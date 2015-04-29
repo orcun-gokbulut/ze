@@ -37,8 +37,6 @@
 #include "ZESoundModule.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESoundSource);
-
 ZESoundSource::ZESoundSource()
 {
 	SoundSourceState = ZE_SSS_NONE;
@@ -301,7 +299,7 @@ float ZESoundSource::GetEndPositionTime() const
 		return 0;
 }
 
-float ZESoundSource::GetEndPositionPersentage() const
+float ZESoundSource::GetEndPositionPercentage() const
 {
 	if (SoundResource != NULL)
 		return ((float)EndPosition / SoundResource->GetSampleCount()) * 100.0f;
@@ -405,9 +403,4 @@ ZESoundResource* ZESoundSource::GetSoundResource() const
 ZESoundSource* ZESoundSource::CreateInstance()
 {
 	return zeSound->CreateSoundSource();
-}
-
-ZEEntityRunAt ZESoundSourceDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

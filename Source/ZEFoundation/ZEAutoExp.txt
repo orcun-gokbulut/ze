@@ -159,7 +159,7 @@ ZEString{
 	)
 }
 
-ZEVariant{
+ZEValue{
     preview
     (
         #if ($e.Type == 0) (

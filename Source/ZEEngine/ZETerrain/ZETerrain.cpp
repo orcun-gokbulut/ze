@@ -60,7 +60,6 @@ ZEDrawFlags ZETerrain::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
-
 void ZETerrain::SetChunkSize(ZEUInt Size)
 {
 	ChunkSize = Size;
@@ -295,8 +294,8 @@ bool ZETerrain::LoadLevelData()
 
 	File.Close();
 
-	DetailNormalTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDetailNormal.jpg")->GetTexture();
-	ColorTexture = ZETexture2DResource::LoadResource("ZESimulationDemo/Terrains/TerrainDiffuse.bmp")->GetTexture();
+	DetailNormalTexture = ZETexture2DResource::LoadResource("#R:/ZESimulationDemo/Terrains/TerrainDetailNormal.jpg")->GetTexture();
+	ColorTexture = ZETexture2DResource::LoadResource("#R:/ZESimulationDemo/Terrains/TerrainDiffuse.bmp")->GetTexture();
 	 
 	return true;
 }
@@ -663,9 +662,4 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 ZETerrain* ZETerrain::CreateInstance()
 {
 	return new ZETerrain();
-}
-
-ZEEntityRunAt ZETerrainDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

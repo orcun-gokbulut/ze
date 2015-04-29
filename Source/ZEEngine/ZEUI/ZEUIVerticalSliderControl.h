@@ -39,8 +39,12 @@
 
 #include "ZEUIControl.h"
 
+ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
+
 class ZEUIVerticalSliderControl : public ZEUIControl
 {
+	ZE_OBJECT
+
 	private:
 
 		ZEUIRectangle	SliderButton;

@@ -43,9 +43,9 @@ struct ZEFileCompilerOptions
 {
 	ZEString	ClassName;
 	ZEString	InputFileName;
-	ZEString	SourceFileName;
-	ZEString	HeaderFileName;
-	bool		Verbose;
+	ZEString	OutputSourceFileName;
+	ZEString	OutputHeaderFileName;
+	bool		Quiet;
 };
 
 #endif

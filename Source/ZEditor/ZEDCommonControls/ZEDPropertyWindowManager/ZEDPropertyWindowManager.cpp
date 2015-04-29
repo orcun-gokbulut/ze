@@ -33,16 +33,18 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDPropertyWindowManager.h"
+#include "ZEDPropertyWidget.h"
+#include "ZEDCommonControls/CSS.h"
+#include "ZEGame/ZEEntity.h"
+
 #include <QtCore/QList>
 #include <QtGui/QFont>
 #include <QtGui/QPalette>
-#include "ZEDPropertyWindowManager.h"
-#include "ZEGame\ZEEntity.h"
-#include "ZEDPropertyWidget.h"
 #include <QtCore/QModelIndex>
 #include <QtGui/QPainter>
 #include <QtGui/QStyleOptionViewItem>
-#include "ZEDCommonControls/CSS.h"
+
 
 ZEDPropertyWindowManagerGroup::ZEDPropertyWindowManagerGroup(QString GroupName, QTreeWidgetItem* Parent)
 {
@@ -63,10 +65,10 @@ ZEDPropertyWindowManagerGroup::~ZEDPropertyWindowManagerGroup()
 	delete Item;
 }
 
-ZEDPropertyWindowManager::ZEDPropertyWindowManager(QWidget *parent, ZEObject* Class, QString WorkingDirectory) : QTreeWidget(parent)
+ZEDPropertyWindowManager::ZEDPropertyWindowManager(QWidget *parent, ZEObject* Object, QString WorkingDirectory) : QTreeWidget(parent)
 {
 	this->WorkingDirectory = WorkingDirectory;
-	this->Class = Class;
+	this->Object = Object;
 	setColumnCount(2);
 	QStringList HorizontalHeader;
 	HorizontalHeader << "Name" << "Value";
@@ -100,33 +102,33 @@ QTreeWidgetItem* ZEDPropertyWindowManager::FindGroup(QString GroupName)
 void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 {
 
-	UpdateCustomPropertyWidgets();
+	//UpdateCustomPropertyWidgets();
 
 	QSize							RowSize;
 	QStringList						GroupNames;
 	QString							CurrentGroupName;
 	QFont							TopLevelFont;
 
-	const ZEPropertyDescription*		Properties;
-	ZESize								PropertyCount;
+	ZEProperty*						Properties;
+	ZESize							PropertyCount;
 
-	ZEObjectDescription* ClassDescription = this->Class->GetDescription();
+	ZEClass* Class = this->Object->GetClass();
 
-	while (ClassDescription != NULL)
+	while (Class != NULL)
 	{
-		PropertyCount = ClassDescription->GetPropertyCount();
+		PropertyCount = Class->GetPropertyCount();
 
 		if(PropertyCount != 0)
-			this->addTopLevelItem(new QTreeWidgetItem(QStringList(QString(ClassDescription->GetName()))));
+			this->addTopLevelItem(new QTreeWidgetItem(QStringList(QString(Class->GetName()))));
 	
-		Properties = ClassDescription->GetProperties();
+		Properties = const_cast<ZEProperty*>(Class->GetProperties());
 
 		for(ZESize I = 0; I < PropertyCount; I++)
 		{
-			ZEPropertyDescription Property = Properties[I];
+			ZEProperty* Property = (Properties + I);
 
-			if (Property.Visibility == false)
-				continue;
+ 			if (Property->Access != ZEMT_PA_READ_WRITE)
+ 				continue;
 
 			QTreeWidgetItem* TopLevelItem;
 
@@ -145,279 +147,86 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 			TopLevelItem->setFont(0,TopLevelFont);
 			TopLevelItem->setForeground(0,QBrush(QColor(255,255,255)));
 
+			ZEType PropertyType = Property->Type;
 
-			bool GroupExists = false;
-
-			for(ZESize I = 0; I < PropertyCount; I++)
+			switch(PropertyType.Type)
 			{
-				GroupExists = false;
-
-				if(Properties[I].GroupName != NULL)
+				case ZE_TT_BOOLEAN:
 				{
-					for(ZEInt J = 0; J < Groups.count(); J++)
-					{
-						if(Groups[J]->GroupName == QString(Properties[I].GroupName))
-							GroupExists = true;
-					}
-
-					if(GroupExists == false)
-					{
-						Groups.append(new ZEDPropertyWindowManagerGroup(QString(Properties[I].GroupName), TopLevelItem));
-					}
+					QTreeWidgetItem* Item = new ZEDBoolComboBox(this, TopLevelItem, Object, Property);
+					TopLevelItem->addChild(Item);
+					((ZEDBoolComboBox*)(Item))->SetType(ZED_PW_TYPE_BOOLCOMBOBOX);
+					PropertyWidgetsList.append(((ZEDBoolComboBox*)(Item)));
+					break;
 				}
-			}
-
-			switch(Property.Type)
-			{
-				case ZE_VRT_BOOLEAN:
-
-					if(Property.GroupName == NULL)
-					{
-						QTreeWidgetItem* Item = new ZEDBoolComboBox(this, TopLevelItem, Class, Property);
-						TopLevelItem->addChild(Item);
-						((ZEDBoolComboBox*)(Item))->SetType(ZED_PW_TYPE_BOOLCOMBOBOX);
-						PropertyWidgetsList.append(((ZEDBoolComboBox*)(Item)));
-					}
-
-					else
-					{
-						QTreeWidgetItem* Item = new ZEDBoolComboBox(this, FindGroup(QString(Property.GroupName)), Class, Property);
-						FindGroup(QString(Property.GroupName))->addChild(Item);
-						((ZEDBoolComboBox*)(Item))->SetType(ZED_PW_TYPE_BOOLCOMBOBOX);
-						PropertyWidgetsList.append(((ZEDBoolComboBox*)(Item)));
-					}
-
+				case ZE_TT_FLOAT:
+				{
+					QTreeWidgetItem* Item = new ZEDSpinBox1Float(this, TopLevelItem, Object, Property);
+					TopLevelItem->addChild(Item);
+					((ZEDSpinBox1Float*)(Item))->SetType(ZED_PW_TYPE_SPINBOXFLOAT);
+					PropertyWidgetsList.append(((ZEDSpinBox1Float*)(Item)));
 					break;
-
-				case ZE_VRT_FLOAT:
-
-					if(Property.GroupName == NULL)
-					{
-						QTreeWidgetItem* Item = new ZEDSpinBox1Float(this, TopLevelItem, Class, Property);
-						TopLevelItem->addChild(Item);
-						((ZEDSpinBox1Float*)(Item))->SetType(ZED_PW_TYPE_SPINBOXFLOAT);
-						PropertyWidgetsList.append(((ZEDSpinBox1Float*)(Item)));
-					}
-
-					else
-					{
-						QTreeWidgetItem* Item = new ZEDSpinBox1Float(this, FindGroup(QString(Property.GroupName)), Class, Property);
-						FindGroup(QString(Property.GroupName))->addChild(Item);
-						((ZEDSpinBox1Float*)(Item))->SetType(ZED_PW_TYPE_SPINBOXFLOAT);
-						PropertyWidgetsList.append(((ZEDSpinBox1Float*)(Item)));
-					}
-
+				}
+				case ZE_TT_INTEGER_32:
+				{
+					QTreeWidgetItem* Item = new ZEDSpinBox1Integer(this, TopLevelItem, Object, Property); 
+					TopLevelItem->addChild(Item);
+					((ZEDSpinBox1Integer*)(Item))->SetType(ZED_PW_TYPE_SPINBOXINT);
+					PropertyWidgetsList.append(((ZEDSpinBox1Integer*)(Item)));
 					break;
-
-				case ZE_VRT_INTEGER_32:
-
-					if(Property.Enumurators != NULL)
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDEnumComboBox(this, TopLevelItem, Class, Property);
-							TopLevelItem->addChild(Item);
-							((ZEDEnumComboBox*)(Item))->SetType(ZED_PW_TYPE_ENUMCOMBOBOX);
-							PropertyWidgetsList.append(((ZEDEnumComboBox*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDEnumComboBox(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDEnumComboBox*)(Item))->SetType(ZED_PW_TYPE_ENUMCOMBOBOX);
-							PropertyWidgetsList.append(((ZEDEnumComboBox*)(Item)));
-						}
-					}
-					
-					else
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDSpinBox1Integer(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDSpinBox1Integer*)(Item))->SetType(ZED_PW_TYPE_SPINBOXINT);
-							PropertyWidgetsList.append(((ZEDSpinBox1Integer*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDSpinBox1Integer(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDSpinBox1Integer*)(Item))->SetType(ZED_PW_TYPE_SPINBOXINT);
-							PropertyWidgetsList.append(((ZEDSpinBox1Integer*)(Item)));
-						}
-					}
-
+				}
+				case ZE_TT_VECTOR2:
+				{
+					QTreeWidgetItem* Item = new ZEDSpinBox2(this, TopLevelItem, Object, Property); 
+					TopLevelItem->addChild(Item);
+					((ZEDSpinBox2*)(Item))->SetType(ZED_PW_TYPE_SPINBOX2);
+					PropertyWidgetsList.append(((ZEDSpinBox2*)(Item)));
 					break;
-
-				case ZE_VRT_VECTOR2:
-
-					if(Property.GroupName == NULL)
-					{
-						QTreeWidgetItem* Item = new ZEDSpinBox2(this, TopLevelItem, Class, Property); 
-						TopLevelItem->addChild(Item);
-						((ZEDSpinBox2*)(Item))->SetType(ZED_PW_TYPE_SPINBOX2);
-						PropertyWidgetsList.append(((ZEDSpinBox2*)(Item)));
-					}
-
-					else
-					{
-						QTreeWidgetItem* Item = new ZEDSpinBox2(this, FindGroup(QString(Property.GroupName)), Class, Property);
-						FindGroup(QString(Property.GroupName))->addChild(Item);
-						((ZEDSpinBox2*)(Item))->SetType(ZED_PW_TYPE_SPINBOX2);
-						PropertyWidgetsList.append(((ZEDSpinBox2*)(Item)));
-					}
-
-					break;
-
+				}
 				case ZE_VRT_VECTOR3:
-
-					if(Property.Semantic == ZE_PS_COLOR)
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDColorPickerRGB(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDColorPickerRGB*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGB);
-							PropertyWidgetsList.append(((ZEDColorPickerRGB*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDColorPickerRGB(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDColorPickerRGB*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGB);
-							PropertyWidgetsList.append(((ZEDColorPickerRGB*)(Item)));
-						}
-					}
-
-					else
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDSpinBox3(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDSpinBox3*)(Item))->SetType(ZED_PW_TYPE_SPINBOX3);
-							PropertyWidgetsList.append(((ZEDSpinBox3*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDSpinBox3(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDSpinBox3*)(Item))->SetType(ZED_PW_TYPE_SPINBOX3);
-							PropertyWidgetsList.append(((ZEDSpinBox3*)(Item)));
-						}
-					}
-
+				{
+					QTreeWidgetItem* Item = new ZEDSpinBox3(this, TopLevelItem, Object, Property); 
+					TopLevelItem->addChild(Item);
+					((ZEDSpinBox3*)(Item))->SetType(ZED_PW_TYPE_SPINBOX3);
+					PropertyWidgetsList.append(((ZEDSpinBox3*)(Item)));
 					break;
-
+				}
 				case ZE_VRT_VECTOR4:
-
-					if(Property.Semantic == ZE_PS_COLOR)
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDColorPickerRGBA(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDColorPickerRGBA*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGBA);
-							PropertyWidgetsList.append(((ZEDColorPickerRGBA*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDColorPickerRGBA(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDColorPickerRGBA*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGBA);
-							PropertyWidgetsList.append(((ZEDColorPickerRGBA*)(Item)));
-						}
-					}
-
-					else
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDSpinBox4(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDSpinBox4*)(Item))->SetType(ZED_PW_TYPE_SPINBOX4);
-							PropertyWidgetsList.append(((ZEDSpinBox4*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDSpinBox4(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDSpinBox4*)(Item))->SetType(ZED_PW_TYPE_SPINBOX4);
-							PropertyWidgetsList.append(((ZEDSpinBox4*)(Item)));
-						}
-					}
-
+				{
+					QTreeWidgetItem* Item = new ZEDSpinBox4(this, TopLevelItem, Object, Property); 
+					TopLevelItem->addChild(Item);
+					((ZEDSpinBox4*)(Item))->SetType(ZED_PW_TYPE_SPINBOX4);
+					PropertyWidgetsList.append(((ZEDSpinBox4*)(Item)));
 					break;
-
+				}
 				case ZE_VRT_QUATERNION://////////////////////////////////Need Revision
-
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDRotationSpinBox3(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDRotationSpinBox3*)(Item))->SetType(ZED_PW_TYPE_ROTATIONSPINBOX3);
-							PropertyWidgetsList.append(((ZEDRotationSpinBox3*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDRotationSpinBox3(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDRotationSpinBox3*)(Item))->SetType(ZED_PW_TYPE_ROTATIONSPINBOX3);
-							PropertyWidgetsList.append(((ZEDRotationSpinBox3*)(Item)));
-						}
-
+				{
+					QTreeWidgetItem* Item = new ZEDRotationSpinBox3(this, TopLevelItem, Object, Property); 
+					TopLevelItem->addChild(Item);
+					((ZEDRotationSpinBox3*)(Item))->SetType(ZED_PW_TYPE_ROTATIONSPINBOX3);
+					PropertyWidgetsList.append(((ZEDRotationSpinBox3*)(Item)));
 					break;
-
+				}
 				case ZE_VRT_STRING:
-
-					if(Property.Semantic == ZE_PS_FILENAME)
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDFileBrowser(this, TopLevelItem, Class, Property, WorkingDirectory); 
-							TopLevelItem->addChild(Item);
-							((ZEDFileBrowser*)(Item))->SetType(ZED_PW_TYPE_FILEBROWSER);
-							PropertyWidgetsList.append(((ZEDFileBrowser*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDFileBrowser(this, FindGroup(QString(Property.GroupName)), Class, Property, WorkingDirectory);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDFileBrowser*)(Item))->SetType(ZED_PW_TYPE_FILEBROWSER);
-							PropertyWidgetsList.append(((ZEDFileBrowser*)(Item)));
-						}
-					}
-					else
-					{
-						if(Property.GroupName == NULL)
-						{
-							QTreeWidgetItem* Item = new ZEDLineEdit(this, TopLevelItem, Class, Property); 
-							TopLevelItem->addChild(Item);
-							((ZEDLineEdit*)(Item))->SetType(ZED_PW_TYPE_LINEEDIT);
-							PropertyWidgetsList.append(((ZEDLineEdit*)(Item)));
-						}
-
-						else
-						{
-							QTreeWidgetItem* Item = new ZEDLineEdit(this, FindGroup(QString(Property.GroupName)), Class, Property);
-							FindGroup(QString(Property.GroupName))->addChild(Item);
-							((ZEDLineEdit*)(Item))->SetType(ZED_PW_TYPE_LINEEDIT);
-							PropertyWidgetsList.append(((ZEDLineEdit*)(Item)));
-						}
-					}
-
+				{
+					QTreeWidgetItem* Item = new ZEDLineEdit(this, TopLevelItem, Object, Property); 
+					TopLevelItem->addChild(Item);
+					((ZEDLineEdit*)(Item))->SetType(ZED_PW_TYPE_LINEEDIT);
+					PropertyWidgetsList.append(((ZEDLineEdit*)(Item)));
 					break;
+				}
+				case ZE_TT_ENUMERATOR:
+				{
+					QTreeWidgetItem* Item = new ZEDEnumComboBox(this, TopLevelItem, Object, Property);
+					TopLevelItem->addChild(Item);
+					((ZEDEnumComboBox*)(Item))->SetType(ZED_PW_TYPE_ENUMCOMBOBOX);
+					PropertyWidgetsList.append(((ZEDEnumComboBox*)(Item)));
+					break;
+					}
 			}			
 		}
-		ClassDescription = ClassDescription->GetParent();
+
+		Class = Class->GetParentClass();
 	}
 
 	for (ZEInt I = 0; I < model()->rowCount(); I++)
@@ -426,165 +235,165 @@ void ZEDPropertyWindowManager::UpdatePropertyWidgets()
 	}
 }
 
-void ZEDPropertyWindowManager::UpdateCustomPropertyWidgets()
-{
-	QTreeWidgetItem* TopLevelItem;
-
-	if(Class->GetCustomProperties()->GetCount() > 0)
-	{
-		QSize							RowSize;
-		QFont							TopLevelFont;
-
-		TopLevelItem = new QTreeWidgetItem(QStringList(QString("Instance")));
-
-		RowSize = TopLevelItem->sizeHint(0);
-		TopLevelItem->setSizeHint(0, QSize(RowSize.width(),24));
-		TopLevelItem->sizeHint(1);
-		TopLevelItem->setSizeHint(1, QSize(RowSize.width(),24));
-		TopLevelItem->setFlags(0);
-		TopLevelItem->setBackgroundColor(0,QColor(150,150,150));
-		TopLevelItem->setBackgroundColor(1,QColor(150,150,150));
-		TopLevelFont = TopLevelItem->font(0);
-		TopLevelFont.setBold(true);
-		TopLevelItem->setFont(0,TopLevelFont);
-		TopLevelItem->setForeground(0,QBrush(QColor(255,255,255)));
-		this->addTopLevelItem(TopLevelItem);
-		TopLevelItem->setExpanded(true);
-	}
-
-	ZERunTimeProperty RuntimeProperty;
-
-	for (ZESize I = 0; I < Class->GetCustomProperties()->GetCount(); I++)
-	{
-		RuntimeProperty = Class->GetCustomProperties()->GetItem(I);
-		ZEPropertyDescription Property;
-
-		memset(&Property, 0, sizeof(ZEPropertyDescription));
-
-		Property.Name = RuntimeProperty.Name;
-		Property.Semantic = RuntimeProperty.Semantic;
-		Property.Type = RuntimeProperty.Type;
-		Property.Description = "";
-
-		switch(Property.Type)
-		{
-			case ZE_VRT_BOOLEAN:
-				{
-					QTreeWidgetItem* Item = new ZEDBoolComboBox(this, TopLevelItem, Class, Property);
-					TopLevelItem->addChild(Item);
-					((ZEDBoolComboBox*)(Item))->SetType(ZED_PW_TYPE_BOOLCOMBOBOX);
-					PropertyWidgetsList.append(((ZEDBoolComboBox*)(Item)));
-				}
-				break;
-
-			case ZE_VRT_FLOAT:
-				{
-					QTreeWidgetItem* Item = new ZEDSpinBox1Float(this, TopLevelItem, Class, Property);
-					TopLevelItem->addChild(Item);
-					((ZEDSpinBox1Float*)(Item))->SetType(ZED_PW_TYPE_SPINBOXFLOAT);
-					PropertyWidgetsList.append(((ZEDSpinBox1Float*)(Item)));
-				}
-				break;
-
-			case ZE_VRT_INTEGER_32:
-
-				if(Property.Enumurators != NULL)
-				{
-					QTreeWidgetItem* Item = new ZEDEnumComboBox(this, TopLevelItem, Class, Property);
-					TopLevelItem->addChild(Item);
-					((ZEDEnumComboBox*)(Item))->SetType(ZED_PW_TYPE_ENUMCOMBOBOX);
-					PropertyWidgetsList.append(((ZEDEnumComboBox*)(Item)));
-				}
-
-				else
-				{
-					QTreeWidgetItem* Item = new ZEDSpinBox1Integer(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDSpinBox1Integer*)(Item))->SetType(ZED_PW_TYPE_SPINBOXINT);
-					PropertyWidgetsList.append(((ZEDSpinBox1Integer*)(Item)));
-				}
-
-				break;
-
-			case ZE_VRT_VECTOR2:
-				{
-					QTreeWidgetItem* Item = new ZEDSpinBox2(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDSpinBox2*)(Item))->SetType(ZED_PW_TYPE_SPINBOX2);
-					PropertyWidgetsList.append(((ZEDSpinBox2*)(Item)));
-				}
-				break;
-
-			case ZE_VRT_VECTOR3:
-
-				if(Property.Semantic == ZE_PS_COLOR)
-				{
-					QTreeWidgetItem* Item = new ZEDColorPickerRGB(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDColorPickerRGB*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGB);
-					PropertyWidgetsList.append(((ZEDColorPickerRGB*)(Item)));
-				}
-
-				else
-				{
-					QTreeWidgetItem* Item = new ZEDSpinBox3(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDSpinBox3*)(Item))->SetType(ZED_PW_TYPE_SPINBOX3);
-					PropertyWidgetsList.append(((ZEDSpinBox3*)(Item)));
-				}
-
-				break;
-
-			case ZE_VRT_VECTOR4:
-
-				if(Property.Semantic == ZE_PS_COLOR)
-				{
-					QTreeWidgetItem* Item = new ZEDColorPickerRGBA(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDColorPickerRGBA*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGBA);
-					PropertyWidgetsList.append(((ZEDColorPickerRGBA*)(Item)));
-				}
-
-				else
-				{
-					QTreeWidgetItem* Item = new ZEDSpinBox4(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDSpinBox4*)(Item))->SetType(ZED_PW_TYPE_SPINBOX4);
-					PropertyWidgetsList.append(((ZEDSpinBox4*)(Item)));
-				}
-
-				break;
-
-			case ZE_VRT_QUATERNION://////////////////////////////////Need Revision
-				{
-					QTreeWidgetItem* Item = new ZEDRotationSpinBox3(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDRotationSpinBox3*)(Item))->SetType(ZED_PW_TYPE_ROTATIONSPINBOX3);
-					PropertyWidgetsList.append(((ZEDRotationSpinBox3*)(Item)));
-				}
-				break;
-
-			case ZE_VRT_STRING:
-
-				if(Property.Semantic == ZE_PS_FILENAME)
-				{
-					QTreeWidgetItem* Item = new ZEDFileBrowser(this, TopLevelItem, Class, Property, WorkingDirectory); 
-					TopLevelItem->addChild(Item);
-					((ZEDFileBrowser*)(Item))->SetType(ZED_PW_TYPE_FILEBROWSER);
-					PropertyWidgetsList.append(((ZEDFileBrowser*)(Item)));
-				}
-				else
-				{
-					QTreeWidgetItem* Item = new ZEDLineEdit(this, TopLevelItem, Class, Property); 
-					TopLevelItem->addChild(Item);
-					((ZEDLineEdit*)(Item))->SetType(ZED_PW_TYPE_LINEEDIT);
-					PropertyWidgetsList.append(((ZEDLineEdit*)(Item)));
-				}
-
-				break;
-			}
-		}
-}
+// void ZEDPropertyWindowManager::UpdateCustomPropertyWidgets()
+// {
+// 	QTreeWidgetItem* TopLevelItem;
+// 
+// 	if(Class->GetCustomProperties()->GetCount() > 0)
+// 	{
+// 		QSize							RowSize;
+// 		QFont							TopLevelFont;
+// 
+// 		TopLevelItem = new QTreeWidgetItem(QStringList(QString("Instance")));
+// 
+// 		RowSize = TopLevelItem->sizeHint(0);
+// 		TopLevelItem->setSizeHint(0, QSize(RowSize.width(),24));
+// 		TopLevelItem->sizeHint(1);
+// 		TopLevelItem->setSizeHint(1, QSize(RowSize.width(),24));
+// 		TopLevelItem->setFlags(0);
+// 		TopLevelItem->setBackgroundColor(0,QColor(150,150,150));
+// 		TopLevelItem->setBackgroundColor(1,QColor(150,150,150));
+// 		TopLevelFont = TopLevelItem->font(0);
+// 		TopLevelFont.setBold(true);
+// 		TopLevelItem->setFont(0,TopLevelFont);
+// 		TopLevelItem->setForeground(0,QBrush(QColor(255,255,255)));
+// 		this->addTopLevelItem(TopLevelItem);
+// 		TopLevelItem->setExpanded(true);
+// 	}
+// 
+// 	ZERunTimeProperty RuntimeProperty;
+// 
+// 	for (ZESize I = 0; I < Class->GetCustomProperties()->GetCount(); I++)
+// 	{
+// 		RuntimeProperty = Class->GetCustomProperties()->GetItem(I);
+// 		ZEPropertyDescription Property;
+// 
+// 		memset(&Property, 0, sizeof(ZEPropertyDescription));
+// 
+// 		Property.Name = RuntimeProperty.Name;
+// 		Property.Semantic = RuntimeProperty.Semantic;
+// 		Property.Type = RuntimeProperty.Type;
+// 		Property.Description = "";
+// 
+// 		switch(Property.Type)
+// 		{
+// 			case ZE_VRT_BOOLEAN:
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDBoolComboBox(this, TopLevelItem, Class, Property);
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDBoolComboBox*)(Item))->SetType(ZED_PW_TYPE_BOOLCOMBOBOX);
+// 					PropertyWidgetsList.append(((ZEDBoolComboBox*)(Item)));
+// 				}
+// 				break;
+// 
+// 			case ZE_VRT_FLOAT:
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDSpinBox1Float(this, TopLevelItem, Class, Property);
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDSpinBox1Float*)(Item))->SetType(ZED_PW_TYPE_SPINBOXFLOAT);
+// 					PropertyWidgetsList.append(((ZEDSpinBox1Float*)(Item)));
+// 				}
+// 				break;
+// 
+// 			case ZE_VRT_INTEGER_32:
+// 
+// 				if(Property.Enumurators != NULL)
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDEnumComboBox(this, TopLevelItem, Class, Property);
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDEnumComboBox*)(Item))->SetType(ZED_PW_TYPE_ENUMCOMBOBOX);
+// 					PropertyWidgetsList.append(((ZEDEnumComboBox*)(Item)));
+// 				}
+// 
+// 				else
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDSpinBox1Integer(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDSpinBox1Integer*)(Item))->SetType(ZED_PW_TYPE_SPINBOXINT);
+// 					PropertyWidgetsList.append(((ZEDSpinBox1Integer*)(Item)));
+// 				}
+// 
+// 				break;
+// 
+// 			case ZE_VRT_VECTOR2:
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDSpinBox2(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDSpinBox2*)(Item))->SetType(ZED_PW_TYPE_SPINBOX2);
+// 					PropertyWidgetsList.append(((ZEDSpinBox2*)(Item)));
+// 				}
+// 				break;
+// 
+// 			case ZE_VRT_VECTOR3:
+// 
+// 				if(Property.Semantic == ZE_PS_COLOR)
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDColorPickerRGB(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDColorPickerRGB*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGB);
+// 					PropertyWidgetsList.append(((ZEDColorPickerRGB*)(Item)));
+// 				}
+// 
+// 				else
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDSpinBox3(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDSpinBox3*)(Item))->SetType(ZED_PW_TYPE_SPINBOX3);
+// 					PropertyWidgetsList.append(((ZEDSpinBox3*)(Item)));
+// 				}
+// 
+// 				break;
+// 
+// 			case ZE_VRT_VECTOR4:
+// 
+// 				if(Property.Semantic == ZE_PS_COLOR)
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDColorPickerRGBA(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDColorPickerRGBA*)(Item))->SetType(ZED_PW_TYPE_COLORPICKERRGBA);
+// 					PropertyWidgetsList.append(((ZEDColorPickerRGBA*)(Item)));
+// 				}
+// 
+// 				else
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDSpinBox4(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDSpinBox4*)(Item))->SetType(ZED_PW_TYPE_SPINBOX4);
+// 					PropertyWidgetsList.append(((ZEDSpinBox4*)(Item)));
+// 				}
+// 
+// 				break;
+// 
+// 			case ZE_VRT_QUATERNION://////////////////////////////////Need Revision
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDRotationSpinBox3(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDRotationSpinBox3*)(Item))->SetType(ZED_PW_TYPE_ROTATIONSPINBOX3);
+// 					PropertyWidgetsList.append(((ZEDRotationSpinBox3*)(Item)));
+// 				}
+// 				break;
+// 
+// 			case ZE_VRT_STRING:
+// 
+// 				if(Property.Semantic == ZE_PS_FILENAME)
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDFileBrowser(this, TopLevelItem, Class, Property, WorkingDirectory); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDFileBrowser*)(Item))->SetType(ZED_PW_TYPE_FILEBROWSER);
+// 					PropertyWidgetsList.append(((ZEDFileBrowser*)(Item)));
+// 				}
+// 				else
+// 				{
+// 					QTreeWidgetItem* Item = new ZEDLineEdit(this, TopLevelItem, Class, Property); 
+// 					TopLevelItem->addChild(Item);
+// 					((ZEDLineEdit*)(Item))->SetType(ZED_PW_TYPE_LINEEDIT);
+// 					PropertyWidgetsList.append(((ZEDLineEdit*)(Item)));
+// 				}
+// 
+// 				break;
+// 			}
+// 		}
+// }
 
 void ZEDPropertyWindowManager::UpdatePropertyWidgetValues()
 {
@@ -599,15 +408,15 @@ void ZEDPropertyWindowManager::EmitPropertyChange()
 	emit PropertyChangedSignal();
 }
 
-void ZEDPropertyWindowManager::DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property)
-{
-	#pragma message (".:IMPLEMENT:. ZEDPropertyWindowManager::DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property)")
-}
-
-void ZEDPropertyWindowManager::UpdateCurveEditor()
-{
-	#pragma message (".:IMPLEMENT:.	ZEDPropertyWindowManager::UpdateCurveEditor()")
-}
+// void ZEDPropertyWindowManager::DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property)
+// {
+// 	#pragma message (".:IMPLEMENT:. ZEDPropertyWindowManager::DisplayCurveEditor(ZEObject* Class, ZEPropertyDescription Property)")
+// }
+// 
+// void ZEDPropertyWindowManager::UpdateCurveEditor()
+// {
+// 	#pragma message (".:IMPLEMENT:.	ZEDPropertyWindowManager::UpdateCurveEditor()")
+// }
 
 void ZEDPropertyWindowManager::drawRow(QPainter* Painter, const QStyleOptionViewItem &Option, const QModelIndex &Index) const
 {

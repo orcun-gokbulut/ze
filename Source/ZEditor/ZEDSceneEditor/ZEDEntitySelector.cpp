@@ -40,7 +40,7 @@
 #include "ZEGame\ZEScene.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZECore\ZECore.h"
-#include <ZEGame\ZEEntityProvider.h>
+#include "ZEMeta\ZEProvider.h"
 
 void ZEDEntitySelectorButton::mouseReleaseEvent(QMouseEvent* Event)
 {
@@ -183,7 +183,7 @@ void ZEDEntitySelector::GenerateList()
 
 			Id = CurrentEntity->GetEntityId();
 			Name = CurrentEntity->GetName();
-			Type = CurrentEntity->GetDescription()->GetName();
+			Type = CurrentEntity->GetClass()->GetName();
 			CurrentItem = new ZEDEntitySelectorItem();
 			((ZEDEntitySelectorItem*)CurrentItem)->Entity = CurrentEntity;
 
@@ -195,9 +195,9 @@ void ZEDEntitySelector::GenerateList()
 
 	this->FilterComboBox->addItem(QString("All"));
 
-	for(ZESize I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
+	for(ZESize I = 0; I < ZEProvider::GetInstance()->GetClasses().GetCount(); I++)
 	{
-		this->FilterComboBox->addItem(QString(ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName()));
+		this->FilterComboBox->addItem(QString(ZEProvider::GetInstance()->GetClasses().GetItem(I)->GetName()));
 	}
 }
 

@@ -46,6 +46,7 @@
 #include "ZEInterior/ZEInterior.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEMath/ZEMath.h"
 
 void ZEInteriorRoom::DebugDraw(ZERenderer* Renderer)
 {

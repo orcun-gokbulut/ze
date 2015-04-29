@@ -36,6 +36,7 @@
 #include "ZEDSSoundSource.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
+#include "ZEMath/ZEMath.h"
 
 bool ZEDSSoundSource::CreateBuffer(bool Is3D)
 {
@@ -207,7 +208,7 @@ ZEDSSoundSource::ZEDSSoundSource()
 
 ZEDSSoundSource::~ZEDSSoundSource()
 {
-	GetModule()->SoundSources.DeleteValue(this);
+	GetModule()->SoundSources.RemoveValue(this);
 	if (DSBuffer != NULL)
 		DSBuffer->Release();
 }

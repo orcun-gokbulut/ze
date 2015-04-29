@@ -59,7 +59,7 @@ class ZEArrayIterator
 	public:
 		inline bool IsEnd() const
 		{
-			return (ZESSize)Index >= (ZESSize)Array->GetCount() - 1;
+			return (ZESSize)Index >= (ZESSize)Array->GetCount();
 		} 
 
 		inline ZEType* GetItem()
@@ -77,11 +77,11 @@ class ZEArrayIterator
 		}
 
 		inline ZEType* MoveNext()
-		{
-			if ((ZESSize)Index >= (ZESSize)Array->GetCount() - 1)
-				return NULL;
-
+		{	
 			Index++;
+			if ((ZESSize)Index >= (ZESSize)Array->GetCount())
+				return NULL;
+			
 			return &Array->GetItem(Index);
 		}
 

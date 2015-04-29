@@ -41,13 +41,13 @@
 
 class ZEOptionSection;
 class ZEOption;
-class ZETypedVariant;
+class ZETypedValue;
 
 class ZEErrorManager
 {
 	friend class					ZECore;
 	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedVariant* Value);
+		bool						OptionCallback_General(ZEOption* Option, ZETypedValue* Value);
 		static void					ErrorCallback(ZEErrorType ErrorType);
 
 									ZEErrorManager();

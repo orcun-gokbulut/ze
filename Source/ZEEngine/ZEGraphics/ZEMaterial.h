@@ -83,11 +83,10 @@ enum ZEMaterialOpacityComponent
 class ZEFrameRenderer;
 class ZERenderCommand;
 
-ZE_META_OBJECT_DESCRIPTION(ZEMaterial)
-
 class ZEMaterial : public ZEObject
 {
-	ZE_META_OBJECT(ZEMaterial) 
+	ZE_OBJECT
+
 	protected:
 		bool							ShadowCaster;
 		bool							ShadowReceiver;
@@ -123,17 +122,4 @@ class ZEMaterial : public ZEObject
 		virtual void					Destroy();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEMaterial" noinstance="true" description="Base class of materials.">
-			<property name="LightningEnabled" groupname="Shading" type="boolean" autogetset="yes"/>
-			<property name="ShadowReceiver" groupname="Shadows" type="boolean" autogetset="yes"/>
-			<property name="ShadowCaster" groupname="Shadows" type="boolean" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

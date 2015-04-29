@@ -41,6 +41,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
 #include "ZEMath/ZETriangle.h"
+#include "ZEMath/ZEMath.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
@@ -379,7 +380,7 @@ void ZEModelMesh::AddChild(ZEModelMesh* Mesh)
 void ZEModelMesh::RemoveChild(ZEModelMesh* Mesh)
 {
 	Mesh->ParentMesh = NULL;
-	ChildMeshes.DeleteValue(Mesh);
+	ChildMeshes.RemoveValue(Mesh);
 }
 
 void ZEModelMesh::SetPhysicsEnabled(bool Enabled)
@@ -692,7 +693,7 @@ ZEModelMesh::ZEModelMesh()
 	ActiveLOD = 0;
 	AnimationType = ZE_MAT_NOANIMATION;
 	DrawOrderIsUserDefined = false;
-	UserDefinedDrawOrder = 0.0f;
+	UserDefinedDrawOrder = 0;
 }
 
 ZEModelMesh::~ZEModelMesh()

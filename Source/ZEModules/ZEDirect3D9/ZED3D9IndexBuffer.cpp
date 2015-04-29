@@ -119,7 +119,7 @@ void ZED3D9StaticIndexBuffer::Release()
 
 void ZED3D9StaticIndexBuffer::Destroy()
 {
-	GetModule()->IndexBuffers.DeleteValue((ZED3D9StaticIndexBuffer*)this);
+	GetModule()->IndexBuffers.RemoveValue((ZED3D9StaticIndexBuffer*)this);
 
 	delete this;
 }

@@ -37,44 +37,22 @@
 #ifndef __ZE_DIRECTORY_INFO_H__
 #define __ZE_DIRECTORY_INFO_H__
 
-#include "ZETypes.h"
-#include "ZEPathManager.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEFileUtils.h"
+#include "ZEPathInfo.h"
 
-
-struct ZEFileTime;
-class ZEFileInfo;
-
-class ZEDirectoryInfo
+class ZEDirectoryInfo : public ZEPathInfo
 {
-	private:
-		ZEKnownPath					Root;
-		ZEString					Name;
-		ZEString					Path;
-		ZEFileTime					Creation;
-		ZEFileTime					Modification;
-
 	public:
-									ZEDirectoryInfo();
-									ZEDirectoryInfo(const ZEString& DirectoryPath);
-									~ZEDirectoryInfo();
+		ZEArray<ZEString>		GetSubDirectories();
+		ZEArray<ZEString>		GetFiles();
 
-		void						SetPath(const ZEString& DirectoryPath);
-		const ZEString&				GetPath() const;
-
-		const ZEString&				GetName() const;
-		bool						GetCreationDate(ZEFileTime& Time);
-		bool						GetModificationDate(ZEFileTime& Time);
-
-		ZEArray<ZEFileInfo*>*		GetFileList();
-		ZEArray<ZEDirectoryInfo*>*	GetDirectoryList();
-
-		static bool					IsDirectory(const ZEString& DirectoryPath);
-		static ZEString				GetDirectoryName(const ZEString& DirectoryPath);
-		static ZEString				GetParentDirectory(const ZEString& DirectoryPath);
+		bool					Rename(const char* Name);
+		bool					Move(const char* Destination);
+		bool					Copy(const char* Destination);
+		bool					Delete();
+		
+								ZEDirectoryInfo();
+								ZEDirectoryInfo(const char* Path);
+								ZEDirectoryInfo(const char* ParentPath, const char* RelativePath);
 };
-
 
 #endif

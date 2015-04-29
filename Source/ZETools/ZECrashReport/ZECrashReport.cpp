@@ -53,7 +53,7 @@ bool ZECrashReport::RegisterProvider(ZECrashReportProvider* Provider)
 
 void ZECrashReport::UnregisterProvider(ZECrashReportProvider* Provider)
 {
-	Providers.DeleteValue(Provider);
+	Providers.RemoveValue(Provider);
 	delete Provider;
 }
 

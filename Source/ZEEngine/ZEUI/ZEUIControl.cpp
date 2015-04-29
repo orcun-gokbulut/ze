@@ -193,7 +193,7 @@ void ZEUIControl::AddChildControl(ZEUIControl* Control)
 
 void ZEUIControl::RemoveChildControl(ZEUIControl* Control)
 {
-	ChildControls.DeleteValue(Control);
+	ChildControls.RemoveValue(Control);
 	Control->SetParent(NULL);
 }
 

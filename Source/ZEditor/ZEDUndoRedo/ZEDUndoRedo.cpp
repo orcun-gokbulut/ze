@@ -81,7 +81,7 @@ void ZEDUndoRedoManagerOld::RegisterOperation(ZEDUndoRedoOperation* Operation)
 
 	else
 	{
-		UndoRedoStack.DeleteAt(0);
+		UndoRedoStack.Remove(0);
 		UndoRedoStack.Add(Operation);
 		//CurrentIndex = CurrentIndex;
 	}

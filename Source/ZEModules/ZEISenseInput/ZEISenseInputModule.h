@@ -45,6 +45,7 @@ class ZEInputDevice;
 class ZEISenseInputModule : public ZEInputDeviceModule
 {
 	ZE_EXTENSION(ZEISenseInputModule)
+
 	friend class ZEISenseInputDevice;
 	private:
 		bool						InitializeSelf();

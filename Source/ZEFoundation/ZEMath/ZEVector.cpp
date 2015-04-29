@@ -36,7 +36,6 @@
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEMath.h"
-#include "ZEMath.h"
 #include "ZEAngle.h"
 
 #define		ZE_VECTOR4_ELEMENT_COUNT	(ZESize)4
@@ -50,28 +49,28 @@ const ZEVector2 ZEVector2::UnitY = ZEVector2(0.0f, 1.0f);
 const ZEVector2 ZEVector2::MinValue	= ZEVector2(ZE_FLOAT_MIN, ZE_FLOAT_MIN);
 const ZEVector2 ZEVector2::MaxValue	= ZEVector2(ZE_FLOAT_MAX, ZE_FLOAT_MAX);
 
-inline void ZEVector2::Create(float x, float y)
+inline void ZEVector2::Create(ZEVector2& Out, float x, float y)
 {
-	this->x = x;
-	this->y = y;
+	Out.x = x;
+	Out.y = y;
 }
 
-inline void ZEVector2::Create(const ZEVector2 &Start, const ZEVector2 &End)
+inline void ZEVector2::Create(ZEVector2& Out, const ZEVector2 &Start, const ZEVector2 &End)
 {
-	this->x = End.x - Start.x;
-	this->y = End.y - Start.y;
+	Out.x = End.x - Start.x;
+	Out.y = End.y - Start.y;
 }
 
-void ZEVector2::CreateFromPolar(float Radius, float Theta)
+void ZEVector2::CreateFromPolar(ZEVector2& Out, float Radius, float Theta)
 {
-	x = Radius * ZEAngle::Cos(Theta);
-	y = Radius * ZEAngle::Sin(Theta);
+	Out.x = Radius * ZEAngle::Cos(Theta);
+	Out.y = Radius * ZEAngle::Sin(Theta);
 }
 
-void ZEVector2::ConvertToPolar(float& Radius, float& Theta)
+void ZEVector2::ConvertToPolar(ZEVector2& In, float& Radius, float& Theta)
 {
-	Radius = ZEMath::Sqrt(x * x + y * y);
-	Theta = ZEAngle::ArcTan2(y, x);
+	Radius = ZEMath::Sqrt(In.x * In.x + In.y * In.y);
+	Theta = ZEAngle::ArcTan2(In.y, In.x);
 }
 
 void ZEVector2::Add(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
@@ -338,12 +337,12 @@ float& ZEVector2::operator[](ZESize Index)
 
 ZEVector2::ZEVector2(float x, float y)
 {
-	Create(x, y);
+	Create(*this, x, y);
 }
 
 ZEVector2::ZEVector2(const ZEVector2& Start, const ZEVector2& End)
 {
-	Create(Start, End);
+	Create(*this, Start, End);
 }
 
 ZEVector2::ZEVector2()
@@ -790,7 +789,6 @@ ZEVector3 operator*(float S, const ZEVector3& RightOperand)
 	return RightOperand * S;
 }
 
-
 // ZEVector4
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ZEVector4 ZEVector4::Zero	= ZEVector4(0.0f, 0.0f, 0.0f, 0.0f);
@@ -807,20 +805,20 @@ const ZEVector4 ZEVector4::HomogenousUnitZ = ZEVector4(0.0f, 0.0f, 1.0f, 1.0f);
 const ZEVector4 ZEVector4::MinValue	= ZEVector4(ZE_FLOAT_MIN, ZE_FLOAT_MIN, ZE_FLOAT_MIN, ZE_FLOAT_MIN);
 const ZEVector4 ZEVector4::MaxValue	= ZEVector4(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX);
 
-inline void ZEVector4::Create(float x, float y, float z, float w)
+inline void ZEVector4::Create(ZEVector4& Out, float x, float y, float z, float w)
 {
-	this->x = x;
-	this->y = y;
-	this->z = z;
-	this->w = w;
+	Out.x = x;
+	Out.y = y;
+	Out.z = z;
+	Out.w = w;
 }
 
-inline void ZEVector4::Create(const ZEVector4 &Start, const ZEVector4 &End)
+inline void ZEVector4::Create(ZEVector4& Out, const ZEVector4 &Start, const ZEVector4 &End)
 {
-	x = End.x - Start.x;
-	y = End.y - Start.y;
-	z = End.z - Start.z;
-	w = End.w - Start.w;
+	Out.x = End.x - Start.x;
+	Out.y = End.y - Start.y;
+	Out.z = End.z - Start.z;
+	Out.w = End.w - Start.w;
 }
 
 float ZEVector4::Length(const ZEVector4& Vector)
@@ -1080,22 +1078,22 @@ float& ZEVector4::operator[](ZESize Index)
 
 ZEVector4::ZEVector4(float x, float y, float z, float w)
 {
-	Create(x, y, z, w);
+	Create(*this, x, y, z, w);
 }
 
 ZEVector4::ZEVector4(const ZEVector2& Base, float z, float w)
 {
-	Create(Base.x, Base.y, z, w);
+	Create(*this, Base.x, Base.y, z, w);
 }
 
 ZEVector4::ZEVector4(const ZEVector3& Base, float w)
 {
-	Create(Base.x, Base.y, Base.z, w);
+	Create(*this, Base.x, Base.y, Base.z, w);
 }
 
 ZEVector4::ZEVector4(const ZEVector4& Start, const ZEVector4& End)
 {
-	Create(Start, End);
+	Create(*this, Start, End);
 }
 
 ZEVector4::ZEVector4()

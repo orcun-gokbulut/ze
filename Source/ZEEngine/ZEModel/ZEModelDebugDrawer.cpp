@@ -64,7 +64,7 @@ void ZEModelDebugDrawer::SetTarget(ZEEntity* Target)
 	if (Target == NULL)
 		return;
 
-	if (ZEObjectDescription::CheckParent(ZEModel::Description(), Target->GetDescription()) || (ZEModel::Description() == Target->GetDescription()))
+	if (ZEClass::IsDerivedFrom(ZEModel::Class(), Target->GetClass()))
 	{
 		if (MeshBoundingBoxColor == ZEVector4::Zero)
 			SetMeshBoundingBoxColor(ZEVector4(0.25f, 1.0f, 0.25f, 1.0f));

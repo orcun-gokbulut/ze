@@ -42,21 +42,19 @@
 #include "ZESceneCuller.h"
 #include "ZETypes.h"
 #include "ZEDrawParameters.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZERayCast.h"
 
-class ZEViewVolume;
-class ZEBoundingBox;
-class ZECamera;
-class ZEListener;
-class ZEFrameRenderer;
-class ZEShadowRenderer;
-class ZEPostProcessor;
-class ZEFixedMaterial;
-class ZEEntity;
+ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
+ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
+ZE_META_FORWARD_DECLARE(ZEFrameRenderer,	"ZEGraphics/ZEFrameRenderer.h")
+ZE_META_FORWARD_DECLARE(ZEShadowRenderer,	"ZEGraphics/ZEShadowRenderer.h")
+ZE_META_FORWARD_DECLARE(ZEListener,			"ZESound/ZEListener.h")
+ZE_META_FORWARD_DECLARE(ZEInterior,			"ZEInterior/ZEInterior.h")
+ZE_META_FORWARD_DECLARE(ZEInteriorResource,	"ZEInterior/ZEInteriorResource.h")
+ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
+
 class ZEPhysicalWorld;
-class ZEInterior;
-class ZEInteriorResource;
-class ZEObjectDescription;
 
 #define ZE_RCF_ENTITY							1
 #define ZE_RCF_COMPONENT						2
@@ -66,8 +64,10 @@ class ZEObjectDescription;
 
 #define zeScene ZEScene::GetInstance()
 
-class ZEScene
+class ZEScene : public ZEObject
 {
+	ZE_OBJECT
+
 	private:
 		bool									Initialized;
 
@@ -98,8 +98,7 @@ class ZEScene
 		void									RemoveEntity(ZEEntity* Entity);
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
-		//ZEArray<ZEEntity*>					GetEntities(const char* ClassName);
-		ZEArray<ZEEntity*>						GetEntities(ZEObjectDescription* Desc);
+		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);
 
 		void									ClearEntities();
 

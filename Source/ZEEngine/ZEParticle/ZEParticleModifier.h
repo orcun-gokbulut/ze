@@ -39,6 +39,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEParticle.h"
 

@@ -59,7 +59,7 @@
 #include "ZEDCommonEntities/ZEDScreenAxis.h"
 
 
-#include <ZEGame\ZEEntityProvider.h>
+#include <ZEMeta\ZEProvider.h>
 #include <ZEGraphics\ZEDirectionalLight.h>
 #include <ZECore\ZEOptionManager.h>
 #include <ZEModel\ZEModel.h>
@@ -90,13 +90,13 @@ MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
 	ui->setupUi(this);
 	showMaximized();
 
-	ZEString DefaultCompanyName = "Zinek";
-	ZEString DefaultApplicationName = "Engine";
-	ZEString DefaultResourcesDirectoryName = "Resources";
-	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
+// 	ZEString DefaultCompanyName = "Zinek";
+// 	ZEString DefaultApplicationName = "Engine";
+// 	ZEString DefaultResourcesDirectoryName = "Resources";
+// 	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
 
 	SplashScreen->SetNotificationText("Reading Working Directory...");
-	this->WorkingDirectory = ZEPathManager::GetWorkingDirectory() + "\\";
+	this->WorkingDirectory = ZEPathManager::GetInstance()->GetEnginePath() + "\\";
 
 	SplashScreen->SetNotificationText("Setting Up Assert Browser...");
 	//AssertBrowser = new NewZEDAssertBrowser(QDir::currentPath());	
@@ -326,7 +326,7 @@ void MapEditor::LoadSceneActionTriggered()
 
 	for (ZESize I = 0; I < Scene->GetEntities().GetCount(); I++)
 	{
-		if(QString(Scene->GetEntities()[I]->GetDescription()->GetName()) == QString("ZEPlayer"))
+		if(QString(Scene->GetEntities()[I]->GetClass()->GetName()) == QString("ZEPlayer"))
 			ViewPort->SetPlayerHandle((ZEPlayer*)(Scene->GetEntities()[I]));
 	}
 }
@@ -501,10 +501,14 @@ void MapEditor::UpdatePropertyWidgetValues()
 
 void MapEditor::GenerateAssertList()
 {	
-	for(ZESize I = 0; I < ZEEntityProvider::GetInstance()->GetClasses().GetCount(); I++)
+	ZEArray<ZEClass*> EntityClasses = ZEProvider::GetInstance()->GetClass(ZEEntity::Class());
+	for(ZESize I = 0; I < EntityClasses.GetCount(); I++)
 	{
-		QString Temp = ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName();
-		ui->AssertsList->addItem(QString(ZEEntityProvider::GetInstance()->GetClasses().GetItem(I)->GetName()));
+		if ((EntityClasses[I]->GetFlags() & ZE_CF_CREATE_INSTANCE) == 0)
+			continue;
+		
+		QString Temp = ZEProvider::GetInstance()->GetClasses().GetItem(I)->GetName();
+		ui->AssertsList->addItem(QString(EntityClasses[I]->GetName()));
 	}
 }
 
@@ -512,7 +516,15 @@ void MapEditor::GenerateAssertList()
 void MapEditor::NewEntityToScene()
 {
 	QString TempString = ui->AssertsList->currentItem()->text().toLatin1();
-	ZEEntity* Entity = (ZEEntity*)(ZEEntityProvider::GetInstance()->CreateInstance(((const char*)TempString.toLatin1())));
+
+	ZEClass* Class = ZEProvider::GetInstance()->GetClass((const char*)TempString.toLatin1());
+	if (Class == NULL)
+		return;
+
+	ZEEntity* Entity = static_cast<ZEEntity*>(Class->CreateInstance());
+	if (Entity == NULL)
+		return;
+
 	Scene->AddEntity(Entity);
 
 	TempString = TempString.remove(QString("ZE"));
@@ -615,8 +627,8 @@ void MapEditor::DeleteActionTriggered()
 void MapEditor::CopyActionTriggered()
 {
 	ZEEntity* EntityToCopy;
-	ZEObjectDescription* ClassDescription;
-	const ZEPropertyDescription* PropertyDescriptions;
+	ZEClass* Class;
+	const ZEProperty* Properties;
 	ZEInt	PropertyCount = 0;
 	ZEEntity* NewEntity = NULL;
 	ZEVariant TempVariant;
@@ -628,26 +640,26 @@ void MapEditor::CopyActionTriggered()
 	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
 	{
 		EntityToCopy = ((ZEEntity*)(SelectedItems[I]->GetClass()));
-		ClassDescription = EntityToCopy->GetDescription();
-		NewEntity = (ZEEntity*)(ZEEntityProvider::GetInstance()->CreateInstance(ClassDescription->GetName()));
+		Class = EntityToCopy->GetClass();
+		NewEntity = (ZEEntity*)(ZEProvider::GetInstance()->GetClass(Class->GetName())->CreateInstance());
 		Scene->AddEntity(NewEntity);
 
 		ZEInt TrueId = NewEntity->GetEntityId();
-		EntityName = QString(ClassDescription->GetName()) + QString(" ") + QString().setNum(TrueId);
+		EntityName = QString(Class->GetName()) + QString(" ") + QString().setNum(TrueId);
 		EntityName = EntityName.remove(QString("ZE"));
 				
-		while (ClassDescription != NULL)
+		while (Class != NULL)
 		{
-			PropertyCount = ClassDescription->GetPropertyCount();
-			PropertyDescriptions = ClassDescription->GetProperties();
+			PropertyCount = Class->GetPropertyCount();
+			Properties = Class->GetProperties();
 
 			for(ZEInt J = 0; J < PropertyCount; J++)
 			{
-				EntityToCopy->GetProperty(PropertyDescriptions[J].Name, TempVariant);
-				NewEntity->SetProperty(PropertyDescriptions[J].Name, TempVariant);			
+				EntityToCopy->GetClass()->GetProperty(EntityToCopy, Properties[J].Name, TempVariant);
+				NewEntity->GetClass()->SetProperty(NewEntity, Properties[J].Name, TempVariant);			
 			}			
 
-			ClassDescription = ClassDescription->GetParent();
+			Class = Class->GetParentClass();
 		}
 		
 		NewEntity->SetEntityId(TrueId);
@@ -675,7 +687,7 @@ void MapEditor::GoToEntityActionTriggered()
 	ZESize		SelectedItemCount = SelectedItems.GetCount();
 
 	for (ZESize I = 0; I < SelectedItemCount; I++)
-		FocusPosition = FocusPosition + SelectedItems[I]->GetPosition();
+		FocusPosition = FocusPosition + SelectedItems[I]->GetPosition().GetVector3();
 
 	FocusPosition.x = FocusPosition.x / SelectedItemCount;
 	FocusPosition.y = FocusPosition.y / SelectedItemCount;
@@ -794,7 +806,7 @@ ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
 
 	for (ZESize I = 0; I < SelectionItemPlugIns.GetCount(); I++)
 	{
-		if (QString(Entity->GetDescription()->GetName()) == SelectionItemPlugIns[I]->GetSupportedClassName())
+		if (QString(Entity->GetClass()->GetName()) == SelectionItemPlugIns[I]->GetSupportedClassName())
 			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEObject*)(Entity)), GizmoMode, Scene);
 	}
 

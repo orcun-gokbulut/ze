@@ -35,8 +35,8 @@
 
 #include "ZE3dsMaxInteriorActions.h"
 #include <maxscrpt/maxscrpt.h>
-#include "ZE3dsMaxInteriorScriptRoom_ms.h"
-#include "ZE3dsMaxInteriorScriptDoor_ms.h"
+#include "ZE3dsMaxInteriorScriptRoom.ms.h"
+#include "ZE3dsMaxInteriorScriptDoor.ms.h"
 #include <Commctrl.h>
 
 int ZE3dsMaxInteriorActionAddRoomAttributes::GetId()

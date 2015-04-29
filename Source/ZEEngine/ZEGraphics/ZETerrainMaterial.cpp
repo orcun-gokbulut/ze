@@ -235,6 +235,11 @@ float ZETerrainMaterial::GetDiffuseFactor() const
 	return DiffuseFactor;
 }
 
+void ZETerrainMaterial::Tick( float ElapsedTime )
+{
+
+}
+
 ZETerrainMaterial* ZETerrainMaterial::CreateInstance()
 {
 	return zeGraphics->CreateTerrainMaterial();

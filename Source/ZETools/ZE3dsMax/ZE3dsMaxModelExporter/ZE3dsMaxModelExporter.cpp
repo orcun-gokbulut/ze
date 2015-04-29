@@ -41,7 +41,6 @@
 #include "ZE3dsMaxModelExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
-#include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
 
@@ -190,7 +189,8 @@ void ZE3dsMaxModelExporter::LoadOptions(const char* FilePath)
 
 		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
 		{
-			ExportOptions->Read(&OptionsFile);
+			ModelRoot.SetRootNode(ExportOptions);
+			ModelRoot.Read(&OptionsFile);
 			OptionsFile.Close();
 		}
 	}
@@ -206,7 +206,8 @@ void ZE3dsMaxModelExporter::SaveOptions(const char* FilePath)
 		ZEFile OptionsFile;
 		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 		{
-			OptionsDialog->GetOptions()->Write(&OptionsFile);
+			ModelRoot.SetRootNode(OptionsDialog->GetOptions());
+			ModelRoot.Write(&OptionsFile);
 			OptionsFile.Close();
 		}
 	}
@@ -271,7 +272,7 @@ bool ZE3dsMaxModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, c
 
 ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
-	ExportPath = ZEFileInfo::GetParentDirectory(name);
+	ExportPath = ZEFileInfo(name).GetParentDirectory();
 	LoadOptions(i->GetCurFilePath());
 
 	INodeTab lNodes;
@@ -292,7 +293,12 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 
 	SaveOptions(i->GetCurFilePath());
 
+	ModelRoot.SetRootNode(&ModelNode);
 	ModelNode.SetName("ZEModel");
+	ZEUInt8 MajorVersion = 1;
+	ZEUInt8 MinorVersion = 0;
+	ModelNode.AddProperty("MajorVersion")->SetUInt8(MajorVersion);
+	ModelNode.AddProperty("MinorVersion")->SetUInt8(MinorVersion);
 
 	if(ProgressDialog == NULL)
 		ProgressDialog = ZEProgressDialog::CreateInstance();
@@ -316,9 +322,9 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 
 			Box3 TempBoundingBox;
 			BoundingBoxMesh->GetBoundingBox(TempBoundingBox);
-			ZEMLNode* UserDefinedBoundingBox = ModelNode.AddSubNode("UserDefinedBoundingBox");
-			UserDefinedBoundingBox->AddProperty("Min", ZE3dsMaxUtils::MaxtoZE(TempBoundingBox.pmin));
-			UserDefinedBoundingBox->AddProperty("Max", ZE3dsMaxUtils::MaxtoZE(TempBoundingBox.pmax));
+			ZEMLNode* UserDefinedBoundingBox = ModelNode.AddNode("UserDefinedBoundingBox");
+			UserDefinedBoundingBox->AddProperty("Min")->SetVector3(ZE3dsMaxUtils::MaxtoZE(TempBoundingBox.pmin));
+			UserDefinedBoundingBox->AddProperty("Max")->SetVector3(ZE3dsMaxUtils::MaxtoZE(TempBoundingBox.pmax));
 
 			break;
 		}
@@ -354,7 +360,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 
 	if (IsAnimationExportEnabled)
 	{
-		if(!ProcessAnimations(ModelNode.AddSubNode("Animations")))
+		if(!ProcessAnimations(ModelNode.AddNode("Animations")))
 		{
 			zeError("Processing animations failed.");
 			return false;
@@ -401,10 +407,10 @@ bool ZE3dsMaxModelExporter::WriteToFile(const char* FilePath)
 
 	if (!CurrentOption)
 	{
-		if (ModelNode.GetSubNodes("Bones").GetCount() > 0)
+		if (ModelNode.GetNodes("Bones").GetCount() > 0)
 		{
-			ZEMLNode* BonesNode = ModelNode.GetSubNodes("Bones").GetFirstItem();
-			ModelNode.RemoveItem(BonesNode);
+			ZEMLNode* BonesNode = ModelNode.GetNodes("Bones").GetFirstItem();
+			ModelNode.RemoveElement(BonesNode);
 		}
 	}
 
@@ -412,14 +418,14 @@ bool ZE3dsMaxModelExporter::WriteToFile(const char* FilePath)
 
 	if (!CurrentOption)
 	{
-		if (ModelNode.GetSubNodes("Meshes").GetCount() > 0)
+		if (ModelNode.GetNodes("Meshes").GetCount() > 0)
 		{
-			ZEMLNode* MeshesNode = ModelNode.GetSubNodes("Meshes").GetFirstItem();
-			ModelNode.RemoveItem(MeshesNode);
+			ZEMLNode* MeshesNode = ModelNode.GetNodes("Meshes").GetFirstItem();
+			ModelNode.RemoveElement(MeshesNode);
 		}
 	}
 
-	ModelNode.Write(&File);
+	ModelRoot.Write(&File);
 
 	File.Close();
 

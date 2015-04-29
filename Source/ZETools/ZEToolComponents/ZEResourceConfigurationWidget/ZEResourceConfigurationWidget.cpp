@@ -39,12 +39,11 @@
 #include "QtGui/QTreeWidgetItem"
 #include "ZEML/ZEMLNode.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEFileCommon.h"
 #include "ZEML/ZEMLProperty.h"
 #include "ZEResourceConfigurationWidgetQt.h"
-#include "ZEFile/ZEFileUtils.h"
 
 #include <time.h>
-#include "ZEFile/ZEPathUtils.h"
 #include "ZEResourceConfigurator/ZEResourceConfigurator.h"
 
 inline static time_t GetTime(ZEFileTime* Date)

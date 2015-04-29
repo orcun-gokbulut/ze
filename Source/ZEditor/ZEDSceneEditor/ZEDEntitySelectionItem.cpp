@@ -35,6 +35,7 @@
 
 #include "ZEDEntitySelectionItem.h"
 #include "ZEGraphics\ZECamera.h"
+#include "ZEDS\ZEVariant.h"
 
 void ZEDEntitySelectionItem::Update()
 {

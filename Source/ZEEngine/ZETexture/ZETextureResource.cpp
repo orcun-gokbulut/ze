@@ -34,3 +34,4 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETextureResource.h"
+#include "ZEMeta/ZEObject.h"

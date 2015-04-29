@@ -53,7 +53,6 @@
 #define ACTIONID_SCROLL_UP		10
 #define ACTIONID_SCROLL_DOWN	11
 
-
 void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 {
 	if (GetVisiblity() == false)
@@ -203,7 +202,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("#R:/ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 

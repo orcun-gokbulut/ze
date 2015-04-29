@@ -38,7 +38,7 @@
 #define __ZE_CONSOLE_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 #include <string.h>
 
 #define zeOutput(...) ZEConsole::GetInstance()->Output(__VA_ARGS__)

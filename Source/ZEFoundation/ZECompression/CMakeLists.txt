@@ -55,4 +55,4 @@ ze_add_source(ZEDecompressorZLIB.cpp					Sources)
 ze_add_library(TARGET ZECompression
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation libZLib)
+	LIBS ZEDS libZLib)

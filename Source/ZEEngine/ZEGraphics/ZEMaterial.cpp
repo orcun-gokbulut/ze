@@ -36,7 +36,6 @@
 #include "ZEMaterial.h"
 #include "ZECore/ZECore.h"
 #include "ZEGraphicsModule.h"
-#include "ZEMeta/ZEAnimation.h"
 #include <memory.h>
 
 ZEMaterial::ZEMaterial()
@@ -108,8 +107,7 @@ void ZEMaterial::UpdateMaterial()
 
 void ZEMaterial::AdvanceAnimation(float TimeElapsed)
 {
-	if (GetAnimationController() != NULL)
-		GetAnimationController()->AdvanceAnimation(TimeElapsed);
+
 }
 
 void ZEMaterial::Destroy()

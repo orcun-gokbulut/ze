@@ -142,7 +142,7 @@ Type ZEMath::Max(Type A, Type B)
 }
 
 template <typename TypeA, typename TypeB>
-static TypeA ZEMath::Align(TypeA Value, TypeB Alignment)
+TypeA ZEMath::Align(TypeA Value, TypeB Alignment)
 {
 	return (Value / (TypeA)Alignment) * (TypeA)Alignment;
 }

@@ -109,7 +109,7 @@ static bool ParseIdentifier(const char* Input, ZESize &Cursor, char* Output)
 	return true;
 }
 
-static bool ParseConstant(const char* Input, ZESize &Cursor, ZEVariant *Output)
+static bool ParseConstant(const char* Input, ZESize &Cursor, ZEValue *Output)
 {
 	char Temp[ZE_CONSOLE_PARSER_MAX_STRING_SIZE];
 	ZEInt I = 0;
@@ -199,7 +199,7 @@ static bool ParseConstant(const char* Input, ZESize &Cursor, ZEVariant *Output)
 
 static bool ParseParameters(const char* Input, ZESize &Cursor, ZECommandParameterList *Output)
 {
-	ZEVariant Param;
+	ZEValue Param;
 	bool FirstParam = true;
 
 	Output->Clear();
@@ -276,7 +276,7 @@ bool ZEConsole::ParseInput(const char* Input)
 {
 	char Section[ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE], Name[ZE_CONSOLE_PARSER_MAX_IDENTIFIER_SIZE];
 	ZECommandParameterList ParamList;
-	ZEVariant Constant;
+	ZEValue Constant;
 	ZEOption* Opt;
 	Output("> %s\r\n", Input);
 	ZEConsoleParserState State = ZE_CPS_SECTION;

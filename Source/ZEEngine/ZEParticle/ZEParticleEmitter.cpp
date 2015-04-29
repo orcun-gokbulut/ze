@@ -361,7 +361,7 @@ void ZEParticleEmitter::AddModifier(ZEParticleModifier* Modifier)
 void ZEParticleEmitter::RemoveModifier(ZEParticleModifier* Modifier)
 {
 	if (Modifiers.Exists(Modifier))
-		Modifiers.DeleteValue(Modifier);
+		Modifiers.RemoveValue(Modifier);
 }
 
 void ZEParticleEmitter::SetSphereRadius(float SphereRadius)

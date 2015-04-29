@@ -38,18 +38,19 @@
 #include "ZEDPropertyUndoRedo.h"
 #include "ZEDCommonControls/CSS.h"
 
-ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute, QString WorkingDirectory) : QTreeWidgetItem(parent)
+ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property, QString WorkingDirectory) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
 	this->WorkingDirectory = WorkingDirectory;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_STRING)
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
+	setText(0, Property->Name);
+	//this->setToolTip (0, QString(ClassAttribute.Description));
+
+	if (Value.GetType().Type != ZE_TT_STRING)
 	{
 		setText(1, QString("Error File"));
 		return;
@@ -73,7 +74,7 @@ ZEDFileBrowser::ZEDFileBrowser(QTreeWidget* ParentTree, QTreeWidgetItem *parent,
 
 	ParentTree->setItemWidget(this, 1, LayoutWidget);
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 	{
 		this->LineEdit->setEnabled(false);
 		this->FileButton->setEnabled(false);
@@ -116,14 +117,14 @@ void ZEDFileBrowser::Changed()
 {
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
 	Value.SetString((const char*)this->LineEdit->text().toLatin1());
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

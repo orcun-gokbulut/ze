@@ -45,3 +45,39 @@ macro(ze_unit_test_init)
 		include(External/test_cocoon)
 	endif()
 endmacro()
+
+function (ze_add_test)
+	if (NOT ZEBUILD_UNIT_TESTS_ENABLE)
+		return()
+	endif()
+
+	parse_arguments(PARAMETER "TARGET;SOURCES;TEST_TARGET;EXTRA_SOURCES;LIBS;${ze_check_parameters}" "" ${ARGV})
+		
+	ze_check()
+	if (NOT CHECK_SUCCEEDED)
+		return()
+	endif()
+	
+	add_executable(${PARAMETER_TARGET} ${PARAMETER_SOURCES} ${PARAMETER_EXTRA_SOURCES})
+	set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER ${ZEBUILD_PROJECT_FOLDER})
+	#set_property(TARGET ${PARAMETER_TARGET} PROPERTY FOLDER "${ZEBUILD_PROJECT_FOLDER}/Tests")
+	set_property(TARGET ${PARAMETER_TARGET} APPEND PROPERTY INCLUDE_DIRECTORIES "${CMAKE_CURRENT_BINARY_DIR}" "${CMAKE_CURRENT_SOURCE_DIR}")
+		
+	if (PARAMETER_TEST_TARGET)
+		get_property(TEST_TARGET_LINKS TARGET ${PARAMETER_TEST_TARGET} PROPERTY ZEBUILD_LIBS)
+		ze_link(TARGET ${PARAMETER_TARGET} LIBS ${TEST_TARGET_LINKS})
+
+		get_property(TEST_TARGET_TYPE TARGET ${PARAMETER_TEST_TARGET} PROPERTY TYPE)
+		if (TEST_TARGET_TYPE EQUAL STATIC_LIBRARY)
+			ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_TEST_TARGET})
+		endif()
+	endif()
+
+	ze_link(TARGET ${PARAMETER_TARGET} LIBS ZETest)
+
+	# Copy dependent DLLs
+	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})
+
+	source_group("" FILES ${PARAMETER_SOURCES})		
+	add_test(${PARAMETER_TARGET}Test ${PARAMETER_TARGET})
+endfunction()

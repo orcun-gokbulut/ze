@@ -43,11 +43,10 @@
 class ZETextureCube;
 class ZETexture2D;
 
-ZE_META_OBJECT_DESCRIPTION(ZEOmniProjectiveLight);
-
 class ZEOmniProjectiveLight : public ZELight
 {
-	ZE_META_ENTITY(ZEOmniProjectiveLight)
+	ZE_OBJECT
+
 	private:
 		const ZETextureCube*			ProjectionTexture;
 		ZEViewSphere					ViewVolume;
@@ -81,14 +80,4 @@ class ZEOmniProjectiveLight : public ZELight
 
 		static ZEOmniProjectiveLight*	CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEOmniProjectiveLight" parent="ZELight" description="Omni Projective Light"/>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

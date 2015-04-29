@@ -33,135 +33,123 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDS/ZEArray.h"
 #include "ZEFileInfo.h"
 
-#include <memory.h>
-#include "ZEPathUtils.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEPathManager.h"
+#include "ZEDirectoryInfo.h"
 
-
-ZEFileInfo::ZEFileInfo()
-{
-	Size = 0;
-	memset((void*)&Creation, 0, sizeof(ZEFileTime));
-	memset((void*)&Modification, 0, sizeof(ZEFileTime));
-}
-
-ZEFileInfo::ZEFileInfo(const ZEString& FilePath)
-{
-	Path = ZEPathManager::GetFinalPath(FilePath, &Root);
-	Extension = GetFileExtension(Path);
-	Name = GetFileName(Path);
-
-	Size = 0;
-	memset((void*)&Creation, 0, sizeof(ZEFileTime));
-	memset((void*)&Modification, 0, sizeof(ZEFileTime));
-}
-
-ZEFileInfo::~ZEFileInfo()
-{
-
-}
-
-void ZEFileInfo::SetPath(const ZEString& FilePath)
-{
-	Path = ZEPathManager:: GetFinalPath(FilePath, &Root);
-	Extension = GetFileExtension(Path);
-	Name = GetFileName(Path);
-	
-	Size = 0;
-	memset((void*)&Creation, 0, sizeof(ZEFileTime));
-	memset((void*)&Modification, 0, sizeof(ZEFileTime));
-}
+#ifdef ZE_PLATFORM_WINDOWS
+#include <Windows.h>
+#include <shlwapi.h>
 
 ZEInt64 ZEFileInfo::GetSize()
 {
-	Size = ZEFileUtils::GetFileSize(Path);
+	if ((GetAccess() & ZE_PA_READ) == 0)
+		return -1;
 
-	return Size;
+	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (Handle == INVALID_HANDLE_VALUE)
+		return false;
+
+	LARGE_INTEGER FileSize;
+	if (!GetFileSizeEx(Handle, &FileSize))
+		return -1;
+
+	return FileSize.QuadPart;
 }
 
-const ZEString& ZEFileInfo::GetName() const
+bool ZEFileInfo::Rename(const char* Name)
 {
-	return Name;
-}
+	if ((GetAccess() & ZE_PA_WRITE) == 0)
+		return false;
 
-const ZEString&	ZEFileInfo::GetPath() const
-{
-	return Path;
-}
-
-const ZEString&	ZEFileInfo::GetExtension() const
-{
-	return Extension;
-}
-
-bool ZEFileInfo::GetCreationDate(ZEFileTime& Time)
-{
-    bool Result;
-
-	Result = ZEFileUtils::GetCreationTime(&Creation, Path);
-    memcpy((void*)&Time, (void*)&Creation, sizeof(ZEFileTime));
-
-	return Result;
-}
-
-bool ZEFileInfo::GetModificationDate(ZEFileTime& Time)
-{
-    bool Result;
-
-    Result = ZEFileUtils::GetModificationTime(&Modification, Path);
-    memcpy((void*)&Time, (void*)&Modification, sizeof(ZEFileTime));
-
-    return Result;
-}
-
-
-ZEInt64 ZEFileInfo::GetFileSize(const ZEString& FilePath)
-{
-	return ZEFileUtils::GetFileSize(Path);
-}
-
-bool ZEFileInfo::IsFile(const ZEString& FilePath)
-{
-	return ZEFileUtils::IsFile(FilePath);
-}
-
-ZEString ZEFileInfo::GetFileName(const ZEString& FilePath)
-{
-	ZESSize Length = FilePath.GetLength();
-
-	for (ZESSize I = Length - 1; I >= 0; I--)
+	const char* Temp = Name;
+	while (*Temp == '\0')
 	{
-		if (FilePath[I] == '\\' || FilePath[I] == '/')
-			return FilePath.Right(Length - 1 - I);
+		if (*Temp == '\\' || *Temp == ':' || *Temp == '/')
+			return false;
+		Temp++;
 	}
 
-	return FilePath;
+	ZEString Destination = ZEFormat::Format("{0}\\{1}", GetParentDirectory(), Name);
+
+	ZERealPath DestinationRealPath = ZEFileInfo(Destination).GetRealPath();
+	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
-ZEString ZEFileInfo::GetFileExtension(const ZEString& FilePath)
+bool ZEFileInfo::Move(const char* Destination)
 {
-	ZESSize Length = FilePath.GetLength();
+	if ((GetAccess() & ZE_PA_READ_WRITE) == 0)
+		return false;
 
-	for (ZESSize I = Length - 1; I >= 0; I--)
+	ZEDirectoryInfo DestinationInfo(Destination);
+	if ((DestinationInfo.GetAccess() & ZE_PA_WRITE) == 0)
+		return false;
+
+	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
+	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
+}
+
+bool ZEFileInfo::Copy(const char* Destination)
+{
+	if ((GetAccess() & ZE_PA_READ) == 0)
+		return false;
+
+	ZEDirectoryInfo DestinationInfo(Destination);
+	if ((DestinationInfo.GetAccess() & ZE_PA_WRITE) == 0)
+		return false;
+
+	ZERealPath DestinationRealPath = DestinationInfo.GetRealPath();
+	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, FALSE) != 0;
+}
+
+bool ZEFileInfo::Delete()
+{
+	if ((GetAccess() & ZE_PA_WRITE) == 0)
+		return false;
+
+	return DeleteFile(GetRealPath().Path) != 0;
+}
+
+bool ZEFileInfo::Touch()
+{
+	if ((GetAccess() & ZE_PA_WRITE) == 0)
+		return false;
+
+	SYSTEMTIME Time;
+	GetSystemTime(&Time);
+
+	FILETIME FileTime;
+	SystemTimeToFileTime(&Time, &FileTime);
+
+	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	if (Handle == INVALID_HANDLE_VALUE)
+		return false;
+
+	if (SetFileTime(Handle, &FileTime, &FileTime, &FileTime) == 0)
 	{
-		if(FilePath[I] == '.')
-			return FilePath.Right(Length - I);
+		CloseHandle(Handle);
+		return false;
 	}
 
-	return "";
+	CloseHandle(Handle);
+	return true;
 }
 
-ZEString ZEFileInfo::GetParentDirectory(const ZEString& DirectoryPath)
+ZEFileInfo::ZEFileInfo()
 {
-	ZESSize Length = DirectoryPath.GetLength();
 
-	for (ZESSize I = Length - 1; I >= 0; I--)
-	{
-		if (DirectoryPath[I] == '\\' || DirectoryPath[I] == '/')
-			return DirectoryPath.Left(I);
-	}
-
-	return "";
 }
+
+ZEFileInfo::ZEFileInfo(const char* Path)
+{
+	SetPath(Path);
+}
+
+ZEFileInfo::ZEFileInfo(const char* ParentPath, const char* Path)
+{
+	SetRelativePath(ParentPath, Path);
+}
+
+#endif

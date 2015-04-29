@@ -39,11 +39,10 @@
 
 #include "ZEGame/ZEEntity.h"
 
-ZE_META_ENTITY_DESCRIPTION(ZEListener);
-
 class ZEListener: public ZEEntity
 {
-	ZE_META_ENTITY(ZEListener)
+	ZE_OBJECT
+
 	protected:
 		float					DistanceFactor;
 		float					DopplerFactor;
@@ -69,18 +68,3 @@ class ZEListener: public ZEEntity
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEListener" parent="ZEEntity">
-			<description>Listener</description>
-			<property name="DistanceFactor" type="float" autogetset="yes"/>
-			<property name="DopplerFactor" type="float" autogetset="yes"/>
-			<property name="RollOffFactor" type="float" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

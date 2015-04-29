@@ -50,6 +50,8 @@ enum ZEUISequencePlayerState
 
 class ZEUISequencePlayer : public ZEUIFrameControl
 {
+	ZE_OBJECT
+
 	private:
 
 		ZEArray<const ZETexture2D*>	Frames;

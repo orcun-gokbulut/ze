@@ -37,7 +37,7 @@
 #ifndef __ZE_D3D9_FIXED_MATERIAL_H__
 #define __ZE_D3D9_FIXED_MATERIAL_H__
 
-#include "ZEDS/ZEPointer.h"
+#include "ZEPointer/ZEPointer.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
 

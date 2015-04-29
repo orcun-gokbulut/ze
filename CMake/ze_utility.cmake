@@ -68,41 +68,23 @@ function(ze_copy_headers)
 endfunction()
 
 function(ze_file_compiler)
-	parse_arguments(PARAMETER "CLASS;OUTPUT" "" ${ARGV})
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_INPUT)
+	parse_arguments(PARAMETER "TARGET;FILES;OUTPUTS" "" ${ARGV})
 
-	get_property(ZEFC_BINARY_PATH TARGET ZEFC PROPERTY RUNTIME_OUTPUT_DIRECTORY)
-	add_custom_command(
-		OUTPUT "${PARAMETER_OUTPUT}.cpp" "${PARAMETER_OUTPUT}.h"
-		COMMAND $<TARGET_FILE:ZEFC>
-		ARGS "${PARAMETER_INPUT}" -C "${PARAMETER_CLASS}" -S "${PARAMETER_OUTPUT}.cpp" -H "${PARAMETER_OUTPUT}.h"
-		MAIN_DEPENDENCY "${PARAMETER_INPUT}"
-		DEPENDS ZEFC)
+	foreach(VARIABLE_FILE ${PARAMETER_FILES})
+		get_filename_component(VARIABLE_FILE_NORMALIZED ${VARIABLE_FILE} ABSOLUTE)
+		get_filename_component(VARIABLE_FILE_NAME ${VARIABLE_FILE} NAME)
+		string(REPLACE  "." "_" PARAMETER_CLASS ${VARIABLE_FILE_NAME})
+		add_custom_command(
+			OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h"
+			COMMAND "$<TARGET_FILE:ZEFileCompiler>"
+			ARGS "-q" "\"${VARIABLE_FILE_NORMALIZED}\"" "-c" "\"${PARAMETER_CLASS}\"" "-os" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp\"" "-oh" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h\""
+			MAIN_DEPENDENCY "${VARIABLE_FILE_NORMALIZED}"
+			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+			DEPENDS ZEFileCompiler)
+		set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h")
+	endforeach()
 	
-	if (NOT EXISTS "${PARAMETER_OUTPUT}.h")
-		 file(WRITE "${PARAMETER_OUTPUT}.h"
-			"#pragma once\n\n"
-			"#include \"ZEData.h\"\n"
-			"#include \"ZETypes.h\"\n"
-			"\n"
-			"class ${PARAMETER_CLASS} : public ZEData\n"
-			"{\n"
-			"\tpublic:\n"
-				"\t\tvoid*\t\tGetData();\n"
-				"\t\tZESize\t\tGetSize();\n"
-			"};\n")			
-	endif()
-endfunction()
-
-function(ze_meta_compiler)
-	parse_arguments(PARAMETER "OUTPUT" "" ${ARGV})
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_INPUT)
-
-	add_custom_command(
-		OUTPUT "${PARAMETER_OUTPUT}"
-		COMMAND "${CMAKE_SOURCE_DIR}/External/${ZEBUILD_PLATFORM_NAME}/libZEPP/Tool/zepp"
-		ARGS "${PARAMETER_INPUT}" "${PARAMETER_OUTPUT}"
-		MAIN_DEPENDENCY "${PARAMETER_INPUT}")
+	set(${PARAMETER_OUTPUTS} ${VARIABLE_OUTPUTS} PARENT_SCOPE)
 endfunction()
 
 function(ze_static_analysis PARAMETER_TARGET)
@@ -122,7 +104,7 @@ endfunction()
 function(ze_copy_runtime_dlls)
 	parse_arguments(PARAMETER "TARGET" "" ${ARGV})
 
-	ze_get_dependency_list(TARGET ${PARAMETER_TARGET} RETURN VARIABLE_DEPENDENCIES)
+	ze_get_dependency_list_combined(TARGET ${PARAMETER_TARGET} RETURN VARIABLE_DEPENDENCIES)
 	foreach(VARIABLE_DEPENDENCY ${VARIABLE_DEPENDENCIES})
 		if (TARGET ${VARIABLE_DEPENDENCY})
 			get_property(VARIABLE_TYPE TARGET ${VARIABLE_DEPENDENCY} PROPERTY ZEBUILD_TYPE)
@@ -150,13 +132,11 @@ function(ze_copy_runtime_dlls)
 endfunction()
 
 function(ze_combine_libraries)
-	parse_arguments(PARAMETER "LIBS;${ze_check_parameters}" "" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;LIBS;${ze_check_parameters}" "" ${ARGV})
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
 		return()
 	endif()
-
-	list(GET PARAMETER_DEFAULT_ARGS 0 PARAMETER_TARGET)
 
 	# Gather Libraries
 	foreach(VARIABLE_CURRENT_LIB ${PARAMETER_LIBS})
@@ -185,11 +165,11 @@ function(ze_combine_libraries)
 					get_property(VARIABLE_LIB_DIRECTORY TARGET ${VARIABLE_LIB} PROPERTY ZEBUILD_LIB_DIRECTORY)
 					
 					foreach(VARIABLE_PLATFORM_LIB ${VARIABLE_LIBS})
-						list(APPEND LIBRARY_PATHS "${VARIABLE_LIB_DIRECTORY}/${VARIABLE_CURRENT_DEPENDENCY})
+						list(APPEND LIBRARY_PATHS "${VARIABLE_LIB_DIRECTORY}/${VARIABLE_CURRENT_DEPENDENCY}")
 					endforeach()
 					
 					foreach(VARIABLE_PLATFORM_LIB ${VARIABLE_LIBS_CONFIGURATION})
-						list(APPEND LIBRARY_PATHS "${VARIABLE_LIB_DIRECTORY}/$<CONFIGURATION>/${VARIABLE_CURRENT_DEPENDENCY})
+						list(APPEND LIBRARY_PATHS "${VARIABLE_LIB_DIRECTORY}/$<CONFIGURATION>/${VARIABLE_CURRENT_DEPENDENCY}")
 					endforeach()
 				endif()
 			elseif(VARIABLE_TYPE STREQUAL "LIB")

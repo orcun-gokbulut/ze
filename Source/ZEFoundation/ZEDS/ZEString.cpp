@@ -64,6 +64,7 @@
 #include "ZEStringWriter.h"
 #include "ZEHashGenerator.h"
 
+const ZEString ZEString::Empty;
 
 static ZEUInt GetByteLength(const char* MultiByteCharacter)
 {
@@ -687,6 +688,11 @@ bool ZEString::IsEmpty() const
 	return (Buffer == NULL || (Buffer[0] == '\0'));
 }
 
+ZESize ZEString::GetBufferSize() const
+{
+	return Allocator.GetSize();
+}
+
 void ZEString::SetSize(ZESize Size)
 {
 	Allocator.Reallocate(&Buffer, Size);
@@ -694,7 +700,21 @@ void ZEString::SetSize(ZESize Size)
 
 ZESize ZEString::GetSize() const
 {
-	return Allocator.GetSize();
+	if (Buffer != NULL)
+	{
+		ZESize StringLength = sizeof(char);
+		const char* TempBuffer = Buffer;
+
+		while (*TempBuffer != '\0')
+		{
+			TempBuffer = TempBuffer + sizeof(char);
+			StringLength += sizeof(char);
+		}
+
+		return StringLength;
+	}
+	else
+		return 0;
 }
 
 void ZEString::Compact()
@@ -1107,6 +1127,30 @@ void ZEString::Insert(ZESize Position, const char* String)
 	ZEDebugCheckMemory();
 }
 
+void ZEString::AppendCharacter(const ZECharacter& Character)
+{
+	char Buffer[5];
+	memcpy(Buffer, Character.GetValue(), Character.GetSize());
+	Buffer[Character.GetSize()] = '\0';
+	Append(Buffer);
+}
+
+void ZEString::InsertCharacter(const ZECharacter& Character)
+{
+	char Buffer[5];
+	memcpy(Buffer, Character.GetValue(), Character.GetSize());
+	Buffer[Character.GetSize()] = '\0';
+	Insert(Buffer);
+}
+
+void ZEString::InsertCharacter(ZESize Position, const ZECharacter& Character)
+{
+	char Buffer[5];
+	memcpy(Buffer, Character.GetValue(), Character.GetSize());
+	Buffer[Character.GetSize()] = '\0';
+	InsertCharacter(Position, Buffer);
+}
+
 void ZEString::Remove(ZESize Position, ZESize Count)
 {
 
@@ -1179,11 +1223,13 @@ ZEString ZEString::Left(ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
+	if (Buffer == NULL)
+		return ZEString();
+
+	if (Count >= strlen(Buffer))
+		return *this;
+
 	ZESize ByteCount = GetBytePosition(Buffer, Count);
-
-	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
-	zeDebugCheck(ByteCount >  strlen(Buffer), "Position is bigger than string length.");
-
 	ZEString Temp;
 	Temp.Allocator.Allocate(&Temp.Buffer, (ByteCount + 1) * sizeof(char));
 	memcpy(Temp.Buffer, Buffer, ByteCount * sizeof(char));
@@ -1199,9 +1245,12 @@ ZEString ZEString::Right(ZESize Count) const
 	if (Count == 0)
 		return ZEString();
 
-	zeDebugCheck(Buffer == NULL, "Buffer is empty.");
+	if (Buffer == NULL)
+		return ZEString();
 
 	ZESize ByteLength = strlen(Buffer);
+	if (Count >= ByteLength)
+		return *this;
 
 	char* CountBuffer = Buffer + ByteLength;
 
@@ -1476,7 +1525,7 @@ void ZEString::TrimSelf()
 	ZEDebugCheckMemory();
 }
 
-ZESize ZEString::Hash()
+ZESize ZEString::Hash() const
 {
 	return ZEHashGenerator::Hash(Buffer);
 }

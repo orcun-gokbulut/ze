@@ -92,6 +92,62 @@ class ZEListIterator
 			
 			return Index;
 		}
+
+		operator ZEType*()
+		{
+			return Item;
+		}
+
+		operator const ZEType*() const 
+		{
+			return Item;
+		}
+		
+		ZEType& operator*()
+		{
+			return *Item;
+		}
+		
+		const ZEType& operator*() const
+		{
+			return *Item;
+		}
+
+		ZEType* operator->()
+		{
+			return Item;
+		}
+
+		const ZEType* operator->() const
+		{
+			return Item;
+		}
+
+		ZEListIterator operator++(int)
+		{
+			ZEListIterator Temp = *this;
+			MoveNext();
+			return Temp;
+		}
+
+		ZEListIterator& operator++()
+		{
+			MoveNext();
+			return *this;
+		}
+
+		ZEListIterator operator--(int)
+		{
+			ZEListIterator Temp = *this;
+			MovePrevious();
+			return Temp;
+		}
+
+		ZEListIterator& operator--()
+		{
+			MovePrevious();
+			return *this;
+		}
 };
 
 template<typename ZEType>

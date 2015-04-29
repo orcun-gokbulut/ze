@@ -41,7 +41,6 @@
 #include "ZEDS/ZEString.h"
 #include "ZEFixedMaterial.h"
 #include "ZECore/ZEResource.h"
-#include "ZEMeta/ZEAnimation.h"
 
 
 struct ZETextureOptions;
@@ -51,12 +50,10 @@ class ZEMaterialResource : public ZEResource
 {
 	private:
 		ZEMaterial*								Material;
-		ZEArray<ZEAnimation>					Animations;
 		ZEArray<ZETextureResource*>				TextureResources;
 
 		static bool								LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions);
 		static bool								LoadFixedMaterial(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile);
-		static bool								LoadAnimations(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile);
 
 	protected:
 												ZEMaterialResource();
@@ -67,8 +64,6 @@ class ZEMaterialResource : public ZEResource
 
 		const ZEMaterial*						GetMaterial() const;
 		const ZEArray<ZETextureResource*>&		GetTextureResources() const;
-		const ZEArray<ZEAnimation>&				GetAnimations() const;
-		const ZEAnimation*						GetAnimationByName(const char* Name) const;
 
 		static const ZEMaterialResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		

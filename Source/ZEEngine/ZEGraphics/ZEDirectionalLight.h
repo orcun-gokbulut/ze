@@ -43,8 +43,6 @@
 
 class ZETexture2D;
 
-ZE_META_OBJECT_DESCRIPTION(ZEDirectionalLight);
-
 #define MAX_CASCADE_COUNT			4
 
 struct ZEDirectionalLightCascade
@@ -63,7 +61,8 @@ struct ZEDirectionalLightCascade
 
 class ZEDirectionalLight : public ZELight
 {
-	ZE_META_ENTITY(ZEDirectionalLight)
+	ZE_OBJECT
+
 	private:
 		
 		float								SplitBias;
@@ -101,13 +100,3 @@ class ZEDirectionalLight : public ZELight
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEDirectionalLight" parent="ZELight" description="Directional Light"/>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

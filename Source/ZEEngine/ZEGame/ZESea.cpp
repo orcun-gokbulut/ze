@@ -44,13 +44,7 @@
 #include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZETexture2D.h"
-
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESea);
-
-ZEEntityRunAt ZESeaDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
-}
+#include "ZEMath/ZEMath.h"
 
 ZESea::ZESea()
 {
@@ -65,8 +59,8 @@ ZESea::ZESea()
 	Options.MipMapping = ZE_TMM_ENABLED;
 	Options.MaximumMipmapLevel = 14;
 
-	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaDiffuse.jpg", &Options)->GetTexture());
-	SetNormalTexture(ZETexture2DResource::LoadSharedResource("ZEEngine\\Sea\\SeaNormal.jpg", &Options)->GetTexture());
+	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaDiffuse.jpg", &Options)->GetTexture());
+	SetNormalTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaNormal.jpg", &Options)->GetTexture());
 
 	DiffuseVelocity = ZEVector2::One;
 	NormalVelocity	= -ZEVector2::One;

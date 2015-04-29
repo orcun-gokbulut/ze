@@ -41,10 +41,8 @@ ze_add_source(ZEInputEvent.cpp							Sources)
 ze_add_source(ZEInputEvent.h							Sources Headers)
 ze_add_source(ZEInputMap.cpp							Sources)
 ze_add_source(ZEInputMap.h								Sources Headers)
-
 ze_add_source(ZEInputDefinitions.cpp					Sources)
 ze_add_source(ZEInputDefinitions.h						Sources Headers)
-
 ze_add_source(ZEInputDevice.cpp							Sources)
 ze_add_source(ZEInputDevice.h							Sources Headers)
 ze_add_source(ZEInputDeviceExtension.cpp				Sources)

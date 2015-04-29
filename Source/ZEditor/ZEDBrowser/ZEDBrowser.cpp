@@ -37,6 +37,7 @@
 #include "ZEDBrowser.h"
 #include "ZEDCore/ZEDFileExtension.h"
 #include "ZEDBrowserItem.h"
+#include "ZEMath/ZEMath.h"
 
 #define WorkingDir "C:/Users/Can/Desktop/ZE/trunk/RunDir"
 

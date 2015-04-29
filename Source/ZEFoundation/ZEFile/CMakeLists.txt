@@ -51,29 +51,21 @@ ze_add_source(ZEFileInfo.cpp				Sources)
 ze_add_source(ZEFileInfo.h					Sources Headers)
 ze_add_source(ZEFileInfoTests.cpp			Tests)
 ze_add_source(ZEFileTests.cpp				Tests)
-ze_add_source(ZEFileOperations_Unix.cpp		Sources PLATFORMS Unix)
-ze_add_source(ZEFileOperations_Windows.cpp	Sources PLATFORMS Windows)
-ze_add_source(ZEFileOperations.h			Sources Headers)
-ze_add_source(ZEFileOperationsTests.cpp		Tests)
-ze_add_source(ZEFileUtils_Unix.cpp			Sources PLATFORMS Unix)
-ze_add_source(ZEFileUtils_Windows.cpp		Sources PLATFORMS Windows)
-ze_add_source(ZEFileUtils.h					Sources Headers)
-ze_add_source(ZEFileUtilsTests.cpp			Tests)
+ze_add_source(ZEPathInfo.cpp				Sources)
+ze_add_source(ZEPathInfo.h					Sources Headers)
 ze_add_source(ZEPartialFile.cpp				Sources)
 ze_add_source(ZEPartialFile.h				Sources Headers)
 ze_add_source(ZEPartialFileTests.cpp		Tests)
-ze_add_source(ZEPathManager_Unix.cpp		Sources PLATFORMS Unix)
-ze_add_source(ZEPathManager_Windows.cpp		Sources PLATFORMS Windows)
+ze_add_source(ZEPathManager.cpp				Sources)
 ze_add_source(ZEPathManager.h				Sources)
 ze_add_source(ZEPathManagerTests.cpp		Tests)
-ze_add_source(ZEPathUtils.cpp				Sources)
-ze_add_source(ZEPathUtils.h					Sources)
-ze_add_source(ZEPathUtilsTests.cpp			Tests)
+ze_add_source(ZEFileCommon.cpp				Sources)
+ze_add_source(ZEFileCommon.h				Sources Headers)
 
 ze_add_library(TARGET ZEFile 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-    LIBS ZEFoundation)
+	LIBS ZEDS)
 
 ze_add_test(TARGET ZEFileTests
 	SOURCES ${Tests}

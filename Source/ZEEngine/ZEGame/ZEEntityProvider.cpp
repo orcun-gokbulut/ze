@@ -34,20 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEEntityProvider.h"
-
-ZEEntityProvider::ZEEntityProvider()
-{
-	SetBaseClass(ZEEntity::Description());
-}
-
-ZEEntityProvider::~ZEEntityProvider()
-{
-
-}
-
-ZEEntityProvider* ZEEntityProvider::GetInstance()
-{
-	static ZEEntityProvider* Provider = new ZEEntityProvider();
-
-	return Provider;
-}

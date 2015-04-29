@@ -45,22 +45,19 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-
+#include "ZEPhysics/ZEPhysicalRigidBody.h"
+#include "ZEPhysics/ZEPhysicalJoint.h"
+#include "ZEPhysics/ZEPhysicalShapes.h"
 
 class ZEStaticVertexBuffer;
 class ZETexture2D;
 class ZETexture2DResource;
 class ZEMaterial;
 class ZEPhysicalJoint;
-class ZEMLSerialReader;
+class ZEMLReaderNode;
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
-
-#include "ZEPhysics/ZEPhysicalRigidBody.h"
-#include "ZEPhysics/ZEPhysicalJoint.h"
-#include "ZEPhysics/ZEPhysicalShapes.h"
-
 
 enum ZEModelResourcePhysicalShapeType
 {
@@ -327,9 +324,10 @@ struct ZEModelResourceHelper
 	ZEString									UserDefinedProperties;
 };
 
-
 class ZEModelResource : public ZEResource
 {
+	ZE_OBJECT
+
 	private:
 		ZEArray<ZEModelResourceMesh>				Meshes;
 		ZEArray<ZEModelResourceBone>				Bones;
@@ -341,14 +339,14 @@ class ZEModelResource : public ZEResource
 		bool										BoundingBoxIsUserDefined;
 		ZEAABBox									UserDefinedBoundingBox;
 
-		bool										ReadBones(ZEMLSerialReader* NodeReader);
+		bool										ReadBones(ZEMLReaderNode* BonesNode);
 		void										ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
-		bool										ReadMeshes(ZEMLSerialReader* NodeReader);
-		bool										ReadHelpers(ZEMLSerialReader* NodeReader);
-		bool										ReadAnimations(ZEMLSerialReader* NodeReader);
-		bool										ReadMaterials(ZEMLSerialReader* NodeReader);
-		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLSerialReader* NodeReader);
-		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLSerialReader* NodeReader);
+		bool										ReadMeshes(ZEMLReaderNode* MeshesNode);
+		bool										ReadHelpers(ZEMLReaderNode* HelpersNode);
+		bool										ReadAnimations(ZEMLReaderNode* AnimationsNode);
+		bool										ReadMaterials(ZEMLReaderNode* MaterialsNode);
+		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLReaderNode* PhysicalBodyNode);
+		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLReaderNode* PhysicalJointNode);
 
 		const ZETexture2D*							ManageModelMaterialTextures(const ZEString& FileName);
 		bool  										ReadModelFromFile(ZEFile* ResourceFile);
