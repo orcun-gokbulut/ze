@@ -74,11 +74,9 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 
-ZE_META_OBJECT_DESCRIPTION(ZECamera);
-
 class ZECamera : public ZEEntity
 {
-	ZE_META_OBJECT(ZECamera)
+	ZE_OBJECT
 
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
@@ -147,25 +145,8 @@ class ZECamera : public ZEEntity
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
-		ZEVector2						GetScreenPosition(ZEVector3& WorldPosition);
+		//ZEVector2						GetScreenPosition(ZEVector3& WorldPosition);
 
 		static ZECamera*				CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZECamera" parent="ZEEntity" noinstance="false">
-			<description>Camera</description>
-			<property name="NearZ" type="float" autogetset="yes" description="The nearest distance that camera can show"/>
-			<property name="FarZ" type="float" autogetset="yes" description="The farest distance that camera can show"/>
-			<property name="HorizontalFOV" type="float" autogetset="yes" description="Field of view"/>
-			<property name="AspectRatio" type="float" autogetset="yes" description="Width vs Height aspect ratio"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
 #endif

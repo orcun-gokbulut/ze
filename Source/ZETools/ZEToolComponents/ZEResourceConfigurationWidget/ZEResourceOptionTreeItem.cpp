@@ -63,7 +63,7 @@ void ZEResourceOptionTreeItem::Update()
 
 	if(ResourceOption->PhysicalPath.GetLength() != 0)
 	{
-		if(ZEFileInfo::IsFile(ResourceOption->PhysicalPath))
+		if(ZEFileInfo(ResourceOption->PhysicalPath).IsFile())
 			StatusString += "(P)OK ";
 		else
 			StatusString += "(P)NOK ";
@@ -73,7 +73,7 @@ void ZEResourceOptionTreeItem::Update()
 
 	if(ResourceOption->ExportPath.GetLength() != 0)
 	{
-		if(ZEFileInfo::IsFile(ResourceOption->ExportPath + "\\" + ResourceOption->Identifier))
+		if(ZEFileInfo(ResourceOption->ExportPath + "\\" + ResourceOption->Identifier).IsFile())
 			StatusString += "/ (E)OK";
 		else
 			StatusString += "/ (E)NOK";

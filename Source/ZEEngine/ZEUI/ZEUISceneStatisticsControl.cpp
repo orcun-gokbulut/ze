@@ -116,7 +116,7 @@ ZEMaterial* ZEUISceneStatisticsControl::GetMaterial() const
 void ZEUISceneStatisticsControl::Draw(ZEUIRenderer* Renderer)
 {
 	ZEDrawStatistics Stats = zeScene->GetRenderer()->GetDrawParameters()->Statistics;
-	ZEVariant Value;
+	ZEValue Value;
 
 	//Scene Statistics
 

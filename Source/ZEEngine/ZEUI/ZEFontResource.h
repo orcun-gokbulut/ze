@@ -37,6 +37,7 @@
 #ifndef	__ZE_FONT_RESOURCE_H__
 #define __ZE_FONT_RESOURCE_H__
 
+#include "ZETypes.h"
 #include "ZECore/ZEResource.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
@@ -44,10 +45,7 @@
 
 #define ZE_FONT_CHARACTER_COUNT				256
 
-class ZETexture2D;
-class ZETexture2DResource;
-class ZEUIMaterial;
-class ZEMaterial;
+ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
 
 struct ZEFontCharacterMetric
 {
@@ -84,6 +82,8 @@ struct ZEFontCharacter
 
 class ZEFontResource : public ZEResource
 {
+	ZE_OBJECT
+
 	public:
 		virtual ZEFontResourceType			GetFontResourceType() const = 0;
 		virtual const ZEFontCharacter&		GetCharacter(char Character) = 0;

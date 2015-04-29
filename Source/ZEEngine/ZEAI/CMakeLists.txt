@@ -37,7 +37,7 @@ cmake_minimum_required(VERSION 2.8)
 
 project(ZEAI)
 
-ze_add_source(ZEActor.h							Sources Headers)
+ze_add_source(ZEActor.h							Sources Headers ZEMC)
 ze_add_source(ZEActor.cpp						Sources)
 ze_add_source(ZESteering.h						Sources Headers)
 ze_add_source(ZESteering.cpp					Sources)
@@ -78,8 +78,10 @@ ze_add_source(ZENavigationMeshGenerator.cpp		Sources)
 ze_add_library(TARGET ZEAI
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation)
 	
 ze_add_test(TARGET ZEAITests 
 	SOURCES ${Tests}
+	ZEMC ${ZEMC}
 	TEST_TARGET ZEAI)

@@ -45,12 +45,15 @@ enum ZEUICheckBoxState
 	ZE_UI_CBS_CHECKED		= 1
 };
 
-class ZEString;
-class ZEUILabel;
+ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
+ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
+ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
 
 class ZEUICheckBoxControl : public ZEUIControl
 {
 	friend class ZEUIManager;
+
+	ZE_OBJECT
 
 	private:
 

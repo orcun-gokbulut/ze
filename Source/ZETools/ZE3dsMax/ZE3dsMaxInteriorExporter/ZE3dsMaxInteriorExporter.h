@@ -58,8 +58,9 @@ class ZE3dsMaxInteriorExporter : public SceneExport
 		ZE3dsMaxInteriorExporterOptionsDialog*		OptionsDialog;
 		ZEResourceConfigurationWidget*				ResourceConfigurationDialog;
 
-		ZEMLNode									InteriorNode;
+		ZEMLRoot									InteriorRoot;
 		ZEMLNode*									ExportOptions;
+		ZEMLNode									InteriorNode;
 		QWinWidget*									WinWidget;
 		ZEProgressDialog*							ProgressDialog;
 		ZEString									ExportPath;

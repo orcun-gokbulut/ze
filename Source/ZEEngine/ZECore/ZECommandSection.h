@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEDS/ZEValue.h"
 
 
 class ZECommand;
@@ -62,7 +62,7 @@ class ZECommandSection
 		ZECommand*					GetCommand(const ZEString& Name);
 		ZECommand*					GetCommand(ZESize Index);
 
-		bool						ExecuteCommand(const ZEString& Name, ZEArray<ZEVariant>* Paramlist);
+		bool						ExecuteCommand(const ZEString& Name, ZEArray<ZEValue>* Paramlist);
 
 									ZECommandSection();
 									ZECommandSection(const ZEString& Name);

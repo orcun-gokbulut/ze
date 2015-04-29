@@ -312,7 +312,7 @@ void ZEUILabel::SetFontResource(ZEFontResource* Resource)
 	SetText(Text);
 }
 
-const ZEFontResource* ZEUILabel::GetFontResource() const
+ZEFontResource* ZEUILabel::GetFontResource()
 {
 	return FontResource;
 }

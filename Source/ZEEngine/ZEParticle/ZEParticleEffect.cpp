@@ -37,8 +37,7 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGame/ZEDrawParameters.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEParticleEffect);
-		
+
 ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 {
 	return ZE_DF_DRAW | ZE_DF_CULL;
@@ -100,7 +99,7 @@ void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
 
 void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 {
-	Emitters.DeleteValue(Emitter);
+	Emitters.RemoveValue(Emitter);
 }
 
 const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
@@ -127,7 +126,7 @@ void ZEParticleEffect::AddSystem(ZEParticleSystem* System)
 
 void ZEParticleEffect::RemoveSystem(ZEParticleSystem* System)
 {
-	Systems.DeleteValue(System);
+	Systems.RemoveValue(System);
 }
 
 const ZEParticleStatistics& ZEParticleEffect::GetStatistics()

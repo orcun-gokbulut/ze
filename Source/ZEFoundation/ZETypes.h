@@ -32,7 +32,7 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-
+#pragma once
 #ifndef __ZE_TYPES_H__
 #define __ZE_TYPES_H__
 

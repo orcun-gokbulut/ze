@@ -56,6 +56,7 @@ qt4_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(TARGET ZE3dsMaxModelExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax QWinWidget)
+	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax QWinWidget
+	ZEFC ${ZEFC})
 
 set_property(TARGET ZE3dsMaxModelExporter APPEND PROPERTY COMPILE_FLAGS " /GR")

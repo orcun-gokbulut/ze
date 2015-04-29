@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEDS/ZEArray.h"
 
 #include <d3d9.h>
 
@@ -65,10 +66,9 @@ enum ZEHDRToneMapOperator
 	ZE_HDR_TMO_FILMIC			= 4
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9HDRProcessor);
 class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9HDRProcessor);
+	ZE_OBJECT
 
 	private:
 		ZED3D9FrameRenderer*			Renderer;
@@ -226,47 +226,5 @@ class ZED3D9HDRProcessor : public ZED3D9ComponentBase, public ZEObject
 										ZED3D9HDRProcessor();
 										~ZED3D9HDRProcessor();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9HDRProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9HDRProcessor</description>
-
-				<property name="AutoKey" type="boolean" autogetset="yes" description="..."/>
-				<property name="AutoExposure" type="boolean" autogetset="yes" description="..."/>
-				<property name="BloomEnabled" type="boolean" autogetset="yes" description="..."/>
-
-
-				<property name="Key" type="float" autogetset="yes" description="..."/>
-				<property name="Exposure" type="float" autogetset="yes" description="..."/>
-				<property name="WhiteLevel" type="float" autogetset="yes" description="..."/>
-				<property name="Saturation" type="float" autogetset="yes" description="..."/>
-				<property name="AdaptationRate" type="float" autogetset="yes" description="..."/>
-				<property name="ToneMapOperator" type="integer32" autogetset="yes" description="...">
-					<enumurator name="ZEHDRToneMapOperator">
-						<item name="Logarithmic"	value="ZE_HDR_TMO_LOGARITHMIC"/>
-						<item name="Exponential"	value="ZE_HDR_TMO_EXPONENTIAL"/>
-						<item name="Reinhard"		value="ZE_HDR_TMO_REINHARD"/>
-						<item name="Reinhard Mod"	value="ZE_HDR_TMO_REINHARD_MOD"/>
-						<item name="Filmic"			value="ZE_HDR_TMO_FILMIC"/>
-					</enumurator>
-				</property>
-				
-
-				<property name="BloomFactor" type="float" autogetset="yes" description="..."/>
-				<property name="BloomTreshold" type="float" autogetset="yes" description="..."/>
-				<property name="BloomDeviation" type="float" autogetset="yes" description="..."/>
-				<property name="BloomPassCount" type="integer32" autogetset="yes" description="..."/>
-				<property name="BloomWeightLarge" type="float" autogetset="yes" description="..."/>
-				<property name="BloomWeightMedium" type="float" autogetset="yes" description="..."/>
-				<property name="BloomWeightSmall" type="float" autogetset="yes" description="..."/>
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

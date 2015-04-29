@@ -36,7 +36,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZETerrain.cpp						Sources)
-ze_add_source(ZETerrain.h						Sources ZEPP)
+ze_add_source(ZETerrain.h						Sources)
 ze_add_source(ZETerrainLayer.cpp				Sources)
 ze_add_source(ZETerrainLayer.h					Sources)
 ze_add_source(ZETerrainLevel.cpp				Sources)

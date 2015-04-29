@@ -47,9 +47,10 @@
 
 struct ZEFreeType;
 
-
 class ZEFontResourceDynamic : public ZEFontResource
 {
+	ZE_OBJECT
+
 	private:
 		ZEFreeType*							FreeType;
 

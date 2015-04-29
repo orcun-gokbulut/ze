@@ -66,7 +66,7 @@ bool ZEOptionSection::AddOption(ZEOption* Option)
 
 void ZEOptionSection::DeleteOption(ZESize Index)
 {
-	Options.DeleteAt(Index);
+	Options.Remove(Index);
 }
 
 ZESize ZEOptionSection::GetNumberOfOptions()

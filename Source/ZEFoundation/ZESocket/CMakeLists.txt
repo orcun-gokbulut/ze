@@ -69,7 +69,7 @@ ze_add_source(ZESocketTCPServerListener.h				Sources Headers)
 ze_add_library(TARGET ZESocket 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-    LIBS ZEFoundation)
+    LIBS ZEDS)
 
 ze_link(TARGET ZESocket LIBS ws2_32.lib PLATFORMS Windows)
 

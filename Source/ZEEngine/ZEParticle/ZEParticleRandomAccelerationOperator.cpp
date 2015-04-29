@@ -63,7 +63,8 @@ void ZEParticleRandomAccelerationOperator::Tick(float ElapsedTime, ZEArray<ZEPar
 
 	for(ZESize I = 0; I < GetOwner()->GetOperators().GetCount(); I++)
 	{
-		if(GetOwner()->GetOperators()[I]->GetDescription() == ZEParticlePhysicsOperator::Description())
+		//ZEMETADEBUGCHECK!!!
+		if(GetOwner()->GetOperators()[I]->GetClass() == ZEParticlePhysicsOperator::Class())
 			PhysicsOperator = (ZEParticlePhysicsOperator*)GetOwner()->GetOperators()[I];
 	}
 

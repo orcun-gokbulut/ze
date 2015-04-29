@@ -46,8 +46,6 @@
 #include <string.h>
 #include "ZEWeather.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZELensFlare);
-
 ZEDrawFlags ZELensFlare::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
@@ -75,7 +73,7 @@ void ZELensFlare::Draw(ZEDrawParameters* DrawParameters)
 
 	// Find Sun
 
-	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Description());
+	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Class());
 	if (Entities.GetSize() == 0)
 		return;
 
@@ -115,9 +113,4 @@ ZELensFlare::~ZELensFlare()
 ZELensFlare* ZELensFlare::CreateInstance()
 {
 	return new ZELensFlare();
-}
-
-ZEEntityRunAt ZELensFlareDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

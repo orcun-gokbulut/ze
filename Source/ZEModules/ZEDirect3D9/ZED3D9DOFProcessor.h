@@ -56,11 +56,9 @@ struct ZEDOFScreenAlignedQuad
 	float Position[3];
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9DOFProcessor);
-
 class ZED3D9DOFProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9DOFProcessor)
+	ZE_OBJECT
 
 	private:
 		static ZEDOFScreenAlignedQuad	Vertices[4];
@@ -139,25 +137,4 @@ class ZED3D9DOFProcessor : public ZED3D9ComponentBase, public ZEObject
 		virtual							~ZED3D9DOFProcessor();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9DOFProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9DOFProcessor</description>
-				<property name="FarClamp" type="float" autogetset="yes" description="..."/>
-				<property name="NearClamp" type="float" autogetset="yes" description="..."/>
-				<property name="FarDistance" type="float" autogetset="yes" description="..."/>
-				<property name="NearDistance" type="float" autogetset="yes" description="..."/>
-				<property name="FocusDistance" type="float" autogetset="yes" description="..."/>
-				<property name="FullFocusRange" type="float" autogetset="yes" description="..."/>
-				<property name="BlurPassCount" type="integer32" autogetset="yes" description="..."/>
-				
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-#endif	/* __ZE_D3D9_DOF_PROCESSOR_H__ */
+#endif

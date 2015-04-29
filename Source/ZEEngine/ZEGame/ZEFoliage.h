@@ -83,13 +83,8 @@ public:
 
 class ZEInterior;
 class ZEModelResource;
-
-ZE_META_ENTITY_DESCRIPTION(ZEFoliage);
-
 class ZEFoliage : public ZEEntity
 {
-	ZE_META_ENTITY(ZEFoliage)
-
 	private:
 		float						BrushDensity;
 		ZEVector2					BrushSize;
@@ -143,22 +138,5 @@ class ZEFoliage : public ZEEntity
 		static ZEFoliage*			CreateInstance();
 
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEFoliage" parent="ZEEntity" description="Foliage">		
-			<description>Tiles Trees</description>
-			<property name="SurfaceEntityName" type="string" setfunction="SetSurfaceEntityName" getfunction="GetSurfaceEntityName" description="Surface Entities Name"/>	
-			<property name="MinScale" type="float" autogetset="true" description="..."/>
-			<property name="MaxScale" type="float" autogetset="true" description="..."/>
-			<property name="BrushDensity" type="float" autogetset="true" description="..."/>
-			<property name="BrushSize" type="ZEVector2" autogetset="true" description="..."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

@@ -50,6 +50,8 @@ enum ZESoundFileFormat
 
 class ZESoundResource : public ZEResource
 {
+	ZE_OBJECT
+
 	protected:
 		ZESoundFileFormat				FileFormat;
 

@@ -167,7 +167,7 @@ bool ZEModuleManager::RegisterModule(ZEExtensionDescription* ModuleDesc)
 
 void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 {
-	ModuleList.DeleteValue(ModuleDesc);
+	ModuleList.RemoveValue(ModuleDesc);
 }
 
 #include "ZEInput/ZEInputModule.h"

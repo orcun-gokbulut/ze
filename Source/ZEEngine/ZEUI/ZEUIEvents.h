@@ -38,7 +38,6 @@
 #define __ZE_UI_EVENTS_H__
 
 #include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEFastDelegate.h"
 #include "ZEDS/ZEDelegate.h"
 #include "ZEUI/ZEUIManager.h"
 

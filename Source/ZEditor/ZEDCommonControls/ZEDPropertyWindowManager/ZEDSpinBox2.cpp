@@ -37,18 +37,18 @@
 #include "ZEDUndoRedo\ZEDUndoRedo.h"
 #include "ZEDPropertyUndoRedo.h"
 
-ZEDSpinBox2::ZEDSpinBox2(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute) : QTreeWidgetItem(parent)
+ZEDSpinBox2::ZEDSpinBox2(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property) : QTreeWidgetItem(parent)
 {
 	this->ParentTree = ParentTree;
-	this->Class = Class;
-	this->ClassAttribute = ClassAttribute;
+	this->Object = Object;
+	this->Property = Property;
 	ZEVariant Value;
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 //	setForeground(0,QBrush(QColor(0,0,0)));
-	setText(0, ClassAttribute.Name);
-	this->setToolTip (0, QString(ClassAttribute.Description));
+	setText(0, Property->Name);
+	//this->setToolTip (0, QString(ClassAttribute.Description));
 
-	if (Value.GetType() != ZE_VRT_VECTOR2)
+	if (Value.GetType().Type != ZE_TT_VECTOR2)
 	{
 		setText(1, QString("Error Vector2"));
 		return;
@@ -87,7 +87,7 @@ ZEDSpinBox2::ZEDSpinBox2(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObj
 
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() +  "]");
 
-	if((this->ClassAttribute.Access & ZE_PA_WRITE) != ZE_PA_WRITE)
+	if((this->Property->Access & ZEMT_PA_WRITE) != ZEMT_PA_WRITE)
 	{
 		this->ValueCollectionLine->setEnabled(false);
 		this->XValue->setEnabled(false);
@@ -130,17 +130,17 @@ void ZEDSpinBox2::Changed()
 
 	ZEVariant Value;
 
-	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Class, this->ClassAttribute);
-	Class->GetProperty(ClassAttribute.Name, Value);
+	ZEDPropertyUndoRedoOperation* TempOperation = new ZEDPropertyUndoRedoOperation(this->Object, this->Property);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetOldValue(Value);
 
 	Value.SetVector2(ZEVector2(XValue->GetFloat(), YValue->GetFloat()));
-	this->Class->SetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->SetProperty(Object, Property->Name, Value);
 	ValueCollectionLine->setText("[" + XValue->text() + " ;  " + YValue->text() + "]");
 	LastValidCollection.x = XValue->GetFloat();
 	LastValidCollection.y = YValue->GetFloat();
 
-	Class->GetProperty(ClassAttribute.Name, Value);
+	Object->GetClass()->GetProperty(Object, Property->Name, Value);
 	TempOperation->SetNewValue(Value);
 
 	ZEDUndoRedoManagerOld::RegisterOperation(TempOperation);

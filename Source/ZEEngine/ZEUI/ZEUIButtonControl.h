@@ -39,12 +39,14 @@
 
 #include "ZEUIFrameControl.h"
 
-class ZEUILabel;
+ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
 
 class ZEUIButtonControl : public ZEUIFrameControl
 {
 	friend class ZEUIManager;
 	friend class ZEUICheckBoxControl;
+
+	ZE_OBJECT
 
 	private:
 

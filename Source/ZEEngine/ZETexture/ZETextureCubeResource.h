@@ -39,9 +39,12 @@
 
 #include "ZETextureResource.h"
 
-class ZETextureCube;
+ZE_META_FORWARD_DECLARE(ZETextureCube, "ZEGraphics/ZETextureCube.h")
+
 class ZETextureCubeResource : public ZETextureResource
 {
+	ZE_OBJECT
+
 	private:
 		ZETextureCube*						Texture;
 

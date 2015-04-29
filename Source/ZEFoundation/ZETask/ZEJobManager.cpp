@@ -60,7 +60,7 @@ void ZEJobManager::AddJob(ZEJob* Job)
 void ZEJobManager::RemoveJob(ZEJob* Job)
 {
 	zeDebugCheck(!Jobs.Exists(Job), "Job is not exist in jobs list.");
-	Jobs.DeleteValue(Job);
+	Jobs.RemoveValue(Job);
 }
 
 ZEJob* ZEJobManager::GetJob(const ZEString& Name)

@@ -39,7 +39,8 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include <string.h>
-		
+#include "ZEMath\ZEMath.h"
+
 void ZEModelAnimationTrack::SetOwner(ZEModel* Model)
 {
 	Owner = Model;
@@ -383,16 +384,6 @@ bool ZEModelAnimationTrack::GetLimitsEnabled()
 	return LimitsEnabled;
 }
 
-void ZEModelAnimationTrack::SetBlendMode(ZEModelAnimationBlendMode Mode)
-{
-	this->BlendMode = Mode;
-}
-
-ZEModelAnimationBlendMode ZEModelAnimationTrack::GetBlendMode()
-{
-	return BlendMode;
-}
-
 void ZEModelAnimationTrack::SetBlendFactor(float Factor)
 {
 	BlendFactor = Factor;
@@ -411,6 +402,16 @@ void ZEModelAnimationTrack::SetSpeed(float FPS)
 float ZEModelAnimationTrack::GetSpeed()
 {
 	return Speed;
+}
+
+void ZEModelAnimationTrack::SetBlendMode(ZEModelAnimationBlendMode Mode)
+{
+	this->BlendMode = Mode;
+}
+
+ZEModelAnimationBlendMode ZEModelAnimationTrack::GetBlendMode()
+{
+	return this->BlendMode;
 }
 
 void ZEModelAnimationTrack::Play()

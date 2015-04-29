@@ -46,12 +46,12 @@
 
 struct ZEDrawParameters;
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleEffect);
-
 class ZEParticleEffect : public ZEEntity
 {
 	friend class ZEParticleEmitter;
-	ZE_META_ENTITY(ZEParticleEffect)
+	
+	ZE_OBJECT
+
 	private:
 
 		ZEArray<ZEParticleEmitter*>			Emitters;
@@ -88,17 +88,5 @@ class ZEParticleEffect : public ZEEntity
 		static ZEParticleEffect*			CreateInstance();
 
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleEffect" parent="ZEEntity">
-			<description>Particle Effect</description>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

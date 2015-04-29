@@ -37,8 +37,6 @@
 #include "ZESoundSource3D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZESoundSource3D);
-
 ZESoundSource3D::ZESoundSource3D()
 {
 	MinDistance = 0.0f;
@@ -80,9 +78,4 @@ ZEUInt ZESoundSource3D::GetConeOutsideVolume() const
 ZESoundSource3D* ZESoundSource3D::CreateInstance()
 {
 	return zeSound->CreateSoundSource3D();
-}
-
-ZEEntityRunAt ZESoundSource3DDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

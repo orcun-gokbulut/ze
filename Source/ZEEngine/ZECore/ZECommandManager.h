@@ -63,7 +63,7 @@ class ZECommandManager
 		ZECommandSection*			GetCommandSection(const ZEString& Name);
 		ZECommand*					GetCommand(const ZEString& Section, const ZEString& Name);
 
-		bool						ExecuteCommand(const ZEString& Section, const ZEString& Name, ZEArray<ZEVariant>* ParamList);
+		bool						ExecuteCommand(const ZEString& Section, const ZEString& Name, ZEArray<ZEValue>* ParamList);
 				
 		bool						RegisterSection(ZECommandSection* Section);
 		bool						UnregisterSection(ZECommandSection* Section);

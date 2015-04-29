@@ -38,7 +38,7 @@
 #include "ZEError.h"
 #include "ZEEndian.h"
 #include "ZETextureData.h"
-#include "ZEDS/ZEPointer.h"
+#include "ZEPointer/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
 #include "ZETexturePixelConverter.h"
 #include "ZETextureData.h"

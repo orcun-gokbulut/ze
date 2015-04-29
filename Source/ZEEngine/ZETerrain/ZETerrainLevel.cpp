@@ -37,7 +37,9 @@
 #include "ZETerrainLevel.h"
 #include "ZETerrainLayer.h"
 #include "ZETerrainResource.h"
+
 #include "ZEGraphics\ZETexture2D.h"
+#include "ZEMath\ZEMath.h"
 
 ZETerrainLayer* ZETerrainLevel::GetOwner()
 {

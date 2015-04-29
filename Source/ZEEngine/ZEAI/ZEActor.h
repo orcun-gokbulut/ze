@@ -48,6 +48,8 @@ class ZESteering;
 
 class ZEActor : public ZEEntity
 {
+	ZE_OBJECT
+
 	private:
 		ZEVector3					LinearVelocity;
 		ZEQuaternion				AngularVelocity;

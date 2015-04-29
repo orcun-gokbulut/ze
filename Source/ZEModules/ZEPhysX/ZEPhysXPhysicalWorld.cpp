@@ -184,7 +184,7 @@ void ZEPhysXPhysicalWorld::AddPhysicalObject(ZEPhysicalObject* Object)
 
 void ZEPhysXPhysicalWorld::RemovePhysicalObject(ZEPhysicalObject* Object)
 {
-	PhysicalObjects.DeleteValue(Object);
+	PhysicalObjects.RemoveValue(Object);
 	Object->Deinitialize();
 }
 
@@ -322,7 +322,7 @@ void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 
 void ZEPhysXPhysicalWorld::Destroy()
 {
-	GetModule()->PhysicalWorlds.DeleteValue(this);
+	GetModule()->PhysicalWorlds.RemoveValue(this);
 	delete this; 
 }
 

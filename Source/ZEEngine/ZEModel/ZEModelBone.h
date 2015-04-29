@@ -40,14 +40,20 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
 
-class ZEModel;
-class ZEModelBone
+ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
+
+class ZEModelBone : public ZEObject
 {
 	friend class ZEModel;
 	friend class ZEModelIKChain;
+
+	ZE_OBJECT
+
 	private:
 		ZEModel*							Owner;
 		const ZEModelResourceBone*			BoneResource;

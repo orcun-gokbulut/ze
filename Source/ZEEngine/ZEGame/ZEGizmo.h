@@ -33,8 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-
 #pragma once
 #ifndef __ZE_GIZMO_H__
 #define __ZE_GIZMO_H__
@@ -42,11 +40,6 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
-
-
-class ZESimpleMaterial;
-class ZERenderer;
-class ZERLLight;
 
 enum ZEGizmoMode
 {
@@ -70,8 +63,13 @@ enum ZEGizmoAxis
 	ZE_GA_SCREEN_AXIS
 };
 
+ZE_META_FORWARD_DECLARE(ZESimpleMaterial, "ZEGraphics/ZESimpleMaterial.h")
+ZE_META_FORWARD_DECLARE(ZERenderer, "ZEGraphics/ZERenderer.h")
+
 class ZEGizmo : public ZEEntity
 {
+	ZE_OBJECT
+
 	private:
 		ZECanvas						GizmoLines;
 		ZECanvas						GizmoTriangles;

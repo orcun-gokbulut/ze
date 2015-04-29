@@ -102,7 +102,7 @@ bool ZEExtensionManager::RegisterExtension(ZEExtensionDescription* ExtensionDesc
 
 void ZEExtensionManager::UnregisterExtension(ZEExtensionDescription* ExtensionDescription)
 {
-	ExtensionList.DeleteValue(ExtensionDescription);
+	ExtensionList.RemoveValue(ExtensionDescription);
 }
 
 class ZEExtensionManager* ZEExtensionManager::GetInstance()

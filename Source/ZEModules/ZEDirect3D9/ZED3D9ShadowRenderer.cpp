@@ -131,7 +131,7 @@ void ZED3D9ShadowRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 
 void ZED3D9ShadowRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
-	PostProcessors.DeleteValue(PostProcessor);
+	PostProcessors.RemoveValue(PostProcessor);
 }
 
 void ZED3D9ShadowRenderer::DeviceLost()
@@ -237,7 +237,7 @@ void ZED3D9ShadowRenderer::Deinitialize()
 
 void ZED3D9ShadowRenderer::Destroy()
 {
-	GetModule()->ShadowRenderers.DeleteValue((ZED3D9ShadowRenderer*)this);
+	GetModule()->ShadowRenderers.RemoveValue((ZED3D9ShadowRenderer*)this);
 	ZERenderer::Destroy();
 }
 

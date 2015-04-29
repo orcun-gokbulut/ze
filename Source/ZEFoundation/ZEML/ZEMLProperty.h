@@ -37,39 +37,48 @@
 #ifndef	__ZEML_PROPERTY_H__
 #define __ZEML_PROPERTY_H__
 
-#include "ZEMLItem.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEVariant.h"
+#include "ZEMLElement.h"
+#include "ZEDS/ZEValue.h"
 
-class TiXmlElement;
-
-class ZEMLProperty : public ZEMLItem
+class ZEMLProperty : public ZEMLElement
 {
 	friend class ZEMLNode;
-	friend class ZEMLSerialNode;
-	friend class ZEMLSerialRootNode;
-
 	private:
-
-		ZEVariant			Value;
-
-	protected:
-
-		bool				WriteSelfToXML(TiXmlElement* Element);
-		bool				ReadFromXML(TiXmlElement* Element);
-		virtual bool		WriteSelf(ZEFile* File);
-		virtual bool		ReadSelf(ZEFile* File, bool DeferredDataReading);
+		ZEValue						Value;
 
 	public:
+		virtual ZEMLElementType		GetType();
+		virtual ZESize				GetSize();
 
-		virtual ZEUInt64	GetTotalSize();
+		virtual ZEMLElement*		Clone();
 
-		void				SetValue(const ZEVariant& Value);
-		const ZEVariant&	GetValue() const;
+		ZEMLValueType				GetValueType();
 
-							ZEMLProperty();
-							ZEMLProperty(const ZEString& Name);
-							ZEMLProperty(const ZEString& Name ,const ZEVariant& Value);
+		bool						SetValue(const ZEValue& Value);
+		const ZEValue&				GetValue() const;
+
+		void						SetFloat(float Value);
+		void						SetDouble(double Value);
+		void						SetInt8(ZEInt8 Value);
+		void						SetInt16(ZEInt16 Value);
+		void						SetInt32(ZEInt32 Value);
+		void						SetInt64(ZEInt64 Value);
+		void						SetUInt8(ZEUInt8 Value);
+		void						SetUInt16(ZEUInt16 Value);
+		void						SetUInt32(ZEUInt32 Value);
+		void						SetUInt64(ZEUInt64 Value);
+		void						SetBool(bool Value);
+		void						SetString(const char* Value);
+		void						SetQuaternion(const ZEQuaternion& Value);
+		void						SetVector2(const ZEVector2& Value);
+		void						SetVector3(const ZEVector3& Value);
+		void						SetVector4(const ZEVector4& Value);
+		void						SetMatrix3x3(const ZEMatrix3x3& Value);
+		void						SetMatrix4x4(const ZEMatrix4x4& Value);
+
+									ZEMLProperty();
+									ZEMLProperty(const char* Name);
+									ZEMLProperty(const char* Name, const ZEValue& Value);
 };
 
 #endif

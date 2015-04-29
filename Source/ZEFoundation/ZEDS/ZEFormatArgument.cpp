@@ -541,7 +541,7 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, ZEObject* Argument, const 
 	return "";
 }
 
-bool ZEFormatArgument::FormatVariant(ZEStringWriter& Output, const ZEVariant& Argument, const char* ArgumentFormat)
+bool ZEFormatArgument::FormatVariant(ZEStringWriter& Output, const ZEValue& Argument, const char* ArgumentFormat)
 {
 	switch(Argument.GetType())
 	{

@@ -43,4 +43,4 @@ ze_add_source(ZEOctree.h				Sources Headers)
 ze_add_library(TARGET ZESpatial 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation ZEDS ZEMath)
+	LIBS ZEDS ZEMath)

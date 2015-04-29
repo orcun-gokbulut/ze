@@ -40,7 +40,6 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
-
 void ZECloud::SetAmbientColor(ZEVector3 Color)
 {
 	AmbientColor = Color;

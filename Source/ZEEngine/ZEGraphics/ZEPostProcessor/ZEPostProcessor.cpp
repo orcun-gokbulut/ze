@@ -90,7 +90,7 @@ void ZEPostProcessor::RemoveNode(ZEPostProcessorNode* Node)
 {
 	Node->Deinitialize();
 	Node->SetOwner(NULL);
-	Nodes.DeleteValue(Node);
+	Nodes.RemoveValue(Node);
 }
 
 bool ZEPostProcessor::Initialize()

@@ -36,6 +36,7 @@
 #include "ZEBuffer.h"
 
 #include <memory.h>
+#include "ZEMath\ZEMath.h"
 
 ZESSize ZEBuffer::RawBlockSize(ZEBufferBlockPointer Pointer) const
 {

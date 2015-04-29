@@ -34,9 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETerrain.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEGame\ZEDrawParameters.h"
 #include "ZETerrainLayer.h"
+
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
 
 bool ZETerrain2::InitializeSelf()
 {
@@ -111,7 +112,7 @@ void ZETerrain2::RemoveLayer(ZETerrainLayer* Layer)
 	if (GetState() == ZE_ES_INITIALIZED)
 		Layer->Deinitialize();
 
-	Layers.DeleteValue(Layer);
+	Layers.RemoveValue(Layer);
 }
 
 void ZETerrain2::SetPrimitiveSize(ZEUInt Size)
@@ -135,9 +136,4 @@ void ZETerrain2::Draw(ZEDrawParameters* DrawParameters)
 ZETerrain2* ZETerrain2::CreateInstance()
 {
 	return new ZETerrain2();
-}
-
-ZEEntityRunAt ZETerrain2Description::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

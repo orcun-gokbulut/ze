@@ -36,6 +36,7 @@
 #include "ZEDS/ZEFormat.h"
 #include <stdio.h>
 #include "ZEProtect/ZEProtect.h"
+#include "ZEFile/ZEPathManager.h"
 
 int main(int argc, char** argv)
 {
@@ -52,6 +53,8 @@ int main(int argc, char** argv)
 	Protect.SetApplicationName(Name);
 	Protect.SetActivationFileName("Activations.ZEProtect");
 	Protect.SetSystemWide(stricmp(SystemWide, "yes") == 0 ? true : false);
+
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	if (Protect.Activate())
 	{

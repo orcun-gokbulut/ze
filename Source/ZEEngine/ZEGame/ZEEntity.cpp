@@ -34,11 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEEntity.h"
+
+#include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZERay.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
 #include "ZEError.h"
-#include "ZEEntityProvider.h"
 #include "ZEScene.h"
+#include "ZEEntityProvider.h"
+
 #include <string.h>
+
 
 void ZEEntity::OnTransformChanged()
 {
@@ -77,7 +84,7 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 		Entity->Initialize();
 
 	if(Entity->GetName().GetLength() == 0)
-		Entity->SetName(GetName() + "->" +  Entity->GetDescription()->GetName());
+		Entity->SetName(GetName() + "->" +  Entity->GetClass()->GetName());
 
 	return true;
 }
@@ -90,7 +97,7 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 		return;
 	}
 
-	Components.DeleteValue(Entity);
+	Components.RemoveValue(Entity);
 
 	Entity->Owner = NULL;
 	Entity->SetOwnerScene(NULL);
@@ -122,7 +129,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 		Entity->Initialize();
 
 	if(Entity->GetName().GetLength() == 0)
-		Entity->SetName(GetName() + "->" +  Entity->GetDescription()->GetName());
+		Entity->SetName(GetName() + "->" +  Entity->GetClass()->GetName());
 
 	return true;
 }
@@ -135,7 +142,7 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 		return;
 	}
 
-	ChildEntities.DeleteValue(Entity);
+	ChildEntities.RemoveValue(Entity);
 
 	Entity->Owner = NULL;
 	Entity->SetOwnerScene(NULL);
@@ -577,12 +584,66 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 		Report.PoligonIndex = 0;
 		Report.Normal = ZEVector3::Zero;
 		Report.Binormal = ZEVector3::Zero;
+		
+		return true;
 	}
 
+	return false;
+}
+
+
+bool ZEEntity::Save(ZEMLWriterNode* Serializer)
+{
+	ZEMLWriterNode EntityNode = Serializer->OpenSubNode("Entity");
+		EntityNode.WriteString("Class", GetClass()->GetName());
+		ZEMLWriterNode PropertiesNode = EntityNode.OpenSubNode("Properties");
+			const ZEProperty* Properties = GetClass()->GetProperties();
+			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
+			{
+				const ZEProperty* Current = &Properties[I];
+				if (Current->Type.ContainerType != ZE_CT_NONE)
+					continue;
+
+				if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+					continue;
+
+				if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+					continue;
+
+				if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
+					continue;
+
+				ZEVariant Variant;
+				GetClass()->GetProperty(this, Current->ID, Variant);
+
+				ZEValue Value = Variant.GetValue();
+				if (Value.IsNull())
+					continue;
+
+				PropertiesNode.WriteValue(Current->Name, Value);
+			}
+		PropertiesNode.CloseNode();
+	EntityNode.CloseNode();
+	
 	return true;
 }
 
-ZEEntityRunAt ZEEntityDescription::GetRunAt() const
+bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 {
-	return ZE_ERA_NONE;
+	if (Unserializer->GetName() != "Entity")
+		return false;
+
+	ZEMLReaderNode PropertiesNode = Unserializer->GetSubNode("Properties");
+	const ZESmartArray<ZEMLReaderProperty>& Properties = PropertiesNode.GetProperties();
+
+	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	{
+		if (Properties[I].ElementType == ZEML_ET_DATA)
+			continue;
+
+		if (!GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value)))
+			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Properties[I].Name.ToCString());
+	}
+
+	return true;
 }

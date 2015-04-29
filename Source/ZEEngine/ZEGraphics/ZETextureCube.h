@@ -54,6 +54,8 @@ enum ZETextureCubeFace
 
 class ZETextureCube : public ZETexture
 {
+	ZE_OBJECT
+
 	protected:
 		ZEUInt						EdgeLength;
 		ZEUInt						LevelCount;

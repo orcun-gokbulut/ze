@@ -51,8 +51,8 @@ class ZEDRotationSpinBox3 : public QObject, public QTreeWidgetItem, public ZEDPr
 
 	public:
 
-		ZEObject*				Class;
-		ZEPropertyDescription	ClassAttribute;
+		ZEObject*				Object;
+		ZEProperty*				Property;
 		QTreeWidget*			ParentTree;
 
 		ZEVector3				LastValidCollection;
@@ -71,7 +71,7 @@ class ZEDRotationSpinBox3 : public QObject, public QTreeWidgetItem, public ZEDPr
 
 		virtual void			UpdateValues();
 
-								ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Class, ZEPropertyDescription ClassAttribute);
+								ZEDRotationSpinBox3(QTreeWidget* ParentTree, QTreeWidgetItem *parent, ZEObject* Object, ZEProperty* Property);
 								~ZEDRotationSpinBox3();
 
 	public slots:

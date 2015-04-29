@@ -35,29 +35,32 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEMLItem.h 					Sources Headers)
-ze_add_source(ZEMLItem.cpp 					Sources)
-ze_add_source(ZEMLItemTests.cpp 			Tests)
+ze_add_source(ZEMLCommon.h					Sources Headers)
+ze_add_source(ZEMLCommon.cpp				Sources)
+ze_add_source(ZEMLRoot.h					Sources Headers)
+ze_add_source(ZEMLRoot.cpp					Sources)
+ze_add_source(ZEMLElement.h 				Sources Headers)
+ze_add_source(ZEMLElement.cpp 				Sources)
+ze_add_source(ZEMLElementTests.cpp 			Tests)
 ze_add_source(ZEMLNode.h 					Sources Headers)
 ze_add_source(ZEMLNode.cpp 					Sources)
 ze_add_source(ZEMLNodeTests.cpp 			Tests)
 ze_add_source(ZEMLProperty.h 				Sources Headers)
 ze_add_source(ZEMLProperty.cpp 				Sources)
 ze_add_source(ZEMLPropertyTests.cpp 		Tests)
-ze_add_source(ZEMLDataProperty.h 			Sources Headers)
-ze_add_source(ZEMLDataProperty.cpp 			Sources)
-ze_add_source(ZEMLDataPropertyTests.cpp 	Tests)
-ze_add_source(ZEMLSerialWriter.h 			Sources Headers)
-ze_add_source(ZEMLSerialWriter.cpp 			Sources)
-ze_add_source(ZEMLSerialWriterTests.cpp 	Tests)
-ze_add_source(ZEMLSerialReader.h 			Sources Headers)
-ze_add_source(ZEMLSerialReader.cpp 			Sources)
-ze_add_source(ZEMLSerialReaderTests.cpp 	Tests)
+ze_add_source(ZEMLData.h 					Sources Headers)
+ze_add_source(ZEMLData.cpp 					Sources)
+ze_add_source(ZEMLDataTests.cpp 			Tests)
+ze_add_source(ZEMLReader.h					Sources Headers)
+ze_add_source(ZEMLReader.cpp				Sources)
+ze_add_source(ZEMLReaderV0.cpp				Sources)
+ze_add_source(ZEMLWriter.h 					Sources Headers)
+ze_add_source(ZEMLWriter.cpp 				Sources)
 
 ze_add_library(TARGET ZEML 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation libTinyXML)
+	LIBS ZEDS ZEMath libTinyXML)
 
 ze_add_test(TARGET ZEMLTests
 	SOURCES ${Tests}

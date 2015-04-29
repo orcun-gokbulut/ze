@@ -37,7 +37,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEFile\ZEPathUtils.h"
+#include <shellapi.h>
 
 #include <QtGui/QApplication>
 #include "ZETypes.h"
@@ -47,6 +47,8 @@
 #include "ZEMLVisualizer/ZEMLVisualizerWidget.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEML/ZEMLNode.h"
+#include "ZEFile/ZEPathManager.h"
+
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {	
@@ -58,14 +60,21 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
  	ZEMLVisualizerWidget w;
 	ZEFile File;
 	
-	File.Open("C:\\Users\\Can\\Desktop\\ZE\\Branches\\v0.5.5-NewTools\\Rundir\\Resources\\FontArial16\\Arial16.zefont", ZE_FOM_READ, ZE_FCM_NONE);
+	//File.Open("C:\\Users\\Can\\Desktop\\ZE\\Branches\\v0.5.5-NewTools\\Rundir\\Resources\\FontArial16\\Arial16.zefont", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\asd.ZEMODEL", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\Material #48.ZEMaterial", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\Preset.zeml", ZE_FOM_READ, ZE_FCM_NONE);
 	//File.Open("C:\\Users\\Can\\Desktop\\ExpTest.max.zecfg", ZE_FOM_READ, ZE_FCM_NONE);
-	ZEMLNode* Node = new ZEMLNode("ZEFont");
-	Node->Read(&File);
-	w.SetZEMLNode(Node);
+
+	LPWSTR* ArgList;
+	int ArgCount;
+
+	ArgList = CommandLineToArgvW(GetCommandLineW(), &ArgCount);
+
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+
+	w.SetZEMLFile(ZEString(ArgList[1]));
+
 	w.Show();
 
 // 	ZEResourceConfigurationWidget w;

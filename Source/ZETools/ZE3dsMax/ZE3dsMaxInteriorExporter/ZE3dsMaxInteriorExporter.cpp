@@ -43,7 +43,6 @@
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
 #include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEFile/ZEFileUtils.h"
 #include "ZEFile/ZEFileInfo.h"
 
 ZE3dsMaxInteriorExporter::ZE3dsMaxInteriorExporter()
@@ -186,7 +185,8 @@ void ZE3dsMaxInteriorExporter::LoadOptions(const char* FilePath)
 
 		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		{
-			ExportOptions->Read(&OptionsFile);
+			InteriorRoot.SetRootNode(ExportOptions);
+			InteriorRoot.Read(&OptionsFile);
 			OptionsFile.Close();
 		}
 		else
@@ -203,7 +203,8 @@ void ZE3dsMaxInteriorExporter::SaveOptions(const char* FilePath)
 		ZEFile OptionsFile;
 		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
-			OptionsDialog->GetOptions()->Write(&OptionsFile);
+			InteriorRoot.SetRootNode(OptionsDialog->GetOptions());
+			InteriorRoot.Write(&OptionsFile);
 			OptionsFile.Close();
 		}
 		else
@@ -271,7 +272,7 @@ bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow
 
 ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
-	ExportPath = ZEFileInfo::GetParentDirectory(name);
+	ExportPath = ZEFileInfo(name).GetParentDirectory();
 	LoadOptions(i->GetCurFilePath());
 
 	INodeTab lNodes;
@@ -289,7 +290,12 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 
 	SaveOptions(i->GetCurFilePath());
 
+	InteriorRoot.SetRootNode(&InteriorNode);
 	InteriorNode.SetName("ZEInterior");
+	ZEUInt8 MajorVersion = 1;
+	ZEUInt8 MinorVersion = 0;
+	InteriorNode.AddProperty("MajorVersion")->SetUInt8(MajorVersion);
+	InteriorNode.AddProperty("MinorVersion")->SetUInt8(MinorVersion);
 
 	if(ProgressDialog == NULL)
 		ProgressDialog = ZEProgressDialog::CreateInstance();
@@ -342,17 +348,17 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	}
 	ProgressDialog->CloseTask();
 	
-	InteriorNode.AddProperty("RoomCount", (ZEUInt32)Rooms.Count());
-	InteriorNode.AddProperty("DoorCount", (ZEUInt32)Doors.Count());
-	InteriorNode.AddProperty("HelperCount", (ZEUInt32)Helpers.Count());
-	InteriorNode.AddProperty("MaterialCount", (ZEUInt32)Materials.Count());
+	InteriorNode.AddProperty("RoomCount")->SetUInt32((ZEUInt32)Rooms.Count());
+	InteriorNode.AddProperty("DoorCount")->SetUInt32((ZEUInt32)Doors.Count());
+	InteriorNode.AddProperty("HelperCount")->SetUInt32((ZEUInt32)Helpers.Count());
+	InteriorNode.AddProperty("MaterialCount")->SetUInt32((ZEUInt32)Materials.Count());
 
 	ProgressDialog->OpenTask("Writing File");
 	zeLog("Writing ZEInterior to file...");
 	ZEFile ExportFile;
 	if(ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 	{
-		InteriorNode.Write(&ExportFile);
+		InteriorRoot.Write(&ExportFile);
 		ExportFile.Close();
 	}
 	ProgressDialog->CloseTask();

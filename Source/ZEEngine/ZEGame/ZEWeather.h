@@ -41,19 +41,15 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEDrawParameters.h"
 
-
-class ZEDirectionalLight;
-class ZEDirectionalLight;	
-class ZESkyBrush;	
-class ZESkyDome;			
-class ZECloud;		
-class ZEMoon;	
-
-ZE_META_ENTITY_DESCRIPTION(ZEWeather)
+ZE_META_FORWARD_DECLARE(ZEDirectionalLight, "ZEGraphics/ZEDirectionalLight.h")
+ZE_META_FORWARD_DECLARE(ZESkyBrush, "ZESkyBrush.h")
+ZE_META_FORWARD_DECLARE(ZESkyDome, "ZESkyDome.h")
+ZE_META_FORWARD_DECLARE(ZECloud, "ZECloud.h")
+ZE_META_FORWARD_DECLARE(ZEMoon, "ZEMoon.h")
 
 class ZEWeather : public ZEEntity
 {
-	ZE_META_ENTITY(ZEModel)
+	ZE_OBJECT
 
 	protected:
 
@@ -143,26 +139,4 @@ class ZEWeather : public ZEEntity
 		static ZEWeather*			CreateInstance();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEWeather" parent="ZEEntity" description="Weather">
-			<property name="SunDirection" type="ZEVector3" autogetset="true" description="Sun's Direction"/>
-			<property name="MoonDirection" type="ZEVector3" autogetset="true" description="Moon's Direction"/>
-			<property name="SunLightIntensity" type="float" autogetset="true" description="Sun Light's Intensity"/>
-			<property name="MoonLightIntensity" type="float" autogetset="true" description="Moon  Light's Intensity"/>
-			<property name="MoonPhase" type="float" autogetset="true" description="Moon's Phase"/>
-			<property name="FogFactor" type="float" autogetset="true" description="Fog Density"/>
-			<property name="CloudCover" type="float" autogetset="true" description="Cloud Cover"/>
-			<property name="SunCastsShadows" type="boolean" autogetset="true" description="Sun shadow casting option"/>
-			<property name="MoonCastsShadows" type="boolean" autogetset="true" description="Moon shadow casting option"/>
-			<property name="SunLightColor" type="ZEVector3" autogetset="true" description="Sun Light's Color" semantic="ZE_PS_COLOR"/>
-			<property name="MoonLightColor" type="ZEVector3" autogetset="true" description="Moon Light's Color" semantic="ZE_PS_COLOR"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-#endif // __ZE_WEATHER_H__
+#endif
