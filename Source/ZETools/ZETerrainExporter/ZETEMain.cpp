@@ -49,19 +49,17 @@ void main()
 	Patch = new ZETEPatch();
 	Patch->Load("c:\\World.jpg", ZE_TPT_COLOR);
 	Patch->SetPriority(0);
-	Patch->SetStartX(0);
-	Patch->SetStartY(0);
-	Patch->SetEndX(3.5f * Patch->GetWidth());
-	Patch->SetEndY(3.5f * Patch->GetHeight());
+	Patch->SetStartX(0.4);
+	Patch->SetStartY(0.4);
+	Patch->SetEndX(6.0 * Patch->GetWidth());
+	Patch->SetEndY(5.0 * Patch->GetHeight());
 
 	ZETEBlock Block;
 	Block.SetLevel(Patch->GetLevel());
 	Block.SetPositionX(Patch->GetStartX());
 	Block.SetPositionY(Patch->GetStartY());
 	Block.Create(ZE_TPT_COLOR, 512);
-
-	Patch->Resample(Block.GetData(), Block.GetPitch(), Block.GetPositionX(), Block.GetPositionY(), Block.GetSize());
-
+	Patch->Resample(Block.GetData(), Block.GetPitch(), Block.GetPositionX(), Block.GetPositionY(), Block.GetDataSize());
 	Block.DebugDump("c:/Test");
 
 	//Database.AddPatch(Patch);

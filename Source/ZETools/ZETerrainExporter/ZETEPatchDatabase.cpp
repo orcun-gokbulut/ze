@@ -274,7 +274,6 @@ void ZETEPatchDatabase::Save(const ZEString& Path)
 					Index.Level = Level;
 					Index.Offset = DataFile.Tell();
 					Indexes.Add(Index);
-					MipmapCount = Block.GetMipmapCount();
 					Block.Save(&DataFile);
 				}
 			}
