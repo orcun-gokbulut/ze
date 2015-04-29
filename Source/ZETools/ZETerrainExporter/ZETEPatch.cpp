@@ -230,10 +230,29 @@ void ZETEPatch::Resample(void* BlockData, ZESize BlockPitch, ZEUInt64 BlockX, ZE
 	IppiRect SourceROI;
 	SourceROI.x = PositionX;
 	SourceROI.y = PositionY;
-	SourceROI.width = 512;
-	SourceROI.height = 512;
+	SourceROI.width = BlockSize * LevelScalingWidth;
+	SourceROI.height = BlockSize * LevelScalingHeight;
 
-	int SpecSize;
+	IppiRect DestROI;
+	DestROI.x = 0;
+	DestROI.y = 0;
+	DestROI.width = BlockSize;
+	DestROI.height = BlockSize;
+
+	// IPP 7.1
+	int BufferSize = 0;
+	ippiResizeGetBufSize(SourceROI, DestROI, 4, IPPI_INTER_LINEAR, &BufferSize);
+	Ipp8u* Buffer = ippsMalloc_8u(BufferSize);
+	ippiResizeSqrPixel_8u_C4R(
+		(const Ipp8u*)Data, SourceSize, Pitch, SourceROI, 
+		(Ipp8u*)BlockData, BlockPitch, DestROI, 
+		LevelScalingWidth, LevelScalingHeight, 
+		PositionX - SourceROI.x, PositionY - SourceROI.y, 
+		IPPI_INTER_LINEAR, Buffer);
+	ippsFree(Buffer);
+
+	// IPP 8 Resize
+	/*int SpecSize;
 	int InitBufferSize;
 	int BufferSize;
 	ippiResizeGetSize_8u(SourceSize, DestSize, ippLinear, 0, &SpecSize, &InitBufferSize);
@@ -253,7 +272,7 @@ void ZETEPatch::Resample(void* BlockData, ZESize BlockPitch, ZEUInt64 BlockX, ZE
 	ippsFree(Buffer);
 	ippsFree(Spec);
 	if (InitBuffer != NULL)
-		ippsFree(InitBuffer);
+		ippsFree(InitBuffer);*/
 }
 
 bool ZETEPatch::Create(ZESize Width, ZESize Height, ZETEPixelType Type)

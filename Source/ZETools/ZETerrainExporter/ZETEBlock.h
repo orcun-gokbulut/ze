@@ -54,21 +54,12 @@ class ZETEBlock
 		ZEInt64					PositionX;
 		ZEInt64					PositionY;
 		ZEUInt					Level;
-		ZESize					Size;
+		ZESize					Dimension;
 
 		void*					Data;
-		ZESize					TotalSize;
+		ZESize					DataSize;
 		ZESize					Pitch;
-		ZEUInt					PixelSize;
 		ZETEPixelType			PixelType;
-
-		ZEUInt					MipmapCount;
-		float					MinValue;
-		float					MaxValue;
-
-		void					ConvertUInt16ToFloat();
-		void					CalculateMipmaps();
-		void					CalculateMinMax();
 
 	public:
 		void					SetPositionX(ZEInt64 x);
@@ -80,24 +71,17 @@ class ZETEBlock
 		void					SetLevel(ZEUInt Level);
 		ZEUInt					GetLevel();
 
+		void					SetDimension(ZESize BlockSize);
+		ZESize					GetDimension();
+
 		ZETEPixelType			GetPixelType();
 		ZESize					GetPixelSize();
 
-		ZEUInt					GetMipmapCount();
+		void*					GetData();
+		ZESize					GetPitch();
+		ZESize					GetDataSize();
 
-		void*					GetData(ZEUInt MipmapLevel = 0);
-		ZESize					GetPitch(ZEUInt MipmapLevel = 0);
-		ZESize					GetSize(ZEUInt MipmapLevel = 0);
-
-		float					GetMinValue();
-		float					GetMaxValue();
-		
-		void					Update();
-
-		void*					Sample(ZESize x, ZESize y, ZEUInt MipmapLevel = 0);
-		void					PutPixel(ZESize x, ZESize y, void* Data);
-
-		bool					Create(ZETEPixelType PixelType, ZESize Size);
+		bool					Create(ZETEPixelType PixelType, ZESize Dimension);
 		void					Clean();
 
 		bool					Load(ZEFile* File);
