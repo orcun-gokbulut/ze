@@ -91,7 +91,7 @@ void ZED3D9StaticVertexBuffer::Release()
 
 void ZED3D9StaticVertexBuffer::Destroy()
 {
-	GetModule()->VertexBuffers.DeleteValue((ZED3D9StaticVertexBuffer*)this);
+	GetModule()->VertexBuffers.RemoveValue((ZED3D9StaticVertexBuffer*)this);
 	delete this;
 }
 

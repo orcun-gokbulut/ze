@@ -44,10 +44,8 @@
 
 class ZETerrainLayer;
 
-ZE_META_ENTITY_DESCRIPTION(ZETerrain2)
 class ZETerrain2 : public ZEEntity
 {
-	ZE_META_ENTITY(ZETerrain2)
 	private:
 		ZEArray<ZETerrainLayer*>				Layers;
 		ZETerrainDrawer							Drawer;
@@ -79,13 +77,4 @@ class ZETerrain2 : public ZEEntity
 
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZETerrain2"	parent="ZEEntity"	description="Terrain" />
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

@@ -41,14 +41,13 @@
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
-ZE_META_ENTITY_DESCRIPTION(ZESkyBrush);
-
 class ZETextureCubeResource;
 class ZESkyBoxMaterial;
 
 class ZESkyBrush : public ZEEntity
 {
-	ZE_META_ENTITY(ZESkyBrush)
+	ZE_OBJECT
+
 	private:
 		ZECanvas							SkyBox;
 		ZETextureCubeResource*				SkyTexture;
@@ -82,32 +81,4 @@ class ZESkyBrush : public ZEEntity
 		static ZESkyBrush*					CreateInstance();
 
 };
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZESkyBrush"	parent="ZEEntity"	description="Sky Brush">
-			<property name="SkyColor"
-				type="ZEVector3"
-				autogetset="true"
-				default="ZEVector3::One"
-				description="Color of the sky"
-				semantic="ZE_PS_COLOR"/>
-			<property name="SkyBrightness"
-				type="float"
-				autogetset="true"
-				default="1.0f"
-				description="Intensity of the light"/>
-			<property name="SkyTexture"
-				type="string"
-				autogetset="true"
-				default=""
-				description="Texture of the sky"
-				semantic="ZE_PS_FILENAME"
-				fileextension="IMAGE"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

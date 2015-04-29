@@ -585,7 +585,7 @@ void ZED3D9FrameRenderer::DoPreZPass()
 			continue;
 
 		if (!RenderCommand->Material->SetupPreZPass(this, RenderCommand))
-			zeCriticalError("Can not set material's Pre-Z pass. (Material Type : \"%s\")", RenderCommand->Material->GetDescription()->GetName());
+			zeCriticalError("Can not set material's Pre-Z pass. (Material Type : \"%s\")", RenderCommand->Material->GetClass()->GetName());
 
 		PumpStreams(RenderCommand);
 	}
@@ -631,7 +631,7 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 
 		zeProfilerStart("Object Pass");
 		if (!RenderCommand->Material->SetupGBufferPass(this, RenderCommand))
-			zeCriticalError("Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderCommand->Material->GetDescription()->GetName());
+			zeCriticalError("Can not set material's GBuffer pass. (Material Type : \"%s\")", RenderCommand->Material->GetClass()->GetName());
 
 		PumpStreams(RenderCommand);
 		GeometryCount++;
@@ -775,7 +775,7 @@ void ZED3D9FrameRenderer::DoForwardPass()
 		zeProfilerStart("Object Pass");
 		
 		if (!RenderCommand->Material->SetupForwardPass(this, RenderCommand))
-			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetDescription()->GetName());
+			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetClass()->GetName());
 		PumpStreams(RenderCommand);
 		
 		zeProfilerEnd();
@@ -813,7 +813,7 @@ void ZED3D9FrameRenderer::Do2DPass()
 		zeProfilerStart("Object Pass");
 
 		if (!RenderCommand->Material->SetupForwardPass(this, RenderCommand))
-			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetDescription()->GetName());
+			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetClass()->GetName());
 		PumpStreams(RenderCommand);
 
 		zeProfilerEnd();
@@ -1113,7 +1113,7 @@ bool ZED3D9FrameRenderer::DeviceRestored()
 
 void ZED3D9FrameRenderer::Destroy()
 {
-	GetModule()->Renderers.DeleteValue((ZED3D9FrameRenderer*)this);
+	GetModule()->Renderers.RemoveValue((ZED3D9FrameRenderer*)this);
 	delete this;
 }
 
@@ -1139,7 +1139,7 @@ void ZED3D9FrameRenderer::AddPostProcessor(ZEPostProcessor* PostProcessor)
 
 void ZED3D9FrameRenderer::RemovePostProcessor(ZEPostProcessor* PostProcessor)
 {
-	PostProcessors.DeleteValue(PostProcessor);
+	PostProcessors.RemoveValue(PostProcessor);
 }
 
 void ZED3D9FrameRenderer::SetLights(ZESmartArray<ZELight*>& Lights)

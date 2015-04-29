@@ -43,4 +43,4 @@ ze_add_source(ZESerialPort_Unix.cpp			Sources PLATFORMS Unix)
 ze_add_library(TARGET ZESerialPort 
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	LIBS ZEDS)

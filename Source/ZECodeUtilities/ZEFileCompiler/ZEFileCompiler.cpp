@@ -58,20 +58,20 @@ bool ZEFileCompiler::Compile(const ZEFileCompilerOptions& Options)
 		return false;
 	}
 
-	FILE* SourceFile = fopen(Options.SourceFileName.ToCString(), "w");
+	FILE* SourceFile = fopen(Options.OutputSourceFileName.ToCString(), "w");
 	if (!SourceFile)
 	{
-		zeError("Can not open output file \"%s\".", Options.SourceFileName.ToCString());
+		zeError("Can not open output file \"%s\".", Options.OutputSourceFileName.ToCString());
 		return false;
 	}
 
 	FILE* HeaderFile = NULL;
-	if (!Options.HeaderFileName.IsEmpty())
+	if (!Options.OutputHeaderFileName.IsEmpty())
 	{
-		HeaderFile = fopen(Options.HeaderFileName.ToCString(), "w");
+		HeaderFile = fopen(Options.OutputHeaderFileName.ToCString(), "w");
 		if (!HeaderFile)
 		{
-			zeError("Can not open output file \"%s\".", Options.HeaderFileName.ToCString());
+			zeError("Can not open output file \"%s\".", Options.OutputHeaderFileName.ToCString());
 			return false;
 		}
 	}
@@ -102,7 +102,7 @@ bool ZEFileCompiler::Compile(const ZEFileCompilerOptions& Options)
 			"{\n"
 				"\tstatic ZEUInt8 Data[] =\n"
 				"\t{\n", 
-			Options.HeaderFileName.ToCString(), Options.ClassName.ToCString());
+			Options.OutputHeaderFileName.ToCString(), Options.ClassName.ToCString());
 
 		ZEArray<ZEUInt8> Buffer;
 		Buffer.SetCount(FileSize);

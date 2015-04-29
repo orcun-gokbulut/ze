@@ -39,10 +39,11 @@
 #include "ZEPacking.h"
 #include "ZEEndian.h"
 #include "ZETextureData.h"
-#include "ZEDS/ZEPointer.h"
+#include "ZEPointer/ZEPointer.h"
 #include "ZEFile/ZEFile.h"
 #include "ZETexturePixelConverter.h"
 #include "ZECompression/ZEDecompressorBMPRLE.h"
+#include "ZEMath/ZEMath.h"
 
 ZEPackStruct
 (

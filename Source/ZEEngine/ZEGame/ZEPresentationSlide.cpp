@@ -45,7 +45,6 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 
-
 #include <string.h>
 
 ZEDrawFlags ZEPresentationSlide::GetDrawFlags() const
@@ -180,9 +179,4 @@ ZEPresentationSlide::~ZEPresentationSlide()
 ZEPresentationSlide* ZEPresentationSlide::CreateInstance()
 {
 	return new ZEPresentationSlide();
-}
-
-ZEEntityRunAt ZEPresentationSlideDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
 }

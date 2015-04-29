@@ -42,12 +42,12 @@
 #include "ZEGraphics\ZERenderCommand.h"
 #include "ZETypes.h"
 
-class ZESkyDomeMaterial;
-class ZEMaterial;
-class ZEScene;
+ZE_META_FORWARD_DECLARE(ZESkyDomeMaterial, "ZEGraphics/ZESkyDomeMaterial.h")
 
 class ZESkyDome : public ZEEntity
 {
+	ZE_OBJECT
+
 	protected:
 		float					G;
 
@@ -99,7 +99,7 @@ class ZESkyDome : public ZEEntity
 		void					SetSunLightDirection(const ZEVector3& Value);
 		ZEVector3				GetSunLightDirection() const;
 
-		void					SetSunLightWaveLenght(ZEVector3& Value);
+		void					SetSunLightWaveLenght(const ZEVector3& Value);
 		ZEVector3				GetSunLightWaveLenght() const;
 
 		void					SetOuterRadius(float Value);

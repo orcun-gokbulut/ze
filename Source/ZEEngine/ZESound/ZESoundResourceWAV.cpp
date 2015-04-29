@@ -36,31 +36,6 @@
 #include "ZESoundResourceWAV.h"
 #include "ZEError.h"
 #include <memory.h>
-#include "ZEFile\ZEPathUtils.h"
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
 
 ZESoundResourceWAV::ZESoundResourceWAV()
 {
@@ -91,16 +66,12 @@ void ZESoundResourceWAV::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 
 ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-	
 	bool Result;
 	ZEFile File;
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!Result)
 	{
-		zeError("Can not load WAV resource. Can not open file. (Filename : \"%s\")", NewPath.ToCString());
+		zeError("Can not load WAV resource. Can not open file. (Filename : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
@@ -132,38 +103,38 @@ ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
 	File.Read(&Riff, sizeof(Riff), 1);
 	if (Riff.Header != 'FFIR')
 	{
-		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Wrong wave file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
 	if (Riff.Format != 'EVAW')
 	{
-		zeError("Wave file format it not supported. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Wave file format it not supported. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
 	File.Read(&Fmt, sizeof(Fmt), 1);
 	if (Fmt.Header != ' tmf')
 	{
-		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Wrong wave file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 	
 	if (Fmt.AudioFormat != 1)
 	{
-		zeError("Wave file audio format it not supported. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Wave file audio format it not supported. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
 	File.Read(&Data, sizeof(Data), 1);
 	if (Data.Header != 'atad')
 	{
-		zeError("Wrong wave file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Wrong wave file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 
 	ZESoundResourceWAV* NewResource = new ZESoundResourceWAV();
-	NewResource->SetFileName(NewPath);
+	NewResource->SetFileName(FileName);
 	NewResource->BitsPerSample		= Fmt.BitsPerSample;
 	NewResource->BlockAlign			= Fmt.BlockAlign;
 	NewResource->ChannelCount		= Fmt.NumChannels;

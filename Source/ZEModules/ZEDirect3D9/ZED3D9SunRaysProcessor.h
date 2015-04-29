@@ -45,11 +45,8 @@ class ZED3D9PixelShader;
 class ZED3D9Texture2D;
 class ZED3D9ViewPort;
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9SunRaysProcessor);
-
 class ZED3D9SunRaysProcessor : public ZEObject, public ZED3D9ComponentBase
 {
-	ZE_META_OBJECT(ZED3D9SunRaysProcessor);
 	private:
 		bool								Enabled;
 		ZED3D9Texture2D*					Input;
@@ -95,22 +92,5 @@ class ZED3D9SunRaysProcessor : public ZEObject, public ZED3D9ComponentBase
 											ZED3D9SunRaysProcessor();
 											~ZED3D9SunRaysProcessor();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9SunRaysProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9SunRaysProcessor</description>
-				<property name="Enabled" type="boolean" autogetset="yes" description="..."/>
-				<property name="Intensity" type="float" autogetset="yes" description="..."/>
-				<property name="Density" type="float" autogetset="yes" description="..."/>
-				<property name="DebugOutput" type="boolean" autogetset="yes" description="..."/>
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

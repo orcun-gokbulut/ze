@@ -139,7 +139,7 @@ class ZEDGizmo : public ZEEntity
 		void							StartRotationProjection(ZEDGizmoAxis Axis, const ZEVector2& InitialScreenPos);
 		ZEQuaternion					RotationProjection(const ZEVector2& ScreenPos);
 
-		void							StartScaleProjection(ZEDGizmoAxis Axis, const const ZEVector2& InitialScreenPos);
+		void							StartScaleProjection(ZEDGizmoAxis Axis, const ZEVector2& InitialScreenPos);
 		ZEVector3						ScaleProjection(const ZEVector2& ScreenPos);
 
 		virtual void					Draw(ZEDrawParameters* DrawParameters);

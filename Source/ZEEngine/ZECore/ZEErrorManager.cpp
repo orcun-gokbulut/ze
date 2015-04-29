@@ -48,7 +48,7 @@
 
 static ZEOptionSection ErrorOptions; 
 
-bool ZEErrorManager::OptionCallback_General(ZEOption* Option, ZETypedVariant* Value)
+bool ZEErrorManager::OptionCallback_General(ZEOption* Option, ZETypedValue* Value)
 {
 	if (Option->GetName() == "FileLogging")
 		ZELog::GetInstance()->SetLogFileEnabled(Option->GetValue().GetBoolean());

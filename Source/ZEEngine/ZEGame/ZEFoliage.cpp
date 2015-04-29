@@ -42,13 +42,6 @@
 #include "ZEScene.h"
 #include "ZEInterior\ZEInterior.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEFoliage);
-
-ZEEntityRunAt ZEFoliageDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
-}
-
 bool ZEFoliage::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
@@ -99,7 +92,7 @@ ZEFoliage::~ZEFoliage()
 
 void ZEFoliage::SetSurfaceEntityName(const char* EntityName)
 {
-	ZEArray<ZEEntity*>& Entities = ZEScene::GetInstance()->GetEntities(ZEInterior::Description());
+	ZEArray<ZEEntity*>& Entities = ZEScene::GetInstance()->GetEntities(ZEInterior::Class());
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{

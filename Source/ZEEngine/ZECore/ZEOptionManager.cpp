@@ -275,7 +275,7 @@ bool ZEOptionManager::UnregisterSection(ZEOptionSection* Ref)
 			Ref->GetName().ToCString());
 		return false;
 	}
-	Sections.DeleteValue(Ref);
+	Sections.RemoveValue(Ref);
 	return true;
 }
 

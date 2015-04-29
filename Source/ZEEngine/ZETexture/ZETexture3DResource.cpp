@@ -47,32 +47,6 @@
 #include "ZETextureLoader.h"
 #include "ZEMath/ZEMath.h"
 #include "ZETextureTools.h"
-#include "ZEFile/ZEPathUtils.h"
-
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
 
 static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
 {
@@ -128,16 +102,13 @@ ZETexture3DResource::~ZETexture3DResource()
 
 ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZETexture3DResource* NewResource =(ZETexture3DResource*)zeResources->GetResource(NewPath.GetValue());
+	ZETexture3DResource* NewResource =(ZETexture3DResource*)zeResources->GetResource(FileName.GetValue());
 	if(NewResource == NULL)
 	{		
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, HorizTileCount, VertTileCount, UserOptions);
+		NewResource = LoadResource(FileName, HorizTileCount, VertTileCount, UserOptions);
 		if(NewResource != NULL)
 		{
 			NewResource->Shared = true;
@@ -148,7 +119,7 @@ ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& Fil
 		}
 		else
 		{
-			zeError("Texture file not found. File Path : \"%s\"", NewPath.GetValue());
+			zeError("Texture file not found. File Path : \"%s\"", FileName.GetValue());
 			return NULL;
 		}
 	}
@@ -162,17 +133,13 @@ ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& Fil
 
 void ZETexture3DResource::CacheResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZETexture3DResource* NewResource = (ZETexture3DResource*)zeResources->GetResource(NewPath.GetValue());
+	ZETexture3DResource* NewResource = (ZETexture3DResource*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
 			UserOptions = zeGraphics->GetTextureOptions();
 
-		NewResource = LoadResource(NewPath, HorizTileCount, VertTileCount, UserOptions);
+		NewResource = LoadResource(FileName, HorizTileCount, VertTileCount, UserOptions);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = true;
@@ -187,10 +154,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName,
 	bool Result;
 	ZEFile File;
 	ZETexture3DResource* TextureResource;
-	ZEString NewPath = ConstructResourcePath(FileName);
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if(Result)
 	{
 		if(UserOptions == NULL)
@@ -203,7 +167,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName,
 	}
 	else
 	{
-		zeError("Texture file not found. File Path : \"%s\"", NewPath.GetValue());
+		zeError("Texture file not found. File Path : \"%s\"", FileName.GetValue());
 		return NULL;
 	}
 
@@ -219,7 +183,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	ZETextureData	ProcessedTextureData;
 	ZETextureOptions	FinalOptions;
 	ZEFileCache			FileCache;
-	ZEString			CachePath = "TextureCache.ZECACHE";
+	ZEString			CachePath = "#S:/Caches/TextureCache.ZECache";
 
 	bool CacheIt			= true;
 	bool Process			= true;

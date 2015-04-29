@@ -112,10 +112,15 @@ else()
 	ze_add_source(ZEVectorGeneric.cpp		Sources)
 endif()
 
+set(BuildIn ${BuildIn}
+	ZEMath/ZEVector.h
+	ZEMath/ZEQuaternion.h
+	ZEMath/ZEMatrix.h	
+	PARENT_SCOPE)
+
 ze_add_library(TARGET ZEMath 
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+	HEADERS ${Headers})
 	
 ze_add_test(TARGET ZEMathTests
 	SOURCES ${Tests}

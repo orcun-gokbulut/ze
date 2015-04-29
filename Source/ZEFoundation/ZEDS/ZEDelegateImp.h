@@ -47,6 +47,21 @@
 #define ZE_ARGUMENT_MACRO(Index, Parameter) ZE_MACRO_IF_COMMA(ZE_MACRO_BOOL(Index)) Arg##Index
 #define ZE_ARGUMENTS ZE_MACRO_REPEATER(ZE_MACRO_INCLUDE_INDEX, ZE_ARGUMENT_MACRO, 0)
 
+#ifdef ZE_DELEGATE_GENERATE_LIST
+	#pragma message("#define ZE_ARGUMENT_SEPERATOR " ZE_MACRO_STRING(ZE_ARGUMENT_SEPERATOR))
+	#pragma message("#define ZE_TEMPLATE_ARGUMENT_DEFINITIONS " ZE_MACRO_STRING(ZE_TEMPLATE_ARGUMENT_DEFINITIONS))
+	#pragma message("#define ZE_TEMPLATE_ARGUMENTS " ZE_MACRO_STRING(ZE_TEMPLATE_ARGUMENTS))
+	#pragma message("#define ZE_ARGUMENT_DEFINITIONS " ZE_MACRO_STRING(ZE_ARGUMENT_DEFINITIONS))
+	#pragma message("#define ZE_ARGUMENTS " ZE_MACRO_STRING(ZE_ARGUMENTS))
+	#pragma message("#include \"DelegateImp.h\"")
+	#pragma message("#undef ZE_ARGUMENT_SEPERATOR")
+	#pragma message("#undef ZE_TEMPLATE_ARGUMENT_DEFINITIONS")
+	#pragma message("#undef ZE_TEMPLATE_ARGUMENTS")
+	#pragma message("#undef ZE_ARGUMENT_DEFINITIONS")
+	#pragma message("#undef ZE_ARGUMENTS")
+	#pragma message("")
+#endif
+
 template<typename TReturn ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENT_DEFINITIONS>
 class ZEDelegate<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 {

@@ -54,11 +54,9 @@ struct ZEMLAAScreenAlignedQuad
 	float Position[3];
 };
 
-ZE_META_OBJECT_DESCRIPTION(ZED3D9MLAAProcessor);
-
 class ZED3D9MLAAProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9MLAAProcessor)
+	ZE_OBJECT
 
 	private:
 		bool							VisualizeEdges;
@@ -134,26 +132,6 @@ class ZED3D9MLAAProcessor : public ZED3D9ComponentBase, public ZEObject
 										ZED3D9MLAAProcessor();
 		virtual							~ZED3D9MLAAProcessor();
 
-}; // class ZED3D9MLAAProcessor
+};
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9MLAAProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9MLAAProcessor</description>
-				
-				<property name="VisualizeEdges" type="boolean" autogetset="yes" description="..."/>
-				<property name="VisualizeWeights" type="boolean" autogetset="yes" description="..."/>
-				
-				<property name="Treshold" type="float" autogetset="yes" description="..."/>
-				<property name="SearchStep" type="float" autogetset="yes" description="..."/>
-				
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-#endif // __ZE_D3D9_MLAA_PROCESSOR_H__
+#endif

@@ -44,32 +44,31 @@
 #include "ZEGame/ZEDrawStatistics.h"
 #include "ZEGame/ZERayCast.h"
 
-enum ZEInteriorCullMode
+ZE_ENUM(ZEInteriorCullMode)
 {
 	ZE_ICM_NONE,
 	ZE_ICM_VIEW,
 	ZE_ICM_FULL
 };
 
-ZE_META_ENTITY_DESCRIPTION(ZEInterior)
-
+class ZERay;
+class ZEVector3;
+class ZEViewVolume;
+class ZEViewFrustum;
 class ZEInteriorResource;
 class ZEInteriorRoom;
 class ZEInteriorDoor;
 class ZEInteriorHelper;
 struct ZEDrawParameters;
 struct ZEInteriorCullStatistics;
-class ZERay;
-class ZEVector3;
-class ZEViewVolume;
-class ZEViewFrustum;
 
 class ZEInterior : public ZEEntity
 {
-	ZE_META_ENTITY(ZEInterior)
 	friend class ZEInteriorDoor;
 	friend class ZEInteriorHelper;
 	friend class ZEInteriorDebugDrawer;
+
+	ZE_OBJECT
 
 	private:
 		const ZEInteriorResource*				InteriorResource;
@@ -101,9 +100,9 @@ class ZEInterior : public ZEEntity
 		const ZEArray<ZEInteriorDoor*>&			GetDoors();
 		const ZEArray<ZEInteriorHelper*>&		GetHelpers();
 
-		ZEInteriorRoom*							GetRoom(const char* Name);
-		ZEInteriorDoor*							GetDoor(const char* Name);
-		ZEInteriorHelper*						GetHelper(const char* Name);
+		ZEInteriorRoom*							GetRoom(const ZEString& Name);
+		ZEInteriorDoor*							GetDoor(const ZEString& Name);
+		ZEInteriorHelper*						GetHelper(const ZEString& Name);
 
 		const ZEInteriorStatistics&				GetStatistics() const;
 
@@ -111,8 +110,8 @@ class ZEInterior : public ZEEntity
 
 		virtual void							Draw(ZEDrawParameters* DrawParameters);
 
-		virtual void							SetInteriorFile(const char* InteriorFile);
-		virtual const char*						GetInteriorFile() const;
+		virtual void							SetInteriorFile(const ZEString& InteriorFile);
+		virtual const ZEString&					GetInteriorFile() const;
 
 		void									SetInteriorResource(const ZEInteriorResource* InteriorResource);	
 		const ZEInteriorResource*				GetInteriorResource();
@@ -126,29 +125,4 @@ class ZEInterior : public ZEEntity
 
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEInterior" parent="ZEEntity" description="Interior Map">
-			<property name="InteriorFile"
-				type="string"
-				autogetset="true"
-				default=""
-				description="Interior file"
-				semantic="ZE_PS_FILENAME"
-				fileextension="*.zeInterior"/>
-
-				<property name="CullMode" type="integer32" autogetset="yes">
-					<enumurator name="ZEInteriorCullMode">
-						<item name="Node" value="ZE_ICM_NONE"/>
-						<item name="View" value="ZE_ICM_VIEW"/>
-						<item name="Full" value="ZE_ICM_FULL"/>
-					</enumurator>
-				</property>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 #endif

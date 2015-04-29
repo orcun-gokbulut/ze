@@ -41,13 +41,11 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEMeta\ZEObject.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleGenerator)
-
 class ZEParticleGenerator : public ZEObject
 {
-	ZE_META_OBJECT(ZEParticleGenerator)
-
 	friend class ZEParticleSystem;
+
+	ZE_OBJECT
 
 	private:
 
@@ -80,21 +78,3 @@ class ZEParticleGenerator : public ZEObject
 };
 
 #endif
-
-// Correct ParticlesPerSecond type in XML !!!
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleGenerator">		
-			<noinstance>true</noinstance>
-			<description>Base of particle generators.</description>
-			<property name="ParticlesPerSecond" type="integer32" autogetset="yes" description="Particle count that will be generated in one second."/>
-			<property name="IsSingleBurst" type="boolean" autogetset="yes" description="Is a single use generator or a permenent generator."/>
-			<property name="SingleBurstMaxParticleCount" type="integer32" autogetset="yes" description="If generator is single burst, this number determines how many particles will it generate before stopping generation."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

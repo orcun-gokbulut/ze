@@ -107,11 +107,13 @@ bool ZETEPatchDatabase::AddPatch(ZETEPatch* Patch)
 
 	Patches.Add(Patch);
 	CalculateDimensions();
+
+	return true;
 }
 
 void ZETEPatchDatabase::RemovePatch(ZETEPatch* Patch)
 {
-	Patches.DeleteValue(Patch);
+	Patches.RemoveValue(Patch);
 	CalculateDimensions();
 }
 
@@ -304,7 +306,7 @@ void ZETEPatchDatabase::Save(const ZEString& Path)
 
 	IndexFile.Write(&Info, sizeof(ZETerrainBlockInfo), 1);
 	
-	ZEUInt32 IndexCount = Indexes.GetCount();
+	ZEUInt32 IndexCount = (ZEUInt64)Indexes.GetCount();
 	IndexFile.Write(&IndexCount, sizeof(IndexCount), 1);
 	IndexFile.Write(Indexes.GetCArray(), sizeof(ZETerrainBlockIndex), IndexCount);
 	IndexFile.Close();

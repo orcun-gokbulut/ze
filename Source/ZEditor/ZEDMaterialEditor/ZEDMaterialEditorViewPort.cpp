@@ -43,6 +43,7 @@
 #include "ZEDMaterialEditor.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZEDS/ZEVariant.h"
 
 using namespace Qt;
 
@@ -173,15 +174,15 @@ void ZEDMaterialEditorViewPort::SetModelResource(ZEModelResource* ModelResource)
 
 	for (int J = 0; J < Model->GetModelResource()->GetMaterials().GetCount(); J++)
 	{
-		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[J]->GetDescription()->GetPropertyCount(); I++)
+		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[J]->GetClass()->GetPropertyCount(); I++)
  		{
  			ZEVariant TempVariant;
- 			Model->GetModelResource()->GetMaterials()[J]->GetProperty(I, TempVariant);
+ 			Model->GetModelResource()->GetMaterials()[J]->GetClass()->GetProperty(Model->GetModelResource()->GetMaterials()[J], I, TempVariant);
  
-	 		if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
+	 		if (TempVariant.GetType().Type == ZE_TT_STRING && strcmp(TempVariant.GetString(), "") == 0)
  			continue;
  
- 			ModelResource->GetMaterials()[J]->SetProperty(I, TempVariant);
+ 			ModelResource->GetMaterials()[J]->GetClass()->SetProperty(ModelResource->GetMaterials()[J], I, TempVariant);
  		}
 	}
 
@@ -195,15 +196,15 @@ void ZEDMaterialEditorViewPort::SetMaterial(ZEString MaterialFile)
 
 	for (int J = 0; J < Model->GetModelResource()->GetMaterials().GetCount(); J++)
 	{
-		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[J]->GetDescription()->GetPropertyCount(); I++)
+		for (ZESize I = 0; I < Model->GetModelResource()->GetMaterials()[J]->GetClass()->GetPropertyCount(); I++)
  		{
  			ZEVariant TempVariant;
- 			Model->GetModelResource()->GetMaterials()[J]->GetProperty(I, TempVariant);
+ 			Model->GetModelResource()->GetMaterials()[J]->GetClass()->GetProperty(Model->GetModelResource()->GetMaterials()[J], I, TempVariant);
  
-	 		if (TempVariant.GetType() == ZE_VRT_STRING && strcmp(TempVariant.GetString(), "") == 0)
+	 		if (TempVariant.GetType().Type == ZE_TT_STRING && strcmp(TempVariant.GetString(), "") == 0)
  			continue;
  
- 			ModelResource->GetMaterials()[J]->SetProperty(I, TempVariant);
+ 			ModelResource->GetMaterials()[J]->GetClass()->SetProperty(ModelResource->GetMaterials()[J], I, TempVariant);
  		}
 	}
 }

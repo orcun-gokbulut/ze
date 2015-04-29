@@ -46,9 +46,6 @@
 
 #include <string.h>
 
-
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEProjectiveLight);
-
 ZELightType ZEProjectiveLight::GetLightType()
 {
 	return ZE_LT_PROJECTIVE;

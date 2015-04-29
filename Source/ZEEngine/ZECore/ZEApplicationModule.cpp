@@ -76,11 +76,6 @@ void ZEApplicationModule::Render(float ElapsedTime)
 
 ZEApplicationModule::ZEApplicationModule()
 {
-	// Set Default Names
-	ZEString DefaultCompanyName = "Zinek";
-	ZEString DefaultApplicationName = "Engine";
-	ZEString DefaultResourcesDirectoryName = "Resources";
-	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
 }
 
 ZEApplicationModule::~ZEApplicationModule()

@@ -61,17 +61,17 @@ class ZEPhysicalJoint;
 
 struct ZEDrawParameters;
 
-ZE_META_ENTITY_DESCRIPTION(ZEModel)
-
 class ZEModel : public ZEEntity
 {	
-	ZE_META_ENTITY(ZEModel)
-
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
+
+	ZE_OBJECT
+
 	private:
+		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERenderCommand>			LODRenderCommands;
@@ -120,8 +120,9 @@ class ZEModel : public ZEEntity
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
 
-		void								SetModelFile(const char* ModelFile);
-		const char*							GetModelFile() const;
+		void								SetModelFile(const ZEString& ModelFile);
+		const ZEString&						GetModelFile() const;
+
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
@@ -129,7 +130,6 @@ class ZEModel : public ZEEntity
 		const ZEArray<ZEModelBone*>&		GetSkeleton();
 
 		ZEArray<ZEModelBone>&				GetBones();
-		const ZEArray<ZEMatrix4x4>&			GetBoneTransforms();
 		const ZEArray<ZEModelMesh>&			GetMeshes();
 		const ZEArray<ZEModelHelper>&		GetHelpers();
 		const ZEArray<ZEModelAnimation>*	GetAnimations();
@@ -156,10 +156,6 @@ class ZEModel : public ZEEntity
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
 
-		void								SetStaticPose(const ZEModelAnimation* Animation, ZEUInt Frame);
-		void								SetStaticPoseByIndex(ZESize AnimationIndex, ZEUInt Frame);
-		void								SetStaticPoseByName(const char* AnimationName, ZEUInt Frame);
-
 		virtual void						SetPosition(const ZEVector3& NewPosition);
 		virtual void						SetRotation(const ZEQuaternion& NewRotation);
 		virtual void						SetScale(const ZEVector3& NewScale);
@@ -174,19 +170,5 @@ class ZEModel : public ZEEntity
 		
 		static ZEModel*						CreateInstance();
 };
+
 #endif
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZEModel" parent="ZEEntity" description="Sky Brush">
-			<property name="ModelFile"
-				type="string"
-				autogetset="true"
-				description="Model file"
-				semantic="ZE_PS_FILENAME"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

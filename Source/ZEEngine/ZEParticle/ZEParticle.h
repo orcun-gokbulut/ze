@@ -39,6 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 #include "ZERandom.h"
+#include "ZEMeta/ZEObject.h"
 
 #define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
 
@@ -49,8 +50,9 @@ enum ZEParticleState
 	ZE_PAS_DEAD
 };
 
-class ZEParticle
+class ZEParticle : public ZEObject
 {
+	ZE_OBJECT
 	public:
 
 		ZEVector2		Size2D;

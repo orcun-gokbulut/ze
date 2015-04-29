@@ -37,13 +37,14 @@
 #ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
 #define __ZE_TEXTURE_2D_RESOURCE_H__
 
-#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETextureResource.h"
 
-class ZETexture2D;
+ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
 
 class ZETexture2DResource : public ZETextureResource
 {
+	ZE_OBJECT
+
 	private:
 		ZETexture2D*						Texture;
 

@@ -40,31 +40,6 @@
 #include "ZESoundResourceMP3.h"
 #include "ZESoundResourceOGG.h"
 #include "ZESoundResourceWAV.h"
-#include "ZEFile/ZEPathUtils.h"
-
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
 
 ZESoundFileFormat ZESoundResource::GetFileFormat(const ZEString& FileName)
 {
@@ -165,10 +140,6 @@ ZESoundResource* ZESoundResource::LoadResource(const ZEString& FileName)
 
 ZESoundResource* ZESoundResource::LoadSharedResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
 	ZESoundResource* NewResource =(ZESoundResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
 	{
@@ -189,14 +160,10 @@ ZESoundResource* ZESoundResource::LoadSharedResource(const ZEString& FileName)
 
 void ZESoundResource::CacheResource(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
-	NewPath = ZEPathUtils::GetSimplifiedPath(NewPath, false);
-
-	ZESoundResource* NewResource = (ZESoundResource*)zeResources->GetResource(NewPath);
+	ZESoundResource* NewResource = (ZESoundResource*)zeResources->GetResource(FileName);
 	if (NewResource == NULL)
 	{
-		NewResource = LoadResource(NewPath);
+		NewResource = LoadResource(FileName);
 		if (NewResource != NULL)
 		{
 			NewResource->Cached = true;

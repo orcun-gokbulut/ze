@@ -39,11 +39,9 @@
 
 #include "ZEParticleGenerator.h"
 
-ZE_META_OBJECT_DESCRIPTION(ZEParticleSphereGenerator)
-
 class ZEParticleSphereGenerator : public ZEParticleGenerator
 {
-	ZE_META_OBJECT(ZEParticleSphereGenerator)
+	ZE_OBJECT
 
 	private:
 
@@ -64,17 +62,3 @@ class ZEParticleSphereGenerator : public ZEParticleGenerator
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEParticleSphereGenerator" parent="ZEParticleGenerator">		
-			<noinstance>true</noinstance>
-			<description>Sphere shaped particle generator.</description>
-			<property name="Radius" type="float" autogetset="yes" description="Radius of the generator sphere."/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

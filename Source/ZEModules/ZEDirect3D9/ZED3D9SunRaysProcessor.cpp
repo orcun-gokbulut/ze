@@ -89,7 +89,7 @@ const ZEVector3& ZED3D9SunRaysProcessor::GetSunDirection()
 
 void ZED3D9SunRaysProcessor::SetSunDirectionFromScene()
 {
-	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Description());
+	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Class());
 	if (Entities.GetSize() == 0)
 		return;
 

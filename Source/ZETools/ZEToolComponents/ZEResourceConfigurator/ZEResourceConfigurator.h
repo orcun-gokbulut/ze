@@ -40,6 +40,7 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEString.h"
 #include "ZEML\ZEMLNode.h"
+#include "ZEML/ZEMLRoot.h"
 #include "ZEResourceOption.h"
 
 class ZEFile;
@@ -51,6 +52,7 @@ class ZEResourceConfigurator
 		ZEArray<ZEResourceOption*>			Options;
 		ZEString							WorkingDirectory;
 		ZEMLNode*							Preset;
+		ZEMLRoot							Root;
 
 	public:
 

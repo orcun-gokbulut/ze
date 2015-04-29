@@ -42,11 +42,10 @@
 
 class ZETexture2D;
 
-ZE_META_OBJECT_DESCRIPTION(ZEPointLight);
-
 class ZEPointLight  : public ZELight
 {
-	ZE_META_ENTITY(ZEPointLight)
+	ZE_OBJECT
+
 	private:
 		ZETexture2D*					FrontShadowMap;
 		ZETexture2D*					BackShadowMap;
@@ -77,13 +76,3 @@ class ZEPointLight  : public ZELight
 };
 
 #endif
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEPointLight" parent="ZELight" description="Point Light"/>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/

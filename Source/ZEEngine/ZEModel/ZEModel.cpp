@@ -49,8 +49,6 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEViewVolume.h"
 
-ZE_META_REGISTER_CLASS(ZEEntityProvider, ZEModel);
-
 void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
@@ -215,25 +213,25 @@ void ZEModel::LoadModelResource()
 	}
 }
 
-void ZEModel::SetModelFile(const char* ModelFile)
+void ZEModel::SetModelFile(const ZEString& ModelFile)
 {
 	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
 
 	if (ModelResource == NULL)
 	{
-		zeError("Can not load model file. File Name : \"%s\"", ModelFile);
+		zeError("Can not load model file. File Name : \"%s\"", ModelFile.ToCString());
 		return;
 	}
 
 	SetModelResource(ModelResource);
 }
 
-const char* ZEModel::GetModelFile() const
+const ZEString& ZEModel::GetModelFile() const
 {
 	if (ModelResource != NULL)
 		return ModelResource->GetFileName();
 	else
-		return "";
+		return ZEString::Empty;
 }
 
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
@@ -620,7 +618,3 @@ ZEModel* ZEModel::CreateInstance()
 	return new ZEModel();
 }
 
-ZEEntityRunAt ZEModelDescription::GetRunAt() const
-{
-	return ZE_ERA_BOTH;
-}

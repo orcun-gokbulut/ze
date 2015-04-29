@@ -4,6 +4,7 @@ RoomAttributes = attributes ZEInteriorRoomAttributes
 	parameters ZEInteriorRoom rollout:ZEInteriorRoomRollout
 	(
 		ZEType 					type:#string 		default:"Room" 										animatable:false
+		OctreeEnabled			type:#boolean		default:false		ui:uiGenerateOctree				animatable:false
 		PhysicalMeshExists 		type:#boolean 		default:false		ui:uiPhysicalMeshExists  		animatable:false
 		PhysicalMeshEnabled		type:#boolean		default:true		ui:uiPhysicalMeshEnabled		animatable:false
 		PhysicalMeshUseSelf 	type:#boolean  		default:true 		ui:uiPhysicalMeshUseSelf		animatable:false
@@ -17,6 +18,7 @@ RoomAttributes = attributes ZEInteriorRoomAttributes
 
 		/* LAYOUT DEFINITION */
 		bitmap		uiLogo					fileName:"zineklogo.bmp"
+		checkbox	uiGenerateOctree		"Generate Octree"
 		checkbox 	uiPhysicalMeshExists 	"Export Physical Mesh" 
 		
 		group "Physical Mesh"

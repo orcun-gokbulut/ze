@@ -34,7 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEBase64.h"
+
 #include <string>
+#include "ZEMath\ZEMath.h"
 
 static char EncodingTable[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
 static char DecodingTable[128] = 

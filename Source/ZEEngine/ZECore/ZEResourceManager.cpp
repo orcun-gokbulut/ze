@@ -80,7 +80,7 @@ void ZEResourceManager::AddResource(ZEResource* Resource)
 void ZEResourceManager::RemoveResource(ZEResource* Resource)
 {
 	if (Resource->ReferenceCount <= 0 && !Resource->Cached)
-		SharedResources.DeleteValue(Resource);
+		SharedResources.RemoveValue(Resource);
 }
 
 void ZEResourceManager::ReleaseAllResources()

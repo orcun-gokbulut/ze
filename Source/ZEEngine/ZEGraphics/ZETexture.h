@@ -37,6 +37,8 @@
 #ifndef __ZE_TEXTURE_H__
 #define __ZE_TEXTURE_H__
 
+#include "ZEMeta/ZEObject.h"
+
 enum ZETextureType
 {
 	ZE_TT_2D,
@@ -100,8 +102,10 @@ enum ZETexturePixelFormat
 
 };
 
-class ZETexture
+class ZETexture : public ZEObject
 {
+	ZE_OBJECT
+
 	protected:
 										ZETexture();
 		virtual							~ZETexture();

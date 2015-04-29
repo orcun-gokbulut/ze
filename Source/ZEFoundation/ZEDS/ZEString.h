@@ -40,6 +40,7 @@
 #include <string>
 #include "ZETypes.h"
 #include "ZEAllocator.h"
+#include "ZEMeta\ZEBuiltIn.h"
 
 class ZEString;
 
@@ -115,10 +116,12 @@ bool operator!=(const wchar_t* WideCharacter, const ZECharacter& Character);
 
 class ZEString
 {
+	ZE_BUILTIN_OBJECT
+
 	friend class ZEStringWriter;
 	private:
-		char*						Buffer;
-		ZEAllocatorBase<char>		Allocator;
+		char*								Buffer;
+		ZESmartAllocator<char>				Allocator;
 
 		mutable bool						BufferChanged;
 
@@ -126,6 +129,8 @@ class ZEString
 		mutable ZEAllocatorBase<wchar_t>	WAllocator;
 
 	public:
+		static const ZEString		Empty;
+
 		void						SetBuffer(void* Buffer, ZESize Size);
 
 		void						SetValue(void* Buffer, ZESize Size);
@@ -155,6 +160,7 @@ class ZEString
 		void						SetCharacter(ZESize Position, ZECharacter Value);
 
 		bool						IsEmpty() const;
+		ZESize						GetBufferSize() const;
 		ZESize						GetLength() const;
 
 		void						SetSize(ZESize Size);
@@ -169,6 +175,11 @@ class ZEString
 		void						Insert(const char* String);
 		void						Insert(ZESize Position, const ZEString& String);
 		void						Insert(ZESize Position, const char* String);
+
+		void						AppendCharacter(const ZECharacter& Character);
+		void						InsertCharacter(const ZECharacter& Character);
+		void						InsertCharacter(ZESize Position, const ZECharacter& Character);
+
 		void						Remove(ZESize Position, ZESize Count = 1);
 
 		bool						Equals(const ZEString& String) const;
@@ -189,7 +200,7 @@ class ZEString
 		ZEString					Trim() const;
 		void						TrimSelf();
 
-		ZESize						Hash();
+		ZESize						Hash() const;
 
 		ZEString					Lower() const;
 		void						LowerSelf();

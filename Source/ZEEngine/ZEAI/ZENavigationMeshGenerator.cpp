@@ -268,13 +268,13 @@ void ZENavigationMeshGenerator::RemovePolygonsByOrder(ZESize PolygonAIndex, ZESi
 {
 	if (PolygonAIndex > PolygonBIndex)
 	{
-		Mesh.Polygons.DeleteAt(PolygonAIndex);
-		Mesh.Polygons.DeleteAt(PolygonBIndex);
+		Mesh.Polygons.Remove(PolygonAIndex);
+		Mesh.Polygons.Remove(PolygonBIndex);
 	}
 	else
 	{
-		Mesh.Polygons.DeleteAt(PolygonBIndex);
-		Mesh.Polygons.DeleteAt(PolygonAIndex);
+		Mesh.Polygons.Remove(PolygonBIndex);
+		Mesh.Polygons.Remove(PolygonAIndex);
 	}
 }
 
@@ -282,17 +282,17 @@ void ZENavigationMeshGenerator::RemovePolygonsByOrder(ZESize PolygonAIndex, ZESi
 {
 	if (PolygonAIndex > PolygonBIndex && PolygonAIndex > PolygonCIndex)
 	{
-		Mesh.Polygons.DeleteAt(PolygonAIndex);
+		Mesh.Polygons.Remove(PolygonAIndex);
 		RemovePolygonsByOrder(PolygonBIndex, PolygonCIndex);
 	}
 	if (PolygonBIndex > PolygonAIndex && PolygonBIndex > PolygonCIndex)
 	{
-		Mesh.Polygons.DeleteAt(PolygonBIndex);
+		Mesh.Polygons.Remove(PolygonBIndex);
 		RemovePolygonsByOrder(PolygonAIndex, PolygonCIndex);	
 	}
 	else
 	{
-		Mesh.Polygons.DeleteAt(PolygonCIndex);
+		Mesh.Polygons.Remove(PolygonCIndex);
 		RemovePolygonsByOrder(PolygonAIndex, PolygonBIndex);
 	}
 }
@@ -423,7 +423,7 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZENavigationMeshPolygon& Outpu
 					{
 						if (GetVertex(Output, K - 1) == GetVertex(Output, K) || CheckStraight(GetVertex(Output, K - 1), GetVertex(Output, K), GetVertex(Output, K + 1)))
 						{
-							Output.VertexIndices.DeleteAt(K);
+							Output.VertexIndices.Remove(K);
 							K--;
 						}
 					}
@@ -448,13 +448,13 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZESize PolygonIndex1, ZESize P
 
 	if (PolygonIndex1 > PolygonIndex2)
 	{
-		Mesh.Polygons.DeleteAt(PolygonIndex1);
-		Mesh.Polygons.DeleteAt(PolygonIndex2);
+		Mesh.Polygons.Remove(PolygonIndex1);
+		Mesh.Polygons.Remove(PolygonIndex2);
 	}
 	else
 	{
-		Mesh.Polygons.DeleteAt(PolygonIndex2);
-		Mesh.Polygons.DeleteAt(PolygonIndex1);
+		Mesh.Polygons.Remove(PolygonIndex2);
+		Mesh.Polygons.Remove(PolygonIndex1);
 	}
 
 	Mesh.Polygons.Add(Output);

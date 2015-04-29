@@ -85,7 +85,7 @@ struct ZEMaterialFileAnimationFrameChunk
 struct ZEMaterialFileAnimationKeyChunk
 {
 	ZEUInt32							PropertyIndex;
-	ZEVariant						Value;
+	ZEValue						Value;
 };
 
 struct ZEMaterialFileFixedMaterialChunk

@@ -55,33 +55,34 @@ static void ShowHelp()
 		"  ZEFileCompiler transfer binary files into ZEData based classes so that it can be\n"
 		"  embedded into executables. This tool can generate both header and source files. \n"
 		"\n"
-		"  Note    : You can use ZEFileCompile flag in ze_add_source CMake command which \n"
+		"  Note    : You can use ZEFC flag in ze_add_executive/library/plugin CMake command which \n"
 		"		     automatically uses this tool internally.\n"
-		"  Note    : If you want everything in single cpp file don't use -H parameter.\n"
 		"  Warning : Parameters are case sensitive !\n"
 		"\n"
 		"Usage:\n"
-		"   ZEFileCompiler [InputFileName] -C [ClassName] -S [SourceFile] -H [Header File]\n"
+		"   ZEFileCompiler [InputFileName] -c [ClassName] -os [SourceFile] -oh [HeaderFile]\n"
 		"\n"
 		"Parameters:\n"
 		"  [InputFileName] : Input file name.\n"
 		"  -h : Shows this help text."
-		"  -C [ClassNameName] : Class name of the C++ class that is going to be generated.\n"
-		"  -S [SourceFile] : C/C++ source file name that is going to be generated.\n"
-		"  -H [HeaderFileName] : C/C++ header file name that is going to be generated. (Optional)\n"
-		"  -v : Verbose mode which outputs compilation errors. Default : Not set.\n"
+		"  -c [ClassNameName] : Class name of the C++ class that is going to be generated.\n"
+		"  -os [OutputSourceFile] : C/C++ source file name that is going to be generated.\n"
+		"  -oh [OutputHeaderFileName] : C/C++ header file name that is going to be generated.\n"
+		"  -q : Quiet mode, which only outputs compilation errors. (Optional, Default : Not set).\n"
 		"\n"
 		"Command Line Example:\n"
-		"  ZEMetaCompiler ZEIconResource -I ApplicaionIcon.bmp -S ZEIconResource.h -H ZEIconResource.h \n\n"
+		"  ZEMetaCompiler -c ZEIconResource -oh ZEIconResource.h -os ZEIconResource.cpp ApplicaionIcon.bmp \n\n"
 		"\n"
 		"CMake Command Example:\n"
-		"  ze_add_source(ApplicationIcon.bmp Sources ZEFileCompiler)\n"
+		"  ze_add_source(ApplicationIcon.bmp Sources Resources)\n"
+		"  ze_add_library(ZEApplication SOURCES ${Sources} ZEFC ${Resources})\n"
 		"\n");
 }
 
 static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& Options)
 {
-	Options.Verbose = false;
+	Options.Quiet = false;
+
 	for (int I = 1; I < Argc; I++)
 	{
 		if (strncmp(Argv[I], "-h", 2) == 0)
@@ -89,9 +90,9 @@ static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& 
 			ShowHelp();
 			exit(EXIT_SUCCESS);
 		}
-		else if (strncmp(Argv[I], "-C", 2) == 0)
+		else if (strncmp(Argv[I], "-c", 2) == 0)
 		{
-			if (!Options.SourceFileName.IsEmpty())
+			if (!Options.OutputSourceFileName.IsEmpty())
 				Error("Only one class name can be given.");
 
 			if (I + 1 >= Argc)
@@ -100,31 +101,31 @@ static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& 
 			I++;
 			Options.ClassName = Argv[I];
 		}
-		else if (strncmp(Argv[I], "-S", 2) == 0)
+		else if (strncmp(Argv[I], "-os", 3) == 0)
 		{
-			if (!Options.SourceFileName.IsEmpty())
+			if (!Options.OutputHeaderFileName.IsEmpty())
 				Error("Only one source file name can be given.");
 
 			if (I + 1 >= Argc)
 				Error("Empty parameter value.");
 
 			I++;
-			Options.SourceFileName = Argv[I];
+			Options.OutputSourceFileName = Argv[I];
 		}
-		else if (strncmp(Argv[I], "-H", 2) == 0)
+		else if (strncmp(Argv[I], "-oh", 3) == 0)
 		{
-			if (!Options.HeaderFileName.IsEmpty())
+			if (!Options.OutputHeaderFileName.IsEmpty())
 				Error("Only one header file name can be given.");
 
 			if (I + 1 >= Argc)
 				Error("Empty parameter value.");
 
 			I++;
-			Options.HeaderFileName = Argv[I];
+			Options.OutputHeaderFileName = Argv[I];
 		}
-		else if (strncmp(Argv[I], "-v", 2) == 0)
+		else if (strncmp(Argv[I], "-q", 2) == 0)
 		{
-			Options.Verbose = true;
+			Options.Quiet = true;
 		}
 		else
 		{
@@ -143,33 +144,36 @@ static void ParseParameters(int Argc, const char** Argv, ZEFileCompilerOptions& 
 
 	if (Options.ClassName.IsEmpty())
 	{
-		Error("Missing class name (-C) parameter.");
+		Error("Missing class name (-c) parameter.");
 		ShowHelp();
 	}
 
-	if (Options.SourceFileName.IsEmpty() && Options.HeaderFileName.IsEmpty())
+	if (Options.OutputSourceFileName.IsEmpty())
 	{
-		Error("Missing source file name (-S) and header file name (-H) parameters. You should give at last one of the parameters.");
+		Error("Missing output source file name (-os) parameter.");
 		ShowHelp();
 	}
-	else if (Options.SourceFileName.IsEmpty() && Options.HeaderFileName.IsEmpty())
+	
+	if (Options.OutputHeaderFileName.IsEmpty())
 	{
-		Error("Missing header file name (-H) parameter.");
+		Error("Missing output header file name (-oh) parameter.");
 		ShowHelp();
 	}
 }
 
 int main(int Argc, const char** Argv)
 {
-	printf(
-		"ZEFileCompiler - Version : 0.1\n"
-		"Copyright (C) 2012, Zinek Code House. All rights reserved.\n\n");
-
 	if (Argc == 1)
 		Error("Command line arguments are missing.");
 
 	ZEFileCompilerOptions Options;
 	ParseParameters(Argc, Argv, Options);
+
+	if (!Options.Quiet)
+	{
+		printf("ZEFileCompiler - Version : 0.1\n"
+			"Copyright (C) 2012, Zinek Code House. All rights reserved.\n\n");
+	}
 
 	bool Result = ZEFileCompiler::Compile(Options);
 	if (!Result)

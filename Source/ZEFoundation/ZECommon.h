@@ -45,4 +45,9 @@
 	#define ZE_FORCE_INLINE inline
 #endif
 
+#define ZE_DISALLOW_COPY(ClassName) \
+	private: \
+		ClassName(const ClassName&); \
+		ClassName& operator=(const ClassName&);
+
 #endif

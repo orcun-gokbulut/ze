@@ -41,8 +41,9 @@
 #include "ZEDS/ZEString.h"
 
 class ZEMLNode;
+class ZEMLRoot;
 class QApplication;
-class ZEMLItem;
+class ZEMLElement;
 class QTreeWidgetItem;
 class ZEMLVisualizerTreeWidget;
 
@@ -72,16 +73,17 @@ class ZEMLVisualizerWidget
 	private:
 
 		ZEMLVisualizerQt*				QtComponents;
+		ZEMLRoot*						Root;
 		ZEMLNode*						Node;
 
-		void							AddItem(ZEMLItem* Item, QTreeWidgetItem* ParentItem = NULL);
+		void							AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentItem = NULL);
 
 	public:
 
 		void							Show();
 		void							Hide();
 
-		void							SetZEMLFile(const ZEString& FileNamme);
+		void							SetZEMLFile(const ZEString& FileName);
 		void							SetZEMLNode(ZEMLNode* Node);
 		void							Refresh();
 

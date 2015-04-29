@@ -63,30 +63,6 @@ struct ZEVertexDeclarationFileElementChunk
 	ZEUInt32		Index;
 };
 
-static ZEString ConstructResourcePath(const ZEString& Path)
-{
-	ZEString NewString = Path;
-	ZESize ConstLength = strlen("resources\\") - 1;
-
-	if (Path[0] == '\\' || Path[0] == '/')
-		NewString = NewString.SubString(1, Path.GetLength() - 1);
-
-	// If it is guaranteed that there is no "resources\\" string in beginning
-	if (NewString.GetLength() - 1 < ConstLength)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-	// Else check if there is "resources\\" in the beginning
-	else if (_stricmp("resources\\", Path.SubString(0, ConstLength)) != 0)
-	{
-		NewString.Insert(0, "resources\\");
-		return NewString;
-	}
-
-	return NewString;
-}
-
 ZEVertexDeclaration::ZEVertexDeclaration()
 {
 	
@@ -109,15 +85,13 @@ void ZEVertexDeclaration::Destroy()
 
 ZEVertexDeclaration* ZEVertexDeclaration::LoadFromFile(const ZEString& FileName)
 {
-	ZEString NewPath = ConstructResourcePath(FileName);
-
 	bool Result;
 	ZEFile File;
 
-	Result = File.Open(NewPath, ZE_FOM_READ, ZE_FCM_NONE);
+	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
 	if (!Result)
 	{
-		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", NewPath.ToCString());
+		zeError("Can not open zeVertexDecl file. (FileName : \"%s\")", FileName.ToCString());
 		return NULL;
 	}
 	

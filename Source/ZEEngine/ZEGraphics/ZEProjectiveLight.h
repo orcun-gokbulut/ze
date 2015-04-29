@@ -43,11 +43,10 @@
 class ZETexture2D;
 class ZETexture2DResource;
 
-ZE_META_OBJECT_DESCRIPTION(ZEProjectiveLight);
-
 class ZEProjectiveLight : public ZELight
 {
-	ZE_META_ENTITY(ZEProjectiveLight)
+	ZE_OBJECT
+
 	private:
 		float							FOV;
 		float							AspectRatio;
@@ -92,19 +91,5 @@ class ZEProjectiveLight : public ZELight
 
 		static ZEProjectiveLight*		CreateInstance();
 };
-
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta> 
-		<class name="ZEProjectiveLight" parent="ZELight" description="Point Light">
-			<property name="FOV" groupname="Light" type="float" autogetset="yes"/>
-			<property name="AspectRatio" groupname="Light" type="float" autogetset="yes"/>
-			<property name="ProjectionTextureFile" groupname="Light" type="string" autogetset="yes"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
 
 #endif

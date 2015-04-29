@@ -64,12 +64,9 @@ struct ZEFOGScreenAlignedQuad
 	float Position[3];
 };
 
-
-ZE_META_OBJECT_DESCRIPTION(ZED3D9FogProcessor);
-
 class ZED3D9FogProcessor : public ZED3D9ComponentBase, public ZEObject
 {
-	ZE_META_OBJECT(ZED3D9FogProcessor)
+	ZE_OBJECT
 
 	protected:
 		static ZEFOGScreenAlignedQuad	Vertices[4];
@@ -149,23 +146,4 @@ class ZED3D9FogProcessor : public ZED3D9ComponentBase, public ZEObject
 		virtual							~ZED3D9FogProcessor();
 };
 
-/*
-ZE_POST_PROCESSOR_START(Meta)
-	<zinek>
-		<meta> 
-			<class name="ZED3D9FogProcessor">
-				<noinstance>true</noinstance>
-				<description>ZED3D9FogProcessor</description>
-				<property name="FogDistanceFar" type="float" autogetset="yes" description="..."/>
-				<property name="FogDistanceNear" type="float" autogetset="yes" description="..."/>
-				<property name="FogFactor" type="float" autogetset="yes" description="..."/>
-				<property name="FogColor" type="ZEVector3" autogetset="yes" description="..." semantic="ZE_PS_COLOR"/>
-				<property name="OutScatterFactor" type="ZEVector3" autogetset="yes" description="..." semantic="ZE_PS_COLOR"/>
-				<property name="InScatterFactor" type="ZEVector3" autogetset="yes" description="..." semantic="ZE_PS_COLOR"/>
-			</class>
-		</meta>
-	</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-
-#endif	/* __ZE_D3D9_FOG_PROCESSOR_H__ */
+#endif

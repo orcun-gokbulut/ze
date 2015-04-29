@@ -62,7 +62,7 @@ void ZETimerManager::UnregisterTimer(ZETimer* Timer)
 	if(!TimerList.Exists(Timer))
 		return;
 
-	TimerList.DeleteValue(Timer);
+	TimerList.RemoveValue(Timer);
 }
 
 void ZETimerManager::Tick(float ElapsedTime)
