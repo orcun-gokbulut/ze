@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETEMain.cpp
+ Zinek Engine - ZETEResamplerIPP.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,67 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETEPatchDatabase.h"
+#include "ZETEResamplerIPP.h"
+
+#include "ZETEBlock.h"
 #include "ZETEPatch.h"
 
-#include "ZEFile/ZEPathManager.h"
+#include <ippi.h>
+#include <ippcore.h>
+#include <ipps.h>
 
-#include <FreeImage.h>
-
-void main()
+void ZETEResamplerIPP::Resample(ZETEPatch* Patch, ZETEBlock* Block)
 {
-	FreeImage_Initialise();
+	double PositionX = (Block->GetPositionX() - Patch->GetStartX()) / Patch->GetPixelScaleX();
+	double PositionY = (Block->GetPositionY() - Patch->GetStartY()) / Patch->GetPixelScaleY();
 
-	ZEPathManager::GetInstance()->SetAccessControl(false);
+	IppiSize SourceSize;
+	SourceSize.width = Patch->GetWidth();
+	SourceSize.height = Patch->GetHeight();
 
-	ZETEPatchDatabase Database;
-	Database.SetPath("c:\\Test"); 
-	Database.SetBlockSize(1024);
+	IppiRect SourceROI;
+	SourceROI.x = 0;
+	SourceROI.y = 0;
+	SourceROI.width = Patch->GetWidth();
+	SourceROI.height = Patch->GetHeight();
 
-	ZETEPatch* Patch;
-	Patch = new ZETEPatch();
-	Patch->Load("c:\\World.jpg", ZETE_PT_COLOR);
-	Patch->SetPriority(0);
-	Patch->SetStartX(2.5);
-	Patch->SetStartY(2.5);
-	Patch->SetEndX(Patch->GetWidth());
-	Patch->SetEndY(Patch->GetHeight());
-	Database.AddPatch(Patch);
+	IppiRect DestROI;
+	DestROI.x = 0;
+	DestROI.y = 0;
+	DestROI.width = Block->GetSize();
+	DestROI.height = Block->GetSize();
 
-	Database.GenerateBlocks();
-	
-	FreeImage_DeInitialise();
+	int CurrentBufferSize = 0;
+	ippiResizeGetBufSize(SourceROI, DestROI, 4, IPPI_INTER_LINEAR, &CurrentBufferSize);
+	if (CurrentBufferSize != BufferSize)
+	{
+		if (Buffer != NULL)
+			ippsFree(Buffer);
+
+		Buffer = ippsMalloc_8u(CurrentBufferSize);	
+		BufferSize = CurrentBufferSize;
+	}
+
+	IppStatus Result = ippiResizeSqrPixel_8u_C4R(
+		(const Ipp8u*)Patch->GetData(), SourceSize, Patch->GetPitch(), SourceROI, 
+		(Ipp8u*)Block->GetData(), Block->GetPitch(), DestROI, 
+		Patch->GetLevelScaleX(), Patch->GetLevelScaleY(), 
+		-PositionX, -PositionY, 
+		IPPI_INTER_LINEAR, (Ipp8u*)Buffer);
+}
+
+ZETEResamplerIPP::ZETEResamplerIPP()
+{
+	Buffer = NULL;
+	BufferSize = 0;
+}
+
+ZETEResamplerIPP::~ZETEResamplerIPP()
+{
+	if (Buffer != NULL)
+	{
+		ippsFree(Buffer);
+		Buffer = NULL;
+		BufferSize = 0;
+	}
 }

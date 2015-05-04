@@ -42,10 +42,10 @@ class ZEFile;
 
 enum ZETEPixelType
 {
-	ZE_TPT_NONE			= 0,
-	ZE_TPT_ELEVATION	= 1,	// Float
-	ZE_TPT_COLOR		= 2,	// ZEUInt8[4]
-	ZE_TPT_GRAYSCALE	= 3		// ZEUInt8
+	ZETE_PT_NONE		= 0,
+	ZETE_PT_ELEVATION	= 1,	// Float
+	ZETE_PT_COLOR		= 2,	// ZEUInt8[4]
+	ZETE_PT_GRAYSCALE	= 3		// ZEUInt8
 };
 
 class ZETEBlock
@@ -54,12 +54,13 @@ class ZETEBlock
 		ZEInt64					PositionX;
 		ZEInt64					PositionY;
 		ZEUInt					Level;
-		ZESize					Dimension;
+		ZESize					Size;
 
 		void*					Data;
 		ZESize					DataSize;
-		ZESize					Pitch;
 		ZETEPixelType			PixelType;
+
+		void					Configure();
 
 	public:
 		void					SetPositionX(ZEInt64 x);
@@ -71,23 +72,27 @@ class ZETEBlock
 		void					SetLevel(ZEUInt Level);
 		ZEUInt					GetLevel();
 
-		void					SetDimension(ZESize BlockSize);
-		ZESize					GetDimension();
+		void					SetSize(ZESize BlockSize);
+		ZESize					GetSize();
 
+		void					SetPixelType(ZETEPixelType Type);
 		ZETEPixelType			GetPixelType();
+
 		ZESize					GetPixelSize();
 
 		void*					GetData();
 		ZESize					GetPitch();
 		ZESize					GetDataSize();
 
-		bool					Create(ZETEPixelType PixelType, ZESize Dimension);
 		void					Clean();
 
+		bool					Load(const ZEString& FileName);
 		bool					Load(ZEFile* File);
+
+		bool					Save(const ZEString& FileName);
 		bool					Save(ZEFile* File);
 		
-		bool					DebugDump(const ZEString& Directory);
+		bool					Dump(const ZEString& Directory);
 
 								ZETEBlock();
 								~ZETEBlock();

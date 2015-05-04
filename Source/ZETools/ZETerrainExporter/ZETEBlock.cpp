@@ -66,6 +66,21 @@ ZEPackStruct(
 	}
 );
 
+void ZETEBlock::Configure()
+{
+	if (Data != NULL)
+	{
+		delete[] Data;
+		Data = NULL;
+	}
+
+	if (PixelType == ZETE_PT_NONE || Size == 0)
+		return;
+
+	DataSize = Size * Size * GetPixelSize();
+	Data = new ZEBYTE[DataSize];
+}
+
 void ZETEBlock::SetPositionX(ZEInt64 x)
 {
 	PositionX = x;
@@ -96,14 +111,27 @@ ZEUInt ZETEBlock::GetLevel()
 	return Level;
 }
 
-void ZETEBlock::SetDimension(ZESize Dimension)
+void ZETEBlock::SetSize(ZESize Size)
 {
-	this->Dimension = Dimension;
+	if (this->Size == Size)
+		return;
+
+	this->Size = Size;
+	Configure();
 }
 
-ZESize ZETEBlock::GetDimension()
+ZESize ZETEBlock::GetSize()
 {
-	return Dimension;
+	return Size;
+}
+
+void ZETEBlock::SetPixelType(ZETEPixelType Type)
+{
+	if (PixelType == Type)
+		return;
+
+	PixelType = Type;
+	Configure();
 }
 
 ZETEPixelType ZETEBlock::GetPixelType()
@@ -116,13 +144,13 @@ ZESize ZETEBlock::GetPixelSize()
 	switch (PixelType)
 	{
 		default:
-		case ZE_TPT_NONE:
+		case ZETE_PT_NONE:
 			return 0;
-		case ZE_TPT_ELEVATION:
+		case ZETE_PT_ELEVATION:
 			return 4;
-		case ZE_TPT_COLOR:
+		case ZETE_PT_COLOR:
 			return 4;
-		case ZE_TPT_GRAYSCALE:
+		case ZETE_PT_GRAYSCALE:
 			return 1;
 	}
 }
@@ -134,7 +162,7 @@ void* ZETEBlock::GetData()
 
 ZESize ZETEBlock::GetPitch()
 {
-	return Pitch;
+	return Size * GetPixelSize();
 }
 
 ZESize ZETEBlock::GetDataSize()
@@ -142,64 +170,77 @@ ZESize ZETEBlock::GetDataSize()
 	return DataSize;
 }
 
-bool ZETEBlock::Create(ZETEPixelType PixelType, ZESize Dimension)
+void ZETEBlock::Clean()
 {
-	if (this->PixelType != PixelType && this->Dimension != Dimension)
-		Clean();
+	if (Size == 0 || PixelType == ZETE_PT_NONE)
+		return;
 
-	this->PixelType = PixelType;
-	this->Dimension = Dimension;
-	Pitch = Dimension * GetPixelSize();
-	DataSize = Dimension * Pitch;
-	Data = new ZEUInt8[DataSize];
+	memset(Data, 0, GetPitch() * GetSize());
+}
+
+bool ZETEBlock::Load(const ZEString& FileName)
+{
+	ZEFile File;
+	if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
+		return false;
+
+	if (!Load(&File))
+		return false;
+
+	File.Close();
 
 	return true;
 }
 
-void ZETEBlock::Clean()
-{
-	Dimension = 0;
-	DataSize = 0;
-	Pitch = 0;
-	PixelType = ZE_TPT_NONE;
-	
-	if (Data == NULL)
-	{
-		delete[] (ZEUInt8*)Data;
-		Data = NULL;
-	}
-}
-
 bool ZETEBlock::Load(ZEFile* File)
 {
-	Clean();
+	if (File == NULL)
+		return false;
 
 	ZETEBlockFileHeader Header = {0};
 	if (!File->Read(&Header, sizeof(ZETEBlockFileHeader), 1) == 1)
 		return false;
-	
-	Create((ZETEPixelType)Header.Type, Header.Dimension);
-
-	if (File->Read(GetData(), DataSize, 1) != 1)
-	{
-		Clean();
-		return false;
-	}
 
 	PositionX = Header.PositionX;
 	PositionY = Header.PositionY;
 	Level = Header.Level;
+
+	SetPixelType((ZETEPixelType)Header.Type);
+	SetSize(Header.Dimension);
+	
+	if (File->Read(GetData(), DataSize, 1) != 1)
+		return false;
+
+	return true;
+}
+
+bool ZETEBlock::Save(const ZEString& FileName)
+{
+	ZEFile File;
+	if (!File.Open(FileName, ZE_FOM_WRITE, ZE_FCM_CREATE))
+		return false;
+
+	if (!Save(&File))
+		return false;
+
+	File.Close();
 
 	return true;
 }
 
 bool ZETEBlock::Save(ZEFile* File)
 {
+	if (File == NULL)
+		return false;
+
+	if (Size == 0 || PixelType == ZETE_PT_NONE)
+		return false;
+
 	ZETEBlockFileHeader Header;
 	Header.PositionX = PositionX;
 	Header.PositionY = PositionY;
 	Header.Level = Level;
-	Header.Dimension = Dimension;
+	Header.Dimension = Size;
 	Header.Type = PixelType;
 
 	if (File->Write(&Header, sizeof(ZETEBlockFileHeader), 1) != 1)
@@ -211,14 +252,23 @@ bool ZETEBlock::Save(ZEFile* File)
 	return true;
 }
 
-bool ZETEBlock::DebugDump(const ZEString& Directory)
+bool ZETEBlock::Dump(const ZEString& FileName)
 {
-	FIBITMAP* Bitmap = FreeImage_ConvertFromRawBits((BYTE*)GetData(), GetDimension(), GetDimension(), GetPitch(), 32, 0, 0, 0, true);
+	FIBITMAP* Bitmap = NULL;
+	if (PixelType == ZETE_PT_COLOR)
+		Bitmap = FreeImage_ConvertFromRawBits((BYTE*)GetData(), GetSize(), GetSize(), GetPitch(), 32, 0, 0, 0, true);
+	else if (PixelType == ZETE_PT_GRAYSCALE)
+		Bitmap = FreeImage_ConvertFromRawBits((BYTE*)GetData(), GetSize(), GetSize(), GetPitch(), 8, 0, 0, 0, true);
+
 	if (Bitmap == NULL)
 		return false;
-	if (!FreeImage_Save(FIF_PNG, Bitmap, ZEFormat::Format("{0}/L{1}-X{2}-Y{3}-ML{4}.png", Directory, GetLevel(), GetPositionX(), GetPositionY(), 0).ToCString()))
+	
+	if (!FreeImage_Save(FIF_PNG, Bitmap, ZEFormat::Format("{0}.png", FileName).ToCString()))
 		return false;
+	
 	FreeImage_Unload(Bitmap);
+	
+	return true;
 }
 
 ZETEBlock::ZETEBlock()
@@ -226,11 +276,18 @@ ZETEBlock::ZETEBlock()
 	PositionX = 0;
 	PositionY = 0;
 	Level = 0;
+	Size = 0;
+
 	Data = NULL;
-	Clean();
+	DataSize = 0;
+	PixelType = ZETE_PT_NONE;
 }
 
 ZETEBlock::~ZETEBlock()
 {
-	Clean();
+	if (Data != NULL)
+	{
+		delete Data;
+		Data = NULL;
+	}
 }

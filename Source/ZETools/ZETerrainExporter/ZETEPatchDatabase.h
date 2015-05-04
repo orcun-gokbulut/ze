@@ -49,8 +49,10 @@ enum ZETerrainBlockAvailableResult
 	ZE_TBAR_NONE
 };
 
+
 class ZETEPatchDatabase
 {
+	friend ZETEPatch;
 	private:
 		double							StartX;
 		double							StartY;
@@ -59,6 +61,8 @@ class ZETEPatchDatabase
 		double							UnitSize;
 
 		ZEUInt							LevelCount;
+
+		ZEString						Path;
 
 		ZESize							BlockSize;
 		ZESize							BlocksPerChunk;
@@ -76,25 +80,23 @@ class ZETEPatchDatabase
 		void							SetBlockType(ZETEPixelType Type);
 		ZETEPixelType					GetBlockType();
 
+		void							SetBlockSize(ZESize BlockSize);
+		ZESize							GetBlockSize();
+
+		void							GetUnitSize(double UnitSize);
+		double							GetUnitSize();
+
 		double							GetStartX();
 		double							GetStartY();
 		double							GetEndX();
 		double							GetEndY();
 
-		void							GetUnitSize(double UnitSize);
-		double							GetUnitSize();
+		void							SetPath(const ZEString& Path);
+		const ZEString&					GetPath();
 
-		void							SetBlocksPerChunks(ZESize BlocksPerChunk);
-		ZESize							GetBlocksPerChunks();
-		
-		void							SetBlockSize(ZESize BlockSize);
-		ZESize							GetBlockSize();
+		bool							Intersect(double PositionX, double PositionY, double Width, double Height, ZEArray<ZETEPatch*>& Patches, ZESize& Count);
 
-		bool							CheckBlockAvailable(ZESize Level, double x, double y);
-
-		void							UpdateOrder();
-
-		void							Save(const ZEString& Path);
+		void							GenerateBlocks();
 
 										ZETEPatchDatabase();
 										~ZETEPatchDatabase();

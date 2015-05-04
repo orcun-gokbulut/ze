@@ -39,14 +39,21 @@
 #include "ZETEBlock.h"
 #include "ZEMath\ZEVector.h"
 
+class ZETEPatchDatabase;
+
 class ZETEPatch
 {
+	friend class ZETEPatchDatabase;
 	private:
+		ZETEPatchDatabase*		Database;
+
 		ZEUInt					Priority;
 		ZEUInt					Level;
 		double					StartX, StartY;
 		double					EndX, EndY;
+
 		double					LevelScalingWidth, LevelScalingHeight;
+		double					PixelScaleX, PixelScaleY;
 
 		void*					Data;
 		ZESize					Width, Height;
@@ -68,8 +75,11 @@ class ZETEPatch
 		void					SetEndY(double EndY);
 		double					GetEndY();
 
-		double					GetLevelScaleWidth();
-		double					GetLevelScaleHeight();
+		double					GetPixelScaleX();
+		double					GetPixelScaleY();
+
+		double					GetLevelScaleX();
+		double					GetLevelScaleY();
 
 		ZESize					GetWidth();
 		ZESize					GetHeight();
@@ -85,10 +95,8 @@ class ZETEPatch
 		void					SetPriority(ZEUInt Priority);
 		ZEUInt					GetPriority();
 		
-		bool					BoundaryCheck(double x, double y);
+		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
 		
-		void					Resample(void* BlockData, ZESize BlockPitch, ZEUInt64 BlockX, ZEUInt64 BlockY, ZESize BlockSize);
-
 		bool					Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
 		void					Clean();
 
