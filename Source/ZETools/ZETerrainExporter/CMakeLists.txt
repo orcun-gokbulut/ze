@@ -35,12 +35,20 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+find_package(OpenMP REQUIRED)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 ze_add_source(ZETEBlock.cpp					Sources)
 ze_add_source(ZETEBlock.h					Sources)
 ze_add_source(ZETEPatch.cpp					Sources)
 ze_add_source(ZETEPatch.h					Sources)
 ze_add_source(ZETEPatchDatabase.cpp			Sources)
 ze_add_source(ZETEPatchDatabase.h			Sources)
+ze_add_source(ZETEResamplerIPP.cpp			Sources)
+ze_add_source(ZETEResamplerIPP.h			Sources)
 ze_add_source(ZETEMain.cpp					Sources)
 
 ze_add_executable(TARGET ZETerrainExporter

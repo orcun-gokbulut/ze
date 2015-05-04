@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETEMain.cpp
+ Zinek Engine - ZETEResamplerIPP.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETEPatchDatabase.h"
-#include "ZETEPatch.h"
+#pragma once
 
-#include "ZEFile/ZEPathManager.h"
+#include "ZETypes.h"
 
-#include <FreeImage.h>
+class ZETEPatch;
+class ZETEBlock;
 
-void main()
+class ZETEResamplerIPP
 {
-	FreeImage_Initialise();
+	private:
+		void*					Buffer;
+		ZESize					BufferSize;
 
-	ZEPathManager::GetInstance()->SetAccessControl(false);
+	public:
+		void					Resample(ZETEPatch* Patch, ZETEBlock* Block);
 
-	ZETEPatchDatabase Database;
-	Database.SetPath("c:\\Test"); 
-	Database.SetBlockSize(1024);
-
-	ZETEPatch* Patch;
-	Patch = new ZETEPatch();
-	Patch->Load("c:\\World.jpg", ZETE_PT_COLOR);
-	Patch->SetPriority(0);
-	Patch->SetStartX(2.5);
-	Patch->SetStartY(2.5);
-	Patch->SetEndX(Patch->GetWidth());
-	Patch->SetEndY(Patch->GetHeight());
-	Database.AddPatch(Patch);
-
-	Database.GenerateBlocks();
-	
-	FreeImage_DeInitialise();
-}
+								ZETEResamplerIPP();
+								~ZETEResamplerIPP();
+};

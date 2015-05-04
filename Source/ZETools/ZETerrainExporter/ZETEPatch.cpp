@@ -34,14 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETEPatch.h"
+#include "ZETEPatchDatabase.h"
 
 #include "ZEError.h"
 #include "ZEMath\ZEMath.h"
 
 #include <FreeImage.h>
-#include <ippi.h>
-#include <ippcore.h>
-#include <ipps.h>
 
 void ZETEPatch::UpdateLevelAndScaling()
 {
@@ -50,20 +48,26 @@ void ZETEPatch::UpdateLevelAndScaling()
 		Level = 0;
 		LevelScalingWidth = 1.0;
 		LevelScalingHeight = 1.0;
-		return;
+		PixelScaleX = 0.0;
+		PixelScaleY = 0.0;
+	}
+	else
+	{
+		PixelScaleX = (EndX - StartX) / (double)Width;
+		PixelScaleY = (EndY - StartY) / (double)Height;
+
+		double MinScale = (LevelScalingWidth < LevelScalingHeight ? PixelScaleX : PixelScaleY);
+
+		double LevelTemp = log(MinScale) / log(2);
+		Level = (ZEUInt)floor(LevelTemp + 0.5);
+
+		double LevelScale = pow(2, Level);
+		LevelScalingWidth = LevelScale / PixelScaleX;
+		LevelScalingHeight = LevelScale / PixelScaleY;
 	}
 
-	LevelScalingWidth = (EndX - StartX) / (double)Width;
-	LevelScalingHeight = (EndY - StartY) / (double)Height;
-
-	double MinScale = (LevelScalingWidth < LevelScalingHeight ? LevelScalingWidth : LevelScalingHeight);
-
-	double LevelTemp = log(MinScale) / log(2);
-	Level = (ZEUInt)floor(LevelTemp + 0.5);
-
-	double LevelScale = pow(2, Level);
-	LevelScalingWidth = LevelScale / LevelScalingWidth;
-	LevelScalingHeight = LevelScale / LevelScalingHeight;
+	if (Database != NULL)
+		Database->CalculateDimensions();
 }
 
 void ZETEPatch::SetStartX(double x)
@@ -122,12 +126,22 @@ double ZETEPatch::GetEndY()
 	return EndY;
 }
 
-double ZETEPatch::GetLevelScaleWidth()
+double ZETEPatch::GetPixelScaleX()
+{
+	return PixelScaleX;
+}
+
+double ZETEPatch::GetPixelScaleY()
+{
+	return PixelScaleY;
+}
+
+double ZETEPatch::GetLevelScaleX()
 {
 	return LevelScalingWidth;
 }
 
-double ZETEPatch::GetLevelScaleHeight()
+double ZETEPatch::GetLevelScaleY()
 {
 	return LevelScalingHeight;
 }
@@ -162,16 +176,16 @@ ZESize ZETEPatch::GetPixelSize()
 	switch (PixelType)
 	{
 		default:
-		case ZE_TPT_NONE:
+		case ZETE_PT_NONE:
 			return 0;
 
-		case ZE_TPT_ELEVATION:
+		case ZETE_PT_ELEVATION:
 			return 4;
 
-		case ZE_TPT_COLOR:
+		case ZETE_PT_COLOR:
 			return 4;
 
-		case ZE_TPT_GRAYSCALE:
+		case ZETE_PT_GRAYSCALE:
 			return 1;
 	}
 }
@@ -191,17 +205,14 @@ ZEUInt ZETEPatch::GetPriority()
 	return Priority;
 }
 
-bool  ZETEPatch::BoundaryCheck(double x, double y)
-{
-	return (x >= StartX && x <= EndX) && (y >= StartY && y <= EndY);
-}
-
 void ZETEPatch::Clean()
 {
-	PixelType = ZE_TPT_NONE;
+	PixelType = ZETE_PT_NONE;
 	Width = 0;
 	Height = 0;
 	Pitch = 0;
+	PixelScaleX = 0.0;
+	PixelScaleY = 0.0;
 
 	if (Data == NULL)
 	{
@@ -210,69 +221,10 @@ void ZETEPatch::Clean()
 	}
 }
 
-void ZETEPatch::Resample(void* BlockData, ZESize BlockPitch, ZEUInt64 BlockX, ZEUInt64 BlockY, ZESize BlockSize)
+bool ZETEPatch::Intersect(double Px, double Py, double Width, double Height)
 {
-	double PositionX = (BlockX - StartX) / pow(2, Level);
-	double PositionY = (BlockY - StartY) / pow(2, Level);
-
-	IppiSize SourceSize;
-	SourceSize.width = Width;
-	SourceSize.height = Height;
-
-	IppiSize DestSize;
-	DestSize.width = BlockSize;
-	DestSize.height = BlockSize;
-
-	IppiPoint Offset;
-	Offset.x = PositionX;
-	Offset.y = PositionY;
-
-	IppiRect SourceROI;
-	SourceROI.x = PositionX;
-	SourceROI.y = PositionY;
-	SourceROI.width = BlockSize * LevelScalingWidth;
-	SourceROI.height = BlockSize * LevelScalingHeight;
-
-	IppiRect DestROI;
-	DestROI.x = 0;
-	DestROI.y = 0;
-	DestROI.width = BlockSize;
-	DestROI.height = BlockSize;
-
-	// IPP 7.1
-	int BufferSize = 0;
-	ippiResizeGetBufSize(SourceROI, DestROI, 4, IPPI_INTER_LINEAR, &BufferSize);
-	Ipp8u* Buffer = ippsMalloc_8u(BufferSize);
-	ippiResizeSqrPixel_8u_C4R(
-		(const Ipp8u*)Data, SourceSize, Pitch, SourceROI, 
-		(Ipp8u*)BlockData, BlockPitch, DestROI, 
-		LevelScalingWidth, LevelScalingHeight, 
-		PositionX - SourceROI.x, PositionY - SourceROI.y, 
-		IPPI_INTER_LINEAR, Buffer);
-	ippsFree(Buffer);
-
-	// IPP 8 Resize
-	/*int SpecSize;
-	int InitBufferSize;
-	int BufferSize;
-	ippiResizeGetSize_8u(SourceSize, DestSize, ippLinear, 0, &SpecSize, &InitBufferSize);
-
-	IppiResizeSpec_32f* Spec = (IppiResizeSpec_32f*)ippsMalloc_8u(SpecSize);
-
-	Ipp8u* InitBuffer = NULL;
-	if (InitBufferSize != 0)
-		InitBuffer = ippsMalloc_8u(InitBufferSize);
-	ippiResizeLinearInit_8u(SourceSize, DestSize, Spec);
-
-	ippiResizeGetBufferSize_8u(Spec, DestSize, 4, &BufferSize);
-	Ipp8u* Buffer = ippsMalloc_8u(BufferSize);
-
-	IppStatus Result = ippiResizeLinear_8u_C4R((const Ipp8u*)Data, Pitch, (Ipp8u*)BlockData, BlockPitch, Offset, DestSize, ippBorderRepl, 0, Spec, Buffer);
-
-	ippsFree(Buffer);
-	ippsFree(Spec);
-	if (InitBuffer != NULL)
-		ippsFree(InitBuffer);*/
+	return (StartX <= Px + Width && Px <= EndX &&
+			StartY <= Py + Width && Py <= EndY);
 }
 
 bool ZETEPatch::Create(ZESize Width, ZESize Height, ZETEPixelType Type)
@@ -318,7 +270,7 @@ bool ZETEPatch::Load(const char* FileName, ZETEPixelType PixelType)
 	switch(PixelType)
 	{
 
-		case ZE_TPT_COLOR:
+		case ZETE_PT_COLOR:
 			FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
 			FreeImage_Unload(Bitmap);
 			break;
@@ -332,6 +284,7 @@ ZETEPatch::ZETEPatch()
 	Data = NULL;
 	Clean();
 
+	Database = NULL;
 	Level = 0;
 	Priority = 0;
 	StartX = 0.0;
