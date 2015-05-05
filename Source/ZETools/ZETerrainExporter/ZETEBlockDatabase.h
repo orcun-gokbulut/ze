@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETEResamplerIPP.h
+ Zinek Engine - ZETEBlockDatabase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,19 +36,51 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
+#include "ZETEBlock.h"
 
-class ZETEPatch;
-class ZETEBlock;
-
-class ZETEResamplerIPP
+class ZETEBlockRegister
 {
-	private:
-		void*			Buffer;
-		ZESize			BufferSize;
+	public:
+		ZEUInt64	PositionX;
+		ZEUInt64	PositionY;
+		ZEUInt		Level;
+		ZESize		SubBlocks[4];
+		void*		Cache;
+
+					ZETEBlockRegister();
+					~ZETEBlockRegister();
+};
+
+
+class ZETEBlock;
+class ZEFile;
+
+class ZETEBlockDatabase
+{
+	public:
+		ZEString					Path;
+		ZEArray<ZETEBlockRegister>	Registers;
+		ZESize						BlockSize;
+		ZETEPixelType				PixelType;
 
 	public:
-		void			Resample(ZETEPatch* Patch, ZETEBlock* Block);
+		ZETEBlockRegister*			GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEUInt Level);
 
-						ZETEResamplerIPP();
-						~ZETEResamplerIPP();
+		void						SetBlockType(ZETEPixelType Type);
+		ZETEPixelType				GetBlockType();
+
+		void						SetBlockSize(ZESize BlockSize);
+		ZESize						GetBlockSize();
+
+		void						SetPath(const ZEString& Path);
+		const ZEString&				GetPath(const ZEString& Path);
+
+		bool						LoadBlock(ZETEBlock* Block);
+		bool						StoreBlock(ZETEBlock* Block);
+
+		bool						LoadDatabase();
+		bool						SaveDatabase();
+
+									ZETEBlockDatabase();
 };

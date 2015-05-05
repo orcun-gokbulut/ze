@@ -43,12 +43,16 @@ endif()
 
 ze_add_source(ZETEBlock.cpp					Sources)
 ze_add_source(ZETEBlock.h					Sources)
+ze_add_source(ZETEBlockDatabase.cpp			Sources)
+ze_add_source(ZETEBlockDatabase.h			Sources)
 ze_add_source(ZETEPatch.cpp					Sources)
 ze_add_source(ZETEPatch.h					Sources)
 ze_add_source(ZETEPatchDatabase.cpp			Sources)
 ze_add_source(ZETEPatchDatabase.h			Sources)
 ze_add_source(ZETEResamplerIPP.cpp			Sources)
 ze_add_source(ZETEResamplerIPP.h			Sources)
+ze_add_source(ZETEProcessor.cpp				Sources)
+ze_add_source(ZETEProcessor.h				Sources)
 ze_add_source(ZETEMain.cpp					Sources)
 
 ze_add_executable(TARGET ZETerrainExporter
