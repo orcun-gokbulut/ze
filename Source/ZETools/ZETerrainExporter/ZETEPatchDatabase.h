@@ -96,8 +96,6 @@ class ZETEPatchDatabase
 
 		bool							Intersect(double PositionX, double PositionY, double Width, double Height, ZEArray<ZETEPatch*>& Patches, ZESize& Count);
 
-		void							GenerateBlocks();
-
 										ZETEPatchDatabase();
 										~ZETEPatchDatabase();
 };

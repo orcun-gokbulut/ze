@@ -39,6 +39,7 @@
 #include "ZEFile/ZEPathManager.h"
 
 #include <FreeImage.h>
+#include "ZETEProcessor.h"
 
 void main()
 {
@@ -46,21 +47,31 @@ void main()
 
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
-	ZETEPatchDatabase Database;
-	Database.SetPath("c:\\Test"); 
-	Database.SetBlockSize(1024);
+	ZETEProcessor Procesor;
+	
+	ZETEPatchDatabase PatchDatabase;
+	PatchDatabase.SetBlockSize(1024);
+	PatchDatabase.SetBlockType(ZETE_PT_COLOR);
+	PatchDatabase.SetPath("c:\\Test\\Patches");
+	Procesor.SetPatchDatabase(&PatchDatabase);
 
+	ZETEBlockDatabase BlockDatabase;
+	BlockDatabase.SetBlockSize(1024);
+	BlockDatabase.SetBlockType(ZETE_PT_COLOR);
+	BlockDatabase.SetPath("c:\\Test\\Blocks");
+	Procesor.SetBlockDatabase(&BlockDatabase);
+	
 	ZETEPatch* Patch;
 	Patch = new ZETEPatch();
 	Patch->Load("c:\\World.jpg", ZETE_PT_COLOR);
 	Patch->SetPriority(0);
-	Patch->SetStartX(2.5);
-	Patch->SetStartY(2.5);
+	Patch->SetStartX(200.5);
+	Patch->SetStartY(200.5);
 	Patch->SetEndX(Patch->GetWidth());
 	Patch->SetEndY(Patch->GetHeight());
-	Database.AddPatch(Patch);
+	PatchDatabase.AddPatch(Patch);
 
-	Database.GenerateBlocks();
+	Procesor.Generate();
 	
 	FreeImage_DeInitialise();
 }

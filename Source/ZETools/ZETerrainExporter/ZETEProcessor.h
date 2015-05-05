@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETEResamplerIPP.h
+ Zinek Engine - ZETEProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZETEPatchDatabase.h"
+#include "ZETEBlockDatabase.h"
 
-#include "ZETypes.h"
-
-class ZETEPatch;
-class ZETEBlock;
-
-class ZETEResamplerIPP
+class ZETEProcessor
 {
 	private:
-		void*			Buffer;
-		ZESize			BufferSize;
+		ZETEPatchDatabase*	PatchDatabase;
+		ZETEBlockDatabase*	BlockDatabase;
 
 	public:
-		void			Resample(ZETEPatch* Patch, ZETEBlock* Block);
+		void				SetPatchDatabase(ZETEPatchDatabase* Database);
+		ZETEPatchDatabase*	GetPatchDatabase();
+		
+		void				SetBlockDatabase(ZETEBlockDatabase* Database);
+		ZETEBlockDatabase*	GetBlockDatabase();
 
-						ZETEResamplerIPP();
-						~ZETEResamplerIPP();
+		bool				Generate();
+
+							ZETEProcessor();
 };

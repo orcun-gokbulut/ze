@@ -87,7 +87,7 @@ void ZETEPatchDatabase::CalculateDimensions()
 
 void ZETEPatchDatabase::SetBlockType(ZETEPixelType Type)
 {
-	this->PixelType = Type;
+	PixelType = Type;
 }
 
 ZETEPixelType ZETEPatchDatabase::GetBlockType()
@@ -97,9 +97,6 @@ ZETEPixelType ZETEPatchDatabase::GetBlockType()
 
 bool ZETEPatchDatabase::AddPatch(ZETEPatch* Patch)
 {
-	if (PixelType == ZETE_PT_NONE)
-		PixelType = Patch->GetPixelType();
-
 	if (Patch->GetPixelType() != PixelType)
 		return false;
 
@@ -190,77 +187,6 @@ bool ZETEPatchDatabase::Intersect(double PositionX, double PositionY, double Wid
 	}
 
 	return (OutputSize != 0);
-}
-
-static int ComparePatches(ZETEPatch* const * Ap, ZETEPatch* const* Bp)
-{
-	ZETEPatch* A = *Ap;
-	ZETEPatch* B = *Bp;
-
-	if (A->GetLevel() > B->GetLevel())
-	{
-		return 1;
-	}
-	else if (A->GetLevel() < B->GetLevel())
-	{
-		return -1;
-	}
-	else
-	{
-		if (A->GetPriority() < B->GetPriority())
-			return 1;
-		else if (A->GetPriority() > B->GetPriority())
-			return -1;
-		else
-			return 0;
-	}
-}
-
-void ZETEPatchDatabase::GenerateBlocks()
-{
-	ZEUInt64 BlockCountX = (ZEUInt64)(EndX - StartX) / BlockSize;
-	ZEUInt64 BlockCountY = (ZEUInt64)(EndY - StartY) / BlockSize;
-
-	#pragma omp parallel
-	{
-		ZETEBlock Block;
-		Block.SetSize(BlockSize);
-		Block.SetPixelType(ZETE_PT_COLOR);
-
-		ZEArray<ZETEPatch*> IntersectedPatches;
-		ZESize IntersectedPatchCount = 0;
-		IntersectedPatches.SetCount(this->Patches.GetCount());
-
-		ZETEResamplerIPP Resampler;
-		
-		#pragma omp for schedule(dynamic)
-		for (ZEInt64 I = 0; I < BlockCountX * BlockCountY; I++)
-		{
-			ZEUInt64 IndexX = I % BlockCountX;
-			ZEUInt64 IndexY = I / BlockCountX;
-
-			printf("Processing Block %lld of %lld. (X: %lld, Y: %lld, L: %lld) \n", 
-				IndexY * BlockCountX + IndexX,
-				BlockCountX * BlockCountY,
-				IndexX * BlockSize,
-				IndexY * BlockSize,
-				0);
-
-			if (!Intersect(IndexX * BlockSize, IndexY * BlockSize, BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
-				continue;
-
-			IntersectedPatches.Sort(ComparePatches);
-			Block.SetPositionX(IndexX * BlockSize);
-			Block.SetPositionY(IndexY * BlockSize);
-			Block.Clean();
-
-			for (ZESize I = 0; I < IntersectedPatchCount; I++)
-				Resampler.Resample(IntersectedPatches[I], &Block);
-
-			Block.Save(ZEFormat::Format("{0}/Y{1}-X{2}-Z{3}.zeBlock", Path, Block.GetPositionY(), Block.GetPositionX(), Block.GetLevel()));
-		}
-
-	}
 }
 
 ZETEPatchDatabase::ZETEPatchDatabase()
