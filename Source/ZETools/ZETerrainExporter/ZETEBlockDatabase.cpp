@@ -37,11 +37,13 @@
 
 #include "ZETEBlock.h"
 
-#include <memory.h>
-#include "ZEDS\ZEFormat.h"
 #include "ZEEndian.h"
+#include "ZEDS\ZEFormat.h"
 #include "ZEFile\ZEFile.h"
 #include "ZEPacking.h"
+
+#include <memory.h>
+#include <stdint.h>
 
 ZEPackStruct
 (
@@ -99,12 +101,12 @@ const ZEString& ZETEBlockDatabase::GetPath(const ZEString& Path)
 	return Path;
 }
 
-void ZETEBlockDatabase::SetBlockType(ZETEPixelType Type)
+void ZETEBlockDatabase::SetPixelType(ZETEPixelType Type)
 {
 	PixelType = Type;
 }
 
-ZETEPixelType ZETEBlockDatabase::GetBlockType()
+ZETEPixelType ZETEBlockDatabase::GetPixelType()
 {
 	return PixelType;
 }
@@ -119,17 +121,47 @@ ZESize ZETEBlockDatabase::GetBlockSize()
 	return BlockSize;
 }
 
+ZEInt64 ZETEBlockDatabase::GetStartX()
+{
+	return StartX;
+}
+
+ZEInt64 ZETEBlockDatabase::GetStartY()
+{
+	return StartY;
+}
+
+ZEInt64 ZETEBlockDatabase::GetEndX()
+{
+	return EndX;
+}
+
+ZEInt64 ZETEBlockDatabase::GetEndY()
+{
+	return EndY;
+}
+
+void ZETEBlockDatabase::SetMaxLevel(ZEUInt Level)
+{
+	MaxLevel = Level;
+}
+
+ZEUInt ZETEBlockDatabase::GetMaxLevel()
+{
+	return MaxLevel;
+}
+
 bool ZETEBlockDatabase::LoadBlock(ZETEBlock* Block)
 {
 	ZETEBlockRegister* Register = GetRegister(Block->GetPositionX(), Block->GetPositionY(), Block->GetLevel());
-	if (Register != NULL)
+	if (Register == NULL)
 	{
 		Block->Clean();
 		return false;
 	}
 	else
 	{
-		ZEString BlockPath = ZEFormat::Format("{0}/Y{1}-X{2}-Z{3}.zeBlock", Path, Block->GetPositionY(), Block->GetPositionX(), Block->GetLevel());
+		ZEString BlockPath = ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
 		if (Block->Load(BlockPath))
 		{
 			return true;
@@ -144,21 +176,39 @@ bool ZETEBlockDatabase::LoadBlock(ZETEBlock* Block)
 
 bool ZETEBlockDatabase::StoreBlock(ZETEBlock* Block)
 {
-	ZEString BlockPath = ZEFormat::Format("{0}/Y{1}-X{2}-Z{3}.zeBlock", Path, Block->GetPositionY(), Block->GetPositionX(), Block->GetLevel());
+	ZEString BlockPath = ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
 	if (!Block->Save(BlockPath))
 		return false;
 
+	ZEString BlockDumpPath = ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
+	Block->Dump(BlockDumpPath);
+
 	static ZELock Lock;
 	Lock.Lock();
-	ZETEBlockRegister* Register = GetRegister(Block->GetPositionX(), Block->GetPositionY(), Block->GetLevel());
-	if (Register == NULL)
 	{
-		ZETEBlockRegister NewRegister;
-		NewRegister.PositionX = Block->GetPositionX();
-		NewRegister.PositionY = Block->GetPositionY();
-		NewRegister.Level = Block->GetLevel();
+		ZETEBlockRegister* Register = GetRegister(Block->GetPositionX(), Block->GetPositionY(), Block->GetLevel());
+		if (Register == NULL)
+		{
+			ZETEBlockRegister NewRegister;
+			NewRegister.PositionX = Block->GetPositionX();
+			NewRegister.PositionY = Block->GetPositionY();
+			NewRegister.Level = Block->GetLevel();
 
-		Registers.Add(NewRegister);
+			if (StartX > Block->GetPositionX())
+				StartX = Block->GetPositionX();
+
+			if (StartY > Block->GetPositionY())
+				StartY = Block->GetPositionY();
+
+			ZEInt64 LevelBlockSize = pow(2, Block->GetLevel()) * Block->GetSize();
+			if (EndX < Block->GetPositionX() + LevelBlockSize)
+				EndX = Block->GetPositionX() + LevelBlockSize;
+
+			if (EndY < Block->GetPositionY() + LevelBlockSize)
+				EndY = Block->GetPositionY() + LevelBlockSize;
+
+			Registers.Add(NewRegister);
+		}
 	}
 	Lock.Unlock();
 
@@ -233,4 +283,9 @@ ZETEBlockDatabase::ZETEBlockDatabase()
 {
 	BlockSize = 512;
 	PixelType = ZETE_PT_NONE;
+	StartX = INT64_MAX;
+	StartY = INT64_MAX;
+	EndX = INT64_MIN;
+	EndY = INT64_MIN;
+	MaxLevel = 22;
 }

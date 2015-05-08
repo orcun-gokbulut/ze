@@ -40,15 +40,32 @@
 class ZETEPatch;
 class ZETEBlock;
 
+class ZETEResampleData;
+class ZETEDownsampleData;
+
 class ZETEResamplerIPP
 {
 	private:
-		void*			Buffer;
-		ZESize			BufferSize;
+		struct
+		{
+			void*			Buffer;
+			ZESize			BufferSize;
+		} ResampleData;
+
+		struct
+		{
+			void*			Buffer;
+			int				BufferSize;
+			void*			Spec;
+			int				SpecSize;
+			void*			InitBuffer;
+			int				InitBufferSize;
+		} DownsampleData;
 
 	public:
-		void			Resample(ZETEPatch* Patch, ZETEBlock* Block);
+		void				Resample(ZETEPatch* Patch, ZETEBlock* Block);
+		void				Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
 
-						ZETEResamplerIPP();
-						~ZETEResamplerIPP();
+							ZETEResamplerIPP();
+							~ZETEResamplerIPP();
 };

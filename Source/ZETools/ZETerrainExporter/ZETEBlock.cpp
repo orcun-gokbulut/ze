@@ -42,6 +42,7 @@
 
 #include <FreeImage.h>
 #include "ZEEndian.h"
+#include "ZEFile\ZEFileInfo.h"
 
 enum ZETEImagePixelType
 {
@@ -180,6 +181,10 @@ void ZETEBlock::Clean()
 
 bool ZETEBlock::Load(const ZEString& FileName)
 {
+	ZEFileInfo FileInfo(FileName);
+	if (!FileInfo.IsExists())
+		return false;
+	
 	ZEFile File;
 	if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 		return false;

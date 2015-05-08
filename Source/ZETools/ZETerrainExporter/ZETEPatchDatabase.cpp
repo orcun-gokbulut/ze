@@ -52,7 +52,6 @@ void ZETEPatchDatabase::CalculateDimensions()
 		StartY = 0;
 		EndX = 0;
 		EndY = 0;
-		LevelCount = 0;
 	}
 	else
 	{
@@ -61,7 +60,8 @@ void ZETEPatchDatabase::CalculateDimensions()
 		StartY = CurrentPatch->GetStartY();
 		EndX = CurrentPatch->GetEndX();
 		EndY = CurrentPatch->GetEndY();
-		LevelCount = CurrentPatch->GetLevel();
+		MinLevel = CurrentPatch->GetLevel();
+		MaxLevel = CurrentPatch->GetLevel();
 
 		for (ZESize I = 1; I < Patches.GetCount(); I++)
 		{
@@ -79,18 +79,21 @@ void ZETEPatchDatabase::CalculateDimensions()
 			if (EndY < CurrentPatch->GetEndY())
 				EndY = CurrentPatch->GetEndY();
 
-			if (LevelCount > CurrentPatch->GetLevel())
-				LevelCount = CurrentPatch->GetLevel();
+			if (MinLevel > CurrentPatch->GetLevel())
+				MinLevel = CurrentPatch->GetLevel();
+
+			if (MaxLevel < CurrentPatch->GetLevel())
+				MaxLevel = CurrentPatch->GetLevel();
 		}
 	}
 }
 
-void ZETEPatchDatabase::SetBlockType(ZETEPixelType Type)
+void ZETEPatchDatabase::SetPixelType(ZETEPixelType Type)
 {
 	PixelType = Type;
 }
 
-ZETEPixelType ZETEPatchDatabase::GetBlockType()
+ZETEPixelType ZETEPatchDatabase::GetPixelType()
 {
 	return PixelType;
 }
@@ -153,6 +156,16 @@ double ZETEPatchDatabase::GetUnitSize()
 	return UnitSize;
 }
 
+ZEUInt ZETEPatchDatabase::GetMinLevel()
+{
+	return MinLevel;
+}
+
+ZEUInt ZETEPatchDatabase::GetMaxLevel()
+{
+	return MaxLevel;
+}
+
 void ZETEPatchDatabase::SetBlockSize(ZESize BlockSize)
 {
 	this->BlockSize = BlockSize;
@@ -196,10 +209,11 @@ ZETEPatchDatabase::ZETEPatchDatabase()
 	EndX = 0.0;
 	EndY = 0.0;
 	UnitSize = 1.0;
-	LevelCount = 0;
 	BlocksPerChunk = 128;
 	BlockSize = 256;
 	PixelType = ZETE_PT_NONE;
+	MinLevel = UINT_MAX;
+	MaxLevel = 0;
 }
 
 ZETEPatchDatabase::~ZETEPatchDatabase()

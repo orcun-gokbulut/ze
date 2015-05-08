@@ -84,8 +84,6 @@ class ZETEBlock
 		ZESize					GetPitch();
 		ZESize					GetDataSize();
 
-		void					Clean();
-
 		bool					Load(const ZEString& FileName);
 		bool					Load(ZEFile* File);
 
@@ -93,6 +91,8 @@ class ZETEBlock
 		bool					Save(ZEFile* File);
 		
 		bool					Dump(const ZEString& Directory);
+
+		void					Clean();
 
 								ZETEBlock();
 								~ZETEBlock();

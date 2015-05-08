@@ -51,13 +51,13 @@ void main()
 	
 	ZETEPatchDatabase PatchDatabase;
 	PatchDatabase.SetBlockSize(1024);
-	PatchDatabase.SetBlockType(ZETE_PT_COLOR);
+	PatchDatabase.SetPixelType(ZETE_PT_COLOR);
 	PatchDatabase.SetPath("c:\\Test\\Patches");
 	Procesor.SetPatchDatabase(&PatchDatabase);
 
 	ZETEBlockDatabase BlockDatabase;
 	BlockDatabase.SetBlockSize(1024);
-	BlockDatabase.SetBlockType(ZETE_PT_COLOR);
+	BlockDatabase.SetPixelType(ZETE_PT_COLOR);
 	BlockDatabase.SetPath("c:\\Test\\Blocks");
 	Procesor.SetBlockDatabase(&BlockDatabase);
 	
