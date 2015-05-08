@@ -49,7 +49,6 @@ enum ZETerrainBlockAvailableResult
 	ZE_TBAR_NONE
 };
 
-
 class ZETEPatchDatabase
 {
 	friend ZETEPatch;
@@ -60,7 +59,8 @@ class ZETEPatchDatabase
 		double							EndY;
 		double							UnitSize;
 
-		ZEUInt							LevelCount;
+		ZEUInt							MinLevel;
+		ZEUInt							MaxLevel;
 
 		ZEString						Path;
 
@@ -77,14 +77,19 @@ class ZETEPatchDatabase
 		bool							AddPatch(ZETEPatch* Patch);
 		void							RemovePatch(ZETEPatch* Patch);
 
-		void							SetBlockType(ZETEPixelType Type);
-		ZETEPixelType					GetBlockType();
+		void							SetPixelType(ZETEPixelType Type);
+		ZETEPixelType					GetPixelType();
 
 		void							SetBlockSize(ZESize BlockSize);
 		ZESize							GetBlockSize();
 
 		void							GetUnitSize(double UnitSize);
 		double							GetUnitSize();
+
+		ZEUInt							GetMinLevel();
+
+		ZEUInt							GetMaxLevel();
+		void							SetMaxLevel(ZEUInt Level);
 
 		double							GetStartX();
 		double							GetStartY();

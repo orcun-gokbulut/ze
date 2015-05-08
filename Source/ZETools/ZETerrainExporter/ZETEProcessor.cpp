@@ -36,8 +36,10 @@
 #include "ZETEProcessor.h"
 #include "ZETEResamplerIPP.h"
 #include "ZETEPatch.h"
+#include "ZETEBlock.h"
+#include "ZEMath\ZEMath.h"
 
-#include <ippj.h>
+#include <omp.h>
 
 static int ComparePatches(ZETEPatch* const * Ap, ZETEPatch* const* Bp)
 {
@@ -63,36 +65,12 @@ static int ComparePatches(ZETEPatch* const * Ap, ZETEPatch* const* Bp)
 	}
 }
 
-void ZETEProcessor::SetPatchDatabase(ZETEPatchDatabase* Database)
+bool ZETEProcessor::GenerateBlocks()
 {
-	PatchDatabase = Database;
-}
+	printf("Processing Patches.\n");
+	printf("Generating Leaf Blocks.\n");
 
-ZETEPatchDatabase* ZETEProcessor::GetPatchDatabase()
-{
-	return PatchDatabase;
-}
-
-void ZETEProcessor::SetBlockDatabase(ZETEBlockDatabase* Database)
-{
-	BlockDatabase = Database;
-}
-
-ZETEBlockDatabase* ZETEProcessor::GetBlockDatabase()
-{
-	return BlockDatabase;
-}
-
-bool ZETEProcessor::Generate()
-{
-	if (PatchDatabase == NULL || BlockDatabase == NULL)
-		return false;
-
-	if (PatchDatabase->GetBlockSize() != BlockDatabase->GetBlockSize())
-		return false;
-
-	if (PatchDatabase->GetBlockType() != BlockDatabase->GetBlockType() || PatchDatabase->GetBlockType() == ZETE_PT_NONE)
-		return false;
+	Info.Progress = 0;
 
 	ZESize BlockSize = PatchDatabase->GetBlockSize();
 	ZEUInt64 BlockCountX = (ZEUInt64)(PatchDatabase->GetEndX() - PatchDatabase->GetStartX()) / BlockSize;
@@ -117,15 +95,21 @@ bool ZETEProcessor::Generate()
 			if (Error)
 				continue;
 
+			ZEUInt Progress = (I * 100) / (BlockCountX * BlockCountY);
+			if (Progress > Info.Progress)
+				Info.Progress = Progress;
+
 			ZEUInt64 IndexX = I % BlockCountX;
 			ZEUInt64 IndexY = I / BlockCountX;
 
-			printf("Processing Block %lld of %lld. (X: %lld, Y: %lld, L: %lld) \n", 
+			printf("  Progress: %d%% (%lld of %lld). Thread: %d. L: %d, Y: %lld, X: %lld.\n", 
+				Info.Progress,
 				IndexY * BlockCountX + IndexX,
 				BlockCountX * BlockCountY,
-				IndexX * BlockSize,
+				omp_get_thread_num(),
+				Block.GetLevel(),
 				IndexY * BlockSize,
-				0);
+				IndexX * BlockSize);
 
 			if (!PatchDatabase->Intersect(IndexX * BlockSize, IndexY * BlockSize, BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
 				continue;
@@ -143,11 +127,186 @@ bool ZETEProcessor::Generate()
 		}
 	}
 
-	return Error;
+	if (!Error)
+		Info.Progress = 100;
+
+	return !Error;
+}
+
+bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEUInt Level)
+{
+	Info.Progress = 0;
+
+	printf("Processing Level %d.\n", Level);
+	ZEUInt SourceLevelScale = pow(2, Level);
+	ZESize SourceLevelBlockSize = SourceLevelScale * BlockDatabase->GetBlockSize();
+
+	ZEUInt DestinationLevelScale = pow(2, Level + 1);
+	ZESize DestinationLevelBlockSize = DestinationLevelScale * BlockDatabase->GetBlockSize();
+
+	ZEUInt64 BlockCountX = (BlockDatabase->GetEndX() - BlockDatabase->GetStartX()) / DestinationLevelBlockSize;
+	ZEUInt64 BlockCountY = (BlockDatabase->GetEndY() - BlockDatabase->GetStartY()) / DestinationLevelBlockSize;
+	
+	bool Error = false;
+	#pragma omp parallel
+	{
+		ZETEBlock Block00, Block01, Block10, Block11;
+		ZETEBlock Output;
+	
+		Block00.SetLevel(Level);
+		Block01.SetLevel(Level);
+		Block10.SetLevel(Level);
+		Block11.SetLevel(Level);
+		Output.SetLevel(Level + 1);
+		Output.SetPixelType(BlockDatabase->GetPixelType());
+		Output.SetSize(BlockDatabase->GetBlockSize());
+
+		ZETEResamplerIPP Resampler;
+
+		#pragma omp for schedule(dynamic)
+		for (ZEInt64 I = 0; I < BlockCountX * BlockCountY; I++)
+		{
+			ZEUInt Progress = (I * 100) / (BlockCountX * BlockCountY);
+			if (Progress > Info.Progress)
+				Info.Progress = Progress;
+
+			ZEInt64 IndexX = I % BlockCountX;
+			ZEInt64 IndexY = I / BlockCountX;
+		
+			ZEInt64 PositionX = BlockDatabase->GetStartX() + IndexX * DestinationLevelBlockSize;
+			ZEInt64 PositionY = BlockDatabase->GetStartY() + IndexY * DestinationLevelBlockSize;
+
+			printf("  Progress: %d%% (%lld of %lld). Thread: %d, Block: L: %d, Y: %lld, X: %lld.\n", 
+				Info.Progress,
+				IndexY * BlockCountX + IndexX,
+				BlockCountX * BlockCountY,
+				omp_get_thread_num(),
+				Block00.GetLevel(),
+				IndexY * DestinationLevelBlockSize,
+				IndexX * DestinationLevelBlockSize);
+
+			bool BlockLoadded = false;
+			Block00.SetPositionX(PositionX);
+			Block00.SetPositionY(PositionY);
+			BlockLoadded |= BlockDatabase->LoadBlock(&Block00);
+
+			Block01.SetPositionX(PositionX + SourceLevelBlockSize);
+			Block01.SetPositionY(PositionY);
+			BlockLoadded |= BlockDatabase->LoadBlock(&Block01);
+
+			Block10.SetPositionX(PositionX);
+			Block10.SetPositionY(PositionY + SourceLevelBlockSize);
+			BlockLoadded |= BlockDatabase->LoadBlock(&Block10);
+
+			Block11.SetPositionX(PositionX + SourceLevelBlockSize);
+			Block11.SetPositionY(PositionY + SourceLevelBlockSize);
+			BlockLoadded |= BlockDatabase->LoadBlock(&Block11);
+
+			if (BlockLoadded)
+			{
+				Resampler.Downsample(&Output, &Block00, &Block01, &Block10, &Block11);
+				Output.SetPositionX(PositionX);
+				Output.SetPositionY(PositionY);
+				BlockDatabase->StoreBlock(&Output);
+			}
+		}
+	}
+
+	if (!Error)
+		Info.Progress = 100;
+
+	return !Error;
+}
+
+bool ZETEProcessor::GenerateLevels()
+{
+	Info.Status = ZETE_PS_GENERATING_LEVELS;
+
+	ZEUInt MaxLevel = 10;
+	ZEUInt MinLevel = PatchDatabase->GetMinLevel();
+	ZEUInt MaxLevelX = floor(log((BlockDatabase->GetEndX() - BlockDatabase->GetStartX())) / log(2));
+	ZEUInt MaxLevelY = floor(log((BlockDatabase->GetEndY() - BlockDatabase->GetStartY())) / log(2));
+	ZEUInt EffectiveMaxLevel = ZEMath::Min(MaxLevel, ZEMath::Min(MaxLevelX, MaxLevelY));
+
+	for (ZEUInt I = MinLevel; I < EffectiveMaxLevel; I++)
+		GenerateLevel(BlockDatabase->GetStartX(), BlockDatabase->GetStartY(), BlockDatabase->GetEndX(), BlockDatabase->GetEndY(), I);
+
+	return true;
+}
+
+const ZETEProcessorInfo& ZETEProcessor::GetInfo()
+{
+	return Info;
+}
+
+void ZETEProcessor::SetPatchDatabase(ZETEPatchDatabase* Database)
+{
+	PatchDatabase = Database;
+}
+
+ZETEPatchDatabase* ZETEProcessor::GetPatchDatabase()
+{
+	return PatchDatabase;
+}
+
+void ZETEProcessor::SetBlockDatabase(ZETEBlockDatabase* Database)
+{
+	BlockDatabase = Database;
+}
+
+ZETEBlockDatabase* ZETEProcessor::GetBlockDatabase()
+{
+	return BlockDatabase;
+}
+
+bool ZETEProcessor::Generate()
+{
+	memset(&Info, 0, sizeof(ZETEProcessorInfo));
+
+	if (PatchDatabase == NULL || BlockDatabase == NULL)
+	{
+		Info.Status = ZETE_PS_ERROR;
+		return false;
+	}
+
+	if (PatchDatabase->GetBlockSize() != BlockDatabase->GetBlockSize())
+	{
+		Info.Status = ZETE_PS_ERROR;
+		return false;
+	}
+
+	if (PatchDatabase->GetPixelType() != BlockDatabase->GetPixelType() || PatchDatabase->GetPixelType() == ZETE_PT_NONE)
+	{
+		Info.Status = ZETE_PS_ERROR;
+		return false;
+	}
+
+	Info.TotalProgress = 0;
+
+	if (!GenerateBlocks())
+	{
+		Info.Status = ZETE_PS_ERROR;
+		return false;
+	}
+
+	Info.TotalProgress = 50;
+
+	if (!GenerateLevels())
+	{
+		Info.Status = ZETE_PS_ERROR;
+		return false;
+	}
+
+	Info.TotalProgress = 100;
+	Info.Status = ZETE_PS_DONE;
+
+	return true;
 }
 
 ZETEProcessor::ZETEProcessor()
 {
+	memset(&Info, 0, sizeof(ZETEProcessorInfo));
+
 	PatchDatabase = NULL;
 	BlockDatabase = NULL;
 }

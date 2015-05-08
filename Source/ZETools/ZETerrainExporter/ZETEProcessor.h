@@ -36,13 +36,40 @@
 #include "ZETEPatchDatabase.h"
 #include "ZETEBlockDatabase.h"
 
+enum ZETEProcessorStatus
+{
+	ZETE_PS_NONE = 0,
+	ZETE_PS_GENERATING_BLOCKS,
+	ZETE_PS_GENERATING_LEVELS,
+	ZETE_PS_ERROR,
+	ZETE_PS_DONE
+};
+
+struct ZETEProcessorInfo
+{
+	ZETEProcessorStatus		Status;
+	ZEUInt					TotalProgress;
+	ZEUInt					Progress;
+	ZEUInt					NumberOfThreads;
+};
+
 class ZETEProcessor
 {
 	private:
 		ZETEPatchDatabase*	PatchDatabase;
 		ZETEBlockDatabase*	BlockDatabase;
 
+		ZETEProcessorInfo	Info;
+
+		bool				GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEUInt Level);
+
+		bool				GenerateBlocks();
+		bool				GenerateLevels();
+
 	public:
+		const 
+		ZETEProcessorInfo&	GetInfo();
+
 		void				SetPatchDatabase(ZETEPatchDatabase* Database);
 		ZETEPatchDatabase*	GetPatchDatabase();
 		
