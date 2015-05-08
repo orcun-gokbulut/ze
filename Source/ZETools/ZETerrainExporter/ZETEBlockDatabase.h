@@ -70,6 +70,8 @@ class ZETEBlockDatabase
 		ZEInt64						EndY;
 		ZEUInt						MaxLevel;
 
+		ZEString					GetBlockFilePath(ZETEBlock* Block);
+
 	public:
 		ZETEBlockRegister*			GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEUInt Level);
 
@@ -90,8 +92,10 @@ class ZETEBlockDatabase
 		void						SetMaxLevel(ZEUInt Level);
 		ZEUInt						GetMaxLevel();
 
+		bool						CheckBlock(ZETEBlock* Block);
 		bool						LoadBlock(ZETEBlock* Block);
 		bool						StoreBlock(ZETEBlock* Block);
+		bool						RemoveBlock(ZETEBlock* Block);
 
 		bool						LoadDatabase();
 		bool						SaveDatabase();

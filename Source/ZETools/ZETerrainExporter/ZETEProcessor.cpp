@@ -73,8 +73,12 @@ bool ZETEProcessor::GenerateBlocks()
 	Info.Progress = 0;
 
 	ZESize BlockSize = PatchDatabase->GetBlockSize();
-	ZEUInt64 BlockCountX = (ZEUInt64)(PatchDatabase->GetEndX() - PatchDatabase->GetStartX()) / BlockSize;
-	ZEUInt64 BlockCountY = (ZEUInt64)(PatchDatabase->GetEndY() - PatchDatabase->GetStartY()) / BlockSize;
+	ZEUInt64 StartBlockX = ZEMath::Align((ZEInt64)PatchDatabase->GetStartX(), BlockSize);
+	ZEUInt64 StartBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetStartY(), BlockSize);
+	ZEUInt64 EndBlockX = ZEMath::Align((ZEInt64)PatchDatabase->GetEndX(), BlockSize);
+	ZEUInt64 EndBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetEndY(), BlockSize);
+	ZEUInt64 BlockCountX = (EndBlockX - StartBlockX) / BlockSize + 1;
+	ZEUInt64 BlockCountY = (EndBlockX - StartBlockY) / BlockSize + 1;
 
 	bool Error = false;
 	#pragma omp parallel
@@ -101,6 +105,8 @@ bool ZETEProcessor::GenerateBlocks()
 
 			ZEUInt64 IndexX = I % BlockCountX;
 			ZEUInt64 IndexY = I / BlockCountX;
+			ZEUInt64 PositionX = StartBlockX + IndexX * BlockSize;
+			ZEUInt64 PositionY = StartBlockY + IndexY * BlockSize;
 
 			printf("  Progress: %d%% (%lld of %lld). Thread: %d. L: %d, Y: %lld, X: %lld.\n", 
 				Info.Progress,
@@ -111,12 +117,12 @@ bool ZETEProcessor::GenerateBlocks()
 				IndexY * BlockSize,
 				IndexX * BlockSize);
 
-			if (!PatchDatabase->Intersect(IndexX * BlockSize, IndexY * BlockSize, BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
+			if (!PatchDatabase->Intersect(PositionX, PositionY, BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
 				continue;
 
 			IntersectedPatches.Sort(ComparePatches);
-			Block.SetPositionX(IndexX * BlockSize);
-			Block.SetPositionY(IndexY * BlockSize);
+			Block.SetPositionX(PositionX);
+			Block.SetPositionY(PositionY);
 			Block.Clean();
 
 			for (ZESize I = 0; I < IntersectedPatchCount; I++)
@@ -144,8 +150,8 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 	ZEUInt DestinationLevelScale = pow(2, Level + 1);
 	ZESize DestinationLevelBlockSize = DestinationLevelScale * BlockDatabase->GetBlockSize();
 
-	ZEUInt64 BlockCountX = (BlockDatabase->GetEndX() - BlockDatabase->GetStartX()) / DestinationLevelBlockSize;
-	ZEUInt64 BlockCountY = (BlockDatabase->GetEndY() - BlockDatabase->GetStartY()) / DestinationLevelBlockSize;
+	ZEUInt64 BlockCountX = (BlockDatabase->GetEndX() - BlockDatabase->GetStartX() + DestinationLevelBlockSize - 1) / DestinationLevelBlockSize;
+	ZEUInt64 BlockCountY = (BlockDatabase->GetEndY() - BlockDatabase->GetStartY() + DestinationLevelBlockSize - 1) / DestinationLevelBlockSize;
 	
 	bool Error = false;
 	#pragma omp parallel
@@ -204,6 +210,7 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 
 			if (BlockLoadded)
 			{
+				Output.Clean();
 				Resampler.Downsample(&Output, &Block00, &Block01, &Block10, &Block11);
 				Output.SetPositionX(PositionX);
 				Output.SetPositionY(PositionY);

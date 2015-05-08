@@ -44,6 +44,7 @@
 
 #include <memory.h>
 #include <stdint.h>
+#include "ZEFile\ZEFileInfo.h"
 
 ZEPackStruct
 (
@@ -75,6 +76,11 @@ ZETEBlockRegister::~ZETEBlockRegister()
 		delete Cache;
 		Cache = NULL;
 	}
+}
+
+ZEString ZETEBlockDatabase::GetBlockFilePath(ZETEBlock* Block)
+{
+	return ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
 }
 
 ZETEBlockRegister* ZETEBlockDatabase::GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEUInt Level)
@@ -151,6 +157,12 @@ ZEUInt ZETEBlockDatabase::GetMaxLevel()
 	return MaxLevel;
 }
 
+bool ZETEBlockDatabase::CheckBlock(ZETEBlock* Block)
+{
+	ZEFileInfo FileInfo(GetBlockFilePath(Block));
+	return FileInfo.IsExists();
+}
+
 bool ZETEBlockDatabase::LoadBlock(ZETEBlock* Block)
 {
 	ZETEBlockRegister* Register = GetRegister(Block->GetPositionX(), Block->GetPositionY(), Block->GetLevel());
@@ -161,8 +173,7 @@ bool ZETEBlockDatabase::LoadBlock(ZETEBlock* Block)
 	}
 	else
 	{
-		ZEString BlockPath = ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
-		if (Block->Load(BlockPath))
+		if (Block->Load(GetBlockFilePath(Block)))
 		{
 			return true;
 		}
@@ -176,12 +187,15 @@ bool ZETEBlockDatabase::LoadBlock(ZETEBlock* Block)
 
 bool ZETEBlockDatabase::StoreBlock(ZETEBlock* Block)
 {
-	ZEString BlockPath = ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
-	if (!Block->Save(BlockPath))
-		return false;
+	ZEString BlockPath = GetBlockFilePath(Block);
 
-	ZEString BlockDumpPath = ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
-	Block->Dump(BlockDumpPath);
+	if (!CheckBlock(Block))
+	{
+		if (!Block->Save(BlockPath))
+			return false;
+
+		Block->Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX()));
+	}
 
 	static ZELock Lock;
 	Lock.Lock();
@@ -213,6 +227,12 @@ bool ZETEBlockDatabase::StoreBlock(ZETEBlock* Block)
 	Lock.Unlock();
 
 	return true;
+}
+
+bool ZETEBlockDatabase::RemoveBlock(ZETEBlock* Block)
+{
+	ZEFileInfo FileInfo(GetBlockFilePath(Block));
+	return FileInfo.Delete();
 }
 
 bool ZETEBlockDatabase::SaveDatabase()
