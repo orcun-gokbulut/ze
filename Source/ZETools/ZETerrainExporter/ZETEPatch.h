@@ -55,14 +55,18 @@ class ZETEPatch
 		double					LevelScalingWidth, LevelScalingHeight;
 		double					PixelScaleX, PixelScaleY;
 
-		void*					Data;
+	protected:
 		ZESize					Width, Height;
-		ZESize					Pitch;
 		ZETEPixelType			PixelType;
 
 		void					UpdateLevelAndScaling();
 
 	public:
+		void					SetPriority(ZEUInt Priority);
+		ZEUInt					GetPriority();
+
+		ZEUInt					GetLevel();
+
 		void					SetStartX(double x);
 		double					GetStartX();
 
@@ -84,23 +88,13 @@ class ZETEPatch
 		ZESize					GetWidth();
 		ZESize					GetHeight();
 
-		void*					GetData();
-		ZESize					GetPitch();
-
 		ZETEPixelType			GetPixelType();
 		ZESize					GetPixelSize();
-
-		ZEUInt					GetLevel();
-
-		void					SetPriority(ZEUInt Priority);
-		ZEUInt					GetPriority();
 		
 		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
-		
-		bool					Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
-		void					Clean();
 
-		bool					Load(const char* FileName, ZETEPixelType PixelType);
+		virtual	void*			GetData() = 0;
+		virtual	ZESize			GetPitch() = 0;
 
 								ZETEPatch();
 								~ZETEPatch();

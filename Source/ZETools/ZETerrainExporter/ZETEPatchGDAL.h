@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETEPatchGDAL.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,36 +30,28 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-find_package(OpenMP REQUIRED)
-if (OPENMP_FOUND)
-    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-endif()
+#include "ZETEPatch.h"
 
-ze_add_source(ZETEBlock.cpp					Sources)
-ze_add_source(ZETEBlock.h					Sources)
-ze_add_source(ZETEBlockDatabase.cpp			Sources)
-ze_add_source(ZETEBlockDatabase.h			Sources)
-ze_add_source(ZETEPatch.cpp					Sources)
-ze_add_source(ZETEPatch.h					Sources)
-ze_add_source(ZETEPatchFile.cpp				Sources)
-ze_add_source(ZETEPatchFile.h				Sources)
-ze_add_source(ZETEPatchGDAL.cpp				Sources)
-ze_add_source(ZETEPatchGDAL.h				Sources)
-ze_add_source(ZETEPatchDatabase.cpp			Sources)
-ze_add_source(ZETEPatchDatabase.h			Sources)
-ze_add_source(ZETEResamplerIPP.cpp			Sources)
-ze_add_source(ZETEResamplerIPP.h			Sources)
-ze_add_source(ZETEProcessor.cpp				Sources)
-ze_add_source(ZETEProcessor.h				Sources)
-ze_add_source(ZETEMain.cpp					Sources)
+class ZETEPatchGDAL : public ZETEPatch
+{
+	private:
+		void*					Data;
+		ZESize					Pitch;
 
-ze_add_executable(TARGET ZETerrainExporter
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation libFreeImage libIPP libGDAL)
+	public:
+		void*					GetData();
+		ZESize					GetPitch();
+	
+		bool					Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
+		void					Clean();
+
+		bool					Load(const char* FileName, ZETEPixelType PixelType);
+
+								ZETEPatchGDAL();
+								~ZETEPatchGDAL();
+};

@@ -34,12 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETEPatchDatabase.h"
-#include "ZETEPatch.h"
-
+#include "ZETEProcessor.h"
+#include "ZETEPatchFile.h"
 #include "ZEFile/ZEPathManager.h"
 
 #include <FreeImage.h>
-#include "ZETEProcessor.h"
 
 void main()
 {
@@ -61,8 +60,8 @@ void main()
 	BlockDatabase.SetPath("c:\\Test\\Blocks");
 	Procesor.SetBlockDatabase(&BlockDatabase);
 	
-	ZETEPatch* Patch;
-	Patch = new ZETEPatch();
+	ZETEPatchFile* Patch;
+	Patch = new ZETEPatchFile();
 	Patch->Load("c:\\World.jpg", ZETE_PT_COLOR);
 	Patch->SetPriority(0);
 	Patch->SetStartX(200.5);
