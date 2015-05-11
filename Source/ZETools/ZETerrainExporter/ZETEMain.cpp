@@ -47,7 +47,9 @@ void main()
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	ZETEProcessor Procesor;
-	
+	Procesor.SetDebugDump(true);
+	Procesor.SetRegenerate(true);
+
 	ZETEPatchDatabase PatchDatabase;
 	PatchDatabase.SetBlockSize(1024);
 	PatchDatabase.SetPixelType(ZETE_PT_COLOR);

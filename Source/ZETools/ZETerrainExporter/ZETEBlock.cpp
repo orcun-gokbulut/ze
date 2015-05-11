@@ -102,6 +102,16 @@ ZEInt64 ZETEBlock::GetPositionY()
 	return PositionY;
 }
 
+ZEInt64 ZETEBlock::GetEndX()
+{
+	return PositionX + Size * pow(2, Level);
+}
+
+ZEInt64 ZETEBlock::GetEndY()
+{
+	return PositionY + Size * pow(2, Level);
+}
+
 void ZETEBlock::SetLevel(ZEUInt Level)
 {
 	this->Level = Level;

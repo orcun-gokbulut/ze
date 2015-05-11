@@ -79,7 +79,7 @@ void ZETEPatch::SetStartX(double x)
 	UpdateLevelAndScaling();
 }
 
-double ZETEPatch::GetStartX()
+double ZETEPatch::GetPositionX()
 {
 	return StartX;
 }
@@ -93,7 +93,7 @@ void ZETEPatch::SetStartY(double y)
 	UpdateLevelAndScaling();
 }
 
-double ZETEPatch::GetStartY()
+double ZETEPatch::GetPositionY()
 {
 	return StartY;
 }

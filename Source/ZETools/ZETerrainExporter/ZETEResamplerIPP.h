@@ -50,6 +50,8 @@ class ZETEResamplerIPP
 		{
 			void*			Buffer;
 			ZESize			BufferSize;
+			void*			PatchBuffer;
+			ZESize			PatchBufferSize;
 		} ResampleData;
 
 		struct
@@ -65,6 +67,8 @@ class ZETEResamplerIPP
 	public:
 		void				Resample(ZETEPatch* Patch, ZETEBlock* Block);
 		void				Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+		
+		void				CleanUp();
 
 							ZETEResamplerIPP();
 							~ZETEResamplerIPP();

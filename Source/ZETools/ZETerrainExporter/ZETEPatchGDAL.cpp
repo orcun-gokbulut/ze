@@ -36,14 +36,9 @@
 #include "ZETEPatchGDAL.h"
 #include "ZEError.h"
 
-void* ZETEPatchGDAL::GetData()
+bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
 {
-	return Data;
-}
-
-ZESize ZETEPatchGDAL::GetPitch()
-{
-	return Pitch;
+	return false;
 }
 
 void ZETEPatchGDAL::Clean()
