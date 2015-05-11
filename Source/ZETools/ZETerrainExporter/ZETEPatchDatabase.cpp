@@ -56,8 +56,8 @@ void ZETEPatchDatabase::CalculateDimensions()
 	else
 	{
 		ZETEPatch* CurrentPatch = Patches[0];
-		StartX = CurrentPatch->GetStartX();
-		StartY = CurrentPatch->GetStartY();
+		StartX = CurrentPatch->GetPositionX();
+		StartY = CurrentPatch->GetPositionY();
 		EndX = CurrentPatch->GetEndX();
 		EndY = CurrentPatch->GetEndY();
 		MinLevel = CurrentPatch->GetLevel();
@@ -67,11 +67,11 @@ void ZETEPatchDatabase::CalculateDimensions()
 		{
 			CurrentPatch = Patches[I];
 
-			if (StartX > CurrentPatch->GetStartX())
-				StartX = CurrentPatch->GetStartX();
+			if (StartX > CurrentPatch->GetPositionX())
+				StartX = CurrentPatch->GetPositionX();
 
-			if (StartY > CurrentPatch->GetStartY())
-				StartY = CurrentPatch->GetStartY();
+			if (StartY > CurrentPatch->GetPositionY())
+				StartY = CurrentPatch->GetPositionY();
 
 			if (EndX < CurrentPatch->GetEndX())
 				EndX = CurrentPatch->GetEndX();

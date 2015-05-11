@@ -61,6 +61,9 @@ class ZETEProcessor
 
 		ZETEProcessorInfo	Info;
 
+		bool				Regenerate;
+		bool				DebugDump;
+
 		bool				GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEUInt Level);
 
 		bool				GenerateBlocks();
@@ -75,6 +78,12 @@ class ZETEProcessor
 		
 		void				SetBlockDatabase(ZETEBlockDatabase* Database);
 		ZETEBlockDatabase*	GetBlockDatabase();
+		
+		void				SetRegenerate(bool Regenerate);
+		bool				GetRegenerate();
+
+		void				SetDebugDump(bool DebugDump);
+		bool				GetDebugDump();
 
 		bool				Generate();
 

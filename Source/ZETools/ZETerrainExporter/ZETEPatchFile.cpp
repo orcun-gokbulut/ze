@@ -38,14 +38,29 @@
 
 #include <FreeImage.h>
 
-void* ZETEPatchFile::GetData()
-{
-	return Data;
-}
 
-ZESize ZETEPatchFile::GetPitch()
+bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
 {
-	return Pitch;
+	if (x + Width >= this->Width)
+		return false;
+
+	if (y + Height >= this->Height)
+		return false;
+
+	ZESize PixelSize = GetPixelSize();
+	ZESize DestinationPitch = Width * PixelSize;
+
+	ZEBYTE* Source = (ZEBYTE*)Data + y * Pitch + x * PixelSize;
+	ZEBYTE* Destination = (ZEBYTE*)Output;
+
+	for (ZEUInt64 I = 0; I < Height; I++)
+	{
+		memcpy(Destination, Source, DestinationPitch);
+		Source += Pitch;
+		Destination += DestinationPitch;
+	}
+
+	return true;
 }
 
 void ZETEPatchFile::Clean()

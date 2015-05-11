@@ -44,8 +44,7 @@ class ZETEPatchFile : public ZETEPatch
 		ZESize					Pitch;
 
 	public:
-		void*					GetData();
-		ZESize					GetPitch();
+		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height);
 	
 		bool					Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
 		void					Clean();

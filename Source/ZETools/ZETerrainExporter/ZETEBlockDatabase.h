@@ -87,7 +87,7 @@ class ZETEBlockDatabase
 		ZEInt64						GetEndY();
 
 		void						SetPath(const ZEString& Path);
-		const ZEString&				GetPath(const ZEString& Path);
+		const ZEString&				GetPath();
 
 		void						SetMaxLevel(ZEUInt Level);
 		ZEUInt						GetMaxLevel();

@@ -69,6 +69,9 @@ class ZETEBlock
 		void					SetPositionY(ZEInt64 y);
 		ZEInt64					GetPositionY();
 
+		ZEInt64					GetEndX();
+		ZEInt64					GetEndY();
+
 		void					SetLevel(ZEUInt Level);
 		ZEUInt					GetLevel();
 

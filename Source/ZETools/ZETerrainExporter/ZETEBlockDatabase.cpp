@@ -102,7 +102,7 @@ void ZETEBlockDatabase::SetPath(const ZEString& Path)
 	this->Path = Path;
 }
 
-const ZEString& ZETEBlockDatabase::GetPath(const ZEString& Path)
+const ZEString& ZETEBlockDatabase::GetPath()
 {
 	return Path;
 }
@@ -189,13 +189,8 @@ bool ZETEBlockDatabase::StoreBlock(ZETEBlock* Block)
 {
 	ZEString BlockPath = GetBlockFilePath(Block);
 
-	if (!CheckBlock(Block))
-	{
-		if (!Block->Save(BlockPath))
-			return false;
-
-		Block->Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX()));
-	}
+	if (!Block->Save(BlockPath))
+		return false;
 
 	static ZELock Lock;
 	Lock.Lock();

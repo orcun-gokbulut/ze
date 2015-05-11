@@ -37,9 +37,13 @@
 #include "ZETEResamplerIPP.h"
 #include "ZETEPatch.h"
 #include "ZETEBlock.h"
+
+#include "ZEDS\ZEFormat.h"
 #include "ZEMath\ZEMath.h"
+#include "ZEFile\ZEDirectoryInfo.h"
 
 #include <omp.h>
+
 
 static int ComparePatches(ZETEPatch* const * Ap, ZETEPatch* const* Bp)
 {
@@ -117,12 +121,20 @@ bool ZETEProcessor::GenerateBlocks()
 				IndexY * BlockSize,
 				IndexX * BlockSize);
 
+			Block.SetPositionX(PositionX);
+			Block.SetPositionY(PositionY);
+			if (BlockDatabase->CheckBlock(&Block))
+			{
+				if (Regenerate)
+					BlockDatabase->RemoveBlock(&Block);
+				else
+					continue;
+			}
+
 			if (!PatchDatabase->Intersect(PositionX, PositionY, BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
 				continue;
 
 			IntersectedPatches.Sort(ComparePatches);
-			Block.SetPositionX(PositionX);
-			Block.SetPositionY(PositionY);
 			Block.Clean();
 
 			for (ZESize I = 0; I < IntersectedPatchCount; I++)
@@ -130,6 +142,9 @@ bool ZETEProcessor::GenerateBlocks()
 
 			if (!BlockDatabase->StoreBlock(&Block))
 				Error = true;
+
+			if (DebugDump)
+				Block.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Block.GetLevel(), Block.GetPositionY(), Block.GetPositionX()));
 		}
 	}
 
@@ -187,9 +202,19 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 				IndexY * BlockCountX + IndexX,
 				BlockCountX * BlockCountY,
 				omp_get_thread_num(),
-				Block00.GetLevel(),
+				Output.GetLevel(),
 				IndexY * DestinationLevelBlockSize,
 				IndexX * DestinationLevelBlockSize);
+
+			Output.SetPositionX(PositionX);
+			Output.SetPositionY(PositionY);
+			if (BlockDatabase->CheckBlock(&Output))
+			{
+				if (Regenerate)
+					BlockDatabase->RemoveBlock(&Output);
+				else
+					continue;
+			}
 
 			bool BlockLoadded = false;
 			Block00.SetPositionX(PositionX);
@@ -208,14 +233,15 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 			Block11.SetPositionY(PositionY + SourceLevelBlockSize);
 			BlockLoadded |= BlockDatabase->LoadBlock(&Block11);
 
-			if (BlockLoadded)
-			{
-				Output.Clean();
-				Resampler.Downsample(&Output, &Block00, &Block01, &Block10, &Block11);
-				Output.SetPositionX(PositionX);
-				Output.SetPositionY(PositionY);
-				BlockDatabase->StoreBlock(&Output);
-			}
+			if (!BlockLoadded)
+				continue;
+
+			Output.Clean();
+			Resampler.Downsample(&Output, &Block00, &Block01, &Block10, &Block11);
+			BlockDatabase->StoreBlock(&Output);
+
+			if (DebugDump)
+				Output.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Output.GetLevel(), Output.GetPositionY(), Output.GetPositionX()));
 		}
 	}
 
@@ -266,6 +292,26 @@ ZETEBlockDatabase* ZETEProcessor::GetBlockDatabase()
 	return BlockDatabase;
 }
 
+void ZETEProcessor::SetRegenerate(bool Regenerate)
+{
+	this->Regenerate = Regenerate;
+}
+
+bool ZETEProcessor::GetRegenerate()
+{
+	return Regenerate;
+}
+
+void ZETEProcessor::SetDebugDump(bool Enable)
+{
+	DebugDump = Enable;
+}
+
+bool ZETEProcessor::GetDebugDump()
+{
+	return DebugDump;
+}
+
 bool ZETEProcessor::Generate()
 {
 	memset(&Info, 0, sizeof(ZETEProcessorInfo));
@@ -274,6 +320,12 @@ bool ZETEProcessor::Generate()
 	{
 		Info.Status = ZETE_PS_ERROR;
 		return false;
+	}
+
+	if (DebugDump)
+	{
+		ZEDirectoryInfo DumpDirectory(BlockDatabase->GetPath() + "/Dump");
+		DumpDirectory.Create();
 	}
 
 	if (PatchDatabase->GetBlockSize() != BlockDatabase->GetBlockSize())
@@ -313,6 +365,9 @@ bool ZETEProcessor::Generate()
 ZETEProcessor::ZETEProcessor()
 {
 	memset(&Info, 0, sizeof(ZETEProcessorInfo));
+
+	Regenerate = false;
+	DebugDump = false;
 
 	PatchDatabase = NULL;
 	BlockDatabase = NULL;

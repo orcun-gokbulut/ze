@@ -68,10 +68,10 @@ class ZETEPatch
 		ZEUInt					GetLevel();
 
 		void					SetStartX(double x);
-		double					GetStartX();
+		double					GetPositionX();
 
 		void					SetStartY(double y);
-		double					GetStartY();
+		double					GetPositionY();
 
 		void					SetEndX(double EndX);
 		double					GetEndX();
@@ -92,9 +92,8 @@ class ZETEPatch
 		ZESize					GetPixelSize();
 		
 		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
-
-		virtual	void*			GetData() = 0;
-		virtual	ZESize			GetPitch() = 0;
+		
+		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height) = 0;
 
 								ZETEPatch();
 								~ZETEPatch();
