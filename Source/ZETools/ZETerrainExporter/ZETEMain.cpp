@@ -64,12 +64,12 @@ void main()
 	
 	ZETEPatchFile* Patch;
 	Patch = new ZETEPatchFile();
-	Patch->Load("c:\\World.jpg", ZETE_PT_COLOR);
+	Patch->SetSource("c:\\World.jpg");
 	Patch->SetPriority(0);
 	Patch->SetStartX(200.5);
 	Patch->SetStartY(200.5);
-	Patch->SetEndX(Patch->GetWidth());
-	Patch->SetEndY(Patch->GetHeight());
+	Patch->SetEndX(26000);
+	Patch->SetEndY(8000);
 	PatchDatabase.AddPatch(Patch);
 
 	Procesor.Generate();

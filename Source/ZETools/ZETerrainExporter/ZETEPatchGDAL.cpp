@@ -41,48 +41,12 @@ bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, 
 	return false;
 }
 
-void ZETEPatchGDAL::Clean()
-{
-	PixelType = ZETE_PT_NONE;
-	Width = 0;
-	Height = 0;
-	Pitch = 0;
-
-	if (Data == NULL)
-	{
-		delete[] (ZEUInt8*)Data;
-		Data = NULL;
-	}
-}
-
-bool ZETEPatchGDAL::Create(ZESize Width, ZESize Height, ZETEPixelType Type)
-{
-	Clean();
-
-	PixelType = Type;
-	this->Width = Width;
-	this->Height = Height;
-	Pitch = Width * GetPixelSize();
-	Data = new ZEUInt8[Height * Pitch];
-
-	UpdateLevelAndScaling();
-
-	return true;
-}
-
-bool ZETEPatchGDAL::Load(const char* FileName, ZETEPixelType PixelType)
-{
-	Clean();
-	return false;
-}
-
 ZETEPatchGDAL::ZETEPatchGDAL()
 {
-	Data = NULL;
-	Clean();
+
 }
 
 ZETEPatchGDAL::~ZETEPatchGDAL()
 {
-	Clean();
+
 }

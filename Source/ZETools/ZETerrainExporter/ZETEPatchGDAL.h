@@ -39,18 +39,9 @@
 
 class ZETEPatchGDAL : public ZETEPatch
 {
-	private:
-		void*				Data;
-		ZESize				Pitch;
-
 	public:
 		virtual bool		GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height);
 	
-		bool				Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
-		void				Clean();
-
-		bool				Load(const char* FileName, ZETEPixelType PixelType);
-
 							ZETEPatchGDAL();
 							~ZETEPatchGDAL();
 };

@@ -38,7 +38,6 @@
 
 #include <FreeImage.h>
 
-
 bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
 {
 	if (x + Width >= this->Width)
@@ -63,7 +62,65 @@ bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, 
 	return true;
 }
 
-void ZETEPatchFile::Clean()
+bool ZETEPatchFile::Create(ZESize Width, ZESize Height, ZETEPixelType Type)
+{
+	if (Data != NULL)
+	{
+		delete Data;
+		Data = NULL;
+	}
+
+	PixelType = Type;
+	this->Width = Width;
+	this->Height = Height;
+	
+	Pitch = Width * GetPixelSize();
+	Data = new ZEUInt8[Height * Pitch];
+
+	UpdateLevelAndScaling();
+
+	return true;
+}
+
+bool ZETEPatchFile::Load()
+{
+	Unload();
+
+	PixelType = ZETE_PT_COLOR;
+
+	FREE_IMAGE_FORMAT BitmapFileFormat = FreeImage_GetFileType(GetSource());
+	if (BitmapFileFormat == FIF_UNKNOWN)
+	{
+		zeError("Unknown bitmap file format.");
+		return false;
+	}
+
+	FIBITMAP* Bitmap = FreeImage_Load(BitmapFileFormat, GetSource());
+	if (Bitmap == NULL)
+	{
+		zeError("Can not load bitmap.");
+		return false;
+	}
+
+	if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_COLOR))
+	{
+		FreeImage_Unload(Bitmap);
+		return false;
+	}
+
+	switch(PixelType)
+	{
+
+		case ZETE_PT_COLOR:
+			FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
+			FreeImage_Unload(Bitmap);
+			break;
+	}
+	
+	return ZETEPatch::Load();
+}
+
+void ZETEPatchFile::Unload()
 {
 	PixelType = ZETE_PT_NONE;
 	Width = 0;
@@ -77,65 +134,16 @@ void ZETEPatchFile::Clean()
 	}
 }
 
-bool ZETEPatchFile::Create(ZESize Width, ZESize Height, ZETEPixelType Type)
-{
-	Clean();
-
-	PixelType = Type;
-	this->Width = Width;
-	this->Height = Height;
-	Pitch = Width * GetPixelSize();
-	Data = new ZEUInt8[Height * Pitch];
-
-	UpdateLevelAndScaling();
-
-	return true;
-}
-
-bool ZETEPatchFile::Load(const char* FileName, ZETEPixelType PixelType)
-{
-	Clean();
-
-	FREE_IMAGE_FORMAT BitmapFileFormat = FreeImage_GetFileType(FileName);
-	if (BitmapFileFormat == FIF_UNKNOWN)
-	{
-		zeError("Unknown bitmap file format.");
-		return false;
-	}
-
-	FIBITMAP* Bitmap = FreeImage_Load(BitmapFileFormat, FileName);
-	if (Bitmap == NULL)
-	{
-		zeError("Can not load bitmap.");
-		return false;
-	}
-
-	if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), PixelType))
-	{
-		FreeImage_Unload(Bitmap);
-		return false;
-	}
-
-
-	switch(PixelType)
-	{
-
-		case ZETE_PT_COLOR:
-			FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
-			FreeImage_Unload(Bitmap);
-			break;
-	}
-	
-	return true;
-}
-
 ZETEPatchFile::ZETEPatchFile()
 {
 	Data = NULL;
-	Clean();
+	PixelType = ZETE_PT_NONE;
+	Width = 0;
+	Height = 0;
+	Pitch = 0;
 }
 
 ZETEPatchFile::~ZETEPatchFile()
 {
-	Clean();
+	Unload();
 }
