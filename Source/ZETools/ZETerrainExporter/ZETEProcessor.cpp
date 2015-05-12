@@ -44,7 +44,6 @@
 
 #include <omp.h>
 
-
 static int ComparePatches(ZETEPatch* const * Ap, ZETEPatch* const* Bp)
 {
 	ZETEPatch* A = *Ap;
@@ -69,6 +68,42 @@ static int ComparePatches(ZETEPatch* const * Ap, ZETEPatch* const* Bp)
 	}
 }
 
+bool ZETEProcessor::LoadPatches()
+{
+	printf("Loading Patches.\n");
+	Info.Progress = 0;
+
+	const ZEArray<ZETEPatch*> Patches = GetPatchDatabase()->GetPatches();
+
+	bool Error = false;
+	#pragma omp parallel
+	{
+		#pragma omp for schedule(dynamic)
+		for (ZESSize I = 0; I < Patches.GetCount(); I++)
+		{
+			if (Error)
+				continue;
+
+			ZEUInt Progress = (I * 100) / Patches.GetCount();
+			if (Progress > Info.Progress)
+				Info.Progress = Progress;
+
+			printf("  Progress: %d%% (%lld of %lld). Thread: %d. Source: %s.\n", 
+				Info.Progress,
+				I + 1,
+				Patches.GetCount(),
+				omp_get_thread_num(),
+				Patches[I]->GetSource().ToCString());
+
+			if (!Patches[I]->Load())
+				Error = true;
+		}
+	}
+
+	Info.Progress = 100;
+	return true;
+}
+
 bool ZETEProcessor::GenerateBlocks()
 {
 	printf("Processing Patches.\n");
@@ -77,12 +112,12 @@ bool ZETEProcessor::GenerateBlocks()
 	Info.Progress = 0;
 
 	ZESize BlockSize = PatchDatabase->GetBlockSize();
-	ZEUInt64 StartBlockX = ZEMath::Align((ZEInt64)PatchDatabase->GetStartX(), BlockSize);
-	ZEUInt64 StartBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetStartY(), BlockSize);
-	ZEUInt64 EndBlockX = ZEMath::Align((ZEInt64)PatchDatabase->GetEndX(), BlockSize);
-	ZEUInt64 EndBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetEndY(), BlockSize);
-	ZEUInt64 BlockCountX = (EndBlockX - StartBlockX) / BlockSize + 1;
-	ZEUInt64 BlockCountY = (EndBlockX - StartBlockY) / BlockSize + 1;
+	ZEInt64 StartBlockX = ZEMath::Align((ZEInt64)PatchDatabase->GetStartX(), BlockSize);
+	ZEInt64 StartBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetStartY(), BlockSize);
+	ZEInt64 EndBlockX = ZEMath::Align((ZEInt64)PatchDatabase->GetEndX(), BlockSize);
+	ZEInt64 EndBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetEndY(), BlockSize);
+	ZEInt64 BlockCountX = (EndBlockX - StartBlockX) / BlockSize + 1;
+	ZEInt64 BlockCountY = (EndBlockY - StartBlockY) / BlockSize + 1;
 
 	bool Error = false;
 	#pragma omp parallel
@@ -114,7 +149,7 @@ bool ZETEProcessor::GenerateBlocks()
 
 			printf("  Progress: %d%% (%lld of %lld). Thread: %d. L: %d, Y: %lld, X: %lld.\n", 
 				Info.Progress,
-				IndexY * BlockCountX + IndexX,
+				IndexY * BlockCountX + IndexX  + 1,
 				BlockCountX * BlockCountY,
 				omp_get_thread_num(),
 				Block.GetLevel(),
@@ -199,7 +234,7 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 
 			printf("  Progress: %d%% (%lld of %lld). Thread: %d, Block: L: %d, Y: %lld, X: %lld.\n", 
 				Info.Progress,
-				IndexY * BlockCountX + IndexX,
+				IndexY * BlockCountX + IndexX + 1,
 				BlockCountX * BlockCountY,
 				omp_get_thread_num(),
 				Output.GetLevel(),
@@ -342,21 +377,30 @@ bool ZETEProcessor::Generate()
 
 	Info.TotalProgress = 0;
 
+	Info.Status = ZETE_PS_LOADING_PATCHES;
+	if (!LoadPatches())
+	{
+		Info.Status = ZETE_PS_ERROR;
+		return false;
+	}
+	Info.TotalProgress = 25;
+
+	Info.Status = ZETE_PS_GENERATING_BLOCKS;
 	if (!GenerateBlocks())
 	{
 		Info.Status = ZETE_PS_ERROR;
 		return false;
 	}
-
 	Info.TotalProgress = 50;
 
+	Info.Status = ZETE_PS_GENERATING_LEVELS;
 	if (!GenerateLevels())
 	{
 		Info.Status = ZETE_PS_ERROR;
 		return false;
 	}
-
 	Info.TotalProgress = 100;
+
 	Info.Status = ZETE_PS_DONE;
 
 	return true;

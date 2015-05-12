@@ -39,6 +39,7 @@
 enum ZETEProcessorStatus
 {
 	ZETE_PS_NONE = 0,
+	ZETE_PS_LOADING_PATCHES,
 	ZETE_PS_GENERATING_BLOCKS,
 	ZETE_PS_GENERATING_LEVELS,
 	ZETE_PS_ERROR,
@@ -66,6 +67,7 @@ class ZETEProcessor
 
 		bool				GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEUInt Level);
 
+		bool				LoadPatches();
 		bool				GenerateBlocks();
 		bool				GenerateLevels();
 

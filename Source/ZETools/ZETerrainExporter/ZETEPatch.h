@@ -52,8 +52,10 @@ class ZETEPatch
 		double					StartX, StartY;
 		double					EndX, EndY;
 
-		double					LevelScalingWidth, LevelScalingHeight;
+		double					LevelScalingX, LevelScalingY;
 		double					PixelScaleX, PixelScaleY;
+
+		ZEString				Source;
 
 	protected:
 		ZESize					Width, Height;
@@ -91,9 +93,15 @@ class ZETEPatch
 		ZETEPixelType			GetPixelType();
 		ZESize					GetPixelSize();
 		
+		void					SetSource(const ZEString& Source);
+		const ZEString&			GetSource();
+
 		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
 		
 		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height) = 0;
+
+		virtual bool			Load();
+		virtual void			Unload() = 0;
 
 								ZETEPatch();
 								~ZETEPatch();

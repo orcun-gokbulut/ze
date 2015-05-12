@@ -46,8 +46,8 @@ void ZETEPatch::UpdateLevelAndScaling()
 	if (Width == 0 || Height == 0 || EndX - StartX <= 0 || EndY - StartY <= 0)
 	{
 		Level = 0;
-		LevelScalingWidth = 1.0;
-		LevelScalingHeight = 1.0;
+		LevelScalingX = 1.0;
+		LevelScalingY = 1.0;
 		PixelScaleX = 0.0;
 		PixelScaleY = 0.0;
 	}
@@ -56,14 +56,14 @@ void ZETEPatch::UpdateLevelAndScaling()
 		PixelScaleX = (EndX - StartX) / (double)Width;
 		PixelScaleY = (EndY - StartY) / (double)Height;
 
-		double MinScale = (LevelScalingWidth < LevelScalingHeight ? PixelScaleX : PixelScaleY);
+		double MinScale = (PixelScaleX < PixelScaleY ? PixelScaleX : PixelScaleY);
 
 		double LevelTemp = log(MinScale) / log(2);
 		Level = (ZEUInt)floor(LevelTemp + 0.5);
 
 		double LevelScale = pow(2, Level);
-		LevelScalingWidth = LevelScale / PixelScaleX;
-		LevelScalingHeight = LevelScale / PixelScaleY;
+		LevelScalingX = PixelScaleX / LevelScale;
+		LevelScalingY = PixelScaleY / LevelScale;
 	}
 
 	if (Database != NULL)
@@ -138,12 +138,12 @@ double ZETEPatch::GetPixelScaleY()
 
 double ZETEPatch::GetLevelScaleX()
 {
-	return LevelScalingWidth;
+	return LevelScalingX;
 }
 
 double ZETEPatch::GetLevelScaleY()
 {
-	return LevelScalingHeight;
+	return LevelScalingY;
 }
 
 ZESize ZETEPatch::GetWidth()
@@ -195,10 +195,26 @@ ZEUInt ZETEPatch::GetPriority()
 	return Priority;
 }
 
+void ZETEPatch::SetSource(const ZEString& Source)
+{
+	this->Source = Source;
+}
+
+const ZEString& ZETEPatch::GetSource()
+{
+	return Source;
+}
+
 bool ZETEPatch::Intersect(double Px, double Py, double Width, double Height)
 {
 	return (StartX <= Px + Width && Px <= EndX &&
 			StartY <= Py + Width && Py <= EndY);
+}
+
+bool ZETEPatch::Load()
+{
+	Database->CalculateDimensions();
+	return true;
 }
 
 ZETEPatch::ZETEPatch()
@@ -210,8 +226,8 @@ ZETEPatch::ZETEPatch()
 	StartY = 0.0;
 	EndX = 0.0;
 	EndY = 0.0;
-	LevelScalingWidth = 1.0;
-	LevelScalingHeight = 1.0;
+	LevelScalingX = 1.0;
+	LevelScalingY = 1.0;
 }
 
 ZETEPatch::~ZETEPatch()

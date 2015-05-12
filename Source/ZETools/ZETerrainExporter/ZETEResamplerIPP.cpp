@@ -45,8 +45,6 @@
 
 void ZETEResamplerIPP::Resample(ZETEPatch* Patch, ZETEBlock* Block)
 {
-	zeBreak(Block->GetPositionY() == 0 && Block->GetPositionX() == 21504);
-	
 	double SourcePositionX = (Block->GetPositionX() - Patch->GetPositionX()) / Patch->GetPixelScaleX();
 	double SourcePositionY = (Block->GetPositionY() - Patch->GetPositionY()) / Patch->GetPixelScaleY();
 
@@ -109,11 +107,12 @@ void ZETEResamplerIPP::Resample(ZETEPatch* Patch, ZETEBlock* Block)
 	Patch->GetData(ResampleData.PatchBuffer, (ZEUInt64)ClampedSourcePositionX, (ZEUInt64)ClampedSourcePositionY, SourceSize.width, SourceSize.height);
 
 	IppStatus Result = ippiResizeSqrPixel_8u_C4R(
-		(const Ipp8u*)ResampleData.PatchBuffer, SourceSize, SourceSize.width * Patch->GetPixelSize(), SourceROI, 
+		(const Ipp8u*)ResampleData.PatchBuffer, SourceSize, 
+		SourceSize.width * Patch->GetPixelSize(), SourceROI, 
 		(Ipp8u*)Block->GetData(), Block->GetPitch(), DestROI, 
 		Patch->GetLevelScaleX(), Patch->GetLevelScaleY(), 
-		ClampedSourcePositionX - SourcePositionX, 
-		ClampedSourcePositionY - SourcePositionY, 
+		(ClampedSourcePositionX - SourcePositionX) * Patch->GetLevelScaleX(), 
+		(ClampedSourcePositionY - SourcePositionY) * Patch->GetLevelScaleY(), 
 		IPPI_INTER_LINEAR, (Ipp8u*)ResampleData.Buffer);
 }
 

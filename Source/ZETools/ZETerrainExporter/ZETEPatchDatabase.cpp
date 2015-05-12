@@ -100,8 +100,8 @@ ZETEPixelType ZETEPatchDatabase::GetPixelType()
 
 bool ZETEPatchDatabase::AddPatch(ZETEPatch* Patch)
 {
-	if (Patch->GetPixelType() != PixelType)
-		return false;
+	/*if (Patch->GetPixelType() != PixelType)
+		return false;*/
 
 	if (Patches.Exists(Patch))
 		return true;
