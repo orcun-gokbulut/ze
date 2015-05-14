@@ -36,18 +36,21 @@
 #include "ZETEPatchDatabase.h"
 #include "ZETEProcessor.h"
 #include "ZETEPatchFile.h"
+#include "ZETEPatchGDAL.h"
 #include "ZEFile/ZEPathManager.h"
 
 #include <FreeImage.h>
+#include <gdal.h>
 
 void main()
 {
+	GDALAllRegister();
 	FreeImage_Initialise();
 
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	ZETEProcessor Procesor;
-	Procesor.SetDebugDump(true);
+	Procesor.SetDebugDump(false);
 	Procesor.SetRegenerate(true);
 
 	ZETEPatchDatabase PatchDatabase;
@@ -62,9 +65,10 @@ void main()
 	BlockDatabase.SetPath("c:\\Test\\Blocks");
 	Procesor.SetBlockDatabase(&BlockDatabase);
 	
-	ZETEPatchFile* Patch;
+	ZETEPatch* Patch;
 	Patch = new ZETEPatchFile();
 	Patch->SetSource("c:\\World.jpg");
+	Patch->Load();
 	Patch->SetPriority(0);
 	Patch->SetStartX(200.5);
 	Patch->SetStartY(200.5);

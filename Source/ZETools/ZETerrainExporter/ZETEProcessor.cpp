@@ -118,18 +118,26 @@ bool ZETEProcessor::GenerateBlocks()
 	ZEInt64 EndBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetEndY(), BlockSize);
 	ZEInt64 BlockCountX = (EndBlockX - StartBlockX) / BlockSize + 1;
 	ZEInt64 BlockCountY = (EndBlockY - StartBlockY) / BlockSize + 1;
-
+		
 	bool Error = false;
 	#pragma omp parallel
 	{
-		ZETEBlock Block;
-		Block.SetSize(PatchDatabase->GetBlockSize());
-		Block.SetPixelType(ZETE_PT_COLOR);
+		int ThreadCount = omp_get_num_threads();
+		int ThreadNo = omp_get_thread_num();
+
+		ZEArray<void*> PatchThreadData;
+		PatchThreadData.SetCount(PatchDatabase->GetPatches().GetCount());
+		for (int I = 0; I < PatchThreadData.GetCount(); I++)
+			PatchThreadData[I] = PatchDatabase->GetPatches()[I]->ThreadBegin();
 
 		ZEArray<ZETEPatch*> IntersectedPatches;
 		ZESize IntersectedPatchCount = 0;
 		IntersectedPatches.SetCount(PatchDatabase->GetPatches().GetCount());
 
+		ZETEBlock Block;
+		Block.SetSize(PatchDatabase->GetBlockSize());
+		Block.SetPixelType(ZETE_PT_COLOR);
+	
 		ZETEResamplerIPP Resampler;
 		
 		#pragma omp for schedule(dynamic)
@@ -181,6 +189,9 @@ bool ZETEProcessor::GenerateBlocks()
 			if (DebugDump)
 				Block.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Block.GetLevel(), Block.GetPositionY(), Block.GetPositionX()));
 		}
+
+		for (int I = 0; I < PatchThreadData.GetCount(); I++)
+			PatchDatabase->GetPatches()[I]->ThreadEnd(PatchThreadData[I]);
 	}
 
 	if (!Error)
@@ -189,7 +200,7 @@ bool ZETEProcessor::GenerateBlocks()
 	return !Error;
 }
 
-bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEUInt Level)
+bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEInt Level)
 {
 	Info.Progress = 0;
 
@@ -290,13 +301,13 @@ bool ZETEProcessor::GenerateLevels()
 {
 	Info.Status = ZETE_PS_GENERATING_LEVELS;
 
-	ZEUInt MaxLevel = 10;
-	ZEUInt MinLevel = PatchDatabase->GetMinLevel();
-	ZEUInt MaxLevelX = floor(log((BlockDatabase->GetEndX() - BlockDatabase->GetStartX())) / log(2));
-	ZEUInt MaxLevelY = floor(log((BlockDatabase->GetEndY() - BlockDatabase->GetStartY())) / log(2));
-	ZEUInt EffectiveMaxLevel = ZEMath::Min(MaxLevel, ZEMath::Min(MaxLevelX, MaxLevelY));
+	ZEInt MaxLevel = 10;
+	ZEInt MinLevel = PatchDatabase->GetMinLevel();
+	ZEInt MaxLevelX = (ZEInt)floor(log((BlockDatabase->GetEndX() - BlockDatabase->GetStartX())) / log(2));
+	ZEInt MaxLevelY = (ZEInt)floor(log((BlockDatabase->GetEndY() - BlockDatabase->GetStartY())) / log(2));
+	ZEInt EffectiveMaxLevel = ZEMath::Min(MaxLevel, ZEMath::Min(MaxLevelX, MaxLevelY));
 
-	for (ZEUInt I = MinLevel; I < EffectiveMaxLevel; I++)
+	for (ZEInt I = MinLevel; I < EffectiveMaxLevel; I++)
 		GenerateLevel(BlockDatabase->GetStartX(), BlockDatabase->GetStartY(), BlockDatabase->GetEndX(), BlockDatabase->GetEndY(), I);
 
 	return true;

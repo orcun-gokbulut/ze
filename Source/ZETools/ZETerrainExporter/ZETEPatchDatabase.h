@@ -59,8 +59,8 @@ class ZETEPatchDatabase
 		double							EndY;
 		double							UnitSize;
 
-		ZEUInt							MinLevel;
-		ZEUInt							MaxLevel;
+		ZEInt							MinLevel;
+		ZEInt							MaxLevel;
 
 		ZEString						Path;
 
@@ -86,10 +86,10 @@ class ZETEPatchDatabase
 		void							GetUnitSize(double UnitSize);
 		double							GetUnitSize();
 
-		ZEUInt							GetMinLevel();
+		ZEInt							GetMinLevel();
 
-		ZEUInt							GetMaxLevel();
-		void							SetMaxLevel(ZEUInt Level);
+		ZEInt							GetMaxLevel();
+		void							SetMaxLevel(ZEInt Level);
 
 		double							GetStartX();
 		double							GetStartY();

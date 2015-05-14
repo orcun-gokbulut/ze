@@ -156,12 +156,12 @@ double ZETEPatchDatabase::GetUnitSize()
 	return UnitSize;
 }
 
-ZEUInt ZETEPatchDatabase::GetMinLevel()
+ZEInt ZETEPatchDatabase::GetMinLevel()
 {
 	return MinLevel;
 }
 
-ZEUInt ZETEPatchDatabase::GetMaxLevel()
+ZEInt ZETEPatchDatabase::GetMaxLevel()
 {
 	return MaxLevel;
 }

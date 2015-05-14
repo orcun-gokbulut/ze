@@ -65,7 +65,7 @@ class ZETEProcessor
 		bool				Regenerate;
 		bool				DebugDump;
 
-		bool				GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEUInt Level);
+		bool				GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEInt Level);
 
 		bool				LoadPatches();
 		bool				GenerateBlocks();

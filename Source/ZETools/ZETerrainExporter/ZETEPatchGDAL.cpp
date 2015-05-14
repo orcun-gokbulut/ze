@@ -36,17 +36,102 @@
 #include "ZETEPatchGDAL.h"
 #include "ZEError.h"
 
-bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
+#include <gdal_priv.h>
+#include "ippi.h"
+
+struct ZETEThreadData
 {
-	return false;
+	GDALDataset* Dataset;
+};
+
+void* ZETEPatchGDAL::ThreadBegin()
+{
+	GDALDataset* Dataset = (GDALDataset*)GDALOpen(GetSource(), GA_ReadOnly);
+	if (Dataset == NULL)
+		return NULL;
+
+	ZETEThreadData* ThreadData = new ZETEThreadData();
+	ThreadData->Dataset = Dataset;
+
+	return ThreadData;
+}
+
+bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData)
+{
+	GDALDataset* Dataset = NULL;
+	if (ThreadData == NULL)
+		Dataset = this->Dataset;
+	else
+		Dataset = static_cast<ZETEThreadData*>(ThreadData)->Dataset;
+
+	if (Dataset == NULL)
+		return false;
+
+	if (x + Width >= this->Width)
+		return false;
+
+	if (y + Height >= this->Height)
+		return false;
+	
+	memset(Output, 0xFF, Width * Height * GetPixelSize());
+	Lock.Lock();
+	CPLErr Result = Dataset->RasterIO(GF_Read, x, y, Width, Height, (ZEBYTE*)Output, Width, Height, GDT_Byte, Dataset->GetRasterCount(), NULL, GetPixelSize(),  Width * GetPixelSize(), 1);
+	Lock.Unlock();
+	if (Result != CE_None)
+		return false;
+
+	IppiSize Size;
+	Size.width = Width;
+	Size.height = Height;
+	int Order[4] = {2, 1, 0, 3};
+	ippiSwapChannels_8u_C4IR((Ipp8u*)Output, Width * GetPixelSize(), Size, Order);
+
+	return true;
+}
+
+void ZETEPatchGDAL::ThreadEnd(void* ThreadData)
+{
+	if (ThreadData == NULL)
+		return;
+	
+	ZETEThreadData* Data = static_cast<ZETEThreadData*>(ThreadData);
+	if (Data->Dataset != NULL)
+	{
+		GDALClose(Data->Dataset);
+		Data->Dataset = NULL;
+	}
+
+	delete Data;
+}
+
+bool ZETEPatchGDAL::Load()
+{
+	Unload();
+
+	Dataset = (GDALDataset*)GDALOpen(GetSource(), GA_ReadOnly);
+	if (Dataset == NULL)
+		return false;
+
+	Width = Dataset->GetRasterXSize();
+	Height = Dataset->GetRasterYSize();
+	PixelType = ZETE_PT_COLOR;
+}
+
+void ZETEPatchGDAL::Unload()
+{
+	if (Dataset != NULL)
+	{
+		GDALClose(Dataset);
+		Dataset = NULL;
+	}
 }
 
 ZETEPatchGDAL::ZETEPatchGDAL()
 {
-
+	Dataset = NULL;
 }
 
 ZETEPatchGDAL::~ZETEPatchGDAL()
 {
-
+	Unload();
 }

@@ -59,11 +59,9 @@ ZEPackStruct(
 	{
 		ZELittleEndian<ZEUInt64>	PositionX;
 		ZELittleEndian<ZEUInt64>	PositionY;
-		ZEUInt8						Level;
-		ZELittleEndian<ZEUInt32>	Dimension;
+		ZEInt8						Level;
+		ZELittleEndian<ZEUInt32>	Size;
 		ZEUInt8						Type;
-		float						MinValue;
-		float						MaxValue;
 	}
 );
 
@@ -112,12 +110,12 @@ ZEInt64 ZETEBlock::GetEndY()
 	return PositionY + Size * pow(2, Level);
 }
 
-void ZETEBlock::SetLevel(ZEUInt Level)
+void ZETEBlock::SetLevel(ZEInt Level)
 {
 	this->Level = Level;
 }
 
-ZEUInt ZETEBlock::GetLevel()
+ZEInt ZETEBlock::GetLevel()
 {
 	return Level;
 }
@@ -221,7 +219,7 @@ bool ZETEBlock::Load(ZEFile* File)
 	Level = Header.Level;
 
 	SetPixelType((ZETEPixelType)Header.Type);
-	SetSize(Header.Dimension);
+	SetSize(Header.Size);
 	
 	if (File->Read(GetData(), DataSize, 1) != 1)
 		return false;
@@ -255,7 +253,7 @@ bool ZETEBlock::Save(ZEFile* File)
 	Header.PositionX = PositionX;
 	Header.PositionY = PositionY;
 	Header.Level = Level;
-	Header.Dimension = Size;
+	Header.Size = Size;
 	Header.Type = PixelType;
 
 	if (File->Write(&Header, sizeof(ZETEBlockFileHeader), 1) != 1)

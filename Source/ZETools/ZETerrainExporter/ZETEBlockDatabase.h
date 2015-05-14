@@ -44,7 +44,7 @@ class ZETEBlockRegister
 	public:
 		ZEUInt64	PositionX;
 		ZEUInt64	PositionY;
-		ZEUInt		Level;
+		ZEInt		Level;
 		ZESize		SubBlocks[4];
 		void*		Cache;
 
@@ -68,12 +68,12 @@ class ZETEBlockDatabase
 		ZEInt64						StartY;
 		ZEInt64						EndX;
 		ZEInt64						EndY;
-		ZEUInt						MaxLevel;
+		ZEInt						MaxLevel;
 
 		ZEString					GetBlockFilePath(ZETEBlock* Block);
 
 	public:
-		ZETEBlockRegister*			GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEUInt Level);
+		ZETEBlockRegister*			GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEInt Level);
 
 		void						SetPixelType(ZETEPixelType Type);
 		ZETEPixelType				GetPixelType();
@@ -89,8 +89,8 @@ class ZETEBlockDatabase
 		void						SetPath(const ZEString& Path);
 		const ZEString&				GetPath();
 
-		void						SetMaxLevel(ZEUInt Level);
-		ZEUInt						GetMaxLevel();
+		void						SetMaxLevel(ZEInt Level);
+		ZEInt						GetMaxLevel();
 
 		bool						CheckBlock(ZETEBlock* Block);
 		bool						LoadBlock(ZETEBlock* Block);

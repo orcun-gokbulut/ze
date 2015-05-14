@@ -48,7 +48,7 @@ class ZETEPatch
 		ZETEPatchDatabase*		Database;
 
 		ZEUInt					Priority;
-		ZEUInt					Level;
+		ZEInt					Level;
 		double					StartX, StartY;
 		double					EndX, EndY;
 
@@ -56,6 +56,8 @@ class ZETEPatch
 		double					PixelScaleX, PixelScaleY;
 
 		ZEString				Source;
+
+		bool					Loaded;
 
 	protected:
 		ZESize					Width, Height;
@@ -67,7 +69,7 @@ class ZETEPatch
 		void					SetPriority(ZEUInt Priority);
 		ZEUInt					GetPriority();
 
-		ZEUInt					GetLevel();
+		ZEInt					GetLevel();
 
 		void					SetStartX(double x);
 		double					GetPositionX();
@@ -98,10 +100,13 @@ class ZETEPatch
 
 		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
 		
-		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height) = 0;
+		virtual void*			ThreadBegin();
+		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData = 0) = 0;
+		virtual void			ThreadEnd(void* ThreadData);
 
+		bool					IsLoaded();
 		virtual bool			Load();
-		virtual void			Unload() = 0;
+		virtual void			Unload();
 
 								ZETEPatch();
 								~ZETEPatch();
