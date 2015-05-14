@@ -38,7 +38,7 @@
 
 #include <FreeImage.h>
 
-bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
+bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData)
 {
 	if (x + Width >= this->Width)
 		return false;
@@ -132,6 +132,8 @@ void ZETEPatchFile::Unload()
 		delete[] (ZEUInt8*)Data;
 		Data = NULL;
 	}
+
+	ZETEPatch::Unload();
 }
 
 ZETEPatchFile::ZETEPatchFile()

@@ -83,7 +83,7 @@ ZEString ZETEBlockDatabase::GetBlockFilePath(ZETEBlock* Block)
 	return ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
 }
 
-ZETEBlockRegister* ZETEBlockDatabase::GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEUInt Level)
+ZETEBlockRegister* ZETEBlockDatabase::GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEInt Level)
 {
 	for (ZESize I = 0; I < Registers.GetCount(); I++)
 	{
@@ -147,12 +147,12 @@ ZEInt64 ZETEBlockDatabase::GetEndY()
 	return EndY;
 }
 
-void ZETEBlockDatabase::SetMaxLevel(ZEUInt Level)
+void ZETEBlockDatabase::SetMaxLevel(ZEInt Level)
 {
 	MaxLevel = Level;
 }
 
-ZEUInt ZETEBlockDatabase::GetMaxLevel()
+ZEInt ZETEBlockDatabase::GetMaxLevel()
 {
 	return MaxLevel;
 }

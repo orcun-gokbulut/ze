@@ -36,11 +36,23 @@
 #pragma once
 
 #include "ZETEPatch.h"
+#include "ZEThread\ZEMutex.h"
+
+class GDALDataset;
 
 class ZETEPatchGDAL : public ZETEPatch
 {
+	private:
+		GDALDataset*		Dataset;
+		ZEMutex				Lock;
+
 	public:
-		virtual bool		GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height);
+		virtual void*		ThreadBegin();
+		virtual bool		GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData);
+		virtual void		ThreadEnd(void* ThreadData);
+
+		virtual bool		Load();
+		virtual void		Unload();
 	
 							ZETEPatchGDAL();
 							~ZETEPatchGDAL();

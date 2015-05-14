@@ -59,7 +59,7 @@ void ZETEPatch::UpdateLevelAndScaling()
 		double MinScale = (PixelScaleX < PixelScaleY ? PixelScaleX : PixelScaleY);
 
 		double LevelTemp = log(MinScale) / log(2);
-		Level = (ZEUInt)floor(LevelTemp + 0.5);
+		Level = (ZEInt)floor(LevelTemp + 0.5);
 
 		double LevelScale = pow(2, Level);
 		LevelScalingX = PixelScaleX / LevelScale;
@@ -180,7 +180,7 @@ ZESize ZETEPatch::GetPixelSize()
 	}
 }
 
-ZEUInt ZETEPatch::GetLevel()
+ZEInt ZETEPatch::GetLevel()
 {
 	return Level;
 }
@@ -211,10 +211,32 @@ bool ZETEPatch::Intersect(double Px, double Py, double Width, double Height)
 			StartY <= Py + Width && Py <= EndY);
 }
 
+void* ZETEPatch::ThreadBegin()
+{
+	return NULL;
+}
+
+void ZETEPatch::ThreadEnd(void*)
+{
+
+}
+
+bool ZETEPatch::IsLoaded()
+{
+	return Loaded;
+}
+
 bool ZETEPatch::Load()
 {
-	Database->CalculateDimensions();
+	Loaded = true;
+	if (Database != NULL)
+		Database->CalculateDimensions();
 	return true;
+}
+
+void ZETEPatch::Unload()
+{
+	Loaded = false;
 }
 
 ZETEPatch::ZETEPatch()

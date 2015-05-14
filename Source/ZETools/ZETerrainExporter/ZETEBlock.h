@@ -53,7 +53,7 @@ class ZETEBlock
 	private:
 		ZEInt64					PositionX;
 		ZEInt64					PositionY;
-		ZEUInt					Level;
+		ZEInt					Level;
 		ZESize					Size;
 
 		void*					Data;
@@ -72,8 +72,8 @@ class ZETEBlock
 		ZEInt64					GetEndX();
 		ZEInt64					GetEndY();
 
-		void					SetLevel(ZEUInt Level);
-		ZEUInt					GetLevel();
+		void					SetLevel(ZEInt Level);
+		ZEInt					GetLevel();
 
 		void					SetSize(ZESize BlockSize);
 		ZESize					GetSize();
