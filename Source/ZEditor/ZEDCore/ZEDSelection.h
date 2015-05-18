@@ -39,6 +39,7 @@
 
 #include "ZEFoundation/ZEMath/ZEAABBox.h"
 #include "ZEFoundation/ZEMath/ZEQuaternion.h"
+#include "ZEFoundation/ZEDS/ZEArray.h"
 
 class ZEObject;
 class ZEDrawParameters;
@@ -58,11 +59,14 @@ class ZEDSelection
 		ZEVector3 PivotPosition;
 		ZEQuaternion PivotRotation;
 		ZEVector3 PivotScale;
-		bool Lock;
+		ZEMatrix4x4 Transformation;
+		bool IsDirty; //BBox Dirty Should be added. ZEFlags.
 
+		bool Lock;
 		ZEArray<ZEDSelectionElement> Elements;
 
 		void CalculateBoundingBox();
+		bool IsElementExists(const ZEObject* Object);
 
 	public:
 		ZEArray<ZEDSelectionElement>& GetElements();

@@ -36,18 +36,6 @@
 #include "ZEDEntityTag.h"
 #include "ZEGame\ZEDrawParameters.h"
 
-bool ZEDEntityTag::InitializeSelf()
-{
-	if (!ZEDTag::InitializeSelf())
-		return false;
-
-	return true;
-}
-
-bool ZEDEntityTag::DeinitializeSelf()
-{
-	return ZEDTag::DeinitializeSelf();
-}
 
 void ZEDEntityTag::SetObject(ZEObject* Object)
 {
@@ -59,7 +47,7 @@ void ZEDEntityTag::SetObject(ZEObject* Object)
 
 ZEObject* ZEDEntityTag::GetObject()
 {
-	ZEDTag::GetObject();
+	return ZEDTag::GetObject();
 }
 
 void ZEDEntityTag::SetPosition(const ZEVector3& NewPosition)
@@ -102,17 +90,12 @@ bool ZEDEntityTag::Restore(ZEMLReaderNode* Unserializer)
 	return true;
 }
 
-void ZEDEntityTag::Tick(float Time)
-{
-	ZEDTag::Tick(Time);
-}
-
 void ZEDEntityTag::Draw(ZEDrawParameters* DrawParameters)
 {
-	ZEEntity* Entity = (ZEEntity*)GetObject();
-
-	if (Entity == NULL)
+	if (GetObject() == NULL)
 		return;
+
+	ZEEntity* Entity = (ZEEntity*)GetObject();
 
 	TagCanvas.Clean();
 
