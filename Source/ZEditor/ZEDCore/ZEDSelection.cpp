@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSelection.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,130 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSelection.h"
+
+void ZEDSelection::CalculateBoundingBox()
+{
+
+}
+
+bool ZEDSelection::IsElementExists(const ZEObject* Object)
+{
+	if (Elements.GetCount() == 0)
+		return false;
+
+	for (ZESize I = 0; I < Elements.GetCount(); I++)
+		if (Elements[I].Object == Object)
+			return true;
+
+	return false;
+}
+
+ZEArray<ZEDSelectionElement>& ZEDSelection::GetElements()
+{
+	return Elements;
+}
+
+ZEObject* ZEDSelection::GetElement(ZESize Index)
+{
+	return Elements[Index].Object;
+}
+
+void ZEDSelection::AddElement(const ZEObject* Object)
+{
+	if (Object == NULL)
+		return;
+
+	if (IsElementExists(Object))
+		return;
+
+	//How to set Element.OffsetToPivot? Should it be sent to TransformationManager.
+}
+
+void ZEDSelection::RemoveElement(const ZEObject* Object)
+{
+	if (Object == NULL)
+		return;
+
+	if (!IsElementExists(Object))
+		return;
+
+	for (ZESize I = 0; I < Elements.GetCount(); I++)
+	{
+		if (Elements[I].Object == Object)
+		{
+			Elements.Remove(I);
+			return;
+		}
+	}
+}
+
+const ZEMatrix4x4& ZEDSelection::GetTransform()
+{
+	if (!IsDirty)
+		return Transformation;
+
+	ZEMatrix4x4::CreateOrientation(Transformation, PivotPosition, PivotRotation, PivotScale);
+	IsDirty = false;
+
+	return Transformation;
+}
+
+void ZEDSelection::SetPosition(const ZEVector3& Position)
+{
+	PivotPosition = Position;
+	IsDirty = true;
+}
+
+const ZEVector3& ZEDSelection::GetPosition()
+{
+	return PivotPosition;
+}
+
+void ZEDSelection::SetRotation(const ZEQuaternion& Rotation)
+{
+	PivotRotation = Rotation;
+	IsDirty = true;
+}
+
+const ZEQuaternion& ZEDSelection::GetRotation()
+{
+	return PivotRotation;
+}
+
+void ZEDSelection::SetScale(const ZEVector3& Scale)
+{
+	PivotScale = Scale;
+	IsDirty = true;
+}
+
+const ZEVector3& ZEDSelection::GetScale()
+{
+	return PivotScale;
+}
+
+bool ZEDSelection::IsLocked()
+{
+	return Lock;
+}
+
+void ZEDSelection::Tick(float Time)
+{
+
+}
+
+void ZEDSelection::Draw(ZEDrawParameters* Parameters)
+{
+
+}
+
+ZEDSelection::ZEDSelection()
+{
+	IsDirty = true;
+	Lock = false;
+}
+
+ZEDSelection::~ZEDSelection()
+{
+
+}

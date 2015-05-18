@@ -41,14 +41,6 @@
 
 class ZEDEntityTag : public ZEDTag
 {
-	protected:
-
-		virtual bool InitializeSelf();
-		virtual bool DeinitializeSelf();
-
-		ZEDEntityTag();
-		virtual ~ZEDEntityTag();
-
 	public:
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
@@ -57,12 +49,9 @@ class ZEDEntityTag : public ZEDTag
 		virtual void SetRotation(const ZEQuaternion& NewRotation);
 		virtual void SetScale(const ZEVector3& NewScale);
 
-		virtual void Destroy();
-
 		virtual bool Save(ZEMLWriterNode* Serializer);
 		virtual bool Restore(ZEMLReaderNode* Unserializer);
 
-		virtual void Tick(float Time);
 		virtual void Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEDEntityTag* CreateInstance();

@@ -109,6 +109,9 @@ bool ZEDTag::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
+	if (Object == NULL)
+		return false;
+
 	if (TagMaterial == NULL)
 		TagMaterial = ZESimpleMaterial::CreateInstance();
 
@@ -125,6 +128,9 @@ bool ZEDTag::InitializeSelf()
 
 bool ZEDTag::DeinitializeSelf()
 {
+	if (Object == NULL)
+		return false;
+
 	TagCanvas.Clean();
 	TagRenderCommand.SetZero();
 
