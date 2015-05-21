@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainPrimitiveBuffer.h
+ Zinek Engine - ZETRLayer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,77 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_PRIMITIVE_BUFFER_H__
-#define __ZE_TERRAIN_PRIMITIVE_BUFFER_H__
 
-#include "ZETypes.h"
-#include "ZEMath/ZEVector.h"
+#include "ZETRBlockCache.h"
 
-enum ZETerrainPrimitiveType
-{
-	ZE_TPT_CENTER,
-	ZE_TPT_VERTICAL,
-	ZE_TPT_HORIZONTAL,
-	ZE_TPT_CORNER,
-	ZE_TPT_CORNER_FLIP,
-	ZE_TPT_CORNER_HORIZONTAL,
-	ZE_TPT_CORNER_HORIZONTAL_FLIP,
-	ZE_TPT_CORNER_VERTICAL,
-	ZE_TPT_CORNER_VERTICAL_FLIP
-};
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEVector.h"
 
-struct ZETerrainVertex
-{
-	ZEVector3 Position;
-};
+class ZETerrain;
+class ZETRLevel;
 
-struct ZETerrainPrimitive
-{
-	ZESize							VertexOffset;
-	ZESize							VertexCount;
-};
-
-struct ZETerrainPrimitiveRange
-{
-	ZESize							NegativeExtent2Offset;
-	ZESize							NegativeExtent1Offset;
-	ZESize							CoreOffset;
-	ZESize							CoreEndOffset;
-	ZESize							PositiveExtent1EndOffset;
-	ZESize							PositiveExtent2EndOffset;
-};
-
-class ZEVertexBuffer;
-class ZEStaticVertexBuffer;
-class ZEVertexDeclaration;
-
-class ZETerrainPrimitiveBuffer
+class ZETRLayer
 {
 	private:
-		bool						Initialized;
-
-		ZEStaticVertexBuffer*		VertexBuffer;
-		ZEVertexDeclaration*		VertexDeclaration;
-
-		ZEUInt						PrimitiveSize;
-		ZETerrainPrimitiveRange		PrimitiveRange[9];
-
-		bool						CreateVertexBuffer();
-		bool						CreateVertexDeclaration();
+		ZETerrain*						Terrain;
+		ZETRBlockCache					Cache;
+		ZEArray<ZETRLevel*>				Levels;
+		ZEVector3						ViewPosition;
+		ZEInt							MinLevel;
+		ZEInt							MaxLevel;
 
 	public:
-		void						SetPrimitiveSize(ZEUInt Size);
-		ZEUInt						GetPrimitiveSize();
+		ZETRBlockCache*					GetBlockCache();
+		const ZEArray<ZETRLevel*>&		GetLevels();
 
-		ZEVertexBuffer*				GetVertexBuffer();
-		ZEVertexDeclaration*		GetVertexDeclaration();
-		ZETerrainPrimitive			GetPrimitive(ZETerrainPrimitiveType Type, ZEInt Negative, ZEInt Positive);
+		ZETerrain*						GetTerrain();
 
-		bool						Initialize();
-		void						Deinitialize();
+		void							SetViewPosition(const ZEVector3& Position);
+		const ZEVector3&				GetViewPosition();
 
-									ZETerrainPrimitiveBuffer();
-									~ZETerrainPrimitiveBuffer();
+		ZEInt							GetMinLevel();
+		ZEInt							GetMaxLevel();
+
+		void							Process();
+
+										ZETRLayer();
+										~ZETRLayer();
 };
-
-#endif

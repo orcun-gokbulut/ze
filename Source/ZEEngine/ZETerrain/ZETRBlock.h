@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainLevel.h
+ Zinek Engine - ZETRBlock.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,65 +34,68 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_LEVEL_H__
-#define __ZE_TERRAIN_LEVEL_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZETerrainBlock.h"
-#include "ZETerrainBlockCache.h"
+#include "ZEDS\ZEString.h"
 
-class ZETexture2D;
-class ZETerrainLayer;
+class ZEFile;
 
-class ZETerrainLevel
+enum ZETRPixelType
 {
-	friend class ZETerrainLayer;
-	private:
-		ZETerrainLayer*					Owner;
-		ZEUInt							Level;
-
-		ZETexture2D*					Texture;
-		ZEMatrix4x4						TexcoordMatrix;
-		
-		float							MinHeight;
-		float							MaxHeight;
-
-		ZEUInt64						PositionX;
-		ZEUInt64						PositionY;
-
-		ZEArray<ZETerrainBlock>			Blocks;
-		ZEInt							LevelScale;
-
-		bool							Initialized;
-
-		ZESize							ConvertToTextureCoords(ZEInt64 Value, ZEUInt Level);
-		ZESize							ConvertToBlockCoords(ZEInt64 Value);
-		ZESize							ConvertToBlockIndex(ZEInt64 PositionX, ZEInt64 PositionY);
-
-		void							CopyBlockToTexture(ZETerrainBlock* Block);
-
-		void							UpdateBlock(ZEInt64 PositionX, ZEUInt64 PositionY);	
-		void							UpdateLoadingBlocks();
-
-	public:
-		ZETerrainLayer*					GetOwner();
-
-		ZETexture2D*					GetTexture();
-		const ZEMatrix4x4&				GetTexcoordMatrix();
-
-		float							GetMinHeight();
-		float							GetMaxHeight();
-
-		bool							Initialize();
-		void							Deinitialize();
-
-		void							Stream(ZEInt64 PositionX, ZEUInt64 PositionY);
-
-										ZETerrainLevel();
-										~ZETerrainLevel();
+	ZETR_PT_NONE		= 0,
+	ZETR_PT_ELEVATION	= 1,
+	ZETR_PT_COLOR		= 2,
+	ZETR_PT_GRAYSCALE	= 3
 };
 
+enum ZETRBlockStatus
+{
+	ZETR_BRS_NONE,
+	ZETR_BRS_AVAILABLE,
+	ZETR_BRS_LOADING,
+	ZETR_BRS_NOT_AVAILABLE,
+};
 
-#endif
+class ZETRBlock
+{
+	private:
+		ZETRBlockStatus			Status;
+		ZEUInt64				BlockSquence;
+
+		ZEInt64					PositionX;
+		ZEInt64					PositionY;
+		ZEInt					Level;
+		ZESize					Size;
+
+		void*					Data;
+		ZESize					DataSize;
+		ZETRPixelType			PixelType;
+
+		void					Clean();
+
+	public:
+		ZETRBlockStatus			GetStatus();
+		ZEUInt64				GetBlockSequence();
+
+		ZEInt64					GetPositionX();
+		ZEInt64					GetPositionY();
+		ZEInt64					GetEndX();
+		ZEInt64					GetEndY();
+
+		ZEInt					GetLevel();
+		ZESize					GetSize();
+		ZETRPixelType			GetPixelType();
+		ZESize					GetPixelSize();
+
+		void*					GetData();
+		ZESize					GetPitch();
+		ZESize					GetDataSize();
+
+		bool					Load(const ZEString& FileName);
+		bool					Load(ZEFile* File);
+
+								ZETRBlock();
+								~ZETRBlock();
+
+		static ZETRBlock*		Create(ZEUInt64 BlockSequence, ZEInt64 PositionX, ZEInt64 PositionY, ZEInt Level);
+};

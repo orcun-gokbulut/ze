@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainDrawer.h
+ Zinek Engine - ZETRPrimitives.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,58 +34,73 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_DRAWER_H__
-#define __ZE_TERRAIN_DRAWER_H__
 
 #include "ZETypes.h"
-#include "ZETerrainPrimitiveBuffer.h"
+#include "ZEMath/ZEVector.h"
 
-class ZETerrain2;
-class ZEMaterial;
-struct ZEDrawParameters;
+enum ZETRPrimitiveType
+{
+	ZETR_PT_CENTER,
+	ZETR_PT_VERTICAL,
+	ZETR_PT_HORIZONTAL,
+	ZETR_PT_CORNER,
+	ZETR_PT_CORNER_FLIP,
+	ZETR_PT_CORNER_HORIZONTAL,
+	ZETR_PT_CORNER_HORIZONTAL_FLIP,
+	ZETR_PT_CORNER_VERTICAL,
+	ZETR_PT_CORNER_VERTICAL_FLIP
+};
 
-class ZETerrainDrawer
+struct ZETRVertex
+{
+	ZEVector3 Position;
+};
+
+struct ZETRPrimitive
+{
+	ZESize							VertexOffset;
+	ZESize							VertexCount;
+};
+
+struct ZETRPrimitiveRange
+{
+	ZESize							NegativeExtent2Offset;
+	ZESize							NegativeExtent1Offset;
+	ZESize							CoreOffset;
+	ZESize							CoreEndOffset;
+	ZESize							PositiveExtent1EndOffset;
+	ZESize							PositiveExtent2EndOffset;
+};
+
+class ZEVertexBuffer;
+class ZEStaticVertexBuffer;
+class ZEVertexDeclaration;
+
+class ZETRPrimitiveBuffer
 {
 	private:
-		ZETerrain2*					Terrain;
-		ZEUInt						MinLevel;
-		ZEUInt						MaxLevel;
-		float						MaxViewDistance;
-		ZETerrainPrimitiveBuffer	VertexBuffer;
 		bool						Initialized;
-		ZEMaterial*					Material;
 
-		void						DrawPrimitive(ZEDrawParameters* DrawParameters,
-										float WorldPositionX, float WorldPositionY,
-										ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETerrainPrimitiveType Type, 
-										ZEInt NegativeExtent, ZEInt PositiveExtent, 
-										float MinHeight, float MaxHeight);
+		ZEStaticVertexBuffer*		VertexBuffer;
+		ZEVertexDeclaration*		VertexDeclaration;
+
+		ZEUInt						PrimitiveSize;
+		ZETRPrimitiveRange			PrimitiveRange[9];
+
+		bool						CreateVertexBuffer();
+		bool						CreateVertexDeclaration();
+
 	public:
-		void						SetTerrain(ZETerrain2* Terrain);
-		ZETerrain2*					GetTerrain();
-
-		void						SetPrimitiveSize(ZEUInt PrimtiveSize);
+		void						SetPrimitiveSize(ZEUInt Size);
 		ZEUInt						GetPrimitiveSize();
 
-		void						SetMinLevel(ZEUInt MinLevel);
-		ZEUInt						GetMinLevel();
-
-		void						SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt						GetMaxLevel();
-
-		void						SetMaxViewDistance(float MaxViewDistance);
-		float						GetMaxViewDistance();
-
-		void						SetMaterial(ZEMaterial* Material);
-		ZEMaterial*					GetMaterial();
+		ZEVertexBuffer*				GetVertexBuffer();
+		ZEVertexDeclaration*		GetVertexDeclaration();
+		ZETRPrimitive				GetPrimitive(ZETRPrimitiveType Type, ZEInt Negative, ZEInt Positive);
 
 		bool						Initialize();
 		void						Deinitialize();
 
-		void						Draw(ZEDrawParameters* DrawParameters);
-
-									ZETerrainDrawer();
-									~ZETerrainDrawer();
+									ZETRPrimitiveBuffer();
+									~ZETRPrimitiveBuffer();
 };
-
-#endif

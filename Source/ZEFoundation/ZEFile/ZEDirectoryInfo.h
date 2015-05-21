@@ -45,6 +45,7 @@ class ZEDirectoryInfo : public ZEPathInfo
 		ZEArray<ZEString>		GetSubDirectories();
 		ZEArray<ZEString>		GetFiles();
 
+		bool					Create();
 		bool					Rename(const char* Name);
 		bool					Move(const char* Destination);
 		bool					Copy(const char* Destination);

@@ -161,7 +161,7 @@ class ZEDelegate<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 		{
 			ZEDelegate Delegate;
 			Delegate.Object = Object;
-			Delegate.Wrapper =&ZEDelegate::WrapperImpMember<TClass, TMethod>;
+			Delegate.Wrapper = &ZEDelegate::WrapperImpMember<TClass, TMethod>;
 			return Delegate;
 		}
 

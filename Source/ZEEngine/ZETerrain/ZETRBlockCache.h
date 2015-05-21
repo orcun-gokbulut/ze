@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.h
+ Zinek Engine - ZETRBlockCache.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,47 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_H__
-#define __ZE_TERRAIN_H__
+
+#include "ZETRBlock.h"
 
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEThread\ZELock.h"
+#include "ZEThread\ZESignal.h"
+#include "ZEThread\ZEThread.h"
+#include "ZEInitializable.h"
 
-#include "ZETerrainDrawer.h"
-
-class ZETerrainLayer;
-
-class ZETerrain2 : public ZEEntity
+struct ZETRBlockPosition
 {
-	private:
-		ZEArray<ZETerrainLayer*>				Layers;
-		ZETerrainDrawer							Drawer;
+	ZEInt64 PositionX;
+	ZEInt64 PositionY;
+	ZEInt Level;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
-
-												ZETerrain2();
-												~ZETerrain2();
-
-	public:	
-		virtual ZEDrawFlags						GetDrawFlags() const;
-
-		ZETerrainDrawer&						GetDrawer();
-
-		const ZEArray<ZETerrainLayer*>&			GetLayers();
-		void									AddLayer(ZETerrainLayer* Layer);
-		void									RemoveLayer(ZETerrainLayer* Layer);
-
-		void									SetPrimitiveSize(ZEUInt Size);
-		ZEUInt									GetPrimitiveSize();
-
-		void									SetMaxLevel(ZEUInt MaxLevel);
-		ZEUInt									GetMaxLevel();
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-	
-		static ZETerrain2*						CreateInstance();
-
+	ZEInt64 DistanceSquare(const ZETRBlockPosition& OtherBlock);
 };
 
-#endif
+class ZETRBlockCache : public ZEInitializable
+{
+	private:
+		ZEArray<ZETRBlock*>			Blocks;
+		ZESignal					CrawlerSignal;
+		ZEThread					CrawlerThread;
+		ZEUInt64					LastBlockSquence;
+
+		ZETRBlockPosition			PointOfInterest;
+
+		void						LoadBlock(ZETRBlock* Block);
+		void						Crawler(ZEThread* Thread, void* ExtraParameters);
+
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
+
+	public:
+		void						SetPointOfInterest(const ZETRBlockPosition& PointOfInterest);
+		const ZETRBlockPosition&	GetPointOfInterest();
+
+		ZETRBlock*					RequestBlock(const ZETRBlockPosition& BlockRequest);
+		void						Clean();
+};
