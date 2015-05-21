@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrain.cpp
+ Zinek Engine - ZETRLevel.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,107 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETerrain.h"
-#include "ZETerrainLayer.h"
+#include "ZETRLevel.h"
+#include "ZEGraphics\ZETexture2D.h"
 
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-
-bool ZETerrain2::InitializeSelf()
+ZETRLayer* ZETRLevel::GetLayer()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	return Layer;
+}
 
-	Drawer.SetTerrain(this);
-	if (!Drawer.Initialize())
+const ZEMatrix3x3& ZETRLevel::GetTextureTransform()
+{
+	return TextureTransform;
+}
+
+ZETexture2D* ZETRLevel::GetTexture()
+{
+	return Texture;
+}
+
+void ZETRLevel::Process()
+{
+
+}
+
+ZETRLevel::ZETRLevel()
+{
+	Layer = NULL;
+	Texture = NULL;
+}
+
+ZETRLevel::~ZETRLevel()
+{
+	if (Texture != NULL)
 	{
-		zeError("Can not initialize.");
-		return false;
+		Texture->Release();
+		Texture = NULL;
 	}
 
-	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
-	Material->SetMaterialColor(ZEVector4::One);
-	Material->SetVertexColor(false);
-	Material->SetWireframe(true);
-	Drawer.SetMaterial(Material);
-
-	return true;
-}
-
-bool ZETerrain2::DeinitializeSelf()
-{
-	Drawer.Deinitialize();
-	return false;
-}
-
-ZETerrain2::ZETerrain2()
-{
-
-}
-
-ZETerrain2::~ZETerrain2()
-{
-	Deinitialize();
-	for (ZESize I = 0; I < Layers.GetCount(); I++)
-		delete Layers[I];
-}
-
-ZEDrawFlags ZETerrain2::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
-
-ZETerrainDrawer& ZETerrain2::GetDrawer()
-{
-	return Drawer;
-}
-
-const ZEArray<ZETerrainLayer*>&	ZETerrain2::GetLayers()
-{
-	return Layers;
-}
-
-void ZETerrain2::AddLayer(ZETerrainLayer* Layer)
-{
-	if (Layers.Exists(Layer))
-		return;
-
-	Layers.Add(Layer);
-
-	if (GetState() == ZE_ES_INITIALIZED)
-		Layer->Initialize();	
-}
-
-void ZETerrain2::RemoveLayer(ZETerrainLayer* Layer)
-{
-	if (!Layers.Exists(Layer))
-		return;
-
-	if (GetState() == ZE_ES_INITIALIZED)
-		Layer->Deinitialize();
-
-	Layers.RemoveValue(Layer);
-}
-
-void ZETerrain2::SetPrimitiveSize(ZEUInt Size)
-{
-	Drawer.SetPrimitiveSize(Size);
-}
-
-ZEUInt ZETerrain2::GetPrimitiveSize()
-{
-	return Drawer.GetPrimitiveSize();
-}
-
-void ZETerrain2::Draw(ZEDrawParameters* DrawParameters)
-{
-	for (ZESize I = 0; I < Layers.GetCount(); I++)
-		Layers[I]->Stream(DrawParameters->View->Position.x, DrawParameters->View->Position.y, 0, 6);
-
-	Drawer.Draw(DrawParameters);
-}
-
-ZETerrain2* ZETerrain2::CreateInstance()
-{
-	return new ZETerrain2();
 }

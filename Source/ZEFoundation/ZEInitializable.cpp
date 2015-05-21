@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainLayer.cpp
+ Zinek Engine - ZEInitializable.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,135 +33,52 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETerrain.h"
-#include "ZETerrainLayer.h"
-#include "ZETerrainLevel.h"
-#include "ZETerrainResource.h"
+#include "ZEInitializable.h"
 
-ZETerrain2* ZETerrainLayer::GetOwner()
+bool ZEInitializable::InitializeSelf()
 {
-	return Owner;
+	return true;
 }
 
-const ZEArray<ZETerrainLevel>& ZETerrainLayer::GetLevels()
+void ZEInitializable::DeinitializeSelf()
 {
-	return Levels;
+
 }
 
-void ZETerrainLayer::SetResource(ZETerrainResource* Resource)
+bool ZEInitializable::IsInitialized()
 {
-	if (this->Resource != Resource)
-		return;
-
-	this->Resource = Resource;
-
-	if (Initialized)
-	{
-		Deinitialize();
-		Initialize();
-	}
+	return Initialized;
 }
 
-ZETerrainResource* ZETerrainLayer::GetResource()
-{
-	return Resource;
-}
-
-void ZETerrainLayer::SetLevelCount(ZEUInt LevelCount)
-{
-	if (this->LevelCount == LevelCount)
-		return;
-
-	this->LevelCount = LevelCount;
-
-	if (Initialized)
-	{
-		Deinitialize();
-		Initialize();
-	}
-}
-
-ZEUInt ZETerrainLayer::GetLevelCount()
-{
-	return LevelCount;
-}
-
-void ZETerrainLayer::SetPrimitiveScale(float Scale)
-{
-	if (PrimitiveScale == Scale)
-		return;
-
-	PrimitiveScale = Scale;
-
-	if (Initialized)
-	{
-		Deinitialize();
-		Initialize();
-	}
-}
-
-float ZETerrainLayer::GetPrimitiveScale()
-{
-	return PrimitiveScale;
-}
-
-bool ZETerrainLayer::Initialize()
+bool ZEInitializable::Initialize()
 {
 	if (Initialized)
 		return true;
 
-	if (Resource != NULL)
-	{
-		Levels.SetCount(LevelCount);
-		for (ZESize I = 0; I < LevelCount; I++)
-			Levels[I].Initialize();
-
-		BlockCache.SetResource(Resource);
-		BlockCache.Initialize();
-
-		LevelBlockSize = Resource->GetInfo().BlockSize;
-		LevelAreaSize = (Owner->GetPrimitiveSize() * 4 + 2) * (1 << LevelOffset);
-		LevelBlockCount = ((Owner->GetPrimitiveSize() * 6) * (1 << LevelOffset)) / LevelBlockSize + 1;
-		if (LevelBlockCount < 2)
-			LevelBlockCount = 2;
-		LevelTextureSize = LevelBlockCount * LevelBlockSize;
-	}
+	if (!InitializeSelf())
+		return false;
 
 	Initialized = true;
+
 	return true;
 }
 
-void ZETerrainLayer::Deinitialize()
+void ZEInitializable::Deinitialize()
 {
 	if (!Initialized)
 		return;
 
-	Levels.Clear();
-	BlockCache.Deinitialize();
+	DeinitializeSelf();
 
 	Initialized = false;
 }
 
-void ZETerrainLayer::Stream(ZEInt64 PositionX, ZEInt64 PositionY, ZEUInt MinLevel, ZEUInt MaxLevel)
-{
-	if (!Initialized || Resource == NULL)
-		return;
-
-	MaxLevel = MaxLevel > (ZEUInt)Levels.GetCount() - 1 ? (ZEUInt)Levels.GetCount() : MaxLevel;
-	for(ZEUInt I = MinLevel; I < MaxLevel; I++)
-		Levels[I].Stream(PositionX, PositionY);
-}
-
-ZETerrainLayer::ZETerrainLayer()
+ZEInitializable::ZEInitializable()
 {
 	Initialized = false;
-	Owner = NULL;
-	Resource = NULL;
-	PrimitiveScale = 1.0f;
-	LevelCount = 10;
 }
 
-ZETerrainLayer::~ZETerrainLayer()
+ZEInitializable::~ZEInitializable()
 {
 	Deinitialize();
 }

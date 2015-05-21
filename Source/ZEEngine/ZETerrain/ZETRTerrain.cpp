@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZETRTerrain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,91 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETRTerrain.h"
+#include "ZETRLayer.h"
+
+#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZESimpleMaterial.h"
+
+bool ZETRTerrain::InitializeSelf()
+{
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
+	Drawer.SetTerrain(this);
+	if (!Drawer.Initialize())
+	{
+		zeError("Can not initialize.");
+		return false;
+	}
+
+	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
+	Material->SetMaterialColor(ZEVector4::One);
+	Material->SetVertexColor(false);
+	Material->SetWireframe(true);
+	Drawer.SetMaterial(Material);
+
+	return true;
+}
+
+bool ZETRTerrain::DeinitializeSelf()
+{
+	Drawer.Deinitialize();
+	return false;
+}
+
+ZETRTerrain::ZETRTerrain()
+{
+
+}
+
+ZETRTerrain::~ZETRTerrain()
+{
+	Deinitialize();
+	for (ZESize I = 0; I < Layers.GetCount(); I++)
+		delete Layers[I];
+}
+
+ZEDrawFlags ZETRTerrain::GetDrawFlags() const
+{
+	return ZE_DF_DRAW;
+}
+
+ZETRDrawer& ZETRTerrain::GetDrawer()
+{
+	return Drawer;
+}
+
+const ZEArray<ZETRLayer*>&	ZETRTerrain::GetLayers()
+{
+	return Layers;
+}
+
+void ZETRTerrain::AddLayer(ZETRLayer* Layer)
+{
+}
+
+void ZETRTerrain::RemoveLayer(ZETRLayer* Layer)
+{
+}
+
+void ZETRTerrain::SetPrimitiveSize(ZEUInt Size)
+{
+	Drawer.SetPrimitiveSize(Size);
+}
+
+ZEUInt ZETRTerrain::GetPrimitiveSize()
+{
+	return Drawer.GetPrimitiveSize();
+}
+
+void ZETRTerrain::Draw(ZEDrawParameters* DrawParameters)
+{
+
+	Drawer.Draw(DrawParameters);
+}
+
+ZETRTerrain* ZETRTerrain::CreateInstance()
+{
+	return new ZETRTerrain();
+}

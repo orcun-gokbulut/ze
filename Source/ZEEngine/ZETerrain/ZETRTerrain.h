@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainElevation.h
+ Zinek Engine - ZETRTerrain.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,25 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
 
-class ZERay;
-class ZETerrainDatabase
+#include "ZETRDrawer.h"
+
+#include "ZETypes.h"
+#include "ZEGame/ZEEntity.h"
+
+class ZETRLayer;
+
+class ZETRTerrain : public ZEEntity
 {
 	private:
-		ZESTri
-		ZEArray<float>		ElevationData;
+		ZEArray<ZETRLayer*>				Layers;
+		ZETRDrawer						Drawer;
 
-	public:
-		void				SetPosition(const ZEVector3& Position);
-		const ZEVector3&	GetPosition();
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
-		void				SetScale(const ZEVector3& SetScale);
-		const ZEVector3&	GetScale();
+										ZETRTerrain();
+										~ZETRTerrain();
 
-		bool				DoHAT(float& Result);
-		bool				DoHOT(float& Result);
-		bool				CastRay(const ZERay& Ray, float& ResulT);
+	public:	
+		virtual ZEDrawFlags				GetDrawFlags() const;
+		ZETRDrawer&						GetDrawer();
 
-		void				SetFileName(const char* FileName);
-		const char*			GetFileName();
+		const ZEArray<ZETRLayer*>&		GetLayers();
+		void							AddLayer(ZETRLayer* Layer);
+		void							RemoveLayer(ZETRLayer* Layer);
+
+		void							SetPrimitiveSize(ZEUInt Size);
+		ZEUInt							GetPrimitiveSize();
+
+		void							SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt							GetMaxLevel();
+
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+	
+		static ZETRTerrain*				CreateInstance();
 };

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETextureSampler.cpp
+ Zinek Engine - ZETRDrawer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-// Template Programming
-/*void ZETextureSampler::SetData(void* Data)
-{
-	this->Data = Data;
-}
+#pragma once
 
-void ;ZETextureSampler::GetData()
-{
-	return Data;
-}
+#include "ZETRPrimitives.h"
 
-void ZETextureSampler::SetWidth(ZESize Width)
-{
-	this->Width = Width;
-}
+#include "ZETypes.h"
 
-void ZETextureSampler::GetWidth()
-{
-	return Width;
-}
+class ZETRTerrain;
+class ZEMaterial;
+struct ZEDrawParameters;
 
-void ZETextureSampler::SetHeight(ZESize Height)
+class ZETRDrawer
 {
-	this->Height = Height;
-}
+	private:
+		ZETRTerrain*			Terrain;
+		ZEUInt					MinLevel;
+		ZEUInt					MaxLevel;
+		float					MaxViewDistance;
+		ZETRPrimitiveBuffer		VertexBuffer;
+		bool					Initialized;
+		ZEMaterial*				Material;
 
-void ZETextureSampler::GetHeight()
-{
-	return Height;
-}
+		void					DrawPrimitive(ZEDrawParameters* DrawParameters,
+									float WorldPositionX, float WorldPositionY,
+									ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETRPrimitiveType Type, 
+									ZEInt NegativeExtent, ZEInt PositiveExtent, 
+									float MinHeight, float MaxHeight);
+	public:
+		void					SetTerrain(ZETRTerrain* Terrain);
+		ZETRTerrain*			GetTerrain();
 
-void ZETextureSampler::SetMipmapCount(ZEUInt MipmapCount)
-{
-	this->MipmapCount = MipmapCount;
-}
+		void					SetPrimitiveSize(ZEUInt PrimtiveSize);
+		ZEUInt					GetPrimitiveSize();
 
-ZEUInt ZETextureSampler::GetMipmapCount()
-{
-	return MipmapCount;
-}
+		void					SetMinLevel(ZEUInt MinLevel);
+		ZEUInt					GetMinLevel();
 
-void ZETextureSampler::SetPixelSize(ZESize PixelSize)
-{
-	this->PixelSize = PixelSize;
-}
+		void					SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt					GetMaxLevel();
 
-void ZETextureSampler::GetPixelSize()
-{
-	return PixelSize;
-}
+		void					SetMaxViewDistance(float MaxViewDistance);
+		float					GetMaxViewDistance();
 
-void ZETextureSampler::SetVerticalAddresingMode(ZETextureSamplerAddresingMode AddresingMode)
-{
-	this->VerticalAddressingMode = AddresingMode;
-}
+		void					SetMaterial(ZEMaterial* Material);
+		ZEMaterial*				GetMaterial();
 
-void ZETextureSampler::SetHorizontalAddresingMode(ZETextureSamplerAddresingMode AddresingMode)
-{
-	this->HorizontalAddressingMode = AddresingMode;
-}
+		bool					Initialize();
+		void					Deinitialize();
 
-void ZETextureSampler::SetFilteringMode(ZETextureSampleFilteringMode FilteringMode)
-{
-	this->FilteringMode = FilteringMode
-}*/
+		void					Draw(ZEDrawParameters* DrawParameters);
+
+								ZETRDrawer();
+								~ZETRDrawer();
+};

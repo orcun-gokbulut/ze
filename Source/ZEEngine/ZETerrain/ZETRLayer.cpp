@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainLayer.h
+ Zinek Engine - ZETRLayer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,63 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_LAYER_H__
-#define __ZE_TERRAIN_LAYER_H__
+#include "ZETRLayer.h"
+#include "ZETRLevel.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZETerrainLevel.h"
-#include "ZETerrainBlockCache.h"
-
-class ZETerrain2;
-class ZETerrainResource;
-
-class ZETerrainLayer
+ZETRBlockCache* ZETRLayer::GetBlockCache()
 {
-	friend class ZETerrain2;
-	friend class ZETerrainLevel;
-	private:
-		ZETerrain2*						Owner;
-		ZETerrainResource*				Resource;
-		ZEArray<ZETerrainLevel>			Levels;	
-		bool							Initialized;
+	return &Cache;
+}
 
-		ZETerrainBlockCache				BlockCache;
-		float							PrimitiveScale;
+const ZEArray<ZETRLevel*>& ZETRLayer::GetLevels()
+{
+	return Levels;
+}
 
-		ZEUInt							LevelOffset;
-		ZEUInt							LevelCount;
+ZETerrain* ZETRLayer::GetTerrain()
+{
+	return Terrain;
+}
 
-		ZESize							LevelBlockCount;
-		ZESize							LevelBlockSize; 
-		ZESize							LevelTextureSize;
-		
-		ZESize							LevelAreaSize;
-		ZESize							LevelAreaBlockCount;
+void ZETRLayer::SetViewPosition(const ZEVector3& Position)
+{
+	ViewPosition = Position;
+}
 
+const ZEVector3& ZETRLayer::GetViewPosition()
+{
+	return ViewPosition;
+}
 
-	public:
-		ZETerrain2*						GetOwner();
+ZEInt ZETRLayer::GetMinLevel()
+{
+	return MinLevel;
+}
 
-		const ZEArray<ZETerrainLevel>&	GetLevels();
+ZEInt ZETRLayer::GetMaxLevel()
+{
+	return MaxLevel;
+}
 
-		void							SetResource(ZETerrainResource* Resource);
-		ZETerrainResource*				GetResource();
+void ZETRLayer::Process()
+{
+	for (ZEInt I = 0; I < Levels.GetCount(); I++)
+		Levels[I]->Process();
+}
 
-		void							SetPrimitiveScale(float Scale);
-		float							GetPrimitiveScale();
+ZETRLayer::ZETRLayer()
+{
+	Terrain = NULL;
+	MinLevel = 0;
+	MaxLevel = 0;
+}
 
-		void							SetLevelCount(ZEUInt LevelCount);
-		ZEUInt							GetLevelCount();
-
-		bool							Initialize();
-		void							Deinitialize();
-
-		void							Stream(ZEInt64 PositionX, ZEInt64 PositionY, ZEUInt MinLevel, ZEUInt MaxLevel);
-
-										ZETerrainLayer();
-										~ZETerrainLayer();
-};
-
-#endif
+ZETRLayer::~ZETRLayer()
+{
+	for (ZESize I = 0; I < Levels.GetCount(); I++)
+		delete Levels[I];
+}

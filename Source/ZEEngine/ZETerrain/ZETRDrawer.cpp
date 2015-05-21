@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainDrawer.cpp
+ Zinek Engine - ZETRDrawer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETerrainDrawer.h"
-#include "ZETerrain.h"
+#include "ZETRDrawer.h"
+#include "ZETRTerrain.h"
 
 #include "ZEGraphics/ZEMaterial.h"
 #include "ZEGraphics/ZECamera.h"
@@ -44,67 +44,67 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
 
-void ZETerrainDrawer::SetTerrain(ZETerrain2* Terrain)
+void ZETRDrawer::SetTerrain(ZETRTerrain* Terrain)
 {
 	this->Terrain = Terrain;
 }
 
-ZETerrain2* ZETerrainDrawer::GetTerrain()
+ZETRTerrain* ZETRDrawer::GetTerrain()
 {
 	return Terrain;
 }
 
-void ZETerrainDrawer::SetPrimitiveSize(ZEUInt PrimtiveSize)
+void ZETRDrawer::SetPrimitiveSize(ZEUInt PrimtiveSize)
 {
 	VertexBuffer.SetPrimitiveSize(PrimtiveSize);
 }
 
-ZEUInt ZETerrainDrawer::GetPrimitiveSize()
+ZEUInt ZETRDrawer::GetPrimitiveSize()
 {
 	return VertexBuffer.GetPrimitiveSize();
 }
 
-void ZETerrainDrawer::SetMinLevel(ZEUInt MinLevel)
+void ZETRDrawer::SetMinLevel(ZEUInt MinLevel)
 {
 	this->MinLevel = MinLevel;
 }
 
-ZEUInt ZETerrainDrawer::GetMinLevel()
+ZEUInt ZETRDrawer::GetMinLevel()
 {
 	return MinLevel;
 }
 
-void ZETerrainDrawer::SetMaxLevel(ZEUInt MaxLevel)
+void ZETRDrawer::SetMaxLevel(ZEUInt MaxLevel)
 {
 	this->MaxLevel = MaxLevel;
 }
 
-ZEUInt ZETerrainDrawer::GetMaxLevel()
+ZEUInt ZETRDrawer::GetMaxLevel()
 {
 	return MaxLevel;
 }
 
-void ZETerrainDrawer::SetMaxViewDistance(float MaxViewDistance)
+void ZETRDrawer::SetMaxViewDistance(float MaxViewDistance)
 {
 	this->MaxViewDistance = MaxViewDistance;
 }
 
-float ZETerrainDrawer::GetMaxViewDistance()
+float ZETRDrawer::GetMaxViewDistance()
 {
 	return MaxViewDistance;
 }
 
-void ZETerrainDrawer::SetMaterial(ZEMaterial* Material)
+void ZETRDrawer::SetMaterial(ZEMaterial* Material)
 {
 	this->Material = Material;
 }
 
-ZEMaterial* ZETerrainDrawer::GetMaterial()
+ZEMaterial* ZETRDrawer::GetMaterial()
 {
 	return Material;
 }
 
-bool ZETerrainDrawer::Initialize()
+bool ZETRDrawer::Initialize()
 {
 	if (Initialized)
 		return true;
@@ -120,7 +120,7 @@ bool ZETerrainDrawer::Initialize()
 	return true;
 }
 
-void ZETerrainDrawer::Deinitialize()
+void ZETRDrawer::Deinitialize()
 {
 	if (!Initialized)
 		return;
@@ -129,7 +129,7 @@ void ZETerrainDrawer::Deinitialize()
 
 }
 
-void ZETerrainDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float WorldPositionX, float WorldPositionY, ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETerrainPrimitiveType Type, ZEInt NegativeExtent, ZEInt PositiveExtent, float MinHeight, float MaxHeigt)
+void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float WorldPositionX, float WorldPositionY, ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETRPrimitiveType Type, ZEInt NegativeExtent, ZEInt PositiveExtent, float MinHeight, float MaxHeigt)
 {
 	ZEUInt Scale = 1 << Level;
 	ZEAABBox BoundingBox;
@@ -142,7 +142,7 @@ void ZETerrainDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float Worl
 	float PositionX = LocalPositionX * (float)VertexBuffer.GetPrimitiveSize() * Scale;
 	float PositionY = LocalPositionY * (float)VertexBuffer.GetPrimitiveSize() * Scale;
 
-	ZETerrainPrimitive Primitive = VertexBuffer.GetPrimitive(Type, NegativeExtent, PositiveExtent);
+	ZETRPrimitive Primitive = VertexBuffer.GetPrimitive(Type, NegativeExtent, PositiveExtent);
 
 	ZERenderCommand RenderCommand;
 	RenderCommand.SetZero();
@@ -167,7 +167,7 @@ void ZETerrainDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float Worl
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 
-void ZETerrainDrawer::Draw(ZEDrawParameters* DrawParameters)
+void ZETRDrawer::Draw(ZEDrawParameters* DrawParameters)
 {
 	ZEInt PositionX = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().x);
 	ZEInt PositionY = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().z);
@@ -205,62 +205,62 @@ void ZETerrainDrawer::Draw(ZEDrawParameters* DrawParameters)
 			break;
 
 		if (Level == MinLevel)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, 0.0f, 0.0f, ZE_TPT_CENTER,	0, 0, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, 0.0f, 0.0f, ZETR_PT_CENTER,	0, 0, 0.0f, 10.0f);
 
-		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f,  1.5f, ZE_TPT_VERTICAL,	(ShrinkDirectionY > 0 ? -1 : 0), ExtentY,	0.0f, 10.0f);
-		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f, -1.5f, ZE_TPT_VERTICAL,	ExtentY, (ShrinkDirectionY < 0 ? -1 : 0),	0.0f, 10.0f);
-		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  0.0f, ZE_TPT_HORIZONTAL, ExtentX, (ShrinkDirectionX < 0 ? -1 : 0),	0.0f, 10.0f);
-		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  0.0f, ZE_TPT_HORIZONTAL, (ShrinkDirectionX > 0 ? -1 : 0), ExtentX,	0.0f, 10.0f);
+		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f,  1.5f, ZETR_PT_VERTICAL,	(ShrinkDirectionY > 0 ? -1 : 0), ExtentY,	0.0f, 10.0f);
+		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f, -1.5f, ZETR_PT_VERTICAL,	ExtentY, (ShrinkDirectionY < 0 ? -1 : 0),	0.0f, 10.0f);
+		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  0.0f, ZETR_PT_HORIZONTAL, ExtentX, (ShrinkDirectionX < 0 ? -1 : 0),	0.0f, 10.0f);
+		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  0.0f, ZETR_PT_HORIZONTAL, (ShrinkDirectionX > 0 ? -1 : 0), ExtentX,	0.0f, 10.0f);
 
 		// Top Left Corner
  		ZEInt Shrink = ((ShrinkDirectionX < 0) && (ShrinkDirectionY > 0) ? -1 : 0);
 		if (ExtentX && ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZE_TPT_CORNER_FLIP, Shrink, 1, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZETR_PT_CORNER_FLIP, Shrink, 1, 0.0f, 10.0f);
 		else if (ExtentX)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZE_TPT_CORNER_HORIZONTAL_FLIP, Shrink, 1, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZETR_PT_CORNER_HORIZONTAL_FLIP, Shrink, 1, 0.0f, 0.0f);
 		else if (ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZE_TPT_CORNER_VERTICAL_FLIP, Shrink, 1, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZETR_PT_CORNER_VERTICAL_FLIP, Shrink, 1, 0.0f, 10.0f);
 		else
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZE_TPT_CORNER_FLIP, Shrink, 0, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  1.5f, ZETR_PT_CORNER_FLIP, Shrink, 0, 0.0f, 0.0f);
 		
 
 		// Top Right Corner
 		Shrink = ((ShrinkDirectionX > 0) && (ShrinkDirectionY > 0) ? -1 : 0);
 		if (ExtentX && ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZE_TPT_CORNER, Shrink, 1, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZETR_PT_CORNER, Shrink, 1, 0.0f, 10.0f);
 		else if (ExtentX)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZE_TPT_CORNER_HORIZONTAL, Shrink, 1, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZETR_PT_CORNER_HORIZONTAL, Shrink, 1, 0.0f, 0.0f);
 		else if (ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZE_TPT_CORNER_VERTICAL, Shrink, 1, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZETR_PT_CORNER_VERTICAL, Shrink, 1, 0.0f, 10.0f);
 		else
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZE_TPT_CORNER, Shrink, 0, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  1.5f, ZETR_PT_CORNER, Shrink, 0, 0.0f, 0.0f);
 
 
 		// Bottom Right Corner
 		Shrink = ((ShrinkDirectionX > 0) && (ShrinkDirectionY < 0) ? -1 : 0);
 		if (ExtentX && ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZE_TPT_CORNER_FLIP, 1, Shrink, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZETR_PT_CORNER_FLIP, 1, Shrink, 0.0f, 10.0f);
 		else if (ExtentX)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZE_TPT_CORNER_HORIZONTAL_FLIP, 1, Shrink, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZETR_PT_CORNER_HORIZONTAL_FLIP, 1, Shrink, 0.0f, 0.0f);
 		else if (ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZE_TPT_CORNER_VERTICAL_FLIP, 1, Shrink, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZETR_PT_CORNER_VERTICAL_FLIP, 1, Shrink, 0.0f, 10.0f);
 		else
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZE_TPT_CORNER_FLIP, 0, Shrink, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f, -1.5f, ZETR_PT_CORNER_FLIP, 0, Shrink, 0.0f, 0.0f);
 
 		// Bottom Left Corner
 		Shrink = ((ShrinkDirectionX < 0) && (ShrinkDirectionY < 0) ? -1 : 0);
 		if (ExtentX && ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZE_TPT_CORNER, 1, Shrink, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZETR_PT_CORNER, 1, Shrink, 0.0f, 10.0f);
 		else if (ExtentX)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZE_TPT_CORNER_HORIZONTAL, 1, Shrink, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZETR_PT_CORNER_HORIZONTAL, 1, Shrink, 0.0f, 0.0f);
 		else if (ExtentY)
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZE_TPT_CORNER_VERTICAL, 1, Shrink, 0.0f, 10.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZETR_PT_CORNER_VERTICAL, 1, Shrink, 0.0f, 10.0f);
 		else
-			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZE_TPT_CORNER, 0, Shrink, 0.0f, 0.0f);
+			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f, -1.5f, ZETR_PT_CORNER, 0, Shrink, 0.0f, 0.0f);
 	}
 }
 
-ZETerrainDrawer::ZETerrainDrawer()
+ZETRDrawer::ZETRDrawer()
 {
 	MinLevel = 0;
 	MaxLevel = 15;
@@ -268,7 +268,7 @@ ZETerrainDrawer::ZETerrainDrawer()
 	Initialized = false;
 }
 
-ZETerrainDrawer::~ZETerrainDrawer()
+ZETRDrawer::~ZETRDrawer()
 {
 	Deinitialize();
 }

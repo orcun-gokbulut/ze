@@ -152,6 +152,17 @@ bool ZEDirectoryInfo::Delete()
 	return DeleteFile(GetRealPath().Path) != 0;
 }
 
+bool ZEDirectoryInfo::Create()
+{
+	if ((GetAccess() & ZE_PA_WRITE) == 0)
+		return false;
+
+	if (IsExists())
+		return true;
+
+	return CreateDirectoryA(GetPath(), NULL) != 0;
+}
+
 #endif
 
 ZEDirectoryInfo::ZEDirectoryInfo()

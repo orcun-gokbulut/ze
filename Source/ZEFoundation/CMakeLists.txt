@@ -95,7 +95,8 @@ ze_add_source(ZEBase64.h				Sources Headers)
 ze_add_source(ZEBase64.cpp				Sources)
 ze_add_source(ZEVersion.cpp				Sources)
 ze_add_source(ZEVersion.h				Sources Headers)
-
+ze_add_source(ZEInitializable.cpp		Sources)
+ze_add_source(ZEInitializable.h			Sources Headers)
 
 ze_add_library(TARGET ZEFoundation
 	COMBINE
