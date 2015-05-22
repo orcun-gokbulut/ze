@@ -38,30 +38,34 @@
 #define __ZED_TAG_H__
 
 #include "ZEMeta/ZEObject.h"
-#include "ZEGame/ZEEntity.h"
 #include "ZEUI/ZEUIFrameControl.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
 
 class ZECanvas;
 class ZERectangle3D;
+class ZEMLWriterNode;
+class ZEMLReaderNode;
 
-class ZEDTag : public ZEEntity
+class ZEDTag
 {
+	friend class ZEDSelection;
+
 	private:
 		ZEUIFrameControl Icon;
 		ZEVector4 Color;
 
-		bool Selected;
+		//bool Selected;
 		ZEObject* Object;
+		ZEDSelection* Selection;
 
 	protected:
 		ZEMaterial* TagMaterial;
 		ZECanvas TagCanvas;
 		ZERenderCommand TagRenderCommand;
 
-		void SetIcon(const ZEUIMaterial* Material);
-		const ZEUIMaterial* GetIcon();
+		void SetSelection(ZEDSelection* Selection);
+		ZEDSelection* GetSelection();
 
 		void DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, const ZEVector4& Color, ZECanvas& Canvas);
 		void DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, const ZEVector4& Color, ZECanvas& Canvas);
@@ -79,8 +83,8 @@ class ZEDTag : public ZEEntity
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
 
-		void SetSelected(bool Value);
-		bool GetSelected();
+		void SetIcon(const ZEUIMaterial* Material);
+		const ZEUIMaterial* GetIcon();
 
 		void SetDrawColor(const ZEVector4& Color);
 		const ZEVector4& GetDrawColor();

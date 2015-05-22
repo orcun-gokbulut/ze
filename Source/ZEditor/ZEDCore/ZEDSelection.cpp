@@ -70,6 +70,7 @@ void ZEDSelection::AddElement(const ZEObject* Object)
 	if (IsElementExists(Object))
 		return;
 
+	DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
 	//How to set Element.OffsetToPivot? Should it be sent to TransformationManager.
 }
 
@@ -86,6 +87,7 @@ void ZEDSelection::RemoveElement(const ZEObject* Object)
 		if (Elements[I].Object == Object)
 		{
 			Elements.Remove(I);
+			DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
 			return;
 		}
 	}
@@ -93,19 +95,30 @@ void ZEDSelection::RemoveElement(const ZEObject* Object)
 
 const ZEMatrix4x4& ZEDSelection::GetTransform()
 {
-	if (!IsDirty)
+	if (!DirtyFlags.GetFlags(ZED_SELECTION_DIRTY_FLAG_TRANSFORM))
 		return Transformation;
 
 	ZEMatrix4x4::CreateOrientation(Transformation, PivotPosition, PivotRotation, PivotScale);
-	IsDirty = false;
+	DirtyFlags.UnraiseFlags(ZED_SELECTION_DIRTY_FLAG_TRANSFORM);
 
 	return Transformation;
+}
+
+const ZEAABBox& ZEDSelection::GetBoundingBox()
+{
+	if (!DirtyFlags.GetFlags(ZED_SELECTION_DIRTY_FLAG_BBOX))
+		return BoundingBox;
+
+	CalculateBoundingBox();
+	DirtyFlags.UnraiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
+
+	return BoundingBox;
 }
 
 void ZEDSelection::SetPosition(const ZEVector3& Position)
 {
 	PivotPosition = Position;
-	IsDirty = true;
+	DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_TRANSFORM);
 }
 
 const ZEVector3& ZEDSelection::GetPosition()
@@ -116,7 +129,7 @@ const ZEVector3& ZEDSelection::GetPosition()
 void ZEDSelection::SetRotation(const ZEQuaternion& Rotation)
 {
 	PivotRotation = Rotation;
-	IsDirty = true;
+	DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_TRANSFORM);
 }
 
 const ZEQuaternion& ZEDSelection::GetRotation()
@@ -127,7 +140,7 @@ const ZEQuaternion& ZEDSelection::GetRotation()
 void ZEDSelection::SetScale(const ZEVector3& Scale)
 {
 	PivotScale = Scale;
-	IsDirty = true;
+	DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_TRANSFORM);
 }
 
 const ZEVector3& ZEDSelection::GetScale()
@@ -152,7 +165,7 @@ void ZEDSelection::Draw(ZEDrawParameters* Parameters)
 
 ZEDSelection::ZEDSelection()
 {
-	IsDirty = true;
+	DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_ALL);
 	Lock = false;
 }
 
