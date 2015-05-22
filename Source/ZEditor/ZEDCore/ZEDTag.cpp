@@ -34,20 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDTag.h"
-
+#include "ZEDSelection.h"
 #include "ZEGraphics/ZEUIMaterial.h"
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEMath/ZEBSphere.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEML/ZEMLReader.h"
 
-void ZEDTag::SetIcon(const ZEUIMaterial* Material)
+void ZEDTag::SetSelection(ZEDSelection* Selection)
 {
-	Icon.SetMaterial((ZEMaterial*)Material);
+	this->Selection = Selection;
 }
 
-const ZEUIMaterial* ZEDTag::GetIcon()
+ZEDSelection* ZEDTag::GetSelection()
 {
-	return (ZEUIMaterial*)Icon.GetMaterial();
+	return Selection;
 }
 
 void ZEDTag::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, const ZEVector4& Color, ZECanvas& Canvas)
@@ -106,9 +109,6 @@ void ZEDTag::DrawRectangle(const ZERectangle3D& Rectangle, const ZEVector4& Colo
 
 bool ZEDTag::InitializeSelf()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
-
 	if (Object == NULL)
 		return false;
 
@@ -140,12 +140,12 @@ bool ZEDTag::DeinitializeSelf()
 		TagMaterial = NULL;
 	}
 
-	return ZEEntity::DeinitializeSelf();
+	return true;
 }
 
 ZEDTag::ZEDTag()
 {
-	Selected = false;
+	Selection = NULL;
 	Object = NULL;
 	Color = ZEVector4::Zero;
 
@@ -175,14 +175,14 @@ ZEObject* ZEDTag::GetObject()
 	return Object;
 }
 
-void ZEDTag::SetSelected(bool Value)
+void ZEDTag::SetIcon(const ZEUIMaterial* Material)
 {
-	Selected = Value;
+	Icon.SetMaterial((ZEMaterial*)Material);
 }
 
-bool ZEDTag::GetSelected()
+const ZEUIMaterial* ZEDTag::GetIcon()
 {
-	return Selected;
+	return (ZEUIMaterial*)Icon.GetMaterial();
 }
 
 void ZEDTag::SetDrawColor(const ZEVector4& Color)
@@ -197,17 +197,20 @@ const ZEVector4& ZEDTag::GetDrawColor()
 
 void ZEDTag::SetPosition(const ZEVector3& NewPosition)
 {
-	ZEEntity::SetPosition(NewPosition);
+	if (Selection != NULL)
+		Selection->DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
 }
 
 void ZEDTag::SetRotation(const ZEQuaternion& NewRotation)
 {
-	ZEEntity::SetRotation(NewRotation);
+	if (Selection != NULL)
+		Selection->DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);	
 }
 
 void ZEDTag::SetScale(const ZEVector3& NewScale)
 {
-	ZEEntity::SetScale(NewScale);
+	if (Selection != NULL)
+		Selection->DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
 }
 
 void ZEDTag::Destroy()
@@ -227,12 +230,12 @@ bool ZEDTag::Restore(ZEMLReaderNode* Unserializer)
 
 void ZEDTag::Tick(float Time)
 {
-	ZEEntity::Tick(Time);
+	
 }
 
 void ZEDTag::Draw(ZEDrawParameters* DrawParameters)
 {
-	ZEEntity::Draw(DrawParameters);
+
 }
 
 ZEDTag* ZEDTag::CreateInstance()

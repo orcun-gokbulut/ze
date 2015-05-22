@@ -40,6 +40,12 @@
 #include "ZEFoundation/ZEMath/ZEAABBox.h"
 #include "ZEFoundation/ZEMath/ZEQuaternion.h"
 #include "ZEFoundation/ZEDS/ZEArray.h"
+#include "ZEFoundation/ZEDS/ZEFlags.h"
+
+#define ZED_SELECTION_DIRTY_FLAG_NONE 0
+#define ZED_SELECTION_DIRTY_FLAG_TRANSFORM 1
+#define ZED_SELECTION_DIRTY_FLAG_BBOX 2
+#define ZED_SELECTION_DIRTY_FLAG_ALL 0xFFFFFFFF
 
 class ZEObject;
 class ZEDrawParameters;
@@ -53,6 +59,7 @@ struct ZEDSelectionElement
 class ZEDSelection
 {
 	friend class ZEDSelectionManager;
+	friend class ZEDTag;
 
 	private:
 		ZEAABBox BoundingBox;
@@ -60,7 +67,7 @@ class ZEDSelection
 		ZEQuaternion PivotRotation;
 		ZEVector3 PivotScale;
 		ZEMatrix4x4 Transformation;
-		bool IsDirty; //BBox Dirty Should be added. ZEFlags.
+		ZEFlags DirtyFlags;
 
 		bool Lock;
 		ZEArray<ZEDSelectionElement> Elements;
@@ -75,6 +82,7 @@ class ZEDSelection
 		void RemoveElement(const ZEObject* Object);
 
 		const ZEMatrix4x4& GetTransform();
+		const ZEAABBox& GetBoundingBox();
 
 		void SetPosition(const ZEVector3& Position);
 		const ZEVector3& GetPosition();
