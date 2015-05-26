@@ -46,8 +46,10 @@ class ZETEPatchFile : public ZETEPatch
 		bool					Create(ZESize Width, ZESize Height, ZETEPixelType PixelType);
 
 	public:
-		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData = NULL);
+		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height);
 	
+		virtual void			SetSource(const ZEString& Source);
+
 		virtual bool			Load();
 		virtual void			Unload();
 

@@ -47,9 +47,9 @@ class ZETEPatchGDAL : public ZETEPatch
 		ZEMutex				Lock;
 
 	public:
-		virtual void*		ThreadBegin();
-		virtual bool		GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData);
-		virtual void		ThreadEnd(void* ThreadData);
+		virtual void		SetSource(const ZEString& Source);
+
+		virtual bool		GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height);
 
 		virtual bool		Load();
 		virtual void		Unload();

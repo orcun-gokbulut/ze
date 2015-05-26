@@ -64,6 +64,10 @@ class ZETEResamplerIPP
 			int				InitBufferSize;
 		} DownsampleData;
 
+		void				DownsampleElevation(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+		void				DownsampleColor(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+		void				DownsampleGrayscale(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+
 	public:
 		void				Resample(ZETEPatch* Patch, ZETEBlock* Block);
 		void				Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);

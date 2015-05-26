@@ -37,11 +37,11 @@
 
 #include "ZETEBlock.h"
 #include "ZETEPatch.h"
+#include "ZEError.h"
 
 #include <ippi.h>
 #include <ippcore.h>
 #include <ipps.h>
-#include "ZEError.h"
 
 void ZETEResamplerIPP::Resample(ZETEPatch* Patch, ZETEBlock* Block)
 {
@@ -106,17 +106,42 @@ void ZETEResamplerIPP::Resample(ZETEPatch* Patch, ZETEBlock* Block)
 
 	Patch->GetData(ResampleData.PatchBuffer, (ZEUInt64)ClampedSourcePositionX, (ZEUInt64)ClampedSourcePositionY, SourceSize.width, SourceSize.height);
 
-	IppStatus Result = ippiResizeSqrPixel_8u_C4R(
-		(const Ipp8u*)ResampleData.PatchBuffer, SourceSize, 
-		SourceSize.width * Patch->GetPixelSize(), SourceROI, 
-		(Ipp8u*)Block->GetData(), Block->GetPitch(), DestROI, 
-		Patch->GetLevelScaleX(), Patch->GetLevelScaleY(), 
-		(ClampedSourcePositionX - SourcePositionX) * Patch->GetLevelScaleX(), 
-		(ClampedSourcePositionY - SourcePositionY) * Patch->GetLevelScaleY(), 
-		IPPI_INTER_LINEAR, (Ipp8u*)ResampleData.Buffer);
+	if (Patch->GetPixelType() == ZETE_PT_ELEVATION)
+	{
+		IppStatus Result = ippiResizeSqrPixel_16u_C1R(
+			(const Ipp16u*)ResampleData.PatchBuffer, SourceSize, 
+			SourceSize.width * Patch->GetPixelSize(), SourceROI, 
+			(Ipp16u*)Block->GetData(), Block->GetPitch(), DestROI, 
+			Patch->GetLevelScaleX(), Patch->GetLevelScaleY(), 
+			(ClampedSourcePositionX - SourcePositionX) * Patch->GetLevelScaleX(), 
+			(ClampedSourcePositionY - SourcePositionY) * Patch->GetLevelScaleY(), 
+			IPPI_INTER_LINEAR, (Ipp8u*)ResampleData.Buffer);
+	}
+	else if (Patch->GetPixelType() == ZETE_PT_COLOR)
+	{
+		IppStatus Result = ippiResizeSqrPixel_8u_C4R(
+			(const Ipp8u*)ResampleData.PatchBuffer, SourceSize, 
+			SourceSize.width * Patch->GetPixelSize(), SourceROI, 
+			(Ipp8u*)Block->GetData(), Block->GetPitch(), DestROI, 
+			Patch->GetLevelScaleX(), Patch->GetLevelScaleY(), 
+			(ClampedSourcePositionX - SourcePositionX) * Patch->GetLevelScaleX(), 
+			(ClampedSourcePositionY - SourcePositionY) * Patch->GetLevelScaleY(), 
+			IPPI_INTER_LINEAR, (Ipp8u*)ResampleData.Buffer);
+	}
+	else if (Patch->GetPixelType() == ZETE_PT_GRAYSCALE)
+	{
+		IppStatus Result = ippiResizeSqrPixel_8u_C1R(
+			(const Ipp8u*)ResampleData.PatchBuffer, SourceSize, 
+			SourceSize.width * Patch->GetPixelSize(), SourceROI, 
+			(Ipp8u*)Block->GetData(), Block->GetPitch(), DestROI, 
+			Patch->GetLevelScaleX(), Patch->GetLevelScaleY(), 
+			(ClampedSourcePositionX - SourcePositionX) * Patch->GetLevelScaleX(), 
+			(ClampedSourcePositionY - SourcePositionY) * Patch->GetLevelScaleY(), 
+			IPPI_INTER_LINEAR, (Ipp8u*)ResampleData.Buffer);
+	}
 }
 
-void ZETEResamplerIPP::Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11)
+void ZETEResamplerIPP::DownsampleElevation(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11)
 {
 	ZESize HalfBlockSize = Block00->GetSize() / 2;
 	IppiSize SourceSize = {Block00->GetSize(), Block00->GetSize()};
@@ -126,11 +151,11 @@ void ZETEResamplerIPP::Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlo
 
 	int CurrentSpecSize = 0;
 	int CurrentInitBufferSize = 0;
-	Result = ippiResizeGetSize_8u(SourceSize, DestinationSize, ippLanczos, 0, &CurrentSpecSize, &CurrentInitBufferSize);
+	Result = ippiResizeGetSize_16u(SourceSize, DestinationSize, ippLinear, 0, &CurrentSpecSize, &CurrentInitBufferSize);
 	if (Result != ippStsNoErr) 
 		return;
 
-	/*if (CurrentInitBufferSize != DownsampleData.InitBufferSize)
+	if (CurrentInitBufferSize != DownsampleData.InitBufferSize)
 	{
 		if (DownsampleData.InitBuffer != NULL)
 		{
@@ -140,7 +165,99 @@ void ZETEResamplerIPP::Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlo
 
 		DownsampleData.InitBuffer = ippsMalloc_8u(CurrentInitBufferSize);
 		DownsampleData.InitBufferSize = CurrentInitBufferSize;
-	}*/
+	}
+
+	if (CurrentSpecSize > DownsampleData.SpecSize)
+	{
+		if (DownsampleData.Spec != NULL)
+		{
+			ippsFree(DownsampleData.Spec);
+			DownsampleData.Spec = NULL;
+		}
+
+		DownsampleData.Spec = ippsMalloc_8u(CurrentSpecSize);
+		DownsampleData.SpecSize = CurrentSpecSize;
+
+		ippiResizeLinearInit_16u(SourceSize, DestinationSize, (IppiResizeSpec_32f*)DownsampleData.Spec);
+	}
+
+	int CurrentBufferSize = 0;
+	Result = ippiResizeGetBufferSize_16u((IppiResizeSpec_32f*)DownsampleData.Spec, DestinationSize, 1, &CurrentBufferSize);
+	if (Result != ippStsNoErr) 
+		return;
+
+	if (CurrentBufferSize > DownsampleData.BufferSize)
+	{
+		if (DownsampleData.Buffer != NULL)
+		{
+			ippsFree(DownsampleData.Buffer);
+			DownsampleData.Buffer = NULL;
+		}
+
+		DownsampleData.Buffer = ippsMalloc_8u(CurrentBufferSize);
+		DownsampleData.BufferSize = CurrentBufferSize;
+	}
+
+	IppiPoint DestinationOffset;
+	DestinationOffset.x = 0;
+	DestinationOffset.y = 0;
+
+	Ipp16u* Destination = (Ipp16u*)Output->GetData();
+	Result = ippiResizeLinear_16u_C1R(
+		(Ipp16u*)Block00->GetData(), Block00->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+
+
+	Destination = (Ipp16u*)Output->GetData() + HalfBlockSize * Output->GetPixelSize();
+	Result = ippiResizeLinear_16u_C1R(
+		(Ipp16u*)Block01->GetData(), Block01->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+
+
+	Destination = (Ipp16u*)Output->GetData() + HalfBlockSize * Output->GetPitch();
+	Result = ippiResizeLinear_16u_C1R(
+		(Ipp16u*)Block10->GetData(), Block10->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+
+	Destination = (Ipp16u*)Output->GetData()  + HalfBlockSize * Output->GetPitch() + HalfBlockSize * Output->GetPixelSize();
+	Result = ippiResizeLinear_16u_C1R(
+		(Ipp16u*)Block11->GetData(), Block11->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+}
+
+void ZETEResamplerIPP::DownsampleColor(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11)
+{
+	ZESize HalfBlockSize = Block00->GetSize() / 2;
+	IppiSize SourceSize = {Block00->GetSize(), Block00->GetSize()};
+	IppiSize DestinationSize = {HalfBlockSize, HalfBlockSize};
+
+	IppStatus Result;
+
+	int CurrentSpecSize = 0;
+	int CurrentInitBufferSize = 0;
+	Result = ippiResizeGetSize_8u(SourceSize, DestinationSize, ippLinear, 0, &CurrentSpecSize, &CurrentInitBufferSize);
+	if (Result != ippStsNoErr) 
+		return;
+
+	if (CurrentInitBufferSize != DownsampleData.InitBufferSize)
+	{
+		if (DownsampleData.InitBuffer != NULL)
+		{
+			ippsFree(DownsampleData.InitBuffer);
+			DownsampleData.InitBuffer = NULL;
+		}
+
+		DownsampleData.InitBuffer = ippsMalloc_8u(CurrentInitBufferSize);
+		DownsampleData.InitBufferSize = CurrentInitBufferSize;
+	}
 
 	if (CurrentSpecSize > DownsampleData.SpecSize)
 	{
@@ -206,6 +323,109 @@ void ZETEResamplerIPP::Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlo
 		Destination, Output->GetPitch(), 
 		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
 		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+}
+
+void ZETEResamplerIPP::DownsampleGrayscale(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11)
+{
+	ZESize HalfBlockSize = Block00->GetSize() / 2;
+	IppiSize SourceSize = {Block00->GetSize(), Block00->GetSize()};
+	IppiSize DestinationSize = {HalfBlockSize, HalfBlockSize};
+
+	IppStatus Result;
+
+	int CurrentSpecSize = 0;
+	int CurrentInitBufferSize = 0;
+	Result = ippiResizeGetSize_8u(SourceSize, DestinationSize, ippLinear, 0, &CurrentSpecSize, &CurrentInitBufferSize);
+	if (Result != ippStsNoErr) 
+		return;
+
+	if (CurrentInitBufferSize != DownsampleData.InitBufferSize)
+	{
+		if (DownsampleData.InitBuffer != NULL)
+		{
+			ippsFree(DownsampleData.InitBuffer);
+			DownsampleData.InitBuffer = NULL;
+		}
+
+		DownsampleData.InitBuffer = ippsMalloc_8u(CurrentInitBufferSize);
+		DownsampleData.InitBufferSize = CurrentInitBufferSize;
+	}
+
+	if (CurrentSpecSize > DownsampleData.SpecSize)
+	{
+		if (DownsampleData.Spec != NULL)
+		{
+			ippsFree(DownsampleData.Spec);
+			DownsampleData.Spec = NULL;
+		}
+
+		DownsampleData.Spec = ippsMalloc_8u(CurrentSpecSize);
+		DownsampleData.SpecSize = CurrentSpecSize;
+
+		ippiResizeLinearInit_8u(SourceSize, DestinationSize, (IppiResizeSpec_32f*)DownsampleData.Spec);
+	}
+
+	int CurrentBufferSize = 0;
+	Result = ippiResizeGetBufferSize_8u((IppiResizeSpec_32f*)DownsampleData.Spec, DestinationSize, 1, &CurrentBufferSize);
+	if (Result != ippStsNoErr) 
+		return;
+
+	if (CurrentBufferSize > DownsampleData.BufferSize)
+	{
+		if (DownsampleData.Buffer != NULL)
+		{
+			ippsFree(DownsampleData.Buffer);
+			DownsampleData.Buffer = NULL;
+		}
+
+		DownsampleData.Buffer = ippsMalloc_8u(CurrentBufferSize);
+		DownsampleData.BufferSize = CurrentBufferSize;
+	}
+
+	IppiPoint DestinationOffset;
+	DestinationOffset.x = 0;
+	DestinationOffset.y = 0;
+
+	Ipp8u* Destination = (Ipp8u*)Output->GetData();
+	Result = ippiResizeLinear_8u_C1R(
+		(Ipp8u*)Block00->GetData(), Block00->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+
+
+	Destination = (Ipp8u*)Output->GetData() + HalfBlockSize * Output->GetPixelSize();
+	Result = ippiResizeLinear_8u_C1R(
+		(Ipp8u*)Block01->GetData(), Block01->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+
+
+	Destination = (Ipp8u*)Output->GetData() + HalfBlockSize * Output->GetPitch();
+	Result = ippiResizeLinear_8u_C1R(
+		(Ipp8u*)Block10->GetData(), Block10->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+
+	Destination = (Ipp8u*)Output->GetData()  + HalfBlockSize * Output->GetPitch() + HalfBlockSize * Output->GetPixelSize();
+	Result = ippiResizeLinear_8u_C1R(
+		(Ipp8u*)Block11->GetData(), Block11->GetPitch(), 
+		Destination, Output->GetPitch(), 
+		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
+		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
+}
+
+
+void ZETEResamplerIPP::Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11)
+{
+	if (Block00->GetPixelType() == ZETE_PT_ELEVATION)
+		DownsampleElevation(Output, Block00, Block01, Block10, Block11);
+	else if (Block00->GetPixelType() == ZETE_PT_COLOR)
+		DownsampleColor(Output, Block00, Block01, Block10, Block11);
+	else if (Block00->GetPixelType() == ZETE_PT_GRAYSCALE)
+		DownsampleGrayscale(Output, Block00, Block01, Block10, Block11);
 }
 
 void ZETEResamplerIPP::CleanUp()

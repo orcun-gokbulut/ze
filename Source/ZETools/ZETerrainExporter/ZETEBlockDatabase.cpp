@@ -45,6 +45,9 @@
 #include <memory.h>
 #include <stdint.h>
 #include "ZEFile\ZEFileInfo.h"
+#include "ZEML\ZEMLWriter.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEMath\ZEMath.h"
 
 ZEPackStruct
 (
@@ -80,7 +83,17 @@ ZETEBlockRegister::~ZETEBlockRegister()
 
 ZEString ZETEBlockDatabase::GetBlockFilePath(ZETEBlock* Block)
 {
-	return ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetPositionY(), Block->GetPositionX());
+	return ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", Path, Block->GetLevel(), Block->GetIndexY(), Block->GetIndexX());
+}
+
+void ZETEBlockDatabase::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString& ZETEBlockDatabase::GetName()
+{
+	return Name;
 }
 
 ZETEBlockRegister* ZETEBlockDatabase::GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEInt Level)
@@ -127,34 +140,74 @@ ZESize ZETEBlockDatabase::GetBlockSize()
 	return BlockSize;
 }
 
-ZEInt64 ZETEBlockDatabase::GetStartX()
+ZEInt ZETEBlockDatabase::GetMinLevel()
 {
-	return StartX;
-}
-
-ZEInt64 ZETEBlockDatabase::GetStartY()
-{
-	return StartY;
-}
-
-ZEInt64 ZETEBlockDatabase::GetEndX()
-{
-	return EndX;
-}
-
-ZEInt64 ZETEBlockDatabase::GetEndY()
-{
-	return EndY;
-}
-
-void ZETEBlockDatabase::SetMaxLevel(ZEInt Level)
-{
-	MaxLevel = Level;
+	return MinLevel;
 }
 
 ZEInt ZETEBlockDatabase::GetMaxLevel()
 {
 	return MaxLevel;
+}
+
+ZEInt64 ZETEBlockDatabase::GetMinIndexX()
+{
+	return MinIndexX;
+}
+
+ZEInt64 ZETEBlockDatabase::GetMinIndexY()
+{
+	return MinIndexY;
+}
+
+ZEInt64 ZETEBlockDatabase::GetMaxIndexX()
+{
+	return MaxIndexX;
+}
+
+ZEInt64 ZETEBlockDatabase::GetMaxIndexY()
+{
+	return MaxIndexY;
+}
+
+double ZETEBlockDatabase::GetMinPositionX()
+{
+	return GetMinIndexX() * ZEMath::Power(2, MinLevel) * BlockSize;
+}
+
+double ZETEBlockDatabase::GetMinPositionY()
+{
+	return GetMinIndexY() * ZEMath::Power(2, MinLevel) * BlockSize;
+}
+
+double ZETEBlockDatabase::GetMaxPositionX()
+{
+	return (GetMaxIndexX() + 1) * ZEMath::Power(2, MinLevel) * BlockSize;
+}
+
+double ZETEBlockDatabase::GetMaxPositionY()
+{
+	return (GetMaxIndexY() + 1) * ZEMath::Power(2, MinLevel) * BlockSize;
+}
+
+void ZETEBlockDatabase::SetMinLevelLimit(ZEInt Level)
+{
+	MinLevelLimit = Level;
+}
+
+ZEInt ZETEBlockDatabase::GetMinLevelLimit()
+{
+	return MinLevelLimit;
+}
+
+void ZETEBlockDatabase::SetMaxLevelLimit(ZEInt Level)
+{
+	MaxLevelLimit = Level;
+}
+
+ZEInt ZETEBlockDatabase::GetMaxLevelLimit()
+{
+	return MaxLevelLimit;
 }
 
 bool ZETEBlockDatabase::CheckBlock(ZETEBlock* Block)
@@ -187,6 +240,9 @@ bool ZETEBlockDatabase::LoadBlock(ZETEBlock* Block)
 
 bool ZETEBlockDatabase::StoreBlock(ZETEBlock* Block)
 {
+	if (Block->GetLevel() > MaxLevelLimit || Block->GetLevel() < MinLevelLimit)
+		return false;
+
 	ZEString BlockPath = GetBlockFilePath(Block);
 
 	if (!Block->Save(BlockPath))
@@ -203,18 +259,40 @@ bool ZETEBlockDatabase::StoreBlock(ZETEBlock* Block)
 			NewRegister.PositionY = Block->GetPositionY();
 			NewRegister.Level = Block->GetLevel();
 
-			if (StartX > Block->GetPositionX())
-				StartX = Block->GetPositionX();
+			if (MinLevel == INT_MAX)
+				MinLevel = Block->GetLevel();
 
-			if (StartY > Block->GetPositionY())
-				StartY = Block->GetPositionY();
+			ZEInt LevelDifference = Block->GetLevel() - MinLevel;
 
-			ZEInt64 LevelBlockSize = pow(2, Block->GetLevel()) * Block->GetSize();
-			if (EndX < Block->GetPositionX() + LevelBlockSize)
-				EndX = Block->GetPositionX() + LevelBlockSize;
+			if (MaxLevel < Block->GetLevel())
+				MaxLevel = Block->GetLevel();
 
-			if (EndY < Block->GetPositionY() + LevelBlockSize)
-				EndY = Block->GetPositionY() + LevelBlockSize;
+			if (MinLevel > Block->GetLevel())
+			{
+				ZEInt LevelScale = ZEMath::Power(2, LevelDifference);
+				MinIndexX *= LevelScale;
+				MinIndexY *= LevelScale;
+				MaxIndexX *= LevelScale;
+				MaxIndexY *= LevelScale;
+
+				LevelDifference = 0;
+
+				MinLevel = Block->GetLevel();
+			}
+
+			ZEInt LevelScale = ZEMath::Power(2, LevelDifference);		
+
+			if (MinIndexX > Block->GetIndexX() * LevelScale)
+				MinIndexX = Block->GetIndexX() * LevelScale;
+
+			if (MinIndexY > Block->GetIndexY() * LevelScale)
+				MinIndexY = Block->GetIndexY() * LevelScale;
+
+			if (MaxIndexX < Block->GetIndexX() * LevelScale)
+				MaxIndexX = Block->GetIndexX() * LevelScale;
+
+			if (MaxIndexY < Block->GetIndexY() * LevelScale)
+				MaxIndexY = Block->GetIndexY() * LevelScale;
 
 			Registers.Add(NewRegister);
 		}
@@ -232,64 +310,53 @@ bool ZETEBlockDatabase::RemoveBlock(ZETEBlock* Block)
 
 bool ZETEBlockDatabase::SaveDatabase()
 {
-	ZEFile File;
-	if (!File.Open(ZEFormat::Format("{0}/Index.zeBlockDatabase", Path), ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeTRLayer", Path);
+
+	ZEMLWriter Writer;
+	if (!Writer.Open(HeaderFile))
 		return false;
-	
-	ZELittleEndian<ZEUInt64> ElementCount = Registers.GetCount();
-	File.Write(&ElementCount, sizeof(ZEUInt64), 1);
-	for (ZESize I = 0; I < Registers.GetCount(); I++)
-	{
-		ZETEBlockRegisterData Data;
-		Data.PositionX = Registers[I].PositionX;
-		Data.PositionY = Registers[I].PositionY;
-		Data.Level = Registers[I].Level;
-		
-		ZESize* SubBlocks = Registers[I].SubBlocks;
-		Data.SubBlocks[0] = SubBlocks[0];
-		Data.SubBlocks[1] = SubBlocks[1];
-		Data.SubBlocks[2] = SubBlocks[2];
-		Data.SubBlocks[3] = SubBlocks[3];
 
-		if (!File.Write(&Data, sizeof(ZETEBlockRegisterData), 1) == 1)
-			return false;
-	}
+	ZEMLWriterNode Node = Writer.WriteRootNode("ZETRLayer");
+		Node.WriteString("Name", GetName());
+		Node.WriteUInt32("BlockSize", (ZEUInt32)GetBlockSize());
+		Node.WriteUInt8("Type",	(ZEUInt8)this->GetPixelType());
+		Node.WriteInt64("MinIndexX", GetMinIndexX());
+		Node.WriteInt64("MaxIndexX", GetMinIndexY());
+		Node.WriteInt64("MinIndexY", GetMaxIndexX());
+		Node.WriteInt64("MaxIndexY", GetMaxIndexY());
+		Node.WriteInt32("MinLevel", GetMinLevel());
+		Node.WriteInt32("MaxLevel", GetMaxLevel());
+	Node.CloseNode();
 
-	File.Close();
+	Writer.Close();
 
 	return true;
 }
 
 bool ZETEBlockDatabase::LoadDatabase()
 {
-	ZEFile File;
-	if (!File.Open(ZEFormat::Format("{0}/Index.zeBlockDatabase", Path), ZE_FOM_READ, ZE_FCM_NONE))
+	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeTRLayer", Path);
+
+	ZEMLReader Reader;
+	if (!Reader.Open(HeaderFile))
 		return false;
 
-	ZELittleEndian<ZEUInt64> ElementCount = 0;
-	if (File.Read(&ElementCount, sizeof(ZEUInt64), 1) != 1)
+	ZEMLReaderNode Node = Reader.GetRootNode();
+
+	if (Node.GetName() != "ZETELayer")
 		return false;
 
-	Registers.SetCount(ElementCount);
+	Name = Node.ReadString("Name", "");
+	BlockSize = Node.ReadUInt32("BlockSize", 0);
+	PixelType = (ZETEPixelType)Node.ReadUInt8("Type", ZETE_PT_NONE);
+	MinIndexX = Node.ReadInt64("MinIndexX", 0);
+	MinIndexY = Node.ReadInt64("MaxIndexX", 0);
+	MaxIndexX = Node.ReadInt64("MinIndexY", 0);
+	MaxIndexY = Node.ReadInt64("MaxIndexY", 0);
+	MinLevel = Node.ReadInt32("MinLevel", 0);
+	MaxLevel = Node.ReadInt32("MaxLevel", 0);
 
-	for (ZESize I = 0; I < Registers.GetCount(); I++)
-	{
-		ZETEBlockRegisterData Data;
-		if (File.Read(&Data, sizeof(ZETEBlockRegisterData), 1) != 1)
-			return false;
-
-		Registers[I].PositionX = Data.PositionX;
-		Registers[I].PositionY = Data.PositionY;
-		Registers[I].Level = Data.Level;
-
-		ZESize* SubBlocks = Registers[I].SubBlocks;
-		SubBlocks[0] = Data.SubBlocks[0];
-		SubBlocks[1] = Data.SubBlocks[1];
-		SubBlocks[2] = Data.SubBlocks[2];
-		SubBlocks[3] = Data.SubBlocks[3];
-	}
-
-	File.Close();
+	Reader.Close();
 
 	return true;
 }
@@ -298,9 +365,12 @@ ZETEBlockDatabase::ZETEBlockDatabase()
 {
 	BlockSize = 512;
 	PixelType = ZETE_PT_NONE;
-	StartX = INT64_MAX;
-	StartY = INT64_MAX;
-	EndX = INT64_MIN;
-	EndY = INT64_MIN;
-	MaxLevel = 22;
+	MinIndexX = INT64_MAX;
+	MinIndexY = INT64_MAX;
+	MaxIndexX = INT64_MIN;
+	MaxIndexY = INT64_MIN;
+	MinLevel = INT_MAX;
+	MaxLevel = INT_MIN;
+	MinLevelLimit = 0;
+	MaxLevelLimit = 22;
 }

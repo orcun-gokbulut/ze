@@ -44,6 +44,9 @@
 #include "ZEEndian.h"
 #include "ZEFile\ZEFileInfo.h"
 
+#include <zlib.h>
+#include "ZEMath\ZEMath.h"
+
 enum ZETEImagePixelType
 {
 	ZETE_IPT_NONE					= 0,
@@ -57,8 +60,8 @@ enum ZETEImagePixelType
 ZEPackStruct(
 	struct ZETEBlockFileHeader
 	{
-		ZELittleEndian<ZEUInt64>	PositionX;
-		ZELittleEndian<ZEUInt64>	PositionY;
+		ZELittleEndian<ZEUInt64>	IndexX;
+		ZELittleEndian<ZEUInt64>	IndexY;
 		ZEInt8						Level;
 		ZELittleEndian<ZEUInt32>	Size;
 		ZEUInt8						Type;
@@ -80,34 +83,24 @@ void ZETEBlock::Configure()
 	Data = new ZEBYTE[DataSize];
 }
 
-void ZETEBlock::SetPositionX(ZEInt64 x)
+void ZETEBlock::SetIndexX(ZEUInt64 Index)
 {
-	PositionX = x;
+	IndexX = Index;
 }
 
-ZEInt64 ZETEBlock::GetPositionX()
+ZEInt64 ZETEBlock::GetIndexX()
 {
-	return PositionX;
+	return IndexX;
 }
 
-void ZETEBlock::SetPositionY(ZEInt64 y)
+void ZETEBlock::SetIndexY(ZEUInt64 Index)
 {
-	PositionY = y;
+	IndexY = Index;
 }
 
-ZEInt64 ZETEBlock::GetPositionY()
+ZEInt64 ZETEBlock::GetIndexY()
 {
-	return PositionY;
-}
-
-ZEInt64 ZETEBlock::GetEndX()
-{
-	return PositionX + Size * pow(2, Level);
-}
-
-ZEInt64 ZETEBlock::GetEndY()
-{
-	return PositionY + Size * pow(2, Level);
+	return IndexY;
 }
 
 void ZETEBlock::SetLevel(ZEInt Level)
@@ -134,6 +127,11 @@ ZESize ZETEBlock::GetSize()
 	return Size;
 }
 
+double ZETEBlock::GetLevelBlockSize()
+{
+	return ZEMath::Power(2, Level) * Size;
+}
+
 void ZETEBlock::SetPixelType(ZETEPixelType Type)
 {
 	if (PixelType == Type)
@@ -141,6 +139,26 @@ void ZETEBlock::SetPixelType(ZETEPixelType Type)
 
 	PixelType = Type;
 	Configure();
+}
+
+double ZETEBlock::GetPositionX()
+{
+	return IndexX * GetLevelBlockSize();
+}
+
+double ZETEBlock::GetPositionY()
+{
+	return IndexY * GetLevelBlockSize();
+}
+
+double ZETEBlock::GetEndX()
+{
+	return (IndexX + 1) * GetLevelBlockSize();
+}
+
+double ZETEBlock::GetEndY()
+{
+	return (IndexY + 1) * GetLevelBlockSize();
 }
 
 ZETEPixelType ZETEBlock::GetPixelType()
@@ -155,10 +173,13 @@ ZESize ZETEBlock::GetPixelSize()
 		default:
 		case ZETE_PT_NONE:
 			return 0;
+
 		case ZETE_PT_ELEVATION:
-			return 4;
+			return 2;
+
 		case ZETE_PT_COLOR:
 			return 4;
+
 		case ZETE_PT_GRAYSCALE:
 			return 1;
 	}
@@ -214,12 +235,11 @@ bool ZETEBlock::Load(ZEFile* File)
 	if (!File->Read(&Header, sizeof(ZETEBlockFileHeader), 1) == 1)
 		return false;
 
-	PositionX = Header.PositionX;
-	PositionY = Header.PositionY;
-	Level = Header.Level;
-
-	SetPixelType((ZETEPixelType)Header.Type);
+	SetIndexX(Header.IndexX);
+	SetIndexY(Header.IndexY);
+	SetLevel(Header.Level);
 	SetSize(Header.Size);
+	SetPixelType((ZETEPixelType)Header.Type);
 	
 	if (File->Read(GetData(), DataSize, 1) != 1)
 		return false;
@@ -250,8 +270,8 @@ bool ZETEBlock::Save(ZEFile* File)
 		return false;
 
 	ZETEBlockFileHeader Header;
-	Header.PositionX = PositionX;
-	Header.PositionY = PositionY;
+	Header.IndexX = GetIndexX();
+	Header.IndexY = GetIndexY();
 	Header.Level = Level;
 	Header.Size = Size;
 	Header.Type = PixelType;
@@ -267,16 +287,31 @@ bool ZETEBlock::Save(ZEFile* File)
 
 bool ZETEBlock::Dump(const ZEString& FileName)
 {
+	if (Data == NULL)
+		return false;
+
 	FIBITMAP* Bitmap = NULL;
 	if (PixelType == ZETE_PT_COLOR)
+	{
 		Bitmap = FreeImage_ConvertFromRawBits((BYTE*)GetData(), GetSize(), GetSize(), GetPitch(), 32, 0, 0, 0, true);
+	}
 	else if (PixelType == ZETE_PT_GRAYSCALE)
+	{
 		Bitmap = FreeImage_ConvertFromRawBits((BYTE*)GetData(), GetSize(), GetSize(), GetPitch(), 8, 0, 0, 0, true);
+	}
+	else if (PixelType == ZETE_PT_ELEVATION)
+	{
+		Bitmap = FreeImage_AllocateExT(FIT_UINT16, GetSize(), GetSize(), 16, NULL);
+		ZESize DestPitch = FreeImage_GetPitch(Bitmap);
+		ZEBYTE* DestBuffer = FreeImage_GetBits(Bitmap);
+		for (ZESize I = 0; I < Size; I++)
+			memcpy(DestBuffer + I * DestPitch, (ZEBYTE*)Data + I * Size * 2, Size * 2);
+	}
 
 	if (Bitmap == NULL)
 		return false;
 	
-	if (!FreeImage_Save(FIF_PNG, Bitmap, ZEFormat::Format("{0}.png", FileName).ToCString()))
+	if (!FreeImage_Save(FIF_PNG, Bitmap, FileName))
 		return false;
 	
 	FreeImage_Unload(Bitmap);
@@ -286,8 +321,8 @@ bool ZETEBlock::Dump(const ZEString& FileName)
 
 ZETEBlock::ZETEBlock()
 {
-	PositionX = 0;
-	PositionY = 0;
+	IndexX = 0;
+	IndexY = 0;
 	Level = 0;
 	Size = 0;
 
