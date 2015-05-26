@@ -59,20 +59,31 @@ class ZEFile;
 class ZETEBlockDatabase
 {
 	public:
+		ZEString					Name;
 		ZEString					Path;
 		ZEArray<ZETEBlockRegister>	Registers;
 		ZESize						BlockSize;
 		ZETEPixelType				PixelType;
 
-		ZEInt64						StartX;
-		ZEInt64						StartY;
-		ZEInt64						EndX;
-		ZEInt64						EndY;
+		ZEInt64						MinIndexX;
+		ZEInt64						MaxIndexX;
+		ZEInt64						MinIndexY;
+		ZEInt64						MaxIndexY;
+		ZEInt						MinLevel;
 		ZEInt						MaxLevel;
+
+		ZEInt						MinLevelLimit;
+		ZEInt						MaxLevelLimit;
 
 		ZEString					GetBlockFilePath(ZETEBlock* Block);
 
 	public:
+		void						SetName(const ZEString& Name);
+		const ZEString&				GetName();
+
+		void						SetPath(const ZEString& Path);
+		const ZEString&				GetPath();
+
 		ZETEBlockRegister*			GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEInt Level);
 
 		void						SetPixelType(ZETEPixelType Type);
@@ -80,17 +91,25 @@ class ZETEBlockDatabase
 
 		void						SetBlockSize(ZESize BlockSize);
 		ZESize						GetBlockSize();
-		
-		ZEInt64						GetStartX();
-		ZEInt64						GetStartY();
-		ZEInt64						GetEndX();
-		ZEInt64						GetEndY();
 
-		void						SetPath(const ZEString& Path);
-		const ZEString&				GetPath();
-
-		void						SetMaxLevel(ZEInt Level);
+		ZEInt						GetMinLevel();
 		ZEInt						GetMaxLevel();
+
+		ZEInt64						GetMinIndexX();
+		ZEInt64						GetMinIndexY();
+		ZEInt64						GetMaxIndexX();
+		ZEInt64						GetMaxIndexY();
+		
+		double						GetMinPositionX();
+		double						GetMinPositionY();
+		double						GetMaxPositionX();
+		double						GetMaxPositionY();
+
+		void						SetMinLevelLimit(ZEInt Level);
+		ZEInt						GetMinLevelLimit();
+
+		void						SetMaxLevelLimit(ZEInt Level);
+		ZEInt						GetMaxLevelLimit();
 
 		bool						CheckBlock(ZETEBlock* Block);
 		bool						LoadBlock(ZETEBlock* Block);

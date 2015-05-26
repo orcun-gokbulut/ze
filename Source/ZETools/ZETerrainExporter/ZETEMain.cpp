@@ -50,33 +50,34 @@ void main()
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	ZETEProcessor Procesor;
-	Procesor.SetDebugDump(false);
+	Procesor.SetDebugDump(true);
 	Procesor.SetRegenerate(true);
 
 	ZETEPatchDatabase PatchDatabase;
 	PatchDatabase.SetBlockSize(1024);
 	PatchDatabase.SetPixelType(ZETE_PT_COLOR);
-	PatchDatabase.SetPath("c:\\Test\\Patches");
+	PatchDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Test/Patches");
 	Procesor.SetPatchDatabase(&PatchDatabase);
 
 	ZETEBlockDatabase BlockDatabase;
 	BlockDatabase.SetBlockSize(1024);
 	BlockDatabase.SetPixelType(ZETE_PT_COLOR);
-	BlockDatabase.SetPath("c:\\Test\\Blocks");
+	BlockDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Test/Blocks");
 	Procesor.SetBlockDatabase(&BlockDatabase);
 	
 	ZETEPatch* Patch;
 	Patch = new ZETEPatchFile();
 	Patch->SetSource("c:\\World.jpg");
-	Patch->Load();
 	Patch->SetPriority(0);
-	Patch->SetStartX(200.5);
-	Patch->SetStartY(200.5);
+	Patch->SetPositionX(200.5);
+	Patch->SetPositionY(200.5);
 	Patch->SetEndX(26000);
 	Patch->SetEndY(8000);
 	PatchDatabase.AddPatch(Patch);
 
 	Procesor.Generate();
+
+	BlockDatabase.SaveDatabase();
 	
 	FreeImage_DeInitialise();
 }

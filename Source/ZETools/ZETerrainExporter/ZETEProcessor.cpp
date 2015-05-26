@@ -118,17 +118,12 @@ bool ZETEProcessor::GenerateBlocks()
 	ZEInt64 EndBlockY = ZEMath::Align((ZEInt64)PatchDatabase->GetEndY(), BlockSize);
 	ZEInt64 BlockCountX = (EndBlockX - StartBlockX) / BlockSize + 1;
 	ZEInt64 BlockCountY = (EndBlockY - StartBlockY) / BlockSize + 1;
-		
+
 	bool Error = false;
 	#pragma omp parallel
 	{
 		int ThreadCount = omp_get_num_threads();
 		int ThreadNo = omp_get_thread_num();
-
-		ZEArray<void*> PatchThreadData;
-		PatchThreadData.SetCount(PatchDatabase->GetPatches().GetCount());
-		for (int I = 0; I < PatchThreadData.GetCount(); I++)
-			PatchThreadData[I] = PatchDatabase->GetPatches()[I]->ThreadBegin();
 
 		ZEArray<ZETEPatch*> IntersectedPatches;
 		ZESize IntersectedPatchCount = 0;
@@ -152,8 +147,9 @@ bool ZETEProcessor::GenerateBlocks()
 
 			ZEUInt64 IndexX = I % BlockCountX;
 			ZEUInt64 IndexY = I / BlockCountX;
-			ZEUInt64 PositionX = StartBlockX + IndexX * BlockSize;
-			ZEUInt64 PositionY = StartBlockY + IndexY * BlockSize;
+
+			Block.SetIndexX(StartBlockX + IndexX);
+			Block.SetIndexY(StartBlockY + IndexY);
 
 			printf("  Progress: %d%% (%lld of %lld). Thread: %d. L: %d, Y: %lld, X: %lld.\n", 
 				Info.Progress,
@@ -161,11 +157,9 @@ bool ZETEProcessor::GenerateBlocks()
 				BlockCountX * BlockCountY,
 				omp_get_thread_num(),
 				Block.GetLevel(),
-				IndexY * BlockSize,
-				IndexX * BlockSize);
+				Block.GetIndexX(),
+				Block.GetIndexY());
 
-			Block.SetPositionX(PositionX);
-			Block.SetPositionY(PositionY);
 			if (BlockDatabase->CheckBlock(&Block))
 			{
 				if (Regenerate)
@@ -174,7 +168,7 @@ bool ZETEProcessor::GenerateBlocks()
 					continue;
 			}
 
-			if (!PatchDatabase->Intersect(PositionX, PositionY, BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
+			if (!PatchDatabase->Intersect(Block.GetPositionX(), Block.GetPositionY(), BlockSize, BlockSize, IntersectedPatches, IntersectedPatchCount))
 				continue;
 
 			IntersectedPatches.Sort(ComparePatches);
@@ -187,11 +181,8 @@ bool ZETEProcessor::GenerateBlocks()
 				Error = true;
 
 			if (DebugDump)
-				Block.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Block.GetLevel(), Block.GetPositionY(), Block.GetPositionX()));
+				Block.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Block.GetLevel(), Block.GetIndexY(), Block.GetIndexX()));
 		}
-
-		for (int I = 0; I < PatchThreadData.GetCount(); I++)
-			PatchDatabase->GetPatches()[I]->ThreadEnd(PatchThreadData[I]);
 	}
 
 	if (!Error)
@@ -204,15 +195,21 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 {
 	Info.Progress = 0;
 
+	if (Level < GetBlockDatabase()->GetMinLevel())
+		return false;
+
 	printf("Processing Level %d.\n", Level);
-	ZEUInt SourceLevelScale = pow(2, Level);
-	ZESize SourceLevelBlockSize = SourceLevelScale * BlockDatabase->GetBlockSize();
 
-	ZEUInt DestinationLevelScale = pow(2, Level + 1);
-	ZESize DestinationLevelBlockSize = DestinationLevelScale * BlockDatabase->GetBlockSize();
+	ZEInt LevelDifference = ZEMath::Power(2, Level + 1 - GetBlockDatabase()->GetMinLevel());
 
-	ZEUInt64 BlockCountX = (BlockDatabase->GetEndX() - BlockDatabase->GetStartX() + DestinationLevelBlockSize - 1) / DestinationLevelBlockSize;
-	ZEUInt64 BlockCountY = (BlockDatabase->GetEndY() - BlockDatabase->GetStartY() + DestinationLevelBlockSize - 1) / DestinationLevelBlockSize;
+	ZEInt64 StartIndexX = GetBlockDatabase()->GetMinIndexX() / LevelDifference;
+	ZEInt64 StartIndexY = GetBlockDatabase()->GetMinIndexY() / LevelDifference;
+
+	ZEInt64 EndIndexX = GetBlockDatabase()->GetMaxIndexX() / LevelDifference;
+	ZEInt64 EndIndexY = GetBlockDatabase()->GetMaxIndexY() / LevelDifference;
+
+	ZEUInt64 BlockCountX = EndIndexX - StartIndexX + 1;
+	ZEUInt64 BlockCountY = EndIndexY - StartIndexY + 1;
 	
 	bool Error = false;
 	#pragma omp parallel
@@ -237,11 +234,11 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 			if (Progress > Info.Progress)
 				Info.Progress = Progress;
 
-			ZEInt64 IndexX = I % BlockCountX;
-			ZEInt64 IndexY = I / BlockCountX;
+			ZEInt64 IndexX = StartIndexX + I % BlockCountX;
+			ZEInt64 IndexY = StartIndexY + I / BlockCountX;
 		
-			ZEInt64 PositionX = BlockDatabase->GetStartX() + IndexX * DestinationLevelBlockSize;
-			ZEInt64 PositionY = BlockDatabase->GetStartY() + IndexY * DestinationLevelBlockSize;
+			Output.SetIndexX(IndexX);
+			Output.SetIndexY(IndexY);
 
 			printf("  Progress: %d%% (%lld of %lld). Thread: %d, Block: L: %d, Y: %lld, X: %lld.\n", 
 				Info.Progress,
@@ -249,11 +246,10 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 				BlockCountX * BlockCountY,
 				omp_get_thread_num(),
 				Output.GetLevel(),
-				IndexY * DestinationLevelBlockSize,
-				IndexX * DestinationLevelBlockSize);
+				Output.GetIndexX(),
+				Output.GetIndexY());
 
-			Output.SetPositionX(PositionX);
-			Output.SetPositionY(PositionY);
+
 			if (BlockDatabase->CheckBlock(&Output))
 			{
 				if (Regenerate)
@@ -263,20 +259,20 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 			}
 
 			bool BlockLoadded = false;
-			Block00.SetPositionX(PositionX);
-			Block00.SetPositionY(PositionY);
+			Block00.SetIndexX(IndexX * 2);
+			Block00.SetIndexY(IndexY * 2);
 			BlockLoadded |= BlockDatabase->LoadBlock(&Block00);
 
-			Block01.SetPositionX(PositionX + SourceLevelBlockSize);
-			Block01.SetPositionY(PositionY);
+			Block01.SetIndexX(IndexX * 2 + 1);
+			Block01.SetIndexY(IndexY * 2);
 			BlockLoadded |= BlockDatabase->LoadBlock(&Block01);
 
-			Block10.SetPositionX(PositionX);
-			Block10.SetPositionY(PositionY + SourceLevelBlockSize);
+			Block10.SetIndexX(IndexX * 2);
+			Block10.SetIndexY(IndexY * 2 + 1);
 			BlockLoadded |= BlockDatabase->LoadBlock(&Block10);
 
-			Block11.SetPositionX(PositionX + SourceLevelBlockSize);
-			Block11.SetPositionY(PositionY + SourceLevelBlockSize);
+			Block11.SetIndexX(IndexX * 2 + 1);
+			Block11.SetIndexY(IndexY * 2 + 1);
 			BlockLoadded |= BlockDatabase->LoadBlock(&Block11);
 
 			if (!BlockLoadded)
@@ -287,7 +283,7 @@ bool ZETEProcessor::GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 End
 			BlockDatabase->StoreBlock(&Output);
 
 			if (DebugDump)
-				Output.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Output.GetLevel(), Output.GetPositionY(), Output.GetPositionX()));
+				Output.Dump(ZEFormat::Format("{0}/Dump/L{1}-Y{2}-X{3}.png", BlockDatabase->GetPath(), Output.GetLevel(), Output.GetIndexY(), Output.GetIndexX()));
 		}
 	}
 
@@ -301,14 +297,14 @@ bool ZETEProcessor::GenerateLevels()
 {
 	Info.Status = ZETE_PS_GENERATING_LEVELS;
 
-	ZEInt MaxLevel = 10;
+	ZEInt MaxLevel = BlockDatabase->GetMaxLevelLimit();
 	ZEInt MinLevel = PatchDatabase->GetMinLevel();
-	ZEInt MaxLevelX = (ZEInt)floor(log((BlockDatabase->GetEndX() - BlockDatabase->GetStartX())) / log(2));
-	ZEInt MaxLevelY = (ZEInt)floor(log((BlockDatabase->GetEndY() - BlockDatabase->GetStartY())) / log(2));
+	ZEInt MaxLevelX = (ZEInt)floor(log((BlockDatabase->GetMaxIndexX() - BlockDatabase->GetMinIndexX()) * BlockDatabase->GetBlockSize()) / log(2));
+	ZEInt MaxLevelY = (ZEInt)floor(log((BlockDatabase->GetMaxIndexY() - BlockDatabase->GetMinIndexY()) * BlockDatabase->GetBlockSize()) / log(2));
 	ZEInt EffectiveMaxLevel = ZEMath::Min(MaxLevel, ZEMath::Min(MaxLevelX, MaxLevelY));
 
 	for (ZEInt I = MinLevel; I < EffectiveMaxLevel; I++)
-		GenerateLevel(BlockDatabase->GetStartX(), BlockDatabase->GetStartY(), BlockDatabase->GetEndX(), BlockDatabase->GetEndY(), I);
+		GenerateLevel(BlockDatabase->GetMinIndexX(), BlockDatabase->GetMinIndexY(), BlockDatabase->GetMaxIndexX(), BlockDatabase->GetMaxIndexY(), I);
 
 	return true;
 }

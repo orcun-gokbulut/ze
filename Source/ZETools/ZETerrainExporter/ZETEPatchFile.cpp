@@ -38,7 +38,7 @@
 
 #include <FreeImage.h>
 
-bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData)
+bool ZETEPatchFile::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
 {
 	if (x + Width >= this->Width)
 		return false;
@@ -82,6 +82,30 @@ bool ZETEPatchFile::Create(ZESize Width, ZESize Height, ZETEPixelType Type)
 	return true;
 }
 
+void ZETEPatchFile::SetSource(const ZEString& Source)
+{
+	ZETEPatch::SetSource(Source);
+
+	FREE_IMAGE_FORMAT BitmapFileFormat = FreeImage_GetFileType(GetSource());
+	if (BitmapFileFormat == FIF_UNKNOWN)
+		return;
+
+	FIBITMAP* Bitmap = FreeImage_Load(BitmapFileFormat, GetSource(), FIF_LOAD_NOPIXELS);
+	int BPP = FreeImage_GetBPP(Bitmap);
+	FreeImage_Unload(Bitmap);
+	
+	if (BPP == 8)
+		PixelType = ZETE_PT_GRAYSCALE;
+	else if (BPP == 16)
+		PixelType = ZETE_PT_ELEVATION;
+	else if (BPP == 24)
+		PixelType = ZETE_PT_COLOR;
+	else if (BPP == 32)
+		PixelType = ZETE_PT_COLOR;
+	else
+		PixelType = ZETE_PT_NONE;
+}
+
 bool ZETEPatchFile::Load()
 {
 	Unload();
@@ -102,21 +126,57 @@ bool ZETEPatchFile::Load()
 		return false;
 	}
 
-	if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_COLOR))
+	int BPP = FreeImage_GetBPP(Bitmap);
+	if (BPP == 8)
 	{
-		FreeImage_Unload(Bitmap);
-		return false;
-	}
-
-	switch(PixelType)
-	{
-
-		case ZETE_PT_COLOR:
-			FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
+		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_GRAYSCALE))
+		{
 			FreeImage_Unload(Bitmap);
-			break;
+			return false;
+		}
+		FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 8, 0, 0, 0, true);
+		FreeImage_Unload(Bitmap);
 	}
-	
+	else if (BPP == 16)
+	{
+		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_ELEVATION))
+		{
+			FreeImage_Unload(Bitmap);
+			return false;
+		}
+		ZESize SrcPitch = FreeImage_GetPitch(Bitmap);
+		ZEBYTE* SrcBuffer = FreeImage_GetBits(Bitmap);
+		for (ZESize I = 0; I < Height; I++)
+			memcpy((ZEBYTE*)Data + I * Width * 2, SrcBuffer + I * SrcPitch, Width * 2);
+		FreeImage_Unload(Bitmap);
+	}
+	else if (BPP == 24)
+	{
+		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_COLOR))
+		{
+			FreeImage_Unload(Bitmap);
+			return false;
+		}
+		FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
+		FreeImage_Unload(Bitmap);
+
+	}
+	else if (BPP == 32)
+	{
+		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_COLOR))
+		{
+			FreeImage_Unload(Bitmap);
+			return false;
+		}
+		FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
+		FreeImage_Unload(Bitmap);
+	}
+	else
+	{
+		PixelType = ZETE_PT_NONE;
+		FreeImage_Unload(Bitmap);
+	}
+
 	return ZETEPatch::Load();
 }
 

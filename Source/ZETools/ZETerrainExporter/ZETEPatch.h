@@ -71,10 +71,10 @@ class ZETEPatch
 
 		ZEInt					GetLevel();
 
-		void					SetStartX(double x);
+		void					SetPositionX(double x);
 		double					GetPositionX();
 
-		void					SetStartY(double y);
+		void					SetPositionY(double y);
 		double					GetPositionY();
 
 		void					SetEndX(double EndX);
@@ -95,14 +95,12 @@ class ZETEPatch
 		ZETEPixelType			GetPixelType();
 		ZESize					GetPixelSize();
 		
-		void					SetSource(const ZEString& Source);
+		virtual void			SetSource(const ZEString& Source);
 		const ZEString&			GetSource();
 
 		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
 		
-		virtual void*			ThreadBegin();
-		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData = 0) = 0;
-		virtual void			ThreadEnd(void* ThreadData);
+		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height) = 0;
 
 		bool					IsLoaded();
 		virtual bool			Load();

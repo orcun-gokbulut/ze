@@ -37,33 +37,30 @@
 #include "ZEError.h"
 
 #include <gdal_priv.h>
-#include "ippi.h"
+#include <ippi.h>
 
-struct ZETEThreadData
+void ZETEPatchGDAL::SetSource(const ZEString& Source)
 {
-	GDALDataset* Dataset;
-};
+	ZETEPatch::SetSource(Source);
 
-void* ZETEPatchGDAL::ThreadBegin()
-{
-	GDALDataset* Dataset = (GDALDataset*)GDALOpen(GetSource(), GA_ReadOnly);
+	Dataset = (GDALDataset*)GDALOpen(GetSource(), GA_ReadOnly);
 	if (Dataset == NULL)
-		return NULL;
+		return;
 
-	ZETEThreadData* ThreadData = new ZETEThreadData();
-	ThreadData->Dataset = Dataset;
-
-	return ThreadData;
+	GDALDataType BitSize = Dataset->GetRasterBand(0)->GetRasterDataType();
+	int ChannelCount = Dataset->GetRasterCount();
+	if (BitSize == GDT_Int16 && ChannelCount == 1)
+		PixelType = ZETE_PT_GRAYSCALE;
+	else if (BitSize == GDT_Byte && ChannelCount == 1)
+		PixelType = ZETE_PT_GRAYSCALE;
+	else if (BitSize == GDT_Byte && ChannelCount == 4)
+		PixelType = ZETE_PT_COLOR;
+	else
+		PixelType = ZETE_PT_NONE;
 }
 
-bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height, void* ThreadData)
+bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height)
 {
-	GDALDataset* Dataset = NULL;
-	if (ThreadData == NULL)
-		Dataset = this->Dataset;
-	else
-		Dataset = static_cast<ZETEThreadData*>(ThreadData)->Dataset;
-
 	if (Dataset == NULL)
 		return false;
 
@@ -89,21 +86,6 @@ bool ZETEPatchGDAL::GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, 
 	return true;
 }
 
-void ZETEPatchGDAL::ThreadEnd(void* ThreadData)
-{
-	if (ThreadData == NULL)
-		return;
-	
-	ZETEThreadData* Data = static_cast<ZETEThreadData*>(ThreadData);
-	if (Data->Dataset != NULL)
-	{
-		GDALClose(Data->Dataset);
-		Data->Dataset = NULL;
-	}
-
-	delete Data;
-}
-
 bool ZETEPatchGDAL::Load()
 {
 	Unload();
@@ -114,7 +96,19 @@ bool ZETEPatchGDAL::Load()
 
 	Width = Dataset->GetRasterXSize();
 	Height = Dataset->GetRasterYSize();
-	PixelType = ZETE_PT_COLOR;
+
+	GDALDataType BitSize = Dataset->GetRasterBand(0)->GetRasterDataType();
+	int ChannelCount = Dataset->GetRasterCount();
+	if (BitSize == GDT_Int16 && ChannelCount == 1)
+		PixelType = ZETE_PT_GRAYSCALE;
+	else if (BitSize == GDT_Byte && ChannelCount == 1)
+		PixelType = ZETE_PT_GRAYSCALE;
+	else if (BitSize == GDT_Byte && ChannelCount == 4)
+		PixelType = ZETE_PT_COLOR;
+	else
+		PixelType = ZETE_PT_NONE;
+
+	return true;
 }
 
 void ZETEPatchGDAL::Unload()

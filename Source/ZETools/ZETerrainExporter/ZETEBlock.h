@@ -43,7 +43,7 @@ class ZEFile;
 enum ZETEPixelType
 {
 	ZETE_PT_NONE		= 0,
-	ZETE_PT_ELEVATION	= 1,	// Float
+	ZETE_PT_ELEVATION	= 1,	// ZEUInt16
 	ZETE_PT_COLOR		= 2,	// ZEUInt8[4]
 	ZETE_PT_GRAYSCALE	= 3		// ZEUInt8
 };
@@ -51,8 +51,8 @@ enum ZETEPixelType
 class ZETEBlock
 {
 	private:
-		ZEInt64					PositionX;
-		ZEInt64					PositionY;
+		ZEInt64					IndexX;
+		ZEInt64					IndexY;
 		ZEInt					Level;
 		ZESize					Size;
 
@@ -63,20 +63,24 @@ class ZETEBlock
 		void					Configure();
 
 	public:
-		void					SetPositionX(ZEInt64 x);
-		ZEInt64					GetPositionX();
+		void					SetIndexX(ZEUInt64 Index);
+		ZEInt64					GetIndexX();
 
-		void					SetPositionY(ZEInt64 y);
-		ZEInt64					GetPositionY();
-
-		ZEInt64					GetEndX();
-		ZEInt64					GetEndY();
+		void					SetIndexY(ZEUInt64 Index);
+		ZEInt64					GetIndexY();
 
 		void					SetLevel(ZEInt Level);
 		ZEInt					GetLevel();
 
 		void					SetSize(ZESize BlockSize);
 		ZESize					GetSize();
+
+		double					GetPositionX();
+		double					GetPositionY();
+		double					GetEndX();
+		double					GetEndY();
+
+		double					GetLevelBlockSize();
 
 		void					SetPixelType(ZETEPixelType Type);
 		ZETEPixelType			GetPixelType();

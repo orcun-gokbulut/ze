@@ -70,7 +70,7 @@ void ZETEPatch::UpdateLevelAndScaling()
 		Database->CalculateDimensions();
 }
 
-void ZETEPatch::SetStartX(double x)
+void ZETEPatch::SetPositionX(double x)
 {
 	if (StartX == x)
 		return;
@@ -84,7 +84,7 @@ double ZETEPatch::GetPositionX()
 	return StartX;
 }
 
-void ZETEPatch::SetStartY(double y)
+void ZETEPatch::SetPositionY(double y)
 {
 	if (StartY == y)
 		return;
@@ -211,16 +211,6 @@ bool ZETEPatch::Intersect(double Px, double Py, double Width, double Height)
 			StartY <= Py + Width && Py <= EndY);
 }
 
-void* ZETEPatch::ThreadBegin()
-{
-	return NULL;
-}
-
-void ZETEPatch::ThreadEnd(void*)
-{
-
-}
-
 bool ZETEPatch::IsLoaded()
 {
 	return Loaded;
@@ -231,6 +221,7 @@ bool ZETEPatch::Load()
 	Loaded = true;
 	if (Database != NULL)
 		Database->CalculateDimensions();
+
 	return true;
 }
 
