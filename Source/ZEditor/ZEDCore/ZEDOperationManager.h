@@ -42,12 +42,14 @@
 
 class ZEDOperationManager
 {
+	friend class ZEDCore;
+
 	private:
 		ZEArray<ZEDOperation*> Stack;
 		ZESSize StackIndex;
 
 		ZEDOperationManager();
-		virtual ~ZEDOperationManager();
+		~ZEDOperationManager();
 
 	public:
 		const ZEArray<ZEDOperation*>& GetStack();
@@ -62,7 +64,7 @@ class ZEDOperationManager
 
 		bool DoOperation(ZEDOperation* Operation);
 
-		virtual void Destoy();
+		void Destroy();
 
 		static ZEDOperationManager* GetInstance();
 };

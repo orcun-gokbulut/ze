@@ -37,14 +37,25 @@
 #ifndef __ZED_TRANSFORMATION_MANAGER_H__
 #define __ZED_TRANSFORMATION_MANAGER_H__
 
+enum ZEDTransformationSpace
+{
+	ZED_TFS_WORLD,
+	ZED_TFS_LOCAL
+};
+
 class ZEDTransformationManager
 {
+	friend class ZEDCore;
+
 	private:
+		ZEDTransformationSpace CurrentSpace;
+
 		ZEDTransformationManager();
-		virtual ~ZEDTransformationManager();
 
 	public:
-		virtual void Destroy();
+		ZEDTransformationSpace GetCurrentSpace();
+
+		void Destroy();
 
 		static ZEDTransformationManager* GetInstance();
 };

@@ -45,12 +45,23 @@ class ZEDEntityTag : public ZEDTag
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
 
-		virtual void SetPosition(const ZEVector3& NewPosition);
-		virtual void SetRotation(const ZEQuaternion& NewRotation);
-		virtual void SetScale(const ZEVector3& NewScale);
+		virtual ZEAABBox GetBoundingBox();
+		virtual ZEAABBox GetWorldBoundingBox();
 
-		virtual bool Save(ZEMLWriterNode* Serializer);
-		virtual bool Restore(ZEMLReaderNode* Unserializer);
+		virtual void SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3 GetPosition();
+		virtual void SetWorldPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3 GetWorldPosition();
+
+		virtual void SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion GetRotation();
+		virtual void SetWorldRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion GetWorldRotation();
+
+		virtual void SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3 GetScale();
+		virtual void SetWorldScale(const ZEVector3& NewScale);
+		virtual ZEVector3 GetWorldScale();
 
 		virtual void Draw(ZEDrawParameters* DrawParameters);
 

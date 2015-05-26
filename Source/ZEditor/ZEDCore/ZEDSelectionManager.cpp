@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDSelectionManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,108 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDSelectionManager.h"
+#include "ZEDCore.h"
+#include "ZEDEntityTag.h"
+#include "ZEFoundation/ZEMath/ZEViewVolume.h"
+#include "ZEGame/ZEEntity.h"
+
+
+ZEDSelection* ZEDSelectionManager::CreateSelection(ZEViewVolume* ViewVolume)
+{
+	if (ViewVolume == NULL)
+		return NULL;
+
+	if (ViewVolume->GetViewVolumeType() == ZE_VVT_NONE)
+		return NULL;
+
+	switch (Mode)
+	{
+	case ZED_SLM_ENTITY:
+		break;
+	case ZED_SLM_VERTEX:
+		break;
+	}
+
+	ZEArray<ZEDTag*> Tags /*= ZEDCore::GetCurrentScene()->GetEntityTags()*/;
+	ZEDSelection * NewSelection = new ZEDSelection();
+	
+	for (ZESize I = 0; I < Tags.GetCount(); I++)
+		if (!ViewVolume->CullTest(Tags[I]->GetWorldBoundingBox()))
+			NewSelection->AddElement(Tags[I]);
+
+	//With the pivot of new selection calculated (by who?) Transformation manager is called to calculate offsettopivot for elements.
+}
+
+ZEArray<ZEDSelection*>& ZEDSelectionManager::GetSelections()
+{
+	return Selections;
+}
+
+ZEDSelection* ZEDSelectionManager::GetSelection(ZESize Index)
+{
+	return Selections[Index];
+}
+
+void ZEDSelectionManager::AddSelection(ZEDSelection* Selection)
+{
+	if (Selections.Exists(Selection)) //Since old selections while changing current selection will be deleted. This adding should be a copy of the original selection.
+		return;
+
+	Selections.Add(Selection);
+}
+
+void ZEDSelectionManager::RemoveSelection(ZEDSelection* Selection)
+{
+	if (!Selections.Exists(Selection))
+		return;
+
+	Selections.RemoveValue(Selection);
+}
+
+void ZEDSelectionManager::LockSelection(ZESize Index, bool Value)
+{
+	if (Index >= Selections.GetCount())
+		return;
+
+	Selections[Index]->Lock = Value;
+}
+
+void ZEDSelectionManager::SetMode(ZEDSelectionMode Mode)
+{
+	this->Mode = Mode;
+}
+
+ZEDSelectionMode ZEDSelectionManager::GetMode()
+{
+	return Mode;
+}
+
+void ZEDSelectionManager::Destroy()
+{
+	delete this;
+}
+
+ZEDSelectionManager* ZEDSelectionManager::GetInstance()
+{
+	return ZEDCore::GetInstance()->GetSelectionManager();
+}
+
+ZEDSelectionManager::ZEDSelectionManager()
+{
+	CurrentSelection = NULL;
+	Mode = ZED_SLM_ENTITY;
+}
+
+void ZEDSelectionManager::SetCurrentSelection(ZEDSelection* Selection)
+{
+	if (CurrentSelection != NULL)
+		delete CurrentSelection;
+
+	CurrentSelection = Selection;
+}
+
+ZEDSelection* ZEDSelectionManager::GetCurrentSelection()
+{
+	return CurrentSelection;
+}

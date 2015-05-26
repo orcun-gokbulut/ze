@@ -40,13 +40,13 @@ void ZEDSelection::CalculateBoundingBox()
 
 }
 
-bool ZEDSelection::IsElementExists(const ZEObject* Object)
+bool ZEDSelection::IsElementExists(const ZEDTag* Element)
 {
 	if (Elements.GetCount() == 0)
 		return false;
 
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
-		if (Elements[I].Object == Object)
+		if (Elements[I].Tag == Element)
 			return true;
 
 	return false;
@@ -57,40 +57,50 @@ ZEArray<ZEDSelectionElement>& ZEDSelection::GetElements()
 	return Elements;
 }
 
-ZEObject* ZEDSelection::GetElement(ZESize Index)
+ZEDTag* ZEDSelection::GetElement(ZESize Index)
 {
-	return Elements[Index].Object;
+	return Elements[Index].Tag;
 }
 
-void ZEDSelection::AddElement(const ZEObject* Object)
+void ZEDSelection::AddElement(const ZEDTag* Element)
 {
-	if (Object == NULL)
+	if (Element == NULL)
 		return;
 
-	if (IsElementExists(Object))
+	if (IsElementExists(Element))
 		return;
 
 	DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
 	//How to set Element.OffsetToPivot? Should it be sent to TransformationManager.
 }
 
-void ZEDSelection::RemoveElement(const ZEObject* Object)
+void ZEDSelection::RemoveElement(const ZEDTag* Element)
 {
-	if (Object == NULL)
+	if (Element == NULL)
 		return;
 
-	if (!IsElementExists(Object))
+	if (!IsElementExists(Element))
 		return;
 
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
 	{
-		if (Elements[I].Object == Object)
+		if (Elements[I].Tag == Element)
 		{
 			Elements.Remove(I);
 			DirtyFlags.RaiseFlags(ZED_SELECTION_DIRTY_FLAG_BBOX);
 			return;
 		}
 	}
+}
+
+void ZEDSelection::SetDirtyFlags(ZEUInt Flags, bool Value)
+{
+	DirtyFlags.SetFlags(Flags, Value);
+}
+
+ZEUInt ZEDSelection::GetDirtyFlags()
+{
+	return DirtyFlags.Value;
 }
 
 const ZEMatrix4x4& ZEDSelection::GetTransform()

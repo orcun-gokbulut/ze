@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDScene.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,4 +32,48 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
+#include "ZEDScene.h"
+#include "ZEDTag.h"
+#include "ZEGame/ZEEntity.h"
+
+const ZESmartArray<ZEDTag*>& ZEDScene::GetTags()
+{
+	return Tags;
+}
+
+ZEArray<ZEDTag*> ZEDScene::GetTags(ZEClass* Class)
+{
+	ZEArray<ZEDTag*> DerivedTags;
+	ZEObject* CurrentObject = NULL;
+
+	for (ZESize I = 0; I < Tags.GetCount(); I++)
+	{
+		CurrentObject = Tags[I]->GetObject();
+		if (ZEClass::IsDerivedFrom(Class, CurrentObject->GetClass()))
+			DerivedTags.Add(Tags[I]);
+	}
+
+	return DerivedTags;
+}
+
+void ZEDScene::AddTag(ZEDTag* Tag)
+{
+	//How should non-entity tags be managed regarding scene ops.
+}
+
+void ZEDScene::RemoveTag(ZEDTag* Tag)
+{
+
+}
+
+void ZEDScene::ClearTags()
+{
+
+}
+
+ZEDScene::ZEDScene()
+{
+
+}
 

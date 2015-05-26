@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelection.h
+ Zinek Engine - ZEDCore.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,74 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_SELECTION_H__
-#define __ZED_SELECTION_H__
+#ifndef __ZED_CORE_H__
+#define __ZED_CORE_H__
 
-#include "ZEDTag.h"
-#include "ZEFoundation/ZEMath/ZEAABBox.h"
-#include "ZEFoundation/ZEMath/ZEQuaternion.h"
 #include "ZEFoundation/ZEDS/ZEArray.h"
-#include "ZEFoundation/ZEDS/ZEFlags.h"
 
-#define ZED_SELECTION_DIRTY_FLAG_NONE 0
-#define ZED_SELECTION_DIRTY_FLAG_TRANSFORM 1
-#define ZED_SELECTION_DIRTY_FLAG_BBOX 2
-#define ZED_SELECTION_DIRTY_FLAG_ALL 0xFFFFFFFF
+class ZEDOperationManager;
+class ZEDSelectionManager;
+class ZEDTransformationManager;
+class ZEDViewPort;
+class ZEDScene;
 
-class ZEObject;
-class ZEDrawParameters;
-
-struct ZEDSelectionElement
+class ZEDCore
 {
-	ZEDTag* Tag;
-	ZEMatrix4x4 OffsetToPivot;
-};
-
-class ZEDSelection
-{
-	friend class ZEDSelectionManager;
-
 	private:
-		ZEAABBox BoundingBox;
-		ZEVector3 PivotPosition;
-		ZEQuaternion PivotRotation;
-		ZEVector3 PivotScale;
-		ZEMatrix4x4 Transformation;
-		ZEFlags DirtyFlags;
+		ZEDOperationManager* OperationManager;
+		ZEDSelectionManager* SelectionManager;
+		ZEDTransformationManager* TransformationManager;
 
-		bool Lock;
-		ZEArray<ZEDSelectionElement> Elements;
+		ZEArray<ZEDViewPort*> Viewports;
+		ZEDViewPort* CurrentViewport;
+		ZEArray<ZEDScene*> Scenes;
+		ZEDScene* CurrentScene;
 
-		void CalculateBoundingBox();
-		bool IsElementExists(const ZEDTag* Element);
+		ZEDCore();
+		~ZEDCore();
 
 	public:
-		ZEArray<ZEDSelectionElement>& GetElements();
-		ZEDTag* GetElement(ZESize Index);
-		void AddElement(const ZEDTag* Element);
-		void RemoveElement(const ZEDTag* Element);
+		ZEDOperationManager* GetOperationManager();
+		ZEDSelectionManager* GetSelectionManager();
+		ZEDTransformationManager* GetTransformationManager();
 
-		void SetDirtyFlags(ZEUInt Flags, bool Value);
-		ZEUInt GetDirtyFlags();
+		ZEDViewPort* GetCurrentViewport();
+		ZEDScene* GetCurrentScene();
 
-		const ZEMatrix4x4& GetTransform();
-		const ZEAABBox& GetBoundingBox();
+		void Destroy();
 
-		void SetPosition(const ZEVector3& Position);
-		const ZEVector3& GetPosition();
-
-		void SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion& GetRotation();
-
-		void SetScale(const ZEVector3& Scale);
-		const ZEVector3& GetScale();
-
-		bool IsLocked();
-		void Tick(float Time);
-		void Draw(ZEDrawParameters* Parameters);
-
-		ZEDSelection();
-		virtual ~ZEDSelection();
+		static ZEDCore* GetInstance();
 };
+
 
 #endif

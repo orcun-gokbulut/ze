@@ -37,6 +37,7 @@
 
 #include "ZEDOperation.h"
 #include "ZEError.h"
+#include "ZEDCore.h"
 
 ZEDOperationManager::ZEDOperationManager()
 {
@@ -143,16 +144,12 @@ void ZEDOperationManager::Clear()
 	StackIndex = -1;
 }
 
-void ZEDOperationManager::Destoy()
+void ZEDOperationManager::Destroy()
 {
 	delete this;
 }
 
 ZEDOperationManager* ZEDOperationManager::GetInstance()
 {
-	static ZEDOperationManager* Instance = NULL;
-	if (Instance == NULL)
-		Instance = new ZEDOperationManager();
-
-	return Instance;
+	return ZEDCore::GetInstance()->GetOperationManager();
 }

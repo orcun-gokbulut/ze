@@ -55,6 +55,8 @@ ze_add_source(ZEDViewPort.cpp				Sources)
 ze_add_source(ZEDViewPort.h					Sources Headers)
 ze_add_source(ZEDEntityTag.cpp				Sources)
 ze_add_source(ZEDEntityTag.h				Sources Headers)
+ze_add_source(ZEDCore.cpp					Sources)
+ze_add_source(ZEDCore.h						Sources Headers)
 
 
 ze_add_library(TARGET ZEDCore 
