@@ -36,6 +36,74 @@
 #include "ZETRLayer.h"
 #include "ZETRLevel.h"
 
+#include "ZEDS\ZEFormat.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEError.h"
+
+bool ZETRLayer::LoadHeader()
+{
+	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeLayer", Path);
+	ZEMLReader Reader;
+	if (!Reader.Open(HeaderFile))
+		return false;
+
+	ZEMLReaderNode Node = Reader.GetRootNode();
+	if (Node.GetName() != "ZETRLayer")
+		return false;
+
+	Name = Node.ReadString("Name");
+	BlockSize = Node.ReadUInt32("BlockSize", 0);
+	PixelType = (ZETRPixelType)Node.ReadUInt8("Type", 0);
+	StartX = Node.ReadInt64("StartX", 0);
+	StartY = Node.ReadInt64("StartY", 0);
+	EndX = Node.ReadInt64("EndX", 0);
+	EndY = Node.ReadInt64("EndY", 0);
+	MinLevel = Node.ReadInt32("MinLevel", 0);
+	MaxLevel = Node.ReadInt32("MaxLevel", 0);
+
+	return true;
+}
+
+bool ZETRLayer::InitializeSelf()
+{
+	if (!LoadHeader())
+	{
+		zeError("Cannot load terrain layer header file. (Path: \"%s\")", ZEFormat::Format("{0}/Header.zeLayer", Path).ToCString());
+		return false;
+	}
+	
+	Cache.SetPath(Path);
+	if (!Cache.Initialize())
+	{
+		zeError("Cannot initialize terrain layer block cache. (Path: \"%s\")", ZEFormat::Format("{0}/Header.zeLayer", Path).ToCString());
+		return false;
+	}
+
+	Levels.SetCount(MaxLevel - MinLevel);
+	for (ZESize I = MinLevel; I < MaxLevel; I++)
+	{
+		ZETRLevel*& CurrentLevel = Levels[I];
+		CurrentLevel = new ZETRLevel();
+		CurrentLevel->Layer = this;
+		CurrentLevel->SetLevel(I);
+
+		if (!CurrentLevel->Initialize())
+			return false;
+	}
+
+	return true;
+}
+
+void ZETRLayer::DeinitializeSelf()
+{
+	Cache.Clean();
+}
+
+ZETerrain* ZETRLayer::GetTerrain()
+{
+	return Terrain;
+}
+
 ZETRBlockCache* ZETRLayer::GetBlockCache()
 {
 	return &Cache;
@@ -46,9 +114,14 @@ const ZEArray<ZETRLevel*>& ZETRLayer::GetLevels()
 	return Levels;
 }
 
-ZETerrain* ZETRLayer::GetTerrain()
+void ZETRLayer::SetName(const ZEString& Name)
 {
-	return Terrain;
+	this->Name = Name;
+}
+
+const ZEString& ZETRLayer::GetName()
+{
+	return Name;
 }
 
 void ZETRLayer::SetViewPosition(const ZEVector3& Position)
@@ -61,6 +134,26 @@ const ZEVector3& ZETRLayer::GetViewPosition()
 	return ViewPosition;
 }
 
+ZEInt64 ZETRLayer::GetStartX()
+{
+	return StartX;
+}
+
+ZEInt64 ZETRLayer::GetStartY()
+{
+	return StartY;
+}
+
+ZEInt64 ZETRLayer::GetEndX()
+{
+	return EndX;
+}
+
+ZEInt64 ZETRLayer::GetEndY()
+{
+	return EndY;
+}
+
 ZEInt ZETRLayer::GetMinLevel()
 {
 	return MinLevel;
@@ -69,6 +162,30 @@ ZEInt ZETRLayer::GetMinLevel()
 ZEInt ZETRLayer::GetMaxLevel()
 {
 	return MaxLevel;
+}
+
+ZETRPixelType ZETRLayer::GetPixelType()
+{
+	return PixelType;
+}
+
+ZESize ZETRLayer::GetBlockSize()
+{
+	return BlockSize;
+}
+
+void ZETRLayer::SetPath(const ZEString& Path)
+{
+	if (this->Path == Path)
+		return;
+
+	this->Path = Path;
+	Reinitialize();
+}
+
+const ZEString& ZETRLayer::GetPath()
+{
+	return Path;
 }
 
 void ZETRLayer::Process()
@@ -80,12 +197,16 @@ void ZETRLayer::Process()
 ZETRLayer::ZETRLayer()
 {
 	Terrain = NULL;
+	StartX = 0;
+	StartY = 0;
+	EndX = 0;
+	EndY = 0;
 	MinLevel = 0;
 	MaxLevel = 0;
+	PixelType = ZETR_PT_NONE;
 }
 
 ZETRLayer::~ZETRLayer()
 {
-	for (ZESize I = 0; I < Levels.GetCount(); I++)
-		delete Levels[I];
+
 }

@@ -47,6 +47,8 @@ class ZETRTerrain : public ZEEntity
 	private:
 		ZEArray<ZETRLayer*>				Layers;
 		ZETRDrawer						Drawer;
+		ZESize							BlockSize;
+		ZETRLayer*						ElevationLayer;
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
@@ -59,11 +61,14 @@ class ZETRTerrain : public ZEEntity
 		ZETRDrawer&						GetDrawer();
 
 		const ZEArray<ZETRLayer*>&		GetLayers();
-		void							AddLayer(ZETRLayer* Layer);
+		bool							AddLayer(ZETRLayer* Layer);
 		void							RemoveLayer(ZETRLayer* Layer);
 
 		void							SetPrimitiveSize(ZEUInt Size);
 		ZEUInt							GetPrimitiveSize();
+
+		void							SetBlockSize(ZESize Size);
+		ZESize							GetBlockSize();
 
 		void							SetMaxLevel(ZEUInt MaxLevel);
 		ZEUInt							GetMaxLevel();

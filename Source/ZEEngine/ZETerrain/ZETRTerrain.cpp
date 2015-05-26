@@ -35,9 +35,12 @@
 
 #include "ZETRTerrain.h"
 #include "ZETRLayer.h"
+#include "ZEGraphics\ZECamera.h"
 
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZEGraphics\ZESimpleMaterial.h"
+#include "ZEError.h"
+#include "ZEGraphics\ZETerrainMaterial.h"
 
 bool ZETRTerrain::InitializeSelf()
 {
@@ -52,10 +55,18 @@ bool ZETRTerrain::InitializeSelf()
 	}
 
 	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
-	Material->SetMaterialColor(ZEVector4::One);
-	Material->SetVertexColor(false);
 	Material->SetWireframe(true);
-	Drawer.SetMaterial(Material);
+	Material->SetMaterialColor(ZEVector4::One);
+	Drawer.SetMaterial((ZETerrainMaterial*)Material);
+
+	for (ZESize I = 0; I < Layers.GetCount(); I++)
+	{
+		if (!Layers[I]->Initialize())
+		{
+			zeError("Cannot initialize terrain layer. Layer Name: \"%s\".", Layers[I]->GetName().ToCString());
+			return false;
+		}
+	}
 
 	return true;
 }
@@ -68,7 +79,7 @@ bool ZETRTerrain::DeinitializeSelf()
 
 ZETRTerrain::ZETRTerrain()
 {
-
+	BlockSize = 1024;
 }
 
 ZETRTerrain::~ZETRTerrain()
@@ -93,12 +104,44 @@ const ZEArray<ZETRLayer*>&	ZETRTerrain::GetLayers()
 	return Layers;
 }
 
-void ZETRTerrain::AddLayer(ZETRLayer* Layer)
+bool ZETRTerrain::AddLayer(ZETRLayer* Layer)
 {
+	if (Layers.Exists(Layer))
+	{
+		zeError("Layer is already registered.");
+		return false;
+	}
+
+	Layers.Add(Layer);
+
+	if (IsInitialized())
+	{
+		if (!Layer->Initialize())
+		{
+			zeError("Cannot initialize terrain layer. Layer Name: \"%s\".", Layer->GetName().ToCString());
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void ZETRTerrain::RemoveLayer(ZETRLayer* Layer)
 {
+	if (IsInitialized())
+		Layer->Deinitialize();
+
+	Layers.RemoveValue(Layer);
+}
+
+void ZETRTerrain::SetBlockSize(ZESize Size)
+{
+	BlockSize = Size;
+}
+
+ZESize ZETRTerrain::GetBlockSize()
+{
+	return BlockSize;
 }
 
 void ZETRTerrain::SetPrimitiveSize(ZEUInt Size)
@@ -113,6 +156,16 @@ ZEUInt ZETRTerrain::GetPrimitiveSize()
 
 void ZETRTerrain::Draw(ZEDrawParameters* DrawParameters)
 {
+	for (ZESize I = 0; I < Layers.GetCount(); I++)
+	{
+		ZETRLayer* CurrentLayer = Layers[I];
+		
+		if (!CurrentLayer->IsInitialized())
+			continue;
+		
+		CurrentLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
+		CurrentLayer->Process();
+	}
 
 	Drawer.Draw(DrawParameters);
 }

@@ -61,7 +61,7 @@ ZEMLValueType ZEMLUtils::ConvertValueType(ZEValueType Type)
 			return ZEML_VT_INT32;
 
 		case ZE_VRT_INTEGER_64:
-			return ZEML_VT_UINT64;
+			return ZEML_VT_INT64;
 
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			return ZEML_VT_UINT8;

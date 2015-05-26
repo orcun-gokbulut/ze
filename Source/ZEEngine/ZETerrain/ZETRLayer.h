@@ -44,27 +44,52 @@
 class ZETerrain;
 class ZETRLevel;
 
-class ZETRLayer
+class ZETRLayer : public ZEInitializable
 {
 	private:
 		ZETerrain*						Terrain;
+		ZEString						Name;
 		ZETRBlockCache					Cache;
 		ZEArray<ZETRLevel*>				Levels;
 		ZEVector3						ViewPosition;
+		ZESize							BlockSize;
+		ZETRPixelType					PixelType;
+		ZEInt64							StartX;
+		ZEInt64							StartY;
+		ZEInt64							EndX;
+		ZEInt64							EndY;
 		ZEInt							MinLevel;
 		ZEInt							MaxLevel;
+		ZEString						Path;
+
+		bool							LoadHeader();
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
 	public:
+		ZETerrain*						GetTerrain();
 		ZETRBlockCache*					GetBlockCache();
 		const ZEArray<ZETRLevel*>&		GetLevels();
 
-		ZETerrain*						GetTerrain();
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName();
 
 		void							SetViewPosition(const ZEVector3& Position);
 		const ZEVector3&				GetViewPosition();
 
+		ZEInt64							GetStartX();
+		ZEInt64							GetStartY();
+		ZEInt64							GetEndX();
+		ZEInt64							GetEndY();
 		ZEInt							GetMinLevel();
 		ZEInt							GetMaxLevel();
+
+		ZETRPixelType					GetPixelType();
+		ZESize							GetBlockSize();
+
+		void							SetPath(const ZEString& Path);
+		const ZEString&					GetPath();
 
 		void							Process();
 

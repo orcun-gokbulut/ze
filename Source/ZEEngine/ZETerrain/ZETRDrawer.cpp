@@ -43,6 +43,7 @@
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZEGraphics/ZETerrainMaterial.h"
 
 void ZETRDrawer::SetTerrain(ZETRTerrain* Terrain)
 {
@@ -94,12 +95,12 @@ float ZETRDrawer::GetMaxViewDistance()
 	return MaxViewDistance;
 }
 
-void ZETRDrawer::SetMaterial(ZEMaterial* Material)
+void ZETRDrawer::SetMaterial(ZETerrainMaterial* Material)
 {
 	this->Material = Material;
 }
 
-ZEMaterial* ZETRDrawer::GetMaterial()
+ZETerrainMaterial* ZETRDrawer::GetMaterial()
 {
 	return Material;
 }

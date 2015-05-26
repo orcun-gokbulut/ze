@@ -45,8 +45,8 @@
 ZEPackStruct(
 	struct ZETRBlockFileHeader
 	{
-		ZELittleEndian<ZEUInt64>	PositionX;
-		ZELittleEndian<ZEUInt64>	PositionY;
+		ZELittleEndian<ZEUInt64>	IndexX;
+		ZELittleEndian<ZEUInt64>	IndexY;
 		ZEInt8						Level;
 		ZELittleEndian<ZEUInt32>	Size;
 		ZEUInt8						Type;
@@ -64,8 +64,8 @@ void ZETRBlock::Clean()
 	Status = ZETR_BRS_NONE;
 	BlockSquence = 0;
 
-	PositionX = 0;
-	PositionY = 0;
+	IndexX = 0;
+	IndexY = 0;
 	Level = 0;
 	Size = 0;
 
@@ -83,24 +83,34 @@ ZEUInt64 ZETRBlock::GetBlockSequence()
 	return BlockSquence;
 }
 
-ZEInt64 ZETRBlock::GetPositionX()
+ZEInt64 ZETRBlock::GetIndexX()
 {
-	return PositionX;
+	return IndexX;
 }
 
-ZEInt64 ZETRBlock::GetPositionY()
+ZEInt64 ZETRBlock::GetIndexY()
 {
-	return PositionY;
+	return IndexY;
 }
 
-ZEInt64 ZETRBlock::GetEndX()
+double ZETRBlock::GetPositionX()
 {
-	return PositionX + Size * (ZEInt64)ZEMath::Power(2, (float)Level);
+	return GetIndexX() * Size * ZEMath::Power(2, (float)Level);
 }
 
-ZEInt64 ZETRBlock::GetEndY()
+double ZETRBlock::GetPositionY()
 {
-	return PositionY + Size * (ZEInt64)ZEMath::Power(2, (float)Level);
+	return GetIndexY() * Size * ZEMath::Power(2, (float)Level);
+}
+
+double ZETRBlock::GetEndX()
+{
+	return (GetPositionX() + 1) * Size * ZEMath::Power(2, (float)Level);
+}
+
+double ZETRBlock::GetEndY()
+{
+	return (GetPositionY() + 1) * Size * ZEMath::Power(2, (float)Level);
 }
 
 ZEInt ZETRBlock::GetLevel()
@@ -198,8 +208,8 @@ bool ZETRBlock::Load(ZEFile* File)
 		return false;
 	}
 
-	PositionX = Header.PositionX;
-	PositionY = Header.PositionY;
+	IndexX = Header.IndexX;
+	IndexY = Header.IndexY;
 	Level = Header.Level;
 	PixelType = (ZETRPixelType)Header.Type;
 	Size = Header.Size;
@@ -234,16 +244,4 @@ ZETRBlock::ZETRBlock()
 ZETRBlock::~ZETRBlock()
 {
 	Clean();
-}
-
-
-ZETRBlock* ZETRBlock::Create(ZEUInt64 BlockSquence, ZEInt64 PositionX, ZEInt64 PositionY, ZEInt Level)
-{
-	ZETRBlock* NewBlock = new ZETRBlock();
-	NewBlock->PositionX = PositionX;
-	NewBlock->PositionY = PositionY;
-	NewBlock->Level = Level;
-	NewBlock->BlockSquence = BlockSquence;
-
-	return NewBlock;
 }

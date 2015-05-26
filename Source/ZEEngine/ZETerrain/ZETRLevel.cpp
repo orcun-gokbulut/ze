@@ -34,16 +34,133 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETRLevel.h"
+#include "ZETRLayer.h"
+
 #include "ZEGraphics\ZETexture2D.h"
+#include "ZEMath\ZEMath.h"
+
+#define ZETR_LEVEL_BLOCK_COUNT 3
+
+ZETRLevelBlock::ZETRLevelBlock()
+{
+	IndexX = 0;
+	IndexY = 0;
+	LastStatus = ZETR_BRS_NONE;
+	Cleaned = false;
+}
+
+void ZETRLevel::CalculateTextureTransform()
+{
+	TextureTransform = ZEMatrix3x3::Identity;
+}
+
+void ZETRLevel::ProcessBlock(ZESSize IndexX, ZESSize IndexY)
+{
+	int LocalIndexX = ZEMath::CircularMod(IndexX, (ZESSize)ZETR_LEVEL_BLOCK_COUNT);
+	int LocalIndexY = ZEMath::CircularMod(IndexY, (ZESSize)ZETR_LEVEL_BLOCK_COUNT);
+
+	ZETRLevelBlock* Block = &Blocks[LocalIndexX][LocalIndexY];
+	if (Block->IndexX != IndexX ||
+		Block->IndexY != IndexY)
+	{
+		Block->IndexX = IndexX;
+		Block->IndexY = IndexY;
+		Block->LastStatus = ZETR_BRS_NONE;
+		Block->Cleaned = false;
+	}
+	
+	if (Block->LastStatus == ZETR_BRS_AVAILABLE || Block->LastStatus == ZETR_BRS_NOT_AVAILABLE)
+	{
+		return;
+	}
+	else if (Block->LastStatus == ZETR_BRS_NONE || Block->LastStatus == ZETR_BRS_LOADING)
+	{
+		ZETRBlock* NewBlock = Layer->GetBlockCache()->RequestBlock(IndexX, IndexY, Level);
+		Block->LastStatus = NewBlock->GetStatus();
+		if (Block->LastStatus == ZETR_BRS_AVAILABLE)
+		{
+			ZESize BlockSize = Layer->GetBlockSize();
+			ZEBYTE* SourceBuffer = (ZEBYTE*)NewBlock->GetData();
+			ZESize SourcePitch = NewBlock->GetPitch();
+
+			void* DestBuffer;
+			ZESize DestPitch;
+			Texture->Lock(&DestBuffer, &DestPitch, 0, LocalIndexX * BlockSize, LocalIndexY * BlockSize, BlockSize, BlockSize);
+				for (ZESize I = 0; I < BlockSize; I++)
+					memcpy((ZEBYTE*)DestBuffer + I * DestPitch, SourceBuffer + I * SourcePitch, SourcePitch);
+			Texture->Unlock(0);
+		}
+		else
+		{
+			if (Block->Cleaned)
+				return;
+
+			ZESize BlockSize = Layer->GetBlockSize();
+			ZESize SourcePitch = BlockSize * NewBlock->GetPixelSize();
+
+			void* DestBuffer;
+			ZESize DestPitch;
+			Texture->Lock(&DestBuffer, &DestPitch, 0, LocalIndexX * BlockSize, LocalIndexY * BlockSize, BlockSize, BlockSize);
+				for (ZESize I = 0; I < BlockSize; I++)
+					memset((ZEBYTE*)DestBuffer + I * DestPitch, 0, SourcePitch);
+			Texture->Unlock(0);
+
+			Block->Cleaned = true;
+		}
+	}
+}
+
+void ZETRLevel::SetLevel(ZEInt Level)
+{
+	this->Level = Level;
+	LevelScale = ZEMath::Power(2, Level);
+	LevelBlockSize = LevelScale * Layer->GetBlockSize();
+}
+
+bool ZETRLevel::InitializeSelf()
+{
+	if (Layer == NULL)
+		return false;
+
+	ZESize BlockSize = Layer->GetBlockSize();
+	Texture = ZETexture2D::CreateInstance();
+	if (!Texture->Create(BlockSize * ZETR_LEVEL_BLOCK_COUNT, BlockSize * ZETR_LEVEL_BLOCK_COUNT, 0, ZE_TPF_RGBA8, false))
+	{
+		Texture->Destroy();
+		Texture = NULL;
+		return false;
+	}
+
+	return true;
+}
+
+void ZETRLevel::DeinitializeSelf()
+{
+	if (Texture != NULL)
+	{
+		Texture->Destroy();
+		Texture = NULL;
+	}
+}
 
 ZETRLayer* ZETRLevel::GetLayer()
 {
 	return Layer;
 }
 
-const ZEMatrix3x3& ZETRLevel::GetTextureTransform()
+ZEInt ZETRLevel::GetLevel()
 {
-	return TextureTransform;
+	return Level;
+}
+
+float ZETRLevel::GetLevelScale()
+{
+	return LevelScale;
+}
+
+float ZETRLevel::GetLevelBlockSize()
+{
+	return LevelBlockSize;
 }
 
 ZETexture2D* ZETRLevel::GetTexture()
@@ -51,23 +168,36 @@ ZETexture2D* ZETRLevel::GetTexture()
 	return Texture;
 }
 
+const ZEMatrix3x3& ZETRLevel::GetTextureTransform()
+{
+	return TextureTransform;
+}
+
 void ZETRLevel::Process()
 {
+	ZEVector3 Position = Layer->GetViewPosition();
 
+	ZEInt64 IndexX = ZEMath::Floor(Position.x / LevelBlockSize);
+	ZEInt64 IndexY = ZEMath::Floor(Position.z / LevelBlockSize);
+
+	ProcessBlock(IndexX - 1, IndexY + 1);
+	ProcessBlock(IndexX,	 IndexY + 1);
+	ProcessBlock(IndexX + 1, IndexY + 1);
+
+	ProcessBlock(IndexX - 1, IndexY);
+	ProcessBlock(IndexX,	 IndexY);
+	ProcessBlock(IndexX + 1, IndexY);
+
+	ProcessBlock(IndexX - 1, IndexY - 1);
+	ProcessBlock(IndexX,	 IndexY - 1);
+	ProcessBlock(IndexX + 1, IndexY - 1);
+
+	CalculateTextureTransform();
 }
 
 ZETRLevel::ZETRLevel()
 {
+	Level = 0;
 	Layer = NULL;
 	Texture = NULL;
-}
-
-ZETRLevel::~ZETRLevel()
-{
-	if (Texture != NULL)
-	{
-		Texture->Release();
-		Texture = NULL;
-	}
-
 }

@@ -73,6 +73,15 @@ void ZEInitializable::Deinitialize()
 	Initialized = false;
 }
 
+bool ZEInitializable::Reinitialize()
+{
+	if (!Initialized)
+		return false;
+
+	Deinitialize();
+	return Initialize();
+}
+
 ZEInitializable::ZEInitializable()
 {
 	Initialized = false;

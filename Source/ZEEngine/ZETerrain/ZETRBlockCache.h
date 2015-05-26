@@ -44,24 +44,14 @@
 #include "ZEThread\ZEThread.h"
 #include "ZEInitializable.h"
 
-struct ZETRBlockPosition
-{
-	ZEInt64 PositionX;
-	ZEInt64 PositionY;
-	ZEInt Level;
-
-	ZEInt64 DistanceSquare(const ZETRBlockPosition& OtherBlock);
-};
-
 class ZETRBlockCache : public ZEInitializable
 {
 	private:
+		ZEString					Path;
 		ZEArray<ZETRBlock*>			Blocks;
 		ZESignal					CrawlerSignal;
 		ZEThread					CrawlerThread;
 		ZEUInt64					LastBlockSquence;
-
-		ZETRBlockPosition			PointOfInterest;
 
 		void						LoadBlock(ZETRBlock* Block);
 		void						Crawler(ZEThread* Thread, void* ExtraParameters);
@@ -70,9 +60,10 @@ class ZETRBlockCache : public ZEInitializable
 		virtual void				DeinitializeSelf();
 
 	public:
-		void						SetPointOfInterest(const ZETRBlockPosition& PointOfInterest);
-		const ZETRBlockPosition&	GetPointOfInterest();
+		void						SetPath(const ZEString& Path);
+		const ZEString&				GetPath();
 
-		ZETRBlock*					RequestBlock(const ZETRBlockPosition& BlockRequest);
+		ZETRBlock*					RequestBlock(ZEInt64 IndexX, ZEInt64 IndexY, ZEInt Level);
+
 		void						Clean();
 };

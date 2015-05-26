@@ -35,31 +35,60 @@
 
 #pragma once
 
+#include "ZEInitializable.h"
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEMatrix.h"
 #include "ZEMath\ZEVector.h"
+#include "ZETRBlock.h"
 
 class ZETerrain;
 class ZETexture2D;
 class ZETRLayer;
+class ZEMaterial;
 
-class ZETRLevel
+struct ZETRLevelBlock
 {
+	ZEInt64 IndexX;
+	ZEInt64 IndexY;
+	ZETRBlockStatus LastStatus;
+	bool Cleaned;
+
+	ZETRLevelBlock();
+};
+
+class ZETRLevel : public ZEInitializable
+{
+	friend class ZETRLayer;
 	private:
 		ZETRLayer*				Layer;
-
+		ZEInt					Level;
 		ZETexture2D*			Texture;
 		ZEMatrix3x3				TextureTransform;
+		ZETRLevelBlock			Blocks[3][3];
+		ZEMaterial*				Material;
+		float					LevelScale;
+		float					LevelBlockSize;
+
+		void					CalculateTextureTransform();
+		void					ProcessBlock(ZESSize IndexX, ZESSize IndexY);
+
+		void					SetLevel(ZEInt Level);
+
+		virtual bool			InitializeSelf();
+		virtual void			DeinitializeSelf();
 
 	public:
 		ZETRLayer*				GetLayer();
 
-		const ZEMatrix3x3&		GetTextureTransform();
+		ZEInt					GetLevel();
+		float					GetLevelScale();
+		float					GetLevelBlockSize();
+
+		ZEMaterial*				GetMaterial();
 		ZETexture2D*			GetTexture();
+		const ZEMatrix3x3&		GetTextureTransform();
 
 		void					Process();
 
 								ZETRLevel();
-								~ZETRLevel();
-
 };
