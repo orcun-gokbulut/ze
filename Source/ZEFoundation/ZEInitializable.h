@@ -48,6 +48,7 @@ class ZEInitializable
 		bool			IsInitialized();
 		bool			Initialize();
 		void			Deinitialize();
+		bool			Reinitialize();
 
 						ZEInitializable();
 		virtual			~ZEInitializable();

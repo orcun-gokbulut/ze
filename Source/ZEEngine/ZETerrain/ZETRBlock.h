@@ -58,12 +58,13 @@ enum ZETRBlockStatus
 
 class ZETRBlock
 {
+	friend class ZETRBlockCache;
 	private:
 		ZETRBlockStatus			Status;
 		ZEUInt64				BlockSquence;
 
-		ZEInt64					PositionX;
-		ZEInt64					PositionY;
+		ZEInt64					IndexX;
+		ZEInt64					IndexY;
 		ZEInt					Level;
 		ZESize					Size;
 
@@ -77,10 +78,13 @@ class ZETRBlock
 		ZETRBlockStatus			GetStatus();
 		ZEUInt64				GetBlockSequence();
 
-		ZEInt64					GetPositionX();
-		ZEInt64					GetPositionY();
-		ZEInt64					GetEndX();
-		ZEInt64					GetEndY();
+		ZEInt64					GetIndexX();
+		ZEInt64					GetIndexY();
+
+		double					GetPositionX();
+		double					GetPositionY();
+		double					GetEndX();
+		double					GetEndY();
 
 		ZEInt					GetLevel();
 		ZESize					GetSize();
@@ -96,6 +100,4 @@ class ZETRBlock
 
 								ZETRBlock();
 								~ZETRBlock();
-
-		static ZETRBlock*		Create(ZEUInt64 BlockSequence, ZEInt64 PositionX, ZEInt64 PositionY, ZEInt Level);
 };

@@ -310,7 +310,7 @@ bool ZETEBlockDatabase::RemoveBlock(ZETEBlock* Block)
 
 bool ZETEBlockDatabase::SaveDatabase()
 {
-	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeTRLayer", Path);
+	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeLayer", Path);
 
 	ZEMLWriter Writer;
 	if (!Writer.Open(HeaderFile))
@@ -335,7 +335,7 @@ bool ZETEBlockDatabase::SaveDatabase()
 
 bool ZETEBlockDatabase::LoadDatabase()
 {
-	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeTRLayer", Path);
+	ZEString HeaderFile = ZEFormat::Format("{0}/Header.zeLayer", Path);
 
 	ZEMLReader Reader;
 	if (!Reader.Open(HeaderFile))

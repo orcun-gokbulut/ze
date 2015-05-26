@@ -36,19 +36,14 @@
 #include "ZETRBlockCache.h"
 #include "ZEDS\ZEFormat.h"
 
-ZEInt64 ZETRBlockPosition::DistanceSquare(const ZETRBlockPosition& OtherBlock)
-{
-	ZEInt64 DeltaX = OtherBlock.PositionX - PositionX;
-	ZEInt64 DeltaY = OtherBlock.PositionY - PositionY;
-	return DeltaX * DeltaX + DeltaY * DeltaY;
-}
-
 bool ZETRBlockCache::InitializeSelf()
 {
 	CrawlerThread.SetFunction(ZEThreadFunction::Create<ZETRBlockCache, &ZETRBlockCache::Crawler>(this));
-	CrawlerThread.Run(NULL);
+	//CrawlerThread.Run(NULL);
 
 	Blocks.SetCount(256);
+	Blocks.Fill(NULL);
+	LastBlockSquence = 0;
 
 	return true;
 }
@@ -57,51 +52,64 @@ void ZETRBlockCache::DeinitializeSelf()
 {
 	CrawlerSignal.Signal();
 	CrawlerThread.Wait();
+
+	for (ZESize I = 0; I < Blocks.GetCount(); I++)
+	{
+		if (Blocks[I] != NULL)
+			delete Blocks[I];
+	}
+	Blocks.Clear();
+	LastBlockSquence = 0;
 }
 
-void ZETRBlockCache::SetPointOfInterest(const ZETRBlockPosition& PointOfInterest)
+void ZETRBlockCache::SetPath(const ZEString& Path)
 {
-	this->PointOfInterest = PointOfInterest;
+	this->Path = Path;
 }
 
-const ZETRBlockPosition& ZETRBlockCache::GetPointOfInterest()
+const ZEString& ZETRBlockCache::GetPath()
 {
-	return PointOfInterest;
+	return Path;
 }
 
 void ZETRBlockCache::LoadBlock(ZETRBlock* Block)
 {
+	if (Block == NULL || Block->Status != ZETR_BRS_NONE)
+		return;
+		
 	Block->Load(
-		ZEFormat::Format("{0}/L{1}-Y{2}-Z{3}.zeBlock", 
-			"C:/Test/Blocks", 
-			Block->GetLevel(), Block->GetPositionY(), Block->GetPositionY()));
+		ZEFormat::Format("{0}/L{1}-Y{2}-X{3}.zeBlock", 
+			Path, 
+			Block->GetLevel(), Block->GetIndexY(), Block->GetIndexX()));
 }
 
 void ZETRBlockCache::Crawler(ZEThread* Thread, void* ExtraParameters)
 {
-	while(Thread->ControlPoint())
+	/*while(Thread->ControlPoint())
 	{
-		CrawlerSignal.Wait();
+		CrawlerSignal.Wait();*/
 		for (ZESize I = 0; I < Blocks.GetCount(); I++)
 		{
-			if (!Thread->ControlPoint())
-				return;
+			/*if (!Thread->ControlPoint())
+				return;*/
 
 			LoadBlock(Blocks[I]);
 		}
-	}
+	//}
 }
 
-ZETRBlock* ZETRBlockCache::RequestBlock(const ZETRBlockPosition& BlockRequest)
+ZETRBlock* ZETRBlockCache::RequestBlock(ZEInt64 IndexX, ZEInt64 IndexY, ZEInt Level)
 {
 	for (ZESize I = 0; I < Blocks.GetCount(); I++)
 	{
 		ZETRBlock* CurrentBlock = Blocks[I];
 		if (CurrentBlock != NULL &&
-			CurrentBlock->GetPositionX() == BlockRequest.PositionX &&
-			CurrentBlock->GetPositionY() == BlockRequest.PositionY &&
-			CurrentBlock->GetLevel() == BlockRequest.Level)
-		{				
+			CurrentBlock->GetIndexX() == IndexX &&
+			CurrentBlock->GetIndexY() == IndexY &&
+			CurrentBlock->GetLevel() == Level)
+		{
+			LastBlockSquence++;
+			CurrentBlock->BlockSquence = LastBlockSquence;
 			return CurrentBlock;
 		}
 	}
@@ -145,9 +153,23 @@ ZETRBlock* ZETRBlockCache::RequestBlock(const ZETRBlockPosition& BlockRequest)
 	}
 
 	LastBlockSquence++;
-	*NewBlock = ZETRBlock::Create(LastBlockSquence, BlockRequest.PositionX, BlockRequest.PositionY, BlockRequest.Level);
-	CrawlerSignal.Signal();
+	*NewBlock = new ZETRBlock();
+	(*NewBlock)->BlockSquence = LastBlockSquence;
+	(*NewBlock)->IndexX = IndexX;
+	(*NewBlock)->IndexY = IndexY;
+	(*NewBlock)->Level = Level;
+	
+	//CrawlerSignal.Signal();
+	Crawler(&CrawlerThread, NULL);
 
 	return *NewBlock;
 }
 
+void ZETRBlockCache::Clean()
+{
+	for (ZESize I = 0; I < Blocks.GetCount(); I++)
+	{
+		delete Blocks[I];
+		Blocks[I] = NULL;
+	}
+}

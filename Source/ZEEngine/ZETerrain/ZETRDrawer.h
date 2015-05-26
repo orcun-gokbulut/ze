@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 
 class ZETRTerrain;
-class ZEMaterial;
+class ZETerrainMaterial;
 struct ZEDrawParameters;
 
 class ZETRDrawer
@@ -52,7 +52,7 @@ class ZETRDrawer
 		float					MaxViewDistance;
 		ZETRPrimitiveBuffer		VertexBuffer;
 		bool					Initialized;
-		ZEMaterial*				Material;
+		ZETerrainMaterial*		Material;
 
 		void					DrawPrimitive(ZEDrawParameters* DrawParameters,
 									float WorldPositionX, float WorldPositionY,
@@ -75,8 +75,8 @@ class ZETRDrawer
 		void					SetMaxViewDistance(float MaxViewDistance);
 		float					GetMaxViewDistance();
 
-		void					SetMaterial(ZEMaterial* Material);
-		ZEMaterial*				GetMaterial();
+		void					SetMaterial(ZETerrainMaterial* Material);
+		ZETerrainMaterial*		GetMaterial();
 
 		bool					Initialize();
 		void					Deinitialize();
