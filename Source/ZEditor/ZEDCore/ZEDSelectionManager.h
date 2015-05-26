@@ -40,15 +40,18 @@
 #include "ZEDSelection.h"
 #include "ZEFoundation/ZEDS/ZEArray.h"
 
+class ZEViewVolume;
+
 enum ZEDSelectionMode
 {
 	ZED_SLM_ENTITY,
 	ZED_SLM_VERTEX
 };
 
-
 class ZEDSelectionManager
 {
+	friend class ZEDCore;
+
 	private:
 		ZEArray<ZEDSelection*> Selections;
 		ZEDSelection* CurrentSelection;
@@ -56,9 +59,10 @@ class ZEDSelectionManager
 		//ZEFlags Filter;
 	
 		ZEDSelectionManager();
-		virtual ~ZEDSelectionManager();
 
 	public:
+		ZEDSelection* CreateSelection(ZEViewVolume* ViewVolume);
+
 		ZEArray<ZEDSelection*>& GetSelections();
 		ZEDSelection* GetSelection(ZESize Index);
 
@@ -66,10 +70,13 @@ class ZEDSelectionManager
 		void RemoveSelection(ZEDSelection* Selection);
 		void LockSelection(ZESize Index, bool Value);
 
+		void SetCurrentSelection(ZEDSelection* Selection);
+		ZEDSelection* GetCurrentSelection();
+
 		void SetMode(ZEDSelectionMode Mode);
 		ZEDSelectionMode GetMode();
 
-		virtual void Destroy();
+		void Destroy();
 
 		static ZEDSelectionManager* GetInstance();
 };

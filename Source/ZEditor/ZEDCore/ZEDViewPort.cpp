@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDViewPort.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEWindow.h"
 
 void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 {
@@ -64,7 +66,8 @@ void ZEDViewPort::keyReleaseEvent(QKeyEvent* KeyEvent)
 
 void ZEDViewPort::resizeEvent(QResizeEvent* ResizeEvent)
 {
-
+	QSize NewSize = ResizeEvent->size();
+	ZECore::GetInstance()->GetWindow()->SetWindowSize(NewSize.width(), NewSize.height());
 }
 
 void ZEDViewPort::dragEnterEvent(QDragEnterEvent* Event)

@@ -52,17 +52,11 @@ enum ZEDGizmoMode
 	ZED_GM_SCALE
 };
 
-enum ZEDGizmoTargetSpace
-{
-	ZED_GTS_WORLD,
-	ZED_GTS_LOCAL
-};
-
 class ZEDGizmo
 {
 	private:
 		ZEDGizmoMode Mode;
-		ZEDGizmoTargetSpace TargetSpace;
+		//ZEDGizmoTargetSpace TargetSpace;
 		ZEDSelection* Target;
 		//ZEMatrix4x4 TargetOldTransform;
 

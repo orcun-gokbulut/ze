@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDScene.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+#ifndef __ZED_SCENE_H__
+#define __ZED_SCENE_H__
+
+#include "ZEGame/ZEScene.h"
+
+class ZEDTag;
+
+class ZEDScene : public ZEScene
+{
+	private:
+		ZESmartArray<ZEDTag*> Tags;
+
+		void AddTag(ZEDTag* Tag);
+		void RemoveTag(ZEDTag* Tag);
+
+	public:
+		const ZESmartArray<ZEDTag*>& GetTags();
+		ZEArray<ZEDTag*> GetTags(ZEClass* Class);
+
+
+
+		void ClearTags();
+
+		ZEDScene();
+};
+
+#endif

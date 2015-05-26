@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDTransformationManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEDTransformationManager.h"
+#include "ZEDCore.h"
+
+ZEDTransformationManager::ZEDTransformationManager()
+{
+	CurrentSpace = ZED_TFS_WORLD;
+}
+
+ZEDTransformationSpace ZEDTransformationManager::GetCurrentSpace()
+{
+	return CurrentSpace;
+}
+
+void ZEDTransformationManager::Destroy()
+{
+
+}
+
+ZEDTransformationManager* ZEDTransformationManager::GetInstance()
+{
+	return ZEDCore::GetInstance()->GetTransformationManager();
+}
