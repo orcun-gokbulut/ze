@@ -61,6 +61,7 @@ class ZETRLayer : public ZEInitializable
 		ZEInt							MinLevel;
 		ZEInt							MaxLevel;
 		ZEString						Path;
+		bool							Enabled;
 
 		bool							LoadHeader();
 
@@ -71,9 +72,13 @@ class ZETRLayer : public ZEInitializable
 		ZETerrain*						GetTerrain();
 		ZETRBlockCache*					GetBlockCache();
 		const ZEArray<ZETRLevel*>&		GetLevels();
+		ZETRLevel*						GetLevel(ZEInt Level);
 
 		void							SetName(const ZEString& Name);
 		const ZEString&					GetName();
+
+		void							SetEnabled(bool Enabled);
+		bool							GetEnabled();
 
 		void							SetViewPosition(const ZEVector3& Position);
 		const ZEVector3&				GetViewPosition();

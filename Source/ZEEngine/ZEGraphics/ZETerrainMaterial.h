@@ -41,13 +41,17 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMeta/ZEObject.h"
 
-class ZETextureCube;
-class ZETextureCubeResource;
-class ZETexture2D;
-class ZETexture2DResource;
+class ZETRLayer;
+class ZETRTerrain;
+
+struct ZETRMaterialInstanceData
+{
+	ZEUInt Level;
+};
 
 class ZETerrainMaterial : public ZEMaterial
 {
+	friend class ZETRDrawer;
 	protected:
 		bool							TwoSided;
 		bool							Wireframe;
@@ -58,81 +62,32 @@ class ZETerrainMaterial : public ZEMaterial
 		ZEVector3						DiffuseColor;
 		float							DiffuseFactor;
 
-		float							HeightOffset;
-		float							HeightScale;
+		ZETRTerrain*					Terrain;
+		ZETRLayer*						ElevationLayer;
+		ZETRLayer*						ColorLayer;
 
-		ZESize							ChunkSize;
-		float							BlendTreshold;
+		float							ElevationOffset;
+		float							ElevationScale;
+		float							BlendThreshold;
+		float							ChunkSize;
 
-		ZEVector2						TextureScale;
-		ZEVector2						TextureOffset;
-
-		union
-		{
-			struct
-			{
-				ZEVector3				AmbientColorSC;
-				float					Reserved1;
-
-				ZEVector3				DiffuseColorSC;
-				float					Reserved2;
-			};
-			float						PixelShaderConstants[8];
-		};
-
-
-		ZETexture2D*					HeightTexture;
-		ZETexture2D*					ColorTexture;
-		ZETexture2D*					NormalTexture;
-
-										ZETerrainMaterial();
+		ZETerrainMaterial();
 		virtual							~ZETerrainMaterial();
 
 	public:
-		ZESize							Level;
 		virtual ZEMaterialFlags			GetMaterialFlags() const;
 
-		// Material Options
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
 
 		void							SetWireframe(bool Enable);
 		bool							GetWireframe() const;
 
-		void							SetTextureScale(const ZEVector2& Scale);
-		const ZEVector2&				GetTextureScale() const;
-
-		void							SetTextureOffset(const ZEVector2& Offset);
-		const ZEVector2&				GetTextureOffset() const;
-
-		void							SetHeightTexture(ZETexture2D* Texture);
-		ZETexture2D*					GetHeightTexture();
-
-		void							SetHeightOffset(float Offset);
-		float							GetHeightOffset();
-
-		void							SetHeightScale(float Scale);
-		float							GetHeightScale();
-
-		void							SetChunkSize(ZESize Size);
-		ZESize							GetChunkSize();
-
-		void							SetBlendTreshold(float Treshold);
-		float							GetBlendTreshold();
-
-		void							SetColorTexture(ZETexture2D* Texture);
-		ZETexture2D*					GetColorTexture();
-
-		void							SetNormalTexture(ZETexture2D* Texture);
-		ZETexture2D*					GetNormalTexture();
-
-		// Ambient
 		void							SetAmbientFactor(float Factor);
 		float							GetAmbientFactor() const;
 		void							SetAmbientColor(const ZEVector3& Color);
 		const ZEVector3&				GetAmbientColor() const;
 
-		// Diffuse
 		void							SetDiffuseColor(const ZEVector3& Color);
 		const ZEVector3&				GetDiffuseColor() const;
 		void							SetDiffuseFactor(float Factor);
@@ -142,4 +97,8 @@ class ZETerrainMaterial : public ZEMaterial
 
 		static ZETerrainMaterial*		CreateInstance();
 };
+
+// Graphics API
+//		Device/Resource Wrappers
+//		Main Rendering Corridor
 #endif

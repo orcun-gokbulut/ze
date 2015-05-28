@@ -49,26 +49,21 @@
 
 ZETerrainMaterial::ZETerrainMaterial()
 {
-	HeightTexture = NULL;
-	ColorTexture = NULL;
-	NormalTexture = NULL;
-
 	TwoSided = false;
 	Wireframe = false;
-	HeightScale = 1.0f;
-	HeightOffset = 0.0f;
-	TextureOffset = ZEVector2::Zero;
-	TextureScale = ZEVector2::One;
-	ChunkSize = 32;
-	BlendTreshold = 0.5f;
 
-	HeightTexture = NULL;
-	ColorTexture = NULL;
-	NormalTexture = NULL;
-	SetDiffuseColor(ZEVector3::One);
-	SetDiffuseFactor(1.0f);
-	SetAmbientColor(ZEVector3::One);
-	SetAmbientFactor(0.0f);
+	ElevationLayer = NULL;
+	ColorLayer = NULL;
+
+	ElevationOffset = 0.0f;
+	ElevationScale = 1.0f;
+	BlendThreshold = 0.125f;
+
+	AmbientFactor = 0.0f;
+	AmbientColor = ZEVector3::One;
+
+	DiffuseFactor = 1.0f;
+	DiffuseColor = ZEVector3::One;
 }
 
 ZETerrainMaterial::~ZETerrainMaterial()
@@ -101,100 +96,9 @@ bool ZETerrainMaterial::GetTwoSided() const
 	return TwoSided;
 }
 
-void ZETerrainMaterial::SetHeightTexture(ZETexture2D* Texture)
-{
-	HeightTexture = Texture;
-}
-
-ZETexture2D* ZETerrainMaterial::GetHeightTexture()
-{
-	return HeightTexture;
-}
-
-void ZETerrainMaterial::SetHeightOffset(float Offset)
-{
-	HeightOffset = Offset;
-}
-
-float ZETerrainMaterial::GetHeightOffset()
-{
-	return HeightOffset;
-}
-
-void ZETerrainMaterial::SetHeightScale(float Scale)
-{
-	HeightScale = Scale;
-}
-
-float ZETerrainMaterial::GetHeightScale()
-{
-	return HeightScale;
-}
-
-void ZETerrainMaterial::SetTextureScale(const ZEVector2& Scale)
-{
-	TextureScale = Scale;
-}
-
-const ZEVector2& ZETerrainMaterial::GetTextureScale() const
-{
-	return TextureScale;
-}
-
-void ZETerrainMaterial::SetTextureOffset(const ZEVector2& Offset)
-{
-	TextureOffset = Offset;
-}
-
-const ZEVector2& ZETerrainMaterial::GetTextureOffset() const
-{
-	return TextureOffset;
-}
-
-void ZETerrainMaterial::SetChunkSize(ZESize Size)
-{
-	ChunkSize = Size;
-}
-
-ZESize ZETerrainMaterial::GetChunkSize()
-{
-	return ChunkSize;
-}
-
-void ZETerrainMaterial::SetBlendTreshold(float Treshold)
-{
-	BlendTreshold = Treshold;
-}
-
-float ZETerrainMaterial::GetBlendTreshold()
-{
-	return BlendTreshold;
-}
-
-void ZETerrainMaterial::SetColorTexture(ZETexture2D* Texture)
-{
-	ColorTexture = Texture;
-}
-
-ZETexture2D* ZETerrainMaterial::GetColorTexture()
-{
-	return ColorTexture;
-}
-
-void ZETerrainMaterial::SetNormalTexture(ZETexture2D* Texture)
-{
-	NormalTexture = Texture;
-}
-
-ZETexture2D* ZETerrainMaterial::GetNormalTexture()
-{
-	return NormalTexture;
-}
-
 void ZETerrainMaterial::SetAmbientColor(const ZEVector3& Color)
 {
 	AmbientColor = Color;
-	AmbientColorSC = AmbientColor * AmbientFactor;
 }
 
 const ZEVector3& ZETerrainMaterial::GetAmbientColor() const
@@ -205,7 +109,6 @@ const ZEVector3& ZETerrainMaterial::GetAmbientColor() const
 void ZETerrainMaterial::SetAmbientFactor(float Factor)
 {
 	AmbientFactor = Factor;
-	AmbientColorSC = AmbientColor * AmbientFactor;
 }
 
 float ZETerrainMaterial::GetAmbientFactor() const
@@ -216,7 +119,6 @@ float ZETerrainMaterial::GetAmbientFactor() const
 void ZETerrainMaterial::SetDiffuseColor(const ZEVector3& Color)
 {
 	DiffuseColor = Color;
-	ZEVector3::Scale(DiffuseColorSC, DiffuseColor, DiffuseFactor);
 }
 
 const ZEVector3& ZETerrainMaterial::GetDiffuseColor() const
@@ -227,7 +129,6 @@ const ZEVector3& ZETerrainMaterial::GetDiffuseColor() const
 void ZETerrainMaterial::SetDiffuseFactor(float Factor)
 {
 	DiffuseFactor = Factor;
-	ZEVector3::Scale(DiffuseColorSC, DiffuseColor, DiffuseFactor);
 }
 
 float ZETerrainMaterial::GetDiffuseFactor() const
@@ -235,7 +136,7 @@ float ZETerrainMaterial::GetDiffuseFactor() const
 	return DiffuseFactor;
 }
 
-void ZETerrainMaterial::Tick( float ElapsedTime )
+void ZETerrainMaterial::Tick(float ElapsedTime)
 {
 
 }

@@ -111,12 +111,16 @@ bool ZETRDrawer::Initialize()
 		return true;
 
 	VertexBuffer.SetPrimitiveSize(GetPrimitiveSize());
-
 	if (!VertexBuffer.Initialize())
 	{
 		zeError("Can not initialize.");
 		return false;
 	}
+
+	Material = ZETerrainMaterial::CreateInstance();
+	Material->SetWireframe(true);
+	Material->SetAmbientColor(ZEVector3::One);
+	Material->SetAmbientFactor(1.0f);
 
 	return true;
 }
@@ -130,7 +134,11 @@ void ZETRDrawer::Deinitialize()
 
 }
 
-void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float WorldPositionX, float WorldPositionY, ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETRPrimitiveType Type, ZEInt NegativeExtent, ZEInt PositiveExtent, float MinHeight, float MaxHeigt)
+void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, 
+							   float WorldPositionX, float WorldPositionY, ZEUInt Level, 
+							   float LocalPositionX, float LocalPositionY, 
+							   ZETRPrimitiveType Type, ZEInt NegativeExtent, ZEInt PositiveExtent, 
+							   float MinHeight, float MaxHeigt)
 {
 	ZEUInt Scale = 1 << Level;
 	ZEAABBox BoundingBox;
@@ -147,20 +155,20 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float WorldPosi
 
 	ZERenderCommand RenderCommand;
 	RenderCommand.SetZero();
-	RenderCommand.Flags				= ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	RenderCommand.VertexDeclaration = VertexBuffer.GetVertexDeclaration();
-	RenderCommand.Material			= Material;
-	RenderCommand.Order				= 0;
-	RenderCommand.Pipeline			= ZE_RORP_3D;
-	RenderCommand.VertexBuffer		= VertexBuffer.GetVertexBuffer();
-	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE;
-	RenderCommand.Priority			= 3;
-	RenderCommand.Flags				|= 1024;
-	RenderCommand.VertexBufferOffset = Primitive.VertexOffset;
-	RenderCommand.PrimitiveCount = Primitive.VertexCount / 3;
+	RenderCommand.Flags					= ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	RenderCommand.VertexDeclaration		= VertexBuffer.GetVertexDeclaration();
+	RenderCommand.Material				= Material;
+	RenderCommand.Order					= 0;
+	RenderCommand.Pipeline				= ZE_RORP_3D;
+	RenderCommand.VertexBuffer			= VertexBuffer.GetVertexBuffer();
+	RenderCommand.PrimitiveType			= ZE_ROPT_TRIANGLE;
+	RenderCommand.Priority				= 3;
+	RenderCommand.InstanceData			= (void*)Level;
+	RenderCommand.VertexBufferOffset	= Primitive.VertexOffset;
+	RenderCommand.PrimitiveCount		= Primitive.VertexCount / 3;
 
 	ZEMatrix4x4 LocalTransform;
-	ZEMatrix4x4::CreateOrientation(LocalTransform, ZEVector3(PositionX, 0.0f, PositionY), ZEVector3(Scale, 1.0f, Scale));
+	ZEMatrix4x4::CreateOrientation(RenderCommand.LocalMatrix, ZEVector3(PositionX, 0.0f, PositionY), ZEVector3(Scale, 1.0f, Scale));
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4::CreateTranslation(WorldTransform, ZEVector3(WorldPositionX, 0.0f, WorldPositionY));
 	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, WorldTransform, LocalTransform);
@@ -170,6 +178,10 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, float WorldPosi
 
 void ZETRDrawer::Draw(ZEDrawParameters* DrawParameters)
 {
+	Material->Terrain = GetTerrain();
+	Material->ElevationLayer = GetTerrain()->GetElevationLayer();
+	Material->ColorLayer = GetTerrain()->GetColorLayer();
+	
 	ZEInt PositionX = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().x);
 	ZEInt PositionY = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().z);
 
@@ -267,6 +279,7 @@ ZETRDrawer::ZETRDrawer()
 	MaxLevel = 15;
 	MaxViewDistance = 0;
 	Initialized = false;
+	Material = NULL;
 }
 
 ZETRDrawer::~ZETRDrawer()

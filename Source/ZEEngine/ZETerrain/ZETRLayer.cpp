@@ -114,6 +114,15 @@ const ZEArray<ZETRLevel*>& ZETRLayer::GetLevels()
 	return Levels;
 }
 
+ZETRLevel* ZETRLayer::GetLevel(ZEInt Level)
+{
+	for (ZESize I = 0; I < Levels.GetCount(); I++)
+		if (Levels[I]->GetLevel() == Level)
+			return Levels[0];
+
+	return NULL;
+}
+
 void ZETRLayer::SetName(const ZEString& Name)
 {
 	this->Name = Name;
@@ -122,6 +131,16 @@ void ZETRLayer::SetName(const ZEString& Name)
 const ZEString& ZETRLayer::GetName()
 {
 	return Name;
+}
+
+void ZETRLayer::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZETRLayer::GetEnabled()
+{
+	return Enabled;
 }
 
 void ZETRLayer::SetViewPosition(const ZEVector3& Position)
