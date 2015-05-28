@@ -127,11 +127,21 @@ ZEInt ZEDViewPort::GetStepSize()
 
 void ZEDViewPort::Tick(float Time)
 {
+	if (ClickedMouseKeys.count() > 0)
+	{
+		QSet<ZEInt>::const_iterator Iterator = ClickedMouseKeys.constBegin();
+
+		while (Iterator != ClickedMouseKeys.constEnd())
+		{
+			++Iterator;
+		}
+	}
+
 
 }
 
 ZEDViewPort::ZEDViewPort(QWidget* Parent) : QFrame(Parent)
 {
-	ViewMode = ZED_VM_PERSPECTIVE;
+	ViewMode = ZED_VM_FREE;
 	StepSize = 1;
 }

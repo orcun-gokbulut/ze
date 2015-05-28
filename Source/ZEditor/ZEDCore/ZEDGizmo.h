@@ -56,9 +56,10 @@ class ZEDGizmo
 {
 	private:
 		ZEDGizmoMode Mode;
-		//ZEDGizmoTargetSpace TargetSpace;
-		ZEDSelection* Target;
-		//ZEMatrix4x4 TargetOldTransform;
+
+		ZEVector3 Position;
+		ZEQuaternion Rotation;
+		ZEVector3 Scale;
 
 		ZECanvas GizmoCanvas;
 		ZESimpleMaterial* GizmoMaterial;
@@ -71,8 +72,9 @@ class ZEDGizmo
 		void SetMode(ZEDGizmoMode Mode);
 		ZEDGizmoMode GetMode();
 
-		void SetTarget(ZEDSelection* Target);
-		ZEDSelection* GetTarget();
+		const ZEVector3& GetCurrentPosition();
+		const ZEQuaternion& GetCurrentRotation();
+		const ZEVector3& GetCurrentScale();
 
 		void Tick(float Time);
 		void Draw(ZEDrawParameters* Parameters);

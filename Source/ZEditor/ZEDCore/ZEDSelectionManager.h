@@ -34,18 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_SELECTION_MANAGER_H__
-#define __ZED_SELECTION_MANAGER_H__
 
-#include "ZEDSelection.h"
 #include "ZEFoundation/ZEDS/ZEArray.h"
+#include "ZEFoundation/ZEMath/ZERay.h"
 
+class ZEDTag;
+class ZEEntity;
+class ZEClass;
 class ZEViewVolume;
 
 enum ZEDSelectionMode
 {
-	ZED_SLM_ENTITY,
-	ZED_SLM_VERTEX
+	ZED_SLM_FULLY,
+	ZED_SLM_PARTIAL
 };
 
 class ZEDSelectionManager
@@ -53,33 +54,30 @@ class ZEDSelectionManager
 	friend class ZEDCore;
 
 	private:
-		ZEArray<ZEDSelection*> Selections;
-		ZEDSelection* CurrentSelection;
+		ZEArray<ZEDTag*> Selection;
 		ZEDSelectionMode Mode;
-		//ZEFlags Filter;
-	
+		ZEClass* Filter;
+
 		ZEDSelectionManager();
 
 	public:
-		ZEDSelection* CreateSelection(ZEViewVolume* ViewVolume);
+		const ZEArray<ZEDTag*>& GetSelectedObjects();
 
-		ZEArray<ZEDSelection*>& GetSelections();
-		ZEDSelection* GetSelection(ZESize Index);
+		void SelectObject(const ZERay& Ray);
+		void SelectObject(ZEViewVolume* ViewVolume);
+		void SelectObject(ZEDTag* Object);
+		void SelectObject(const ZEString& Name);
 
-		void AddSelection(ZEDSelection* Selection);
-		void RemoveSelection(ZEDSelection* Selection);
-		void LockSelection(ZESize Index, bool Value);
+		void DeselectObject(ZEDTag* Object);
 
-		void SetCurrentSelection(ZEDSelection* Selection);
-		ZEDSelection* GetCurrentSelection();
+		void SetSelectionFilter(ZEClass* Class);
+		ZEClass* GetSelectionFilter();
+		bool FilterSelection(ZEEntity* Entity, void* Class);
 
-		void SetMode(ZEDSelectionMode Mode);
-		ZEDSelectionMode GetMode();
+		void SetSelectionMode(ZEDSelectionMode Mode);
+		ZEDSelectionMode GetSelectionMode();
 
 		void Destroy();
 
 		static ZEDSelectionManager* GetInstance();
 };
-
-
-#endif

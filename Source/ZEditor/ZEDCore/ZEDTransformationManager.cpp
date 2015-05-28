@@ -35,15 +35,61 @@
 
 #include "ZEDTransformationManager.h"
 #include "ZEDCore.h"
+#include "ZEDGizmo.h"
 
 ZEDTransformationManager::ZEDTransformationManager()
 {
-	CurrentSpace = ZED_TFS_WORLD;
+	
 }
 
-ZEDTransformationSpace ZEDTransformationManager::GetCurrentSpace()
+void ZEDTransformationManager::SetPivotPosition(const ZEVector3& Position)
 {
-	return CurrentSpace;
+
+}
+
+const ZEVector3& ZEDTransformationManager::GetPivotPosition()
+{
+	return Gizmo->GetCurrentPosition();
+}
+
+void ZEDTransformationManager::SetPivotRotation(const ZEQuaternion& Rotation)
+{
+
+}
+
+const ZEQuaternion& ZEDTransformationManager::GetPivotRotation()
+{
+	return Gizmo->GetCurrentRotation();
+}
+
+void ZEDTransformationManager::SetTransformType(ZEDTransformType Type)
+{
+	TransformType = Type;
+}
+
+ZEDTransformType ZEDTransformationManager::GetTransformType()
+{
+	return TransformType;
+}
+
+void ZEDTransformationManager::BeginTransform(...)
+{
+
+}
+
+void ZEDTransformationManager::ResetTransform(...)
+{
+
+}
+
+void ZEDTransformationManager::ApplyTransform(...)
+{
+
+}
+
+void ZEDTransformationManager::EndTransform(...)
+{
+
 }
 
 void ZEDTransformationManager::Destroy()

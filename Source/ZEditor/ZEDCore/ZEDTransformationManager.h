@@ -34,31 +34,46 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_TRANSFORMATION_MANAGER_H__
-#define __ZED_TRANSFORMATION_MANAGER_H__
 
-enum ZEDTransformationSpace
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEVector.h"
+
+enum ZEDTransformType
 {
-	ZED_TFS_WORLD,
-	ZED_TFS_LOCAL
+	ZED_TT_NONE,
+	ZED_TT_TRANSLATE,
+	ZED_TT_ROTATE,
+	ZED_TT_SCALE
 };
+
+class ZEDGizmo;
 
 class ZEDTransformationManager
 {
 	friend class ZEDCore;
 
 	private:
-		ZEDTransformationSpace CurrentSpace;
+		ZEDTransformType TransformType;
+		ZEDGizmo* Gizmo;
 
 		ZEDTransformationManager();
 
 	public:
-		ZEDTransformationSpace GetCurrentSpace();
+		void SetPivotPosition(const ZEVector3& Position);
+		const ZEVector3& GetPivotPosition();
+
+		void SetPivotRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion& GetPivotRotation();
+
+		void SetTransformType(ZEDTransformType Type);
+		ZEDTransformType GetTransformType();
+
+		void BeginTransform(...);
+		void ResetTransform(...);
+		void ApplyTransform(...);
+		void EndTransform(...);
 
 		void Destroy();
 
 		static ZEDTransformationManager* GetInstance();
 };
-
-
-#endif

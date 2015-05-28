@@ -49,10 +49,8 @@
 
 enum ZEDViewMode
 {
-	ZED_VM_PERSPECTIVE,
-	ZED_VM_FRONT,
-	ZED_VM_RIGHT,
-	ZED_VM_TOP
+	ZED_VM_FREE,
+	ZED_VM_LOCKED
 };
 
 class ZEDViewPort : public QFrame
