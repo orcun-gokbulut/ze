@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTag.h
+ Zinek Engine - ZEDObjectWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -43,7 +43,7 @@
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 
-class ZEDTag
+class ZEDObjectWrapper
 {
 	private:
 		ZESize Id;
@@ -54,13 +54,13 @@ class ZEDTag
 		
 		ZEObject* Object;
 
-		ZEDTag* ParentTag;
-		ZEArray<ZEDTag*> ChildTags;
-		ZEArray<ZEDTag*> ComponentTags;
+		ZEDObjectWrapper* ParentWrapper;
+		ZEArray<ZEDObjectWrapper*> ChildWrapper;
+		ZEArray<ZEDObjectWrapper*> ComponentWrapper;
 		
 	protected:
-		ZEDTag();
-		virtual ~ZEDTag();
+		ZEDObjectWrapper();
+		virtual ~ZEDObjectWrapper();
 
 	public slots:
 		virtual void OnSelected();
@@ -104,15 +104,15 @@ class ZEDTag
 		virtual void SetScale(const ZEVector3& NewScale) = 0;
 		virtual ZEVector3 GetScale() = 0;
 
-		void SetParentTag(ZEDTag* Tag);
-		ZEDTag* GetParentTag();
+		void SetParentWrapper(ZEDObjectWrapper* Wrapper);
+		ZEDObjectWrapper* GetParentWrapper();
 
-		ZEArray<ZEDTag*>& GetChildTags();
-		virtual void AddChildTag(ZEDTag* Tag);
-		virtual void RemoveChildTag(ZEDTag* Tag);
+		ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
+		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
+		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
 
-		ZEArray<ZEDTag*>& GetComponentTags();
-		void AddComponentTag(ZEDTag* Tag);
-		void RemoveComponentTag(ZEDTag* Tag);
+		ZEArray<ZEDObjectWrapper*>& GetComponentWrappers();
+		void AddComponentWrapper(ZEDObjectWrapper* Wrapper);
+		void RemoveComponentWrapper(ZEDObjectWrapper* Wrapper);
 
 };

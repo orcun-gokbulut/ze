@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTag.cpp
+ Zinek Engine - ZEDEntityWrapper.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,155 +33,94 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTag.h"
+#include "ZEDEntityWrapper.h"
+#include "ZEGame/ZEEntity.h"
 
-ZEDTag::ZEDTag()
+void ZEDEntityWrapper::SetObject(ZEObject* Object)
 {
-	Id = 0;
-	CustomWidget = NULL;
-	PopupMenu = NULL;
-
-	Object = NULL;
-	ParentTag = NULL;
-}
-
-ZEDTag::~ZEDTag()
-{
-	if (Object != NULL)
-	{
-		delete Object;
-		Object = NULL;
-	}
-}
-
-void ZEDTag::SetId(ZESize Id)
-{
-	this->Id = Id;
-}
-
-ZESize ZEDTag::GetId()
-{
-	return Id;
-}
-
-void ZEDTag::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString& ZEDTag::GetName()
-{
-	return Name;
-}
-
-void ZEDTag::SetCustomWidget(QWidget* Widget)
-{
-	CustomWidget = Widget;
-}
-
-QWidget* ZEDTag::GetCustomWidget()
-{
-	return CustomWidget;
-}
-
-void ZEDTag::SetPopupMenu(QMenu* Menu)
-{
-	PopupMenu = Menu;
-}
-
-QMenu* ZEDTag::GetPopupMenu()
-{
-	return PopupMenu;
-}
-
-void ZEDTag::SetObject(ZEObject* Object)
-{
-	if (this->Object != NULL)
+	if (Object->GetClass()->GetParentClass() != ZEEntity::Class())
 		return;
 
-	this->Object = Object;
+	ZEDObjectWrapper::SetObject(Object);
+
+	ZEAABBox::GenerateOBoundingBox(BoundingBox, ((ZEEntity*)Object)->GetBoundingBox());
 }
 
-ZEObject* ZEDTag::GetObject()
+ZEObject* ZEDEntityWrapper::GetObject()
 {
-	return Object;
+	return ZEDObjectWrapper::GetObject();
 }
 
-void ZEDTag::SetIcon(const ZEString& Icon)
+void ZEDEntityWrapper::SetVisibility(bool Value)
 {
-	this->Icon = Icon;
+	((ZEEntity*)GetObject())->SetVisible(Value);
 }
 
-const ZEString& ZEDTag::GetIcon()
+bool ZEDEntityWrapper::GetVisibility()
 {
-	return Icon;
+	return ((ZEEntity*)GetObject())->GetVisible();
 }
 
-void ZEDTag::SetParentTag(ZEDTag* Tag)
+ZEOBBox ZEDEntityWrapper::GetBoundingBox()
 {
-	ParentTag = Tag;
+	if (GetObject() == NULL)
+		return BoundingBox;
+
+	ZEOBBox ResultBox;
+	ZEOBBox::Transform(ResultBox, ((ZEEntity*)GetObject())->GetWorldTransform(), BoundingBox);
+
+	return ResultBox;
 }
 
-ZEDTag* ZEDTag::GetParentTag()
+void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 {
-	return ParentTag;
-}
-
-ZEArray<ZEDTag*>& ZEDTag::GetChildTags()
-{
-	return ChildTags;
-}
-
-void ZEDTag::AddChildTag(ZEDTag* Tag)
-{
-	if (Tag == NULL)
+	if (GetObject() == NULL)
 		return;
 
-	if (ChildTags.Exists(Tag))
-		return;
-
-	if (!ZEClass::IsDerivedFrom(Object->GetClass(), Tag->GetObject()->GetClass()))
-		return;
-
-	ChildTags.Add(Tag);
-	Tag->SetParentTag(this);
+	((ZEEntity*)GetObject())->SetWorldPosition(NewPosition);
 }
 
-void ZEDTag::RemoveChildTag(ZEDTag* Tag)
+ZEVector3 ZEDEntityWrapper::GetPosition()
 {
-	if (Tag == NULL)
-		return;
+	if (GetObject() == NULL)
+		return ZEVector3::Zero;
 
-	if (!ChildTags.Exists(Tag))
-		return;
-
-	ChildTags.RemoveValue(Tag);
-	Tag->SetParentTag(NULL);
+	return ((ZEEntity*)GetObject())->GetWorldPosition();
 }
 
-ZEArray<ZEDTag*>& ZEDTag::GetComponentTags()
+void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 {
-	return ComponentTags;
+	if (GetObject() == NULL)
+		return;
+
+	((ZEEntity*)GetObject())->SetWorldRotation(NewRotation);
 }
 
-void ZEDTag::AddComponentTag(ZEDTag* Tag)
+ZEQuaternion ZEDEntityWrapper::GetRotation()
 {
-	if (Tag == NULL)
-		return;
+	if (GetObject() == NULL)
+		return ZEQuaternion::Identity;
 
-	if (ComponentTags.Exists(Tag))
-		return;
-
-	ComponentTags.Add(Tag);
+	return ((ZEEntity*)GetObject())->GetWorldRotation();
 }
 
-void ZEDTag::RemoveComponentTag(ZEDTag* Tag)
+void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 {
-	if (Tag == NULL)
+	if (GetObject() == NULL)
 		return;
 
-	if (!ComponentTags.Exists(Tag))
-		return;
+	((ZEEntity*)GetObject())->SetWorldScale(NewScale);
+}
 
-	ComponentTags.RemoveValue(Tag);
+ZEVector3 ZEDEntityWrapper::GetScale()
+{
+	if (GetObject() == NULL)
+		return ZEVector3::One;
+
+	return ((ZEEntity*)GetObject())->GetWorldScale();
+}
+
+ZEDEntityWrapper* ZEDEntityWrapper::CreateInstance()
+{
+	return new ZEDEntityWrapper();
 }

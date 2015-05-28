@@ -35,7 +35,7 @@
 
 #include "ZEDSelectionManager.h"
 #include "ZEDCore.h"
-#include "ZEDTag.h"
+#include "ZEDObjectWrapper.h"
 #include "ZEDScene.h"
 #include "ZEFoundation/ZEMath/ZEViewVolume.h"
 #include "ZEGame/ZEEntity.h"
@@ -57,17 +57,17 @@
 // 		break;
 // 	}
 // 
-// 	ZEArray<ZEDTag*> Tags /*= ZEDCore::GetCurrentScene()->GetEntityTags()*/;
+// 	ZEArray<ZEDObjectWrapper*> Wrappers /*= ZEDCore::GetCurrentScene()->GetEntityWrappers()*/;
 // 	ZEDSelection * NewSelection = new ZEDSelection();
 // 	
-// 	for (ZESize I = 0; I < Tags.GetCount(); I++)
-// 		if (!ViewVolume->CullTest(Tags[I]->GetWorldBoundingBox()))
-// 			NewSelection->AddElement(Tags[I]);
+// 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+// 		if (!ViewVolume->CullTest(Wrappers[I]->GetWorldBoundingBox()))
+// 			NewSelection->AddElement(Wrappers[I]);
 // 
 // 	//With the pivot of new selection calculated (by who?) Transformation manager is called to calculate offsettopivot for elements.
 // }
 
-const ZEArray<ZEDTag*>& ZEDSelectionManager::GetSelectedObjects()
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionManager::GetSelectedObjects()
 {
 	return Selection;
 }
@@ -93,7 +93,7 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 
 }
 
-void ZEDSelectionManager::SelectObject(ZEDTag* Object)
+void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 {
 	if (Object == NULL)
 		return;
@@ -110,7 +110,7 @@ void ZEDSelectionManager::SelectObject(const ZEString& Name)
 
 }
 
-void ZEDSelectionManager::DeselectObject(ZEDTag* Object)
+void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 {
 	if (Object = NULL)
 		return;

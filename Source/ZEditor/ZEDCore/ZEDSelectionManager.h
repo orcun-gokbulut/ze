@@ -38,7 +38,7 @@
 #include "ZEFoundation/ZEDS/ZEArray.h"
 #include "ZEFoundation/ZEMath/ZERay.h"
 
-class ZEDTag;
+class ZEDObjectWrapper;
 class ZEEntity;
 class ZEClass;
 class ZEViewVolume;
@@ -54,21 +54,21 @@ class ZEDSelectionManager
 	friend class ZEDCore;
 
 	private:
-		ZEArray<ZEDTag*> Selection;
+		ZEArray<ZEDObjectWrapper*> Selection;
 		ZEDSelectionMode Mode;
 		ZEClass* Filter;
 
 		ZEDSelectionManager();
 
 	public:
-		const ZEArray<ZEDTag*>& GetSelectedObjects();
+		const ZEArray<ZEDObjectWrapper*>& GetSelectedObjects();
 
 		void SelectObject(const ZERay& Ray);
 		void SelectObject(ZEViewVolume* ViewVolume);
-		void SelectObject(ZEDTag* Object);
+		void SelectObject(ZEDObjectWrapper* Object);
 		void SelectObject(const ZEString& Name);
 
-		void DeselectObject(ZEDTag* Object);
+		void DeselectObject(ZEDObjectWrapper* Object);
 
 		void SetSelectionFilter(ZEClass* Class);
 		ZEClass* GetSelectionFilter();

@@ -34,40 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDScene.h"
-#include "ZEDTag.h"
+#include "ZEDObjectWrapper.h"
 #include "ZEGame/ZEEntity.h"
 
-const ZESmartArray<ZEDTag*>& ZEDScene::GetTags()
+const ZESmartArray<ZEDObjectWrapper*>& ZEDScene::GetWrappers()
 {
-	return Tags;
+	return Wrappers;
 }
 
-ZEArray<ZEDTag*> ZEDScene::GetTags(ZEClass* Class)
+ZEArray<ZEDObjectWrapper*> ZEDScene::GetWrappers(ZEClass* Class)
 {
-	ZEArray<ZEDTag*> DerivedTags;
+	ZEArray<ZEDObjectWrapper*> DerivedWrappers;
 	ZEObject* CurrentObject = NULL;
 
-	for (ZESize I = 0; I < Tags.GetCount(); I++)
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		CurrentObject = Tags[I]->GetObject();
+		CurrentObject = Wrappers[I]->GetObject();
 		if (ZEClass::IsDerivedFrom(Class, CurrentObject->GetClass()))
-			DerivedTags.Add(Tags[I]);
+			DerivedWrappers.Add(Wrappers[I]);
 	}
 
-	return DerivedTags;
+	return DerivedWrappers;
 }
 
-void ZEDScene::AddTag(ZEDTag* Tag)
+void ZEDScene::AddWrapper(ZEDObjectWrapper* Wrapper)
 {
-	//How should non-entity tags be managed regarding scene ops.
+	//How should non-entity Wrappers be managed regarding scene ops.
 }
 
-void ZEDScene::RemoveTag(ZEDTag* Tag)
+void ZEDScene::RemoveWrapper(ZEDObjectWrapper* Wrapper)
 {
 
 }
 
-void ZEDScene::ClearTags()
+void ZEDScene::ClearWrappers()
 {
 
 }

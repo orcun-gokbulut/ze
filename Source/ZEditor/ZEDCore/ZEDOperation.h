@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_OPERATION_H__
-#define __ZED_OPERATION_H__
 
 #include "ZEDS\ZEString.h"
 
@@ -71,5 +69,3 @@ class ZEDOperation
 		ZEDOperation();
 		virtual ~ZEDOperation();
 };
-
-#endif

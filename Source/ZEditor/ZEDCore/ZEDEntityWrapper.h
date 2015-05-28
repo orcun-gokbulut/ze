@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDEntityTag.cpp
+ Zinek Engine - ZEDEntityWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,94 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDEntityTag.h"
+#pragma once
+
+#include "ZEDObjectWrapper.h"
 #include "ZEGame/ZEEntity.h"
 
-void ZEDEntityTag::SetObject(ZEObject* Object)
+class ZEDEntityWrapper : public ZEDObjectWrapper
 {
-	if (Object->GetClass()->GetParentClass() != ZEEntity::Class())
-		return;
+	protected:
+		ZEOBBox BoundingBox;
 
-	ZEDTag::SetObject(Object);
+	public:
+		virtual void SetObject(ZEObject* Object);
+		virtual ZEObject* GetObject();
 
-	ZEAABBox::GenerateOBoundingBox(BoundingBox, ((ZEEntity*)Object)->GetBoundingBox());
-}
+		virtual void SetVisibility(bool Value);
+		virtual bool GetVisibility();
 
-ZEObject* ZEDEntityTag::GetObject()
-{
-	return ZEDTag::GetObject();
-}
-
-void ZEDEntityTag::SetVisibility(bool Value)
-{
-	((ZEEntity*)GetObject())->SetVisible(Value);
-}
-
-bool ZEDEntityTag::GetVisibility()
-{
-	return ((ZEEntity*)GetObject())->GetVisible();
-}
-
-ZEOBBox ZEDEntityTag::GetBoundingBox()
-{
-	if (GetObject() == NULL)
-		return BoundingBox;
-
-	ZEOBBox ResultBox;
-	ZEOBBox::Transform(ResultBox, ((ZEEntity*)GetObject())->GetWorldTransform(), BoundingBox);
-
-	return ResultBox;
-}
-
-void ZEDEntityTag::SetPosition(const ZEVector3& NewPosition)
-{
-	if (GetObject() == NULL)
-		return;
-
-	((ZEEntity*)GetObject())->SetWorldPosition(NewPosition);
-}
-
-ZEVector3 ZEDEntityTag::GetPosition()
-{
-	if (GetObject() == NULL)
-		return ZEVector3::Zero;
-
-	return ((ZEEntity*)GetObject())->GetWorldPosition();
-}
-
-void ZEDEntityTag::SetRotation(const ZEQuaternion& NewRotation)
-{
-	if (GetObject() == NULL)
-		return;
-
-	((ZEEntity*)GetObject())->SetWorldRotation(NewRotation);
-}
-
-ZEQuaternion ZEDEntityTag::GetRotation()
-{
-	if (GetObject() == NULL)
-		return ZEQuaternion::Identity;
-
-	return ((ZEEntity*)GetObject())->GetWorldRotation();
-}
-
-void ZEDEntityTag::SetScale(const ZEVector3& NewScale)
-{
-	if (GetObject() == NULL)
-		return;
-
-	((ZEEntity*)GetObject())->SetWorldScale(NewScale);
-}
-
-ZEVector3 ZEDEntityTag::GetScale()
-{
-	if (GetObject() == NULL)
-		return ZEVector3::One;
-
-	return ((ZEEntity*)GetObject())->GetWorldScale();
-}
-
-ZEDEntityTag* ZEDEntityTag::CreateInstance()
-{
-	return new ZEDEntityTag();
-}
+		virtual ZEOBBox GetBoundingBox();
+		virtual void SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3 GetPosition();
+		virtual void SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion GetRotation();
+		virtual void SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3 GetScale();
+		
+		static ZEDEntityWrapper* CreateInstance();
+};

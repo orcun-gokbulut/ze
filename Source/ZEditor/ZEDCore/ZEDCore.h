@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_CORE_H__
-#define __ZED_CORE_H__
 
 #include "ZEFoundation/ZEDS/ZEArray.h"
 
@@ -72,6 +70,3 @@ class ZEDCore
 
 		static ZEDCore* GetInstance();
 };
-
-
-#endif
