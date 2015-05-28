@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_GIZMO_H__
-#define __ZED_GIZMO_H__
 
 #include "ZEGraphics/ZECanvas.h"
 #include "ZEGraphics/ZERenderCommand.h"
@@ -83,5 +81,3 @@ class ZEDGizmo
 
 		static ZEDGizmo* CreateInstance();
 };
-
-#endif

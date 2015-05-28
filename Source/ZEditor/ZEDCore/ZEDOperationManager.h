@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_OPERATION_MANAGER_H__
-#define __ZED_OPERATION_MANAGER_H__
 
 #include "ZEDOperation.h"
 #include "ZEDS\ZEArray.h"
@@ -68,5 +66,3 @@ class ZEDOperationManager
 
 		static ZEDOperationManager* GetInstance();
 };
-
-#endif

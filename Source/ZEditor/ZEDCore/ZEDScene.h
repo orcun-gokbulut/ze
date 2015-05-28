@@ -34,28 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_SCENE_H__
-#define __ZED_SCENE_H__
 
 #include "ZEGame/ZEScene.h"
 
-class ZEDTag;
+class ZEDObjectWrapper;
 
 class ZEDScene : public ZEScene
 {
 	private:
-		ZESmartArray<ZEDTag*> Tags;
+		ZESmartArray<ZEDObjectWrapper*> Wrappers;
 
-		void AddTag(ZEDTag* Tag);
-		void RemoveTag(ZEDTag* Tag);
+		void AddWrapper(ZEDObjectWrapper* Wrapper);
+		void RemoveWrapper(ZEDObjectWrapper* Wrapper);
 
 	public:
-		const ZESmartArray<ZEDTag*>& GetTags();
-		ZEArray<ZEDTag*> GetTags(ZEClass* Class);
+		const ZESmartArray<ZEDObjectWrapper*>& GetWrappers();
+		ZEArray<ZEDObjectWrapper*> GetWrappers(ZEClass* Class);
 
-		void ClearTags();
+		void ClearWrappers();
 
 		ZEDScene();
 };
-
-#endif
