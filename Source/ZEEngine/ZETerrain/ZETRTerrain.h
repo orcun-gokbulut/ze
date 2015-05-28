@@ -45,10 +45,11 @@ class ZETRLayer;
 class ZETRTerrain : public ZEEntity
 {
 	private:
-		ZEArray<ZETRLayer*>				Layers;
+		ZEArray<ZETRLayer*>				ExtraLayers;
 		ZETRDrawer						Drawer;
 		ZESize							BlockSize;
 		ZETRLayer*						ElevationLayer;
+		ZETRLayer*						ColorLayer;
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
@@ -60,9 +61,15 @@ class ZETRTerrain : public ZEEntity
 		virtual ZEDrawFlags				GetDrawFlags() const;
 		ZETRDrawer&						GetDrawer();
 
-		const ZEArray<ZETRLayer*>&		GetLayers();
-		bool							AddLayer(ZETRLayer* Layer);
-		void							RemoveLayer(ZETRLayer* Layer);
+		const ZEArray<ZETRLayer*>&		GetExtraLayers();
+		bool							AddExtraLayer(ZETRLayer* Layer);
+		void							RemoveExtraLayer(ZETRLayer* Layer);
+
+		bool							SetElevationLayer(ZETRLayer* Layer);
+		ZETRLayer*						GetElevationLayer();
+
+		bool							SetColorLayer(ZETRLayer* Layer);
+		ZETRLayer*						GetColorLayer();
 
 		void							SetPrimitiveSize(ZEUInt Size);
 		ZEUInt							GetPrimitiveSize();

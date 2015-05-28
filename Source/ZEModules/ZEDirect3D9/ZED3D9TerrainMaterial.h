@@ -43,6 +43,7 @@
 
 class ZED3D9VertexShader;
 class ZED3D9PixelShader;
+class ZETRLevel;
 
 class ZED3D9TerrainMaterial : public ZETerrainMaterial, private ZED3D9ComponentBase
 {
@@ -57,6 +58,9 @@ class ZED3D9TerrainMaterial : public ZETerrainMaterial, private ZED3D9ComponentB
 
 		void							CreateShaders();
 		void							ReleaseShaders();
+
+		ZEVector4						GetTexcoordTransform(ZETRLevel* Level, const ZEVector3& Position) const;
+		void							SetupLevel(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 
 	protected:
 										ZED3D9TerrainMaterial();

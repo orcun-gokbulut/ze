@@ -38,6 +38,7 @@
 
 #include "ZEGraphics\ZETexture2D.h"
 #include "ZEMath\ZEMath.h"
+#include "ZEGraphics\ZETerrainMaterial.h"
 
 #define ZETR_LEVEL_BLOCK_COUNT 3
 
@@ -49,15 +50,10 @@ ZETRLevelBlock::ZETRLevelBlock()
 	Cleaned = false;
 }
 
-void ZETRLevel::CalculateTextureTransform()
-{
-	TextureTransform = ZEMatrix3x3::Identity;
-}
-
 void ZETRLevel::ProcessBlock(ZESSize IndexX, ZESSize IndexY)
 {
-	int LocalIndexX = ZEMath::CircularMod(IndexX, (ZESSize)ZETR_LEVEL_BLOCK_COUNT);
-	int LocalIndexY = ZEMath::CircularMod(IndexY, (ZESSize)ZETR_LEVEL_BLOCK_COUNT);
+	int LocalIndexX = ZEMath::CircularMod(IndexX, (ZESSize)GetBlockCount());
+	int LocalIndexY = ZEMath::CircularMod(IndexY, (ZESSize)GetBlockCount());
 
 	ZETRLevelBlock* Block = &Blocks[LocalIndexX][LocalIndexY];
 	if (Block->IndexX != IndexX ||
@@ -124,7 +120,7 @@ bool ZETRLevel::InitializeSelf()
 
 	ZESize BlockSize = Layer->GetBlockSize();
 	Texture = ZETexture2D::CreateInstance();
-	if (!Texture->Create(BlockSize * ZETR_LEVEL_BLOCK_COUNT, BlockSize * ZETR_LEVEL_BLOCK_COUNT, 0, ZE_TPF_RGBA8, false))
+	if (!Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 0, ZE_TPF_RGBA8, false))
 	{
 		Texture->Destroy();
 		Texture = NULL;
@@ -163,14 +159,14 @@ float ZETRLevel::GetLevelBlockSize()
 	return LevelBlockSize;
 }
 
+ZESize  ZETRLevel::GetBlockCount()
+{
+	return ZETR_LEVEL_BLOCK_COUNT;
+}
+
 ZETexture2D* ZETRLevel::GetTexture()
 {
 	return Texture;
-}
-
-const ZEMatrix3x3& ZETRLevel::GetTextureTransform()
-{
-	return TextureTransform;
 }
 
 void ZETRLevel::Process()
@@ -191,8 +187,6 @@ void ZETRLevel::Process()
 	ProcessBlock(IndexX - 1, IndexY - 1);
 	ProcessBlock(IndexX,	 IndexY - 1);
 	ProcessBlock(IndexX + 1, IndexY - 1);
-
-	CalculateTextureTransform();
 }
 
 ZETRLevel::ZETRLevel()

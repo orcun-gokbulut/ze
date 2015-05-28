@@ -35,12 +35,12 @@
 
 #include "ZETRTerrain.h"
 #include "ZETRLayer.h"
-#include "ZEGraphics\ZECamera.h"
 
 #include "ZEGame\ZEDrawParameters.h"
+#include "ZEGraphics\ZECamera.h"
 #include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEError.h"
 #include "ZEGraphics\ZETerrainMaterial.h"
+#include "ZEError.h"
 
 bool ZETRTerrain::InitializeSelf()
 {
@@ -54,16 +54,29 @@ bool ZETRTerrain::InitializeSelf()
 		return false;
 	}
 
-	ZESimpleMaterial* Material = ZESimpleMaterial::CreateInstance();
-	Material->SetWireframe(true);
-	Material->SetMaterialColor(ZEVector4::One);
-	Drawer.SetMaterial((ZETerrainMaterial*)Material);
-
-	for (ZESize I = 0; I < Layers.GetCount(); I++)
+	if (ElevationLayer != NULL)
 	{
-		if (!Layers[I]->Initialize())
+		if (!ElevationLayer->Initialize())
 		{
-			zeError("Cannot initialize terrain layer. Layer Name: \"%s\".", Layers[I]->GetName().ToCString());
+			zeError("Cannot initialize terrain elevation layer. Layer Name: \"%s\".", ElevationLayer->GetName().ToCString());
+			return false;
+		}
+	}
+
+	if (ColorLayer != NULL)
+	{
+		if (!ColorLayer->Initialize())
+		{
+			zeError("Cannot initialize terrain color layer. Layer Name: \"%s\".", ColorLayer->GetName().ToCString());
+			return false;
+		}
+	}
+	
+	for (ZESize I = 0; I < ExtraLayers.GetCount(); I++)
+	{
+		if (!ExtraLayers[I]->Initialize())
+		{
+			zeError("Cannot initialize terrain layer. Layer Name: \"%s\".", ExtraLayers[I]->GetName().ToCString());
 			return false;
 		}
 	}
@@ -80,13 +93,15 @@ bool ZETRTerrain::DeinitializeSelf()
 ZETRTerrain::ZETRTerrain()
 {
 	BlockSize = 1024;
+	ElevationLayer = NULL;
+	ColorLayer = NULL;
 }
 
 ZETRTerrain::~ZETRTerrain()
 {
 	Deinitialize();
-	for (ZESize I = 0; I < Layers.GetCount(); I++)
-		delete Layers[I];
+	for (ZESize I = 0; I < ExtraLayers.GetCount(); I++)
+		delete ExtraLayers[I];
 }
 
 ZEDrawFlags ZETRTerrain::GetDrawFlags() const
@@ -99,20 +114,23 @@ ZETRDrawer& ZETRTerrain::GetDrawer()
 	return Drawer;
 }
 
-const ZEArray<ZETRLayer*>&	ZETRTerrain::GetLayers()
+const ZEArray<ZETRLayer*>& ZETRTerrain::GetExtraLayers()
 {
-	return Layers;
+	return ExtraLayers;
 }
 
-bool ZETRTerrain::AddLayer(ZETRLayer* Layer)
+bool ZETRTerrain::AddExtraLayer(ZETRLayer* Layer)
 {
-	if (Layers.Exists(Layer))
+	if (Layer == NULL)
+		return false;
+
+	if (ExtraLayers.Exists(Layer))
 	{
 		zeError("Layer is already registered.");
 		return false;
 	}
 
-	Layers.Add(Layer);
+	ExtraLayers.Add(Layer);
 
 	if (IsInitialized())
 	{
@@ -126,12 +144,62 @@ bool ZETRTerrain::AddLayer(ZETRLayer* Layer)
 	return true;
 }
 
-void ZETRTerrain::RemoveLayer(ZETRLayer* Layer)
+void ZETRTerrain::RemoveExtraLayer(ZETRLayer* Layer)
 {
+	if (Layer == NULL)
+		return;
+
+	if (!ExtraLayers.Exists(Layer))
+	{
+		zeError("Cannot remove layer that is not registered.");
+		return;
+	}
+
 	if (IsInitialized())
 		Layer->Deinitialize();
 
-	Layers.RemoveValue(Layer);
+	ExtraLayers.RemoveValue(Layer);
+}
+
+bool ZETRTerrain::SetElevationLayer(ZETRLayer* Layer)
+{
+	if (ElevationLayer == Layer)
+		return true;
+
+	if (ElevationLayer != NULL)
+		ElevationLayer->Deinitialize();
+
+	ElevationLayer = Layer;
+
+	if (IsInitialized())
+		ElevationLayer->Initialize();
+
+	return true;
+}
+
+ZETRLayer* ZETRTerrain::GetElevationLayer()
+{
+	return ElevationLayer;
+}
+
+bool ZETRTerrain::SetColorLayer(ZETRLayer* Layer)
+{
+	if (ColorLayer == Layer)
+		return true;
+
+	if (ColorLayer != NULL)
+		ColorLayer->Deinitialize();
+
+	ColorLayer = Layer;
+
+	if (IsInitialized())
+		ColorLayer->Initialize();
+
+	return true;
+}
+ZETRLayer* ZETRTerrain::GetColorLayer()
+{
+	return ColorLayer;
 }
 
 void ZETRTerrain::SetBlockSize(ZESize Size)
@@ -156,13 +224,19 @@ ZEUInt ZETRTerrain::GetPrimitiveSize()
 
 void ZETRTerrain::Draw(ZEDrawParameters* DrawParameters)
 {
-	for (ZESize I = 0; I < Layers.GetCount(); I++)
+	if (ElevationLayer != NULL)
+		ElevationLayer->Process();
+
+	if (ColorLayer != NULL)
+		ColorLayer->Process();
+
+	for (ZESize I = 0; I < ExtraLayers.GetCount(); I++)
 	{
-		ZETRLayer* CurrentLayer = Layers[I];
+		ZETRLayer* CurrentLayer = ExtraLayers[I];
 		
-		if (!CurrentLayer->IsInitialized())
+		if (!CurrentLayer->GetEnabled())
 			continue;
-		
+
 		CurrentLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
 		CurrentLayer->Process();
 	}

@@ -44,7 +44,7 @@
 class ZETerrain;
 class ZETexture2D;
 class ZETRLayer;
-class ZEMaterial;
+class ZETerrainMaterial;
 
 struct ZETRLevelBlock
 {
@@ -63,13 +63,11 @@ class ZETRLevel : public ZEInitializable
 		ZETRLayer*				Layer;
 		ZEInt					Level;
 		ZETexture2D*			Texture;
-		ZEMatrix3x3				TextureTransform;
+
 		ZETRLevelBlock			Blocks[3][3];
-		ZEMaterial*				Material;
 		float					LevelScale;
 		float					LevelBlockSize;
 
-		void					CalculateTextureTransform();
 		void					ProcessBlock(ZESSize IndexX, ZESSize IndexY);
 
 		void					SetLevel(ZEInt Level);
@@ -83,12 +81,14 @@ class ZETRLevel : public ZEInitializable
 		ZEInt					GetLevel();
 		float					GetLevelScale();
 		float					GetLevelBlockSize();
+		ZESize					GetBlockCount();
 
-		ZEMaterial*				GetMaterial();
+		ZETerrainMaterial*		GetMaterial();
 		ZETexture2D*			GetTexture();
-		const ZEMatrix3x3&		GetTextureTransform();
 
 		void					Process();
 
 								ZETRLevel();
 };
+
+
