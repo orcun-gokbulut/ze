@@ -34,139 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDTag.h"
-#include "ZEGraphics/ZEUIMaterial.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEMath/ZERectangle3D.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEMath/ZEBSphere.h"
-#include "ZEML/ZEMLWriter.h"
-#include "ZEML/ZEMLReader.h"
-#include "ZEGame/ZEDrawParameters.h"
-
-void ZEDTag::SetSelection(ZEDSelection* Selection)
-{
-	this->Selection = Selection;
-}
-
-ZEDSelection* ZEDTag::GetSelection()
-{
-	return Selection;
-}
-
-void ZEDTag::SetParentTag(ZEDTag* Tag)
-{
-	ParentTag = Tag;
-}
-
-ZEDTag* ZEDTag::GetParentTag()
-{
-	return ParentTag;
-}
-
-void ZEDTag::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, const ZEVector4& Color, ZECanvas& Canvas)
-{
-	ZEMatrix4x4 LocalPivot, WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(LocalPivot, BoundingBox.GetCenter(), 
-		ZEQuaternion::Identity, 
-		ZEVector3((BoundingBox.Max.x - BoundingBox.Min.x), 
-		(BoundingBox.Max.y - BoundingBox.Min.y), 
-		(BoundingBox.Max.z - BoundingBox.Min.z))
-		);
-	ZEMatrix4x4::Multiply(WorldMatrix, Transform, LocalPivot);
-
-	Canvas.SetTransfomation(WorldMatrix);
-	Canvas.SetColor(Color);
-	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
-}
-
-void ZEDTag::DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, const ZEVector4& Color, ZECanvas& Canvas)
-{
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
-		ZEQuaternion::Identity, 
-		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
-
-	Canvas.SetColor(Color);
-	Canvas.SetTransfomation(WorldMatrix);
-	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
-}
-
-void ZEDTag::DrawBoundingSphere(const ZEBSphere& BoundingSphere, const ZEVector4& Color, ZECanvas& Canvas)
-{
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingSphere.Position, 
-		ZEQuaternion::Identity, 
-		ZEVector3(BoundingSphere.Radius, BoundingSphere.Radius, BoundingSphere.Radius));
-
-	Canvas.SetTransfomation(WorldMatrix);
-	Canvas.SetColor(Color);
-	Canvas.AddWireframeSphere(1.0f, 8, 8);
-}
-
-void ZEDTag::DrawLineSegment(const ZEVector3& StartPosition, const ZEVector3& EndPosition, const ZEVector4& Color, ZECanvas& Canvas)
-{
-	Canvas.SetTransfomation(ZEMatrix4x4::Identity);
-	Canvas.SetColor(Color);
-	Canvas.AddLine(StartPosition, EndPosition);
-}
-
-void ZEDTag::DrawRectangle(const ZERectangle3D& Rectangle, const ZEVector4& Color, ZECanvas& Canvas)
-{
-	Canvas.SetTransfomation(ZEMatrix4x4::Identity);
-	Canvas.SetColor(Color);
-	Canvas.AddWireframeQuad(Rectangle.P1, Rectangle.P2, Rectangle.P3, Rectangle.P4);
-}
-
-bool ZEDTag::InitializeSelf()
-{
-	if (Object == NULL)
-		return false;
-
-	if (TagMaterial == NULL)
-		TagMaterial = ZESimpleMaterial::CreateInstance();
-
-	TagCanvas.Clean();
-	TagCanvas.AddQuad(ZEVector3(1.0f, 1.0f, 0.0f), ZEVector3(-1.0f, 1.0f, 0.0f), ZEVector3(-1.0f, -1.0f, 0.0f), ZEVector3(1.0f, -1.0f, 0.0f));
-
-	TagRenderCommand.SetZero();
-	TagRenderCommand.Material = TagMaterial;
-	TagRenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_NO_Z_WRITE;
-	TagRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	TagRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	TagRenderCommand.PrimitiveCount = TagCanvas.Vertices.GetCount() / 2;
-	TagRenderCommand.VertexBuffer = &TagCanvas;
-	TagRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-	TagRenderCommand.Priority = 10;
-
-	return true;
-}
-
-bool ZEDTag::DeinitializeSelf()
-{
-	if (Object == NULL)
-		return false;
-
-	TagCanvas.Clean();
-	TagRenderCommand.SetZero();
-
-	if (TagMaterial != NULL)
-	{
-		TagMaterial->Release();
-		TagMaterial = NULL;
-	}
-
-	return true;
-}
 
 ZEDTag::ZEDTag()
 {
-	Selection = NULL;
+	Id = 0;
+	CustomWidget = NULL;
+	PopupMenu = NULL;
+
 	Object = NULL;
 	ParentTag = NULL;
-
-	TagMaterial = NULL;
-	TagRenderCommand.SetZero();
 }
 
 ZEDTag::~ZEDTag()
@@ -176,6 +52,46 @@ ZEDTag::~ZEDTag()
 		delete Object;
 		Object = NULL;
 	}
+}
+
+void ZEDTag::SetId(ZESize Id)
+{
+	this->Id = Id;
+}
+
+ZESize ZEDTag::GetId()
+{
+	return Id;
+}
+
+void ZEDTag::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString& ZEDTag::GetName()
+{
+	return Name;
+}
+
+void ZEDTag::SetCustomWidget(QWidget* Widget)
+{
+	CustomWidget = Widget;
+}
+
+QWidget* ZEDTag::GetCustomWidget()
+{
+	return CustomWidget;
+}
+
+void ZEDTag::SetPopupMenu(QMenu* Menu)
+{
+	PopupMenu = Menu;
+}
+
+QMenu* ZEDTag::GetPopupMenu()
+{
+	return PopupMenu;
 }
 
 void ZEDTag::SetObject(ZEObject* Object)
@@ -191,27 +107,29 @@ ZEObject* ZEDTag::GetObject()
 	return Object;
 }
 
-void ZEDTag::SetIcon(ZESimpleMaterial* Material)
+void ZEDTag::SetIcon(const ZEString& Icon)
 {
-	if (TagMaterial != NULL)
-		TagMaterial->Release();
-
-	TagMaterial = Material;
+	this->Icon = Icon;
 }
 
-const ZESimpleMaterial* ZEDTag::GetIcon()
+const ZEString& ZEDTag::GetIcon()
 {
-	return (ZESimpleMaterial*)TagMaterial;
+	return Icon;
+}
+
+void ZEDTag::SetParentTag(ZEDTag* Tag)
+{
+	ParentTag = Tag;
+}
+
+ZEDTag* ZEDTag::GetParentTag()
+{
+	return ParentTag;
 }
 
 ZEArray<ZEDTag*>& ZEDTag::GetChildTags()
 {
 	return ChildTags;
-}
-
-ZEDTag* ZEDTag::GetChildTag(ZESize Index)
-{
-	return ChildTags[Index];
 }
 
 void ZEDTag::AddChildTag(ZEDTag* Tag)
@@ -246,11 +164,6 @@ ZEArray<ZEDTag*>& ZEDTag::GetComponentTags()
 	return ComponentTags;
 }
 
-ZEDTag* ZEDTag::GetComponentTag(ZESize Index)
-{
-	return ComponentTags[Index];
-}
-
 void ZEDTag::AddComponentTag(ZEDTag* Tag)
 {
 	if (Tag == NULL)
@@ -271,29 +184,4 @@ void ZEDTag::RemoveComponentTag(ZEDTag* Tag)
 		return;
 
 	ComponentTags.RemoveValue(Tag);
-}
-
-bool ZEDTag::Save(ZEMLWriterNode* Serializer)
-{
-	return true;
-}
-
-bool ZEDTag::Restore(ZEMLReaderNode* Unserializer)
-{
-	return true;
-}
-
-void ZEDTag::Tick(float Time)
-{
-
-}
-
-void ZEDTag::Draw(ZEDrawParameters* DrawParameters)
-{
-	ZEMatrix4x4 Transformation;
-	ZEMatrix4x4::CreateOrientation(Transformation, GetPosition(), GetRotation());
-
-	TagRenderCommand.Material = TagMaterial;
-	TagRenderCommand.WorldMatrix = Transformation;
-	DrawParameters->Renderer->AddToRenderList(&TagRenderCommand);
 }

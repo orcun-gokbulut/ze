@@ -34,38 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_ENTITY_TAG_H__
-#define __ZED_ENTITY_TAG_H__
 
 #include "ZEDTag.h"
+#include "ZEGame/ZEEntity.h"
 
-class ZEDEntityTag : public ZEDTag
+class ZEDEntityTag : public ZEDTag, ZEEntity // Rename ObjectWrapper
 {
+	protected:
+		ZEOBBox BoundingBox;
+
 	public:
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
 
-		virtual ZEAABBox GetBoundingBox();
-		virtual ZEAABBox GetWorldBoundingBox();
+		virtual void SetVisibility(bool Value);
+		virtual bool GetVisibility();
 
+		virtual ZEOBBox GetBoundingBox();
 		virtual void SetPosition(const ZEVector3& NewPosition);
 		virtual ZEVector3 GetPosition();
-		virtual void SetWorldPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3 GetWorldPosition();
-
 		virtual void SetRotation(const ZEQuaternion& NewRotation);
 		virtual ZEQuaternion GetRotation();
-		virtual void SetWorldRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion GetWorldRotation();
-
 		virtual void SetScale(const ZEVector3& NewScale);
 		virtual ZEVector3 GetScale();
-		virtual void SetWorldScale(const ZEVector3& NewScale);
-		virtual ZEVector3 GetWorldScale();
-
-		virtual void Draw(ZEDrawParameters* DrawParameters);
-
+		
 		static ZEDEntityTag* CreateInstance();
 };
-
-#endif

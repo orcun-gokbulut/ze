@@ -53,8 +53,6 @@ class ZEDScene : public ZEScene
 		const ZESmartArray<ZEDTag*>& GetTags();
 		ZEArray<ZEDTag*> GetTags(ZEClass* Class);
 
-
-
 		void ClearTags();
 
 		ZEDScene();

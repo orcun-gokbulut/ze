@@ -34,10 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDEntityTag.h"
-#include "ZEDSelection.h"
-#include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderer.h"
 
 void ZEDEntityTag::SetObject(ZEObject* Object)
 {
@@ -45,6 +42,8 @@ void ZEDEntityTag::SetObject(ZEObject* Object)
 		return;
 
 	ZEDTag::SetObject(Object);
+
+	ZEAABBox::GenerateOBoundingBox(BoundingBox, ((ZEEntity*)Object)->GetBoundingBox());
 }
 
 ZEObject* ZEDEntityTag::GetObject()
@@ -52,20 +51,25 @@ ZEObject* ZEDEntityTag::GetObject()
 	return ZEDTag::GetObject();
 }
 
-ZEAABBox ZEDEntityTag::GetBoundingBox()
+void ZEDEntityTag::SetVisibility(bool Value)
 {
-	if (GetObject() == NULL)
-		return ZEAABBox();
-
-	return ((ZEEntity*)GetObject())->GetBoundingBox();
+	((ZEEntity*)GetObject())->SetVisible(Value);
 }
 
-ZEAABBox ZEDEntityTag::GetWorldBoundingBox()
+bool ZEDEntityTag::GetVisibility()
+{
+	return ((ZEEntity*)GetObject())->GetVisible();
+}
+
+ZEOBBox ZEDEntityTag::GetBoundingBox()
 {
 	if (GetObject() == NULL)
-		return ZEAABBox();
+		return BoundingBox;
 
-	return ((ZEEntity*)GetObject())->GetWorldBoundingBox();
+	ZEOBBox ResultBox;
+	ZEOBBox::Transform(ResultBox, ((ZEEntity*)GetObject())->GetWorldTransform(), BoundingBox);
+
+	return ResultBox;
 }
 
 void ZEDEntityTag::SetPosition(const ZEVector3& NewPosition)
@@ -73,32 +77,10 @@ void ZEDEntityTag::SetPosition(const ZEVector3& NewPosition)
 	if (GetObject() == NULL)
 		return;
 
-	((ZEEntity*)GetObject())->SetPosition(NewPosition);
-
-	if (GetSelection() != NULL)
-		GetSelection()->SetDirtyFlags(ZED_SELECTION_DIRTY_FLAG_BBOX, true);
+	((ZEEntity*)GetObject())->SetWorldPosition(NewPosition);
 }
 
 ZEVector3 ZEDEntityTag::GetPosition()
-{
-	if (GetObject() == NULL)
-		return ZEVector3::Zero;
-
-	return ((ZEEntity*)GetObject())->GetPosition();
-}
-
-void ZEDEntityTag::SetWorldPosition(const ZEVector3& NewPosition)
-{
-	if (GetObject() == NULL)
-		return;
-
-	((ZEEntity*)GetObject())->SetWorldPosition(NewPosition);
-
-	if (GetSelection() != NULL)
-		GetSelection()->SetDirtyFlags(ZED_SELECTION_DIRTY_FLAG_BBOX, true);
-}
-
-ZEVector3 ZEDEntityTag::GetWorldPosition()
 {
 	if (GetObject() == NULL)
 		return ZEVector3::Zero;
@@ -111,32 +93,10 @@ void ZEDEntityTag::SetRotation(const ZEQuaternion& NewRotation)
 	if (GetObject() == NULL)
 		return;
 
-	((ZEEntity*)GetObject())->SetRotation(NewRotation);
-
-	if (GetSelection() != NULL)
-		GetSelection()->SetDirtyFlags(ZED_SELECTION_DIRTY_FLAG_BBOX, true);
+	((ZEEntity*)GetObject())->SetWorldRotation(NewRotation);
 }
 
 ZEQuaternion ZEDEntityTag::GetRotation()
-{
-	if (GetObject() == NULL)
-		return ZEQuaternion::Identity;
-
-	return ((ZEEntity*)GetObject())->GetRotation();
-}
-
-void ZEDEntityTag::SetWorldRotation(const ZEQuaternion& NewRotation)
-{
-	if (GetObject() == NULL)
-		return;
-
-	((ZEEntity*)GetObject())->SetWorldRotation(NewRotation);
-
-	if (GetSelection() != NULL)
-		GetSelection()->SetDirtyFlags(ZED_SELECTION_DIRTY_FLAG_BBOX, true);
-}
-
-ZEQuaternion ZEDEntityTag::GetWorldRotation()
 {
 	if (GetObject() == NULL)
 		return ZEQuaternion::Identity;
@@ -149,10 +109,7 @@ void ZEDEntityTag::SetScale(const ZEVector3& NewScale)
 	if (GetObject() == NULL)
 		return;
 
-	((ZEEntity*)GetObject())->SetScale(NewScale);
-
-	if (GetSelection() != NULL)
-		GetSelection()->SetDirtyFlags(ZED_SELECTION_DIRTY_FLAG_BBOX, true);
+	((ZEEntity*)GetObject())->SetWorldScale(NewScale);
 }
 
 ZEVector3 ZEDEntityTag::GetScale()
@@ -160,44 +117,7 @@ ZEVector3 ZEDEntityTag::GetScale()
 	if (GetObject() == NULL)
 		return ZEVector3::One;
 
-	return ((ZEEntity*)GetObject())->GetScale();
-}
-
-void ZEDEntityTag::SetWorldScale(const ZEVector3& NewScale)
-{
-	if (GetObject() == NULL)
-		return;
-
-	((ZEEntity*)GetObject())->SetWorldScale(NewScale);
-
-	if (GetSelection() != NULL)
-		GetSelection()->SetDirtyFlags(ZED_SELECTION_DIRTY_FLAG_BBOX, true);
-}
-
-ZEVector3 ZEDEntityTag::GetWorldScale()
-{
-	if (GetObject() == NULL)
-		return ZEVector3::One;
-
 	return ((ZEEntity*)GetObject())->GetWorldScale();
-}
-
-void ZEDEntityTag::Draw(ZEDrawParameters* DrawParameters)
-{
-	if (GetObject() == NULL)
-		return;
-
-	ZEEntity* Entity = (ZEEntity*)GetObject();
-
-	TagCanvas.Clean();
-
-	DrawAxisAlignedBoundingBox(Entity->GetWorldBoundingBox(), ZEVector4::UnitW, TagCanvas); //How to affect draw colors etc globally.
-
-	if (TagCanvas.Vertices.GetCount() == 0)
-		return;
-
-	TagRenderCommand.PrimitiveCount = TagCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&TagRenderCommand);
 }
 
 ZEDEntityTag* ZEDEntityTag::CreateInstance()

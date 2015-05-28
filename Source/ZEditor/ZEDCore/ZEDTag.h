@@ -34,97 +34,85 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_TAG_H__
-#define __ZED_TAG_H__
 
 #include "ZEMeta/ZEObject.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
-
-
-class ZECanvas;
-class ZEDrawParameters;
-class ZERectangle3D;
-class ZESimpleMaterial;
-class ZEMLWriterNode;
-class ZEMLReaderNode;
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include <QtGui/QWidget>
+#include <QtGui/QMenu>
 
 class ZEDTag
 {
-	friend class ZEDSelection;
-
 	private:
+		ZESize Id;
+		ZEString Name;
+		ZEString Icon;
+		QWidget* CustomWidget;
+		QMenu* PopupMenu;
+		
 		ZEObject* Object;
-		ZEDSelection* Selection;
 
 		ZEDTag* ParentTag;
 		ZEArray<ZEDTag*> ChildTags;
 		ZEArray<ZEDTag*> ComponentTags;
 		
 	protected:
-		ZEMaterial* TagMaterial;
-		ZECanvas TagCanvas;
-		ZERenderCommand TagRenderCommand;
+		ZEDTag();
+		virtual ~ZEDTag();
 
-		void SetSelection(ZEDSelection* Selection);
-		ZEDSelection* GetSelection();
+	public slots:
+		virtual void OnSelected();
+		virtual void OnDeselected();
+		virtual void OnCreated();
+		virtual void OnDestroy();
+		virtual void OnTransformed();
+		virtual void OnChildObjectChanged();
+		virtual void OnParentObjectChanged();
+		virtual void OnOpenContainer();
+		virtual void OnCloseContainer();
+		virtual void Save();
+		virtual void Load();
+
+	public:
+		void SetId(ZESize Id);
+		ZESize GetId();
+		void SetName(const ZEString& Name);
+		const ZEString& GetName();
+		void SetIcon(const ZEString& Icon);
+		const ZEString& GetIcon();
+		void SetCustomWidget(QWidget* Widget);
+		QWidget* GetCustomWidget();
+		void SetPopupMenu(QMenu* Menu);
+		QMenu* GetPopupMenu();
+
+		virtual void SetObject(ZEObject* Object);
+		virtual ZEObject* GetObject();
+
+		virtual void SetVisibility(bool Value) = 0;
+		virtual bool GetVisibility() = 0;
+
+		virtual ZEOBBox GetBoundingBox() = 0;
+
+		virtual void SetPosition(const ZEVector3& NewPosition) = 0;
+		virtual ZEVector3 GetPosition() = 0;
+
+		virtual void SetRotation(const ZEQuaternion& NewRotation) = 0;
+		virtual ZEQuaternion GetRotation() = 0;
+
+		virtual void SetScale(const ZEVector3& NewScale) = 0;
+		virtual ZEVector3 GetScale() = 0;
 
 		void SetParentTag(ZEDTag* Tag);
 		ZEDTag* GetParentTag();
 
-		void DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, const ZEVector4& Color, ZECanvas& Canvas);
-		void DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, const ZEVector4& Color, ZECanvas& Canvas);
-		void DrawBoundingSphere(const ZEBSphere& BoundingSphere, const ZEVector4& Color, ZECanvas& Canvas);
-		void DrawLineSegment(const ZEVector3& StartPosition, const ZEVector3& EndPosition, const ZEVector4& Color, ZECanvas& Canvas);
-		void DrawRectangle(const ZERectangle3D& Rectangle, const ZEVector4& Color, ZECanvas& Canvas);
-
-		virtual bool InitializeSelf();
-		virtual bool DeinitializeSelf();
-
-		ZEDTag();
-		virtual ~ZEDTag();
-
-	public:
-		virtual void SetObject(ZEObject* Object);
-		virtual ZEObject* GetObject();
-
-		void SetIcon(ZESimpleMaterial* Material);
-		const ZESimpleMaterial* GetIcon();
-
-		virtual ZEAABBox GetBoundingBox() = 0;
-		virtual ZEAABBox GetWorldBoundingBox() = 0;
-
-		virtual void SetPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3 GetPosition() = 0;
-		virtual void SetWorldPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3 GetWorldPosition() = 0;
-
-		virtual void SetRotation(const ZEQuaternion& NewRotation) = 0;
-		virtual ZEQuaternion GetRotation() = 0;
-		virtual void SetWorldRotation(const ZEQuaternion& NewRotation) = 0;
-		virtual ZEQuaternion GetWorldRotation() = 0;
-
-		virtual void SetScale(const ZEVector3& NewScale) = 0;
-		virtual ZEVector3 GetScale() = 0;
-		virtual void SetWorldScale(const ZEVector3& NewScale) = 0;
-		virtual ZEVector3 GetWorldScale() = 0;
-
 		ZEArray<ZEDTag*>& GetChildTags();
-		ZEDTag* GetChildTag(ZESize Index);
-
 		virtual void AddChildTag(ZEDTag* Tag);
 		virtual void RemoveChildTag(ZEDTag* Tag);
 
 		ZEArray<ZEDTag*>& GetComponentTags();
-		ZEDTag* GetComponentTag(ZESize Index);
 		void AddComponentTag(ZEDTag* Tag);
 		void RemoveComponentTag(ZEDTag* Tag);
 
-		virtual bool Save(ZEMLWriterNode* Serializer);
-		virtual bool Restore(ZEMLReaderNode* Unserializer);
-
-		virtual void Tick(float Time);
-		virtual void Draw(ZEDrawParameters* DrawParameters);
 };
-
-#endif

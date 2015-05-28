@@ -35,77 +35,113 @@
 
 #include "ZEDSelectionManager.h"
 #include "ZEDCore.h"
-#include "ZEDEntityTag.h"
+#include "ZEDTag.h"
+#include "ZEDScene.h"
 #include "ZEFoundation/ZEMath/ZEViewVolume.h"
 #include "ZEGame/ZEEntity.h"
 
 
-ZEDSelection* ZEDSelectionManager::CreateSelection(ZEViewVolume* ViewVolume)
+// ZEDSelection* ZEDSelectionManager::CreateSelection(ZEViewVolume* ViewVolume)
+// {
+// 	if (ViewVolume == NULL)
+// 		return NULL;
+// 
+// 	if (ViewVolume->GetViewVolumeType() == ZE_VVT_NONE)
+// 		return NULL;
+// 
+// 	switch (Mode)
+// 	{
+// 	case ZED_SLM_ENTITY:
+// 		break;
+// 	case ZED_SLM_VERTEX:
+// 		break;
+// 	}
+// 
+// 	ZEArray<ZEDTag*> Tags /*= ZEDCore::GetCurrentScene()->GetEntityTags()*/;
+// 	ZEDSelection * NewSelection = new ZEDSelection();
+// 	
+// 	for (ZESize I = 0; I < Tags.GetCount(); I++)
+// 		if (!ViewVolume->CullTest(Tags[I]->GetWorldBoundingBox()))
+// 			NewSelection->AddElement(Tags[I]);
+// 
+// 	//With the pivot of new selection calculated (by who?) Transformation manager is called to calculate offsettopivot for elements.
+// }
+
+const ZEArray<ZEDTag*>& ZEDSelectionManager::GetSelectedObjects()
 {
-	if (ViewVolume == NULL)
-		return NULL;
-
-	if (ViewVolume->GetViewVolumeType() == ZE_VVT_NONE)
-		return NULL;
-
-	switch (Mode)
-	{
-	case ZED_SLM_ENTITY:
-		break;
-	case ZED_SLM_VERTEX:
-		break;
-	}
-
-	ZEArray<ZEDTag*> Tags /*= ZEDCore::GetCurrentScene()->GetEntityTags()*/;
-	ZEDSelection * NewSelection = new ZEDSelection();
-	
-	for (ZESize I = 0; I < Tags.GetCount(); I++)
-		if (!ViewVolume->CullTest(Tags[I]->GetWorldBoundingBox()))
-			NewSelection->AddElement(Tags[I]);
-
-	//With the pivot of new selection calculated (by who?) Transformation manager is called to calculate offsettopivot for elements.
+	return Selection;
 }
 
-ZEArray<ZEDSelection*>& ZEDSelectionManager::GetSelections()
+void ZEDSelectionManager::SelectObject(const ZERay& Ray)
 {
-	return Selections;
-}
+	ZERayCastParameters Parameters;
+	Parameters.Ray = Ray;
+	Parameters.FilterFunction = ZERayCastFilterFunction::Create<ZEDSelectionManager, &ZEDSelectionManager::FilterSelection>(this);
+	Parameters.FilterFunctionParameter = Filter;
+	ZERayCastReport Report;
 
-ZEDSelection* ZEDSelectionManager::GetSelection(ZESize Index)
-{
-	return Selections[Index];
-}
-
-void ZEDSelectionManager::AddSelection(ZEDSelection* Selection)
-{
-	if (Selections.Exists(Selection)) //Since old selections while changing current selection will be deleted. This adding should be a copy of the original selection.
+	if (!ZEDCore::GetInstance()->GetCurrentScene()->RayCast(Report, Parameters))
 		return;
 
-	Selections.Add(Selection);
+	// This functionality should work on ZEWrappers.
+
+	//Report.Entity add to Selection... or Sub Component
 }
 
-void ZEDSelectionManager::RemoveSelection(ZEDSelection* Selection)
+void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 {
-	if (!Selections.Exists(Selection))
+
+}
+
+void ZEDSelectionManager::SelectObject(ZEDTag* Object)
+{
+	if (Object == NULL)
 		return;
 
-	Selections.RemoveValue(Selection);
+	if (Filter != NULL)
+		if (!ZEClass::IsDerivedFrom(Filter, Object->GetObject()->GetClass()))
+			return;
+
+	Selection.Add(Object);
 }
 
-void ZEDSelectionManager::LockSelection(ZESize Index, bool Value)
+void ZEDSelectionManager::SelectObject(const ZEString& Name)
 {
-	if (Index >= Selections.GetCount())
+
+}
+
+void ZEDSelectionManager::DeselectObject(ZEDTag* Object)
+{
+	if (Object = NULL)
 		return;
 
-	Selections[Index]->Lock = Value;
+	if (!Selection.Exists(Object))
+		return;
+
+	Selection.RemoveValue(Object);
 }
 
-void ZEDSelectionManager::SetMode(ZEDSelectionMode Mode)
+void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)
+{
+	Filter = Class;
+}
+
+ZEClass* ZEDSelectionManager::GetSelectionFilter()
+{
+	return Filter;
+}
+
+bool ZEDSelectionManager::FilterSelection(ZEEntity* Entity, void* Class)
+{
+	return ZEClass::IsDerivedFrom(Entity->GetClass(), (ZEClass*)Class);
+}
+
+void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)
 {
 	this->Mode = Mode;
 }
 
-ZEDSelectionMode ZEDSelectionManager::GetMode()
+ZEDSelectionMode ZEDSelectionManager::GetSelectionMode()
 {
 	return Mode;
 }
@@ -122,19 +158,7 @@ ZEDSelectionManager* ZEDSelectionManager::GetInstance()
 
 ZEDSelectionManager::ZEDSelectionManager()
 {
-	CurrentSelection = NULL;
-	Mode = ZED_SLM_ENTITY;
+	Mode = ZED_SLM_FULLY;
+	Filter = NULL;
 }
 
-void ZEDSelectionManager::SetCurrentSelection(ZEDSelection* Selection)
-{
-	if (CurrentSelection != NULL)
-		delete CurrentSelection;
-
-	CurrentSelection = Selection;
-}
-
-ZEDSelection* ZEDSelectionManager::GetCurrentSelection()
-{
-	return CurrentSelection;
-}
