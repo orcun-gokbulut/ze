@@ -136,7 +136,7 @@ ZESize ZETRBlock::GetPixelSize()
 		case ZETR_PT_NONE:
 			return 0;
 		case ZETR_PT_ELEVATION:
-			return 4;
+			return 2;
 		case ZETR_PT_COLOR:
 			return 4;
 		case ZETR_PT_GRAYSCALE:
@@ -223,7 +223,6 @@ bool ZETRBlock::Load(ZEFile* File)
 
 	DataSize = Size * Size * GetPixelSize();
 	Data = new ZEBYTE[DataSize];
-
 	if (File->Read(GetData(), DataSize, 1) != 1)
 	{
 		Clean();

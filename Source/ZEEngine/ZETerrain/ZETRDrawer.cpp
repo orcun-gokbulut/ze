@@ -140,7 +140,7 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters,
 							   ZETRPrimitiveType Type, ZEInt NegativeExtent, ZEInt PositiveExtent, 
 							   float MinHeight, float MaxHeigt)
 {
-	ZEUInt Scale = 1 << Level;
+	float Scale = ZEMath::Power(2, Level);
 	ZEAABBox BoundingBox;
 	BoundingBox.Min = ZEVector3((float)(LocalPositionX + VertexBuffer.GetPrimitiveSize() - 1) * Scale, MinHeight, (float)(LocalPositionY + VertexBuffer.GetPrimitiveSize() - 1) * Scale);
 	BoundingBox.Max = ZEVector3((float)(LocalPositionX + VertexBuffer.GetPrimitiveSize() + 1) * Scale, MaxHeigt, (float)(LocalPositionY + VertexBuffer.GetPrimitiveSize() + 1) * Scale);
@@ -167,11 +167,10 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters,
 	RenderCommand.VertexBufferOffset	= Primitive.VertexOffset;
 	RenderCommand.PrimitiveCount		= Primitive.VertexCount / 3;
 
-	ZEMatrix4x4 LocalTransform;
 	ZEMatrix4x4::CreateOrientation(RenderCommand.LocalMatrix, ZEVector3(PositionX, 0.0f, PositionY), ZEVector3(Scale, 1.0f, Scale));
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4::CreateTranslation(WorldTransform, ZEVector3(WorldPositionX, 0.0f, WorldPositionY));
-	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, WorldTransform, LocalTransform);
+	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, WorldTransform, RenderCommand.LocalMatrix);
 
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
@@ -181,11 +180,12 @@ void ZETRDrawer::Draw(ZEDrawParameters* DrawParameters)
 	Material->Terrain = GetTerrain();
 	Material->ElevationLayer = GetTerrain()->GetElevationLayer();
 	Material->ColorLayer = GetTerrain()->GetColorLayer();
+	Material->ChunkSize = GetPrimitiveSize();
 	
 	ZEInt PositionX = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().x);
 	ZEInt PositionY = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().z);
 
-	for (ZEUInt Level = MinLevel; Level <= MaxLevel; Level++)
+	for (ZEUInt Level = MinLevel; Level < MaxLevel; Level++)
 	{
 		float WorldPositionX = (PositionX / (1 << Level)) * (1 << Level);
 		float WorldPositionY = (PositionY / (1 << Level)) * (1 << Level);

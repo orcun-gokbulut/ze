@@ -202,33 +202,33 @@ void ZETEResamplerIPP::DownsampleElevation(ZETEBlock* Output, ZETEBlock* Block00
 	DestinationOffset.x = 0;
 	DestinationOffset.y = 0;
 
-	Ipp16u* Destination = (Ipp16u*)Output->GetData();
+	ZEBYTE* Destination = (ZEBYTE*)Output->GetData();
 	Result = ippiResizeLinear_16u_C1R(
 		(Ipp16u*)Block00->GetData(), Block00->GetPitch(), 
-		Destination, Output->GetPitch(), 
+		(Ipp16u*)Destination, Output->GetPitch(), 
 		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
 		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
 
 
-	Destination = (Ipp16u*)Output->GetData() + HalfBlockSize * Output->GetPixelSize();
+	Destination = (ZEBYTE*)Output->GetData() + HalfBlockSize * Output->GetPixelSize();
 	Result = ippiResizeLinear_16u_C1R(
 		(Ipp16u*)Block01->GetData(), Block01->GetPitch(), 
-		Destination, Output->GetPitch(), 
+		(Ipp16u*)Destination, Output->GetPitch(), 
 		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
 		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
 
 
-	Destination = (Ipp16u*)Output->GetData() + HalfBlockSize * Output->GetPitch();
+	Destination = (ZEBYTE*)Output->GetData() + HalfBlockSize * Output->GetPitch();
 	Result = ippiResizeLinear_16u_C1R(
 		(Ipp16u*)Block10->GetData(), Block10->GetPitch(), 
-		Destination, Output->GetPitch(), 
+		(Ipp16u*)Destination, Output->GetPitch(), 
 		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
 		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
 
-	Destination = (Ipp16u*)Output->GetData()  + HalfBlockSize * Output->GetPitch() + HalfBlockSize * Output->GetPixelSize();
+	Destination = (ZEBYTE*)Output->GetData()  + HalfBlockSize * Output->GetPitch() + HalfBlockSize * Output->GetPixelSize();
 	Result = ippiResizeLinear_16u_C1R(
 		(Ipp16u*)Block11->GetData(), Block11->GetPitch(), 
-		Destination, Output->GetPitch(), 
+		(Ipp16u*)Destination, Output->GetPitch(), 
 		DestinationOffset, DestinationSize, ippBorderRepl, 0, 
 		(IppiResizeSpec_32f*)DownsampleData.Spec, (Ipp8u*)DownsampleData.Buffer);
 }

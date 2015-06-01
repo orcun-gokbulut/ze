@@ -50,6 +50,56 @@ ZETRLevelBlock::ZETRLevelBlock()
 	Cleaned = false;
 }
 
+void ZETRLevel::CleanBlock(ZESize LocalIndexX, ZESize LocalIndexY)
+{
+	ZESize BlockSize = Layer->GetBlockSize();
+
+	void* DestBuffer;
+	ZESize DestPitch;
+	ZESize Pitch = 0;
+	if (Layer->GetPixelType() == ZETR_PT_ELEVATION)
+		Pitch = sizeof(float) * Layer->GetBlockSize();
+	else if (Layer->GetPixelType() == ZETR_PT_COLOR)
+		Pitch = 4 * Layer->GetBlockSize();
+	else if (Layer->GetPixelType() == ZETR_PT_GRAYSCALE)
+		Pitch = Layer->GetBlockSize();
+
+	Texture->Lock(&DestBuffer, &DestPitch, 0, LocalIndexX * BlockSize, LocalIndexY * BlockSize, BlockSize, BlockSize);
+	for (ZESize I = 0; I < BlockSize; I++)
+		memset((ZEBYTE*)DestBuffer + I * DestPitch, 0, Pitch);
+
+	Texture->Unlock(0);
+}
+
+void ZETRLevel::LoadBlock(ZESize LocalIndexX, ZESize LocalIndexY, ZETRBlock* Block)
+{
+	ZESize BlockSize = Layer->GetBlockSize();
+	ZEBYTE* SourceBuffer = (ZEBYTE*)Block->GetData();
+	ZESize SourcePitch = Block->GetPitch();
+
+	void* DestBuffer;
+	ZESize DestPitch;
+	Texture->Lock(&DestBuffer, &DestPitch, 0, LocalIndexX * BlockSize, LocalIndexY * BlockSize, BlockSize, BlockSize);
+
+	if (Layer->GetPixelType() == ZETR_PT_ELEVATION)
+	{
+		for (ZESize Y = 0; Y < BlockSize; Y++)
+		{
+			float* DestValue = (float*)((ZEBYTE*)DestBuffer + Y * DestPitch);
+			ZEUInt16* SrcValue = (ZEUInt16*)((ZEBYTE*)SourceBuffer + Y * SourcePitch);
+			for (ZESize X = 0; X < BlockSize; X++)
+				DestValue[X] = SrcValue[X];
+		}
+	}
+	else
+	{
+		for (ZESize I = 0; I < BlockSize; I++)
+			memcpy((ZEBYTE*)DestBuffer + I * DestPitch, SourceBuffer + I * SourcePitch, SourcePitch);
+	}
+	
+	Texture->Unlock(0);
+}
+
 void ZETRLevel::ProcessBlock(ZESSize IndexX, ZESSize IndexY)
 {
 	int LocalIndexX = ZEMath::CircularMod(IndexX, (ZESSize)GetBlockCount());
@@ -75,32 +125,14 @@ void ZETRLevel::ProcessBlock(ZESSize IndexX, ZESSize IndexY)
 		Block->LastStatus = NewBlock->GetStatus();
 		if (Block->LastStatus == ZETR_BRS_AVAILABLE)
 		{
-			ZESize BlockSize = Layer->GetBlockSize();
-			ZEBYTE* SourceBuffer = (ZEBYTE*)NewBlock->GetData();
-			ZESize SourcePitch = NewBlock->GetPitch();
-
-			void* DestBuffer;
-			ZESize DestPitch;
-			Texture->Lock(&DestBuffer, &DestPitch, 0, LocalIndexX * BlockSize, LocalIndexY * BlockSize, BlockSize, BlockSize);
-				for (ZESize I = 0; I < BlockSize; I++)
-					memcpy((ZEBYTE*)DestBuffer + I * DestPitch, SourceBuffer + I * SourcePitch, SourcePitch);
-			Texture->Unlock(0);
+			LoadBlock(LocalIndexX, LocalIndexY, NewBlock);
 		}
 		else
 		{
 			if (Block->Cleaned)
 				return;
 
-			ZESize BlockSize = Layer->GetBlockSize();
-			ZESize SourcePitch = BlockSize * NewBlock->GetPixelSize();
-
-			void* DestBuffer;
-			ZESize DestPitch;
-			Texture->Lock(&DestBuffer, &DestPitch, 0, LocalIndexX * BlockSize, LocalIndexY * BlockSize, BlockSize, BlockSize);
-				for (ZESize I = 0; I < BlockSize; I++)
-					memset((ZEBYTE*)DestBuffer + I * DestPitch, 0, SourcePitch);
-			Texture->Unlock(0);
-
+			CleanBlock(LocalIndexX, LocalIndexY);
 			Block->Cleaned = true;
 		}
 	}
@@ -115,12 +147,32 @@ void ZETRLevel::SetLevel(ZEInt Level)
 
 bool ZETRLevel::InitializeSelf()
 {
-	if (Layer == NULL)
+	if (Layer == NULL || Layer->GetPixelType() == ZETR_PT_NONE)
 		return false;
 
 	ZESize BlockSize = Layer->GetBlockSize();
 	Texture = ZETexture2D::CreateInstance();
-	if (!Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 0, ZE_TPF_RGBA8, false))
+	bool Result = false;
+	
+	switch (Layer->GetPixelType())
+	{
+		case ZETR_PT_ELEVATION:
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 0, ZE_TPF_F32, false);
+			break;
+
+		case ZETR_PT_COLOR:
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 0, ZE_TPF_I8_4, false);
+			break;
+
+		case ZETR_PT_GRAYSCALE:
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 0, ZE_TPF_I8, false);
+			break;
+
+		default:
+			break;
+	}
+
+	if (!Result)
 	{
 		Texture->Destroy();
 		Texture = NULL;

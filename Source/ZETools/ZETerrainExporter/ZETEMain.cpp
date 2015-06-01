@@ -55,19 +55,19 @@ void main()
 
 	ZETEPatchDatabase PatchDatabase;
 	PatchDatabase.SetBlockSize(1024);
-	PatchDatabase.SetPixelType(ZETE_PT_COLOR);
-	PatchDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Test/Patches");
+	PatchDatabase.SetPixelType(ZETE_PT_ELEVATION);
+	PatchDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Patches");
 	Procesor.SetPatchDatabase(&PatchDatabase);
 
 	ZETEBlockDatabase BlockDatabase;
 	BlockDatabase.SetBlockSize(1024);
-	BlockDatabase.SetPixelType(ZETE_PT_COLOR);
-	BlockDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Test/Blocks");
+	BlockDatabase.SetPixelType(ZETE_PT_ELEVATION);
+	BlockDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Layers/Elevation");
 	Procesor.SetBlockDatabase(&BlockDatabase);
 	
 	ZETEPatch* Patch;
 	Patch = new ZETEPatchFile();
-	Patch->SetSource("c:\\World.jpg");
+	Patch->SetSource("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Patches/world_elevation.tif");
 	Patch->SetPriority(0);
 	Patch->SetPositionX(200.5);
 	Patch->SetPositionY(200.5);

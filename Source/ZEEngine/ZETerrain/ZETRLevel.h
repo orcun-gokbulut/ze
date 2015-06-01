@@ -68,6 +68,8 @@ class ZETRLevel : public ZEInitializable
 		float					LevelScale;
 		float					LevelBlockSize;
 
+		void					CleanBlock(ZESize LocalIndexX, ZESize LocalIndexY);
+		void					LoadBlock(ZESize LocalIndexX, ZESize LocalIndexY, ZETRBlock* Block);
 		void					ProcessBlock(ZESSize IndexX, ZESSize IndexY);
 
 		void					SetLevel(ZEInt Level);

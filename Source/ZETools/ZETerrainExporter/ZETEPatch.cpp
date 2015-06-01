@@ -170,7 +170,7 @@ ZESize ZETEPatch::GetPixelSize()
 			return 0;
 
 		case ZETE_PT_ELEVATION:
-			return 4;
+			return 2;
 
 		case ZETE_PT_COLOR:
 			return 4;

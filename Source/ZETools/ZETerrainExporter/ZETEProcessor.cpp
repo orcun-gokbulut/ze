@@ -131,7 +131,7 @@ bool ZETEProcessor::GenerateBlocks()
 
 		ZETEBlock Block;
 		Block.SetSize(PatchDatabase->GetBlockSize());
-		Block.SetPixelType(ZETE_PT_COLOR);
+		Block.SetPixelType(PatchDatabase->GetPixelType());
 	
 		ZETEResamplerIPP Resampler;
 		

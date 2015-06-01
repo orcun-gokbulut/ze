@@ -305,7 +305,7 @@ bool ZETEBlock::Dump(const ZEString& FileName)
 		ZESize DestPitch = FreeImage_GetPitch(Bitmap);
 		ZEBYTE* DestBuffer = FreeImage_GetBits(Bitmap);
 		for (ZESize I = 0; I < Size; I++)
-			memcpy(DestBuffer + I * DestPitch, (ZEBYTE*)Data + I * Size * 2, Size * 2);
+			memcpy(DestBuffer + I * DestPitch, (ZEBYTE*)Data + (Size - I - 1) * Size * 2, Size * 2);
 	}
 
 	if (Bitmap == NULL)

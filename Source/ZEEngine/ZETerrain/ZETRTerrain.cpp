@@ -224,11 +224,17 @@ ZEUInt ZETRTerrain::GetPrimitiveSize()
 
 void ZETRTerrain::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (ElevationLayer != NULL)
+	if (ElevationLayer != NULL && ElevationLayer->GetEnabled())
+	{
+		ElevationLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
 		ElevationLayer->Process();
+	}
 
-	if (ColorLayer != NULL)
+	if (ColorLayer != NULL && ColorLayer->GetEnabled())
+	{
+		ColorLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
 		ColorLayer->Process();
+	}
 
 	for (ZESize I = 0; I < ExtraLayers.GetCount(); I++)
 	{
