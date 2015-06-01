@@ -118,7 +118,7 @@ ZETRLevel* ZETRLayer::GetLevel(ZEInt Level)
 {
 	for (ZESize I = 0; I < Levels.GetCount(); I++)
 		if (Levels[I]->GetLevel() == Level)
-			return Levels[0];
+			return Levels[I];
 
 	return NULL;
 }
@@ -223,6 +223,7 @@ ZETRLayer::ZETRLayer()
 	MinLevel = 0;
 	MaxLevel = 0;
 	PixelType = ZETR_PT_NONE;
+	Enabled = true;
 }
 
 ZETRLayer::~ZETRLayer()
