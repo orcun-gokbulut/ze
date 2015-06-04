@@ -41,7 +41,7 @@ class ZEDOperationManager;
 class ZEDSelectionManager;
 class ZEDTransformationManager;
 class ZEDViewPort;
-class ZEDScene;
+class ZEScene;
 
 class ZEDCore
 {
@@ -50,10 +50,10 @@ class ZEDCore
 		ZEDSelectionManager* SelectionManager;
 		ZEDTransformationManager* TransformationManager;
 
-		ZEArray<ZEDViewPort*> Viewports;
-		ZEDViewPort* CurrentViewport;
-		ZEArray<ZEDScene*> Scenes;
-		ZEDScene* CurrentScene;
+		ZEDViewPort* Viewport;
+
+		ZEScene* ExportScene;
+		ZEScene* EditorScene;
 
 		ZEDCore();
 		~ZEDCore();
@@ -63,8 +63,9 @@ class ZEDCore
 		ZEDSelectionManager* GetSelectionManager();
 		ZEDTransformationManager* GetTransformationManager();
 
-		ZEDViewPort* GetCurrentViewport();
-		ZEDScene* GetCurrentScene();
+		ZEDViewPort* GetViewport();
+		ZEScene* GetExportScene();
+		ZEScene* GetEditorScene();
 
 		void Destroy();
 

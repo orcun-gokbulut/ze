@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewPort.h
+ Zinek Engine - ZEDTransformationOperation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,73 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_VIEWPORT_H__
-#define __ZED_VIEWPORT_H__
 
-#include <QtGui/QFrame>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QDropEvent>
-#include <QtGui/QFocusEvent>
-#include <QtCore/QTimer>
+#include "ZEDOperation.h"
+#include "ZEDTransformationManager.h"
+#include "ZEDS/ZEArray.h"
 
-#include "ZETypes.h"
-#include "ZEGraphics/ZECamera.h"
+class ZEDObjectWrapper;
 
-enum ZEDViewMode
-{
-	ZED_VM_FREE,
-	ZED_VM_LOCKED
-};
-
-class ZEDViewPort : public QFrame
+class ZEDTransformationOperation : public ZEDOperation
 {
 	private:
-		ZEDViewMode ViewMode;
-		ZECamera* Camera;
+		ZEDTransformType Type;
+		ZEMatrix4x4 Transform;
+		ZEArray<ZEDObjectWrapper*> Objects;
 
-		QSet<ZEInt> PressedKeyboardKeys;
-		ZEInt StepSize;
-
-		ZEVector2 MouseStartPosition;
-		ZEVector2 MouseCurrentPosition;
-
-		float Pitch;
-		float Yaw;
-		float Roll;
-
-		void MoveCamera(float ElapsedTime);
-		void RotateCamera(const ZEVector2& MousePosition);
-
-	protected:
-		virtual void mousePressEvent(QMouseEvent* MouseEvent);
-		virtual void mouseMoveEvent(QMouseEvent* MouseEvent);
-		virtual void mouseReleaseEvent(QMouseEvent* MouseEvent);		
-				 
-		virtual void keyPressEvent(QKeyEvent* KeyEvent);
-		virtual void keyReleaseEvent(QKeyEvent* KeyEvent);
-				 
-		virtual void resizeEvent(QResizeEvent* ResizeEvent);
-				 
-		virtual void dragEnterEvent(QDragEnterEvent* Event);
-		virtual void dragMoveEvent(QDragMoveEvent* Event);
-		virtual void dragLeaveEvent(QDragLeaveEvent* Event);
-		virtual void dropEvent(QDropEvent* Event);
-				 
-		virtual void focusInEvent(QFocusEvent* Event);
-		virtual void focusOutEvent(QFocusEvent* Event);
+	protected:		
+		virtual bool Apply();
+		virtual bool Revert();
 
 	public:
-		void SetViewMode(ZEDViewMode Mode);
-		ZEDViewMode GetViewMode();
-		const ZEView& GetView();
+		virtual void Destroy();
 
-		void SetStepSize(ZEInt StepSize);
-		ZEInt GetStepSize();
-
-		void Tick(float Time);
-
-		ZEDViewPort(QWidget* Parent = NULL);
+		ZEDTransformationOperation(ZEDTransformType Type, ZEMatrix4x4 Transform, const ZEArray<ZEDObjectWrapper*>& Wrappers);
 };
-
-#endif

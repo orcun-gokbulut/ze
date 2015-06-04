@@ -37,41 +37,6 @@
 #include "ZEDObjectWrapper.h"
 #include "ZEGame/ZEEntity.h"
 
-const ZESmartArray<ZEDObjectWrapper*>& ZEDScene::GetWrappers()
-{
-	return Wrappers;
-}
-
-ZEArray<ZEDObjectWrapper*> ZEDScene::GetWrappers(ZEClass* Class)
-{
-	ZEArray<ZEDObjectWrapper*> DerivedWrappers;
-	ZEObject* CurrentObject = NULL;
-
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		CurrentObject = Wrappers[I]->GetObject();
-		if (ZEClass::IsDerivedFrom(Class, CurrentObject->GetClass()))
-			DerivedWrappers.Add(Wrappers[I]);
-	}
-
-	return DerivedWrappers;
-}
-
-void ZEDScene::AddWrapper(ZEDObjectWrapper* Wrapper)
-{
-	//How should non-entity Wrappers be managed regarding scene ops.
-}
-
-void ZEDScene::RemoveWrapper(ZEDObjectWrapper* Wrapper)
-{
-
-}
-
-void ZEDScene::ClearWrappers()
-{
-
-}
-
 ZEDScene::ZEDScene()
 {
 

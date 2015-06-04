@@ -41,17 +41,8 @@ class ZEDObjectWrapper;
 
 class ZEDScene : public ZEScene
 {
-	private:
-		ZESmartArray<ZEDObjectWrapper*> Wrappers;
-
-		void AddWrapper(ZEDObjectWrapper* Wrapper);
-		void RemoveWrapper(ZEDObjectWrapper* Wrapper);
 
 	public:
-		const ZESmartArray<ZEDObjectWrapper*>& GetWrappers();
-		ZEArray<ZEDObjectWrapper*> GetWrappers(ZEClass* Class);
-
-		void ClearWrappers();
 
 		ZEDScene();
 };

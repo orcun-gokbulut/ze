@@ -35,8 +35,9 @@
 
 #pragma once
 
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
 
 enum ZEDTransformType
 {
@@ -44,6 +45,12 @@ enum ZEDTransformType
 	ZED_TT_TRANSLATE,
 	ZED_TT_ROTATE,
 	ZED_TT_SCALE
+};
+
+enum ZEDTransformSpace
+{
+	ZED_TS_LOCAL,
+	ZED_TS_WORLD
 };
 
 class ZEDGizmo;
@@ -54,24 +61,25 @@ class ZEDTransformationManager
 
 	private:
 		ZEDTransformType TransformType;
+		ZEDTransformSpace TransformSpace;
+		ZEMatrix4x4 Transform;
 		ZEDGizmo* Gizmo;
 
 		ZEDTransformationManager();
 
 	public:
-		void SetPivotPosition(const ZEVector3& Position);
-		const ZEVector3& GetPivotPosition();
-
-		void SetPivotRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion& GetPivotRotation();
-
 		void SetTransformType(ZEDTransformType Type);
 		ZEDTransformType GetTransformType();
 
-		void BeginTransform(...);
-		void ResetTransform(...);
-		void ApplyTransform(...);
-		void EndTransform(...);
+		void SetTransformSpace(ZEDTransformSpace Space);
+		ZEDTransformSpace GetTransformSpace();
+
+		ZEDGizmo* GetGizmo();
+
+		void BeginTransform(ZEDTransformType Type);
+		void ResetTransform();
+		void ApplyTransform(ZEMatrix4x4 Transform);
+		void EndTransform();
 
 		void Destroy();
 

@@ -54,22 +54,22 @@ ZEDObjectWrapper::~ZEDObjectWrapper()
 	}
 }
 
-void ZEDObjectWrapper::SetId(ZESize Id)
+void ZEDObjectWrapper::SetObjectId(ZESize Id)
 {
 	this->Id = Id;
 }
 
-ZESize ZEDObjectWrapper::GetId()
+ZESize ZEDObjectWrapper::GetObjectId()
 {
 	return Id;
 }
 
-void ZEDObjectWrapper::SetName(const ZEString& Name)
+void ZEDObjectWrapper::SetObjectName(const ZEString& Name)
 {
 	this->Name = Name;
 }
 
-const ZEString& ZEDObjectWrapper::GetName()
+const ZEString& ZEDObjectWrapper::GetObjectName()
 {
 	return Name;
 }
@@ -107,12 +107,12 @@ ZEObject* ZEDObjectWrapper::GetObject()
 	return Object;
 }
 
-void ZEDObjectWrapper::SetIcon(const ZEString& Icon)
+void ZEDObjectWrapper::SetObjectIcon(const ZEString& Icon)
 {
 	this->Icon = Icon;
 }
 
-const ZEString& ZEDObjectWrapper::GetIcon()
+const ZEString& ZEDObjectWrapper::GetObjectIcon()
 {
 	return Icon;
 }

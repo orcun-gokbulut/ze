@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDEntityWrapper.h"
-#include "ZEGame/ZEEntity.h"
 
 void ZEDEntityWrapper::SetObject(ZEObject* Object)
 {
@@ -51,17 +50,17 @@ ZEObject* ZEDEntityWrapper::GetObject()
 	return ZEDObjectWrapper::GetObject();
 }
 
-void ZEDEntityWrapper::SetVisibility(bool Value)
+void ZEDEntityWrapper::SetObjectVisibility(bool Value)
 {
 	((ZEEntity*)GetObject())->SetVisible(Value);
 }
 
-bool ZEDEntityWrapper::GetVisibility()
+bool ZEDEntityWrapper::GetObjectVisibility()
 {
 	return ((ZEEntity*)GetObject())->GetVisible();
 }
 
-ZEOBBox ZEDEntityWrapper::GetBoundingBox()
+ZEOBBox ZEDEntityWrapper::GetObjectBoundingBox()
 {
 	if (GetObject() == NULL)
 		return BoundingBox;
@@ -72,7 +71,7 @@ ZEOBBox ZEDEntityWrapper::GetBoundingBox()
 	return ResultBox;
 }
 
-void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
+void ZEDEntityWrapper::SetObjectPosition(const ZEVector3& NewPosition)
 {
 	if (GetObject() == NULL)
 		return;
@@ -80,7 +79,7 @@ void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 	((ZEEntity*)GetObject())->SetWorldPosition(NewPosition);
 }
 
-ZEVector3 ZEDEntityWrapper::GetPosition()
+ZEVector3 ZEDEntityWrapper::GetObjectPosition()
 {
 	if (GetObject() == NULL)
 		return ZEVector3::Zero;
@@ -88,7 +87,7 @@ ZEVector3 ZEDEntityWrapper::GetPosition()
 	return ((ZEEntity*)GetObject())->GetWorldPosition();
 }
 
-void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
+void ZEDEntityWrapper::SetObjectRotation(const ZEQuaternion& NewRotation)
 {
 	if (GetObject() == NULL)
 		return;
@@ -96,7 +95,7 @@ void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 	((ZEEntity*)GetObject())->SetWorldRotation(NewRotation);
 }
 
-ZEQuaternion ZEDEntityWrapper::GetRotation()
+ZEQuaternion ZEDEntityWrapper::GetObjectRotation()
 {
 	if (GetObject() == NULL)
 		return ZEQuaternion::Identity;
@@ -104,7 +103,7 @@ ZEQuaternion ZEDEntityWrapper::GetRotation()
 	return ((ZEEntity*)GetObject())->GetWorldRotation();
 }
 
-void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
+void ZEDEntityWrapper::SetObjectScale(const ZEVector3& NewScale)
 {
 	if (GetObject() == NULL)
 		return;
@@ -112,7 +111,7 @@ void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 	((ZEEntity*)GetObject())->SetWorldScale(NewScale);
 }
 
-ZEVector3 ZEDEntityWrapper::GetScale()
+ZEVector3 ZEDEntityWrapper::GetObjectScale()
 {
 	if (GetObject() == NULL)
 		return ZEVector3::One;

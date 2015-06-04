@@ -36,7 +36,6 @@
 #pragma once
 
 #include "ZEDObjectWrapper.h"
-#include "ZEGame/ZEEntity.h"
 
 class ZEDEntityWrapper : public ZEDObjectWrapper
 {
@@ -47,16 +46,16 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
 
-		virtual void SetVisibility(bool Value);
-		virtual bool GetVisibility();
+		virtual void SetObjectVisibility(bool Value);
+		virtual bool GetObjectVisibility();
 
-		virtual ZEOBBox GetBoundingBox();
-		virtual void SetPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3 GetPosition();
-		virtual void SetRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion GetRotation();
-		virtual void SetScale(const ZEVector3& NewScale);
-		virtual ZEVector3 GetScale();
+		virtual ZEOBBox GetObjectBoundingBox();
+		virtual void SetObjectPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3 GetObjectPosition();
+		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion GetObjectRotation();
+		virtual void SetObjectScale(const ZEVector3& NewScale);
+		virtual ZEVector3 GetObjectScale();
 		
 		static ZEDEntityWrapper* CreateInstance();
 };
