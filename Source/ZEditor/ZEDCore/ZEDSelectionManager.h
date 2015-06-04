@@ -37,16 +37,18 @@
 
 #include "ZEFoundation/ZEDS/ZEArray.h"
 #include "ZEFoundation/ZEMath/ZERay.h"
+#include "ZEFoundation/ZEMath/ZEMatrix.h"
 
 class ZEDObjectWrapper;
 class ZEEntity;
 class ZEClass;
 class ZEViewVolume;
 
-enum ZEDSelectionMode
+enum ZEDSelectionPivotMode
 {
-	ZED_SLM_FULLY,
-	ZED_SLM_PARTIAL
+	ZED_SCM_ENTITY_PIVOT,
+	ZED_SCM_SELECTION_CENTER,
+	ZED_SCM_SPACE_CENTER
 };
 
 class ZEDSelectionManager
@@ -55,28 +57,42 @@ class ZEDSelectionManager
 
 	private:
 		ZEArray<ZEDObjectWrapper*> Selection;
-		ZEDSelectionMode Mode;
+
+		ZEDSelectionPivotMode PivotMode;
+		ZEMatrix4x4 SelectionPivot;
+		bool DirtyPivot;
+
 		ZEClass* Filter;
+
+		void CalculateSelectionPivot();
 
 		ZEDSelectionManager();
 
 	public:
 		const ZEArray<ZEDObjectWrapper*>& GetSelectedObjects();
 
+		void SelectObject(ZEDObjectWrapper* Object);
 		void SelectObject(const ZERay& Ray);
 		void SelectObject(ZEViewVolume* ViewVolume);
-		void SelectObject(ZEDObjectWrapper* Object);
+		void SelectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2);
 		void SelectObject(const ZEString& Name);
 
 		void DeselectObject(ZEDObjectWrapper* Object);
+		void DeselectObject(const ZERay& Ray);
+		void DeselectObject(ZEViewVolume* ViewVolume);
+		void DeselectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2);
+		void DeselectObject(const ZEString& Name);
+
+		void ClearSelection();
 
 		void SetSelectionFilter(ZEClass* Class);
 		ZEClass* GetSelectionFilter();
 		bool FilterSelection(ZEEntity* Entity, void* Class);
 
-		void SetSelectionMode(ZEDSelectionMode Mode);
-		ZEDSelectionMode GetSelectionMode();
-
+		void SetSelectionPivotMode(ZEDSelectionPivotMode Mode);
+		ZEDSelectionPivotMode GetSelectionPivotMode();
+		ZEMatrix4x4 GetSelectionPivot();
+		
 		void Destroy();
 
 		static ZEDSelectionManager* GetInstance();

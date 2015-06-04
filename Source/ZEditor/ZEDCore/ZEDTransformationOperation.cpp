@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewPort.h
+ Zinek Engine - ZEDTransformationOperation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,74 +33,75 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZED_VIEWPORT_H__
-#define __ZED_VIEWPORT_H__
+#include "ZEDTransformationOperation.h"
+#include "ZEDObjectWrapper.h"
 
-#include <QtGui/QFrame>
-#include <QtGui/QMouseEvent>
-#include <QtGui/QKeyEvent>
-#include <QtGui/QDropEvent>
-#include <QtGui/QFocusEvent>
-#include <QtCore/QTimer>
 
-#include "ZETypes.h"
-#include "ZEGraphics/ZECamera.h"
-
-enum ZEDViewMode
+bool ZEDTransformationOperation::Apply()
 {
-	ZED_VM_FREE,
-	ZED_VM_LOCKED
-};
+	if (Type == ZED_TT_NONE)
+		return false;
 
-class ZEDViewPort : public QFrame
+	for (ZESize I = 0; I < Objects.GetCount(); I++)
+	{
+
+		if (Type == ZED_TT_TRANSLATE)
+		{
+			Objects[I]->SetPosition(Transform * Objects[I]->GetPosition());
+		}
+		else if (Type == ZED_TT_ROTATE)
+		{
+			ZEQuaternion Result;
+			ZEQuaternion::CreateFromMatrix(Result, Transform);
+			Objects[I]->SetRotation((Result * Objects[I]->GetRotation()).Normalize());
+		}
+		else if (Type == ZED_TT_SCALE)
+		{
+			Objects[I]->SetScale(Transform.GetScale() * Objects[I]->GetScale());
+		}
+	}
+
+	return true;
+}
+
+bool ZEDTransformationOperation::Revert()
 {
-	private:
-		ZEDViewMode ViewMode;
-		ZECamera* Camera;
+	if (Type == ZED_TT_NONE)
+		return false;
 
-		QSet<ZEInt> PressedKeyboardKeys;
-		ZEInt StepSize;
+	for (ZESize I = 0; I < Objects.GetCount(); I++)
+	{
 
-		ZEVector2 MouseStartPosition;
-		ZEVector2 MouseCurrentPosition;
+		if (Type == ZED_TT_TRANSLATE)
+		{
+			Objects[I]->SetPosition(Transform.Inverse() * Objects[I]->GetPosition());
+		}
+		else if (Type == ZED_TT_ROTATE)
+		{
+			ZEQuaternion Result;
+			ZEQuaternion::CreateFromMatrix(Result, Transform);
+			Objects[I]->SetRotation((Result.Conjugate() * Objects[I]->GetRotation()).Normalize());
+		}
+		else if (Type == ZED_TT_SCALE)
+		{
+			Objects[I]->SetScale(Transform.GetScale() / Objects[I]->GetScale());
+		}
+	}
 
-		float Pitch;
-		float Yaw;
-		float Roll;
+	return true;
+}
 
-		void MoveCamera(float ElapsedTime);
-		void RotateCamera(const ZEVector2& MousePosition);
+void ZEDTransformationOperation::Destroy()
+{
+	delete this;
+}
 
-	protected:
-		virtual void mousePressEvent(QMouseEvent* MouseEvent);
-		virtual void mouseMoveEvent(QMouseEvent* MouseEvent);
-		virtual void mouseReleaseEvent(QMouseEvent* MouseEvent);		
-				 
-		virtual void keyPressEvent(QKeyEvent* KeyEvent);
-		virtual void keyReleaseEvent(QKeyEvent* KeyEvent);
-				 
-		virtual void resizeEvent(QResizeEvent* ResizeEvent);
-				 
-		virtual void dragEnterEvent(QDragEnterEvent* Event);
-		virtual void dragMoveEvent(QDragMoveEvent* Event);
-		virtual void dragLeaveEvent(QDragLeaveEvent* Event);
-		virtual void dropEvent(QDropEvent* Event);
-				 
-		virtual void focusInEvent(QFocusEvent* Event);
-		virtual void focusOutEvent(QFocusEvent* Event);
+ZEDTransformationOperation::ZEDTransformationOperation(ZEDTransformType Type, ZEMatrix4x4 Transform, const ZEArray<ZEDObjectWrapper*>& Wrappers)
+{
+	this->Type = Type;
+	this->Transform = Transform;
+	Objects.SetCount(Wrappers.GetCount());
 
-	public:
-		void SetViewMode(ZEDViewMode Mode);
-		ZEDViewMode GetViewMode();
-		const ZEView& GetView();
-
-		void SetStepSize(ZEInt StepSize);
-		ZEInt GetStepSize();
-
-		void Tick(float Time);
-
-		ZEDViewPort(QWidget* Parent = NULL);
-};
-
-#endif
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+		Objects[I] =  Wrappers[I];
+}

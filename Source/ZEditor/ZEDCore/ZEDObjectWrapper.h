@@ -35,15 +35,11 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEOBBox.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
+#include "ZEGame/ZEEntity.h"
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 
-class ZEDObjectWrapper
+class ZEDObjectWrapper : public ZEEntity
 {
 	private:
 		ZESize Id;
@@ -76,12 +72,12 @@ class ZEDObjectWrapper
 		virtual void Load();
 
 	public:
-		void SetId(ZESize Id);
-		ZESize GetId();
-		void SetName(const ZEString& Name);
-		const ZEString& GetName();
-		void SetIcon(const ZEString& Icon);
-		const ZEString& GetIcon();
+		void SetObjectId(ZESize Id);
+		ZESize GetObjectId();
+		void SetObjectName(const ZEString& Name);
+		const ZEString& GetObjectName();
+		void SetObjectIcon(const ZEString& Icon);
+		const ZEString& GetObjectIcon();
 		void SetCustomWidget(QWidget* Widget);
 		QWidget* GetCustomWidget();
 		void SetPopupMenu(QMenu* Menu);
@@ -90,19 +86,19 @@ class ZEDObjectWrapper
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
 
-		virtual void SetVisibility(bool Value) = 0;
-		virtual bool GetVisibility() = 0;
+		virtual void SetObjectVisibility(bool Value) = 0;
+		virtual bool GetObjectVisibility() = 0;
 
-		virtual ZEOBBox GetBoundingBox() = 0;
+		virtual ZEOBBox GetObjectBoundingBox() = 0;
 
-		virtual void SetPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3 GetPosition() = 0;
+		virtual void SetObjectPosition(const ZEVector3& NewPosition) = 0;
+		virtual ZEVector3 GetObjectPosition() = 0;
 
-		virtual void SetRotation(const ZEQuaternion& NewRotation) = 0;
-		virtual ZEQuaternion GetRotation() = 0;
+		virtual void SetObjectRotation(const ZEQuaternion& NewRotation) = 0;
+		virtual ZEQuaternion GetObjectRotation() = 0;
 
-		virtual void SetScale(const ZEVector3& NewScale) = 0;
-		virtual ZEVector3 GetScale() = 0;
+		virtual void SetObjectScale(const ZEVector3& NewScale) = 0;
+		virtual ZEVector3 GetObjectScale() = 0;
 
 		void SetParentWrapper(ZEDObjectWrapper* Wrapper);
 		ZEDObjectWrapper* GetParentWrapper();

@@ -36,30 +36,16 @@
 #include "ZEDTransformationManager.h"
 #include "ZEDCore.h"
 #include "ZEDGizmo.h"
+#include "ZEDTransformationOperation.h"
+#include "ZEDObjectWrapper.h"
+#include "ZEDSelectionManager.h"
+#include "ZEDOperationManager.h"
 
 ZEDTransformationManager::ZEDTransformationManager()
 {
-	
-}
-
-void ZEDTransformationManager::SetPivotPosition(const ZEVector3& Position)
-{
-
-}
-
-const ZEVector3& ZEDTransformationManager::GetPivotPosition()
-{
-	return Gizmo->GetCurrentPosition();
-}
-
-void ZEDTransformationManager::SetPivotRotation(const ZEQuaternion& Rotation)
-{
-
-}
-
-const ZEQuaternion& ZEDTransformationManager::GetPivotRotation()
-{
-	return Gizmo->GetCurrentRotation();
+	Gizmo = ZEDGizmo::CreateInstance();
+	TransformType = ZED_TT_NONE;
+	Transform = ZEMatrix4x4::Identity;
 }
 
 void ZEDTransformationManager::SetTransformType(ZEDTransformType Type)
@@ -72,29 +58,74 @@ ZEDTransformType ZEDTransformationManager::GetTransformType()
 	return TransformType;
 }
 
-void ZEDTransformationManager::BeginTransform(...)
+void ZEDTransformationManager::SetTransformSpace(ZEDTransformSpace Space)
+{
+	TransformSpace = Space;
+}
+
+ZEDTransformSpace ZEDTransformationManager::GetTransformSpace()
+{
+	return TransformSpace;
+}
+
+void ZEDTransformationManager::BeginTransform(ZEDTransformType Type)
+{
+	if (Type == ZED_TT_NONE)
+		return;
+
+	if (TransformType != ZED_TT_NONE)
+		return;
+
+	SetTransformType(Type);
+}
+
+void ZEDTransformationManager::ResetTransform()
+{
+	if (TransformType == ZED_TT_NONE)
+		return;
+
+	const ZEArray<ZEDObjectWrapper*>& Selection = ZEDSelectionManager::GetInstance()->GetSelectedObjects();
+
+	for (ZESize I = 0; I < Selection.GetCount(); I++)
+	{
+		switch (TransformType)
+		{
+			case ZED_TT_TRANSLATE:
+				Selection[I]->SetWorldPosition(Selection[I]->GetWorldPosition() + (Transform.Inverse()).GetTranslation());
+				break;
+			case ZED_TT_ROTATE:
+			{
+				ZEQuaternion Result;
+				ZEQuaternion::CreateFromMatrix(Result, Transform);
+				Selection[I]->SetWorldRotation(Selection[I]->GetWorldRotation() * Result.Conjugate());
+				break;
+			}
+			case ZED_TT_SCALE:
+				Selection[I]->SetWorldScale(Selection[I]->GetWorldScale() * (Transform.Inverse()).GetScale());
+				break;
+		}
+	}
+}
+
+void ZEDTransformationManager::ApplyTransform(ZEMatrix4x4 Transform)
 {
 
 }
 
-void ZEDTransformationManager::ResetTransform(...)
+void ZEDTransformationManager::EndTransform()
 {
+	ZEDOperationManager::GetInstance()->DoOperation(new ZEDTransformationOperation(TransformType, Transform, ZEDSelectionManager::GetInstance()->GetSelectedObjects()));
 
-}
-
-void ZEDTransformationManager::ApplyTransform(...)
-{
-
-}
-
-void ZEDTransformationManager::EndTransform(...)
-{
-
+	TransformType = ZED_TT_NONE;
+	Transform = ZEMatrix4x4::Identity;
 }
 
 void ZEDTransformationManager::Destroy()
 {
+	if (Gizmo != NULL)
+		delete Gizmo;
 
+	delete this;
 }
 
 ZEDTransformationManager* ZEDTransformationManager::GetInstance()

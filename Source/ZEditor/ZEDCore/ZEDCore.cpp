@@ -45,6 +45,10 @@ ZEDCore::ZEDCore()
 	OperationManager = new ZEDOperationManager();
 	SelectionManager = new ZEDSelectionManager();
 	TransformationManager = new ZEDTransformationManager();
+
+	ExportScene = new ZEScene();
+	EditorScene = new ZEScene();
+
 }
 
 ZEDCore::~ZEDCore()
@@ -69,14 +73,19 @@ ZEDTransformationManager* ZEDCore::GetTransformationManager()
 	return ZEDTransformationManager::GetInstance();
 }
 
-ZEDViewPort* ZEDCore::GetCurrentViewport()
+ZEDViewPort* ZEDCore::GetViewport()
 {
-	return CurrentViewport;
+	return Viewport;
 }
 
-ZEDScene* ZEDCore::GetCurrentScene()
+ZEScene* ZEDCore::GetExportScene()
 {
-	return CurrentScene;
+	return ExportScene;
+}
+
+ZEScene* ZEDCore::GetEditorScene()
+{
+	return EditorScene;
 }
 
 void ZEDCore::Destroy()
