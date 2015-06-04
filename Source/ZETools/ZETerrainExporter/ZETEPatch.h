@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETEPatch.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,78 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZETypes.h"
+#include "ZETEBlock.h"
+#include "ZEMath\ZEVector.h"
 
-class ZETRLayer;
-class ZETRTerrain;
+class ZETEPatchDatabase;
 
-struct ZETRMaterialInstanceData
+class ZETEPatch
 {
-	ZEUInt Level;
-};
+	friend class ZETEPatchDatabase;
+	private:
+		ZETEPatchDatabase*		Database;
 
-class ZETerrainMaterial : public ZEMaterial
-{
-	friend class ZETRDrawer;
+		ZEUInt					Priority;
+		ZEInt					Level;
+		double					StartX, StartY;
+		double					EndX, EndY;
+
+		double					LevelScalingX, LevelScalingY;
+		double					PixelScaleX, PixelScaleY;
+
+		ZEString				Source;
+
+		bool					Loaded;
+
 	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+		ZESize					Width, Height;
+		ZETEPixelType			PixelType;
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
-
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
-
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
-
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+		void					UpdateLevelAndScaling();
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		void					SetPriority(ZEUInt Priority);
+		ZEUInt					GetPriority();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		ZEInt					GetLevel();
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		void					SetPositionX(double x);
+		double					GetPositionX();
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+		void					SetPositionY(double y);
+		double					GetPositionY();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
+		void					SetEndX(double EndX);
+		double					GetEndX();
 
-		void							Tick(float ElapsedTime);
+		void					SetEndY(double EndY);
+		double					GetEndY();
 
-		static ZETerrainMaterial*		CreateInstance();
+		double					GetPixelScaleX();
+		double					GetPixelScaleY();
+
+		double					GetLevelScaleX();
+		double					GetLevelScaleY();
+
+		ZESize					GetWidth();
+		ZESize					GetHeight();
+
+		ZETEPixelType			GetPixelType();
+		ZESize					GetPixelSize();
+		
+		virtual void			SetSource(const ZEString& Source);
+		const ZEString&			GetSource();
+
+		bool					Intersect(double PositionX, double PositionY, double Width, double Height);
+		
+		virtual bool			GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height) = 0;
+
+		bool					IsLoaded();
+		virtual bool			Load();
+		virtual void			Unload();
+
+								ZETEPatch();
+								~ZETEPatch();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

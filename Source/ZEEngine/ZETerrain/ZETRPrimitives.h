@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETRPrimitives.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,72 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
+#include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
 
-class ZETRLayer;
-class ZETRTerrain;
-
-struct ZETRMaterialInstanceData
+enum ZETRPrimitiveType
 {
-	ZEUInt Level;
+	ZETR_PT_CENTER,
+	ZETR_PT_VERTICAL,
+	ZETR_PT_HORIZONTAL,
+	ZETR_PT_CORNER,
+	ZETR_PT_CORNER_FLIP,
+	ZETR_PT_CORNER_HORIZONTAL,
+	ZETR_PT_CORNER_HORIZONTAL_FLIP,
+	ZETR_PT_CORNER_VERTICAL,
+	ZETR_PT_CORNER_VERTICAL_FLIP
 };
 
-class ZETerrainMaterial : public ZEMaterial
+struct ZETRVertex
 {
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+	ZEVector3 Position;
+};
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+struct ZETRPrimitive
+{
+	ZESize							VertexOffset;
+	ZESize							VertexCount;
+};
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
+struct ZETRPrimitiveRange
+{
+	ZESize							NegativeExtent2Offset;
+	ZESize							NegativeExtent1Offset;
+	ZESize							CoreOffset;
+	ZESize							CoreEndOffset;
+	ZESize							PositiveExtent1EndOffset;
+	ZESize							PositiveExtent2EndOffset;
+};
 
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
+class ZEVertexBuffer;
+class ZEStaticVertexBuffer;
+class ZEVertexDeclaration;
 
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+class ZETRPrimitiveBuffer : public ZEInitializable
+{
+	private:
+		ZEStaticVertexBuffer*		VertexBuffer;
+		ZEVertexDeclaration*		VertexDeclaration;
+
+		ZEUInt						PrimitiveSize;
+		ZETRPrimitiveRange			PrimitiveRange[9];
+
+		bool						CreateVertexBuffer();
+		bool						CreateVertexDeclaration();
+
+		bool						InitializeSelf();
+		void						DeinitializeSelf();
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		void						SetPrimitiveSize(ZEUInt Size);
+		ZEUInt						GetPrimitiveSize();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		ZEVertexBuffer*				GetVertexBuffer();
+		ZEVertexDeclaration*		GetVertexDeclaration();
+		ZETRPrimitive				GetPrimitive(ZETRPrimitiveType Type, ZEInt Negative, ZEInt Positive);
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
-
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
-
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
-
-		void							Tick(float ElapsedTime);
-
-		static ZETerrainMaterial*		CreateInstance();
+									ZETRPrimitiveBuffer();
+									~ZETRPrimitiveBuffer();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

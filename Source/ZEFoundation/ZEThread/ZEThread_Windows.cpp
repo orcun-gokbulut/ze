@@ -126,8 +126,9 @@ void ZEThread::Exit()
 
 	if (CurrentThread == this)
 	{
-		CurrentThread->Status = ZE_TS_DONE;
+		Status = ZE_TS_EXITING;
 		ExitThread(EXIT_SUCCESS);
+		CurrentThread->Status = ZE_TS_DONE;
 	}
 	else
 		Status = ZE_TS_EXITING;

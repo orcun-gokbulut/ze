@@ -35,15 +35,22 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZETerrain.cpp					Sources)
-ze_add_source(ZETerrain.h					Sources Headers ZEMC)
-ze_add_source(ZETerrainResource.cpp			Sources)
-ze_add_source(ZETerrainResource.h			Sources Headers)
-ze_add_source(ZETerrainVertexBuffer.cpp		Sources)
-ze_add_source(ZETerrainVertexBuffer.h		Sources)
+ze_add_source(ZETRTerrain.cpp				Sources)
+ze_add_source(ZETRTerrain.h					Sources Headers)
+ze_add_source(ZETRBlock.cpp					Sources)
+ze_add_source(ZETRBlock.h					Sources Headers)
+ze_add_source(ZETRBlockCache.cpp			Sources)
+ze_add_source(ZETRBlockCache.h				Sources Headers)
+ze_add_source(ZETRDrawer.cpp				Sources)
+ze_add_source(ZETRDrawer.h					Sources Headers)
+ze_add_source(ZETRPrimitives.cpp			Sources)
+ze_add_source(ZETRPrimitives.h				Sources)
+ze_add_source(ZETRLayer.cpp					Sources)
+ze_add_source(ZETRLayer.h					Sources Headers)
+ze_add_source(ZETRLevel.cpp					Sources)
+ze_add_source(ZETRLevel.h					Sources Headers)
 
-ze_add_library(TARGET ZETerrain 
+ze_add_library(TARGET ZETerrain
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	ZEMC ${ZEMC}
 	LIBS ZEFoundation)

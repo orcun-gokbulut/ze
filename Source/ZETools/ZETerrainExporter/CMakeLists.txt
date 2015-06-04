@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZED3D9TerrainMaterial.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,49 +30,36 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_TERRAIN_MATERIAL_H__
-#define __ZE_D3D9_TERRAIN_MATERIAL_H__
+cmake_minimum_required (VERSION 2.8)
 
-#include <d3d9.h>
-#include "ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZETerrainMaterial.h"
+find_package(OpenMP REQUIRED)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
 
-class ZED3D9VertexShader;
-class ZED3D9PixelShader;
-class ZETRLevel;
+ze_add_source(ZETEBlock.cpp					Sources)
+ze_add_source(ZETEBlock.h					Sources)
+ze_add_source(ZETEBlockDatabase.cpp			Sources)
+ze_add_source(ZETEBlockDatabase.h			Sources)
+ze_add_source(ZETEPatch.cpp					Sources)
+ze_add_source(ZETEPatch.h					Sources)
+ze_add_source(ZETEPatchFile.cpp				Sources)
+ze_add_source(ZETEPatchFile.h				Sources)
+ze_add_source(ZETEPatchGDAL.cpp				Sources)
+ze_add_source(ZETEPatchGDAL.h				Sources)
+ze_add_source(ZETEPatchDatabase.cpp			Sources)
+ze_add_source(ZETEPatchDatabase.h			Sources)
+ze_add_source(ZETEResamplerIPP.cpp			Sources)
+ze_add_source(ZETEResamplerIPP.h			Sources)
+ze_add_source(ZETEProcessor.cpp				Sources)
+ze_add_source(ZETEProcessor.h				Sources)
+ze_add_source(ZETEMain.cpp					Sources)
 
-class ZED3D9TerrainMaterial : public ZETerrainMaterial, private ZED3D9ComponentBase
-{
-	friend class ZED3D9Module;
-	private:
-		ZED3D9VertexShader*				GBufferPassVertexShader;
-		ZED3D9PixelShader*				GBufferPassPixelShader;
-		ZED3D9VertexShader*				ForwardPassVertexShader;
-		ZED3D9PixelShader*				ForwardPassPixelShader;
-		ZED3D9VertexShader*				ShadowPassVertexShader;
-		ZED3D9PixelShader*				ShadowPassPixelShader;
-
-		void							CreateShaders();
-		void							ReleaseShaders();
-
-		ZEVector4						GetTexcoordTransform(ZETRLevel* Level, const ZEVector3& Position) const;
-		void							SetupLevel(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-
-	protected:
-										ZED3D9TerrainMaterial();
-		virtual							~ZED3D9TerrainMaterial();
-
-	public:
-		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual bool					SetupShadowPass() const;	
-
-		virtual void					UpdateMaterial();
-
-		virtual void					Release();
-};
-#endif
+ze_add_executable(TARGET ZETerrainExporter
+	CONSOLE
+	SOURCES ${Sources}
+	LIBS ZEFoundation libFreeImage libIPP libGDAL)

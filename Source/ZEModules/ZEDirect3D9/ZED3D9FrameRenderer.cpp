@@ -244,7 +244,7 @@ void ZED3D9FrameRenderer::DeinitializeLightning()
 
 void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 {
-	zeProfilerStart("Light Pass");
+	zeProfilerStart("Directional Light Pass");
 
 	// Light Parameters
 	struct
@@ -283,13 +283,12 @@ void ZED3D9FrameRenderer::DrawPointLight(ZEPointLight* Light)
 	GetDevice()->SetPixelShader(LightningComponents.PointLightPS->GetPixelShader());
 	
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
-
+	
 	zeProfilerEnd();
 }
 
 void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 {
-	D3DPERF_BeginEvent(0, L"Directional Light Pass");
 	zeProfilerStart("Directional Light Pass");
 
 	GetDevice()->SetVertexShader(LightningComponents.DirectionalLightVS->GetVertexShader());
@@ -389,18 +388,14 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 0, 2); // Quad
 
 	zeProfilerEnd();
-
-	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 {
-	D3DPERF_BeginEvent(0, L"Projective Light Pass");
+	zeProfilerStart("Projective Light Pass");
 
 	if (Light->GetProjectionTexture() == NULL)
 		return;
-
-	zeProfilerStart("Projective Light Pass");
 
 	// Light Parameters
 	struct
@@ -498,19 +493,16 @@ void ZED3D9FrameRenderer::DrawProjectiveLight(ZEProjectiveLight* Light)
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 4542, 6); // Cone 2
 
 	GetDevice()->SetRenderState(D3DRS_STENCILENABLE, FALSE);
-	zeProfilerEnd();
 
-	D3DPERF_EndEvent();
+	zeProfilerEnd();
 }
 
 void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 {
-	D3DPERF_BeginEvent(0, L"Omni Projective Light Pass");
+	zeProfilerStart(0, L"Omni Projective Light Pass");
 
 	if (Light->GetProjectionTexture() == NULL)
 		return;
-
-	zeProfilerStart("Omni Projective Light Pass");
 
 	// Light Parameters
 	struct
@@ -561,8 +553,6 @@ void ZED3D9FrameRenderer::DrawOmniProjectiveLight(ZEOmniProjectiveLight* Light)
 	GetDevice()->DrawPrimitive(D3DPT_TRIANGLELIST, 6, 312); // Sphere 1
 
 	zeProfilerEnd();
-
-	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DoPreZPass()
@@ -596,7 +586,6 @@ void ZED3D9FrameRenderer::DoPreZPass()
 void ZED3D9FrameRenderer::DoGBufferPass()
 {
 	zeProfilerStart("GBuffer Pass");
-	D3DPERF_BeginEvent(0, L"GBuffer Pass");
 
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	GetDevice()->SetRenderTarget(0, ((ZED3D9ViewPort*)GBuffer1->GetViewPort())->FrameBuffer);
@@ -650,10 +639,9 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 		zeCriticalError("Clear failed");
 	}
 
-	D3DPERF_EndEvent();
 	zeProfilerEnd();
 	
-	D3DPERF_BeginEvent(0, L"SSAO Pass");
+	zeProfilerStart("SSAO Pass");
 	
 	SSAOProcessor.SetInputDepth(GBuffer1);
 	SSAOProcessor.SetInputNormal(GBuffer2);
@@ -665,14 +653,12 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 	HBAOProcessor.SetOutput(SSAOBuffer);
 	HBAOProcessor.Process();
 	
-	D3DPERF_EndEvent();
+	zeProfilerEnd();
 }
 
 void ZED3D9FrameRenderer::DoLightningPass()
 {
 	zeProfilerStart("Lightning Pass");
-
-	D3DPERF_BeginEvent(0, L"LBuffer Pass");
 
 	ZED3D9CommonTools::SetRenderTarget(0, LBuffer1);
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
@@ -738,15 +724,11 @@ void ZED3D9FrameRenderer::DoLightningPass()
 		}
 
 	zeProfilerEnd();
-
-	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::DoForwardPass()
 {
 	zeProfilerStart("Forward Pass");
-	 
-	D3DPERF_BeginEvent(0, L"ABuffer Pass");
 
 	GetDevice()->SetDepthStencilSurface(ViewPort->ZBuffer);
 	//ZED3D9CommonTools::SetRenderTarget(0, ViewPort);
@@ -788,8 +770,6 @@ void ZED3D9FrameRenderer::DoForwardPass()
 	GetDevice()->SetTexture(4, NULL);
 
 	zeProfilerEnd();
-	
-	D3DPERF_EndEvent();
 }
 
 void ZED3D9FrameRenderer::Do2DPass()

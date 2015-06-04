@@ -35,6 +35,7 @@
 
 macro (ze_init)
 	SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+	set_property(DIRECTORY ${CMAKE_SOURCE_DIR} APPEND PROPERTY COMPILE_DEFINITIONS ZE_ZINEK)
 	include(External/build_dir_check)
 	include(External/parse_arguments)
 	include(ze_check)

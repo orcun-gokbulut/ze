@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETRDrawer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,66 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZETRPrimitives.h"
 
-class ZETRLayer;
+#include "ZETypes.h"
+#include "ZEInitializable.h"
+
 class ZETRTerrain;
+class ZETerrainMaterial;
+struct ZEDrawParameters;
 
-struct ZETRMaterialInstanceData
+class ZETRDrawer : public ZEInitializable
 {
-	ZEUInt Level;
-};
+	private:
+		ZETRTerrain*			Terrain;
+		ZEUInt					MinLevel;
+		ZEUInt					MaxLevel;
+		float					MaxViewDistance;
+		ZEVector3				ViewPosition;
+		ZETRPrimitiveBuffer		VertexBuffer;
+		ZETerrainMaterial*		Material;
 
-class ZETerrainMaterial : public ZEMaterial
-{
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+		bool					DebugDraw;
+		ZETerrainMaterial*		DebugMaterial;
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+		void					DrawPrimitive(ZEDrawParameters* DrawParameters,
+									float WorldPositionX, float WorldPositionY,
+									ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETRPrimitiveType Type, 
+									ZEInt NegativeExtent, ZEInt PositiveExtent, 
+									float MinHeight, float MaxHeight);
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
-
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
-
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+		bool					InitializeSelf();
+		void					DeinitializeSelf();
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		void					SetTerrain(ZETRTerrain* Terrain);
+		ZETRTerrain*			GetTerrain();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		void					SetPrimitiveSize(ZEUInt PrimtiveSize);
+		ZEUInt					GetPrimitiveSize();
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		void					SetMinLevel(ZEUInt MinLevel);
+		ZEUInt					GetMinLevel();
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+		void					SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt					GetMaxLevel();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
+		void					SetMaxViewDistance(float MaxViewDistance);
+		float					GetMaxViewDistance();
 
-		void							Tick(float ElapsedTime);
+		void					SetMaterial(ZETerrainMaterial* Material);
+		ZETerrainMaterial*		GetMaterial();
 
-		static ZETerrainMaterial*		CreateInstance();
+		void					SetDebugDraw(bool Enabled);
+		bool					GetDebugDraw();
+
+		void					SetViewPosition(const ZEVector3& Position);
+		const ZEVector3&		GetViewPosition();
+
+		void					Draw(ZEDrawParameters* DrawParameters);
+
+								ZETRDrawer();
+								~ZETRDrawer();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

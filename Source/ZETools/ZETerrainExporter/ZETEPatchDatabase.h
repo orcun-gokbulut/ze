@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainResource.cpp
+ Zinek Engine - ZETEPatchDatabase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,74 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZETEBlock.h"
+
+class ZETEPatch;
+class ZETEBlock;
+
+enum ZETerrainBlockAvailableResult
+{
+	ZE_TBAR_FULLY,
+	ZE_TBAR_PARTIALLY,
+	ZE_TBAR_NONE
+};
+
+class ZETEPatchDatabase
+{
+	friend ZETEPatch;
+	private:
+		double							StartX;
+		double							StartY;
+		double							EndX;
+		double							EndY;
+		double							UnitSize;
+
+		ZEInt							MinLevel;
+		ZEInt							MaxLevel;
+
+		ZEString						Path;
+
+		ZESize							BlockSize;
+		ZESize							BlocksPerChunk;
+		ZETEPixelType					PixelType;
+	
+		ZEArray<ZETEPatch*>				Patches;
+	
+		void							CalculateDimensions();
+
+	public:
+		const ZEArray<ZETEPatch*>&		GetPatches();
+		bool							AddPatch(ZETEPatch* Patch);
+		void							RemovePatch(ZETEPatch* Patch);
+
+		void							SetPixelType(ZETEPixelType Type);
+		ZETEPixelType					GetPixelType();
+
+		void							SetBlockSize(ZESize BlockSize);
+		ZESize							GetBlockSize();
+
+		void							GetUnitSize(double UnitSize);
+		double							GetUnitSize();
+
+		ZEInt							GetMinLevel();
+
+		ZEInt							GetMaxLevel();
+		void							SetMaxLevel(ZEInt Level);
+
+		double							GetStartX();
+		double							GetStartY();
+		double							GetEndX();
+		double							GetEndY();
+
+		void							SetPath(const ZEString& Path);
+		const ZEString&					GetPath();
+
+		bool							Intersect(double PositionX, double PositionY, double Width, double Height, ZEArray<ZETEPatch*>& Patches, ZESize& Count);
+
+										ZETEPatchDatabase();
+										~ZETEPatchDatabase();
+};
