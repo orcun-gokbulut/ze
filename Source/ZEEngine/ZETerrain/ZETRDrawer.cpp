@@ -45,6 +45,50 @@
 #include "ZEMath/ZEViewVolume.h"
 #include "ZEGraphics/ZETerrainMaterial.h"
 
+bool ZETRDrawer::InitializeSelf()
+{
+	VertexBuffer.SetPrimitiveSize(GetPrimitiveSize());
+	if (!VertexBuffer.Initialize())
+	{
+		zeError("Can not initialize.");
+		return false;
+	}
+
+	Material = ZETerrainMaterial::CreateInstance();
+	Material->SetWireframe(false);
+	Material->SetAmbientColor(ZEVector3::Zero);
+	Material->SetAmbientFactor(0.0f);
+
+	if (DebugDraw)
+	{
+		DebugMaterial = ZETerrainMaterial::CreateInstance();
+		DebugMaterial->SetWireframe(true);
+		DebugMaterial->SetAmbientColor(ZEVector3::Zero);
+		DebugMaterial->SetAmbientFactor(0.0f);
+		DebugMaterial->SetDiffuseColor(ZEVector3::Zero);
+		DebugMaterial->SetDiffuseFactor(0.0f);
+	}
+
+	return true;
+}
+
+void ZETRDrawer::DeinitializeSelf()
+{
+	VertexBuffer.Deinitialize();
+
+	if (Material != NULL)
+	{
+		Material->Destroy();
+		Material = NULL;
+	}
+
+	if (DebugMaterial != NULL)
+	{
+		DebugMaterial->Destroy();
+		DebugMaterial = NULL;
+	}
+}
+
 void ZETRDrawer::SetTerrain(ZETRTerrain* Terrain)
 {
 	this->Terrain = Terrain;
@@ -105,33 +149,15 @@ ZETerrainMaterial* ZETRDrawer::GetMaterial()
 	return Material;
 }
 
-bool ZETRDrawer::Initialize()
+void ZETRDrawer::SetDebugDraw(bool Enabled)
 {
-	if (Initialized)
-		return true;
-
-	VertexBuffer.SetPrimitiveSize(GetPrimitiveSize());
-	if (!VertexBuffer.Initialize())
-	{
-		zeError("Can not initialize.");
-		return false;
-	}
-
-	Material = ZETerrainMaterial::CreateInstance();
-	Material->SetWireframe(true);
-	Material->SetAmbientColor(ZEVector3::One);
-	Material->SetAmbientFactor(1.0f);
-
-	return true;
+	DebugDraw = Enabled;
+	Reinitialize();
 }
 
-void ZETRDrawer::Deinitialize()
+bool ZETRDrawer::GetDebugDraw()
 {
-	if (!Initialized)
-		return;
-
-	VertexBuffer.Deinitialize();
-
+	return DebugDraw;
 }
 
 void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters, 
@@ -171,19 +197,45 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters,
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4::CreateTranslation(WorldTransform, ZEVector3(WorldPositionX, 0.0f, WorldPositionY));
 	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, WorldTransform, RenderCommand.LocalMatrix);
-
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+
+	if (DebugDraw)
+	{
+		RenderCommand.Material = DebugMaterial;
+		DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	}
+}
+
+void ZETRDrawer::SetViewPosition(const ZEVector3& Position)
+{
+	ViewPosition = Position;
+}
+
+const ZEVector3& ZETRDrawer::GetViewPosition()
+{
+	return ViewPosition;
 }
 
 void ZETRDrawer::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (!IsInitialized())
+		return;
+
 	Material->Terrain = GetTerrain();
 	Material->ElevationLayer = GetTerrain()->GetElevationLayer();
 	Material->ColorLayer = GetTerrain()->GetColorLayer();
 	Material->ChunkSize = GetPrimitiveSize();
+
+	if (DebugDraw)
+	{
+		DebugMaterial->Terrain = GetTerrain();
+		DebugMaterial->ElevationLayer = GetTerrain()->GetElevationLayer();
+		DebugMaterial->ColorLayer = GetTerrain()->GetColorLayer();
+		DebugMaterial->ChunkSize = GetPrimitiveSize();
+	}
 	
-	ZEInt PositionX = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().x);
-	ZEInt PositionY = ZEMath::Floor(DrawParameters->View->Camera->GetWorldPosition().z);
+	ZEInt PositionX = ZEMath::Floor(ViewPosition.x);
+	ZEInt PositionY = ZEMath::Floor(ViewPosition.z);
 
 	for (ZEUInt Level = MinLevel; Level < MaxLevel; Level++)
 	{
@@ -220,8 +272,8 @@ void ZETRDrawer::Draw(ZEDrawParameters* DrawParameters)
 		if (Level == MinLevel)
 			DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, 0.0f, 0.0f, ZETR_PT_CENTER,	0, 0, 0.0f, 10.0f);
 
-		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f,  1.5f, ZETR_PT_VERTICAL,	(ShrinkDirectionY > 0 ? -1 : 0), ExtentY,	0.0f, 10.0f);
-		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f, -1.5f, ZETR_PT_VERTICAL,	ExtentY, (ShrinkDirectionY < 0 ? -1 : 0),	0.0f, 10.0f);
+		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f,  1.5f, ZETR_PT_VERTICAL, (ShrinkDirectionY > 0 ? -1 : 0), ExtentY,	0.0f, 10.0f);
+		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  0.0f, -1.5f, ZETR_PT_VERTICAL, ExtentY, (ShrinkDirectionY < 0 ? -1 : 0),	0.0f, 10.0f);
 		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level, -1.5f,  0.0f, ZETR_PT_HORIZONTAL, ExtentX, (ShrinkDirectionX < 0 ? -1 : 0),	0.0f, 10.0f);
 		DrawPrimitive(DrawParameters, WorldPositionX, WorldPositionY, Level,  1.5f,  0.0f, ZETR_PT_HORIZONTAL, (ShrinkDirectionX > 0 ? -1 : 0), ExtentX,	0.0f, 10.0f);
 
@@ -275,11 +327,12 @@ void ZETRDrawer::Draw(ZEDrawParameters* DrawParameters)
 
 ZETRDrawer::ZETRDrawer()
 {
+	DebugDraw = false;
 	MinLevel = 0;
 	MaxLevel = 15;
 	MaxViewDistance = 0;
-	Initialized = false;
 	Material = NULL;
+	DebugMaterial = NULL;
 }
 
 ZETRDrawer::~ZETRDrawer()

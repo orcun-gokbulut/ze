@@ -99,7 +99,7 @@ void ZETRLayer::DeinitializeSelf()
 	Cache.Clean();
 }
 
-ZETerrain* ZETRLayer::GetTerrain()
+ZETRTerrain* ZETRLayer::GetTerrain()
 {
 	return Terrain;
 }

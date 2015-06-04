@@ -57,7 +57,7 @@ class ZETRTerrain : public ZEEntity
 										ZETRTerrain();
 										~ZETRTerrain();
 
-	public:	
+	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
 		ZETRDrawer&						GetDrawer();
 
@@ -79,6 +79,9 @@ class ZETRTerrain : public ZEEntity
 
 		void							SetMaxLevel(ZEUInt MaxLevel);
 		ZEUInt							GetMaxLevel();
+
+		void							SetDebugDraw(bool DebugDraw);
+		bool							SetDebugDraw();
 
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
 	

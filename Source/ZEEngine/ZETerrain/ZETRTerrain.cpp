@@ -131,6 +131,7 @@ bool ZETRTerrain::AddExtraLayer(ZETRLayer* Layer)
 	}
 
 	ExtraLayers.Add(Layer);
+	Layer->Terrain = this;
 
 	if (IsInitialized())
 	{
@@ -158,6 +159,8 @@ void ZETRTerrain::RemoveExtraLayer(ZETRLayer* Layer)
 	if (IsInitialized())
 		Layer->Deinitialize();
 
+	Layer->Terrain = NULL;
+
 	ExtraLayers.RemoveValue(Layer);
 }
 
@@ -170,6 +173,7 @@ bool ZETRTerrain::SetElevationLayer(ZETRLayer* Layer)
 		ElevationLayer->Deinitialize();
 
 	ElevationLayer = Layer;
+	ElevationLayer->Terrain = this;
 
 	if (IsInitialized())
 		ElevationLayer->Initialize();
@@ -191,6 +195,7 @@ bool ZETRTerrain::SetColorLayer(ZETRLayer* Layer)
 		ColorLayer->Deinitialize();
 
 	ColorLayer = Layer;
+	ColorLayer->Terrain = this;
 
 	if (IsInitialized())
 		ColorLayer->Initialize();
@@ -224,29 +229,37 @@ ZEUInt ZETRTerrain::GetPrimitiveSize()
 
 void ZETRTerrain::Draw(ZEDrawParameters* DrawParameters)
 {
-	if (ElevationLayer != NULL && ElevationLayer->GetEnabled())
+	static ZEVector3 ViewPosition;
+
+	if (GetEnabled())
 	{
-		ElevationLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
-		ElevationLayer->Process();
+		ViewPosition = DrawParameters->View->Camera->GetWorldPosition();
+
+		if (ElevationLayer != NULL && ElevationLayer->GetEnabled())
+		{
+			ElevationLayer->SetViewPosition(ViewPosition);
+			ElevationLayer->Process();
+		}
+
+		if (ColorLayer != NULL && ColorLayer->GetEnabled())
+		{
+			ColorLayer->SetViewPosition(ViewPosition);
+			ColorLayer->Process();
+		}
+
+		for (ZESize I = 0; I < ExtraLayers.GetCount(); I++)
+		{
+			ZETRLayer* CurrentLayer = ExtraLayers[I];
+
+			if (!CurrentLayer->GetEnabled())
+				continue;
+
+			CurrentLayer->SetViewPosition(ViewPosition);
+			CurrentLayer->Process();
+		}
 	}
 
-	if (ColorLayer != NULL && ColorLayer->GetEnabled())
-	{
-		ColorLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
-		ColorLayer->Process();
-	}
-
-	for (ZESize I = 0; I < ExtraLayers.GetCount(); I++)
-	{
-		ZETRLayer* CurrentLayer = ExtraLayers[I];
-		
-		if (!CurrentLayer->GetEnabled())
-			continue;
-
-		CurrentLayer->SetViewPosition(DrawParameters->View->Camera->GetWorldPosition());
-		CurrentLayer->Process();
-	}
-
+	Drawer.SetViewPosition(ViewPosition);
 	Drawer.Draw(DrawParameters);
 }
 

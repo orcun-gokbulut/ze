@@ -41,13 +41,14 @@
 #include "ZEMath\ZEMatrix.h"
 #include "ZEMath\ZEVector.h"
 
-class ZETerrain;
+class ZETRTerrain;
 class ZETRLevel;
 
 class ZETRLayer : public ZEInitializable
 {
+	friend class ZETRTerrain;
 	private:
-		ZETerrain*						Terrain;
+		ZETRTerrain*					Terrain;
 		ZEString						Name;
 		ZETRBlockCache					Cache;
 		ZEArray<ZETRLevel*>				Levels;
@@ -69,7 +70,8 @@ class ZETRLayer : public ZEInitializable
 		virtual void					DeinitializeSelf();
 
 	public:
-		ZETerrain*						GetTerrain();
+		bool							Blender;
+		ZETRTerrain*					GetTerrain();
 		ZETRBlockCache*					GetBlockCache();
 		const ZEArray<ZETRLevel*>&		GetLevels();
 		ZETRLevel*						GetLevel(ZEInt Level);

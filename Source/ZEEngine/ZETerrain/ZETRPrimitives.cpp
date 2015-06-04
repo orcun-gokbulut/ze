@@ -294,15 +294,37 @@ bool ZETRPrimitiveBuffer::CreateVertexBuffer()
 	return true;
 }
 
+
+bool ZETRPrimitiveBuffer::InitializeSelf()
+{
+	if (!CreateVertexBuffer())
+		return false;
+
+	if (!CreateVertexDeclaration())
+		return false;
+
+	return true;
+}
+
+void ZETRPrimitiveBuffer::DeinitializeSelf()
+{
+	if (VertexBuffer != NULL)
+	{
+		VertexBuffer->Destroy();
+		VertexBuffer = NULL;
+	}
+
+	if (VertexDeclaration != NULL)
+	{
+		VertexDeclaration->Destroy();
+		VertexDeclaration = NULL;
+	}
+}
+
 void ZETRPrimitiveBuffer::SetPrimitiveSize(ZEUInt Size)
 {
 	this->PrimitiveSize = Size;
-	if (Initialized)
-	{
-		Deinitialize();
-		Initialize();
-	}
-
+	Reinitialize();
 }
 
 ZEUInt ZETRPrimitiveBuffer::GetPrimitiveSize()
@@ -344,45 +366,8 @@ ZETRPrimitive ZETRPrimitiveBuffer::GetPrimitive(ZETRPrimitiveType Type, ZEInt Ne
 	return Primitive;
 }
 
-bool ZETRPrimitiveBuffer::Initialize()
-{
-	if (Initialized)
-		return true;
-
-	if (!CreateVertexBuffer())
-		return false;
-
-	if (!CreateVertexDeclaration())
-		return false;
-
-	Initialized = true;
-	
-	return true;
-}
-
-void ZETRPrimitiveBuffer::Deinitialize()
-{
-	if (!Initialized)
-		return;
-
-	if (VertexBuffer != NULL)
-	{
-		VertexBuffer->Destroy();
-		VertexBuffer = NULL;
-	}
-
-	if (VertexDeclaration != NULL)
-	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
-	}
-
-	Initialized = false;
-}
-
 ZETRPrimitiveBuffer::ZETRPrimitiveBuffer()
 {
-	Initialized = false;
 	PrimitiveSize = 8;
 	VertexBuffer = NULL;
 	VertexDeclaration = NULL;
@@ -390,5 +375,4 @@ ZETRPrimitiveBuffer::ZETRPrimitiveBuffer()
 
 ZETRPrimitiveBuffer::~ZETRPrimitiveBuffer()
 {
-	Deinitialize();
 }
