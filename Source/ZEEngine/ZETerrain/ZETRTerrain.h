@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETRTerrain.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,56 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZETRDrawer.h"
+
+#include "ZETypes.h"
+#include "ZEGame/ZEEntity.h"
 
 class ZETRLayer;
-class ZETRTerrain;
 
-struct ZETRMaterialInstanceData
+class ZETRTerrain : public ZEEntity
 {
-	ZEUInt Level;
-};
-
-class ZETerrainMaterial : public ZEMaterial
-{
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
-
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
-
-		ZETRTerrain*					Terrain;
+	private:
+		ZEArray<ZETRLayer*>				ExtraLayers;
+		ZETRDrawer						Drawer;
+		ZESize							BlockSize;
 		ZETRLayer*						ElevationLayer;
 		ZETRLayer*						ColorLayer;
 
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+										ZETRTerrain();
+										~ZETRTerrain();
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		virtual ZEDrawFlags				GetDrawFlags() const;
+		ZETRDrawer&						GetDrawer();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		const ZEArray<ZETRLayer*>&		GetExtraLayers();
+		bool							AddExtraLayer(ZETRLayer* Layer);
+		void							RemoveExtraLayer(ZETRLayer* Layer);
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		bool							SetElevationLayer(ZETRLayer* Layer);
+		ZETRLayer*						GetElevationLayer();
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+		bool							SetColorLayer(ZETRLayer* Layer);
+		ZETRLayer*						GetColorLayer();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
+		void							SetPrimitiveSize(ZEUInt Size);
+		ZEUInt							GetPrimitiveSize();
 
-		void							Tick(float ElapsedTime);
+		void							SetBlockSize(ZESize Size);
+		ZESize							GetBlockSize();
 
-		static ZETerrainMaterial*		CreateInstance();
+		void							SetMaxLevel(ZEUInt MaxLevel);
+		ZEUInt							GetMaxLevel();
+
+		void							SetDebugDraw(bool DebugDraw);
+		bool							SetDebugDraw();
+
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
+	
+		static ZETRTerrain*				CreateInstance();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

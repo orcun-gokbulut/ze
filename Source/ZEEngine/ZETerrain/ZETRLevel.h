@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETRLevel.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,63 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMath\ZEVector.h"
+#include "ZETRBlock.h"
 
+class ZETerrain;
+class ZETexture2D;
 class ZETRLayer;
-class ZETRTerrain;
+class ZETerrainMaterial;
 
-struct ZETRMaterialInstanceData
+struct ZETRLevelBlock
 {
-	ZEUInt Level;
+	ZEInt64 IndexX;
+	ZEInt64 IndexY;
+	ZETRBlockStatus LastStatus;
+	bool Cleaned;
+
+	ZETRLevelBlock();
 };
 
-class ZETerrainMaterial : public ZEMaterial
+class ZETRLevel : public ZEInitializable
 {
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+	friend class ZETRLayer;
+	private:
+		ZETRLayer*				Layer;
+		ZEInt					Level;
+		ZETexture2D*			Texture;
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+		ZETRLevelBlock			Blocks[3][3];
+		float					LevelScale;
+		float					LevelBlockSize;
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
+		void					CleanBlock(ZESize LocalIndexX, ZESize LocalIndexY);
+		void					LoadBlock(ZESize LocalIndexX, ZESize LocalIndexY, ZETRBlock* Block);
+		void					ProcessBlock(ZESSize IndexX, ZESSize IndexY);
 
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
+		void					SetLevel(ZEInt Level);
 
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+		virtual bool			InitializeSelf();
+		virtual void			DeinitializeSelf();
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		ZETRLayer*				GetLayer();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		ZEInt					GetLevel();
+		float					GetLevelScale();
+		float					GetLevelBlockSize();
+		ZESize					GetBlockCount();
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		ZETerrainMaterial*		GetMaterial();
+		ZETexture2D*			GetTexture();
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+		void					Process();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
-
-		void							Tick(float ElapsedTime);
-
-		static ZETerrainMaterial*		CreateInstance();
+								ZETRLevel();
 };
 
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif
+

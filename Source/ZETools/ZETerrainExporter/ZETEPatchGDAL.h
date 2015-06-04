@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETEPatchGDAL.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZETEPatch.h"
+#include "ZEThread\ZEMutex.h"
 
-class ZETRLayer;
-class ZETRTerrain;
+class GDALDataset;
 
-struct ZETRMaterialInstanceData
+class ZETEPatchGDAL : public ZETEPatch
 {
-	ZEUInt Level;
-};
-
-class ZETerrainMaterial : public ZEMaterial
-{
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
-
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
-
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
-
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
-
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+	private:
+		GDALDataset*		Dataset;
+		ZEMutex				Lock;
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		virtual void		SetSource(const ZEString& Source);
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		virtual bool		GetData(void* Output, ZEUInt64 x, ZEUInt64 y, ZESize Width, ZESize Height);
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
-
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
-
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
-
-		void							Tick(float ElapsedTime);
-
-		static ZETerrainMaterial*		CreateInstance();
+		virtual bool		Load();
+		virtual void		Unload();
+	
+							ZETEPatchGDAL();
+							~ZETEPatchGDAL();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

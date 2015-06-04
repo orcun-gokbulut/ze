@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_DRAW_PARAMETERS_H__
-#define __ZE_DRAW_PARAMETERS_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -98,5 +96,3 @@ struct ZEDrawParameters
 	ZESmartArray<ZELight*>	Lights;
 	void*					CustomData;
 };
-
-#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETEMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
+#include "ZETEPatchDatabase.h"
+#include "ZETEProcessor.h"
+#include "ZETEPatchFile.h"
+#include "ZETEPatchGDAL.h"
+#include "ZEFile/ZEPathManager.h"
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include <FreeImage.h>
+#include <gdal.h>
 
-class ZETRLayer;
-class ZETRTerrain;
-
-struct ZETRMaterialInstanceData
+void main()
 {
-	ZEUInt Level;
-};
+	GDALAllRegister();
+	FreeImage_Initialise();
 
-class ZETerrainMaterial : public ZEMaterial
-{
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+
+	ZETEProcessor Procesor;
+	Procesor.SetDebugDump(true);
+	Procesor.SetRegenerate(true);
+
+	ZETEPatchDatabase PatchDatabase;
+	PatchDatabase.SetBlockSize(1024);
+	PatchDatabase.SetPixelType(ZETE_PT_ELEVATION);
+	PatchDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Patches");
+	Procesor.SetPatchDatabase(&PatchDatabase);
+
+	ZETEBlockDatabase BlockDatabase;
+	BlockDatabase.SetBlockSize(1024);
+	BlockDatabase.SetPixelType(ZETE_PT_ELEVATION);
+	BlockDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Layers/Elevation");
+	Procesor.SetBlockDatabase(&BlockDatabase);
 	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+	ZETEPatch* Patch;
+	Patch = new ZETEPatchFile();
+	Patch->SetSource("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Patches/world_elevation.tif");
+	Patch->SetPriority(0);
+	Patch->SetPositionX(200.5);
+	Patch->SetPositionY(200.5);
+	Patch->SetEndX(26000);
+	Patch->SetEndY(8000);
+	PatchDatabase.AddPatch(Patch);
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+	Procesor.Generate();
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
-
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
-
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
-
-	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
-
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
-
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
-
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
-
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
-
-		void							Tick(float ElapsedTime);
-
-		static ZETerrainMaterial*		CreateInstance();
-};
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif
+	BlockDatabase.SaveDatabase();
+	
+	FreeImage_DeInitialise();
+}

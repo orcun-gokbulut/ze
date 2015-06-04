@@ -42,6 +42,10 @@
 #include "ZEGraphics/ZECamera.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEGraphics/ZEMaterialComponents.h"
+#include "ZETerrain/ZETRTerrain.h"
+#include "ZETerrain/ZETRLevel.h"
+#include "ZETerrain/ZETRLayer.h"
+#include "ZEMath/ZEMath.h"
 
 void ZED3D9TerrainMaterial::CreateShaders()
 {
@@ -57,7 +61,6 @@ void ZED3D9TerrainMaterial::CreateShaders()
 
 void ZED3D9TerrainMaterial::ReleaseShaders()
 {
-
 	ZED3D_RELEASE(GBufferPassVertexShader);
 	ZED3D_RELEASE(GBufferPassPixelShader);
 
@@ -83,6 +86,117 @@ ZED3D9TerrainMaterial::ZED3D9TerrainMaterial()
 	ShadowPassPixelShader = NULL;
 }
 
+ZEVector4 ZED3D9TerrainMaterial::GetTexcoordTransform(ZETRLevel* Level, const ZEVector3& Position) const
+{
+	ZEVector4 Transform; // xy: scale, zw: offset
+
+	float Scale = Level->GetLevelBlockSize() * Level->GetBlockCount();
+	Transform.x = 1.0f / Scale;
+	Transform.y = Transform.x;
+
+	Transform.z = 0.0f;
+	Transform.w = Transform.z;
+
+	return Transform;
+}
+
+void ZED3D9TerrainMaterial::SetupLevel(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
+{
+	float ElevationScale = 0.001f;
+	float ElevationOffset = 0.0f;
+
+	ZEInt Level = (ZEInt)RenderCommand->InstanceData;
+
+	ZEVector3 Position = Renderer->GetCamera()->GetWorldPosition();
+	Position.x = ZEMath::Floor(Position.x);
+	Position.z = ZEMath::Floor(Position.z);
+
+	bool HasElevation = false;
+	if (ElevationLayer != NULL)
+	{
+		ZETRLevel* ElevationLevel = NULL;
+		if (Level >= ElevationLayer->GetMinLevel())
+			ElevationLevel = ElevationLayer->GetLevel(Level);
+		else
+			ElevationLevel = ElevationLayer->GetLevel(ElevationLayer->GetMinLevel());
+		
+		ZETRLevel* ElevationLevelLow = NULL;
+		if (Level + 1 < ElevationLayer->GetMaxLevel())
+			ElevationLevelLow = ElevationLayer->GetLevel(Level + 1);
+		else
+			ElevationLevelLow = ElevationLevel;
+
+		if (ElevationLevel != NULL)
+		{
+			float TextureSize = ElevationLevel->GetBlockCount() * ElevationLayer->GetBlockSize();
+
+			ZEVector4 ElevationTexcoordTransform = GetTexcoordTransform(ElevationLevel, Position);
+			ZEVector4 ElevationTexcoordTransformLow = GetTexcoordTransform(ElevationLevelLow, Position);
+
+			GetDevice()->SetVertexShaderConstantF(16, (float*)&ElevationTexcoordTransform, 1);
+			GetDevice()->SetVertexShaderConstantF(17, (float*)&ElevationTexcoordTransformLow, 1);
+
+			GetDevice()->SetVertexShaderConstantF(18, (float*)&ZEVector4(TextureSize, 1.0f / TextureSize, ElevationScale, ElevationOffset), 1);
+		
+			ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, ElevationLevel->GetTexture(), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
+			ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER1, ElevationLevelLow->GetTexture(), D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
+
+			HasElevation = true;
+		}
+	}
+	
+	if (!HasElevation)
+	{
+		ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, (ZED3D9Texture2D*)NULL, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
+		ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER1, (ZED3D9Texture2D*)NULL, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
+
+	}
+	
+	bool HasColor = false;
+	if (ColorLayer != NULL)
+	{
+		ZETRLevel* ColorLevel = NULL;
+		if (Level >= ColorLayer->GetMinLevel())
+			ColorLevel = ColorLayer->GetLevel(Level);
+		else
+			ColorLevel = ColorLayer->GetLevel(ColorLayer->GetMinLevel());
+
+		ZETRLevel* ColorLevelLow = NULL;
+		if (Level + 1 < ColorLayer->GetMaxLevel())
+			ColorLevelLow = ColorLayer->GetLevel(Level + 1);
+		else
+			ColorLevelLow = ColorLevel;
+
+		if (ColorLevel != NULL)
+		{
+			ZEVector4 ColorTexcoordTransform = GetTexcoordTransform(ColorLevel, Position);
+			ZEVector4 ColorTexcoordTransformLow = GetTexcoordTransform(ColorLevelLow, Position);
+
+			GetDevice()->SetVertexShaderConstantF(19, (float*)&ColorTexcoordTransform, 1);
+			GetDevice()->SetVertexShaderConstantF(20, (float*)&ColorTexcoordTransformLow, 1);
+
+			ZED3D9CommonTools::SetTexture(4, ColorLevel->GetTexture(), D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
+			ZED3D9CommonTools::SetTexture(5, ColorLevelLow->GetTexture(), D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
+
+			HasColor = true;
+		}
+	}
+	
+	if (!HasColor)
+	{
+		ZED3D9CommonTools::SetTexture(4, (ZED3D9Texture2D*)NULL, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
+		ZED3D9CommonTools::SetTexture(5, (ZED3D9Texture2D*)NULL, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
+	}
+
+	float LevelScale =  ZEMath::Power(2, Level);
+	float BlendPercentage = 0.00125;
+	float BlendEnd = 2.0f * ChunkSize * LevelScale;
+	float BlendStart = BlendEnd * (1.0f - BlendPercentage);
+	float BlendScale = 1.0f / (BlendEnd - BlendStart);
+
+	GetDevice()->SetVertexShaderConstantF(21, (float*)&ZEVector4(BlendStart, BlendScale, 0.0f, 0.0f), 1);
+}
+
 bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
@@ -93,15 +207,9 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&Camera->GetViewProjectionTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
-	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightOffset, HeightScale, HeightOffset / (float)(1 << Level), HeightScale / (float)(1 << Level)), 1);
-	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
-	GetDevice()->SetVertexShaderConstantF(15, (float*)&ZEVector4(BlendTreshold * 2.0f * ChunkSize, ((RenderCommand->Flags & 1024) != 0 ? -1 : 0) + (1.0f - BlendTreshold) * 2.0f * ChunkSize, 0.0f, 0.0f), 1);	GetDevice()->SetVertexShaderConstantF(20, (float*)&RenderCommand->LocalMatrix, 4);
+	GetDevice()->SetVertexShaderConstantF(12, (float*)&RenderCommand->LocalMatrix, 4);
 
-	GetDevice()->SetPixelShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
-	GetDevice()->SetPixelShaderConstantF(13, (float*)&ZEVector4(HeightOffset, HeightScale, HeightOffset / (float)(1 << Level), HeightScale / (float)(1 << Level)), 1);
-	GetDevice()->SetPixelShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
-	GetDevice()->SetPixelShaderConstantF(15, (float*)&ZEVector4(BlendTreshold * 2.0f * ChunkSize, (1.0f - BlendTreshold) * 2.0f * ChunkSize, 0.0f, 0.0f), 1);
-
+	SetupLevel(Renderer, RenderCommand);
 
 	GetDevice()->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
 
@@ -127,14 +235,8 @@ bool ZED3D9TerrainMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERender
 
 
 	// Setup Material Properties
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
+	//GetDevice()->SetPixelShaderConstantF(1, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
 	
-	// Setup Textures
-	GetDevice()->SetSamplerState(D3DVERTEXTEXTURESAMPLER0, D3DSAMP_BORDERCOLOR, 0x00);
-	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	ZED3D9CommonTools::SetTexture(0, HeightTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_CLAMP);
-	ZED3D9CommonTools::SetTexture(5, NormalTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
-
 	// Setup Shaders
 	GetDevice()->SetPixelShader(GBufferPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(GBufferPassVertexShader->GetVertexShader());
@@ -152,16 +254,9 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 	GetDevice()->SetVertexShaderConstantF(0, (float*)&Camera->GetViewProjectionTransform(), 4);
 	GetDevice()->SetVertexShaderConstantF(4, (float*)&RenderCommand->WorldMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(8, (float*)&Camera->GetViewTransform(), 4);
-	GetDevice()->SetVertexShaderConstantF(13, (float*)&ZEVector4(HeightOffset, HeightScale, HeightOffset / (float)(1 << Level), HeightScale / (float)(1 << Level)), 1);
-	GetDevice()->SetVertexShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
-	GetDevice()->SetVertexShaderConstantF(15, (float*)&ZEVector4(BlendTreshold * 2.0f * ChunkSize, ((RenderCommand->Flags & 1024) != 0 ? -1 : 0) + (1.0f - BlendTreshold) * 2.0f * ChunkSize, 0.0f, 0.0f), 1);
-	GetDevice()->SetVertexShaderConstantF(16, (float*)&ZEVector4(0.0f, 0.0f, 1.0f / (float)ColorTexture->GetWidth(), 1.0f / (float)ColorTexture->GetHeight()), 1);
-	GetDevice()->SetVertexShaderConstantF(20, (float*)&RenderCommand->LocalMatrix, 4);
-	
-	GetDevice()->SetPixelShaderConstantF(13, (float*)&ZEVector4(HeightOffset, HeightScale, HeightOffset / (float)(1 << Level), HeightScale / (float)(1 << Level)), 1);
-	GetDevice()->SetPixelShaderConstantF(14, (float*)&ZEVector4(TextureOffset.x, TextureOffset.y, TextureScale.x, TextureScale.y), 1);
-	GetDevice()->SetPixelShaderConstantF(15, (float*)&ZEVector4(BlendTreshold * 2.0f * ChunkSize, (1.0f - BlendTreshold) * 2.0f * ChunkSize, 0.0f, 0.0f), 1);
-	
+	GetDevice()->SetVertexShaderConstantF(12, (float*)&RenderCommand->LocalMatrix, 4);
+
+	SetupLevel(Renderer, RenderCommand);
 
 	// Setup ZCulling
 	if (RenderCommand->Flags & ZE_ROF_ENABLE_Z_CULLING)
@@ -190,11 +285,9 @@ bool ZED3D9TerrainMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERender
 
 	// Setup Material Properties
 	GetDevice()->SetPixelShaderConstantF(0, (const float*)&ZEVector4(1.0f / (float)Renderer->GetViewPort()->GetWidth(), 1.0f / (float)Renderer->GetViewPort()->GetHeight(), 0.5f / (float)Renderer->GetViewPort()->GetWidth(), 0.5f / (float)Renderer->GetViewPort()->GetHeight()), 1);
-	GetDevice()->SetPixelShaderConstantF(1, (const float*)PixelShaderConstants, sizeof(PixelShaderConstants) / 16);
+	GetDevice()->SetPixelShaderConstantF(1, (const float*)&ZEVector4(AmbientFactor * AmbientColor, 1.0f), 1);
+	GetDevice()->SetPixelShaderConstantF(2, (const float*)&ZEVector4(DiffuseFactor * DiffuseColor, 1.0f), 1);
 
-	GetDevice()->SetSamplerState(D3DVERTEXTEXTURESAMPLER0, D3DSAMP_BORDERCOLOR, 0x00);
-	ZED3D9CommonTools::SetTexture(D3DVERTEXTEXTURESAMPLER0, HeightTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_BORDER);
-	ZED3D9CommonTools::SetTexture(4, ColorTexture, D3DTEXF_ANISOTROPIC, D3DTEXF_ANISOTROPIC, D3DTADDRESS_BORDER);
 	GetDevice()->SetSamplerState(4, D3DSAMP_MAXANISOTROPY, 4);
 
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());

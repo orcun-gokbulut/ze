@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETEBlockDatabase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,90 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
+#include "ZETEBlock.h"
 
-class ZETRLayer;
-class ZETRTerrain;
-
-struct ZETRMaterialInstanceData
+class ZETEBlockRegister
 {
-	ZEUInt Level;
+	public:
+		ZEUInt64	PositionX;
+		ZEUInt64	PositionY;
+		ZEInt		Level;
+		ZESize		SubBlocks[4];
+		void*		Cache;
+
+					ZETEBlockRegister();
+					~ZETEBlockRegister();
 };
 
-class ZETerrainMaterial : public ZEMaterial
+
+class ZETEBlock;
+class ZEFile;
+
+class ZETEBlockDatabase
 {
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+	public:
+		ZEString					Name;
+		ZEString					Path;
+		ZEArray<ZETEBlockRegister>	Registers;
+		ZESize						BlockSize;
+		ZETEPixelType				PixelType;
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+		ZEInt64						MinIndexX;
+		ZEInt64						MaxIndexX;
+		ZEInt64						MinIndexY;
+		ZEInt64						MaxIndexY;
+		ZEInt						MinLevel;
+		ZEInt						MaxLevel;
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
+		ZEInt						MinLevelLimit;
+		ZEInt						MaxLevelLimit;
 
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
-
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+		ZEString					GetBlockFilePath(ZETEBlock* Block);
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		void						SetName(const ZEString& Name);
+		const ZEString&				GetName();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		void						SetPath(const ZEString& Path);
+		const ZEString&				GetPath();
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		ZETEBlockRegister*			GetRegister(ZEUInt64 PositionX, ZEUInt64 PositionY, ZEInt Level);
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+		void						SetPixelType(ZETEPixelType Type);
+		ZETEPixelType				GetPixelType();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
+		void						SetBlockSize(ZESize BlockSize);
+		ZESize						GetBlockSize();
 
-		void							Tick(float ElapsedTime);
+		ZEInt						GetMinLevel();
+		ZEInt						GetMaxLevel();
 
-		static ZETerrainMaterial*		CreateInstance();
+		ZEInt64						GetMinIndexX();
+		ZEInt64						GetMinIndexY();
+		ZEInt64						GetMaxIndexX();
+		ZEInt64						GetMaxIndexY();
+		
+		double						GetMinPositionX();
+		double						GetMinPositionY();
+		double						GetMaxPositionX();
+		double						GetMaxPositionY();
+
+		void						SetMinLevelLimit(ZEInt Level);
+		ZEInt						GetMinLevelLimit();
+
+		void						SetMaxLevelLimit(ZEInt Level);
+		ZEInt						GetMaxLevelLimit();
+
+		bool						CheckBlock(ZETEBlock* Block);
+		bool						LoadBlock(ZETEBlock* Block);
+		bool						StoreBlock(ZETEBlock* Block);
+		bool						RemoveBlock(ZETEBlock* Block);
+
+		bool						LoadDatabase();
+		bool						SaveDatabase();
+
+									ZETEBlockDatabase();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

@@ -105,6 +105,8 @@ class ZERenderCommand
 
 		ZEArray<ZELight*>				Lights;
 
+		void*							InstanceData;
+
 		void							SetZero();
 };
 #endif

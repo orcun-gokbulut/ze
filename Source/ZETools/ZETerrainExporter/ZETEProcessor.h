@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETEProcessor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,61 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
+#include "ZETEPatchDatabase.h"
+#include "ZETEBlockDatabase.h"
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
-
-class ZETRLayer;
-class ZETRTerrain;
-
-struct ZETRMaterialInstanceData
+enum ZETEProcessorStatus
 {
-	ZEUInt Level;
+	ZETE_PS_NONE = 0,
+	ZETE_PS_LOADING_PATCHES,
+	ZETE_PS_GENERATING_BLOCKS,
+	ZETE_PS_GENERATING_LEVELS,
+	ZETE_PS_ERROR,
+	ZETE_PS_DONE
 };
 
-class ZETerrainMaterial : public ZEMaterial
+struct ZETEProcessorInfo
 {
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+	ZETEProcessorStatus		Status;
+	ZEUInt					TotalProgress;
+	ZEUInt					Progress;
+	ZEUInt					NumberOfThreads;
+};
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+class ZETEProcessor
+{
+	private:
+		ZETEPatchDatabase*	PatchDatabase;
+		ZETEBlockDatabase*	BlockDatabase;
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
+		ZETEProcessorInfo	Info;
 
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
+		bool				Regenerate;
+		bool				DebugDump;
 
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+		bool				GenerateLevel(ZEUInt64 StartX, ZEUInt64 StartY, ZEUInt64 EndX, ZEUInt64 EndY, ZEInt Level);
+
+		bool				LoadPatches();
+		bool				GenerateBlocks();
+		bool				GenerateLevels();
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		const 
+		ZETEProcessorInfo&	GetInfo();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		void				SetPatchDatabase(ZETEPatchDatabase* Database);
+		ZETEPatchDatabase*	GetPatchDatabase();
+		
+		void				SetBlockDatabase(ZETEBlockDatabase* Database);
+		ZETEBlockDatabase*	GetBlockDatabase();
+		
+		void				SetRegenerate(bool Regenerate);
+		bool				GetRegenerate();
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		void				SetDebugDump(bool DebugDump);
+		bool				GetDebugDump();
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+		bool				Generate();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
-
-		void							Tick(float ElapsedTime);
-
-		static ZETerrainMaterial*		CreateInstance();
+							ZETEProcessor();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

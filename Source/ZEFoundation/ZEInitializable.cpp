@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZEInitializable.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,72 +33,61 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
+#include "ZEInitializable.h"
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
-
-class ZETRLayer;
-class ZETRTerrain;
-
-struct ZETRMaterialInstanceData
+bool ZEInitializable::InitializeSelf()
 {
-	ZEUInt Level;
-};
+	return true;
+}
 
-class ZETerrainMaterial : public ZEMaterial
+void ZEInitializable::DeinitializeSelf()
 {
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
+}
 
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
+bool ZEInitializable::IsInitialized()
+{
+	return Initialized;
+}
 
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
+bool ZEInitializable::Initialize()
+{
+	if (Initialized)
+		return true;
 
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+	if (!InitializeSelf())
+		return false;
 
-	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+	Initialized = true;
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+	return true;
+}
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+void ZEInitializable::Deinitialize()
+{
+	if (!Initialized)
+		return;
 
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
+	DeinitializeSelf();
 
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
+	Initialized = false;
+}
 
-		void							Tick(float ElapsedTime);
+bool ZEInitializable::Reinitialize()
+{
+	if (!Initialized)
+		return false;
 
-		static ZETerrainMaterial*		CreateInstance();
-};
+	Deinitialize();
+	return Initialize();
+}
 
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif
+ZEInitializable::ZEInitializable()
+{
+	Initialized = false;
+}
+
+ZEInitializable::~ZEInitializable()
+{
+	Deinitialize();
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.h
+ Zinek Engine - ZETEResamplerIPP.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,71 +34,46 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_MATERIAL_H__ 
-#define __ZE_TERRAIN_MATERIAL_H__
 
-#include "ZEMaterial.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZETypes.h"
 
-class ZETRLayer;
-class ZETRTerrain;
+class ZETEPatch;
+class ZETEBlock;
 
-struct ZETRMaterialInstanceData
+class ZETEResampleData;
+class ZETEDownsampleData;
+
+class ZETEResamplerIPP
 {
-	ZEUInt Level;
-};
+	private:
+		struct
+		{
+			void*			Buffer;
+			ZESize			BufferSize;
+			void*			PatchBuffer;
+			ZESize			PatchBufferSize;
+		} ResampleData;
 
-class ZETerrainMaterial : public ZEMaterial
-{
-	friend class ZETRDrawer;
-	protected:
-		bool							TwoSided;
-		bool							Wireframe;
-	
-		ZEVector3						AmbientColor;
-		float							AmbientFactor;
+		struct
+		{
+			void*			Buffer;
+			int				BufferSize;
+			void*			Spec;
+			int				SpecSize;
+			void*			InitBuffer;
+			int				InitBufferSize;
+		} DownsampleData;
 
-		ZEVector3						DiffuseColor;
-		float							DiffuseFactor;
-
-		ZETRTerrain*					Terrain;
-		ZETRLayer*						ElevationLayer;
-		ZETRLayer*						ColorLayer;
-
-		float							ElevationOffset;
-		float							ElevationScale;
-		float							BlendThreshold;
-		float							ChunkSize;
-
-		ZETerrainMaterial();
-		virtual							~ZETerrainMaterial();
+		void				DownsampleElevation(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+		void				DownsampleColor(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+		void				DownsampleGrayscale(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
 
 	public:
-		virtual ZEMaterialFlags			GetMaterialFlags() const;
+		void				Resample(ZETEPatch* Patch, ZETEBlock* Block);
+		void				Downsample(ZETEBlock* Output, ZETEBlock* Block00, ZETEBlock* Block01, ZETEBlock* Block10, ZETEBlock* Block11);
+		
+		void				CleanUp();
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
-
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
-
-		void							SetAmbientFactor(float Factor);
-		float							GetAmbientFactor() const;
-		void							SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&				GetAmbientColor() const;
-
-		void							SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&				GetDiffuseColor() const;
-		void							SetDiffuseFactor(float Factor);
-		float							GetDiffuseFactor() const;
-
-		void							Tick(float ElapsedTime);
-
-		static ZETerrainMaterial*		CreateInstance();
+							ZETEResamplerIPP();
+							~ZETEResamplerIPP();
 };
-
-// Graphics API
-//		Device/Resource Wrappers
-//		Main Rendering Corridor
-#endif

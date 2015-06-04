@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainVertexBuffer.h
+ Zinek Engine - ZETRBlockCache.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,31 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TERRAIN_VERTEX_BUFFER_H__
-#define __ZE_TERRAIN_VERTEX_BUFFER_H__
+
+#include "ZETRBlock.h"
 
 #include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEThread\ZELock.h"
+#include "ZEThread\ZESignal.h"
+#include "ZEThread\ZEThread.h"
+#include "ZEInitializable.h"
 
-class ZEStaticVertexBuffer;
-
-enum ZETerrainPrimitive
+class ZETRBlockCache : public ZEInitializable
 {
-	ZE_TP_VERTICAL		= 0,
-	ZE_TP_HORIZONTAL	= 1,
-	ZE_TP_CORNER		= 2,
-	ZE_TP_CORNER_1		= 3,
-	ZE_TP_CORNER_2		= 4
-};
+	private:
+		ZEString					Path;
+		ZEArray<ZETRBlock*>			Blocks;
+		ZESignal					CrawlerSignal;
+		ZEThread					CrawlerThread;
+		ZEUInt64					LastBlockSquence;
 
-struct ZETerrainPrimitiveIndices
-{
-	ZESize Index[5];
-};
+		void						LoadBlock(ZETRBlock* Block);
+		void						Crawler(ZEThread* Thread, void* ExtraParameters);
 
-class ZETerrainPrimitivesGenerator
-{
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
+
 	public:
-		static bool Generate(ZEStaticVertexBuffer** Buffer, ZETerrainPrimitiveIndices* Indices, ZEInt EdgeLenght);
-};
+		void						SetPath(const ZEString& Path);
+		const ZEString&				GetPath();
 
-#endif
+		ZETRBlock*					RequestBlock(ZEInt64 IndexX, ZEInt64 IndexY, ZEInt Level);
+
+		void						Clean();
+};
