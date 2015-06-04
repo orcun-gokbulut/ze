@@ -56,10 +56,8 @@ float4 MaterialParameters[3]		: register(ps, c1);
 #define ColorTexcoordTransform			VertexShaderParameters[3]
 #define ColorTexcoordTransformLow		VertexShaderParameters[4]
 
-#define BlendOffset						VertexShaderParameters[5].x
+#define BlendStart						VertexShaderParameters[5].x
 #define BlendScale						VertexShaderParameters[5].y
-
-
 
 #define ScreenToTextureParams			PipelineParametersPS[0]
 #define DiffuseColor					MaterialParameters[0].rgb
@@ -74,12 +72,12 @@ sampler2D ColorTextureLow		: register(s5);
 
 float2 GetTexcoord(float3 WorldPosition, float4 Transform)
 {
-	return Transform.xy * float2(WorldPosition.x, -WorldPosition.z) + Transform.zw;
+	return Transform.xy * float2(WorldPosition.x, WorldPosition.z) + Transform.zw;
 }
 
 float GetBlendFactor(float3 LocalPosition)
 {
-	float2 Blend = (abs(LocalPosition.xz) - BlendOffset) * BlendScale;
+	float2 Blend = (abs(LocalPosition.xz) - BlendStart) * BlendScale;
 	return saturate(max(Blend.x, Blend.y));
 }
 
@@ -88,24 +86,30 @@ float3 GetLocalPosition(float3 VertexPosition)
 	return mul(LocalMatrix, float4(VertexPosition, 1.0f)).xyz;
 }
 
+float SampleBilinear(sampler2D Texture, float2 Texcoord)
+{
+	float2 PixelCoords = Texcoord * ElevationTextureSize.xx;
+	float2 Frac = frac(PixelCoords);
+
+	float Sample00 = tex2Dlod(Texture, float4(Texcoord, 0.0f, 1.0f)).r;
+	float Sample10 = tex2Dlod(Texture, float4(Texcoord + float2(ElevationTexelSize,	0.0f), 0.0f, 1.0f)).r;
+	float Sample01 = tex2Dlod(Texture, float4(Texcoord + float2(0.0f, ElevationTexelSize), 0.0f, 1.0f)).r;
+	float Sample11 = tex2Dlod(Texture, float4(Texcoord + float2(ElevationTexelSize,	ElevationTexelSize), 0.0f, 1.0f)).r;
+
+	float Sample0 = lerp(Sample00, Sample10, Frac.x);
+	float Sample1 = lerp(Sample01, Sample11, Frac.x);
+	
+	return lerp(Sample0, Sample1, Frac.y);
+}
+
 float SampleElevation(float3 LocalPosition, float BlendFactor)
 {
 	float2 Texcoord = GetTexcoord(LocalPosition, ElevationTexcoordTransform);
-	float Elevation = tex2Dlod(ElevationTexture, float4(Texcoord, 0.0f, 0.0f)).r;
+	float Elevation = tex2Dlod(ElevationTexture, float4(Texcoord, 0.0f, 1.0f)).r;
 
-	if (false)//BlendFactor > 0.0f)
-	{
-		float2 TexcoordLow = GetTexcoord(LocalPosition, ElevationTexcoordTransformLow);
-
-		float ElevationLow00 = tex2Dlod(ElevationTextureLow, float4(TexcoordLow, 0.0f, 0.0f)).r;
-		float ElevationLow01 = tex2Dlod(ElevationTextureLow, float4(TexcoordLow + float2(ElevationTexelSize, 0.0f), 0.0f, 0.0f)).r;
-		float ElevationLow10 = tex2Dlod(ElevationTextureLow, float4(TexcoordLow + float2(0.0f, ElevationTexelSize), 0.0f, 0.0f)).r;
-		float ElevationLow11 = tex2Dlod(ElevationTextureLow, float4(TexcoordLow + float2(ElevationTexelSize, ElevationTexelSize), 0.0f, 0.0f)).r;
-	
-		float2 Frac = frac(Texcoord * ElevationTextureSize);
-		float ElevationLow = lerp(lerp(ElevationLow00, ElevationLow01, Frac.x), lerp(ElevationLow10, ElevationLow11, Frac.x), Frac.y);
-		Elevation = lerp(Elevation, ElevationLow, BlendFactor);
-	}
+	float2 TexcoordLow = GetTexcoord(LocalPosition, ElevationTexcoordTransformLow);
+	float ElevationLow = SampleBilinear(ElevationTextureLow, TexcoordLow);
+	Elevation = lerp(Elevation, ElevationLow, BlendFactor);
 
 	return ElevationScale * Elevation + ElevationOffset;
 }
@@ -150,8 +154,9 @@ ZETerrainMaterial_GBuffer_VSOutput ZETerrainMaterial_GBuffer_VertexShader(ZETerr
 {
 	ZETerrainMaterial_GBuffer_VSOutput Output;
 
+	float4 LocalPosition = mul(LocalMatrix, float4(Input.Position.xyz, 1.0f));
 	float4 WorldPosition = mul(WorldMatrix, float4(Input.Position.xyz, 1.0f));
-	float BlendFactor = GetBlendFactor(WorldPosition.xyz);
+	float BlendFactor = GetBlendFactor(LocalPosition.xyz);
 
 	WorldPosition.y = SampleElevation(WorldPosition.xyz, BlendFactor);
 	Output.Position = mul(ViewMatrix, WorldPosition).xyz;
@@ -203,8 +208,9 @@ ZETerrainMaterial_ForwardPass_VSOutput ZETerrainMaterial_ForwardPass_VertexShade
 {
 	ZETerrainMaterial_ForwardPass_VSOutput Output;
 	
+	float4 LocalPosition = mul(LocalMatrix, float4(Input.Position.xyz, 1.0f));
 	float4 WorldPosition = mul(WorldMatrix, float4(Input.Position.xyz, 1.0f));
-	Output.BlendFactor = GetBlendFactor(WorldPosition.xyz);
+	Output.BlendFactor = GetBlendFactor(LocalPosition.xyz);
 
 	WorldPosition.y =  SampleElevation(WorldPosition.xyz, Output.BlendFactor);
 	Output.Position_ = mul(ViewProjMatrix, WorldPosition);
@@ -237,12 +243,12 @@ ZETerrainMaterial_ForwardPass_PSOutput ZETerrainMaterial_ForwardPass_PixelShader
 
 	float3 TextureColor = tex2D(ColorTexture, Input.Texcoord).rgb;
 	float3 TextureColorLow = tex2D(ColorTextureLow, Input.TexcoordLow).rgb;
-	float3 BaseColor = TextureColor; //lerp(TextureColor, TextureColorLow, Input.BlendAndHeight.x);
+	float3 BaseColor = lerp(TextureColor, TextureColorLow, Input.BlendFactor.x);
 		
 	Output.Color.rgb  = BaseColor * AmbientColor;
 	Output.Color.rgb += BaseColor * DiffuseColor * ZELBuffer_GetDiffuse(ScreenPosition);
-	
-	Output.Color.rgb = Input.BlendFactor.xxx;
+
+	Output.Color.r += Input.BlendFactor.x;
 
 	return Output;
 }

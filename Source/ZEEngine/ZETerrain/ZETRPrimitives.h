@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEInitializable.h"
 
 enum ZETRPrimitiveType
 {
@@ -76,11 +77,9 @@ class ZEVertexBuffer;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 
-class ZETRPrimitiveBuffer
+class ZETRPrimitiveBuffer : public ZEInitializable
 {
 	private:
-		bool						Initialized;
-
 		ZEStaticVertexBuffer*		VertexBuffer;
 		ZEVertexDeclaration*		VertexDeclaration;
 
@@ -90,6 +89,9 @@ class ZETRPrimitiveBuffer
 		bool						CreateVertexBuffer();
 		bool						CreateVertexDeclaration();
 
+		bool						InitializeSelf();
+		void						DeinitializeSelf();
+
 	public:
 		void						SetPrimitiveSize(ZEUInt Size);
 		ZEUInt						GetPrimitiveSize();
@@ -97,9 +99,6 @@ class ZETRPrimitiveBuffer
 		ZEVertexBuffer*				GetVertexBuffer();
 		ZEVertexDeclaration*		GetVertexDeclaration();
 		ZETRPrimitive				GetPrimitive(ZETRPrimitiveType Type, ZEInt Negative, ZEInt Positive);
-
-		bool						Initialize();
-		void						Deinitialize();
 
 									ZETRPrimitiveBuffer();
 									~ZETRPrimitiveBuffer();

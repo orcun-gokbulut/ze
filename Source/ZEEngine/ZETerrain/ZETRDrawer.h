@@ -38,27 +38,35 @@
 #include "ZETRPrimitives.h"
 
 #include "ZETypes.h"
+#include "ZEInitializable.h"
 
 class ZETRTerrain;
 class ZETerrainMaterial;
 struct ZEDrawParameters;
 
-class ZETRDrawer
+class ZETRDrawer : public ZEInitializable
 {
 	private:
 		ZETRTerrain*			Terrain;
 		ZEUInt					MinLevel;
 		ZEUInt					MaxLevel;
 		float					MaxViewDistance;
+		ZEVector3				ViewPosition;
 		ZETRPrimitiveBuffer		VertexBuffer;
-		bool					Initialized;
 		ZETerrainMaterial*		Material;
+
+		bool					DebugDraw;
+		ZETerrainMaterial*		DebugMaterial;
 
 		void					DrawPrimitive(ZEDrawParameters* DrawParameters,
 									float WorldPositionX, float WorldPositionY,
 									ZEUInt Level, float LocalPositionX, float LocalPositionY, ZETRPrimitiveType Type, 
 									ZEInt NegativeExtent, ZEInt PositiveExtent, 
 									float MinHeight, float MaxHeight);
+
+		bool					InitializeSelf();
+		void					DeinitializeSelf();
+
 	public:
 		void					SetTerrain(ZETRTerrain* Terrain);
 		ZETRTerrain*			GetTerrain();
@@ -78,8 +86,11 @@ class ZETRDrawer
 		void					SetMaterial(ZETerrainMaterial* Material);
 		ZETerrainMaterial*		GetMaterial();
 
-		bool					Initialize();
-		void					Deinitialize();
+		void					SetDebugDraw(bool Enabled);
+		bool					GetDebugDraw();
+
+		void					SetViewPosition(const ZEVector3& Position);
+		const ZEVector3&		GetViewPosition();
 
 		void					Draw(ZEDrawParameters* DrawParameters);
 
