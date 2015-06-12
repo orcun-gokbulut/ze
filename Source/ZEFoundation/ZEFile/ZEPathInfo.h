@@ -62,27 +62,29 @@ class ZEPathInfo
 		void					SetPath(const char* Path);
 		void					SetRelativePath(const char* ParentPath, const char* RelativePath);
 
-		const ZEString&			GetPath();
-		ZEString				GetFileName();
-		ZEString				GetName();
-		ZEString				GetExtension();
-		ZEString				GetParentDirectory();
-		ZEPathRoot				GetRoot();
-		ZEPathAccess			GetAccess();
-		ZERealPath				GetRealPath();
+		const ZEString&			GetPath() const;
+		ZEString				GetFileName() const;
+		ZEString				GetName() const;
+		ZEString				GetExtension() const;
+		ZEString				GetParentDirectory() const;
+		ZEPathRoot				GetRoot() const;
+		ZEPathAccess			GetAccess() const;
+		ZERealPath				GetRealPath() const;
 
-		bool					IsExists();
-		bool					IsFile();
-		bool					IsDirectory();
-		bool					IsInsidePackage();
+		bool					IsExists() const;
+		bool					IsFile() const;
+		bool					IsDirectory() const;
+		bool					IsInsidePackage() const;
 
-		bool					IsParent(const char* ParentPath);
-		ZEString				GetRelativeTo(const char* ParentPath);
+		bool					IsParent(const char* ParentPath) const;
+		ZEString				GetRelativeTo(const char* ParentPath) const;
 
-		ZEFileTime				GetCreationDate();
-		ZEFileTime				GetModificationTime();
+		ZEFileTime				GetCreationDate() const;
+		ZEFileTime				GetModificationTime() const;
 
 		ZEString				Normalize();
+
+		bool					Equals(const ZEPathInfo& OtherPath) const;
 
 		bool					Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true);
 

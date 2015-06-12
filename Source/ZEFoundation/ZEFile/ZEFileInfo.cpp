@@ -43,7 +43,7 @@
 #include <Windows.h>
 #include <shlwapi.h>
 
-ZEInt64 ZEFileInfo::GetSize()
+ZEInt64 ZEFileInfo::GetSize() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return -1;
@@ -59,7 +59,7 @@ ZEInt64 ZEFileInfo::GetSize()
 	return FileSize.QuadPart;
 }
 
-bool ZEFileInfo::Rename(const char* Name)
+bool ZEFileInfo::Rename(const char* Name) const
 {
 	if ((GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
@@ -78,7 +78,7 @@ bool ZEFileInfo::Rename(const char* Name)
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
-bool ZEFileInfo::Move(const char* Destination)
+bool ZEFileInfo::Move(const char* Destination) const
 {
 	if ((GetAccess() & ZE_PA_READ_WRITE) == 0)
 		return false;
@@ -91,7 +91,7 @@ bool ZEFileInfo::Move(const char* Destination)
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
-bool ZEFileInfo::Copy(const char* Destination)
+bool ZEFileInfo::Copy(const char* Destination) const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
@@ -104,7 +104,7 @@ bool ZEFileInfo::Copy(const char* Destination)
 	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, FALSE) != 0;
 }
 
-bool ZEFileInfo::Delete()
+bool ZEFileInfo::Delete() const
 {
 	if ((GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
@@ -112,7 +112,7 @@ bool ZEFileInfo::Delete()
 	return DeleteFile(GetRealPath().Path) != 0;
 }
 
-bool ZEFileInfo::Touch()
+bool ZEFileInfo::Touch() const
 {
 	if ((GetAccess() & ZE_PA_WRITE) == 0)
 		return false;

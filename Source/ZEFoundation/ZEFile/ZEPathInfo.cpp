@@ -40,8 +40,6 @@
 #include "ZEFileInfo.h"
 #include "ZEDirectoryInfo.h"
 
-
-
 void ZEPathInfo::SetPath(const char* Path)
 {
 	this->Path = Path;
@@ -67,12 +65,12 @@ void ZEPathInfo::SetRelativePath(const char* ParentPath, const char* RelativePat
 	}
 }
 
-const ZEString&	ZEPathInfo::GetPath()
+const ZEString&	ZEPathInfo::GetPath() const
 {
 	return Path;
 }
 
-ZEString ZEPathInfo::GetFileName()
+ZEString ZEPathInfo::GetFileName() const
 {
 	ZESSize Length = Path.GetLength();
 	for (ZESSize I = Length - 1; I >= 0; I--)
@@ -84,7 +82,7 @@ ZEString ZEPathInfo::GetFileName()
 	return Path;
 }
 
-ZEString ZEPathInfo::GetName()
+ZEString ZEPathInfo::GetName() const
 {
 	ZESize Length = Path.GetLength();
 	
@@ -103,7 +101,7 @@ ZEString ZEPathInfo::GetName()
 	}
 
 	ZESSize ExtensionStart = Length;
-	for (ZESSize I = Start;  I < Length; I++)
+	for (ZESSize I = Start;  I < (ZESSize)Length; I++)
 	{
 		if(Path[I] == '.')
 			ExtensionStart = I;
@@ -113,7 +111,7 @@ ZEString ZEPathInfo::GetName()
 	return Path.Middle(Start, Length).Trim();
 }
 
-ZEString ZEPathInfo::GetExtension()
+ZEString ZEPathInfo::GetExtension() const
 {
 	ZESSize Length = Path.GetLength();
 
@@ -128,7 +126,7 @@ ZEString ZEPathInfo::GetExtension()
 	return "";
 }
 
-ZEString ZEPathInfo::GetParentDirectory()
+ZEString ZEPathInfo::GetParentDirectory() const
 {
 	ZESSize Length = Path.GetLength();
 
@@ -141,28 +139,28 @@ ZEString ZEPathInfo::GetParentDirectory()
 	return "";
 }
 
-ZERealPath ZEPathInfo::GetRealPath()
+ZERealPath ZEPathInfo::GetRealPath() const
 {
 	return ZEPathManager::GetInstance()->TranslateToRealPath(Path);
 }
 
-ZEPathRoot ZEPathInfo::GetRoot()
+ZEPathRoot ZEPathInfo::GetRoot() const
 {
 	return ZEPathManager::GetInstance()->GetRoot(Path);
 }
 
-ZEPathAccess ZEPathInfo::GetAccess()
+ZEPathAccess ZEPathInfo::GetAccess() const
 {
 	ZERealPath RealPath = GetRealPath();
 	return RealPath.Access;
 }
 
-bool ZEPathInfo::IsInsidePackage()
+bool ZEPathInfo::IsInsidePackage() const
 {
 	return false;
 }
 
-bool ZEPathInfo::IsParent(const char* ParentPath)
+bool ZEPathInfo::IsParent(const char* ParentPath) const
 {
 	ZEArray<ZEString> ParentPathElements = Divide(ParentPath);
 	if (!Normalize(ParentPathElements))
@@ -175,7 +173,7 @@ bool ZEPathInfo::IsParent(const char* ParentPath)
 	return CheckParent(ParentPathElements, PathElements);
 }
 
-ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath)
+ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 {
 	ZEArray<ZEString> ParentPathElements = Divide(ParentPath);
 	if (!Normalize(ParentPathElements))
@@ -193,7 +191,7 @@ ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath)
 #include <Windows.h>
 #include <shlwapi.h>
 
-bool ZEPathInfo::IsExists()
+bool ZEPathInfo::IsExists() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
@@ -205,7 +203,7 @@ bool ZEPathInfo::IsExists()
 		return true;
 }
 
-bool ZEPathInfo::IsFile()
+bool ZEPathInfo::IsFile() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
@@ -219,7 +217,7 @@ bool ZEPathInfo::IsFile()
 		return false;
 }
 
-bool ZEPathInfo::IsDirectory()
+bool ZEPathInfo::IsDirectory() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
@@ -233,7 +231,7 @@ bool ZEPathInfo::IsDirectory()
 		return false;
 }
 
-ZEFileTime ZEPathInfo::GetCreationDate()
+ZEFileTime ZEPathInfo::GetCreationDate() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEFileTime();
@@ -267,7 +265,7 @@ ZEFileTime ZEPathInfo::GetCreationDate()
 	return Output;
 }
 
-ZEFileTime ZEPathInfo::GetModificationTime()
+ZEFileTime ZEPathInfo::GetModificationTime() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEFileTime();
@@ -309,6 +307,20 @@ ZEString ZEPathInfo::Normalize()
 	if (!Normalize(PathElements))
 		return "";
 	return Construct(PathElements);
+}
+
+bool ZEPathInfo::Equals(const ZEPathInfo& OtherPath) const
+{
+	ZERealPath OtherRealPath = OtherPath.GetRealPath();
+	ZERealPath RealPath = GetRealPath();
+	
+	if ((RealPath.Access & ZE_PA_READ) == 0 ||
+		(OtherRealPath.Access & ZE_PA_READ) == 0)
+	{
+		return false;
+	}
+	
+	return (RealPath.Path == OtherRealPath.Path);
 }
 
 bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements, bool Recursive)
