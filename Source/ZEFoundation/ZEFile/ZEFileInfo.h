@@ -46,16 +46,16 @@
 class ZEFileInfo : public ZEPathInfo
 {
 	public:
-		ZEInt64					GetSize();
+		ZEInt64					GetSize() const;
 
-		bool					Rename(const char* Name);
-		bool					Move(const char* Destination);
-		bool					Copy(const char* Destination);
-		bool					Delete();
-		bool					Touch();
+		bool					Rename(const char* Name) const;
+		bool					Move(const char* Destination) const;
+		bool					Copy(const char* Destination) const;
+		bool					Delete() const;
+		bool					Touch() const;
 	
-		bool					LoadText(ZEString& Output);
-		bool					LoadBinary(ZEArray<ZEBYTE>& Output);
+		bool					LoadText(ZEString& Output) const;
+		bool					LoadBinary(ZEArray<ZEBYTE>& Output) const;
 
 								ZEFileInfo();
 								ZEFileInfo(const char* Path);

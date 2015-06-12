@@ -37,9 +37,7 @@
 #include "ZEError.h"
 #include "ZETypes.h"
 #include "ZEResourceManager.h"
-
-#include <string.h>
-
+#include "ZEFile\ZEPathInfo.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
@@ -50,9 +48,11 @@ ZEResource* ZEResourceManager::_GetResource(const char* FileName)
 	for (ZESize I = 0; I < this->SharedResources.GetCount(); I++)
 	{
 		CurResource = this->SharedResources.GetItem(I);
-		if (_stricmp (CurResource->FileName, FileName) == 0)
+		if (ZEPathInfo(CurResource->FileName).Equals(ZEPathInfo(FileName)))
+		{
 				CurResource->ReferenceCount++;
 				return CurResource;
+		}
 	}
 	return NULL;
 }
@@ -63,7 +63,7 @@ const ZEResource* ZEResourceManager::GetResource(const char* FileName)
 	for (ZESize I = 0; I < this->SharedResources.GetCount(); I++)
 	{
 		CurResource = this->SharedResources.GetItem(I);
-		if (_stricmp (CurResource->FileName, FileName) == 0)
+		if (ZEPathInfo(CurResource->FileName).Equals(ZEPathInfo(FileName)))
 		{
 			CurResource->ReferenceCount++;
 			return CurResource;

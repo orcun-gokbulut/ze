@@ -41,7 +41,7 @@
 #include <Windows.h>
 #include <shlwapi.h>
 
-ZEArray<ZEString> ZEDirectoryInfo::GetSubDirectories()
+ZEArray<ZEString> ZEDirectoryInfo::GetSubDirectories() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEArray<ZEString>();
@@ -68,7 +68,7 @@ ZEArray<ZEString> ZEDirectoryInfo::GetSubDirectories()
 	return Output; 
 }
 
-ZEArray<ZEString> ZEDirectoryInfo::GetFiles()
+ZEArray<ZEString> ZEDirectoryInfo::GetFiles() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZEArray<ZEString>();
@@ -95,7 +95,7 @@ ZEArray<ZEString> ZEDirectoryInfo::GetFiles()
 	return Output; 
 }
 
-bool ZEDirectoryInfo::Rename(const char* Name)
+bool ZEDirectoryInfo::Rename(const char* Name) const
 {
 	if ((GetAccess() & ZE_PA_READ_WRITE) == 0)
 		return false;
@@ -109,7 +109,7 @@ bool ZEDirectoryInfo::Rename(const char* Name)
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
-bool ZEDirectoryInfo::Move(const char* Destination)
+bool ZEDirectoryInfo::Move(const char* Destination) const
 {
 	if ((GetAccess() & ZE_PA_READ_WRITE) == 0)
 		return false;
@@ -125,7 +125,7 @@ bool ZEDirectoryInfo::Move(const char* Destination)
 	return MoveFileEx(GetRealPath().Path, DestinationRealPath.Path, MOVEFILE_REPLACE_EXISTING) != 0;
 }
 
-bool ZEDirectoryInfo::Copy(const char* Destination)
+bool ZEDirectoryInfo::Copy(const char* Destination) const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return false;
@@ -141,7 +141,7 @@ bool ZEDirectoryInfo::Copy(const char* Destination)
 	return CopyFile(GetRealPath().Path, DestinationRealPath.Path, TRUE) != 0;
 }
 
-bool ZEDirectoryInfo::Delete()
+bool ZEDirectoryInfo::Delete() const
 {
 	if ((GetAccess() & ZE_PA_WRITE) == 0)
 		return false;
@@ -152,7 +152,7 @@ bool ZEDirectoryInfo::Delete()
 	return DeleteFile(GetRealPath().Path) != 0;
 }
 
-bool ZEDirectoryInfo::Create()
+bool ZEDirectoryInfo::Create() const
 {
 	if ((GetAccess() & ZE_PA_WRITE) == 0)
 		return false;

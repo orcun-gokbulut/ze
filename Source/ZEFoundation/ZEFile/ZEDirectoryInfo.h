@@ -42,14 +42,14 @@
 class ZEDirectoryInfo : public ZEPathInfo
 {
 	public:
-		ZEArray<ZEString>		GetSubDirectories();
-		ZEArray<ZEString>		GetFiles();
+		ZEArray<ZEString>		GetSubDirectories() const;
+		ZEArray<ZEString>		GetFiles() const;
 
-		bool					Create();
-		bool					Rename(const char* Name);
-		bool					Move(const char* Destination);
-		bool					Copy(const char* Destination);
-		bool					Delete();
+		bool					Create() const;
+		bool					Rename(const char* Name) const;
+		bool					Move(const char* Destination) const;
+		bool					Copy(const char* Destination) const;
+		bool					Delete() const;
 		
 								ZEDirectoryInfo();
 								ZEDirectoryInfo(const char* Path);
