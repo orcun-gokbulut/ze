@@ -43,6 +43,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEDelegate.h"
 
+class ZEPathTokenizer;
+
 enum ZEPathOperationElement
 {
 	ZE_POE_NONE			= 0,
@@ -55,48 +57,44 @@ typedef ZEDelegate<bool (const char*, ZEPathOperationElement)> ZEPathOperationFu
 
 class ZEPathInfo
 {
-	protected:
-		ZEString				Path;
+	private:
+		ZEString					Path;
 
 	public:
-		void					SetPath(const char* Path);
-		void					SetRelativePath(const char* ParentPath, const char* RelativePath);
+		void						SetPath(const char* Path);
+		void						SetRelativePath(const char* ParentPath, const char* RelativePath);
 
-		const ZEString&			GetPath() const;
-		ZEString				GetFileName() const;
-		ZEString				GetName() const;
-		ZEString				GetExtension() const;
-		ZEString				GetParentDirectory() const;
-		ZEPathRoot				GetRoot() const;
-		ZEPathAccess			GetAccess() const;
-		ZERealPath				GetRealPath() const;
+		const ZEString&				GetPath() const;
+		ZEString					GetFileName() const;
+		ZEString					GetName() const;
+		ZEString					GetExtension() const;
+		ZEString					GetParentDirectory() const;
+		ZEPathRoot					GetRoot() const;
+		ZEPathAccess				GetAccess() const;
+		ZERealPath					GetRealPath() const;
 
-		bool					IsExists() const;
-		bool					IsFile() const;
-		bool					IsDirectory() const;
-		bool					IsInsidePackage() const;
+		bool						IsExists() const;
+		bool						IsFile() const;
+		bool						IsDirectory() const;
+		bool						IsInsidePackage() const;
 
-		bool					IsParent(const char* ParentPath) const;
-		ZEString				GetRelativeTo(const char* ParentPath) const;
+		bool						IsParent(const char* ParentPath) const;
+		ZEString					GetRelativeTo(const char* ParentPath) const;
 
-		ZEFileTime				GetCreationDate() const;
-		ZEFileTime				GetModificationTime() const;
+		ZEFileTime					GetCreationDate() const;
+		ZEFileTime					GetModificationTime() const;
 
-		ZEString				Normalize();
+		ZEString					Normalize();
 
-		bool					Equals(const ZEPathInfo& OtherPath) const;
+		bool						Equals(const ZEPathInfo& OtherPath) const;
 
-		bool					Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true);
+		bool						Operate(const char* TargetDirectory, ZEPathOperationFunction Function, ZEPathOperationElement Elements = ZE_POE_FILE, bool Recursive = true);
 
-								ZEPathInfo();
-								ZEPathInfo(const char* Path);
-								ZEPathInfo(const char* ParentPath, const char* RelativePath);
+									ZEPathInfo();
+									ZEPathInfo(const char* Path);
+									ZEPathInfo(const char* ParentPath, const char* RelativePath);
 
-		static ZEArray<ZEString>	Divide(const char* Path);
-		static bool					Normalize(ZEArray<ZEString>& PathElements);
-		static ZEString				Construct(const ZEArray<ZEString>& PathElements);
-		static bool					CheckParent(const ZEArray<ZEString>& ParentPathElemens, const ZEArray<ZEString>& ChildrenPathElements);
-		static ZEArray<ZEString>	RelativeTo(const ZEArray<ZEString>& ParentPathElemens, const ZEArray<ZEString>& ChildrenPathElements);
+		static bool					Normalize(ZEPathTokenizer& Tokenizer);
 };
 
 #endif
