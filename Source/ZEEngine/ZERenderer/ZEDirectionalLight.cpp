@@ -34,16 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECamera.h"
-#include "ZETexture2D.h"
 #include "ZECore/ZECore.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEShadowRenderer.h"
-#include "ZEGraphicsModule.h"
 #include "ZEDirectionalLight.h"
 #include "ZEMath/ZEViewCuboid.h"
 #include "ZEGame/ZEEntityProvider.h"
-
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMatrix.h"

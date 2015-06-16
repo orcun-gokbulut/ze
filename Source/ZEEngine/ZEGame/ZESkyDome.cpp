@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESkyDome.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZESkyDomeMaterial.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
 void ZESkyDome::SetSetMieConstant(float Value)

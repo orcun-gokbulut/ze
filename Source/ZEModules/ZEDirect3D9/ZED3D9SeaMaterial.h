@@ -37,7 +37,7 @@
 #ifndef	__ZE_D3D9_SEA_MATERIAL_H__
 #define __ZE_D3D9_SEA_MATERIAL_H__
 
-#include "ZEGraphics/ZESeaMaterial.h"
+#include "ZERenderer/ZESeaMaterial.h"
 #include "ZED3D9ComponentBase.h"
 #include "ZED3D9Shader.h"
 

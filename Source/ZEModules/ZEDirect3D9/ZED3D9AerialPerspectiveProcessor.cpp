@@ -39,7 +39,7 @@
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9AerialPerspectiveProcessor.h"
 #include "ZEMath/ZEMath.h"
 

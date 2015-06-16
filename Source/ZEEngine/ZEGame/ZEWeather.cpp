@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWeather.h"
-#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZERenderer/ZEDirectionalLight.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEScene.h"
 #include "ZEGame.h"
@@ -43,7 +43,7 @@
 #include "ZESkyDome.h"
 #include "ZECloud.h"
 #include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEMath.h"
 

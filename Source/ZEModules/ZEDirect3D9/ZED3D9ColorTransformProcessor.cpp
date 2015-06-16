@@ -40,7 +40,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9ColorTransformProcessor.h"
 #include "ZETexture/ZETexture2DResource.h"
 

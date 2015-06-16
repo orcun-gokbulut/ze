@@ -38,8 +38,8 @@
 #define __ZE_DEBUG_DRAWER_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
 
 #define ZE_DDE_NONE									0
 #define ZE_DDE_ENTITY_WORLD_BOUNDING_BOX			1

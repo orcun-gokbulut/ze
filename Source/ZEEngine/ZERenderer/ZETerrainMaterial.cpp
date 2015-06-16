@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPColorInputNode.h
+ Zinek Engine - ZETerrainMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,116 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PP_COLOR_INPUT_NODE_H__
-#define __ZE_PP_COLOR_INPUT_NODE_H__
-#include "ZETypes.h"
-#include "ZEPostProcessorNode.h"
+#include "ZETerrainMaterial.h"
 
-class ZETexture2D;
-class ZERenderer;
+#include "ZEMaterialComponents.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZETextureCube.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
-class ZEPPColorInputNode : public ZEPostProcessorNode
-{
-	friend class ZEPostProcessor;
+#include <Memory.h>
 
-	protected:
-		ZERenderer*								Renderer;
-
-												ZEPPColorInputNode();
-
-	public:
-		virtual ZEPostProcessorNodeType			GetNodeType();
-
-		void									SetRenderer(ZERenderer* Renderer);
-		ZERenderer*								GetRenderer();
-
-		virtual ZETexture2D*					GetOutput();
-
-		virtual bool							Process();
-
-		static ZEPPColorInputNode*				CreateInstance();
-};
-
+#ifndef NULL
+#define NULL 0
 #endif
+
+ZETerrainMaterial::ZETerrainMaterial()
+{
+	TwoSided = false;
+	Wireframe = false;
+
+	ElevationLayer = NULL;
+	ColorLayer = NULL;
+
+	ElevationOffset = 0.0f;
+	ElevationScale = 1.0f;
+	BlendThreshold = 0.125f;
+
+	AmbientFactor = 0.0f;
+	AmbientColor = ZEVector3::One;
+
+	DiffuseFactor = 1.0f;
+	DiffuseColor = ZEVector3::One;
+}
+
+ZETerrainMaterial::~ZETerrainMaterial()
+{
+
+}
+
+ZEMaterialFlags ZETerrainMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
+}
+
+void ZETerrainMaterial::SetWireframe(bool Enable)
+{
+	Wireframe = Enable;
+}
+
+bool ZETerrainMaterial::GetWireframe() const
+{
+	return Wireframe;
+}
+
+void ZETerrainMaterial::SetTwoSided(bool Enable)
+{
+	TwoSided = Enable;
+}
+
+bool ZETerrainMaterial::GetTwoSided() const
+{
+	return TwoSided;
+}
+
+void ZETerrainMaterial::SetAmbientColor(const ZEVector3& Color)
+{
+	AmbientColor = Color;
+}
+
+const ZEVector3& ZETerrainMaterial::GetAmbientColor() const
+{
+	return AmbientColor;
+}
+
+void ZETerrainMaterial::SetAmbientFactor(float Factor)
+{
+	AmbientFactor = Factor;
+}
+
+float ZETerrainMaterial::GetAmbientFactor() const
+{
+	return AmbientFactor;
+}
+
+void ZETerrainMaterial::SetDiffuseColor(const ZEVector3& Color)
+{
+	DiffuseColor = Color;
+}
+
+const ZEVector3& ZETerrainMaterial::GetDiffuseColor() const
+{
+	return DiffuseColor;
+}
+
+void ZETerrainMaterial::SetDiffuseFactor(float Factor)
+{
+	DiffuseFactor = Factor;
+}
+
+float ZETerrainMaterial::GetDiffuseFactor() const
+{
+	return DiffuseFactor;
+}
+
+void ZETerrainMaterial::Tick(float ElapsedTime)
+{
+
+}
+
+ZETerrainMaterial* ZETerrainMaterial::CreateInstance()
+{
+	return zeGraphics->CreateTerrainMaterial();
+}

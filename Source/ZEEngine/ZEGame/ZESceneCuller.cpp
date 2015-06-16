@@ -36,8 +36,8 @@
 #include "ZESceneCuller.h"
 #include "ZEScene.h"
 #include "ZEEntity.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZELight.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 

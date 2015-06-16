@@ -40,8 +40,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGame/ZERayCast.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZESpatial/ZEOctree.h"
 

@@ -38,8 +38,8 @@
 #define __ZE_D3D9_UI_MATERIAL_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZEUIMaterial.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZEUIMaterial.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZECamera;
 class ZED3D9UIMaterial : public ZEUIMaterial, public ZED3D9ComponentBase

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D9PPBlurNode.h
+ Zinek Engine - ZESkyDomeMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D9_BLUR_NODE_H__
-#define __ZE_D3D9_BLUR_NODE_H__
+#include "ZESkyDomeMaterial.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGame/ZEScene.h"
+#include "ZECamera.h"
+#include <float.h>
 
-#include "ZEGraphics/ZEPostProcessor/ZEPPBlurNode.h"
-#include "../ZED3D9ComponentBase.h"
-#include <d3d9.h>
 
-class ZETexture2D;
-
-class ZED3D9PPBlurNode : public ZEPPBlurNode, private ZED3D9ComponentBase
+ZESkyDomeMaterial::ZESkyDomeMaterial()
 {
-	friend class ZED3D9PostProcessor;
+	MieConstant				= 0.0010f;
+	MieScaleDepth			= 0.1000f;
+	
+	RayleighConstant		= 0.0025f;
+	RayleighScaleDepth		= 0.2500f;
+	
+	SunLightIntensity		= 20.0f;
+	G						= -0.99f;
 
-	private:		
-		static LPDIRECT3DVERTEXSHADER9		VertexShader;
-		static LPDIRECT3DPIXELSHADER9		VerticalPassPixelShader;
-		static LPDIRECT3DPIXELSHADER9		HorizontalPassPixelShader;
+	OuterRadius				= 61500.0f;
+	InnerRadius				= 60000.0f;
 
-		ZETexture2D*						Output;
-		LPDIRECT3DTEXTURE9					Internal;
+	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
+	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
 
-		void								DoHorizantalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget);
-		void								DoVerticalPass(LPDIRECT3DTEXTURE9 Source, LPDIRECT3DSURFACE9 RenderTarget);
+	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);
+	CameraPositionOffset	= ZEVector3(0.0f, 60000.0f, 0.0f);
+}
 
-		/*									ZED3D9PPBlurNode();
-		virtual								~ZED3D9PPBlurNode();*/
+ZESkyDomeMaterial::~ZESkyDomeMaterial()
+{
+	
+}
 
-	public:	
-		/*virtual bool						Initialize();
-		virtual void						Deinitialize();
+ZEMaterialFlags ZESkyDomeMaterial::GetMaterialFlags() const
+{
+	return ZE_MTF_NONE;
+}
 
-		virtual	bool						Process();
-
-		virtual ZETexture2D*				GetOutput();*/
-};
-
-#endif
+ZESkyDomeMaterial* ZESkyDomeMaterial::CreateInstance()
+{
+	return zeGraphics->CreateSkyDomeMaterial();
+}

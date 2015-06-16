@@ -38,8 +38,8 @@
 #define __ZE_D3D9_SKYBOX_MATERIAL_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZESkyBoxMaterial.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZESkyBoxMaterial.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZECamera;
 class ZED3D9VertexShader;

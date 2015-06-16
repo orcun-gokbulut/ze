@@ -43,7 +43,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SSAOProcessor.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 
 #include "ZEFile/ZEFile.h"
 #include "ZEMath/ZEMath.h"

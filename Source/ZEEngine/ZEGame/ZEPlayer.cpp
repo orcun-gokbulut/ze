@@ -44,8 +44,8 @@
 #include "ZEMath/ZERay.h"
 #include "ZESound/ZEListener.h"
 #include "ZEEntityProvider.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZEProjectiveLight.h"
 #include "ZEMath/ZEMath.h"
 
 #define ACTIONID_FORWARD			0

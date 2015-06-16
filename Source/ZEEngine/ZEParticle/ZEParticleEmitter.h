@@ -41,7 +41,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZEParticle.h"
 #include "ZEMath/ZEAABBox.h"
 

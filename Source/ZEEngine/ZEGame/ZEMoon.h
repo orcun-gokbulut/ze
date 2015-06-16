@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZERenderer\ZERenderCommand.h"
 
 ZE_META_FORWARD_DECLARE(ZEMoonMaterial, "ZEGraphics/ZEMoonMaterial.h")
 ZE_META_FORWARD_DECLARE(ZETexture3DResource, "ZETexture/ZETexture3DResource.h")

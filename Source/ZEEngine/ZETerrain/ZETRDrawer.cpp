@@ -36,14 +36,14 @@
 #include "ZETRDrawer.h"
 #include "ZETRTerrain.h"
 
-#include "ZEGraphics/ZEMaterial.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZEMaterial.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
-#include "ZEGraphics/ZETerrainMaterial.h"
+#include "ZERenderer/ZETerrainMaterial.h"
 
 bool ZETRDrawer::InitializeSelf()
 {

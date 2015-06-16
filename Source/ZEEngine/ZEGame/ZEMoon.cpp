@@ -35,10 +35,11 @@
 
 
 #include "ZEMoon.h"
+
 #include "ZEMath\ZEVector.h"
 #include "ZEDrawParameters.h"
-#include "ZEGraphics\ZERenderer.h"
-#include "ZEGraphics\ZEMoonMaterial.h"
+#include "ZERenderer\ZERenderer.h"
+#include "ZERenderer\ZEMoonMaterial.h"
 #include "ZETexture\ZETexture3DResource.h"
 
 void ZEMoon::SetPhase(float Phase)

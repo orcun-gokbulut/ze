@@ -41,7 +41,7 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelMeshLod.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZEModelResource.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEGame/ZERayCast.h"

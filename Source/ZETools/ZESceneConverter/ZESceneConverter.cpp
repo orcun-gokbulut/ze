@@ -38,6 +38,7 @@
 #include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEPathManager.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEError.h"
 
 #define ZE_MAX_NAME_SIZE			128
 #define ZE_MAX_FILE_NAME_SIZE		256

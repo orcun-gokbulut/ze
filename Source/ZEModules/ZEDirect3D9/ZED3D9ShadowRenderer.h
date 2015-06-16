@@ -37,7 +37,7 @@
 #ifndef __ZE_D3D9_SHADOW_RENDERER_H__
 #define __ZE_D3D9_SHADOW_RENDERER_H__
 
-#include "ZEGraphics/ZEShadowRenderer.h"
+#include "ZERenderer/ZEShadowRenderer.h"
 #include "ZED3D9ComponentBase.h"
 
 #include <d3d9.h>

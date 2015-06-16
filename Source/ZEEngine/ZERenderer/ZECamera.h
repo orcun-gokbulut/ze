@@ -38,13 +38,13 @@
 #define __ZE_CAMERA_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZEGame/ZEDrawParameters.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEGame/ZEDrawParameters.h"
 #include "ZEDS/ZEFlags.h"
 
 typedef ZEFlags ZECameraDirtyFlags;

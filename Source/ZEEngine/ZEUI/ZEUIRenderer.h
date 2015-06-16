@@ -41,7 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMeta/ZEObject.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 
 class ZEVertexDeclaration;
 

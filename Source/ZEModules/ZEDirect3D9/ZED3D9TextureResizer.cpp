@@ -43,7 +43,7 @@
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9ViewPort.h"
 #include "ZED3D9Texture2D.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9Profiler.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9TextureResizeFilters.h"

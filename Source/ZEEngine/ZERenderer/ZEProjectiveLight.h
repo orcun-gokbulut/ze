@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPBlurNode.cpp
+ Zinek Engine - ZEProjectiveLight.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,110 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPPBlurNode.h"
-#include "ZEError.h"
-#include "ZEMath/ZEMath.h"
-#include "ZEMath/ZEAngle.h"
+#pragma once
+#ifndef	__ZE_PROJECTIVE_LIGHT_H__
+#define __ZE_PROJECTIVE_LIGHT_H__
 
-void ZEPPBlurNode::UpdateKernel()
+#include "ZELight.h"
+
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEViewFrustum.h"
+
+class ZETexture2D;
+class ZETexture2DResource;
+
+class ZEProjectiveLight : public ZELight
 {
-	if (KernelDirtyFlag)
-	{
-		for (ZESize I = 0; I < 7; I++)
-			Kernel[I] = (1.0f / (ZEMath::Sqrt(2.0f * ZE_PI * StandartDeviation))) * ZEMath::Power(ZE_E, -((((float)I - 3) * ((float)I - 3)) / (2 * StandartDeviation * StandartDeviation)));
+	ZE_OBJECT
 
-		KernelDirtyFlag = false;
-	}
-}
+	private:
+		float							FOV;
+		float							AspectRatio;
+		ZEViewFrustum					ViewVolume;
+		const ZETexture2D*				ProjectionTexture;
+		ZETexture2D*					ShadowMap;
+		ZEMatrix4x4						ViewProjectionMatrix;
+		
+		ZETexture2DResource*			ProjectionTextureResource;
+		ZEString						ProjectionTextureFile;
 
-ZEPPBlurNode::ZEPPBlurNode()
-{
-	Input = NULL;
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
-	HorizontalPass		= true;
-	VerticalPass		= true;
-	StandartDeviation	= 0.84089642f;		
-	KernelDirtyFlag		= true;
-	PassCount			= 1;
-	DownSample			= 1;
-}
+										ZEProjectiveLight();
+		virtual							~ZEProjectiveLight();
 
-ZEPPBlurNode::~ZEPPBlurNode()
-{
-}
+	public:
+		ZELightType						GetLightType();
 
-ZEPostProcessorNodeType ZEPPBlurNode::GetNodeType()
-{
-	return ZE_PPNT_PROCESSOR_NODE;
-}
+		void							SetFOV(float FOV);
+		float							GetFOV() const;
 
-ZESize ZEPPBlurNode::GetDependencyCount()
-{
-	return 1;
-}
+		void							SetAspectRatio(float AspectRatio);
+		float							GetAspectRatio() const;
 
-ZEPostProcessorNode** ZEPPBlurNode::GetDependencies()
-{
-	return &Input;
-}
+		void							SetProjectionTextureFile(const ZEString& Filename);
+		const ZEString&					GetProjectionTextureFile() const;
 
-void ZEPPBlurNode::SetInput(ZEPostProcessorNode* Input)
-{
-	this->Input = Input;
-}
+		void							SetProjectionTexture(const ZETexture2D* Texture);
+		const ZETexture2D*				GetProjectionTexture() const;
 
-ZEPostProcessorNode* ZEPPBlurNode::GetInput()
-{
-	return Input;
-}
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
-void ZEPPBlurNode::SetDownSample(ZEUInt Factor)
-{
-	DownSample = Factor;
-}
+		virtual void					SetCastsShadow(bool NewValue);
 
-ZEUInt ZEPPBlurNode::GetDownSample()
-{
-	return DownSample;
-}
+		ZETexture2D*					GetShadowMap();
 
-void ZEPPBlurNode::SetPassCount(ZEUInt PassCount)
-{
-	this->PassCount = PassCount;
-}
+		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
-ZEUInt ZEPPBlurNode::GetPassCount()
-{
-	return PassCount;
-}
+		static ZEProjectiveLight*		CreateInstance();
+};
 
-void ZEPPBlurNode::SetHorizontalPass(bool Enable)
-{
-	HorizontalPass = Enable;
-}
-
-bool ZEPPBlurNode::GetHorizontalPass()
-{
-	return HorizontalPass;
-}
-
-void ZEPPBlurNode::SetVerticalPass(bool Enable)
-{
-	VerticalPass = Enable;
-}
-
-bool ZEPPBlurNode::GetVerticalPass()
-{
-	return VerticalPass;
-}
-
-void ZEPPBlurNode::SetStandartDeviation(float Ro)
-{
-	StandartDeviation = Ro;
-	KernelDirtyFlag = true;
-}
-
-float ZEPPBlurNode::GetStandartDeviation()
-{
-	return StandartDeviation;
-}
+#endif

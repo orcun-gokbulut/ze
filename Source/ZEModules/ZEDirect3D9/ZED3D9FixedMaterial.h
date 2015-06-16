@@ -39,7 +39,7 @@
 
 #include "ZEPointer/ZEPointer.h"
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 
 #include <d3d9.h>
 

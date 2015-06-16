@@ -38,8 +38,8 @@
 #define __ZE_GIZMO_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 enum ZEGizmoMode
 {

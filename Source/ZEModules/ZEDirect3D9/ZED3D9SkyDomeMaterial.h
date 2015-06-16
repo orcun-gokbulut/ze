@@ -38,7 +38,7 @@
 #define __ZE_D3D9_SKY_DOME_MATERIAL_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics\ZESkyDomeMaterial.h"
+#include "ZERenderer/ZESkyDomeMaterial.h"
 
 class ZEFrameRenderer;
 class ZERenderCommand;

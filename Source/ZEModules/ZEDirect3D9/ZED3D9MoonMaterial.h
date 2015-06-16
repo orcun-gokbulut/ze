@@ -38,7 +38,7 @@
 #define __ZE_D3D9_MOON_MATERIAL_H__
 
 #include "ZED3D9ComponentBase.h"
-#include "ZEGraphics/ZEMoonMaterial.h"
+#include "ZERenderer/ZEMoonMaterial.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
 

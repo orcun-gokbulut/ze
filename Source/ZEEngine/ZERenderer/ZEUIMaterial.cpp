@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPVelocityInputNode.cpp
+ Zinek Engine - ZEUIMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,68 +32,59 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-/*
-#include "ZEPPVelocityInputNode.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEError.h"
-#include "ZEDefinitions.h"
 
-ZEPPVelocityInputNode::ZEPPVelocityInputNode()
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEUIMaterial.h"
+#include "ZEGraphics/ZETexture2D.h"
+
+ZEUIMaterial::ZEUIMaterial()
 {
-	Renderer = NULL;
+	Texture = NULL;
+	WireFrame = false;
+	WireSize = 1.0f;
 }
 
-ZEPostProcessorNodeType ZEPPVelocityInputNode::GetNodeType()
+ZEUIMaterial::~ZEUIMaterial()
 {
-	return ZE_PPNT_INPUT_NODE;
+	
 }
 
-void ZEPPVelocityInputNode::SetRenderer(ZERenderer* Renderer)
+ZEMaterialFlags ZEUIMaterial::GetMaterialFlags() const
 {
-
-	this->Renderer = Renderer;
+	return ZE_MTF_NONE;
 }
 
-ZERenderer* ZEPPVelocityInputNode::GetRenderer()
+void ZEUIMaterial::SetWireFrame(bool Enabled)
 {
-	return Renderer;
+	WireFrame = Enabled;
 }
 
-ZETexture2D* ZEPPVelocityInputNode::GetOutput()
+bool ZEUIMaterial::GetWireFrame() const
 {
-	if (Renderer == NULL)
-		return NULL;
-	else
-		return Renderer->GetVelocityTexture(); 
+	return WireFrame;
 }
 
-bool ZEPPVelocityInputNode::Process()
+void ZEUIMaterial::SetWireSize(float Size)
 {
-
-	if (Renderer == NULL)
-	{
-		zeError("There is no renderer available.");
-		return false;
-	}
-
-	if (Renderer->GetRenderVelocityTexture() == false)
-	{
-		zeError("Current renderer does not enabled to provide color texture.");
-		return false;
-	}
-
-	if (Renderer->GetVelocityTexture() == NULL)
-	{
-		zeError("Current renderer does provide color texture.");
-		return false;
-	}
-
-	return true;
+	WireSize = Size;
 }
 
-
-ZEPPVelocityInputNode* ZEPPVelocityInputNode::CreateInstance()
+float ZEUIMaterial::GetWireSize() const
 {
-	return new ZEPPVelocityInputNode();
+	return WireSize;
 }
-*/
+
+void ZEUIMaterial::SetTexture(const ZETexture2D* Texture)
+{
+	this->Texture = Texture;
+}
+
+const ZETexture2D* ZEUIMaterial::GetTexture() const
+{
+	return Texture;
+}
+
+ZEUIMaterial* ZEUIMaterial::CreateInstance()
+{
+	return zeGraphics->CreateUIMaterial();
+}

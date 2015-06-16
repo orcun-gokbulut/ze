@@ -39,7 +39,7 @@
 
 #include "ZEParticleEmitter.h"
 #include "ZEParticleRenderer.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZERenderer\ZERenderCommand.h"
 
 class ZESimpleVertex;
 struct ZEDrawParameters;

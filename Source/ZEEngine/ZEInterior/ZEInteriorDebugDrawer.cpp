@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInteriorDebugDrawer.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEInterior.h"
 #include "ZEInteriorDoor.h"
 #include "ZEInteriorRoom.h"
 #include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZERenderer.h"
+#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZERenderer.h"
 
 void ZEInteriorDebugDrawer::DebugDrawEntity()
 {

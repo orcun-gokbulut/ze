@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9Shader.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZEFrameRenderer.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZEFrameRenderer.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZED3D9CloudMaterial.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZETexture2D.h"

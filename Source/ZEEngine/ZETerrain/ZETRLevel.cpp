@@ -38,7 +38,7 @@
 
 #include "ZEGraphics\ZETexture2D.h"
 #include "ZEMath\ZEMath.h"
-#include "ZEGraphics\ZETerrainMaterial.h"
+#include "ZERenderer\ZETerrainMaterial.h"
 
 #define ZETR_LEVEL_BLOCK_COUNT 3
 

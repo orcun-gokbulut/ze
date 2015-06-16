@@ -40,12 +40,12 @@
 #define NULL 0
 #endif
 
-#include "ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEMaterialComponents.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureCubeResource.h"
-#include "ZETexture2D.h"
-#include "ZETextureCube.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZETextureCube.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEFileInfo.h"

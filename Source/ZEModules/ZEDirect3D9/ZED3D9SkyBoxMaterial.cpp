@@ -37,10 +37,10 @@
 #include "ZEFile/ZEFile.h"
 #include "ZED3D9TextureCube.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9SkyBoxMaterial.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 
 #include <D3D9.h>

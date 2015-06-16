@@ -41,13 +41,13 @@
 #include "ZEMath/ZEPlane.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEMath/ZETriangle.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
 ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;

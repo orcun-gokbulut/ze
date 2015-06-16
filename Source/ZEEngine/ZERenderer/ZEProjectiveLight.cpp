@@ -34,13 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProjectiveLight.h"
-#include "ZETexture2D.h"
+
+#include "ZEShadowRenderer.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZETextureCube.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZETextureCube.h"
+
 #include "ZEError.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEShadowRenderer.h"
-#include "ZEGraphicsModule.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEAngle.h"
 
@@ -81,9 +83,9 @@ const ZETexture2D* ZEProjectiveLight::GetProjectionTexture() const
 	return ProjectionTexture;
 }
 
-void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
+void ZEProjectiveLight::SetProjectionTextureFile(const ZEString& FileName)
 {
-	strncpy(ProjectionTextureFile, Filename, ZE_MAX_FILE_NAME_SIZE);
+	ProjectionTextureFile = FileName;
 	if (IsInitialized())
 	{
 		if (ProjectionTextureResource != NULL)
@@ -97,12 +99,9 @@ void ZEProjectiveLight::SetProjectionTextureFile(const char* Filename)
 	}
 }
 
-const char* ZEProjectiveLight::GetProjectionTextureFile() const
+const ZEString& ZEProjectiveLight::GetProjectionTextureFile() const
 {
-	if (strlen(ProjectionTextureFile) == 0)
-		return "";
-	else
-		return ProjectionTextureFile;
+	return ProjectionTextureFile;
 }
 
 ZETexture2D* ZEProjectiveLight::GetShadowMap()
@@ -201,7 +200,6 @@ ZEProjectiveLight::ZEProjectiveLight()
 	ProjectionTexture = NULL;
 	ProjectionTextureResource = NULL;
 	ViewProjectionMatrix = ZEMatrix4x4::Identity;
-	memset(ProjectionTextureFile, 0, ZE_MAX_FILE_NAME_SIZE);
 }
 
 ZEProjectiveLight::~ZEProjectiveLight()
