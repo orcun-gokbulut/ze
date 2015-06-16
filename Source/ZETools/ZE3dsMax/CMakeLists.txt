@@ -37,7 +37,7 @@ cmake_minimum_required (VERSION 2.8)
 
 ze_set_project_folder("ZETools/ZE3dsMax")
 
-set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files (x86)\\Autodesk\\3ds Max 2010" CACHE STRING "Directory of 3ds max.")
+set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files\\Autodesk\\3ds Max 2015" CACHE STRING "Directory of 3ds max.")
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 

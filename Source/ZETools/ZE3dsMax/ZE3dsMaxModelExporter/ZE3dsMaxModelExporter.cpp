@@ -79,13 +79,6 @@ ZE3dsMaxModelExporter::~ZE3dsMaxModelExporter()
 		OptionsDialog = NULL;
 	}
 
-	if(ResourceConfigurationDialog != NULL)
-	{
-		ResourceConfigurationDialog->Hide();
-		delete ResourceConfigurationDialog;
-		ResourceConfigurationDialog = NULL;
-	}
-
 	if(WinWidget != NULL)
 	{
 		WinWidget->hide();
@@ -108,37 +101,37 @@ ZEInt ZE3dsMaxModelExporter::ExtCount()
 
 const TCHAR *ZE3dsMaxModelExporter::Ext(ZEInt n)
 {		
-	return "zeModel";
+	return L"zeModel";
 }
 
 const TCHAR *ZE3dsMaxModelExporter::LongDesc()
 {
-	return "Zinek Engine Model File";
+	return L"Zinek Engine Model File";
 }
 	
 const TCHAR *ZE3dsMaxModelExporter::ShortDesc() 
 {			
-	return "Zinek Engine Model";
+	return L"Zinek Engine Model";
 }
 
 const TCHAR *ZE3dsMaxModelExporter::AuthorName()
 {			
-	return "Zinek Engine Staff";
+	return L"Zinek Engine Staff";
 }
 
 const TCHAR *ZE3dsMaxModelExporter::CopyrightMessage() 
 {	
-	return "Copyright (c) 2008, Zinek Engine Staff";
+	return L"Copyright (c) 2008, Zinek Engine Staff";
 }
 
 const TCHAR *ZE3dsMaxModelExporter::OtherMessage1() 
 {		
-	return "";
+	return L"";
 }
 
 const TCHAR *ZE3dsMaxModelExporter::OtherMessage2() 
 {		
-	return "";
+	return L"";
 }
 
 ZEUInt ZE3dsMaxModelExporter::Version()
@@ -272,8 +265,8 @@ bool ZE3dsMaxModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, c
 
 ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
-	ExportPath = ZEFileInfo(name).GetParentDirectory();
-	LoadOptions(i->GetCurFilePath());
+	ExportPath = ZEFileInfo(ZEString(name)).GetParentDirectory();
+	LoadOptions(i->GetCurFilePath().ToCStr());
 
 	INodeTab lNodes;
 	GetSceneNodes(lNodes);
@@ -288,10 +281,10 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	if(!ShowOptionsDialog(i->GetMAXHWnd()))
 		return true;
 
-	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath()))
+	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath().ToCStr()))
 		return true;
 
-	SaveOptions(i->GetCurFilePath());
+	SaveOptions(i->GetCurFilePath().ToCStr());
 
 	ModelRoot.SetRootNode(&ModelNode);
 	ModelNode.SetName("ZEModel");
@@ -311,12 +304,12 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	zeLog("Exporting model to file \"%s\".", name);
 
 	Tab<IGameNode*> Meshes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
-	const char* Type;
+	const MCHAR* Type;
 
 	for (ZESize I = 0; I < (ZESize)Meshes.Count(); I++)
 	{
 		Type = NULL;
-		if (ZE3dsMaxUtils::GetProperty(Meshes[I]->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type) && strcmp(Type, "BoundingBox") == 0)
+		if (ZE3dsMaxUtils::GetProperty(Meshes[I]->GetIGameObject(), ZE_STRING_PROP, L"ZEType", Type) && wcscmp(Type, L"BoundingBox") == 0)
 		{
 			IGameMesh* BoundingBoxMesh = (IGameMesh*)Meshes[I]->GetIGameObject();
 
@@ -369,7 +362,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Material Process", true);
-	if (!ProcessMaterials(name))
+	if (!ProcessMaterials(ZEString(name)))
 	{
 		zeError("Processing materials failed.");
 		return false;
@@ -378,7 +371,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 
 	ProgressDialog->OpenTask("Writing File");
 	zeLog("Writing ZEModel to file...");
-	if (!WriteToFile(name))
+	if (!WriteToFile(ZEString(name)))
 	{
 		zeError("Writing model to file failed.");
 		return false;

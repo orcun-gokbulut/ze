@@ -34,41 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxModelActions.h"
-#include <maxscrpt/maxscrpt.h>
 #include "ZE3dsMaxModelScriptMesh.ms.h"
 #include "ZE3dsMaxModelScriptBone.ms.h"
 #include "ZE3dsMaxModelScriptPhysicalBody.ms.h"
 #include "ZE3dsMaxModelScriptBoundingBox.ms.h"
+#include "ZEDS/ZEString.h"
+#include <maxscript/maxscript.h>
 
 int ZE3dsMaxModelActionAddMeshAttributes::GetId()
 {
-	return ZEModelMeshAttributesAdd_Action_ID;
+	return ZEModelMeshAttributesAdd_Action_ID.PartA();
 }
 
 BOOL ZE3dsMaxModelActionAddMeshAttributes::ExecuteAction()
 {
 	ZE3dsMaxModelScriptMesh_ms MeshScript;
-	return ExecuteMAXScriptScript((char*)MeshScript.GetData());
+	bool Result = ExecuteMAXScriptScript(ZEString((const char*)(MeshScript.GetData())).ToWCString());
+	return Result;
 }
 
 void ZE3dsMaxModelActionAddMeshAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = "Add ZEModel Mesh Attributes";
+	buttonText = L"Add ZEModel Mesh Attributes";
 }
 
 void ZE3dsMaxModelActionAddMeshAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = "Add ZEModel Mesh Attributes";
+	menuText = L"Add ZEModel Mesh Attributes";
 }
 
 void ZE3dsMaxModelActionAddMeshAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = "Add ZEModel Mesh Attributes";
+	descText = L"Add ZEModel Mesh Attributes";
 }
 
 void ZE3dsMaxModelActionAddMeshAttributes::GetCategoryText(MSTR& catText)
 {
-	catText = "Zinek Engine";
+	catText = L"Zinek Engine";
 }
 
 BOOL ZE3dsMaxModelActionAddMeshAttributes::IsChecked()
@@ -89,14 +91,15 @@ BOOL ZE3dsMaxModelActionAddMeshAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxModelActionAddMeshAttributes::GetIcon()
 {
 	if (MeshActionIcon == NULL)
-		MeshActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 1);
+		MeshActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 1);
 
 	return MeshActionIcon;
 }
 
 void ZE3dsMaxModelActionAddMeshAttributes::DeleteThis()
 {
-	delete MeshActionIcon;
+	//delete MeshActionIcon;
+	delete this;
 }
 
 ZE3dsMaxModelActionAddMeshAttributes::ZE3dsMaxModelActionAddMeshAttributes()
@@ -106,33 +109,34 @@ ZE3dsMaxModelActionAddMeshAttributes::ZE3dsMaxModelActionAddMeshAttributes()
 
 int ZE3dsMaxModelActionAddBoneAttributes::GetId()
 {
-	return ZEModelBoneAttributesAdd_Action_ID;
+	return ZEModelBoneAttributesAdd_Action_ID.PartA();
 }
 
 BOOL ZE3dsMaxModelActionAddBoneAttributes::ExecuteAction()
 {
 	ZE3dsMaxModelScriptBone_ms BoneScript;
-	return ExecuteMAXScriptScript((char*)BoneScript.GetData());
+	bool Result = ExecuteMAXScriptScript(ZEString((const char*)BoneScript.GetData()).ToWCString());
+	return Result;
 }
 
 void ZE3dsMaxModelActionAddBoneAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = "Add ZEModel Bone Attributes";
+	buttonText = L"Add ZEModel Bone Attributes";
 }
 
 void ZE3dsMaxModelActionAddBoneAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = "Add ZEModel Bone Attributes";
+	menuText = L"Add ZEModel Bone Attributes";
 }
 
 void ZE3dsMaxModelActionAddBoneAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = "Add ZEModel Bone Attributes";
+	descText = L"Add ZEModel Bone Attributes";
 }
 
 void ZE3dsMaxModelActionAddBoneAttributes::GetCategoryText(MSTR& catText)
 {
-	catText = "Zinek Engine";
+	catText = L"Zinek Engine";
 }
 
 BOOL ZE3dsMaxModelActionAddBoneAttributes::IsChecked()
@@ -153,14 +157,15 @@ BOOL ZE3dsMaxModelActionAddBoneAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxModelActionAddBoneAttributes::GetIcon()
 {
 	if (BoneActionIcon == NULL)
-		BoneActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 2);
+		BoneActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 2);
 
 	return BoneActionIcon;
 }
 
 void ZE3dsMaxModelActionAddBoneAttributes::DeleteThis()
 {
-	delete BoneActionIcon;
+	//delete BoneActionIcon;
+	delete this;
 }
 
 ZE3dsMaxModelActionAddBoneAttributes::ZE3dsMaxModelActionAddBoneAttributes()
@@ -170,33 +175,33 @@ ZE3dsMaxModelActionAddBoneAttributes::ZE3dsMaxModelActionAddBoneAttributes()
 
 int ZE3dsMaxModelActionAddPhysicalBodyAttributes::GetId()
 {
-	return ZEModelPhysicalBodyAttributesAdd_Action_ID;
+	return ZEModelPhysicalBodyAttributesAdd_Action_ID.PartA();
 }
 
 BOOL ZE3dsMaxModelActionAddPhysicalBodyAttributes::ExecuteAction()
 {
 	ZE3dsMaxModelScriptPhysicalBody_ms PhysicalBodyScript;
-	return ExecuteMAXScriptScript((char*)PhysicalBodyScript.GetData());
+	return ExecuteMAXScriptScript(ZEString((const char*)PhysicalBodyScript.GetData()).ToWCString());
 }
 
 void ZE3dsMaxModelActionAddPhysicalBodyAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = "Add ZEModel Physical Body Attributes";
+	buttonText = L"Add ZEModel Physical Body Attributes";
 }
 
 void ZE3dsMaxModelActionAddPhysicalBodyAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = "Add ZEModel Physical Body Attributes";
+	menuText = L"Add ZEModel Physical Body Attributes";
 }
 
 void ZE3dsMaxModelActionAddPhysicalBodyAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = "Add ZEModel Physical Body Attributes";
+	descText = L"Add ZEModel Physical Body Attributes";
 }
 
 void ZE3dsMaxModelActionAddPhysicalBodyAttributes::GetCategoryText(MSTR& catText)
 {
-	catText	= "Zinek Engine";
+	catText	= L"Zinek Engine";
 }
 
 BOOL ZE3dsMaxModelActionAddPhysicalBodyAttributes::IsChecked()
@@ -217,14 +222,15 @@ BOOL ZE3dsMaxModelActionAddPhysicalBodyAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxModelActionAddPhysicalBodyAttributes::GetIcon()
 {
 	if (PhysicalBodyActionIcon == NULL)
-		PhysicalBodyActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 3);
+		PhysicalBodyActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 3);
 
 	return PhysicalBodyActionIcon;
 }
 
 void ZE3dsMaxModelActionAddPhysicalBodyAttributes::DeleteThis()
 {
-	delete PhysicalBodyActionIcon;
+	//delete PhysicalBodyActionIcon;
+	delete this;
 }
 
 ZE3dsMaxModelActionAddPhysicalBodyAttributes::ZE3dsMaxModelActionAddPhysicalBodyAttributes()
@@ -234,33 +240,33 @@ ZE3dsMaxModelActionAddPhysicalBodyAttributes::ZE3dsMaxModelActionAddPhysicalBody
 
 int ZE3dsMaxModelActionAddBoundingBoxAttributes::GetId()
 {
-	return ZEModelBoundingBoxAttributesAdd_Action_ID;
+	return ZEModelBoundingBoxAttributesAdd_Action_ID.PartA();
 }
 
 BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::ExecuteAction()
 {
 	ZE3dsMaxModelScriptBoundingBox_ms BoundingBoxScript;
-	return ExecuteMAXScriptScript((char*)BoundingBoxScript.GetData());
+	return ExecuteMAXScriptScript(ZEString((const char*)BoundingBoxScript.GetData()).ToWCString());
 }
 
 void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = "Add ZEModel Bounding Box Attributes";
+	buttonText = L"Add ZEModel Bounding Box Attributes";
 }
 
 void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = "Add ZEModel Bounding Box Attributes";
+	menuText = L"Add ZEModel Bounding Box Attributes";
 }
 
 void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = "Add ZEModel Bounding Box Attributes";
+	descText = L"Add ZEModel Bounding Box Attributes";
 }
 
 void ZE3dsMaxModelActionAddBoundingBoxAttributes::GetCategoryText(MSTR& catText)
 {
-	catText	= "Zinek Engine";
+	catText	= L"Zinek Engine";
 }
 
 BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::IsChecked()
@@ -281,14 +287,15 @@ BOOL ZE3dsMaxModelActionAddBoundingBoxAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxModelActionAddBoundingBoxAttributes::GetIcon()
 {
 	if (BoundingBoxActionIcon == NULL)
-		BoundingBoxActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 8);
+		BoundingBoxActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 8);
 
 	return BoundingBoxActionIcon;
 }
 
 void ZE3dsMaxModelActionAddBoundingBoxAttributes::DeleteThis()
 {
-	delete BoundingBoxActionIcon;
+	//delete BoundingBoxActionIcon;
+	delete this;
 }
 
 ZE3dsMaxModelActionAddBoundingBoxAttributes::ZE3dsMaxModelActionAddBoundingBoxAttributes()

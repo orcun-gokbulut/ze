@@ -35,6 +35,8 @@
 
 #include "ZE3dsMaxUIDescription.h"
 #include "ZE3dsMaxUI.h"
+#include "ZE3dsMaxInteriorActions.h"
+#include "ZE3dsMaxModelActions.h"
 
 #define ZE_3DS_MAX_UI_CLASS_ID Class_ID(0x9b240b2, 0x2c757d96)
 
@@ -50,7 +52,7 @@ void* ZE3dsMaxUIDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxUIDescription::ClassName()
 { 
-	return "ZE3dsMaxUI"; 
+	return L"ZE3dsMaxUI"; 
 }
 
 SClass_ID ZE3dsMaxUIDescription::SuperClassID()
@@ -65,12 +67,12 @@ Class_ID ZE3dsMaxUIDescription::ClassID()
 
 const TCHAR* ZE3dsMaxUIDescription::Category()
 {
-	return "Zinek"; 
+	return L"Zinek"; 
 }
 
 const TCHAR* ZE3dsMaxUIDescription::InternalName()
 { 
-	return "Zinek Engine UI"; 
+	return L"Zinek Engine UI"; 
 }
 
 HINSTANCE ZE3dsMaxUIDescription::HInstance()
@@ -85,15 +87,20 @@ int ZE3dsMaxUIDescription::NumActionTables()
 
 ActionTable* ZE3dsMaxUIDescription::GetActionTable(int i)
 {
-	ActionTable* MainActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionMainUI);
+	ActionTable* ZinekActionTable = new ActionTable(ZE3dsMax_Action_Table_ID.PartA(), kActionMainUIContext, MSTR::FromCStr("Zinek Engine"));
+	ZinekActionTable->AppendOperation(new ZE3dsMaxModelActionAddMeshAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxModelActionAddBoneAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxModelActionAddPhysicalBodyAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxModelActionAddBoundingBoxAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxInteriorActionAddRoomAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxInteriorActionAddDoorAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxCommonUtilsActionAddHelperAttributes());
+	ZinekActionTable->AppendOperation(new ZE3dsMaxCommonUtilsRemoveAttributes());
 
-	ZE3dsMaxCommonUtilsActionAddHelperAttributes* AddZEHelperAttributesAction = new ZE3dsMaxCommonUtilsActionAddHelperAttributes();
-	MainActionTable->AppendOperation(AddZEHelperAttributesAction);
+	ZE3dsMaxActionCallback* ActionTableCallback = new ZE3dsMaxActionCallback(ZinekActionTable);
+	ZinekActionTable->SetCallback(ActionTableCallback);
 
-	ZE3dsMaxCommonUtilsRemoveAttributes* RemoveZEAttributesAction = new ZE3dsMaxCommonUtilsRemoveAttributes();
-	MainActionTable->AppendOperation(RemoveZEAttributesAction);
-
-	return MainActionTable;
+	return ZinekActionTable;
 }
 
 ClassDesc2* ZE3dsMaxUIDescription::GetInstance()

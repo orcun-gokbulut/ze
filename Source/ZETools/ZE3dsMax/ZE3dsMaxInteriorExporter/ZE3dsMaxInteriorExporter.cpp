@@ -77,13 +77,6 @@ ZE3dsMaxInteriorExporter::~ZE3dsMaxInteriorExporter()
 		OptionsDialog = NULL;
 	}
 
-	if(ResourceConfigurationDialog != NULL)
-	{
-		ResourceConfigurationDialog->Hide();
-		delete ResourceConfigurationDialog;
-		ResourceConfigurationDialog = NULL;
-	}
-
 	if(WinWidget != NULL)
 	{
 		WinWidget->hide();
@@ -106,37 +99,37 @@ ZEInt ZE3dsMaxInteriorExporter::ExtCount()
 
 const TCHAR *ZE3dsMaxInteriorExporter::Ext(ZEInt n)
 {		
-	return "zeInterior";
+	return L"zeInterior";
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::LongDesc()
 {
-	return "Zinek Engine Interior File";
+	return L"Zinek Engine Interior File";
 }
 	
 const TCHAR *ZE3dsMaxInteriorExporter::ShortDesc() 
 {			
-	return "Zinek Engine Interior";
+	return L"Zinek Engine Interior";
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::AuthorName()
 {			
-	return "Zinek Code House and Game Studio";
+	return L"Zinek Code House and Game Studio";
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::CopyrightMessage() 
 {	
-	return "Copyright (c) 2008-2011, Zinek Code House and Game Studio";
+	return L"Copyright (c) 2008-2011, Zinek Code House and Game Studio";
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::OtherMessage1() 
 {		
-	return "";
+	return L"";
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::OtherMessage2() 
 {		
-	return "";
+	return L"";
 }
 
 ZEUInt ZE3dsMaxInteriorExporter::Version()
@@ -272,8 +265,8 @@ bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow
 
 ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interface* i, BOOL suppressPrompts, DWORD options)
 {
-	ExportPath = ZEFileInfo(name).GetParentDirectory();
-	LoadOptions(i->GetCurFilePath());
+	ExportPath = ZEFileInfo(ZEString(name)).GetParentDirectory();
+	LoadOptions(i->GetCurFilePath().ToCStr());
 
 	INodeTab lNodes;
 	GetSceneNodes(lNodes);
@@ -285,10 +278,10 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	if(!ShowOptionsDialog(i->GetMAXHWnd()))
 		return true;
 
-	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath(), ExportPath))
+	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath().ToCStr(), ExportPath))
 		return true;
 
-	SaveOptions(i->GetCurFilePath());
+	SaveOptions(i->GetCurFilePath().ToCStr());
 
 	InteriorRoot.SetRootNode(&InteriorNode);
 	InteriorNode.SetName("ZEInterior");
@@ -341,7 +334,7 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Materials", true);
-	if (!ProcessMaterials(name))
+	if (!ProcessMaterials(ZEString(name)))
 	{
 		zeError("Can not process materials.");
 		return false;

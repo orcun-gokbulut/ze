@@ -40,6 +40,6 @@ ze_add_source(ZE3dsMaxUtils.cpp				Sources)
 
 ze_add_library(TARGET ZE3dsMaxUtils
 	SOURCES ${Sources}
-	LIBS ZEFoundation lib3dsMax)
+	LIBS ZEFoundation lib3dsMax2015)
 
 set_property(TARGET ZE3dsMaxUtils APPEND PROPERTY COMPILE_FLAGS "/GR")
