@@ -67,7 +67,7 @@ Quat ZE3dsMaxUtils::ZEtoMax(const ZEQuaternion& Quaternion)
 	return Quat(Quaternion.x, Quaternion.y, Quaternion.z, Quaternion.w);
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const char* Property, INode*& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const MCHAR* Property, INode*& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -75,7 +75,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const char* Property, INo
 	if (Prop != NULL)
 	{
 		IParamBlock2* ParamBlock =  Prop->GetMaxParamBlock2();
-		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamBlockIndex());
+		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamIndex());
 		if (ParamBlock->GetParameterType(ParamId) != TYPE_INODE)
 			return false;
 
@@ -90,7 +90,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const char* Property, INo
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const char* Property, IGameScene* Scene, IGameNode*& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const MCHAR* Property, IGameScene* Scene, IGameNode*& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -100,7 +100,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const char* Property, IGa
 	if (Prop != NULL)
 	{	
 		IParamBlock2* ParamBlock = Prop->GetMaxParamBlock2();
-		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamBlockIndex());
+		ZEInt ParamId = ParamBlock->IndextoID(Prop->GetParamIndex());
 
 		INode* Node =  ParamBlock->GetINode(ParamId);
 		if (Node == NULL)
@@ -119,7 +119,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const char* Property, IGa
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, bool& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, bool& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -157,7 +157,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, const char*& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, const MCHAR*& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -189,7 +189,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 	return false;
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, ZEInt& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEInt& Value)
 { 
 	if (Object == NULL)
 		return false;
@@ -223,7 +223,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, ZEUInt& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEUInt& Value)
 {
 	ZEInt Temp;
 	if (Object == NULL)
@@ -266,7 +266,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, float& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, float& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -300,7 +300,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, ZEMLProperty& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEMLProperty& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -367,11 +367,11 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ch
 				}
 			case ZE_STRING_PROP:
 				{
-					const char* StringValue;
+					const MCHAR* StringValue;
 					Result = Prop->GetPropertyValue(StringValue);
 
 					if (Result)
-						Value.SetString(StringValue);
+						Value.SetString(ZEString(StringValue));
 
 					break;
 				}

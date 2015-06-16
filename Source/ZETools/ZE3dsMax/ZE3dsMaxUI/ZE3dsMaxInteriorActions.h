@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZE3dsMaxModelActions.h
+ Zinek Engine - ZE3dsMaxInteriorActions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,24 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_3DS_MAX_MODEL_ACTIONS_H__
-#define __ZE_3DS_MAX_MODEL_ACTIONS_H__
+#ifndef __ZE_3DS_MAX_INTERIOR_ACTIONS_H__
+#define __ZE_3DS_MAX_INTERIOR_ACTIONS_H__
 
-#define ZEModelMeshAttributesAdd_Action_ID 900
-#define ZEModelBoneAttributesAdd_Action_ID 910
-#define ZEModelPhysicalBodyAttributesAdd_Action_ID 920
-#define ZEModelBoundingBoxAttributesAdd_Action_ID 930
-
+#define ZEInteriorRoomAttributesAdd_Action_ID Class_ID(0x4994533c, 0x217b6f0c)
+#define ZEInteriorDoorAttributesAdd_Action_ID Class_ID(0x44f51b76, 0x1435451e)
 
 #include <Max.h>
 #include <ActionTable.h>
 #include <MaxIcon.h>
 
-class ZE3dsMaxModelActionAddMeshAttributes : public ActionItem
+class ZE3dsMaxInteriorActionAddRoomAttributes : public ActionItem
 {
 	private:
 
-		MaxBmpFileIcon*		MeshActionIcon;
+		MaxBmpFileIcon*		RoomActionIcon;
 
 	public:
 		int					GetId();
@@ -70,14 +67,14 @@ class ZE3dsMaxModelActionAddMeshAttributes : public ActionItem
 
 		void				DeleteThis();
 
-							ZE3dsMaxModelActionAddMeshAttributes();
+							ZE3dsMaxInteriorActionAddRoomAttributes();
 };
 
-class ZE3dsMaxModelActionAddBoneAttributes : public ActionItem
+class ZE3dsMaxInteriorActionAddDoorAttributes : public ActionItem
 {
 	private:
 
-		MaxBmpFileIcon*		BoneActionIcon;
+		MaxBmpFileIcon*		DoorActionIcon;
 
 	public:
 		int					GetId();
@@ -96,59 +93,8 @@ class ZE3dsMaxModelActionAddBoneAttributes : public ActionItem
 
 		void				DeleteThis();
 
-							ZE3dsMaxModelActionAddBoneAttributes();
+							ZE3dsMaxInteriorActionAddDoorAttributes();
 };
 
-class ZE3dsMaxModelActionAddPhysicalBodyAttributes : public ActionItem
-{
-	private:
-
-		MaxBmpFileIcon*		PhysicalBodyActionIcon;
-
-	public:
-		int					GetId();
-		BOOL				ExecuteAction();
-
-		void				GetButtonText(MSTR& buttonText);
-		void				GetMenuText(MSTR& menuText);
-		void				GetDescriptionText(MSTR& descText);
-		void				GetCategoryText(MSTR& catText);
-
-		BOOL				IsChecked();
-		BOOL				IsItemVisible();
-		BOOL				IsEnabled();
-
-		MaxIcon*			GetIcon();
-
-		void				DeleteThis();
-
-							ZE3dsMaxModelActionAddPhysicalBodyAttributes();
-};
-
-class ZE3dsMaxModelActionAddBoundingBoxAttributes : public ActionItem
-{
-private:
-
-	MaxBmpFileIcon*		BoundingBoxActionIcon;
-
-public:
-	int					GetId();
-	BOOL				ExecuteAction();
-
-	void				GetButtonText(MSTR& buttonText);
-	void				GetMenuText(MSTR& menuText);
-	void				GetDescriptionText(MSTR& descText);
-	void				GetCategoryText(MSTR& catText);
-
-	BOOL				IsChecked();
-	BOOL				IsItemVisible();
-	BOOL				IsEnabled();
-
-	MaxIcon*			GetIcon();
-
-	void				DeleteThis();
-
-						ZE3dsMaxModelActionAddBoundingBoxAttributes();
-};
 
 #endif

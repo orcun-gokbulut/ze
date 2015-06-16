@@ -68,7 +68,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 
 __declspec( dllexport ) const TCHAR* LibDescription()
 {
-	return "Zinek Engine 3ds Max Plugin";
+	return L"Zinek Engine 3ds Max Plugin";
 }
 
 __declspec( dllexport ) ZEInt LibNumberClasses()
@@ -98,7 +98,7 @@ __declspec( dllexport ) ULONG LibVersion()
 
 __declspec( dllexport ) ZEInt LibInitialize(void)
 {	
-	ZEDirectoryInfo IconsDirectory = ZEDirectoryInfo(IPathConfigMgr::GetPathConfigMgr()->GetDir(APP_USER_ICONS_DIR));
+	ZEDirectoryInfo IconsDirectory = ZEDirectoryInfo(ZEString(IPathConfigMgr::GetPathConfigMgr()->GetDir(APP_USER_ICONS_DIR)));
 
 	ZEToolbarIcons_16a_bmp IconImage16a;
 	ZEToolbarIcons_16i_bmp IconImage16i;

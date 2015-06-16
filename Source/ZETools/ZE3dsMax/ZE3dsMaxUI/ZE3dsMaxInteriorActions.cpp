@@ -34,40 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxInteriorActions.h"
-#include <maxscrpt/maxscrpt.h>
+#include <maxscript/maxscript.h>
 #include "ZE3dsMaxInteriorScriptRoom.ms.h"
 #include "ZE3dsMaxInteriorScriptDoor.ms.h"
+#include "ZEDS/ZEString.h"
 #include <Commctrl.h>
 
 int ZE3dsMaxInteriorActionAddRoomAttributes::GetId()
 {
-	return ZEInteriorRoomAttributesAdd_Action_ID;
+	return ZEInteriorRoomAttributesAdd_Action_ID.PartA();
 }
 
 BOOL ZE3dsMaxInteriorActionAddRoomAttributes::ExecuteAction()
 {
 	ZE3dsMaxInteriorScriptRoom_ms RoomScript;
-	return ExecuteMAXScriptScript((char*)RoomScript.GetData());
+	return ExecuteMAXScriptScript(ZEString((const char*)RoomScript.GetData()).ToWCString());
 }
 
 void ZE3dsMaxInteriorActionAddRoomAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = "Add ZEInterior Room Attributes";
+	buttonText = L"Add ZEInterior Room Attributes";
 }
 
 void ZE3dsMaxInteriorActionAddRoomAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = "Add ZEInterior Room Attributes";
+	menuText = L"Add ZEInterior Room Attributes";
 }
 
 void ZE3dsMaxInteriorActionAddRoomAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = "Add ZEInterior Room Attributes";
+	descText = L"Add ZEInterior Room Attributes";
 }
 
 void ZE3dsMaxInteriorActionAddRoomAttributes::GetCategoryText(MSTR& catText)
 {
-	catText = "Zinek Engine";
+	catText = L"Zinek Engine";
 }
 
 BOOL ZE3dsMaxInteriorActionAddRoomAttributes::IsChecked()
@@ -88,14 +89,15 @@ BOOL ZE3dsMaxInteriorActionAddRoomAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxInteriorActionAddRoomAttributes::GetIcon()
 {
 	if (RoomActionIcon == NULL)
-		RoomActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 4);
+		RoomActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 4);
 
 	return RoomActionIcon;
 }
 
 void ZE3dsMaxInteriorActionAddRoomAttributes::DeleteThis()
 {
-	delete RoomActionIcon;
+	//delete RoomActionIcon;
+	delete this;
 }
 
 ZE3dsMaxInteriorActionAddRoomAttributes::ZE3dsMaxInteriorActionAddRoomAttributes()
@@ -105,33 +107,33 @@ ZE3dsMaxInteriorActionAddRoomAttributes::ZE3dsMaxInteriorActionAddRoomAttributes
 
 int ZE3dsMaxInteriorActionAddDoorAttributes::GetId()
 {
-	return ZEInteriorDoorAttributesAdd_Action_ID;
+	return ZEInteriorDoorAttributesAdd_Action_ID.PartA();
 }
 
 BOOL ZE3dsMaxInteriorActionAddDoorAttributes::ExecuteAction()
 {
 	ZE3dsMaxInteriorScriptDoor_ms DoorScript;
-	return ExecuteMAXScriptScript((char*)DoorScript.GetData());
+	return ExecuteMAXScriptScript(ZEString((const char*)DoorScript.GetData()).ToWCString());
 }
 
 void ZE3dsMaxInteriorActionAddDoorAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = "Add ZEInterior Door Attributes";
+	buttonText = L"Add ZEInterior Door Attributes";
 }
 
 void ZE3dsMaxInteriorActionAddDoorAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = "Add ZEInterior Door Attributes";
+	menuText = L"Add ZEInterior Door Attributes";
 }
 
 void ZE3dsMaxInteriorActionAddDoorAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = "Add ZEInterior Door Attributes";
+	descText = L"Add ZEInterior Door Attributes";
 }
 
 void ZE3dsMaxInteriorActionAddDoorAttributes::GetCategoryText(MSTR& catText)
 {
-	catText = "Zinek Engine";
+	catText = L"Zinek Engine";
 }
 
 BOOL ZE3dsMaxInteriorActionAddDoorAttributes::IsChecked()
@@ -152,14 +154,15 @@ BOOL ZE3dsMaxInteriorActionAddDoorAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxInteriorActionAddDoorAttributes::GetIcon()
 {
 	if (DoorActionIcon == NULL)
-		DoorActionIcon = new MaxBmpFileIcon("ZEToolbarIcons", 5);
+		DoorActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 5);
 
 	return DoorActionIcon;
 }
 
 void ZE3dsMaxInteriorActionAddDoorAttributes::DeleteThis()
 {
-	delete DoorActionIcon;
+	//delete DoorActionIcon;
+	delete this;
 }
 
 ZE3dsMaxInteriorActionAddDoorAttributes::ZE3dsMaxInteriorActionAddDoorAttributes()

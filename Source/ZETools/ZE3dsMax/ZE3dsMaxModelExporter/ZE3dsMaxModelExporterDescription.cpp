@@ -35,9 +35,7 @@
 
 #include "ZE3dsMaxModelExporterDescription.h"
 #include "ZE3dsMaxModelExporter.h"
-#include "ZE3dsMaxModelActions.h"
-//#include "BasicMaxScript.h"
-#include <maxscrpt\maxscrpt.h>
+#include <maxscript\maxscript.h>
 
 #define ZE3dsModelExporter_CLASS_ID	Class_ID(0x9129e3a6, 0xa6fe6398)
 
@@ -53,7 +51,7 @@ void* ZE3dsMaxModelExporterDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxModelExporterDescription::ClassName()
 { 
-	return "ZE3dsMaxModelExporter"; 
+	return L"ZE3dsMaxModelExporter"; 
 }
 
 SClass_ID ZE3dsMaxModelExporterDescription::SuperClassID()
@@ -68,36 +66,22 @@ Class_ID ZE3dsMaxModelExporterDescription::ClassID()
 
 const TCHAR* ZE3dsMaxModelExporterDescription::Category()
 {
-	return "Exporter"; 
+	return L"Exporter"; 
 }
 
 const TCHAR* ZE3dsMaxModelExporterDescription::InternalName()
 { 
-	return "ZEModel Exporter"; 
+	return L"ZEModel Exporter"; 
 }
 
 int ZE3dsMaxModelExporterDescription::NumActionTables()
 {
-	return 1;
+	return 0;
 }
 
 ActionTable* ZE3dsMaxModelExporterDescription::GetActionTable(int i)
 {
-	ActionTable* MainActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionMainUI);
-
-	ZE3dsMaxModelActionAddMeshAttributes* AddZEModelMeshAttributesAction = new ZE3dsMaxModelActionAddMeshAttributes();
-	MainActionTable->AppendOperation(AddZEModelMeshAttributesAction);
-
-	ZE3dsMaxModelActionAddBoneAttributes* AddZEModelBoneAttributesAction = new ZE3dsMaxModelActionAddBoneAttributes();
-	MainActionTable->AppendOperation(AddZEModelBoneAttributesAction);
-
-	ZE3dsMaxModelActionAddPhysicalBodyAttributes* AddZEModelPhysicalBodyAttributesAction = new ZE3dsMaxModelActionAddPhysicalBodyAttributes();
-	MainActionTable->AppendOperation(AddZEModelPhysicalBodyAttributesAction);
-
-	ZE3dsMaxModelActionAddBoundingBoxAttributes* AddZEModelBoundingBoxAttributesAction = new ZE3dsMaxModelActionAddBoundingBoxAttributes();
-	MainActionTable->AppendOperation(AddZEModelBoundingBoxAttributesAction);
-
-	return MainActionTable;
+	return NULL;
 }
 
 HINSTANCE ZE3dsMaxModelExporterDescription::HInstance()
