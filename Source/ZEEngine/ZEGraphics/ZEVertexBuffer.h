@@ -33,64 +33,72 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef	__ZE_VERTEX_BUFFER_H__
 #define __ZE_VERTEX_BUFFER_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEVertexLayout.h"
+#include "ZEGraphicsDefinitions.h"
+#include "ZEGraphicsResource.h"
 
-class ZEVertexBuffer
+struct ZEVertexBufferElement
 {
-	public:
-		virtual bool						IsStatic() = 0;
-		virtual ZESize						GetBufferSize() = 0;
+	char					Semantic[ZE_MAX_SHADER_VARIABLE_NAME];
+	ZEUInt8					Index;
+	ZEVertexElementType		Type;
+	ZEUInt16				Offset;
+	ZEVertexUsage			Usage;
+	ZEUInt16				InstanceCount;
 
-											ZEVertexBuffer();
-		virtual								~ZEVertexBuffer();
+	static ZESize			GetHash(const char* Semantic, ZEUInt8 Index);
 };
 
-class ZEStaticVertexBuffer : public ZEVertexBuffer
+class ZEVertexBuffer : public ZEGraphicsResource
 {
+	friend class ZEVertexLayout;
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
 	protected:
-											ZEStaticVertexBuffer();
-		virtual								~ZEStaticVertexBuffer();
+		static ZESize					TotalSize;
+		static ZEUInt16					TotalCount;
+
+		ZEShadowCopy					ShadowCopy;
+
+		ZESize							BufferSize;
+		ZESize							VertexSize;
+		ZEUInt							VertexCount;
+
+		ZESize							ElementCount;
+		ZESize							Hashes[ZE_MAX_VERTEX_LAYOUT_ELEMENT];
+		ZEVertexBufferElement			Elements[ZE_MAX_VERTEX_LAYOUT_ELEMENT];
+
+		virtual bool					UpdateWith(ZEUInt ShadowIndex);
+
+										ZEVertexBuffer();
+		virtual							~ZEVertexBuffer();
 
 	public:
-		virtual bool						IsStatic();
+		ZEGraphicsResourceType			GetResourceType() const;
 
-		virtual bool						Create(ZESize BufferSize) = 0;
-		virtual void*						Lock() = 0;
-		virtual void						Unlock() = 0;
-		virtual void						Release() = 0;
+		ZEUInt							GetVertexCount() const;
+		ZESize							GetBufferSize() const;
+		ZESize							GetVertexSize() const;
+		
+		const ZEVertexBufferElement*	GetElements() const;
+		ZESize							GetElementCount() const;
+		
+		void							ClearElements();
+		void							RegisterElements(const ZEVertexBufferElement* Elements, ZESize Count);
 
-		virtual void						Destroy();
-
-		static ZEStaticVertexBuffer*		CreateInstance();
-};
-
-class ZEDynamicVertexBuffer : public ZEVertexBuffer
-{
-	public:
-		virtual bool						IsStatic();
-
-		virtual ZESize						GetBufferSize() = 0;
-		virtual void*						GetVertexBuffer() = 0;
-};
-
-template<typename _VertexType, typename _Allocator = ZESmartAllocator<_VertexType> >
-class ZEArrayVertexBuffer : public ZEDynamicVertexBuffer, public ZEArray<_VertexType, _Allocator>
-{
-	public:
-		virtual ZESize GetBufferSize()
-		{
-			return GetCount() * sizeof(_VertexType);
-		}
-
-		virtual void* GetVertexBuffer()
-		{
-			return GetCArray();
-		}
+		virtual void					Unlock();
+		virtual bool					Lock(void** Data);
+		
+		virtual bool					CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData = NULL);
+		virtual bool					CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
+		
+		static ZEVertexBuffer*			CreateInstance();
 };
 
 #endif

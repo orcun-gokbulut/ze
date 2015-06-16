@@ -40,7 +40,6 @@
 #include "ZETextureTools.h"
 #include "ZEGraphics/ZETexture2D.h"
 #include "ZETexture2DResource.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
 #include "ZEMath/ZEMath.h"
@@ -194,11 +193,11 @@ void ZETextureTools::DownSample2x(void* DestinationData, const ZESize Destinatio
 
 	if (UseGpu)
 	{
-		static ZED3D9TextureResizer Resizer;
+/*		static ZED3D9TextureResizer Resizer;
 
 		Resizer.Initialize(DestinationData, DestinationPitch, DestinationWidth, DestinationHeight, SourceData, SourcePitch, SourceWidth, SourceHeight);
 		Resizer.Process();
-		Resizer.Deinitialize();
+		Resizer.Deinitialize();*/
 
 	}
 	else

@@ -36,9 +36,26 @@
 #include "ZETexture.h"
 #include "ZEGraphicsModule.h"
 
+bool ZETexture::GetIsRenderTarget() const
+{
+	return IsRenderTarget;
+}
+
+ZETextureType ZETexture::GetTextureType() const
+{
+	return TextureType;
+}
+
+ZETexturePixelFormat ZETexture::GetPixelFormat() const
+{
+	return PixelFormat;
+}
+
 ZETexture::ZETexture()
 {
-
+	IsRenderTarget = false;
+	TextureType = ZE_TT_NONE;
+	PixelFormat = ZE_TPF_NOTSET;
 }
 
 ZETexture::~ZETexture()

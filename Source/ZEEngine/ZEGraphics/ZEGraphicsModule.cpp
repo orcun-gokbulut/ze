@@ -33,39 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphicsModule.h"
-#include "ZECore/ZEOptionManager.h"
-#include "ZECore/ZEOption.h"
+#include "ZEShader.h"
+#include "ZEStatePool.h"
+#include "ZETexture2D.h"
+#include "ZETexture3D.h"
 #include "ZECore/ZECore.h"
-#include "ZETexture/ZETexture2DResource.h"
+#include "ZEIndexBuffer.h"
+#include "ZETextureCube.h"
+#include "ZERenderTarget.h"
+#include "ZEVertexBuffer.h"
+#include "ZECore/ZEOption.h"
+#include "ZEGraphicsModule.h"
+#include "ZEConstantBuffer.h"
+#include "ZEGraphicsWindow.h"
+#include "ZEDepthStencilBuffer.h"
+#include "ZECore/ZEOptionManager.h"
 
-#include <freeimage.h>
+#include <FreeImage.h>
 
 ZEOptionSection ZEGraphicsModule::GraphicsOptions;
 
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGraphicsModule, ZEModule, &ZEGraphicsModule::GraphicsOptions)
 
+void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
+{
+	zeLog("%s", Message);
+}
+
+void ZEGraphicsModule::BaseInitialize()
+{
+	FreeImage_Initialise();
+	FreeImage_SetOutputMessage(FreeImageOutput);
+
+	GraphicsOptions.SetName("Graphics");
+	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("FullScreen", false, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("VerticalSync", false, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("SampleCount", 1, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 1, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("TextureQuality", ZE_TQ_HIGH, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
+	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
+	// ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
+}
+
+void ZEGraphicsModule::BaseDeinitialize()
+{
+	FreeImage_DeInitialise();
+
+	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
+}
+
 ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 {
-	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE,		ZE_TCQ_HIGH,    ZE_TDS_NONE,	ZE_TFC_DISABLED,	ZE_TMM_ENABLED,		25};
-	static ZETextureOptions High		= {ZE_TCT_NONE,		ZE_TCQ_HIGH,	ZE_TDS_NONE,	ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
+	static ZETextureOptions VeryHigh	= {ZE_TCT_NONE,		ZE_TCQ_HIGH,    ZE_TDS_NONE,	ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
+	static ZETextureOptions High		= {ZE_TCT_DXT5,		ZE_TCQ_HIGH,	ZE_TDS_NONE,	ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
 	static ZETextureOptions Normal		= {ZE_TCT_NONE,		ZE_TCQ_NORMAL,	ZE_TDS_2X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
-	static ZETextureOptions Low			= {ZE_TCT_NONE,		ZE_TCQ_NORMAL,	ZE_TDS_2X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
-	static ZETextureOptions VeryLow		= {ZE_TCT_NONE,		ZE_TCQ_LOW,		ZE_TDS_4X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
-	static ZETextureOptions UltraLow	= {ZE_TCT_NONE,		ZE_TCQ_LOW,		ZE_TDS_8X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
+	static ZETextureOptions Low			= {ZE_TCT_DXT5,		ZE_TCQ_NORMAL,	ZE_TDS_2X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
+	static ZETextureOptions VeryLow		= {ZE_TCT_DXT5,		ZE_TCQ_LOW,		ZE_TDS_4X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
+	static ZETextureOptions UltraLow	= {ZE_TCT_DXT5,		ZE_TCQ_LOW,		ZE_TDS_8X,		ZE_TFC_ENABLED,		ZE_TMM_ENABLED,		25};
 
 	switch(TextureQuality)
 	{
-		
 		case ZE_TQ_VERY_HIGH:
 			return &VeryHigh;
 			break;
-		
-		default:
+
 		case ZE_TQ_HIGH:
 			return &High;
 			break;
-		
+
+		default:
 		case ZE_TQ_NORMAL:
 			return &Normal;
 			break;
@@ -84,185 +127,125 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	}
 }
 
-ZESize ZEGraphicsModule::GetCurrentFrameId()
+ZEGraphicsWindow* ZEGraphicsModule::GetWindow(ZEUInt WindowId) const
 {
-	return CurrentFrameId;
+	ZESize Count = Windows.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (Windows[I]->GetId() == WindowId)
+		{
+			return Windows[I];
+		}
+	}
+	return NULL;
 }
 
-void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
+const ZEArray<ZEGraphicsWindow*>& ZEGraphicsModule::GetWindows() const
 {
-	zeLog("%s", Message);
+	return Windows;
 }
 
-void ZEGraphicsModule::BaseInitialize()
+const ZEGraphicsMonitor* ZEGraphicsModule::GetMonitor(ZEUInt MonitorId) const
 {
-	FreeImage_Initialise();
-	FreeImage_SetOutputMessage(FreeImageOutput);
-	GraphicsOptions.SetName("Graphics");
-	GraphicsOptions.AddOption(new ZEOption("ScreenWidth", 640, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ScreenHeight", 480, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("Fullscreen", false, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("VerticalSync", false, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("Antialiasing", 0, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilter", 0, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("AnisotropicFilterLevel", 8, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ShaderQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("TextureQuality", ZE_TQ_HIGH, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ModelQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("PostEffectQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	GraphicsOptions.AddOption(new ZEOption("NearZ", 0.5f, ZE_OA_INTERNAL));
-	GraphicsOptions.AddOption(new ZEOption("FarZ", 11000.0f, ZE_OA_INTERNAL));
-	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
+	ZESize Count = Monitors.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (Monitors[I]->GetId() == MonitorId)
+		{
+			return Monitors[I];
+		}
+	}
+	return NULL;
 }
 
-void ZEGraphicsModule::BaseDeinitialize()
+const ZEArray<ZEGraphicsMonitor*>& ZEGraphicsModule::GetMonitors() const
 {
-	FreeImage_DeInitialise();
-	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
+	return Monitors;
 }
 
-void ZEGraphicsModule::SetScreenSize(ZEInt Width, ZEInt Height)
+ZEGraphicsDevice* ZEGraphicsModule::GetDevice(ZESize Index) const
 {
-	ScreenWidth = Width;
-	ScreenHeight = Height;
+	zeDebugCheck(Index >= Devices.GetCount(), "Index out of range");
+	return Devices[Index];
 }
 
-void ZEGraphicsModule::GetScreenSize(ZEInt& Width, ZEInt& Height)
+const ZEArray<ZEGraphicsDevice*>& ZEGraphicsModule::GetDevices() const
 {
-	Width = ScreenWidth;
-	Height = ScreenHeight;
+	return Devices;
 }
 
-ZEInt ZEGraphicsModule::GetScreenWidth()
+void ZEGraphicsModule::GetStatistics(ZEGraphicsStatistics& Statistics) const
 {
-	return ScreenWidth;
-}
+	Statistics.BlendStateCount = ZEStatePool::BlendStateCount;
+	Statistics.SamplerStateCount = ZEStatePool::SamplerStateCount;
+	Statistics.DepthStencilCount = ZEStatePool::DepthStencilStateCount;
+	Statistics.RasterizerCount = ZEStatePool::RasterizerStateCount;
+	Statistics.VertexLayoutCount = ZEStatePool::VertexLayoutCount;
 
-ZEInt ZEGraphicsModule::GetScreenHeight()
-{
-	return ScreenHeight;
-}
+	Statistics.ShaderCount = ZEShader::TotalCount;
+	Statistics.ShaderSize = ZEShader::TotalSize;
 
-float ZEGraphicsModule::GetAspectRatio()
-{
-	return (float)ScreenWidth / (float)ScreenHeight;
+	Statistics.Texture2DCount = ZETexture2D::TotalCount;
+	Statistics.Texture2DSize = ZETexture2D::TotalSize;
+	
+	Statistics.Texture3DCount = ZETexture3D::TotalCount;
+	Statistics.Texture3DSize = ZETexture3D::TotalSize;
+	
+	Statistics.TextureCubeCount	= ZETextureCube::TotalCount;
+	Statistics.TextureCubeSize = ZETextureCube::TotalSize;
+	
+	Statistics.DepthStancilBufferCount = ZEDepthStencilBuffer::TotalCount;
+	Statistics.DepthStancilBufferSize = ZEDepthStencilBuffer::TotalSize;
+	
+	Statistics.IndexBufferCount	= ZEIndexBuffer::TotalCount;
+	Statistics.IndexBufferSize = ZEIndexBuffer::TotalSize;
+	
+	Statistics.VertexBufferCount = ZEVertexBuffer::TotalCount;
+	Statistics.VertexBufferSize	= ZEVertexBuffer::TotalSize;
+	
+	Statistics.ConstantBufferCount = ZEConstantBuffer::TotalCount;
+	Statistics.ConstantBufferSize = ZEConstantBuffer::TotalSize;	
+	
+	Statistics.RenderTargetCount = ZERenderTarget::TotalCount;	
 }
-
-void ZEGraphicsModule::SetNearZ(float NearZ)
-{
-	this->NearZ = NearZ;
-}
-
-float ZEGraphicsModule::GetNearZ()
-{
-	return NearZ;
-}
-
-void ZEGraphicsModule::SetFarZ(float FarZ)
-{
-	this->FarZ = FarZ;
-}
-
-float ZEGraphicsModule::GetFarZ()
-{
-	return FarZ;
-}
-
-void ZEGraphicsModule::SetVerticalSync(bool Enabled)
-{
-	VerticalSync = Enabled;
-}
-
-bool ZEGraphicsModule::GetVerticalSync()
-{
-	return VerticalSync;
-}
-
-void ZEGraphicsModule::SetShaderQuality(ZEInt Quality)
-{
-	ShaderQuality = Quality;
-}
-
-ZEInt ZEGraphicsModule::GetShaderQuality()
-{
-	return ShaderQuality;
-}
-
-void ZEGraphicsModule::SetTextureQuality(ZETextureQuality Quality)
-{
-	TextureQuality = Quality;
-}
-
-ZETextureQuality ZEGraphicsModule::GetTextureQuality()
-{
-	return TextureQuality;
-}
-
-void ZEGraphicsModule::SetModelQuality(ZEInt Quality)
-{
-	ModelQuality = Quality;
-}
-
-ZEInt ZEGraphicsModule::GetModelQuality()
-{
-	return ModelQuality;
-}
-
-void ZEGraphicsModule::SetShadowQuality(ZEInt Quality)
-{
-	ShadowQuality = Quality;
-}
-
-ZEInt ZEGraphicsModule::GetShadowQuality()
-{
-	return ShadowQuality;
-}
-
-void ZEGraphicsModule::SetPostEffectQuality(ZEInt Quality)
-{
-	PostEffectQuality = Quality;
-}
-
-ZEInt ZEGraphicsModule::GetPostEffectQuality()
-{
-	return PostEffectQuality;
-}
-
-void ZEGraphicsModule::SetHDRQuality(ZEInt Quality)
-{
-	HDRQuality = Quality;
-}
-
-ZEInt ZEGraphicsModule::GetHDRQuality()
-{
-	return HDRQuality;
-}
-
-void ZEGraphicsModule::SetAntiAliasing(ZEInt Level)
-{
-	AntiAliasing = Level;
-}
-
-ZEInt ZEGraphicsModule::GetAntiAliasing()
-{
-	return AntiAliasing;
-}
-
-void ZEGraphicsModule::SetAnisotropicFilter(ZEUInt Level)
-{
-	AnisotropicFilter = Level;
-}
-
-ZEUInt ZEGraphicsModule::GetAnisotropicFilter()
-{
-	return AnisotropicFilter;
-}
-
 
 ZEGraphicsModule* ZEGraphicsModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetGraphicsModule();
+}
+
+bool ZEGraphicsModule::InitializeSelf()
+{
+	if (!ZEModule::InitializeSelf())
+		return false;
+
+	ZEGraphicsWindow* MainWindow = ZEGraphicsWindow::CreateInstance();
+	MainWindow->Initialize();
+
+	return true;
+}
+
+bool ZEGraphicsModule::DeinitializeSelf()
+{
+	Devices.Clear();
+	Monitors.Clear(false);
+
+	ZESize WindowCount = Windows.GetCount();
+	for (ZESize I = 0; I < WindowCount; ++I)
+	{
+		ZE_DESTROY(Windows[I]);
+	}
+	Windows.Clear(false);
+
+	return ZEModule::Deinitialize();
+}
+
+ZEGraphicsModule::ZEGraphicsModule()
+{
+	TextureQuality = ZE_TQ_HIGH;
+}
+
+ZEGraphicsModule::~ZEGraphicsModule()
+{
+
 }

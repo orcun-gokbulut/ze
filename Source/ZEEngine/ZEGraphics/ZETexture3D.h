@@ -33,39 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_TEXTURE_3D_H__
 #define __ZE_TEXTURE_3D_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
 
+class ZERenderTarget;
+class ZETextureData;
+
 class ZETexture3D : public ZETexture
 {
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+
 	protected:
+		static ZEUInt16				TotalCount;
+		static ZESize				TotalSize;
+
+		ZEShadowCopy				ShadowCopy;
+
+		ZESize						Size;
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
 		ZEUInt						LevelCount;
-		ZETexturePixelFormat		PixelFormat;
+		ZEVector3					PixelSize;
+
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
 
 									ZETexture3D();
 		virtual						~ZETexture3D();
 
 	public:
-		virtual ZETextureType		GetTextureType() const;
+		ZEGraphicsResourceType		GetResourceType() const;
 
+		ZESize						GetSize() const;
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetDepth() const;
 		ZEUInt						GetLevelCount() const;
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
+		const ZEVector3&			GetPixelSize() const;
 
-		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat) = 0;
-		virtual void				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level) = 0;
-		virtual void				Unlock(ZEUInt Level) = 0;
-
+		virtual bool				Unlock();
+		virtual bool				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch);
+		
+		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
+		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
+		
+		virtual ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		
 		static ZETexture3D*			CreateInstance();
 };
 

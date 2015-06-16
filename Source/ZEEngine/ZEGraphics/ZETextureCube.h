@@ -33,14 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_TEXTURE_CUBE_H__
 #define __ZE_TEXTURE_CUBE_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
-
-class ZEViewPort;
 
 enum ZETextureCubeFace
 {
@@ -52,32 +49,47 @@ enum ZETextureCubeFace
 	ZE_CTF_NEGATIVEZ	= 5
 };
 
+class ZETextureData;
+class ZERenderTarget;
+
 class ZETextureCube : public ZETexture
 {
-	ZE_OBJECT
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
 
 	protected:
+		static ZEUInt16				TotalCount;
+		static ZESize				TotalSize;
+
+		ZEShadowCopy				ShadowCopy;
+
+		ZESize						Size;
 		ZEUInt						EdgeLength;
 		ZEUInt						LevelCount;
-		ZETexturePixelFormat		PixelFormat;
-		bool						RenderTarget;
+		ZEVector2					PixelSize;
+
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
 
 									ZETextureCube();
 		virtual						~ZETextureCube();
 
 	public:
-		virtual ZETextureType		GetTextureType() const;
-		ZEUInt						GetLevelCount() const;
+		ZEGraphicsResourceType		GetResourceType() const;
+
+		ZESize						GetSize() const;
 		ZEUInt						GetEdgeLenght() const;
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
+		ZEUInt						GetLevelCount() const;
+		const ZEVector2&			GetPixelSize() const;
 
-		virtual ZEViewPort*			GetViewPort(ZETextureCubeFace Face) = 0;
-
-		virtual	bool				Create(ZEUInt EdgeLength, ZEUInt Levels, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual bool				Lock(ZETextureCubeFace Face, ZEUInt Level, void** Buffer, ZESize* Pitch) = 0;
-		virtual void				Unlock(ZETextureCubeFace Face, ZEUInt Level) = 0;
+		virtual bool				Unlock(ZETextureCubeFace Face);
+		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face);
+		
+		virtual	bool				CreateDynamic(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, ZETextureData* InitialData = NULL);
+		virtual	bool				CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = NULL);
+		
+		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
 
 		static ZETextureCube*		CreateInstance();
 };
+
 #endif
