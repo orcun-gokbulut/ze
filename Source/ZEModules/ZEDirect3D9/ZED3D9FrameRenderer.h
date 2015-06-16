@@ -51,7 +51,7 @@
 #include "ZED3D9BlurMaskProcessor.h"
 #include "ZED3D9ZoomBlurProcessor.h"
 #include "ZED3D9TextureMaskProcessor.h"
-#include "ZEGraphics/ZEFrameRenderer.h"
+#include "ZERenderer/ZEFrameRenderer.h"
 #include "ZED3D9ColorTransformProcessor.h"
 #include "ZED3D9UnsharpenFilterProcessor.h"
 #include "ZED3D9AerialPerspectiveProcessor.h"

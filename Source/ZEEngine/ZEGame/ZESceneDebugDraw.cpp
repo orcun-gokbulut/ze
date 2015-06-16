@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESceneDebugDraw.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEBSphere.h"

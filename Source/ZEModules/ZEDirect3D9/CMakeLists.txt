@@ -48,8 +48,6 @@ if(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE)
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D9_DEBUG_SHADERS)
 endif()
 
-add_subdirectory (ZED3D9PostProcessor)
-
 ze_add_source(ZED3D9PixelWorldPositionProcessor.cpp		Sources)
 ze_add_source(ZED3D9PixelWorldPositionProcessor.h		Sources)
 ze_add_source(ZED3D9BlurMaskProcessor.cpp				Sources)

@@ -36,7 +36,7 @@
 #include "ZEParticleModifier.h"
 #include "ZEParticleEmitter.h"
 #include "ZEParticleEffect.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZERenderer\ZEFixedMaterial.h"
 #include "ZERandom.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEMath\ZEMath.h"

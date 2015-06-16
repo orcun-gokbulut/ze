@@ -35,11 +35,11 @@
 
 #include "ZESkyBrush.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZEGraphics/ZESkyBoxMaterial.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZERenderer/ZESkyBoxMaterial.h"
+#include "ZERenderer/ZEDirectionalLight.h"
 #include "ZETexture/ZETextureCubeResource.h"
 
 #include <string.h>

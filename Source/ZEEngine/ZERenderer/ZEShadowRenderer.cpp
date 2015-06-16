@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPFilter2DNode.h
+ Zinek Engine - ZEShadowRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEPostProcessorNode.h"
-#include "ZEMath/ZEVector.h"
+#include "ZEShadowRenderer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
-class ZETexture2D;
-
-struct ZEKernel2DElement
+ZERendererType ZEShadowRenderer::GetRendererType()
 {
-	float										SampleMultiplier;
-	ZEVector2									SampleLocation;
-	float										Reserved;
-};
+	return ZE_RT_SHADOW;
+}
 
-class ZEPPFilter2DNode : public ZEPostProcessorNode
+ZEShadowRenderer* ZEShadowRenderer::CreateInstance()
 {
-	protected:		
-		ZEPostProcessorNode*					Input;
-		ZETexture2D*							Internal;
-		ZETexture2D*							Output;
+	return zeGraphics->CreateShadowRenderer();
+}
 
-		ZEArray<ZEKernel2DElement>				Kernel;
-	
-												ZEPPFilter2DNode();
-		virtual									~ZEPPFilter2DNode();
+ZEShadowRenderer::ZEShadowRenderer()
+{
 
-	public:	
-		virtual ZESize							GetDependencyCount();
-		virtual ZEPostProcessorNode**			GetDependencies();
+}
 
-		void									SetKernelElements(const ZEArray<ZEKernel2DElement>& Values);
-		const ZEArray<ZEKernel2DElement>&		GetKernelElements();
+ZEShadowRenderer::~ZEShadowRenderer()
+{
 
-		virtual void							SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*			GetInput();
-
-		virtual ZETexture2D*					GetOutput();
-};
-#endif
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPointLight.cpp
+ Zinek Engine - ZEOmniProjectiveLight.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPointLight.h"
-#include "ZETexture2D.h"
-#include "ZEShadowRenderer.h"
+#include "ZEOmniProjectiveLight.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEShadowRenderer.h"
+#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZETexture2D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
-ZELightType ZEPointLight::GetLightType()
+ZELightType ZEOmniProjectiveLight::GetLightType()
 {
-	return ZE_LT_POINT;
+	return ZE_LT_OMNIPROJECTIVE;
 }
 
-void ZEPointLight::SetCastShadows(bool NewValue)
+const ZETextureCube* ZEOmniProjectiveLight::GetProjectionTexture()
+{
+	return ProjectionTexture;
+}
+
+void ZEOmniProjectiveLight::SetProjectionTexture(const ZETextureCube* Texture)
+{
+	ProjectionTexture = Texture;
+}
+
+void ZEOmniProjectiveLight::SetCastsShadow(bool NewValue)
 {
 	if (NewValue == false)
 	{
-		if (FrontShadowMap)
+		if (FrontShadowMap != NULL)
 		{
 			FrontShadowMap->Destroy();
 			FrontShadowMap = NULL;
 		}
 
-		if (BackShadowMap)
+		if (BackShadowMap != NULL)
 		{
 			BackShadowMap->Destroy();
 			BackShadowMap = NULL;
@@ -64,25 +75,15 @@ void ZEPointLight::SetCastShadows(bool NewValue)
 	ZELight::SetCastsShadow(NewValue);
 }
 
-ZETexture2D* ZEPointLight::GetFrontShadowMap()
+bool ZEOmniProjectiveLight::DeinitializeSelf()
 {
-	return FrontShadowMap;
-}
-
-ZETexture2D* ZEPointLight::GetBackShadowMap()
-{
-	return FrontShadowMap;
-}
-
-bool ZEPointLight::DeinitializeSelf()
-{
-	if (FrontShadowMap)
+	if (FrontShadowMap != NULL)
 	{
 		FrontShadowMap->Destroy();
 		FrontShadowMap = NULL;
 	}
 
-	if (BackShadowMap)
+	if (BackShadowMap != NULL)
 	{
 		BackShadowMap->Destroy();
 		BackShadowMap = NULL;
@@ -91,28 +92,38 @@ bool ZEPointLight::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
-ZESize ZEPointLight::GetViewCount()
+ZETexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
+{
+	return FrontShadowMap;
+}
+
+ZETexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
+{
+	return BackShadowMap;
+}
+
+ZESize ZEOmniProjectiveLight::GetViewCount()
 {
 	return 1;
 }
 
-const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index)
+const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
 		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
 		UpdateViewVolume = false;
 	}
-	
+
 	return ViewVolume;
 }
 
-const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
-{
+const ZEMatrix4x4& ZEOmniProjectiveLight::GetViewTransform(ZESize Index)
+{	
 	return ViewProjectionMatrix;
 }
 
-void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
+void ZEOmniProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass != ZE_RP_COLOR)
 		return;
@@ -123,22 +134,23 @@ void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
 
 	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
 		ZELight::Draw(DrawParameters);
-
 }
 
-ZEPointLight::ZEPointLight()
+ZEOmniProjectiveLight::ZEOmniProjectiveLight()
 {
+	ProjectionTexture = NULL;
+
 	FrontShadowMap = NULL;
 	BackShadowMap = NULL;
 	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 }
 
-ZEPointLight::~ZEPointLight()
+ZEOmniProjectiveLight::~ZEOmniProjectiveLight()
 {
 
 }
 
-ZEPointLight* ZEPointLight::CreateInstance()
+ZEOmniProjectiveLight* ZEOmniProjectiveLight::CreateInstance()
 {
-	return new ZEPointLight();
+	return new ZEOmniProjectiveLight();
 }

@@ -36,7 +36,8 @@
 #include "ZED3D9UIMaterial.h"
 #include "ZED3D9Texture2D.h"
 #include "ZED3D9CommonTools.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
+
 #include <D3D9.h>
 
 LPDIRECT3DVERTEXSHADER9 ZED3D9UIMaterial::VertexShader = NULL;

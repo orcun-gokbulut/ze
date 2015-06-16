@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESeaMaterial.h"
-#include "ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 ZEMaterialFlags ZESeaMaterial::GetMaterialFlags() const
 {

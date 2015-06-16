@@ -37,9 +37,9 @@
 #include "ZETRLayer.h"
 
 #include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZECamera.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEGraphics\ZETerrainMaterial.h"
+#include "ZERenderer\ZECamera.h"
+#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZETerrainMaterial.h"
 #include "ZEError.h"
 
 bool ZETRTerrain::InitializeSelf()

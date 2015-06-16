@@ -37,15 +37,15 @@
 #include "ZEInteriorRoom.h"
 #include "ZEInteriorResource.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZEGraphics/ZELight.h"
+#include "ZERenderer/ZELight.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEMath/ZEViewVolume.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
 void ZEInteriorRoom::DebugDraw(ZERenderer* Renderer)

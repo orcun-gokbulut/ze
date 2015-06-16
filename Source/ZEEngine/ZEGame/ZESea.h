@@ -38,7 +38,7 @@
 #define __ZE_SEA_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZESeaMaterial;
 class ZEVertexDeclaration;

@@ -38,9 +38,10 @@
 #define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 
 class ZEFixedMaterial;
 class ZETexture2DResource;

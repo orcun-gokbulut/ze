@@ -43,7 +43,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9HBAOProcessor.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 
 #define COLOR_RED	D3DCOLORWRITEENABLE_RED
 #define COLOR_ALL	D3DCOLORWRITEENABLE_RED | D3DCOLORWRITEENABLE_GREEN | D3DCOLORWRITEENABLE_BLUE | D3DCOLORWRITEENABLE_ALPHA

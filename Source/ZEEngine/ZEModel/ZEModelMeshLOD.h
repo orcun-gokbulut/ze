@@ -37,7 +37,7 @@
 #ifndef	__ZE_MODEL_MESH_LOD_H__
 #define __ZE_MODEL_MESH_LOD_H__
 
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 struct ZEDrawParameters;
 class ZEModel;

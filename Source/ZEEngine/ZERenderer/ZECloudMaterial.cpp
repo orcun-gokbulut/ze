@@ -34,15 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECloudMaterial.h"
-#include "ZEGraphicsModule.h"
-#include "ZECamera.h"
-#include "ZEGame\ZEScene.h"
+
 #include "ZEDS\ZEArray.h"
+#include "ZECamera.h"
 #include "ZETypes.h"
-#include "ZEMath\ZEAABBox.h"
-#include "ZEGame\ZEEntity.h"
-#include "ZETexture2D.h"
-#include "ZEMath\ZEMath.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEMath.h"
 
 
 ZECloudMaterial::ZECloudMaterial()

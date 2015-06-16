@@ -42,7 +42,7 @@
 #include "ZED3D9DOFProcessor.h"
 #include "ZED3D9BlurProcessor.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 #include <d3d9.h>

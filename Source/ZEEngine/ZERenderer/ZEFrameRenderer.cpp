@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPostProcessorNode.cpp
+ Zinek Engine - ZEFrameRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,66 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPostProcessorNode.h"
-#include "ZEDefinitions.h"
+#include "ZEFrameRenderer.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
-ZEPostProcessorNode::ZEPostProcessorNode()
+ZERendererType ZEFrameRenderer::GetRendererType()
 {
-	Owner = NULL;
-	State = ZE_PPNS_NOT_PROCESSED;
+	return ZE_RT_FRAME;
 }
 
-ZEPostProcessorNode::~ZEPostProcessorNode()
+ZEFrameRenderer* ZEFrameRenderer::CreateInstance()
 {
-
-}
-
-
-void  ZEPostProcessorNode::SetOwner(ZEPostProcessor* Owner)
-{
-	this->Owner = Owner;
-}
-
-ZEPostProcessor*  ZEPostProcessorNode::GetOwner()
-{
-	return Owner;
-}
-
-ZESize ZEPostProcessorNode::GetDependencyCount()
-{
-	return 0;
-}
-
-ZEPostProcessorNode** ZEPostProcessorNode::GetDependencies()
-{
-	return NULL;
-}
-
-void ZEPostProcessorNode::SetState(ZEPostProcessorNodeState State)
-{
-	this->State = State;
-}
-
-ZEPostProcessorNodeState ZEPostProcessorNode::GetState() const
-{
-	return State;
-}
-
-bool ZEPostProcessorNode::Initialize()
-{
-	return true;
-}
-
-void ZEPostProcessorNode::Deinitialize()
-{
-}
-
-void ZEPostProcessorNode::Destroy()
-{
-	delete this;
-}
-
-bool ZEPostProcessorNode::Process()
-{
-	return true;
+	return zeGraphics->CreateFrameRenderer();
 }

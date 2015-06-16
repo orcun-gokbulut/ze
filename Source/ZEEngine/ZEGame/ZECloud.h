@@ -38,8 +38,8 @@
 #define __ZE_CLOUD_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics\ZECanvas.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZERenderer\ZECanvas.h"
+#include "ZERenderer\ZERenderCommand.h"
 #include "ZETypes.h"
 #include "ZEMath\ZEAABBox.h"
 

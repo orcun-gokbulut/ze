@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUITextCursor.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZERenderer/ZEUIMaterial.h"
 
 ZEUITextCursor::ZEUITextCursor()
 {

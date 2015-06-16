@@ -37,8 +37,8 @@
 #include "ZEInteriorResource.h"
 #include "ZEInterior.h"
 #include "ZEInteriorRoom.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEGraphics\ZERenderer.h"
+#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZERenderer.h"
 
 void ZEInteriorDoor::DebugDraw(ZERenderer* Renderer)
 {

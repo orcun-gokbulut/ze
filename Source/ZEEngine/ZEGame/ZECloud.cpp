@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECloud.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZECloudMaterial.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZECloudMaterial.h"
 #include "ZEDrawParameters.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 void ZECloud::SetAmbientColor(ZEVector3 Color)

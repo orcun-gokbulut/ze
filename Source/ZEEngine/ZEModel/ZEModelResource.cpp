@@ -37,7 +37,7 @@
 #include "ZEModelResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFileInfo.h"

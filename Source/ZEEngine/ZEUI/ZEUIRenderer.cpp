@@ -36,9 +36,9 @@
 #include "ZEUIRenderer.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 
 ZEInt32 CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)

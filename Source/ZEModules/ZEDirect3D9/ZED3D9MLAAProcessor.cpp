@@ -42,7 +42,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9MLAAProcessor.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9MLAAProcessorAreaImage.h"
 #include "ZETexture/ZETexture2DResource.h"
 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPScreenOutputNode.cpp
+ Zinek Engine - ZEPointLight.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,112 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPPScreenOutputNode.h"
-#include "ZEDefinitions.h"
+#include "ZEPointLight.h"
+#include "ZEGraphics/ZETexture2D.h"
+#include "ZEShadowRenderer.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntityProvider.h"
 
-ZEPPScreenOutputNode::ZEPPScreenOutputNode()
+ZELightType ZEPointLight::GetLightType()
 {
-	Input = NULL;
+	return ZE_LT_POINT;
 }
 
-ZEPostProcessorNodeType ZEPPScreenOutputNode::GetNodeType()
+void ZEPointLight::SetCastShadows(bool NewValue)
 {
-	return ZE_PPNT_OUTPUT_NODE;
+	if (NewValue == false)
+	{
+		if (FrontShadowMap)
+		{
+			FrontShadowMap->Destroy();
+			FrontShadowMap = NULL;
+		}
+
+		if (BackShadowMap)
+		{
+			BackShadowMap->Destroy();
+			BackShadowMap = NULL;
+		}
+	}
+
+	ZELight::SetCastsShadow(NewValue);
 }
 
-ZESize ZEPPScreenOutputNode::GetDependencyCount()
+ZETexture2D* ZEPointLight::GetFrontShadowMap()
+{
+	return FrontShadowMap;
+}
+
+ZETexture2D* ZEPointLight::GetBackShadowMap()
+{
+	return FrontShadowMap;
+}
+
+bool ZEPointLight::DeinitializeSelf()
+{
+	if (FrontShadowMap)
+	{
+		FrontShadowMap->Destroy();
+		FrontShadowMap = NULL;
+	}
+
+	if (BackShadowMap)
+	{
+		BackShadowMap->Destroy();
+		BackShadowMap = NULL;
+	}
+
+	return ZELight::DeinitializeSelf();
+}
+
+ZESize ZEPointLight::GetViewCount()
 {
 	return 1;
 }
 
-ZEPostProcessorNode** ZEPPScreenOutputNode::GetDependencies()
+const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index)
 {
-	return &Input;
+	if (UpdateViewVolume)
+	{
+		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
+		UpdateViewVolume = false;
+	}
+	
+	return ViewVolume;
 }
 
-void ZEPPScreenOutputNode::SetInput(ZEPostProcessorNode* Node)
+const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
 {
-	Input = Node;
+	return ViewProjectionMatrix;
 }
 
-ZEPostProcessorNode* ZEPPScreenOutputNode::GetInput()
+void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
 {
-	return Input;
+	if (DrawParameters->Pass != ZE_RP_COLOR)
+		return;
+
+	ZEBSphere LightBoundingSphere;
+	LightBoundingSphere.Position = GetWorldPosition();
+	LightBoundingSphere.Radius = GetRange();
+
+	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
+		ZELight::Draw(DrawParameters);
+
+}
+
+ZEPointLight::ZEPointLight()
+{
+	FrontShadowMap = NULL;
+	BackShadowMap = NULL;
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
+}
+
+ZEPointLight::~ZEPointLight()
+{
+
+}
+
+ZEPointLight* ZEPointLight::CreateInstance()
+{
+	return new ZEPointLight();
 }

@@ -40,7 +40,7 @@
 #include "ZED3D9CommonTools.h"
 #include "ZED3D9FrameRenderer.h"
 #include "ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZED3D9ChannelDisorientationProcessor.h"
 

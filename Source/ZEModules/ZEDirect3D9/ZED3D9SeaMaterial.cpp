@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED3D9SeaMaterial.h"
-#include "ZEGraphics/ZEFrameRenderer.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZEFrameRenderer.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZED3D9Shader.h"
 #include "ZED3D9CommonTools.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZED3D9Texture2D.h"
 
 

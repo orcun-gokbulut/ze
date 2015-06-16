@@ -41,7 +41,7 @@
 
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 

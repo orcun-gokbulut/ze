@@ -48,7 +48,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZEMaterial;
 class ZEPhysicalObject;

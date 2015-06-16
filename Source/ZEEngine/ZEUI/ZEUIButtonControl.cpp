@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIButtonControl.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
-#include "zeui/ZEUIRenderer.h"
+#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZEUI/ZEUIRenderer.h"
 #include "ZEUILabel.h"
 #include "ZEFontResourceDynamic.h"
 

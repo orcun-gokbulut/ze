@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPPBlurNode.h
+ Zinek Engine - ZEMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,84 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_POST_EFFECTS_H__
-#define __ZE_POST_EFFECTS_H__
+#include "ZEMaterial.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEPostProcessorNode.h"
-class ZETexture2D;
+#include "ZECore/ZECore.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
-class ZEPPBlurNode : public ZEPostProcessorNode
+ZEMaterial::ZEMaterial()
 {
-	protected:		
-		ZEPostProcessorNode*				Input;
-	
-		float								StandartDeviation;	
-		ZEUInt								PassCount;
-		ZEUInt								DownSample;
+	LightningEnabled = true;
+	ShadowCaster = true;
+	ShadowReceiver = true;
+}
 
-		bool								HorizontalPass;
-		bool								VerticalPass;
+ZEMaterial::~ZEMaterial()
+{
 
-		float								Kernel[7];
-		bool								KernelDirtyFlag;
+}
 
-		void								UpdateKernel();
+void ZEMaterial::SetShadowCaster(bool Value)
+{
+	ShadowCaster = Value;
+}
 
-											ZEPPBlurNode();
-		virtual								~ZEPPBlurNode();
+bool ZEMaterial::GetShadowCaster() const
+{
+	return ShadowCaster;
+}
 
-	public:	
-		virtual ZEPostProcessorNodeType		GetNodeType();
+void ZEMaterial::SetShadowReceiver(bool Value)
+{
+	ShadowReceiver = Value;
+}
 
-		virtual ZESize						GetDependencyCount();
-		virtual ZEPostProcessorNode**		GetDependencies();
+bool ZEMaterial::GetShadowReceiver() const
+{
+	return ShadowReceiver;
+}
 
+void ZEMaterial::SetLightningEnabled(bool Enabled)
+{
+	LightningEnabled = Enabled;
+}
 
-		virtual void						SetInput(ZEPostProcessorNode* Node);
-		virtual ZEPostProcessorNode*		GetInput();
+bool ZEMaterial::GetLightningEnabled() const
+{
+	return LightningEnabled;
+}
 
-		void								SetDownSample(ZEUInt Factor);
-		ZEUInt								GetDownSample();
+bool ZEMaterial::SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
+{
+	return false;
+}
 
-		void								SetPassCount(ZEUInt PassCount);
-		ZEUInt								GetPassCount();
+bool ZEMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
+{
+	return false;
+}
 
-		void								SetStandartDeviation(float Ro);
-		float								GetStandartDeviation();
+bool ZEMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
+{
+	return false;
+}
 
-		void								SetHorizontalPass(bool Enabled);
-		bool								GetHorizontalPass();
+bool ZEMaterial::SetupShadowPass() const
+{
+	return false;
+}
 
-		void								SetVerticalPass(bool Enabled);
-		bool								GetVerticalPass();
-};
+void ZEMaterial::UpdateMaterial()
+{
 
-#endif
+}
+
+void ZEMaterial::AdvanceAnimation(float TimeElapsed)
+{
+
+}
+
+void ZEMaterial::Destroy()
+{
+	delete this;
+}

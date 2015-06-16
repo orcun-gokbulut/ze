@@ -33,9 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETexture3D.h"
 #include "ZEMoonMaterial.h"
-#include "ZEGraphicsModule.h"
+
+#include "ZEGraphics/ZETexture3D.h"
+#include "ZEGraphics/ZEGraphicsModule.h"
 
 
 ZEMoonMaterial::ZEMoonMaterial()

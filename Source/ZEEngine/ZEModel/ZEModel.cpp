@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModel.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEScene.h"

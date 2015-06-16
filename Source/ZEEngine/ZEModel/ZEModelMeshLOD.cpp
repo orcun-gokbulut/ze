@@ -34,8 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelMeshLOD.h"
+
 #include "ZEModel.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 

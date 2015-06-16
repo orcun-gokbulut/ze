@@ -60,7 +60,7 @@
 #include "ZED3D9SkyDomeMaterial.h"
 #include "ZED3D9CloudMaterial.h"
 #include "ZED3D9SeaMaterial.h"
-#include "ZEGraphics/ZESeaMaterial.h"
+#include "ZERenderer/ZESeaMaterial.h"
 #include "Logo.png.h"
 
 #include <d3dx9.h>

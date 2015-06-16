@@ -38,8 +38,8 @@
 #define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERenderCommand.h"
 
 class ZETextureCubeResource;
 class ZESkyBoxMaterial;

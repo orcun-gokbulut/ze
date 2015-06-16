@@ -35,7 +35,7 @@
 
 #include "ZEPhysicsPicker.h"
 #include "ZEGame\ZEScene.h"
-#include "ZEGraphics\ZECamera.h"
+#include "ZERenderer\ZECamera.h"
 #include "ZECore\ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEPhysicalWorld.h"

@@ -37,10 +37,10 @@
 #include "ZEError.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERenderCommand.h"
 #include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEMaterial.h"
+#include "ZERenderer/ZEMaterial.h"
 
 ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 {

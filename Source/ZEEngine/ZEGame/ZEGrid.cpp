@@ -35,11 +35,11 @@
 
 #include "ZEGrid.h"
 #include "ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZESimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
