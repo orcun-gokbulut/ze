@@ -39,6 +39,41 @@
 #include "ZEPathManager.h"
 #include "ZEFileInfo.h"
 #include "ZEDirectoryInfo.h"
+#include "ZEPathTokenizer.h"
+
+bool ZEPathInfo::Normalize(ZEPathTokenizer& Tokenizer)
+{
+	for (int I = 0; I < Tokenizer.GetTokenCount(); I++)
+	{
+		if (Tokenizer.GetToken(I) == "." || Tokenizer.GetToken(I) == '\0')
+		{
+			Tokenizer.SetToken(I, NULL);
+		}
+		else if (strcmp(Tokenizer.GetToken(I), "..") == 0)
+		{
+			Tokenizer.SetToken(I, NULL);
+
+			// Find Parent Path
+			bool Found = false;
+			for (ZESSize N = I - 1; N >= 0; N--)
+			{
+				if (Tokenizer.GetToken(N) != NULL)
+				{
+					Tokenizer.SetToken(N, NULL);
+					Found = true;
+					break;
+				}
+			}
+
+			if (!Found) // Something Fishy
+				return false;
+		}
+	}
+
+	Tokenizer.Squish();
+
+	return true;
+}
 
 void ZEPathInfo::SetPath(const char* Path)
 {
@@ -146,7 +181,7 @@ ZERealPath ZEPathInfo::GetRealPath() const
 
 ZEPathRoot ZEPathInfo::GetRoot() const
 {
-	return ZEPathManager::GetInstance()->GetRoot(Path);
+	return ZEPathManager::GetInstance()->TranslateToRealPath(Path).Root;
 }
 
 ZEPathAccess ZEPathInfo::GetAccess() const
@@ -160,30 +195,29 @@ bool ZEPathInfo::IsInsidePackage() const
 	return false;
 }
 
-bool ZEPathInfo::IsParent(const char* ParentPath) const
-{
-	ZEArray<ZEString> ParentPathElements = Divide(ParentPath);
-	if (!Normalize(ParentPathElements))
-		return false;
-
-	ZEArray<ZEString> PathElements = Divide(Path);
-	if (!Normalize(PathElements))
-		return false;
-
-	return CheckParent(ParentPathElements, PathElements);
-}
-
 ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 {
-	ZEArray<ZEString> ParentPathElements = Divide(ParentPath);
-	if (!Normalize(ParentPathElements))
-		return false;
+	ZEPathTokenizer PathTokens;
+	PathTokens.Tokenize(Path);
+	if (!Normalize(PathTokens))
+		return "";
 
-	ZEArray<ZEString> PathElements = Divide(Path);
-	if (!Normalize(PathElements))
-		return false;
+	ZEPathTokenizer ParentPathTokens;
+	PathTokens.Tokenize(ParentPath);
+	if (!Normalize(ParentPathTokens))
+		return "";
 
-	return Construct(RelativeTo(ParentPathElements, PathElements));
+	ZESize Index = 0;
+	for (ZESize I = 0; I < ParentPathTokens.GetTokenCount(); I++)
+	{
+		const char* ParentToken = ParentPathTokens.GetToken(I);
+		if (ParentToken == NULL)
+			continue;
+	}
+
+	PathTokens.Combine();
+
+	return PathTokens.GetOutput();
 }
 
 #ifdef ZE_PLATFORM_WINDOWS
@@ -303,10 +337,16 @@ ZEFileTime ZEPathInfo::GetModificationTime() const
 
 ZEString ZEPathInfo::Normalize()
 {
-	ZEArray<ZEString> PathElements = Divide(Path);
-	if (!Normalize(PathElements))
+	ZEPathTokenizer Tokenizer;
+	Tokenizer.Tokenize(Path);
+
+	if (!Normalize(Tokenizer))
 		return "";
-	return Construct(PathElements);
+
+	Tokenizer.Combine();
+	Path = Tokenizer.GetOutput();
+
+	return Path;
 }
 
 bool ZEPathInfo::Equals(const ZEPathInfo& OtherPath) const
@@ -374,148 +414,4 @@ ZEPathInfo::ZEPathInfo(const char* Path)
 ZEPathInfo::ZEPathInfo(const char* ParentPath, const char* Path)
 {
 	SetRelativePath(ParentPath, Path);
-}
-
-
-static const char* TokenizePath(char* Output, const char* Path)
-{
-	if (Path == NULL || Path == '\0')
-		return false;
-
-	char* OutputStart = Output;
-	*Output = '\0';
-
-	bool TrimLeft = true;
-	while(*Path != '\0')
-	{
-		if (TrimLeft && (*Path == ' ' || *Path == '\t'))
-		{
-			Path++;
-			continue;
-		}
-
-		TrimLeft = false;
-
-		if (*Path == '\\' || *Path == '/')
-		{
-			Path++;
-			break;
-		}
-		else if (*Path == '<' || *Path == '>' ||
-			*Path == '*' ||	*Path == '"' ||
-			*Path == '|' ||	*Path == '?')
-		{
-			return false;
-		}
-
-		*Output = *Path;
-		Output++;
-		Path++;
-	}
-
-	*Output = '\0';
-
-	if (Output - OutputStart != 0)
-	{
-		for (char* Iter = Output - 1; Iter != OutputStart; Iter--)
-		{
-			if (*Iter != ' ' && *Iter != '\t')
-				break;
-
-			Iter = '\0';
-		}
-	}
-
-	return Path;
-}
-
-ZEArray<ZEString> ZEPathInfo::Divide(const char* Path)
-{
-	ZEArray<ZEString> Output;
-
-	const char* Iterator = Path;
-	while (*Iterator != '\0')
-	{
-		char PathBuffer[256];
-		Iterator = TokenizePath(PathBuffer, Iterator);
-
-		if (Iterator == NULL)
-			return ZEArray<ZEString>();
-
-		Output.Add(PathBuffer);
-	}
-
-	return Output;
-}
-
-bool ZEPathInfo::Normalize(ZEArray<ZEString>& PathElements)
-{
-	for (int I = 0; I < PathElements.GetCount(); I++)
-	{
-		if (PathElements[I] == "." || PathElements[I].IsEmpty())
-		{
-			PathElements.Remove(I);
-			I--;
-		}
-		else if (PathElements[I] == '..')
-		{
-			if (I == 0) // Something Fishy
-				return false;
-
-			PathElements.Remove(I - 1);
-			I--;
-		}
-		else if (PathElements[I].IsEmpty() && I != 0)
-		{
-			PathElements.Remove(I);
-			I--;
-		}
-	}
-
-	return true;
-}
-
-ZEString ZEPathInfo::Construct(const ZEArray<ZEString>& PathElements)
-{
-	ZEString Output;
-	for (ZESize I = 0; I < PathElements.GetSize(); I++)
-	{
-		Output += PathElements[I];
-		if (I != PathElements.GetSize() - 1)
-			Output += "/";
-	}
-
-	return Output;
-}
-
-bool ZEPathInfo::CheckParent(const ZEArray<ZEString>& ParentPathElements, const ZEArray<ZEString>& ChildrenPathElements)
-{
-	if (ParentPathElements.GetSize() >= ChildrenPathElements.GetSize())
-		return false;
-
-	for (ZESize I = 0; I < ParentPathElements.GetSize(); I++)
-	{
-		if (ParentPathElements[I] != ChildrenPathElements[I])
-			return false;
-	}
-
-	return true;
-}
-
-ZEArray<ZEString> ZEPathInfo::RelativeTo(const ZEArray<ZEString>& ParentPathElements, const ZEArray<ZEString>& ChildrenPathElements)
-{
-	if (ParentPathElements.GetSize() <= ChildrenPathElements.GetSize())
-		return ZEArray<ZEString>();
-
-	ZEArray<ZEString> Output;
-	for (ZESize I = 0; I < ParentPathElements.GetSize(); I++)
-	{
-		if (ParentPathElements[I] != ChildrenPathElements[I])	
-		{
-			for (ZESize N = I; N < ChildrenPathElements.GetCount(); N++)
-				Output.Add(ChildrenPathElements[N]);
-		}
-	}
-
-	return Output;
 }

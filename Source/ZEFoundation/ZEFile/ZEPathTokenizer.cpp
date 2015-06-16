@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPathManager.h
+ Zinek Engine - ZEPathTokenizer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,122 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PATH_MANAGER_H__
-#define __ZE_PATH_MANAGER_H__
+#include "ZEPathTokenizer.h"
 
-#include "ZETypes.h"
-#include "ZEFileCommon.h"
-#include "ZEDS/ZEString.h"
+#include <string.h>
 
-class ZEPathManager
+char* ZEPathTokenizer::Trim(char* Data)
 {
-	private:
-		bool					AccessControl;
+	char* Cursor = Data;
 
-		ZEString				EnginePath;
-		ZEString				ResourcePath;
-		ZEString				StoragePath;
-		ZEString				UserStoragePath;
+	char* Start = NULL;
+	while(*Cursor != '\0')
+	{
+		if (*Cursor != ' ' && *Cursor != '\t')
+		{
+			Start = Cursor;
+			break;
+		}
+		Cursor++;
+	}
 
-		void					SetEnginePath(const ZEString& Path);
-		void					SetResourcePath(const ZEString& Path);
-		void					SetStoragePath(const ZEString& Path);
-		void					SetUserStoragePath(const ZEString& Path);
+	if (Start == NULL)
+	{
+		*Data = '\0';
+		return Data;
+	}
 
-	public:
-		void					SetAccessControl(bool Enable);
-		bool					GetAccessControl();
+	char* LastNonSpace = NULL;
+	while(*Cursor != '\0')
+	{
+		if (*Cursor != ' ' && *Cursor != '\t')
+			LastNonSpace = Cursor;
 
-		const ZEString&			GetEnginePath();
-		const ZEString&			GetResourcePath();
-		const ZEString&			GetStoragePath();
-		const ZEString&			GetUserStoragePath();
+		Cursor++;
+	}
 
-		void					Initialize();
-		void					Deinitialize();
+	LastNonSpace[1] = '\0';
 
-		ZERealPath				TranslateToRealPath(const char* Path);
+	return Start;
+}
 
-								ZEPathManager();
+const char* ZEPathTokenizer::GetToken(ZESize Index)
+{
+	return TokenList[Index];
+}
 
-		static ZEPathManager*	GetInstance();
-};
+void ZEPathTokenizer::SetToken(ZESize Index, const char* String)
+{
+	TokenList[Index] = String;
+}
 
-#endif
+ZESize ZEPathTokenizer::GetTokenCount()
+{
+	return TokenCount;
+}
+
+const char* ZEPathTokenizer::GetOutput()
+{
+	return Buffer;
+}
+
+void ZEPathTokenizer::Squish()
+{
+	ZESize OldTokenCount = TokenCount;
+	for (ZESize I = 0; I < OldTokenCount; I++)
+	{
+		if (TokenList[I] != NULL)
+			continue;
+
+		bool Found = false;
+		for (ZESize N = I + 1; N < OldTokenCount; N++)
+		{
+			if (TokenList[N] == NULL)
+					continue;
+
+			TokenList[I] = TokenList[N];
+			TokenList[N] = NULL;
+			Found = true;
+			break;
+		}
+
+		if (!Found)
+		{
+			TokenCount = I;
+			return;
+		}
+	}
+}
+
+void ZEPathTokenizer::Tokenize(const char* Path)
+{
+	strcpy_s(Buffer, 4095, Path);
+
+	TokenCount = 0;
+	char* Context = NULL;
+	TokenList[TokenCount] = strtok_s(Buffer, "\\/", &Context);
+	while(TokenList[TokenCount] != NULL)
+	{
+		TokenList[TokenCount] = Trim((char*)TokenList[TokenCount]);
+		TokenCount++;
+		TokenList[TokenCount] = strtok_s(NULL, "\\/", &Context);
+	}
+}
+
+void ZEPathTokenizer::Combine()
+{
+	char Temp[ZE_PATH_TOKENIZER_BUFFER_SIZE];
+	Temp[0] = '\0';
+
+	for (ZESize I = 0; I < TokenCount; I++)
+	{
+		if (TokenList[I] == NULL)
+			continue;
+
+		if (I != 0)
+			strcat_s(Temp, ZE_PATH_TOKENIZER_BUFFER_SIZE, "/");
+		strcat_s(Temp, ZE_PATH_TOKENIZER_BUFFER_SIZE, TokenList[I]);
+	}
+
+	strcpy(Buffer, Temp);
+}

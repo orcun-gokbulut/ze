@@ -39,29 +39,26 @@
 #include "ZEPathInfo.h"
 #include "ZEDS\ZEFormat.h"
 #include "ZEFileInfo.h"
+#include "ZEPathTokenizer.h"
 
-void ZEPathManager::SetEnginePath(const char* Path)
+void ZEPathManager::SetEnginePath(const ZEString& Path)
 {
-	EnginePath = ZEPathInfo::Divide(Path);
-	ZEPathInfo::Normalize(EnginePath);
+	EnginePath = ZEPathInfo(Path).Normalize();
 }
 
-void ZEPathManager::SetResourcePath(const char* Path)
+void ZEPathManager::SetResourcePath(const ZEString& Path)
 {
-	ResourcePath = ZEPathInfo::Divide(Path);
-	ZEPathInfo::Normalize(ResourcePath);
+	ResourcePath = ZEPathInfo(Path).Normalize();
 }
 
-void ZEPathManager::SetStoragePath(const char* Path)
+void ZEPathManager::SetStoragePath(const ZEString& Path)
 {
-	StoragePath = ZEPathInfo::Divide(Path);
-	ZEPathInfo::Normalize(StoragePath);
+	StoragePath = ZEPathInfo(Path).Normalize();
 }
 
-void ZEPathManager::SetUserStoragePath(const char* Path)
+void ZEPathManager::SetUserStoragePath(const ZEString& Path)
 {
-	UserStoragePath = ZEPathInfo::Divide(Path);
-	ZEPathInfo::Normalize(UserStoragePath);
+	UserStoragePath = ZEPathInfo(Path).Normalize();
 }
 
 void ZEPathManager::SetAccessControl(bool Enable)
@@ -74,24 +71,24 @@ bool ZEPathManager::GetAccessControl()
 	return AccessControl;
 }
 
-ZEString ZEPathManager::GetEnginePath()
+const ZEString& ZEPathManager::GetEnginePath()
 {
-	return ZEPathInfo::Construct(EnginePath);
+	return EnginePath;
 }
 
-ZEString ZEPathManager::GetResourcePath()
+const ZEString& ZEPathManager::GetResourcePath()
 {
-	return ZEPathInfo::Construct(ResourcePath);
+	return ResourcePath;
 }
 
-ZEString ZEPathManager::GetStoragePath()
+const ZEString& ZEPathManager::GetStoragePath()
 {
-	return ZEPathInfo::Construct(StoragePath);
+	return StoragePath;
 }
 
-ZEString ZEPathManager::GetUserStoragePath()
+const ZEString& ZEPathManager::GetUserStoragePath()
 {
-	return ZEPathInfo::Construct(UserStoragePath);
+	return UserStoragePath;
 }
 
 #ifdef WIN32
@@ -127,96 +124,76 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 	ZERealPath RealPath;
 	RealPath.Access = AccessControl ? ZE_PA_NO_ACCESS : ZE_PA_READ_WRITE;
 	RealPath.Root = ZE_PR_UNKOWN;
-	RealPath.Path = Path;
 
 	if (Path == NULL || Path[0] == '\0')
 		return RealPath;
 
-	ZEArray<ZEString> PathElements = ZEPathInfo::Divide(Path);
-	ZEPathInfo::Normalize(PathElements);
-	
-	if (PathElements.GetSize() == 0)
+	ZEPathTokenizer Tokenizer;
+	Tokenizer.Tokenize(Path);
+	if (!ZEPathInfo::Normalize(Tokenizer))
 		return RealPath;
 
-	if (PathElements[0] == "#Internal:" || PathElements[0] == "#I:")
+	if (Tokenizer.GetTokenCount() == 0)
+		return RealPath;
+
+	const char* FirstToken = Tokenizer.GetToken(0);
+
+	if (stricmp(FirstToken, "#Internal:") == 0 || stricmp(FirstToken, "#I:") == 0)
 	{
 		RealPath.Access = ZE_PA_READ;
 		RealPath.Root = ZE_PR_INTERNAL;
-		PathElements.Remove(0);
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
+		Tokenizer.SetToken(0, NULL);
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
 	}
-	else if (PathElements[0] == "#Resource:" || PathElements[0] == "#R:")
+	else if (stricmp(FirstToken, "#Resource:") == 0 || 	stricmp(FirstToken, "#R:") == 0)
 	{
 		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
 		RealPath.Root = ZE_PR_RESOURCE;
-		PathElements.Remove(0);
-		PathElements.MassInsert(0, ResourcePath.GetCArray(), ResourcePath.GetSize());
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
+		Tokenizer.SetToken(0, ResourcePath.ToCString());
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
 	}
-	else if (PathElements[0] == "#Storage:" || PathElements[0] == "#S:")
+	else if (stricmp(FirstToken, "#Storage:") == 0 || stricmp(FirstToken, "#S:") == 0)
 	{
 		RealPath.Access = ZE_PA_READ_WRITE;
 		RealPath.Root = ZE_PR_STORAGE;
-		PathElements.Remove(0);
-		PathElements.MassInsert(0, StoragePath.GetCArray(), StoragePath.GetSize());
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
+		Tokenizer.SetToken(0, StoragePath.ToCString());
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
 	}
-	else if (PathElements[0] == "#UserStorage:" || PathElements[0] == "#US:")
+	else if (stricmp(FirstToken, "#UserStorage:") == 0 || strcmp(FirstToken, "#US:") == 0)
 	{
 		RealPath.Access = ZE_PA_READ_WRITE;
 		RealPath.Root = ZE_PR_USER_STORAGE;
-		PathElements.Remove(0);
-		PathElements.MassInsert(0, UserStoragePath.GetCArray(), UserStoragePath.GetSize());
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
+		Tokenizer.SetToken(0, UserStoragePath.ToCString());
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
 	}
-	else if (ZEPathInfo::CheckParent(ResourcePath, PathElements))
+	else
 	{
-		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
-		RealPath.Root = ZE_PR_RESOURCE;
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
-	}
-	else if (ZEPathInfo::CheckParent(StoragePath, PathElements))
-	{
-		RealPath.Access = ZE_PA_READ_WRITE;
-		RealPath.Root = ZE_PR_STORAGE;
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
-	}
-	else if (ZEPathInfo::CheckParent(UserStoragePath, PathElements))
-	{
-		RealPath.Access = ZE_PA_READ_WRITE;
-		RealPath.Root = ZE_PR_USER_STORAGE;
-		RealPath.Path = ZEPathInfo::Construct(PathElements);
+		Tokenizer.Combine();
+		if (strnicmp(Tokenizer.GetOutput(), ResourcePath.ToCString(), ResourcePath.GetLength()) == 0)
+		{
+			RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+			RealPath.Root = ZE_PR_RESOURCE;
+			RealPath.Path = Tokenizer.GetOutput();
+		}
+		else if (strnicmp(Tokenizer.GetOutput(), StoragePath.ToCString(), StoragePath.GetLength()) == 0)
+		{
+			RealPath.Access = ZE_PA_READ_WRITE;
+			RealPath.Root = ZE_PR_STORAGE;
+			RealPath.Path = Tokenizer.GetOutput();
+		}
+		else if (strnicmp(Tokenizer.GetOutput(), UserStoragePath.ToCString(), UserStoragePath.GetLength()) == 0)
+		{
+			RealPath.Access = ZE_PA_READ_WRITE;
+			RealPath.Root = ZE_PR_USER_STORAGE;
+			RealPath.Path = Tokenizer.GetOutput();
+		}
 	}
 
 	return RealPath;
-}
-
-ZEPathRoot ZEPathManager::GetRoot(const char* Path)
-{
-	if (Path == NULL || Path[0] == '\0')
-		return ZE_PR_UNKOWN;
-
-	ZEArray<ZEString> PathElements = ZEPathInfo::Divide(Path);
-	ZEPathInfo::Normalize(PathElements);
-	if (PathElements.GetSize() == 0)
-		return ZEPathRoot();
-
-	if (PathElements[0] == "#Internal:" || PathElements[0] == "#I:")
-		return ZE_PR_INTERNAL;
-	else if (PathElements[0] == "#Resource:" || PathElements[0] == "#R:")
-		return ZE_PR_RESOURCE;
-	else if (PathElements[0] == "#Storage:" || PathElements[0] == "#S:")
-		return ZE_PR_STORAGE;
-	else if (PathElements[0] == "#UserStorage:" || PathElements[0] == "#US:")
-		return ZE_PR_USER_STORAGE;
-	else if (ZEPathInfo::CheckParent(PathElements, ResourcePath))
-		return ZE_PR_RESOURCE;
-	else if (ZEPathInfo::CheckParent(PathElements, StoragePath))
-		return ZE_PR_STORAGE;
-	else if (ZEPathInfo::CheckParent(PathElements, UserStoragePath))
-		return ZE_PR_USER_STORAGE;
-
-	return ZE_PR_UNKOWN;
 }
 
 ZEPathManager::ZEPathManager()
