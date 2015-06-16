@@ -1,0 +1,519 @@
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEGraphicsDevice.cpp
+ ------------------------------------------------------------------------------
+ Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
+
+ This file is part of the Zinek Engine  Software. Zinek Engine Software and the
+ accompanying  materials are  made available  under the  terms of Zinek  Engine
+ Commercial License or the GNU General Public License Version 3.
+
+                      ZINEK ENGINE COMMERCIAL LICENSE
+ Licensees  holding  valid  Zinek Engine Commercial  License(s) may  use  Zinek
+ Engine  Software in  accordance  with   the  commercial  license  agreement(s)
+ (which can only be  issued  by  copyright  owner "Yiğit  Orçun  GÖKBULUT") and
+ provided with the Software  or, alternatively,  in  accordance with the  terms
+ contained  in  a  written  agreement  between  you  and  copyright  owner. For
+ licensing  terms  and conditions  please  contact  with  copyright owner.
+
+                    GNU GENERAL PUBLIC LICENSE VERSION 3
+ This program is free software: you can  redistribute it and/or modify it under
+ the terms of the GNU General Public  License as published by the Free Software
+ Foundation, either  version 3 of  the License, or  (at your option)  any later
+ version. This program is  distributed in the hope that  it will be useful, but
+ WITHOUT ANY WARRANTY; without even the  implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See  the GNU General Public License for more
+ details. You  should have received  a copy of the  GNU General  Public License
+ along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ Copyright Owner Information:
+  Name: Yiğit Orçun GÖKBULUT
+  Contact: orcun.gokbulut@gmail.com
+  Github: https://www.github.com/orcun-gokbulut/ZE
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
+
+#include "ZEShader.h"
+#include "ZEGraphicsDevice.h"
+
+ZEGraphicsDevice::ZEGraphicsDevice()
+{
+	ActiveAF = 0;
+	ActiveMSAA = 0;
+}
+
+ZEGraphicsDevice::~ZEGraphicsDevice()
+{
+	MSAAModeList.Clear();
+	AFModeList.Clear();
+}
+
+const ZEArray<ZEUInt>& ZEGraphicsDevice::GetModesAF() const
+{
+	return AFModeList;
+}
+
+const ZEArray<ZEMSAAMode>& ZEGraphicsDevice::GetModesMSAA() const
+{
+	return MSAAModeList;
+}
+
+bool ZEGraphicsDevice::SetSampleCountAF(ZEUInt SampleCount)
+{
+	ZESize Count = AFModeList.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (AFModeList[I] == SampleCount)
+		{
+			ActiveAF = I;
+			return true;
+		}
+	}
+	return false;
+}
+
+ZEUInt ZEGraphicsDevice::GetSampleCountAF() const
+{
+	return AFModeList[ActiveAF];
+}
+
+bool ZEGraphicsDevice::SetSampleCountMSAA(ZEUInt SampleCount)
+{
+	ZESize Count = MSAAModeList.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (MSAAModeList[I].SampleCount == SampleCount)
+		{
+			ActiveMSAA = I;
+			return true;
+		}
+	}
+	return false;
+}
+
+ZEUInt ZEGraphicsDevice::GetSampleCountMSAA() const
+{
+	return MSAAModeList[ActiveMSAA].SampleCount;
+}
+
+bool ZEGraphicsDevice::CheckSupportAF(ZEUInt SampleCount)
+{
+	ZESize Count = AFModeList.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (AFModeList[I] == SampleCount)
+			return true;
+	}
+	return false;
+}
+
+bool ZEGraphicsDevice::CheckSupportMSAA(ZEUInt SampleCount)
+{
+	ZESize Count = MSAAModeList.GetCount();
+	for (ZESize I = 0; I < Count; ++I)
+	{
+		if (MSAAModeList[I].SampleCount == SampleCount)
+			return true;
+	}
+	return false;
+}
+
+// Null means auto generate
+void ZEGraphicsDevice::SetVertexLayout(ZEVertexLayout* Layout)
+{
+	CurrentState.VertexLayout = Layout;
+}
+
+ZEVertexLayout* ZEGraphicsDevice::GetVertexLayout()
+{
+	return CurrentState.VertexLayout;
+}
+
+void ZEGraphicsDevice::SetVertexBuffer(ZEUInt Index, ZEVertexBuffer* Buffer)
+{
+	zeDebugCheck(Index >= ZE_MAX_VERTEX_BUFFER_SLOT, "Index out of range.");
+
+	CurrentState.VertexBuffers[(ZESize)Index] = Buffer;
+}
+
+const ZEVertexBuffer* ZEGraphicsDevice::GetVertexBuffer(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_VERTEX_BUFFER_SLOT, "Index out of range.");
+
+	return CurrentState.VertexBuffers[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetVertexBufferArray(ZEVertexBuffer* const Buffers[ZE_MAX_VERTEX_BUFFER_SLOT])
+{
+	zeDebugCheck(Buffers == NULL, "NULL Pointer.");
+
+	memcpy(CurrentState.VertexBuffers, Buffers, sizeof(ZEVertexBuffer*) * ZE_MAX_VERTEX_BUFFER_SLOT);
+}
+
+void ZEGraphicsDevice::SetIndexBuffer(ZEIndexBuffer* Buffer)
+{
+	CurrentState.IndexBuffer = Buffer;
+}
+
+const ZEIndexBuffer* ZEGraphicsDevice::GetIndexBuffer() const
+{
+	return CurrentState.IndexBuffer;
+}
+
+void ZEGraphicsDevice::SetVertexShader(ZEShader* Shader)
+{
+	zeDebugCheck(Shader != NULL && Shader->GetShaderType() != ZE_ST_VERTEX, "Wrong shader type");
+
+	CurrentState.VertexShader = Shader;
+}
+
+const ZEShader* ZEGraphicsDevice::GetVertexShader() const
+{
+	return CurrentState.VertexShader;
+}
+
+void ZEGraphicsDevice::SetVertexShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer)
+{
+	zeDebugCheck(Index >= ZE_MAX_CONSTANT_BUFFER_SLOT, "Index out of range.");
+
+	CurrentState.VertexShaderBuffers[(ZESize)Index] = Buffer;
+}
+
+const ZEConstantBuffer* ZEGraphicsDevice::GetVertexShaderBuffer(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_CONSTANT_BUFFER_SLOT, "Index out of range.");
+
+	return CurrentState.VertexShaderBuffers[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetVertexShaderTexture(ZEUInt Index, const ZETexture* Texture)
+{
+	zeDebugCheck(Index >= ZE_MAX_TEXTURE_SLOT, "Index out of range.");
+
+	CurrentState.VertexShaderTextures[(ZESize)Index] = Texture;
+}
+
+const ZETexture* ZEGraphicsDevice::GetVertexShaderTexture(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_TEXTURE_SLOT, "Index out of range.");
+
+	return CurrentState.VertexShaderTextures[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetVertexShaderSampler(ZEUInt Index, ZESamplerState& Sampler)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	if (CurrentState.VertexShaderSamplers[(ZESize)Index].GetHash() != Sampler.GetHash())
+	{
+		CurrentState.VertexShaderSamplers[(ZESize)Index] = Sampler;
+	}
+}
+
+ZESamplerState& ZEGraphicsDevice::GetVertexShaderSampler(ZEUInt Index)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	return CurrentState.VertexShaderSamplers[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetGeometryShader(ZEShader* Shader)
+{
+	zeDebugCheck(Shader != NULL && Shader->GetShaderType() != ZE_ST_GEOMETRY, "Wrong shader type");
+
+	CurrentState.GeometryShader = Shader;
+}
+
+const ZEShader* ZEGraphicsDevice::GetGeometryShader() const
+{
+	return CurrentState.GeometryShader;
+}
+
+void ZEGraphicsDevice::SetGeometryShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer)
+{
+	zeDebugCheck(Index >= ZE_MAX_CONSTANT_BUFFER_SLOT, "Index out of range.");
+
+	CurrentState.GeometryShaderBuffers[(ZESize)Index] = Buffer;
+}
+
+const ZEConstantBuffer* ZEGraphicsDevice::GetGeometryShaderBuffer(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_CONSTANT_BUFFER_SLOT, "Index out of range.");
+
+	return CurrentState.GeometryShaderBuffers[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetGeometryShaderTexture(ZEUInt Index, const ZETexture* Texture)
+{
+	zeDebugCheck(Index >= ZE_MAX_TEXTURE_SLOT, "Index out of range.");
+
+	CurrentState.GeometryShaderTextures[(ZESize)Index] = Texture;
+}
+
+const ZETexture* ZEGraphicsDevice::GetGeometryShaderTexture(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_TEXTURE_SLOT, "Index out of range.");
+
+	return CurrentState.GeometryShaderTextures[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetGeometryShaderSampler(ZEUInt Index, ZESamplerState& Sampler)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	if (CurrentState.GeometryShaderSamplers[(ZESize)Index].GetHash() != Sampler.GetHash())
+	{
+		CurrentState.GeometryShaderSamplers[(ZESize)Index] = Sampler;
+	}
+}
+
+ZESamplerState& ZEGraphicsDevice::GetGeometryShaderSampler(ZEUInt Index)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	return CurrentState.GeometryShaderSamplers[Index];
+}
+
+void ZEGraphicsDevice::SetRasterizerState(ZERasterizerState& State)
+{
+	if (CurrentState.RasterizerState.GetHash() != State.GetHash())
+	{
+		CurrentState.RasterizerState = State;
+	}
+}
+
+ZERasterizerState& ZEGraphicsDevice::GetRasterizerState()
+{
+	return CurrentState.RasterizerState;
+}
+
+void ZEGraphicsDevice::SetViewport(ZEUInt Index, ZEViewport& ViewPort)
+{
+	zeDebugCheck(Index >= ZE_MAX_VIEWPORT_SLOT, "Index out of range.");
+
+	if (CurrentState.ViewPorts[(ZESize)Index] != ViewPort)
+	{
+		CurrentState.ViewPorts[(ZESize)Index] = ViewPort;
+	}
+}
+
+ZEViewport& ZEGraphicsDevice::GetViewport(ZEUInt Index)
+{
+	return CurrentState.ViewPorts[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetScissorRectangle(ZEUInt Index, ZEScissorRectangle& Rectangle)
+{
+	zeDebugCheck(Index >= ZE_MAX_SCISSOR_SLOT, "Index out of range.");
+
+	if (CurrentState.ScissorRects[(ZESize)Index] != Rectangle)
+	{
+		CurrentState.ScissorRects[(ZESize)Index] = Rectangle;
+	}
+}
+
+ZEScissorRectangle& ZEGraphicsDevice::GetScissorRectangle(ZEUInt Index)
+{
+	zeDebugCheck(Index >= ZE_MAX_SCISSOR_SLOT, "Index out of range.");
+
+	return CurrentState.ScissorRects[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetPixelShader(ZEShader* Shader)
+{
+	zeDebugCheck(Shader != NULL && Shader->GetShaderType() != ZE_ST_PIXEL, "Wrong shader type");
+
+	CurrentState.PixelShader = Shader;
+}
+
+const ZEShader* ZEGraphicsDevice::GetPixelShader() const
+{
+	return CurrentState.PixelShader;
+}
+
+void ZEGraphicsDevice::SetPixelShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer)
+{
+	zeDebugCheck(Index >= ZE_MAX_CONSTANT_BUFFER_SLOT, "Index out of range.");
+
+	CurrentState.PixelShaderBuffers[(ZESize)Index] = Buffer;
+}
+
+const ZEConstantBuffer* ZEGraphicsDevice::GetPixelShaderBuffer(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_CONSTANT_BUFFER_SLOT, "Index out of range.");
+
+	return CurrentState.PixelShaderBuffers[Index];
+}
+
+void ZEGraphicsDevice::SetPixelShaderTexture(ZEUInt Index, const ZETexture* Texture)
+{
+	zeDebugCheck(Index >= ZE_MAX_TEXTURE_SLOT, "Index out of range.");
+
+	CurrentState.PixelShaderTextures[(ZESize)Index] = Texture;
+}
+
+const ZETexture* ZEGraphicsDevice::GetPixelShaderTexture(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_TEXTURE_SLOT, "Index out of range.");
+
+	return CurrentState.PixelShaderTextures[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetPixelShaderSampler(ZEUInt Index, ZESamplerState& Sampler)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	if (CurrentState.PixelShaderSamplers[(ZESize)Index].GetHash() != Sampler.GetHash())
+	{
+		CurrentState.PixelShaderSamplers[(ZESize)Index] = Sampler;
+	}
+}
+
+ZESamplerState& ZEGraphicsDevice::GetPixelShaderSampler(ZEUInt Index)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	return CurrentState.PixelShaderSamplers[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetBlendState(ZEBlendState& State, ZEVector4& ComponentBlendFactors, ZEComponentMask ComponentBlendMask)
+{
+	if (CurrentState.BlendState.GetHash() != State.GetHash() || 
+		CurrentState.ComponentBlendFactors != ComponentBlendFactors || 
+		CurrentState.ComponentBlendMask != ComponentBlendMask)
+	{
+		CurrentState.BlendState = State;
+		CurrentState.ComponentBlendMask = ComponentBlendMask;
+		CurrentState.ComponentBlendFactors = ComponentBlendFactors;
+	}	
+}
+
+void ZEGraphicsDevice::SetBlendState(ZEBlendState& State)
+{
+	if (CurrentState.BlendState.GetHash() != State.GetHash())
+	{
+		CurrentState.BlendState = State;
+	}
+}
+
+ZEBlendState& ZEGraphicsDevice::GetBlendState()
+{
+	return CurrentState.BlendState;
+}
+		
+void ZEGraphicsDevice::SetComponentBlendMask(ZEComponentMask ComponentBlendMask)
+{
+	CurrentState.ComponentBlendMask = ComponentBlendMask;
+}
+
+ZEComponentMask& ZEGraphicsDevice::GetComponentBlendMask()
+{
+	return CurrentState.ComponentBlendMask;
+}
+
+void ZEGraphicsDevice::SetComponentBlendFactors(ZEVector4* ComponentBlendFactors)
+{
+	CurrentState.ComponentBlendFactors = ComponentBlendFactors == NULL ? ZEVector4::One : *ComponentBlendFactors;
+}
+
+ZEVector4& ZEGraphicsDevice::GetComponentBlendFactors()
+{
+	return CurrentState.ComponentBlendFactors;
+}
+
+void ZEGraphicsDevice::SetDepthStencilState(ZEDepthStencilState& State, ZEUInt32 StencilReferance)
+{
+	if (CurrentState.DepthStencilState.GetHash() != State.GetHash() || 
+		CurrentState.StencilReferance != StencilReferance)
+	{
+		CurrentState.DepthStencilState = State;
+		CurrentState.StencilReferance = StencilReferance;
+	}
+}
+
+void ZEGraphicsDevice::SetDepthStencilState(ZEDepthStencilState& State)
+{
+	if (CurrentState.DepthStencilState.GetHash() != State.GetHash())
+	{
+		CurrentState.DepthStencilState = State;
+	}
+}
+
+ZEDepthStencilState& ZEGraphicsDevice::GetDepthStencilState()
+{
+	return CurrentState.DepthStencilState;
+}
+
+void ZEGraphicsDevice::SetStencilReferance(ZEUInt32 StencilReferance)
+{
+	CurrentState.StencilReferance = StencilReferance;
+}
+
+ZEUInt32& ZEGraphicsDevice::GetStencilReferance()
+{
+	return CurrentState.StencilReferance;
+}
+
+void ZEGraphicsDevice::SetRenderTargetScreen(const ZERenderTarget* FrameBuffer)
+{
+	zeDebugCheck(FrameBuffer == NULL, "NULL pointer.");
+
+	memset(CurrentState.RenderTargets, NULL, sizeof(ZERenderTarget*) * ZE_MAX_RENDER_TARGET_SLOT);
+
+	CurrentState.RenderTargets[0] = FrameBuffer;
+	CurrentState.ScreenWriteEnable = true;
+}
+
+bool ZEGraphicsDevice::GetScreenWriteEnable() const
+{
+	return CurrentState.ScreenWriteEnable;
+}
+
+void ZEGraphicsDevice::SetRenderTarget(ZEUInt Index, const ZERenderTarget* Target)
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+
+	CurrentState.RenderTargets[(ZESize)Index] = Target;
+	CurrentState.ScreenWriteEnable = false;
+}
+
+void ZEGraphicsDevice::SetRenderTargetArray(const ZERenderTarget* const Targets[ZE_MAX_RENDER_TARGET_SLOT])
+{
+	zeDebugCheck(Targets == NULL, "NULL Pointer.");
+
+	memcpy(CurrentState.RenderTargets, Targets, sizeof(ZERenderTarget*) * ZE_MAX_RENDER_TARGET_SLOT);
+	CurrentState.ScreenWriteEnable = false;
+}
+
+const ZERenderTarget* ZEGraphicsDevice::GetRenderTarget(ZEUInt Index) const
+{
+	zeDebugCheck(Index >= ZE_MAX_SAMPLER_SLOT, "Index out of range.");
+	
+	return CurrentState.RenderTargets[(ZESize)Index];
+}
+
+void ZEGraphicsDevice::SetDepthStencilBuffer(const ZEDepthStencilBuffer* Buffer)
+{
+	CurrentState.DepthStencilBuffer = Buffer;
+}
+
+const ZEDepthStencilBuffer* ZEGraphicsDevice::GetDepthStencilBuffer() const
+{
+	return CurrentState.DepthStencilBuffer;
+}
+
+void ZEGraphicsDevice::SetDeviceState(ZEGraphicsDeviceState& State)
+{
+	memcpy(&CurrentState, &State, sizeof(ZEGraphicsDeviceState));
+}
+
+ZEGraphicsDeviceState& ZEGraphicsDevice::GetDeviceState()
+{
+	return CurrentState;
+}
+
+void ZEGraphicsDevice::ResetStates()
+{
+	CurrentState.SetToDefault();
+	OldState.SetToDefault();
+}

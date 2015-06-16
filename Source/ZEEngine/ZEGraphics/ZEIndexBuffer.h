@@ -33,72 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#pragma once
 #ifndef	__ZE_INDEX_BUFFER_H__
 #define __ZE_INDEX_BUFFER_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEGraphicsResource.h"
 
 enum ZEIndexBufferFormat
 {
-	ZE_IBF_INDEX16	= 0,
-	ZE_IBF_INDEX32	= 1,
-
+	ZE_IBF_NONE			= 0,
+	ZE_IBF_INDEX16		= 1,
+	ZE_IBF_INDEX32		= 2
 };
 
-class ZEIndexBuffer
+class ZEIndexBuffer : public ZEGraphicsResource
 {
-	public:
-		virtual bool					IsStatic() = 0;
-		virtual ZESize					GetBufferSize() = 0;
+	friend class ZEGraphicsModule;
 
-										ZEIndexBuffer();
-		virtual							~ZEIndexBuffer();
-};
-
-class ZEStaticIndexBuffer : public ZEIndexBuffer
-{
 	protected:
-										ZEStaticIndexBuffer();
-		virtual							~ZEStaticIndexBuffer();
+		static ZESize			TotalSize;
+		static ZEUInt16			TotalCount;
+
+		ZEShadowCopy			ShadowCopy;
+
+		ZEIndexBufferFormat		Format;
+		ZESize					BufferSize;
+		ZESize					IndexCount;
+
+		virtual bool			UpdateWith(ZEUInt ShadowIndex);
+
+								ZEIndexBuffer();
+		virtual					~ZEIndexBuffer();
 
 	public:
-		virtual bool					IsStatic();
+		ZEGraphicsResourceType	GetResourceType() const;
 
-		virtual bool					Create(ZESize BufferSize, ZEIndexBufferFormat Format) = 0;
-		virtual void*					Lock() = 0;
-		virtual void					Unlock() = 0;
-		virtual void					Release() = 0;
+		ZESize					GetBufferSize() const;
+		ZESize					GetIndexCount() const;
+		ZEIndexBufferFormat		GetBufferFormat() const;
 
-		virtual void					Destroy();
+		void					SetZero();
+		void					SetData(void* ConstantData);
 
-		static ZEStaticIndexBuffer*		CreateInstance();
+		void					Unlock();
+		bool					Lock(void** Data);
+		
+		virtual bool			CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData = NULL);
+		virtual bool			CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData);
+		
+		static ZEIndexBuffer*	CreateInstance();
 };
 
-class ZEDynamicIndexBuffer : public ZEIndexBuffer
-{
-	public:
-		virtual bool					IsStatic();
-
-		virtual ZESize					GetBufferSize() = 0;
-		virtual void*					GetIndexBuffer() = 0;
-};
-
-template<typename _VertexType, typename _Allocator = ZESmartAllocator<_VertexType> >
-class ZEArrayIndexBuffer : public ZEDynamicIndexBuffer, public ZEArray<_VertexType, _Allocator>
-{
-	public:
-		virtual ZESize GetBufferSize()
-		{
-			return GetCount() * sizeof(_VertexType);
-		}
-
-		virtual void* GetVertexBuffer()
-		{
-			return GetCArray();
-		}
-};
-
-#endif // __ZE_INDEX_BUFFER_H__
+#endif

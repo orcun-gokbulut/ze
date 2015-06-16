@@ -33,52 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_TEXTURE_2D_H__
 #define __ZE_TEXTURE_2D_H__
 
 #include "ZETypes.h"
 #include "ZETexture.h"
 
-class ZEViewPort;
+class ZETextureData;
+class ZERenderTarget;
 
 class ZETexture2D : public ZETexture
 {
-	ZE_OBJECT
+	friend class ZEGraphicsDevice;
+	friend class ZEGraphicsModule;
+	friend class ZETexture2D;
 
 	protected:
-		ZEUInt						Width;
-		ZEUInt						Height;	
-		ZEUInt						LevelCount;
+		static ZEUInt16				TotalCount;
+		static ZESize				TotalSize;
 
-		ZETexturePixelFormat		PixelFormat;
-		bool						RenderTarget;
+		ZEShadowCopy				ShadowCopy;
+
+		ZESize						Size;
+		ZEUInt						Width;
+		ZEUInt						Height;
+		ZEUInt						LevelCount;
+		ZEVector2					PixelSize;
+
+		virtual bool				UpdateWith(ZEUInt ShadowIndex);
 
 									ZETexture2D();
 		virtual						~ZETexture2D();
 
 	public:
-		virtual ZETextureType		GetTextureType() const;
+		ZEGraphicsResourceType		GetResourceType() const;
 
+		ZESize						GetSize() const;
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetLevelCount() const;
+		const ZEVector2&			GetPixelSize() const;
 
-		ZETexturePixelFormat		GetPixelFormat() const;
-		bool						IsRenderTarget() const;
+		virtual bool				Unlock();
+		virtual bool				Lock(void** Buffer, ZESize* Pitch);
 
-		virtual bool				IsEmpty() const = 0;
+		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
+		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
+		
+		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
 
-		virtual ZEViewPort*			GetViewPort() = 0;
-
-		virtual bool				Create(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false) = 0;
-		virtual void				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
-		virtual void				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level, ZEUInt PositionX, ZEUInt PositionY, ZEUInt Width, ZEUInt Height) = 0;
-
-		virtual void				Unlock(ZEUInt Level) = 0;
-
+		static ZESize				CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat);
 		static ZETexture2D*			CreateInstance();
 };
-
 
 #endif

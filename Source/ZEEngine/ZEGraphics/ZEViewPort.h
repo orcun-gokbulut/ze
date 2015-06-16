@@ -33,20 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
 #ifndef __ZE_VIEW_PORT_H__
 #define __ZE_VIEW_PORT_H__
 
 #include "ZETypes.h"
 
-class ZEViewPort
+class ZEViewport
 {
 	public:
-		virtual float			GetAspectRatio() = 0;
-		virtual ZEUInt			GetWidth() = 0;
-		virtual ZEUInt			GetHeight() = 0;
+		struct ZEViewportData
+		{
+			float			TopLeftX;
+			float			TopLeftY;
+			float			Width;
+			float			Height;
+			float			MinDepth;
+			float			MaxDepth;
 
-		virtual					~ZEViewPort();
+		} StateData;
+
+		ZESize				GetHash() const;
+
+		void				SetZero();
+
+		const ZEViewport&	operator =(const ZEViewport& Other);
+		bool				operator ==(const ZEViewport& Other);
+		bool				operator !=(const ZEViewport& Other);
+
+							ZEViewport();
+							~ZEViewport();
 };
 
 #endif
