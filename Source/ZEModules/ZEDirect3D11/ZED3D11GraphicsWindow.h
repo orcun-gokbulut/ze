@@ -41,13 +41,13 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEGraphicsWindow.h"
+#include "ZEGraphics/ZEGRWindow.h"
 
 class ZED3D11Texture2D;
 class ZED3D11RenderTarget;
 class ZED3D11DepthStencilBuffer;
 
-class ZED3D11GraphicsWindow : public ZEGraphicsWindow
+class ZED3D11GraphicsWindow : public ZEGRWindow
 {
 	friend class ZED3D11GraphicsModule;
 

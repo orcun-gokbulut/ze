@@ -40,12 +40,12 @@
 #include "ZED3D11Shader.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEDS/ZEPointer.h"
-#include "ZEGraphics/ZEShader.h"
+#include "ZEGraphics/ZEGRShader.h"
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZED3D11ShaderCompiler.h"
 #include "ZED3D11GraphicsDevice.h"
 #include "ZED3D11GraphicsModule.h"
-#include "ZEGraphics/ZEShaderCompiler.h"
+#include "ZEGraphics/ZEGRShaderCompiler.h"
 
 #define ZE_SHADER_COMPILER_DEFAULT_PARAMETERS	(D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
 
@@ -89,23 +89,23 @@ class ZED3D11Include : public ID3DInclude
 
 inline static ZEGRShaderConstantType GetZEShaderConstantDataType(D3D_SHADER_VARIABLE_TYPE Type)
 {
-	ZEGRShaderConstantType Var = ZE_SCDT_VOID;
+	ZEGRShaderConstantType Var = ZEGR_SCDT_VOID;
 	switch (Type)
 	{
 		case D3D_SVT_VOID:
-			Var = ZE_SCDT_VOID;
+			Var = ZEGR_SCDT_VOID;
 			break;
 		case D3D_SVT_BOOL:
-			Var = ZE_SCDT_BOOL;
+			Var = ZEGR_SCDT_BOOL;
 			break;
 		case D3D_SVT_INT:
-			Var = ZE_SCDT_INT;
+			Var = ZEGR_SCDT_INT;
 			break;
 		case D3D_SVT_UINT:
-			Var = ZE_SCDT_UINT;
+			Var = ZEGR_SCDT_UINT;
 			break;
 		case D3D_SVT_FLOAT:
-			Var = ZE_SCDT_FLOAT;
+			Var = ZEGR_SCDT_FLOAT;
 			break;
 	}
 
@@ -114,65 +114,65 @@ inline static ZEGRShaderConstantType GetZEShaderConstantDataType(D3D_SHADER_VARI
 
 inline static ZEGRShaderSystemSemantic GetZEShaderSystemValueType(D3D_NAME Name)
 {
-	ZEGRShaderSystemSemantic Type = ZE_SSVT_NONE;
+	ZEGRShaderSystemSemantic Type = ZEGR_SSS_NONE;
 
 	switch (Name)
 	{
 		case D3D_NAME_UNDEFINED:
-			Type = ZE_SSVT_NONE;
+			Type = ZEGR_SSS_NONE;
 			break;
 		case D3D_NAME_POSITION:
-			Type = ZE_SSVT_POSITION;
+			Type = ZEGR_SSS_POSITION;
 			break;
 		case D3D_NAME_CLIP_DISTANCE:
-			Type = ZE_SSVT_CLIP_DISTANCE;
+			Type = ZEGR_SSS_CLIP_DISTANCE;
 			break;
 		case D3D_NAME_CULL_DISTANCE:
-			Type = ZE_SSVT_CULL_DISTANCE;
+			Type = ZEGR_SSS_CULL_DISTANCE;
 			break;
 		case D3D_NAME_RENDER_TARGET_ARRAY_INDEX:
-			Type = ZE_SSVT_RENDER_TARGET_ARRAY_INDEX;
+			Type = ZEGR_SSS_RENDER_TARGET_ARRAY_INDEX;
 			break;
 		case D3D_NAME_VIEWPORT_ARRAY_INDEX:
-			Type = ZE_SSVT_VIEWPORT_ARRAY_INDEX;
+			Type = ZEGR_SSS_VIEWPORT_ARRAY_INDEX;
 			break;
 		case D3D_NAME_VERTEX_ID:
-			Type = ZE_SSVT_VERTEX_ID;
+			Type = ZEGR_SSS_VERTEX_ID;
 			break;
 		case D3D_NAME_PRIMITIVE_ID:
-			Type = ZE_SSVT_PRIMITIVE_ID;
+			Type = ZEGR_SSS_PRIMITIVE_ID;
 			break;
 		case D3D_NAME_INSTANCE_ID:
-			Type = ZE_SSVT_INSTANCE_ID;
+			Type = ZEGR_SSS_INSTANCE_ID;
 			break;
 		case D3D_NAME_IS_FRONT_FACE:
-			Type = ZE_SSVT_IS_FRONT_FACE;
+			Type = ZEGR_SSS_IS_FRONT_FACE;
 			break;
 		case D3D_NAME_SAMPLE_INDEX:
-			Type = ZE_SSVT_SAMPLE_INDEX;
+			Type = ZEGR_SSS_SAMPLE_INDEX;
 			break;
 		case D3D_NAME_TARGET:
-			Type = ZE_SSVT_TARGET;
+			Type = ZEGR_SSS_TARGET;
 			break;
 		case D3D_NAME_DEPTH:
-			Type = ZE_SSVT_DEPTH;
+			Type = ZEGR_SSS_DEPTH;
 			break;
 		case D3D_NAME_COVERAGE:
-			Type = ZE_SSVT_COVERAGE;
+			Type = ZEGR_SSS_COVERAGE;
 			break;
 	}
 
 	return Type;
 }
 
-inline static ZEShaderRegisterType GetZEShaderComponentType(D3D_REGISTER_COMPONENT_TYPE Type)
+inline static ZEGRShaderRegisterType GetZEShaderComponentType(D3D_REGISTER_COMPONENT_TYPE Type)
 {
-	static const ZEShaderRegisterType Values[] =
+	static const ZEGRShaderRegisterType Values[] =
 	{
-		ZE_SRT_NONE,				// D3D_REGISTER_COMPONENT_UNKNOWN	= 0,
-		ZE_SRT_UNSIGNED_INT_32,		// D3D_REGISTER_COMPONENT_UINT32	= 1,
-		ZE_SRT_SIGNED_INT_32,		// D3D_REGISTER_COMPONENT_SINT32	= 2,
-		ZE_SRT_FLOAT_32				// D3D_REGISTER_COMPONENT_FLOAT32	= 3
+		ZEGR_SRT_NONE,				// D3D_REGISTER_COMPONENT_UNKNOWN	= 0,
+		ZEGR_SRT_UNSIGNED_INT_32,		// D3D_REGISTER_COMPONENT_UINT32	= 1,
+		ZEGR_SRT_SIGNED_INT_32,		// D3D_REGISTER_COMPONENT_SINT32	= 2,
+		ZEGR_SRT_FLOAT_32				// D3D_REGISTER_COMPONENT_FLOAT32	= 3
 	};
 	
 	return Values[Type];
@@ -209,12 +209,12 @@ inline static ZEGRShaderSamplerType GetZEShaderSamplerReturnType(D3D_RESOURCE_RE
 	static const ZEGRShaderSamplerType Values[] =
 	{
 		(ZEGRShaderSamplerType)-1,		
-		ZE_SSRT_UNSIGNED_NORMALIZED,	// D3D_RETURN_TYPE_UNORM	= 1,		
-		ZE_SSRT_SIGNED_NORMALIZED,		// D3D_RETURN_TYPE_SNORM	= 2,
-		ZE_SSRT_SIGNED_INTEGER,			// D3D_RETURN_TYPE_SINT		= 3,
-		ZE_SSRT_UNSIGNED_INTEGER,		// D3D_RETURN_TYPE_UINT		= 4,
-		ZE_SSRT_FLOAT,					// D3D_RETURN_TYPE_FLOAT	= 5,
-		ZE_SSRT_MIXED					// D3D_RETURN_TYPE_MIXED	= 6,
+		ZEGR_SSRT_UNSIGNED_NORMALIZED,	// D3D_RETURN_TYPE_UNORM	= 1,		
+		ZEGR_SSRT_SIGNED_NORMALIZED,		// D3D_RETURN_TYPE_SNORM	= 2,
+		ZEGR_SSRT_SIGNED_INTEGER,			// D3D_RETURN_TYPE_SINT		= 3,
+		ZEGR_SSRT_UNSIGNED_INTEGER,		// D3D_RETURN_TYPE_UINT		= 4,
+		ZEGR_SSRT_FLOAT,					// D3D_RETURN_TYPE_FLOAT	= 5,
+		ZEGR_SSRT_MIXED					// D3D_RETURN_TYPE_MIXED	= 6,
 	};
 	
 	return Values[Type];
@@ -225,14 +225,14 @@ inline static ZEGRShaderConstantBufferType GetZEShaderConstantBufferType(D3D_CBU
 {
 	static const ZEGRShaderConstantBufferType Values[] =
 	{
-		ZE_SCBT_C_BUFFER,	//  D3D_CT_CBUFFER = 0,
-		ZE_SCBT_T_BUFFER	//  D3D_CT_TBUFFER = 1,
+		ZEGR_SCBT_C_BUFFER,	//  D3D_CT_CBUFFER = 0,
+		ZEGR_SCBT_T_BUFFER	//  D3D_CT_TBUFFER = 1,
 	};
 	
 	return Values[Type];
 }
 
-inline static DXGI_FORMAT GetInputElementFormat(ZEShaderRegisterMask UsedRegisters, ZEShaderRegisterType RegisterType)
+inline static DXGI_FORMAT GetInputElementFormat(ZEShaderRegisterMask UsedRegisters, ZEGRShaderRegisterType RegisterType)
 {
 	DXGI_FORMAT Format = DXGI_FORMAT_UNKNOWN;
 

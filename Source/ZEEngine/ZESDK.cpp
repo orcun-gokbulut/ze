@@ -35,7 +35,7 @@
 
 #include "ZESDK.h"
 #include "ZECore/ZECore.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 #define WINDOWS_MEAN_AND_LEAN
 #include <windows.h>

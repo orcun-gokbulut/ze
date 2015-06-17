@@ -41,8 +41,8 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEGraphicsMonitor.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRMonitor.h"
 
 class ZEGRTexture2D;
 class ZEGRTexture3D;
@@ -51,7 +51,7 @@ class ZEGRTextureCube;
 class ZEGRIndexBuffer;
 class ZEVertexBuffer;
 class ZEGRShaderCompiler;
-class ZEGraphicsDevice;
+class ZEGRDevice;
 class ZEDepthStencilBuffer;
 class ZEGraphicsEventTracer;
 class ZED3D11GraphicsDevice;
@@ -68,7 +68,7 @@ class ZED3D11GraphicsDevice;
 #define ZE_MAX_MULTI_SAMPLE_COUNT		D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT
 #define ZE_MAX_ANISOTROPY_LEVEL			D3D11_MAX_MAXANISOTROPY
 
-class ZED3D11GraphicsModule : public ZEGraphicsModule
+class ZED3D11GraphicsModule : public ZEGRGraphicsModule
 {
 	ZE_MODULE(ZED3D11GraphicsModule)
 
@@ -113,7 +113,7 @@ class ZED3D11GraphicsModule : public ZEGraphicsModule
 		virtual ZEGRTextureCube*					CreateTextureCube();
 		virtual ZEGRIndexBuffer*					CreateIndexBuffer();
 		virtual ZEVertexBuffer*					CreateVertexBuffer();
-		virtual ZEGraphicsWindow*				CreateGraphicsWindow();
+		virtual ZEGRWindow*				CreateGraphicsWindow();
 		virtual ZEConstantBuffer*				CreateConstantBuffer();
 		virtual ZEDepthStencilBuffer*			CreateDepthStencilBuffer();
 		

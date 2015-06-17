@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPointLight.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEShadowRenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"

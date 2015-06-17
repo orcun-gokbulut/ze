@@ -53,7 +53,7 @@
 #include "ZEProfiler.h"
 #include "ZETimerManager.h"
 
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZESound/ZESoundModule.h"
@@ -166,13 +166,13 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetDescription() != ZEGraphicsModule::Description() && Module->GetDescription()->GetParent() != ZEGraphicsModule::Description())
+		if (Module->GetDescription() != ZEGRGraphicsModule::Description() && Module->GetDescription()->GetParent() != ZEGRGraphicsModule::Description())
 		{
 			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
 			return false;
 		}
-		GraphicsModule = (ZEGraphicsModule*)Module;
+		GraphicsModule = (ZEGRGraphicsModule*)Module;
 	}
 	else
 		GraphicsModule = NULL;
@@ -180,7 +180,7 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 	return true;
 }
 
-ZEGraphicsModule* ZECore::GetGraphicsModule()
+ZEGRGraphicsModule* ZECore::GetGraphicsModule()
 {
 	return GraphicsModule;
 }
@@ -447,7 +447,7 @@ bool ZECore::InitializeModules()
 	zeLog("Initializing modules.");
 
 	if (GraphicsModule == NULL)
-		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGraphicsModule::Description()));
+		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGRGraphicsModule::Description()));
 	
 	if (SoundModule == NULL)
 		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModuleInstance(ZESoundModule::Description()));
@@ -736,7 +736,7 @@ ZECore::ZECore()
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 
-	ZEGraphicsModule::BaseInitialize();
+	ZEGRGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
 	ZEInputModule::BaseInitialize();
 
@@ -745,7 +745,7 @@ ZECore::ZECore()
 ZECore::~ZECore()
 {
 	
-	ZEGraphicsModule::BaseDeinitialize();
+	ZEGRGraphicsModule::BaseDeinitialize();
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 

@@ -38,7 +38,7 @@
 
 #include "ZETypes.h"
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 struct ID3D11DepthStencilView;
 

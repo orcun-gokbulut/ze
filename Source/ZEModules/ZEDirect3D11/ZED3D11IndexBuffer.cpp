@@ -37,7 +37,7 @@
 #include "ZED3D11IndexBuffer.h"
 #include "ZED3D11GraphicsModule.h"
 
-inline static ZESize GetIndexSize(ZEIndexBufferFormat Format)
+inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
 {
 	static const ZESize FormatToIndexSize[3] = 
 	{
@@ -80,11 +80,11 @@ const ID3D11Buffer* ZED3D11IndexBuffer::GetD3D10Buffer() const
 	return D3D10Buffer;
 }
 
-bool ZED3D11IndexBuffer::CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
+bool ZED3D11IndexBuffer::CreateDynamic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData)
 {
 	zeDebugCheck(GetIsCreated(), "Buffer already created.");
 	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
-	zeDebugCheck(Format == ZE_IBF_NONE, "Unknown buffer format.");
+	zeDebugCheck(Format == ZEGR_IBF_NONE, "Unknown buffer format.");
 
 	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
 	zeDebugCheck(Size > 134217728, "Buffer too large");
@@ -111,12 +111,12 @@ bool ZED3D11IndexBuffer::CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Fo
 	return ZEGRIndexBuffer::CreateDynamic(IndexCount, Format, InitialData);
 }
 
-bool ZED3D11IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
+bool ZED3D11IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData)
 {
 	zeDebugCheck(GetIsCreated(), "Buffer already created.");
 	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
 	zeDebugCheck(InitialData == NULL, "Buffer must have initial data.");
-	zeDebugCheck(Format == ZE_IBF_NONE, "Unknown buffer format");
+	zeDebugCheck(Format == ZEGR_IBF_NONE, "Unknown buffer format");
 
 	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
 	zeDebugCheck(Size > 134217728, "Buffer too large");

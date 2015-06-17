@@ -39,7 +39,7 @@
 #include "ZED3D11RenderTarget.h"
 #include "ZED3D11GraphicsModule.h"
 #include "ZETexture/ZETextureData.h"
-#include "ZEGraphics/ZEGraphicsDefinitions.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 
 inline static DXGI_FORMAT ConvertPixelFormat(ZEGRTextureFormat Format)
 {

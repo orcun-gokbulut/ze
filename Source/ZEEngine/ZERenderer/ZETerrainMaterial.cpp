@@ -36,9 +36,9 @@
 #include "ZETerrainMaterial.h"
 
 #include "ZEMaterialComponents.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZETexture2D.h"
-#include "ZEGraphics/ZETextureCube.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureCubeResource.h"
 

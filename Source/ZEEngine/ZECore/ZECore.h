@@ -70,7 +70,7 @@ class ZEResourceManager;
 class ZECommandManager;
 class ZEConsole;
 class ZEWindow;
-class ZEGraphicsModule;
+class ZEGRGraphicsModule;
 class ZESoundModule;
 class ZEInputModule;
 class ZEPhysicsModule;
@@ -114,7 +114,7 @@ class ZECore
 		ZEConsole*						Console;
 		ZEWindow*						Window;
 		
-		ZEGraphicsModule*				GraphicsModule;
+		ZEGRGraphicsModule*				GraphicsModule;
 		ZESoundModule*					SoundModule;
 		ZEInputModule*					InputModule;
 		ZEPhysicsModule*				PhysicsModule;
@@ -154,7 +154,7 @@ class ZECore
 		const char*						GetResourceDirectory();
 
 		bool							SetGraphicsModule(ZEModule* Module);
-		ZEGraphicsModule*				GetGraphicsModule();
+		ZEGRGraphicsModule*				GetGraphicsModule();
 
 		bool							SetSoundModule(ZEModule* Module);
 		ZESoundModule*					GetSoundModule();

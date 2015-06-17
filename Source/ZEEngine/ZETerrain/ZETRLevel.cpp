@@ -36,7 +36,7 @@
 #include "ZETRLevel.h"
 #include "ZETRLayer.h"
 
-#include "ZEGraphics\ZETexture2D.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZEMath\ZEMath.h"
 #include "ZERenderer\ZETerrainMaterial.h"
 

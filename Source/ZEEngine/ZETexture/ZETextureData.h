@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEEndian.h"
 #include "ZEPacking.h"
-#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEDS/ZEArray.h"
 
 class ZETextureData;

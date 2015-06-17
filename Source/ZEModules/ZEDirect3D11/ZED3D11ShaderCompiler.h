@@ -40,7 +40,7 @@
 #include <d3d11.h>
 
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEShaderCompiler.h"
+#include "ZEGraphics/ZEGRShaderCompiler.h"
 
 class ZEGRShader;
 class ZED3D11Shader;

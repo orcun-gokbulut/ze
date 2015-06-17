@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZETexture/ZETextureOptions.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZETexture/ZETextureResource.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureLoader.h"

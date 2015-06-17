@@ -39,7 +39,7 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZERandom.h"
 
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEDrawParameters.h"

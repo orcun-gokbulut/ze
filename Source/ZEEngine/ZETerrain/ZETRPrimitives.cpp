@@ -36,7 +36,7 @@
 #include "ZETRPrimitives.h"
 
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZERandom.h"
 

@@ -40,7 +40,7 @@
 
 #include "ZETypes.h"
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZETextureCube.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
 
 class ZETextureData;
 class ZEGRRenderTarget;

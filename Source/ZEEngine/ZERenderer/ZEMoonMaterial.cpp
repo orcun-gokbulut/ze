@@ -35,8 +35,8 @@
 
 #include "ZEMoonMaterial.h"
 
-#include "ZEGraphics/ZETexture3D.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRTexture3D.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 
 ZEMoonMaterial::ZEMoonMaterial()

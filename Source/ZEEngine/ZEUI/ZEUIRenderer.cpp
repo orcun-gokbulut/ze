@@ -34,12 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRenderer.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZERenderer/ZERenderCommand.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 
 ZEInt32 CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
 {

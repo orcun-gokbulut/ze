@@ -60,13 +60,13 @@
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D11GraphicsMonitor.h"
 #include "ZED3D11DepthStencilBuffer.h"
-#include "ZEGraphics/ZEGraphicsWindow.h"
+#include "ZEGraphics/ZEGRWindow.h"
 
 
 #pragma warning(disable:4267)
 
 
-ZE_MODULE_DESCRIPTION(ZED3D11GraphicsModule, ZEGraphicsModule, NULL)
+ZE_MODULE_DESCRIPTION(ZED3D11GraphicsModule, ZEGRGraphicsModule, NULL)
 
 void ZED3D11GraphicsModule::ReleaseWindows()
 {
@@ -294,7 +294,7 @@ bool ZED3D11GraphicsModule::DisableAssociations()
 
 bool ZED3D11GraphicsModule::InitializeSelf()
 {
-	if (!ZEGraphicsModule::InitializeSelf())
+	if (!ZEGRGraphicsModule::InitializeSelf())
 		return false;
 
 	
@@ -331,7 +331,7 @@ bool ZED3D11GraphicsModule::InitializeSelf()
 	bool FullScreen = ZEOptionManager::GetInstance()->GetOption("Graphics", "FullScreen")->GetValue().GetBoolean();
 	bool VerticalSync = ZEOptionManager::GetInstance()->GetOption("Graphics", "VerticalSync")->GetValue().GetBoolean();
 	
-	ZEGraphicsWindow* Window = GetWindow();
+	ZEGRWindow* Window = GetWindow();
 	Window->SetSize(Width, Height);
 	Window->SetFullScreen(FullScreen);
 	Window->SetVSynchEnabed(VerticalSync);
@@ -355,7 +355,7 @@ bool ZED3D11GraphicsModule::DeinitializeSelf()
 	zeLog("Direct3D module deinitialized.");
 #endif
 	
-	return ZEGraphicsModule::DeinitializeSelf();
+	return ZEGRGraphicsModule::DeinitializeSelf();
 }
 
 ZEGraphicsEventTracer* ZED3D11GraphicsModule::GetEventTracer() const
@@ -391,7 +391,7 @@ ZEVertexBuffer* ZED3D11GraphicsModule::CreateVertexBuffer()
 	return new ZED3D11VertexBuffer();
 }
 
-ZEGraphicsWindow* ZED3D11GraphicsModule::CreateGraphicsWindow()
+ZEGRWindow* ZED3D11GraphicsModule::CreateGraphicsWindow()
 {
 	ZED3D11GraphicsWindow* NewWindow = new ZED3D11GraphicsWindow();
 	Windows.Add(NewWindow);

@@ -42,7 +42,7 @@
 #include "ZEPhysicalRigidBody.h"
 #include "ZEPhysicalJoint.h"
 #include "ZEPhysicalShapes.h"
-#include "ZEGraphics\ZEGraphicsModule.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
 
 void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorYOutput, float& Depth, const ZEVector3& Input)
 {

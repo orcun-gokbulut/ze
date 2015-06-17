@@ -40,7 +40,7 @@
 
 #include "ZETypes.h"
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 
 class ZED3D11VertexBuffer : public ZEVertexBuffer, public ZED3D11ComponentBase
 {

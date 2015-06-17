@@ -39,7 +39,7 @@
 
 #include "ZECore/ZEResource.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZETextureOptions.h"
 
 class ZEFileCacheManager
