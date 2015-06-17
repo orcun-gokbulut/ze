@@ -33,81 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
 #include "ZERenderTarget.h"
+#include "ZEError.h"
 
-ZEUInt ZERenderTarget::GetWidth() const
+ZEUInt ZEGRRenderTarget::GetWidth() const
 {
 	return Width;
 }
 		
-ZEUInt ZERenderTarget::GetHeight() const
+ZEUInt ZEGRRenderTarget::GetHeight() const
 {
 	return Height;
 }
 
-ZEUInt ZERenderTarget::GetDepth() const
+ZEUInt ZEGRRenderTarget::GetDepth() const
 {
 	return Depth;
 }
 
-const ZEVector3& ZERenderTarget::GetPixelSize() const
+ZEVector2 ZEGRRenderTarget::GetPixelSize() const
 {
-	return PixelSize;
+	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-ZETexturePixelFormat ZERenderTarget::GetPixelFormat() const
+ZEGRTextureFormat ZEGRRenderTarget::GetFormat() const
 {
-	return PixelFormat;
+	return Format;
 }
 
-ZERenderTargetType ZERenderTarget::GetRenderTargetType() const
+ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat Format)
 {
-	return RenderTargetType;
-}
-
-void ZERenderTarget::SetDebugName(const char* String)
-{
-#ifdef ZE_DEBUG_ENABLE
-	DebugName = String;
-#endif
-}
-
-const char* ZERenderTarget::GetDebugName() const
-{
-#ifdef ZE_DEBUG_ENABLE
-	return DebugName.ToCString();
-#else
-	return NULL;
-#endif
-}
-
-void ZERenderTarget::Destroy()
-{
-	delete this;
-}
-
-ZEUInt16	ZERenderTarget::TotalCount = 0;
-
-ZERenderTarget::ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType)
-{
-	zeDebugCheck(Width == 0, "Width cannot be zero");
-	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(Depth == 0, "Depth cannot be zero");
-	zeDebugCheck(PixelFormat == ZE_TT_NONE, "RenderTargetType must be set");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
+	zeDebugCheck(Width == 0, "Width cannot be zero.");
+	zeDebugCheck(Height == 0, "Height cannot be zero.");
+	zeDebugCheck(Format == ZEGR_TF_NONE, "Ilvalid render target format.");
 
 	this->Width = Width;
 	this->Height = Height;
 	this->Depth = Depth;
-	this->PixelSize = ZEVector3(1.0f / Width, 1.0f / Height, 1.0f / Depth);
-	this->PixelFormat = PixelFormat;
-	this->RenderTargetType = RenderTargetType;
-
-	TotalCount++;
+	this->Format = Format;
 }
 
-ZERenderTarget::~ZERenderTarget()
+ZEGRRenderTarget::~ZEGRRenderTarget()
 {
-	TotalCount--;
 }

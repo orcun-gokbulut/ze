@@ -33,48 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SHADER_COMPILE_OPTIONS_H__
-#define __ZE_SHADER_COMPILE_OPTIONS_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
-enum ZEShaderModel
+struct ZEGRShaderMeta;
+
+enum ZEGRShaderModel
 {
-	ZE_SM_NONE		= 0,
-	ZE_SM_3_0		= 1,
-	ZE_SM_4_0		= 2,
-	ZE_SM_4_1		= 3,
-	ZE_SM_5_0		= 4
+	ZEGR_SM_NONE	= 0,
+	ZEGR_SM_3_0		= 1,
+	ZEGR_SM_4_0		= 2,
+	ZEGR_SM_4_1		= 3,
+	ZEGR_SM_5_0		= 4
 };
 
-enum ZEShaderType
+enum ZEGRShaderType
 {
-	ZE_ST_NONE		= 0,
-	ZE_ST_VERTEX	= 1,
-	ZE_ST_PIXEL		= 2,
-	ZE_ST_GEOMETRY	= 3,
-	ZE_ST_DOMAIN	= 4,
-	ZE_ST_HULL		= 5,
-	ZE_ST_COMPUTE	= 6
+	ZEGR_ST_NONE		= 0,
+	ZEGR_ST_VERTEX		= 1,
+	ZEGR_ST_PIXEL		= 2,
+	ZEGR_ST_GEOMETRY	= 3,
+	ZEGR_ST_DOMAIN		= 4,
+	ZEGR_ST_HULL		= 5,
+	ZEGR_ST_COMPUTE		= 6
 };
 
-struct ZEShaderParameter
+struct ZEGRShaderDefinition
 {
-	ZESize		Hash;
-	ZEString	Name;
-	ZEString	Definition;
+	ZESize			Hash;
+	ZEString		Name;
+	ZEString		Value;
 };
 
-struct ZEShaderCompileOptions
+struct ZEGRShaderCompileOptions
 {
-	ZEShaderType				Type;
-	ZEShaderModel				Model;
-	ZEString					FileName;
-	ZEString					EntryPoint;
-	ZEString					SourceData;
-	ZEArray<ZEShaderParameter>	Parameters;
+	ZEGRShaderType					Type;
+	ZEGRShaderModel					Model;
+	ZEString						FileName;
+	ZEString						EntryPoint;
+	ZEString						SourceData;
+	ZEArray<ZEGRShaderDefinition>	Definitions;
 };
-
-#endif

@@ -38,30 +38,29 @@
 
 #include "ZETypes.h"
 
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+
 class ZEViewport
 {
 	public:
 		struct ZEViewportData
 		{
-			float			TopLeftX;
-			float			TopLeftY;
-			float			Width;
-			float			Height;
-			float			MinDepth;
-			float			MaxDepth;
+			float						TopLeftX;
+			float						TopLeftY;
+			float						Width;
+			float						Height;
+			float						MinDepth;
+			float						MaxDepth;
 
 		} StateData;
 
-		ZESize				GetHash() const;
+		void							SetZero();
+		ZEGRRenderTarget*				GetRenderTarget();
+		ZEGRDepthStencilBuffer*			GetDepthStencilBuffer();
 
-		void				SetZero();
-
-		const ZEViewport&	operator =(const ZEViewport& Other);
-		bool				operator ==(const ZEViewport& Other);
-		bool				operator !=(const ZEViewport& Other);
-
-							ZEViewport();
-							~ZEViewport();
+										ZEViewport();
+										~ZEViewport();
 };
 
 #endif

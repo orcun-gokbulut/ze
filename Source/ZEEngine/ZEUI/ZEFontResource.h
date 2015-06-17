@@ -45,7 +45,7 @@
 
 #define ZE_FONT_CHARACTER_COUNT				256
 
-ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
 
 struct ZEFontCharacterMetric
 {
@@ -73,7 +73,7 @@ enum ZEFontResourceType
 
 struct ZEFontCharacter
 {
-	const ZETexture2D*		Texture;
+	const ZEGRTexture2D*		Texture;
 	ZEUInt32				GlyphIndex;
 	char					Character;
 	ZEFontCharacterMetric	CharacterMetric;

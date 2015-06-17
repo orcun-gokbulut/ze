@@ -42,7 +42,7 @@
 
 #include "d3d11.h"
 
-class ZERenderTarget;
+class ZEGRRenderTarget;
 class ZEDepthStencilBuffer;
 
 class ZED3D11GraphicsDevice : public ZEGraphicsDevice, public ZED3D11ComponentBase
@@ -72,7 +72,7 @@ class ZED3D11GraphicsDevice : public ZEGraphicsDevice, public ZED3D11ComponentBa
 		virtual void			DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
 		virtual void			DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
 
-		virtual void			ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor);
+		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
 		virtual void			ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
 
 		D3D_FEATURE_LEVEL		GetD3DFeatureLevel() const;

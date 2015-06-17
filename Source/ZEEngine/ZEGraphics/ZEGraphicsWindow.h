@@ -112,10 +112,10 @@ struct ZEWindowStyle
 #define ZE_GWF_FULLSCREEN			1 << 4
 typedef ZEFlagsBase<ZEUInt32>		ZEGraphicsWindowFlags;
 
-class ZETexture2D;
-class ZERenderTarget;
-class ZEGraphicsMonitor;
-class ZEDepthStencilBuffer;
+class ZEGRTexture2D;
+class ZEGRRenderTarget;
+class ZEGRMonitor;
+class ZEGRDepthStencilBuffer;
 
 class ZEGraphicsWindow
 {
@@ -144,7 +144,7 @@ class ZEGraphicsWindow
 		bool								Maximized;
 
 		bool								FullScreen;
-		const ZEGraphicsMonitor*			FullScreenMonitor;
+		const ZEGRMonitor*			FullScreenMonitor;
 
 		bool								VSynchEnabed;
 
@@ -185,13 +185,13 @@ class ZEGraphicsWindow
 
 		void								GetRectangle(ZERectangle& Rectangle) const;
 
-		virtual bool						SetFullScreen(bool Value, const ZEGraphicsMonitor* Monitor = NULL);
+		virtual bool						SetFullScreen(bool Value, const ZEGRMonitor* Monitor = NULL);
 		bool								GetFullScreen() const;
 
 		virtual bool						SetVSynchEnabed(bool Value);
 		bool								GetVSynchEnabed() const;
 
-		const ZEGraphicsMonitor*			GetContainingMonitor() const;
+		const ZEGRMonitor*			GetContainingMonitor() const;
 
 		virtual void						Enable();
 		virtual void						Disable();
@@ -222,9 +222,9 @@ class ZEGraphicsWindow
 		virtual bool						Update();
 		virtual bool						Present() = 0;
 
-		virtual const ZETexture2D*			GetBackBufferTexture() = 0;
-		virtual const ZERenderTarget*		GetBackBuffer() = 0;
-		virtual const ZEDepthStencilBuffer*	GetDepthBuffer() = 0;
+		virtual const ZEGRTexture2D*			GetBackBufferTexture() = 0;
+		virtual const ZEGRRenderTarget*		GetBackBuffer() = 0;
+		virtual const ZEGRDepthStencilBuffer*	GetDepthBuffer() = 0;
 
 		static ZEUInt						GetWindowCount();
 		static ZEGraphicsWindow*			CreateInstance();

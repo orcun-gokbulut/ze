@@ -113,7 +113,7 @@ ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
 
 //////////////////////////////////////////////////////////////// READ ////////////////////////////////////////////////////////////////
 
-const ZETexture2D* ZEModelResource::ManageModelMaterialTextures(const ZEString& FileName)
+const ZEGRTexture2D* ZEModelResource::ManageModelMaterialTextures(const ZEString& FileName)
 {
 	if (strncmp(FileName, "", ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		return NULL;

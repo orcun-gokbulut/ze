@@ -44,7 +44,7 @@
 
 
 class ZECamera;
-class ZETexture2D;
+class ZEGRTexture2D;
 
 class ZECloudMaterial : public ZEMaterial
 {
@@ -75,7 +75,7 @@ class ZECloudMaterial : public ZEMaterial
 		float						EarthRadius;
 		float						AtmosphereHeight;
 
-		const ZETexture2D*			CloudFormationTexture;
+		const ZEGRTexture2D*			CloudFormationTexture;
 
 									ZECloudMaterial();
 		virtual						~ZECloudMaterial();

@@ -74,12 +74,12 @@ float ZEUIMaterial::GetWireSize() const
 	return WireSize;
 }
 
-void ZEUIMaterial::SetTexture(const ZETexture2D* Texture)
+void ZEUIMaterial::SetTexture(const ZEGRTexture2D* Texture)
 {
 	this->Texture = Texture;
 }
 
-const ZETexture2D* ZEUIMaterial::GetTexture() const
+const ZEGRTexture2D* ZEUIMaterial::GetTexture() const
 {
 	return Texture;
 }

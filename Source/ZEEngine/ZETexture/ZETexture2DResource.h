@@ -39,23 +39,23 @@
 
 #include "ZETextureResource.h"
 
-ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
 
 class ZETexture2DResource : public ZETextureResource
 {
 	ZE_OBJECT
 
 	private:
-		ZETexture2D*						Texture;
+		ZEGRTexture2D*						Texture;
 
 	protected:
 											ZETexture2DResource();
 		virtual 							~ZETexture2DResource();
 
 	public:
-		const ZETexture2D*					GetTexture() const;
+		const ZEGRTexture2D*					GetTexture() const;
 		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
+		virtual ZEGRTextureType				GetTextureType() const;
 
 		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);

@@ -41,7 +41,7 @@
 #include "ZEMath/ZEViewCuboid.h"
 #include "ZEMath/ZEViewFrustum.h"
 
-class ZETexture2D;
+class ZEGRTexture2D;
 
 #define MAX_CASCADE_COUNT			4
 
@@ -54,7 +54,7 @@ struct ZEDirectionalLightCascade
 	float			FilterScale;
 	ZEUInt			UpdateInterval;
 
-	ZETexture2D*	ShadowMap;
+	ZEGRTexture2D*	ShadowMap;
 	ZEViewCuboid	ViewVolume;
 	ZEMatrix4x4		ShadowTransform;
 };
@@ -89,7 +89,7 @@ class ZEDirectionalLight : public ZELight
 
 		const ZEDirectionalLightCascade&	GetCascadeData(ZESize Index) const;
 
-		ZETexture2D*						GetShadowMap(ZESize Index = 0);
+		ZEGRTexture2D*						GetShadowMap(ZESize Index = 0);
 		
 		ZESize								GetViewCount();
 		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);

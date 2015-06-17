@@ -147,7 +147,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	ZEUInt RowSize		= Width * PixelSize;
 	ZEUInt RowCount		= Height;
 
-	TextureData->Create(ZE_TT_2D, ZE_TPF_I8_4, 1, 1, Width, Height);
+	TextureData->Create(ZEGR_TT_2D, ZEGR_TF_I8_4, 1, 1, Width, Height);
 	BYTE* TargetData = (BYTE*)TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 
 	FreeImage_ConvertToRawBits(TargetData, Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
@@ -163,7 +163,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 // Saves level 0 of surface 0 to specified file in ".TGA" format
 bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZESize Surface, ZESize Level)
 {
-	if(TextureData->GetPixelFormat() != ZE_TPF_I8_4)
+	if(TextureData->GetPixelFormat() != ZEGR_TF_I8_4)
 	{
 		zeError("Pixel Format is not supported for saving.");
 		return false;
@@ -233,8 +233,8 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 	}
 
 	// Create TextureData
-	TextureData->Create(	(ZETextureType)FileHeader.TextureType, 
-								(ZETexturePixelFormat)FileHeader.PixelFormat, 
+	TextureData->Create(	(ZEGRTextureType)FileHeader.TextureType, 
+								(ZEGRTextureFormat)FileHeader.PixelFormat, 
 								FileHeader.SurfaceCount,
 								FileHeader.LevelCount, 
 								FileHeader.Width, 
@@ -439,7 +439,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureDataInfo* TextureInfo, ZEFile* File)
 	// Fill texture info
 	TextureInfo->LevelCount		= 1;
 	TextureInfo->SurfaceCount	= 1;
-	TextureInfo->PixelFormat	= ZE_TPF_I8_4;
+	TextureInfo->PixelFormat	= ZEGR_TF_I8_4;
 	TextureInfo->Width			= FreeImage_GetWidth(Bitmap);
 	TextureInfo->Height			= FreeImage_GetHeight(Bitmap);
 	
@@ -472,7 +472,7 @@ bool ZETextureLoader::GetTextureInfo(ZETextureDataInfo* TextureInfo, ZEFile* Fil
 	TextureInfo->Height			= FileHeader.Height;
 	TextureInfo->SurfaceCount	= FileHeader.SurfaceCount;
 	TextureInfo->LevelCount		= FileHeader.LevelCount;
-	TextureInfo->PixelFormat	= (ZETexturePixelFormat)FileHeader.PixelFormat;
+	TextureInfo->PixelFormat	= (ZEGRTextureFormat)FileHeader.PixelFormat;
 	
 	zeLog("Texture info gathered successfully: \"%s\".", File->GetPath().GetValue());
 

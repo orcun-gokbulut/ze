@@ -57,7 +57,7 @@ class ZETextureQualityManager
 												const ZETextureOptions* UserOptions, 
 												const ZEUInt TileCountX = 1, 
 												const ZEUInt TileCountY = 1, 
-												const ZETextureType TextureType = ZE_TT_2D );
+												const ZEGRTextureType TextureType = ZEGR_TT_2D );
 
 };
 

@@ -33,265 +33,231 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEStatePool.h"
-#include "ZEFoundation/ZELog.h"
 #include "ZEDepthStencilState.h"
-#include "ZEDS/ZEHashGenerator.h"
 
-#include <string.h>
+#include <memory.h>
 
-ZESize ZEDepthStencilState::GetHash()
-{
-	if (Dirty)
-	{
-		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZEDepthStencilStateData));;
-		Dirty = false;
-	}
-	return Hash;
-}
-
-void ZEDepthStencilState::SetZTestEnable(bool Enable)
+void ZEGRDepthStencilState::SetZTestEnable(bool Enable)
 {
 	if (StateData.ZTestEnable != Enable)
 	{
 		StateData.ZTestEnable = Enable;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-bool ZEDepthStencilState::GetZTestEnable() const
+bool ZEGRDepthStencilState::GetZTestEnable() const
 {
 	return StateData.ZTestEnable;
 }
 
-void ZEDepthStencilState::SetStencilTestEnable(bool Enable)
+void ZEGRDepthStencilState::SetStencilTestEnable(bool Enable)
 {
 	if (StateData.StencilTestEnable != Enable)
 	{
 		StateData.StencilTestEnable = Enable;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-bool ZEDepthStencilState::GetStencilTestEnable() const
+bool ZEGRDepthStencilState::GetStencilTestEnable() const
 {
 	return StateData.StencilTestEnable;
 }
 
-void ZEDepthStencilState::SetZWriteEnable(bool Enable)
+void ZEGRDepthStencilState::SetZWriteEnable(bool Enable)
 {
 	if (StateData.ZWriteEnable != Enable)
 	{
 		StateData.ZWriteEnable = Enable;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-bool ZEDepthStencilState::GetZWriteEnable() const
+bool ZEGRDepthStencilState::GetZWriteEnable() const
 {
 	return StateData.ZWriteEnable;
 }
 
-void ZEDepthStencilState::SetStencilWriteMask(ZEUInt8 Mask)
+void ZEGRDepthStencilState::SetStencilWriteMask(ZEUInt8 Mask)
 {
 	if (StateData.StencilWriteMask != Mask)
 	{
 		StateData.StencilWriteMask = Mask;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEUInt8 ZEDepthStencilState::GetStencilWriteMask() const
+ZEUInt8 ZEGRDepthStencilState::GetStencilWriteMask() const
 {
 	return StateData.StencilWriteMask;
 }
 
-void ZEDepthStencilState::SetStencilReadMask(ZEUInt8 Mask)
+void ZEGRDepthStencilState::SetStencilReadMask(ZEUInt8 Mask)
 {
 	if (StateData.StencilReadMask != Mask)
 	{
 		StateData.StencilReadMask = Mask;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEUInt8 ZEDepthStencilState::GetStencilReadMask() const
+ZEUInt8 ZEGRDepthStencilState::GetStencilReadMask() const
 {
 	return StateData.StencilReadMask;
 }
 
-void ZEDepthStencilState::SetZFunction(ZEComparisonFunction Function)
+void ZEGRDepthStencilState::SetZFunction(ZEGRComparisonFunction Function)
 {
 	if (StateData.ZFunction != Function)
 	{
 		StateData.ZFunction = Function;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEComparisonFunction ZEDepthStencilState::GetZFunction() const
+ZEGRComparisonFunction ZEGRDepthStencilState::GetZFunction() const
 {
 	return StateData.ZFunction;
 }
 
-void ZEDepthStencilState::SetFrontStencilFail(ZEStencilOperation Operation)
+void ZEGRDepthStencilState::SetFrontStencilFail(ZEGRStencilOperation Operation)
 {
 	if (StateData.FrontStencilFailOperation != Operation)
 	{
 		StateData.FrontStencilFailOperation = Operation;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEStencilOperation ZEDepthStencilState::GetFrontStencilFail() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetFrontStencilFail() const
 {
 	return StateData.FrontStencilFailOperation;
 }
 
-void ZEDepthStencilState::SetFrontZFail(ZEStencilOperation Operation)
+void ZEGRDepthStencilState::SetFrontZFail(ZEGRStencilOperation Operation)
 {
 	if (StateData.FrontZFailOperation != Operation)
 	{
 		StateData.FrontZFailOperation = Operation;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEStencilOperation ZEDepthStencilState::GetFrontZFail() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetFrontZFail() const
 {
 	return StateData.FrontZFailOperation;
 }
 
-void ZEDepthStencilState::SetFrontStencilPass(ZEStencilOperation Operation)
+void ZEGRDepthStencilState::SetFrontStencilPass(ZEGRStencilOperation Operation)
 {
 	if (StateData.FrontStencilPassOperation != Operation)
 	{
 		StateData.FrontStencilPassOperation = Operation;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEStencilOperation ZEDepthStencilState::GetFrontStencilPass() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetFrontStencilPass() const
 {
 	return StateData.FrontStencilPassOperation;
 }
 
-void ZEDepthStencilState::SetFrontStencilFunction(ZEComparisonFunction Function)
+void ZEGRDepthStencilState::SetFrontStencilFunction(ZEGRComparisonFunction Function)
 {
 	if (StateData.FrontStencilFunction != Function)
 	{
 		StateData.FrontStencilFunction = Function;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEComparisonFunction ZEDepthStencilState::GetFrontStencilFunction() const
+ZEGRComparisonFunction ZEGRDepthStencilState::GetFrontStencilFunction() const
 {
 	return StateData.FrontStencilFunction;
 }
 
-void ZEDepthStencilState::SetBackStencilFail(ZEStencilOperation Operation)
+void ZEGRDepthStencilState::SetBackStencilFail(ZEGRStencilOperation Operation)
 {
 	if (StateData.BackStencilFailOperation != Operation)
 	{
 		StateData.BackStencilFailOperation = Operation;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEStencilOperation ZEDepthStencilState::GetBackStencilFail() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetBackStencilFail() const
 {
 	return StateData.BackStencilFailOperation;
 }
 
-void ZEDepthStencilState::SetBackZFail(ZEStencilOperation Operation)
+void ZEGRDepthStencilState::SetBackZFail(ZEGRStencilOperation Operation)
 {
 	if (StateData.BackZFailOperation != Operation)
 	{
 		StateData.BackZFailOperation = Operation;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEStencilOperation ZEDepthStencilState::GetBackZFail() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetBackZFail() const
 {
 	return StateData.BackZFailOperation;
 }
 
-void ZEDepthStencilState::SetBackStencilPass(ZEStencilOperation Operation)
+void ZEGRDepthStencilState::SetBackStencilPass(ZEGRStencilOperation Operation)
 {
 	if (StateData.BackStencilPassOperation != Operation)
 	{
 		StateData.BackStencilPassOperation = Operation;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEStencilOperation ZEDepthStencilState::GetBackStencilPass() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetBackStencilPass() const
 {
 	return StateData.BackStencilPassOperation;
 }
 
-void ZEDepthStencilState::SetBackStencilFunction(ZEComparisonFunction Function)
+void ZEGRDepthStencilState::SetBackStencilFunction(ZEGRComparisonFunction Function)
 {
 	if (StateData.BackStencilFunction != Function)
 	{
 		StateData.BackStencilFunction = Function;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEComparisonFunction ZEDepthStencilState::GetBackStencilFunction() const
+ZEGRComparisonFunction ZEGRDepthStencilState::GetBackStencilFunction() const
 {
 	return StateData.BackStencilFunction;
 }
 
-void ZEDepthStencilState::SetToDefault()
+void ZEGRDepthStencilState::SetToDefault()
 {
-	Hash = 0;
-	Dirty = false;
-
 	memset(&StateData, 0, sizeof(ZEDepthStencilStateData));
 	StateData.ZTestEnable = true;
 	StateData.StencilTestEnable = false;
 	StateData.ZWriteEnable = false;
 	StateData.StencilWriteMask = 0xFF;
 	StateData.StencilReadMask = 0xFF;
-	StateData.ZFunction = ZE_CF_LESS;
-	StateData.FrontStencilFailOperation = ZE_SO_KEEP;
-	StateData.FrontZFailOperation = ZE_SO_KEEP;
-	StateData.FrontStencilPassOperation = ZE_SO_KEEP;
-	StateData.FrontStencilFunction = ZE_CF_ALWAYS;
-	StateData.BackStencilFailOperation = ZE_SO_KEEP;
-	StateData.BackZFailOperation = ZE_SO_KEEP;
-	StateData.BackStencilPassOperation = ZE_SO_KEEP;
-	StateData.BackStencilFunction = ZE_CF_ALWAYS;
+	StateData.ZFunction = ZEGR_CF_LESS;
+	StateData.FrontStencilFailOperation = ZEGR_SO_KEEP;
+	StateData.FrontZFailOperation = ZEGR_SO_KEEP;
+	StateData.FrontStencilPassOperation = ZEGR_SO_KEEP;
+	StateData.FrontStencilFunction = ZEGR_CF_ALWAYS;
+	StateData.BackStencilFailOperation = ZEGR_SO_KEEP;
+	StateData.BackZFailOperation = ZEGR_SO_KEEP;
+	StateData.BackStencilPassOperation = ZEGR_SO_KEEP;
+	StateData.BackStencilFunction = ZEGR_CF_ALWAYS;
 }
 
-const ZEDepthStencilState& ZEDepthStencilState::operator=(const ZEDepthStencilState& State)
-{
-	Hash = State.Hash;
-	Dirty = State.Dirty;
-	memcpy(&StateData, &State.StateData, sizeof(ZEDepthStencilStateData));
-	return *this;
-}
-
-bool ZEDepthStencilState::operator==(const ZEDepthStencilState& State)
-{
-	return memcmp(&StateData, &State.StateData, sizeof(ZEDepthStencilStateData)) == 0;
-}
-
-bool ZEDepthStencilState::operator!=(const ZEDepthStencilState& State)
-{
-	return !operator==(State);
-}
-
-ZEDepthStencilState::ZEDepthStencilState()
+ZEGRDepthStencilState::ZEGRDepthStencilState()
 {
 	SetToDefault();
 }
 
-ZEDepthStencilState::~ZEDepthStencilState()
+ZEGRDepthStencilState::~ZEGRDepthStencilState()
 {
 
 }

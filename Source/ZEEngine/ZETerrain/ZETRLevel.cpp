@@ -151,21 +151,21 @@ bool ZETRLevel::InitializeSelf()
 		return false;
 
 	ZESize BlockSize = Layer->GetBlockSize();
-	Texture = ZETexture2D::CreateInstance();
+	Texture = ZEGRTexture2D::CreateInstance();
 	bool Result = false;
 	
 	switch (Layer->GetPixelType())
 	{
 		case ZETR_PT_ELEVATION:
-			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZE_TPF_F32, false);
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_F32, false);
 			break;
 
 		case ZETR_PT_COLOR:
-			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZE_TPF_I8_4, false);
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_I8_4, false);
 			break;
 
 		case ZETR_PT_GRAYSCALE:
-			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZE_TPF_I8, false);
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_I8, false);
 			break;
 
 		default:
@@ -216,7 +216,7 @@ ZESize  ZETRLevel::GetBlockCount()
 	return ZETR_LEVEL_BLOCK_COUNT;
 }
 
-ZETexture2D* ZETRLevel::GetTexture()
+ZEGRTexture2D* ZETRLevel::GetTexture()
 {
 	return Texture;
 }

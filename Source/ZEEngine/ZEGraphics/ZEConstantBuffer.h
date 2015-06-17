@@ -33,57 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SHADER_CONSTANT_BUFFER_H__
-#define __ZE_SHADER_CONSTANT_BUFFER_H__
+#pragma once
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
 #include "ZEGraphicsResource.h"
 #include "ZEGraphicsDefinitions.h"
 
-struct ZEShaderBuffer;
-
-class ZEConstantBuffer : public ZEGraphicsResource
+class ZEGRConstantBuffer : public ZEGRResource
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEGraphicsModule;
-
 	protected:
-		static ZESize				TotalSize;
-		static ZEUInt16				TotalCount;
-
-		ZEShadowCopy				ShadowCopy;
-
-		ZESize						Size;
-		const ZEShaderBuffer*		Info;
-
-		virtual bool				UpdateWith(ZEUInt ShadowIndex);
-
-									ZEConstantBuffer();
-		virtual						~ZEConstantBuffer();
+									ZEGRConstantBuffer();
+		virtual						~ZEGRConstantBuffer();
 
 	public:
-		ZESize						GetSize() const;
-		const ZEShaderBuffer*		GetInfo() const;
-
-		ZEGraphicsResourceType		GetResourceType() const;
+		ZEGRResourceType		GetResourceType() const;
 
 		void						SetZero();
-		void						SetData(void* ConstantData);
+		virtual void				SetData(void* ConstantData) = 0;
 
-		bool						SetConstant(ZEUInt Index, const void* SourceData);
-		bool						SetConstant(const char* Name, const void* SourceData);
+		virtual bool				Create(ZESize BufferSize) = 0;
 
-		bool						GetConstant(ZEUInt Index, void* DestinationData) const;
-		bool						GetConstant(const char* Name, void* DestinationData) const;
-
-		void						Unlock();
-		bool						Lock(void** Data);
-		
-		virtual bool				Create(const ZEShaderBuffer* BufferInfo);
-		virtual bool				Create(ZESize BufferSize);
-
-		static ZEConstantBuffer*	CreateInstance();
+		static ZEGRConstantBuffer*	CreateInstance();
 };
-
-#endif

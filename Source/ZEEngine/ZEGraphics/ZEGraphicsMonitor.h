@@ -33,14 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_GRAPHICS_MONITOR_H__
-#define __ZE_GRAPHICS_MONITOR_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZERectangle.h"
 
-class ZEGraphicsMonitor
+class ZEGRMonitor
 {
 	friend class ZEGraphicsModule;
 
@@ -50,8 +49,8 @@ class ZEGraphicsMonitor
 		void*					Handle;
 		ZERectangle				Area;
 	
-								ZEGraphicsMonitor();
-		virtual					~ZEGraphicsMonitor();
+								ZEGRMonitor();
+		virtual					~ZEGRMonitor();
 
 	public:
 		void*					GetHandle();
@@ -61,5 +60,3 @@ class ZEGraphicsMonitor
 		const ZERectangle&		GetArea();
 
 };
-
-#endif

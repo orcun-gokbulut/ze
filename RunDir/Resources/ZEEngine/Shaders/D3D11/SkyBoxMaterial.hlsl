@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStatePool.cpp
+ Zinek Engine - SkyBoxMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEStatePool.h"
+samplerCUBE SkyTexture : register(s5);
 
+float4x4 WorldViewProjMatrix: register(c0);
+float3 SkyColor : register(c10);
 
-void ZEStatePool::ClearStates()
+struct VSInput 
 {
-	BlendStateCount = 0;
-	SamplerStateCount = 0;
-	VertexLayoutCount = 0;
-	RasterizerStateCount = 0;
-	DepthStencilStateCount = 0;
+	float4 Position : POSITION0;
+};
+
+struct VSOutput 
+{
+	float4 Position : POSITION0;
+	float3 CubeTexcoord : TEXCOORD0;
+};
+
+VSOutput VSMain(VSInput Input)
+{
+	VSOutput Output;
+
+	Output.Position = mul(WorldViewProjMatrix, Input.Position.xyz);
+	Output.Position.z = Output.Position.w;
+	Output.CubeTexcoord = Input.Position.xyz;
+	return Output;
 }
 
-ZEUInt16 ZEStatePool::BlendStateCount = 0;
-ZEUInt16 ZEStatePool::SamplerStateCount = 0;
-ZEUInt16 ZEStatePool::VertexLayoutCount = 0;
-ZEUInt16 ZEStatePool::RasterizerStateCount = 0;
-ZEUInt16 ZEStatePool::DepthStencilStateCount = 0;
-
-ZEStatePool::ZEStatePool()
+struct PSInput
 {
+	float3 CubeTexcoord : TEXCOORD0;
+};
 
-}
-
-ZEStatePool::~ZEStatePool()
+float4 PSMain(PSInput Input) : COLOR0
 {
-
+	return float4(SkyColor * texCUBE(SkyTexture, normalize(Input.CubeTexcoord)), 1.0f);
 }

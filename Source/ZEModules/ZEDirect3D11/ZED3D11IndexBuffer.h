@@ -42,7 +42,7 @@
 #include "ZED3D11ComponentBase.h"
 #include "ZEGraphics/ZEIndexBuffer.h"
 
-class ZED3D11IndexBuffer : public ZEIndexBuffer, public ZED3D11ComponentBase
+class ZED3D11IndexBuffer : public ZEGRIndexBuffer, public ZED3D11ComponentBase
 {
 	friend class ZED3D11GraphicsDevice;
 	friend class ZED3D11GraphicsModule;

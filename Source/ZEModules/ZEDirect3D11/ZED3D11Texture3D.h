@@ -44,9 +44,9 @@
 #include "ZED3D11RenderTarget.h"
 
 class ZETextureData;
-class ZERenderTarget;
+class ZEGRRenderTarget;
 
-class ZED3D11Texture3D : public ZETexture3D, public ZED3D11ComponentBase
+class ZED3D11Texture3D : public ZEGRTexture3D, public ZED3D11ComponentBase
 {
 	friend class ZED3D11GraphicsModule;
 	friend class ZED3D11GraphicsDevice;
@@ -64,10 +64,10 @@ class ZED3D11Texture3D : public ZETexture3D, public ZED3D11ComponentBase
 		const ID3D11Texture3D*				GetD3D10Texture() const;
 		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
 		
-		bool								CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
-		bool								CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
+		bool								CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEGRTextureFormat PixelFormat, ZETextureData* Data = NULL);
+		bool								CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
 
-		ZERenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
+		ZEGRRenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
 };
 
 #endif

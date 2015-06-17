@@ -32,105 +32,92 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#pragma  once
 
-#ifndef __ZE_DEVICE_STATE_BLEND_H__
-#define __ZE_DEVICE_STATE_BLEND_H__
+#include "ZEGRState.h"
 
 #include "ZETypes.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEGraphicsDefinitions.h"
-#include "ZEFoundation/ZEDS/ZEFlags.h"
 
-enum ZEBlendOption 
+enum ZEGRBlendOption 
 {	
-	ZE_BO_ZERO					= 1,
-	ZE_BO_ONE					= 2,
-	ZE_BO_SRC_COLOR				= 3,
-	ZE_BO_INV_SRC_COLOR			= 4,
-	ZE_BO_SRC_ALPHA				= 5,
-	ZE_BO_INV_SRC_ALPHA			= 6,
-	ZE_BO_DEST_ALPHA			= 7,
-	ZE_BO_INV_DEST_ALPHA		= 8,
-	ZE_BO_DEST_COLOR			= 9,
-	ZE_BO_INV_DEST_COLOR		= 10,
-	ZE_BO_SRC_ALPHA_SAT			= 11,
-	ZE_BO_BLEND_FACTOR			= 12,
-	ZE_BO_INV_BLEND_FACTOR		= 13,
-	ZE_BO_SRC1_COLOR			= 14,
-	ZE_BO_INV_SRC1_COLOR		= 15,
-	ZE_BO_SRC1_ALPHA			= 16,
-	ZE_BO_INV_SRC1_ALPHA		= 17
+	ZEGR_BO_ZERO				= 1,
+	ZEGR_BO_ONE					= 2,
+	ZEGR_BO_SRC_COLOR			= 3,
+	ZEGR_BO_INV_SRC_COLOR		= 4,
+	ZEGR_BO_SRC_ALPHA			= 5,
+	ZEGR_BO_INV_SRC_ALPHA		= 6,
+	ZEGR_BO_DEST_ALPHA			= 7,
+	ZEGR_BO_INV_DEST_ALPHA		= 8,
+	ZEGR_BO_DEST_COLOR			= 9,
+	ZEGR_BO_INV_DEST_COLOR		= 10,
+	ZEGR_BO_SRC_ALPHA_SAT		= 11,
+	ZEGR_BO_BLEND_FACTOR		= 12,
+	ZEGR_BO_INV_BLEND_FACTOR	= 13,
+	ZEGR_BO_SRC1_COLOR			= 14,
+	ZEGR_BO_INV_SRC1_COLOR		= 15,
+	ZEGR_BO_SRC1_ALPHA			= 16,
+	ZEGR_BO_INV_SRC1_ALPHA		= 17
 };
 
-enum ZEBlendEquation 
+enum ZEGRBlendEquation 
 { 
-	ZE_BE_ADD					= 1,
-	ZE_BE_SUBTRACT				= 2,
-	ZE_BE_REV_SUBTRACT			= 3,
-	ZE_BE_MIN					= 4,
-	ZE_BE_MAX					= 5 
+	ZEGR_BE_ADD					= 1,
+	ZEGR_BE_SUBTRACT			= 2,
+	ZEGR_BE_REV_SUBTRACT		= 3,
+	ZEGR_BE_MIN					= 4,
+	ZEGR_BE_MAX					= 5 
 };
 
-typedef ZEComponentMask ZEColorWriteMask;
+typedef ZEGRColorMask ZEGRColorWriteMask;
 
-class ZEBlendState
+class ZEGRBlendState : public ZEGRState
 {
-	protected:
-		ZESize						Hash;
-		bool						Dirty;
-		
+	private:
 		struct ZEBlendStateData
 		{
 			bool					AlphaToCoverageEnable : 2;
-			ZEBlendOption			SourceBlendOption : 6;
-			ZEBlendOption			DestinationBlendOption : 6;
-			ZEBlendEquation			BlendEquation : 4;
-			ZEBlendOption			SourceBlendAlphaOption : 6;
-			ZEBlendOption			DestinationBlendAlphaOption : 6;
-			ZEBlendEquation			BlendAlphaEquation : 4;
-			bool					BlendEnable[ZE_MAX_RENDER_TARGET_SLOT];
-			ZEColorWriteMask		ComponentWriteMask[ZE_MAX_RENDER_TARGET_SLOT];
+			ZEGRBlendOption			SourceBlendOption : 6;
+			ZEGRBlendOption			DestinationBlendOption : 6;
+			ZEGRBlendEquation		BlendEquation : 4;
+			ZEGRBlendOption			SourceBlendAlphaOption : 6;
+			ZEGRBlendOption			DestinationBlendAlphaOption : 6;
+			ZEGRBlendEquation		BlendAlphaEquation : 4;
+			bool					BlendEnable[ZEGR_MAX_RENDER_TARGET_SLOT];
+			ZEGRColorWriteMask		ComponentWriteMask[ZEGR_MAX_RENDER_TARGET_SLOT];
 
 		} StateData;
 		
 	public:
-		ZESize						GetHash();
-
 		void						SetAlphaToCoverageEnable(bool Enable);
 		bool						GetAlphaToCoverageEnable() const;
 
 		void						SetBlendEnable(ZEUInt RenderTarget, bool Enable);
 		bool						GetBlendEnable(ZEUInt RenderTarget) const;
 		
-		void						SetSourceBlendOption(ZEBlendOption Option);
-		ZEBlendOption				GetSourceBlendOption() const;
+		void						SetSourceBlendOption(ZEGRBlendOption Option);
+		ZEGRBlendOption				GetSourceBlendOption() const;
 		
-		void						SetDestinationBlendOption(ZEBlendOption Option);
-		ZEBlendOption				GetDestinationBlendOption() const;
+		void						SetDestinationBlendOption(ZEGRBlendOption Option);
+		ZEGRBlendOption				GetDestinationBlendOption() const;
 
-		void						SetBlendEquation(ZEBlendEquation Equation);
-		ZEBlendEquation				GetBlendEquation() const;
+		void						SetBlendEquation(ZEGRBlendEquation Equation);
+		ZEGRBlendEquation			GetBlendEquation() const;
 
-		void						SetSourceBlendAlphaOption(ZEBlendOption Option);
-		ZEBlendOption				GetSourceBlendAlphaOption() const;
+		void						SetSourceBlendAlphaOption(ZEGRBlendOption Option);
+		ZEGRBlendOption				GetSourceBlendAlphaOption() const;
 		
-		void						SetDestinationBlendAlphaOption(ZEBlendOption Option);
-		ZEBlendOption				GetDestinationBlendAlphaOption() const;
+		void						SetDestinationBlendAlphaOption(ZEGRBlendOption Option);
+		ZEGRBlendOption				GetDestinationBlendAlphaOption() const;
 		
-		void						SetBlendAlphaEquation(ZEBlendEquation Equation);
-		ZEBlendEquation				GetBlendAlphaEquation() const;
+		void						SetBlendAlphaEquation(ZEGRBlendEquation Equation);
+		ZEGRBlendEquation			GetBlendAlphaEquation() const;
 
-		void						SetComponentWriteMask(ZEUInt RenderTarget, ZEColorWriteMask Mask);
-		ZEColorWriteMask			GetComponentWriteMask(ZEUInt RenderTarget) const;
+		void						SetComponentWriteMask(ZEUInt RenderTarget, ZEGRColorWriteMask Mask);
+		ZEGRColorWriteMask			GetComponentWriteMask(ZEUInt RenderTarget) const;
 
 		void						SetToDefault();
-		
-		const ZEBlendState&			operator=(const ZEBlendState& State);
-		bool						operator==(const ZEBlendState& State);
-		bool						operator!=(const ZEBlendState& State);
 
-									ZEBlendState();
-									~ZEBlendState();
-
+									ZEGRBlendState();
+									~ZEGRBlendState();
 };
-#endif

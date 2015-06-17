@@ -58,8 +58,8 @@ void ZEDirectionalLight::CreateRenderTargets()
 		if (Cascades[I].ShadowMap == NULL)
 		{
 			// Create if not allocated
-			Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
-			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
+			Cascades[I].ShadowMap = ZEGRTexture2D::CreateInstance();
+			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZEGR_TF_INTZ, true);
 		}
 		else
 		{
@@ -67,8 +67,8 @@ void ZEDirectionalLight::CreateRenderTargets()
 			if (Cascades[I].ShadowMap->GetWidth() != Dimension || Cascades[I].ShadowMap->GetHeight() != Dimension)
 			{
 				Cascades[I].ShadowMap->Destroy();
-				Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
-				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_INTZ, true);
+				Cascades[I].ShadowMap = ZEGRTexture2D::CreateInstance();
+				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZEGR_TF_INTZ, true);
 			}
 		}
 	}
@@ -89,7 +89,7 @@ void ZEDirectionalLight::CreateRenderTargets()
 		{
 			// Create if not allocated
 			Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
-			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_R32F, true);
+			Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZEGR_TF_R32F, true);
 		}
 		else
 		{
@@ -98,7 +98,7 @@ void ZEDirectionalLight::CreateRenderTargets()
 			{
 				Cascades[I].ShadowMap->Destroy();
 				Cascades[I].ShadowMap = ZETexture2D::CreateInstance();
-				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZE_TPF_R32F, true);
+				Cascades[I].ShadowMap->Create(Dimension, Dimension, 1, ZEGR_TF_R32F, true);
 			}
 		}
 	}
@@ -158,7 +158,7 @@ const ZEDirectionalLightCascade& ZEDirectionalLight::GetCascadeData(ZESize Index
 	return Cascades[Index];
 }
 
-ZETexture2D* ZEDirectionalLight::GetShadowMap(ZESize Index)
+ZEGRTexture2D* ZEDirectionalLight::GetShadowMap(ZESize Index)
 {
 	zeDebugCheck(Index >= MAX_CASCADE_COUNT, "Index out of range");
 	return Cascades[Index].ShadowMap;

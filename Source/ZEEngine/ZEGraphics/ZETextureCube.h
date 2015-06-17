@@ -50,46 +50,33 @@ enum ZETextureCubeFace
 };
 
 class ZETextureData;
-class ZERenderTarget;
+class ZEGRRenderTarget;
 
-class ZETextureCube : public ZETexture
+class ZEGRTextureCube : public ZEGRTexture
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEGraphicsModule;
+	private:
+		ZEUInt							Length;
 
 	protected:
-		static ZEUInt16				TotalCount;
-		static ZESize				TotalSize;
+		virtual	bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget, ZETextureData* InitialData) = 0;
 
-		ZEShadowCopy				ShadowCopy;
-
-		ZESize						Size;
-		ZEUInt						EdgeLength;
-		ZEUInt						LevelCount;
-		ZEVector2					PixelSize;
-
-		virtual bool				UpdateWith(ZEUInt ShadowIndex);
-
-									ZETextureCube();
-		virtual						~ZETextureCube();
+										ZEGRTextureCube();
+		virtual							~ZEGRTextureCube();
 
 	public:
-		ZEGraphicsResourceType		GetResourceType() const;
+		ZEGRResourceType				GetResourceType() const;
+		ZEGRTextureType					GetTextureType() const;
 
-		ZESize						GetSize() const;
-		ZEUInt						GetEdgeLenght() const;
-		ZEUInt						GetLevelCount() const;
-		const ZEVector2&			GetPixelSize() const;
+		ZEUInt							GetLength() const;
+		float							GetPixelSize() const;
 
-		virtual bool				Unlock(ZETextureCubeFace Face);
-		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face);
+		virtual bool					Unlock(ZETextureCubeFace Face) = 0;
+		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face) = 0;
 		
-		virtual	bool				CreateDynamic(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, ZETextureData* InitialData = NULL);
-		virtual	bool				CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = NULL);
 		
-		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		virtual	ZEGRRenderTarget*		GetRenderTarget(ZETextureCubeFace Face, ZEUInt MipLevel = 0) const = 0;
 
-		static ZETextureCube*		CreateInstance();
+		static ZEGRTextureCube*			CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = 0);
 };
 
 #endif

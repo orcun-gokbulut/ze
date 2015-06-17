@@ -57,7 +57,7 @@ class ZED3D11ConstantBuffer : public ZEConstantBuffer, public ZED3D11ComponentBa
 	public:
 		const ID3D11Buffer*		GetD3D10Buffer() const;
 
-		bool					Create(const ZEShaderBuffer* BufferInfo);
+		bool					Create(const ZEGRShaderConstantBuffer* BufferInfo);
 		bool					Create(ZESize BufferSize);
 };
 

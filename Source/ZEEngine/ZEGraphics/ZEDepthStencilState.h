@@ -33,63 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEVICE_STATE_DEPTH_STENCIL_H__
-#define __ZE_DEVICE_STATE_DEPTH_STENCIL_H__
+#pragma once
+
+#include "ZEGRState.h"
 
 #include "ZETypes.h"
 
-enum ZEStencilOperation 
+enum ZEGRStencilOperation 
 { 
-	ZE_SO_KEEP			= 1,
-	ZE_SO_ZERO			= 2,
-	ZE_SO_REPLACE		= 3,
-	ZE_SO_INCR_SAT		= 4,
-	ZE_SO_DECR_SAT		= 5,
-	ZE_SO_INVERT		= 6,
-	ZE_SO_INCR			= 7,
-	ZE_SO_DECR			= 8 
+	ZEGR_SO_KEEP			= 1,
+	ZEGR_SO_ZERO			= 2,
+	ZEGR_SO_REPLACE			= 3,
+	ZEGR_SO_INCR_SAT		= 4,
+	ZEGR_SO_DECR_SAT		= 5,
+	ZEGR_SO_INVERT			= 6,
+	ZEGR_SO_INCR			= 7,
+	ZEGR_SO_DECR			= 8 
 };
 
-enum ZEComparisonFunction 
+enum ZEGRComparisonFunction 
 { 
-	ZE_CF_NEVER				= 1,
-	ZE_CF_LESS				= 2,
-	ZE_CF_EQUAL				= 3,
-	ZE_CF_LESS_EQUAL		= 4,
-	ZE_CF_GREATER			= 5,
-	ZE_CF_NOT_EQUAL			= 6,
-	ZE_CF_GREATER_EQUAL		= 7,
-	ZE_CF_ALWAYS			= 8 
+	ZEGR_CF_NEVER			= 1,
+	ZEGR_CF_LESS			= 2,
+	ZEGR_CF_EQUAL			= 3,
+	ZEGR_CF_LESS_EQUAL		= 4,
+	ZEGR_CF_GREATER			= 5,
+	ZEGR_CF_NOT_EQUAL		= 6,
+	ZEGR_CF_GREATER_EQUAL	= 7,
+	ZEGR_CF_ALWAYS			= 8 
 };
 
-class ZEDepthStencilState
+class ZEGRDepthStencilState : public ZEGRState
 {
-	protected:
-		ZESize							Hash;
-		bool							Dirty;
-
+	private:
 		struct ZEDepthStencilStateData
 		{
 			bool						ZTestEnable : 2;
 			bool						ZWriteEnable : 2;
 			bool						StencilTestEnable : 2;
-			ZEComparisonFunction		ZFunction : 5;
+			ZEGRComparisonFunction		ZFunction : 5;
 			ZEUInt8						StencilWriteMask : 8;
 			ZEUInt8						StencilReadMask : 8;
-			ZEStencilOperation			FrontStencilFailOperation : 5;
-			ZEStencilOperation			FrontZFailOperation : 5;
-			ZEStencilOperation			FrontStencilPassOperation : 5;
-			ZEComparisonFunction		FrontStencilFunction : 5;
-			ZEStencilOperation			BackStencilFailOperation : 5;
-			ZEStencilOperation			BackZFailOperation : 5;
-			ZEStencilOperation			BackStencilPassOperation : 5;
-			ZEComparisonFunction		BackStencilFunction : 5;
+			ZEGRStencilOperation		FrontStencilFailOperation : 5;
+			ZEGRStencilOperation		FrontZFailOperation : 5;
+			ZEGRStencilOperation		FrontStencilPassOperation : 5;
+			ZEGRComparisonFunction		FrontStencilFunction : 5;
+			ZEGRStencilOperation		BackStencilFailOperation : 5;
+			ZEGRStencilOperation		BackZFailOperation : 5;
+			ZEGRStencilOperation		BackStencilPassOperation : 5;
+			ZEGRComparisonFunction		BackStencilFunction : 5;
 
 		} StateData;
 	
 	public:
-		ZESize							GetHash();
-
 		void							SetZTestEnable(bool Enable);
 		bool							GetZTestEnable() const;
 	
@@ -105,41 +101,35 @@ class ZEDepthStencilState
 		void							SetStencilReadMask(ZEUInt8 Mask);
 		ZEUInt8							GetStencilReadMask() const;
 
-		void							SetZFunction(ZEComparisonFunction Function);
-		ZEComparisonFunction			GetZFunction() const;
+		void							SetZFunction(ZEGRComparisonFunction Function);
+		ZEGRComparisonFunction			GetZFunction() const;
 	
-		void							SetFrontStencilFail(ZEStencilOperation Operation);
-		ZEStencilOperation				GetFrontStencilFail() const;
+		void							SetFrontStencilFail(ZEGRStencilOperation Operation);
+		ZEGRStencilOperation			GetFrontStencilFail() const;
 	
-		void							SetFrontZFail(ZEStencilOperation Operation);
-		ZEStencilOperation				GetFrontZFail() const;
+		void							SetFrontZFail(ZEGRStencilOperation Operation);
+		ZEGRStencilOperation			GetFrontZFail() const;
 	
-		void							SetFrontStencilPass(ZEStencilOperation Operation);
-		ZEStencilOperation				GetFrontStencilPass() const;
+		void							SetFrontStencilPass(ZEGRStencilOperation Operation);
+		ZEGRStencilOperation			GetFrontStencilPass() const;
 	
-		void							SetFrontStencilFunction(ZEComparisonFunction Function);
-		ZEComparisonFunction			GetFrontStencilFunction() const;
+		void							SetFrontStencilFunction(ZEGRComparisonFunction Function);
+		ZEGRComparisonFunction			GetFrontStencilFunction() const;
 	
-		void							SetBackStencilFail(ZEStencilOperation Operation);
-		ZEStencilOperation				GetBackStencilFail() const;
+		void							SetBackStencilFail(ZEGRStencilOperation Operation);
+		ZEGRStencilOperation			GetBackStencilFail() const;
 	
-		void							SetBackZFail(ZEStencilOperation Operation);
-		ZEStencilOperation				GetBackZFail() const;
+		void							SetBackZFail(ZEGRStencilOperation Operation);
+		ZEGRStencilOperation			GetBackZFail() const;
 	
-		void							SetBackStencilPass(ZEStencilOperation Operation);
-		ZEStencilOperation				GetBackStencilPass() const;
+		void							SetBackStencilPass(ZEGRStencilOperation Operation);
+		ZEGRStencilOperation			GetBackStencilPass() const;
 	
-		void							SetBackStencilFunction(ZEComparisonFunction Function);		
-		ZEComparisonFunction			GetBackStencilFunction() const;
+		void							SetBackStencilFunction(ZEGRComparisonFunction Function);		
+		ZEGRComparisonFunction			GetBackStencilFunction() const;
 
 		void							SetToDefault();
 
-		const ZEDepthStencilState&		operator=(const ZEDepthStencilState& State);
-		bool							operator==(const ZEDepthStencilState& State);
-		bool							operator!=(const ZEDepthStencilState& State);
-
-										ZEDepthStencilState();
-										~ZEDepthStencilState();
+										ZEGRDepthStencilState();
+										~ZEGRDepthStencilState();
 };
-
-#endif

@@ -33,12 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SCISSOR_RECTANGLE_H__
-#define __ZE_SCISSOR_RECTANGLE_H__
+#pragma once
 
 #include "ZETypes.h"
 
-class ZEScissorRectangle
+class ZEGRScissorRectangle
 {
 	public:
 		struct ZEScissorRectangleData
@@ -50,16 +49,7 @@ class ZEScissorRectangle
 
 		} StateData;
 
-		ZESize						GetHash() const;
-
 		void						SetZero();
 
-		const ZEScissorRectangle&	operator =(const ZEScissorRectangle& Other);
-		bool						operator ==(const ZEScissorRectangle& Other);
-		bool						operator !=(const ZEScissorRectangle& Other);
-
-									ZEScissorRectangle();
-									~ZEScissorRectangle();
+									ZEGRScissorRectangle();
 };
-
-#endif

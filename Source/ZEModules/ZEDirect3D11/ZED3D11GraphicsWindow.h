@@ -79,8 +79,8 @@ class ZED3D11GraphicsWindow : public ZEGraphicsWindow
 		virtual bool						Update();
 		virtual bool						Present();
 
-		virtual const ZETexture2D*			GetBackBufferTexture();
-		virtual const ZERenderTarget*		GetBackBuffer();
+		virtual const ZEGRTexture2D*			GetBackBufferTexture();
+		virtual const ZEGRRenderTarget*		GetBackBuffer();
 		virtual const ZEDepthStencilBuffer*	GetDepthBuffer();
 };
 

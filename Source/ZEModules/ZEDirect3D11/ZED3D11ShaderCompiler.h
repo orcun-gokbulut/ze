@@ -42,13 +42,13 @@
 #include "ZED3D11ComponentBase.h"
 #include "ZEGraphics/ZEShaderCompiler.h"
 
-class ZEShader;
+class ZEGRShader;
 class ZED3D11Shader;
 class ZED3D11PixelShader;
 class ZED3D11VertexShader;
 class ZED3D11GeometryShader;
 
-class ZED3D11ShaderCompiler : public ZEShaderCompiler, public ZED3D11ComponentBase
+class ZED3D11ShaderCompiler : public ZEGRShaderCompiler, public ZED3D11ComponentBase
 {
 	friend class ZED3D11GraphicsModule;
 
@@ -62,7 +62,7 @@ class ZED3D11ShaderCompiler : public ZEShaderCompiler, public ZED3D11ComponentBa
 
 		bool						CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* ByteCode);
 
-		ZEShader*					CompileShader(ZEShaderCompileOptions* Options);
+		ZEGRShader*					CompileShader(ZEGRShaderCompileOptions* Options);
 
 									ZED3D11ShaderCompiler();
 		virtual						~ZED3D11ShaderCompiler();

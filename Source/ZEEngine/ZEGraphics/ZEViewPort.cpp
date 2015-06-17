@@ -33,49 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <memory>
-
 #include "ZEViewPort.h"
-#include "ZEDS/ZEHashGenerator.h"
 
-ZESize ZEViewport::GetHash() const
-{
-	return ZEHashGenerator::Hash((void*)&StateData, sizeof(ZEViewportData));
-}
+#include <memory>
 
 void ZEViewport::SetZero()
 {
 	memset(&StateData, 0, sizeof(ZEViewportData));
-}
-
-const ZEViewport& ZEViewport::operator =(const ZEViewport& Other)
-{
-	memcpy(&StateData, &Other.StateData, sizeof(ZEViewportData));
-
-	return *this;
-}
-
-bool ZEViewport::operator ==(const ZEViewport& Other)
-{
-	if (StateData.Width != Other.StateData.Width)
-		return false;
-	if (StateData.Height != Other.StateData.Height)
-		return false;
-	if (StateData.TopLeftX != Other.StateData.TopLeftX)
-		return false;
-	if (StateData.TopLeftY != Other.StateData.TopLeftY)
-		return false;
-	if (ZEMath::Abs(StateData.MinDepth - Other.StateData.MinDepth) > ZE_ZERO_THRESHOLD)
-		return false;
-	if (ZEMath::Abs(StateData.MaxDepth - Other.StateData.MaxDepth) > ZE_ZERO_THRESHOLD)
-		return false;
-
-	return true;
-}
-
-bool ZEViewport::operator !=(const ZEViewport& Other)
-{
-	return !operator==(Other);
 }
 
 ZEViewport::ZEViewport()

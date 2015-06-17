@@ -40,18 +40,18 @@
 #include "ZELight.h"
 #include "ZEMath/ZEViewSphere.h"
 
-class ZETextureCube;
-class ZETexture2D;
+class ZEGRTextureCube;
+class ZEGRTexture2D;
 
 class ZEOmniProjectiveLight : public ZELight
 {
 	ZE_OBJECT
 
 	private:
-		const ZETextureCube*			ProjectionTexture;
+		const ZEGRTextureCube*			ProjectionTexture;
 		ZEViewSphere					ViewVolume;
-		ZETexture2D*					FrontShadowMap;
-		ZETexture2D*					BackShadowMap;
+		ZEGRTexture2D*					FrontShadowMap;
+		ZEGRTexture2D*					BackShadowMap;
 		ZEMatrix4x4						ViewProjectionMatrix;
 
 		virtual bool					DeinitializeSelf();
@@ -62,10 +62,10 @@ class ZEOmniProjectiveLight : public ZELight
 	public:
 		ZELightType						GetLightType();
 
-		const ZETextureCube*			GetShadowMap();
+		const ZEGRTextureCube*			GetShadowMap();
 
-		void							SetProjectionTexture(const ZETextureCube* Texture);
-		const ZETextureCube*			GetProjectionTexture();
+		void							SetProjectionTexture(const ZEGRTextureCube* Texture);
+		const ZEGRTextureCube*			GetProjectionTexture();
 
 		virtual void					SetCastsShadow(bool NewValue);
 		
@@ -73,8 +73,8 @@ class ZEOmniProjectiveLight : public ZELight
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
-		ZETexture2D*					GetFrontShadowMap();
-		ZETexture2D*					GetBackShadowMap();
+		ZEGRTexture2D*					GetFrontShadowMap();
+		ZEGRTexture2D*					GetBackShadowMap();
 
 		virtual void					Draw(ZEDrawParameters* DrawParameters);
 

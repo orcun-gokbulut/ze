@@ -50,7 +50,7 @@
 #include <stdio.h>
 #include <string.h>
 
-static void CopyToTexture2D(ZETexture2D* Output, ZETextureData* TextureData)
+static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 {
 	ZEUInt LevelCount = TextureData->GetLevelCount();
 	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
@@ -73,12 +73,12 @@ const char* ZETexture2DResource::GetResourceType() const
 	return "Texture Resource";
 }
 
-ZETextureType ZETexture2DResource::GetTextureType() const 
+ZEGRTextureType ZETexture2DResource::GetTextureType() const 
 {
-	return ZE_TT_2D;
+	return ZEGR_TT_2D;
 }
 
-const ZETexture2D* ZETexture2DResource::GetTexture() const
+const ZEGRTexture2D* ZETexture2DResource::GetTexture() const
 {
 	return Texture;
 }
@@ -183,7 +183,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	bool IdentifierExists	= false;
 
 	// Decide final texture options
-	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 1, 1, ZE_TT_2D);
+	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 1, 1, ZEGR_TT_2D);
 	
 	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
@@ -285,7 +285,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Create TextureResource 
 	ZETexture2DResource* TextureResource = new ZETexture2DResource();
-	ZETexture2D* Texture = TextureResource->Texture = ZETexture2D::CreateInstance();
+	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance();
 
 	// Set Other Variables
 	TextureResource->SetFileName(ResourceFile->GetPath());

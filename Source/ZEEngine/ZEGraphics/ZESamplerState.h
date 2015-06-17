@@ -33,41 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEVICE_STATE_SAMPLER_H__
-#define __ZE_DEVICE_STATE_SAMPLER_H__
+#pragma once
 
-#include "ZETexture.h"
-#include "ZEFoundation/ZEMath/ZEVector.h"
+#include "ZEGRState.h"
 
-enum ZETextureAddressMode
+#include "ZEMath/ZEVector.h"
+
+enum ZEGRTextureAddressMode
 {
-	ZE_TAM_WRAP				    = 1,
-	ZE_TAM_MIRROR			    = 2,
-	ZE_TAM_CLAMP			    = 3,
-	ZE_TAM_BORDER				= 4
+	ZEGR_TAM_WRAP			    = 1,
+	ZEGR_TAM_MIRROR			    = 2,
+	ZEGR_TAM_CLAMP			    = 3,
+	ZEGR_TAM_BORDER				= 4
 };
 
-enum ZETextureFilterMode
+enum ZEGRTextureFilterMode
 {
-	ZE_TFM_POINT				= 1,
-	ZE_TFM_LINEAR				= 2,
-	ZE_TFM_ANISOTROPY			= 3
+	ZEGR_TFM_POINT				= 1,
+	ZEGR_TFM_LINEAR				= 2,
+	ZEGR_TFM_ANISOTROPY			= 3
 };
 
-class ZESamplerState
+class ZEGRSamplerState : public ZEGRState
 {
-	protected:
-		ZESize						Hash;
-		bool						Dirty;
-
+	private:
 		struct ZESamplerStateData
 		{
-			ZETextureAddressMode	AddressU : 4;
-			ZETextureAddressMode	AddressV : 4;
-			ZETextureAddressMode	AddressW : 4;
-			ZETextureFilterMode		MinFilter : 4;
-			ZETextureFilterMode		MagFilter : 4;
-			ZETextureFilterMode		MipFilter : 4;
+			ZEGRTextureAddressMode	AddressU : 4;
+			ZEGRTextureAddressMode	AddressV : 4;
+			ZEGRTextureAddressMode	AddressW : 4;
+			ZEGRTextureFilterMode	MinFilter : 4;
+			ZEGRTextureFilterMode	MagFilter : 4;
+			ZEGRTextureFilterMode	MipFilter : 4;
 			ZEUInt32				MaxAnisotropy : 6;
 
 			float					MinLOD;
@@ -78,25 +75,23 @@ class ZESamplerState
 		} StateData;
 
 	public:
-		ZESize						GetHash();
-
-		void						SetMinFilter(ZETextureFilterMode FilterMode);
-		ZETextureFilterMode			GetMinFilter() const;
+		void						SetMinFilter(ZEGRTextureFilterMode FilterMode);
+		ZEGRTextureFilterMode		GetMinFilter() const;
 		
-		void						SetMagFilter(ZETextureFilterMode FilterMode);
-		ZETextureFilterMode			GetMagFilter() const;
+		void						SetMagFilter(ZEGRTextureFilterMode FilterMode);
+		ZEGRTextureFilterMode		GetMagFilter() const;
 		
-		void						SetMipFilter(ZETextureFilterMode FilterMode);
-		ZETextureFilterMode			GetMipFilter() const;
+		void						SetMipFilter(ZEGRTextureFilterMode FilterMode);
+		ZEGRTextureFilterMode		GetMipFilter() const;
 		
-		void						SetAddressU(ZETextureAddressMode AdressMode);
-		ZETextureAddressMode		GetAddressU() const;
+		void						SetAddressU(ZEGRTextureAddressMode AdressMode);
+		ZEGRTextureAddressMode		GetAddressU() const;
 		
-		void						SetAddressV(ZETextureAddressMode AdressMode);
-		ZETextureAddressMode		GetAddressV() const;
+		void						SetAddressV(ZEGRTextureAddressMode AdressMode);
+		ZEGRTextureAddressMode		GetAddressV() const;
 		
-		void						SetAddressW(ZETextureAddressMode AdressMode);
-		ZETextureAddressMode		GetAddressW() const;
+		void						SetAddressW(ZEGRTextureAddressMode AdressMode);
+		ZEGRTextureAddressMode		GetAddressW() const;
 		
 		void						SetMipLODBias(float LODBias);
 		float						GetMipLODBias() const;
@@ -115,12 +110,6 @@ class ZESamplerState
 
 		void						SetToDefault();
 
-		const ZESamplerState&		operator=(const ZESamplerState& State);
-		bool						operator==(const ZESamplerState& State);
-		bool						operator!=(const ZESamplerState& State);
-
-									ZESamplerState();
-									~ZESamplerState();
+									ZEGRSamplerState();
+		virtual						~ZEGRSamplerState();
 };
-
-#endif

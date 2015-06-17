@@ -81,65 +81,65 @@ class ZEGraphicsDevice
 		void						SetVerticalSync(bool Enabled);
 		bool						GetVerticalSync() const;
 
-		void						SetVertexLayout(ZEVertexLayout* Layout);
-		ZEVertexLayout*				GetVertexLayout();
+		void						SetVertexLayout(ZEGRVertexLayout* Layout);
+		ZEGRVertexLayout*				GetVertexLayout();
 		
-		void						SetVertexBufferArray(ZEVertexBuffer* const Buffer[ZE_MAX_VERTEX_BUFFER_SLOT]);
+		void						SetVertexBufferArray(ZEVertexBuffer* const Buffer[ZEGR_MAX_VERTEX_BUFFER_SLOT]);
 		void						SetVertexBuffer(ZEUInt Index, ZEVertexBuffer* Buffer);
 		const ZEVertexBuffer*		GetVertexBuffer(ZEUInt Index) const;
 		
-		void						SetIndexBuffer(ZEIndexBuffer* Buffer);
-		const ZEIndexBuffer*		GetIndexBuffer() const;
+		void						SetIndexBuffer(ZEGRIndexBuffer* Buffer);
+		const ZEGRIndexBuffer*		GetIndexBuffer() const;
 		
-		void						SetVertexShader(ZEShader* Shader);
-		const ZEShader*				GetVertexShader() const;
+		void						SetVertexShader(ZEGRShader* Shader);
+		const ZEGRShader*				GetVertexShader() const;
 		
-		void						SetVertexShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer);
-		const ZEConstantBuffer*		GetVertexShaderBuffer(ZEUInt Index) const;
+		void						SetVertexShaderBuffer(ZEUInt Index, ZEGRConstantBuffer* Buffer);
+		const ZEGRConstantBuffer*		GetVertexShaderBuffer(ZEUInt Index) const;
 		
-		void						SetVertexShaderTexture(ZEUInt Index, const ZETexture* Texture);
-		const ZETexture*			GetVertexShaderTexture(ZEUInt Index) const;
+		void						SetVertexShaderTexture(ZEUInt Index, const ZEGRTexture* Texture);
+		const ZEGRTexture*			GetVertexShaderTexture(ZEUInt Index) const;
 		
-		void						SetVertexShaderSampler(ZEUInt Index, ZESamplerState& Sampler);
-		ZESamplerState&				GetVertexShaderSampler(ZEUInt Index);
+		void						SetVertexShaderSampler(ZEUInt Index, ZEGRSamplerState& Sampler);
+		ZEGRSamplerState&				GetVertexShaderSampler(ZEUInt Index);
 		
-		void						SetGeometryShader(ZEShader* Shader);
-		const ZEShader*				GetGeometryShader() const;
+		void						SetGeometryShader(ZEGRShader* Shader);
+		const ZEGRShader*				GetGeometryShader() const;
 		
-		void						SetGeometryShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer);
-		const ZEConstantBuffer*		GetGeometryShaderBuffer(ZEUInt Index) const;
+		void						SetGeometryShaderBuffer(ZEUInt Index, ZEGRConstantBuffer* Buffer);
+		const ZEGRConstantBuffer*		GetGeometryShaderBuffer(ZEUInt Index) const;
 		
-		void						SetGeometryShaderTexture(ZEUInt Index, const ZETexture* Texture);
-		const ZETexture*			GetGeometryShaderTexture(ZEUInt Index) const;
+		void						SetGeometryShaderTexture(ZEUInt Index, const ZEGRTexture* Texture);
+		const ZEGRTexture*			GetGeometryShaderTexture(ZEUInt Index) const;
 		
-		void						SetGeometryShaderSampler(ZEUInt Index, ZESamplerState& Sampler);
-		ZESamplerState&				GetGeometryShaderSampler(ZEUInt Index);
+		void						SetGeometryShaderSampler(ZEUInt Index, ZEGRSamplerState& Sampler);
+		ZEGRSamplerState&				GetGeometryShaderSampler(ZEUInt Index);
 		
-		void						SetRasterizerState(ZERasterizerState& State);
-		ZERasterizerState&			GetRasterizerState();
+		void						SetRasterizerState(ZEGRRasterizerState& State);
+		ZEGRRasterizerState&			GetRasterizerState();
 		
 		void						SetViewport(ZEUInt Index, ZEViewport& ViewPort);
 		ZEViewport&					GetViewport(ZEUInt Index);
 		
-		void						SetScissorRectangle(ZEUInt Index, ZEScissorRectangle& Rectangle);
-		ZEScissorRectangle&			GetScissorRectangle(ZEUInt Index);
+		void						SetScissorRectangle(ZEUInt Index, ZEGRScissorRectangle& Rectangle);
+		ZEGRScissorRectangle&			GetScissorRectangle(ZEUInt Index);
 		
-		void						SetPixelShader(ZEShader* Shader);
-		const ZEShader*				GetPixelShader() const;
+		void						SetPixelShader(ZEGRShader* Shader);
+		const ZEGRShader*				GetPixelShader() const;
 		
-		void						SetPixelShaderBuffer(ZEUInt Index, ZEConstantBuffer* Buffer);
-		const ZEConstantBuffer*		GetPixelShaderBuffer(ZEUInt Index) const;
+		void						SetPixelShaderBuffer(ZEUInt Index, ZEGRConstantBuffer* Buffer);
+		const ZEGRConstantBuffer*		GetPixelShaderBuffer(ZEUInt Index) const;
 		
-		void						SetPixelShaderTexture(ZEUInt Index, const ZETexture* Texture);
-		const ZETexture*			GetPixelShaderTexture(ZEUInt Index) const;
+		void						SetPixelShaderTexture(ZEUInt Index, const ZEGRTexture* Texture);
+		const ZEGRTexture*			GetPixelShaderTexture(ZEUInt Index) const;
 		
-		void						SetPixelShaderSampler(ZEUInt Index, ZESamplerState& SamplerState);
-		ZESamplerState&				GetPixelShaderSampler(ZEUInt Index);
+		void						SetPixelShaderSampler(ZEUInt Index, ZEGRSamplerState& SamplerState);
+		ZEGRSamplerState&				GetPixelShaderSampler(ZEUInt Index);
 		
-		void						SetBlendState(ZEBlendState& State, ZEVector4& ComponentBlendFactors, ZEComponentMask ComponentBlendMask);
+		void						SetBlendState(ZEGRBlendState& State, ZEVector4& ComponentBlendFactors, ZEGRColorMask ComponentBlendMask);
 		
-		void						SetBlendState(ZEBlendState& State);
-		ZEBlendState&				GetBlendState();
+		void						SetBlendState(ZEGRBlendState& State);
+		ZEGRBlendState&				GetBlendState();
 		
 		void						SetComponentBlendMask(ColorBlendMask ComponentBlendMask);
 		ColorBlendMask&				GetComponentBlendMask();
@@ -147,23 +147,23 @@ class ZEGraphicsDevice
 		void						SetComponentBlendFactors(ZEVector4* ComponentBlendFactors);
 		ZEVector4&					GetComponentBlendFactors();
 
-		void						SetDepthStencilState(ZEDepthStencilState& State, ZEUInt32 StencilReferance);
+		void						SetDepthStencilState(ZEGRDepthStencilState& State, ZEUInt32 StencilReferance);
 		
-		void						SetDepthStencilState(ZEDepthStencilState& State);
-		ZEDepthStencilState&		GetDepthStencilState();
+		void						SetDepthStencilState(ZEGRDepthStencilState& State);
+		ZEGRDepthStencilState&		GetDepthStencilState();
 		
 		void						SetStencilReferance(ZEUInt32 StencilReferance);
 		ZEUInt32&					GetStencilReferance();
 		
-		void						SetRenderTargetScreen(const ZERenderTarget* FrameBuffer);
+		void						SetRenderTargetScreen(const ZEGRRenderTarget* FrameBuffer);
 		bool						GetScreenWriteEnable() const;
 		
-		void						SetRenderTargetArray(const ZERenderTarget* const Targets[ZE_MAX_RENDER_TARGET_SLOT]);
-		void						SetRenderTarget(ZEUInt Index, const ZERenderTarget* Target);
-		const ZERenderTarget*		GetRenderTarget(ZEUInt Index) const;
+		void						SetRenderTargetArray(const ZEGRRenderTarget* const Targets[ZEGR_MAX_RENDER_TARGET_SLOT]);
+		void						SetRenderTarget(ZEUInt Index, const ZEGRRenderTarget* Target);
+		const ZEGRRenderTarget*		GetRenderTarget(ZEUInt Index) const;
 		
-		void						SetDepthStencilBuffer(const ZEDepthStencilBuffer* Buffer);
-		const ZEDepthStencilBuffer*	GetDepthStencilBuffer() const;
+		void						SetDepthStencilBuffer(const ZEGRDepthStencilBuffer* Buffer);
+		const ZEGRDepthStencilBuffer*	GetDepthStencilBuffer() const;
 		
 		void						SetDeviceState(ZEGraphicsDeviceState& State);
 		ZEGraphicsDeviceState&		GetDeviceState();
@@ -175,8 +175,8 @@ class ZEGraphicsDevice
 		virtual void				DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
 		virtual void				DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance) = 0;
 		
-		virtual void				ClearRenderTarget(const ZERenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
-		virtual void				ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
+		virtual void				ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
+		virtual void				ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
 };
 
 #endif

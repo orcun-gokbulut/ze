@@ -39,7 +39,7 @@
 
 #include "ZEMaterial.h"
 
-class ZETextureCube;
+class ZEGRTextureCube;
 
 class ZESkyBoxMaterial : public ZEMaterial
 {
@@ -48,7 +48,7 @@ class ZESkyBoxMaterial : public ZEMaterial
 	protected:
 		ZEVector3						Color;
 		float							Brightness;
-		const ZETextureCube*			Texture;
+		const ZEGRTextureCube*			Texture;
 
 										ZESkyBoxMaterial();
 		virtual							~ZESkyBoxMaterial();
@@ -62,8 +62,8 @@ class ZESkyBoxMaterial : public ZEMaterial
 		void							SetBrightness(float Brightness);
 		float							GetBrightness() const;
 
-		void							SetTexture(const ZETextureCube* Texture);
-		const ZETextureCube*			GetTexture() const;
+		void							SetTexture(const ZEGRTextureCube* Texture);
+		const ZEGRTextureCube*			GetTexture() const;
 
 		static ZESkyBoxMaterial*		CreateInstance();
 };

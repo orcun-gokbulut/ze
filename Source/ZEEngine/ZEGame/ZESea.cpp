@@ -73,7 +73,7 @@ ZESea::ZESea()
 
 	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
 
-	ZEVertexElement ElementArray[] = {
+	ZEGRVertexElement ElementArray[] = {
 		{ZE_VES_POSITION, ZE_VET_FLOAT4, 0},
 		{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
 		{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
@@ -225,12 +225,12 @@ ZEVector2 ZESea::GetNormalVelocity() const
 	return NormalVelocity;
 }
 
-void ZESea::SetDiffuseTexture(const ZETexture2D* Texture)
+void ZESea::SetDiffuseTexture(const ZEGRTexture2D* Texture)
 {
 	Material->SetDiffuseTexture(Texture);
 }
 
-void  ZESea::SetNormalTexture(const ZETexture2D* Texture)
+void  ZESea::SetNormalTexture(const ZEGRTexture2D* Texture)
 {
 	Material->SetNormalTexture(Texture);
 }

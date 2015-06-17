@@ -52,62 +52,21 @@
 	}						\
 }
 
-struct ZEGraphicsStatistics
-{
-	ZEUInt16	ShaderCount;
-	ZESize		ShaderSize;
 
-	ZEUInt16	Texture2DCount;
-	ZESize		Texture2DSize;
 
-	ZEUInt16	Texture3DCount;
-	ZESize		Texture3DSize;
-
-	ZEUInt16	TextureCubeCount;
-	ZESize		TextureCubeSize;
-
-	ZEUInt16	DepthStancilBufferCount;
-	ZESize		DepthStancilBufferSize;
-
-	ZEUInt16	IndexBufferCount;
-	ZESize		IndexBufferSize;
-
-	ZEUInt16	VertexBufferCount;
-	ZESize		VertexBufferSize;
-
-	ZEUInt16	ConstantBufferCount;
-	ZESize		ConstantBufferSize;	
-
-	ZEUInt16	RenderTargetCount;
-
-	ZEUInt16	BlendStateCount;
-	ZEUInt16	SamplerStateCount;
-	ZEUInt16	DepthStencilCount;
-	ZEUInt16	RasterizerCount;
-	ZEUInt16	VertexLayoutCount;
-	ZEUInt16	StatesPerSecond;
-};
-
-class ZEShader;
-class ZEStatePool;
-class ZETexture2D;
-class ZETexture3D;
-class ZETextureCube;
-class ZEIndexBuffer;
-class ZEVertexLayout;
-class ZEVertexBuffer;
-class ZERenderTarget;
-class ZERenderTarget;
-class ZEShaderCompiler;
+class ZEGRRenderState;
+class ZEGRTexture2D;
+class ZEGRTexture3D;
+class ZEGRTextureCube;
+class ZEGRIndexBuffer;
+class ZEGRVertexBuffer;
+class ZEGRVertexLayout;
 class ZEGraphicsDevice;
-class ZEConstantBuffer;
+class ZEGRDevice;
 class ZEGraphicsWindow;
-class ZEDepthStencilBuffer;
-class ZEGraphicsEventTracer;
-
-
-
-#define zeGraphics ZEGraphicsModule::GetInstance()
+class ZEGRShader;
+class ZEGRShaderCompiler;
+class ZEGRConstantBuffer;
 
 class ZEGraphicsModule : public ZEModule
 {
@@ -117,7 +76,7 @@ class ZEGraphicsModule : public ZEModule
 
 	protected:
 		ZEArray<ZEGraphicsWindow*>			Windows;
-		ZEArray<ZEGraphicsMonitor*>			Monitors;
+		ZEArray<ZEGRMonitor*>				Monitors;
 		ZEArray<ZEGraphicsDevice*>			Devices;
 
 		virtual bool						InitializeSelf();
@@ -136,27 +95,20 @@ class ZEGraphicsModule : public ZEModule
 		virtual ZETextureOptions*			GetTextureOptions();
 		// -------------------------------------------
 
-		ZEGraphicsWindow*					GetWindow(ZEUInt WindowId = 0) const;
 		const ZEArray<ZEGraphicsWindow*>&	GetWindows() const;
-
-		const ZEGraphicsMonitor*			GetMonitor(ZEUInt MonitorId = 0) const;
-		const ZEArray<ZEGraphicsMonitor*>&	GetMonitors() const;
-
-		ZEGraphicsDevice*					GetDevice(ZESize Index = 0) const;
+		const ZEArray<ZEGRMonitor*>&		GetMonitors() const;
 		const ZEArray<ZEGraphicsDevice*>&	GetDevices() const;
 
-		virtual ZEStatePool*				GetStatePool() const = 0;
-		virtual ZEGraphicsEventTracer*		GetEventTracer() const = 0;
-		virtual ZEShaderCompiler*			GetShaderCompiler() const = 0;
-
-		virtual ZETexture2D*				CreateTexture2D() = 0;
-		virtual ZETexture3D*				CreateTexture3D() = 0;
-		virtual ZETextureCube*				CreateTextureCube() = 0;
-		virtual ZEIndexBuffer*				CreateIndexBuffer() = 0;
-		virtual ZEVertexBuffer*				CreateVertexBuffer() = 0;
 		virtual ZEGraphicsWindow*			CreateGraphicsWindow() = 0;
-		virtual ZEConstantBuffer*			CreateConstantBuffer() = 0;
-		virtual ZEDepthStencilBuffer*		CreateDepthStencilBuffer() = 0;
+		virtual ZEGRDevice*					CreateContext();
+		virtual ZEGRTexture2D*				CreateTexture2D() = 0;
+		virtual ZEGRTexture3D*				CreateTexture3D() = 0;
+		virtual ZEGRTextureCube*			CreateTextureCube() = 0;
+		virtual ZEGRIndexBuffer*			CreateIndexBuffer() = 0;
+		virtual ZEVertexBuffer*				CreateVertexBuffer() = 0;
+		virtual ZEGRConstantBuffer*			CreateConstantBuffer() = 0;
+		virtual ZEGRDepthStencilBuffer*		CreateDepthStencilBuffer() = 0;
+		virtual ZEGRShaderCompiler*			CreateShaderCompiler() = 0;
 
 		virtual void						GetStatistics(ZEGraphicsStatistics& Statistics) const;
 

@@ -33,57 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_2D_H__
-#define __ZE_TEXTURE_2D_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZETexture.h"
+#include "ZEMath\ZEVector.h"
 
 class ZETextureData;
-class ZERenderTarget;
-
-class ZETexture2D : public ZETexture
+class ZEGRRenderTarget;
+class ZEGRTexture2D : public ZEGRTexture
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
-	friend class ZETexture2D;
 
 	protected:
-		static ZEUInt16				TotalCount;
-		static ZESize				TotalSize;
-
-		ZEShadowCopy				ShadowCopy;
-
-		ZESize						Size;
 		ZEUInt						Width;
 		ZEUInt						Height;
-		ZEUInt						LevelCount;
-		ZEVector2					PixelSize;
 
-		virtual bool				UpdateWith(ZEUInt ShadowIndex);
+		virtual bool				Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false) = 0;	
 
-									ZETexture2D();
-		virtual						~ZETexture2D();
+									ZEGRTexture2D();
 
 	public:
-		ZEGraphicsResourceType		GetResourceType() const;
+		virtual ZEGRResourceType	GetResourceType() const;
+		virtual ZEGRTextureType		GetTextureType() const;
 
-		ZESize						GetSize() const;
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
-		ZEUInt						GetLevelCount() const;
-		const ZEVector2&			GetPixelSize() const;
+		ZEVector2					GetPixelSize() const;
 
-		virtual bool				Unlock();
-		virtual bool				Lock(void** Buffer, ZESize* Pitch);
+		void						LoadData(ZETextureData* Data);
 
-		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
-		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
-		
-		virtual	ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		virtual bool				Lock(void** Buffer, ZESize* Pitch) = 0;
+		virtual bool				Unlock() = 0;
 
-		static ZESize				CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat);
-		static ZETexture2D*			CreateInstance();
+		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) const = 0;
+
+		static ZEGRTexture2D*		CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);
 };
-
-#endif

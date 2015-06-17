@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESeaMaterial.h
+ Zinek Engine - ZEGRState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,81 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SEA_MATERIAL_H__
-#define __ZE_SEA_MATERIAL_H__
 
-#include "ZEMaterial.h"
-
-class ZETexture2D;
-
-class ZESeaMaterial : public ZEMaterial
+class ZEGRState
 {
-	friend class ZESea;
-	friend class ZED3D9Module;
-	
+	private:
+		bool				Dirty;
+
 	protected:
+		void				MarkDirty();
 
-		const ZETexture2D*				DiffuseTexture;
-		const ZETexture2D*				NormalTexture;
-
-		bool							GlobalAmbientEnabled;
-		ZEVector4						AmbientColor;
-		float							AmbientFactor;
-
-		ZEVector4						DiffuseColor;
-		float							DiffuseFactor;
-
-		ZEVector4						SpecularColor;
-		float							SpecularFactor;
-
-		float							SpecularShineness;
-
-		ZEVector2						DiffuseTextureOffset;
-		ZEVector2						NormalTextureOffset;
-
-		ZEVector2						NormalTextureTile;
-		ZEVector2						DiffuseTextureTile;
-
-		ZEVector2						EntityXZScale;
-
-										ZESeaMaterial();
-		virtual							~ZESeaMaterial();
+							ZEGRState();
+		virtual				~ZEGRState();
 
 	public:
+		bool				IsDirty();
 
-		ZEMaterialFlags					GetMaterialFlags() const;
+		virtual void		Update();
 
-		void							SetGlobalAmbientEnabled(bool Value);
-		bool							GetGlobalAmbientEnabled() const;
-
-		void							SetAmbientColor(const ZEVector4& Color);
-		const ZEVector4&				GetAmbientColor() const;
-
-		void							SetAmbientFactor(float Value);
-		float							GetAmbientFactor() const;
-
-		void							SetDiffuseColor(const ZEVector4& Color);
-		const ZEVector4&				GetDiffuseColor() const;
-
-		void							SetDiffuseFactor(float Color);
-		float							GetDiffuseFactor() const;
-
-		void							SetSpecularColor(const ZEVector4& Color);
-		const ZEVector4&				GetSpecularColor() const;
-
-		void							SetSpecularFactor(float Color);
-		float							GetSpecularFactor() const;
-
-		void							SetSpecularShineness(float Color);
-		float							GetSpecularShineness() const;
-
-		void							SetDiffuseTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDiffuseTexture() const;
-
-		void							SetNormalTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetNormalTexture() const;
-
-		static ZESeaMaterial*			CreateInstance();
 };
-
-#endif

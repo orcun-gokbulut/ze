@@ -34,61 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GRAPHICS_EVENT_H__
-#define __ZE_GRAPHICS_EVENT_H__
 
-class ZEGraphicsEvent
+class ZEGRTracer
 {
 	private:
 		const char*		Name;
 		bool			Started;
 
 	public:
-		inline void SetName(const char* Name)
-		{
-			this->Name = Name;
-		}
-		
-		inline const char* GetName()
-		{
-			return Name;
-		}
-		
-		inline bool IsStarted()
-		{
-			return Started;
-		}
+		void			SetName(const char* Name);
+		const char*		GetName();
 
-		inline void Start()
-		{
-			#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
-				if (!Started)
-					ZEGraphicsEventTracer::GetInstance()->StartEvent(Name);
-			#endif
-		}
+		bool			IsStarted();
 
-		inline void End()
-		{
-			#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
-				if (Started)
-					ZEGraphicsEventTracer::GetInstance()->EndEvent(Name);
-			#endif
-		}
+		void			Start();
+		void			End();
 
-		ZEGraphicsEvent()
-		{
-			Started = false;
-		}
-
-		ZEGraphicsEvent(const char* Name)
-		{
-			SetName(Name);
-		}
-
-		~ZEGraphicsEvent()
-		{
-			End();
-		}
+						ZEGRTracer();
+						ZEGRTracer(const char* Name);
+						~ZEGRTracer();
 };
-
-#endif

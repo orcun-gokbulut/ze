@@ -33,52 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_RENDER_TARGET_H__
-#define __ZE_RENDER_TARGET_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZETexture.h"
-#include "ZEViewPort.h"
-#include "ZEScissorRectangle.h"
-#include "ZEDS/ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEGraphicsResource.h"
 
-typedef ZETextureType	ZERenderTargetType;
-
-class ZERenderTarget
+class ZEGRRenderTarget : public ZEGRResource
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
-
 	protected:
-		static ZEUInt16				TotalCount;
-
-#ifdef ZE_DEBUG_ENABLE
-		ZEString					DebugName;
-#endif
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
-		ZEVector3					PixelSize;
-		ZETexturePixelFormat		PixelFormat;
-		ZERenderTargetType			RenderTargetType;
+		ZEGRTextureFormat			Format;
 
-									ZERenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType);
-		virtual						~ZERenderTarget();
+									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat PixelFormat);
+		virtual						~ZEGRRenderTarget();
 
 	public:
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEUInt						GetDepth() const;
-		const ZEVector3&			GetPixelSize() const;
-		ZETexturePixelFormat		GetPixelFormat() const;
-		ZERenderTargetType			GetRenderTargetType() const;
-
-		void						SetDebugName(const char* String);
-		const char*					GetDebugName() const;
-
-		virtual bool				IsEmpty() const = 0;
-
-		virtual void				Destroy();
+		ZEVector2					GetPixelSize() const;
+		ZEGRTextureFormat			GetFormat() const;
 };
-
-#endif

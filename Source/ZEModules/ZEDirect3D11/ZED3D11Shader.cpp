@@ -65,7 +65,7 @@ ZED3D11Shader::~ZED3D11Shader()
 /*					ZED3D11PixelShader									*/
 /************************************************************************/
 
-ZEShaderType ZED3D11PixelShader::GetShaderType() const
+ZEGRShaderType ZED3D11PixelShader::GetShaderType() const
 {
 	return ZE_ST_PIXEL;
 }
@@ -89,7 +89,7 @@ ZED3D11PixelShader::~ZED3D11PixelShader()
 /*					ZED3D11VertexShader									*/
 /************************************************************************/
 
-ZEShaderType ZED3D11VertexShader::GetShaderType() const
+ZEGRShaderType ZED3D11VertexShader::GetShaderType() const
 {
 	return ZE_ST_VERTEX;
 }
@@ -113,7 +113,7 @@ ZED3D11VertexShader::~ZED3D11VertexShader()
 /*						ZED3D11GeometryShader							*/
 /************************************************************************/
 
-ZEShaderType ZED3D11GeometryShader::GetShaderType() const
+ZEGRShaderType ZED3D11GeometryShader::GetShaderType() const
 {
 	return ZE_ST_GEOMETRY;
 }
@@ -137,7 +137,7 @@ ZED3D11GeometryShader::~ZED3D11GeometryShader()
 /*						ZED3D11DomainShader								*/
 /************************************************************************/
 
-ZEShaderType ZED3D11DomainShader::GetShaderType() const
+ZEGRShaderType ZED3D11DomainShader::GetShaderType() const
 {
 	return ZE_ST_DOMAIN;
 }
@@ -161,7 +161,7 @@ ZED3D11DomainShader::~ZED3D11DomainShader()
 /*						ZED3D11HullShader								*/
 /************************************************************************/
 
-ZEShaderType ZED3D11HullShader::GetShaderType() const
+ZEGRShaderType ZED3D11HullShader::GetShaderType() const
 {
 	return ZE_ST_HULL;
 }
@@ -185,7 +185,7 @@ ZED3D11HullShader::~ZED3D11HullShader()
 /*						ZED3D11ComputeShader							*/
 /************************************************************************/
 
-ZEShaderType ZED3D11ComputeShader::GetShaderType() const
+ZEGRShaderType ZED3D11ComputeShader::GetShaderType() const
 {
 	return ZE_ST_COMPUTE;
 }

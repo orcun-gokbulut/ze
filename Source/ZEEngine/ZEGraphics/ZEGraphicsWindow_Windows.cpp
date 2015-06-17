@@ -511,7 +511,7 @@ bool ZEGraphicsWindow::SetSize(ZEInt Width, ZEInt Height)
 	return true;
 }
 
-bool ZEGraphicsWindow::SetFullScreen(bool Value, const ZEGraphicsMonitor* Monitor)
+bool ZEGraphicsWindow::SetFullScreen(bool Value, const ZEGRMonitor* Monitor)
 {
 	if (FullScreen == Value)
 		return true;
@@ -542,11 +542,11 @@ bool ZEGraphicsWindow::SetVSynchEnabed(bool Value)
 	return IsInitialized();
 }
 
-const ZEGraphicsMonitor* ZEGraphicsWindow::GetContainingMonitor() const
+const ZEGRMonitor* ZEGraphicsWindow::GetContainingMonitor() const
 {
 	HMONITOR CurrentMonitor = MonitorFromWindow((HWND)Handle, MONITOR_DEFAULTTONEAREST);
 
-	const ZEArray<ZEGraphicsMonitor*>& Monitors = zeGraphics->GetMonitors();
+	const ZEArray<ZEGRMonitor*>& Monitors = zeGraphics->GetMonitors();
 	
 	ZESize Count = Monitors.GetCount();
 	for (ZESize I = 0; I < Count; ++I)

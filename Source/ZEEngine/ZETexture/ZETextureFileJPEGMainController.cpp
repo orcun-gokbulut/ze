@@ -428,7 +428,7 @@ bool ZEJpegMainController::LoadHeader(ZETextureDataInfo* TextureDataInfo)
 	}
 	else
 	{
-		TextureDataInfo->Type = ZE_TT_2D;
+		TextureDataInfo->Type = ZEGR_TT_2D;
 		TextureDataInfo->LevelCount = 1;
 		TextureDataInfo->SurfaceCount = 1;
 		TextureDataInfo->Width = Info.ImageWidth;
@@ -437,13 +437,13 @@ bool ZEJpegMainController::LoadHeader(ZETextureDataInfo* TextureDataInfo)
 		switch (Info.ComponentCount)
 		{
 			case 1:
-				TextureDataInfo->PixelFormat = ZE_TPF_I8;
+				TextureDataInfo->PixelFormat = ZEGR_TF_I8;
 				break;
 			
 			case 3:
 			case 4:
 			default:
-				TextureDataInfo->PixelFormat = ZE_TPF_I8_4;
+				TextureDataInfo->PixelFormat = ZEGR_TF_I8_4;
 				break;
 		}
 
@@ -480,8 +480,8 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 	
 	// Image info should be read till now
 	TextureData = new ZETextureData();
-	ZETexturePixelFormat PixelFormat = Info.ComponentCount == 1 ? ZE_TPF_I8 : ZE_TPF_I8_4;
-	TextureData->Create(ZE_TT_2D, PixelFormat, 1, 1, Info.ImageWidth, Info.ImageHeight);
+	ZEGRTextureFormat PixelFormat = Info.ComponentCount == 1 ? ZEGR_TF_I8 : ZEGR_TF_I8_4;
+	TextureData->Create(ZEGR_TT_2D, PixelFormat, 1, 1, Info.ImageWidth, Info.ImageHeight);
 	Info.OutputData = TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 	Info.OutputPitch = TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();
 

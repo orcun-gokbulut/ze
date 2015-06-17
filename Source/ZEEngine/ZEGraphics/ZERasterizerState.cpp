@@ -33,97 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEStatePool.h"
 #include "ZERasterizerState.h"
-#include "ZEDS/ZEHashGenerator.h"
 
-ZESize ZERasterizerState::GetHash()
-{
-	if (Dirty)
-	{
-		Hash = ZEHashGenerator::Hash(&StateData, sizeof(ZERasterizerStateData));
-		Dirty = false;
-	}
-	return Hash;
-}
+#include <memory.h>
 
-void ZERasterizerState::SetFillMode(ZEFillMode Mode)
+void ZEGRRasterizerState::SetFillMode(ZEFillMode Mode)
 {
 	if (StateData.FillMode != Mode)
 	{
 		StateData.FillMode = Mode;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZEFillMode ZERasterizerState::GetFillMode() const
+ZEFillMode ZEGRRasterizerState::GetFillMode() const
 {
 	return StateData.FillMode;
 }
 
-void ZERasterizerState::SetCullDirection(ZECullDirection Direction)
+void ZEGRRasterizerState::SetCullDirection(ZECullDirection Direction)
 {
 	if (StateData.CullDirection != Direction)
 	{
 		StateData.CullDirection = Direction;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-ZECullDirection ZERasterizerState::GetCullDirection() const
+ZECullDirection ZEGRRasterizerState::GetCullDirection() const
 {
 	return StateData.CullDirection;
 }
 
-void ZERasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
+void ZEGRRasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
 {
 	if (StateData.FrontIsCounterClockwise != IsCounterClockwise)
 	{
 		StateData.FrontIsCounterClockwise = IsCounterClockwise;
-		Dirty = true;
+		MarkDirty();
 	}
 }
 
-bool ZERasterizerState::GetFrontIsCounterClockwise() const
+bool ZEGRRasterizerState::GetFrontIsCounterClockwise() const
 {
 	return StateData.FrontIsCounterClockwise;
 }
 
-void ZERasterizerState::SetToDefault()
+void ZEGRRasterizerState::SetToDefault()
 {
-	Hash = 0;
-	Dirty = false;
-
 	memset(&StateData, 0, sizeof(ZERasterizerStateData));
-	StateData.FillMode = ZE_FM_SOLID;
-	StateData.CullDirection = ZE_CD_COUNTER_CLOCKWISE;
+	StateData.FillMode = ZEGR_FM_SOLID;
+	StateData.CullDirection = ZEGR_CD_COUNTER_CLOCKWISE;
 	StateData.FrontIsCounterClockwise = false;
 }
 
-const ZERasterizerState& ZERasterizerState::operator=(const ZERasterizerState& State)
-{
-	Hash = State.Hash;
-	Dirty = State.Dirty;
-	memcpy(&StateData, &State.StateData, sizeof(ZERasterizerStateData));
-	return *this;
-}
-
-bool ZERasterizerState::operator==(const ZERasterizerState& State)
-{
-	return memcmp(&StateData, &State.StateData, sizeof(ZERasterizerStateData)) == 0 ? true : false;
-}
-
-bool ZERasterizerState::operator!=(const ZERasterizerState& State)
-{
-	return !operator==(State);
-}
-
-ZERasterizerState::ZERasterizerState()
+ZEGRRasterizerState::ZEGRRasterizerState()
 {
 	SetToDefault();
 }
 
-ZERasterizerState::~ZERasterizerState()
+ZEGRRasterizerState::~ZEGRRasterizerState()
 {
 
 }

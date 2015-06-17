@@ -45,9 +45,9 @@
 
 #include "ZEMeta/ZEObject.h"
 
-ZE_META_FORWARD_DECLARE(ZETextureCube, "ZETextureCube.h")
+ZE_META_FORWARD_DECLARE(ZEGRTextureCube, "ZETextureCube.h")
 ZE_META_FORWARD_DECLARE(ZETextureCubeResource, "ZETexture/ZETextureCubeResource.h")
-ZE_META_FORWARD_DECLARE(ZETexture2D, "ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZETexture2D.h")
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 
 class ZEFixedMaterial : public ZEMaterial
@@ -135,19 +135,19 @@ class ZEFixedMaterial : public ZEMaterial
 		{
 			struct
 			{
-				const ZETexture2D*		BaseMap;
-				const ZETexture2D*		NormalMap;
-				const ZETexture2D*		ParallaxMap;
-				const ZETexture2D*		SpecularMap;
-				const ZETexture2D*		EmmisiveMap;
-				const ZETexture2D*		OpacityMap;
-				const ZETexture2D*		DetailBaseMap;
-				const ZETexture2D*		DetailNormalMap;
-				const ZETextureCube*	EnvironmentMap;
-				const ZETexture2D*		LightMap;
-				const ZETexture2D*		DistortionMap;
+				const ZEGRTexture2D*		BaseMap;
+				const ZEGRTexture2D*		NormalMap;
+				const ZEGRTexture2D*		ParallaxMap;
+				const ZEGRTexture2D*		SpecularMap;
+				const ZEGRTexture2D*		EmmisiveMap;
+				const ZEGRTexture2D*		OpacityMap;
+				const ZEGRTexture2D*		DetailBaseMap;
+				const ZEGRTexture2D*		DetailNormalMap;
+				const ZEGRTextureCube*	EnvironmentMap;
+				const ZEGRTexture2D*		LightMap;
+				const ZEGRTexture2D*		DistortionMap;
 			};
-			ZETexture2D*				Textures[12];
+			ZEGRTexture2D*				Textures[12];
 		};
 		#endif
 
@@ -235,8 +235,8 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetGlobalAmbientEnabled(bool Enabled);
 		bool							GetGlobalAmbientEnabled() const;
 
-		void							SetBaseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetBaseMap() const;
+		void							SetBaseMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetBaseMap() const;
 		void							SetBaseMapFile(const char* Filename);
 		const char*						GetBaseMapFile() const;
 		void							SetBaseMapAddressModeU(ZETextureAddressMode Mode);
@@ -263,8 +263,8 @@ class ZEFixedMaterial : public ZEMaterial
 		float							GetSpecularShininess() const;
 		void							SetSpecularColor(const ZEVector3& Color);
 		const ZEVector3&				GetSpecularColor() const;
-		void							SetSpecularMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetSpecularMap() const;
+		void							SetSpecularMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetSpecularMap() const;
 		void							SetSpecularMapFile(const char* Filename);
 		const char*						GetSpecularMapFile() const;
 		void							SetSpecularMapAddressModeU(ZETextureAddressMode Mode);
@@ -279,8 +279,8 @@ class ZEFixedMaterial : public ZEMaterial
 		float							GetEmmisiveFactor() const;
 		void							SetEmmisiveColor(const ZEVector3& Color);
 		const ZEVector3&				GetEmmisiveColor() const;
-		void							SetEmmisiveMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetEmmisiveMap() const;
+		void							SetEmmisiveMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetEmmisiveMap() const;
 		void							SetEmmisiveMapFile(const char* Filename);
 		const char*						GetEmmisiveMapFile() const;
 		void							SetEmmisiveMapAddressModeU(ZETextureAddressMode Mode);
@@ -291,8 +291,8 @@ class ZEFixedMaterial : public ZEMaterial
 		// Normal Map
 		void							SetNormalMapEnabled(bool Enabled);
 		bool							GetNormalMapEnabled() const;
-		void							SetNormalMap(const ZETexture2D*	Texture);
-		const ZETexture2D*				GetNormalMap() const;
+		void							SetNormalMap(const ZEGRTexture2D*	Texture);
+		const ZEGRTexture2D*				GetNormalMap() const;
 		void							SetNormalMapFile(const char* Filename);
 		const char*						GetNormalMapFile() const;
 		void							SetNormalMapAddressModeU(ZETextureAddressMode Mode);
@@ -303,8 +303,8 @@ class ZEFixedMaterial : public ZEMaterial
 		// ParallaxMap
 		void							SetParallaxMapEnabled(bool Enabled);
 		bool							GetParallaxMapEnabled() const;
-		void							SetParallaxMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetParallaxMap() const;
+		void							SetParallaxMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetParallaxMap() const;
 		void							SetParallaxMapFile(const char* Filename);
 		const char*						GetParallaxMapFile() const;
 		void							SetParallaxMapAddressModeU(ZETextureAddressMode Mode);
@@ -319,8 +319,8 @@ class ZEFixedMaterial : public ZEMaterial
 		float							GetOpacity() const;
 		void							SetOpacityComponent(ZEMaterialOpacityComponent Component);
 		ZEMaterialOpacityComponent		GetOpacityComponent() const;
-		void							SetOpacityMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetOpacityMap() const;
+		void							SetOpacityMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetOpacityMap() const;
 		void							SetOpacityMapFile(const char* Filename);
 		const char*						GetOpacityMapFile() const;
 		void							SetOpacityMapAddressModeU(ZETextureAddressMode Mode);
@@ -329,8 +329,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			GetOpacityMapAddressModeV() const;
 
 		// Environment Map
-		void							SetEnvironmentMap(const ZETextureCube* Texture);
-		const ZETextureCube*			GetEnvironmentMap() const;
+		void							SetEnvironmentMap(const ZEGRTextureCube* Texture);
+		const ZEGRTextureCube*			GetEnvironmentMap() const;
 		void							SetEnvironmentMapFile(const char* Filename);
 		const char*						GetEnvironmentMapFile() const;
 		void							SetEnvironmentMapAddressModeU(ZETextureAddressMode Mode);
@@ -360,8 +360,8 @@ class ZEFixedMaterial : public ZEMaterial
 		const ZEVector2&				GetDetailMapTiling() const;
 		void							SetDetailBaseMapEnabled(bool Enabled); 
 		bool							GetDetailBaseMapEnabled() const;
-		void							SetDetailBaseMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDetailBaseMap() const;
+		void							SetDetailBaseMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetDetailBaseMap() const;
 		void							SetDetailBaseMapFile(const char* Filename);
 		const char*						GetDetailBaseMapFile() const;
 		void							SetDetailBaseMapAddressModeU(ZETextureAddressMode Mode);
@@ -370,8 +370,8 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			GetDetailBaseMapAddressModeV() const;
 		void							SetDetailNormalMapEnabled(bool Enabled); 
 		bool							GetDetailNormalMapEnabled() const;
-		void							SetDetailNormalMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDetailNormalMap() const;
+		void							SetDetailNormalMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetDetailNormalMap() const;
 		void							SetDetailNormalMapFile(const char* Filename);
 		const char*						GetDetailNormalMapFile() const;
 		void							SetDetailNormalMapAddressModeU(ZETextureAddressMode Mode);
@@ -384,8 +384,8 @@ class ZEFixedMaterial : public ZEMaterial
 		bool							GetLightMapEnabled() const;
 		void							SetLightMapFactor(float Factor);
 		float							GetLightMapFactor() const;
-		void							SetLightMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetLightMap() const;
+		void							SetLightMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetLightMap() const;
 		void							SetLightMapFile(const char* Filename);
 		const char*						GetLightMapFile() const;
 		void							SetLightMapAddressModeU(ZETextureAddressMode Mode);
@@ -398,8 +398,8 @@ class ZEFixedMaterial : public ZEMaterial
 		bool							GetDistortionEnabled() const;
 		void							SetDistortionFactor(float Factor);
 		float							GetDistortionFactor() const;
-		void							SetDistortionMap(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDistortionMap() const;
+		void							SetDistortionMap(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetDistortionMap() const;
 		void							SetDistortionMapFile(const char* Filename);
 		const char*						GetDistortionMapFile() const;
 		void							SetDistortionMapAddressModeU(ZETextureAddressMode Mode);

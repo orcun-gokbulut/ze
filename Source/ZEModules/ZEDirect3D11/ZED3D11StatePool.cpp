@@ -184,7 +184,7 @@ inline static D3D11_STENCIL_OP ZEStencilOperationToD3D10(ZEStencilOperation Sten
 	return Values[StencilOperation];
 }
 
-inline static DXGI_FORMAT ZEVertexElementTypeToD3D10(ZEVertexElementType ElementType)
+inline static DXGI_FORMAT ZEVertexElementTypeToD3D10(ZEGRVertexElementType ElementType)
 {
 	static const DXGI_FORMAT Values[] = 
 	{ 
@@ -206,7 +206,7 @@ inline static DXGI_FORMAT ZEVertexElementTypeToD3D10(ZEVertexElementType Element
 	return Values[ElementType];
 }
 
-inline static D3D11_INPUT_CLASSIFICATION ZEVertexUsageToD3D10(ZEVertexUsage Usage)
+inline static D3D11_INPUT_CLASSIFICATION ZEVertexUsageToD3D10(ZEGRVertexUsage Usage)
 {
 	static const D3D11_INPUT_CLASSIFICATION Values[] =
 	{
@@ -386,7 +386,7 @@ ID3D11DepthStencilState* ZED3D11StatePool::CreateD3D10State(ZEDepthStencilState*
 	return D3D10State;
 }
 
-ID3D11InputLayout* ZED3D11StatePool::CreateD3D10State(ZEVertexLayout* VertexLayout, ID3DBlob* ByteCode)
+ID3D11InputLayout* ZED3D11StatePool::CreateD3D10State(ZEGRVertexLayout* VertexLayout, ID3DBlob* ByteCode)
 {
 	if (VertexLayoutPool.GetCount() >= ZE_STATE_POOL_CACHE_CAPACITY)
 	{
@@ -395,7 +395,7 @@ ID3D11InputLayout* ZED3D11StatePool::CreateD3D10State(ZEVertexLayout* VertexLayo
 	}
 
 	ZEUInt ElementCount = VertexLayout->GetElementCount();
-	const ZEVertexElement* Elements = VertexLayout->GetLayout();
+	const ZEGRVertexElement* Elements = VertexLayout->GetElements();
 
 	D3D11_INPUT_ELEMENT_DESC ElementDesc[16];
 	for (ZESize I = 0; I < ElementCount; ++I)
@@ -531,7 +531,7 @@ void* ZED3D11StatePool::GetState(ZEDepthStencilState* DepthStencilState)
 	return Entry == NULL ? CreateD3D10State(DepthStencilState) : ((ZEDepthStencilStateEntry*)Entry)->DepthStencilState;
 }
 
-void* ZED3D11StatePool::GetState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader)
+void* ZED3D11StatePool::GetState(ZEGRVertexLayout* VertexLayout, const ZEShader* VertexShader)
 {
 	zeDebugCheck(VertexLayout == NULL, "NULL pointer.");
 	zeDebugCheck(VertexShader == NULL, "NULL pointer.");

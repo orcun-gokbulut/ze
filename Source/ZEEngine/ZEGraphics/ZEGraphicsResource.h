@@ -33,109 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_GRAPHICS_RESOURCE_H__
-#define __ZE_GRAPHICS_RESOURCE_H__
+#pragma once
 
-#include "ZEDS/ZEString.h"
 #include "ZEGraphicsDefinitions.h"
+#include "ZEDS/ZEString.h"
 
-class ZETextureData;
-
-class ZEShadowCopy
+enum ZEGRResourceType
 {
-	friend class ZERenderer;
-
-	protected:
-		ZEUInt			RowCount;
-		ZEUInt			SliceCount;
-		ZESize			RowSize;
-		ZESize			SliceSize;
-
-		ZEUInt			CurrentIndex;
-		bool			SynchEnabled;
-
-		void*			Shadows[ZE_MAX_SHADOW_COPY_COUNT];
-		bool			Changed[ZE_MAX_SHADOW_COPY_COUNT];
-
-		void			MoveNext();
-
-	public:
-						ZEShadowCopy();
-		virtual			~ZEShadowCopy();
-
-		void			SetSynchEnabled(bool Enabled);
-		bool			GetSynchEnabled() const;
-
-		ZEUInt			GetRowCount() const;
-		ZEUInt			GetSliceCount() const;
-		ZESize			GetRowSize() const;
-		ZESize			GetSliceSize() const;
-
-		ZEUInt			GetCurrentIndex() const;
-
-		void*			GetData();
-		const void*		GetConstData() const;
-
-		void			SetChanged(bool Value);
-		bool			GetChanged() const;
-		
-		void*			GetData(ZEUInt Index);
-		const void*		GetConstData(ZEUInt Index) const;
-		
-		void			SetChanged(ZEUInt Index, bool Value);
-		bool			GetChanged(ZEUInt Index) const;
-		
-
-		bool			CreateBuffer(ZESize RowSize, const void* InitialData = NULL);
-		bool			CreateTexture(ZEUInt RowCount, ZESize RowSize, ZEUInt SliceCount, ZESize SliceSize, ZETextureData* InitialData = NULL);
+	ZEGR_RT_NONE		= 0,
+	ZEGR_RT_TEXTURE		= 1,
+	ZEGR_RT_BUFFER		= 2,
 };
 
-enum ZEGraphicsResourceType
-{
-	ZE_GRT_NONE			= 0,
-	ZE_GRT_TEXTURE		= 1,
-	ZE_GRT_BUFFER		= 2,
-};
-
-class ZEGraphicsResource
+class ZEGRResource
 {
 	friend class ZEGraphicsDevice;
 	friend class ZEGraphicsModule;
 
 	protected:
-		struct 
-		{
-			bool						IsCreated;
-			bool						IsStatic;
-			bool						IsLocked;
+		ZESize							Size;
 
-			bool						IsOccupied;
-			bool						IsDestroyed;
-			
-		} State;
-		
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
+		#ifdef ZE_DEBUG_ENABLE
+		ZEString						Name;
+		#endif
 
-		virtual bool					UpdateWith(ZEUInt ShadowIndex) = 0;
-		
-										ZEGraphicsResource();
-		virtual 						~ZEGraphicsResource();
+										ZEGRResource();
+		virtual 						~ZEGRResource();
 
 	public:
-		bool							GetIsCreated() const;
-		bool							GetIsStatic() const;
-		bool							GetIsLocked() const;
-		bool							GetIsDeleted() const;
-		
-		void							SetDebugName(const char* Name);
-		const char*						GetDebugName() const;
+		virtual ZEGRResourceType		GetResourceType() const = 0;
+
+		void							SetName(const char* Name);
+		const char*						GetName() const;
+
+		bool							IsInUse();
+
+		void							GetSize();
 
 		virtual void					Destroy();
-
-		virtual ZEGraphicsResourceType	GetResourceType() const = 0;
-
 };
-
-#endif

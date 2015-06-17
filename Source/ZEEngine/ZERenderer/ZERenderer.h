@@ -58,7 +58,7 @@ class ZEPostProcessor;
 class ZECamera;
 class ZERenderCommand;
 struct ZEDrawParameters;
-class ZETexture2D;
+class ZEGRTexture2D;
 class ZEViewPort;
 class ZELight;
 

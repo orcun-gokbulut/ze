@@ -88,7 +88,7 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 		ZEUInt64 OldPos;
 		switch(TextureChunk.TextureType)
 		{
-			case ZE_TT_CUBE:
+			case ZEGR_TT_CUBE:
 				if (TextureChunk.InternalSize != 0)
 				{
 					OldPos = ResourceFile->Tell();
@@ -105,7 +105,7 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 				}
 				break;
 
-			case ZE_TT_2D:
+			case ZEGR_TT_2D:
 				if (TextureChunk.InternalSize != 0)
 				{
 					OldPos = ResourceFile->Tell();					
@@ -122,7 +122,7 @@ bool ZEMaterialResource::LoadTextures(ZEMaterialResource* MaterialResource, ZEFi
 				}
 				break;
 
-			case ZE_TT_3D:
+			case ZEGR_TT_3D:
 				if (TextureChunk.InternalSize != 0)
 				{
 					zeWarning("3D Textures is not supported in materials. (Material FileName : \"%s\", Texture Index : %d)", ResourceFile->GetPath().GetValue(), I);

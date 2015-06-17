@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsEventTracer.h
+ Zinek Engine - PixelWorldPositionProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,29 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_GRAPHICS_EVENT_TRACER_H__
-#define __ZE_GRAPHICS_EVENT_TRACER_H__
+#ifndef __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
+#define __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
 
-class ZEGraphicsEventTracer
+#include	"GBuffer.hlsl"
+
+float2		SampleCoord				: register(c0);
+
+struct VSInput
 {
-	friend class ZEGraphicsModule;
-
-	protected:
-		bool							TracingEnabled;
-
-										ZEGraphicsEventTracer();
-		virtual							~ZEGraphicsEventTracer();
-
-	public:
-		virtual void					SetTracingEnabled(bool Enabled) = 0;
-		bool							GetTracingEnabled() const;
-
-		virtual void					EndEvent() = 0;
-		virtual void					StartEvent(const char* EventName) = 0;
-		virtual void					Mark(const char* MarkerName) = 0;
-		
-		static ZEGraphicsEventTracer*	GetInstance();
+	float3 Position		: POSITION0;
+	float2 TexCoord		: TEXCOORD0;
 };
+
+float4 VSMain(VSInput Input) : POSITION0
+{
+	return float4(sign(Input.Position).xyz, 1.0f);
+}
+
+float4 PSMain() : COLOR0
+{
+	return ZEGBuffer_GetDepth(SampleCoord).xxxx;
+}
 
 #endif

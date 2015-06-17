@@ -41,7 +41,7 @@
 #include "ZEMath\ZEVector.h"
 
 
-class ZETexture3D;
+class ZEGRTexture3D;
 
 class ZEMoonMaterial : public ZEMaterial
 {
@@ -56,7 +56,7 @@ class ZEMoonMaterial : public ZEMaterial
 		ZEVector3						MoonAmbientColor;
 		ZEVector3						MoonDirection;
 
-		const ZETexture3D*				MoonTexture;
+		const ZEGRTexture3D*				MoonTexture;
 
 										ZEMoonMaterial();
 		virtual							~ZEMoonMaterial();

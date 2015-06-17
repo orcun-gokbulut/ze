@@ -33,53 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEPTH_STENCIL_BUFFER_H__ 
-#define __ZE_DEPTH_STENCIL_BUFFER_H__
+#pragma once
 
 #include "ZETypes.h"
-#include "ZEDS/ZEString.h"
+#include "ZEGraphicsResource.h"
 
-enum ZEDepthStencilPixelFormat
+enum ZEGRDepthStencilPixelFormat
 {
-	ZE_DSPF_NOTSET				= 0,
-	ZE_DSPF_DEPTH16				= 1,	// 16 bit unsigned normalized depth values
-	ZE_DSPF_DEPTH24_STENCIL8	= 2,	// 24 bit unsigned normalized depth values + 8 bit unsigned int stencil values
-	ZE_DSPF_DEPTHD32_FLOAT		= 3,	// 32 bit float depth values
+	ZEGR_DSPF_NONE				= 0,
+	ZEGR_DSPF_DEPTH16			= 1,
+	ZEGR_DSPF_DEPTH24_STENCIL8	= 2,
+	ZEGR_DSPF_DEPTHD32_FLOAT	= 3,
 };
 
-class ZEDepthStencilBuffer
+class ZEGRDepthStencilBuffer : public ZEGRResource
 {
-	friend class ZEGraphicsModule;
-	friend class ZEGraphicsDevice;
-
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
-
-#ifdef ZE_DEBUG_ENABLE
-		ZEString						DebugName;
-#endif
 		ZEUInt							Width;
 		ZEUInt							Height;
-		ZEDepthStencilPixelFormat		PixelFormat;
+		ZEGRDepthStencilPixelFormat		Format;
 
-										ZEDepthStencilBuffer();
-		virtual							~ZEDepthStencilBuffer();
+										ZEGRDepthStencilBuffer();
+		virtual							~ZEGRDepthStencilBuffer();
 
 	public:
 		ZEUInt							GetWidth() const;
 		ZEUInt							GetHeight() const;
-		ZEDepthStencilPixelFormat		GetPixelFormat() const;
+		ZEGRDepthStencilPixelFormat		GetFormat() const;
 
-		void							SetDebugName(const char* String);
-		const char*						GetDebugName() const;
+		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilPixelFormat Format) = 0;
 
-		virtual bool					IsEmpty() const = 0;
-		
-		virtual void					Destroy();
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-		static ZEDepthStencilBuffer*	CreateInstance();
+		static ZEGRDepthStencilBuffer*	CreateInstance();
 };
-
-#endif

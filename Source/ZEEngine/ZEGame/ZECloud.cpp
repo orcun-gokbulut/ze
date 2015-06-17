@@ -247,7 +247,7 @@ bool ZECloud::InitializeSelf()
 	CloudRenderCommand.Flags			= ZE_ROF_NONE;
 	CloudRenderCommand.PrimitiveCount	= 0;
 	CloudRenderCommand.VertexDeclaration = (ZEVertexDeclaration*)-1;
-	CloudRenderCommand.IndexBuffer		= (ZEIndexBuffer*)-1;
+	CloudRenderCommand.IndexBuffer		= (ZEGRIndexBuffer*)-1;
 
 	return true;
 }

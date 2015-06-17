@@ -87,9 +87,9 @@ class ZED3D11Include : public ID3DInclude
 } D3D10Include;
 
 
-inline static ZEShaderConstantType GetZEShaderConstantDataType(D3D_SHADER_VARIABLE_TYPE Type)
+inline static ZEGRShaderConstantType GetZEShaderConstantDataType(D3D_SHADER_VARIABLE_TYPE Type)
 {
-	ZEShaderConstantType Var = ZE_SCDT_VOID;
+	ZEGRShaderConstantType Var = ZE_SCDT_VOID;
 	switch (Type)
 	{
 		case D3D_SVT_VOID:
@@ -112,9 +112,9 @@ inline static ZEShaderConstantType GetZEShaderConstantDataType(D3D_SHADER_VARIAB
 	return Var;
 }
 
-inline static ZEShaderSystemValueType GetZEShaderSystemValueType(D3D_NAME Name)
+inline static ZEGRShaderSystemSemantic GetZEShaderSystemValueType(D3D_NAME Name)
 {
-	ZEShaderSystemValueType Type = ZE_SSVT_NONE;
+	ZEGRShaderSystemSemantic Type = ZE_SSVT_NONE;
 
 	switch (Name)
 	{
@@ -178,9 +178,9 @@ inline static ZEShaderRegisterType GetZEShaderComponentType(D3D_REGISTER_COMPONE
 	return Values[Type];
 }
 
-inline static ZETextureType GetZETextureType(D3D_SRV_DIMENSION Dimension)
+inline static ZEGRTextureType GetZETextureType(D3D_SRV_DIMENSION Dimension)
 {
-	ZETextureType Var = ZE_TT_NONE;
+	ZEGRTextureType Var = ZEGR_TT_NONE;
 	switch(Dimension)
 	{
 		case D3D_SRV_DIMENSION_TEXTURE1D:
@@ -191,24 +191,24 @@ inline static ZETextureType GetZETextureType(D3D_SRV_DIMENSION Dimension)
 		case D3D_SRV_DIMENSION_TEXTURE2DMS:
 		case D3D_SRV_DIMENSION_TEXTURE2DARRAY:
 		case D3D_SRV_DIMENSION_TEXTURE2DMSARRAY:
-			Var = ZE_TT_2D;
+			Var = ZEGR_TT_2D;
 			break;
 		case D3D_SRV_DIMENSION_TEXTURE3D:
-			Var = ZE_TT_3D;
+			Var = ZEGR_TT_3D;
 			break;
 		case D3D_SRV_DIMENSION_TEXTURECUBE:
-			Var = ZE_TT_CUBE;
+			Var = ZEGR_TT_CUBE;
 			break;
 	}
 
 	return Var;
 }
 
-inline static ZEShaderSamplerReturnType GetZEShaderSamplerReturnType(D3D_RESOURCE_RETURN_TYPE Type)
+inline static ZEGRShaderSamplerType GetZEShaderSamplerReturnType(D3D_RESOURCE_RETURN_TYPE Type)
 {
-	static const ZEShaderSamplerReturnType Values[] =
+	static const ZEGRShaderSamplerType Values[] =
 	{
-		(ZEShaderSamplerReturnType)-1,		
+		(ZEGRShaderSamplerType)-1,		
 		ZE_SSRT_UNSIGNED_NORMALIZED,	// D3D_RETURN_TYPE_UNORM	= 1,		
 		ZE_SSRT_SIGNED_NORMALIZED,		// D3D_RETURN_TYPE_SNORM	= 2,
 		ZE_SSRT_SIGNED_INTEGER,			// D3D_RETURN_TYPE_SINT		= 3,
@@ -221,9 +221,9 @@ inline static ZEShaderSamplerReturnType GetZEShaderSamplerReturnType(D3D_RESOURC
 }
 
 
-inline static ZEShaderConstantBufferType GetZEShaderConstantBufferType(D3D_CBUFFER_TYPE Type)
+inline static ZEGRShaderConstantBufferType GetZEShaderConstantBufferType(D3D_CBUFFER_TYPE Type)
 {
-	static const ZEShaderConstantBufferType Values[] =
+	static const ZEGRShaderConstantBufferType Values[] =
 	{
 		ZE_SCBT_C_BUFFER,	//  D3D_CT_CBUFFER = 0,
 		ZE_SCBT_T_BUFFER	//  D3D_CT_TBUFFER = 1,
@@ -329,9 +329,9 @@ inline static DXGI_FORMAT GetInputElementFormat(ZEShaderRegisterMask UsedRegiste
 	return Format;
 }
 
-inline static ZEVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterMask UsedRegisters, D3D_REGISTER_COMPONENT_TYPE ComponentType)
+inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterMask UsedRegisters, D3D_REGISTER_COMPONENT_TYPE ComponentType)
 {
-	ZEVertexElementType Type = ZE_VET_NONE;
+	ZEGRVertexElementType Type = ZE_VET_NONE;
 
 	switch (UsedRegisters)
 	{
@@ -396,11 +396,11 @@ inline static ZEVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterMas
 	return Type;
 }
 
-ZESSize ProcessPrimitive(ZEArray<ZEShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface);
-ZESSize ProcessStruct(ZEArray<ZEShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface);
-ZESSize ProcessVariable(ZEArray<ZEShaderConstant>* Variables, const ZEString& ParentName, ZESize ParentOffset, ID3D11ShaderReflectionType* VariableInterface);
+ZESSize ProcessPrimitive(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface);
+ZESSize ProcessStruct(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface);
+ZESSize ProcessVariable(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& ParentName, ZESize ParentOffset, ID3D11ShaderReflectionType* VariableInterface);
 
-ZESSize ProcessPrimitive(ZEArray<ZEShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface)
+ZESSize ProcessPrimitive(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface)
 {
 	// Get variable type description
 	D3D11_SHADER_TYPE_DESC TypeDesc;
@@ -413,7 +413,7 @@ ZESSize ProcessPrimitive(ZEArray<ZEShaderConstant>* Variables, const ZEString& V
 	ZESize NextOffset = VariableOffset;
 
 	// Fill initial/common data
-	ZEShaderConstant Variable;
+	ZEGRShaderConstant Variable;
 	Variable.RowCount = TypeDesc.Rows;
 	Variable.ColumnCount = TypeDesc.Columns;
 	// NOTE: If variable is an array, each element is placed at a new register regardless of their size
@@ -443,7 +443,7 @@ ZESSize ProcessPrimitive(ZEArray<ZEShaderConstant>* Variables, const ZEString& V
 	return Variable.Offset + Variable.Size;
 }
 
-ZESSize ProcessStruct(ZEArray<ZEShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface)
+ZESSize ProcessStruct(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface)
 {
 	// Get variable type description
 	D3D11_SHADER_TYPE_DESC TypeDesc;
@@ -498,7 +498,7 @@ ZESSize ProcessStruct(ZEArray<ZEShaderConstant>* Variables, const ZEString& Vari
 	return VariableEnd;
 }
 
-inline static ZESSize ProcessVariable(ZEArray<ZEShaderConstant>* Variables, const ZEString& ParentName, ZESize ParentOffset, ID3D11ShaderReflectionType* VariableInterface)
+inline static ZESSize ProcessVariable(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& ParentName, ZESize ParentOffset, ID3D11ShaderReflectionType* VariableInterface)
 {
 	// Get variable type description
 	D3D11_SHADER_TYPE_DESC TypeDesc;
@@ -540,10 +540,10 @@ inline static ZESSize ProcessVariable(ZEArray<ZEShaderConstant>* Variables, cons
 bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* ByteCode)
 {
 	// Get meta containers
-	ZEArray<ZEShaderBuffer>* Buffers = &Shader->MetaTable.Buffers;
-	ZEArray<ZEShaderSampler>* Samplers = &Shader->MetaTable.Samplers;
-	ZEArray<ZEShaderTexture>* Textures = &Shader->MetaTable.Textures;
-	ZEArray<ZEShaderInput>* InputSignature = &Shader->MetaTable.Inputs;
+	ZEArray<ZEGRShaderConstantBuffer>* Buffers = &Shader->MetaTable.Buffers;
+	ZEArray<ZEGRShaderSampler>* Samplers = &Shader->MetaTable.Samplers;
+	ZEArray<ZEGRShaderTexture>* Textures = &Shader->MetaTable.Textures;
+	ZEArray<ZEGRShaderInput>* InputSignature = &Shader->MetaTable.Inputs;
 	
 	LPVOID ByteData = ByteCode->GetBufferPointer();
 	SIZE_T ByteSize = ByteCode->GetBufferSize();
@@ -580,7 +580,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 			return false;
 		}
 		
-		ZEShaderInput* InputParameter = &InputSignature->GetItem(I);
+		ZEGRShaderInput* InputParameter = &InputSignature->GetItem(I);
 		
 		if (strnlen(SignParamDesc.SemanticName, ZE_MAX_SHADER_VARIABLE_NAME) >= ZE_MAX_SHADER_VARIABLE_NAME)
 		{
@@ -590,12 +590,12 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 		}
 
 		strcpy(InputParameter->Semantic, SignParamDesc.SemanticName);
-		InputParameter->UsedRegisters = SignParamDesc.Mask;
+		InputParameter->Mask = SignParamDesc.Mask;
 		InputParameter->Index = SignParamDesc.SemanticIndex;
 		InputParameter->RegisterType = GetZEShaderComponentType(SignParamDesc.ComponentType);
-		InputParameter->SystemValue = GetZEShaderSystemValueType(SignParamDesc.SystemValueType); 
+		InputParameter->SystemSemantic = GetZEShaderSystemValueType(SignParamDesc.SystemValueType); 
 		InputParameter->ElementType = D3D10ToZEVertexElementType(SignParamDesc.Mask, SignParamDesc.ComponentType);
-		InputParameter->Hash = ZEShaderInput::GetHash(SignParamDesc.SemanticName, (ZEUInt8)SignParamDesc.SemanticIndex);
+		InputParameter->Hash = ZEGRShaderInput::GetHash(SignParamDesc.SemanticName, (ZEUInt8)SignParamDesc.SemanticIndex);
 	}
 
 	// Get textures buffer sampler data
@@ -615,7 +615,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 			case D3D_SIT_CBUFFER:
 			case D3D_SIT_TBUFFER:
 			{
-				ZEShaderBuffer BufferInfo;
+				ZEGRShaderConstantBuffer BufferInfo;
 				BufferInfo.Name = BindDesc.Name;
 				BufferInfo.Slot = BindDesc.BindPoint;
 				BufferInfo.Hash = ZEString(BindDesc.Name).Hash();
@@ -624,7 +624,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 			}
 			case D3D_SIT_TEXTURE:
 			{
-				ZEShaderTexture TextureInfo;
+				ZEGRShaderTexture TextureInfo;
 				TextureInfo.Name = BindDesc.Name;
 				TextureInfo.Count = BindDesc.BindCount;
 				TextureInfo.Slot = BindDesc.BindPoint;
@@ -634,7 +634,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 			}
 			case D3D_SIT_SAMPLER:
 			{
-				ZEShaderSampler SamplerInfo;
+				ZEGRShaderSampler SamplerInfo;
 				SamplerInfo.Name = BindDesc.Name;
 				SamplerInfo.Slot = BindDesc.BindPoint;
 				SamplerInfo.SampleCount = BindDesc.NumSamples;
@@ -651,7 +651,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 	for (ZESize	BuffN = 0; BuffN < CBufferCount; ++BuffN)
 	{
 		// Get const buffer
-		ZEShaderBuffer* Buffer = &Buffers->GetItem(BuffN);
+		ZEGRShaderConstantBuffer* Buffer = &Buffers->GetItem(BuffN);
 		ID3D11ShaderReflectionConstantBuffer* CBuffer = Reflector->GetConstantBufferByName(Buffer->Name.ToCString());
 
 		D3D11_SHADER_BUFFER_DESC CBufferDesc;
@@ -682,7 +682,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 				return false;
 			}
 
-			ZEArray<ZEShaderConstant>* Variables = &Buffer->Constants;
+			ZEArray<ZEGRShaderConstant>* Variables = &Buffer->Constants;
 			if (ProcessVariable(Variables, VariableDesc.Name, VariableDesc.StartOffset, CBufferVariable->GetType()) < 0)
 			{
 				zeError("Can not create buffer meta table");
@@ -811,7 +811,7 @@ ZED3D11ComputeShader* ZED3D11ShaderCompiler::CreateComputeShader(ID3DBlob* ByteC
 	return ComputeShader;
 }
 
-ZEShader* ZED3D11ShaderCompiler::CompileShader(ZEShaderCompileOptions* Options)
+ZEGRShader* ZED3D11ShaderCompiler::CompileShader(ZEGRShaderCompileOptions* Options)
 {
 	zeDebugCheck(Options->SourceData.IsEmpty(), "No shader source available.");
 	zeDebugCheck(Options->EntryPoint.IsEmpty(), "Shader entry point is not available");
@@ -876,16 +876,16 @@ ZEShader* ZED3D11ShaderCompiler::CompileShader(ZEShaderCompileOptions* Options)
 	}
 	
 	// Fill macros array
-	ZESize ComponentCount = Options->Parameters.GetCount();
+	ZESize ComponentCount = Options->Definitions.GetCount();
 	ZEArray<D3D_SHADER_MACRO> Macros;
 	Macros.SetCount(ComponentCount + 1);
 	for (ZESize I = 0; I < ComponentCount; I++)
 	{
-		Macros[I].Name = Options->Parameters[I].Name.ToCString();
-		Macros[I].Definition = Options->Parameters[I].Definition.ToCString();
+		Macros[I].Name = Options->Definitions[I].Name.ToCString();
+		Macros[I].Definition = Options->Definitions[I].Value.ToCString();
 
 		// Also hash the parameter
-		Options->Parameters[I].Hash = Options->Parameters[I].Name.Hash();
+		Options->Definitions[I].Hash = Options->Definitions[I].Name.Hash();
 	}
 	Macros[ComponentCount].Name = NULL;
 	Macros[ComponentCount].Definition = NULL;
@@ -951,10 +951,10 @@ ZEShader* ZED3D11ShaderCompiler::CompileShader(ZEShaderCompileOptions* Options)
 #ifdef ZE_GRAPHIC_LOG_ENABLE
 	char Parameter[36] = {0};
 	char Parameters[1024] = {0};
-	for (ZESize I = 0; I < Options->Parameters.GetCount(); ++I)
+	for (ZESize I = 0; I < Options->Definitions.GetCount(); ++I)
 	{
-		const char* Name = Options->Parameters[I].Name.ToCString();
-		const char* Defn = Options->Parameters[I].Definition.ToCString();
+		const char* Name = Options->Definitions[I].Name.ToCString();
+		const char* Defn = Options->Definitions[I].Value.ToCString();
 
 		sprintf(Parameter, "%s %s, ", Name, Defn == NULL ? "" : Defn);
 		strcat(Parameters, Parameter);

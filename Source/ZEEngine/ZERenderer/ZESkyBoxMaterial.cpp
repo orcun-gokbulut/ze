@@ -73,12 +73,12 @@ float ZESkyBoxMaterial::GetBrightness() const
 	return Brightness;
 }
 
-void ZESkyBoxMaterial::SetTexture(const ZETextureCube* Texture)
+void ZESkyBoxMaterial::SetTexture(const ZEGRTextureCube* Texture)
 {
 	this->Texture = Texture;
 }
 
-const ZETextureCube* ZESkyBoxMaterial::GetTexture() const
+const ZEGRTextureCube* ZESkyBoxMaterial::GetTexture() const
 {
 	return Texture;
 }

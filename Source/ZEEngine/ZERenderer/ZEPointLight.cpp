@@ -64,12 +64,12 @@ void ZEPointLight::SetCastShadows(bool NewValue)
 	ZELight::SetCastsShadow(NewValue);
 }
 
-ZETexture2D* ZEPointLight::GetFrontShadowMap()
+ZEGRTexture2D* ZEPointLight::GetFrontShadowMap()
 {
 	return FrontShadowMap;
 }
 
-ZETexture2D* ZEPointLight::GetBackShadowMap()
+ZEGRTexture2D* ZEPointLight::GetBackShadowMap()
 {
 	return FrontShadowMap;
 }
