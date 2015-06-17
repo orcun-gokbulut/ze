@@ -39,7 +39,7 @@
 #include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZEGraphics/ZEShader.h"
+#include "ZEGraphics/ZEGRShader.h"
 #include "ZED3D11ComponentBase.h"
 
 class ZED3D11Shader : public ZEGRShader

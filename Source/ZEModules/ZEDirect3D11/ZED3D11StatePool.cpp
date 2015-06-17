@@ -36,15 +36,15 @@
 #include "ZETypes.h"
 #include "ZED3D11Shader.h"
 #include "ZED3D11StatePool.h"
-#include "ZEGraphics/ZEShader.h"
+#include "ZEGraphics/ZEGRShader.h"
 #include "ZEDS/ZEListIterators.h"
 #include "ZED3D11GraphicsModule.h"
-#include "ZEGraphics/ZEBlendState.h"
-#include "ZEGraphics/ZEVertexLayout.h"
-#include "ZEGraphics/ZESamplerState.h"
-#include "ZEGraphics/ZERasterizerState.h"
-#include "ZEGraphics/ZEDepthStencilState.h"
-#include "ZEGraphics/ZEGraphicsDefinitions.h"
+#include "ZEGraphics/ZEGRBlendState.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEGraphics/ZEGRSamplerState.h"
+#include "ZEGraphics/ZEGRRasterizerState.h"
+#include "ZEGraphics/ZEGRDepthStencilState.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 
 inline static D3D11_BLEND ZEBlendOptionToD3D10(ZEBlendOption BlendOption)
 {
@@ -141,7 +141,7 @@ inline static D3D11_FILTER ZETextureFilterModeToD3D10(ZETextureFilterMode Min, Z
 							(ZETextureFilterModeToD3D10FilterType(Mip) << D3D11_MIP_FILTER_SHIFT));
 }
 
-inline static D3D11_FILL_MODE ZEFillModeToD3D10(ZEFillMode FillMode)
+inline static D3D11_FILL_MODE ZEFillModeToD3D10(ZEGRFillMode FillMode)
 {
 	static const D3D11_FILL_MODE Values[] = 
 	{
@@ -153,7 +153,7 @@ inline static D3D11_FILL_MODE ZEFillModeToD3D10(ZEFillMode FillMode)
 	return Values[FillMode];
 }
 
-inline static D3D11_CULL_MODE ZECullDirectionToD3D10(ZECullDirection CullDirection)
+inline static D3D11_CULL_MODE ZECullDirectionToD3D10(ZEGRCullDirection CullDirection)
 {
 	static const D3D11_CULL_MODE Values[] = 
 	{

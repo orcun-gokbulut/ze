@@ -35,7 +35,7 @@
 
 #include "ZEError.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZETexture/ZETextureOptions.h"
 #include "ZEMaterialResource.h"
 #include "ZETexture/ZETexture2DResource.h"

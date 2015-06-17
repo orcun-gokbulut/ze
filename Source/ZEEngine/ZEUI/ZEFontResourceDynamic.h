@@ -40,7 +40,7 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEVector.h"
 
-#include "ZEGraphics\ZETexture2D.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZERenderer\ZEUIMaterial.h"
 #include "ZEUI\ZEFontResource.h"
 #include "ZEUI\ZEUIRectangle.h"

@@ -38,14 +38,14 @@
 
 #include "ZED3D11StatePool.h"
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEGraphicsDevice.h"
+#include "ZEGraphics/ZEGRDevice.h"
 
 #include "d3d11.h"
 
 class ZEGRRenderTarget;
 class ZEDepthStencilBuffer;
 
-class ZED3D11GraphicsDevice : public ZEGraphicsDevice, public ZED3D11ComponentBase
+class ZED3D11GraphicsDevice : public ZEGRDevice, public ZED3D11ComponentBase
 {
 	friend class ZED3D11GraphicsModule;
 
@@ -67,10 +67,10 @@ class ZED3D11GraphicsDevice : public ZEGraphicsDevice, public ZED3D11ComponentBa
 		virtual					~ZED3D11GraphicsDevice();
 
 	public:
-		virtual void			Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
-		virtual void			DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
-		virtual void			DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
-		virtual void			DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
+		virtual void			Draw(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
+		virtual void			DrawIndexed(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
+		virtual void			DrawInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
+		virtual void			DrawIndexedInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
 
 		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
 		virtual void			ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);

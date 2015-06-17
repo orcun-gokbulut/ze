@@ -34,11 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEGraphics/ZETextureCube.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZETextureData.h"
 #include "ZETextureLoader.h"
 #include "ZECore/ZEConsole.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEFile/ZEFileCache.h"
 #include "ZETextureCubeResource.h"
 #include "ZETextureQualityManager.h"

@@ -36,8 +36,8 @@
 #include "ZEOmniProjectiveLight.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEShadowRenderer.h"
-#include "ZEGraphics/ZETexture.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGame/ZEEntityProvider.h"
 
 ZELightType ZEOmniProjectiveLight::GetLightType()

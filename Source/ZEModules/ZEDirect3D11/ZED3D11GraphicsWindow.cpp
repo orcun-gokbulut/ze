@@ -35,12 +35,12 @@
 
 #include "ZED3D11GraphicsWindow.h"
 #include "ZED3D11GraphicsModule.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZED3D11DepthStencilBuffer.h"
-#include "ZEGraphics/ZEDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZED3D11RenderTarget.h"
-#include "ZEGraphics/ZERenderTarget.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZED3D11Texture2D.h"
 
 void ZED3D11GraphicsWindow::ReleaseSwapChain()
@@ -261,7 +261,7 @@ IDXGISwapChain1* ZED3D11GraphicsWindow::GetDXGISwapChain() const
 
 bool ZED3D11GraphicsWindow::Update()
 {
-	if (!ZEGraphicsWindow::Update())
+	if (!ZEGRWindow::Update())
 		return false;
 
 	FlagLock.Lock();

@@ -39,7 +39,7 @@
 #include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZEGraphics/ZETexture3D.h"
+#include "ZEGraphics/ZEGRTexture3D.h"
 #include "ZED3D11ComponentBase.h"
 #include "ZED3D11RenderTarget.h"
 

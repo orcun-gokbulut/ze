@@ -37,7 +37,7 @@
 #define __ZE_D3D10_GRAPHICS_MONITOR_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEGraphicsMonitor.h"
+#include "ZEGraphics/ZEGRMonitor.h"
 
 #include <dxgi1_2.h>
 

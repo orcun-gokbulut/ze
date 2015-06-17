@@ -41,7 +41,7 @@
 #include "ZEInput/ZEInputModule.h"
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX

@@ -38,7 +38,7 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGame.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZERay.h"

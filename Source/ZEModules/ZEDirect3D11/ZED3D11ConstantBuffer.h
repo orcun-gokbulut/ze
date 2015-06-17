@@ -37,7 +37,7 @@
 #define __ZE_D3D11_CONSTANT_BUFFER_H__
 
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEConstantBuffer.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 struct ID3D11Buffer;
 

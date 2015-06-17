@@ -35,8 +35,8 @@
 
 #include "ZECamera.h"
 #include "ZECore/ZECore.h"
-#include "ZEGraphics/ZETexture2D.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEShadowRenderer.h"

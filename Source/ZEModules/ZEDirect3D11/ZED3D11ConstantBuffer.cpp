@@ -39,7 +39,7 @@
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZED3D11ConstantBuffer.h"
 #include "ZED3D11GraphicsModule.h"
-#include "ZEGraphics/ZEShaderMeta.h"
+#include "ZEGraphics/ZEGRShaderMeta.h"
 
 bool ZED3D11ConstantBuffer::UpdateWith(ZEUInt ShadowIndex)
 {

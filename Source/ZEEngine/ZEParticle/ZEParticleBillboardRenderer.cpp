@@ -36,7 +36,7 @@
 #include "ZEParticleBillboardRenderer.h"
 #include "ZEParticle\ZEParticleEffect.h"
 #include "ZEParticle\ZEParticleSystem.h"
-#include "ZEGraphics\ZEVertexBuffer.h"
+#include "ZEGraphics\ZEGRVertexBuffer.h"
 #include "ZEGraphics\ZEVertexTypes.h"
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer\ZECamera.h"

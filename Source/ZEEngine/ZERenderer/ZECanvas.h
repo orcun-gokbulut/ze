@@ -41,7 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"

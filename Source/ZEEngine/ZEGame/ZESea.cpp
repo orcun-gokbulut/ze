@@ -35,15 +35,15 @@
 
 #include "ZESea.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZESeaMaterial.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEDrawParameters.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEMath/ZEMath.h"
 
 ZESea::ZESea()

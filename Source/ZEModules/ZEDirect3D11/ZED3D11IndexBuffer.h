@@ -40,7 +40,7 @@
 
 #include "ZETypes.h"
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEIndexBuffer.h"
+#include "ZEGraphics/ZEGRIndexBuffer.h"
 
 class ZED3D11IndexBuffer : public ZEGRIndexBuffer, public ZED3D11ComponentBase
 {
@@ -58,8 +58,8 @@ class ZED3D11IndexBuffer : public ZEGRIndexBuffer, public ZED3D11ComponentBase
 	public:
 		const ID3D11Buffer*		GetD3D10Buffer() const;
 
-		bool					CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData = NULL);
-		bool					CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData);
+		bool					CreateDynamic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData = NULL);
+		bool					CreateStatic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData);
 };
 
 #endif

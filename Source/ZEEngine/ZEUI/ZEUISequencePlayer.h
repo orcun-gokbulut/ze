@@ -37,7 +37,7 @@
 #ifndef	__ZE_UI_SEQUANCE_PLAYER__
 #define __ZE_UI_SEQUANCE_PLAYER__
 #include "ZEUI/ZEUIFrameControl.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEDS/ZEArray.h"
 #include "ZESound/ZESoundSource.h"
 

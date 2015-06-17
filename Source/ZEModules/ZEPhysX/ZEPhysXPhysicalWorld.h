@@ -46,7 +46,7 @@
 #include "ZEPhysXCollisionManager.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZERenderer/ZERenderCommand.h"
 

@@ -38,7 +38,7 @@
 #include "ZEInteriorResource.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZERenderer/ZELight.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"

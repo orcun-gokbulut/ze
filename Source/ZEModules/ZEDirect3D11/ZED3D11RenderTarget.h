@@ -40,7 +40,7 @@
 
 #include "ZETypes.h"
 #include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZERenderTarget.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
 
 struct ID3D11RenderTargetView;
 

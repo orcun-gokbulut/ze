@@ -46,9 +46,9 @@
 #include "ZED3D11GraphicsModule.h"
 #include "ZED3D11ConstantBuffer.h"
 #include "ZED3D11DepthStencilBuffer.h"
-#include "ZEGraphics/ZEGraphicsDefinitions.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 
-inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEIndexBufferFormat BufferFormat)
+inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEGRIndexBufferFormat BufferFormat)
 {
 	static const DXGI_FORMAT Values[] = 
 	{
@@ -58,7 +58,7 @@ inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEIndexBufferFormat BufferFormat)
 	return Values[BufferFormat];
 }
 
-inline D3D11_PRIMITIVE_TOPOLOGY ZEPrimitiveTypeToD3D10(ZEPrimitiveType PrimitiveType)
+inline D3D11_PRIMITIVE_TOPOLOGY ZEPrimitiveTypeToD3D10(ZEGRPrimitiveType PrimitiveType)
 {
 	static const D3D11_PRIMITIVE_TOPOLOGY Values[] = 
 	{
@@ -550,28 +550,28 @@ void ZED3D11GraphicsDevice::ApplyStates()
 	ApplyInputStates();
 }
 
-void ZED3D11GraphicsDevice::Draw(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex)
+void ZED3D11GraphicsDevice::Draw(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex)
 {
 	ApplyStates();
 	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
 	D3DContexes[ContextIndex]->Draw(VertexCount, FirstVertex);
 }
 
-void ZED3D11GraphicsDevice::DrawIndexed(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex)
+void ZED3D11GraphicsDevice::DrawIndexed(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex)
 {
 	ApplyStates();
 	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
 	D3DContexes[ContextIndex]->DrawIndexed(IndexCount, FirstIndex, BaseVertex);
 }
 
-void ZED3D11GraphicsDevice::DrawInstanced(ZEPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
+void ZED3D11GraphicsDevice::DrawInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
 {
 	ApplyStates();
 	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
 	D3DContexes[ContextIndex]->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
 }
 
-void ZED3D11GraphicsDevice::DrawIndexedInstanced(ZEPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance)
+void ZED3D11GraphicsDevice::DrawIndexedInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance)
 {
 	ApplyStates();
 	D3DContexes[ContextIndex]->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
