@@ -50,7 +50,7 @@
 #include "ZEPhysics/ZEPhysicalShapes.h"
 
 class ZEStaticVertexBuffer;
-class ZETexture2D;
+class ZEGRTexture2D;
 class ZETexture2DResource;
 class ZEMaterial;
 class ZEPhysicalJoint;
@@ -348,7 +348,7 @@ class ZEModelResource : public ZEResource
 		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLReaderNode* PhysicalBodyNode);
 		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLReaderNode* PhysicalJointNode);
 
-		const ZETexture2D*							ManageModelMaterialTextures(const ZEString& FileName);
+		const ZEGRTexture2D*							ManageModelMaterialTextures(const ZEString& FileName);
 		bool  										ReadModelFromFile(ZEFile* ResourceFile);
 
 		virtual										~ZEModelResource();

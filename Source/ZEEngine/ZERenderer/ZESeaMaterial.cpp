@@ -121,22 +121,22 @@ float ZESeaMaterial::GetSpecularShineness() const
 	return SpecularShineness;
 }
 
-void ZESeaMaterial::SetDiffuseTexture(const ZETexture2D* Texture)
+void ZESeaMaterial::SetDiffuseTexture(const ZEGRTexture2D* Texture)
 {
 	DiffuseTexture = Texture;
 }
 
-const ZETexture2D* ZESeaMaterial::GetDiffuseTexture() const
+const ZEGRTexture2D* ZESeaMaterial::GetDiffuseTexture() const
 {
 	return DiffuseTexture;
 }
 
-void ZESeaMaterial::SetNormalTexture(const ZETexture2D* Texture)
+void ZESeaMaterial::SetNormalTexture(const ZEGRTexture2D* Texture)
 {
 	NormalTexture = Texture;
 }
 
-const ZETexture2D* ZESeaMaterial::GetNormalTexture() const
+const ZEGRTexture2D* ZESeaMaterial::GetNormalTexture() const
 {
 	return NormalTexture;
 }

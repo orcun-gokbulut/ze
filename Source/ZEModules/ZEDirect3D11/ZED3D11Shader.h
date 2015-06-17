@@ -42,7 +42,7 @@
 #include "ZEGraphics/ZEShader.h"
 #include "ZED3D11ComponentBase.h"
 
-class ZED3D11Shader : public ZEShader
+class ZED3D11Shader : public ZEGRShader
 {
 	friend class ZED3D11StatePool;
 	friend class ZED3D11ShaderCompiler;
@@ -71,7 +71,7 @@ class ZED3D11PixelShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		virtual						~ZED3D11PixelShader();
 
 	public:
-		ZEShaderType				GetShaderType() const;
+		ZEGRShaderType				GetShaderType() const;
 
 		const ID3D11PixelShader*	GetD3D10PixelShader() const;
 
@@ -89,7 +89,7 @@ class ZED3D11VertexShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		virtual						~ZED3D11VertexShader();
 
 	public:
-		ZEShaderType				GetShaderType() const;
+		ZEGRShaderType				GetShaderType() const;
 
 		const ID3D11VertexShader*	GetD3D10VertexShader() const;
 };
@@ -106,7 +106,7 @@ class ZED3D11GeometryShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		virtual						~ZED3D11GeometryShader();
 
 	public:
-		ZEShaderType				GetShaderType() const;
+		ZEGRShaderType				GetShaderType() const;
 
 		const ID3D11GeometryShader*	GetD3D10GeometryShader() const;
 };
@@ -123,7 +123,7 @@ class ZED3D11DomainShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		virtual						~ZED3D11DomainShader();
 
 	public:
-		ZEShaderType				GetShaderType() const;
+		ZEGRShaderType				GetShaderType() const;
 
 		const ID3D11DomainShader*	GetD3D10DomainShader() const;
 };
@@ -140,7 +140,7 @@ class ZED3D11HullShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		virtual						~ZED3D11HullShader();
 
 	public:
-		ZEShaderType				GetShaderType() const;
+		ZEGRShaderType				GetShaderType() const;
 
 		const ID3D11HullShader*		GetD3D10HullShader() const;
 };
@@ -157,7 +157,7 @@ class ZED3D11ComputeShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		virtual						~ZED3D11ComputeShader();
 
 	public:
-		ZEShaderType				GetShaderType() const;
+		ZEGRShaderType				GetShaderType() const;
 
 		const ID3D11ComputeShader*	GetD3D10ComputeShader() const;
 };

@@ -54,7 +54,7 @@ class ZETextureResource : public ZEResource
 	ZE_OBJECT
 
 	public:
-		virtual ZETextureType				GetTextureType() const = 0;
+		virtual ZEGRTextureType				GetTextureType() const = 0;
 };
 
 #endif

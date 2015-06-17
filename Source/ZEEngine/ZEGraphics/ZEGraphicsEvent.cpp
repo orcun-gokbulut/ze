@@ -34,3 +34,50 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGraphicsEvent.h"
+
+void ZEGRTracer::SetName(const char* Name)
+{
+	this->Name = Name;
+}
+
+const char* ZEGRTracer::GetName()
+{
+	return Name;
+}
+
+bool ZEGRTracer::IsStarted()
+{
+	return Started;
+}
+
+void ZEGRTracer::Start()
+{
+	#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
+	if (!IsStarted())
+		ZEGraphicsEventTracer::GetInstance()->StartEvent(Name);
+	#endif
+}
+
+void ZEGRTracer::End()
+{
+	#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
+	if (IsStarted())
+		ZEGraphicsEventTracer::GetInstance()->EndEvent(Name);
+	#endif
+}
+
+ZEGRTracer::ZEGRTracer()
+{
+	Started = false;
+}
+
+ZEGRTracer::ZEGRTracer(const char* Name)
+{
+	Started = false;
+	SetName(Name);
+}
+
+ZEGRTracer::~ZEGRTracer()
+{
+	End();
+}

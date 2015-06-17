@@ -45,12 +45,12 @@ ZELightType ZEOmniProjectiveLight::GetLightType()
 	return ZE_LT_OMNIPROJECTIVE;
 }
 
-const ZETextureCube* ZEOmniProjectiveLight::GetProjectionTexture()
+const ZEGRTextureCube* ZEOmniProjectiveLight::GetProjectionTexture()
 {
 	return ProjectionTexture;
 }
 
-void ZEOmniProjectiveLight::SetProjectionTexture(const ZETextureCube* Texture)
+void ZEOmniProjectiveLight::SetProjectionTexture(const ZEGRTextureCube* Texture)
 {
 	ProjectionTexture = Texture;
 }
@@ -92,12 +92,12 @@ bool ZEOmniProjectiveLight::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
-ZETexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
+ZEGRTexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
 {
 	return FrontShadowMap;
 }
 
-ZETexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
+ZEGRTexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
 {
 	return BackShadowMap;
 }

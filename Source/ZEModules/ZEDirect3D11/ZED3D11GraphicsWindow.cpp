@@ -315,12 +315,12 @@ bool ZED3D11GraphicsWindow::Present()
 	return true;
 }
 
-const ZETexture2D* ZED3D11GraphicsWindow::GetBackBufferTexture()
+const ZEGRTexture2D* ZED3D11GraphicsWindow::GetBackBufferTexture()
 {
 	return NULL; //BackBufferTexture;
 }
 
-const ZERenderTarget* ZED3D11GraphicsWindow::GetBackBuffer()
+const ZEGRRenderTarget* ZED3D11GraphicsWindow::GetBackBuffer()
 {
 	return BackBuffer;
 }

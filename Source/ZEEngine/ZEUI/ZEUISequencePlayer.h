@@ -54,7 +54,7 @@ class ZEUISequencePlayer : public ZEUIFrameControl
 
 	private:
 
-		ZEArray<const ZETexture2D*>	Frames;
+		ZEArray<const ZEGRTexture2D*>	Frames;
 		ZESoundSource*				SoundPlayer;
 
 		float						TimeRemainder;

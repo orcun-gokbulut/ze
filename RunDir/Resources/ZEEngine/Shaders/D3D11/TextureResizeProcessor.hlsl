@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEStatePool.h
+ Zinek Engine - TextureResizeProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,40 +33,77 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_STATE_POOL_H__
-#define __ZE_STATE_POOL_H__
+sampler2D 	TextureInput	 : register(s0);
+float2		PixelSize 		 : register(vs, c0);
+float2		Weights[21] 	 : register(ps, c0);
 
-#include "ZETypes.h"
-#include "ZEGraphicsDefinitions.h"
-
-class ZEShader;
-class ZEBlendState;
-class ZESamplerState;
-class ZEVertexLayout;
-class ZERasterizerState;
-class ZEDepthStencilState;
-
-class ZEStatePool
+// Vertex Shader Input Struct
+struct VS_INPUT
 {
-	public:
-		static ZEUInt16			BlendStateCount;
-		static ZEUInt16			SamplerStateCount;
-		static ZEUInt16			VertexLayoutCount;
-		static ZEUInt16			RasterizerStateCount;
-		static ZEUInt16			DepthStencilStateCount;
+	float4 Position  : POSITION0;
+	float2 Texcoord  : TEXCOORD0;
 
-								ZEStatePool();
-		virtual					~ZEStatePool();
-
-	public:
-		virtual void			ClearStates();
-
-		virtual void*			GetState(ZEBlendState* BlendState) = 0;
-		virtual void*			GetState(ZESamplerState* SamplerState) = 0;
-		virtual void*			GetState(ZERasterizerState* RasterizerState) = 0;
-		virtual void*			GetState(ZEDepthStencilState* DepthStencilState) = 0;
-		virtual void*			GetState(ZEVertexLayout* VertexLayout, const ZEShader* VertexShader) = 0;
 };
 
-#endif
+// Vertex Shader Output Struct
+struct VS_OUTPUT 
+{
+	float4 	Position   : POSITION0;
+	float2 	Texcoord   : TEXCOORD0;
+};
+
+// Pixel Shader Input Struct
+struct PS_INPUT
+{
+	float2 	TexCoord  : TEXCOORD0;   
+};
+
+// Pixel Shader Output Struct
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+// Vertex Shader Main
+VS_OUTPUT vs_main_generic( VS_INPUT Input )
+{
+	VS_OUTPUT Output;
+
+	Output.Position = Input.Position;
+	Output.Texcoord = Input.Texcoord + 0.5f * PixelSize;
+
+	return Output;
+}
+
+// Pixel Shader Main horizontal
+// Samples in x axis
+PS_OUTPUT ps_main_horizontal( PS_INPUT Input )
+{
+	PS_OUTPUT Output;
+	
+	Output.PixelColor = (float4)0.0f;
+
+	for(int I = 0; I < 21; I++)
+	{
+		Output.PixelColor += Weights[I].x * tex2D(TextureInput, Input.TexCoord + float2(Weights[I].y, 0.0f));
+	}
+
+	return Output;
+}
+
+
+// Pixel Shader Main vertical
+// Samples in y axis
+PS_OUTPUT ps_main_vertical( PS_INPUT Input )
+{
+	PS_OUTPUT Output;
+	
+	Output.PixelColor = (float4)0.0f;
+   
+	for(int I = 0; I < 21; I++)
+	{
+		Output.PixelColor += Weights[I].x * tex2D(TextureInput, Input.TexCoord + float2(0.0f, Weights[I].y));
+	}
+
+	return Output;
+}

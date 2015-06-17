@@ -34,28 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEShader.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
 
-const ZEShaderMetaTable* ZEShader::GetMetaTable() const
-{
-	return &MetaTable;
-}
-
-void ZEShader::Destroy()
+void ZEGRShader::Destroy()
 {
 	delete this;
 }
 
-ZESize		ZEShader::TotalSize = 0;
-ZEUInt16	ZEShader::TotalCount = 0;
-
-ZEShader::ZEShader()
+ZEGRShader::ZEGRShader()
 {
 
 }
 
-ZEShader::~ZEShader()
+ZEGRShader::~ZEGRShader()
 {
 
 }

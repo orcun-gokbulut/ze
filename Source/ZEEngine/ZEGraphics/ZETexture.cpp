@@ -34,31 +34,70 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETexture.h"
+
 #include "ZEGraphicsModule.h"
 
-bool ZETexture::GetIsRenderTarget() const
+bool ZEGRTexture::GetIsRenderTarget() const
 {
 	return IsRenderTarget;
 }
 
-ZETextureType ZETexture::GetTextureType() const
+ZEGRTextureFormat ZEGRTexture::GetFormat() const
 {
-	return TextureType;
+	return Format;
 }
 
-ZETexturePixelFormat ZETexture::GetPixelFormat() const
-{
-	return PixelFormat;
-}
-
-ZETexture::ZETexture()
+ZEGRTexture::ZEGRTexture()
 {
 	IsRenderTarget = false;
-	TextureType = ZE_TT_NONE;
-	PixelFormat = ZE_TPF_NOTSET;
+	LevelCount = 0;
+	Format = ZEGR_TF_NONE;
 }
 
-ZETexture::~ZETexture()
+ZESize ZEGRTexture::GetBlockSize(ZEGRTextureFormat PixelFormat)
 {
+	ZESize Size = 0;
+	switch (PixelFormat)
+	{
+		case ZEGR_TF_R8:
+			Size = 1;
+			break;
 
+		case ZEGR_TF_R16F:
+		case ZEGR_TF_R16:	
+		case ZEGR_TF_R8G8:
+			Size = 2;
+			break;
+
+		case ZEGR_TF_R32F:
+		case ZEGR_TF_R8G8B8A8:
+		case ZEGR_TF_R16G16:
+		case ZEGR_TF_R16FG16F:
+		case ZEGR_TF_INTZ:
+			Size = 4;
+			break;
+
+		case ZEGR_TF_R16G16B16A16: // 8 byte
+		case ZEGR_TF_R16FG16FB16FA16F:
+		case ZEGR_TF_R32G32:
+		case ZEGR_TF_R32FG32F:	
+			Size = 8;
+			break;
+
+		case ZEGR_TF_R32G32B32A32:
+		case ZEGR_TF_R32FG32FB32FA32F:	
+			Size = 16;
+				
+		case ZEGR_TF_DXT1:
+			Size = 8;
+			break;
+		case ZEGR_TF_DXT3:
+			Size = 16;
+			break;
+		case ZEGR_TF_DXT5:
+			Size = 16;
+			break;
+	};
+
+	return Size;
 }

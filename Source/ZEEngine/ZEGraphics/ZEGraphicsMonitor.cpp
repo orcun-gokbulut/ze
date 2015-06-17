@@ -35,33 +35,32 @@
 
 #include "ZEGraphicsMonitor.h"
 
-static ZEUInt NextMonitorId = 0;
-ZEGraphicsMonitor::ZEGraphicsMonitor() : Id(NextMonitorId++), Name(""), Handle(NULL)
+ZEGRMonitor::ZEGRMonitor()
+{
+	Id = 0;
+}
+
+ZEGRMonitor::~ZEGRMonitor()
 {
 
 }
 
-ZEGraphicsMonitor::~ZEGraphicsMonitor()
-{
-
-}
-
-void* ZEGraphicsMonitor::GetHandle()
+void* ZEGRMonitor::GetHandle()
 {
 	return Handle;
 }
 
-ZEUInt ZEGraphicsMonitor::GetId()
+ZEUInt ZEGRMonitor::GetId()
 {
 	return Id;
 }
 
-const char* ZEGraphicsMonitor::GetName()
+const char* ZEGRMonitor::GetName()
 {
 	return Name.ToCString();
 }
 
-const ZERectangle& ZEGraphicsMonitor::GetArea()
+const ZERectangle& ZEGRMonitor::GetArea()
 {
 	return Area;
 }

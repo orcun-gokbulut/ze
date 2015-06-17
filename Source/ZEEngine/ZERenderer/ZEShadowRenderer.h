@@ -40,8 +40,8 @@
 #include "ZERenderer.h"
 #include "ZETypes.h"
 
-class ZETexture2D;
-class ZETextureCube;
+class ZEGRTexture2D;
+class ZEGRTextureCube;
 struct ZEDrawParameters;
 enum ZETextureCubeFace;
 

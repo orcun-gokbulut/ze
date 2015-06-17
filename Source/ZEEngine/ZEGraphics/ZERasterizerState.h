@@ -33,50 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DEVICE_RASTERIZER_STATE_H__
-#define __ZE_DEVICE_RASTERIZER_STATE_H__
+#pragma once
+
+#include "ZEGRState.h"
 
 #include "ZETypes.h"
 
 enum ZEPrimitiveType
 {
-	ZE_PT_NONE				= 0,
-	ZE_PT_POINT_LIST		= 1,
-	ZE_PT_LINE_LIST			= 2,
-	ZE_PT_TRIANGLE_LIST		= 3,
-	ZE_PT_TRIANGLE_STRIPT	= 4
+	ZEGR_PT_NONE			= 0,
+	ZEGR_PT_POINT_LIST		= 1,
+	ZEGR_PT_LINE_LIST		= 2,
+	ZEGR_PT_TRIANGLE_LIST	= 3,
+	ZEGR_PT_TRIANGLE_STRIPT	= 4
 };
 
 enum ZEFillMode
 {
-	ZE_FM_WIREFRAME			= 1,
-	ZE_FM_SOLID				= 2
+	ZEGR_FM_WIREFRAME		= 1,
+	ZEGR_FM_SOLID			= 2
 };
 
 enum ZECullDirection
 {
-	ZE_CD_NONE				= 1,
-	ZE_CD_CLOCKWISE 		= 2,
-	ZE_CD_COUNTER_CLOCKWISE	= 3
+	ZEGR_CD_NONE				= 1,
+	ZEGR_CD_CLOCKWISE 			= 2,
+	ZEGR_CD_COUNTER_CLOCKWISE	= 3
 };
 
-class ZERasterizerState
+class ZEGRRasterizerState : public ZEGRState
 {
-	protected:
-		ZESize						Hash;
-		bool						Dirty;
-		
+	private:
 		struct ZERasterizerStateData	
 		{
 			ZEFillMode				FillMode : 3;
 			ZECullDirection			CullDirection : 3;
-			bool					FrontIsCounterClockwise : 2;
-			
+			bool					FrontIsCounterClockwise : 2;	
 		} StateData;
 
 	public:
-		ZESize						GetHash();
-
 		void						SetFillMode(ZEFillMode Mode);
 		ZEFillMode					GetFillMode() const;
 	
@@ -88,12 +83,6 @@ class ZERasterizerState
 
 		void						SetToDefault();
 
-		const ZERasterizerState&	operator=(const ZERasterizerState& State);
-		bool						operator==(const ZERasterizerState& State);
-		bool						operator!=(const ZERasterizerState& State);
-
-									ZERasterizerState();
-									~ZERasterizerState();
+									ZEGRRasterizerState();
+		virtual						~ZEGRRasterizerState();
 };
-
-#endif

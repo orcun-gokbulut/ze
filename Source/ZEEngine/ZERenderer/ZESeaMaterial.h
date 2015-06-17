@@ -40,7 +40,7 @@
 #include "ZEMaterial.h"
 #include "ZEMath/ZEVector.h"
 
-class ZETexture2D;
+class ZEGRTexture2D;
 
 class ZESeaMaterial : public ZEMaterial
 {
@@ -51,8 +51,8 @@ class ZESeaMaterial : public ZEMaterial
 	
 	protected:
 
-		const ZETexture2D*				DiffuseTexture;
-		const ZETexture2D*				NormalTexture;
+		const ZEGRTexture2D*				DiffuseTexture;
+		const ZEGRTexture2D*				NormalTexture;
 
 		bool							GlobalAmbientEnabled;
 		ZEVector4						AmbientColor;
@@ -105,11 +105,11 @@ class ZESeaMaterial : public ZEMaterial
 		void							SetSpecularShineness(float Color);
 		float							GetSpecularShineness() const;
 
-		void							SetDiffuseTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetDiffuseTexture() const;
+		void							SetDiffuseTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetDiffuseTexture() const;
 
-		void							SetNormalTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetNormalTexture() const;
+		void							SetNormalTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetNormalTexture() const;
 
 		static ZESeaMaterial*			CreateInstance();
 };

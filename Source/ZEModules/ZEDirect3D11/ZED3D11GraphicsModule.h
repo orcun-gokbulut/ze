@@ -44,13 +44,13 @@
 #include "ZEGraphics/ZEGraphicsModule.h"
 #include "ZEGraphics/ZEGraphicsMonitor.h"
 
-class ZETexture2D;
-class ZETexture3D;
+class ZEGRTexture2D;
+class ZEGRTexture3D;
 class ZEStatePool;
-class ZETextureCube;
-class ZEIndexBuffer;
+class ZEGRTextureCube;
+class ZEGRIndexBuffer;
 class ZEVertexBuffer;
-class ZEShaderCompiler;
+class ZEGRShaderCompiler;
 class ZEGraphicsDevice;
 class ZEDepthStencilBuffer;
 class ZEGraphicsEventTracer;
@@ -106,12 +106,12 @@ class ZED3D11GraphicsModule : public ZEGraphicsModule
 	public:
 		virtual ZEStatePool*					GetStatePool() const;
 		virtual ZEGraphicsEventTracer*			GetEventTracer() const;
-		virtual ZEShaderCompiler*				GetShaderCompiler() const;
+		virtual ZEGRShaderCompiler*				GetShaderCompiler() const;
 
-		virtual ZETexture2D*					CreateTexture2D();
-		virtual ZETexture3D*					CreateTexture3D();
-		virtual ZETextureCube*					CreateTextureCube();
-		virtual ZEIndexBuffer*					CreateIndexBuffer();
+		virtual ZEGRTexture2D*					CreateTexture2D();
+		virtual ZEGRTexture3D*					CreateTexture3D();
+		virtual ZEGRTextureCube*					CreateTextureCube();
+		virtual ZEGRIndexBuffer*					CreateIndexBuffer();
 		virtual ZEVertexBuffer*					CreateVertexBuffer();
 		virtual ZEGraphicsWindow*				CreateGraphicsWindow();
 		virtual ZEConstantBuffer*				CreateConstantBuffer();

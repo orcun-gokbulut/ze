@@ -73,7 +73,7 @@ const ID3D11Buffer* ZED3D11ConstantBuffer::GetD3D10Buffer() const
 	return D3D10Buffer;
 }
 
-bool ZED3D11ConstantBuffer::Create(const ZEShaderBuffer* BufferInfo)
+bool ZED3D11ConstantBuffer::Create(const ZEGRShaderConstantBuffer* BufferInfo)
 {
 	zeDebugCheck(BufferInfo == NULL, "NUll pointer.");
 	zeDebugCheck(GetIsCreated(), "Buffer already created.");

@@ -34,15 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_DEVICE_STATE_VERTEX_LAYOUT_H__
-#define __ZE_DEVICE_STATE_VERTEX_LAYOUT_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
+#include "ZEGRState.h"
 #include "ZEGraphicsDefinitions.h"
 
-enum ZEVertexElementType
+struct ZEGRShaderMeta;
+
+enum ZEGRVertexElementType
 {
 	ZE_VET_NONE			= 0,
 	ZE_VET_INT			= 1,
@@ -59,58 +59,42 @@ enum ZEVertexElementType
 	ZE_VET_FLOAT4		= 12
 };
 
-enum ZEVertexUsage
+enum ZEGRVertexUsage
 {
 	ZE_VU_PER_VERTEX	= 0,
 	ZE_VU_PER_INSTANCE	= 1
 };
 
-struct ZEVertexElement
+struct ZEGRVertexElement
 {
-	char					Semantic[ZE_MAX_SHADER_VARIABLE_NAME];
-	ZEUInt8					Index;
-	ZEVertexElementType		Type;
-	ZEUInt8					Stream;
-	ZEUInt16				Offset;
-	ZEVertexUsage			Usage;
-	ZEUInt16				InstanceCount;
+	char							Semantic[ZEGR_MAX_SHADER_VARIABLE_NAME];
+	ZEUInt8							Index;
+	ZEGRVertexElementType			Type;
+	ZEUInt8							Stream;
+	ZEUInt16						Offset;
+	ZEGRVertexUsage					Usage;
+	ZEUInt16						InstanceCount;
 };
 
-class ZEShader;
-class ZEVertexBuffer;
-
-class ZEVertexLayout
+class ZEGRVertexLayout : public ZEGRState
 {
-	protected:
-		ZESize					Hash;
-		bool					Dirty;
-
+	private:
 		struct ZEVertexLayoutData
 		{
-			ZEUInt				ElementCount;
-			ZEVertexElement		VertexElements[ZE_MAX_VERTEX_LAYOUT_ELEMENT];
+			ZEUInt					ElementCount;
+			ZEGRVertexElement		Elements[ZEGR_MAX_VERTEX_LAYOUT_ELEMENT];		
 		
 		} StateData;
 
 	public:
-		ZESize					GetHash();
-		bool					IsEmpty() const;
+		void						SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount);
+		ZEUInt						GetElementCount() const;
+		const ZEGRVertexElement*	GetElements() const;
 		
-		ZEUInt					GetElementCount() const;
-		const ZEVertexElement*	GetLayout() const;
+		void						SetToDefault();
 
-		void					SetLayout(const ZEVertexElement* VertexElements, ZEUInt ElementCount);
-		
-		void					SetToDefault();
+		static ZEGRVertexLayout*	Generate(ZEGRShaderMeta* Shader);
 
-		const ZEVertexLayout&	operator=(const ZEVertexLayout& State);
-		bool					operator==(const ZEVertexLayout& State);
-		bool					operator!=(const ZEVertexLayout& State);
-
-		static bool				GenerateLayout(ZEVertexLayout& Output, ZEVertexBuffer* BufferArr[ZE_MAX_VERTEX_BUFFER_SLOT], const ZEShader* VertexShader);
-
-								ZEVertexLayout();
-								~ZEVertexLayout();
+									ZEGRVertexLayout();
+									~ZEGRVertexLayout();
 };
-
-#endif

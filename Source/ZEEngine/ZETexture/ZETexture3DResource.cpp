@@ -48,7 +48,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZETextureTools.h"
 
-static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
+static void CopyToTexture3D(ZEGRTexture3D* Texture, ZETextureData* TextureData)
 {
 	// Copy texture data into ZETexture3D
 	void* TargetBuffer	= NULL;
@@ -79,12 +79,12 @@ const char* ZETexture3DResource::GetResourceType() const
 	return "Volume Texture Resource";
 }
 
-ZETextureType ZETexture3DResource::GetTextureType() const
+ZEGRTextureType ZETexture3DResource::GetTextureType() const
 {
-	return ZE_TT_3D;
+	return ZEGR_TT_3D;
 }
 
-const ZETexture3D* ZETexture3DResource::GetTexture() const
+const ZEGRTexture3D* ZETexture3DResource::GetTexture() const
 {
 	return Texture;
 }
@@ -193,7 +193,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	bool IdentifierExists	= false;
 
 	// Decide final texture options
-	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, HorizTileCount, VertTileCount, ZE_TT_3D);
+	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, HorizTileCount, VertTileCount, ZEGR_TT_3D);
 
 	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
@@ -297,7 +297,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 
 	// Create Texture3DResource 
 	ZETexture3DResource* TextureResource = new ZETexture3DResource();
-	ZETexture3D* Texture = TextureResource->Texture = ZETexture3D::CreateInstance();
+	ZEGRTexture3D* Texture = TextureResource->Texture = ZEGRTexture3D::CreateInstance();
 	if (Texture == NULL)
 	{
 		delete TextureResource;

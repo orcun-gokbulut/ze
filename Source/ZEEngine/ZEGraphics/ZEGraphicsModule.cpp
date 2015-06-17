@@ -33,10 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEShader.h"
-#include "ZEStatePool.h"
-#include "ZETexture2D.h"
-#include "ZETexture3D.h"
+
 #include "ZECore/ZECore.h"
 #include "ZEIndexBuffer.h"
 #include "ZETextureCube.h"
@@ -127,46 +124,14 @@ ZETextureOptions* ZEGraphicsModule::GetTextureOptions()
 	}
 }
 
-ZEGraphicsWindow* ZEGraphicsModule::GetWindow(ZEUInt WindowId) const
-{
-	ZESize Count = Windows.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		if (Windows[I]->GetId() == WindowId)
-		{
-			return Windows[I];
-		}
-	}
-	return NULL;
-}
-
 const ZEArray<ZEGraphicsWindow*>& ZEGraphicsModule::GetWindows() const
 {
 	return Windows;
 }
 
-const ZEGraphicsMonitor* ZEGraphicsModule::GetMonitor(ZEUInt MonitorId) const
-{
-	ZESize Count = Monitors.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		if (Monitors[I]->GetId() == MonitorId)
-		{
-			return Monitors[I];
-		}
-	}
-	return NULL;
-}
-
-const ZEArray<ZEGraphicsMonitor*>& ZEGraphicsModule::GetMonitors() const
+const ZEArray<ZEGRMonitor*>& ZEGraphicsModule::GetMonitors() const
 {
 	return Monitors;
-}
-
-ZEGraphicsDevice* ZEGraphicsModule::GetDevice(ZESize Index) const
-{
-	zeDebugCheck(Index >= Devices.GetCount(), "Index out of range");
-	return Devices[Index];
 }
 
 const ZEArray<ZEGraphicsDevice*>& ZEGraphicsModule::GetDevices() const
@@ -174,39 +139,9 @@ const ZEArray<ZEGraphicsDevice*>& ZEGraphicsModule::GetDevices() const
 	return Devices;
 }
 
-void ZEGraphicsModule::GetStatistics(ZEGraphicsStatistics& Statistics) const
+const ZEGraphicsStatistics& ZEGraphicsModule::GetStatistics() const
 {
-	Statistics.BlendStateCount = ZEStatePool::BlendStateCount;
-	Statistics.SamplerStateCount = ZEStatePool::SamplerStateCount;
-	Statistics.DepthStencilCount = ZEStatePool::DepthStencilStateCount;
-	Statistics.RasterizerCount = ZEStatePool::RasterizerStateCount;
-	Statistics.VertexLayoutCount = ZEStatePool::VertexLayoutCount;
-
-	Statistics.ShaderCount = ZEShader::TotalCount;
-	Statistics.ShaderSize = ZEShader::TotalSize;
-
-	Statistics.Texture2DCount = ZETexture2D::TotalCount;
-	Statistics.Texture2DSize = ZETexture2D::TotalSize;
-	
-	Statistics.Texture3DCount = ZETexture3D::TotalCount;
-	Statistics.Texture3DSize = ZETexture3D::TotalSize;
-	
-	Statistics.TextureCubeCount	= ZETextureCube::TotalCount;
-	Statistics.TextureCubeSize = ZETextureCube::TotalSize;
-	
-	Statistics.DepthStancilBufferCount = ZEDepthStencilBuffer::TotalCount;
-	Statistics.DepthStancilBufferSize = ZEDepthStencilBuffer::TotalSize;
-	
-	Statistics.IndexBufferCount	= ZEIndexBuffer::TotalCount;
-	Statistics.IndexBufferSize = ZEIndexBuffer::TotalSize;
-	
-	Statistics.VertexBufferCount = ZEVertexBuffer::TotalCount;
-	Statistics.VertexBufferSize	= ZEVertexBuffer::TotalSize;
-	
-	Statistics.ConstantBufferCount = ZEConstantBuffer::TotalCount;
-	Statistics.ConstantBufferSize = ZEConstantBuffer::TotalSize;	
-	
-	Statistics.RenderTargetCount = ZERenderTarget::TotalCount;	
+	return Statistics;
 }
 
 ZEGraphicsModule* ZEGraphicsModule::GetInstance()

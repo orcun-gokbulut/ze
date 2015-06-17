@@ -34,16 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SHADER_META_INFO_H__
-#define __ZE_SHADER_META_INFO_H__
 
-#include "ZEDS/ZEFlags.h"
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZETexture.h"
 #include "ZEVertexLayout.h"
 #include "ZEGraphicsDefinitions.h"
+#include "ZEShaderCompileOptions.h"
+
+typedef ZEGRColorMask	ZEShaderRegisterMask;
 
 enum ZEShaderRegisterType
 {
@@ -53,7 +54,7 @@ enum ZEShaderRegisterType
 	ZE_SRT_NONE				= 3,
 };
 
-enum ZEShaderSystemValueType
+enum ZEGRShaderSystemSemantic
 {
 	ZE_SSVT_NONE						= 0,
 	ZE_SSVT_POSITION					= 1,
@@ -71,31 +72,13 @@ enum ZEShaderSystemValueType
 	ZE_SSVT_COVERAGE					= 13
 };
 
-typedef ZEComponentMask	ZEShaderRegisterMask;
-
-struct ZEShaderInput
-{
-	ZESize						Hash;
-	char						Semantic[ZE_MAX_SHADER_VARIABLE_NAME];
-	ZEUInt8						Index;
-	ZEVertexElementType			ElementType;
-	ZEShaderSystemValueType		SystemValue;
-	ZEShaderRegisterMask		UsedRegisters;
-	ZEShaderRegisterType		RegisterType;
-
-	static ZESize				GetHash(const char* Semantic, ZEUInt8 Index);
-
-								ZEShaderInput();
-								~ZEShaderInput();
-};
-
-enum ZEShaderConstantBufferType
+enum ZEGRShaderConstantBufferType
 {
 	ZE_SCBT_C_BUFFER	= 0,
 	ZE_SCBT_T_BUFFER	= 1
 };
 
-enum ZEShaderConstantType
+enum ZEGRShaderConstantType
 {
 	ZE_SCDT_VOID		= 0,
     ZE_SCDT_BOOL		= 1,
@@ -104,28 +87,7 @@ enum ZEShaderConstantType
 	ZE_SCDT_FLOAT		= 4
 };
 
-struct ZEShaderConstant
-{
-	ZESize					Hash;
-	ZEString				Name;
-	ZEShaderConstantType	Type;
-	ZESize					Size;
-	ZESize					Offset;
-	ZEUInt					RowCount;
-	ZEUInt					ColumnCount;
-};
-
-struct ZEShaderBuffer
-{
-	ZESize							Hash;
-	ZEString						Name;
-	ZEUInt							Slot;
-	ZESize							Size;
-	ZEShaderConstantBufferType		Type;
-	ZEArray<ZEShaderConstant>		Constants;
-};
-
-enum ZEShaderSamplerReturnType
+enum ZEGRShaderSamplerType
 {
 	ZE_SSRT_UNSIGNED_NORMALIZED		= 1,
 	ZE_SSRT_SIGNED_NORMALIZED		= 2,
@@ -135,22 +97,65 @@ enum ZEShaderSamplerReturnType
 	ZE_SSRT_MIXED					= 6
 };
 
-struct ZEShaderSampler
+struct ZEGRShaderInput
 {
-	ZESize						Hash;
-	ZEString					Name;
-	ZEUInt						Slot;
-	ZEUInt						SampleCount;
-	ZEShaderSamplerReturnType	SamplerReturnType;
+	ZESize							Hash;
+	ZEString						Name;
+	ZEGRShaderSystemSemantic		SystemSemantic;
+	ZEString						Semantic;
+	ZEUInt8							Index;
+	ZEGRVertexElementType				ElementType;
+	ZEShaderRegisterMask			Mask;
+	ZEShaderRegisterType			RegisterType;
 };
 
-struct ZEShaderTexture
+struct ZEGRShaderConstant
 {
-	ZESize				Hash;
-	ZEString			Name;
-	ZEUInt				Slot;
-	ZEUInt				Count;
-	ZETextureType		Type;
+	ZESize							Hash;
+	ZEString						Name;
+	ZEGRShaderConstantType			Type;
+	ZESize							Size;
+	ZESize							Offset;
+	ZEUInt							RowCount;
+	ZEUInt							ColumnCount;
 };
 
-#endif
+struct ZEGRShaderConstantBuffer
+{
+	ZESize							Hash;
+	ZEString						Name;
+	ZEString						Semantic;
+	ZEUInt							Slot;
+	ZESize							Size;
+	ZEGRShaderConstantBufferType	Type;
+	ZEArray<ZEGRShaderConstant>		Constants;
+};
+
+struct ZEGRShaderSampler
+{
+	ZESize							Hash;
+	ZEString						Name;
+	ZEString						Semantic;
+	ZEUInt							Slot;
+	ZEUInt							SampleCount;
+	ZEGRShaderSamplerType			SamplerReturnType;
+};
+
+struct ZEGRShaderTexture
+{
+	ZESize							Hash;
+	ZEString						Name;
+	ZEString						Semantic;
+	ZEUInt							Slot;
+	ZEUInt							Count;
+	ZEGRTextureType					Type;
+};
+
+struct ZEGRShaderMeta
+{
+	ZEArray<ZEGRShaderSampler>			Samplers;
+	ZEArray<ZEGRShaderTexture>			Textures;
+	ZEArray<ZEGRShaderConstantBuffer>	Buffers;
+	ZEArray<ZEGRShaderInput>			Inputs;
+	ZEGRShaderCompileOptions			CompileOptions;
+};

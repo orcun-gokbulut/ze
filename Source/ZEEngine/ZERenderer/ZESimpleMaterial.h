@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEMaterial.h"
 
-class ZETexture2D;
+class ZEGRTexture2D;
 
 class ZESimpleMaterial : public ZEMaterial
 {
@@ -54,7 +54,7 @@ class ZESimpleMaterial : public ZEMaterial
 		ZEUInt							TransparancyCullLimit;
 		ZEVector4						MaterialColor;
 
-		const ZETexture2D*				Texture;
+		const ZEGRTexture2D*				Texture;
 		ZETextureAddressMode			TextureAddressModeU;
 		ZETextureAddressMode			TextureAddressModeV;
 
@@ -82,8 +82,8 @@ class ZESimpleMaterial : public ZEMaterial
 		void							SetTransparancyCullLimit(ZEUInt Limit);
 		ZEUInt							GetTransparancyCullLimit() const;
 
-		void							SetTexture(const ZETexture2D* Texture);
-		const ZETexture2D*				GetTexture() const;
+		void							SetTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*				GetTexture() const;
 		void							SetTextureAddressModeU(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetTextureAddressModeU() const;
 		void							SetTextureAddressModeV(ZETextureAddressMode Mode);

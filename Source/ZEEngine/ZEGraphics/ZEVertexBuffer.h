@@ -33,72 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_VERTEX_BUFFER_H__
-#define __ZE_VERTEX_BUFFER_H__
+#pragma once
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEVertexLayout.h"
-#include "ZEGraphicsDefinitions.h"
 #include "ZEGraphicsResource.h"
 
-struct ZEVertexBufferElement
+class ZEVertexBuffer : public ZEGRResource
 {
-	char					Semantic[ZE_MAX_SHADER_VARIABLE_NAME];
-	ZEUInt8					Index;
-	ZEVertexElementType		Type;
-	ZEUInt16				Offset;
-	ZEVertexUsage			Usage;
-	ZEUInt16				InstanceCount;
-
-	static ZESize			GetHash(const char* Semantic, ZEUInt8 Index);
-};
-
-class ZEVertexBuffer : public ZEGraphicsResource
-{
-	friend class ZEVertexLayout;
-	friend class ZEGraphicsDevice;
-	friend class ZEGraphicsModule;
-
 	protected:
-		static ZESize					TotalSize;
-		static ZEUInt16					TotalCount;
-
-		ZEShadowCopy					ShadowCopy;
-
-		ZESize							BufferSize;
-		ZESize							VertexSize;
-		ZEUInt							VertexCount;
-
-		ZESize							ElementCount;
-		ZESize							Hashes[ZE_MAX_VERTEX_LAYOUT_ELEMENT];
-		ZEVertexBufferElement			Elements[ZE_MAX_VERTEX_LAYOUT_ELEMENT];
-
-		virtual bool					UpdateWith(ZEUInt ShadowIndex);
-
 										ZEVertexBuffer();
 		virtual							~ZEVertexBuffer();
 
 	public:
-		ZEGraphicsResourceType			GetResourceType() const;
+		ZEGRResourceType				GetResourceType() const;
 
-		ZEUInt							GetVertexCount() const;
-		ZESize							GetBufferSize() const;
-		ZESize							GetVertexSize() const;
+		virtual void					Unlock() = 0;
+		virtual bool					Lock(void** Data) = 0;
 		
-		const ZEVertexBufferElement*	GetElements() const;
-		ZESize							GetElementCount() const;
-		
-		void							ClearElements();
-		void							RegisterElements(const ZEVertexBufferElement* Elements, ZESize Count);
-
-		virtual void					Unlock();
-		virtual bool					Lock(void** Data);
-		
-		virtual bool					CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData = NULL);
-		virtual bool					CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
+		virtual bool					Create(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData = NULL) = 0;
 		
 		static ZEVertexBuffer*			CreateInstance();
 };
-
-#endif

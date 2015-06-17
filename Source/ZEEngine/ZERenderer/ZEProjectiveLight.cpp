@@ -73,12 +73,12 @@ float ZEProjectiveLight::GetAspectRatio() const
 	return AspectRatio;
 }
 
-void ZEProjectiveLight::SetProjectionTexture(const ZETexture2D* Texture)
+void ZEProjectiveLight::SetProjectionTexture(const ZEGRTexture2D* Texture)
 {
 	ProjectionTexture = Texture;
 }
 
-const ZETexture2D* ZEProjectiveLight::GetProjectionTexture() const
+const ZEGRTexture2D* ZEProjectiveLight::GetProjectionTexture() const
 {
 	return ProjectionTexture;
 }
@@ -104,7 +104,7 @@ const ZEString& ZEProjectiveLight::GetProjectionTextureFile() const
 	return ProjectionTextureFile;
 }
 
-ZETexture2D* ZEProjectiveLight::GetShadowMap()
+ZEGRTexture2D* ZEProjectiveLight::GetShadowMap()
 {
 	return ShadowMap;
 }

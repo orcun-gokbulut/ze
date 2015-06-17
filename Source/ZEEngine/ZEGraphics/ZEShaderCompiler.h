@@ -34,28 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SHADER_COMPILER_H__
-#define __ZE_SHADER_COMPILER_H__
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEShaderMetaTable.h"
 #include "ZEShaderCompileOptions.h"
 
-class ZEShader;
+class ZEGRShader;
 
-class ZEShaderCompiler
+class ZEGRShaderCompiler
 {
-	protected:
-		virtual ZEShader*		CompileShader(ZEShaderCompileOptions* Options) = 0;
-
-								ZEShaderCompiler();
-		virtual					~ZEShaderCompiler();
-		
 	public:
-		static ZEShader*		CompileShaderFromFile(ZEShaderCompileOptions* Options);
-		static ZEShader*		CompileShaderFromSource(ZEShaderCompileOptions* Options);
-		
-};
+		virtual ZEGRShader*			Compile(const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output) = 0;
 
-#endif
+		static ZEGRShaderCompiler*	CreateInstance();
+};

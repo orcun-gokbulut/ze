@@ -38,39 +38,12 @@
 #include "ZEScissorRectangle.h"
 #include "ZEDS/ZEHashGenerator.h"
 
-ZESize ZEScissorRectangle::GetHash() const
-{
-	return ZEHashGenerator::Hash((void*)&StateData, sizeof(ZEScissorRectangleData));
-}
-
-void ZEScissorRectangle::SetZero()
+void ZEGRScissorRectangle::SetZero()
 {
 	memset(&StateData, 0, sizeof(ZEScissorRectangleData));
 }
 
-const ZEScissorRectangle& ZEScissorRectangle::operator =(const ZEScissorRectangle& Other)
-{
-	memcpy(&StateData, &Other.StateData, sizeof(ZEScissorRectangleData));
-
-	return *this;
-}
-
-bool ZEScissorRectangle::operator ==(const ZEScissorRectangle& Other)
-{
-	return memcmp(&StateData, &Other.StateData, sizeof(ZEScissorRectangleData)) == 0 ? true : false;
-}
-
-bool ZEScissorRectangle::operator !=(const ZEScissorRectangle& Other)
-{
-	return !operator==(Other);
-}
-
-ZEScissorRectangle::ZEScissorRectangle()
+ZEGRScissorRectangle::ZEGRScissorRectangle()
 {
 	SetZero();
-}
-
-ZEScissorRectangle::~ZEScissorRectangle()
-{
-
 }

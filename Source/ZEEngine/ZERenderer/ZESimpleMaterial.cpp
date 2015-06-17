@@ -122,12 +122,12 @@ ZEUInt ZESimpleMaterial::GetTransparancyCullLimit() const
 }
 
 
-void ZESimpleMaterial::SetTexture(const ZETexture2D* Texture)
+void ZESimpleMaterial::SetTexture(const ZEGRTexture2D* Texture)
 {
 	this->Texture = Texture;
 }
 
-const ZETexture2D* ZESimpleMaterial::GetTexture() const
+const ZEGRTexture2D* ZESimpleMaterial::GetTexture() const
 {
 	return Texture;
 }

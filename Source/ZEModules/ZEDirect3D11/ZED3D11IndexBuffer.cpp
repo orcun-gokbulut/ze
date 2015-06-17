@@ -72,7 +72,7 @@ bool ZED3D11IndexBuffer::UpdateWith(ZEUInt ShadowIndex)
 	zeLog("Index buffer contents updated. IndexBuffer: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
 #endif
 
-	return ZEIndexBuffer::UpdateWith(ShadowIndex);
+	return ZEGRIndexBuffer::UpdateWith(ShadowIndex);
 }
 
 const ID3D11Buffer* ZED3D11IndexBuffer::GetD3D10Buffer() const
@@ -108,7 +108,7 @@ bool ZED3D11IndexBuffer::CreateDynamic(ZEUInt IndexCount, ZEIndexBufferFormat Fo
 		return false;
 	}
 
-	return ZEIndexBuffer::CreateDynamic(IndexCount, Format, InitialData);
+	return ZEGRIndexBuffer::CreateDynamic(IndexCount, Format, InitialData);
 }
 
 bool ZED3D11IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat Format, const void* InitialData)
@@ -140,7 +140,7 @@ bool ZED3D11IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEIndexBufferFormat For
 		return false;
 	}
 	
-	return ZEIndexBuffer::CreateStatic(IndexCount, Format, InitialData);
+	return ZEGRIndexBuffer::CreateStatic(IndexCount, Format, InitialData);
 }
 
 ZED3D11IndexBuffer::ZED3D11IndexBuffer()

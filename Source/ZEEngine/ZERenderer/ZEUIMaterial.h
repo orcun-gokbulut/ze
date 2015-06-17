@@ -39,7 +39,7 @@
 
 #include "ZEMaterial.h"
 
-ZE_META_FORWARD_DECLARE(ZETexture2D, "ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZETexture2D.h")
 
 class ZEUIMaterial : public ZEMaterial
 {
@@ -47,7 +47,7 @@ class ZEUIMaterial : public ZEMaterial
 
 	friend class ZED3D9Module;
 	protected:
-		const ZETexture2D*		Texture;
+		const ZEGRTexture2D*		Texture;
 		bool					WireFrame;
 		float					WireSize;
 
@@ -63,8 +63,8 @@ class ZEUIMaterial : public ZEMaterial
 		void					SetWireSize(float Size);
 		float					GetWireSize() const;
 
-		void					SetTexture(const ZETexture2D* Texture);
-		const ZETexture2D*		GetTexture() const;
+		void					SetTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*		GetTexture() const;
 
 		static ZEUIMaterial*	CreateInstance();
 };

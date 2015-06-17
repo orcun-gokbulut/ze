@@ -40,15 +40,15 @@
 #include "ZELight.h"
 #include "ZEMath/ZEViewSphere.h"
 
-class ZETexture2D;
+class ZEGRTexture2D;
 
 class ZEPointLight  : public ZELight
 {
 	ZE_OBJECT
 
 	private:
-		ZETexture2D*					FrontShadowMap;
-		ZETexture2D*					BackShadowMap;
+		ZEGRTexture2D*					FrontShadowMap;
+		ZEGRTexture2D*					BackShadowMap;
 
 		ZEViewSphere					ViewVolume;
 		ZEMatrix4x4						ViewProjectionMatrix;
@@ -63,8 +63,8 @@ class ZEPointLight  : public ZELight
 
 		virtual void					SetCastShadows(bool NewValue);
 
-		ZETexture2D*					GetFrontShadowMap();
-		ZETexture2D*					GetBackShadowMap();
+		ZEGRTexture2D*					GetFrontShadowMap();
+		ZEGRTexture2D*					GetBackShadowMap();
 
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);

@@ -364,7 +364,7 @@ ZEGraphicsEventTracer* ZED3D11GraphicsModule::GetEventTracer() const
 	return &EventTracer;
 }
 
-ZEShaderCompiler* ZED3D11GraphicsModule::GetShaderCompiler() const
+ZEGRShaderCompiler* ZED3D11GraphicsModule::GetShaderCompiler() const
 {
 	static ZED3D11ShaderCompiler Compiler;
 	return &Compiler;
@@ -376,7 +376,7 @@ ZEStatePool* ZED3D11GraphicsModule::GetStatePool() const
 	return &Pool;
 }
 
-ZEIndexBuffer* ZED3D11GraphicsModule::CreateIndexBuffer()
+ZEGRIndexBuffer* ZED3D11GraphicsModule::CreateIndexBuffer()
 {
 	return new ZED3D11IndexBuffer();
 }
@@ -399,17 +399,17 @@ ZEGraphicsWindow* ZED3D11GraphicsModule::CreateGraphicsWindow()
 	return NewWindow;
 }
 
-ZETexture2D* ZED3D11GraphicsModule::CreateTexture2D()
+ZEGRTexture2D* ZED3D11GraphicsModule::CreateTexture2D()
 {
 	return new ZED3D11Texture2D();
 }
 
-ZETexture3D* ZED3D11GraphicsModule::CreateTexture3D()
+ZEGRTexture3D* ZED3D11GraphicsModule::CreateTexture3D()
 {
 	return new ZED3D11Texture3D();
 }
 
-ZETextureCube* ZED3D11GraphicsModule::CreateTextureCube()
+ZEGRTextureCube* ZED3D11GraphicsModule::CreateTextureCube()
 {
 	return new ZED3D11TextureCube();
 }

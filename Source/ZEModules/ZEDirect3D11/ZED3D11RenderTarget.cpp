@@ -47,8 +47,8 @@ bool ZED3D11RenderTarget::IsEmpty() const
 	return D3D10RenderTargetView == NULL;
 }
 
-ZED3D11RenderTarget::ZED3D11RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView) 
-	: ZERenderTarget(Width, Height, Depth, PixelFormat, RenderTargetType)
+ZED3D11RenderTarget::ZED3D11RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEGRTextureFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView) 
+	: ZEGRRenderTarget(Width, Height, Depth, PixelFormat, RenderTargetType)
 {
 	zeDebugCheck(RenderTargtetView == NULL, "Null Pointer.");
 

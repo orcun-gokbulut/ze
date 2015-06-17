@@ -33,57 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_3D_H__
-#define __ZE_TEXTURE_3D_H__
+#pragma once
 
-#include "ZETypes.h"
 #include "ZETexture.h"
 
-class ZERenderTarget;
+#include "ZETypes.h"
+#include "ZEMath\ZEVector.h"
+
+class ZEGRRenderTarget;
 class ZETextureData;
 
-class ZETexture3D : public ZETexture
+class ZEGRTexture3D : public ZEGRTexture
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEGraphicsModule;
-
 	protected:
-		static ZEUInt16				TotalCount;
-		static ZESize				TotalSize;
+		ZEUInt							Width;
+		ZEUInt							Height;
+		ZEUInt							Depth;
 
-		ZEShadowCopy				ShadowCopy;
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget) = 0;	
 
-		ZESize						Size;
-		ZEUInt						Width;
-		ZEUInt						Height;
-		ZEUInt						Depth;
-		ZEUInt						LevelCount;
-		ZEVector3					PixelSize;
-
-		virtual bool				UpdateWith(ZEUInt ShadowIndex);
-
-									ZETexture3D();
-		virtual						~ZETexture3D();
+										ZEGRTexture3D();
 
 	public:
-		ZEGraphicsResourceType		GetResourceType() const;
+		virtual ZEGRResourceType		GetResourceType() const;
+		virtual ZEGRTextureType			GetTextureType() const;
 
-		ZESize						GetSize() const;
-		ZEUInt						GetWidth() const;
-		ZEUInt						GetHeight() const;
-		ZEUInt						GetDepth() const;
-		ZEUInt						GetLevelCount() const;
-		const ZEVector3&			GetPixelSize() const;
+		ZEUInt							GetWidth() const;
+		ZEUInt							GetHeight() const;
+		ZEUInt							GetDepth() const;
+		ZEVector3						GetPixelSize() const;
 
-		virtual bool				Unlock();
-		virtual bool				Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch);
+		bool							LoadData(ZETextureData* Data);
+		virtual bool					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch) = 0;
+		virtual bool					Unlock() = 0;
+
+		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
 		
-		virtual bool				CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZETexturePixelFormat PixelFormat, ZETextureData* Data = NULL);
-		virtual bool				CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
-		
-		virtual ZERenderTarget*		CreateRenderTarget(ZEUInt MipLevel = 0) const = 0;
-		
-		static ZETexture3D*			CreateInstance();
+		ZEGRTexture3D*					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);	
 };
-
-#endif

@@ -42,7 +42,7 @@
 class ZETextureTestUtils
 {
 	public:
-		static ZESize		GetPixelSize(ZETexturePixelFormat Format);
+		static ZESize		GetPixelSize(ZEGRTextureFormat Format);
 
 		static void			DumpAsTGA(const char* FileName, ZETextureData* Data);
 		static void			DumpAsTGA(const char* FileName, ZETextureSurface* Surface);

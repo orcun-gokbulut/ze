@@ -39,14 +39,14 @@
 
 #include "ZETextureResource.h"
 
-ZE_META_FORWARD_DECLARE(ZETextureCube, "ZEGraphics/ZETextureCube.h")
+ZE_META_FORWARD_DECLARE(ZEGRTextureCube, "ZEGraphics/ZETextureCube.h")
 
 class ZETextureCubeResource : public ZETextureResource
 {
 	ZE_OBJECT
 
 	private:
-		ZETextureCube*						Texture;
+		ZEGRTextureCube*						Texture;
 
 	protected:
 		 									ZETextureCubeResource();
@@ -54,9 +54,9 @@ class ZETextureCubeResource : public ZETextureResource
 
 	public:
 		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
+		virtual ZEGRTextureType				GetTextureType() const;
 
-		const ZETextureCube*				GetTexture() const;
+		const ZEGRTextureCube*				GetTexture() const;
 
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETextureCubeResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);

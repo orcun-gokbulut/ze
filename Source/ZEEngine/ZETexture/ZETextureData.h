@@ -53,8 +53,8 @@ struct ZETextureDataInfo
 	ZEUInt							LevelCount;
 	ZEUInt							Width;
 	ZEUInt							Height;
-	ZETexturePixelFormat			PixelFormat;
-	ZETextureType					Type;
+	ZEGRTextureFormat			PixelFormat;
+	ZEGRTextureType					Type;
 };
 
 class ZETextureLevel
@@ -129,13 +129,13 @@ class ZETextureData
 		ZEUInt							GetHeight();
 		ZEUInt							GetLevelCount();
 		ZEUInt							GetSurfaceCount();
-		ZETextureType					GetType();
-		ZETexturePixelFormat			GetPixelFormat();
+		ZEGRTextureType					GetType();
+		ZEGRTextureFormat					GetPixelFormat();
 
 		ZESize							GetSize();
 		ZESize							GetSizeOnDisk();
 
-		void							Create(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height);
+		void							Create(ZEGRTextureType TextureType, ZEGRTextureFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height);
 		void							Create(ZETextureData& TextureData);
 		void							Destroy();
 

@@ -39,38 +39,38 @@
 #include "ZED3D11GraphicsModule.h"
 #include "ZETexture/ZETextureData.h"
 
-inline static DXGI_FORMAT GetD3D10PixelFormat(ZETexturePixelFormat Format)
+inline static DXGI_FORMAT GetD3D10PixelFormat(ZEGRTextureFormat Format)
 {
 	switch(Format)
 	{
-		case ZE_TPF_I8:
+		case ZEGR_TF_I8:
 			return DXGI_FORMAT_R8_UNORM;
-		case ZE_TPF_I8_4:
+		case ZEGR_TF_I8_4:
 			return DXGI_FORMAT_R8G8B8A8_UNORM;
-		case ZE_TPF_I16:
+		case ZEGR_TF_I16:
 			return DXGI_FORMAT_R16_UNORM;
-		case ZE_TPF_I16_2:
+		case ZEGR_TF_I16_2:
 			return DXGI_FORMAT_R16G16_UNORM;
 
-		case ZE_TPF_F16:
+		case ZEGR_TF_F16:
 			return DXGI_FORMAT_R16_FLOAT;
-		case ZE_TPF_F16_2:
+		case ZEGR_TF_F16_2:
 			return DXGI_FORMAT_R16G16_FLOAT;
-		case ZE_TPF_F16_4:
+		case ZEGR_TF_F16_4:
 			return DXGI_FORMAT_R16G16B16A16_FLOAT;
 
-		case ZE_TPF_F32:
+		case ZEGR_TF_F32:
 			return DXGI_FORMAT_R32_FLOAT;
-		case ZE_TPF_F32_2:
+		case ZEGR_TF_F32_2:
 			return DXGI_FORMAT_R32G32_FLOAT;
-		case ZE_TPF_F32_4:
+		case ZEGR_TF_F32_4:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-		case ZE_TPF_DXT1:
+		case ZEGR_TF_DXT1:
 			return DXGI_FORMAT_BC1_UNORM;
-		case ZE_TPF_DXT3:
+		case ZEGR_TF_DXT3:
 			return DXGI_FORMAT_BC2_UNORM;
-		case ZE_TPF_DXT5:
+		case ZEGR_TF_DXT5:
 			return DXGI_FORMAT_BC3_UNORM;
 			
 		default:
@@ -79,43 +79,43 @@ inline static DXGI_FORMAT GetD3D10PixelFormat(ZETexturePixelFormat Format)
 	}
 }
 
-inline static ZETexturePixelFormat GetZEPixelFormat(DXGI_FORMAT Format)
+inline static ZEGRTextureFormat GetZEPixelFormat(DXGI_FORMAT Format)
 {
 	switch(Format)
 	{
 		case DXGI_FORMAT_R8_UNORM:
-			return ZE_TPF_I8;
+			return ZEGR_TF_I8;
 		case DXGI_FORMAT_R8G8B8A8_UNORM:
-			return ZE_TPF_I8_4;
+			return ZEGR_TF_I8_4;
 		case DXGI_FORMAT_R16_UNORM:
-			return ZE_TPF_I16;
+			return ZEGR_TF_I16;
 		case DXGI_FORMAT_R16G16_UNORM:
-			return ZE_TPF_I16_2;
+			return ZEGR_TF_I16_2;
 
 		case DXGI_FORMAT_R16_FLOAT:
-			return ZE_TPF_F16;
+			return ZEGR_TF_F16;
 		case DXGI_FORMAT_R16G16_FLOAT:
-			return ZE_TPF_F16_2;
+			return ZEGR_TF_F16_2;
 		case DXGI_FORMAT_R16G16B16A16_FLOAT:
-			return ZE_TPF_F16_4;
+			return ZEGR_TF_F16_4;
 
 		case DXGI_FORMAT_R32_FLOAT:
-			return ZE_TPF_F32;
+			return ZEGR_TF_F32;
 		case DXGI_FORMAT_R32G32_FLOAT:
-			return ZE_TPF_F32_2;
+			return ZEGR_TF_F32_2;
 		case DXGI_FORMAT_R32G32B32A32_FLOAT:
-			return ZE_TPF_F32_4;
+			return ZEGR_TF_F32_4;
 
 		case DXGI_FORMAT_BC1_UNORM:
-			return ZE_TPF_DXT1;
+			return ZEGR_TF_DXT1;
 		case DXGI_FORMAT_BC2_UNORM:
-			return ZE_TPF_DXT3;
+			return ZEGR_TF_DXT3;
 		case DXGI_FORMAT_BC3_UNORM:
-			return ZE_TPF_DXT5;
+			return ZEGR_TF_DXT5;
 			
 		default:
 			zeWarning("Unknown pixel format.");
-			return ZE_TPF_NOTSET;
+			return ZEGR_TF_NONE;
 	}
 }
 
@@ -154,7 +154,7 @@ bool ZED3D11Texture2D::UpdateWith(ZEUInt ShadowIndex)
 	zeLog("Texture 2D contents updated. Texture2D: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
 #endif
 
-	return ZETexture2D::UpdateWith(ShadowIndex);
+	return ZEGRTexture2D::UpdateWith(ShadowIndex);
 }
 
 const ID3D11Texture2D* ZED3D11Texture2D::GetD3D10Texture() const
@@ -167,7 +167,7 @@ const ID3D11ShaderResourceView* ZED3D11Texture2D::GetD3D10ResourceView() const
 	return D3D10ShaderResourceView;
 }
 
-ZERenderTarget* ZED3D11Texture2D::CreateRenderTarget(ZEUInt MipLevel) const
+ZEGRRenderTarget* ZED3D11Texture2D::CreateRenderTarget(ZEUInt MipLevel) const
 {
 	zeDebugCheck(!GetIsCreated(), "Texture not created.");
 	zeDebugCheck(!State.IsStatic, "Dynamic textures cannot be render target");
@@ -225,7 +225,7 @@ bool ZED3D11Texture2D::Create(ID3D11Texture2D* D3DTexture)
 	LevelCount = TextureDesc.MipLevels;
 	PixelFormat = GetZEPixelFormat(TextureDesc.Format);
 	PixelSize = ZEVector2::One / ZEVector2(Width, Height);
-	Size = ZETexture2D::CalculateSize(Width, Height, LevelCount, PixelFormat);
+	Size = ZEGRTexture2D::CalculateSize(Width, Height, LevelCount, PixelFormat);
 
 	IsRenderTarget = (TextureDesc.BindFlags & D3D11_BIND_RENDER_TARGET) == D3D11_BIND_RENDER_TARGET;
 	State.IsStatic = (TextureDesc.BindFlags & D3D11_CPU_ACCESS_WRITE) != D3D11_CPU_ACCESS_WRITE;
@@ -237,12 +237,12 @@ bool ZED3D11Texture2D::Create(ID3D11Texture2D* D3DTexture)
 	return true;
 }
 
-bool ZED3D11Texture2D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixelFormat PixelFormat, ZETextureData* Data)
+bool ZED3D11Texture2D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat PixelFormat, ZETextureData* Data)
 {
 	zeDebugCheck(GetIsCreated(), "Texture already created.");
 	zeDebugCheck(Width == 0, "Width cannot be zero");
 	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
+	zeDebugCheck(PixelFormat == ZEGR_TF_NONE, "PixelFormat must be set");
 	zeDebugCheck(Width > 8192 || Height > 8192, "Texture2D dimensions exceeds the limits");
 
 	D3D11_USAGE Usage;
@@ -296,16 +296,16 @@ bool ZED3D11Texture2D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZETexturePixel
 		return false;
 	}
 	
-	return ZETexture2D::CreateDynamic(Width, Height, PixelFormat, Data);
+	return ZEGRTexture2D::CreateDynamic(Width, Height, PixelFormat, Data);
 }
 
-bool ZED3D11Texture2D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget, ZETextureData* Data)
+bool ZED3D11Texture2D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget, ZETextureData* Data)
 {
 	zeDebugCheck(GetIsCreated(), "Texture already created.");
 	zeDebugCheck(Width == 0, "Width cannot be zero");
 	zeDebugCheck(Height == 0, "Height cannot be zero");
 	zeDebugCheck(LevelCount == 0, "LevelCount cannot be zero");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be valid");
+	zeDebugCheck(PixelFormat == ZEGR_TF_NONE, "PixelFormat must be valid");
 	zeDebugCheck(RenderTarget && LevelCount != 1, "Render target's LevelCount must be one ");
 	zeDebugCheck(Width > 8192 || Height > 8192, "Texture2D dimensions exceeds the limits.");
 	
@@ -368,7 +368,7 @@ bool ZED3D11Texture2D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCou
 		return false;
 	}
 
-	return ZETexture2D::CreateStatic(Width, Height, LevelCount, PixelFormat, RenderTarget, Data);
+	return ZEGRTexture2D::CreateStatic(Width, Height, LevelCount, PixelFormat, RenderTarget, Data);
 }
 
 ZED3D11Texture2D::ZED3D11Texture2D()

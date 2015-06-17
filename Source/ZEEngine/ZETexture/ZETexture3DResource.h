@@ -40,14 +40,14 @@
 #include "ZETextureResource.h"
 
 class ZEFile;
-class ZETexture3D;
+class ZEGRTexture3D;
 
 struct ZETextureOptions;
 
 class ZETexture3DResource : public ZETextureResource
 {
 	private:
-		ZETexture3D*						Texture;
+		ZEGRTexture3D*						Texture;
 
 	protected:
 											ZETexture3DResource();
@@ -55,9 +55,9 @@ class ZETexture3DResource : public ZETextureResource
 
 	public:
 		const char*							GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
+		virtual ZEGRTextureType				GetTextureType() const;
 
-		const ZETexture3D*					GetTexture() const;
+		const ZEGRTexture3D*					GetTexture() const;
 
 		static void							CacheResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);

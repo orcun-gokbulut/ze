@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsEventTracer.cpp
+ Zinek Engine - TextureMaskProcessor.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,25 +33,66 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphicsEventTracer.h"
-#include "ZEGraphicsModule.h"
+sampler2D 	ColorBuffer		: register (s0);
+sampler2D 	MaskBuffer		: register (s1);
 
-ZEGraphicsEventTracer::ZEGraphicsEventTracer()
+float4 		VSParameters	: register(vs, c0);
+
+#define		PixelSizeRT		VSParameters.xy
+#define		PixelSizeMask	VSParameters.zw
+
+float4		PSParameters	: register(ps, c0);
+
+#define		MaskFactor		PSParameters.x
+
+
+struct VS_INPUT
 {
-	TracingEnabled = true;
+	float4 Position	: POSITION0;
+	float2 TexCoord : TEXCOORD0;
+	
+};
+
+struct VS_OUTPUT 
+{
+	float4 Position : POSITION0;
+	float2 TexCoordColor : TEXCOORD0;
+	float2 TexCoordMask : TEXCOORD1;
+};
+
+struct PS_INPUT
+{
+	float2 TexCoordColor : TEXCOORD0;
+	float2 TexCoordMask : TEXCOORD1;
+};
+
+struct PS_OUTPUT
+{
+	float4 PixelColor : COLOR0;
+};
+
+VS_OUTPUT vs_main(VS_INPUT Input)
+{
+	VS_OUTPUT Output = (VS_OUTPUT)0.0f;
+   
+	Output.Position	= sign(Input.Position);
+
+	Output.TexCoordColor.x = 0.5f * (1.0f + Output.Position.x + PixelSizeRT.x);
+	Output.TexCoordColor.y = 0.5f * (1.0f - Output.Position.y + PixelSizeRT.y);
+	
+	Output.TexCoordMask = Input.TexCoord + (PixelSizeMask * 0.5f);
+
+	return Output;
 }
 
-ZEGraphicsEventTracer::~ZEGraphicsEventTracer()
+PS_OUTPUT ps_main( PS_INPUT Input )
 {
+	PS_OUTPUT Output = (PS_OUTPUT)0.0f;
 
-}
+	Output.PixelColor = tex2D(ColorBuffer, Input.TexCoordColor);
+	float3 Masked = tex2D(MaskBuffer, Input.TexCoordMask).rgb * Output.PixelColor.rgb;
+	
+	Output.PixelColor.rgb = lerp(Output.PixelColor.rgb, Masked, MaskFactor);
 
-bool ZEGraphicsEventTracer::GetTracingEnabled() const
-{
-	return TracingEnabled;
-}
-
-ZEGraphicsEventTracer* ZEGraphicsEventTracer::GetInstance()
-{
-	return ZEGraphicsModule::GetInstance()->GetEventTracer();
+	return Output;
 }

@@ -34,225 +34,46 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETextureCube.h"
+
 #include "ZEGraphicsModule.h"
 #include "ZETexture/ZETextureData.h"
 
-inline static float GetAveragePixelSize(ZETexturePixelFormat PixelFormat)
+ZEGRResourceType ZEGRTextureCube::GetResourceType() const
 {
-	float Size = 0.0f;
-	switch (PixelFormat)
-	{
-		case ZE_TPF_R32F: // 4 byte
-		case ZE_TPF_RGBA8:
-		case ZE_TPF_RG16F:
-		case ZE_TPF_RG16:
-		case ZE_TPF_INTZ:
-			Size = 4.0f;
-			break;
-
-		case ZE_TPF_R16F: // 2 byte
-		case ZE_TPF_R16:	
-		case ZE_TPF_LA8:
-			Size = 2.0f;
-			break;
-
-		case ZE_TPF_RG32F: // 8 byte
-		case ZE_TPF_RGBA16F:
-		case ZE_TPF_RGBA16:	
-			Size = 8.0f;
-			break;
-
-		case ZE_TPF_L8: // 1 byte
-			Size = 1.0f;
-			break;
-			
-		case ZE_TPF_NULL: // 0 byte
-			Size = 0.0f;
-			break;
-
-		case ZE_TPF_DXT1: // 8 byte per 4x4 block
-			Size = 8.0f / 16.0f;
-			break;
-		case ZE_TPF_DXT3: // 16 byte per 4x4 block
-			Size = 16.0f / 16.0f;
-			break;
-		case ZE_TPF_DXT5: // 16 byte per 4x4 block
-			Size = 16.0f / 16.0f;
-			break;
-
-	};
-	return Size;
+	return ZEGR_RT_TEXTURE;
 }
 
-static ZESize CalculateTextureCubeSize(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat)
+ZEGRTextureType ZEGRTextureCube::GetTextureType() const
 {
-	float TotalSize = 0;
-	float PixelSize = GetAveragePixelSize(PixelFormat);
-	
-	for (ZESize LevelN = LevelCount; LevelN > 0; --LevelN)
-	{
-		ZEUInt32 LevelIndex = (ZEUInt32)LevelN - 1;
+	return ZEGR_TT_CUBE;
+}
 
-		float PixelCount = ZEMath::Power((float)(EdgeLength >> LevelIndex), 2.0f);
-		TotalSize += PixelCount * PixelSize;
+ZEUInt ZEGRTextureCube::GetLength() const
+{
+	return Length;
+}
+
+float ZEGRTextureCube::GetPixelSize() const
+{
+	return 1.0f / (float)GetLength();
+}
+
+ZEGRTextureCube::ZEGRTextureCube()
+{
+	Length = 0;
+}
+
+ZEGRTextureCube* ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget, ZETextureData* InitialData)
+{
+	ZEGRTextureCube* Texture = zeGraphics->CreateTextureCube();
+	if (Texture == NULL)
+		return NULL;
+
+	if (!Texture->Initialize(Length, LevelCount, Format, RenderTarget, InitialData))
+	{
+		Texture->Destroy();
+		return NULL;
 	}
-	return (ZESize)(TotalSize * 6.0f);
-}
 
-bool ZETextureCube::UpdateWith(ZEUInt ShadowIndex)
-{
-	ShadowCopy.SetChanged(ShadowIndex, false);
-	return true;
-}
-
-ZEGraphicsResourceType ZETextureCube::GetResourceType() const
-{
-	return ZE_GRT_TEXTURE;
-}
-
-ZESize ZETextureCube::GetSize() const
-{
-	return Size;
-}
-
-ZEUInt ZETextureCube::GetEdgeLenght() const
-{
-	return EdgeLength;
-}
-
-ZEUInt ZETextureCube::GetLevelCount() const
-{
-	return LevelCount;
-}
-
-const ZEVector2& ZETextureCube::GetPixelSize() const
-{
-	return PixelSize;
-}
-
-bool ZETextureCube::Unlock(ZETextureCubeFace Face)
-{
-	zeDebugCheck(!GetIsCreated(), "Buffer not created.");
-	zeDebugCheck(GetIsStatic(), "Static buffer not be locked/unlocked.");
-
-	State.IsLocked = false;
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Dynamic cube texture unlocked. Texture2D: %p, Face: %u", this, (ZEUInt)Face);
-#endif
-
-	return true;
-}
-
-bool ZETextureCube::Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face)
-{
-	zeDebugCheck(GetIsCreated(), "Texture not created.");
-	zeDebugCheck(Pitch == NULL, "Pitch cannot be null");
-	zeDebugCheck(Buffer == NULL, "Buffer cannot be null");
-	zeDebugCheck(GetIsLocked(), "Already locked.");
-	zeDebugCheck(GetIsStatic(), "Static buffer not be locked/unlocked.");
-
-	void* Data = ShadowCopy.GetData();
-	ZESize RowSize = ShadowCopy.GetRowSize();
-
-	*Buffer = (ZEUInt8*)Data + Face * RowSize;
-	*Pitch = RowSize * 6;
-
-	State.IsLocked = true;
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Dynamic cube texture locked. TextureCube: %p, Buffer: %p, Pitch: %u, Face: %u", 
-			this, *Buffer, *Pitch, (ZEUInt)Face);
-#endif
-
-	return true;
-}
-
-bool ZETextureCube::CreateDynamic(ZEUInt EdgeLength, ZETexturePixelFormat PixelFormat, ZETextureData* InitialData)
-{
-	zeDebugCheck(GetIsCreated(), "Texture already created.");
-	zeDebugCheck(EdgeLength == 0, "EdgeLength cannot be zero");
-	zeDebugCheck(EdgeLength > 8192, "EdgeLength exceeds the limits.");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
-	
-	ZESize RowSize = ZETextureLevel::GetRowSize(EdgeLength, PixelFormat);
-	ZEUInt RowCount = ZETextureLevel::GetRowCount(EdgeLength, PixelFormat);
-	ZESize SliceSize = ZETextureSurface::GetSurfaceSize(RowCount, RowSize);
-	ShadowCopy.CreateTexture(RowCount, RowSize, 6, SliceSize, InitialData);
-
-	this->LevelCount = 1;
-	this->EdgeLength = EdgeLength;
-	this->PixelFormat = PixelFormat;
-	this->Size = CalculateTextureCubeSize(EdgeLength, 1, PixelFormat);
-	this->PixelSize = ZEVector2::One / ZEVector2((float)EdgeLength, (float)EdgeLength);
-
-	this->IsRenderTarget = false;
-	this->State.IsStatic = false;
-	this->State.IsCreated = true;
-
-	TotalSize += Size;
-	TotalCount++;
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Dynamic cube texture created. TextureCube: %p, EdgeLength: %u, LevelCount: %u, PixelFormat: %u", 
-			this, EdgeLength, 1, PixelFormat);
-#endif
-
-	return true;
-}
-
-bool ZETextureCube::CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZETexturePixelFormat PixelFormat, bool RenderTarget, ZETextureData* InitialData)
-{
-	zeDebugCheck(GetIsCreated(), "Texture already created.");
-	zeDebugCheck(EdgeLength == 0, "EdgeLength cannot be zero");
-	zeDebugCheck(LevelCount == 0, "LevelCount cannot be zero");
-	zeDebugCheck(EdgeLength > 8192, "EdgeLength exceeds the limits.");
-	zeDebugCheck(PixelFormat == ZE_TPF_NOTSET, "PixelFormat must be set");
-	zeDebugCheck(RenderTarget && LevelCount != 1, "Render target's LevelCount must be one.");
-
-	this->EdgeLength = EdgeLength;
-	this->LevelCount = LevelCount;
-	this->PixelFormat = PixelFormat;
-	this->PixelSize = ZEVector2::One / ZEVector2((float)EdgeLength, (float)EdgeLength);
-	this->Size = CalculateTextureCubeSize(EdgeLength, LevelCount, PixelFormat);
-
-	this->IsRenderTarget = RenderTarget;
-	this->State.IsStatic = true;
-	this->State.IsCreated = true;
-
-	TotalSize += Size;
-	TotalCount++;
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Static cube texture created. TextureCube: %p, EdgeLength: %u, LevelCount: %u, PixelFormat: %u, RenderTarget: %u",
-			this, EdgeLength, LevelCount, PixelFormat, RenderTarget);
-#endif
-
-	return true;
-}
-
-ZESize		ZETextureCube::TotalSize = 0;
-ZEUInt16	ZETextureCube::TotalCount = 0;
-
-ZETextureCube::ZETextureCube()
-{
-	Size = 0;
-	EdgeLength = 0;
-	LevelCount = 0;
-	TextureType = ZE_TT_CUBE;
-	PixelSize = ZEVector2::Zero;
-}
-
-ZETextureCube::~ZETextureCube()
-{
-	if (GetIsCreated())
-	{
-		TotalSize -= Size;
-		TotalCount--;
-	}
-}
-
-ZETextureCube* ZETextureCube::CreateInstance()
-{
-	return zeGraphics->CreateTextureCube();
+	return Texture;
 }

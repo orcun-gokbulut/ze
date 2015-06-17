@@ -54,7 +54,7 @@ static void CreateQuad(ZETRVertex* Output, ZEInt x, ZEInt y)
 bool ZETRPrimitiveBuffer::CreateVertexDeclaration()
 {
 	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
-	ZEVertexElement Elements[] = 
+	ZEGRVertexElement Elements[] = 
 	{
 		{ZE_VES_POSITION, ZE_VET_FLOAT3, 0}
 	};

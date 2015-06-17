@@ -33,36 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SHADER_H__
-#define __ZE_SHADER_H__
+#pragma once
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEVertexLayout.h"
-#include "ZEConstantBuffer.h"
-#include "ZEShaderMetaTable.h"
+#include "ZEGraphicsResource.h"
 
-class ZEShader
+#include "ZEShaderCompileOptions.h"
+
+class ZEGRShader : public ZEGRResource
 {
-	friend class ZEShaderCompiler;
-	friend class ZEGraphicsModule;
-
 	protected:
-		static ZESize				TotalSize;
-		static ZEUInt16				TotalCount;
-
-		ZEShaderMetaTable			MetaTable;
-
-									ZEShader();
-		virtual						~ZEShader();
+									ZEGRShader();
+		virtual						~ZEGRShader();
 
 	public:
-		const ZEShaderMetaTable*	GetMetaTable() const;
-		
 		virtual void				Destroy();
 
-		virtual ZEShaderType		GetShaderType() const = 0;
+		virtual ZEGRShaderType		GetShaderType() const = 0;
 };
-
-#endif

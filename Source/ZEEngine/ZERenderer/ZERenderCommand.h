@@ -75,7 +75,7 @@ class ZELight;
 class ZEMaterial;
 class ZEVertexDeclaration;
 class ZEVertexBuffer;
-class ZEIndexBuffer;
+class ZEGRIndexBuffer;
 
 class ZERenderCommand
 {
@@ -93,7 +93,7 @@ class ZERenderCommand
 
 		const ZEMaterial*				Material;
 
-		ZEIndexBuffer*					IndexBuffer;
+		ZEGRIndexBuffer*					IndexBuffer;
 		ZEVertexBuffer*					VertexBuffer;
 		ZEVertexDeclaration*			VertexDeclaration;
 

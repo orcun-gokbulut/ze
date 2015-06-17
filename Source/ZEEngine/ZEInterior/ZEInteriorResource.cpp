@@ -63,7 +63,7 @@
 #define ZE_SHADER_LIGHT_MAP					1024
 #define ZE_SHADER_DISTORTION_MAP			2048
 
-const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
+const ZEGRTexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
 		return NULL;

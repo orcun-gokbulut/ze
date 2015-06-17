@@ -34,90 +34,67 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEXTURE_H__
-#define __ZE_TEXTURE_H__
 
-#include "ZETypes.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEGraphicsResource.h"
 
-enum ZETextureType
+#include "ZETypes.h"
+
+enum ZEGRTextureType
 {
-	ZE_TT_NONE		= 0,
-	ZE_TT_2D		= 1,
-	ZE_TT_3D		= 2,
-	ZE_TT_CUBE		= 3
+	ZEGR_TT_NONE	= 0,
+	ZEGR_TT_2D		= 1,
+	ZEGR_TT_3D		= 2,
+	ZEGR_TT_CUBE	= 3
 };
 
-enum ZETexturePixelFormat
+enum ZEGRTextureFormat
 {
-	ZE_TPF_NOTSET,
+	ZEGR_TF_NONE,
 
-	ZE_TPF_I8,
-	ZE_TPF_I8_2,
-	ZE_TPF_I8_4,
+	ZEGR_TF_R8,
+	ZEGR_TF_R8G8,
+	ZEGR_TF_R8G8B8A8,
 
-	ZE_TPF_I16,
-	ZE_TPF_I16_2,
-	ZE_TPF_I16_4,
+	ZEGR_TF_R16,
+	ZEGR_TF_R16G16,
+	ZEGR_TF_R16G16B16A16,
 
-	ZE_TPF_I32,
+	ZEGR_TF_R32,
+	ZEGR_TF_R32G32,
+	ZEGR_TF_R32G32B32A32,
 
-	ZE_TPF_F16,
-	ZE_TPF_F16_2,
-	ZE_TPF_F16_4,
+	ZEGR_TF_R16F,
+	ZEGR_TF_R16FG16F,
+	ZEGR_TF_R16FG16FB16FA16F,
 
-	ZE_TPF_F32,
-	ZE_TPF_F32_2,
-	ZE_TPF_F32_4,
+	ZEGR_TF_R32F,
+	ZEGR_TF_R32FG32F,
+	ZEGR_TF_R32FG32FB32FA32F,
 
-	ZE_TPF_DXT1,
-	ZE_TPF_DXT3,
-	ZE_TPF_DXT5,
+	ZEGR_TF_DXT1,
+	ZEGR_TF_DXT3,
+	ZEGR_TF_DXT5,
 
 	// Special formats for shadow mapping
-	ZE_TPF_NULL,
-	ZE_TPF_INTZ,
-
-	// New Formats
-	ZE_TPF_RGBA8	= ZE_TPF_I8_4,
-
-	ZE_TPF_R16		= ZE_TPF_I16,
-	ZE_TPF_RG16		= ZE_TPF_I16_2,
-	ZE_TPF_RGBA16	= ZE_TPF_I16_4,
-
-	ZE_TPF_R16F		= ZE_TPF_F16,
-	ZE_TPF_RG16F	= ZE_TPF_F16_2,
-	ZE_TPF_RGBA16F	= ZE_TPF_F16_4,
-
-	ZE_TPF_R32F		= ZE_TPF_F32,
-	ZE_TPF_RG32F	= ZE_TPF_F32_2,
-	ZE_TPF_RGBA32F	= ZE_TPF_F32_4,
-
-	ZE_TPF_L8		= ZE_TPF_I8,
-	ZE_TPF_LA8		= ZE_TPF_I8_2,
-
-	ZE_TPF_L16		= ZE_TPF_I16,
-	ZE_TPF_LA16		= ZE_TPF_I16_2
+	ZEGR_TF_NULL,
+	ZEGR_TF_INTZ,
 };
 
-class ZETexture : public ZEGraphicsResource
+class ZEGRTexture : public ZEGRResource
 {
-	friend class ZEGraphicsDevice;
-	friend class ZEGraphicsModule;
-
 	protected:
-		ZETexturePixelFormat		PixelFormat;
-		ZETextureType				TextureType;
-		bool						IsRenderTarget;
+		ZEGRTextureFormat		Format;
+		ZEUInt					LevelCount;
+		bool					IsRenderTarget;
 
-									ZETexture();
-		virtual						~ZETexture();
+								ZEGRTexture();
 
 	public:
-		ZETexturePixelFormat		GetPixelFormat() const;
-		ZETextureType				GetTextureType() const;
-		bool						GetIsRenderTarget() const;
-};
+		virtual ZEGRTextureType	GetTextureType() const = 0;
 
-#endif
+		ZEGRTextureFormat		GetFormat() const;
+		ZEUInt					GetLevelCount() const;
+		bool					GetIsRenderTarget() const;
+
+		static ZESize			GetBlockSize(ZEGRTextureFormat PixelFormat);
+};

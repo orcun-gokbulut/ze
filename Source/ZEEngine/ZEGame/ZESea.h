@@ -43,7 +43,7 @@
 class ZESeaMaterial;
 class ZEVertexDeclaration;
 class ZEStaticVertexBuffer;
-class ZETexture2D;
+class ZEGRTexture2D;
 
 class ZESea : public ZEEntity
 {
@@ -73,8 +73,8 @@ class ZESea : public ZEEntity
 		virtual					~ZESea();
 
 	public:
-		void					SetDiffuseTexture(const ZETexture2D* Texture);
-		void					SetNormalTexture(const ZETexture2D* Texture);
+		void					SetDiffuseTexture(const ZEGRTexture2D* Texture);
+		void					SetNormalTexture(const ZEGRTexture2D* Texture);
 
 		void					SetAmbientColor(const ZEVector3& Color);
 		ZEVector3				GetAmbientColor() const;

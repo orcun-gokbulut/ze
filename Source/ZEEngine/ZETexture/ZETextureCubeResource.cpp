@@ -46,7 +46,7 @@
 #include "ZETextureCacheDataIdentifier.h"
 
 
-static void CopyToTextureCube(ZETextureCube* Output, ZETextureData* TextureData)
+static void CopyToTextureCube(ZEGRTextureCube* Output, ZETextureData* TextureData)
 {
 	ZEUInt LevelCount = TextureData->GetLevelCount();
 	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
@@ -161,7 +161,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	bool IdentifierExists	= false;
 
 	// Decide final texture options
-	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 3, 2, ZE_TT_CUBE);
+	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 3, 2, ZEGR_TT_CUBE);
 	
 	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
@@ -265,7 +265,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	
 	// Create TextureCubeResource 
 	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZETextureCube* Texture = TextureResource->Texture = ZETextureCube::CreateInstance();
+	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::CreateInstance();
 	if (Texture == NULL)
 	{
 		delete TextureResource;
@@ -303,12 +303,12 @@ const char* ZETextureCubeResource::GetResourceType() const
 }
 
 
-ZETextureType ZETextureCubeResource::GetTextureType() const
+ZEGRTextureType ZETextureCubeResource::GetTextureType() const
 {
-	return ZE_TT_CUBE;
+	return ZEGR_TT_CUBE;
 }
 
-const ZETextureCube* ZETextureCubeResource::GetTexture() const
+const ZEGRTextureCube* ZETextureCubeResource::GetTexture() const
 {
 	return Texture;
 }

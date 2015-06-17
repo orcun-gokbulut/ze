@@ -34,30 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEShaderMeta.h"
-#include "ZEDS/ZEHashGenerator.h"
-
-ZESize ZEShaderInput::GetHash(const char* Semantic, ZEUInt8 Index)
-{
-	ZESize Hash = 0;
-	ZEHashGenerator::Hash(Hash, (const char*)Semantic);
-	ZEHashGenerator::Hash(Hash, (void*)&Index, sizeof(ZEUInt8));
-
-	return Hash;
-}
-
-ZEShaderInput::ZEShaderInput()
-{
-	Semantic[0] = '\0';
-
-	Hash = 0;
-	Index = 0;
-	ElementType = ZE_VET_NONE;
-	SystemValue = ZE_SSVT_NONE;
-	UsedRegisters = ZE_CM_GREEN;
-	RegisterType = ZE_SRT_NONE;
-}
-
-ZEShaderInput::~ZEShaderInput()
-{
-
-}
