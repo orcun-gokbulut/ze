@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPathManager.h
+ Zinek Engine - ZEPathTokenizer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_PATH_MANAGER_H__
-#define __ZE_PATH_MANAGER_H__
-
 #include "ZETypes.h"
-#include "ZEFileCommon.h"
-#include "ZEDS/ZEString.h"
 
-class ZEPathManager
+#define ZE_PATH_TOKENIZER_BUFFER_SIZE 4096
+#define ZE_PATH_TOKENIZER_TOKEN_LIST_SIZE 256
+
+class ZEPathTokenizer
 {
 	private:
-		bool					AccessControl;
+		char			Buffer[ZE_PATH_TOKENIZER_BUFFER_SIZE];
+		const char*		TokenList[ZE_PATH_TOKENIZER_TOKEN_LIST_SIZE];
+		ZESize			TokenCount;
 
-		ZEString				EnginePath;
-		ZEString				ResourcePath;
-		ZEString				StoragePath;
-		ZEString				UserStoragePath;
-
-		void					SetEnginePath(const ZEString& Path);
-		void					SetResourcePath(const ZEString& Path);
-		void					SetStoragePath(const ZEString& Path);
-		void					SetUserStoragePath(const ZEString& Path);
+		static char*	Trim(char* Data);
 
 	public:
-		void					SetAccessControl(bool Enable);
-		bool					GetAccessControl();
+		const char*		GetToken(ZESize Index);
+		void			SetToken(ZESize Index, const char* String);
+		ZESize			GetTokenCount();
+		void			Squish();
+		const char*		GetOutput();
 
-		const ZEString&			GetEnginePath();
-		const ZEString&			GetResourcePath();
-		const ZEString&			GetStoragePath();
-		const ZEString&			GetUserStoragePath();
-
-		void					Initialize();
-		void					Deinitialize();
-
-		ZERealPath				TranslateToRealPath(const char* Path);
-
-								ZEPathManager();
-
-		static ZEPathManager*	GetInstance();
+		void			Tokenize(const char* Path);
+		void			Combine();
 };
-
-#endif
