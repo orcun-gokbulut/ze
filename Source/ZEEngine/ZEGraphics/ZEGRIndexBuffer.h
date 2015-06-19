@@ -49,10 +49,14 @@ enum ZEGRIndexBufferFormat
 class ZEGRIndexBuffer : public ZEGRResource
 {
 	friend class ZEGRGraphicsModule;
-	protected:
-		ZEGRIndexBufferFormat		Format;
+	private:
+		ZESize					IndexCount;
+		ZEGRIndexBufferFormat	Format;
 
-		ZEGRIndexBuffer();
+	protected:
+		virtual bool			Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+
+								ZEGRIndexBuffer();
 		virtual					~ZEGRIndexBuffer();
 
 	public:
@@ -62,10 +66,8 @@ class ZEGRIndexBuffer : public ZEGRResource
 
 		void					Unlock();
 		bool					Lock(void** Data);
-		
-		virtual bool			Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
-		
-		static ZEGRIndexBuffer*	CreateInstance();
+	
+		static ZEGRIndexBuffer*	Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
 };
 
 #endif

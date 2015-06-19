@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ComponentBase.h
+ Zinek Engine - ZED11ComponentBase.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,27 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_D3D11_COMPONENT_BASE_H_
-#define __ZE_D3D11_COMPONENT_BASE_H_
 
 #include <d3d11.h>
 
-#include "ZEDS/ZEArray.h"
-
 class ZED3D11GraphicsModule;
 
-class ZED3D11ComponentBase
+class ZED11ComponentBase
 {
-	protected:
-		static ZED3D11GraphicsModule*			GraphicsModule;
-		
-		static ZEArray<ID3D11Device*>			D3DDevices;
-		static ZEArray<ID3D11DeviceContext*>	D3DContexes;
-		
-		
+	friend class ZED3D11GraphicsModule;
+	private:
+		static ZED3D11GraphicsModule*	Module;
+		static ID3D11Device*			Device;
+
 	public:
-		static bool								BaseInitialize(ZED3D11GraphicsModule* Module);
-
+		ZED3D11GraphicsModule*			GetModule();
+		ID3D11Device*					GetDevice();
 };
-
-#endif

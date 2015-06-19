@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11EventTracer.cpp
+ Zinek Engine - ZEGRTracerEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,54 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <d3d9.h>
+#pragma once
 
-#include "ZEError.h"
-#include "ZED3D11EventTracer.h"
-#include "ZED3D11GraphicsModule.h"
-
-void ZED3D11EventTracer::SetTracingEnabled(bool Enabled)
+class ZEGRTracerEvent
 {
-	if (Enabled)
-	{
-		D3DPERF_SetOptions(0);
-	}
-	else
-	{
-		D3DPERF_SetOptions(1);
-	}
-	
-	TracingEnabled = Enabled;
-}
+	private:
+		const char*			Name;
+		bool				Started;
 
-void ZED3D11EventTracer::Mark(const char* MakerName)
-{
-	wchar_t Temp[150];
-	mbstowcs(Temp, MakerName, 150);
-	D3DPERF_SetMarker(0x00, Temp);
-}
+	public:
+		void				SetName(const char* Name);
+		const char*			GetName();
 
-void ZED3D11EventTracer::StartEvent(const char* EventName)
-{
-	wchar_t Temp[150];
-	mbstowcs(Temp, EventName, 150);
-	D3DPERF_BeginEvent(0x00, Temp);
-	EventCount++;
-}
+		bool				IsStarted();
 
-void ZED3D11EventTracer::EndEvent()
-{
-	zeDebugCheck(EventCount == 0, "No started event available.");
-	D3DPERF_EndEvent();
-	EventCount--;
-}
+		#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
+		void				Start();
+		void				Mark(const char* MarkerName);
+		void				End();
+		#else
+		void				Start() {}
+		void				Mark(const char* MarkerName) {}
+		void				End() {}
+		#endif
 
-ZED3D11EventTracer::ZED3D11EventTracer()
-{
-	EventCount = 0;
-}
-
-ZED3D11EventTracer::~ZED3D11EventTracer()
-{
-
-}
+							ZEGRTracerEvent();
+							ZEGRTracerEvent(const char* Name);
+							~ZEGRTracerEvent();
+};

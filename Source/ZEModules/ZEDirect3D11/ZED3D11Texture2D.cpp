@@ -379,6 +379,6 @@ ZED3D11Texture2D::ZED3D11Texture2D()
 
 ZED3D11Texture2D::~ZED3D11Texture2D()
 {
-	ZED3D_RELEASE(D3D10ShaderResourceView);
-	ZED3D_RELEASE(D3D10Texture2D);
+	ZEGR_RELEASE(D3D10ShaderResourceView);
+	ZEGR_RELEASE(D3D10Texture2D);
 }

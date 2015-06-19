@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11GraphicsDevice.h
+ Zinek Engine - ZED11Tracer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_GRAPHICS_DEVICE_H__
-#define __ZE_D3D11_GRAPHICS_DEVICE_H__
+#include <d3d9.h>
 
-#include "ZED3D11StatePool.h"
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRDevice.h"
+#include "ZEError.h"
+#include "ZED11Tracer.h"
+#include "ZED3D11GraphicsModule.h"
 
-#include "d3d11.h"
-
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-
-class ZED3D11GraphicsDevice : public ZEGRDevice, public ZED11ComponentBase
+void ZED11Tracer::SetEnabled(bool Enabled)
 {
-	friend class ZED3D11GraphicsModule;
+	D3DPERF_SetOptions(Enabled ? 1 : 0);
+	ZEGRTracer::SetEnabled(Enabled);
+}
 
-	protected:
-		ZEUInt					ContextIndex;
-		bool					RenderTargetChanged;
-		D3D_FEATURE_LEVEL		FeatureLevel;
+void ZED11Tracer::StartEvent(const char* EventName)
+{
+	wchar_t Temp[150];
+	mbstowcs(Temp, EventName, 150);
+	D3DPERF_BeginEvent(0x00, Temp);
+	ZEGRTracer::StartEvent(EventName);
+}
 
-		void					ApplyInputStates();
-		void					ApplyVertexShaderStates();
-		void					ApplyGeometryShaderStates();
-		void					ApplyRasterizerStates();
-		void					ApplyPixelShaderStates();
-		void					ApplyOutputStates();
+void ZED11Tracer::Mark(const char* MakerName)
+{
+	wchar_t Temp[150];
+	mbstowcs(Temp, MakerName, 150);
+	D3DPERF_SetMarker(0x00, Temp);
+}
 
-		void					ApplyStates();
-		
-								ZED3D11GraphicsDevice(ID3D11Device* D3D10Device, ZEUInt ContextIndex);
-		virtual					~ZED3D11GraphicsDevice();
+void ZED11Tracer::EndEvent()
+{
+	D3DPERF_EndEvent();
+	ZEGRTracer::EndEvent();
+}
 
-	public:
-		virtual void			Draw(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
-		virtual void			DrawIndexed(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
-		virtual void			DrawInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
-		virtual void			DrawIndexedInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
+ZED11Tracer::ZED11Tracer()
+{
+	EventCount = 0;
+}
 
-		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
-		virtual void			ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
+ZED11Tracer::~ZED11Tracer()
+{
 
-		D3D_FEATURE_LEVEL		GetD3DFeatureLevel() const;
-};
-
-#endif
+}

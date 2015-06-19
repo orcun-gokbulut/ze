@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRStatistics.cpp
+ Zinek Engine - ZEGRCounter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRStatistics.h"
+#include "ZEGRCounter.h"
 
 #include <memory.h>
 
-void ZEGRStatistics::Clean()
+void ZEGRCounter::Clean()
 {
-	memset(&DrawStatistics, 0, sizeof(ZEGRStatisticsDrawCall));
-	memset(&MemoryStatistics, 0, sizeof(ZEGRStatisticsMemory));
-	memset(&ObjectStatistics, 0, sizeof(ZEGRStatisticsObjects));
+	memset(&DrawStatistics, 0, sizeof(ZEGRDrawStatistics));
+	memset(&MemoryUsage, 0, sizeof(ZEGRMemoryUsage));
+	memset(&ObjectCount, 0, sizeof(ZEGRObjectsCount));
 
 }
 
-void ZEGRStatistics::Reset()
+void ZEGRCounter::Reset()
 {
 	DrawStatistics.DrawCall = 0;
 	DrawStatistics.InstancedDrawCall = 0;
@@ -53,22 +53,22 @@ void ZEGRStatistics::Reset()
 	DrawStatistics.StateChanges = 0;
 }
 
-ZEGRStatistics::ZEGRStatistics()
+ZEGRCounter::ZEGRCounter()
 {
 	Clean();
 }
 
-const ZEGRStatisticsDrawCall& ZEGRStatistics::GetDrawStatistics()
+const ZEGRDrawStatistics& ZEGRCounter::GetDrawStatistics()
 {
 	return DrawStatistics;
 }
 
-const ZEGRStatisticsMemory& ZEGRStatistics::GetMemoryStatistics()
+const ZEGRMemoryUsage& ZEGRCounter::GetMemoryUsage()
 {
-	return MemoryStatistics;
+	return MemoryUsage;
 }
 
-const ZEGRStatisticsObjects& ZEGRStatistics::GetObjectStatistics()
+const ZEGRObjectsCount& ZEGRCounter::GetObjectCount()
 {
-	return ObjectStatistics;
+	return ObjectCount;
 }

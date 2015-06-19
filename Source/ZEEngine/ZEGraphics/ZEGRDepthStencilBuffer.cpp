@@ -35,28 +35,25 @@
 
 #include "ZEGRDepthStencilBuffer.h"
 #include "ZEGRGraphicsModule.h"
+#include "ZEGRCounter.h"
 
-inline static ZESize GetPixelSize(ZEGRDepthStencilPixelFormat Format)
+ZESize SizeOfPixel(ZEGRDepthStencilFormat Format)
 {
-	ZESize Size = 0;
 	switch(Format)
 	{
-		case ZEGR_DSPF_DEPTH16:
-			Size = 2;
-			break;
-		case ZEGR_DSPF_DEPTH24_STENCIL8:
-			Size = 4;
-			break;
-		case ZEGR_DSPF_DEPTHD32_FLOAT:
-			Size = 4;
-			break;
-	}
-	return Size;
-}
+		default:
+		case ZEGR_DSF_NONE:
+			return 0;
 
-inline static ZESize CalculateBufferSize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilPixelFormat Format)
-{
-	return Width * Height * GetPixelSize(Format);
+		case ZEGR_DSF_DEPTH16:
+			return 2;
+
+		case ZEGR_DSF_DEPTH24_STENCIL8:
+			return 4;
+
+		case ZEGR_DSF_DEPTHD32_FLOAT:
+			return 4;
+	}
 }
 
 ZEUInt ZEGRDepthStencilBuffer::GetWidth() const
@@ -69,43 +66,63 @@ ZEUInt ZEGRDepthStencilBuffer::GetHeight() const
 	return Height;
 }
 
-ZEGRDepthStencilPixelFormat ZEGRDepthStencilBuffer::GetFormat() const
+ZEGRDepthStencilFormat ZEGRDepthStencilBuffer::GetFormat() const
 {
 	return Format;
 }
 
-bool ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilPixelFormat PixelFormat)
+bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format)
 {
-	zeDebugCheck(Width == 0, "Width cannot be zero");
-	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(PixelFormat == ZEGR_DSPF_NONE, "PixelFormat must be valid");
-	zeDebugCheck(Width > 8192 || Height > 8192, "Depth stencil buffer dimensions exceeds the limits.");
-
-	this->Format = PixelFormat;
+	this->Format = Format;
 	this->Height = Height;
 	this->Width = Width;
 	
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Depth stencil buffer created. Width: %u, Height: %u, PixelFormat: %u.", 
-			Width, Height, PixelFormat);
-#endif
+	#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Depth stencil buffer created. Width: %u, Height: %u, PixelFormat: %u.", 	Width, Height, Format);
+	#endif
+
+	SetSize(Width * Height * SizeOfPixel(Format));
+
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
 
 	return true;
+}
+
+void ZEGRDepthStencilBuffer::Deinitialize()
+{
+	Width = 0;
+	Height = 0;
+	Format = ZEGR_DSF_NONE;
+	
+	SetSize(0);
+	
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
 }
 
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
 {
 	Width = 0;
 	Height = 0;
-	Format = ZEGR_DSPF_NONE;
+	Format = ZEGR_DSF_NONE;
+
 }
 
 ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
 {
-
+	Deinitialize();
 }
 
-ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::CreateInstance()
+ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format)
 {
-	return ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
+	ZEGRDepthStencilBuffer* DepthStencilBuffer = ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
+	if (DepthStencilBuffer == NULL)
+		return NULL;
+
+	if (!DepthStencilBuffer->Initialize(Width, Height, Format))
+	{
+		DepthStencilBuffer->Destroy();
+		return NULL;
+	}
+
+	return DepthStencilBuffer;
 }

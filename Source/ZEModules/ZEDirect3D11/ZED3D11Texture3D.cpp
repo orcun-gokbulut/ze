@@ -38,7 +38,7 @@
 #include "ZED3D11GraphicsModule.h"
 #include "ZETexture/ZETextureData.h"
 
-inline static DXGI_FORMAT ConvertPixelFormat(ZEGRTextureFormat Format)
+inline static DXGI_FORMAT ConvertFormat(ZEGRTextureFormat Format)
 {
 	switch(Format)
 	{
@@ -143,7 +143,7 @@ ZEGRRenderTarget* ZED3D11Texture3D::CreateRenderTarget(ZEUInt MipLevel) const
 
 	// Create render target view
 	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
-	RenderTargetDesc.Format = ConvertPixelFormat(PixelFormat);
+	RenderTargetDesc.Format = ConvertFormat(PixelFormat);
 	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
 	RenderTargetDesc.Texture3D.MipSlice = MipLevel;
 	RenderTargetDesc.Texture3D.FirstWSlice = 0;
@@ -194,7 +194,7 @@ bool ZED3D11Texture3D::CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, 
 	TextureDesc.Usage = Usage;
 	TextureDesc.BindFlags = BindFlags;
 	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
+	TextureDesc.Format = ConvertFormat(PixelFormat);
 
 	D3D11_SUBRESOURCE_DATA InitialData;
 	if (Data != NULL)
@@ -257,7 +257,7 @@ bool ZED3D11Texture3D::CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, Z
 	TextureDesc.Usage = Usage;
 	TextureDesc.BindFlags = BindFlags;
 	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
+	TextureDesc.Format = ConvertFormat(PixelFormat);
 	
 	// ZETExturedata is not appropiate for d3d texture 3d initializetion!!!!!
 
@@ -293,6 +293,6 @@ ZED3D11Texture3D::ZED3D11Texture3D()
 
 ZED3D11Texture3D::~ZED3D11Texture3D()
 {
-	ZED3D_RELEASE(D3D10ShaderResourceView);
-	ZED3D_RELEASE(D3D10Texture3D);
+	ZEGR_RELEASE(D3D10ShaderResourceView);
+	ZEGR_RELEASE(D3D10Texture3D);
 }

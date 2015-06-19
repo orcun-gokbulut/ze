@@ -36,7 +36,7 @@
 #include "ZED3D11GraphicsWindow.h"
 #include "ZED3D11GraphicsModule.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZED3D11DepthStencilBuffer.h"
+#include "ZED11DepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZED3D11RenderTarget.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
@@ -45,7 +45,7 @@
 
 void ZED3D11GraphicsWindow::ReleaseSwapChain()
 {
-	ZED3D_RELEASE(SwapChain);
+	ZEGR_RELEASE(SwapChain);
 }
 
 bool ZED3D11GraphicsWindow::CreateSwapChain()
@@ -132,7 +132,7 @@ bool ZED3D11GraphicsWindow::CreateBackBuffer()
 	BackBuffer = (ZED3D11RenderTarget*)BackBufferTexture->CreateRenderTarget();
 	BackBuffer->SetDebugName("SwapChainBackBuffer");
 
-	DepthBuffer = (ZED3D11DepthStencilBuffer*)ZEDepthStencilBuffer::CreateInstance();
+	DepthBuffer = (ZED11DepthStencilBuffer*)ZEGRDepthStencilBuffer::CreateInstance();
 	DepthBuffer->Create(Width, Height, ZE_DSPF_DEPTH24_STENCIL8);
 	DepthBuffer->SetDebugName("SwapChainDepthBuffer");
 
@@ -325,7 +325,7 @@ const ZEGRRenderTarget* ZED3D11GraphicsWindow::GetBackBuffer()
 	return BackBuffer;
 }
 
-const ZEDepthStencilBuffer* ZED3D11GraphicsWindow::GetDepthBuffer()
+const ZEGRDepthStencilBuffer* ZED3D11GraphicsWindow::GetDepthBuffer()
 {
 	return DepthBuffer;
 }

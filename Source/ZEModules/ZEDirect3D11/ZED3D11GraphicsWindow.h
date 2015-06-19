@@ -45,7 +45,7 @@
 
 class ZED3D11Texture2D;
 class ZED3D11RenderTarget;
-class ZED3D11DepthStencilBuffer;
+class ZED11DepthStencilBuffer;
 
 class ZED3D11GraphicsWindow : public ZEGRWindow
 {
@@ -54,7 +54,7 @@ class ZED3D11GraphicsWindow : public ZEGRWindow
 	protected:
 		IDXGISwapChain1*					SwapChain;
 		
-		ZED3D11DepthStencilBuffer*			DepthBuffer;
+		ZED11DepthStencilBuffer*			DepthBuffer;
 		ZED3D11RenderTarget*				BackBuffer;
 		ZED3D11Texture2D*					BackBufferTexture;
 
@@ -80,8 +80,8 @@ class ZED3D11GraphicsWindow : public ZEGRWindow
 		virtual bool						Present();
 
 		virtual const ZEGRTexture2D*			GetBackBufferTexture();
-		virtual const ZEGRRenderTarget*		GetBackBuffer();
-		virtual const ZEDepthStencilBuffer*	GetDepthBuffer();
+		virtual const ZEGRRenderTarget*			GetBackBuffer();
+		virtual const ZEGRDepthStencilBuffer*	GetDepthBuffer();
 };
 
 #endif

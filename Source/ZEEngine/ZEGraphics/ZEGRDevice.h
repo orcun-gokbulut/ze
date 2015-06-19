@@ -41,7 +41,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRRasterizerState.h"
 #include "ZEGRDepthStencilState.h"
-#include "ZEGRDeviceState.h"
+#include "ZEGRRenderState.h"
 
 class ZEGRVertexLayout;
 class ZEGRVertexBuffer;
@@ -58,8 +58,8 @@ class ZEGRDevice
 		virtual					~ZEGRDevice();
 
 	public:
-		virtual void			Draw(ZEGRDeviceState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
-		virtual void			DrawInstanced(ZEGRDeviceState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
+		virtual void			Draw(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
+		virtual void			DrawInstanced(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
 		
 		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
 		virtual void			ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRStatistics.h
+ Zinek Engine - ZEGRRenderState.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,66 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETypes.h"
+#include "ZEGRRenderState.h"
 
-#include "ZEThread/ZELock.h"
+#include "ZEGRGraphicsModule.h"
 
-struct ZEGRStatisticsDrawCall
+void ZEGRRenderState::SetToDefault()
 {
-	ZESize		FrameCount;
-	ZESize		DrawCall;
-	ZESize		InstancedDrawCall;
-	ZESize		DrawedPrimtivies;
-	ZESize		StateChanges;
-};
+	VertexLayout = NULL;
+	memset(VertexBuffers, NULL, sizeof(ZEGRVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
+	IndexBuffer = NULL;
+	
+	memset(Shaders, NULL, sizeof(ZEGRShader*) * ZEGR_SHADER_TYPE_COUNT);
+	memset(ShaderConstantBuffers, NULL, sizeof(ZEGRConstantBuffer*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
+	memset(ShaderTextures, NULL, sizeof(const ZEGRTexture*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
+	memset(ShaderSamplers, 0, sizeof(ZESize) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
+	
+	DepthStencilBuffer = NULL;
+	memset(RenderTargets, NULL, sizeof(const ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
 
-struct ZEGRStatisticsMemory
+	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
+		BlendState[I].SetToDefault();
+
+	for (ZESize I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
+		ViewPorts[I].SetZero();
+
+	for (ZESize I = 0; I < ZEGR_MAX_SCISSOR_SLOT; I++)
+		ScissorRects[I].SetZero();
+
+	RasterizerState.SetToDefault();
+	DepthStencilState.SetToDefault();
+}
+
+ZEGRRenderState::ZEGRRenderState()
 {
-	ZESize		ResourceMemoryUsage;
-	ZESize		IndexBufferMemoryUsage;
-	ZESize		VertexBufferMemoryUsage;
-	ZESize		ShaderMemoryUsage;
-	ZESize		ConstantBufferMemoryUsage;	
-	ZESize		DepthStancilBufferMemoryUsage;
-	ZESize		TextureMemoryUsage;
-	ZESize		Texture3DMemoryUsage;
-	ZESize		Texture2DMemoryUsage;
-	ZESize		TextureCubeMemoryUsage;
-};
+	SetToDefault();
+}
 
-struct ZEGRStatisticsObjects
+ZEGRRenderState::~ZEGRRenderState()
 {
-	ZESize		VertexBufferCount;
-	ZESize		IndexBufferCount;
-	ZESize		ShaderCount;
-	ZESize		RenderStateCount;
-	ZESize		SamplerCount;
-	ZESize		TextureCount;
-	ZESize		Texture2DCount;
-	ZESize		Texture3DCount;
-	ZESize		TextureCubeCount;
-	ZESize		RenderTargetCount;
-	ZESize		DepthStencilBufferCount;
 
-};
+}
 
-class ZEGRStatistics
+ZEGRRenderState* ZEGRRenderState::CreateInstance()
 {
-	friend ZEGRGraphicsModule;
-	private:
-		ZELock							Lock;
-
-		ZEGRStatisticsDrawCall			DrawStatistics;
-		ZEGRStatisticsMemory			MemoryStatistics;
-		ZEGRStatisticsObjects			ObjectStatistics;
-
-		void							Clean();
-		void							Reset();
-
-										ZEGRStatistics();
-
-	public:
-		const ZEGRStatisticsDrawCall&	GetDrawStatistics();
-		const ZEGRStatisticsMemory&		GetMemoryStatistics();
-		const ZEGRStatisticsObjects&	GetObjectStatistics();
-};
+	return ZEGRGraphicsModule::GetInstance()->CreateDeviceState();
+}

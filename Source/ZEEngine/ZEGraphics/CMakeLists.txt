@@ -39,10 +39,8 @@ ze_add_source(ZEGRGraphicsModule.cpp 		Sources)
 ze_add_source(ZEGRGraphicsModule.h 			Sources Headers)
 ze_add_source(ZEGRDevice.cpp				Sources)
 ze_add_source(ZEGRDevice.h					Sources Headers)
-ze_add_source(ZEGRDeviceState.cpp			Sources)
-ze_add_source(ZEGRDeviceState.h				Sources Headers)
-ze_add_source(ZEGRStatistics.cpp			Source)
-ze_add_source(ZEGRStatistics.h				Sources Headers)
+ze_add_source(ZEGRRenderState.cpp			Sources)
+ze_add_source(ZEGRRenderState.h				Sources Headers)
 
 ze_add_source(ZEGRDefinitions.cpp			Sources)
 ze_add_source(ZEGRDefinitions.h				Sources Headers)
@@ -90,9 +88,6 @@ ze_add_source(ZEGRScissorRectangle.h		Sources Headers)
 ze_add_source(ZEGRViewPort.cpp				Sources)
 ze_add_source(ZEGRViewPort.h				Sources Headers)
 
-ze_add_source(ZEGRTracer.cpp				Sources)
-ze_add_source(ZEGRTracer.h					Sources Headers)
-
 ze_add_source(ZEGRShader.cpp 				Sources)
 ze_add_source(ZEGRShader.h 					Sources Headers)
 ze_add_source(ZEGRShaderMeta.cpp			Sources)
@@ -108,6 +103,13 @@ ze_add_source(ZEGRWindow.h					Sources Headers)
 ze_add_source(ZEGRWindow.cpp				Sources)
 ze_add_source(ZEGRWindow_Unix.cpp			Sources PLATFORMS Unix)
 ze_add_source(ZEGRWindow_Windows.cpp		Sources PLATFORMS Windows)
+
+ze_add_source(ZEGRCounter.cpp				Sources)
+ze_add_source(ZEGRCounter.h					Sources Headers)
+ze_add_source(ZEGRTracer.cpp				Sources)
+ze_add_source(ZEGRTracer.h					Sources Headers)
+ze_add_source(ZEGRTracerEvent.cpp			Sources)
+ze_add_source(ZEGRTracerEvent.h				Sources Headers)
 
 ze_add_library(TARGET ZEGraphics 
 	SOURCES ${Sources}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ConstantBuffer.h
+ Zinek Engine - ZED11ConstantBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_CONSTANT_BUFFER_H__
-#define __ZE_D3D11_CONSTANT_BUFFER_H__
+#pragma once
 
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 
 struct ID3D11Buffer;
+class ZEGRShaderConstantBuffer;
 
-class ZED3D11ConstantBuffer : public ZEConstantBuffer, public ZED3D11ComponentBase
+class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 {
 	friend class ZED3D11GraphicsDevice;
 	friend class ZED3D11GraphicsModule;
 
 	protected:
-		ID3D11Buffer*			D3D10Buffer;
-		
-		bool					UpdateWith(ZEUInt ShadowIndex);
+		ID3D11Buffer*			Buffer;	
 
-								ZED3D11ConstantBuffer();
-		virtual					~ZED3D11ConstantBuffer();
+		virtual bool			Initialize(ZESize BufferSize);
+
+								ZED11ConstantBuffer();
+		virtual					~ZED11ConstantBuffer();
 
 	public:
-		const ID3D11Buffer*		GetD3D10Buffer() const;
-
-		bool					Create(const ZEGRShaderConstantBuffer* BufferInfo);
-		bool					Create(ZESize BufferSize);
+		const ID3D11Buffer*		GetBuffer() const;
 };
-
-#endif

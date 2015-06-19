@@ -57,5 +57,5 @@ ZED3D11RenderTarget::ZED3D11RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Dep
 
 ZED3D11RenderTarget::~ZED3D11RenderTarget()
 {
-	ZED3D_RELEASE(D3D10RenderTargetView);	
+	ZEGR_RELEASE(D3D10RenderTargetView);	
 }

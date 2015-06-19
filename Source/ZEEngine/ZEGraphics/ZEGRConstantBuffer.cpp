@@ -35,28 +35,38 @@
 
 #include "ZEGRConstantBuffer.h"
 #include "ZEGRGraphicsModule.h"
+#include "ZEGRCounter.h"
 
 ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
 {
-	return ZEGR_RT_BUFFER;
+	return ZEGR_RT_CONSTANT_BUFFER;
 }
 
-void ZEGRConstantBuffer::SetZero()
+bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
 {
-	SetData(NULL);
+	SetSize(BufferSize);
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, ConstantBuffer, Pipeline);
 }
 
 ZEGRConstantBuffer::ZEGRConstantBuffer()
 {
-	Size = 0;
+
 }
 
 ZEGRConstantBuffer::~ZEGRConstantBuffer()
 {
-
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
+	SetSize(0);
 }
 
-ZEGRConstantBuffer* ZEGRConstantBuffer::CreateInstance()
+ZEGRConstantBuffer* ZEGRConstantBuffer::Create(ZESize BufferSize)
 {
-	return ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
+	ZEGRConstantBuffer* ConstantBuffer = ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
+	if (!ConstantBuffer->Initialize(BufferSize))
+	{
+		ConstantBuffer->Release();
+		return NULL;
+	}
+	
+	return ConstantBuffer;
 }

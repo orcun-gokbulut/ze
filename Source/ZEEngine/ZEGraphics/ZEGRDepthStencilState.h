@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDepthStencilState.h
+ Zinek Engine - ZEGRDepthStencilState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -68,9 +68,9 @@ class ZEGRDepthStencilState : public ZEGRState
 	private:
 		struct ZEDepthStencilStateData
 		{
-			bool						ZTestEnable : 2;
-			bool						ZWriteEnable : 2;
-			bool						StencilTestEnable : 2;
+			bool						ZTestEnable : 1;
+			bool						ZWriteEnable : 1;
+			bool						StencilTestEnable : 1;
 			ZEGRComparisonFunction		ZFunction : 5;
 			ZEUInt8						StencilWriteMask : 8;
 			ZEUInt8						StencilReadMask : 8;

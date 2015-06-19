@@ -66,17 +66,17 @@ class ZEGRRasterizerState : public ZEGRState
 	private:
 		struct ZERasterizerStateData	
 		{
-			ZEGRFillMode				FillMode : 3;
-			ZEGRCullDirection			CullDirection : 3;
+			ZEGRFillMode			FillMode : 3;
+			ZEGRCullDirection		CullDirection : 3;
 			bool					FrontIsCounterClockwise : 2;	
 		} StateData;
 
 	public:
 		void						SetFillMode(ZEGRFillMode Mode);
-		ZEGRFillMode					GetFillMode() const;
+		ZEGRFillMode				GetFillMode() const;
 	
 		void						SetCullDirection(ZEGRCullDirection Direction);
-		ZEGRCullDirection				GetCullDirection() const;
+		ZEGRCullDirection			GetCullDirection() const;
 	
 		void						SetFrontIsCounterClockwise(bool IsCounterClockwise);
 		bool						GetFrontIsCounterClockwise() const;

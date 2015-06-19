@@ -39,10 +39,10 @@
 #include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 
-class ZED3D11VertexBuffer : public ZEGRVertexBuffer, public ZED3D11ComponentBase
+class ZED3D11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 {
 	friend class ZED3D11GraphicsDevice;
 	friend class ZED3D11GraphicsModule;

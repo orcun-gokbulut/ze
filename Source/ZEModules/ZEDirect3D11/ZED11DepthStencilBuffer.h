@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11IndexBuffer.h
+ Zinek Engine - ZED11DepthStencilBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_INDEX_BUFFER_H__
-#define __ZE_D3D11_INDEX_BUFFER_H__
+#pragma once
 
-#include <d3d11.h>
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZED11ComponentBase.h"
 
 #include "ZETypes.h"
-#include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEGRIndexBuffer.h"
 
-class ZED3D11IndexBuffer : public ZEGRIndexBuffer, public ZED3D11ComponentBase
+struct ID3D11DepthStencilView;
+struct ID3D11Texture2D;
+
+class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsDevice;
-	friend class ZED3D11GraphicsModule;
-	
-	protected:	
-		ID3D11Buffer*			D3D10Buffer;
+	protected:
+		ID3D11Texture2D*				Texture;
+		ID3D11DepthStencilView*			View;
 
-		bool					UpdateWith(ZEUInt ShadowIndex);
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format);
 
-								ZED3D11IndexBuffer();
-								~ZED3D11IndexBuffer();
+										ZED11DepthStencilBuffer();
+		virtual							~ZED11DepthStencilBuffer();
 
 	public:
-		const ID3D11Buffer*		GetD3D10Buffer() const;
-
-		bool					CreateDynamic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData = NULL);
-		bool					CreateStatic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData);
+		const ID3D11Texture2D*			GetTexture() const;
+		const ID3D11DepthStencilView*	GetView() const;
 };
-
-#endif

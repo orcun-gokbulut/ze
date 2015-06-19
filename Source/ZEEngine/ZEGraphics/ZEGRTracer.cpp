@@ -35,49 +35,57 @@
 
 #include "ZEGRTracer.h"
 
-void ZEGRTracer::SetName(const char* Name)
-{
-	this->Name = Name;
-}
-
-const char* ZEGRTracer::GetName()
-{
-	return Name;
-}
-
-bool ZEGRTracer::IsStarted()
-{
-	return Started;
-}
-
-void ZEGRTracer::Start()
-{
-	#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
-	if (!IsStarted())
-		ZEGraphicsEventTracer::GetInstance()->StartEvent(Name);
-	#endif
-}
-
-void ZEGRTracer::End()
-{
-	#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
-	if (IsStarted())
-		ZEGraphicsEventTracer::GetInstance()->EndEvent(Name);
-	#endif
-}
+#include "ZEError.h"
+#include "ZEGRGraphicsModule.h"
 
 ZEGRTracer::ZEGRTracer()
 {
-	Started = false;
-}
-
-ZEGRTracer::ZEGRTracer(const char* Name)
-{
-	Started = false;
-	SetName(Name);
+	Enabled = true;
+	EventCount = 0;
 }
 
 ZEGRTracer::~ZEGRTracer()
 {
-	End();
+
+}
+
+void ZEGRTracer::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEGRTracer::GetEnabled()
+{
+	return Enabled;
+}
+
+void ZEGRTracer::StartFrame()
+{
+	zeDebugCheck(EventCount != 0, "There are still tracer events left open in previous frame.");
+}
+
+void ZEGRTracer::StartEvent(const char* EventName)
+{
+	EventCount++;
+}
+
+void ZEGRTracer::Mark(const char* MakerName)
+{
+
+}
+
+void ZEGRTracer::EndEvent()
+{
+	zeDebugCheck(EventCount == 0, "No started event available.");
+	EventCount--;
+}
+
+void ZEGRTracer::EndFrame()
+{
+	zeDebugCheck(EventCount != 0, "There are still tracer events left open in this frame.");
+}
+
+ZEGRTracer* ZEGRTracer::GetInstance()
+{
+	return ZEGRGraphicsModule::GetTracer();
 }

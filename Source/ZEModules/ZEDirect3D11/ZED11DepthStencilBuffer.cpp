@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11DepthStencilBuffer.cpp
+ Zinek Engine - ZED11DepthStencilBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,50 +37,42 @@
 
 #include "ZEError.h"
 #include "ZED3D11GraphicsModule.h"
-#include "ZED3D11DepthStencilBuffer.h"
+#include "ZED11DepthStencilBuffer.h"
 
-inline static DXGI_FORMAT ConvertPixelFormat(ZEDepthStencilPixelFormat Format)
+inline static DXGI_FORMAT ConvertFormat(ZEGRDepthStencilFormat Format)
 {
-	DXGI_FORMAT DXGIFormat = DXGI_FORMAT_UNKNOWN;
 	switch(Format)
 	{
-		case ZE_DSPF_NOTSET:
-			DXGIFormat = DXGI_FORMAT_UNKNOWN;
-			break;
-		case ZE_DSPF_DEPTH16:
-			DXGIFormat = DXGI_FORMAT_D16_UNORM;
-			break;
-		case ZE_DSPF_DEPTH24_STENCIL8:
-			DXGIFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-			break;
-		case ZE_DSPF_DEPTHD32_FLOAT:
-			DXGIFormat = DXGI_FORMAT_D32_FLOAT;
-			break;
+		default:
+		case ZEGR_DSF_NONE:
+			return DXGI_FORMAT_UNKNOWN;
+
+		case ZEGR_DSF_DEPTH16:
+			return DXGI_FORMAT_D16_UNORM;
+
+		case ZEGR_DSF_DEPTH24_STENCIL8:
+			return DXGI_FORMAT_D24_UNORM_S8_UINT;
+
+		case ZEGR_DSF_DEPTHD32_FLOAT:
+			return DXGI_FORMAT_D32_FLOAT;
 	}
-	return DXGIFormat;
 }
 
-const ID3D11Texture2D* ZED3D11DepthStencilBuffer::GetD3D10DepthTexture() const
+const ID3D11Texture2D* ZED11DepthStencilBuffer::GetTexture() const
 {
-	return D3D10DepthTexture;
+	return Texture;
 }
 
-const ID3D11DepthStencilView* ZED3D11DepthStencilBuffer::GetD3D10DepthStencilView() const
+const ID3D11DepthStencilView* ZED11DepthStencilBuffer::GetView() const
 {
-	return D3D10DepthStencilView;
+	return View;
 }
 
-bool ZED3D11DepthStencilBuffer::IsEmpty() const
+bool ZED11DepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format)
 {
-	return D3D10DepthStencilView == NULL;
-}
-
-bool ZED3D11DepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat)
-{
-	zeDebugCheck(Width == 0, "Width cannot be zero");
-	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(!IsEmpty(), "Depth stencil buffer alread created");
-	zeDebugCheck(PixelFormat == ZE_DSPF_NOTSET, "PixelFormat must be valid");
+	zeDebugCheck(Width == 0, "Width cannot be zero.");
+	zeDebugCheck(Height == 0, "Height cannot be zero.");
+	zeDebugCheck(ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, "Unknown depth stencil format.");
 	zeDebugCheck(Width > 8191 || Height > 8191, "Depth stencil buffer dimensions exceeds the limits, 0-8191.");
 
 	D3D11_TEXTURE2D_DESC DepthStencilDesc;
@@ -88,7 +80,7 @@ bool ZED3D11DepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStenc
 	DepthStencilDesc.MipLevels = 1;
 	DepthStencilDesc.Width = Width;
 	DepthStencilDesc.Height = Height;
-	DepthStencilDesc.Format = ConvertPixelFormat(PixelFormat);
+	DepthStencilDesc.Format = ConvertFormat(Format);
 	DepthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	DepthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	DepthStencilDesc.CPUAccessFlags = 0;
@@ -96,48 +88,40 @@ bool ZED3D11DepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEDepthStenc
 	DepthStencilDesc.SampleDesc.Count = 1;
 	DepthStencilDesc.SampleDesc.Quality = 0;
 
-	// Create depth stencil texture
-	HRESULT Result = D3DDevices[0]->CreateTexture2D(&DepthStencilDesc, NULL, &D3D10DepthTexture);
+	HRESULT Result = GetDevice()->CreateTexture2D(&DepthStencilDesc, NULL, &Texture);
 	if(FAILED(Result))
 	{
-		zeError("D3D10 depth stencil texture creation failed. ErrorCode: %d.", Result);
+		zeError("Depth stencil texture creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 
-	// Create depth stencil view
 	D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
 	DepthStencilViewDesc.Format = DepthStencilDesc.Format;
 	DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
 	DepthStencilViewDesc.Texture2D.MipSlice = 0;
 	DepthStencilViewDesc.Flags = 0;
 
-	Result = D3DDevices[0]->CreateDepthStencilView(D3D10DepthTexture, &DepthStencilViewDesc, &D3D10DepthStencilView);
+	Result = GetDevice()->CreateDepthStencilView(Texture, &DepthStencilViewDesc, &View);
 	if (FAILED(Result))
 	{	
-		zeError("D3D10 depth stencil view creation failed. ErrorCode: %d.", Result);
-		
-		ZED3D_RELEASE(D3D10DepthTexture);
+		zeError("Depth stencil view creation failed. ErrorCode: %d.", Result);	
+		ZEGR_RELEASE(Texture);
 		return false;
 	}
 
-	if (!ZEDepthStencilBuffer::Create(Width, Height, PixelFormat))
-	{
-		zeError("Cannot create depth buffer");
-		ZED3D_RELEASE(D3D10DepthStencilView);
-		ZED3D_RELEASE(D3D10DepthTexture);
-	}
+	SetSize(SizeofFormat(Format) * Width * Height);
 
-	return true;
+	return ZEGRDepthStencilBuffer::Initialize(Width, Height, Format);
 }
 
-ZED3D11DepthStencilBuffer::ZED3D11DepthStencilBuffer()
+ZED11DepthStencilBuffer::ZED11DepthStencilBuffer()
 {
-	D3D10DepthTexture = NULL;
-	D3D10DepthStencilView = NULL;
+	Texture = NULL;
+	View = NULL;
 }
 
-ZED3D11DepthStencilBuffer::~ZED3D11DepthStencilBuffer()
+ZED11DepthStencilBuffer::~ZED11DepthStencilBuffer()
 {
-	ZED3D_RELEASE(D3D10DepthStencilView);
-	ZED3D_RELEASE(D3D10DepthTexture);
+	ZEGR_RELEASE(View);
+	ZEGR_RELEASE(Texture);
 }

@@ -47,12 +47,17 @@ void ZEGRResource::Destroy()
 	delete this;
 }
 
-ZESize ZEGRResource::GetSize()
+void ZEGRResource::SetSize(ZESize Size)
+{
+	this->Size = Size;
+}
+
+ZESize ZEGRResource::GetSize() const
 {
 	return Size;
 }
 
-ZESize ZEGRResource::GetReferenceCount()
+ZESize ZEGRResource::GetReferenceCount() const
 {
 	return ReferenceCount;
 }

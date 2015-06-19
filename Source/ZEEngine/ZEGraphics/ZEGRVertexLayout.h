@@ -78,18 +78,19 @@ struct ZEGRVertexElement
 	ZEUInt16						InstanceCount;
 };
 
-class ZEGRVertexLayout : public ZEGRResource, public ZEGRState
+class ZEGRVertexLayout : public ZEGRState
 {
 	private:
 		struct ZEVertexLayoutData
 		{
-			ZEUInt					ElementCount;
+			ZEUInt8					ElementCount;
 			ZEGRVertexElement		Elements[ZEGR_MAX_VERTEX_LAYOUT_ELEMENT];		
 		
 		} StateData;
 
 	public:
 		void						SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount);
+		
 		ZEUInt						GetElementCount() const;
 		const ZEGRVertexElement*	GetElements() const;
 		

@@ -48,7 +48,7 @@ class ZEGRRenderTarget : public ZEGRResource
 		ZEUInt						Depth;
 		ZEGRTextureFormat			Format;
 
-									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat PixelFormat);
+									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat Format);
 		virtual						~ZEGRRenderTarget();
 
 	public:

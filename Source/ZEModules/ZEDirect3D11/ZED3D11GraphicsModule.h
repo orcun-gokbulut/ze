@@ -52,18 +52,9 @@ class ZEGRIndexBuffer;
 class ZEGRVertexBuffer;
 class ZEGRShaderCompiler;
 class ZEGRDevice;
-class ZEDepthStencilBuffer;
+class ZEGRDepthStencilBuffer;
 class ZEGraphicsEventTracer;
 class ZED3D11GraphicsDevice;
-
-#define ZED3D_RELEASE(x)	\
-{							\
-	if ((x) != NULL)		\
-	{						\
-		(x)->Release();		\
-		(x) = NULL;			\
-	}						\
-}
 
 #define ZE_MAX_MULTI_SAMPLE_COUNT		D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT
 #define ZE_MAX_ANISOTROPY_LEVEL			D3D11_MAX_MAXANISOTROPY
@@ -110,12 +101,12 @@ class ZED3D11GraphicsModule : public ZEGRGraphicsModule
 
 		virtual ZEGRTexture2D*					CreateTexture2D();
 		virtual ZEGRTexture3D*					CreateTexture3D();
-		virtual ZEGRTextureCube*					CreateTextureCube();
-		virtual ZEGRIndexBuffer*					CreateIndexBuffer();
-		virtual ZEGRVertexBuffer*					CreateVertexBuffer();
-		virtual ZEGRWindow*				CreateGraphicsWindow();
-		virtual ZEConstantBuffer*				CreateConstantBuffer();
-		virtual ZEDepthStencilBuffer*			CreateDepthStencilBuffer();
+		virtual ZEGRTextureCube*				CreateTextureCube();
+		virtual ZEGRIndexBuffer*				CreateIndexBuffer();
+		virtual ZEGRVertexBuffer*				CreateVertexBuffer();
+		virtual ZEGRWindow*						CreateGraphicsWindow();
+		virtual ZEGRConstantBuffer*				CreateConstantBuffer();
+		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer();
 		
 		ID3D11Device*							GetD3D10Device(ZESize Index = 0) const;
 		const ZEArray<ID3D11Device*>&			GetD3D10Devices() const;

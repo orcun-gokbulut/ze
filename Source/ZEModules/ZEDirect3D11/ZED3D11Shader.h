@@ -40,7 +40,7 @@
 
 #include "ZETypes.h"
 #include "ZEGraphics/ZEGRShader.h"
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 
 class ZED3D11Shader : public ZEGRShader
 {
@@ -59,7 +59,7 @@ class ZED3D11Shader : public ZEGRShader
 		const ID3DBlob*				GetD3D10ByteCode();
 };
 
-class ZED3D11PixelShader : public ZED3D11Shader, private ZED3D11ComponentBase
+class ZED3D11PixelShader : public ZED3D11Shader, private ZED11ComponentBase
 {
 	friend class ZED3D11ShaderCompiler;
 	friend class ZED3D11GraphicsDevice;
@@ -77,7 +77,7 @@ class ZED3D11PixelShader : public ZED3D11Shader, private ZED3D11ComponentBase
 
 };
 
-class ZED3D11VertexShader : public ZED3D11Shader, private ZED3D11ComponentBase
+class ZED3D11VertexShader : public ZED3D11Shader, private ZED11ComponentBase
 {
 	friend class ZED3D11ShaderCompiler;
 	friend class ZED3D11GraphicsDevice;
@@ -94,7 +94,7 @@ class ZED3D11VertexShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		const ID3D11VertexShader*	GetD3D10VertexShader() const;
 };
 
-class ZED3D11GeometryShader : public ZED3D11Shader, private ZED3D11ComponentBase
+class ZED3D11GeometryShader : public ZED3D11Shader, private ZED11ComponentBase
 {
 	friend class ZED3D11ShaderCompiler;
 	friend class ZED3D11GraphicsDevice;
@@ -111,7 +111,7 @@ class ZED3D11GeometryShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		const ID3D11GeometryShader*	GetD3D10GeometryShader() const;
 };
 
-class ZED3D11DomainShader : public ZED3D11Shader, private ZED3D11ComponentBase
+class ZED3D11DomainShader : public ZED3D11Shader, private ZED11ComponentBase
 {
 	friend class ZED3D11ShaderCompiler;
 	friend class ZED3D11GraphicsDevice;
@@ -128,7 +128,7 @@ class ZED3D11DomainShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		const ID3D11DomainShader*	GetD3D10DomainShader() const;
 };
 
-class ZED3D11HullShader : public ZED3D11Shader, private ZED3D11ComponentBase
+class ZED3D11HullShader : public ZED3D11Shader, private ZED11ComponentBase
 {
 	friend class ZED3D11ShaderCompiler;
 	friend class ZED3D11GraphicsDevice;
@@ -145,7 +145,7 @@ class ZED3D11HullShader : public ZED3D11Shader, private ZED3D11ComponentBase
 		const ID3D11HullShader*		GetD3D10HullShader() const;
 };
 
-class ZED3D11ComputeShader : public ZED3D11Shader, private ZED3D11ComponentBase
+class ZED3D11ComputeShader : public ZED3D11Shader, private ZED11ComponentBase
 {
 	friend class ZED3D11ShaderCompiler;
 	friend class ZED3D11GraphicsDevice;

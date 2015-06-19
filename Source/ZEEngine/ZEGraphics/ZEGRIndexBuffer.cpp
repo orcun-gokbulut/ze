@@ -36,24 +36,46 @@
 #include "ZEGRIndexBuffer.h"
 
 #include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGRCounter.h"
+
+inline ZESize SizeOfIndex(ZEGRIndexBufferFormat Format)
+{
+	switch(Format)
+	{
+		default:
+		case ZEGR_IBF_NONE:
+			return 0;
+
+		case ZEGR_IBF_INDEX16:
+			return sizeof(ZEUInt16);
+
+		case ZEGR_IBF_INDEX32:
+			return sizeof(ZEUInt32);
+	}
+}
+
+bool ZEGRIndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+{
+	zeDebugCheck(SizeOfIndex(Format), "Invalid Index buffer format.");
+
+	this->IndexCount = IndexCount;
+	this->Format = Format;
+
+	SetSize(IndexCount * SizeOfIndex(Format));
+
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, IndexBuffer, Geometry);
+
+	return true;
+}
 
 ZEGRResourceType ZEGRIndexBuffer::GetResourceType() const
 {
-	return ZEGR_RT_BUFFER;
+	return ZEGR_RT_INDEX_BUFFER;
 }
 
 ZESize ZEGRIndexBuffer::GetIndexCount() const
 {
-	switch(Format)
-	{
-		case ZEGR_IBF_INDEX16:
-			return Size / sizeof(ZEUInt16);
-
-		case ZEGR_IBF_INDEX32:
-			return Size / sizeof(ZEUInt32);
-	}
-
-	return 0;
+	return IndexCount;
 }
 
 ZEGRIndexBufferFormat ZEGRIndexBuffer::GetFormat() const
@@ -68,10 +90,17 @@ ZEGRIndexBuffer::ZEGRIndexBuffer()
 
 ZEGRIndexBuffer::~ZEGRIndexBuffer()
 {
-
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, IndexBuffer, Geometry);
 }
 
-ZEGRIndexBuffer* ZEGRIndexBuffer::CreateInstance()
+ZEGRIndexBuffer* ZEGRIndexBuffer::Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
 {
-	return ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
+	ZEGRIndexBuffer* IndexBuffer = ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
+	if (!IndexBuffer->Initialize(IndexCount, Format))
+	{
+		IndexBuffer->Release();
+		return NULL;
+	}
+
+	return IndexBuffer;
 }

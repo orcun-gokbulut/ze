@@ -38,20 +38,24 @@
 #include "ZETypes.h"
 #include "ZEGRResource.h"
 
-enum ZEGRDepthStencilPixelFormat
+enum ZEGRDepthStencilFormat
 {
-	ZEGR_DSPF_NONE				= 0,
-	ZEGR_DSPF_DEPTH16			= 1,
-	ZEGR_DSPF_DEPTH24_STENCIL8	= 2,
-	ZEGR_DSPF_DEPTHD32_FLOAT	= 3,
+	ZEGR_DSF_NONE				= 0,
+	ZEGR_DSF_DEPTH16			= 1,
+	ZEGR_DSF_DEPTH24_STENCIL8	= 2,
+	ZEGR_DSF_DEPTHD32_FLOAT		= 3,
 };
 
 class ZEGRDepthStencilBuffer : public ZEGRResource
 {
-	protected:
+	private:
 		ZEUInt							Width;
 		ZEUInt							Height;
-		ZEGRDepthStencilPixelFormat		Format;
+		ZEGRDepthStencilFormat			Format;
+
+	protected:	
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format);
+		virtual void					Deinitialize();
 
 										ZEGRDepthStencilBuffer();
 		virtual							~ZEGRDepthStencilBuffer();
@@ -59,9 +63,7 @@ class ZEGRDepthStencilBuffer : public ZEGRResource
 	public:
 		ZEUInt							GetWidth() const;
 		ZEUInt							GetHeight() const;
-		ZEGRDepthStencilPixelFormat		GetFormat() const;
+		ZEGRDepthStencilFormat			GetFormat() const;
 
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilPixelFormat Format) = 0;
-
-		static ZEGRDepthStencilBuffer*	CreateInstance();
+		static ZEGRDepthStencilBuffer*	Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format);
 };

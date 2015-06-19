@@ -39,13 +39,13 @@
 #include "ZED3D11Texture2D.h"
 #include "ZED3D11Texture3D.h"
 #include "ZED3D11TextureCube.h"
-#include "ZED3D11IndexBuffer.h"
+#include "ZED11IndexBuffer.h"
 #include "ZED3D11RenderTarget.h"
 #include "ZED3D11VertexBuffer.h"
 #include "ZED3D11GraphicsDevice.h"
 #include "ZED3D11GraphicsModule.h"
-#include "ZED3D11ConstantBuffer.h"
-#include "ZED3D11DepthStencilBuffer.h"
+#include "ZED11ConstantBuffer.h"
+#include "ZED11DepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
 
 inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEGRIndexBufferFormat BufferFormat)
@@ -110,7 +110,7 @@ void ZED3D11GraphicsDevice::ApplyInputStates()
 	}
 	
 	if (CurrentState.IndexBuffer != NULL)
-		((ZED3D11IndexBuffer*)CurrentState.IndexBuffer)->UpdateWith(0);
+		((ZED11IndexBuffer*)CurrentState.IndexBuffer)->UpdateWith(0);
 
 	if (CurrentState.IndexBuffer != OldState.IndexBuffer)
 	{
@@ -119,7 +119,7 @@ void ZED3D11GraphicsDevice::ApplyInputStates()
 		
 		if (CurrentState.IndexBuffer != NULL)
 		{
-			D3D10IndexBuffer = ((const ZED3D11IndexBuffer*)CurrentState.IndexBuffer)->D3D10Buffer;
+			D3D10IndexBuffer = ((const ZED11IndexBuffer*)CurrentState.IndexBuffer)->D3D10Buffer;
 			D3D10Format = ZEIndexBufferFormatToD3D10(CurrentState.IndexBuffer->GetFormat());
 		}
 
@@ -176,11 +176,11 @@ void ZED3D11GraphicsDevice::ApplyVertexShaderStates()
 		ID3D11Buffer* D3D10Buffer = NULL;
 		
 		if (CurrentState.VertexShaderBuffers[I] != NULL)
-			((ZED3D11ConstantBuffer*)CurrentState.VertexShaderBuffers[I])->UpdateWith(0);
+			((ZED11ConstantBuffer*)CurrentState.VertexShaderBuffers[I])->UpdateWith(0);
 	
 		if (CurrentState.VertexShaderBuffers[I] != OldState.VertexShaderBuffers[I])
 		{
-			D3D10Buffer = CurrentState.VertexShaderBuffers[I] == NULL ? NULL : ((ZED3D11ConstantBuffer*)CurrentState.VertexShaderBuffers[I])->D3D10Buffer;
+			D3D10Buffer = CurrentState.VertexShaderBuffers[I] == NULL ? NULL : ((ZED11ConstantBuffer*)CurrentState.VertexShaderBuffers[I])->Buffer;
 			
 			OldState.VertexShaderBuffers[I] = CurrentState.VertexShaderBuffers[I];
 			D3DContexes[ContextIndex]->VSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
@@ -254,11 +254,11 @@ void ZED3D11GraphicsDevice::ApplyGeometryShaderStates()
 	for (ZESize I = 0; I < ZE_MAX_CONSTANT_BUFFER_SLOT; ++I)
 	{		
 		if (CurrentState.GeometryShaderBuffers[I] != NULL)
-			((ZED3D11ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->UpdateWith(0);
+			((ZED11ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->UpdateWith(0);
 
 		if (CurrentState.GeometryShaderBuffers[I] != OldState.GeometryShaderBuffers[I])
 		{
-			ID3D11Buffer* D3D10Buffer = CurrentState.GeometryShaderBuffers[I] == NULL ? NULL : ((ZED3D11ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->D3D10Buffer;
+			ID3D11Buffer* D3D10Buffer = CurrentState.GeometryShaderBuffers[I] == NULL ? NULL : ((ZED11ConstantBuffer*)CurrentState.GeometryShaderBuffers[I])->Buffer;
 			
 			OldState.GeometryShaderBuffers[I] = CurrentState.GeometryShaderBuffers[I];
 			D3DContexes[ContextIndex]->GSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
@@ -396,11 +396,11 @@ void ZED3D11GraphicsDevice::ApplyPixelShaderStates()
 	for (ZESize I = 0; I < ZE_MAX_CONSTANT_BUFFER_SLOT; ++I)
 	{
 		if (CurrentState.PixelShaderBuffers[I] != NULL)
-			((ZED3D11ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->UpdateWith(0);
+			((ZED11ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->UpdateWith(0);
 
 		if (CurrentState.PixelShaderBuffers[I] != OldState.PixelShaderBuffers[I])
 		{
-			ID3D11Buffer* D3D10Buffer = CurrentState.PixelShaderBuffers[I] == NULL ? NULL : ((ZED3D11ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->D3D10Buffer;
+			ID3D11Buffer* D3D10Buffer = CurrentState.PixelShaderBuffers[I] == NULL ? NULL : ((ZED11ConstantBuffer*)CurrentState.PixelShaderBuffers[I])->Buffer;
 			
 			OldState.PixelShaderBuffers[I] = CurrentState.PixelShaderBuffers[I];
 			D3DContexes[ContextIndex]->PSSetConstantBuffers((UINT)I, 1, &D3D10Buffer);
@@ -464,7 +464,7 @@ void ZED3D11GraphicsDevice::ApplyOutputStates()
 	ID3D11DepthStencilView* D3D10DepthStencil = NULL;
 	ID3D11RenderTargetView* D3D10Targets[ZE_MAX_RENDER_TARGET_SLOT] = {NULL};
 
-	D3D10DepthStencil = CurrentState.DepthStencilBuffer == NULL ? NULL : ((const ZED3D11DepthStencilBuffer*)CurrentState.DepthStencilBuffer)->D3D10DepthStencilView;
+	D3D10DepthStencil = CurrentState.DepthStencilBuffer == NULL ? NULL : ((const ZED11DepthStencilBuffer*)CurrentState.DepthStencilBuffer)->D3D10DepthStencilView;
 
 	if (OldState.DepthStencilBuffer != CurrentState.DepthStencilBuffer)
 	{
@@ -583,13 +583,13 @@ void ZED3D11GraphicsDevice::ClearRenderTarget(const ZEGRRenderTarget* RenderTarg
 	D3DContexes[ContextIndex]->ClearRenderTargetView(((ZED3D11RenderTarget*)RenderTarget)->D3D10RenderTargetView, ClearColor.M);
 }
 
-void ZED3D11GraphicsDevice::ClearDepthStencilBuffer(const ZEDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
+void ZED3D11GraphicsDevice::ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
 {
 	UINT ClearFlag = 0;
 	ClearFlag |= Depth ? D3D11_CLEAR_DEPTH : 0;
 	ClearFlag |= Stencil ? D3D11_CLEAR_STENCIL : 0;
 
-	D3DContexes[ContextIndex]->ClearDepthStencilView(((ZED3D11DepthStencilBuffer*)DepthStencil)->D3D10DepthStencilView, ClearFlag, DepthValue, StencilValue);
+	D3DContexes[ContextIndex]->ClearDepthStencilView(((ZED11DepthStencilBuffer*)DepthStencil)->View, ClearFlag, DepthValue, StencilValue);
 }
 
 D3D_FEATURE_LEVEL ZED3D11GraphicsDevice::GetD3DFeatureLevel() const

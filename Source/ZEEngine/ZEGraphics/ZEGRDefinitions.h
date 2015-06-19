@@ -85,3 +85,5 @@ enum ZEGRShaderType
 #define	ZEGR_CM_ALPHA			0x8
 #define ZEGR_CM_ALL				ZEGR_CM_RED | ZEGR_CM_GREEN | ZEGR_CM_BLUE | ZEGR_CM_ALPHA
 typedef ZEFlagsBase<ZEUInt8>	ZEGRColorMask;
+
+#define ZEGR_RELEASE(x) {if ((x) != NULL) {(x)->Release(); (x) = NULL;}}

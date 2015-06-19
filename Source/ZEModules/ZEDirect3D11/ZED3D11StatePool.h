@@ -42,7 +42,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEList.h"
 #include "ZEDS/ZEArray.h"
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZED3D11GraphicsModule.h"
 #include "ZEGraphics/ZEStatePool.h"
 
@@ -83,7 +83,7 @@ class ZEBlendStateEntry : public ZEStatePoolEntry
 		}
 		virtual ~ZEBlendStateEntry()
 		{
-			ZED3D_RELEASE(BlendState);
+			ZEGR_RELEASE(BlendState);
 		}
 };
 
@@ -102,7 +102,7 @@ class ZESamplerStateEntry : public ZEStatePoolEntry
 		}
 		virtual ~ZESamplerStateEntry()
 		{
-			ZED3D_RELEASE(SamplerState);
+			ZEGR_RELEASE(SamplerState);
 		}
 };
 
@@ -121,7 +121,7 @@ class ZERasterizerStateEntry : public ZEStatePoolEntry
 		}
 		virtual ~ZERasterizerStateEntry()
 		{
-			ZED3D_RELEASE(RasterizerState);
+			ZEGR_RELEASE(RasterizerState);
 		}
 };
 
@@ -140,7 +140,7 @@ class ZEDepthStencilStateEntry : public ZEStatePoolEntry
 		}
 		virtual ~ZEDepthStencilStateEntry()
 		{
-			ZED3D_RELEASE(DepthStencilState);
+			ZEGR_RELEASE(DepthStencilState);
 		}
 };
 
@@ -159,7 +159,7 @@ class ZEVertexLayoutEntry : public ZEStatePoolEntry
 		}
 		virtual ~ZEVertexLayoutEntry()
 		{
-			ZED3D_RELEASE(VertexLayout);
+			ZEGR_RELEASE(VertexLayout);
 		}
 };
 
@@ -170,7 +170,7 @@ class ZESamplerState;
 class ZERasterizerState;
 class ZEDepthStencilState;
 
-class ZED3D11StatePool : public ZEStatePool, public ZED3D11ComponentBase
+class ZED3D11StatePool : public ZEStatePool, public ZED11ComponentBase
 {
 	friend class ZED3D11GraphicsModule;
 
