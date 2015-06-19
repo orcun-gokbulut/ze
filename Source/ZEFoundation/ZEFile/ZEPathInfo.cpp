@@ -211,11 +211,15 @@ ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 	for (ZESize I = 0; I < ParentPathTokens.GetTokenCount(); I++)
 	{
 		const char* ParentToken = ParentPathTokens.GetToken(I);
-		if (ParentToken == NULL)
-			continue;
+		const char* PathToken = PathTokens.GetToken(I);
+		if (ParentToken != PathToken)
+		{
+			for (ZESize N = 0; N <= I; N++)
+				ParentPathTokens.SetToken(N, NULL);
+		}
 	}
 
-	PathTokens.Combine();
+	ParentPathTokens.Combine();
 
 	return PathTokens.GetOutput();
 }
