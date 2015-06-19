@@ -49,7 +49,7 @@ class ZEGRTexture3D;
 class ZEStatePool;
 class ZEGRTextureCube;
 class ZEGRIndexBuffer;
-class ZEVertexBuffer;
+class ZEGRVertexBuffer;
 class ZEGRShaderCompiler;
 class ZEGRDevice;
 class ZEDepthStencilBuffer;
@@ -112,7 +112,7 @@ class ZED3D11GraphicsModule : public ZEGRGraphicsModule
 		virtual ZEGRTexture3D*					CreateTexture3D();
 		virtual ZEGRTextureCube*					CreateTextureCube();
 		virtual ZEGRIndexBuffer*					CreateIndexBuffer();
-		virtual ZEVertexBuffer*					CreateVertexBuffer();
+		virtual ZEGRVertexBuffer*					CreateVertexBuffer();
 		virtual ZEGRWindow*				CreateGraphicsWindow();
 		virtual ZEConstantBuffer*				CreateConstantBuffer();
 		virtual ZEDepthStencilBuffer*			CreateDepthStencilBuffer();

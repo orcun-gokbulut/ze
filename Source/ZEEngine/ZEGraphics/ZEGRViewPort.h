@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEViewPort.h
+ Zinek Engine - ZEGRViewPort.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -41,7 +41,7 @@
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 
-class ZEViewport
+class ZEGRViewport
 {
 	public:
 		struct ZEViewportData
@@ -59,8 +59,8 @@ class ZEViewport
 		ZEGRRenderTarget*				GetRenderTarget();
 		ZEGRDepthStencilBuffer*			GetDepthStencilBuffer();
 
-										ZEViewport();
-										~ZEViewport();
+										ZEGRViewport();
+										~ZEGRViewport();
 };
 
 #endif

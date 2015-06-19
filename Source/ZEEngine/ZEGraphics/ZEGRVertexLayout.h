@@ -35,10 +35,12 @@
 
 #pragma once
 
+#include "ZEGRResource.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGRState.h"
 #include "ZEGRDefinitions.h"
+#include "ZEGRState.h"
 
 struct ZEGRShaderMeta;
 
@@ -76,7 +78,7 @@ struct ZEGRVertexElement
 	ZEUInt16						InstanceCount;
 };
 
-class ZEGRVertexLayout : public ZEGRState
+class ZEGRVertexLayout : public ZEGRResource, public ZEGRState
 {
 	private:
 		struct ZEVertexLayoutData

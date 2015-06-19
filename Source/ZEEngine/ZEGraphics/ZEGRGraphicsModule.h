@@ -42,6 +42,7 @@
 #include "ZEGRDeviceState.h"
 #include "ZECore/ZEOptionSection.h"
 #include "ZETexture/ZETextureOptions.h"
+#include "ZEGRStatistics.h"
 
 class ZEGRRenderState;
 class ZEGRTexture2D;
@@ -55,7 +56,6 @@ class ZEGRWindow;
 class ZEGRShader;
 class ZEGRShaderCompiler;
 class ZEGRConstantBuffer;
-class ZEGRStatistics;
 
 class ZEGRGraphicsModule : public ZEModule
 {
@@ -67,6 +67,8 @@ class ZEGRGraphicsModule : public ZEModule
 		ZEArray<ZEGRWindow*>				Windows;
 		ZEArray<ZEGRMonitor*>				Monitors;
 		ZEArray<ZEGRDevice*>				Devices;
+
+		ZEGRStatistics						Statistics;
 
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
@@ -88,16 +90,17 @@ class ZEGRGraphicsModule : public ZEModule
 		const ZEArray<ZEGRMonitor*>&		GetMonitors() const;
 		const ZEArray<ZEGRDevice*>&			GetDevices() const;
 
-		virtual ZEGRWindow*					CreateGraphicsWindow() = 0;
-		virtual ZEGRDevice*					CreateContext();
+		virtual ZEGRDevice*					CreateContext() = 0;
+		virtual ZEGRDeviceState*			CreateDeviceState() = 0;
+		virtual ZEGRVertexBuffer*			CreateVertexBuffer() = 0;
+		virtual ZEGRIndexBuffer*			CreateIndexBuffer() = 0;
+		virtual ZEGRConstantBuffer*			CreateConstantBuffer() = 0;
 		virtual ZEGRTexture2D*				CreateTexture2D() = 0;
 		virtual ZEGRTexture3D*				CreateTexture3D() = 0;
 		virtual ZEGRTextureCube*			CreateTextureCube() = 0;
-		virtual ZEGRIndexBuffer*			CreateIndexBuffer() = 0;
-		virtual ZEVertexBuffer*				CreateVertexBuffer() = 0;
-		virtual ZEGRConstantBuffer*			CreateConstantBuffer() = 0;
 		virtual ZEGRDepthStencilBuffer*		CreateDepthStencilBuffer() = 0;
 		virtual ZEGRShaderCompiler*			CreateShaderCompiler() = 0;
+		virtual ZEGRWindow*					CreateGraphicsWindow() = 0;
 
 		const ZEGRStatistics&				GetStatistics() const;
 

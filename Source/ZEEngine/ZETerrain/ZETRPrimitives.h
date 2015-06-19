@@ -73,7 +73,7 @@ struct ZETRPrimitiveRange
 	ZESize							PositiveExtent2EndOffset;
 };
 
-class ZEVertexBuffer;
+class ZEGRVertexBuffer;
 class ZEStaticVertexBuffer;
 class ZEVertexDeclaration;
 
@@ -96,7 +96,7 @@ class ZETRPrimitiveBuffer : public ZEInitializable
 		void						SetPrimitiveSize(ZEUInt Size);
 		ZEUInt						GetPrimitiveSize();
 
-		ZEVertexBuffer*				GetVertexBuffer();
+		ZEGRVertexBuffer*			GetVertexBuffer();
 		ZEVertexDeclaration*		GetVertexDeclaration();
 		ZETRPrimitive				GetPrimitive(ZETRPrimitiveType Type, ZEInt Negative, ZEInt Positive);
 

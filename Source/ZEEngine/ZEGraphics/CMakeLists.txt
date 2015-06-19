@@ -42,7 +42,7 @@ ze_add_source(ZEGRDevice.h					Sources Headers)
 ze_add_source(ZEGRDeviceState.cpp			Sources)
 ze_add_source(ZEGRDeviceState.h				Sources Headers)
 ze_add_source(ZEGRStatistics.cpp			Source)
-ze_add_source(ZEGRStatistics.h				Source Headers)
+ze_add_source(ZEGRStatistics.h				Sources Headers)
 
 ze_add_source(ZEGRDefinitions.cpp			Sources)
 ze_add_source(ZEGRDefinitions.h				Sources Headers)
@@ -62,6 +62,9 @@ ze_add_source(ZEGRVertexLayout.h			Sources Headers)
 
 ze_add_source(ZEGRResource.cpp				Sources)
 ze_add_source(ZEGRResource.h				Sources Headers)
+ze_add_source(ZEGRHolder.cpp				Sources)
+ze_add_source(ZEGRHolder.h					Sources Headers)
+
 ze_add_source(ZEGRIndexBuffer.cpp 			Sources)
 ze_add_source(ZEGRIndexBuffer.h 			Sources Headers)
 ze_add_source(ZEGRVertexBuffer.cpp 			Sources)

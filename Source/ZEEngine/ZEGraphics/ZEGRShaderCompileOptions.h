@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEShaderCompileOptions.h
+ Zinek Engine - ZEGRShaderCompileOptions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,31 +35,13 @@
 
 #pragma once
 
+#include "ZEGRDefinitions.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 
 struct ZEGRShaderMeta;
-
-enum ZEGRShaderModel
-{
-	ZEGR_SM_NONE	= 0,
-	ZEGR_SM_3_0		= 1,
-	ZEGR_SM_4_0		= 2,
-	ZEGR_SM_4_1		= 3,
-	ZEGR_SM_5_0		= 4
-};
-
-enum ZEGRShaderType
-{
-	ZEGR_ST_NONE		= 0,
-	ZEGR_ST_VERTEX		= 1,
-	ZEGR_ST_PIXEL		= 2,
-	ZEGR_ST_GEOMETRY	= 3,
-	ZEGR_ST_DOMAIN		= 4,
-	ZEGR_ST_HULL		= 5,
-	ZEGR_ST_COMPUTE		= 6
-};
 
 struct ZEGRShaderDefinition
 {

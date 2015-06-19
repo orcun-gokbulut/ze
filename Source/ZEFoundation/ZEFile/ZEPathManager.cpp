@@ -191,6 +191,8 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 			RealPath.Root = ZE_PR_USER_STORAGE;
 			RealPath.Path = Tokenizer.GetOutput();
 		}
+		else
+			RealPath.Path = Tokenizer.GetOutput();
 	}
 
 	return RealPath;

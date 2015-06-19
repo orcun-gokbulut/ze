@@ -56,7 +56,6 @@ struct ZEGRStatisticsMemory
 	ZESize		DepthStancilBufferMemoryUsage;
 	ZESize		TextureMemoryUsage;
 	ZESize		Texture3DMemoryUsage;
-	ZESize		ResourceMemoryUsage;
 	ZESize		Texture2DMemoryUsage;
 	ZESize		TextureCubeMemoryUsage;
 };
@@ -77,9 +76,9 @@ struct ZEGRStatisticsObjects
 
 };
 
-
 class ZEGRStatistics
 {
+	friend ZEGRGraphicsModule;
 	private:
 		ZELock							Lock;
 

@@ -332,7 +332,7 @@ ZEUInt ZETRPrimitiveBuffer::GetPrimitiveSize()
 	return PrimitiveSize;
 }
 
-ZEVertexBuffer* ZETRPrimitiveBuffer::GetVertexBuffer()
+ZEGRVertexBuffer* ZETRPrimitiveBuffer::GetVertexBuffer()
 {
 	return VertexBuffer;
 }

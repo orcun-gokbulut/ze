@@ -386,7 +386,7 @@ ZEConstantBuffer* ZED3D11GraphicsModule::CreateConstantBuffer()
 	return new ZED3D11ConstantBuffer();
 }
 
-ZEVertexBuffer* ZED3D11GraphicsModule::CreateVertexBuffer()
+ZEGRVertexBuffer* ZED3D11GraphicsModule::CreateVertexBuffer()
 {
 	return new ZED3D11VertexBuffer();
 }

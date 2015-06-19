@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDefinitions.cpp
+ Zinek Engine - ZEGRDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -56,6 +56,27 @@
 
 #define	ZEGR_MAX_SHADOW_COPY_COUNT			5
 #define	ZEGR_RENDER_BUFFER_COUNT			2
+
+enum ZEGRShaderModel
+{
+	ZEGR_SM_NONE	= 0,
+	ZEGR_SM_3_0		= 1,
+	ZEGR_SM_4_0		= 2,
+	ZEGR_SM_4_1		= 3,
+	ZEGR_SM_5_0		= 4
+};
+
+#define ZEGR_SHADER_TYPE_COUNT	7
+enum ZEGRShaderType
+{
+	ZEGR_ST_NONE		= 0,
+	ZEGR_ST_VERTEX		= 1,
+	ZEGR_ST_PIXEL		= 2,
+	ZEGR_ST_GEOMETRY	= 3,
+	ZEGR_ST_DOMAIN		= 4,
+	ZEGR_ST_HULL		= 5,
+	ZEGR_ST_COMPUTE		= 6
+};
 
 #define ZEGR_CM_NONE			0x0
 #define	ZEGR_CM_RED				0x1

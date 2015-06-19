@@ -33,52 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath/ZEMath.h"
-#include "ZEDS/ZEHashGenerator.h"
 #include "ZEGRDeviceState.h"
 
-/************************************************************************/
-/*                          ZEGraphicsDeviceState                       */
-/************************************************************************/
+#include "ZEGRGraphicsModule.h"
+
 void ZEGRDeviceState::SetToDefault()
 {
-	IndexBuffer = NULL;
 	VertexLayout = NULL;
-	PixelShader = NULL;
-	VertexShader = NULL;
-	GeometryShader = NULL;
+	memset(VertexBuffers, NULL, sizeof(ZEGRVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
+	IndexBuffer = NULL;
+	
+	memset(Shaders, NULL, sizeof(ZEGRShader*) * ZEGR_SHADER_TYPE_COUNT);
+	memset(ShaderConstantBuffers, NULL, sizeof(ZEGRConstantBuffer*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
+	memset(ShaderTextures, NULL, sizeof(const ZEGRTexture*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
+	memset(ShaderSamplers, 0, sizeof(ZESize) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
+	
 	DepthStencilBuffer = NULL;
+	memset(RenderTargets, NULL, sizeof(const ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
 
-	StencilReferance = 0;
-	ComponentBlendMask = ZEGR_CM_ALL;
-	ComponentBlendFactors = ZEVector4::One;
-	ScreenWriteEnable = false;
+	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
+		BlendState[I].SetToDefault();
 
-	BlendState.SetToDefault();
+	for (ZESize I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
+		ViewPorts[I].SetZero();
+
+	for (ZESize I = 0; I < ZEGR_MAX_SCISSOR_SLOT; I++)
+		ScissorRects[I].SetZero();
+
 	RasterizerState.SetToDefault();
 	DepthStencilState.SetToDefault();
-
-	for (ZESize I = 0; I < ZEGR_MAX_SAMPLER_SLOT; ++I)
-	{
-		VertexShaderSamplers[I].SetToDefault();
-		GeometryShaderSamplers[I].SetToDefault();
-		PixelShaderSamplers[I].SetToDefault();
-	}
-
-	memset(ViewPorts, 0, sizeof(ZEGRScissorRectangle) * ZEGR_MAX_SCISSOR_SLOT);
-	memset(ScissorRects, 0, sizeof(ZEViewport) * ZEGR_MAX_VIEWPORT_SLOT);
-
-	memset(PixelShaderTextures, 0, sizeof(const ZEGRTexture*) * ZEGR_MAX_TEXTURE_SLOT);
-	memset(VertexShaderTextures, 0, sizeof(const ZEGRTexture*) * ZEGR_MAX_TEXTURE_SLOT);
-	memset(GeometryShaderTextures, 0, sizeof(const ZEGRTexture*) * ZEGR_MAX_TEXTURE_SLOT);
-
-	memset(RenderTargets, 0, sizeof(const ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
-
-	memset(VertexBuffers, 0, sizeof(ZEVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
-
-	memset(PixelShaderBuffers, 0, sizeof(ZEGRConstantBuffer*) * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(VertexShaderBuffers, 0, sizeof(ZEGRConstantBuffer*) * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(GeometryShaderBuffers, 0, sizeof(ZEGRConstantBuffer*) * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
 }
 
 ZEGRDeviceState::ZEGRDeviceState()
@@ -91,54 +74,7 @@ ZEGRDeviceState::~ZEGRDeviceState()
 
 }
 
-/************************************************************************/
-/*                      ZEGraphicsDeviceHashState                       */
-/************************************************************************/
-
-void ZEGraphicsDeviceHashState::SetToDefault()
+ZEGRDeviceState* ZEGRDeviceState::CreateInstance()
 {
-	VertexLayoutHash = 0;
-
-	IndexBuffer = NULL;
-	memset(VertexBuffers, NULL, sizeof(ZEVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
-	
-	VertexShader = NULL;
-	memset(VertexShaderBuffers, NULL, sizeof(ZEGRConstantBuffer*) * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(VertexShaderTextures, NULL, sizeof(const ZEGRTexture*) * ZEGR_MAX_TEXTURE_SLOT);
-	memset(VertexShaderSamplerHashes, 0, sizeof(ZESize) * ZEGR_MAX_SAMPLER_SLOT);
-
-	GeometryShader = NULL;
-	memset(GeometryShaderBuffers, NULL, sizeof(ZEGRConstantBuffer*) * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(GeometryShaderTextures, NULL, sizeof(const ZEGRTexture*) * ZEGR_MAX_TEXTURE_SLOT);
-	memset(GeometryShaderSamplerHashes, 0, sizeof(ZESize) * ZEGR_MAX_SAMPLER_SLOT);
-
-	RasterizerStateHash = 0;
-	memset(ViewPortHashes, 0, sizeof(ZESize) * ZEGR_MAX_VIEWPORT_SLOT);
-	memset(ScissorRectHashes, 0, sizeof(ZESize) * ZEGR_MAX_SCISSOR_SLOT);
-	
-	PixelShader = NULL;
-	memset(PixelShaderBuffers, NULL, sizeof(ZEGRConstantBuffer*) * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(PixelShaderTextures, NULL, sizeof(const ZEGRTexture*) * ZEGR_MAX_TEXTURE_SLOT);
-	memset(PixelShaderSamplerHashes, 0, sizeof(ZESize) * ZEGR_MAX_SAMPLER_SLOT);
-
-	BlendStateHash = 0;
-	ComponentBlendMask = ZEGR_CM_ALL;
-	ComponentBlendFactors = ZEVector4::One;
-	
-	DepthStencilStateHash = 0;
-	StencilReferance = 0;
-	
-	DepthStencilBuffer = NULL;
-	ScreenWriteEnable = false;
-	memset(RenderTargets, NULL, sizeof(const ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
-}
-
-ZEGraphicsDeviceHashState::ZEGraphicsDeviceHashState()
-{
-	SetToDefault();
-}
-
-ZEGraphicsDeviceHashState::~ZEGraphicsDeviceHashState()
-{
-
+	return ZEGRGraphicsModule::GetInstance()->CreateDeviceState();
 }

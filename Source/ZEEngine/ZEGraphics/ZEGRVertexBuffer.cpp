@@ -36,17 +36,17 @@
 #include "ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-ZEVertexBuffer::ZEVertexBuffer()
+ZEGRVertexBuffer::ZEGRVertexBuffer()
 {
 
 }
 
-ZEVertexBuffer::~ZEVertexBuffer()
+ZEGRVertexBuffer::~ZEGRVertexBuffer()
 {
 
 }
 
-ZEVertexBuffer*	ZEVertexBuffer::CreateInstance()
+ZEGRVertexBuffer*	ZEGRVertexBuffer::CreateInstance()
 {
 	return ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
 }

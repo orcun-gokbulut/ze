@@ -37,17 +37,17 @@
 
 #include <memory>
 
-void ZEViewport::SetZero()
+void ZEGRViewport::SetZero()
 {
 	memset(&StateData, 0, sizeof(ZEViewportData));
 }
 
-ZEViewport::ZEViewport()
+ZEGRViewport::ZEGRViewport()
 {
 	SetZero();
 }
 
-ZEViewport::~ZEViewport()
+ZEGRViewport::~ZEGRViewport()
 {
 
 }
