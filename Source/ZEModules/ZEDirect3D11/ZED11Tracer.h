@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDeviceState.cpp
+ Zinek Engine - ZED11Tracer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRDeviceState.h"
+#pragma once
 
-#include "ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRTracer.h"
+#include "ZED11ComponentBase.h"
 
-void ZEGRDeviceState::SetToDefault()
+#include "ZETypes.h"
+
+class ZED11Tracer : public ZEGRTracer, public ZED11ComponentBase
 {
-	VertexLayout = NULL;
-	memset(VertexBuffers, NULL, sizeof(ZEGRVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
-	IndexBuffer = NULL;
+	friend class ZED3D11GraphicsModule;
 	
-	memset(Shaders, NULL, sizeof(ZEGRShader*) * ZEGR_SHADER_TYPE_COUNT);
-	memset(ShaderConstantBuffers, NULL, sizeof(ZEGRConstantBuffer*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_CONSTANT_BUFFER_SLOT);
-	memset(ShaderTextures, NULL, sizeof(const ZEGRTexture*) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_TEXTURE_SLOT);
-	memset(ShaderSamplers, 0, sizeof(ZESize) * ZEGR_SHADER_TYPE_COUNT * ZEGR_MAX_SAMPLER_SLOT);
-	
-	DepthStencilBuffer = NULL;
-	memset(RenderTargets, NULL, sizeof(const ZEGRRenderTarget*) * ZEGR_MAX_RENDER_TARGET_SLOT);
+	protected:
+						ZED11Tracer();
+		virtual			~ZED11Tracer();
 
-	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
-		BlendState[I].SetToDefault();
-
-	for (ZESize I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-		ViewPorts[I].SetZero();
-
-	for (ZESize I = 0; I < ZEGR_MAX_SCISSOR_SLOT; I++)
-		ScissorRects[I].SetZero();
-
-	RasterizerState.SetToDefault();
-	DepthStencilState.SetToDefault();
-}
-
-ZEGRDeviceState::ZEGRDeviceState()
-{
-	SetToDefault();
-}
-
-ZEGRDeviceState::~ZEGRDeviceState()
-{
-
-}
-
-ZEGRDeviceState* ZEGRDeviceState::CreateInstance()
-{
-	return ZEGRGraphicsModule::GetInstance()->CreateDeviceState();
-}
+	public:
+		virtual void	SetEnabled(bool Enabled);
+		
+		virtual void	StartEvent(const char* EventName);
+		virtual void	Mark(const char* MarkerName);
+		virtual void	EndEvent();
+};

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11EventTracer.h
+ Zinek Engine - ZEGRTracerEvent.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D11_EVENT_TRACER_H__
-#define __ZE_D3D11_EVENT_TRACER_H__
+#include "ZEGRTracerEvent.h"
 
-#include "ZETypes.h"
-#include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEGraphicsEventTracer.h"
-
-class ZED3D11EventTracer : public ZEGraphicsEventTracer, public ZED3D11ComponentBase
+void ZEGRTracerEvent::SetName(const char* Name)
 {
-	friend class ZED3D11GraphicsModule;
-	
-	protected:
-		ZESSize			EventCount;
+	this->Name = Name;
+}
 
-						ZED3D11EventTracer();
-						~ZED3D11EventTracer();
+const char* ZEGRTracerEvent::GetName()
+{
+	return Name;
+}
 
-	public:
-		void			SetTracingEnabled(bool Enabled);
+bool ZEGRTracerEvent::IsStarted()
+{
+	return Started;
+}
 
-		void			EndEvent();
-		void			StartEvent(const char* EventName);
-		void			Mark(const char* MarkerName);
+#ifdef ZE_DEBUG_GRAPHICS_EVENT_TRACER
+	void ZEGRTracerEvent::Start()
+	{
+		zeDebugCheck(Started, "Tracer Event is already started.");
+		ZEGRTracer::GetInstance()->EndEvent(Name);
+		Started = true;
+	}
 
+	void ZEGRTracerEvent::Mark(const char* MarkerName)
+	{
+		ZEGRTracer::GetInstance()->Mark(Name, MarkerName);
+	}
 
-};
-
+	void ZEGRTracerEvent::End()
+	{
+		zeDebugCheck(!Started, "Tracer Event is not started.");
+		ZEGRTracer::GetInstance()->EndEvent(Name);
+		Started = false;
+	}
 #endif
+
+ZEGRTracerEvent::ZEGRTracerEvent()
+{
+	Started = false;
+}
+
+ZEGRTracerEvent::ZEGRTracerEvent(const char* Name)
+{
+	Started = false;
+	SetName(Name);
+}
+
+ZEGRTracerEvent::~ZEGRTracerEvent()
+{
+	End();
+}

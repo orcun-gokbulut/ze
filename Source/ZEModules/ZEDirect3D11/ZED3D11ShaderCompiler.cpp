@@ -562,7 +562,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 	D3D11_SHADER_DESC ShaderDesc;
 	if (FAILED(Reflector->GetDesc(&ShaderDesc)))
 	{
-		ZED3D_RELEASE(Reflector);
+		ZEGR_RELEASE(Reflector);
 		zeError("Cannot get shader description.");
 		return false;
 	}
@@ -575,7 +575,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 		D3D11_SIGNATURE_PARAMETER_DESC SignParamDesc;
 		if (FAILED(Reflector->GetInputParameterDesc((UINT)I, &SignParamDesc)))
 		{
-			ZED3D_RELEASE(Reflector);
+			ZEGR_RELEASE(Reflector);
 			zeError("Cannot get input parameter signature.");
 			return false;
 		}
@@ -584,7 +584,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 		
 		if (strnlen(SignParamDesc.SemanticName, ZE_MAX_SHADER_VARIABLE_NAME) >= ZE_MAX_SHADER_VARIABLE_NAME)
 		{
-			ZED3D_RELEASE(Reflector);
+			ZEGR_RELEASE(Reflector);
 			zeError("Shader input semantic name too long. \"%s\"", SignParamDesc.SemanticName);
 			return false;
 		}
@@ -605,7 +605,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 		D3D11_SHADER_INPUT_BIND_DESC BindDesc;
 		if (FAILED(Reflector->GetResourceBindingDesc(I, &BindDesc)))
 		{
-			ZED3D_RELEASE(Reflector);
+			ZEGR_RELEASE(Reflector);
 			zeError("Cannot get binded resource info.");
 			return false;
 		}
@@ -657,7 +657,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 		D3D11_SHADER_BUFFER_DESC CBufferDesc;
 		if (FAILED(CBuffer->GetDesc(&CBufferDesc)))
 		{
-			ZED3D_RELEASE(Reflector);
+			ZEGR_RELEASE(Reflector);
 			zeError("Cannot get binded resource info.");
 			return false;
 		}
@@ -678,7 +678,7 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 			if (FAILED(CBufferVariable->GetDesc(&VariableDesc)))
 			{
 				zeError("Cannot get variable description.");
-				ZED3D_RELEASE(Reflector);
+				ZEGR_RELEASE(Reflector);
 				return false;
 			}
 
@@ -686,13 +686,13 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 			if (ProcessVariable(Variables, VariableDesc.Name, VariableDesc.StartOffset, CBufferVariable->GetType()) < 0)
 			{
 				zeError("Can not create buffer meta table");
-				ZED3D_RELEASE(Reflector);
+				ZEGR_RELEASE(Reflector);
 				return false;
 			}
 		}	
 	}
 	
-	ZED3D_RELEASE(Reflector);
+	ZEGR_RELEASE(Reflector);
 
 	return true;
 }
@@ -907,7 +907,7 @@ ZEGRShader* ZED3D11ShaderCompiler::CompileShader(ZEGRShaderCompileOptions* Optio
 		return NULL;
 	}
 
-	ZED3D_RELEASE(Output);
+	ZEGR_RELEASE(Output);
 
 	ZED3D11Shader* Shader = NULL;
 	switch (Options->Type)

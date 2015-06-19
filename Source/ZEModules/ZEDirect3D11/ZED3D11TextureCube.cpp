@@ -41,7 +41,7 @@
 #include "ZETexture/ZETextureData.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
 
-inline static DXGI_FORMAT ConvertPixelFormat(ZEGRTextureFormat Format)
+inline static DXGI_FORMAT ConvertFormat(ZEGRTextureFormat Format)
 {
 	switch(Format)
 	{
@@ -146,7 +146,7 @@ ZEGRRenderTarget* ZED3D11TextureCube::CreateRenderTarget(ZEUInt MipLevel) const
 
 	// Create render target view
 	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
-	RenderTargetDesc.Format = ConvertPixelFormat(PixelFormat);
+	RenderTargetDesc.Format = ConvertFormat(PixelFormat);
 	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
 	RenderTargetDesc.Texture2DArray.MipSlice = MipLevel;
 	RenderTargetDesc.Texture2DArray.FirstArraySlice = 0;
@@ -201,7 +201,7 @@ bool ZED3D11TextureCube::CreateDynamic(ZEUInt EdgeLength, ZEGRTextureFormat Pixe
 	TextureDesc.CPUAccessFlags = CPUAccess;
 	TextureDesc.SampleDesc.Count = 1;
 	TextureDesc.SampleDesc.Quality = 0;
-	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
+	TextureDesc.Format = ConvertFormat(PixelFormat);
 
 	ZEArray<D3D11_SUBRESOURCE_DATA> Data;
 	if (InitialData != NULL)
@@ -274,7 +274,7 @@ bool ZED3D11TextureCube::CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZEGR
 	TextureDesc.CPUAccessFlags = CPUAccess;
 	TextureDesc.SampleDesc.Count = 1;
 	TextureDesc.SampleDesc.Quality = 0;
-	TextureDesc.Format = ConvertPixelFormat(PixelFormat);
+	TextureDesc.Format = ConvertFormat(PixelFormat);
 
 	bool UseInitialData = !RenderTarget && InitialData != NULL;
 
@@ -330,6 +330,6 @@ ZED3D11TextureCube::ZED3D11TextureCube()
 
 ZED3D11TextureCube::~ZED3D11TextureCube()
 {
-	ZED3D_RELEASE(D3D10ShaderResourceView);
-	ZED3D_RELEASE(D3D10TextureCube);
+	ZEGR_RELEASE(D3D10ShaderResourceView);
+	ZEGR_RELEASE(D3D10TextureCube);
 }

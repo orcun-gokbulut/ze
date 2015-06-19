@@ -139,7 +139,7 @@ ZED3D11VertexBuffer::ZED3D11VertexBuffer()
 
 ZED3D11VertexBuffer::~ZED3D11VertexBuffer()
 {
-	ZED3D_RELEASE(D3D10Buffer);
+	ZEGR_RELEASE(D3D10Buffer);
 }
 
 

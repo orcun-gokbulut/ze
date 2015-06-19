@@ -41,9 +41,13 @@
 
 enum ZEGRResourceType
 {
-	ZEGR_RT_NONE		= 0,
-	ZEGR_RT_TEXTURE		= 1,
-	ZEGR_RT_BUFFER		= 2,
+	ZEGR_RT_NONE					= 0,
+	ZEGR_RT_TEXTURE					= 1,
+	ZEGR_RT_VERTEX_BUFFER			= 2,
+	ZEGR_RT_INDEX_BUFFER			= 3,
+	ZEGR_RT_CONSTANT_BUFFER			= 4,
+	ZEGR_RT_DEPTH_STENCIL_BUFFER	= 5,
+	ZEGR_RT_SHADER					= 6
 };
 
 class ZEGRResource
@@ -55,9 +59,10 @@ class ZEGRResource
 
 	private:
 		ZESSize							ReferenceCount;
+		ZESize							Size;
 
 	protected:
-		ZESize							Size;
+		void							SetSize(ZESize Size);
 
 		#ifdef ZE_DEBUG_ENABLE
 		ZEString						Name;
@@ -71,8 +76,8 @@ class ZEGRResource
 
 	public:
 		virtual ZEGRResourceType		GetResourceType() const = 0;
-		ZESize							GetSize();
-		ZESize							GetReferenceCount();
+		ZESize							GetSize() const;
+		ZESize							GetReferenceCount() const;
 
 		void							SetName(const char* Name);
 		const char*						GetName() const;

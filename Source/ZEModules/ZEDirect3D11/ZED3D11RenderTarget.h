@@ -39,12 +39,12 @@
 #include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 
 struct ID3D11RenderTargetView;
 
-class ZED3D11RenderTarget : public ZEGRRenderTarget, public ZED3D11ComponentBase
+class ZED3D11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 {
 	friend class ZED3D11Texture2D;
 	friend class ZED3D11Texture3D;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsEvent.h
+ Zinek Engine - ZEGRTracer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,22 +35,30 @@
 
 #pragma once
 
+#include "ZETypes.h"
+
 class ZEGRTracer
 {
-	private:
-		const char*		Name;
-		bool			Started;
+	friend class ZED3D11GraphicsModule;
+	
+	protected:
+		bool					Enabled;
+		ZESSize					EventCount;
+
+								ZEGRTracer();
+		virtual					~ZEGRTracer();
 
 	public:
-		void			SetName(const char* Name);
-		const char*		GetName();
+		virtual void			SetEnabled(bool Enabled);
+		bool					GetEnabled();
 
-		bool			IsStarted();
+		ZESSize					GetEventCount();
 
-		void			Start();
-		void			End();
+		void					StartFrame();
+		virtual void			StartEvent(const char* EventName);
+		virtual void			Mark(const char* MarkerName);
+		virtual void			EndEvent();
+		void					EndFrame();
 
-						ZEGRTracer();
-						ZEGRTracer(const char* Name);
-						~ZEGRTracer();
+		static ZEGRTracer*		GetInstance();
 };

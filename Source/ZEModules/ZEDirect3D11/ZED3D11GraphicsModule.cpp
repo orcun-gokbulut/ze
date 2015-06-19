@@ -44,22 +44,22 @@
 #include "ZED3D11StatePool.h"
 #include "ZED3D11Texture2D.h"
 #include "ZED3D11Texture3D.h"
-#include "ZED3D11EventTracer.h"
+#include "ZED11Tracer.h"
 #include "ZED3D11TextureCube.h"
-#include "ZED3D11EventTracer.h"
-#include "ZED3D11IndexBuffer.h"
+#include "ZED11Tracer.h"
+#include "ZED11IndexBuffer.h"
 #include "ZED3D11VertexBuffer.h"
 #include "ZED3D11RenderTarget.h"
 #include "ZED3D11ShaderManager.h"
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZED3D11GraphicsWindow.h"
 #include "ZED3D11GraphicsModule.h"
 #include "ZED3D11GraphicsDevice.h"
 #include "ZED3D11ShaderCompiler.h"
-#include "ZED3D11ConstantBuffer.h"
+#include "ZED11ConstantBuffer.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D11GraphicsMonitor.h"
-#include "ZED3D11DepthStencilBuffer.h"
+#include "ZED11DepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRWindow.h"
 
 
@@ -79,7 +79,7 @@ void ZED3D11GraphicsModule::ReleaseWindows()
 
 void ZED3D11GraphicsModule::ReleaseFactory()
 {
-	ZED3D_RELEASE(DXGIFactory);
+	ZEGR_RELEASE(DXGIFactory);
 
 #ifdef ZE_GRAPHIC_LOG_ENABLE
 	zeLog("Factory is released.");
@@ -108,7 +108,7 @@ void ZED3D11GraphicsModule::ReleaseAdapters()
 	ZESize Count = Adapters.GetCount();
 	for (ZESize I = 0; I < Count; ++I)
 	{	
-		ZED3D_RELEASE(Adapters[I]);
+		ZEGR_RELEASE(Adapters[I]);
 	}
 	Adapters.Clear(false);
 
@@ -168,7 +168,7 @@ void ZED3D11GraphicsModule::ReleaseMonitors()
 	for (ZESize I = 0; I < Monitors.GetCount(); ++I)
 	{
 		ZED3D11GraphicsMonitor* Monitor = (ZED3D11GraphicsMonitor*)Monitors[I];
-		ZED3D_RELEASE(Monitor->DXGIOutput);
+		ZEGR_RELEASE(Monitor->DXGIOutput);
 	}
 
 #ifdef ZE_GRAPHIC_LOG_ENABLE
@@ -210,8 +210,8 @@ void ZED3D11GraphicsModule::ReleaseDevices()
 	ZESize Count = D3DDevices.GetCount();
 	for (ZESize I = 0; I < Count; ++I)
 	{
-		ZED3D_RELEASE(D3DDevices[I]);
-		ZED3D_RELEASE(D3DContexes[I]);
+		ZEGR_RELEASE(D3DDevices[I]);
+		ZEGR_RELEASE(D3DContexes[I]);
 	}
 	D3DContexes.Clear(false);
 	D3DDevices.Clear(false);
@@ -320,7 +320,7 @@ bool ZED3D11GraphicsModule::InitializeSelf()
 	if (!DisableAssociations())
 		return false;
 
-	ZED3D11ComponentBase::BaseInitialize(this);
+	ZED11ComponentBase::BaseInitialize(this);
 
 	TextureQuality = (ZETextureQuality)ZEOptionManager::GetInstance()->GetOption("Graphics", "TextureQuality")->GetValue().GetInt32();
 	ZEUInt Anisotropy = (ZEUInt)ZEOptionManager::GetInstance()->GetOption("Graphics", "AnisotropicFilter")->GetValue().GetInt32();
@@ -360,7 +360,7 @@ bool ZED3D11GraphicsModule::DeinitializeSelf()
 
 ZEGraphicsEventTracer* ZED3D11GraphicsModule::GetEventTracer() const
 {
-	static ZED3D11EventTracer EventTracer;
+	static ZED11Tracer EventTracer;
 	return &EventTracer;
 }
 
@@ -378,12 +378,12 @@ ZEStatePool* ZED3D11GraphicsModule::GetStatePool() const
 
 ZEGRIndexBuffer* ZED3D11GraphicsModule::CreateIndexBuffer()
 {
-	return new ZED3D11IndexBuffer();
+	return new ZED11IndexBuffer();
 }
 
-ZEConstantBuffer* ZED3D11GraphicsModule::CreateConstantBuffer()
+ZEGRConstantBuffer* ZED3D11GraphicsModule::CreateConstantBuffer()
 {
-	return new ZED3D11ConstantBuffer();
+	return new ZED11ConstantBuffer();
 }
 
 ZEGRVertexBuffer* ZED3D11GraphicsModule::CreateVertexBuffer()
@@ -414,9 +414,9 @@ ZEGRTextureCube* ZED3D11GraphicsModule::CreateTextureCube()
 	return new ZED3D11TextureCube();
 }
 
-ZEDepthStencilBuffer* ZED3D11GraphicsModule::CreateDepthStencilBuffer()
+ZEGRDepthStencilBuffer* ZED3D11GraphicsModule::CreateDepthStencilBuffer()
 {
-	return new ZED3D11DepthStencilBuffer();
+	return new ZED11DepthStencilBuffer();
 }
 
 ID3D11Device* ZED3D11GraphicsModule::GetD3D10Device(ZESize Index) const

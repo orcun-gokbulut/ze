@@ -39,13 +39,13 @@
 #include <d3d11.h>
 
 #include "ZETypes.h"
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 
 class ZETextureData;
 class ZEGRRenderTarget;
 
-class ZED3D11Texture2D : public ZEGRTexture2D, public ZED3D11ComponentBase
+class ZED3D11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 {
 	friend class ZED3D11GraphicsModule;
 	friend class ZED3D11GraphicsDevice;

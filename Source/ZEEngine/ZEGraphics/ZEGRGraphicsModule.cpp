@@ -139,9 +139,9 @@ const ZEArray<ZEGRDevice*>& ZEGRGraphicsModule::GetDevices() const
 	return Devices;
 }
 
-const ZEGRStatistics& ZEGRGraphicsModule::GetStatistics() const
+ZEGRCounter& ZEGRGraphicsModule::GetCounter()
 {
-	return Statistics;
+	return Counter;
 }
 
 ZEGRGraphicsModule* ZEGRGraphicsModule::GetInstance()

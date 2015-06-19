@@ -42,16 +42,15 @@
 class ZEGRConstantBuffer : public ZEGRResource
 {
 	protected:
+		virtual bool				Initialize(ZESize BufferSize);
+
 									ZEGRConstantBuffer();
 		virtual						~ZEGRConstantBuffer();
 
 	public:
-		ZEGRResourceType		GetResourceType() const;
+		ZEGRResourceType			GetResourceType() const;
 
-		void						SetZero();
 		virtual void				SetData(void* ConstantData) = 0;
 
-		virtual bool				Create(ZESize BufferSize) = 0;
-
-		static ZEGRConstantBuffer*	CreateInstance();
+		static ZEGRConstantBuffer*	Create(ZESize BufferSize);
 };

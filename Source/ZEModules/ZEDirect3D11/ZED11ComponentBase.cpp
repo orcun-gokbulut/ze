@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11DepthStencilBuffer.h
+ Zinek Engine - ZED11ComponentBase.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_DEPTH_BUFFER_H__ 
-#define __ZE_D3D11_DEPTH_BUFFER_H__
+#include "ZED11ComponentBase.h"
 
-#include "ZETypes.h"
-#include "ZED3D11ComponentBase.h"
-#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+ZED3D11GraphicsModule* ZED11ComponentBase::Module = NULL;
+ID3D11Device* ZED11ComponentBase::Device = NULL;
 
-struct ID3D11DepthStencilView;
-
-class ZED3D11DepthStencilBuffer : public ZEDepthStencilBuffer, public ZED3D11ComponentBase
+ZED3D11GraphicsModule* ZED11ComponentBase::GetModule()
 {
-	friend class ZED3D11GraphicsModule;
-	friend class ZED3D11GraphicsDevice;
+	return Module;
+}
 
-	protected:
-		ID3D11Texture2D*				D3D10DepthTexture;
-		ID3D11DepthStencilView*			D3D10DepthStencilView;
-
-										ZED3D11DepthStencilBuffer();
-		virtual							~ZED3D11DepthStencilBuffer();
-
-	public:
-		const ID3D11Texture2D*			GetD3D10DepthTexture() const;
-		const ID3D11DepthStencilView*	GetD3D10DepthStencilView() const;
-
-		virtual bool					IsEmpty() const;
-
-		virtual bool					Create(ZEUInt Width, ZEUInt Height, ZEDepthStencilPixelFormat PixelFormat);
-
-};
-#endif
+ID3D11Device* ZED11ComponentBase::GetDevice()
+{
+	return Device;
+}

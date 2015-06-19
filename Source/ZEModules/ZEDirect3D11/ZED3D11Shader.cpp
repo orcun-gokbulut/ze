@@ -58,7 +58,7 @@ ZED3D11Shader::~ZED3D11Shader()
 	TotalSize -= D3D10ByteCode->GetBufferSize();
 	TotalCount--;
 
-	ZED3D_RELEASE(D3D10ByteCode);
+	ZEGR_RELEASE(D3D10ByteCode);
 }
 
 /************************************************************************/
@@ -82,7 +82,7 @@ ZED3D11PixelShader::ZED3D11PixelShader(ID3DBlob* ByteCode, ID3D11PixelShader*	Pi
 
 ZED3D11PixelShader::~ZED3D11PixelShader()
 {
-	ZED3D_RELEASE(D3D10PixelShader);
+	ZEGR_RELEASE(D3D10PixelShader);
 }
 
 /************************************************************************/
@@ -106,7 +106,7 @@ ZED3D11VertexShader::ZED3D11VertexShader(ID3DBlob* ByteCode, ID3D11VertexShader*
 
 ZED3D11VertexShader::~ZED3D11VertexShader()
 {
-	ZED3D_RELEASE(D3D10VertexShader);
+	ZEGR_RELEASE(D3D10VertexShader);
 }
 
 /************************************************************************/
@@ -130,7 +130,7 @@ ZED3D11GeometryShader::ZED3D11GeometryShader(ID3DBlob* ByteCode, ID3D11GeometryS
 
 ZED3D11GeometryShader::~ZED3D11GeometryShader()
 {
-	ZED3D_RELEASE(D3D10GeometryShader);
+	ZEGR_RELEASE(D3D10GeometryShader);
 }
 
 /************************************************************************/
@@ -154,7 +154,7 @@ ZED3D11DomainShader::ZED3D11DomainShader(ID3DBlob* ByteCode, ID3D11DomainShader*
 
 ZED3D11DomainShader::~ZED3D11DomainShader()
 {
-	ZED3D_RELEASE(D3D10DomainShader);
+	ZEGR_RELEASE(D3D10DomainShader);
 }
 
 /************************************************************************/
@@ -178,7 +178,7 @@ ZED3D11HullShader::ZED3D11HullShader(ID3DBlob* ByteCode, ID3D11HullShader* HullS
 
 ZED3D11HullShader::~ZED3D11HullShader()
 {
-	ZED3D_RELEASE(D3D10HullShader);
+	ZEGR_RELEASE(D3D10HullShader);
 }
 
 /************************************************************************/
@@ -202,7 +202,7 @@ ZED3D11ComputeShader::ZED3D11ComputeShader(ID3DBlob* ByteCode, ID3D11ComputeShad
 
 ZED3D11ComputeShader::~ZED3D11ComputeShader()
 {
-	ZED3D_RELEASE(D3D10ComputeShader);
+	ZEGR_RELEASE(D3D10ComputeShader);
 }
 
 

@@ -39,7 +39,7 @@
 
 #include <d3d11.h>
 
-#include "ZED3D11ComponentBase.h"
+#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRShaderCompiler.h"
 
 class ZEGRShader;
@@ -48,7 +48,7 @@ class ZED3D11PixelShader;
 class ZED3D11VertexShader;
 class ZED3D11GeometryShader;
 
-class ZED3D11ShaderCompiler : public ZEGRShaderCompiler, public ZED3D11ComponentBase
+class ZED3D11ShaderCompiler : public ZEGRShaderCompiler, public ZED11ComponentBase
 {
 	friend class ZED3D11GraphicsModule;
 

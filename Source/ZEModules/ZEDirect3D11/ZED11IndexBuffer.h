@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ComponentBase.cpp
+ Zinek Engine - ZED11IndexBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D11ComponentBase.h"
-#include "ZED3D11GraphicsModule.h"
+#ifndef __ZE_D3D11_INDEX_BUFFER_H__
+#define __ZE_D3D11_INDEX_BUFFER_H__
 
-ZEArray<ID3D11Device*> ZED3D11ComponentBase::D3DDevices;
-ZEArray<ID3D11DeviceContext*> ZED3D11ComponentBase::D3DContexes;
+#include <d3d11.h>
 
-ZED3D11GraphicsModule* ZED3D11ComponentBase::GraphicsModule = NULL;
+#include "ZETypes.h"
+#include "ZED11ComponentBase.h"
+#include "ZEGraphics/ZEGRIndexBuffer.h"
 
-bool ZED3D11ComponentBase::BaseInitialize(ZED3D11GraphicsModule* Module)
+class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 {
-	GraphicsModule = Module;
+	friend class ZED3D11GraphicsDevice;
+	friend class ZED3D11GraphicsModule;
+	
+	protected:	
+		ID3D11Buffer*			Buffer;
 
-	D3DDevices = Module->GetD3D10Devices();
-	D3DContexes = Module->GetD3D10Contexes();
+		virtual bool			Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
 
-	return true;
-}
+								ZED11IndexBuffer();
+								~ZED11IndexBuffer();
+
+	public:
+		const ID3D11Buffer*		GetBuffer() const;
+		void					Unlock();
+		bool					Lock(void** Data);
+};
+
+#endif

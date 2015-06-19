@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDeviceState.h
+ Zinek Engine - ZEGRRenderState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,6 +35,7 @@
 
 #pragma once
 
+#include "ZEGRVertexLayout.h"
 #include "ZEGRDefinitions.h"
 #include "ZEGRBlendState.h"
 #include "ZEGRSamplerState.h"
@@ -57,12 +58,12 @@ class ZEGRDepthStencilBuffer;
 
 typedef ZEGRColorMask ColorBlendMask;
 
-class ZEGRDeviceState
+class ZEGRRenderState
 {
 	friend class ZEGRDevice;
 
 	private:
-		ZEGRHolder<ZEGRVertexLayout>			VertexLayout;
+		ZEGRVertexLayout						VertexLayout;
 		ZEGRHolder<ZEGRVertexBuffer>			VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
 		ZEGRHolder<ZEGRIndexBuffer>				IndexBuffer;
 
@@ -83,8 +84,8 @@ class ZEGRDeviceState
 		ZEGRScissorRectangle					ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
 
 
-												ZEGRDeviceState();
-		virtual									~ZEGRDeviceState();
+												ZEGRRenderState();
+		virtual									~ZEGRRenderState();
 
 	public:
 		void									SetVertexLayout(ZEGRVertexLayout* Layout);
@@ -130,5 +131,5 @@ class ZEGRDeviceState
 
 		virtual void							Update();
 
-		static ZEGRDeviceState*					CreateInstance();
+		static ZEGRRenderState*					CreateInstance();
 };
