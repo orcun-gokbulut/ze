@@ -37,6 +37,7 @@
 
 #include "ZEGRDefinitions.h"
 #include "ZEDS/ZEString.h"
+#include "ZECommon.h"
 
 enum ZEGRResourceType
 {
@@ -47,8 +48,13 @@ enum ZEGRResourceType
 
 class ZEGRResource
 {
-	friend class ZEGRDevice;
+	ZE_DISALLOW_COPY(ZEGRResource)
+
+	template <typename Type> friend class ZEGRHolder;
 	friend class ZEGRGraphicsModule;
+
+	private:
+		ZESSize							ReferenceCount;
 
 	protected:
 		ZESize							Size;
@@ -57,18 +63,19 @@ class ZEGRResource
 		ZEString						Name;
 		#endif
 
+		void							AddRef();
+		virtual void					Destroy();
+
 										ZEGRResource();
 		virtual 						~ZEGRResource();
 
 	public:
 		virtual ZEGRResourceType		GetResourceType() const = 0;
+		ZESize							GetSize();
+		ZESize							GetReferenceCount();
 
 		void							SetName(const char* Name);
 		const char*						GetName() const;
 
-		bool							IsInUse();
-
-		void							GetSize();
-
-		virtual void					Destroy();
+		void							Release();
 };

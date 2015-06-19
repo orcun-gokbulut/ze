@@ -61,7 +61,7 @@ bool ZED3D11VertexBuffer::UpdateWith(ZEUInt ShadowIndex)
 	zeLog("Vertex buffer contents updated. VertexBuffer: %p, ShadowCOpyIdnex: %u.", this, ShadowIndex);
 #endif
 
-	return ZEVertexBuffer::UpdateWith(ShadowIndex);
+	return ZEGRVertexBuffer::UpdateWith(ShadowIndex);
 }
 
 const ID3D11Buffer* ZED3D11VertexBuffer::GetD3D10Buffer() const
@@ -97,7 +97,7 @@ bool ZED3D11VertexBuffer::CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, c
 		return false;
 	}
 
-	return ZEVertexBuffer::CreateDynamic(VertexCount, VertexSize, VertexData);
+	return ZEGRVertexBuffer::CreateDynamic(VertexCount, VertexSize, VertexData);
 }
 
 bool ZED3D11VertexBuffer::CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData)
@@ -129,7 +129,7 @@ bool ZED3D11VertexBuffer::CreateStatic(ZEUInt VertexCount, ZESize VertexSize, co
 		return false;
 	}
 
-	return ZEVertexBuffer::CreateStatic(VertexCount, VertexSize, VertexData);
+	return ZEGRVertexBuffer::CreateStatic(VertexCount, VertexSize, VertexData);
 }
 
 ZED3D11VertexBuffer::ZED3D11VertexBuffer()

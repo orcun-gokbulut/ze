@@ -74,7 +74,7 @@ enum ZEROPrimitiveType
 class ZELight;
 class ZEMaterial;
 class ZEVertexDeclaration;
-class ZEVertexBuffer;
+class ZEGRVertexBuffer;
 class ZEGRIndexBuffer;
 
 class ZERenderCommand
@@ -93,8 +93,8 @@ class ZERenderCommand
 
 		const ZEMaterial*				Material;
 
-		ZEGRIndexBuffer*					IndexBuffer;
-		ZEVertexBuffer*					VertexBuffer;
+		ZEGRIndexBuffer*				IndexBuffer;
+		ZEGRVertexBuffer*				VertexBuffer;
 		ZEVertexDeclaration*			VertexDeclaration;
 
 		ZEMatrix4x4						LocalMatrix;

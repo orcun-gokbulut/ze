@@ -52,7 +52,7 @@ class ZEModelMeshLOD
 		ZEModel*							Owner;
 		ZEModelMesh*						OwnerMesh;
 		const ZEModelResourceMeshLOD*		LODResource;
-		ZEVertexBuffer*						VertexBuffer;
+		ZEGRVertexBuffer*					VertexBuffer;
 		ZERenderCommand						RenderCommand;
 		const ZEMaterial*					Material;
 		bool								Skinned;

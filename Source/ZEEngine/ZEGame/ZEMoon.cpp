@@ -197,7 +197,7 @@ void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
 	RenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
 	RenderCommand.VertexBufferOffset= 0;
 	RenderCommand.IndexBuffer		= (ZEGRIndexBuffer*)-1;
-	RenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
+	RenderCommand.VertexBuffer		= (ZEGRVertexBuffer*)-1;
 	RenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)-1;
 	
 	// ---------------------------------------

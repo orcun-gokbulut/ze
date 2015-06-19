@@ -139,7 +139,7 @@ const ZEArray<ZEGRDevice*>& ZEGRGraphicsModule::GetDevices() const
 	return Devices;
 }
 
-const ZEGraphicsStatistics& ZEGRGraphicsModule::GetStatistics() const
+const ZEGRStatistics& ZEGRGraphicsModule::GetStatistics() const
 {
 	return Statistics;
 }

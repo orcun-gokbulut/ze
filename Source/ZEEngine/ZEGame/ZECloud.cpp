@@ -242,7 +242,7 @@ bool ZECloud::InitializeSelf()
 	CloudRenderCommand.Priority			= 1;
 	CloudRenderCommand.Order			= 1.3f;
 	CloudRenderCommand.Pipeline			= ZE_RORP_3D;
-	CloudRenderCommand.VertexBuffer		= (ZEVertexBuffer*)-1;
+	CloudRenderCommand.VertexBuffer		= (ZEGRVertexBuffer*)-1;
 	CloudRenderCommand.PrimitiveType	= ZE_ROPT_TRIANGLE;
 	CloudRenderCommand.Flags			= ZE_ROF_NONE;
 	CloudRenderCommand.PrimitiveCount	= 0;

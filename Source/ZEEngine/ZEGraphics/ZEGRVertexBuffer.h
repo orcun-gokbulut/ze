@@ -38,11 +38,11 @@
 #include "ZETypes.h"
 #include "ZEGRResource.h"
 
-class ZEVertexBuffer : public ZEGRResource
+class ZEGRVertexBuffer : public ZEGRResource
 {
 	protected:
-										ZEVertexBuffer();
-		virtual							~ZEVertexBuffer();
+										ZEGRVertexBuffer();
+		virtual							~ZEGRVertexBuffer();
 
 	public:
 		ZEGRResourceType				GetResourceType() const;
@@ -52,5 +52,5 @@ class ZEVertexBuffer : public ZEGRResource
 		
 		virtual bool					Create(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData = NULL) = 0;
 		
-		static ZEVertexBuffer*			CreateInstance();
+		static ZEGRVertexBuffer*		CreateInstance();
 };

@@ -42,7 +42,7 @@
 #include "ZED3D11ComponentBase.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 
-class ZED3D11VertexBuffer : public ZEVertexBuffer, public ZED3D11ComponentBase
+class ZED3D11VertexBuffer : public ZEGRVertexBuffer, public ZED3D11ComponentBase
 {
 	friend class ZED3D11GraphicsDevice;
 	friend class ZED3D11GraphicsModule;

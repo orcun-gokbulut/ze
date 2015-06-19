@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRResource.cpp
+ Zinek Engine - ZEGRHolder.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRResource.h"
-
-#include "ZEError.h"
-
-void ZEGRResource::AddRef()
-{
-	ReferenceCount++;
-}
-
-void ZEGRResource::Destroy()
-{
-	delete this;
-}
-
-ZESize ZEGRResource::GetSize()
-{
-	return Size;
-}
-
-ZESize ZEGRResource::GetReferenceCount()
-{
-	return ReferenceCount;
-}
-
-void ZEGRResource::SetName(const char* Name)
-{
-	#ifdef ZE_DEBUG_ENABLE
-		Name = Name;
-	#endif
-}
-
-const char* ZEGRResource::GetName() const
-{
-	#ifdef ZE_DEBUG_ENABLE
-		return Name.ToCString();
-	#else
-		return NULL;
-	#endif
-}
-
-void ZEGRResource::Release()
-{
-	ReferenceCount--;
-	if (ReferenceCount == 0)
-		Destroy();
-}
-
-ZEGRResource::ZEGRResource()
-{
-	Size = 0;
-	ReferenceCount = 0;
-}
-
-ZEGRResource::~ZEGRResource()
-{
-	zeDebugCheck(ReferenceCount != 0, "There are holders still referencing object that being deleted.");
-}
+#include "ZEGRHolder.h"

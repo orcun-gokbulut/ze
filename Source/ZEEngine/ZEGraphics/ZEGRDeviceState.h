@@ -35,20 +35,22 @@
 
 #pragma once
 
-#include "ZETypes.h"
+#include "ZEGRDefinitions.h"
 #include "ZEGRBlendState.h"
-#include "ZEGRVertexLayout.h"
 #include "ZEGRSamplerState.h"
 #include "ZEGRRasterizerState.h"
 #include "ZEGRDepthStencilState.h"
-#include "ZEGRDefinitions.h"
 #include "ZEGRScissorRectangle.h"
 #include "ZEGRViewPort.h"
+#include "ZEGRHolder.h"
 
+#include "ZETypes.h"
+
+class ZEGRVertexLayout;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
 class ZEGRShader;
 class ZEGRTexture;
-class ZEGRIndexBuffer;
-class ZEVertexBuffer;
 class ZEGRRenderTarget;
 class ZEGRConstantBuffer;
 class ZEGRDepthStencilBuffer;
@@ -59,43 +61,74 @@ class ZEGRDeviceState
 {
 	friend class ZEGRDevice;
 
+	private:
+		ZEGRHolder<ZEGRVertexLayout>			VertexLayout;
+		ZEGRHolder<ZEGRVertexBuffer>			VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
+		ZEGRHolder<ZEGRIndexBuffer>				IndexBuffer;
+
+		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEGRHolder<ZEGRConstantBuffer>			ShaderConstantBuffers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_CONSTANT_BUFFER_SLOT];
+		ZEGRHolder<ZEGRTexture>					ShaderTextures[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_TEXTURE_SLOT];
+		ZEGRSamplerState						ShaderSamplers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_SAMPLER_SLOT];
+
+		ZEGRRasterizerState						RasterizerState;
+		ZEGRDepthStencilState					DepthStencilState;
+		ZEGRBlendState							BlendState[ZEGR_MAX_RENDER_TARGET_SLOT];
+
+		bool									RenderTargetsDirty;
+		ZEGRHolder<ZEGRRenderTarget>			RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+		ZEGRHolder<ZEGRDepthStencilBuffer>		DepthStencilBuffer;
+
+		ZEGRViewport							ViewPorts[ZEGR_MAX_VIEWPORT_SLOT];
+		ZEGRScissorRectangle					ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
+
+
+												ZEGRDeviceState();
+		virtual									~ZEGRDeviceState();
+
 	public:
-		ZEGRVertexLayout*				VertexLayout;
-		ZEGRIndexBuffer*				IndexBuffer;
-		ZEVertexBuffer*					VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
+		void									SetVertexLayout(ZEGRVertexLayout* Layout);
+		ZEGRVertexLayout*						GetVertexLayout();
 
-		ZEGRShader*						VertexShader;
-		ZEGRConstantBuffer*				VertexShaderBuffers[ZEGR_MAX_CONSTANT_BUFFER_SLOT];
-		const ZEGRTexture*				VertexShaderTextures[ZEGR_MAX_TEXTURE_SLOT];
-		ZEGRSamplerState				VertexShaderSamplers[ZEGR_MAX_SAMPLER_SLOT];
+		void									SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
+		const ZEGRVertexBuffer*					GetVertexBuffer(ZEUInt Index) const;
 
-		ZEGRShader*						GeometryShader;
-		ZEGRConstantBuffer*				GeometryShaderBuffers[ZEGR_MAX_CONSTANT_BUFFER_SLOT];
-		const ZEGRTexture*				GeometryShaderTextures[ZEGR_MAX_TEXTURE_SLOT];
-		ZEGRSamplerState				GeometryShaderSamplers[ZEGR_MAX_SAMPLER_SLOT];
+		void									SetIndexBuffer(ZEGRIndexBuffer* Buffer);
+		const ZEGRIndexBuffer*					GetIndexBuffer() const;
 
-		ZEGRRasterizerState				RasterizerState;
-		ZEViewport						ViewPorts[ZEGR_MAX_VIEWPORT_SLOT];
-		ZEGRScissorRectangle			ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
-		
-		ZEGRShader*						PixelShader;
-		ZEGRConstantBuffer*				PixelShaderBuffers[ZEGR_MAX_CONSTANT_BUFFER_SLOT];
-		const ZEGRTexture*				PixelShaderTextures[ZEGR_MAX_TEXTURE_SLOT];
-		ZEGRSamplerState				PixelShaderSamplers[ZEGR_MAX_SAMPLER_SLOT];
+		void									SetShader(ZEGRShaderType Type, ZEGRShader* Shader);
+		const ZEGRShader*						GetVertexShader(ZEGRShaderType Type) const;
 
-		ZEGRBlendState					BlendState;
-		ColorBlendMask					ComponentBlendMask;
-		ZEVector4						ComponentBlendFactors;
+		void									SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer);
+		const ZEGRConstantBuffer*				GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index) const;
 
-		ZEGRDepthStencilState			DepthStencilState;
-		ZEUInt32						StencilReferance;
+		void									SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture);
+		const ZEGRTexture*						GetTexture(ZEGRShaderType Shader, ZEUInt Index) const;
 
-		const ZEGRRenderTarget*			RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-		const ZEGRDepthStencilBuffer*	DepthStencilBuffer;
-		bool							ScreenWriteEnable;
-		
-		void							SetToDefault();
+		void									SetSampler(ZEGRShaderType Shader, ZEUInt Index, ZEGRSamplerState& Sampler);
+		ZEGRSamplerState&						GetSampler(ZEGRShaderType Shader, ZEUInt Index);
 
-										ZEGRDeviceState();
-										~ZEGRDeviceState();
+		void									SetViewport(ZEUInt Index, ZEGRViewport& ViewPort);
+		ZEGRViewport&							GetViewport(ZEUInt Index);
+
+		void									SetRenderTarget(ZEUInt Index, const ZEGRRenderTarget* Target);
+		const ZEGRRenderTarget*					GetRenderTarget(ZEUInt Index) const;
+
+		void									SetRasterizerState(ZEGRRasterizerState& State);
+		ZEGRRasterizerState&					GetRasterizerState();
+
+		void									SetBlendState(ZEUInt Index, ZEGRBlendState& State);
+		ZEGRBlendState&							GetBlendState();
+
+		void									SetDepthStencilBuffer(const ZEGRDepthStencilBuffer* Buffer);
+		const ZEGRDepthStencilBuffer*			GetDepthStencilBuffer() const;
+
+		void									SetDepthStencilState(ZEGRDepthStencilState& State);
+		ZEGRDepthStencilState&					GetDepthStencilState();
+
+		void									SetToDefault();
+
+		virtual void							Update();
+
+		static ZEGRDeviceState*					CreateInstance();
 };
