@@ -43,12 +43,14 @@
 #include "ZEML/ZEMLRoot.h"
 
 class Ui_ZEMLEditorElementWidget;
+class QTextDocument;
 
 class ZEMLEditorElementWidget : public QWidget
 {
 	Q_OBJECT
 	private:
 		Ui_ZEMLEditorElementWidget*	Form;
+		QTextDocument*			ValueStringDocument;
 
 		ZEMLElement*			Element;
 		bool					Valid;
@@ -65,7 +67,7 @@ class ZEMLEditorElementWidget : public QWidget
 		void					txtName_OnTextEdited(const QString& NewText);
 		void					cmbValueType_OnCurrentIndexChanged(int Index);
 		void					txtValueInt_OnTextEdited(const QString& NewText);
-		void					txtValueString_OnTextEdited(const QString& NewText);
+		void					ValueStringDocument_OnContentsChanged();
 		void					chkValueBoolean_OnStateChanged(int State);
 		void					txtValueFloat_OnTextEdited(const QString& NewText);
 		void					btnDataLoad_OnClicked();

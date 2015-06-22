@@ -121,6 +121,7 @@ class ZEMLReaderNode
 
 		ZESize						ReadDataSize(const char* Name);
 		bool						ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0);
+		bool						ReadDataItems(const char* Name, void* Buffer, ZESize ItemSize, ZESize ItemCount, ZESize Offset = 0);
 
 									ZEMLReaderNode();
 };

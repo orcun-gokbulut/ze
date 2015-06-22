@@ -241,7 +241,8 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 
 		ZEArray<ZEInteriorFilePolygonChunk> MapPolygons;
 		MapPolygons.SetCount(RoomNode.ReadDataSize("Polygons") / sizeof(ZEInteriorFilePolygonChunk));
-		RoomNode.ReadData("Polygons", MapPolygons.GetCArray(), RoomNode.ReadDataSize("Polygons"));
+		if (!RoomNode.ReadDataItems("Polygons", MapPolygons.GetCArray(), sizeof(ZEInteriorFilePolygonChunk), MapPolygons.GetCount()))
+			return false;
 		
 		if(MapPolygons.GetCount() == 0)
 			zeError("Polygon count is : 0. Room name : %s", Room->Name);
@@ -301,10 +302,12 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 				Room->PhysicalMesh.UserDefinedProperties = PhysicalMeshNode.ReadString("UserDefinedProperties");
 
 			Room->PhysicalMesh.Polygons.SetCount(PhysicalMeshNode.ReadDataSize("Polygons") / sizeof(ZEInteriorPhysicalMeshPolygon));
-			PhysicalMeshNode.ReadData("Polygons", Room->PhysicalMesh.Polygons.GetCArray(), PhysicalMeshNode.ReadDataSize("Polygons"));
+			if (!RoomNode.ReadDataItems("Polygons", Room->PhysicalMesh.Polygons.GetCArray(), sizeof(ZEInteriorPhysicalMeshPolygon), Room->PhysicalMesh.Polygons.GetCount()))
+				return false;
 
 			Room->PhysicalMesh.Vertices.SetCount(PhysicalMeshNode.ReadDataSize("Vertices") / sizeof(ZEVector3));
-			PhysicalMeshNode.ReadData("Vertices", Room->PhysicalMesh.Vertices.GetCArray(), PhysicalMeshNode.ReadDataSize("Vertices"));
+			if (!RoomNode.ReadDataItems("Vertices", Room->PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), Room->PhysicalMesh.Vertices.GetCount()))
+				return false;
 
 			Room->HasPhysicalMesh = true;
 		}

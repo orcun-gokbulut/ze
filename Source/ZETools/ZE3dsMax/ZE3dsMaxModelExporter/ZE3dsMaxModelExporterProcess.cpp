@@ -1712,7 +1712,7 @@ void ZE3dsMaxModelExporter::CollectResources()
 
 	for (ZESize I = 0; I < (ZESize)Nodes.Count(); I++)
 	{
-		IGameNode* CurrentNode = Nodes[I];;
+		IGameNode* CurrentNode = Nodes[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		const MCHAR* NodeZEType = NULL;
 

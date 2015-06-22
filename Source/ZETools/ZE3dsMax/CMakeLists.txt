@@ -41,6 +41,8 @@ set(ZEBUILD_3DS_MAX_BINARY_DIRECTORY "C:\\Program Files\\Autodesk\\3ds Max 2015"
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
+add_definitions(-D_UNICODE)
+
 add_subdirectory(ZE3dsMaxUI)
 add_subdirectory(ZE3dsMaxModelExporter)
 add_subdirectory(ZE3dsMaxInteriorExporter)

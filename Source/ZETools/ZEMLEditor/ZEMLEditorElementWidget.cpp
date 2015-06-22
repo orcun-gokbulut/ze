@@ -216,7 +216,9 @@ void ZEMLEditorElementWidget::ConfigureProperty()
 	else if (Property->GetValueType() == ZEML_VT_STRING)
 	{
 		Form->txtValueString->setVisible(true);
-		Form->txtValueString->setText(Property->GetValue().GetString().ToCString());
+		ValueStringDocument->blockSignals(true);
+		ValueStringDocument->setPlainText(Property->GetValue().GetString().ToCString());
+		ValueStringDocument->blockSignals(false);
 	}
 	else if (Property->GetValueType() == ZEML_VT_BOOLEAN)
 	{
@@ -480,12 +482,12 @@ void ZEMLEditorElementWidget::txtValueInt_OnTextEdited(const QString& NewText)
 	emit ValueChanged(Property, Property->GetValue(), OldValue);
 }
 
-void ZEMLEditorElementWidget::txtValueString_OnTextEdited(const QString& NewText)
+void ZEMLEditorElementWidget::ValueStringDocument_OnContentsChanged()
 {
 	ZEMLProperty* Property = (ZEMLProperty*)Element;
 	ZEValue OldValue = Property->GetValue();
 	
-	Property->SetString(NewText.toStdString().c_str());
+	Property->SetString(ValueStringDocument->toPlainText().toUtf8().constData());
 
 	emit ValueChanged(Property, Property->GetValue(), OldValue);
 }
@@ -643,6 +645,9 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 	Form = new Ui_ZEMLEditorElementWidget();
 	Form->setupUi(this);
 
+	ValueStringDocument = new QTextDocument();
+	Form->txtValueString->setDocument(ValueStringDocument);
+
 	Update();
 
 	Form->txtValueFloat11->setProperty("row", 1); Form->txtValueFloat11->setProperty("column", 1);
@@ -665,7 +670,7 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 	connect(Form->txtName, SIGNAL(textEdited(const QString&)), this, SLOT(txtName_OnTextEdited(const QString&)));
 	connect(Form->cmbValueType, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbValueType_OnCurrentIndexChanged(int)));
 	connect(Form->chkValueBoolean, SIGNAL(stateChanged(int)), this, SLOT(chkValueBoolean_OnStateChanged(int)));
-	connect(Form->txtValueString, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueString_OnTextEdited(const QString&)));
+	connect(ValueStringDocument, SIGNAL(contentsChanged()), this, SLOT(ValueStringDocument_OnContentsChanged()));
 	connect(Form->txtValueInt, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueInt_OnTextEdited(const QString&)));
 	connect(Form->txtValueFloat11, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
 	connect(Form->txtValueFloat11, SIGNAL(textEdited(const QString&)), this, SLOT(txtValueFloat_OnTextEdited(const QString&)));
@@ -690,5 +695,8 @@ ZEMLEditorElementWidget::ZEMLEditorElementWidget(QWidget* Parent) : QWidget(Pare
 
 ZEMLEditorElementWidget::~ZEMLEditorElementWidget()
 {
+	Form->txtValueString->setDocument(NULL);
+	disconnect(ValueStringDocument, SIGNAL(contentsChanged()), this, SLOT(ValueStringDocument_OnContentsChanged()));
+	delete ValueStringDocument;
 	delete Form;
 }

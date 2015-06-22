@@ -252,7 +252,9 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLRe
 					return false;
 
 				Shape->Convex.Vertices.SetCount(PhysicalShapeNode.ReadDataSize("Vertices") / sizeof(ZEVector3));
-				PhysicalShapeNode.ReadData("Vertices", Shape->Convex.Vertices.GetCArray(), PhysicalShapeNode.ReadDataSize("Vertices"));
+				if (!PhysicalShapeNode.ReadDataItems("Vertices", Shape->Convex.Vertices.GetCArray(), sizeof(ZEVector3), Shape->Convex.Vertices.GetCount()))
+					return false;
+
 				break;
 			}
 			default:
@@ -372,10 +374,12 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 					return false;
 
 				LOD->SkinnedVertices.SetCount(LODNode.ReadDataSize("Vertices") / sizeof(ZESkinnedModelVertex));
-				LODNode.ReadData("Vertices", LOD->SkinnedVertices.GetCArray(), LODNode.ReadDataSize("Vertices"));
+				if (!LODNode.ReadDataItems("Vertices", LOD->SkinnedVertices.GetCArray(), sizeof(ZESkinnedModelVertex), LOD->SkinnedVertices.GetCount()))
+					return false;
 
 				LOD->AffectingBoneIds.SetCount(LODNode.ReadDataSize("AffectingBoneIds") / sizeof(ZEUInt32));
-				LODNode.ReadData("AffectingBoneIds", LOD->AffectingBoneIds.GetCArray(), LODNode.ReadDataSize("AffectingBoneIds"));
+				if (!LODNode.ReadDataItems("AffectingBoneIds", LOD->AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), LOD->AffectingBoneIds.GetCount()))
+					return false;
 			}
 			else
 			{
@@ -383,7 +387,8 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 					return false;
 
 				LOD->Vertices.SetCount(LODNode.ReadDataSize("Vertices") / sizeof(ZEModelVertex));
-				LODNode.ReadData("Vertices", LOD->Vertices.GetCArray(), LODNode.ReadDataSize("Vertices"));
+ 				if (!LODNode.ReadDataItems("Vertices", LOD->Vertices.GetCArray(), sizeof(ZEModelVertex), LOD->Vertices.GetCount()))
+ 					return false;
 			}
 		}
 
@@ -684,12 +689,14 @@ bool ZEModelResource::ReadAnimations(ZEMLReaderNode* AnimationsNode)
 			CurrentAnimationFrame->BoneKeys.SetCount(BoneKeyCount);
 		
 			if (BoneKeyCount != 0)
-				AnimationNode.ReadData("Frames", CurrentAnimationFrame->BoneKeys.GetCArray(), BoneKeyCount * sizeof(ZEModelResourceAnimationKey), (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey));
+				if (!AnimationNode.ReadDataItems("Frames", CurrentAnimationFrame->BoneKeys.GetCArray(), sizeof(ZEModelResourceAnimationKey), BoneKeyCount, (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey)))
+					return false;
 		
 			CurrentAnimationFrame->MeshKeys.SetCount(MeshKeyCount);
 		
 			if (MeshKeyCount != 0)
-				AnimationNode.ReadData("Frames", CurrentAnimationFrame->MeshKeys.GetCArray(), MeshKeyCount * sizeof(ZEModelResourceAnimationKey), (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey) + BoneKeyCount * sizeof(ZEModelResourceAnimationKey));
+			if (!AnimationNode.ReadDataItems("Frames", CurrentAnimationFrame->MeshKeys.GetCArray(), sizeof(ZEModelResourceAnimationKey), MeshKeyCount, (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey) + BoneKeyCount * sizeof(ZEModelResourceAnimationKey)))
+				return false;
 		}
 	}
 

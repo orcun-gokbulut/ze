@@ -145,9 +145,10 @@ void ZEPathTokenizer::Combine()
 		if (TokenList[I] == NULL)
 			continue;
 
-		if (I != 0)
-			strcat_s(Temp, ZE_PATH_TOKENIZER_BUFFER_SIZE, "/");
 		strcat_s(Temp, ZE_PATH_TOKENIZER_BUFFER_SIZE, TokenList[I]);
+
+		if (I != TokenCount - 1)
+			strcat_s(Temp, ZE_PATH_TOKENIZER_BUFFER_SIZE, "/");
 	}
 
 	strcpy(Buffer, Temp);

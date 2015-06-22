@@ -100,7 +100,7 @@ bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
 		else if (Elements[I]->GetType() == ZEML_ET_DATA)
 		{
 			ZEMLData* Data = static_cast<ZEMLData*>(Elements[I]);
-			if (!WriterNode->WriteData(Data->GetName(), Data->GetData(), Data->GetSize()))
+			if (!WriterNode->WriteData(Data->GetName(), Data->GetData(), Data->GetDataSize()))
 				return false;
 		}
 		else
