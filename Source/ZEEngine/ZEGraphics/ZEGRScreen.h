@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ConstantBuffer.cpp
+ Zinek Engine - ZEGRScreen.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED11ConstantBuffer.h"
+#pragma once
 
-#include "ZEError.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZEInitializable.h"
+#include "ZETypes.h"
 
-#include <d3d11.h>
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+class ZEGRMonitor;
 
-const ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
+class ZEGRScreen : public ZEInitializable
 {
-	return Buffer;
-}
+	private:
+		ZEUInt								Width;
+		ZEUInt								Height;
+		bool								Visible;
+		bool								Fullscreen;
+		void*								Handle;
+		ZEGRMonitor*						Monitor;
 
-bool ZED11ConstantBuffer::Initialize(ZESize BufferSize)
-{	
-	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
-	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
-	zeDebugCheck(BufferSize > 65536, "Buffer too large");
+	protected:
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
-	D3D11_BUFFER_DESC Desc;
-	Desc.MiscFlags = 0;
-	Desc.Usage = D3D11_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	Desc.ByteWidth = (UINT)BufferSize;
-	
-	HRESULT Result = GetDevice()->CreateBuffer(&Desc, NULL, &Buffer);
-	if (FAILED(Result))
-	{
-		zeError("Constant buffer creation failed. ErrorCode: %d.", Result);
-		return false;
-	}
+											ZEGRScreen();
 
-	SetSize(BufferSize);
+	public:
+		virtual void						SetHandle(void* Handle);
+		void*								GetHandle();
 
-	return true;
-}
+		virtual void						SetSize(ZEUInt Width, ZEUInt Height);
+		ZEUInt								GetWidth();
+		ZEUInt								GetHeight();
 
-void ZED11ConstantBuffer::Deinitialize()
-{
-	ZEGR_RELEASE(Buffer);
-	ZEGRConstantBuffer::Deinitialize();
-}
+		virtual void						SetVisible(bool Visible);
+		bool								GetVisible();
 
-ZED11ConstantBuffer::ZED11ConstantBuffer()
-{
-	Buffer = NULL;
-}
+		virtual void						SetMonitor(ZEGRMonitor* Monitor);
+		ZEGRMonitor*						GetMonitor();
+
+		virtual void						SetFullscreen(bool Monitor);
+		bool								GetFullscreen();
+
+		virtual ZEGRRenderTarget*			GetRenderTarget() = 0;
+		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer() = 0;
+
+		virtual void						Present() = 0;
+};

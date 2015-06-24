@@ -38,6 +38,7 @@
 #include <d3d11.h>
 
 class ZED3D11GraphicsModule;
+enum ZEGRTextureFormat;
 
 class ZED11ComponentBase
 {
@@ -49,4 +50,7 @@ class ZED11ComponentBase
 	public:
 		ZED3D11GraphicsModule*			GetModule();
 		ID3D11Device*					GetDevice();
+		ID3D11DeviceContext*			GetMainContext();
+
+		static DXGI_FORMAT				ConvertFormat(ZEGRTextureFormat Format);
 };

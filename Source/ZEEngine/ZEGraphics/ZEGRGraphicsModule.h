@@ -98,6 +98,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRRenderState*			CreateDeviceState() = 0;
 		virtual ZEGRVertexBuffer*			CreateVertexBuffer() = 0;
 		virtual ZEGRIndexBuffer*			CreateIndexBuffer() = 0;
+		virtual ZEGRShader*					CreateShader() = 0;
 		virtual ZEGRConstantBuffer*			CreateConstantBuffer() = 0;
 		virtual ZEGRTexture2D*				CreateTexture2D() = 0;
 		virtual ZEGRTexture3D*				CreateTexture3D() = 0;

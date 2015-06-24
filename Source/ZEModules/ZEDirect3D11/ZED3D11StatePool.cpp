@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETypes.h"
-#include "ZED3D11Shader.h"
+#include "ZED11Shader.h"
 #include "ZED3D11StatePool.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEDS/ZEListIterators.h"
@@ -538,5 +538,5 @@ void* ZED3D11StatePool::GetState(ZEGRVertexLayout* VertexLayout, const ZEShader*
 	zeDebugCheck(VertexShader->GetShaderType() != ZE_ST_VERTEX, "Wrong shader type.");
 
 	ZEStatePoolEntry* Entry = FindPoolEntry(VertexLayoutPool, VertexLayout->GetHash());
-	return Entry == NULL ? CreateD3D10State(VertexLayout, ((ZED3D11Shader*)VertexShader)->D3D10ByteCode) : ((ZEVertexLayoutEntry*)Entry)->VertexLayout;
+	return Entry == NULL ? CreateD3D10State(VertexLayout, ((ZED11Shader*)VertexShader)->Shader) : ((ZEVertexLayoutEntry*)Entry)->VertexLayout;
 }

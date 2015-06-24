@@ -99,6 +99,8 @@ ze_add_source(ZEGRShaderCompileOptions.h	Sources Headers)
 
 ze_add_source(ZEGRMonitor.h					Sources Headers)
 ze_add_source(ZEGRMonitor.cpp				Sources)
+ze_add_source(ZEGRScreen.h					Sources Headers)
+ze_add_source(ZEGRScreen.cpp				Sources)
 ze_add_source(ZEGRWindow.h					Sources Headers)
 ze_add_source(ZEGRWindow.cpp				Sources)
 ze_add_source(ZEGRWindow_Unix.cpp			Sources PLATFORMS Unix)

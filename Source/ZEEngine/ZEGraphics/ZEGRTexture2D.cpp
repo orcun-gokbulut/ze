@@ -37,6 +37,7 @@
 
 #include "ZEGRGraphicsModule.h"
 #include "ZETexture/ZETextureData.h"
+#include "ZEMath/ZEMath.h"
 
 ZEGRResourceType ZEGRTexture2D::GetResourceType() const
 {
@@ -61,6 +62,30 @@ ZEUInt ZEGRTexture2D::GetHeight() const
 ZEVector2 ZEGRTexture2D::GetPixelSize() const
 {
 	return ZEVector2(1.0f / Width, 1.0f / Height);
+}
+
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+{
+	zeDebugCheck(Width == 0, "Width cannot be 0.");
+	zeDebugCheck(Height == 0, "Height cannot be 0.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || ZEMath::IsPowerOfTwo(Height)), "Level must be 1 for non-power of two textures.");
+
+	this->Width = Width;
+	this->Height = Height;
+	SetLevelCount(LevelCount);
+	SetFormat(Format);
+
+	SetSize(CalculateSize(Width, Height, LevelCount, GetBlockSize(), GetBlockDimension()));
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);
+
+	return true;
+}
+
+void ZEGRTexture2D::Deinitialize()
+{
+	SetSize(0);
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, Texture2D, Texture);
 }
 
 ZEGRTexture2D::ZEGRTexture2D()

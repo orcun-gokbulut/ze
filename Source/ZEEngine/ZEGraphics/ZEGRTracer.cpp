@@ -87,5 +87,5 @@ void ZEGRTracer::EndFrame()
 
 ZEGRTracer* ZEGRTracer::GetInstance()
 {
-	return ZEGRGraphicsModule::GetTracer();
+	return ZEGRGraphicsModule::GetInstance()->GetTracer();
 }

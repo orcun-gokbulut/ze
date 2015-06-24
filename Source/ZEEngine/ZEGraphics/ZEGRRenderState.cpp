@@ -39,7 +39,7 @@
 
 void ZEGRRenderState::SetToDefault()
 {
-	VertexLayout = NULL;
+	VertexLayout.SetToDefault();
 	memset(VertexBuffers, NULL, sizeof(ZEGRVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
 	IndexBuffer = NULL;
 	

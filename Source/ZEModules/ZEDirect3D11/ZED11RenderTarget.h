@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11Texture3D.h
+ Zinek Engine - ZED11RenderTarget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,41 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_TEXTURE_3D_H__
-#define __ZE_D3D11_TEXTURE_3D_H__
+#pragma once
 
-#include <d3d11.h>
-
-#include "ZETypes.h"
-#include "ZEGraphics/ZEGRTexture3D.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZED11ComponentBase.h"
-#include "ZED3D11RenderTarget.h"
+#include "ZETypes.h"
 
-class ZETextureData;
-class ZEGRRenderTarget;
+struct ID3D11RenderTargetView;
 
-class ZED3D11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
+class ZED11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
-	friend class ZED3D11GraphicsDevice;
+	friend class ZED11GraphicsModule;
+	friend class ZED11Window;
+	friend class ZED11Texture2D;
+	friend class ZED11Texture3D;
+	friend class ZED11TextureCube;
 
 	private:
-		ID3D11Texture3D*					D3D10Texture3D;
-		ID3D11ShaderResourceView*			D3D10ShaderResourceView;
+		ID3D11RenderTargetView*			RenderTargetView;
 
-		bool								UpdateWith(ZEUInt ShadowIndex);
-
-											ZED3D11Texture3D();
-		virtual								~ZED3D11Texture3D();
-
+	protected:
+										ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat Format, ID3D11RenderTargetView* RenderTargtetView);
+		virtual							~ZED11RenderTarget();
+	
 	public:
-		const ID3D11Texture3D*				GetD3D10Texture() const;
-		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
-		
-		bool								CreateDynamic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEGRTextureFormat PixelFormat, ZETextureData* Data = NULL);
-		bool								CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
-
-		ZEGRRenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
+		ID3D11RenderTargetView*			GetRenderTargetView();
 };
-
-#endif

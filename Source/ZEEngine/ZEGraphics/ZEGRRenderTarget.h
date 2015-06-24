@@ -52,9 +52,11 @@ class ZEGRRenderTarget : public ZEGRResource
 		virtual						~ZEGRRenderTarget();
 
 	public:
-		ZEUInt						GetWidth() const;
-		ZEUInt						GetHeight() const;
-		ZEUInt						GetDepth() const;
-		ZEVector2					GetPixelSize() const;
-		ZEGRTextureFormat			GetFormat() const;
+		virtual ZEGRResourceType	GetResourceType();
+
+		ZEUInt						GetWidth();
+		ZEUInt						GetHeight();
+		ZEUInt						GetDepth();
+		ZEVector2					GetPixelSize();
+		ZEGRTextureFormat			GetFormat();
 };

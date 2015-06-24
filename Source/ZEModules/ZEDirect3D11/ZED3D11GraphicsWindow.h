@@ -43,41 +43,61 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZEGRWindow.h"
 
-class ZED3D11Texture2D;
-class ZED3D11RenderTarget;
+class ZED11Texture2D;
+class ZED11RenderTarget;
 class ZED11DepthStencilBuffer;
+
+class ZEGROutput
+{
+	private:
+		virtual void				OnResize(ZEUInt NewWidth, ZEUInt NewHeight);
+		virtual void				OnHidden();
+		virtual void				OnShown();
+
+	public:
+		ZEUInt						GetWidth();
+		ZEUInt						SetHeight();
+		ZEGRTextureFormat			GetFormat();
+
+		ZEGRRenderTarget*			GetRenderTarget();
+		ZEGRDepthStencilBuffer*		GetDepthStencilBuffer();
+
+		void*						GetHandle();
+
+
+};
 
 class ZED3D11GraphicsWindow : public ZEGRWindow
 {
 	friend class ZED3D11GraphicsModule;
 
 	protected:
-		IDXGISwapChain1*					SwapChain;
+		IDXGISwapChain1*						SwapChain;
 		
-		ZED11DepthStencilBuffer*			DepthBuffer;
-		ZED3D11RenderTarget*				BackBuffer;
-		ZED3D11Texture2D*					BackBufferTexture;
+		ZED11DepthStencilBuffer*				DepthBuffer;
+		ZED11RenderTarget*						BackBuffer;
+		ZED11Texture2D*							BackBufferTexture;
 
-		void								ReleaseSwapChain();
-		bool								CreateSwapChain();
+		void									ReleaseSwapChain();
+		bool									CreateSwapChain();
 
-		void								ReleaseBackBuffer();
-		bool								CreateBackBuffer();
+		void									ReleaseBackBuffer();
+		bool									CreateBackBuffer();
 
-		bool								ManageFlagCreated();
-		bool								ManageFlagDestroyed();
-		bool								ManageFlagResized();
-		bool								ManageFlagWindowed();
-		bool								ManageFlagFullScreen();
+		bool									ManageFlagCreated();
+		bool									ManageFlagDestroyed();
+		bool									ManageFlagResized();
+		bool									ManageFlagWindowed();
+		bool									ManageFlagFullScreen();
 
-											ZED3D11GraphicsWindow();
-		virtual								~ZED3D11GraphicsWindow();
+												ZED3D11GraphicsWindow();
+		virtual									~ZED3D11GraphicsWindow();
 
 	public:
-		IDXGISwapChain1*					GetDXGISwapChain() const;
+		IDXGISwapChain1*						GetDXGISwapChain() const;
 
-		virtual bool						Update();
-		virtual bool						Present();
+		virtual bool							Update();
+		virtual bool							Present();
 
 		virtual const ZEGRTexture2D*			GetBackBufferTexture();
 		virtual const ZEGRRenderTarget*			GetBackBuffer();

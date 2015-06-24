@@ -46,6 +46,13 @@ bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
 {
 	SetSize(BufferSize);
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, ConstantBuffer, Pipeline);
+	return true;
+}
+
+void ZEGRConstantBuffer::Deinitialize()
+{
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
+	SetSize(0);
 }
 
 ZEGRConstantBuffer::ZEGRConstantBuffer()
@@ -55,8 +62,7 @@ ZEGRConstantBuffer::ZEGRConstantBuffer()
 
 ZEGRConstantBuffer::~ZEGRConstantBuffer()
 {
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
-	SetSize(0);
+	Deinitialize();
 }
 
 ZEGRConstantBuffer* ZEGRConstantBuffer::Create(ZESize BufferSize)

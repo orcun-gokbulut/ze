@@ -36,6 +36,23 @@
 #include "ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
+bool ZEGRVertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
+{
+	zeDebugCheck(VertexCount == 0, "Vertex count cannot be zero.");
+	zeDebugCheck(VertexSize == 0, "Vertex size cannot be zoro.");
+
+	SetSize(VertexCount * VertexSize);
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, VertexBuffer, Geometry);
+
+	return true;
+}
+
+void ZEGRVertexBuffer::Deinitialize()
+{
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, VertexBuffer, Geometry);
+	SetSize(0);
+}
+
 ZEGRVertexBuffer::ZEGRVertexBuffer()
 {
 
@@ -43,10 +60,20 @@ ZEGRVertexBuffer::ZEGRVertexBuffer()
 
 ZEGRVertexBuffer::~ZEGRVertexBuffer()
 {
-
+	Deinitialize();
 }
 
-ZEGRVertexBuffer*	ZEGRVertexBuffer::CreateInstance()
+ZEGRVertexBuffer* ZEGRVertexBuffer::Create(ZEUInt VertexCount, ZESize VertexSize)
 {
-	return ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
+	ZEGRVertexBuffer* VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
+	if (VertexBuffer == NULL)
+		return NULL;
+
+	if (!VertexBuffer->Initialize(VertexCount, VertexSize))
+	{
+		VertexBuffer->Release();
+		return NULL;
+	}
+
+	return VertexBuffer;
 }

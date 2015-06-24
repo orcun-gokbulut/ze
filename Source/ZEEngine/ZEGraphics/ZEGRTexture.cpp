@@ -36,68 +36,154 @@
 #include "ZEGRTexture.h"
 
 #include "ZEGRGraphicsModule.h"
+#include "ZEMath\ZEMath.h"
 
-bool ZEGRTexture::GetIsRenderTarget() const
+void ZEGRTexture::SetFormat(ZEGRTextureFormat Format)
 {
-	return IsRenderTarget;
+	this->Format = Format;
 }
 
-ZEGRTextureFormat ZEGRTexture::GetFormat() const
+void ZEGRTexture::SetLevelCount(ZEUInt LevelCount)
 {
-	return Format;
+	this->LevelCount = LevelCount;
+}
+
+void ZEGRTexture::SetIsRenderTarget(bool RenderTarget)
+{
+	this->IsRenderTarget = RenderTarget;
+}
+
+ZESize ZEGRTexture::CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZESize BlockSize, ZESize BlockDimension)
+{
+	ZESize Output = 0;
+
+	Width /= (ZEUInt)BlockDimension;
+	Height /= (ZEUInt)BlockDimension;
+
+	for (ZESize I = 0; I < LevelCount; I++)
+		Output += (Width << LevelCount) * (Height << LevelCount);
+
+	return Output * BlockSize;
+}
+
+ZESize ZEGRTexture::CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZESize BlockDimension)
+{
+	Width /= (ZEUInt)BlockDimension;
+	Height /= (ZEUInt)BlockDimension;
+
+	if (!ZEMath::IsPowerOfTwo(Width) || ZEMath::IsPowerOfTwo(Height))
+		return 1;
+
+	ZEUInt Level = 1;
+	while(Width != 1 && Height != 1)
+	{
+		Width <<= 1;
+		Height <<= 1;
+		Level++;
+	}
+
+	return Level;
+}
+
+ZESize ZEGRTexture::GetBlockSize(ZEGRTextureFormat Format)
+{
+	switch (Format)
+	{
+		default:
+		case ZEGR_TF_NONE:
+		case ZEGR_TF_NULL:
+			return 0;
+
+		case ZEGR_TF_R8:
+			return 1;
+
+		case ZEGR_TF_R8G8:
+		case ZEGR_TF_R16:
+		case ZEGR_TF_R16F:
+			return 2;
+
+		case ZEGR_TF_R8G8B8A8:
+		case ZEGR_TF_R16G16:
+		case ZEGR_TF_R16FG16F:
+		case ZEGR_TF_R32:
+		case ZEGR_TF_R32F:
+			return 4;
+
+		case ZEGR_TF_R16G16B16A16:
+		case ZEGR_TF_R16FG16FB16FA16F:
+		case ZEGR_TF_R32G32:
+		case ZEGR_TF_R32FG32F:
+			return 8;
+
+		case ZEGR_TF_R32G32B32A32:
+		case ZEGR_TF_R32FG32FB32FA32F:
+			return 16;
+
+		case ZEGR_TF_DXT1:
+			return 8;
+
+		case ZEGR_TF_DXT3:
+		case ZEGR_TF_DXT5:
+			return 16;
+	}
+}
+
+ZESize ZEGRTexture::GetBlockDimension(ZEGRTextureFormat Format)
+{
+	switch (Format)
+	{
+		default:
+		case ZEGR_TF_NONE:
+		case ZEGR_TF_NULL:
+		case ZEGR_TF_R8:
+		case ZEGR_TF_R8G8:
+		case ZEGR_TF_R16:
+		case ZEGR_TF_R16F:
+		case ZEGR_TF_R8G8B8A8:
+		case ZEGR_TF_R16G16:
+		case ZEGR_TF_R16FG16F:
+		case ZEGR_TF_R32:
+		case ZEGR_TF_R32F:
+		case ZEGR_TF_R16G16B16A16:
+		case ZEGR_TF_R16FG16FB16FA16F:
+		case ZEGR_TF_R32G32:
+		case ZEGR_TF_R32FG32F:
+		case ZEGR_TF_R32G32B32A32:
+		case ZEGR_TF_R32FG32FB32FA32F:
+			return 1;
+
+		case ZEGR_TF_DXT1:
+			return 8;
+
+		case ZEGR_TF_DXT3:
+		case ZEGR_TF_DXT5:
+			return 4;
+	}
 }
 
 ZEGRTexture::ZEGRTexture()
 {
-	IsRenderTarget = false;
-	LevelCount = 0;
 	Format = ZEGR_TF_NONE;
+	LevelCount = 0;
+	IsRenderTarget = false;
 }
 
-ZESize ZEGRTexture::GetBlockSize(ZEGRTextureFormat PixelFormat)
+ZEGRTextureFormat ZEGRTexture::GetFormat()
 {
-	ZESize Size = 0;
-	switch (PixelFormat)
-	{
-		case ZEGR_TF_R8:
-			Size = 1;
-			break;
+	return Format;
+}
 
-		case ZEGR_TF_R16F:
-		case ZEGR_TF_R16:	
-		case ZEGR_TF_R8G8:
-			Size = 2;
-			break;
+ZESize ZEGRTexture::GetBlockSize()
+{
+	return GetBlockSize(Format);
+}
 
-		case ZEGR_TF_R32F:
-		case ZEGR_TF_R8G8B8A8:
-		case ZEGR_TF_R16G16:
-		case ZEGR_TF_R16FG16F:
-		case ZEGR_TF_INTZ:
-			Size = 4;
-			break;
+ZESize ZEGRTexture::GetBlockDimension()
+{
+	return GetBlockDimension(Format);
+}
 
-		case ZEGR_TF_R16G16B16A16: // 8 byte
-		case ZEGR_TF_R16FG16FB16FA16F:
-		case ZEGR_TF_R32G32:
-		case ZEGR_TF_R32FG32F:	
-			Size = 8;
-			break;
-
-		case ZEGR_TF_R32G32B32A32:
-		case ZEGR_TF_R32FG32FB32FA32F:	
-			Size = 16;
-				
-		case ZEGR_TF_DXT1:
-			Size = 8;
-			break;
-		case ZEGR_TF_DXT3:
-			Size = 16;
-			break;
-		case ZEGR_TF_DXT5:
-			Size = 16;
-			break;
-	};
-
-	return Size;
+bool ZEGRTexture::GetIsRenderTarget()
+{
+	return IsRenderTarget;
 }

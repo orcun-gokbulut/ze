@@ -34,18 +34,56 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRShader.h"
+#include "ZEGRCounter.h"
+#include "ZEGRGraphicsModule.h"
 
-void ZEGRShader::Destroy()
+bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
 {
-	delete this;
+	this->ShaderType = ShaderType;
+
+	SetSize(Size);
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, Shader, Pipeline);
+
+	return true;
+}
+
+void ZEGRShader::Deinitialize()
+{
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, Shader, Pipeline);
+	SetSize(0);
 }
 
 ZEGRShader::ZEGRShader()
 {
-
+	ShaderType = ZEGR_ST_NONE;
 }
 
 ZEGRShader::~ZEGRShader()
 {
+	Deinitialize();
+}
 
+ZEGRResourceType ZEGRShader::GetResourceType()
+{
+	return ZEGR_RT_SHADER;
+}
+
+ZEGRShaderType ZEGRShader::GetShaderType()
+{
+	return ShaderType;
+}
+
+ZEGRShader* ZEGRShader::Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
+{
+	ZEGRShader* Shader = ZEGRGraphicsModule::GetInstance()->CreateShader();
+	if (Shader == NULL)
+		return NULL;
+
+	if (!Shader->Initialize(ShaderType, ShaderBinary, Size))
+	{
+		Shader->Destroy();
+		return NULL;
+	}
+
+	return Shader;
 }

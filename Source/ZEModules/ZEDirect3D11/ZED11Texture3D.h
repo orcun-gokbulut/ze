@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ConstantBuffer.cpp
+ Zinek Engine - ZED11Texture3D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED11ConstantBuffer.h"
+#pragma once
 
-#include "ZEError.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZEGraphics/ZEGRTexture3D.h"
+#include "ZED11ComponentBase.h"
+#include "ZETypes.h"
 
-#include <d3d11.h>
+class ZEGRRenderTarget;
 
-const ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
+class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 {
-	return Buffer;
-}
+	friend class ZED3D11GraphicsModule;
 
-bool ZED11ConstantBuffer::Initialize(ZESize BufferSize)
-{	
-	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
-	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
-	zeDebugCheck(BufferSize > 65536, "Buffer too large");
+	private:
+		ID3D11Texture3D*					Texture3D;
+		ID3D11ShaderResourceView*			ResourceView;
 
-	D3D11_BUFFER_DESC Desc;
-	Desc.MiscFlags = 0;
-	Desc.Usage = D3D11_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	Desc.ByteWidth = (UINT)BufferSize;
-	
-	HRESULT Result = GetDevice()->CreateBuffer(&Desc, NULL, &Buffer);
-	if (FAILED(Result))
-	{
-		zeError("Constant buffer creation failed. ErrorCode: %d.", Result);
-		return false;
-	}
+		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual void						Deinitialize();
 
-	SetSize(BufferSize);
+											ZED11Texture3D();
 
-	return true;
-}
+	public:
+		ID3D11Texture3D*					GetTexture();
+		ID3D11ShaderResourceView*			GetResourceView();
 
-void ZED11ConstantBuffer::Deinitialize()
-{
-	ZEGR_RELEASE(Buffer);
-	ZEGRConstantBuffer::Deinitialize();
-}
+		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Depth, ZEUInt Level);
+		virtual void						Unlock(ZEUInt Level);
 
-ZED11ConstantBuffer::ZED11ConstantBuffer()
-{
-	Buffer = NULL;
-}
+		virtual ZEGRRenderTarget*			GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel);
+};

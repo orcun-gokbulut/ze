@@ -34,8 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRTexture3D.h"
+
 #include "ZEGRGraphicsModule.h"
-#include "ZETexture/ZETextureData.h"
+#include "ZEMath/ZEMath.h"
+
+bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+{
+	zeDebugCheck(Width == 0, "Width cannot be 0.");
+	zeDebugCheck(Height == 0, "Height cannot be 0.");
+	zeDebugCheck(Depth == 0, "Depth cannot be 0.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), "Level must be 1 for non-power of two textures.");
+
+	this->Width = Width;
+	this->Height = Height;
+	this->Depth = Depth;
+	SetLevelCount(LevelCount);
+	SetFormat(Format);
+
+	SetSize(Depth * CalculateSize(Width, Height, LevelCount, GetBlockSize(), GetBlockDimension()));
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture3D, Texture);
+
+	return true;
+}
+
+void ZEGRTexture3D::Deinitialize()
+{
+	SetSize(0);
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, Texture3D, Texture);
+}
 
 ZEGRResourceType ZEGRTexture3D::GetResourceType() const
 {
@@ -69,12 +96,15 @@ ZEVector3 ZEGRTexture3D::GetPixelSize() const
 
 ZEGRTexture3D::ZEGRTexture3D()
 {
-	Size = 0;
 	Width = 0;
 	Height = 0;
 	Depth = 0;
-	LevelCount = 0;
-};
+}
+
+ZEGRTexture3D::~ZEGRTexture3D()
+{
+	Deinitialize();
+}
 
 ZEGRTexture3D* ZEGRTexture3D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
 {

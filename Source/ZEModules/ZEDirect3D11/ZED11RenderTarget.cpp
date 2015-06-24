@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11TextureCube.h
+ Zinek Engine - ZED11RenderTarget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,40 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_TEXTURE_CUBE_H__
-#define __ZE_D3D11_TEXTURE_CUBE_H__
+#include "ZED11RenderTarget.h"
+#include "ZEGraphics\ZEGRDefinitions.h"
 
-#include <d3d11.h>
-
-#include "ZETypes.h"
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
-
-class ZETextureData;
-class ZEGRRenderTarget;
-
-class ZED3D11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
+ID3D11RenderTargetView* ZED11RenderTarget::GetRenderTargetView()
 {
-	friend class ZED3D11GraphicsModule;
-	friend class ZED3D11GraphicsDevice;
-	
-	protected:
-		ID3D11Texture2D*					D3D10TextureCube;
-		ID3D11ShaderResourceView*			D3D10ShaderResourceView;
+	return RenderTargetView;
+}
 
-		bool								UpdateWith(ZEUInt ShadowIndex);
+ZED11RenderTarget::ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat PixelFormat, ID3D11RenderTargetView* RenderTargtetView) : ZEGRRenderTarget(Width, Height, PixelFormat)
+{
+	this->RenderTargetView = RenderTargtetView;
+}
 
-											ZED3D11TextureCube();
-		virtual								~ZED3D11TextureCube();
-
-	public:		
-		const ID3D11Texture2D*				GetD3D10Texture() const;
-		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
-		
-		bool								CreateDynamic(ZEUInt EdgeLength, ZEGRTextureFormat PixelFormat, ZETextureData* InitialData = NULL);
-		bool								CreateStatic(ZEUInt EdgeLength, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = NULL);
-
-		ZEGRRenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
-};
-
-#endif
+ZED11RenderTarget::~ZED11RenderTarget()
+{
+	ZEGR_RELEASE(RenderTargetView);	
+}

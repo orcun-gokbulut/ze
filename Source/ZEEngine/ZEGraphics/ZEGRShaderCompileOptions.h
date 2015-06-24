@@ -45,7 +45,6 @@ struct ZEGRShaderMeta;
 
 struct ZEGRShaderDefinition
 {
-	ZESize			Hash;
 	ZEString		Name;
 	ZEString		Value;
 };

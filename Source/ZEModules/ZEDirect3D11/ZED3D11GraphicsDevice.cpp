@@ -35,13 +35,13 @@
 
 #include <d3d11.h>
 
-#include "ZED3D11Shader.h"
-#include "ZED3D11Texture2D.h"
-#include "ZED3D11Texture3D.h"
-#include "ZED3D11TextureCube.h"
+#include "ZED11Shader.h"
+#include "ZED11Texture2D.h"
+#include "ZED11Texture3D.h"
+#include "ZED11TextureCube.h"
 #include "ZED11IndexBuffer.h"
-#include "ZED3D11RenderTarget.h"
-#include "ZED3D11VertexBuffer.h"
+#include "ZED11RenderTarget.h"
+#include "ZED11VertexBuffer.h"
 #include "ZED3D11GraphicsDevice.h"
 #include "ZED3D11GraphicsModule.h"
 #include "ZED11ConstantBuffer.h"
@@ -135,15 +135,15 @@ void ZED3D11GraphicsDevice::ApplyInputStates()
 		ID3D11Buffer* D3D10VertexBuffer = NULL;
 
 		if (CurrentState.VertexBuffers[I] != NULL)
-			((ZED3D11VertexBuffer*)CurrentState.VertexBuffers[I])->UpdateWith(0);
+			((ZED11VertexBuffer*)CurrentState.VertexBuffers[I])->UpdateWith(0);
 
 		if (CurrentState.VertexBuffers[I] != OldState.VertexBuffers[I])
 		{
-			const ZED3D11VertexBuffer* VertexBuffer = (ZED3D11VertexBuffer*)CurrentState.VertexBuffers[I];
+			const ZED11VertexBuffer* VertexBuffer = (ZED11VertexBuffer*)CurrentState.VertexBuffers[I];
 			if (VertexBuffer != NULL)
 			{
 
-				D3D10VertexBuffer = VertexBuffer->D3D10Buffer;
+				D3D10VertexBuffer = VertexBuffer->Buffer;
 				D3D10VertexBufferOffset = 0;
 				D3D10VertexBufferStride = (UINT)VertexBuffer->VertexSize;
 			}
@@ -214,16 +214,16 @@ void ZED3D11GraphicsDevice::ApplyVertexShaderStates()
 				switch(Texture->GetTextureType())
 				{
 					case ZEGR_TT_2D:
-						((ZED3D11Texture2D*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11Texture2D*)Texture)->D3D10ShaderResourceView;
+						((ZED11Texture2D*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11Texture2D*)Texture)->ResourceView;
 						break;
 					case ZEGR_TT_3D:
-						((ZED3D11Texture3D*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11Texture3D*)Texture)->D3D10ShaderResourceView;
+						((ZED11Texture3D*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11Texture3D*)Texture)->ResourceView;
 						break;
 					case ZEGR_TT_CUBE:
-						((ZED3D11TextureCube*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11TextureCube*)Texture)->D3D10ShaderResourceView;
+						((ZED11TextureCube*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11TextureCube*)Texture)->ResourceView;
 						break;
 				}
 			}
@@ -292,16 +292,16 @@ void ZED3D11GraphicsDevice::ApplyGeometryShaderStates()
 				switch(Texture->GetTextureType())
 				{
 					case ZEGR_TT_2D:
-						((ZED3D11Texture2D*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11Texture2D*)Texture)->D3D10ShaderResourceView;
+						((ZED11Texture2D*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11Texture2D*)Texture)->ResourceView;
 						break;
 					case ZEGR_TT_3D:
-						((ZED3D11Texture3D*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11Texture3D*)Texture)->D3D10ShaderResourceView;
+						((ZED11Texture3D*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11Texture3D*)Texture)->ResourceView;
 						break;
 					case ZEGR_TT_CUBE:
-						((ZED3D11TextureCube*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11TextureCube*)Texture)->D3D10ShaderResourceView;
+						((ZED11TextureCube*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11TextureCube*)Texture)->ResourceView;
 						break;
 				}
 			}
@@ -434,16 +434,16 @@ void ZED3D11GraphicsDevice::ApplyPixelShaderStates()
 				switch(Texture->GetTextureType())
 				{
 					case ZEGR_TT_2D:
-						((ZED3D11Texture2D*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11Texture2D*)Texture)->D3D10ShaderResourceView;
+						((ZED11Texture2D*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11Texture2D*)Texture)->ResourceView;
 						break;
 					case ZEGR_TT_3D:
-						((ZED3D11Texture3D*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11Texture3D*)Texture)->D3D10ShaderResourceView;
+						((ZED11Texture3D*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11Texture3D*)Texture)->ResourceView;
 						break;
 					case ZEGR_TT_CUBE:
-						((ZED3D11TextureCube*)Texture)->UpdateWith(0);
-						D3D10Resource = ((ZED3D11TextureCube*)Texture)->D3D10ShaderResourceView;
+						((ZED11TextureCube*)Texture)->UpdateWith(0);
+						D3D10Resource = ((ZED11TextureCube*)Texture)->ResourceView;
 						break;
 				}
 			}
@@ -477,7 +477,7 @@ void ZED3D11GraphicsDevice::ApplyOutputStates()
 	{
 		if (CurrentState.RenderTargets[0] != OldState.RenderTargets[0])
 		{
-			D3D10Targets[0] = CurrentState.RenderTargets[0] == NULL ? NULL : ((const ZED3D11RenderTarget*)CurrentState.RenderTargets[0])->D3D10RenderTargetView;
+			D3D10Targets[0] = CurrentState.RenderTargets[0] == NULL ? NULL : ((const ZED11RenderTarget*)CurrentState.RenderTargets[0])->D3D10RenderTargetView;
 			
 			OldState.RenderTargets[0] = CurrentState.RenderTargets[0];
 			RenderTargetChanged = true;
@@ -496,7 +496,7 @@ void ZED3D11GraphicsDevice::ApplyOutputStates()
 		for (ZESize I = 0; I < ZE_MAX_RENDER_TARGET_SLOT; ++I)
 		{
 			// Use all render targets without comparing to old ones
-			D3D10Targets[I] = CurrentState.RenderTargets[I] == NULL ? NULL : ((const ZED3D11RenderTarget*)CurrentState.RenderTargets[I])->D3D10RenderTargetView;
+			D3D10Targets[I] = CurrentState.RenderTargets[I] == NULL ? NULL : ((const ZED11RenderTarget*)CurrentState.RenderTargets[I])->D3D10RenderTargetView;
 
 			if (OldState.RenderTargets[I] != CurrentState.RenderTargets[I])
 			{
@@ -580,7 +580,7 @@ void ZED3D11GraphicsDevice::DrawIndexedInstanced(ZEGRPrimitiveType PrimitiveType
 
 void ZED3D11GraphicsDevice::ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
-	D3DContexes[ContextIndex]->ClearRenderTargetView(((ZED3D11RenderTarget*)RenderTarget)->D3D10RenderTargetView, ClearColor.M);
+	D3DContexes[ContextIndex]->ClearRenderTargetView(((ZED11RenderTarget*)RenderTarget)->RenderTargetView, ClearColor.M);
 }
 
 void ZED3D11GraphicsDevice::ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)

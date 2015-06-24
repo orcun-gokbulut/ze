@@ -39,7 +39,6 @@
 #include "ZEGRTexture.h"
 #include "ZEMath\ZEVector.h"
 
-class ZETextureData;
 class ZEGRRenderTarget;
 class ZEGRTexture2D : public ZEGRTexture
 {
@@ -50,7 +49,8 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt						Width;
 		ZEUInt						Height;
 
-		virtual bool				Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false) = 0;	
+		virtual bool				Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRTextureFormat Format, bool RenderTarget = false);	
+		virtual void				Deinitialize();
 
 									ZEGRTexture2D();
 
@@ -61,11 +61,9 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt						GetWidth() const;
 		ZEUInt						GetHeight() const;
 		ZEVector2					GetPixelSize() const;
-
-		void						LoadData(ZETextureData* Data);
-
-		virtual bool				Lock(void** Buffer, ZESize* Pitch) = 0;
-		virtual bool				Unlock() = 0;
+		
+		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
+		virtual void				Unlock(ZEUInt Level) = 0;
 
 		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) const = 0;
 

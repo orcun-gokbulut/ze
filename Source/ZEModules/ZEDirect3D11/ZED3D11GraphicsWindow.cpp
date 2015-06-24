@@ -38,10 +38,10 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZED11DepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZED3D11RenderTarget.h"
+#include "ZED11RenderTarget.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZED3D11Texture2D.h"
+#include "ZED11Texture2D.h"
 
 void ZED3D11GraphicsWindow::ReleaseSwapChain()
 {
@@ -66,14 +66,14 @@ bool ZED3D11GraphicsWindow::CreateSwapChain()
 	SwapChainDesc.SampleDesc.Quality = 0;
 	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
 
-#if(WINVER >= _WIN32_WINNT_WIN8)
+	#if(WINVER >= _WIN32_WINNT_WIN8)
 	// Override for better performance
 	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-#endif
+	#endif
 
-#ifdef ZE_GRAPHICS_CONTENT_PROTECTION
+	#ifdef ZE_GRAPHICS_CONTENT_PROTECTION
 	SwapChainDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_DISPLAY_ONLY;
-#endif
+	#endif
 
 	// Always create windowed and then switch to full screen if needed
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc;
@@ -83,9 +83,9 @@ bool ZED3D11GraphicsWindow::CreateSwapChain()
 	FullScreenDesc.RefreshRate.Numerator = 0;
 	FullScreenDesc.RefreshRate.Denominator = 0;
 
-//#ifdef ZE_GRAPHICS_CONTENT_PROTECTION
-//	Output = Adapters[ActiveAdapter].Outputs[I].Output;
-//#endif
+	//#ifdef ZE_GRAPHICS_CONTENT_PROTECTION
+	//Output = Adapters[ActiveAdapter].Outputs[I].Output;
+	//#endif
 
 	IDXGIOutput* Output = NULL;
 	ID3D11Device* D3DDevice = Module->GetD3D10Device();
@@ -105,9 +105,9 @@ bool ZED3D11GraphicsWindow::CreateSwapChain()
 
 void ZED3D11GraphicsWindow::ReleaseBackBuffer()
 {
-	ZE_DESTROY(BackBuffer);
-	ZE_DESTROY(BackBufferTexture);
-	ZE_DESTROY(DepthBuffer);
+	ZEGR_RELEASE(BackBuffer);
+	ZEGR_RELEASE(BackBufferTexture);
+	ZEGR_RELEASE(DepthBuffer);
 
 	zeLog("Buffers released.");
 }
@@ -125,16 +125,15 @@ bool ZED3D11GraphicsWindow::CreateBackBuffer()
 		return false;
 	}
 
-	BackBufferTexture = new ZED3D11Texture2D();
+	BackBufferTexture = new ZED11Texture2D();
 	BackBufferTexture->Create(D3DBackBuffer);
 	BackBufferTexture->SetDebugName("SwapChainBackBufferTexture");
 
-	BackBuffer = (ZED3D11RenderTarget*)BackBufferTexture->CreateRenderTarget();
+	BackBuffer = (ZED11RenderTarget*)BackBufferTexture->CreateRenderTarget();
 	BackBuffer->SetDebugName("SwapChainBackBuffer");
 
-	DepthBuffer = (ZED11DepthStencilBuffer*)ZEGRDepthStencilBuffer::CreateInstance();
-	DepthBuffer->Create(Width, Height, ZE_DSPF_DEPTH24_STENCIL8);
-	DepthBuffer->SetDebugName("SwapChainDepthBuffer");
+	DepthBuffer = (ZED11DepthStencilBuffer*)ZEGRDepthStencilBuffer::Create(Width, Height, ZEGR_DSF_DEPTH24_STENCIL8);
+	DepthBuffer->SetName("SwapChainDepthBuffer");
 
 	zeLog("Buffers created");
 

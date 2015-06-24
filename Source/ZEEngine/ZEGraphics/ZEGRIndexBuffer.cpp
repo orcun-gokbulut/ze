@@ -68,17 +68,23 @@ bool ZEGRIndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format
 	return true;
 }
 
-ZEGRResourceType ZEGRIndexBuffer::GetResourceType() const
+void ZEGRIndexBuffer::Deinitialize()
+{
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, IndexBuffer, Geometry);
+	SetSize(0);
+}
+
+ZEGRResourceType ZEGRIndexBuffer::GetResourceType()
 {
 	return ZEGR_RT_INDEX_BUFFER;
 }
 
-ZESize ZEGRIndexBuffer::GetIndexCount() const
+ZESize ZEGRIndexBuffer::GetIndexCount()
 {
 	return IndexCount;
 }
 
-ZEGRIndexBufferFormat ZEGRIndexBuffer::GetFormat() const
+ZEGRIndexBufferFormat ZEGRIndexBuffer::GetFormat()
 {
 	return Format;
 }
@@ -90,7 +96,7 @@ ZEGRIndexBuffer::ZEGRIndexBuffer()
 
 ZEGRIndexBuffer::~ZEGRIndexBuffer()
 {
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, IndexBuffer, Geometry);
+	Deinitialize();
 }
 
 ZEGRIndexBuffer* ZEGRIndexBuffer::Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11VertexBuffer.h
+ Zinek Engine - ZED11Texture2D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,33 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_VERTEX_BUFFER_H__
-#define __ZE_D3D11_VERTEX_BUFFER_H__
-
-#include <d3d11.h>
+#pragma once
 
 #include "ZETypes.h"
 #include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 
-class ZED3D11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
+class ZETextureData;
+class ZEGRRenderTarget;
+
+class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsDevice;
 	friend class ZED3D11GraphicsModule;
 
-	protected:		
-		ID3D11Buffer*			D3D10Buffer;
-	
-		bool					UpdateWith(ZEUInt ShadowIndex);
+	protected:
+		ID3D11Texture2D*					Texture2D;
+		ID3D11ShaderResourceView*			ResourceView;
 
-								ZED3D11VertexBuffer();
-		virtual					~ZED3D11VertexBuffer();
+		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual void						Deinitialize();
+
+											ZED11Texture2D();
 
 	public:
-		const ID3D11Buffer*		GetD3D10Buffer() const;
+		ID3D11Texture2D*					GetTexture();
+		ID3D11ShaderResourceView*			GetResourceView();
+		ZEGRRenderTarget*					GetRenderTarget(ZEUInt Level);
 
-		bool					CreateDynamic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
-		bool					CreateStatic(ZEUInt VertexCount, ZESize VertexSize, const void* VertexData);
+		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
+		virtual void						Unlock(ZEUInt Level);
 };
-
-#endif

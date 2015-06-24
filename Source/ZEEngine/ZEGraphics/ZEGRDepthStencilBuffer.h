@@ -53,6 +53,8 @@ class ZEGRDepthStencilBuffer : public ZEGRResource
 		ZEUInt							Height;
 		ZEGRDepthStencilFormat			Format;
 
+		static ZESize					GetPixelSize(ZEGRDepthStencilFormat Format);
+
 	protected:	
 		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format);
 		virtual void					Deinitialize();
@@ -61,9 +63,11 @@ class ZEGRDepthStencilBuffer : public ZEGRResource
 		virtual							~ZEGRDepthStencilBuffer();
 
 	public:
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEGRDepthStencilFormat			GetFormat() const;
+		virtual ZEGRResourceType		GetResourceType();
+
+		ZEUInt							GetWidth();
+		ZEUInt							GetHeight();
+		ZEGRDepthStencilFormat			GetFormat();
 
 		static ZEGRDepthStencilBuffer*	Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format);
 };

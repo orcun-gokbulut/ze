@@ -51,12 +51,13 @@ class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 		ID3D11Buffer*			Buffer;
 
 		virtual bool			Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		virtual void			Deinitialize();
 
 								ZED11IndexBuffer();
-								~ZED11IndexBuffer();
 
 	public:
 		const ID3D11Buffer*		GetBuffer() const;
+
 		void					Unlock();
 		bool					Lock(void** Data);
 };
