@@ -74,8 +74,9 @@ enum ZEGRShaderSystemSemantic
 
 enum ZEGRShaderConstantBufferType
 {
-	ZEGR_SCBT_C_BUFFER	= 0,
-	ZEGR_SCBT_T_BUFFER	= 1
+	ZEGR_SCBT_NONE		= 0,
+	ZEGR_SCBT_C_BUFFER	= 1,
+	ZEGR_SCBT_T_BUFFER	= 2
 };
 
 enum ZEGRShaderConstantType
@@ -89,12 +90,14 @@ enum ZEGRShaderConstantType
 
 enum ZEGRShaderSamplerType
 {
+	ZEGR_SSRT_NONE					= 0,
 	ZEGR_SSRT_UNSIGNED_NORMALIZED	= 1,
 	ZEGR_SSRT_SIGNED_NORMALIZED		= 2,
 	ZEGR_SSRT_SIGNED_INTEGER		= 3,
 	ZEGR_SSRT_UNSIGNED_INTEGER		= 4,
 	ZEGR_SSRT_FLOAT					= 5,
-	ZEGR_SSRT_MIXED					= 6
+	ZEGR_SSRT_DOUBLE				= 6,
+	ZEGR_SSRT_MIXED					= 7
 };
 
 struct ZEGRShaderInput

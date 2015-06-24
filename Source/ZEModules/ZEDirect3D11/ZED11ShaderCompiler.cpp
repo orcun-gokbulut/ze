@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ShaderCompiler.cpp
+ Zinek Engine - ZED11ShaderCompiler.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZED11ShaderCompiler.h"
+
+#include "ZED11Shader.h"
+#include "ZEError.h"
+#include "ZEGraphics/ZEGRShaderMeta.h"
+
 #include <d3dcompiler.h>
 #include <d3dcompiler.inl>
-
-#include "ZEError.h"
-#include "ZED3D11Shader.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEDS/ZEPointer.h"
-#include "ZEGraphics/ZEGRShader.h"
-#include "ZEDS/ZEHashGenerator.h"
-#include "ZED3D11ShaderCompiler.h"
-#include "ZED3D11GraphicsDevice.h"
-#include "ZED3D11GraphicsModule.h"
-#include "ZEGraphics/ZEGRShaderCompiler.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 
 #define ZE_SHADER_COMPILER_DEFAULT_PARAMETERS	(D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
 
@@ -89,27 +85,25 @@ class ZED3D11Include : public ID3DInclude
 
 inline static ZEGRShaderConstantType GetZEShaderConstantDataType(D3D_SHADER_VARIABLE_TYPE Type)
 {
-	ZEGRShaderConstantType Var = ZEGR_SCDT_VOID;
 	switch (Type)
 	{
+		default:
 		case D3D_SVT_VOID:
-			Var = ZEGR_SCDT_VOID;
-			break;
-		case D3D_SVT_BOOL:
-			Var = ZEGR_SCDT_BOOL;
-			break;
-		case D3D_SVT_INT:
-			Var = ZEGR_SCDT_INT;
-			break;
-		case D3D_SVT_UINT:
-			Var = ZEGR_SCDT_UINT;
-			break;
-		case D3D_SVT_FLOAT:
-			Var = ZEGR_SCDT_FLOAT;
-			break;
-	}
+			return ZEGR_SCDT_VOID;
 
-	return Var;
+		case D3D_SVT_BOOL:
+			return ZEGR_SCDT_BOOL;
+
+		case D3D_SVT_INT:
+			return ZEGR_SCDT_INT;
+
+		case D3D_SVT_UINT:
+			return ZEGR_SCDT_UINT;
+
+		case D3D_SVT_FLOAT:
+			return ZEGR_SCDT_FLOAT;
+
+	}
 }
 
 inline static ZEGRShaderSystemSemantic GetZEShaderSystemValueType(D3D_NAME Name)
@@ -167,69 +161,91 @@ inline static ZEGRShaderSystemSemantic GetZEShaderSystemValueType(D3D_NAME Name)
 
 inline static ZEGRShaderRegisterType GetZEShaderComponentType(D3D_REGISTER_COMPONENT_TYPE Type)
 {
-	static const ZEGRShaderRegisterType Values[] =
+	switch (Type)
 	{
-		ZEGR_SRT_NONE,				// D3D_REGISTER_COMPONENT_UNKNOWN	= 0,
-		ZEGR_SRT_UNSIGNED_INT_32,		// D3D_REGISTER_COMPONENT_UINT32	= 1,
-		ZEGR_SRT_SIGNED_INT_32,		// D3D_REGISTER_COMPONENT_SINT32	= 2,
-		ZEGR_SRT_FLOAT_32				// D3D_REGISTER_COMPONENT_FLOAT32	= 3
-	};
-	
-	return Values[Type];
+		default:
+		case D3D_REGISTER_COMPONENT_UNKNOWN:
+			return ZEGR_SRT_NONE;
+
+		case D3D_REGISTER_COMPONENT_UINT32:
+			return ZEGR_SRT_UNSIGNED_INT_32;
+
+		case D3D_REGISTER_COMPONENT_SINT32:
+			return ZEGR_SRT_SIGNED_INT_32;
+
+		case D3D_REGISTER_COMPONENT_FLOAT32:
+			return ZEGR_SRT_FLOAT_32;
+	}
 }
 
 inline static ZEGRTextureType GetZETextureType(D3D_SRV_DIMENSION Dimension)
 {
-	ZEGRTextureType Var = ZEGR_TT_NONE;
 	switch(Dimension)
 	{
+		default:
 		case D3D_SRV_DIMENSION_TEXTURE1D:
 		case D3D_SRV_DIMENSION_TEXTURE1DARRAY:
 			zeCriticalError("ZETexture1D not implemented yet");
-			break;
+			return ZEGR_TT_NONE;
+
 		case D3D_SRV_DIMENSION_TEXTURE2D:
 		case D3D_SRV_DIMENSION_TEXTURE2DMS:
 		case D3D_SRV_DIMENSION_TEXTURE2DARRAY:
 		case D3D_SRV_DIMENSION_TEXTURE2DMSARRAY:
-			Var = ZEGR_TT_2D;
-			break;
-		case D3D_SRV_DIMENSION_TEXTURE3D:
-			Var = ZEGR_TT_3D;
-			break;
-		case D3D_SRV_DIMENSION_TEXTURECUBE:
-			Var = ZEGR_TT_CUBE;
-			break;
-	}
+			return ZEGR_TT_2D;
 
-	return Var;
+		case D3D_SRV_DIMENSION_TEXTURE3D:
+			return ZEGR_TT_3D;
+
+		case D3D_SRV_DIMENSION_TEXTURECUBE:
+			return ZEGR_TT_CUBE;
+	}
 }
 
 inline static ZEGRShaderSamplerType GetZEShaderSamplerReturnType(D3D_RESOURCE_RETURN_TYPE Type)
 {
-	static const ZEGRShaderSamplerType Values[] =
+	switch (Type)
 	{
-		(ZEGRShaderSamplerType)-1,		
-		ZEGR_SSRT_UNSIGNED_NORMALIZED,	// D3D_RETURN_TYPE_UNORM	= 1,		
-		ZEGR_SSRT_SIGNED_NORMALIZED,		// D3D_RETURN_TYPE_SNORM	= 2,
-		ZEGR_SSRT_SIGNED_INTEGER,			// D3D_RETURN_TYPE_SINT		= 3,
-		ZEGR_SSRT_UNSIGNED_INTEGER,		// D3D_RETURN_TYPE_UINT		= 4,
-		ZEGR_SSRT_FLOAT,					// D3D_RETURN_TYPE_FLOAT	= 5,
-		ZEGR_SSRT_MIXED					// D3D_RETURN_TYPE_MIXED	= 6,
-	};
-	
-	return Values[Type];
-}
+		default:
+		case D3D_RETURN_TYPE_CONTINUED:
+			return ZEGR_SSRT_NONE;
 
+		case D3D_RETURN_TYPE_UNORM:
+			return ZEGR_SSRT_UNSIGNED_NORMALIZED;
+
+		case D3D_RETURN_TYPE_SNORM:
+			return ZEGR_SSRT_SIGNED_NORMALIZED;
+
+		case D3D_RETURN_TYPE_SINT:
+			return ZEGR_SSRT_SIGNED_INTEGER;
+
+		case D3D_RETURN_TYPE_UINT:
+			return ZEGR_SSRT_UNSIGNED_INTEGER;
+
+		case D3D_RETURN_TYPE_FLOAT:
+			return ZEGR_SSRT_FLOAT;
+
+		case D3D_RETURN_TYPE_MIXED:
+			return ZEGR_SSRT_MIXED;
+
+		case D3D_RETURN_TYPE_DOUBLE:
+			return ZEGR_SSRT_DOUBLE;
+	}
+}
 
 inline static ZEGRShaderConstantBufferType GetZEShaderConstantBufferType(D3D_CBUFFER_TYPE Type)
 {
-	static const ZEGRShaderConstantBufferType Values[] =
+	switch (Type)
 	{
-		ZEGR_SCBT_C_BUFFER,	//  D3D_CT_CBUFFER = 0,
-		ZEGR_SCBT_T_BUFFER	//  D3D_CT_TBUFFER = 1,
-	};
-	
-	return Values[Type];
+		default:
+			return ZEGR_SCBT_NONE;
+
+		case D3D_CT_CBUFFER:
+			return ZEGR_SCBT_C_BUFFER;
+
+		case D3D_CT_TBUFFER:
+			return ZEGR_SCBT_T_BUFFER;
+	}
 }
 
 inline static DXGI_FORMAT GetInputElementFormat(ZEShaderRegisterMask UsedRegisters, ZEGRShaderRegisterType RegisterType)
@@ -249,16 +265,16 @@ inline static DXGI_FORMAT GetInputElementFormat(ZEShaderRegisterMask UsedRegiste
 	// Not very healthy!!
 	switch (UsedRegisters)
 	{
-		case ZE_CM_RED:
+		case ZEGR_CM_RED:
 			Format = (DXGI_FORMAT)(Offsets[0] + RegisterType);
 			break;
-		case ZE_CM_RED | ZE_CM_GREEN:
+		case ZEGR_CM_RED | ZEGR_CM_GREEN:
 			Format = (DXGI_FORMAT)(Offsets[1] + RegisterType);
 			break;
-		case ZE_CM_RED | ZE_CM_GREEN | ZE_CM_BLUE:
+		case ZEGR_CM_RED | ZEGR_CM_GREEN | ZEGR_CM_BLUE:
 			Format = (DXGI_FORMAT)(Offsets[2] + RegisterType);
 			break;
-		case ZE_CM_RED | ZE_CM_GREEN | ZE_CM_BLUE | ZE_CM_ALPHA:
+		case ZEGR_CM_RED | ZEGR_CM_GREEN | ZEGR_CM_BLUE | ZEGR_CM_ALPHA:
 			Format = (DXGI_FORMAT)(Offsets[3] + RegisterType);
 			break;
 	}
@@ -335,7 +351,7 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 
 	switch (UsedRegisters)
 	{
-		case ZE_CM_RED:
+		case ZEGR_CM_RED:
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
@@ -349,7 +365,7 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 					break;
 			};
 			break;
-		case ZE_CM_RED | ZE_CM_GREEN:
+		case ZEGR_CM_RED | ZEGR_CM_GREEN:
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
@@ -363,7 +379,7 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 					break;
 			};
 			break;
-		case ZE_CM_RED | ZE_CM_GREEN | ZE_CM_BLUE:
+		case ZEGR_CM_RED | ZEGR_CM_GREEN | ZEGR_CM_BLUE:
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
@@ -377,7 +393,7 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 					break;
 			};
 			break;
-		case ZE_CM_RED | ZE_CM_GREEN | ZE_CM_BLUE | ZE_CM_ALPHA:
+		case ZEGR_CM_RED | ZEGR_CM_GREEN | ZEGR_CM_BLUE | ZEGR_CM_ALPHA:
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
@@ -537,13 +553,13 @@ inline static ZESSize ProcessVariable(ZEArray<ZEGRShaderConstant>* Variables, co
 	return Result;
 }
 
-bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* ByteCode)
+bool ZED11ShaderCompiler::CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode)
 {
 	// Get meta containers
-	ZEArray<ZEGRShaderConstantBuffer>* Buffers = &Shader->MetaTable.Buffers;
-	ZEArray<ZEGRShaderSampler>* Samplers = &Shader->MetaTable.Samplers;
-	ZEArray<ZEGRShaderTexture>* Textures = &Shader->MetaTable.Textures;
-	ZEArray<ZEGRShaderInput>* InputSignature = &Shader->MetaTable.Inputs;
+	ZEArray<ZEGRShaderConstantBuffer>* Buffers = &Meta->Buffers;
+	ZEArray<ZEGRShaderSampler>* Samplers = &Meta->Samplers;
+	ZEArray<ZEGRShaderTexture>* Textures = &Meta->Textures;
+	ZEArray<ZEGRShaderInput>* InputSignature = &Meta->Inputs;
 	
 	LPVOID ByteData = ByteCode->GetBufferPointer();
 	SIZE_T ByteSize = ByteCode->GetBufferSize();
@@ -582,20 +598,19 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 		
 		ZEGRShaderInput* InputParameter = &InputSignature->GetItem(I);
 		
-		if (strnlen(SignParamDesc.SemanticName, ZE_MAX_SHADER_VARIABLE_NAME) >= ZE_MAX_SHADER_VARIABLE_NAME)
+		if (strnlen(SignParamDesc.SemanticName, ZEGR_MAX_SHADER_VARIABLE_NAME) >= ZEGR_MAX_SHADER_VARIABLE_NAME)
 		{
 			ZEGR_RELEASE(Reflector);
 			zeError("Shader input semantic name too long. \"%s\"", SignParamDesc.SemanticName);
 			return false;
 		}
 
-		strcpy(InputParameter->Semantic, SignParamDesc.SemanticName);
+		InputParameter->Semantic = SignParamDesc.SemanticName;
 		InputParameter->Mask = SignParamDesc.Mask;
 		InputParameter->Index = SignParamDesc.SemanticIndex;
 		InputParameter->RegisterType = GetZEShaderComponentType(SignParamDesc.ComponentType);
 		InputParameter->SystemSemantic = GetZEShaderSystemValueType(SignParamDesc.SystemValueType); 
 		InputParameter->ElementType = D3D10ToZEVertexElementType(SignParamDesc.Mask, SignParamDesc.ComponentType);
-		InputParameter->Hash = ZEGRShaderInput::GetHash(SignParamDesc.SemanticName, (ZEUInt8)SignParamDesc.SemanticIndex);
 	}
 
 	// Get textures buffer sampler data
@@ -697,282 +712,140 @@ bool ZED3D11ShaderCompiler::CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* Byt
 	return true;
 }
 
-ZED3D11VertexShader* ZED3D11ShaderCompiler::CreateVertexShader(ID3DBlob* ByteCode)
+ZEGRShader* ZED11ShaderCompiler::Compile(const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output)
 {
-	ID3D11VertexShader* Shader = NULL;
-	HRESULT Result = D3DDevices[0]->CreateVertexShader(ByteCode->GetBufferPointer(), ByteCode->GetBufferSize(), NULL, &Shader);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Vertex shader creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	ZED3D11VertexShader* VertexShader = new ZED3D11VertexShader(ByteCode, Shader);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Vertex shader created. Size: %Iu.", (ZEUInt64)ByteCode->GetBufferSize());
-#endif
-
-	return VertexShader;
-}
-
- ZED3D11GeometryShader* ZED3D11ShaderCompiler::CreateGeometryShader(ID3DBlob* ByteCode)
-{	
-	ID3D11GeometryShader* Shader = NULL;
-	HRESULT Result = D3DDevices[0]->CreateGeometryShader(ByteCode->GetBufferPointer(), ByteCode->GetBufferSize(), NULL, &Shader);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Geometry shader creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	ZED3D11GeometryShader* GeometryShader = new ZED3D11GeometryShader(ByteCode, Shader);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Geometry shader created. Size: %Iu.", (ZEUInt64)ByteCode->GetBufferSize());
-#endif
-
-	return GeometryShader;
-}
-
-ZED3D11DomainShader* ZED3D11ShaderCompiler::CreateDomainShader(ID3DBlob* ByteCode)
-{
-	ID3D11DomainShader* Shader = NULL;
-	HRESULT Result = D3DDevices[0]->CreateDomainShader(ByteCode->GetBufferPointer(), ByteCode->GetBufferSize(), NULL, &Shader);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Domain shader creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	ZED3D11DomainShader* DomainShader = new ZED3D11DomainShader(ByteCode, Shader);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Domain shader created. Size: %Iu.", (ZEUInt64)ByteCode->GetBufferSize());
-#endif
-
-	return DomainShader;
-}
-
-ZED3D11HullShader* ZED3D11ShaderCompiler::CreateHullShader(ID3DBlob* ByteCode)
-{
-	ID3D11HullShader* Shader = NULL;
-	HRESULT Result = D3DDevices[0]->CreateHullShader(ByteCode->GetBufferPointer(), ByteCode->GetBufferSize(), NULL, &Shader);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Hull shader creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	ZED3D11HullShader* HullShader = new ZED3D11HullShader(ByteCode, Shader);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Hull shader created. Size: %Iu.", (ZEUInt64)ByteCode->GetBufferSize());
-#endif
-
-	return HullShader;
-}
-
-ZED3D11PixelShader* ZED3D11ShaderCompiler::CreatePixelShader(ID3DBlob* ByteCode)
-{	
-	ID3D11PixelShader* Shader = NULL;
-	HRESULT Result = D3DDevices[0]->CreatePixelShader(ByteCode->GetBufferPointer(), ByteCode->GetBufferSize(), NULL, &Shader);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Pixel shader creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	ZED3D11PixelShader* PixelShader = new ZED3D11PixelShader(ByteCode, Shader);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Pixel shader created. Size: %Iu.", (ZEUInt64)ByteCode->GetBufferSize());
-#endif
-
-	return PixelShader;
-}
-
-ZED3D11ComputeShader* ZED3D11ShaderCompiler::CreateComputeShader(ID3DBlob* ByteCode)
-{
-	ID3D11ComputeShader* Shader = NULL;
-	HRESULT Result = D3DDevices[0]->CreateComputeShader(ByteCode->GetBufferPointer(), ByteCode->GetBufferSize(), NULL, &Shader);
-	if (FAILED(Result))
-	{
-		zeError("D3D10 Hull shader creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	ZED3D11ComputeShader* ComputeShader = new ZED3D11ComputeShader(ByteCode, Shader);
-
-#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Compute shader created. Size: %Iu.", (ZEUInt64)ByteCode->GetBufferSize());
-#endif
-
-	return ComputeShader;
-}
-
-ZEGRShader* ZED3D11ShaderCompiler::CompileShader(ZEGRShaderCompileOptions* Options)
-{
-	zeDebugCheck(Options->SourceData.IsEmpty(), "No shader source available.");
-	zeDebugCheck(Options->EntryPoint.IsEmpty(), "Shader entry point is not available");
-	zeDebugCheck(Options->Type == ZE_ST_COMPUTE, "Shader type is not supported.");
-	zeDebugCheck(Options->Type == ZE_ST_DOMAIN, "Shader type is not supported.");
-	zeDebugCheck(Options->Type == ZE_ST_HULL, "Shader type is not supported.");
-	zeDebugCheck(Options->Model != ZE_SM_4_0, "Shader model is not supported by this module.");
+	zeDebugCheck(Options.SourceData.IsEmpty(), "No shader source available.");
+	zeDebugCheck(Options.EntryPoint.IsEmpty(), "Shader entry point is not available");
+	zeDebugCheck(Options.Type == ZEGR_ST_COMPUTE, "Shader type is not supported.");
+	zeDebugCheck(Options.Type == ZEGR_ST_DOMAIN, "Shader type is not supported.");
+	zeDebugCheck(Options.Type == ZEGR_ST_HULL, "Shader type is not supported.");
+	zeDebugCheck(Options.Model != ZEGR_SM_4_0, "Shader model is not supported by this module.");
 	
 	// Decide shader type
 	ZEString Profile = "";
-	switch (Options->Type)
+	switch (Options.Type)
 	{
-		case ZE_ST_VERTEX:
+		case ZEGR_ST_VERTEX:
 			Profile += "vs";
 			break;
 
-		case ZE_ST_PIXEL:
+		case ZEGR_ST_PIXEL:
 			Profile += "ps";
 			break;
 
-		case ZE_ST_GEOMETRY:
+		case ZEGR_ST_GEOMETRY:
 			Profile += "gs";
 			break;
 
-		case ZE_ST_COMPUTE:
+		case ZEGR_ST_COMPUTE:
 			Profile += "cs";
 			break;
 
-		case ZE_ST_DOMAIN:
+		case ZEGR_ST_DOMAIN:
 			Profile += "ds";
 			break;
 
-		case ZE_ST_HULL:
+		case ZEGR_ST_HULL:
 			Profile += "hs";
 			break;
 
 		default:
 			zeError("Unsupported shader type");
 			return NULL;
-			break;
 	}
 
 	// Decide shader model
-	switch (Options->Model)
+	switch (Options.Model)
 	{
-		case ZE_SM_4_0:
+		case ZEGR_SM_4_0:
 			Profile += "_4_0";
 			break;
 
-		case ZE_SM_4_1:
+		case ZEGR_SM_4_1:
 			Profile += "_4_1";
 			break;
 		
-		case ZE_SM_5_0:
+		case ZEGR_SM_5_0:
 			Profile += "_5_0";
 			break;
 
 		default:
 			zeError("Unsupported shader model");
 			return NULL;
-			break;
 	}
 	
 	// Fill macros array
-	ZESize ComponentCount = Options->Definitions.GetCount();
+	ZESize ComponentCount = Options.Definitions.GetCount();
 	ZEArray<D3D_SHADER_MACRO> Macros;
 	Macros.SetCount(ComponentCount + 1);
 	for (ZESize I = 0; I < ComponentCount; I++)
 	{
-		Macros[I].Name = Options->Definitions[I].Name.ToCString();
-		Macros[I].Definition = Options->Definitions[I].Value.ToCString();
-
-		// Also hash the parameter
-		Options->Definitions[I].Hash = Options->Definitions[I].Name.Hash();
+		Macros[I].Name = Options.Definitions[I].Name.ToCString();
+		Macros[I].Definition = Options.Definitions[I].Value.ToCString();
 	}
 	Macros[ComponentCount].Name = NULL;
 	Macros[ComponentCount].Definition = NULL;
 	
 	// Assign temp variables
-	ID3DBlob* Output = NULL;
+	ID3DBlob* CompileOutput = NULL;
 	ID3DBlob* ByteCode = NULL;
 	LPCSTR TempProfile = Profile.ToCString();
-	LPCSTR TempSource = Options->SourceData.ToCString();
-	SIZE_T TempSize = Options->SourceData.GetSize();
-	LPCSTR TempEntry = Options->EntryPoint.ToCString();
+	LPCSTR TempSource = Options.SourceData.ToCString();
+	SIZE_T TempSize = Options.SourceData.GetSize();
+	LPCSTR TempEntry = Options.EntryPoint.ToCString();
 	const D3D_SHADER_MACRO* TempMacros = Macros.GetConstCArray();
 
 	// Compile
-	HRESULT Result = D3DCompile(TempSource, TempSize, Options->FileName, TempMacros, &D3D10Include, TempEntry, TempProfile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &Output);
+	HRESULT Result = D3DCompile(TempSource, TempSize, Options.FileName, TempMacros, &D3D10Include, TempEntry, TempProfile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
 	if (FAILED(Result))
 	{
-		zeError("Can not compile shader.\r\nFile: \"%s\".\r\nCompile output: \r\n%s\r\n", Options->FileName.ToCString(), Output->GetBufferPointer());
+		zeError("Can not compile shader.\r\nFile: \"%s\".\r\nCompile output: \r\n%s\r\n", Options.FileName.ToCString(), CompileOutput->GetBufferPointer());
 		return NULL;
 	}
 
-	ZEGR_RELEASE(Output);
+	*Output = (char*)CompileOutput->GetBufferPointer();
+	ZEGR_RELEASE(CompileOutput);
 
-	ZED3D11Shader* Shader = NULL;
-	switch (Options->Type)
+	if (Meta != NULL)
 	{
-		case ZE_ST_VERTEX:
-			Shader = CreateVertexShader(ByteCode);
-			break;
+		if (!CreateMetaTable(Meta, ByteCode))
+		{
+			ZEGR_RELEASE(ByteCode);
+			return NULL;
+		}
 
-		case ZE_ST_DOMAIN:
-			Shader = CreateDomainShader(ByteCode);
-			break;
-
-		case ZE_ST_HULL:
-			Shader = CreateHullShader(ByteCode);
-			break;
-
-		case ZE_ST_GEOMETRY:
-			Shader = CreateGeometryShader(ByteCode);
-			break;
-
-		case ZE_ST_PIXEL:
-			Shader = CreatePixelShader(ByteCode);
-			break;
-
-		case ZE_ST_COMPUTE:
-			Shader = CreateComputeShader(ByteCode);
-			break;
-	}
-	
-	if (Shader == NULL)
-		return NULL;
-
-	if (!CreateMetaTable(Shader, ByteCode))
-	{
-		ZE_DESTROY(Shader);
-		return NULL;
+		Meta->CompileOptions = Options;
 	}
 
-	Shader->MetaTable.CompileOptions = *Options;
 
-#ifdef ZE_GRAPHIC_LOG_ENABLE
+	#ifdef ZE_GRAPHIC_LOG_ENABLE
 	char Parameter[36] = {0};
 	char Parameters[1024] = {0};
-	for (ZESize I = 0; I < Options->Definitions.GetCount(); ++I)
+	for (ZESize I = 0; I < Options.Definitions.GetCount(); ++I)
 	{
-		const char* Name = Options->Definitions[I].Name.ToCString();
-		const char* Defn = Options->Definitions[I].Value.ToCString();
+		const char* Name = Options.Definitions[I].Name.ToCString();
+		const char* Defn = Options.Definitions[I].Value.ToCString();
 
 		sprintf(Parameter, "%s %s, ", Name, Defn == NULL ? "" : Defn);
 		strcat(Parameters, Parameter);
 	}
 
 	zeLog("Shader compiled with options: ShaderModel: %u, FileName: %s, Entry: %s, Parameters: %s.", 
-			Options->Model + 2, Options->FileName.ToCString(), Options->EntryPoint.ToCString(), Parameters);
-#endif
+			Options.Model + 2, Options.FileName.ToCString(), Options.EntryPoint.ToCString(), Parameters);
+	#endif
+	
+	ZEGRShader* Shader = ZEGRShader::Create(Options.Type, ByteCode->GetBufferPointer(), ByteCode->GetBufferSize());
+	ZEGR_RELEASE(ByteCode);
 
 	return Shader;
 }
 
-ZED3D11ShaderCompiler::ZED3D11ShaderCompiler()
+ZED11ShaderCompiler::ZED11ShaderCompiler()
 {
 
 }
 
-ZED3D11ShaderCompiler::~ZED3D11ShaderCompiler()
+ZED11ShaderCompiler::~ZED11ShaderCompiler()
 {
 
 }

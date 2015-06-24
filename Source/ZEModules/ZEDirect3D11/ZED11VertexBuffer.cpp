@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ShaderCompiler.h
+ Zinek Engine - ZED11VertexBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_D3D11_SHADER_COMPILER_H__
-#define __ZE_D3D11_SHADER_COMPILER_H__
+#include "ZEError.h"
+#include "ZED11VertexBuffer.h"
+#include "ZED3D11GraphicsModule.h"
 
-#include <d3d11.h>
-
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRShaderCompiler.h"
-
-class ZEGRShader;
-class ZED3D11Shader;
-class ZED3D11PixelShader;
-class ZED3D11VertexShader;
-class ZED3D11GeometryShader;
-
-class ZED3D11ShaderCompiler : public ZEGRShaderCompiler, public ZED11ComponentBase
+const ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
 {
-	friend class ZED3D11GraphicsModule;
+	return Buffer;
+}
 
-	protected:
-		ZED3D11VertexShader*		CreateVertexShader(ID3DBlob* ByteCode);
-		ZED3D11GeometryShader*		CreateGeometryShader(ID3DBlob* ByteCode);
-		ZED3D11DomainShader*		CreateDomainShader(ID3DBlob* ByteCode);
-		ZED3D11HullShader*			CreateHullShader(ID3DBlob* ByteCode);
-		ZED3D11PixelShader*			CreatePixelShader(ID3DBlob* ByteCode);
-		ZED3D11ComputeShader*		CreateComputeShader(ID3DBlob* ByteCode);
+bool ZED11VertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
+{
+	zeDebugCheck(Buffer != NULL, "Vertex buffer is already initialized.");
+	zeDebugCheck(VertexSize == 0, "Zero vertex size.");
+	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
 
-		bool						CreateMetaTable(ZED3D11Shader* Shader, ID3DBlob* ByteCode);
+	ZESize Size = VertexSize * (ZESize)VertexCount;
+	zeDebugCheck(Size > 134217728, "Buffer too large.");
 
-		ZEGRShader*					CompileShader(ZEGRShaderCompileOptions* Options);
+	D3D11_BUFFER_DESC BufferDesc;
+	BufferDesc.MiscFlags = 0;
+	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
 
-									ZED3D11ShaderCompiler();
-		virtual						~ZED3D11ShaderCompiler();
-};
+	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
+	if (FAILED(Result))
+	{
+		zeError("Can not create dynamic vertex buffer.");
+		return false;
+	}
 
-#endif
+	return ZEGRVertexBuffer::Initialize(VertexCount, VertexSize);
+}
+
+void ZED11VertexBuffer::Deinitialize()
+{
+	ZEGR_RELEASE(Buffer);
+}
+
+ZED11VertexBuffer::ZED11VertexBuffer()
+{
+	Buffer = NULL;
+}

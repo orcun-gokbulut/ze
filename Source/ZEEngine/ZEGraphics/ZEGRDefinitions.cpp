@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGraphicsDefinitions.cpp
+ Zinek Engine - ZEGRDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#include "ZEDS/ZEFlags.h"
-
-//#define ZE_GRAPHIC_LOG_ENABLE
-//#define ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
-//#define ZE_GRAPHICS_CONTENT_PROTECTION
-
-#define ZEGR_MAX_SHADER_VARIABLE_NAME		32
-
-#define ZEGR_MAX_RENDER_TARGET_SLOT			8
-#define ZEGR_MAX_VERTEX_LAYOUT_ELEMENT		16
-#define ZEGR_MAX_VERTEX_BUFFER_SLOT			16
-#define ZEGR_MAX_SAMPLER_SLOT				16
-#define ZEGR_MAX_TEXTURE_SLOT				32
-#define ZEGR_MAX_CONSTANT_BUFFER_SLOT		14
-#define ZEGR_MAX_VIEWPORT_SLOT				16
-#define ZEGR_MAX_SCISSOR_SLOT				16
-
-#define	ZEGR_STATE_POOL_CACHE_CAPACITY		128
-
-#define	ZEGR_MAX_SHADOW_COPY_COUNT			5
-#define	ZEGR_RENDER_BUFFER_COUNT			2
-
-#define ZEGR_CM_NONE			0x0
-#define	ZEGR_CM_RED				0x1
-#define	ZEGR_CM_GREEN			0x2
-#define	ZEGR_CM_BLUE			0x4
-#define	ZEGR_CM_ALPHA			0x8
-#define ZEGR_CM_ALL				ZEGR_CM_RED | ZEGR_CM_GREEN | ZEGR_CM_BLUE | ZEGR_CM_ALPHA
-typedef ZEFlagsBase<ZEUInt8>	ZEGRColorMask;
+#include "ZEGRDefinitions.h"

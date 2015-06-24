@@ -41,12 +41,19 @@
 
 class ZEGRShader : public ZEGRResource
 {
+	private:
+		ZEGRShaderType				ShaderType;
+
 	protected:
+		virtual bool				Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
+		virtual void				Deinitialize();
+
 									ZEGRShader();
 		virtual						~ZEGRShader();
 
 	public:
-		virtual void				Destroy();
+		virtual ZEGRResourceType	GetResourceType();
+		virtual ZEGRShaderType		GetShaderType();
 
-		virtual ZEGRShaderType		GetShaderType() const = 0;
+		static ZEGRShader*			Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
 };

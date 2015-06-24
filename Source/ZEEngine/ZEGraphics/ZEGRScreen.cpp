@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11RenderTarget.h
+ Zinek Engine - ZEGRScreen.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,84 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_RENDER_TARGET_H__
-#define __ZE_D3D11_RENDER_TARGET_H__
+#include "ZEGRScreen.h"
 
-#include <d3d11.h>
-
-#include "ZETypes.h"
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
-
-struct ID3D11RenderTargetView;
-
-class ZED3D11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
-{
-	friend class ZED3D11Texture2D;
-	friend class ZED3D11Texture3D;
-	friend class ZED3D11TextureCube;
-	friend class ZED3D11GraphicsModule;
-	friend class ZED3D11GraphicsDevice;
-	friend class ZED3D11GraphicsWindow;
-
-	protected:
-		ID3D11RenderTargetView*			D3D10RenderTargetView;
-
-										ZED3D11RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEGRTextureFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView);
-		virtual							~ZED3D11RenderTarget();
-	
-	public:
-		const ID3D11RenderTargetView*	GetD3D10RenderTargetView() const;
-		
-		virtual bool					IsEmpty() const;
-};
-
+#ifndef NULL
+#define NULL 0
 #endif
+
+bool ZEGRScreen::InitializeSelf()
+{
+	return true;
+}
+
+void ZEGRScreen::DeinitializeSelf()
+{
+
+}
+
+void ZEGRScreen::SetHandle(void* Handle)
+{
+	this->Handle = Handle;
+}
+
+void* ZEGRScreen::GetHandle()
+{
+	return Handle;
+}
+
+void ZEGRScreen::SetSize(ZEUInt Width, ZEUInt Height)
+{
+	this->Width = Width;
+	this->Height = Height;
+}
+
+ZEUInt ZEGRScreen::GetWidth()
+{
+	return Width;
+}
+
+ZEUInt ZEGRScreen::GetHeight()
+{
+	return Height;
+}
+
+void ZEGRScreen::SetVisible(bool Visible)
+{
+	this->Visible = Visible;
+}
+
+bool ZEGRScreen::GetVisible()
+{
+	return Visible;
+}
+
+void ZEGRScreen::SetMonitor(ZEGRMonitor* Monitor)
+{
+	this->Monitor = Monitor;
+}
+
+ZEGRMonitor* ZEGRScreen::GetMonitor()
+{
+	return Monitor;
+}
+
+void ZEGRScreen::SetFullscreen(bool Fullscreen)
+{
+	this->Fullscreen = Fullscreen;
+}
+
+bool ZEGRScreen::GetFullscreen()
+{
+	return Fullscreen;
+}
+
+ZEGRScreen::ZEGRScreen()
+{
+	Handle = NULL;
+	Width = 0;
+	Height = 0;
+	Visible = true;
+	Fullscreen = true;
+	Monitor = NULL;
+}

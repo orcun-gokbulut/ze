@@ -59,9 +59,9 @@ static void CopyToTextureCube(ZEGRTextureCube* Output, ZETextureData* TextureDat
 	{
 		for(ZESize Level = 0; Level < (ZESize)LevelCount; ++Level)
 		{
-			Output->Lock((ZETextureCubeFace)Surface, (ZEUInt)Level, &TargetBuffer, &TargetPitch);
+			Output->Lock((ZEGRTextureCubeFace)Surface, (ZEUInt)Level, &TargetBuffer, &TargetPitch);
 			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
-			Output->Unlock((ZETextureCubeFace)Surface, (ZEUInt)Level);
+			Output->Unlock((ZEGRTextureCubeFace)Surface, (ZEUInt)Level);
 		}
 	}
 }
@@ -265,7 +265,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	
 	// Create TextureCubeResource 
 	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::CreateInstance();
+	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::Create();
 	if (Texture == NULL)
 	{
 		delete TextureResource;

@@ -115,11 +115,12 @@ struct ZEWindowStyle
 	};
 };
 
+
 class ZEGRWindow
 {
 	protected:
 		static ZEUInt							WindowCount;
-		static ZEGRWindow*				LastCursorLock;
+		static ZEGRWindow*						LastCursorLock;
 
 		ZEUInt									Id;
 
@@ -225,5 +226,9 @@ class ZEGRWindow
 		virtual const ZEGRDepthStencilBuffer*	GetDepthBuffer() = 0;
 
 		static ZEUInt							GetWindowCount();
-		static ZEGRWindow*				CreateInstance();
+		static ZEGRWindow*						CreateInstance();
 };
+
+// Window As Output Device
+
+// Window As Windo

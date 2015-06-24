@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ConstantBuffer.cpp
+ Zinek Engine - ZED11TextureCube.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED11ConstantBuffer.h"
+#pragma once
 
-#include "ZEError.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZED11ComponentBase.h"
 
-#include <d3d11.h>
+#include "ZETypes.h"
 
-const ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
+struct ID3D11Texture2D;
+struct ID3D11ShaderResourceView;
+class ZEGRRenderTarget;
+
+class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
 {
-	return Buffer;
-}
+	friend class ZED3D11GraphicsModule;
+	private:
+		ID3D11Texture2D*				Texture;
+		ID3D11ShaderResourceView*		ResourceView;
 
-bool ZED11ConstantBuffer::Initialize(ZESize BufferSize)
-{	
-	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
-	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
-	zeDebugCheck(BufferSize > 65536, "Buffer too large");
+		virtual bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual void					Deinitialize();
 
-	D3D11_BUFFER_DESC Desc;
-	Desc.MiscFlags = 0;
-	Desc.Usage = D3D11_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	Desc.ByteWidth = (UINT)BufferSize;
-	
-	HRESULT Result = GetDevice()->CreateBuffer(&Desc, NULL, &Buffer);
-	if (FAILED(Result))
-	{
-		zeError("Constant buffer creation failed. ErrorCode: %d.", Result);
-		return false;
-	}
+										ZED11TextureCube();
 
-	SetSize(BufferSize);
+	public:		
+		ID3D11Texture2D*				GetTexture();
+		ID3D11ShaderResourceView*		GetResourceView();
+		
+		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level);
+		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level);
 
-	return true;
-}
-
-void ZED11ConstantBuffer::Deinitialize()
-{
-	ZEGR_RELEASE(Buffer);
-	ZEGRConstantBuffer::Deinitialize();
-}
-
-ZED11ConstantBuffer::ZED11ConstantBuffer()
-{
-	Buffer = NULL;
-}
+		ZEGRRenderTarget*				GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level);
+};

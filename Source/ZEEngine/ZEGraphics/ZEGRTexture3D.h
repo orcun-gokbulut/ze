@@ -44,15 +44,17 @@ class ZEGRRenderTarget;
 class ZETextureData;
 
 class ZEGRTexture3D : public ZEGRTexture
-{
+ {
 	protected:
 		ZEUInt							Width;
 		ZEUInt							Height;
 		ZEUInt							Depth;
 
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget) = 0;	
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual void					Deinitialize();	
 
 										ZEGRTexture3D();
+		virtual							~ZEGRTexture3D();
 
 	public:
 		virtual ZEGRResourceType		GetResourceType() const;
@@ -63,11 +65,10 @@ class ZEGRTexture3D : public ZEGRTexture
 		ZEUInt							GetDepth() const;
 		ZEVector3						GetPixelSize() const;
 
-		bool							LoadData(ZETextureData* Data);
 		virtual bool					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch) = 0;
-		virtual bool					Unlock() = 0;
+		virtual void					Unlock(ZEUInt Level) = 0;
 
-		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
+		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) = 0;
 		
 		ZEGRTexture3D*					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);	
 };

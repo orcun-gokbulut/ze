@@ -117,7 +117,7 @@ struct ZEGRObjectsCount
 
 class ZEGRCounter
 {
-	ZE_DISALLOW_COPY(ZEGRCounter)
+	//ZE_DISALLOW_COPY(ZEGRCounter);
 
 	friend class ZEGRGraphicsModule;
 	friend class ZEGRVertexBuffer;

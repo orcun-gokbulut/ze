@@ -38,24 +38,24 @@
 
 #include "ZEError.h"
 #include "ZECore/ZECore.h"
-#include "ZED3D11Shader.h"
+#include "ZED11Shader.h"
 #include "ZECore/ZEModule.h"
 #include "ZECore/ZEWindow.h"
 #include "ZED3D11StatePool.h"
-#include "ZED3D11Texture2D.h"
-#include "ZED3D11Texture3D.h"
+#include "ZED11Texture2D.h"
+#include "ZED11Texture3D.h"
 #include "ZED11Tracer.h"
-#include "ZED3D11TextureCube.h"
+#include "ZED11TextureCube.h"
 #include "ZED11Tracer.h"
 #include "ZED11IndexBuffer.h"
-#include "ZED3D11VertexBuffer.h"
-#include "ZED3D11RenderTarget.h"
+#include "ZED11VertexBuffer.h"
+#include "ZED11RenderTarget.h"
 #include "ZED3D11ShaderManager.h"
 #include "ZED11ComponentBase.h"
 #include "ZED3D11GraphicsWindow.h"
 #include "ZED3D11GraphicsModule.h"
 #include "ZED3D11GraphicsDevice.h"
-#include "ZED3D11ShaderCompiler.h"
+#include "ZED11ShaderCompiler.h"
 #include "ZED11ConstantBuffer.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZED3D11GraphicsMonitor.h"
@@ -366,7 +366,7 @@ ZEGraphicsEventTracer* ZED3D11GraphicsModule::GetEventTracer() const
 
 ZEGRShaderCompiler* ZED3D11GraphicsModule::GetShaderCompiler() const
 {
-	static ZED3D11ShaderCompiler Compiler;
+	static ZED11ShaderCompiler Compiler;
 	return &Compiler;
 }
 
@@ -388,7 +388,7 @@ ZEGRConstantBuffer* ZED3D11GraphicsModule::CreateConstantBuffer()
 
 ZEGRVertexBuffer* ZED3D11GraphicsModule::CreateVertexBuffer()
 {
-	return new ZED3D11VertexBuffer();
+	return new ZED11VertexBuffer();
 }
 
 ZEGRWindow* ZED3D11GraphicsModule::CreateGraphicsWindow()
@@ -401,17 +401,17 @@ ZEGRWindow* ZED3D11GraphicsModule::CreateGraphicsWindow()
 
 ZEGRTexture2D* ZED3D11GraphicsModule::CreateTexture2D()
 {
-	return new ZED3D11Texture2D();
+	return new ZED11Texture2D();
 }
 
 ZEGRTexture3D* ZED3D11GraphicsModule::CreateTexture3D()
 {
-	return new ZED3D11Texture3D();
+	return new ZED11Texture3D();
 }
 
 ZEGRTextureCube* ZED3D11GraphicsModule::CreateTextureCube()
 {
-	return new ZED3D11TextureCube();
+	return new ZED11TextureCube();
 }
 
 ZEGRDepthStencilBuffer* ZED3D11GraphicsModule::CreateDepthStencilBuffer()

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11Texture2D.h
+ Zinek Engine - ZED11Shader.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_TEXTURE_2D_H__
-#define __ZE_D3D11_TEXTURE_2D_H__
+#pragma once
 
-#include <d3d11.h>
+#include "ZEGraphics/ZEGRShader.h"
 
 #include "ZETypes.h"
 #include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 
-class ZETextureData;
-class ZEGRRenderTarget;
+struct ID3D11VertexShader;
+struct ID3D11GeometryShader;
+struct ID3D11DomainShader;
+struct ID3D11HullShader;
+struct ID3D11PixelShader;
+struct ID3D11ComputeShader;
 
-class ZED3D11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
+class ZED11Shader : public ZEGRShader, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
-	friend class ZED3D11GraphicsDevice;
-	friend class ZED3D11GraphicsWindow;
-
 	protected:
-		ID3D11Texture2D*					D3D10Texture2D;
-		ID3D11ShaderResourceView*			D3D10ShaderResourceView;
+		union
+		{
+			ID3D11VertexShader*		VertexShader;
+			ID3D11GeometryShader*	GeometryShader;
+			ID3D11DomainShader*		DomainShader;
+			ID3D11HullShader*		HullShader;
+			ID3D11PixelShader*		PixelShader;
+			ID3D11ComputeShader*	ComputeShader;
+		};
 
-		bool								UpdateWith(ZEUInt ShadowIndex);
+		virtual bool				Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
+		virtual void				Deinitialize();
 
-											ZED3D11Texture2D();
-		virtual								~ZED3D11Texture2D();
+									ZED11Shader();
 
 	public:
-		const ID3D11Texture2D*				GetD3D10Texture() const;
-		const ID3D11ShaderResourceView*		GetD3D10ResourceView() const;
-		
-		ZEGRRenderTarget*						CreateRenderTarget(ZEUInt MipLevel = 0) const;
-		
-		bool								Create(ID3D11Texture2D* D3DTexture);
-
-		bool								CreateDynamic(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat PixelFormat, ZETextureData* Data = NULL);
-		bool								CreateStatic(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget = false, ZETextureData* Data = NULL);
+		ID3D11VertexShader*			GetVertexShader();
+		ID3D11GeometryShader*		GetGeometryShader();
+		ID3D11DomainShader*			GetDomainShader();
+		ID3D11HullShader*			GetHullShader();
+		ID3D11PixelShader*			GetPixelShader();
+		ID3D11ComputeShader*		GetComputeShader();
 };
-
-#endif
-
-
-
-

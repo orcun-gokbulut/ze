@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ConstantBuffer.cpp
+ Zinek Engine - ZED11Shader.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,111 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED11ConstantBuffer.h"
-
-#include "ZEError.h"
+#include "ZED11Shader.h"
 #include "ZED3D11GraphicsModule.h"
 
-#include <d3d11.h>
-
-const ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
+bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
 {
-	return Buffer;
+	HRESULT Result;
+	switch (ShaderType)
+	{
+		case ZEGR_ST_VERTEX:
+			Result = GetDevice()->CreateVertexShader(ShaderBinary, Size, NULL, &VertexShader);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Result = GetDevice()->CreateDomainShader(ShaderBinary, Size, NULL, &DomainShader);
+			break;
+
+		case ZEGR_ST_HULL:
+			Result = GetDevice()->CreateHullShader(ShaderBinary, Size, NULL, &HullShader);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Result = GetDevice()->CreateGeometryShader(ShaderBinary, Size, NULL, &GeometryShader);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Result = GetDevice()->CreatePixelShader(ShaderBinary, Size, NULL, &PixelShader);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Result = GetDevice()->CreateComputeShader(ShaderBinary, Size, NULL, &ComputeShader);
+			break;
+
+		default:
+			return NULL;
+	}
+	
+	if (FAILED(Result))
+		return NULL;
+
+	return ZEGRShader::Initialize(ShaderType, ShaderBinary, Size);
 }
 
-bool ZED11ConstantBuffer::Initialize(ZESize BufferSize)
-{	
-	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
-	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
-	zeDebugCheck(BufferSize > 65536, "Buffer too large");
-
-	D3D11_BUFFER_DESC Desc;
-	Desc.MiscFlags = 0;
-	Desc.Usage = D3D11_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	Desc.ByteWidth = (UINT)BufferSize;
-	
-	HRESULT Result = GetDevice()->CreateBuffer(&Desc, NULL, &Buffer);
-	if (FAILED(Result))
+void ZED11Shader::Deinitialize()
+{
+	switch (GetShaderType())
 	{
-		zeError("Constant buffer creation failed. ErrorCode: %d.", Result);
-		return false;
+		case ZEGR_ST_VERTEX:
+			ZEGR_RELEASE(ComputeShader);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			ZEGR_RELEASE(DomainShader);
+			break;
+
+		case ZEGR_ST_HULL:
+			ZEGR_RELEASE(HullShader);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			ZEGR_RELEASE(GeometryShader);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			ZEGR_RELEASE(PixelShader);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			ZEGR_RELEASE(ComputeShader);
+			break;
 	}
 
-	SetSize(BufferSize);
-
-	return true;
+	ZEGRShader::Deinitialize();
 }
 
-void ZED11ConstantBuffer::Deinitialize()
+ZED11Shader::ZED11Shader()
 {
-	ZEGR_RELEASE(Buffer);
-	ZEGRConstantBuffer::Deinitialize();
+	VertexShader = NULL;
 }
 
-ZED11ConstantBuffer::ZED11ConstantBuffer()
+ID3D11VertexShader* ZED11Shader::GetVertexShader()
 {
-	Buffer = NULL;
+	return VertexShader;
+}
+
+ID3D11GeometryShader* ZED11Shader::GetGeometryShader()
+{
+	return GeometryShader;
+}
+
+ID3D11DomainShader* ZED11Shader::GetDomainShader()
+{
+	return DomainShader;
+}
+
+ID3D11HullShader* ZED11Shader::GetHullShader()
+{
+	return HullShader;
+}
+
+ID3D11PixelShader* ZED11Shader::GetPixelShader()
+{
+	return PixelShader;
+}
+
+ID3D11ComputeShader* ZED11Shader::GetComputeShader()
+{
+	return ComputeShader;
 }

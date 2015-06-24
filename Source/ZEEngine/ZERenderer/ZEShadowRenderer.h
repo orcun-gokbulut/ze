@@ -43,7 +43,7 @@
 class ZEGRTexture2D;
 class ZEGRTextureCube;
 struct ZEDrawParameters;
-enum ZETextureCubeFace;
+enum ZEGRTextureCubeFace;
 
 class ZEShadowRenderer : public ZERenderer
 {

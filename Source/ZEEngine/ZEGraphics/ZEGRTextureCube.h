@@ -39,14 +39,14 @@
 #include "ZETypes.h"
 #include "ZEGRTexture.h"
 
-enum ZETextureCubeFace
+enum ZEGRTextureCubeFace
 {
-	ZE_CTF_POSITIVEX	= 0,
-	ZE_CTF_NEGATIVEX	= 1,
-	ZE_CTF_POSITIVEY	= 2,
-	ZE_CTF_NEGATIVEY	= 3,
-	ZE_CTF_POSITIVEZ	= 4,
-	ZE_CTF_NEGATIVEZ	= 5
+	ZEGR_TCF_POSITIVEX		= 0,
+	ZEGR_TCF_NEGATIVEX		= 1,
+	ZEGR_TCF_POSITIVEY		= 2,
+	ZEGR_TCF_NEGATIVEY		= 3,
+	ZEGR_TCF_POSITIVEZ		= 4,
+	ZEGR_TCF_NEGATIVEZ		= 5
 };
 
 class ZETextureData;
@@ -58,7 +58,8 @@ class ZEGRTextureCube : public ZEGRTexture
 		ZEUInt							Length;
 
 	protected:
-		virtual	bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget, ZETextureData* InitialData) = 0;
+		virtual	bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget) = 0;
+		virtual void					Deinitialize();
 
 										ZEGRTextureCube();
 		virtual							~ZEGRTextureCube();
@@ -70,13 +71,12 @@ class ZEGRTextureCube : public ZEGRTexture
 		ZEUInt							GetLength() const;
 		float							GetPixelSize() const;
 
-		virtual bool					Unlock(ZETextureCubeFace Face) = 0;
-		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZETextureCubeFace Face) = 0;
+		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
+		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
 		
-		
-		virtual	ZEGRRenderTarget*		GetRenderTarget(ZETextureCubeFace Face, ZEUInt MipLevel = 0) const = 0;
+		virtual	ZEGRRenderTarget*		GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) const = 0;
 
-		static ZEGRTextureCube*			CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat PixelFormat, bool RenderTarget = false, ZETextureData* InitialData = 0);
+		static ZEGRTextureCube*			Create(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);
 };
 
 #endif

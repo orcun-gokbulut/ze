@@ -53,11 +53,9 @@ const ID3D11Buffer* ZED11IndexBuffer::GetBuffer() const
 	return Buffer;
 }
 
-bool ZED11IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEGRIndexBufferFormat Format, const void* InitialData)
+bool ZED11IndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
 {
-	zeDebugCheck(GetIsCreated(), "Buffer already created.");
 	zeDebugCheck(IndexCount == 0, "Cannot create empty buffer.");
-	zeDebugCheck(InitialData == NULL, "Buffer must have initial data.");
 	zeDebugCheck(Format == ZEGR_IBF_NONE, "Unknown buffer format");
 
 	ZESize Size = GetIndexSize(Format) * (ZESize)IndexCount;
@@ -70,27 +68,23 @@ bool ZED11IndexBuffer::CreateStatic(ZEUInt IndexCount, ZEGRIndexBufferFormat For
 	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	BufferDesc.ByteWidth = (UINT)Size;
 
-	D3D11_SUBRESOURCE_DATA Data;
-	Data.pSysMem = InitialData;
-	Data.SysMemPitch = 0;
-	Data.SysMemSlicePitch = 0;
-
-	HRESULT Result = D3DDevices[0]->CreateBuffer(&BufferDesc, &Data, &Buffer);
+	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
 	if (FAILED(Result))
 	{
-		zeError("D3D10 Static index buffer creation failed. ErrorCode: %d.", Result);
+		zeError("Index buffer creation failed. ErrorCode: %d.", Result);
 		return false;
 	}
 	
-	return ZEGRIndexBuffer::CreateStatic(IndexCount, Format, InitialData);
+	return ZEGRIndexBuffer::Initialize(IndexCount, Format);
+}
+
+void ZED11IndexBuffer::Deinitialize()
+{
+	ZEGR_RELEASE(Buffer);
+	ZEGRIndexBuffer::Deinitialize();
 }
 
 ZED11IndexBuffer::ZED11IndexBuffer()
 {
 	Buffer = NULL;
-}
-
-ZED11IndexBuffer::~ZED11IndexBuffer()
-{
-	ZEGR_RELEASE(Buffer);
 }

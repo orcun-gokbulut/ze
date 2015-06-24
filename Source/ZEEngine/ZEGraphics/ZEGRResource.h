@@ -42,12 +42,13 @@
 enum ZEGRResourceType
 {
 	ZEGR_RT_NONE					= 0,
-	ZEGR_RT_TEXTURE					= 1,
-	ZEGR_RT_VERTEX_BUFFER			= 2,
-	ZEGR_RT_INDEX_BUFFER			= 3,
-	ZEGR_RT_CONSTANT_BUFFER			= 4,
-	ZEGR_RT_DEPTH_STENCIL_BUFFER	= 5,
-	ZEGR_RT_SHADER					= 6
+	ZEGR_RT_VERTEX_BUFFER			= 1,
+	ZEGR_RT_INDEX_BUFFER			= 2,
+	ZEGR_RT_CONSTANT_BUFFER			= 3,
+	ZEGR_RT_TEXTURE					= 4,
+	ZEGR_RT_RENDER_TARGET			= 5,
+	ZEGR_RT_DEPTH_STENCIL_BUFFER	= 6,
+	ZEGR_RT_SHADER					= 7
 };
 
 class ZEGRResource
@@ -75,7 +76,7 @@ class ZEGRResource
 		virtual 						~ZEGRResource();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() const = 0;
+		virtual ZEGRResourceType		GetResourceType() = 0;
 		ZESize							GetSize() const;
 		ZESize							GetReferenceCount() const;
 

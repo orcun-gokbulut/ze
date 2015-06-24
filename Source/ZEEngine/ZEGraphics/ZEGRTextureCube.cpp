@@ -36,7 +36,31 @@
 #include "ZEGRTextureCube.h"
 
 #include "ZEGRGraphicsModule.h"
-#include "ZETexture/ZETextureData.h"
+#include "ZEError.h"
+#include "ZEMath/ZEMath.h"
+
+bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+{
+	zeDebugCheck(Length == 0, "Width cannot be 0.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), "Level must be 1 for non-power of two textures.");
+
+	this->Length = Length;
+	SetLevelCount(LevelCount);
+	SetFormat(Format);
+
+	SetSize(CalculateSize(Length, Length, LevelCount, GetBlockSize(), GetBlockDimension()));
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, TextureCube, Texture);
+
+	return true;
+}
+
+void ZEGRTextureCube::Deinitialize()
+{
+	SetSize(0);
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, TextureCube, Texture);
+}
+
 
 ZEGRResourceType ZEGRTextureCube::GetResourceType() const
 {
@@ -63,13 +87,18 @@ ZEGRTextureCube::ZEGRTextureCube()
 	Length = 0;
 }
 
-ZEGRTextureCube* ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget, ZETextureData* InitialData)
+ZEGRTextureCube::~ZEGRTextureCube()
+{
+	Deinitialize();
+}
+
+ZEGRTextureCube* ZEGRTextureCube::Create(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
 {
 	ZEGRTextureCube* Texture = ZEGRGraphicsModule::GetInstance()->CreateTextureCube();
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Length, LevelCount, Format, RenderTarget, InitialData))
+	if (!Texture->Initialize(Length, LevelCount, Format, RenderTarget))
 	{
 		Texture->Destroy();
 		return NULL;

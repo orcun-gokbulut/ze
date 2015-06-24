@@ -39,7 +39,7 @@
 #include "ZED3D11GraphicsModule.h"
 #include "ZED11DepthStencilBuffer.h"
 
-inline static DXGI_FORMAT ConvertFormat(ZEGRDepthStencilFormat Format)
+inline static DXGI_FORMAT ConvertDepthStencilFormat(ZEGRDepthStencilFormat Format)
 {
 	switch(Format)
 	{
@@ -72,7 +72,7 @@ bool ZED11DepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthS
 {
 	zeDebugCheck(Width == 0, "Width cannot be zero.");
 	zeDebugCheck(Height == 0, "Height cannot be zero.");
-	zeDebugCheck(ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, "Unknown depth stencil format.");
+	zeDebugCheck(ConvertDepthStencilFormat(Format) == DXGI_FORMAT_UNKNOWN, "Unknown depth stencil format.");
 	zeDebugCheck(Width > 8191 || Height > 8191, "Depth stencil buffer dimensions exceeds the limits, 0-8191.");
 
 	D3D11_TEXTURE2D_DESC DepthStencilDesc;
@@ -80,7 +80,7 @@ bool ZED11DepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthS
 	DepthStencilDesc.MipLevels = 1;
 	DepthStencilDesc.Width = Width;
 	DepthStencilDesc.Height = Height;
-	DepthStencilDesc.Format = ConvertFormat(Format);
+	DepthStencilDesc.Format = ConvertDepthStencilFormat(Format);
 	DepthStencilDesc.Usage = D3D11_USAGE_DEFAULT;
 	DepthStencilDesc.BindFlags = D3D11_BIND_DEPTH_STENCIL;
 	DepthStencilDesc.CPUAccessFlags = 0;
@@ -109,19 +109,18 @@ bool ZED11DepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthS
 		return false;
 	}
 
-	SetSize(SizeofFormat(Format) * Width * Height);
-
 	return ZEGRDepthStencilBuffer::Initialize(Width, Height, Format);
+}
+
+void ZED11DepthStencilBuffer::Deinitialize()
+{
+	ZEGR_RELEASE(View);
+	ZEGR_RELEASE(Texture);
+	ZEGRDepthStencilBuffer::Deinitialize();
 }
 
 ZED11DepthStencilBuffer::ZED11DepthStencilBuffer()
 {
 	Texture = NULL;
 	View = NULL;
-}
-
-ZED11DepthStencilBuffer::~ZED11DepthStencilBuffer()
-{
-	ZEGR_RELEASE(View);
-	ZEGR_RELEASE(Texture);
 }

@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11ComponentBase.h"
+#include "ZEGraphics\ZEGRTexture.h"
 
 ZED3D11GraphicsModule* ZED11ComponentBase::Module = NULL;
 ID3D11Device* ZED11ComponentBase::Device = NULL;
@@ -46,4 +47,69 @@ ZED3D11GraphicsModule* ZED11ComponentBase::GetModule()
 ID3D11Device* ZED11ComponentBase::GetDevice()
 {
 	return Device;
+}
+
+DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRTextureFormat Format)
+{
+	switch (Format)
+	{
+		default:
+		case ZEGR_TF_NULL:
+		case ZEGR_TF_NONE:
+			return DXGI_FORMAT_UNKNOWN;
+
+		case ZEGR_TF_R8:
+			return DXGI_FORMAT_R8_UINT;
+
+		case ZEGR_TF_R8G8:
+			return DXGI_FORMAT_R8G8_UINT;
+
+		case ZEGR_TF_R8G8B8A8:
+			return DXGI_FORMAT_R8G8B8A8_UINT;
+
+		case ZEGR_TF_R16:
+			return DXGI_FORMAT_R16_UINT;
+
+		case ZEGR_TF_R16G16:
+			return DXGI_FORMAT_R16G16_UINT;
+
+		case ZEGR_TF_R16G16B16A16:
+			return DXGI_FORMAT_R16G16B16A16_UINT;
+	
+		case ZEGR_TF_R32:
+			return DXGI_FORMAT_R32_UINT;
+
+		case ZEGR_TF_R32G32:
+			return DXGI_FORMAT_R32G32_UINT;
+
+		case ZEGR_TF_R32G32B32A32:
+			return DXGI_FORMAT_R32G32B32A32_UINT;
+
+		case ZEGR_TF_R16F:
+			return DXGI_FORMAT_R16_FLOAT;
+
+		case ZEGR_TF_R16FG16F:
+			return DXGI_FORMAT_R16G16_FLOAT;
+
+		case ZEGR_TF_R16FG16FB16FA16F:
+			return DXGI_FORMAT_R16G16B16A16_FLOAT;
+
+		case ZEGR_TF_R32F:
+			return DXGI_FORMAT_R32_FLOAT;
+
+		case ZEGR_TF_R32FG32F:
+			return DXGI_FORMAT_R32G32_FLOAT;
+
+		case ZEGR_TF_R32FG32FB32FA32F:
+			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+		case ZEGR_TF_DXT1:
+			return DXGI_FORMAT_BC1_UNORM;
+
+		case ZEGR_TF_DXT3:
+			return DXGI_FORMAT_BC2_UNORM;
+
+		case ZEGR_TF_DXT5:
+			return DXGI_FORMAT_BC3_UNORM;
+	}
 }

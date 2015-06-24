@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11RenderTarget.cpp
+ Zinek Engine - ZED11ShaderCompiler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,29 +33,22 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
-#include "ZED3D11RenderTarget.h"
-#include "ZED3D11GraphicsModule.h"
+#pragma once
 
-const ID3D11RenderTargetView* ZED3D11RenderTarget::GetD3D10RenderTargetView() const
+#include "ZED11ComponentBase.h"
+#include "ZEGraphics/ZEGRShaderCompiler.h"
+
+class ZEGRShader;
+
+class ZED11ShaderCompiler : public ZEGRShaderCompiler, public ZED11ComponentBase
 {
-	return D3D10RenderTargetView;
-}
+	friend class ZED3D11GraphicsModule;
+	protected:
+		bool						CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
 
-bool ZED3D11RenderTarget::IsEmpty() const
-{
-	return D3D10RenderTargetView == NULL;
-}
+									ZED11ShaderCompiler();
+		virtual						~ZED11ShaderCompiler();
 
-ZED3D11RenderTarget::ZED3D11RenderTarget(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEGRTextureFormat PixelFormat, ZERenderTargetType RenderTargetType, ID3D11RenderTargetView* RenderTargtetView) 
-	: ZEGRRenderTarget(Width, Height, Depth, PixelFormat, RenderTargetType)
-{
-	zeDebugCheck(RenderTargtetView == NULL, "Null Pointer.");
-
-	D3D10RenderTargetView = RenderTargtetView;
-}
-
-ZED3D11RenderTarget::~ZED3D11RenderTarget()
-{
-	ZEGR_RELEASE(D3D10RenderTargetView);	
-}
+	public:
+		ZEGRShader*					Compile(const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output);
+};

@@ -75,26 +75,34 @@ enum ZEGRTextureFormat
 	ZEGR_TF_DXT3,
 	ZEGR_TF_DXT5,
 
-	// Special formats for shadow mapping
-	ZEGR_TF_NULL,
-	ZEGR_TF_INTZ,
+	ZEGR_TF_NULL
 };
 
 class ZEGRTexture : public ZEGRResource
 {
-	protected:
+	private:
 		ZEGRTextureFormat		Format;
 		ZEUInt					LevelCount;
 		bool					IsRenderTarget;
 
+	protected:
+		void					SetFormat(ZEGRTextureFormat Format);	
+		void					SetLevelCount(ZEUInt LevelCount);
+		void					SetIsRenderTarget(bool RenderTarget);
+
+		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZESize BlockSize, ZESize BlockDimension);
+		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZESize BlockDimension);
+		static ZESize			GetBlockSize(ZEGRTextureFormat Format);
+		static ZESize			GetBlockDimension(ZEGRTextureFormat Format);
+
 								ZEGRTexture();
 
 	public:
-		virtual ZEGRTextureType	GetTextureType() const = 0;
+		virtual ZEGRTextureType	GetTextureType() = 0;
 
-		ZEGRTextureFormat		GetFormat() const;
-		ZEUInt					GetLevelCount() const;
-		bool					GetIsRenderTarget() const;
-
-		static ZESize			GetBlockSize(ZEGRTextureFormat PixelFormat);
+		ZEGRTextureFormat		GetFormat();
+		ZEUInt					GetLevelCount();
+		ZESize					GetBlockSize();
+		ZESize					GetBlockDimension();
+		bool					GetIsRenderTarget();
 };

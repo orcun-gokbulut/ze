@@ -50,6 +50,7 @@ class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11Compo
 		ID3D11DepthStencilView*			View;
 
 		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format);
+		virtual void					Deinitialize();
 
 										ZED11DepthStencilBuffer();
 		virtual							~ZED11DepthStencilBuffer();
