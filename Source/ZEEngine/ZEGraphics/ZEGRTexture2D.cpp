@@ -39,32 +39,32 @@
 #include "ZETexture/ZETextureData.h"
 #include "ZEMath/ZEMath.h"
 
-ZEGRResourceType ZEGRTexture2D::GetResourceType() const
+ZEGRResourceType ZEGRTexture2D::GetResourceType()
 {
 	return ZEGR_RT_TEXTURE;
 }
 
-ZEGRTextureType ZEGRTexture2D::GetTextureType() const
+ZEGRTextureType ZEGRTexture2D::GetTextureType()
 {
 	return ZEGR_TT_2D;
 }
 
-ZEUInt ZEGRTexture2D::GetWidth() const
+ZEUInt ZEGRTexture2D::GetWidth()
 {
 	return Width;
 }
 
-ZEUInt ZEGRTexture2D::GetHeight() const
+ZEUInt ZEGRTexture2D::GetHeight()
 {
 	return Height;
 }
 
-ZEVector2 ZEGRTexture2D::GetPixelSize() const
+ZEVector2 ZEGRTexture2D::GetPixelSize()
 {
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Width == 0, "Width cannot be 0.");
 	zeDebugCheck(Height == 0, "Height cannot be 0.");
@@ -94,7 +94,7 @@ ZEGRTexture2D::ZEGRTexture2D()
 	Height = 0;
 };
 
-ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)

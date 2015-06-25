@@ -42,7 +42,7 @@
 
 class ZED11Tracer : public ZEGRTracer, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 	
 	protected:
 						ZED11Tracer();

@@ -234,7 +234,7 @@ bool ZETextureLoader::Read(ZEFile* File, ZETextureData* TextureData)
 
 	// Create TextureData
 	TextureData->Create(	(ZEGRTextureType)FileHeader.TextureType, 
-								(ZEGRTextureFormat)FileHeader.PixelFormat, 
+								(ZEGRFormat)FileHeader.PixelFormat, 
 								FileHeader.SurfaceCount,
 								FileHeader.LevelCount, 
 								FileHeader.Width, 
@@ -472,7 +472,7 @@ bool ZETextureLoader::GetTextureInfo(ZETextureDataInfo* TextureInfo, ZEFile* Fil
 	TextureInfo->Height			= FileHeader.Height;
 	TextureInfo->SurfaceCount	= FileHeader.SurfaceCount;
 	TextureInfo->LevelCount		= FileHeader.LevelCount;
-	TextureInfo->PixelFormat	= (ZEGRTextureFormat)FileHeader.PixelFormat;
+	TextureInfo->PixelFormat	= (ZEGRFormat)FileHeader.PixelFormat;
 	
 	zeLog("Texture info gathered successfully: \"%s\".", File->GetPath().GetValue());
 

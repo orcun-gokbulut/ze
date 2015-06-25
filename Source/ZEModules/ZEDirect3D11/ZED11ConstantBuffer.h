@@ -43,8 +43,8 @@ class ZEGRShaderConstantBuffer;
 
 class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsDevice;
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Device;
+	friend class ZED11Direct3D11Module;
 
 	protected:
 		ID3D11Buffer*			Buffer;	
@@ -56,4 +56,7 @@ class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 
 	public:
 		const ID3D11Buffer*		GetBuffer() const;
+
+		virtual bool			Lock(void* Lock);
+		virtual void			Unlock();
 };

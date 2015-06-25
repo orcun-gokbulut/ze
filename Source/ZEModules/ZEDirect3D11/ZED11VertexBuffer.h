@@ -43,7 +43,7 @@ struct  ID3D11Buffer;
 
 class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 
 	private:		
 		ID3D11Buffer*				Buffer;
@@ -56,6 +56,6 @@ class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 	public:
 		const ID3D11Buffer*			GetBuffer() const;
 
-		virtual void				Unlock() = 0;
-		virtual bool				Lock(void** Data) = 0;
+		virtual bool				Lock(void** Data);
+		virtual void				Unlock();
 };

@@ -46,12 +46,12 @@ class ZEGRRenderTarget;
 
 class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 	private:
 		ID3D11Texture2D*				Texture;
 		ID3D11ShaderResourceView*		ResourceView;
 
-		virtual bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
 		virtual void					Deinitialize();
 
 										ZED11TextureCube();

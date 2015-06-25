@@ -42,7 +42,6 @@
 #include "ZECore/ZEOption.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRConstantBuffer.h"
-#include "ZEGRWindow.h"
 #include "ZEGRDepthStencilBuffer.h"
 #include "ZECore/ZEOptionManager.h"
 
@@ -124,21 +123,6 @@ ZETextureOptions* ZEGRGraphicsModule::GetTextureOptions()
 	}
 }
 
-const ZEArray<ZEGRWindow*>& ZEGRGraphicsModule::GetWindows() const
-{
-	return Windows;
-}
-
-const ZEArray<ZEGRMonitor*>& ZEGRGraphicsModule::GetMonitors() const
-{
-	return Monitors;
-}
-
-const ZEArray<ZEGRDevice*>& ZEGRGraphicsModule::GetDevices() const
-{
-	return Devices;
-}
-
 ZEGRCounter& ZEGRGraphicsModule::GetCounter()
 {
 	return Counter;
@@ -154,28 +138,11 @@ bool ZEGRGraphicsModule::InitializeSelf()
 	if (!ZEModule::InitializeSelf())
 		return false;
 
-	ZEGRWindow* MainWindow = ZEGRWindow::CreateInstance();
-	MainWindow->Initialize();
-
 	return true;
 }
 
 bool ZEGRGraphicsModule::DeinitializeSelf()
 {
-	Devices.Clear();
-	Monitors.Clear(false);
-
-	ZESize WindowCount = Windows.GetCount();
-	for (ZESize I = 0; I < WindowCount; ++I)
-	{
-		if (Windows[I] != NULL)
-		{
-			Windows[I]->Destroy();
-			Windows[I] = NULL;
-		}
-	}
-	Windows.Clear(false);
-
 	return ZEModule::Deinitialize();
 }
 

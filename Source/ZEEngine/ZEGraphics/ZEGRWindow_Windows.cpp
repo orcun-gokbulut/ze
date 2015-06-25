@@ -543,20 +543,6 @@ bool ZEGRWindow::SetVSynchEnabed(bool Value)
 	return IsInitialized();
 }
 
-const ZEGRMonitor* ZEGRWindow::GetContainingMonitor() const
-{
-	HMONITOR CurrentMonitor = MonitorFromWindow((HWND)Handle, MONITOR_DEFAULTTONEAREST);
-
-	const ZEArray<ZEGRMonitor*>& Monitors = ZEGRGraphicsModule::GetInstance()->GetMonitors();
-	
-	ZESize Count = Monitors.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		if (Monitors[I]->GetHandle() == CurrentMonitor)
-			return Monitors[I];
-	}
-	return NULL;
-}
 
 void ZEGRWindow::Enable()
 {

@@ -49,23 +49,23 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt						Width;
 		ZEUInt						Height;
 
-		virtual bool				Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRTextureFormat Format, bool RenderTarget = false);	
+		virtual bool				Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget = false);	
 		virtual void				Deinitialize();
 
 									ZEGRTexture2D();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType() const;
-		virtual ZEGRTextureType		GetTextureType() const;
+		virtual ZEGRResourceType	GetResourceType();
+		virtual ZEGRTextureType		GetTextureType();
 
-		ZEUInt						GetWidth() const;
-		ZEUInt						GetHeight() const;
-		ZEVector2					GetPixelSize() const;
+		ZEUInt						GetWidth();
+		ZEUInt						GetHeight();
+		ZEVector2					GetPixelSize();
 		
 		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
 		virtual void				Unlock(ZEUInt Level) = 0;
 
-		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) = 0;
 
-		static ZEGRTexture2D*		CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);
+		static ZEGRTexture2D*		CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);
 };

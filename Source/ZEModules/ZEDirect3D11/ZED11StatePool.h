@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRMonitor.cpp
+ Zinek Engine - ZED11StatePool.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRMonitor.h"
+#pragma once
 
-ZEGRMonitor::ZEGRMonitor()
+#include "ZED11ComponentBase.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEList.h"
+
+
+class ZEStatePoolEntry : public ZEListItem
 {
-	Id = 0;
-}
+	public:
+		ZESize Hash;
+		ZESize AccessCount;
+		IUnknown* Pointer;
+};
 
-ZEGRMonitor::~ZEGRMonitor()
+class ZEGRShader;
+class ZEGRBlendState;
+class ZEGRGRVertexLayout;
+class ZEGRSamplerState;
+class ZEGRRasterizerState;
+class ZEGRDepthStencilState;
+class ZEGRVertexLayout;
+
+class ZED11StatePool : public ZED11ComponentBase
 {
+	friend class ZED11Direct3D11Module;
 
-}
+	protected:
+		ZEList<ZEStatePoolEntry>				BlendStatePool;
+		ZEList<ZEStatePoolEntry>				VertexLayoutPool;
+		ZEList<ZEStatePoolEntry>				SamplerStatePool;
+		ZEList<ZEStatePoolEntry>				RasterizerStatePool;
+		ZEList<ZEStatePoolEntry>				DepthStencilStatePool;
+		
+		ID3D11BlendState*						CreateState(ZEGRBlendState* BlendState);
+		ID3D11SamplerState*						CreateState(ZEGRSamplerState* SamplerState);
+		ID3D11RasterizerState*					CreateState(ZEGRRasterizerState* RasterizerState);
+		ID3D11DepthStencilState*				CreateState(ZEGRDepthStencilState* DepthStencilState);
+		ID3D11InputLayout*						CreateState(ZEGRVertexLayout* VertexLayout, ZEGRShader* Shader);
 
-void* ZEGRMonitor::GetHandle()
-{
-	return Handle;
-}
+		ZEStatePoolEntry*						FindPoolEntry(ZEList<ZEStatePoolEntry>& Pool, ZESize Hash);
 
-ZEUInt ZEGRMonitor::GetId()
-{
-	return Id;
-}
+												ZED11StatePool();
+		virtual									~ZED11StatePool();
 
-const char* ZEGRMonitor::GetName()
-{
-	return Name.ToCString();
-}
+	public:
+		virtual void							ClearStates();
 
-const ZERectangle& ZEGRMonitor::GetArea()
-{
-	return Area;
-}
+		virtual ID3D11BlendState*				GetState(ZEGRBlendState* BlendState);
+		virtual ID3D11SamplerState*				GetState(ZEGRSamplerState* SamplerState);
+		virtual ID3D11RasterizerState*			GetState(ZEGRRasterizerState* RasterizerState);
+		virtual ID3D11DepthStencilState*		GetState(ZEGRDepthStencilState* DepthStencilState);
+		virtual ID3D11InputLayout*				GetState(ZEGRVertexLayout* VertexLayout, ZEGRShader* VertexShader);
+};

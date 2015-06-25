@@ -43,7 +43,7 @@ struct ID3D11RenderTargetView;
 
 class ZED11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 {
-	friend class ZED11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 	friend class ZED11Window;
 	friend class ZED11Texture2D;
 	friend class ZED11Texture3D;
@@ -53,9 +53,9 @@ class ZED11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 		ID3D11RenderTargetView*			RenderTargetView;
 
 	protected:
-										ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat Format, ID3D11RenderTargetView* RenderTargtetView);
+										ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format, ID3D11RenderTargetView* RenderTargtetView);
 		virtual							~ZED11RenderTarget();
 	
 	public:
-		ID3D11RenderTargetView*			GetRenderTargetView();
+		ID3D11RenderTargetView*			GetView();
 };

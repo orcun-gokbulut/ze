@@ -154,7 +154,7 @@ ZESize GetPixelSize(ZETIFFPixelFormat Format)
 
 }
 
-static ZEGRTextureFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
+static ZEGRFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
 {
 	switch(PixelFormat)
 	{

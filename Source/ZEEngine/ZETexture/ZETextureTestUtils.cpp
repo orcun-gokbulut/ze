@@ -41,7 +41,7 @@
 #include "ZETextureLoader.h"
 #include "ZEMath/ZEMath.h"
 
-ZESize ZETextureTestUtils::GetPixelSize(ZEGRTextureFormat Format)
+ZESize ZETextureTestUtils::GetPixelSize(ZEGRFormat Format)
 {
 	switch(Format)
 	{
@@ -110,7 +110,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 	ZEPixelColor* Destination = Bitmap.GetPixels();
 	void* Source = Level->GetData();
 
-	ZEGRTextureFormat Format = Level->GetOwner()->GetOwner()->GetPixelFormat();
+	ZEGRFormat Format = Level->GetOwner()->GetOwner()->GetPixelFormat();
 	for (ZESize y = 0; y < Level->GetHeight(); y++)
 	{
 		for (ZESize x = 0; x < Level->GetWidth(); x++)

@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11Shader.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 
 bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
 {

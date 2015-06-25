@@ -35,7 +35,7 @@
 
 #include "ZEError.h"
 #include "ZED11VertexBuffer.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 
 const ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
 {
@@ -66,6 +66,21 @@ bool ZED11VertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
 	}
 
 	return ZEGRVertexBuffer::Initialize(VertexCount, VertexSize);
+}
+
+bool ZED11VertexBuffer::Lock(void** Data)
+{
+	D3D11_MAPPED_SUBRESOURCE Map;
+	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE, 0, &Map);
+	if (FAILED(Result))
+		return false;
+
+	return true;
+}
+
+void ZED11VertexBuffer::Unlock()
+{
+	GetMainContext()->Unmap(Buffer, 0);
 }
 
 void ZED11VertexBuffer::Deinitialize()

@@ -50,25 +50,25 @@ class ZEGRTexture3D : public ZEGRTexture
 		ZEUInt							Height;
 		ZEUInt							Depth;
 
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
 		virtual void					Deinitialize();	
 
 										ZEGRTexture3D();
 		virtual							~ZEGRTexture3D();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() const;
-		virtual ZEGRTextureType			GetTextureType() const;
+		virtual ZEGRResourceType		GetResourceType();
+		virtual ZEGRTextureType			GetTextureType();
 
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEUInt							GetDepth() const;
-		ZEVector3						GetPixelSize() const;
+		ZEUInt							GetWidth();
+		ZEUInt							GetHeight();
+		ZEUInt							GetDepth();
+		ZEVector3						GetPixelSize();
 
-		virtual bool					Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch) = 0;
+		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEUInt Depth, ZEUInt Level) = 0;
 		virtual void					Unlock(ZEUInt Level) = 0;
 
 		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) = 0;
 		
-		ZEGRTexture3D*					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);	
+		ZEGRTexture3D*					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);	
 };

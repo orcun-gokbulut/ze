@@ -36,7 +36,7 @@
 #include <d3d11.h>
 
 #include "ZEError.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 #include "ZED11DepthStencilBuffer.h"
 
 inline static DXGI_FORMAT ConvertDepthStencilFormat(ZEGRDepthStencilFormat Format)
@@ -58,12 +58,12 @@ inline static DXGI_FORMAT ConvertDepthStencilFormat(ZEGRDepthStencilFormat Forma
 	}
 }
 
-const ID3D11Texture2D* ZED11DepthStencilBuffer::GetTexture() const
+ID3D11Texture2D* ZED11DepthStencilBuffer::GetTexture()
 {
 	return Texture;
 }
 
-const ID3D11DepthStencilView* ZED11DepthStencilBuffer::GetView() const
+ID3D11DepthStencilView* ZED11DepthStencilBuffer::GetView()
 {
 	return View;
 }

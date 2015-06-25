@@ -48,7 +48,7 @@ class ZEGRVertexBuffer : public ZEGRResource
 		virtual							~ZEGRVertexBuffer();
 
 	public:
-		ZEGRResourceType				GetResourceType() const;
+		ZEGRResourceType				GetResourceType();
 
 		virtual void					Unlock() = 0;
 		virtual bool					Lock(void** Data) = 0;

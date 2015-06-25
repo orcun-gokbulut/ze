@@ -46,25 +46,25 @@ struct ZEGRShaderMeta;
 
 enum ZEGRVertexElementType
 {
-	ZE_VET_NONE			= 0,
-	ZE_VET_INT			= 1,
-	ZE_VET_INT2			= 2,
-	ZE_VET_INT3			= 3,
-	ZE_VET_INT4			= 4,
-	ZE_VET_UINT			= 5,
-	ZE_VET_UINT2		= 6,
-	ZE_VET_UINT3		= 7,
-	ZE_VET_UINT4		= 8,
-	ZE_VET_FLOAT		= 9,
-	ZE_VET_FLOAT2		= 10,
-	ZE_VET_FLOAT3		= 11,
-	ZE_VET_FLOAT4		= 12
+	ZEGR_VET_NONE		= 0,
+	ZEGR_VET_INT		= 1,
+	ZEGR_VET_INT2		= 2,
+	ZEGR_VET_INT3		= 3,
+	ZEGR_VET_INT4		= 4,
+	ZEGR_VET_UINT		= 5,
+	ZEGR_VET_UINT2		= 6,
+	ZEGR_VET_UINT3		= 7,
+	ZEGR_VET_UINT4		= 8,
+	ZEGR_VET_FLOAT		= 9,
+	ZEGR_VET_FLOAT2		= 10,
+	ZEGR_VET_FLOAT3		= 11,
+	ZEGR_VET_FLOAT4		= 12
 };
 
 enum ZEGRVertexUsage
 {
-	ZE_VU_PER_VERTEX	= 0,
-	ZE_VU_PER_INSTANCE	= 1
+	ZEGR_VU_PER_VERTEX		= 0,
+	ZEGR_VU_PER_INSTANCE	= 1
 };
 
 struct ZEGRVertexElement

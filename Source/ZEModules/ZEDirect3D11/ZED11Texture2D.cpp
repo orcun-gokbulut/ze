@@ -37,7 +37,7 @@
 
 #include "ZEError.h"
 #include "ZED11RenderTarget.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 
 ID3D11Texture2D* ZED11Texture2D::GetTexture()
 {
@@ -77,7 +77,7 @@ ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level)
 	return RenderTarget;
 }
 
-bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRTextureFormat Format, bool RenderTarget)
+bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Width == 0, "Width cannot be zero");
 	zeDebugCheck(Height == 0, "Height cannot be zero");

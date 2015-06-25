@@ -115,7 +115,7 @@ static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
 	return Surface % (ZEUInt)ZEMath::Power(2.0f, (float)Level) == 0;
 }
 
-static bool IsCompressed(ZEGRTextureFormat Format)
+static bool IsCompressed(ZEGRFormat Format)
 {
 	return Format == ZEGR_TF_DXT1 || Format == ZEGR_TF_DXT3 || Format == ZEGR_TF_DXT5;
 }
@@ -145,7 +145,7 @@ ZEUInt ZETextureLevel::GetWidth()
 	}
 
 	ZEUInt TextureWidth			= Owner->GetOwner()->GetWidth();
-	ZEGRTextureFormat Format = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat Format = Owner->GetOwner()->GetPixelFormat();
 	ZEUInt LevelWidth			= TextureWidth >> Level;
 	
 	// Width of last 2 level of compressed textures (2x2 and 1x1) must be 4x4
@@ -172,7 +172,7 @@ ZEUInt ZETextureLevel::GetHeight()
 		return 0;
 	}
 
-	ZEGRTextureFormat Format = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat Format = Owner->GetOwner()->GetPixelFormat();
 	ZEUInt TextureHeight		= Owner->GetOwner()->GetHeight();
 	ZEUInt LevelHeight			= TextureHeight >> Level;
 	
@@ -193,7 +193,7 @@ ZESize ZETextureLevel::GetPitch()
 {
 	ZESize Pitch = 0;
 	ZEUInt LevelWidth = this->GetWidth();
-	ZEGRTextureFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 	
 	switch (PixelFormat)
 	{		
@@ -250,7 +250,7 @@ ZEUInt ZETextureLevel::GetRowCount()
 {
 	ZEUInt RowCount = 0;
 	ZEUInt LevelHeight = this->GetHeight();
-	ZEGRTextureFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 
 	switch (PixelFormat)
 	{
@@ -413,7 +413,7 @@ ZETextureSurface::~ZETextureSurface()
 }
 
 // Creates the texture by allocating surface, levels and enough memory based on texture type
-void ZETextureData::Create(ZEGRTextureType TextureType, ZEGRTextureFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
+void ZETextureData::Create(ZEGRTextureType TextureType, ZEGRFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
 {
 	if (!this->IsEmpty())
 	{
@@ -645,7 +645,7 @@ ZEGRTextureType ZETextureData::GetType()
 }
 
 // Returns pixel format
-ZEGRTextureFormat ZETextureData::GetPixelFormat()
+ZEGRFormat ZETextureData::GetPixelFormat()
 {
 	return Info.PixelFormat;
 }

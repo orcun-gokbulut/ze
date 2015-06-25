@@ -47,60 +47,29 @@ enum ZEGRTextureType
 	ZEGR_TT_CUBE	= 3
 };
 
-enum ZEGRTextureFormat
-{
-	ZEGR_TF_NONE,
-
-	ZEGR_TF_R8,
-	ZEGR_TF_R8G8,
-	ZEGR_TF_R8G8B8A8,
-
-	ZEGR_TF_R16,
-	ZEGR_TF_R16G16,
-	ZEGR_TF_R16G16B16A16,
-
-	ZEGR_TF_R32,
-	ZEGR_TF_R32G32,
-	ZEGR_TF_R32G32B32A32,
-
-	ZEGR_TF_R16F,
-	ZEGR_TF_R16FG16F,
-	ZEGR_TF_R16FG16FB16FA16F,
-
-	ZEGR_TF_R32F,
-	ZEGR_TF_R32FG32F,
-	ZEGR_TF_R32FG32FB32FA32F,
-
-	ZEGR_TF_DXT1,
-	ZEGR_TF_DXT3,
-	ZEGR_TF_DXT5,
-
-	ZEGR_TF_NULL
-};
-
 class ZEGRTexture : public ZEGRResource
 {
 	private:
-		ZEGRTextureFormat		Format;
+		ZEGRFormat				Format;
 		ZEUInt					LevelCount;
 		bool					IsRenderTarget;
 
 	protected:
-		void					SetFormat(ZEGRTextureFormat Format);	
+		void					SetFormat(ZEGRFormat Format);	
 		void					SetLevelCount(ZEUInt LevelCount);
 		void					SetIsRenderTarget(bool RenderTarget);
 
 		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZESize BlockSize, ZESize BlockDimension);
 		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZESize BlockDimension);
-		static ZESize			GetBlockSize(ZEGRTextureFormat Format);
-		static ZESize			GetBlockDimension(ZEGRTextureFormat Format);
+		static ZESize			GetBlockSize(ZEGRFormat Format);
+		static ZESize			GetBlockDimension(ZEGRFormat Format);
 
 								ZEGRTexture();
 
 	public:
 		virtual ZEGRTextureType	GetTextureType() = 0;
 
-		ZEGRTextureFormat		GetFormat();
+		ZEGRFormat				GetFormat();
 		ZEUInt					GetLevelCount();
 		ZESize					GetBlockSize();
 		ZESize					GetBlockDimension();
