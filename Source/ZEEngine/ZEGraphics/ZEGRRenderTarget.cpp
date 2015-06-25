@@ -61,12 +61,12 @@ ZEVector2 ZEGRRenderTarget::GetPixelSize()
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-ZEGRTextureFormat ZEGRRenderTarget::GetFormat()
+ZEGRFormat ZEGRRenderTarget::GetFormat()
 {
 	return Format;
 }
 
-ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRTextureFormat Format)
+ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	zeDebugCheck(Width == 0, "Width cannot be zero.");
 	zeDebugCheck(Height == 0, "Height cannot be zero.");

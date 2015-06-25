@@ -480,7 +480,7 @@ ZETextureData* ZEJpegMainController::LoadJpeg()
 	
 	// Image info should be read till now
 	TextureData = new ZETextureData();
-	ZEGRTextureFormat PixelFormat = Info.ComponentCount == 1 ? ZEGR_TF_I8 : ZEGR_TF_I8_4;
+	ZEGRFormat PixelFormat = Info.ComponentCount == 1 ? ZEGR_TF_I8 : ZEGR_TF_I8_4;
 	TextureData->Create(ZEGR_TT_2D, PixelFormat, 1, 1, Info.ImageWidth, Info.ImageHeight);
 	Info.OutputData = TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 	Info.OutputPitch = TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetPitch();

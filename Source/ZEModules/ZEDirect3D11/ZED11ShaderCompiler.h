@@ -42,7 +42,7 @@ class ZEGRShader;
 
 class ZED11ShaderCompiler : public ZEGRShaderCompiler, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 	protected:
 		bool						CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
 

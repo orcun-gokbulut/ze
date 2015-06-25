@@ -37,20 +37,20 @@
 
 #include <d3d11.h>
 
-class ZED3D11GraphicsModule;
-enum ZEGRTextureFormat;
+class ZED11Direct3D11Module;
+enum ZEGRFormat;
 
 class ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 	private:
-		static ZED3D11GraphicsModule*	Module;
+		static ZED11Direct3D11Module*	Module;
 		static ID3D11Device*			Device;
 
 	public:
-		ZED3D11GraphicsModule*			GetModule();
+		ZED11Direct3D11Module*			GetModule();
 		ID3D11Device*					GetDevice();
 		ID3D11DeviceContext*			GetMainContext();
 
-		static DXGI_FORMAT				ConvertFormat(ZEGRTextureFormat Format);
+		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 };

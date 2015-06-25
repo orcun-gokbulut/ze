@@ -35,7 +35,7 @@
 
 #include "ZEError.h"
 #include "ZED11IndexBuffer.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 
 inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
 {

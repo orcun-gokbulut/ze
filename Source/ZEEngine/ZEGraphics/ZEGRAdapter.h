@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ShaderManager.h
+ Zinek Engine - ZEGRAdapter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
-#ifndef __ZE_D3D11_SHADER_MANAGER_H__
-#define __ZE_D3D11_SHADER_MANAGER_H__
 
+#include "ZEGRDefinitions.h"
+#include "ZETypes.h"
+#include "ZEMath/ZERectangle.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-class ZED3D11ShaderManager
+class ZEGRAdapter;
+class ZEGRMonitor;
+
+class ZEGRMode
 {
-	private:
 	public:
-		ZED3D11ShaderManager();
-		~ZED3D11ShaderManager();
+		ZEGRMonitor*							Monitor;
+		ZEUInt									Width;
+		ZEUInt									Height;
+		ZEGRFormat								Format;
+		ZEUInt									RefreshRate;
+
+	/*protected:
+		ZEGRMonitor*							GetMonitor();
+		ZEUInt									GetWidth();
+		ZEUInt									GetHeight();
+		ZEGRFormat								GetFormat();
+		ZEUInt									GetRefreshRate();*/
+
+												ZEGRMode();
+
 };
 
+class ZEGRMonitor
+{
+	protected:
+		ZEGRAdapter*							Adapter;
+		ZEString								Name;
+		void*									Handle;
+		ZERectangle								Area;
+	
+												ZEGRMonitor();
+		virtual									~ZEGRMonitor();
 
-#endif 
+	public:
+		ZEGRAdapter*							GetAdapter();
+		const char*								GetName();
+		const ZERectangle&						GetArea();
+		virtual	const ZEArray<ZEGRMode>&		GetModes() = 0;
+};
+
+class ZEGRAdapter
+{
+	friend class ZEGRGraphicsModule;
+	protected:
+		ZEUInt64								Id;
+		ZEString								Name;
+
+												ZEGRAdapter();
+		virtual									~ZEGRAdapter();
+
+	public:
+		ZEUInt									GetId();
+		const ZEString&							GetName();
+
+		virtual const ZEArray<ZEGRMonitor*>&	GetMonitors() = 0;
+
+		static const ZEArray<ZEGRAdapter*>&		GetAdapters();
+};

@@ -37,7 +37,7 @@
 
 #include "ZEError.h"
 #include "ZED11Tracer.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 
 void ZED11Tracer::SetEnabled(bool Enabled)
 {

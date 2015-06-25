@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11GraphicsWindow.h
+ Zinek Engine - ZED11Device.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,75 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_D3D11_GRAPHICS_WINDOW_H__
-#define __ZE_D3D11_GRAPHICS_WINDOW_H__
+#ifndef __ZE_D3D11_GRAPHICS_DEVICE_H__
+#define __ZE_D3D11_GRAPHICS_DEVICE_H__
 
-#include <dxgi1_2.h>
-#include <d3d11.h>
+#include "ZED11StatePool.h"
+#include "ZED11ComponentBase.h"
+#include "ZEGraphics/ZEGRDevice.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEGRWindow.h"
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
 
-class ZED11Texture2D;
-class ZED11RenderTarget;
-class ZED11DepthStencilBuffer;
-
-class ZEGROutput
+class ZED11Device : public ZEGRDevice, public ZED11ComponentBase
 {
-	private:
-		virtual void				OnResize(ZEUInt NewWidth, ZEUInt NewHeight);
-		virtual void				OnHidden();
-		virtual void				OnShown();
-
-	public:
-		ZEUInt						GetWidth();
-		ZEUInt						SetHeight();
-		ZEGRTextureFormat			GetFormat();
-
-		ZEGRRenderTarget*			GetRenderTarget();
-		ZEGRDepthStencilBuffer*		GetDepthStencilBuffer();
-
-		void*						GetHandle();
-
-
-};
-
-class ZED3D11GraphicsWindow : public ZEGRWindow
-{
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 
 	protected:
-		IDXGISwapChain1*						SwapChain;
-		
-		ZED11DepthStencilBuffer*				DepthBuffer;
-		ZED11RenderTarget*						BackBuffer;
-		ZED11Texture2D*							BackBufferTexture;
-
-		void									ReleaseSwapChain();
-		bool									CreateSwapChain();
-
-		void									ReleaseBackBuffer();
-		bool									CreateBackBuffer();
-
-		bool									ManageFlagCreated();
-		bool									ManageFlagDestroyed();
-		bool									ManageFlagResized();
-		bool									ManageFlagWindowed();
-		bool									ManageFlagFullScreen();
-
-												ZED3D11GraphicsWindow();
-		virtual									~ZED3D11GraphicsWindow();
+								ZED11Device();
+		virtual					~ZED11Device();
 
 	public:
-		IDXGISwapChain1*						GetDXGISwapChain() const;
+		virtual void			Draw(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
+		virtual void			DrawInstanced(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
 
-		virtual bool							Update();
-		virtual bool							Present();
-
-		virtual const ZEGRTexture2D*			GetBackBufferTexture();
-		virtual const ZEGRRenderTarget*			GetBackBuffer();
-		virtual const ZEGRDepthStencilBuffer*	GetDepthBuffer();
+		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
+		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
 };
 
 #endif

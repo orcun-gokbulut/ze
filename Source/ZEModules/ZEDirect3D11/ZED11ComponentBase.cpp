@@ -36,10 +36,10 @@
 #include "ZED11ComponentBase.h"
 #include "ZEGraphics\ZEGRTexture.h"
 
-ZED3D11GraphicsModule* ZED11ComponentBase::Module = NULL;
+ZED11Direct3D11Module* ZED11ComponentBase::Module = NULL;
 ID3D11Device* ZED11ComponentBase::Device = NULL;
 
-ZED3D11GraphicsModule* ZED11ComponentBase::GetModule()
+ZED11Direct3D11Module* ZED11ComponentBase::GetModule()
 {
 	return Module;
 }
@@ -49,7 +49,7 @@ ID3D11Device* ZED11ComponentBase::GetDevice()
 	return Device;
 }
 
-DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRTextureFormat Format)
+DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRFormat Format)
 {
 	switch (Format)
 	{

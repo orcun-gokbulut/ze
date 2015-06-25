@@ -61,6 +61,6 @@ class ZEGRDevice
 		virtual void			Draw(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
 		virtual void			DrawInstanced(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
 		
-		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
-		virtual void			ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
+		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
+		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
 };

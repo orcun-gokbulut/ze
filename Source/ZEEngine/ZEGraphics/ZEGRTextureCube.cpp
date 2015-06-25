@@ -39,7 +39,7 @@
 #include "ZEError.h"
 #include "ZEMath/ZEMath.h"
 
-bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Length == 0, "Width cannot be 0.");
 	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
@@ -62,22 +62,22 @@ void ZEGRTextureCube::Deinitialize()
 }
 
 
-ZEGRResourceType ZEGRTextureCube::GetResourceType() const
+ZEGRResourceType ZEGRTextureCube::GetResourceType()
 {
 	return ZEGR_RT_TEXTURE;
 }
 
-ZEGRTextureType ZEGRTextureCube::GetTextureType() const
+ZEGRTextureType ZEGRTextureCube::GetTextureType()
 {
 	return ZEGR_TT_CUBE;
 }
 
-ZEUInt ZEGRTextureCube::GetLength() const
+ZEUInt ZEGRTextureCube::GetLength()
 {
 	return Length;
 }
 
-float ZEGRTextureCube::GetPixelSize() const
+float ZEGRTextureCube::GetPixelSize()
 {
 	return 1.0f / (float)GetLength();
 }
@@ -92,7 +92,7 @@ ZEGRTextureCube::~ZEGRTextureCube()
 	Deinitialize();
 }
 
-ZEGRTextureCube* ZEGRTextureCube::Create(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+ZEGRTextureCube* ZEGRTextureCube::Create(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	ZEGRTextureCube* Texture = ZEGRGraphicsModule::GetInstance()->CreateTextureCube();
 	if (Texture == NULL)

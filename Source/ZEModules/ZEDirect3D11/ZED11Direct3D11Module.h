@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11GraphicsDevice.h
+ Zinek Engine - ZED11Direct3D11Module.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_GRAPHICS_DEVICE_H__
-#define __ZE_D3D11_GRAPHICS_DEVICE_H__
+#pragma once
 
-#include "ZED3D11StatePool.h"
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRDevice.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
-#include "d3d11.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZED11StatePool.h"
+#include "ZED11Tracer.h"
 
-class ZEGRRenderTarget;
+class ZEGRTexture2D;
+class ZEGRTexture3D;
+class ZEGRTextureCube;
+class ZEGRIndexBuffer;
+class ZEGRVertexBuffer;
+class ZEGRShaderCompiler;
+class ZEGRDevice;
 class ZEGRDepthStencilBuffer;
 
-class ZED3D11GraphicsDevice : public ZEGRDevice, public ZED11ComponentBase
+#define ZE_MAX_MULTI_SAMPLE_COUNT		D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT
+#define ZE_MAX_ANISOTROPY_LEVEL			D3D11_MAX_MAXANISOTROPY
+
+class ZED11Direct3D11Module : public ZEGRGraphicsModule
 {
-	friend class ZED3D11GraphicsModule;
-
+	ZE_MODULE(ZED11Direct3D11Module)
 	protected:
-		ZEUInt					ContextIndex;
-		bool					RenderTargetChanged;
-		D3D_FEATURE_LEVEL		FeatureLevel;
+		ID3D11Device*							Device;
+		ZEArray<ZEGRAdapter*>					Adapters;
+		ZED11StatePool							StatePool;
+		ZED11Tracer								Tracer;
 
-		void					ApplyInputStates();
-		void					ApplyVertexShaderStates();
-		void					ApplyGeometryShaderStates();
-		void					ApplyRasterizerStates();
-		void					ApplyPixelShaderStates();
-		void					ApplyOutputStates();
+		bool									CreateDevice(ZEGRAdapter* Adapter);
 
-		void					ApplyStates();
-		
-								ZED3D11GraphicsDevice(ID3D11Device* D3D10Device, ZEUInt ContextIndex);
-		virtual					~ZED3D11GraphicsDevice();
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
+
+												ZED11Direct3D11Module();
+		virtual									~ZED11Direct3D11Module();
 
 	public:
-		virtual void			Draw(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
-		virtual void			DrawIndexed(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt FirstIndex, ZEInt BaseVertex);
-		virtual void			DrawInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
-		virtual void			DrawIndexedInstanced(ZEGRPrimitiveType PrimitiveType, ZEUInt IndexCount, ZEUInt InstanceCount, ZEUInt FirstIndex, ZEInt BaseVertex, ZEUInt FirstInstance);
+		ZED11StatePool*							GetStatePool();
+		virtual ZEGRTracer*						GetTracer();
+		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters();
 
-		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
-		virtual void			ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
-
-		D3D_FEATURE_LEVEL		GetD3DFeatureLevel() const;
+		virtual ZEGRDevice*						CreateContext();
+		virtual ZEGRRenderState*				CreateDeviceState();
+		virtual ZEGRVertexBuffer*				CreateVertexBuffer();
+		virtual ZEGRIndexBuffer*				CreateIndexBuffer();
+		virtual ZEGRShader*						CreateShader();
+		virtual ZEGRConstantBuffer*				CreateConstantBuffer();
+		virtual ZEGRTexture2D*					CreateTexture2D();
+		virtual ZEGRTexture3D*					CreateTexture3D();
+		virtual ZEGRTextureCube*				CreateTextureCube();
+		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer();
+		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
+		virtual ZEGRWindow*						CreateGraphicsWindow();
 };
-
-#endif

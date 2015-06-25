@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11TextureCube.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11Texture2D.h"
 
@@ -82,7 +82,7 @@ ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZE
 	return RenderTarget;
 }
 
-bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget)
+bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Texture != NULL, "Texture already created.");
 	zeDebugCheck(Length == 0, "EdgeLength cannot be zero");

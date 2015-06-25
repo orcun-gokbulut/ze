@@ -46,6 +46,7 @@
 bool ZED11Screen::InitializeSelf()
 {
 	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
+	memset(&SwapChainDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC));
 	SwapChainDesc.Width = GetWidth();
 	SwapChainDesc.Height = GetHeight();
 	SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
@@ -68,7 +69,8 @@ bool ZED11Screen::InitializeSelf()
 	#endif
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc;
-	FullScreenDesc.Windowed = TRUE;
+	memset(&FullScreenDesc, 0, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
+	FullScreenDesc.Windowed = !GetFullscreen();
 	FullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	FullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
 	FullScreenDesc.RefreshRate.Numerator = 0;
@@ -101,6 +103,7 @@ bool ZED11Screen::InitializeSelf()
 
 void ZED11Screen::DeinitializeSelf()
 {
+	SwapChain->SetFullscreenState(FALSE, Output);
 	ZEGR_RELEASE(RenderTarget);
 	ZEGR_RELEASE(DepthStencilBuffer);
 	ZEGR_RELEASE(SwapChain);

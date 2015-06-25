@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED3D11ShaderManager.cpp
+ Zinek Engine - ZED11Adapter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,14 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED3D11ShaderManager.h"
+#pragma once
 
-ZED3D11ShaderManager::ZED3D11ShaderManager()
+#include "ZEGraphics/ZEGRAdapter.h"
+
+#include "ZEDS/ZEArray.h"
+
+struct IDXGIAdapter2;			
+struct IDXGIOutput1;
+
+class ZED11Monitor : public ZEGRMonitor
 {
+	friend class ZED11Adapter;
+	protected:
+		IDXGIOutput1*			Output;
+		ZEArray<ZEGRMode>		Modes;
 
-}
+								ZED11Monitor(ZED11Adapter* Adapter, IDXGIOutput1* Output);
+		virtual					~ZED11Monitor();
 
-ZED3D11ShaderManager::~ZED3D11ShaderManager()
+	public:
+		IDXGIOutput1*			GetOutput();
+		virtual const 
+		ZEArray<ZEGRMode>&		GetModes();
+};
+
+class ZED11Adapter : public ZEGRAdapter
 {
+	friend class ZED11Direct3D11Module;
+	private:
+		IDXGIAdapter2*			Adapter;
+		ZEArray<ZEGRMonitor*>	Monitors;
 
-}
+								ZED11Adapter(IDXGIAdapter2* Adapter);
+		virtual					~ZED11Adapter();
+
+	public:
+		IDXGIAdapter2*			GetAdapter();
+		virtual const 
+		ZEArray<ZEGRMonitor*>&	GetMonitors();
+};

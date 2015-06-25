@@ -37,7 +37,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
 
-ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
+ZEGRResourceType ZEGRConstantBuffer::GetResourceType()
 {
 	return ZEGR_RT_CONSTANT_BUFFER;
 }
@@ -53,6 +53,17 @@ void ZEGRConstantBuffer::Deinitialize()
 {
 	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
 	SetSize(0);
+}
+
+void ZEGRConstantBuffer::SetData(void* Data)
+{
+	void* Buffer;
+	if (!Lock(Buffer))
+		return;
+
+	memcpy(Buffer, Data, GetSize());
+
+	Unlock();
 }
 
 ZEGRConstantBuffer::ZEGRConstantBuffer()

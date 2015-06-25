@@ -347,7 +347,7 @@ inline static DXGI_FORMAT GetInputElementFormat(ZEShaderRegisterMask UsedRegiste
 
 inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterMask UsedRegisters, D3D_REGISTER_COMPONENT_TYPE ComponentType)
 {
-	ZEGRVertexElementType Type = ZE_VET_NONE;
+	ZEGRVertexElementType Type = ZEGR_VET_NONE;
 
 	switch (UsedRegisters)
 	{
@@ -355,13 +355,13 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZE_VET_UINT;
+					Type = ZEGR_VET_UINT;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZE_VET_INT;
+					Type = ZEGR_VET_INT;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZE_VET_FLOAT;
+					Type = ZEGR_VET_FLOAT;
 					break;
 			};
 			break;
@@ -369,13 +369,13 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZE_VET_UINT2;
+					Type = ZEGR_VET_UINT2;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZE_VET_INT2;
+					Type = ZEGR_VET_INT2;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZE_VET_FLOAT2;
+					Type = ZEGR_VET_FLOAT2;
 					break;
 			};
 			break;
@@ -383,13 +383,13 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZE_VET_UINT3;
+					Type = ZEGR_VET_UINT3;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZE_VET_INT3;
+					Type = ZEGR_VET_INT3;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZE_VET_FLOAT3;
+					Type = ZEGR_VET_FLOAT3;
 					break;
 			};
 			break;
@@ -397,13 +397,13 @@ inline static ZEGRVertexElementType D3D10ToZEVertexElementType(ZEShaderRegisterM
 			switch (ComponentType)
 			{
 				case D3D_REGISTER_COMPONENT_UINT32:
-					Type = ZE_VET_UINT4;
+					Type = ZEGR_VET_UINT4;
 					break;
 				case D3D_REGISTER_COMPONENT_SINT32:
-					Type = ZE_VET_INT4;
+					Type = ZEGR_VET_INT4;
 					break;	
 				case D3D_REGISTER_COMPONENT_FLOAT32:
-					Type = ZE_VET_FLOAT4;
+					Type = ZEGR_VET_FLOAT4;
 					break;
 			};
 			break;

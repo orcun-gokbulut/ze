@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRMonitor.h
+ Zinek Engine - ZEGRAdapter.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,82 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEGRAdapter.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZERectangle.h"
+#include "ZEGRGraphicsModule.h"
 
-class ZEGRMonitor
+/*ZEGRMonitor* ZEGRMode::GetMonitor()
 {
-	friend class ZEGRGraphicsModule;
+	return Monitor;
+}
 
-	protected:
-		ZEUInt					Id;
-		ZEString				Name;
-		void*					Handle;
-		ZERectangle				Area;
-	
-								ZEGRMonitor();
-		virtual					~ZEGRMonitor();
+ZEUInt ZEGRMode::GetWidth()
+{
+	return Width;
+}
 
-	public:
-		void*					GetHandle();
+ZEUInt ZEGRMode::GetHeight()
+{
+	return Height;
+}
 
-		ZEUInt					GetId();
-		const char*				GetName();
-		const ZERectangle&		GetArea();
+ZEGRFormat ZEGRMode::GetFormat()
+{
+	return Format;
+}
 
-};
+ZEUInt ZEGRMode::GetRefreshRate()
+{
+	return RefreshRate;
+}
+
+ZEGRMode::ZEGRMode()
+{
+	memset(this, 0, sizeof(ZEGRMode));
+}*/
+
+ZEGRMonitor::ZEGRMonitor()
+{
+	Adapter = NULL;
+	memset(&Area, 0, sizeof(ZERectangle));
+}
+
+ZEGRMonitor::~ZEGRMonitor()
+{
+
+}
+
+ZEGRAdapter* ZEGRMonitor::GetAdapter()
+{
+	return Adapter;
+}
+
+const char* ZEGRMonitor::GetName()
+{
+	return Name.ToCString();
+}
+
+const ZERectangle& ZEGRMonitor::GetArea()
+{
+	return Area;
+}
+
+ZEGRAdapter::ZEGRAdapter()
+{
+	Id = 0;
+}
+
+ZEGRAdapter::~ZEGRAdapter()
+{
+
+}
+
+const ZEString& ZEGRAdapter::GetName()
+{
+	return Name;
+}
+
+const ZEArray<ZEGRAdapter*>& ZEGRAdapter::GetAdapters()
+{
+	return ZEGRGraphicsModule::GetInstance()->GetAdapters();
+}

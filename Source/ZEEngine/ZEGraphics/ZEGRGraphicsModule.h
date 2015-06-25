@@ -38,7 +38,7 @@
 
 #include "ZETypes.h"
 #include "ZECore/ZEModule.h"
-#include "ZEGRMonitor.h"
+#include "ZEGRAdapter.h"
 #include "ZEGRRenderState.h"
 #include "ZECore/ZEOptionSection.h"
 #include "ZETexture/ZETextureOptions.h"
@@ -61,54 +61,45 @@ class ZEGRTracer;
 class ZEGRGraphicsModule : public ZEModule
 {
 	ZE_MODULE(ZEGRGraphicsModule)
-
 	friend class ZEGRDevice;
-
 	protected:
-		ZEArray<ZEGRWindow*>				Windows;
-		ZEArray<ZEGRMonitor*>				Monitors;
-		ZEArray<ZEGRDevice*>				Devices;
+		ZEGRCounter								Counter;
 
-		ZEGRCounter							Counter;
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
-
-											ZEGRGraphicsModule();
-		virtual								~ZEGRGraphicsModule();
+												ZEGRGraphicsModule();
+		virtual									~ZEGRGraphicsModule();
 
 	public:
 		// NOTE: These methods should be here ?
 		// -------------------------------------------
-		ZETextureQuality					TextureQuality;
-		static ZEOptionSection				GraphicsOptions;
-		static void							BaseInitialize();
-		static void							BaseDeinitialize();
-		virtual ZETextureOptions*			GetTextureOptions();
+		ZETextureQuality						TextureQuality;
+		static ZEOptionSection					GraphicsOptions;
+		static void								BaseInitialize();
+		static void								BaseDeinitialize();
+		virtual ZETextureOptions*				GetTextureOptions();
 		// -------------------------------------------
 
-		const ZEArray<ZEGRWindow*>&			GetWindows() const;
-		const ZEArray<ZEGRMonitor*>&		GetMonitors() const;
-		const ZEArray<ZEGRDevice*>&			GetDevices() const;
-		
-		virtual ZEGRTracer*					GetTracer() = 0;
-		ZEGRCounter&						GetCounter();
+		ZEGRDevice*								GetDevice();
+		ZEGRCounter&							GetCounter();
+		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters() = 0;
+		virtual ZEGRTracer*						GetTracer() = 0;
 
-		virtual ZEGRDevice*					CreateContext() = 0;
-		virtual ZEGRRenderState*			CreateDeviceState() = 0;
-		virtual ZEGRVertexBuffer*			CreateVertexBuffer() = 0;
-		virtual ZEGRIndexBuffer*			CreateIndexBuffer() = 0;
-		virtual ZEGRShader*					CreateShader() = 0;
-		virtual ZEGRConstantBuffer*			CreateConstantBuffer() = 0;
-		virtual ZEGRTexture2D*				CreateTexture2D() = 0;
-		virtual ZEGRTexture3D*				CreateTexture3D() = 0;
-		virtual ZEGRTextureCube*			CreateTextureCube() = 0;
-		virtual ZEGRDepthStencilBuffer*		CreateDepthStencilBuffer() = 0;
-		virtual ZEGRShaderCompiler*			CreateShaderCompiler() = 0;
-		virtual ZEGRWindow*					CreateGraphicsWindow() = 0;
+		virtual ZEGRDevice*						CreateContext() = 0;
+		virtual ZEGRRenderState*				CreateDeviceState() = 0;
+		virtual ZEGRVertexBuffer*				CreateVertexBuffer() = 0;
+		virtual ZEGRIndexBuffer*				CreateIndexBuffer() = 0;
+		virtual ZEGRShader*						CreateShader() = 0;
+		virtual ZEGRConstantBuffer*				CreateConstantBuffer() = 0;
+		virtual ZEGRTexture2D*					CreateTexture2D() = 0;
+		virtual ZEGRTexture3D*					CreateTexture3D() = 0;
+		virtual ZEGRTextureCube*				CreateTextureCube() = 0;
+		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer() = 0;
+		virtual ZEGRShaderCompiler*				CreateShaderCompiler() = 0;
+		virtual ZEGRWindow*						CreateGraphicsWindow() = 0;
 
-
-		static ZEGRGraphicsModule*			GetInstance();
+		static ZEGRGraphicsModule*				GetInstance();
 };
 
 #endif

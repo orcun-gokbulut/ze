@@ -35,7 +35,7 @@
 
 #include "ZED11Texture3D.h"
 
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11Texture2D.h"
 #include "ZEError.h"
@@ -88,7 +88,7 @@ ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level)
 }
 
 
-bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt Level, ZEGRTextureFormat Format, bool RenderTarget)
+bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Texture3D != NULL, "Texture already created.");
 	zeDebugCheck(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, "Unknown texture format.");

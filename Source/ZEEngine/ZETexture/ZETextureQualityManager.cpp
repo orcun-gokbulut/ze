@@ -48,7 +48,7 @@
 #define ZE_TC_BLOCK_HEIGHT	4 // Pixels
 #define ZE_PIXEL_SIZE		4 // Bytes
 
-static bool IsCompressed(ZEGRTextureFormat PixelFormat)
+static bool IsCompressed(ZEGRFormat PixelFormat)
 {
 	switch (PixelFormat)
 	{
@@ -89,7 +89,7 @@ static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
 	return 0;
 }
 
-static ZEGRTextureFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionType)
+static ZEGRFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionType)
 {
 	switch (CompressionType)
 	{
@@ -110,7 +110,7 @@ static ZEGRTextureFormat GetCompressedPixelFormat(ZETextureCompressionType Compr
 	return ZEGR_TF_NONE;
 }
 
-static ZETextureCompressionType GetCompressionType(ZEGRTextureFormat PixelFormat)
+static ZETextureCompressionType GetCompressionType(ZEGRFormat PixelFormat)
 {
 	switch (PixelFormat)
 	{
@@ -192,7 +192,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	ZEUInt DestLevelCount					= FinalOptions->MaximumMipmapLevel;
 	ZEUInt SrcSurfaceCount					= TextureData->GetSurfaceCount();
 	ZEGRTextureType SrcTextureType			= TextureData->GetType();
-	ZEGRTextureFormat DestPixelFormat	= GetCompressedPixelFormat(FinalOptions->CompressionType) == ZEGR_TF_NONE ? TextureData->GetPixelFormat() : GetCompressedPixelFormat(FinalOptions->CompressionType);
+	ZEGRFormat DestPixelFormat	= GetCompressedPixelFormat(FinalOptions->CompressionType) == ZEGR_TF_NONE ? TextureData->GetPixelFormat() : GetCompressedPixelFormat(FinalOptions->CompressionType);
 
 	ZEUInt SrcWidth			= TextureData->GetWidth();
 	ZEUInt SrcHeight		= TextureData->GetHeight();

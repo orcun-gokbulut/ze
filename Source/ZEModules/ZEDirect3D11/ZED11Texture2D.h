@@ -44,13 +44,13 @@ class ZEGRRenderTarget;
 
 class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 {
-	friend class ZED3D11GraphicsModule;
+	friend class ZED11Direct3D11Module;
 
 	protected:
 		ID3D11Texture2D*					Texture2D;
 		ID3D11ShaderResourceView*			ResourceView;
 
-		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRTextureFormat Format, bool RenderTarget);
+		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget);
 		virtual void						Deinitialize();
 
 											ZED11Texture2D();

@@ -35,20 +35,23 @@
 
 #pragma once
 
+#include "ZETypes.h"
+
 class ZEGRState
 {
 	private:
-		bool				Dirty;
+		bool					Dirty;
 
 	protected:
-		void				MarkDirty();
+		void					MarkDirty();
 
-							ZEGRState();
-		virtual				~ZEGRState();
+								ZEGRState();
+		virtual					~ZEGRState();
 
 	public:
-		bool				IsDirty();
+		virtual ZEUInt64		GetHash();
+		bool					IsDirty();
 
-		virtual void		Update();
+		virtual void			Update();
 
 };

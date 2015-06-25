@@ -36,7 +36,7 @@
 #include "ZED11ConstantBuffer.h"
 
 #include "ZEError.h"
-#include "ZED3D11GraphicsModule.h"
+#include "ZED11Direct3D11Module.h"
 
 #include <d3d11.h>
 
@@ -74,6 +74,23 @@ void ZED11ConstantBuffer::Deinitialize()
 {
 	ZEGR_RELEASE(Buffer);
 	ZEGRConstantBuffer::Deinitialize();
+}
+
+bool ZED11ConstantBuffer::Lock(void* Buffer)
+{
+	D3D11_MAPPED_SUBRESOURCE Map;
+	HRESULT Result = GetMainContext()->Map(this->Buffer, 0, D3D11_MAP_WRITE_DISCARD, NULL, &Map);
+	if (FAILED(Result))
+	{
+		zeError("Cannot lock constant buffer.");
+		return false;
+	}
+
+	return true;
+}
+void ZED11ConstantBuffer::Unlock()
+{
+	GetMainContext()->Unmap(Buffer, 0);
 }
 
 ZED11ConstantBuffer::ZED11ConstantBuffer()

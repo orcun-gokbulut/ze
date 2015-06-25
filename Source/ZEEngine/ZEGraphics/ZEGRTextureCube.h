@@ -58,25 +58,25 @@ class ZEGRTextureCube : public ZEGRTexture
 		ZEUInt							Length;
 
 	protected:
-		virtual	bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget) = 0;
+		virtual	bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget) = 0;
 		virtual void					Deinitialize();
 
 										ZEGRTextureCube();
 		virtual							~ZEGRTextureCube();
 
 	public:
-		ZEGRResourceType				GetResourceType() const;
-		ZEGRTextureType					GetTextureType() const;
+		ZEGRResourceType				GetResourceType();
+		ZEGRTextureType					GetTextureType();
 
-		ZEUInt							GetLength() const;
-		float							GetPixelSize() const;
+		ZEUInt							GetLength();
+		float							GetPixelSize();
 
 		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
 		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
 		
-		virtual	ZEGRRenderTarget*		GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) const = 0;
+		virtual	ZEGRRenderTarget*		GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) = 0;
 
-		static ZEGRTextureCube*			Create(ZEUInt Length, ZEUInt LevelCount, ZEGRTextureFormat Format, bool RenderTarget = false);
+		static ZEGRTextureCube*			Create(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);
 };
 
 #endif

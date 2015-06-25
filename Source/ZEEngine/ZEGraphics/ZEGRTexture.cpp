@@ -38,7 +38,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEMath\ZEMath.h"
 
-void ZEGRTexture::SetFormat(ZEGRTextureFormat Format)
+void ZEGRTexture::SetFormat(ZEGRFormat Format)
 {
 	this->Format = Format;
 }
@@ -85,7 +85,7 @@ ZESize ZEGRTexture::CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZESize Bloc
 	return Level;
 }
 
-ZESize ZEGRTexture::GetBlockSize(ZEGRTextureFormat Format)
+ZESize ZEGRTexture::GetBlockSize(ZEGRFormat Format)
 {
 	switch (Format)
 	{
@@ -128,7 +128,7 @@ ZESize ZEGRTexture::GetBlockSize(ZEGRTextureFormat Format)
 	}
 }
 
-ZESize ZEGRTexture::GetBlockDimension(ZEGRTextureFormat Format)
+ZESize ZEGRTexture::GetBlockDimension(ZEGRFormat Format)
 {
 	switch (Format)
 	{
@@ -168,7 +168,7 @@ ZEGRTexture::ZEGRTexture()
 	IsRenderTarget = false;
 }
 
-ZEGRTextureFormat ZEGRTexture::GetFormat()
+ZEGRFormat ZEGRTexture::GetFormat()
 {
 	return Format;
 }
