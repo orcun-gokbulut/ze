@@ -92,18 +92,21 @@ void ZETEPatchFile::SetSource(const ZEString& Source)
 
 	FIBITMAP* Bitmap = FreeImage_Load(BitmapFileFormat, GetSource(), FIF_LOAD_NOPIXELS);
 	int BPP = FreeImage_GetBPP(Bitmap);
+	FREE_IMAGE_COLOR_TYPE ColorType = FreeImage_GetColorType(Bitmap);
 	FreeImage_Unload(Bitmap);
-	
-	if (BPP == 8)
-		PixelType = ZETE_PT_GRAYSCALE;
-	else if (BPP == 16)
-		PixelType = ZETE_PT_ELEVATION;
-	else if (BPP == 24)
+
+	PixelType = ZETE_PT_NONE;
+	if (ColorType == FIC_RGB || ColorType == FIC_RGBALPHA || ColorType == FIC_PALETTE)
+	{
 		PixelType = ZETE_PT_COLOR;
-	else if (BPP == 32)
-		PixelType = ZETE_PT_COLOR;
-	else
-		PixelType = ZETE_PT_NONE;
+	}
+	else if (ColorType == FIC_MINISBLACK)
+	{
+		if (BPP == 16)
+			PixelType = ZETE_PT_ELEVATION;
+		else if (BPP == 8)
+			PixelType = ZETE_PT_GRAYSCALE;
+	}
 }
 
 bool ZETEPatchFile::Load()
@@ -127,32 +130,10 @@ bool ZETEPatchFile::Load()
 	}
 
 	int BPP = FreeImage_GetBPP(Bitmap);
-	if (BPP == 8)
-	{
-		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_GRAYSCALE))
-		{
-			FreeImage_Unload(Bitmap);
-			return false;
-		}
-		FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 8, 0, 0, 0, true);
-		FreeImage_Unload(Bitmap);
-		PixelType = ZETE_PT_GRAYSCALE;
-	}
-	else if (BPP == 16)
-	{
-		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_ELEVATION))
-		{
-			FreeImage_Unload(Bitmap);
-			return false;
-		}
-		ZESize SrcPitch = FreeImage_GetPitch(Bitmap);
-		ZEBYTE* SrcBuffer = FreeImage_GetBits(Bitmap);
-		for (ZESize I = 0; I < Height; I++)
-			memcpy((ZEBYTE*)Data + I * Width * 2, SrcBuffer + (Height - I - 1) * SrcPitch, Width * 2);
-		FreeImage_Unload(Bitmap);
-		PixelType = ZETE_PT_ELEVATION;
-	}
-	else if (BPP == 24)
+	FREE_IMAGE_COLOR_TYPE ColorType = FreeImage_GetColorType(Bitmap);
+
+	PixelType = ZETE_PT_NONE;
+	if (ColorType == FIC_RGB || ColorType == FIC_RGBALPHA || ColorType == FIC_PALETTE)
 	{
 		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_COLOR))
 		{
@@ -160,25 +141,41 @@ bool ZETEPatchFile::Load()
 			return false;
 		}
 		FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
-		FreeImage_Unload(Bitmap);
 		PixelType = ZETE_PT_COLOR;
 	}
-	else if (BPP == 32)
+	else if (ColorType == FIC_MINISBLACK)
 	{
-		if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_COLOR))
+		if (BPP == 16)
 		{
-			FreeImage_Unload(Bitmap);
-			return false;
+			if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_ELEVATION))
+			{
+				FreeImage_Unload(Bitmap);
+				return false;
+			}
+			ZESize SrcPitch = FreeImage_GetPitch(Bitmap);
+			ZEBYTE* SrcBuffer = FreeImage_GetBits(Bitmap);
+			for (ZESize I = 0; I < Height; I++)
+				memcpy((ZEBYTE*)Data + I * Width * 2, SrcBuffer + (Height - I - 1) * SrcPitch, Width * 2);
+			PixelType = ZETE_PT_ELEVATION;
 		}
-		FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 32, 0, 0, 0, true);
-		FreeImage_Unload(Bitmap);
-		PixelType = ZETE_PT_COLOR;
+		else if (BPP == 8)
+		{
+			if (!Create(FreeImage_GetWidth(Bitmap), FreeImage_GetHeight(Bitmap), ZETE_PT_GRAYSCALE))
+			{
+				FreeImage_Unload(Bitmap);
+				return false;
+			}
+			FreeImage_ConvertToRawBits((BYTE*)Data, Bitmap, Pitch, 8, 0, 0, 0, true);
+			PixelType = ZETE_PT_GRAYSCALE;
+		}
 	}
 	else
 	{
-		PixelType = ZETE_PT_NONE;
-		FreeImage_Unload(Bitmap);
+		zeError("Unknown patch pixel format.");
+		return false;
 	}
+
+	FreeImage_Unload(Bitmap);
 
 	return ZETEPatch::Load();
 }

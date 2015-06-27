@@ -102,7 +102,7 @@ ZEVector4 ZED3D9TerrainMaterial::GetTexcoordTransform(ZETRLevel* Level, const ZE
 
 void ZED3D9TerrainMaterial::SetupLevel(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
-	float ElevationScale = 0.001f;
+	float ElevationScale = 1.0f;
 	float ElevationOffset = 0.0f;
 
 	ZEInt Level = (ZEInt)RenderCommand->InstanceData;
