@@ -44,7 +44,7 @@
 
 class ZELight;
 class ZECamera;
-class ZERenderer;
+class ZERNRenderer;
 class ZEViewVolume;
 
 enum ZERenderPass
@@ -63,6 +63,7 @@ enum ZEViewType
 
 struct ZEView
 {
+
 	ZEViewType				Type;
 	ZELight*				Light;
 	ZECamera*				Camera;
@@ -85,14 +86,13 @@ struct ZEDrawParameters
 	ZESize					FrameId;
 	float					ElapsedTime;
 	float					Time;
-	ZERenderer*				Renderer;
+	ZERNRenderer*				Renderer;
 	ZERenderPass			Pass;
 	ZEDrawStatistics		Statistics;
 
-	const ZEView*			View;
-	const ZEViewPort*		ViewPort;
-	const ZEViewVolume*		ViewVolume;
+	ZEViewPort*				ViewPort;
+	ZEViewVolume*			ViewVolume;
 
-	ZESmartArray<ZELight*>	Lights;
+	ZESmartArray<ZELight*>	Lights; 
 	void*					CustomData;
 };

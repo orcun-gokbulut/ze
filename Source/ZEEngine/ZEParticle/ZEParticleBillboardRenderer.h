@@ -39,7 +39,7 @@
 
 #include "ZEParticleEmitter.h"
 #include "ZEParticleRenderer.h"
-#include "ZERenderer\ZERenderCommand.h"
+#include "ZERenderer\ZERNCommand.h"
 
 class ZESimpleVertex;
 struct ZEDrawParameters;
@@ -52,7 +52,7 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 		ZEParticleBillboardType				BillboardType;
 
 		ZEStaticVertexBuffer*				VertexBuffer;
-		ZERenderCommand						RenderCommand;
+		ZERNCommand						RenderCommand;
 		ZEVector3							AxisOfOrientation;
 
 		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);

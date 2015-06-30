@@ -784,7 +784,7 @@ const ZESmartArray<ZETexture2DResource*>& ZEModelResource::GetTextures() const
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterial*>& ZEModelResource::GetMaterials() const
+const ZEArray<ZERNMaterial*>& ZEModelResource::GetMaterials() const
 {
 	return Materials;
 }

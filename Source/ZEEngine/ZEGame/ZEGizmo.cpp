@@ -44,7 +44,7 @@
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZERenderer/ZESimpleMaterial.h"
@@ -1077,12 +1077,12 @@ void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
 	RenderCommand.PrimitiveCount = GizmoLines.Vertices.GetCount() / 2;
 	RenderCommand.VertexBuffer = &GizmoLines;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 
 	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
 	RenderCommand.PrimitiveCount = GizmoTriangles.Vertices.GetCount() / 3;
 	RenderCommand.VertexBuffer = &GizmoTriangles;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 ZEGizmoAxis ZEGizmo::PickAxis(const ZERay& Ray, float& TRay)

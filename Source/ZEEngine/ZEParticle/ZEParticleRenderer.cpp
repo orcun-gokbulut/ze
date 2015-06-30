@@ -103,12 +103,12 @@ void ZEParticleRenderer::SetParticleCount(ZEUInt Count)
 	SortTempArray.Resize((ZESize)Count);
 }
 
-void ZEParticleRenderer::SetMaterial(ZEMaterial* Material)
+void ZEParticleRenderer::SetMaterial(ZERNMaterial* Material)
 {
 	this->Material = Material;
 }
 
-const ZEMaterial* ZEParticleRenderer::GetMaterial() const
+const ZERNMaterial* ZEParticleRenderer::GetMaterial() const
 {
 	return Material;
 }

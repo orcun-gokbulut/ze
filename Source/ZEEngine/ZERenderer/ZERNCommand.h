@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMoonMaterial.cpp
+ Zinek Engine - ZERNCommand.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,79 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMoonMaterial.h"
+#pragma once
 
-#include "ZEGraphics/ZEGRTexture3D.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEAABBox.h"
 
-
-ZEMoonMaterial::ZEMoonMaterial()
+enum ZERenderPipeline
 {
-	MoonTexture			= NULL;
+	ZE_RORP_3D = 0,
+	ZE_RORP_2D = 1
+};
 
-	MoonPhase			= 0.0f;
-	MoonScale			= 1.0f;
-	MoonRotation		= 0.0f;
-	MoonAmbientFactor	= 1.0f;
-	MoonAmbientColor	= ZEVector3::One;
-	MoonDirection		= ZEVector3::UnitY;
+// ZERenderCommandFlags
+typedef ZEUInt32 ZERenderCommandFlags;
+#define	ZE_ROF_NONE									0
+#define	ZE_ROF_ENABLE_Z_CULLING						4
+#define	ZE_ROF_ENABLE_NO_Z_WRITE					8
+#define	ZE_ROF_ENABLE_WORLD_TRANSFORM				16
+#define ZE_ROF_ENABLE_VIEW_TRANSFORM				32
+#define ZE_ROF_ENABLE_PROJECTION_TRANSFORM			64
+#define	ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM		(ZE_ROF_ENABLE_VIEW_TRANSFORM | ZE_ROF_ENABLE_PROJECTION_TRANSFORM) 
+#define ZE_ROF_INSTANCED							128
+#define ZE_ROF_SKINNED								256
+#define ZE_ROF_INDEXED								512
 
-}
 
-ZEMoonMaterial::~ZEMoonMaterial()
+enum ZEROPrimitiveType
 {
-	MoonTexture = NULL;
-}
+	ZE_ROPT_POINT,
+	ZE_ROPT_LINE,
+	ZE_ROPT_TRIANGLE,
+	ZE_ROPT_TRIANGLE_STRIPT
+};
 
-ZEMaterialFlags ZEMoonMaterial::GetMaterialFlags() const
-{
-	return ZE_MTF_NONE;
-}
+class ZELight;
+class ZERNMaterial;
+class ZEVertexDeclaration;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
+class ZEGRRenderState;
 
-ZEMoonMaterial* ZEMoonMaterial::CreateInstance()
+class ZERNCommand
 {
-	return zeGraphics->CreateMoonMaterial();
-}
+	public:
+		ZEGRRenderState*				RenderState;
+		ZERenderPipeline				Pipeline;
+		ZEInt							Priority;
+		float							Order;
+		ZERenderCommandFlags			Flags;
+
+		ZEROPrimitiveType				PrimitiveType;
+		void*							PrimitiveParameters;
+		ZESize							PrimitiveCount;
+
+		ZESize							VertexBufferOffset;
+
+		const ZERNMaterial*				Material;
+
+		ZEGRIndexBuffer*				IndexBuffer;
+		ZEGRVertexBuffer*				VertexBuffer;
+		ZEVertexDeclaration*			VertexDeclaration;
+
+		ZEMatrix4x4						LocalMatrix;
+		ZEMatrix4x4						WorldMatrix;
+
+		ZEArray<ZERNCommand*>			Instances;
+		ZEArray<ZEMatrix4x4>			BoneTransforms;
+
+		ZEArray<ZELight*>				Lights;
+
+		void*							InstanceData;
+
+		void							SetZero();
+};

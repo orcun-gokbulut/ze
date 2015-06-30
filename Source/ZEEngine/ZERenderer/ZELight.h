@@ -67,11 +67,6 @@ class ZELight : public ZEEntity
 		bool							CastsShadows;
 		bool							UpdateViewVolume;
 		
-		float							ShadowFactor;
-		float							PenumbraScale;
-		float							DepthScaledBias;
-		float							SlopeScaledBias;
-		
 		float							Range;
 		float							Intensity;
 
@@ -81,38 +76,26 @@ class ZELight : public ZEEntity
 		virtual void					OnTransformChanged();
 
 	public:
-		void							SetRange(float NewValue);
-		float							GetRange() const;
+		virtual ZEDrawFlags				GetDrawFlags() const;
+
+		virtual	void					SetPosition(const ZEVector3& NewPosition);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		void							SetIntensity(float NewValue);
 		float							GetIntensity() const;
 
-		void							SetPenumbraScale(float NewValue);
-		float							GetPenumbraScale() const;
-
-		void							SetDepthScaledBias(float NewValue);
-		float							GetDepthScaledBias() const;
-
-		void							SetSlopeScaledBias(float NewValue);
-		float							GetSlopeScaledBias() const;
+		void							SetAttenuation(const ZEVector3& Attenuation);
+		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		const ZEVector3&				GetAttenuation() const;
 
 		void							SetColor(const ZEVector3& NewColor);
 		const ZEVector3&				GetColor() const;
 
-		void							SetAttenuation(const ZEVector3& Attenuation);
-		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
-		const ZEVector3&				GetAttenuation() const;
-		
-		virtual ZEDrawFlags				GetDrawFlags() const;
+		void							SetRange(float NewValue);
+		float							GetRange() const;		
 
 		virtual void					SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
-
-		void							SetShadowFactor(float Factor);
-		float							GetShadowFactor() const;
-		
-		virtual	void					SetPosition(const ZEVector3& NewPosition);
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		virtual ZELightType				GetLightType() = 0;
 		virtual ZESize					GetViewCount() = 0;

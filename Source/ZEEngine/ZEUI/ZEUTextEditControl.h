@@ -40,7 +40,7 @@
 #include "ZEUILabel.h"
 #include "ZEUITextCursor.h"
 
-ZE_META_FORWARD_DECLARE(ZEMaterial, "ZEGraphics/ZEMaterial.h")
+ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZEGraphics/ZEMaterial.h")
 ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
 
 class ZEUITextEditControl : public ZEUILabel
@@ -62,7 +62,7 @@ class ZEUITextEditControl : public ZEUILabel
 		virtual void						Tick(float ElapsedTime);
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
-		const ZEMaterial*					GetCursorMaterial() const;
+		const ZERNMaterial*					GetCursorMaterial() const;
 		void								SetCursorColor(const ZEVector4& Color);
 		const ZEVector4&					GetCursorColor() const;
 

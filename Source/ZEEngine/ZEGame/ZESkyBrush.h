@@ -39,7 +39,7 @@
 
 #include "ZEEntity.h"
 #include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
 class ZETextureCubeResource;
 class ZESkyBoxMaterial;
@@ -52,7 +52,7 @@ class ZESkyBrush : public ZEEntity
 		ZECanvas							SkyBox;
 		ZETextureCubeResource*				SkyTexture;
 		ZESkyBoxMaterial*					SkyMaterial;
-		ZERenderCommand						SkyRenderCommand;
+		ZERNCommand						SkyRenderCommand;
 
 		ZEVector3							SkyColor;
 		float								SkyBrightness;

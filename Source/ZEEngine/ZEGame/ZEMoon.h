@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
-#include "ZERenderer\ZERenderCommand.h"
+#include "ZERenderer\ZERNCommand.h"
 
 ZE_META_FORWARD_DECLARE(ZEMoonMaterial, "ZEGraphics/ZEMoonMaterial.h")
 ZE_META_FORWARD_DECLARE(ZETexture3DResource, "ZETexture/ZETexture3DResource.h")
@@ -51,7 +51,7 @@ class ZEMoon : public ZEEntity
 	protected:
 		ZEMoonMaterial*				Material;
 		ZETexture3DResource*		Texture;
-		ZERenderCommand				RenderCommand;
+		ZERNCommand				RenderCommand;
 
 		float						Phase;
 		float						Scale;

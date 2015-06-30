@@ -56,8 +56,6 @@ class ZEGRViewport
 		} StateData;
 
 		void							SetZero();
-		ZEGRRenderTarget*				GetRenderTarget();
-		ZEGRDepthStencilBuffer*			GetDepthStencilBuffer();
 
 										ZEGRViewport();
 										~ZEGRViewport();

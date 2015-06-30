@@ -39,7 +39,7 @@
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZERenderer/ZELight.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
@@ -48,7 +48,7 @@
 #include "ZERenderer/ZESimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
-void ZEInteriorRoom::DebugDraw(ZERenderer* Renderer)
+void ZEInteriorRoom::DebugDraw(ZERNRenderer* Renderer)
 {
 	if (DebugDrawComponents.Material == NULL)
 	{
@@ -74,7 +74,7 @@ void ZEInteriorRoom::DebugDraw(ZERenderer* Renderer)
 	DebugDrawComponents.BoxRenderCommand.WorldMatrix = Owner->GetWorldTransform() * LocalMatrix;
 	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
 	DebugDrawComponents.BoxRenderCommand.Priority = 4;
-	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
+	Renderer->AddCommand(&DebugDrawComponents.BoxRenderCommand);
 }
 
 
@@ -362,7 +362,7 @@ void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
 		RenderCommands[I].Lights.Clear();
 		RenderCommands[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
 
-		DrawParameters->Renderer->AddToRenderList(&RenderCommands[I]);
+		DrawParameters->Renderer->AddCommand(&RenderCommands[I]);
 	}
 }
 
@@ -399,8 +399,8 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 		{
 			if (!Processed[N])
 			{
-				ZEMaterial* Material = Resource->Polygons[N].Material;
-				ZERenderCommand* RenderCommand = RenderCommands.Add();
+				ZERNMaterial* Material = Resource->Polygons[N].Material;
+				ZERNCommand* RenderCommand = RenderCommands.Add();
 
 				RenderCommand->SetZero();
 				RenderCommand->Priority = 2;

@@ -40,7 +40,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGame/ZERayCast.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZESpatial/ZEOctree.h"
@@ -50,7 +50,7 @@ class ZEInteriorDoor;
 struct ZEInteriorResourceRoom;
 class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
-class ZERenderer;
+class ZERNRenderer;
 struct ZEDrawParameters;
 class ZEViewVolume;
 class ZESimpleMaterial;
@@ -72,7 +72,7 @@ class ZEInteriorRoom
 		ZEInterior*							Owner;
 		const ZEInteriorResourceRoom*		Resource;
 		ZEStaticVertexBuffer*				VertexBuffer;
-		ZEArray<ZERenderCommand>			RenderCommands;
+		ZEArray<ZERNCommand>			RenderCommands;
 		ZEArray<ZEInteriorDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 
@@ -97,11 +97,11 @@ class ZEInteriorRoom
 		{
 			ZESimpleMaterial*				Material;
 			ZECanvas						BoxCanvas;
-			ZERenderCommand					BoxRenderCommand;
+			ZERNCommand					BoxRenderCommand;
 
 		} DebugDrawComponents;
 
-		void								DebugDraw(ZERenderer* Renderer);
+		void								DebugDraw(ZERNRenderer* Renderer);
 
 		bool								RayCastPoligons(const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
 		bool								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFrameRenderer.h
+ Zinek Engine - ZERNRenderer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,20 +34,81 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FRAME_RENDERER_H__
-#define __ZE_FRAME_RENDERER_H__
 
-#include "ZERenderer.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEGame/ZEDrawStatistics.h"
+#include "ZEInitializable.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
-class ZEFrameRenderer : public ZERenderer
+struct ZEViewPoint
 {
-	public:
-		virtual ZERendererType					GetRendererType();
-
-		virtual void							SetCamera(ZECamera* Camera) = 0;
-		virtual ZECamera*						GetCamera() = 0;
-
-		static ZEFrameRenderer*					CreateInstance();
+	float									FOV;
+	float									NearZ;
+	float									FarZ;
+	ZEVector3								ViewPosition;
+	ZEMatrix4x4								ViewMatrix;
+	ZEMatrix4x4								ProjMatrix;
+	ZEMatrix4x4								ViewProjMatrix;
 };
 
-#endif
+class ZECamera;
+
+enum ZERendererType
+{
+	ZE_RT_FRAME,
+	ZE_RT_SHADOW
+};
+
+class ZEGRDevice;
+class ZEGRViewPort;
+class ZERNStage;
+class ZELight;
+class ZEPostProcessor;
+class ZERNCommand;
+struct ZEDrawParameters;
+
+class ZERNRenderer : public ZEInitializable
+{
+	private:
+		ZEGRDevice*						Device;
+		
+		ZESmartArray<ZERNCommand*>	Commands;
+		ZEArray<ZERNStage*>				Stages;
+		ZEArray<ZELight*>				Lights;
+		ZERendererStatistics			Statistics;
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+	public:
+		ZERendererType					GetRendererType();
+		const ZERendererStatistics&		GetStatistics() const;
+
+		const ZEArray<ZERNStage*>		GetStates();
+		void							AddStage(ZERNStage* Stage);
+		void							RemoveStage(ZERNStage* Stage);
+
+		void							SetDevice(ZEGRDevice* Device);
+		ZEGRDevice*						GetDevice();
+
+		void							SetDrawParameters(ZEDrawParameters* DrawParameters);
+		ZEDrawParameters*				GetDrawParameters();
+
+		void							SetViewPort(ZEGRViewPort* ViewPort);
+		ZEGRViewPort*					GetViewPort();
+
+		void							AddLight(ZELight* Light);
+		void							ClearLights();
+
+		void							AddCommand(ZERNCommand* Command);
+		void							ClearCommands();
+
+		void							Render(float ElaspedTime = 0);
+		void							Clear();
+
+										ZERNRenderer();
+										~ZERNRenderer();
+};

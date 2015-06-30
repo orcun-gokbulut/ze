@@ -123,7 +123,7 @@ const ZEVector2& ZEUITextCursor::GetPosition() const
 	return Positions.LeftUp;
 }
 
-const ZEMaterial* ZEUITextCursor::GetMaterial() const
+const ZERNMaterial* ZEUITextCursor::GetMaterial() const
 {
 	return Material;
 }

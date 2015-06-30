@@ -164,12 +164,12 @@ void ZEUICursorControl::SetZOrder(ZEInt32 Z)
 	Cursor.ZOrder = Z;
 }
 
-ZEMaterial* ZEUICursorControl::GetMaterial() const
+ZERNMaterial* ZEUICursorControl::GetMaterial() const
 {
 	return CursorMaterial;
 }
 
-void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
+void ZEUICursorControl::SetMaterial(ZERNMaterial* Material)
 {
 	Cursor.Material = (ZEUIMaterial*)Material;
 }

@@ -39,31 +39,17 @@
 
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEDrawParameters.h"
-#include "ZERenderer/ZERenderer.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
-
-enum ZECameraSettingType
-{
-	ZE_CST_NONE			= 0,
-	ZE_CST_ASPECT_RATIO = 1,
-	ZE_CST_NEAR_Z		= 2,
-	ZE_CST_FAR_Z		= 3,
-	ZE_CST_ALL			= 0xFFFFFFFF
-};
-
-//#define ZE_CSF_NONE			0
-//#define ZE_CSF_ASPECT_RATIO	1
-//#define ZE_CSF_NEAR_Z		2
-//#define ZE_CSF_FAR_Z		4
-//#define ZE_CSF_ALL			0xFFFFFFFF
 
 enum ZECameraProjectionType
 {
@@ -73,42 +59,53 @@ enum ZECameraProjectionType
 };
 
 class ZEViewPort;
+class ZEGRScreen;
+class ZEGRConstantBuffer;
 
 class ZECamera : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 
-		float							NearZ, FarZ;
-		float							VerticalFOV;
-		float							AspectRatio;
-		mutable float					EffectiveNearZ, EffectiveFarZ,  EffectiveAspectRatio;
-		float							Width, Height;
+		ZEGRScreen*						Screen;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		bool							AutoZ;
+		struct
+		{
+			ZEMatrix4x4					ViewTransform;
+			ZEMatrix4x4					ProjectionTransform;
+			ZEMatrix4x4					ViewProjectionTransform;
+
+			ZEUInt32					Width;
+			ZEUInt32					Height;
+			float						AspectRatio;
+			float						VerticalFOV;
+			float						HorizontalFOV;
+			float						NearZ;
+			float						FarZ;
+			float						ShadowDistance;
+			float						ShadowFadeDistance;
+		} Constants;
+
 		bool							AutoAspectRatio;
-
-		float							ShadowDistance;
-		float							ShadowFadeDistance;
-
-		ZEMatrix4x4						ViewTransform;
-		ZEMatrix4x4						ProjectionTransform;
-		ZEMatrix4x4						ViewProjectionTransform;
 
 		ZEViewFrustum					ViewFrustum;
 		ZEView							View;
 
-										ZECamera();
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 		virtual void					OnTransformChanged();
-		virtual void					UpdateAutoParameters();
+		void							UpdateAutoParameters();
+
+										ZECamera();
 
 	public:
+		ZEGRConstantBuffer*				GetConstantBuffer();
 
-		void							SetAutoZ(bool Enabled);
-		bool							GetAutoZ();
+		void							SetScreen(ZEGRScreen* Screen);
+		ZEGRScreen*						GetScreen();
 
 		void							SetNearZ(float NearZ);
 		float							GetNearZ() const;
@@ -145,7 +142,7 @@ class ZECamera : public ZEEntity
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
-		//ZEVector2						GetScreenPosition(ZEVector3& WorldPosition);
+		ZEVector2						GetScreenPosition(const ZEVector3& WorldPosition);
 
 		static ZECamera*				CreateInstance();
 };

@@ -76,18 +76,6 @@ ZEGRTexture2D* ZEPointLight::GetBackShadowMap()
 
 bool ZEPointLight::DeinitializeSelf()
 {
-	if (FrontShadowMap)
-	{
-		FrontShadowMap->Destroy();
-		FrontShadowMap = NULL;
-	}
-
-	if (BackShadowMap)
-	{
-		BackShadowMap->Destroy();
-		BackShadowMap = NULL;
-	}
-
 	return ZELight::DeinitializeSelf();
 }
 

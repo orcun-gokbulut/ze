@@ -228,7 +228,3 @@ class ZEGRWindow
 		static ZEUInt							GetWindowCount();
 		static ZEGRWindow*						CreateInstance();
 };
-
-// Window As Output Device
-
-// Window As Windo

@@ -39,7 +39,7 @@
 
 #include "ZEEntity.h"
 #include "ZERenderer\ZECanvas.h"
-#include "ZERenderer\ZERenderCommand.h"
+#include "ZERenderer\ZERNCommand.h"
 #include "ZETypes.h"
 #include "ZEMath\ZEAABBox.h"
 
@@ -72,7 +72,7 @@ class ZECloud : public ZEEntity
 		ZETexture2DResource*	CloudFormationTexture;
 
 		ZECloudMaterial*		CloudMaterial;
-		ZERenderCommand			CloudRenderCommand;
+		ZERNCommand			CloudRenderCommand;
 
 		virtual bool			InitializeSelf();
 		virtual bool			DeinitializeSelf();

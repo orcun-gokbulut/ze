@@ -58,7 +58,7 @@ void ZEGRConstantBuffer::Deinitialize()
 void ZEGRConstantBuffer::SetData(void* Data)
 {
 	void* Buffer;
-	if (!Lock(Buffer))
+	if (!Lock(&Buffer))
 		return;
 
 	memcpy(Buffer, Data, GetSize());

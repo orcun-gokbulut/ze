@@ -39,7 +39,7 @@
 
 #include "ZEGame/ZEEntity.h"
 #include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
 enum ZEGizmoMode
 {
@@ -64,7 +64,7 @@ enum ZEGizmoAxis
 };
 
 ZE_META_FORWARD_DECLARE(ZESimpleMaterial, "ZEGraphics/ZESimpleMaterial.h")
-ZE_META_FORWARD_DECLARE(ZERenderer, "ZEGraphics/ZERenderer.h")
+ZE_META_FORWARD_DECLARE(ZERNRenderer, "ZEGraphics/ZERenderer.h")
 
 class ZEGizmo : public ZEEntity
 {
@@ -79,7 +79,7 @@ class ZEGizmo : public ZEEntity
 
 		static ZESimpleMaterial*		GizmoMaterial;
 
-		ZERenderCommand					RenderCommand;
+		ZERNCommand					RenderCommand;
 
 		ZEGizmoMode						Mode;
 		ZEGizmoAxis						HoveredAxis;

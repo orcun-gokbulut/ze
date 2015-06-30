@@ -57,6 +57,6 @@ class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 	public:
 		const ID3D11Buffer*		GetBuffer() const;
 
-		virtual bool			Lock(void* Lock);
+		virtual bool			Lock(void** Lock);
 		virtual void			Unlock();
 };

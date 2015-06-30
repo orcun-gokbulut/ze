@@ -228,12 +228,12 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 	return ProperEntities;
 }
 
-ZERenderer* ZEScene::GetRenderer()
+ZERNRenderer* ZEScene::GetRenderer()
 {
 	return Renderer;
 }
 
-ZERenderer*	ZEScene::GetShadowRenderer()
+ZERNRenderer*	ZEScene::GetShadowRenderer()
 {
 	return ShadowRenderer;
 }

@@ -102,8 +102,8 @@ class ZEScene : public ZEObject
 
 		void									ClearEntities();
 
-		ZERenderer*								GetRenderer();
-		ZERenderer*								GetShadowRenderer();
+		ZERNRenderer*								GetRenderer();
+		ZERNRenderer*								GetShadowRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);

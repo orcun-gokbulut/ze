@@ -53,7 +53,7 @@ class ZEGRConstantBuffer : public ZEGRResource
 
 		void						SetData(void* ConstantData);
 
-		virtual bool				Lock(void* Buffer) = 0;
+		virtual bool				Lock(void** Buffer) = 0;
 		virtual void				Unlock() = 0;
 
 		static ZEGRConstantBuffer*	Create(ZESize BufferSize);

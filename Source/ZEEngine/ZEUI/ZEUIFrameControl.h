@@ -63,8 +63,8 @@ class ZEUIFrameControl : public ZEUIControl
 		virtual void		SetWidth(float Width);
 		virtual void		SetHeight(float Height);
 
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZERNMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZERNMaterial* Material);
 
 		virtual void		SetPosition(const ZEVector2& Position);
 

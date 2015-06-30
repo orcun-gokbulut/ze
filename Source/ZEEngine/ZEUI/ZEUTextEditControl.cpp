@@ -269,7 +269,7 @@ ZEUITextEditControl::ZEUITextEditControl()
 	IsTextDirty = false;
 }
 
-const ZEMaterial* ZEUITextEditControl::GetCursorMaterial() const
+const ZERNMaterial* ZEUITextEditControl::GetCursorMaterial() const
 {
 	return Cursor.Material; 
 }

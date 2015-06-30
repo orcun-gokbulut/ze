@@ -52,7 +52,7 @@
 class ZEStaticVertexBuffer;
 class ZEGRTexture2D;
 class ZETexture2DResource;
-class ZEMaterial;
+class ZERNMaterial;
 class ZEPhysicalJoint;
 class ZEMLReaderNode;
 
@@ -334,7 +334,7 @@ class ZEModelResource : public ZEResource
 		ZEArray<ZEModelResourceHelper>				Helpers;
 		ZEArray<ZEModelResourceAnimation>			Animations;
 		ZESmartArray<ZETexture2DResource*>			TextureResources;
-		ZEArray<ZEMaterial*>						Materials;
+		ZEArray<ZERNMaterial*>						Materials;
 
 		bool										BoundingBoxIsUserDefined;
 		ZEAABBox									UserDefinedBoundingBox;
@@ -359,7 +359,7 @@ class ZEModelResource : public ZEResource
 		bool										GetUserDefinedBoundingBoxEnabled() const;
 		const ZEAABBox&								GetUserDefinedBoundingBox() const;
 		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
-		const ZEArray<ZEMaterial*>&					GetMaterials() const;
+		const ZEArray<ZERNMaterial*>&					GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;
 		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
 		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;

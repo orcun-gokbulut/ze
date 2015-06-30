@@ -168,8 +168,8 @@ class ZEUIBorderedFrameControl : public ZEUIControl
 
 		void				SetBorderThickness(float Thickness);
 
-		virtual void		SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZERNMaterial* Material);
+		virtual ZERNMaterial*	GetMaterial() const;
 
 							ZEUIBorderedFrameControl();
 

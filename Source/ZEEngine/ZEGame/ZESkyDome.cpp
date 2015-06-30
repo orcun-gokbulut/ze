@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESkyDome.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZESkyDomeMaterial.h"
 #include "ZEDrawParameters.h"
 
@@ -248,7 +248,7 @@ void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
 
 	SkyDomeRenderCommand.Material			= SkyDomeMaterial;
 	SkyDomeRenderCommand.WorldMatrix		= GetWorldTransform();
-	DrawParameters->Renderer->AddToRenderList(&SkyDomeRenderCommand);
+	DrawParameters->Renderer->AddCommand(&SkyDomeRenderCommand);
 }
 
 void ZESkyDome::Tick(float Time)

@@ -152,7 +152,7 @@ void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
 	{
 		SkyRenderCommand.Material = SkyMaterial;
 		SkyRenderCommand.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&SkyRenderCommand);
+		DrawParameters->Renderer->AddCommand(&SkyRenderCommand);
 	}
 }
 

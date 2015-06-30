@@ -36,7 +36,7 @@
 #include "ZEGrid.h"
 #include "ZEScene.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZERenderer/ZESimpleMaterial.h"
@@ -208,7 +208,7 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MinorGridPosition, GetRotation(), ZEVector3::One);
 		RenderCommand.VertexBuffer = &MinorGrid;
 		RenderCommand.PrimitiveCount = MinorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddToRenderList(&RenderCommand);
+		Parameters->Renderer->AddCommand(&RenderCommand);
 	}
 
 	if (MajorGridEnabled)
@@ -222,7 +222,7 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MajorGridPosition, GetRotation(), ZEVector3::One);
 		RenderCommand.VertexBuffer = &MajorGrid;
 		RenderCommand.PrimitiveCount = MajorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddToRenderList(&RenderCommand);
+		Parameters->Renderer->AddCommand(&RenderCommand);
 	}
 
 	if (AxisEnabled)
@@ -237,14 +237,14 @@ void ZEGrid::Draw(ZEDrawParameters* Parameters)
 		{
 			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
 			RenderCommand.VertexBuffer = &AxisX;
-			Parameters->Renderer->AddToRenderList(&RenderCommand);
+			Parameters->Renderer->AddCommand(&RenderCommand);
 		}
 
 		if (AxisXGridPosition.x > -GridSize.x * 0.5f && AxisXGridPosition.x < GridSize.x * 0.5f)
 		{
 			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
 			RenderCommand.VertexBuffer = &AxisZ;
-			Parameters->Renderer->AddToRenderList(&RenderCommand);
+			Parameters->Renderer->AddCommand(&RenderCommand);
 		}
 	}
 }

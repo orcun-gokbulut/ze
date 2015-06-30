@@ -37,7 +37,7 @@
 #ifndef __ZE_UI_MATERIAL_H__ 
 #define __ZE_UI_MATERIAL_H__
 
-#include "ZEMaterial.h"
+#include "ZERNMaterial.h"
 
 ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZETexture2D.h")
 

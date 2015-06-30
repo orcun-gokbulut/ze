@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
@@ -74,7 +74,7 @@ class ZEModel : public ZEEntity
 		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERenderCommand>			LODRenderCommands;
+		ZEArray<ZERNCommand>			LODRenderCommands;
 		
 		ZEModelStatistics					Statistics;
 

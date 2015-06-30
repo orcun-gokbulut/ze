@@ -38,9 +38,9 @@
 #include "ZEInterior.h"
 #include "ZEInteriorRoom.h"
 #include "ZERenderer\ZESimpleMaterial.h"
-#include "ZERenderer\ZERenderer.h"
+#include "ZERenderer\ZERNRenderer.h"
 
-void ZEInteriorDoor::DebugDraw(ZERenderer* Renderer)
+void ZEInteriorDoor::DebugDraw(ZERNRenderer* Renderer)
 {
 	if (DebugDrawComponents.Material == NULL)
 	{
@@ -66,7 +66,7 @@ void ZEInteriorDoor::DebugDraw(ZERenderer* Renderer)
 	DebugDrawComponents.BoxRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
 	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
 	DebugDrawComponents.BoxRenderCommand.Priority = 4;
-	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
+	Renderer->AddCommand(&DebugDrawComponents.BoxRenderCommand);
 }
 
 void ZEInteriorDoor::CalculateRectangle()

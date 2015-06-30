@@ -40,7 +40,7 @@
 #include "ZEEntity.h"
 
 #include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZEFixedMaterial.h"
 
 class ZEFixedMaterial;
@@ -49,7 +49,7 @@ class ZETexture2DResource;
 class ZELensFlareArtifact
 {
 	private:
-		ZERenderCommand Command;
+		ZERNCommand Command;
 		ZEFixedMaterial* Material;
 		ZETexture2DResource* Texture;
 

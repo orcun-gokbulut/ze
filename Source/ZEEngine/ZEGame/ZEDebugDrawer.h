@@ -38,7 +38,7 @@
 #define __ZE_DEBUG_DRAWER_H__
 
 #include "ZEEntity.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 
 #define ZE_DDE_NONE									0
@@ -49,7 +49,7 @@
 class ZEAABBox;
 class ZEMatrix4x4;
 class ZERectangle3D;
-class ZEMaterial;
+class ZERNMaterial;
 class ZEUIDebugDrawTag;
 
 class ZEDebugDrawer : public ZEEntity
@@ -58,9 +58,9 @@ class ZEDebugDrawer : public ZEEntity
 		ZEVector4				DrawColor;
 		ZEFlags					DebugDrawElements;
 
-		ZEMaterial*				Material;
+		ZERNMaterial*				Material;
 		ZECanvas				DrawCanvas;
-		ZERenderCommand			RenderCommand;
+		ZERNCommand			RenderCommand;
 
 	protected:
 		ZEEntity*				Target;

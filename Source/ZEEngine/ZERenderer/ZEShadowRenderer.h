@@ -37,7 +37,7 @@
 #ifndef __ZE_SHADOW_RENDERER_H__
 #define __ZE_SHADOW_RENDERER_H__
 
-#include "ZERenderer.h"
+#include "ZERNRenderer.h"
 #include "ZETypes.h"
 
 class ZEGRTexture2D;
@@ -45,7 +45,7 @@ class ZEGRTextureCube;
 struct ZEDrawParameters;
 enum ZEGRTextureCubeFace;
 
-class ZEShadowRenderer : public ZERenderer
+class ZEShadowRenderer : public ZERNRenderer
 {
 	public:
 
