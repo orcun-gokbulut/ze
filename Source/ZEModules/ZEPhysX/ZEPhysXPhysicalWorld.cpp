@@ -38,7 +38,7 @@
 #include "ZEPhysics/ZEPhysicalObject.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEError.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZESimpleMaterial.h"
 #include <NxDebugRenderable.h>
 #include <NxRay.h>
@@ -262,7 +262,7 @@ void ZEPhysXPhysicalWorld::Deinitialize()
 	}
 }
 
-void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
+void ZEPhysXPhysicalWorld::Draw(ZERNRenderer* Renderer)
 {
 	if (!Visualize)
 		return;
@@ -281,7 +281,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 		DebugDraw.PointsVertexBuffer[I].Color = NX_TO_ZE(DebugPoints[I].color);
 	}
 	if (DebugDraw.PointsRenderCommand.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.PointsRenderCommand);
+		Renderer->AddCommand(&DebugDraw.PointsRenderCommand);
 
 
 	DebugDraw.LinesRenderCommand.PrimitiveCount = DebugRenderable->getNbLines();
@@ -295,7 +295,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 		DebugDraw.LinesVertexBuffer[2 * I + 1].Color = NX_TO_ZE(DebugLines[I].color);
 	}
 	if (DebugDraw.LinesRenderCommand.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.LinesRenderCommand);
+		Renderer->AddCommand(&DebugDraw.LinesRenderCommand);
 
 	DebugDraw.TrianglesRenderCommand.PrimitiveCount = DebugRenderable->getNbTriangles();
 	DebugDraw.TrianglesVertexBuffer.SetCount(DebugDraw.TrianglesRenderCommand.PrimitiveCount * 3);
@@ -310,7 +310,7 @@ void ZEPhysXPhysicalWorld::Draw(ZERenderer* Renderer)
 		DebugDraw.TrianglesVertexBuffer[3 * I + 2].Color = NX_TO_ZE(DebugTriangles[I].color);
 	}
 	if (DebugDraw.TrianglesRenderCommand.PrimitiveCount != 0)
-		Renderer->AddToRenderList(&DebugDraw.TrianglesRenderCommand);
+		Renderer->AddCommand(&DebugDraw.TrianglesRenderCommand);
 }
 
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)

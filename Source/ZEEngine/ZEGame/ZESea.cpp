@@ -40,7 +40,7 @@
 #include "ZERenderer/ZESeaMaterial.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEDrawParameters.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
@@ -275,7 +275,7 @@ void ZESea::Draw(ZEDrawParameters* DrawParameters)
 	Command.PrimitiveParameters = 0;
 	Command.Flags = 0;
 
-	DrawParameters->Renderer->AddToRenderList(&Command);
+	DrawParameters->Renderer->AddCommand(&Command);
 }
 
 ZEDrawFlags ZESea::GetDrawFlags() const

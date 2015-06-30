@@ -36,7 +36,7 @@
 #include "ZEModelMesh.h"
 #include "ZEModel.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"

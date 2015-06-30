@@ -243,7 +243,7 @@ void ZEParticleBillboardRenderer::Draw(ZEDrawParameters* DrawParameters)
 
 	RenderCommand.VertexBuffer = VertexBuffer;
 	RenderCommand.Material = Material;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 void ZEParticleBillboardRenderer::SetAxixOfOrientation(const ZEVector3& AxisOfOrientation)

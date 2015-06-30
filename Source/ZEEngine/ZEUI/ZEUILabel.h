@@ -68,7 +68,7 @@ class ZEUILabel : public ZEUIFrameControl
 		ZEArray<ZEInt32>					LineTextWidths;
 
 		ZEFontResource*						FontResource;
-		ZEMaterial*							FontMaterial;
+		ZERNMaterial*							FontMaterial;
 		ZEVector4							FontColor;
 
 		ZERectangle							TextRenderingArea;

@@ -60,10 +60,7 @@ void ZEGRVertexLayout::SetElements(const ZEGRVertexElement* VertexElements, ZEUI
 	StateData.ElementCount = ElementCount;
 	for (ZESize I = 0; I < ElementCount; ++I)
 	{
-		zeDebugCheck(strnlen(VertexElements[I].Semantic, ZEGR_MAX_SHADER_VARIABLE_NAME) == ZEGR_MAX_SHADER_VARIABLE_NAME, 
-						"Wrong vertex buffer element semantic");
-
-		sprintf(StateData.Elements[I].Semantic, "%s", VertexElements[I].Semantic);
+		StateData.Elements[I].Semantic = VertexElements[I].Semantic;
 		StateData.Elements[I].Index = VertexElements[I].Index;
 		StateData.Elements[I].Type = VertexElements[I].Type;
 		StateData.Elements[I].Stream = VertexElements[I].Stream;

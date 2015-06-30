@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELight.h"
-#include "ZERenderCommand.h"
+#include "ZERNCommand.h"
 #include "ZEGame\ZEDrawParameters.h"
-#include "ZERenderer.h"
+#include "ZERNRenderer.h"
 
 float ZELight::AttenuationFunction(float RootToTry)
 {
@@ -70,36 +70,6 @@ void ZELight::SetIntensity(float NewValue)
 float ZELight::GetIntensity() const
 {
 	return Intensity;
-}
-
-void ZELight::SetPenumbraScale(float NewValue)
-{
-	PenumbraScale = NewValue;
-}
-
-float ZELight::GetPenumbraScale() const
-{
-	return PenumbraScale;
-}
-
-void ZELight::SetDepthScaledBias(float NewValue)
-{
-	DepthScaledBias = NewValue;
-}
-
-float ZELight::GetDepthScaledBias() const
-{
-	return DepthScaledBias;
-}
-
-void ZELight::SetSlopeScaledBias(float NewValue)
-{
-	SlopeScaledBias = NewValue;
-}
-
-float ZELight::GetSlopeScaledBias() const
-{
-	return SlopeScaledBias;
 }
 
 void ZELight::SetColor(const ZEVector3& NewColor)
@@ -177,16 +147,6 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
-void ZELight::SetShadowFactor(float Factor)
-{
-	ShadowFactor = Factor;
-}
-
-float ZELight::GetShadowFactor() const
-{
-	return ShadowFactor;
-}
-
 void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	if (GetPosition() != NewPosition)
@@ -216,17 +176,10 @@ ZELight::ZELight()
 	CastsShadows = false;
 	UpdateViewVolume = true;
 
-	PenumbraScale = 1.0f;
-
-	DepthScaledBias = 0.0f;
-	SlopeScaledBias = 0.0f;
-
 	Range = 100.0f;
 	Intensity = 1.0f;
 	Color = ZEVector3(1.0f, 1.0f, 1.0f);
 	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
-
-	ShadowFactor = 0.9f;
 }
 
 ZELight::~ZELight()

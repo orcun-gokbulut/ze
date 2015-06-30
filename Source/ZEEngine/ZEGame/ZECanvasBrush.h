@@ -40,17 +40,17 @@
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZERenderer;
-class ZEMaterial;
+class ZERNRenderer;
+class ZERNMaterial;
 
 class ZECanvasBrush : public ZEEntity
 {
 	ZE_OBJECT
 	
 	private:
-		ZERenderCommand					RenderCommand;
+		ZERNCommand					RenderCommand;
 		ZEStaticVertexBuffer*			VertexBuffer;
 		ZESize							OldVertexCount;
 	
@@ -64,7 +64,7 @@ class ZECanvasBrush : public ZEEntity
 		virtual ZEDrawFlags				GetDrawFlags() const;
 
 		ZEROPrimitiveType				PrimitiveType;
-		ZEMaterial*						Material;
+		ZERNMaterial*						Material;
 		ZECanvas						Canvas;
 
 		void							UpdateCanvas();

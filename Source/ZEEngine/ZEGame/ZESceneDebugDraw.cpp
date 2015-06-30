@@ -35,14 +35,14 @@
 
 #include "ZESceneDebugDraw.h"
 #include "ZERenderer/ZESimpleMaterial.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEOBBox.h"
 
-void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color)
+void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERNRenderer* Renderer, const ZEVector4& Color)
 {
 	ZEMatrix4x4 LocalPivot, WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(LocalPivot, BoundingBox.GetCenter(), 
@@ -58,7 +58,7 @@ void ZESceneDebugDraw::DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, cons
 	VertexBuffer.AddWireframeBox(1.0f, 1.0f, 1.0f);
 }
 
-void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color)
+void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERNRenderer* Renderer, const ZEVector4& Color)
 {
 	ZEMatrix4x4 WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
@@ -70,7 +70,7 @@ void ZESceneDebugDraw::DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, Z
 	VertexBuffer.AddWireframeBox(1.0f, 1.0f, 1.0f);
 }
 
-void ZESceneDebugDraw::DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color)
+void ZESceneDebugDraw::DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERNRenderer* Renderer, const ZEVector4& Color)
 {
 	ZEMatrix4x4 WorldMatrix;
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingSphere.Position, 
@@ -122,13 +122,13 @@ void ZESceneDebugDraw::Deinitialize()
 	Initialized = false;
 }
 
-void ZESceneDebugDraw::Draw(ZERenderer* Renderer)
+void ZESceneDebugDraw::Draw(ZERNRenderer* Renderer)
 {
 	if (VertexBuffer.Vertices.GetCount() == 0)
 		return;
 
 	RenderCommand.PrimitiveCount = VertexBuffer.Vertices.GetCount() / 2;
-	Renderer->AddToRenderList(&RenderCommand);
+	Renderer->AddCommand(&RenderCommand);
 }
 
 ZESceneDebugDraw::ZESceneDebugDraw()

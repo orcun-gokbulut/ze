@@ -41,7 +41,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZEParticle.h"
 #include "ZEMath/ZEAABBox.h"
 
@@ -83,9 +83,9 @@ class ZEParticleEmitter : public ZEObject
 		ZEArray<ZEParticle>				SortArray;
 		ZEArray<ZEParticleModifier*>	Modifiers;
 
-		ZEMaterial*						Material;
+		ZERNMaterial*						Material;
 		ZEStaticVertexBuffer*			VertexBuffer;
-		ZERenderCommand					RenderCommand;
+		ZERNCommand					RenderCommand;
 
 		ZEParticleBillboardType			BillboardType;
 
@@ -206,8 +206,8 @@ class ZEParticleEmitter : public ZEObject
 		void							SetAxisOrientation(const ZEVector3& Orientation);
 		const ZEVector3&				GetAxisOrientation() const;
 
-		void							SetMaterial(ZEMaterial *Material);
-		ZEMaterial*						GetMaterial() const;
+		void							SetMaterial(ZERNMaterial *Material);
+		ZERNMaterial*						GetMaterial() const;
 
 		void							Tick(float TimeElapsed);
 		void							Draw(ZEDrawParameters* DrawParameters);

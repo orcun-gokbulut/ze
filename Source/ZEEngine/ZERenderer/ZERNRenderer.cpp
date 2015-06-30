@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERenderCommand.cpp
+ Zinek Engine - ZERNRenderer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,93 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERenderCommand.h"
-#include <memory.h>
+#include "ZERNRenderer.h"
+#include "ZERNStage.h"
 
-void ZERenderCommand::SetZero()
+bool ZERNRenderer::InitializeSelf()
 {
-	memset(this, 0, sizeof(ZERenderCommand));
-	this->Priority = 3;
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		if (!Stages[I]->Initialize())
+			return false;
+
+	return true;
+}
+
+void ZERNRenderer::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		Stages[I]->Deinitialize();
+}
+
+const ZEArray<ZERNStage*> ZERNRenderer::GetStates()
+{
+	return Stages;
+}
+
+void ZERNRenderer::AddStage(ZERNStage* Stage)
+{
+	if (Stages.Exists(Stage))
+		zeError("Stage is already added.");
+
+	Stages.Add(Stage);
+}
+
+void ZERNRenderer::RemoveStage(ZERNStage* Stage)
+{
+	Stages.RemoveValue(Stage);
+}
+
+const ZERendererStatistics& ZERNRenderer::GetStatistics() const
+{
+	return Statistics;
+}
+
+void ZERNRenderer::AddLight(ZELight* Light)
+{
+	Lights.Add(Light);
+}
+
+void ZERNRenderer::ClearLights()
+{
+	Lights.Clear();
+}
+
+void ZERNRenderer::AddCommand(ZERNCommand* Command)
+{
+	Commands.Add(Command);
+}
+
+void ZERNRenderer::ClearCommands()
+{
+	Commands.Clear();
+}
+
+void ZERNRenderer::Render(float ElaspedTime)
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+	{
+		ZERNStage* Stage = Stages[I];
+		Stage->Setup(Device);
+
+		for (ZESize N = 0; N < Commands.GetCount(); I++)
+			Stage->Render(Commands[I]);
+
+		Stage->CleanUp();
+	}
+}
+
+void ZERNRenderer::Clear()
+{
+	ClearLights();
+	ClearCommands();
+}
+
+ZERNRenderer::ZERNRenderer()
+{
+	memset(&Statistics, 0, sizeof(ZERendererStatistics));
+}
+
+ZERNRenderer::~ZERNRenderer()
+{
+
 }

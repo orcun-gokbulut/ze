@@ -39,7 +39,7 @@
 
 #include "ZECanvasBrush.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
 class ZEListener;
 class ZEScene;
@@ -56,7 +56,7 @@ class ZEGrid : public ZEEntity
 		ZECanvas					AxisZ;
 
 		ZESimpleMaterial*			Material;
-		ZERenderCommand				RenderCommand;
+		ZERNCommand				RenderCommand;
 
 		ZEVector2					GridSize;
 		bool						FollowerGrid;

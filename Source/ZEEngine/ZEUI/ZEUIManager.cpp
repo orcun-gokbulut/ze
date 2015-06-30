@@ -584,7 +584,7 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 	return ParentControl;
 }
 
-void ZEUIManager::Render(ZERenderer* Renderer)
+void ZEUIManager::Render(ZERNRenderer* Renderer)
 {
 	UIRenderer->Clean();
 	for (size_t I = 0; I < Controls.GetCount(); I++)

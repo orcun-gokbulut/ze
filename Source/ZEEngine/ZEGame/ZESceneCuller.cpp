@@ -37,7 +37,7 @@
 #include "ZEScene.h"
 #include "ZEEntity.h"
 #include "ZERenderer/ZELight.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 

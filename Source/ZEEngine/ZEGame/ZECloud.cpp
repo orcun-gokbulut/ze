@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZECloud.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECloudMaterial.h"
 #include "ZEDrawParameters.h"
 #include "ZERenderer/ZECamera.h"
@@ -302,7 +302,7 @@ void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 	CloudRenderCommand.VertexBufferOffset	= 0;
 	CloudRenderCommand.Material				= CloudMaterial;
 	CloudRenderCommand.WorldMatrix			= GetWorldTransform();
-	DrawParameters->Renderer->AddToRenderList(&CloudRenderCommand);
+	DrawParameters->Renderer->AddCommand(&CloudRenderCommand);
 
 }
 

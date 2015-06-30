@@ -37,10 +37,10 @@
 #include "ZEError.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZERenderer/ZERenderer.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZERenderer/ZEMaterial.h"
+#include "ZERenderer/ZERNMaterial.h"
 
 ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 {
@@ -106,7 +106,7 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 		RenderCommand.Material = Material;
 		RenderCommand.PrimitiveType = PrimitiveType;
 		RenderCommand.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+		DrawParameters->Renderer->AddCommand(&RenderCommand);
 	}
 }
 

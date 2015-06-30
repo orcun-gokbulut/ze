@@ -49,7 +49,7 @@ class ZETextureResource;
 class ZEMaterialResource : public ZEResource
 {
 	private:
-		ZEMaterial*								Material;
+		ZERNMaterial*								Material;
 		ZEArray<ZETextureResource*>				TextureResources;
 
 		static bool								LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions);
@@ -62,7 +62,7 @@ class ZEMaterialResource : public ZEResource
 	public:
 		virtual const char*						GetResourceType() const;
 
-		const ZEMaterial*						GetMaterial() const;
+		const ZERNMaterial*						GetMaterial() const;
 		const ZEArray<ZETextureResource*>&		GetTextureResources() const;
 
 		static const ZEMaterialResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);

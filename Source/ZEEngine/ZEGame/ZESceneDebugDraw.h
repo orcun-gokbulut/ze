@@ -37,21 +37,21 @@
 #ifndef __ZE_SCENE_DEBUG_DRAW_H__
 #define __ZE_SCENE_DEBUG_DRAW_H__
 
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 
 class ZEAABBox;
 class ZEMatrix4x4;
 class ZEVector4;
-class ZEMaterial;
-class ZERenderer;
+class ZERNMaterial;
+class ZERNRenderer;
 
 class ZESceneDebugDraw
 {
 	private:
-		ZEMaterial*				Material;
+		ZERNMaterial*				Material;
 		ZECanvas				VertexBuffer;
-		ZERenderCommand			RenderCommand;
+		ZERNCommand			RenderCommand;
 
 		bool					Initialized;
 
@@ -60,13 +60,13 @@ class ZESceneDebugDraw
 		void					Deinitialize();
 		void					Destroy();
 
-		void					DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERenderer* Renderer, const ZEVector4& Color);
-		void					DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERenderer* Renderer, const ZEVector4& Color);
-		void					DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERenderer* Renderer, const ZEVector4& Color);
+		void					DrawOrientedBoundingBox(const ZEAABBox& BoundingBox, const ZEMatrix4x4& Transform, ZERNRenderer* Renderer, const ZEVector4& Color);
+		void					DrawAxisAlignedBoundingBox(const ZEAABBox& BoundingBox, ZERNRenderer* Renderer, const ZEVector4& Color);
+		void					DrawBoundingSphere(const ZEBSphere& BoundingSphere, ZERNRenderer* Renderer, const ZEVector4& Color);
 
 		void					Clean();
 
-		void					Draw(ZERenderer* Renderer);
+		void					Draw(ZERNRenderer* Renderer);
 
 								ZESceneDebugDraw();
 								~ZESceneDebugDraw();

@@ -36,10 +36,10 @@
 #include "ZETRDrawer.h"
 #include "ZETRTerrain.h"
 
-#include "ZERenderer/ZEMaterial.h"
+#include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZERenderCommand.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
@@ -179,7 +179,7 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters,
 
 	ZETRPrimitive Primitive = VertexBuffer.GetPrimitive(Type, NegativeExtent, PositiveExtent);
 
-	ZERenderCommand RenderCommand;
+	ZERNCommand RenderCommand;
 	RenderCommand.SetZero();
 	RenderCommand.Flags					= ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
 	RenderCommand.VertexDeclaration		= VertexBuffer.GetVertexDeclaration();
@@ -197,12 +197,12 @@ void ZETRDrawer::DrawPrimitive(ZEDrawParameters* DrawParameters,
 	ZEMatrix4x4 WorldTransform;
 	ZEMatrix4x4::CreateTranslation(WorldTransform, ZEVector3(WorldPositionX, 0.0f, WorldPositionY));
 	ZEMatrix4x4::Multiply(RenderCommand.WorldMatrix, WorldTransform, RenderCommand.LocalMatrix);
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 
 	if (DebugDraw)
 	{
 		RenderCommand.Material = DebugMaterial;
-		DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+		DrawParameters->Renderer->AddCommand(&RenderCommand);
 	}
 }
 

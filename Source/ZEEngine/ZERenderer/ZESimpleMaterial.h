@@ -38,11 +38,11 @@
 #define __ZE_SIMPLE_MATERIAL_H__
 
 #include "ZETypes.h"
-#include "ZEMaterial.h"
+#include "ZERNMaterial.h"
 
 class ZEGRTexture2D;
 
-class ZESimpleMaterial : public ZEMaterial
+class ZESimpleMaterial : public ZERNMaterial
 {
 	friend class ZED3D9Module;
 	protected:
@@ -54,16 +54,14 @@ class ZESimpleMaterial : public ZEMaterial
 		ZEUInt							TransparancyCullLimit;
 		ZEVector4						MaterialColor;
 
-		const ZEGRTexture2D*				Texture;
-		ZETextureAddressMode			TextureAddressModeU;
-		ZETextureAddressMode			TextureAddressModeV;
+		ZEGRTexture2D*					Texture;
+		ZEGRTextureAddressing			TextureAddressModeU;
+		ZEGRTextureAddressing			TextureAddressModeV;
 
 										ZESimpleMaterial();
 		virtual							~ZESimpleMaterial();
 
 	public:
-		ZEMaterialFlags					GetMaterialFlags() const;
-
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
 
@@ -82,12 +80,12 @@ class ZESimpleMaterial : public ZEMaterial
 		void							SetTransparancyCullLimit(ZEUInt Limit);
 		ZEUInt							GetTransparancyCullLimit() const;
 
-		void							SetTexture(const ZEGRTexture2D* Texture);
-		const ZEGRTexture2D*				GetTexture() const;
-		void							SetTextureAddressModeU(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetTextureAddressModeU() const;
-		void							SetTextureAddressModeV(ZETextureAddressMode Mode);
-		ZETextureAddressMode			GetTextureAddressModeV() const;
+		void							SetTexture(ZEGRTexture2D* Texture);
+		ZEGRTexture2D*					GetTexture() const;
+		void							SetTextureAddressModeU(ZEGRTextureAddressing Mode);
+		ZEGRTextureAddressing			GetTextureAddressModeU() const;
+		void							SetTextureAddressModeV(ZEGRTextureAddressing Mode);
+		ZEGRTextureAddressing			GetTextureAddressModeV() const;
 
 		static ZESimpleMaterial*		CreateInstance();
 };

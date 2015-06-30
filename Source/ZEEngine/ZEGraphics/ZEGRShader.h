@@ -56,4 +56,5 @@ class ZEGRShader : public ZEGRResource
 		virtual ZEGRShaderType		GetShaderType();
 
 		static ZEGRShader*			Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
+		static ZEGRShader*			Create(ZEGRShaderType ShaderType, const ZEString& FileName, ZESize Size);
 };

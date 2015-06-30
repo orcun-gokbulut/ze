@@ -38,7 +38,7 @@
 #define __ZE_SEA_H__
 
 #include "ZEEntity.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
 class ZESeaMaterial;
 class ZEVertexDeclaration;
@@ -65,7 +65,7 @@ class ZESea : public ZEEntity
 		ZEVector2				NormalTextureTile;
 		ZEVector2				DiffuseTextureTile;
 
-		ZERenderCommand			Command;
+		ZERNCommand			Command;
 
 	protected:
 

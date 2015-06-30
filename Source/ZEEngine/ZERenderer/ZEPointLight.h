@@ -45,11 +45,7 @@ class ZEGRTexture2D;
 class ZEPointLight  : public ZELight
 {
 	ZE_OBJECT
-
 	private:
-		ZEGRTexture2D*					FrontShadowMap;
-		ZEGRTexture2D*					BackShadowMap;
-
 		ZEViewSphere					ViewVolume;
 		ZEMatrix4x4						ViewProjectionMatrix;
 
@@ -62,9 +58,6 @@ class ZEPointLight  : public ZELight
 		ZELightType						GetLightType();
 
 		virtual void					SetCastShadows(bool NewValue);
-
-		ZEGRTexture2D*					GetFrontShadowMap();
-		ZEGRTexture2D*					GetBackShadowMap();
 
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);

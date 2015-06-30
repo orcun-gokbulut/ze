@@ -61,7 +61,7 @@ const char* ZEMaterialResource::GetResourceType() const
 	return "Material";
 }
 
-const ZEMaterial* ZEMaterialResource::GetMaterial() const
+const ZERNMaterial* ZEMaterialResource::GetMaterial() const
 {
 	return Material;
 }

@@ -58,7 +58,7 @@ class ZEGRDepthStencilBuffer;
 
 typedef ZEGRColorMask ColorBlendMask;
 
-class ZEGRRenderState
+class ZEGRRenderState : public ZEGRResource
 {
 	friend class ZEGRDevice;
 

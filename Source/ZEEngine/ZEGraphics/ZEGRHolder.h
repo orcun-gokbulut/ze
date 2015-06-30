@@ -150,7 +150,7 @@ const TargetType* ZEGRHolder<Type>::ConstCast()
 template<typename Type>
 ZEGRHolder<Type>::operator Type*()
 {
-	return Resource;
+	return (Type*)Resource;
 }
 
 template<typename Type>
@@ -177,14 +177,14 @@ template<typename Type>
 Type& ZEGRHolder<Type>::operator*()
 {
 	zeDebugCheck(Resource == NULL, "ZEPointer does not points any data structure.");
-	return *Resource;
+	return *(Type*)Resource;
 }
 
 template<typename Type>
 Type* ZEGRHolder<Type>::operator->()
 {
 	zeDebugCheck(Resource == NULL, "ZEPointer does not points any data structure.");
-	return Resource;
+	return (Type*)Resource;
 }
 
 template<typename Type>

@@ -48,9 +48,9 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZEMaterial;
+class ZERNMaterial;
 class ZEPhysicalObject;
 class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 {
@@ -60,14 +60,14 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 
 		struct 
 		{
-			ZEMaterial* Material;
+			ZERNMaterial* Material;
 			ZEArrayVertexBuffer<ZEColoredVertex>	PointsVertexBuffer;
 			ZEArrayVertexBuffer<ZEColoredVertex>	LinesVertexBuffer;
 			ZEArrayVertexBuffer<ZEColoredVertex>	TrianglesVertexBuffer;
 
-			ZERenderCommand							PointsRenderCommand;
-			ZERenderCommand							LinesRenderCommand;
-			ZERenderCommand							TrianglesRenderCommand;
+			ZERNCommand							PointsRenderCommand;
+			ZERNCommand							LinesRenderCommand;
+			ZERNCommand							TrianglesRenderCommand;
 
 		} DebugDraw;
 
@@ -105,7 +105,7 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		virtual bool								Initialize();
 		virtual void								Deinitialize();
 
-		virtual void								Draw(ZERenderer* Renderer);
+		virtual void								Draw(ZERNRenderer* Renderer);
 
 		virtual void								Destroy();
 

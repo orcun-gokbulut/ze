@@ -39,7 +39,7 @@
 
 #include <memory.h>
 
-void ZEGRSamplerState::SetMinFilter(ZEGRTextureFilterMode FilterMode)
+void ZEGRSamplerState::SetMinFilter(ZEGRTextureFilter FilterMode)
 {
 	if (StateData.MinFilter != FilterMode)
 	{
@@ -48,12 +48,12 @@ void ZEGRSamplerState::SetMinFilter(ZEGRTextureFilterMode FilterMode)
 	}
 }
 
-ZEGRTextureFilterMode ZEGRSamplerState::GetMinFilter() const
+ZEGRTextureFilter ZEGRSamplerState::GetMinFilter() const
 {
 	return StateData.MinFilter;
 }
 
-void ZEGRSamplerState::SetMagFilter(ZEGRTextureFilterMode FilterMode)
+void ZEGRSamplerState::SetMagFilter(ZEGRTextureFilter FilterMode)
 {
 	if (StateData.MagFilter != FilterMode)
 	{
@@ -62,12 +62,12 @@ void ZEGRSamplerState::SetMagFilter(ZEGRTextureFilterMode FilterMode)
 	}
 }
 
-ZEGRTextureFilterMode	ZEGRSamplerState::GetMagFilter() const
+ZEGRTextureFilter	ZEGRSamplerState::GetMagFilter() const
 {
 	return StateData.MagFilter;
 }
 
-void ZEGRSamplerState::SetMipFilter(ZEGRTextureFilterMode FilterMode)
+void ZEGRSamplerState::SetMipFilter(ZEGRTextureFilter FilterMode)
 {
 	if (StateData.MipFilter != FilterMode)
 	{
@@ -76,12 +76,12 @@ void ZEGRSamplerState::SetMipFilter(ZEGRTextureFilterMode FilterMode)
 	}
 }
 
-ZEGRTextureFilterMode ZEGRSamplerState::GetMipFilter() const
+ZEGRTextureFilter ZEGRSamplerState::GetMipFilter() const
 {
 	return StateData.MipFilter;
 }
 
-void ZEGRSamplerState::SetAddressU(ZEGRTextureAddressMode AdressMode)
+void ZEGRSamplerState::SetAddressU(ZEGRTextureAddressing AdressMode)
 {
 	if (StateData.AddressU != AdressMode)
 	{
@@ -90,12 +90,12 @@ void ZEGRSamplerState::SetAddressU(ZEGRTextureAddressMode AdressMode)
 	}
 }
 
-ZEGRTextureAddressMode ZEGRSamplerState::GetAddressU() const
+ZEGRTextureAddressing ZEGRSamplerState::GetAddressU() const
 {
 	return StateData.AddressU;
 }
 
-void ZEGRSamplerState::SetAddressV(ZEGRTextureAddressMode AdressMode)
+void ZEGRSamplerState::SetAddressV(ZEGRTextureAddressing AdressMode)
 {
 	if (StateData.AddressV != AdressMode)
 	{
@@ -104,12 +104,12 @@ void ZEGRSamplerState::SetAddressV(ZEGRTextureAddressMode AdressMode)
 	}
 }
 
-ZEGRTextureAddressMode ZEGRSamplerState::GetAddressV() const
+ZEGRTextureAddressing ZEGRSamplerState::GetAddressV() const
 {
 	return StateData.AddressV;
 }
 
-void ZEGRSamplerState::SetAddressW(ZEGRTextureAddressMode AdressMode)
+void ZEGRSamplerState::SetAddressW(ZEGRTextureAddressing AdressMode)
 {
 	if (StateData.AddressW != AdressMode)
 	{
@@ -118,7 +118,7 @@ void ZEGRSamplerState::SetAddressW(ZEGRTextureAddressMode AdressMode)
 	}
 }
 
-ZEGRTextureAddressMode ZEGRSamplerState::GetAddressW() const
+ZEGRTextureAddressing ZEGRSamplerState::GetAddressW() const
 {
 	return StateData.AddressW;
 }

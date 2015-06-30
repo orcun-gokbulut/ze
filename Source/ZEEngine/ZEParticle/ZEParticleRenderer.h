@@ -43,7 +43,7 @@
 
 struct ZEDrawParameters;
 class ZEParticleSystem;
-class ZEMaterial;
+class ZERNMaterial;
 
 class ZEParticleRenderer
 {
@@ -63,7 +63,7 @@ class ZEParticleRenderer
 
 	protected:
 
-		ZEMaterial*				Material;
+		ZERNMaterial*				Material;
 		ZEArray<ZEParticle>		Particles;
 
 								ZEParticleRenderer();
@@ -74,8 +74,8 @@ class ZEParticleRenderer
 		void					SetParticlesLocal(bool AreParticlesLocal);
 		bool					GetParticlesLocal() const;
 
-		void					SetMaterial(ZEMaterial* Material);
-		const ZEMaterial*		GetMaterial() const;
+		void					SetMaterial(ZERNMaterial* Material);
+		const ZERNMaterial*		GetMaterial() const;
 
 		void					SetSortingEnabled(bool Enabled = true);
 		bool					GetSortingEnabled() const;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETerrainMaterial.cpp
+ Zinek Engine - ZERNMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,116 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETerrainMaterial.h"
+#include "ZERNMaterial.h"
 
-#include "ZEMaterialComponents.h"
+#include "ZECore/ZECore.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
-#include "ZETexture/ZETexture2DResource.h"
-#include "ZETexture/ZETextureCubeResource.h"
 
-#include <Memory.h>
-
-#ifndef NULL
-#define NULL 0
-#endif
-
-ZETerrainMaterial::ZETerrainMaterial()
+ZERNMaterial::ZERNMaterial()
 {
-	TwoSided = false;
-	Wireframe = false;
-
-	ElevationLayer = NULL;
-	ColorLayer = NULL;
-
-	ElevationOffset = 0.0f;
-	ElevationScale = 1.0f;
-	BlendThreshold = 0.125f;
-
-	AmbientFactor = 0.0f;
-	AmbientColor = ZEVector3::One;
-
-	DiffuseFactor = 1.0f;
-	DiffuseColor = ZEVector3::One;
+	LightningEnabled = true;
+	ShadowCaster = true;
+	ShadowReceiver = true;
 }
 
-ZETerrainMaterial::~ZETerrainMaterial()
+ZERNMaterial::~ZERNMaterial()
 {
 
 }
 
-ZEMaterialFlags ZETerrainMaterial::GetMaterialFlags() const
+void ZERNMaterial::SetShadowCaster(bool Value)
 {
-	return ZE_MTF_G_BUFFER_PASS | ZE_MTF_PRE_Z_PASS | ZE_MTF_SUPPORTS_SKINNING;
+	ShadowCaster = Value;
 }
 
-void ZETerrainMaterial::SetWireframe(bool Enable)
+bool ZERNMaterial::GetShadowCaster() const
 {
-	Wireframe = Enable;
+	return ShadowCaster;
 }
 
-bool ZETerrainMaterial::GetWireframe() const
+void ZERNMaterial::SetShadowReceiver(bool Value)
 {
-	return Wireframe;
+	ShadowReceiver = Value;
 }
 
-void ZETerrainMaterial::SetTwoSided(bool Enable)
+bool ZERNMaterial::GetShadowReceiver() const
 {
-	TwoSided = Enable;
+	return ShadowReceiver;
 }
 
-bool ZETerrainMaterial::GetTwoSided() const
+void ZERNMaterial::SetLightningEnabled(bool Enabled)
 {
-	return TwoSided;
+	LightningEnabled = Enabled;
 }
 
-void ZETerrainMaterial::SetAmbientColor(const ZEVector3& Color)
+bool ZERNMaterial::GetLightningEnabled() const
 {
-	AmbientColor = Color;
+	return LightningEnabled;
 }
 
-const ZEVector3& ZETerrainMaterial::GetAmbientColor() const
-{
-	return AmbientColor;
-}
-
-void ZETerrainMaterial::SetAmbientFactor(float Factor)
-{
-	AmbientFactor = Factor;
-}
-
-float ZETerrainMaterial::GetAmbientFactor() const
-{
-	return AmbientFactor;
-}
-
-void ZETerrainMaterial::SetDiffuseColor(const ZEVector3& Color)
-{
-	DiffuseColor = Color;
-}
-
-const ZEVector3& ZETerrainMaterial::GetDiffuseColor() const
-{
-	return DiffuseColor;
-}
-
-void ZETerrainMaterial::SetDiffuseFactor(float Factor)
-{
-	DiffuseFactor = Factor;
-}
-
-float ZETerrainMaterial::GetDiffuseFactor() const
-{
-	return DiffuseFactor;
-}
-
-void ZETerrainMaterial::Tick(float ElapsedTime)
+ZEGRRenderState* ZERNMaterial::GetRenderState(ZERNStage* State)
 {
 
 }
 
-ZETerrainMaterial* ZETerrainMaterial::CreateInstance()
+void ZERNMaterial::UpdateMaterial()
 {
-	return zeGraphics->CreateTerrainMaterial();
+
 }

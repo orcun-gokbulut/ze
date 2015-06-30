@@ -57,49 +57,12 @@ void ZEOmniProjectiveLight::SetProjectionTexture(const ZEGRTextureCube* Texture)
 
 void ZEOmniProjectiveLight::SetCastsShadow(bool NewValue)
 {
-	if (NewValue == false)
-	{
-		if (FrontShadowMap != NULL)
-		{
-			FrontShadowMap->Destroy();
-			FrontShadowMap = NULL;
-		}
-
-		if (BackShadowMap != NULL)
-		{
-			BackShadowMap->Destroy();
-			BackShadowMap = NULL;
-		}
-	}
-
 	ZELight::SetCastsShadow(NewValue);
 }
 
 bool ZEOmniProjectiveLight::DeinitializeSelf()
 {
-	if (FrontShadowMap != NULL)
-	{
-		FrontShadowMap->Destroy();
-		FrontShadowMap = NULL;
-	}
-
-	if (BackShadowMap != NULL)
-	{
-		BackShadowMap->Destroy();
-		BackShadowMap = NULL;
-	}
-
 	return ZELight::DeinitializeSelf();
-}
-
-ZEGRTexture2D* ZEOmniProjectiveLight::GetFrontShadowMap()
-{
-	return FrontShadowMap;
-}
-
-ZEGRTexture2D* ZEOmniProjectiveLight::GetBackShadowMap()
-{
-	return BackShadowMap;
 }
 
 ZESize ZEOmniProjectiveLight::GetViewCount()

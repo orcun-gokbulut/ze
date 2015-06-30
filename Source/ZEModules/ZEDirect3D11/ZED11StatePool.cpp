@@ -167,7 +167,7 @@ inline static D3D11_COMPARISON_FUNC Convert(ZEGRComparisonFunction CompFunc)
 	}
 }
 
-inline static D3D11_TEXTURE_ADDRESS_MODE Convert(ZEGRTextureAddressMode TextureAddress)
+inline static D3D11_TEXTURE_ADDRESS_MODE Convert(ZEGRTextureAddressing TextureAddress)
 {
 	switch (TextureAddress)
 	{
@@ -188,7 +188,7 @@ inline static D3D11_TEXTURE_ADDRESS_MODE Convert(ZEGRTextureAddressMode TextureA
 	}
 }
 
-inline static D3D11_FILTER_TYPE Convert(ZEGRTextureFilterMode FilterMode)
+inline static D3D11_FILTER_TYPE Convert(ZEGRTextureFilter FilterMode)
 {
 	switch (FilterMode)
 	{
@@ -203,7 +203,7 @@ inline static D3D11_FILTER_TYPE Convert(ZEGRTextureFilterMode FilterMode)
 	}
 }
 
-inline static D3D11_FILTER Convert(ZEGRTextureFilterMode Min, ZEGRTextureFilterMode Mag, ZEGRTextureFilterMode Mip)
+inline static D3D11_FILTER Convert(ZEGRTextureFilter Min, ZEGRTextureFilter Mag, ZEGRTextureFilter Mip)
 {
 	if (Min == ZEGR_TFM_ANISOTROPY || Mag == ZEGR_TFM_ANISOTROPY || Mip == ZEGR_TFM_ANISOTROPY)
 		return D3D11_FILTER_ANISOTROPIC;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyDomeMaterial.cpp
+ Zinek Engine - ZERNMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESkyDomeMaterial.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGame/ZEScene.h"
-#include "ZECamera.h"
-#include <float.h>
+#pragma once
 
+#include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
 
-ZESkyDomeMaterial::ZESkyDomeMaterial()
+class ZEGRRenderState;
+class ZERNStage;
+
+enum ZEMaterialTransparancyMode
 {
-	MieConstant				= 0.0010f;
-	MieScaleDepth			= 0.1000f;
-	
-	RayleighConstant		= 0.0025f;
-	RayleighScaleDepth		= 0.2500f;
-	
-	SunLightIntensity		= 20.0f;
-	G						= -0.99f;
+	ZE_MTM_NONE					= 0,
+	ZE_MTM_REGULAR				= 2,
+	ZE_MTM_ADDAPTIVE			= 3,
+	ZE_MTM_SUBTRACTIVE			= 4,
+}; 
 
-	OuterRadius				= 61500.0f;
-	InnerRadius				= 60000.0f;
-
-	SunLightDirection		= ZEVector3(0.0f, 0.0f, -1.0f);
-	SunLightWaveLenght		= ZEVector3(0.650f, 0.570f, 0.475f);
-
-	CameraPosition			= ZEVector3(0.0f, 0.0f, 0.0f);
-	CameraPositionOffset	= ZEVector3(0.0f, 60000.0f, 0.0f);
-}
-
-ZESkyDomeMaterial::~ZESkyDomeMaterial()
+enum ZEMaterialOpacityComponent
 {
-	
-}
+	ZE_MOC_CONSTANT				= 0,
+	ZE_MOC_BASE_MAP_ALPHA		= 1,
+	ZE_MOC_OPACITY_MAP			= 2,
+};
 
-ZEMaterialFlags ZESkyDomeMaterial::GetMaterialFlags() const
+class ZERNMaterial : public ZEObject, public ZEInitializable
 {
-	return ZE_MTF_NONE;
-}
+	ZE_OBJECT
+	private:
+		bool							ShadowCaster;
+		bool							ShadowReceiver;
+		bool							LightningEnabled;
 
-ZESkyDomeMaterial* ZESkyDomeMaterial::CreateInstance()
-{
-	return zeGraphics->CreateSkyDomeMaterial();
-}
+										ZERNMaterial();
+		virtual							~ZERNMaterial();
+
+	public:
+		virtual void					SetShadowCaster(bool Value);
+		bool							GetShadowCaster() const;
+
+		virtual void					SetShadowReceiver(bool Value);
+		bool							GetShadowReceiver() const;
+
+		virtual void					SetLightningEnabled(bool Enabled);
+		bool							GetLightningEnabled() const;
+
+		virtual ZEGRRenderState*		GetRenderState(ZERNStage* State);
+
+		virtual void					UpdateMaterial();
+};

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERenderer.h
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_RENDERER_H__
-#define __ZE_RENDERER_H__
-
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEGame/ZEDrawStatistics.h"
-
-struct ZEViewPoint
-{
-	float									FOV;
-	float									NearZ;
-	float									FarZ;
-	ZEVector3								ViewPosition;
-	ZEMatrix4x4								ViewMatrix;
-	ZEMatrix4x4								ProjMatrix;
-	ZEMatrix4x4								ViewProjMatrix;
-};
-
-class ZEPostProcessor;
-class ZECamera;
-class ZERenderCommand;
-struct ZEDrawParameters;
-class ZEGRTexture2D;
-class ZEViewPort;
-class ZELight;
-
-enum ZERendererType
-{
-	ZE_RT_FRAME,
-	ZE_RT_SHADOW
-};
-
-class ZERenderer
-{
-	protected:
-
-		ZERendererStatistics					Statistics;
-
-												ZERenderer();
-		virtual									~ZERenderer();
-
-	public:
-
-		virtual void							SetDrawParameters(ZEDrawParameters* DrawParameters) = 0;
-		virtual ZEDrawParameters*				GetDrawParameters() = 0;
-
-		virtual ZERendererType					GetRendererType() = 0;
-		virtual	const ZERendererStatistics&		GetStatistics() const;
-
-		virtual ZEArray<ZEPostProcessor*>&		GetPostProcessors() = 0;
-		virtual void							AddPostProcessor(ZEPostProcessor* PostProcessor) = 0;
-		virtual void							RemovePostProcessor(ZEPostProcessor* PostProcessor) = 0;
-
-		virtual void							SetViewPort(ZEViewPort* ViewPort) = 0;
-		virtual ZEViewPort*						GetViewPort() = 0;
-
-		virtual bool							Initialize() = 0;
-		virtual void							Deinitialize() = 0;
-
-		virtual void							Destroy();
-
-		virtual void							AddToLightList(ZELight* Light);
-		virtual void							ClearLightList();
-
-		virtual const ZESmartArray<ZERenderCommand>& GetRenderList() const = 0;
-		virtual void							AddToRenderList(ZERenderCommand* RenderCommand) = 0;
-		virtual void							ClearRenderList() = 0;
-
-		void									ClearLists();
-		
-		virtual void							Render(float ElaspedTime = 0) = 0;
-
-		virtual bool							IsGPUBusy() = 0;
-		void									WaitGPU();
-};
-
-#endif

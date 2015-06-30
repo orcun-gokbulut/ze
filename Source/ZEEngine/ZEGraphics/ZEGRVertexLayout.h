@@ -46,30 +46,45 @@ struct ZEGRShaderMeta;
 
 enum ZEGRVertexElementType
 {
-	ZEGR_VET_NONE		= 0,
-	ZEGR_VET_INT		= 1,
-	ZEGR_VET_INT2		= 2,
-	ZEGR_VET_INT3		= 3,
-	ZEGR_VET_INT4		= 4,
-	ZEGR_VET_UINT		= 5,
-	ZEGR_VET_UINT2		= 6,
-	ZEGR_VET_UINT3		= 7,
-	ZEGR_VET_UINT4		= 8,
-	ZEGR_VET_FLOAT		= 9,
-	ZEGR_VET_FLOAT2		= 10,
-	ZEGR_VET_FLOAT3		= 11,
-	ZEGR_VET_FLOAT4		= 12
+	ZEGR_VET_NONE				= 0,
+	ZEGR_VET_INT				= 1,
+	ZEGR_VET_INT2				= 2,
+	ZEGR_VET_INT3				= 3,
+	ZEGR_VET_INT4				= 4,
+	ZEGR_VET_UINT				= 5,
+	ZEGR_VET_UINT2				= 6,
+	ZEGR_VET_UINT3				= 7,
+	ZEGR_VET_UINT4				= 8,
+	ZEGR_VET_FLOAT				= 9,
+	ZEGR_VET_FLOAT2				= 10,
+	ZEGR_VET_FLOAT3				= 11,
+	ZEGR_VET_FLOAT4				= 12
 };
 
 enum ZEGRVertexUsage
 {
-	ZEGR_VU_PER_VERTEX		= 0,
-	ZEGR_VU_PER_INSTANCE	= 1
+	ZEGR_VU_PER_VERTEX			= 0,
+	ZEGR_VU_PER_INSTANCE		= 1
 };
+
+enum ZEGRVertexElementSemantic
+{
+	ZEGR_VES_UNKNOWN			= 0,
+	ZEGR_VES_POSITION			= 1,
+	ZEGR_VES_NORMAL				= 2,
+	ZEGR_VES_BINORMAL			= 3,
+	ZEGR_VES_TANGENT			= 4,
+	ZEGR_VES_TEXCOORD			= 5,
+	ZEGR_VES_COLOR				= 6,
+	ZEGR_VES_BLEND_INDEXSES		= 7,
+	ZEGR_VES_BLEND_WEIGHTS		= 8,
+	ZEGR_VES_CUSTOM				= 9
+};
+
 
 struct ZEGRVertexElement
 {
-	char							Semantic[ZEGR_MAX_SHADER_VARIABLE_NAME];
+	ZEGRVertexElementSemantic		Semantic;
 	ZEUInt8							Index;
 	ZEGRVertexElementType			Type;
 	ZEUInt8							Stream;
@@ -85,7 +100,6 @@ class ZEGRVertexLayout : public ZEGRState
 		{
 			ZEUInt8					ElementCount;
 			ZEGRVertexElement		Elements[ZEGR_MAX_VERTEX_LAYOUT_ELEMENT];		
-		
 		} StateData;
 
 	public:

@@ -34,23 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CANVAS_H__
-#define __ZE_CANVAS_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-#include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+
+class ZEGRVertexLayout;
 
 class ZECanvasVertex
 {
 	private:
-		static ZEVertexDeclaration*		VertexDeclaration;
+		static ZEGRVertexLayout*		VertexLayout;
 
 	public:
 		ZEVector3						Position;
@@ -58,10 +57,10 @@ class ZECanvasVertex
 		ZEVector2						Texcoord;
 		ZEVector4						Color;
 
-		static ZEVertexDeclaration*		GetVertexDeclaration();
+		static ZEGRVertexLayout*		GetVertexLayout();
 };
 
-class ZECanvas : public ZEDynamicVertexBuffer 
+class ZECanvas
 {
 	public:
 		ZESmartArray<ZECanvasVertex>	Vertices;
@@ -136,7 +135,7 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		bool							IsEmpty();
 		void							Clean();
 
-		ZEStaticVertexBuffer*			CreateStaticVertexBuffer();
+		ZEGRVertexBuffer*				CreateVertexBuffer();
 
 		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);
@@ -146,5 +145,3 @@ class ZECanvas : public ZEDynamicVertexBuffer
 		
 										ZECanvas();
 };
-
-#endif

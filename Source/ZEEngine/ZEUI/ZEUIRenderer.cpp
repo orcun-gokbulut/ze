@@ -38,10 +38,10 @@
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 
-ZEInt32 CompareCommandOrder(const ZERenderCommand* Command1, const ZERenderCommand* Command2)
+ZEInt32 CompareCommandOrder(const ZERNCommand* Command1, const ZERNCommand* Command2)
 {
 	if(Command1->Order > Command2->Order)
 		return 1;
@@ -118,7 +118,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 			return;
 		}
 
-	ZERenderCommand* NewRenderCommand = RenderCommands.Add();
+	ZERNCommand* NewRenderCommand = RenderCommands.Add();
 	NewRenderCommand->WorldMatrix = ScreenTransform;
 	NewRenderCommand->Material = Rectangle.Material;
 	NewRenderCommand->Pipeline = ZE_RORP_2D;
@@ -135,7 +135,7 @@ void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
 	Rectangle.ConvertToVertices(Buffer);
 }
 
-void ZEUIRenderer::Render(ZERenderer* Renderer)
+void ZEUIRenderer::Render(ZERNRenderer* Renderer)
 {
 	RenderCommands.Sort(&CompareCommandOrder);
 	
@@ -145,7 +145,7 @@ void ZEUIRenderer::Render(ZERenderer* Renderer)
 
 		if (RenderCommands[I].Material == NULL)
 			RenderCommands[I].Material = DefaultMaterial;
-		Renderer->AddToRenderList(&RenderCommands[I]);
+		Renderer->AddCommand(&RenderCommands[I]);
 	}
 }
 

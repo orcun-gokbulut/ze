@@ -37,7 +37,7 @@
 #include "ZEModel.h"
 
 #include "ZERenderer/ZESimpleMaterial.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 
 
@@ -121,7 +121,7 @@ void ZEModelDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	ModelRenderCommand.PrimitiveCount = ModelDrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&ModelRenderCommand);
+	DrawParameters->Renderer->AddCommand(&ModelRenderCommand);
 }
 
 bool ZEModelDebugDrawer::InitializeSelf()

@@ -35,7 +35,7 @@
 
 #include "ZEDebugDrawer.h"
 #include "ZERenderer/ZESimpleMaterial.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEBSphere.h"
@@ -228,7 +228,7 @@ void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	RenderCommand.PrimitiveCount = DrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 bool ZEDebugDrawer::InitializeSelf()

@@ -418,7 +418,7 @@ const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures() const
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials() const
+const ZEArray<ZERNMaterial*>& ZEInteriorResource::GetMaterials() const
 {
 	return Materials;
 }

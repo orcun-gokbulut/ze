@@ -37,14 +37,14 @@
 #ifndef	__ZE_MODEL_MESH_LOD_H__
 #define __ZE_MODEL_MESH_LOD_H__
 
-#include "ZERenderer/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
 struct ZEDrawParameters;
 class ZEModel;
-class ZEMaterial;
+class ZERNMaterial;
 class ZEModelMesh;
 class ZEModelResourceMeshLOD;
-class ZERenderer;
+class ZERNRenderer;
 
 class ZEModelMeshLOD
 {
@@ -53,14 +53,14 @@ class ZEModelMeshLOD
 		ZEModelMesh*						OwnerMesh;
 		const ZEModelResourceMeshLOD*		LODResource;
 		ZEGRVertexBuffer*					VertexBuffer;
-		ZERenderCommand						RenderCommand;
-		const ZEMaterial*					Material;
+		ZERNCommand						RenderCommand;
+		const ZERNMaterial*					Material;
 		bool								Skinned;
 
 	public:
 		void								ResetMaterial();
-		void								SetMaterial(const ZEMaterial* Material);
-		const ZEMaterial*					GetMaterial();
+		void								SetMaterial(const ZERNMaterial* Material);
+		const ZERNMaterial*					GetMaterial();
 
 		const ZEModelResourceMeshLOD*		GetLODResource();
 

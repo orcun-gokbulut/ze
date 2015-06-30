@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
 #include "ZECanvas.h"
+
+#include "ZEError.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEGraphics/ZEVertexDeclaration.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
 
 #include <stdio.h>
-
 
 #define ZECANVAS_ADDVERTEX(Vertex, Matrix, Pos, Nor, Texcrd)\
 	ZEMatrix4x4::Transform((Vertex).Position, (Matrix), (Pos));\
@@ -55,30 +55,24 @@
 	(Vertex).Texcoord = ZEVector2(0.0f, 0.0f);\
 	(Vertex).Color = Color
 
-ZEVertexDeclaration* ZECanvasVertex::VertexDeclaration = NULL;
+ZEGRVertexLayout* ZECanvasVertex::VertexLayout = NULL;
 
-ZEVertexDeclaration* ZECanvasVertex::GetVertexDeclaration()
+ZEGRVertexLayout* ZECanvasVertex::GetVertexLayout()
 {
-	if (VertexDeclaration != NULL)
-		return VertexDeclaration;
-
-	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
-
-	ZEGRVertexElement ElementArray[] = {
-										{ZE_VES_POSITION, ZE_VET_FLOAT3, 0},
-										{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
-										{ZE_VES_TEXTCOORD, ZE_VET_FLOAT4, 1},
-									};
-
-	if (!VertexDeclaration->Create(ElementArray, 4))
+	if (VertexLayout == NULL)
 	{
-		VertexDeclaration->Destroy();
-		VertexDeclaration = NULL;
+		VertexLayout = new ZEGRVertexLayout();
+
+		static ZEGRVertexElement ElementArray[] = {
+			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT3, 0, 0, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD, 0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_COLOR,	0, ZEGR_VET_FLOAT4, 0, 36, ZEGR_VU_PER_VERTEX, 0}};
+
+		VertexLayout->SetElements(ElementArray, 4);
 	}
 
-	zeDebugCheck(VertexDeclaration->GetVertexSize() != sizeof(ZECanvasVertex), "Vertex decleration size does not matches.");
-	return VertexDeclaration;
+	return VertexLayout;
 }
 
 void ZECanvas::PushTransformation()
@@ -806,11 +800,12 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	return true;
 }
 
-ZEStaticVertexBuffer* ZECanvas::CreateStaticVertexBuffer()
+ZEGRVertexBuffer* ZECanvas::CreateVertexBuffer()
 {
-	ZEStaticVertexBuffer* Buffer = ZEStaticVertexBuffer::CreateInstance();
-	Buffer->Create(Vertices.GetCount() * sizeof(ZECanvasVertex));
-	void* BufferPtr = Buffer->Lock();
+	ZEGRVertexBuffer* Buffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZECanvasVertex));
+	void* BufferPtr = NULL;
+	if (!Buffer->Lock(&BufferPtr))
+		return NULL;
 	memcpy(BufferPtr, Vertices.GetCArray(), Vertices.GetCount() * sizeof(ZECanvasVertex));
 	Buffer->Unlock();
 	return Buffer;

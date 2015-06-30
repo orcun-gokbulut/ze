@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESamplerState.h
+ Zinek Engine - ZEGRSamplerState.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 
-enum ZEGRTextureAddressMode
+enum ZEGRTextureAddressing
 {
 	ZEGR_TAM_WRAP			    = 1,
 	ZEGR_TAM_MIRROR			    = 2,
@@ -47,7 +47,7 @@ enum ZEGRTextureAddressMode
 	ZEGR_TAM_BORDER				= 4
 };
 
-enum ZEGRTextureFilterMode
+enum ZEGRTextureFilter
 {
 	ZEGR_TFM_POINT				= 1,
 	ZEGR_TFM_LINEAR				= 2,
@@ -59,12 +59,12 @@ class ZEGRSamplerState : public ZEGRState
 	private:
 		struct ZESamplerStateData
 		{
-			ZEGRTextureAddressMode	AddressU : 4;
-			ZEGRTextureAddressMode	AddressV : 4;
-			ZEGRTextureAddressMode	AddressW : 4;
-			ZEGRTextureFilterMode	MinFilter : 4;
-			ZEGRTextureFilterMode	MagFilter : 4;
-			ZEGRTextureFilterMode	MipFilter : 4;
+			ZEGRTextureAddressing	AddressU : 4;
+			ZEGRTextureAddressing	AddressV : 4;
+			ZEGRTextureAddressing	AddressW : 4;
+			ZEGRTextureFilter		MinFilter : 4;
+			ZEGRTextureFilter		MagFilter : 4;
+			ZEGRTextureFilter		MipFilter : 4;
 			ZEUInt32				MaxAnisotropy : 6;
 
 			float					MinLOD;
@@ -75,23 +75,23 @@ class ZEGRSamplerState : public ZEGRState
 		} StateData;
 
 	public:
-		void						SetMinFilter(ZEGRTextureFilterMode FilterMode);
-		ZEGRTextureFilterMode		GetMinFilter() const;
+		void						SetMinFilter(ZEGRTextureFilter FilterMode);
+		ZEGRTextureFilter			GetMinFilter() const;
 		
-		void						SetMagFilter(ZEGRTextureFilterMode FilterMode);
-		ZEGRTextureFilterMode		GetMagFilter() const;
+		void						SetMagFilter(ZEGRTextureFilter FilterMode);
+		ZEGRTextureFilter			GetMagFilter() const;
 		
-		void						SetMipFilter(ZEGRTextureFilterMode FilterMode);
-		ZEGRTextureFilterMode		GetMipFilter() const;
+		void						SetMipFilter(ZEGRTextureFilter FilterMode);
+		ZEGRTextureFilter			GetMipFilter() const;
 		
-		void						SetAddressU(ZEGRTextureAddressMode AdressMode);
-		ZEGRTextureAddressMode		GetAddressU() const;
+		void						SetAddressU(ZEGRTextureAddressing AdressMode);
+		ZEGRTextureAddressing		GetAddressU() const;
 		
-		void						SetAddressV(ZEGRTextureAddressMode AdressMode);
-		ZEGRTextureAddressMode		GetAddressV() const;
+		void						SetAddressV(ZEGRTextureAddressing AdressMode);
+		ZEGRTextureAddressing		GetAddressV() const;
 		
-		void						SetAddressW(ZEGRTextureAddressMode AdressMode);
-		ZEGRTextureAddressMode		GetAddressW() const;
+		void						SetAddressW(ZEGRTextureAddressing AdressMode);
+		ZEGRTextureAddressing		GetAddressW() const;
 		
 		void						SetMipLODBias(float LODBias);
 		float						GetMipLODBias() const;

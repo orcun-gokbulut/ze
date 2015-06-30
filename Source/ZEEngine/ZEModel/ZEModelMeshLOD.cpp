@@ -36,7 +36,7 @@
 #include "ZEModelMeshLOD.h"
 
 #include "ZEModel.h"
-#include "ZERenderer/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 
@@ -45,12 +45,12 @@ void ZEModelMeshLOD::ResetMaterial()
 	RenderCommand.Material = Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId];
 }
 
-void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
+void ZEModelMeshLOD::SetMaterial(const ZERNMaterial* Material)
 {
 	RenderCommand.Material = Material;
 }
 
-const ZEMaterial* ZEModelMeshLOD::GetMaterial()
+const ZERNMaterial* ZEModelMeshLOD::GetMaterial()
 {
 	return RenderCommand.Material;
 }
@@ -86,7 +86,7 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 
 	RenderCommand.Order = DrawOrder;
 
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 bool ZEModelMeshLOD::UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices)

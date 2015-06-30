@@ -46,7 +46,7 @@ class ZEGRRenderTarget : public ZEGRResource
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEUInt						Depth;
-		ZEGRFormat			Format;
+		ZEGRFormat					Format;
 
 									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 		virtual						~ZEGRRenderTarget();
@@ -58,5 +58,5 @@ class ZEGRRenderTarget : public ZEGRResource
 		ZEUInt						GetHeight();
 		ZEUInt						GetDepth();
 		ZEVector2					GetPixelSize();
-		ZEGRFormat			GetFormat();
+		ZEGRFormat					GetFormat();
 };

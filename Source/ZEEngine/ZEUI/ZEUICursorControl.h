@@ -59,8 +59,8 @@ class ZEUICursorControl : public ZEUIControl
 		virtual void		Draw(ZEUIRenderer* Renderer);
 		virtual void		Tick(float ElapsedTime);
 
-		virtual ZEMaterial* GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZERNMaterial* GetMaterial() const;
+		virtual void		SetMaterial(ZERNMaterial* Material);
 
 		ZEUIMouseKey		GetCurrentButton();
 

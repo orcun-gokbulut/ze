@@ -39,7 +39,7 @@
 #include "ZEInteriorRoom.h"
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer\ZESimpleMaterial.h"
-#include "ZERenderer\ZERenderer.h"
+#include "ZERenderer\ZERNRenderer.h"
 
 void ZEInteriorDebugDrawer::DebugDrawEntity()
 {
@@ -101,7 +101,7 @@ void ZEInteriorDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	InteriorRenderCommand.PrimitiveCount = InteriorDrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&InteriorRenderCommand);
+	DrawParameters->Renderer->AddCommand(&InteriorRenderCommand);
 }
 
 bool ZEInteriorDebugDrawer::InitializeSelf()

@@ -48,7 +48,7 @@
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZESpatial/ZEOctree.h"
 
-class ZEMaterial;
+class ZERNMaterial;
 class ZEGRTexture2D;
 class ZETexture2DResource;
 struct ZEInteriorResourceDoor;
@@ -63,7 +63,7 @@ enum ZEInteriorResourceHelperOwnerType
 struct ZEInteriorPolygon
 {
 	ZEInteriorVertex		Vertices[3];
-	ZEMaterial*				Material;
+	ZERNMaterial*				Material;
 	ZEUInt32				LastIteration;
 };
 
@@ -130,7 +130,7 @@ class ZEInteriorResource : public ZEResource
 {
 	private:
 		ZEArray<ZETexture2DResource*>				TextureResources;
-		ZEArray<ZEMaterial*>						Materials;
+		ZEArray<ZERNMaterial*>						Materials;
 		ZEArray<ZEInteriorResourceDoor>				Doors;
 		ZEArray<ZEInteriorResourceRoom>				Rooms;
 		ZEArray<ZEInteriorResourceHelper>			Helpers;
@@ -149,7 +149,7 @@ class ZEInteriorResource : public ZEResource
 		const char*									GetResourceType() const;
 
 		const ZEArray<ZETexture2DResource*>&		GetTextures() const;
-		const ZEArray<ZEMaterial*>&					GetMaterials() const;
+		const ZEArray<ZERNMaterial*>&					GetMaterials() const;
 		const ZEArray<ZEInteriorResourceRoom>&		GetRooms() const;
 		const ZEArray<ZEInteriorResourceDoor>&		GetDoors() const;
 		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers() const;

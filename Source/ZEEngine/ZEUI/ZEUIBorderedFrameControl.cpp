@@ -147,12 +147,12 @@ void ZEUIBorderedFrameControl::SetWidth(float Width)
  	MainArea.SetWidth(MainArea.GetWidth() + WidthDifference);
 }
 
-void ZEUIBorderedFrameControl::SetMaterial(ZEMaterial* Material)
+void ZEUIBorderedFrameControl::SetMaterial(ZERNMaterial* Material)
 {
 
 }
 
-ZEMaterial*	ZEUIBorderedFrameControl::GetMaterial() const
+ZERNMaterial*	ZEUIBorderedFrameControl::GetMaterial() const
 {
 	return NULL;
 }

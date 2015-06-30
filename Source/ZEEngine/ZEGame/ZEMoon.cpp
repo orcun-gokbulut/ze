@@ -38,7 +38,7 @@
 
 #include "ZEMath\ZEVector.h"
 #include "ZEDrawParameters.h"
-#include "ZERenderer\ZERenderer.h"
+#include "ZERenderer\ZERNRenderer.h"
 #include "ZERenderer\ZEMoonMaterial.h"
 #include "ZETexture\ZETexture3DResource.h"
 
@@ -202,9 +202,9 @@ void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
 	
 	// ---------------------------------------
 
-	RenderCommand.Material			= (ZEMaterial*)Material;
+	RenderCommand.Material			= (ZERNMaterial*)Material;
 	RenderCommand.WorldMatrix		= GetWorldTransform();
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 	
 }
 

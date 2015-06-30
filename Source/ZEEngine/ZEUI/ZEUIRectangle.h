@@ -43,14 +43,14 @@
 
 struct ZEUIVertex;
 
-class ZEMaterial;
+class ZERNMaterial;
 
 class ZEUIRectangle
 {
 	public:
 		ZERectangle			Positions;
 		ZERectangle			Texcoords;
-		const ZEMaterial*	Material;
+		const ZERNMaterial*	Material;
 		ZEVector4			Color;
 		ZEInt32				ZOrder;
 
