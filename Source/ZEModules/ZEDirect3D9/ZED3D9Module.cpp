@@ -61,7 +61,9 @@
 #include "ZED3D9CloudMaterial.h"
 #include "ZED3D9SeaMaterial.h"
 #include "ZEGraphics/ZESeaMaterial.h"
-#include "Logo.png.h"
+#include "SplashScreen.png.h"
+#include "SplashScreenDevelopment.png.h"
+#include "SplashScreenDemo.png.h"
 
 #include <d3dx9.h>
 
@@ -151,9 +153,28 @@ static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float To
 
 void ZED3D9Module::DrawLogo()
 {
-	Logo_png Data;
 	LPDIRECT3DTEXTURE9 Logo;
-	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), Data.GetData(), Data.GetSize(),
+	ZEData* SplashScreen = NULL;
+	#if ZE_EDITION_STANDARD
+		SplashScreenDemo_png Data;	
+		SplashScreen = &Data;
+	#elif ZE_EDITION_DEVELOPMENT
+		SplashScreenDevelopment_png Data;	
+		SplashScreen = &Data;
+	#elif ZE_EDITION_DEMO
+		SplashScreenDemo_png Data;	
+		SplashScreen = &Data;
+	#elif ZE_EDITION_NONE
+		SplashScreen = NULL;
+	#else
+		SplashScreenDemo_png Data;	
+		SplashScreen = &Data;	
+	#endif
+
+	if (SplashScreen == NULL)
+		return;
+
+	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), SplashScreen->GetData(), SplashScreen->GetSize(),
 		D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, NULL, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 
 		D3DX_DEFAULT , D3DX_DEFAULT , 0, NULL, NULL, &Logo);
 	
