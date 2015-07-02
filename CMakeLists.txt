@@ -42,7 +42,7 @@ endif()
 project(ZinekEngine)
 
 
-set(ZEBUILD_EDITION "Development" CACHE STRINGS "Standard" "Development" "Demo")
+set(ZEBUILD_EDITION "Development" CACHE STRING "Determines edition of the Zinek Engine. Values: Standard, Development, Demo")
 string(TOUPPER ${ZEBUILD_EDITION} ZEBUILD_EDITION_UPPER)
 add_definitions(-DZE_EDITION_${ZEBUILD_EDITION_UPPER})
 add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
