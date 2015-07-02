@@ -41,6 +41,12 @@ endif()
  
 project(ZinekEngine)
 
+
+set(ZEBUILD_EDITION "Development" CACHE STRINGS "Standard" "Development" "Demo")
+string(TOUPPER ${ZEBUILD_EDITION} ZEBUILD_EDITION_UPPER)
+add_definitions(-DZE_EDITION_${ZEBUILD_EDITION_UPPER})
+add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
+
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
