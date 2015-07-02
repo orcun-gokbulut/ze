@@ -64,6 +64,7 @@
 #include "SplashScreen.png.h"
 #include "SplashScreenDevelopment.png.h"
 #include "SplashScreenDemo.png.h"
+#include "Loading.png.h"
 
 #include <d3dx9.h>
 
@@ -201,6 +202,44 @@ void ZED3D9Module::DrawLogo()
 	}
 
 	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->BeginScene();
+	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0xFFFFFFFF);
+	GetDevice()->EndScene();
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+
+	Sleep(2000);
+	for (int I = 255; I >= 0; I-=8)
+	{
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+		GetDevice()->BeginScene();
+		DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0x01010101 * I);
+		GetDevice()->EndScene();
+		GetDevice()->Present(NULL, NULL, NULL, NULL);
+		Sleep(20);
+	}
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->BeginScene();
+	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0);
+	GetDevice()->EndScene();
+	GetDevice()->Present(NULL, NULL, NULL, NULL);
+
+	Logo->Release();
+
+	Sleep(400);
+
+	Loading_png Loading;
+	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), Loading.GetData(), Loading.GetSize(),
+		D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, NULL, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 
+		D3DX_DEFAULT , D3DX_DEFAULT , 0, NULL, NULL, &Logo);
+
+	Logo->GetLevelDesc(0, &LogoDesc);
+	Left = (FrameBufferViewPort.GetWidth() - LogoDesc.Width) / 2;
+	Right = Left + LogoDesc.Width;
+	Top = (FrameBufferViewPort.GetHeight() - LogoDesc.Height) / 2;
+	Bottom = Top + LogoDesc.Height;
+
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0, 1.0f, 0);
 	GetDevice()->BeginScene();
 	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0xFFFFFFFF);
 	GetDevice()->EndScene();
