@@ -1226,6 +1226,9 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNod
 	ZEInt32 CurrentMeshLODLevel;
 	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD", CurrentMeshLODLevel);
 
+	ZEInt32 CurrentMeshLODLevelDistance;
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD_Distance", CurrentMeshLODLevelDistance);
+
 	ZEArray<ZEMLNode*> Meshes = MeshesNode->GetNodes("Mesh");
 	ZEMLNode* MasterMesh = NULL;
 
@@ -1274,6 +1277,7 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNod
 	}
 
 	LODNode->AddProperty("LODLevel")->SetInt32(CurrentMeshLODLevel);
+	LODNode->AddProperty("LODDistance")->SetInt32(CurrentMeshLODLevelDistance);
 
 	if (!ProcessMeshLODVertices(Node, LODNode))
 		return false;

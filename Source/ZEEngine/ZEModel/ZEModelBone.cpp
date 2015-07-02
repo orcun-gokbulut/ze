@@ -157,7 +157,7 @@ const ZEMatrix4x4& ZEModelBone::GetInverseTransform() const
 
 const ZEMatrix4x4& ZEModelBone::GetVertexTransform() const
 {
-	ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), BoneResource->InverseTransform);
+	ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), GetInverseTransform());
 	return VertexTransform;
 }
 
@@ -242,7 +242,7 @@ void ZEModelBone::SetWorldPosition(const ZEVector3& WorldPosition)
 	else
 	{
 		ZEVector3 Result;
-		ZEMatrix4x4::Transform(Result, ParentBone->GetWorldTransform(), WorldPosition);
+		ZEMatrix4x4::Transform(Result, ParentBone->GetWorldTransform().Inverse(), WorldPosition);
 		SetPosition(Result);
 	}
 }

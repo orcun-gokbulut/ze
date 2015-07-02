@@ -366,6 +366,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 			ZEModelResourceMeshLOD* LOD = Mesh->LODs.Add();
 
 			LOD->LODLevel = LODNode.ReadInt32("LODLevel");
+			LOD->LODDistance = LODNode.ReadInt32("LODDistance", I * 30);
 			LOD->MaterialId = LODNode.ReadInt32("MaterialId");
 
 			if (Mesh->IsSkinned)
@@ -612,6 +613,7 @@ bool ZEModelResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 		return false;
 
 	ZESize SubNodeCount = (ZESize)HelpersNode->GetSubNodeCount();
+	Helpers.SetCount(SubNodeCount);
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -620,7 +622,7 @@ bool ZEModelResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 		if (!HelperNode.IsValid())
 			return false;
 
-		ZEModelResourceHelper* Helper = Helpers.Add();
+		ZEModelResourceHelper* Helper = &Helpers[I];
 
 		memset(Helper, 0, sizeof(ZEModelResourceHelper));
 
