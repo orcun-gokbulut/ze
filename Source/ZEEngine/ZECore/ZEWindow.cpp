@@ -47,6 +47,7 @@
 #define NOMINMAX
 #include <windows.h>
 #include <stdio.h>
+#include "ZEWindowResources.h"
 
 #define ZEWINDOW_WINDOWNAME		"Zinek Engine"
 #define ZEWINDOW_CLASSNAME		"ZINEKENGINE"
@@ -248,7 +249,7 @@ bool ZEWindow::CreateMainWindow(const char* WindowTitle)
     wc.cbClsExtra		= 0;
     wc.cbWndExtra		= 0;
 	wc.hInstance		= (HINSTANCE)zeCore->GetApplicationInstance();
-    wc.hIcon			= NULL;
+    wc.hIcon			= LoadIcon((HINSTANCE)zeCore->GetApplicationInstance(), MAKEINTRESOURCE(IDI_ICON1));
     wc.hCursor			= NULL;
     wc.hbrBackground	= NULL;
     wc.lpszMenuName		= NULL;
