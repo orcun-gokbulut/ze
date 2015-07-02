@@ -560,36 +560,36 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 	if (!Visible)
 		return;
 
-	float DrawOrder;
-	ZEInt Lod = 0;
+	float DrawOrder = 0.0f;
+	ZEInt32 CurrentLOD = 0;
+	float LODDistanceSquare = 0.0f;
 
 	ZEVector3 WorldPosition;
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
-	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
+	float EntityDistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
 
 	if (!DrawOrderIsUserDefined)
-		DrawOrder = DistanceSquare;
+		DrawOrder = EntityDistanceSquare;
 	else
-		DrawOrder = DistanceSquare * (UserDefinedDrawOrder + 1);
-	
-	/*ZEInt LastLod = LODs.GetCount() - 1;
+		DrawOrder = EntityDistanceSquare * (UserDefinedDrawOrder + 1);
+ 	
+	float CurrentDistanceSquare = 0.0f;
 
-	if (DistanceSquare > 40 * 40) 
-		Lod = -1;
-	else if (DistanceSquare > 30 * 30)
-		Lod = 2;
-	else if (DistanceSquare > 20 * 20)
-		Lod = 1;
-	else
-		Lod = 0;
+	for (ZESize I = 0; I < LODs.GetCount(); I++)
+	{
+		LODDistanceSquare = ZEMath::Power(LODs[I].GetDrawDistance(), 2.0);
 
-	if (Lod == -1)
-		return;
+		if (LODDistanceSquare < EntityDistanceSquare)
+		{
+			if (CurrentDistanceSquare <= LODDistanceSquare)
+			{
+				CurrentDistanceSquare = LODDistanceSquare;
+				CurrentLOD = I;
+			}
+		}
+	}
 
-	if (Lod > LastLod)
-		Lod = LastLod;*/
-
-	LODs[(ZESize)Lod].Draw(DrawParameters, DrawOrder);
+	LODs[(ZESize)CurrentLOD].Draw(DrawParameters, DrawOrder);
 }
 
 bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
