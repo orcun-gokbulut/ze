@@ -67,6 +67,8 @@
 #include "Loading.png.h"
 
 #include <d3dx9.h>
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEApplicationModule.h"
 
 LPDIRECT3DDEVICE9 D3D9Device;
 ZED3D9Module* D3D9Module;
@@ -116,13 +118,45 @@ void ZED3D9Module::SetEnabled(bool Enabled)
 	this->Enabled = Enabled;
 }
 
-static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float Top, float Bottom, LPDIRECT3DTEXTURE9 Texture, D3DCOLOR Color)
+static void DrawRect(LPDIRECT3DDEVICE9 Device, ZESize ScreenWidth, ZESize ScreenHeight, LPDIRECT3DTEXTURE9 Texture, D3DCOLOR Color)
 {
-	Left -= 0.5f;
-	Right -= 0.5f;
-	Top -= 0.5f;
-	Bottom -= 0.5f;
+	D3DSURFACE_DESC LogoDesc;
+	Texture->GetLevelDesc(0, &LogoDesc);
 
+	/*float LogoWidth = (float)LogoDesc.Width / (float)ScreenWidth;
+	float LogoHeight = (float)LogoDesc.Height / (float)ScreenHeight;
+
+	float Left	= (1.0f - (float)LogoWidth) / 2.0f;
+	float Top	= (1.0f - (float)LogoHeight) / 2.0f;
+	float Right = Left + LogoWidth;
+	float Bottom = Top + LogoHeight;
+
+	Left = -Left			- 1.0f / (float)ScreenWidth;
+	Top = -Top				- 1.0f / (float)ScreenHeight;
+	Right = 2.0f - Right	- 1.0f / (float)ScreenWidth;
+	Bottom = 2.0f - Bottom	- 1.0f / (float)ScreenHeight;
+
+	struct Vertex
+	{
+		float x, y, z, w;
+		D3DCOLOR Color;
+		float u,v;
+	} 
+	Vertices[6] =
+	{
+		{0.0f,			ScreenHeight,	0.0f, 1.0f,	Color,	Left,	Bottom	},
+		{0.0f,			0.0f,			0.0f, 1.0f,	Color,	Left,	Top		},
+		{ScreenWidth,	0.0f,			0.0f, 1.0f,	Color,	Right,	Top		},
+		{0.0f,			ScreenHeight,	0.0f, 1.0f,	Color,	Left,	Bottom	},
+		{ScreenWidth,	0.0f,			0.0f, 1.0f,	Color,	Right,	Top		},
+		{ScreenWidth,	ScreenHeight,	0.0f, 1.0f,	Color,	Right,	Bottom	}
+	};*/
+
+
+	float Left = (ScreenWidth - LogoDesc.Width) / 2 - 0.5f;
+	float Right = Left + LogoDesc.Width - 0.5f;
+	float Top = (ScreenHeight - LogoDesc.Height) / 2 - 0.5f;
+	float Bottom = Top + LogoDesc.Height - 0.5f;
 	struct Vertex
 	{
 		float x, y, z, w;
@@ -140,6 +174,8 @@ static void DrawRect(LPDIRECT3DDEVICE9 Device, float Left, float Right, float To
 	};
 
 	Device->SetTexture(0, Texture);
+	//Device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
+	//Device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
 	Device->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
 	Device->SetTextureStageState(0 ,D3DTSS_COLORARG1, D3DTA_TEXTURE);
 	Device->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_CONSTANT);
@@ -178,70 +214,67 @@ void ZED3D9Module::DrawLogo()
 	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), SplashScreen->GetData(), SplashScreen->GetSize(),
 		D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, NULL, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 
 		D3DX_DEFAULT , D3DX_DEFAULT , 0, NULL, NULL, &Logo);
-	
-	D3DSURFACE_DESC LogoDesc;
-	Logo->GetLevelDesc(0, &LogoDesc);
 
-	float Left = (FrameBufferViewPort.GetWidth() - LogoDesc.Width) / 2;
-	float Right = Left + LogoDesc.Width;
-	float Top = (FrameBufferViewPort.GetHeight() - LogoDesc.Height) / 2;
-	float Bottom = Top + LogoDesc.Height;
-
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 	GetDevice()->Present(NULL, NULL, NULL, NULL);
 	Sleep(200);
 
 	for (int I = 0; I < 256; I+=8)
 	{
-		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0);
 		GetDevice()->BeginScene();
-		DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0x01010101 * I);
+		DrawRect(GetDevice(), FrameBufferViewPort.GetWidth(), FrameBufferViewPort.GetHeight(), Logo, 0x01010101 * I);
 		GetDevice()->EndScene();
 		GetDevice()->Present(NULL, NULL, NULL, NULL);
 		Sleep(20);
 	}
 
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0);
 	GetDevice()->BeginScene();
-	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0xFFFFFFFF);
+	DrawRect(GetDevice(), FrameBufferViewPort.GetWidth(), FrameBufferViewPort.GetHeight(), Logo, 0xFFFFFFFF);
 	GetDevice()->EndScene();
 	GetDevice()->Present(NULL, NULL, NULL, NULL);
 
 	Sleep(2000);
 	for (int I = 255; I >= 0; I-=8)
 	{
-		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
 		GetDevice()->BeginScene();
-		DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0x01010101 * I);
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x00000000, 1.0f, 0);
+		DrawRect(GetDevice(), FrameBufferViewPort.GetWidth(), FrameBufferViewPort.GetHeight(), Logo, 0x01010101 * I);
 		GetDevice()->EndScene();
 		GetDevice()->Present(NULL, NULL, NULL, NULL);
 		Sleep(20);
 	}
 
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER, 0, 1.0f, 0);
-	GetDevice()->BeginScene();
-	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0);
-	GetDevice()->EndScene();
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0, 1.0f, 0);
 	GetDevice()->Present(NULL, NULL, NULL, NULL);
 
 	Logo->Release();
 
 	Sleep(400);
 
-	Loading_png Loading;
-	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), Loading.GetData(), Loading.GetSize(),
+	Loading_png DefaultLoadingScreen;
+	ZEData* LoadingScreen = &DefaultLoadingScreen;	
+	if (ZECore::GetInstance()->GetApplicationModule()->GetLoadingScreen() != NULL)
+		LoadingScreen = ZECore::GetInstance()->GetApplicationModule()->GetLoadingScreen();
+
+	D3DXCreateTextureFromFileInMemoryEx(GetDevice(), LoadingScreen->GetData(), LoadingScreen->GetSize(),
 		D3DX_DEFAULT_NONPOW2, D3DX_DEFAULT_NONPOW2, 1, NULL, D3DFMT_UNKNOWN, D3DPOOL_MANAGED, 
 		D3DX_DEFAULT , D3DX_DEFAULT , 0, NULL, NULL, &Logo);
 
-	Logo->GetLevelDesc(0, &LogoDesc);
-	Left = (FrameBufferViewPort.GetWidth() - LogoDesc.Width) / 2;
-	Right = Left + LogoDesc.Width;
-	Top = (FrameBufferViewPort.GetHeight() - LogoDesc.Height) / 2;
-	Bottom = Top + LogoDesc.Height;
+	for (int I = 0; I < 256; I+=8)
+	{
+		GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0x01010101 * I, 1.0f, 0);
+		GetDevice()->BeginScene();
+		DrawRect(GetDevice(), FrameBufferViewPort.GetWidth(), FrameBufferViewPort.GetHeight(), Logo, 0x01010101 * I);
+		GetDevice()->EndScene();
+		GetDevice()->Present(NULL, NULL, NULL, NULL);
+		Sleep(20);
+	}
 
-	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET | D3DCLEAR_ZBUFFER | D3DCLEAR_STENCIL, 0, 1.0f, 0);
+	GetDevice()->Clear(0, NULL, D3DCLEAR_TARGET, 0xFFFFFFFF, 1.0f, 0);
 	GetDevice()->BeginScene();
-	DrawRect(GetDevice(), Left, Right, Top, Bottom, Logo, 0xFFFFFFFF);
+	DrawRect(GetDevice(), FrameBufferViewPort.GetWidth(), FrameBufferViewPort.GetHeight(), Logo, 0xFFFFFFFF);
 	GetDevice()->EndScene();
 	GetDevice()->Present(NULL, NULL, NULL, NULL);
 
