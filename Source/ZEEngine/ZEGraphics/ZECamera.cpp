@@ -50,6 +50,42 @@
 #define ZE_CDF_VIEW_PROJECTION_TRANSFORM		16
 #define ZE_CDF_ALL								0xFFFFFFFF
 
+bool ZECamera::InitializeSelf()
+{
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
+	ZEGraphicsModule* GraphicsModule = ZEGraphicsModule::GetInstance();
+
+	if (GraphicsModule == NULL)
+		return false;
+
+	if (!CameraSettingFlags.GetFlags(ZE_CSF_FAR_Z))
+	{
+		FarZ = GraphicsModule->GetFarZ();
+		EffectiveFarZ = FarZ;
+	}
+	
+	if (!CameraSettingFlags.GetFlags(ZE_CSF_NEAR_Z))
+	{
+		NearZ = GraphicsModule->GetNearZ();
+		EffectiveNearZ = NearZ;
+	}
+	
+	if (!CameraSettingFlags.GetFlags(ZE_CSF_ASPECT_RATIO))
+		AspectRatio = GraphicsModule->GetAspectRatio();
+
+	if (!CameraSettingFlags.GetFlags(ZE_CSF_FOV))
+		SetHorizontalFOV(ZE_PI_2);
+
+	return true;
+}
+
+bool ZECamera::DeinitializeSelf()
+{
+	return ZEEntity::DeinitializeSelf();
+}
+
 const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_TRANSFORM))
@@ -107,6 +143,9 @@ void ZECamera::OnTransformChanged()
 
 void ZECamera::UpdateAutoParameters()
 {
+	if (ZEGraphicsModule::GetInstance() == NULL)
+		return;
+
 	if (AutoAspectRatio && EffectiveAspectRatio != zeGraphics->GetAspectRatio())
 	{
 		EffectiveAspectRatio = zeGraphics->GetAspectRatio();
@@ -140,6 +179,7 @@ bool ZECamera::GetAutoZ()
 void ZECamera::SetNearZ(float NearZ)
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+	CameraSettingFlags.RaiseFlags(ZE_CSF_NEAR_Z);
 	this->NearZ = NearZ;
 
 	if (!AutoZ)
@@ -154,6 +194,8 @@ float ZECamera::GetNearZ() const
 void ZECamera::SetFarZ(float FarZ)
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+	CameraSettingFlags.RaiseFlags(ZE_CSF_FAR_Z);
+
 	this->FarZ = FarZ;
 
 	if (!AutoZ)
@@ -167,6 +209,8 @@ float ZECamera::GetFarZ() const
 
 void ZECamera::SetHorizontalFOV(float FOV)
 {
+	CameraSettingFlags.RaiseFlags(ZE_CSF_FOV);
+
 	UpdateAutoParameters();
 
 	SetVerticalFOV(2.0f * ZEAngle::ArcTan(ZEAngle::Tan(FOV * 0.5f) / EffectiveAspectRatio));
@@ -180,6 +224,7 @@ float ZECamera::GetHorizontalFOV() const
 void ZECamera::SetVerticalFOV(float FOV)
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+	CameraSettingFlags.RaiseFlags(ZE_CSF_FOV);
 
 	this->VerticalFOV = FOV;
 }
@@ -205,6 +250,7 @@ bool ZECamera::GetAutoAspectRatio()
 void ZECamera::SetAspectRatio(float AspectRatio)
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
+	CameraSettingFlags.RaiseFlags(ZE_CSF_ASPECT_RATIO);
 
 	this->AspectRatio = AspectRatio;
 
@@ -297,13 +343,15 @@ ZECamera::ZECamera()
 	AutoZ = true;
 	AutoAspectRatio = true;
 
-	FarZ = zeGraphics->GetFarZ();
+	CameraSettingFlags.SetFlags(ZE_CSF_NONE, true);
+
+	FarZ = 0.0f;
 	EffectiveFarZ = FarZ;
-	NearZ = zeGraphics->GetNearZ();
+	NearZ = 0.0f;
 	EffectiveNearZ = NearZ;
-	AspectRatio = zeGraphics->GetAspectRatio();
+	AspectRatio = 0.0f;
 	EffectiveAspectRatio = AspectRatio;
-	SetHorizontalFOV(ZE_PI_2);
+	VerticalFOV = 0.0f;
 	
 	ShadowDistance = 1000.0f;
 	ShadowFadeDistance = ShadowDistance * 0.1f;

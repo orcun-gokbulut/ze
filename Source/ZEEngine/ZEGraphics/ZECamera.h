@@ -50,20 +50,12 @@
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
 
-enum ZECameraSettingType
-{
-	ZE_CST_NONE			= 0,
-	ZE_CST_ASPECT_RATIO = 1,
-	ZE_CST_NEAR_Z		= 2,
-	ZE_CST_FAR_Z		= 3,
-	ZE_CST_ALL			= 0xFFFFFFFF
-};
-
-//#define ZE_CSF_NONE			0
-//#define ZE_CSF_ASPECT_RATIO	1
-//#define ZE_CSF_NEAR_Z		2
-//#define ZE_CSF_FAR_Z		4
-//#define ZE_CSF_ALL			0xFFFFFFFF
+#define ZE_CSF_NONE			0
+#define ZE_CSF_ASPECT_RATIO	1
+#define ZE_CSF_NEAR_Z		2
+#define ZE_CSF_FAR_Z		4
+#define ZE_CSF_FOV			8
+#define ZE_CSF_ALL			0xFFFFFFFF
 
 enum ZECameraProjectionType
 {
@@ -80,6 +72,7 @@ class ZECamera : public ZEEntity
 
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
+		ZECameraSettingFlags			CameraSettingFlags;
 
 		float							NearZ, FarZ;
 		float							VerticalFOV;
@@ -104,6 +97,10 @@ class ZECamera : public ZEEntity
 
 		virtual void					OnTransformChanged();
 		virtual void					UpdateAutoParameters();
+
+	protected:
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 	public:
 
