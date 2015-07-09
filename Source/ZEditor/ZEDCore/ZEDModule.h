@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.cpp
+ Zinek Engine - ZEDModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDCore.h"
-#include "ZEDOperationManager.h"
-#include "ZEDSelectionManager.h"
-#include "ZEDTransformationManager.h"
-#include "ZEDModule.h"
-#include "ZEDViewPort.h"
-#include "ZEDS/ZEString.h"
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZECore/ZEOptionManager.h"
-#include <windows.h>
-#include <QtCore/QObject>
+#pragma once
 
-extern HINSTANCE ApplicationInstance;
+#include "ZECore/ZEApplicationModule.h"
 
-ZEDCore::ZEDCore()
+class ZEDScene;
+class ZEDViewPort;
+class ZEGrid;
+
+class ZEDModule : public ZEApplicationModule
 {
-	OperationManager = new ZEDOperationManager();
-	SelectionManager = new ZEDSelectionManager();
-	TransformationManager = new ZEDTransformationManager();
-	EditorModule = new ZEDModule();
-}
+	private:
+		ZEDViewPort* Viewport;
+		ZEDScene* Scene;
 
-ZEDCore::~ZEDCore()
-{
-	delete OperationManager;
-	delete SelectionManager;
-	delete TransformationManager;
-	delete EditorModule;
-}
+		ZEGrid* Grid;
+	public:
+		ZEDViewPort* GetViewPort();
+		ZEDScene* GetScene();
 
-ZEDOperationManager* ZEDCore::GetOperationManager()
-{
-	return OperationManager;
-}
+		virtual void Tick(float ElapsedTime);
+		virtual void Render(float ElapsedTime);
 
-ZEDSelectionManager* ZEDCore::GetSelectionManager()
-{
-	return SelectionManager;
-}
+		virtual void StartUp();
+		virtual void ShutDown();
 
-ZEDTransformationManager* ZEDCore::GetTransformationManager()
-{
-	return TransformationManager;
-}
+		ZEDModule();
+		virtual ~ZEDModule();
 
-ZEDModule* ZEDCore::GetEditorModule()
-{
-	return EditorModule;
-}
-
-void ZEDCore::InitializeEngine()
-{
-	zeCore->SetApplicationModule(EditorModule);
-
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
-	zeCore->GetWindow()->SetComponentWindowHandle(EditorModule->GetViewPort()->winId());
-	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
-
-	if (zeCore->StartUp(EditorModule->GetViewPort()->winId()))
-		zeCore->Run();
-}
-
-void ZEDCore::DeinitializeEngine()
-{
-	zeCore->ShutDown();
-}
-
-void ZEDCore::Destroy()
-{
-	delete this;
-}
-
-ZEDCore* ZEDCore::GetInstance()
-{
-	static ZEDCore Core;
-	return &Core;
-}
+};

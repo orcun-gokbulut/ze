@@ -37,15 +37,14 @@
 #ifndef __ZED_VIEWPORT_H__
 #define __ZED_VIEWPORT_H__
 
+#include "ZETypes.h"
+#include "ZEGraphics/ZECamera.h"
 #include <QtGui/QFrame>
 #include <QtGui/QMouseEvent>
 #include <QtGui/QKeyEvent>
 #include <QtGui/QDropEvent>
 #include <QtGui/QFocusEvent>
 #include <QtCore/QTimer>
-
-#include "ZETypes.h"
-#include "ZEGraphics/ZECamera.h"
 
 enum ZEDViewMode
 {
@@ -55,6 +54,7 @@ enum ZEDViewMode
 
 class ZEDViewPort : public QFrame
 {
+	Q_OBJECT
 	private:
 		ZEDViewMode ViewMode;
 		ZECamera* Camera;
@@ -99,6 +99,9 @@ class ZEDViewPort : public QFrame
 		ZEInt GetStepSize();
 
 		void Tick(float Time);
+
+		bool Initialize();
+		bool Deinitialize();
 
 		ZEDViewPort(QWidget* Parent = NULL);
 };

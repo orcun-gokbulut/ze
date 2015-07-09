@@ -68,6 +68,11 @@ ZEDTransformSpace ZEDTransformationManager::GetTransformSpace()
 	return TransformSpace;
 }
 
+ZEDGizmo* ZEDTransformationManager::GetGizmo()
+{
+	return Gizmo;
+}
+
 void ZEDTransformationManager::BeginTransform(ZEDTransformType Type)
 {
 	if (Type == ZED_TT_NONE)
@@ -109,7 +114,26 @@ void ZEDTransformationManager::ResetTransform()
 
 void ZEDTransformationManager::ApplyTransform(ZEMatrix4x4 Transform)
 {
+	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
+	const ZEArray<ZEDObjectWrapper*>& Selection = SelectionManager->GetSelectedObjects();
 
+	 if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_ENTITY_PIVOT)
+	 {
+		 for (ZESize I = 0; I < Selection.GetCount(); I++)
+		 {
+
+		 }
+	 }
+	 else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SELECTION_CENTER)
+	 {
+
+	 }
+	 else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SPACE_CENTER)
+	 {
+
+	 }
+
+	 ZEMatrix4x4::Multiply(this->Transform, Transform, this->Transform);
 }
 
 void ZEDTransformationManager::EndTransform()

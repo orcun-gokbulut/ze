@@ -34,11 +34,57 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDScene.h"
-#include "ZEDObjectWrapper.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZEDEntityWrapper.h"
+#include "ZEMeta/ZEObject.h"
+
+void ZEDScene::AddZEDObject(ZEObject* Object)
+{
+	ZEClass* TargetClass = Object->GetClass();
+
+	/*Requires implementation with ZEMeta, making wrappers class identifiers identical with ZEEntity and derivations' class identifiers, 
+	thus returning the appropriate wrapper class if it exists, if it does not exist return it's parent's and so on.*/
+
+	if (TargetClass == ZEEntity::Class())
+	{
+		ZEDEntityWrapper* EntityWrapper = ZEDEntityWrapper::CreateInstance();
+		EntityWrapper->SetObject(Object);
+
+		AddEntity(EntityWrapper);
+	}
+
+}
+
+void ZEDScene::RemoveZEDObject(ZEObject* Object)
+{
+	
+}
+
+bool ZEDScene::ExportZEDScene()
+{
+	const ZESmartArray<ZEEntity*>& Wrappers = GetEntities();
+	ZESize Count = Wrappers.GetCount();
+
+	for (ZESize I = 0; I < Count; I++)
+	{
+		ZEDObjectWrapper* CurrentWrapper = (ZEDObjectWrapper*)Wrappers[I];
+		CurrentWrapper->GetObject();
+
+
+
+	}
+}
+
+bool ZEDScene::ImportZEDScene()
+{
+
+}
 
 ZEDScene::ZEDScene()
 {
 
 }
 
+ZEDScene* ZEDScene::CreateInstance()
+{
+	return new ZEDScene();
+}

@@ -36,6 +36,7 @@
 #include "ZEDSelectionManager.h"
 #include "ZEDCore.h"
 #include "ZEDTransformationManager.h"
+#include "ZEDModule.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDScene.h"
 #include "ZEFoundation/ZEMath/ZEViewVolume.h"
@@ -125,7 +126,7 @@ void ZEDSelectionManager::SelectObject(const ZERay& Ray)
 	Parameters.FilterFunctionParameter = Filter;
 	ZERayCastReport Report;
 
-	if (!ZEDCore::GetInstance()->GetEditorScene()->RayCast(Report, Parameters))
+	if (!ZEDCore::GetInstance()->GetEditorModule()->GetScene()->RayCast(Report, Parameters))
 		return;
 
 	SelectObject((ZEDObjectWrapper*)Report.Entity);
@@ -139,7 +140,7 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 	if (ViewVolume->GetViewVolumeType() == ZE_VVT_NONE)
 		return;
 
-	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorScene()->GetEntities(Filter);
+	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetEntities(Filter);
 	
 	ZEDObjectWrapper* TempWrapper = NULL;
 
@@ -154,7 +155,7 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 
 void ZEDSelectionManager::SelectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
 {
-	ZECamera* ActiveCamera = ZEDCore::GetInstance()->GetEditorScene()->GetActiveCamera();
+	ZECamera* ActiveCamera = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera();
 
 	if (ActiveCamera == NULL)
 		return;
@@ -217,7 +218,7 @@ void ZEDSelectionManager::SelectObject(const ZEString& Name)
 	if (Name.IsEmpty())
 		return;
 
-	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorScene()->GetEntities(Filter);
+	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetEntities(Filter);
 
 	ZEDObjectWrapper* TempWrapper = NULL;
 
@@ -251,7 +252,7 @@ void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
 	Parameters.FilterFunctionParameter = Filter;
 	ZERayCastReport Report;
 
-	if (!ZEDCore::GetInstance()->GetEditorScene()->RayCast(Report, Parameters))
+	if (!ZEDCore::GetInstance()->GetEditorModule()->GetScene()->RayCast(Report, Parameters))
 		return;
 
 	DeselectObject((ZEDObjectWrapper*)Report.Entity);
@@ -265,7 +266,7 @@ void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
 	if (ViewVolume->GetViewVolumeType() == ZE_VVT_NONE)
 		return;
 
-	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorScene()->GetEntities(Filter);
+	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetEntities(Filter);
 
 	ZEDObjectWrapper* TempWrapper = NULL;
 
@@ -280,7 +281,7 @@ void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
 
 void ZEDSelectionManager::DeselectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
 {
-	ZECamera* ActiveCamera = ZEDCore::GetInstance()->GetEditorScene()->GetActiveCamera();
+	ZECamera* ActiveCamera = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera();
 
 	if (ActiveCamera == NULL)
 		return;
@@ -343,7 +344,7 @@ void ZEDSelectionManager::DeselectObject(const ZEString& Name)
 	if (Name.IsEmpty())
 		return;
 
-	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorScene()->GetEntities(Filter);
+	ZEArray<ZEEntity*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetEntities(Filter);
 
 	ZEDObjectWrapper* TempWrapper = NULL;
 

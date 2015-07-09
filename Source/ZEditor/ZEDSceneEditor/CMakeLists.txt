@@ -35,15 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-project (ZEditor)
-ze_set_project_folder("ZEditor")
+ze_add_source(ZEDMainEditor.ui					Sources QtUI)
+ze_add_source(ZEDMainEditor.cpp					Sources)
+ze_add_source(ZEDMainEditor.h					Sources QtMocs)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+qt4_add_resources (QtResourceFiles ${QtResources})
+qt4_wrap_ui (QtUIFiles ${QtUI})
+qt4_wrap_cpp (QtMocFiles  ${QtMocs})
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDSceneEditor)
-
-ze_add_source(ZEDMain.cpp		Sources)
-
-ze_add_executable(TARGET ZEditor 
-	SOURCES ${Sources} LIBS ZEEngine ZEDCore ZEDSceneEditor libQt)
+ze_add_library(TARGET ZEDSceneEditor 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
+	LIBS libQt)

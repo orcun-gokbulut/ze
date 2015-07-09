@@ -36,22 +36,21 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-#include <QtGui/QApplication>
-
 #include "ZETypes.h"
-#include "ZEDSceneEditor/ZEDSceneEditor.h"
+#include "ZEDSceneEditor/ZEDMainEditor.h"
+
+#include <windows.h>
+#include <QtGui/QApplication>
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
 	ZEInt argc = 0;
 	char** argv = NULL;
 
-	QApplication a(argc, argv);
-	ZEDSceneEditor w;
+	QApplication Application(argc, argv);
+	ZEDMainEditor Editor;
 
-	w.show();
-	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
-	return a.exec();
+	Editor.show();
+	Application.connect(&Application, SIGNAL(lastWindowClosed()), &Application, SLOT(quit()));
+	return Application.exec();
 }
