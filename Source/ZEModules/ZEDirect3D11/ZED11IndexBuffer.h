@@ -44,7 +44,7 @@
 
 class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 {
-	friend class ZED11Device;
+	friend class ZED11Context;
 	friend class ZED11Direct3D11Module;
 	
 	protected:	

@@ -51,16 +51,16 @@ class ZEGRHolder
 		void					Assign(Type* RawPointer);
 		void					Release();
 
-		void					Copy(ZEGRHolder<Type>& OtherHolder);
+		void					Copy(const ZEGRHolder<Type>& OtherHolder);
 		Type*					Transfer();
 
 		template<typename TargetType>
-		TargetType*				Cast();
+		TargetType*				Cast() const;
 		template<typename TargetType>
-		const TargetType*		ConstCast();
+		const TargetType*		ConstCast() const;
 
-								operator Type*();
-								operator const Type*();
+								operator Type*() const;
+								operator const Type*() const;
 
 		// Not available unless "C++11 - Explicit Casting Operators" becomes available.
 		/*template<typename TargetType>
@@ -68,14 +68,14 @@ class ZEGRHolder
 		template<typename TargetType>
 		explicit				operator const TargetType*();*/
 
-		Type&					operator*();
-		Type*					operator->();
+		Type&					operator*() const;
+		Type*					operator->() const;
 
-		ZEGRHolder<Type>&		operator=(Type* RawPointer);
-		ZEGRHolder<Type>&		operator=(ZEGRHolder<Type>& OtherHolder);
+		ZEGRHolder<Type>&		operator=(Type* Source);
+		ZEGRHolder<Type>&		operator=(ZEGRHolder<Type>& Source);
 
-		bool					operator==(const Type* RawPointer);
-		bool					operator!=(const Type* RawPointer);
+		bool					operator==(const Type* RawPointer) const;
+		bool					operator!=(const Type* RawPointer) const;
 
 								ZEGRHolder();
 								ZEGRHolder(Type* RawPointer);
@@ -84,7 +84,7 @@ class ZEGRHolder
 };
 
 template<typename Type>
-void ZEGRHolder<Type>::Assign(Type* RawPointer)
+void ZEGRHolder<Type>::Assign(Type* const RawPointer)
 {
 	if ((ZEGRResource*)RawPointer == Resource)
 		return;
@@ -104,10 +104,9 @@ bool ZEGRHolder<Type>::IsNull() const
 }
 
 template<typename Type>
-void ZEGRHolder<Type>::Copy(ZEGRHolder<Type>& OtherHolder)
+void ZEGRHolder<Type>::Copy(const ZEGRHolder<Type>& Source)
 {
-	Release();
-	Resource = OtherHolder.Resource;
+	Assign(Source.GetPointer());
 }
 
 template<typename Type>
@@ -122,7 +121,7 @@ void ZEGRHolder<Type>::Release()
 template<typename Type>
 Type* ZEGRHolder<Type>::GetPointer() const
 {
-	return Resource;
+	return reinterpret_cast<Type*>(Resource);
 }
 
 template<typename Type>
@@ -135,26 +134,26 @@ Type* ZEGRHolder<Type>::Transfer()
 
 template<typename Type>
 template<typename TargetType>
-TargetType* ZEGRHolder<Type>::Cast()
+TargetType* ZEGRHolder<Type>::Cast() const
 {
 	return (TargetType*)Resource;
 }
 
 template<typename Type>
 template<typename TargetType>
-const TargetType* ZEGRHolder<Type>::ConstCast()
+const TargetType* ZEGRHolder<Type>::ConstCast() const
 {
-	return (const TargetType*)Resource;
+	return reinterpret_cast<const Type*>(Resource);
 }
 
 template<typename Type>
-ZEGRHolder<Type>::operator Type*()
+ZEGRHolder<Type>::operator Type*() const
 {
 	return (Type*)Resource;
 }
 
 template<typename Type>
-ZEGRHolder<Type>::operator const Type*()
+ZEGRHolder<Type>::operator const Type*() const
 {
 	return Resource;
 }
@@ -174,41 +173,41 @@ ZEGRHolder<Type>::operator const TargetType*()
 }*/
 
 template<typename Type>
-Type& ZEGRHolder<Type>::operator*()
+Type& ZEGRHolder<Type>::operator*() const
 {
 	zeDebugCheck(Resource == NULL, "ZEPointer does not points any data structure.");
 	return *(Type*)Resource;
 }
 
 template<typename Type>
-Type* ZEGRHolder<Type>::operator->()
+Type* ZEGRHolder<Type>::operator->() const
 {
 	zeDebugCheck(Resource == NULL, "ZEPointer does not points any data structure.");
 	return (Type*)Resource;
 }
 
 template<typename Type>
-ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(Type* RawPointer)
+ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(Type* Source)
 {
-	Assign(RawPointer);
+	Assign(Source);
 	return *this;
 }
 
 template<typename Type>
-ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(ZEGRHolder<Type>& OtherHolder)
+ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(ZEGRHolder<Type>& Source)
 {
-	Copy(OtherHolder);
+	Copy(Source);
 	return *this;
 }
 
 template<typename Type>
-bool ZEGRHolder<Type>::operator==(const Type* RawPointer)
+bool ZEGRHolder<Type>::operator==(const Type* RawPointer) const
 {
 	return (Resource == RawPointer);
 }
 
 template<typename Type>
-bool ZEGRHolder<Type>::operator!=(const Type* RawPointer)
+bool ZEGRHolder<Type>::operator!=(const Type* RawPointer) const
 {
 	return (Resource != RawPointer);
 }

@@ -38,7 +38,7 @@
 #include "ZEInteriorDoor.h"
 #include "ZEInteriorRoom.h"
 #include "ZEGame\ZEDrawParameters.h"
-#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZERNSimpleMaterial.h"
 #include "ZERenderer\ZERNRenderer.h"
 
 void ZEInteriorDebugDrawer::DebugDrawEntity()
@@ -110,7 +110,7 @@ bool ZEInteriorDebugDrawer::InitializeSelf()
 		return false;
 
 	if (InteriorMaterial == NULL)
-		InteriorMaterial = ZESimpleMaterial::CreateInstance();
+		InteriorMaterial = ZERNSimpleMaterial::CreateInstance();
 
 	InteriorRenderCommand.SetZero();
 	InteriorRenderCommand.Material = InteriorMaterial;

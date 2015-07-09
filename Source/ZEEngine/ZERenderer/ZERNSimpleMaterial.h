@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESimpleMaterial.h
+ Zinek Engine - ZERNSimpleMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -39,10 +39,12 @@
 
 #include "ZETypes.h"
 #include "ZERNMaterial.h"
+#include "ZERNSampler.h"
+#include "ZEGraphics\ZEGRRenderState.h"
 
 class ZEGRTexture2D;
 
-class ZESimpleMaterial : public ZERNMaterial
+class ZERNSimpleMaterial : public ZERNMaterial
 {
 	friend class ZED3D9Module;
 	protected:
@@ -54,12 +56,13 @@ class ZESimpleMaterial : public ZERNMaterial
 		ZEUInt							TransparancyCullLimit;
 		ZEVector4						MaterialColor;
 
-		ZEGRTexture2D*					Texture;
-		ZEGRTextureAddressing			TextureAddressModeU;
-		ZEGRTextureAddressing			TextureAddressModeV;
+		ZERNSampler						TextureSampler;
 
-										ZESimpleMaterial();
-		virtual							~ZESimpleMaterial();
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+										ZERNSimpleMaterial();
+		virtual							~ZERNSimpleMaterial();
 
 	public:
 		void							SetTwoSided(bool Enable);
@@ -80,14 +83,10 @@ class ZESimpleMaterial : public ZERNMaterial
 		void							SetTransparancyCullLimit(ZEUInt Limit);
 		ZEUInt							GetTransparancyCullLimit() const;
 
-		void							SetTexture(ZEGRTexture2D* Texture);
-		ZEGRTexture2D*					GetTexture() const;
-		void							SetTextureAddressModeU(ZEGRTextureAddressing Mode);
-		ZEGRTextureAddressing			GetTextureAddressModeU() const;
-		void							SetTextureAddressModeV(ZEGRTextureAddressing Mode);
-		ZEGRTextureAddressing			GetTextureAddressModeV() const;
+		void							SetTexture(const ZERNSampler& Sampler);
+		const ZERNSampler&				GetTexture() const;
 
-		static ZESimpleMaterial*		CreateInstance();
+		static ZERNSimpleMaterial*		CreateInstance();
 };
 
 #endif

@@ -43,7 +43,7 @@
 
 class ZEListener;
 class ZEScene;
-class ZESimpleMaterial;
+class ZERNSimpleMaterial;
 
 class ZEGrid : public ZEEntity
 {
@@ -55,7 +55,7 @@ class ZEGrid : public ZEEntity
 		ZECanvas					AxisX;
 		ZECanvas					AxisZ;
 
-		ZESimpleMaterial*			Material;
+		ZERNSimpleMaterial*			Material;
 		ZERNCommand				RenderCommand;
 
 		ZEVector2					GridSize;

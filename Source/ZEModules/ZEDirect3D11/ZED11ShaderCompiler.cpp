@@ -53,7 +53,7 @@
 
 #define ZE_D3D11_DEVICE_REGISTER_SIZE			16	// Bytes
 
-class ZED3D11Include : public ID3DInclude
+class ZED11Include : public ID3DInclude
 {
 	HRESULT __stdcall Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID * ppData, UINT * pBytes)
 	{

@@ -53,9 +53,11 @@ class ZETexture2DResource : public ZETextureResource
 		virtual 							~ZETexture2DResource();
 
 	public:
-		const ZEGRTexture2D*					GetTexture() const;
 		virtual const char*					GetResourceType() const;
 		virtual ZEGRTextureType				GetTextureType() const;
+
+		virtual ZEGRTexture*				GetTexture() const;
+		ZEGRTexture2D*						GetTexture2D() const;
 
 		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);

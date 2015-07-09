@@ -39,7 +39,7 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
@@ -257,7 +257,7 @@ bool ZEGrid::InitializeSelf()
 	GenerateGrid();
 	
 	if (Material == NULL)
-		Material = ZESimpleMaterial::CreateInstance();
+		Material = ZERNSimpleMaterial::CreateInstance();
 
 	RenderCommand.SetZero();
 	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();

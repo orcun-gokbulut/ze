@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESimpleMaterial.cpp
+ Zinek Engine - ZERNSimpleMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,9 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZESimpleMaterial.h"
+#include "ZERNSimpleMaterial.h"
 
-ZESimpleMaterial::ZESimpleMaterial()
+bool ZERNSimpleMaterial::InitializeSelf()
+{
+
+}
+
+void ZERNSimpleMaterial::DeinitializeSelf()
+{
+
+}
+
+ZERNSimpleMaterial::ZERNSimpleMaterial()
 {
 	Wireframe = false;
 	TwoSided = false;
@@ -44,115 +54,86 @@ ZESimpleMaterial::ZESimpleMaterial()
 	TransparancyMode = ZE_MTM_NONE;
 	TransparancyCullLimit = 0x80;
 	MaterialColor = ZEVector4::One;
-	Texture = NULL;
-	TextureAddressModeU = ZE_TAM_MIRROR;
-	TextureAddressModeV = ZE_TAM_MIRROR;
 }
 
-ZESimpleMaterial::~ZESimpleMaterial()
+ZERNSimpleMaterial::~ZERNSimpleMaterial()
 {
 	
 }
 
-ZEMaterialFlags ZESimpleMaterial::GetMaterialFlags() const
-{
-	return ZE_MTF_NONE;
-}
-
-void ZESimpleMaterial::SetTwoSided(bool Enable)
+void ZERNSimpleMaterial::SetTwoSided(bool Enable)
 {
 	TwoSided = Enable;
 }
 
-bool ZESimpleMaterial::GetTwoSided() const
+bool ZERNSimpleMaterial::GetTwoSided() const
 {
 	return TwoSided;
 }
 
-void ZESimpleMaterial::SetWireframe(bool Enable)
+void ZERNSimpleMaterial::SetWireframe(bool Enable)
 {
 	Wireframe = Enable;
 }
 
-bool ZESimpleMaterial::GetWireframe() const
+bool ZERNSimpleMaterial::GetWireframe() const
 {
 	return Wireframe;
 }
 
-void ZESimpleMaterial::SetVertexColor(bool Enable)
+void ZERNSimpleMaterial::SetVertexColor(bool Enable)
 {
 	VertexColorEnabled = Enable;
 }
 
-bool ZESimpleMaterial::GetVertexColor()
+bool ZERNSimpleMaterial::GetVertexColor()
 {
 	return VertexColorEnabled;
 }
 
 
-void ZESimpleMaterial::SetMaterialColor(const ZEVector4& Color)
+void ZERNSimpleMaterial::SetMaterialColor(const ZEVector4& Color)
 {
 	MaterialColor = Color;
 }
 
-const ZEVector4& ZESimpleMaterial::GetMaterialColor() const
+const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
 {
 	return MaterialColor;
 }
 
-void ZESimpleMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
+void ZERNSimpleMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 {
 	TransparancyMode = Mode;
 
 }
 
-ZEMaterialTransparancyMode ZESimpleMaterial::GetTransparancyMode() const
+ZEMaterialTransparancyMode ZERNSimpleMaterial::GetTransparancyMode() const
 {
 	return TransparancyMode;
 }
 
-void ZESimpleMaterial::SetTransparancyCullLimit(ZEUInt Limit)
+void ZERNSimpleMaterial::SetTransparancyCullLimit(ZEUInt Limit)
 {
 	Limit = TransparancyCullLimit;
 }
 
-ZEUInt ZESimpleMaterial::GetTransparancyCullLimit() const
+ZEUInt ZERNSimpleMaterial::GetTransparancyCullLimit() const
 {
 	return TransparancyCullLimit;
 }
 
-
-void ZESimpleMaterial::SetTexture(const ZEGRTexture2D* Texture)
+void ZERNSimpleMaterial::SetTexture(const ZERNSampler& Sampler)
 {
-	this->Texture = Texture;
+	TextureSampler = Sampler;
 }
 
-const ZEGRTexture2D* ZESimpleMaterial::GetTexture() const
+const ZERNSampler& ZERNSimpleMaterial::GetTexture() const
 {
-	return Texture;
+	return TextureSampler;
 }
 
-void ZESimpleMaterial::SetTextureAddressModeU(ZETextureAddressMode Mode)
+ZERNSimpleMaterial* ZERNSimpleMaterial::CreateInstance()
 {
-	TextureAddressModeU = Mode;
-}
-
-ZETextureAddressMode ZESimpleMaterial::GetTextureAddressModeU() const
-{
-	return TextureAddressModeU;
-}
-
-void ZESimpleMaterial::SetTextureAddressModeV(ZETextureAddressMode Mode)
-{
-	TextureAddressModeV = Mode;
-}
-
-ZETextureAddressMode ZESimpleMaterial::GetTextureAddressModeV() const
-{
-	return TextureAddressModeV;
-}
-
-ZESimpleMaterial* ZESimpleMaterial::CreateInstance()
-{
-	return zeGraphics->CreateSimpleMaterial();
+	return new ZERNSimpleMaterial();
 }

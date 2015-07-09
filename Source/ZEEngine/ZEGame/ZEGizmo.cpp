@@ -47,10 +47,10 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
-ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
+ZERNSimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
 
 void ZEGizmo::UpdateMoveGizmo()
 {
@@ -1047,7 +1047,7 @@ bool ZEGizmo::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	GizmoMaterial = ZESimpleMaterial::CreateInstance();
+	GizmoMaterial = ZERNSimpleMaterial::CreateInstance();
 
 	RenderCommand.SetZero();
 	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();

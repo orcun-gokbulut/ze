@@ -59,7 +59,7 @@ class ZERNStageGBuffer : public ZERNStage
 
 		virtual ZEGRRenderState*		GetRenderState();
 
-		virtual void					Setup(ZEGRDevice* Device);
+		virtual void					Setup(ZEGRContext* Device);
 		virtual void					CleanUp();
 		virtual void					Reconfigure();
 };

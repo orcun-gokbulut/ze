@@ -36,7 +36,7 @@
 #include "ZEModelDebugDrawer.h"
 #include "ZEModel.h"
 
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEDrawParameters.h"
 
@@ -130,7 +130,7 @@ bool ZEModelDebugDrawer::InitializeSelf()
 		return false;
 
 	if (ModelMaterial == NULL)
-		ModelMaterial = ZESimpleMaterial::CreateInstance();
+		ModelMaterial = ZERNSimpleMaterial::CreateInstance();
 
 	ModelRenderCommand.SetZero();
 	ModelRenderCommand.Material = ModelMaterial;

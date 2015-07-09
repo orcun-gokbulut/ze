@@ -46,6 +46,7 @@
 #include "ZEGRHolder.h"
 
 #include "ZETypes.h"
+#include "ZECommon.h"
 
 class ZEGRVertexLayout;
 class ZEGRVertexBuffer;
@@ -55,12 +56,20 @@ class ZEGRTexture;
 class ZEGRRenderTarget;
 class ZEGRConstantBuffer;
 class ZEGRDepthStencilBuffer;
+class ZEGRContext;
 
 typedef ZEGRColorMask ColorBlendMask;
 
-class ZEGRRenderState : public ZEGRResource
+class ZEGRRenderStateData : public ZEGRResource
 {
-	friend class ZEGRDevice;
+	public:
+		virtual ZEGRResourceType				GetResourceType();
+		virtual void							Setup(ZEGRContext* Device) = 0;
+};
+
+class ZEGRRenderState
+{
+	friend class ZEGRContext;
 
 	private:
 		ZEGRVertexLayout						VertexLayout;
@@ -83,53 +92,53 @@ class ZEGRRenderState : public ZEGRResource
 		ZEGRViewport							ViewPorts[ZEGR_MAX_VIEWPORT_SLOT];
 		ZEGRScissorRectangle					ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
 
-
-												ZEGRRenderState();
-		virtual									~ZEGRRenderState();
-
 	public:
-		void									SetVertexLayout(ZEGRVertexLayout* Layout);
-		ZEGRVertexLayout*						GetVertexLayout();
+		virtual ZEGRResourceType				GetResourceType();
+
+		void									SetVertexLayout(const ZEGRVertexLayout& Layout);
+		const ZEGRVertexLayout&					GetVertexLayout() const;
 
 		void									SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
-		const ZEGRVertexBuffer*					GetVertexBuffer(ZEUInt Index) const;
+		ZEGRVertexBuffer*						GetVertexBuffer(ZEUInt Index) const;
 
 		void									SetIndexBuffer(ZEGRIndexBuffer* Buffer);
-		const ZEGRIndexBuffer*					GetIndexBuffer() const;
+		ZEGRIndexBuffer*						GetIndexBuffer() const;
 
 		void									SetShader(ZEGRShaderType Type, ZEGRShader* Shader);
-		const ZEGRShader*						GetVertexShader(ZEGRShaderType Type) const;
+		ZEGRShader*								GetShader(ZEGRShaderType Type) const;
 
 		void									SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer);
-		const ZEGRConstantBuffer*				GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index) const;
+		ZEGRConstantBuffer*						GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index) const;
 
-		void									SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture);
-		const ZEGRTexture*						GetTexture(ZEGRShaderType Shader, ZEUInt Index) const;
+		void									SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
+		ZEGRTexture*							GetTexture(ZEGRShaderType Shader, ZEUInt Index) const;
 
-		void									SetSampler(ZEGRShaderType Shader, ZEUInt Index, ZEGRSamplerState& Sampler);
-		ZEGRSamplerState&						GetSampler(ZEGRShaderType Shader, ZEUInt Index);
+		void									SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* Target);
+		ZEGRRenderTarget*						GetRenderTarget(ZEUInt Index) const;
 
-		void									SetViewport(ZEUInt Index, ZEGRViewport& ViewPort);
-		ZEGRViewport&							GetViewport(ZEUInt Index);
+		void									SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer);
+		ZEGRDepthStencilBuffer*					GetDepthStencilBuffer() const;
 
-		void									SetRenderTarget(ZEUInt Index, const ZEGRRenderTarget* Target);
-		const ZEGRRenderTarget*					GetRenderTarget(ZEUInt Index) const;
+		void									SetRasterizerState(const ZEGRRasterizerState& State);
+		const ZEGRRasterizerState&				GetRasterizerState() const;
 
-		void									SetRasterizerState(ZEGRRasterizerState& State);
-		ZEGRRasterizerState&					GetRasterizerState();
+		void									SetBlendState(ZEUInt Index, const ZEGRBlendState& State);
+		const ZEGRBlendState&					GetBlendState(ZEUInt Index) const;
 
-		void									SetBlendState(ZEUInt Index, ZEGRBlendState& State);
-		ZEGRBlendState&							GetBlendState();
+		void									SetDepthStencilState(const ZEGRDepthStencilState& State);
+		const ZEGRDepthStencilState&			GetDepthStencilState() const;
 
-		void									SetDepthStencilBuffer(const ZEGRDepthStencilBuffer* Buffer);
-		const ZEGRDepthStencilBuffer*			GetDepthStencilBuffer() const;
+		void									SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
+		const ZEGRSamplerState&					GetSampler(ZEGRShaderType Shader, ZEUInt Index) const;
 
-		void									SetDepthStencilState(ZEGRDepthStencilState& State);
-		ZEGRDepthStencilState&					GetDepthStencilState();
+		void									SetViewport(ZEUInt Index, const ZEGRViewport& ViewPort);
+		const ZEGRViewport&						GetViewport(ZEUInt Index) const;
+
 
 		void									SetToDefault();
 
-		virtual void							Update();
+		ZEGRRenderStateData*					Compile();
 
-		static ZEGRRenderState*					CreateInstance();
+												ZEGRRenderState();
+		virtual									~ZEGRRenderState();
 };

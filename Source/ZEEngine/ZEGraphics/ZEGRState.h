@@ -37,9 +37,13 @@
 
 #include "ZETypes.h"
 
+class ZEGRRenderTarget;
+
 class ZEGRState
 {
 	private:
+		ZEGRRenderTarget*		RenderState;
+		mutable ZEUInt32		Hash;
 		bool					Dirty;
 
 	protected:
@@ -49,8 +53,13 @@ class ZEGRState
 		virtual					~ZEGRState();
 
 	public:
-		virtual ZEUInt64		GetHash();
-		bool					IsDirty();
+		bool					IsDirty() const;
+
+		ZEUInt32				GetHash() const;
+		virtual const void*		GetData() const = 0;
+		virtual ZESize			GetDataSize() const = 0;
+
+		bool					Equals(const ZEGRState& State);
 
 		virtual void			Update();
 

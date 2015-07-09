@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDevice.h
+ Zinek Engine - ZEGRContext.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEGRContext.h"
 
-#include "ZEGRBlendState.h"
-#include "ZEGRSamplerState.h"
-#include "ZEGRVertexLayout.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRRasterizerState.h"
-#include "ZEGRDepthStencilState.h"
-#include "ZEGRRenderState.h"
 
-class ZEGRVertexLayout;
-class ZEGRVertexBuffer;
-class ZEGRIndexBuffer;
-class ZEGRShader;
-class ZEGRConstantBuffer;
-class ZEGRTexture;
-class ZEGRSamplerState;
-
-class ZEGRDevice
-{
-	protected:
-								ZEGRDevice();
-		virtual					~ZEGRDevice();
-
-	public:
-		virtual void			Draw(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
-		virtual void			DrawInstanced(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
-		
-		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
-		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
-};

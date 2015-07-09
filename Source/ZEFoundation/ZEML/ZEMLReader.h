@@ -86,7 +86,7 @@ class ZEMLReaderNode
 	public:
 		const ZEString&				GetName();
 
-		const ZESmartArray<ZEMLReaderSubNode>&	GetSubNodes();
+		const ZESmartArray<ZEMLReaderSubNode>& GetSubNodes();
 		const ZESmartArray<ZEMLReaderProperty>& GetProperties();	
 
 		ZESize						GetSubNodeCount();

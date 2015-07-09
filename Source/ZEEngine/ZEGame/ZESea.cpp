@@ -59,8 +59,8 @@ ZESea::ZESea()
 	Options.MipMapping = ZE_TMM_ENABLED;
 	Options.MaximumMipmapLevel = 14;
 
-	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaDiffuse.jpg", &Options)->GetTexture());
-	SetNormalTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaNormal.jpg", &Options)->GetTexture());
+	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaDiffuse.jpg", &Options)->GetTexture2D());
+	SetNormalTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaNormal.jpg", &Options)->GetTexture2D());
 
 	DiffuseVelocity = ZEVector2::One;
 	NormalVelocity	= -ZEVector2::One;

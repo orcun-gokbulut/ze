@@ -45,14 +45,14 @@
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEMath/ZEViewVolume.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
 void ZEInteriorRoom::DebugDraw(ZERNRenderer* Renderer)
 {
 	if (DebugDrawComponents.Material == NULL)
 	{
-		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
+		DebugDrawComponents.Material = ZERNSimpleMaterial::CreateInstance();
 
 		DebugDrawComponents.BoxRenderCommand.SetZero();
 		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;

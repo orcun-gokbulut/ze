@@ -93,7 +93,7 @@ void ZEProjectiveLight::SetProjectionTextureFile(const ZEString& FileName)
 
 		ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
 		if (ProjectionTextureResource != NULL)
-			ProjectionTexture = ProjectionTextureResource->GetTexture();
+			ProjectionTexture = ProjectionTextureResource->GetTexture2D();
 		else
 			zeError("Can not load projection texture.");
 	}
@@ -130,18 +130,6 @@ const ZEMatrix4x4& ZEProjectiveLight::GetViewTransform(ZESize CascadeIndex)
 	return ViewProjectionMatrix;
 }
 
-void ZEProjectiveLight::SetCastsShadow(bool NewValue)
-{
-	if (NewValue == false)
-		if (ShadowMap != NULL)
-		{
-			ShadowMap->Destroy();
-			ShadowMap = NULL;
-		}
-
-	ZELight::SetCastsShadow(NewValue);
-}
-
 bool ZEProjectiveLight::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
@@ -154,7 +142,7 @@ bool ZEProjectiveLight::InitializeSelf()
 
 		ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
 		if (ProjectionTextureResource != NULL)
-			ProjectionTexture = ProjectionTextureResource->GetTexture();
+			ProjectionTexture = ProjectionTextureResource->GetTexture2D();
 		else
 			zeError("Can not load projection texture.");
 	}
@@ -168,12 +156,6 @@ bool ZEProjectiveLight::DeinitializeSelf()
 	{
 		ProjectionTextureResource->Release();
 		ProjectionTextureResource = NULL;
-	}
-
-	if (ShadowMap != NULL)
-	{
-		ShadowMap->Destroy();
-		ShadowMap = NULL;
 	}
 
 	return ZEEntity::DeinitializeSelf();

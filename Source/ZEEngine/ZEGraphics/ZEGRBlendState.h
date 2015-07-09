@@ -89,6 +89,9 @@ class ZEGRBlendState : public ZEGRState
 		} StateData;
 		
 	public:
+		virtual const void*			GetData() const;
+		virtual ZESize				GetDataSize() const;
+
 		void						SetAlphaToCoverageEnable(bool Enable);
 		bool						GetAlphaToCoverageEnable() const;
 

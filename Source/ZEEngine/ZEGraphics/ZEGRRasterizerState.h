@@ -72,6 +72,9 @@ class ZEGRRasterizerState : public ZEGRState
 		} StateData;
 
 	public:
+		virtual const void*			GetData() const;
+		virtual ZESize				GetDataSize() const;
+
 		void						SetFillMode(ZEGRFillMode Mode);
 		ZEGRFillMode				GetFillMode() const;
 	

@@ -49,6 +49,8 @@
 
 #include "ZED11Shader.h"
 #include "ZED11Direct3D11Module.h"
+#include "ZED11Context.h"
+#include "ZED11RenderStateData.h"
 
 inline static D3D11_BLEND Convert(ZEGRBlendOption BlendOption)
 {
@@ -343,7 +345,7 @@ inline static D3D11_INPUT_CLASSIFICATION Convert(ZEGRVertexUsage Usage)
 	}
 }
 
-ID3D11BlendState* ZED11StatePool::CreateState(ZEGRBlendState* BlendState)
+ID3D11BlendState* ZED11StatePool::CreateState(const ZEGRBlendState& BlendState)
 {
 	if (BlendStatePool.GetCount() >= ZEGR_STATE_POOL_CACHE_CAPACITY)
 	{
@@ -352,22 +354,21 @@ ID3D11BlendState* ZED11StatePool::CreateState(ZEGRBlendState* BlendState)
 	}
 	
 	D3D11_BLEND_DESC BlendDesc;
-
 	BlendDesc.IndependentBlendEnable = true;
-	BlendDesc.AlphaToCoverageEnable = BlendState->GetAlphaToCoverageEnable();
+	BlendDesc.AlphaToCoverageEnable = BlendState.GetAlphaToCoverageEnable();
 
 	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; ++I)
 	{
-		BlendDesc.RenderTarget[I].BlendEnable = BlendState->GetBlendEnable((ZEUInt)I) ? 1 : 0;
-		BlendDesc.RenderTarget[I].RenderTargetWriteMask = BlendState->GetComponentWriteMask((ZEUInt)I).Value;
+		BlendDesc.RenderTarget[I].BlendEnable = BlendState.GetBlendEnable((ZEUInt)I) ? 1 : 0;
+		BlendDesc.RenderTarget[I].RenderTargetWriteMask = BlendState.GetComponentWriteMask((ZEUInt)I).Value;
 
-		BlendDesc.RenderTarget[I].BlendOp = Convert(BlendState->GetBlendEquation());
-		BlendDesc.RenderTarget[I].SrcBlend = Convert(BlendState->GetSourceBlendOption());
-		BlendDesc.RenderTarget[I].DestBlend = Convert(BlendState->GetDestinationBlendOption());
+		BlendDesc.RenderTarget[I].BlendOp = Convert(BlendState.GetBlendEquation());
+		BlendDesc.RenderTarget[I].SrcBlend = Convert(BlendState.GetSourceBlendOption());
+		BlendDesc.RenderTarget[I].DestBlend = Convert(BlendState.GetDestinationBlendOption());
 		
-		BlendDesc.RenderTarget[I].BlendOpAlpha = Convert(BlendState->GetBlendAlphaEquation());
-		BlendDesc.RenderTarget[I].SrcBlendAlpha = Convert(BlendState->GetSourceBlendAlphaOption());
-		BlendDesc.RenderTarget[I].DestBlendAlpha = Convert(BlendState->GetDestinationBlendAlphaOption());
+		BlendDesc.RenderTarget[I].BlendOpAlpha = Convert(BlendState.GetBlendAlphaEquation());
+		BlendDesc.RenderTarget[I].SrcBlendAlpha = Convert(BlendState.GetSourceBlendAlphaOption());
+		BlendDesc.RenderTarget[I].DestBlendAlpha = Convert(BlendState.GetDestinationBlendAlphaOption());
 	}
 
 	ID3D11BlendState* NativeState = NULL;
@@ -385,7 +386,7 @@ ID3D11BlendState* ZED11StatePool::CreateState(ZEGRBlendState* BlendState)
 	return NativeState;
 }
 
-ID3D11SamplerState* ZED11StatePool::CreateState(ZEGRSamplerState* SamplerState)
+ID3D11SamplerState* ZED11StatePool::CreateState(const ZEGRSamplerState& SamplerState)
 {
 	if (SamplerStatePool.GetCount() >= ZEGR_STATE_POOL_CACHE_CAPACITY)
 	{
@@ -393,7 +394,7 @@ ID3D11SamplerState* ZED11StatePool::CreateState(ZEGRSamplerState* SamplerState)
 		return NULL;
 	}
 
-	ZEVector4 BorderColor = SamplerState->GetBorderColor();
+	ZEVector4 BorderColor = SamplerState.GetBorderColor();
 
 	D3D11_SAMPLER_DESC SamplerDesc;
 	SamplerDesc.BorderColor[0] = BorderColor.x;
@@ -401,14 +402,14 @@ ID3D11SamplerState* ZED11StatePool::CreateState(ZEGRSamplerState* SamplerState)
 	SamplerDesc.BorderColor[2] = BorderColor.z;
 	SamplerDesc.BorderColor[3] = BorderColor.w;
 	SamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
-	SamplerDesc.MinLOD = SamplerState->GetMinLOD();
-	SamplerDesc.MaxLOD = SamplerState->GetMaxLOD();
-	SamplerDesc.MipLODBias = SamplerState->GetMipLODBias();
-	SamplerDesc.MaxAnisotropy = SamplerState->GetMaxAnisotrophy();
-	SamplerDesc.AddressU = Convert(SamplerState->GetAddressU());
-	SamplerDesc.AddressV = Convert(SamplerState->GetAddressV());
-	SamplerDesc.AddressW = Convert(SamplerState->GetAddressW());
-	SamplerDesc.Filter = Convert(SamplerState->GetMinFilter(), SamplerState->GetMagFilter(), SamplerState->GetMipFilter());
+	SamplerDesc.MinLOD = SamplerState.GetMinLOD();
+	SamplerDesc.MaxLOD = SamplerState.GetMaxLOD();
+	SamplerDesc.MipLODBias = SamplerState.GetMipLODBias();
+	SamplerDesc.MaxAnisotropy = SamplerState.GetMaxAnisotrophy();
+	SamplerDesc.AddressU = Convert(SamplerState.GetAddressU());
+	SamplerDesc.AddressV = Convert(SamplerState.GetAddressV());
+	SamplerDesc.AddressW = Convert(SamplerState.GetAddressW());
+	SamplerDesc.Filter = Convert(SamplerState.GetMinFilter(), SamplerState.GetMagFilter(), SamplerState.GetMipFilter());
 	
 	ID3D11SamplerState* NativeState = NULL;
 	HRESULT Result = GetDevice()->CreateSamplerState(&SamplerDesc, &NativeState);
@@ -425,7 +426,7 @@ ID3D11SamplerState* ZED11StatePool::CreateState(ZEGRSamplerState* SamplerState)
 	return NativeState;
 }
 
-ID3D11RasterizerState* ZED11StatePool::CreateState(ZEGRRasterizerState* RasterizerState)
+ID3D11RasterizerState* ZED11StatePool::CreateState(const ZEGRRasterizerState& RasterizerState)
 {
 	if (RasterizerStatePool.GetCount() >= ZEGR_STATE_POOL_CACHE_CAPACITY)
 	{
@@ -441,9 +442,9 @@ ID3D11RasterizerState* ZED11StatePool::CreateState(ZEGRRasterizerState* Rasteriz
 	RasterizerDesc.DepthClipEnable = true;
 	RasterizerDesc.MultisampleEnable = false;
 	RasterizerDesc.AntialiasedLineEnable = false;
-	RasterizerDesc.FillMode = Convert(RasterizerState->GetFillMode());
-	RasterizerDesc.CullMode = Convert(RasterizerState->GetCullDirection());
-	RasterizerDesc.FrontCounterClockwise = RasterizerState->GetFrontIsCounterClockwise();
+	RasterizerDesc.FillMode = Convert(RasterizerState.GetFillMode());
+	RasterizerDesc.CullMode = Convert(RasterizerState.GetCullDirection());
+	RasterizerDesc.FrontCounterClockwise = RasterizerState.GetFrontIsCounterClockwise();
 
 	ID3D11RasterizerState* NativeState = NULL;
 	HRESULT Result = GetDevice()->CreateRasterizerState(&RasterizerDesc, &NativeState);
@@ -460,7 +461,7 @@ ID3D11RasterizerState* ZED11StatePool::CreateState(ZEGRRasterizerState* Rasteriz
 	return NativeState;
 }
 
-ID3D11DepthStencilState* ZED11StatePool::CreateState(ZEGRDepthStencilState* DepthStencilState)
+ID3D11DepthStencilState* ZED11StatePool::CreateState(const ZEGRDepthStencilState& DepthStencilState)
 {
 	if (DepthStencilStatePool.GetCount() >= ZEGR_STATE_POOL_CACHE_CAPACITY)
 	{
@@ -469,20 +470,20 @@ ID3D11DepthStencilState* ZED11StatePool::CreateState(ZEGRDepthStencilState* Dept
 	}
 	
 	D3D11_DEPTH_STENCIL_DESC DepthStencilDesc;
-	DepthStencilDesc.DepthEnable = DepthStencilState->GetZTestEnable();
-	DepthStencilDesc.DepthFunc = Convert(DepthStencilState->GetZFunction());
-	DepthStencilDesc.DepthWriteMask = DepthStencilState->GetZWriteEnable() ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
-	DepthStencilDesc.StencilEnable = DepthStencilState->GetStencilTestEnable();
-	DepthStencilDesc.StencilReadMask = DepthStencilState->GetStencilReadMask();
-	DepthStencilDesc.StencilWriteMask = DepthStencilState->GetStencilWriteMask();
-	DepthStencilDesc.BackFace.StencilPassOp = Convert(DepthStencilState->GetBackStencilPass());
-	DepthStencilDesc.BackFace.StencilFailOp = Convert(DepthStencilState->GetBackStencilFail());
-	DepthStencilDesc.BackFace.StencilDepthFailOp = Convert(DepthStencilState->GetBackZFail());
-	DepthStencilDesc.BackFace.StencilFunc = Convert(DepthStencilState->GetBackStencilFunction());
-	DepthStencilDesc.FrontFace.StencilPassOp = Convert(DepthStencilState->GetFrontStencilPass());
-	DepthStencilDesc.FrontFace.StencilFailOp = Convert(DepthStencilState->GetFrontStencilFail());
-	DepthStencilDesc.FrontFace.StencilDepthFailOp = Convert(DepthStencilState->GetFrontZFail());
-	DepthStencilDesc.FrontFace.StencilFunc = Convert(DepthStencilState->GetFrontStencilFunction());
+	DepthStencilDesc.DepthEnable = DepthStencilState.GetZTestEnable();
+	DepthStencilDesc.DepthFunc = Convert(DepthStencilState.GetZFunction());
+	DepthStencilDesc.DepthWriteMask = DepthStencilState.GetZWriteEnable() ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
+	DepthStencilDesc.StencilEnable = DepthStencilState.GetStencilTestEnable();
+	DepthStencilDesc.StencilReadMask = DepthStencilState.GetStencilReadMask();
+	DepthStencilDesc.StencilWriteMask = DepthStencilState.GetStencilWriteMask();
+	DepthStencilDesc.BackFace.StencilPassOp = Convert(DepthStencilState.GetBackStencilPass());
+	DepthStencilDesc.BackFace.StencilFailOp = Convert(DepthStencilState.GetBackStencilFail());
+	DepthStencilDesc.BackFace.StencilDepthFailOp = Convert(DepthStencilState.GetBackZFail());
+	DepthStencilDesc.BackFace.StencilFunc = Convert(DepthStencilState.GetBackStencilFunction());
+	DepthStencilDesc.FrontFace.StencilPassOp = Convert(DepthStencilState.GetFrontStencilPass());
+	DepthStencilDesc.FrontFace.StencilFailOp = Convert(DepthStencilState.GetFrontStencilFail());
+	DepthStencilDesc.FrontFace.StencilDepthFailOp = Convert(DepthStencilState.GetFrontZFail());
+	DepthStencilDesc.FrontFace.StencilFunc = Convert(DepthStencilState.GetFrontStencilFunction());
 
 	ID3D11DepthStencilState* NativeState = NULL;
 	HRESULT Result = GetDevice()->CreateDepthStencilState(&DepthStencilDesc, &NativeState);
@@ -499,7 +500,7 @@ ID3D11DepthStencilState* ZED11StatePool::CreateState(ZEGRDepthStencilState* Dept
 	return NativeState;
 }
 
-ID3D11InputLayout* ZED11StatePool::CreateState(ZEGRVertexLayout* VertexLayout, ZEGRShader* Shader)
+ID3D11InputLayout* ZED11StatePool::CreateState(const ZEGRVertexLayout& VertexLayout, ZEGRShader* Shader)
 {
 	if (VertexLayoutPool.GetCount() >= ZEGR_STATE_POOL_CACHE_CAPACITY)
 	{
@@ -507,13 +508,56 @@ ID3D11InputLayout* ZED11StatePool::CreateState(ZEGRVertexLayout* VertexLayout, Z
 		return NULL;
 	}
 
-	ZEUInt ElementCount = VertexLayout->GetElementCount();
-	const ZEGRVertexElement* Elements = VertexLayout->GetElements();
+	ZEUInt ElementCount = VertexLayout.GetElementCount();
+	const ZEGRVertexElement* Elements = VertexLayout.GetElements();
 
 	D3D11_INPUT_ELEMENT_DESC ElementDesc[16];
+	char* SemanticType = NULL;
 	for (ZESize I = 0; I < ElementCount; ++I)
 	{
-		ElementDesc[I].SemanticName = Elements[I].Semantic;
+		switch(Elements[I].Semantic)
+		{
+			case ZEGR_VES_UNKNOWN:
+				ElementDesc[I].SemanticName = "UNKNOWN";
+				break;
+
+			case ZEGR_VES_POSITION:
+				ElementDesc[I].SemanticName = "POSITION";
+				break;
+
+			case ZEGR_VES_NORMAL:
+				ElementDesc[I].SemanticName = "NORMAL";
+				break;
+
+			case ZEGR_VES_BINORMAL:
+				ElementDesc[I].SemanticName = "BINORMAL";
+				break;
+
+			case ZEGR_VES_TANGENT:
+				ElementDesc[I].SemanticName = "TANGENT";
+				break;
+
+			case ZEGR_VES_TEXCOORD:
+				ElementDesc[I].SemanticName = "TEXCOORD";
+				break;
+
+			case ZEGR_VES_COLOR:
+				ElementDesc[I].SemanticName = "COLOR";
+				break;
+
+			case ZEGR_VES_BLEND_INDEXES:
+				ElementDesc[I].SemanticName = "INDEXES";
+				break;
+
+			case ZEGR_VES_BLEND_WEIGHTS:
+				ElementDesc[I].SemanticName = "WEIGHTS";
+				break;
+
+			case ZEGR_VES_CUSTOM:
+				ElementDesc[I].SemanticName = "CUSTOM";
+				break;
+		}
+
 		ElementDesc[I].SemanticIndex = Elements[I].Index;
 		ElementDesc[I].Format = Convert(Elements[I].Type);
 		ElementDesc[I].InputSlot = Elements[I].Stream;
@@ -541,15 +585,15 @@ ID3D11InputLayout* ZED11StatePool::CreateState(ZEGRVertexLayout* VertexLayout, Z
 	return NativeState;
 }
 
-ZEStatePoolEntry* ZED11StatePool::FindPoolEntry(ZEList<ZEStatePoolEntry>& Pool, ZESize Hash)
+ZED11StateBase* ZED11StatePool::FindPoolEntry(ZEList<ZED11StateBase>& Pool, const ZEGRState& State)
 {
-	ZEStatePoolEntry* Entry = NULL;
-	ZEListIterator<ZEStatePoolEntry> Iterator = Pool.GetIterator();
+	ZED11StateBase* Entry = NULL;
+	ZEListIterator<ZED11StateBase> Iterator = Pool.GetIterator();
 	
 	Entry = Iterator.GetItem();
 	while (!Iterator.IsEnd())
 	{
-		if (Entry->Hash == Hash)
+		if (Entry->GetStateBase().GetHash() == State.GetHash() && memcmp(Entry->GetStateBase().GetData(), State.GetData(), State.GetDataSize()) == 0)
 			return Entry;
 
 		Entry = Iterator.MoveNext();
@@ -570,127 +614,119 @@ ZED11StatePool::~ZED11StatePool()
 
 void ZED11StatePool::ClearStates()
 {
-	ZESize Count = 0;
 
-	Count = BlendStatePool.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		ZEStatePoolEntry* Entry = BlendStatePool.Dequeue();
-		delete Entry;
-	}
-
-	Count = VertexLayoutPool.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		ZEStatePoolEntry* Entry = VertexLayoutPool.Dequeue();
-		delete Entry;
-	}
-
-	Count = SamplerStatePool.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		ZEStatePoolEntry* Entry = SamplerStatePool.Dequeue();
-		delete Entry;
-	}
-
-	Count = RasterizerStatePool.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		ZEStatePoolEntry* Entry = RasterizerStatePool.Dequeue();
-		delete Entry;
-	}
-
-	Count = DepthStencilStatePool.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		ZEStatePoolEntry* Entry = DepthStencilStatePool.Dequeue();
-		delete Entry;
-	}
 }
 
-ID3D11BlendState* ZED11StatePool::GetState(ZEGRBlendState* BlendState)
+ZED11BlendState* ZED11StatePool::GetState(const ZEGRBlendState& BlendState)
 {
-	zeDebugCheck(BlendState == NULL, "ZEGRBlendState parameter is NULL.");
-
-	ZEStatePoolEntry* Entry = FindPoolEntry(BlendStatePool, BlendState->GetHash());
+	ZED11BlendState* Entry = (ZED11BlendState*)FindPoolEntry(BlendStatePool, BlendState);
 	if (Entry == NULL)
 	{
-		Entry = new ZEStatePoolEntry();
-		Entry->Hash = BlendState->GetHash();
-		Entry->AccessCount = 1;
-		Entry->Pointer = CreateState(BlendState);
+		Entry = new ZED11BlendState();
+		Entry->State = BlendState;
+		Entry->Interface = CreateState(BlendState);
+		BlendStatePool.Append(Entry);
+	}
+
+	return Entry;
+}
+
+ZED11SamplerState* ZED11StatePool::GetState(const ZEGRSamplerState& SamplerState)
+{
+	ZED11SamplerState* Entry = (ZED11SamplerState*)FindPoolEntry(SamplerStatePool, SamplerState);
+	if (Entry == NULL)
+	{
+		Entry = new ZED11SamplerState();
+		Entry->State = SamplerState;
+		Entry->Interface = CreateState(SamplerState);
 		SamplerStatePool.Append(Entry);
 	}
 
-	return (ID3D11BlendState*)Entry->Pointer;
+	return Entry;
 }
 
-ID3D11SamplerState* ZED11StatePool::GetState(ZEGRSamplerState* SamplerState)
+ZED11RasterizerState* ZED11StatePool::GetState(const ZEGRRasterizerState& RasterizerState)
 {
-	zeDebugCheck(SamplerState == NULL, "ZEGRSamplerState parameter is NULL.");
-
-	ZEStatePoolEntry* Entry = FindPoolEntry(SamplerStatePool, SamplerState->GetHash());
+	ZED11RasterizerState* Entry = (ZED11RasterizerState*)FindPoolEntry(RasterizerStatePool, RasterizerState);
 	if (Entry == NULL)
 	{
-		Entry = new ZEStatePoolEntry();
-		Entry->Hash = SamplerState->GetHash();
-		Entry->AccessCount = 1;
-		Entry->Pointer = CreateState(SamplerState);
-		SamplerStatePool.Append(Entry);
+		Entry = new ZED11RasterizerState();
+		Entry->State = RasterizerState;
+		Entry->Interface = CreateState(RasterizerState);
+		RasterizerStatePool.Append(Entry);
 	}
 
-	return (ID3D11SamplerState*)Entry->Pointer;
+	return Entry;
 }
 
-ID3D11RasterizerState* ZED11StatePool::GetState(ZEGRRasterizerState* RasterizerState)
+ZED11DepthStencilState* ZED11StatePool::GetState(const ZEGRDepthStencilState& DepthStencilState)
 {
-	zeDebugCheck(RasterizerState == NULL, "RasterizerState parameter is NULL.");
-
-	ZEStatePoolEntry* Entry = FindPoolEntry(RasterizerStatePool, RasterizerState->GetHash());
+	ZED11DepthStencilState* Entry = (ZED11DepthStencilState*)FindPoolEntry(DepthStencilStatePool, DepthStencilState);
 	if (Entry == NULL)
 	{
-		Entry = new ZEStatePoolEntry();
-		Entry->Hash = RasterizerState->GetHash();
-		Entry->AccessCount = 1;
-		Entry->Pointer = CreateState(RasterizerState);
+		Entry = new ZED11DepthStencilState();
+		Entry->State = DepthStencilState;
+		Entry->Interface = CreateState(DepthStencilState);
 		DepthStencilStatePool.Append(Entry);
 	}
 
-	return (ID3D11RasterizerState*)Entry->Pointer;
+	return Entry;
 }
 
-ID3D11DepthStencilState* ZED11StatePool::GetState(ZEGRDepthStencilState* DepthStencilState)
+ZED11VertexLayout* ZED11StatePool::GetState(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader)
 {
-	zeDebugCheck(DepthStencilState == NULL, "DepthStencilState parameter is NULL.");
-
-	ZEStatePoolEntry* Entry = FindPoolEntry(DepthStencilStatePool, DepthStencilState->GetHash());
-	if (Entry == NULL)
-	{
-		Entry = new ZEStatePoolEntry();
-		Entry->Hash = DepthStencilState->GetHash();
-		Entry->AccessCount = 1;
-		Entry->Pointer = CreateState(DepthStencilState);
-		DepthStencilStatePool.Append(Entry);
-	}
-
-	return (ID3D11DepthStencilState*)Entry->Pointer;
-}
-
-ID3D11InputLayout* ZED11StatePool::GetState(ZEGRVertexLayout* VertexLayout, ZEGRShader* VertexShader)
-{
-	zeDebugCheck(VertexLayout == NULL, "VertexLayout parameter is NULL.");
 	zeDebugCheck(VertexShader == NULL, "VertexShader parameter is NULL.");
 	zeDebugCheck(VertexShader->GetShaderType() != ZEGR_ST_VERTEX, "Wrong shader type.");
 
-	ZEStatePoolEntry* Entry = FindPoolEntry(VertexLayoutPool, VertexLayout->GetHash());
+	ZED11VertexLayout* Entry = (ZED11VertexLayout*)FindPoolEntry(VertexLayoutPool, VertexLayout);
 	if (Entry == NULL)
 	{
-		Entry = new ZEStatePoolEntry();
-		Entry->Hash = VertexLayout->GetHash();
-		Entry->AccessCount = 1;
-		Entry->Pointer = CreateState(VertexLayout, VertexShader);
-		DepthStencilStatePool.Append(Entry);
+		Entry = new ZED11VertexLayout();
+		Entry->State = VertexLayout;
+		Entry->Interface = CreateState(VertexLayout, VertexShader);
+		VertexLayoutPool.Append(Entry);
 	}
 
-	return (ID3D11InputLayout*)Entry->Pointer;
+	return Entry;
+}
+
+ZEGRRenderStateData* ZED11StatePool::CompileRenderState(const ZEGRRenderState& RenderState)
+{
+	ZED11RenderStateData* StateData = new ZED11RenderStateData();
+
+	StateData->VertexLayout = GetState(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
+	for (ZESize I = 0; I < ZEGR_MAX_VERTEX_BUFFER_SLOT; I++)
+		StateData->VertexBuffers[I] = RenderState.GetVertexBuffer((ZEUInt)I);
+
+	StateData->IndexBuffer = RenderState.GetIndexBuffer();
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+	{
+		StateData->Shaders[I] = RenderState.GetShader((ZEGRShaderType)I);
+		for (ZESize N = 0; N < ZEGR_MAX_CONSTANT_BUFFER_SLOT; I++)
+			StateData->ShaderConstantBuffers[I][N] = RenderState.GetConstantBuffer((ZEGRShaderType)I, (ZEUInt)N);
+
+		for (ZESize N = 0; N < ZEGR_MAX_CONSTANT_BUFFER_SLOT; I++)
+			StateData->ShaderTextures[I][N] = RenderState.GetTexture((ZEGRShaderType)I, (ZEUInt)N);
+
+		for (ZESize N = 0; N < ZEGR_MAX_CONSTANT_BUFFER_SLOT; I++)
+			StateData->ShaderSamplers[I][N] = GetState(RenderState.GetSampler((ZEGRShaderType)I, (ZEUInt)N));
+	}
+
+	StateData->DepthStencilBuffer = RenderState.GetDepthStencilBuffer();
+	StateData->RasterizerState = GetState(RenderState.GetRasterizerState());
+	StateData->DepthStencilState = GetState(RenderState.GetDepthStencilState());
+
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		StateData->BlendState[I];
+
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		StateData->RenderTargets[I];
+
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		StateData->ViewPorts[I];
+
+	for (ZESize I = 0; I < ZEGR_MAX_CONSTANT_BUFFER_SLOT; I++)
+		StateData->ScissorRects[I];
+
+	return StateData;
 }

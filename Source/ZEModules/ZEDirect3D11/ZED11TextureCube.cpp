@@ -52,9 +52,9 @@ ID3D11ShaderResourceView* ZED11TextureCube::GetResourceView()
 
 ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level)
 {
-	zeDebugCheck(Texture != NULL, "Texture already created.");
-	zeDebugCheck(!GetIsRenderTarget(), "Texture not created with render target flag");
-	zeDebugCheck(Level >= GetLevelCount(), "Texture dont have specified Mipmap level");
+	zeDebugCheck(Texture == NULL, "Empty texture.");
+	zeCheckError(!GetIsRenderTarget(), NULL, "Texture not created with render target flag");
+	zeCheckError(Level >= GetLevelCount(), NULL, "Texture dont have specified Mipmap level");
 
 	// Create render target view
 	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
@@ -85,11 +85,7 @@ ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZE
 bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Texture != NULL, "Texture already created.");
-	zeDebugCheck(Length == 0, "EdgeLength cannot be zero");
-	zeDebugCheck(LevelCount == 0, "LevelCount cannot be zero");
-	zeDebugCheck(Length > 8192, "Length exceeds the limits.");
-	zeDebugCheck(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, "Unknwon pixel format.");
-	zeDebugCheck(RenderTarget && LevelCount != 1, "Render target's LevelCount must be one.");
+	zeCheckError(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknwon pixel format.");
 
 	D3D11_USAGE Usage;
 	Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
@@ -150,9 +146,9 @@ void ZED11TextureCube::Deinitialize()
 bool ZED11TextureCube::Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level)
 {
 	zeDebugCheck(Texture == NULL, "Texture is not initailized.");
-	zeDebugCheck(Buffer == NULL || Pitch == NULL, "Wrong arguments.");
-	zeDebugCheck(Level >= GetLevelCount(), "There is no such a texture level.");
-	zeDebugCheck(Face >= 6, "There is no such a cube texture face.");
+	zeCheckError(Buffer == NULL || Pitch == NULL, false, "Buffer is NULL.");
+	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
+	zeCheckError(Face >= 6, false, "There is no such a cube texture face.");
 
 	D3D11_MAPPED_SUBRESOURCE MapData;
 	HRESULT Result = GetMainContext()->Map(Texture, Face * GetLevelCount() + Level, D3D11_MAP_WRITE, D3D11_MAP_FLAG_DO_NOT_WAIT, &MapData);
@@ -171,8 +167,8 @@ bool ZED11TextureCube::Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Fa
 void ZED11TextureCube::Unlock(ZEGRTextureCubeFace Face, ZEUInt Level)
 {
 	zeDebugCheck(Texture == NULL, "Texture is not initailized.");
-	zeDebugCheck(Level >= GetLevelCount(), "There is no such a texture level.");
-	zeDebugCheck(Face >= 6, "There is no such a cube texture face.");
+	zeCheckError(Level >= GetLevelCount(), ZE_VOID, "There is no such a texture level.");
+	zeCheckError(Face >= 6, ZE_VOID, "There is no such a cube texture face.");
 
 	GetMainContext()->Unmap(Texture, Face * GetLevelCount() + Level);
 }

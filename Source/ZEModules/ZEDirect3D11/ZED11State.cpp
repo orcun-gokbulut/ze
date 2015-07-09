@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.cpp
+ Zinek Engine - ZED11State.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageGBuffer.h"
+#include "ZED11StatePool.h"
 
-ZEGRTexture2D* ZERNStageGBuffer::GetPositionBuffer()
+void ZED11StateBase::AddRef()
 {
-	return GBuffer0;
+	ReferenceCount++;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetNormalBuffer()
+void ZED11StateBase::Release()
 {
-	return GBuffer1;
+	if (ReferenceCount == 0)
+		delete this;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetDiffuseBuffer()
+ZESize ZED11StateBase::GetReferenceCount()
 {
-	return GBuffer2;
+	return ReferenceCount;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetSpecularBuffer()
+ZED11StateBase::ZED11StateBase()
 {
-	return GBuffer3;
+	ReferenceCount = 0;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationBuffer()
-{
-	return AccumulationBuffer;
-}
-
-ZEGRRenderState* ZERNStageGBuffer::GetRenderState()
-{
-	return RenderState;
-}
-
-void ZERNStageGBuffer::Setup(ZEGRContext* Device)
-{
-
-}
-
-void ZERNStageGBuffer::CleanUp()
-{
-
-}
-
-void ZERNStageGBuffer::Reconfigure()
+ZED11StateBase::~ZED11StateBase()
 {
 
 }

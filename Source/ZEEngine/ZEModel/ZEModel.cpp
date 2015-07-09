@@ -36,7 +36,7 @@
 #include "ZEModel.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEScene.h"

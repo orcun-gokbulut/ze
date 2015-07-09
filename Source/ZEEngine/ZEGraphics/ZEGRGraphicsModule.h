@@ -51,7 +51,7 @@ class ZEGRTextureCube;
 class ZEGRIndexBuffer;
 class ZEGRVertexBuffer;
 class ZEGRVertexLayout;
-class ZEGRDevice;
+class ZEGRContext;
 class ZEGRWindow;
 class ZEGRShader;
 class ZEGRShaderCompiler;
@@ -61,7 +61,7 @@ class ZEGRTracer;
 class ZEGRGraphicsModule : public ZEModule
 {
 	ZE_MODULE(ZEGRGraphicsModule)
-	friend class ZEGRDevice;
+	friend class ZEGRContext;
 	protected:
 		ZEGRCounter								Counter;
 
@@ -81,13 +81,13 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZETextureOptions*				GetTextureOptions();
 		// -------------------------------------------
 
-		ZEGRDevice*								GetDevice();
 		ZEGRCounter&							GetCounter();
 		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters() = 0;
 		virtual ZEGRTracer*						GetTracer() = 0;
 
-		virtual ZEGRDevice*						CreateContext() = 0;
-		virtual ZEGRRenderState*				CreateDeviceState() = 0;
+		virtual ZEGRContext*					GetMainContext() = 0;
+
+		virtual ZEGRContext*					CreateContext() = 0;
 		virtual ZEGRVertexBuffer*				CreateVertexBuffer() = 0;
 		virtual ZEGRIndexBuffer*				CreateIndexBuffer() = 0;
 		virtual ZEGRShader*						CreateShader() = 0;
@@ -98,6 +98,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer() = 0;
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler() = 0;
 		virtual ZEGRWindow*						CreateGraphicsWindow() = 0;
+		virtual ZEGRRenderStateData*			CreateRenderStateData(const ZEGRRenderState& RenderState) = 0;
 
 		static ZEGRGraphicsModule*				GetInstance();
 };

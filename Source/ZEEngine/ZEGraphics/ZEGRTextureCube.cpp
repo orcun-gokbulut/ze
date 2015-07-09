@@ -41,10 +41,6 @@
 
 bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
-	zeDebugCheck(Length == 0, "Width cannot be 0.");
-	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
-	zeDebugCheck(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), "Level must be 1 for non-power of two textures.");
-
 	this->Length = Length;
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
@@ -93,7 +89,11 @@ ZEGRTextureCube::~ZEGRTextureCube()
 }
 
 ZEGRTextureCube* ZEGRTextureCube::Create(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
-{
+{	
+	zeCheckError(Length == 0, NULL, "Width cannot be 0.");
+	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
+	zeCheckError(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), NULL, "Level must be 1 for non-power of two textures.");
+
 	ZEGRTextureCube* Texture = ZEGRGraphicsModule::GetInstance()->CreateTextureCube();
 	if (Texture == NULL)
 		return NULL;

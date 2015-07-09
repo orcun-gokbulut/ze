@@ -75,6 +75,9 @@ class ZEGRSamplerState : public ZEGRState
 		} StateData;
 
 	public:
+		virtual const void*			GetData() const;
+		virtual ZESize				GetDataSize() const;
+
 		void						SetMinFilter(ZEGRTextureFilter FilterMode);
 		ZEGRTextureFilter			GetMinFilter() const;
 		
@@ -110,6 +113,9 @@ class ZEGRSamplerState : public ZEGRState
 
 		void						SetToDefault();
 
+		ZEGRSamplerState&			operator=(const ZEGRSamplerState& State);
+
 									ZEGRSamplerState();
+									ZEGRSamplerState(const ZEGRSamplerState& State);
 		virtual						~ZEGRSamplerState();
 };

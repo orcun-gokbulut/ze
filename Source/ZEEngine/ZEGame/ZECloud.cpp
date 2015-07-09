@@ -235,7 +235,7 @@ bool ZECloud::InitializeSelf()
 		CloudMaterial->SunLightDirection		= SunLightDirection;
 
 		if (CloudFormationTexture != NULL)
-			CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture();
+			CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture2D();
 	}
 
 
@@ -294,7 +294,7 @@ void ZECloud::Draw(ZEDrawParameters* DrawParameters)
 	CloudMaterial->SunLightDirection		= SunLightDirection;
 
 	if (CloudFormationTexture != NULL)
-		CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture();
+		CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture2D();
 
 	CloudRenderCommand.Order				= 1.3f;
 	CloudRenderCommand.Priority				= 1;

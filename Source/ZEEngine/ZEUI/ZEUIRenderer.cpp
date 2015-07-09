@@ -76,7 +76,7 @@ void ZEUIRenderer::Initialize()
 // 		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
 // 	}
 
-	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)zeGraphics->GetScreenWidth(), 0.0f, (float)zeGraphics->GetScreenHeight(), 0.0f, 1.0f);
+	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)ZEGRGraphicsModule::GetInstance()->GetScreenWidth(), 0.0f, (float)ZEGRGraphicsModule::GetInstance()->GetScreenHeight(), 0.0f, 1.0f);
 	
 }
 

@@ -38,7 +38,7 @@
 
 #include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer\ZECamera.h"
-#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZERNSimpleMaterial.h"
 #include "ZERenderer\ZETerrainMaterial.h"
 #include "ZEError.h"
 

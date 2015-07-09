@@ -80,10 +80,6 @@ bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthSt
 	this->Height = Height;
 	this->Width = Width;
 	
-	#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Depth stencil buffer created. Width: %u, Height: %u, PixelFormat: %u.", 	Width, Height, Format);
-	#endif
-
 	SetSize(Width * Height * GetPixelSize(Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
 

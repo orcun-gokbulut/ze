@@ -150,7 +150,7 @@ bool ZEMaterialResource::LoadFixedMaterial(ZEMaterialResource* MaterialResource,
 ZEMaterialResource* ZEMaterialResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
 	if(UserOptions == NULL)
-		UserOptions = zeGraphics->GetTextureOptions();
+		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	ZEMaterialFileHeaderChunk HeaderChunk;
 
@@ -197,7 +197,7 @@ ZEMaterialResource* ZEMaterialResource::LoadResource(const ZEString& FileName, c
 	if (Result)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		MaterialResource = LoadResource(&File, UserOptions);
 		File.Close();
@@ -217,7 +217,7 @@ const ZEMaterialResource* ZEMaterialResource::LoadSharedResource(const ZEString&
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)

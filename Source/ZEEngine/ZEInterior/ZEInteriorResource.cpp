@@ -70,7 +70,7 @@ const ZEGRTexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZE
 
 	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		if (TextureResources[I]->GetFileName() == FileName)
-			return TextureResources[I]->GetTexture();
+			return TextureResources[I]->GetTexture2D();
 
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo(this->GetFileName()).GetParentDirectory() + "\\" + FileName);
 	if (NewTextureResource == NULL)
@@ -79,7 +79,7 @@ const ZEGRTexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZE
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);
-	return NewTextureResource->GetTexture();
+	return NewTextureResource->GetTexture2D();
 }
 
 bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)

@@ -79,13 +79,6 @@ ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level)
 
 bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
 {
-	zeDebugCheck(Width == 0, "Width cannot be zero");
-	zeDebugCheck(Height == 0, "Height cannot be zero");
-	zeDebugCheck(Level == 0, "LevelCount cannot be zero");
-	zeDebugCheck(Format == ZEGR_TF_NONE, "PixelFormat must be valid");
-	zeDebugCheck(RenderTarget && Level != 1, "Render target's LevelCount must be one ");
-	zeDebugCheck(Width > 8192 || Height > 8192, "Texture2D dimensions exceeds the limits.");
-	
 	D3D11_USAGE Usage;
 	Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
 
@@ -140,8 +133,8 @@ void ZED11Texture2D::Deinitialize()
 bool ZED11Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
 {
 	zeDebugCheck(Texture2D == NULL, "Texture is not initailized.");
-	zeDebugCheck(Buffer == NULL || Pitch == NULL, "Wrong arguments.");
-	zeDebugCheck(Level >= GetLevelCount(), "There is no such a texture level.");
+	zeCheckError(Buffer == NULL || Pitch == NULL, false, "Buffer is NULL.");
+	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
 
 	D3D11_MAPPED_SUBRESOURCE MapData;
 	HRESULT Result = GetMainContext()->Map(Texture2D, Level, D3D11_MAP_WRITE, D3D11_MAP_FLAG_DO_NOT_WAIT, &MapData);
@@ -160,7 +153,7 @@ bool ZED11Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
 void ZED11Texture2D::Unlock(ZEUInt Level)
 {
 	zeDebugCheck(Texture2D == NULL, "Texture is not initailized.");
-	zeDebugCheck(Level >= GetLevelCount(), "There is no such a texture level.");
+	zeCheckError(Level >= GetLevelCount(), ZE_VOID, "There is no such a texture level.");
 
 	GetMainContext()->Unmap(Texture2D, Level);
 }

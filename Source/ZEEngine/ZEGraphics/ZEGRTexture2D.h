@@ -42,7 +42,7 @@
 class ZEGRRenderTarget;
 class ZEGRTexture2D : public ZEGRTexture
 {
-	friend class ZEGRDevice;
+	friend class ZEGRContext;
 	friend class ZEGRGraphicsModule;
 
 	protected:

@@ -34,15 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRState.h"
+#include "ZEGRRenderState.h"
+#include "ZEDS/ZEHashGenerator.h"
 
 void ZEGRState::MarkDirty()
 {
-
+	/*if (RenderState != NULL)
+		RenderState->MarkDirty();*/
 }
 
 ZEGRState::ZEGRState()
 {
 	Dirty = true;
+	RenderState = NULL;
 }
 
 ZEGRState::~ZEGRState()
@@ -50,7 +54,16 @@ ZEGRState::~ZEGRState()
 
 }
 
-bool ZEGRState::IsDirty()
+ZEUInt32 ZEGRState::GetHash() const
+{
+	if (Dirty)
+		Hash = ZEHashGenerator::Hash(GetData(), GetDataSize());
+
+	return Hash;
+}
+
+
+bool ZEGRState::IsDirty() const
 {
 	return Dirty;
 }
@@ -58,4 +71,9 @@ bool ZEGRState::IsDirty()
 void ZEGRState::Update()
 {
 	Dirty = false;
+}
+
+bool ZEGRState::Equals(const ZEGRState& State)
+{
+	return memcmp(GetData(), State.GetData(), GetDataSize()) == 0;
 }
