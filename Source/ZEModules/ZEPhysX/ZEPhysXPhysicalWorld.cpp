@@ -39,7 +39,7 @@
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEError.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include <NxDebugRenderable.h>
 #include <NxRay.h>
 
@@ -137,7 +137,7 @@ void ZEPhysXPhysicalWorld::InitializeDebugDraw()
 
 	const NxDebugRenderable* DebugRenderable = Scene->getDebugRenderable();
 
-	DebugDraw.Material = ZESimpleMaterial::CreateInstance();
+	DebugDraw.Material = ZERNSimpleMaterial::CreateInstance();
 
 	DebugDraw.PointsRenderCommand.SetZero();
 	DebugDraw.PointsRenderCommand.Material = DebugDraw.Material;

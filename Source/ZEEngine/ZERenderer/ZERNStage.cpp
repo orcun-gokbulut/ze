@@ -36,7 +36,7 @@
 #include "ZERNStage.h"
 
 #include "ZERNCommand.h"
-#include "ZEGraphics\ZEGRDevice.h"
+#include "ZEGraphics\ZEGRContext.h"
 
 ZEGRRenderState* ZERNStage::GetRenderState()
 {
@@ -48,7 +48,7 @@ void ZERNStage::Reconfigure()
 
 }
 
-void ZERNStage::Setup(ZEGRDevice* Device)
+void ZERNStage::Setup(ZEGRContext* Device)
 {
 	this->Device = Device;
 }

@@ -56,7 +56,7 @@ inline ZESize SizeOfIndex(ZEGRIndexBufferFormat Format)
 
 bool ZEGRIndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
 {
-	zeDebugCheck(SizeOfIndex(Format), "Invalid Index buffer format.");
+	zeCheckError(SizeOfIndex(Format), false, "Invalid Index buffer format.");
 
 	this->IndexCount = IndexCount;
 	this->Format = Format;

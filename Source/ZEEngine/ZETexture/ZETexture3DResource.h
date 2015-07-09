@@ -57,7 +57,8 @@ class ZETexture3DResource : public ZETextureResource
 		const char*							GetResourceType() const;
 		virtual ZEGRTextureType				GetTextureType() const;
 
-		const ZEGRTexture3D*					GetTexture() const;
+		virtual ZEGRTexture*				GetTexture() const;
+		ZEGRTexture3D*						GetTexture3D() const;
 
 		static void							CacheResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);

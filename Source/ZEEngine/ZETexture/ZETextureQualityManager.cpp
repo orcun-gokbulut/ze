@@ -695,7 +695,7 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 		return false;
 	}
 
-	ZETextureOptions *DefaultOptions = zeGraphics->GetTextureOptions();
+	ZETextureOptions *DefaultOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	// Eliminate the auto options
 	FinalOptions->CompressionType		= (UserOptions->CompressionType == ZE_TCT_AUTO)		? DefaultOptions->CompressionType		: UserOptions->CompressionType;

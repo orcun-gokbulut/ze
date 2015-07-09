@@ -76,7 +76,7 @@ enum ZEGRVertexElementSemantic
 	ZEGR_VES_TANGENT			= 4,
 	ZEGR_VES_TEXCOORD			= 5,
 	ZEGR_VES_COLOR				= 6,
-	ZEGR_VES_BLEND_INDEXSES		= 7,
+	ZEGR_VES_BLEND_INDEXES		= 7,
 	ZEGR_VES_BLEND_WEIGHTS		= 8,
 	ZEGR_VES_CUSTOM				= 9
 };
@@ -103,7 +103,10 @@ class ZEGRVertexLayout : public ZEGRState
 		} StateData;
 
 	public:
-		void						SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount);
+		virtual const void*			GetData() const;
+		virtual ZESize				GetDataSize() const;
+
+		bool						SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount);
 		
 		ZEUInt						GetElementCount() const;
 		const ZEGRVertexElement*	GetElements() const;

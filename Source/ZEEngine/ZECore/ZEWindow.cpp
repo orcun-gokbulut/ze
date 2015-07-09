@@ -320,8 +320,8 @@ bool ZEWindow::SetComponentWindowHandle(void* Handle)
 	GetWindowRect((HWND)WindowHandle, &Rect);
 	WindowWidth = Rect.right - Rect.left;
 	WindowHeight = Rect.bottom - Rect.top;
-	if (zeGraphics != NULL)
-		zeGraphics->SetScreenSize(WindowWidth, WindowHeight);
+	if (ZEGRGraphicsModule::GetInstance() != NULL)
+		ZEGRGraphicsModule::GetInstance()->SetScreenSize(WindowWidth, WindowHeight);
 
 	WindowType = ZE_WT_COMPONENT;
 	return true;
@@ -340,8 +340,8 @@ void ZEWindow::WindowResized(ZEInt Width, ZEInt Height)
 		Difference.y = (WindowRectangle.bottom - WindowRectangle.top) - ClientRectangle.bottom;
 	}*/
 
-	if (zeGraphics != NULL)
-		zeGraphics->SetScreenSize(Width, Height);
+	if (ZEGRGraphicsModule::GetInstance() != NULL)
+		ZEGRGraphicsModule::GetInstance()->SetScreenSize(Width, Height);
 
 	WindowWidth = Width;
 	WindowHeight = Height;

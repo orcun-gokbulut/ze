@@ -49,7 +49,7 @@ class ZETextureResource;
 class ZEMaterialResource : public ZEResource
 {
 	private:
-		ZERNMaterial*								Material;
+		ZERNMaterial*							Material;
 		ZEArray<ZETextureResource*>				TextureResources;
 
 		static bool								LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions);

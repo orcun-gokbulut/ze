@@ -80,7 +80,17 @@ bool ZERNMaterial::GetLightningEnabled() const
 	return LightningEnabled;
 }
 
-ZEGRRenderState* ZERNMaterial::GetRenderState(ZERNStage* State)
+bool ZERNMaterial::SetupRenderState(ZEGRRenderState& Output, const char* StageName)
+{
+	return false;
+}
+
+bool ZERNMaterial::SetupCommand(ZERNCommand* Command)
+{
+
+}
+
+void ZERNMaterial::CleanUpCommand()
 {
 
 }

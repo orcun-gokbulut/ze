@@ -269,6 +269,13 @@ enum ZEErrorType
 		while(false)
 #endif
 
+#define ZE_VOID
+#define zeCheck(Condition, ReturnValue)	if (Condition) {return ReturnValue;}
+#define zeCheckError(Condition, ReturnValue, ...) if (Condition) {zeError(__VA_ARGS__); return ReturnValue;}
+#define zeCheckWarning(Condition, ReturnValue, ...) if (Condition) {zeWarning(__VA_ARGS__); return ReturnValue;}
+#define zeCheckDebugError(Condition, ReturnValue, ...) if (Condition) {zeDebugCheck(Condition, __VA_ARGS__); return ReturnValue;}
+#define zeCheckCriticalError(Condition, ReturnValue, ...) if (Condition) {zeCriticalError(__VA_ARGS__); return ReturnValue;}
+
 typedef void (*ZEErrorCallback)(ZEErrorType Type);
 
 class ZEError

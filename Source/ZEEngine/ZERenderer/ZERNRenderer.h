@@ -62,7 +62,7 @@ enum ZERendererType
 	ZE_RT_SHADOW
 };
 
-class ZEGRDevice;
+class ZEGRContext;
 class ZEGRViewPort;
 class ZERNStage;
 class ZELight;
@@ -73,7 +73,7 @@ struct ZEDrawParameters;
 class ZERNRenderer : public ZEInitializable
 {
 	private:
-		ZEGRDevice*						Device;
+		ZEGRContext*						Device;
 		
 		ZESmartArray<ZERNCommand*>	Commands;
 		ZEArray<ZERNStage*>				Stages;
@@ -91,8 +91,8 @@ class ZERNRenderer : public ZEInitializable
 		void							AddStage(ZERNStage* Stage);
 		void							RemoveStage(ZERNStage* Stage);
 
-		void							SetDevice(ZEGRDevice* Device);
-		ZEGRDevice*						GetDevice();
+		void							SetDevice(ZEGRContext* Device);
+		ZEGRContext*						GetDevice();
 
 		void							SetDrawParameters(ZEDrawParameters* DrawParameters);
 		ZEDrawParameters*				GetDrawParameters();

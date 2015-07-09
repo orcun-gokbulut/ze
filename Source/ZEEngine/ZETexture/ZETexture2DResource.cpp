@@ -73,12 +73,17 @@ const char* ZETexture2DResource::GetResourceType() const
 	return "Texture Resource";
 }
 
-ZEGRTextureType ZETexture2DResource::GetTextureType() const 
+ZEGRTextureType ZETexture2DResource::GetTextureType() 
 {
 	return ZEGR_TT_2D;
 }
 
-const ZEGRTexture2D* ZETexture2DResource::GetTexture() const
+ZEGRTexture* ZETexture2DResource::GetTexture() const
+{
+	return Texture;
+}
+
+ZEGRTexture2D* ZETexture2DResource::GetTexture2D() const
 {
 	return Texture;
 }
@@ -100,7 +105,7 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& Fil
 	if(NewResource == NULL)
 	{		
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if(NewResource != NULL)
@@ -129,7 +134,7 @@ void ZETexture2DResource::CacheResource(const ZEString& FileName, const ZETextur
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
@@ -150,7 +155,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	if(Result)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		TextureResource = LoadResource(&File, UserOptions);
 		File.Close();
@@ -167,7 +172,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
 	if(UserOptions == NULL)
-		UserOptions = zeGraphics->GetTextureOptions();
+		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	ZETextureData	TextureData;
 	ZETextureData	ProcessedTextureData;

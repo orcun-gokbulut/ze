@@ -56,6 +56,8 @@ enum ZEMaterialOpacityComponent
 	ZE_MOC_OPACITY_MAP			= 2,
 };
 
+class ZERNCommand;
+
 class ZERNMaterial : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
@@ -64,6 +66,7 @@ class ZERNMaterial : public ZEObject, public ZEInitializable
 		bool							ShadowReceiver;
 		bool							LightningEnabled;
 
+	protected:
 										ZERNMaterial();
 		virtual							~ZERNMaterial();
 
@@ -77,7 +80,10 @@ class ZERNMaterial : public ZEObject, public ZEInitializable
 		virtual void					SetLightningEnabled(bool Enabled);
 		bool							GetLightningEnabled() const;
 
-		virtual ZEGRRenderState*		GetRenderState(ZERNStage* State);
+		virtual bool					SetupRenderState(ZEGRRenderState& Output, const char* StageName);
+		virtual bool					SetupCommand(ZERNCommand* Command);
+		virtual void					CleanUpCommand();
 
 		virtual void					UpdateMaterial();
 };
+

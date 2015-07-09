@@ -41,12 +41,12 @@
 
 enum ZEGRStencilOperation 
 { 
-	ZEGR_SO_KEEP			= 1,
-	ZEGR_SO_ZERO			= 2,
-	ZEGR_SO_REPLACE			= 3,
-	ZEGR_SO_INCREASE_SATURATE		= 4,
-	ZEGR_SO_DECREASE_SATURATE		= 5,
-	ZEGR_SO_INVERT			= 6,
+	ZEGR_SO_KEEP				= 1,
+	ZEGR_SO_ZERO				= 2,
+	ZEGR_SO_REPLACE				= 3,
+	ZEGR_SO_INCREASE_SATURATE	= 4,
+	ZEGR_SO_DECREASE_SATURATE	= 5,
+	ZEGR_SO_INVERT				= 6,
 	ZEGR_SO_INCREASE			= 7,
 	ZEGR_SO_DECREASE			= 8 
 };
@@ -86,6 +86,9 @@ class ZEGRDepthStencilState : public ZEGRState
 		} StateData;
 	
 	public:
+		virtual const void*				GetData() const;
+		virtual ZESize					GetDataSize() const;
+
 		void							SetZTestEnable(bool Enable);
 		bool							GetZTestEnable() const;
 	

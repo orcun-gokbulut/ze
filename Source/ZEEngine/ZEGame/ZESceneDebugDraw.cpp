@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESceneDebugDraw.h"
-#include "ZERenderer/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
@@ -92,7 +92,7 @@ bool ZESceneDebugDraw::Initialize()
 		return false;
 
 	if (Material == NULL)
-		Material = ZESimpleMaterial::CreateInstance();
+		Material = ZERNSimpleMaterial::CreateInstance();
 
 	RenderCommand.SetZero();
 	RenderCommand.Material = Material;

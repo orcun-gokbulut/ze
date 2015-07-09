@@ -44,16 +44,20 @@
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZEGRShaderMeta.h"
 
-void ZEGRVertexLayout::SetToDefault()
+const void* ZEGRVertexLayout::GetData() const
 {
-	memset(&StateData, 0, sizeof(ZEVertexLayoutData));
+	return &StateData;
 }
 
-void ZEGRVertexLayout::SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount)
+ZESize ZEGRVertexLayout::GetDataSize() const
 {
-	zeDebugCheck(VertexElements == NULL, "NULL pointer");
-	zeDebugCheck(ElementCount == 0, "Zero element count");
-	zeDebugCheck(ElementCount >= ZEGR_MAX_VERTEX_LAYOUT_ELEMENT, "Too many elements");
+	return sizeof(StateData);
+}
+
+bool ZEGRVertexLayout::SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount)
+{
+	zeCheckError(VertexElements == NULL && ElementCount != 0, false, "VertexElements is NULL but ElementCount is not zero.");
+	zeCheckError(ElementCount >= ZEGR_MAX_VERTEX_LAYOUT_ELEMENT, false, "ElementCount is too much.");
 
 	SetToDefault();
 
@@ -70,6 +74,8 @@ void ZEGRVertexLayout::SetElements(const ZEGRVertexElement* VertexElements, ZEUI
 	}
 
 	MarkDirty();
+
+	return true;
 }
 
 const ZEGRVertexElement* ZEGRVertexLayout::GetElements() const
@@ -150,6 +156,13 @@ ZEGRVertexLayout* ZEGRVertexLayout::Generate(ZEGRShaderMeta* MetaTable)
 	Output.SetElements(FinalLayout.GetConstCArray(), (ZEUInt)ShaderInputCount);
 	return true;*/
 }
+
+
+void ZEGRVertexLayout::SetToDefault()
+{
+	memset(&StateData, 0, sizeof(ZEVertexLayoutData));
+}
+
 
 ZEGRVertexLayout::ZEGRVertexLayout()
 {

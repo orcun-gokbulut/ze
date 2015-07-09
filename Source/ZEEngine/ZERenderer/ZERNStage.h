@@ -36,22 +36,25 @@
 #pragma once
 
 #include "ZEInitializable.h"
+#include "ZEDS\ZEString.h"
 
-class ZEGRDevice;
+class ZEGRContext;
 class ZEGRRenderState;
 class ZERNCommand;
 
 class ZERNStage : public ZEInitializable
 {
 	private:
-		ZEGRDevice*						Device;
+		ZEString						Name;
+		ZEGRContext*						Device;
 
 	public:
+		const ZEString&					GetName();
 		virtual ZEGRRenderState*		GetRenderState();
 
 		virtual void					Reconfigure();
 
-		virtual void					Setup(ZEGRDevice* Device);
+		virtual void					Setup(ZEGRContext* Device);
 		virtual void					Render(ZERNCommand* RenderCommand);
 		virtual void					CleanUp();
 };

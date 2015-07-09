@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.cpp
+ Zinek Engine - ZEGRContext.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageGBuffer.h"
+#pragma once
 
-ZEGRTexture2D* ZERNStageGBuffer::GetPositionBuffer()
+#include "ZEGRBlendState.h"
+#include "ZEGRSamplerState.h"
+#include "ZEGRVertexLayout.h"
+#include "ZEGRGraphicsModule.h"
+#include "ZEGRRasterizerState.h"
+#include "ZEGRDepthStencilState.h"
+#include "ZEGRRenderState.h"
+
+class ZEGRVertexLayout;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
+class ZEGRShader;
+class ZEGRConstantBuffer;
+class ZEGRTexture;
+class ZEGRSamplerState;
+
+class ZEGRContext
 {
-	return GBuffer0;
-}
+	protected:
+								ZEGRContext();
+		virtual					~ZEGRContext();
 
-ZEGRTexture2D* ZERNStageGBuffer::GetNormalBuffer()
-{
-	return GBuffer1;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetDiffuseBuffer()
-{
-	return GBuffer2;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetSpecularBuffer()
-{
-	return GBuffer3;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationBuffer()
-{
-	return AccumulationBuffer;
-}
-
-ZEGRRenderState* ZERNStageGBuffer::GetRenderState()
-{
-	return RenderState;
-}
-
-void ZERNStageGBuffer::Setup(ZEGRContext* Device)
-{
-
-}
-
-void ZERNStageGBuffer::CleanUp()
-{
-
-}
-
-void ZERNStageGBuffer::Reconfigure()
-{
-
-}
+	public:
+		virtual void			Draw(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
+		virtual void			DrawInstanced(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
+		
+		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
+		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
+};

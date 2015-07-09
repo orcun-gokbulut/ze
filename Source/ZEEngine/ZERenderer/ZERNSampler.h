@@ -40,15 +40,20 @@
 
 class ZETextureResource;
 class ZEGRTexture;
+class ZEMLWriterNode;
+class ZEMLReaderNode;
 
-class ZERNSampler : public ZEGRSamplerState
+class ZERNSampler
 {
 	private:
 		ZETextureResource*				Resource;
-		mutable ZEGRHolder<ZEGRTexture>	Texture;
+		ZEGRHolder<ZEGRTexture>			Texture;
 		ZEGRSamplerState				Sampler;
 
 	public:
+		void							SetSamplerState(ZEGRSamplerState Sampler);
+		ZEGRSamplerState				GetSamplerState();
+
 		void							SetTexture(ZEGRTexture* Texture);
 		ZEGRTexture*					GetTexture() const;
 
@@ -60,6 +65,11 @@ class ZERNSampler : public ZEGRSamplerState
 		void							Load2D(const ZEString& FileName);
 		void							Load3D(const ZEString& FileName);
 		void							LoadCube(const ZEString& FileName);
+
+		ZERNSampler&					operator=(const ZERNSampler& Other);
+
+		void							Write(ZEMLWriterNode& Node);
+		void							Read(ZEMLReaderNode& Node);
 
 										ZERNSampler();
 										~ZERNSampler();

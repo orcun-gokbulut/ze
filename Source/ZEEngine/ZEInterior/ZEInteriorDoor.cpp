@@ -37,14 +37,14 @@
 #include "ZEInteriorResource.h"
 #include "ZEInterior.h"
 #include "ZEInteriorRoom.h"
-#include "ZERenderer\ZESimpleMaterial.h"
+#include "ZERenderer\ZERNSimpleMaterial.h"
 #include "ZERenderer\ZERNRenderer.h"
 
 void ZEInteriorDoor::DebugDraw(ZERNRenderer* Renderer)
 {
 	if (DebugDrawComponents.Material == NULL)
 	{
-		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
+		DebugDrawComponents.Material = ZERNSimpleMaterial::CreateInstance();
 
 		DebugDrawComponents.BoxRenderCommand.SetZero();
 		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;

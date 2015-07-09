@@ -36,16 +36,25 @@
 #include "ZEGRSamplerState.h"
 
 #include "ZEMath\ZEMath.h"
-
 #include <memory.h>
+
+const void* ZEGRSamplerState::GetData() const
+{
+	return &StateData;
+}
+
+ZESize ZEGRSamplerState::GetDataSize() const
+{
+	return sizeof(StateData);
+}
 
 void ZEGRSamplerState::SetMinFilter(ZEGRTextureFilter FilterMode)
 {
-	if (StateData.MinFilter != FilterMode)
-	{
-		StateData.MinFilter = FilterMode;
-		MarkDirty();
-	}
+	if (StateData.MinFilter == FilterMode)
+		return;
+
+	StateData.MinFilter = FilterMode;
+	MarkDirty();
 }
 
 ZEGRTextureFilter ZEGRSamplerState::GetMinFilter() const
@@ -55,11 +64,11 @@ ZEGRTextureFilter ZEGRSamplerState::GetMinFilter() const
 
 void ZEGRSamplerState::SetMagFilter(ZEGRTextureFilter FilterMode)
 {
-	if (StateData.MagFilter != FilterMode)
-	{
-		StateData.MagFilter = FilterMode;
-		MarkDirty();
-	}
+	if (StateData.MagFilter == FilterMode)
+		return;
+
+	StateData.MagFilter = FilterMode;
+	MarkDirty();
 }
 
 ZEGRTextureFilter	ZEGRSamplerState::GetMagFilter() const
@@ -69,11 +78,11 @@ ZEGRTextureFilter	ZEGRSamplerState::GetMagFilter() const
 
 void ZEGRSamplerState::SetMipFilter(ZEGRTextureFilter FilterMode)
 {
-	if (StateData.MipFilter != FilterMode)
-	{
-		StateData.MipFilter = FilterMode;
-		MarkDirty();
-	}
+	if (StateData.MipFilter == FilterMode)
+		return;
+
+	StateData.MipFilter = FilterMode;
+	MarkDirty();
 }
 
 ZEGRTextureFilter ZEGRSamplerState::GetMipFilter() const
@@ -83,11 +92,11 @@ ZEGRTextureFilter ZEGRSamplerState::GetMipFilter() const
 
 void ZEGRSamplerState::SetAddressU(ZEGRTextureAddressing AdressMode)
 {
-	if (StateData.AddressU != AdressMode)
-	{
-		StateData.AddressU = AdressMode;
-		MarkDirty();
-	}
+	if (StateData.AddressU == AdressMode)
+		return;
+
+	StateData.AddressU = AdressMode;
+	MarkDirty();
 }
 
 ZEGRTextureAddressing ZEGRSamplerState::GetAddressU() const
@@ -97,11 +106,11 @@ ZEGRTextureAddressing ZEGRSamplerState::GetAddressU() const
 
 void ZEGRSamplerState::SetAddressV(ZEGRTextureAddressing AdressMode)
 {
-	if (StateData.AddressV != AdressMode)
-	{
-		StateData.AddressV = AdressMode;
-		MarkDirty();
-	}
+	if (StateData.AddressV == AdressMode)
+		return;
+
+	StateData.AddressV = AdressMode;
+	MarkDirty();
 }
 
 ZEGRTextureAddressing ZEGRSamplerState::GetAddressV() const
@@ -111,11 +120,11 @@ ZEGRTextureAddressing ZEGRSamplerState::GetAddressV() const
 
 void ZEGRSamplerState::SetAddressW(ZEGRTextureAddressing AdressMode)
 {
-	if (StateData.AddressW != AdressMode)
-	{
-		StateData.AddressW = AdressMode;
-		MarkDirty();
-	}
+	if (StateData.AddressW == AdressMode)
+		return;
+
+	StateData.AddressW = AdressMode;
+	MarkDirty();
 }
 
 ZEGRTextureAddressing ZEGRSamplerState::GetAddressW() const
@@ -125,11 +134,11 @@ ZEGRTextureAddressing ZEGRSamplerState::GetAddressW() const
 
 void ZEGRSamplerState::SetMipLODBias(float LODBias)
 {
-	if (ZEMath::Abs(StateData.MipLODBias - LODBias) > ZE_ZERO_THRESHOLD)
-	{
-		StateData.MipLODBias = LODBias;
-		MarkDirty();
-	}
+	if (ZEMath::Abs(StateData.MipLODBias - LODBias) <= ZE_ZERO_THRESHOLD)
+		return;
+
+	StateData.MipLODBias = LODBias;
+	MarkDirty();
 }
 
 float ZEGRSamplerState::GetMipLODBias() const
@@ -139,11 +148,11 @@ float ZEGRSamplerState::GetMipLODBias() const
 
 void ZEGRSamplerState::SetMaxAnisotrophy(unsigned int AnisotrophyLevel)
 {
-	if (StateData.MaxAnisotropy != AnisotrophyLevel)
-	{
-		StateData.MaxAnisotropy = AnisotrophyLevel;
-		MarkDirty();
-	}
+	if (StateData.MaxAnisotropy == AnisotrophyLevel)
+		return;
+
+	StateData.MaxAnisotropy = AnisotrophyLevel;
+	MarkDirty();
 }
 
 unsigned int ZEGRSamplerState::GetMaxAnisotrophy() const
@@ -154,10 +163,10 @@ unsigned int ZEGRSamplerState::GetMaxAnisotrophy() const
 void ZEGRSamplerState::SetBorderColor(const ZEVector4 &Color)
 {
 	if (StateData.BorderColor != Color)
-	{
-		StateData.BorderColor = Color;
-		MarkDirty();
-	}
+		return;
+
+	StateData.BorderColor = Color;
+	MarkDirty();
 }
 
 ZEVector4 ZEGRSamplerState::GetBorderColor() const
@@ -167,11 +176,11 @@ ZEVector4 ZEGRSamplerState::GetBorderColor() const
 
 void ZEGRSamplerState::SetMinLOD(float LOD)
 {
-	if (ZEMath::Abs(StateData.MinLOD - LOD) > ZE_ZERO_THRESHOLD)
-	{
-		StateData.MinLOD = LOD;
-		MarkDirty();
-	}
+	if (ZEMath::Abs(StateData.MinLOD - LOD) <= ZE_ZERO_THRESHOLD)
+		return;
+
+	StateData.MinLOD = LOD;
+	MarkDirty();
 }
 
 float ZEGRSamplerState::GetMinLOD() const
@@ -181,11 +190,11 @@ float ZEGRSamplerState::GetMinLOD() const
 
 void ZEGRSamplerState::SetMaxLOD(float LOD)
 {
-	if (ZEMath::Abs(StateData.MaxLOD - LOD) > ZE_ZERO_THRESHOLD)
-	{
-		StateData.MaxLOD = LOD;
-		MarkDirty();
-	}
+	if (ZEMath::Abs(StateData.MaxLOD - LOD) >= ZE_ZERO_THRESHOLD)
+	return;
+
+	StateData.MaxLOD = LOD;
+	MarkDirty();
 }
 
 float ZEGRSamplerState::GetMaxLOD() const
@@ -207,6 +216,28 @@ void ZEGRSamplerState::SetToDefault()
 	StateData.MaxAnisotropy = 8;
 	StateData.MipLODBias = 0.0f;
 	StateData.BorderColor = ZEVector4::Zero;
+}
+
+ZEGRSamplerState& ZEGRSamplerState::operator=(const ZEGRSamplerState& Source)
+{
+	SetMinFilter(Source.GetMinFilter());
+	SetMagFilter(Source.GetMagFilter());
+	SetMipFilter(Source.GetMipFilter());
+	SetAddressU(Source.GetAddressU());
+	SetAddressV(Source.GetAddressV());
+	SetAddressW(Source.GetAddressW());
+	SetMinLOD(Source.GetMinLOD());
+	SetMaxLOD(Source.GetMaxLOD());
+	SetMaxAnisotrophy(Source.GetMaxAnisotrophy());
+	SetMipLODBias(Source.GetMipLODBias());
+	SetBorderColor(Source.GetBorderColor());
+
+	return *this;
+}
+
+ZEGRSamplerState::ZEGRSamplerState(const ZEGRSamplerState& Source)
+{
+	ZEGRSamplerState::operator=(Source);
 }
 
 ZEGRSamplerState::ZEGRSamplerState()

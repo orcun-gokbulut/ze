@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.cpp
+ Zinek Engine - ZED11Context.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageGBuffer.h"
+#pragma once
 
-ZEGRTexture2D* ZERNStageGBuffer::GetPositionBuffer()
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZED11ComponentBase.h"
+
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+
+class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 {
-	return GBuffer0;
-}
+	friend class ZED11Direct3D11Module;
+	protected:
+		ID3D11DeviceContext*	Context;
 
-ZEGRTexture2D* ZERNStageGBuffer::GetNormalBuffer()
-{
-	return GBuffer1;
-}
+								ZED11Context();
+		virtual					~ZED11Context();
 
-ZEGRTexture2D* ZERNStageGBuffer::GetDiffuseBuffer()
-{
-	return GBuffer2;
-}
+	public:
+		ID3D11DeviceContext*	GetContext();
 
-ZEGRTexture2D* ZERNStageGBuffer::GetSpecularBuffer()
-{
-	return GBuffer3;
-}
+		virtual void			Draw(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex);
+		virtual void			DrawInstanced(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance);
 
-ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationBuffer()
-{
-	return AccumulationBuffer;
-}
-
-ZEGRRenderState* ZERNStageGBuffer::GetRenderState()
-{
-	return RenderState;
-}
-
-void ZERNStageGBuffer::Setup(ZEGRContext* Device)
-{
-
-}
-
-void ZERNStageGBuffer::CleanUp()
-{
-
-}
-
-void ZERNStageGBuffer::Reconfigure()
-{
-
-}
+		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
+		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
+};

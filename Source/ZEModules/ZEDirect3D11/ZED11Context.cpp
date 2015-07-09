@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Device.cpp
+ Zinek Engine - ZED11Context.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <d3d11.h>
+#include "ZED11Context.h"
 
 #include "ZED11Shader.h"
 #include "ZED11Texture2D.h"
@@ -42,11 +42,12 @@
 #include "ZED11IndexBuffer.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11VertexBuffer.h"
-#include "ZED11Device.h"
 #include "ZED11Direct3D11Module.h"
 #include "ZED11ConstantBuffer.h"
 #include "ZED11DepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
+
+#include <d3d11.h>
 
 inline DXGI_FORMAT ZEIndexBufferFormatToD3D10(ZEGRIndexBufferFormat BufferFormat)
 {
@@ -72,25 +73,27 @@ inline D3D11_PRIMITIVE_TOPOLOGY ZEPrimitiveTypeToD3D10(ZEGRPrimitiveType Primiti
 	return Values[PrimitiveType];
 }
 
-void ZED11Device::Draw(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex)
+void ZED11Context::Draw(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex)
 {
+	State->Setup(this);
 	GetMainContext()->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
 	GetMainContext()->Draw(VertexCount, FirstVertex);
 }
 
-void ZED11Device::DrawInstanced(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
+void ZED11Context::DrawInstanced(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
 {
+	State->Setup(this);
 	GetMainContext()->IASetPrimitiveTopology(ZEPrimitiveTypeToD3D10(PrimitiveType));
 	GetMainContext()->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
 }
 
 
-void ZED11Device::ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
+void ZED11Context::ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
 	GetMainContext()->ClearRenderTargetView(((ZED11RenderTarget*)RenderTarget)->GetView(), ClearColor.M);
 }
 
-void ZED11Device::ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
+void ZED11Context::ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
 {
 	UINT ClearFlag = 0;
 	ClearFlag |= Depth ? D3D11_CLEAR_DEPTH : 0;
@@ -99,12 +102,12 @@ void ZED11Device::ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, 
 	GetMainContext()->ClearDepthStencilView(((ZED11DepthStencilBuffer*)DepthStencil)->GetView(), ClearFlag, DepthValue, StencilValue);
 }
 
-ZED11Device::ZED11Device()
+ZED11Context::ZED11Context()
 {
 
 }
 
-ZED11Device::~ZED11Device()
+ZED11Context::~ZED11Context()
 {
-
+	ZEGR_RELEASE(Context);
 }

@@ -34,8 +34,174 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRRenderState.h"
-
 #include "ZEGRGraphicsModule.h"
+
+void ZEGRRenderState::SetVertexLayout(const ZEGRVertexLayout& Layout)
+{
+	VertexLayout = Layout;
+}
+
+const ZEGRVertexLayout& ZEGRRenderState::GetVertexLayout() const
+{
+	return VertexLayout;
+}
+
+void ZEGRRenderState::SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer)
+{
+	zeCheckError(Index >= ZEGR_MAX_VERTEX_BUFFER_SLOT, ZE_VOID, "Vertex buffer index is too much.");
+	VertexBuffers[Index] = Buffer;
+}
+
+ZEGRVertexBuffer* ZEGRRenderState::GetVertexBuffer(ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_VERTEX_BUFFER_SLOT, NULL, "Vertex buffer index is too much.");
+	return VertexBuffers[Index];
+}
+
+void ZEGRRenderState::SetIndexBuffer(ZEGRIndexBuffer* Buffer)
+{
+	IndexBuffer = Buffer;
+}
+
+ZEGRIndexBuffer* ZEGRRenderState::GetIndexBuffer() const
+{
+	return IndexBuffer;
+}
+
+void ZEGRRenderState::SetShader(ZEGRShaderType Type, ZEGRShader* Shader)
+{
+	zeCheckError(Type >= ZEGR_SHADER_TYPE_COUNT, ZE_VOID, "Unknown shader type.");
+	Shaders[Type] = Shader;
+}
+
+ZEGRShader* ZEGRRenderState::GetShader(ZEGRShaderType Type) const
+{
+	zeCheckError(Type >= ZEGR_SHADER_TYPE_COUNT, NULL, "Unknown shader type.");
+	return Shaders[Type];
+}
+
+void ZEGRRenderState::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer)
+{
+	zeCheckError(Shader >= ZEGR_SHADER_TYPE_COUNT, ZE_VOID, "Unknown shader type.");
+	zeCheckError(Index >= ZEGR_MAX_CONSTANT_BUFFER_SLOT, ZE_VOID, "Constant buffer index is too much.");
+
+	if (Shader >= ZEGR_SHADER_TYPE_COUNT || Index >= ZEGR_MAX_CONSTANT_BUFFER_SLOT)
+		return;
+
+	ShaderConstantBuffers[Shader][Index] = Buffer;
+}
+
+ZEGRConstantBuffer* ZEGRRenderState::GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_CONSTANT_BUFFER_SLOT, NULL, "Constant buffer index is too much.");
+	zeCheckError(Shader >= ZEGR_SHADER_TYPE_COUNT, NULL, "Unknown shader type.");
+
+	return ShaderConstantBuffers[Shader][Index];
+}
+
+void ZEGRRenderState::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture)
+{
+	zeCheckError(Index >= ZEGR_MAX_TEXTURE_SLOT, ZE_VOID, "Texture index is too much.");
+	zeCheckError(Shader >= ZEGR_SHADER_TYPE_COUNT, ZE_VOID, "Unknown shader type.");
+
+	ShaderTextures[Shader][Index] = Texture;
+}
+
+ZEGRTexture* ZEGRRenderState::GetTexture(ZEGRShaderType Shader, ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_TEXTURE_SLOT, NULL, "Texture index is too much.");
+	zeCheckError(Shader >= ZEGR_SHADER_TYPE_COUNT, NULL, "Unknown shader type.");
+
+	return ShaderTextures[Shader][Index];
+}
+
+void ZEGRRenderState::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler)
+{
+	zeCheckError(Index >= ZEGR_MAX_SAMPLER_SLOT, ZE_VOID, "Sampler index is too much.");
+	zeCheckError(Shader >= ZEGR_SHADER_TYPE_COUNT, ZE_VOID, "Unknown shader type.");
+
+	if (Index >= ZEGR_MAX_VIEWPORT_SLOT || Shader >= ZEGR_SHADER_TYPE_COUNT)
+		return;
+
+	ShaderSamplers[Shader][Index] = Sampler;
+}
+
+const ZEGRSamplerState& ZEGRRenderState::GetSampler(ZEGRShaderType Shader, ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_SAMPLER_SLOT, ZEGRSamplerState(), "Sampler index is too much.");
+	zeCheckError(Shader >= ZEGR_SHADER_TYPE_COUNT, ZEGRSamplerState(), "Unknown shader type.");
+
+	return ShaderSamplers[Shader][Index];
+}
+
+void ZEGRRenderState::SetViewport(ZEUInt Index, const ZEGRViewport& ViewPort)
+{
+	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Viewport index is too much.");
+	if (Index >= ZEGR_MAX_VIEWPORT_SLOT)
+		return;
+
+	ViewPorts[Index] = ViewPort;
+}
+
+const ZEGRViewport& ZEGRRenderState::GetViewport(ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZEGRViewport(), "Viewport index is too much.");
+	return ViewPorts[Index];
+}
+
+void ZEGRRenderState::SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* Target)
+{
+	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "RenderTarget index is too much.");
+	RenderTargets[Index] = Target;
+}
+
+ZEGRRenderTarget* ZEGRRenderState::GetRenderTarget(ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, NULL, "RenderTarget index is too much.");
+	return RenderTargets[Index];
+}
+
+void ZEGRRenderState::SetRasterizerState(const ZEGRRasterizerState& State)
+{
+	RasterizerState = State;
+}
+
+const ZEGRRasterizerState& ZEGRRenderState::GetRasterizerState() const
+{
+	return RasterizerState;
+}
+
+void ZEGRRenderState::SetBlendState(ZEUInt Index, const ZEGRBlendState& State)
+{
+	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "Blend state index is too much.");
+	BlendState[Index] = State;
+}
+
+const ZEGRBlendState& ZEGRRenderState::GetBlendState(ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZEGRBlendState(), "Blend state index is too much.");
+	return BlendState[Index];
+}
+
+void ZEGRRenderState::SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer)
+{
+	DepthStencilBuffer = Buffer;
+}
+
+ZEGRDepthStencilBuffer* ZEGRRenderState::GetDepthStencilBuffer() const
+{
+	return DepthStencilBuffer;
+}
+
+void ZEGRRenderState::SetDepthStencilState(const ZEGRDepthStencilState& State)
+{
+	DepthStencilState = State;
+}
+
+const ZEGRDepthStencilState& ZEGRRenderState::GetDepthStencilState() const
+{
+	return DepthStencilState;
+}
 
 void ZEGRRenderState::SetToDefault()
 {
@@ -64,6 +230,11 @@ void ZEGRRenderState::SetToDefault()
 	DepthStencilState.SetToDefault();
 }
 
+ZEGRRenderStateData* ZEGRRenderState::Compile()
+{
+	return ZEGRGraphicsModule::GetInstance()->CreateRenderStateData(*this);
+}
+
 ZEGRRenderState::ZEGRRenderState()
 {
 	SetToDefault();
@@ -72,9 +243,4 @@ ZEGRRenderState::ZEGRRenderState()
 ZEGRRenderState::~ZEGRRenderState()
 {
 
-}
-
-ZEGRRenderState* ZEGRRenderState::CreateInstance()
-{
-	return ZEGRGraphicsModule::GetInstance()->CreateDeviceState();
 }

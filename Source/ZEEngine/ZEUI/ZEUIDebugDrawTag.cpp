@@ -72,7 +72,7 @@ void ZEUIDebugDrawTag::SetTypeField(const ZEString& Type)
 void ZEUIDebugDrawTag::SetIcon(const ZEString& IconPath)
 {
 	ZEUIMaterial* IconMaterial = (ZEUIMaterial*)Icon->GetMaterial();
-	IconMaterial->SetTexture(ZETexture2DResource::LoadSharedResource(IconPath.ToCString())->GetTexture());
+	IconMaterial->SetTexture(ZETexture2DResource::LoadSharedResource(IconPath.ToCString())->GetTexture2D());
 }
 
 void ZEUIDebugDrawTag::SetPosition(const ZEVector2& Position)

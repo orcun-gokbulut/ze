@@ -48,7 +48,8 @@ enum ZEGRResourceType
 	ZEGR_RT_TEXTURE					= 4,
 	ZEGR_RT_RENDER_TARGET			= 5,
 	ZEGR_RT_DEPTH_STENCIL_BUFFER	= 6,
-	ZEGR_RT_SHADER					= 7
+	ZEGR_RT_SHADER					= 7,
+	ZEGR_RT_RENDER_STATE			= 8
 };
 
 class ZEGRResource

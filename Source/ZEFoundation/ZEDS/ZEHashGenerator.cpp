@@ -35,6 +35,69 @@
 
 #include "ZEHashGenerator.h"
 
+#if (defined(__GNUC__) && defined(__i386__)) || defined(_MSC_VER)
+	#define Convert16Bit(d) (*((const ZEUInt16*) (d)))
+#else
+	#define Convert16Bit(d) ((((ZEUInt32)(((const ZEUInt8*)(d))[1])) << 8) + (uint32_t)(((const ZEUInt8*)(d))[0]))
+#endif
+
+ZEUInt32 ZEHashGenerator::Hash(const void* Input, ZESize Size) 
+{
+	ZEBYTE* Data = (ZEBYTE*)Input;
+	ZEUInt32 Output = Size;
+
+	ZEUInt32 Temp;
+	ZEInt32 Reminder;
+
+	if (Data == NULL || Size == 0) 
+		return 0;
+
+	Reminder = Size & 3;
+	Size >>= 2;
+
+	for (; Size > 0; Size--) 
+	{
+		Output += Convert16Bit(Data);
+		Temp = (Convert16Bit(Data + 2) << 11) ^ Output;
+		Output = (Output << 16) ^ Temp;
+		Output += Output >> 11;
+		Data += 2 * sizeof(ZEUInt16);
+
+	}
+
+	switch (Reminder) 
+	{
+		case 3: 
+			Output += Convert16Bit (Data);
+			Output ^= Output << 16;
+			Output ^= ((ZEInt8)Data[sizeof (ZEUInt16)]) << 18;
+			Output += Output >> 11;
+			break;
+
+		case 2: 
+			Output += Convert16Bit(Data);
+			Output ^= Output << 11;
+			Output += Output >> 17;
+			break;
+
+		case 1: 
+			Output += (ZEInt8)*Data;
+			Output ^= Output << 10;
+			Output += Output >> 1;
+	}
+
+	Output ^= Output << 3;
+	Output += Output >> 5;
+	Output ^= Output << 4;
+	Output += Output >> 17;
+	Output ^= Output << 25;
+	Output += Output >> 6;
+
+	return Output;
+}
+
+/*
+// Slow old code
 ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
 {
 	ZEUInt Hash = 0;
@@ -42,9 +105,9 @@ ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
 		Hash = (ZEUInt)((ZEUInt8*)Value)[I] + (Hash << 6) + (Hash << 16) - Hash;
 
 	return Hash;
-}
+}*/
 
-ZESize ZEHashGenerator::Hash(const char* String)
+ZEUInt32 ZEHashGenerator::Hash(const char* String)
 {
 	ZEUInt Hash = 0;
 	while(*String != '\0')
@@ -56,7 +119,7 @@ ZESize ZEHashGenerator::Hash(const char* String)
 	return Hash;
 }
 
-ZESize ZEHashGenerator::Hash(const ZEString& String)
+ZEUInt32 ZEHashGenerator::Hash(const ZEString& String)
 {
 	return Hash(String.ToCString());
 }

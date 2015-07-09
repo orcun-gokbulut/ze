@@ -66,10 +66,6 @@ ZEVector2 ZEGRTexture2D::GetPixelSize()
 
 bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
-	zeDebugCheck(Width == 0, "Width cannot be 0.");
-	zeDebugCheck(Height == 0, "Height cannot be 0.");
-	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
-	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || ZEMath::IsPowerOfTwo(Height)), "Level must be 1 for non-power of two textures.");
 
 	this->Width = Width;
 	this->Height = Height;
@@ -96,6 +92,13 @@ ZEGRTexture2D::ZEGRTexture2D()
 
 ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
+	zeCheckError(Width == 0, false, "Width cannot be 0.");
+	zeCheckError(Height == 0, false, "Height cannot be 0.");
+	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
+	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
+	zeCheckError(LevelCount == 0, false, "Level cannot be 0.");
+	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || ZEMath::IsPowerOfTwo(Height)), false, "Level must be 1 for non-power of two textures.");
+
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)
 		return NULL;

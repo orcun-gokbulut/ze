@@ -44,7 +44,7 @@
 class ZEInterior;
 class ZEInteriorRoom;
 struct ZEInteriorResourceDoor;
-class ZESimpleMaterial;
+class ZERNSimpleMaterial;
 class ZECanvas;
 class ZERNRenderer;
 class ZERNCommand;
@@ -72,7 +72,7 @@ class ZEInteriorDoor
 
 		struct
 		{
-			ZESimpleMaterial*				Material;
+			ZERNSimpleMaterial*				Material;
 			ZECanvas						BoxCanvas;
 			ZERNCommand					BoxRenderCommand;
 

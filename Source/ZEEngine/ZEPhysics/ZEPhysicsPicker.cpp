@@ -69,7 +69,7 @@ void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorY
 	ZEVector4 ProjectionPosition = ProjectionTransform * ViewPosition;
 
 	ZEMatrix4x4 ViewPortTransform;
-	ZEMatrix4x4::CreateViewPortTransform(ViewPortTransform, WindowLeftPosition, WindowLeftPosition + WindowWidth, WindowTopPosition + WindowHeight, WindowTopPosition, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+	ZEMatrix4x4::CreateViewPortTransform(ViewPortTransform, WindowLeftPosition, WindowLeftPosition + WindowWidth, WindowTopPosition + WindowHeight, WindowTopPosition, ZEGRGraphicsModule::GetInstance()->GetNearZ(), ZEGRGraphicsModule::GetInstance()->GetFarZ());
 
 	ZEVector4 ScreenPosition = ViewPortTransform * ProjectionPosition;
 
@@ -82,8 +82,8 @@ void ZEPhysicsPicker::ReverseViewProjection(ZEVector3& Output, const ZEInt& Curs
 {
 	ZEVector3 TempVector;
 	const ZEMatrix4x4& ProjMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
-	TempVector.x =  (((2.0f * CursorXInput ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11;
-	TempVector.y = -(((2.0f * CursorYInput ) / zeGraphics->GetScreenHeight()) - 1) / ProjMatrix.M22;
+	TempVector.x =  (((2.0f * CursorXInput ) / ZEGRGraphicsModule::GetInstance()->GetScreenWidth()) - 1) / ProjMatrix.M11;
+	TempVector.y = -(((2.0f * CursorYInput ) / ZEGRGraphicsModule::GetInstance()->GetScreenHeight()) - 1) / ProjMatrix.M22;
 	TempVector.z =  1.0f;
 
 	ZEMatrix4x4 InvViewMatrix;
@@ -100,8 +100,8 @@ void ZEPhysicsPicker::ReverseViewProjection(ZEVector3& Output, const ZEInt& Curs
 // 	zeCore->GetWindow()->GetWindowPosition(LeftPosition, TopPosition);
 // 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 // 
-// 	//ZEMatrix4x4::CreateViewPortTransform(ViewPort, LeftPosition, LeftPosition + WindowWidth, TopPosition + WindowHeight, TopPosition, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
-// 	//ZEMatrix4x4::CreateViewPortTransform(ViewPort, 0.0f, WindowWidth, WindowHeight, 0.0f, zeGraphics->GetNearZ(), zeGraphics->GetFarZ());
+// 	//ZEMatrix4x4::CreateViewPortTransform(ViewPort, LeftPosition, LeftPosition + WindowWidth, TopPosition + WindowHeight, TopPosition, ZEGRGraphicsModule::GetInstance()->GetNearZ(), ZEGRGraphicsModule::GetInstance()->GetFarZ());
+// 	//ZEMatrix4x4::CreateViewPortTransform(ViewPort, 0.0f, WindowWidth, WindowHeight, 0.0f, ZEGRGraphicsModule::GetInstance()->GetNearZ(), ZEGRGraphicsModule::GetInstance()->GetFarZ());
 // 	
 // 	ZEVector4 ViewPortVector;
 // 	ViewPortVector.x = (2.0f * ((float)CursorXInput) / ((float)WindowWidth)) - 1.0f;

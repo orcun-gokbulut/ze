@@ -53,7 +53,7 @@ class ZEPhysicalMesh;
 class ZERNRenderer;
 struct ZEDrawParameters;
 class ZEViewVolume;
-class ZESimpleMaterial;
+class ZERNSimpleMaterial;
 
 typedef ZEFlags ZEInteriorRoomDirtyFlags;
 #define ZE_IRDF_NONE							0
@@ -95,7 +95,7 @@ class ZEInteriorRoom
 
 		struct
 		{
-			ZESimpleMaterial*				Material;
+			ZERNSimpleMaterial*				Material;
 			ZECanvas						BoxCanvas;
 			ZERNCommand					BoxRenderCommand;
 

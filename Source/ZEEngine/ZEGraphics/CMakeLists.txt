@@ -37,8 +37,8 @@ cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEGRGraphicsModule.cpp 		Sources)
 ze_add_source(ZEGRGraphicsModule.h 			Sources Headers)
-ze_add_source(ZEGRDevice.cpp				Sources)
-ze_add_source(ZEGRDevice.h					Sources Headers)
+ze_add_source(ZEGRContext.cpp				Sources)
+ze_add_source(ZEGRContext.h					Sources Headers)
 ze_add_source(ZEGRRenderState.cpp			Sources)
 ze_add_source(ZEGRRenderState.h				Sources Headers)
 

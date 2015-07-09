@@ -52,7 +52,7 @@ ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 	if (SharedVertexBuffer == NULL)
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
-			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateStaticVertexBuffer();
 			SharedVertexBuffer->Create(sizeof(ZESkinnedModelVertex) * SkinnedVertices.GetCount());
 			
 			void* Buffer = SharedVertexBuffer->Lock();
@@ -61,7 +61,7 @@ ZEStaticVertexBuffer* ZEModelResourceMeshLOD::GetSharedVertexBuffer() const
 		}
 		else if (Vertices.GetCount() != 0)
 		{
-			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+			((ZEModelResourceMeshLOD*)this)->SharedVertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateStaticVertexBuffer();
 			SharedVertexBuffer->Create(sizeof(ZEModelVertex) * Vertices.GetCount());
 			
 			void* Buffer = SharedVertexBuffer->Lock();
@@ -78,7 +78,7 @@ ZEStaticVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
 	if (SharedVertexBuffer == NULL)
 		if (this->SkinnedVertices.GetCount() != 0)
 		{
-			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+			VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateStaticVertexBuffer();
 			VertexBuffer->Create(sizeof(ZESkinnedModelVertex) * SkinnedVertices.GetCount());
 
 			void* Buffer = VertexBuffer->Lock();
@@ -87,7 +87,7 @@ ZEStaticVertexBuffer* ZEModelResourceMeshLOD::CreatePrivateVertexBuffer() const
 		}
 		else if (Vertices.GetCount() != 0)
 		{
-			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+			VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateStaticVertexBuffer();
 			VertexBuffer->Create(sizeof(ZEModelVertex) * Vertices.GetCount());
 			
 			void* Buffer = VertexBuffer->Lock();
@@ -122,7 +122,7 @@ const ZEGRTexture2D* ZEModelResource::ManageModelMaterialTextures(const ZEString
 	{
 		//if (strnicmp(TextureResources[I]->GetFileName(), FileName, ZE_MDLF_MAX_FILENAME_SIZE) == 0)
 		if (TextureResources[I]->GetFileName() == FileName)
-			return TextureResources[I]->GetTexture();
+			return TextureResources[I]->GetTexture2D();
 	}
 
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(FileName);
@@ -132,7 +132,7 @@ const ZEGRTexture2D* ZEModelResource::ManageModelMaterialTextures(const ZEString
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);
-	return NewTextureResource->GetTexture();
+	return NewTextureResource->GetTexture2D();
 }
 
 #define ZE_MFSC_SKINTRANSFORM				1

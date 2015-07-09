@@ -56,7 +56,8 @@ class ZETextureCubeResource : public ZETextureResource
 		virtual const char*					GetResourceType() const;
 		virtual ZEGRTextureType				GetTextureType() const;
 
-		const ZEGRTextureCube*				GetTexture() const;
+		ZEGRTexture*						GetTexture() const;
+		ZEGRTextureCube*					GetTextureCube() const;
 
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETextureCubeResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);

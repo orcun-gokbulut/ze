@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Device.h
+ Zinek Engine - ZED11RenderStateData.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_D3D11_GRAPHICS_DEVICE_H__
-#define __ZE_D3D11_GRAPHICS_DEVICE_H__
+#pragma once
+#include "ZEGraphics\ZEGRRenderState.h"
+#include "ZEGraphics\ZEGRHolder.h"
+#include "ZED11State.h"
 
-#include "ZED11StatePool.h"
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRDevice.h"
+class ZEGRContext;
 
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-
-class ZED11Device : public ZEGRDevice, public ZED11ComponentBase
+class ZED11RenderStateData : public ZEGRRenderStateData
 {
-	friend class ZED11Direct3D11Module;
-
-	protected:
-								ZED11Device();
-		virtual					~ZED11Device();
+	friend class ZED11StatePool;
+	private:
+		ZED11VertexLayout*						VertexLayout;
+		ZEGRHolder<ZEGRVertexBuffer>			VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
+		ZEGRHolder<ZEGRIndexBuffer>				IndexBuffer;
+		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEGRHolder<ZEGRConstantBuffer>			ShaderConstantBuffers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_CONSTANT_BUFFER_SLOT];
+		ZEGRHolder<ZEGRTexture>					ShaderTextures[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_TEXTURE_SLOT];
+		ZED11SamplerState*						ShaderSamplers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_SAMPLER_SLOT];
+		ZED11RasterizerState*					RasterizerState;
+		ZED11DepthStencilState*					DepthStencilState;
+		ZED11BlendState*						BlendState[ZEGR_MAX_RENDER_TARGET_SLOT];
+		ZEGRHolder<ZEGRRenderTarget>			RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+		ZEGRHolder<ZEGRDepthStencilBuffer>		DepthStencilBuffer;
+		ZEGRViewport							ViewPorts[ZEGR_MAX_VIEWPORT_SLOT];
+		ZEGRScissorRectangle					ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
 
 	public:
-		virtual void			Draw(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
-		virtual void			DrawInstanced(ZEGRRenderState* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
-
-		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
-		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
+		void									Setup(ZEGRContext* Device);
 };
-
-#endif

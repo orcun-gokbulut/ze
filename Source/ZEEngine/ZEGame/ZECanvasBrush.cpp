@@ -55,7 +55,7 @@ void ZECanvasBrush::UpdateCanvas()
 	if (!Canvas.IsEmpty())
 	{
 		if (VertexBuffer == NULL)
-			VertexBuffer = zeGraphics->CreateStaticVertexBuffer();
+			VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateStaticVertexBuffer();
 
 		if (OldVertexCount != Canvas.Vertices.GetCount())
 		{

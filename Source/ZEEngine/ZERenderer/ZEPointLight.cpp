@@ -44,36 +44,6 @@ ZELightType ZEPointLight::GetLightType()
 	return ZE_LT_POINT;
 }
 
-void ZEPointLight::SetCastShadows(bool NewValue)
-{
-	if (NewValue == false)
-	{
-		if (FrontShadowMap)
-		{
-			FrontShadowMap->Destroy();
-			FrontShadowMap = NULL;
-		}
-
-		if (BackShadowMap)
-		{
-			BackShadowMap->Destroy();
-			BackShadowMap = NULL;
-		}
-	}
-
-	ZELight::SetCastsShadow(NewValue);
-}
-
-ZEGRTexture2D* ZEPointLight::GetFrontShadowMap()
-{
-	return FrontShadowMap;
-}
-
-ZEGRTexture2D* ZEPointLight::GetBackShadowMap()
-{
-	return FrontShadowMap;
-}
-
 bool ZEPointLight::DeinitializeSelf()
 {
 	return ZELight::DeinitializeSelf();
@@ -116,8 +86,6 @@ void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
 
 ZEPointLight::ZEPointLight()
 {
-	FrontShadowMap = NULL;
-	BackShadowMap = NULL;
 	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 }
 

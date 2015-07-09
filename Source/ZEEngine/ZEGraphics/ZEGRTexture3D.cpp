@@ -40,12 +40,6 @@
 
 bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
-	zeDebugCheck(Width == 0, "Width cannot be 0.");
-	zeDebugCheck(Height == 0, "Height cannot be 0.");
-	zeDebugCheck(Depth == 0, "Depth cannot be 0.");
-	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
-	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), "Level must be 1 for non-power of two textures.");
-
 	this->Width = Width;
 	this->Height = Height;
 	this->Depth = Depth;
@@ -108,6 +102,12 @@ ZEGRTexture3D::~ZEGRTexture3D()
 
 ZEGRTexture3D* ZEGRTexture3D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
+	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
+	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
+	zeCheckError(Depth == 0, NULL, "Depth cannot be 0.");
+	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
+	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), NULL, "Level must be 1 for non-power of two textures.");
+
 	ZEGRTexture3D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture3D();
 	if (Texture == NULL)
 		return NULL;

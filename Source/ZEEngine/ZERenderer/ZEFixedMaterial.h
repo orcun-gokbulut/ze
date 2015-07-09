@@ -38,17 +38,12 @@
 #include "ZERNMaterial.h"
 
 #include "ZERNSampler.h"
+#include "ZEDS/ZEString.h"
 #include "ZEDefinitions.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEGRHolder.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
-
-ZE_META_FORWARD_DECLARE(ZEGRTextureCube, "ZETextureCube.h")
-ZE_META_FORWARD_DECLARE(ZETextureCubeResource, "ZETexture/ZETextureCubeResource.h")
-ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZETexture2D.h")
-ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 
 class ZEGRConstantBuffer;
 class ZEFixedMaterial : public ZERNMaterial
@@ -67,23 +62,11 @@ class ZEFixedMaterial : public ZERNMaterial
 		ZERNSampler						DetailBaseTexture;
 		ZERNSampler						DetailNormalTexture;
 		ZERNSampler						EnvironmentTexture;
-		ZERNSampler						LightMap;
+		ZERNSampler						DistortionTexture;
 
 		ZEGRRenderState*				GBufferPass;
 		ZEGRRenderState*				ForwardPass;
 		ZEGRRenderState*				ShadowPass;
-
-		ZETexture2DResource*			BaseMapResource;
-		ZETexture2DResource*			NormalMapResource;
-		ZETexture2DResource*			ParallaxMapResource;
-		ZETexture2DResource*			SpecularMapResource;
-		ZETexture2DResource*			EmmisiveMapResource;
-		ZETexture2DResource*			OpacityMapResource;
-		ZETexture2DResource*			DetailBaseMapResource;
-		ZETexture2DResource*			DetailNormalMapResource;
-		ZETextureCubeResource*			EnvironmentMapResource;
-		ZETexture2DResource*			LightMapResource;
-		ZETexture2DResource*			DistortionMapResource;
 
 		struct
 		{
@@ -116,10 +99,29 @@ class ZEFixedMaterial : public ZERNMaterial
 		ZEVector3						EmmisiveColor;
 		float							EmmisiveFactor;
 
+		bool							VertexColorEnabled;
+		bool							AlphaCullEnabled;
+		bool							AmbientEnabled;
+		bool							DiffuseEnabled;
+		bool							SpecularEnabled;
+		bool							EmmisiveEnabled;
+		bool							NormalMapEnabled;
+		bool							DisplacementEnabled;
+		bool							OpacityEnabled;
+		bool							EnvironmentMapEnabled;
+		bool							ReflectionEnabled;
+		bool							RefractionEnabled;
+		bool							DetailBaseMapEnabled;
+		bool							DetailNormalMapEnabled;
+		bool							DistortionEnabled;
+		bool							SSAOEnabled;
+		
 		ZEMaterialTransparancyMode		TransparancyMode;
+		ZEMaterialOpacityComponent		OpacityComponent;
 
 		void							UpdateShaders();
 		void							UpdateRenderStates();
+		void							Update();
 
 										ZEFixedMaterial();
 		virtual							~ZEFixedMaterial();
@@ -196,8 +198,8 @@ class ZEFixedMaterial : public ZERNMaterial
 		void							SetNormalMap(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetNormalMap() const;
 
-		void							SetDisplacementEnabled(bool Enabled);
-		bool							GetDisplacementEnabled() const;
+		void							SetDisplacementMapEnabled(bool Enabled);
+		bool							GetDisplacementMapEnabled() const;
 		void							SetDisplacementOffset(float Offset);
 		float							GetDisplacementOffset() const;
 		void							SetDisplacementScale(float Scale);
@@ -211,8 +213,8 @@ class ZEFixedMaterial : public ZERNMaterial
 		float							GetOpacity() const;
 		void							SetOpacityComponent(ZEMaterialOpacityComponent Component);
 		ZEMaterialOpacityComponent		GetOpacityComponent() const;
-		void							SetOpacityMap(ZERNSampler& Sampler);
-		ZERNSampler&					GetOpacityMap();
+		void							SetOpacityMap(const ZERNSampler& Sampler);
+		const ZERNSampler&				GetOpacityMap() const;
 
 		void							SetEnvironmentMappingEnabled(bool Enabled);
 		bool							GetEnvironmentMappingEnabled();
@@ -243,8 +245,8 @@ class ZEFixedMaterial : public ZERNMaterial
 		void							SetDetailNormalMap(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetDetailNormalMap() const;
 
-		void							SetDistortionEnabled(bool Enabled);
-		bool							GetDistortionEnabled() const;
+		void							SetDistortionMapEnabled(bool Enabled);
+		bool							GetDistortionMapEnabled() const;
 		void							SetDistortionFactor(float Factor);
 		float							GetDistortionFactor() const;
 		void							SetDistortionMap(const ZERNSampler& Sampler);

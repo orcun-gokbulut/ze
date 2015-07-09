@@ -53,7 +53,7 @@
 #include "ZED11RenderTarget.h"
 #include "ZED11ComponentBase.h"
 #include "ZED11Direct3D11Module.h"
-#include "ZED11Device.h"
+#include "ZED11Context.h"
 #include "ZED11ShaderCompiler.h"
 #include "ZED11ConstantBuffer.h"
 #include "ZED11Adapter.h"
@@ -62,37 +62,6 @@
 #pragma warning(disable:4267)
 
 ZE_MODULE_DESCRIPTION(ZED11Direct3D11Module, ZEGRGraphicsModule, NULL)
-
-const ZEArray<ZEGRAdapter*>& ZED11Direct3D11Module::GetAdapters()
-{
-	if (Adapters.GetCount() == 0)
-	{
-		IDXGIFactory2* DXGIFactory = NULL;
-		HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
-
-		IDXGIAdapter2* DXGIAdapter = NULL;
-		ZEUInt AdapterId = 0;
-		while (DXGIFactory->EnumAdapters1(AdapterId++, (IDXGIAdapter1**)&DXGIAdapter) != DXGI_ERROR_NOT_FOUND)
-		{
-			ZED11Adapter* Adapter = new ZED11Adapter(DXGIAdapter);
-			Adapters.Add(Adapter);
-		}
-
-		if (Adapters.GetCount() == 0)
-		{
-			zeCriticalError("Cannot enumerate adapters. Error: %d", DXGI_ERROR_NOT_FOUND);
-			Deinitialize();
-			return Adapters;
-		}
-
-		#ifdef ZE_GRAPHIC_LOG_ENABLE
-		zeLog("Adaptors are enumerated.");
-		#endif
-	}
-	
-	return Adapters;
-}
-
 
 bool ZED11Direct3D11Module::CreateDevice(ZEGRAdapter* Adapter)
 {
@@ -130,6 +99,8 @@ bool ZED11Direct3D11Module::CreateDevice(ZEGRAdapter* Adapter)
 			Deinitialize();
 			return false;
 		}
+
+		D3DDevice->GetImmediateContext(&MainContext.Context);
 	}
 	
 	return true;
@@ -172,19 +143,62 @@ bool ZED11Direct3D11Module::DeinitializeSelf()
 	return ZEGRGraphicsModule::DeinitializeSelf();
 }
 
+ZED11StatePool* ZED11Direct3D11Module::GetStatePool()
+{
+	return &StatePool;
+}
+
 ZEGRTracer* ZED11Direct3D11Module::GetTracer()
 {
 	return &Tracer;
 }
 
-ZEGRShaderCompiler* ZED11Direct3D11Module::CreateShaderCompiler()
+const ZEArray<ZEGRAdapter*>& ZED11Direct3D11Module::GetAdapters()
 {
-	return new ZED11ShaderCompiler();
+	if (Adapters.GetCount() == 0)
+	{
+		IDXGIFactory2* DXGIFactory = NULL;
+		HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
+
+		IDXGIAdapter2* DXGIAdapter = NULL;
+		ZEUInt AdapterId = 0;
+		while (DXGIFactory->EnumAdapters1(AdapterId++, (IDXGIAdapter1**)&DXGIAdapter) != DXGI_ERROR_NOT_FOUND)
+		{
+			ZED11Adapter* Adapter = new ZED11Adapter(DXGIAdapter);
+			Adapters.Add(Adapter);
+		}
+
+		if (Adapters.GetCount() == 0)
+		{
+			zeCriticalError("Cannot enumerate adapters. Error: %d", DXGI_ERROR_NOT_FOUND);
+			Deinitialize();
+			return Adapters;
+		}
+
+		#ifdef ZE_GRAPHIC_LOG_ENABLE
+		zeLog("Adaptors are enumerated.");
+		#endif
+	}
+	
+	return Adapters;
 }
 
-ZED11StatePool* ZED11Direct3D11Module::GetStatePool()
+ZEGRContext*  ZED11Direct3D11Module::GetMainContext()
 {
-	return &StatePool;
+	return &MainContext;
+}
+
+
+ZEGRContext* ZED11Direct3D11Module::CreateContext()
+{
+	ZED11Context* Context = new ZED11Context();
+	if (FAILED(Device->CreateDeferredContext(0, &Context->Context)))
+	{
+		zeError("Cannot create deffered device context.");
+		return NULL;
+	}
+
+	return Context;
 }
 
 ZEGRIndexBuffer* ZED11Direct3D11Module::CreateIndexBuffer()
@@ -220,6 +234,16 @@ ZEGRTextureCube* ZED11Direct3D11Module::CreateTextureCube()
 ZEGRDepthStencilBuffer* ZED11Direct3D11Module::CreateDepthStencilBuffer()
 {
 	return new ZED11DepthStencilBuffer();
+}
+
+ZEGRRenderStateData* ZED11Direct3D11Module::CreateRenderStateData(const ZEGRRenderState& RenderState)
+{
+	return StatePool.CompileRenderState(RenderState);
+}
+
+ZEGRShaderCompiler* ZED11Direct3D11Module::CreateShaderCompiler()
+{
+	return new ZED11ShaderCompiler();
 }
 
 ZED11Direct3D11Module::ZED11Direct3D11Module()

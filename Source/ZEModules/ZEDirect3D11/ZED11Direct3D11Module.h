@@ -41,6 +41,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZED11StatePool.h"
 #include "ZED11Tracer.h"
+#include "ZED11Context.h"
 
 class ZEGRTexture2D;
 class ZEGRTexture3D;
@@ -48,7 +49,7 @@ class ZEGRTextureCube;
 class ZEGRIndexBuffer;
 class ZEGRVertexBuffer;
 class ZEGRShaderCompiler;
-class ZEGRDevice;
+class ZEGRContext;
 class ZEGRDepthStencilBuffer;
 
 #define ZE_MAX_MULTI_SAMPLE_COUNT		D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT
@@ -59,6 +60,7 @@ class ZED11Direct3D11Module : public ZEGRGraphicsModule
 	ZE_MODULE(ZED11Direct3D11Module)
 	protected:
 		ID3D11Device*							Device;
+		ZED11Context							MainContext;
 		ZEArray<ZEGRAdapter*>					Adapters;
 		ZED11StatePool							StatePool;
 		ZED11Tracer								Tracer;
@@ -75,9 +77,9 @@ class ZED11Direct3D11Module : public ZEGRGraphicsModule
 		ZED11StatePool*							GetStatePool();
 		virtual ZEGRTracer*						GetTracer();
 		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters();
+		virtual ZEGRContext*					GetMainContext();
 
-		virtual ZEGRDevice*						CreateContext();
-		virtual ZEGRRenderState*				CreateDeviceState();
+		virtual ZEGRContext*					CreateContext();
 		virtual ZEGRVertexBuffer*				CreateVertexBuffer();
 		virtual ZEGRIndexBuffer*				CreateIndexBuffer();
 		virtual ZEGRShader*						CreateShader();
@@ -88,4 +90,5 @@ class ZED11Direct3D11Module : public ZEGRGraphicsModule
 		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer();
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
 		virtual ZEGRWindow*						CreateGraphicsWindow();
+		virtual ZEGRRenderStateData*			CreateRenderStateData(const ZEGRRenderState& RenderState);
 };

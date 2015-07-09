@@ -37,13 +37,23 @@
 
 #include <memory.h>
 
+const void* ZEGRRasterizerState::GetData() const
+{
+	return &StateData;
+}
+
+ZESize ZEGRRasterizerState::GetDataSize() const
+{
+	return sizeof(StateData);
+}
+
 void ZEGRRasterizerState::SetFillMode(ZEGRFillMode Mode)
 {
-	if (StateData.FillMode != Mode)
-	{
-		StateData.FillMode = Mode;
-		MarkDirty();
-	}
+	if (StateData.FillMode == Mode)
+		return;
+
+	StateData.FillMode = Mode;
+	MarkDirty();
 }
 
 ZEGRFillMode ZEGRRasterizerState::GetFillMode() const
@@ -53,11 +63,11 @@ ZEGRFillMode ZEGRRasterizerState::GetFillMode() const
 
 void ZEGRRasterizerState::SetCullDirection(ZEGRCullDirection Direction)
 {
-	if (StateData.CullDirection != Direction)
-	{
-		StateData.CullDirection = Direction;
-		MarkDirty();
-	}
+	if (StateData.CullDirection == Direction)
+		return;
+
+	StateData.CullDirection = Direction;
+	MarkDirty();
 }
 
 ZEGRCullDirection ZEGRRasterizerState::GetCullDirection() const
@@ -67,11 +77,11 @@ ZEGRCullDirection ZEGRRasterizerState::GetCullDirection() const
 
 void ZEGRRasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
 {
-	if (StateData.FrontIsCounterClockwise != IsCounterClockwise)
-	{
-		StateData.FrontIsCounterClockwise = IsCounterClockwise;
-		MarkDirty();
-	}
+	if (StateData.FrontIsCounterClockwise == IsCounterClockwise)
+		return;
+
+	StateData.FrontIsCounterClockwise = IsCounterClockwise;
+	MarkDirty();
 }
 
 bool ZEGRRasterizerState::GetFrontIsCounterClockwise() const
