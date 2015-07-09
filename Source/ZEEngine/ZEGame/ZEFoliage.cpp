@@ -47,24 +47,22 @@ bool ZEFoliage::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-
-
 	Trees.Add(ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Goknar\\Goknar.ZEMODEL"));
 	Trees.Add(ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Karacam\\Karacam.ZEMODEL"));
 	Trees.Add(ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Mese\\Mese.ZEMODEL"));
 	Trees.Add(ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Zeytin\\Zeytin.ZEMODEL"));
-
-// 	Tree1 = ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Goknar\\Goknar.ZEMODEL");
-// 	Tree2 = ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Karacam\\Karacam.ZEMODEL");
-// 	Tree3 = ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Mese\\Mese.ZEMODEL");
-// 	Tree4 = ZEModelResource::LoadSharedResource("CustTPayloadSim\\Trees\\Zeytin\\Zeytin.ZEMODEL");
-
 
 	return true;
 }
 
 bool ZEFoliage::DeinitializeSelf()
 {
+	for (ZESize I = 0; I < Trees.GetCount(); I++)
+	{
+		if (Trees[I] != NULL)
+			Trees[I]->Release();
+	}
+
 	return ZEEntity::DeinitializeSelf();
 }
 
@@ -77,22 +75,14 @@ ZEFoliage::ZEFoliage()
 	MinScale = 1.0f;
 
 	Ground = NULL;
-
-// 	Tree1 = NULL;
-// 	Tree2 = NULL;
-// 	Tree3 = NULL;
-// 	Tree4 = NULL;
-
-}
-
-ZEFoliage::~ZEFoliage()
-{
-
 }
 
 void ZEFoliage::SetSurfaceEntityName(const char* EntityName)
 {
-	ZEArray<ZEEntity*>& Entities = ZEScene::GetInstance()->GetEntities(ZEInterior::Class());
+	if (GetOwnerScene() == NULL)
+		return;
+
+	ZEArray<ZEEntity*>& Entities = GetOwnerScene()->GetEntities(ZEInterior::Class());
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{

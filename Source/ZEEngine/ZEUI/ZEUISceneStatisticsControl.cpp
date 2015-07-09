@@ -103,19 +103,12 @@
 #define GreenTextColor						ZEVector4(0.0f, 0.7f, 0.0f, 1.0f)
 #define RedTextColor						ZEVector4(7.0f, 0.0f, 0.0f, 1.0f)
 
-void ZEUISceneStatisticsControl::SetMaterial(ZEMaterial* Material)
-{
-
-}
-
-ZEMaterial* ZEUISceneStatisticsControl::GetMaterial() const
-{
-	return NULL;
-}
-
 void ZEUISceneStatisticsControl::Draw(ZEUIRenderer* Renderer)
 {
-	ZEDrawStatistics Stats = zeScene->GetRenderer()->GetDrawParameters()->Statistics;
+	if (Scene == NULL)
+		return;
+
+	ZEDrawStatistics Stats = Scene->GetRenderer()->GetDrawParameters()->Statistics;
 	ZEValue Value;
 
 	//Scene Statistics
@@ -288,15 +281,16 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 		AverageFPS = FrameCount * 2;
 		FrameCount = 0;
 	}
-
-	ZEScene* TempScene = zeScene;
 	
-	if (TempScene->GetActiveCamera() != NULL)
+	if (Scene != NULL)
 	{
-		ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
+		if (Scene->GetActiveCamera() != NULL)
+		{
+			ZEVector3 CamPos = Scene->GetActiveCamera()->GetWorldPosition();
 
-		FPSCount->SetText(ZEFormat::Format(FPSText, AverageFPS));
-		CameraPosition->SetText(ZEFormat::Format(CamPosText, CamPos.x, CamPos.y, CamPos.z));
+			FPSCount->SetText(ZEFormat::Format(FPSText, AverageFPS));
+			CameraPosition->SetText(ZEFormat::Format(CamPosText, CamPos.x, CamPos.y, CamPos.z));
+		}
 	}
 
 	InputMap.Update();
@@ -318,8 +312,21 @@ void ZEUISceneStatisticsControl::Tick(float ElapsedTime)
 
 }
 
+void ZEUISceneStatisticsControl::SetTargetScene(ZEScene* Scene)
+{
+	this->Scene = Scene;
+}
+
+ZEScene* ZEUISceneStatisticsControl::GetTargetScene()
+{
+	return Scene;
+}
+
 ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 {
+	Scene = NULL;
+
+
 	CameraPosition = new ZEUILabel();
 	CameraPosition->SetWidth(350.0f);
 	CameraPosition->SetHeight(25.0f);
@@ -827,5 +834,5 @@ ZEUISceneStatisticsControl::ZEUISceneStatisticsControl()
 
 	InputMap.AddButtonAction("Keyboard", ZE_IKB_F1, ZE_IS_PRESSED, ACTIONID_VISIBILITY);
 }
-	
+
 	

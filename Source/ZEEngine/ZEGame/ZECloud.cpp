@@ -39,6 +39,7 @@
 #include "ZEDrawParameters.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
+#include "ZEScene.h"
 
 void ZECloud::SetAmbientColor(ZEVector3 Color)
 {
@@ -215,6 +216,11 @@ bool ZECloud::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
+
+	if (GetOwnerScene() == NULL)
+		return false;
+
+	Camera = GetOwnerScene()->GetActiveCamera();
 
 	// Create Material
 	if (CloudMaterial == NULL)

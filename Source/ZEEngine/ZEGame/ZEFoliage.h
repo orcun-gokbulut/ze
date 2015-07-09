@@ -93,11 +93,6 @@ class ZEFoliage : public ZEEntity
 
 		ZEInterior*					Ground;
 
-// 		ZEModelResource*			Tree1;
-// 		ZEModelResource*			Tree2;
-// 		ZEModelResource*			Tree3;
-// 		ZEModelResource*			Tree4;
-
 		ZEArray<ZEModelResource*>	Trees;
 
 
@@ -106,7 +101,6 @@ class ZEFoliage : public ZEEntity
 		virtual bool				DeinitializeSelf();
 
 									ZEFoliage();
-		virtual						~ZEFoliage();
 
 	public:
 
@@ -132,8 +126,6 @@ class ZEFoliage : public ZEEntity
 		virtual void				Realign();
 
 		virtual void				SetPosition(const ZEVector3& NewPosition);
-
-/*		virtual void				Draw(ZEDrawParameters* DrawParameters);*/
 
 		static ZEFoliage*			CreateInstance();
 

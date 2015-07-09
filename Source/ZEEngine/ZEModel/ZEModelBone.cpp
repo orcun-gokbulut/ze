@@ -53,6 +53,11 @@ const char* ZEModelBone::GetName()
 	return BoneResource->Name;
 }
 
+ZEModel* ZEModelBone::GetOwner()
+{
+	return Owner;
+}
+
 ZEModelBone* ZEModelBone::GetParentBone()
 {
 	return ParentBone;
@@ -405,7 +410,11 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 					break;
 			}
 		}
-		PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+
+		if (Owner->GetOwnerScene() == NULL)
+			return;
+
+		PhysicalBody->SetPhysicalWorld(Owner->GetOwnerScene()->GetPhysicalWorld());
 		PhysicalBody->Initialize();
 
 	}
@@ -535,16 +544,12 @@ void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneReso
 			PhysicalJoint->SetAngularSlerpMotorDamper(BoneResource->PhysicalJoint.AngularSlerpMotorDamper);
 		}
 
-		PhysicalJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+		if (Owner->GetOwnerScene() == NULL)
+			return;
+
+		PhysicalJoint->SetPhysicalWorld(Owner->GetOwnerScene()->GetPhysicalWorld());
 		PhysicalJoint->Initialize();
 	}
-
-// 	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
-// 	{
-// 		delete ShapeList[I];
-// 	}
-// 
-// 	ShapeList.Clear();
 }
 
 void ZEModelBone::Deinitialize()

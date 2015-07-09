@@ -214,7 +214,7 @@ void ZED3D9FogProcessor::Process()
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)InputDepthBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	ZED3D9CommonTools::SetTexture(4, (ZETexture2D*)InputColorBuffer, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_CLAMP);
 	
-	ZECamera* Camera = zeScene->GetActiveCamera();
+	ZECamera* Camera = Renderer->Camera;
 
 	struct 
 	{

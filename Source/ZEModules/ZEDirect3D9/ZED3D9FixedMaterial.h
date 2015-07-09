@@ -50,6 +50,10 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 {
 	friend class ZED3D9Module;
 	private:
+
+		mutable ZEVector3				HackGlobalAmbientColor;
+		mutable float					HackGlobalAmbientFactor;
+
 		void							SetTextureStage(ZEUInt Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV) const;
 		void							SetTextureStage(ZEUInt Id, ZETextureAddressMode AddressU, ZETextureAddressMode AddressV, ZETextureAddressMode AddressW) const;
 

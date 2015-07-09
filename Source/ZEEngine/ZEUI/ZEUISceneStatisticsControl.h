@@ -41,11 +41,14 @@
 #include "ZEUI/ZEUILabel.h"
 #include "ZEInput/ZEInputMap.h"
 
+class ZEScene;
+
 class ZEUISceneStatisticsControl : public ZEUIControl
 {
 	private:
 
 		ZEInputMap				InputMap;
+		ZEScene*				Scene;
 
 		ZEUILabel*				FPSCount;
 		ZEUILabel*				CameraPosition;
@@ -113,9 +116,8 @@ class ZEUISceneStatisticsControl : public ZEUIControl
 		ZEUILabel*				ParticleEmitterCount;
 
 	public:
-
-		void					SetMaterial(ZEMaterial* Material);
-		ZEMaterial*				GetMaterial() const;
+		void					SetTargetScene(ZEScene* Scene);
+		ZEScene*				GetTargetScene();
 
 		void					Draw(ZEUIRenderer* Renderer);
 		void					Tick(float ElapsedTime);

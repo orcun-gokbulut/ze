@@ -237,10 +237,13 @@ void  ZESea::SetNormalTexture(const ZETexture2D* Texture)
 
 void ZESea::Tick(float ElapsedTime)
 {
+	if (GetOwnerScene() == NULL)
+		return;
+
 	if(Material->GetGlobalAmbientEnabled())
 	{
-		SetAmbientFactor(zeScene->GetAmbientFactor());
-		SetAmbientColor(zeScene->GetAmbientColor());
+		SetAmbientFactor(GetOwnerScene()->GetAmbientFactor());
+		SetAmbientColor(GetOwnerScene()->GetAmbientColor());
 	}
 
 	DiffuseOffset += DiffuseVelocity * ElapsedTime;

@@ -787,7 +787,10 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 
 void ZEParticleEmitter::SortParticles()
 {
-	ZEVector3 CamPos = zeScene->GetActiveCamera()->GetWorldPosition();
+	if (Owner->GetOwnerScene() == NULL)
+		return;
+
+	ZEVector3 CamPos = Owner->GetOwnerScene()->GetActiveCamera()->GetWorldPosition();
 	float DistanceSqr;
 
 	for (ZEInt I = 0; I < 32; I++)

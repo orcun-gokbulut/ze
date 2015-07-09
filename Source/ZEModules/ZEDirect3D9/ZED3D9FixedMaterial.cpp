@@ -89,6 +89,9 @@ ZED3D9FixedMaterial::ZED3D9FixedMaterial()
 	ForwardPassPixelShader = NULL;
 	ShadowPassVertexShader = NULL;
 	ShadowPassPixelShader = NULL;
+
+	HackGlobalAmbientColor = ZEVector3::Zero;
+	HackGlobalAmbientFactor = 0.0f;
 }
 
 
@@ -186,6 +189,12 @@ void ZED3D9FixedMaterial::SetTextureStage(ZEUInt Id, ZETextureAddressMode Addres
 
 bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
+	if (GetGlobalAmbientEnabled())
+	{
+		HackGlobalAmbientColor = Renderer->GetCamera()->GetOwnerScene()->GetAmbientColor();
+		HackGlobalAmbientFactor = Renderer->GetCamera()->GetOwnerScene()->GetAmbientFactor();
+	}
+
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
 
@@ -324,6 +333,12 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 
 bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
+	if (GetGlobalAmbientEnabled())
+	{
+		HackGlobalAmbientColor = Renderer->GetCamera()->GetOwnerScene()->GetAmbientColor();
+		HackGlobalAmbientFactor = Renderer->GetCamera()->GetOwnerScene()->GetAmbientFactor();
+	}
+
 	// Update material if its changed. (Recompile shaders, etc.)
 	((ZED3D9FixedMaterial*)this)->UpdateMaterial();
 
@@ -531,8 +546,8 @@ void ZED3D9FixedMaterial::UpdateMaterial()
 	if(GetGlobalAmbientEnabled())
 	{
 		SetAmbientEnabled(true);
-		SetAmbientFactor(zeScene->GetAmbientFactor());
-		SetAmbientColor(zeScene->GetAmbientColor());
+		SetAmbientFactor(HackGlobalAmbientFactor);
+		SetAmbientColor(HackGlobalAmbientColor);
 	}
 
 	if ((MaterialComponents & MaterialComponentMask) != OldMaterialComponents)

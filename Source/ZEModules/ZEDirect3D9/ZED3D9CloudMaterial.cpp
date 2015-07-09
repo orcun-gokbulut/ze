@@ -444,8 +444,8 @@ void ZED3D9CloudMaterial::ReleaseBuffers()
 void ZED3D9CloudMaterial::CreateRenderTargets()
 {
 	bool Result = false;
-	ZEUInt TargetWidth = zeScene->GetRenderer()->GetViewPort()->GetWidth() / 2;
-	ZEUInt TargetHeight = zeScene->GetRenderer()->GetViewPort()->GetHeight() / 2;
+	ZEUInt TargetWidth = Camera->GetOwnerScene()->GetRenderer()->GetViewPort()->GetWidth() / 2;
+	ZEUInt TargetHeight = Camera->GetOwnerScene()->GetRenderer()->GetViewPort()->GetHeight() / 2;
 
 	if(CloudShadowBuffer == NULL)
 	{
@@ -567,8 +567,8 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	// Update material if its changed. (Recompile shader, etc.)
 	// ((ZED3D9CloudMaterial*)this)->UpdateMaterial();
 	
-	float OriginalFarZ = zeScene->GetActiveCamera()->GetFarZ();
-	zeScene->GetActiveCamera()->SetFarZ(20000.0f);
+	float OriginalFarZ = Renderer->GetCamera()->GetFarZ();
+	Renderer->GetCamera()->SetFarZ(20000.0f);
 
 	((ZED3D9CloudMaterial*)this)->UpdateShadowTransformations();
 
@@ -593,7 +593,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudTexture, D3DTEXF_POINT, D3DTEXF_POINT, D3DTADDRESS_WRAP);
 	*/
 
-	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
+	ZEVector3 CameraPosition = Renderer->GetCamera()->GetWorldPosition();
 
 	struct
 	{
@@ -655,7 +655,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	ZED3D9CommonTools::SetTexture(0, (ZETexture2D*)CloudFormationTexture, D3DTEXF_LINEAR, D3DTEXF_LINEAR, D3DTADDRESS_WRAP);
 
 	ZEMatrix4x4	WorldViewProjMatrix;
-	ZEMatrix4x4::Multiply(WorldViewProjMatrix, zeScene->GetActiveCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
+	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Renderer->GetCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
 
 	GetDevice()->SetVertexShaderConstantF(0, (const float*)&WorldViewProjMatrix, 4);
 	GetDevice()->SetVertexShaderConstantF(4, (const float*)&VertexShaderParameters, sizeof(VertexShaderParameters) / 16);
@@ -900,7 +900,7 @@ bool ZED3D9CloudMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 	RenderCommand->VertexBuffer			= RenderCloudVertexBuffer;
 	RenderCommand->VertexDeclaration	= RenderCloudVertexDeclaration;
 
-	zeScene->GetActiveCamera()->SetFarZ(OriginalFarZ);
+	Renderer->GetCamera()->SetFarZ(OriginalFarZ);
 
 	return true;
 }

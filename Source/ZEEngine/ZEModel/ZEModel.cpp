@@ -197,7 +197,10 @@ void ZEModel::LoadModelResource()
 		ParentlessBoneShape->SetPosition(ZEVector3::Zero);
 		ParentlessBoneBody->AddPhysicalShape(ParentlessBoneShape);
 
-		ParentlessBoneBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+		if (GetOwnerScene() == NULL)
+			return;
+
+		ParentlessBoneBody->SetPhysicalWorld(GetOwnerScene()->GetPhysicalWorld());
 		ParentlessBoneBody->Initialize();
 
 		for(ZESize I = 0; I < Skeleton.GetCount(); I++)
@@ -442,7 +445,10 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 
 	ParentlessBoneJoint->SetMassInertiaTensor(ZEVector3(1,1,1)); // For solid joint connection
 
-	ParentlessBoneJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+	if (GetOwnerScene() == NULL)
+		return;
+
+	ParentlessBoneJoint->SetPhysicalWorld(GetOwnerScene()->GetPhysicalWorld());
 	ParentlessBoneJoint->Initialize();
 }
 

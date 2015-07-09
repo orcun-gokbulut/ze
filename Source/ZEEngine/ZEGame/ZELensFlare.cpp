@@ -73,14 +73,19 @@ void ZELensFlare::Draw(ZEDrawParameters* DrawParameters)
 
 	// Find Sun
 
-	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Class());
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+
+	ZEArray<ZEEntity*> Entities = Scene->GetEntities(ZEWeather::Class());
 	if (Entities.GetSize() == 0)
 		return;
 
 	ZEWeather* Weather = static_cast<ZEWeather*>(Entities[0]);
 	ZEVector3 SunDirection = Weather->GetSunDirection();
 
-	ZECamera* Camera = ZEScene::GetInstance()->GetActiveCamera();
+	ZECamera* Camera = Scene->GetActiveCamera();
 	
 	ZEVector4 SunDirectionScreen;
 	ZEMatrix4x4::Transform(SunDirectionScreen, Camera->GetViewProjectionTransform(), ZEVector4(SunDirection, 1.0f));

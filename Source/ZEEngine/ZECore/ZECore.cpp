@@ -57,7 +57,6 @@
 #include "ZEInput/ZEInputModule.h"
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZESound/ZESoundModule.h"
-#include "ZEGame/ZEGame.h"
 #include "ZECrashHandler.h"
 
 #include "ZEMeta/ZEProvider.h"
@@ -276,17 +275,6 @@ bool ZECore::SetNetworkModule(ZENetworkModule* Module)
 ZENetworkModule* ZECore::GetNetworkModule()
 {
 	return NetworkModule;
-}
-
-bool ZECore::SetGame(ZEGame* Game)
-{
-	this->Game = Game;
-	return true;
-}
-
-ZEGame* ZECore::GetGame()
-{
-	return Game;
 }
 
 void ZECore::SetApplicationModule(ZEApplicationModule* Component)
@@ -576,8 +564,6 @@ bool ZECore::StartUp(void* WindowHandle)
 	zeLog("Modules initialized.");
 
 	Console->EnableInput();
-	if (Game != NULL)
-		Game->Initialize();
 
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	zeLog("Core initialized.");
@@ -596,17 +582,10 @@ void ZECore::ShutDown()
 	if (Application != NULL)
 		Application->ShutDown();
 
-	// Destroy game
-	zeLog("Deinitializing Running Games.");
-	if (Game != NULL)
-		Game->Deinitialize();
-
 	zeLog("Saving options.");
 	if (CoreState == ZE_CS_CRITICAL_ERROR)
 		zeLog("Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	OptionManager->Save("options.ini");
-
-	zeLog("Releasing game content data.");
 
 	zeLog("Releasing shared resources.");
 	ResourceManager->ReleaseAllResources();
@@ -665,20 +644,21 @@ void ZECore::MainLoop()
 
 	// Game Logic
 	InputModule->Process();
-
-	if (Game != NULL)
-		Game->Tick(FrameTime);
 	
 	if (Application != NULL)
+	{
+		Application->Tick(FrameTime);
 		Application->Process(FrameTime);
-	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
+	}
 
 	// Engine Logic
 	PhysicsModule->Process(FrameTime);
 	SoundModule->ProcessSound(FrameTime);
 	GraphicsModule->ClearFrameBuffer();
-	if (Game != NULL)
-		Game->Render(FrameTime);
+
+	if (Application != NULL)
+		Application->Render(FrameTime);
+
 	GraphicsModule->UpdateScreen();
 	PhysicsModule->UpdateWorlds();
 
@@ -732,7 +712,6 @@ ZECore::ZECore()
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
 	Window					= new ZEWindow();
-	Game					= new ZEGame();
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 
@@ -749,7 +728,6 @@ ZECore::~ZECore()
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 
-	delete Game;
 	delete Window;
 	delete PluginManager;
 	delete ExtensionManager;

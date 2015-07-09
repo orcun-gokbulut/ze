@@ -54,8 +54,13 @@ ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
 
 void ZEGizmo::UpdateMoveGizmo()
 {
-	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
-	ZEQuaternion CameraRotation = zeScene->GetActiveCamera()->GetWorldRotation();
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+	
+	ZEVector3 CameraPosition = Scene->GetActiveCamera()->GetWorldPosition();
+	ZEQuaternion CameraRotation = Scene->GetActiveCamera()->GetWorldRotation();
 	
 	static ZEVector3 OldCameraPosition = ZEVector3::Zero;
 	static ZEQuaternion OldCameraRotation = ZEQuaternion::Identity;
@@ -63,7 +68,7 @@ void ZEGizmo::UpdateMoveGizmo()
 	if (!DirtyGizmoFlag && CameraPosition == OldCameraPosition && CameraRotation == OldCameraRotation)
 		return;
 
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisLenght_10 = AxisLenght * 0.1f;
 	float AxisLenght_5 = AxisLenght * 0.2f;
@@ -183,8 +188,13 @@ void ZEGizmo::UpdateMoveGizmo()
 
 void ZEGizmo::UpdateRotateGizmo()
 {
-	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
-	ZEQuaternion CameraRotation = zeScene->GetActiveCamera()->GetWorldRotation();
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+
+	ZEVector3 CameraPosition = Scene->GetActiveCamera()->GetWorldPosition();
+	ZEQuaternion CameraRotation = Scene->GetActiveCamera()->GetWorldRotation();
 	
 	static ZEVector3 OldCameraPosition = ZEVector3::Zero;
 	static ZEQuaternion OldCameraRotation = ZEQuaternion::Identity;
@@ -193,7 +203,7 @@ void ZEGizmo::UpdateRotateGizmo()
 		return;
 
 
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisLenght_10 = AxisLenght * 0.1f;
 	float AxisLenght_4 = AxisLenght * 0.25f;
@@ -387,8 +397,13 @@ void ZEGizmo::UpdateRotateGizmo()
 
 void ZEGizmo::UpdateScaleGizmo()
 {
-	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
-	ZEQuaternion CameraRotation = zeScene->GetActiveCamera()->GetWorldRotation();
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+
+	ZEVector3 CameraPosition = Scene->GetActiveCamera()->GetWorldPosition();
+	ZEQuaternion CameraRotation = Scene->GetActiveCamera()->GetWorldRotation();
 	
 	static ZEVector3 OldCameraPosition = ZEVector3::Zero;
 	static ZEQuaternion OldCameraRotation = ZEQuaternion::Identity;
@@ -396,7 +411,7 @@ void ZEGizmo::UpdateScaleGizmo()
 	if (!DirtyGizmoFlag && CameraPosition == OldCameraPosition && CameraRotation == OldCameraRotation)
 		return;
 
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(CameraPosition, GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisLenght_10 = AxisLenght * 0.1f;
 	float AxisLenght_5 = AxisLenght * 0.2f;
@@ -535,8 +550,12 @@ void ZEGizmo::UpdateScaleGizmo()
 
 void ZEGizmo::UpdateHelperGizmo()
 {
+	ZEScene* Scene = GetOwnerScene();
 
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(zeScene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	if (Scene == NULL)
+		return;
+
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(Scene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_5 = AxisLenght * 0.2f;
 	float AxisLenght_10 = AxisLenght * 0.1f;
 
@@ -555,7 +574,7 @@ void ZEGizmo::UpdateHelperGizmo()
 	GizmoLines.SetColor(ZEVector4(0.0f, 0.0f, 1.0f, 1.0f));
 	GizmoLines.AddLine(ZEVector3::Zero, ZEVector3(0.0f, 0.0f, 1.0f) * AxisLenght);
 
-	GizmoLines.SetRotation(zeScene->GetActiveCamera()->GetWorldRotation() * GetRotation().Conjugate());
+	GizmoLines.SetRotation(Scene->GetActiveCamera()->GetWorldRotation() * GetRotation().Conjugate());
 
 	// X Letter
 	GizmoLines.SetColor(ZEVector4(1.0f, 0.0f, 0.0f, 1.0f));
@@ -692,6 +711,11 @@ ZEVector3 ZEGizmo::MoveProjection_(ZEGizmoAxis Axis, const ZERay& Ray)
 
 ZEQuaternion ZEGizmo::RotationProjection_(ZEGizmoAxis Axis, const ZERay& Ray)
 {
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return ZEQuaternion::Identity;
+
 	ZEVector2 Replacement;
 	float Displacement = Replacement.Length();
 	
@@ -720,7 +744,7 @@ ZEQuaternion ZEGizmo::RotationProjection_(ZEGizmoAxis Axis, const ZERay& Ray)
 			break;
 
 		case ZE_GA_SCREEN_AXIS:
-			RotationAxis = zeScene->GetActiveCamera()->GetWorldFront();
+			RotationAxis = Scene->GetActiveCamera()->GetWorldFront();
 			break;
 	}
 
@@ -736,7 +760,12 @@ ZEVector3 ZEGizmo::ScaleProjection_(ZEGizmoAxis Axis, const ZERay& Ray)
 
 ZEGizmoAxis ZEGizmo::PickMoveAxis(const ZERay& Ray, float& TRay)
 {
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(zeScene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return ZE_GA_NONE;
+
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(Scene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisTreshold = AxisLenght * 0.1f;
 
@@ -822,13 +851,18 @@ ZEGizmoAxis ZEGizmo::PickMoveAxis(const ZERay& Ray, float& TRay)
 
 ZEGizmoAxis ZEGizmo::PickRotateAxis(const ZERay& Ray, float& TRay)
 {
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(zeScene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return ZE_GA_NONE;
+
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(Scene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisTreshold = AxisLenght * 0.1f;
 
-	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition().Normalize();
+	ZEVector3 CameraPosition = Scene->GetActiveCamera()->GetWorldPosition().Normalize();
 	const ZEVector3& Position = GetPosition();
 
-	ZEVector3 CameraDirection = zeScene->GetActiveCamera()->GetWorldRotation() * ZEVector3::UnitZ;
+	ZEVector3 CameraDirection = Scene->GetActiveCamera()->GetWorldRotation() * ZEVector3::UnitZ;
 
 	ZEVector3 Right, Up, Front;
 	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetRotation());
@@ -891,7 +925,12 @@ ZEGizmoAxis ZEGizmo::PickRotateAxis(const ZERay& Ray, float& TRay)
 
 ZEGizmoAxis ZEGizmo::PickScaleAxis(const ZERay& Ray, float& TRay)
 {
-	float AxisLenght = this->AxisLenght * ZEVector3::Distance(zeScene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * zeScene->GetActiveCamera()->GetProjectionTransform().M11;
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return ZE_GA_NONE;
+
+	float AxisLenght = this->AxisLenght * ZEVector3::Distance(Scene->GetActiveCamera()->GetWorldPosition(), GetPosition()) * Scene->GetActiveCamera()->GetProjectionTransform().M11;
 	float AxisLenght_2 = AxisLenght * 0.5f;
 	float AxisTreshold = AxisLenght * 0.1f;
 

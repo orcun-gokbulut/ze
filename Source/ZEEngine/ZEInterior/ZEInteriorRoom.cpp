@@ -442,7 +442,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 			PhysicalTriangles[I].Indices[2] =  Resource->PhysicalMesh.Polygons[I].Indices[2];
 		}
 
-		if (PhysicalMesh == NULL)
+		if (PhysicalMesh == NULL && GetOwner()->GetOwnerScene() != NULL)
 		{
 			PhysicalMesh = ZEPhysicalMesh::CreateInstance();
 			PhysicalMesh->SetData(Resource->PhysicalMesh.Vertices.GetConstCArray(), 
@@ -456,7 +456,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 			PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
 			PhysicalMesh->SetEnabled(Resource->PhysicalMesh.PhysicalMeshEnabled);
 			PhysicalMesh->Initialize();
-			zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
+			GetOwner()->GetOwnerScene()->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
 		}
 	}
 

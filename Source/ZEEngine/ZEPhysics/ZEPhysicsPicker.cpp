@@ -60,11 +60,11 @@ void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorY
 	zeCore->GetWindow()->GetWindowPosition(WindowLeftPosition, WindowTopPosition);
 	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 
-	ZEMatrix4x4 ViewTransform = zeScene->GetActiveCamera()->GetViewTransform();
+	ZEMatrix4x4 ViewTransform = GetOwnerScene()->GetActiveCamera()->GetViewTransform();
 
 	ZEVector4 ViewPosition = ViewTransform * WorldSpacePosition;
 
-	ZEMatrix4x4 ProjectionTransform = zeScene->GetActiveCamera()->GetProjectionTransform();
+	ZEMatrix4x4 ProjectionTransform = GetOwnerScene()->GetActiveCamera()->GetProjectionTransform();
 
 	ZEVector4 ProjectionPosition = ProjectionTransform * ViewPosition;
 
@@ -81,13 +81,13 @@ void ZEPhysicsPicker::ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorY
 void ZEPhysicsPicker::ReverseViewProjection(ZEVector3& Output, const ZEInt& CursorXInput, const ZEInt& CursorYInput, const float& Depth)
 {
 	ZEVector3 TempVector;
-	const ZEMatrix4x4& ProjMatrix = zeScene->GetActiveCamera()->GetProjectionTransform();
+	const ZEMatrix4x4& ProjMatrix = GetOwnerScene()->GetActiveCamera()->GetProjectionTransform();
 	TempVector.x =  (((2.0f * CursorXInput ) / zeGraphics->GetScreenWidth()) - 1) / ProjMatrix.M11;
 	TempVector.y = -(((2.0f * CursorYInput ) / zeGraphics->GetScreenHeight()) - 1) / ProjMatrix.M22;
 	TempVector.z =  1.0f;
 
 	ZEMatrix4x4 InvViewMatrix;
-	ZEMatrix4x4::Inverse(InvViewMatrix, zeScene->GetActiveCamera()->GetViewTransform());
+	ZEMatrix4x4::Inverse(InvViewMatrix, GetOwnerScene()->GetActiveCamera()->GetViewTransform());
 
 	ZEMatrix4x4::Transform3x3(Output, InvViewMatrix, TempVector);
 
@@ -165,7 +165,7 @@ bool ZEPhysicsPicker::PickObject(ZEInt X, ZEInt Y)
 	Sphere->SetRadius(0.01f);
 
 	MouseSphere->AddPhysicalShape(Sphere);
-	MouseSphere->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+	MouseSphere->SetPhysicalWorld(GetOwnerScene()->GetPhysicalWorld());
 	MouseSphere->SetMass(0.005f);
 
 	MouseJoint = ZEPhysicalJoint::CreateInstance();
@@ -180,13 +180,13 @@ bool ZEPhysicsPicker::PickObject(ZEInt X, ZEInt Y)
 
 	ZERay Ray;
 
-	zeScene->GetActiveCamera()->GetScreenRay(Ray, X, Y);
+	GetOwnerScene()->GetActiveCamera()->GetScreenRay(Ray, X, Y);
 
 	RayCast = Ray;
 
 	ZERayCastResultDetails ResultDetails;
 
-	ZEPhysicalShape* ClosestShape = zeScene->GetPhysicalWorld()->RayCastToClosestShape(Ray, ZE_PRCFST_ALL_SHAPES, ResultDetails);
+	ZEPhysicalShape* ClosestShape = GetOwnerScene()->GetPhysicalWorld()->RayCastToClosestShape(Ray, ZE_PRCFST_ALL_SHAPES, ResultDetails);
 
 	if(ClosestShape == NULL)
 		return false;
@@ -237,7 +237,7 @@ bool ZEPhysicsPicker::PickObject(ZEInt X, ZEInt Y)
 // 		MouseJoint->SetBodyBConnectionPosition(ResultMatrix * ResultDetails.ImpactWorldPosition);
 		//Orientation ayarla
 
-		MouseJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+		MouseJoint->SetPhysicalWorld(GetOwnerScene()->GetPhysicalWorld());
 		MouseJoint->Initialize();
 
 		delete Sphere;
@@ -254,7 +254,7 @@ void ZEPhysicsPicker::MoveObject(ZEInt X, ZEInt Y)
 		return;
 	ZERay TargetPosition;
 // 	ReverseViewProjection(TargetPosition, X, Y, MouseDepth);
-	zeScene->GetActiveCamera()->GetScreenRay(TargetPosition, X, Y);
+	GetOwnerScene()->GetActiveCamera()->GetScreenRay(TargetPosition, X, Y);
 
 	TargetPosition.v *= MouseDepth;
 	TargetPosition.v += TargetPosition.p;

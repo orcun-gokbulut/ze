@@ -62,7 +62,7 @@ class ZEPhysicalWorld;
 #define ZE_RCF_POSITON							8
 #define ZE_RCF_NORMAL							16
 
-#define zeScene ZEScene::GetInstance()
+/*#define zeScene ZEScene::GetInstance()*/
 
 class ZEScene : public ZEObject
 {
@@ -92,6 +92,10 @@ class ZEScene : public ZEObject
 		ZEVector3								AmbientColor;
 
 		void									Tick(ZEEntity* Entity, float ElapsedTime);
+
+	protected:
+												ZEScene();
+		virtual									~ZEScene();
 
 	public:
 		void									AddEntity(ZEEntity* Entity);
@@ -135,10 +139,7 @@ class ZEScene : public ZEObject
 		void									SetAmbientColor(ZEVector3 Color);
 		const ZEVector3&						GetAmbientColor() const;
 
-												ZEScene();
-		virtual									~ZEScene();
-
-		static ZEScene*							GetInstance();
+		static ZEScene*							CreateInstance();
 };
 
 #endif

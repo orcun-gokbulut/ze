@@ -35,8 +35,20 @@
 
 #include "ZEApplicationModule.h"
 #include "ZEFile/ZEPathManager.h"
+#include "ZEUI/ZEUIManager.h"
 
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
+
+
+void ZEApplicationModule::SetUIManager(ZEUIManager* UIManager)
+{
+	this->UIManager = UIManager;
+}
+
+ZEUIManager* ZEApplicationModule::GetUIManager()
+{
+	return UIManager;
+}
 
 void ZEApplicationModule::PreProcess()
 {
@@ -76,6 +88,7 @@ void ZEApplicationModule::Render(float ElapsedTime)
 
 ZEApplicationModule::ZEApplicationModule()
 {
+	UIManager = NULL;
 }
 
 ZEApplicationModule::~ZEApplicationModule()

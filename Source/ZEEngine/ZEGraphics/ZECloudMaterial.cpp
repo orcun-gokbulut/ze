@@ -78,8 +78,6 @@ ZECloudMaterial::~ZECloudMaterial()
 
 void ZECloudMaterial::UpdateParameters(float Time)
 {
-	Camera = zeScene->GetActiveCamera();
-
 	if (Camera == NULL)
 		return;
 

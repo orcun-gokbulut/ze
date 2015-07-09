@@ -95,6 +95,7 @@ class ZEModelMesh : public ZEObject
 		void								OnTransformChanged();
 
 	public:
+		ZEModel*							GetOwner();
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();

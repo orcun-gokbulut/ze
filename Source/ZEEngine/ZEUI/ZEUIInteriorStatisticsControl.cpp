@@ -51,100 +51,103 @@
 #define FPSText				ZEString("Frame Per Second      : ")
 #define CamPosText			ZEString("Camera Position       : ")
 
-void ZEUIInteriorStatisticsControl::SetMaterial( ZEMaterial* Material )
-{
 
-}
-
-ZEMaterial* ZEUIInteriorStatisticsControl::GetMaterial() const
-{
-	return NULL;
-}
-
-void ZEUIInteriorStatisticsControl::Draw( ZEUIRenderer* Renderer )
+void ZEUIInteriorStatisticsControl::Draw(ZEUIRenderer* Renderer)
 {
 	ZEUIControl::Draw(Renderer);
 }
 
-void ZEUIInteriorStatisticsControl::Tick( float ElapsedTime )
+void ZEUIInteriorStatisticsControl::Tick(float ElapsedTime)
 {
 	//Portal Culling Calculation
 
-	ZEScene* TempScene = zeScene;
-	ZEInterior* TempMap = (ZEInterior*)TempScene->GetEntities(ZEInterior::Description()).GetFirstItem();
-	ZEVector3 CamPos = TempScene->GetActiveCamera()->GetWorldPosition();
-	ZEInteriorCullStatistics Stats = TempMap->GetCullStatistics();
-	ZEString Value;
+	if (Scene != NULL)
+	{
+		ZEInterior* TempMap = (ZEInterior*)Scene->GetEntities(ZEInterior::Class()).GetFirstItem();
+		ZEVector3 CamPos = Scene->GetActiveCamera()->GetWorldPosition();
+		ZEInteriorStatistics Stats = TempMap->GetStatistics();
+		ZEString Value;
 
-	Value.SetValue(Stats.TotalRoomCount);
-	TotalRoomCount->SetText(TotalRoomText + Value);
+		Value.SetValue(Stats.TotalRoomCount);
+		TotalRoomCount->SetText(TotalRoomText + Value);
 
-	Value.SetValue(Stats.CulledRoomCount);
-	CulledRoomCount->SetText(CulledRoomText + Value);
+		Value.SetValue(Stats.CulledRoomCount);
+		CulledRoomCount->SetText(CulledRoomText + Value);
 
-	Value.SetValue(Stats.DrawedRoomCount);
-	DrawedRoomCount->SetText(DrawedRoomText + Value);
+		Value.SetValue(Stats.DrawedRoomCount);
+		DrawedRoomCount->SetText(DrawedRoomText + Value);
 
-	Value.SetValue(Stats.TotalInteriorPolygonCount);
-	TotalPolygonCount->SetText(TotalPolygonText + Value);
+		Value.SetValue(Stats.TotalInteriorPolygonCount);
+		TotalPolygonCount->SetText(TotalPolygonText + Value);
 
-	Value.SetValue(Stats.CulledInteriorPolygonCount);
-	CulledPolygonCount->SetText(CulledPolygonText + Value);
+		Value.SetValue(Stats.CulledInteriorPolygonCount);
+		CulledPolygonCount->SetText(CulledPolygonText + Value);
 
-	Value.SetValue(Stats.DrawedInteriorPolygonCount);
-	DrawedPolygonCount->SetText(DrawedPolygonText + Value);
+		Value.SetValue(Stats.DrawedInteriorPolygonCount);
+		DrawedPolygonCount->SetText(DrawedPolygonText + Value);
+	}
 
 	ZEUIControl::Tick(ElapsedTime);
 }
 
+void ZEUIInteriorStatisticsControl::SetTargetScene(ZEScene* Scene)
+{
+	this->Scene = Scene;
+}
+
+ZEScene* ZEUIInteriorStatisticsControl::GetTargetScene()
+{
+	return Scene;
+}
+
 ZEUIInteriorStatisticsControl::ZEUIInteriorStatisticsControl()
 {
-	TotalRoomCount = new ZEUITextControl();
+	TotalRoomCount = new ZEUILabel();
 	TotalRoomCount->SetWidth(250.0f);
 	TotalRoomCount->SetHeight(25.0f);
 	TotalRoomCount->SetPosition(ZEVector2(0.0f, 0.0f));
-	TotalRoomCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	TotalRoomCount->SetTextColor(ZEVector4::One);
+	TotalRoomCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
+	TotalRoomCount->SetFontColor(ZEVector4::One);
 	AddChildControl(TotalRoomCount);
 
-	CulledRoomCount = new ZEUITextControl();
+	CulledRoomCount = new ZEUILabel();
 	CulledRoomCount->SetWidth(250.0f);
 	CulledRoomCount->SetHeight(25.0f);
 	CulledRoomCount->SetPosition(ZEVector2(0.0f, 25.0f));
-	CulledRoomCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	CulledRoomCount->SetTextColor(ZEVector4::One);
+	CulledRoomCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
+	CulledRoomCount->SetFontColor(ZEVector4::One);
 	AddChildControl(CulledRoomCount);
 
-	DrawedRoomCount = new ZEUITextControl();
+	DrawedRoomCount = new ZEUILabel();
 	DrawedRoomCount->SetWidth(250.0f);
 	DrawedRoomCount->SetHeight(25.0f);
 	DrawedRoomCount->SetPosition(ZEVector2(0.0f, 50.0f));
-	DrawedRoomCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	DrawedRoomCount->SetTextColor(ZEVector4::One);
+	DrawedRoomCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
+	DrawedRoomCount->SetFontColor(ZEVector4::One);
 	AddChildControl(DrawedRoomCount);
 
-	TotalPolygonCount = new ZEUITextControl();
+	TotalPolygonCount = new ZEUILabel();
 	TotalPolygonCount->SetWidth(250.0f);
 	TotalPolygonCount->SetHeight(25.0f);
 	TotalPolygonCount->SetPosition(ZEVector2(0.0f, 100.0f));
-	TotalPolygonCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	TotalPolygonCount->SetTextColor(ZEVector4::One);
+	TotalPolygonCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
+	TotalPolygonCount->SetFontColor(ZEVector4::One);
 	AddChildControl(TotalPolygonCount);
 
-	CulledPolygonCount = new ZEUITextControl();
+	CulledPolygonCount = new ZEUILabel();
 	CulledPolygonCount->SetWidth(250.0f);
 	CulledPolygonCount->SetHeight(25.0f);
 	CulledPolygonCount->SetPosition(ZEVector2(0.0f, 125.0f));
-	CulledPolygonCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	CulledPolygonCount->SetTextColor(ZEVector4::One);
+	CulledPolygonCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
+	CulledPolygonCount->SetFontColor(ZEVector4::One);
 	AddChildControl(CulledPolygonCount);
 
-	DrawedPolygonCount = new ZEUITextControl();
+	DrawedPolygonCount = new ZEUILabel();
 	DrawedPolygonCount->SetWidth(250.0f);
 	DrawedPolygonCount->SetHeight(25.0f);
 	DrawedPolygonCount->SetPosition(ZEVector2(0.0f, 150.0f));
-	DrawedPolygonCount->SetFont(ZEFontResource::LoadResource("ZEEngine/ZEGUI/Fonts/Arial16Bitmap/Arial16.zeFont"));
-	DrawedPolygonCount->SetTextColor(ZEVector4::One);
+	DrawedPolygonCount->SetFontResource(ZEUIManager::GetDefaultFontResource());
+	DrawedPolygonCount->SetFontColor(ZEVector4::One);
 	AddChildControl(DrawedPolygonCount);
 
 	this->SetHeight(175.0f);

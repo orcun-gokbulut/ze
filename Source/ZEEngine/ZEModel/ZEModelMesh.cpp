@@ -74,6 +74,11 @@ bool ZEModelMesh::GetVisible()
 	return Visible;
 }
 
+ZEModel* ZEModelMesh::GetOwner()
+{
+	return Owner;
+}
+
 ZEModelMesh* ZEModelMesh::GetParentMesh()
 {
 	return ParentMesh;
@@ -491,7 +496,10 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				}
 			}
 
-			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			if (Owner->GetOwnerScene() == NULL)
+				return;
+
+			PhysicalBody->SetPhysicalWorld(Owner->GetOwnerScene()->GetPhysicalWorld());
 			PhysicalBody->Initialize();
 		}
 		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)
@@ -515,7 +523,11 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 			PhysicalCloth->SetBendingMode(true);
 			PhysicalCloth->SetBendingStiffness(1.0f);
 			PhysicalCloth->SetStretchingStiffness(1.0f);
-			PhysicalCloth->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+
+			if (Owner->GetOwnerScene() == NULL)
+				return;
+
+			PhysicalCloth->SetPhysicalWorld(Owner->GetOwnerScene()->GetPhysicalWorld());
 			PhysicalCloth->Initialize();
 		}
 	}
