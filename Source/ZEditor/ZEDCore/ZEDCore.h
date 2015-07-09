@@ -35,13 +35,10 @@
 
 #pragma once
 
-#include "ZEFoundation/ZEDS/ZEArray.h"
-
 class ZEDOperationManager;
 class ZEDSelectionManager;
 class ZEDTransformationManager;
-class ZEDViewPort;
-class ZEScene;
+class ZEDModule;
 
 class ZEDCore
 {
@@ -49,12 +46,8 @@ class ZEDCore
 		ZEDOperationManager* OperationManager;
 		ZEDSelectionManager* SelectionManager;
 		ZEDTransformationManager* TransformationManager;
-
-		ZEDViewPort* Viewport;
-
-		ZEScene* ExportScene;
-		ZEScene* EditorScene;
-
+		ZEDModule* EditorModule;
+		
 		ZEDCore();
 		~ZEDCore();
 
@@ -62,10 +55,10 @@ class ZEDCore
 		ZEDOperationManager* GetOperationManager();
 		ZEDSelectionManager* GetSelectionManager();
 		ZEDTransformationManager* GetTransformationManager();
+		ZEDModule* GetEditorModule();
 
-		ZEDViewPort* GetViewport();
-		ZEScene* GetExportScene();
-		ZEScene* GetEditorScene();
+		void InitializeEngine();
+		void DeinitializeEngine();
 
 		void Destroy();
 

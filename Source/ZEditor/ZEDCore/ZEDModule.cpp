@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.cpp
+ Zinek Engine - ZEDModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDCore.h"
-#include "ZEDOperationManager.h"
-#include "ZEDSelectionManager.h"
-#include "ZEDTransformationManager.h"
 #include "ZEDModule.h"
+#include "ZEDScene.h"
 #include "ZEDViewPort.h"
-#include "ZEDS/ZEString.h"
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZECore/ZEOptionManager.h"
-#include <windows.h>
-#include <QtCore/QObject>
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEGrid.h"
 
-extern HINSTANCE ApplicationInstance;
-
-ZEDCore::ZEDCore()
+ZEDScene* ZEDModule::GetScene()
 {
-	OperationManager = new ZEDOperationManager();
-	SelectionManager = new ZEDSelectionManager();
-	TransformationManager = new ZEDTransformationManager();
-	EditorModule = new ZEDModule();
+	return Scene;
 }
 
-ZEDCore::~ZEDCore()
+ZEDViewPort* ZEDModule::GetViewPort()
 {
-	delete OperationManager;
-	delete SelectionManager;
-	delete TransformationManager;
-	delete EditorModule;
+	return Viewport;
 }
 
-ZEDOperationManager* ZEDCore::GetOperationManager()
+void ZEDModule::Tick(float ElapsedTime)
 {
-	return OperationManager;
+	Scene->Tick(ElapsedTime);
+	Viewport->Tick(ElapsedTime);
 }
 
-ZEDSelectionManager* ZEDCore::GetSelectionManager()
+void ZEDModule::Render(float ElapsedTime)
 {
-	return SelectionManager;
+	Scene->Render(ElapsedTime);
+	Scene->GetRenderer()->Render(ElapsedTime);
+	Scene->GetRenderer()->ClearLists();
 }
 
-ZEDTransformationManager* ZEDCore::GetTransformationManager()
+void ZEDModule::StartUp()
 {
-	return TransformationManager;
+	if (Scene == NULL)
+	{
+		Scene = ZEDScene::CreateInstance();
+		Scene->Initialize();
+	}
+
+	Viewport->Initialize();
+
+	Grid = ZEGrid::CreateInstance();
+	Scene->AddEntity(Grid);
 }
 
-ZEDModule* ZEDCore::GetEditorModule()
+void ZEDModule::ShutDown()
 {
-	return EditorModule;
+	Viewport->Deinitialize();
+
+	if (Scene != NULL)
+	{
+		Scene->Deinitialize();
+		Scene->Destroy();
+		Scene = NULL;
+	}
 }
 
-void ZEDCore::InitializeEngine()
+ZEDModule::ZEDModule()
 {
-	zeCore->SetApplicationModule(EditorModule);
-
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
-	zeCore->GetWindow()->SetComponentWindowHandle(EditorModule->GetViewPort()->winId());
-	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
-
-	if (zeCore->StartUp(EditorModule->GetViewPort()->winId()))
-		zeCore->Run();
+	Scene = NULL;
+	Viewport = new ZEDViewPort();
 }
 
-void ZEDCore::DeinitializeEngine()
+ZEDModule::~ZEDModule()
 {
-	zeCore->ShutDown();
+
 }
 
-void ZEDCore::Destroy()
-{
-	delete this;
-}
-
-ZEDCore* ZEDCore::GetInstance()
-{
-	static ZEDCore Core;
-	return &Core;
-}

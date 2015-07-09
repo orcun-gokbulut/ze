@@ -35,7 +35,9 @@
 
 #include "ZEDViewPort.h"
 #include "ZEDCore.h"
+#include "ZEDModule.h"
 #include "ZEDGizmo.h"
+#include "ZEDScene.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDTransformationManager.h"
 #include "ZECore/ZECore.h"
@@ -105,6 +107,7 @@ void ZEDViewPort::RotateCamera(const ZEVector2& MousePosition)
 	ZEQuaternion::CreateFromEuler(Temp, Pitch, Yaw, Roll);
 	ZEQuaternion::Normalize(Rotation, Temp);
 	Camera->SetRotation(Rotation);
+	MouseStartPosition = MousePosition;
 }
 
 void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
@@ -120,7 +123,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 	if (MouseEvent->button() == Qt::LeftButton && !(MouseEvent->buttons() & Qt::RightButton))
 	{
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->pos().x(), MouseEvent->pos().y());
+		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 		float TRay = FLT_MAX;
 
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
@@ -157,11 +160,13 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 			ZEVector3 CameraDirection = Camera->GetFront();
 			ZEVector3::Scale(CameraDirection,CameraDirection, 0.1f * (MouseStartPosition.y - MouseEvent->y()));
 			Camera->SetPosition(Camera->GetPosition() + CameraDirection);
+			MouseStartPosition.x = MouseEvent->x();
+			MouseStartPosition.y = MouseEvent->y();
 		}
 		else if (MouseEvent->modifiers() == Qt::NoModifier)
 		{
-			MouseCurrentPosition.x = MouseEvent->pos().x();
-			MouseCurrentPosition.y = MouseEvent->pos().y();
+			MouseCurrentPosition.x = MouseEvent->x();
+			MouseCurrentPosition.y = MouseEvent->y();
 			RotateCamera(MouseCurrentPosition);	
 		}
 
@@ -171,7 +176,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	if(MouseEvent->buttons() & Qt::LeftButton)
 	{	
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->pos().x(), MouseEvent->pos().y());
+		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 	
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
 
@@ -212,8 +217,8 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 		}
 		else
 		{
-			MouseCurrentPosition.x = MouseEvent->pos().x();
-			MouseCurrentPosition.y = MouseEvent->pos().y();
+			MouseCurrentPosition.x = MouseEvent->x();
+			MouseCurrentPosition.y = MouseEvent->y();
 
 			if (MouseEvent->modifiers() & Qt::ControlModifier)
 			{
@@ -229,7 +234,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	else
 	{
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->pos().x(), MouseEvent->pos().y());
+		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 		float TRay = FLT_MAX;
 
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
@@ -274,7 +279,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 		ZEDTransformationManager* TransformationManager = ZEDTransformationManager::GetInstance();
 
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->pos().x(), MouseEvent->pos().y());
+		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 
 		ZEDGizmo* Gizmo = TransformationManager->GetGizmo();
 
@@ -309,8 +314,8 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 		}
 		else
 		{
-			MouseCurrentPosition.x = MouseEvent->pos().x();
-			MouseCurrentPosition.y = MouseEvent->pos().y();
+			MouseCurrentPosition.x = MouseEvent->x();
+			MouseCurrentPosition.y = MouseEvent->y();
 
 			if (MouseEvent->modifiers() & Qt::ControlModifier) //this should be equality but I'm not sure.
 			{
@@ -425,13 +430,31 @@ void ZEDViewPort::Tick(float Time)
 
 }
 
+bool ZEDViewPort::Initialize()
+{
+	Camera = ZECamera::CreateInstance();
+	Camera->SetHorizontalFOV(ZE_PI / 3);
+
+	ZEScene* Scene = ZEDCore::GetInstance()->GetEditorModule()->GetScene();
+	Scene->SetActiveCamera(Camera);
+	Scene->AddEntity(Camera);
+
+	return true;
+}
+
+bool ZEDViewPort::Deinitialize()
+{
+	return true;
+}
+
 ZEDViewPort::ZEDViewPort(QWidget* Parent) : QFrame(Parent)
 {
 	ViewMode = ZED_VM_FREE;
+	Camera = NULL;
 	MouseStartPosition = ZEVector2::Zero;
 	MouseCurrentPosition = ZEVector2::Zero;
-	float Pitch = 0.0f;
-	float Yaw = 0.0f;
-	float Roll = 0.0f;
+	Pitch = 0.0f;
+	Yaw = 0.0f;
+	Roll = 0.0f;
 	StepSize = 1;
 }

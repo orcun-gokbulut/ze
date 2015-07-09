@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.cpp
+ Zinek Engine - ZEDMainEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,83 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDCore.h"
-#include "ZEDOperationManager.h"
-#include "ZEDSelectionManager.h"
-#include "ZEDTransformationManager.h"
-#include "ZEDModule.h"
-#include "ZEDViewPort.h"
-#include "ZEDS/ZEString.h"
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZECore/ZEOptionManager.h"
-#include <windows.h>
-#include <QtCore/QObject>
+#pragma once
 
-extern HINSTANCE ApplicationInstance;
+#include "ZEDCore/ZEDCore.h"
+#include <QtGui/QMainWindow>
 
-ZEDCore::ZEDCore()
+class ZEDCore;
+
+namespace Ui
 {
-	OperationManager = new ZEDOperationManager();
-	SelectionManager = new ZEDSelectionManager();
-	TransformationManager = new ZEDTransformationManager();
-	EditorModule = new ZEDModule();
+	class MainEditor;
 }
 
-ZEDCore::~ZEDCore()
+class ZEDMainEditor : public QMainWindow
 {
-	delete OperationManager;
-	delete SelectionManager;
-	delete TransformationManager;
-	delete EditorModule;
-}
+	Q_OBJECT
+	private:
+		Ui::MainEditor* ui;
+		ZEDCore* Core;
 
-ZEDOperationManager* ZEDCore::GetOperationManager()
-{
-	return OperationManager;
-}
+		bool InitializeSelf();
+		bool DeinitializeSelf();
 
-ZEDSelectionManager* ZEDCore::GetSelectionManager()
-{
-	return SelectionManager;
-}
+	private slots:
+		//File Menu Actions
+		void actNew_onTriggered();
+		void actOpen_onTriggered();
+		void actClose_onTriggered();
+		void actSave_onTriggered();
+		void actSaveAs_onTriggered();
+		void actExit_onTriggered();
+		//Edit Menu Actions
+// 		void actUndo_onTriggered();
+// 		void actRedo_onTriggered();
+// 		void actClone_onTriggered();
+// 		void actDelete_onTriggered();
+		//Operations Menu Actions
+// 		void actSelect_onTriggered();
+// 		void actMove_onTriggered();
+// 		void actRotate_onTriggered();
+// 		void actScale_onTriggered();
+// 		void actHide_onTriggered();
+// 		void actUnhide_onTriggered();
+// 		void actFreeze_onTriggered();
+// 		void actUnfreeze_onTriggered();
+// 		void actGoToEntity_onTriggered();
 
-ZEDTransformationManager* ZEDCore::GetTransformationManager()
-{
-	return TransformationManager;
-}
 
-ZEDModule* ZEDCore::GetEditorModule()
-{
-	return EditorModule;
-}
+		
+	public:
+		bool Initialize();
+		bool Deinitalize();
 
-void ZEDCore::InitializeEngine()
-{
-	zeCore->SetApplicationModule(EditorModule);
-
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
-	zeCore->GetWindow()->SetComponentWindowHandle(EditorModule->GetViewPort()->winId());
-	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
-
-	if (zeCore->StartUp(EditorModule->GetViewPort()->winId()))
-		zeCore->Run();
-}
-
-void ZEDCore::DeinitializeEngine()
-{
-	zeCore->ShutDown();
-}
-
-void ZEDCore::Destroy()
-{
-	delete this;
-}
-
-ZEDCore* ZEDCore::GetInstance()
-{
-	static ZEDCore Core;
-	return &Core;
-}
+		ZEDMainEditor(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
+};

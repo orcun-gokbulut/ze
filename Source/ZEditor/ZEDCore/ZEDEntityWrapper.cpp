@@ -37,7 +37,7 @@
 
 void ZEDEntityWrapper::SetObject(ZEObject* Object)
 {
-	if (Object->GetClass()->GetParentClass() != ZEEntity::Class())
+	if (!ZEClass::IsDerivedFrom(ZEEntity::Class(), Object->GetClass()))
 		return;
 
 	ZEDObjectWrapper::SetObject(Object);

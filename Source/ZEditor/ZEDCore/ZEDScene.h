@@ -37,12 +37,19 @@
 
 #include "ZEGame/ZEScene.h"
 
-class ZEDObjectWrapper;
+class ZEObject;
 
 class ZEDScene : public ZEScene
 {
+	protected:
+		ZEDScene();
+
+		bool ExportZEDScene();
+		bool ImportZEDScene();
 
 	public:
-
-		ZEDScene();
+		void AddZEDObject(ZEObject* Object);
+		void RemoveZEDObject(ZEObject* Object);
+		
+		static ZEDScene* CreateInstance();
 };
