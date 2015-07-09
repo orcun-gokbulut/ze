@@ -40,10 +40,12 @@
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUILabel.h"
 
+class ZEScene;
 
 class ZEUIInteriorStatisticsControl : public ZEUIControl
 {
 private:
+	ZEScene*				Scene;
 
 	ZEUILabel*				TotalRoomCount;
 	ZEUILabel*				CulledRoomCount;
@@ -54,9 +56,8 @@ private:
 	ZEUILabel*				DrawedPolygonCount;
 
 public:
-
-	void					SetMaterial(ZEMaterial* Material);
-	ZEMaterial*				GetMaterial() const;
+	void					SetTargetScene(ZEScene* Scene);
+	ZEScene*				GetTargetScene();
 
 	void					Draw(ZEUIRenderer* Renderer);
 	void					Tick(float ElapsedTime);

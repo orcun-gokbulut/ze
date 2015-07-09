@@ -106,7 +106,7 @@ bool ZED3D9SeaMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetPixelShaderConstantF(8, ZEVector4(EntityXZScale.x, EntityXZScale.y, DiffuseTextureTile.x, DiffuseTextureTile.y).M, 1);
 
 	ZEMatrix4x4 WorldViewProjection;
-	ZEMatrix4x4::Multiply(WorldViewProjection, zeScene->GetActiveCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
+	ZEMatrix4x4::Multiply(WorldViewProjection, Renderer->GetCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
 	GetDevice()->SetVertexShaderConstantF(0, WorldViewProjection.MA, 4);
 
 	float Width = (float)Renderer->GetViewPort()->GetWidth();
@@ -148,11 +148,11 @@ bool ZED3D9SeaMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderComm
 	GetDevice()->SetPixelShaderConstantF(8, ZEVector4(EntityXZScale.x, EntityXZScale.y, NormalTextureTile.x, NormalTextureTile.y).M, 1);
 
 	ZEMatrix4x4 WorldViewProjection;
-	ZEMatrix4x4::Multiply(WorldViewProjection, zeScene->GetActiveCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
+	ZEMatrix4x4::Multiply(WorldViewProjection, Renderer->GetCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
 	GetDevice()->SetVertexShaderConstantF(0, WorldViewProjection.MA, 4);
 
 	ZEMatrix4x4 WorldView;
-	ZEMatrix4x4::Multiply(WorldView, zeScene->GetActiveCamera()->GetViewTransform(), RenderCommand->WorldMatrix);
+	ZEMatrix4x4::Multiply(WorldView, Renderer->GetCamera()->GetViewTransform(), RenderCommand->WorldMatrix);
 	GetDevice()->SetVertexShaderConstantF(4, WorldView.MA, 4);
 
 	D3DPERF_EndEvent();

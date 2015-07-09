@@ -33,7 +33,6 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGame.h"
 #include "ZETypes.h"
 #include "ZEScene.h"
 #include "ZEError.h"
@@ -501,9 +500,9 @@ ZEScene::~ZEScene()
 		Entities[I]->Destroy();
 }
 
-ZEScene* ZEScene::GetInstance()
+ZEScene* ZEScene::CreateInstance()
 {
-	return zeGame->GetScene();
+	return new ZEScene();
 }
 
 void ZEScene::SetEnabled(bool Enabled)

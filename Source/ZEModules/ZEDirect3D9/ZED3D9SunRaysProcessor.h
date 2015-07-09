@@ -44,6 +44,8 @@ class ZED3D9VertexShader;
 class ZED3D9PixelShader;
 class ZED3D9Texture2D;
 class ZED3D9ViewPort;
+class ZED3D9FrameRenderer;
+class ZEFrameRenderer;
 
 class ZED3D9SunRaysProcessor : public ZEObject, public ZED3D9ComponentBase
 {
@@ -51,6 +53,7 @@ class ZED3D9SunRaysProcessor : public ZEObject, public ZED3D9ComponentBase
 		bool								Enabled;
 		ZED3D9Texture2D*					Input;
 		ZED3D9ViewPort*						Output;
+		ZED3D9FrameRenderer*				Renderer;
 		ZEVector3							SunDirection;
 		float								Intensity;
 		float								Density;
@@ -83,6 +86,9 @@ class ZED3D9SunRaysProcessor : public ZEObject, public ZED3D9ComponentBase
 
 		void								SetDensity(float Density);
 		float								GetDensity() const;
+
+		void								SetRenderer(ZEFrameRenderer* Renderer);
+		ZEFrameRenderer*					GetRenderer();
 
 		void								Initialize();
 		void								Deinitialize();

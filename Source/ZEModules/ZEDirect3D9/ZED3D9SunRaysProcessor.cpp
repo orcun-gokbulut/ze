@@ -89,12 +89,12 @@ const ZEVector3& ZED3D9SunRaysProcessor::GetSunDirection()
 
 void ZED3D9SunRaysProcessor::SetSunDirectionFromScene()
 {
-	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Class());
+	ZEArray<ZEEntity*> Entities = Renderer->GetCamera()->GetOwnerScene()->GetEntities(ZEWeather::Class());
 	if (Entities.GetSize() == 0)
 		return;
 
-	ZEWeather* Wheater = static_cast<ZEWeather*>(Entities[0]);
-	SunDirection = Wheater->GetSunDirection();
+	ZEWeather* Weather = static_cast<ZEWeather*>(Entities[0]);
+	SunDirection = Weather->GetSunDirection();
 }
 
 void ZED3D9SunRaysProcessor::SetDebugOutput(bool Value)
@@ -125,6 +125,16 @@ void ZED3D9SunRaysProcessor::SetDensity(float Density)
 float ZED3D9SunRaysProcessor::GetDensity() const
 {
 	return Density;
+}
+
+void ZED3D9SunRaysProcessor::SetRenderer(ZEFrameRenderer* Renderer)
+{
+	this->Renderer = (ZED3D9FrameRenderer*)Renderer;
+}
+
+ZEFrameRenderer* ZED3D9SunRaysProcessor::GetRenderer()
+{
+	return (ZEFrameRenderer*)Renderer;
 }
 
 void ZED3D9SunRaysProcessor::Initialize()
@@ -173,7 +183,7 @@ void ZED3D9SunRaysProcessor::Process()
 	ZEVector3 SunDirectionNormalized = SunDirection.Normalize();
 
 	// Early Rejection
-	ZECamera* Camera = ZEScene::GetInstance()->GetActiveCamera();
+	ZECamera* Camera = Renderer->GetCamera();
 	if (ZEVector3::DotProduct(SunDirectionNormalized, Camera->GetWorldFront()) >= 0)
 		return;
 

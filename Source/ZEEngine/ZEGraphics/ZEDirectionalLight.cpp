@@ -51,7 +51,10 @@
 
 void ZEDirectionalLight::CreateRenderTargets()
 {
-	ZEUInt Dimension = ((ZEShadowRenderer*)zeScene->GetShadowRenderer())->GetShadowResolution();
+	if (GetOwnerScene() == NULL)
+		return;
+
+	ZEUInt Dimension = ((ZEShadowRenderer*)GetOwnerScene()->GetShadowRenderer())->GetShadowResolution();
 	
 	ZESize I = 0;
 	for ( ; I < CascadeCount; ++I)
@@ -216,9 +219,14 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 
 	CreateRenderTargets();
 
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+
 	// Update cascade transformations
 	ZECamera* Camera = DrawParameters->View->Camera;
-	ZEShadowRenderer* ShadowRenderer = (ZEShadowRenderer*)zeScene->GetShadowRenderer();
+	ZEShadowRenderer* ShadowRenderer = (ZEShadowRenderer*)Scene->GetShadowRenderer();
 
 	// Fetch camera constants
 	float CameraFOV = Camera->GetHorizontalFOV();
@@ -399,7 +407,7 @@ void ZEDirectionalLight::Draw(ZEDrawParameters* DrawParameters)
 		DrawParametersShadow.CustomData = &Cascades[CascadeN];
 		
 		ShadowRenderer->ClearLists();
-		zeScene->GetSceneCuller().CullScene(zeScene, &DrawParametersShadow);
+		Scene->GetSceneCuller().CullScene(Scene, &DrawParametersShadow);
 
 		ShadowRenderer->SetLight(this);
 		ShadowRenderer->SetDrawParameters(&DrawParametersShadow);

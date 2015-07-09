@@ -336,7 +336,7 @@ void ZED3D9FrameRenderer::DrawDirectionalLight(ZEDirectionalLight* Light)
 		ZEMatrix4x4 CameraInverseView;
 		ZEMatrix4x4::Inverse(CameraInverseView, Camera->GetViewTransform());
 
-		ZED3D9ShadowRenderer* ShadowRenderer = (ZED3D9ShadowRenderer*)zeScene->GetShadowRenderer();
+		ZED3D9ShadowRenderer* ShadowRenderer = (ZED3D9ShadowRenderer*)Light->GetOwnerScene()->GetShadowRenderer();
 		float ShadowMapDimension = (float)ShadowRenderer->GetShadowResolution();
 		float RotationmapDimension = (float)ShadowRenderer->GetRandomRotationMap()->GetWidth();
 		float TexOffset = 0.5f + (0.5f / ShadowMapDimension);
@@ -1330,6 +1330,7 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 
  		SunRaysProcessor.SetInput(HDRProcessor.BloomLevels[0]);
 		SunRaysProcessor.SetOutput(ViewPort);
+		SunRaysProcessor.SetRenderer(this);
 		SunRaysProcessor.SetSunDirectionFromScene();
 		SunRaysProcessor.Process();
 

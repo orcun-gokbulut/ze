@@ -35,11 +35,11 @@
 
 #include "ZEPlayer.h"
 
+#include "ZEScene.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGame.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZERay.h"
 #include "ZESound/ZEListener.h"
@@ -235,8 +235,11 @@ float ZEPlayer::GetFOV()
 
 void ZEPlayer::Activate()
 {
-	zeScene->SetActiveCamera(Camera);
-	zeScene->SetActiveListener(Listener);
+	if (GetOwnerScene() == NULL)
+		return;
+
+	GetOwnerScene()->SetActiveCamera(Camera);
+	GetOwnerScene()->SetActiveListener(Listener);
 }
 
 void ZEPlayer::Tick(float Time)
@@ -269,8 +272,11 @@ bool ZEPlayer::InitializeSelf()
 	if (!ZEActor::InitializeSelf())
 		return false;
 
-	zeScene->SetActiveCamera(Camera);
-	zeScene->SetActiveListener(Listener);
+	if (GetOwnerScene() == NULL)
+		return false;
+
+	GetOwnerScene()->SetActiveCamera(Camera);
+	GetOwnerScene()->SetActiveListener(Listener);
 
 	return true;
 }

@@ -44,10 +44,10 @@
 #include "ZEDrawParameters.h"
 #include "ZEGraphics/ZELight.h"
 #include "ZEUI/ZEUIDebugDrawTag.h"
-#include "ZEGame.h"
 #include "ZEScene.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
+#include "ZECore/ZEApplicationModule.h"
 #include "ZEGraphics/ZECamera.h"
 #include "ZERandom.h"
 #include "ZEMath/ZERectangle3D.h"
@@ -202,7 +202,7 @@ void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		ZEInt32 WindowWidth, WindowHeight;
 		zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
 
-		ZECamera* Camera = zeScene->GetActiveCamera();
+		ZECamera* Camera = Target->GetOwnerScene()->GetActiveCamera();
 
 		ZEVector4 LabelPositionInViewProj;
 		ZEMatrix4x4::Transform(LabelPositionInViewProj, Camera->GetViewProjectionTransform(), ZEVector4(Target->GetWorldPosition(), 1.0f));
@@ -252,7 +252,10 @@ bool ZEDebugDrawer::InitializeSelf()
 	EntityTag->SetFontColor(DrawColor);
 	EntityTag->SetIcon("zinek2.png");
 	EntityTag->SetZOrder(1);
-	zeGame->UIManager->AddControl(EntityTag);
+	if (zeCore->GetApplicationModule()->GetUIManager() == NULL)
+		return false;
+		
+	zeCore->GetApplicationModule()->GetUIManager()->AddControl(EntityTag);
 
 	return true;
 }

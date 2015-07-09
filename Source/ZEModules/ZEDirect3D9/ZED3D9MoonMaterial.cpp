@@ -181,9 +181,9 @@ bool ZED3D9MoonMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCom
 	ZEMatrix4x4	WorldViewProjMatrix;
 	ZEMatrix4x4::Multiply(WorldViewProjMatrix, Renderer->GetCamera()->GetViewProjectionTransform(), RenderCommand->WorldMatrix);
 
-	ZEVector3 CameraUp = zeScene->GetActiveCamera()->GetWorldUp();
-	ZEVector3 CameraRight = zeScene->GetActiveCamera()->GetWorldRight();
-	ZEVector3 CameraPosition = zeScene->GetActiveCamera()->GetWorldPosition();
+	ZEVector3 CameraUp = Renderer->GetCamera()->GetWorldUp();
+	ZEVector3 CameraRight = Renderer->GetCamera()->GetWorldRight();
+	ZEVector3 CameraPosition = Renderer->GetCamera()->GetWorldPosition();
 	
 	// Find Moon Up
 	ZEQuaternion Rotation;

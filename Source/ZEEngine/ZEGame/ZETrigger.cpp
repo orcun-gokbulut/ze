@@ -102,10 +102,15 @@ ZEReportBehaviour ZETrigger::GetReportBehaviour() const
 
 void ZETrigger::Tick(float ElapsedTime)
 {
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+
 	if (Callback != NULL && ActivateTriggerOn != ZE_ATO_NONE)
-		for (ZESize I = 0; I < zeScene->GetEntities().GetCount(); I++)
+		for (ZESize I = 0; I < Scene->GetEntities().GetCount(); I++)
 		{
-			ZEEntity* CurrentEntity = zeScene->GetEntities()[I];
+			ZEEntity* CurrentEntity = Scene->GetEntities()[I];
 
 			if (CurrentEntity == this)
 				continue;

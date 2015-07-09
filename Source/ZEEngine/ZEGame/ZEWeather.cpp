@@ -37,7 +37,6 @@
 #include "ZEGraphics\ZEDirectionalLight.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEScene.h"
-#include "ZEGame.h"
 #include "ZESkyBrush.h"
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
@@ -122,7 +121,10 @@ void ZEWeather::SetFogFactor(float Value)
 {
 	FogFactor = Value;
 
-	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogFactor(Value);
+	if (GetOwnerScene() == NULL)
+		return;
+
+	((ZED3D9FrameRenderer*)GetOwnerScene()->GetRenderer())->FogProcessor.SetFogFactor(Value);
 }
 
 float ZEWeather::GetFogFactor() const
@@ -302,6 +304,11 @@ bool ZEWeather::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
+	if (GetOwnerScene() == NULL)
+		return false;
+
+	Cloud->SetCamera(GetOwnerScene()->GetActiveCamera());
+
 	return true;
 }
 
@@ -402,7 +409,7 @@ ZEWeather::ZEWeather()
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
 	Cloud->SetCloudFormationTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
-	Cloud->SetCamera(zeScene->GetActiveCamera());
+	Cloud->SetCamera(NULL);
 	Cloud->SetCloudPlaneHeight(600.0f);
 	Cloud->SetSunLightDirection(SunDirection);
 	Cloud->SetSunLightColor(SunLightColor);

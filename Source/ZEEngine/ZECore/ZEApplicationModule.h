@@ -39,12 +39,21 @@
 
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEString.h"
+#include "ZEMeta/ZEObject.h"
+
+ZE_META_FORWARD_DECLARE(ZEUIManager, "ZEUI/ZEUIManager.h")
 
 class ZEApplicationModule : public ZEModule
 {
 	ZE_MODULE(ZEApplicationModule)
 
+	protected:
+		ZEUIManager*		UIManager;
+
 	public:
+		void				SetUIManager(ZEUIManager* UIManager);
+		ZEUIManager*		GetUIManager();
+
 		virtual void		PreProcess();
 		virtual void		Process(float ElapsedTime);
 		virtual void		PostProcess();

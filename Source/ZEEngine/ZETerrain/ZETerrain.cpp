@@ -514,6 +514,11 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
 		return;
 
+	ZEScene* Scene = GetOwnerScene();
+
+	if (Scene == NULL)
+		return;
+
 	static ZEInt PositionX;
 	static ZEInt PositionY;
 	static ZEInt OffsetPositionX;
@@ -546,8 +551,8 @@ void ZETerrain::Draw(ZEDrawParameters* DrawParameters)
 	int ActiveLevel = 0;
 	for (ZESize CurrIndex = 0; CurrIndex < LevelCount; CurrIndex++)
 	{
-		Levels[CurrIndex].Material->SetAmbientColor(zeScene->GetAmbientColor());
-		Levels[CurrIndex].Material->SetAmbientFactor(zeScene->GetAmbientFactor());
+		Levels[CurrIndex].Material->SetAmbientColor(Scene->GetAmbientColor());
+		Levels[CurrIndex].Material->SetAmbientFactor(Scene->GetAmbientFactor());
 
 		ZEInt CurrLevelPositionX = Align(PositionX, 1 << CurrIndex);
 		ZEInt CurrLevelPositionY = Align(PositionY, 1 << CurrIndex);

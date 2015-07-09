@@ -74,7 +74,6 @@ class ZEGraphicsModule;
 class ZESoundModule;
 class ZEInputModule;
 class ZEPhysicsModule;
-class ZEGame;
 class ZEModule;
 class ZENetworkModule;
 class ZEApplicationModule;
@@ -119,7 +118,6 @@ class ZECore
 		ZEInputModule*					InputModule;
 		ZEPhysicsModule*				PhysicsModule;
 		ZENetworkModule*				NetworkModule;
-		ZEGame*							Game;
 
 		ZESystemMessageManager*			SystemMessageManager;
 		ZESystemMessageHandler*			SystemMessageHandler;
@@ -167,9 +165,6 @@ class ZECore
 
 		bool							SetNetworkModule(ZENetworkModule* Module);
 		ZENetworkModule*				GetNetworkModule();
-
-		bool							SetGame(ZEGame* Game);
-		ZEGame*							GetGame();
 
 		void							SetApplicationModule(ZEApplicationModule* Module);
 		ZEApplicationModule*			GetApplicationModule();

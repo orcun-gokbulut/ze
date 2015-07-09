@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZERay.h"
+#include "ZEGame/ZEEntity.h"
 
 class ZERay;
 class ZEVector3;
@@ -46,7 +47,7 @@ class ZEPhysicalRigidBody;
 class ZEPhysicalSphereShape;
 class ZEPhysicalJoint;
 
-class ZEPhysicsPicker
+class ZEPhysicsPicker : public ZEEntity
 {
 	private:
 		ZEPhysicalJoint*			MouseJoint;
