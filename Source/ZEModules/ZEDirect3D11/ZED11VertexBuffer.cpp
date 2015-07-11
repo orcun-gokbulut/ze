@@ -37,7 +37,7 @@
 #include "ZED11VertexBuffer.h"
 #include "ZED11Direct3D11Module.h"
 
-const ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
+ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
 {
 	return Buffer;
 }

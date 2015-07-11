@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SIMPLE_MATERIAL_H__ 
-#define __ZE_SIMPLE_MATERIAL_H__
 
 #include "ZETypes.h"
 #include "ZERNMaterial.h"
@@ -52,10 +50,19 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool							Wireframe;
 		bool							VertexColorEnabled;
 
-		ZEMaterialTransparancyMode		TransparancyMode;
-		ZEUInt							TransparancyCullLimit;
-		ZEVector4						MaterialColor;
+		bool							DirtyConstants;
+		bool							DirtyShaders;
+		bool							DirtyRenderStates;
 
+		ZEGRHolder<ZEGRRenderStateData> RenderStateData;
+		struct
+		{
+			ZEVector4					MaterialColor;
+			ZEUInt						TransparancyCullLimit;
+		} Constants;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+
+		ZEMaterialTransparancyMode		TransparancyMode;
 		ZERNSampler						TextureSampler;
 
 		virtual bool					InitializeSelf();
@@ -85,8 +92,14 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		void							SetTexture(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetTexture() const;
+		
+		virtual const ZEGRRenderState&	GetRenderState(const char* StageName);
+
+		virtual bool					SetupMaterial(const char* StageName);
+		virtual bool					SetupCommand(const char* StageName, ZERNCommand* Command);
+		virtual void					CleanupMaterial(const char* StageName);
+
+		virtual void					Update();
 
 		static ZERNSimpleMaterial*		CreateInstance();
 };
-
-#endif

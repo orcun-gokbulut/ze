@@ -41,6 +41,9 @@ bool ZEGRVertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
 	zeCheckError(VertexCount == 0, false, "Vertex count cannot be zero.");
 	zeCheckError(VertexSize == 0, false, "Vertex size cannot be zoro.");
 
+	this->VertexCount = VertexCount;
+	this->VertexSize = VertexSize;
+
 	SetSize(VertexCount * VertexSize);
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, VertexBuffer, Geometry);
 
@@ -55,12 +58,23 @@ void ZEGRVertexBuffer::Deinitialize()
 
 ZEGRVertexBuffer::ZEGRVertexBuffer()
 {
-
+	VertexSize = 0;
+	VertexCount = 0;
 }
 
 ZEGRVertexBuffer::~ZEGRVertexBuffer()
 {
 	Deinitialize();
+}
+
+ZESize ZEGRVertexBuffer::GetVertexSize()
+{
+	return VertexSize;
+}
+
+ZESize ZEGRVertexBuffer::GetVertexCount()
+{
+	return VertexCount;
 }
 
 ZEGRVertexBuffer* ZEGRVertexBuffer::Create(ZEUInt VertexCount, ZESize VertexSize)

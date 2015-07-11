@@ -147,19 +147,19 @@ static ZETextureData* LoadData(ZEFile* File, ZETargaHeader* Header, ZEPixelRGBA8
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
 	if ((Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_COLOR || (Header->ImageType & ZE_TIT_TYPE_MASK) == ZE_TIT_INDEXED)
 	{
-		Texture->Create(ZEGR_TT_2D, ZEGR_TF_RGBA8, 1, 1, Width, Height);
+		Texture->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8, 1, 1, Width, Height);
 		DestinationPixelSize = 4;
 	}
 	else
 	{
 		if (Header->BPP == 8)
 		{
-			Texture->Create(ZEGR_TT_2D, ZEGR_TF_L8, 1, 1, Width, Height);
+			Texture->Create(ZEGR_TT_2D, ZEGR_TF_R8, 1, 1, Width, Height);
 			DestinationPixelSize = 1;
 		}
 		else
 		{
-			Texture->Create(ZEGR_TT_2D, ZEGR_TF_LA8, 1, 1, Width, Height);
+			Texture->Create(ZEGR_TT_2D, ZEGR_TF_R8G8, 1, 1, Width, Height);
 			DestinationPixelSize = 2;
 		}
 	}
@@ -445,14 +445,14 @@ bool ZETextureFileTGA::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 	Info->Height = Header.Height;
 	if (Header.ImageType == ZE_TIT_COLOR || Header.ImageType == ZE_TIT_INDEXED)
 	{
-		Info->PixelFormat = ZEGR_TF_RGBA8;
+		Info->PixelFormat = ZEGR_TF_R8G8B8A8;
 	}
 	else
 	{
 		if (Header.BPP == 8)
-			Info->PixelFormat = ZEGR_TF_L8;
+			Info->PixelFormat = ZEGR_TF_R8;
 		else
-			Info->PixelFormat = ZEGR_TF_LA8;
+			Info->PixelFormat = ZEGR_TF_R8G8;
 	}
 
 	Info->Type = ZEGR_TT_2D;

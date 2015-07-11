@@ -48,7 +48,7 @@ inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
 	return FormatToIndexSize[Format];
 }
 
-const ID3D11Buffer* ZED11IndexBuffer::GetBuffer() const
+ID3D11Buffer* ZED11IndexBuffer::GetBuffer() const
 {
 	return Buffer;
 }

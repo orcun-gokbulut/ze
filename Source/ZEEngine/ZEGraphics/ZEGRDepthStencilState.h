@@ -82,7 +82,6 @@ class ZEGRDepthStencilState : public ZEGRState
 			ZEGRStencilOperation		BackZFailOperation : 5;
 			ZEGRStencilOperation		BackStencilPassOperation : 5;
 			ZEGRComparisonFunction		BackStencilFunction : 5;
-
 		} StateData;
 	
 	public:

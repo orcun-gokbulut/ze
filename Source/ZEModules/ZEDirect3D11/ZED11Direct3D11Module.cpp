@@ -33,14 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <d3d11.h>
-#include <dxgi1_2.h>
+#include "ZED11Direct3D11Module.h"
 
-#include "ZEError.h"
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEOptionManager.h"
-#include "ZECore/ZEModule.h"
-#include "ZECore/ZEWindow.h"
 #include "ZED11Shader.h"
 #include "ZED11StatePool.h"
 #include "ZED11Texture2D.h"
@@ -52,12 +46,20 @@
 #include "ZED11VertexBuffer.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11ComponentBase.h"
-#include "ZED11Direct3D11Module.h"
 #include "ZED11Context.h"
 #include "ZED11ShaderCompiler.h"
 #include "ZED11ConstantBuffer.h"
 #include "ZED11Adapter.h"
 #include "ZED11DepthStencilBuffer.h"
+#include "ZED11RenderStateData.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZEOptionManager.h"
+#include "ZECore/ZEModule.h"
+#include "ZECore/ZEWindow.h"
+#include "ZEError.h"
+
+#include <d3d11.h>
+#include <dxgi1_2.h>
 
 #pragma warning(disable:4267)
 
@@ -236,9 +238,9 @@ ZEGRDepthStencilBuffer* ZED11Direct3D11Module::CreateDepthStencilBuffer()
 	return new ZED11DepthStencilBuffer();
 }
 
-ZEGRRenderStateData* ZED11Direct3D11Module::CreateRenderStateData(const ZEGRRenderState& RenderState)
+ZEGRRenderStateData* ZED11Direct3D11Module::CreateRenderStateData()
 {
-	return StatePool.CompileRenderState(RenderState);
+	return new ZED11RenderStateData();
 }
 
 ZEGRShaderCompiler* ZED11Direct3D11Module::CreateShaderCompiler()

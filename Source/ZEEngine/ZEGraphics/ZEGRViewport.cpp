@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRScissorRectangle.cpp
+ Zinek Engine - ZEGRViewport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,17 +33,91 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEGRViewPort.h"
+
 #include <memory>
 
-#include "ZEGRScissorRectangle.h"
-#include "ZEDS/ZEHashGenerator.h"
-
-void ZEGRScissorRectangle::SetZero()
+void ZEGRViewport::SetEnabled(bool Enabled)
 {
-	memset(&StateData, 0, sizeof(ZEScissorRectangleData));
+	StateData.Enabled = Enabled;
 }
 
-ZEGRScissorRectangle::ZEGRScissorRectangle()
+bool ZEGRViewport::GetEnabled()
+{
+	return StateData.Enabled;
+}
+
+void ZEGRViewport::SetX(float x)
+{
+	StateData.X = x;
+}
+
+float ZEGRViewport::GetX() const
+{
+	return StateData.X;
+}
+
+void ZEGRViewport::SetY(float y)
+{
+	StateData.Y = y;
+}
+
+float ZEGRViewport::GetY() const
+{
+	return StateData.Y;
+}
+
+void ZEGRViewport::SetWidth(float Width)
+{
+	StateData.Width = Width;
+}
+
+float ZEGRViewport::GetWidth() const
+{
+	return StateData.Width;
+}
+
+void ZEGRViewport::SetHeight(float Height)
+{
+	StateData.Height = Height;
+}
+
+float ZEGRViewport::GetHeight() const
+{
+	return StateData.Height;
+}
+
+void ZEGRViewport::SetMinDepth(float Depth)
+{
+	StateData.MinDepth = Depth;
+}
+
+float ZEGRViewport::GetMinDepth() const
+{
+	return StateData.MinDepth;
+}
+
+void ZEGRViewport::SetMaxDepth(float Depth)
+{
+	StateData.MaxDepth = Depth;
+}
+
+float ZEGRViewport::GetMaxDepth() const
+{
+	return StateData.MaxDepth;
+}
+
+void ZEGRViewport::SetZero()
+{
+	memset(&StateData, 0, sizeof(ZEViewportData));
+}
+
+ZEGRViewport::ZEGRViewport()
 {
 	SetZero();
+}
+
+ZEGRViewport::~ZEGRViewport()
+{
+
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEScissorRectangle.h
+ Zinek Engine - ZEGRViewport.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,19 +37,45 @@
 
 #include "ZETypes.h"
 
-class ZEGRScissorRectangle
+class ZEGRViewport
 {
 	public:
-		struct ZEScissorRectangleData
+		struct ZEViewportData
 		{
-			ZEInt					Bottom;
-			ZEInt					Left;
-			ZEInt					Right;
-			ZEInt					Top;
+			bool				Enabled;
+			float				X;
+			float				Y;
+			float				Width;
+			float				Height;
+			float				MinDepth;
+			float				MaxDepth;
 
 		} StateData;
 
-		void						SetZero();
+	public:
+		void					SetEnabled(bool Enabled);
+		bool					GetEnabled();
 
-									ZEGRScissorRectangle();
+		void					SetX(float x);
+		float					GetX() const;
+
+		void					SetY(float y);
+		float					GetY() const;
+
+		void					SetWidth(float Width);
+		float					GetWidth() const;
+
+		void					SetHeight(float Height);
+		float					GetHeight() const;
+
+		void					SetMinDepth(float Depth);
+		float					GetMinDepth() const;
+
+		void					SetMaxDepth(float Depth);
+		float					GetMaxDepth() const;
+
+		void					SetZero();
+
+								ZEGRViewport();
+								~ZEGRViewport();
 };

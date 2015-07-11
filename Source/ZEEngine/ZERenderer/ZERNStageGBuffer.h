@@ -57,7 +57,7 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRTexture2D*					GetSpecularBuffer();
 		ZEGRTexture2D*					GetAccumulationBuffer();
 
-		virtual ZEGRRenderState*		GetRenderState();
+		virtual const ZEGRRenderState&	GetRenderState();
 
 		virtual void					Setup(ZEGRContext* Device);
 		virtual void					CleanUp();

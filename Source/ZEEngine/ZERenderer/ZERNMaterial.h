@@ -57,6 +57,7 @@ enum ZEMaterialOpacityComponent
 };
 
 class ZERNCommand;
+class ZERNRenderer;
 
 class ZERNMaterial : public ZEObject, public ZEInitializable
 {
@@ -71,6 +72,8 @@ class ZERNMaterial : public ZEObject, public ZEInitializable
 		virtual							~ZERNMaterial();
 
 	public:
+		ZERNRenderer*					GetRenderer();
+
 		virtual void					SetShadowCaster(bool Value);
 		bool							GetShadowCaster() const;
 
@@ -80,9 +83,11 @@ class ZERNMaterial : public ZEObject, public ZEInitializable
 		virtual void					SetLightningEnabled(bool Enabled);
 		bool							GetLightningEnabled() const;
 
-		virtual bool					SetupRenderState(ZEGRRenderState& Output, const char* StageName);
-		virtual bool					SetupCommand(ZERNCommand* Command);
-		virtual void					CleanUpCommand();
+		virtual const ZEGRRenderState&	GetRenderState(const char* StageName);
+
+		virtual bool					SetupMaterial(const char* StageName);
+		virtual bool					SetupCommand(const char* StageName, ZERNCommand* Command);
+		virtual void					CleanupMaterial(const char* StageName);
 
 		virtual void					UpdateMaterial();
 };

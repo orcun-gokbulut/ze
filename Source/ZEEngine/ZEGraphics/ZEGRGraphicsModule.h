@@ -98,7 +98,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer() = 0;
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler() = 0;
 		virtual ZEGRWindow*						CreateGraphicsWindow() = 0;
-		virtual ZEGRRenderStateData*			CreateRenderStateData(const ZEGRRenderState& RenderState) = 0;
+		virtual ZEGRRenderStateData*			CreateRenderStateData() = 0;
 
 		static ZEGRGraphicsModule*				GetInstance();
 };

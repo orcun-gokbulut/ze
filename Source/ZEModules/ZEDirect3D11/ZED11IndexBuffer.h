@@ -56,7 +56,7 @@ class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 								ZED11IndexBuffer();
 
 	public:
-		const ID3D11Buffer*		GetBuffer() const;
+		ID3D11Buffer*			GetBuffer() const;
 
 		void					Unlock();
 		bool					Lock(void** Data);

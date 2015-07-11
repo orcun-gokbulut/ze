@@ -45,50 +45,45 @@ ZESize ZETextureTestUtils::GetPixelSize(ZEGRFormat Format)
 {
 	switch(Format)
 	{
-		case ZEGR_TF_RGBA8:
+		case ZEGR_TF_R8G8B8A8:
 			return 4;
 
-		case ZEGR_TF_RGBA16:
+		case ZEGR_TF_R16G16B16A16:
 			return 8;
 
 		case ZEGR_TF_R16F:
 			return 2;
 
-		case ZEGR_TF_RG16F:
-			return 4;;
+		case ZEGR_TF_R16FG16F:
+			return 4;
 
-		case ZEGR_TF_RGBA16F:
+		case ZEGR_TF_R16FG16FB16FA16F:
 			return 16;
 
 		case ZEGR_TF_R32F:
 			return 8;
 
-		case ZEGR_TF_RG32F:
+		case ZEGR_TF_R32FG32F:
 			return 16;
 
-		case ZEGR_TF_RGBA32F:
+		case ZEGR_TF_R32FG32FB32FA32F:
 			return 32;
 
-		case ZEGR_TF_L8:
+		case ZEGR_TF_R8:
 			return 1;
 
-		case ZEGR_TF_LA8:
+		case ZEGR_TF_R8G8:
 			return 2;
 
-		case ZEGR_TF_L16:
+		case ZEGR_TF_R16:
 			return 2;
 
-		case ZEGR_TF_LA16:
+		case ZEGR_TF_R16G16:
 			return 4;
 
 		default:
 			return 0;
 	}
-}
-
-void a(const char* A)
-{
-
 }
 
 void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureData* Data)
@@ -118,7 +113,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 			ZEPixelColor* Current = &Bitmap.GetPixel(x, y);
 			switch(Format)
 			{
-				case ZEGR_TF_RGBA8:
+				case ZEGR_TF_R8G8B8A8:
 				{
 					ZEPixelRGBA8* Pixel = (ZEPixelRGBA8*)Source + Level->GetWidth() * y + x;
 					Current->a = Pixel->A;
@@ -128,7 +123,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_RGBA16:
+				case ZEGR_TF_R16G16B16A16:
 				{
 					ZEPixelRGBA16* Pixel = (ZEPixelRGBA16*)Source + Level->GetWidth() * y + x;
 					Current->a = Pixel->A >> 8;
@@ -148,7 +143,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_RG32F:
+				case ZEGR_TF_R32FG32F:
 				{
 					ZEPixelRG32F* Pixel = (ZEPixelRG32F*)Source + Level->GetWidth() * y + x;
 					Current->a = 0;
@@ -158,7 +153,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_RGBA32F:
+				case ZEGR_TF_R32FG32FB32FA32F:
 				{
 					ZEPixelRGBA32F* Pixel = (ZEPixelRGBA32F*)Source + Level->GetWidth() * y + x;
 					Current->a = ZEMath::Saturate(Pixel->A) * 255;
@@ -168,7 +163,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_L8:
+				case ZEGR_TF_R8:
 				{
 					ZEPixelL8* Pixel = (ZEPixelL8*)Source + Level->GetWidth() * y + x;
 					Current->a = 255;
@@ -178,7 +173,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_LA8:
+				case ZEGR_TF_R8G8:
 				{
 					ZEPixelLA8* Pixel = (ZEPixelLA8*)Source + Level->GetWidth() * y + x;
 					Current->a = Pixel->A;
@@ -188,7 +183,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_L16:
+				case ZEGR_TF_R16:
 				{
 					ZEPixelL16* Pixel = (ZEPixelL16*)Source + Level->GetWidth() * y + x;
 					Current->a = 255;
@@ -198,7 +193,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_LA16:
+				case ZEGR_TF_R16G16:
 				{
 					ZEPixelLA16* Pixel = (ZEPixelLA16*)Source + Level->GetWidth() * y + x;
 					Current->a = Pixel->A >> 8;
@@ -209,8 +204,8 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 				}
 
 				case ZEGR_TF_R16F:
-				case ZEGR_TF_RG16F:
-				case ZEGR_TF_RGBA16F:
+				case ZEGR_TF_R16FG16F:
+				case ZEGR_TF_R16FG16FB16FA16F:
 				default:
 				{
 					Current->a = 0;
