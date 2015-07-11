@@ -114,7 +114,7 @@ static ZETextureCompressionType GetCompressionType(ZEGRFormat PixelFormat)
 {
 	switch (PixelFormat)
 	{
-		case ZEGR_TF_I8_4:
+		case ZEGR_TF_R8G8B8A8:
 			return ZE_TCT_NONE;
 			break;
 		case ZEGR_TF_DXT1:

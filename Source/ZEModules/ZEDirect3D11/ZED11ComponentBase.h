@@ -48,7 +48,7 @@ class ZED11ComponentBase
 		static ID3D11Device*			Device;
 
 	public:
-		ZED11Direct3D11Module*			GetModule();
+		static ZED11Direct3D11Module*	GetModule();
 		ID3D11Device*					GetDevice();
 		ID3D11DeviceContext*			GetMainContext();
 

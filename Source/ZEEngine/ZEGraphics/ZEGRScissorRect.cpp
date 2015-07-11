@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRViewPort.h
+ Zinek Engine - ZEGRScissorRect.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,32 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_VIEW_PORT_H__
-#define __ZE_VIEW_PORT_H__
+#include <memory>
 
-#include "ZETypes.h"
+#include "ZEGRScissorRect.h"
+#include "ZEDS/ZEHashGenerator.h"
 
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-
-class ZEGRViewport
+void ZEGRScissorRect::SetLeft(ZEInt Left)
 {
-	public:
-		struct ZEViewportData
-		{
-			float						TopLeftX;
-			float						TopLeftY;
-			float						Width;
-			float						Height;
-			float						MinDepth;
-			float						MaxDepth;
+	StateData.Left = Left;
+}
 
-		} StateData;
+ZEInt ZEGRScissorRect::GetLeft() const
+{
+	return StateData.Left;
+}
 
-		void							SetZero();
+void ZEGRScissorRect::SetRight(ZEInt Right)
+{
+	StateData.Right = Right;
+}
 
-										ZEGRViewport();
-										~ZEGRViewport();
-};
+ZEInt ZEGRScissorRect::GetRight() const
+{
+	return StateData.Right;
+}
 
-#endif
+void ZEGRScissorRect::SetTop(ZEInt Top)
+{
+	StateData.Top = Top;
+}
+
+ZEInt ZEGRScissorRect::GetTop() const
+{
+	return StateData.Top;
+}
+
+void ZEGRScissorRect::SetBottom(ZEInt Bottom)
+{
+	StateData.Bottom = Bottom;
+}
+
+ZEInt ZEGRScissorRect::GetBottom() const
+{
+	return StateData.Bottom;
+}
+
+void ZEGRScissorRect::SetZero()
+{
+	memset(&StateData, 0, sizeof(ZEScissorRectangleData));
+}
+
+ZEGRScissorRect::ZEGRScissorRect()
+{
+	SetZero();
+}

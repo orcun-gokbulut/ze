@@ -33,12 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNSimpleMaterial.h"
+
+#include "ZERNRenderer.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
+#include "ZEGraphics/ZEGRShader.h"
 
 bool ZERNSimpleMaterial::InitializeSelf()
 {
-
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	return true;
 }
 
 void ZERNSimpleMaterial::DeinitializeSelf()
@@ -52,8 +57,8 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	TwoSided = false;
 	VertexColorEnabled = true;
 	TransparancyMode = ZE_MTM_NONE;
-	TransparancyCullLimit = 0x80;
-	MaterialColor = ZEVector4::One;
+	Constants.TransparancyCullLimit = 0x80;
+	Constants.MaterialColor = ZEVector4::One;
 }
 
 ZERNSimpleMaterial::~ZERNSimpleMaterial()
@@ -91,21 +96,26 @@ bool ZERNSimpleMaterial::GetVertexColor()
 	return VertexColorEnabled;
 }
 
-
 void ZERNSimpleMaterial::SetMaterialColor(const ZEVector4& Color)
 {
-	MaterialColor = Color;
+	if (Constants.MaterialColor == Color)
+		return;
+
+	Constants.MaterialColor = Color;
 }
 
 const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
 {
-	return MaterialColor;
+	return Constants.MaterialColor;
 }
 
 void ZERNSimpleMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
 {
-	TransparancyMode = Mode;
+	if (TransparancyMode == Mode)
+		return;
 
+	TransparancyMode = Mode;
+	DirtyRenderStates = true;
 }
 
 ZEMaterialTransparancyMode ZERNSimpleMaterial::GetTransparancyMode() const
@@ -115,22 +125,67 @@ ZEMaterialTransparancyMode ZERNSimpleMaterial::GetTransparancyMode() const
 
 void ZERNSimpleMaterial::SetTransparancyCullLimit(ZEUInt Limit)
 {
-	Limit = TransparancyCullLimit;
+	if (Constants.TransparancyCullLimit == Limit)
+		return;
+	
+	Constants.TransparancyCullLimit = Limit;
+	DirtyConstants = true;
 }
 
 ZEUInt ZERNSimpleMaterial::GetTransparancyCullLimit() const
 {
-	return TransparancyCullLimit;
+	return Constants.TransparancyCullLimit;
 }
 
 void ZERNSimpleMaterial::SetTexture(const ZERNSampler& Sampler)
 {
 	TextureSampler = Sampler;
+	DirtyRenderStates;
 }
 
 const ZERNSampler& ZERNSimpleMaterial::GetTexture() const
 {
 	return TextureSampler;
+}
+
+bool ZERNSimpleMaterial::SetupMaterial(const char* StageName)
+{
+
+}
+
+bool ZERNSimpleMaterial::SetupCommand(const char* StageName, ZERNCommand* Command)
+{
+
+}
+
+void ZERNSimpleMaterial::CleanupMaterial(const char* StageName)
+{
+
+}
+
+void ZERNSimpleMaterial::Update()
+{
+	if (DirtyConstants)
+		ConstantBuffer->SetData(&Constants);
+
+	if (DirtyShaders || DirtyRenderStates)
+	{
+		ZEGRRenderState State = GetRenderer()->GetRenderState("GPass");
+
+		ZEGRShaderCompileOptions Options;
+		Options.SourceData = "#R:/ZEEngine/Shaders/D3D11/ZED11SimpleMaterial.hlsl";
+		Options.Model = ZEGR_SM_4_0;
+
+		Options.Type = ZEGR_ST_VERTEX;
+		Options.EntryPoint = "VSMain";
+		State.SetShader(Options.Type, ZEGRShader::Compile(Options));
+
+		Options.Type = ZEGR_ST_PIXEL;
+		Options.EntryPoint = "VSMain";
+		State.SetShader(Options.Type, ZEGRShader::Compile(Options));
+
+		DirtyRenderStates = true;
+	}
 }
 
 ZERNSimpleMaterial* ZERNSimpleMaterial::CreateInstance()

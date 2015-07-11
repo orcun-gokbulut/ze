@@ -54,7 +54,7 @@ class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 									ZED11VertexBuffer();
 
 	public:
-		const ID3D11Buffer*			GetBuffer() const;
+		ID3D11Buffer*				GetBuffer() const;
 
 		virtual bool				Lock(void** Data);
 		virtual void				Unlock();

@@ -46,6 +46,11 @@ void ZED11StateBase::Release()
 		delete this;
 }
 
+ZEGRResourceType ZED11StateBase::GetResourceType()
+{
+	return ZEGR_RT_RENDER_STATE;
+}
+
 ZESize ZED11StateBase::GetReferenceCount()
 {
 	return ReferenceCount;

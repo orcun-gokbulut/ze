@@ -51,9 +51,18 @@ void ZERNRenderer::DeinitializeSelf()
 		Stages[I]->Deinitialize();
 }
 
-const ZEArray<ZERNStage*> ZERNRenderer::GetStates()
+const ZEArray<ZERNStage*>& ZERNRenderer::GetStages()
 {
 	return Stages;
+}
+
+ZERNStage* ZERNRenderer::GetStage(const char* Name)
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		if (Stages[I]->GetName() == Name)
+			return Stages[I];
+
+	return NULL;
 }
 
 void ZERNRenderer::AddStage(ZERNStage* Stage)

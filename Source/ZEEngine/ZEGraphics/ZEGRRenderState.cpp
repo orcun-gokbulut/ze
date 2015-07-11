@@ -36,6 +36,28 @@
 #include "ZEGRRenderState.h"
 #include "ZEGRGraphicsModule.h"
 
+ZEGRResourceType ZEGRRenderStateData::GetResourceType()
+{
+	return ZEGR_RT_RENDER_STATE;
+}
+
+ZEGRRenderStateData* ZEGRRenderStateData::Create(const ZEGRRenderState& RenderState)
+{
+	ZEGRRenderStateData* RenderStateData = ZEGRGraphicsModule::GetInstance()->CreateRenderStateData();
+	RenderStateData->Initialize(RenderState);
+	return RenderStateData;
+}
+
+void ZEGRRenderState::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEGRRenderState::GetEnabled()
+{
+	return Enabled;
+}
+
 void ZEGRRenderState::SetVertexLayout(const ZEGRVertexLayout& Layout)
 {
 	VertexLayout = Layout;
@@ -134,21 +156,6 @@ const ZEGRSamplerState& ZEGRRenderState::GetSampler(ZEGRShaderType Shader, ZEUIn
 	return ShaderSamplers[Shader][Index];
 }
 
-void ZEGRRenderState::SetViewport(ZEUInt Index, const ZEGRViewport& ViewPort)
-{
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Viewport index is too much.");
-	if (Index >= ZEGR_MAX_VIEWPORT_SLOT)
-		return;
-
-	ViewPorts[Index] = ViewPort;
-}
-
-const ZEGRViewport& ZEGRRenderState::GetViewport(ZEUInt Index) const
-{
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZEGRViewport(), "Viewport index is too much.");
-	return ViewPorts[Index];
-}
-
 void ZEGRRenderState::SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* Target)
 {
 	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "RenderTarget index is too much.");
@@ -203,8 +210,98 @@ const ZEGRDepthStencilState& ZEGRRenderState::GetDepthStencilState() const
 	return DepthStencilState;
 }
 
+void ZEGRRenderState::SetPrimitiveType(ZEGRPrimitiveType Type)
+{
+	PrimitiveType = Type;
+}
+
+ZEGRPrimitiveType ZEGRRenderState::GetPrimitiveType() const
+{
+	return PrimitiveType;
+}
+
+void ZEGRRenderState::SetStencilRef(ZEUInt32 Reference)
+{
+	StencilRef = Reference;
+}
+
+ZEUInt32 ZEGRRenderState::GetStencilRef() const
+{
+	return StencilRef;
+}
+
+void ZEGRRenderState::SetBlendFactors(ZEVector4& Factors)
+{
+	BlendFactor = Factors;
+}
+
+const ZEVector4& ZEGRRenderState::GetBlendFactors() const
+{
+	return BlendFactor;
+}
+
+void ZEGRRenderState::SetBlendMask(ZEUInt32 Mask)
+{
+	BlendMask = Mask;
+}
+
+ZEUInt32 ZEGRRenderState::GetBlendMask() const
+{
+	return BlendMask;
+}
+
+void ZEGRRenderState::SetScissorRect(ZEUInt Index, const ZEGRScissorRect& Rect)
+{
+	zeCheckError(Index >= ZEGR_MAX_SCISSOR_SLOT, ZE_VOID, "Scissor rectangle index is too much.");
+	ScissorRects[Index] = Rect;
+}
+
+const ZEGRScissorRect& ZEGRRenderState::GetScissorRect(ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_SCISSOR_SLOT, ZEGRScissorRect(), "Scissor rectangle index is too much.");
+	return ScissorRects[Index];
+}
+
+void ZEGRRenderState::SetScissorRectCount(ZEUInt Count)
+{
+	zeCheckError(Count >= ZEGR_MAX_SCISSOR_SLOT, ZE_VOID, "Scissor rectangle index is too much.");
+	ScissorRectCount = Count;
+}
+
+ZEUInt ZEGRRenderState::GetScissorRectCount() const
+{
+	return ScissorRectCount;
+}
+
+void ZEGRRenderState::SetViewport(ZEUInt Index, const ZEGRViewport& ViewPort)
+{
+	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Viewport index is too much.");
+	if (Index >= ZEGR_MAX_VIEWPORT_SLOT)
+		return;
+
+	Viewports[Index] = ViewPort;
+}
+
+const ZEGRViewport& ZEGRRenderState::GetViewport(ZEUInt Index) const
+{
+	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZEGRViewport(), "Viewport index is too much.");
+	return Viewports[Index];
+}
+
+void ZEGRRenderState::SetViewportCount(ZEUInt Count)
+{
+	zeCheckError(Count >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Viewport index is too much.");
+	ViewportCount = Count;
+}
+
+ZEUInt ZEGRRenderState::GetViewportCount() const
+{
+	return ViewportCount;
+}
+
 void ZEGRRenderState::SetToDefault()
 {
+	Enabled = false;
 	VertexLayout.SetToDefault();
 	memset(VertexBuffers, NULL, sizeof(ZEGRVertexBuffer*) * ZEGR_MAX_VERTEX_BUFFER_SLOT);
 	IndexBuffer = NULL;
@@ -221,18 +318,21 @@ void ZEGRRenderState::SetToDefault()
 		BlendState[I].SetToDefault();
 
 	for (ZESize I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-		ViewPorts[I].SetZero();
+		Viewports[I].SetZero();
 
 	for (ZESize I = 0; I < ZEGR_MAX_SCISSOR_SLOT; I++)
 		ScissorRects[I].SetZero();
 
 	RasterizerState.SetToDefault();
 	DepthStencilState.SetToDefault();
-}
 
-ZEGRRenderStateData* ZEGRRenderState::Compile()
-{
-	return ZEGRGraphicsModule::GetInstance()->CreateRenderStateData(*this);
+	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
+
+	ScissorRectCount = 0;
+	memset(ScissorRects, 0, sizeof(ScissorRects));
+
+	ViewportCount = 0;
+	memset(Viewports, 0, sizeof(Viewports));
 }
 
 ZEGRRenderState::ZEGRRenderState()

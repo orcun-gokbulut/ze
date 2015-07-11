@@ -42,16 +42,17 @@
 #include "ZEGame/ZEDrawStatistics.h"
 #include "ZEInitializable.h"
 #include "ZEGraphics/ZEGRHolder.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 
 struct ZEViewPoint
 {
-	float									FOV;
-	float									NearZ;
-	float									FarZ;
-	ZEVector3								ViewPosition;
-	ZEMatrix4x4								ViewMatrix;
-	ZEMatrix4x4								ProjMatrix;
-	ZEMatrix4x4								ViewProjMatrix;
+	float								FOV;
+	float								NearZ;
+	float								FarZ;
+	ZEVector3							ViewPosition;
+	ZEMatrix4x4							ViewMatrix;
+	ZEMatrix4x4							ProjMatrix;
+	ZEMatrix4x4							ViewProjMatrix;
 };
 
 class ZECamera;
@@ -63,22 +64,22 @@ enum ZERendererType
 };
 
 class ZEGRContext;
-class ZEGRViewPort;
 class ZERNStage;
 class ZELight;
-class ZEPostProcessor;
 class ZERNCommand;
+class ZEGRRenderState;
 struct ZEDrawParameters;
 
 class ZERNRenderer : public ZEInitializable
 {
 	private:
-		ZEGRContext*						Device;
+		ZEGRContext*					Device;
 		
-		ZESmartArray<ZERNCommand*>	Commands;
+		ZESmartArray<ZERNCommand*>		Commands;
 		ZEArray<ZERNStage*>				Stages;
 		ZEArray<ZELight*>				Lights;
 		ZERendererStatistics			Statistics;
+		ZEGRRenderState					RenderState;
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
@@ -87,18 +88,18 @@ class ZERNRenderer : public ZEInitializable
 		ZERendererType					GetRendererType();
 		const ZERendererStatistics&		GetStatistics() const;
 
-		const ZEArray<ZERNStage*>		GetStates();
+		void							SetDevice(ZEGRContext* Device);
+		ZEGRContext*					GetDevice();
+
+		const ZEGRRenderState&			GetRenderState();
+
+		const ZEArray<ZERNStage*>&		GetStages();
+		ZERNStage*						GetStage(const char* Name);
 		void							AddStage(ZERNStage* Stage);
 		void							RemoveStage(ZERNStage* Stage);
 
-		void							SetDevice(ZEGRContext* Device);
-		ZEGRContext*						GetDevice();
-
 		void							SetDrawParameters(ZEDrawParameters* DrawParameters);
 		ZEDrawParameters*				GetDrawParameters();
-
-		void							SetViewPort(ZEGRViewPort* ViewPort);
-		ZEGRViewPort*					GetViewPort();
 
 		void							AddLight(ZELight* Light);
 		void							ClearLights();

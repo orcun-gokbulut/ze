@@ -90,5 +90,5 @@ class ZED11Direct3D11Module : public ZEGRGraphicsModule
 		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer();
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
 		virtual ZEGRWindow*						CreateGraphicsWindow();
-		virtual ZEGRRenderStateData*			CreateRenderStateData(const ZEGRRenderState& RenderState);
+		virtual ZEGRRenderStateData*			CreateRenderStateData();
 };

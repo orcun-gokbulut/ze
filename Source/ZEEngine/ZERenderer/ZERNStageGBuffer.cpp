@@ -60,7 +60,7 @@ ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationBuffer()
 	return AccumulationBuffer;
 }
 
-ZEGRRenderState* ZERNStageGBuffer::GetRenderState()
+const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
 {
 	return RenderState;
 }

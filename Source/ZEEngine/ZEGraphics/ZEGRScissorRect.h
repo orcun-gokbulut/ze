@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRViewPort.cpp
+ Zinek Engine - ZEGRScissorRect.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,21 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRViewPort.h"
+#pragma once
 
-#include <memory>
+#include "ZETypes.h"
 
-void ZEGRViewport::SetZero()
+class ZEGRScissorRect
 {
-	memset(&StateData, 0, sizeof(ZEViewportData));
-}
+	private:
+		struct ZEScissorRectangleData
+		{
+			ZEInt				Bottom;
+			ZEInt				Left;
+			ZEInt				Right;
+			ZEInt				Top;
 
-ZEGRViewport::ZEGRViewport()
-{
-	SetZero();
-}
+		} StateData;
 
-ZEGRViewport::~ZEGRViewport()
-{
+	public:
+		void					SetLeft(ZEInt Left);
+		ZEInt					GetLeft() const;
 
-}
+		void					SetRight(ZEInt Right);
+		ZEInt					GetRight() const;
+
+		void					SetTop(ZEInt Top);
+		ZEInt					GetTop() const;
+
+		void					SetBottom(ZEInt Bottom);
+		ZEInt					GetBottom() const;
+
+		void					SetZero();
+
+								ZEGRScissorRect();
+};

@@ -40,6 +40,9 @@
 
 class ZEGRVertexBuffer : public ZEGRResource
 {
+	private:
+		ZESize							VertexCount;
+		ZESize							VertexSize;
 	protected:
 		virtual bool					Initialize(ZEUInt VertexCount, ZESize VertexSize);
 		virtual void					Deinitialize();
@@ -49,6 +52,9 @@ class ZEGRVertexBuffer : public ZEGRResource
 
 	public:
 		ZEGRResourceType				GetResourceType();
+
+		ZESize							GetVertexSize();
+		ZESize							GetVertexCount();
 
 		virtual void					Unlock() = 0;
 		virtual bool					Lock(void** Data) = 0;

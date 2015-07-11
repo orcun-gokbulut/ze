@@ -157,15 +157,15 @@ bool ZETRLevel::InitializeSelf()
 	switch (Layer->GetPixelType())
 	{
 		case ZETR_PT_ELEVATION:
-			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_F32, false);
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_R32F, false);
 			break;
 
 		case ZETR_PT_COLOR:
-			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_I8_4, false);
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_R8G8B8A8, false);
 			break;
 
 		case ZETR_PT_GRAYSCALE:
-			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_I8, false);
+			Result = Texture->Create(BlockSize * GetBlockCount(), BlockSize * GetBlockCount(), 1, ZEGR_TF_R8, false);
 			break;
 
 		default:

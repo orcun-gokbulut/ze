@@ -50,7 +50,7 @@ struct ID3D11DepthStencilState;
 struct ID3D11RasterizerState;
 struct ID3D11InputLayout;
 
-class ZED11StateBase : public ZEListItem
+class ZED11StateBase : public ZEListItem, public ZEGRResource
 {
 	friend class ZED11RenderStateData;
 	private:
@@ -64,6 +64,7 @@ class ZED11StateBase : public ZEListItem
 									~ZED11StateBase();
 
 	public:
+		virtual ZEGRResourceType	GetResourceType();
 		ZESize						GetReferenceCount();
 		virtual IUnknown*			GetInterfaceBase();
 		virtual const ZEGRState&	GetStateBase();

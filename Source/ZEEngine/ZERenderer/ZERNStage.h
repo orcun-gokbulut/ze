@@ -39,6 +39,7 @@
 #include "ZEDS\ZEString.h"
 
 class ZEGRContext;
+class ZERNRenderer;
 class ZEGRRenderState;
 class ZERNCommand;
 
@@ -46,11 +47,12 @@ class ZERNStage : public ZEInitializable
 {
 	private:
 		ZEString						Name;
-		ZEGRContext*						Device;
+		ZERNRenderer*					Rernderer;
+		ZEGRContext*					Device;
 
 	public:
 		const ZEString&					GetName();
-		virtual ZEGRRenderState*		GetRenderState();
+		virtual const ZEGRRenderState&	GetRenderState();
 
 		virtual void					Reconfigure();
 

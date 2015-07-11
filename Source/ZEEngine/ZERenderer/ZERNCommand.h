@@ -40,6 +40,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 enum ZERenderPipeline
 {
@@ -74,12 +75,12 @@ class ZERNMaterial;
 class ZEVertexDeclaration;
 class ZEGRVertexBuffer;
 class ZEGRIndexBuffer;
-class ZEGRRenderState;
+class ZEGRRenderStateData;
 
 class ZERNCommand
 {
 	public:
-		ZEGRRenderState*				RenderState;
+		ZEGRHolder<ZEGRRenderStateData>	RenderState;
 		ZERenderPipeline				Pipeline;
 		ZEInt							Priority;
 		float							Order;
