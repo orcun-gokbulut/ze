@@ -64,6 +64,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		ZEMaterialTransparancyMode		TransparancyMode;
 		ZERNSampler						TextureSampler;
+		ZEGRHolder<ZEGRRenderStateData>	RenderState;
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
@@ -95,9 +96,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		
 		virtual const ZEGRRenderState&	GetRenderState(const char* StageName);
 
-		virtual bool					SetupMaterial(const char* StageName);
-		virtual bool					SetupCommand(const char* StageName, ZERNCommand* Command);
-		virtual void					CleanupMaterial(const char* StageName);
+		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 
 		virtual void					Update();
 

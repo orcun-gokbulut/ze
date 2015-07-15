@@ -48,7 +48,6 @@
 class ZEGRConstantBuffer;
 class ZEFixedMaterial : public ZERNMaterial
 {
-	ZE_OBJECT
 	protected:
 		ZEString						Name;
 		ZEString						FileName;

@@ -36,6 +36,9 @@
 #include "ZEGRShader.h"
 #include "ZEGRCounter.h"
 #include "ZEGRGraphicsModule.h"
+#include "ZEFile\ZEFile.h"
+#include "ZEGRShaderCompiler.h"
+#include "ZEPointer\ZEPointer.h"
 
 bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
 {
@@ -86,4 +89,32 @@ ZEGRShader* ZEGRShader::Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZE
 	}
 
 	return Shader;
+}
+
+ZEGRShader* ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
+{
+	ZEFile File;
+	if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
+		return NULL;
+	}
+
+	File.Seek(0, ZE_SF_END);
+	ZEUInt64 Size = File.Tell();
+	File.Seek(0, ZE_SF_BEGINING);
+
+	ZEBYTE* Buffer = new ZEBYTE[Size];
+	if (File.Read(Buffer, Size, 1) != 1)
+	{
+		zeError("Cannot read shader file. File Name: \"%s", Options.FileName.ToCString());
+		return NULL;
+	}
+
+	File.Close();
+
+	ZEGRShaderCompileOptions UpdatedOptions = Options;
+	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
+	UpdatedOptions.SourceData = (char*)Buffer;
+	return Compiler->Compile(Options, NULL, NULL);	
 }

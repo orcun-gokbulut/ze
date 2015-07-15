@@ -42,7 +42,6 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 #include "ZESpatial/ZEOctree.h"
 
 class ZEInterior;

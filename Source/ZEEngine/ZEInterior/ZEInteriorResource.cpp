@@ -46,22 +46,29 @@
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEFoundation/ZEPacking.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
 
 #include <string.h>
 
-// Reading
-#define ZE_SHADER_SKINTRANSFORM				1
-#define ZE_SHADER_BASE_MAP					2
-#define ZE_SHADER_NORMAL_MAP				4
-#define ZE_SHADER_SPECULAR_MAP				8
-#define ZE_SHADER_EMMISIVE_MAP				16
-#define ZE_SHADER_OPACITY_MAP				32
-#define ZE_SHADER_DETAIL_BASE_MAP			64
-#define ZE_SHADER_DETAIL_NORMAL_MAP			128
-#define ZE_SHADER_REFLECTION				256
-#define ZE_SHADER_REFRACTION				512
-#define ZE_SHADER_LIGHT_MAP					1024
-#define ZE_SHADER_DISTORTION_MAP			2048
+ZEGRVertexLayout ZEInteriorVertex::VertexLayout;
+ZEGRVertexLayout* ZEInteriorVertex::GetVertexLayout()
+{
+
+	if (VertexLayout.GetElementCount() == 0)
+	{
+		ZEGRVertexElement ElementArray[] = 
+		{
+			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0}
+		};
+		VertexLayout.SetElements(ElementArray, 5);
+	}
+
+	return &VertexLayout;
+}
 
 const ZEGRTexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
 {

@@ -100,7 +100,7 @@ ZEGRTexture3D::~ZEGRTexture3D()
 	Deinitialize();
 }
 
-ZEGRTexture3D* ZEGRTexture3D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+ZEGRTexture3D* ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");

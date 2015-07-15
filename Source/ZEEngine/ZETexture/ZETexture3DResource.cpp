@@ -58,11 +58,10 @@ static void CopyToTexture3D(ZEGRTexture3D* Texture, ZETextureData* TextureData)
 	// Get texture specs
 	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetLevelCount();
 	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetSurfaceCount();
-
-
-	for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
+	
+	/*for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
 	{
-		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt	)Level);
+		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt)Level);
 
 		for (ZESize Surface = 0, SurfaceCopyCount = 0; Surface < TextureSurfaceCount; Surface += SurfaceIncrement, ++SurfaceCopyCount)
 		{
@@ -70,8 +69,7 @@ static void CopyToTexture3D(ZEGRTexture3D* Texture, ZETextureData* TextureData)
 		}
 
 		Texture->Unlock((ZEUInt	)Level);
-	}
-
+	}*/
 }
 
 const char* ZETexture3DResource::GetResourceType() const
@@ -101,8 +99,7 @@ ZETexture3DResource::ZETexture3DResource()
 
 ZETexture3DResource::~ZETexture3DResource()
 {
-	if (Texture != NULL)
-		Texture->Destroy();
+
 }
 
 ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
@@ -302,7 +299,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 
 	// Create Texture3DResource 
 	ZETexture3DResource* TextureResource = new ZETexture3DResource();
-	ZEGRTexture3D* Texture = TextureResource->Texture = ZEGRTexture3D::CreateInstance();
+	ZEGRTexture3D* Texture = TextureResource->Texture = ZEGRTexture3D::Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat());
 	if (Texture == NULL)
 	{
 		delete TextureResource;
@@ -315,16 +312,6 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	TextureResource->SetFileName(ResourceFile->GetPath().GetValue());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
-
-	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat()))
-	{
-		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
-		ProcessedTextureData.Destroy();
-		TempTextureData.Destroy();
-		delete TextureResource;
-		return NULL;
-	}
 
 	CopyToTexture3D(Texture, &ProcessedTextureData);
 

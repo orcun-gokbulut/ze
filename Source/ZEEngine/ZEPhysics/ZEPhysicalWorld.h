@@ -91,8 +91,6 @@ class ZEPhysicalWorld
 		
 		virtual void					Destroy();
 
-		virtual void					Draw(ZERNRenderer* Renderer) = 0;
-
 		virtual ZEPhysicalShape*		RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& ResultDetails) = 0;
 
 		static ZEPhysicalWorld*			CreateInstance();

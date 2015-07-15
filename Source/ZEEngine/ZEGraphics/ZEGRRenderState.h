@@ -47,6 +47,7 @@
 
 #include "ZETypes.h"
 #include "ZECommon.h"
+#include "ZEGRDepthStencilBuffer.h"
 
 class ZEGRVertexLayout;
 class ZEGRVertexBuffer;
@@ -80,52 +81,22 @@ class ZEGRRenderState
 	friend class ZEGRContext;
 
 	private:
-		bool									Enabled;
-
-		ZEGRVertexLayout						VertexLayout;
-		ZEGRHolder<ZEGRVertexBuffer>			VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
-		ZEGRHolder<ZEGRIndexBuffer>				IndexBuffer;
-
-		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
-		ZEGRHolder<ZEGRConstantBuffer>			ShaderConstantBuffers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_CONSTANT_BUFFER_SLOT];
-		ZEGRHolder<ZEGRTexture>					ShaderTextures[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_TEXTURE_SLOT];
-		ZEGRSamplerState						ShaderSamplers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_SAMPLER_SLOT];
-
-		ZEGRRasterizerState						RasterizerState;
-
-		ZEGRDepthStencilState					DepthStencilState;
-		ZEGRHolder<ZEGRDepthStencilBuffer>		DepthStencilBuffer;
-		ZEUInt32								StencilRef;
-
-		bool									RenderTargetsDirty;
-		ZEGRHolder<ZEGRRenderTarget>			RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-
-		ZEGRBlendState							BlendState[ZEGR_MAX_RENDER_TARGET_SLOT];
-		ZEVector4								BlendFactor;
-		ZEUInt32								BlendMask;
-
-		ZEGRViewport							Viewports[ZEGR_MAX_VIEWPORT_SLOT];
-		ZEUInt									ViewportCount;
-
-		ZEGRScissorRect							ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
-		ZEUInt									ScissorRectCount;
-
 		ZEGRPrimitiveType						PrimitiveType;
+		ZEGRVertexLayout						VertexLayout;
+		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEGRRasterizerState						RasterizerState;
+		ZEGRDepthStencilState					DepthStencilState;
+		ZEGRDepthStencilFormat					DepthStencilFormat;
+		ZEGRFormat								RenderTargetFormats[ZEGR_MAX_RENDER_TARGET_SLOT];
+		ZEGRBlendState							BlendStates[ZEGR_MAX_RENDER_TARGET_SLOT];
 
 	public:
-		virtual ZEGRResourceType				GetResourceType();
+		static ZEGRRenderState					Default;
 
-		void									SetEnabled(bool Enabled);
-		bool									GetEnabled();
+		virtual ZEGRResourceType				GetResourceType();
 
 		void									SetVertexLayout(const ZEGRVertexLayout& Layout);
 		const ZEGRVertexLayout&					GetVertexLayout() const;
-
-		void									SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
-		ZEGRVertexBuffer*						GetVertexBuffer(ZEUInt Index) const;
-
-		void									SetIndexBuffer(ZEGRIndexBuffer* Buffer);
-		ZEGRIndexBuffer*						GetIndexBuffer() const;
 
 		void									SetPrimitiveType(ZEGRPrimitiveType Type);
 		ZEGRPrimitiveType						GetPrimitiveType() const;
@@ -133,17 +104,11 @@ class ZEGRRenderState
 		void									SetShader(ZEGRShaderType Type, ZEGRShader* Shader);
 		ZEGRShader*								GetShader(ZEGRShaderType Type) const;
 
-		void									SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer);
-		ZEGRConstantBuffer*						GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index) const;
+		void									SetRenderTargetFormat(ZEUInt Index, ZEGRFormat Format);
+		ZEGRFormat								GetRenderTargetFormat(ZEUInt Index) const;
 
-		void									SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
-		ZEGRTexture*							GetTexture(ZEGRShaderType Shader, ZEUInt Index) const;
-
-		void									SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* Target);
-		ZEGRRenderTarget*						GetRenderTarget(ZEUInt Index) const;
-
-		void									SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer);
-		ZEGRDepthStencilBuffer*					GetDepthStencilBuffer() const;
+		void									SetDepthStencilFormat(ZEGRDepthStencilFormat Format);
+		ZEGRDepthStencilFormat					GetDepthStencilFormat() const;
 
 		void									SetRasterizerState(const ZEGRRasterizerState& State);
 		const ZEGRRasterizerState&				GetRasterizerState() const;
@@ -153,35 +118,14 @@ class ZEGRRenderState
 
 		void									SetDepthStencilState(const ZEGRDepthStencilState& State);
 		const ZEGRDepthStencilState&			GetDepthStencilState() const;
-
-		void									SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
-		const ZEGRSamplerState&					GetSampler(ZEGRShaderType Shader, ZEUInt Index) const;
-
-		void									SetStencilRef(ZEUInt Reference);
-		ZEUInt32								GetStencilRef() const;
-
-		void									SetBlendFactors(ZEVector4& Factors);
-		const ZEVector4&						GetBlendFactors() const;
-
-		void									SetBlendMask(ZEUInt Mask);
-		ZEUInt32								GetBlendMask() const;
-
-		void									SetScissorRect(ZEUInt Index, const ZEGRScissorRect& Rect);
-		const ZEGRScissorRect&					GetScissorRect(ZEUInt Index) const;
-
-		void									SetScissorRectCount(ZEUInt Count);
-		ZEUInt									GetScissorRectCount() const;
-
-		void									SetViewport(ZEUInt Index, const ZEGRViewport& ViewPort);
-		const ZEGRViewport&						GetViewport(ZEUInt Index) const;
-
-		void									SetViewportCount(ZEUInt Count);
-		ZEUInt									GetViewportCount() const;
 		
 		void									SetToDefault();
 
 		ZEGRRenderStateData*					Compile();
 
+		ZEGRRenderState&						operator=(const ZEGRRenderState& RenderState);
+
 												ZEGRRenderState();
+												ZEGRRenderState(const ZEGRRenderState& RenderState);
 		virtual									~ZEGRRenderState();
 };

@@ -63,6 +63,13 @@ enum ZERendererType
 	ZE_RT_SHADOW
 };
 
+#define ZERN_CONSTANTS_PIPELINE				0
+#define ZERN_CONSTANTS_RENDERER				1
+#define ZERN_CONSTANTS_SCENE				2
+#define ZERN_CONSTANTS_MATERIAL_GLOBAL		3
+#define ZERN_CONSTANTS_MATERIAL				4
+#define ZERN_CONSTANTS_INSTANCE				5
+
 class ZEGRContext;
 class ZERNStage;
 class ZELight;
@@ -90,13 +97,6 @@ class ZERNRenderer : public ZEInitializable
 
 		void							SetDevice(ZEGRContext* Device);
 		ZEGRContext*					GetDevice();
-
-		const ZEGRRenderState&			GetRenderState();
-
-		const ZEArray<ZERNStage*>&		GetStages();
-		ZERNStage*						GetStage(const char* Name);
-		void							AddStage(ZERNStage* Stage);
-		void							RemoveStage(ZERNStage* Stage);
 
 		void							SetDrawParameters(ZEDrawParameters* DrawParameters);
 		ZEDrawParameters*				GetDrawParameters();
