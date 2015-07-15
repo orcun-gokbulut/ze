@@ -36,10 +36,8 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-
-class ZEGRRenderState;
-class ZERNStage;
+#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEGraphics/ZEGRResource.h"
 
 enum ZEMaterialTransparancyMode
 {
@@ -56,10 +54,26 @@ enum ZEMaterialOpacityComponent
 	ZE_MOC_OPACITY_MAP			= 2,
 };
 
+class ZEGRContext;
 class ZERNCommand;
 class ZERNRenderer;
+class ZERNStage;
+class ZEGRRenderState;
+class ZEGRRenderStateData;
+class ZERNStageManager;
 
-class ZERNMaterial : public ZEObject, public ZEInitializable
+class ZERNMaterialStage
+{
+	public:
+		ZERNStage*						Stage;
+		ZEGRHolder<ZEGRRenderStateData> RenderState;
+
+										ZERNMaterialStage();
+};
+
+#define ZEGR_MAX_RENDERER_STAGE_COUNT 20
+
+class ZERNMaterial : public ZEGRResource
 {
 	ZE_OBJECT
 	private:
@@ -67,12 +81,18 @@ class ZERNMaterial : public ZEObject, public ZEInitializable
 		bool							ShadowReceiver;
 		bool							LightningEnabled;
 
+		ZERNMaterialStage				Stages[ZEGR_MAX_RENDERER_STAGE_COUNT];
+		ZESize							StageCount;
+
+		void							AddStage(ZERNStage* Stage, ZEGRRenderStateData* State);
+		ZEGRRenderStateData*			GetRenderState(ZERNStage* Stage);
+
 	protected:
 										ZERNMaterial();
 		virtual							~ZERNMaterial();
 
 	public:
-		ZERNRenderer*					GetRenderer();
+		virtual ZEGRResourceType		GetResourceType();
 
 		virtual void					SetShadowCaster(bool Value);
 		bool							GetShadowCaster() const;
@@ -83,12 +103,9 @@ class ZERNMaterial : public ZEObject, public ZEInitializable
 		virtual void					SetLightningEnabled(bool Enabled);
 		bool							GetLightningEnabled() const;
 
-		virtual const ZEGRRenderState&	GetRenderState(const char* StageName);
-
-		virtual bool					SetupMaterial(const char* StageName);
-		virtual bool					SetupCommand(const char* StageName, ZERNCommand* Command);
-		virtual void					CleanupMaterial(const char* StageName);
+		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+		virtual bool					SetupCommand(ZEGRContext* Context, ZERNStage* Stage, ZERNCommand* Command);
+		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 
 		virtual void					UpdateMaterial();
 };
-

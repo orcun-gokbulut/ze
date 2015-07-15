@@ -38,14 +38,9 @@
 #include "ZERNCommand.h"
 #include "ZEGraphics\ZEGRContext.h"
 
-ZEGRRenderState* ZERNStage::GetRenderState()
+const ZEGRRenderState& ZERNStage::GetRenderState()
 {
-	return NULL;
-}
-
-void ZERNStage::Reconfigure()
-{
-
+	return ZEGRRenderState::Default;
 }
 
 void ZERNStage::Setup(ZEGRContext* Device)
@@ -58,7 +53,8 @@ void ZERNStage::Render(ZERNCommand* RenderCommand)
 	zeDebugCheck(Device != NULL, "Device is NULL.");
 	zeDebugCheck(RenderCommand != NULL, "RenderCommand is NULL.");
 
-	Device->Draw(RenderCommand->RenderState, ZEGR_PT_TRIANGLE_LIST, RenderCommand->PrimitiveCount, RenderCommand->VertexBufferOffset);
+	Device->SetRenderState(RenderCommand->RenderState);
+	Device->Draw(RenderCommand->PrimitiveCount, RenderCommand->VertexBufferOffset);
 }
 
 void ZERNStage::CleanUp()

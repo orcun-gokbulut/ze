@@ -58,8 +58,27 @@ class ZEGRContext
 		virtual					~ZEGRContext();
 
 	public:
-		virtual void			Draw(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex) = 0;
-		virtual void			DrawInstanced(ZEGRRenderStateData* State, ZEGRPrimitiveType PrimitiveType, ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance) = 0;
+		virtual void			SetRenderState(ZEGRRenderStateData* State) = 0;
+
+		virtual void			SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer) = 0;
+		virtual void			SetIndexBuffer(ZEGRIndexBuffer* Buffer) = 0;
+
+		virtual void			SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer) = 0;
+		virtual void			SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture) = 0;
+		virtual void			SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler) = 0;
+
+		virtual void			SetRenderTarget(ZEUInt Count, ZEGRRenderTarget** RenderTargets) = 0;
+		virtual void			SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer) = 0;
+
+		virtual void			SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts) = 0;
+		virtual void			SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects) = 0;
+
+		virtual void			SetStencilRef(ZEUInt Reference) = 0;
+		virtual void			SetBlendFactors(ZEVector4& Factors) = 0;
+		virtual void			SetBlendMask(ZEUInt Mask) = 0;
+
+		virtual  void			Draw(ZEUInt PrimitiveCount, ZEUInt VertexOffset) = 0;
+		virtual void			DrawInstanced(ZEUInt PrimitiveCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
 		
 		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
 		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;

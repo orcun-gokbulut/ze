@@ -50,8 +50,8 @@ class ZECanvasBrush : public ZEEntity
 	ZE_OBJECT
 	
 	private:
-		ZERNCommand					RenderCommand;
-		ZEStaticVertexBuffer*			VertexBuffer;
+		ZERNCommand						RenderCommand;
+		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
 		ZESize							OldVertexCount;
 	
 	protected:

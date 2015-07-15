@@ -55,11 +55,11 @@ static void CopyToTextureCube(ZEGRTextureCube* Output, ZETextureData* TextureDat
 	void* TargetBuffer = NULL;
 	ZESize TargetPitch = 0;
 
-	for(ZESize Surface = 0; Surface < (ZESize)SurfaceCount; ++Surface)
+	for (ZESize Surface = 0; Surface < 6; Surface++)
 	{
-		for(ZESize Level = 0; Level < (ZESize)LevelCount; ++Level)
+		for (ZESize Level = 0; Level < (ZESize)LevelCount; Level++)
 		{
-			Output->Lock((ZEGRTextureCubeFace)Surface, (ZEUInt)Level, &TargetBuffer, &TargetPitch);
+			Output->Lock(&TargetBuffer, &TargetPitch,(ZEGRTextureCubeFace)Surface, (ZEUInt)Level);
 			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
 			Output->Unlock((ZEGRTextureCubeFace)Surface, (ZEUInt)Level);
 		}
@@ -265,22 +265,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	
 	// Create TextureCubeResource 
 	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::Create();
+	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false);
 	if (Texture == NULL)
-	{
-		delete TextureResource;
-		ProcessedTextureData.Destroy();
-		TempTextureData.Destroy();
-		return NULL;
-	}
-
-	// Set Other Variables
-	TextureResource->SetFileName(ResourceFile->GetPath().GetValue());
-	TextureResource->Cached = false;
-	TextureResource->Shared = false;
-
-	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false))
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
 		ProcessedTextureData.Destroy();
@@ -288,6 +274,10 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		delete TextureResource;
 		return NULL;
 	}
+
+	TextureResource->SetFileName(ResourceFile->GetPath().GetValue());
+	TextureResource->Cached = false;
+	TextureResource->Shared = false;
 
 	CopyToTextureCube(Texture, &ProcessedTextureData);
 	
@@ -325,6 +315,5 @@ ZETextureCubeResource::ZETextureCubeResource()
 
 ZETextureCubeResource::~ZETextureCubeResource()
 {
-	if (Texture != NULL)
-		Texture->Destroy();
+
 };

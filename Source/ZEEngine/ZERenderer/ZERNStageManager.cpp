@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.h
+ Zinek Engine - ZERNStageManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
+#include "ZERNStageManager.h"
 #include "ZERNStage.h"
-#include "ZEGraphics\ZEGRHolder.h"
-#include "ZEGraphics\ZEGRRenderState.h"
 
-class ZEGRTexture2D;
-
-class ZERNStageGBuffer : public ZERNStage
+bool ZERNStageManager::InitializeSelf()
 {
-	private:
-		ZEGRHolder<ZEGRTexture2D>		GBuffer0;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer1;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer2;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer3;
-		ZEGRHolder<ZEGRTexture2D>		AccumulationBuffer;
-		ZEGRRenderState					RenderState;
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		if (!Stages[I]->Initialize())
+			return false;
 
-	public:
-		ZEGRTexture2D*					GetPositionBuffer();
-		ZEGRTexture2D*					GetNormalBuffer();
-		ZEGRTexture2D*					GetDiffuseBuffer();
-		ZEGRTexture2D*					GetSpecularBuffer();
-		ZEGRTexture2D*					GetAccumulationBuffer();
+	return true;
+}
 
-		virtual const ZEGRRenderState&	GetRenderState();
+void ZERNStageManager::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		Stages[I]->Deinitialize();
+}
 
-		virtual void					Setup(ZEGRContext* Device);
-		virtual void					CleanUp();
-		virtual void					Reconfigure();
-};
+ZERNStageManager::ZERNStageManager()
+{
+
+}
+
+ZERNStageManager::~ZERNStageManager()
+{
+
+}
+
+const ZEArray<ZERNStage*>& ZERNStageManager::GetStages()
+{
+	return Stages;
+}
+
+ZERNStage* ZERNStageManager::GetStage(const char* Name)
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		if (Stages[I]->GetName() == Name)
+			return Stages[I];
+
+	return NULL;
+}
+
+void ZERNStageManager::AddStage(ZERNStage* Stage)
+{
+	if (Stages.Exists(Stage))
+		zeError("Stage is already added.");
+
+	if (IsInitialized())
+		Stage->Initialize();
+
+	Stages.Add(Stage);
+}
+
+void ZERNStageManager::RemoveStage(ZERNStage* Stage)
+{
+	if (IsInitialized())
+		Stage->Deinitialize();
+
+	Stages.RemoveValue(Stage);
+}
+
+ZERNStageManager* ZERNStageManager::GetInstance()
+{
+	static ZERNStageManager Manager;
+	return &Manager;
+}

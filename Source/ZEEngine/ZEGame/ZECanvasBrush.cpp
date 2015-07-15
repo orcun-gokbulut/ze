@@ -49,31 +49,22 @@ ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 
 void ZECanvasBrush::UpdateCanvas()
 {
-	if (RenderCommand.VertexBuffer != NULL)
-		delete RenderCommand.VertexBuffer;
-	
-	if (!Canvas.IsEmpty())
+	if (OldVertexCount != Canvas.Vertices.GetCount())
 	{
-		if (VertexBuffer == NULL)
-			VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateStaticVertexBuffer();
-
-		if (OldVertexCount != Canvas.Vertices.GetCount())
-		{
-			OldVertexCount = Canvas.Vertices.GetCount();
-			VertexBuffer->Release();
-			if (!VertexBuffer->Create(Canvas.GetBufferSize()))
-				zeCriticalError("Can not create Static Vertex Buffer.");
-		}
-		
-		void* Buffer = VertexBuffer->Lock();
-		memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
-		VertexBuffer->Unlock();
-	
-		ZEAABBox BoundingBox;
-		Canvas.CalculateBoundingBox(BoundingBox);
-		SetBoundingBox(BoundingBox);
-		RenderCommand.VertexBuffer = Canvas.CreateStaticVertexBuffer();
+		OldVertexCount = Canvas.Vertices.GetCount();
+		VertexBuffer = VertexBuffer->Create(Canvas.GetBufferSize());
+		if (VertexBuffer != NULL)
+			zeCriticalError("Can not create Static Vertex Buffer.");
 	}
+	
+	void* Buffer = VertexBuffer->Lock();
+	memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
+	VertexBuffer->Unlock();
+	
+	ZEAABBox BoundingBox;
+	Canvas.CalculateBoundingBox(BoundingBox);
+	SetBoundingBox(BoundingBox);
+	RenderCommand.VertexBuffer = Canvas.CreateVertexBuffer();
 }
 
 void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)

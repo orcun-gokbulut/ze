@@ -73,7 +73,7 @@ const char* ZETexture2DResource::GetResourceType() const
 	return "Texture Resource";
 }
 
-ZEGRTextureType ZETexture2DResource::GetTextureType() 
+ZEGRTextureType ZETexture2DResource::GetTextureType() const
 {
 	return ZEGR_TT_2D;
 }
@@ -290,21 +290,20 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Create TextureResource 
 	ZETexture2DResource* TextureResource = new ZETexture2DResource();
-	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance();
+	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false);
+
+	if (Texture == NULL)
+	{
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
+		ProcessedTextureData.Destroy();
+		delete TextureResource;
+		return NULL;
+	}
 
 	// Set Other Variables
 	TextureResource->SetFileName(ResourceFile->GetPath());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
-
-	// Create the Texture
-	if(!Texture->Create(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false))
-	{
-		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
-		TextureData.Destroy();
-		delete TextureResource;
-		return NULL;
-	}
 
 	CopyToTexture2D(Texture, FinalTextureData);
 

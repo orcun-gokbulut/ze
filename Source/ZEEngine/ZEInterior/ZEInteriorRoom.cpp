@@ -410,7 +410,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
 				RenderCommand->VertexBufferOffset = VertexIndex;
 				RenderCommand->VertexBuffer = VertexBuffer;
-				RenderCommand->VertexDeclaration = ZEInteriorVertex::GetVertexDeclaration();
+				RenderCommand->VertexDeclaration = ZEInteriorVertex::GetVertexLayout();
 				RenderCommand->WorldMatrix = WorldTransform;
 
 				RenderCommand->PrimitiveCount = 0;

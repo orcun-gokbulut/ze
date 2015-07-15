@@ -69,6 +69,8 @@ ze_add_source(ZEMaterialResource.h 					Sources Headers)
 
 ze_add_source(ZERNStage.h 							Sources Headers)
 ze_add_source(ZERNStage.cpp 						Sources)
+ze_add_source(ZERNStageManager.h 					Sources Headers)
+ze_add_source(ZERNStageManager.cpp 					Sources)
 ze_add_source(ZERNStageGBuffer.h 					Sources Headers)
 ze_add_source(ZERNStageGBuffer.cpp 					Sources)
 ze_add_source(ZERNStageAO.h 						Sources Headers)

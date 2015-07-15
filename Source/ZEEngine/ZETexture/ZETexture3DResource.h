@@ -34,10 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_3D_RESOURCE_H__
-#define __ZE_TEXTURE_3D_RESOURCE_H__
 
 #include "ZETextureResource.h"
+#include "ZEGraphics\ZEGRHolder.h"
 
 class ZEFile;
 class ZEGRTexture3D;
@@ -47,7 +46,7 @@ struct ZETextureOptions;
 class ZETexture3DResource : public ZETextureResource
 {
 	private:
-		ZEGRTexture3D*						Texture;
+		ZEGRHolder<ZEGRTexture3D>			Texture;
 
 	protected:
 											ZETexture3DResource();
@@ -62,9 +61,6 @@ class ZETexture3DResource : public ZETextureResource
 
 		static void							CacheResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture3DResource*			LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
-		
 		static ZETexture3DResource*			LoadResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture3DResource*			LoadResource(ZEFile* ResourceFile, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions = NULL);
 };
-
-#endif

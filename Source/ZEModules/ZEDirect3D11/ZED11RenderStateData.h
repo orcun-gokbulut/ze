@@ -52,63 +52,21 @@ class ZEGRTexture;
 class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBase
 {
 	friend class ZED11Direct3D11Module;
+	friend class ZED11Context;
 	friend class ZED11StatePool;
 	private:
 		ZEGRHolder<ZED11VertexLayout>			VertexLayout;
-		ZEGRHolder<ZED11IndexBuffer>			IndexBuffer;
-		ZEGRHolder<ZED11VertexBuffer>			VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
-		ZEGRHolder<ZEGRTexture>					Textures[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_TEXTURE_SLOT];
-		ZEGRHolder<ZED11SamplerState>			Samplers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_SAMPLER_SLOT];
-		ZEGRHolder<ZED11ConstantBuffer>			ConstantBuffers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_CONSTANT_BUFFER_SLOT];
 		ZEGRHolder<ZED11RasterizerState>		RasterizerState;
 		ZEGRHolder<ZED11DepthStencilState>		DepthStencilState;
 		ZEGRHolder<ZED11DepthStencilBuffer>		DepthStencilBuffer;
 		ZEGRHolder<ZED11BlendState>				BlendState;
-		ZEGRHolder<ZED11RenderTarget>			RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
 
-		ZEUInt									VertexBuffersStart;
-		ZEUInt									VertexBuffersCount;
-		ZEUInt									VertexBuffersStrides[ZEGR_MAX_VERTEX_BUFFER_SLOT];
-		ZEUInt									VertexBuffersOffsets[ZEGR_MAX_VERTEX_BUFFER_SLOT];
-		ID3D11Buffer*							NativeVertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
-		
-		DXGI_FORMAT								IndexBufferFormat;
 		D3D11_PRIMITIVE_TOPOLOGY				PrimitiveTopology;
 
 		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
-		ZEUInt									ConstantBuffersStart[ZEGR_SHADER_TYPE_COUNT];
-		ZEUInt									ConstantBuffersCount[ZEGR_SHADER_TYPE_COUNT];
-		ID3D11Buffer*							NativeConstantBuffers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_CONSTANT_BUFFER_SLOT];
-
-		ZEUInt									SamplersStart[ZEGR_SHADER_TYPE_COUNT];
-		ZEUInt									SamplersCount[ZEGR_SHADER_TYPE_COUNT];
-		ID3D11SamplerState*						NativeSamplers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_SAMPLER_SLOT];
-		
-		ZEUInt									TexturesStart[ZEGR_SHADER_TYPE_COUNT];
-		ZEUInt									TexturesCount[ZEGR_SHADER_TYPE_COUNT];
-		ID3D11ShaderResourceView*				NativeTextures[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_TEXTURE_SLOT];
-
 		ID3D11RasterizerState*					NativeRasterizerState;
 		ID3D11DepthStencilState*				NativeDepthStencilState;
-		ID3D11DepthStencilView*					NativeDepthStencilBuffer;
-		
-		ZEUInt									BlendStateStart;
-		ZEUInt									BlendStateCount;
 		ID3D11BlendState*						NativeBlendState;
-
-		ZEUInt									RenderTargetsStart;
-		ZEUInt									RenderTargetsCount;
-		ID3D11RenderTargetView*					NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-
-		ZEUInt									ViewportCount;
-		D3D11_VIEWPORT							Viewports[ZEGR_MAX_VIEWPORT_SLOT];
-
-		ZEUInt									ScissorRectsCount;
-		D3D11_RECT								ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
-
-		ZEUInt									StencilRef;
-		ZEVector4								BlendFactors;
-		ZEUInt32								BlendMask;
 
 		virtual void							Initialize(const ZEGRRenderState& RenderState);
 

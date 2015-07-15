@@ -70,5 +70,5 @@ class ZEGRTexture3D : public ZEGRTexture
 
 		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) = 0;
 		
-		ZEGRTexture3D*					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);	
+		static ZEGRTexture3D*			Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);	
 };

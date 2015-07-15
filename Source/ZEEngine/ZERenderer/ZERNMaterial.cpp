@@ -37,6 +37,38 @@
 
 #include "ZECore/ZECore.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZERNCommand.h"
+
+ZERNMaterialStage::ZERNMaterialStage()
+{
+	Stage = NULL;
+}
+
+void ZERNMaterial::AddStage(ZERNStage* Stage, ZEGRRenderStateData* State)
+{
+	bool Found = false;
+	for (ZESize I = 0; I < StageCount; I++)
+	{
+		if (Stages[I].Stage == Stage)
+		{
+			Stages[I].RenderState = State;
+			Found = true;
+		}
+	}
+
+	if (!Found)
+	{
+		Stages[StageCount].Stage = Stage;
+		Stages[StageCount].RenderState = State;
+		StageCount++;
+	}
+}
+
+ZEGRRenderStateData* ZERNMaterial::GetRenderState(ZERNStage* Stage)
+{
+	return NULL;
+}
 
 ZERNMaterial::ZERNMaterial()
 {
@@ -48,6 +80,11 @@ ZERNMaterial::ZERNMaterial()
 ZERNMaterial::~ZERNMaterial()
 {
 
+}
+
+ZEGRResourceType ZERNMaterial::GetResourceType()
+{
+	return ZEGR_RT_MATERIAL;
 }
 
 void ZERNMaterial::SetShadowCaster(bool Value)
@@ -80,28 +117,23 @@ bool ZERNMaterial::GetLightningEnabled() const
 	return LightningEnabled;
 }
 
-const ZEGRRenderState& ZERNMaterial::GetRenderState(const char* StageName)
+bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
-	static ZEGRRenderState Default;
-	return Default;
-}
+	ZEGRRenderStateData* State =  GetRenderState(Stage);
+	if (Stage == NULL)
+		return false;
 
-bool ZERNMaterial::SetupMaterial(const char* StageName)
-{
-	return false;
-}
-
-bool ZERNMaterial::SetupCommand(const char* StageName, ZERNCommand* Command)
-{
+	Context->SetRenderState(State);
 	return true;
 }
 
-void ZERNMaterial::CleanupMaterial(const char* StageName)
+bool ZERNMaterial::SetupCommand(ZEGRContext* Context, ZERNStage* Stage, ZERNCommand* Command)
 {
-
+	Context->Draw(Command->PrimitiveCount, Command->VertexBufferOffset);
+	return true;
 }
 
-void ZERNMaterial::UpdateMaterial()
+void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
 
 }

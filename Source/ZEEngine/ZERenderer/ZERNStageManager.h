@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPhysicsPicker.h
+ Zinek Engine - ZERNStageManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma  once
-#ifndef __ZE_PHYSICS_PICKER_H__
-#define __ZE_PHYSICS_PICKER_H__
+#pragma once
 
-#include "ZETypes.h"
-#include "ZEMath/ZERay.h"
+#include "ZEInitializable.h"
+#include "ZEDS\ZEArray.h"
 
-class ZERay;
-class ZEVector3;
-class ZEPhysicalRigidBody;
-class ZEPhysicalSphereShape;
-class ZEPhysicalJoint;
+class ZERNStage;
 
-class ZEPhysicsPicker
+class ZERNStageManager : public ZEInitializable
 {
 	private:
-		ZEPhysicalJoint*			MouseJoint;
-		ZEPhysicalRigidBody*		MouseSphere;
-		float						MouseDepth;
-		
+		ZEArray<ZERNStage*>				Stages;
 
-	protected:
-		void						ForwardViewProjection(ZEInt& CursorXOutput, ZEInt& CursorYOutput, float& Depth, const ZEVector3& Input);
-		void						ReverseViewProjection(ZEVector3& Output, const ZEInt& CursorXInput, const ZEInt& CursorYInput, const float& Depth);
-		
-									ZEPhysicsPicker();
-									~ZEPhysicsPicker();
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+		ZERNStageManager();
+		~ZERNStageManager();
 
 	public:
-		ZERay						RayCast;
-		bool						PickObject(ZEInt X, ZEInt Y);
-		void						MoveObject(ZEInt X, ZEInt Y);
-		void						ReleaseObject();
+		const ZEArray<ZERNStage*>&		GetStages();
+		ZERNStage*						GetStage(const char* Name);
+		void							AddStage(ZERNStage* Stage);
+		void							RemoveStage(ZERNStage* Stage);
 
-		void						Initialize();
-		void						Deinitialize();
-
-		static ZEPhysicsPicker*		CreateInstance();
-
-
+		static ZERNStageManager*		GetInstance();
 };
-
-#endif

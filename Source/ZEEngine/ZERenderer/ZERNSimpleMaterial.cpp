@@ -39,6 +39,9 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZEGraphics/ZEGRShader.h"
+#include "ZERNStageManager.h"
+#include "ZERNStage.h"
+#include "ZEGraphics/ZEGRContext.h"
 
 bool ZERNSimpleMaterial::InitializeSelf()
 {
@@ -148,19 +151,21 @@ const ZERNSampler& ZERNSimpleMaterial::GetTexture() const
 	return TextureSampler;
 }
 
-bool ZERNSimpleMaterial::SetupMaterial(const char* StageName)
+bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
+	ZERNMaterial::SetupMaterial(Context, Stage);
+	if (TextureSampler.GetTexture() != NULL)
+	{
+		Context->SetTexture(ZEGR_ST_PIXEL, 2, TextureSampler.GetTexture());
+		Context->SetSampler(ZEGR_ST_PIXEL, 2, TextureSampler.GetSamplerState());
+	}
+	else
+	{
+		Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
+	}
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_CONSTANTS_MATERIAL, ConstantBuffer);
 
-}
-
-bool ZERNSimpleMaterial::SetupCommand(const char* StageName, ZERNCommand* Command)
-{
-
-}
-
-void ZERNSimpleMaterial::CleanupMaterial(const char* StageName)
-{
-
+	return true;
 }
 
 void ZERNSimpleMaterial::Update()
@@ -170,7 +175,7 @@ void ZERNSimpleMaterial::Update()
 
 	if (DirtyShaders || DirtyRenderStates)
 	{
-		ZEGRRenderState State = GetRenderer()->GetRenderState("GPass");
+		ZEGRRenderState State = ZERNStageManager::GetInstance()->GetStage("GBuffer")->GetRenderState();
 
 		ZEGRShaderCompileOptions Options;
 		Options.SourceData = "#R:/ZEEngine/Shaders/D3D11/ZED11SimpleMaterial.hlsl";
@@ -183,8 +188,9 @@ void ZERNSimpleMaterial::Update()
 		Options.Type = ZEGR_ST_PIXEL;
 		Options.EntryPoint = "VSMain";
 		State.SetShader(Options.Type, ZEGRShader::Compile(Options));
-
-		DirtyRenderStates = true;
+				
+		RenderState = State.Compile();
+		DirtyRenderStates = false;
 	}
 }
 
