@@ -35,6 +35,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+include_directories("C:/Users/Orcun/Desktop/Zinek Engine/ZEExternal/trunk/Windows-x64-MSVCv110/libQt/Include")
+
 ze_add_source(ZEDOperation.cpp					Sources)
 ze_add_source(ZEDOperation.h					Sources Headers)
 ze_add_source(ZEDOperationManager.cpp			Sources)
