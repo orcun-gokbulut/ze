@@ -50,6 +50,16 @@ ZEObject* ZEDEntityWrapper::GetObject()
 	return ZEDObjectWrapper::GetObject();
 }
 
+void ZEDEntityWrapper::SetObjectEnabled(bool Value)
+{
+	((ZEEntity*)GetObject())->SetEnabled(Value);
+}
+
+bool ZEDEntityWrapper::GetObjectEnabled()
+{
+	return ((ZEEntity*)GetObject())->GetEnabled();
+}
+
 void ZEDEntityWrapper::SetObjectVisibility(bool Value)
 {
 	((ZEEntity*)GetObject())->SetVisible(Value);
@@ -117,6 +127,16 @@ ZEVector3 ZEDEntityWrapper::GetObjectScale()
 		return ZEVector3::One;
 
 	return ((ZEEntity*)GetObject())->GetWorldScale();
+}
+
+void ZEDEntityWrapper::Draw(ZEDrawParameters* Parameters)
+{
+	//Bounding Box
+}
+
+void ZEDEntityWrapper::Tick(float ElapsedTime)
+{
+
 }
 
 ZEDEntityWrapper* ZEDEntityWrapper::CreateInstance()

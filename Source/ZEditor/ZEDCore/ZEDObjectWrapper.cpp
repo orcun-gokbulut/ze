@@ -38,7 +38,7 @@
 ZEDObjectWrapper::ZEDObjectWrapper()
 {
 	Id = 0;
-	CustomWidget = NULL;
+/*	CustomWidget = NULL;*/
 	PopupMenu = NULL;
 
 	Object = NULL;
@@ -74,15 +74,15 @@ const ZEString& ZEDObjectWrapper::GetObjectName()
 	return Name;
 }
 
-void ZEDObjectWrapper::SetCustomWidget(QWidget* Widget)
-{
-	CustomWidget = Widget;
-}
-
-QWidget* ZEDObjectWrapper::GetCustomWidget()
-{
-	return CustomWidget;
-}
+// void ZEDObjectWrapper::SetCustomWidget(QWidget* Widget)
+// {
+// 	CustomWidget = Widget;
+// }
+// 
+// QWidget* ZEDObjectWrapper::GetCustomWidget()
+// {
+// 	return CustomWidget;
+// }
 
 void ZEDObjectWrapper::SetPopupMenu(QMenu* Menu)
 {
@@ -184,4 +184,14 @@ void ZEDObjectWrapper::RemoveComponentWrapper(ZEDObjectWrapper* Wrapper)
 		return;
 
 	ComponentWrapper.RemoveValue(Wrapper);
+}
+
+void ZEDObjectWrapper::Draw(ZEDrawParameters* Parameters)
+{
+	//Icon
+}
+
+void ZEDObjectWrapper::Tick(float ElapsedTime)
+{
+
 }

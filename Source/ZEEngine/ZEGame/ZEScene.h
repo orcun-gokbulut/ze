@@ -122,16 +122,16 @@ class ZEScene : public ZEObject
 		ZESceneCuller&							GetSceneCuller();
 		const ZESceneStatistics&				GetStatistics() const;
 
-		bool									Save(const ZEString& FileName);
-		bool									Load(const ZEString& FileName);
+		virtual bool							Save(const ZEString& FileName);
+		virtual bool							Load(const ZEString& FileName);
 
-		bool									Initialize();
-		void									Deinitialize();
-		void									Destroy();
+		virtual bool							Initialize();
+		virtual void							Deinitialize();
+		virtual void							Destroy();
 
-		void									Tick(float ElapsedTime);
-		void									Render(float ElapsedTime);
-		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void							Tick(float ElapsedTime);
+		virtual void							Render(float ElapsedTime);
+		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		void									SetAmbientFactor(float Factor);
 		float									GetAmbientFactor() const;
