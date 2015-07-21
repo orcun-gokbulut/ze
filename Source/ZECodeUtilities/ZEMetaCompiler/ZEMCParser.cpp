@@ -133,9 +133,7 @@ class ZEMetaCompilerASTConsumer : public clang::ASTConsumer
 		virtual bool HandleTopLevelDecl(DeclGroupRef DR) 
 		{
 			for (DeclGroupRef::iterator Iterator = DR.begin(); Iterator != DR.end(); Iterator++)
-			{
 				Parser->ProcessDeclaration(*Iterator);
-			}
 
 			return true;
 		}

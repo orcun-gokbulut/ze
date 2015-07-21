@@ -92,7 +92,7 @@ class ZEMCParser
 		void CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl);
 
 		// Attributes
-		bool ParseAttribute(ZEMCAttribute& Attribute, const AnnotateAttr* ClangAttribute);
+		bool ParseAttribute(ZEMCAttribute& Attribute, const Attr* ClangAttribute);
 		void ParseAttributes(ZEMCDeclaration* Decleration, Decl* ClangDecl);
 		bool CheckAttribute(ZEMCDeclaration* Decleration, const char* AttributeName);
 		const ZEArray<ZEString>* GetAttribute(ZEMCDeclaration* Declaration, const char* AttributeName);

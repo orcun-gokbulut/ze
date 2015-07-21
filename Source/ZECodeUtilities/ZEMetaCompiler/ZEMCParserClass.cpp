@@ -190,6 +190,10 @@ bool ZEMCParser::CheckTargetDeclaration(Decl* Declaration)
 	clang::SourceLocation Location = Declaration->getLocEnd();
 	clang::FileID CurrentFileID = Compiler->getSourceManager().getFileID(Location);
 	clang::FileID MainFileId = Compiler->getSourceManager().getMainFileID();
+
+	const char* CurrentFileName = Compiler->getSourceManager().getFileEntryForID(CurrentFileID)->getName();
+	const char* MainFileName = Compiler->getSourceManager().getFileEntryForID(MainFileId)->getName();
+
 	return (CurrentFileID == MainFileId);
 }
 
@@ -200,9 +204,8 @@ bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
 		ZEMCAttribute AttributeData;
 		for (CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 		{
-			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-
-			if (AttributeData.Name == "ForwardDeclaration")
+			bool Result = ParseAttribute(AttributeData, *CurrentAttr);
+			if (Result && AttributeData.Name == "ForwardDeclaration")
 			{
 				bool Found = false;
 				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
@@ -289,12 +292,7 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		ClassData->Properties = ClassData->BaseClass->Properties;
 	}
 
-	ZEMCAttribute AttributeData;
-	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
-	{
-		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-		ClassData->Attributes.Add(AttributeData);
-	}
+	ParseAttributes(ClassData, Class);
 
 	for(CXXRecordDecl::decl_iterator Current = Class->decls_begin(), End = Class->decls_end(); Current != End; ++Current)
 	{
@@ -319,12 +317,7 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		else if(isa<RecordDecl>(*Current))
 		{
 			RecordDecl* AnonymousRecord = ((RecordDecl*)*Current);
-			ZEMCAttribute AnonymousRecordAttributeData;
-			for(CXXRecordDecl::attr_iterator CurrentAttr = AnonymousRecord->attr_begin(), LastAttr = AnonymousRecord->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
-			{
-				ParseAttribute(AnonymousRecordAttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-				ClassData->Attributes.Add(AnonymousRecordAttributeData);
-			}
+			ParseAttributes(ClassData, AnonymousRecord);
 		}
 	}
 

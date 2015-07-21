@@ -37,8 +37,12 @@
 #include "ZEMCOptions.h"
 #include "ZEMCContext.h"
 
-bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribute)
+bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const Attr* BaseAttribute)
 {
+	if (BaseAttribute->getKind() != attr::Annotate)
+		return false;
+
+	const AnnotateAttr* Attribute = (const AnnotateAttr*)BaseAttribute;
 	std::string Temp = Attribute->getAnnotation().str();
 	const char* AttributeText = Temp.c_str();
 
@@ -225,7 +229,7 @@ void ZEMCParser::ParseAttributes(ZEMCDeclaration* Decleration, Decl* ClangDecl)
 	for(Decl::attr_iterator CurrentAttr = ClangDecl->attr_begin(); CurrentAttr != ClangDecl->attr_end(); CurrentAttr++)
 	{
 		ZEMCAttribute Attribute;
-		if (ParseAttribute(Attribute, ((AnnotateAttr*)(*CurrentAttr))))
+		if (ParseAttribute(Attribute, *CurrentAttr))
 			Decleration->Attributes.Add(Attribute);
 	}
 }

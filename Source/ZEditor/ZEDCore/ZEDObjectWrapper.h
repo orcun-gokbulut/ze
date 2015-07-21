@@ -44,12 +44,10 @@
 
 class ZEDrawParameters;
 
+ZE_ATTRIBUTE_0("ObjectClass")
 class ZEDObjectWrapper : public ZEObject
 {
 	ZE_OBJECT
-
-	//ZE_ATTRIBUTE_0("ObjectClass")
-
 	private:
 		ZESize Id;
 		ZEString Name;
