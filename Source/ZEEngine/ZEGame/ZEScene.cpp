@@ -220,7 +220,7 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
 		CurrentEntity = Entities[I];
-		if (Class->IsDerivedFrom(Class, CurrentEntity->GetClass()))
+		if (ZEClass::IsDerivedFrom(Class, CurrentEntity->GetClass()))
 			ProperEntities.Add(CurrentEntity);
 	}
 

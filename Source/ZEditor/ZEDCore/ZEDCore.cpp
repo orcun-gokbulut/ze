@@ -38,11 +38,13 @@
 #include "ZEDSelectionManager.h"
 #include "ZEDTransformationManager.h"
 #include "ZEDModule.h"
+#include "ZEDObjectWrapper.h"
 #include "ZEDViewPort.h"
 #include "ZEDS/ZEString.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZECore/ZEOptionManager.h"
+#include "ZEMeta/ZEProvider.h"
 #include <windows.h>
 #include <QtCore/QObject>
 
@@ -84,6 +86,11 @@ ZEDModule* ZEDCore::GetEditorModule()
 	return EditorModule;
 }
 
+const ZEArray<ZEClass*>& ZEDCore::GetWrapperTypes()
+{
+	return WrapperTypes;
+}
+
 void ZEDCore::InitializeEngine()
 {
 	zeCore->SetApplicationModule(EditorModule);
@@ -96,6 +103,8 @@ void ZEDCore::InitializeEngine()
 
 	if (zeCore->StartUp(EditorModule->GetViewPort()->winId()))
 		zeCore->Run();
+
+	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
 }
 
 void ZEDCore::DeinitializeEngine()

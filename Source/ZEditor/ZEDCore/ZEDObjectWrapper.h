@@ -35,12 +35,21 @@
 
 #pragma once
 
-#include "ZEGame/ZEEntity.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEDS/ZEArray.h"
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 
-class ZEDObjectWrapper : public ZEEntity
+class ZEDrawParameters;
+
+class ZEDObjectWrapper : public ZEObject
 {
+	ZE_OBJECT
+
+	//ZE_ATTRIBUTE_0("ObjectClass")
+
 	private:
 		ZESize Id;
 		ZEString Name;
@@ -86,6 +95,9 @@ class ZEDObjectWrapper : public ZEEntity
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
 
+		virtual void SetObjectEnabled(bool Value) = 0;
+		virtual bool GetObjectEnabled() = 0;
+
 		virtual void SetObjectVisibility(bool Value) = 0;
 		virtual bool GetObjectVisibility() = 0;
 
@@ -100,6 +112,9 @@ class ZEDObjectWrapper : public ZEEntity
 		virtual void SetObjectScale(const ZEVector3& NewScale) = 0;
 		virtual ZEVector3 GetObjectScale() = 0;
 
+		virtual void Draw(ZEDrawParameters* Parameters);
+		virtual void Tick(float ElapsedTime);
+
 		void SetParentWrapper(ZEDObjectWrapper* Wrapper);
 		ZEDObjectWrapper* GetParentWrapper();
 
@@ -110,5 +125,4 @@ class ZEDObjectWrapper : public ZEEntity
 		ZEArray<ZEDObjectWrapper*>& GetComponentWrappers();
 		void AddComponentWrapper(ZEDObjectWrapper* Wrapper);
 		void RemoveComponentWrapper(ZEDObjectWrapper* Wrapper);
-
 };

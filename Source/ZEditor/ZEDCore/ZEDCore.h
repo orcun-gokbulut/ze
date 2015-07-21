@@ -35,10 +35,13 @@
 
 #pragma once
 
+#include "ZEDS/ZEArray.h"
+
 class ZEDOperationManager;
 class ZEDSelectionManager;
 class ZEDTransformationManager;
 class ZEDModule;
+class ZEClass;
 
 class ZEDCore
 {
@@ -48,6 +51,8 @@ class ZEDCore
 		ZEDTransformationManager* TransformationManager;
 		ZEDModule* EditorModule;
 		
+		ZEArray<ZEClass*> WrapperTypes;
+
 		ZEDCore();
 		~ZEDCore();
 
@@ -56,6 +61,7 @@ class ZEDCore
 		ZEDSelectionManager* GetSelectionManager();
 		ZEDTransformationManager* GetTransformationManager();
 		ZEDModule* GetEditorModule();
+		const ZEArray<ZEClass*>& GetWrapperTypes();
 
 		void InitializeEngine();
 		void DeinitializeEngine();

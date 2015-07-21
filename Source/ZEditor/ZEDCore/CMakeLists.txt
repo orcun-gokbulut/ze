@@ -48,19 +48,23 @@ ze_add_source(ZEDTransformationManager.h		Sources Headers)
 ze_add_source(ZEDScene.cpp						Sources)
 ze_add_source(ZEDScene.h						Sources Headers)
 ze_add_source(ZEDObjectWrapper.cpp				Sources)
-ze_add_source(ZEDObjectWrapper.h				Sources Headers)
+ze_add_source(ZEDObjectWrapper.h				Sources Headers ZEMC)
 ze_add_source(ZEDSelectionManager.cpp			Sources)
 ze_add_source(ZEDSelectionManager.h				Sources Headers)
 ze_add_source(ZEDViewPort.cpp					Sources)
 ze_add_source(ZEDViewPort.h						Sources Headers QtMocs)
 ze_add_source(ZEDEntityWrapper.cpp				Sources)
-ze_add_source(ZEDEntityWrapper.h				Sources Headers)
+ze_add_source(ZEDEntityWrapper.h				Sources Headers ZEMC)
 ze_add_source(ZEDModule.cpp						Sources)
 ze_add_source(ZEDModule.h						Sources Headers)
 ze_add_source(ZEDCore.cpp						Sources)
 ze_add_source(ZEDCore.h							Sources Headers)
 
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+qt4_wrap_cpp (QtMocFiles ${QtMocs})
 
 ze_add_library(TARGET ZEDCore 
-	SOURCES ${Sources} ${QtMocFiles} LIBS libQt)
+	ZEMC ${ZEMC}
+	SOURCES ${Sources} 
+	HEADERS ${Headers} 
+	${QtMocFiles} 
+	LIBS ZEFoundation libQt)

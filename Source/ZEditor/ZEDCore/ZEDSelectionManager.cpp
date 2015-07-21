@@ -58,17 +58,17 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 
 	if (PivotMode == ZED_SCM_ENTITY_PIVOT)
 	{
-		SelectionCenterPosition = Selection.GetFirstItem()->GetWorldPosition(); //GetPivotPosition
+		SelectionCenterPosition = Selection.GetFirstItem()->GetObjectPosition(); //GetPivotPosition
 
 		if (TargetSpace == ZED_TS_LOCAL)
-			SelectionCenterRotation = Selection.GetFirstItem()->GetWorldRotation(); //GetPivotRotation
+			SelectionCenterRotation = Selection.GetFirstItem()->GetObjectRotation(); //GetPivotRotation
 	}
 	else if (PivotMode == ZED_SCM_SELECTION_CENTER)
 	{
 		if (TargetSpace == ZED_TS_LOCAL)
 		{
 			SelectionCenterPosition = Selection.GetFirstItem()->GetObjectBoundingBox().Center;
-			SelectionCenterRotation = Selection.GetFirstItem()->GetWorldRotation(); //GetPivotRotation ? BBox rotation?
+			SelectionCenterRotation = Selection.GetFirstItem()->GetObjectRotation(); //GetPivotRotation ? BBox rotation?
 		}
 		else if (TargetSpace == ZED_TS_WORLD)
 		{
@@ -85,8 +85,8 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 	{
 		if (TargetSpace == ZED_TS_LOCAL)
 		{
-			SelectionCenterPosition = Selection.GetFirstItem()->GetWorldPosition(); //GetPivotPosition
-			SelectionCenterRotation = Selection.GetFirstItem()->GetWorldRotation(); //GetPivotRotation
+			SelectionCenterPosition = Selection.GetFirstItem()->GetObjectPosition(); //GetPivotPosition
+			SelectionCenterRotation = Selection.GetFirstItem()->GetObjectRotation(); //GetPivotRotation
 		}
 		else if (TargetSpace == ZED_TS_WORLD)
 		{

@@ -35,21 +35,35 @@
 
 #pragma once
 
+#include "ZEDObjectWrapper.h"
 #include "ZEGame/ZEScene.h"
 
 class ZEObject;
 
 class ZEDScene : public ZEScene
 {
+	private:
+		ZESmartArray<ZEDObjectWrapper*> Wrappers;
+		void Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime);
 	protected:
-		ZEDScene();
-
 		bool ExportZEDScene();
 		bool ImportZEDScene();
 
+		ZEDScene();
+
 	public:
-		void AddZEDObject(ZEObject* Object);
-		void RemoveZEDObject(ZEObject* Object);
+		void AddWrapper(ZEObject* Object);
+		void RemoveWrapper(ZEObject* Object);
+
+		const ZESmartArray<ZEDObjectWrapper*>& GetWrappers();
+		ZEArray<ZEDObjectWrapper*> GetWrappers(ZEClass* Class);
+					 
+		virtual bool Initialize();
+		virtual void Deinitialize();
+					 
+		virtual void Tick(float ElapsedTime);
+		virtual void Render(float ElapsedTime);
+		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEDScene* CreateInstance();
 };
