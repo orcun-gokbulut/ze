@@ -69,7 +69,7 @@ class ZEModelDebugDrawer : public ZEDebugDrawer
 		void						SetBonePathColor(ZEVector4 Color);
 		ZEVector4					GetBonePathColor() const;
 
-		virtual void				Draw(ZEDrawParameters* DrawParameters);
+		virtual void				Draw(ZERNDrawParameters* DrawParameters);
 
 		static ZEModelDebugDrawer*	CreateInstance();
 

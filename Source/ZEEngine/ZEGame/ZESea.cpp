@@ -39,7 +39,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZESeaMaterial.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
@@ -256,7 +256,7 @@ void ZESea::Tick(float ElapsedTime)
 	ZEEntity::Tick(ElapsedTime);
 }
 
-void ZESea::Draw(ZEDrawParameters* DrawParameters)
+void ZESea::Draw(ZERNDrawParameters* DrawParameters)
 {
 	
 	Command.SetZero();

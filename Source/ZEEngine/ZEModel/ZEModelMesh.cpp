@@ -38,7 +38,7 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEMath.h"
@@ -555,7 +555,7 @@ void ZEModelMesh::OnTransformChanged()
 	}
 }
 
-void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
+void ZEModelMesh::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (!Visible)
 		return;

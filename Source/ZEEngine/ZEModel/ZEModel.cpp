@@ -37,7 +37,7 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEError.h"
@@ -446,7 +446,7 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 	ParentlessBoneJoint->Initialize();
 }
 
-void ZEModel::Draw(ZEDrawParameters* DrawParameters)
+void ZEModel::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if(!GetVisible())
 		return;

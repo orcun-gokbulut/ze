@@ -41,7 +41,7 @@
 #include "ZESceneDebugDraw.h"
 #include "ZESceneCuller.h"
 #include "ZETypes.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZERayCast.h"
 
@@ -79,7 +79,7 @@ class ZEScene : public ZEObject
 
 		ZEPhysicalWorld*						PhysicalWorld;
 
-		ZEDrawParameters						FrameDrawParameters;
+		ZERNDrawParameters						FrameDrawParameters;
 
 		ZEFrameRenderer*						Renderer;
 		ZEShadowRenderer*						ShadowRenderer;

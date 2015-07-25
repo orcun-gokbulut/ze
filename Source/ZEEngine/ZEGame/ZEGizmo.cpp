@@ -45,7 +45,7 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZELineSegment.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
@@ -1067,7 +1067,7 @@ bool ZEGizmo::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
+void ZEGizmo::Draw(ZERNDrawParameters* DrawParameters)
 {
 	UpdateGizmo();
 

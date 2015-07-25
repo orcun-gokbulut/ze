@@ -162,7 +162,7 @@ class ZEModelMesh : public ZEObject
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		void								Draw(ZEDrawParameters* DrawParameters);
+		void								Draw(ZERNDrawParameters* DrawParameters);
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();

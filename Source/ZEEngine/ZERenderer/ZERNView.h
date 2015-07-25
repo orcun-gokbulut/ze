@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDrawParameters.h
+ Zinek Engine - ZERNView.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,63 +36,46 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEDrawStatistics.h"
 
-class ZELight;
-class ZECamera;
-class ZERNRenderer;
+enum ZERNViewType
+{
+	ZERN_VT_NONE,
+	ZERN_VT_CAMERA,
+	ZERN_VT_SHADOW_CASTER,
+	ZERN_VT_PROBE
+};
+
+class ZEGRScreen;
 class ZEViewVolume;
+class ZEEntity;
 
-enum ZERenderPass
+struct ZERNView
 {
-	ZE_RP_COLOR,
-	ZE_RP_DEPTH,
-	ZE_RP_SHADOW_MAP,
-	ZE_RP_OCCLUSION_MAP
-};
+	ZERNViewType				Type;
+	ZEEntity*					Entity;
+	ZEVector3					Position;
+	ZEQuaternion				Rotation;
+	ZEVector3					Direction;
 
-enum ZEViewType
-{
-	ZE_VPT_CAMERA,
-	ZE_VPT_LIGHT
-};
+	// Orthographic Projection
+	float						VerticalWidth;		
+	float						HorizontalWidth;
+	
+	// Perspective Projection
+	float						VerticalFOV;		
+	float						HorizontalFOV;
+	float						D;
+	ZEVector3					CornerRays[4];
 
-struct ZEView
-{
+	float						AspectRatio;
+	
+	ZEMatrix4x4					ViewTransform;
+	ZEMatrix4x4					ProjectionTransform;
+	ZEMatrix4x4					ViewProjectionTransform;
 
-	ZEViewType				Type;
-	ZELight*				Light;
-	ZECamera*				Camera;
-
-	ZEVector3				Position;
-	ZEQuaternion			Rotation;
-	ZEVector3				Direction;
-
-	float					FOV;
-
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;
-	ZEMatrix4x4				ViewProjectionTransform;
-};
-
-class ZEViewPort;
-
-struct ZEDrawParameters
-{
-	ZESize					FrameId;
-	float					ElapsedTime;
-	float					Time;
-	ZERNRenderer*				Renderer;
-	ZERenderPass			Pass;
-	ZEDrawStatistics		Statistics;
-
-	ZEViewPort*				ViewPort;
-	ZEViewVolume*			ViewVolume;
-
-	ZESmartArray<ZELight*>	Lights; 
-	void*					CustomData;
+	ZEGRScreen*					Screen;
+	ZEViewVolume*				ViewVolume;
 };

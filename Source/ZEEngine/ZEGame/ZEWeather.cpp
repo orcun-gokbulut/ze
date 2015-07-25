@@ -282,7 +282,7 @@ bool ZEWeather::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEWeather::Draw(ZEDrawParameters* DrawParameters)
+void ZEWeather::Draw(ZERNDrawParameters* DrawParameters)
 {
 	
 }

@@ -104,7 +104,7 @@ class ZEGrid : public ZEEntity
 		void						SetAxisColor(const ZEVector3& Color);
 		const ZEVector3&			GetAxisColor();
 
-		virtual void				Draw(ZEDrawParameters* Parameters);
+		virtual void				Draw(ZERNDrawParameters* Parameters);
 
 		static ZEGrid*				CreateInstance();
 };

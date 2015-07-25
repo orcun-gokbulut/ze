@@ -86,7 +86,7 @@ const ZEMatrix4x4& ZEOmniProjectiveLight::GetViewTransform(ZESize Index)
 	return ViewProjectionMatrix;
 }
 
-void ZEOmniProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
+void ZEOmniProjectiveLight::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass != ZE_RP_COLOR)
 		return;

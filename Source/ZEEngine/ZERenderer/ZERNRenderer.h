@@ -35,81 +35,83 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEGame/ZEDrawStatistics.h"
 #include "ZEInitializable.h"
-#include "ZEGraphics/ZEGRHolder.h"
-#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZERNView.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEDS/ZEList.h"
 
-struct ZEViewPoint
-{
-	float								FOV;
-	float								NearZ;
-	float								FarZ;
-	ZEVector3							ViewPosition;
-	ZEMatrix4x4							ViewMatrix;
-	ZEMatrix4x4							ProjMatrix;
-	ZEMatrix4x4							ViewProjMatrix;
-};
+typedef ZEFlags ZERNRenderFlags;
+#define ZERN_RF_NONE				0x0
+#define ZERN_RF_DRAW				0x1
+#define ZERN_RF_CULL				0x2
+#define ZERN_RF_PROBE				0x4
 
-class ZECamera;
+typedef ZEFlags ZERNRenderPasses;
+#define ZERN_RP_DEFERRED_GPASS		0x0001
+#define ZERN_RP_FORWARD				0x0002
+#define ZERN_RP_FORWARD_TRANSPARANT	0x0004
+#define ZERN_RP_POST_HDR			0x0008
+#define ZERN_RP_POST_EFFECT			0x0010
+#define ZERN_RP_2D					0x0020
+#define ZERN_RP_SHADOW_OMNI			0x0040
+#define ZERN_RP_SHADOW_DIRECTIONAL	0x0080
+#define ZERN_RP_SHADOW_PROJECTIVE	0x0080
 
-enum ZERendererType
-{
-	ZE_RT_FRAME,
-	ZE_RT_SHADOW
-};
-
-#define ZERN_CONSTANTS_PIPELINE				0
-#define ZERN_CONSTANTS_RENDERER				1
-#define ZERN_CONSTANTS_SCENE				2
-#define ZERN_CONSTANTS_MATERIAL_GLOBAL		3
-#define ZERN_CONSTANTS_MATERIAL				4
-#define ZERN_CONSTANTS_INSTANCE				5
-
+class ZEEntity;
 class ZEGRContext;
+class ZEScene;
+class ZECamera;
 class ZERNStage;
-class ZELight;
-class ZERNCommand;
-class ZEGRRenderState;
-struct ZEDrawParameters;
+
+class ZERNRenderInfo : public ZEListItem
+{
+	public:
+		ZERNRenderFlags				Flags;
+		ZERNRenderPasses			Passes;
+		ZEUInt						Priority;
+		float						Order;
+		ZEEntity*					Entity;
+
+									ZERNRenderInfo();
+};
+
+
+// Cull Entities
+// Order Entities
+// Fill Stages
+
+class ZE
 
 class ZERNRenderer : public ZEInitializable
 {
 	private:
-		ZEGRContext*					Device;
-		
-		ZESmartArray<ZERNCommand*>		Commands;
-		ZEArray<ZERNStage*>				Stages;
-		ZEArray<ZELight*>				Lights;
-		ZERendererStatistics			Statistics;
-		ZEGRRenderState					RenderState;
+		ZEGRContext*				Device;
+		ZEScene*					Scene;
+		ZEArray<ZERNStage*>			Stages;
+		ZERNView					View;
+		ZEList<ZERNRenderInfo>		RenderInfos;			
 
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
 
 	public:
-		ZERendererType					GetRendererType();
-		const ZERendererStatistics&		GetStatistics() const;
+		void						SetDevice(ZEGRContext* Device);
+		ZEGRContext*				GetDevice();
 
-		void							SetDevice(ZEGRContext* Device);
-		ZEGRContext*					GetDevice();
+		void						SetView(const ZERNView& View);
+		const ZERNView&				GetView();
 
-		void							SetDrawParameters(ZEDrawParameters* DrawParameters);
-		ZEDrawParameters*				GetDrawParameters();
+		void						SetScene(ZEScene* Scene);
+		ZEScene*					GetScene();
 
-		void							AddLight(ZELight* Light);
-		void							ClearLights();
+		void						AddStage(ZERNStage* Stage);
+		void						RemoveStage(ZERNStage* Stage);
 
-		void							AddCommand(ZERNCommand* Command);
-		void							ClearCommands();
+		void						Render(float ElaspedTime = 0);
 
-		void							Render(float ElaspedTime = 0);
-		void							Clear();
+		void						Clear();
 
-										ZERNRenderer();
-										~ZERNRenderer();
+									ZERNRenderer();
+									~ZERNRenderer();
 };

@@ -37,7 +37,7 @@
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZERenderer/ZESkyBoxMaterial.h"
 #include "ZERenderer/ZEDirectionalLight.h"
 #include "ZETexture/ZETextureCubeResource.h"
@@ -66,7 +66,7 @@ bool ZELensFlare::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZELensFlare::Draw(ZEDrawParameters* DrawParameters)
+void ZELensFlare::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
 		return;

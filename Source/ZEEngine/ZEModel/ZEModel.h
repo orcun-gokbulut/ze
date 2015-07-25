@@ -59,7 +59,7 @@ class ZERNSimpleMaterial;
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
 
-struct ZEDrawParameters;
+struct ZERNDrawParameters;
 
 class ZEModel : public ZEEntity
 {	
@@ -161,7 +161,7 @@ class ZEModel : public ZEEntity
 		virtual void						SetScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
-		void								Draw(ZEDrawParameters* DrawParameters);
+		void								Draw(ZERNDrawParameters* DrawParameters);
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
 		
 		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);

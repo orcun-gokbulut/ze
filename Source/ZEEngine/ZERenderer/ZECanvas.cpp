@@ -55,24 +55,22 @@
 	(Vertex).Texcoord = ZEVector2(0.0f, 0.0f);\
 	(Vertex).Color = Color
 
-ZEGRVertexLayout* ZECanvasVertex::VertexLayout = NULL;
+ZEGRVertexLayout ZECanvasVertex::VertexLayout;
 
 ZEGRVertexLayout* ZECanvasVertex::GetVertexLayout()
 {
-	if (VertexLayout == NULL)
+	if (VertexLayout.GetElementCount() == 0)
 	{
-		VertexLayout = new ZEGRVertexLayout();
-
 		static ZEGRVertexElement ElementArray[] = {
 			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT3, 0, 0, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_TEXCOORD, 0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_COLOR,	0, ZEGR_VET_FLOAT4, 0, 36, ZEGR_VU_PER_VERTEX, 0}};
 
-		VertexLayout->SetElements(ElementArray, 4);
+		VertexLayout.SetElements(ElementArray, 4);
 	}
 
-	return VertexLayout;
+	return &VertexLayout;
 }
 
 void ZECanvas::PushTransformation()

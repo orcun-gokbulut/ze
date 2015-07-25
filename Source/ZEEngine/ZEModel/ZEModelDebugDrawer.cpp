@@ -38,7 +38,7 @@
 
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 
 
 void ZEModelDebugDrawer::DebugDrawEntity()
@@ -111,7 +111,7 @@ ZEVector4 ZEModelDebugDrawer::GetBonePathColor() const
 	return BonePathColor;
 }
 
-void ZEModelDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
+void ZEModelDebugDrawer::Draw(ZERNDrawParameters* DrawParameters)
 {
 	ModelDrawCanvas.Clean();
 

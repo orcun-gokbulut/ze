@@ -36,7 +36,7 @@
 #include "ZESkyDome.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZESkyDomeMaterial.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 
 void ZESkyDome::SetSetMieConstant(float Value)
 {
@@ -228,7 +228,7 @@ bool ZESkyDome::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZESkyDome::Draw(ZEDrawParameters* DrawParameters)
+void ZESkyDome::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
 		return;

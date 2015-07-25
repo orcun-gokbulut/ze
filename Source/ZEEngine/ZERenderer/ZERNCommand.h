@@ -72,7 +72,7 @@ enum ZEROPrimitiveType
 
 class ZELight;
 class ZERNMaterial;
-class ZEVertexDeclaration;
+class ZEGRVertexLayout;
 class ZEGRVertexBuffer;
 class ZEGRIndexBuffer;
 class ZEGRRenderStateData;
@@ -96,7 +96,7 @@ class ZERNCommand
 
 		ZEGRIndexBuffer*				IndexBuffer;
 		ZEGRVertexBuffer*				VertexBuffer;
-		ZEVertexDeclaration*			VertexDeclaration;
+		ZEGRVertexLayout*				VertexLayout;
 
 		ZEMatrix4x4						LocalMatrix;
 		ZEMatrix4x4						WorldMatrix;

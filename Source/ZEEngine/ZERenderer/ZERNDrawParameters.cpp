@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESceneCuller.h
+ Zinek Engine - ZERNDrawParameters.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_SCENE_CULLER_H__
-#define __ZE_SCENE_CULLER_H__
-
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDrawStatistics.h"
-
-class ZEScene;
-class ZEEntity;
-class ZELight;
-struct ZEDrawParameters;
-
-class ZESceneCuller
-{
-	private:
-		ZESceneStatistics					Statistics;
-
-		void								CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters);
-		void								CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters);
-
-	public:
-		virtual const ZESceneStatistics&	GetStatistics() const;
-
-		virtual void						CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters);
-
-											ZESceneCuller();
-		virtual								~ZESceneCuller();
-};
-
-#endif
+#include "ZERNDrawParameters.h"

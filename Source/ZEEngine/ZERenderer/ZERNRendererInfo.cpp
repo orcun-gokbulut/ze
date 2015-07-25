@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.h
+ Zinek Engine - ZERNRendererInfo.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
+#include "ZERNRenderer.h"
+#include "ZERNStage.h"
 
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERNCommand.h"
-
-class ZETextureCubeResource;
-class ZESkyBoxMaterial;
-
-class ZESkyBrush : public ZEEntity
+bool ZERNRenderer::InitializeSelf()
 {
-	ZE_OBJECT
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		if (!Stages[I]->Initialize())
+			return false;
 
-	private:
-		ZECanvas							SkyBox;
-		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
-		ZERNCommand						SkyRenderCommand;
+	return true;
+}
 
-		ZEVector3							SkyColor;
-		float								SkyBrightness;
+void ZERNRenderer::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		Stages[I]->Deinitialize();
+}
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+void ZERNRenderer::SetScene(ZEScene* Scene)
+{
+	this->Scene = Scene;
+}
 
-											ZESkyBrush();
-		virtual								~ZESkyBrush();
+ZEScene* ZERNRenderer::GetScene()
+{
+	return Scene;
+}
 
-	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
+void ZERNRenderer::Render(float ElaspedTime)
+{
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+	{
+		ZERNStage* Stage = Stages[I];
+		Stage->Setup(Device);
 
-		virtual void						SetSkyTexture(const char* FileName);
-		const char*							GetSkyTexture() const;
-	
-		virtual void						SetSkyBrightness(float Brightness);
-		float								GetSkyBrightness() const;
+		for (ZESize N = 0; N < Commands.GetCount(); I++)
+			Stage->Render(Commands[I]);
 
-		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor() const;
+		Stage->CleanUp();
+	}
+}
 
-		virtual void						Draw(ZERNDrawParameters* DrawParameters);
-		virtual void						Tick(float Time);
+void ZERNRenderer::Clear()
+{
 
-		static ZESkyBrush*					CreateInstance();
+}
 
-};
-#endif
+ZERNRenderer::ZERNRenderer()
+{
+	memset(&Statistics, 0, sizeof(ZERendererStatistics));
+}
+
+ZERNRenderer::~ZERNRenderer()
+{
+
+}

@@ -39,7 +39,7 @@
 
 #include "ZEEntity.h"
 #include "ZEMath\ZEVector.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 
 ZE_META_FORWARD_DECLARE(ZEDirectionalLight, "ZEGraphics/ZEDirectionalLight.h")
 ZE_META_FORWARD_DECLARE(ZESkyBrush, "ZESkyBrush.h")
@@ -133,7 +133,7 @@ class ZEWeather : public ZEEntity
 
 		virtual ZEDrawFlags			GetDrawFlags() const;
 
-		virtual void				Draw(ZEDrawParameters* DrawParameters);
+		virtual void				Draw(ZERNDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);
 
 		static ZEWeather*			CreateInstance();

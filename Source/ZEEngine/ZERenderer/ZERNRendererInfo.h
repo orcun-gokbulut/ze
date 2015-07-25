@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDrawParameters.cpp
+ Zinek Engine - ZERNRendererInfo.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,80 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDrawParameters.h"
+#pragma once
+
+#include "ZEInitializable.h"
+#include "ZERNView.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEFlags.h"
+
+
+typedef ZEFlags ZERNRenderFlags;
+#define ZERN_RF_NONE				0x0
+#define ZERN_RF_DRAW				0x1
+#define ZERN_RF_CULL				0x2
+#define ZERN_RF_PROBE				0x4
+
+typedef ZEFlags ZERNRenderPasses;
+#define ZERN_RP_DEFERRED_GPASS		0x0001
+#define ZERN_RP_FORWARD				0x0002
+#define ZERN_RP_FORWARD_TRANSPARANT	0x0004
+#define ZERN_RP_POST_HDR			0x0008
+#define ZERN_RP_POST_EFFECT			0x0010
+#define ZERN_RP_2D					0x0020
+#define ZERN_RP_SHADOW_OMNI			0x0040
+#define ZERN_RP_SHADOW_DIRECTIONAL	0x0080
+#define ZERN_RP_SHADOW_PROJECTIVE	0x0080
+
+class ZEEntity;
+class ZEGRContext;
+class ZEScene;
+class ZECamera;
+class ZERNStage;
+
+class ZERNRenderInfo
+{
+	public:
+		ZERNRenderFlags				Flags;
+		ZERNRenderPasses			Passes;
+		ZEUInt						Priority;
+		float						Order;
+		ZEEntity*					Entity;
+
+									ZERNRenderInfo();
+};
+
+class ZERNRenderer : public ZEInitializable
+{
+	private:
+		ZEGRContext*				Device;
+		ZEScene*					Scene;
+		ZEArray<ZERNStage>			Stages;
+		ZERNView					View;
+
+		void						ProcessLights();
+
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
+
+	public:
+		void						SetDevice(ZEGRContext* Device);
+		ZEGRContext*				GetDevice();
+
+		void						SetView(const ZERNView& View);
+		const ZERNView&				GetView();
+
+		void						SetScene(ZEScene* Scene);
+		ZEScene*					GetScene();
+
+		void						Render(float ElaspedTime = 0);
+		void						Clear();
+
+									ZERNRenderer();
+									~ZERNRenderer();
+};
+
+// Cull Scene
+// For each entity in scene check bounding box
+// Make Priority List
+

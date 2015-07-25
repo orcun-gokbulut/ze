@@ -35,7 +35,7 @@
 
 #include "ZECanvasBrush.h"
 #include "ZEError.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
@@ -47,17 +47,28 @@ ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 	return ZE_DF_DRAW | ZE_DF_CULL;
 }
 
+ZECanvas* ZECanvasBrush::GetCanvas()
+{
+	return &Canvas;
+}
+
 void ZECanvasBrush::UpdateCanvas()
 {
 	if (OldVertexCount != Canvas.Vertices.GetCount())
 	{
 		OldVertexCount = Canvas.Vertices.GetCount();
-		VertexBuffer = VertexBuffer->Create(Canvas.GetBufferSize());
+		VertexBuffer = VertexBuffer->Create(Canvas.GetBufferSize() / sizeof(ZECanvasVertex), sizeof(ZECanvasVertex));
 		if (VertexBuffer != NULL)
 			zeCriticalError("Can not create Static Vertex Buffer.");
 	}
 	
-	void* Buffer = VertexBuffer->Lock();
+	void* Buffer = NULL; 
+	if (!VertexBuffer->Lock(&Buffer))
+	{
+		zeError("Cannot lock vertex buffer.");
+		return;
+	}
+
 	memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
 	VertexBuffer->Unlock();
 	
@@ -67,7 +78,7 @@ void ZECanvasBrush::UpdateCanvas()
 	RenderCommand.VertexBuffer = Canvas.CreateVertexBuffer();
 }
 
-void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
+void ZECanvasBrush::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (RenderCommand.VertexBuffer != NULL)
 	{
@@ -102,39 +113,26 @@ void ZECanvasBrush::Draw(ZEDrawParameters* DrawParameters)
 }
 
 bool ZECanvasBrush::DeinitializeSelf()
-{
-	if (VertexBuffer != NULL)
-		VertexBuffer->Destroy();
-
+{	
 	Canvas.Clean();
-
+	VertexBuffer.Release();
 	return ZEEntity::DeinitializeSelf();
 }
 
 void ZECanvasBrush::Tick(float ElapsedTime)
 {
-	if (Material != NULL)
-		Material->AdvanceAnimation(ElapsedTime);
+
 }
 
 ZECanvasBrush::ZECanvasBrush()
 {
 	VertexBuffer = NULL;
-	OldVertexCount = 0;
-	RenderCommand.SetZero();
-	Material = NULL;
-	PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderCommand.Material = Material;
+	RenderCommand.RenderState = RenderState;
 }
 
 ZECanvasBrush::~ZECanvasBrush()
 {
-	if (Material != NULL)
-		Material->Release();
-	if (RenderCommand.VertexBuffer != NULL)
-		((ZEStaticVertexBuffer*)RenderCommand.VertexBuffer)->Release();
+
 }
 
 ZECanvasBrush* ZECanvasBrush::CreateInstance()

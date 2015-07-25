@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESceneCuller.cpp
+ Zinek Engine - ZERNCuller.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -38,11 +38,11 @@
 #include "ZEEntity.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZEMath/ZEViewVolume.h"
 
 
-void ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameters)
+void ZESceneCuller::CullEntity(ZEEntity* Entity, ZERNDrawParameters* DrawParameters)
 {
 	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
 
@@ -97,7 +97,7 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity, ZEDrawParameters* DrawParameter
 	return;
 }
 
-void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameters)
+void ZESceneCuller::CullEntities(ZEScene* Scene, ZERNDrawParameters* DrawParameters)
 {
 	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
 
@@ -112,7 +112,7 @@ void ZESceneCuller::CullEntities(ZEScene* Scene, ZEDrawParameters* DrawParameter
 
 }
 
-void ZESceneCuller::CullScene(ZEScene* Scene, ZEDrawParameters* DrawParameters)
+void ZESceneCuller::CullScene(ZEScene* Scene, ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass == ZE_RP_COLOR)
 		memset(&Statistics, 0, sizeof(ZESceneStatistics));

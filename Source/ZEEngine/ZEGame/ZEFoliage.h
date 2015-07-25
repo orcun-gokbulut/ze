@@ -133,7 +133,7 @@ class ZEFoliage : public ZEEntity
 
 		virtual void				SetPosition(const ZEVector3& NewPosition);
 
-/*		virtual void				Draw(ZEDrawParameters* DrawParameters);*/
+/*		virtual void				Draw(ZERNDrawParameters* DrawParameters);*/
 
 		static ZEFoliage*			CreateInstance();
 

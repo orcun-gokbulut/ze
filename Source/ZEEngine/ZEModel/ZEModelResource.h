@@ -44,7 +44,6 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEPhysics/ZEPhysicalJoint.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"

@@ -42,7 +42,7 @@
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZECore.h"
 #include "ZESceneCuller.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEEntityProvider.h"
 #include "ZERenderer/ZELight.h"
@@ -313,7 +313,7 @@ void ZEScene::Render(float ElapsedTime)
 	FrameDrawParameters.Pass = ZE_RP_COLOR;
 	FrameDrawParameters.Renderer = Renderer;
 	FrameDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
+	FrameDrawParameters.View = (ZERNView*)&ActiveCamera->GetView();
 	FrameDrawParameters.Lights.Clear();
 
 	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
@@ -323,6 +323,7 @@ void ZEScene::Render(float ElapsedTime)
 	Culler.CullScene(this, &FrameDrawParameters);
 
 	//Fill Draw Parameters Statistics ZESceneStats section
+
 }
 
 bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

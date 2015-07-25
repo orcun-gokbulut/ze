@@ -49,7 +49,7 @@ class ZEGRVertexLayout;
 class ZECanvasVertex
 {
 	private:
-		static ZEGRVertexLayout*		VertexLayout;
+		static ZEGRVertexLayout			VertexLayout;
 
 	public:
 		ZEVector3						Position;

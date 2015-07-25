@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.h
+ Zinek Engine - ZERNDrawParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,51 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
 
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERNCommand.h"
+#include "ZETypes.h"
+#include "ZEDrawStatistics.h"
 
-class ZETextureCubeResource;
-class ZESkyBoxMaterial;
-
-class ZESkyBrush : public ZEEntity
+enum ZERNViewType
 {
-	ZE_OBJECT
-
-	private:
-		ZECanvas							SkyBox;
-		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
-		ZERNCommand						SkyRenderCommand;
-
-		ZEVector3							SkyColor;
-		float								SkyBrightness;
-
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
-
-											ZESkyBrush();
-		virtual								~ZESkyBrush();
-
-	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
-
-		virtual void						SetSkyTexture(const char* FileName);
-		const char*							GetSkyTexture() const;
-	
-		virtual void						SetSkyBrightness(float Brightness);
-		float								GetSkyBrightness() const;
-
-		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor() const;
-
-		virtual void						Draw(ZERNDrawParameters* DrawParameters);
-		virtual void						Tick(float Time);
-
-		static ZESkyBrush*					CreateInstance();
-
+	ZERN_VT_NONE,
+	ZERN_VT_CAMERA,
+	ZERN_VT_SHADOW_CASTER,
+	ZERN_VT_PROBE
 };
-#endif
+
+enum ZERNRenderPass
+{
+	ZERN_RP_COLOR_DEFERRED,
+	ZERN_RP_COLOR_FORWARD,
+	ZERN_RP_COLOR_TRANSPARANCY,
+	ZERN_RP_SHADOW,
+	ZERN_RP_SHADOW_CASCADED,
+	ZERN_RP_SHADOW_OMNI,
+	ZERN_RP_ENVIRONMENT,
+	ZERN_RP_POST_EFFECT,
+	ZERN_RP_USER_INTERFACE
+};
+
+class ZEGRScreen;
+class ZERNRenderer;
+class ZERNStage;
+
+struct ZERNDrawParameters
+{
+	ZESize					FrameId;
+	float					ElapsedTime;
+	float					Time;
+	ZEScene*				Scene;
+	ZERNRenderer*			Renderer;
+	ZERNRenderPass			Pass;
+	ZERNStage*				Stage;
+	ZERNView*				View;
+	ZEDrawStatistics		Statistics;
+};
