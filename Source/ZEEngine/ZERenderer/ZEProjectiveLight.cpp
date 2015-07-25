@@ -161,7 +161,7 @@ bool ZEProjectiveLight::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEProjectiveLight::Draw(ZEDrawParameters* DrawParameters)
+void ZEProjectiveLight::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass != ZE_RP_COLOR)
 		return;

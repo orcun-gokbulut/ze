@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleSystem.h"
-#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGame\ZERNDrawParameters.h"
 #include "ZEParticleRenderer.h"
 #include "ZEParticleOperator.h"
 #include "ZEParticleGenerator.h"

@@ -39,7 +39,7 @@
 
 #include "ZERenderer/ZERNCommand.h"
 
-struct ZEDrawParameters;
+struct ZERNDrawParameters;
 class ZEModel;
 class ZERNMaterial;
 class ZEModelMesh;
@@ -66,7 +66,7 @@ class ZEModelMeshLOD
 
 		bool								IsSkinned();
 
-		void								Draw(ZEDrawParameters* DrawParameters, float DrawOrder);
+		void								Draw(ZERNDrawParameters* DrawParameters, float DrawOrder);
 
 		bool								UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices);
 		

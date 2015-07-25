@@ -119,7 +119,7 @@ class ZESkyDome : public ZEEntity
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
-		virtual void			Draw(ZEDrawParameters* DrawParameters);
+		virtual void			Draw(ZERNDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
 
 		static ZESkyDome*		CreateInstance();

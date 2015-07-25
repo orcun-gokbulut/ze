@@ -73,7 +73,7 @@ class ZEOmniProjectiveLight : public ZELight
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Draw(ZERNDrawParameters* DrawParameters);
 
 		static ZEOmniProjectiveLight*	CreateInstance();
 };

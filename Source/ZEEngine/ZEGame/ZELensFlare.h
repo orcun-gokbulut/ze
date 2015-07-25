@@ -95,7 +95,7 @@ class ZELensFlare : public ZEEntity
 		void								SetMaxExtent(float MaxExtent);
 		float								GetMaxExtent();
 
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
+		virtual void						Draw(ZERNDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
 
 		static ZELensFlare*					CreateInstance();

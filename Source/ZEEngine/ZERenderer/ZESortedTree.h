@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.h
+ Zinek Engine - ZESortedTree.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
+#define ZE_SORTED_TREE_TAG(ClassName, LinkName) friend class ZESortedTree<ItemType, TagName>; ZELink<ItemType> TagName;
 
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERNCommand.h"
-
-class ZETextureCubeResource;
-class ZESkyBoxMaterial;
-
-class ZESkyBrush : public ZEEntity
+template<typename _Type>
+class ZELink
 {
-	ZE_OBJECT
-
 	private:
-		ZECanvas							SkyBox;
-		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
-		ZERNCommand						SkyRenderCommand;
+		_Type*		GetParent();
+		_Type*		MoveNext();
+		_Type*		MovePrev();
+};
 
-		ZEVector3							SkyColor;
-		float								SkyBrightness;
-
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
-
-											ZESkyBrush();
-		virtual								~ZESkyBrush();
-
-	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
-
-		virtual void						SetSkyTexture(const char* FileName);
-		const char*							GetSkyTexture() const;
-	
-		virtual void						SetSkyBrightness(float Brightness);
-		float								GetSkyBrightness() const;
-
-		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor() const;
-
-		virtual void						Draw(ZERNDrawParameters* DrawParameters);
-		virtual void						Tick(float Time);
-
-		static ZESkyBrush*					CreateInstance();
+template<typename _Type, typename TagName>
+class ZESortedTree
+{
+	void Add(_Type Item);
+	void Remove(_Type Item);
 
 };
-#endif

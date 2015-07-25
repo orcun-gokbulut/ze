@@ -41,7 +41,7 @@
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEOBBox.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZERenderer/ZELight.h"
 #include "ZEUI/ZEUIDebugDrawTag.h"
 #include "ZEGame.h"
@@ -189,7 +189,7 @@ ZEUInt ZEDebugDrawer::GetDebugDrawElements() const
 	return DebugDrawElements.Value;
 }
 
-void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
+void ZEDebugDrawer::Draw(ZERNDrawParameters* DrawParameters)
 {
 	DrawCanvas.Clean();
 

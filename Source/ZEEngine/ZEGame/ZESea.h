@@ -103,7 +103,7 @@ class ZESea : public ZEEntity
 		ZEVector2				GetNormalTile() const;
 
 		virtual void			Tick(float ElapsedTime);
-		virtual void			Draw(ZEDrawParameters* DrawParameters);
+		virtual void			Draw(ZERNDrawParameters* DrawParameters);
 
 		virtual bool			RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

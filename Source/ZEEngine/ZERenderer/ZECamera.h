@@ -38,7 +38,7 @@
 #define __ZE_CAMERA_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"

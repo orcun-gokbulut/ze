@@ -42,7 +42,7 @@
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 
 void ZEParticleEmitter::Tick(float TimeElapsed)

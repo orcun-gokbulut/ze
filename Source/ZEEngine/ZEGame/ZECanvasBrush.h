@@ -51,9 +51,15 @@ class ZECanvasBrush : public ZEEntity
 	
 	private:
 		ZERNCommand						RenderCommand;
-		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
 		ZESize							OldVertexCount;
-	
+		ZEROPrimitiveType				PrimitiveType;
+		ZEGRHolder<ZEGRRenderStateData>	RenderState;
+		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
+		ZEGRHolder<ZERNMaterial>		Material;
+		ZECanvas						Canvas;
+
+		void							UpdateRenderState();
+
 	protected:
 		virtual bool					DeinitializeSelf();
 
@@ -63,13 +69,11 @@ class ZECanvasBrush : public ZEEntity
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		ZEROPrimitiveType				PrimitiveType;
-		ZERNMaterial*						Material;
-		ZECanvas						Canvas;
+		ZECanvas*						GetCanvas();
 
 		void							UpdateCanvas();
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Draw(ZERNDrawParameters* DrawParameters);
 		virtual void					Tick(float ElapsedTime);
 
 		static ZECanvasBrush*			CreateInstance();

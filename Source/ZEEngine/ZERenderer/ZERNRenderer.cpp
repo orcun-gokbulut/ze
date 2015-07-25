@@ -35,6 +35,7 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStage.h"
+#include "ZEGame\ZEScene.h"
 
 bool ZERNRenderer::InitializeSelf()
 {
@@ -51,33 +52,20 @@ void ZERNRenderer::DeinitializeSelf()
 		Stages[I]->Deinitialize();
 }
 
-const ZERendererStatistics& ZERNRenderer::GetStatistics() const
+void ZERNRenderer::SetScene(ZEScene* Scene)
 {
-	return Statistics;
+	this->Scene = Scene;
 }
 
-void ZERNRenderer::AddLight(ZELight* Light)
+ZEScene* ZERNRenderer::GetScene()
 {
-	Lights.Add(Light);
-}
-
-void ZERNRenderer::ClearLights()
-{
-	Lights.Clear();
-}
-
-void ZERNRenderer::AddCommand(ZERNCommand* Command)
-{
-	Commands.Add(Command);
-}
-
-void ZERNRenderer::ClearCommands()
-{
-	Commands.Clear();
+	return Scene;
 }
 
 void ZERNRenderer::Render(float ElaspedTime)
 {
+	const ZESmartArray<ZEEntity*>& Entities =  Scene->GetEntities();
+
 	for (ZESize I = 0; I < Stages.GetCount(); I++)
 	{
 		ZERNStage* Stage = Stages[I];
@@ -92,8 +80,7 @@ void ZERNRenderer::Render(float ElaspedTime)
 
 void ZERNRenderer::Clear()
 {
-	ClearLights();
-	ClearCommands();
+
 }
 
 ZERNRenderer::ZERNRenderer()

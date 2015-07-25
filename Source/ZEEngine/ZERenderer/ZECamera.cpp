@@ -40,7 +40,7 @@
 #include "ZEGraphics/ZEGRDefinitions.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRScreen.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"

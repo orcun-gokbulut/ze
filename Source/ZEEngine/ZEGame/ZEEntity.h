@@ -54,7 +54,7 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEEnumerator.h"
 
-struct ZEDrawParameters;
+struct ZERNDrawParameters;
 
 // ZEDrawFlags
 typedef ZEFlags ZEDrawFlags;
@@ -206,7 +206,7 @@ class ZEEntity : public ZEObject
 		virtual bool							Restore(ZEMLReaderNode* Unserializer);
 
 		virtual void							Tick(float Time);
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
+		virtual void							Draw(ZERNDrawParameters* DrawParameters);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

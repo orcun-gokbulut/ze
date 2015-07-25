@@ -35,7 +35,7 @@
 
 #include "ZEParticleEffect.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 
 
 ZEDrawFlags ZEParticleEffect::GetDrawFlags() const

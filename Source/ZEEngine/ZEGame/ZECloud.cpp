@@ -36,7 +36,7 @@
 #include "ZECloud.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECloudMaterial.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
@@ -271,7 +271,7 @@ bool ZECloud::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZECloud::Draw(ZEDrawParameters* DrawParameters)
+void ZECloud::Draw(ZERNDrawParameters* DrawParameters)
 {
 	// Set updated parameters to material
 	

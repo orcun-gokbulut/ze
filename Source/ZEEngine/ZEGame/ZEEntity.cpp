@@ -553,7 +553,7 @@ void ZEEntity::Tick(float Time)
 
 }
 
-void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
+void ZEEntity::Draw(ZERNDrawParameters* DrawParameters)
 {
 
 }

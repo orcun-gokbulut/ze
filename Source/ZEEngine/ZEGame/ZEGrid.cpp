@@ -37,7 +37,7 @@
 #include "ZEScene.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
@@ -193,7 +193,7 @@ const ZEVector3& ZEGrid::GetAxisColor()
 	return AxisColor;
 }
 
-void ZEGrid::Draw(ZEDrawParameters* Parameters)
+void ZEGrid::Draw(ZERNDrawParameters* Parameters)
 {
 	ZEVector3 CameraPosition = Parameters->View->Camera->GetWorldPosition();
 	

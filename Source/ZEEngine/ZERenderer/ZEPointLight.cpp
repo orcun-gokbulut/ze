@@ -70,7 +70,7 @@ const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
 	return ViewProjectionMatrix;
 }
 
-void ZEPointLight::Draw(ZEDrawParameters* DrawParameters)
+void ZEPointLight::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass != ZE_RP_COLOR)
 		return;

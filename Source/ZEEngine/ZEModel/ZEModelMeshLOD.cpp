@@ -37,7 +37,7 @@
 
 #include "ZEModel.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 
 void ZEModelMeshLOD::ResetMaterial()
@@ -60,7 +60,7 @@ bool ZEModelMeshLOD::IsSkinned()
 	return Skinned;
 }
 
-void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
+void ZEModelMeshLOD::Draw(ZERNDrawParameters* DrawParameters, float DrawOrder)
 {
 	if (VertexBuffer == NULL)
 		return;

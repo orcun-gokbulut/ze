@@ -37,7 +37,7 @@
 #include "ZEMoon.h"
 
 #include "ZEMath\ZEVector.h"
-#include "ZEDrawParameters.h"
+#include "ZERNDrawParameters.h"
 #include "ZERenderer\ZERNRenderer.h"
 #include "ZERenderer\ZEMoonMaterial.h"
 #include "ZETexture\ZETexture3DResource.h"
@@ -166,7 +166,7 @@ bool ZEMoon::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEMoon::Draw(ZEDrawParameters* DrawParameters)
+void ZEMoon::Draw(ZERNDrawParameters* DrawParameters)
 {
 	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
 		return;

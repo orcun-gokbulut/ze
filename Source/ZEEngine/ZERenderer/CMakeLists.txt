@@ -42,8 +42,16 @@ ze_add_source(ZECamera.h							Sources Headers ZEMC)
 
 ze_add_source(ZERNRenderer.cpp 						Sources)
 ze_add_source(ZERNRenderer.h 						Sources Headers)
+ze_add_source(ZERNCuller.cpp						Sources)
+ze_add_source(ZERNCuller.h							Sources Headers)
 ze_add_source(ZERNCommand.cpp 						Sources)
 ze_add_source(ZERNCommand.h 						Sources Headers)
+ze_add_source(ZERNView.cpp							Sources)
+ze_add_source(ZERNView.h							Sources Headers)
+ze_add_source(ZERNDrawParameters.cpp				Sources)
+ze_add_source(ZERNDrawParameters.h					Sources Headers)
+ze_add_source(ZEDrawStatistics.cpp					Sources)
+ze_add_source(ZEDrawStatistics.h					Sources Headers)
 
 ze_add_source(ZELight.cpp 							Sources)
 ze_add_source(ZELight.h 							Sources Headers ZEMC)
@@ -81,6 +89,8 @@ ze_add_source(ZERNStageHDR.h 						Sources Headers)
 ze_add_source(ZERNStageHDR.cpp 						Sources)
 #ze_add_source(ZERNStageForward.h 					Sources Headers)
 #ze_add_source(ZERNStageForward.cpp 					Sources)
+ze_add_source(ZESortedTree.h 					Sources Headers)
+ze_add_source(ZESortedTree.cpp 					Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}

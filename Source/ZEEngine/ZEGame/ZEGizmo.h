@@ -142,7 +142,7 @@ class ZEGizmo : public ZEEntity
 		void							StartScaleProjection(ZEGizmoAxis Axis, const ZERay& InitialRay);
 		ZEVector3						ScaleProjection(const ZERay& Ray);
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Draw(ZERNDrawParameters* DrawParameters);
 
 		static ZEGizmo*					CreateInstance();
 };

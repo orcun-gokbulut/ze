@@ -35,7 +35,7 @@
 
 #include "ZELight.h"
 #include "ZERNCommand.h"
-#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGame\ZERNDrawParameters.h"
 #include "ZERNRenderer.h"
 
 float ZELight::AttenuationFunction(float RootToTry)
@@ -165,7 +165,7 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 	}
 }
 
-void ZELight::Draw(ZEDrawParameters* DrawParameters)
+void ZELight::Draw(ZERNDrawParameters* DrawParameters)
 {
 	DrawParameters->Lights.Add(this);
 }

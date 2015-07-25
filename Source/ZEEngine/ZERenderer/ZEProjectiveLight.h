@@ -89,7 +89,7 @@ class ZEProjectiveLight : public ZELight
 
 		ZEGRTexture2D*					GetShadowMap();
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual void					Draw(ZERNDrawParameters* DrawParameters);
 
 		static ZEProjectiveLight*		CreateInstance();
 };

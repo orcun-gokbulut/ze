@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.h
+ Zinek Engine - ZERNCuller.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,51 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
+#ifndef __ZE_SCENE_CULLER_H__
+#define __ZE_SCENE_CULLER_H__
 
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERNCommand.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDrawStatistics.h"
 
-class ZETextureCubeResource;
-class ZESkyBoxMaterial;
+class ZEScene;
+class ZEEntity;
+class ZELight;
+struct ZERNDrawParameters;
 
-class ZESkyBrush : public ZEEntity
+class ZESceneCuller
 {
-	ZE_OBJECT
-
 	private:
-		ZECanvas							SkyBox;
-		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
-		ZERNCommand						SkyRenderCommand;
+		ZESceneStatistics					Statistics;
 
-		ZEVector3							SkyColor;
-		float								SkyBrightness;
-
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
-
-											ZESkyBrush();
-		virtual								~ZESkyBrush();
+		void								CullEntity(ZEEntity* Entity, ZERNDrawParameters* DrawParameters);
+		void								CullEntities(ZEScene* Scene, ZERNDrawParameters* DrawParameters);
 
 	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
+		virtual const ZESceneStatistics&	GetStatistics() const;
 
-		virtual void						SetSkyTexture(const char* FileName);
-		const char*							GetSkyTexture() const;
-	
-		virtual void						SetSkyBrightness(float Brightness);
-		float								GetSkyBrightness() const;
+		virtual void						CullScene(ZEScene* Scene, ZERNDrawParameters* DrawParameters);
 
-		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor() const;
-
-		virtual void						Draw(ZERNDrawParameters* DrawParameters);
-		virtual void						Tick(float Time);
-
-		static ZESkyBrush*					CreateInstance();
-
+											ZESceneCuller();
+		virtual								~ZESceneCuller();
 };
+
 #endif

@@ -38,7 +38,7 @@
 #include "ZEParticle\ZEParticleSystem.h"
 #include "ZEGraphics\ZEGRVertexBuffer.h"
 #include "ZEGraphics\ZEVertexTypes.h"
-#include "ZEGame\ZEDrawParameters.h"
+#include "ZEGame\ZERNDrawParameters.h"
 #include "ZERenderer\ZECamera.h"
 
 void ZEParticleBillboardRenderer::DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up)
