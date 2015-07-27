@@ -40,6 +40,8 @@
 
 class ZEDEntityWrapper : public ZEDObjectWrapper
 {
+/*	ZE_OBJECT*/
+
 	protected:
 		ZEOBBox BoundingBox;
 

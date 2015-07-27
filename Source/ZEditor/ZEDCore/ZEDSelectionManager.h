@@ -40,7 +40,7 @@
 #include "ZEFoundation/ZEMath/ZEMatrix.h"
 
 class ZEDObjectWrapper;
-class ZEEntity;
+class ZEObject;
 class ZEClass;
 class ZEViewVolume;
 
@@ -87,7 +87,7 @@ class ZEDSelectionManager
 
 		void SetSelectionFilter(ZEClass* Class);
 		ZEClass* GetSelectionFilter();
-		bool FilterSelection(ZEEntity* Entity, void* Class);
+		bool FilterSelection(ZEObject* Object, void* Class);
 
 		void SetSelectionPivotMode(ZEDSelectionPivotMode Mode);
 		ZEDSelectionPivotMode GetSelectionPivotMode();

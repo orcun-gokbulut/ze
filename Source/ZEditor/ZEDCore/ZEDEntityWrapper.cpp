@@ -40,9 +40,33 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 	if (!ZEClass::IsDerivedFrom(ZEEntity::Class(), Object->GetClass()))
 		return;
 
-	ZEDObjectWrapper::SetObject(Object);
+	ZEEntity* Entity = (ZEEntity*)Object;
 
-	ZEAABBox::GenerateOBoundingBox(BoundingBox, ((ZEEntity*)Object)->GetBoundingBox());
+	ZEDObjectWrapper::SetObject(Entity);
+
+	ZEAABBox::GenerateOBoundingBox(BoundingBox, Entity->GetBoundingBox());
+
+	const ZEArray<ZEEntity*>& Children = Entity->GetChildEntities();
+
+	//Same finding suitable wrapper algorithm in ZEDScene.
+
+	// 	const ZEArray<ZEClass*>& WrapperTypes = ZEDCore::GetInstance()->GetWrapperTypes();
+	// 
+	// 	for (ZESize I = 0; I < WrapperTypes.GetCount(); I++)
+	// 	{
+	// 		if (WrapperTypes[]) //WrapperTypes[I]->GetAttributes()->Values*
+	// 		{
+	// 			ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)WrapperTypes[I]->CreateInstance();
+	// 			Wrapper->SetObject(Object);
+	// 		}
+	// 	}
+
+	for (ZESize I = 0; I < Children.GetCount(); I++)
+	{
+		ZEDEntityWrapper* ChildWrapper = ZEDEntityWrapper::CreateInstance();
+		ChildWrapper->SetObject(Children[I]);
+		AddChildWrapper(ChildWrapper);
+	}
 }
 
 ZEObject* ZEDEntityWrapper::GetObject()

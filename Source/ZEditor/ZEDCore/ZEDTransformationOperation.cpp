@@ -47,17 +47,17 @@ bool ZEDTransformationOperation::Apply()
 
 		if (Type == ZED_TT_TRANSLATE)
 		{
-			Objects[I]->SetPosition(Transform * Objects[I]->GetPosition());
+			Objects[I]->SetObjectPosition(Transform * Objects[I]->GetObjectPosition());
 		}
 		else if (Type == ZED_TT_ROTATE)
 		{
 			ZEQuaternion Result;
 			ZEQuaternion::CreateFromMatrix(Result, Transform);
-			Objects[I]->SetRotation((Result * Objects[I]->GetRotation()).Normalize());
+			Objects[I]->SetObjectRotation((Result * Objects[I]->GetObjectRotation()).Normalize());
 		}
 		else if (Type == ZED_TT_SCALE)
 		{
-			Objects[I]->SetScale(Transform.GetScale() * Objects[I]->GetScale());
+			Objects[I]->SetObjectScale(Transform.GetScale() * Objects[I]->GetObjectScale());
 		}
 	}
 
@@ -74,17 +74,17 @@ bool ZEDTransformationOperation::Revert()
 
 		if (Type == ZED_TT_TRANSLATE)
 		{
-			Objects[I]->SetPosition(Transform.Inverse() * Objects[I]->GetPosition());
+			Objects[I]->SetObjectPosition(Transform.Inverse() * Objects[I]->GetObjectPosition());
 		}
 		else if (Type == ZED_TT_ROTATE)
 		{
 			ZEQuaternion Result;
 			ZEQuaternion::CreateFromMatrix(Result, Transform);
-			Objects[I]->SetRotation((Result.Conjugate() * Objects[I]->GetRotation()).Normalize());
+			Objects[I]->SetObjectRotation((Result.Conjugate() * Objects[I]->GetObjectRotation()).Normalize());
 		}
 		else if (Type == ZED_TT_SCALE)
 		{
-			Objects[I]->SetScale(Transform.GetScale() / Objects[I]->GetScale());
+			Objects[I]->SetObjectScale(Transform.GetScale() / Objects[I]->GetObjectScale());
 		}
 	}
 

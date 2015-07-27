@@ -129,7 +129,7 @@ void ZEDSelectionManager::SelectObject(const ZERay& Ray)
 	if (!ZEDCore::GetInstance()->GetEditorModule()->GetScene()->RayCast(Report, Parameters))
 		return;
 
-	SelectObject((ZEDObjectWrapper*)Report.Entity);
+	SelectObject((ZEDObjectWrapper*)Report.Object);
 }
 
 void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
@@ -148,7 +148,7 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 	{
 		TempWrapper = (ZEDObjectWrapper*)Wrappers[I];
 
-		if (!ViewVolume->CullTest(TempWrapper->GetWorldBoundingBox()))
+		if (!ViewVolume->CullTest(TempWrapper->GetObjectBoundingBox()))
 			SelectObject(TempWrapper);
 	}
 }
@@ -226,7 +226,7 @@ void ZEDSelectionManager::SelectObject(const ZEString& Name)
 	{
 		TempWrapper = (ZEDObjectWrapper*)Wrappers[I];
 
-		if (TempWrapper->GetName() == Name)
+		if (TempWrapper->GetObjectName() == Name)
 			SelectObject(TempWrapper);
 	}
 }
@@ -255,7 +255,7 @@ void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
 	if (!ZEDCore::GetInstance()->GetEditorModule()->GetScene()->RayCast(Report, Parameters))
 		return;
 
-	DeselectObject((ZEDObjectWrapper*)Report.Entity);
+	DeselectObject((ZEDObjectWrapper*)Report.Object);
 }
 
 void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
@@ -274,7 +274,7 @@ void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
 	{
 		TempWrapper = (ZEDObjectWrapper*)Wrappers[I];
 
-		if (!ViewVolume->CullTest(TempWrapper->GetWorldBoundingBox()))
+		if (!ViewVolume->CullTest(TempWrapper->GetObjectBoundingBox()))
 			DeselectObject(TempWrapper);
 	}
 }
@@ -352,7 +352,7 @@ void ZEDSelectionManager::DeselectObject(const ZEString& Name)
 	{
 		TempWrapper = (ZEDObjectWrapper*)Wrappers[I];
 
-		if (TempWrapper->GetName() == Name)
+		if (TempWrapper->GetObjectName() == Name)
 			DeselectObject(TempWrapper);
 	}
 }
@@ -374,9 +374,9 @@ ZEClass* ZEDSelectionManager::GetSelectionFilter()
 	return Filter;
 }
 
-bool ZEDSelectionManager::FilterSelection(ZEEntity* Entity, void* Class)
+bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
 {
-	return ZEClass::IsDerivedFrom(Entity->GetClass(), (ZEClass*)Class);
+	return ZEClass::IsDerivedFrom((ZEClass*)Class, Object->GetClass());
 }
 
 void ZEDSelectionManager::SetSelectionPivotMode(ZEDSelectionPivotMode Mode)

@@ -96,17 +96,17 @@ void ZEDTransformationManager::ResetTransform()
 		switch (TransformType)
 		{
 			case ZED_TT_TRANSLATE:
-				Selection[I]->SetWorldPosition(Selection[I]->GetWorldPosition() + (Transform.Inverse()).GetTranslation());
+				Selection[I]->SetObjectPosition(Selection[I]->GetObjectPosition() + (Transform.Inverse()).GetTranslation());
 				break;
 			case ZED_TT_ROTATE:
 			{
 				ZEQuaternion Result;
 				ZEQuaternion::CreateFromMatrix(Result, Transform);
-				Selection[I]->SetWorldRotation(Selection[I]->GetWorldRotation() * Result.Conjugate());
+				Selection[I]->SetObjectRotation(Selection[I]->GetObjectRotation() * Result.Conjugate());
 				break;
 			}
 			case ZED_TT_SCALE:
-				Selection[I]->SetWorldScale(Selection[I]->GetWorldScale() * (Transform.Inverse()).GetScale());
+				Selection[I]->SetObjectScale(Selection[I]->GetObjectScale() * (Transform.Inverse()).GetScale());
 				break;
 		}
 	}

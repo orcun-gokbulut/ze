@@ -39,15 +39,16 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEOBBox.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEGame/ZERayCast.h"
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 
-class ZEDrawParameters;
+struct ZEDrawParameters;
 
-ZE_ATTRIBUTE_0("ObjectClass")
+/*ZE_ATTRIBUTE_0(ObjectClass)*/
 class ZEDObjectWrapper : public ZEObject
 {
-	ZE_OBJECT
+/*	ZE_OBJECT*/
 	private:
 		ZESize Id;
 		ZEString Name;
@@ -59,24 +60,23 @@ class ZEDObjectWrapper : public ZEObject
 
 		ZEDObjectWrapper* ParentWrapper;
 		ZEArray<ZEDObjectWrapper*> ChildWrapper;
-		ZEArray<ZEDObjectWrapper*> ComponentWrapper;
 		
 	protected:
 		ZEDObjectWrapper();
 		virtual ~ZEDObjectWrapper();
 
-	public slots:
-		virtual void OnSelected();
-		virtual void OnDeselected();
-		virtual void OnCreated();
-		virtual void OnDestroy();
-		virtual void OnTransformed();
-		virtual void OnChildObjectChanged();
-		virtual void OnParentObjectChanged();
-		virtual void OnOpenContainer();
-		virtual void OnCloseContainer();
-		virtual void Save();
-		virtual void Load();
+// 	public slots:
+// 		virtual void OnSelected();
+// 		virtual void OnDeselected();
+// 		virtual void OnCreated();
+// 		virtual void OnDestroy();
+// 		virtual void OnTransformed();
+// 		virtual void OnChildObjectChanged();
+// 		virtual void OnParentObjectChanged();
+// 		virtual void OnOpenContainer();
+// 		virtual void OnCloseContainer();
+// 		virtual void Save();
+// 		virtual void Load();
 
 	public:
 		void SetObjectId(ZESize Id);
@@ -89,6 +89,8 @@ class ZEDObjectWrapper : public ZEObject
 		QWidget* GetCustomWidget();
 		void SetPopupMenu(QMenu* Menu);
 		QMenu* GetPopupMenu();
+
+		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();
@@ -120,7 +122,5 @@ class ZEDObjectWrapper : public ZEObject
 		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
 
-		ZEArray<ZEDObjectWrapper*>& GetComponentWrappers();
-		void AddComponentWrapper(ZEDObjectWrapper* Wrapper);
-		void RemoveComponentWrapper(ZEDObjectWrapper* Wrapper);
+		virtual void Destroy();
 };

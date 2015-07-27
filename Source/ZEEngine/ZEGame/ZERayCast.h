@@ -43,7 +43,7 @@
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEFlags.h"
 
-class ZEEntity;
+class ZEObject;
 class ZEMaterial;
 
 typedef ZEFlags ZERayCastReportExtras;
@@ -54,7 +54,7 @@ typedef ZEFlags ZERayCastReportExtras;
 #define ZE_RCRE_POLIGON_INDEX		0x4
 #define ZE_RCRE_POLYGON_MATERIAL	0x8
 
-typedef ZEDelegate<bool (ZEEntity*, void*)> ZERayCastFilterFunction;
+typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;
 
 struct ZERayCastParameters
 {
@@ -70,7 +70,7 @@ struct ZERayCastParameters
 
 struct ZERayCastReport
 {
-	ZEEntity*					Entity;
+	ZEObject*					Object;
 	void*						SubComponent;
 	ZESize						PoligonIndex;
 

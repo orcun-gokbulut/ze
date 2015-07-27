@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDObjectWrapper.h"
+#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEMath.h"
 
 ZEDObjectWrapper::ZEDObjectWrapper()
 {
@@ -92,6 +94,31 @@ void ZEDObjectWrapper::SetPopupMenu(QMenu* Menu)
 QMenu* ZEDObjectWrapper::GetPopupMenu()
 {
 	return PopupMenu;
+}
+
+bool ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	float TMin = 0.0f;
+
+	if (!ZEOBBox::IntersectionTest(GetObjectBoundingBox(), Parameters.Ray, TMin))
+		return false;
+
+	ZEVector3 IntersectionPoint = Parameters.Ray.GetPointOn(TMin);
+	float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, IntersectionPoint);
+	if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
+	{
+		Report.Position = IntersectionPoint;
+		Report.Distance = ZEMath::Sqrt(DistanceSquare);
+		Report.Object = this;
+		Report.SubComponent = NULL;
+		Report.PoligonIndex = 0;
+		Report.Normal = ZEVector3::Zero;
+		Report.Binormal = ZEVector3::Zero;
+
+		return true;
+	}
+
+	return false;
 }
 
 void ZEDObjectWrapper::SetObject(ZEObject* Object)
@@ -159,33 +186,6 @@ void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 	Wrapper->SetParentWrapper(NULL);
 }
 
-ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetComponentWrappers()
-{
-	return ComponentWrapper;
-}
-
-void ZEDObjectWrapper::AddComponentWrapper(ZEDObjectWrapper* Wrapper)
-{
-	if (Wrapper == NULL)
-		return;
-
-	if (ComponentWrapper.Exists(Wrapper))
-		return;
-
-	ComponentWrapper.Add(Wrapper);
-}
-
-void ZEDObjectWrapper::RemoveComponentWrapper(ZEDObjectWrapper* Wrapper)
-{
-	if (Wrapper == NULL)
-		return;
-
-	if (!ComponentWrapper.Exists(Wrapper))
-		return;
-
-	ComponentWrapper.RemoveValue(Wrapper);
-}
-
 void ZEDObjectWrapper::Draw(ZEDrawParameters* Parameters)
 {
 	//Icon
@@ -194,4 +194,9 @@ void ZEDObjectWrapper::Draw(ZEDrawParameters* Parameters)
 void ZEDObjectWrapper::Tick(float ElapsedTime)
 {
 
+}
+
+void ZEDObjectWrapper::Destroy()
+{
+	delete this;
 }
