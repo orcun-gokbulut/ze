@@ -45,10 +45,8 @@ class ZEDScene : public ZEScene
 	private:
 		ZESmartArray<ZEDObjectWrapper*> Wrappers;
 		void Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime);
-	protected:
-		bool ExportZEDScene();
-		bool ImportZEDScene();
 
+	protected:
 		ZEDScene();
 
 	public:

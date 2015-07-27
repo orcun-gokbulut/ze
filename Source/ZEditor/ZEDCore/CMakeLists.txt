@@ -35,38 +35,36 @@
 
 cmake_minimum_required(VERSION 2.8)
 
-include_directories("C:/Users/Orcun/Desktop/Zinek Engine/ZEExternal/trunk/Windows-x64-MSVCv110/libQt/Include")
+#include_directories("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-NewEditor/External/Windows-x64-MSVCv110/libQt/include")
 
 ze_add_source(ZEDOperation.cpp					Sources)
-ze_add_source(ZEDOperation.h					Sources Headers)
+ze_add_source(ZEDOperation.h					Sources)
 ze_add_source(ZEDOperationManager.cpp			Sources)
-ze_add_source(ZEDOperationManager.h				Sources Headers)
+ze_add_source(ZEDOperationManager.h				Sources)
 ze_add_source(ZEDTransformationOperation.cpp	Sources)
-ze_add_source(ZEDTransformationOperation.h		Sources Headers)
+ze_add_source(ZEDTransformationOperation.h		Sources)
 ze_add_source(ZEDGizmo.cpp						Sources)
-ze_add_source(ZEDGizmo.h						Sources Headers)
+ze_add_source(ZEDGizmo.h						Sources)
 ze_add_source(ZEDTransformationManager.cpp		Sources)
-ze_add_source(ZEDTransformationManager.h		Sources Headers)
+ze_add_source(ZEDTransformationManager.h		Sources)
 ze_add_source(ZEDScene.cpp						Sources)
-ze_add_source(ZEDScene.h						Sources Headers)
+ze_add_source(ZEDScene.h						Sources)
 ze_add_source(ZEDObjectWrapper.cpp				Sources)
-ze_add_source(ZEDObjectWrapper.h				Sources Headers ZEMC)
+ze_add_source(ZEDObjectWrapper.h				Sources)
 ze_add_source(ZEDSelectionManager.cpp			Sources)
-ze_add_source(ZEDSelectionManager.h				Sources Headers)
+ze_add_source(ZEDSelectionManager.h				Sources)
 ze_add_source(ZEDViewPort.cpp					Sources)
-ze_add_source(ZEDViewPort.h						Sources Headers QtMocs)
+ze_add_source(ZEDViewPort.h						Sources QtMocs)
 ze_add_source(ZEDEntityWrapper.cpp				Sources)
-ze_add_source(ZEDEntityWrapper.h				Sources Headers ZEMC)
+ze_add_source(ZEDEntityWrapper.h				Sources)
 ze_add_source(ZEDModule.cpp						Sources)
-ze_add_source(ZEDModule.h						Sources Headers)
+ze_add_source(ZEDModule.h						Sources)
 ze_add_source(ZEDCore.cpp						Sources)
-ze_add_source(ZEDCore.h							Sources Headers)
+ze_add_source(ZEDCore.h							Sources)
 
 qt4_wrap_cpp (QtMocFiles ${QtMocs})
 
 ze_add_library(TARGET ZEDCore 
-	ZEMC ${ZEMC}
 	SOURCES ${Sources} 
-	HEADERS ${Headers} 
 	${QtMocFiles} 
 	LIBS ZEFoundation libQt)

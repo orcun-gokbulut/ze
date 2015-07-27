@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZED_VIEWPORT_H__
-#define __ZED_VIEWPORT_H__
 
 #include "ZETypes.h"
 #include "ZEGraphics/ZECamera.h"
@@ -55,6 +53,7 @@ enum ZEDViewMode
 class ZEDViewPort : public QFrame
 {
 	Q_OBJECT
+
 	private:
 		ZEDViewMode ViewMode;
 		ZECamera* Camera;
@@ -105,5 +104,3 @@ class ZEDViewPort : public QFrame
 
 		ZEDViewPort(QWidget* Parent = NULL);
 };
-
-#endif

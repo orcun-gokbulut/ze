@@ -49,7 +49,7 @@ ZERayCastParameters::ZERayCastParameters()
 
 ZERayCastReport::ZERayCastReport()
 {
-	Entity = NULL;
+	Object = NULL;
 	SubComponent = NULL;
 	PoligonIndex = 0;
 	Position = ZEVector3::Zero;

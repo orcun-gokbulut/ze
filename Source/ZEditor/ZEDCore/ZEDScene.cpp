@@ -37,55 +37,66 @@
 #include "ZEDCore.h"
 #include "ZEDEntityWrapper.h"
 #include "ZEMeta/ZEObject.h"
+#include "ZEGraphics/ZERenderer.h"
 
-bool ZEDScene::ExportZEDScene()
+void ZEDScene::Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime)
 {
-	const ZESmartArray<ZEEntity*>& Wrappers = GetEntities();
-	ZESize Count = Wrappers.GetCount();
+	if (!Wrapper->GetObjectEnabled())
+		return;
 
-	for (ZESize I = 0; I < Count; I++)
-	{
-		ZEDObjectWrapper* CurrentWrapper = (ZEDObjectWrapper*)Wrappers[I];
-		CurrentWrapper->GetObject();
+	Wrapper->Tick(ElapsedTime);
 
-
-
-	}
-}
-
-bool ZEDScene::ImportZEDScene()
-{
-
+	const ZEArray<ZEDObjectWrapper*>& SubEntities = Wrapper->GetChildWrappers();
+	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
+		Tick(SubEntities[N], ElapsedTime);
 }
 
 void ZEDScene::AddWrapper(ZEObject* Object)
 {
+	if (Object == NULL)
+		return;
+
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+		if (Wrappers[I]->GetObject() == Object)
+			return;
+
 	ZEClass* TargetClass = Object->GetClass();
 
 	/*Requires implementation with ZEMeta, making wrappers class identifiers identical with ZEEntity and derivations' class identifiers, 
 	thus returning the appropriate wrapper class if it exists, if it does not exist return it's parent's and so on.*/
 
-	const ZEArray<ZEClass*>& WrapperTypes = ZEDCore::GetInstance()->GetWrapperTypes();
+// 	const ZEArray<ZEClass*>& WrapperTypes = ZEDCore::GetInstance()->GetWrapperTypes();
+// 
+// 	for (ZESize I = 0; I < WrapperTypes.GetCount(); I++)
+// 	{
+// 		if (WrapperTypes[]) //WrapperTypes[I]->GetAttributes()->Values*
+// 		{
+// 			ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)WrapperTypes[I]->CreateInstance();
+// 			Wrapper->SetObject(Object);
+// 		}
+// 	}
 
-	for (ZESize I = 0; I < WrapperTypes.GetCount(); I++)
-	{
-		if (false)//WrapperTypes[I]->GetAttributes()->Values*
-		{
-			ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)WrapperTypes[I]->CreateInstance();
-			Wrapper->SetObject(Object);
-		}
-	}
+	ZEDEntityWrapper* Temp = ZEDEntityWrapper::CreateInstance();
+	Temp->SetObject(Object);
 
-	if (ZEClass::IsDerivedFrom(ZEEntity::Class(), TargetClass))
-	{
-		AddEntity((ZEEntity*)Object);
-	}
-
+	Wrappers.Add(Temp);
 }
 
 void ZEDScene::RemoveWrapper(ZEObject* Object)
 {
-	
+	if (Object == NULL)
+		return;
+
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{
+		if (Wrappers[I]->GetObject() == Object)
+		{
+			ZEDObjectWrapper* Temporary = Wrappers[I];
+			Wrappers.Remove(I);
+			Temporary->Destroy();
+			return;
+		}
+	}
 }
 
 const ZESmartArray<ZEDObjectWrapper*>& ZEDScene::GetWrappers()
@@ -111,23 +122,6 @@ ZEArray<ZEDObjectWrapper*> ZEDScene::GetWrappers(ZEClass* Class)
 	return ResultWrappers;
 }
 
-void ZEDScene::Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime)
-{
-	if (!Wrapper->GetObjectEnabled())
-		return;
-
-	Wrapper->Tick(ElapsedTime);
-
-	const ZEArray<ZEDObjectWrapper*>& Components = Wrapper->GetComponentWrappers();
-	for (ZESize N = 0; N < Components.GetCount(); N++)
-		Tick(Components[N], ElapsedTime);
-
-
-	const ZEArray<ZEDObjectWrapper*>& SubEntities = Wrapper->GetChildWrappers();
-	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
-		Tick(SubEntities[N], ElapsedTime);
-}
-
 void ZEDScene::Tick(float ElapsedTime)
 {
 	if (!GetEnabled())
@@ -141,12 +135,43 @@ void ZEDScene::Tick(float ElapsedTime)
 
 void ZEDScene::Render(float ElapsedTime)
 {
+	if (GetActiveCamera() == NULL)
+		return;
 
+	ZEScene::Render(ElapsedTime);
+
+	ZEDrawParameters* Parameters = GetRenderer()->GetDrawParameters();
+
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{
+		Wrappers[I]->Draw(Parameters);
+
+		const ZEArray<ZEDObjectWrapper*>& Children = Wrappers[I]->GetChildWrappers();
+		for (ZESize J = 0; J < Children.GetCount(); J++)
+			Children[J]->Draw(Parameters);
+	}
 }
 
 bool ZEDScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	// DO raycast from wrappers
+
+	bool Result = false;
+	if (!Parameters.FilterFunction.IsNull())
+	{
+		for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+		{
+			if (Parameters.FilterFunction(Wrappers[I], Parameters.FilterFunctionParameter))
+				Result |= Wrappers[I]->RayCast(Report, Parameters);
+		}
+	}
+	else
+	{
+		for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+			Result |= Wrappers[I]->RayCast(Report, Parameters);
+	}
+
+	return Result;
 }
 
 bool ZEDScene::Initialize()
@@ -154,15 +179,11 @@ bool ZEDScene::Initialize()
 	if (!ZEScene::Initialize())
 		return false;
 
-
-
 	return true;
 }
 
 void ZEDScene::Deinitialize()
 {
-
-
 	return ZEDScene::Deinitialize();
 }
 
