@@ -2,14 +2,24 @@
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="ZEArray&lt;*&gt;"> 
-		<Expand> 
-			<Item Name="Count">Count</Item>
-			<ArrayItems>
-				<Size>Count</Size>
-				<ValuePointer>Items</ValuePointer>
-			</ArrayItems>
-		</Expand> 
-	</Type>
+	<Expand> 
+		<Item Name="Count">Count</Item>
+		<ArrayItems>
+			<Size>Count</Size>
+			<ValuePointer>Items</ValuePointer>
+		</ArrayItems>
+	</Expand> 
+  </Type>
+  <Type Name="ZEList2&lt;*&gt;"> 
+	<Expand> 
+		<Item Name="Count">Count</Item>
+		<LinkedListItems>
+			<HeadPointer>First</HeadPointer>
+			<NextPointer>Next</NextPointer>
+			<ValueNode>Item</ValueNode>
+		</LinkedListItems>
+	</Expand> 
+  </Type>
   <Type Name="ZEString">
     <DisplayString>{(Buffer != 0 ? Buffer : ""), s}</DisplayString>
     <StringView>(Buffer != 0 ? Buffer : ""),s</StringView>
