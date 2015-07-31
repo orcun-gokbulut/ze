@@ -89,8 +89,6 @@ ze_add_source(ZERNStageHDR.h 						Sources Headers)
 ze_add_source(ZERNStageHDR.cpp 						Sources)
 #ze_add_source(ZERNStageForward.h 					Sources Headers)
 #ze_add_source(ZERNStageForward.cpp 					Sources)
-ze_add_source(ZESortedTree.h 					Sources Headers)
-ze_add_source(ZESortedTree.cpp 					Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}
