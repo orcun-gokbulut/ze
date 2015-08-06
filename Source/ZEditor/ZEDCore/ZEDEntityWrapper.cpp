@@ -172,7 +172,7 @@ ZEVector3 ZEDEntityWrapper::GetObjectScale()
 	return ((ZEEntity*)GetObject())->GetWorldScale();
 }
 
-bool ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+bool ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	return ((ZEEntity*)GetObject())->RayCast(Report, Parameters);
 }
