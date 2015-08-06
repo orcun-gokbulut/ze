@@ -38,6 +38,10 @@
 #include "ZEDViewPort.h"
 #include "ZEGraphics/ZERenderer.h"
 #include "ZEGame/ZEGrid.h"
+#include "ZEModel/ZEModel.h"
+#include "ZEDTransformationManager.h"
+#include "ZEDCore.h"
+#include "ZEDGizmo.h"
 
 ZEDScene* ZEDModule::GetScene()
 {
@@ -74,6 +78,24 @@ void ZEDModule::StartUp()
 
 	Grid = ZEGrid::CreateInstance();
 	Scene->AddEntity(Grid);
+	Scene->GetWrapper(Grid)->SetObjectSelectable(false);
+
+	ZEModel* Trial = ZEModel::CreateInstance();
+	Trial->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
+	Trial->SetUserDefinedBoundingBoxEnabled(true);
+	Scene->AddEntity(Trial);
+
+	ZEModel* Trial2 = ZEModel::CreateInstance();
+	Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
+	Trial2->SetUserDefinedBoundingBoxEnabled(true);
+	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
+	Scene->AddEntity(Trial2);
+
+	Scene->AddEntity(ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo());
+	Scene->GetWrapper(ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo())->SetObjectSelectable(false);
+
+	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_TRANSLATE);
+	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_MOVE);
 }
 
 void ZEDModule::ShutDown()

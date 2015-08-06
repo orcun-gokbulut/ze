@@ -1077,6 +1077,9 @@ bool ZEDGizmo::DeinitializeSelf()
 
 void ZEDGizmo::Draw(ZEDrawParameters* DrawParameters)
 {
+	if (!GetVisible())
+		return;
+
 	UpdateGizmo();
 
 	RenderCommand.Priority = 4;
@@ -1147,8 +1150,16 @@ ZEDGizmo::ZEDGizmo()
 {
 	DirtyGizmoFlag = true;
 	HoveredAxis = ZED_GA_NONE;
+	SelectedAxis = ZED_GA_NONE;
 	Mode = ZED_GM_NONE;
-	AxisLength = 1.0f;
+	AxisLength = 0.1f;
+
+	GizmoMaterial = NULL;
+	MoveDifference = ZEVector3::Zero;
+	InitialRotation = ZEQuaternion::Identity;
+	InitialScale = ZEVector3::One;
+	OldPosition = ZEVector3::Zero;
+	StartScreenPosition = ZEVector2::Zero;
 }
 
 ZEDGizmo* ZEDGizmo::CreateInstance()

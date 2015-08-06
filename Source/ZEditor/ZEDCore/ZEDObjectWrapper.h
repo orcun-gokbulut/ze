@@ -37,13 +37,16 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEGame/ZERayCast.h"
+#include "ZEGraphics/ZECanvas.h"
+#include "ZEGraphics/ZERenderCommand.h"
 #include <QtGui/QWidget>
 #include <QtGui/QMenu>
 
 struct ZEDrawParameters;
+class ZEMaterial;
 
 /*ZE_ATTRIBUTE_0(ObjectClass)*/
 class ZEDObjectWrapper : public ZEObject
@@ -53,6 +56,7 @@ class ZEDObjectWrapper : public ZEObject
 		ZESize Id;
 		ZEString Name;
 		ZEString Icon;
+		bool Selectable;
 		QWidget* CustomWidget;
 		QMenu* PopupMenu;
 		
@@ -62,6 +66,10 @@ class ZEDObjectWrapper : public ZEObject
 		ZEArray<ZEDObjectWrapper*> ChildWrapper;
 		
 	protected:
+		ZEMaterial* Material;
+		ZECanvas DrawCanvas;
+		ZERenderCommand RenderCommand;
+
 		ZEDObjectWrapper();
 		virtual ~ZEDObjectWrapper();
 
@@ -98,10 +106,14 @@ class ZEDObjectWrapper : public ZEObject
 		virtual void SetObjectEnabled(bool Value) = 0;
 		virtual bool GetObjectEnabled() = 0;
 
+		void SetObjectSelectable(bool Value);
+		bool GetObjectSelectable();
+
 		virtual void SetObjectVisibility(bool Value) = 0;
 		virtual bool GetObjectVisibility() = 0;
 
-		virtual ZEOBBox GetObjectBoundingBox() = 0;
+		virtual ZEAABBox GetObjectBoundingBox() = 0;
+		virtual ZEMatrix4x4 GetObjectTransform() = 0;
 
 		virtual void SetObjectPosition(const ZEVector3& NewPosition) = 0;
 		virtual ZEVector3 GetObjectPosition() = 0;

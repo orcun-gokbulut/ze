@@ -579,7 +579,7 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 	{
 		Report.Position = IntersectionPoint;
 		Report.Distance = ZEMath::Sqrt(DistanceSquare);
-		Report.Entity = this;
+		Report.Object = this;
 		Report.SubComponent = NULL;
 		Report.PoligonIndex = 0;
 		Report.Normal = ZEVector3::Zero;

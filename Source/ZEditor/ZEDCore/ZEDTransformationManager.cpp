@@ -45,6 +45,7 @@ ZEDTransformationManager::ZEDTransformationManager()
 {
 	Gizmo = ZEDGizmo::CreateInstance();
 	TransformType = ZED_TT_NONE;
+	TransformSpace = ZED_TS_WORLD;
 	Transform = ZEMatrix4x4::Identity;
 }
 
@@ -100,9 +101,9 @@ void ZEDTransformationManager::ResetTransform()
 				break;
 			case ZED_TT_ROTATE:
 			{
-				ZEQuaternion Result;
-				ZEQuaternion::CreateFromMatrix(Result, Transform);
-				Selection[I]->SetObjectRotation(Selection[I]->GetObjectRotation() * Result.Conjugate());
+				ZEQuaternion Temp;
+				ZEQuaternion::CreateFromMatrix(Temp, Transform);
+				Selection[I]->SetObjectRotation(Temp.Conjugate() * Selection[I]->GetObjectRotation());
 				break;
 			}
 			case ZED_TT_SCALE:
@@ -114,31 +115,106 @@ void ZEDTransformationManager::ResetTransform()
 
 void ZEDTransformationManager::ApplyTransform(ZEMatrix4x4 Transform)
 {
+	if (TransformType == ZED_TT_NONE)
+		return;
+
 	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
 	const ZEArray<ZEDObjectWrapper*>& Selection = SelectionManager->GetSelectedObjects();
+	ZEDSelectionPivotMode PivotMode = SelectionManager->GetSelectionPivotMode();
 
-	 if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_ENTITY_PIVOT)
-	 {
-		 for (ZESize I = 0; I < Selection.GetCount(); I++)
-		 {
+	if (TransformType == ZED_TT_TRANSLATE)
+	{
+		for (ZESize I = 0; I < Selection.GetCount(); I++)
+			Selection[I]->SetObjectPosition(Selection[I]->GetObjectPosition() + Transform.GetTranslation());
+	}
+	else if (TransformType == ZED_TT_ROTATE)
+	{
+		if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_ENTITY_PIVOT)
+		{
+			for (ZESize I = 0; I < Selection.GetCount(); I++)
+				Selection[I]->SetObjectRotation(Transform.GetRotation() * Selection[I]->GetObjectRotation());
+		}
+		else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SELECTION_CENTER)
+		{
+			ZEMatrix4x4 ResultTransform;
+			ZEMatrix4x4 PivotTransform = SelectionManager->GetSelectionPivot();
+			ZEQuaternion Rotation = Transform.GetRotation();
 
-		 }
-	 }
-	 else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SELECTION_CENTER)
-	 {
+			for (ZESize I = 0; I < Selection.GetCount(); I++)
+			{
+				ZEVector3 ObjectPositionInPivotSpace = PivotTransform.Inverse() * Selection[I]->GetObjectPosition();
+				ZEVector3 RotatedPositionInPivotSpace = Rotation * ObjectPositionInPivotSpace;
+				Selection[I]->SetObjectPosition(PivotTransform * RotatedPositionInPivotSpace);
+				Selection[I]->SetObjectRotation(Rotation * Selection[I]->GetObjectRotation());
+			}
+		}
+		else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SPACE_CENTER)
+		{
+			ZEQuaternion Rotation = Transform.GetRotation();
 
-	 }
-	 else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SPACE_CENTER)
-	 {
+			for (ZESize I = 0; I < Selection.GetCount(); I++)
+			{
+				Selection[I]->SetObjectPosition(Rotation * Selection[I]->GetObjectPosition());
+				Selection[I]->SetObjectRotation(Rotation * Selection[I]->GetObjectRotation());
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+	else if (TransformType == ZED_TT_SCALE)
+	{
+		if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_ENTITY_PIVOT)
+		{
+			for (ZESize I = 0; I < Selection.GetCount(); I++)
+				Selection[I]->SetObjectScale(Transform.GetScale() * Selection[I]->GetObjectScale());
+		}
+		else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SELECTION_CENTER)
+		{
+			ZEMatrix4x4 ResultTransform;
+			ZEMatrix4x4 PivotTransform = SelectionManager->GetSelectionPivot();
+			ZEVector3 Scale = Transform.GetScale();
 
-	 }
+			for (ZESize I = 0; I < Selection.GetCount(); I++)
+			{
+				ZEVector3 ObjectPositionInPivotSpace = PivotTransform.Inverse() * Selection[I]->GetObjectPosition();
+				ZEVector3 ScaledPositionInPivotSpace = Scale * ObjectPositionInPivotSpace;
+				Selection[I]->SetObjectPosition(PivotTransform * ScaledPositionInPivotSpace);
+				Selection[I]->SetObjectScale(Scale * Selection[I]->GetObjectScale());
+			}
 
-	 ZEMatrix4x4::Multiply(this->Transform, Transform, this->Transform);
+		}
+		else if (SelectionManager->GetSelectionPivotMode() == ZED_SCM_SPACE_CENTER)
+		{
+			ZEVector3 Scale = Transform.GetScale();
+
+			for (ZESize I = 0; I < Selection.GetCount(); I++)
+			{
+				Selection[I]->SetObjectPosition(Scale * Selection[I]->GetObjectPosition());
+				Selection[I]->SetObjectScale(Scale * Selection[I]->GetObjectScale());
+			}
+		}
+		else
+		{
+			return;
+		}
+	}
+	else
+	{
+		return;
+	}
+
+
+	 ZEMatrix4x4 CurrentTransform = this->Transform;
+	 ZEMatrix4x4::Multiply(this->Transform, Transform, CurrentTransform);
 }
 
 void ZEDTransformationManager::EndTransform()
 {
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEDTransformationOperation(TransformType, Transform, ZEDSelectionManager::GetInstance()->GetSelectedObjects()));
+	ResetTransform();
+	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
+	ZEDOperationManager::GetInstance()->DoOperation(new ZEDTransformationOperation(TransformType, SelectionManager->GetSelectionPivotMode(), Transform, SelectionManager->GetSelectedObjects()));
 
 	TransformType = ZED_TT_NONE;
 	Transform = ZEMatrix4x4::Identity;
@@ -147,7 +223,9 @@ void ZEDTransformationManager::EndTransform()
 void ZEDTransformationManager::Destroy()
 {
 	if (Gizmo != NULL)
-		delete Gizmo;
+	{
+		Gizmo->Destroy();
+	}
 
 	delete this;
 }

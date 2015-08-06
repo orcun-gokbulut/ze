@@ -128,7 +128,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
 
-		if (Gizmo->GetMode() == ZED_GM_NONE)
+		if (!Gizmo->GetVisible() || Gizmo->GetMode() == ZED_GM_NONE)
 			return;
 
 		Gizmo->SetSelectedAxis(Gizmo->PickAxis(Ray, TRay));
@@ -180,7 +180,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
 
-		if (Gizmo->GetSelectedAxis() != ZED_GA_NONE)
+		if (Gizmo->GetVisible() && Gizmo->GetSelectedAxis() != ZED_GA_NONE)
 		{
 			ZEMatrix4x4 NewTransform = ZEMatrix4x4::Identity;
 
@@ -192,7 +192,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Ray) - Gizmo->GetPosition());
 				ZEMatrix4x4::CreateTranslation(NewTransform, NewTranslation);
 				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
-				//ParentEditor->UpdatePropertyWidgetValues();
+				Gizmo->SetPosition(Gizmo->GetPosition() + NewTranslation);
 			}
 			else if (Gizmo->GetMode() == ZED_GM_ROTATE)
 			{
@@ -202,7 +202,6 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Ray);
 				ZEMatrix4x4::CreateRotation(NewTransform, NewOrientation);
 				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
-				//ParentEditor->UpdatePropertyWidgetValues();
 			}
 			else if (Gizmo->GetMode() == ZED_GM_SCALE)
 			{
@@ -212,7 +211,6 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 				ZEVector3 NewScale = Gizmo->ScaleProjection(Ray);
 				ZEMatrix4x4::CreateScale(NewTransform, NewScale);
 				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
-				//ParentEditor->UpdatePropertyWidgetValues();
 			}
 		}
 		else
@@ -283,7 +281,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 
 		ZEDGizmo* Gizmo = TransformationManager->GetGizmo();
 
-		if (Gizmo->GetSelectedAxis() != ZED_GA_NONE)
+		if (Gizmo->GetVisible() && Gizmo->GetSelectedAxis() != ZED_GA_NONE)
 		{
 			ZEMatrix4x4 NewTransform = ZEMatrix4x4::Identity;
 
@@ -417,16 +415,15 @@ void ZEDViewPort::Tick(float Time)
 	if (!PressedKeyboardKeys.isEmpty())
 		MoveCamera(Time);
 
-	ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
-	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
+	ZEDTransformationManager::GetInstance()->GetGizmo()->SetVisible(ZEDSelectionManager::GetInstance()->GetSelectedObjects().GetCount() != 0);
 
-	if ((Gizmo->GetMode() != ZED_GM_NONE) && (SelectionManager->GetSelectedObjects().GetCount() != 0))
-	{
-		ZEMatrix4x4 Pivot = SelectionManager->GetSelectionPivot();
-		Gizmo->SetWorldPosition(Pivot.GetTranslation());
-		Gizmo->SetWorldRotation(Pivot.GetRotation());
-		Gizmo->SetWorldScale(Pivot.GetScale());
-	}
+// 	if ((Gizmo->GetMode() != ZED_GM_NONE) && (SelectionManager->GetSelectedObjects().GetCount() != 0))
+// 	{
+// 		ZEMatrix4x4 Pivot = SelectionManager->GetSelectionPivot();
+// 		Gizmo->SetWorldPosition(Pivot.GetTranslation());
+// 		Gizmo->SetWorldRotation(Pivot.GetRotation());
+// 		//Gizmo->SetWorldScale(Pivot.GetScale());
+// 	}
 
 }
 
