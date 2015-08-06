@@ -64,6 +64,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void SetObjectScale(const ZEVector3& NewScale);
 		virtual ZEVector3 GetObjectScale();
 
+		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		virtual void Draw(ZEDrawParameters* Parameters);
 		virtual void Tick(float ElapsedTime);
 
