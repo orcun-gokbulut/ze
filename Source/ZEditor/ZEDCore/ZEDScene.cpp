@@ -214,7 +214,7 @@ bool ZEDScene::Initialize()
 
 void ZEDScene::Deinitialize()
 {
-	return ZEDScene::Deinitialize();
+	ZEScene::Deinitialize();
 }
 
 ZEDScene::ZEDScene()
