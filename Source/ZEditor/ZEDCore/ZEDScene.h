@@ -47,15 +47,19 @@ class ZEDScene : public ZEScene
 		void Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime);
 
 	protected:
-		ZEDScene();
-
-	public:
 		void AddWrapper(ZEObject* Object);
 		void RemoveWrapper(ZEObject* Object);
 
+		ZEDScene();
+
+	public:
 		const ZESmartArray<ZEDObjectWrapper*>& GetWrappers();
 		ZEArray<ZEDObjectWrapper*> GetWrappers(ZEClass* Class);
-					 
+		ZEDObjectWrapper* GetWrapper(ZEObject* Object);
+		
+		virtual void AddEntity(ZEEntity* Entity);
+		virtual void RemoveEntity(ZEEntity* Entity);
+
 		virtual bool Initialize();
 		virtual void Deinitialize();
 					 

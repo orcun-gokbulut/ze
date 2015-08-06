@@ -614,7 +614,7 @@ bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parame
 		Result |= Bones[I].RayCast(Report, Parameters);
 	
 	if (Result)
-		Report.Entity = this;
+		Report.Object = this;
 
 	return Result;
 }

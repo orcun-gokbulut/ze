@@ -549,7 +549,7 @@ bool ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Par
 		Result |= Rooms[I]->RayCast(Report, Parameters);
 	
 	if (Result)
-		Report.Entity = this;
+		Report.Object = this;
 
 	return Result;
 }

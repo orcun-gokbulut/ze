@@ -38,6 +38,8 @@
 #include "ZEDEntityWrapper.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEGraphics/ZERenderer.h"
+#include "ZEDTransformationManager.h"
+#include "ZEDGizmo.h"
 
 void ZEDScene::Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime)
 {
@@ -111,15 +113,41 @@ ZEArray<ZEDObjectWrapper*> ZEDScene::GetWrappers(ZEClass* Class)
 	ResultWrappers.Clear();
 
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-
-		
+	{	
 		CurrentWrapper = Wrappers[I];
 		if (ZEClass::IsDerivedFrom(Class, CurrentWrapper->GetClass()))
 			ResultWrappers.Add(CurrentWrapper);
 	}
 
 	return ResultWrappers;
+}
+
+ZEDObjectWrapper* ZEDScene::GetWrapper(ZEObject* Object)
+{
+	if (Object == NULL)
+		return NULL;
+
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{	
+		if (Wrappers[I]->GetObject() == Object)
+			return Wrappers[I];
+	}
+
+	return NULL;
+}
+
+void ZEDScene::AddEntity(ZEEntity* Entity)
+{
+	ZEScene::AddEntity(Entity);
+
+	AddWrapper(Entity);
+}
+
+void ZEDScene::RemoveEntity(ZEEntity* Entity)
+{
+	RemoveWrapper(Entity);
+
+	ZEScene::RemoveEntity(Entity);
 }
 
 void ZEDScene::Tick(float ElapsedTime)
@@ -150,6 +178,8 @@ void ZEDScene::Render(float ElapsedTime)
 		for (ZESize J = 0; J < Children.GetCount(); J++)
 			Children[J]->Draw(Parameters);
 	}
+
+	ZEDTransformationManager::GetInstance()->GetGizmo()->Draw(Parameters);
 }
 
 bool ZEDScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

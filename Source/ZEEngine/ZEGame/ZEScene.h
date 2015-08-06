@@ -98,8 +98,8 @@ class ZEScene : public ZEObject
 		virtual									~ZEScene();
 
 	public:
-		void									AddEntity(ZEEntity* Entity);
-		void									RemoveEntity(ZEEntity* Entity);
+		virtual void							AddEntity(ZEEntity* Entity);
+		virtual void							RemoveEntity(ZEEntity* Entity);
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
 		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);

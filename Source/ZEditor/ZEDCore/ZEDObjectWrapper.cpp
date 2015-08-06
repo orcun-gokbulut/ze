@@ -34,21 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDObjectWrapper.h"
-#include "ZEMath/ZEOBBox.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEGraphics/ZESimpleMaterial.h"
 
 ZEDObjectWrapper::ZEDObjectWrapper()
 {
 	Id = 0;
-/*	CustomWidget = NULL;*/
+	CustomWidget = NULL;
 	PopupMenu = NULL;
+	Selectable = true;
 
 	Object = NULL;
 	ParentWrapper = NULL;
+
+	Material = ZESimpleMaterial::CreateInstance();
+
+	RenderCommand.SetZero();
+	RenderCommand.Material = Material;
+	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
+	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	RenderCommand.VertexBuffer = &DrawCanvas;
+	RenderCommand.Priority = 10;
 }
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
 {
+	if (Material != NULL)
+	{
+		Material->Release();
+		Material->Destroy();
+		Material = NULL;
+	}
+
 	if (Object != NULL)
 	{
 		delete Object;
@@ -76,15 +95,15 @@ const ZEString& ZEDObjectWrapper::GetObjectName()
 	return Name;
 }
 
-// void ZEDObjectWrapper::SetCustomWidget(QWidget* Widget)
-// {
-// 	CustomWidget = Widget;
-// }
-// 
-// QWidget* ZEDObjectWrapper::GetCustomWidget()
-// {
-// 	return CustomWidget;
-// }
+void ZEDObjectWrapper::SetCustomWidget(QWidget* Widget)
+{
+	CustomWidget = Widget;
+}
+
+QWidget* ZEDObjectWrapper::GetCustomWidget()
+{
+	return CustomWidget;
+}
 
 void ZEDObjectWrapper::SetPopupMenu(QMenu* Menu)
 {
@@ -98,9 +117,22 @@ QMenu* ZEDObjectWrapper::GetPopupMenu()
 
 bool ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	float TMin = 0.0f;
+	if (!ZEAABBox::IntersectionTest(GetObjectBoundingBox(), Parameters.Ray))
+		return false;
 
-	if (!ZEOBBox::IntersectionTest(GetObjectBoundingBox(), Parameters.Ray, TMin))
+	ZEMatrix4x4 Transform;
+	ZEMatrix4x4::CreateOrientation(Transform, GetObjectPosition(), GetObjectRotation(), GetObjectScale());
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, Transform.Inverse(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, Transform.Inverse(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	ZEAABBox LocalBoundingBox;
+	ZEAABBox::Transform(LocalBoundingBox, GetObjectBoundingBox(), Transform.Inverse());
+
+	float TMin = 0.0f;
+	if (!ZEAABBox::IntersectionTest(LocalBoundingBox, LocalRay, TMin))
 		return false;
 
 	ZEVector3 IntersectionPoint = Parameters.Ray.GetPointOn(TMin);
@@ -119,6 +151,16 @@ bool ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 	}
 
 	return false;
+}
+
+void ZEDObjectWrapper::SetObjectSelectable(bool Value)
+{
+	Selectable = Value;
+}
+
+bool ZEDObjectWrapper::GetObjectSelectable()
+{
+	return Selectable;
 }
 
 void ZEDObjectWrapper::SetObject(ZEObject* Object)
@@ -188,6 +230,9 @@ void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 
 void ZEDObjectWrapper::Draw(ZEDrawParameters* Parameters)
 {
+	//RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
+	//DrawCanvas.Clean();
+
 	//Icon
 }
 

@@ -37,6 +37,7 @@
 
 #include "ZEDOperation.h"
 #include "ZEDTransformationManager.h"
+#include "ZEDSelectionManager.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEDObjectWrapper;
@@ -46,7 +47,9 @@ class ZEDTransformationOperation : public ZEDOperation
 	private:
 		ZEDTransformType Type;
 		ZEMatrix4x4 Transform;
-		ZEArray<ZEDObjectWrapper*> Objects;
+		ZEDSelectionPivotMode PivotMode;
+		ZEMatrix4x4 Pivot;
+		ZEArray<ZEDObjectWrapper*> Wrappers;
 
 	protected:		
 		virtual bool Apply();
@@ -55,5 +58,5 @@ class ZEDTransformationOperation : public ZEDOperation
 	public:
 		virtual void Destroy();
 
-		ZEDTransformationOperation(ZEDTransformType Type, ZEMatrix4x4 Transform, const ZEArray<ZEDObjectWrapper*>& Wrappers);
+		ZEDTransformationOperation(ZEDTransformType Type, ZEDSelectionPivotMode PivotMode, ZEMatrix4x4 Transform, const ZEArray<ZEDObjectWrapper*>& Wrappers);
 };

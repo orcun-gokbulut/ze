@@ -60,7 +60,6 @@ class ZEDSelectionManager
 
 		ZEDSelectionPivotMode PivotMode;
 		ZEMatrix4x4 SelectionPivot;
-		bool DirtyPivot;
 
 		ZEClass* Filter;
 
@@ -76,12 +75,14 @@ class ZEDSelectionManager
 		void SelectObject(ZEViewVolume* ViewVolume);
 		void SelectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2);
 		void SelectObject(const ZEString& Name);
+		void SelectObject(ZESize Id);
 
 		void DeselectObject(ZEDObjectWrapper* Object);
 		void DeselectObject(const ZERay& Ray);
 		void DeselectObject(ZEViewVolume* ViewVolume);
 		void DeselectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2);
 		void DeselectObject(const ZEString& Name);
+		void DeselectObject(ZESize Id);
 
 		void ClearSelection();
 

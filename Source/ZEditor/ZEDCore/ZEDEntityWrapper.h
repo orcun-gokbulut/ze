@@ -43,7 +43,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 /*	ZE_OBJECT*/
 
 	protected:
-		ZEOBBox BoundingBox;
+		void DrawBoundingBox(const ZEVector4& Color);
 
 	public:
 		virtual void SetObject(ZEObject* Object);
@@ -55,7 +55,8 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void SetObjectVisibility(bool Value);
 		virtual bool GetObjectVisibility();
 
-		virtual ZEOBBox GetObjectBoundingBox();
+		virtual ZEAABBox GetObjectBoundingBox();
+		virtual ZEMatrix4x4 GetObjectTransform();
 		virtual void SetObjectPosition(const ZEVector3& NewPosition);
 		virtual ZEVector3 GetObjectPosition();
 		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);

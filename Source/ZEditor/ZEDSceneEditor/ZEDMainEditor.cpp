@@ -110,3 +110,8 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 
 	Core->InitializeEngine();
 }
+
+ZEDMainEditor::~ZEDMainEditor()
+{
+	Core->DeinitializeEngine();
+}

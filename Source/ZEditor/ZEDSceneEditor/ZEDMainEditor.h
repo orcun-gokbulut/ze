@@ -86,4 +86,5 @@ class ZEDMainEditor : public QMainWindow
 		bool Deinitalize();
 
 		ZEDMainEditor(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
+		~ZEDMainEditor();
 };
