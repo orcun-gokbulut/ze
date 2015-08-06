@@ -98,7 +98,7 @@ class ZEDObjectWrapper : public ZEObject
 		void SetPopupMenu(QMenu* Menu);
 		QMenu* GetPopupMenu();
 
-		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters) = 0;
 
 		virtual void SetObject(ZEObject* Object);
 		virtual ZEObject* GetObject();

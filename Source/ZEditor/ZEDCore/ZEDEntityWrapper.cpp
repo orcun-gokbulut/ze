@@ -172,6 +172,11 @@ ZEVector3 ZEDEntityWrapper::GetObjectScale()
 	return ((ZEEntity*)GetObject())->GetWorldScale();
 }
 
+bool ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	return ((ZEEntity*)GetObject())->RayCast(Report, Parameters);
+}
+
 void ZEDEntityWrapper::Draw(ZEDrawParameters* Parameters)
 {
 	RenderCommand.PrimitiveType = ZE_ROPT_LINE;

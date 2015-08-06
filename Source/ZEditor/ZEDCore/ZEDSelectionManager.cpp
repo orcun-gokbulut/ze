@@ -123,10 +123,12 @@ void ZEDSelectionManager::SelectObject(const ZERay& Ray)
 	Parameters.FilterFunctionParameter = Filter;
 	ZERayCastReport Report;
 
-	if (!ZEDCore::GetInstance()->GetEditorModule()->GetScene()->RayCast(Report, Parameters))
+	ZEDScene* Scene = ZEDCore::GetInstance()->GetEditorModule()->GetScene();
+
+	if (!Scene->RayCast(Report, Parameters))
 		return;
 
-	SelectObject((ZEDObjectWrapper*)Report.Object);
+	SelectObject(Scene->GetWrapper(Report.Object));
 }
 
 void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
@@ -253,11 +255,12 @@ void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
 	Parameters.FilterFunction = ZERayCastFilterFunction::Create<ZEDSelectionManager, &ZEDSelectionManager::FilterSelection>(this);
 	Parameters.FilterFunctionParameter = Filter;
 	ZERayCastReport Report;
+	ZEDScene* Scene = ZEDCore::GetInstance()->GetEditorModule()->GetScene();
 
-	if (!ZEDCore::GetInstance()->GetEditorModule()->GetScene()->RayCast(Report, Parameters))
+	if (!Scene->RayCast(Report, Parameters))
 		return;
 
-	DeselectObject((ZEDObjectWrapper*)Report.Object);
+	DeselectObject(Scene->GetWrapper(Report.Object));
 }
 
 void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)

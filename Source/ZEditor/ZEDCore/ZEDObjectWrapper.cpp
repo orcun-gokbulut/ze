@@ -115,44 +115,6 @@ QMenu* ZEDObjectWrapper::GetPopupMenu()
 	return PopupMenu;
 }
 
-bool ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-	if (!ZEAABBox::IntersectionTest(GetObjectBoundingBox(), Parameters.Ray))
-		return false;
-
-	ZEMatrix4x4 Transform;
-	ZEMatrix4x4::CreateOrientation(Transform, GetObjectPosition(), GetObjectRotation(), GetObjectScale());
-
-	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, Transform.Inverse(), Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, Transform.Inverse(), Parameters.Ray.v);
-	LocalRay.v.NormalizeSelf();
-
-	ZEAABBox LocalBoundingBox;
-	ZEAABBox::Transform(LocalBoundingBox, GetObjectBoundingBox(), Transform.Inverse());
-
-	float TMin = 0.0f;
-	if (!ZEAABBox::IntersectionTest(LocalBoundingBox, LocalRay, TMin))
-		return false;
-
-	ZEVector3 IntersectionPoint = Parameters.Ray.GetPointOn(TMin);
-	float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, IntersectionPoint);
-	if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
-	{
-		Report.Position = IntersectionPoint;
-		Report.Distance = ZEMath::Sqrt(DistanceSquare);
-		Report.Object = this;
-		Report.SubComponent = NULL;
-		Report.PoligonIndex = 0;
-		Report.Normal = ZEVector3::Zero;
-		Report.Binormal = ZEVector3::Zero;
-
-		return true;
-	}
-
-	return false;
-}
-
 void ZEDObjectWrapper::SetObjectSelectable(bool Value)
 {
 	Selectable = Value;
