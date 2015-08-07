@@ -39,6 +39,7 @@
 #include "ZEDModule.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDScene.h"
+#include "ZEDGizmo.h"
 #include "ZEFoundation/ZEMath/ZEViewVolume.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZECamera.h"
@@ -95,6 +96,20 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 	ZEMatrix4x4::CreateOrientation(SelectionPivot, SelectionCenterPosition, SelectionCenterRotation, ZEVector3::One);
 }
 
+void ZEDSelectionManager::ConfigureGizmo()
+{
+	const ZEMatrix4x4& Pivot = GetSelectionPivot();
+	ZEDTransformSpace Space = ZEDTransformationManager::GetInstance()->GetTransformSpace();
+	ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
+
+	Gizmo->SetPosition(Pivot.GetTranslation());
+
+	if (Space == ZED_TS_LOCAL && (Gizmo->GetMode() == ZED_GM_MOVE || Gizmo->GetMode() == ZED_GM_HELPER))
+	{
+		Gizmo->SetRotation(Pivot.GetRotation());
+	}
+}
+
 const ZEArray<ZEDObjectWrapper*>& ZEDSelectionManager::GetSelectedObjects()
 {
 	return Selection;
@@ -113,6 +128,8 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 			return;
 
 	Selection.Add(Object);
+
+	ConfigureGizmo();
 }
 
 void ZEDSelectionManager::SelectObject(const ZERay& Ray)
@@ -246,6 +263,8 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 		return;
 
 	Selection.RemoveValue(Object);
+
+	ConfigureGizmo();
 }
 
 void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
@@ -401,7 +420,7 @@ ZEDSelectionPivotMode ZEDSelectionManager::GetSelectionPivotMode()
 	return PivotMode;
 }
 
-ZEMatrix4x4 ZEDSelectionManager::GetSelectionPivot()
+const ZEMatrix4x4& ZEDSelectionManager::GetSelectionPivot()
 {
 	CalculateSelectionPivot();
 

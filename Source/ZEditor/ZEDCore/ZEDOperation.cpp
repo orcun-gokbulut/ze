@@ -40,14 +40,34 @@ void ZEDOperation::SetText(const char* Text)
 	this->Text = Text;
 }
 
-const ZEString& ZEDOperation::GetText()
+const ZEString& ZEDOperation::GetText() const
 {
 	return Text;
 }
 
-ZEDOperationStatus ZEDOperation::GetStatus()
+ZEDOperationStatus ZEDOperation::GetStatus() const
 {
 	return Status;
+}
+
+void ZEDOperation::SetApplyEnabled(bool Value)
+{
+	ApplyEnabled = Value;
+}
+
+bool ZEDOperation::GetApplyEnabled() const
+{
+	return ApplyEnabled;
+}
+
+void ZEDOperation::SetRevertEnabled(bool Value)
+{
+	RevertEnabled = Value;
+}
+
+bool ZEDOperation::GetRevertEnabled() const
+{
+	return RevertEnabled;
 }
 
 bool ZEDOperation::Do()
@@ -55,7 +75,11 @@ bool ZEDOperation::Do()
 	if (Status == ZED_OS_DONE)
 		return false;
 
-	bool Result = Apply();
+	bool Result = true;
+
+	if (ApplyEnabled)
+		Result = Apply();
+
 	if (Result)
 		Status = ZED_OS_DONE;
 
@@ -67,7 +91,11 @@ bool ZEDOperation::Undo()
 	if (Status != ZED_OS_DONE)
 		return false;
 
-	bool Result = Revert();
+	bool Result = true;
+
+	if (RevertEnabled)
+		Result = Revert();
+
 	if (Result)
 		Status = ZED_OS_NOT_DONE;
 
@@ -82,6 +110,8 @@ void ZEDOperation::Destroy()
 ZEDOperation::ZEDOperation()
 {
 	Status = ZED_OS_NONE;
+	ApplyEnabled = true;
+	RevertEnabled = true;
 }
 
 ZEDOperation::~ZEDOperation()

@@ -212,9 +212,11 @@ void ZEDTransformationManager::ApplyTransform(ZEMatrix4x4 Transform)
 
 void ZEDTransformationManager::EndTransform()
 {
-	ResetTransform();
 	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
-	ZEDOperationManager::GetInstance()->DoOperation(new ZEDTransformationOperation(TransformType, SelectionManager->GetSelectionPivotMode(), Transform, SelectionManager->GetSelectedObjects()));
+	ZEDTransformationOperation* Operation = new ZEDTransformationOperation(TransformType, SelectionManager->GetSelectionPivotMode(), Transform, SelectionManager->GetSelectedObjects());
+	Operation->SetApplyEnabled(false);
+	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	Operation->SetApplyEnabled(true);
 
 	TransformType = ZED_TT_NONE;
 	Transform = ZEMatrix4x4::Identity;
