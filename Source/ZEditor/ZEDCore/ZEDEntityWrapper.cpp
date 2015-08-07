@@ -174,7 +174,7 @@ ZEVector3 ZEDEntityWrapper::GetObjectScale()
 
 bool ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	return ((ZEEntity*)GetObject())->RayCast(Report, Parameters);
+	return ((ZEEntity*)GetObject())->ZEEntity::RayCast(Report, Parameters);
 }
 
 void ZEDEntityWrapper::Draw(ZEDrawParameters* Parameters)

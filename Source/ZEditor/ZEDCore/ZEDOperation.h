@@ -50,6 +50,8 @@ class ZEDOperation
 	private:
 		ZEString Text;
 		ZEDOperationStatus Status;
+		bool ApplyEnabled;
+		bool RevertEnabled;
 
 	protected:
 		void SetText(const char* Text);
@@ -58,8 +60,14 @@ class ZEDOperation
 		virtual bool Revert() = 0;
 
 	public:
-		const ZEString& GetText();
-		ZEDOperationStatus GetStatus();
+		const ZEString& GetText() const;
+		ZEDOperationStatus GetStatus() const;
+
+		void SetApplyEnabled(bool Value);
+		bool GetApplyEnabled() const;
+
+		void SetRevertEnabled(bool Value);
+		bool GetRevertEnabled() const;
 
 		bool Do();
 		bool Undo();
