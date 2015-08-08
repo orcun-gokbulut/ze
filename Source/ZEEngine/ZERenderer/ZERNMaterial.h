@@ -104,7 +104,6 @@ class ZERNMaterial : public ZEGRResource
 		bool							GetLightningEnabled() const;
 
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-		virtual bool					SetupCommand(ZEGRContext* Context, ZERNStage* Stage, ZERNCommand* Command);
 		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 
 		virtual void					UpdateMaterial();

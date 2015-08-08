@@ -33,23 +33,70 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZERNCuller.h"
+
 #include "ZERNRenderer.h"
 #include "ZERNStage.h"
+#include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
+
+static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
+{
+	if (A->Priority < B->Priority)
+		return -1;
+	else if (A->Priority > B->Priority)
+		return 1;
+	else
+		return (int)(A->Order - B->Order);
+}
+
+void ZERNRenderer::Cull()
+{
+	ZESceneCuller Culler;
+	ZERNCullParameters CullParameters;
+	CullParameters.Renderer = this;
+	CullParameters.View = &View;
+
+	Culler.SetScene(Scene);
+	Culler.Cull();
+}
+
+void ZERNRenderer::SortStageQueues()
+{
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+		StageQueues[I].Commands.Sort<CompareCommands>();
+}
+
+void ZERNRenderer::RenderStages()
+{
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+	{
+		ZERNStageQueue* Queue = &StageQueues[I];
+		ZELink<ZERNCommand>* Link = StageQueues[I].Commands.GetFirst();
+		Queue->Stage->Setup(Device);
+		while (Link != NULL)
+		{
+			ZERNCommand* Command = Link->GetItem();
+			Command->Entity->Render(Command);
+		}
+		Queue->Stage->CleanUp();
+	}
+}
 
 bool ZERNRenderer::InitializeSelf()
 {
-	for (ZESize I = 0; I < Stages.GetCount(); I++)
-		if (!Stages[I]->Initialize())
-			return false;
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+		if (!StageQueues[I].Stage != NULL)
+			StageQueues[I].Stage->Initialize();
 
 	return true;
 }
 
 void ZERNRenderer::DeinitializeSelf()
 {
-	for (ZESize I = 0; I < Stages.GetCount(); I++)
-		Stages[I]->Deinitialize();
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+		if (StageQueues[I].Stage != NULL)
+			StageQueues[I].Stage->Deinitialize();
 }
 
 void ZERNRenderer::SetScene(ZEScene* Scene)
@@ -62,30 +109,74 @@ ZEScene* ZERNRenderer::GetScene()
 	return Scene;
 }
 
-void ZERNRenderer::Render(float ElaspedTime)
+void ZERNRenderer::AddStage(ZERNStage* Stage)
 {
-	const ZESmartArray<ZEEntity*>& Entities =  Scene->GetEntities();
+	ZERNStageQueue Queue;
+	Queue.Stage = Stage;
+	StageQueues.Add(Queue);
 
-	for (ZESize I = 0; I < Stages.GetCount(); I++)
+	if (IsInitialized())
+		Stage->Initialize();
+}
+
+void ZERNRenderer::RemoveStage(ZERNStage* Stage)
+{
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
 	{
-		ZERNStage* Stage = Stages[I];
-		Stage->Setup(Device);
+		if (StageQueues[I].Stage == Stage)
+		{
+			if (StageQueues[I].Stage != NULL)
+				StageQueues[I].Stage->Deinitialize();
 
-		for (ZESize N = 0; N < Commands.GetCount(); I++)
-			Stage->Render(Commands[I]);
-
-		Stage->CleanUp();
+			StageQueues.Remove(I);
+		}
 	}
 }
 
-void ZERNRenderer::Clear()
+void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
+	ZELink<ZERNCommand>* EmptyLink = NULL;
+	for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
+		EmptyLink = &Command->StageQueueLinks[I];
 
+	if (EmptyLink == NULL)
+		return;
+
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+		if ((Command->StageMask & StageQueues[I].Stage->GetId()) != 0)
+			StageQueues[I].Commands.AddEnd(EmptyLink);
+}
+
+void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
+{
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+	{
+		for (ZESize N = 0; N < ZERN_MAX_COMMAND_STAGE; I++)
+		{
+			if (StageQueues[I].Commands.Exists(&Command->StageQueueLinks[N]))
+				StageQueues[I].Commands.Remove(&Command->StageQueueLinks[N]);
+			break;
+		}
+	}
+}
+
+void ZERNRenderer::CleanCommands()
+{
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+		StageQueues[I].Commands.Clean();
+}
+
+void ZERNRenderer::Render()
+{
+	Cull();
+	SortStageQueues();
+	RenderStages();
 }
 
 ZERNRenderer::ZERNRenderer()
 {
-	memset(&Statistics, 0, sizeof(ZERendererStatistics));
+	Device = NULL;
+	Scene = NULL;
 }
 
 ZERNRenderer::~ZERNRenderer()

@@ -40,7 +40,6 @@
 #include "ZEGraphics/ZEGRDefinitions.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRScreen.h"
-#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
@@ -260,20 +259,34 @@ float ZECamera::GetShadowFadeDistance() const
 	return Constants.ShadowFadeDistance;
 }
 
-const ZEView& ZECamera::GetView()
+const ZERNView& ZECamera::GetView()
 {
 	UpdateAutoParameters();
 
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW))
 	{
-		View.Type = ZE_VPT_CAMERA;
-		View.Camera = this;
-		View.FOV = GetHorizontalFOV();
-		View.ProjectionTransform = GetProjectionTransform();
-		View.ViewTransform = GetViewTransform();
-		View.ViewProjectionTransform = GetViewProjectionTransform();
+
+
+		View.Type = ZERN_VT_CAMERA;
+		View.Entity = this;
+		View.Position = GetWorldPosition();
 		View.Rotation = GetWorldRotation();
 		View.Direction = GetWorldFront();
+
+		View.ProjectionType = ZERN_PT_PERSPECTIVE;
+		View.Width = 2.0f;
+		View.Height = 2.0f;
+		View.VerticalFOV = GetVerticalFOV();
+		View.HorizontalFOV = GetHorizontalFOV();
+		View.AspectRatio = GetAspectRatio();
+
+		View.ViewTransform = GetViewTransform();
+		View.ViewProjectionTransform = GetProjectionTransform();
+		View.ViewProjectionTransform = GetViewProjectionTransform();
+
+		View.Screen = Screen;
+		View.ViewVolume = &GetViewVolume();
+
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW);
 	}
 

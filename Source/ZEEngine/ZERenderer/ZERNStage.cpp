@@ -48,15 +48,6 @@ void ZERNStage::Setup(ZEGRContext* Device)
 	this->Device = Device;
 }
 
-void ZERNStage::Render(ZERNCommand* RenderCommand)
-{
-	zeDebugCheck(Device != NULL, "Device is NULL.");
-	zeDebugCheck(RenderCommand != NULL, "RenderCommand is NULL.");
-
-	Device->SetRenderState(RenderCommand->RenderState);
-	Device->Draw(RenderCommand->PrimitiveCount, RenderCommand->VertexBufferOffset);
-}
-
 void ZERNStage::CleanUp()
 {
 

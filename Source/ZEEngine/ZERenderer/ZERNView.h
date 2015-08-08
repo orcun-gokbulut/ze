@@ -40,6 +40,17 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
+class ZEGRScreen;
+class ZEViewVolume;
+class ZEEntity;
+
+enum ZERNProjectionType
+{
+	ZERN_PT_PERSPECTIVE,
+	ZERN_PT_ORTHAGONAL,
+	ZERN_PT_PARABOLOID,
+};
+
 enum ZERNViewType
 {
 	ZERN_VT_NONE,
@@ -47,10 +58,6 @@ enum ZERNViewType
 	ZERN_VT_SHADOW_CASTER,
 	ZERN_VT_PROBE
 };
-
-class ZEGRScreen;
-class ZEViewVolume;
-class ZEEntity;
 
 struct ZERNView
 {
@@ -60,22 +67,19 @@ struct ZERNView
 	ZEQuaternion				Rotation;
 	ZEVector3					Direction;
 
-	// Orthographic Projection
-	float						VerticalWidth;		
-	float						HorizontalWidth;
-	
-	// Perspective Projection
+	ZERNProjectionType			ProjectionType;
+	float						Width;
+	float						Height;
 	float						VerticalFOV;		
 	float						HorizontalFOV;
-	float						D;
+	float						AspectRatio;
+
 	ZEVector3					CornerRays[4];
 
-	float						AspectRatio;
-	
 	ZEMatrix4x4					ViewTransform;
 	ZEMatrix4x4					ProjectionTransform;
 	ZEMatrix4x4					ViewProjectionTransform;
 
 	ZEGRScreen*					Screen;
-	ZEViewVolume*				ViewVolume;
+	const ZEViewVolume*			ViewVolume;
 };

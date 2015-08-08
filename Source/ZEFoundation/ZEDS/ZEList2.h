@@ -46,14 +46,13 @@ class ZELink
 	ZE_DISALLOW_COPY(ZELink);
 	friend class ZEList2<ZEItemType>;
 	private:
-		ZEList2<ZEItemType>*		List;
+		bool						InUse;
 		ZEItemType*					Item;
 		ZELink*						Prev;
 		ZELink*						Next;
 
 	public:
-		ZEList2<ZEItemType>*		GetList();
-		const ZEList2<ZEItemType>*	GetList() const;
+		bool						GetInUse() const;
 		ZELink*						GetPrev();
 		const ZELink*				GetPrev() const;
 		ZELink*						GetNext();
@@ -71,7 +70,7 @@ class ZELink
 template<typename ZEItemType>
 class ZEList2
 {
-	ZE_DISALLOW_COPY(ZEList2)
+	//ZE_DISALLOW_COPY(ZEList2)
 	private:
 		ZELink<ZEItemType>*			First;
 		ZELink<ZEItemType>*			Last;
@@ -91,7 +90,9 @@ class ZEList2
 
 		ZELink<ZEItemType>*			Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink = NULL);
 		const ZELink<ZEItemType>*	Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink = NULL) const;
-		ZESize						FindIndex(ZELink<ZEItemType>* Link) const;
+		ZESSize						FindIndex(ZELink<ZEItemType>* Link) const;
+
+		bool						Exists(ZELink<ZEItemType>* Link);
 
 		void						AddBegin(ZELink<ZEItemType>* Link);
 		void						AddEnd(ZELink<ZEItemType>* Link);
@@ -101,6 +102,7 @@ class ZEList2
 		
 		void						Remove(ZELink<ZEItemType>* Link);
 		void						Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B);
+
 
 		void						Reverse();
 
@@ -116,15 +118,9 @@ class ZEList2
 };
 
 template<typename ZEItemType>
-ZEList2<ZEItemType>* ZELink<ZEItemType>::GetList()
+bool ZELink<ZEItemType>::GetInUse() const
 {
-	return List;
-}
-
-template<typename ZEItemType>
-const ZEList2<ZEItemType>* ZELink<ZEItemType>::GetList() const
-{
-	return List;
+	return InUse;
 }
 
 
@@ -159,32 +155,9 @@ ZEItemType* ZELink<ZEItemType>::GetItem() const
 }
 
 template<typename ZEItemType>
-void ZELink<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Item)
-{
-	zeDebugCheck(List == NULL, "This links is not contained in any list.");
-
-	List->InsertBefore(this, Item);
-}
-
-template<typename ZEItemType>
-void ZELink<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Item)
-{
-	zeDebugCheck(List == NULL, "This links is not contained in any list.");
-	
-	List->InsertAfter(this, Item);
-}
-
-template<typename ZEItemType>
-void ZELink<ZEItemType>::Remove()
-{
-	zeDebugCheck(List == NULL, "This links is not contained in any list.");
-	List->Remove(this);
-}
-
-template<typename ZEItemType>
 ZELink<ZEItemType>::ZELink(ZEItemType* Object)
 {
-	 List = NULL;
+	 InUse = false;
 	 Prev = NULL;
 	 Next = NULL;
 	 this->Item = Object;
@@ -193,7 +166,7 @@ ZELink<ZEItemType>::ZELink(ZEItemType* Object)
 template<typename ZEItemType>
 ZELink<ZEItemType>::~ZELink()
 {
-	zeDebugCheck(List != NULL, "Link has destructed before it it has been removed from the list.");
+	zeDebugCheck(InUse, "Link has destructed before it it has been removed from the list.");
 }
 
 template<typename ZEItemType>
@@ -230,7 +203,7 @@ ZESize ZEList2<ZEItemType>::GetCount() const
 template<typename ZEItemType>
 ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink)
 {
-	zeDebugCheck(StartLink != NULL && StartLink->List != this, "Start link is not contained in this list.");
+	zeDebugCheck(StartLink != NULL && !Exists(StartLink), "Start link is not in this list.");
 
 	ZELink<ZEItemType>* Cursor = First;
 	if (StartLink != NULL)
@@ -250,7 +223,7 @@ ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, ZELink<ZEI
 template<typename ZEItemType>
 const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink) const
 {
-	zeDebugCheck(StartLink != NULL && StartLink->List != this, "Start link is not contained in this list.");
+	zeDebugCheck(StartLink != NULL && !Exists(StartLink), "Start link is not in this list.");
 
 	const ZELink<ZEItemType>* Cursor = First;
 	if (StartLink != NULL)
@@ -268,20 +241,29 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::Find(const ZEItemType* Item, cons
 }
 
 template<typename ZEItemType>
-ZESize ZEList2<ZEItemType>::FindIndex(ZELink<ZEItemType>* Link) const
+ZESSize ZEList2<ZEItemType>::FindIndex(ZELink<ZEItemType>* Link) const
 {
+	if (!Link->InUse)
+		return -1;
+
 	ZESize Index = 0;
 	const ZELink<ZEItemType>* Cursor = First;
 	while(Cursor != NULL)
 	{
 		if (Cursor == Link)
-			break;
+			return Index;
 
 		Cursor = Cursor->Next;
 		Index++;
 	}
 
-	return Index;
+	return -1;
+}
+
+template<typename ZEItemType>
+bool ZEList2<ZEItemType>::Exists(ZELink<ZEItemType>* Link)
+{
+	return FindIndex(Link) != -1;
 }
 
 template<typename ZEItemType>
@@ -322,11 +304,11 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::AddBegin(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-	zeDebugCheck(Link->List != NULL, "Link already cointained in another list.");
+	zeDebugCheck(Link->InUse, "Link already cointained in a list.");
 
 	if (First == NULL)
 	{
-		Link->List = this;
+		Link->InUse = true;
 		First = Link;
 		Last = Link;
 		Count++;
@@ -341,11 +323,11 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-	zeDebugCheck(Link->List != NULL, "Link already cointained in another list.");
+	zeDebugCheck(Link->InUse, "Link already cointained in a list.");
 
 	if (Last == NULL)
 	{
-		Link->List = this;
+		Link->InUse = true;
 		First = Link;
 		Last = Link;
 		Count++;
@@ -359,14 +341,14 @@ void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
-	zeDebugCheck(Link->List != this, "Link is not in this list.");
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
+	zeDebugCheck(!Exists(Link), "Link parameter is not in this list.");
 	zeDebugCheck(NewLink == NULL, "NewLink parameter cannot be null.");
-	zeDebugCheck(NewLink->List != NULL, "NewLink already cointained in another list.");
+	zeDebugCheck(NewLink->InUse, "NewLink already cointained in a list.");
 
 	NewLink->Prev = Link->Prev;
 	NewLink->Next = Link;
-	NewLink->List = this;
+	NewLink->InUse = true;
 
 	if (Link->Prev == NULL)
 		First = NewLink;
@@ -381,14 +363,14 @@ void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemTy
 template<typename ZEItemType>
 void ZEList2<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
-	zeDebugCheck(Link->List != this, "Link is not in this list.");
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
+	zeDebugCheck(!Exists(Link), "Link parameter is not in this list.");
 	zeDebugCheck(NewLink == NULL, "NewLink parameter cannot be null.");
-	zeDebugCheck(NewLink->List != NULL, "NewLink already cointained in another list.");
+	zeDebugCheck(NewLink->InUse, "NewLink already cointained in a list.");
 
 	NewLink->Prev = Link;
 	NewLink->Next = Link->Next;
-	NewLink->List = this;
+	NewLink->InUse = true;
 
 	if (Link->Next == NULL)
 		Last = NewLink;
@@ -404,7 +386,7 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-	zeDebugCheck(Link->List != this, "Link is not in this list.");
+	zeDebugCheck(!Exists(Link), "Link is not in this list.");
 
 	if (Link->Prev == NULL)
 		First = Link->Next;
@@ -416,7 +398,7 @@ void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 	else
 		Link->Next->Prev = Link->Prev;
 
-	Link->List = NULL;
+	Link->InUse = false;
 	Link->Prev = NULL;
 	Link->Next = NULL;
 
@@ -427,10 +409,10 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B)
 {
 	zeDebugCheck(A == NULL, "A parameter cannot be null.");
-	zeDebugCheck(A->List != this, "A is not in this list.");
+	zeDebugCheck(!Exists(A), "A link is not in this list.");
 
 	zeDebugCheck(B == NULL, "B parameter cannot be null.");
-	zeDebugCheck(B->List != this, "B is not in this list.");
+	zeDebugCheck(!Exists(B), "B link is not in this list.");
 
 	ZELink<ZEItemType>* Temp;
 	Temp = A->Prev;
@@ -462,7 +444,7 @@ inline void ZEList2<ZEItemType>::Clean()
 		ZELink<ZEItemType>* Temp = Link->Next;
 		Link->Prev = NULL;
 		Link->Next = NULL;
-		Link->List = NULL;
+		Link->InUse = false;
 		Link = Temp;
 	}
 	Count = 0;

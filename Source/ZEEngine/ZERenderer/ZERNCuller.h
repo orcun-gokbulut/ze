@@ -34,33 +34,54 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SCENE_CULLER_H__
-#define __ZE_SCENE_CULLER_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDrawStatistics.h"
 
 class ZEScene;
 class ZEEntity;
-class ZELight;
-struct ZERNDrawParameters;
+struct ZERNView;
+class ZERNRenderer;
+
+struct ZERNCullParameters
+{
+	ZERNRenderer*					Renderer;
+	ZERNView*						View;
+};
+
+struct ZESceneStatistics
+{
+	ZEUInt32						TotalEntityCount;
+	ZEUInt32						DrawableEntityCount;
+
+	ZEUInt32						CulledEntityCount;
+	ZEUInt32						DrawedEntityCount;
+
+	ZEUInt32						TotalLightCount;
+	ZEUInt32						CulledLightCount;
+	ZEUInt32						DrawedLightCount;
+};
 
 class ZESceneCuller
 {
 	private:
-		ZESceneStatistics					Statistics;
+		ZEScene*					Scene;
+		ZERNCullParameters			CullParameters;
+		ZESceneStatistics			Statistics;
 
-		void								CullEntity(ZEEntity* Entity, ZERNDrawParameters* DrawParameters);
-		void								CullEntities(ZEScene* Scene, ZERNDrawParameters* DrawParameters);
+		void						CullEntity(ZEEntity* Entity);
 
 	public:
-		virtual const ZESceneStatistics&	GetStatistics() const;
+		void						SetScene(ZEScene* Scene);
+		ZEScene*					GetScene();
 
-		virtual void						CullScene(ZEScene* Scene, ZERNDrawParameters* DrawParameters);
+		void						SetCullParameters(const ZERNCullParameters& Parameters);
+		const ZERNCullParameters&	GetCullParameters();
 
-											ZESceneCuller();
-		virtual								~ZESceneCuller();
+		void						SetStatistics(const ZESceneStatistics& Statistics);
+		const ZESceneStatistics&	GetStatistics() const;
+
+		void						Cull();
+
+									ZESceneCuller();
+		virtual						~ZESceneCuller();
 };
-
-#endif
