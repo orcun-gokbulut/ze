@@ -34,13 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CANVASBRUSH_H__
-#define __ZE_CANVASBRUSH_H__
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZERenderer/ZECanvas.h"
-#include "ZERenderer/ZERNCommand.h"
 
 class ZERNRenderer;
 class ZERNMaterial;

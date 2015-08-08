@@ -55,6 +55,9 @@
 #include "ZEMeta/ZEEnumerator.h"
 
 struct ZERNDrawParameters;
+struct ZERNCullParameters;
+class ZERNRenderParameters;
+class ZERNCommand;
 
 // ZEDrawFlags
 typedef ZEFlags ZEDrawFlags;
@@ -207,6 +210,9 @@ class ZEEntity : public ZEObject
 
 		virtual void							Tick(float Time);
 		virtual void							Draw(ZERNDrawParameters* DrawParameters);
+
+		virtual bool							Cull(ZERNCullParameters* CullParameters);
+		virtual void							Render(ZERNCommand* Command);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

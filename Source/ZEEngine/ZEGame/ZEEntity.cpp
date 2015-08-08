@@ -553,7 +553,12 @@ void ZEEntity::Tick(float Time)
 
 }
 
-void ZEEntity::Draw(ZERNDrawParameters* DrawParameters)
+bool ZEEntity::Cull(ZERNCullParameters* CullParameters)
+{
+
+}
+
+void ZEEntity::Render(ZERNCommand* Command)
 {
 
 }

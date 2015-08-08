@@ -34,11 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CAMERA_H__
-#define __ZE_CAMERA_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGame/ZERNDrawParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
@@ -91,7 +88,7 @@ class ZECamera : public ZEEntity
 		bool							AutoAspectRatio;
 
 		ZEViewFrustum					ViewFrustum;
-		ZEView							View;
+		ZERNView						View;
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
@@ -138,7 +135,7 @@ class ZECamera : public ZEEntity
 		virtual void					SetPosition(const ZEVector3& NewPosition);	
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
-		const ZEView&					GetView();
+		const ZERNView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
@@ -146,4 +143,3 @@ class ZECamera : public ZEEntity
 
 		static ZECamera*				CreateInstance();
 };
-#endif

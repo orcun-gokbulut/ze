@@ -41,60 +41,27 @@
 #include "ZEMath/ZERay.h"
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZECore.h"
-#include "ZESceneCuller.h"
-#include "ZERNDrawParameters.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEEntityProvider.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZERenderer/ZEFrameRenderer.h"
-#include "ZERenderer/ZEShadowRenderer.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZESerialization/ZEFileSerializer.h"
 #include "ZESerialization/ZEFileUnserializer.h"
 #include "ZEInterior/ZEInteriorResource.h"
-
-#include <memory.h>
 #include "ZEMeta/ZEProvider.h"
 #include "ZEML/ZEMLReader.h"
+
+#include <memory.h>
+
 
 bool ZEScene::Initialize()
 {
 	if (Initialized)
 		return true;
-
-	if (Renderer == NULL)
-		Renderer = ZEFrameRenderer::CreateInstance();
-
-	if (Renderer == NULL)
-	{
-		zeCriticalError("Can not create renderer.");
-		return false;
-	}
-
-	if (!Renderer->Initialize())
-	{
-		zeCriticalError("Can not initialize renderer.");
-		return false;
-	}
-
-	if (ShadowRenderer == NULL)
-		ShadowRenderer = ZEShadowRenderer::CreateInstance();
-
-	if (ShadowRenderer == NULL)
-	{
-		zeCriticalError("Can not create shadow renderer.");
-		return false;
-	}
 	
-	if (!ShadowRenderer->Initialize())
-	{
-		zeCriticalError("Can not initialize shadow renderer.");
-		return false;
-	}
-
 	if (PhysicalWorld == NULL)
 		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
 
@@ -131,14 +98,7 @@ void ZEScene::Deinitialize()
 	if (PhysicalWorld != NULL)
 		PhysicalWorld->Deinitialize();
 
-	if (Renderer != NULL)
-		Renderer->Deinitialize();
-
-	if (ShadowRenderer != NULL)
-		ShadowRenderer->Deinitialize();
-
 	Initialized = false;
-	
 }
 
 void ZEScene::Destroy()
@@ -151,18 +111,6 @@ void ZEScene::Destroy()
 	{
 		PhysicalWorld->Destroy();
 		PhysicalWorld = NULL;
-	}
-
-	if (Renderer != NULL)
-	{
-		Renderer->Destroy();
-		Renderer = NULL;
-	}
-
-	if (ShadowRenderer != NULL)
-	{
-		ShadowRenderer->Destroy();
-		ShadowRenderer = NULL;
 	}
 
 	delete this;
@@ -228,16 +176,6 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 	return ProperEntities;
 }
 
-ZERNRenderer* ZEScene::GetRenderer()
-{
-	return Renderer;
-}
-
-ZERNRenderer*	ZEScene::GetShadowRenderer()
-{
-	return ShadowRenderer;
-}
-
 ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
 {
 	return PhysicalWorld;
@@ -257,16 +195,6 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 {
 	ActiveListener = Listener;
 	zeSound->SetActiveListener(Listener);
-}
-
-ZESceneCuller& ZEScene::GetSceneCuller()
-{
-	return Culler;
-}
-
-const ZESceneStatistics& ZEScene::GetStatistics() const
-{
-	return Culler.GetStatistics();
 }
 
 ZEListener* ZEScene::GetActiveListener()
@@ -305,25 +233,6 @@ void ZEScene::Render(float ElapsedTime)
 {
 	if (ActiveCamera == NULL)
 		return;
-
-	Renderer->SetCamera(ActiveCamera);
-	
-	FrameDrawParameters.ElapsedTime = ElapsedTime;
-	FrameDrawParameters.FrameId = zeCore->GetFrameId();
-	FrameDrawParameters.Pass = ZE_RP_COLOR;
-	FrameDrawParameters.Renderer = Renderer;
-	FrameDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	FrameDrawParameters.View = (ZERNView*)&ActiveCamera->GetView();
-	FrameDrawParameters.Lights.Clear();
-
-	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
-
-	FrameDrawParameters.Renderer->SetDrawParameters(&FrameDrawParameters);
-
-	Culler.CullScene(this, &FrameDrawParameters);
-
-	//Fill Draw Parameters Statistics ZESceneStats section
-
 }
 
 bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

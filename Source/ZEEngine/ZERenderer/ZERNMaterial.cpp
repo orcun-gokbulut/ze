@@ -127,12 +127,6 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	return true;
 }
 
-bool ZERNMaterial::SetupCommand(ZEGRContext* Context, ZERNStage* Stage, ZERNCommand* Command)
-{
-	Context->Draw(Command->PrimitiveCount, Command->VertexBufferOffset);
-	return true;
-}
-
 void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
 

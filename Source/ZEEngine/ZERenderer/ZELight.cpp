@@ -35,7 +35,6 @@
 
 #include "ZELight.h"
 #include "ZERNCommand.h"
-#include "ZEGame\ZERNDrawParameters.h"
 #include "ZERNRenderer.h"
 
 float ZELight::AttenuationFunction(float RootToTry)
