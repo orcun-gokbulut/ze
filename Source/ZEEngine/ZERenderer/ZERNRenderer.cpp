@@ -39,6 +39,7 @@
 #include "ZERNStage.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
+#include "ZERNCommand.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {

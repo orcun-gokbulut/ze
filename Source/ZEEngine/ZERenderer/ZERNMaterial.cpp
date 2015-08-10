@@ -38,7 +38,6 @@
 #include "ZECore/ZECore.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZERNCommand.h"
 
 ZERNMaterialStage::ZERNMaterialStage()
 {

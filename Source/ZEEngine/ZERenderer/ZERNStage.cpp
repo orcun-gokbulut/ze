@@ -35,7 +35,6 @@
 
 #include "ZERNStage.h"
 
-#include "ZERNCommand.h"
 #include "ZEGraphics\ZEGRContext.h"
 
 const ZEGRRenderState& ZERNStage::GetRenderState()

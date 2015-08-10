@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPointLight.h
+ Zinek Engine - ZELightPoint.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,15 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_POINT_LIGHT_H__
-#define __ZE_POINT_LIGHT_H__
 
 #include "ZELight.h"
 #include "ZEMath/ZEViewSphere.h"
 
 class ZEGRTexture2D;
 
-class ZEPointLight  : public ZELight
+class ZELightPoint  : public ZELight
 {
 	ZE_OBJECT
 	private:
@@ -51,8 +49,8 @@ class ZEPointLight  : public ZELight
 
 		virtual bool					DeinitializeSelf();
 
-										ZEPointLight();
-		virtual							~ZEPointLight();
+										ZELightPoint();
+		virtual							~ZELightPoint();
 
 	public:
 		ZELightType						GetLightType();
@@ -63,9 +61,5 @@ class ZEPointLight  : public ZELight
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
-
-		static ZEPointLight*			CreateInstance();
+		static ZELightPoint*			CreateInstance();
 };
-
-#endif

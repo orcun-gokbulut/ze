@@ -35,8 +35,6 @@
 
 #include "ZECloud.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZECloudMaterial.h"
-#include "ZERNDrawParameters.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZETexture/ZETexture2DResource.h"
 
@@ -216,99 +214,18 @@ bool ZECloud::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	// Create Material
-	if (CloudMaterial == NULL)
-	{
-		CloudMaterial = ZECloudMaterial::CreateInstance();
-		CloudMaterial->Camera = Camera;
-		CloudMaterial->UpdateMaterial();
-	
-		// Send initial Parameters to material
-		CloudMaterial->Camera					= Camera;
-		//CloudMaterial->EarthRadius			= EarthRadius;
-		//CloudMaterial->AtmosphereHeight		= AtmosphereHeight;
-		CloudMaterial->CloudCover				= CloudCover;
-		CloudMaterial->WindVelocity				= WindVelocity;
-		CloudMaterial->CloudPlaneHeight			= CloudPlaneHeight;
-		CloudMaterial->AmbientColor				= AmbientColor;
-		CloudMaterial->SunLightColor			= SunLightColor;
-		CloudMaterial->SunLightDirection		= SunLightDirection;
-
-		if (CloudFormationTexture != NULL)
-			CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture2D();
-	}
-
-
-	CloudRenderCommand.Priority			= 1;
-	CloudRenderCommand.Order			= 1.3f;
-	CloudRenderCommand.Pipeline			= ZE_RORP_3D;
-	CloudRenderCommand.VertexBuffer		= (ZEGRVertexBuffer*)-1;
-	CloudRenderCommand.PrimitiveType	= ZE_ROPT_TRIANGLE;
-	CloudRenderCommand.Flags			= ZE_ROF_NONE;
-	CloudRenderCommand.PrimitiveCount	= 0;
-	CloudRenderCommand.VertexDeclaration = (ZEVertexDeclaration*)-1;
-	CloudRenderCommand.IndexBuffer		= (ZEGRIndexBuffer*)-1;
-
 	return true;
 }
 
 bool ZECloud::DeinitializeSelf()
 {
-	if (CloudMaterial != NULL)
-	{
-		CloudMaterial->Destroy();
-		CloudMaterial = NULL;
-	}
-
-	if (CloudFormationTexture != NULL)
-	{
-		CloudFormationTexture->Release();
-		CloudFormationTexture = NULL;
-	}
-
-	CloudRenderCommand.SetZero();
-
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZECloud::Draw(ZERNDrawParameters* DrawParameters)
-{
-	// Set updated parameters to material
-	
-	// CloudMaterial->Rayleigh				= Rayleigh;
-	// CloudMaterial->Mie					= Mie;
-	// CloudMaterial->G						= G;
-	// CloudMaterial->LightScale			= LightScale;
-	// CloudMaterial->AmbientScale			= AmbientScale;
-	// CloudMaterial->AmbientColor			= AmbientColor;
-	CloudMaterial->AmbientColor				= AmbientColor;
-
-	// Update materials parameters before drawing
-	CloudMaterial->Camera					= Camera;
-	//CloudMaterial->EarthRadius			= EarthRadius;
-	//CloudMaterial->AtmosphereHeight		= AtmosphereHeight;
-	CloudMaterial->CloudCover				= CloudCover;
-	CloudMaterial->WindVelocity				= WindVelocity;
-	//CloudMaterial->CloudPlaneHeight		= CloudPlaneHeight;
-	CloudMaterial->SunLightColor			= SunLightColor;
-	CloudMaterial->SunLightDirection		= SunLightDirection;
-
-	if (CloudFormationTexture != NULL)
-		CloudMaterial->CloudFormationTexture = CloudFormationTexture->GetTexture2D();
-
-	CloudRenderCommand.Order				= 1.3f;
-	CloudRenderCommand.Priority				= 1;
-
-	CloudRenderCommand.VertexBufferOffset	= 0;
-	CloudRenderCommand.Material				= CloudMaterial;
-	CloudRenderCommand.WorldMatrix			= GetWorldTransform();
-	DrawParameters->Renderer->AddCommand(&CloudRenderCommand);
-
-}
 
 void ZECloud::Tick(float Time)
 {
-	CloudMaterial->UpdateParameters(Time);
+
 }
 
 ZECloud* ZECloud::CreateInstance()

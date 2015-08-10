@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECanvasBrush.h
+ Zinek Engine - ZERNRenderParameters.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,45 +35,55 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZEGraphics/ZEGRHolder.h"
-#include "ZERenderer/ZERNCommand.h"
+#include "ZERNView.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEDS/ZEList2.h"
 
-class ZERNMaterial;
-class ZEGRVertexBuffer;
-class ZEGRRenderStateData;
+typedef ZEFlags ZERNRenderFlags;
+#define ZERN_RF_NONE				0x0
+#define ZERN_RF_DRAW				0x1
+#define ZERN_RF_CULL				0x2
+#define ZERN_RF_PROBE				0x4
 
-class ZECanvasBrush : public ZEEntity
+typedef ZEUInt32 ZERNStageMask, ZERNStageID;
+#define ZERN_S_STAGE_ID(Id) (1<<ID)
+#define ZERN_S_DEFERRED_GPASS			ZERN_S_STAGE_ID(0)
+#define ZERN_S_FORWARD					ZERN_S_STAGE_ID(1)
+#define ZERN_S_FORWARD_TRANSPARANT		ZERN_S_STAGE_ID(2)
+#define ZERN_S_POST_HDR					ZERN_S_STAGE_ID(3)
+#define ZERN_S_POST_EFFECT				ZERN_S_STAGE_ID(4)
+#define ZERN_S_2D						ZERN_S_STAGE_ID(5)
+#define ZERN_S_SHADOW_OMNI				ZERN_S_STAGE_ID(6)
+#define ZERN_S_SHADOW_DIRECTIONAL		ZERN_S_STAGE_ID(7)
+#define ZERN_S_SHADOW_PROJECTIVE		ZERN_S_STAGE_ID(8)
+
+class ZERNRenderer;
+class ZERNStage;
+class ZERNCommand;
+class ZEGRContext;
+class ZEScene;
+
+enum ZERNDrawType
 {
-	ZE_OBJECT
-	
-	private:
-		ZERNCommand						RenderCommand;
-		ZESize							OldVertexCount;
-		ZEGRHolder<ZEGRRenderStateData>	RenderState;
-		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEGRHolder<ZERNMaterial>		Material;
-		ZECanvas						Canvas;
+	ZERN_DT_CULL,
+	ZERN_DT_DRAW_NORMAL,
+	ZERN_DT_DRAW_OMNI,
+	ZERN_DT_DRAW_PROJECTIVE,
+	ZERN_DT_DRAW_ORTOGONAL
+};
 
-		void							UpdateRenderState();
-
-	protected:
-		virtual bool					DeinitializeSelf();
-
-										ZECanvasBrush();
-		virtual							~ZECanvasBrush();
-
+class ZERNRenderParameters
+{
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
-		ZECanvas*						GetCanvas();
-
-		void							UpdateCanvas();
-
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
-		virtual void					Tick(float ElapsedTime);
-
-		static ZECanvasBrush*			CreateInstance();
+		ZESize							FrameId;
+		float							ElapsedTime;
+		float							Time;
+		ZEScene*						Scene;
+		ZEGRContext*					Context;
+		ZERNView*						View;
+		ZERNRenderer*					Renderer;
+		ZERNDrawType					Type;
+		ZERNStageID						StageID;
+		ZERNStage*						Stage;
+		ZERNCommand*					Command;
 };

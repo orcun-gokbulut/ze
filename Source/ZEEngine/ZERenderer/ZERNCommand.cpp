@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEPointLight.cpp
+ Zinek Engine - ZERNCommand.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEPointLight.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEShadowRenderer.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEEntityProvider.h"
-
-ZELightType ZEPointLight::GetLightType()
-{
-	return ZE_LT_POINT;
-}
-
-bool ZEPointLight::DeinitializeSelf()
-{
-	return ZELight::DeinitializeSelf();
-}
-
-ZESize ZEPointLight::GetViewCount()
-{
-	return 1;
-}
-
-const ZEViewVolume& ZEPointLight::GetViewVolume(ZESize Index)
-{
-	if (UpdateViewVolume)
-	{
-		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
-		UpdateViewVolume = false;
-	}
-	
-	return ViewVolume;
-}
-
-const ZEMatrix4x4& ZEPointLight::GetViewTransform(ZESize Index)
-{
-	return ViewProjectionMatrix;
-}
-
-void ZEPointLight::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass != ZE_RP_COLOR)
-		return;
-
-	ZEBSphere LightBoundingSphere;
-	LightBoundingSphere.Position = GetWorldPosition();
-	LightBoundingSphere.Radius = GetRange();
-
-	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-		ZELight::Draw(DrawParameters);
-
-}
-
-ZEPointLight::ZEPointLight()
-{
-	ViewProjectionMatrix = ZEMatrix4x4::Identity;
-}
-
-ZEPointLight::~ZEPointLight()
-{
-
-}
-
-ZEPointLight* ZEPointLight::CreateInstance()
-{
-	return new ZEPointLight();
-}
+#include "ZERNCommand.h"

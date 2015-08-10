@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELight.h"
-#include "ZERNCommand.h"
+
 #include "ZERNRenderer.h"
 
 float ZELight::AttenuationFunction(float RootToTry)
@@ -162,11 +162,6 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 		UpdateViewVolume = true;
 		ZEEntity::SetRotation(NewRotation);
 	}
-}
-
-void ZELight::Draw(ZERNDrawParameters* DrawParameters)
-{
-	DrawParameters->Lights.Add(this);
 }
 
 ZELight::ZELight()

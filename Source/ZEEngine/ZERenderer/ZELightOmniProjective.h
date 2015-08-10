@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEOmniProjectiveLight.cpp
+ Zinek Engine - ZELightOmniProjective.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,87 +33,43 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEOmniProjectiveLight.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEShadowRenderer.h"
-#include "ZEGraphics/ZEGRTexture.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGame/ZEEntityProvider.h"
+#pragma once
 
-ZELightType ZEOmniProjectiveLight::GetLightType()
+#include "ZELight.h"
+#include "ZEMath/ZEViewSphere.h"
+
+class ZEGRTextureCube;
+class ZEGRTexture2D;
+
+class ZELightOmniProjective : public ZELight
 {
-	return ZE_LT_OMNIPROJECTIVE;
-}
+	ZE_OBJECT
 
-const ZEGRTextureCube* ZEOmniProjectiveLight::GetProjectionTexture()
-{
-	return ProjectionTexture;
-}
+	private:
+		const ZEGRTextureCube*			ProjectionTexture;
+		ZEViewSphere					ViewVolume;
+		ZEGRTexture2D*					FrontShadowMap;
+		ZEGRTexture2D*					BackShadowMap;
+		ZEMatrix4x4						ViewProjectionMatrix;
 
-void ZEOmniProjectiveLight::SetProjectionTexture(const ZEGRTextureCube* Texture)
-{
-	ProjectionTexture = Texture;
-}
+		virtual bool					DeinitializeSelf();
 
-void ZEOmniProjectiveLight::SetCastsShadow(bool NewValue)
-{
-	ZELight::SetCastsShadow(NewValue);
-}
+										ZELightOmniProjective();
+		virtual							~ZELightOmniProjective();
 
-bool ZEOmniProjectiveLight::DeinitializeSelf()
-{
-	return ZELight::DeinitializeSelf();
-}
+	public:
+		ZELightType						GetLightType();
 
-ZESize ZEOmniProjectiveLight::GetViewCount()
-{
-	return 1;
-}
+		const ZEGRTextureCube*			GetShadowMap();
 
-const ZEViewVolume& ZEOmniProjectiveLight::GetViewVolume(ZESize Index)
-{
-	if (UpdateViewVolume)
-	{
-		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
-		UpdateViewVolume = false;
-	}
+		void							SetProjectionTexture(const ZEGRTextureCube* Texture);
+		const ZEGRTextureCube*			GetProjectionTexture();
 
-	return ViewVolume;
-}
+		virtual void					SetCastsShadow(bool NewValue);
+		
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 
-const ZEMatrix4x4& ZEOmniProjectiveLight::GetViewTransform(ZESize Index)
-{	
-	return ViewProjectionMatrix;
-}
-
-void ZEOmniProjectiveLight::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass != ZE_RP_COLOR)
-		return;
-
-	ZEBSphere LightBoundingSphere;
-	LightBoundingSphere.Position = GetWorldPosition();
-	LightBoundingSphere.Radius = GetRange();
-
-	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-		ZELight::Draw(DrawParameters);
-}
-
-ZEOmniProjectiveLight::ZEOmniProjectiveLight()
-{
-	ProjectionTexture = NULL;
-
-	FrontShadowMap = NULL;
-	BackShadowMap = NULL;
-	ViewProjectionMatrix = ZEMatrix4x4::Identity;
-}
-
-ZEOmniProjectiveLight::~ZEOmniProjectiveLight()
-{
-
-}
-
-ZEOmniProjectiveLight* ZEOmniProjectiveLight::CreateInstance()
-{
-	return new ZEOmniProjectiveLight();
-}
+		static ZELightOmniProjective*	CreateInstance();
+};

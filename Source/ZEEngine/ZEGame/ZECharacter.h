@@ -85,7 +85,7 @@ enum ZECharacterRecordingStatus
 	ZE_CRS_PLAYING
 };
 
-class ZEProjectiveLight;
+class ZELightProjective;
 
 class ZEGameCharacter : public ZEEntity
 {

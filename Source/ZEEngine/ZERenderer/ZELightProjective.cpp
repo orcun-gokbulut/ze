@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProjectiveLight.cpp
+ Zinek Engine - ZELightProjective.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEProjectiveLight.h"
+#include "ZELightProjective.h"
 
-#include "ZEShadowRenderer.h"
+#include "ZEError.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZETexture/ZETexture2DResource.h"
 
-#include "ZEError.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZEMath/ZEAngle.h"
-
-#include <string.h>
-
-ZELightType ZEProjectiveLight::GetLightType()
+ZELightType ZELightProjective::GetLightType()
 {
 	return ZE_LT_PROJECTIVE;
 }
 
-void ZEProjectiveLight::SetFOV(float FOV)
+void ZELightProjective::SetFOV(float FOV)
 {
 	this->FOV = FOV;
 }
 
-float ZEProjectiveLight::GetFOV() const
+float ZELightProjective::GetFOV() const
 {
 	return FOV;
 }
 
-void ZEProjectiveLight::SetAspectRatio(float AspectRatio)
+void ZELightProjective::SetAspectRatio(float AspectRatio)
 {
 	this->AspectRatio = AspectRatio;
 }
 
-float ZEProjectiveLight::GetAspectRatio() const
+float ZELightProjective::GetAspectRatio() const
 {
 	return AspectRatio;
 }
 
-void ZEProjectiveLight::SetProjectionTexture(const ZEGRTexture2D* Texture)
+void ZELightProjective::SetProjectionTexture(const ZEGRTexture2D* Texture)
 {
 	ProjectionTexture = Texture;
 }
 
-const ZEGRTexture2D* ZEProjectiveLight::GetProjectionTexture() const
+const ZEGRTexture2D* ZELightProjective::GetProjectionTexture() const
 {
 	return ProjectionTexture;
 }
 
-void ZEProjectiveLight::SetProjectionTextureFile(const ZEString& FileName)
+void ZELightProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
 	ProjectionTextureFile = FileName;
 	if (IsInitialized())
@@ -99,22 +95,22 @@ void ZEProjectiveLight::SetProjectionTextureFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZEProjectiveLight::GetProjectionTextureFile() const
+const ZEString& ZELightProjective::GetProjectionTextureFile() const
 {
 	return ProjectionTextureFile;
 }
 
-ZEGRTexture2D* ZEProjectiveLight::GetShadowMap()
+ZEGRTexture2D* ZELightProjective::GetShadowMap()
 {
 	return ShadowMap;
 }
 
-ZESize ZEProjectiveLight::GetViewCount()
+ZESize ZELightProjective::GetViewCount()
 {
 	return 1;
 }
 
-const ZEViewVolume& ZEProjectiveLight::GetViewVolume(ZESize Index)
+const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index)
 {
 	if (UpdateViewVolume)
 	{
@@ -125,12 +121,12 @@ const ZEViewVolume& ZEProjectiveLight::GetViewVolume(ZESize Index)
 	return ViewVolume;
 }
 
-const ZEMatrix4x4& ZEProjectiveLight::GetViewTransform(ZESize CascadeIndex)
+const ZEMatrix4x4& ZELightProjective::GetViewTransform(ZESize CascadeIndex)
 {
 	return ViewProjectionMatrix;
 }
 
-bool ZEProjectiveLight::InitializeSelf()
+bool ZELightProjective::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
@@ -150,7 +146,7 @@ bool ZEProjectiveLight::InitializeSelf()
 	return true;
 }
 
-bool ZEProjectiveLight::DeinitializeSelf()
+bool ZELightProjective::DeinitializeSelf()
 {
 	if (ProjectionTextureResource != NULL)
 	{
@@ -161,20 +157,7 @@ bool ZEProjectiveLight::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEProjectiveLight::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass != ZE_RP_COLOR)
-		return;
-
-	ZEBSphere LightBoundingSphere;
-	LightBoundingSphere.Position = GetWorldPosition();
-	LightBoundingSphere.Radius = GetRange();
-
-	if (!DrawParameters->ViewVolume->CullTest(LightBoundingSphere))
-		ZELight::Draw(DrawParameters);
-}
-
-ZEProjectiveLight::ZEProjectiveLight()
+ZELightProjective::ZELightProjective()
 {
 	FOV = ZE_PI_2;
 	AspectRatio = 1.0f;
@@ -184,12 +167,12 @@ ZEProjectiveLight::ZEProjectiveLight()
 	ViewProjectionMatrix = ZEMatrix4x4::Identity;
 }
 
-ZEProjectiveLight::~ZEProjectiveLight()
+ZELightProjective::~ZELightProjective()
 {
 
 }
 
-ZEProjectiveLight* ZEProjectiveLight::CreateInstance()
+ZELightProjective* ZELightProjective::CreateInstance()
 {
-	return new ZEProjectiveLight();
+	return new ZELightProjective();
 }

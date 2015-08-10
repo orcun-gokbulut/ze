@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWeather.h"
-#include "ZERenderer/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEScene.h"
 #include "ZEGame.h"
@@ -98,12 +98,12 @@ ZESkyBrush*	ZEWeather::GetStarMap() const
 	return StarMap;
 }
 
-ZEDirectionalLight* ZEWeather::GetSunLight() const
+ZELightDirectional* ZEWeather::GetSunLight() const
 {
 	return SunLight;
 }
 
-ZEDirectionalLight* ZEWeather::GetMoonLight() const
+ZELightDirectional* ZEWeather::GetMoonLight() const
 {
 	return MoonLight;
 }
@@ -334,7 +334,7 @@ ZEWeather::ZEWeather()
 	ZEQuaternion::CreateFromDirection(SunRotation, SunDirection);
 
 	// Sun Light
-	SunLight = ZEDirectionalLight::CreateInstance();
+	SunLight = ZELightDirectional::CreateInstance();
 	SunLight->SetName("SunLight");
 	SunLight->SetVisible(true);
 	SunLight->SetEnabled(true);
@@ -350,7 +350,7 @@ ZEWeather::ZEWeather()
 	ZEQuaternion::CreateFromDirection(MoonRotation, -SunDirection);
 
 	// Moon Light
-	MoonLight = ZEDirectionalLight::CreateInstance();
+	MoonLight = ZELightDirectional::CreateInstance();
 	MoonLight->SetName("MoonLight");
 	MoonLight->SetEnabled(true);
 	MoonLight->SetVisible(true);
