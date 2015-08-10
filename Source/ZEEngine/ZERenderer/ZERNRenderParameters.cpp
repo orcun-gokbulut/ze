@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDirectionalLight.cpp
+ Zinek Engine - ZERNCommand.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDirectionalLight.h"
-
-ZELightType ZEDirectionalLight::GetLightType()
-{
-	return ZE_LT_DIRECTIONAL;
-}
-
-bool ZEDirectionalLight::InitializeSelf()
-{
-	return true;
-}
-
-bool ZEDirectionalLight::DeinitializeSelf()
-{
-
-	return ZEEntity::DeinitializeSelf();
-}
-
-ZEDirectionalLight* ZEDirectionalLight::CreateInstance()
-{
-	return new ZEDirectionalLight();
-}
-
-
-ZESize ZEDirectionalLight::GetViewCount()
-{
-	return 0;
-}
-
-const ZEViewVolume& ZEDirectionalLight::GetViewVolume(ZESize Index)
-{
-	static ZEViewCuboid Volume;
-	return Volume;
-}
-
-const ZEMatrix4x4& ZEDirectionalLight::GetViewTransform(ZESize CascadeIndex)
-{
-	return ZEMatrix4x4::Identity;
-}
-
-ZEDirectionalLight::ZEDirectionalLight()
-{
-
-}
-
-ZEDirectionalLight::~ZEDirectionalLight()
-{
-	Deinitialize();
-}
+#include "ZERNCommand.h"

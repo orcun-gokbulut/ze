@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECanvasBrush.h
+ Zinek Engine - ZELightProjective.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,45 +35,57 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZEGraphics/ZEGRHolder.h"
-#include "ZERenderer/ZERNCommand.h"
+#include "ZELight.h"
 
-class ZERNMaterial;
-class ZEGRVertexBuffer;
-class ZEGRRenderStateData;
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEViewFrustum.h"
 
-class ZECanvasBrush : public ZEEntity
+class ZEGRTexture2D;
+class ZETexture2DResource;
+
+class ZELightProjective : public ZELight
 {
 	ZE_OBJECT
-	
+
 	private:
-		ZERNCommand						RenderCommand;
-		ZESize							OldVertexCount;
-		ZEGRHolder<ZEGRRenderStateData>	RenderState;
-		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEGRHolder<ZERNMaterial>		Material;
-		ZECanvas						Canvas;
+		float							FOV;
+		float							AspectRatio;
+		ZEViewFrustum					ViewVolume;
+		const ZEGRTexture2D*				ProjectionTexture;
+		ZEGRTexture2D*					ShadowMap;
+		ZEMatrix4x4						ViewProjectionMatrix;
+		
+		ZETexture2DResource*			ProjectionTextureResource;
+		ZEString						ProjectionTextureFile;
 
-		void							UpdateRenderState();
-
-	protected:
+		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
-										ZECanvasBrush();
-		virtual							~ZECanvasBrush();
+										ZELightProjective();
+		virtual							~ZELightProjective();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
+		ZELightType						GetLightType();
 
-		ZECanvas*						GetCanvas();
+		void							SetFOV(float FOV);
+		float							GetFOV() const;
 
-		void							UpdateCanvas();
+		void							SetAspectRatio(float AspectRatio);
+		float							GetAspectRatio() const;
 
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
-		virtual void					Tick(float ElapsedTime);
+		void							SetProjectionTextureFile(const ZEString& Filename);
+		const ZEString&					GetProjectionTextureFile() const;
 
-		static ZECanvasBrush*			CreateInstance();
+		void							SetProjectionTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*			GetProjectionTexture() const;
+
+		virtual ZESize					GetViewCount();
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
+
+		virtual void					SetCastsShadow(bool NewValue);
+
+		ZEGRTexture2D*					GetShadowMap();
+
+		static ZELightProjective*		CreateInstance();
 };

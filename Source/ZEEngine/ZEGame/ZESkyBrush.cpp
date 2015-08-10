@@ -39,7 +39,7 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGame/ZERNDrawParameters.h"
 #include "ZERenderer/ZESkyBoxMaterial.h"
-#include "ZERenderer/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZETexture/ZETextureCubeResource.h"
 
 #include <string.h>

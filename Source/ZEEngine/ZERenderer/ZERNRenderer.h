@@ -36,75 +36,16 @@
 #pragma once
 
 #include "ZEInitializable.h"
-#include "ZERNView.h"
+
 #include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEList2.h"
+#include "ZERNView.h"
 
-#define ZERN_MAX_COMMAND_STAGE 5
-
-typedef ZEFlags ZERNRenderFlags;
-#define ZERN_RF_NONE				0x0
-#define ZERN_RF_DRAW				0x1
-#define ZERN_RF_CULL				0x2
-#define ZERN_RF_PROBE				0x4
-
-typedef ZEUInt32 ZERNStageMask, ZERNStageID;
-#define ZERN_S_STAGE_ID(Id) (1<<ID)
-#define ZERN_S_DEFERRED_GPASS			ZERN_S_STAGE_ID(0)
-#define ZERN_S_FORWARD					ZERN_S_STAGE_ID(1)
-#define ZERN_S_FORWARD_TRANSPARANT		ZERN_S_STAGE_ID(2)
-#define ZERN_S_POST_HDR					ZERN_S_STAGE_ID(3)
-#define ZERN_S_POST_EFFECT				ZERN_S_STAGE_ID(4)
-#define ZERN_S_2D						ZERN_S_STAGE_ID(5)
-#define ZERN_S_SHADOW_OMNI				ZERN_S_STAGE_ID(6)
-#define ZERN_S_SHADOW_DIRECTIONAL		ZERN_S_STAGE_ID(7)
-#define ZERN_S_SHADOW_PROJECTIVE		ZERN_S_STAGE_ID(8)
-
-class ZERNRenderer;
 class ZERNStage;
 class ZERNCommand;
-class ZEEntity;
-class ZEGRContext;
 class ZEScene;
-class ZECamera;
+class ZEGRContext;
 
-enum ZERNDrawType
-{
-	ZERN_DT_CULL,
-	ZERN_DT_DRAW_NORMAL,
-	ZERN_DT_DRAW_OMNI,
-	ZERN_DT_DRAW_PROJECTIVE,
-	ZERN_DT_DRAW_ORTOGONAL
-};
-
-class ZERNRenderParameters
-{
-	public:
-		ZESize						FrameId;
-		float						ElapsedTime;
-		float						Time;
-		ZEScene*					Scene;
-		ZERNRenderer*				Renderer;
-		ZERNDrawType				Type;
-		ZERNStageID					StageID;
-		ZERNStage*					Stage;
-		ZERNCommand*				Command;
-};
-
-class ZERNCommand
-{
-	public:
-		ZEInt							Priority;
-		float							Order;
-		ZEUInt							StageMask;
-		ZEEntity*						Entity;
-		void*							ExtraParameters;
-
-		ZELink<ZERNCommand>				StageQueueLinks[ZERN_MAX_COMMAND_STAGE];
-
-										ZERNCommand();
-};
 
 class ZERNStageQueue
 {
@@ -116,6 +57,8 @@ class ZERNStageQueue
 class ZERNRenderer : public ZEInitializable
 {
 	private:
+		// Lights
+		// Probes
 		ZEGRContext*				Device;
 		ZEScene*					Scene;
 		ZERNView					View;

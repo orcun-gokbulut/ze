@@ -45,7 +45,6 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZELineSegment.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"

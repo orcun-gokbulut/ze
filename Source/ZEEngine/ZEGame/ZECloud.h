@@ -34,14 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CLOUD_H__
-#define __ZE_CLOUD_H__
 
 #include "ZEEntity.h"
-#include "ZERenderer\ZECanvas.h"
-#include "ZERenderer\ZERNCommand.h"
 #include "ZETypes.h"
-#include "ZEMath\ZEAABBox.h"
+#include "ZERenderer\ZERNCommand.h"
+#include "ZEGraphics\ZEGRHolder.h"
 
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 ZE_META_FORWARD_DECLARE(ZECloudMaterial, "ZEGraphics/ZECloudMaterial.h")
@@ -69,10 +66,9 @@ class ZECloud : public ZEEntity
 		float					EarthRadius;
 		float					AtmosphereHeight;
 
-		ZETexture2DResource*	CloudFormationTexture;
+		ZEGRHolder<ZETexture2DResource>	CloudFormationTexture;
 
-		ZECloudMaterial*		CloudMaterial;
-		ZERNCommand			CloudRenderCommand;
+		ZERNCommand				CloudRenderCommand;
 
 		virtual bool			InitializeSelf();
 		virtual bool			DeinitializeSelf();
@@ -134,7 +130,4 @@ class ZECloud : public ZEEntity
 
 		static ZECloud*			CreateInstance();
 
-}; // class ZECloud
-
-
-#endif
+};

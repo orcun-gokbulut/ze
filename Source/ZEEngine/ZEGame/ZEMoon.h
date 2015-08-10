@@ -34,24 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MOON_H__
-#define __ZE_MOON_H__
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
 #include "ZERenderer\ZERNCommand.h"
 
-ZE_META_FORWARD_DECLARE(ZEMoonMaterial, "ZEGraphics/ZEMoonMaterial.h")
 ZE_META_FORWARD_DECLARE(ZETexture3DResource, "ZETexture/ZETexture3DResource.h")
 
 class ZEMoon : public ZEEntity
 {
 	ZE_OBJECT
-
-	protected:
-		ZEMoonMaterial*				Material;
+	private:
 		ZETexture3DResource*		Texture;
-		ZERNCommand				RenderCommand;
+		ZERNCommand					RenderCommand;
 
 		float						Phase;
 		float						Scale;
@@ -65,8 +60,6 @@ class ZEMoon : public ZEEntity
 
 									ZEMoon();
 		virtual						~ZEMoon();
-
-	private:
 
 	public:
 		virtual void				SetPhase(float Phase);
@@ -90,12 +83,7 @@ class ZEMoon : public ZEEntity
 		virtual void				SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
 		const ZEString				GetTexture() const;
 
-		virtual ZEDrawFlags			GetDrawFlags() const;
-
-		virtual void				Draw(ZERNDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);
 
 		static ZEMoon*				CreateInstance();
 };
-
-#endif // __ZE_MOON_H__

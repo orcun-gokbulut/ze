@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDirectionalLight.h
+ Zinek Engine - ZELightDirectional.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,29 +33,52 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZELightDirectional.h"
 
-#include "ZELight.h"
-#include "ZEMath/ZEViewCuboid.h"
-#include "ZEMath/ZEViewFrustum.h"
-
-class ZEDirectionalLight : public ZELight
+ZELightType ZELightDirectional::GetLightType()
 {
-	ZE_OBJECT
+	return ZE_LT_DIRECTIONAL;
+}
 
-	private:
-		bool								InitializeSelf();
-		bool								DeinitializeSelf();
+bool ZELightDirectional::InitializeSelf()
+{
+	return true;
+}
 
-											ZEDirectionalLight();
-		virtual								~ZEDirectionalLight();
+bool ZELightDirectional::DeinitializeSelf()
+{
 
-	public:
-		ZELightType							GetLightType();
+	return ZEEntity::DeinitializeSelf();
+}
 
-		ZESize								GetViewCount();
-		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
-		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
-		
-		static ZEDirectionalLight*			CreateInstance();
-};
+ZELightDirectional* ZELightDirectional::CreateInstance()
+{
+	return new ZELightDirectional();
+}
+
+
+ZESize ZELightDirectional::GetViewCount()
+{
+	return 0;
+}
+
+const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index)
+{
+	static ZEViewCuboid Volume;
+	return Volume;
+}
+
+const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize CascadeIndex)
+{
+	return ZEMatrix4x4::Identity;
+}
+
+ZELightDirectional::ZELightDirectional()
+{
+
+}
+
+ZELightDirectional::~ZELightDirectional()
+{
+	Deinitialize();
+}

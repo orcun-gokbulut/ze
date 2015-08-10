@@ -37,9 +37,7 @@
 #include "ZEMoon.h"
 
 #include "ZEMath\ZEVector.h"
-#include "ZERNDrawParameters.h"
 #include "ZERenderer\ZERNRenderer.h"
-#include "ZERenderer\ZEMoonMaterial.h"
 #include "ZETexture\ZETexture3DResource.h"
 
 void ZEMoon::SetPhase(float Phase)
@@ -120,97 +118,17 @@ const ZEString ZEMoon::GetTexture() const
 	return (Texture == NULL) ? "" : Texture->GetFileName();
 }
 
-ZEDrawFlags ZEMoon::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
-
 bool ZEMoon::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
-
-	if (Material == NULL)
-	{
-		Material = ZEMoonMaterial::CreateInstance();
-		Material->UpdateMaterial();
-
-		Material->MoonPhase				= Phase;
-		Material->MoonAmbientColor		= AmbientColor;
-		Material->MoonAmbientFactor		= AmbientFactor;
-		Material->MoonScale				= Scale;
-		Material->MoonRotation			= Rotation;
-		Material->MoonDirection			= Direction;
-	
-		if (Texture != NULL)
-			Material->MoonTexture = Texture->GetTexture();
-	}
 
 	return true;
 }
 
 bool ZEMoon::DeinitializeSelf()
 {
-	if (Material != NULL)
-	{
-		Material->Destroy();
-		Material = NULL;
-	}
-
-	if (Texture != NULL)
-	{
-		Texture->Release();
-		Texture = NULL;
-	}
-
 	return ZEEntity::DeinitializeSelf();
-}
-
-void ZEMoon::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
-		return;
-
-	if (Texture == NULL || Material == NULL)
-	{
-		zeWarning("Uninitialized variable in ZEMoon");
-		return;
-	}
-
-	Material->MoonPhase				= Phase;
-	Material->MoonAmbientColor		= AmbientColor;
-	Material->MoonAmbientFactor		= AmbientFactor;
-	Material->MoonScale				= Scale;
-	Material->MoonRotation			= Rotation;
-	Material->MoonDirection			= Direction;
-	
-	if (Texture != NULL)
-		Material->MoonTexture = Texture->GetTexture();
-
-	// ---------------------------------------
-
-	RenderCommand.Order				= 1.2f;
-	RenderCommand.Priority			= 1;
-	RenderCommand.Pipeline			= ZE_RORP_3D;
-	RenderCommand.PrimitiveCount	= 0;
-	RenderCommand.PrimitiveType		= ZE_ROPT_TRIANGLE_STRIPT;
-	RenderCommand.Flags				= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderCommand.VertexBufferOffset= 0;
-	RenderCommand.IndexBuffer		= (ZEGRIndexBuffer*)-1;
-	RenderCommand.VertexBuffer		= (ZEGRVertexBuffer*)-1;
-	RenderCommand.VertexDeclaration	= (ZEVertexDeclaration*)-1;
-	
-	// ---------------------------------------
-
-	RenderCommand.Material			= (ZERNMaterial*)Material;
-	RenderCommand.WorldMatrix		= GetWorldTransform();
-	DrawParameters->Renderer->AddCommand(&RenderCommand);
-	
-}
-
-void ZEMoon::Tick(float Time)
-{
-
 }
 
 ZEMoon* ZEMoon::CreateInstance()
@@ -220,27 +138,13 @@ ZEMoon* ZEMoon::CreateInstance()
 
 ZEMoon::ZEMoon()
 {	
-	Material			= NULL;
 	Texture				= NULL;
-	
 	Phase				= 0.3f;
 	Scale				= 0.05f;
 	Rotation			= 0.0f;
 	AmbientFactor		= 1.0f;
 	AmbientColor		= ZEVector3::One;
 	Direction			= ZEVector3(0.0001f, 1.0f, 0.0001f);
-
-	// Fill render command
-	RenderCommand.SetZero();
-	RenderCommand.Priority				= 4;
-	RenderCommand.Order					= 4.0f;
-	RenderCommand.PrimitiveCount		= 0;
-	RenderCommand.VertexBuffer			= NULL;
-	RenderCommand.IndexBuffer			= NULL;
-	RenderCommand.VertexDeclaration		= NULL;
-	RenderCommand.PrimitiveType			= ZE_ROPT_TRIANGLE_STRIPT;
-	RenderCommand.Flags					= ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	
 }
 
 ZEMoon::~ZEMoon()

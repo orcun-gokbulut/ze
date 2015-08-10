@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECanvasBrush.h
+ Zinek Engine - ZELightPoint.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZELightPoint.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntityProvider.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 
-#include "ZETypes.h"
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZEGraphics/ZEGRHolder.h"
-#include "ZERenderer/ZERNCommand.h"
-
-class ZERNMaterial;
-class ZEGRVertexBuffer;
-class ZEGRRenderStateData;
-
-class ZECanvasBrush : public ZEEntity
+ZELightType ZELightPoint::GetLightType()
 {
-	ZE_OBJECT
+	return ZE_LT_POINT;
+}
+
+bool ZELightPoint::DeinitializeSelf()
+{
+	return ZELight::DeinitializeSelf();
+}
+
+ZESize ZELightPoint::GetViewCount()
+{
+	return 1;
+}
+
+const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index)
+{
+	if (UpdateViewVolume)
+	{
+		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
+		UpdateViewVolume = false;
+	}
 	
-	private:
-		ZERNCommand						RenderCommand;
-		ZESize							OldVertexCount;
-		ZEGRHolder<ZEGRRenderStateData>	RenderState;
-		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEGRHolder<ZERNMaterial>		Material;
-		ZECanvas						Canvas;
+	return ViewVolume;
+}
 
-		void							UpdateRenderState();
+const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index)
+{
+	return ViewProjectionMatrix;
+}
 
-	protected:
-		virtual bool					DeinitializeSelf();
+ZELightPoint::ZELightPoint()
+{
+	ViewProjectionMatrix = ZEMatrix4x4::Identity;
+}
 
-										ZECanvasBrush();
-		virtual							~ZECanvasBrush();
+ZELightPoint::~ZELightPoint()
+{
 
-	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
+}
 
-		ZECanvas*						GetCanvas();
-
-		void							UpdateCanvas();
-
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
-		virtual void					Tick(float ElapsedTime);
-
-		static ZECanvasBrush*			CreateInstance();
-};
+ZELightPoint* ZELightPoint::CreateInstance()
+{
+	return new ZELightPoint();
+}

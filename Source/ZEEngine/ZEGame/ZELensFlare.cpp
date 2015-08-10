@@ -37,26 +37,17 @@
 #include "ZEGame/ZEScene.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGame/ZERNDrawParameters.h"
-#include "ZERenderer/ZESkyBoxMaterial.h"
-#include "ZERenderer/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZETexture/ZETextureCubeResource.h"
-
-
-#include <string.h>
 #include "ZEWeather.h"
 
-ZEDrawFlags ZELensFlare::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
+#include <string.h>
 
 bool ZELensFlare::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	
 	return true;
 }
 
@@ -68,11 +59,6 @@ bool ZELensFlare::DeinitializeSelf()
 
 void ZELensFlare::Draw(ZERNDrawParameters* DrawParameters)
 {
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
-		return;
-
-	// Find Sun
-
 	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Class());
 	if (Entities.GetSize() == 0)
 		return;
@@ -89,10 +75,6 @@ void ZELensFlare::Draw(ZERNDrawParameters* DrawParameters)
 	SunDirectionScreen.y /= SunDirectionScreen.w;
 
 	float Length = SunDirectionScreen.Length();
-	
-
-
-
 }
 
 void ZELensFlare::Tick(float Time)

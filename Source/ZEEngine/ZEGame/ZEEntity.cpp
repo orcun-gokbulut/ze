@@ -555,7 +555,7 @@ void ZEEntity::Tick(float Time)
 
 bool ZEEntity::Cull(ZERNCullParameters* CullParameters)
 {
-
+	return true;
 }
 
 void ZEEntity::Render(ZERNCommand* Command)

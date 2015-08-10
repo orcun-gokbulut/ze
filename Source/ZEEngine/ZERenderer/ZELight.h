@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_LIGHT_H__
-#define __ZE_LIGHT_H__
 
 #include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
@@ -107,5 +105,3 @@ class ZELight : public ZEEntity
 										ZELight();
 		virtual							~ZELight();
 };
-
-#endif

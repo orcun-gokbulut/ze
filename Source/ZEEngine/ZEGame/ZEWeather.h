@@ -34,14 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_WEATHER_H__
-#define __ZE_WEATHER_H__
 
 #include "ZEEntity.h"
 #include "ZEMath\ZEVector.h"
-#include "ZERNDrawParameters.h"
 
-ZE_META_FORWARD_DECLARE(ZEDirectionalLight, "ZEGraphics/ZEDirectionalLight.h")
+ZE_META_FORWARD_DECLARE(ZELightDirectional, "ZEGraphics/ZEDirectionalLight.h")
 ZE_META_FORWARD_DECLARE(ZESkyBrush, "ZESkyBrush.h")
 ZE_META_FORWARD_DECLARE(ZESkyDome, "ZESkyDome.h")
 ZE_META_FORWARD_DECLARE(ZECloud, "ZECloud.h")
@@ -50,15 +47,13 @@ ZE_META_FORWARD_DECLARE(ZEMoon, "ZEMoon.h")
 class ZEWeather : public ZEEntity
 {
 	ZE_OBJECT
-
-	protected:
-
+	private:
 		ZEMoon*						Moon;
 		ZECloud*					Cloud;
 		ZESkyDome*					SkyDome;
 		ZESkyBrush*					StarMap;
-		ZEDirectionalLight*			SunLight;
-		ZEDirectionalLight*			MoonLight;
+		ZELightDirectional*			SunLight;
+		ZELightDirectional*			MoonLight;
 
 		float						SunHeight;
 		float						MoonHeight;
@@ -85,15 +80,13 @@ class ZEWeather : public ZEEntity
 		virtual void				AdjustHDR(float DayTime);
 		virtual void				UpdateCloudColor();
 
-	private:
-
 	public:
 		ZEMoon*						GetMoon() const;
 		ZECloud*					GetCloud() const;
 		ZESkyDome*					GetSkyDome() const;
 		ZESkyBrush*					GetStarMap() const;
-		ZEDirectionalLight*			GetSunLight() const;
-		ZEDirectionalLight*			GetMoonLight() const;
+		ZELightDirectional*			GetSunLight() const;
+		ZELightDirectional*			GetMoonLight() const;
 
 		float						GetSunHeight() const;
 		float						GetMoonHeight() const;
@@ -138,5 +131,3 @@ class ZEWeather : public ZEEntity
 
 		static ZEWeather*			CreateInstance();
 };
-
-#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECanvasBrush.h
+ Zinek Engine - ZERNCommand.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,45 +35,22 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEEntity.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZEGraphics/ZEGRHolder.h"
-#include "ZERenderer/ZERNCommand.h"
+#include "ZEDS/ZEList2.h"
 
-class ZERNMaterial;
-class ZEGRVertexBuffer;
-class ZEGRRenderStateData;
+#define ZERN_MAX_COMMAND_STAGE 5
 
-class ZECanvasBrush : public ZEEntity
+class ZEEntity;
+
+class ZERNCommand
 {
-	ZE_OBJECT
-	
-	private:
-		ZERNCommand						RenderCommand;
-		ZESize							OldVertexCount;
-		ZEGRHolder<ZEGRRenderStateData>	RenderState;
-		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEGRHolder<ZERNMaterial>		Material;
-		ZECanvas						Canvas;
-
-		void							UpdateRenderState();
-
-	protected:
-		virtual bool					DeinitializeSelf();
-
-										ZECanvasBrush();
-		virtual							~ZECanvasBrush();
-
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
+		ZEInt							Priority;
+		float							Order;
+		ZEUInt							StageMask;
+		ZEEntity*						Entity;
+		void*							ExtraParameters;
 
-		ZECanvas*						GetCanvas();
+		ZELink<ZERNCommand>				StageQueueLinks[ZERN_MAX_COMMAND_STAGE];
 
-		void							UpdateCanvas();
-
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
-		virtual void					Tick(float ElapsedTime);
-
-		static ZECanvasBrush*			CreateInstance();
+										ZERNCommand();
 };

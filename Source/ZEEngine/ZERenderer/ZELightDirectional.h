@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProjectiveLight.h
+ Zinek Engine - ZELightDirectional.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PROJECTIVE_LIGHT_H__
-#define __ZE_PROJECTIVE_LIGHT_H__
 
 #include "ZELight.h"
-
-#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEViewCuboid.h"
 #include "ZEMath/ZEViewFrustum.h"
 
-class ZEGRTexture2D;
-class ZETexture2DResource;
-
-class ZEProjectiveLight : public ZELight
+class ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
-
 	private:
-		float							FOV;
-		float							AspectRatio;
-		ZEViewFrustum					ViewVolume;
-		const ZEGRTexture2D*				ProjectionTexture;
-		ZEGRTexture2D*					ShadowMap;
-		ZEMatrix4x4						ViewProjectionMatrix;
-		
-		ZETexture2DResource*			ProjectionTextureResource;
-		ZEString						ProjectionTextureFile;
+		bool								InitializeSelf();
+		bool								DeinitializeSelf();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
-
-										ZEProjectiveLight();
-		virtual							~ZEProjectiveLight();
+											ZELightDirectional();
+		virtual								~ZELightDirectional();
 
 	public:
-		ZELightType						GetLightType();
+		ZELightType							GetLightType();
 
-		void							SetFOV(float FOV);
-		float							GetFOV() const;
-
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio() const;
-
-		void							SetProjectionTextureFile(const ZEString& Filename);
-		const ZEString&					GetProjectionTextureFile() const;
-
-		void							SetProjectionTexture(const ZEGRTexture2D* Texture);
-		const ZEGRTexture2D*				GetProjectionTexture() const;
-
-		virtual ZESize					GetViewCount();
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
-
-		virtual void					SetCastsShadow(bool NewValue);
-
-		ZEGRTexture2D*					GetShadowMap();
-
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
-
-		static ZEProjectiveLight*		CreateInstance();
+		ZESize								GetViewCount();
+		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
+		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
+		
+		static ZELightDirectional*			CreateInstance();
 };
-
-#endif

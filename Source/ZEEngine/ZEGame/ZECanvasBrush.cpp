@@ -35,7 +35,6 @@
 
 #include "ZECanvasBrush.h"
 #include "ZEError.h"
-#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
@@ -75,41 +74,6 @@ void ZECanvasBrush::UpdateCanvas()
 	ZEAABBox BoundingBox;
 	Canvas.CalculateBoundingBox(BoundingBox);
 	SetBoundingBox(BoundingBox);
-	RenderCommand.VertexBuffer = Canvas.CreateVertexBuffer();
-}
-
-void ZECanvasBrush::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (RenderCommand.VertexBuffer != NULL)
-	{
-		RenderCommand.Lights.SetCount(DrawParameters->Lights.GetCount());
-		for (ZESize I = 0; I < DrawParameters->Lights.GetCount(); I++)
-			RenderCommand.Lights[I] = DrawParameters->Lights[I];
-
-		switch(PrimitiveType)
-		{
-			case ZE_ROPT_POINT:
-				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount();
-				break;			
-			case ZE_ROPT_LINE:
-				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() / 2;
-				break;			
-			case ZE_ROPT_TRIANGLE:
-				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() / 3;
-				break;			
-			case ZE_ROPT_TRIANGLE_STRIPT:
-				RenderCommand.PrimitiveCount = Canvas.Vertices.GetCount() - 2;
-				break;			
-			default:
-				RenderCommand.PrimitiveCount = 0;
-				break;
-		}
-
-		RenderCommand.Material = Material;
-		RenderCommand.PrimitiveType = PrimitiveType;
-		RenderCommand.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddCommand(&RenderCommand);
-	}
 }
 
 bool ZECanvasBrush::DeinitializeSelf()
