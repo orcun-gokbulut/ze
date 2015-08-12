@@ -38,6 +38,8 @@
 #include "ZECore/ZEApplicationModule.h"
 
 class ZEDScene;
+class ZEDSceneWrapper;
+class ZEDObjectWrapper;
 class ZEDViewPort;
 class ZEGrid;
 
@@ -46,11 +48,17 @@ class ZEDModule : public ZEApplicationModule
 	private:
 		ZEDViewPort* Viewport;
 		ZEDScene* Scene;
+		ZEDSceneWrapper* SceneWrapper;
 
 		ZEGrid* Grid;
 	public:
+		void SetViewPort(ZEDViewPort* Viewport);
 		ZEDViewPort* GetViewPort();
+
+		void SetScene(ZEDScene* Scene);
 		ZEDScene* GetScene();
+		
+		ZEDObjectWrapper* GetRootWrapper();
 
 		virtual void Tick(float ElapsedTime);
 		virtual void Render(float ElapsedTime);

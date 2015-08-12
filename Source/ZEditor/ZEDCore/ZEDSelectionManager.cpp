@@ -96,11 +96,13 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 	ZEMatrix4x4::CreateOrientation(SelectionPivot, SelectionCenterPosition, SelectionCenterRotation, ZEVector3::One);
 }
 
-void ZEDSelectionManager::ConfigureGizmo()
+void ZEDSelectionManager::UpdateSelectionGizmo()
 {
 	const ZEMatrix4x4& Pivot = GetSelectionPivot();
 	ZEDTransformSpace Space = ZEDTransformationManager::GetInstance()->GetTransformSpace();
 	ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
+
+	Gizmo->SetVisible(Selection.GetCount());
 
 	Gizmo->SetPosition(Pivot.GetTranslation());
 
@@ -129,7 +131,7 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 
 	Selection.Add(Object);
 
-	ConfigureGizmo();
+	UpdateSelectionGizmo();
 }
 
 void ZEDSelectionManager::SelectObject(const ZERay& Ray)
@@ -179,6 +181,9 @@ void ZEDSelectionManager::SelectObject(const ZEVector2& ScreenPoint1, const ZEVe
 		SelectObject(Ray);
 		return;
 	}
+
+	if (ScreenPoint1.x == ScreenPoint2.x || ScreenPoint1.y == ScreenPoint2.y)
+		return;
 
 	ZEVector2 LeftUp, RightDown;
 
@@ -256,7 +261,7 @@ void ZEDSelectionManager::SelectObject(ZESize Id)
 
 void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 {
-	if (Object = NULL)
+	if (Object == NULL)
 		return;
 
 	if (!Selection.Exists(Object))
@@ -264,7 +269,7 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 
 	Selection.RemoveValue(Object);
 
-	ConfigureGizmo();
+	UpdateSelectionGizmo();
 }
 
 void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
@@ -391,6 +396,7 @@ void ZEDSelectionManager::ClearSelection()
 {
 	Selection.Clear(false);
 	SelectionPivot = ZEMatrix4x4::Zero;
+	UpdateSelectionGizmo();
 }
 
 void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)

@@ -51,6 +51,6 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	ZEDMainEditor Editor;
 
 	Editor.show();
-	Application.connect(&Application, SIGNAL(lastWindowClosed()), &Application, SLOT(quit()));
+	Application.connect(&Application, SIGNAL(lastWindowClosed()), &Editor, SLOT(actExit_onTriggered()));
 	return Application.exec();
 }

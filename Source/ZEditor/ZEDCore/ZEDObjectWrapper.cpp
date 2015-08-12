@@ -158,9 +158,9 @@ ZEDObjectWrapper* ZEDObjectWrapper::GetParentWrapper()
 	return ParentWrapper;
 }
 
-ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetChildWrappers()
+const ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetChildWrappers()
 {
-	return ChildWrapper;
+	return ChildWrappers;
 }
 
 void ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper)
@@ -168,13 +168,13 @@ void ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper)
 	if (Wrapper == NULL)
 		return;
 
-	if (ChildWrapper.Exists(Wrapper))
+	if (ChildWrappers.Exists(Wrapper))
 		return;
 
 	if (!ZEClass::IsDerivedFrom(Object->GetClass(), Wrapper->GetObject()->GetClass()))
 		return;
 
-	ChildWrapper.Add(Wrapper);
+	ChildWrappers.Add(Wrapper);
 	Wrapper->SetParentWrapper(this);
 }
 
@@ -183,10 +183,10 @@ void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 	if (Wrapper == NULL)
 		return;
 
-	if (!ChildWrapper.Exists(Wrapper))
+	if (!ChildWrappers.Exists(Wrapper))
 		return;
 
-	ChildWrapper.RemoveValue(Wrapper);
+	ChildWrappers.RemoveValue(Wrapper);
 	Wrapper->SetParentWrapper(NULL);
 }
 

@@ -52,7 +52,7 @@ class ZEMaterial;
 class ZEDObjectWrapper : public ZEObject
 {
 /*	ZE_OBJECT*/
-	private:
+	protected:
 		ZESize Id;
 		ZEString Name;
 		ZEString Icon;
@@ -63,9 +63,8 @@ class ZEDObjectWrapper : public ZEObject
 		ZEObject* Object;
 
 		ZEDObjectWrapper* ParentWrapper;
-		ZEArray<ZEDObjectWrapper*> ChildWrapper;
+		ZEArray<ZEDObjectWrapper*> ChildWrappers;
 		
-	protected:
 		ZEMaterial* Material;
 		ZECanvas DrawCanvas;
 		ZERenderCommand RenderCommand;
@@ -127,10 +126,10 @@ class ZEDObjectWrapper : public ZEObject
 		virtual void Draw(ZEDrawParameters* Parameters);
 		virtual void Tick(float ElapsedTime);
 
-		void SetParentWrapper(ZEDObjectWrapper* Wrapper);
-		ZEDObjectWrapper* GetParentWrapper();
+		virtual void SetParentWrapper(ZEDObjectWrapper* Wrapper);
+		virtual ZEDObjectWrapper* GetParentWrapper();
 
-		ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
+		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
 		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
 

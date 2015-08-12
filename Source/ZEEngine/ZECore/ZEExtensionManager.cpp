@@ -110,11 +110,11 @@ class ZEExtensionManager* ZEExtensionManager::GetInstance()
 	return ZECore::GetInstance()->GetExtensionManager();
 }
 
-#include "ZEModules/ZEWindowsInput/ZEWindowsInputModule.h"
+#include "ZEModules/ZEVirtualInput/ZEVirtualInputModule.h"
 
 ZEExtensionManager::ZEExtensionManager()
 {
-	RegisterExtension(ZEWindowsInputModule::Description());
+	RegisterExtension(ZEVirtualInputModule::Description());
 }
 
 ZEExtensionManager::~ZEExtensionManager()

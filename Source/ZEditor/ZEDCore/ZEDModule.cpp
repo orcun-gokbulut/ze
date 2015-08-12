@@ -35,22 +35,40 @@
 
 #include "ZEDModule.h"
 #include "ZEDScene.h"
+#include "ZEDSceneWrapper.h"
 #include "ZEDViewPort.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEGrid.h"
-#include "ZEModel/ZEModel.h"
 #include "ZEDTransformationManager.h"
 #include "ZEDCore.h"
 #include "ZEDGizmo.h"
+#include "ZEDEntityWrapper.h"
+#include "ZEGraphics/ZERenderer.h"
+#include "ZEGame/ZEGrid.h"
+#include "ZEModel/ZEModel.h"
+
+void ZEDModule::SetScene(ZEDScene* Scene)
+{
+	this->Scene = Scene;
+}
 
 ZEDScene* ZEDModule::GetScene()
 {
 	return Scene;
 }
 
+void ZEDModule::SetViewPort(ZEDViewPort* Viewport)
+{
+	//Multiple ViewPorts across different widgets will have a reference in here.
+	this->Viewport = Viewport;
+}
+
 ZEDViewPort* ZEDModule::GetViewPort()
 {
 	return Viewport;
+}
+
+ZEDObjectWrapper* ZEDModule::GetRootWrapper()
+{
+	return SceneWrapper;
 }
 
 void ZEDModule::Tick(float ElapsedTime)
@@ -72,36 +90,43 @@ void ZEDModule::StartUp()
 	{
 		Scene = ZEDScene::CreateInstance();
 		Scene->Initialize();
+
+		SceneWrapper = ZEDSceneWrapper::CreateInstance();
+		SceneWrapper->SetObject(Scene);
 	}
 
-	Viewport->Initialize();
-
 	Grid = ZEGrid::CreateInstance();
-	Scene->AddEntity(Grid);
-	Scene->GetWrapper(Grid)->SetObjectSelectable(false);
+	ZEDEntityWrapper* GridWrapper = ZEDEntityWrapper::CreateInstance();
+	GridWrapper->SetObject(Grid);
+	GridWrapper->SetObjectSelectable(false);
+	SceneWrapper->AddChildWrapper(GridWrapper);
 
 	ZEModel* Trial = ZEModel::CreateInstance();
 	Trial->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
 	Trial->SetUserDefinedBoundingBoxEnabled(true);
-	Scene->AddEntity(Trial);
+	ZEDEntityWrapper* Trial1Wrapper = ZEDEntityWrapper::CreateInstance();
+	Trial1Wrapper->SetObject(Trial);
+	SceneWrapper->AddChildWrapper(Trial1Wrapper);
 
 	ZEModel* Trial2 = ZEModel::CreateInstance();
 	Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
 	Trial2->SetUserDefinedBoundingBoxEnabled(true);
 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
-	Scene->AddEntity(Trial2);
+	ZEDEntityWrapper* Trial2Wrapper = ZEDEntityWrapper::CreateInstance();
+	Trial2Wrapper->SetObject(Trial2);
+	SceneWrapper->AddChildWrapper(Trial2Wrapper);
 
-	Scene->AddEntity(ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo());
-	Scene->GetWrapper(ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo())->SetObjectSelectable(false);
-
-	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_TRANSLATE);
-	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_MOVE);
+	ZEDGizmo* Gizmo = ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo();
+	Gizmo->SetMode(ZED_GM_HELPER);
+	Gizmo->SetVisible(false);
+	ZEDEntityWrapper* GizmoWrapper = ZEDEntityWrapper::CreateInstance();
+	GizmoWrapper->SetObject(Gizmo);
+	GizmoWrapper->SetObjectSelectable(false);
+	SceneWrapper->AddChildWrapper(GizmoWrapper);
 }
 
 void ZEDModule::ShutDown()
 {
-	Viewport->Deinitialize();
-
 	if (Scene != NULL)
 	{
 		Scene->Deinitialize();
@@ -113,7 +138,8 @@ void ZEDModule::ShutDown()
 ZEDModule::ZEDModule()
 {
 	Scene = NULL;
-	Viewport = new ZEDViewPort();
+	SceneWrapper = NULL;
+	Viewport = NULL;
 }
 
 ZEDModule::~ZEDModule()

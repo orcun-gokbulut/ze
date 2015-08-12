@@ -123,6 +123,8 @@ bool ZEDTransformationOperation::Apply()
 		return false;
 	}
 
+	ZEDSelectionManager::GetInstance()->UpdateSelectionGizmo();
+
 	return true;
 }
 
@@ -211,6 +213,8 @@ bool ZEDTransformationOperation::Revert()
 	{
 		return false;
 	}
+
+	ZEDSelectionManager::GetInstance()->UpdateSelectionGizmo();
 
 	return true;
 }

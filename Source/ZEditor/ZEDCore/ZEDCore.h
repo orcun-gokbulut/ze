@@ -64,6 +64,7 @@ class ZEDCore
 		const ZEArray<ZEClass*>& GetWrapperTypes();
 
 		void InitializeEngine();
+		void ProcessEngine();
 		void DeinitializeEngine();
 
 		void Destroy();
