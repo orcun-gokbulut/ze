@@ -50,6 +50,8 @@ enum ZEDViewMode
 	ZED_VM_LOCKED
 };
 
+class ZEDScene;
+
 class ZEDViewPort : public QFrame
 {
 	Q_OBJECT
@@ -57,6 +59,7 @@ class ZEDViewPort : public QFrame
 	private:
 		ZEDViewMode ViewMode;
 		ZECamera* Camera;
+		ZEDScene* Scene;
 
 		QSet<ZEInt> PressedKeyboardKeys;
 		ZEInt StepSize;
@@ -93,6 +96,9 @@ class ZEDViewPort : public QFrame
 		void SetViewMode(ZEDViewMode Mode);
 		ZEDViewMode GetViewMode();
 		const ZEView& GetView();
+
+		void SetScene(ZEDScene* Scene);
+		ZEDScene* GetScene();
 
 		void SetStepSize(ZEInt StepSize);
 		ZEInt GetStepSize();

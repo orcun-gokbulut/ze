@@ -373,6 +373,9 @@
    <property name="text">
     <string>Rotate</string>
    </property>
+   <property name="shortcut">
+    <string>R</string>
+   </property>
   </action>
   <action name="actMove">
    <property name="checkable">
@@ -381,6 +384,9 @@
    <property name="text">
     <string>Move</string>
    </property>
+   <property name="shortcut">
+    <string>E</string>
+   </property>
   </action>
   <action name="actScale">
    <property name="checkable">
@@ -388,6 +394,9 @@
    </property>
    <property name="text">
     <string>Scale</string>
+   </property>
+   <property name="shortcut">
+    <string>T</string>
    </property>
   </action>
   <action name="actHelp">
@@ -439,6 +448,9 @@
    </property>
    <property name="text">
     <string>Select</string>
+   </property>
+   <property name="shortcut">
+    <string>Q</string>
    </property>
   </action>
   <action name="DeleteAction">

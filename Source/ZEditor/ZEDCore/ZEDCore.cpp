@@ -102,9 +102,22 @@ void ZEDCore::InitializeEngine()
 	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
 
 	if (zeCore->StartUp(EditorModule->GetViewPort()->winId()))
-		zeCore->Run();
+	{
+		zeCore->SetCoreState(ZE_CS_RUNNING);
+		EditorModule->Initialize();
+	}
 
 	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
+}
+
+void ZEDCore::ProcessEngine()
+{
+	ZECoreState State = zeCore->GetCoreState();
+
+	if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
+		DeinitializeEngine();
+
+	zeCore->MainLoop();
 }
 
 void ZEDCore::DeinitializeEngine()

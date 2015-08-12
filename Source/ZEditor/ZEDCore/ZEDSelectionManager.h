@@ -64,7 +64,7 @@ class ZEDSelectionManager
 		ZEClass* Filter;
 
 		void CalculateSelectionPivot();
-		void ConfigureGizmo();
+		
 
 		ZEDSelectionManager();
 
@@ -94,7 +94,8 @@ class ZEDSelectionManager
 		void SetSelectionPivotMode(ZEDSelectionPivotMode Mode);
 		ZEDSelectionPivotMode GetSelectionPivotMode();
 		const ZEMatrix4x4& GetSelectionPivot();
-		
+		void UpdateSelectionGizmo();
+
 		void Destroy();
 
 		static ZEDSelectionManager* GetInstance();

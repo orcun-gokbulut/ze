@@ -42,7 +42,6 @@
 #include "ZEDTransformationManager.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEGame/ZEScene.h"
 #include "ZEMath/ZEAngle.h"
 
 void ZEDViewPort::MoveCamera(float ElapsedTime)
@@ -112,6 +111,9 @@ void ZEDViewPort::RotateCamera(const ZEVector2& MousePosition)
 
 void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 {
+	if (Scene == NULL)
+		return;
+
 	setFocus(Qt::MouseFocusReason);
 
 	if(MouseEvent->button() == Qt::LeftButton || MouseEvent->button() == Qt::RightButton)
@@ -123,7 +125,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 	if (MouseEvent->button() == Qt::LeftButton && !(MouseEvent->buttons() & Qt::RightButton))
 	{
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
+		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 		float TRay = FLT_MAX;
 
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
@@ -153,6 +155,9 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 
 void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 {	
+	if (Scene == NULL)
+		return;
+
 	if((MouseEvent->buttons() & Qt::RightButton))
 	{
 		if (MouseEvent->modifiers() & Qt::AltModifier)
@@ -176,7 +181,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	if(MouseEvent->buttons() & Qt::LeftButton)
 	{	
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
+		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 	
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
 
@@ -232,7 +237,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	else
 	{
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
+		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 		float TRay = FLT_MAX;
 
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
@@ -272,12 +277,15 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 
 void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 {
+	if (Scene == NULL)
+		return;
+
 	if (MouseEvent->button() == Qt::LeftButton)
 	{
 		ZEDTransformationManager* TransformationManager = ZEDTransformationManager::GetInstance();
 
 		ZERay Ray;
-		ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
+		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
 
 		ZEDGizmo* Gizmo = TransformationManager->GetGizmo();
 
@@ -400,6 +408,16 @@ const ZEView& ZEDViewPort::GetView()
 	return Camera->GetView();
 }
 
+void ZEDViewPort::SetScene(ZEDScene* Scene)
+{
+	this->Scene = Scene;
+}
+
+ZEDScene* ZEDViewPort::GetScene()
+{
+	return Scene;
+}
+
 void ZEDViewPort::SetStepSize(ZEInt StepSize)
 {
 	this->StepSize = StepSize;
@@ -414,25 +432,17 @@ void ZEDViewPort::Tick(float Time)
 {
 	if (!PressedKeyboardKeys.isEmpty())
 		MoveCamera(Time);
-
-	ZEDTransformationManager::GetInstance()->GetGizmo()->SetVisible(ZEDSelectionManager::GetInstance()->GetSelectedObjects().GetCount() != 0);
-
-// 	if ((Gizmo->GetMode() != ZED_GM_NONE) && (SelectionManager->GetSelectedObjects().GetCount() != 0))
-// 	{
-// 		ZEMatrix4x4 Pivot = SelectionManager->GetSelectionPivot();
-// 		Gizmo->SetWorldPosition(Pivot.GetTranslation());
-// 		Gizmo->SetWorldRotation(Pivot.GetRotation());
-// 		//Gizmo->SetWorldScale(Pivot.GetScale());
-// 	}
-
 }
 
 bool ZEDViewPort::Initialize()
 {
+	if (Scene == NULL)
+		return false;
+
 	Camera = ZECamera::CreateInstance();
 	Camera->SetHorizontalFOV(ZE_PI / 3);
 
-	ZEScene* Scene = ZEDCore::GetInstance()->GetEditorModule()->GetScene();
+	//Add Wrapper Properly
 	Scene->SetActiveCamera(Camera);
 	Scene->AddEntity(Camera);
 

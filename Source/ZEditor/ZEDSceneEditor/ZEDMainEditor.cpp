@@ -34,18 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDMainEditor.h"
+#include "ZEDCore/ZEDCore.h"
 #include "ZEDCore/ZEDModule.h"
 #include "ZEDCore/ZEDViewPort.h"
+#include "ZEDCore/ZEDOperationManager.h"
+#include "ZEDCore/ZEDTransformationManager.h"
+#include "ZEDCore/ZEDGizmo.h"
 #include "ui_ZEDMainEditor.h"
 
 bool ZEDMainEditor::InitializeSelf()
 {
-	QObject::connect(ui->actNew, SIGNAL(triggered(bool)), this, SLOT(actNew_onTriggered()));
-	QObject::connect(ui->actOpen, SIGNAL(triggered(bool)), this, SLOT(actOpen_onTriggered()));
-	QObject::connect(ui->actClose, SIGNAL(triggered(bool)), this, SLOT(actClose_onTriggered()));
-	QObject::connect(ui->actSave, SIGNAL(triggered(bool)), this, SLOT(actSave_onTriggered()));
-	QObject::connect(ui->actSaveAs, SIGNAL(triggered(bool)), this, SLOT(actSaveAs_onTriggered()));
-	QObject::connect(ui->actExit, SIGNAL(triggered(bool)), this, SLOT(actExit_onTriggered()));
+	MainViewPort->SetScene(Core->GetEditorModule()->GetScene());
+	MainViewPort->Initialize();
+
+	connect(ui->actNew, SIGNAL(triggered(bool)), this, SLOT(actNew_onTriggered()));
+	connect(ui->actOpen, SIGNAL(triggered(bool)), this, SLOT(actOpen_onTriggered()));
+	connect(ui->actClose, SIGNAL(triggered(bool)), this, SLOT(actClose_onTriggered()));
+	connect(ui->actSave, SIGNAL(triggered(bool)), this, SLOT(actSave_onTriggered()));
+	connect(ui->actSaveAs, SIGNAL(triggered(bool)), this, SLOT(actSaveAs_onTriggered()));
+	connect(ui->actExit, SIGNAL(triggered(bool)), this, SLOT(actExit_onTriggered()));
+	connect(ui->actSelect, SIGNAL(triggered(bool)), this, SLOT(actSelect_onTriggered()));
+	connect(ui->actMove, SIGNAL(triggered(bool)), this, SLOT(actMove_onTriggered()));
+	connect(ui->actRotate, SIGNAL(triggered(bool)), this, SLOT(actRotate_onTriggered()));
+	connect(ui->actScale, SIGNAL(triggered(bool)), this, SLOT(actScale_onTriggered()));
+	connect(ui->actUndo, SIGNAL(triggered(bool)), this, SLOT(actUndo_onTriggered()));
+	connect(ui->actRedo, SIGNAL(triggered(bool)), this, SLOT(actRedo_onTriggered()));
+	connect(MainTimer, SIGNAL(timeout()), this, SLOT(MainTimer_onTimeout()));
+	MainTimer->start();
 
 	return true;
 }
@@ -82,17 +97,103 @@ void ZEDMainEditor::actSaveAs_onTriggered()
 
 void ZEDMainEditor::actExit_onTriggered()
 {
+	Deinitalize();
+
+	//Save
+
+	qApp->quit();
+}
+
+void ZEDMainEditor::actUndo_onTriggered()
+{
+	if (Core->GetEditorModule()->GetViewPort()->hasFocus())
+		ZEDCore::GetInstance()->GetOperationManager()->Undo();
+}
+
+void ZEDMainEditor::actRedo_onTriggered()
+{
+	if (Core->GetEditorModule()->GetViewPort()->hasFocus())
+		ZEDCore::GetInstance()->GetOperationManager()->Redo();
+}
+
+void ZEDMainEditor::actClone_onTriggered()
+{
 
 }
 
+void ZEDMainEditor::actDelete_onTriggered()
+{
+
+}
+
+void ZEDMainEditor::actSelect_onTriggered()
+{
+	ui->actMove->setChecked(false);
+	ui->actRotate->setChecked(false);
+	ui->actScale->setChecked(false);
+
+	if(!ui->actSelect->isChecked())
+		ui->actSelect->setChecked(true);
+
+	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_HELPER);
+}
+
+void ZEDMainEditor::actMove_onTriggered()
+{
+	ui->actSelect->setChecked(false);
+	ui->actRotate->setChecked(false);
+	ui->actScale->setChecked(false);
+
+	if(!ui->actMove->isChecked())
+		ui->actMove->setChecked(true);
+
+	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_MOVE);
+}
+
+void ZEDMainEditor::actRotate_onTriggered()
+{
+	ui->actSelect->setChecked(false);
+	ui->actMove->setChecked(false);
+	ui->actScale->setChecked(false);
+
+	if(!ui->actRotate->isChecked())
+		ui->actRotate->setChecked(true);
+
+	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_ROTATE);
+}
+
+void ZEDMainEditor::actScale_onTriggered()
+{
+	ui->actSelect->setChecked(false);
+	ui->actMove->setChecked(false);
+	ui->actRotate->setChecked(false);
+
+	if(!ui->actScale->isChecked())
+		ui->actScale->setChecked(true);
+
+	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_SCALE);
+}
+
+void ZEDMainEditor::MainTimer_onTimeout()
+{
+	Core->ProcessEngine();
+
+	ui->actUndo->setEnabled(Core->GetOperationManager()->CanUndo());
+	ui->actRedo->setEnabled(Core->GetOperationManager()->CanRedo());
+}
 
 bool ZEDMainEditor::Initialize()
 {
+	Core->InitializeEngine();
+
 	return InitializeSelf();
 }
 
 bool ZEDMainEditor::Deinitalize()
 {
+	if (Core != NULL)
+		Core->DeinitializeEngine();
+
 	return DeinitializeSelf();
 }
 
@@ -102,16 +203,20 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	ui->setupUi(this);
 	showMaximized();
 
-	Core = ZEDCore::GetInstance();
-	ZEDViewPort* ViewPort = Core->GetEditorModule()->GetViewPort();
-	ViewPort->setParent(ui->CentralWidget);
-	ui->ViewPort = ViewPort;
-	ui->gridLayout->addWidget(ui->ViewPort, 0, 0, 1, 1);
+	MainTimer = new QTimer(this);
+	MainTimer->setInterval(0);
 
-	Core->InitializeEngine();
+	Core = ZEDCore::GetInstance();
+	MainViewPort = new ZEDViewPort(ui->CentralWidget);
+	ui->ViewPort = MainViewPort;
+	ui->gridLayout->addWidget(ui->ViewPort, 0, 0, 1, 1);
+	
+	Core->GetEditorModule()->SetViewPort(MainViewPort);
+	
+	Initialize();
 }
 
 ZEDMainEditor::~ZEDMainEditor()
 {
-	Core->DeinitializeEngine();
+	Deinitalize();
 }

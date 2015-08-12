@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMainEditor.h
+ Zinek Engine - ZEDSceneWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,58 +35,35 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDViewPort.h"
-#include <QtGui/QMainWindow>
-#include <QtCore/QTimer>
+#include "ZEDObjectWrapper.h"
+#include "ZEDScene.h"
 
-namespace Ui
+class ZEDSceneWrapper : public ZEDObjectWrapper
 {
-	class MainEditor;
-}
-
-class ZEDMainEditor : public QMainWindow
-{
-	Q_OBJECT
-	private:
-		Ui::MainEditor* ui;
-		ZEDCore* Core;
-		ZEDViewPort* MainViewPort;
-		QTimer* MainTimer;
-
-		bool InitializeSelf();
-		bool DeinitializeSelf();
-
-	private slots:
-		//File Menu Actions
-		void actNew_onTriggered();
-		void actOpen_onTriggered();
-		void actClose_onTriggered();
-		void actSave_onTriggered();
-		void actSaveAs_onTriggered();
-		void actExit_onTriggered();
-		//Edit Menu Actions
- 		void actUndo_onTriggered();
- 		void actRedo_onTriggered();
- 		void actClone_onTriggered();
- 		void actDelete_onTriggered();
-		//Operations Menu Actions
- 		void actSelect_onTriggered();
- 		void actMove_onTriggered();
- 		void actRotate_onTriggered();
- 		void actScale_onTriggered();
-// 		void actHide_onTriggered();
-// 		void actUnhide_onTriggered();
-// 		void actFreeze_onTriggered();
-// 		void actUnfreeze_onTriggered();
-// 		void actGoToEntity_onTriggered();
-
-		void MainTimer_onTimeout();
-		
 	public:
-		bool Initialize();
-		bool Deinitalize();
+		virtual void SetObject(ZEObject* Object);
+		virtual ZEObject* GetObject();
 
-		ZEDMainEditor(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
-		~ZEDMainEditor();
+		virtual void SetObjectEnabled(bool Value);
+		virtual bool GetObjectEnabled();
+
+		virtual void SetObjectVisibility(bool Value);
+		virtual bool GetObjectVisibility();
+
+		virtual ZEAABBox GetObjectBoundingBox();
+		virtual ZEMatrix4x4 GetObjectTransform();
+		virtual void SetObjectPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3 GetObjectPosition();
+		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion GetObjectRotation();
+		virtual void SetObjectScale(const ZEVector3& NewScale);
+		virtual ZEVector3 GetObjectScale();
+
+		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
+		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
+		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
+
+		static ZEDSceneWrapper* CreateInstance();
 };

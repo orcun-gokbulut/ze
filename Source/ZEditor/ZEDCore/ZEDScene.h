@@ -42,24 +42,23 @@ class ZEObject;
 
 class ZEDScene : public ZEScene
 {
+	friend class ZEDSceneWrapper;
+
 	private:
-		ZESmartArray<ZEDObjectWrapper*> Wrappers;
+		ZEArray<ZEDObjectWrapper*> Wrappers;
 		void Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime);
 
 	protected:
-		void AddWrapper(ZEObject* Object);
-		void RemoveWrapper(ZEObject* Object);
+		void AddWrapper(ZEDObjectWrapper* Wrapper);
+		void RemoveWrapper(ZEDObjectWrapper* Wrapper);
 
-		ZEDScene();
+		ZEDScene() {};
 
 	public:
-		const ZESmartArray<ZEDObjectWrapper*>& GetWrappers();
+		const ZEArray<ZEDObjectWrapper*>& GetWrappers();
 		ZEArray<ZEDObjectWrapper*> GetWrappers(ZEClass* Class);
 		ZEDObjectWrapper* GetWrapper(ZEObject* Object);
 		
-		virtual void AddEntity(ZEEntity* Entity);
-		virtual void RemoveEntity(ZEEntity* Entity);
-
 		virtual bool Initialize();
 		virtual void Deinitialize();
 					 

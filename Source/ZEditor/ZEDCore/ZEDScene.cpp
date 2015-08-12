@@ -53,55 +53,29 @@ void ZEDScene::Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime)
 		Tick(SubEntities[N], ElapsedTime);
 }
 
-void ZEDScene::AddWrapper(ZEObject* Object)
+void ZEDScene::AddWrapper(ZEDObjectWrapper* Wrapper)
 {
-	if (Object == NULL)
+	if (Wrapper == NULL)
 		return;
 
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-		if (Wrappers[I]->GetObject() == Object)
-			return;
-
-	ZEClass* TargetClass = Object->GetClass();
-
-	/*Requires implementation with ZEMeta, making wrappers class identifiers identical with ZEEntity and derivations' class identifiers, 
-	thus returning the appropriate wrapper class if it exists, if it does not exist return it's parent's and so on.*/
-
-// 	const ZEArray<ZEClass*>& WrapperTypes = ZEDCore::GetInstance()->GetWrapperTypes();
-// 
-// 	for (ZESize I = 0; I < WrapperTypes.GetCount(); I++)
-// 	{
-// 		if (WrapperTypes[]) //WrapperTypes[I]->GetAttributes()->Values*
-// 		{
-// 			ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)WrapperTypes[I]->CreateInstance();
-// 			Wrapper->SetObject(Object);
-// 		}
-// 	}
-
-	ZEDEntityWrapper* Temp = ZEDEntityWrapper::CreateInstance();
-	Temp->SetObject(Object);
-
-	Wrappers.Add(Temp);
-}
-
-void ZEDScene::RemoveWrapper(ZEObject* Object)
-{
-	if (Object == NULL)
+	if (Wrappers.Exists(Wrapper))
 		return;
 
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		if (Wrappers[I]->GetObject() == Object)
-		{
-			ZEDObjectWrapper* Temporary = Wrappers[I];
-			Wrappers.Remove(I);
-			Temporary->Destroy();
-			return;
-		}
-	}
+	Wrappers.Add(Wrapper);
 }
 
-const ZESmartArray<ZEDObjectWrapper*>& ZEDScene::GetWrappers()
+void ZEDScene::RemoveWrapper(ZEDObjectWrapper* Wrapper)
+{
+	if (Wrapper == NULL)
+		return;
+
+	if (!Wrappers.Exists(Wrapper))
+		return;
+
+	Wrappers.RemoveValue(Wrapper);
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDScene::GetWrappers()
 {
 	return Wrappers;
 }
@@ -134,20 +108,6 @@ ZEDObjectWrapper* ZEDScene::GetWrapper(ZEObject* Object)
 	}
 
 	return NULL;
-}
-
-void ZEDScene::AddEntity(ZEEntity* Entity)
-{
-	ZEScene::AddEntity(Entity);
-
-	AddWrapper(Entity);
-}
-
-void ZEDScene::RemoveEntity(ZEEntity* Entity)
-{
-	RemoveWrapper(Entity);
-
-	ZEScene::RemoveEntity(Entity);
 }
 
 void ZEDScene::Tick(float ElapsedTime)
@@ -215,11 +175,6 @@ bool ZEDScene::Initialize()
 void ZEDScene::Deinitialize()
 {
 	ZEScene::Deinitialize();
-}
-
-ZEDScene::ZEDScene()
-{
-
 }
 
 ZEDScene* ZEDScene::CreateInstance()
