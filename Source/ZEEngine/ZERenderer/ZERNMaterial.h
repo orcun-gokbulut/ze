@@ -75,7 +75,6 @@ class ZERNMaterialStage
 
 class ZERNMaterial : public ZEGRResource
 {
-	ZE_OBJECT
 	private:
 		bool							ShadowCaster;
 		bool							ShadowReceiver;
@@ -93,7 +92,7 @@ class ZERNMaterial : public ZEGRResource
 
 	public:
 		virtual ZEGRResourceType		GetResourceType();
-
+		virtual ZEUInt					GetStageMask();
 		virtual void					SetShadowCaster(bool Value);
 		bool							GetShadowCaster() const;
 

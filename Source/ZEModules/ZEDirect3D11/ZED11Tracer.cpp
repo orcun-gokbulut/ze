@@ -37,11 +37,11 @@
 
 #include "ZEError.h"
 #include "ZED11Tracer.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 
 void ZED11Tracer::SetEnabled(bool Enabled)
 {
-	D3DPERF_SetOptions(Enabled ? 1 : 0);
+	//D3DPERF_SetOptions(Enabled ? 1 : 0);
 	ZEGRTracer::SetEnabled(Enabled);
 }
 
@@ -49,7 +49,7 @@ void ZED11Tracer::StartEvent(const char* EventName)
 {
 	wchar_t Temp[150];
 	mbstowcs(Temp, EventName, 150);
-	D3DPERF_BeginEvent(0x00, Temp);
+	//D3DPERF_BeginEvent(0x00, Temp);
 	ZEGRTracer::StartEvent(EventName);
 }
 
@@ -57,12 +57,12 @@ void ZED11Tracer::Mark(const char* MakerName)
 {
 	wchar_t Temp[150];
 	mbstowcs(Temp, MakerName, 150);
-	D3DPERF_SetMarker(0x00, Temp);
+	//D3DPERF_SetMarker(0x00, Temp);
 }
 
 void ZED11Tracer::EndEvent()
 {
-	D3DPERF_EndEvent();
+	//D3DPERF_EndEvent();
 	ZEGRTracer::EndEvent();
 }
 

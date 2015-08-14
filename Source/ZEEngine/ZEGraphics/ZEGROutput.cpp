@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNCommand.h
+ Zinek Engine - ZEGROutput.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEGROutput.h"
+#include "ZEGRGraphicsModule.h"
 
-#include "ZEDS/ZEList2.h"
-
-#define ZERN_MAX_COMMAND_STAGE 5
-
-class ZEEntity;
-class ZERNRenderParameters;
-
-class ZERNCommand
+ZEGRResourceType ZEGROutput::GetResourceType()
 {
-	//ZE_DISALLOW_COPY(ZERNCommand);
-	friend class ZERNRenderer;
-	private:
-		ZELink<ZERNCommand>				StageQueueLinks[ZERN_MAX_COMMAND_STAGE];
+	return ZEGR_RT_OUTPUT;
+}
 
-	public:
-		ZEEntity*						Entity;
+ZEGROutput* ZEGROutput::Create(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format)
+{
+	zeCheckError(Handle == NULL, false, "Width cannot be 0.");
+	zeCheckError(Width == 0, false, "Width cannot be 0.");
+	zeCheckError(Height == 0, false, "Height cannot be 0.");
+	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
+	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
 
-		ZEInt							Priority;
-		float							Order;
-		ZEUInt							StageMask;
-		void*							ExtraParameters;
+	ZEGROutput* Output = ZEGRGraphicsModule::GetInstance()->CreateOutput();
+	if (Output == NULL)
+		return NULL;
 
-		virtual void					Execute(const ZERNRenderParameters* Parameters);
+	if (!Output->Initialize(Handle, Mode, Width, Height, Format))
+	{
+		delete Output;
+		return NULL;
+	}
 
-										ZERNCommand();
-};
+	return Output;
+}

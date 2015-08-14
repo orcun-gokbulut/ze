@@ -291,10 +291,10 @@ ZEPlayer::ZEPlayer()
 	Camera = ZECamera::CreateInstance();
 	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Camera->SetRotation(ZEQuaternion::Identity);
-	Camera->SetNearZ(ZEGRGraphicsModule::GetInstance()->GetNearZ());
-	Camera->SetFarZ(ZEGRGraphicsModule::GetInstance()->GetFarZ());
+	Camera->SetNearZ(1);
+	Camera->SetFarZ(10000);
 	Camera->SetHorizontalFOV(FOV);
-	Camera->SetAspectRatio(ZEGRGraphicsModule::GetInstance()->GetAspectRatio());
+	Camera->SetAutoAspectRatio(true);
 	AddComponent(Camera);
 
 	Listener = ZEListener::CreateInstance();

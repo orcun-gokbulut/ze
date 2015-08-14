@@ -33,13 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModelDebugDrawer.h"
+/*#include "ZEModelDebugDrawer.h"
 #include "ZEModel.h"
 
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZERNDrawParameters.h"
-
 
 void ZEModelDebugDrawer::DebugDrawEntity()
 {
@@ -175,3 +173,4 @@ ZEModelDebugDrawer* ZEModelDebugDrawer::CreateInstance()
 {
 	return new ZEModelDebugDrawer();
 }
+*/

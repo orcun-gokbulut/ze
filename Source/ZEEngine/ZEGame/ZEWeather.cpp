@@ -42,7 +42,6 @@
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
 #include "ZECloud.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEMath.h"
@@ -121,8 +120,6 @@ float ZEWeather::GetMoonHeight() const
 void ZEWeather::SetFogFactor(float Value)
 {
 	FogFactor = Value;
-
-	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogFactor(Value);
 }
 
 float ZEWeather::GetFogFactor() const
@@ -342,7 +339,6 @@ ZEWeather::ZEWeather()
 	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
 	SunLight->SetCastsShadow(false);
-	SunLight->SetShadowFactor(0.8f);
 	SunLight->SetRange(600.0f);
 	this->AddComponent(SunLight);
 

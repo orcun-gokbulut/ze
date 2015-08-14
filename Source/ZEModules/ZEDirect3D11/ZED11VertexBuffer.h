@@ -43,7 +43,7 @@ struct  ID3D11Buffer;
 
 class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 
 	private:		
 		ID3D11Buffer*				Buffer;

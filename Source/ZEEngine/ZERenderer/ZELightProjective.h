@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEViewFrustum.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 class ZEGRTexture2D;
 class ZETexture2DResource;
@@ -51,8 +52,8 @@ class ZELightProjective : public ZELight
 		float							FOV;
 		float							AspectRatio;
 		ZEViewFrustum					ViewVolume;
-		const ZEGRTexture2D*				ProjectionTexture;
-		ZEGRTexture2D*					ShadowMap;
+		ZEGRHolder<ZEGRTexture2D>		ProjectionTexture;
+		ZEGRHolder<ZEGRTexture2D>		ShadowMap;
 		ZEMatrix4x4						ViewProjectionMatrix;
 		
 		ZETexture2DResource*			ProjectionTextureResource;
@@ -76,14 +77,12 @@ class ZELightProjective : public ZELight
 		void							SetProjectionTextureFile(const ZEString& Filename);
 		const ZEString&					GetProjectionTextureFile() const;
 
-		void							SetProjectionTexture(const ZEGRTexture2D* Texture);
-		const ZEGRTexture2D*			GetProjectionTexture() const;
+		void							SetProjectionTexture(ZEGRTexture2D* Texture);
+		ZEGRTexture2D*					GetProjectionTexture() const;
 
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
-
-		virtual void					SetCastsShadow(bool NewValue);
 
 		ZEGRTexture2D*					GetShadowMap();
 

@@ -92,8 +92,6 @@ class ZEDebugDrawer : public ZEEntity
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
-		virtual void			Draw(ZERNDrawParameters* DrawParameters);
-
 		static ZEDebugDrawer*	CreateInstance();
 
 };

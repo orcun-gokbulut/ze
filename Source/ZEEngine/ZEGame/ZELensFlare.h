@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
 
@@ -95,38 +93,8 @@ class ZELensFlare : public ZEEntity
 		void								SetMaxExtent(float MaxExtent);
 		float								GetMaxExtent();
 
-		virtual void						Draw(ZERNDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
 
 		static ZELensFlare*					CreateInstance();
 
 };
-/*
-ZE_POST_PROCESSOR_START(Meta)
-<zinek>
-	<meta>
-		<class name="ZELensFlare"	parent="ZEEntity"	description="Sky Brush">
-			<property name="SkyColor"
-				type="ZEVector3"
-				autogetset="true"
-				default="ZEVector3::One"
-				description="Color of the sky"
-				semantic="ZE_PS_COLOR"/>
-			<property name="SkyBrightness"
-				type="float"
-				autogetset="true"
-				default="1.0f"
-				description="Intensity of the light"/>
-			<property name="SkyTexture"
-				type="string"
-				autogetset="true"
-				default=""
-				description="Texture of the sky"
-				semantic="ZE_PS_FILENAME"
-				fileextension="IMAGE"/>
-		</class>
-	</meta>
-</zinek>
-ZE_POST_PROCESSOR_END()
-*/
-#endif

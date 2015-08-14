@@ -181,7 +181,7 @@ bool ZEDSModule::InitializeSelf()
 		return false;
 	}
 
-	hr=DS->SetCooperativeLevel((HWND)zeWindow->GetHandle(), DSSCL_PRIORITY);
+	hr=DS->SetCooperativeLevel(::GetDesktopWindow(), DSSCL_NORMAL);
 	
 	if (FAILED(hr))
 	{	

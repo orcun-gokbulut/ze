@@ -131,6 +131,12 @@ bool ZEMoon::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
+
+void ZEMoon::Tick(float ElapsedTime)
+{
+	return;
+}
+
 ZEMoon* ZEMoon::CreateInstance()
 {
 	return new ZEMoon();

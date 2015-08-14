@@ -49,6 +49,7 @@ struct ID3D11ComputeShader;
 
 class ZED11Shader : public ZEGRShader, public ZED11ComponentBase
 {
+	friend class ZED11Module;
 	protected:
 		union
 		{

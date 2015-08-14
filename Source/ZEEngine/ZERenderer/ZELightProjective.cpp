@@ -69,12 +69,12 @@ float ZELightProjective::GetAspectRatio() const
 	return AspectRatio;
 }
 
-void ZELightProjective::SetProjectionTexture(const ZEGRTexture2D* Texture)
+void ZELightProjective::SetProjectionTexture(ZEGRTexture2D* Texture)
 {
 	ProjectionTexture = Texture;
 }
 
-const ZEGRTexture2D* ZELightProjective::GetProjectionTexture() const
+ZEGRTexture2D* ZELightProjective::GetProjectionTexture() const
 {
 	return ProjectionTexture;
 }

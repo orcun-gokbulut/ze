@@ -38,10 +38,14 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEMath.h"
+#include "ZERenderer/ZERNView.h"
+#include "ZEMath/ZEViewVolume.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZEModelMeshLOD.h"
+#include "ZERenderer/ZERNMaterial.h"
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
@@ -496,27 +500,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 		}
 		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)
 		{
-			PhysicalCloth = ZEPhysicalCloth::CreateInstance();
-
-			ZESize VertexCount = MeshResource->LODs[0].Vertices.GetCount();
-			ZEArray<ZEVector3>& ClothVertices = PhysicalCloth->GetVertices();
-			ClothVertices.SetCount(VertexCount);
-
-			for(ZESize I = 0; I < VertexCount; I++)
-				ClothVertices[I] = MeshResource->LODs[0].Vertices[I].Position;
-
-			PhysicalCloth->SetPosition(Owner->GetWorldTransform() * Position);
-			ZEQuaternion TempRotation;
-			ZEQuaternion::CreateFromMatrix(TempRotation, Owner->GetWorldTransform() * GetLocalTransform());
-			PhysicalCloth->SetRotation(TempRotation);
-
-			PhysicalCloth->SetEnabled(true);
-			PhysicalCloth->SetThickness(0.5f);
-			PhysicalCloth->SetBendingMode(true);
-			PhysicalCloth->SetBendingStiffness(1.0f);
-			PhysicalCloth->SetStretchingStiffness(1.0f);
-			PhysicalCloth->SetPhysicalWorld(zeScene->GetPhysicalWorld());
-			PhysicalCloth->Initialize();
+	
 		}
 	}
 
@@ -555,42 +539,6 @@ void ZEModelMesh::OnTransformChanged()
 	}
 }
 
-void ZEModelMesh::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (!Visible)
-		return;
-
-	float DrawOrder;
-	ZEInt Lod = 0;
-
-	ZEVector3 WorldPosition;
-	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
-	float DistanceSquare = ZEVector3::DistanceSquare(DrawParameters->View->Camera->GetWorldPosition(), WorldPosition);
-
-	if (!DrawOrderIsUserDefined)
-		DrawOrder = DistanceSquare;
-	else
-		DrawOrder = DistanceSquare * (UserDefinedDrawOrder + 1);
-	
-	/*ZEInt LastLod = LODs.GetCount() - 1;
-
-	if (DistanceSquare > 40 * 40) 
-		Lod = -1;
-	else if (DistanceSquare > 30 * 30)
-		Lod = 2;
-	else if (DistanceSquare > 20 * 20)
-		Lod = 1;
-	else
-		Lod = 0;
-
-	if (Lod == -1)
-		return;
-
-	if (Lod > LastLod)
-		Lod = LastLod;*/
-
-	LODs[(ZESize)Lod].Draw(DrawParameters, DrawOrder);
-}
 
 bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
 {
@@ -598,7 +546,7 @@ bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& Poligon
 		return false;
 
 	bool HaveIntersection = false;
-	const ZEArray<ZEModelVertex>& Vertices = MeshResource->LODs[0].Vertices;
+	/*const ZEArray<ZEModelVertex>& Vertices = MeshResource->LODs[0].Vertices;
 
 	for (ZESize I = 0; I < Vertices.GetCount(); I += 3)
 	{
@@ -614,9 +562,53 @@ bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& Poligon
 				HaveIntersection = true;
 			}
 		}
-	}
+	}*/
 
 	return HaveIntersection;
+}
+
+bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
+{
+	if (!Visible)
+		return false;
+
+	if (CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+		return false;
+
+	float DrawOrder;
+	float DistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());
+	if (!DrawOrderIsUserDefined)
+		DrawOrder = DistanceSquare;
+	else
+		DrawOrder = DistanceSquare * (UserDefinedDrawOrder + 1);
+	
+	ZEInt Lod = 0;
+	/*ZEInt LastLod = LODs.GetCount() - 1;
+	if (DistanceSquare > 40 * 40) 
+		Lod = -1;
+	else if (DistanceSquare > 30 * 30)
+		Lod = 2;
+	else if (DistanceSquare > 20 * 20)
+		Lod = 1;
+	else
+		Lod = 0;
+
+	if (Lod == -1)
+		return;
+
+	if (Lod > LastLod)
+		Lod = LastLod;*/
+
+	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)Lod];
+	RenderCommand.Priority = 0;
+	RenderCommand.Order = DrawOrder;
+	RenderCommand.StageMask = MeshLOD->GetMaterial()->GetStageMask();
+	RenderCommand.Entity = Owner;
+	RenderCommand.ExtraParameters = MeshLOD;
+	
+	CullParameters->Renderer->AddCommand(&RenderCommand);
+	
+	return true;
 }
 
 bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -647,30 +639,6 @@ bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 			Report.Position = WorldPosition;
 			Report.SubComponent = this;
 			Report.PoligonIndex = PoligonIndex;
-
-			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
-			{
-				ZEVector3 V0 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex].Position;
-				ZEVector3 V1 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 1].Position;
-				ZEVector3 V2 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 2].Position;
-
-				ZEVector3 Binormal = ZEVector3(V0, V1);
-				ZEVector3 Tangent = ZEVector3(V0, V2);
-				ZEVector3 Normal;
-				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
-
-				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
-				{
-					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
-					Report.Normal.NormalizeSelf();
-				}
-
-				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
-				{
-					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
-					Report.Binormal.NormalizeSelf();
-				}
-			}
 
 			return true;
 		}

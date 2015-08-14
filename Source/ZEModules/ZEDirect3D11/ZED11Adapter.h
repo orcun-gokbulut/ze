@@ -47,7 +47,7 @@ class ZED11Monitor : public ZEGRMonitor
 	friend class ZED11Adapter;
 	protected:
 		IDXGIOutput1*			Output;
-		ZEArray<ZEGRMode>		Modes;
+		ZEArray<ZEGRMonitorMode>		Modes;
 
 								ZED11Monitor(ZED11Adapter* Adapter, IDXGIOutput1* Output);
 		virtual					~ZED11Monitor();
@@ -55,12 +55,12 @@ class ZED11Monitor : public ZEGRMonitor
 	public:
 		IDXGIOutput1*			GetOutput();
 		virtual const 
-		ZEArray<ZEGRMode>&		GetModes();
+		ZEArray<ZEGRMonitorMode>&		GetModes();
 };
 
 class ZED11Adapter : public ZEGRAdapter
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	private:
 		IDXGIAdapter2*			Adapter;
 		ZEArray<ZEGRMonitor*>	Monitors;

@@ -35,7 +35,7 @@
 
 #include "ZEError.h"
 #include "ZED11IndexBuffer.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 
 inline static ZESize GetIndexSize(ZEGRIndexBufferFormat Format)
 {
@@ -87,4 +87,21 @@ void ZED11IndexBuffer::Deinitialize()
 ZED11IndexBuffer::ZED11IndexBuffer()
 {
 	Buffer = NULL;
+}
+
+bool ZED11IndexBuffer::Lock(void** Data)
+{
+	D3D11_MAPPED_SUBRESOURCE Map;
+	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE, 0, &Map);
+	if (FAILED(Result))
+		return false;
+	
+	*Data = Map.pData;
+
+	return true;
+}
+
+void ZED11IndexBuffer::Unlock()
+{
+	GetMainContext()->Unmap(Buffer, 0);
 }

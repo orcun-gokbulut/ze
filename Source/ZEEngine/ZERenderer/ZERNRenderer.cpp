@@ -78,7 +78,7 @@ void ZERNRenderer::RenderStages()
 		while (Link != NULL)
 		{
 			ZERNCommand* Command = Link->GetItem();
-			Command->Entity->Render(Command);
+			Command->Execute(NULL);
 		}
 		Queue->Stage->CleanUp();
 	}

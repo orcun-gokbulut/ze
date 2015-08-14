@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Screen.cpp
+ Zinek Engine - ZED11Output.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED11Screen.h"
+#include "ZED11Output.h"
 
 #include "ZEGraphics\ZEGRDefinitions.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics\ZEGRAdapter.h"
+#include "ZED11Texture2D.h"
+
 #include "ZEError.h"
 
 #include <d3d11.h>
 #include <dxgi1_2.h>
 
-bool ZED11Screen::InitializeSelf()
+void ZED11Output::SwitchToFullscreen()
 {
+	DXGI_MODE_DESC Description;
+	Description.Width = Mode->GetWidth();
+	Description.Height = Mode->GetWidth();
+	Description.RefreshRate.Numerator = Mode->GetRefreshRate().Numerator;
+	Description.RefreshRate.Denominator = Mode->GetRefreshRate().Denominator;
+	Description.Format = ConvertFormat(Mode->GetFormat());
+	Description.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
+	Description.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
+	SwapChain->ResizeTarget(&Description);
+	SwapChain->SetFullscreenState(TRUE, Output);
+}
+
+void ZED11Output::UpdateRenderTarget(ZESize Width, ZESize Height, ZEGRFormat Format)
+{
+	ID3D11RenderTargetView* RenderTargetView;
+	ID3D11Texture2D* OutputTexture;
+	HRESULT Result = SwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D), (void**)&OutputTexture);
+	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
+	OutputTexture->Release();
+	RenderTarget = ZED11RenderTarget(Width, Height, Format, RenderTargetView);
+	SetSize(Width * Height * ZED11Texture2D::GetBlockSize(Format));
+}
+
+bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format)
+{
+	zeDebugCheck(Handle == NULL, "Handle parameter cannot be null.");
+	zeDebugCheck(Width == 0 || Height == 0, "Width and Height cannot be null.");
+
+	this->Handle = Handle;
+	this->Mode = Mode;
+
 	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
-	memset(&SwapChainDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC));
-	SwapChainDesc.Width = GetWidth();
-	SwapChainDesc.Height = GetHeight();
-	SwapChainDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+	memset(&SwapChainDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC1));
+	SwapChainDesc.Width = Mode != NULL ? Mode->GetWidth() : Width;
+	SwapChainDesc.Height = Mode != NULL ? Mode->GetHeight() : Height;
+	SwapChainDesc.Format = Mode != NULL ? ZED11ComponentBase::ConvertFormat(Mode->GetFormat()) : DXGI_FORMAT_B8G8R8A8_UNORM;
 	SwapChainDesc.Stereo = FALSE;
 	SwapChainDesc.BufferCount = 5;
 	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
@@ -70,15 +104,11 @@ bool ZED11Screen::InitializeSelf()
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc;
 	memset(&FullScreenDesc, 0, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
-	FullScreenDesc.Windowed = !GetFullscreen();
+	FullScreenDesc.Windowed = Mode == NULL;
 	FullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	FullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	FullScreenDesc.RefreshRate.Numerator = 0;
-	FullScreenDesc.RefreshRate.Denominator = 0;
-
-	//#ifdef ZE_GRAPHICS_CONTENT_PROTECTION
-	//Output = Adapters[ActiveAdapter].Outputs[I].Output;
-	//#endif
+	FullScreenDesc.RefreshRate.Numerator = Mode != NULL ? Mode->GetRefreshRate().Numerator : 0;
+	FullScreenDesc.RefreshRate.Denominator = Mode != NULL ? Mode->GetRefreshRate().Denominator : 0;
 
 	IDXGIFactory2* DXGIFactory = NULL;
 	HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
@@ -89,54 +119,95 @@ bool ZED11Screen::InitializeSelf()
 	}
 
 	IDXGIOutput* Output = NULL;
-	Result = DXGIFactory->CreateSwapChainForHwnd(GetDevice(), (HWND)GetHandle(), &SwapChainDesc, &FullScreenDesc, Output, &SwapChain);
+	Result = DXGIFactory->CreateSwapChainForHwnd(GetDevice(), (HWND)Handle, &SwapChainDesc, &FullScreenDesc, Output, &SwapChain);
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create swap chain. Error: %d", Result);
 		return false;
 	}
 
-	zeLog("Swap chain created");
+	UpdateRenderTarget(SwapChainDesc.Width, SwapChainDesc.Height, Mode != NULL ? Mode->GetFormat() : Format);
+	DXGIFactory->Release();
 
 	return true;
 }
 
-void ZED11Screen::DeinitializeSelf()
+void ZED11Output::Deinitialize()
 {
 	SwapChain->SetFullscreenState(FALSE, Output);
-	ZEGR_RELEASE(RenderTarget);
-	ZEGR_RELEASE(DepthStencilBuffer);
 	ZEGR_RELEASE(SwapChain);
 	ZEGR_RELEASE(Output);
 }
 
-ZED11Screen::ZED11Screen()
+ZED11Output::ZED11Output()
 {
-	RenderTarget = NULL;
-	DepthStencilBuffer = NULL;
+	Handle = NULL;
+	Mode = NULL;
 }
 
-void ZED11Screen::SetSize(ZEUInt Width, ZEUInt Height)
+void* ZED11Output::GetHandle()
 {
-	ZEGRScreen::SetSize(Width, Height);
+	return Handle;
 }
 
-void ZED11Screen::SetVisible(bool Visible)
+ZEGRRenderTarget* ZED11Output::GetRenderTarget()
 {
-	ZEGRScreen::SetVisible(Visible);
+	return &RenderTarget;
 }
 
-ZEGRRenderTarget* ZED11Screen::GetRenderTarget()
+void ZED11Output::SetMonitorMode(ZEGRMonitorMode* Mode)
 {
-	return RenderTarget;
+	if (this->Mode == Mode)
+		return;
+	
+	this->Mode = Mode;
+	
+	if (Fullscreen)
+		SwitchToFullscreen();
 }
 
-ZEGRDepthStencilBuffer* ZED11Screen::GetDepthStencilBuffer()
+ZEGRMonitorMode* ZED11Output::GetMonitorMode()
 {
-	return DepthStencilBuffer;
+	return Mode;
 }
 
-void ZED11Screen::Present()
+void ZED11Output::SetFullscreen(bool Enabled)
 {
+	if (Fullscreen == Enabled)
+		return;
 
+	Fullscreen = Enabled;
+
+	if (Enabled)
+		SwitchToFullscreen();
+	else
+		SwapChain->SetFullscreenState(FALSE, Output);
+}
+
+bool ZED11Output::GetFullscreen()
+{
+	return Fullscreen;
+}
+
+void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
+{
+	if (SwapChain == NULL)
+		return;
+
+	if (Width == 0 || Height == 0)
+		return;
+
+	if (RenderTarget.GetWidth() == Width && RenderTarget.GetHeight() == Height)
+		return;
+
+	if (RenderTarget.View != NULL)
+		RenderTarget.View->Release();
+
+	HRESULT Result = SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	UpdateRenderTarget(Width, Height, RenderTarget.GetFormat());
+}
+
+void ZED11Output::Present()
+{
+	SwapChain->Present(0, 0);
 }

@@ -36,7 +36,7 @@
 #include "ZED11Context.h"
 
 #include "ZEGraphics/ZEGRDefinitions.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 #include "ZED11Shader.h"
 #include "ZED11Texture2D.h"
 #include "ZED11Texture3D.h"
@@ -87,6 +87,24 @@ void ZED11Context::UpdateBlendState()
 		return;
 
 	Context->OMSetBlendState(RenderState->NativeBlendState, (float*)&BlendFactors, BlendMask);
+}
+
+void ZED11Context::UpdateDepthStencilState()
+{
+	if (!DirtyStencilState)
+		return;
+
+	Context->OMSetDepthStencilState(RenderState->NativeDepthStencilState, StencilRef);
+}
+
+void ZED11Context::Initialize(ID3D11DeviceContext* Context)
+{
+	this->Context = Context;
+}
+
+void ZED11Context::Deinitialize()
+{
+	ZEGR_RELEASE(Context);
 }
 
 void ZED11Context::UpdateRenderTargets()
@@ -404,19 +422,11 @@ void ZED11Context::DrawInstanced(ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt 
 
 void ZED11Context::ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
-	UpdateRenderTargets();
-	UpdateBlendState();
-	UpdateDepthStencilState();
-
 	GetMainContext()->ClearRenderTargetView(((ZED11RenderTarget*)RenderTarget)->GetView(), ClearColor.M);
 }
 
 void ZED11Context::ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
 {
-	UpdateRenderTargets();
-	UpdateBlendState();
-	UpdateDepthStencilState();
-
 	UINT ClearFlag = 0;
 	ClearFlag |= Depth ? D3D11_CLEAR_DEPTH : 0;
 	ClearFlag |= Stencil ? D3D11_CLEAR_STENCIL : 0;
@@ -435,7 +445,7 @@ ZED11Context::ZED11Context()
 
 	DirtyRenderTargets = true;
 	RenderTargetCount = 0;
-	memset(RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT], 0, sizeof(RenderTargets));
+	memset(RenderTargets, 0, ZEGR_MAX_RENDER_TARGET_SLOT * sizeof(ID3D11RenderTargetView*));
 	DepthStencilState = NULL;
 	DepthStencilBuffer = NULL;
 
@@ -447,5 +457,5 @@ ZED11Context::ZED11Context()
 
 ZED11Context::~ZED11Context()
 {
-	ZEGR_RELEASE(Context);
+	Deinitialize();
 }

@@ -41,69 +41,26 @@
 #include "ZERenderer/ZERNCommand.h"
 
 class ZESeaMaterial;
-class ZEVertexDeclaration;
-class ZEStaticVertexBuffer;
 class ZEGRTexture2D;
 
 class ZESea : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
-
-		ZEVertexDeclaration*	VertexDeclaration;
-		ZESeaMaterial*			Material;
-
-		ZEStaticVertexBuffer*	VertexBuffer;
-
 		ZEVector2				DiffuseVelocity;
 		ZEVector2				NormalVelocity;
-
 		ZEVector2				DiffuseOffset;
 		ZEVector2				NormalOffset;
-
 		ZEVector2				NormalTextureTile;
 		ZEVector2				DiffuseTextureTile;
 
-		ZERNCommand			Command;
-
-	protected:
+		ZERNCommand				Command;
 
 								ZESea();
 		virtual					~ZESea();
 
 	public:
-		void					SetDiffuseTexture(const ZEGRTexture2D* Texture);
-		void					SetNormalTexture(const ZEGRTexture2D* Texture);
-
-		void					SetAmbientColor(const ZEVector3& Color);
-		ZEVector3				GetAmbientColor() const;
-		void					SetAmbientFactor(float Factor);
-		float					GetAmbientFactor() const;
-
-		void					SetDiffuseVelocity(const ZEVector2& Velocity);
-		ZEVector2				GetDiffuseVelocity() const;
-		void					SetDiffuseTile(const ZEVector2& Tile);
-		ZEVector2				GetDiffuseTile() const;
-		void					SetDiffuseColor(const ZEVector3& Color);
-		ZEVector3				GetDiffuseColor() const;
-		void					SetDiffuseFactor(float Factor);
-		float					GetDiffuseFactor() const;
-
-		void					SetSpecularFactor(float Factor);
-		float					GetSpecularFactor() const;
-		void					SetSpecularShineness(float Shineness);
-		float					GetSpecularShineness() const;
-		void					SetSpecularColor(const ZEVector3& Color);
-		ZEVector3				GetSpecularColor() const;
-
-		void					SetNormalVelocity(const ZEVector2& Velocity);
-		ZEVector2				GetNormalVelocity() const;
-		void					SetNormalTile(const ZEVector2& Tile);
-		ZEVector2				GetNormalTile() const;
-
 		virtual void			Tick(float ElapsedTime);
-		virtual void			Draw(ZERNDrawParameters* DrawParameters);
 
 		virtual bool			RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

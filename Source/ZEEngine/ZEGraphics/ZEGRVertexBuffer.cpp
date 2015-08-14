@@ -67,6 +67,11 @@ ZEGRVertexBuffer::~ZEGRVertexBuffer()
 	Deinitialize();
 }
 
+ZEGRResourceType ZEGRVertexBuffer::GetResourceType()
+{
+	return ZEGR_RT_VERTEX_BUFFER;
+}
+
 ZESize ZEGRVertexBuffer::GetVertexSize()
 {
 	return VertexSize;

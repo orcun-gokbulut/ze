@@ -37,17 +37,12 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
-#include "ZEGame/ZERNDrawParameters.h"
-#include "ZEGame/ZEEntity.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEError.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <float.h>
-
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZEMath/ZEViewVolume.h"
 
 void ZEModel::CalculateBoundingBox() const
 {
@@ -108,11 +103,6 @@ void ZEModel::UpdateTransforms()
 ZEDrawFlags ZEModel::GetDrawFlags() const
 {
 	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
-}
-
-const ZEModelStatistics& ZEModel::GetStatistics() const
-{
-	return Statistics;
 }
 
 void ZEModel::LoadModelResource()
@@ -446,17 +436,10 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 	ParentlessBoneJoint->Initialize();
 }
 
-void ZEModel::Draw(ZERNDrawParameters* DrawParameters)
+bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
 {
-	if(!GetVisible())
-		return;
-
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		memset(&Statistics, 0, sizeof(ZEModelStatistics));
-
-		Statistics.TotalMeshCount = Meshes.GetCount();
-	}
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
 
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
 	{
@@ -464,48 +447,20 @@ void ZEModel::Draw(ZERNDrawParameters* DrawParameters)
 			AnimationTracks[I].UpdateAnimation();
 	}
 
-	ZEUInt32 EntityDrawFlags = GetDrawFlags();
-
+	bool Result = false;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && !Meshes[I].LODs[0].IsSkinned())
-		{
-			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
-			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.CulledMeshCount++;
-
-				continue;
-			}
-			else
-			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.DrawnMeshCount++;
-
-				Meshes[I].Draw(DrawParameters);
-			}
-		}
-		else
-		{
-			if (DrawParameters->Pass == ZE_RP_COLOR)
-				Statistics.DrawnMeshCount++;
-
-			Meshes[I].Draw(DrawParameters);
-		}
+		if (Meshes[I].PreRender(CullParameters))
+			Result = true;
 	}
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		DrawParameters->Statistics.ModelStatistics.TotalMeshCount += Statistics.TotalMeshCount;
-		DrawParameters->Statistics.ModelStatistics.CulledMeshCount += Statistics.CulledMeshCount;
-		DrawParameters->Statistics.ModelStatistics.DrawnMeshCount += Statistics.DrawnMeshCount;
-	}
+	return Result;
+}
 
-// 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-// 		Meshes[I].Draw(DrawParameters);
-	
-// 	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
-// 		DebugDraw(DrawParameters->Renderer);
+void ZEModel::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
+{
+	ZEModelMeshLOD* MeshLOD = (ZEModelMeshLOD*)Command->ExtraParameters;
+	MeshLOD->Render(RenderParameters, Command);
 }
 
 void ZEModel::Tick(float ElapsedTime)
@@ -520,7 +475,6 @@ void ZEModel::Tick(float ElapsedTime)
 
 	for(ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
-	
 }
 
 void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation)
@@ -573,8 +527,6 @@ ZEModel::ZEModel()
 	ParentlessBoneBody = NULL;
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
-
-	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
 
 ZEModel::~ZEModel()

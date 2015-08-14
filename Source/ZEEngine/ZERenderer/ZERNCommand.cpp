@@ -34,3 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNCommand.h"
+#include "ZEGame\ZEEntity.h"
+
+void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
+{
+	if (Entity == NULL)
+		return;
+
+	Entity->Render(Parameters, this);
+}
+
+ZERNCommand::ZERNCommand()
+{
+	for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
+		new (&StageQueueLinks[I]) ZELink<ZERNCommand>(this); 
+}

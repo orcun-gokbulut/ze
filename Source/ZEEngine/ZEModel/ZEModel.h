@@ -49,7 +49,6 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
-#include "ZEGame/ZEDrawStatistics.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
@@ -74,10 +73,8 @@ class ZEModel : public ZEEntity
 		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERNCommand>			LODRenderCommands;
+		ZEArray<ZERNCommand>				LODRenderCommands;
 		
-		ZEModelStatistics					Statistics;
-
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
 		ZEArray<ZEModelHelper>				Helpers;
@@ -98,6 +95,8 @@ class ZEModel : public ZEEntity
 
 		bool								BoundingBoxIsUserDefined;
 
+		ZERNCommand							RenderCommand;
+
 		void								CalculateBoundingBox() const;
 		void								UpdateTransforms();
 	
@@ -115,14 +114,11 @@ class ZEModel : public ZEEntity
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
 
-		virtual const ZEModelStatistics&	GetStatistics() const;
-
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
 
 		void								SetModelFile(const ZEString& ModelFile);
 		const ZEString&						GetModelFile() const;
-
 
 		void								SetModelResource(const ZEModelResource* ModelResource);	
 		const ZEModelResource*				GetModelResource();
@@ -161,12 +157,14 @@ class ZEModel : public ZEEntity
 		virtual void						SetScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
-		void								Draw(ZERNDrawParameters* DrawParameters);
-		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
 		
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
+
+		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);	
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
+		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEModel*						CreateInstance();
 };

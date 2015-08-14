@@ -42,6 +42,8 @@
 
 class ZEGRTexture2D;
 
+#define ZERN_SHADER_MATERIAL_SLOT
+
 class ZERNSimpleMaterial : public ZERNMaterial
 {
 	friend class ZED3D9Module;

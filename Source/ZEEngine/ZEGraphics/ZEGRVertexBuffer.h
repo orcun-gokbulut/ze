@@ -51,7 +51,7 @@ class ZEGRVertexBuffer : public ZEGRResource
 		virtual							~ZEGRVertexBuffer();
 
 	public:
-		ZEGRResourceType				GetResourceType();
+		virtual ZEGRResourceType		GetResourceType();
 
 		ZESize							GetVertexSize();
 		ZESize							GetVertexCount();

@@ -254,5 +254,5 @@ ZEUInt ZEGRWindow::GetWindowCount()
 
 ZEGRWindow* ZEGRWindow::CreateInstance()
 {
-	return ZEGRGraphicsModule::GetInstance()->CreateGraphicsWindow();
+	return NULL;
 }

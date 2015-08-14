@@ -43,6 +43,7 @@
 #include "ZEMath/ZERectangle.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRHolder.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
@@ -55,7 +56,7 @@ enum ZECameraProjectionType
 };
 
 class ZEViewPort;
-class ZEGRScreen;
+class ZEGROutput;
 class ZEGRConstantBuffer;
 
 class ZECamera : public ZEEntity
@@ -64,10 +65,10 @@ class ZECamera : public ZEEntity
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 
-		ZEGRScreen*						Screen;
+		ZEGRViewport					Viewport;
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		struct
+		mutable struct
 		{
 			ZEMatrix4x4					ViewTransform;
 			ZEMatrix4x4					ProjectionTransform;
@@ -93,15 +94,14 @@ class ZECamera : public ZEEntity
 		virtual bool					DeinitializeSelf();
 
 		virtual void					OnTransformChanged();
-		void							UpdateAutoParameters();
 
 										ZECamera();
 
 	public:
 		ZEGRConstantBuffer*				GetConstantBuffer();
 
-		void							SetScreen(ZEGRScreen* Screen);
-		ZEGRScreen*						GetScreen();
+		void							SetViewport(const ZEGRViewport& Viewport);
+		const ZEGRViewport&				GetViewport() const;
 
 		void							SetNearZ(float NearZ);
 		float							GetNearZ() const;
@@ -116,7 +116,7 @@ class ZECamera : public ZEEntity
 		float							GetVerticalFOV() const;
 
 		void							SetAutoAspectRatio(bool Enabled);
-		bool							GetAutoAspectRatio();
+		bool							GetAutoAspectRatio() const;
 
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;

@@ -61,7 +61,6 @@ class ZEGRTexture : public ZEGRResource
 
 		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZESize BlockSize, ZESize BlockDimension);
 		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZESize BlockDimension);
-		static ZESize			GetBlockSize(ZEGRFormat Format);
 		static ZESize			GetBlockDimension(ZEGRFormat Format);
 
 								ZEGRTexture();
@@ -74,4 +73,6 @@ class ZEGRTexture : public ZEGRResource
 		ZESize					GetBlockSize();
 		ZESize					GetBlockDimension();
 		bool					GetIsRenderTarget();
+
+		static ZESize			GetBlockSize(ZEGRFormat Format);
 };

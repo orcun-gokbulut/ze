@@ -43,7 +43,7 @@ template<typename ZEItemType> class ZEList2;
 template<typename ZEItemType>
 class ZELink
 {
-	ZE_DISALLOW_COPY(ZELink);
+	//ZE_DISALLOW_COPY(ZELink);
 	friend class ZEList2<ZEItemType>;
 	private:
 		bool						InUse;
@@ -63,6 +63,7 @@ class ZELink
 		void						InsertAfter(ZELink<ZEItemType>* Item);
 		void						Remove();
 
+									ZELink();
 									ZELink(ZEItemType* Object);
 									~ZELink();
 };
@@ -152,6 +153,15 @@ template<typename ZEItemType>
 ZEItemType* ZELink<ZEItemType>::GetItem() const
 {
 	return Item;
+}
+
+template<typename ZEItemType>
+ZELink<ZEItemType>::ZELink()
+{
+	InUse = false;
+	Prev = NULL;
+	Next = NULL;
+	Item = NULL;
 }
 
 template<typename ZEItemType>

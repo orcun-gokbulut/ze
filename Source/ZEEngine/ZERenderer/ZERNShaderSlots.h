@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRScreen.h
+ Zinek Engine - ZERNShaderSlots.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,48 +35,16 @@
 
 #pragma once
 
-#include "ZEInitializable.h"
-#include "ZETypes.h"
+#define ZERN_SHADER_GBUFFER_NORMAL_MODEL		0
+#define ZERN_SHADER_GBUFFER_DIFFUSE_SUBSURFACE	1
+#define ZERN_SHADER_GBUFFER_SPECULAR			2
+#define ZERN_SHADER_GBUFFER_ACCUMULATOR			3
 
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-class ZEGRMonitor;
-
-class ZEGRScreen : public ZEInitializable
-{
-	private:
-		ZEUInt								Width;
-		ZEUInt								Height;
-		bool								Visible;
-		bool								Fullscreen;
-		void*								Handle;
-		ZEGRMonitor*						Monitor;
-
-	protected:
-		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
-
-											ZEGRScreen();
-
-	public:
-		virtual void						SetHandle(void* Handle);
-		void*								GetHandle();
-
-		virtual void						SetSize(ZEUInt Width, ZEUInt Height);
-		ZEUInt								GetWidth();
-		ZEUInt								GetHeight();
-
-		virtual void						SetVisible(bool Visible);
-		bool								GetVisible();
-
-		virtual void						SetMonitor(ZEGRMonitor* Monitor);
-		ZEGRMonitor*						GetMonitor();
-
-		virtual void						SetFullscreen(bool Monitor);
-		bool								GetFullscreen();
-
-		virtual ZEGRRenderTarget*			GetRenderTarget() = 0;
-		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer() = 0;
-
-		virtual void						Present() = 0;
-};
+#define ZERN_SHADER_CONSTANT_RENDERER			0
+#define ZERN_SHADER_CONSTANT_SCENE				1
+#define ZERN_SHADER_CONSTANT_CAMERA				2
+#define ZERN_SHADER_CONSTANT_MATERIAL			3
+#define ZERN_SHADER_CONSTANT_DRAW_MATERIAL		4
+#define ZERN_SHADER_CONSTANT_DRAW_TRANSFORM		5
+#define ZERN_SHADER_CONSTANT_DRAW_SKIN			6
+#define ZERN_SHADER_CONSTANT_DRAW_OTHER			7

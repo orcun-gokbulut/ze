@@ -42,7 +42,6 @@ class ZEGRViewport
 	public:
 		struct ZEViewportData
 		{
-			bool				Enabled;
 			float				X;
 			float				Y;
 			float				Width;
@@ -53,9 +52,6 @@ class ZEGRViewport
 		} StateData;
 
 	public:
-		void					SetEnabled(bool Enabled);
-		bool					GetEnabled();
-
 		void					SetX(float x);
 		float					GetX() const;
 
@@ -73,9 +69,4 @@ class ZEGRViewport
 
 		void					SetMaxDepth(float Depth);
 		float					GetMaxDepth() const;
-
-		void					SetZero();
-
-								ZEGRViewport();
-								~ZEGRViewport();
 };

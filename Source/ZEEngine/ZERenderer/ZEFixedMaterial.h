@@ -118,8 +118,6 @@ class ZEFixedMaterial : public ZERNMaterial
 		ZEMaterialTransparancyMode		TransparancyMode;
 		ZEMaterialOpacityComponent		OpacityComponent;
 
-		void							UpdateShaders();
-		void							UpdateRenderStates();
 		void							Update();
 
 										ZEFixedMaterial();

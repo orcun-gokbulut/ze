@@ -37,35 +37,35 @@
 
 #include "ZEGRGraphicsModule.h"
 
-/*ZEGRMonitor* ZEGRMode::GetMonitor()
+ZEGRMonitor* ZEGRMonitorMode::GetMonitor()
 {
 	return Monitor;
 }
 
-ZEUInt ZEGRMode::GetWidth()
+ZEUInt ZEGRMonitorMode::GetWidth()
 {
 	return Width;
 }
 
-ZEUInt ZEGRMode::GetHeight()
+ZEUInt ZEGRMonitorMode::GetHeight()
 {
 	return Height;
 }
 
-ZEGRFormat ZEGRMode::GetFormat()
+ZEGRFormat ZEGRMonitorMode::GetFormat()
 {
 	return Format;
 }
 
-ZEUInt ZEGRMode::GetRefreshRate()
+ZEGRRefreshRate ZEGRMonitorMode::GetRefreshRate()
 {
 	return RefreshRate;
 }
 
-ZEGRMode::ZEGRMode()
+ZEGRMonitorMode::ZEGRMonitorMode()
 {
-	memset(this, 0, sizeof(ZEGRMode));
-}*/
+	memset(this, 0, sizeof(ZEGRMonitorMode));
+}
 
 ZEGRMonitor::ZEGRMonitor()
 {

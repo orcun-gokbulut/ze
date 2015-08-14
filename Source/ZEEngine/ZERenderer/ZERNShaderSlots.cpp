@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRScreen.cpp
+ Zinek Engine - ZERNShaderSlots.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,84 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRScreen.h"
+#include "ZERNShaderSlots.h"
+#include "ZECommon.h"
 
-#ifndef NULL
-#define NULL 0
-#endif
-
-bool ZEGRScreen::InitializeSelf()
-{
-	return true;
-}
-
-void ZEGRScreen::DeinitializeSelf()
-{
-
-}
-
-void ZEGRScreen::SetHandle(void* Handle)
-{
-	this->Handle = Handle;
-}
-
-void* ZEGRScreen::GetHandle()
-{
-	return Handle;
-}
-
-void ZEGRScreen::SetSize(ZEUInt Width, ZEUInt Height)
-{
-	this->Width = Width;
-	this->Height = Height;
-}
-
-ZEUInt ZEGRScreen::GetWidth()
-{
-	return Width;
-}
-
-ZEUInt ZEGRScreen::GetHeight()
-{
-	return Height;
-}
-
-void ZEGRScreen::SetVisible(bool Visible)
-{
-	this->Visible = Visible;
-}
-
-bool ZEGRScreen::GetVisible()
-{
-	return Visible;
-}
-
-void ZEGRScreen::SetMonitor(ZEGRMonitor* Monitor)
-{
-	this->Monitor = Monitor;
-}
-
-ZEGRMonitor* ZEGRScreen::GetMonitor()
-{
-	return Monitor;
-}
-
-void ZEGRScreen::SetFullscreen(bool Fullscreen)
-{
-	this->Fullscreen = Fullscreen;
-}
-
-bool ZEGRScreen::GetFullscreen()
-{
-	return Fullscreen;
-}
-
-ZEGRScreen::ZEGRScreen()
-{
-	Handle = NULL;
-	Width = 0;
-	Height = 0;
-	Visible = true;
-	Fullscreen = true;
-	Monitor = NULL;
-}
+ZE_SUPPRESS_LNK4221

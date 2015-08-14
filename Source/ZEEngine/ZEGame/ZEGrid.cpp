@@ -37,8 +37,6 @@
 #include "ZEScene.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZERNDrawParameters.h"
-#include "ZEGame/ZEEntityProvider.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
@@ -193,62 +191,6 @@ const ZEVector3& ZEGrid::GetAxisColor()
 	return AxisColor;
 }
 
-void ZEGrid::Draw(ZERNDrawParameters* Parameters)
-{
-	ZEVector3 CameraPosition = Parameters->View->Camera->GetWorldPosition();
-	
-	if (MinorGridEnabled)
-	{
-		RenderCommand.Order = 0.0f;
-		ZEVector3 MinorGridPosition(
-			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
-			0.0f,
-			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
-
-		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MinorGridPosition, GetRotation(), ZEVector3::One);
-		RenderCommand.VertexBuffer = &MinorGrid;
-		RenderCommand.PrimitiveCount = MinorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddCommand(&RenderCommand);
-	}
-
-	if (MajorGridEnabled)
-	{
-		RenderCommand.Order = 1.0f;
-		ZEVector3 MajorGridPosition(
-			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
-			0.0f,
-			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
-
-		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MajorGridPosition, GetRotation(), ZEVector3::One);
-		RenderCommand.VertexBuffer = &MajorGrid;
-		RenderCommand.PrimitiveCount = MajorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddCommand(&RenderCommand);
-	}
-
-	if (AxisEnabled)
-	{
-		RenderCommand.Order = 2.0f;
-		ZEVector3 AxisXGridPosition(CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
-		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
-
-		RenderCommand.PrimitiveCount = 1;
-
-		if (AxisYGridPosition.z > -GridSize.y * 0.5f && AxisYGridPosition.z < GridSize.y * 0.5f)
-		{
-			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
-			RenderCommand.VertexBuffer = &AxisX;
-			Parameters->Renderer->AddCommand(&RenderCommand);
-		}
-
-		if (AxisXGridPosition.x > -GridSize.x * 0.5f && AxisXGridPosition.x < GridSize.x * 0.5f)
-		{
-			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
-			RenderCommand.VertexBuffer = &AxisZ;
-			Parameters->Renderer->AddCommand(&RenderCommand);
-		}
-	}
-}
-
 bool ZEGrid::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
@@ -256,15 +198,6 @@ bool ZEGrid::InitializeSelf()
 
 	GenerateGrid();
 	
-	if (Material == NULL)
-		Material = ZERNSimpleMaterial::CreateInstance();
-
-	RenderCommand.SetZero();
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	RenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderCommand.Material = Material;
-
 	return true;
 }
 

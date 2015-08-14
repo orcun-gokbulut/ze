@@ -39,7 +39,7 @@
 
 class ZEGRTracer
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	
 	protected:
 		bool					Enabled;

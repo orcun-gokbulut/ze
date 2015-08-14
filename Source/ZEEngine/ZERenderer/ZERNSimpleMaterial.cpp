@@ -42,6 +42,7 @@
 #include "ZERNStageManager.h"
 #include "ZERNStage.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZERNShaderConfig.h"
 
 bool ZERNSimpleMaterial::InitializeSelf()
 {
@@ -154,16 +155,14 @@ const ZERNSampler& ZERNSimpleMaterial::GetTexture() const
 bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
 	ZERNMaterial::SetupMaterial(Context, Stage);
+
 	if (TextureSampler.GetTexture() != NULL)
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 2, TextureSampler.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 2, TextureSampler.GetSamplerState());
+		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureSampler.GetTexture());
+		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureSampler.GetSamplerState());
 	}
-	else
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	}
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_CONSTANTS_MATERIAL, ConstantBuffer);
+
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_DRAW, ConstantBuffer);
 
 	return true;
 }

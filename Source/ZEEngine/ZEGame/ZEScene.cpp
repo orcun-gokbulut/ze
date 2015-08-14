@@ -47,10 +47,8 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEInterior/ZEInterior.h"
 #include "ZESerialization/ZEFileSerializer.h"
 #include "ZESerialization/ZEFileUnserializer.h"
-#include "ZEInterior/ZEInteriorResource.h"
 #include "ZEMeta/ZEProvider.h"
 #include "ZEML/ZEMLReader.h"
 
@@ -392,9 +390,6 @@ ZEScene::ZEScene()
 {
 	Initialized = false;
 	LastEntityId = 0;
-	PostProcessor = NULL;
-	ShadowRenderer = NULL;
-	Renderer = NULL;
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;

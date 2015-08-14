@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_ENTITY_H__
-#define __ZE_ENTITY_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -209,12 +207,10 @@ class ZEEntity : public ZEObject
 		virtual bool							Restore(ZEMLReaderNode* Unserializer);
 
 		virtual void							Tick(float Time);
-		virtual void							Draw(ZERNDrawParameters* DrawParameters);
 
-		virtual bool							Cull(ZERNCullParameters* CullParameters);
-		virtual void							Render(ZERNCommand* Command);
+		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 };
-#endif

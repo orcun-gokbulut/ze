@@ -228,3 +228,12 @@ class ZEGRWindow
 		static ZEUInt							GetWindowCount();
 		static ZEGRWindow*						CreateInstance();
 };
+
+
+// Window
+	// Windowed or Fullscreen
+		// Cursor Hiding
+		// Cursor Locking
+		// Full Screen Locking
+// Monitor
+// ChildWindow

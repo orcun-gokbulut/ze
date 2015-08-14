@@ -34,8 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_COMMON_H__
-#define __ZE_COMMON_H__
+
+#if ZE_PLATFORM_COMPILER_MSVC
+#define ZE_SUPPRESS_LNK4221 namespace { char dummy; };
+#else
+	#define ZE_SUPPRESS_LNK4221
+#endif
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 	#define ZE_FORCE_INLINE __forceinline
@@ -49,5 +53,3 @@
 	private: \
 		ClassName(const ClassName&); \
 		ClassName& operator=(const ClassName&);
-
-#endif

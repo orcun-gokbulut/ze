@@ -35,4 +35,12 @@
 
 #include "ZEGRContext.h"
 
+ZEGRContext::ZEGRContext()
+{
 
+}
+
+ZEGRContext::~ZEGRContext()
+{
+
+}

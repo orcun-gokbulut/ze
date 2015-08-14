@@ -90,8 +90,7 @@ void ZECanvasBrush::Tick(float ElapsedTime)
 
 ZECanvasBrush::ZECanvasBrush()
 {
-	VertexBuffer = NULL;
-	RenderCommand.RenderState = RenderState;
+
 }
 
 ZECanvasBrush::~ZECanvasBrush()

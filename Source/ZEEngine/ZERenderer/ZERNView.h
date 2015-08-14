@@ -40,9 +40,10 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 
-class ZEGRScreen;
 class ZEViewVolume;
 class ZEEntity;
+class ZEGROutput;
+class ZEGRViewport;
 
 enum ZERNProjectionType
 {
@@ -80,6 +81,7 @@ struct ZERNView
 	ZEMatrix4x4					ProjectionTransform;
 	ZEMatrix4x4					ViewProjectionTransform;
 
-	ZEGRScreen*					Screen;
+	ZEGROutput*					Output;
+	const ZEGRViewport*			Viewport;
 	const ZEViewVolume*			ViewVolume;
 };

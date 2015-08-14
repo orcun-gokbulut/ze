@@ -599,12 +599,14 @@ bool ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	ZEVector3 IntersectionPoint;
 	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
 	float DistanceSquare = IntersectionPoint.LengthSquare();
-	if (Report.Distance * Report.Distance > DistanceSquare && Report.Distance * Report.Distance < Parameters.MaximumDistance)
-	{
-		Report.Distance = ZEMath::Sqrt(DistanceSquare);
-		Report.SubComponent = NULL;
-		Report.PoligonIndex = 0;
-		Report.Normal = Report.Binormal = ZEVector3::Zero;
-		ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
-	}
+	if (Report.Distance * Report.Distance < DistanceSquare || Report.Distance * Report.Distance > Parameters.MaximumDistance)
+		return false;
+	
+	Report.Distance = ZEMath::Sqrt(DistanceSquare);
+	Report.SubComponent = NULL;
+	Report.PoligonIndex = 0;
+	Report.Normal = Report.Binormal = ZEVector3::Zero;
+	ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
+
+	return true;
 }

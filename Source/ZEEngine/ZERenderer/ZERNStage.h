@@ -52,9 +52,9 @@ class ZERNStage : public ZEInitializable
 		ZEGRContext*					Device;
 
 	public:
-		ZEInt							GetId();
-		const ZEString&					GetName();
-		const ZEGRRenderState&			GetRenderState();
+		virtual ZEInt					GetId() = 0;
+		virtual const ZEString&			GetName() = 0;
+		virtual const ZEGRRenderState&	GetRenderState() = 0;
 
 		virtual void					Setup(ZEGRContext* Device);
 		virtual void					CleanUp();

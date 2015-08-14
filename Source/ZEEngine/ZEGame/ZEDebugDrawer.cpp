@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDebugDrawer.h"
+/*#include "ZEDebugDrawer.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEVector.h"
@@ -41,7 +41,6 @@
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEOBBox.h"
-#include "ZERNDrawParameters.h"
 #include "ZERenderer/ZELight.h"
 #include "ZEUI/ZEUIDebugDrawTag.h"
 #include "ZEGame.h"
@@ -289,7 +288,4 @@ ZEDebugDrawer::~ZEDebugDrawer()
 ZEDebugDrawer* ZEDebugDrawer::CreateInstance()
 {
 	return new ZEDebugDrawer(); 
-}
-
-
-
+}*/

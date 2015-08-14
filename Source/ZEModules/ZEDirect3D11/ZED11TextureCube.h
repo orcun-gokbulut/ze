@@ -46,7 +46,7 @@ class ZEGRRenderTarget;
 
 class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	private:
 		ID3D11Texture2D*				Texture;
 		ID3D11ShaderResourceView*		ResourceView;

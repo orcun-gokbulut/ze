@@ -1046,12 +1046,6 @@ bool ZEGizmo::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	GizmoMaterial = ZERNSimpleMaterial::CreateInstance();
-
-	RenderCommand.SetZero();
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.Material = GizmoMaterial;
-	
 	return true;
 }
 
@@ -1064,24 +1058,6 @@ bool ZEGizmo::DeinitializeSelf()
 	}
 
 	return ZEEntity::DeinitializeSelf();
-}
-
-void ZEGizmo::Draw(ZERNDrawParameters* DrawParameters)
-{
-	UpdateGizmo();
-
-	RenderCommand.Priority = 4;
-	RenderCommand.WorldMatrix = GetWorldTransform();
-	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	RenderCommand.PrimitiveCount = GizmoLines.Vertices.GetCount() / 2;
-	RenderCommand.VertexBuffer = &GizmoLines;
-	DrawParameters->Renderer->AddCommand(&RenderCommand);
-
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.PrimitiveCount = GizmoTriangles.Vertices.GetCount() / 3;
-	RenderCommand.VertexBuffer = &GizmoTriangles;
-	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 ZEGizmoAxis ZEGizmo::PickAxis(const ZERay& Ray, float& TRay)

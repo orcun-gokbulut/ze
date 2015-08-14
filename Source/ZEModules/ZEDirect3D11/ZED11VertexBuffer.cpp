@@ -35,7 +35,7 @@
 
 #include "ZEError.h"
 #include "ZED11VertexBuffer.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 
 ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
 {
@@ -74,6 +74,8 @@ bool ZED11VertexBuffer::Lock(void** Data)
 	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE, 0, &Map);
 	if (FAILED(Result))
 		return false;
+
+	*Data = Map.pData;
 
 	return true;
 }

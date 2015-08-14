@@ -66,8 +66,8 @@ class ZED11StateBase : public ZEListItem, public ZEGRResource
 	public:
 		virtual ZEGRResourceType	GetResourceType();
 		ZESize						GetReferenceCount();
-		virtual IUnknown*			GetInterfaceBase();
-		virtual const ZEGRState&	GetStateBase();
+		virtual IUnknown*			GetInterfaceBase() = 0;
+		virtual const ZEGRState&	GetStateBase() = 0;
 };
 
 template<typename _ZEGRState, typename _IInterface>
@@ -81,7 +81,6 @@ class ZED11State : public ZED11StateBase
 	public:
 		virtual IUnknown*			GetInterfaceBase();
 		virtual const ZEGRState&	GetStateBase();
-
 		_IInterface*				GetInterface();
 		const _ZEGRState&			GetState();
 
