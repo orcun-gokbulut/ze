@@ -41,6 +41,7 @@
 #include "ZEDCore/ZEDTransformationManager.h"
 #include "ZEDCore/ZEDGizmo.h"
 #include "ui_ZEDMainEditor.h"
+#include "ZEDMainBrowser.h"
 
 bool ZEDMainEditor::InitializeSelf()
 {
@@ -182,19 +183,36 @@ void ZEDMainEditor::MainTimer_onTimeout()
 	ui->actRedo->setEnabled(Core->GetOperationManager()->CanRedo());
 }
 
+ZEDMainBrowser* ZEDMainEditor::GetBrowser()
+{
+	return Browser;
+}
+
 bool ZEDMainEditor::Initialize()
 {
 	Core->InitializeEngine();
 
-	return InitializeSelf();
+	if (!InitializeSelf())
+		return false;
+
+	if (!Browser->GetBrowserWidget()->Initialize())
+		return false;
+
+	return true;
 }
 
 bool ZEDMainEditor::Deinitalize()
 {
+	if (!Browser->GetBrowserWidget()->Deinitalize())
+		return false;
+
+	if (!DeinitializeSelf())
+		return false;
+
 	if (Core != NULL)
 		Core->DeinitializeEngine();
 
-	return DeinitializeSelf();
+	return true;
 }
 
 ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWindow(Parent, Flags)
@@ -202,6 +220,8 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	ui = new Ui::MainEditor();
 	ui->setupUi(this);
 	showMaximized();
+	setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
 	MainTimer = new QTimer(this);
 	MainTimer->setInterval(0);
@@ -213,6 +233,9 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	
 	Core->GetEditorModule()->SetViewPort(MainViewPort);
 	
+	Browser = new ZEDMainBrowser(this);
+	addDockWidget(Qt::RightDockWidgetArea, Browser);
+
 	Initialize();
 }
 

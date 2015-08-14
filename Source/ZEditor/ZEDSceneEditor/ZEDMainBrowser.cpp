@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneWrapper.h
+ Zinek Engine - ZEDMainBrowser.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,76 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDMainBrowser.h"
+#include "ui_ZEDMainBrowser.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDCore.h"
+#include "ZEDCore/ZEDModule.h"
 
-#include "ZEDObjectWrapper.h"
-#include "ZEDScene.h"
-
-class ZEDSceneWrapper : public ZEDObjectWrapper
+void ZEDMainBrowserWidget::LoadObject(QTreeWidgetItem* Item, ZEDObjectWrapper* Object)
 {
-	public:
-		virtual void SetObjectId(ZEInt Id);
-		virtual ZEInt GetObjectId();
+	if (Item == NULL || Object == NULL)
+		return;
 
-		virtual void SetObjectName(const ZEString& Name);
-		virtual ZEString GetObjectName();
+	Item->setText(0, Object->GetObjectName().ToCString());
+	Item->setText(1, Object->GetObject()->GetClass()->GetName());
+	Item->setData(0, Qt::UserRole, QVariant((qlonglong)Object));
 
-		virtual void SetObject(ZEObject* Object);
+	const ZEArray<ZEDObjectWrapper*>& ChildObjects = Object->GetChildWrappers();
 
-		virtual void SetObjectEnabled(bool Value);
-		virtual bool GetObjectEnabled();
+	for (ZESize I = 0; I < ChildObjects.GetCount(); I++)
+	{
+		QTreeWidgetItem* SubItem = new QTreeWidgetItem(Item);
+		LoadObject(SubItem, ChildObjects[I]);
+	}
+}
 
-		virtual void SetObjectVisibility(bool Value);
-		virtual bool GetObjectVisibility();
+void ZEDMainBrowserWidget::LoadScene()
+{
+	Form->treeBrowser->clear();
 
-		virtual ZEAABBox GetObjectBoundingBox();
-		virtual ZEMatrix4x4 GetObjectTransform();
-		virtual void SetObjectPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3 GetObjectPosition();
-		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion GetObjectRotation();
-		virtual void SetObjectScale(const ZEVector3& NewScale);
-		virtual ZEVector3 GetObjectScale();
+	if (Scene == NULL)
+		return;
 
-		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+	QTreeWidgetItem* TopLevelItem = new QTreeWidgetItem();
+	Form->treeBrowser->addTopLevelItem(TopLevelItem);
+	LoadObject(TopLevelItem, Scene);
+}
 
-		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
-		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
-		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
+bool ZEDMainBrowserWidget::Initialize()
+{
+	Scene = ZEDCore::GetInstance()->GetEditorModule()->GetRootWrapper();
 
-		static ZEDSceneWrapper* CreateInstance();
-};
+	LoadScene();
+
+	return true;
+}
+
+bool ZEDMainBrowserWidget::Deinitalize()
+{
+	Scene = NULL;
+
+	return true;
+}
+
+ZEDMainBrowserWidget::ZEDMainBrowserWidget(QWidget* Parent) : QWidget(Parent)
+{
+	Form = new Ui::MainBrowser();
+	Form->setupUi(this);
+
+	Scene = NULL;
+}
+
+//ZEDMainBrowser Dock Widget
+
+ZEDMainBrowserWidget* ZEDMainBrowser::GetBrowserWidget()
+{
+	return Browser;
+}
+
+ZEDMainBrowser::ZEDMainBrowser(QWidget* Parent) : QDockWidget("Main Browser", Parent)
+{
+	Browser = new ZEDMainBrowserWidget(this);
+	setWidget(Browser);
+	setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
+}

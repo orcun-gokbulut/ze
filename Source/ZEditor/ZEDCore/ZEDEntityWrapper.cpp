@@ -51,6 +51,26 @@ void ZEDEntityWrapper::DrawBoundingBox(const ZEVector4& Color)
 	DrawCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 }
 
+void ZEDEntityWrapper::SetObjectId(ZEInt Id)
+{
+	((ZEEntity*)Object)->SetEntityId(Id);
+}
+
+ZEInt ZEDEntityWrapper::GetObjectId()
+{
+	return ((ZEEntity*)Object)->GetEntityId();
+}
+
+void ZEDEntityWrapper::SetObjectName(const ZEString& Name)
+{
+	((ZEEntity*)Object)->SetName(Name);
+}
+
+ZEString ZEDEntityWrapper::GetObjectName()
+{
+	return ((ZEEntity*)Object)->GetName();
+}
+
 void ZEDEntityWrapper::SetObject(ZEObject* Object)
 {
 	if (!ZEClass::IsDerivedFrom(ZEEntity::Class(), Object->GetClass()))
@@ -81,11 +101,6 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 		ChildWrapper->SetObject(Children[I]);
 		AddChildWrapper(ChildWrapper);
 	}
-}
-
-ZEObject* ZEDEntityWrapper::GetObject()
-{
-	return ZEDObjectWrapper::GetObject();
 }
 
 void ZEDEntityWrapper::SetObjectEnabled(bool Value)

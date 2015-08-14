@@ -38,6 +38,12 @@ cmake_minimum_required (VERSION 2.8)
 ze_add_source(ZEDMainEditor.ui					Sources QtUI)
 ze_add_source(ZEDMainEditor.cpp					Sources)
 ze_add_source(ZEDMainEditor.h					Sources QtMocs)
+ze_add_source(ZEDMainBrowser.ui					Sources QtUI)
+ze_add_source(ZEDMainBrowser.cpp				Sources)
+ze_add_source(ZEDMainBrowser.h					Sources QtMocs)
+ze_add_source(ZEDAddToSceneOperation.cpp			Sources)
+ze_add_source(ZEDAddToSceneOperation.h				Sources)
+
 
 qt4_add_resources (QtResourceFiles ${QtResources})
 qt4_wrap_ui (QtUIFiles ${QtUI})

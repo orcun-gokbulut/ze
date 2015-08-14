@@ -53,8 +53,6 @@ class ZEDObjectWrapper : public ZEObject
 {
 /*	ZE_OBJECT*/
 	protected:
-		ZESize Id;
-		ZEString Name;
 		ZEString Icon;
 		bool Selectable;
 		QWidget* CustomWidget;
@@ -86,16 +84,20 @@ class ZEDObjectWrapper : public ZEObject
 // 		virtual void Load();
 
 	public:
-		void SetObjectId(ZESize Id);
-		ZESize GetObjectId();
-		void SetObjectName(const ZEString& Name);
-		const ZEString& GetObjectName();
 		void SetObjectIcon(const ZEString& Icon);
 		const ZEString& GetObjectIcon();
+
 		void SetCustomWidget(QWidget* Widget);
 		QWidget* GetCustomWidget();
+
 		void SetPopupMenu(QMenu* Menu);
 		QMenu* GetPopupMenu();
+
+		virtual void SetObjectId(ZEInt Id) = 0;
+		virtual ZEInt GetObjectId() = 0;
+
+		virtual void SetObjectName(const ZEString& Name) = 0;
+		virtual ZEString GetObjectName() = 0;
 
 		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters) = 0;
 

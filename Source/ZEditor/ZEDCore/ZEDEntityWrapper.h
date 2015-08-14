@@ -46,8 +46,13 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		void DrawBoundingBox(const ZEVector4& Color);
 
 	public:
+		virtual void SetObjectId(ZEInt Id);
+		virtual ZEInt GetObjectId();
+
+		virtual void SetObjectName(const ZEString& Name);
+		virtual ZEString GetObjectName();
+
 		virtual void SetObject(ZEObject* Object);
-		virtual ZEObject* GetObject();
 
 		virtual void SetObjectEnabled(bool Value);
 		virtual bool GetObjectEnabled();

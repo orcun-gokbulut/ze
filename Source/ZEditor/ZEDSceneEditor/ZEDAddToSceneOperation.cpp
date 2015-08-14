@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneWrapper.h
+ Zinek Engine - ZEDAddToSceneOperation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAddToSceneOperation.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
 
-#include "ZEDObjectWrapper.h"
-#include "ZEDScene.h"
-
-class ZEDSceneWrapper : public ZEDObjectWrapper
+bool ZEDAddToSceneOperation::Apply()
 {
-	public:
-		virtual void SetObjectId(ZEInt Id);
-		virtual ZEInt GetObjectId();
+	if (Parent == NULL || Object == NULL)
+		return false;
 
-		virtual void SetObjectName(const ZEString& Name);
-		virtual ZEString GetObjectName();
+	Parent->AddChildWrapper(Object);
+}
 
-		virtual void SetObject(ZEObject* Object);
+bool ZEDAddToSceneOperation::Revert()
+{
+	if (Parent == NULL || Object == NULL)
+		return false;
 
-		virtual void SetObjectEnabled(bool Value);
-		virtual bool GetObjectEnabled();
+	Parent->RemoveChildWrapper(Object);
+}
 
-		virtual void SetObjectVisibility(bool Value);
-		virtual bool GetObjectVisibility();
+void ZEDAddToSceneOperation::Destroy()
+{
+	if (ZED_OS_NOT_DONE)
+		Object->Destroy();
+}
 
-		virtual ZEAABBox GetObjectBoundingBox();
-		virtual ZEMatrix4x4 GetObjectTransform();
-		virtual void SetObjectPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3 GetObjectPosition();
-		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion GetObjectRotation();
-		virtual void SetObjectScale(const ZEVector3& NewScale);
-		virtual ZEVector3 GetObjectScale();
-
-		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
-		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
-		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
-		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
-
-		static ZEDSceneWrapper* CreateInstance();
-};
+ZEDAddToSceneOperation::ZEDAddToSceneOperation(ZEDObjectWrapper* Parent, ZEDObjectWrapper* Object)
+{
+	SetText("Add To Scene");
+	this->Parent = Parent;
+	this->Object = Object;
+}

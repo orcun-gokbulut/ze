@@ -40,7 +40,6 @@
 
 ZEDObjectWrapper::ZEDObjectWrapper()
 {
-	Id = 0;
 	CustomWidget = NULL;
 	PopupMenu = NULL;
 	Selectable = true;
@@ -73,26 +72,6 @@ ZEDObjectWrapper::~ZEDObjectWrapper()
 		delete Object;
 		Object = NULL;
 	}
-}
-
-void ZEDObjectWrapper::SetObjectId(ZESize Id)
-{
-	this->Id = Id;
-}
-
-ZESize ZEDObjectWrapper::GetObjectId()
-{
-	return Id;
-}
-
-void ZEDObjectWrapper::SetObjectName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString& ZEDObjectWrapper::GetObjectName()
-{
-	return Name;
 }
 
 void ZEDObjectWrapper::SetCustomWidget(QWidget* Widget)

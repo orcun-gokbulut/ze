@@ -36,6 +36,26 @@
 #include "ZEDSceneWrapper.h"
 #include "ZEDEntityWrapper.h"
 
+void ZEDSceneWrapper::SetObjectId(ZEInt Id)
+{
+
+}
+
+ZEInt ZEDSceneWrapper::GetObjectId()
+{
+	return 0;
+}
+
+void ZEDSceneWrapper::SetObjectName(const ZEString& Name)
+{
+
+}
+
+ZEString ZEDSceneWrapper::GetObjectName()
+{
+	return ZEString();
+}
+
 void ZEDSceneWrapper::SetObject(ZEObject* Object)
 {
 	if (Object == NULL)
@@ -73,11 +93,6 @@ void ZEDSceneWrapper::SetObject(ZEObject* Object)
 		Temp->SetObject(Entities[I]);
 		ChildWrappers[I] = Temp;
 	}
-}
-
-ZEObject* ZEDSceneWrapper::GetObject()
-{
-	return GetObject();
 }
 
 void ZEDSceneWrapper::SetObjectEnabled(bool Value)
