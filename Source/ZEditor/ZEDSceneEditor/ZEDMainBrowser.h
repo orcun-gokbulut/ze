@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneWrapper.h
+ Zinek Engine - ZEDMainBrowser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,40 +35,37 @@
 
 #pragma once
 
-#include "ZEDObjectWrapper.h"
-#include "ZEDScene.h"
+#include <QtGui/QDockWidget>
+#include <QtGui/QTreeWidget>
 
-class ZEDSceneWrapper : public ZEDObjectWrapper
+namespace Ui { class MainBrowser; }
+class ZEDObjectWrapper;
+
+class ZEDMainBrowserWidget : public QWidget
 {
+	Q_OBJECT
+
+	private:
+		Ui::MainBrowser* Form;
+		ZEDObjectWrapper* Scene;
+
 	public:
-		virtual void SetObjectId(ZEInt Id);
-		virtual ZEInt GetObjectId();
+		void LoadObject(QTreeWidgetItem* Item, ZEDObjectWrapper* Object);
+		void LoadScene();
 
-		virtual void SetObjectName(const ZEString& Name);
-		virtual ZEString GetObjectName();
+		bool Initialize();
+		bool Deinitalize();
 
-		virtual void SetObject(ZEObject* Object);
+		ZEDMainBrowserWidget(QWidget* Parent = 0);
+};
 
-		virtual void SetObjectEnabled(bool Value);
-		virtual bool GetObjectEnabled();
+class ZEDMainBrowser : public QDockWidget
+{
+	private:
+		ZEDMainBrowserWidget* Browser;
 
-		virtual void SetObjectVisibility(bool Value);
-		virtual bool GetObjectVisibility();
+	public:
+		ZEDMainBrowserWidget* GetBrowserWidget();
 
-		virtual ZEAABBox GetObjectBoundingBox();
-		virtual ZEMatrix4x4 GetObjectTransform();
-		virtual void SetObjectPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3 GetObjectPosition();
-		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion GetObjectRotation();
-		virtual void SetObjectScale(const ZEVector3& NewScale);
-		virtual ZEVector3 GetObjectScale();
-
-		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
-		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
-		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
-		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
-
-		static ZEDSceneWrapper* CreateInstance();
+		ZEDMainBrowser(QWidget* Parent = 0);
 };

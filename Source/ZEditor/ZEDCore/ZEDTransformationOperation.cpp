@@ -239,4 +239,12 @@ ZEDTransformationOperation::ZEDTransformationOperation(ZEDTransformType Type, ZE
 
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 		this->Wrappers[I] = Wrappers[I];
+
+	if (Type == ZED_TT_TRANSLATE)
+		SetText("Change Position");
+	else if (Type == ZED_TT_ROTATE)
+		SetText("Change Rotation");
+	else if (Type == ZED_TT_SCALE)
+		SetText("Change Scale");
+
 }

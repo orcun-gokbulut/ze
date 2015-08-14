@@ -40,10 +40,8 @@
 #include <QtGui/QMainWindow>
 #include <QtCore/QTimer>
 
-namespace Ui
-{
-	class MainEditor;
-}
+namespace Ui {class MainEditor;}
+class ZEDMainBrowser;
 
 class ZEDMainEditor : public QMainWindow
 {
@@ -53,6 +51,8 @@ class ZEDMainEditor : public QMainWindow
 		ZEDCore* Core;
 		ZEDViewPort* MainViewPort;
 		QTimer* MainTimer;
+
+		ZEDMainBrowser* Browser;
 
 		bool InitializeSelf();
 		bool DeinitializeSelf();
@@ -82,8 +82,23 @@ class ZEDMainEditor : public QMainWindow
 // 		void actGoToEntity_onTriggered();
 
 		void MainTimer_onTimeout();
+
+// 		virtual void OnSelected();
+// 		virtual void OnDeselected();
+// 		virtual void OnCreated();
+// 		virtual void OnDestroy();
+// 		virtual void OnTransformed();
+// 		virtual void OnChildObjectChanged();
+// 		virtual void OnParentObjectChanged();
+// 		virtual void OnOpenContainer();
+// 		virtual void OnCloseContainer();
+// 		virtual void Save();
+// 		virtual void Load();
 		
 	public:
+
+		ZEDMainBrowser* GetBrowser();
+
 		bool Initialize();
 		bool Deinitalize();
 

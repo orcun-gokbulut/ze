@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneWrapper.h
+ Zinek Engine - ZEDAddToSceneOperation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,40 +35,23 @@
 
 #pragma once
 
-#include "ZEDObjectWrapper.h"
-#include "ZEDScene.h"
+#include "ZEDCore/ZEDOperation.h"
+#include "ZEDS/ZEArray.h"
 
-class ZEDSceneWrapper : public ZEDObjectWrapper
+class ZEDObjectWrapper;
+
+class ZEDAddToSceneOperation : public ZEDOperation
 {
+	private:
+		ZEDObjectWrapper* Parent;
+		ZEDObjectWrapper* Object;
+
+	protected:		
+		virtual bool Apply();
+		virtual bool Revert();
+
 	public:
-		virtual void SetObjectId(ZEInt Id);
-		virtual ZEInt GetObjectId();
+		virtual void Destroy();
 
-		virtual void SetObjectName(const ZEString& Name);
-		virtual ZEString GetObjectName();
-
-		virtual void SetObject(ZEObject* Object);
-
-		virtual void SetObjectEnabled(bool Value);
-		virtual bool GetObjectEnabled();
-
-		virtual void SetObjectVisibility(bool Value);
-		virtual bool GetObjectVisibility();
-
-		virtual ZEAABBox GetObjectBoundingBox();
-		virtual ZEMatrix4x4 GetObjectTransform();
-		virtual void SetObjectPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3 GetObjectPosition();
-		virtual void SetObjectRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion GetObjectRotation();
-		virtual void SetObjectScale(const ZEVector3& NewScale);
-		virtual ZEVector3 GetObjectScale();
-
-		virtual bool RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
-		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
-		virtual void AddChildWrapper(ZEDObjectWrapper* Wrapper);
-		virtual void RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
-
-		static ZEDSceneWrapper* CreateInstance();
+		ZEDAddToSceneOperation(ZEDObjectWrapper* Parent, ZEDObjectWrapper* Object);
 };
