@@ -46,16 +46,11 @@ class ZERNCommand;
 class ZERNStage : public ZEInitializable
 {
 	friend class ZERNRenderer;
-	private:
-		ZEString						Name;
-		ZERNRenderer*					Renderer;
-		ZEGRContext*					Device;
-
 	public:
 		virtual ZEInt					GetId() = 0;
 		virtual const ZEString&			GetName() = 0;
 		virtual const ZEGRRenderState&	GetRenderState() = 0;
 
-		virtual void					Setup(ZEGRContext* Device);
+		virtual void					Setup(ZERNRenderer* Device, ZEGRContext* Context);
 		virtual void					CleanUp();
 };

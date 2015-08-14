@@ -34,6 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStageGBuffer.h"
+#include "ZEGraphics\ZEGRContext.h"
+
+bool ZERNStageGBuffer::InitializeSelf()
+{
+
+}
+
+void ZERNStageGBuffer::DeinitializeSelf()
+{
+
+}
+
+ZEInt ZERNStageGBuffer::GetId()
+{
+	return 1;
+}
+
+const ZEString& ZERNStageGBuffer::GetName()
+{
+	return "GBuffer";
+}
+
+const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
+{
+	return RenderState;
+}
 
 ZEGRTexture2D* ZERNStageGBuffer::GetPositionBuffer()
 {
@@ -65,17 +91,15 @@ const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
 	return RenderState;
 }
 
-void ZERNStageGBuffer::Setup(ZEGRContext* Device)
+void ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-
+	Context->SetRenderTarget(0, GBuffer0->GetRenderTarget());
+	Context->SetRenderTarget(1, GBuffer0);
+	Context->SetRenderTarget(2, GBuffer0);
+	Context->SetRenderTarget(3, GBuffer0);
 }
 
 void ZERNStageGBuffer::CleanUp()
-{
-
-}
-
-void ZERNStageGBuffer::Reconfigure()
 {
 
 }

@@ -41,10 +41,11 @@
 #include "ZEDS/ZEList2.h"
 #include "ZERNView.h"
 
+class ZEScene;
 class ZERNStage;
 class ZERNCommand;
-class ZEScene;
 class ZEGRContext;
+class ZEGROutput;
 
 
 class ZERNStageQueue
@@ -62,6 +63,7 @@ class ZERNRenderer : public ZEInitializable
 		ZEGRContext*				Device;
 		ZEScene*					Scene;
 		ZERNView					View;
+		ZEGROutput*					Output;
 		ZEArray<ZERNStageQueue>		StageQueues;
 		ZEList2<ZERNCommand>		Commands;
 		
@@ -79,6 +81,9 @@ class ZERNRenderer : public ZEInitializable
 
 		void						SetView(const ZERNView& View);
 		const ZERNView&				GetView();
+
+		void						SetOutput(ZEGROutput* Output);
+		ZEGROutput*					GetOutput();
 
 		void						SetScene(ZEScene* Scene);
 		ZEScene*					GetScene();
