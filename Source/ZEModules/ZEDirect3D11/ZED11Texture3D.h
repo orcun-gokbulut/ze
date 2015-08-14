@@ -43,7 +43,7 @@ class ZEGRRenderTarget;
 
 class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 
 	private:
 		ID3D11Texture3D*					Texture3D;

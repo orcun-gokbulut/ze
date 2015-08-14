@@ -36,7 +36,7 @@
 #include <d3d11.h>
 
 #include "ZEError.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 #include "ZED11DepthStencilBuffer.h"
 
 inline static DXGI_FORMAT ConvertDepthStencilFormat(ZEGRDepthStencilFormat Format)

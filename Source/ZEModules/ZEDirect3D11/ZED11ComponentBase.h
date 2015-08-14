@@ -37,18 +37,19 @@
 
 #include <d3d11.h>
 
-class ZED11Direct3D11Module;
+class ZED11Module;
 enum ZEGRFormat;
 
 class ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	private:
-		static ZED11Direct3D11Module*	Module;
+		static ZED11Module*	Module;
 		static ID3D11Device*			Device;
+		static ID3D11DeviceContext*		Context;
 
 	public:
-		static ZED11Direct3D11Module*	GetModule();
+		static ZED11Module*	GetModule();
 		ID3D11Device*					GetDevice();
 		ID3D11DeviceContext*			GetMainContext();
 

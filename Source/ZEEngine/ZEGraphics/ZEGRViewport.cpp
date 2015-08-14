@@ -37,16 +37,6 @@
 
 #include <memory>
 
-void ZEGRViewport::SetEnabled(bool Enabled)
-{
-	StateData.Enabled = Enabled;
-}
-
-bool ZEGRViewport::GetEnabled()
-{
-	return StateData.Enabled;
-}
-
 void ZEGRViewport::SetX(float x)
 {
 	StateData.X = x;
@@ -105,19 +95,4 @@ void ZEGRViewport::SetMaxDepth(float Depth)
 float ZEGRViewport::GetMaxDepth() const
 {
 	return StateData.MaxDepth;
-}
-
-void ZEGRViewport::SetZero()
-{
-	memset(&StateData, 0, sizeof(ZEViewportData));
-}
-
-ZEGRViewport::ZEGRViewport()
-{
-	SetZero();
-}
-
-ZEGRViewport::~ZEGRViewport()
-{
-
 }

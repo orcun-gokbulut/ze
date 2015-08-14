@@ -66,8 +66,6 @@ class ZERNSampler
 		void							Load3D(const ZEString& FileName);
 		void							LoadCube(const ZEString& FileName);
 
-		ZERNSampler&					operator=(const ZERNSampler& Other);
-
 		void							Write(ZEMLWriterNode& Node);
 		void							Read(ZEMLReaderNode& Node);
 

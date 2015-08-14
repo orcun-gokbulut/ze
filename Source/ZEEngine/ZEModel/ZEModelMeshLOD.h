@@ -38,13 +38,16 @@
 #define __ZE_MODEL_MESH_LOD_H__
 
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
-struct ZERNDrawParameters;
 class ZEModel;
-class ZERNMaterial;
 class ZEModelMesh;
 class ZEModelResourceMeshLOD;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
+class ZERNMaterial;
 class ZERNRenderer;
+class ZERNRenderParameters;
 
 class ZEModelMeshLOD
 {
@@ -52,26 +55,27 @@ class ZEModelMeshLOD
 		ZEModel*							Owner;
 		ZEModelMesh*						OwnerMesh;
 		const ZEModelResourceMeshLOD*		LODResource;
-		ZEGRVertexBuffer*					VertexBuffer;
-		ZERNCommand						RenderCommand;
-		const ZERNMaterial*					Material;
+		
+		ZEGRHolder<ZEGRIndexBuffer>			IndexBuffer;
+		ZEGRHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEGRHolder<ZEGRVertexBuffer>		VertexBufferNormals;
+		ZEGRHolder<ZEGRVertexBuffer>		VertexBufferSkin;
+
+		ZEGRHolder<ZERNMaterial>			Material;
 		bool								Skinned;
 
 	public:
-		void								ResetMaterial();
-		void								SetMaterial(const ZERNMaterial* Material);
-		const ZERNMaterial*					GetMaterial();
+		bool								IsSkinned();
+
+		void								SetMaterial(ZERNMaterial* Material);
+		ZERNMaterial*						GetMaterial();
 
 		const ZEModelResourceMeshLOD*		GetLODResource();
 
-		bool								IsSkinned();
-
-		void								Draw(ZERNDrawParameters* DrawParameters, float DrawOrder);
-
-		bool								UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices);
-		
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();
+
+		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
 											ZEModelMeshLOD();
 											~ZEModelMeshLOD();

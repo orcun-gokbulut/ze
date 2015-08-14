@@ -87,7 +87,7 @@ const ZEModelAnimation* ZEModelAnimationTrack::GetAnimation()
 	return Animation;
 }
 
-void ZEModelAnimationTrack::SetAnimationByName(const char* AnimationName)
+void ZEModelAnimationTrack::SetAnimationByName(const ZEString& AnimationName)
 {
 	Animation = NULL;
 
@@ -95,7 +95,7 @@ void ZEModelAnimationTrack::SetAnimationByName(const char* AnimationName)
 		return;
 
 	for (ZESize I = 0; I < Owner->ModelResource->GetAnimations().GetCount(); I++)
-		if (strnicmp(AnimationName, Owner->ModelResource->GetAnimations()[I].Name, ZE_MDLF_MAX_NAME_SIZE) == 0)
+		if (AnimationName == Owner->ModelResource->GetAnimations()[I].Name)
 		{
 			Animation = &Owner->ModelResource->GetAnimations()[I];
 
@@ -105,12 +105,12 @@ void ZEModelAnimationTrack::SetAnimationByName(const char* AnimationName)
 		}
 }	
 
-const char* ZEModelAnimationTrack::GetAnimationName()
+const ZEString& ZEModelAnimationTrack::GetAnimationName()
 {
 	if (Animation != NULL)
 		return Animation->Name;
 	else
-		return "";
+		return ZEString::Empty;
 }
 
 void ZEModelAnimationTrack::SetCurrentFrame(float Frame)

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Direct3D11Module.h
+ Zinek Engine - ZED11Output.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,60 +35,49 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGROutput.h"
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZED11StatePool.h"
-#include "ZED11Tracer.h"
-#include "ZED11Context.h"
+#include "ZED11ComponentBase.h"
+#include "ZED11RenderTarget.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
-class ZEGRTexture2D;
-class ZEGRTexture3D;
-class ZEGRTextureCube;
-class ZEGRIndexBuffer;
-class ZEGRVertexBuffer;
-class ZEGRShaderCompiler;
-class ZEGRContext;
+struct IDXGIOutput;
+struct IDXGISwapChain1;
+class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 
-#define ZE_MAX_MULTI_SAMPLE_COUNT		D3D11_MAX_MULTISAMPLE_SAMPLE_COUNT
-#define ZE_MAX_ANISOTROPY_LEVEL			D3D11_MAX_MAXANISOTROPY
-
-class ZED11Direct3D11Module : public ZEGRGraphicsModule
+class ZED11Output : public ZEGROutput, ZED11ComponentBase
 {
-	ZE_MODULE(ZED11Direct3D11Module)
-	protected:
-		ID3D11Device*							Device;
-		ZED11Context							MainContext;
-		ZEArray<ZEGRAdapter*>					Adapters;
-		ZED11StatePool							StatePool;
-		ZED11Tracer								Tracer;
+	friend ZED11Module;
+	private:
+		void*								Handle;
+		ZEGRMonitorMode*					Mode;
+		bool								Fullscreen;
+		ZED11RenderTarget					RenderTarget;
 
-		bool									CreateDevice(ZEGRAdapter* Adapter);
+		IDXGIOutput*						Output;
+		IDXGISwapChain1*					SwapChain;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		void								SwitchToFullscreen();
+		void								UpdateRenderTarget(ZESize Width, ZESize Height, ZEGRFormat Format);
 
-												ZED11Direct3D11Module();
-		virtual									~ZED11Direct3D11Module();
+		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format);
+		virtual	void						Deinitialize();
+
+											ZED11Output();
 
 	public:
-		ZED11StatePool*							GetStatePool();
-		virtual ZEGRTracer*						GetTracer();
-		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters();
-		virtual ZEGRContext*					GetMainContext();
+		virtual void*						GetHandle();
+		virtual ZEGRRenderTarget*			GetRenderTarget();
 
-		virtual ZEGRContext*					CreateContext();
-		virtual ZEGRVertexBuffer*				CreateVertexBuffer();
-		virtual ZEGRIndexBuffer*				CreateIndexBuffer();
-		virtual ZEGRShader*						CreateShader();
-		virtual ZEGRConstantBuffer*				CreateConstantBuffer();
-		virtual ZEGRTexture2D*					CreateTexture2D();
-		virtual ZEGRTexture3D*					CreateTexture3D();
-		virtual ZEGRTextureCube*				CreateTextureCube();
-		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer();
-		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
-		virtual ZEGRWindow*						CreateGraphicsWindow();
-		virtual ZEGRRenderStateData*			CreateRenderStateData();
+		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode);
+		virtual ZEGRMonitorMode*			GetMonitorMode();
+
+		virtual void						SetFullscreen(bool Enabled);
+		virtual bool						GetFullscreen();
+
+		virtual void						Resize(ZEUInt Width, ZEUInt Height);
+
+		virtual void						Present();
 };

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_MESH_H__
-#define __ZE_MODEL_MESH_H__
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
@@ -91,6 +89,8 @@ class ZEModelMesh : public ZEObject
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
+		ZERNCommand							RenderCommand;
+		
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
 		void								OnTransformChanged();
 
@@ -162,10 +162,10 @@ class ZEModelMesh : public ZEObject
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		void								Draw(ZERNDrawParameters* DrawParameters);
+		bool								PreRender(const ZERNCullParameters* CullParameters);
+
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();
 											~ZEModelMesh();
 };
-#endif

@@ -45,7 +45,7 @@
 class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 {
 	friend class ZED11Context;
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	
 	protected:	
 		ID3D11Buffer*			Buffer;
@@ -58,8 +58,8 @@ class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 	public:
 		ID3D11Buffer*			GetBuffer() const;
 
-		void					Unlock();
-		bool					Lock(void** Data);
+		virtual void			Unlock();
+		virtual bool			Lock(void** Data);
 };
 
 #endif

@@ -41,7 +41,6 @@
 #include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLNode.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGame/ZEDrawStatistics.h"
 #include "ZEGame/ZERayCast.h"
 
 ZE_ENUM(ZEInteriorCullMode)
@@ -76,9 +75,7 @@ class ZEInterior : public ZEEntity
 		ZEArray<ZEInteriorRoom*>				Rooms;
 		ZEArray<ZEInteriorDoor*>				Doors;
 		ZEArray<ZEInteriorHelper*>				Helpers;
-
 		ZEInteriorCullMode						CullMode;
-		ZEInteriorStatistics					Statistics;
 
 		void									LoadInteriorResource();
 
@@ -103,8 +100,6 @@ class ZEInterior : public ZEEntity
 		ZEInteriorRoom*							GetRoom(const ZEString& Name);
 		ZEInteriorDoor*							GetDoor(const ZEString& Name);
 		ZEInteriorHelper*						GetHelper(const ZEString& Name);
-
-		const ZEInteriorStatistics&				GetStatistics() const;
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
 

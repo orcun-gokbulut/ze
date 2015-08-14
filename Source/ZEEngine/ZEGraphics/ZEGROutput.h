@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNCommand.h
+ Zinek Engine - ZEGROutput.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,29 +35,37 @@
 
 #pragma once
 
-#include "ZEDS/ZEList2.h"
+#include "ZEGRResource.h"
 
-#define ZERN_MAX_COMMAND_STAGE 5
+#include "ZETypes.h"
+#include "ZEGRDefinitions.h"
 
-class ZEEntity;
-class ZERNRenderParameters;
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+class ZEGRMonitorMode;
+class ZEWindow;
 
-class ZERNCommand
+class ZEGROutput : public ZEGRResource
 {
-	//ZE_DISALLOW_COPY(ZERNCommand);
-	friend class ZERNRenderer;
-	private:
-		ZELink<ZERNCommand>				StageQueueLinks[ZERN_MAX_COMMAND_STAGE];
+	protected:
+		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format) = 0;
+		virtual void						Deinitialize() = 0;
 
 	public:
-		ZEEntity*						Entity;
+		virtual ZEGRResourceType			GetResourceType();
 
-		ZEInt							Priority;
-		float							Order;
-		ZEUInt							StageMask;
-		void*							ExtraParameters;
+		virtual void*						GetHandle() = 0;
+		virtual ZEGRRenderTarget*			GetRenderTarget() = 0;
 
-		virtual void					Execute(const ZERNRenderParameters* Parameters);
+		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode) = 0;
+		virtual ZEGRMonitorMode*			GetMonitorMode() = 0;
 
-										ZERNCommand();
+		virtual void						SetFullscreen(bool Enabled) = 0;
+		virtual bool						GetFullscreen() = 0;
+
+		virtual void						Resize(ZEUInt Width, ZEUInt Height) = 0;
+
+		virtual void						Present() = 0;
+
+		static ZEGROutput*					Create(void* Window, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format);
 };

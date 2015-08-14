@@ -48,7 +48,7 @@
 #include "ZEGraphics/ZEGRShader.h"
 
 #include "ZED11Shader.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 #include "ZED11Context.h"
 #include "ZED11RenderStateData.h"
 

@@ -46,7 +46,7 @@ class ZEGRRenderStateData;
 
 class ZED11StatePool : public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	protected:
 		ZEList<ZED11StateBase>				BlendStatePool;
 		ZEList<ZED11StateBase>				VertexLayoutPool;

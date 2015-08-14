@@ -51,11 +51,6 @@ ZEUInt ZEGRRenderTarget::GetHeight()
 	return Height;
 }
 
-ZEUInt ZEGRRenderTarget::GetDepth()
-{
-	return Depth;
-}
-
 ZEVector2 ZEGRRenderTarget::GetPixelSize()
 {
 	return ZEVector2(1.0f / Width, 1.0f / Height);
@@ -68,13 +63,8 @@ ZEGRFormat ZEGRRenderTarget::GetFormat()
 
 ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
-	zeDebugCheck(Width == 0, "Width cannot be zero.");
-	zeDebugCheck(Height == 0, "Height cannot be zero.");
-	zeDebugCheck(Format == ZEGR_TF_NONE, "Ilvalid render target format.");
-
 	this->Width = Width;
 	this->Height = Height;
-	this->Depth = Depth;
 	this->Format = Format;
 }
 

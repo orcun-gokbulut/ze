@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Screen.h
+ Zinek Engine - ZED11Module.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,39 +35,55 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRScreen.h"
-#include "ZED11ComponentBase.h"
-#include "ZETypes.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
-struct IDXGIOutput;
-struct IDXGISwapChain1;
-class ZEGRRenderTarget;
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZED11StatePool.h"
+#include "ZED11Tracer.h"
+#include "ZED11Context.h"
+
+class ZEGRTexture2D;
+class ZEGRTexture3D;
+class ZEGRTextureCube;
+class ZEGRIndexBuffer;
+class ZEGRVertexBuffer;
+class ZEGRShaderCompiler;
+class ZEGRContext;
 class ZEGRDepthStencilBuffer;
 
-class ZED11Screen : public ZEGRScreen, ZED11ComponentBase
+class ZED11Module : public ZEGRGraphicsModule
 {
-	private:
-		IDXGIOutput*						Output;
-		IDXGISwapChain1*					SwapChain;
+	ZE_MODULE(ZED11Module)
+	protected:
+		ID3D11Device*							Device;
+		ZED11Context							Context;
+		ZEArray<ZEGRAdapter*>					Adapters;
+		ZED11StatePool							StatePool;
+		ZED11Tracer								Tracer;
 
-		ZEGRRenderTarget*					RenderTarget;
-		ZEGRDepthStencilBuffer*				DepthStencilBuffer;
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
-		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
-
-		ZED11Screen();
+												ZED11Module();
+		virtual									~ZED11Module();
 
 	public:
-		virtual void						SetSize(ZEUInt Width, ZEUInt Height);
-		ZEUInt								GetWidth();
-		ZEUInt								GetHeight();
+		ZED11StatePool*							GetStatePool();
+		virtual ZEGRTracer*						GetTracer();
+		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters();
+		virtual ZEGRContext*					GetMainContext();
 
-		virtual void						SetVisible(bool Visible);
-		bool								GetVisible();
-
-		virtual ZEGRRenderTarget*			GetRenderTarget();
-		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer();
-
-		virtual void						Present();
+		virtual ZEGROutput*						CreateOutput();
+		virtual ZEGRContext*					CreateContext();
+		virtual ZEGRVertexBuffer*				CreateVertexBuffer();
+		virtual ZEGRIndexBuffer*				CreateIndexBuffer();
+		virtual ZEGRShader*						CreateShader();
+		virtual ZEGRConstantBuffer*				CreateConstantBuffer();
+		virtual ZEGRTexture2D*					CreateTexture2D();
+		virtual ZEGRTexture3D*					CreateTexture3D();
+		virtual ZEGRTextureCube*				CreateTextureCube();
+		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer();
+		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
+		virtual ZEGRRenderStateData*			CreateRenderStateData();
 };

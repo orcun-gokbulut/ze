@@ -117,11 +117,6 @@ ZEConsole* ZECore::GetConsole()
 	return Console;
 }
 
-ZEWindow* ZECore::GetWindow()
-{
-	return Window;
-}
-
 ZEModuleManager* ZECore::GetModuleManager()
 {
 	return ModuleManager;
@@ -563,13 +558,6 @@ bool ZECore::StartUp(void* WindowHandle)
 	zeLog("Loading ZEMeta classes.");
 	LoadClasses();
 
-	zeLog("Initializing main window...");
-	if (WindowHandle != NULL)
-		Window->SetComponentWindowHandle(WindowHandle);
-
-	if (Window->Initialize() == false)
-		zeCriticalError("Can not create main window.");
-
 	zeLog("Initializing Modules...");
 	if (!InitializeModules())
 		zeCriticalError("Can not initialize modules.");
@@ -638,9 +626,7 @@ void ZECore::ShutDown()
 		PhysicsModule->Destroy();
 	}
 
-	Window->Deinitialize();
 	zeLog("Core deinitialized.");
-
 	zeLog("Terminating engine.");
 
 	CrashHandler->Deinitialize();
@@ -671,15 +657,12 @@ void ZECore::MainLoop()
 	
 	if (Application != NULL)
 		Application->Process(FrameTime);
-	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
 
 	// Engine Logic
 	PhysicsModule->Process(FrameTime);
 	SoundModule->ProcessSound(FrameTime);
-	GraphicsModule->ClearFrameBuffer();
 	if (Game != NULL)
 		Game->Render(FrameTime);
-	GraphicsModule->UpdateScreen();
 	PhysicsModule->UpdateWorlds();
 
 	if (Application != NULL)
@@ -731,7 +714,6 @@ ZECore::ZECore()
 	ModuleManager			= new ZEModuleManager();
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
-	Window					= new ZEWindow();
 	Game					= new ZEGame();
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
@@ -750,7 +732,6 @@ ZECore::~ZECore()
 	ZEInputModule::BaseDeinitialize();
 
 	delete Game;
-	delete Window;
 	delete PluginManager;
 	delete ExtensionManager;
 	delete ModuleManager;

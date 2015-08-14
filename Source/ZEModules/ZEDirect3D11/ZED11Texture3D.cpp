@@ -35,7 +35,7 @@
 
 #include "ZED11Texture3D.h"
 
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11Texture2D.h"
 #include "ZEError.h"

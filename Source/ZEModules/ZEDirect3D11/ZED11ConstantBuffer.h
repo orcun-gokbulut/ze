@@ -44,7 +44,7 @@ class ZEGRShaderConstantBuffer;
 class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 {
 	friend class ZED11Context;
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 
 	protected:
 		ID3D11Buffer*			Buffer;	

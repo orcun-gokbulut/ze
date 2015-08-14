@@ -36,7 +36,7 @@
 #include "ZED11ConstantBuffer.h"
 
 #include "ZEError.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 
 #include <d3d11.h>
 

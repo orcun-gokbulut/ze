@@ -37,7 +37,7 @@
 
 #include "ZEError.h"
 #include "ZED11RenderTarget.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 
 ID3D11Texture2D* ZED11Texture2D::GetTexture()
 {

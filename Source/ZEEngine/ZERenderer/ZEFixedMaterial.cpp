@@ -50,6 +50,11 @@
 #include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEFileInfo.h"
 
+void ZEFixedMaterial::Update()
+{
+
+}
+
 ZEFixedMaterial::ZEFixedMaterial()
 {
 	Constants.AmbientColor = ZEVector3::One;

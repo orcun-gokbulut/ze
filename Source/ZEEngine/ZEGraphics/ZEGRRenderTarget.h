@@ -40,12 +40,11 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEGRResource.h"
 
-class ZEGRRenderTarget : public ZEGRResource
+class ZEGRRenderTarget
 {
 	protected:
 		ZEUInt						Width;
 		ZEUInt						Height;
-		ZEUInt						Depth;
 		ZEGRFormat					Format;
 
 									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
@@ -56,7 +55,6 @@ class ZEGRRenderTarget : public ZEGRResource
 
 		ZEUInt						GetWidth();
 		ZEUInt						GetHeight();
-		ZEUInt						GetDepth();
-		ZEVector2					GetPixelSize();
 		ZEGRFormat					GetFormat();
+		ZEVector2					GetPixelSize();
 };

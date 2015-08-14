@@ -62,13 +62,13 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity)
 					Statistics.CulledEntityCount++;
 			else
 			{
-				if (!Entity->Cull(&CullParameters))
+				if (!Entity->PreRender(&CullParameters))
 					Statistics.DrawedEntityCount++;				
 			}
 		}
 		else
 		{
-			if (Entity->Cull(&CullParameters))
+			if (Entity->PreRender(&CullParameters))
 				Statistics.DrawedEntityCount++;
 		}
 	}

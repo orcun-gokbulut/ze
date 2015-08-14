@@ -86,6 +86,11 @@ ZEGRResourceType ZERNMaterial::GetResourceType()
 	return ZEGR_RT_MATERIAL;
 }
 
+ZEUInt ZERNMaterial::GetStageMask()
+{
+	return 0;
+}
+
 void ZERNMaterial::SetShadowCaster(bool Value)
 {
 	ShadowCaster = Value;
@@ -127,6 +132,11 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 }
 
 void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+{
+
+}
+
+void ZERNMaterial::UpdateMaterial()
 {
 
 }

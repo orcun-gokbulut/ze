@@ -67,12 +67,9 @@ class ZECanvasBrush : public ZEEntity
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
-
 		ZECanvas*						GetCanvas();
 
 		void							UpdateCanvas();
-
-		virtual void					Draw(ZERNDrawParameters* DrawParameters);
 		virtual void					Tick(float ElapsedTime);
 
 		static ZECanvasBrush*			CreateInstance();

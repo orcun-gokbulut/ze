@@ -55,8 +55,6 @@ class ZELightPoint  : public ZELight
 	public:
 		ZELightType						GetLightType();
 
-		virtual void					SetCastShadows(bool NewValue);
-
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);

@@ -61,13 +61,13 @@ class ZEGRIndexBuffer : public ZEGRResource
 		virtual						~ZEGRIndexBuffer();
 
 	public:
-		ZEGRResourceType			GetResourceType();
+		virtual ZEGRResourceType	GetResourceType();
 
 		ZESize						GetIndexCount();
 		ZEGRIndexBufferFormat		GetFormat();
 
-		virtual bool				Lock(void** Data);
-		virtual void				Unlock();
+		virtual bool				Lock(void** Data) = 0;
+		virtual void				Unlock() = 0;
 	
 		static ZEGRIndexBuffer*		Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
 };

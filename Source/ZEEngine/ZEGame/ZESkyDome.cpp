@@ -35,8 +35,6 @@
 
 #include "ZESkyDome.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZESkyDomeMaterial.h"
-#include "ZERNDrawParameters.h"
 
 void ZESkyDome::SetSetMieConstant(float Value)
 {
@@ -85,7 +83,7 @@ void ZESkyDome::SetSunIntensity(float Value)
 
 float ZESkyDome::GetSunIntensity() const
 {
-	return SkyDomeMaterial->SunLightIntensity;
+	return 0; //SkyDomeMaterial->SunLightIntensity;
 }
 
 void ZESkyDome::SetSunLightDirection(const ZEVector3& Value)
@@ -170,7 +168,7 @@ bool ZESkyDome::InitializeSelf()
 		return false;
 
 	// Create Material
-	if (SkyDomeMaterial == NULL)
+/*	if (SkyDomeMaterial == NULL)
 	{
 		SkyDomeMaterial = ZESkyDomeMaterial::CreateInstance();
 		SkyDomeMaterial->UpdateMaterial();
@@ -207,14 +205,14 @@ bool ZESkyDome::InitializeSelf()
 	SkyDomeRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
 	SkyDomeRenderCommand.Flags = ZE_ROF_NONE;
 	SkyDomeRenderCommand.PrimitiveCount = SkyDomeGeometry.Vertices.GetCount() / 3;
-	SkyDomeRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
+	SkyDomeRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();*/
 
 	return true;
 }
 
 bool ZESkyDome::DeinitializeSelf()
 {	
-	if (SkyDomeMaterial != NULL)
+	/*if (SkyDomeMaterial != NULL)
 	{
 		SkyDomeMaterial->Destroy();
 		SkyDomeMaterial = NULL;
@@ -223,32 +221,9 @@ bool ZESkyDome::DeinitializeSelf()
 	if (!SkyDomeGeometry.IsEmpty())
 		SkyDomeGeometry.Clean();
 
-	SkyDomeRenderCommand.SetZero();	
+	SkyDomeRenderCommand.SetZero();	*/
 
 	return ZEEntity::DeinitializeSelf();
-}
-
-void ZESkyDome::Draw(ZERNDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
-		return;
-
-	SkyDomeMaterial->G						= G;
-	SkyDomeMaterial->MieConstant			= MieConstant;
-	SkyDomeMaterial->RayleighConstant		= RayleighConstant;
-	SkyDomeMaterial->MieScaleDepth			= MieScaleDepth;
-	SkyDomeMaterial->RayleighScaleDepth		= RayleighScaleDepth;
-	SkyDomeMaterial->OuterRadius			= OuterRadius;
-	SkyDomeMaterial->InnerRadius			= InnerRadius;
-	SkyDomeMaterial->SunLightIntensity		= SunIntensity;
-	SkyDomeMaterial->SunLightDirection		= SunLightDirection;
-	SkyDomeMaterial->SunLightWaveLenght		= SunLightWaveLenght;
-	SkyDomeMaterial->CameraPosition			= CameraPosition;
-	SkyDomeMaterial->CameraPositionOffset	= CameraPositionOffset;
-
-	SkyDomeRenderCommand.Material			= SkyDomeMaterial;
-	SkyDomeRenderCommand.WorldMatrix		= GetWorldTransform();
-	DrawParameters->Renderer->AddCommand(&SkyDomeRenderCommand);
 }
 
 void ZESkyDome::Tick(float Time)
@@ -284,7 +259,6 @@ ZESkyDome::ZESkyDome()
 	SkyDomeMaterial			= NULL;
 	
 	SkyDomeGeometry.Clean();
-	SkyDomeRenderCommand.SetZero();
 }
 
 ZESkyDome::~ZESkyDome()

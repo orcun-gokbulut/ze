@@ -44,7 +44,7 @@ class ZED11RenderStateData;
 
 class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	protected:
 		ID3D11DeviceContext*		Context;
 		
@@ -67,6 +67,9 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		void						UpdateBlendState();
 		void						UpdateRenderTargets();
 		void						UpdateDepthStencilState();
+
+		void						Initialize(ID3D11DeviceContext* Device);
+		void						Deinitialize();
 
 									ZED11Context();
 		virtual						~ZED11Context();

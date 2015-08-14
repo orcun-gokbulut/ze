@@ -44,23 +44,29 @@
 class ZEGRAdapter;
 class ZEGRMonitor;
 
-class ZEGRMode
+struct ZEGRRefreshRate
+{
+	ZEUInt			Numerator;
+	ZEUInt			Denominator;
+};
+
+class ZEGRMonitorMode
 {
 	public:
 		ZEGRMonitor*							Monitor;
 		ZEUInt									Width;
 		ZEUInt									Height;
 		ZEGRFormat								Format;
-		ZEUInt									RefreshRate;
+		ZEGRRefreshRate							RefreshRate;
 
-	/*protected:
+	public:
 		ZEGRMonitor*							GetMonitor();
 		ZEUInt									GetWidth();
 		ZEUInt									GetHeight();
 		ZEGRFormat								GetFormat();
-		ZEUInt									GetRefreshRate();*/
+		ZEGRRefreshRate							GetRefreshRate();
 
-												ZEGRMode();
+												ZEGRMonitorMode();
 
 };
 
@@ -79,7 +85,7 @@ class ZEGRMonitor
 		ZEGRAdapter*							GetAdapter();
 		const char*								GetName();
 		const ZERectangle&						GetArea();
-		virtual	const ZEArray<ZEGRMode>&		GetModes() = 0;
+		virtual	const ZEArray<ZEGRMonitorMode>&	GetModes() = 0;
 };
 
 class ZEGRAdapter

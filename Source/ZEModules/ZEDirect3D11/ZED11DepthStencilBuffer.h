@@ -45,7 +45,7 @@ struct ID3D11Texture2D;
 
 class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	protected:
 		ID3D11Texture2D*				Texture;
 		ID3D11DepthStencilView*			View;
@@ -54,7 +54,6 @@ class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11Compo
 		virtual void					Deinitialize();
 
 										ZED11DepthStencilBuffer();
-		virtual							~ZED11DepthStencilBuffer();
 
 	public:
 		ID3D11Texture2D*				GetTexture();

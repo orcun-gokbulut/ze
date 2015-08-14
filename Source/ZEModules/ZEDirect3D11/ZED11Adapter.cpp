@@ -35,7 +35,7 @@
 
 #include "ZED11Adapter.h"
 
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 #include "ZEError.h"
 
 #include <dxgi1_2.h>
@@ -73,7 +73,7 @@ IDXGIOutput1* ZED11Monitor::GetOutput()
 	return Output;
 }
 
-const ZEArray<ZEGRMode>& ZED11Monitor::GetModes()
+const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes()
 {
 	if (Modes.GetCount() != 0)
 	{
@@ -101,7 +101,8 @@ const ZEArray<ZEGRMode>& ZED11Monitor::GetModes()
 			Modes[I].Width = ModeDesc[I].Width;
 			Modes[I].Height = ModeDesc[I].Height;
 			Modes[I].Format = ZEGR_TF_R8G8B8A8;
-			Modes[I].RefreshRate = ModeDesc[I].RefreshRate.Numerator / ModeDesc[I].RefreshRate.Denominator;
+			Modes[I].RefreshRate.Numerator = ModeDesc[I].RefreshRate.Numerator;
+			Modes[I].RefreshRate.Denominator = ModeDesc[I].RefreshRate.Denominator;
 		}
 	}
 

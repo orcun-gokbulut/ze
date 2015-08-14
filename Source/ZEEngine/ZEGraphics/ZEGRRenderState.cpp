@@ -149,9 +149,7 @@ void ZEGRRenderState::SetToDefault()
 	DepthStencilState.SetToDefault();
 
 	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
-
 }
-
 
 ZEGRRenderState& ZEGRRenderState::operator=(const ZEGRRenderState& RenderState)
 {

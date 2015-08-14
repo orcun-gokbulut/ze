@@ -125,7 +125,6 @@ class ZECloud : public ZEEntity
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
-		virtual void			Draw(ZERNDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
 
 		static ZECloud*			CreateInstance();

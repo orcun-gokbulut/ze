@@ -173,6 +173,11 @@ ZEGRFormat ZEGRTexture::GetFormat()
 	return Format;
 }
 
+ZEUInt ZEGRTexture::GetLevelCount()
+{
+	return LevelCount;
+}
+
 ZESize ZEGRTexture::GetBlockSize()
 {
 	return GetBlockSize(Format);

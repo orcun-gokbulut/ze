@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKY_DOME_H__
-#define __ZE_SKY_DOME_H__
 
 #include "ZEEntity.h"
 #include "ZERenderer\ZECanvas.h"
@@ -119,10 +117,7 @@ class ZESkyDome : public ZEEntity
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
-		virtual void			Draw(ZERNDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
 
 		static ZESkyDome*		CreateInstance();
 };
-
-#endif // __ZE_SKY_DOME_H__

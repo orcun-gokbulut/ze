@@ -51,7 +51,7 @@ class ZEGRTexture;
 
 class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBase
 {
-	friend class ZED11Direct3D11Module;
+	friend class ZED11Module;
 	friend class ZED11Context;
 	friend class ZED11StatePool;
 	private:
@@ -69,8 +69,4 @@ class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBa
 		ID3D11BlendState*						NativeBlendState;
 
 		virtual void							Initialize(const ZEGRRenderState& RenderState);
-
-	public:
-
-		void									Setup(ZEGRContext* Device);
 };

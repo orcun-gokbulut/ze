@@ -47,16 +47,20 @@
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEPhysics/ZEPhysicalJoint.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEDS/ZEString.h"
 
-class ZEStaticVertexBuffer;
+#define ZE_MDLF_MAX_NAME_SIZE					128
+#define ZE_MDLF_MAX_FILENAME_SIZE				256
+
+class ZEGRIndexBuffer;
+class ZEGRVertexBuffer;
 class ZEGRTexture2D;
 class ZETexture2DResource;
 class ZERNMaterial;
 class ZEPhysicalJoint;
 class ZEMLReaderNode;
-
-#define ZE_MDLF_MAX_NAME_SIZE					128
-#define ZE_MDLF_MAX_FILENAME_SIZE				256
 
 enum ZEModelResourcePhysicalShapeType
 {
@@ -82,6 +86,37 @@ enum ZEModelResourceHelperOwnerType
 	ZE_MRHOT_BONE			= 2
 };
 
+struct ZEModelVertex
+{
+	private:
+		static ZEGRVertexLayout			VertexLayout;
+
+	public:
+		ZEVector3						Position;
+		ZEVector3						Normal;
+		ZEVector3						Tangent;
+		ZEVector3						Binormal;
+		ZEVector2						Texcoord;
+
+		static ZEGRVertexLayout*		GetVertexLayout();
+};
+
+struct ZESkinnedModelVertex
+{
+	private:
+		static ZEGRVertexLayout			VertexLayout;
+
+	public:
+		ZEVector3						Position;
+		ZEVector3						Normal;
+		ZEVector3						Tangent;
+		ZEVector3						Binormal;
+		ZEVector2						Texcoord;
+		unsigned char					BoneIndices[4];
+		float							BoneWeights[4];
+
+		static ZEGRVertexLayout*		GetVertexLayout();
+};
 
 struct ZEModelResourcePhysicalPolygon
 {
@@ -255,33 +290,30 @@ struct ZEModelResourceAnimationFrame
 
 struct ZEModelResourceAnimation
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEString									Name;
 	ZEArray<ZEModelResourceAnimationFrame>		Frames;
 };
 
 
 class ZEModelResourceMeshLOD
 {
-	private:
-		ZEStaticVertexBuffer*					SharedVertexBuffer;
-
 	public:
+		ZEGRHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEGRHolder<ZEGRVertexBuffer>			VertexBufferNormals;
+		ZEGRHolder<ZEGRVertexBuffer>			VertexBufferSkin;
+		ZEGRHolder<ZEGRIndexBuffer>				IndexBuffer;
+		
+		ZEUInt32								TriangleCount;
+		ZEUInt32								VertexCount;
+
 		ZEInt32									LODLevel;
 		ZEInt32									MaterialId;
-		ZEArray<ZEModelVertex>					Vertices;
-		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
 		ZEArray<ZEUInt32>						AffectingBoneIds;
-
-		ZEStaticVertexBuffer*					GetSharedVertexBuffer() const;
-		ZEStaticVertexBuffer*					CreatePrivateVertexBuffer() const;
-
-												ZEModelResourceMeshLOD();
-												~ZEModelResourceMeshLOD();
 };
 
 struct ZEModelResourceMesh
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
+	ZEString									Name; 
 	ZEAABBox									BoundingBox;
 	ZEInt32										ParentMesh;
 	ZEVector3									Position;
@@ -296,7 +328,7 @@ struct ZEModelResourceMesh
 
 struct ZEModelResourceBone
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEString									Name;
 	ZEAABBox									BoundingBox;
 	ZEInt32										ParentBone;
 	ZEVector3									Position;
@@ -312,7 +344,7 @@ struct ZEModelResourceBone
 
 struct ZEModelResourceHelper
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEString									Name;
 	ZEModelResourceHelperOwnerType				OwnerType;
 	ZEInt32										OwnerId;
 	ZEModelResourceMesh*						OwnerMesh;
@@ -347,7 +379,7 @@ class ZEModelResource : public ZEResource
 		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLReaderNode* PhysicalBodyNode);
 		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLReaderNode* PhysicalJointNode);
 
-		const ZEGRTexture2D*							ManageModelMaterialTextures(const ZEString& FileName);
+		const ZEGRTexture2D*						ManageModelMaterialTextures(const ZEString& FileName);
 		bool  										ReadModelFromFile(ZEFile* ResourceFile);
 
 		virtual										~ZEModelResource();
@@ -358,7 +390,7 @@ class ZEModelResource : public ZEResource
 		bool										GetUserDefinedBoundingBoxEnabled() const;
 		const ZEAABBox&								GetUserDefinedBoundingBox() const;
 		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
-		const ZEArray<ZERNMaterial*>&					GetMaterials() const;
+		const ZEArray<ZERNMaterial*>&				GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;
 		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
 		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;

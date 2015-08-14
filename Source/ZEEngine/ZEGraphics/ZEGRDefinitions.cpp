@@ -34,3 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRDefinitions.h"
+#include "ZECommon.h"
+
+ZE_SUPPRESS_LNK4221

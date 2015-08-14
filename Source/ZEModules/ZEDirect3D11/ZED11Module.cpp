@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Direct3D11Module.cpp
+ Zinek Engine - ZED11Module.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 
 #include "ZED11Shader.h"
 #include "ZED11StatePool.h"
@@ -60,55 +60,13 @@
 
 #include <d3d11.h>
 #include <dxgi1_2.h>
+#include "ZED11Output.h"
 
 #pragma warning(disable:4267)
 
-ZE_MODULE_DESCRIPTION(ZED11Direct3D11Module, ZEGRGraphicsModule, NULL)
+ZE_MODULE_DESCRIPTION(ZED11Module, ZEGRGraphicsModule, NULL)
 
-bool ZED11Direct3D11Module::CreateDevice(ZEGRAdapter* Adapter)
-{
-	D3D_FEATURE_LEVEL FeatureLevelArr[] = 
-	{
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0,
-		D3D_FEATURE_LEVEL_9_3,
-		D3D_FEATURE_LEVEL_9_2,
-		D3D_FEATURE_LEVEL_9_1
-	};
-
-	UINT DeviceFlags = 0;
-	#ifdef ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
-		DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-	#endif	
-	
-	ZESize Count = Adapters.GetCount();
-	for (ZESize I = 0; I < Count; ++I)
-	{
-		ID3D11Device* D3DDevice = NULL;
-		ID3D11DeviceContext* D3DContext = NULL;
-		D3D_FEATURE_LEVEL FeatureLevel;
-
-		HRESULT Result = D3D11CreateDevice(((ZED11Adapter*)Adapter)->GetAdapter(), 
-			D3D_DRIVER_TYPE_UNKNOWN, NULL, DeviceFlags, 
-			FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, 
-			&Device, &FeatureLevel, &D3DContext);
-		
-		if(FAILED(Result))
-		{
-			zeCriticalError("Cannot create device. Error: %d", Result);
-			Deinitialize();
-			return false;
-		}
-
-		D3DDevice->GetImmediateContext(&MainContext.Context);
-	}
-	
-	return true;
-}
-
-bool ZED11Direct3D11Module::InitializeSelf()
+bool ZED11Module::InitializeSelf()
 {
 	if (!ZEGRGraphicsModule::InitializeSelf())
 		return false;
@@ -119,25 +77,59 @@ bool ZED11Direct3D11Module::InitializeSelf()
 		ZEGRTracer::GetInstance()->SetEnabled(false);
 	#endif
 
-	if (!CreateDevice(Adapters[0]))
-		return false;
+	D3D_FEATURE_LEVEL FeatureLevelArr[] = 
+	{
+		D3D_FEATURE_LEVEL_11_0,
+		D3D_FEATURE_LEVEL_10_1,
+		D3D_FEATURE_LEVEL_10_0,
+		D3D_FEATURE_LEVEL_9_3,
+		D3D_FEATURE_LEVEL_9_2,
+		D3D_FEATURE_LEVEL_9_1
+	};
+
+	UINT DeviceFlags = 0;
+	//#ifdef ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
+		DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+	/*#else
+		DeviceFlags |= D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
+	#endif*/
 	
+	D3D_FEATURE_LEVEL FeatureLevel;
+
+	ID3D11DeviceContext* NativeContext;
+	HRESULT Result = D3D11CreateDevice(NULL, 
+		D3D_DRIVER_TYPE_HARDWARE, NULL, DeviceFlags, 
+		FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, 
+		&Device, &FeatureLevel, &NativeContext);
+		
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot create device. Error: %d", Result);
+		Deinitialize();
+		return false;
+	}
+
+	Context.Initialize(NativeContext);
+
 	ZED11ComponentBase::Module = this;
 	ZED11ComponentBase::Device = Device;
+	ZED11ComponentBase::Context = Context.Context;
 
 	// Read options
-	TextureQuality = (ZETextureQuality)ZEOptionManager::GetInstance()->GetOption("Graphics", "TextureQuality")->GetValue().GetInt32();
+	/*TextureQuality = (ZETextureQuality)ZEOptionManager::GetInstance()->GetOption("Graphics", "TextureQuality")->GetValue().GetInt32();
 	ZEUInt Anisotropy = (ZEUInt)ZEOptionManager::GetInstance()->GetOption("Graphics", "AnisotropicFilter")->GetValue().GetInt32();
 	ZEInt Width = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32();
 	ZEInt Height = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInt32();
 	bool FullScreen = ZEOptionManager::GetInstance()->GetOption("Graphics", "FullScreen")->GetValue().GetBoolean();
-	bool VerticalSync = ZEOptionManager::GetInstance()->GetOption("Graphics", "VerticalSync")->GetValue().GetBoolean();
+	bool VerticalSync = ZEOptionManager::GetInstance()->GetOption("Graphics", "VerticalSync")->GetValue().GetBoolean();*/
 
 	return true;
 }
 
-bool ZED11Direct3D11Module::DeinitializeSelf()
+bool ZED11Module::DeinitializeSelf()
 {
+	Context.Deinitialize();
+
 	Adapters.Clear();
 	for (ZESize I = 0; I < Adapters.GetCount(); I++)
 		delete (ZED11Adapter*)Adapters[I];
@@ -145,17 +137,17 @@ bool ZED11Direct3D11Module::DeinitializeSelf()
 	return ZEGRGraphicsModule::DeinitializeSelf();
 }
 
-ZED11StatePool* ZED11Direct3D11Module::GetStatePool()
+ZED11StatePool* ZED11Module::GetStatePool()
 {
 	return &StatePool;
 }
 
-ZEGRTracer* ZED11Direct3D11Module::GetTracer()
+ZEGRTracer* ZED11Module::GetTracer()
 {
 	return &Tracer;
 }
 
-const ZEArray<ZEGRAdapter*>& ZED11Direct3D11Module::GetAdapters()
+const ZEArray<ZEGRAdapter*>& ZED11Module::GetAdapters()
 {
 	if (Adapters.GetCount() == 0)
 	{
@@ -185,13 +177,17 @@ const ZEArray<ZEGRAdapter*>& ZED11Direct3D11Module::GetAdapters()
 	return Adapters;
 }
 
-ZEGRContext*  ZED11Direct3D11Module::GetMainContext()
+ZEGRContext*  ZED11Module::GetMainContext()
 {
-	return &MainContext;
+	return &Context;
 }
 
+ZEGROutput* ZED11Module::CreateOutput()
+{
+	return new ZED11Output();
+}
 
-ZEGRContext* ZED11Direct3D11Module::CreateContext()
+ZEGRContext* ZED11Module::CreateContext()
 {
 	ZED11Context* Context = new ZED11Context();
 	if (FAILED(Device->CreateDeferredContext(0, &Context->Context)))
@@ -203,56 +199,62 @@ ZEGRContext* ZED11Direct3D11Module::CreateContext()
 	return Context;
 }
 
-ZEGRIndexBuffer* ZED11Direct3D11Module::CreateIndexBuffer()
+ZEGRIndexBuffer* ZED11Module::CreateIndexBuffer()
 {
 	return new ZED11IndexBuffer();
 }
 
-ZEGRConstantBuffer* ZED11Direct3D11Module::CreateConstantBuffer()
+ZEGRShader* ZED11Module::CreateShader()
+{
+	return new ZED11Shader();
+}
+
+ZEGRConstantBuffer* ZED11Module::CreateConstantBuffer()
 {
 	return new ZED11ConstantBuffer();
 }
 
-ZEGRVertexBuffer* ZED11Direct3D11Module::CreateVertexBuffer()
+ZEGRVertexBuffer* ZED11Module::CreateVertexBuffer()
 {
 	return new ZED11VertexBuffer();
 }
 
-ZEGRTexture2D* ZED11Direct3D11Module::CreateTexture2D()
+ZEGRTexture2D* ZED11Module::CreateTexture2D()
 {
 	return new ZED11Texture2D();
 }
 
-ZEGRTexture3D* ZED11Direct3D11Module::CreateTexture3D()
+ZEGRTexture3D* ZED11Module::CreateTexture3D()
 {
 	return new ZED11Texture3D();
 }
 
-ZEGRTextureCube* ZED11Direct3D11Module::CreateTextureCube()
+ZEGRTextureCube* ZED11Module::CreateTextureCube()
 {
 	return new ZED11TextureCube();
 }
 
-ZEGRDepthStencilBuffer* ZED11Direct3D11Module::CreateDepthStencilBuffer()
+ZEGRDepthStencilBuffer* ZED11Module::CreateDepthStencilBuffer()
 {
 	return new ZED11DepthStencilBuffer();
 }
 
-ZEGRRenderStateData* ZED11Direct3D11Module::CreateRenderStateData()
+ZEGRRenderStateData* ZED11Module::CreateRenderStateData()
 {
 	return new ZED11RenderStateData();
 }
 
-ZEGRShaderCompiler* ZED11Direct3D11Module::CreateShaderCompiler()
+ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
 {
 	return new ZED11ShaderCompiler();
 }
 
-ZED11Direct3D11Module::ZED11Direct3D11Module()
+ZED11Module::ZED11Module()
 {
+	Context = Context;
 }
 
-ZED11Direct3D11Module::~ZED11Direct3D11Module()
+ZED11Module::~ZED11Module()
 {
 	Deinitialize();
 }

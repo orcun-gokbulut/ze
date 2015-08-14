@@ -112,7 +112,6 @@ class ZECore
 		ZECommandManager*				CommandManager;
 		ZETimerManager*					TimerManager;
 		ZEConsole*						Console;
-		ZEWindow*						Window;
 		
 		ZEGRGraphicsModule*				GraphicsModule;
 		ZESoundModule*					SoundModule;
@@ -140,7 +139,6 @@ class ZECore
 		ZEResourceManager*				GetResourceManager();
 		ZECommandManager*				GetCommands();
 		ZEConsole*						GetConsole();
-		ZEWindow*						GetWindow();
 		ZEModuleManager*				GetModuleManager();
 		ZEExtensionManager*				GetExtensionManager();
 		ZEPluginManager*				GetPluginManager();

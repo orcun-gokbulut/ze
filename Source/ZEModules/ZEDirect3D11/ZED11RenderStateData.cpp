@@ -44,7 +44,7 @@
 #include "ZED11Shader.h"
 #include "ZED11StatePool.h"
 #include "ZED11DepthStencilBuffer.h"
-#include "ZED11Direct3D11Module.h"
+#include "ZED11Module.h"
 #include "ZEGraphics/ZEGRTexture.h"
 
 #include <d3d11.h>

@@ -71,8 +71,6 @@ class ZEGRRenderStateData : public ZEGRResource
 	public:
 		virtual ZEGRResourceType				GetResourceType();
 
-		virtual void							Setup(ZEGRContext* Device) = 0;
-
 		static ZEGRRenderStateData*				Create(const ZEGRRenderState& RenderState);
 };
 
@@ -92,8 +90,6 @@ class ZEGRRenderState
 
 	public:
 		static ZEGRRenderState					Default;
-
-		virtual ZEGRResourceType				GetResourceType();
 
 		void									SetVertexLayout(const ZEGRVertexLayout& Layout);
 		const ZEGRVertexLayout&					GetVertexLayout() const;

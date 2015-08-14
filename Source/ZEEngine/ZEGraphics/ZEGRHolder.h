@@ -72,14 +72,14 @@ class ZEGRHolder
 		Type*					operator->() const;
 
 		ZEGRHolder<Type>&		operator=(Type* Source);
-		ZEGRHolder<Type>&		operator=(ZEGRHolder<Type>& Source);
+		ZEGRHolder<Type>&		operator=(const ZEGRHolder<Type>& Source);
 
 		bool					operator==(const Type* RawPointer) const;
 		bool					operator!=(const Type* RawPointer) const;
 
 								ZEGRHolder();
 								ZEGRHolder(Type* RawPointer);
-		explicit				ZEGRHolder(ZEGRHolder<Type>& OtherHolder);
+		explicit				ZEGRHolder(const ZEGRHolder<Type>& OtherHolder);
 								~ZEGRHolder();
 };
 
@@ -194,7 +194,7 @@ ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(Type* Source)
 }
 
 template<typename Type>
-ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(ZEGRHolder<Type>& Source)
+ZEGRHolder<Type>& ZEGRHolder<Type>::operator=(const ZEGRHolder<Type>& Source)
 {
 	Copy(Source);
 	return *this;
@@ -226,7 +226,7 @@ ZEGRHolder<Type>::ZEGRHolder(Type* RawPointer)
 }
 
 template<typename Type>
-ZEGRHolder<Type>::ZEGRHolder(ZEGRHolder<Type>& OtherHolder)
+ZEGRHolder<Type>::ZEGRHolder(const ZEGRHolder<Type>& OtherHolder)
 {
 	Resource = NULL;
 	Copy(OtherHolder);

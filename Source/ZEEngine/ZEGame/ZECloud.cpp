@@ -180,14 +180,8 @@ ZECamera* ZECloud::GetCamera()
 
 void ZECloud::SetCloudFormationTexture(const ZEString& FileName)
 {
-	// Load the texture
-	if (CloudFormationTexture != NULL)
+	ZETextureOptions TextureOption = 
 	{
-		CloudFormationTexture->Release();
-		CloudFormationTexture = NULL;
-	}
-
-	ZETextureOptions TextureOption = {
 		ZE_TCT_NONE,
 		ZE_TCQ_LOW,
 		ZE_TDS_NONE,
@@ -201,7 +195,7 @@ void ZECloud::SetCloudFormationTexture(const ZEString& FileName)
 
 const ZEString ZECloud::GetCloudFormationTexture() const
 {
-	return (CloudFormationTexture == NULL) ? "" : CloudFormationTexture->GetFileName();
+	return CloudFormationTexture.IsNull() ? "" : CloudFormationTexture->GetFileName();
 }
 
 ZEDrawFlags ZECloud::GetDrawFlags() const
@@ -235,7 +229,6 @@ ZECloud* ZECloud::CreateInstance()
 
 ZECloud::ZECloud()
 {
-	CloudMaterial			= NULL;
 	Camera					= NULL;
 	G						= 0.7f;
 	LightScale				= 8.0f;

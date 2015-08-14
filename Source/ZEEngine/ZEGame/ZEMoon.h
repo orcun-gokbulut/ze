@@ -83,7 +83,7 @@ class ZEMoon : public ZEEntity
 		virtual void				SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
 		const ZEString				GetTexture() const;
 
-		virtual void				Tick(float Time);
+		virtual void				Tick(float ElapsedTime);
 
 		static ZEMoon*				CreateInstance();
 };
