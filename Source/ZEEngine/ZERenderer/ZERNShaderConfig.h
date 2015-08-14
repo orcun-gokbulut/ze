@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.h
+ Zinek Engine - ZERNShaderConfig.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,15 @@
 
 #pragma once
 
-#include "ZERNStage.h"
-#include "ZEGraphics\ZEGRHolder.h"
-#include "ZEGraphics\ZEGRRenderState.h"
+#define ZERN_SHADER_GBUFFER_NORMAL_MODEL		0
+#define ZERN_SHADER_GBUFFER_DIFFUSE_SUBSURFACE	1
+#define ZERN_SHADER_GBUFFER_SPECULAR			2
+#define ZERN_SHADER_GBUFFER_ACCUMULATOR			3
 
-class ZEGRTexture2D;
-
-class ZERNStageGBuffer : public ZERNStage
-{
-	private:
-		ZEGRHolder<ZEGRTexture2D>		GBuffer0;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer1;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer2;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer3;
-		ZEGRHolder<ZEGRTexture2D>		AccumulationBuffer;
-		ZEGRRenderState					RenderState;
-
-		void							UpdateRenderTargets();
-
-	public:
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
-		virtual const ZEGRRenderState&	GetRenderState();
-
-		ZEGRTexture2D*					GetPositionBuffer();
-		ZEGRTexture2D*					GetNormalBuffer();
-		ZEGRTexture2D*					GetDiffuseBuffer();
-		ZEGRTexture2D*					GetSpecularBuffer();
-		ZEGRTexture2D*					GetAccumulationBuffer();
-
-		virtual const ZEGRRenderState&	GetRenderState();
-
-		virtual void					Setup(ZERNRenderer* Device, ZEGRContext* Context);
-		virtual void					CleanUp();
-};
+#define ZERN_SHADER_CONSTANT_RENDERER			0
+#define ZERN_SHADER_CONSTANT_SCENE				1
+#define ZERN_SHADER_CONSTANT_CAMERA				2
+#define ZERN_SHADER_CONSTANT_MATERIAL			3
+#define ZERN_SHADER_CONSTANT_DRAW				4
+#define ZERN_SHADER_CONSTANT_DRAW_SKIN			5
+#define ZERN_SHADER_CONSTANT_DRAW_OTHER			6

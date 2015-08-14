@@ -100,6 +100,36 @@ void ZERNRenderer::DeinitializeSelf()
 			StageQueues[I].Stage->Deinitialize();
 }
 
+void ZERNRenderer::SetDevice(ZEGRContext* Device)
+{
+	this->Device = Device;
+}
+
+ZEGRContext* ZERNRenderer::GetDevice()
+{
+	return Device;
+}
+
+void ZERNRenderer::SetView(const ZERNView& View)
+{
+	this->View = View;
+}
+
+const ZERNView& ZERNRenderer::GetView()
+{
+	return View;
+}
+
+void ZERNRenderer::SetOutput(ZEGROutput* Output)
+{
+	this->Output = Output;
+}
+
+ZEGROutput* ZERNRenderer::GetOutput()
+{
+	return Output;
+}
+
 void ZERNRenderer::SetScene(ZEScene* Scene)
 {
 	this->Scene = Scene;
