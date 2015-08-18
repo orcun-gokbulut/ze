@@ -607,4 +607,6 @@ bool ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 		Report.Normal = Report.Binormal = ZEVector3::Zero;
 		ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
 	}
+
+	return true;
 }
