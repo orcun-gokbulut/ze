@@ -44,6 +44,7 @@ class ZEGRTexture2D;
 class ZERNStageGBuffer : public ZERNStage
 {
 	private:
+		ZEGRRenderTarget*				RenderTargets[4];
 		ZEGRHolder<ZEGRTexture2D>		GBuffer0;
 		ZEGRHolder<ZEGRTexture2D>		GBuffer1;
 		ZEGRHolder<ZEGRTexture2D>		GBuffer2;
@@ -51,7 +52,7 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRHolder<ZEGRTexture2D>		AccumulationBuffer;
 		ZEGRRenderState					RenderState;
 
-		void							UpdateRenderTargets();
+		void							UpdateRenderTargets(ZERNRenderer* Renderer);
 
 	public:
 		virtual ZEInt					GetId();
@@ -63,9 +64,6 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRTexture2D*					GetDiffuseBuffer();
 		ZEGRTexture2D*					GetSpecularBuffer();
 		ZEGRTexture2D*					GetAccumulationBuffer();
-
-		virtual const ZEGRRenderState&	GetRenderState();
-
-		virtual void					Setup(ZERNRenderer* Device, ZEGRContext* Context);
-		virtual void					CleanUp();
+		
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 };

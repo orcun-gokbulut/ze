@@ -41,7 +41,7 @@ ZEGRResourceType ZEGROutput::GetResourceType()
 	return ZEGR_RT_OUTPUT;
 }
 
-ZEGROutput* ZEGROutput::Create(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format)
+ZEGROutput* ZEGROutput::Create(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	zeCheckError(Handle == NULL, false, "Width cannot be 0.");
 	zeCheckError(Width == 0, false, "Width cannot be 0.");

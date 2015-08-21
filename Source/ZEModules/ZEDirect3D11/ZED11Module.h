@@ -56,7 +56,7 @@ class ZED11Module : public ZEGRGraphicsModule
 {
 	ZE_MODULE(ZED11Module)
 	protected:
-		ID3D11Device*							Device;
+		ID3D11Device1*							Device;
 		ZED11Context							Context;
 		ZEArray<ZEGRAdapter*>					Adapters;
 		ZED11StatePool							StatePool;

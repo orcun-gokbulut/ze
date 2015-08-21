@@ -652,11 +652,11 @@ void ZECore::MainLoop()
 	// Game Logic
 	InputModule->Process();
 
-	if (Game != NULL)
-		Game->Tick(FrameTime);
-	
 	if (Application != NULL)
 		Application->Process(FrameTime);
+
+	if (Game != NULL)
+		Game->Tick(FrameTime);
 
 	// Engine Logic
 	PhysicsModule->Process(FrameTime);

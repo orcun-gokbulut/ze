@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 
 class ZED11Module;
 enum ZEGRFormat;
@@ -45,13 +45,13 @@ class ZED11ComponentBase
 	friend class ZED11Module;
 	private:
 		static ZED11Module*	Module;
-		static ID3D11Device*			Device;
-		static ID3D11DeviceContext*		Context;
+		static ID3D11Device1*			Device;
+		static ID3D11DeviceContext1*	Context;
 
 	public:
-		static ZED11Module*	GetModule();
-		ID3D11Device*					GetDevice();
-		ID3D11DeviceContext*			GetMainContext();
+		static ZED11Module*				GetModule();
+		ID3D11Device1*					GetDevice();
+		ID3D11DeviceContext1*			GetMainContext();
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 };

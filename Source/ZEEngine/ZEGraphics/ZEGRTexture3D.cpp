@@ -46,7 +46,7 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
 
-	SetSize(Depth * CalculateSize(Width, Height, LevelCount, GetBlockSize(), GetBlockDimension()));
+	SetSize(Depth * CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture3D, Texture);
 
 	return true;

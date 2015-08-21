@@ -117,7 +117,7 @@ static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
 
 static bool IsCompressed(ZEGRFormat Format)
 {
-	return Format == ZEGR_TF_DXT1 || Format == ZEGR_TF_DXT3 || Format == ZEGR_TF_DXT5;
+	return Format == ZEGR_TF_DXT1_UNORM || Format == ZEGR_TF_DXT1_UNORM || Format == ZEGR_TF_DXT1_UNORM;
 }
 
 // Returns owner surface of level
@@ -195,52 +195,9 @@ ZESize ZETextureLevel::GetPitch()
 	ZEUInt LevelWidth = this->GetWidth();
 	ZEGRFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 	
-	switch (PixelFormat)
-	{		
-		case ZEGR_TF_R8:
-			Pitch = ((ZESize)LevelWidth / ZE_I8_COMPRESSION_BLOCK_WIDTH) * ZE_I8_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R16:
-			Pitch = ((ZESize)LevelWidth / ZE_I16_COMPRESSION_BLOCK_WIDTH) * ZE_I16_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R16G16:
-			Pitch = ((ZESize)LevelWidth / ZE_I16_2_COMPRESSION_BLOCK_WIDTH) * ZE_I16_2_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R32:
-			Pitch = ((ZESize)LevelWidth / ZE_I32_COMPRESSION_BLOCK_WIDTH) * ZE_I32_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R32F:
-			Pitch = ((ZESize)LevelWidth / ZE_F32_COMPRESSION_BLOCK_WIDTH) * ZE_F32_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R32FG32F:
-			Pitch = ((ZESize)LevelWidth / ZE_F32_2_COMPRESSION_BLOCK_WIDTH) * ZE_F32_2_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R32FG32FB32FA32F:
-			Pitch = ((ZESize)LevelWidth / ZE_F32_4_COMPRESSION_BLOCK_WIDTH) * ZE_F32_4_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R8G8B8A8:
-			Pitch = ((ZESize)LevelWidth / ZE_I8_4_COMPRESSION_BLOCK_WIDTH) * ZE_I8_4_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_DXT1:
-			Pitch = ((ZESize)LevelWidth / ZE_DXT_1_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_1_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_DXT3:
-			Pitch = ((ZESize)LevelWidth / ZE_DXT_3_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_3_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_DXT5:
-			Pitch = ((ZESize)LevelWidth / ZE_DXT_5_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_5_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZEGR_TF_R16F:
-		case ZEGR_TF_R16FG16F:
-		case ZEGR_TF_R16FG16FB16FA16F:
-			zeCriticalError("16 Bit floating point data is not supported.");
-			break;
-		case ZEGR_TF_NONE:
-		default:
-			zeCriticalError("Unknown Pixel Format");
-			break;
-
-	}
+	const ZEGRFormatDefinition* Definition = ZEGRFormatDefinition::GetDefinition(PixelFormat);
+	if (Definition != NULL)
+		Pitch = ((ZESize)LevelWidth / Definition->BlockDimension) * Definition->BlockSize;
 
 	return Pitch;
 }
@@ -252,51 +209,9 @@ ZEUInt ZETextureLevel::GetRowCount()
 	ZEUInt LevelHeight = this->GetHeight();
 	ZEGRFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 
-	switch (PixelFormat)
-	{
-		case ZEGR_TF_R8:
-			RowCount = LevelHeight / ZE_I8_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R16:
-			RowCount = LevelHeight / ZE_I16_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R16G16:
-			RowCount = LevelHeight / ZE_I16_2_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R32:
-			RowCount = LevelHeight / ZE_I32_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R32F:
-			RowCount = LevelHeight / ZE_F32_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R32FG32F:
-			RowCount = LevelHeight / ZE_F32_2_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R32FG32FB32FA32F:
-			RowCount = LevelHeight / ZE_F32_4_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R8G8B8A8:
-			RowCount = LevelHeight / ZE_I8_4_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_DXT1:
-			RowCount = LevelHeight / ZE_DXT_1_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_DXT3:
-			RowCount = LevelHeight / ZE_DXT_3_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_DXT5:
-			RowCount = LevelHeight / ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZEGR_TF_R16F:
-		case ZEGR_TF_R16FG16F:
-		case ZEGR_TF_R16FG16FB16FA16F:
-			zeCriticalError("16 Bit floating point data is not supported.");
-			break;
-		case ZEGR_TF_NONE:
-		default:
-			zeCriticalError("Unknown Pixel Format");
-			break;
-	}
+	const ZEGRFormatDefinition* Definition = ZEGRFormatDefinition::GetDefinition(PixelFormat);
+	if (Definition != NULL)
+		RowCount = (ZESize)LevelHeight / Definition->BlockDimension;
 
 	return RowCount;
 

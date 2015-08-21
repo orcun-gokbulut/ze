@@ -45,7 +45,9 @@
 #include "ZEGraphics/ZEGRHolder.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
 
+class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
+
 class ZEFixedMaterial : public ZERNMaterial
 {
 	protected:
@@ -63,9 +65,9 @@ class ZEFixedMaterial : public ZERNMaterial
 		ZERNSampler						EnvironmentTexture;
 		ZERNSampler						DistortionTexture;
 
-		ZEGRRenderState*				GBufferPass;
-		ZEGRRenderState*				ForwardPass;
-		ZEGRRenderState*				ShadowPass;
+		ZEGRHolder<ZEGRRenderStateData*>	GBufferPass;
+		ZEGRHolder<ZEGRRenderStateData*>	ForwardPass;
+		ZEGRHolder<ZEGRRenderStateData*>	ShadowPass;
 
 		struct
 		{
@@ -114,9 +116,6 @@ class ZEFixedMaterial : public ZERNMaterial
 		bool							DetailNormalMapEnabled;
 		bool							DistortionEnabled;
 		bool							SSAOEnabled;
-		
-		ZEMaterialTransparancyMode		TransparancyMode;
-		ZEMaterialOpacityComponent		OpacityComponent;
 
 		void							Update();
 
@@ -145,9 +144,6 @@ class ZEFixedMaterial : public ZERNMaterial
 		bool							GetAlphaCullEnabled() const;
 		void							SetAlphaCullLimit(float Limit);
 		float							GetAlphaCullLimit() const;
-
-		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
-		ZEMaterialTransparancyMode		GetTransparancyMode() const;
 
 		void							SetBaseMap(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetBaseMap() const;
@@ -208,8 +204,6 @@ class ZEFixedMaterial : public ZERNMaterial
 		bool							GetOpacityEnabled() const;
 		void							SetOpacity(float Value);
 		float							GetOpacity() const;
-		void							SetOpacityComponent(ZEMaterialOpacityComponent Component);
-		ZEMaterialOpacityComponent		GetOpacityComponent() const;
 		void							SetOpacityMap(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetOpacityMap() const;
 

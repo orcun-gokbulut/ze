@@ -79,13 +79,9 @@ ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level)
 
 bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
 {
-	D3D11_USAGE Usage;
-	Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
-
-	UINT CPUAccess = 0;
-	UINT BindFlags = 0;
-	BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-	BindFlags |= RenderTarget ? D3D11_BIND_RENDER_TARGET : 0;
+	D3D11_USAGE Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
+	UINT CPUAccess = RenderTarget ? 0 : D3D11_CPU_ACCESS_WRITE;
+	UINT BindFlags = D3D11_BIND_SHADER_RESOURCE | (RenderTarget ? D3D11_BIND_RENDER_TARGET : 0);
 
 	D3D11_TEXTURE2D_DESC TextureDesc;
 	TextureDesc.MiscFlags = 0;

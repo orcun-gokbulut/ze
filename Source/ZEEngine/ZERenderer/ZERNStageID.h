@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Output.h
+ Zinek Engine - ZERNStageID.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,49 +35,25 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGROutput.h"
-
 #include "ZETypes.h"
-#include "ZED11ComponentBase.h"
-#include "ZED11RenderTarget.h"
-#include "ZEGraphics/ZEGRHolder.h"
 
-struct IDXGIOutput;
-struct IDXGISwapChain1;
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
+typedef ZEUInt32 ZERNStageMask;
+typedef ZEUInt64 ZERNStageID;
 
-class ZED11Output : public ZEGROutput, ZED11ComponentBase
-{
-	friend ZED11Module;
-	private:
-		void*								Handle;
-		ZEGRMonitorMode*					Mode;
-		bool								Fullscreen;
-		ZEGRHolder<ZED11RenderTarget>		RenderTarget;
+// Normal
+#define ZERN_STAGE_ID(ID)						(1<<ID)
+#define ZERN_STAGE_GBUFFER						ZERN_STAGE_ID(1)
+#define ZERN_STAGE_LIGHTING						ZERN_STAGE_ID(2)
+#define ZERN_STAGE_AO							ZERN_STAGE_ID(3)
+#define ZERN_STAGE_FORWARD						ZERN_STAGE_ID(4)
+#define ZERN_STAGE_FORWARD_TRANSPARANT			ZERN_STAGE_ID(5)
+#define ZERN_STAGE_PRE_HDR_EFFECT				ZERN_STAGE_ID(6)
+#define ZERN_STAGE_HDR							ZERN_STAGE_ID(7)
+#define ZERN_STAGE_POST_EFFECT					ZERN_STAGE_ID(8)
+#define ZERN_STAGE_2D							ZERN_STAGE_ID(9)
+#define ZERN_STAGE_POST_2D_EFFECT				ZERN_STAGE_ID(10)
 
-		IDXGIOutput*						Output;
-		IDXGISwapChain1*					SwapChain;
-
-		void								SwitchToFullscreen();
-		void								UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-
-		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-		virtual	void						Deinitialize();
-
-											ZED11Output();
-
-	public:
-		virtual void*						GetHandle();
-		virtual ZEGRRenderTarget*			GetRenderTarget();
-
-		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode);
-		virtual ZEGRMonitorMode*			GetMonitorMode();
-
-		virtual void						SetFullscreen(bool Enabled);
-		virtual bool						GetFullscreen();
-
-		virtual void						Resize(ZEUInt Width, ZEUInt Height);
-
-		virtual void						Present();
-};
+// Shadow Map
+#define ZERN_STAGE_SHADOW_MAP_OMNI				ZERN_STAGE_ID(11)
+#define ZERN_STAGE_SHADOW_MAP_DIRECTIONAL		ZERN_STAGE_ID(12)
+#define ZERN_STAGE_SHADOW_MAP_PROJECTIVE		ZERN_STAGE_ID(13)

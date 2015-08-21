@@ -114,7 +114,7 @@ static ZETextureData* LoadData(ZEFile* File, ZEBitmapHeader* Header, ZEPixelRGBA
 	ZESSize Height = (Header->Height < 0 ? -Header->Height : Header->Height);
 
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
-	Texture->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
+	Texture->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8_UNORM, 1, 1, (ZEUInt)Width, (ZEUInt)Height);
 	
 	ZEPixelRGBA8* Destination = (ZEPixelRGBA8*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
 	ZEPixelRGBA8* DestinationRow = Destination + (Header->Height > 0 ? Height - 1 : 0) * Width;
@@ -438,7 +438,7 @@ bool ZETextureFileBMP::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 
 	Info->Width = ZEMath::Abs((ZEInt16)Header.Width);
 	Info->Height = ZEMath::Abs((ZEInt16)Header.Height);
-	Info->PixelFormat = ZEGR_TF_R8G8B8A8;
+	Info->PixelFormat = ZEGR_TF_R8G8B8A8_UNORM;
 	Info->Type = ZEGR_TT_2D;
 	Info->SurfaceCount = 1;
 	Info->LevelCount = 1;

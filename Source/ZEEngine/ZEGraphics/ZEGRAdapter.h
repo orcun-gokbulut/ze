@@ -40,6 +40,7 @@
 #include "ZEMath/ZERectangle.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEGRFormat.h"
 
 class ZEGRAdapter;
 class ZEGRMonitor;

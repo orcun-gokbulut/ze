@@ -50,11 +50,6 @@
 #include "ZEML/ZEMLWriter.h"
 #include "ZEFile/ZEFileInfo.h"
 
-void ZEFixedMaterial::Update()
-{
-
-}
-
 ZEFixedMaterial::ZEFixedMaterial()
 {
 	Constants.AmbientColor = ZEVector3::One;
@@ -75,7 +70,6 @@ ZEFixedMaterial::ZEFixedMaterial()
 	Constants.Wireframe = false;
 	Constants.GlobalAmbientEnabled = true;
 
-	TransparancyMode = ZE_MTM_NONE;
 	AmbientFactor = 0.0f;
 	DiffuseFactor = 1.0f;
 	SpecularFactor = 0.0f;
@@ -84,7 +78,6 @@ ZEFixedMaterial::ZEFixedMaterial()
 	DiffuseColor = ZEVector3::One;
 	SpecularColor = ZEVector3::One;
 	EmmisiveColor = ZEVector3::One;
-	OpacityComponent = ZE_MOC_BASE_MAP_ALPHA;
 	
 	VertexColorEnabled = false;
 	AlphaCullEnabled = false;
@@ -104,6 +97,11 @@ ZEFixedMaterial::ZEFixedMaterial()
 	SSAOEnabled = false;
 
 	FileName = "";
+}
+
+void ZEFixedMaterial::Update()
+{
+
 }
 
 ZEFixedMaterial::~ZEFixedMaterial()
@@ -144,17 +142,6 @@ void ZEFixedMaterial::SetWireframe(bool Enable)
 bool ZEFixedMaterial::GetWireframe() const
 {
 	return Constants.Wireframe;
-}
-
-void ZEFixedMaterial::SetTransparancyMode(ZEMaterialTransparancyMode Mode)
-{
-	TransparancyMode = Mode;
-	Update();
-}
-
-ZEMaterialTransparancyMode ZEFixedMaterial::GetTransparancyMode() const
-{
-	return TransparancyMode;
 }
 
 void ZEFixedMaterial::SetAlphaCullEnabled(bool Enabled)
@@ -414,21 +401,6 @@ float ZEFixedMaterial::GetOpacity() const
 	return Constants.Opacity;
 }
 
-void ZEFixedMaterial::SetOpacityComponent(ZEMaterialOpacityComponent Component)
-{
-	if (OpacityComponent == Component)
-		return;
-
-	OpacityComponent = Component;
-
-	Update();
-}
-
-ZEMaterialOpacityComponent ZEFixedMaterial::GetOpacityComponent() const
-{
-	return OpacityComponent;
-}
-
 void ZEFixedMaterial::SetOpacityMap(const ZERNSampler& Texture)
 {
 	OpacityTexture = Texture;
@@ -662,10 +634,10 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteString("Name", "Default"); //Will be changed when configuration is implemented.
 	ConfigurationNode.WriteBool("Wireframe", GetWireframe());
 	ConfigurationNode.WriteBool("TwoSided", GetTwoSided());
-	ConfigurationNode.WriteInt32("TransparencyMode", (ZEInt32)GetTransparancyMode());
-	ConfigurationNode.WriteBool("LightningEnabled", GetLightningEnabled());
+	/*ConfigurationNode.WriteInt32("TransparencyMode", (ZEInt32)GetTransparancyMode());
+	ConfigurationNode.WriteBool("LightningEnabled", GetLightingEnabled());
 	ConfigurationNode.WriteBool("ShadowReceiver", GetShadowReceiver());
-	ConfigurationNode.WriteBool("ShadowCaster", GetShadowCaster());
+	ConfigurationNode.WriteBool("ShadowCaster", GetShadowCaster());*/
 
 	ConfigurationNode.WriteBool("AmbientEnabled", GetAmbientEnabled());
 	ConfigurationNode.WriteBool("GlobalAmbientEnabled", GetGlobalAmbientEnabled());
@@ -684,7 +656,7 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteBool("VertexColorEnabled", GetVertexColorEnabled());
 
 	ConfigurationNode.WriteFloat("Opacity", GetOpacity());
-	ConfigurationNode.WriteInt32("OpacityComponent", (ZEInt32)GetOpacityComponent());
+	//ConfigurationNode.WriteInt32("OpacityComponent", (ZEInt32)GetOpacityComponent());
 	ConfigurationNode.WriteFloat("AlphaCullLimit", GetAlphaCullLimit());
 	ConfigurationNode.WriteVector2("DetailMapTiling", GetDetailMapTiling());
 	ConfigurationNode.WriteFloat("SpecularShininess", GetSpecularShininess());
@@ -787,8 +759,8 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 
 		SetWireframe(ConfigurationNode.ReadBoolean("Wireframe"));
 		SetTwoSided(ConfigurationNode.ReadBoolean("TwoSided"));
-		SetLightningEnabled(ConfigurationNode.ReadBoolean("LightningEnabled"));
-		SetTransparancyMode((ZEMaterialTransparancyMode)ConfigurationNode.ReadInt32("TransparencyMode"));
+		/*SetLightingEnabled(ConfigurationNode.ReadBoolean("LightningEnabled"));
+		SetTransparancyMode((ZEMaterialTransparancyMode)ConfigurationNode.ReadInt32("TransparencyMode"));*/
 
 		SetAmbientEnabled(ConfigurationNode.ReadBoolean("AmbientEnabled"));
 		SetGlobalAmbientEnabled(ConfigurationNode.ReadBoolean("GlobalAmbientEnabled"));
@@ -807,7 +779,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetVertexColorEnabled(ConfigurationNode.ReadBoolean("VertexColorEnabled"));
 
 		SetOpacity(ConfigurationNode.ReadFloat("Opacity", 1.0f));
-		SetOpacityComponent((ZEMaterialOpacityComponent)ConfigurationNode.ReadInt32("OpacityComponent"));
+		//SetOpacityComponent((ZEMaterialOpacityComponent)ConfigurationNode.ReadInt32("OpacityComponent"));
 		SetDetailMapTiling(ConfigurationNode.ReadVector2("DetailMapTiling", ZEVector2::One));
 		SetAmbientColor(ConfigurationNode.ReadVector3("AmbientColor", ZEVector3::One));
 		SetAmbientFactor(ConfigurationNode.ReadFloat("AmbientFactor", 1.0f));
@@ -862,6 +834,6 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		File.Close();
 
 	FileName = FilePath;
-
-	UpdateMaterial();
+	
+	Update();
 }

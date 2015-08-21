@@ -50,19 +50,11 @@
 
 static bool IsCompressed(ZEGRFormat PixelFormat)
 {
-	switch (PixelFormat)
-	{
-		case ZEGR_TF_DXT1:
-		case ZEGR_TF_DXT3:
-		case ZEGR_TF_DXT5:
-			return true;
-			break;
-		default:
-			return false;
-			break;
-	}
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(PixelFormat);
+	if (FormatDefinition == NULL)
+		return false;
 
-	return false;
+	return FormatDefinition->Compressed;
 }
 
 static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
@@ -94,13 +86,13 @@ static ZEGRFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionT
 	switch (CompressionType)
 	{
 		case ZE_TCT_DXT1:
-			return ZEGR_TF_DXT1;
+			return ZEGR_TF_DXT1_UNORM;
 			break;
 		case ZE_TCT_DXT3:
-			return ZEGR_TF_DXT3;
+			return ZEGR_TF_DXT3_UNORM;
 			break;
 		case ZE_TCT_DXT5:
-			return ZEGR_TF_DXT5;
+			return ZEGR_TF_DXT5_UNORM;
 			break;
 		default:
 			return ZEGR_TF_NONE;
@@ -114,16 +106,16 @@ static ZETextureCompressionType GetCompressionType(ZEGRFormat PixelFormat)
 {
 	switch (PixelFormat)
 	{
-		case ZEGR_TF_R8G8B8A8:
+		case ZEGR_TF_R8G8B8A8_UNORM:
 			return ZE_TCT_NONE;
 			break;
-		case ZEGR_TF_DXT1:
+		case ZEGR_TF_DXT1_UNORM:
 			return ZE_TCT_DXT1;
 			break;
-		case ZEGR_TF_DXT3:
+		case ZEGR_TF_DXT3_UNORM:
 			return ZE_TCT_DXT3;
 			break;
-		case ZEGR_TF_DXT5:
+		case ZEGR_TF_DXT5_UNORM:
 			return ZE_TCT_DXT5;
 			break;
 		default:

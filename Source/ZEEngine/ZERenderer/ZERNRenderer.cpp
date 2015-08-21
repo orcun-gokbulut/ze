@@ -40,6 +40,7 @@
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
 #include "ZERNCommand.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -59,6 +60,7 @@ void ZERNRenderer::Cull()
 	CullParameters.View = &View;
 
 	Culler.SetScene(Scene);
+	Culler.SetCullParameters(CullParameters);
 	Culler.Cull();
 }
 
@@ -70,17 +72,22 @@ void ZERNRenderer::SortStageQueues()
 
 void ZERNRenderer::RenderStages()
 {
+	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
 	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
 	{
 		ZERNStageQueue* Queue = &StageQueues[I];
 		ZELink<ZERNCommand>* Link = StageQueues[I].Commands.GetFirst();
-		Queue->Stage->Setup(Device);
+		
+		if (!Queue->Stage->Setup(this, Context, StageQueues[I].Commands))
+			continue;
+
 		while (Link != NULL)
 		{
 			ZERNCommand* Command = Link->GetItem();
 			Command->Execute(NULL);
 		}
-		Queue->Stage->CleanUp();
+
+		Queue->Stage->CleanUp(this, Context);
 	}
 }
 
@@ -140,6 +147,26 @@ ZEScene* ZERNRenderer::GetScene()
 	return Scene;
 }
 
+ZEArray<ZERNStage*> ZERNRenderer::GetStages()
+{
+	ZEArray<ZERNStage*> Stages;
+	Stages.SetCount(StageQueues.GetCount());
+
+	for (ZESize I = 0; I < Stages.GetCount(); I++)
+		Stages[I] = StageQueues[I].Stage;
+
+	return Stages;
+}
+
+ZERNStage* ZERNRenderer::GetStage(ZERNStageID Id)
+{
+	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
+		if (StageQueues[I].Stage->GetId() == Id)
+			return StageQueues[I].Stage;
+
+	return NULL;
+}
+
 void ZERNRenderer::AddStage(ZERNStage* Stage)
 {
 	ZERNStageQueue Queue;
@@ -168,7 +195,13 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
 	ZELink<ZERNCommand>* EmptyLink = NULL;
 	for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
-		EmptyLink = &Command->StageQueueLinks[I];
+	{
+		if (!Command->StageQueueLinks[I].GetInUse())
+		{
+			EmptyLink = &Command->StageQueueLinks[I];
+			break;
+		}
+	}
 
 	if (EmptyLink == NULL)
 		return;

@@ -40,7 +40,7 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEGRResource.h"
 
-class ZEGRRenderTarget
+class ZEGRRenderTarget : public ZEGRResource
 {
 	protected:
 		ZEUInt						Width;

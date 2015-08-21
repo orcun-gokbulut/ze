@@ -90,4 +90,4 @@ ze_add_source(ZED11VertexBuffer.h				Sources)
 
 ze_add_library(TARGET ZEDirect3D11
 	SOURCES ${Sources}
-	LIBS d3d11 dxgi D3dcompiler)
+	LIBS d3d11 uuid dxgi D3dcompiler)

@@ -71,9 +71,7 @@ ZEGRRenderStateData* ZERNMaterial::GetRenderState(ZERNStage* Stage)
 
 ZERNMaterial::ZERNMaterial()
 {
-	LightningEnabled = true;
-	ShadowCaster = true;
-	ShadowReceiver = true;
+
 }
 
 ZERNMaterial::~ZERNMaterial()
@@ -91,36 +89,6 @@ ZEUInt ZERNMaterial::GetStageMask()
 	return 0;
 }
 
-void ZERNMaterial::SetShadowCaster(bool Value)
-{
-	ShadowCaster = Value;
-}
-
-bool ZERNMaterial::GetShadowCaster() const
-{
-	return ShadowCaster;
-}
-
-void ZERNMaterial::SetShadowReceiver(bool Value)
-{
-	ShadowReceiver = Value;
-}
-
-bool ZERNMaterial::GetShadowReceiver() const
-{
-	return ShadowReceiver;
-}
-
-void ZERNMaterial::SetLightningEnabled(bool Enabled)
-{
-	LightningEnabled = Enabled;
-}
-
-bool ZERNMaterial::GetLightningEnabled() const
-{
-	return LightningEnabled;
-}
-
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
 	ZEGRRenderStateData* State =  GetRenderState(Stage);
@@ -132,11 +100,6 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 }
 
 void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
-{
-
-}
-
-void ZERNMaterial::UpdateMaterial()
 {
 
 }

@@ -44,6 +44,7 @@ class ZEViewVolume;
 class ZEEntity;
 class ZEGROutput;
 class ZEGRViewport;
+class ZEGRConstantBuffer;
 
 enum ZERNProjectionType
 {
@@ -84,4 +85,6 @@ struct ZERNView
 	ZEGROutput*					Output;
 	const ZEGRViewport*			Viewport;
 	const ZEViewVolume*			ViewVolume;
+
+	ZEGRConstantBuffer*			ConstantBuffer;
 };

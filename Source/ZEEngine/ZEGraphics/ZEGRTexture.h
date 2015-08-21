@@ -38,6 +38,7 @@
 #include "ZEGRResource.h"
 
 #include "ZETypes.h"
+#include "ZEGRFormat.h"
 
 enum ZEGRTextureType
 {
@@ -59,20 +60,15 @@ class ZEGRTexture : public ZEGRResource
 		void					SetLevelCount(ZEUInt LevelCount);
 		void					SetIsRenderTarget(bool RenderTarget);
 
-		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZESize BlockSize, ZESize BlockDimension);
-		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZESize BlockDimension);
-		static ZESize			GetBlockDimension(ZEGRFormat Format);
+		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
+		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 
-								ZEGRTexture();
+		ZEGRTexture();
 
 	public:
 		virtual ZEGRTextureType	GetTextureType() = 0;
 
 		ZEGRFormat				GetFormat();
 		ZEUInt					GetLevelCount();
-		ZESize					GetBlockSize();
-		ZESize					GetBlockDimension();
 		bool					GetIsRenderTarget();
-
-		static ZESize			GetBlockSize(ZEGRFormat Format);
 };

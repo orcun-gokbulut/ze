@@ -63,8 +63,8 @@ enum ZEGizmoAxis
 	ZE_GA_SCREEN_AXIS
 };
 
-ZE_META_FORWARD_DECLARE(ZERNSimpleMaterial, "ZEGraphics/ZESimpleMaterial.h")
-ZE_META_FORWARD_DECLARE(ZERNRenderer, "ZEGraphics/ZERenderer.h")
+ZE_META_FORWARD_DECLARE(ZERNSimpleMaterial, "ZERNRenderer/ZESimpleMaterial.h")
+ZE_META_FORWARD_DECLARE(ZERNRenderer, "ZERNRenderer/ZERenderer.h")
 
 class ZEGizmo : public ZEEntity
 {
@@ -79,7 +79,7 @@ class ZEGizmo : public ZEEntity
 
 		static ZERNSimpleMaterial*		GizmoMaterial;
 
-		ZERNCommand					RenderCommand;
+		ZERNCommand						RenderCommand;
 
 		ZEGizmoMode						Mode;
 		ZEGizmoAxis						HoveredAxis;

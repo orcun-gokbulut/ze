@@ -51,8 +51,8 @@ class ZERNSampler
 		ZEGRSamplerState				Sampler;
 
 	public:
-		void							SetSamplerState(ZEGRSamplerState Sampler);
-		ZEGRSamplerState				GetSamplerState();
+		void							SetSamplerState(const ZEGRSamplerState& Sampler);
+		const ZEGRSamplerState&			GetSamplerState();
 
 		void							SetTexture(ZEGRTexture* Texture);
 		ZEGRTexture*					GetTexture() const;

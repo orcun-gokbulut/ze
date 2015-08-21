@@ -57,10 +57,10 @@
 #include "ZECore/ZEModule.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEError.h"
-
-#include <d3d11.h>
-#include <dxgi1_2.h>
 #include "ZED11Output.h"
+
+#include <d3d11_1.h>
+#include <dxgi1_2.h>
 
 #pragma warning(disable:4267)
 
@@ -79,12 +79,8 @@ bool ZED11Module::InitializeSelf()
 
 	D3D_FEATURE_LEVEL FeatureLevelArr[] = 
 	{
-		D3D_FEATURE_LEVEL_11_0,
-		D3D_FEATURE_LEVEL_10_1,
-		D3D_FEATURE_LEVEL_10_0,
-		D3D_FEATURE_LEVEL_9_3,
-		D3D_FEATURE_LEVEL_9_2,
-		D3D_FEATURE_LEVEL_9_1
+		D3D_FEATURE_LEVEL_11_1,
+		D3D_FEATURE_LEVEL_11_0	
 	};
 
 	UINT DeviceFlags = 0;
@@ -94,13 +90,11 @@ bool ZED11Module::InitializeSelf()
 		DeviceFlags |= D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
 	#endif*/
 	
-	D3D_FEATURE_LEVEL FeatureLevel;
-
-	ID3D11DeviceContext* NativeContext;
+	ID3D11Device* DeviceTemp;
 	HRESULT Result = D3D11CreateDevice(NULL, 
 		D3D_DRIVER_TYPE_HARDWARE, NULL, DeviceFlags, 
 		FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, 
-		&Device, &FeatureLevel, &NativeContext);
+		&DeviceTemp, NULL, NULL);
 		
 	if(FAILED(Result))
 	{
@@ -109,6 +103,17 @@ bool ZED11Module::InitializeSelf()
 		return false;
 	}
 
+	Result = DeviceTemp->QueryInterface(__uuidof(ID3D11Device1), (void**)&Device);
+	if (FAILED(Result) || Device == NULL)
+	{
+		zeCriticalError("Cannot query Direct3D11 Interface.");
+		return false;
+	}
+
+	DeviceTemp->Release();
+
+	ID3D11DeviceContext1* NativeContext;
+	Device->GetImmediateContext1(&NativeContext);
 	Context.Initialize(NativeContext);
 
 	ZED11ComponentBase::Module = this;
@@ -190,7 +195,7 @@ ZEGROutput* ZED11Module::CreateOutput()
 ZEGRContext* ZED11Module::CreateContext()
 {
 	ZED11Context* Context = new ZED11Context();
-	if (FAILED(Device->CreateDeferredContext(0, &Context->Context)))
+	if (FAILED(Device->CreateDeferredContext1(0, &Context->Context)))
 	{
 		zeError("Cannot create deffered device context.");
 		return NULL;

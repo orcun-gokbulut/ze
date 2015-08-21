@@ -116,5 +116,5 @@ ZEGRShader* ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 	ZEGRShaderCompileOptions UpdatedOptions = Options;
 	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
 	UpdatedOptions.SourceData = (char*)Buffer;
-	return Compiler->Compile(Options, NULL, NULL);	
+	return Compiler->Compile(Options, NULL, NULL);
 }

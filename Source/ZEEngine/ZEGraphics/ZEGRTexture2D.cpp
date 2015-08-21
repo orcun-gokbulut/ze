@@ -72,7 +72,7 @@ bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
 
-	SetSize(CalculateSize(Width, Height, LevelCount, GetBlockSize(), GetBlockDimension()));
+	SetSize(CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);
 
 	return true;
