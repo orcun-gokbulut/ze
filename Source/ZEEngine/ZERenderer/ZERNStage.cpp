@@ -42,12 +42,12 @@ const ZEGRRenderState& ZERNStage::GetRenderState()
 	return ZEGRRenderState::Default;
 }
 
-void ZERNStage::Setup(ZEGRContext* Device)
+bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	this->Device = Device;
+	return false;
 }
 
-void ZERNStage::CleanUp()
+void ZERNStage::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 
 }

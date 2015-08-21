@@ -37,21 +37,21 @@
 #include "ZEGraphics\ZEGRTexture.h"
 
 ZED11Module* ZED11ComponentBase::Module = NULL;
-ID3D11Device* ZED11ComponentBase::Device = NULL;
-ID3D11DeviceContext* ZED11ComponentBase::Context = NULL;
+ID3D11Device1* ZED11ComponentBase::Device = NULL;
+ID3D11DeviceContext1* ZED11ComponentBase::Context = NULL;
 
 ZED11Module* ZED11ComponentBase::GetModule()
 {
 	return Module;
 }
 
-ID3D11Device* ZED11ComponentBase::GetDevice()
+ID3D11Device1* ZED11ComponentBase::GetDevice()
 {
 	return Device;
 }
 
 
-ID3D11DeviceContext* ZED11ComponentBase::GetMainContext()
+ID3D11DeviceContext1* ZED11ComponentBase::GetMainContext()
 {
 	return Context;
 }
@@ -61,62 +61,130 @@ DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRFormat Format)
 	switch (Format)
 	{
 		default:
-		case ZEGR_TF_NULL:
 		case ZEGR_TF_NONE:
 			return DXGI_FORMAT_UNKNOWN;
 
-		case ZEGR_TF_R8:
+		case ZEGR_TF_R8_SINT:
+			return DXGI_FORMAT_R8_SINT;
+		
+		case ZEGR_TF_R8_UINT:
 			return DXGI_FORMAT_R8_UINT;
+		
+		case ZEGR_TF_R8_UNORM:
+			return DXGI_FORMAT_R8_UNORM;
+		
+		case ZEGR_TF_R8_SNORM:
+			return DXGI_FORMAT_R8_SNORM;
 
-		case ZEGR_TF_R8G8:
+
+
+		case ZEGR_TF_R8G8_UINT:
 			return DXGI_FORMAT_R8G8_UINT;
 
-		case ZEGR_TF_R8G8B8A8:
+		case ZEGR_TF_R8G8_SINT:
+			return DXGI_FORMAT_R8G8_SINT;
+
+		case ZEGR_TF_R8G8_UNORM:
+			return DXGI_FORMAT_R8G8_UNORM;
+
+		case ZEGR_TF_R8G8_SNORM:
+			return DXGI_FORMAT_R8G8_SNORM;
+
+
+
+		case ZEGR_TF_R8G8B8A8_UINT:
 			return DXGI_FORMAT_R8G8B8A8_UINT;
 
-		case ZEGR_TF_R16:
+		case ZEGR_TF_R8G8B8A8_SINT:
+			return DXGI_FORMAT_R8G8B8A8_SINT;
+
+		case ZEGR_TF_R8G8B8A8_UNORM:
+			return DXGI_FORMAT_R8G8B8A8_UNORM;
+
+		case ZEGR_TF_R8G8B8A8_SNORM:
+			return DXGI_FORMAT_R8G8B8A8_SNORM;
+
+
+
+		case ZEGR_TF_R16_UINT:
 			return DXGI_FORMAT_R16_UINT;
 
-		case ZEGR_TF_R16G16:
-			return DXGI_FORMAT_R16G16_UINT;
+		case ZEGR_TF_R16_SINT:
+			return DXGI_FORMAT_R16_SINT;
 
-		case ZEGR_TF_R16G16B16A16:
-			return DXGI_FORMAT_R16G16B16A16_UINT;
-	
-		case ZEGR_TF_R32:
-			return DXGI_FORMAT_R32_UINT;
+		case ZEGR_TF_R16_UNORM:
+			return DXGI_FORMAT_R16_UNORM;
 
-		case ZEGR_TF_R32G32:
-			return DXGI_FORMAT_R32G32_UINT;
+		case ZEGR_TF_R16_SNORM:
+			return DXGI_FORMAT_R16_SNORM;
 
-		case ZEGR_TF_R32G32B32A32:
-			return DXGI_FORMAT_R32G32B32A32_UINT;
-
-		case ZEGR_TF_R16F:
+		case ZEGR_TF_R16_FLOAT:
 			return DXGI_FORMAT_R16_FLOAT;
 
-		case ZEGR_TF_R16FG16F:
+
+		case ZEGR_TF_R16G16_UINT:
+			return DXGI_FORMAT_R16G16_UINT;
+
+		case ZEGR_TF_R16G16_SINT:
+			return DXGI_FORMAT_R16G16_SINT;
+
+		case ZEGR_TF_R16G16_UNORM:
+			return DXGI_FORMAT_R16G16_UNORM;
+
+		case ZEGR_TF_R16G16_SNORM:
+			return DXGI_FORMAT_R16G16_SNORM;
+
+		case ZEGR_TF_R16G16_FLOAT:
 			return DXGI_FORMAT_R16G16_FLOAT;
 
-		case ZEGR_TF_R16FG16FB16FA16F:
+
+
+		case ZEGR_TF_R16G16B16A16_UINT:
+			return DXGI_FORMAT_R16G16B16A16_UINT;
+
+		case ZEGR_TF_R16G16B16A16_SINT:
+			return DXGI_FORMAT_R16G16B16A16_SINT;
+
+		case ZEGR_TF_R16G16B16A16_UNORM:
+			return DXGI_FORMAT_R16G16B16A16_UNORM;
+
+		case ZEGR_TF_R16G16B16A16_SNORM:
+			return DXGI_FORMAT_R16G16B16A16_SNORM;
+
+		case ZEGR_TF_R16G16B16A16_FLOAT:
 			return DXGI_FORMAT_R16G16B16A16_FLOAT;
 
-		case ZEGR_TF_R32F:
-			return DXGI_FORMAT_R32_FLOAT;
 
-		case ZEGR_TF_R32FG32F:
-			return DXGI_FORMAT_R32G32_FLOAT;
 
-		case ZEGR_TF_R32FG32FB32FA32F:
+		case ZEGR_TF_R32G32B32A32_SINT:
+			return DXGI_FORMAT_R32G32B32A32_SINT;
+
+		case ZEGR_TF_R32G32B32A32_UINT:
+			return DXGI_FORMAT_R32G32B32A32_UINT;
+
+		case ZEGR_TF_R32G32B32A32_FLOAT:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
 
-		case ZEGR_TF_DXT1:
+
+
+		case ZEGR_TF_R10G10B10A2_UINT:
+			return DXGI_FORMAT_R10G10B10A2_UINT;
+
+		case ZEGR_TF_R10G10B10A2_UNORM:
+			return DXGI_FORMAT_R10G10B10A2_UNORM;
+
+		case ZEGR_TF_R11FG11FB10F_FLOAT:
+			return DXGI_FORMAT_R11G11B10_FLOAT;
+
+
+
+		case ZEGR_TF_DXT1_UNORM:
 			return DXGI_FORMAT_BC1_UNORM;
 
-		case ZEGR_TF_DXT3:
+		case ZEGR_TF_DXT3_UNORM:
 			return DXGI_FORMAT_BC2_UNORM;
 
-		case ZEGR_TF_DXT5:
+		case ZEGR_TF_DXT5_UNORM:
 			return DXGI_FORMAT_BC3_UNORM;
 	}
 }

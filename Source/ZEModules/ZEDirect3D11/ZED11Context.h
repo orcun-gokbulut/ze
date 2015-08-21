@@ -46,7 +46,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	protected:
-		ID3D11DeviceContext*		Context;
+		ID3D11DeviceContext1*		Context;
 		
 		bool						DirtyBlendState;
 		ID3D11BlendState*			BlendState;
@@ -68,7 +68,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		void						UpdateRenderTargets();
 		void						UpdateDepthStencilState();
 
-		void						Initialize(ID3D11DeviceContext* Device);
+		void						Initialize(ID3D11DeviceContext1* Device);
 		void						Deinitialize();
 
 									ZED11Context();
@@ -82,7 +82,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void				SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
 		virtual void				SetIndexBuffer(ZEGRIndexBuffer* Buffer);
 		
-		virtual void				SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer);
+		virtual void				SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset = 0, ZEUInt Size = 0);
 		virtual void				SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
 		virtual void				SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
 	

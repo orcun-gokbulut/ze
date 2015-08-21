@@ -48,7 +48,7 @@
 #include "ZED11DepthStencilBuffer.h"
 #include "ZED11RenderStateData.h"
 
-#include <d3d11.h>
+#include <d3d11_1.h>
 #include "ZED11StatePool.h"
 
 inline D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitiveType(ZEGRPrimitiveType PrimitiveType)
@@ -97,7 +97,7 @@ void ZED11Context::UpdateDepthStencilState()
 	Context->OMSetDepthStencilState(RenderState->NativeDepthStencilState, StencilRef);
 }
 
-void ZED11Context::Initialize(ID3D11DeviceContext* Context)
+void ZED11Context::Initialize(ID3D11DeviceContext1* Context)
 {
 	this->Context = Context;
 }
@@ -176,7 +176,7 @@ void ZED11Context::SetIndexBuffer(ZEGRIndexBuffer* Buffer)
 {
 	ID3D11Buffer* NativeBuffer = NULL;
 	ZED11IndexBuffer* D11Buffer = static_cast<ZED11IndexBuffer*>(Buffer);
-	if (Buffer != NULL)
+	if (D11Buffer != NULL)
 		NativeBuffer = D11Buffer->GetBuffer();
 
 	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Buffer->GetFormat()), 0);
@@ -260,9 +260,12 @@ void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
 	Context->RSSetViewports(Count, NativeViewports);
 }
 
-void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer)
+void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset, ZEUInt Size)
 {
 	ID3D11Buffer* NativeConstants = NULL;
+	UINT* FirstConstant = StartOffset == 0 ? NULL : &StartOffset;
+	UINT* NumberOfConstant = Size == 0 ? NULL : &Size;
+
 	switch(Shader)
 	{
 		default:
@@ -270,27 +273,27 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 			break;
 
 		case ZEGR_ST_VERTEX:
-			Context->VSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->VSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 
 		case ZEGR_ST_PIXEL:
-			Context->PSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->PSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 
 		case ZEGR_ST_GEOMETRY:
-			Context->GSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->GSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 
 		case ZEGR_ST_DOMAIN:
-			Context->DSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 
 		case ZEGR_ST_HULL:
-			Context->HSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 
 		case ZEGR_ST_COMPUTE:
-			Context->CSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 	}
 }
@@ -391,7 +394,7 @@ void ZED11Context::SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer)
 {
 	ID3D11DepthStencilView* NativeView = NULL;
 	ZED11DepthStencilBuffer* D11Buffer = static_cast<ZED11DepthStencilBuffer*>(Buffer);
-	if (D11Buffer == NULL)
+	if (D11Buffer != NULL)
 		NativeView = D11Buffer->GetView();
 
 	if (DepthStencilBuffer == NativeView)

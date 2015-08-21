@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEGRDefinitions.h"
+#include "ZEGRFormat.h"
 
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
@@ -48,7 +49,7 @@ class ZEWindow;
 class ZEGROutput : public ZEGRResource
 {
 	protected:
-		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format) = 0;
+		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format) = 0;
 		virtual void						Deinitialize() = 0;
 
 	public:
@@ -67,5 +68,5 @@ class ZEGROutput : public ZEGRResource
 
 		virtual void						Present() = 0;
 
-		static ZEGROutput*					Create(void* Window, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format);
+		static ZEGROutput*					Create(void* Window, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 };

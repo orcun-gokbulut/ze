@@ -60,18 +60,20 @@ void ZED11Output::SwitchToFullscreen()
 	SwapChain->SetFullscreenState(TRUE, Output);
 }
 
-void ZED11Output::UpdateRenderTarget(ZESize Width, ZESize Height, ZEGRFormat Format)
+void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	ID3D11RenderTargetView* RenderTargetView;
 	ID3D11Texture2D* OutputTexture;
 	HRESULT Result = SwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D), (void**)&OutputTexture);
 	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
 	OutputTexture->Release();
-	RenderTarget = ZED11RenderTarget(Width, Height, Format, RenderTargetView);
-	SetSize(Width * Height * ZED11Texture2D::GetBlockSize(Format));
+	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
+
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Format);
+	SetSize(Width * Height * FormatDefinition->BlockSize);
 }
 
-bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZESize Width, ZESize Height, ZEGRFormat Format)
+bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	zeDebugCheck(Handle == NULL, "Handle parameter cannot be null.");
 	zeDebugCheck(Width == 0 || Height == 0, "Width and Height cannot be null.");
@@ -152,7 +154,7 @@ void* ZED11Output::GetHandle()
 
 ZEGRRenderTarget* ZED11Output::GetRenderTarget()
 {
-	return &RenderTarget;
+	return RenderTarget;
 }
 
 void ZED11Output::SetMonitorMode(ZEGRMonitorMode* Mode)
@@ -197,14 +199,13 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 	if (Width == 0 || Height == 0)
 		return;
 
-	if (RenderTarget.GetWidth() == Width && RenderTarget.GetHeight() == Height)
+	if (RenderTarget->GetWidth() == Width && RenderTarget->GetHeight() == Height)
 		return;
 
-	if (RenderTarget.View != NULL)
-		RenderTarget.View->Release();
+	ZEGR_RELEASE(RenderTarget->View);
 
 	HRESULT Result = SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
-	UpdateRenderTarget(Width, Height, RenderTarget.GetFormat());
+	UpdateRenderTarget(Width, Height, RenderTarget->GetFormat());
 }
 
 void ZED11Output::Present()

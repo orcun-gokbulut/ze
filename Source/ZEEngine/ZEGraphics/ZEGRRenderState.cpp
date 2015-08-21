@@ -151,6 +151,13 @@ void ZEGRRenderState::SetToDefault()
 	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
 }
 
+ZEGRRenderStateData* ZEGRRenderState::Compile()
+{
+	ZEGRRenderStateData* RenderState = ZEGRGraphicsModule::GetInstance()->CreateRenderStateData();
+	RenderState->Initialize(*this);
+	return RenderState;
+}
+
 ZEGRRenderState& ZEGRRenderState::operator=(const ZEGRRenderState& RenderState)
 {
 	PrimitiveType = RenderState.PrimitiveType;

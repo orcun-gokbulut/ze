@@ -147,7 +147,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	ZEUInt RowSize		= Width * PixelSize;
 	ZEUInt RowCount		= Height;
 
-	TextureData->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8, 1, 1, Width, Height);
+	TextureData->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8_UNORM, 1, 1, Width, Height);
 	BYTE* TargetData = (BYTE*)TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 
 	FreeImage_ConvertToRawBits(TargetData, Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
@@ -163,7 +163,7 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 // Saves level 0 of surface 0 to specified file in ".TGA" format
 bool ZETextureLoader::SaveAsImageFile(ZEFile* File, ZETextureData* TextureData, ZESize Surface, ZESize Level)
 {
-	if(TextureData->GetPixelFormat() != ZEGR_TF_R8G8B8A8)
+	if(TextureData->GetPixelFormat() != ZEGR_TF_R8G8B8A8_UNORM)
 	{
 		zeError("Pixel Format is not supported for saving.");
 		return false;
@@ -439,7 +439,7 @@ bool ZETextureLoader::GetImageInfo(ZETextureDataInfo* TextureInfo, ZEFile* File)
 	// Fill texture info
 	TextureInfo->LevelCount		= 1;
 	TextureInfo->SurfaceCount	= 1;
-	TextureInfo->PixelFormat	= ZEGR_TF_R8G8B8A8;
+	TextureInfo->PixelFormat	= ZEGR_TF_R8G8B8A8_UNORM;
 	TextureInfo->Width			= FreeImage_GetWidth(Bitmap);
 	TextureInfo->Height			= FreeImage_GetHeight(Bitmap);
 	

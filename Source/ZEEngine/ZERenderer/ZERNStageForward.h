@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Output.h
+ Zinek Engine - ZERNStageForward.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,49 +35,33 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGROutput.h"
+#include "ZERNStage.h"
+#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEGraphics\ZEGRRenderState.h"
 
-#include "ZETypes.h"
-#include "ZED11ComponentBase.h"
-#include "ZED11RenderTarget.h"
-#include "ZEGraphics/ZEGRHolder.h"
+class ZEGRTexture2D;
 
-struct IDXGIOutput;
-struct IDXGISwapChain1;
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-
-class ZED11Output : public ZEGROutput, ZED11ComponentBase
+class ZERNStageForward : public ZERNStage
 {
-	friend ZED11Module;
 	private:
-		void*								Handle;
-		ZEGRMonitorMode*					Mode;
-		bool								Fullscreen;
-		ZEGRHolder<ZED11RenderTarget>		RenderTarget;
+		ZEGRRenderTarget*				AccumulationBuffer;
 
-		IDXGIOutput*						Output;
-		IDXGISwapChain1*					SwapChain;
-
-		void								SwitchToFullscreen();
-		void								UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-
-		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-		virtual	void						Deinitialize();
-
-											ZED11Output();
+		void							SetupRenderTarget();
 
 	public:
-		virtual void*						GetHandle();
-		virtual ZEGRRenderTarget*			GetRenderTarget();
+		virtual ZEInt					GetId();
+		virtual const ZEString&			GetName();
+		virtual const ZEGRRenderState&	GetRenderState();
+		
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+};
 
-		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode);
-		virtual ZEGRMonitorMode*			GetMonitorMode();
+class ZERNStageForwardTransparent : public ZERNStageForward
+{
+	public:
+		virtual ZEInt					GetId();
+		virtual const ZEString&			GetName();
+		virtual const ZEGRRenderState&	GetRenderState();
 
-		virtual void						SetFullscreen(bool Enabled);
-		virtual bool						GetFullscreen();
-
-		virtual void						Resize(ZEUInt Width, ZEUInt Height);
-
-		virtual void						Present();
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 };

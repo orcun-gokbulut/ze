@@ -35,32 +35,16 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEInitializable.h"
 #include "ZEGraphics/ZEGRResource.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
-enum ZEMaterialTransparancyMode
-{
-	ZE_MTM_NONE					= 0,
-	ZE_MTM_REGULAR				= 2,
-	ZE_MTM_ADDAPTIVE			= 3,
-	ZE_MTM_SUBTRACTIVE			= 4,
-}; 
-
-enum ZEMaterialOpacityComponent
-{
-	ZE_MOC_CONSTANT				= 0,
-	ZE_MOC_BASE_MAP_ALPHA		= 1,
-	ZE_MOC_OPACITY_MAP			= 2,
-};
+#define ZEGR_MAX_RENDERER_STAGE_COUNT 10
 
 class ZEGRContext;
-class ZERNCommand;
 class ZERNRenderer;
 class ZERNStage;
-class ZEGRRenderState;
 class ZEGRRenderStateData;
-class ZERNStageManager;
 
 class ZERNMaterialStage
 {
@@ -71,15 +55,9 @@ class ZERNMaterialStage
 										ZERNMaterialStage();
 };
 
-#define ZEGR_MAX_RENDERER_STAGE_COUNT 20
-
-class ZERNMaterial : public ZEGRResource
+class ZERNMaterial : public ZEGRResource, public ZEInitializable
 {
 	private:
-		bool							ShadowCaster;
-		bool							ShadowReceiver;
-		bool							LightningEnabled;
-
 		ZERNMaterialStage				Stages[ZEGR_MAX_RENDERER_STAGE_COUNT];
 		ZESize							StageCount;
 
@@ -93,17 +71,7 @@ class ZERNMaterial : public ZEGRResource
 	public:
 		virtual ZEGRResourceType		GetResourceType();
 		virtual ZEUInt					GetStageMask();
-		virtual void					SetShadowCaster(bool Value);
-		bool							GetShadowCaster() const;
-
-		virtual void					SetShadowReceiver(bool Value);
-		bool							GetShadowReceiver() const;
-
-		virtual void					SetLightningEnabled(bool Enabled);
-		bool							GetLightningEnabled() const;
 
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-
-		virtual void					UpdateMaterial();
 };

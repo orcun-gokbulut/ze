@@ -42,6 +42,16 @@
 #include "ZEML/ZEMLReader.h"
 #include "ZEMath/ZEMath.h"
 
+void ZERNSampler::SetSamplerState(const ZEGRSamplerState& Sampler)
+{
+	this->Sampler = Sampler;
+}
+
+const ZEGRSamplerState& ZERNSampler::GetSamplerState()
+{
+	return Sampler;
+}
+
 void ZERNSampler::SetTexture(ZEGRTexture* Texture)
 {
 	this->Texture = Texture;

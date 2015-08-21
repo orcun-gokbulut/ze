@@ -37,6 +37,7 @@
 
 #include "ZEInitializable.h"
 #include "ZEDS\ZEString.h"
+#include "ZEDS\ZEList2.h"
 
 class ZEGRContext;
 class ZERNRenderer;
@@ -49,8 +50,8 @@ class ZERNStage : public ZEInitializable
 	public:
 		virtual ZEInt					GetId() = 0;
 		virtual const ZEString&			GetName() = 0;
-		virtual const ZEGRRenderState&	GetRenderState() = 0;
+		virtual const ZEGRRenderState&	GetRenderState();
 
-		virtual void					Setup(ZERNRenderer* Device, ZEGRContext* Context);
-		virtual void					CleanUp();
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 };

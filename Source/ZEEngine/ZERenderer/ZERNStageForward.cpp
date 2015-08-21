@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialResource.h
+ Zinek Engine - ZERNStageForward.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,42 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_MATERIAL_RESOURCE_H__ 
-#define __ZE_MATERIAL_RESOURCE_H__
+#include "ZERNStageForward.h"
+#include "ZERNStageGBuffer.h"
+#include "ZEGraphics\ZEGRContext.h"
+#include "ZERNRenderer.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZERNStageID.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEFixedMaterial.h"
-#include "ZECore/ZEResource.h"
-
-
-struct ZETextureOptions;
-class ZETextureResource;
-
-class ZEMaterialResource : public ZEResource
+ZEInt ZERNStageForward::GetId()
 {
-	private:
-		ZERNMaterial*							Material;
-		ZEArray<ZETextureResource*>				TextureResources;
+	return ZERN_STAGE_FORWARD;
+}
 
-		static bool								LoadTextures(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile, const ZETextureOptions* UserOptions);
-		static bool								LoadFixedMaterial(ZEMaterialResource* MaterialResource, ZEFile* ResourceFile);
+const ZEString& ZERNStageForward::GetName()
+{
+	static ZEString Name = "Forward";
+	return Name;
+}
 
-	protected:
-												ZEMaterialResource();
-												~ZEMaterialResource();
+const ZEGRRenderState& ZERNStageForward::GetRenderState()
+{
+	static ZEGRRenderState RenderState;
+	bool Initialized = false;
+	if (!Initialized)
+	{
+		ZEGRDepthStencilState DepthStencilState;
+		DepthStencilState.SetZTestEnable(true);
+		DepthStencilState.SetZWriteEnable(true);
+		RenderState.SetDepthStencilState(DepthStencilState);
 
-	public:
-		virtual const char*						GetResourceType() const;
+		ZEGRBlendState BlendState;
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R10G10B10A2_UINT);
+	}
 
-		const ZERNMaterial*						GetMaterial() const;
-		const ZEArray<ZETextureResource*>&		GetTextureResources() const;
+	return RenderState;
+}
 
-		static const ZEMaterialResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		
-		static ZEMaterialResource*				LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZEMaterialResource*				LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-};
+bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+{
+	if (Commands.GetCount() == 0)
+		return false;
 
-#endif
+	ZERNStageGBuffer* GBufferStage = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	if (GBufferStage != NULL)
+		return false;
+
+	ZEGRRenderTarget* AccumulationBuffer = GBufferStage->GetAccumulationBuffer()->GetRenderTarget(0);
+	Context->SetRenderTarget(1, &AccumulationBuffer);
+
+	return true;
+}
+
+ZEInt ZERNStageForwardTransparent::GetId()
+{
+	return ZERN_STAGE_FORWARD_TRANSPARANT;
+}
+
+const ZEString& ZERNStageForwardTransparent::GetName()
+{
+	static ZEString Name = "ForwardTransparent";
+	return Name;
+}

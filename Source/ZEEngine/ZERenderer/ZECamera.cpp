@@ -52,7 +52,10 @@
 #define ZE_CDF_VIEW_TRANSFORM					4
 #define ZE_CDF_PROJECTION_TRANSFORM				8
 #define ZE_CDF_VIEW_PROJECTION_TRANSFORM		16
-#define ZE_CDF_CONSTANT_BUFFER					32
+#define ZE_CDF_INV_VIEW_TRANSFORM				32
+#define ZE_CDF_INV_PROJECTION_TRANSFORM			64
+#define ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM	128
+#define ZE_CDF_CONSTANT_BUFFER					256
 #define ZE_CDF_ALL								0xFFFFFFFF
 
 bool ZECamera::InitializeSelf()
@@ -106,6 +109,39 @@ const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 	return Constants.ViewProjectionTransform;
 }
 
+const ZEMatrix4x4& ZECamera::GetInvViewTransform()
+{
+	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_VIEW_TRANSFORM))
+	{
+		ZEMatrix4x4::Transpose(Constants.InvViewTransform, GetViewTransform());
+		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_VIEW_TRANSFORM);
+	}
+
+	return Constants.InvViewTransform;
+}
+
+const ZEMatrix4x4& ZECamera::GetInvProjectionTransform()
+{
+	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_PROJECTION_TRANSFORM))
+	{
+		ZEMatrix4x4::Inverse(Constants.InvProjectionTransform, GetProjectionTransform());
+		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_PROJECTION_TRANSFORM);
+	}
+
+	return Constants.InvProjectionTransform;
+}
+
+const ZEMatrix4x4& ZECamera::GetInvViewProjectionTransform()
+{
+	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM))
+	{
+		ZEMatrix4x4::Multiply(Constants.InvViewProjectionTransform, GetInvViewTransform(), GetInvProjectionTransform());
+		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM);
+	}
+
+	return Constants.InvViewProjectionTransform;
+}
+
 void ZECamera::SetPosition(const ZEVector3& NewPosition)
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_PROJECTION_TRANSFORM);
@@ -134,6 +170,20 @@ ZEGRConstantBuffer* ZECamera::GetConstantBuffer()
 		GetViewTransform();
 		GetProjectionTransform();
 		GetViewProjectionTransform();
+		GetInvViewTransform();
+		GetInvProjectionTransform();
+		GetInvViewProjectionTransform();
+		
+		Constants.Position = ZEVector4(GetWorldPosition(), 1.0f);
+		Constants.Rotation = GetWorldRotation();
+		
+		ZEVector3 RotationEuler;
+		ZEQuaternion::ConvertToEulerAngles(RotationEuler, Constants.Rotation);
+		Constants.RotationEuler = ZEVector4(RotationEuler, 0.0f);
+
+		Constants.Up = ZEVector4(GetWorldUp(), 1.0f);
+		Constants.Right = ZEVector4(GetWorldRight(), 1.0f);
+		Constants.Front = ZEVector4(GetWorldFront(), 1.0f);
 
 		void* Buffer;
 		ConstantBuffer->Lock(&Buffer);
@@ -287,11 +337,12 @@ const ZERNView& ZECamera::GetView()
 		View.AspectRatio = GetAspectRatio();
 
 		View.ViewTransform = GetViewTransform();
-		View.ViewProjectionTransform = GetProjectionTransform();
+		View.ProjectionTransform = GetProjectionTransform();
 		View.ViewProjectionTransform = GetViewProjectionTransform();
 
 		View.Viewport = &GetViewport();
 		View.ViewVolume = &GetViewVolume();
+		View.ConstantBuffer = GetConstantBuffer();
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW);
 	}

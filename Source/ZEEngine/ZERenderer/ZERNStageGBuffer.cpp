@@ -35,29 +35,67 @@
 
 #include "ZERNStageGBuffer.h"
 #include "ZEGraphics\ZEGRContext.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZERNRenderer.h"
+#include "ZEGraphics\ZEGROutput.h"
+#include "ZEGraphics\ZEGRRenderTarget.h"
+#include "ZERNStageID.h"
 
-bool ZERNStageGBuffer::InitializeSelf()
+void ZERNStageGBuffer::UpdateRenderTargets(ZERNRenderer* Renderer)
 {
+	ZEGROutput* Output = Renderer->GetOutput();
+	ZEGRRenderTarget* OutputRenderTarget = Output->GetRenderTarget();
+	if (Output == NULL || OutputRenderTarget == NULL)
+	{
+		GBuffer0.Release();
+		GBuffer1.Release();
+		GBuffer2.Release();
+		GBuffer3.Release();
+	}
 
-}
+	if (!GBuffer0.IsNull() && GBuffer0->GetWidth() == OutputRenderTarget->GetWidth() && GBuffer0->GetHeight() == OutputRenderTarget->GetHeight())
+		return;
 
-void ZERNStageGBuffer::DeinitializeSelf()
-{
+	GBuffer0 = ZEGRTexture2D::CreateInstance(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	GBuffer1 = ZEGRTexture2D::CreateInstance(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	GBuffer2 = ZEGRTexture2D::CreateInstance(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	GBuffer3 = ZEGRTexture2D::CreateInstance(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight(), 1, ZEGR_TF_R10G10B10A2_UINT, true);
 
+	RenderTargets[0] = GBuffer0->GetRenderTarget(0);
+	RenderTargets[1] = GBuffer1->GetRenderTarget(0);
+	RenderTargets[2] = GBuffer2->GetRenderTarget(0);
+	RenderTargets[3] = GBuffer3->GetRenderTarget(0);
 }
 
 ZEInt ZERNStageGBuffer::GetId()
 {
-	return 1;
+	return ZERN_STAGE_GBUFFER;
 }
 
 const ZEString& ZERNStageGBuffer::GetName()
 {
-	return "GBuffer";
+	static ZEString Name = "GBuffer";
+	return Name;
 }
 
 const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
 {
+	static ZEGRRenderState RendererState;
+	bool Initialized = false;
+	if (!Initialized)
+	{
+		ZEGRDepthStencilState DepthStencilState;
+		DepthStencilState.SetZTestEnable(true);
+		DepthStencilState.SetZWriteEnable(true);
+		RenderState.SetDepthStencilState(DepthStencilState);
+
+		ZEGRBlendState BlendState;
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetRenderTargetFormat(1, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetRenderTargetFormat(2, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetRenderTargetFormat(3, ZEGR_TF_R10G10B10A2_UINT);
+	}
+
 	return RenderState;
 }
 
@@ -86,20 +124,10 @@ ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationBuffer()
 	return AccumulationBuffer;
 }
 
-const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
+bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	return RenderState;
-}
-
-void ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context)
-{
-	Context->SetRenderTarget(0, GBuffer0->GetRenderTarget());
-	Context->SetRenderTarget(1, GBuffer0);
-	Context->SetRenderTarget(2, GBuffer0);
-	Context->SetRenderTarget(3, GBuffer0);
-}
-
-void ZERNStageGBuffer::CleanUp()
-{
-
+	UpdateRenderTargets(Renderer);
+	Context->SetRenderTarget(4, RenderTargets);
+	
+	return true;
 }

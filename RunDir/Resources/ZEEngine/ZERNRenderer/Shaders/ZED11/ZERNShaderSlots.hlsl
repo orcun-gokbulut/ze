@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Output.h
+ Zinek Engine - ZERNShaderSlots.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,49 +35,15 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGROutput.h"
 
-#include "ZETypes.h"
-#include "ZED11ComponentBase.h"
-#include "ZED11RenderTarget.h"
-#include "ZEGraphics/ZEGRHolder.h"
+// DEFINITIONS
+///////////////////////////////////////////////////////////////////////////////
 
-struct IDXGIOutput;
-struct IDXGISwapChain1;
-class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-
-class ZED11Output : public ZEGROutput, ZED11ComponentBase
-{
-	friend ZED11Module;
-	private:
-		void*								Handle;
-		ZEGRMonitorMode*					Mode;
-		bool								Fullscreen;
-		ZEGRHolder<ZED11RenderTarget>		RenderTarget;
-
-		IDXGIOutput*						Output;
-		IDXGISwapChain1*					SwapChain;
-
-		void								SwitchToFullscreen();
-		void								UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-
-		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-		virtual	void						Deinitialize();
-
-											ZED11Output();
-
-	public:
-		virtual void*						GetHandle();
-		virtual ZEGRRenderTarget*			GetRenderTarget();
-
-		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode);
-		virtual ZEGRMonitorMode*			GetMonitorMode();
-
-		virtual void						SetFullscreen(bool Enabled);
-		virtual bool						GetFullscreen();
-
-		virtual void						Resize(ZEUInt Width, ZEUInt Height);
-
-		virtual void						Present();
-};
+#define ZERN_SHADER_CONSTANT_RENDERER			cb0
+#define ZERN_SHADER_CONSTANT_SCENE				cb1
+#define ZERN_SHADER_CONSTANT_CAMERA				cb2
+#define ZERN_SHADER_CONSTANT_MATERIAL			cb3
+#define ZERN_SHADER_CONSTANT_DRAW_MATERIAL		cb4
+#define ZERN_SHADER_CONSTANT_DRAW_TRANSFORM		cb5
+#define ZERN_SHADER_CONSTANT_DRAW_SKIN			cb6
+#define ZERN_SHADER_CONSTANT_DRAW_OTHER			cb7

@@ -562,7 +562,7 @@ bool ZEEntity::PreRender(const ZERNCullParameters* CullParameters)
 		return false;
 
 	ZEDrawFlags Flags = GetDrawFlags();
-	if (Flags.GetFlags(ZE_DF_DRAW))
+	if (!Flags.GetFlags(ZE_DF_DRAW))
 		return false;
 
 	if (Flags.GetFlags(ZE_DF_CULL) && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))

@@ -40,6 +40,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEList2.h"
 #include "ZERNView.h"
+#include "ZERNStage.h"
+#include "ZERNStageID.h"
 
 class ZEScene;
 class ZERNStage;
@@ -92,6 +94,8 @@ class ZERNRenderer : public ZEInitializable
 		void						RemoveCommand(ZERNCommand* Command);
 		void						CleanCommands();
 
+		ZEArray<ZERNStage*>			GetStages();
+		ZERNStage*					GetStage(ZERNStageID Id);
 		void						AddStage(ZERNStage* Stage);
 		void						RemoveStage(ZERNStage* Stage);
 

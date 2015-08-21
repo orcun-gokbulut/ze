@@ -159,25 +159,25 @@ static ZEGRFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
 	switch(PixelFormat)
 	{
 		case ZE_TIFF_PT_L8:
-			return ZEGR_TF_R8;
+			return ZEGR_TF_R8_UNORM;
 
 		case ZE_TIFF_PT_LA8:
-			return ZEGR_TF_R8G8;
+			return ZEGR_TF_R8G8_UNORM;
 
 		case ZE_TIFF_PT_L16:
-			return ZEGR_TF_R16;
+			return ZEGR_TF_R16_UNORM;
 
 		case ZE_TIFF_PT_LA16:
-			return ZEGR_TF_R16G16;
+			return ZEGR_TF_R16G16_UNORM;
 
 		case ZE_TIFF_PT_INDEXED:
 		case ZE_TIFF_PT_RGB8:
 		case ZE_TIFF_PT_RGBA8:
-			return ZEGR_TF_R8G8B8A8;
+			return ZEGR_TF_R8G8B8A8_UNORM;
 
 		case ZE_TIFF_PT_RGB16:
 		case ZE_TIFF_PT_RGBA16:
-			return ZEGR_TF_R16G16B16A16;
+			return ZEGR_TF_R16G16B16A16_UNORM;
 	}
 
 	return ZEGR_TF_NONE;

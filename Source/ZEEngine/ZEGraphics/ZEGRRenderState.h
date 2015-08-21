@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZETypes.h"
+#include "ZECommon.h"
 #include "ZEGRVertexLayout.h"
 #include "ZEGRDefinitions.h"
 #include "ZEGRBlendState.h"
@@ -44,10 +46,8 @@
 #include "ZEGRScissorRect.h"
 #include "ZEGRViewPort.h"
 #include "ZEGRHolder.h"
-
-#include "ZETypes.h"
-#include "ZECommon.h"
 #include "ZEGRDepthStencilBuffer.h"
+#include "ZEGRFormat.h"
 
 class ZEGRVertexLayout;
 class ZEGRVertexBuffer;
@@ -65,6 +65,7 @@ class ZEGRRenderState;
 
 class ZEGRRenderStateData : public ZEGRResource
 {
+	friend class ZEGRRenderState;
 	protected:
 		virtual void							Initialize(const ZEGRRenderState& RenderState) = 0;
 

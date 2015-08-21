@@ -41,51 +41,6 @@
 #include "ZETextureLoader.h"
 #include "ZEMath/ZEMath.h"
 
-ZESize ZETextureTestUtils::GetPixelSize(ZEGRFormat Format)
-{
-	switch(Format)
-	{
-		case ZEGR_TF_R8G8B8A8:
-			return 4;
-
-		case ZEGR_TF_R16G16B16A16:
-			return 8;
-
-		case ZEGR_TF_R16F:
-			return 2;
-
-		case ZEGR_TF_R16FG16F:
-			return 4;
-
-		case ZEGR_TF_R16FG16FB16FA16F:
-			return 16;
-
-		case ZEGR_TF_R32F:
-			return 8;
-
-		case ZEGR_TF_R32FG32F:
-			return 16;
-
-		case ZEGR_TF_R32FG32FB32FA32F:
-			return 32;
-
-		case ZEGR_TF_R8:
-			return 1;
-
-		case ZEGR_TF_R8G8:
-			return 2;
-
-		case ZEGR_TF_R16:
-			return 2;
-
-		case ZEGR_TF_R16G16:
-			return 4;
-
-		default:
-			return 0;
-	}
-}
-
 void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureData* Data)
 {
 	for (ZESize I = 0; I < Data->GetSurfaces().GetCount(); I++)
@@ -113,7 +68,10 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 			ZEPixelColor* Current = &Bitmap.GetPixel(x, y);
 			switch(Format)
 			{
-				case ZEGR_TF_R8G8B8A8:
+				case ZEGR_TF_R8G8B8A8_UINT:
+				case ZEGR_TF_R8G8B8A8_SINT:
+				case ZEGR_TF_R8G8B8A8_UNORM:
+				case ZEGR_TF_R8G8B8A8_SNORM:
 				{
 					ZEPixelRGBA8* Pixel = (ZEPixelRGBA8*)Source + Level->GetWidth() * y + x;
 					Current->a = Pixel->A;
@@ -123,7 +81,10 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_R16G16B16A16:
+				case ZEGR_TF_R16G16B16A16_UINT:
+				case ZEGR_TF_R16G16B16A16_SINT:
+				case ZEGR_TF_R16G16B16A16_UNORM:
+				case ZEGR_TF_R16G16B16A16_SNORM:
 				{
 					ZEPixelRGBA16* Pixel = (ZEPixelRGBA16*)Source + Level->GetWidth() * y + x;
 					Current->a = Pixel->A >> 8;
@@ -133,7 +94,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					break;
 				}
 
-				case ZEGR_TF_R32F:
+				/*case ZEGR_TF_R32F_FLOAT:
 				{
 					ZEPixelR32F* Pixel = (ZEPixelR32F*)Source + Level->GetWidth() * y + x;
 					Current->a = 255;
@@ -213,7 +174,7 @@ void ZETextureTestUtils::DumpAsTGA(const char* FileName, ZETextureLevel* Level)
 					Current->g = 0;
 					Current->b = 0;
 					break;
-				}
+				}*/
 			}
 		}
 	}

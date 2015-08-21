@@ -71,18 +71,33 @@ class ZECamera : public ZEEntity
 		mutable struct
 		{
 			ZEMatrix4x4					ViewTransform;
-			ZEMatrix4x4					ProjectionTransform;
+			ZEMatrix4x4					ProjectionTransform;		
+			ZEMatrix4x4					InvViewTransform;
+			ZEMatrix4x4					InvProjectionTransform;			
 			ZEMatrix4x4					ViewProjectionTransform;
-
-			ZEUInt32					Width;
-			ZEUInt32					Height;
-			float						AspectRatio;
+			ZEMatrix4x4					InvViewProjectionTransform;
+			
+			float						Width;
+			float						Height;
 			float						VerticalFOV;
 			float						HorizontalFOV;
+
+			float						AspectRatio;
 			float						NearZ;
 			float						FarZ;
+			float						Reserved0;
+
+			ZEVector4					Position;
+			ZEQuaternion				Rotation;
+			ZEVector4					RotationEuler;
+
+			ZEVector4					Up;
+			ZEVector4					Right;
+			ZEVector4					Front;
+
 			float						ShadowDistance;
 			float						ShadowFadeDistance;
+			float						Reserved1[2];
 		} Constants;
 
 		bool							AutoAspectRatio;
@@ -130,6 +145,10 @@ class ZECamera : public ZEEntity
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetProjectionTransform();
 		const ZEMatrix4x4&				GetViewProjectionTransform();
+
+		const ZEMatrix4x4&				GetInvViewTransform();
+		const ZEMatrix4x4&				GetInvProjectionTransform();
+		const ZEMatrix4x4&				GetInvViewProjectionTransform();
 
 		virtual void					SetPosition(const ZEVector3& NewPosition);	
 		virtual void					SetRotation(const ZEQuaternion& NewRotation);

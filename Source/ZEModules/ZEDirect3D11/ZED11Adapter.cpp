@@ -100,7 +100,7 @@ const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes()
 		{
 			Modes[I].Width = ModeDesc[I].Width;
 			Modes[I].Height = ModeDesc[I].Height;
-			Modes[I].Format = ZEGR_TF_R8G8B8A8;
+			Modes[I].Format = ZEGR_TF_R8G8B8A8_UNORM;
 			Modes[I].RefreshRate.Numerator = ModeDesc[I].RefreshRate.Numerator;
 			Modes[I].RefreshRate.Denominator = ModeDesc[I].RefreshRate.Denominator;
 		}

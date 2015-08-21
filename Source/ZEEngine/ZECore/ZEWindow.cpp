@@ -370,7 +370,7 @@ bool ZEWindow::InitializeSelf()
 	if (!CreateWindow_())
 		return false;
 
-	Output = ZEGROutput::Create(Handle, Fullscreen ? MonitorMode : NULL, Width, Height, ZEGR_TF_R8G8B8A8);
+	Output = ZEGROutput::Create(Handle, Fullscreen ? MonitorMode : NULL, Width, Height, ZEGR_TF_R8G8B8A8_UNORM);
 }
 
 void ZEWindow::DeinitializeSelf()

@@ -38,23 +38,16 @@
 #include "ZETypes.h"
 #include "ZERNMaterial.h"
 #include "ZERNSampler.h"
+#include "ZERNStageID.h"
 #include "ZEGraphics\ZEGRRenderState.h"
-
-class ZEGRTexture2D;
-
-#define ZERN_SHADER_MATERIAL_SLOT
 
 class ZERNSimpleMaterial : public ZERNMaterial
 {
-	friend class ZED3D9Module;
-	protected:
+	private:
 		bool							TwoSided;
 		bool							Wireframe;
 		bool							VertexColorEnabled;
-
 		bool							DirtyConstants;
-		bool							DirtyShaders;
-		bool							DirtyRenderStates;
 
 		ZEGRHolder<ZEGRRenderStateData> RenderStateData;
 		struct
@@ -63,18 +56,17 @@ class ZERNSimpleMaterial : public ZERNMaterial
 			ZEUInt						TransparancyCullLimit;
 		} Constants;
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
-
-		ZEMaterialTransparancyMode		TransparancyMode;
-		ZERNSampler						TextureSampler;
 		ZEGRHolder<ZEGRRenderStateData>	RenderState;
+		ZERNSampler						TextureSampler;
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
 
 										ZERNSimpleMaterial();
-		virtual							~ZERNSimpleMaterial();
 
 	public:
+		virtual ZERNStageMask			GetStageMask();
+
 		void							SetTwoSided(bool Enable);
 		bool							GetTwoSided() const;
 
@@ -87,20 +79,10 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		void							SetMaterialColor(const ZEVector4& Color);
 		const ZEVector4&				GetMaterialColor() const;
 
-		void							SetTransparancyMode(ZEMaterialTransparancyMode Mode);
-		ZEMaterialTransparancyMode		GetTransparancyMode() const;
-
-		void							SetTransparancyCullLimit(ZEUInt Limit);
-		ZEUInt							GetTransparancyCullLimit() const;
-
 		void							SetTexture(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetTexture() const;
 		
-		virtual const ZEGRRenderState&	GetRenderState(const char* StageName);
-
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-
-		virtual void					Update();
 
 		static ZERNSimpleMaterial*		CreateInstance();
 };
