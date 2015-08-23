@@ -35,6 +35,8 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+add_subdirectory(ZEDSHShaderEditor)
+
 ze_add_source(ZEGRGraphicsModule.cpp 		Sources)
 ze_add_source(ZEGRGraphicsModule.h 			Sources Headers)
 ze_add_source(ZEGRContext.cpp				Sources)
