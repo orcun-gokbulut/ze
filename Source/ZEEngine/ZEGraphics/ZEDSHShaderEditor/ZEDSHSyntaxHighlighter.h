@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSHOutputWindow.cpp
+ Zinek Engine - ZEDSHSyntaxHighlighter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,19 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDSHOutputWindow.h"
+#include <QtGui/QSyntaxHighlighter>
 
-#include <QtGui/QPlainTextEdit>
-
-QPlainTextEdit* ZEDSHOutputWindow::GetOutput()
+struct ZEDSHSyntaxElement
 {
-	return Output;
-}
+	QString Name;
+	QString Description;
+	
+	bool ExpressionEnabled;
+	QRegExp Expression;
 
-ZEDSHOutputWindow::ZEDSHOutputWindow(QWidget* Parent) : QDockWidget(Parent)
+	bool ExpressionBlockEnabled;
+	QRegExp StartExpression;
+	QRegExp EndExpression;
+
+	QFont Font;
+	QBrush Foreground;
+	QBrush Background;
+
+	bool operator==(const ZEDSHSyntaxElement& Element);
+	ZEDSHSyntaxElement();
+};
+
+class ZEDSHSyntaxHightlighter : public QSyntaxHighlighter
 {
-	this->setWindowTitle("Output");
+	private:
+		QList<ZEDSHSyntaxElement> Elements;
 
-	Output = new QPlainTextEdit(this);
-	this->setWidget(Output);
-}
+		void					HighlightElement(const QString &text, ZEDSHSyntaxElement& Element);
+	
+public:
+		const QList<ZEDSHSyntaxElement>& GetSyntaxElements();
+		void					AddSyntaxElement(const ZEDSHSyntaxElement& Element);
+		void					RemoveSyntaxElement(const ZEDSHSyntaxElement& Element);
+
+		void					highlightBlock(const QString &text);
+
+								ZEDSHSyntaxHightlighter(QTextDocument* Document);
+};

@@ -41,14 +41,17 @@ ze_add_source(ZEDSHOutputWindow.cpp			Sources)
 ze_add_source(ZEDSHOutputWindow.h			Sources QtMocs)
 ze_add_source(ZEDSHEditorWidget.cpp			Sources)
 ze_add_source(ZEDSHEditorWidget.h			Sources QtMocs)
+ze_add_source(ZEDSHSyntaxHighlighter.cpp	Sources)
+ze_add_source(ZEDSHSyntaxHighlighter.h		Sources QtMocs)
 ze_add_source(ZEDSHMainWindow.cpp			Sources)
 ze_add_source(ZEDSHMainWindow.h				Sources QtMocs)
 ze_add_source(ZEDSHMainWindow.ui			Sources QtUIs)
-ze_add_source(ZEDSHMain						Sources)
+ze_add_source(ZEDSHMain.cpp					Sources)
 
 qt4_wrap_cpp(QtMocFiles ${QtMocs})
 qt4_wrap_ui(QtUIFiles ${QtUIs})
 
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 ze_add_executable(TARGET ZEDSHShaderEditor
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation libQt libMSVCRv100)

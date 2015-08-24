@@ -68,6 +68,9 @@ class ZEDSHMainWindow : public QMainWindow
 		void UpdateUI();
 
 	private slots:
+		void Editor_OnTextChanged();
+		void Editor_OnSelectionChanged();
+
 		void actNew_OnTrigger();
 		void actOpen_OnTrigger();
 		void actRecent_OnTrigger();
@@ -77,6 +80,8 @@ class ZEDSHMainWindow : public QMainWindow
 		void actQuit_OnTrigger();
 		void actUndo_OnTrigger();
 		void actRedo_OnTrigger();
+		void actSelectAll_OnTrigger();
+		void actDeselect_OnTrigger();
 		void actCut_OnTrigger();
 		void actCopy_OnTrigger();
 		void actPaste_OnTrigger();
@@ -91,6 +96,7 @@ class ZEDSHMainWindow : public QMainWindow
 		void actCompileParameters_OnTrigger();
 		void actReflection_OnTrigger();
 		void actAbout_OnTrigger();
+
 
 	public:
 		ZEDSHMainWindow(QWidget* Parent = NULL);

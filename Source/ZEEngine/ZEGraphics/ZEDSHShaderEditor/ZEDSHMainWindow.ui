@@ -16,16 +16,16 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <property name="leftMargin">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="topMargin">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="rightMargin">
-     <number>0</number>
+     <number>2</number>
     </property>
     <property name="bottomMargin">
-     <number>0</number>
+     <number>2</number>
     </property>
     <item>
      <widget class="ZEDSHEditorWidget" name="textEdit"/>
@@ -67,6 +67,9 @@
     <addaction name="actUndo"/>
     <addaction name="actRedo"/>
     <addaction name="separator"/>
+    <addaction name="actSelectAll"/>
+    <addaction name="actDeselect"/>
+    <addaction name="separator"/>
     <addaction name="actCut"/>
     <addaction name="actCopy"/>
     <addaction name="actPaste"/>
@@ -74,6 +77,7 @@
     <addaction name="separator"/>
     <addaction name="actFind"/>
     <addaction name="actReplace"/>
+    <addaction name="separator"/>
    </widget>
    <widget class="QMenu" name="menuBuild">
     <property name="title">
@@ -194,9 +198,12 @@
     <string>Ctrl+V</string>
    </property>
   </action>
-  <action name="actDelete">
+  <action name="actSelectAll">
    <property name="text">
-    <string>Delete</string>
+    <string>Select All</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+A</string>
    </property>
   </action>
   <action name="actFind">
@@ -266,6 +273,19 @@
   <action name="actClose">
    <property name="text">
     <string>Close</string>
+   </property>
+  </action>
+  <action name="actDeselect">
+   <property name="text">
+    <string>Deselect</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actDelete">
+   <property name="text">
+    <string>Delete</string>
    </property>
   </action>
  </widget>

@@ -34,8 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSHEditorWidget.h"
+#include "ZEDSHSyntaxHighlighter.h"
 
 ZEDSHEditorWidget::ZEDSHEditorWidget(QWidget* Parent) : QTextEdit(Parent)
 {
+	new ZEDSHSyntaxHightlighter(document());
+	setFont(QFont("Consolas", 10));
 
+	const int tabStop = 4;
+	QFontMetrics metrics(font());
+	setTabStopWidth(tabStop * metrics.width(' '));
+
+	setWordWrapMode(QTextOption::NoWrap);
 }
