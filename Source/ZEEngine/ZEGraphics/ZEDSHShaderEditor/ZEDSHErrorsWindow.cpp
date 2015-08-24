@@ -49,6 +49,8 @@ void ZEDSHErrorsWindow::ParseErrors(const char* Errors)
 
 ZEDSHErrorsWindow::ZEDSHErrorsWindow(QWidget* Parent) : QDockWidget(Parent)
 {
+	this->setWindowTitle("Errors");
+
 	QTableWidget* ErrorTable = new QTableWidget(this);
 	
 	ErrorTable->setColumnCount(6);

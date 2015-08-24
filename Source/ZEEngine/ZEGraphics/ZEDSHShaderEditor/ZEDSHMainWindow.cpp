@@ -44,21 +44,26 @@
 
 void ZEDSHMainWindow::UpdateUI()
 {
-	bool Selection = Editor->textCursor().hasSelection();
+	bool Selection = Loaded && Editor->textCursor().hasSelection();
 	Editor->setEnabled(Loaded);
 	Form->actNew->setEnabled(!Engine);
 	Form->actOpen->setEnabled(!Engine);
 	Form->actRecent->setEnabled(!Engine);
+	Form->actLoadShader->setEnabled(Engine);
+	Form->actUploadToEngine->setEnabled(Engine);
 	Form->actSave->setEnabled(Loaded);
 	Form->actSaveAs->setEnabled(Loaded);
-	Form->actUndo->setEnabled(Loaded);
-	Form->actRedo->setEnabled(Loaded);
+	Form->actClose->setEnabled(Loaded);
+
+	Form->actSelectAll->setEnabled(Loaded);
+	Form->actDeselect->setEnabled(Selection);
 	Form->actCut->setEnabled(Selection);
 	Form->actCopy->setEnabled(Selection);
 	Form->actPaste->setEnabled(Selection);
 	Form->actDelete->setEnabled(Selection);
 	Form->actFind->setEnabled(Loaded);
 	Form->actReplace->setEnabled(Loaded);
+
 	Form->actCompile->setEnabled(Loaded);
 	this->setWindowTitle(QString("Zinek Shader Editor %1").arg(FileName != "" ? QString(" - %1").arg(FileName) : QString("")));
 }
@@ -74,6 +79,9 @@ void ZEDSHMainWindow::NewDocument()
 	Compiled = false;
 	this->FileName = QString();
 
+	Form->actUndo->setEnabled(false);
+	Form->actRedo->setEnabled(false);
+
 	UpdateUI();
 }
 
@@ -83,29 +91,31 @@ void ZEDSHMainWindow::OpenDocument(const QString& FileName)
 		return;
 
 	ZEFile File;
-	if (!File.Open(FileName.toLocal8Bit().begin(), ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+	if (!File.Open(FileName.toLocal8Bit().begin(), ZE_FOM_READ, ZE_FCM_NONE))
 	{
 		QMessageBox::critical(this, "Zinek Shader Editor", "Cannot open file for reading.", QMessageBox::Ok);
 		return;
 	}
-
-	File.Seek(0, ZE_SF_END);
-	ZESize FileSize = File.Tell();
-	File.Seek(0, ZE_SF_BEGINING);
-
-	ZEPointer<ZEBYTE> Buffer = new ZEBYTE[FileSize];
-
-	if (File.Read(Buffer.GetPointer(), FileSize, 1) != 1)
+	
+	ZESize FileSize = File.GetSize();
+	ZEPointer<ZEBYTE> Buffer = new ZEBYTE[FileSize + 1];
+	if (FileSize != 0 && File.Read(Buffer.GetPointer(), FileSize, 1) != 1)
 	{
 		QMessageBox::critical(this, "Zinek Shader Editor", "Cannot read from file.", QMessageBox::Ok);
 		return;
 	}
 	File.Close();
 
+	Buffer[FileSize] = '\0';
+	Editor->setPlainText((char*)Buffer.GetPointer());
+
 	Loaded = true;
 	Compiled = false;
 	HasChanges = false;
 	this->FileName = FileName;
+
+	Form->actUndo->setEnabled(false);
+	Form->actRedo->setEnabled(false);
 
 	UpdateUI();
 }
@@ -151,8 +161,24 @@ bool ZEDSHMainWindow::CloseDocument()
 	Compiled = false;
 	HasChanges = false;
 	this->FileName = QString();
+	Editor->setPlainText("");
+
+	UpdateUI();
 
 	return true;
+}
+void ZEDSHMainWindow::Editor_OnTextChanged()
+{
+	if (HasChanges)
+		return;
+
+	HasChanges = true;
+	UpdateUI();
+}
+
+void ZEDSHMainWindow::Editor_OnSelectionChanged()
+{
+	UpdateUI();
 }
 
 void ZEDSHMainWindow::actNew_OnTrigger()
@@ -162,7 +188,7 @@ void ZEDSHMainWindow::actNew_OnTrigger()
 
 void ZEDSHMainWindow::actOpen_OnTrigger()
 {
-	QString FileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(), tr("Shader files (*.zeShader, *.hlsl);;Any files (*)"));
+	QString FileName = QFileDialog::getOpenFileName(this, tr("Open File"), this->FileName, tr("Shader Files (*.zeShader *.hlsl);;Any Files (*.*)"));
 	if (FileName.isNull())
 		return;
 
@@ -187,9 +213,7 @@ void ZEDSHMainWindow::actSave_OnTrigger()
 
 void ZEDSHMainWindow::actSaveAs_OnTrigger()
 {
-	QString FileName = QFileDialog::getOpenFileName(this, tr("Open File"), QString(), 
-		tr("Shader files (*.zeShader, *.hlsl);;Any files (*)"));
-
+	QString FileName = QFileDialog::getSaveFileName(this, tr("Open File"), this->FileName, tr("Shader files (*.zeShader *.hlsl);;Any Files (*.*)"));
 	if (FileName.isNull())
 		return;
 
@@ -209,32 +233,42 @@ void ZEDSHMainWindow::actQuit_OnTrigger()
 
 void ZEDSHMainWindow::actUndo_OnTrigger()
 {
-
+	Editor->document()->undo();
 }
 
 void ZEDSHMainWindow::actRedo_OnTrigger()
 {
+	Editor->document()->redo();
+}
 
+void ZEDSHMainWindow::actSelectAll_OnTrigger()
+{
+	Editor->selectAll();
+}
+
+void ZEDSHMainWindow::actDeselect_OnTrigger()
+{
+	Editor->textCursor().clearSelection();
 }
 
 void ZEDSHMainWindow::actCut_OnTrigger()
 {
-
+	Editor->cut();
 }
 
 void ZEDSHMainWindow::actCopy_OnTrigger()
 {
-
+	Editor->copy();
 }
 
 void ZEDSHMainWindow::actPaste_OnTrigger()
 {
-
+	Editor->paste();
 }
 
 void ZEDSHMainWindow::actDelete_OnTrigger()
 {
-
+	Editor->textCursor().removeSelectedText();
 }
 
 void ZEDSHMainWindow::actFind_OnTrigger()
@@ -307,6 +341,9 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 
 	UpdateUI();
 
+	Form->actUndo->setEnabled(false);
+	Form->actRedo->setEnabled(false);
+
 	connect(Form->actNew,				SIGNAL(triggered()), this, SLOT(actNew_OnTrigger()));
 	connect(Form->actOpen,				SIGNAL(triggered()), this, SLOT(actOpen_OnTrigger()));
 	connect(Form->actRecent,			SIGNAL(triggered()), this, SLOT(actRecent_OnTrigger()));
@@ -316,6 +353,8 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 	connect(Form->actQuit,				SIGNAL(triggered()), this, SLOT(actQuit_OnTrigger()));
 	connect(Form->actUndo,				SIGNAL(triggered()), this, SLOT(actUndo_OnTrigger()));
 	connect(Form->actRedo,				SIGNAL(triggered()), this, SLOT(actRedo_OnTrigger()));
+	connect(Form->actSelectAll,			SIGNAL(triggered()), this, SLOT(actSelectAll_OnTrigger()));
+	connect(Form->actDeselect,			SIGNAL(triggered()), this, SLOT(actDeselect_OnTrigger()));
 	connect(Form->actCut,				SIGNAL(triggered()), this, SLOT(actCut_OnTrigger()));
 	connect(Form->actCopy,				SIGNAL(triggered()), this, SLOT(actCopy_OnTrigger()));
 	connect(Form->actPaste,				SIGNAL(triggered()), this, SLOT(actPaste_OnTrigger()));
@@ -330,4 +369,6 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 	connect(Form->actCompileParameters,	SIGNAL(triggered()), this, SLOT(actCompileParameters_OnTrigger()));
 	connect(Form->actReflection,		SIGNAL(triggered()), this, SLOT(actReflection_OnTrigger()));
 	connect(Form->actAbout,				SIGNAL(triggered()), this, SLOT(actAbout_OnTrigger()));
+	connect(Editor,						SIGNAL(undoAvailable(bool)), Form->actUndo, SLOT(setEnabled(bool)));
+	connect(Editor,						SIGNAL(redoAvailable(bool)), Form->actRedo, SLOT(setEnabled(bool)));
 }

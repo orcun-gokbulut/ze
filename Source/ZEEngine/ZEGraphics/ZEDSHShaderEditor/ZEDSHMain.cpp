@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSHMainWindow.h"
+#include "ZEFile/ZEPathManager.h"
 
 #include <QtGui/QApplication>
 
@@ -43,25 +44,20 @@
 
 	int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 	{
+
 		int argc = 1;
 		char* argv[] =
 		{
 			"ZEDSHShaderEditor.exe"
 		};
-
-		QApplication Application(argc, argv);
-		ZEDSHMainWindow Widget;
-		Widget.show();
-		return Application.exec();
-	}
 #else
 	int Main(int argc, char** argv)
 	{
+#endif
 		ZEPathManager::GetInstance()->SetAccessControl(false);
 
 		QApplication Application(argc, argv);
-		ZEMLEditorWindow Widget;
-		Widget.show();
+		ZEDSHMainWindow MainWindow;
+		MainWindow.show();
 		return Application.exec();
 	}
-#endif
