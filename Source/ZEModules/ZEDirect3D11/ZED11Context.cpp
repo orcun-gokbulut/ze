@@ -51,6 +51,10 @@
 #include <d3d11_1.h>
 #include "ZED11StatePool.h"
 
+#define ZEGR_CONTEXT_DIRTY_BLEND_STATE 1
+#define ZEGR_CONTEXT_DIRTY_STENCIL_STATE 1
+#define ZEGR_CONTEXT_DIRTY_RENDER_TARGETS 1
+
 inline D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitiveType(ZEGRPrimitiveType PrimitiveType)
 {
 	static const D3D11_PRIMITIVE_TOPOLOGY Values[] = 
@@ -81,20 +85,29 @@ inline DXGI_FORMAT ConverIndexBufferFormat(ZEGRIndexBufferFormat Format)
 	}
 }
 
-void ZED11Context::UpdateBlendState()
+void ZED11Context::UpdateContext()
 {
-	if (!DirtyBlendState)
+	if (RenderState == NULL)
 		return;
 
-	Context->OMSetBlendState(RenderState->NativeBlendState, (float*)&BlendFactors, BlendMask);
-}
+	if (DirtyFlags.GetBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE))
+	{
+		Context->OMSetBlendState(RenderState->NativeBlendState, (float*)&BlendFactors, BlendMask);
+		DirtyFlags.UnraiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
+	}
 
-void ZED11Context::UpdateDepthStencilState()
-{
-	if (!DirtyStencilState)
-		return;
 
-	Context->OMSetDepthStencilState(RenderState->NativeDepthStencilState, StencilRef);
+	if (DirtyFlags.GetBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE))
+	{
+		Context->OMSetDepthStencilState(RenderState->NativeDepthStencilState, StencilRef);
+		DirtyFlags.UnraiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
+	}
+
+	if (DirtyFlags.GetBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS))
+	{
+		Context->OMSetRenderTargets(RenderTargetCount, RenderTargets, DepthStencilBuffer);
+		DirtyFlags.UnraiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
+	}
 }
 
 void ZED11Context::Initialize(ID3D11DeviceContext1* Context)
@@ -105,14 +118,6 @@ void ZED11Context::Initialize(ID3D11DeviceContext1* Context)
 void ZED11Context::Deinitialize()
 {
 	ZEGR_RELEASE(Context);
-}
-
-void ZED11Context::UpdateRenderTargets()
-{
-	if (!DirtyRenderTargets)
-		return;
-
-	Context->OMSetRenderTargets(RenderTargetCount, RenderTargets, DepthStencilBuffer);
 }
 
 void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
@@ -146,12 +151,12 @@ void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 	Context->RSSetState(RenderState->RasterizerState->GetInterface());
 
 	if (BlendState != RenderState->NativeBlendState)
-		DirtyBlendState = true;
+		DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
 
 	if (DepthStencilState != RenderState->NativeDepthStencilState)
-		DirtyBlendState = true;
+		DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
 
-	DirtyRenderTargets = true;
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
 }
 
 void ZED11Context::SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer)
@@ -193,7 +198,7 @@ void ZED11Context::SetRenderTarget(ZEUInt Count, ZEGRRenderTarget** RenderTarget
 	for (ZESize I = 0; I < RenderTargetCount; I++)
 		this->RenderTargets[I] = static_cast<ZED11RenderTarget*>(RenderTargets[I])->GetView();
 
-	DirtyRenderTargets = true;
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
 }
 
 void ZED11Context::SetStencilRef(ZEUInt Reference)
@@ -202,13 +207,16 @@ void ZED11Context::SetStencilRef(ZEUInt Reference)
 		return;
 
 	StencilRef = Reference;
-	DirtyStencilState = true;
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
 }
 
 void ZED11Context::SetBlendFactors(ZEVector4& Factors)
 {
-	DirtyBlendState = true;
+	if (BlendFactors == Factors)
+		return;
+
 	BlendFactors = Factors;
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
 }
 
 void ZED11Context::SetBlendMask(ZEUInt Mask)
@@ -217,7 +225,7 @@ void ZED11Context::SetBlendMask(ZEUInt Mask)
 		return;
 
 	BlendMask = Mask;
-	DirtyBlendState = true;
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
 }
 
 void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
@@ -401,27 +409,21 @@ void ZED11Context::SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer)
 		return;
 
 	DepthStencilBuffer = NativeView;
-	DirtyRenderTargets = true;
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
 }
 
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)
 {
-	UpdateRenderTargets();
-	UpdateBlendState();
-	UpdateDepthStencilState();
+	UpdateContext();
 
 	GetMainContext()->Draw(VertexCount, FirstVertex);
 }
 
 void ZED11Context::DrawInstanced(ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
 {
-	UpdateRenderTargets();
-	UpdateBlendState();
-	UpdateDepthStencilState();
-
+	UpdateContext();
 	GetMainContext()->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
 }
-
 
 void ZED11Context::ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
@@ -441,18 +443,16 @@ ZED11Context::ZED11Context()
 {
 	Context = NULL;
 
-	DirtyBlendState = true;
+	DirtyFlags.UnraiseAll();
+
 	BlendState = NULL;
 	BlendFactors = ZEVector4::One;
 	BlendMask = 0xFFFFFFFF;
 
-	DirtyRenderTargets = true;
 	RenderTargetCount = 0;
 	memset(RenderTargets, 0, ZEGR_MAX_RENDER_TARGET_SLOT * sizeof(ID3D11RenderTargetView*));
 	DepthStencilState = NULL;
 	DepthStencilBuffer = NULL;
-
-	DirtyStencilState = true;
 	StencilRef = 0;
 
 	RenderState = NULL;

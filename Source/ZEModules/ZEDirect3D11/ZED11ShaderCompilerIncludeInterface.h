@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ShaderCompiler.h
+ Zinek Engine - ZED11ShaderCompilerIncludeInterface.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,20 +35,21 @@
 
 #pragma once
 
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRShaderCompiler.h"
+#include <d3dcommon.h>
 
-class ZEGRShader;
+struct ZEGRShaderCompileOptions;
 
-class ZED11ShaderCompiler : public ZEGRShaderCompiler
+class ZED11ShaderCompilerIncludeInterface : public ID3DInclude
 {
-	friend class ZED11Module;
-	protected:
-		bool						CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
-
-									ZED11ShaderCompiler();
-		virtual						~ZED11ShaderCompiler();
+	private:
+		const ZEGRShaderCompileOptions*	CompileOptions;
 
 	public:
-		bool						Compile(ZEArray<BYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* BuildOutput);
+		void							SetCompileOptions(const ZEGRShaderCompileOptions* Options);
+		const ZEGRShaderCompileOptions*	GetCompileOptions();
+
+		HRESULT __stdcall				Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT * pBytes);
+		HRESULT __stdcall				Close(LPCVOID pData);
+
+										ZED11ShaderCompilerIncludeInterface();
 };

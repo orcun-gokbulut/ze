@@ -44,6 +44,7 @@ bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Fo
 	this->Length = Length;
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
+	SetIsRenderTarget(RenderTarget);
 
 	SetSize(CalculateSize(Length, Length, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, TextureCube, Texture);

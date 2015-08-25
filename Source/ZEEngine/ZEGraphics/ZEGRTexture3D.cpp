@@ -45,6 +45,7 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 	this->Depth = Depth;
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
+	SetIsRenderTarget(RenderTarget);
 
 	SetSize(Depth * CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture3D, Texture);

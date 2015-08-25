@@ -50,8 +50,9 @@ class ZERNStage : public ZEInitializable
 	public:
 		virtual ZEInt					GetId() = 0;
 		virtual const ZEString&			GetName() = 0;
-		virtual const ZEGRRenderState&	GetRenderState();
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+		static const ZEGRRenderState&	GetRenderState();
 };

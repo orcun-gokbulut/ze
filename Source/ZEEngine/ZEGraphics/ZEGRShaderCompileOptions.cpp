@@ -36,4 +36,10 @@
 #include "ZEGRShaderCompileOptions.h"
 #include "ZECommon.h"
 
-ZE_SUPPRESS_LNK4221
+ZEGRShaderCompileOptions::ZEGRShaderCompileOptions()
+{
+	Type = ZEGR_ST_NONE;
+	Model = ZEGR_SM_NONE;
+	Debug = false;
+	OptimizationLevel = 5;
+}

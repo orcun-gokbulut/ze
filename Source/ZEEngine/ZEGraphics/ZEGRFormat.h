@@ -143,8 +143,8 @@ class ZEGRFormatDefinition
 		ZEGRFormatStructure					Structure;
 		ZEGRFormatType						Type;
 		ZEGRFormatEncoding					Encoding;
-		ZESize								BlockSize;
 		ZESize								BlockDimension;
+		ZESize								BlockSize;
 		bool								Compressed;
 
 		static ZESize						GetFormatCount();

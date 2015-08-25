@@ -43,26 +43,27 @@
 #include "ZERNStage.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZERNShaderConfig.h"
+#include "ZERNStageForward.h"
 
 bool ZERNSimpleMaterial::InitializeSelf()
 {
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	ConstantBuffer->SetData(&Constants);
 
-	ZEGRRenderState State = ZERNStageManager::GetInstance()->GetStage("GBuffer")->GetRenderState();
+	ZEGRRenderState State = ZERNStageForward::GetRenderState();
 
 	ZEGRShaderCompileOptions Options;
-	Options.SourceData = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZESHSimpleMaterial.hlsl";
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSimpleMaterial.hlsl";
 	Options.Model = ZEGR_SM_4_0;
 
 	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "VSMain";
+	Options.EntryPoint = "ZERNSimpleMaterial_VSMain_ForwardStage";
 	ZEGRShader* VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(VertexShader == NULL, false, "Cannot compile vertex shader.");
 	State.SetShader(Options.Type, VertexShader);
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "PSMain";
+	Options.EntryPoint = "ZERNSimpleMaterial_PSMain_ForwardStage";
 	ZEGRShader* PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Cannot compile pixel shader.");
 	State.SetShader(Options.Type, PixelShader);

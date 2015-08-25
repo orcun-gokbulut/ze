@@ -57,7 +57,6 @@ class ZERNStageGBuffer : public ZERNStage
 	public:
 		virtual ZEInt					GetId();
 		virtual const ZEString&			GetName();
-		virtual const ZEGRRenderState&	GetRenderState();
 
 		ZEGRTexture2D*					GetPositionBuffer();
 		ZEGRTexture2D*					GetNormalBuffer();
@@ -66,4 +65,6 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRTexture2D*					GetAccumulationBuffer();
 		
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+
+		static const ZEGRRenderState&	GetRenderState();
 };
