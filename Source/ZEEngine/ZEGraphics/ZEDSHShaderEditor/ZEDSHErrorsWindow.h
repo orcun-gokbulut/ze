@@ -37,16 +37,30 @@
 
 #include <QtGui/QDockWidget>
 
+#include "ZERegEx/ZERegEx.h"
+
 class QTableWidget;
+
+enum ZEDSHErrorType
+{
+	ZEDSG_ET_ERROR,
+	ZEDSG_ET_WARNING,
+	ZEDSG_ET_NOTICE
+};
 
 class ZEDSHErrorsWindow : public QDockWidget
 {
 	private:
-		QTableWidget*		ErrorTable;
+		QTableWidget*		ErrorsTable;
+		ZERegEx				CompilerOutputRegex;
 
 	public:
 		QTableWidget*		GetErrorTable();
 
-		void				ParseErrors(const char* Errors);
+		void				AddError(ZEDSHErrorType Type, QString Code, QString Description, QString Line, QString File);
+		void				Clear();
+
+		void				ParseCompilerOutput(const QString& Errors);
+
 							ZEDSHErrorsWindow(QWidget* Parent = NULL);
 };

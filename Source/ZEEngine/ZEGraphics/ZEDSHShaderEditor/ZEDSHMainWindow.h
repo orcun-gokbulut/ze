@@ -65,6 +65,9 @@ class ZEDSHMainWindow : public QMainWindow
 		void SaveDocument(const QString& FileName);
 		bool CloseDocument();
 
+		void RegisterRecentFile(const QString& FileName);
+		void LoadRecentFiles();
+
 		void UpdateUI();
 
 	private slots:
@@ -73,7 +76,7 @@ class ZEDSHMainWindow : public QMainWindow
 
 		void actNew_OnTrigger();
 		void actOpen_OnTrigger();
-		void actRecent_OnTrigger();
+		void actRecentFile_OnTrigger();
 		void actSave_OnTrigger();
 		void actSaveAs_OnTrigger();
 		void actClose_OnTrigger();

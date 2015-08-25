@@ -35,42 +35,103 @@
 
 #include "ZEDSHErrorsWindow.h"
 
+#include "ZEFile/ZEFileInfo.h"
+#include "ZERegEx/ZERegEx.h"
+
 #include <QtGui/QTableWidget>
+#include <QtGui/QHeaderView>
 
 QTableWidget* ZEDSHErrorsWindow::GetErrorTable()
 {
-	return ErrorTable;
+	return ErrorsTable;
 }
 
-void ZEDSHErrorsWindow::ParseErrors(const char* Errors)
+void ZEDSHErrorsWindow::AddError(ZEDSHErrorType Type, QString Code, QString Description, QString Line, QString File)
 {
+	int NewIndex = ErrorsTable->rowCount();
+	ErrorsTable->insertRow(NewIndex);
+	const char* TypeString;
+	switch(Type)
+	{
+		case ZEDSG_ET_ERROR:
+			TypeString = "E";
+			break;
 
+		case ZEDSG_ET_WARNING:
+				TypeString = "W";
+			break;
+
+		default:
+		case ZEDSG_ET_NOTICE:
+			TypeString = "N";
+			break;
+	};
+
+	ErrorsTable->setItem(NewIndex, 0, new QTableWidgetItem(TypeString));
+	ErrorsTable->setItem(NewIndex, 1, new QTableWidgetItem(QString("%1 %2: %3").arg(TypeString).arg(Code).arg(Description)));
+	ErrorsTable->setItem(NewIndex, 2, new QTableWidgetItem(Line));
+	ErrorsTable->setItem(NewIndex, 3, new QTableWidgetItem(File));
+
+}
+
+void ZEDSHErrorsWindow::Clear()
+{
+	ErrorsTable->setRowCount(0);
+}
+
+
+void ZEDSHErrorsWindow::ParseCompilerOutput(const QString& Errors)
+{
+	Clear();
+	QStringList Lines = Errors.split(QRegExp("[\r\n]"), QString::SkipEmptyParts);
+	for (int I = 0; I < Lines.count(); I++)
+	{
+		ZERegExMatch Match;
+		if (!CompilerOutputRegex.Match(Lines[I].toLocal8Bit().begin(), Match))
+			return;
+
+		ZEDSHErrorType ErrorType = ZEDSG_ET_ERROR;
+		if (Match.SubMatches[0].String == "error")
+			ErrorType = ZEDSG_ET_ERROR;
+		else if (Match.SubMatches[0].String == "warning")
+			ErrorType = ZEDSG_ET_WARNING;
+		else if (Match.SubMatches[0].String == "notice")
+			ErrorType = ZEDSG_ET_NOTICE;
+
+		AddError(ErrorType, Match.SubMatches[5].String.ToCString(), Match.SubMatches[6].String.ToCString(), 
+			Match.SubMatches[1].String.ToCString(), Match.SubMatches[0].String.ToCString());
+	}
 }
 
 ZEDSHErrorsWindow::ZEDSHErrorsWindow(QWidget* Parent) : QDockWidget(Parent)
 {
 	this->setWindowTitle("Errors");
 
-	QTableWidget* ErrorTable = new QTableWidget(this);
+	ErrorsTable = new QTableWidget(this);
+	ErrorsTable->setFont(QFont("Consolas", 10));
+	ErrorsTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 	
-	ErrorTable->setColumnCount(6);
-	QTableWidgetItem* Column0 = new QTableWidgetItem("Type");
-	ErrorTable->setHorizontalHeaderItem(0, Column0);
+	ErrorsTable->setColumnCount(4);
 
-	QTableWidgetItem* Column1 = new QTableWidgetItem("Index");
-	ErrorTable->setHorizontalHeaderItem(1, Column1);
+	QTableWidgetItem* Column0 = new QTableWidgetItem("");
+	ErrorsTable->setHorizontalHeaderItem(0, Column0);
 	
-	QTableWidgetItem* Column2 = new QTableWidgetItem("Description");
-	ErrorTable->setHorizontalHeaderItem(2, Column2);
+	QTableWidgetItem* Column1 = new QTableWidgetItem("Description");
+	ErrorsTable->setHorizontalHeaderItem(1, Column1);
 	
+	QTableWidgetItem* Column2 = new QTableWidgetItem("Line");
+	ErrorsTable->setHorizontalHeaderItem(2, Column2);
+
 	QTableWidgetItem* Column3 = new QTableWidgetItem("File");
-	ErrorTable->setHorizontalHeaderItem(3, Column3);
-	
-	QTableWidgetItem* Column4 = new QTableWidgetItem("Line");
-	ErrorTable->setHorizontalHeaderItem(4, Column4);
-	
-	QTableWidgetItem* Column5 = new QTableWidgetItem("Column");
-	ErrorTable->setHorizontalHeaderItem(5, Column5);
+	ErrorsTable->setHorizontalHeaderItem(3, Column3);
+	setWidget(ErrorsTable);
 
-	setWidget(ErrorTable);
+	QHeaderView* HeaderView = new QHeaderView(Qt::Horizontal, ErrorsTable);
+	ErrorsTable->setHorizontalHeader(HeaderView);
+	HeaderView->setResizeMode(0, QHeaderView::Interactive);
+	HeaderView->setResizeMode(1, QHeaderView::Interactive);
+	HeaderView->setResizeMode(2, QHeaderView::Interactive);
+	HeaderView->setResizeMode(3, QHeaderView::Interactive);
+
+	CompilerOutputRegex.Compile("\\s*(.*)\\s*\\(\\s*(.*)\\s*,\\s*(.*)\\s*\\-\\s*(.*)\\s*\\)\\s*:\\s*(.*)\\s+(.*)\\s*:\\s*(.*)\\s*");
 }
