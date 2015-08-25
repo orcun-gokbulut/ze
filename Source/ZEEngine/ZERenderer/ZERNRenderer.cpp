@@ -41,6 +41,7 @@
 #include "ZEGame\ZEScene.h"
 #include "ZERNCommand.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
+#include "ZERNRenderParameters.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -73,18 +74,34 @@ void ZERNRenderer::SortStageQueues()
 void ZERNRenderer::RenderStages()
 {
 	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
+
+	ZERNRenderParameters Parameters;
+	Parameters.FrameId = 0;
+	Parameters.ElapsedTime = 0;
+	Parameters.Time = 0;
+	Parameters.Scene = Scene;
+	Parameters.Context = Context;
+	Parameters.View = &View;
+	Parameters.Renderer = this;
+	Parameters.Type = ZERN_DT_NORMAL;
+	Parameters.Command;
+	
 	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
 	{
 		ZERNStageQueue* Queue = &StageQueues[I];
 		ZELink<ZERNCommand>* Link = StageQueues[I].Commands.GetFirst();
-		
+
+		Parameters.StageID =  Queue->Stage->GetId();
+		Parameters.Stage = Queue->Stage;
+	
 		if (!Queue->Stage->Setup(this, Context, StageQueues[I].Commands))
 			continue;
 
 		while (Link != NULL)
 		{
 			ZERNCommand* Command = Link->GetItem();
-			Command->Execute(NULL);
+			Parameters.Command = Command;
+			Command->Execute(&Parameters);
 		}
 
 		Queue->Stage->CleanUp(this, Context);

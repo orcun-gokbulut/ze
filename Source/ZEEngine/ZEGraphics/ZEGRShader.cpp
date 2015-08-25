@@ -104,17 +104,27 @@ ZEGRShader* ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 	ZEUInt64 Size = File.Tell();
 	File.Seek(0, ZE_SF_BEGINING);
 
-	ZEBYTE* Buffer = new ZEBYTE[Size];
+	ZEBYTE* Buffer = new ZEBYTE[Size + 1];
 	if (File.Read(Buffer, Size, 1) != 1)
 	{
 		zeError("Cannot read shader file. File Name: \"%s", Options.FileName.ToCString());
 		return NULL;
 	}
-
+	Buffer[Size] = '\0';
 	File.Close();
 
 	ZEGRShaderCompileOptions UpdatedOptions = Options;
-	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
 	UpdatedOptions.SourceData = (char*)Buffer;
-	return Compiler->Compile(Options, NULL, NULL);
+
+	#ifdef ZEGR_DEBUG_SHADERS
+		UpdatedOptions.Debug = true;
+		UpdatedOptions.OptimizationLevel = 0;
+	#endif
+		
+	ZEArray<ZEBYTE> OutputShaderBinary;
+	ZEPointer<ZEGRShaderCompiler> Compiler = ZEGRShaderCompiler::CreateInstance();
+	if (!Compiler->Compile(OutputShaderBinary, UpdatedOptions, NULL, NULL))
+		return NULL;
+
+	return ZEGRShader::Create(Options.Type, OutputShaderBinary.GetCArray(), OutputShaderBinary.GetCount());
 }

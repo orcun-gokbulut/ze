@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ShaderCompiler.h
+ Zinek Engine - ZED11ShaderMetaCompiler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,18 +37,32 @@
 
 #include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRShaderCompiler.h"
+#include "ZEGraphics/ZEGRShaderMeta.h"
+
+#include <d3dcompiler.h>
+#include <d3dcompiler.inl>
+#include <d3dcommon.h>
+
 
 class ZEGRShader;
 
-class ZED11ShaderCompiler : public ZEGRShaderCompiler
+class ZED11ShaderMetaCompiler : public ZEGRShaderCompiler
 {
 	friend class ZED11Module;
-	protected:
-		bool						CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
 
-									ZED11ShaderCompiler();
-		virtual						~ZED11ShaderCompiler();
-
+	private:
+		static ZEGRShaderConstantType		ConvertConstantType(D3D_SHADER_VARIABLE_TYPE Type);
+		static ZEGRShaderSystemSemantic		ConvertSystemSemantic(D3D_NAME Name);
+		static ZEGRShaderRegisterType		ConvertRegisterType(D3D_REGISTER_COMPONENT_TYPE Type);
+		static ZEGRTextureType				ConvertTextureType(D3D_SRV_DIMENSION Dimension);
+		static ZEGRShaderSamplerType		ConvertSamplerType(D3D_RESOURCE_RETURN_TYPE Type);
+		static ZEGRShaderConstantBufferType ConvertConstantBufferType(D3D_CBUFFER_TYPE Type);
+		static DXGI_FORMAT					ConvertInputElementFormat(ZEShaderRegisterMask UsedRegisters, ZEGRShaderRegisterType RegisterType);
+		static ZEGRVertexElementType		ConvertVertexElementType(ZEShaderRegisterMask UsedRegisters, D3D_REGISTER_COMPONENT_TYPE ComponentType);
+		
+		static ZESSize						ProcessPrimitive(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface);
+		static ZESSize						ProcessStruct(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& VariableName, ZESize VariableOffset, ID3D11ShaderReflectionType* VariableInterface);
+		static ZESSize						ProcessVariable(ZEArray<ZEGRShaderConstant>* Variables, const ZEString& ParentName, ZESize ParentOffset, ID3D11ShaderReflectionType* VariableInterface);
 	public:
-		bool						Compile(ZEArray<BYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* BuildOutput);
+		static bool							Reflect(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
 };

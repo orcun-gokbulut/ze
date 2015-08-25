@@ -39,6 +39,7 @@
 #include "ZERNRenderer.h"
 #include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZERNStageID.h"
+#include "ZEGraphics\ZEGROutput.h"
 
 ZEInt ZERNStageForward::GetId()
 {
@@ -51,12 +52,29 @@ const ZEString& ZERNStageForward::GetName()
 	return Name;
 }
 
+bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+{
+	if (Commands.GetCount() == 0)
+		return false;
+
+	ZERNStageGBuffer* GBufferStage = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	if (GBufferStage == NULL)
+		return false;
+
+	ZEGRRenderTarget* AccumulationBuffer = Renderer->GetOutput()->GetRenderTarget();
+	Context->SetRenderTarget(1, &AccumulationBuffer);
+
+	return true;
+}
+
 const ZEGRRenderState& ZERNStageForward::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
 	bool Initialized = false;
 	if (!Initialized)
 	{
+		RenderState = ZERNStage::GetRenderState();
+
 		ZEGRDepthStencilState DepthStencilState;
 		DepthStencilState.SetZTestEnable(true);
 		DepthStencilState.SetZWriteEnable(true);
@@ -69,21 +87,6 @@ const ZEGRRenderState& ZERNStageForward::GetRenderState()
 	return RenderState;
 }
 
-bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
-{
-	if (Commands.GetCount() == 0)
-		return false;
-
-	ZERNStageGBuffer* GBufferStage = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-	if (GBufferStage != NULL)
-		return false;
-
-	ZEGRRenderTarget* AccumulationBuffer = GBufferStage->GetAccumulationBuffer()->GetRenderTarget(0);
-	Context->SetRenderTarget(1, &AccumulationBuffer);
-
-	return true;
-}
-
 ZEInt ZERNStageForwardTransparent::GetId()
 {
 	return ZERN_STAGE_FORWARD_TRANSPARANT;
@@ -93,4 +96,9 @@ const ZEString& ZERNStageForwardTransparent::GetName()
 {
 	static ZEString Name = "ForwardTransparent";
 	return Name;
+}
+
+const ZEGRRenderState& ZERNStageForwardTransparent::GetRenderState()
+{
+	return ZERNStageForward::GetRenderState();
 }

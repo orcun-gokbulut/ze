@@ -54,7 +54,9 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		{
 			ZEVector4					MaterialColor;
 			ZEUInt						TransparancyCullLimit;
+			float						Reserved0[3];
 		} Constants;
+
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 		ZEGRHolder<ZEGRRenderStateData>	RenderState;
 		ZERNSampler						TextureSampler;

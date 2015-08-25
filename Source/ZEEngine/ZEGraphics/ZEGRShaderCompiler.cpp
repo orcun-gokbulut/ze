@@ -39,5 +39,5 @@
 
 ZEGRShaderCompiler* ZEGRShaderCompiler::CreateInstance()
 {
-	return NULL;
+	return ZEGRGraphicsModule::GetInstance()->CreateShaderCompiler();
 }

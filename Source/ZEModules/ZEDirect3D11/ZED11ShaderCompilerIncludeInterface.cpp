@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ShaderCompiler.h
+ Zinek Engine - ZED11ShaderCompilerIncludeInterface.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZED11ShaderCompilerIncludeInterface.h"
 
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRShaderCompiler.h"
+#include "ZEGraphics\ZEGRShaderCompileOptions.h"
+#include "ZEFile\ZEFile.h"
+#include "ZEDS\ZEFormat.h"
+#include "ZEFile\ZEFileInfo.h"
 
-class ZEGRShader;
-
-class ZED11ShaderCompiler : public ZEGRShaderCompiler
+void  ZED11ShaderCompilerIncludeInterface::SetCompileOptions(const ZEGRShaderCompileOptions* Options)
 {
-	friend class ZED11Module;
-	protected:
-		bool						CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
+	CompileOptions = Options;
+}
 
-									ZED11ShaderCompiler();
-		virtual						~ZED11ShaderCompiler();
+const ZEGRShaderCompileOptions* ZED11ShaderCompilerIncludeInterface::GetCompileOptions()
+{
+	return CompileOptions;
+}
 
-	public:
-		bool						Compile(ZEArray<BYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* BuildOutput);
-};
+HRESULT __stdcall ZED11ShaderCompilerIncludeInterface::Open(D3D_INCLUDE_TYPE IncludeType, LPCSTR pFileName, LPCVOID pParentData, LPCVOID* ppData, UINT * pBytes)
+{
+	ZEFile IncludeFile;
+	if (IncludeFile.Open(ZEFormat::Format("{0}/{1}", ZEFileInfo(CompileOptions->FileName).GetParentDirectory(), pFileName), ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		*pBytes =  (UINT)IncludeFile.GetSize();
+		*ppData = new ZEBYTE[*pBytes];
+		IncludeFile.Read((void*)*ppData, *pBytes, 1);
+		IncludeFile.Close();
+		
+		return S_OK;
+	}
+	else
+	{
+		for (ZESize I = 0; I < CompileOptions->IncludeDirectories.GetCount(); I++)
+		{
+			ZEFile IncludeFile;
+			if (!IncludeFile.Open(ZEFormat::Format("{0}/{1}", CompileOptions->IncludeDirectories[I], pFileName), ZE_FOM_READ, ZE_FCM_NONE))
+				continue;
+
+			*pBytes =  (UINT)IncludeFile.GetSize();
+			*ppData = new ZEBYTE[*pBytes];
+			IncludeFile.Read((void*)*ppData, *pBytes, 1);
+			IncludeFile.Close();
+			
+			return S_OK;
+		}
+	}
+
+	*ppData = NULL;
+	return S_OK;
+}
+
+HRESULT __stdcall ZED11ShaderCompilerIncludeInterface::Close(LPCVOID pData)
+{
+	if (pData != NULL)
+		delete[] pData;
+	return S_OK;
+}
+
+ZED11ShaderCompilerIncludeInterface::ZED11ShaderCompilerIncludeInterface()
+{
+	CompileOptions = NULL;
+}

@@ -48,25 +48,20 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 	protected:
 		ID3D11DeviceContext1*		Context;
 		
-		bool						DirtyBlendState;
+		ZEFlags						DirtyFlags;
+
+		ZED11RenderStateData*		RenderState;
+
 		ID3D11BlendState*			BlendState;
 		ZEVector4					BlendFactors;
 		ZEUInt						BlendMask;
-
-		bool						DirtyRenderTargets;
 		ZEUInt						RenderTargetCount;
 		ID3D11RenderTargetView*		RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
 		ID3D11DepthStencilState*	DepthStencilState;
 		ID3D11DepthStencilView*		DepthStencilBuffer;
-
-		bool						DirtyStencilState;
 		ZEUInt						StencilRef;
 
-		ZED11RenderStateData*		RenderState;
-
-		void						UpdateBlendState();
-		void						UpdateRenderTargets();
-		void						UpdateDepthStencilState();
+		void						UpdateContext();
 
 		void						Initialize(ID3D11DeviceContext1* Device);
 		void						Deinitialize();

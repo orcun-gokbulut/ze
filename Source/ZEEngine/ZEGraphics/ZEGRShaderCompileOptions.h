@@ -43,6 +43,9 @@
 
 struct ZEGRShaderMeta;
 
+#define ZEGR_SCF_DEBUG
+#define ZEGR_SCF_STRIPT
+
 struct ZEGRShaderDefinition
 {
 	ZEString		Name;
@@ -53,8 +56,13 @@ struct ZEGRShaderCompileOptions
 {
 	ZEGRShaderType					Type;
 	ZEGRShaderModel					Model;
+	bool							Debug;
+	ZEUInt							OptimizationLevel;
 	ZEString						FileName;
 	ZEString						EntryPoint;
 	ZEString						SourceData;
 	ZEArray<ZEGRShaderDefinition>	Definitions;
+	ZEArray<ZEString>				IncludeDirectories;
+
+									ZEGRShaderCompileOptions();
 };

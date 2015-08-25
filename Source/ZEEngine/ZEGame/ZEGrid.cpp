@@ -43,6 +43,7 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNShaderSlots.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
 {
@@ -51,7 +52,7 @@ ZEDrawFlags ZEGrid::GetDrawFlags() const
 
 void ZEGrid::GenerateGrid()
 {
-	if (!IsInitialized())
+	if (GetState() == ZE_ES_NOT_INITIALIZED || GetState() == ZE_ES_DEINITIALIZING)
 		return;
 
 	ZECanvas Canvas;
@@ -275,6 +276,11 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 	RenderCommand.Order = 0;
 	RenderCommand.StageMask = Material->GetStageMask();
 
+	void* Buffer;
+	ConstantBuffer->Lock(&Buffer);
+	memcpy(Buffer, &Constants, sizeof(Constants));
+	ConstantBuffer->Unlock();
+
 	Parameters->Renderer->AddCommand(&RenderCommand);
 	return true;
 }
@@ -319,9 +325,11 @@ bool ZEGrid::InitializeSelf()
 	RenderCommand.Priority = 0;
 	RenderCommand.Order = 0;
 
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	Material = ZERNSimpleMaterial::CreateInstance();
 	Material->SetVertexColor(true);
-	
+	Material->Initialize();
+
 	GenerateGrid();
 	
 	return true;
