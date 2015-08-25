@@ -36,11 +36,25 @@
 #include "ZEDSHMainWindow.h"
 
 #include "ui_ZEDSHMainWindow.h"
-#include <QtGui/QMessageBox>
-#include <QtGui/QFileDialog>
 #include "ZEFile/ZEFile.h"
 #include "ZEDSHErrorsWindow.h"
 #include "ZEDSHOutputWindow.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
+#include "ZEModules/ZEDirect3D11/ZED11ShaderCompiler.h"
+
+#include <QtGui/QPlainTextEdit>
+#include <QtGui/QMessageBox>
+#include <QtGui/QFileDialog>
+#include <QtCore/QDateTime>
+#include "QtCore/QSettings"
+
+
+class ZEDSHShaderCompiler : public ZED11ShaderCompiler
+{
+	public:
+						ZEDSHShaderCompiler() {}
+		virtual			~ZEDSHShaderCompiler() {}
+};
 
 void ZEDSHMainWindow::UpdateUI()
 {
@@ -48,7 +62,7 @@ void ZEDSHMainWindow::UpdateUI()
 	Editor->setEnabled(Loaded);
 	Form->actNew->setEnabled(!Engine);
 	Form->actOpen->setEnabled(!Engine);
-	Form->actRecent->setEnabled(!Engine);
+	Form->mnuRecentFiles->setEnabled(!Engine);
 	Form->actLoadShader->setEnabled(Engine);
 	Form->actUploadToEngine->setEnabled(Engine);
 	Form->actSave->setEnabled(Loaded);
@@ -117,6 +131,7 @@ void ZEDSHMainWindow::OpenDocument(const QString& FileName)
 	Form->actUndo->setEnabled(false);
 	Form->actRedo->setEnabled(false);
 
+	RegisterRecentFile(FileName);
 	UpdateUI();
 }
 
@@ -143,7 +158,8 @@ void ZEDSHMainWindow::SaveDocument(const QString& FileName)
 
 	HasChanges = false;
 	this->FileName = FileName;
-
+	
+	RegisterRecentFile(FileName);
 	UpdateUI();
 }
 
@@ -167,6 +183,47 @@ bool ZEDSHMainWindow::CloseDocument()
 
 	return true;
 }
+
+
+void ZEDSHMainWindow::RegisterRecentFile(const QString& FileName)
+{
+	QSettings Settings("Zinek", "ZESHShaderEditor");
+	QStringList RecentFiles = Settings.value("RecentFiles", QStringList()).toStringList();
+
+	int Index = RecentFiles.indexOf(FileName);
+	if (Index != -1)
+		RecentFiles.removeAt(Index);
+
+	if (RecentFiles.size() > 10)
+		RecentFiles.removeLast();
+
+	RecentFiles.insert(0, FileName);
+
+	Settings.setValue("RecentFiles", RecentFiles);
+
+	LoadRecentFiles();
+
+	Form->mnuRecentFiles->setVisible(false);
+}
+
+void ZEDSHMainWindow::LoadRecentFiles()
+{
+	QSettings Settings("Zinek", "ZESHShaderEditor");
+	QStringList RecentFiles = Settings.value("RecentFiles", QStringList()).toStringList();
+
+	Form->mnuRecentFiles->setVisible(!RecentFiles.isEmpty());
+
+	Form->mnuRecentFiles->clear();
+	for (int I = 0; I < RecentFiles.size(); I++)
+	{
+		QAction* RecentFileAction = new QAction(this);
+		RecentFileAction->setText(RecentFiles[I]);
+		connect(RecentFileAction, SIGNAL(triggered()), this, SLOT(actRecentFile_OnTrigger()));
+		Form->mnuRecentFiles->addAction(RecentFileAction);	
+	}
+}
+
+
 void ZEDSHMainWindow::Editor_OnTextChanged()
 {
 	if (HasChanges)
@@ -195,9 +252,9 @@ void ZEDSHMainWindow::actOpen_OnTrigger()
 	OpenDocument(FileName);
 }
 
-void ZEDSHMainWindow::actRecent_OnTrigger()
+void ZEDSHMainWindow::actRecentFile_OnTrigger()
 {
-
+	OpenDocument(((QAction*)sender())->text().toUtf8().constData());
 }
 
 void ZEDSHMainWindow::actSave_OnTrigger()
@@ -283,7 +340,31 @@ void ZEDSHMainWindow::actReplace_OnTrigger()
 
 void ZEDSHMainWindow::actCompile_OnTrigger()
 {
+	OutputWindow->Print(QString("Compiling... (%1)\n").arg(QDateTime::currentDateTime().toString()));
+	OutputWindow->Print("\n");
 
+	ZEGRShaderCompileOptions Options;
+	Options.EntryPoint = "";
+	Options.FileName = FileName.toLocal8Bit().begin();
+	Options.Model = ZEGR_SM_5_0;
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.SourceData = Editor->toPlainText().toLocal8Bit().begin();
+	ZEPointer<ZEDSHShaderCompiler> Compiler = new ZEDSHShaderCompiler();
+	
+	ZEArray<ZEBYTE> ShaderBinary;
+	ZEString Output;
+	bool BreakOnError = ZEError::GetInstance()->GetBreakOnErrorEnabled();
+	
+	ZEError::GetInstance()->SetBreakOnErrorEnabled(false);
+	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(false);
+	bool Result = Compiler->Compile(ShaderBinary, Options, NULL, &Output);
+	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
+	ZEError::GetInstance()->SetBreakOnErrorEnabled(BreakOnError);
+
+	ErrorsWindow->ParseCompilerOutput(QString(Output));
+
+	OutputWindow->Print(Output.ToCString());
+	OutputWindow->Print(QString("Compile %1.").arg(Result ? "suceeded" : "failed"));
 }
 
 void ZEDSHMainWindow::actPreference_OnTrigger()
@@ -346,7 +427,6 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 
 	connect(Form->actNew,				SIGNAL(triggered()), this, SLOT(actNew_OnTrigger()));
 	connect(Form->actOpen,				SIGNAL(triggered()), this, SLOT(actOpen_OnTrigger()));
-	connect(Form->actRecent,			SIGNAL(triggered()), this, SLOT(actRecent_OnTrigger()));
 	connect(Form->actSave,				SIGNAL(triggered()), this, SLOT(actSave_OnTrigger()));
 	connect(Form->actSaveAs,			SIGNAL(triggered()), this, SLOT(actSaveAs_OnTrigger()));
 	connect(Form->actClose,				SIGNAL(triggered()), this, SLOT(actClose_OnTrigger()));
@@ -371,4 +451,6 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 	connect(Form->actAbout,				SIGNAL(triggered()), this, SLOT(actAbout_OnTrigger()));
 	connect(Editor,						SIGNAL(undoAvailable(bool)), Form->actUndo, SLOT(setEnabled(bool)));
 	connect(Editor,						SIGNAL(redoAvailable(bool)), Form->actRedo, SLOT(setEnabled(bool)));
+
+	LoadRecentFiles();
 }

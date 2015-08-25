@@ -44,7 +44,6 @@
 
 	int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 	{
-
 		int argc = 1;
 		char* argv[] =
 		{

@@ -54,4 +54,4 @@ qt4_wrap_ui(QtUIFiles ${QtUIs})
 source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 ze_add_executable(TARGET ZEDSHShaderEditor
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
-	LIBS ZEFoundation libQt libMSVCRv100)
+	LIBS ZEFoundation ZEGraphics ZEDirect3D11 libQt libMSVCRv100)

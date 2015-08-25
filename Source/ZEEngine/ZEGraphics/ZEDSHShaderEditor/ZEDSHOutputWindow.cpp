@@ -42,10 +42,23 @@ QPlainTextEdit* ZEDSHOutputWindow::GetOutput()
 	return Output;
 }
 
+void ZEDSHOutputWindow::Clear()
+{
+	Output->setPlainText(QString());
+}
+
+void ZEDSHOutputWindow::Print(const QString& Text)
+{
+	Output->setPlainText(Output->toPlainText() + Text);
+	Output->update();
+}
+
 ZEDSHOutputWindow::ZEDSHOutputWindow(QWidget* Parent) : QDockWidget(Parent)
 {
 	this->setWindowTitle("Output");
 
 	Output = new QPlainTextEdit(this);
+	Output->setFont(QFont("Consolas", 10));
+	Output->setWordWrapMode(QTextOption::NoWrap);
 	this->setWidget(Output);
 }

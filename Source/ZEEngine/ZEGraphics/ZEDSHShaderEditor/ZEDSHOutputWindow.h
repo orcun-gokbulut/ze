@@ -47,5 +47,8 @@ class ZEDSHOutputWindow : public QDockWidget
 	public:
 		QPlainTextEdit*		GetOutput();
 
+		void				Clear();
+		void				Print(const QString& String);
+
 							ZEDSHOutputWindow(QWidget* Parent = NULL);
 };
