@@ -730,7 +730,7 @@ void ZEString::Clear()
 	Buffer = NULL;
 }
 
-void ZEString::SetBuffer(void* Buffer, ZESize Size)
+void ZEString::SetBuffer(const void* Buffer, ZESize Size)
 {
 	BufferChanged = true;
 
@@ -744,7 +744,7 @@ void ZEString::SetBuffer(void* Buffer, ZESize Size)
 	this->Allocator.Size = Size;
 }
 
-void ZEString::SetValue(void* Value, ZESize Size)
+void ZEString::SetValue(const void* Value, ZESize Size)
 {
 	BufferChanged = true;
 	this->Allocator.Reallocate(&Buffer, Size + 1);
