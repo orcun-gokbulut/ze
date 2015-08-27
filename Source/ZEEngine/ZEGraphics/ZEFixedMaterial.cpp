@@ -1467,13 +1467,13 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 
 	SetName(MaterialNode.ReadString("Name"));
 
-	ZESize SubNodeCount = MaterialNode.GetSubNodeCount("Configuration");
+	ZESize SubNodeCount = MaterialNode.GetNode("Configuration");
 
 	//When Material Configuration functionality is implemented this reading mechanism should be revised, now it just loads "Default" config.
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode ConfigurationNode = MaterialNode.GetSubNode("Configuration", I);
+		ZEMLReaderNode ConfigurationNode = MaterialNode.GetNode("Configuration", I);
 
 		if (!ConfigurationNode.IsValid())
 		{

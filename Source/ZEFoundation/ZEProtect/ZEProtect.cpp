@@ -276,12 +276,12 @@ bool ZEProtect::Verify()
 		ProtectReader.Open(FileName);
 		ZEMLReaderNode ProtectNode = ProtectReader.GetRootNode();
 
-		ZESize ProductCount = ProtectNode.GetSubNodeCount("Product");
+		ZESize ProductCount = ProtectNode.GetNode("Product");
 		ZEMLReaderNode ProductNode;
 
 		for (ZESize I = 0; I < ProductCount; I++)
 		{
-			ProductNode = ProtectNode.GetSubNode("Product", I);
+			ProductNode = ProtectNode.GetNode("Product", I);
 
 			if (strncmp(ProductNode.ReadString("Key").ToCString(), ActivationCode, ActivationCodeSize) == 0)
 			{

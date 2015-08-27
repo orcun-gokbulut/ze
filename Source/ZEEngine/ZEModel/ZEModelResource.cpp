@@ -156,11 +156,11 @@ bool ZEModelResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 	if (!MaterialsNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)MaterialsNode->GetSubNodeCount("Material");
+	ZESize SubNodeCount = (ZESize)MaterialsNode->GetNode("Material");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode MaterialNode = MaterialsNode->GetSubNode("Material", I);
+		ZEMLReaderNode MaterialNode = MaterialsNode->GetNode("Material", I);
 
 		ZEString MaterialPath = ZEFileInfo(this->GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
 		
@@ -192,16 +192,16 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLRe
 	Body->LinearDamping = PhysicalBodyNode->ReadFloat("LinearDamping");
 	Body->AngularDamping = PhysicalBodyNode->ReadFloat("AngularDamping");
 
-	ZEMLReaderNode PhysicalShapesNode = PhysicalBodyNode->GetSubNode("PhysicalShapes");
+	ZEMLReaderNode PhysicalShapesNode = PhysicalBodyNode->GetNode("PhysicalShapes");
 
 	if (!PhysicalShapesNode.IsValid())
 		return false;
 
-	ZESize SubNodeCount = PhysicalShapesNode.GetSubNodeCount("PhysicalShape");
+	ZESize SubNodeCount = PhysicalShapesNode.GetNode("PhysicalShape");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode PhysicalShapeNode = PhysicalShapesNode.GetSubNode("PhysicalShape", I);
+		ZEMLReaderNode PhysicalShapeNode = PhysicalShapesNode.GetNode("PhysicalShape", I);
 
 		if (!PhysicalShapeNode.IsValid())
 			return false;
@@ -218,7 +218,7 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLRe
 		if (PhysicalShapeNode.IsPropertyExists("UserDefinedProperties"))
 			Shape->UserDefinedProperties = PhysicalShapeNode.ReadString("UserDefinedProperties");
 
-		ZEMLReaderNode ShapeNode = PhysicalShapeNode.GetSubNode("Shape");
+		ZEMLReaderNode ShapeNode = PhysicalShapeNode.GetNode("Shape");
 
 		switch (Shape->Type)
 		{
@@ -318,11 +318,11 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 	if (!MeshesNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)MeshesNode->GetSubNodeCount("Mesh");
+	ZESize SubNodeCount = (ZESize)MeshesNode->GetNode("Mesh");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode MeshNode = MeshesNode->GetSubNode("Mesh", I);
+		ZEMLReaderNode MeshNode = MeshesNode->GetNode("Mesh", I);
 
 		if (!MeshNode.IsValid())
 			return false;
@@ -345,20 +345,20 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 		if (MeshNode.IsPropertyExists("UserDefinedProperties"))
 			Mesh->UserDefinedProperties = MeshNode.ReadString("UserDefinedProperties");
 
-		ZEMLReaderNode BoundingBoxNode = MeshNode.GetSubNode("BoundingBox");
+		ZEMLReaderNode BoundingBoxNode = MeshNode.GetNode("BoundingBox");
 		Mesh->BoundingBox.Max = BoundingBoxNode.ReadVector3("Max");
 		Mesh->BoundingBox.Min = BoundingBoxNode.ReadVector3("Min");
 
-		ZEMLReaderNode LODsNode = MeshNode.GetSubNode("LODs");
+		ZEMLReaderNode LODsNode = MeshNode.GetNode("LODs");
 
 		if (!LODsNode.IsValid())
 			return false;
 
-		ZESize LODCount = (ZESize)LODsNode.GetSubNodeCount("LOD");
+		ZESize LODCount = (ZESize)LODsNode.GetNode("LOD");
 
 		for (ZESize I = 0; I < LODCount; I++)
 		{
-			ZEMLReaderNode LODNode = LODsNode.GetSubNode("LOD", I);
+			ZEMLReaderNode LODNode = LODsNode.GetNode("LOD", I);
 
 			if (!LODNode.IsValid())
 				return false;
@@ -397,7 +397,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 
 		if (MeshNode.IsSubNodeExists("PhysicalBody"))
 		{
-			ZEMLReaderNode PhysicalBodyNode = MeshNode.GetSubNode("PhysicalBody");
+			ZEMLReaderNode PhysicalBodyNode = MeshNode.GetNode("PhysicalBody");
 			
 			if (!ReadPhysicalBody(&Mesh->PhysicalBody, &PhysicalBodyNode))
 				return false;
@@ -547,11 +547,11 @@ bool ZEModelResource::ReadBones(ZEMLReaderNode* BonesNode)
 	if (!BonesNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)BonesNode->GetSubNodeCount();
+	ZESize SubNodeCount = (ZESize)BonesNode->GetNode();
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode BoneNode = BonesNode->GetSubNode("Bone", I);
+		ZEMLReaderNode BoneNode = BonesNode->GetNode("Bone", I);
 
 		if (!BoneNode.IsValid())
 			return false;
@@ -567,7 +567,7 @@ bool ZEModelResource::ReadBones(ZEMLReaderNode* BonesNode)
 		if (BoneNode.IsPropertyExists("UserDefinedProperties"))
 			Bone->UserDefinedProperties = BoneNode.ReadString("UserDefinedProperties");
 
-		ZEMLReaderNode BoundingBoxNode = BoneNode.GetSubNode("BoundingBox");
+		ZEMLReaderNode BoundingBoxNode = BoneNode.GetNode("BoundingBox");
 		Bone->BoundingBox.Max = BoundingBoxNode.ReadVector3("Max");
 		Bone->BoundingBox.Min = BoundingBoxNode.ReadVector3("Min");
 
@@ -575,7 +575,7 @@ bool ZEModelResource::ReadBones(ZEMLReaderNode* BonesNode)
 
 		if (BoneNode.IsSubNodeExists("PhysicalJoint"))
 		{
-			ZEMLReaderNode PhysicalJointNode = BoneNode.GetSubNode("PhysicalJoint");
+			ZEMLReaderNode PhysicalJointNode = BoneNode.GetNode("PhysicalJoint");
 
 			if (!ReadPhysicalJoint(&Bone->PhysicalJoint, &PhysicalJointNode))
 				return false;
@@ -585,7 +585,7 @@ bool ZEModelResource::ReadBones(ZEMLReaderNode* BonesNode)
 
 		if (BoneNode.IsSubNodeExists("PhysicalBody"))
 		{
-			ZEMLReaderNode PhysicalBodyNode = BoneNode.GetSubNode("PhysicalBody");
+			ZEMLReaderNode PhysicalBodyNode = BoneNode.GetNode("PhysicalBody");
 			
 			if (!ReadPhysicalBody(&Bone->PhysicalBody, &PhysicalBodyNode))
 				return false;
@@ -612,12 +612,12 @@ bool ZEModelResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 	if (!HelpersNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)HelpersNode->GetSubNodeCount();
+	ZESize SubNodeCount = (ZESize)HelpersNode->GetNode();
 	Helpers.SetCount(SubNodeCount);
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode HelperNode = HelpersNode->GetSubNode("Helper", I);
+		ZEMLReaderNode HelperNode = HelpersNode->GetNode("Helper", I);
 
 		if (!HelperNode.IsValid())
 			return false;
@@ -665,11 +665,11 @@ bool ZEModelResource::ReadAnimations(ZEMLReaderNode* AnimationsNode)
 	if (!AnimationsNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)AnimationsNode->GetSubNodeCount();
+	ZESize SubNodeCount = (ZESize)AnimationsNode->GetNode();
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode AnimationNode = AnimationsNode->GetSubNode("Animation", I);
+		ZEMLReaderNode AnimationNode = AnimationsNode->GetNode("Animation", I);
 
 		if (!AnimationNode.IsValid())
 			return false;
@@ -721,7 +721,7 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 
 	if (ModelNode.IsSubNodeExists("UserDefinedBoundingBox"))
 	{
-		ZEMLReaderNode UserDefinedBoundingBoxNode = ModelNode.GetSubNode("UserDefinedBoundingBox");
+		ZEMLReaderNode UserDefinedBoundingBoxNode = ModelNode.GetNode("UserDefinedBoundingBox");
 		UserDefinedBoundingBox.Min = UserDefinedBoundingBoxNode.ReadVector3("Min");
 		UserDefinedBoundingBox.Max = UserDefinedBoundingBoxNode.ReadVector3("Max");
 		BoundingBoxIsUserDefined = true;
@@ -733,7 +733,7 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 
 	if (ModelNode.IsSubNodeExists("Bones"))
 	{
-		ZEMLReaderNode BonesNode = ModelNode.GetSubNode("Bones");
+		ZEMLReaderNode BonesNode = ModelNode.GetNode("Bones");
 
 		if (!ReadBones(&BonesNode))
 			return false;
@@ -741,7 +741,7 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 
 	if (ModelNode.IsSubNodeExists("Meshes"))
 	{
-		ZEMLReaderNode MeshesNode = ModelNode.GetSubNode("Meshes");
+		ZEMLReaderNode MeshesNode = ModelNode.GetNode("Meshes");
 
 		if (!ReadMeshes(&MeshesNode))
 			return false;
@@ -749,7 +749,7 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 
 	if (ModelNode.IsSubNodeExists("Helpers"))
 	{
-		ZEMLReaderNode HelpersNode = ModelNode.GetSubNode("Helpers");
+		ZEMLReaderNode HelpersNode = ModelNode.GetNode("Helpers");
 
 		if (!ReadHelpers(&HelpersNode))
 			return false;
@@ -757,13 +757,13 @@ bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
 
 	if (ModelNode.IsSubNodeExists("Animations"))
 	{
-		ZEMLReaderNode AnimationsNode = ModelNode.GetSubNode("Animations");
+		ZEMLReaderNode AnimationsNode = ModelNode.GetNode("Animations");
 
 		if (!ReadAnimations(&AnimationsNode))
 			return false;
 	}
 
-	ZEMLReaderNode MaterialsNode = ModelNode.GetSubNode("Materials");
+	ZEMLReaderNode MaterialsNode = ModelNode.GetNode("Materials");
 
 	if (!ReadMaterials(&MaterialsNode))
 		return false;
