@@ -633,7 +633,7 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 	if (Unserializer->GetName() != "Entity")
 		return false;
 
-	ZEMLReaderNode PropertiesNode = Unserializer->GetSubNode("Properties");
+	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
 	const ZESmartArray<ZEMLReaderProperty>& Properties = PropertiesNode.GetProperties();
 
 	for (ZESize I = 0; I < Properties.GetCount(); I++)

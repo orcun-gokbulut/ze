@@ -35,7 +35,7 @@
 
 #include "ZEHashGenerator.h"
 
-ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
+ZEUInt ZEHashGenerator::Hash(void* Value, ZESize Size)
 {
 	ZEUInt Hash = 0;
 	for (ZESize I = 0; I < Size; I++)
@@ -44,7 +44,7 @@ ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
 	return Hash;
 }
 
-ZESize ZEHashGenerator::Hash(const char* String)
+ZEUInt ZEHashGenerator::Hash(const char* String)
 {
 	ZEUInt Hash = 0;
 	while(*String != '\0')
@@ -56,7 +56,7 @@ ZESize ZEHashGenerator::Hash(const char* String)
 	return Hash;
 }
 
-ZESize ZEHashGenerator::Hash(const ZEString& String)
+ZEUInt ZEHashGenerator::Hash(const ZEString& String)
 {
 	return Hash(String.ToCString());
 }

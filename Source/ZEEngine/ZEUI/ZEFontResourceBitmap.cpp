@@ -183,16 +183,16 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 	if (!RootNode.IsSubNodeExists("Textures"))
 		zeError("Can not find Textures node.");
 
-	ZEMLReaderNode TexturesNode = RootNode.GetSubNode("Textures");
+	ZEMLReaderNode TexturesNode = RootNode.GetNode("Textures");
 
-	ZESize TextureCount = TexturesNode.GetSubNodeCount("Texture");
+	ZESize TextureCount = TexturesNode.GetNode("Texture");
 
 	NewResource->TextureResources.SetCount(TextureCount);
 	NewResource->Textures.SetCount(TextureCount);
 
 	for(ZESize I = 0; I < TextureCount; I++)
 	{
-		ZEMLReaderNode TextureNode = TexturesNode.GetSubNode("Texture", I);
+		ZEMLReaderNode TextureNode = TexturesNode.GetNode("Texture", I);
 
 		if(!TextureNode.IsValid())
 		{
@@ -208,19 +208,19 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 		NewResource->Textures[I] = NewResource->TextureResources[I]->GetTexture();
 	}
 
-	ZEMLReaderNode CharactersNode = RootNode.GetSubNode("Characters");
+	ZEMLReaderNode CharactersNode = RootNode.GetNode("Characters");
 
 	if(!CharactersNode.IsValid())
 		zeError("Can not find Characters node.");
 
 
-	ZESize CharacterCount = CharactersNode.GetSubNodeCount("Character");
+	ZESize CharacterCount = CharactersNode.GetNode("Character");
 
 	NewResource->Characters.SetCount(CharacterCount);
 
 	for(ZESize I = 0; I < CharacterCount; I++)
 	{
-		ZEMLReaderNode CharacterNode = CharactersNode.GetSubNode("Character", I);
+		ZEMLReaderNode CharacterNode = CharactersNode.GetNode("Character", I);
 
 		if(CharacterNode.IsValid())
 		{

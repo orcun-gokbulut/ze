@@ -200,7 +200,7 @@ class ZEString
 		ZEString					Trim() const;
 		void						TrimSelf();
 
-		ZESize						Hash() const;
+		ZEUInt						Hash() const;
 
 		ZEString					Lower() const;
 		void						LowerSelf();
