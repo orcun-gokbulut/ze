@@ -86,7 +86,7 @@ bool ZEBase64::IsBase64(void* Data, ZESize Size)
 
 ZESize ZEBase64::EncodeSize(ZESize Size)
 {
-	return ZEMath::Ceil(Size / 3) * 4;
+	return ((Size + 2) / 3) * 4; // Round Up Division of (Size / 3) * 4
 }
 
 ZESize ZEBase64::DecodeSize(void* Data, ZESize Size)

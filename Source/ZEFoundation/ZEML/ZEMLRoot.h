@@ -40,6 +40,7 @@
 #include "ZEMLNode.h"
 
 class ZEFile;
+class ZEMLFormat;
 
 class ZEMLRoot
 {
@@ -63,8 +64,8 @@ class ZEMLRoot
 		bool						Read(const char* FileName);
 		bool						Read(ZEFile* File);
 
-		bool						Write(const char* FileName);
-		bool						Write(ZEFile* File);
+		bool						Write(const char* FileName, ZEMLFormat* Format = NULL);
+		bool						Write(ZEFile* File, ZEMLFormat* Format = NULL);
 
 									ZEMLRoot();
 };

@@ -254,6 +254,8 @@ bool ZEMLWriter::OpenRootNode(const char* Name, ZEMLWriterNode& RootNode)
 		zeError("Cannot open ZEML file root node. File Name: \"%s\"", File->GetPath().ToCString());
 		return false;
 	}
+
+	return true;
 }
 
 bool ZEMLWriter::Open(const char* FileName)
@@ -316,16 +318,16 @@ bool ZEMLWriter::Open(ZEFile* File)
 
 void ZEMLWriter::Close()
 {
-	if (Format != NULL)
+	if (File != NULL)
 		Format->WriteHeaderClose(File);
 	OwnedFile.Close();
+	File = NULL;
 }
 
 ZEMLWriter::ZEMLWriter()
 {
 	File = NULL;
 }
-
 
 ZEMLWriter::~ZEMLWriter()
 {

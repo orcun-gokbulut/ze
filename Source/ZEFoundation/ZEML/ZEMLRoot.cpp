@@ -90,7 +90,7 @@ bool ZEMLRoot::Read(ZEFile* File)
 	return RootNode->Read(&ReaderNode);
 }
 
-bool ZEMLRoot::Write(const char* FileName)
+bool ZEMLRoot::Write(const char* FileName, ZEMLFormat* Format)
 {
 	if (RootNode == NULL)
 	{
@@ -99,6 +99,7 @@ bool ZEMLRoot::Write(const char* FileName)
 	}
 
 	ZEMLWriter Writer;
+	Writer.SetFormat(Format);
 	if (!Writer.Open(FileName))
 		return false;
 
@@ -115,7 +116,7 @@ bool ZEMLRoot::Write(const char* FileName)
 	return true;
 }
 
-bool ZEMLRoot::Write(ZEFile* File)
+bool ZEMLRoot::Write(ZEFile* File, ZEMLFormat* Format)
 {
 	if (RootNode == NULL)
 	{
@@ -124,6 +125,7 @@ bool ZEMLRoot::Write(ZEFile* File)
 	}
 
 	ZEMLWriter Writer;
+	Writer.SetFormat(Format);
 	if (!Writer.Open(File))
 		return false;
 
