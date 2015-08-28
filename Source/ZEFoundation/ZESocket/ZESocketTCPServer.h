@@ -59,6 +59,7 @@ class ZESocketTCPServer
 
 	public:
 		ZESocketTCPStatus			GetStatus();
+		SOCKET_TYPE					GetSocket();
 
 		const ZEIPAddress&			GetBindIPAddress() const;
 		const ZEIPAddress&			GetClientIPAddress() const;
