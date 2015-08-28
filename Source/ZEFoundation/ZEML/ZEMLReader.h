@@ -45,6 +45,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEPointer/ZEPointer.h"
 
 
 struct ZEMLReaderProperty
@@ -87,7 +88,8 @@ class ZEMLReaderNode
 		const ZEArray<ZEMLFormatElement>&	GetElements();
 
 		ZESize						GetNodeCount();
-		ZESize						GetNode(const char* Name);
+		ZESize						GetNodeCount(const char* Name);
+
 		ZEMLReaderNode				GetNode(const char* Name, ZESize Index = 0);
 		ZEMLReaderNode				GetNode(ZESize Index);
 
@@ -127,7 +129,7 @@ class ZEMLReader
 	private:
 		ZEFile						OwnedFile;
 		ZEFile*						File;
-		ZEMLFormat*					Format;
+		ZEPointer<ZEMLFormat>		Format;
 		ZEMLReaderNode				RootNode;
 
 		bool						Load();

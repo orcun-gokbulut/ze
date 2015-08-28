@@ -37,11 +37,12 @@
 #ifndef	__ZEML_WRITER_H__
 #define __ZEML_WRITER_H__
 
+#include "ZEMLFormat.h"
 #include "ZECommon.h"
 #include "ZETypes.h"
-#include "ZEMLCommon.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEPointer/ZEPointer.h"
 
 class ZEMLWriterNode
 {
@@ -49,15 +50,12 @@ class ZEMLWriterNode
 	private:
 		ZEMLWriterNode*		Parent;
 		ZEFile*				File;
-		ZEString			Name;
-		ZEUInt64			NodeDataOffset;
-		ZEUInt64			SubElementCount;
+		ZEMLFormat*			Format;
+		ZEMLFormatElement	Node;
 		bool				SubNodeIsOpen;
 
-		bool				WriteElementHeader(const char* Name, ZEMLElementType ElementType);
-
 	public:
-		ZEMLWriterNode		OpenSubNode(const char* Name);
+		bool				OpenNode(const char* Name, ZEMLWriterNode& NewNode);
 
 		bool				WriteValue(const char* Name, const ZEValue& Value);
 		bool				WriteFloat(const char* Name, float Value);
@@ -80,7 +78,7 @@ class ZEMLWriterNode
 		bool				WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value);
 		bool				WriteData(const char* Name, const void* Data, ZEUInt64 DataSize);
 
-		void				CloseNode();
+		bool				CloseNode();
 
 							ZEMLWriterNode();
 							~ZEMLWriterNode();
@@ -89,20 +87,22 @@ class ZEMLWriterNode
 class ZEMLWriter
 {
 	private:
-		ZEFile				OwnedFile;
-		ZEFile*				File;
-
-		void				WriteHeader();
+		ZEFile					OwnedFile;
+		ZEFile*					File;
+		ZEPointer<ZEMLFormat>	Format;
 
 	public:
-		ZEMLWriterNode		WriteRootNode(const char* Name);
+		void					SetFormat(ZEMLFormat* Format);
+		ZEMLFormat*				GetFormat();
 
-		bool				Open(const char* FileName);
-		bool				Open(ZEFile* File);
-		void				Close();
+		bool					OpenRootNode(const char* Name, ZEMLWriterNode& RootNode);
 
-							ZEMLWriter();
-							~ZEMLWriter();
+		bool					Open(const char* FileName);
+		bool					Open(ZEFile* File);
+		void					Close();
+
+								ZEMLWriter();
+								~ZEMLWriter();
 };
 
 

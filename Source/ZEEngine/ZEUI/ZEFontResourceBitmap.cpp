@@ -185,7 +185,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 
 	ZEMLReaderNode TexturesNode = RootNode.GetNode("Textures");
 
-	ZESize TextureCount = TexturesNode.GetNode("Texture");
+	ZESize TextureCount = TexturesNode.GetNodeCount("Texture");
 
 	NewResource->TextureResources.SetCount(TextureCount);
 	NewResource->Textures.SetCount(TextureCount);
@@ -214,7 +214,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 		zeError("Can not find Characters node.");
 
 
-	ZESize CharacterCount = CharactersNode.GetNode("Character");
+	ZESize CharacterCount = CharactersNode.GetNodeCount("Character");
 
 	NewResource->Characters.SetCount(CharacterCount);
 

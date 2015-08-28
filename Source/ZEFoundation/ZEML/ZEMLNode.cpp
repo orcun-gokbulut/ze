@@ -84,7 +84,9 @@ bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
 		if (Elements[I]->GetType() == ZEML_ET_NODE)
 		{
 			ZEMLNode* Node = static_cast<ZEMLNode*>(Elements[I]);
-			ZEMLWriterNode NewWriterNode = WriterNode->OpenSubNode(Node->GetName());
+			ZEMLWriterNode NewWriterNode;
+			if (!WriterNode->OpenNode(Node->GetName(), NewWriterNode))
+				return false;
 			if (!Node->Write(&NewWriterNode))
 				return false;
 			NewWriterNode.CloseNode();
@@ -113,23 +115,6 @@ bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
 ZEMLElementType ZEMLNode::GetType()
 {
 	return ZEML_ET_NODE;
-}
-
-ZESize ZEMLNode::GetSize()
-{
-	ZESize Size = 1 +			// Identifier
-		1 + Name.GetLength() +	// Name
-		8 +						// Size
-		8;						// Element Count
-
-	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
-	while(!Iterator.IsEnd())
-	{
-		Size += Iterator->GetSize();
-		Iterator++;
-	}
-
-	return Size;
 }
 
 const ZEList<ZEMLElement>& ZEMLNode::GetElements()

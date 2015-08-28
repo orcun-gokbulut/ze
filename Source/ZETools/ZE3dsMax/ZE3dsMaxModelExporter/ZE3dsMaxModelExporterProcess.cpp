@@ -358,12 +358,14 @@ bool ZE3dsMaxModelExporter::ProcessMaterials(const char* FileName)
 
 		ZEMLWriter MaterialWriter;
 		MaterialWriter.Open(&MaterialFile);
-		ZEMLWriterNode MaterialSerialNode = MaterialWriter.WriteRootNode("Material");
+		ZEMLWriterNode MaterialSerialNode;
+		MaterialWriter.OpenRootNode("Material", MaterialSerialNode);
 		MaterialSerialNode.WriteUInt8("MajorVersion", 1);
 		MaterialSerialNode.WriteUInt8("MinorVersion", 0);
 		MaterialSerialNode.WriteString("Name", MaterialName);
 
-		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenSubNode("Configuration");
+		ZEMLWriterNode MaterialConfigNode;
+		MaterialSerialNode.OpenNode("Configuration", MaterialConfigNode);
 		MaterialConfigNode.WriteString("Name", "Default");
 		bool TempBooleanValue = false;
 		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, L"wire", TempBooleanValue);

@@ -40,6 +40,7 @@
 #include "ZEDS\ZEValue.h"
 
 class ZEFile;
+class ZEMLFormat;
 
 typedef ZEUInt ZEMFormatSupport;
 #define ZEML_FS_NONE		0
@@ -55,35 +56,46 @@ enum ZEMLFormatType
 
 struct ZEMLFormatElement
 {
-	ZEMLElementType		ElementType;
-	ZEString			Name;
-	ZEUInt32			NameHash;
-	ZEUInt64			Offset;
-	ZEUInt64			Count;
-	ZESize				Size;
-	ZEMLValueType		ValueType;
-	ZEValue				Value;
+	ZEMLElementType			ElementType;
+	ZEString				Name;
+	ZEUInt32				NameHash;
+	ZEUInt64				Offset;
+	ZEUInt64				Count;
+	ZESize					Size;
+	ZEMLValueType			ValueType;
+	ZEValue					Value;
+
+							ZEMLFormatElement();
+};
+
+struct ZEMLFormatDescription
+{
+	public:
+		virtual const char*				GetName() const = 0;
+		virtual ZEUInt					GetMinorVersion() const = 0;
+		virtual ZEUInt					GetMajorVersion() const = 0;
+		virtual ZEMLFormatType			GetType() const = 0;
+		virtual ZEMFormatSupport		GetSupport() const = 0;
+		virtual bool					Determine(ZEFile* File) = 0;
+		virtual ZEMLFormat*				CreateInstance() = 0;
 };
 
 class ZEMLFormat
 {
 	public:
-		virtual const char*			GetName() const = 0;
-		virtual ZEUInt				GetMajorVersion() const  = 0;
-		virtual ZEUInt				GetMinorVersion() const  = 0;
-		virtual ZEMLFormatType		GetType() const  = 0;
-		virtual ZEMFormatSupport	GetSupport() const  = 0;	
+		virtual ZEMLFormatDescription*	GetDescription() = 0;
 
-		virtual bool				ReadHeader(ZEFile* File) = 0;
-		virtual bool				ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node) = 0;
-		virtual bool				ReadElement(ZEFile* File, ZEMLFormatElement& Element) = 0;
-		virtual bool				ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size) = 0;
+		virtual bool					ReadHeader(ZEFile* File) = 0;
+		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node) = 0;
+		virtual bool					ReadElement(ZEFile* File, ZEMLFormatElement& Element) = 0;
+		virtual bool					ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size) = 0;
 
-		virtual bool				WriteHeader(ZEFile* File) = 0;
-		virtual bool				WriteHeaderClose(ZEFile* File) = 0;
-		virtual bool				WriteElement(ZEFile* File, ZEMLFormatElement& Element) = 0;
-		virtual bool				WriteElementClose(ZEFile* File, ZEMLFormatElement& Element) = 0;
+		virtual bool					WriteHeader(ZEFile* File) = 0;
+		virtual bool					WriteHeaderClose(ZEFile* File) = 0;
+		virtual bool					WriteElement(ZEFile* File, ZEMLFormatElement& Element) = 0;
+		virtual bool					WriteElementClose(ZEFile* File, ZEMLFormatElement& Element) = 0;
 
-		//static bool				Determine(ZEFile* File);
-		//static ZEMLFormat*		CreateInstance();
+
+		static ZESize					GetFormatCount();
+		static ZEMLFormatDescription*const* GetFormats();
 };

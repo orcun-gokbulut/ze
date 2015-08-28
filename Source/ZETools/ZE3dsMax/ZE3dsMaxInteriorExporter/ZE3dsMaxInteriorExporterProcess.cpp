@@ -740,11 +740,13 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		zeLog("Writing material file.");
 		ZEMLWriter MaterialWriter;
 		MaterialWriter.Open(&MaterialFile);
-		ZEMLWriterNode MaterialSerialNode = MaterialWriter.WriteRootNode("ZEMaterial");
+		ZEMLWriterNode MaterialSerialNode;
+		MaterialWriter.OpenRootNode("ZEMaterial", MaterialSerialNode);
 		MaterialSerialNode.WriteUInt8("MajorVersion", 1);
 		MaterialSerialNode.WriteUInt8("MinorVersion", 0);
 		MaterialSerialNode.WriteString("Name", MaterialName);
-		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenSubNode("Configuration");
+		ZEMLWriterNode MaterialConfigNode;
+		MaterialSerialNode.OpenNode("Configuration", MaterialConfigNode);
 
 		MaterialConfigNode.WriteString("Name", "Default");
 		bool TempBooleanValue = false;

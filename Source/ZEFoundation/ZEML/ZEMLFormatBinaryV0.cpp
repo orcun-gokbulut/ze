@@ -67,29 +67,89 @@ enum ZEMLElementTypeV0
 	ZEML_ETV0_NODE			= 21
 };
 
-const char* ZEMLFormatBinaryV0::GetName() const
+struct ZEMLFormatBinartyV0Description : public ZEMLFormatDescription
+{
+	public:
+		virtual const char*			GetName() const;
+		virtual ZEUInt				GetMinorVersion() const;
+		virtual ZEUInt				GetMajorVersion() const;
+		virtual ZEMLFormatType		GetType() const;
+		virtual ZEMFormatSupport	GetSupport() const;
+		virtual bool				Determine(ZEFile* File);
+		virtual ZEMLFormat*			CreateInstance();
+};
+
+
+const char* ZEMLFormatBinartyV0Description::GetName() const
 {
 	return "ZEML Binary V1.0";
 }
 
-ZEUInt ZEMLFormatBinaryV0::GetMajorVersion() const
+ZEUInt ZEMLFormatBinartyV0Description::GetMajorVersion() const
 {
 	return 0;
 }
 
-ZEUInt ZEMLFormatBinaryV0::GetMinorVersion() const
+ZEUInt ZEMLFormatBinartyV0Description::GetMinorVersion() const
 {
 	return 0;
 }
 
-ZEMLFormatType ZEMLFormatBinaryV0::GetType() const
+ZEMLFormatType ZEMLFormatBinartyV0Description::GetType() const
 {
 	return ZEML_FT_BINARY;
 }
 
-ZEMFormatSupport ZEMLFormatBinaryV0::GetSupport() const
+ZEMFormatSupport ZEMLFormatBinartyV0Description::GetSupport() const
 {
 	return ZEML_FS_READ;
+}
+
+bool ZEMLFormatBinartyV0Description::Determine(ZEFile* File)
+{
+	if (File == NULL)
+	{
+		zeError("Cannot load ZEML file. File is NULL.");
+		return false;
+	}
+
+	if (!File->IsOpen())
+	{
+		zeError("Cannot load ZEML file. File is not open.");
+		return false;
+	}
+
+	File->Seek(0, ZE_SF_BEGINING);
+
+	char Identifier[2];
+	if (File->Read(Identifier, 2, 1) != 1)
+	{
+		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
+		return false;
+	}
+
+	if (Identifier[0] != 'Z' || Identifier[1] != 21)
+		return false;
+
+	zeWarning("Deprecated ZEML file format detected. Please convert this file to newer ZEML file version. File Name: \"%s\".", File->GetPath().ToCString());
+
+	return true;
+}
+
+ZEMLFormat* ZEMLFormatBinartyV0Description::CreateInstance()
+{
+	return new ZEMLFormatBinaryV0();
+}
+
+ZEMLFormatDescription* ZEMLFormatBinaryV0::Description()
+{
+	static ZEMLFormatBinartyV0Description Description;
+	return &Description;
+}
+
+ZEMLFormatDescription* ZEMLFormatBinaryV0::GetDescription()
+{
+	return Description();
 }
 
 bool ZEMLFormatBinaryV0::ReadHeader(ZEFile* File)
@@ -403,38 +463,4 @@ bool ZEMLFormatBinaryV0::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 bool ZEMLFormatBinaryV0::WriteElementClose(ZEFile* File, ZEMLFormatElement& Element)
 {
 	return false;
-}
-
-bool ZEMLFormatBinaryV0::Determine(ZEFile* File)
-{
-	if (File == NULL)
-	{
-		zeError("Cannot load ZEML file. File is NULL.");
-		return false;
-	}
-
-	if (!File->IsOpen())
-	{
-		zeError("Cannot load ZEML file. File is not open.");
-		return false;
-	}
-
-	File->Seek(0, ZE_SF_BEGINING);
-
-	char Identifier[2];
-	if (File->Read(Identifier, 2, 1) != 1)
-	{
-		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
-		return false;
-	}
-
-	if (Identifier[0] != 'Z' || Identifier[1] != 21)
-		return false;
-
-	return true;
-}
-
-ZEMLFormat* ZEMLFormatBinaryV0::CreateInstance()
-{
-	return new ZEMLFormatBinaryV0();
 }

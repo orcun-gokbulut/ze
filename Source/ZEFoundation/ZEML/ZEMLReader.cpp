@@ -90,15 +90,19 @@ const ZEArray<ZEMLFormatElement>& ZEMLReaderNode::GetElements()
 	return Elements;
 }
 
-ZESize ZEMLReaderNode::GetNode(const char* Name)
+ZESize ZEMLReaderNode::GetNodeCount()
 {
-	ZEUInt NameHash = ZEHashGenerator::Hash(Name);
+	return NodeCount;
+}
+
+ZESize ZEMLReaderNode::GetNodeCount(const char* Name)
+{
 	ZESize Count = 0;
+	ZEUInt32 NameHash = ZEHashGenerator::Hash(Name);
+
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
-	{
 		if (Elements[I].NameHash == NameHash && Elements[I].Name == Name)
 			Count++;
-	}
 
 	return Count;
 }
@@ -402,21 +406,22 @@ ZEMLReaderNode::ZEMLReaderNode()
 	Format = NULL;
 }
 
-#include "ZEMLFormatBinaryV1.h"
-#include "ZEMLFormatBinaryV0.h"
-
 bool ZEMLReader::Load()
 {
-	if (ZEMLFormatBinaryV1::Determine(File))
+	ZEMLFormatDescription*const* FormatDescriptions = ZEMLFormat::GetFormats();
+	for (ZESize I = 0; I < ZEMLFormat::GetFormatCount(); I++)
 	{
-		Format = ZEMLFormatBinaryV1::CreateInstance();
+		if ((FormatDescriptions[I]->GetSupport() & ZEML_FS_READ) == 0)
+			continue;
+
+		if (!FormatDescriptions[I]->Determine(File))
+			continue;
+
+		Format = FormatDescriptions[I]->CreateInstance();
+		break;
 	}
-	else if (ZEMLFormatBinaryV0::Determine(File))
-	{
-		zeWarning("Deprecated ZEML file format detected. Please convert this file to newer ZEML file version. File Name: \"%s\".", File->GetPath().ToCString());
-		Format = ZEMLFormatBinaryV0::CreateInstance();
-	}
-	else
+
+	if (Format == NULL)
 	{
 		zeError("Unknown ZEML file format. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
@@ -485,11 +490,6 @@ void ZEMLReader::Close()
 	}
 	
 	RootNode = ZEMLReaderNode();
-	if (Format != NULL)
-	{
-		delete Format;
-		Format = NULL;
-	}
 }
 
 ZEMLReader::ZEMLReader()

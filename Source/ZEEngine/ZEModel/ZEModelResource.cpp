@@ -156,7 +156,7 @@ bool ZEModelResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 	if (!MaterialsNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)MaterialsNode->GetNode("Material");
+	ZESize SubNodeCount = MaterialsNode->GetNodeCount("Material");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -197,7 +197,7 @@ bool ZEModelResource::ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLRe
 	if (!PhysicalShapesNode.IsValid())
 		return false;
 
-	ZESize SubNodeCount = PhysicalShapesNode.GetNode("PhysicalShape");
+	ZESize SubNodeCount = PhysicalShapesNode.GetNodeCount("PhysicalShape");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -318,7 +318,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 	if (!MeshesNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)MeshesNode->GetNode("Mesh");
+	ZESize SubNodeCount = MeshesNode->GetNodeCount("Mesh");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -354,7 +354,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 		if (!LODsNode.IsValid())
 			return false;
 
-		ZESize LODCount = (ZESize)LODsNode.GetNode("LOD");
+		ZESize LODCount = LODsNode.GetNodeCount("LOD");
 
 		for (ZESize I = 0; I < LODCount; I++)
 		{
@@ -547,7 +547,7 @@ bool ZEModelResource::ReadBones(ZEMLReaderNode* BonesNode)
 	if (!BonesNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)BonesNode->GetNode();
+	ZESize SubNodeCount = BonesNode->GetNodeCount();
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -612,7 +612,7 @@ bool ZEModelResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 	if (!HelpersNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)HelpersNode->GetNode();
+	ZESize SubNodeCount = HelpersNode->GetNodeCount();
 	Helpers.SetCount(SubNodeCount);
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
@@ -665,7 +665,7 @@ bool ZEModelResource::ReadAnimations(ZEMLReaderNode* AnimationsNode)
 	if (!AnimationsNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = (ZESize)AnimationsNode->GetNode();
+	ZESize SubNodeCount = AnimationsNode->GetNodeCount();
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{

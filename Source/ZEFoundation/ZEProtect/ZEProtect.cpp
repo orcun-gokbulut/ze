@@ -223,11 +223,13 @@ bool ZEProtect::Activate()
 
 		ZEUInt8 MajorVersion = 1;
 		ZEUInt8 MinorVersion = 0;
-		ZEMLWriterNode RootNode = ProtectWriter.WriteRootNode("ZEProtect");
+		ZEMLWriterNode RootNode;
+		ProtectWriter.OpenRootNode("ZEProtect", RootNode);
 		RootNode.WriteUInt8("MajorVersion", MajorVersion);
 		RootNode.WriteUInt8("MinorVersion", MinorVersion);
 
-		ZEMLWriterNode ProductNode = RootNode.OpenSubNode("Product");
+		ZEMLWriterNode ProductNode;
+		RootNode.OpenNode("Product", ProductNode);
 		ProductNode.WriteString("Name", GetApplicationName().ToCString());
 		ProductNode.WriteString("Key", ActivationCode.ToCString());
 		ProductNode.WriteUInt8("Type", 0);
@@ -276,7 +278,7 @@ bool ZEProtect::Verify()
 		ProtectReader.Open(FileName);
 		ZEMLReaderNode ProtectNode = ProtectReader.GetRootNode();
 
-		ZESize ProductCount = ProtectNode.GetNode("Product");
+		ZESize ProductCount = ProtectNode.GetNodeCount("Product");
 		ZEMLReaderNode ProductNode;
 
 		for (ZESize I = 0; I < ProductCount; I++)

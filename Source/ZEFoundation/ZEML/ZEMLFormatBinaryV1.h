@@ -37,26 +37,17 @@
 
 class ZEMLFormatBinaryV1 : public ZEMLFormat
 {
-	private:
-		bool						ReadProperty();
-
 	public:
-		virtual const char*			GetName() const;
-		virtual ZEUInt				GetMinorVersion() const;
-		virtual ZEUInt				GetMajorVersion() const;
-		virtual ZEMLFormatType		GetType() const;
-		virtual ZEMFormatSupport	GetSupport() const;
+		static ZEMLFormatDescription*	Description();
+		virtual ZEMLFormatDescription*	GetDescription();
 
-		virtual bool				ReadHeader(ZEFile* File);
-		virtual bool				ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node);
-		virtual bool				ReadElement(ZEFile* File, ZEMLFormatElement& Element);
-		virtual bool				ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size);
+		virtual bool					ReadHeader(ZEFile* File);
+		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node);
+		virtual bool					ReadElement(ZEFile* File, ZEMLFormatElement& Element);
+		virtual bool					ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size);
 
-		virtual bool				WriteHeader(ZEFile* File);
-		virtual bool				WriteHeaderClose(ZEFile* File);
-		virtual bool				WriteElement(ZEFile* File, ZEMLFormatElement& Element);
-		virtual bool				WriteElementClose(ZEFile* File, ZEMLFormatElement& Element);
-
-		static bool					Determine(ZEFile* File);
-		static ZEMLFormat*			CreateInstance();
+		virtual bool					WriteHeader(ZEFile* File);
+		virtual bool					WriteHeaderClose(ZEFile* File);
+		virtual bool					WriteElement(ZEFile* File, ZEMLFormatElement& Element);
+		virtual bool					WriteElementClose(ZEFile* File, ZEMLFormatElement& Element);
 };

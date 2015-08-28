@@ -416,7 +416,7 @@ bool ZEScene::Load(const ZEString& FileName)
 	ClearEntities();
 
 	ZEMLReaderNode EntitiesNode = SceneNode.GetNode("Entities");
-	ZESize EntityCount = EntitiesNode.GetNode("Entity");
+	ZESize EntityCount = EntitiesNode.GetNodeCount("Entity");
 	for (ZESize I = 0; I < EntityCount; I++)
 	{
 		ZEMLReaderNode EntityNode = EntitiesNode.GetNode("Entity", I);

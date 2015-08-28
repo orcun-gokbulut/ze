@@ -211,7 +211,7 @@ void ZEMLEditorWindow::ConfigureUI()
 
 	Form->actNew->setEnabled(GetEditMode());
 	Form->actSave->setEnabled(GetEditMode() && RootNode != NULL);
-	Form->actSaveAs->setEnabled(GetEditMode() && RootNode != NULL);
+	Form->actSaveAs->setEnabled(RootNode != NULL);
 	Form->trwElementTree->setEnabled(RootNode != NULL);
 	
 	int SelectedItem = Form->trwElementTree->selectedItems().count();

@@ -1357,11 +1357,13 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ZEMLWriter MaterialWriter;
 	MaterialWriter.Open(&File);
 
-	ZEMLWriterNode MaterialNode = MaterialWriter.WriteRootNode("ZEMaterial");
+	ZEMLWriterNode MaterialNode;
+	MaterialWriter.OpenRootNode("ZEMaterial", MaterialNode);
 
 	MaterialNode.WriteString("Name", GetName().ToCString());
 
-	ZEMLWriterNode ConfigurationNode = MaterialNode.OpenSubNode("Configuration");
+	ZEMLWriterNode ConfigurationNode;
+	MaterialNode.OpenNode("Configuration", ConfigurationNode);
 
 	ConfigurationNode.WriteString("Name", "Default"); //Will be changed when configuration is implemented.
 	ConfigurationNode.WriteBool("Wireframe", GetWireframe());
@@ -1467,7 +1469,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 
 	SetName(MaterialNode.ReadString("Name"));
 
-	ZESize SubNodeCount = MaterialNode.GetNode("Configuration");
+	ZESize SubNodeCount = MaterialNode.GetNodeCount("Configuration");
 
 	//When Material Configuration functionality is implemented this reading mechanism should be revised, now it just loads "Default" config.
 
