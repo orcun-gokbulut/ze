@@ -60,6 +60,7 @@ class ZESocketTCPServerListener
 
 	public:
 		ZESocketTCPServerListenerStatus		GetStatus();
+		SOCKET_TYPE							GetSocket();
 
 		void								SetBindIPAddress(const ZEIPAddress& IPAddress);
 		const ZEIPAddress&					GetBindIPAddress() const;

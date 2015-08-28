@@ -60,6 +60,7 @@ class ZESocketTCPClient
 		void						UpdateStatus();
 	public:
 		ZESocketTCPClientStatus		GetStatus();
+		SOCKET_TYPE					GetSocket();
 
 		void						SetBindIPAddress(const ZEIPAddress& IPAddress);
 		const ZEIPAddress&			GetBindIPAddress() const;
@@ -71,6 +72,7 @@ class ZESocketTCPClient
 		ZEUInt16					GetPort() const;		
 
 		bool						Open();
+		bool						Open(SOCKET_TYPE Socket);
 		void						Close();
 
 		ZESSize						Send(const void* Buffer, ZESize BufferSize);
