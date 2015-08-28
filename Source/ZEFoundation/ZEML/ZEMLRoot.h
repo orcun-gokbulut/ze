@@ -54,8 +54,6 @@ class ZEMLRoot
 		ZEString					FileName;
 
 	public:
-		virtual ZESize				GetSize();
-
 		void						SetRootNode(ZEMLNode* Node);
 		ZEMLNode*					GetRootNode();
 

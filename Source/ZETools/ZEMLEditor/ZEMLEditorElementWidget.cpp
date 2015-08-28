@@ -347,7 +347,7 @@ void ZEMLEditorElementWidget::ConfigureForm()
 	Form->grpElement->setVisible(true);
 
 	Form->txtName->setText(Element->GetName().ToCString());
-	Form->lblElementSize->setText(QString::number(Element->GetSize()));
+	Form->lblElementSize->setText("-");
 
 	if (Element->GetType() == ZEML_ET_NODE)
 	{

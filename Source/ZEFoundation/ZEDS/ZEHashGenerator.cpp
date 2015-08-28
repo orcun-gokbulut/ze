@@ -46,6 +46,9 @@ ZEUInt ZEHashGenerator::Hash(void* Value, ZESize Size)
 
 ZEUInt ZEHashGenerator::Hash(const char* String)
 {
+	if (String == NULL)
+		return 0;
+
 	ZEUInt Hash = 0;
 	while(*String != '\0')
 	{

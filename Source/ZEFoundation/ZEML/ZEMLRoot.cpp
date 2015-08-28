@@ -37,18 +37,6 @@
 #include "ZEMLReader.h"
 #include "ZEMLWriter.h"
 
-ZESize ZEMLRoot::GetSize()
-{
-
-	ZESize Size = 
-		4 +	// Identifier
-		2 + // Version
-		8 + // StartOffset
-		RootNode->GetSize();
-
-	return Size;
-}
-
 void ZEMLRoot::SetRootNode(ZEMLNode* Node)
 {
 	RootNode = Node;
@@ -83,11 +71,7 @@ bool ZEMLRoot::Read(const char* FileName)
 		return false;
 
 	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
-	bool Result = RootNode->Read(&ReaderNode);
-	
-	zeDebugCheck(!_CrtCheckMemory(), "Heap problem");
-
-	return Result;
+	return RootNode->Read(&ReaderNode);
 }
 
 bool ZEMLRoot::Read(ZEFile* File)
@@ -118,8 +102,13 @@ bool ZEMLRoot::Write(const char* FileName)
 	if (!Writer.Open(FileName))
 		return false;
 
-	ZEMLWriterNode WriterNode = Writer.WriteRootNode(RootNode->GetName());
-	RootNode->Write(&WriterNode);
+	ZEMLWriterNode WriterNode;
+	if (!Writer.OpenRootNode(RootNode->GetName(), WriterNode))
+		return false;
+
+	if (!RootNode->Write(&WriterNode))
+		return false;
+
 	WriterNode.CloseNode();
 	Writer.Close();
 
@@ -138,8 +127,13 @@ bool ZEMLRoot::Write(ZEFile* File)
 	if (!Writer.Open(File))
 		return false;
 
-	ZEMLWriterNode WriterNode = Writer.WriteRootNode(RootNode->GetName());
-	RootNode->Write(&WriterNode);
+	ZEMLWriterNode WriterNode;
+	if (!Writer.OpenRootNode(RootNode->GetName(), WriterNode))
+		 return false;
+
+	if (!RootNode->Write(&WriterNode))
+		return false;
+
 	WriterNode.CloseNode();
 	Writer.Close();
 

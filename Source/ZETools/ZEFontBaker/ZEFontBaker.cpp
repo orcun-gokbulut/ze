@@ -196,15 +196,17 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 	ZEMLWriter FreeTypeFontWriter;
 	FreeTypeFontWriter.Open(CharacterMetricsOutput);
 
-	ZEMLWriterNode FreeTypeRootNode = FreeTypeFontWriter.WriteRootNode("ZEFont");
+	ZEMLWriterNode FreeTypeRootNode;
+	FreeTypeFontWriter.OpenRootNode("ZEFont", FreeTypeRootNode);
 
-	ZEMLWriterNode TexturesNode = FreeTypeRootNode.OpenSubNode("Textures");
+	ZEMLWriterNode TexturesNode;
+	FreeTypeRootNode.OpenNode("Textures", TexturesNode);
 
 	ZEMLWriterNode TextureNode;
 
 	for(ZESize I = 0; I <= TextureId; I++)
 	{
-		TextureNode = TexturesNode.OpenSubNode("Texture");
+		TexturesNode.OpenNode("Texture", TextureNode);
 		ZEString TextureFileName;
 		TextureFileName.Append(I);
 		TextureFileName.Append(".png");
@@ -214,7 +216,8 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 
 	TexturesNode.CloseNode();
 
-	ZEMLWriterNode FontInformationNode = FreeTypeRootNode.OpenSubNode("FontInformation");
+	ZEMLWriterNode FontInformationNode;
+	FreeTypeRootNode.OpenNode("FontInformation", FontInformationNode);
 	FontInformationNode.WriteString("CharacterSequence", CharacterSequence);
 	FontInformationNode.WriteUInt32("TextureCount", TextureId + 1);
 	FontInformationNode.WriteUInt32("FontSize", FontSize);
@@ -231,13 +234,15 @@ bool ZEFontBaker::BakeFont(ZEString CharacterSequence, ZEString FontFilePath, ZE
 	FontInformationNode.WriteUInt32("VerticalPadding", VerticalPadding);
 	FontInformationNode.CloseNode();
 
-	ZEMLWriterNode CharactersNode = FreeTypeRootNode.OpenSubNode("Characters");
+	ZEMLWriterNode CharactersNode;
+	FreeTypeRootNode.OpenNode("Characters", CharactersNode);
 
 	ZEMLWriterNode CharacterMetricNode;
 
 	for(ZESize I = 0; I < FontCharacters.GetCount(); I++)
 	{
-		CharacterMetricNode = CharactersNode.OpenSubNode("Character");
+		CharacterMetricNode;
+		CharactersNode.OpenNode("Character", CharacterMetricNode);
 		CharacterMetricNode.WriteInt32("Value", FontCharacters[I].Character);
 		CharacterMetricNode.WriteUInt32("GlyphIndex", FontCharacters[I].GlyphIndex);
 		CharacterMetricNode.WriteUInt32("FontSize", FontCharacters[I].FontSize);

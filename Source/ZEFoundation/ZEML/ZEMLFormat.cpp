@@ -34,3 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMLFormat.h"
+
+ZEMLFormatElement::ZEMLFormatElement()
+{
+	ElementType = ZEML_ET_NONE;
+	NameHash = 0;
+	Offset = 0;
+	Count = 0;
+	Size = 0;
+	ValueType = ZEML_VT_UNDEFINED;
+}
+
+ZESize ZEMLFormat::GetFormatCount()
+{
+	return 2;
+}
+
+#include "ZEMLFormatBinaryV0.h"
+#include "ZEMLFormatBinaryV1.h"
+ZEMLFormatDescription*const*  ZEMLFormat::GetFormats()
+{
+	static ZEMLFormatDescription* Formats[] = 
+	{
+		ZEMLFormatBinaryV1::Description(),
+		ZEMLFormatBinaryV0::Description()
+	};
+
+	return Formats;
+}

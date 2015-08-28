@@ -157,7 +157,7 @@ bool ZEInteriorResource::ReadDoors(ZEMLReaderNode* DoorsNode)
 	if (!DoorsNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = DoorsNode->GetNode("Door");
+	ZESize SubNodeCount = DoorsNode->GetNodeCount("Door");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -220,7 +220,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 		ZEInteriorFileVertexChunk	Vertices[3];
 	});
 
-	ZESize SubNodeCount = RoomsNode->GetNode("Room");
+	ZESize SubNodeCount = RoomsNode->GetNodeCount("Room");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -352,7 +352,7 @@ bool ZEInteriorResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 	if (!HelpersNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = HelpersNode->GetNode("Helper");
+	ZESize SubNodeCount = HelpersNode->GetNodeCount("Helper");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -393,7 +393,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
 		Materials[I] = ZEFixedMaterial::CreateInstance();
 
-	ZESize SubNodeCount = MaterialsNode->GetNode("Material");
+	ZESize SubNodeCount = MaterialsNode->GetNodeCount("Material");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{

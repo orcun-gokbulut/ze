@@ -41,29 +41,85 @@
 #define ZEML_ITEM_FILE_IDENTIFIER	'Z'
 #define ZEML_MAX_NAME_SIZE			256
 
-const char* ZEMLFormatBinaryV1::GetName() const
+struct ZEMLFormatBinartyV1Description : public ZEMLFormatDescription
+{
+	public:
+		virtual const char*			GetName() const;
+		virtual ZEUInt				GetMinorVersion() const;
+		virtual ZEUInt				GetMajorVersion() const;
+		virtual ZEMLFormatType		GetType() const;
+		virtual ZEMFormatSupport	GetSupport() const;
+		virtual bool				Determine(ZEFile* File);
+		virtual ZEMLFormat*			CreateInstance();
+};
+
+const char* ZEMLFormatBinartyV1Description::GetName() const
 {
 	return "ZEML Binary V1.0";
 }
 
-ZEUInt ZEMLFormatBinaryV1::GetMajorVersion() const
+ZEUInt ZEMLFormatBinartyV1Description::GetMajorVersion() const
 {
 	return 1;
 }
 
-ZEUInt ZEMLFormatBinaryV1::GetMinorVersion() const
+ZEUInt ZEMLFormatBinartyV1Description::GetMinorVersion() const
 {
 	return 0;
 }
 
-ZEMLFormatType ZEMLFormatBinaryV1::GetType() const
+ZEMLFormatType ZEMLFormatBinartyV1Description::GetType() const
 {
 	return ZEML_FT_BINARY;
 }
 
-ZEMFormatSupport ZEMLFormatBinaryV1::GetSupport() const
+ZEMFormatSupport ZEMLFormatBinartyV1Description::GetSupport() const
 {
 	return ZEML_FS_WRITE | ZEML_FS_READ;
+}
+
+
+bool ZEMLFormatBinartyV1Description::Determine(ZEFile* File)
+{
+	File->Seek(0, ZE_SF_BEGINING);
+
+	char Identifier[4];
+	if (File->Read(Identifier, 4, 1) != 1)
+	{
+		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
+		return false;
+	}
+
+	if (Identifier[0] != 'Z' || Identifier[1] != 'E' ||	Identifier[2] != 'M' ||	Identifier[3] != 'L')
+		return false;
+
+	ZEUInt8 Version[2];
+	if (File->Read(&Version, 2 * sizeof(ZEUInt8), 1) != 1)
+	{
+		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
+		return false;
+	}
+
+	if (Version[0] != 1)
+		return false;
+
+	return true;
+}
+
+ZEMLFormat* ZEMLFormatBinartyV1Description::CreateInstance()
+{
+	return new ZEMLFormatBinaryV1();
+}
+
+ZEMLFormatDescription* ZEMLFormatBinaryV1::Description()
+{
+	static ZEMLFormatBinartyV1Description Description;
+	return &Description;
+}
+
+ZEMLFormatDescription* ZEMLFormatBinaryV1::GetDescription()
+{
+	return Description();
 }
 
 bool ZEMLFormatBinaryV1::ReadHeader(ZEFile* File)
@@ -343,64 +399,253 @@ bool ZEMLFormatBinaryV1::ReadData(ZEFile* File, const ZEMLFormatElement& Element
 
 bool ZEMLFormatBinaryV1::WriteHeader(ZEFile* File)
 {
-	return false;
-}
-
-bool ZEMLFormatBinaryV1::WriteHeaderClose(ZEFile* File)
-{
-	return false;
-}
-
-bool ZEMLFormatBinaryV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
-{
-	return false;
-}
-
-bool ZEMLFormatBinaryV1::WriteElementClose(ZEFile* File, ZEMLFormatElement& Element)
-{
-	return false;
-}
-
-bool ZEMLFormatBinaryV1::Determine(ZEFile* File)
-{
-	if (File == NULL)
+	const char Identifer[6] =
 	{
-		zeError("Cannot load ZEML file. File is NULL.");
-		return false;
-	}
+		'Z', 'E', 'M', 'L',
+		1, // Major Version
+		0 // Minor Version
+	};
+	File->Write(Identifer, 6, 1);
 
-	if (!File->IsOpen())
-	{
-		zeError("Cannot load ZEML file. File is not open.");
-		return false;
-	}
-
-	File->Seek(0, ZE_SF_BEGINING);
-
-	char Identifier[4];
-	if (File->Read(Identifier, 4, 1) != 1)
-	{
-		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
-		return false;
-	}
-
-	if (Identifier[0] != 'Z' || Identifier[1] != 'E' ||	Identifier[2] != 'M' ||	Identifier[3] != 'L')
-		return false;
-
-	ZEUInt8 Version[2];
-	if (File->Read(&Version, 2 * sizeof(ZEUInt8), 1) != 1)
-	{
-		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
-		return false;
-	}
-
-	if (Version[0] != 1)
+	ZEUInt64 StartOffset = ZEEndian::Little(File->Tell() + sizeof(ZEUInt64));
+	if (!File->Write(&StartOffset, sizeof(ZEUInt64), 1) != 1)
 		return false;
 
 	return true;
 }
 
-ZEMLFormat* ZEMLFormatBinaryV1::CreateInstance()
+bool ZEMLFormatBinaryV1::WriteHeaderClose(ZEFile* File)
 {
-	return new ZEMLFormatBinaryV1();
+	return true;
+}
+
+bool ZEMLFormatBinaryV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
+{
+	char Header[2];
+	Header[0] = 'Z';
+	Header[1] = Element.ElementType;
+	if (File->Write(Header, 2 * sizeof(char), 1) != 1)
+		return false;
+
+	ZESize NameSizeFull = Element.Name.GetLength() + 1;
+	if (NameSizeFull >= ZEML_MAX_NAME_SIZE)
+		return false;
+
+	ZEUInt8 NameSize = (ZEUInt8)NameSizeFull;
+	if (File->Write(&NameSize, sizeof(ZEUInt8), 1) != 1)
+		return false;
+
+	if (File->Write(Element.Name.ToCString(), NameSize, 1) != 1)
+		return false;
+
+	if (Element.ElementType == ZEML_ET_NODE)
+	{
+		ZEUInt64 NodeSize = 0;
+		if (File->Write(&NodeSize, sizeof(ZEUInt64), 1) != 1)
+			return false;
+
+		ZEUInt64 ElementCount = 0;
+		if (File->Write(&ElementCount, sizeof(ZEUInt64), 1) != 1)
+			return false;
+
+		Element.Offset = File->Tell();
+
+		return true;
+	}
+	else if (Element.ElementType == ZEML_ET_PROPERTY)
+	{
+		ZEUInt8 ValueType = Element.ValueType;
+		if (File->Write(&ValueType, sizeof(char), 1) != 1)
+			return false;
+
+		switch (Element.ValueType)
+		{
+			default:
+			case ZEML_VT_UNDEFINED:
+				return false;
+
+			case ZEML_VT_FLOAT:
+			{
+				float ValueTemp = Element.Value.GetFloat();
+				if (File->Write(&ValueTemp, sizeof(float), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_DOUBLE:
+			{
+				double ValueTemp = Element.Value.GetDouble();
+				if (File->Write(&ValueTemp, sizeof(double), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_INT8:
+			{
+				ZEInt8 ValueTemp = Element.Value.GetInt8();
+				if (File->Write(&ValueTemp, sizeof(ZEInt8), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_INT16:
+			{
+				ZEInt16 ValueTemp = ZEEndian::Little(Element.Value.GetInt16());
+				if (File->Write(&ValueTemp, sizeof(ZEInt16), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_INT32:
+			{
+				ZEInt32 ValueTemp = ZEEndian::Little(Element.Value.GetInt32());
+				if (File->Write(&ValueTemp, sizeof(ZEInt32), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_INT64:
+			{
+				ZEInt64 ValueTemp = ZEEndian::Little(Element.Value.GetInt64());
+				if (File->Write(&ValueTemp, sizeof(ZEInt64), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_UINT8:
+			{
+				ZEUInt8 ValueTemp = Element.Value.GetUInt8();
+				if (File->Write(&ValueTemp, sizeof(ZEUInt8), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_UINT16:
+			{
+				ZEUInt16 ValueTemp = ZEEndian::Little(Element.Value.GetUInt16());
+				if (File->Write(&ValueTemp, sizeof(ZEUInt16), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_UINT32:
+			{
+				ZEUInt32 ValueTemp = ZEEndian::Little(Element.Value.GetUInt32());
+				if (File->Write(&ValueTemp, sizeof(ZEUInt32), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_UINT64:
+			{
+				ZEUInt64 ValueTemp = ZEEndian::Little(Element.Value.GetUInt64());
+				if (File->Write(&ValueTemp, sizeof(ZEUInt64), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_BOOLEAN:
+			{
+				bool ValueTemp = Element.Value.GetBoolean();
+				if (File->Write(&ValueTemp, sizeof(bool), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_STRING:
+			{
+				ZEUInt32 StringSize = ZEEndian::Little((ZEUInt32)Element.Value.GetString().GetSize());
+				if (File->Write(&StringSize, sizeof(ZEUInt32), 1) != 1)
+					return false;
+				if (File->Write(Element.Value.GetString().ToCString(), Element.Value.GetString().GetSize() * sizeof(char), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_QUATERNION:
+			{
+				ZEQuaternion ValueTemp = Element.Value.GetQuaternion();
+				if (File->Write(&ValueTemp, sizeof(ZEQuaternion), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_VECTOR2:
+			{
+				ZEVector2 ValueTemp = Element.Value.GetVector2();
+				if (File->Write(&ValueTemp, sizeof(ZEVector2), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_VECTOR3:
+			{
+				ZEVector3 ValueTemp = Element.Value.GetVector3();
+				if (File->Write(&ValueTemp, sizeof(ZEVector3), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_VECTOR4:
+			{
+				ZEVector4 ValueTemp = Element.Value.GetVector4();
+				if (File->Write(&ValueTemp, sizeof(ZEVector4), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_MATRIX3X3:
+			{
+				ZEMatrix3x3 ValueTemp = Element.Value.GetMatrix3x3();
+				if (File->Write(&ValueTemp, sizeof(ZEMatrix3x3), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_MATRIX4X4:
+			{
+				ZEMatrix4x4 ValueTemp = Element.Value.GetMatrix4x4();
+				if (File->Write(&ValueTemp, sizeof(ZEMatrix4x4), 1) != 1)
+					return false;
+				break;
+			}
+		}
+	}
+	else if (Element.ElementType == ZEML_ET_DATA)
+	{
+		void* DataPointer = (void*)Element.Value.GetUInt64();
+		ZEUInt64 DataSize = ZEEndian::Little(Element.Size);
+		if (File->Write(&DataSize, sizeof(ZEUInt64), 1) != 1)
+			return false;
+
+		if (File->Write(DataPointer, DataSize, 1) != 1)
+			return false;
+	}
+	else
+	{
+		return false;
+	}
+
+	return true;
+}
+
+bool ZEMLFormatBinaryV1::WriteElementClose(ZEFile* File, ZEMLFormatElement& Element)
+{
+	if (Element.ElementType == ZEML_ET_NODE)
+	{
+		ZEUInt64 CurrentFilePos = File->Tell();
+		File->Seek(Element.Offset - 2 * sizeof(ZEUInt64), ZE_SF_BEGINING);
+
+		ZEUInt64 NodeSize = ZEEndian::Little(CurrentFilePos - Element.Offset);
+		if (File->Write(&NodeSize, sizeof(ZEUInt64), 1) != 1)
+			return false;
+
+		ZEUInt64 NodeCount = ZEEndian::Little(Element.Count);
+		if (File->Write(&NodeCount, sizeof(ZEUInt64), 1) != 1)
+			return false;
+
+		File->Seek(CurrentFilePos, ZE_SF_BEGINING);
+	}
+
+	return true;
 }

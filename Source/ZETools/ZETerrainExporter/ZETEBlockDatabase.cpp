@@ -316,7 +316,8 @@ bool ZETEBlockDatabase::SaveDatabase()
 	if (!Writer.Open(HeaderFile))
 		return false;
 
-	ZEMLWriterNode Node = Writer.WriteRootNode("ZETRLayer");
+	ZEMLWriterNode Node;
+	Writer.OpenRootNode("ZETRLayer", Node);
 		Node.WriteString("Name", GetName());
 		Node.WriteUInt32("BlockSize", (ZEUInt32)GetBlockSize());
 		Node.WriteUInt8("Type",	(ZEUInt8)this->GetPixelType());
