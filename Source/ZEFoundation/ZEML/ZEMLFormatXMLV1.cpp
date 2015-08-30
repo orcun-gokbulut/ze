@@ -40,12 +40,12 @@
 #include "ZEDS\ZEFormat.h"
 #include "ZEFile\ZEFile.h"
 #include "ZEPointer\ZEPointer.h"
+#include "ZERegEx\ZERegEx.h"
+#include "ZEError.h"
 
 #include <tinyxml.h>
-#include "ZERegEx\ZERegEx.h"
 
-#define ZEML_ITEM_FILE_IDENTIFIER	'Z'
-#define ZEML_MAX_NAME_SIZE			256
+#define FormatError(Text) zeError(Text##" File Name: \"%s\", Element: \"%s\".", File->GetPath().ToCString(), CurrentNode->Attribute("Name") != NULL ? CurrentNode->Attribute("Name") : "Unknown")
 
 struct ZEMLFormatXMLV1Description : public ZEMLFormatDescription
 {
@@ -92,12 +92,22 @@ bool ZEMLFormatXMLV1Description::Determine(ZEFile* File)
 	File->Read(StartBuffer, 1, 100);
 	StartBuffer[1023] = '\0';
 
-	ZERegEx RegEx("<\?ZEML\?>");
-	if (RegEx.Match(StartBuffer))
-		return true;
+	ZERegEx RegEx("<\\?ZEML\\s*VersionMajor\\s*=\\s*\"(.*)\"\\s*VersionMinor\\s*=\\s*\"(.*)\"\\s*\\?>");
+	ZERegExMatch Match;
+	if (!RegEx.Match(StartBuffer, Match))
+		return false;
+
+	if (Match.SubMatches[0].String.ToInt32() != 1)
+	{
+		zeWarning("Unknown XML based ZEML format version detected. File Name: \"%s\"", File->GetPath());
+		return false;
+	}
+
+	if (Match.SubMatches[1].String.ToInt32() != 0)
+		zeWarning("Unknown XML based ZEML format minor version is detected. Can cause problems. File Name: \"%s\"", File->GetPath());
 
 	if (File->GetSize() >= 64 * 1024)
-		zeWarning("Loading XML based ZEML format which is slow and has high memory allocation. Please convert it to a faster binary ZEML format.");
+		zeWarning("Loading XML based ZEML format which is slow and has high memory allocation. Please convert it to a faster binary ZEML format. File Name: \"%s\"", File->GetPath());
 
 	return true;
 }
@@ -113,16 +123,63 @@ ZEMLFormatDescription* ZEMLFormatXMLV1::Description()
 	return &Description;
 }
 
+
+ZEMLFormatDescription* ZEMLFormatXMLV1::GetDescription()
+{
+	return Description();
+}
+
+
 void ZEMLFormatXMLV1::PrintC14NSpace(ZEFile* File)
 {
 	for (ZESize I = 0; I < C14NDepth; I++)
 		File->Write(" ", 1, 1);
 }
 
-ZEMLFormatDescription* ZEMLFormatXMLV1::GetDescription()
+bool ZEMLFormatXMLV1::ReadVectors(ZEFile* File, float* Output, const char** Members, ZESize MemberCount)
 {
-	return Description();
+	bool ReadedMembers[32];
+	memset(&ReadedMembers, 0, sizeof(bool) * MemberCount);
+
+	TiXmlNode* Node = CurrentNode->FirstChild();
+	while(Node != NULL)
+	{
+		if (Node->Type() != TiXmlNode::TINYXML_ELEMENT)
+			continue;
+
+		const char* Name = Node->Value();
+		for (ZESize I = 0; I < MemberCount; I++)
+		{
+			if (strcmp(Members[I], Name) == 0)
+			{
+				if (ReadedMembers[I] == true)
+				{
+					FormatError("Multiple entries for the same vector/matrix elements detected.");
+					return false;
+				}
+
+				const char* Value = ((TiXmlElement*)Node)->GetText();
+				Output[I] = ZEString(Value).ToFloat();
+				ReadedMembers[I] = true;
+				break;
+			}
+		}
+
+		Node = Node->NextSibling();
+	}
+
+	for (ZESize I = 0; I < MemberCount; I++)
+	{
+		if (!ReadedMembers[I])
+		{
+			FormatError("Missing vector/matrix entires in vector/matrix property have detected.");
+			return false;
+		}
+	}
+
+	return true;
 }
+
 
 bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 {
@@ -130,34 +187,369 @@ bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 
 	ZESize FileSize = File->GetSize();
 	ZEPointer<char> Buffer = new char[FileSize + 1];
-	if (File->Read(Buffer, FileSize, 1) != 0)
+	if (File->Read(Buffer, FileSize, 1) != 1)
 	{
 		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
 	}
 
 	Buffer[FileSize] = '\0';
-	if (!Document->Parse(Buffer))
+	Document = new TiXmlDocument();
+	Document->Parse(Buffer, 0, TIXML_ENCODING_UTF8);
+	if (Document->Error())
 	{
-		zeError("Cannot parse ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
+		zeError("Cannot parse XML in ZEML file. Corrupted ZEML file. File Name: \"%s\". Error Description: %s", File->GetPath().ToCString(), Document->ErrorDesc());
 		return false;
 	}
-	
+
+	if (strcmp(Document->RootElement()->Value(), "Node") != 0)
+	{
+		zeError("XML base ZEML file must have <ZEML> tag as root element. File Name: \"%s\".", File->GetPath().ToCString());
+		return false;
+	}
+
+	CurrentNode = Document->RootElement();
+
 	return true;
 }
 
 bool ZEMLFormatXMLV1::ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Element)
 {
-	return false;
+	if (Element.ElementType != ZEML_ET_NODE)
+		return false;
+
+	CurrentNode = (TiXmlElement*)Element.Offset;
+
+	bool Found = false;
+	TiXmlNode* NextNode = CurrentNode->FirstChild();
+	while(NextNode != NULL)
+	{
+		if (NextNode->Type() == TiXmlNode::TINYXML_ELEMENT)
+		{
+			CurrentNode = NextNode->ToElement();
+			Found = true;
+			break;
+		}
+	}
+
+	if (!Found)
+		CurrentNode = NULL;
+
+	return true;
 }
+
 
 bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 {
-	return false;
+	if (CurrentNode == NULL)
+		return false;
+
+	const char* Name = CurrentNode->Attribute("Name");
+	if (Name == NULL)
+	{
+		FormatError("ZEML element does not have Name attribute.");
+		return false;
+	}
+
+	if (strcmp(CurrentNode->Value(), "Node") == 0)
+	{
+		Element.ElementType = ZEML_ET_NODE;
+		Element.Name = CurrentNode->Attribute("Name");
+		Element.NameHash = Element.Name.Hash();
+		Element.Count = 0;
+		Element.Offset = (ZEUInt64)CurrentNode;
+
+		TiXmlNode* Node = CurrentNode->FirstChild();
+		while(Node != NULL)
+		{
+			if (Node->Type() == TiXmlNode::TINYXML_ELEMENT)
+				Element.Count++;
+			Node = Node->NextSibling();
+		}
+		
+		return true;
+	}
+	else if (strcmp(CurrentNode->Value(), "Property") == 0)
+	{
+		const char* Type = CurrentNode->Attribute("Type");
+		if (Type == NULL)
+		{
+			FormatError("ZEML Property element does not have Type attribute.");
+			return false;
+		}
+		
+		Element.ElementType = ZEML_ET_PROPERTY;
+		Element.Name = Name;
+		Element.NameHash = Element.Name.Hash();
+
+		if (strcmp(Type, "UInt8") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_UINT8;
+			Element.Value.SetUInt8(ZEString(Text).ToUInt8());
+		}
+		else if (strcmp(Type, "UInt16") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_UINT16;
+			Element.Value.SetUInt16(ZEString(Text).ToUInt16());
+		}
+		else if (strcmp(Type, "UInt32") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_UINT32;
+			Element.Value.SetUInt32(ZEString(Text).ToUInt32());
+		}
+		else if (strcmp(Type, "UInt64") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");	
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_UINT64;
+			Element.Value.SetUInt64(ZEString(Text).ToUInt64());
+		}
+		else if (strcmp(Type, "Int8") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");			
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_INT8;
+			Element.Value.SetInt8(ZEString(Text).ToInt8());
+		}
+		else if (strcmp(Type, "Int16") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_INT16;
+			Element.Value.SetInt16(ZEString(Text).ToInt16());
+		}
+		else if (strcmp(Type, "Int32") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_INT32;
+			Element.Value.SetInt32(ZEString(Text).ToInt32());
+		}
+		else if (strcmp(Type, "Int64") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_INT64;
+			Element.Value.SetInt64(ZEString(Text).ToUInt64());
+		}
+		else if (strcmp(Type, "Float") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_FLOAT;
+			Element.Value.SetFloat(ZEString(Text).ToFloat());
+		}
+		else if (strcmp(Type, "Double") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_DOUBLE;
+			Element.Value.SetDouble(ZEString(Text).ToDouble());
+		}
+		else if (strcmp(Type, "Bool") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			if (Text == NULL)
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+
+			Element.ValueType = ZEML_VT_BOOLEAN;
+			if (stricmp(Text, "True") == 0)
+				Element.Value.SetBoolean(true);
+			else if (stricmp(Text, "False") == 0)
+				Element.Value.SetBoolean(false);
+			else
+			{
+				FormatError("Not valid property value.");
+				return false;
+			}
+		}
+		else if (strcmp(Type, "String") == 0)
+		{
+			const char* Text = CurrentNode->GetText();
+			Element.ValueType = ZEML_VT_STRING;
+			Element.Value.SetString(Text);
+		}
+		else if (strcmp(Type, "Vector2") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR2;
+
+			const char* Members[2] = {"x", "y"};
+			float Output[2];
+			if (!ReadVectors(File, Output, Members, 2))
+				return false;
+			Element.Value.SetVector2(*(ZEVector2*)Output);
+		}
+		else if (strcmp(Type, "Vector3") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR3;
+
+			const char* Members[3] = {"x", "y", "z"};
+			float Output[3];
+			if (!ReadVectors(File, Output, Members, 3))
+				return false;
+			Element.Value.SetVector3(*(ZEVector3*)Output);
+		}
+		else if (strcmp(Type, "Vector4") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR4;
+
+			const char* Members[4] = {"x", "y", "z", "w"};
+			float Output[4];
+			if (!ReadVectors(File, Output, Members, 4))
+				return false;
+			Element.Value.SetVector4(*(ZEVector4*)Output);
+		}
+		else if (strcmp(Type, "Quaternion") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR4;
+
+			const char* Members[4] = {"w", "x", "y", "z"};
+			float Output[4];
+			if (!ReadVectors(File, Output, Members, 4))
+				return false;
+			Element.Value.SetQuaternion(*(ZEQuaternion*)Output);
+		}
+		else if (strcmp(Type, "Matrix3x3") == 0)
+		{
+			Element.ValueType = ZEML_VT_MATRIX3X3;
+
+			const char* Members[9] = 
+			{
+				"M11", "M21", "M31",
+				"M12", "M22", "M32",
+				"M13", "M23", "M33",
+			};
+			float Output[9];
+			if (!ReadVectors(File, Output, Members, 9))
+				return false;
+			Element.Value.SetMatrix3x3(*(ZEMatrix3x3*)Output);
+		}
+		else if (strcmp(Type, "Matrix4x4") == 0)
+		{
+			Element.ValueType = ZEML_VT_MATRIX4X4;
+
+			const char* Members[16] = 
+			{
+				"M11", "M21", "M31", "M41",
+				"M12", "M22", "M32", "M42",
+				"M13", "M23", "M33", "M43",
+				"M14", "M24", "M34", "M44"
+			};
+			float Output[16];
+			if (!ReadVectors(File, Output, Members, 16))
+				return false;
+			Element.Value.SetMatrix4x4(*(ZEMatrix4x4*)Output);
+		}
+		else
+		{
+			FormatError("Unknown property type.");
+		}
+	}
+	else if (strcmp(CurrentNode->Value(), "Data") == 0)
+	{
+		const char* Size = CurrentNode->Attribute("Size");
+		if (Size == NULL)
+		{
+			FormatError("ZEML Data element does not have Size attribute.");
+			return false;
+		}
+		
+		Element.ElementType = ZEML_ET_DATA;
+		Element.Name = Name;
+		Element.NameHash = Element.Name.Hash();
+		Element.Size = ZEString(Size).ToUInt64();
+		Element.Offset = (ZEUInt64)CurrentNode;
+	}
+	else
+	{
+		FormatError("Unknown element type.");
+	}
+
+	bool Found = false;
+	TiXmlNode* NextNode = CurrentNode->NextSibling();
+	while(NextNode != NULL)
+	{
+		if (NextNode->Type() == TiXmlNode::TINYXML_ELEMENT)
+		{
+			CurrentNode = NextNode->ToElement();
+			Found = true;
+			break;
+		}
+	}
+		
+	if (!Found)
+		CurrentNode = NULL;
+
+	return true;
 }
 
 bool ZEMLFormatXMLV1::ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size)
 {
+	TiXmlElement* DataElement = (TiXmlElement*)Element.Offset;
+	
+	ZEPointer<ZEBYTE> Data = new ZEBYTE[Element.Size];
+	if (!ZEBase64::Decode(Data, DataElement->GetText(), ZEBase64::EncodeSize(Element.Size)))
+		return false;
+
 	return false;
 }
 
@@ -165,8 +557,7 @@ bool ZEMLFormatXMLV1::WriteHeader(ZEFile* File)
 {
 	const char Header[] =
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-		"<?ZEML?>\n"
-		"<ZEML MajorVersion=\"1\" MinorVersion=\"0\">\n";
+		"<?ZEML VersionMajor=\"1\" VersionMinor=\"0\"?>\n";
 
 	if (File->Write(Header, sizeof(Header) - 1, 1) != 1)
 		return false;
@@ -178,10 +569,6 @@ bool ZEMLFormatXMLV1::WriteHeader(ZEFile* File)
 
 bool ZEMLFormatXMLV1::WriteHeaderClose(ZEFile* File)
 {
-	const char Footer[] = "</ZEML>";
-	if (File->Write(Footer, sizeof(Footer) - 1, 1) != 1)
-		return false;
-
 	return true;
 }
 
@@ -339,7 +726,7 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				{
 					const ZEQuaternion& Quaternion = Element.Value.GetQuaternion();
 					ZEString Output	= ZEFormat::Format(
-						"<Property Name=\"{0}\" Type=\"Quaternion3x3\">"
+						"<Property Name=\"{0}\" Type=\"Quaternion\">"
 						"<w>{1}</w><x>{2}</x><y>{3}</y><z>{4}</z>"
 						"</Property>\n", 
 						Element.Name,

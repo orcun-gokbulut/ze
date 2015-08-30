@@ -35,6 +35,17 @@
 
 #include "ZEMLFormat.h"
 
+#include "ZEMLFormatBinaryV0.h"
+#include "ZEMLFormatBinaryV1.h"
+#include "ZEMLFormatXMLV1.h"
+
+static ZEMLFormatDescription* Formats[] = 
+{
+	ZEMLFormatBinaryV1::Description(),
+	ZEMLFormatBinaryV0::Description(),
+	ZEMLFormatXMLV1::Description()
+};
+
 ZEMLFormatElement::ZEMLFormatElement()
 {
 	ElementType = ZEML_ET_NONE;
@@ -47,18 +58,11 @@ ZEMLFormatElement::ZEMLFormatElement()
 
 ZESize ZEMLFormat::GetFormatCount()
 {
-	return 2;
+	return sizeof(Formats) / sizeof(ZEMLFormatDescription);
 }
 
-#include "ZEMLFormatBinaryV0.h"
-#include "ZEMLFormatBinaryV1.h"
 ZEMLFormatDescription*const*  ZEMLFormat::GetFormats()
 {
-	static ZEMLFormatDescription* Formats[] = 
-	{
-		ZEMLFormatBinaryV1::Description(),
-		ZEMLFormatBinaryV0::Description()
-	};
 
 	return Formats;
 }
