@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECommon.h
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#if ZE_PLATFORM_COMPILER_MSVC
-#define ZE_SUPPRESS_LNK4221 namespace { char dummy; };
-#else
-	#define ZE_SUPPRESS_LNK4221
-#endif
-
-#ifdef ZE_PLATFORM_COMPILER_MSVC
-	#define ZE_FORCE_INLINE __forceinline
-#elif defined(ZE_PLATFORM_COMPILER_GCC)
-	#define ZE_FORCE_INLINE inline
-#else
-	#define ZE_FORCE_INLINE inline
-#endif
-
-#define ZE_DISALLOW_COPY(ClassName) \
-	private: \
-		ClassName(const ClassName&); \
-		ClassName& operator=(const ClassName&);

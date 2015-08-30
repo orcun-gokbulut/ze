@@ -131,9 +131,9 @@ class ZEString
 	public:
 		static const ZEString		Empty;
 
-		void						SetBuffer(void* Buffer, ZESize Size);
+		void						SetBuffer(const void* Buffer, ZESize Size);
 
-		void						SetValue(void* Buffer, ZESize Size);
+		void						SetValue(const void* Buffer, ZESize Size);
 		void						SetValue(const ZEString& String);
 		void						SetValue(const char* String);
 		void						SetValue(const wchar_t* String);

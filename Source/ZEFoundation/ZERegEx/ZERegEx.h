@@ -34,25 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef ZE_REG_EX
-#define ZE_REG_EX
 
+#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
-#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
 
 typedef ZEFlags ZERegExFlags;
 #define ZE_REF_NONE						0
-#define ZE_REF_IN_CASE_SENSITIVE		1
+#define ZE_REF_CASE_INSENSITIVE			1
 #define ZE_REF_NEW_LINE					2
+#define ZE_REF_NO_SUBMATCH				4
+#define ZE_REF_NO_MATCH_STRING			8		// Only store offset and count in ZERegExMatch structures. Do not store string of actual match.
 
-class ZEString;
-
-class ZERegExMatch
+struct ZERegExSubMatch
 {
-	public:
-		ZESize		Offset;
-		ZESize		Size;
+	ZEString					String;
+	ZESize						Offset;
+	ZESize						Size;
+};
+
+struct ZERegExMatch
+{
+	ZEString					String;
+	ZESize						Offset;
+	ZESize						Size;
+	ZEArray<ZERegExSubMatch>	SubMatches;
 };
 
 class ZERegEx
@@ -61,17 +68,12 @@ class ZERegEx
 		void*			Code;
 
 	public:
-		bool			Compile(const ZEString& RegEx, ZERegExFlags Flags = ZE_REF_NONE);
+		bool			IsValid();	
 
-		bool			Match(const ZEString& String);
-		bool			Match(const ZEString& String, ZEArray<ZERegExMatch>& Matches);
+		bool			Compile(const ZEString& RegEx, ZERegExFlags Flags = ZE_REF_NONE);
+		bool			Match(const ZEString& Input, ZERegExMatch& Match, ZERegExFlags Flags = ZE_REF_NONE, ZERegExMatch* OldMatch = NULL);
 
 						ZERegEx();
 						ZERegEx(const ZEString& RegEx, ZERegExFlags Flags = ZE_REF_NONE);
 						~ZERegEx();
-
-		static bool		Match(const ZEString& RegEx, const ZEString& String, ZERegExFlags Flags = ZE_REF_NONE);
-		static bool		Match(const ZEString& RegEx, const ZEString& String, ZEArray<ZERegExMatch>& Matches, ZERegExFlags Flags = ZE_REF_NONE);
 };
-
-#endif

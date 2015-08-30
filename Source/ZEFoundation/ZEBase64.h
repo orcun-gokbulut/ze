@@ -48,8 +48,8 @@ class ZEBase64
 		static ZESize					EncodeSize(ZESize Size);
 		static ZESize					DecodeSize(void* Data, ZESize Size);
 
-		static void						Encode(void* Output, void* Input, ZESize InputSize);
-		static bool						Decode(void* Output, void* Input, ZESize InputSize);
+		static void						Encode(void* Output, const void* Input, ZESize InputSize);
+		static bool						Decode(void* Output, const void* Input, ZESize InputSize);
 };
 
 #endif
