@@ -557,6 +557,8 @@ bool ZEMLFormatBinaryV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				ZEUInt32 StringSize = ZEEndian::Little((ZEUInt32)Element.Value.GetString().GetSize());
 				if (File->Write(&StringSize, sizeof(ZEUInt32), 1) != 1)
 					return false;
+				if (StringSize == 0)
+					break;
 				if (File->Write(Element.Value.GetString().ToCString(), Element.Value.GetString().GetSize() * sizeof(char), 1) != 1)
 					return false;
 				break;

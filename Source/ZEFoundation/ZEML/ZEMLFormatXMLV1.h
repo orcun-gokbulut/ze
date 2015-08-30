@@ -49,6 +49,7 @@ class ZEMLFormatXMLV1 : public ZEMLFormat
 		ZEUInt							C14NDepth;
 
 		void							PrintC14NSpace(ZEFile* File);
+		bool							ReadVectors(ZEFile* File, float* Output, const char** Members, ZESize MemberCount);
 
 	public:
 		static ZEMLFormatDescription*	Description();

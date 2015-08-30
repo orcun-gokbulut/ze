@@ -67,4 +67,4 @@ qt4_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZEMLEditor 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation libQt)
+	LIBS ZEFoundation libQt libMSVCRv100)
