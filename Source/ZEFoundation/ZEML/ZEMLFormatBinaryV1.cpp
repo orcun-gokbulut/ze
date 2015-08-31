@@ -41,7 +41,7 @@
 #define ZEML_ITEM_FILE_IDENTIFIER	'Z'
 #define ZEML_MAX_NAME_SIZE			256
 
-struct ZEMLFormatBinartyV1Description : public ZEMLFormatDescription
+struct ZEMLFormatBinaryV1Description : public ZEMLFormatDescription
 {
 	public:
 		virtual const char*			GetName() const;
@@ -53,33 +53,33 @@ struct ZEMLFormatBinartyV1Description : public ZEMLFormatDescription
 		virtual ZEMLFormat*			CreateInstance();
 };
 
-const char* ZEMLFormatBinartyV1Description::GetName() const
+const char* ZEMLFormatBinaryV1Description::GetName() const
 {
-	return "ZEML Binary V1.0";
+	return "ZEML Binary  Format v1.0";
 }
 
-ZEUInt ZEMLFormatBinartyV1Description::GetMajorVersion() const
+ZEUInt ZEMLFormatBinaryV1Description::GetMajorVersion() const
 {
 	return 1;
 }
 
-ZEUInt ZEMLFormatBinartyV1Description::GetMinorVersion() const
+ZEUInt ZEMLFormatBinaryV1Description::GetMinorVersion() const
 {
 	return 0;
 }
 
-ZEMLFormatType ZEMLFormatBinartyV1Description::GetType() const
+ZEMLFormatType ZEMLFormatBinaryV1Description::GetType() const
 {
 	return ZEML_FT_BINARY;
 }
 
-ZEMFormatSupport ZEMLFormatBinartyV1Description::GetSupport() const
+ZEMFormatSupport ZEMLFormatBinaryV1Description::GetSupport() const
 {
 	return ZEML_FS_WRITE | ZEML_FS_READ;
 }
 
 
-bool ZEMLFormatBinartyV1Description::Determine(ZEFile* File)
+bool ZEMLFormatBinaryV1Description::Determine(ZEFile* File)
 {
 	File->Seek(0, ZE_SF_BEGINING);
 
@@ -106,14 +106,14 @@ bool ZEMLFormatBinartyV1Description::Determine(ZEFile* File)
 	return true;
 }
 
-ZEMLFormat* ZEMLFormatBinartyV1Description::CreateInstance()
+ZEMLFormat* ZEMLFormatBinaryV1Description::CreateInstance()
 {
 	return new ZEMLFormatBinaryV1();
 }
 
 ZEMLFormatDescription* ZEMLFormatBinaryV1::Description()
 {
-	static ZEMLFormatBinartyV1Description Description;
+	static ZEMLFormatBinaryV1Description Description;
 	return &Description;
 }
 

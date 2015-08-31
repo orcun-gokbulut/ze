@@ -51,6 +51,9 @@ class ZEMLEditorFormatSelector : public QDialog
 	private:
 		Ui_ZEMLEditorFormatSelector*	Form;
 		ZEMLFormatDescription*			Format;
+	
+	private slots:
+		void							cmbFormats_onCurrentIndexChanged(int Index);
 
 	public:
 		void							SetFormat(ZEMLFormatDescription* Description);

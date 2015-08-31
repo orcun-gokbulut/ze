@@ -61,7 +61,7 @@ struct ZEMLFormatXMLV1Description : public ZEMLFormatDescription
 
 const char* ZEMLFormatXMLV1Description::GetName() const
 {
-	return "ZEML Binary V1.0";
+	return "ZEML XML Format v1.0";
 }
 
 ZEUInt ZEMLFormatXMLV1Description::GetMajorVersion() const
@@ -218,10 +218,10 @@ bool ZEMLFormatXMLV1::ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Elemen
 	if (Element.ElementType != ZEML_ET_NODE)
 		return false;
 
-	CurrentNode = (TiXmlElement*)Element.Offset;
+	TiXmlElement* Node = (TiXmlElement*)Element.Offset;
 
 	bool Found = false;
-	TiXmlNode* NextNode = CurrentNode->FirstChild();
+	TiXmlNode* NextNode = Node->FirstChild();
 	while(NextNode != NULL)
 	{
 		if (NextNode->Type() == TiXmlNode::TINYXML_ELEMENT)
@@ -266,8 +266,6 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				Element.Count++;
 			Node = Node->NextSibling();
 		}
-		
-		return true;
 	}
 	else if (strcmp(CurrentNode->Value(), "Property") == 0)
 	{

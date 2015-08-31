@@ -82,7 +82,7 @@ struct ZEMLFormatBinartyV0Description : public ZEMLFormatDescription
 
 const char* ZEMLFormatBinartyV0Description::GetName() const
 {
-	return "ZEML Binary V1.0";
+	return "ZEML Binary Format v0.0";
 }
 
 ZEUInt ZEMLFormatBinartyV0Description::GetMajorVersion() const

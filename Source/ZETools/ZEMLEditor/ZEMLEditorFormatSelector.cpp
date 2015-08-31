@@ -37,16 +37,23 @@
 #include "ui_ZEMLEditorFormatSelector.h"
 #include "ZEML\ZEMLFormat.h"
 
+void ZEMLEditorFormatSelector::cmbFormats_onCurrentIndexChanged(int Index)
+{
+	Format = (ZEMLFormatDescription*)Form->cmbFormats->itemData(Index, Qt::UserRole).toULongLong();
+}
+
 void ZEMLEditorFormatSelector::SetFormat(ZEMLFormatDescription* Description)
 {
 	Format = Description;
 	for (int I = 0; I < Form->cmbFormats->count(); I++)
 	{
-		if (Form->cmbFormats->itemText(I)  == Description->GetName())
+		ZEMLFormatDescription* Current = (ZEMLFormatDescription*)Form->cmbFormats->itemData(I, Qt::UserRole).toULongLong();
+		if (Current == Description)
 		{
 			Form->cmbFormats->blockSignals(true);
 			Form->cmbFormats->setCurrentIndex(I);
 			Form->cmbFormats->blockSignals(false);
+			break;
 		}
 	}
 }
@@ -65,10 +72,12 @@ ZEMLEditorFormatSelector::ZEMLEditorFormatSelector(QWidget* Parent) : QDialog(Pa
 	for (ZESize I = 0; I < ZEMLFormat::GetFormatCount(); I++)
 	{
 		if (Formats[I]->GetSupport() & ZEML_FS_WRITE)
-			Form->cmbFormats->addItem(Formats[I]->GetName());
+			Form->cmbFormats->addItem(Formats[I]->GetName(), QVariant((ZEUInt64)Formats[I]));
 	}
 
 	Form->cmbFormats->setCurrentIndex(0);
+
+	connect(Form->cmbFormats, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFormats_onCurrentIndexChanged(int)));
 }
 
 ZEMLEditorFormatSelector::~ZEMLEditorFormatSelector()
