@@ -57,6 +57,8 @@
 #include <QtGui\QDesktopServices>
 #include <QtGui\QTreeWidgetItem>
 #include "QtGui\qlabel.h"
+#include "ZEML\ZEMLFormatXMLV1.h"
+#include "ZEMLEditorFormatSelector.h"
 
 ZEMLEditorWindow* ZEMLEditorWindow::Instance = NULL;
 
@@ -170,6 +172,8 @@ void ZEMLEditorWindow::OpenFile(const ZEString& FileName)
 		return;
 	}
 
+	Format = Root.GetFormat();
+
 	this->FileName = FileName;
 	if (RootNode != NULL)
 		delete RootNode;
@@ -193,6 +197,7 @@ void ZEMLEditorWindow::SaveFile(const ZEString& FileName)
 
 	ZEMLRoot Root;
 	Root.SetRootNode(RootNode);
+	Root.SetFormat(Format);
 	if (!Root.Write(FileName))
 	{
 		QMessageBox::critical(this, "ZEML Editor", "Cannot save ZEML file.", QMessageBox::Ok);
@@ -286,7 +291,7 @@ void ZEMLEditorWindow::New()
 	RootNode = new ZEMLNode();
 	RootNode->SetName("ZEML");
 	Root.SetRootNode(RootNode);
-
+	Format = ZEMLFormat::GetFormats()[0];
 	ZEDOperationManager::GetInstance()->Clear();
 
 	ConfigureUI();
@@ -332,6 +337,10 @@ void ZEMLEditorWindow::SaveAs()
 	QString NewFileName = QFileDialog::getSaveFileName(this, 
 		"Save ZEML File", FileName.ToCString(), 
 		"ZEML Based Files (*.ZEML *.ZE*);;ZEML Files (*.ZEML);;All Files (*.*)");
+
+	ZEMLEditorFormatSelector* FormatSelector = new ZEMLEditorFormatSelector();
+	FormatSelector->setModal(true);
+	FormatSelector->show();
 
 	SaveFile(NewFileName.toUtf8().constData());
 }

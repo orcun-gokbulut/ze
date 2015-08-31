@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLFormatBinaryV0.h
+ Zinek Engine - ZEMLEditorFormatSelector.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMLFormat.h"
+#include "ZEMLEditorFormatSelector.h"
+#include "ui_ZEMLEditorFormatSelector.h"
+#include "ZEML\ZEMLFormat.h"
 
-class ZEMLFormatBinaryV0 : public ZEMLFormat
+void ZEMLEditorFormatSelector::SetFormat(ZEMLFormatDescription* Description)
 {
-	public:
-		static ZEMLFormatDescription*	Description();
-		virtual ZEMLFormatDescription*	GetDescription() const;
+	Format = Description;
+	for (int I = 0; I < Form->cmbFormats->count(); I++)
+	{
+		if (Form->cmbFormats->itemText(I)  == Description->GetName())
+		{
+			Form->cmbFormats->blockSignals(true);
+			Form->cmbFormats->setCurrentIndex(I);
+			Form->cmbFormats->blockSignals(false);
+		}
+	}
+}
 
-		virtual bool					ReadHeader(ZEFile* File);
-		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node);
-		virtual bool					ReadElement(ZEFile* File, ZEMLFormatElement& Element);
-		virtual bool					ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size);
+ZEMLFormatDescription* ZEMLEditorFormatSelector::GetFormat()
+{
+	return Format;
+}
 
-		virtual bool					WriteHeader(ZEFile* File);
-		virtual bool					WriteHeaderClose(ZEFile* File);
-		virtual bool					WriteElement(ZEFile* File, ZEMLFormatElement& Element);
-		virtual bool					WriteElementClose(ZEFile* File, ZEMLFormatElement& Element);
+ZEMLEditorFormatSelector::ZEMLEditorFormatSelector(QWidget* Parent) : QDialog(Parent)
+{
+	Form = new Ui_ZEMLEditorFormatSelector();
+	Form->setupUi(this);
 
+	ZEMLFormatDescription*const* Formats = ZEMLFormat::GetFormats();
+	for (ZESize I = 0; I < ZEMLFormat::GetFormatCount(); I++)
+	{
+		if (Formats[I]->GetSupport() & ZEML_FS_WRITE)
+			Form->cmbFormats->addItem(Formats[I]->GetName());
+	}
 
-};
+	Form->cmbFormats->setCurrentIndex(0);
+}
+
+ZEMLEditorFormatSelector::~ZEMLEditorFormatSelector()
+{
+
+}

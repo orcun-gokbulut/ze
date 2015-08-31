@@ -53,7 +53,7 @@ class ZEMLFormatXMLV1 : public ZEMLFormat
 
 	public:
 		static ZEMLFormatDescription*	Description();
-		virtual ZEMLFormatDescription*	GetDescription();
+		virtual ZEMLFormatDescription*	GetDescription() const;
 
 		virtual bool					ReadHeader(ZEFile* File);
 		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node);

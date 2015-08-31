@@ -36,6 +36,7 @@
 #include "ZEMLRoot.h"
 #include "ZEMLReader.h"
 #include "ZEMLWriter.h"
+#include "ZEMLFormat.h"
 
 void ZEMLRoot::SetRootNode(ZEMLNode* Node)
 {
@@ -57,6 +58,18 @@ bool ZEMLRoot::GetDeferredDataLoadingMode()
 	return DeferredMode;
 }
 
+
+void ZEMLRoot::SetFormat(ZEMLFormatDescription* Format)
+{
+	this->Format = Format;
+}
+
+ZEMLFormatDescription* ZEMLRoot::GetFormat()
+{
+	return Format;
+}
+
+
 bool ZEMLRoot::Read(const char* FileName)
 {
 	if (RootNode == NULL)
@@ -69,6 +82,8 @@ bool ZEMLRoot::Read(const char* FileName)
 	ZEMLReader Reader;
 	if (!Reader.Open(FileName))
 		return false;
+
+	Format = Reader.GetFormat()->GetDescription();
 
 	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
 	return RootNode->Read(&ReaderNode);
@@ -90,7 +105,7 @@ bool ZEMLRoot::Read(ZEFile* File)
 	return RootNode->Read(&ReaderNode);
 }
 
-bool ZEMLRoot::Write(const char* FileName, ZEMLFormat* Format)
+bool ZEMLRoot::Write(const char* FileName)
 {
 	if (RootNode == NULL)
 	{
@@ -99,7 +114,7 @@ bool ZEMLRoot::Write(const char* FileName, ZEMLFormat* Format)
 	}
 
 	ZEMLWriter Writer;
-	Writer.SetFormat(Format);
+	Writer.SetFormat(Format->CreateInstance());
 	if (!Writer.Open(FileName))
 		return false;
 
@@ -116,7 +131,7 @@ bool ZEMLRoot::Write(const char* FileName, ZEMLFormat* Format)
 	return true;
 }
 
-bool ZEMLRoot::Write(ZEFile* File, ZEMLFormat* Format)
+bool ZEMLRoot::Write(ZEFile* File)
 {
 	if (RootNode == NULL)
 	{
@@ -125,7 +140,7 @@ bool ZEMLRoot::Write(ZEFile* File, ZEMLFormat* Format)
 	}
 
 	ZEMLWriter Writer;
-	Writer.SetFormat(Format);
+	Writer.SetFormat(Format->CreateInstance());
 	if (!Writer.Open(File))
 		return false;
 
@@ -144,6 +159,7 @@ bool ZEMLRoot::Write(ZEFile* File, ZEMLFormat* Format)
 
 ZEMLRoot::ZEMLRoot()
 {
+	Format = NULL;
 	RootNode = NULL;
 	DeferredMode = false;
 }
