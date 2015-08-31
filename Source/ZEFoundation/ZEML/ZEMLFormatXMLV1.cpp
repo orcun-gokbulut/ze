@@ -124,7 +124,7 @@ ZEMLFormatDescription* ZEMLFormatXMLV1::Description()
 }
 
 
-ZEMLFormatDescription* ZEMLFormatXMLV1::GetDescription()
+ZEMLFormatDescription* ZEMLFormatXMLV1::GetDescription() const
 {
 	return Description();
 }

@@ -147,7 +147,7 @@ ZEMLFormatDescription* ZEMLFormatBinaryV0::Description()
 	return &Description;
 }
 
-ZEMLFormatDescription* ZEMLFormatBinaryV0::GetDescription()
+ZEMLFormatDescription* ZEMLFormatBinaryV0::GetDescription() const
 {
 	return Description();
 }

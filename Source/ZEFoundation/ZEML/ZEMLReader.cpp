@@ -445,6 +445,11 @@ ZEMLReaderNode ZEMLReader::GetRootNode()
 	return RootNode;
 }
 
+ZEMLFormat* ZEMLReader::GetFormat()
+{
+	return Format;
+}
+
 bool ZEMLReader::Open(const char* FileName)
 {
 	Close();

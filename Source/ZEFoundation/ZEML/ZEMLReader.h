@@ -137,7 +137,7 @@ class ZEMLReader
 	public:
 		ZEMLReaderNode				GetRootNode();
 
-		const ZEMLFormat&			GetFormat();
+		ZEMLFormat*					GetFormat();
 
 		bool						Open(const char* FileName);
 		bool						Open(ZEFile* File);

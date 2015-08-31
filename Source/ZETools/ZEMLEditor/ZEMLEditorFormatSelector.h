@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLFormatBinaryV0.h
+ Zinek Engine - ZEMLEditorFormatSelector.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMLFormat.h"
+#pragma once
+#ifndef	__ZEML_EDITOR_FORMAT_SELECTOR_H__
+#define __ZEML_EDITOR_FORMAT_SELECTOR_H__
 
-class ZEMLFormatBinaryV0 : public ZEMLFormat
+#include <QtGui/QDialog>
+
+#include "ZEDS/ZEString.h"
+#include "ZEML/ZEMLRoot.h"
+
+class Ui_ZEMLEditorFormatSelector;
+class ZEMLFormatDescription;
+
+class ZEMLEditorFormatSelector : public QDialog
 {
+	Q_OBJECT
+	private:
+		Ui_ZEMLEditorFormatSelector*	Form;
+		ZEMLFormatDescription*			Format;
+
 	public:
-		static ZEMLFormatDescription*	Description();
-		virtual ZEMLFormatDescription*	GetDescription() const;
+		void							SetFormat(ZEMLFormatDescription* Description);
+		ZEMLFormatDescription*			GetFormat();
 
-		virtual bool					ReadHeader(ZEFile* File);
-		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node);
-		virtual bool					ReadElement(ZEFile* File, ZEMLFormatElement& Element);
-		virtual bool					ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size);
-
-		virtual bool					WriteHeader(ZEFile* File);
-		virtual bool					WriteHeaderClose(ZEFile* File);
-		virtual bool					WriteElement(ZEFile* File, ZEMLFormatElement& Element);
-		virtual bool					WriteElementClose(ZEFile* File, ZEMLFormatElement& Element);
-
-
+										ZEMLEditorFormatSelector(QWidget* Parent = NULL);
+										~ZEMLEditorFormatSelector();
 };
+
+#endif

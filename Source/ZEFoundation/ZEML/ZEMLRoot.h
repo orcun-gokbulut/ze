@@ -40,7 +40,7 @@
 #include "ZEMLNode.h"
 
 class ZEFile;
-class ZEMLFormat;
+class ZEMLFormatDescription;
 
 class ZEMLRoot
 {
@@ -53,6 +53,7 @@ class ZEMLRoot
 
 		ZEFile*						File;
 		ZEString					FileName;
+		ZEMLFormatDescription*		Format;
 
 	public:
 		void						SetRootNode(ZEMLNode* Node);
@@ -61,11 +62,14 @@ class ZEMLRoot
 		void						SetDeferredDataLoadingMode(bool Enabled);
 		bool						GetDeferredDataLoadingMode();
 
+		void						SetFormat(ZEMLFormatDescription* Format);
+		ZEMLFormatDescription*		GetFormat();
+
 		bool						Read(const char* FileName);
 		bool						Read(ZEFile* File);
 
-		bool						Write(const char* FileName, ZEMLFormat* Format = NULL);
-		bool						Write(ZEFile* File, ZEMLFormat* Format = NULL);
+		bool						Write(const char* FileName);
+		bool						Write(ZEFile* File);
 
 									ZEMLRoot();
 };

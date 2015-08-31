@@ -83,7 +83,7 @@ struct ZEMLFormatDescription
 class ZEMLFormat
 {
 	public:
-		virtual ZEMLFormatDescription*	GetDescription() = 0;
+		virtual ZEMLFormatDescription*	GetDescription() const = 0;
 
 		virtual bool					ReadHeader(ZEFile* File) = 0;
 		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node) = 0;
