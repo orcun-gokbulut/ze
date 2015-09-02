@@ -282,7 +282,7 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 	if (Type < GetMinimumLogLevel())
 		return;
 
-	char Buffer[4096];
+	char Buffer[8192];
 
 	va_list VList;
 	va_start(VList, Format);
@@ -290,7 +290,7 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 	va_end(VList);
 
 	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-		char DebugBuffer[4096];
+		char DebugBuffer[8192];
 		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::GetLogTypeString(ZE_LOG_INFO), Buffer);
 		OutputDebugString(DebugBuffer);
 	#endif

@@ -55,6 +55,8 @@ void ZEDSHOutputWindow::Print(const QString& Text)
 
 ZEDSHOutputWindow::ZEDSHOutputWindow(QWidget* Parent) : QDockWidget(Parent)
 {
+	MainWindow = (ZEDSHMainWindow*)Parent;
+
 	this->setWindowTitle("Output");
 
 	Output = new QPlainTextEdit(this);

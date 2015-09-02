@@ -102,5 +102,9 @@ class ZEDSHMainWindow : public QMainWindow
 
 
 	public:
+		ZEDSHEditorWidget* GetEditor();
+		ZEDSHOutputWindow* GetOutputWindow();
+		ZEDSHErrorsWindow* GetErrorsWindow();
+
 		ZEDSHMainWindow(QWidget* Parent = NULL);
 };

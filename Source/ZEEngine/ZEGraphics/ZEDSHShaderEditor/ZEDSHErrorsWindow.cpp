@@ -37,19 +37,38 @@
 
 #include "ZEFile/ZEFileInfo.h"
 #include "ZERegEx/ZERegEx.h"
+#include "ZEDSHMainWindow.h"
+#include "ZEDSHEditorWidget.h"
 
 #include <QtGui/QTableWidget>
 #include <QtGui/QHeaderView>
+#include <QtGui/QTextCursor>
+#include <QtGui/QTextBlock>
+
+void ZEDSHErrorsWindow::tblErrors_onItemDoubleClicked(QTableWidgetItem * Item)
+{
+	int Row = Item->row();
+	bool Result = false;
+	int LineNumber = tblErrors->item(Row, 2)->text().toInt(&Result);
+	if (!Result)
+		return;
+
+	QTextCursor TextCursor(MainWindow->GetEditor()->document()->findBlockByLineNumber(LineNumber - 1));
+	TextCursor.select(QTextCursor::LineUnderCursor);
+	MainWindow->GetEditor()->setTextCursor(TextCursor);
+
+	MainWindow->GetEditor()->setFocus(Qt::OtherFocusReason);
+}
 
 QTableWidget* ZEDSHErrorsWindow::GetErrorTable()
 {
-	return ErrorsTable;
+	return tblErrors;
 }
 
 void ZEDSHErrorsWindow::AddError(ZEDSHErrorType Type, QString Code, QString Description, QString Line, QString File)
 {
-	int NewIndex = ErrorsTable->rowCount();
-	ErrorsTable->insertRow(NewIndex);
+	int NewIndex = tblErrors->rowCount();
+	tblErrors->insertRow(NewIndex);
 	const char* TypeString;
 	switch(Type)
 	{
@@ -67,16 +86,26 @@ void ZEDSHErrorsWindow::AddError(ZEDSHErrorType Type, QString Code, QString Desc
 			break;
 	};
 
-	ErrorsTable->setItem(NewIndex, 0, new QTableWidgetItem(TypeString));
-	ErrorsTable->setItem(NewIndex, 1, new QTableWidgetItem(QString("%1 %2: %3").arg(TypeString).arg(Code).arg(Description)));
-	ErrorsTable->setItem(NewIndex, 2, new QTableWidgetItem(Line));
-	ErrorsTable->setItem(NewIndex, 3, new QTableWidgetItem(File));
+	QTableWidgetItem* Item0 = new QTableWidgetItem(TypeString);
+	Item0->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	tblErrors->setItem(NewIndex, 0, Item0);
 
+	QTableWidgetItem* Item1 = new QTableWidgetItem(QString("%1 %2: %3").arg(TypeString).arg(Code).arg(Description));
+	Item1->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	tblErrors->setItem(NewIndex, 1, Item1);
+
+	QTableWidgetItem* Item2 = new QTableWidgetItem(Line);
+	Item2->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	tblErrors->setItem(NewIndex, 2, Item2);
+
+	QTableWidgetItem* Item3 = new QTableWidgetItem(File);
+	Item3->setFlags(Qt::ItemIsSelectable | Qt::ItemIsEnabled);
+	tblErrors->setItem(NewIndex, 3, Item3);
 }
 
 void ZEDSHErrorsWindow::Clear()
 {
-	ErrorsTable->setRowCount(0);
+	tblErrors->setRowCount(0);
 }
 
 
@@ -105,33 +134,40 @@ void ZEDSHErrorsWindow::ParseCompilerOutput(const QString& Errors)
 
 ZEDSHErrorsWindow::ZEDSHErrorsWindow(QWidget* Parent) : QDockWidget(Parent)
 {
+	MainWindow = (ZEDSHMainWindow*)Parent;
+
 	this->setWindowTitle("Errors");
 
-	ErrorsTable = new QTableWidget(this);
-	ErrorsTable->setFont(QFont("Consolas", 10));
-	ErrorsTable->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
+	tblErrors = new QTableWidget(this);
+	tblErrors->setFont(QFont("Consolas", 10));
+	tblErrors->horizontalHeader()->setResizeMode(QHeaderView::Interactive);
 	
-	ErrorsTable->setColumnCount(4);
+	tblErrors->setColumnCount(4);
 
 	QTableWidgetItem* Column0 = new QTableWidgetItem("");
-	ErrorsTable->setHorizontalHeaderItem(0, Column0);
+	tblErrors->setHorizontalHeaderItem(0, Column0);
 	
 	QTableWidgetItem* Column1 = new QTableWidgetItem("Description");
-	ErrorsTable->setHorizontalHeaderItem(1, Column1);
+	tblErrors->setHorizontalHeaderItem(1, Column1);
 	
 	QTableWidgetItem* Column2 = new QTableWidgetItem("Line");
-	ErrorsTable->setHorizontalHeaderItem(2, Column2);
+	tblErrors->setHorizontalHeaderItem(2, Column2);
 
 	QTableWidgetItem* Column3 = new QTableWidgetItem("File");
-	ErrorsTable->setHorizontalHeaderItem(3, Column3);
-	setWidget(ErrorsTable);
+	tblErrors->setHorizontalHeaderItem(3, Column3);
+	setWidget(tblErrors);
 
-	QHeaderView* HeaderView = new QHeaderView(Qt::Horizontal, ErrorsTable);
-	ErrorsTable->setHorizontalHeader(HeaderView);
+	QHeaderView* HeaderView = new QHeaderView(Qt::Horizontal, tblErrors);
+	tblErrors->setHorizontalHeader(HeaderView);
 	HeaderView->setResizeMode(0, QHeaderView::Interactive);
 	HeaderView->setResizeMode(1, QHeaderView::Interactive);
 	HeaderView->setResizeMode(2, QHeaderView::Interactive);
 	HeaderView->setResizeMode(3, QHeaderView::Interactive);
 
+	tblErrors->setSelectionMode(QAbstractItemView::SingleSelection);
+	tblErrors->setSelectionBehavior(QAbstractItemView::SelectRows);
+	
 	CompilerOutputRegex.Compile("\\s*(.*)\\s*\\(\\s*(.*)\\s*,\\s*(.*)\\s*\\-\\s*(.*)\\s*\\)\\s*:\\s*(.*)\\s+(.*)\\s*:\\s*(.*)\\s*");
+
+	connect(tblErrors, SIGNAL(itemDoubleClicked(QTableWidgetItem*)), this, SLOT(tblErrors_onItemDoubleClicked(QTableWidgetItem*)));
 }

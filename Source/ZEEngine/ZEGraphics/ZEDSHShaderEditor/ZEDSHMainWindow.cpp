@@ -148,8 +148,8 @@ void ZEDSHMainWindow::SaveDocument(const QString& FileName)
 	}
 
 	QString Text = Editor->toPlainText();
-	QByteArray TextUTF8 = Text.toUtf8();
-	if (File.Write(TextUTF8.begin(), TextUTF8.count(), 1) != 1)
+	QByteArray TextUTF8 = Text.toLocal8Bit();
+	if (TextUTF8.count() != 0 && File.Write(TextUTF8.begin(), TextUTF8.count(), 1) != 1)
 	{
 		QMessageBox::critical(this, "Zinek Shader Editor", "Cannot write to file.", QMessageBox::Ok);
 		return;
@@ -340,11 +340,12 @@ void ZEDSHMainWindow::actReplace_OnTrigger()
 
 void ZEDSHMainWindow::actCompile_OnTrigger()
 {
+	OutputWindow->Clear();
 	OutputWindow->Print(QString("Compiling... (%1)\n").arg(QDateTime::currentDateTime().toString()));
 	OutputWindow->Print("\n");
 
 	ZEGRShaderCompileOptions Options;
-	Options.EntryPoint = "";
+	Options.EntryPoint = "ZERNSimpleMaterial_VSMain_ForwardStage";
 	Options.FileName = FileName.toLocal8Bit().begin();
 	Options.Model = ZEGR_SM_5_0;
 	Options.Type = ZEGR_ST_VERTEX;
@@ -364,7 +365,8 @@ void ZEDSHMainWindow::actCompile_OnTrigger()
 	ErrorsWindow->ParseCompilerOutput(QString(Output));
 
 	OutputWindow->Print(Output.ToCString());
-	OutputWindow->Print(QString("Compile %1.").arg(Result ? "suceeded" : "failed"));
+	OutputWindow->Print("\n");
+	OutputWindow->Print(QString("Compile %1.\n").arg(Result ? "suceeded" : "failed"));
 }
 
 void ZEDSHMainWindow::actPreference_OnTrigger()
@@ -400,6 +402,21 @@ void ZEDSHMainWindow::actReflection_OnTrigger()
 void ZEDSHMainWindow::actAbout_OnTrigger()
 {
 
+}
+
+ZEDSHEditorWidget* ZEDSHMainWindow::GetEditor()
+{
+	return Editor;
+}
+
+ZEDSHOutputWindow* ZEDSHMainWindow::GetOutputWindow()
+{
+	return OutputWindow;
+}
+
+ZEDSHErrorsWindow* ZEDSHMainWindow::GetErrorsWindow()
+{
+	return ErrorsWindow;
 }
 
 ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)

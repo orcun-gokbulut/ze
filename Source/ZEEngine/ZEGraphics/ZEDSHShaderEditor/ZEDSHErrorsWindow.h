@@ -39,7 +39,9 @@
 
 #include "ZERegEx/ZERegEx.h"
 
+class ZEDSHMainWindow;
 class QTableWidget;
+class QTableWidgetItem;
 
 enum ZEDSHErrorType
 {
@@ -50,9 +52,14 @@ enum ZEDSHErrorType
 
 class ZEDSHErrorsWindow : public QDockWidget
 {
+	Q_OBJECT
 	private:
-		QTableWidget*		ErrorsTable;
+		QTableWidget*		tblErrors;
 		ZERegEx				CompilerOutputRegex;
+		ZEDSHMainWindow*	MainWindow;
+
+	private slots:
+		void				tblErrors_onItemDoubleClicked(QTableWidgetItem * Item);
 
 	public:
 		QTableWidget*		GetErrorTable();
