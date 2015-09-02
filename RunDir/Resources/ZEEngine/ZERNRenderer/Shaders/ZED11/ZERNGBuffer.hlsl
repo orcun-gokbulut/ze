@@ -33,7 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_GBUFFER_H__
+#define __ZERN_GBUFFER_H__
+
+#include "ZERNView.hlsl"
 
 
 // SHADER RESOURCES
@@ -57,20 +60,19 @@ struct ZERNGBuffer
 // DEPTH
 ///////////////////////////////////////////////////////////////////////////////
 
-float ZERNGBuffer_GetDepth(float4 ScreenPos)
+float ZERNGBuffer_GetDepth(int2 ScreenPos)
 {
-	return ZERNGBuffer_DepthStencil.Load(ScreenPos);
+	return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos.xy, 0)).x;
 }
 
 
 // POSITION
 ///////////////////////////////////////////////////////////////////////////////
 
-float3 ZERNGBuffer_GetViewPosition(float2 ClipPos, float4 ScreenPos)
+float3 ZERNGBuffer_GetViewPosition(float2 ClipPos, int2 ScreenPos)
 {
-	int3 ScreenCoord = int3(ScreenPos.xy, 0 );
-    float ClipDepth = g_Depth.Load(ScreenCoord);
- 	return float3(ClipPos, -1.0f) / (ClipDepth * ZERNView_Constants.InvProjectionTransform.z + ZERNView_Constants.InvProjectionTransform.w);
+/*    float ClipDepth = ZERNGBuffer_GetDepth(ScreenPos);
+ 	return float3(ClipPos, -1.0f) / (ClipDepth * ZERNView_Constants.InvProjectionTransform[0][0] + ZERNView_Constants.InvProjectionTransform[0][0]);*/
 }
 
 
@@ -82,9 +84,9 @@ void ZERNGBuffer_SetShadingModel(inout ZERNGBuffer GBuffer, uint Model)
 	GBuffer.Buffer0.w = Model;
 }
 
-uint ZERNGBuffer_GetShadingModel(float4 ScreenPos)
+uint ZERNGBuffer_GetShadingModel(int2 ScreenPos)
 {
-	return ZERNGBuffer.Buffer0.Load(ScreenPos).w;
+	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).w;
 }
 
 
@@ -97,11 +99,11 @@ void ZERNGBuffer_SetViewNormal(inout ZERNGBuffer GBuffer, float3 Normal /*Must b
 	GBuffer.Buffer3.a = sign(Normal.z) + 1.0f;
 }
 
-float3 ZERNGBuffer_GetViewNormal(float4 ScreenPos)
+float3 ZERNGBuffer_GetViewNormal(int2 ScreenPos)
 {
 	float3 Normal;
-	Normal.xy =	ZERNGBuffer_Buffer0.Sample(ZERNGBuffer_PointSampler, ScreenPos).xy * 2.0f - 1.0f;
-	Normal.z = (ZERNGBuffer_Buffer3.Sample(ZERNGBuffer_PointSampler, ScreenPos).a - 1.0f) * sqrt(1.0f - dot(Normal.xy, Normal.xy);
+	Normal.xy =	ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xy * 2.0f - 1.0f;
+	Normal.z = (ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w - 1.0f) * sqrt(1.0f - dot(Normal.xy, Normal.xy));
 	return Normal;
 }
 
@@ -114,9 +116,9 @@ void ZERNGBuffer_SetSubsurfaceScattering(inout ZERNGBuffer GBuffer, float Subsur
 	GBuffer.Buffer0.z = SubsurfaceScattering;
 }
 
-float ZERNGBuffer_GetSubsurfaceScattering(float4 ScreenPos)
+float ZERNGBuffer_GetSubsurfaceScattering(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer0.Sample(ZERNGBuffer_PointSampler, ScreenPos).z;
+	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).z;
 }
 
 
@@ -128,9 +130,9 @@ void ZERNGBuffer_SetDiffuseColor(inout ZERNGBuffer GBuffer, float3 DiffuseColor)
 	GBuffer.Buffer1.xyz = DiffuseColor;
 }
 
-float3 ZERNGBuffer_GetDiffuseColor(float4 ScreenPos)
+float3 ZERNGBuffer_GetDiffuseColor(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer1.Sample(ZERNGBuffer_PointSampler, ScreenPos).xyz;
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -142,9 +144,9 @@ void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float3 SpecularColo
 	GBuffer.Buffer2.xyz = SpecularColor;
 }
 
-float3 ZERNGBuffer_GetSpecularColor(float4 ScreenPos)
+float3 ZERNGBuffer_GetSpecularColor(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer2.Sample(ZERNGBuffer_PointSampler, ScreenPos).xyz;
+	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -156,7 +158,9 @@ void ZERNGBuffer_SetSpecularPower(inout ZERNGBuffer GBuffer, float SpecularPower
 	GBuffer.Buffer2.w = SpecularPower;
 }
 
-float ZERNGBuffer_SetSpecularPower(float4 ScreenPos)
+float ZERNGBuffer_SetSpecularPower(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer2.Sample(ZERNGBuffer_PointSampler, ScreenPos).w;
+	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).w;
 }
+
+#endif

@@ -38,11 +38,13 @@
 #include <QtGui/QDockWidget>
 
 class QPlainTextEdit;
+class ZEDSHMainWindow;
 
 class ZEDSHOutputWindow : public QDockWidget
 {
 	private:
 		QPlainTextEdit*		Output;
+		ZEDSHMainWindow*	MainWindow;
 
 	public:
 		QPlainTextEdit*		GetOutput();

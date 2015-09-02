@@ -33,7 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_SHADER_SLOTS_H__
+#define __ZERN_SHADER_SLOTS_H__
 
 
 // DEFINITIONS
@@ -47,3 +48,5 @@
 #define ZERN_SHADER_CONSTANT_DRAW_TRANSFORM		cb5
 #define ZERN_SHADER_CONSTANT_DRAW_SKIN			cb6
 #define ZERN_SHADER_CONSTANT_DRAW_OTHER			cb7
+
+#endif

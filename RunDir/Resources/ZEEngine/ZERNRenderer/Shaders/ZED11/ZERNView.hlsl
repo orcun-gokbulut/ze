@@ -33,9 +33,10 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_VIEW_H__
+#define __ZERN_VIEW_H__
 
-#include "ZERNSahaderSlots.hlsl"
+#include "ZERNShaderSlots.hlsl"
 
 
 // SHADER RESOURCES
@@ -43,32 +44,34 @@
 
 cbuffer ZERNView_Constants : register(ZERN_SHADER_CONSTANT_CAMERA)
 {
-	float4x4				ViewTransform;
-	float4x4				ProjectionTransform;		
-	float4x4				InvViewTransform;
-	float4x4				InvProjTransform;			
-	float4x4				ViewProjectionTransform;
-	float4x4				InvViewProjectionTransform;
-			
-	float					Width;
-	float					Height;
-	float					VerticalFOV;
-	float					HorizontalFOV;
+	float4x4				ZERNView_ViewTransform;
+	float4x4				ZERNView_ProjectionTransform;		
+	float4x4				ZERNView_InvViewTransform;
+	float4x4				ZERNView_InvProjTransform;			
+	float4x4				ZERNView_ViewProjectionTransform;
+	float4x4				ZERNView_InvViewProjectionTransform;
 
-	float					AspectRatio;
-	float					NearZ;
-	float					FarZ;
-	float					Reserved0;
+	float					ZERNView_Width;
+	float					ZERNView_Height;
+	float					ZERNView_VerticalFOV;
+	float					ZERNView_HorizontalFOV;
 
-	float4					Position;
-	float4					RotationQuaternion;
-	float4					RotationEuler;
+	float					ZERNView_AspectRatio;
+	float					ZERNView_NearZ;
+	float					ZERNView_FarZ;
+	float					ZERNView_Reserved0;
 
-	float4					UpVector;
-	float4					RightVector;
-	float4					FrontVector;
+	float4					ZERNView_Position;
+	float4					ZERNView_RotationQuaternion;
+	float4					ZERNView_RotationEuler;
 
-	float					ShadowDistance;
-	float					ShadowFadeDistance;
-	float					Reserved1[2];
+	float4					ZERNView_UpVector;
+	float4					ZERNView_RightVector;
+	float4					ZERNView_FrontVector;
+
+	float					ZERNView_ShadowDistance;
+	float					ZERNView_ShadowFadeDistance;
+	float					ZERNView_Reserved1[2];
 };
+
+#endif

@@ -33,11 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_SIMPLE_MATERIAL_H__
+#define __ZERN_SIMPLE_MATERIAL_H__
 
 #include "ZERNGBuffer.hlsl"
-#include "ZERNShaderSlots.hlsl"
 #include "ZERNView.hlsl"
+#include "ZERNShaderSlots.hlsl"
 
 
 // SHADER RESOURCES
@@ -45,19 +46,19 @@
 
 cbuffer ZERNSimpleMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
-	float4 Color;
-	bool EnableTexture
-	bool EnableVertexColor
-	float Reserved0[2];
+	float4 	ZERNSimpleMaterial_Color;
+	bool 	ZERNSimpleMaterial_EnableTexture;
+	bool 	ZERNSimpleMaterial_EnableVertexColor;
+	float 	ZERNSimpleMaterial_Reserved0[2];
 };
 
 cbuffer ZERNSimpleMaterial_InstanceConstants : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	float4x4 WorldTransform;
+	float4x4 ZERNSimpleMaterial_WorldTransform;
 };
 
-sampler2D<float4> ZERNSimpleMaterial_TextureSampler	: register(s0);
-Texture2D<float4> ZERNSimpleMaterial_Texture		: register(t0);
+sampler ZERNSimpleMaterial_Sampler				: register(s0);
+Texture2D<float4> ZERNSimpleMaterial_Texture	: register(t0);
 
 
 // INPUT OUTPUTS
@@ -79,8 +80,8 @@ struct ZERNSimpleMaterial_VSOutput
 
 struct ZERNSimpleMaterial_PSInput
 {
-	float2 Texcoord				: TEXCOORD0;
-	float4 Color			    : TEXCOORD1;
+	float2 Texcoord			: TEXCOORD0;
+	float4 Color		    : TEXCOORD1;
 };
 
 
@@ -91,14 +92,14 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 {
 	ZERNSimpleMaterial_VSOutput Output;
 
-	float4x4 WorldViewProjectionTransform = mul(ZERNView.ViewProjectionTransform, MaterialConstants.WorldTransform);
+	float4x4 WorldViewProjectionTransform = mul(ZERNView_ViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
 	Output.Position = mul(WorldViewProjectionTransform, Input.Position);
 	Output.Texcoord = Input.Textcoord;
 	
-	Output.Color = MaterialColor;
+	Output.Color = ZERNSimpleMaterial_Color;
 	
-	if (MaterialConstants.EnableVertexColor)
-		MaterialConstants.Color *= Input.Color;
+	if (ZERNSimpleMaterial_EnableVertexColor)
+		Output.Color *= Input.Color;
 	
 	return Output;
 }
@@ -111,8 +112,10 @@ float4 ZERNSimpleMaterial_PSMain_ForwardStage(ZERNSimpleMaterial_PSInput Input) 
 {
 	float4 Color = Input.Color;
 
-	if (EnableTexture)
-		Color *= Texture.Sample(Sampler, Input.Texcoord);	
+	if (ZERNSimpleMaterial_EnableTexture)
+		Color *= ZERNSimpleMaterial_Texture.Sample(ZERNSimpleMaterial_Sampler, Input.Texcoord);	
 		
 	return Color;
 }
+
+#endif
