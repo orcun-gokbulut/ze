@@ -70,11 +70,14 @@ bool ZEMLReaderNode::Load()
 	if (!Format->ReadGoToNode(File, Node))
 		return false;
 
+	NodeCount = 0;
 	Elements.SetCount(Node.Count);
 	for (ZESize I = 0; I < Node.Count; I++)
 	{
 		if (!Format->ReadElement(File, Elements[I]))
 			return false;
+		if (Elements[I].ElementType == ZEML_ET_NODE)
+			NodeCount++;
 	}
 
 	return true;
@@ -125,7 +128,7 @@ ZEMLReaderNode ZEMLReaderNode::GetNode(const char* Name, ZESize Index)
 
 ZEMLReaderNode ZEMLReaderNode::GetNode(ZESize Index)
 {
-	if (Index >= NodeCount)
+	if (Index >= Elements.GetCount())
 		return ZEMLReaderNode();
 
 	if (Elements[Index].ElementType != ZEML_ET_NODE)
@@ -402,6 +405,7 @@ bool ZEMLReaderNode::ReadDataItems(const char* Name, void* Buffer, ZESize Elemen
 
 ZEMLReaderNode::ZEMLReaderNode()
 {
+	NodeCount = 0;
 	File = NULL;
 	Format = NULL;
 }
