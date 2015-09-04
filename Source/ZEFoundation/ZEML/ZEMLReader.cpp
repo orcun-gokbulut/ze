@@ -374,33 +374,15 @@ bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize,
 	if (Property->ElementType != ZEML_ET_DATA)
 		return true;
 
-	ZESize EffectiveSize = Property->Size - Offset;
-	if (EffectiveSize > BufferSize)
-		EffectiveSize = BufferSize;
-
+	if (Offset + BufferSize > Property->Size)
+		return false;
 
 	return Format->ReadData(File, *Property, Buffer, Offset, BufferSize);
 }
 
 bool ZEMLReaderNode::ReadDataItems(const char* Name, void* Buffer, ZESize ElementSize, ZESize ElementCount, ZESize Offset)
 {
-	const ZEMLFormatElement* Property = FindElement(Name, ZEML_ET_DATA);
-	if (Property == NULL)
-		return true;
-
-	if (Property->ElementType != ZEML_ET_DATA)
-		return true;
-	
-	if (Offset + ElementCount * ElementSize > Property->Size)
-		return false;
-
-	File->Seek(Property->Offset + Offset, ZE_SF_BEGINING);
-
-	ZESize Result = File->Read(Buffer, ElementCount * ElementSize, 1);
-	if (Result != 1)
-		return false;
-
-	return true;
+	return ReadData(Name, Buffer, ElementCount * ElementSize, Offset);
 }
 
 ZEMLReaderNode::ZEMLReaderNode()
