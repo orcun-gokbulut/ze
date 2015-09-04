@@ -544,11 +544,26 @@ bool ZEMLFormatXMLV1::ReadData(ZEFile* File, const ZEMLFormatElement& Element, v
 {
 	TiXmlElement* DataElement = (TiXmlElement*)Element.Offset;
 	
-	ZEPointer<ZEBYTE> Data = new ZEBYTE[Element.Size];
-	if (!ZEBase64::Decode(Data, DataElement->GetText(), ZEBase64::EncodeSize(Element.Size)))
-		return false;
+	if (Offset == 0 && Size == Element.Size)
+	{
+		if (!ZEBase64::Decode(Buffer, DataElement->GetText(), ZEBase64::EncodeSize(Element.Size)))
+		{
+			FormatError("Base64 decoding has failed.");
+			return false;
+		}
+	}
+	else
+	{
+		ZEPointer<ZEBYTE> Data = new ZEBYTE[Element.Size];
+		if (!ZEBase64::Decode(Data, DataElement->GetText(), ZEBase64::EncodeSize(Element.Size)))
+		{
+			FormatError("Base64 decoding has failed.");
+			return false;
+		}
+		memcpy(Buffer, (ZEBYTE*)Data + Offset, Size);
+	}
 
-	return false;
+	return true;
 }
 
 bool ZEMLFormatXMLV1::WriteHeader(ZEFile* File)
