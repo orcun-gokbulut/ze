@@ -469,7 +469,7 @@ class ZEArray
 		}
 
 		template<typename ZESearchValueType, ZEInt CompareFunction(const ZEType&, ZESearchValueType)>
-		ZESSize BinarySearch(ZESearchValueType TargetValue) 
+		ZESSize BinarySearch(ZESearchValueType TargetValue) const
 		{
 			ZESSize Low = 0;
 			ZESSize High = Count;

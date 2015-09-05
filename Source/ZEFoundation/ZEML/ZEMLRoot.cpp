@@ -36,18 +36,7 @@
 #include "ZEMLRoot.h"
 #include "ZEMLReader.h"
 #include "ZEMLWriter.h"
-
-ZESize ZEMLRoot::GetSize()
-{
-
-	ZESize Size = 
-		4 +	// Identifier
-		2 + // Version
-		8 + // StartOffset
-		RootNode->GetSize();
-
-	return Size;
-}
+#include "ZEMLFormat.h"
 
 void ZEMLRoot::SetRootNode(ZEMLNode* Node)
 {
@@ -69,6 +58,18 @@ bool ZEMLRoot::GetDeferredDataLoadingMode()
 	return DeferredMode;
 }
 
+
+void ZEMLRoot::SetFormat(ZEMLFormatDescription* Format)
+{
+	this->Format = Format;
+}
+
+ZEMLFormatDescription* ZEMLRoot::GetFormat()
+{
+	return Format;
+}
+
+
 bool ZEMLRoot::Read(const char* FileName)
 {
 	if (RootNode == NULL)
@@ -82,12 +83,10 @@ bool ZEMLRoot::Read(const char* FileName)
 	if (!Reader.Open(FileName))
 		return false;
 
-	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
-	bool Result = RootNode->Read(&ReaderNode);
-	
-	zeDebugCheck(!_CrtCheckMemory(), "Heap problem");
+	Format = Reader.GetFormat()->GetDescription();
 
-	return Result;
+	ZEMLReaderNode ReaderNode = Reader.GetRootNode();
+	return RootNode->Read(&ReaderNode);
 }
 
 bool ZEMLRoot::Read(ZEFile* File)
@@ -115,11 +114,17 @@ bool ZEMLRoot::Write(const char* FileName)
 	}
 
 	ZEMLWriter Writer;
+	Writer.SetFormat(Format->CreateInstance());
 	if (!Writer.Open(FileName))
 		return false;
 
-	ZEMLWriterNode WriterNode = Writer.WriteRootNode(RootNode->GetName());
-	RootNode->Write(&WriterNode);
+	ZEMLWriterNode WriterNode;
+	if (!Writer.OpenRootNode(RootNode->GetName(), WriterNode))
+		return false;
+
+	if (!RootNode->Write(&WriterNode))
+		return false;
+
 	WriterNode.CloseNode();
 	Writer.Close();
 
@@ -135,11 +140,17 @@ bool ZEMLRoot::Write(ZEFile* File)
 	}
 
 	ZEMLWriter Writer;
+	Writer.SetFormat(Format->CreateInstance());
 	if (!Writer.Open(File))
 		return false;
 
-	ZEMLWriterNode WriterNode = Writer.WriteRootNode(RootNode->GetName());
-	RootNode->Write(&WriterNode);
+	ZEMLWriterNode WriterNode;
+	if (!Writer.OpenRootNode(RootNode->GetName(), WriterNode))
+		 return false;
+
+	if (!RootNode->Write(&WriterNode))
+		return false;
+
 	WriterNode.CloseNode();
 	Writer.Close();
 
@@ -148,6 +159,7 @@ bool ZEMLRoot::Write(ZEFile* File)
 
 ZEMLRoot::ZEMLRoot()
 {
+	Format = NULL;
 	RootNode = NULL;
 	DeferredMode = false;
 }

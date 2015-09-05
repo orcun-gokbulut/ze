@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLProperty.h
+ Zinek Engine - ZEMLFormat.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,50 +34,68 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_PROPERTY_H__
-#define __ZEML_PROPERTY_H__
 
-#include "ZEMLElement.h"
-#include "ZEDS/ZEValue.h"
+#include "ZEMLCommon.h"
+#include "ZEDS\ZEFlags.h"
+#include "ZEDS\ZEValue.h"
 
-class ZEMLProperty : public ZEMLElement
+class ZEFile;
+class ZEMLFormat;
+
+typedef ZEUInt ZEMFormatSupport;
+#define ZEML_FS_NONE		0
+#define ZEML_FS_READ		1
+#define ZEML_FS_WRITE		2
+
+enum ZEMLFormatType
 {
-	friend class ZEMLNode;
-	private:
-		ZEValue						Value;
-
-	public:
-		virtual ZEMLElementType		GetType();
-
-		virtual ZEMLElement*		Clone();
-
-		ZEMLValueType				GetValueType();
-
-		bool						SetValue(const ZEValue& Value);
-		const ZEValue&				GetValue() const;
-
-		void						SetFloat(float Value);
-		void						SetDouble(double Value);
-		void						SetInt8(ZEInt8 Value);
-		void						SetInt16(ZEInt16 Value);
-		void						SetInt32(ZEInt32 Value);
-		void						SetInt64(ZEInt64 Value);
-		void						SetUInt8(ZEUInt8 Value);
-		void						SetUInt16(ZEUInt16 Value);
-		void						SetUInt32(ZEUInt32 Value);
-		void						SetUInt64(ZEUInt64 Value);
-		void						SetBool(bool Value);
-		void						SetString(const char* Value);
-		void						SetQuaternion(const ZEQuaternion& Value);
-		void						SetVector2(const ZEVector2& Value);
-		void						SetVector3(const ZEVector3& Value);
-		void						SetVector4(const ZEVector4& Value);
-		void						SetMatrix3x3(const ZEMatrix3x3& Value);
-		void						SetMatrix4x4(const ZEMatrix4x4& Value);
-
-									ZEMLProperty();
-									ZEMLProperty(const char* Name);
-									ZEMLProperty(const char* Name, const ZEValue& Value);
+	ZEML_FT_BINARY,
+	ZEML_FT_XML,
+	ZEML_FT_XML_SIMPLIFIED
 };
 
-#endif
+struct ZEMLFormatElement
+{
+	ZEMLElementType			ElementType;
+	ZEString				Name;
+	ZEUInt32				NameHash;
+	ZEUInt64				Offset;
+	ZEUInt64				Count;
+	ZESize					Size;
+	ZEMLValueType			ValueType;
+	ZEValue					Value;
+
+							ZEMLFormatElement();
+};
+
+struct ZEMLFormatDescription
+{
+	public:
+		virtual const char*				GetName() const = 0;
+		virtual ZEUInt					GetMinorVersion() const = 0;
+		virtual ZEUInt					GetMajorVersion() const = 0;
+		virtual ZEMLFormatType			GetType() const = 0;
+		virtual ZEMFormatSupport		GetSupport() const = 0;
+		virtual bool					Determine(ZEFile* File) = 0;
+		virtual ZEMLFormat*				CreateInstance() = 0;
+};
+
+class ZEMLFormat
+{
+	public:
+		virtual ZEMLFormatDescription*	GetDescription() const = 0;
+
+		virtual bool					ReadHeader(ZEFile* File) = 0;
+		virtual bool					ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Node) = 0;
+		virtual bool					ReadElement(ZEFile* File, ZEMLFormatElement& Element) = 0;
+		virtual bool					ReadData(ZEFile* File, const ZEMLFormatElement& Element, void* Buffer, ZESize Offset, ZESize Size) = 0;
+
+		virtual bool					WriteHeader(ZEFile* File) = 0;
+		virtual bool					WriteHeaderClose(ZEFile* File) = 0;
+		virtual bool					WriteElement(ZEFile* File, ZEMLFormatElement& Element) = 0;
+		virtual bool					WriteElementClose(ZEFile* File, ZEMLFormatElement& Element) = 0;
+
+
+		static ZESize					GetFormatCount();
+		static ZEMLFormatDescription*const* GetFormats();
+};

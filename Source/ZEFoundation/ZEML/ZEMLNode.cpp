@@ -42,38 +42,36 @@
 bool ZEMLNode::Read(ZEMLReaderNode* Reader)
 {
 	Name = Reader->GetName();
-	const ZESmartArray<ZEMLReaderProperty>& Properties = Reader->GetProperties();
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	const ZEArray<ZEMLFormatElement>& FormatElements = Reader->GetElements();
+	for (ZESize I = 0; I < FormatElements.GetCount(); I++)
 	{
-		if (Properties[I].ElementType == ZEML_ET_DATA)
+		if (FormatElements[I].ElementType == ZEML_ET_NODE)
 		{
-			ZEPointer<ZEMLData> NewData = new ZEMLData(Properties[I].Name);
-			NewData->Allocate(Properties[I].DataSize);
-			if (!Reader->ReadData(Properties[I].Name, const_cast<void*>(NewData->GetData()), NewData->GetSize()))
-				continue;
+			ZEPointer<ZEMLNode> NewNode = new ZEMLNode();
+			ZEMLReaderNode NewReaderNode = Reader->GetNode(I);
 
-			AddElement(NewData.Transfer());
+			if (!NewNode->Read(&NewReaderNode))
+				return false;
+
+			AddElement(NewNode.Transfer());
 		}
-		else
+		else if (FormatElements[I].ElementType == ZEML_ET_PROPERTY)
 		{
-			ZEPointer<ZEMLProperty> NewProperty = new ZEMLProperty(Properties[I].Name);
+			ZEPointer<ZEMLProperty> NewProperty = new ZEMLProperty(FormatElements[I].Name);
 			if (NewProperty != NULL)
 			{
-				NewProperty->SetValue(Properties[I].Value);
+				NewProperty->SetValue(FormatElements[I].Value);
 				AddElement(NewProperty.Transfer());
 			}
 		}
-	}
-
-	const ZESmartArray<ZEMLReaderSubNode>& Nodes = Reader->GetSubNodes();
-	for (ZESize I = 0; I < Nodes.GetCount(); I++)
-	{
-		ZEPointer<ZEMLNode> NewNode = new ZEMLNode();
-		ZEMLReaderNode NewReaderNode = Reader->GetSubNode(I);
-		if (!NewNode->Read(&NewReaderNode))
-			return false;
-
-		AddElement(NewNode.Transfer());
+		else if (FormatElements[I].ElementType == ZEML_ET_DATA)
+		{
+			ZEPointer<ZEMLData> NewData = new ZEMLData(FormatElements[I].Name);
+			NewData->Allocate(FormatElements[I].Size);
+			if (!Reader->ReadData(FormatElements[I].Name, const_cast<void*>(NewData->GetData()), NewData->GetDataSize()))
+				continue;
+			AddElement(NewData.Transfer());
+		}
 	}
 
 	return true;
@@ -86,7 +84,9 @@ bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
 		if (Elements[I]->GetType() == ZEML_ET_NODE)
 		{
 			ZEMLNode* Node = static_cast<ZEMLNode*>(Elements[I]);
-			ZEMLWriterNode NewWriterNode = WriterNode->OpenSubNode(Node->GetName());
+			ZEMLWriterNode NewWriterNode;
+			if (!WriterNode->OpenNode(Node->GetName(), NewWriterNode))
+				return false;
 			if (!Node->Write(&NewWriterNode))
 				return false;
 			NewWriterNode.CloseNode();
@@ -115,23 +115,6 @@ bool ZEMLNode::Write(ZEMLWriterNode* WriterNode)
 ZEMLElementType ZEMLNode::GetType()
 {
 	return ZEML_ET_NODE;
-}
-
-ZESize ZEMLNode::GetSize()
-{
-	ZESize Size = 1 +			// Identifier
-		1 + Name.GetLength() +	// Name
-		8 +						// Size
-		8;						// Element Count
-
-	ZEList<ZEMLElement>::Iterator Iterator = Elements.GetIterator();
-	while(!Iterator.IsEnd())
-	{
-		Size += Iterator->GetSize();
-		Iterator++;
-	}
-
-	return Size;
 }
 
 const ZEList<ZEMLElement>& ZEMLNode::GetElements()

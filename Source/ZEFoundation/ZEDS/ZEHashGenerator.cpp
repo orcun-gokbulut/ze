@@ -35,18 +35,21 @@
 
 #include "ZEHashGenerator.h"
 
-ZESize ZEHashGenerator::Hash(void* Value, ZESize Size)
+ZEUInt32 ZEHashGenerator::Hash(void* Value, ZESize Size)
 {
-	ZEUInt Hash = 0;
+	ZEUInt32 Hash = 0;
 	for (ZESize I = 0; I < Size; I++)
 		Hash = (ZEUInt)((ZEUInt8*)Value)[I] + (Hash << 6) + (Hash << 16) - Hash;
 
 	return Hash;
 }
 
-ZESize ZEHashGenerator::Hash(const char* String)
+ZEUInt32 ZEHashGenerator::Hash(const char* String)
 {
-	ZEUInt Hash = 0;
+	if (String == NULL)
+		return 0;
+
+	ZEUInt32 Hash = 0;
 	while(*String != '\0')
 	{
 		Hash = (ZEUInt)*String + (Hash << 6) + (Hash << 16) - Hash;
@@ -56,7 +59,7 @@ ZESize ZEHashGenerator::Hash(const char* String)
 	return Hash;
 }
 
-ZESize ZEHashGenerator::Hash(const ZEString& String)
+ZEUInt32 ZEHashGenerator::Hash(const ZEString& String)
 {
 	return Hash(String.ToCString());
 }
