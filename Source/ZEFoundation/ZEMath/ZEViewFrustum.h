@@ -85,9 +85,6 @@ class ZEViewFrustum : public ZEViewVolume
 		float								SinRatio;
 		float								TanRatio;
 
-
-
-
 		float								AspectRatio;
 		float								FOV;
 		float								NearZ;	

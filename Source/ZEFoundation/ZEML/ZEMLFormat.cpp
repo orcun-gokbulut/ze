@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMLFormat.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,46 +30,39 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEMLFormat.h"
 
-ze_add_source(ZEMLCommon.h					Sources Headers)
-ze_add_source(ZEMLCommon.cpp				Sources)
-ze_add_source(ZEMLRoot.h					Sources Headers)
-ze_add_source(ZEMLRoot.cpp					Sources)
-ze_add_source(ZEMLElement.h 				Sources Headers)
-ze_add_source(ZEMLElement.cpp 				Sources)
-ze_add_source(ZEMLElementTests.cpp 			Tests)
-ze_add_source(ZEMLFormat.cpp				Sources)
-ze_add_source(ZEMLFormat.h					Sources Headers)
-ze_add_source(ZEMLFormatBinaryV0.cpp		Sources)
-ze_add_source(ZEMLFormatBinaryV0.h			Sources)
-ze_add_source(ZEMLFormatBinaryV1.cpp		Sources)
-ze_add_source(ZEMLFormatBinaryV1.h			Sources)
-ze_add_source(ZEMLFormatXMLV1.cpp			Sources)
-ze_add_source(ZEMLFormatXMLV1.h				Sources)
-ze_add_source(ZEMLNode.h 					Sources Headers)
-ze_add_source(ZEMLNode.cpp 					Sources)
-ze_add_source(ZEMLNodeTests.cpp 			Tests)
-ze_add_source(ZEMLProperty.h 				Sources Headers)
-ze_add_source(ZEMLProperty.cpp 				Sources)
-ze_add_source(ZEMLPropertyTests.cpp 		Tests)
-ze_add_source(ZEMLData.h 					Sources Headers)
-ze_add_source(ZEMLData.cpp 					Sources)
-ze_add_source(ZEMLDataTests.cpp 			Tests)
-ze_add_source(ZEMLReader.h					Sources Headers)
-ze_add_source(ZEMLReader.cpp				Sources)
-ze_add_source(ZEMLWriter.h 					Sources Headers)
-ze_add_source(ZEMLWriter.cpp 				Sources)
+#include "ZEMLFormatBinaryV0.h"
+#include "ZEMLFormatBinaryV1.h"
+#include "ZEMLFormatXMLV1.h"
 
-ze_add_library(TARGET ZEML 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath libTinyXML)
+static ZEMLFormatDescription* Formats[] = 
+{
+	ZEMLFormatBinaryV1::Description(),
+	ZEMLFormatBinaryV0::Description(),
+	ZEMLFormatXMLV1::Description()
+};
 
-ze_add_test(TARGET ZEMLTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZEML)
+ZEMLFormatElement::ZEMLFormatElement()
+{
+	ElementType = ZEML_ET_NONE;
+	NameHash = 0;
+	Offset = 0;
+	Count = 0;
+	Size = 0;
+	ValueType = ZEML_VT_UNDEFINED;
+}
+
+ZESize ZEMLFormat::GetFormatCount()
+{
+	return sizeof(Formats) / sizeof(ZEMLFormatDescription);
+}
+
+ZEMLFormatDescription*const*  ZEMLFormat::GetFormats()
+{
+
+	return Formats;
+}

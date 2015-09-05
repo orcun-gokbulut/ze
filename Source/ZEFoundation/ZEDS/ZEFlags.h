@@ -89,6 +89,16 @@ class ZEFlagsBase
 
 		}
 
+		inline void RaiseAll()
+		{
+			Value = 0xFFFFFFFF;
+		}
+
+		inline void UnraiseAll()
+		{
+			Value = 0;
+		}
+
 		inline bool GetFlags(ZEInt Flags) const
 		{
 			return (Value & Flags) == Flags;

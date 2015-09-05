@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMLEditorFormatSelector.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,46 +30,57 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#include "ZEMLEditorFormatSelector.h"
+#include "ui_ZEMLEditorFormatSelector.h"
+#include "ZEML\ZEMLFormat.h"
 
-ze_add_source(ZEMLCommon.h					Sources Headers)
-ze_add_source(ZEMLCommon.cpp				Sources)
-ze_add_source(ZEMLRoot.h					Sources Headers)
-ze_add_source(ZEMLRoot.cpp					Sources)
-ze_add_source(ZEMLElement.h 				Sources Headers)
-ze_add_source(ZEMLElement.cpp 				Sources)
-ze_add_source(ZEMLElementTests.cpp 			Tests)
-ze_add_source(ZEMLFormat.cpp				Sources)
-ze_add_source(ZEMLFormat.h					Sources Headers)
-ze_add_source(ZEMLFormatBinaryV0.cpp		Sources)
-ze_add_source(ZEMLFormatBinaryV0.h			Sources)
-ze_add_source(ZEMLFormatBinaryV1.cpp		Sources)
-ze_add_source(ZEMLFormatBinaryV1.h			Sources)
-ze_add_source(ZEMLFormatXMLV1.cpp			Sources)
-ze_add_source(ZEMLFormatXMLV1.h				Sources)
-ze_add_source(ZEMLNode.h 					Sources Headers)
-ze_add_source(ZEMLNode.cpp 					Sources)
-ze_add_source(ZEMLNodeTests.cpp 			Tests)
-ze_add_source(ZEMLProperty.h 				Sources Headers)
-ze_add_source(ZEMLProperty.cpp 				Sources)
-ze_add_source(ZEMLPropertyTests.cpp 		Tests)
-ze_add_source(ZEMLData.h 					Sources Headers)
-ze_add_source(ZEMLData.cpp 					Sources)
-ze_add_source(ZEMLDataTests.cpp 			Tests)
-ze_add_source(ZEMLReader.h					Sources Headers)
-ze_add_source(ZEMLReader.cpp				Sources)
-ze_add_source(ZEMLWriter.h 					Sources Headers)
-ze_add_source(ZEMLWriter.cpp 				Sources)
+void ZEMLEditorFormatSelector::cmbFormats_onCurrentIndexChanged(int Index)
+{
+	Format = (ZEMLFormatDescription*)Form->cmbFormats->itemData(Index, Qt::UserRole).toULongLong();
+}
 
-ze_add_library(TARGET ZEML 
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS ZEMath libTinyXML)
+void ZEMLEditorFormatSelector::SetFormat(ZEMLFormatDescription* Description)
+{
+	Format = Description;
+	for (int I = 0; I < Form->cmbFormats->count(); I++)
+	{
+		ZEMLFormatDescription* Current = (ZEMLFormatDescription*)Form->cmbFormats->itemData(I, Qt::UserRole).toULongLong();
+		if (Current == Description)
+		{
+			Form->cmbFormats->blockSignals(true);
+			Form->cmbFormats->setCurrentIndex(I);
+			Form->cmbFormats->blockSignals(false);
+			break;
+		}
+	}
+}
 
-ze_add_test(TARGET ZEMLTests
-	SOURCES ${Tests}
-	EXTRA_SOURCES
-	TEST_TARGET ZEML)
+ZEMLFormatDescription* ZEMLEditorFormatSelector::GetFormat()
+{
+	return Format;
+}
+
+ZEMLEditorFormatSelector::ZEMLEditorFormatSelector(QWidget* Parent) : QDialog(Parent)
+{
+	Form = new Ui_ZEMLEditorFormatSelector();
+	Form->setupUi(this);
+
+	ZEMLFormatDescription*const* Formats = ZEMLFormat::GetFormats();
+	for (ZESize I = 0; I < ZEMLFormat::GetFormatCount(); I++)
+	{
+		if (Formats[I]->GetSupport() & ZEML_FS_WRITE)
+			Form->cmbFormats->addItem(Formats[I]->GetName(), QVariant((ZEUInt64)Formats[I]));
+	}
+
+	Form->cmbFormats->setCurrentIndex(0);
+
+	connect(Form->cmbFormats, SIGNAL(currentIndexChanged(int)), this, SLOT(cmbFormats_onCurrentIndexChanged(int)));
+}
+
+ZEMLEditorFormatSelector::~ZEMLEditorFormatSelector()
+{
+
+}

@@ -43,9 +43,9 @@
 class ZEHashGenerator
 {
 	public:
-		static ZESize		Hash(void* Value, ZESize Size);
-		static ZESize		Hash(const char* String);
-		static ZESize		Hash(const ZEString& String);
+		static ZEUInt32		Hash(void* Value, ZESize Size);
+		static ZEUInt32		Hash(const char* String);
+		static ZEUInt32		Hash(const ZEString& String);
 };
 
 #endif

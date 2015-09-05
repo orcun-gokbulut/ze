@@ -47,10 +47,10 @@ inline ZEReturnType& ZEReference::ConvertRef() const
 	if (ValueType.Type != Type)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 
-	if (ValueType.TypeQualifier == ZE_TQ_REFERENCE)
-		return *(ZEReturnType*)Value.Pointer;
-	else
+	if (ValueType.TypeQualifier != ZE_TQ_REFERENCE)
 		zeCriticalError("Variant is const reference. Can not convert const reference to reference.");
+
+	return *(ZEReturnType*)Value.Pointer;		
 }
 
 template <typename ZEReturnType, ZETypeType Type>
@@ -658,7 +658,6 @@ ZEObject*& ZEReference::GetObjectPtrRef() const
 
 ZEObject*const& ZEReference::GetObjectPtrConstRef() const
 {
-
 	if (ValueType.Type != ZE_TT_OBJECT_PTR)
 		zeCriticalError("Variant type mismatch. Can not convert reference type to different reference type.");
 

@@ -57,7 +57,6 @@ class ZEMLNode : public ZEMLElement
 
 	public:
 		virtual ZEMLElementType		GetType();
-		virtual ZESize				GetSize();
 
 		virtual ZEMLElement*		Clone();
 

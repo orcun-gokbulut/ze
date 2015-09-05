@@ -41,16 +41,6 @@ ZEMLElementType ZEMLProperty::GetType()
 	return ZEML_ET_PROPERTY;
 }
 
-ZESize ZEMLProperty::GetSize()
-{
-	ZESize Size = 1 +				// Identifier
-		1 + GetName().GetLength() +	// Name
-		8 +							// Size;
-		Value.SizeOf();				// Data
-
-	return Size;
-}
-
 ZEMLElement* ZEMLProperty::Clone()
 {
 	ZEMLProperty* CloneProperty = new ZEMLProperty(GetName());

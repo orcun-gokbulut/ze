@@ -249,10 +249,10 @@ void ZEMatrix3x3::CreateRotation2D(ZEMatrix3x3& Matrix, float Angle)
 	float SinAngle = ZEAngle::Sin(Angle);
 
 	Matrix.M11 = CosAngle;
-	Matrix.M12 = SinAngle;
+	Matrix.M12 = -SinAngle;
 	Matrix.M13 = 0.0f;
 
-	Matrix.M21 = -SinAngle;
+	Matrix.M21 = SinAngle;
 	Matrix.M22 = CosAngle;
 	Matrix.M23 = 0.0f;
 
@@ -283,10 +283,10 @@ void ZEMatrix3x3::CreateOrientation2D(ZEMatrix3x3& Matrix, const ZEVector2& Tran
 	float Sin = ZEAngle::Sin(Angle);
 
 	Matrix.M11 = Cos * Scale.x;
-	Matrix.M12 = Sin * Scale.y;
+	Matrix.M12 = -Sin * Scale.y;
 	Matrix.M13 = Translation.x;
 
-	Matrix.M21 = -Sin * Scale.x;
+	Matrix.M21 = Sin * Scale.x;
 	Matrix.M22 = Cos * Scale.y;
 	Matrix.M23 = Translation.y;
 

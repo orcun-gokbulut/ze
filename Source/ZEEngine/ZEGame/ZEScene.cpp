@@ -415,11 +415,11 @@ bool ZEScene::Load(const ZEString& FileName)
 
 	ClearEntities();
 
-	ZEMLReaderNode EntitiesNode = SceneNode.GetSubNode("Entities");
-	ZESize EntityCount = EntitiesNode.GetSubNodeCount("Entity");
+	ZEMLReaderNode EntitiesNode = SceneNode.GetNode("Entities");
+	ZESize EntityCount = EntitiesNode.GetNodeCount("Entity");
 	for (ZESize I = 0; I < EntityCount; I++)
 	{
-		ZEMLReaderNode EntityNode = EntitiesNode.GetSubNode("Entity", I);
+		ZEMLReaderNode EntityNode = EntitiesNode.GetNode("Entity", I);
 		if (!EntityNode.IsValid())
 		{
 			zeError("Cannot load scene. Corrupted scene file. File Name: \"%s\".", FileName.ToCString());

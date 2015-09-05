@@ -39,184 +39,25 @@
 #include "ZEMLProperty.h"
 #include "ZEMLData.h"
 #include "ZEEndian.h"
-
-bool ZEMLWriterNode::WriteElementHeader(const char* Name, ZEMLElementType Type)
-{
-	if (Name == NULL)
-		return false;
-
-	if (Type == ZEML_ET_NONE)
-		return false;
-
-	if (SubNodeIsOpen)
-	{
-		zeError("You cannot write a element while a child node is still open.");
-		return false;
-	}
-
-	char Header[2];
-	Header[0] = 'Z';
-	Header[1] = Type;
-	File->Write(Header, 2 * sizeof(char), 1);
-
-	ZESize Size = strlen(Name) + 1;
-	if (Size > 254)
-	{
-		zeError("Cannot write ZEML property. Item name is too long (Max Size: 254). Item Name: \"%s\". File Name: \"%s\"", Name, File->GetPath());
-		return false;
-	}
-
-	ZEUInt8 NameSize = (ZEUInt8)Size;
-	File->Write(&NameSize, sizeof(ZEUInt8), 1);
-	File->Write(Name, Size, 1);
-
-	return true;
-}
+#include "ZEMLFormatBinaryV1.h"
 
 bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 {
 	ZEMLValueType ValueType = ZEMLUtils::ConvertValueType(Value.GetType());
 
-	if (!WriteElementHeader(Name, ZEML_ET_PROPERTY))
-		return false;
-
-	File->Write(&ValueType, sizeof(char), 1);
-
-	switch (ValueType)
+	ZEMLFormatElement Element;
+	Element.Name = Name;
+	Element.ElementType = ZEML_ET_PROPERTY;
+	Element.ValueType = ZEMLUtils::ConvertValueType(Value.GetType());
+	Element.Value = Value;
+	
+	if (!Format->WriteElement(File, Element))
 	{
-		default:
-		case ZEML_VT_UNDEFINED:
-			return false;
-
-		case ZEML_VT_FLOAT:
-		{
-			float ValueTemp = Value.GetFloat();
-			File->Write(&ValueTemp, sizeof(float), 1);
-			break;
-		}
-
-		case ZEML_VT_DOUBLE:
-		{
-			double ValueTemp = Value.GetDouble();
-			File->Write(&ValueTemp, sizeof(double), 1);
-			break;
-		}
-
-		case ZEML_VT_INT8:
-		{
-			ZEInt8 ValueTemp = Value.GetInt8();
-			File->Write(&ValueTemp, sizeof(ZEInt8), 1);
-			break;
-		}
-
-		case ZEML_VT_INT16:
-		{
-			ZEInt16 ValueTemp = ZEEndian::Little(Value.GetInt16());
-			File->Write(&ValueTemp, sizeof(ZEInt16), 1);
-			break;
-		}
-
-		case ZEML_VT_INT32:
-		{
-			ZEInt32 ValueTemp = ZEEndian::Little(Value.GetInt32());
-			File->Write(&ValueTemp, sizeof(ZEInt32), 1);
-			break;
-		}
-
-		case ZEML_VT_INT64:
-		{
-			ZEInt64 ValueTemp = ZEEndian::Little(Value.GetInt64());
-			File->Write(&ValueTemp, sizeof(ZEInt64), 1);
-			break;
-		}
-
-		case ZEML_VT_UINT8:
-		{
-			ZEUInt8 ValueTemp = Value.GetUInt8();
-			File->Write(&ValueTemp, sizeof(ZEUInt8), 1);
-			break;
-		}
-
-		case ZEML_VT_UINT16:
-		{
-			ZEUInt16 ValueTemp = ZEEndian::Little(Value.GetUInt16());
-			File->Write(&ValueTemp, sizeof(ZEUInt16), 1);
-			break;
-		}
-
-		case ZEML_VT_UINT32:
-		{
-			ZEUInt32 ValueTemp = ZEEndian::Little(Value.GetUInt32());
-			File->Write(&ValueTemp, sizeof(ZEUInt32), 1);
-			break;
-		}
-
-		case ZEML_VT_UINT64:
-		{
-			ZEUInt64 ValueTemp = ZEEndian::Little(Value.GetUInt64());
-			File->Write(&ValueTemp, sizeof(ZEUInt64), 1);
-			break;
-		}
-
-		case ZEML_VT_BOOLEAN:
-		{
-			bool ValueTemp = Value.GetBoolean();
-			File->Write(&ValueTemp, sizeof(bool), 1);
-			break;
-		}
-
-		case ZEML_VT_STRING:
-		{
-			ZEUInt32 StringSize = ZEEndian::Little((ZEUInt32)Value.GetString().GetSize());
-			File->Write(&StringSize, sizeof(ZEUInt32), 1);
-			File->Write(Value.GetString().ToCString(), Value.GetString().GetSize() * sizeof(char), 1);
-			break;
-		}
-
-		case ZEML_VT_QUATERNION:
-		{
-			ZEQuaternion ValueTemp = Value.GetQuaternion();
-			File->Write(&ValueTemp, sizeof(ZEQuaternion), 1);
-			break;
-		}
-
-		case ZEML_VT_VECTOR2:
-		{
-			ZEVector2 ValueTemp = Value.GetVector2();
-			File->Write(&ValueTemp, sizeof(ZEVector2), 1);
-			break;
-		}
-
-		case ZEML_VT_VECTOR3:
-		{
-			ZEVector3 ValueTemp = Value.GetVector3();
-			File->Write(&ValueTemp, sizeof(ZEVector3), 1);
-			break;
-		}
-
-		case ZEML_VT_VECTOR4:
-		{
-			ZEVector4 ValueTemp = Value.GetVector4();
-			File->Write(&ValueTemp, sizeof(ZEVector4), 1);
-			break;
-		}
-
-		case ZEML_VT_MATRIX3X3:
-		{
-			ZEMatrix3x3 ValueTemp = Value.GetMatrix3x3();
-			File->Write(&ValueTemp, sizeof(ZEMatrix3x3), 1);
-			break;
-		}
-
-		case ZEML_VT_MATRIX4X4:
-		{
-			ZEMatrix4x4 ValueTemp = Value.GetMatrix4x4();
-			File->Write(&ValueTemp, sizeof(ZEMatrix4x4), 1);
-			break;
-		}
+		zeError("Cannot write ZEML data. File Name: \"%s\", Element Name: \"%s\".", File->GetPath().ToCString(), Name);
+		return false;
 	}
-
-	SubElementCount++;
+	
+	Node.Count++;
 
 	return true;
 }
@@ -313,76 +154,70 @@ bool ZEMLWriterNode::WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value)
 
 bool ZEMLWriterNode::WriteData(const char* Name, const void* Data, ZEUInt64 Size)
 {
-	if (!WriteElementHeader(Name, ZEML_ET_DATA))
-		return false;
+	ZEMLFormatElement Element;
+	Element.Name = Name;
+	Element.ElementType = ZEML_ET_DATA;
+	Element.Size = Size;
+	Element.Value = (ZEUInt64)Data;
 
-	ZEUInt64 TempSize = ZEEndian::Little(Size);
-	File->Write(&TempSize, sizeof(ZEUInt64), 1);
+	Node.Count++;
 
-	if (File->Write(Data, Size, 1) == 0)
+	if (!Format->WriteElement(File, Element))
 	{
-		zeError("Cannot write ZEML file. Cannot write data property. Property Name: \"%s\". File Name: \"%s\".", Name, File->GetPath().ToCString());
+		zeError("Cannot write ZEML data. File Name: \"%s\", Element Name: \"%s\".", File->GetPath().ToCString(), Name);
 		return false;
 	}
-
-	SubElementCount++;
 
 	return true;
 }
 
-ZEMLWriterNode ZEMLWriterNode::OpenSubNode(const char* Name)
+bool ZEMLWriterNode::OpenNode(const char* Name, ZEMLWriterNode& NewNode)
 {
-	if (!WriteElementHeader(Name, ZEML_ET_NODE))
-		return ZEMLWriterNode();
-
-	ZEMLWriterNode NewNode;
-	NewNode.Name = Name;
-	NewNode.File = File;
+	NewNode = ZEMLWriterNode();
 	NewNode.Parent = this;
+	NewNode.File = File;
+	NewNode.Format = Format;
+	NewNode.Node.Name = Name;
+	NewNode.Node.ElementType = ZEML_ET_NODE;
 
-	ZEUInt64 NodeSize = 0;
-	File->Write(&NodeSize, sizeof(ZEUInt64), 1);
+	if (!Format->WriteElement(File, NewNode.Node))
+	{
+		zeError("Cannot open ZEML node. File Name: \"%s\", Element Name: \"%s\".", File->GetPath().ToCString(), Name);
+		return false;
+	}
 
-	ZEUInt64 NodeSubItemCount = 0;
-	File->Write(&NodeSubItemCount, sizeof(ZEUInt64), 1);
-
-	NewNode.NodeDataOffset = File->Tell();
-
-	SubElementCount++;
-
+	Node.Count++;
 	SubNodeIsOpen = true;
 
-	return NewNode;
+	return true;
 }
 
-void ZEMLWriterNode::CloseNode()
+bool ZEMLWriterNode::CloseNode()
 {
 	if (SubNodeIsOpen)
 	{
 		zeError("You cannot close the node while a child node is still open.");
-		return;
+		return false;
 	}
 
-	ZEUInt64 CurrentFilePos = File->Tell();
-	File->Seek(NodeDataOffset - 2 * sizeof(ZEUInt64), ZE_SF_BEGINING);
-
-	ZEUInt64 NodeSize = ZEEndian::Little(CurrentFilePos - NodeDataOffset);
-	File->Write(&NodeSize, sizeof(ZEUInt64), 1);
-
-	ZEUInt64 NodeSubItemCount = ZEEndian::Little(SubElementCount);
-	File->Write(&NodeSubItemCount, sizeof(ZEUInt64), 1);
-
-	File->Seek(NodeDataOffset + NodeSize, ZE_SF_BEGINING);
+	if (!Format->WriteElementClose(File, Node))
+	{
+		zeError("Cannot close ZEML node. File Name: \"%s\", Element Name: \"%s\".", File->GetPath().ToCString(), Node.Name.ToCString());
+		return false;
+	}
 
 	if (Parent != NULL)
 		Parent->SubNodeIsOpen = false;
+
+	return true;
 }
 
 ZEMLWriterNode::ZEMLWriterNode()
 {
 	File = NULL;
-	Name = "";
-	SubElementCount = 0;
+	Format = NULL;
+	Parent = NULL;
+	Node.ElementType = ZEML_ET_NODE;
 	SubNodeIsOpen = false;
 }
 
@@ -396,28 +231,31 @@ ZEMLWriterNode::~ZEMLWriterNode()
 /*							RootNode	                                */
 /************************************************************************/
 
-ZEMLWriterNode ZEMLWriter::WriteRootNode(const char* Name)
+void ZEMLWriter::SetFormat(ZEMLFormat* Format)
 {
-	ZEMLWriterNode Node;
-	Node.File = File;
-	Node.NodeDataOffset = File->Tell();
-
-	ZEMLWriterNode RootNode	= Node.OpenSubNode(Name);
-	return RootNode;
+	this->Format = Format;
 }
 
-void ZEMLWriter::WriteHeader()
+ZEMLFormat* ZEMLWriter::GetFormat()
 {
-	const char Identifer[6] =
-	{
-		'Z', 'E', 'M', 'L',
-		1, // Major Version
-		0 // Minor Version
-	};
-	File->Write(Identifer, 6, 1);
+	return Format;
+}
 
-	ZEUInt64 StartOffset = ZEEndian::Little(File->Tell() + sizeof(ZEUInt64));
-	File->Write(&StartOffset, sizeof(ZEUInt64), 1);
+bool ZEMLWriter::OpenRootNode(const char* Name, ZEMLWriterNode& RootNode)
+{
+	RootNode.File = File;
+	RootNode.Format = Format;
+	RootNode.Node.Name = Name;
+	RootNode.Node.ElementType = ZEML_ET_NODE;
+	RootNode.Parent = NULL;
+
+	if (!Format->WriteElement(File, RootNode.Node))
+	{
+		zeError("Cannot open ZEML file root node. File Name: \"%s\"", File->GetPath().ToCString());
+		return false;
+	}
+
+	return true;
 }
 
 bool ZEMLWriter::Open(const char* FileName)
@@ -432,7 +270,17 @@ bool ZEMLWriter::Open(const char* FileName)
 
 	File = &OwnedFile;
 
-	WriteHeader();
+	if (Format == NULL)
+		Format = ZEMLFormat::GetFormats()[0]->CreateInstance();
+
+	if ((Format->GetDescription()->GetSupport() & ZEML_FS_WRITE) == 0)
+	{
+		zeError("Setted format does not support writing. Format Name: \"%s\" File Name: \"%s\"", Format->GetDescription()->GetName(), File->GetPath().ToCString());
+		return false;
+	}
+
+	this->File = File;
+	Format->WriteHeader(File);
 
 	return true;
 }
@@ -453,25 +301,33 @@ bool ZEMLWriter::Open(ZEFile* File)
 		return false;
 	}
 
+	if (Format == NULL)
+		Format = new ZEMLFormatBinaryV1();
+
+	if ((Format->GetDescription()->GetSupport() & ZEML_FS_WRITE) == 0)
+	{
+		zeError("Selected ZEML format does not support writing. Format Name: \"%s\" File Name: \"%s\"", Format->GetDescription()->GetName(), File->GetPath().ToCString());
+		return false;
+	}
 
 	this->File = File;
-	File->Seek(0, ZE_SF_BEGINING);
-
-	WriteHeader();
+	Format->WriteHeader(File);
 
 	return true;
 }
 
 void ZEMLWriter::Close()
 {
+	if (File != NULL)
+		Format->WriteHeaderClose(File);
 	OwnedFile.Close();
+	File = NULL;
 }
 
 ZEMLWriter::ZEMLWriter()
 {
 	File = NULL;
 }
-
 
 ZEMLWriter::~ZEMLWriter()
 {

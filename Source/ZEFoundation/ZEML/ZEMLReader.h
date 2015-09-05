@@ -37,12 +37,16 @@
 #ifndef	__ZEML_READER_H__
 #define __ZEML_READER_H__
 
+#include "ZEMLElement.h"
+#include "ZEMLFormat.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEMLElement.h"
+#include "ZEPointer/ZEPointer.h"
+
 
 struct ZEMLReaderProperty
 {
@@ -70,32 +74,26 @@ class ZEMLReaderNode
 	friend class ZEMLReader;
 	private:
 		ZEFile*						File;
-		ZEUInt64					Offset;
-		ZEUInt64					Size;
-		ZEInt						VersionMajor;
-		ZEInt						VersionMinor;
-		ZEString					Name;
+		ZEMLFormat*					Format;
+		ZEMLFormatElement			Node;
 
-		ZESmartArray<ZEMLReaderSubNode>		SubNodes;
-		ZESmartArray<ZEMLReaderProperty>	Properties;
-		
-		const ZEMLReaderProperty*	FindProperty(const char* Name);
-		bool						LoadV0();
+		ZEArray<ZEMLFormatElement>	Elements;
+		ZESize						NodeCount;
+
+		const ZEMLFormatElement*	FindElement(const char* Name, ZEMLElementType Type, ZESize Index = 0);
 		bool						Load();
 		 
 	public:
-		const ZEString&				GetName();
+		const ZEString&						GetName();
+		const ZEArray<ZEMLFormatElement>&	GetElements();
 
-		const ZESmartArray<ZEMLReaderSubNode>&	GetSubNodes();
-		const ZESmartArray<ZEMLReaderProperty>& GetProperties();	
+		ZESize						GetNodeCount();
+		ZESize						GetNodeCount(const char* Name);
 
-		ZESize						GetSubNodeCount();
-		ZESize						GetSubNodeCount(const char* Name);
-		ZEMLReaderNode				GetSubNode(const char* Name, ZESize Index = 0);
-		ZEMLReaderNode				GetSubNode(ZESize Index);
+		ZEMLReaderNode				GetNode(const char* Name, ZESize Index = 0);
+		ZEMLReaderNode				GetNode(ZESize Index);
 
 		bool						IsValid();
-
 		bool						IsPropertyExists(const char* Name);
 		bool						IsSubNodeExists(const char* Name);
 
@@ -131,8 +129,7 @@ class ZEMLReader
 	private:
 		ZEFile						OwnedFile;
 		ZEFile*						File;
-		ZEUInt						VersionMajor;
-		ZEUInt						VersionMinor;
+		ZEPointer<ZEMLFormat>		Format;
 		ZEMLReaderNode				RootNode;
 
 		bool						Load();
@@ -140,8 +137,7 @@ class ZEMLReader
 	public:
 		ZEMLReaderNode				GetRootNode();
 
-		ZEUInt						GetVersionMajor();
-		ZEUInt						GetVersionMinor();
+		ZEMLFormat*					GetFormat();
 
 		bool						Open(const char* FileName);
 		bool						Open(ZEFile* File);
