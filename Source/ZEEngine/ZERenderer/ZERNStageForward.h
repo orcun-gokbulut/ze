@@ -49,7 +49,7 @@ class ZERNStageForward : public ZERNStage
 		static  const ZEGRRenderState&	GetRenderState();
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-
+		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward

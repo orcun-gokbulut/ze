@@ -46,6 +46,7 @@
 #include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZEGraphics\ZEGRContext.h"
 #include "ZEGraphics\ZEGRConstantBuffer.h"
+#include "ZEGraphics\ZEGROutput.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -304,6 +305,7 @@ void ZERNRenderer::Render()
 	Cull();
 	SortStageQueues();
 	RenderStages();
+	Output->Present();
 }
 
 ZERNRenderer::ZERNRenderer()

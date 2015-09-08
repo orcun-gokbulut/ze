@@ -242,7 +242,7 @@ ZEWindow::ZEWindow()
 	Fullscreen = false;
 	MonitorMode = NULL;
 
-	HideCursor = true;
+	HideCursor = false;
 	LockCursor = false;
 }
 

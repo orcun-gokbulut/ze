@@ -275,8 +275,13 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 	zeDebugCheck((Size % 16) != 0, "Size must be multiple of 16.");
 
 	ID3D11Buffer* NativeConstants = NULL;
-	UINT* FirstConstant = &StartOffset;
-	UINT* NumberOfConstant = &Size;
+	UINT* FirstConstant = NULL;
+	UINT* NumberOfConstant = NULL;
+	if (Size != 0)
+	{
+		FirstConstant = &StartOffset;
+		NumberOfConstant = &Size;
+	}
 
 	if (Buffer != NULL)
 		 NativeConstants = ((ZED11ConstantBuffer*)Buffer)->GetBuffer();
@@ -380,7 +385,7 @@ void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* 
 
 void ZED11Context::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler)
 {
-	ID3D11SamplerState* NativeSampler = GetModule()->GetStatePool()->GetState(Sampler)->GetInterface();
+	ID3D11SamplerState* NativeSampler = GetModule()->GetStatePool()->GetSamplerState(Sampler)->GetInterface();
 
 	switch(Shader)
 	{

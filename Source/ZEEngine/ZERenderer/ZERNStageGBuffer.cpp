@@ -82,15 +82,39 @@ const ZEString& ZERNStageGBuffer::GetName()
 	return Name;
 }
 
+const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
+{
+	static ZEGRRenderState RenderState;
+	bool Initialized = false;
+	if (!Initialized)
+	{
+		RenderState = ZERNStage::GetRenderState();
+
+		ZEGRDepthStencilState DepthStencilState;
+		DepthStencilState.SetDepthTestEnable(true);
+		DepthStencilState.SetDepthWriteEnable(true);
+		RenderState.SetDepthStencilState(DepthStencilState);
+
+		ZEGRBlendState BlendState;
+
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R10G10B10A2_UINT);
+		RenderState.SetRenderTargetFormat(1, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetRenderTargetFormat(2, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetRenderTargetFormat(3, ZEGR_TF_R8G8B8A8_UNORM);
+	}
+
+	return RenderState;
+}
+
 bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
 	ZEGROutput* Output = Renderer->GetOutput();
 	ZEGRRenderTarget* OutputRenderTarget = Output->GetRenderTarget();
 
 	UpdateRenderTargets(Renderer);
-	
+
 	Context->SetViewports(1, &Viewport);
-	Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
+	Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::One);
 	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(0), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(0), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer3->GetRenderTarget(0), ZEVector4::Zero);
@@ -104,27 +128,4 @@ bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	Context->SetDepthStencilBuffer(DepthStencilBuffer);
 
 	return true;
-}
-
-const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
-{
-	static ZEGRRenderState RenderState;
-	bool Initialized = false;
-	if (!Initialized)
-	{
-		RenderState = ZERNStage::GetRenderState();
-
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetZTestEnable(true);
-		DepthStencilState.SetZWriteEnable(true);
-		RenderState.SetDepthStencilState(DepthStencilState);
-
-		ZEGRBlendState BlendState;
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R10G10B10A2_UINT);
-		RenderState.SetRenderTargetFormat(1, ZEGR_TF_R8G8B8A8_UNORM);
-		RenderState.SetRenderTargetFormat(2, ZEGR_TF_R8G8B8A8_UNORM);
-		RenderState.SetRenderTargetFormat(3, ZEGR_TF_R8G8B8A8_UNORM);
-	}
-
-	return RenderState;
 }

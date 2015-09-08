@@ -94,16 +94,14 @@ const ZEGRRasterizerState& ZEGRRenderState::GetRasterizerState() const
 	return RasterizerState;
 }
 
-void ZEGRRenderState::SetBlendState(ZEUInt Index, const ZEGRBlendState& State)
+void ZEGRRenderState::SetBlendState(const ZEGRBlendState& State)
 {
-	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "Blend state index is too much.");
-	BlendStates[Index] = State;
+	BlendState = State;
 }
 
-const ZEGRBlendState& ZEGRRenderState::GetBlendState(ZEUInt Index) const
+const ZEGRBlendState& ZEGRRenderState::GetBlendState() const
 {
-	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZEGRBlendState(), "Blend state index is too much.");
-	return BlendStates[Index];
+	return BlendState;
 }
 
 void ZEGRRenderState::SetDepthStencilFormat(ZEGRDepthStencilFormat Format)
@@ -143,8 +141,7 @@ void ZEGRRenderState::SetToDefault()
 	DepthStencilFormat = ZEGR_DSF_NONE;
 	memset(RenderTargetFormats, ZEGR_TF_NONE, sizeof(ZEGRFormat) * ZEGR_MAX_RENDER_TARGET_SLOT);
 
-	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
-		BlendStates[I].SetToDefault();
+	BlendState.SetToDefault();
 	RasterizerState.SetToDefault();
 	DepthStencilState.SetToDefault();
 
@@ -170,12 +167,10 @@ ZEGRRenderState& ZEGRRenderState::operator=(const ZEGRRenderState& RenderState)
 	RasterizerState = RenderState.RasterizerState;
 	DepthStencilState = RenderState.DepthStencilState;
 	DepthStencilFormat = RenderState.DepthStencilFormat;
+	BlendState = RenderState.BlendState;
 
 	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
 		RenderTargetFormats[I] = RenderState.RenderTargetFormats[I];
-
-	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
-		BlendStates[I] = RenderState.BlendStates[I];
 
 	return *this;
 }

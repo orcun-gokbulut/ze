@@ -93,7 +93,7 @@ void ZEGRRasterizerState::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZERasterizerStateData));
 	StateData.FillMode = ZEGR_FM_SOLID;
-	StateData.CullDirection = ZEGR_CD_COUNTER_CLOCKWISE;
+	StateData.CullDirection = ZEGR_CD_NONE;
 	StateData.FrontIsCounterClockwise = false;
 }
 
