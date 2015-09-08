@@ -43,6 +43,10 @@ class Ui_ZEDSHMainWindow;
 class ZEDSHOutputWindow;
 class ZEDSHErrorsWindow;
 class ZEDSHEditorWidget;
+class ZEDSHCompileOptionsWindow;
+class QLabel;
+
+struct ZEGRShaderCompileOptions;
 
 class ZEDSHMainWindow : public QMainWindow
 {
@@ -52,13 +56,17 @@ class ZEDSHMainWindow : public QMainWindow
 		bool Engine;
 		bool Compiled;
 		bool HasChanges;
+		bool UploadedToEngine;
 		QString	FileName;
 
 		ZEPointer<Ui_ZEDSHMainWindow> Form;
 		ZEDSHEditorWidget* Editor;
 		ZEDSHOutputWindow* OutputWindow;
 		ZEDSHErrorsWindow* ErrorsWindow;
+		ZEDSHCompileOptionsWindow* CompileOptionsWindow;
+		QLabel* lblRowColNum;
 
+		ZEGRShaderCompileOptions* EngineCompileOptions;
 
 		void NewDocument();
 		void OpenDocument(const QString& FileName);
@@ -73,6 +81,7 @@ class ZEDSHMainWindow : public QMainWindow
 	private slots:
 		void Editor_OnTextChanged();
 		void Editor_OnSelectionChanged();
+		void Editor_OnCursorPositionChanged();
 
 		void actNew_OnTrigger();
 		void actOpen_OnTrigger();
@@ -99,12 +108,21 @@ class ZEDSHMainWindow : public QMainWindow
 		void actCompileParameters_OnTrigger();
 		void actReflection_OnTrigger();
 		void actAbout_OnTrigger();
+		void actUploadToEngine_OnTrigger();
 
+		void UploadToEngine();
+		void UpdateRowColNums();
+
+	protected:
+		void closeEvent(QCloseEvent* e);
 
 	public:
 		ZEDSHEditorWidget* GetEditor();
 		ZEDSHOutputWindow* GetOutputWindow();
 		ZEDSHErrorsWindow* GetErrorsWindow();
+		ZEDSHCompileOptionsWindow* GetCompileOptionsWindow();
+		
+		void Load(ZEGRShaderCompileOptions& Options);
 
 		ZEDSHMainWindow(QWidget* Parent = NULL);
 };

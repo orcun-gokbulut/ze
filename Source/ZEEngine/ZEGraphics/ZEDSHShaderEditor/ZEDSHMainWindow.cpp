@@ -35,12 +35,15 @@
 
 #include "ZEDSHMainWindow.h"
 
+#include "ui_ZEDSHCompileOptionsWindow.h"
 #include "ui_ZEDSHMainWindow.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEDSHErrorsWindow.h"
 #include "ZEDSHOutputWindow.h"
+#include "ZEDSHCompileOptionsWindow.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZEModules/ZEDirect3D11/ZED11ShaderCompiler.h"
+#include "ZEFile/ZEPathManager.h"
 
 #include <QtGui/QPlainTextEdit>
 #include <QtGui/QMessageBox>
@@ -128,6 +131,10 @@ void ZEDSHMainWindow::OpenDocument(const QString& FileName)
 	HasChanges = false;
 	this->FileName = FileName;
 
+	ZEGRShaderCompileOptions Options = CompileOptionsWindow->GetOptions();
+	Options.FileName = FileName.toLocal8Bit().begin();
+	CompileOptionsWindow->SetOptions(Options);
+
 	Form->actUndo->setEnabled(false);
 	Form->actRedo->setEnabled(false);
 
@@ -139,6 +146,10 @@ void ZEDSHMainWindow::SaveDocument(const QString& FileName)
 {
 	if (!Loaded)
 		return;
+
+	ZEPathManager* PathManager = ZEPathManager::GetInstance();
+	bool AccessControl = PathManager->GetAccessControl();
+	PathManager->SetAccessControl(false);
 
 	ZEFile File;
 	if (!File.Open(FileName.toLocal8Bit().begin(), ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
@@ -155,6 +166,14 @@ void ZEDSHMainWindow::SaveDocument(const QString& FileName)
 		return;
 	}
 	File.Close();
+
+	PathManager->SetAccessControl(AccessControl);
+
+	ZEGRShaderCompileOptions TempOptions = GetCompileOptionsWindow()->GetOptions();
+	TempOptions.SourceData = Editor->toPlainText().toLocal8Bit().begin();
+	GetCompileOptionsWindow()->SetOptions(TempOptions);
+
+	this->statusBar()->showMessage("Changes Saved!");
 
 	HasChanges = false;
 	this->FileName = FileName;
@@ -176,6 +195,7 @@ bool ZEDSHMainWindow::CloseDocument()
 	Loaded = false;
 	Compiled = false;
 	HasChanges = false;
+	UploadedToEngine = false;
 	this->FileName = QString();
 	Editor->setPlainText("");
 
@@ -223,19 +243,26 @@ void ZEDSHMainWindow::LoadRecentFiles()
 	}
 }
 
-
 void ZEDSHMainWindow::Editor_OnTextChanged()
 {
 	if (HasChanges)
 		return;
 
 	HasChanges = true;
+	Compiled = false;
+	UploadedToEngine = false;
+
 	UpdateUI();
 }
 
 void ZEDSHMainWindow::Editor_OnSelectionChanged()
 {
 	UpdateUI();
+}
+
+void ZEDSHMainWindow::Editor_OnCursorPositionChanged()
+{
+
 }
 
 void ZEDSHMainWindow::actNew_OnTrigger()
@@ -344,21 +371,18 @@ void ZEDSHMainWindow::actCompile_OnTrigger()
 	OutputWindow->Print(QString("Compiling... (%1)\n").arg(QDateTime::currentDateTime().toString()));
 	OutputWindow->Print("\n");
 
-	ZEGRShaderCompileOptions Options;
-	Options.EntryPoint = "ZERNSimpleMaterial_VSMain_ForwardStage";
-	Options.FileName = FileName.toLocal8Bit().begin();
-	Options.Model = ZEGR_SM_5_0;
-	Options.Type = ZEGR_ST_VERTEX;
+	ZEGRShaderCompileOptions Options = CompileOptionsWindow->GetOptions();
 	Options.SourceData = Editor->toPlainText().toLocal8Bit().begin();
+
 	ZEPointer<ZEDSHShaderCompiler> Compiler = new ZEDSHShaderCompiler();
-	
+
 	ZEArray<ZEBYTE> ShaderBinary;
 	ZEString Output;
 	bool BreakOnError = ZEError::GetInstance()->GetBreakOnErrorEnabled();
 	
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(false);
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(false);
-	bool Result = Compiler->Compile(ShaderBinary, Options, NULL, &Output);
+	bool Result = Compiler->Compile(ShaderBinary, Options, NULL, &Output, true);
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(BreakOnError);
 
@@ -404,6 +428,30 @@ void ZEDSHMainWindow::actAbout_OnTrigger()
 
 }
 
+void ZEDSHMainWindow::actUploadToEngine_OnTrigger()
+{
+	UploadToEngine();
+}
+
+void ZEDSHMainWindow::closeEvent(QCloseEvent* e)
+{
+	if(Engine && !UploadedToEngine)
+	{
+		int Result = QMessageBox::question(this, "Zinek Shader Editor", "Do you want to upload to engine " + FileName + " ?", QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+		if(Result == QMessageBox::Yes)
+		{
+			UploadToEngine();
+		}
+		else if(Result == QMessageBox::Cancel)
+		{
+			e->ignore();
+			return;
+		}
+	}
+
+	e->accept();
+}
+
 ZEDSHEditorWidget* ZEDSHMainWindow::GetEditor()
 {
 	return Editor;
@@ -419,6 +467,49 @@ ZEDSHErrorsWindow* ZEDSHMainWindow::GetErrorsWindow()
 	return ErrorsWindow;
 }
 
+ZEDSHCompileOptionsWindow* ZEDSHMainWindow::GetCompileOptionsWindow()
+{
+	return CompileOptionsWindow;
+}
+
+void ZEDSHMainWindow::Load(ZEGRShaderCompileOptions& Options)
+{
+	CompileOptionsWindow->SetOptions(Options);
+	Editor->setPlainText(Options.SourceData.ToCString());
+
+	Loaded = true;
+	Engine = true;
+	Compiled = false;
+	HasChanges = false;
+	UploadedToEngine = false;
+
+	FileName = Options.FileName.ToCString();
+
+	EngineCompileOptions = &Options;
+
+	actCompile_OnTrigger();
+
+	RegisterRecentFile(FileName);
+	UpdateUI();
+}
+
+void ZEDSHMainWindow::UploadToEngine()
+{
+	*EngineCompileOptions = GetCompileOptionsWindow()->GetOptions();
+
+	UploadedToEngine = true;
+
+	this->statusBar()->showMessage("Shader Uploaded To Engine!");
+}
+
+void ZEDSHMainWindow::UpdateRowColNums()
+{
+	ZEUInt16 RowNum = Editor->textCursor().blockNumber() + 1;
+	ZEUInt16 ColNum = Editor->textCursor().columnNumber() + 1;
+
+	lblRowColNum->setText(QString("Row:%1   Col:%2").arg(RowNum, 3).arg(ColNum, 3));
+}
+
 ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 {
 	Form = new Ui_ZEDSHMainWindow();
@@ -428,14 +519,22 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 
 	OutputWindow = new ZEDSHOutputWindow(this);
 	ErrorsWindow = new ZEDSHErrorsWindow(this);
+	CompileOptionsWindow = new ZEDSHCompileOptionsWindow(this);
 
 	addDockWidget(Qt::BottomDockWidgetArea, OutputWindow);
 	addDockWidget(Qt::BottomDockWidgetArea, ErrorsWindow);
+	addDockWidget(Qt::RightDockWidgetArea, CompileOptionsWindow);
+
+	lblRowColNum = new QLabel("Row:     Col:     ");
+	lblRowColNum->setFixedWidth(100);
+
+	statusBar()->addPermanentWidget(lblRowColNum);
 
 	Loaded = false;
 	Engine = false;
 	Compiled = false;
 	HasChanges = false;
+	UploadedToEngine = false;
 
 	UpdateUI();
 
@@ -466,8 +565,10 @@ ZEDSHMainWindow::ZEDSHMainWindow(QWidget* Parent) : QMainWindow(Parent)
 	connect(Form->actCompileParameters,	SIGNAL(triggered()), this, SLOT(actCompileParameters_OnTrigger()));
 	connect(Form->actReflection,		SIGNAL(triggered()), this, SLOT(actReflection_OnTrigger()));
 	connect(Form->actAbout,				SIGNAL(triggered()), this, SLOT(actAbout_OnTrigger()));
+	connect(Form->actUploadToEngine,	SIGNAL(triggered()), this, SLOT(actUploadToEngine_OnTrigger()));
 	connect(Editor,						SIGNAL(undoAvailable(bool)), Form->actUndo, SLOT(setEnabled(bool)));
 	connect(Editor,						SIGNAL(redoAvailable(bool)), Form->actRedo, SLOT(setEnabled(bool)));
+	connect(Editor,						SIGNAL(cursorPositionChanged()), this, SLOT(UpdateRowColNums()));
 
 	LoadRecentFiles();
 }

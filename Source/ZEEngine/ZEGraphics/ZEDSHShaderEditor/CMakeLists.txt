@@ -46,6 +46,9 @@ ze_add_source(ZEDSHSyntaxHighlighter.h		Sources QtMocs)
 ze_add_source(ZEDSHMainWindow.cpp			Sources)
 ze_add_source(ZEDSHMainWindow.h				Sources QtMocs)
 ze_add_source(ZEDSHMainWindow.ui			Sources QtUIs)
+ze_add_source(ZEDSHCompileOptionsWindow.cpp	Sources)
+ze_add_source(ZEDSHCompileOptionsWindow.h	Sources QtMocs)
+ze_add_source(ZEDSHCompileOptionsWindow.ui	Sources QtUIs)
 ze_add_source(ZEDSHMain.cpp					Sources)
 
 qt4_wrap_cpp(QtMocFiles ${QtMocs})
@@ -55,3 +58,15 @@ source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 ze_add_executable(TARGET ZEDSHShaderEditor
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
 	LIBS ZEFoundation ZEGraphics ZEDirect3D11 libQt libMSVCRv100)
+
+ze_add_source(ZEDSHShaderEditor.def			Sources)
+
+ze_add_library(TARGET ZEDSHShaderEditorDLL
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles}
+	LIBS ZEFoundation ZEGraphics ZEDirect3D11 libQt libMSVCRv100
+	DLL)
+
+set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/Rundir")
+set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_DEBUG "${CMAKE_SOURCE_DIR}/Rundir")
+set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELEASE "${CMAKE_SOURCE_DIR}/Rundir")
+set_property(TARGET ZEDSHShaderEditorDLL PROPERTY RUNTIME_OUTPUT_DIRECTORY_RELWITHDEBINFO "${CMAKE_SOURCE_DIR}/Rundir")

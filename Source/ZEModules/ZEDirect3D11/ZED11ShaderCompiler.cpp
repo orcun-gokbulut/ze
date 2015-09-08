@@ -34,11 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11ShaderCompiler.h"
-
 #include "ZED11ShaderCompilerIncludeInterface.h"
 #include "ZED11ShaderMetaCompiler.h"
-
-#include <d3dcompiler.h>
 
 #define ZE_SHADER_COMPILER_DEFAULT_PARAMETERS	(D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
 
@@ -50,7 +47,82 @@
 
 #define ZE_D3D11_DEVICE_REGISTER_SIZE			16	// Bytes
 
-bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output)
+typedef void (*ZEGRShaderEditorFunction)( ZEGRShaderCompileOptions& Options);
+
+bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen)
+{
+	ZEArray<D3D_SHADER_MACRO> Macros;
+	ZED11ShaderCompilerIncludeInterface IncludeInterface;
+	ZEString Profile;
+
+	if(!PrepareOptions(Options, Macros, IncludeInterface, Profile))
+		return false;
+
+	ID3DBlob* CompileOutput = NULL;
+	ID3DBlob* ByteCode = NULL;
+	ZEGRShaderCompileOptions ResultOptions = Options;
+
+	// Compile
+	HRESULT Result = D3DCompile(Options.SourceData, Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
+	if (FAILED(Result))
+	{	
+		if (!ShaderEditorOpen)
+		{
+			if(OpenShaderEditor(ResultOptions))
+			{
+				if(!PrepareOptions(ResultOptions, Macros, IncludeInterface, Profile))
+					return false;
+
+				Result = D3DCompile(ResultOptions.SourceData, ResultOptions.SourceData.GetSize(), ResultOptions.FileName, Macros.GetConstCArray(), &IncludeInterface, ResultOptions.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
+			}
+		}
+		// Compile
+		if (FAILED(Result))
+		{	
+			zeError("Can not compile shader.\r\nFile: \"%s\".\r\nCompile output: \r\n%s\r\n", ResultOptions.FileName.ToCString(), CompileOutput->GetBufferPointer());
+			if (Output != NULL)
+				*Output = (char*)CompileOutput->GetBufferPointer();
+			return false;
+		}
+	}
+
+	if (Output != NULL && CompileOutput != NULL)
+		*Output = (char*)CompileOutput->GetBufferPointer();
+	ZEGR_RELEASE(CompileOutput);
+
+	if (Meta != NULL)
+	{
+		ZED11ShaderMetaCompiler::Reflect(Meta, ByteCode);
+		Meta->CompileOptions = ResultOptions;
+	}
+
+	OutputByteCode.SetCount(ByteCode->GetBufferSize());
+	memcpy(OutputByteCode.GetCArray(), ByteCode->GetBufferPointer(), OutputByteCode.GetCount());
+	ZEGR_RELEASE(ByteCode);
+
+	return true;
+}
+
+bool ZED11ShaderCompiler::OpenShaderEditor(ZEGRShaderCompileOptions& Options)
+{
+	 HMODULE Module = GetModuleHandle("ZEDSHShaderEditorDll.dll");
+	 if (Module == NULL)
+	 {
+		 Module = LoadLibrary("ZEDSHShaderEditorDll.dll");
+		 if (Module == NULL)
+			 return false;
+	 }
+
+	 ZEGRShaderEditorFunction Function = (ZEGRShaderEditorFunction)GetProcAddress(Module, "ZEDSHEditor_RunEditor");
+	 if(Function == NULL)
+		 return false;
+
+	 Function(Options);
+	 
+	 return true;
+}
+
+bool ZED11ShaderCompiler::PrepareOptions(const ZEGRShaderCompileOptions& Options, ZEArray<D3D_SHADER_MACRO>& OutMacros, ZED11ShaderCompilerIncludeInterface& OutIncludeInterface, ZEString& OutProfile)
 {
 	zeDebugCheck(Options.SourceData.IsEmpty(), "No shader source available.");
 	zeDebugCheck(Options.EntryPoint.IsEmpty(), "Shader entry point is not available");
@@ -123,44 +195,10 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 	}
 	Macros[ComponentCount].Name = NULL;
 	Macros[ComponentCount].Definition = NULL;
-	
-	// Assign temp variables
-	ID3DBlob* CompileOutput = NULL;
-	ID3DBlob* ByteCode = NULL;
-	LPCSTR TempProfile = Profile.ToCString();
-	LPCSTR TempSource = Options.SourceData.ToCString();
-	SIZE_T TempSize = Options.SourceData.GetSize();
-	LPCSTR TempEntry = Options.EntryPoint.ToCString();
-	const D3D_SHADER_MACRO* TempMacros = Macros.GetConstCArray();
 
-	// Include
-
-	ZED11ShaderCompilerIncludeInterface IncludeInterface;
-	IncludeInterface.SetCompileOptions(&Options);
-
-	// Compile
-	HRESULT Result = D3DCompile(TempSource, TempSize, Options.FileName, TempMacros, &IncludeInterface, TempEntry, TempProfile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
-	if (FAILED(Result))
-	{
-		zeError("Can not compile shader.\r\nFile: \"%s\".\r\nCompile output: \r\n%s\r\n", Options.FileName.ToCString(), CompileOutput->GetBufferPointer());
-		if (Output != NULL)
-			*Output = (char*)CompileOutput->GetBufferPointer();
-		return false;
-	}
-
-	if (Output != NULL)
-		*Output = (char*)CompileOutput->GetBufferPointer();
-	ZEGR_RELEASE(CompileOutput);
-
-	if (Meta != NULL)
-	{
-		ZED11ShaderMetaCompiler::Reflect(Meta, ByteCode);
-		Meta->CompileOptions = Options;
-	}
-
-	OutputByteCode.SetCount(ByteCode->GetBufferSize());
-	memcpy(OutputByteCode.GetCArray(), ByteCode->GetBufferPointer(), OutputByteCode.GetCount());
-	ZEGR_RELEASE(ByteCode);
+	OutProfile = Profile;
+	OutMacros = Macros;
+	OutIncludeInterface.SetCompileOptions(&Options);
 
 	return true;
 }

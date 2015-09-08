@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11ShaderCompiler.h
+ Zinek Engine - ZEDSHCompileOptionsWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,27 +35,34 @@
 
 #pragma once
 
-#include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRShaderCompiler.h"
+#include <QtGui/qdockwidget.h>
 
-#include <d3dcompiler.h>
+#include "ZEPointer/ZEPointer.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
-class ZEGRShader;
-class ZED11ShaderCompilerIncludeInterface;
+class Ui_ZEDSHCompileOptionsWindow;
+class QListWidgetItem;
 
-class ZED11ShaderCompiler : public ZEGRShaderCompiler
+class ZEDSHCompileOptionsWindow : public QDockWidget
 {
-	friend class ZED11Module;
+	Q_OBJECT
+
 	private:
-		bool						OpenShaderEditor(ZEGRShaderCompileOptions& Options);
-		bool						PrepareOptions(const ZEGRShaderCompileOptions& Options, ZEArray<D3D_SHADER_MACRO>& OutMacros, ZED11ShaderCompilerIncludeInterface& OutIncludeInterface, ZEString& OutProfile);
+		ZEPointer<Ui_ZEDSHCompileOptionsWindow>	Form;
+		ZEGRShaderCompileOptions				Options;
 
-	protected:
-		bool						CreateMetaTable(ZEGRShaderMeta* Meta, ID3DBlob* ByteCode);
-
-									ZED11ShaderCompiler();
-		virtual						~ZED11ShaderCompiler();
+	private slots:
+		void							btnAddDefinition_OnClick();
+		void							btnRemoveDefinition_OnClick();
+		void							btnAddIncludeDirection_OnClick();
+		void							btnRemoveIncludeDirection_OnClick();
+						
+		void							DefinitionItem_OnDoubleClick(QListWidgetItem* item);
+		void							IncludeDirectoryItem_OnDoubleClick(QListWidgetItem* item);
 
 	public:
-		bool						Compile(ZEArray<BYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* BuildOutput, bool ShaderEditorOpen = false);
+		void							SetOptions(const ZEGRShaderCompileOptions& Options);
+		const ZEGRShaderCompileOptions&	GetOptions();
+
+										ZEDSHCompileOptionsWindow(QWidget* parent = NULL);
 };
