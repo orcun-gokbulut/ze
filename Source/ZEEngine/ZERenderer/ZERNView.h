@@ -39,6 +39,8 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPacking.h"
 
 class ZEViewVolume;
 class ZEEntity;
@@ -65,26 +67,59 @@ struct ZERNView
 {
 	ZERNViewType				Type;
 	ZEEntity*					Entity;
-	ZEVector3					Position;
-	ZEQuaternion				Rotation;
-	ZEVector3					Direction;
 
+	// Transforms
+	ZEMatrix4x4					ViewTransform;
+	ZEMatrix4x4					ProjectionTransform;		
+	ZEMatrix4x4					ViewProjectionTransform;
+	ZEMatrix4x4					InvViewTransform;
+	ZEMatrix4x4					InvProjectionTransform;			
+	ZEMatrix4x4					InvViewProjectionTransform;
+
+	// Parameters
 	ZERNProjectionType			ProjectionType;
 	float						Width;
 	float						Height;
 	float						VerticalFOV;		
 	float						HorizontalFOV;
 	float						AspectRatio;
+	float						NearZ;
+	float						FarZ;
 
-	ZEVector3					CornerRays[4];
+	// Orientation
+	ZEVector3					Position;
+	ZEQuaternion				Rotation;
+	ZEVector3					Direction;
+	ZEVector3					U, V, N;
 
-	ZEMatrix4x4					ViewTransform;
-	ZEMatrix4x4					ProjectionTransform;
-	ZEMatrix4x4					ViewProjectionTransform;
-
+	// Others
 	ZEGROutput*					Output;
 	const ZEGRViewport*			Viewport;
 	const ZEViewVolume*			ViewVolume;
+};
 
-	ZEGRConstantBuffer*			ConstantBuffer;
+struct ZERNViewConstantBuffer
+{
+	ZEMatrix4x4				ViewTransform;
+	ZEMatrix4x4				ProjectionTransform;		
+	ZEMatrix4x4				ViewProjectionTransform;
+	ZEMatrix4x4				InvViewTransform;
+	ZEMatrix4x4				InvProjectionTransform;			
+	ZEMatrix4x4				InvViewProjectionTransform;
+
+	float					Width;
+	float					Height;
+	float					VerticalFOV;
+	float					HorizontalFOV;
+	float					AspectRatio;
+	float					NearZ;
+	float					FarZ;
+	float					Reserved0;
+
+	ZEVector3				Position; float	Reserved1;
+	ZEQuaternion			RotationQuaternion;
+	ZEVector3				RotationEuler; float Reserved2;
+	ZEVector3				U; float Reserved3;
+	ZEVector3				V; float Reserved4;
+	ZEVector3				N; float Reserved5;
 };

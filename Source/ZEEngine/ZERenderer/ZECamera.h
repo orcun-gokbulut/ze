@@ -41,9 +41,9 @@
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEDS/ZEFlags.h"
 
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
@@ -57,7 +57,6 @@ enum ZECameraProjectionType
 
 class ZEViewPort;
 class ZEGROutput;
-class ZEGRConstantBuffer;
 
 class ZECamera : public ZEEntity
 {
@@ -66,44 +65,10 @@ class ZECamera : public ZEEntity
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 
 		ZEGRViewport					Viewport;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
-
-		mutable struct
-		{
-			ZEMatrix4x4					ViewTransform;
-			ZEMatrix4x4					ProjectionTransform;		
-			ZEMatrix4x4					InvViewTransform;
-			ZEMatrix4x4					InvProjectionTransform;			
-			ZEMatrix4x4					ViewProjectionTransform;
-			ZEMatrix4x4					InvViewProjectionTransform;
-			
-			float						Width;
-			float						Height;
-			float						VerticalFOV;
-			float						HorizontalFOV;
-
-			float						AspectRatio;
-			float						NearZ;
-			float						FarZ;
-			float						Reserved0;
-
-			ZEVector4					Position;
-			ZEQuaternion				Rotation;
-			ZEVector4					RotationEuler;
-
-			ZEVector4					Up;
-			ZEVector4					Right;
-			ZEVector4					Front;
-
-			float						ShadowDistance;
-			float						ShadowFadeDistance;
-			float						Reserved1[2];
-		} Constants;
+		mutable ZERNView				View;
 
 		bool							AutoAspectRatio;
-
 		ZEViewFrustum					ViewFrustum;
-		ZERNView						View;
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
@@ -113,8 +78,6 @@ class ZECamera : public ZEEntity
 										ZECamera();
 
 	public:
-		ZEGRConstantBuffer*				GetConstantBuffer();
-
 		void							SetViewport(const ZEGRViewport& Viewport);
 		const ZEGRViewport&				GetViewport() const;
 

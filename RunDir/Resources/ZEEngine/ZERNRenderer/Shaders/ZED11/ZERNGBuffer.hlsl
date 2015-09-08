@@ -50,10 +50,10 @@ Texture2D<float4> ZERNGBuffer_Buffer3		: register(t4);
 
 struct ZERNGBuffer
 {
-	float4 Buffer0 : COLOR0; // xy:Normal, z:Subsurface Scattering, w: ShadingModel
-	float4 Buffer1 : COLOR1; // xyz:DiffuseColor, w: Unused
-	float4 Buffer2 : COLOR2; // xyz:SpecularColor, w:SpacularPower
-	float4 Buffer3 : COLOR3; // xyz:AccumulationBuffer, w:Normal Z Sign
+	float4 Buffer0 : SV_TARGET0; // xyz:AccumulationBuffer
+	float4 Buffer1 : SV_TARGET1; // xyz:Normal, w: ShadingModel
+	float4 Buffer2 : SV_TARGET2; // xyz:DiffuseColor, z:Subsurface Scattering
+	float4 Buffer3 : SV_TARGET3; // xyz:SpecularColor, w:SpacularPower
 };
 
 
@@ -71,8 +71,8 @@ float ZERNGBuffer_GetDepth(int2 ScreenPos)
 
 float3 ZERNGBuffer_GetViewPosition(float2 ClipPos, int2 ScreenPos)
 {
-/*    float ClipDepth = ZERNGBuffer_GetDepth(ScreenPos);
- 	return float3(ClipPos, -1.0f) / (ClipDepth * ZERNView_Constants.InvProjectionTransform[0][0] + ZERNView_Constants.InvProjectionTransform[0][0]);*/
+    float ClipDepth = ZERNGBuffer_GetDepth(ScreenPos);
+ 	return float3(ClipPos, -1.0f) / (ClipDepth * ZERNView_InvProjectionTransform[0][0] + ZERNView_InvProjectionTransform[0][0]);
 }
 
 
@@ -81,12 +81,12 @@ float3 ZERNGBuffer_GetViewPosition(float2 ClipPos, int2 ScreenPos)
 
 void ZERNGBuffer_SetShadingModel(inout ZERNGBuffer GBuffer, uint Model)
 {
-	GBuffer.Buffer0.w = Model;
+	GBuffer.Buffer1.w = Model;
 }
 
 uint ZERNGBuffer_GetShadingModel(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).w;
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).w;
 }
 
 
@@ -95,16 +95,18 @@ uint ZERNGBuffer_GetShadingModel(int2 ScreenPos)
 
 void ZERNGBuffer_SetViewNormal(inout ZERNGBuffer GBuffer, float3 Normal /*Must be Normalized*/)
 {
-	GBuffer.Buffer0.xy	= Normal.xy * 0.5f + 0.5f;
-	GBuffer.Buffer3.a = sign(Normal.z) + 1.0f;
+	GBuffer.Buffer1.xyz = Normal;
+	/*GBuffer.Buffer0.xy = Normal.xy * 0.5f + 0.5f;
+	GBuffer.Buffer3.a = sign(Normal.z) + 1.0f;*/
 }
 
 float3 ZERNGBuffer_GetViewNormal(int2 ScreenPos)
 {
-	float3 Normal;
+	/*float3 Normal;
 	Normal.xy =	ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xy * 2.0f - 1.0f;
 	Normal.z = (ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w - 1.0f) * sqrt(1.0f - dot(Normal.xy, Normal.xy));
-	return Normal;
+	return Normal;*/
+	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -113,12 +115,12 @@ float3 ZERNGBuffer_GetViewNormal(int2 ScreenPos)
 
 void ZERNGBuffer_SetSubsurfaceScattering(inout ZERNGBuffer GBuffer, float SubsurfaceScattering /* Range: [0-1]*/)
 {
-	GBuffer.Buffer0.z = SubsurfaceScattering;
+	GBuffer.Buffer2.z = SubsurfaceScattering;
 }
 
 float ZERNGBuffer_GetSubsurfaceScattering(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).z;
+	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).z;
 }
 
 
@@ -127,12 +129,12 @@ float ZERNGBuffer_GetSubsurfaceScattering(int2 ScreenPos)
 
 void ZERNGBuffer_SetDiffuseColor(inout ZERNGBuffer GBuffer, float3 DiffuseColor)
 {
-	GBuffer.Buffer1.xyz = DiffuseColor;
+	GBuffer.Buffer2.xyz = DiffuseColor;
 }
 
 float3 ZERNGBuffer_GetDiffuseColor(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
+	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -141,12 +143,12 @@ float3 ZERNGBuffer_GetDiffuseColor(int2 ScreenPos)
 
 void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float3 SpecularColor)
 {
-	GBuffer.Buffer2.xyz = SpecularColor;
+	GBuffer.Buffer3.xyz = SpecularColor;
 }
 
 float3 ZERNGBuffer_GetSpecularColor(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).xyz;
+	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -155,12 +157,12 @@ float3 ZERNGBuffer_GetSpecularColor(int2 ScreenPos)
 
 void ZERNGBuffer_SetSpecularPower(inout ZERNGBuffer GBuffer, float SpecularPower)
 {
-	GBuffer.Buffer2.w = SpecularPower;
+	GBuffer.Buffer3.w = SpecularPower;
 }
 
 float ZERNGBuffer_SetSpecularPower(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).w;
+	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w;
 }
 
 #endif

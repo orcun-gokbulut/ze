@@ -61,12 +61,15 @@ class ZED11Shader : public ZEGRShader, public ZED11ComponentBase
 			ID3D11ComputeShader*	ComputeShader;
 		};
 
+		ZEArray<ZEBYTE>				ByteCode;
+
 		virtual bool				Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
 		virtual void				Deinitialize();
 
 									ZED11Shader();
 
 	public:
+		const ZEArray<ZEBYTE>&		GetByteCode();
 		ID3D11VertexShader*			GetVertexShader();
 		ID3D11GeometryShader*		GetGeometryShader();
 		ID3D11DomainShader*			GetDomainShader();

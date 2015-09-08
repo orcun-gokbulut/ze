@@ -68,5 +68,5 @@ class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBa
 		ID3D11DepthStencilState*				NativeDepthStencilState;
 		ID3D11BlendState*						NativeBlendState;
 
-		virtual void							Initialize(const ZEGRRenderState& RenderState);
+		virtual bool							Initialize(const ZEGRRenderState& RenderState);
 };

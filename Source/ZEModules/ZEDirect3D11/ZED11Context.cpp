@@ -51,23 +51,9 @@
 #include <d3d11_1.h>
 #include "ZED11StatePool.h"
 
-#define ZEGR_CONTEXT_DIRTY_BLEND_STATE 1
-#define ZEGR_CONTEXT_DIRTY_STENCIL_STATE 1
-#define ZEGR_CONTEXT_DIRTY_RENDER_TARGETS 1
-
-inline D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitiveType(ZEGRPrimitiveType PrimitiveType)
-{
-	static const D3D11_PRIMITIVE_TOPOLOGY Values[] = 
-	{
-		D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED,
-		D3D11_PRIMITIVE_TOPOLOGY_POINTLIST,
-		D3D11_PRIMITIVE_TOPOLOGY_LINELIST,
-		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
-		D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP
-	};
-
-	return Values[PrimitiveType];
-}
+#define ZEGR_CONTEXT_DIRTY_BLEND_STATE		1
+#define ZEGR_CONTEXT_DIRTY_STENCIL_STATE	2
+#define ZEGR_CONTEXT_DIRTY_RENDER_TARGETS	4
 
 inline DXGI_FORMAT ConverIndexBufferFormat(ZEGRIndexBufferFormat Format)
 {
@@ -148,7 +134,7 @@ void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 	
 	#undef _SetupShader
 
-	Context->RSSetState(RenderState->RasterizerState->GetInterface());
+	Context->RSSetState(RenderState->NativeRasterizerState);
 
 	if (BlendState != RenderState->NativeBlendState)
 		DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
@@ -187,17 +173,32 @@ void ZED11Context::SetIndexBuffer(ZEGRIndexBuffer* Buffer)
 	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Buffer->GetFormat()), 0);
 }
 
-void ZED11Context::SetRenderTarget(ZEUInt Count, ZEGRRenderTarget** RenderTargets)
+void ZED11Context::SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* RenderTargets)
 {
-	zeDebugCheck(Count > ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget count is too much.");
+	zeDebugCheck(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget index is too much.");
 	
+	if (Index >= ZEGR_MAX_RENDER_TARGET_SLOT)
+		Index = ZEGR_MAX_RENDER_TARGET_SLOT;
+
+	ID3D11RenderTargetView* NativeRenderTarget = static_cast<ZED11RenderTarget*>(RenderTargets)->GetView();
+	if (this->RenderTargets[Index] == NativeRenderTarget)
+		return;
+
+	this->RenderTargets[Index] = static_cast<ZED11RenderTarget*>(RenderTargets)->GetView();
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
+}
+
+void ZED11Context::SetRenderTargetCount(ZEUInt Count)
+{
+	zeDebugCheck(Count > ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget index is too much.");
+
 	if (Count > ZEGR_MAX_RENDER_TARGET_SLOT)
 		Count = ZEGR_MAX_RENDER_TARGET_SLOT;
 
-	RenderTargetCount = Count;
-	for (ZESize I = 0; I < RenderTargetCount; I++)
-		this->RenderTargets[I] = static_cast<ZED11RenderTarget*>(RenderTargets[I])->GetView();
+	if (RenderTargetCount == Count)
+		return;
 
+	RenderTargetCount = Count;
 	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
 }
 
@@ -270,9 +271,15 @@ void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
 
 void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset, ZEUInt Size)
 {
+	zeDebugCheck((StartOffset % 16) != 0, "StartOffset must be multiple of 16.");
+	zeDebugCheck((Size % 16) != 0, "Size must be multiple of 16.");
+
 	ID3D11Buffer* NativeConstants = NULL;
-	UINT* FirstConstant = StartOffset == 0 ? NULL : &StartOffset;
-	UINT* NumberOfConstant = Size == 0 ? NULL : &Size;
+	UINT* FirstConstant = &StartOffset;
+	UINT* NumberOfConstant = &Size;
+
+	if (Buffer != NULL)
+		 NativeConstants = ((ZED11ConstantBuffer*)Buffer)->GetBuffer();
 
 	switch(Shader)
 	{
@@ -301,6 +308,15 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 			break;
 
 		case ZEGR_ST_COMPUTE:
+			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->PSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->GSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			break;
 	}
@@ -332,33 +348,33 @@ void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* 
 
 	switch(Shader)
 	{
-	default:
-	case ZEGR_ST_NONE:
-		break;
+		default:
+		case ZEGR_ST_NONE:
+			break;
 
-	case ZEGR_ST_VERTEX:
-		Context->VSSetShaderResources(Index, 1, &NativeTexture);
-		break;
+		case ZEGR_ST_VERTEX:
+			Context->VSSetShaderResources(Index, 1, &NativeTexture);
+			break;
 
-	case ZEGR_ST_PIXEL:
-		Context->PSSetShaderResources(Index, 1, &NativeTexture);
-		break;
+		case ZEGR_ST_PIXEL:
+			Context->PSSetShaderResources(Index, 1, &NativeTexture);
+			break;
 
-	case ZEGR_ST_GEOMETRY:
-		Context->GSSetShaderResources(Index, 1, &NativeTexture);
-		break;
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetShaderResources(Index, 1, &NativeTexture);
+			break;
 
-	case ZEGR_ST_DOMAIN:
-		Context->DSSetShaderResources(Index, 1, &NativeTexture);
-		break;
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetShaderResources(Index, 1, &NativeTexture);
+			break;
 
-	case ZEGR_ST_HULL:
-		Context->HSSetShaderResources(Index, 1, &NativeTexture);
-		break;
+		case ZEGR_ST_HULL:
+			Context->HSSetShaderResources(Index, 1, &NativeTexture);
+			break;
 
-	case ZEGR_ST_COMPUTE:
-		Context->CSSetShaderResources(Index, 1, &NativeTexture);
-		break;
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetShaderResources(Index, 1, &NativeTexture);
+			break;
 	}
 }
 
@@ -409,13 +425,12 @@ void ZED11Context::SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer)
 		return;
 
 	DepthStencilBuffer = NativeView;
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
+	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
 }
 
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)
 {
 	UpdateContext();
-
 	GetMainContext()->Draw(VertexCount, FirstVertex);
 }
 

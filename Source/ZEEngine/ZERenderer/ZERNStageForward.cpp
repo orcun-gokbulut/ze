@@ -54,16 +54,6 @@ const ZEString& ZERNStageForward::GetName()
 
 bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	if (Commands.GetCount() == 0)
-		return false;
-
-	ZERNStageGBuffer* GBufferStage = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-	if (GBufferStage == NULL)
-		return false;
-
-	ZEGRRenderTarget* AccumulationBuffer = Renderer->GetOutput()->GetRenderTarget();
-	Context->SetRenderTarget(1, &AccumulationBuffer);
-
 	return true;
 }
 

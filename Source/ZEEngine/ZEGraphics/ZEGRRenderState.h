@@ -67,7 +67,7 @@ class ZEGRRenderStateData : public ZEGRResource
 {
 	friend class ZEGRRenderState;
 	protected:
-		virtual void							Initialize(const ZEGRRenderState& RenderState) = 0;
+		virtual bool							Initialize(const ZEGRRenderState& RenderState) = 0;
 
 	public:
 		virtual ZEGRResourceType				GetResourceType();

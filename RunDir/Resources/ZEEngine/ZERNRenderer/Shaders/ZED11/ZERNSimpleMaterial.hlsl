@@ -68,20 +68,22 @@ struct ZERNSimpleMaterial_VSInput
 {
 	float4 Position			: POSITION0;
 	float2 Textcoord		: TEXCOORD0;
-	float4 Color			: TEXCOORD1;
+	float3 Normal			: NORMAL0;
+	float4 Color			: COLOR0;
 };
 
 struct ZERNSimpleMaterial_VSOutput 
 {
-	float4 Position			: POSITION0;
+	float4 Position			: SV_Position;
 	float2 Texcoord			: TEXCOORD0;
-	float4 Color			: TEXCOORD1;
+	float4 Color			: COLOR0;
 };
 
 struct ZERNSimpleMaterial_PSInput
 {
+	float4 Position			: SV_Position;
 	float2 Texcoord			: TEXCOORD0;
-	float4 Color		    : TEXCOORD1;
+	float4 Color		    : COLOR0;
 };
 
 
@@ -108,7 +110,7 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 // PIXEL SHADER - FORWARD STAGE      
 ///////////////////////////////////////////////////////////////////////////////
 
-float4 ZERNSimpleMaterial_PSMain_ForwardStage(ZERNSimpleMaterial_PSInput Input) : COLOR0
+float4 ZERNSimpleMaterial_PSMain_ForwardStage(ZERNSimpleMaterial_PSInput Input) : SV_Target0
 {
 	float4 Color = Input.Color;
 

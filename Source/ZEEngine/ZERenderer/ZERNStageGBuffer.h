@@ -38,33 +38,28 @@
 #include "ZERNStage.h"
 #include "ZEGraphics\ZEGRHolder.h"
 #include "ZEGraphics\ZEGRRenderState.h"
+#include "ZEGraphics\ZEGRViewport.h"
 
 class ZEGRTexture2D;
 
 class ZERNStageGBuffer : public ZERNStage
 {
 	private:
-		ZEGRRenderTarget*				RenderTargets[4];
-		ZEGRHolder<ZEGRTexture2D>		GBuffer0;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer1;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer2;
-		ZEGRHolder<ZEGRTexture2D>		GBuffer3;
-		ZEGRHolder<ZEGRTexture2D>		AccumulationBuffer;
-		ZEGRRenderState					RenderState;
+		ZEGRHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffer;
+		ZEGRHolder<ZEGRTexture2D>			GBuffer0;
+		ZEGRHolder<ZEGRTexture2D>			GBuffer1;
+		ZEGRHolder<ZEGRTexture2D>			GBuffer2;
+		ZEGRHolder<ZEGRTexture2D>			GBuffer3;
+		ZEGRRenderState						RenderState;
+		ZEGRViewport						Viewport;
 
-		void							UpdateRenderTargets(ZERNRenderer* Renderer);
+		void								UpdateRenderTargets(ZERNRenderer* Renderer);
 
 	public:
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
-
-		ZEGRTexture2D*					GetPositionBuffer();
-		ZEGRTexture2D*					GetNormalBuffer();
-		ZEGRTexture2D*					GetDiffuseBuffer();
-		ZEGRTexture2D*					GetSpecularBuffer();
-		ZEGRTexture2D*					GetAccumulationBuffer();
+		virtual ZEInt						GetId();
+		virtual const ZEString&				GetName();
 		
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 
-		static const ZEGRRenderState&	GetRenderState();
+		static const ZEGRRenderState&		GetRenderState();
 };

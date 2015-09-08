@@ -54,27 +54,25 @@ ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level)
 	zeDebugCheck(!GetIsRenderTarget(), "Texture is not created with render target flag");
 	zeDebugCheck(Level >= GetLevelCount(), "Texture dont have specified Mipmap level");
 	
-	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
-	RenderTargetDesc.Format = ZED11ComponentBase::ConvertFormat(GetFormat());
-	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-	RenderTargetDesc.Texture2D.MipSlice = Level;
-
-	ID3D11RenderTargetView* RenderTargetView = NULL;
-	HRESULT Result = GetDevice()->CreateRenderTargetView(Texture2D, &RenderTargetDesc, &RenderTargetView);
-	if(FAILED(Result))
+	if (RenderTargets[Level] == NULL)
 	{
-		zeError("Texture 2D render target creation failed. ErrorCode: %d.", Result);
-		return NULL;
+		D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
+		RenderTargetDesc.Format = ZED11ComponentBase::ConvertFormat(GetFormat());
+		RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+		RenderTargetDesc.Texture2D.MipSlice = Level;
+
+		ID3D11RenderTargetView* RenderTargetView = NULL;
+		HRESULT Result = GetDevice()->CreateRenderTargetView(Texture2D, &RenderTargetDesc, &RenderTargetView);
+		if(FAILED(Result))
+		{
+			zeError("Texture 2D render target creation failed. ErrorCode: %d.", Result);
+			return NULL;
+		}
+
+		RenderTargets[Level] = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
 	}
 
-	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
-	
-	#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Render target view created. Texture2D: %p, MipLevel: %u, Width: %u, Height: %u", 
-			this, MipLevel, RenderTarget->Width, RenderTarget->Height);
-	#endif
-
-	return RenderTarget;
+	return RenderTargets[Level];
 }
 
 bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
@@ -150,7 +148,6 @@ void ZED11Texture2D::Unlock(ZEUInt Level)
 {
 	zeDebugCheck(Texture2D == NULL, "Texture is not initailized.");
 	zeCheckError(Level >= GetLevelCount(), ZE_VOID, "There is no such a texture level.");
-
 	GetMainContext()->Unmap(Texture2D, Level);
 }
 

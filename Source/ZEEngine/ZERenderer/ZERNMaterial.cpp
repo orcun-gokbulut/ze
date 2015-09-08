@@ -91,11 +91,6 @@ ZEUInt ZERNMaterial::GetStageMask()
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
-	ZEGRRenderStateData* State =  GetRenderState(Stage);
-	if (Stage == NULL)
-		return false;
-
-	Context->SetRenderState(State);
 	return true;
 }
 

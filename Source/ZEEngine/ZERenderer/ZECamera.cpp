@@ -55,24 +55,15 @@
 #define ZE_CDF_INV_VIEW_TRANSFORM				32
 #define ZE_CDF_INV_PROJECTION_TRANSFORM			64
 #define ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM	128
-#define ZE_CDF_CONSTANT_BUFFER					256
 #define ZE_CDF_ALL								0xFFFFFFFF
 
 bool ZECamera::InitializeSelf()
 {
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	if (ConstantBuffer == NULL)
-	{
-		zeError("Cannot create camera constant buffer.");
-		return false;
-	}
-
 	return true;
 }
 
 bool ZECamera::DeinitializeSelf()
 {
-	ZEGR_RELEASE(ConstantBuffer);
 	return true;
 }
 
@@ -80,66 +71,66 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateViewTransform(Constants.ViewTransform, GetWorldPosition(), GetWorldRotation());
+		ZEMatrix4x4::CreateViewTransform(View.ViewTransform, GetWorldPosition(), GetWorldRotation());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_TRANSFORM);
 	}
 	
-	return Constants.ViewTransform;
+	return View.ViewTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_PROJECTION_TRANSFORM))
 	{
-		ZEMatrix4x4::CreatePerspectiveProjection(Constants.ProjectionTransform, Constants.VerticalFOV, Constants.AspectRatio, Constants.NearZ, Constants.FarZ);
+		ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
 	}
 
-	return Constants.ProjectionTransform;
+	return View.ProjectionTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetViewProjectionTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_PROJECTION_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(Constants.ViewProjectionTransform, GetProjectionTransform(), GetViewTransform());
+		ZEMatrix4x4::Multiply(View.ViewProjectionTransform, GetProjectionTransform(), GetViewTransform());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_PROJECTION_TRANSFORM);
 	}
 
-	return Constants.ViewProjectionTransform;
+	return View.ViewProjectionTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetInvViewTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_VIEW_TRANSFORM))
 	{
-		ZEMatrix4x4::Transpose(Constants.InvViewTransform, GetViewTransform());
+		ZEMatrix4x4::Transpose(View.InvViewTransform, GetViewTransform());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_VIEW_TRANSFORM);
 	}
 
-	return Constants.InvViewTransform;
+	return View.InvViewTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetInvProjectionTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_PROJECTION_TRANSFORM))
 	{
-		ZEMatrix4x4::Inverse(Constants.InvProjectionTransform, GetProjectionTransform());
+		ZEMatrix4x4::Inverse(View.InvProjectionTransform, GetProjectionTransform());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_PROJECTION_TRANSFORM);
 	}
 
-	return Constants.InvProjectionTransform;
+	return View.InvProjectionTransform;
 }
 
 const ZEMatrix4x4& ZECamera::GetInvViewProjectionTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(Constants.InvViewProjectionTransform, GetInvViewTransform(), GetInvProjectionTransform());
+		ZEMatrix4x4::Multiply(View.InvViewProjectionTransform, GetInvViewTransform(), GetInvProjectionTransform());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM);
 	}
 
-	return Constants.InvViewProjectionTransform;
+	return View.InvViewProjectionTransform;
 }
 
 void ZECamera::SetPosition(const ZEVector3& NewPosition)
@@ -160,52 +151,16 @@ void ZECamera::OnTransformChanged()
 	ZEEntity::OnTransformChanged();
 }
 
-ZEGRConstantBuffer* ZECamera::GetConstantBuffer()
-{
-	if (ConstantBuffer == NULL)
-		return NULL;
-
-	if (CameraDirtyFlags.GetFlags(ZE_CDF_CONSTANT_BUFFER))
-	{
-		GetViewTransform();
-		GetProjectionTransform();
-		GetViewProjectionTransform();
-		GetInvViewTransform();
-		GetInvProjectionTransform();
-		GetInvViewProjectionTransform();
-		
-		Constants.Position = ZEVector4(GetWorldPosition(), 1.0f);
-		Constants.Rotation = GetWorldRotation();
-		
-		ZEVector3 RotationEuler;
-		ZEQuaternion::ConvertToEulerAngles(RotationEuler, Constants.Rotation);
-		Constants.RotationEuler = ZEVector4(RotationEuler, 0.0f);
-
-		Constants.Up = ZEVector4(GetWorldUp(), 1.0f);
-		Constants.Right = ZEVector4(GetWorldRight(), 1.0f);
-		Constants.Front = ZEVector4(GetWorldFront(), 1.0f);
-
-		void* Buffer;
-		ConstantBuffer->Lock(&Buffer);
-		memcpy(Buffer, &Constants, sizeof(Constants));
-		ConstantBuffer->Unlock();
-
-		CameraDirtyFlags.UnraiseFlags(ZE_CDF_CONSTANT_BUFFER);
-	}
-
-	return ConstantBuffer;
-}
-
 void ZECamera::SetViewport(const ZEGRViewport& Viewport)
 {
 	this->Viewport = Viewport;
 	if (this->Viewport.GetWidth() != Viewport.GetWidth() ||	this->Viewport.GetHeight() != Viewport.GetHeight())
 	{
-		Constants.Width = Viewport.GetWidth();
-		Constants.Height = Viewport.GetHeight();
+		View.Width = Viewport.GetWidth();
+		View.Height = Viewport.GetHeight();
 		CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 		if (AutoAspectRatio)
-			Constants.AspectRatio = (float)Constants.Width / (float)Constants.Height;
+			View.AspectRatio = (float)View.Width / (float)View.Height;
 	}
 }
 
@@ -216,59 +171,59 @@ const ZEGRViewport& ZECamera::GetViewport() const
 
 void ZECamera::SetNearZ(float NearZ)
 {
-	if (Constants.NearZ == NearZ)
+	if (View.NearZ == NearZ)
 		return;
 
-	Constants.NearZ = NearZ;
+	View.NearZ = NearZ;
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 }
 
 float ZECamera::GetNearZ() const
 {
-	return Constants.NearZ;
+	return View.NearZ;
 }
 
 void ZECamera::SetFarZ(float FarZ)
 {
-	if (Constants.FarZ == FarZ)
+	if (View.FarZ == FarZ)
 		return;
 
-	Constants.FarZ = FarZ;
+	View.FarZ = FarZ;
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 }
 
 float ZECamera::GetFarZ() const
 {
-	return Constants.FarZ;
+	return View.FarZ;
 }
 
 void ZECamera::SetHorizontalFOV(float FOV)
 {
-	if (Constants.HorizontalFOV == FOV)
+	if (View.HorizontalFOV == FOV)
 		return;
 
-	Constants.HorizontalFOV = FOV;
-	SetVerticalFOV(2.0f * ZEAngle::ArcTan(ZEAngle::Tan(FOV * 0.5f) / Constants.AspectRatio));
+	View.HorizontalFOV = FOV;
+	SetVerticalFOV(2.0f * ZEAngle::ArcTan(ZEAngle::Tan(FOV * 0.5f) / View.AspectRatio));
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 }
 
 float ZECamera::GetHorizontalFOV() const
 {
-	return 2.0f * ZEAngle::ArcTan(ZEAngle::Tan(Constants.VerticalFOV * 0.5f) * Constants.AspectRatio);
+	return 2.0f * ZEAngle::ArcTan(ZEAngle::Tan(View.VerticalFOV * 0.5f) * View.AspectRatio);
 }
 
 void ZECamera::SetVerticalFOV(float FOV)
 {
-	if (Constants.VerticalFOV == FOV)
+	if (View.VerticalFOV == FOV)
 		return;
 
-	Constants.VerticalFOV = FOV;
+	View.VerticalFOV = FOV;
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
 }
 
 float ZECamera::GetVerticalFOV() const
 {
-	return Constants.VerticalFOV;
+	return View.VerticalFOV;
 }
 
 void ZECamera::SetAutoAspectRatio(bool Enabled)
@@ -288,61 +243,60 @@ bool ZECamera::GetAutoAspectRatio() const
 void ZECamera::SetAspectRatio(float AspectRatio)
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
-	Constants.AspectRatio = AspectRatio;
+	View.AspectRatio = AspectRatio;
 }
 
 float ZECamera::GetAspectRatio() const
 {
 	if (AutoAspectRatio)
-		Constants.AspectRatio = (float)Viewport.GetWidth() / (float)Viewport.GetHeight();
+		View.AspectRatio = (float)Viewport.GetWidth() / (float)Viewport.GetHeight();
 
-	return Constants.AspectRatio;
+	return View.AspectRatio;
 }
 
 void ZECamera::SetShadowDistance(float Value)
 {
-	Constants.ShadowDistance = Value;
+	//View.ShadowDistance = Value;
 }
 
 float ZECamera::GetShadowDistance() const
 {
-	return Constants.ShadowDistance;
+	return 0.0f;//View.ShadowDistance;
 }
 
 void ZECamera::SetShadowFadeDistance(float Value)
 {
-	Constants.ShadowFadeDistance = Value;
+	//View.ShadowFadeDistance = Value;
 }
 
 float ZECamera::GetShadowFadeDistance() const
 {
-	return Constants.ShadowFadeDistance;
+	return 0.0f;//View.ShadowFadeDistance;
 }
 
 const ZERNView& ZECamera::GetView()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW))
 	{
-		View.Type = ZERN_VT_CAMERA;
-		View.Entity = this;
 		View.Position = GetWorldPosition();
 		View.Rotation = GetWorldRotation();
 		View.Direction = GetWorldFront();
+		View.U = GetWorldRight();
+		View.V = GetWorldUp();
+		View.N = GetWorldFront();
 
-		View.ProjectionType = ZERN_PT_PERSPECTIVE;
 		View.Width = 2.0f;
 		View.Height = 2.0f;
 		View.VerticalFOV = GetVerticalFOV();
 		View.HorizontalFOV = GetHorizontalFOV();
 		View.AspectRatio = GetAspectRatio();
 
-		View.ViewTransform = GetViewTransform();
-		View.ProjectionTransform = GetProjectionTransform();
-		View.ViewProjectionTransform = GetViewProjectionTransform();
-
-		View.Viewport = &GetViewport();
-		View.ViewVolume = &GetViewVolume();
-		View.ConstantBuffer = GetConstantBuffer();
+		GetViewTransform();
+		GetProjectionTransform();
+		GetViewProjectionTransform();
+		GetInvViewTransform();
+		GetInvProjectionTransform();
+		GetInvViewProjectionTransform();
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW);
 	}
@@ -393,14 +347,19 @@ ZECamera::ZECamera()
 {
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW | ZE_CDF_VIEW_FRUSTUM | ZE_CDF_VIEW_TRANSFORM | ZE_CDF_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
 
-	Constants.FarZ = 10000.0f;
-	Constants.NearZ = 1.0f;
-	Constants.AspectRatio = 1.0f;
+	View.Type = ZERN_VT_CAMERA;
+	View.Entity = this;
+	View.FarZ = 10000.0f;
+	View.NearZ = 1.0f;
+	View.AspectRatio = 1.0f;
+	View.Viewport = &Viewport;
+	View.ViewVolume = &ViewFrustum;
+	View.ProjectionType = ZERN_PT_PERSPECTIVE;
 	SetHorizontalFOV(ZE_PI_2);
 	AutoAspectRatio = true;
 	
-	Constants.ShadowDistance = 1000.0f;
-	Constants.ShadowFadeDistance = Constants.ShadowDistance * 0.1f;
+	//View.ShadowDistance = 1000.0f;
+	//View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
 }
 
 ZECamera* ZECamera::CreateInstance()

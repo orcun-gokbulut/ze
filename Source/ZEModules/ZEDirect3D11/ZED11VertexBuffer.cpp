@@ -52,11 +52,13 @@ bool ZED11VertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
 	zeDebugCheck(Size > 134217728, "Buffer too large.");
 
 	D3D11_BUFFER_DESC BufferDesc;
+	memset(&BufferDesc, 0, sizeof(D3D11_BUFFER_DESC));
 	BufferDesc.MiscFlags = 0;
 	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
 	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
+	BufferDesc.StructureByteStride = VertexSize;
 
 	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
 	if (FAILED(Result))
@@ -71,7 +73,7 @@ bool ZED11VertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
 bool ZED11VertexBuffer::Lock(void** Data)
 {
 	D3D11_MAPPED_SUBRESOURCE Map;
-	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE, 0, &Map);
+	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Map);
 	if (FAILED(Result))
 		return false;
 

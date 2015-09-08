@@ -43,6 +43,7 @@ bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESi
 	{
 		case ZEGR_ST_VERTEX:
 			Result = GetDevice()->CreateVertexShader(ShaderBinary, Size, NULL, &VertexShader);
+			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_DOMAIN:
@@ -110,6 +111,11 @@ void ZED11Shader::Deinitialize()
 ZED11Shader::ZED11Shader()
 {
 	VertexShader = NULL;
+}
+
+const ZEArray<ZEBYTE>& ZED11Shader::GetByteCode()
+{
+	return ByteCode;
 }
 
 ID3D11VertexShader* ZED11Shader::GetVertexShader()
