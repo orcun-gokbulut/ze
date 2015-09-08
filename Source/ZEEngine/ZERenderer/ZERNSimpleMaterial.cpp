@@ -51,28 +51,36 @@ bool ZERNSimpleMaterial::InitializeSelf()
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	ConstantBuffer->SetData(&Constants);
 
-	ZEGRRenderState State = ZERNStageForward::GetRenderState();
-	State.SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	ZEGRRenderState RenderState = ZERNStageForward::GetRenderState();
+	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
+
+	ZEGRDepthStencilState DepthStencilState = RenderState.GetDepthStencilState();
+	DepthStencilState.SetDepthTestEnable(false);
+	RenderState.SetDepthStencilState(DepthStencilState);
+
+	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
+	RasterizerState.SetCullDirection(ZEGR_CD_NONE);
+	RenderState.SetRasterizerState(RasterizerState);
 
 	ZEGRShaderCompileOptions Options;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSimpleMaterial.hlsl";
-	Options.Model = ZEGR_SM_4_0;
+	Options.Model = ZEGR_SM_5_0;
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNSimpleMaterial_VSMain_ForwardStage";
 	ZEGRShader* VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(VertexShader == NULL, false, "Cannot compile vertex shader.");
-	State.SetShader(Options.Type, VertexShader);
+	RenderState.SetShader(Options.Type, VertexShader);
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSimpleMaterial_PSMain_ForwardStage";
 	ZEGRShader* PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Cannot compile pixel shader.");
-	State.SetShader(Options.Type, PixelShader);
+	RenderState.SetShader(Options.Type, PixelShader);
 
-	State.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
-	RenderState = State.Compile();
-	zeCheckError(RenderState == NULL, false, "Cannot compile render state.");
+	this->RenderState = RenderState.Compile();
+	zeCheckError(this->RenderState == NULL, false, "Cannot compile render state.");
 
 	return true;
 }
@@ -156,13 +164,8 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 		return false;
 
 	Context->SetRenderState(RenderState);
-
-	if (TextureSampler.GetTexture() != NULL)
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureSampler.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureSampler.GetSamplerState());
-	}
-
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureSampler.GetTexture());
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureSampler.GetSamplerState());
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 

@@ -36,6 +36,110 @@
 #include "ZEGRBlendState.h"
 
 #include <memory.h>
+#include <stddef.h>
+
+void ZEGRBlendRenderTarget::SetBlendEnable(bool Enabled)
+{
+	StateData.BlendEnable = Enabled;
+}
+
+bool ZEGRBlendRenderTarget::GetBlendEnable() const
+{
+	return StateData.BlendEnable;
+}
+
+void ZEGRBlendRenderTarget::SetOperation(ZEGRBlendOperation Equation)
+{
+	StateData.Operation = Equation;
+}
+
+ZEGRBlendOperation ZEGRBlendRenderTarget::GetOperation() const
+{
+	return StateData.Operation;
+}
+
+void ZEGRBlendRenderTarget::SetSource(ZEGRBlend Blend)
+{
+	StateData.Source = Blend;
+}
+
+ZEGRBlend ZEGRBlendRenderTarget::GetSource() const
+{
+	return StateData.Source;
+}
+
+void ZEGRBlendRenderTarget::SetDestination(ZEGRBlend Blend)
+{
+	StateData.Destination = Blend;
+}
+
+ZEGRBlend ZEGRBlendRenderTarget::GetDestination() const
+{
+	return StateData.Destination;
+}
+
+void ZEGRBlendRenderTarget::SetAlphaOperation(ZEGRBlendOperation Equation)
+{
+	StateData.AlphaOperation = Equation;
+}
+
+ZEGRBlendOperation ZEGRBlendRenderTarget::GetAlphaOperation() const
+{
+	return StateData.AlphaOperation;
+}
+
+void ZEGRBlendRenderTarget::SetSourceAlpha(ZEGRBlend Blend)
+{
+	StateData.SourceAlpha = Blend;
+}
+
+ZEGRBlend ZEGRBlendRenderTarget::GetSourceAlpha() const
+{
+	return StateData.SourceAlpha;
+}
+		
+void ZEGRBlendRenderTarget::SetDestinationAlpha(ZEGRBlend Blend)
+{
+	StateData.DestinationAlpha = Blend;
+}
+
+ZEGRBlend ZEGRBlendRenderTarget::GetDestinationAlpha() const
+{
+	return StateData.DestinationAlpha;
+}		
+
+void ZEGRBlendRenderTarget::SetWriteMask(ZEGRColorMask Mask)
+{
+	StateData.WriteMask = Mask;
+}
+
+ZEGRColorMask ZEGRBlendRenderTarget::GetWriteMask() const
+{
+	return StateData.WriteMask;
+}
+
+void ZEGRBlendRenderTarget::SetToDefault()
+{
+	memset(&StateData, 0, sizeof(ZEBlendStateData));
+
+	StateData.Operation = ZEGR_BE_ADD;
+	StateData.Source = ZEGR_BO_SRC_COLOR;
+	StateData.Destination = ZEGR_BO_ZERO;
+	StateData.AlphaOperation = ZEGR_BE_ADD;
+	StateData.SourceAlpha = ZEGR_BO_ONE;
+	StateData.DestinationAlpha = ZEGR_BO_ZERO;
+	StateData.WriteMask = ZEGR_CM_ALL;
+}
+
+ZEGRBlendRenderTarget::ZEGRBlendRenderTarget()					
+{
+	SetToDefault();
+}
+
+ZEGRBlendRenderTarget::~ZEGRBlendRenderTarget()
+{
+
+}
 
 const void* ZEGRBlendState::GetData() const
 {
@@ -44,16 +148,46 @@ const void* ZEGRBlendState::GetData() const
 
 ZESize ZEGRBlendState::GetDataSize() const
 {
-	return sizeof(StateData);
+	if (!StateData.BlendEnable)
+		return sizeof(StateData.BlendEnable);
+	else if (!StateData.IndividualBlendEnable)
+		return offsetof(ZEGRBlendStateData, RenderTargets[1]);
+	else
+		return sizeof(StateData);
+}
+
+void ZEGRBlendState::SetBlendEnable(bool Enable)
+{
+	if (StateData.BlendEnable == Enable)
+		return;
+
+	StateData.BlendEnable = Enable;
+	MarkDirty();
+}
+
+bool ZEGRBlendState::GetBlendEnable() const
+{
+	return StateData.BlendEnable;
+}
+
+
+void ZEGRBlendState::SetIndividualBlendEnable(bool Enable)
+{
+	if (StateData.IndividualBlendEnable == Enable)
+		return;
+
+	StateData.IndividualBlendEnable = Enable;
+	MarkDirty();
+}
+
+bool ZEGRBlendState::GetIndividualBlendEnable() const
+{
+	return StateData.IndividualBlendEnable;
 }
 
 void ZEGRBlendState::SetAlphaToCoverageEnable(bool Enable)
 {
-	if (StateData.AlphaToCoverageEnable == Enable)
-		return;
-
-	StateData.AlphaToCoverageEnable = Enable;
-	MarkDirty();
+	StateData.AlphaToCoverageEnable = true;
 }
 
 bool ZEGRBlendState::GetAlphaToCoverageEnable() const
@@ -61,139 +195,25 @@ bool ZEGRBlendState::GetAlphaToCoverageEnable() const
 	return StateData.AlphaToCoverageEnable;
 }
 
-void ZEGRBlendState::SetBlendEnable(ZEUInt Target, bool Enable)
+void ZEGRBlendState::SetRenderTargetBlend(ZEUInt Index, const ZEGRBlendRenderTarget& RenderTargetState)
 {
-	zeCheckError(Target >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "Index out of range.");
+	zeCheckError(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "Index out of range.");
 
-	if (StateData.BlendEnable[(ZESize)Target] == Enable)
+	if (memcmp(&StateData.RenderTargets[Index].StateData, &RenderTargetState.StateData, sizeof(RenderTargetState.StateData)) == 0)
 		return;
 
-	StateData.BlendEnable[(ZESize)Target] = Enable;
+	StateData.RenderTargets[Index] = RenderTargetState;
 	MarkDirty();
 }
 
-bool ZEGRBlendState::GetBlendEnable(ZEUInt Target) const
+const ZEGRBlendRenderTarget& ZEGRBlendState::GetRenderTarget(ZEUInt Index) const
 {
-	zeCheckError(Target >= ZEGR_MAX_RENDER_TARGET_SLOT, false, "Index out of range.");
-
-	return StateData.BlendEnable[(ZESize)Target];
-}
-		
-void ZEGRBlendState::SetSourceBlendOption(ZEGRBlendOption Option)
-{
-	if (StateData.SourceBlendOption == Option)
-		return;
-
-	StateData.SourceBlendOption = Option;
-	MarkDirty();
-}
-
-ZEGRBlendOption ZEGRBlendState::GetSourceBlendOption() const
-{
-	return StateData.SourceBlendOption;
-}
-
-void ZEGRBlendState::SetDestinationBlendOption(ZEGRBlendOption Option)
-{
-	if (StateData.DestinationBlendOption == Option)
-		return;
-
-	StateData.DestinationBlendOption = Option;
-	MarkDirty();
-}
-
-ZEGRBlendOption ZEGRBlendState::GetDestinationBlendOption() const
-{
-	return StateData.DestinationBlendOption;
-}
-
-void ZEGRBlendState::SetBlendEquation(ZEGRBlendEquation Equation)
-{
-	if (StateData.BlendEquation == Equation)
-		return;
-
-	StateData.BlendEquation = Equation;
-	MarkDirty();
-}
-
-ZEGRBlendEquation ZEGRBlendState::GetBlendEquation() const
-{
-	return StateData.BlendEquation;
-}
-
-void ZEGRBlendState::SetSourceBlendAlphaOption(ZEGRBlendOption Option)
-{
-	if (StateData.SourceBlendAlphaOption == Option)
-		return;
-
-	StateData.SourceBlendAlphaOption = Option;
-	MarkDirty();
-}
-
-ZEGRBlendOption ZEGRBlendState::GetSourceBlendAlphaOption() const
-{
-	return StateData.SourceBlendAlphaOption;
-}
-		
-void ZEGRBlendState::SetDestinationBlendAlphaOption(ZEGRBlendOption Option)
-{
-	if (StateData.DestinationBlendAlphaOption == Option)
-		return;
-
-	StateData.DestinationBlendAlphaOption = Option;
-	MarkDirty();
-}
-
-ZEGRBlendOption ZEGRBlendState::GetDestinationBlendAlphaOption() const
-{
-	return StateData.DestinationBlendAlphaOption;
-}		
-
-void ZEGRBlendState::SetBlendAlphaEquation(ZEGRBlendEquation Equation)
-{
-	if (StateData.BlendAlphaEquation == Equation)
-		return;
-
-	StateData.BlendAlphaEquation= Equation;
-	MarkDirty();
-}
-
-ZEGRBlendEquation ZEGRBlendState::GetBlendAlphaEquation() const
-{
-	return StateData.BlendAlphaEquation;
-}
-
-void ZEGRBlendState::SetComponentWriteMask(ZEUInt Target, ZEGRColorWriteMask Mask)
-{
-	zeCheckError(Target >= ZEGR_MAX_RENDER_TARGET_SLOT, ZE_VOID, "Index out of range.");
-	
-	if (StateData.ComponentWriteMask[(ZESize)Target] == Mask)
-		return;
-
-	StateData.ComponentWriteMask[(ZESize)Target] = Mask;
-	MarkDirty();
-}
-
-ZEGRColorWriteMask ZEGRBlendState::GetComponentWriteMask(ZEUInt Target) const
-{
-	zeCheckError(Target >= ZEGR_MAX_RENDER_TARGET_SLOT, ZEGRColorWriteMask(), "Index out of range.");
-
-	return StateData.ComponentWriteMask[(ZESize)Target];
+	return StateData.RenderTargets[Index];
 }
 
 void ZEGRBlendState::SetToDefault()
 {
-	memset(&StateData, 0, sizeof(ZEBlendStateData));
-	
-	StateData.AlphaToCoverageEnable = false;
-	memset(StateData.BlendEnable, 0, sizeof(bool) * ZEGR_MAX_RENDER_TARGET_SLOT);
-	StateData.SourceBlendOption = ZEGR_BO_ONE;
-	StateData.DestinationBlendOption = ZEGR_BO_ZERO;
-	StateData.BlendEquation = ZEGR_BE_ADD;
-	StateData.SourceBlendAlphaOption = ZEGR_BO_ONE;
-	StateData.DestinationBlendAlphaOption = ZEGR_BO_ZERO;
-	StateData.BlendAlphaEquation = ZEGR_BE_ADD;
-	memset(StateData.ComponentWriteMask, ZEGR_CM_ALL, sizeof(ZEGRColorMask) * ZEGR_MAX_RENDER_TARGET_SLOT);
+	memset(&StateData, 0, sizeof(ZEGRBlendStateData));
 }
 
 ZEGRBlendState::ZEGRBlendState()					

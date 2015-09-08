@@ -52,11 +52,6 @@ const ZEString& ZERNStageForward::GetName()
 	return Name;
 }
 
-bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
-{
-	return true;
-}
-
 const ZEGRRenderState& ZERNStageForward::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
@@ -66,15 +61,38 @@ const ZEGRRenderState& ZERNStageForward::GetRenderState()
 		RenderState = ZERNStage::GetRenderState();
 
 		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetZTestEnable(true);
-		DepthStencilState.SetZWriteEnable(true);
+		DepthStencilState.SetDepthTestEnable(true);
+		DepthStencilState.SetDepthWriteEnable(true);
+		DepthStencilState.SetDepthFunction(ZEGR_CF_LESS);
 		RenderState.SetDepthStencilState(DepthStencilState);
 
+		ZEGRRasterizerState Rasterizer;
+		Rasterizer.SetFillMode(ZEGR_FM_SOLID);
+		Rasterizer.SetFrontIsCounterClockwise(false);
+		Rasterizer.SetCullDirection(ZEGR_CD_COUNTER_CLOCKWISE);
+		RenderState.SetRasterizerState(Rasterizer);
+
 		ZEGRBlendState BlendState;
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R10G10B10A2_UINT);
+		BlendState.SetBlendEnable(false);
+		RenderState.SetBlendState(BlendState);
+
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
 	}
 
 	return RenderState;
+}
+
+bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+{
+	Context->SetRenderTargetCount(1);
+	Context->SetRenderTarget(0, Renderer->GetOutput()->GetRenderTarget());
+	return true;
+}
+
+void ZERNStageForward::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+{
+	Context->SetRenderTargetCount(1);
+	Context->SetRenderTarget(0, NULL);
 }
 
 ZEInt ZERNStageForwardTransparent::GetId()

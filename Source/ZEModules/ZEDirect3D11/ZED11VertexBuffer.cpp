@@ -58,7 +58,7 @@ bool ZED11VertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
 	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
 	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
-	BufferDesc.StructureByteStride = VertexSize;
+	BufferDesc.StructureByteStride = (UINT)VertexSize;
 
 	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
 	if (FAILED(Result))

@@ -47,18 +47,18 @@ ZESize ZEGRDepthStencilState::GetDataSize() const
 	return sizeof(StateData);
 }
 
-void ZEGRDepthStencilState::SetZTestEnable(bool Enable)
+void ZEGRDepthStencilState::SetDepthTestEnable(bool Enable)
 {
-	if (StateData.ZTestEnable == Enable)
+	if (StateData.DepthTestEnable == Enable)
 		return;
 
-	StateData.ZTestEnable = Enable;
+	StateData.DepthTestEnable = Enable;
 	MarkDirty();
 }
 
-bool ZEGRDepthStencilState::GetZTestEnable() const
+bool ZEGRDepthStencilState::GetDepthTestEnable() const
 {
-	return StateData.ZTestEnable;
+	return StateData.DepthTestEnable;
 }
 
 void ZEGRDepthStencilState::SetStencilTestEnable(bool Enable)
@@ -75,18 +75,18 @@ bool ZEGRDepthStencilState::GetStencilTestEnable() const
 	return StateData.StencilTestEnable;
 }
 
-void ZEGRDepthStencilState::SetZWriteEnable(bool Enable)
+void ZEGRDepthStencilState::SetDepthWriteEnable(bool Enable)
 {
-	if (StateData.ZWriteEnable == Enable)
+	if (StateData.DepthWriteEnable == Enable)
 		return;
 
-	StateData.ZWriteEnable = Enable;
+	StateData.DepthWriteEnable = Enable;
 	MarkDirty();
 }
 
-bool ZEGRDepthStencilState::GetZWriteEnable() const
+bool ZEGRDepthStencilState::GetDepthWriteEnable() const
 {
-	return StateData.ZWriteEnable;
+	return StateData.DepthWriteEnable;
 }
 
 void ZEGRDepthStencilState::SetStencilWriteMask(ZEUInt8 Mask)
@@ -117,18 +117,18 @@ ZEUInt8 ZEGRDepthStencilState::GetStencilReadMask() const
 	return StateData.StencilReadMask;
 }
 
-void ZEGRDepthStencilState::SetZFunction(ZEGRComparisonFunction Function)
+void ZEGRDepthStencilState::SetDepthFunction(ZEGRComparisonFunction Function)
 {
-	if (StateData.ZFunction == Function)
+	if (StateData.DepthFunction == Function)
 		return;
 
-	StateData.ZFunction = Function;
+	StateData.DepthFunction = Function;
 	MarkDirty();
 }
 
-ZEGRComparisonFunction ZEGRDepthStencilState::GetZFunction() const
+ZEGRComparisonFunction ZEGRDepthStencilState::GetDepthFunction() const
 {
-	return StateData.ZFunction;
+	return StateData.DepthFunction;
 }
 
 void ZEGRDepthStencilState::SetFrontStencilFail(ZEGRStencilOperation Operation)
@@ -145,18 +145,18 @@ ZEGRStencilOperation ZEGRDepthStencilState::GetFrontStencilFail() const
 	return StateData.FrontStencilFailOperation;
 }
 
-void ZEGRDepthStencilState::SetFrontZFail(ZEGRStencilOperation Operation)
+void ZEGRDepthStencilState::SetFrontStencilDepthFail(ZEGRStencilOperation Operation)
 {
-	if (StateData.FrontZFailOperation == Operation)
+	if (StateData.FrontStencilDepthFailOperation == Operation)
 		return;
 
-	StateData.FrontZFailOperation = Operation;
+	StateData.FrontStencilDepthFailOperation = Operation;
 	MarkDirty();
 }
 
-ZEGRStencilOperation ZEGRDepthStencilState::GetFrontZFail() const
+ZEGRStencilOperation ZEGRDepthStencilState::GetFrontStencilDepthFail() const
 {
-	return StateData.FrontZFailOperation;
+	return StateData.FrontStencilDepthFailOperation;
 }
 
 void ZEGRDepthStencilState::SetFrontStencilPass(ZEGRStencilOperation Operation)
@@ -203,16 +203,16 @@ ZEGRStencilOperation ZEGRDepthStencilState::GetBackStencilFail() const
 
 void ZEGRDepthStencilState::SetBackZFail(ZEGRStencilOperation Operation)
 {
-	if (StateData.BackZFailOperation == Operation)
+	if (StateData.BackStencilDepthFailOperation == Operation)
 		return;
 
-	StateData.BackZFailOperation = Operation;
+	StateData.BackStencilDepthFailOperation = Operation;
 	MarkDirty();
 }
 
 ZEGRStencilOperation ZEGRDepthStencilState::GetBackZFail() const
 {
-	return StateData.BackZFailOperation;
+	return StateData.BackStencilDepthFailOperation;
 }
 
 void ZEGRDepthStencilState::SetBackStencilPass(ZEGRStencilOperation Operation)
@@ -246,20 +246,24 @@ ZEGRComparisonFunction ZEGRDepthStencilState::GetBackStencilFunction() const
 void ZEGRDepthStencilState::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZEDepthStencilStateData));
-	StateData.ZTestEnable = true;
+
+	StateData.DepthTestEnable = false;
+	StateData.DepthWriteEnable = false;
+	StateData.DepthFunction = ZEGR_CF_NEVER;
+
 	StateData.StencilTestEnable = false;
-	StateData.ZWriteEnable = false;
 	StateData.StencilWriteMask = 0xFF;
 	StateData.StencilReadMask = 0xFF;
-	StateData.ZFunction = ZEGR_CF_LESS;
-	StateData.FrontStencilFailOperation = ZEGR_SO_KEEP;
-	StateData.FrontZFailOperation = ZEGR_SO_KEEP;
+
+	StateData.FrontStencilFunction = ZEGR_CF_NEVER;
 	StateData.FrontStencilPassOperation = ZEGR_SO_KEEP;
-	StateData.FrontStencilFunction = ZEGR_CF_ALWAYS;
-	StateData.BackStencilFailOperation = ZEGR_SO_KEEP;
-	StateData.BackZFailOperation = ZEGR_SO_KEEP;
+	StateData.FrontStencilFailOperation = ZEGR_SO_KEEP;
+	StateData.FrontStencilDepthFailOperation = ZEGR_SO_KEEP;
+
+	StateData.BackStencilFunction = ZEGR_CF_NEVER;
 	StateData.BackStencilPassOperation = ZEGR_SO_KEEP;
-	StateData.BackStencilFunction = ZEGR_CF_ALWAYS;
+	StateData.BackStencilFailOperation = ZEGR_SO_KEEP;
+	StateData.BackStencilDepthFailOperation = ZEGR_SO_KEEP;
 }
 
 ZEGRDepthStencilState::ZEGRDepthStencilState()

@@ -54,11 +54,11 @@ class ZED11StatePool : public ZED11ComponentBase
 		ZEList<ZED11StateBase>				RasterizerStatePool;
 		ZEList<ZED11StateBase>				DepthStencilStatePool;
 		
-		ID3D11BlendState*					CreateState(const ZEGRBlendState& BlendState);
-		ID3D11SamplerState*					CreateState(const ZEGRSamplerState& SamplerState);
-		ID3D11RasterizerState*				CreateState(const ZEGRRasterizerState& RasterizerState);
-		ID3D11DepthStencilState*			CreateState(const ZEGRDepthStencilState& DepthStencilState);
-		ID3D11InputLayout*					CreateState(const ZEGRVertexLayout& VertexLayout, ZEGRShader* Shader);
+		ID3D11BlendState*					CreateBlendState(const ZEGRBlendState& BlendState);
+		ID3D11SamplerState*					CreateSamplerState(const ZEGRSamplerState& SamplerState);
+		ID3D11RasterizerState*				CreateRasterizerState(const ZEGRRasterizerState& RasterizerState);
+		ID3D11DepthStencilState*			CreateDepthStencilState(const ZEGRDepthStencilState& DepthStencilState);
+		ID3D11InputLayout*					CreateVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* Shader);
 
 		ZED11StateBase*						FindPoolEntry(ZEList<ZED11StateBase>& Pool, const ZEGRState& State);
 
@@ -68,9 +68,9 @@ class ZED11StatePool : public ZED11ComponentBase
 	public:
 		virtual void						ClearStates();
 
-		ZED11BlendState*					GetState(const ZEGRBlendState& BlendState);
-		ZED11SamplerState*					GetState(const ZEGRSamplerState& SamplerState);
-		ZED11RasterizerState*				GetState(const ZEGRRasterizerState& RasterizerState);
-		ZED11DepthStencilState*				GetState(const ZEGRDepthStencilState& DepthStencilState);
-		ZED11VertexLayout*					GetState(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader);
+		ZED11BlendState*					GetBlendState(const ZEGRBlendState& BlendState);
+		ZED11SamplerState*					GetSamplerState(const ZEGRSamplerState& SamplerState);
+		ZED11RasterizerState*				GetRasterizerState(const ZEGRRasterizerState& RasterizerState);
+		ZED11DepthStencilState*				GetDepthStencilState(const ZEGRDepthStencilState& DepthStencilState);
+		ZED11VertexLayout*					GetVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader);
 };

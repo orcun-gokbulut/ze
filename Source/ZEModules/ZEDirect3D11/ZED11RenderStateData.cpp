@@ -78,21 +78,21 @@ bool ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
 	if (RenderState.GetVertexLayout().GetElementCount() == 0)
 		return false;
 
-	VertexLayout = StatePool->GetState(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
+	VertexLayout = StatePool->GetVertexLayout(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
 	if (VertexLayout == NULL)
 		return false;
 
-	RasterizerState = StatePool->GetState(RenderState.GetRasterizerState());
+	RasterizerState = StatePool->GetRasterizerState(RenderState.GetRasterizerState());
 	if (RasterizerState == NULL)
 		return false;
 	NativeRasterizerState = RasterizerState->GetInterface();
 
-	DepthStencilState = StatePool->GetState(RenderState.GetDepthStencilState());
+	DepthStencilState = StatePool->GetDepthStencilState(RenderState.GetDepthStencilState());
 	if (DepthStencilState == NULL)
 		return false;
 	NativeDepthStencilState = DepthStencilState->GetInterface();
 
-	BlendState = StatePool->GetState(RenderState.GetBlendState(0));
+	BlendState = StatePool->GetBlendState(RenderState.GetBlendState());
 	if (BlendState == NULL)
 		return false;
 	NativeBlendState = BlendState->GetInterface();

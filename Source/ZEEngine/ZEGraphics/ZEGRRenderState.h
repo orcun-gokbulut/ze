@@ -87,7 +87,7 @@ class ZEGRRenderState
 		ZEGRDepthStencilState					DepthStencilState;
 		ZEGRDepthStencilFormat					DepthStencilFormat;
 		ZEGRFormat								RenderTargetFormats[ZEGR_MAX_RENDER_TARGET_SLOT];
-		ZEGRBlendState							BlendStates[ZEGR_MAX_RENDER_TARGET_SLOT];
+		ZEGRBlendState							BlendState;
 
 	public:
 		static ZEGRRenderState					Default;
@@ -110,8 +110,8 @@ class ZEGRRenderState
 		void									SetRasterizerState(const ZEGRRasterizerState& State);
 		const ZEGRRasterizerState&				GetRasterizerState() const;
 
-		void									SetBlendState(ZEUInt Index, const ZEGRBlendState& State);
-		const ZEGRBlendState&					GetBlendState(ZEUInt Index) const;
+		void									SetBlendState(const ZEGRBlendState& State);
+		const ZEGRBlendState&					GetBlendState() const;
 
 		void									SetDepthStencilState(const ZEGRDepthStencilState& State);
 		const ZEGRDepthStencilState&			GetDepthStencilState() const;

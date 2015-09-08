@@ -50,15 +50,15 @@ enum ZEGRPrimitiveType
 
 enum ZEGRFillMode
 {
+	ZEGR_FM_SOLID			= 0,
 	ZEGR_FM_WIREFRAME		= 1,
-	ZEGR_FM_SOLID			= 2
 };
 
 enum ZEGRCullDirection
 {
-	ZEGR_CD_NONE				= 1,
-	ZEGR_CD_CLOCKWISE 			= 2,
-	ZEGR_CD_COUNTER_CLOCKWISE	= 3
+	ZEGR_CD_NONE				= 0,
+	ZEGR_CD_CLOCKWISE 			= 1,
+	ZEGR_CD_COUNTER_CLOCKWISE	= 2
 };
 
 class ZEGRRasterizerState : public ZEGRState
@@ -66,9 +66,9 @@ class ZEGRRasterizerState : public ZEGRState
 	private:
 		struct ZERasterizerStateData	
 		{
-			ZEGRFillMode			FillMode : 3;
-			ZEGRCullDirection		CullDirection : 3;
-			bool					FrontIsCounterClockwise : 2;	
+			ZEGRFillMode			FillMode : 2;
+			ZEGRCullDirection		CullDirection : 2;
+			bool					FrontIsCounterClockwise : 1;	
 		} StateData;
 
 	public:
