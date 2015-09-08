@@ -244,10 +244,10 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
 
 		if (AxisYGridPosition.z > -GridSize.y * 0.5f && AxisYGridPosition.z < GridSize.y * 0.5f)
-			ZEMatrix4x4::CreateOrientation(Constants.AxisXTransform, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
+			ZEMatrix4x4::CreateOrientation(Constants.AxisXTransform, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 1.0f, GridSize.y));
 
 		if (AxisXGridPosition.x > -GridSize.x * 0.5f && AxisXGridPosition.x < GridSize.x * 0.5f)
-			ZEMatrix4x4::CreateOrientation(Constants.AxisYTransform, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
+			ZEMatrix4x4::CreateOrientation(Constants.AxisYTransform, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 1.0f, GridSize.y));
 	}
 
 
@@ -294,22 +294,22 @@ void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* C
 
 	if (MinorGridEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 0, 4);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 0, 64);
 		Context->Draw(MinorGridCount, MinorGridOffset);
 	}
 
 	if (MajorGridEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 4, 4);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 64, 64);
 		Context->Draw(MajorGridCount, MajorGridOffset);
 	}
 
 	if (AxisEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 8, 4);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 128, 64);
 		Context->Draw(2, 0);
 		
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 12, 4);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 192, 64);
 		Context->Draw(2, 2);
 	}
 

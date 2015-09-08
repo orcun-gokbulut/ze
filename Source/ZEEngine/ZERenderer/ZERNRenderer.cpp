@@ -37,11 +37,15 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStage.h"
+#include "ZERNCommand.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNView.h"
+#include "ZERNShaderSlots.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
-#include "ZERNCommand.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
-#include "ZERNRenderParameters.h"
+#include "ZEGraphics\ZEGRContext.h"
+#include "ZEGraphics\ZEGRConstantBuffer.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -51,6 +55,44 @@ static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 		return 1;
 	else
 		return (int)(A->Order - B->Order);
+}
+
+void ZERNRenderer::UpdateViewConstantBuffer()
+{
+	ZERNViewConstantBuffer* Buffer;
+	if (!ViewConstantBuffer->Lock((void**)&Buffer))
+		return;
+
+	memset(Buffer, 0, sizeof(ZERNViewConstantBuffer));
+
+	Buffer->ViewTransform = View.ViewTransform;
+	Buffer->ProjectionTransform = View.ProjectionTransform;
+	Buffer->ViewProjectionTransform = View.ProjectionTransform;
+	Buffer->InvViewTransform = View.InvViewTransform;
+	Buffer->InvProjectionTransform = View.InvProjectionTransform;			
+	Buffer->InvViewProjectionTransform = View.InvProjectionTransform;
+
+	Buffer->Width = View.Width;
+	Buffer->Height = View.Height;
+	Buffer->VerticalFOV = View.VerticalFOV;
+	Buffer->HorizontalFOV = View.HorizontalFOV;
+	Buffer->AspectRatio = View.AspectRatio;
+	Buffer->NearZ = View.NearZ;
+	Buffer->FarZ = View.FarZ;
+	Buffer->Reserved0 = 0.0f;
+
+	Buffer->Position = View.Position;
+	Buffer->RotationQuaternion = View.Rotation;
+	ZEQuaternion::ConvertToEulerAngles(
+		Buffer->RotationEuler.x,
+		Buffer->RotationEuler.y,
+		Buffer->RotationEuler.z, 
+		View.Rotation);
+	Buffer->U = View.U;
+	Buffer->V = View.V;
+	Buffer->N = View.N;
+
+	ViewConstantBuffer->Unlock();
 }
 
 void ZERNRenderer::Cull()
@@ -85,7 +127,13 @@ void ZERNRenderer::RenderStages()
 	Parameters.Renderer = this;
 	Parameters.Type = ZERN_DT_NORMAL;
 	Parameters.Command;
-	
+
+	UpdateViewConstantBuffer();
+
+	//Context->SetConstantBuffer(ZEGR_ST_ALL, 0, GetConstantBuffer());
+	//Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, Scene->GetConstantBuffer());
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
+
 	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
 	{
 		ZERNStageQueue* Queue = &StageQueues[I];
@@ -102,6 +150,7 @@ void ZERNRenderer::RenderStages()
 			ZERNCommand* Command = Link->GetItem();
 			Parameters.Command = Command;
 			Command->Execute(&Parameters);
+			Link = Link->GetNext();
 		}
 
 		Queue->Stage->CleanUp(this, Context);
@@ -114,6 +163,7 @@ bool ZERNRenderer::InitializeSelf()
 		if (!StageQueues[I].Stage != NULL)
 			StageQueues[I].Stage->Initialize();
 
+	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
 	return true;
 }
 
@@ -122,6 +172,8 @@ void ZERNRenderer::DeinitializeSelf()
 	for (ZESize I = 0; I < StageQueues.GetCount(); I++)
 		if (StageQueues[I].Stage != NULL)
 			StageQueues[I].Stage->Deinitialize();
+	
+	ViewConstantBuffer.Release();
 }
 
 void ZERNRenderer::SetDevice(ZEGRContext* Device)

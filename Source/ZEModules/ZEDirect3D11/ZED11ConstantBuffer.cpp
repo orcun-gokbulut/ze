@@ -40,7 +40,7 @@
 
 #include <d3d11.h>
 
-const ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
+ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
 {
 	return Buffer;
 }

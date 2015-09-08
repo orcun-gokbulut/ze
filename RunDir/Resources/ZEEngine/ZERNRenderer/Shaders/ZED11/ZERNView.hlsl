@@ -42,13 +42,13 @@
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
-cbuffer ZERNView_Constants : register(ZERN_SHADER_CONSTANT_CAMERA)
+cbuffer ZERNView_Constants : register(ZERN_SHADER_CONSTANT_VIEW)
 {
 	float4x4				ZERNView_ViewTransform;
 	float4x4				ZERNView_ProjectionTransform;		
-	float4x4				ZERNView_InvViewTransform;
-	float4x4				ZERNView_InvProjTransform;			
 	float4x4				ZERNView_ViewProjectionTransform;
+	float4x4				ZERNView_InvViewTransform;
+	float4x4				ZERNView_InvProjectionTransform;			
 	float4x4				ZERNView_InvViewProjectionTransform;
 
 	float					ZERNView_Width;

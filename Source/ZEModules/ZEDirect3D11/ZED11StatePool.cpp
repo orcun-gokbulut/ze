@@ -356,7 +356,7 @@ ID3D11BlendState* ZED11StatePool::CreateState(const ZEGRBlendState& BlendState)
 	D3D11_BLEND_DESC BlendDesc;
 	BlendDesc.IndependentBlendEnable = true;
 	BlendDesc.AlphaToCoverageEnable = BlendState.GetAlphaToCoverageEnable();
-
+	memset(&BlendDesc, 0, sizeof(D3D11_BLEND_DESC));
 	for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; ++I)
 	{
 		BlendDesc.RenderTarget[I].BlendEnable = BlendState.GetBlendEnable((ZEUInt)I) ? 1 : 0;
@@ -375,7 +375,7 @@ ID3D11BlendState* ZED11StatePool::CreateState(const ZEGRBlendState& BlendState)
 	HRESULT Result = GetDevice()->CreateBlendState(&BlendDesc, &NativeState);
 	if (FAILED(Result))
 	{
-		zeError("D3D10 Blend state creation failed. ErrorCode: %d.", Result);
+		zeError("Blend state creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
@@ -397,6 +397,7 @@ ID3D11SamplerState* ZED11StatePool::CreateState(const ZEGRSamplerState& SamplerS
 	ZEVector4 BorderColor = SamplerState.GetBorderColor();
 
 	D3D11_SAMPLER_DESC SamplerDesc;
+	memset(&SamplerDesc, 0, sizeof(D3D11_SAMPLER_DESC));
 	SamplerDesc.BorderColor[0] = BorderColor.x;
 	SamplerDesc.BorderColor[1] = BorderColor.y;
 	SamplerDesc.BorderColor[2] = BorderColor.z;
@@ -435,6 +436,7 @@ ID3D11RasterizerState* ZED11StatePool::CreateState(const ZEGRRasterizerState& Ra
 	}
 
 	D3D11_RASTERIZER_DESC RasterizerDesc;
+	memset(&RasterizerDesc, 0, sizeof(D3D11_RASTERIZER_DESC));
 	RasterizerDesc.DepthBias = 0;
 	RasterizerDesc.DepthBiasClamp = 0.0f;
 	RasterizerDesc.SlopeScaledDepthBias = 0.0f;
@@ -470,6 +472,7 @@ ID3D11DepthStencilState* ZED11StatePool::CreateState(const ZEGRDepthStencilState
 	}
 	
 	D3D11_DEPTH_STENCIL_DESC DepthStencilDesc;
+	memset(&DepthStencilDesc, 0, sizeof(D3D11_DEPTH_STENCIL_DESC));
 	DepthStencilDesc.DepthEnable = DepthStencilState.GetZTestEnable();
 	DepthStencilDesc.DepthFunc = Convert(DepthStencilState.GetZFunction());
 	DepthStencilDesc.DepthWriteMask = DepthStencilState.GetZWriteEnable() ? D3D11_DEPTH_WRITE_MASK_ALL : D3D11_DEPTH_WRITE_MASK_ZERO;
@@ -502,6 +505,12 @@ ID3D11DepthStencilState* ZED11StatePool::CreateState(const ZEGRDepthStencilState
 
 ID3D11InputLayout* ZED11StatePool::CreateState(const ZEGRVertexLayout& VertexLayout, ZEGRShader* Shader)
 {
+	if (Shader == NULL || Shader->GetShaderType() != ZEGR_ST_VERTEX)
+	{
+		zeError("Vertex Layout creation failed. Wrong shader type or empty vertex shader.");
+		return false;
+	}
+
 	if (VertexLayoutPool.GetCount() >= ZEGR_STATE_POOL_CACHE_CAPACITY)
 	{
 		zeError("Max input layout count reached.");
@@ -567,14 +576,14 @@ ID3D11InputLayout* ZED11StatePool::CreateState(const ZEGRVertexLayout& VertexLay
 	}
 
 	ZED11Shader* D11Shader = (ZED11Shader*)Shader;
-	/*SIZE_T Lenght = D11Shader->GetShader()->GetBufferSize();
-	const void* Code = ByteCode->GetBufferPointer();*/
-	
 	ID3D11InputLayout* NativeState = NULL;
-	HRESULT Result = GetDevice()->CreateInputLayout(ElementDesc, ElementCount, NULL, 0, &NativeState);
+	HRESULT Result = GetDevice()->CreateInputLayout(
+		ElementDesc, ElementCount, 
+		D11Shader->GetByteCode().GetConstCArray(), D11Shader->GetByteCode().GetCount(), 
+		&NativeState);
 	if (FAILED(Result))
 	{
-		zeError("D3D10 Vertex layout creation failed. ErrorCode: %d.", Result);
+		zeError("Vertex layout creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 

@@ -81,7 +81,8 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void				SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
 		virtual void				SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
 	
-		virtual void				SetRenderTarget(ZEUInt Count, ZEGRRenderTarget** RenderTarget);
+		virtual void				SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* RenderTarget);
+		virtual void				SetRenderTargetCount(ZEUInt Count);
 		virtual void				SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer);
 
 		virtual void				SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts);

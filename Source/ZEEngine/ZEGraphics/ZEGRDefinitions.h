@@ -58,7 +58,8 @@ enum ZEGRShaderType
 	ZEGR_ST_GEOMETRY	= 3,
 	ZEGR_ST_DOMAIN		= 4,
 	ZEGR_ST_HULL		= 5,
-	ZEGR_ST_COMPUTE		= 6
+	ZEGR_ST_COMPUTE		= 6,
+	ZEGR_ST_ALL			= 10,
 };
 
 

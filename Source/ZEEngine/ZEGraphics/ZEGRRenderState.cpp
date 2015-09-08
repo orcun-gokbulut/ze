@@ -154,7 +154,9 @@ void ZEGRRenderState::SetToDefault()
 ZEGRRenderStateData* ZEGRRenderState::Compile()
 {
 	ZEGRRenderStateData* RenderState = ZEGRGraphicsModule::GetInstance()->CreateRenderStateData();
-	RenderState->Initialize(*this);
+	if (!RenderState->Initialize(*this))
+		return false;
+
 	return RenderState;
 }
 

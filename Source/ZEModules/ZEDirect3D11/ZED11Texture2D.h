@@ -38,6 +38,7 @@
 #include "ZETypes.h"
 #include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 class ZETextureData;
 class ZEGRRenderTarget;
@@ -49,6 +50,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 	protected:
 		ID3D11Texture2D*					Texture2D;
 		ID3D11ShaderResourceView*			ResourceView;
+		ZEGRHolder<ZEGRRenderTarget>		RenderTargets[14];
 
 		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget);
 		virtual void						Deinitialize();

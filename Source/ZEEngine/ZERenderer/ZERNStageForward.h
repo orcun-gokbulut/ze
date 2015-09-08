@@ -43,18 +43,13 @@ class ZEGRTexture2D;
 
 class ZERNStageForward : public ZERNStage
 {
-	private:
-		ZEGRRenderTarget*				AccumulationBuffer;
-
-		void							SetupRenderTarget();
-
 	public:
 		virtual ZEInt					GetId();
 		virtual const ZEString&			GetName();
-		
+		static  const ZEGRRenderState&	GetRenderState();
+
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 
-		static  const ZEGRRenderState&	GetRenderState();
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward
@@ -62,8 +57,5 @@ class ZERNStageForwardTransparent : public ZERNStageForward
 	public:
 		virtual ZEInt					GetId();
 		virtual const ZEString&			GetName();
-
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-
 		static const ZEGRRenderState&	GetRenderState();
 };

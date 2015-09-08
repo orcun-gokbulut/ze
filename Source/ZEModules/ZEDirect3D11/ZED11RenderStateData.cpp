@@ -49,12 +49,58 @@
 
 #include <d3d11.h>
 
-void ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
+static D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitveType(ZEGRPrimitiveType Type)
+{
+	switch (Type)
+	{
+		default:
+		case ZEGR_PT_NONE:
+			return (D3D11_PRIMITIVE_TOPOLOGY)0;
+
+		case ZEGR_PT_POINT_LIST:
+			return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
+
+		case ZEGR_PT_LINE_LIST:
+			return D3D11_PRIMITIVE_TOPOLOGY_LINELIST;
+
+		case ZEGR_PT_TRIANGLE_LIST:
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST;
+
+		case ZEGR_PT_TRIANGLE_STRIPT:
+			return D3D11_PRIMITIVE_TOPOLOGY_TRIANGLESTRIP;
+	}
+}
+
+bool ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
 {
 	ZED11StatePool* StatePool = GetModule()->GetStatePool();
+	
+	if (RenderState.GetVertexLayout().GetElementCount() == 0)
+		return false;
 
 	VertexLayout = StatePool->GetState(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
+	if (VertexLayout == NULL)
+		return false;
+
 	RasterizerState = StatePool->GetState(RenderState.GetRasterizerState());
+	if (RasterizerState == NULL)
+		return false;
+	NativeRasterizerState = RasterizerState->GetInterface();
+
 	DepthStencilState = StatePool->GetState(RenderState.GetDepthStencilState());
+	if (DepthStencilState == NULL)
+		return false;
+	NativeDepthStencilState = DepthStencilState->GetInterface();
+
 	BlendState = StatePool->GetState(RenderState.GetBlendState(0));
+	if (BlendState == NULL)
+		return false;
+	NativeBlendState = BlendState->GetInterface();
+
+	PrimitiveTopology = ConvertPrimitveType(RenderState.GetPrimitiveType());
+	
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		Shaders[I] = RenderState.GetShader((ZEGRShaderType)I);
+	
+	return true;
 }

@@ -44,6 +44,7 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZERNShaderConfig.h"
 #include "ZERNStageForward.h"
+#include "ZECanvas.h"
 
 bool ZERNSimpleMaterial::InitializeSelf()
 {
@@ -51,6 +52,7 @@ bool ZERNSimpleMaterial::InitializeSelf()
 	ConstantBuffer->SetData(&Constants);
 
 	ZEGRRenderState State = ZERNStageForward::GetRenderState();
+	State.SetPrimitiveType(ZEGR_PT_LINE_LIST);
 
 	ZEGRShaderCompileOptions Options;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSimpleMaterial.hlsl";
@@ -68,6 +70,7 @@ bool ZERNSimpleMaterial::InitializeSelf()
 	zeCheckError(PixelShader == NULL, false, "Cannot compile pixel shader.");
 	State.SetShader(Options.Type, PixelShader);
 
+	State.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 	RenderState = State.Compile();
 	zeCheckError(RenderState == NULL, false, "Cannot compile render state.");
 
@@ -149,7 +152,10 @@ const ZERNSampler& ZERNSimpleMaterial::GetTexture() const
 
 bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
-	ZERNMaterial::SetupMaterial(Context, Stage);
+	if (!ZERNMaterial::SetupMaterial(Context, Stage))
+		return false;
+
+	Context->SetRenderState(RenderState);
 
 	if (TextureSampler.GetTexture() != NULL)
 	{
@@ -157,7 +163,8 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureSampler.GetSamplerState());
 	}
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_DRAW, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 
 	return true;
 }
