@@ -42,7 +42,7 @@ class ZEGRShader;
 class ZEGRShaderCompiler
 {
 	public:
-		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output) = 0;
+		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
 
 		static ZEGRShaderCompiler*	CreateInstance();
 };
