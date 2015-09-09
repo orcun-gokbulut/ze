@@ -39,7 +39,6 @@
 #include "ZEMLProperty.h"
 #include "ZEMLData.h"
 #include "ZEEndian.h"
-#include "ZEMLFormatBinaryV1.h"
 
 bool ZEMLWriterNode::WriteValue(const char* Name, const ZEValue& Value)
 {
@@ -302,7 +301,7 @@ bool ZEMLWriter::Open(ZEFile* File)
 	}
 
 	if (Format == NULL)
-		Format = new ZEMLFormatBinaryV1();
+		Format = ZEMLFormat::GetFormats()[0]->CreateInstance();
 
 	if ((Format->GetDescription()->GetSupport() & ZEML_FS_WRITE) == 0)
 	{

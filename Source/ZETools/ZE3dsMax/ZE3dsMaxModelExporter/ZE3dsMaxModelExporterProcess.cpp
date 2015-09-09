@@ -837,10 +837,20 @@ bool ZE3dsMaxModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 	BoneNode->AddProperty("ParentBone")->SetInt32(ParentBoneId);
 
 	Box3 BB;
-	Bone->GetBoundingBox(BB);
+	Bone->GetMaxObject()->GetLocalBoundBox(0, Node->GetMaxNode(), NULL, BB);
 	ZEMLNode* BoundingBoxNode = BoneNode->AddNode("BoundingBox");
-	BoundingBoxNode->AddProperty("Min")->SetVector3(ZE3dsMaxUtils::MaxtoZE(BB.Min()));
-	BoundingBoxNode->AddProperty("Max")->SetVector3(ZE3dsMaxUtils::MaxtoZE(BB.Max()));
+
+	Point3 Min, Max;
+	Min.x = BB.Min().x;
+	Min.y = BB.Min().z;
+	Min.z = BB.Min().y;
+
+	Max.x = BB.Max().x;
+	Max.y = BB.Max().z;
+	Max.z = BB.Max().y;
+
+	BoundingBoxNode->AddProperty("Min")->SetVector3(ZE3dsMaxUtils::MaxtoZE(Min));
+	BoundingBoxNode->AddProperty("Max")->SetVector3(ZE3dsMaxUtils::MaxtoZE(Max));
 
 	if (ParentBoneId != -1)
 	{
