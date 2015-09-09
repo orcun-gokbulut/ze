@@ -327,7 +327,7 @@ bool ZEGrid::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	Material = ZERNSimpleMaterial::CreateInstance();
-	Material->SetVertexColor(true);
+	Material->SetVertexColorEnabled(true);
 	Material->Initialize();
 
 	GenerateGrid();

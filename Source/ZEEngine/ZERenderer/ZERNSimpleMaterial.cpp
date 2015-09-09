@@ -46,22 +46,51 @@
 #include "ZERNStageForward.h"
 #include "ZECanvas.h"
 
-bool ZERNSimpleMaterial::InitializeSelf()
+#define ZERN_SMDF_RENDER_STATE		1
+#define ZERN_SMDF_CONSTANT_BUFFER	2
+
+void ZERNSimpleMaterial::UpdateRenderState()
 {
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	ConstantBuffer->SetData(&Constants);
+	if (!Dirty.GetFlags(ZERN_SMDF_RENDER_STATE))
+		return;
 
 	ZEGRRenderState RenderState = ZERNStageForward::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
-	ZEGRDepthStencilState DepthStencilState = RenderState.GetDepthStencilState();
-	DepthStencilState.SetDepthTestEnable(false);
-	RenderState.SetDepthStencilState(DepthStencilState);
+	if (DepthTestDisabled)
+	{
+		ZEGRDepthStencilState DepthStencilState = RenderState.GetDepthStencilState();
+		DepthStencilState.SetDepthTestEnable(false);
+		RenderState.SetDepthStencilState(DepthStencilState);
+	}
 
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
-	RasterizerState.SetCullDirection(ZEGR_CD_NONE);
+	RasterizerState.SetCullDirection(TwoSided ? ZEGR_CD_NONE : ZEGR_CD_COUNTER_CLOCKWISE);
+	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : ZEGR_FM_SOLID);
 	RenderState.SetRasterizerState(RasterizerState);
+
+	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
+
+	this->RenderState = RenderState.Compile();
+
+	Dirty.UnraiseFlags(ZERN_SMDF_RENDER_STATE);
+}
+
+void ZERNSimpleMaterial::UpdateConstantBuffer()
+{
+	if (!Dirty.GetFlags(ZERN_SMDF_CONSTANT_BUFFER))
+		return
+		
+	ConstantBuffer->SetData(&Constants);	
+	Dirty.UnraiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
+}
+
+bool ZERNSimpleMaterial::InitializeSelf()
+{
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer->SetData(&Constants);
 
 	ZEGRShaderCompileOptions Options;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSimpleMaterial.hlsl";
@@ -69,18 +98,16 @@ bool ZERNSimpleMaterial::InitializeSelf()
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNSimpleMaterial_VSMain_ForwardStage";
-	ZEGRShader* VertexShader = ZEGRShader::Compile(Options);
+	VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(VertexShader == NULL, false, "Cannot compile vertex shader.");
-	RenderState.SetShader(Options.Type, VertexShader);
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSimpleMaterial_PSMain_ForwardStage";
-	ZEGRShader* PixelShader = ZEGRShader::Compile(Options);
+	PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Cannot compile pixel shader.");
-	RenderState.SetShader(Options.Type, PixelShader);
 
-	this->RenderState = RenderState.Compile();
-	zeCheckError(this->RenderState == NULL, false, "Cannot compile render state.");
+	UpdateRenderState();
+	UpdateConstantBuffer();
 
 	return true;
 }
@@ -95,9 +122,11 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 {
 	Wireframe = false;
 	TwoSided = false;
-	VertexColorEnabled = true;
-	Constants.TransparancyCullLimit = 0x80;
+	DepthTestDisabled = false;
+	Constants.VertexColorEnabled = true;
+	Constants.TextureEnabled = false;
 	Constants.MaterialColor = ZEVector4::One;
+	Dirty.RaiseAll();
 }
 
 ZERNStageMask ZERNSimpleMaterial::GetStageMask()
@@ -107,7 +136,11 @@ ZERNStageMask ZERNSimpleMaterial::GetStageMask()
 
 void ZERNSimpleMaterial::SetTwoSided(bool Enable)
 {
+	if (TwoSided == Enable)
+		return;
+
 	TwoSided = Enable;
+	Dirty.RaiseFlags(ZERN_SMDF_RENDER_STATE);
 }
 
 bool ZERNSimpleMaterial::GetTwoSided() const
@@ -117,7 +150,11 @@ bool ZERNSimpleMaterial::GetTwoSided() const
 
 void ZERNSimpleMaterial::SetWireframe(bool Enable)
 {
+	if (Wireframe == Enable)
+		return;
+
 	Wireframe = Enable;
+	Dirty.RaiseFlags(ZERN_SMDF_RENDER_STATE);
 }
 
 bool ZERNSimpleMaterial::GetWireframe() const
@@ -125,14 +162,32 @@ bool ZERNSimpleMaterial::GetWireframe() const
 	return Wireframe;
 }
 
-void ZERNSimpleMaterial::SetVertexColor(bool Enable)
+void ZERNSimpleMaterial::SetDepthTestDisabled(bool Disabled)
 {
-	VertexColorEnabled = Enable;
+	if (DepthTestDisabled == Disabled)
+		return;
+
+	DepthTestDisabled = Disabled;
+	Dirty.RaiseFlags(ZERN_SMDF_RENDER_STATE);
 }
 
-bool ZERNSimpleMaterial::GetVertexColor()
+bool ZERNSimpleMaterial::GetDepthTestDisabled()
 {
-	return VertexColorEnabled;
+	return DepthTestDisabled;
+}
+
+void ZERNSimpleMaterial::SetVertexColorEnabled(bool Enable)
+{
+	if (Constants.VertexColorEnabled == Enable)
+		return;
+
+	Constants.VertexColorEnabled = Enable;
+	Dirty.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
+}
+
+bool ZERNSimpleMaterial::GetVertexColorEnabled()
+{
+	return Constants.VertexColorEnabled;
 }
 
 void ZERNSimpleMaterial::SetMaterialColor(const ZEVector4& Color)
@@ -141,6 +196,7 @@ void ZERNSimpleMaterial::SetMaterialColor(const ZEVector4& Color)
 		return;
 
 	Constants.MaterialColor = Color;
+	Dirty.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
 }
 
 const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
@@ -151,6 +207,13 @@ const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
 void ZERNSimpleMaterial::SetTexture(const ZERNSampler& Sampler)
 {
 	TextureSampler = Sampler;
+	
+	bool TextureEnabled = (Sampler.GetTexture() != NULL);
+	if (Constants.TextureEnabled == TextureEnabled)
+		return;
+	
+	Constants.TextureEnabled = TextureEnabled;
+	Dirty.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
 }
 
 const ZERNSampler& ZERNSimpleMaterial::GetTexture() const
@@ -163,9 +226,16 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
+	UpdateRenderState();
+	UpdateConstantBuffer();
+
 	Context->SetRenderState(RenderState);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureSampler.GetTexture());
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureSampler.GetSamplerState());
+	if (Constants.TextureEnabled)
+	{
+		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureSampler.GetTexture());
+		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureSampler.GetSamplerState());
+	}
+
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 

@@ -53,7 +53,6 @@
 
 #define ZEGR_CONTEXT_DIRTY_BLEND_STATE		1
 #define ZEGR_CONTEXT_DIRTY_STENCIL_STATE	2
-#define ZEGR_CONTEXT_DIRTY_RENDER_TARGETS	4
 
 inline DXGI_FORMAT ConverIndexBufferFormat(ZEGRIndexBufferFormat Format)
 {
@@ -87,12 +86,6 @@ void ZED11Context::UpdateContext()
 	{
 		Context->OMSetDepthStencilState(RenderState->NativeDepthStencilState, StencilRef);
 		DirtyFlags.UnraiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
-	}
-
-	if (DirtyFlags.GetBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS))
-	{
-		Context->OMSetRenderTargets(RenderTargetCount, RenderTargets, DepthStencilBuffer);
-		DirtyFlags.UnraiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
 	}
 }
 
@@ -141,8 +134,6 @@ void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 
 	if (DepthStencilState != RenderState->NativeDepthStencilState)
 		DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
-
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
 }
 
 void ZED11Context::SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer)
@@ -173,33 +164,26 @@ void ZED11Context::SetIndexBuffer(ZEGRIndexBuffer* Buffer)
 	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Buffer->GetFormat()), 0);
 }
 
-void ZED11Context::SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* RenderTargets)
+void ZED11Context::SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
-	zeDebugCheck(Index >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget index is too much.");
+	zeDebugCheck(Count >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget index is too much.");
 	
-	if (Index >= ZEGR_MAX_RENDER_TARGET_SLOT)
-		Index = ZEGR_MAX_RENDER_TARGET_SLOT;
-
-	ID3D11RenderTargetView* NativeRenderTarget = static_cast<ZED11RenderTarget*>(RenderTargets)->GetView();
-	if (this->RenderTargets[Index] == NativeRenderTarget)
-		return;
-
-	this->RenderTargets[Index] = static_cast<ZED11RenderTarget*>(RenderTargets)->GetView();
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
-}
-
-void ZED11Context::SetRenderTargetCount(ZEUInt Count)
-{
-	zeDebugCheck(Count > ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget index is too much.");
-
-	if (Count > ZEGR_MAX_RENDER_TARGET_SLOT)
+	if (Count >= ZEGR_MAX_RENDER_TARGET_SLOT)
 		Count = ZEGR_MAX_RENDER_TARGET_SLOT;
 
-	if (RenderTargetCount == Count)
-		return;
+	ID3D11RenderTargetView* NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+	for (ZESize I = 0; I < Count; I++)
+	{
+		NativeRenderTargets[I] = NULL;
+		if (RenderTargets[I] != NULL)
+			NativeRenderTargets[I] = static_cast<ZED11RenderTarget*>(RenderTargets[I])->GetView();
+	}
 
-	RenderTargetCount = Count;
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
+	ID3D11DepthStencilView* NativeDepthStencil = NULL;
+	if (DepthStencilBuffer != NULL)
+		NativeDepthStencil = static_cast<ZED11DepthStencilBuffer*>(DepthStencilBuffer)->GetView();
+
+	Context->OMSetRenderTargets(Count, (Count != 0 ? NativeRenderTargets : NULL), NativeDepthStencil);
 }
 
 void ZED11Context::SetStencilRef(ZEUInt Reference)
@@ -286,7 +270,7 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 	if (Buffer != NULL)
 		 NativeConstants = ((ZED11ConstantBuffer*)Buffer)->GetBuffer();
 
-	switch(Shader)
+/*	switch(Shader)
 	{
 		default:
 		case ZEGR_ST_NONE:
@@ -323,6 +307,46 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
 			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+	}*/
+
+	switch(Shader)
+	{
+		default:
+		case ZEGR_ST_NONE:
+			break;
+
+		case ZEGR_ST_VERTEX:
+			Context->VSSetConstantBuffers(Index, 1, &NativeConstants);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetConstantBuffers(Index, 1, &NativeConstants);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetConstantBuffers(Index, 1, &NativeConstants);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetConstantBuffers(Index, 1, &NativeConstants);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetConstantBuffers(Index, 1, &NativeConstants);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetConstantBuffers(Index, 1, &NativeConstants);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->PSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->GSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->DSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->HSSetConstantBuffers(Index, 1, &NativeConstants);
+			Context->CSSetConstantBuffers(Index, 1, &NativeConstants);
 			break;
 	}
 }
@@ -419,20 +443,6 @@ void ZED11Context::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSam
 	}
 }
 
-void ZED11Context::SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer)
-{
-	ID3D11DepthStencilView* NativeView = NULL;
-	ZED11DepthStencilBuffer* D11Buffer = static_cast<ZED11DepthStencilBuffer*>(Buffer);
-	if (D11Buffer != NULL)
-		NativeView = D11Buffer->GetView();
-
-	if (DepthStencilBuffer == NativeView)
-		return;
-
-	DepthStencilBuffer = NativeView;
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_RENDER_TARGETS);
-}
-
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)
 {
 	UpdateContext();
@@ -468,11 +478,7 @@ ZED11Context::ZED11Context()
 	BlendState = NULL;
 	BlendFactors = ZEVector4::One;
 	BlendMask = 0xFFFFFFFF;
-
-	RenderTargetCount = 0;
-	memset(RenderTargets, 0, ZEGR_MAX_RENDER_TARGET_SLOT * sizeof(ID3D11RenderTargetView*));
 	DepthStencilState = NULL;
-	DepthStencilBuffer = NULL;
 	StencilRef = 0;
 
 	RenderState = NULL;

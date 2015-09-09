@@ -52,6 +52,7 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRHolder<ZEGRTexture2D>			GBuffer3;
 		ZEGRRenderState						RenderState;
 		ZEGRViewport						Viewport;
+		ZEGRRenderTarget*					RenderTargets[4];
 
 		void								UpdateRenderTargets(ZERNRenderer* Renderer);
 

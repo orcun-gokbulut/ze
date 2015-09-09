@@ -62,9 +62,9 @@ class ZEGRSamplerState : public ZEGRState
 			ZEGRTextureAddressing	AddressU : 4;
 			ZEGRTextureAddressing	AddressV : 4;
 			ZEGRTextureAddressing	AddressW : 4;
-			ZEGRTextureFilter		MinFilter : 4;
-			ZEGRTextureFilter		MagFilter : 4;
-			ZEGRTextureFilter		MipFilter : 4;
+			ZEGRTextureFilter		MinFilter : 3;
+			ZEGRTextureFilter		MagFilter : 3;
+			ZEGRTextureFilter		MipFilter : 3;
 			ZEUInt32				MaxAnisotropy : 6;
 
 			float					MinLOD;

@@ -67,7 +67,7 @@ class ZEGRRasterizerState : public ZEGRState
 		struct ZERasterizerStateData	
 		{
 			ZEGRFillMode			FillMode : 2;
-			ZEGRCullDirection		CullDirection : 2;
+			ZEGRCullDirection		CullDirection : 3;
 			bool					FrontIsCounterClockwise : 1;	
 		} StateData;
 
