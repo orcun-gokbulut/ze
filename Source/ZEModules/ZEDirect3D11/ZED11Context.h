@@ -46,55 +46,48 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	protected:
-		ID3D11DeviceContext1*		Context;
+		ID3D11DeviceContext1*				Context;
 		
-		ZEFlags						DirtyFlags;
+		ZEFlags								DirtyFlags;
+		ZEGRHolder<ZED11RenderStateData>	RenderState;
+		ID3D11BlendState*					BlendState;
+		ZEVector4							BlendFactors;
+		ZEUInt								BlendMask;
+		ID3D11DepthStencilState*			DepthStencilState;
+		ZEUInt								StencilRef;
 
-		ZED11RenderStateData*		RenderState;
+		void								UpdateContext();
 
-		ID3D11BlendState*			BlendState;
-		ZEVector4					BlendFactors;
-		ZEUInt						BlendMask;
-		ZEUInt						RenderTargetCount;
-		ID3D11RenderTargetView*		RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-		ID3D11DepthStencilState*	DepthStencilState;
-		ID3D11DepthStencilView*		DepthStencilBuffer;
-		ZEUInt						StencilRef;
+		void								Initialize(ID3D11DeviceContext1* Device);
+		void								Deinitialize();
 
-		void						UpdateContext();
-
-		void						Initialize(ID3D11DeviceContext1* Device);
-		void						Deinitialize();
-
-									ZED11Context();
-		virtual						~ZED11Context();
+											ZED11Context();
+		virtual								~ZED11Context();
 
 	public:
-		ID3D11DeviceContext*		GetContext();
+		ID3D11DeviceContext*				GetContext();
 
-		virtual void				SetRenderState(ZEGRRenderStateData* State);
+		virtual void						SetRenderState(ZEGRRenderStateData* State);
 		
-		virtual void				SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
-		virtual void				SetIndexBuffer(ZEGRIndexBuffer* Buffer);
+		virtual void						SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
+		virtual void						SetIndexBuffer(ZEGRIndexBuffer* Buffer);
 		
-		virtual void				SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset = 0, ZEUInt Size = 0);
-		virtual void				SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
-		virtual void				SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
+		virtual void						SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset = 0, ZEUInt Size = 0);
+		virtual void						SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
+		virtual void						SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
 	
-		virtual void				SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* RenderTarget);
-		virtual void				SetRenderTargetCount(ZEUInt Count);
-		virtual void				SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer);
+		virtual void						SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 
-		virtual void				SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts);
-		virtual void				SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects);
+		virtual void						SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts);
+		virtual void						SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects);
 
-		virtual void				SetStencilRef(ZEUInt Reference);
-		virtual void				SetBlendFactors(ZEVector4& Factors);
-		virtual void				SetBlendMask(ZEUInt Mask);
+		virtual void						SetStencilRef(ZEUInt Reference);
+		virtual void						SetBlendFactors(ZEVector4& Factors);
+		virtual void						SetBlendMask(ZEUInt Mask);
 
-		virtual void				Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
-		virtual void				DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);
+		virtual void						Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
+		virtual void						DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);
 
-		virtual void				ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
-		virtual void				ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
+		virtual void						ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
+		virtual void						ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
 };

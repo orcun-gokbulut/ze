@@ -67,9 +67,7 @@ class ZEGRContext
 		virtual void			SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture) = 0;
 		virtual void			SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler) = 0;
 		
-		virtual void			SetRenderTarget(ZEUInt Index, ZEGRRenderTarget* RenderTarget) = 0;
-		virtual void			SetRenderTargetCount(ZEUInt Count) = 0;
-		virtual void			SetDepthStencilBuffer(ZEGRDepthStencilBuffer* Buffer) = 0;
+		virtual void			SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer* DepthStencilBuffer) = 0;
 
 		virtual void			SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts) = 0;
 		virtual void			SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects) = 0;

@@ -70,21 +70,21 @@ class ZEGRDepthStencilState : public ZEGRState
 		{
 			bool						DepthTestEnable : 1;
 			bool						DepthWriteEnable : 1;
-			ZEGRComparisonFunction		DepthFunction : 4;
+			ZEGRComparisonFunction		DepthFunction : 5;
 
 			bool						StencilTestEnable : 1;
 			ZEUInt8						StencilWriteMask : 8;
 			ZEUInt8						StencilReadMask : 8;
 
-			ZEGRComparisonFunction		FrontStencilFunction : 4;
-			ZEGRStencilOperation		FrontStencilPassOperation : 4;
-			ZEGRStencilOperation		FrontStencilFailOperation : 4;
-			ZEGRStencilOperation		FrontStencilDepthFailOperation : 4;
+			ZEGRComparisonFunction		FrontStencilFunction : 5;
+			ZEGRStencilOperation		FrontStencilPassOperation : 5;
+			ZEGRStencilOperation		FrontStencilFailOperation : 5;
+			ZEGRStencilOperation		FrontStencilDepthFailOperation : 5;
 
-			ZEGRComparisonFunction		BackStencilFunction : 4;
-			ZEGRStencilOperation		BackStencilPassOperation : 4;
-			ZEGRStencilOperation		BackStencilFailOperation : 4;
-			ZEGRStencilOperation		BackStencilDepthFailOperation : 4;
+			ZEGRComparisonFunction		BackStencilFunction : 5;
+			ZEGRStencilOperation		BackStencilPassOperation : 5;
+			ZEGRStencilOperation		BackStencilFailOperation : 5;
+			ZEGRStencilOperation		BackStencilDepthFailOperation : 5;
 		} StateData;
 	
 	public:

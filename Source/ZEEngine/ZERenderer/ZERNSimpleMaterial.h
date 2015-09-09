@@ -40,26 +40,36 @@
 #include "ZERNSampler.h"
 #include "ZERNStageID.h"
 #include "ZEGraphics\ZEGRRenderState.h"
+#include "ZEPacking.h"
 
 class ZERNSimpleMaterial : public ZERNMaterial
 {
 	private:
+		ZEFlags							Dirty;
+
 		bool							TwoSided;
 		bool							Wireframe;
-		bool							VertexColorEnabled;
-		bool							DirtyConstants;
+		bool							DepthTestDisabled;
+
+		ZEGRHolder<ZEGRShader>			VertexShader;
+		ZEGRHolder<ZEGRShader>			PixelShader;
 
 		ZEGRHolder<ZEGRRenderStateData> RenderStateData;
 		struct
 		{
 			ZEVector4					MaterialColor;
-			ZEUInt						TransparancyCullLimit;
-			float						Reserved0[3];
+			bool 						TextureEnabled;
+			ZEBYTE						Reserved0[15];
+			bool 						VertexColorEnabled;
+			ZEBYTE						Reserved2[15];
 		} Constants;
 
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 		ZEGRHolder<ZEGRRenderStateData>	RenderState;
 		ZERNSampler						TextureSampler;
+
+		void							UpdateRenderState();
+		void							UpdateConstantBuffer();
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
@@ -75,15 +85,19 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		void							SetWireframe(bool Enable);
 		bool							GetWireframe() const;
 
-		void							SetVertexColor(bool Enable);
-		bool							GetVertexColor();
+		void							SetDepthTestDisabled(bool Disabled);
+		bool							GetDepthTestDisabled();
 
 		void							SetMaterialColor(const ZEVector4& Color);
 		const ZEVector4&				GetMaterialColor() const;
 
 		void							SetTexture(const ZERNSampler& Sampler);
 		const ZERNSampler&				GetTexture() const;
-		
+	
+		void							SetVertexColorEnabled(bool Enable);
+		bool							GetVertexColorEnabled();
+
+
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 
 		static ZERNSimpleMaterial*		CreateInstance();

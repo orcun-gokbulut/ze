@@ -66,7 +66,7 @@ Texture2D<float4> ZERNSimpleMaterial_Texture	: register(t0);
 
 struct ZERNSimpleMaterial_VSInput 
 {
-	float4 Position			: POSITION0;
+	float3 Position			: POSITION0;
 	float2 Textcoord		: TEXCOORD0;
 	float3 Normal			: NORMAL0;
 	float4 Color			: COLOR0;
@@ -95,7 +95,7 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 	ZERNSimpleMaterial_VSOutput Output;
 
 	float4x4 WorldViewProjectionTransform = mul(ZERNView_ViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
-	Output.Position = mul(WorldViewProjectionTransform, Input.Position);
+	Output.Position = mul(WorldViewProjectionTransform, float4(Input.Position, 1.0f));
 	Output.Texcoord = Input.Textcoord;
 	
 	Output.Color = ZERNSimpleMaterial_Color;

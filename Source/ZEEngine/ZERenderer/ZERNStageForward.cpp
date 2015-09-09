@@ -84,15 +84,12 @@ const ZEGRRenderState& ZERNStageForward::GetRenderState()
 
 bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	Context->SetRenderTargetCount(1);
-	Context->SetRenderTarget(0, Renderer->GetOutput()->GetRenderTarget());
 	return true;
 }
 
 void ZERNStageForward::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-	Context->SetRenderTargetCount(1);
-	Context->SetRenderTarget(0, NULL);
+	Context->SetRenderTargets(0, NULL, NULL);
 }
 
 ZEInt ZERNStageForwardTransparent::GetId()
