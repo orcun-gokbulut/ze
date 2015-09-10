@@ -51,7 +51,8 @@ class ZEModelMeshLOD
 	private:
 		ZEModel*							Owner;
 		ZEModelMesh*						OwnerMesh;
-		ZEInt32								DrawDistance;
+		ZEInt32								DrawStartDistance;
+		ZEInt32								DrawEndDistance;
 		const ZEModelResourceMeshLOD*		LODResource;
 		ZEVertexBuffer*						VertexBuffer;
 		ZERenderCommand						RenderCommand;
@@ -65,7 +66,8 @@ class ZEModelMeshLOD
 
 		const ZEModelResourceMeshLOD*		GetLODResource();
 
-		ZEInt32								GetDrawDistance();
+		ZEInt32								GetDrawStartDistance();
+		ZEInt32								GetDrawEndDistance();
 
 		bool								IsSkinned();
 

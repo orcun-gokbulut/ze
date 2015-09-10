@@ -59,9 +59,14 @@ const ZEModelResourceMeshLOD* ZEModelMeshLOD::GetLODResource()
 	return LODResource;
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawDistance()
+ZEInt32 ZEModelMeshLOD::GetDrawStartDistance()
 {
-	return DrawDistance;
+	return DrawStartDistance;
+}
+
+ZEInt32 ZEModelMeshLOD::GetDrawEndDistance()
+{
+	return DrawEndDistance;
 }
 
 bool ZEModelMeshLOD::IsSkinned()
@@ -214,7 +219,8 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Owner = Model;
 	OwnerMesh = Mesh;
 	this->LODResource = LODResource;
-	DrawDistance = LODResource->LODDistance;
+	DrawStartDistance = LODResource->LODStartDistance;
+	DrawEndDistance = LODResource->LODEndDistance;
 
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
@@ -232,7 +238,8 @@ void ZEModelMeshLOD::Deinitialize()
 {
 	Owner = NULL;
 	OwnerMesh = NULL;
-	DrawDistance = 0;
+	DrawStartDistance = 0;
+	DrawEndDistance = 0;
 	RenderCommand.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
@@ -245,7 +252,8 @@ ZEModelMeshLOD::ZEModelMeshLOD()
 	Skinned = false;
 	Owner = NULL;
 	OwnerMesh = NULL;
-	DrawDistance = 0;
+	DrawStartDistance = 0;
+	DrawEndDistance = 0;
 	RenderCommand.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
