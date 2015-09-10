@@ -577,7 +577,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 
 	for (ZESize I = 0; I < LODs.GetCount(); I++)
 	{
-		LODDistanceSquare = ZEMath::Power(LODs[I].GetDrawDistance(), 2.0);
+		LODDistanceSquare = ZEMath::Power(LODs[I].GetDrawStartDistance(), 2.0);
 
 		if (LODDistanceSquare < EntityDistanceSquare)
 		{
@@ -589,7 +589,8 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 		}
 	}
 
-	LODs[(ZESize)CurrentLOD].Draw(DrawParameters, DrawOrder);
+	if (EntityDistanceSquare < ZEMath::Power(LODs[CurrentLOD].GetDrawEndDistance(), 2.0))
+		LODs[(ZESize)CurrentLOD].Draw(DrawParameters, DrawOrder);
 }
 
 bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)

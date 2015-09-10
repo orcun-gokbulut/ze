@@ -268,7 +268,8 @@ class ZEModelResourceMeshLOD
 
 	public:
 		ZEInt32									LODLevel;
-		ZEInt32									LODDistance;
+		ZEInt32									LODStartDistance;
+		ZEInt32									LODEndDistance;
 		ZEInt32									MaterialId;
 		ZEArray<ZEModelVertex>					Vertices;
 		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
