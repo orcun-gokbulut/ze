@@ -64,7 +64,6 @@ void ZEModel::CalculateBoundingBox() const
 		if (!Meshes[I].MeshResource->IsSkinned)
 		{
 			const ZEAABBox& CurrentBoundingBox = Meshes[I].GetModelBoundingBox();
-			//ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
 
 			for (ZEInt N = 0; N < 8; N++)
 			{
@@ -82,7 +81,7 @@ void ZEModel::CalculateBoundingBox() const
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		const ZEAABBox& CurrentBoundingBox = Bones[I].GetBoundingBox();
+		const ZEAABBox& CurrentBoundingBox = Bones[I].GetModelBoundingBox();
 
 		for (ZEInt N = 0; N < 8; N++)
 		{ 
