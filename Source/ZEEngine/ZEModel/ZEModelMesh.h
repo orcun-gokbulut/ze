@@ -46,6 +46,7 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEGame/ZERayCast.h"
 
+class ZEOBBox;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
@@ -95,6 +96,8 @@ class ZEModelMesh : public ZEObject
 		void								OnTransformChanged();
 
 	public:
+		ZEOBBox*							CullBox;
+
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();

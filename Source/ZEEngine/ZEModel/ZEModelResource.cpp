@@ -366,7 +366,8 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 			ZEModelResourceMeshLOD* LOD = Mesh->LODs.Add();
 
 			LOD->LODLevel = LODNode.ReadInt32("LODLevel");
-			LOD->LODDistance = LODNode.ReadInt32("LODDistance", I * 30);
+			LOD->LODStartDistance = LODNode.ReadInt32("LODStartDistance", I * 30);
+			LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 100000);
 			LOD->MaterialId = LODNode.ReadInt32("MaterialId");
 
 			if (Mesh->IsSkinned)
