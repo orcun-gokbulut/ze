@@ -140,7 +140,10 @@ bool ZEMLRoot::Write(ZEFile* File)
 	}
 
 	ZEMLWriter Writer;
-	Writer.SetFormat(Format->CreateInstance());
+	
+	if (Format != NULL)
+		Writer.SetFormat(Format->CreateInstance());
+
 	if (!Writer.Open(File))
 		return false;
 

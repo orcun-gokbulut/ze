@@ -3,10 +3,11 @@ MeshAttributes = attributes ZEMeshAttributes
 (
 	parameters ZEMesh rollout:ZEMeshRollout
 	(
-		ZEType 					type:#string 				default:"Mesh" 												animatable:false
-		Mesh_LOD				type:#integer 				default:0					ui:uiMesh_LOD					animatable:false
-		Mesh_LOD_Distance		type:#integer				default:0					ui:uiMesh_LOD_Distance			animatable:false
-		Mesh_Visibility			type:#boolean				default:true				ui:uiMesh_Visibility			animatable:false
+		ZEType 						type:#string 			default:"Mesh" 												animatable:false
+		Mesh_LOD					type:#integer 			default:0				ui:uiMesh_LOD						animatable:false
+		Mesh_LOD_Start_Distance		type:#integer			default:0				ui:uiMesh_LOD_Start_Distance		animatable:false
+		Mesh_LOD_End_Distance		type:#integer			default:0				ui:uiMesh_LOD_End_Distance			animatable:false
+		Mesh_Visibility				type:#boolean			default:true			ui:uiMesh_Visibility				animatable:false
 	)
 	
 	parameters ZEPhysicalBodyParameters rollout:ZEPhysicalBodyRollout
@@ -24,10 +25,11 @@ MeshAttributes = attributes ZEMeshAttributes
 	rollout ZEMeshRollout "ZE Mesh Parameters" rolledUp:false
 	(
 		/* LAYOUT DEFINITION */
-		bitmap					uiLogo													fileName:"zineklogo.bmp"
-		spinner 				uiMesh_LOD			"LOD Level:" 						type:#integer												toolTip:"Indicates the Level of Detail order."
-		spinner 				uiMesh_LOD_Distance	"LOD Distance:" 					type:#integer				range:[-10000,10000,0]			toolTip:"Indicates starting drawing distance for the LOD Level."
-		checkbox 				uiMesh_Visibility 	"Is Visible"																					toolTip:"Indicates whether the mesh is visible or not."
+		bitmap					uiLogo						fileName:"zineklogo.bmp"
+		spinner 				uiMesh_LOD					"LOD Level:" 						type:#integer												toolTip:"Indicates the Level of Detail order."
+		spinner 				uiMesh_LOD_Start_Distance	"LOD Start Distance:" 				type:#integer				range:[0,100000,0]				toolTip:"Indicates starting drawing distance for the LOD Level."
+		spinner 				uiMesh_LOD_End_Distance		"LOD End Distance:" 				type:#integer				range:[0,100000,0]				toolTip:"Indicates ending drawing distance for the LOD Level."
+		checkbox 				uiMesh_Visibility 			"Is Visible"																					toolTip:"Indicates whether the mesh is visible or not."
 	)
 	
 	rollout ZEPhysicalBodyRollout "ZE Physical Body Parameters" rolledUp:true

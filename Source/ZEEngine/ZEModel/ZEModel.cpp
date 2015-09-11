@@ -64,7 +64,6 @@ void ZEModel::CalculateBoundingBox() const
 		if (!Meshes[I].MeshResource->IsSkinned)
 		{
 			const ZEAABBox& CurrentBoundingBox = Meshes[I].GetModelBoundingBox();
-			//ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
 
 			for (ZEInt N = 0; N < 8; N++)
 			{
@@ -82,7 +81,7 @@ void ZEModel::CalculateBoundingBox() const
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		const ZEAABBox& CurrentBoundingBox = Bones[I].GetBoundingBox();
+		const ZEAABBox& CurrentBoundingBox = Bones[I].GetModelBoundingBox();
 
 		for (ZEInt N = 0; N < 8; N++)
 		{ 
@@ -397,10 +396,25 @@ void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (!BoundingBoxIsUserDefined)
-		CalculateBoundingBox();
+	if (!IsStaticModel || !StaticCalculationsDone)
+	{
+		if (!BoundingBoxIsUserDefined)
+			CalculateBoundingBox();
+
+		StaticCalculationsDone = IsStaticModel;
+	}
 
 	return ZEEntity::GetWorldBoundingBox();
+}
+
+void ZEModel::SetStaticModel(bool Value)
+{
+	IsStaticModel = Value;
+}
+
+bool ZEModel::GetStaticModel() const
+{
+	return IsStaticModel;
 }
 
 void ZEModel::SetPosition(const ZEVector3& NewPosition)
@@ -577,6 +591,8 @@ ZEModel::ZEModel()
 	ParentlessBoneBody = NULL;
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
+	IsStaticModel = false;
+	StaticCalculationsDone = false;
 
 	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
@@ -621,4 +637,3 @@ ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
 }
-

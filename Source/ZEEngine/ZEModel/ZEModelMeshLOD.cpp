@@ -59,9 +59,14 @@ const ZEModelResourceMeshLOD* ZEModelMeshLOD::GetLODResource()
 	return LODResource;
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawDistance()
+ZEInt32 ZEModelMeshLOD::GetDrawStartDistance()
 {
-	return DrawDistance;
+	return DrawStartDistance;
+}
+
+ZEInt32 ZEModelMeshLOD::GetDrawEndDistance()
+{
+	return DrawEndDistance;
 }
 
 bool ZEModelMeshLOD::IsSkinned()
@@ -74,26 +79,32 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 	if (VertexBuffer == NULL)
 		return;
 
-	if (Skinned)
+	if (!Owner->GetStaticModel() || !StaticCalculationsDone)
 	{
-		RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
-		for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
+		if (Skinned)
 		{
-			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
+			RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
+			for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
+			{
+				ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
+			}
+
+			RenderCommand.WorldMatrix = Owner->GetWorldTransform();
+		}
+		else if(OwnerMesh->GetPhysicalCloth() != NULL)
+		{
+			RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
+		}
+		else
+		{
+			RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
 		}
 
-		RenderCommand.WorldMatrix = Owner->GetWorldTransform();
-	}
-	else if(OwnerMesh->GetPhysicalCloth() != NULL)
-	{
-		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-	}
-	else
-	{
-		RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
+		StaticCalculationsDone = Owner->GetStaticModel();
 	}
 
 	RenderCommand.Order = DrawOrder;
+	RenderCommand.InstanceData = OwnerMesh->CullBox;
 
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
@@ -214,7 +225,8 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Owner = Model;
 	OwnerMesh = Mesh;
 	this->LODResource = LODResource;
-	DrawDistance = LODResource->LODDistance;
+	DrawStartDistance = LODResource->LODStartDistance;
+	DrawEndDistance = LODResource->LODEndDistance;
 
 	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
 
@@ -232,12 +244,14 @@ void ZEModelMeshLOD::Deinitialize()
 {
 	Owner = NULL;
 	OwnerMesh = NULL;
-	DrawDistance = 0;
+	DrawStartDistance = 0;
+	DrawEndDistance = 0;
 	RenderCommand.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
 	Skinned = false;
+	StaticCalculationsDone = false;
 }
 
 ZEModelMeshLOD::ZEModelMeshLOD()
@@ -245,11 +259,13 @@ ZEModelMeshLOD::ZEModelMeshLOD()
 	Skinned = false;
 	Owner = NULL;
 	OwnerMesh = NULL;
-	DrawDistance = 0;
+	DrawStartDistance = 0;
+	DrawEndDistance = 0;
 	RenderCommand.SetZero();
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
+	StaticCalculationsDone = false;
 }
 
 ZEModelMeshLOD::~ZEModelMeshLOD()

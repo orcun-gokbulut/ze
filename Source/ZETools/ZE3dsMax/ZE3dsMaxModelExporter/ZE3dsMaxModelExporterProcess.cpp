@@ -837,10 +837,20 @@ bool ZE3dsMaxModelExporter::ProcessBone(IGameNode* Node, ZEMLNode* BonesNode)
 	BoneNode->AddProperty("ParentBone")->SetInt32(ParentBoneId);
 
 	Box3 BB;
-	Bone->GetBoundingBox(BB);
+	Bone->GetMaxObject()->GetLocalBoundBox(0, Node->GetMaxNode(), NULL, BB);
 	ZEMLNode* BoundingBoxNode = BoneNode->AddNode("BoundingBox");
-	BoundingBoxNode->AddProperty("Min")->SetVector3(ZE3dsMaxUtils::MaxtoZE(BB.Min()));
-	BoundingBoxNode->AddProperty("Max")->SetVector3(ZE3dsMaxUtils::MaxtoZE(BB.Max()));
+
+	Point3 Min, Max;
+	Min.x = BB.Min().x;
+	Min.y = BB.Min().z;
+	Min.z = BB.Min().y;
+
+	Max.x = BB.Max().x;
+	Max.y = BB.Max().z;
+	Max.z = BB.Max().y;
+
+	BoundingBoxNode->AddProperty("Min")->SetVector3(ZE3dsMaxUtils::MaxtoZE(Min));
+	BoundingBoxNode->AddProperty("Max")->SetVector3(ZE3dsMaxUtils::MaxtoZE(Max));
 
 	if (ParentBoneId != -1)
 	{
@@ -1196,7 +1206,15 @@ bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesN
 	ZEInt32 MeshLOD;
 	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD", MeshLOD);
 
+	ZEInt32 CurrentMeshLODLevelStartDistance;
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD_Start_Distance", CurrentMeshLODLevelStartDistance);
+
+	ZEInt32 CurrentMeshLODLevelEndDistance;
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD_End_Distance", CurrentMeshLODLevelEndDistance);
+
 	LODNode->AddProperty("LODLevel")->SetInt32(MeshLOD);
+	LODNode->AddProperty("LODStartDistance")->SetInt32(CurrentMeshLODLevelStartDistance);
+	LODNode->AddProperty("LODEndDistance")->SetInt32(CurrentMeshLODLevelEndDistance);
 
 	if (!ProcessMeshLODVertices(Node, LODNode))
 		return false;
@@ -1228,8 +1246,11 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNod
 	ZEInt32 CurrentMeshLODLevel;
 	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD", CurrentMeshLODLevel);
 
-	ZEInt32 CurrentMeshLODLevelDistance;
-	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD_Distance", CurrentMeshLODLevelDistance);
+	ZEInt32 CurrentMeshLODLevelStartDistance;
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD_Start_Distance", CurrentMeshLODLevelStartDistance);
+
+	ZEInt32 CurrentMeshLODLevelEndDistance;
+	ZE3dsMaxUtils::GetProperty(Mesh, ZE_INT_PROP, L"Mesh_LOD_End_Distance", CurrentMeshLODLevelEndDistance);
 
 	ZEArray<ZEMLNode*> Meshes = MeshesNode->GetNodes("Mesh");
 	ZEMLNode* MasterMesh = NULL;
@@ -1279,7 +1300,8 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNod
 	}
 
 	LODNode->AddProperty("LODLevel")->SetInt32(CurrentMeshLODLevel);
-	LODNode->AddProperty("LODDistance")->SetInt32(CurrentMeshLODLevelDistance);
+	LODNode->AddProperty("LODStartDistance")->SetInt32(CurrentMeshLODLevelStartDistance);
+	LODNode->AddProperty("LODEndDistance")->SetInt32(CurrentMeshLODLevelEndDistance);
 
 	if (!ProcessMeshLODVertices(Node, LODNode))
 		return false;
