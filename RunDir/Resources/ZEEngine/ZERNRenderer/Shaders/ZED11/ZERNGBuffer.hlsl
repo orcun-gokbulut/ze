@@ -41,6 +41,11 @@
 
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
+#define ZERN_LM_BLINN_PONG 0
+
+
+// SHADER RESOURCES
+///////////////////////////////////////////////////////////////////////////////
 
 Texture2D<float> ZERNGBuffer_DepthBuffer	: register(t0);
 Texture2D<float4> ZERNGBuffer_Buffer0		: register(t1);
@@ -50,15 +55,21 @@ Texture2D<float4> ZERNGBuffer_Buffer3		: register(t4);
 
 struct ZERNGBuffer
 {
-	float4 Buffer0 : SV_TARGET0; // xyz:AccumulationBuffer
-	float4 Buffer1 : SV_TARGET1; // xyz:Normal, w: ShadingModel
-	float4 Buffer2 : SV_TARGET2; // xyz:DiffuseColor, z:Subsurface Scattering
-	float4 Buffer3 : SV_TARGET3; // xyz:SpecularColor, w:SpacularPower
+	float4 Buffer0 : SV_Target0; // xyz:AccumulationBuffer
+	float4 Buffer1 : SV_Target1; // xyz:Normal, w: ShadingModel
+	float4 Buffer2 : SV_Target2; // xyz:DiffuseColor, z:Subsurface Scattering
+	float4 Buffer3 : SV_Target3; // xyz:SpecularColor, w:SpacularPower
 };
 
 
 // DEPTH
 ///////////////////////////////////////////////////////////////////////////////
+
+void ZERNGBuffer_SetDepth(inout ZERNGBuffer GBuffer, float Depth)
+{
+	// EMPTY BUT MUST BE CALLED BY GBUFFER STAGE SHADERS
+	// FOR FUTURE POSSIBLE USAGES
+}
 
 float ZERNGBuffer_GetDepth(int2 ScreenPos)
 {
@@ -69,10 +80,30 @@ float ZERNGBuffer_GetDepth(int2 ScreenPos)
 // POSITION
 ///////////////////////////////////////////////////////////////////////////////
 
+void ZERNGBuffer_SetViewPosition(inout ZERNGBuffer GBuffer, float3 ViewPosition)
+{
+	// EMPTY BUT MUST BE CALLED BY GBUFFER STAGE SHADERS
+	// FOR FUTURE POSSIBLE USAGES
+}
+
 float3 ZERNGBuffer_GetViewPosition(float2 ClipPos, int2 ScreenPos)
 {
     float ClipDepth = ZERNGBuffer_GetDepth(ScreenPos);
  	return float3(ClipPos, -1.0f) / (ClipDepth * ZERNView_InvProjectionTransform[0][0] + ZERNView_InvProjectionTransform[0][0]);
+}
+
+
+// ACCUMULATION
+///////////////////////////////////////////////////////////////////////////////
+
+void ZERNGBuffer_SetAccumulationColor(inout ZERNGBuffer GBuffer, float3 Color)
+{
+	GBuffer.Buffer0.xyz = Color;
+}
+
+float3 ZERNGBuffer_GetAccumulationColor(int2 ScreenPos)
+{
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -160,7 +191,7 @@ void ZERNGBuffer_SetSpecularPower(inout ZERNGBuffer GBuffer, float SpecularPower
 	GBuffer.Buffer3.w = SpecularPower;
 }
 
-float ZERNGBuffer_SetSpecularPower(int2 ScreenPos)
+float ZERNGBuffer_GetSpecularPower(int2 ScreenPos)
 {
 	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w;
 }

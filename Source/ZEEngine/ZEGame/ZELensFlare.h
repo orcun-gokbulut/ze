@@ -39,16 +39,16 @@
 
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZERNFixedMaterial.h"
 
-class ZEFixedMaterial;
+class ZERNFixedMaterial;
 class ZETexture2DResource;
 
 class ZELensFlareArtifact
 {
 	private:
 		ZERNCommand Command;
-		ZEFixedMaterial* Material;
+		ZERNFixedMaterial* Material;
 		ZETexture2DResource* Texture;
 
 		float Size;

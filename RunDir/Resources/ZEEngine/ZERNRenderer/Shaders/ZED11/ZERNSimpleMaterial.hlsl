@@ -40,7 +40,6 @@
 #include "ZERNView.hlsl"
 #include "ZERNShaderSlots.hlsl"
 
-
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -87,7 +86,7 @@ struct ZERNSimpleMaterial_PSInput
 };
 
 
-// VERTEX SHADER - FORWARD STAGE      
+// FORWARD STAGE - VERTEX SHADER
 ///////////////////////////////////////////////////////////////////////////////
 
 ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMaterial_VSInput Input)
@@ -107,7 +106,7 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 }
 
 
-// PIXEL SHADER - FORWARD STAGE      
+// FORWARD STAGE - PIXEL SHADER
 ///////////////////////////////////////////////////////////////////////////////
 
 float4 ZERNSimpleMaterial_PSMain_ForwardStage(ZERNSimpleMaterial_PSInput Input) : SV_Target0

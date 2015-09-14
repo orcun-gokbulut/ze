@@ -74,4 +74,6 @@ class ZERNMaterial : public ZEGRResource, public ZEInitializable
 
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+
+		virtual bool					Update();
 };

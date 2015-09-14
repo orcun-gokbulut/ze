@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNSimpleMaterial.h
+ Zinek Engine - ZERNSkin.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,74 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZERNShaderSlots.hlsl"
 
-#include "ZETypes.h"
-#include "ZERNMaterial.h"
-#include "ZERNMap.h"
-#include "ZERNStageID.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEPacking.h"
+// SHADER RESOURCES (CONSTANT BUFFER)
+///////////////////////////////////////////////////////////////////////////////
 
-class ZERNSimpleMaterial : public ZERNMaterial
+cbuffer ZERNFixedMaterial_Constants_Draw_Skin : register(ZERN_SHADER_CONSTANT_DRAW_SKIN)
 {
-	private:
-		ZEFlags							DirtyFlags;
-
-		bool							TwoSided;
-		bool							Wireframe;
-		bool							DepthTestDisabled;
-
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
-
-		ZEGRHolder<ZEGRRenderStateData> RenderStateData;
-		struct
-		{
-			ZEVector4					MaterialColor;
-			bool 						TextureEnabled;
-			ZEBYTE						Reserved0[15];
-			bool 						VertexColorEnabled;
-			ZEBYTE						Reserved2[15];
-		} Constants;
-
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
-		ZEGRHolder<ZEGRRenderStateData>	RenderState;
-		ZERNMap							TextureMap;
-
-		void							UpdateShaders();
-		void							UpdateRenderState();
-		void							UpdateConstantBuffer();
-	
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
-
-										ZERNSimpleMaterial();
-
-	public:
-		virtual ZERNStageMask			GetStageMask();
-
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
-
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
-
-		void							SetDepthTestDisabled(bool Disabled);
-		bool							GetDepthTestDisabled();
-
-		void							SetMaterialColor(const ZEVector4& Color);
-		const ZEVector4&				GetMaterialColor() const;
-
-		void							SetTexture(const ZERNMap& Sampler);
-		const ZERNMap&					GetTexture() const;
-	
-		void							SetVertexColorEnabled(bool Enable);
-		bool							GetVertexColorEnabled();
-
-		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-
-		virtual bool					Update();
-
-		static ZERNSimpleMaterial*		CreateInstance();
+	float4x4 ZERNSkin_BoneTransforms[150];
 };
+
+
+// SKIN FUNCTIONS
+///////////////////////////////////////////////////////////////////////////////
+
+float4x4 ZERNSkin_GetSkinTransform(in float4 Weights, in int4 Indices)
+{
+	float4x4 Matrix;
+	Matrix	= ZERNSkin_BoneTransforms[Indices[0]] * Weights[0];
+	Matrix += ZERNSkin_BoneTransforms[Indices[1]] * Weights[1];
+	Matrix += ZERNSkin_BoneTransforms[Indices[2]] * Weights[2];
+	Matrix += ZERNSkin_BoneTransforms[Indices[3]] * Weights[3];
+	
+	return Matrix;
+}
+
+float4x4 ZERNSkin_ApplySkinTransform(in float4x4 PostTransform, in int4 Indices, in float4 Weights)
+{
+	return mul(PostTransform, ZERNSkin_GetSkinTransform(Weights, Indices));
+}
