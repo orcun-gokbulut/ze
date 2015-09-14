@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMaterialComponents.h
+ Zinek Engine - ZERNMap.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,35 +34,45 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MATERIAL_COMPONENTS_H__
-#define __ZE_MATERIAL_COMPONENTS_H__
-// Vertex Transform Properties
-#define ZE_SHADER_MORPHING
-#define ZE_SHADER_SKINNING
 
-// Material Properties
-#define ZE_SHADER_AMBIENT					(1 << 1)
-#define ZE_SHADER_DIFFUSE					(1 << 2)
-#define ZE_SHADER_BASE_MAP					(1 << 3)
-#define ZE_SHADER_BUMP_MAPPING
-#define ZE_SHADER_NORMAL_MAP				(1 << 4)
-#define ZE_SHADER_PARALLAX_MAP				(1 << 5)
-#define ZE_SHADER_SPECULAR					(1 << 6)
-#define ZE_SHADER_SPECULAR_MAP				(1 << 7)
-#define ZE_SHADER_EMMISIVE					(1 << 8)
-#define ZE_SHADER_EMMISIVE_MAP				(1 << 9)
-#define ZE_SHADER_OPACITY					(1 << 10)
-#define ZE_SHADER_OPACITY_BASE_ALPHA		(1 << 11)
-#define ZE_SHADER_OPACITY_CONSTANT			(1 << 12)
-#define ZE_SHADER_OPACITY_MAP				(1 << 13)
-#define ZE_SHADER_DETAIL_MAP				(1 << 14)
-#define ZE_SHADER_DETAIL_BASE_MAP			(1 << 15)
-#define ZE_SHADER_DETAIL_NORMAL_MAP			(1 << 16)
-#define ZE_SHADER_REFLECTION				(1 << 17)
-#define ZE_SHADER_REFRACTION				(1 << 18)
-#define ZE_SHADER_LIGHT_MAP					(1 << 19)
-#define ZE_SHADER_DISTORTION_MAP			(1 << 20)
-#define ZE_SHADER_ALPHA_CULL				(1 << 22)
-#define ZE_SHADER_VERTEX_COLOR				(1 << 23)
-#define ZE_SHADER_SSAO						(1 << 24)
-#endif
+#include "ZEGraphics\ZEGRSamplerState.h"
+#include "ZEGraphics\ZEGRHolder.h"
+
+class ZEGRTexture;
+class ZETextureResource;
+class ZEMLWriterNode;
+class ZEMLReaderNode;
+
+class ZERNMap
+{
+	private:
+		ZETextureResource*				Resource;
+		ZEGRHolder<ZEGRTexture>			Texture;
+		ZEGRSamplerState				Sampler;
+
+	public:
+		void							SetSamplerState(const ZEGRSamplerState& Sampler);
+		const ZEGRSamplerState&			GetSamplerState();
+
+		void							SetTexture(ZEGRTexture* Texture);
+		ZEGRTexture*					GetTexture() const;
+
+		void							SetTextureResource(ZETextureResource* Resource);
+		ZETextureResource*				GetTextureResource() const;
+
+		const ZEString&					GetTextureFile() const;
+
+		bool							IsAvailable();
+
+		void							Load2D(const ZEString& FileName);
+		void							Load3D(const ZEString& FileName);
+		void							LoadCube(const ZEString& FileName);
+
+		void							Write(ZEMLWriterNode& ParentNode, const ZEString& Name);
+		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name);
+
+										ZERNMap();
+										ZERNMap(ZEGRTexture* Resource, const ZEGRSamplerState& SamplerState = ZEGRSamplerState());
+										ZERNMap(ZETextureResource* Resource, const ZEGRSamplerState& SamplerState = ZEGRSamplerState());
+										~ZERNMap();
+};

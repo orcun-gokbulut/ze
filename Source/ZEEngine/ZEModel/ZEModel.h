@@ -52,7 +52,7 @@
 
 class ZEQuaternion;
 class ZEMatrix4x4;
-class ZEFixedMaterial;
+class ZERNFixedMaterial;
 class ZERNSimpleMaterial;
 
 class ZEPhysicalRigidBody;

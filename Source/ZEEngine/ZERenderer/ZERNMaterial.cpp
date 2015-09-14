@@ -98,3 +98,8 @@ void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
 
 }
+
+bool ZERNMaterial::Update()
+{
+	return true;
+}

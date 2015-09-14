@@ -37,7 +37,7 @@
 #include "ZEModelResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZERenderer/ZEFixedMaterial.h"
+#include "ZERenderer/ZERNFixedMaterial.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZEFile/ZEFileInfo.h"
@@ -134,7 +134,7 @@ bool ZEModelResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
-		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
+		ZERNFixedMaterial* CurrentMaterial = ZERNFixedMaterial::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
 		Materials.Add(CurrentMaterial);
 
