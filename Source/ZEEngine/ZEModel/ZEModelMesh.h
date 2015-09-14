@@ -46,7 +46,6 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEGame/ZERayCast.h"
 
-class ZEOBBox;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
@@ -54,9 +53,8 @@ ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 class ZEModelMesh : public ZEObject
 {
 	friend class ZEModel;
-
+	friend class ZEModelMeshLOD;
 	ZE_OBJECT
-
 	private:
 		ZEModel*							Owner;
 
@@ -92,12 +90,12 @@ class ZEModelMesh : public ZEObject
 
 		ZEArray<ZEModelMeshLOD>				LODs;
 
+		ZEArray<ZEPlane>					ClippingPlanes;
+
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
 		void								OnTransformChanged();
 
 	public:
-		ZEOBBox*							CullBox;
-
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();
@@ -157,6 +155,11 @@ class ZEModelMesh : public ZEObject
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled() const;
+
+		void								SetClippingPlaneCount(ZESize Count);
+		ZESize								GetClippingPlaneCount();
+		void								SetClippingPlane(ZESize Index, const ZEPlane& Plane);
+		const ZEPlane&						GetClippingPlane(ZESize Index);
 
 		void								SetCustomDrawOrderEnabled(bool Enabled);
 		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);

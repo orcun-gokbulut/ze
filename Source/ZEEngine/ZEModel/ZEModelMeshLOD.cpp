@@ -104,7 +104,7 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 	}
 
 	RenderCommand.Order = DrawOrder;
-	RenderCommand.InstanceData = OwnerMesh->CullBox;
+	RenderCommand.ClippingPlanes = OwnerMesh->ClippingPlanes;
 
 	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
