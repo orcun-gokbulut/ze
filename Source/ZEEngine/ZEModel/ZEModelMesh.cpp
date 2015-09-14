@@ -408,6 +408,27 @@ ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
 	return UserDefinedDrawOrder;
 }
 
+
+void ZEModelMesh::SetClippingPlaneCount(ZESize Count)
+{
+	ClippingPlanes.SetCount(Count);
+}
+
+ZESize ZEModelMesh::GetClippingPlaneCount()
+{
+	return ClippingPlanes.GetCount();
+}
+
+void ZEModelMesh::SetClippingPlane(ZESize Index, const ZEPlane& Plane)
+{
+	ClippingPlanes[Index] = Plane;
+}
+
+const ZEPlane& ZEModelMesh::GetClippingPlane(ZESize Index)
+{
+	return ClippingPlanes[Index];
+}
+
 void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshResource)
 {
 	Owner = Model;
@@ -577,7 +598,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 
 	for (ZESize I = 0; I < LODs.GetCount(); I++)
 	{
-		LODDistanceSquare = ZEMath::Power(LODs[I].GetDrawStartDistance(), 2.0);
+		LODDistanceSquare = LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance();
 
 		if (LODDistanceSquare < EntityDistanceSquare)
 		{
@@ -589,7 +610,7 @@ void ZEModelMesh::Draw(ZEDrawParameters* DrawParameters)
 		}
 	}
 
-	if (EntityDistanceSquare < ZEMath::Power(LODs[CurrentLOD].GetDrawEndDistance(), 2.0))
+	if (EntityDistanceSquare < (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
 		LODs[(ZESize)CurrentLOD].Draw(DrawParameters, DrawOrder);
 }
 
@@ -695,13 +716,9 @@ ZEModelMesh::ZEModelMesh()
 	AnimationType = ZE_MAT_NOANIMATION;
 	DrawOrderIsUserDefined = false;
 	UserDefinedDrawOrder = 0;
-	CullBox = NULL;
 }
 
 ZEModelMesh::~ZEModelMesh()
 {
 	Deinitialize();
-
-	if (CullBox != NULL)
-		delete CullBox;
 }

@@ -102,6 +102,7 @@ class ZERenderCommand
 
 		ZEArray<ZERenderCommand*>		Instances;
 		ZEArray<ZEMatrix4x4>			BoneTransforms;
+		ZEArray<ZEPlane>				ClippingPlanes;
 
 		ZEArray<ZELight*>				Lights;
 
