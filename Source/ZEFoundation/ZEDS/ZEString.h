@@ -215,10 +215,10 @@ class ZEString
 		ZEInt16						ToInt16() const;
 		ZEInt32						ToInt32() const;
 		ZEInt64						ToInt64() const;
-		ZEUInt8						ToUInt8() const;
-		ZEUInt16					ToUInt16() const;
-		ZEUInt32					ToUInt32() const;
-		ZEUInt64					ToUInt64() const;
+		ZEUInt8						ToUInt8(int Base = 10) const;
+		ZEUInt16					ToUInt16(int Base = 10) const;
+		ZEUInt32					ToUInt32(int Base = 10) const;
+		ZEUInt64					ToUInt64(int Base = 10) const;
 		float						ToFloat() const;
 		double						ToDouble() const;
 
