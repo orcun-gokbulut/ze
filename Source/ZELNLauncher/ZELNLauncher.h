@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELNLauncher.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,17 +30,61 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
 
-ze_add_module(ZEFoundation)
-ze_add_module(ZECodeUtilities)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL)
-ze_add_module(ZETools			OPTIONAL DEFAULT)
-ze_add_module(ZELNLauncher		OPTIONAL DEFAULT)
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEString.h"
+#include "ZEInitializable.h"
 
-ze_add_cmake_project(ZESource)
+class ZELNModule;
+class ZELNLauncherWindow;
+
+enum ZELNLaunchStatus
+{
+	ZELN_LS_NOT_RUNNING,
+	ZELN_LS_LAUNCHING,
+	ZELN_LS_RUNNING,
+	ZELN_LS_TERMINATING,
+	ZELN_LS_ERROR
+};
+
+struct ZELNLaunchInformation
+{
+	ZEString			BinaryPath;
+	ZEArray<ZEString>	Parameters;
+	ZEInt64				ProcessId;
+};
+
+class ZELNLauncher : public ZEInitializable
+{
+	private:
+		static ZELNLauncher*			Instance;
+		ZEArray<ZELNModule*>			Modules;
+		ZELNLauncherWindow*				Window;
+		ZELNLaunchStatus				Status;
+		bool							AllowedToLaunch;
+		ZELNLaunchInformation			Information;
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+	public:
+		const ZEArray<ZELNModule*>		GetModules();
+		ZELNLauncherWindow*				GetWindow();
+
+		ZELNLaunchStatus				GetStatus();
+		const ZELNLaunchInformation&	GetInformation();
+		bool							GetAllowedToLaunch();
+
+		void							Launch();
+		void							Terminate();
+
+		void							Update();
+
+										ZELNLauncher();
+
+		static ZELNLauncher*			GetInstance();
+};

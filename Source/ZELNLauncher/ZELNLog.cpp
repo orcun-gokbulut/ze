@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELNLog.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,17 +30,52 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZELNLog.h"
+#include "ZELNLogWidget.h"
+#include "ui_ZELNLogWidget.h"
 
-ze_add_module(ZEFoundation)
-ze_add_module(ZECodeUtilities)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL)
-ze_add_module(ZETools			OPTIONAL DEFAULT)
-ze_add_module(ZELNLauncher		OPTIONAL DEFAULT)
+#include "ZELog.h"
 
-ze_add_cmake_project(ZESource)
+void ZELNLog::LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+{
+	ZELNLog* Widget = (ZELNLog*)ExtraParameters;
+
+	const char* TypeString = ZELog::GetLogTypeString(Type);
+
+	Widget->GetForm()->txtConsole->appendHtml(
+		QString("[%1] <b>%2</b>: %3")
+		.arg(Module)
+		.arg(TypeString)
+		.arg(LogText));
+}
+
+
+bool ZELNLog::InitializeSelf()
+{
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
+	Widget = new ZELNLogWidget();
+	
+	ZELog::GetInstance()->SetCallback(&LogCallback, this);
+	
+	return true;
+}
+
+const char* ZELNLog::GetName()
+{
+	return "Log";
+}
+
+QWidget* ZELNLog::GetWidget()
+{
+	return Widget;
+}
+
+Ui_ZELNLogWidget* ZELNLog::GetForm()
+{
+	return Widget->Form;
+}
