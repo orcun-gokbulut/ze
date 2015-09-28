@@ -58,9 +58,11 @@ class ZEGUID
 		bool				operator==(const ZEGUID& Other) const;
 		bool				operator!=(const ZEGUID& Other) const;
 
-		ZEString			ToString();
+		bool				FromString(const ZEString& String);
+		ZEString			ToString() const;
 
 							ZEGUID();
+							ZEGUID(const ZEString& String);
 							ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
 							ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
 

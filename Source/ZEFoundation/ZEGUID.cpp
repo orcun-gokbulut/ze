@@ -36,6 +36,7 @@
 #include "ZEGUID.h"
 #include "ZEDS/ZEFormat.h"
 #include "ZERandom.h"
+#include "ZERegEx/ZERegEx.h"
 
 ZEInt ZEGUID::Compare(const ZEGUID& Other) const
 {
@@ -97,14 +98,39 @@ bool ZEGUID::operator!=(const ZEGUID& Other) const
 	return !Equals(Other);
 }
 
-ZEString ZEGUID::ToString()
+bool ZEGUID::FromString(const ZEString& String)
+{
+	ZERegEx RegEx("([0-9a-fA-F]+)-([0-9a-fA-F]+)-([0-9a-fA-F]+)-([0-9a-fA-F]+)-([0-9a-fA-F]+)");
+	ZERegExMatch Match;
+	if (!RegEx.Match(String, Match))
+		return false;
+
+	new (this) ZEGUID(
+		Match.SubMatches[0].String.ToUInt32(16),
+		Match.SubMatches[1].String.ToUInt32(16),
+		Match.SubMatches[2].String.ToUInt32(16),
+		Match.SubMatches[3].String.ToUInt32(16),
+		Match.SubMatches[4].String.ToUInt32(16));
+
+	return true;
+}
+
+ZEString ZEGUID::ToString() const
 {
 	return ZEFormat::Format("{0:X:08}-{1:X:04}-{2:X:04}-{3:X:04}-{4:X:012}", Data1, Data2, Data3, Data4 >> 48, Data4 & (ZEUInt64)0x0000FFFFFFFFFFFF);
 }
 
 ZEGUID::ZEGUID()
 {
+	this->Data1 = 0;
+	this->Data2 = 0;
+	this->Data3 = 0;
+	this->Data4 = 0;
+}
 
+ZEGUID::ZEGUID(const ZEString& String)
+{
+	FromString(String);
 }
 
 ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4)
@@ -120,7 +146,7 @@ ZEGUID::ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4Fir
 	this->Data1 = Data1;
 	this->Data2 = Data2;
 	this->Data3 = Data3;
-	this->Data4 = (Data4FirstTwo << 48) | (Data4Remaining & (ZEUInt64)0x0000FFFFFFFFFFFFFF);
+	this->Data4 = ((ZEUInt64)Data4FirstTwo << 48) | (Data4Remaining & (ZEUInt64)0x0000FFFFFFFFFFFFFF);
 }
 
 ZEGUID ZEGUID::Generate()
