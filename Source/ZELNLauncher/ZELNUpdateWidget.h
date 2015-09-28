@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELNUpdateWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,17 +30,23 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
 
-ze_add_module(ZEFoundation)
-ze_add_module(ZECodeUtilities)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL)
-ze_add_module(ZETools			OPTIONAL DEFAULT)
-ze_add_module(ZELNLauncher		OPTIONAL DEFAULT)
+#include <QtGui/QWidget>
 
-ze_add_cmake_project(ZESource)
+class Ui_ZELNUpdateWidget;
+
+class ZELNUpdateWidget: public QWidget
+{
+	Q_OBJECT
+	friend class ZELNUpdate;
+	private:
+		Ui_ZELNUpdateWidget*		Form;
+
+	public:
+									ZELNUpdateWidget();
+									~ZELNUpdateWidget();
+};

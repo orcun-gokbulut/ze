@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELNModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,17 +30,81 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#include "ZELNModule.h"
+#include "ZELNUpdate.h"
+#include "ZELNLicense.h"
+#include "ZELNLog.h"
+#include "ZELNContact.h"
 
-ze_add_module(ZEFoundation)
-ze_add_module(ZECodeUtilities)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL)
-ze_add_module(ZETools			OPTIONAL DEFAULT)
-ze_add_module(ZELNLauncher		OPTIONAL DEFAULT)
+bool ZELNModule::OnPreLaunch()
+{
+	return true;
+}
 
-ze_add_cmake_project(ZESource)
+void ZELNModule::OnPostLaunch()
+{
+
+}
+
+void ZELNModule::OnTerminate()
+{
+	
+}
+
+void ZELNModule::OnUpdate()
+{
+
+}
+
+QWidget* ZELNModule::GetWidget()
+{
+	return NULL;
+}
+
+bool ZELNModule::GetAllowLaunch()
+{
+	return true;
+}
+
+ZEArray<ZEString> ZELNModule::GetLaunchParameters()
+{
+	return ZEArray<ZEString>();
+}
+
+ZESize ZELNModule::GetModuleCount()
+{
+	return 4;
+}
+
+ZELNModule** ZELNModule::GetModules()
+{
+	static ZELNLog Log;
+	static ZELNLicense License;
+	static ZELNUpdate Update;
+	static ZELNContact Contact;
+
+	static ZELNModule* Modules[] =
+	{
+		&Log,
+		&License,
+		&Update,
+		&Contact
+	};
+
+	return Modules;
+}
+
+ZELNModule* ZELNModule::GetModule(const char* Name)
+{
+	for (ZESize I = 0; I < GetModuleCount(); I++)
+	{
+		ZELNModule* Module = GetModules()[I];
+		if (strcmp(Name, Module->GetName()) == 0)
+			return Module;
+	}
+
+	return NULL;
+}

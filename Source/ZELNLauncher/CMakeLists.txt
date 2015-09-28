@@ -33,14 +33,49 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_add_module(ZEFoundation)
-ze_add_module(ZECodeUtilities)
-ze_add_module(ZEEngine)
-ze_add_module(ZEModules			OPTIONAL DEFAULT)
-ze_add_module(ZEditor			OPTIONAL)
-ze_add_module(ZETools			OPTIONAL DEFAULT)
-ze_add_module(ZELNLauncher		OPTIONAL DEFAULT)
+ze_add_source(ZELNMain.cpp						Sources)
+ze_add_source(ZELNModule.cpp					Sources)
+ze_add_source(ZELNModule.h						Sources)
+ze_add_source(ZELNLauncher.cpp					Sources)
+ze_add_source(ZELNLauncher.h					Sources)
+ze_add_source(ZELNLauncherWindow.cpp			Sources)
+ze_add_source(ZELNLauncherWindow.h				Sources QtMocs)
+ze_add_source(ZELNLauncherWindow.ui				Sources QtUIs)
+ze_add_source(ZELNLauncher.qrc					Sources QtResources)
 
-ze_add_cmake_project(ZESource)
+ze_add_source(ZELNLog.cpp						Sources)
+ze_add_source(ZELNLog.h							Sources)
+ze_add_source(ZELNLogWidget.cpp					Sources)
+ze_add_source(ZELNLogWidget.h					Sources QtMocs)
+ze_add_source(ZELNLogWidget.ui					Sources QtUIs)
+
+ze_add_source(ZELNLicense.cpp					Sources)
+ze_add_source(ZELNLicense.h						Sources)
+ze_add_source(ZELNLicenseWidget.cpp				Sources)
+ze_add_source(ZELNLicenseWidget.h				Sources QtMocs)
+ze_add_source(ZELNLicenseWidget.ui				Sources QtUIs)
+
+ze_add_source(ZELNUpdate.cpp					Sources)
+ze_add_source(ZELNUpdate.h						Sources)
+ze_add_source(ZELNUpdateWidget.cpp				Sources)
+ze_add_source(ZELNUpdateWidget.h				Sources QtMocs)
+ze_add_source(ZELNUpdateWidget.ui				Sources QtUIs)
+
+ze_add_source(ZELNContact.cpp					Sources)
+ze_add_source(ZELNContact.h						Sources)
+ze_add_source(ZELNContactWidget.cpp				Sources)
+ze_add_source(ZELNContactWidget.h				Sources QtMocs)
+ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
+
+
+qt4_wrap_ui(QtUIOutputs ${QtUIs})
+qt4_wrap_cpp(QtMocOutputs  ${QtMocs})
+qt4_add_resources(QtResourceOutputs ${QtResources})
+
+ze_add_executable(TARGET ZELNLauncher 
+	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
+	LIBS ZEFoundation libQt libMSVCRv100)
+	
+source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})
