@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELCEncryption.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZELCLicense.cpp			Sources)
-ze_add_source(ZELCLicense.h				Sources)
-ze_add_source(ZELCLicenseManager.cpp	Sources)
-ze_add_source(ZELCLicenseManager.h		Sources)
-ze_add_source(ZELCEncryption.cpp		Sources)
-ze_add_source(ZELCEncryption.h			Sources)
-ze_add_source(ZELCChecker.cpp			Sources)
-ze_add_source(ZELCChecker.h				Sources)
-ze_add_source(ZELCGenerator.cpp			Sources)
-ze_add_source(ZELCGenerator.h			Sources)
+#include "ZETypes.h"
+#include "ZEDS\ZEArray.h"
 
-ze_add_library(TARGET ZEProtect
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS libCryptopp)
+class ZELCRSAEncription
+{
+	private:
+		ZEArray<ZEBYTE>			PublicKey;
+		ZEArray<ZEBYTE>			PrivateKey;
+
+	public:
+		void					SetPrivateKey(const ZEArray<ZEBYTE>& KeyData);
+		const ZEArray<ZEBYTE>&	GetPrivateKey();
+		
+		void					SetPublicKey(const ZEArray<ZEBYTE>& KeyData);
+		const ZEArray<ZEBYTE>&	GetPubkicKey();
+
+		void					Encrypt(ZEArray<ZEBYTE>& Output, void* Input, ZESize InputSize);
+		void					Decrypt(ZEArray<ZEBYTE>& Output, void* Input, ZESize InputSize);
+
+		void					GenerateKeys(ZEUInt KeySize);
+};

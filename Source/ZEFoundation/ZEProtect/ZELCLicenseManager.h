@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELCLicenseManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,23 +30,29 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZELCLicense.cpp			Sources)
-ze_add_source(ZELCLicense.h				Sources)
-ze_add_source(ZELCLicenseManager.cpp	Sources)
-ze_add_source(ZELCLicenseManager.h		Sources)
-ze_add_source(ZELCEncryption.cpp		Sources)
-ze_add_source(ZELCEncryption.h			Sources)
-ze_add_source(ZELCChecker.cpp			Sources)
-ze_add_source(ZELCChecker.h				Sources)
-ze_add_source(ZELCGenerator.cpp			Sources)
-ze_add_source(ZELCGenerator.h			Sources)
+#include "ZELCLicense.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
 
-ze_add_library(TARGET ZEProtect
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS libCryptopp)
+class ZELCLicenseManager
+{
+	private:
+		ZEArray<ZELCLicense>		Licenses;
+
+		ZEArray<ZELCLicense>		LoadLicenseFile(const ZEString& FileName);
+		bool						SaveLicenseFile(const ZEString& FileName, const ZEArray<ZELCLicense>& Licenses);
+
+	public:
+		const ZEArray<ZELCLicense>&	GetLicenses();
+
+		void						RegisterLicense(const ZELCLicense& License);
+		void						UnregisterLicense(const ZEGUID& LicenseGUID);
+
+		void						LoadLicenses();
+		void						SaveLicenses();
+};
