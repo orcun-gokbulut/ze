@@ -35,75 +35,127 @@
 
 #include "ZELCEncryption.h"
 
-#include "rsa.h"
-#include "osrng.h"
+#include <osrng.h>
+#include <modes.h>
+#include <rsa.h>
+#include <aes.h>
+#include <pssr.h>
 
 static CryptoPP::AutoSeededRandomPool RandomSeedPool;
 
-void ZELCRSAEncription::SetPrivateKey(const ZEArray<ZEBYTE>& KeyData)
+void ZELCEncryption::AESPasskey(void* OutputKey, ZESize KeySize, const ZEString& Password)
 {
-	PrivateKey = KeyData;
+	ZESize PasskeySize = Password.GetLength();
+	if (PasskeySize > KeySize)
+		PasskeySize = KeySize;
+
+	memset(OutputKey, 0, KeySize);
+	memcpy(OutputKey, Password.GetValue(), PasskeySize);
 }
 
-const ZEArray<ZEBYTE>& ZELCRSAEncription::GetPrivateKey()
+void ZELCEncryption::AESEncrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* Key, ZESize KeySize)
 {
-	return PrivateKey;
+	byte iv[CryptoPP::AES::BLOCKSIZE];
+	RandomSeedPool.GenerateBlock(iv, CryptoPP::AES::BLOCKSIZE);
+
+	CryptoPP::CFB_Mode<CryptoPP::AES>::Encryption Encryption((const byte*)Key, KeySize, iv);
+	Output.SetCount(InputSize);
+	Encryption.ProcessData(Output.GetCArray(), (const byte*)Input, InputSize);
+	
+	Output.MassInsert(0, iv, CryptoPP::AES::BLOCKSIZE);
 }
 
-void ZELCRSAEncription::SetPublicKey(const ZEArray<ZEBYTE>& KeyData)
+void ZELCEncryption::AESDecrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* Key, ZESize KeySize)
 {
-	PublicKey = KeyData;
+	byte iv[CryptoPP::AES::BLOCKSIZE];
+	memcpy(iv, Input, CryptoPP::AES::BLOCKSIZE);
+
+	CryptoPP::CFB_Mode<CryptoPP::AES>::Decryption Decryption((const byte*)Key, KeySize, iv);
+	Output.SetCount(InputSize - CryptoPP::AES::BLOCKSIZE);
+	Decryption.ProcessData(Output.GetCArray(), (const byte*)Input + CryptoPP::AES::BLOCKSIZE, Output.GetCount());
 }
 
-const ZEArray<ZEBYTE>& ZELCRSAEncription::GetPubkicKey()
-{
-	return PublicKey;
-}
-
-void ZELCRSAEncription::Encrypt(ZEArray<ZEBYTE>& Output, void* Input, ZESize InputSize)
+void ZELCEncryption::RSAEncrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* PublicKey, ZESize KeySize)
 {
 	Output.Clear();
 
-	CryptoPP::RSA::PublicKey RSAPublicKey;
-	RSAPublicKey.BERDecodePublicKey(CryptoPP::ArraySource((const byte*)PublicKey.GetCArray(), PublicKey.GetSize(), true), false, PublicKey.GetSize());
+	try
+	{
+		CryptoPP::RSA::PublicKey RSAPrivateKey;
+		RSAPrivateKey.BERDecodePublicKey(CryptoPP::ArraySource((const byte*)PublicKey, KeySize, true), false, KeySize);
 
-	CryptoPP::RSAES_OAEP_SHA_Encryptor Encryptor(RSAPublicKey);
-	if (Encryptor.FixedMaxPlaintextLength() < InputSize)
-		return;
+		CryptoPP::RSAES_OAEP_SHA_Encryptor Encryptor(RSAPrivateKey);
+		if (Encryptor.FixedMaxPlaintextLength() < InputSize)
+			return;
 
-	ZESize OutputSize = Encryptor.CiphertextLength(InputSize);
-	if (OutputSize == 0)
-		return;
+		ZESize OutputSize = Encryptor.CiphertextLength(InputSize);
+		if (OutputSize == 0)
+			return;
 
-	Output.SetCount(OutputSize);
-	Encryptor.Encrypt(RandomSeedPool, (const byte*)Input, InputSize, (byte*)Output.GetCArray());
+		Output.SetCount(OutputSize);
+		Encryptor.Encrypt(RandomSeedPool, (const byte*)Input, InputSize, (byte*)Output.GetCArray());
+	}
+	catch (...)
+	{
+	}
 }
 
-void ZELCRSAEncription::Decrypt(ZEArray<ZEBYTE>& Output, void* Input, ZESize InputSize)
+void ZELCEncryption::RSADecrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* PrivateKey, ZESize KeySize)
 {
 	Output.Clear();
 
+	try 
+	{
+		CryptoPP::RSA::PrivateKey RSAPrivateKey;
+		RSAPrivateKey.BERDecodePrivateKey(CryptoPP::ArraySource((const byte*)PrivateKey, KeySize, true), false, KeySize);
+		CryptoPP::RSAES_OAEP_SHA_Decryptor Decryptor(RSAPrivateKey);
+		if (Decryptor.FixedCiphertextLength() == 0)
+			return;
+
+		ZESize OutputSize = Decryptor.MaxPlaintextLength(InputSize);
+		if (OutputSize == 0)
+			return;
+
+		Output.SetCount(OutputSize);
+		CryptoPP::DecodingResult Result = Decryptor.Decrypt(RandomSeedPool, (const byte*)Input, InputSize, Output.GetCArray());
+		if (!Result.isValidCoding || Result.messageLength > OutputSize)
+		{
+			Output.Clear();
+			return;
+		}
+
+		Output.Resize(Result.messageLength);
+	}
+	catch(...)
+	{
+	}
+}
+
+void ZELCEncryption::RSASign(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* PrivateKey, ZESize KeySize)
+{
 	CryptoPP::RSA::PrivateKey RSAPrivateKey;
-	RSAPrivateKey.BERDecodePrivateKey(CryptoPP::ArraySource((const byte*)PrivateKey.GetCArray(), PrivateKey.GetCount(), true), false, PrivateKey.GetCount());
-	CryptoPP::RSAES_OAEP_SHA_Decryptor Decryptor(RSAPrivateKey);
+	RSAPrivateKey.BERDecodePrivateKey(CryptoPP::ArraySource((const byte*)PrivateKey, KeySize, true), false, KeySize);
 
-	if (Decryptor.FixedCiphertextLength() == 0)
-		return;
+	CryptoPP::RSASS<CryptoPP::PSS, CryptoPP::SHA1>::Signer Signer(RSAPrivateKey);
 
-	ZESize OutputSize = Decryptor.MaxPlaintextLength(InputSize);
-	if (OutputSize == 0)
-		return;
+	size_t SignatureLenght = Signer.MaxSignatureLength();
+	Output.SetCount(SignatureLenght);
+	Output.Fill(0);
 
-	CryptoPP::SecByteBlock OutputBlock(OutputSize);
-	CryptoPP::DecodingResult Result = Decryptor.Decrypt(RandomSeedPool, (byte*)Input, InputSize, OutputBlock);
-	if (!Result.isValidCoding || Result.messageLength > OutputSize)
-		return;
-
-	Output.SetCount(Result.messageLength);
-	memcpy(Output.GetCArray(), OutputBlock.data(), Output.GetCount());
+	SignatureLenght = Signer.SignMessage(RandomSeedPool, (const byte*)Input, InputSize, Output.GetCArray());
+	Output.Resize(SignatureLenght);
 }
 
-void ZELCRSAEncription::GenerateKeys(ZEUInt KeySize)
+bool ZELCEncryption::RSAVerify(const void* Input, ZESize InputSize, const void* Signature, ZESize SignatureSize, const void* PublicKey, ZESize KeySize)
+{
+	CryptoPP::RSA::PublicKey RSAPublicKey;
+	RSAPublicKey.BERDecodePublicKey(CryptoPP::ArraySource((const byte*)PublicKey, KeySize, true), false, KeySize);
+
+	CryptoPP::RSASS<CryptoPP::PSS, CryptoPP::SHA1>::Verifier Verifier(RSAPublicKey);
+	return Verifier.VerifyMessage((const byte*)Input, InputSize, (const byte*)Signature, SignatureSize);
+}
+
+void ZELCEncryption::RSAGenerateKeys(ZEUInt KeySize, ZEArray<ZEBYTE>& PrivateKey, ZEArray<ZEBYTE>& PublicKey)
 {
 	CryptoPP::RSA::PrivateKey RSAPrivateKey;
 	RSAPrivateKey.GenerateRandomWithKeySize(RandomSeedPool, KeySize);

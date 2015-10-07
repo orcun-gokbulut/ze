@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGUID.h
+ Zinek Engine - ZELCActivationData.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GUID_H__
-#define __ZE_GUID_H__
 
-#include "ZEDS/ZEString.h"
-#include "ZETypes.h"
 #include "ZEPacking.h"
+#include "ZETypes.h"
+#include "ZEGUID.h"
+#include "ZELCUtils.h"
+
+class ZELCLicense;
 
 ZEPackStruct(
-	class ZEGUID
+	struct ZELCActivationData
 	{
-		public:
-			ZEUInt32			Data1;
-			ZEUInt16			Data2;
-			ZEUInt16			Data3;
-			ZEUInt64			Data4;
+		ZEUInt64		Random;
+		ZEBYTE			SerialKey[ZELC_SERIAL_KEY_SIZE];
+		ZEGUID			MachineSecurityGUID;
+		ZEUInt32		BiosSerialNumber;
+		ZEUInt32		HardDiskSerialNumber;
 
-			ZEInt				Compare(const ZEGUID& Other) const;
-			bool				Equals(const ZEGUID& Other) const;
-
-			bool				operator<(const ZEGUID& Other) const;
-			bool				operator>(const ZEGUID& Other) const;
-			bool				operator<=(const ZEGUID& Other) const;
-			bool				operator>=(const ZEGUID& Other) const;
-			bool				operator==(const ZEGUID& Other) const;
-			bool				operator!=(const ZEGUID& Other) const;
-
-			bool				FromString(const ZEString& String);
-			ZEString			ToString() const;
-
-								ZEGUID();
-								ZEGUID(const ZEString& String);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
-
-			static ZEGUID		Generate();
+		static bool		Generate(ZELCActivationData& ActivationData, const ZELCLicense& License);
 	}
 );
-
-#endif

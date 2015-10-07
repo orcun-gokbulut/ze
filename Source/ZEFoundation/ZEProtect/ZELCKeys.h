@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGUID.h
+ Zinek Engine - ZELCKeys.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GUID_H__
-#define __ZE_GUID_H__
 
-#include "ZEDS/ZEString.h"
-#include "ZETypes.h"
-#include "ZEPacking.h"
+#include "ZEDS\ZEArray.h"
 
-ZEPackStruct(
-	class ZEGUID
-	{
-		public:
-			ZEUInt32			Data1;
-			ZEUInt16			Data2;
-			ZEUInt16			Data3;
-			ZEUInt64			Data4;
+class ZELCKeys
+{
+	private:
+		static const ZEBYTE*		GetEncryptedPreActivationPrivateKey();
+		static ZESize				GetEncryptedPreActivationPrivateKeySize();
+		static const ZEBYTE*		GetEncryptedActivationPrivateKey();
+		static ZESize				GetEncryptedActivationPrivateKeySize();
+	
+	public:
+		static ZEArray<ZEBYTE>		GetPreActivationPrivateKey(const ZEString& Password);
+		static ZESize				GetPreActivationPrivateKeySize();
 
-			ZEInt				Compare(const ZEGUID& Other) const;
-			bool				Equals(const ZEGUID& Other) const;
+		static const ZEBYTE*		GetPreActivationPublicKey();
+		static ZESize				GetPreActivationPublicKeySize();
 
-			bool				operator<(const ZEGUID& Other) const;
-			bool				operator>(const ZEGUID& Other) const;
-			bool				operator<=(const ZEGUID& Other) const;
-			bool				operator>=(const ZEGUID& Other) const;
-			bool				operator==(const ZEGUID& Other) const;
-			bool				operator!=(const ZEGUID& Other) const;
+		static ZEArray<ZEBYTE>		GetActivationPrivateKey(const ZEString& Password);
+		static ZESize				GetActivationPrivateKeySize();
 
-			bool				FromString(const ZEString& String);
-			ZEString			ToString() const;
+		static const ZEBYTE*		GetActivationPublicKey();
+		static ZESize				GetActivationPublicKeySize();
 
-								ZEGUID();
-								ZEGUID(const ZEString& String);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
-
-			static ZEGUID		Generate();
-	}
-);
-
-#endif
+		static bool					GenerateKeys(const ZEString& PrivateKeyPassword, const ZEString& KeyFile = "License.zeKeys", const ZEString& KeyCodeFile = "ZELCKeysData.cpp");
+};

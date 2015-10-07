@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGUID.h
+ Zinek Engine - ZELCActivationCodeGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GUID_H__
-#define __ZE_GUID_H__
 
 #include "ZEDS/ZEString.h"
-#include "ZETypes.h"
-#include "ZEPacking.h"
+#include "ZEDS/ZEArray.h"
 
-ZEPackStruct(
-	class ZEGUID
-	{
-		public:
-			ZEUInt32			Data1;
-			ZEUInt16			Data2;
-			ZEUInt16			Data3;
-			ZEUInt64			Data4;
+class ZELCActivationCodeGenerator
+{
+	private:
+		ZEArray<ZEBYTE>				PreActivationKey;
+		ZEArray<ZEBYTE>				ActivationKey;
+		ZEString					SerialKey;
+		ZEString					PreActivationCode;
 
-			ZEInt				Compare(const ZEGUID& Other) const;
-			bool				Equals(const ZEGUID& Other) const;
+	public:
+		void						SetPreActivationKey(const void* Key, ZESize KeySize);
+		const ZEArray<ZEBYTE>&		GetPreActivationKey() const;
 
-			bool				operator<(const ZEGUID& Other) const;
-			bool				operator>(const ZEGUID& Other) const;
-			bool				operator<=(const ZEGUID& Other) const;
-			bool				operator>=(const ZEGUID& Other) const;
-			bool				operator==(const ZEGUID& Other) const;
-			bool				operator!=(const ZEGUID& Other) const;
+		void						SetActivationKey(const void* Key, ZESize KeySize);
+		const ZEArray<ZEBYTE>&		GetActivationKey() const;
 
-			bool				FromString(const ZEString& String);
-			ZEString			ToString() const;
+		void						SetSerialKey(const ZEString& SerialKey);
+		const ZEString&				GetSerialKey() const;
 
-								ZEGUID();
-								ZEGUID(const ZEString& String);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
+		void						SetPreActivationCode(const ZEString& PreActivationCode);
+		const ZEString&				GetPreActivationCode() const;
 
-			static ZEGUID		Generate();
-	}
-);
+		bool						GenerateActivationCode(ZEString& Output)  const;
 
-#endif
+		void						LoadKeys(const ZEString& Password);
+};
