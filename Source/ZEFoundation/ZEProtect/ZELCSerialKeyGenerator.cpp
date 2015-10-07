@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELCGenerator.cpp
+ Zinek Engine - ZELCSerialKeyGenerator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,10 +32,11 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZELCGenerator.h"
 
+#include "ZELCSerialKeyGenerator.h"
+
+#include "ZELCUtils.h"
 #include "ZEDS\ZEFormat.h"
-#include "ZEGUID.h"
 
 void ZELCSerialKeyGenerator::SetApplicationName(const ZEString& Name)
 {
@@ -99,27 +100,37 @@ ZEUInt32 ZELCSerialKeyGenerator::GetSerialNumber() const
 
 ZEString ZELCSerialKeyGenerator::GenerateSerialKey() const
 {
-	ZEUInt32 SerialKey[5];
-	SerialKey[0] = GetSerialNumber();
-	SerialKey[1] = GetApplicationName().Hash();
-	SerialKey[2] = GetLicenseeName().Hash();
+	ZEUInt32 Values[4];
+	Values[0] = GetSerialNumber();
+	Values[1] = GetApplicationName().Hash();
+	Values[2] = GetLicenseeName().Hash();
 	
-	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKey[3];
+	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&Values[3];
 	VersionEditionFlags[0] = GetApplicationVersionMajor();
 	VersionEditionFlags[1] = GetApplicationVersionMinor();
 	VersionEditionFlags[2] = GetApplicationEdition();
 	VersionEditionFlags[3] = 0;
+
+	ZEUInt32 SerialKey[ZELC_SERIAL_KEY_SIZE / sizeof(ZEUInt32)];
+	SerialKey[0] = Values[0] ^ 0x00C6487A;
+	SerialKey[1] = Values[1] ^ 0x5B52C4E9 ^ SerialKey[0]; 
+	SerialKey[2] = Values[2] ^ 0x07EA99BA ^ SerialKey[0]; 
+	SerialKey[3] = Values[3] ^ 0xB5EFD017 ^ SerialKey[0];
+
+	ZEUInt32 NewValues[4];
+	NewValues[0] = SerialKey[0] ^ 0x00C6487A;
+	NewValues[1] = SerialKey[0] ^ 0x5B52C4E9 ^ SerialKey[1];			
+	NewValues[2] = SerialKey[0] ^ 0x07EA99BA ^ SerialKey[2];
+	NewValues[3] = SerialKey[0] ^ 0xB5EFD017 ^ SerialKey[3];
 
 	ZEUInt32 Check;
 	Check  = SerialKey[0] + 0x46AD788E;
 	Check ^= SerialKey[1] - 0x6B71E511;
 	Check ^= SerialKey[2] - 0x915067FA;
 	Check ^= SerialKey[3] + 0xEE7C85CA;
-
 	SerialKey[4] = Check;
 
-	return ZEFormat::Format("ZE-([a-fA-F0-9]{8})-([a-fA-F0-9]{8})-([a-FA-F0-9]{8})-([a-FA-F0-9]{8})-([a-FA-F0-9]{8})",
-		SerialKey[0], SerialKey[1], SerialKey[2], SerialKey[3], SerialKey[4]);
+	return ZELCUtils::ConvertSerialKey(SerialKey);
 }
 
 ZELCSerialKeyGenerator::ZELCSerialKeyGenerator()
@@ -128,49 +139,4 @@ ZELCSerialKeyGenerator::ZELCSerialKeyGenerator()
 	ApplicationVersionMinor = 0;
 	ApplicationEdition = 0;
 	SerialNumber = 0;
-}
-
-void ZELCActivationCodeGenerator::SetPreActivationPrivateKey(const ZEArray<ZEBYTE>& KeyData)
-{
-	PreActivationPrivateKey = KeyData;
-}
-
-const ZEArray<ZEBYTE>& ZELCActivationCodeGenerator::GetPreActivationPrivateKey() const
-{
-	return PreActivationPrivateKey;
-}
-
-void ZELCActivationCodeGenerator::SetActivationPublicKey(const ZEArray<ZEBYTE>& KeyData)
-{
-	ActivationPublicKey = KeyData;
-}
-
-const ZEArray<ZEBYTE>& ZELCActivationCodeGenerator::GetActivationPublicKey() const
-{
-	return ActivationPublicKey;
-}
-
-void ZELCActivationCodeGenerator::SetSerialKey(const ZEString& SerialKey)
-{
-	this->SerialKey = SerialKey;
-}
-
-const ZEString& ZELCActivationCodeGenerator::GetSerialKey() const
-{
-	return SerialKey;
-}
-
-void ZELCActivationCodeGenerator::SetPreActivationCode(const ZEString& PreActivationCode)
-{
-	this->PreActivationCode = PreActivationCode;
-}
-
-const ZEString& ZELCActivationCodeGenerator::GetPreActivationCode() const
-{
-	return PreActivationCode;
-}
-
-bool ZELCActivationCodeGenerator::GenerateActivationCode(ZEString& Output) const
-{
-	return false;
 }

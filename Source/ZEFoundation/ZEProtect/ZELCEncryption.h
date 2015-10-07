@@ -38,21 +38,18 @@
 #include "ZETypes.h"
 #include "ZEDS\ZEArray.h"
 
-class ZELCRSAEncription
+class ZELCEncryption
 {
-	private:
-		ZEArray<ZEBYTE>			PublicKey;
-		ZEArray<ZEBYTE>			PrivateKey;
-
 	public:
-		void					SetPrivateKey(const ZEArray<ZEBYTE>& KeyData);
-		const ZEArray<ZEBYTE>&	GetPrivateKey();
-		
-		void					SetPublicKey(const ZEArray<ZEBYTE>& KeyData);
-		const ZEArray<ZEBYTE>&	GetPubkicKey();
+		static void			AESPasskey(void* OutputKey, ZESize KeySize, const ZEString& Passkey);
+		static void			AESEncrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* Key, ZESize KeySize);
+		static void			AESDecrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* Key, ZESize KeySize);
 
-		void					Encrypt(ZEArray<ZEBYTE>& Output, void* Input, ZESize InputSize);
-		void					Decrypt(ZEArray<ZEBYTE>& Output, void* Input, ZESize InputSize);
+		static void			RSADecrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* PublicKey, ZESize KeySize);
+		static void			RSAEncrypt(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* PrivateKey, ZESize KeySize);
 
-		void					GenerateKeys(ZEUInt KeySize);
+		static void			RSASign(ZEArray<ZEBYTE>& Output, const void* Input, ZESize InputSize, const void* PrivateKey, ZESize KeySize);
+		static bool			RSAVerify(const void* Input, ZESize InputSize, const void* Signature, ZESize SignatureSize, const void* PublicKey, ZESize KeySize);
+
+		static void			RSAGenerateKeys(ZEUInt KeySize, ZEArray<ZEBYTE>& PrivateKey, ZEArray<ZEBYTE>& PublicKey);
 };

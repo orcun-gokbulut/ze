@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELCGenerator.h
+ Zinek Engine - ZELCUtils.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,64 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#include "ZEDS\ZEString.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
+#define ZELC_ACTIVATION_CODE_SIZE	128
+#define ZELC_SERIAL_KEY_SIZE		20
 
-class ZELCSerialKeyGenerator
+class ZELCUtils
 {
-	private:
-		ZEString				ApplicationName;
-		ZEUInt8					ApplicationVersionMajor;
-		ZEUInt8					ApplicationVersionMinor;
-		ZEUInt8					ApplicationEdition;
-		ZEString				LicenseeName;
-		ZEUInt32				SerialNumber;
-
 	public:
-		void					SetApplicationName(const ZEString& ApplicationName);
-		const ZEString&			GetApplicationName() const;
+		static bool				CheckSerialCode(const void* SerialKeyBinary);
+		static ZEString			ConvertSerialKey(const void* SerialKeyBinary);
+		static bool				ConvertSerialKey(void* SerialKeyBinary, const ZEString& SerialKeyText);
 
-		void					SetApplicationVersionMajor(ZEUInt8 Version);
-		ZEUInt8					GetApplicationVersionMajor() const;
-
-		void					SetApplicationVersionMinor(ZEUInt8 Version);
-		ZEUInt8					GetApplicationVersionMinor() const;
-
-		void					SetApplicationEdition(ZEUInt8 Edition);
-		ZEUInt8					GetApplicationEdition() const;
-
-		void					SetLicenseeName(const ZEString& Name);
-		const ZEString&			GetLicenseeName() const;
-
-		void					SetSerialNumber(ZEUInt32 Serial);
-		ZEUInt32				GetSerialNumber() const;
-
-		ZEString				GenerateSerialKey() const;
-
-								ZELCSerialKeyGenerator();
-};
-
-class ZELCActivationCodeGenerator
-{
-	private:
-		ZEArray<ZEBYTE>			PreActivationPrivateKey;
-		ZEArray<ZEBYTE>			ActivationPublicKey;
-		ZEString				SerialKey;
-		ZEString				PreActivationCode;
-
-	public:
-		void					SetPreActivationPrivateKey(const ZEArray<ZEBYTE>& KeyData);
-		const ZEArray<ZEBYTE>&	GetPreActivationPrivateKey() const;
-
-		void					SetActivationPublicKey(const ZEArray<ZEBYTE>& KeyData);
-		const ZEArray<ZEBYTE>&	GetActivationPublicKey() const;
-
-		void					SetSerialKey(const ZEString& SerialKey);
-		const ZEString&			GetSerialKey() const;
-
-		void					SetPreActivationCode(const ZEString& PreActivationCode);
-		const ZEString&			GetPreActivationCode() const;
-
-		bool					GenerateActivationCode(ZEString& Output)  const;
+		static ZEString			ConvertActivationCode(const void* ActivationCodeBinary);
+		static bool				ConvertActivationCode(void* ActivationCodeBinary, const ZEString& ActivationCodeText);
 };

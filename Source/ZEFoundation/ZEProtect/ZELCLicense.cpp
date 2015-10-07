@@ -35,159 +35,12 @@
 
 #include "ZELCLicense.h"
 
-#ifdef ZE_PLATFORM_WINDOWS
-
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <Shlobj.h>
-#include <WbemCli.h>
+#include "ZELCEncryption.h"
+#include "ZELCKeys.h"
+#include "ZELCUtils.h"
+#include "ZELCActivationData.h"
 #include "ZEML\ZEMLReader.h"
 #include "ZEML\ZEMLWriter.h"
-#include "ZEDS\ZEFormat.h"
-#include "ZERegEx\ZERegEx.h"
-#pragma comment(lib, "wbemuuid.lib")
-
-#include <rsa.h>
-#include "ZELCEncryption.h"
-#include "ZERandom.h"
-
-static ZEString WMIQuery(wchar_t* Query, wchar_t* Column)
-{
-	ZEString Result;
-
-	HRESULT hRes = CoInitializeEx(NULL, COINIT_MULTITHREADED);
-	if(FAILED(hRes))
-		return "";
-
-	if((FAILED(hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_IMPERSONATE, NULL, EOAC_NONE, 0))))
-		return "";
-
-	IWbemLocator* pLocator = NULL;
-	if(FAILED(hRes = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pLocator))))
-		return "";
-
-	IWbemServices* pService = NULL;
-	if(FAILED(hRes = pLocator->ConnectServer(L"root\\CIMV2", NULL, NULL, NULL, WBEM_FLAG_CONNECT_USE_MAX_WAIT, NULL, NULL, &pService)))
-		return "";
-
-	IEnumWbemClassObject* pEnumerator = NULL;
-	if(FAILED(hRes = pService->ExecQuery(L"WQL", Query, WBEM_FLAG_FORWARD_ONLY, NULL, &pEnumerator)))
-	{
-		pLocator->Release();
-		pService->Release();
-		return "";
-	}
-
-	IWbemClassObject* clsObj = NULL;
-	int numElems;
-	while((hRes = pEnumerator->Next(WBEM_INFINITE, 1, &clsObj, (ULONG*)&numElems)) != WBEM_S_FALSE)
-	{
-		if(FAILED(hRes))
-			break;
-
-		VARIANT vRet;
-		VariantInit(&vRet);
-		if(SUCCEEDED(clsObj->Get(L"Description", 0, &vRet, NULL, NULL)) && vRet.vt == VT_BSTR)
-		{
-			Result = vRet.bstrVal;
-			VariantClear(&vRet);
-			break;
-		}
-
-		clsObj->Release();
-	}
-
-	pEnumerator->Release();
-	pService->Release();
-	pLocator->Release();
-
-	return Result;
-}
-
-static ZEUInt32 GetHarddiskSerialNumber()
-{
-	return WMIQuery(L"SELECT SerialKey FROM Win32_PhysicalMedia", L"SerialNumber").ToUInt32();
-}
-
-static ZEUInt32 GetBiosSerialNumber()
-{
-	return WMIQuery(L"SELECT SerialNumber FROM Win32_Bios", L"SerialNumber").ToUInt32();
-}
-
-static ZEGUID GetMachineSecurityGUID()
-{
-	ZEGUID Output;
-
-	HKEY Key;
-	if (RegOpenKey(HKEY_LOCAL_MACHINE, TEXT("Software\\Microsoft\\Cryptography\\"), &Key) != ERROR_SUCCESS)
-		return Output;
-
-	char Value[1024];
-	DWORD ValueSize = 1024;
-	DWORD Type = REG_SZ;
-	RegQueryValueEx(Key, "MachineGUID", NULL, &Type, (LPBYTE)&Value, &ValueSize);
-
-	Output.FromString(Value);
-
-	return Output;
-}
-
-#else
-
-static ZEString GetHDDSerial()
-{
-	return "";
-}
-
-static ZEString GetMACAddress()
-{
-	return "";
-}
-
-static ZEString GetMotherboardSerial()
-{
-	return "";
-}
-
-static ZEString GetSystemWidePath()
-{
-	return "~";
-}
-
-#endif
-
-struct ZELCActivationData
-{
-	ZEUInt64 Random0;
-	ZEUInt32 SerialKey[5];
-	ZEGUID MachineSecurityGUID;
-	ZEUInt32 BiosSerialNumber;
-	ZEUInt32 HarddiskSerialNumber;
-	ZEUInt64 Random1;
-};
-
-static ZELCActivationData GenerateActivationData(const ZELCLicense* License)
-{
-	ZELCActivationData ActivationData;
-	memset(&ActivationData, 0, sizeof(ZELCActivationData));
-
-	ZERegEx RegEx("([a-fA-F0-9]{8})-([a-fA-F0-9]{8})-([a-FA-F0-9]{8})-([a-FA-F0-9]{8})-([a-FA-F0-9]{8})");
-	ZERegExMatch Match;
-	if (!RegEx.Match(License->GetSerialKey(), Match))
-		return ActivationData;
-
-	ActivationData.SerialKey[0] = Match.SubMatches[0].String.ToUInt32(16);
-	ActivationData.SerialKey[1] = Match.SubMatches[1].String.ToUInt32(16);
-	ActivationData.SerialKey[2] = Match.SubMatches[2].String.ToUInt32(16);
-	ActivationData.SerialKey[3] = Match.SubMatches[3].String.ToUInt32(16);
-	ActivationData.SerialKey[4] = Match.SubMatches[4].String.ToUInt32(16);
-
-	ActivationData.MachineSecurityGUID = GetMachineSecurityGUID();
-	ActivationData.HarddiskSerialNumber = GetHarddiskSerialNumber();
-	ActivationData.BiosSerialNumber = GetBiosSerialNumber();
-
-	return ActivationData;
-}
 
 void ZELCLicense::SetGUID(const ZEGUID& GUID)
 {
@@ -301,46 +154,31 @@ bool ZELCLicense::GetSystemWide() const
 
 ZEString ZELCLicense::GeneratePreActivationCode() const
 {
-	ZELCActivationData Data = GenerateActivationData(this);
-	Data.Random0 = ZERandom::GetUInt64();
-	Data.Random1 = ZERandom::GetUInt64();
-
-	/*ZELCRSAEncription Encription;
-	Encription.SetPrivateKey();*/
+	ZELCActivationData ActivationData;
+	if (!ZELCActivationData::Generate(ActivationData, *this))
+		return false;
 
 	ZEArray<ZEBYTE> Buffer;
-	//Encription.Encrypt(Buffer, &Data, sizeof(ZELCActivationData));
+	ZELCEncryption::RSAEncrypt(Buffer, &ActivationData, sizeof(ZELCActivationData), ZELCKeys::GetPreActivationPublicKey(), ZELCKeys::GetPreActivationPublicKeySize());
 
-	ZEString Output;
-	for (ZESize I = 0; I < Buffer.GetSize() / 8; I++)
-		Output += ZEFormat::Format(I == 0 ? "{0:x}" : "-{0:x}", *(ZEUInt32*)&Buffer[I * 4]);
-
-	return Output;
+	return ZELCUtils::ConvertActivationCode((ZEUInt32*)Buffer.GetConstCArray());
 }
 
 bool ZELCLicense::CheckSerialKeyValid() const
 {
-	ZERegEx RegEx("ZE-([a-fA-F0-9]{8})-([a-fA-F0-9]{8})-([a-FA-F0-9]{8})-([a-FA-F0-9]{8})-([a-FA-F0-9]{8})");
-	ZERegExMatch Match;
-	ZEUInt32 SerialKeyEncoded[5];
-
-	SerialKeyEncoded[0] = Match.SubMatches[0].String.ToUInt32(16);
-	SerialKeyEncoded[1] = Match.SubMatches[1].String.ToUInt32(16);
-	SerialKeyEncoded[2] = Match.SubMatches[2].String.ToUInt32(16);
-	SerialKeyEncoded[3] = Match.SubMatches[3].String.ToUInt32(16);
-	SerialKeyEncoded[4] = Match.SubMatches[4].String.ToUInt32(16);
-
-
-	ZEUInt32 Check;
-	Check  = SerialKeyEncoded[0] + 0x46AD788E;
-	Check ^= SerialKeyEncoded[1] - 0x6B71E511;
-	Check ^= SerialKeyEncoded[2] - 0x915067FA;
-	Check ^= SerialKeyEncoded[3] + 0xEE7C85CA;
-
-	if (SerialKeyEncoded[4] != Check)
+	ZEUInt32 SerialKeyEncoded[ZELC_SERIAL_KEY_SIZE / sizeof(ZEUInt32)];
+	if (!ZELCUtils::ConvertSerialKey(SerialKeyEncoded, SerialKey))
 		return false;
 
-	ZEUInt32 SerialKeyDecoded[5];
+	if (!ZELCUtils::CheckSerialCode(SerialKeyEncoded))
+		return false;
+
+	ZEUInt32 SerialKeyDecoded[4];
+	SerialKeyDecoded[0] = SerialKeyEncoded[0] ^ 0x00C6487A;
+	SerialKeyDecoded[1] = SerialKeyEncoded[0] ^ 0x5B52C4E9 ^ SerialKeyEncoded[1];			
+	SerialKeyDecoded[2] = SerialKeyEncoded[0] ^ 0x07EA99BA ^ SerialKeyEncoded[2];
+	SerialKeyDecoded[3] = SerialKeyEncoded[0] ^ 0xB5EFD017 ^ SerialKeyEncoded[3];
+
 	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKeyDecoded[3];
 
 	if (SerialKeyDecoded[1] != GetApplicationName().Hash() ||
@@ -357,29 +195,15 @@ bool ZELCLicense::CheckSerialKeyValid() const
 
 bool ZELCLicense::CheckActivationCodeValid() const
 {
-	ZEArray<ZEBYTE> Buffer;
-	ZELCRSAEncription Encryption;
-	/*Encryption.SetPublicKey();
-	Encryption.Decrypt(Buffer, )*/
-		
-	if (Buffer.GetCount() != sizeof(ZELCActivationData))
+	ZEBYTE ActivationCodeBinary[ZELC_ACTIVATION_CODE_SIZE];
+	if (!ZELCUtils::ConvertActivationCode(ActivationCodeBinary, GetActivationCode()))
 		return false;
 
-	ZELCActivationData Data = GenerateActivationData(this);
-	ZELCActivationData* DecryptedData = (ZELCActivationData*)Buffer.GetCArray();
-	if (DecryptedData->MachineSecurityGUID != Data.MachineSecurityGUID ||
-		DecryptedData->BiosSerialNumber != Data.BiosSerialNumber ||
-		DecryptedData->HarddiskSerialNumber != Data.HarddiskSerialNumber ||
-		DecryptedData->SerialKey[0] != Data.SerialKey[0] ||
-		DecryptedData->SerialKey[1] != Data.SerialKey[1] ||
-		DecryptedData->SerialKey[2] != Data.SerialKey[2] ||
-		DecryptedData->SerialKey[3] != Data.SerialKey[3] ||
-		DecryptedData->SerialKey[4] != Data.SerialKey[4])
-	{
+	ZELCActivationData ActivationData;
+	if (!ZELCActivationData::Generate(ActivationData, *this))
 		return false;
-	}
 
-	return true;
+	return ZELCEncryption::RSAVerify(&ActivationData, sizeof(ZELCActivationData), ActivationCodeBinary, sizeof(ActivationCodeBinary), ZELCKeys::GetActivationPublicKey(), ZELCKeys::GetPreActivationPublicKeySize());
 }
 
 bool ZELCLicense::CheckValid() const

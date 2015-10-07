@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGUID.h
+ Zinek Engine - ZELCSerialKeyGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,42 +34,39 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GUID_H__
-#define __ZE_GUID_H__
 
 #include "ZEDS/ZEString.h"
-#include "ZETypes.h"
-#include "ZEPacking.h"
 
-ZEPackStruct(
-	class ZEGUID
-	{
-		public:
-			ZEUInt32			Data1;
-			ZEUInt16			Data2;
-			ZEUInt16			Data3;
-			ZEUInt64			Data4;
+class ZELCSerialKeyGenerator
+{
+	private:
+		ZEString				ApplicationName;
+		ZEUInt8					ApplicationVersionMajor;
+		ZEUInt8					ApplicationVersionMinor;
+		ZEUInt8					ApplicationEdition;
+		ZEString				LicenseeName;
+		ZEUInt32				SerialNumber;
 
-			ZEInt				Compare(const ZEGUID& Other) const;
-			bool				Equals(const ZEGUID& Other) const;
+	public:
+		void					SetApplicationName(const ZEString& ApplicationName);
+		const ZEString&			GetApplicationName() const;
 
-			bool				operator<(const ZEGUID& Other) const;
-			bool				operator>(const ZEGUID& Other) const;
-			bool				operator<=(const ZEGUID& Other) const;
-			bool				operator>=(const ZEGUID& Other) const;
-			bool				operator==(const ZEGUID& Other) const;
-			bool				operator!=(const ZEGUID& Other) const;
+		void					SetApplicationVersionMajor(ZEUInt8 Version);
+		ZEUInt8					GetApplicationVersionMajor() const;
 
-			bool				FromString(const ZEString& String);
-			ZEString			ToString() const;
+		void					SetApplicationVersionMinor(ZEUInt8 Version);
+		ZEUInt8					GetApplicationVersionMinor() const;
 
-								ZEGUID();
-								ZEGUID(const ZEString& String);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
-								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
+		void					SetApplicationEdition(ZEUInt8 Edition);
+		ZEUInt8					GetApplicationEdition() const;
 
-			static ZEGUID		Generate();
-	}
-);
+		void					SetLicenseeName(const ZEString& Name);
+		const ZEString&			GetLicenseeName() const;
 
-#endif
+		void					SetSerialNumber(ZEUInt32 Serial);
+		ZEUInt32				GetSerialNumber() const;
+
+		ZEString				GenerateSerialKey() const;
+
+								ZELCSerialKeyGenerator();
+};
