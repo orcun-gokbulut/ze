@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
-#include "ZEModelMeshLod.h"
+#include "ZEModelMeshLOD.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEModelResource.h"
@@ -146,6 +146,8 @@ class ZEModelMesh : public ZEObject
 
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();
+
+		ZEArray<ZEModelMeshLOD>&			GetLODs();
 
 		void								SetVisible(bool Visible);
 		bool								GetVisible();

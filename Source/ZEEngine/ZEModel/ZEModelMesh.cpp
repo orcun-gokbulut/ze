@@ -64,6 +64,11 @@ bool ZEModelMesh::GetAutoLOD()
 	return AutoLOD;
 }
 
+ZEArray<ZEModelMeshLOD>& ZEModelMesh::GetLODs()
+{
+	return LODs;
+}
+
 void ZEModelMesh::SetVisible(bool Visible)
 {
 	this->Visible = Visible;
