@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLicense.cpp
+ Zinek Engine - ZELCLicenseToolWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,36 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNLicense.h"
-#include "ZELNLicenseWidget.h"
-#include "ZELog.h"
+#pragma once
 
-bool ZELNLicense::InitializeSelf()
+#include <QtGui/QDialog>
+
+class Ui_ZELCLicenseToolWindow;
+
+class ZELCLicenseToolWindow : public QDialog
 {
-	if (!ZEInitializable::InitializeSelf())
-		return false;
+	Q_OBJECT
+	friend class ZELNContact;
+	private:
+		Ui_ZELCLicenseToolWindow*		Form;
 
-	Widget = new ZELNLicenseWidget();
-
-	return true;
-}
-
-const char* ZELNLicense::GetName()
-{
-	return "License";
-}
-
-QWidget* ZELNLicense::GetWidget()
-{
-	return Widget;
-}
-
-bool ZELNLicense::GetAllowLaunch()
-{
-	return true;
-}
-
-Ui_ZELNLicenseWidget* ZELNLicense::GetForm()
-{
-	return Widget->Form;
-}
+	private slots:
+		void							btnGenerateSerial_clicked();
+		void							btnGenerateActivationCode_clicked();
+	public:
+										ZELCLicenseToolWindow();
+										~ZELCLicenseToolWindow();
+};

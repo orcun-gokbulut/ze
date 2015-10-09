@@ -1,6 +1,7 @@
 <RCC>
   <qresource prefix="ZELNLauncher">
     <file alias="ZinekCodeHouse.png">Resources/ZinekCodeHouse.png</file>
+    <file>Resources/ZinekEngine.ico</file>
     <file alias="Logo.png">Resources/Logo.png</file>
   </qresource>
 </RCC>

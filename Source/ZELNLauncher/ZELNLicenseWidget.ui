@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>486</width>
-    <height>572</height>
+    <width>473</width>
+    <height>490</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -48,14 +48,38 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>486</width>
-        <height>572</height>
+        <width>456</width>
+        <height>651</height>
        </rect>
       </property>
       <property name="styleSheet">
        <string notr="true"/>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_5">
+         <item>
+          <spacer name="horizontalSpacer_4">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnActivate_2">
+           <property name="text">
+            <string>License Manager</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
        <item>
         <widget class="QGroupBox" name="groupBox">
          <property name="title">
@@ -66,27 +90,24 @@
            <enum>QFormLayout::AllNonFixedFieldsGrow</enum>
           </property>
           <item row="0" column="0">
-           <widget class="QLabel" name="label_5">
-            <property name="minimumSize">
-             <size>
-              <width>125</width>
-              <height>0</height>
-             </size>
-            </property>
+           <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>Application</string>
+             <string>Status</string>
+            </property>
+            <property name="alignment">
+             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
             </property>
            </widget>
           </item>
           <item row="0" column="1">
-           <widget class="QLabel" name="lblApplication">
+           <widget class="QLabel" name="lblStatus">
             <property name="text">
-             <string/>
+             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot;font-weight:600; color:#00aa00;&quot;&gt;Valid&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
             </property>
            </widget>
           </item>
           <item row="1" column="0">
-           <widget class="QLabel" name="label">
+           <widget class="QLabel" name="label_11">
             <property name="text">
              <string>Licensee</string>
             </property>
@@ -100,62 +121,84 @@
            </widget>
           </item>
           <item row="2" column="0">
-           <widget class="QLabel" name="label_2">
+           <widget class="QLabel" name="label_12">
             <property name="text">
-             <string>License Type</string>
+             <string>Serial Key</string>
             </property>
            </widget>
           </item>
           <item row="2" column="1">
-           <widget class="QLabel" name="lblLicenseType">
+           <widget class="QLabel" name="lblSerialKey">
             <property name="text">
              <string/>
             </property>
            </widget>
           </item>
           <item row="3" column="0">
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="label_5">
+            <property name="minimumSize">
+             <size>
+              <width>125</width>
+              <height>0</height>
+             </size>
+            </property>
             <property name="text">
-             <string>Status</string>
+             <string>Application</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
-           <widget class="QLabel" name="lblStatus">
+           <widget class="QLabel" name="lblApplicationName">
             <property name="text">
-             <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:12pt; font-weight:600; color:#00aa00;&quot;&gt;Activated&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QLabel" name="label_6">
+            <property name="minimumSize">
+             <size>
+              <width>125</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Application Version</string>
             </property>
            </widget>
           </item>
           <item row="4" column="1">
-           <layout class="QHBoxLayout" name="horizontalLayout_5">
-            <item>
-             <spacer name="horizontalSpacer_4">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QPushButton" name="btnRevokeLicense">
-              <property name="text">
-               <string>Revoke License</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
+           <widget class="QLabel" name="lblApplicationVersion">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="0">
+           <widget class="QLabel" name="label_8">
+            <property name="minimumSize">
+             <size>
+              <width>125</width>
+              <height>0</height>
+             </size>
+            </property>
+            <property name="text">
+             <string>Application Edition</string>
+            </property>
+           </widget>
+          </item>
+          <item row="5" column="1">
+           <widget class="QLabel" name="lblApplicationEdition">
+            <property name="text">
+             <string/>
+            </property>
+           </widget>
           </item>
          </layout>
         </widget>
        </item>
        <item>
-        <widget class="QGroupBox" name="grpSerial">
+        <widget class="QGroupBox" name="grpSerialKey">
          <property name="title">
           <string>Serial Key</string>
          </property>
@@ -173,12 +216,12 @@
           <item>
            <widget class="QLabel" name="label_9">
             <property name="text">
-             <string>Serial Number</string>
+             <string>Serial Key</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="txtSerialNumber"/>
+           <widget class="QLineEdit" name="txtSerialKey"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -196,7 +239,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="btnEnter">
+             <widget class="QPushButton" name="btnSerialKeyEnter">
               <property name="text">
                <string>Enter</string>
               </property>
@@ -214,6 +257,20 @@
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
+           <widget class="QLabel" name="label_13">
+            <property name="text">
+             <string>Serial Key</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="txtSerialKeyActivation">
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
              <string>Pre Activation Code</string>
@@ -221,7 +278,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="txtPreActivationCode">
+           <widget class="QPlainTextEdit" name="txtPreActivationCode">
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -235,7 +292,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="txtActivationCode"/>
+           <widget class="QPlainTextEdit" name="txtActivationCode"/>
           </item>
           <item>
            <layout class="QHBoxLayout" name="horizontalLayout_4">
@@ -283,6 +340,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="ZELNLauncher.qrc"/>
+ </resources>
  <connections/>
 </ui>

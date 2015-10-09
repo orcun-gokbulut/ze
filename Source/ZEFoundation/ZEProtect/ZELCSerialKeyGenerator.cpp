@@ -117,12 +117,6 @@ ZEString ZELCSerialKeyGenerator::GenerateSerialKey() const
 	SerialKey[2] = Values[2] ^ 0x07EA99BA ^ SerialKey[0]; 
 	SerialKey[3] = Values[3] ^ 0xB5EFD017 ^ SerialKey[0];
 
-	ZEUInt32 NewValues[4];
-	NewValues[0] = SerialKey[0] ^ 0x00C6487A;
-	NewValues[1] = SerialKey[0] ^ 0x5B52C4E9 ^ SerialKey[1];			
-	NewValues[2] = SerialKey[0] ^ 0x07EA99BA ^ SerialKey[2];
-	NewValues[3] = SerialKey[0] ^ 0xB5EFD017 ^ SerialKey[3];
-
 	ZEUInt32 Check;
 	Check  = SerialKey[0] + 0x46AD788E;
 	Check ^= SerialKey[1] - 0x6B71E511;

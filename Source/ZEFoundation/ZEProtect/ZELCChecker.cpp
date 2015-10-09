@@ -32,3 +32,19 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
+#include "ZELCChecker.h"
+
+#include "ZELCLicenseManager.h"
+
+bool ZELCChecker::Check(const ZEString& ApplicationName, ZEInt& ApplicationVersionMajor, ZEInt& ApplicationEdition)
+{
+	ZELCLicenseManager Manager;
+	Manager.LoadLicenses();
+	const ZELCLicense* License = Manager.RequestLicense(ApplicationName, ApplicationVersionMajor);
+	if (License == NULL)
+		return false;
+
+	ApplicationEdition = License->GetApplicationEdition();
+	return true;
+}

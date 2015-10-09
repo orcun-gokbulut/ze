@@ -51,8 +51,8 @@ ze_add_source(ZELNLogWidget.cpp					Sources)
 ze_add_source(ZELNLogWidget.h					Sources QtMocs)
 ze_add_source(ZELNLogWidget.ui					Sources QtUIs)
 
-ze_add_source(ZELNLicense.cpp					Sources)
-ze_add_source(ZELNLicense.h						Sources)
+ze_add_source(ZELNLicenseModule.cpp				Sources)
+ze_add_source(ZELNLicenseModule.h				Sources)
 ze_add_source(ZELNLicenseWidget.cpp				Sources)
 ze_add_source(ZELNLicenseWidget.h				Sources QtMocs)
 ze_add_source(ZELNLicenseWidget.ui				Sources QtUIs)
@@ -76,6 +76,6 @@ qt4_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation libQt libMSVCRv100)
+	LIBS ZEFoundation ZEProtect libQt libMSVCRv100)
 	
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

@@ -36,12 +36,26 @@
 #include "ZELNLicenseWidget.h"
 #include "ui_ZELNLicenseWidget.h"
 
+#include "ZELNLicenseModule.h"
+
+void ZELNLicenseWidget::btnEnter_clicked()
+{
+	Module->EnterSerial();
+}
+
+void ZELNLicenseWidget::btnActivate_clicked()
+{
+	Module->Activate();
+}
+
 ZELNLicenseWidget::ZELNLicenseWidget()
 {
 	Form = new Ui_ZELNLicenseWidget();
 	Form->setupUi(this);
-	Form->grpSerial->setVisible(false);
+	Form->grpSerialKey->setVisible(false);
 	Form->grpActivate->setVisible(false);
+	connect(Form->btnEnter, SIGNAL(clicked()), this, SLOT(btnEnter_clicked()));
+	connect(Form->btnActivate, SIGNAL(clicked()), this, SLOT(btnActivate_clicked()));
 }
 
 ZELNLicenseWidget::~ZELNLicenseWidget()
