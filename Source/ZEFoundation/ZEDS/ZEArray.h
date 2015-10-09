@@ -468,6 +468,12 @@ class ZEArray
 			qsort(Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))CompareFunction);
 		}
 
+		template<ZEInt CompareFunction(const ZEType&, const ZEType&)>
+		inline void Sort2()
+		{
+			qsort(Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))CompareFunction);
+		}
+
 		template<typename ZESearchValueType, ZEInt CompareFunction(const ZEType&, ZESearchValueType)>
 		ZESSize BinarySearch(ZESearchValueType TargetValue) const
 		{

@@ -38,13 +38,19 @@
 #include <QtGui/QWidget>
 
 class Ui_ZELNLicenseWidget;
+class ZELNLicenseModule;
 
 class ZELNLicenseWidget : public QWidget
 {
 	Q_OBJECT
-	friend class ZELNLicense;
+	friend class ZELNLicenseModule;
 	private:
+		ZELNLicenseModule*			Module;
 		Ui_ZELNLicenseWidget*		Form;
+
+	private slots:
+		void						btnEnter_clicked();
+		void						btnActivate_clicked();
 
 	public:
 									ZELNLicenseWidget();

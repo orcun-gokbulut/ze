@@ -1,0 +1,44 @@
+<RCC>
+  <qresource prefix="Themes/DarkTheme">			
+		<file alias="StyleSheet.qss">Resources/StyleSheet.qss</file>
+		<file alias="LeftArrow-Disabled.png">Resources/LeftArrow-Disabled.png</file>
+		<file alias="LeftArrow.png">Resources/LeftArrow.png</file>
+		<file alias="RightArrow-Disabled.png">Resources/RightArrow-Disabled.png</file>
+		<file alias="RightArrow.png">Resources/RightArrow.png</file>    
+		<file alias="UpArrow-Disabled.png">Resources/UpArrow-Disabled.png</file>
+		<file alias="UpArrow.png">Resources/UpArrow.png</file>
+		<file alias="DownArrow-Disabled.png">Resources/DownArrow-Disabled.png</file>
+		<file alias="DownArrow.png">Resources/DownArrow.png</file>  
+		<file alias="Branch-Closed-On.png">Resources/Branch-Closed-On.png</file>
+		<file alias="Branch-Closed.png">Resources/Branch-Closed.png</file>
+		<file alias="Branch-Open-On.png">Resources/Branch-Open-On.png</file>
+		<file alias="Branch-Open.png">Resources/Branch-Open.png</file>
+		<file alias="CheckBox-Checked-Disabled.png">Resources/CheckBox-Checked-Disabled.png</file>
+		<file alias="CheckBox-Checked-Focus.png">Resources/CheckBox-Checked-Focus.png</file>
+		<file alias="CheckBox-Checked.png">Resources/CheckBox-Checked.png</file>
+		<file alias="CheckBox-Indeterminate-Disabled.png">Resources/CheckBox-Indeterminate-Disabled.png</file>
+		<file alias="CheckBox-Indeterminate-Focus.png">Resources/CheckBox-Indeterminate-Focus.png</file>
+		<file alias="CheckBox-Indeterminate.png">Resources/CheckBox-Indeterminate.png</file>
+		<file alias="CheckBox-Unchecked-Disabled.png">Resources/CheckBox-Unchecked-Disabled.png</file>
+		<file alias="CheckBox-Unchecked-Focus.png">Resources/CheckBox-Unchecked-Focus.png</file>
+		<file alias="CheckBox-Unchecked.png">Resources/CheckBox-Unchecked.png</file>
+		<file alias="Close-Hover.png">Resources/Close-Hover.png</file>
+		<file alias="Close-Pressed.png">Resources/Close-Pressed.png</file>
+		<file alias="Close.png">Resources/Close.png</file>
+		<file alias="RadioButton-Checked-Disabled.png">Resources/RadioButton-Checked-Disabled.png</file>
+		<file alias="RadioButton-Checked-Focus.png">Resources/RadioButton-Checked-Focus.png</file>
+		<file alias="RadioButton-Checked.png">Resources/RadioButton-Checked.png</file>
+		<file alias="RadioButton-Unchecked-Disabled.png">Resources/RadioButton-Unchecked-Disabled.png</file>
+		<file alias="RadioButton-Unchecked-Focus.png">Resources/RadioButton-Unchecked-Focus.png</file>
+		<file alias="RadioButton-Unchecked.png">Resources/RadioButton-Unchecked.png</file>
+		<file alias="SizeGrip.png">Resources/SizeGrip.png</file>
+		<file alias="StyleSheet-Branch-End.png">Resources/StyleSheet-Branch-End.png</file>
+		<file alias="StyleSheet-Branch-More.png">Resources/StyleSheet-Branch-More.png</file>
+		<file alias="StyleSheet-VerticalLine.png">Resources/StyleSheet-VerticalLine.png</file>
+		<file alias="Toolbar-Mover-Horizontal.png">Resources/Toolbar-Mover-Horizontal.png</file>
+		<file alias="Toolbar-Mover-Vertical.png">Resources/Toolbar-Mover-Vertical.png</file>
+		<file alias="Toolbar-Separator-Horizontal.png">Resources/Toolbar-Separator-Horizontal.png</file>
+		<file alias="Toolbar-Separator-Vertical.png">Resources/Toolbar-Separator-Vertical.png</file>
+		<file alias="Transparent.png">Resources/Transparent.png</file>
+  </qresource>
+</RCC>

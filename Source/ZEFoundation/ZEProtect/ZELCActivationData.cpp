@@ -35,9 +35,9 @@
 
 #include "ZELCActivationData.h"
 
-#include "ZERandom.h"
 #include "ZELCUtils.h"
 #include "ZELCLicense.h"
+#include "ZERandom.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 
@@ -45,29 +45,28 @@
 	#include <windows.h>
 	#include <Shlobj.h>
 	#include <WbemCli.h>
-	#include "ZERandom.h"
 
 	#pragma comment(lib, "wbemuuid.lib")
 
 	static ZEString WMIQuery(wchar_t* Query, wchar_t* Column)
 	{
-		ZEString Result;
+		ZEString Output;
+		HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
 
-		HRESULT hRes = 0;
 		IWbemLocator* pLocator = NULL;
 		if(FAILED(hRes = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pLocator))))
-			return "";
+			return Output;
 
 		IWbemServices* pService = NULL;
 		if(FAILED(hRes = pLocator->ConnectServer(L"root\\CIMV2", NULL, NULL, NULL, WBEM_FLAG_CONNECT_USE_MAX_WAIT, NULL, NULL, &pService)))
-			return "";
+			return Output;
 
 		IEnumWbemClassObject* pEnumerator = NULL;
 		if(FAILED(hRes = pService->ExecQuery(L"WQL", Query, WBEM_FLAG_FORWARD_ONLY, NULL, &pEnumerator)))
 		{
 			pLocator->Release();
 			pService->Release();
-			return "";
+			return Output;
 		}
 
 		IWbemClassObject* clsObj = NULL;
@@ -81,7 +80,7 @@
 			VariantInit(&vRet);
 			if(SUCCEEDED(clsObj->Get(Column, 0, &vRet, NULL, NULL)) && vRet.vt == VT_BSTR)
 			{
-				Result = vRet.bstrVal;
+				Output = vRet.bstrVal;
 				VariantClear(&vRet);
 				break;
 			}
@@ -93,7 +92,7 @@
 		pService->Release();
 		pLocator->Release();
 
-		return Result;
+		return Output;
 	}
 
 	static ZEUInt32 GetHardDiskSerialNumber()

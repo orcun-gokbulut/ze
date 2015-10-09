@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLicense.h
+ Zinek Engine - ZELCMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,25 +32,54 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+#include "ZELCLicenseToolWindow.h"
 
-#pragma once
+#include <QtGui/QApplication>
+#include <QtCore/QFile>
 
-#include "ZELNModule.h"
+#ifdef ZE_PLATFORM_WINDOWS
+#define  WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <combaseapi.h>
 
-class ZELNLicenseWidget;
-class Ui_ZELNLicenseWidget;
-
-class ZELNLicense : public ZELNModule
+int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
-	private:
-		ZELNLicenseWidget*			Widget;
+	int argc = 1;
+	char* argv[] =
+	{
+		"ZELCLicenseTool.exe"
+	};
 
-		virtual bool				InitializeSelf();
 
-	public:
-		virtual const char*			GetName();
-		virtual QWidget*			GetWidget();
-		virtual bool				GetAllowLaunch();
+	QApplication Application(argc, argv);
+	HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
 
-		Ui_ZELNLicenseWidget*		GetForm();
-};
+	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
+	File.open(QFile::ReadOnly);
+	QString StyleSheet = QLatin1String(File.readAll());
+	qApp->setStyleSheet(StyleSheet);
+
+	ZELCLicenseToolWindow Window;
+	Window.show();
+
+	return Application.exec();
+}
+#else
+int Main(int argc, char** argv)
+{
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+	
+	QApplication Application(argc, argv);
+
+
+	QFile File(":/qdarkstyle/style.qss");
+	File.open(QFile::ReadOnly);
+	QString StyleSheet = QLatin1String(File.readAll());
+	qApp->setStyleSheet(StyleSheet);
+
+	ZELCLicenseToolWindow Window;
+	Window.show();
+
+	return Application.exec();
+}
+#endif

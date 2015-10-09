@@ -183,9 +183,9 @@ bool ZELCLicense::CheckSerialKeyValid() const
 
 	if (SerialKeyDecoded[1] != GetApplicationName().Hash() ||
 		SerialKeyDecoded[2] != GetLicenseeName().Hash() ||
-		VersionEditionFlags[0] != GetApplicationVersionMajor()  ||
+		VersionEditionFlags[0] != GetApplicationVersionMajor() /* ||
 		VersionEditionFlags[1] != GetApplicationVersionMinor() ||
-		VersionEditionFlags[2] != GetApplicationEdition())
+		VersionEditionFlags[2] != GetApplicationEdition()*/)
 	{
 		return false;
 	}
@@ -214,16 +214,16 @@ bool ZELCLicense::CheckValid() const
 void ZELCLicense::Load(ZEMLReaderNode* Reader)
 {
 	ZEString GUIDString;
-	Reader->ReadString("GUID", GUIDString);
-	Reader->ReadString("ApplicationName", ApplicationName);
-	Reader->ReadUInt8("ApplicationVersionMajor", ApplicationVersionMajor);
-	Reader->ReadUInt8("ApplicationVersionMinor", ApplicationVersionMinor);
-	Reader->ReadUInt8("ApplicationEdition", ApplicationEdition);
-	Reader->ReadString("LicenseeName", LicenseeName);
-	Reader->ReadString("SerialKey", SerialKey);
-	Reader->ReadString("ActivationCode", ActivationCode);
-	Reader->ReadInt32("Priority", Priority);
-	Reader->ReadUInt8("LicenseVersion", LicenseVersion);
+	GUIDString = Reader->ReadString("GUID");
+	ApplicationName = Reader->ReadString("ApplicationName");
+	ApplicationVersionMajor = Reader->ReadUInt8("ApplicationVersionMajor");
+	ApplicationVersionMinor = Reader->ReadUInt8("ApplicationVersionMinor");
+	ApplicationEdition = Reader->ReadUInt8("ApplicationEdition");
+	LicenseeName = Reader->ReadString("LicenseeName");
+	SerialKey = Reader->ReadString("SerialKey");
+	ActivationCode = Reader->ReadString("ActivationCode");
+	Priority = Reader->ReadInt32("Priority");
+	LicenseVersion = Reader->ReadUInt8("LicenseVersion");
 }
 
 void ZELCLicense::Save(ZEMLWriterNode* Writer) const
@@ -248,5 +248,5 @@ ZELCLicense::ZELCLicense()
 	ApplicationEdition = 0;
 	Priority = 0;
 	LicenseVersion = 1;
-	SystemWide = false;
+	SystemWide = true;
 }

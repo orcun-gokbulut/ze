@@ -34,15 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELNLauncher.h"
+#include "ui_ZELNLauncherWindow.h"
 
 #include "ZELNModule.h"
 #include "ZELNLauncherWindow.h"
-#include "ui_ZELNLauncherWindow.h"
+#include "ZEDS\ZEFormat.h"
+#include "ZEFile\ZEPathInfo.h"
+#include "ZEVersion.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEDS\ZEFormat.h"
-#include "ZEFile\ZEPathInfo.h"
 
 ZELNLauncher* ZELNLauncher::Instance = NULL;
 
@@ -106,6 +107,45 @@ const ZEArray<ZELNModule*> ZELNLauncher::GetModules()
 ZELNLauncherWindow* ZELNLauncher::GetWindow()
 {
 	return Window;
+}
+
+void ZELNLauncher::SetApplicationName(const ZEString& Name)
+{
+	ApplicationName = Name;
+}
+const ZEString& ZELNLauncher::GetApplicationName()
+{
+	return ApplicationName;
+}
+
+void ZELNLauncher::SetApplicationFileName(const ZEString& FileName)
+{
+	ApplicationFileName = FileName;
+}
+
+const ZEString& ZELNLauncher::GetApplicationFileName()
+{
+	return ApplicationName;
+}
+
+void ZELNLauncher::SetApplicationMajorVersion(ZEUInt Version)
+{
+	ApplicationMajorVersion = Version;
+}
+
+ZEUInt ZELNLauncher::GetApplicationVersionMajor()
+{
+	return ApplicationMajorVersion;
+}
+
+void ZELNLauncher::SetApplicationMinorVersion(ZEUInt Version)
+{
+	ApplicationMinorVersion = Version;
+}
+
+ZEUInt ZELNLauncher::GetApplicationVersionMinor()
+{
+	return ApplicationMinorVersion;
 }
 
 void ZELNLauncher::Update()
@@ -217,6 +257,9 @@ void ZELNLauncher::Launch()
 ZELNLauncher::ZELNLauncher()
 {
 	Instance = NULL;
+	ApplicationName = "Zinek Engine";
+	ApplicationMajorVersion = ZEVersion::GetZinekVersion().Major;
+	ApplicationMinorVersion = ZEVersion::GetZinekVersion().Minor;
 }
 
 ZELNLauncher* ZELNLauncher::GetInstance()

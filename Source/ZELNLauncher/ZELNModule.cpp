@@ -35,7 +35,7 @@
 
 #include "ZELNModule.h"
 #include "ZELNUpdate.h"
-#include "ZELNLicense.h"
+#include "ZELNLicenseModule.h"
 #include "ZELNLog.h"
 #include "ZELNContact.h"
 
@@ -82,7 +82,7 @@ ZESize ZELNModule::GetModuleCount()
 ZELNModule** ZELNModule::GetModules()
 {
 	static ZELNLog Log;
-	static ZELNLicense License;
+	static ZELNLicenseModule License;
 	static ZELNUpdate Update;
 	static ZELNContact Contact;
 

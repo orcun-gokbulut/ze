@@ -43,6 +43,26 @@ const ZEArray<ZELCLicense>& ZELCLicenseManager::GetLicenses()
 	return Licenses;
 }
 
+ZEArray<ZELCLicense> ZELCLicenseManager::GetLicenses(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition)
+{
+	ZEArray<ZELCLicense> FoundLicenses;
+	for (ZESize I = 0; I < Licenses.GetCount(); I++)
+	{
+		if (Licenses[I].GetApplicationName() != ApplicationName)
+			continue;
+
+		if (Licenses[I].GetApplicationVersionMajor() < ApplicationVersionMajor)
+			continue;
+
+		if ((ZEInt)Licenses[I].GetApplicationEdition() < ApplicationEdition)
+			continue;
+
+		FoundLicenses.Add(Licenses[I]);
+	}
+
+	return FoundLicenses;
+}
+
 void ZELCLicenseManager::RegisterLicense(const ZELCLicense& License)
 {
 	for (ZESize I = 0; I < Licenses.GetCount(); I++)
@@ -64,6 +84,44 @@ void ZELCLicenseManager::UnregisterLicense(const ZEGUID& LicenseGUID)
 			return;
 		}
 	}
+}
+
+const ZELCLicense* ZELCLicenseManager::RequestLicense(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition)
+{
+	ZEArray<ZELCLicense*> FoundLicenses;
+	ZELCLicense* TargetLicense = NULL;
+	for (ZESize I = 0; I < Licenses.GetCount(); I++)
+	{
+		if (Licenses[I].GetApplicationName() != ApplicationName)
+			continue;
+
+		if (Licenses[I].GetApplicationVersionMajor() < ApplicationVersionMajor)
+			continue;
+
+		if ((ZEInt)Licenses[I].GetApplicationEdition() < ApplicationEdition)
+			continue;
+
+		if (Licenses[I].GetSerialKey().IsEmpty())
+			continue;
+
+		if (Licenses[I].GetActivationCode().IsEmpty())
+			continue;
+
+		if (!Licenses[I].CheckValid())
+			continue;
+
+		if (TargetLicense == NULL)
+		{
+			TargetLicense = &Licenses[I];
+			continue;
+		}
+
+
+		if (CompareLicenseOrder(*TargetLicense, Licenses[I]) > 0)	
+			TargetLicense = &Licenses[I];
+	}
+
+	return TargetLicense;
 }
 
 ZEArray<ZELCLicense> ZELCLicenseManager::LoadLicenseFile(const ZEString& FileName)
@@ -119,14 +177,14 @@ void ZELCLicenseManager::LoadLicenses()
 {
 	Licenses.Clear();
 
-	ZEArray<ZELCLicense> SystemWideLicenses = LoadLicenseFile("S#:/License.zeLicense");
-	for(ZESize I = 0; SystemWideLicenses.GetCount(); I++)
+	ZEArray<ZELCLicense> SystemWideLicenses = LoadLicenseFile("#S:/License.zeLicense");
+	for(ZESize I = 0; I < SystemWideLicenses.GetCount(); I++)
 		SystemWideLicenses[I].SetSystemWide(true);
 	Licenses.Combine(SystemWideLicenses);
 
-	ZEArray<ZELCLicense> InstanceLicenses = LoadLicenseFile("S#:/License.zeLicense");
-	for(ZESize I = 0; SystemWideLicenses.GetCount(); I++)
-		SystemWideLicenses[I].SetSystemWide(false);
+	ZEArray<ZELCLicense> InstanceLicenses = LoadLicenseFile("#US:/License.zeLicense");
+	for(ZESize I = 0; I < InstanceLicenses.GetCount(); I++)
+		InstanceLicenses[I].SetSystemWide(false);
 	Licenses.Combine(InstanceLicenses);
 }
 
@@ -143,6 +201,27 @@ void ZELCLicenseManager::SaveLicenses()
 			InstanceLicenses.Add(Licenses[I]);
 	}
 
-	SaveLicenseFile("S#:/License.zeLicense", SystemWideLicenses);
-	SaveLicenseFile("US#:/License.zeLicense", InstanceLicenses);
+	SaveLicenseFile("#S:/License.zeLicense", SystemWideLicenses);
+	SaveLicenseFile("#US:/License.zeLicense", InstanceLicenses);
+}
+
+ZEInt ZELCLicenseManager::CompareLicenseOrder(const ZELCLicense& A, const ZELCLicense& B)
+{
+	if (A.GetApplicationEdition() > B.GetApplicationEdition())
+	{
+		return -1;
+	}
+	else if (A.GetApplicationEdition() < B.GetApplicationEdition())
+	{
+		return 1;
+	}
+	else
+	{
+		if (A.GetPriority() > B.GetPriority())
+			return -1;
+		else if (A.GetPriority() < B.GetPriority())
+			return 1;
+		else
+			return 0;
+	}
 }

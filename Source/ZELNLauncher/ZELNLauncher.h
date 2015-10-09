@@ -67,6 +67,10 @@ class ZELNLauncher : public ZEInitializable
 		ZELNLaunchStatus				Status;
 		bool							AllowedToLaunch;
 		ZELNLaunchInformation			Information;
+		ZEString						ApplicationName;
+		ZEString						ApplicationFileName;
+		ZEUInt							ApplicationMajorVersion;
+		ZEUInt							ApplicationMinorVersion;
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
@@ -75,9 +79,22 @@ class ZELNLauncher : public ZEInitializable
 		const ZEArray<ZELNModule*>		GetModules();
 		ZELNLauncherWindow*				GetWindow();
 
+		void							SetApplicationName(const ZEString& Name);
+		const ZEString&					GetApplicationName();
+
+		void							SetApplicationFileName(const ZEString& FileName);
+		const ZEString&					GetApplicationFileName();
+
+		void							SetApplicationMajorVersion(ZEUInt Version);
+		ZEUInt							GetApplicationVersionMajor();
+		
+		void							SetApplicationMinorVersion(ZEUInt Version);
+		ZEUInt							GetApplicationVersionMinor();
+
 		ZELNLaunchStatus				GetStatus();
 		const ZELNLaunchInformation&	GetInformation();
 		bool							GetAllowedToLaunch();
+
 
 		void							Launch();
 		void							Terminate();

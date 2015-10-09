@@ -34,3 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+
+#include "ZETypes.h"
+#include "ZEDS\ZEString.h"
+
+class ZELCChecker
+{
+	public:
+		static bool		Check(const ZEString& ApplicationName, ZEInt& ApplicationVersion, ZEInt& ApplicationEdition);
+};

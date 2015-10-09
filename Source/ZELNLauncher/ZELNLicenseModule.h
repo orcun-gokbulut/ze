@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProtectActivator.cpp
+ Zinek Engine - ZELNLicenseModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,32 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDS/ZEFormat.h"
-#include <stdio.h>
-#include "ZEProtect/ZEProtect.h"
-#include "ZEFile/ZEPathManager.h"
+#pragma once
 
-int main(int argc, char** argv)
+#include "ZELNModule.h"
+#include "ZEProtect/ZELCLicense.h"
+
+class ZELNLicenseWidget;
+class Ui_ZELNLicenseWidget;
+
+class ZELNLicenseModule : public ZELNModule
 {
-	char Key[256], Name[256], SystemWide[256];
+	private:
+		ZELNLicenseWidget*			Widget;
+		ZELCLicense					License;
+		bool						LicenseValid;
 
-	printf(" ZinekIG Hardware Activation\n");
-	printf("----------------------------------------------------------------------------------- \n");
-	printf("  Application name : "); scanf("%s", Name);
-	printf("  Key : "); scanf("%s", Key);
-	printf("  System Wide [yes/no] : "); scanf("%s", SystemWide);
+		void						UpdateWidget();
+		virtual bool				InitializeSelf();
 
-	ZEProtect Protect;
-	Protect.SetKey(Key);
-	Protect.SetApplicationName(Name);
-	Protect.SetActivationFileName("Activations.ZEProtect");
-	Protect.SetSystemWide(stricmp(SystemWide, "yes") == 0 ? true : false);
+	public:
+		virtual const char*			GetName();
+		virtual QWidget*			GetWidget();
+		virtual bool				GetAllowLaunch();
+		Ui_ZELNLicenseWidget*		GetForm();
 
-	ZEPathManager::GetInstance()->SetAccessControl(false);
+		const ZELNLicenseModule&	GetCurrentLicense();
 
-	if (Protect.Activate())
-	{
-		printf("Hardware activated. Activation Code : %s\n", Protect.GenerateActivationCode().ToCString());
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		printf("Error !!! Can not activate hardware.\n");
-		return EXIT_FAILURE;
-	}
-}
+		void						EnterSerial();
+		void						Activate();
+};
