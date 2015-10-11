@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
 
 class Ui_ZELNContactWidget;
 

@@ -35,7 +35,9 @@
 
 #pragma once
 
-#include <QtGui/QWidget>
+#include <QtWidgets/QWidget>
+
+#include "ZEProtect/ZELCLicense.h"
 
 class Ui_ZELNLicenseWidget;
 class ZELNLicenseModule;
@@ -45,14 +47,26 @@ class ZELNLicenseWidget : public QWidget
 	Q_OBJECT
 	friend class ZELNLicenseModule;
 	private:
-		ZELNLicenseModule*			Module;
+		ZELCLicense					License;
 		Ui_ZELNLicenseWidget*		Form;
+
+		void						UpdateWidget();
+		void						SaveLicense();
 
 	private slots:
 		void						btnEnter_clicked();
 		void						btnActivate_clicked();
+		void						btnLicenseManager_clicked();
+
+	signals:
+		void						LicenseUpdated();
 
 	public:
-									ZELNLicenseWidget();
+		void						SetLicense(const ZELCLicense& License);
+		const ZELCLicense&			GetLicense();
+
+		void						SetLauncherMode(bool LauncherMode);
+
+									ZELNLicenseWidget(QWidget* Parent = NULL);
 									~ZELNLicenseWidget();
 };

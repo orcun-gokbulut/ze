@@ -47,4 +47,4 @@ qt4_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELCLicensingTool
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect libQt)
+	LIBS ZEFoundation ZEProtect libMSVCRv100 libQt)

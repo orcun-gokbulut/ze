@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNUpdateWidget.h
+ Zinek Engine - ZELNLicenseManagerWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,18 +35,33 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include <QtWidgets/QDialog>
 
-class Ui_ZELNUpdateWidget;
+#include "ZEProtect/ZELCLicenseManager.h"
 
-class ZELNUpdateWidget: public QWidget
+class Ui_ZELNLicenseManagerWindow;
+
+class ZELNLicenseManagerWindow : public QDialog
 {
 	Q_OBJECT
-	friend class ZELNUpdate;
 	private:
-		Ui_ZELNUpdateWidget*		Form;
+		Ui_ZELNLicenseManagerWindow*	Form;
+		ZELCLicenseManager				LicenseManager;
+
+		void							LoadLicenses();
+		void							UpdateGUI();
+
+	private slots:
+		void							tblLicenses_itemSelectionChanged();
+		void							btnViewEdit_clicked();
+		void							btnAdd_clicked();
+		void							btnRemove_clicked();
+		void							btnEnable_clicked();
+		void							btnRefresh_clicked();
+		void							btnImport_clicked();
+		void							btnExport_clicked();
 
 	public:
-									ZELNUpdateWidget();
-									~ZELNUpdateWidget();
+										ZELNLicenseManagerWindow();
+										~ZELNLicenseManagerWindow();
 };

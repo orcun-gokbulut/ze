@@ -132,6 +132,16 @@ ZEInt ZELCLicense::GetPriority() const
 	return Priority;
 }
 
+void ZELCLicense::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZELCLicense::GetEnabled() const
+{
+	return Enabled;
+}
+
 void ZELCLicense::SetLicenseVersion(ZEUInt Version)
 {
 	LicenseVersion = Version;
@@ -208,13 +218,12 @@ bool ZELCLicense::CheckActivationCodeValid() const
 
 bool ZELCLicense::CheckValid() const
 {
-	return CheckSerialKeyValid() && CheckActivationCodeValid();
+	return GetEnabled() && CheckSerialKeyValid() && CheckActivationCodeValid();
 }
 
 void ZELCLicense::Load(ZEMLReaderNode* Reader)
 {
-	ZEString GUIDString;
-	GUIDString = Reader->ReadString("GUID");
+	GUID = ZEGUID(Reader->ReadString("GUID"));
 	ApplicationName = Reader->ReadString("ApplicationName");
 	ApplicationVersionMajor = Reader->ReadUInt8("ApplicationVersionMajor");
 	ApplicationVersionMinor = Reader->ReadUInt8("ApplicationVersionMinor");
@@ -224,6 +233,7 @@ void ZELCLicense::Load(ZEMLReaderNode* Reader)
 	ActivationCode = Reader->ReadString("ActivationCode");
 	Priority = Reader->ReadInt32("Priority");
 	LicenseVersion = Reader->ReadUInt8("LicenseVersion");
+	Enabled = Reader->ReadBoolean("Enablde", true);
 }
 
 void ZELCLicense::Save(ZEMLWriterNode* Writer) const
@@ -237,6 +247,7 @@ void ZELCLicense::Save(ZEMLWriterNode* Writer) const
 	Writer->WriteString("SerialKey", SerialKey);
 	Writer->WriteString("ActivationCode", ActivationCode);
 	Writer->WriteUInt32("Priority", Priority);
+	Writer->WriteBool("Enabled", Enabled);
 	Writer->WriteUInt8("LicenseVersion", LicenseVersion);
 }
 
@@ -249,4 +260,5 @@ ZELCLicense::ZELCLicense()
 	Priority = 0;
 	LicenseVersion = 1;
 	SystemWide = true;
+	Enabled = true;
 }

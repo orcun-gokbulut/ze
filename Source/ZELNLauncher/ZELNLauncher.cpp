@@ -87,6 +87,8 @@ bool ZELNLauncher::InitializeSelf()
 	Update();
 
 	Window->show();
+
+	return true;
 }
 
 void ZELNLauncher::DeinitializeSelf()
