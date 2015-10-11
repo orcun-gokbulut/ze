@@ -37,7 +37,7 @@
 
 #include "ZELog.h"
 
-#include <QtGui/QDialog>
+#include <QtWidgets/QDialog>
 
 class Ui_ZELNLauncherWindow;
 

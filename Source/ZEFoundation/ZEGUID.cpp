@@ -100,17 +100,22 @@ bool ZEGUID::operator!=(const ZEGUID& Other) const
 
 bool ZEGUID::FromString(const ZEString& String)
 {
-	ZERegEx RegEx("([0-9a-fA-F]+)-([0-9a-fA-F]+)-([0-9a-fA-F]+)-([0-9a-fA-F]+)-([0-9a-fA-F]+)");
+	ZERegEx RegEx(
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*");
 	ZERegExMatch Match;
 	if (!RegEx.Match(String, Match))
 		return false;
 
 	new (this) ZEGUID(
 		Match.SubMatches[0].String.ToUInt32(16),
-		Match.SubMatches[1].String.ToUInt32(16),
-		Match.SubMatches[2].String.ToUInt32(16),
-		Match.SubMatches[3].String.ToUInt32(16),
-		Match.SubMatches[4].String.ToUInt32(16));
+		Match.SubMatches[1].String.ToUInt16(16),
+		Match.SubMatches[2].String.ToUInt16(16),
+		Match.SubMatches[3].String.ToUInt16(16),
+		Match.SubMatches[4].String.ToUInt64(16));
 
 	return true;
 }

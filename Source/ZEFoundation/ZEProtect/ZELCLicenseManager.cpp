@@ -63,12 +63,26 @@ ZEArray<ZELCLicense> ZELCLicenseManager::GetLicenses(const ZEString& Application
 	return FoundLicenses;
 }
 
+const ZELCLicense* ZELCLicenseManager::GetLicense(const ZEGUID& GUID)
+{
+	for (ZESize I = 0; I < Licenses.GetCount(); I++)
+	{
+		if (Licenses[I].GetGUID() == GUID)
+			return &Licenses[I];
+	}
+
+	return NULL;
+}
+
 void ZELCLicenseManager::RegisterLicense(const ZELCLicense& License)
 {
 	for (ZESize I = 0; I < Licenses.GetCount(); I++)
 	{
 		if (Licenses[I].GetGUID() == License.GetGUID())
+		{
 			Licenses[I] = License;
+			return;
+		}
 	}
 
 	Licenses.Add(License);

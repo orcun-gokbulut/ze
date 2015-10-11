@@ -56,6 +56,9 @@ ze_add_source(ZELNLicenseModule.h				Sources)
 ze_add_source(ZELNLicenseWidget.cpp				Sources)
 ze_add_source(ZELNLicenseWidget.h				Sources QtMocs)
 ze_add_source(ZELNLicenseWidget.ui				Sources QtUIs)
+ze_add_source(ZELNLicenseManagerWindow.cpp		Sources)
+ze_add_source(ZELNLicenseManagerWindow.h		Sources QtMocs)
+ze_add_source(ZELNLicenseManagerWindow.ui		Source QtUIs)
 
 ze_add_source(ZELNUpdate.cpp					Sources)
 ze_add_source(ZELNUpdate.h						Sources)
@@ -69,13 +72,39 @@ ze_add_source(ZELNContactWidget.cpp				Sources)
 ze_add_source(ZELNContactWidget.h				Sources QtMocs)
 ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
 
+set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
 
-qt4_wrap_ui(QtUIOutputs ${QtUIs})
-qt4_wrap_cpp(QtMocOutputs  ${QtMocs})
-qt4_add_resources(QtResourceOutputs ${QtResources})
+find_package(Qt5Core)
+find_package(Qt5Widgets)
+
+qt5_wrap_ui(QtUIOutputs ${QtUIs})
+qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
+qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect libQt libMSVCRv100)
+	LIBS ZEFoundation ZEProtect)
+
+qt5_use_modules(ZELNLauncher Core Widgets)
+
+message("${Qt5Core_DIR}/../../../bin/")
+	
+add_custom_command(TARGET ZELNLauncher POST_BUILD
+	# DEBUG
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Cored.dll 		${CMAKE_CURRENT_BINARY_DIR}/Debug
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Guid.dll		${CMAKE_CURRENT_BINARY_DIR}/Debug
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Widgetsd.dll 	${CMAKE_CURRENT_BINARY_DIR}/Debug
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/icuin51.dll		${CMAKE_CURRENT_BINARY_DIR}/Debug
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/icuuc51.dll		${CMAKE_CURRENT_BINARY_DIR}/Debug
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/icudt51.dll		${CMAKE_CURRENT_BINARY_DIR}/Debug
+	# RELEASE
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Core.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Gui.dll			${CMAKE_CURRENT_BINARY_DIR}/Release
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Widgets.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/icuin51.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/icuuc51.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
+	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/icudt51.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
+	# Output Message
+	COMMENT "Copying Qt binaries" VERBATIM)
 	
 source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

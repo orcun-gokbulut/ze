@@ -48,7 +48,6 @@ class ZELNLicenseModule : public ZELNModule
 		ZELCLicense					License;
 		bool						LicenseValid;
 
-		void						UpdateWidget();
 		virtual bool				InitializeSelf();
 
 	public:
@@ -56,9 +55,5 @@ class ZELNLicenseModule : public ZELNModule
 		virtual QWidget*			GetWidget();
 		virtual bool				GetAllowLaunch();
 		Ui_ZELNLicenseWidget*		GetForm();
-
 		const ZELNLicenseModule&	GetCurrentLicense();
-
-		void						EnterSerial();
-		void						Activate();
 };

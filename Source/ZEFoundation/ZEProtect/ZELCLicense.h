@@ -56,6 +56,7 @@ class ZELCLicense
 		ZEInt					Priority;
 		ZEUInt					LicenseVersion;
 		bool					SystemWide;
+		bool					Enabled;
 
 	public:
 		void					SetGUID(const ZEGUID& GUID);
@@ -84,6 +85,9 @@ class ZELCLicense
 
 		void					SetPriority(ZEInt Priority);
 		ZEInt					GetPriority() const;
+
+		void					SetEnabled(bool Enabled);
+		bool					GetEnabled() const;
 
 		void					SetSystemWide(bool SystemWide);
 		bool					GetSystemWide() const;

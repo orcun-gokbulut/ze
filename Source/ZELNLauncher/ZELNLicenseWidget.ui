@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>473</width>
-    <height>490</height>
+    <width>472</width>
+    <height>381</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Zinek Launcher - License</string>
+   <string>License</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="ZELNLauncher.qrc">
+    <normaloff>:/ZELNLauncher/Resources/ZinekEngine.ico</normaloff>:/ZELNLauncher/Resources/ZinekEngine.ico</iconset>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout_2">
    <property name="spacing">
@@ -48,8 +52,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>456</width>
-        <height>651</height>
+        <width>455</width>
+        <height>682</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -57,9 +61,9 @@
       </property>
       <layout class="QVBoxLayout" name="verticalLayout">
        <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
-          <spacer name="horizontalSpacer_4">
+          <spacer name="horizontalSpacer_7">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
            </property>
@@ -72,7 +76,7 @@
           </spacer>
          </item>
          <item>
-          <widget class="QPushButton" name="btnActivate_2">
+          <widget class="QPushButton" name="btnLicenseManager">
            <property name="text">
             <string>License Manager</string>
            </property>
@@ -239,7 +243,7 @@
              </spacer>
             </item>
             <item>
-             <widget class="QPushButton" name="btnSerialKeyEnter">
+             <widget class="QPushButton" name="btnEnter">
               <property name="text">
                <string>Enter</string>
               </property>
@@ -320,6 +324,30 @@
           </item>
          </layout>
         </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item>
+          <spacer name="horizontalSpacer_5">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>40</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
+         </item>
+         <item>
+          <widget class="QPushButton" name="btnClose">
+           <property name="text">
+            <string>Close</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer_2">

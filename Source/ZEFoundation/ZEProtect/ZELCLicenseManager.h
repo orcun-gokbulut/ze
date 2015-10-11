@@ -44,12 +44,11 @@ class ZELCLicenseManager
 	private:
 		ZEArray<ZELCLicense>			Licenses;
 
-		ZEArray<ZELCLicense>			LoadLicenseFile(const ZEString& FileName);
-		bool							SaveLicenseFile(const ZEString& FileName, const ZEArray<ZELCLicense>& Licenses);
-
 	public:
 		const ZEArray<ZELCLicense>&		GetLicenses();
 		ZEArray<ZELCLicense>			GetLicenses(const ZEString& ApplicationName, ZEUInt ApplicationVersionMajor, ZEInt ApplicationEdition = -1);
+		const ZELCLicense*				GetLicense(const ZEGUID& GUID);
+
 		void							RegisterLicense(const ZELCLicense& License);
 		void							UnregisterLicense(const ZEGUID& LicenseGUID);
 
@@ -59,4 +58,7 @@ class ZELCLicenseManager
 		void							SaveLicenses();
 
 		static ZEInt					CompareLicenseOrder(const ZELCLicense& A, const ZELCLicense& B);
+
+		static ZEArray<ZELCLicense>		LoadLicenseFile(const ZEString& FileName);
+		static bool						SaveLicenseFile(const ZEString& FileName, const ZEArray<ZELCLicense>& Licenses);
 };

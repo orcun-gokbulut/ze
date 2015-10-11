@@ -37,7 +37,7 @@
 #include "ZELNLauncherWindow.h"
 #include "ZEFile/ZEPathManager.h"
 
-#include <QtGui/QApplication>
+#include <QtWidgets/QApplication>
 
 #ifdef ZE_PLATFORM_WINDOWS
 #define  WIN32_LEAN_AND_MEAN

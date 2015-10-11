@@ -442,7 +442,6 @@ bool ZEMLReader::Open(const char* FileName)
 	
 	if (!OwnedFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		zeError("Cannot read ZEML file. Cannot open file. File Name: \"%s\"", FileName);
 		return false;
 	}
 
