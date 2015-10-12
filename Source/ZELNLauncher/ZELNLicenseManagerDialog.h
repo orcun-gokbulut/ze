@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLicenseModule.cpp
+ Zinek Engine - ZELNLicenseManagerDialog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,66 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNLicenseModule.h"
+#pragma once
 
-#include "ZELNLicenseWidget.h"
-#include "ui_ZELNLicenseWidget.h"
+#include <QtWidgets/QDialog>
 
-#include "ZELNLauncher.h"
-#include "ZEProtect\ZELCLicenseManager.h"
+#include "ZEProtect/ZELCLicenseManager.h"
 
-bool ZELNLicenseModule::InitializeSelf()
+class Ui_ZELNLicenseManagerDialog;
+
+class ZELNLicenseManagerDialog : public QDialog
 {
-	if (!ZEInitializable::InitializeSelf())
-		return false;
+	Q_OBJECT
+	private:
+		Ui_ZELNLicenseManagerDialog*	Form;
+		ZELCLicenseManager				LicenseManager;
 
-	Widget = new ZELNLicenseWidget();
+		void							LoadLicenses();
+		void							UpdateGUI();
 
-	ZELCLicenseManager LicenseManager;
-	LicenseManager.LoadLicenses();
-	const ZELCLicense* ResultLicense = LicenseManager.RequestLicense(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
-	if (ResultLicense != NULL)
-	{
-		License = *ResultLicense;
-		LicenseValid = true;
-	}
-	else
-	{
-		ZEArray<ZELCLicense> Licenses = LicenseManager.GetLicenses(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
-		if (Licenses.GetCount() != 0)
-		{
-			Licenses.Sort2<ZELCLicenseManager::CompareLicenseOrder>();
-			License = Licenses[0];
-		}
-		else
-		{
-			License = ZELCLicense();
-			License.SetApplicationName(ZELNLauncher::GetInstance()->GetApplicationName());
-		}
-		LicenseValid = false;
-	}
+	private slots:
+		void							tblLicenses_cellDoubleClicked(int, int);
+		void							tblLicenses_itemSelectionChanged();
+		void							btnViewEdit_clicked();
+		void							btnAdd_clicked();
+		void							btnRemove_clicked();
+		void							btnRefresh_clicked();
+		void							btnImport_clicked();
+		void							btnExport_clicked();
 
-	Widget->SetLicense(License);
-
-	return true;
-}
-
-const char* ZELNLicenseModule::GetName()
-{
-	return "License";
-}
-
-QWidget* ZELNLicenseModule::GetWidget()
-{
-	return Widget;
-}
-
-bool ZELNLicenseModule::GetAllowLaunch()
-{
-	return LicenseValid;
-}
-
-Ui_ZELNLicenseWidget* ZELNLicenseModule::GetForm()
-{
-	return Widget->Form;
-}
+	public:
+										ZELNLicenseManagerDialog();
+										~ZELNLicenseManagerDialog();
+};

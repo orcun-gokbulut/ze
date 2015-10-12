@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZELNLicenseManagerWindow</class>
- <widget class="QWidget" name="ZELNLicenseManagerWindow">
+ <class>ZELNLicenseManagerDialog</class>
+ <widget class="QWidget" name="ZELNLicenseManagerDialog">
   <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
     <width>692</width>
-    <height>425</height>
+    <height>424</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -112,13 +112,6 @@
         </widget>
        </item>
        <item>
-        <widget class="QPushButton" name="btnEnable">
-         <property name="text">
-          <string>Enable</string>
-         </property>
-        </widget>
-       </item>
-       <item>
         <spacer name="verticalSpacer">
          <property name="orientation">
           <enum>Qt::Vertical</enum>
@@ -163,7 +156,6 @@
   <tabstop>btnViewEdit</tabstop>
   <tabstop>btnAdd</tabstop>
   <tabstop>btnRemove</tabstop>
-  <tabstop>btnEnable</tabstop>
   <tabstop>btnImport</tabstop>
   <tabstop>btnExport</tabstop>
  </tabstops>
