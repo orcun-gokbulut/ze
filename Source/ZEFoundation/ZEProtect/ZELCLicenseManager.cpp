@@ -106,6 +106,9 @@ const ZELCLicense* ZELCLicenseManager::RequestLicense(const ZEString& Applicatio
 	ZELCLicense* TargetLicense = NULL;
 	for (ZESize I = 0; I < Licenses.GetCount(); I++)
 	{
+		if (!Licenses[I].GetEnabled())
+			continue;
+
 		if (Licenses[I].GetApplicationName() != ApplicationName)
 			continue;
 
@@ -221,21 +224,32 @@ void ZELCLicenseManager::SaveLicenses()
 
 ZEInt ZELCLicenseManager::CompareLicenseOrder(const ZELCLicense& A, const ZELCLicense& B)
 {
-	if (A.GetApplicationEdition() > B.GetApplicationEdition())
+	if (A.GetEnabled() && !B.GetEnabled())
 	{
 		return -1;
 	}
-	else if (A.GetApplicationEdition() < B.GetApplicationEdition())
+	else if (!A.GetEnabled() && B.GetEnabled())
 	{
 		return 1;
 	}
 	else
 	{
-		if (A.GetPriority() > B.GetPriority())
+		if (A.GetApplicationEdition() > B.GetApplicationEdition())
+		{
 			return -1;
-		else if (A.GetPriority() < B.GetPriority())
+		}
+		else if (A.GetApplicationEdition() < B.GetApplicationEdition())
+		{
 			return 1;
+		}
 		else
-			return 0;
+		{
+			if (A.GetPriority() > B.GetPriority())
+				return -1;
+			else if (A.GetPriority() < B.GetPriority())
+				return 1;
+			else
+				return 0;
+		}
 	}
 }

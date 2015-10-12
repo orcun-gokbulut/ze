@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLicenseManagerWindow.h
+ Zinek Engine - ZELNLicenseEditorDialog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,31 +37,30 @@
 
 #include <QtWidgets/QDialog>
 
-#include "ZEProtect/ZELCLicenseManager.h"
+#include "ZEProtect/ZELCLicense.h"
 
-class Ui_ZELNLicenseManagerWindow;
+class Ui_ZELNLicenseEditorDialog;
+class ZELNLicenseModule;
 
-class ZELNLicenseManagerWindow : public QDialog
+class ZELNLicenseEditorDialog : public QDialog
 {
 	Q_OBJECT
+	friend class ZELNLicenseModule;
 	private:
-		Ui_ZELNLicenseManagerWindow*	Form;
-		ZELCLicenseManager				LicenseManager;
+		ZELCLicense					License;
+		Ui_ZELNLicenseEditorDialog*	Form;
 
-		void							LoadLicenses();
-		void							UpdateGUI();
+		void						UpdateWidget();
+		void						SaveLicense();
 
 	private slots:
-		void							tblLicenses_itemSelectionChanged();
-		void							btnViewEdit_clicked();
-		void							btnAdd_clicked();
-		void							btnRemove_clicked();
-		void							btnEnable_clicked();
-		void							btnRefresh_clicked();
-		void							btnImport_clicked();
-		void							btnExport_clicked();
+		void						btnSave_clicked();
+		void						btnGeneratePreActivationCode_clicked();
 
 	public:
-										ZELNLicenseManagerWindow();
-										~ZELNLicenseManagerWindow();
+		void						SetLicense(const ZELCLicense& License);
+		const ZELCLicense&			GetLicense();
+
+									ZELNLicenseEditorDialog(QWidget* Parent = NULL);
+									~ZELNLicenseEditorDialog();
 };

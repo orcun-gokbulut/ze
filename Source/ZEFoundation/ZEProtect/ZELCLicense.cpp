@@ -42,6 +42,23 @@
 #include "ZEML\ZEMLReader.h"
 #include "ZEML\ZEMLWriter.h"
 
+static __forceinline bool ConverSerial(ZEUInt32* SerialKeyBinary, const ZEString& SerialKey)
+{
+	ZEUInt32 SerialKeyEncoded[ZELC_SERIAL_KEY_SIZE / sizeof(ZEUInt32)];
+	if (!ZELCUtils::ConvertSerialKey(SerialKeyEncoded, SerialKey))
+		return false;
+
+	if (!ZELCUtils::CheckSerialCode(SerialKeyEncoded))
+		return false;
+
+	SerialKeyBinary[0] = SerialKeyEncoded[0] ^ 0x00C6487A;
+	SerialKeyBinary[1] = SerialKeyEncoded[0] ^ 0x5B52C4E9 ^ SerialKeyEncoded[1];			
+	SerialKeyBinary[2] = SerialKeyEncoded[0] ^ 0x07EA99BA ^ SerialKeyEncoded[2];
+	SerialKeyBinary[3] = SerialKeyEncoded[0] ^ 0xB5EFD017 ^ SerialKeyEncoded[3];
+
+	return true;
+}
+
 void ZELCLicense::SetGUID(const ZEGUID& GUID)
 {
 	this->GUID = GUID;
@@ -62,34 +79,44 @@ const ZEString& ZELCLicense::GetApplicationName() const
 	return ApplicationName;
 }
 
-void ZELCLicense::SetApplicationVersionMajor(ZEUInt8 Version)
-{
-	ApplicationVersionMajor = Version;
-}
-
 ZEUInt8 ZELCLicense::GetApplicationVersionMajor() const
 {
-	return ApplicationVersionMajor;
-}
+	ZEUInt32 SerialKeyBinary[4];
+	if (!ConverSerial(SerialKeyBinary, GetSerialKey()))
+		return 0;
 
-void ZELCLicense::SetApplicationVersionMinor(ZEUInt8 Version)
-{
-	ApplicationVersionMinor = Version;
+	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKeyBinary[3];
+	return VersionEditionFlags[0];
 }
 
 ZEUInt8 ZELCLicense::GetApplicationVersionMinor() const
 {
-	return ApplicationVersionMinor;
-}
+	ZEUInt32 SerialKeyBinary[4];
+	if (!ConverSerial(SerialKeyBinary, GetSerialKey()))
+		return 0;
 
-void ZELCLicense::SetApplicationEdition(ZEUInt8 Type)
-{
-	this->ApplicationEdition = Type;
+	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKeyBinary[3];
+	return VersionEditionFlags[1];
 }
 
 ZEUInt8 ZELCLicense::GetApplicationEdition() const
 {
-	return ApplicationEdition;
+	ZEUInt32 SerialKeyBinary[4];
+	if (!ConverSerial(SerialKeyBinary, GetSerialKey()))
+		return 0;
+
+	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKeyBinary[3];
+	return VersionEditionFlags[2];
+}
+
+ZEUInt8 ZELCLicense::GetFlags() const
+{
+	ZEUInt32 SerialKeyBinary[4];
+	if (!ConverSerial(SerialKeyBinary, GetSerialKey()))
+		return 0;
+
+	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKeyBinary[3];
+	return VersionEditionFlags[3];
 }
 
 void ZELCLicense::SetLicenseeName(const ZEString& Name)
@@ -192,10 +219,7 @@ bool ZELCLicense::CheckSerialKeyValid() const
 	ZEUInt8* VersionEditionFlags = (ZEUInt8*)&SerialKeyDecoded[3];
 
 	if (SerialKeyDecoded[1] != GetApplicationName().Hash() ||
-		SerialKeyDecoded[2] != GetLicenseeName().Hash() ||
-		VersionEditionFlags[0] != GetApplicationVersionMajor() /* ||
-		VersionEditionFlags[1] != GetApplicationVersionMinor() ||
-		VersionEditionFlags[2] != GetApplicationEdition()*/)
+		SerialKeyDecoded[2] != GetLicenseeName().Hash())
 	{
 		return false;
 	}
@@ -225,24 +249,18 @@ void ZELCLicense::Load(ZEMLReaderNode* Reader)
 {
 	GUID = ZEGUID(Reader->ReadString("GUID"));
 	ApplicationName = Reader->ReadString("ApplicationName");
-	ApplicationVersionMajor = Reader->ReadUInt8("ApplicationVersionMajor");
-	ApplicationVersionMinor = Reader->ReadUInt8("ApplicationVersionMinor");
-	ApplicationEdition = Reader->ReadUInt8("ApplicationEdition");
 	LicenseeName = Reader->ReadString("LicenseeName");
 	SerialKey = Reader->ReadString("SerialKey");
 	ActivationCode = Reader->ReadString("ActivationCode");
 	Priority = Reader->ReadInt32("Priority");
 	LicenseVersion = Reader->ReadUInt8("LicenseVersion");
-	Enabled = Reader->ReadBoolean("Enablde", true);
+	Enabled = Reader->ReadBoolean("Enabled", true);
 }
 
 void ZELCLicense::Save(ZEMLWriterNode* Writer) const
 {
 	Writer->WriteString("GUID", GUID.ToString());
 	Writer->WriteString("ApplicationName", ApplicationName);
-	Writer->WriteUInt8("ApplicationVersionMajor", ApplicationVersionMajor);
-	Writer->WriteUInt8("ApplicationVersionMinor", ApplicationVersionMinor);
-	Writer->WriteUInt8("ApplicationEdition", ApplicationEdition);
 	Writer->WriteString("LicenseeName", LicenseeName);
 	Writer->WriteString("SerialKey", SerialKey);
 	Writer->WriteString("ActivationCode", ActivationCode);
@@ -254,9 +272,6 @@ void ZELCLicense::Save(ZEMLWriterNode* Writer) const
 ZELCLicense::ZELCLicense()
 {
 	GUID = ZEGUID::Generate();
-	ApplicationVersionMajor = 0;
-	ApplicationVersionMinor = 0;
-	ApplicationEdition = 0;
 	Priority = 0;
 	LicenseVersion = 1;
 	SystemWide = true;

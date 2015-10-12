@@ -61,18 +61,6 @@ void ZELCLicenseToolWindow::btnGenerateSerial_clicked()
 		QMessageBox::critical(this, "Zinek Engine Crack", "Cannot generate serial key.");
 
 	Form->txtSerialKey->setText(Output.ToCString());
-
-	ZELCLicense License;
-	bool Result = License.CheckSerialKeyValid();
-	License.SetApplicationName(Generator.GetApplicationName());
-	License.SetApplicationVersionMajor(Generator.GetApplicationVersionMajor());
-	License.SetApplicationVersionMinor(Generator.GetApplicationVersionMinor());
-	License.SetApplicationEdition(Generator.GetApplicationEdition());
-	License.SetLicenseeName(Generator.GetLicenseeName());
-	License.SetSerialKey(Output);
-
-	Form->txtSerialKeyActivation->setText(License.GetSerialKey().ToCString());
-	Form->txtPreActivationCode->setPlainText(License.GeneratePreActivationCode().ToCString());
 }
 
 void ZELCLicenseToolWindow::btnGenerateActivationCode_clicked()
@@ -90,26 +78,10 @@ void ZELCLicenseToolWindow::btnGenerateActivationCode_clicked()
 	ZEString Output;
 	if (!Generator.GenerateActivationCode(Output))
 	{
-		QMessageBox::critical(this, "Zinek Engine Crack", "Code generation failed !\nPrivate Key Password, Serial Key or Pre-Activation Code is not valid.", QMessageBox::Ok);
+		QMessageBox::critical(this, "Zinek Licensing Tool", "Code generation failed !\nPrivate Key Password, Serial Key or Pre-Activation Code is not valid.", QMessageBox::Ok);
 		return;
 	}
 	Form->txtActivationCode->setPlainText(Output.ToCString());
-
-	ZELCLicense License;
-	bool Result = License.CheckSerialKeyValid();
-	License.SetApplicationName(Form->txtName->text().toLocal8Bit().begin());
-	License.SetApplicationVersionMajor(Form->txtVersionMajor->value());
-	License.SetApplicationVersionMinor(Form->txtVersionMinor->value());
-	License.SetApplicationEdition(Form->txtEdition->value());
-	License.SetLicenseeName(Form->txtLicensee->text().toLocal8Bit().begin());
-	License.SetSerialKey(Form->txtSerialKeyActivation->text().toLocal8Bit().begin());
-	License.SetActivationCode(Output);
-
-	if (!License.CheckValid())
-	{
-		QMessageBox::critical(this, "Zinek Engine Crack", "Failed to verify generated Activation Code.", QMessageBox::Ok);
-		return;
-	}
 }
 
 ZELCLicenseToolWindow::ZELCLicenseToolWindow()

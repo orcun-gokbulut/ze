@@ -36,11 +36,12 @@
 #include "ZELNLicenseWidget.h"
 #include "ui_ZELNLicenseWidget.h"
 
+#include "ZELNLauncher.h"
 #include "ZELNLicenseModule.h"
+#include "ZELNLicenseManagerDialog.h"
 #include "ZEProtect\ZELCLicenseManager.h"
 
 #include <QtWidgets\QMessageBox>
-#include "ZELNLicenseManagerWindow.h"
 
 void ZELNLicenseWidget::UpdateWidget()
 {
@@ -95,8 +96,6 @@ void ZELNLicenseWidget::SaveLicense()
 	Manager.LoadLicenses();
 	Manager.RegisterLicense(License);
 	Manager.SaveLicenses();
-
-	emit LicenseUpdated();
 }
 
 void ZELNLicenseWidget::btnEnter_clicked()
@@ -135,9 +134,20 @@ void ZELNLicenseWidget::btnActivate_clicked()
 
 void ZELNLicenseWidget::btnLicenseManager_clicked()
 {
-	ZELNLicenseManagerWindow LicenseManager;
-	LicenseManager.setModal(true);
-	LicenseManager.exec();
+	ZELNLicenseManagerDialog LicenseManagerWindow;
+	LicenseManagerWindow.setModal(true);
+	LicenseManagerWindow.exec();
+
+	ZELCLicenseManager LicenseManager;
+	LicenseManager.LoadLicenses();
+
+	const ZELCLicense* UpdatedLicense = LicenseManager.RequestLicense(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
+	if (UpdatedLicense == NULL)
+		License = ZELCLicense();
+	else
+		License = *UpdatedLicense;
+
+	UpdateWidget();
 }
 
 void ZELNLicenseWidget::SetLicense(const ZELCLicense& License)
@@ -151,12 +161,6 @@ const ZELCLicense& ZELNLicenseWidget::GetLicense()
 	return License;
 }
 
-void ZELNLicenseWidget::SetLauncherMode(bool LauncherMode)
-{
-	Form->btnLicenseManager->setVisible(LauncherMode);
-	Form->btnClose->setVisible(!LauncherMode);
-}
-
 ZELNLicenseWidget::ZELNLicenseWidget(QWidget* Parent) : QWidget(Parent)
 {
 	Form = new Ui_ZELNLicenseWidget();
@@ -166,8 +170,6 @@ ZELNLicenseWidget::ZELNLicenseWidget(QWidget* Parent) : QWidget(Parent)
 	connect(Form->btnEnter, SIGNAL(clicked()), this, SLOT(btnEnter_clicked()));
 	connect(Form->btnActivate, SIGNAL(clicked()), this, SLOT(btnActivate_clicked()));
 	connect(Form->btnLicenseManager, SIGNAL(clicked()), this, SLOT(btnLicenseManager_clicked()));
-	connect(Form->btnClose, SIGNAL(clicked()), parent(), SLOT(close()));
-	SetLauncherMode(false);
 }
 
 ZELNLicenseWidget::~ZELNLicenseWidget()

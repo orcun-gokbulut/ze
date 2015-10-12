@@ -58,14 +58,9 @@ class ZELNLicenseWidget : public QWidget
 		void						btnActivate_clicked();
 		void						btnLicenseManager_clicked();
 
-	signals:
-		void						LicenseUpdated();
-
 	public:
 		void						SetLicense(const ZELCLicense& License);
 		const ZELCLicense&			GetLicense();
-
-		void						SetLauncherMode(bool LauncherMode);
 
 									ZELNLicenseWidget(QWidget* Parent = NULL);
 									~ZELNLicenseWidget();

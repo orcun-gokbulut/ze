@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLicenseManagerWindow.cpp
+ Zinek Engine - ZELNLicenseManagerDialog.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNLicenseManagerWindow.h"
-#include "ui_ZELNLicenseManagerWindow.h"
+#include "ZELNLicenseManagerDialog.h"
+#include "Ui_ZELNLicenseManagerDialog.h"
 
 #include "ZELNLauncher.h"
 #include "ZELNLicenseWidget.h"
@@ -43,8 +43,9 @@
 
 #include <QtWidgets\QMessageBox>
 #include <QtWidgets\QFileDialog>
+#include "ZELNLicenseEditorDialog.h"
 
-void ZELNLicenseManagerWindow::LoadLicenses()
+void ZELNLicenseManagerDialog::LoadLicenses()
 {
 	Form->tblLicenses->setRowCount((int)LicenseManager.GetLicenses().GetCount());
 	for (int I = 0; I < LicenseManager.GetLicenses().GetCount(); I++)
@@ -58,7 +59,7 @@ void ZELNLicenseManagerWindow::LoadLicenses()
 		Form->tblLicenses->setItem(I, 5, new QTableWidgetItem(QString("%1.%2")
 			.arg(License.GetApplicationVersionMajor())
 			.arg(License.GetApplicationVersionMinor())));
-		Form->tblLicenses->setItem(I, 6, new QTableWidgetItem(License.GetApplicationEdition()));
+		Form->tblLicenses->setItem(I, 6, new QTableWidgetItem(QString::number(License.GetApplicationEdition())));
 		Form->tblLicenses->setItem(I, 7, new QTableWidgetItem(License.GetSystemWide() ? "System Wide" : "Instance"));
 		Form->tblLicenses->setItem(I, 8, new QTableWidgetItem(License.GetEnabled() ? "Yes" : "No"));
 	}
@@ -66,33 +67,26 @@ void ZELNLicenseManagerWindow::LoadLicenses()
 	UpdateGUI();
 }
 
-void ZELNLicenseManagerWindow::UpdateGUI()
+void ZELNLicenseManagerDialog::UpdateGUI()
 {
 	QModelIndexList Model = Form->tblLicenses->selectionModel()->selectedRows();
 	int SelectedRowCount = Model.count();
 	Form->btnViewEdit->setEnabled(SelectedRowCount == 1);
 	Form->btnRemove->setEnabled(SelectedRowCount > 0);
 	Form->btnExport->setEnabled(SelectedRowCount > 0);
-	if (SelectedRowCount == 1)
-	{
-		Form->btnEnable->setEnabled(true);
-		QModelIndexList SelectedRows = Form->tblLicenses->selectionModel()->selectedIndexes();
-		ZEGUID GUID(Form->tblLicenses->item(SelectedRows[0].row(), 0)->text().toLocal8Bit().begin());
-		const ZELCLicense* License = LicenseManager.GetLicense(GUID);
-		Form->btnEnable->setText(License->GetEnabled() ? "Disable" : "Enable");
-	}
-	else
-	{
-		Form->btnEnable->setEnabled(false);
-	}
 }
 
-void ZELNLicenseManagerWindow::tblLicenses_itemSelectionChanged()
+void ZELNLicenseManagerDialog::tblLicenses_cellDoubleClicked(int, int)
+{
+	btnViewEdit_clicked();
+}
+
+void ZELNLicenseManagerDialog::tblLicenses_itemSelectionChanged()
 {
 	UpdateGUI();
 }
 
-void ZELNLicenseManagerWindow::btnViewEdit_clicked()
+void ZELNLicenseManagerDialog::btnViewEdit_clicked()
 {
 	if (Form->tblLicenses->selectionModel()->selectedRows().count() != 1)
 		return;
@@ -103,37 +97,32 @@ void ZELNLicenseManagerWindow::btnViewEdit_clicked()
 	if (License == NULL)
 		return;
 
-	QDialog LicenseEditor;
-	QVBoxLayout* Layout = new QVBoxLayout();
-	Layout->setMargin(0);
-	LicenseEditor.setLayout(Layout);
-
-	ZELNLicenseWidget* LicenseWidget = new ZELNLicenseWidget(&LicenseEditor);
-	Layout->addWidget(LicenseWidget);
-
-	LicenseWidget->SetLicense(*License);
-	LicenseEditor.resize(LicenseWidget->width(), LicenseWidget->height());
-	LicenseEditor.setModal(true);
-	LicenseEditor.exec();
-
-	LicenseManager.LoadLicenses();
-	LoadLicenses();
+	ZELNLicenseEditorDialog Editor;
+	Editor.SetLicense(*License);
+	Editor.setModal(true);
+	if (Editor.exec() == 1)
+	{
+		LicenseManager.LoadLicenses();
+		LoadLicenses();
+	}
 }
 
-void ZELNLicenseManagerWindow::btnAdd_clicked()
+void ZELNLicenseManagerDialog::btnAdd_clicked()
 {
 	ZELCLicense License;
 	License.SetApplicationName(ZELNLauncher::GetInstance()->GetApplicationName());
-	License.SetApplicationVersionMajor(ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
-	License.SetApplicationVersionMinor(ZELNLauncher::GetInstance()->GetApplicationVersionMinor());
-	LicenseManager.LoadLicenses();
-	LicenseManager.RegisterLicense(License);
-	LicenseManager.SaveLicenses();
 
-	LoadLicenses();
+	ZELNLicenseEditorDialog Editor;
+	Editor.SetLicense(License);
+	Editor.setModal(true);
+	if (Editor.exec() == QDialog::Accepted)
+	{
+		LicenseManager.LoadLicenses();
+		LoadLicenses();
+	}
 }
 
-void ZELNLicenseManagerWindow::btnRemove_clicked()
+void ZELNLicenseManagerDialog::btnRemove_clicked()
 {
 	int Result = QMessageBox::question(this, "Remove License", 
 		"Are you sure that you want to remove selected license(s) ? \nThis operation cannot be undone.");
@@ -155,28 +144,13 @@ void ZELNLicenseManagerWindow::btnRemove_clicked()
 	LoadLicenses();
 }
 
-void ZELNLicenseManagerWindow::btnEnable_clicked()
-{
-	LicenseManager.LoadLicenses();
-
-	QModelIndexList SelectedRows = Form->tblLicenses->selectionModel()->selectedIndexes();
-	ZEGUID GUID(Form->tblLicenses->item(SelectedRows[0].row(), 0)->text().toLocal8Bit().begin());
-	ZELCLicense License = *LicenseManager.GetLicense(GUID);
-	License.SetEnabled(!License.GetEnabled());
-
-	LicenseManager.RegisterLicense(License);
-	LicenseManager.SaveLicenses();
-
-	LoadLicenses();
-}
-
-void ZELNLicenseManagerWindow::btnRefresh_clicked()
+void ZELNLicenseManagerDialog::btnRefresh_clicked()
 {
 	LicenseManager.LoadLicenses();
 	LoadLicenses();
 }
 
-void ZELNLicenseManagerWindow::btnImport_clicked()
+void ZELNLicenseManagerDialog::btnImport_clicked()
 {
 	QString FileName = QFileDialog::getOpenFileName(this, "Import License", QString(), "Zinek License File (*.ZELicense);;All Files (*.*");
 	if (FileName.isEmpty())
@@ -191,7 +165,7 @@ void ZELNLicenseManagerWindow::btnImport_clicked()
 	LoadLicenses();
 }
 
-void ZELNLicenseManagerWindow::btnExport_clicked()
+void ZELNLicenseManagerDialog::btnExport_clicked()
 {
 	QString FileName = QFileDialog::getSaveFileName(this, "Export License", QString(), "Zinek License File (*.ZELicense);;All Files (*.*");
 	if (FileName.isEmpty())
@@ -212,17 +186,16 @@ void ZELNLicenseManagerWindow::btnExport_clicked()
 	ZELCLicenseManager::SaveLicenseFile(FileName.toLocal8Bit().begin(), ExportLicenses);
 }
 
-ZELNLicenseManagerWindow::ZELNLicenseManagerWindow()
+ZELNLicenseManagerDialog::ZELNLicenseManagerDialog()
 {
-	Form = new Ui_ZELNLicenseManagerWindow();
+	Form = new Ui_ZELNLicenseManagerDialog();
 	Form->setupUi(this);
 
 	connect(Form->tblLicenses, SIGNAL(itemSelectionChanged()), this, SLOT(tblLicenses_itemSelectionChanged()));
-	connect(Form->tblLicenses, SIGNAL(itemDoubleClicked()), this, SLOT(btnViewEdit_clicked()));
+	connect(Form->tblLicenses, SIGNAL(cellDoubleClicked(int, int)), this, SLOT(tblLicenses_cellDoubleClicked(int, int)));
 	connect(Form->btnViewEdit, SIGNAL(clicked()), this, SLOT(btnViewEdit_clicked()));
 	connect(Form->btnAdd, SIGNAL(clicked()), this, SLOT(btnAdd_clicked()));
 	connect(Form->btnRemove, SIGNAL(clicked()), this, SLOT(btnRemove_clicked()));
-	connect(Form->btnEnable, SIGNAL(clicked()), this, SLOT(btnEnable_clicked()));
 	connect(Form->btnImport, SIGNAL(clicked()), this, SLOT(btnImport_clicked()));
 	connect(Form->btnExport, SIGNAL(clicked()), this, SLOT(btnExport_clicked()));
 
@@ -231,7 +204,7 @@ ZELNLicenseManagerWindow::ZELNLicenseManagerWindow()
 	UpdateGUI();
 }
 
-ZELNLicenseManagerWindow::~ZELNLicenseManagerWindow()
+ZELNLicenseManagerDialog::~ZELNLicenseManagerDialog()
 {
 	delete Form;
 }
