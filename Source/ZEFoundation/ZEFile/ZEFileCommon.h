@@ -51,6 +51,7 @@ enum ZEPathAccess
 enum ZEPathRoot
 {
 	ZE_PR_UNKOWN,
+	ZE_PR_ENGINE,
 	ZE_PR_RESOURCE,
 	ZE_PR_STORAGE,
 	ZE_PR_USER_STORAGE,

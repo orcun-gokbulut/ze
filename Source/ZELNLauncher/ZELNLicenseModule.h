@@ -43,6 +43,7 @@ class Ui_ZELNLicenseWidget;
 
 class ZELNLicenseModule : public ZELNModule
 {
+	ZELN_MODULE
 	private:
 		ZELNLicenseWidget*			Widget;
 		ZELCLicense					License;
@@ -51,7 +52,6 @@ class ZELNLicenseModule : public ZELNModule
 		virtual bool				InitializeSelf();
 
 	public:
-		virtual const char*			GetName();
 		virtual QWidget*			GetWidget();
 		virtual bool				GetAllowLaunch();
 		Ui_ZELNLicenseWidget*		GetForm();

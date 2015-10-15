@@ -146,6 +146,14 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 		Tokenizer.Combine();
 		RealPath.Path = Tokenizer.GetOutput();
 	}
+	else if (stricmp(FirstToken, "#Engine:") == 0 || 	stricmp(FirstToken, "#E:") == 0)
+	{
+		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_ENGINE;
+		Tokenizer.SetToken(0, EnginePath.ToCString());
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
+	}
 	else if (stricmp(FirstToken, "#Resource:") == 0 || 	stricmp(FirstToken, "#R:") == 0)
 	{
 		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
@@ -177,6 +185,12 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 		{
 			RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
 			RealPath.Root = ZE_PR_RESOURCE;
+			RealPath.Path = Tokenizer.GetOutput();
+		}
+		else if (strnicmp(Tokenizer.GetOutput(), EnginePath.ToCString(), EnginePath.GetLength()) == 0)
+		{
+			RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+			RealPath.Root = ZE_PR_ENGINE;
 			RealPath.Path = Tokenizer.GetOutput();
 		}
 		else if (strnicmp(Tokenizer.GetOutput(), StoragePath.ToCString(), StoragePath.GetLength()) == 0)

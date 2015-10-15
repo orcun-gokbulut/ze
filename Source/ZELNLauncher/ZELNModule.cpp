@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELNModule.h"
-#include "ZELNUpdate.h"
+#include "ZELNUpdateModule.h"
 #include "ZELNLicenseModule.h"
-#include "ZELNLog.h"
-#include "ZELNContact.h"
+#include "ZELNLogModule.h"
+#include "ZELNContactModule.h"
 
 bool ZELNModule::OnPreLaunch()
 {
@@ -74,36 +74,36 @@ ZEArray<ZEString> ZELNModule::GetLaunchParameters()
 	return ZEArray<ZEString>();
 }
 
+void ZELNModule::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
+{
+
+}
+
 ZESize ZELNModule::GetModuleCount()
 {
 	return 4;
 }
 
-ZELNModule** ZELNModule::GetModules()
+ZELNModuleDescription** ZELNModule::GetModules()
 {
-	static ZELNLog Log;
-	static ZELNLicenseModule License;
-	static ZELNUpdate Update;
-	static ZELNContact Contact;
-
-	static ZELNModule* Modules[] =
+	static ZELNModuleDescription* Modules[] =
 	{
-		&Log,
-		&License,
-		&Update,
-		&Contact
+		ZELNLogModule::Description(),
+		ZELNLicenseModule::Description(),
+		ZELNUpdateModule::Description(),
+		ZELNContactModule::Description()
 	};
 
 	return Modules;
 }
 
-ZELNModule* ZELNModule::GetModule(const char* Name)
+ZELNModuleDescription* ZELNModule::GetModule(const char* Name)
 {
 	for (ZESize I = 0; I < GetModuleCount(); I++)
 	{
-		ZELNModule* Module = GetModules()[I];
-		if (strcmp(Name, Module->GetName()) == 0)
-			return Module;
+		ZELNModuleDescription* ModuleDescription = GetModules()[I];
+		if (strcmp(Name, ModuleDescription->GetName()) == 0)
+			return ModuleDescription;
 	}
 
 	return NULL;

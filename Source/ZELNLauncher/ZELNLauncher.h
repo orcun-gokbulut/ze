@@ -41,6 +41,7 @@
 
 class ZELNModule;
 class ZELNLauncherWindow;
+class ZEMLReaderNode;
 
 enum ZELNLaunchStatus
 {
@@ -68,9 +69,13 @@ class ZELNLauncher : public ZEInitializable
 		bool							AllowedToLaunch;
 		ZELNLaunchInformation			Information;
 		ZEString						ApplicationName;
-		ZEString						ApplicationFileName;
-		ZEUInt							ApplicationMajorVersion;
-		ZEUInt							ApplicationMinorVersion;
+		ZEUInt							ApplicationVersionMajor;
+		ZEUInt							ApplicationVersionMinor;
+		ZEString						ApplicationExecutable;
+		ZEString						CommandLineArguments;
+
+		void							InitializeApplication(const ZEMLReaderNode& ApplicationNode);
+		void							InitializeModules(const ZEMLReaderNode& ModulesNode);
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();

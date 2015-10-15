@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLog.cpp
+ Zinek Engine - ZELNContactModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,49 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNLog.h"
-#include "ZELNLogWidget.h"
-#include "ui_ZELNLogWidget.h"
+#pragma once
 
-#include "ZELog.h"
+#include "ZELNModule.h"
 
-void ZELNLog::LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+class ZELNContactWidget;
+class Ui_ZELNContactWidget;
+
+class ZELNContactModule  : public ZELNModule
 {
-	ZELNLog* Widget = (ZELNLog*)ExtraParameters;
+	ZELN_MODULE
+	friend class ZELNLauncher;
+	private:
+		ZELNContactWidget*			Widget;
 
-	const char* TypeString = ZELog::GetLogTypeString(Type);
+		virtual bool				InitializeSelf();
 
-	Widget->GetForm()->txtConsole->appendHtml(
-		QString("[%1] <b>%2</b>: %3")
-		.arg(Module)
-		.arg(TypeString)
-		.arg(LogText));
-}
-
-
-bool ZELNLog::InitializeSelf()
-{
-	if (!ZEInitializable::InitializeSelf())
-		return false;
-
-	Widget = new ZELNLogWidget();
-	
-	ZELog::GetInstance()->SetCallback(&LogCallback, this);
-	
-	return true;
-}
-
-const char* ZELNLog::GetName()
-{
-	return "Log";
-}
-
-QWidget* ZELNLog::GetWidget()
-{
-	return Widget;
-}
-
-Ui_ZELNLogWidget* ZELNLog::GetForm()
-{
-	return Widget->Form;
-}
+	public:
+		virtual QWidget*			GetWidget();
+		Ui_ZELNContactWidget*		GetForm();
+};

@@ -46,6 +46,9 @@ class ZELNLauncherWindow : public QDialog
 	Q_OBJECT
 	private:
 		Ui_ZELNLauncherWindow*		Form;
+	
+	private slots:
+		void						btnLaunch_clicked();
 
 	public:
 		Ui_ZELNLauncherWindow*		GetForm();

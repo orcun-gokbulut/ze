@@ -36,10 +36,10 @@
 #include "ZELNLicenseModule.h"
 
 #include "ZELNLicenseWidget.h"
-#include "ui_ZELNLicenseWidget.h"
-
 #include "ZELNLauncher.h"
 #include "ZEProtect\ZELCLicenseManager.h"
+
+ZELN_MODULE_DECRIPTION(ZELNLicenseModule, "License");
 
 bool ZELNLicenseModule::InitializeSelf()
 {
@@ -75,11 +75,6 @@ bool ZELNLicenseModule::InitializeSelf()
 	Widget->SetLicense(License);
 
 	return true;
-}
-
-const char* ZELNLicenseModule::GetName()
-{
-	return "License";
 }
 
 QWidget* ZELNLicenseModule::GetWidget()

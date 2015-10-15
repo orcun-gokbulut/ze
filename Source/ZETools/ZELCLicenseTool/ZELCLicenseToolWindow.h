@@ -42,7 +42,7 @@ class Ui_ZELCLicenseToolWindow;
 class ZELCLicenseToolWindow : public QDialog
 {
 	Q_OBJECT
-	friend class ZELNContact;
+	friend class ZELNContactModule;
 	private:
 		Ui_ZELCLicenseToolWindow*		Form;
 

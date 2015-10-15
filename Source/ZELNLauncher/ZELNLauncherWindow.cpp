@@ -35,6 +35,12 @@
 
 #include "ZELNLauncherWindow.h"
 #include "ui_ZELNLauncherWindow.h"
+#include "ZELNLauncher.h"
+
+void ZELNLauncherWindow::btnLaunch_clicked()
+{
+	ZELNLauncher::GetInstance()->Launch();
+}
 
 Ui_ZELNLauncherWindow* ZELNLauncherWindow::GetForm()
 {
@@ -55,6 +61,7 @@ ZELNLauncherWindow::ZELNLauncherWindow()
 {
 	Form = new Ui_ZELNLauncherWindow();
 	Form->setupUi(this);
+	connect(Form->btnLaunch, SIGNAL(clicked()), this, SLOT(btnLaunch_clicked()));
 }
 
 ZELNLauncherWindow::~ZELNLauncherWindow()

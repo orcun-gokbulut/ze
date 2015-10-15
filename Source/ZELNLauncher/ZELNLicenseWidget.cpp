@@ -100,6 +100,7 @@ void ZELNLicenseWidget::SaveLicense()
 
 void ZELNLicenseWidget::btnEnter_clicked()
 {
+	License.SetApplicationName(ZELNLauncher::GetInstance()->GetApplicationName());
 	License.SetLicenseeName(Form->txtLicensee->text().toLocal8Bit().begin());
 	License.SetSerialKey(Form->txtSerialKey->text().toLocal8Bit().begin());
 

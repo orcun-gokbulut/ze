@@ -80,46 +80,46 @@ class ZEMLReaderNode
 		ZEArray<ZEMLFormatElement>	Elements;
 		ZESize						NodeCount;
 
-		const ZEMLFormatElement*	FindElement(const char* Name, ZEMLElementType Type, ZESize Index = 0);
+		const ZEMLFormatElement*	FindElement(const char* Name, ZEMLElementType Type, ZESize Index = 0) const;
 		bool						Load();
 		 
 	public:
-		const ZEString&						GetName();
-		const ZEArray<ZEMLFormatElement>&	GetElements();
+		const ZEString&						GetName() const;
+		const ZEArray<ZEMLFormatElement>&	GetElements() const;
 
-		ZESize						GetNodeCount();
-		ZESize						GetNodeCount(const char* Name);
+		ZESize						GetNodeCount() const;
+		ZESize						GetNodeCount(const char* Name) const;
 
-		ZEMLReaderNode				GetNode(const char* Name, ZESize Index = 0);
-		ZEMLReaderNode				GetNode(ZESize Index);
+		ZEMLReaderNode				GetNode(const char* Name, ZESize Index = 0) const;
+		ZEMLReaderNode				GetNode(ZESize Index) const;
 
-		bool						IsValid();
-		bool						IsPropertyExists(const char* Name);
-		bool						IsSubNodeExists(const char* Name);
+		bool						IsValid() const;
+		bool						IsPropertyExists(const char* Name) const;
+		bool						IsSubNodeExists(const char* Name) const;
 
-		ZEValue						ReadValue(const char* Name);
-		ZEInt8						ReadInt8(const char* Name, ZEInt8 Default = 0);
-		ZEInt16						ReadInt16(const char* Name, ZEInt16 Default = 0);
-		ZEInt32						ReadInt32(const char* Name, ZEInt32 Default = 0);
-		ZEInt64						ReadInt64(const char* Name, ZEInt64 Default = 0);
-		ZEUInt8						ReadUInt8(const char* Name, ZEUInt8 Default = 0);
-		ZEUInt16					ReadUInt16(const char* Name, ZEUInt16 Default = 0);
-		ZEUInt32					ReadUInt32(const char* Name, ZEUInt32 Default = 0);
-		ZEUInt64					ReadUInt64(const char* Name, ZEUInt64 Default = 0);
-		float						ReadFloat(const char* Name, float Default = 0.0f);
-		double						ReadDouble(const char* Name, double Default = 0.0);
-		bool						ReadBoolean(const char* Name, bool Default = false);
-		ZEVector2					ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero);
-		ZEVector3					ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero);
-		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero);
-		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero);
-		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero);
-		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero);
-		ZEString					ReadString(const char* Name, const ZEString& Default = "");
+		ZEValue						ReadValue(const char* Name) const;
+		ZEInt8						ReadInt8(const char* Name, ZEInt8 Default = 0) const;
+		ZEInt16						ReadInt16(const char* Name, ZEInt16 Default = 0) const;
+		ZEInt32						ReadInt32(const char* Name, ZEInt32 Default = 0) const;
+		ZEInt64						ReadInt64(const char* Name, ZEInt64 Default = 0) const;
+		ZEUInt8						ReadUInt8(const char* Name, ZEUInt8 Default = 0) const;
+		ZEUInt16					ReadUInt16(const char* Name, ZEUInt16 Default = 0) const;
+		ZEUInt32					ReadUInt32(const char* Name, ZEUInt32 Default = 0) const;
+		ZEUInt64					ReadUInt64(const char* Name, ZEUInt64 Default = 0) const;
+		float						ReadFloat(const char* Name, float Default = 0.0f) const;
+		double						ReadDouble(const char* Name, double Default = 0.0) const;
+		bool						ReadBoolean(const char* Name, bool Default = false) const;
+		ZEVector2					ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero) const;
+		ZEVector3					ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero) const;
+		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero) const;
+		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero) const;
+		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero) const;
+		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero) const;
+		ZEString					ReadString(const char* Name, const ZEString& Default = "") const;
 
-		ZESize						ReadDataSize(const char* Name);
-		bool						ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0);
-		bool						ReadDataItems(const char* Name, void* Buffer, ZESize ItemSize, ZESize ItemCount, ZESize Offset = 0);
+		ZESize						ReadDataSize(const char* Name) const;
+		bool						ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0) const;
+		bool						ReadDataItems(const char* Name, void* Buffer, ZESize ItemSize, ZESize ItemCount, ZESize Offset = 0) const;
 
 									ZEMLReaderNode();
 };
