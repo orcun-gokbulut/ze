@@ -42,7 +42,7 @@ class Ui_ZELNContactWidget;
 class ZELNContactWidget: public QWidget
 {
 	Q_OBJECT
-	friend class ZELNContact;
+	friend class ZELNContactModule;
 	private:
 		Ui_ZELNContactWidget*		Form;
 

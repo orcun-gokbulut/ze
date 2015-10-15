@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNUpdate.h
+ Zinek Engine - ZELNLogModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,19 +37,21 @@
 
 #include "ZELNModule.h"
 
-class ZELNUpdateWidget;
-class Ui_ZELNUpdateWidget;
+class ZELNLogWidget;
+class Ui_ZELNLogWidget;
+enum ZELogType;
 
-class ZELNUpdate  : public ZELNModule
+class ZELNLogModule  : public ZELNModule
 {
+	ZELN_MODULE
 	friend class ZELNLauncher;
 	private:
-		ZELNUpdateWidget*			Widget;
+		ZELNLogWidget*				Widget;
 
+		static void					LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 		virtual bool				InitializeSelf();
 
 	public:
-		virtual const char*			GetName();
 		virtual QWidget*			GetWidget();
-		Ui_ZELNUpdateWidget*		GetForm();
+		Ui_ZELNLogWidget*			GetForm();
 };

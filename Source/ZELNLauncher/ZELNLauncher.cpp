@@ -38,55 +38,142 @@
 
 #include "ZELNModule.h"
 #include "ZELNLauncherWindow.h"
-#include "ZEDS\ZEFormat.h"
-#include "ZEFile\ZEPathInfo.h"
+#include "ZELNLogModule.h"
+#include "ZELNContactModule.h"
 #include "ZEVersion.h"
+#include "ZEDS\ZEFormat.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEFile\ZEPathInfo.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+
 ZELNLauncher* ZELNLauncher::Instance = NULL;
+
+void ZELNLauncher::InitializeApplication(const ZEMLReaderNode& ApplicationNode)
+{
+	if (!ApplicationNode.IsValid())
+	{
+		zeWarning("Application information is missing in configuration file. Using default information.");
+		return;
+	}
+
+	ApplicationName = ApplicationNode.ReadString("Name", ApplicationName);
+	ApplicationVersionMajor = ApplicationNode.ReadUInt8("VersionMajor", ApplicationVersionMajor);
+	ApplicationVersionMinor = ApplicationNode.ReadUInt8("VersionMinor", ApplicationVersionMinor);
+	ApplicationExecutable = ApplicationNode.ReadString("Executable", ApplicationExecutable);
+	CommandLineArguments = ApplicationNode.ReadString("CommandLineArguments", CommandLineArguments);
+}
+
+void ZELNLauncher::InitializeModules(const ZEMLReaderNode& ModulesNode)
+{
+	zeLog("Loading Modules...");
+
+	if (!ModulesNode.IsValid())
+	{
+		zeWarning("No module configuration has found. Loading default modules.");
+		Modules.Add(ZELNContactModule::Description()->CreateInstance());
+	}
+	else
+	{
+		ZESize ModuleCount = ModulesNode.GetNodeCount("Module");
+		for (ZESize I = 0; I < ModuleCount; I++)
+		{
+			ZEMLReaderNode ModuleNode = ModulesNode.GetNode("Module", I);
+			ZEString Name = ModuleNode.ReadString("Name");
+			
+			bool Enabled = ModuleNode.ReadBoolean("Enabled", false);
+			if (!Enabled)
+				continue;
+		
+			ZELNModuleDescription* Description = ZELNModule::GetModule(Name);
+			if (Description == NULL)
+			{
+				zeWarning("Cannot load module. Module Name: \"%s\".", Name.ToCString());
+				continue;
+			}
+
+			bool Found = false;
+			for (ZESize I = 0; I < Modules.GetCount(); I++)
+			{
+				if (Modules[I]->GetDescription() == Description)
+				{
+					Found = true;
+					break;
+				}
+			}
+
+			if (Found)
+				continue;
+
+			ZELNModule* Module = Description->CreateInstance();
+			if (Module == NULL)
+				zeCriticalError("Cannot create module instance. Module Name: \"%s\".", Description->GetName());
+			
+			Module->LoadConfiguration(ModuleNode.GetNode("Configuration"));
+			Modules.Add(Module);
+		}
+	}
+
+	zeLog("Initializing modules...");
+	for (ZESize I = 0; I < Modules.GetCount(); I++)
+	{
+		zeLog("Initializing \"%s\" module.", Modules[I]->GetDescription()->GetName());
+
+		if (!Modules[I]->Initialize())
+		{
+			zeWarning("Cannot initialize \"%s\" module.", Modules[I]->GetDescription()->GetName());
+			continue;
+		}
+
+		QWidget* Widget = Modules[I]->GetWidget();
+		if (Widget != NULL)
+		{
+			int Index = Window->GetForm()->tabWidgets->count();
+			Window->GetForm()->tabWidgets->insertTab(Index, Widget, QIcon(), Modules[I]->GetDescription()->GetName());
+		}
+	}
+
+	zeLog("Modules initialized.");
+}
 
 bool ZELNLauncher::InitializeSelf()
 {
 	if (!ZEInitializable::InitializeSelf())
 		return false;
 
-	ZELNModule::GetModule("Log")->Initialize();
+	ZELNModule* LogModule = ZELNLogModule::Description()->CreateInstance();
+	Modules.Add(LogModule);
+	LogModule->Initialize();
 
-	zeLog(ZE_LOG_INFO, "Initializing Zinek Launcher...");
+	zeLog("Initializing Zinek Launcher...");
+
+	ZEMLReader Reader;
+	ZEMLReaderNode RootNode;
+	if (!Reader.Open("#E:/Launcher.ZEConfig"))
+	{
+		zeWarning("Cannot open Zinek Launcher configuration file.");
+	}
+	else
+	{
+		RootNode  = Reader.GetRootNode();
+		if (RootNode.GetName() != "LauncherConfiguration")
+		{
+			zeWarning("Invalid Zinek Launcher configuration file format.");
+			return false;
+		}
+	}
 
 	Instance = this;
 	Window = new ZELNLauncherWindow();
 
-	zeLog(ZE_LOG_INFO, "Initializing modules...");
-	for (ZESize I = 0; I < ZELNModule::GetModuleCount(); I++)
-	{
-		ZELNModule* Module = ZELNModule::GetModules()[I];
-		zeLog(ZE_LOG_INFO, "Initializing \"%s\" module.", Module->GetName());
-
-		Modules.Add(Module);
-
-		if (!Modules[I]->Initialize())
-		{
-			zeError("Cannot initialize \"%s\" module.", Module->GetName());
-			continue;
-		}
-
-		QWidget* Widget = Modules[I]->GetWidget();
-
-		if (Widget != NULL)
-		{
-			int Index = Window->GetForm()->tabWidgets->count();
-			Window->GetForm()->tabWidgets->insertTab(Index, Widget, QIcon(), Modules[I]->GetName());
-		}
-	}
-
-	zeLog(ZE_LOG_INFO, "Modules loaded.");
+	InitializeApplication(RootNode.GetNode("Application"));
+	InitializeModules(RootNode.GetNode("Modules"));
 
 	Update();
-
 	Window->show();
+	Reader.Close();
 
 	return true;
 }
@@ -122,7 +209,7 @@ const ZEString& ZELNLauncher::GetApplicationName()
 
 void ZELNLauncher::SetApplicationFileName(const ZEString& FileName)
 {
-	ApplicationFileName = FileName;
+	ApplicationExecutable = FileName;
 }
 
 const ZEString& ZELNLauncher::GetApplicationFileName()
@@ -132,27 +219,27 @@ const ZEString& ZELNLauncher::GetApplicationFileName()
 
 void ZELNLauncher::SetApplicationMajorVersion(ZEUInt Version)
 {
-	ApplicationMajorVersion = Version;
+	ApplicationVersionMajor = Version;
 }
 
 ZEUInt ZELNLauncher::GetApplicationVersionMajor()
 {
-	return ApplicationMajorVersion;
+	return ApplicationVersionMajor;
 }
 
 void ZELNLauncher::SetApplicationMinorVersion(ZEUInt Version)
 {
-	ApplicationMinorVersion = Version;
+	ApplicationVersionMinor = Version;
 }
 
 ZEUInt ZELNLauncher::GetApplicationVersionMinor()
 {
-	return ApplicationMinorVersion;
+	return ApplicationVersionMinor;
 }
 
 void ZELNLauncher::Update()
 {
-	zeLog(ZE_LOG_INFO, "Getting launch ready.");
+	zeLog("Getting launch ready.");
 
 	AllowedToLaunch = true;
 	for (ZESize I = 0; I < Modules.GetCount(); I++)
@@ -161,14 +248,14 @@ void ZELNLauncher::Update()
 
 		bool ModuleAllowLaunch = Modules[I]->GetAllowLaunch();
 		if (!ModuleAllowLaunch)
-			zeLog(ZE_LOG_INFO, "Launch is denied by module \"%s\". Please check \"%s\" page for more information.",
-				Modules[I]->GetName(),
-				Modules[I]->GetName());
+			zeLog("Launch is denied by module \"%s\". Please check \"%s\" page for more information.",
+				Modules[I]->GetDescription()->GetName(),
+				Modules[I]->GetDescription()->GetName());
 		
 		AllowedToLaunch &= ModuleAllowLaunch;
 	}
 
-	zeLog(ZE_LOG_INFO, "Launch is %s.", AllowedToLaunch ? "allowed" : "not allowed");
+	zeLog("Launch is %s.", AllowedToLaunch ? "allowed" : "not allowed");
 
 	GetWindow()->GetForm()->btnLaunch->setEnabled(AllowedToLaunch);
 }
@@ -190,10 +277,10 @@ bool ZELNLauncher::GetAllowedToLaunch()
 
 void ZELNLauncher::Launch()
 {
-	if (AllowedToLaunch)
+	if (!AllowedToLaunch)
 		return;
 
-	zeLog(ZE_LOG_INFO, "Launching Zinek Engine...");
+	zeLog("Launching %s...", ApplicationName.ToCString());
 
 	Status = ZELN_LS_LAUNCHING;
 	Window->update();
@@ -203,18 +290,19 @@ void ZELNLauncher::Launch()
 	GetModuleFileName(NULL, LauncherPath, MAX_PATH);
 	ZEPathInfo PathInfo(LauncherPath);
 	ZEString ParentDirectory = PathInfo.GetParentDirectory();
-	Information.BinaryPath = ZEFormat::Format("{0}/{1}", ParentDirectory, "ZE.exe");
+	Information.BinaryPath = ZEFormat::Format("{0}/{1}", ParentDirectory, ApplicationExecutable);
 
 	// Command Line Arguments
 	Information.Parameters.Clear();
-	Information.Parameters.Add(ZEFormat::Format("--ze-launcher {0:X}", (ZEUInt64)GetCurrentProcessId()));
+	Information.Parameters.Add(ZEFormat::Format("{0}", Information.BinaryPath));
+	Information.Parameters.Add(ZEFormat::Format("--ze-launcher {0:X:08}", (ZEUInt64)GetCurrentProcessId()));
 	for (ZESize I = 0; I < Modules.GetCount(); I++)
 	{
 		ZELNModule* Module = Modules[I];
 		if (!Module->OnPreLaunch())
 		{
 			Status = ZELN_LS_ERROR;
-			zeError("Launch has been stopped by module \"%s\".", Module->GetName());
+			zeError("Launch has been stopped by module \"%s\".", Module->GetDescription()->GetName());
 			return;
 		}
 
@@ -224,24 +312,31 @@ void ZELNLauncher::Launch()
 	char ParameterString[32767];
 	ParameterString[0] = '\0';
 	for (ZESize I = 0; I < Information.Parameters.GetCount(); I++)
+	{
+		strncat(ParameterString, " ", 32767);
 		strncat(ParameterString, Information.Parameters[I], 32767);
+	}
 
 
 	// Launch
-	PROCESS_INFORMATION ProcessInformation;
+	PROCESS_INFORMATION ProcessInformation = {0};
+	STARTUPINFO StartUpInfo = {0};
+	StartUpInfo.cb = sizeof(StartUpInfo);
+
 	bool Result = CreateProcess(
-		Information.BinaryPath, ParameterString, 
-		NULL, NULL, NULL, 0, NULL, NULL, NULL, &ProcessInformation);
+		Information.BinaryPath, ParameterString,
+		NULL, NULL, FALSE, 0, 
+		NULL, NULL, &StartUpInfo, &ProcessInformation);
 
 	if (!Result)
 	{
 		Status = ZELN_LS_ERROR;
-		zeError("Engine instance is failed to launch. Error : %d", GetLastError());
+		zeError("Engine instance is failed to launch. Error : %d.", GetLastError());
 		return;
 	}
 
 	Information.ProcessId = ProcessInformation.dwProcessId;
-	zeLog(ZE_LOG_INFO, "Engine instance is launched. PID: %d", Information.ProcessId);
+	zeLog("Engine instance is launched. PID: %d.", Information.ProcessId);
 
 	Status = ZELN_LS_RUNNING;
 	Window->update();
@@ -260,8 +355,8 @@ ZELNLauncher::ZELNLauncher()
 {
 	Instance = NULL;
 	ApplicationName = "Zinek Engine";
-	ApplicationMajorVersion = ZEVersion::GetZinekVersion().Major;
-	ApplicationMinorVersion = ZEVersion::GetZinekVersion().Minor;
+	ApplicationVersionMajor = ZEVersion::GetZinekVersion().Major;
+	ApplicationVersionMinor = ZEVersion::GetZinekVersion().Minor;
 }
 
 ZELNLauncher* ZELNLauncher::GetInstance()

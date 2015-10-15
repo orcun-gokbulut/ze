@@ -40,24 +40,46 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEString.h"
 
+#define ZELN_MODULE \
+	public: \
+	static ZELNModuleDescription* Description(); \
+	virtual ZELNModuleDescription* GetDescription() const;\
+	private: \
+
+#define ZELN_MODULE_DECRIPTION(ModuleClass, Name) \
+	ZELNModuleDescription* ModuleClass::Description() {class ModuleClass##Description : public ZELNModuleDescription {virtual const char* GetName() {return Name;} virtual ZELNModule* CreateInstance() {return new ModuleClass();}}; static ModuleClass##Description Description; return &Description;} \
+	ZELNModuleDescription* ModuleClass::GetDescription() const {return ModuleClass::Description();}
+
+class ZELNModule;
 class QWidget;
+class ZEMLReaderNode;
+
+class ZELNModuleDescription
+{
+	public:
+		virtual const char*				GetName() = 0;
+		virtual ZELNModule*				CreateInstance() = 0;
+};
 
 class ZELNModule : public ZEInitializable
 {
 	friend class ZELNLauncher;
 	protected:
-		virtual bool				OnPreLaunch();
-		virtual void				OnPostLaunch();
-		virtual void				OnTerminate();
-		virtual void				OnUpdate();
+		virtual bool					OnPreLaunch();
+		virtual void					OnPostLaunch();
+		virtual void					OnTerminate();
+		virtual void					OnUpdate();
 
 	public:
-		virtual const char*			GetName() = 0;
-		virtual QWidget*			GetWidget();
-		virtual bool				GetAllowLaunch();
-		virtual ZEArray<ZEString>	GetLaunchParameters();
-		
-		static ZESize				GetModuleCount();
-		static ZELNModule**			GetModules();
-		static ZELNModule*			GetModule(const char* Name);
+		virtual ZELNModuleDescription*	GetDescription() const = 0;
+		virtual QWidget*				GetWidget();
+		virtual bool					GetAllowLaunch();
+		virtual ZEArray<ZEString>		GetLaunchParameters();
+
+		virtual void					LoadConfiguration(const ZEMLReaderNode& ConfigurationNode);
+
+		static ZESize					GetModuleCount();
+		static ZELNModuleDescription**	GetModules();
+		static ZELNModuleDescription*	GetModule(const char* Name);
 };
+

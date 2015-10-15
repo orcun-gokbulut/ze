@@ -42,7 +42,7 @@ class Ui_ZELNUpdateWidget;
 class ZELNUpdateWidget: public QWidget
 {
 	Q_OBJECT
-	friend class ZELNUpdate;
+	friend class ZELNUpdateModule;
 	private:
 		Ui_ZELNUpdateWidget*		Form;
 

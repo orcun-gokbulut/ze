@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNUpdate.cpp
+ Zinek Engine - ZELNLogModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNUpdate.h"
-#include "ZELNUpdateWidget.h"
+#include "ZELNLogModule.h"
 
-bool ZELNUpdate::InitializeSelf()
+#include "ZELNLogWidget.h"
+#include "ui_ZELNLogWidget.h"
+#include "ZELog.h"
+
+ZELN_MODULE_DECRIPTION(ZELNLogModule, "Log");
+
+void ZELNLogModule::LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+{
+	ZELNLogModule* Widget = (ZELNLogModule*)ExtraParameters;
+
+	const char* TypeString = ZELog::GetLogTypeString(Type);
+
+	Widget->GetForm()->txtConsole->appendHtml(
+		QString("[%1] <b>%2</b>: %3")
+		.arg(Module)
+		.arg(TypeString)
+		.arg(LogText));
+}
+
+
+bool ZELNLogModule::InitializeSelf()
 {
 	if (!ZEInitializable::InitializeSelf())
 		return false;
 
-	Widget = new ZELNUpdateWidget();
-
+	Widget = new ZELNLogWidget();
+	
+	ZELog::GetInstance()->SetCallback(&LogCallback, this);
+	
 	return true;
 }
 
-const char* ZELNUpdate::GetName()
-{
-	return "Update";
-}
-
-QWidget* ZELNUpdate::GetWidget()
+QWidget* ZELNLogModule::GetWidget()
 {
 	return Widget;
 }
 
-Ui_ZELNUpdateWidget* ZELNUpdate::GetForm()
+Ui_ZELNLogWidget* ZELNLogModule::GetForm()
 {
 	return Widget->Form;
 }

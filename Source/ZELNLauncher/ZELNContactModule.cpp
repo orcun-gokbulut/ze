@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNContact.h
+ Zinek Engine - ZELNContactModule.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,23 +33,27 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZELNContactModule.h"
+#include "ZELNContactWidget.h"
 
-#include "ZELNModule.h"
+ZELN_MODULE_DECRIPTION(ZELNContactModule, "Contact");
 
-class ZELNContactWidget;
-class Ui_ZELNContactWidget;
-
-class ZELNContact  : public ZELNModule
+bool ZELNContactModule::InitializeSelf()
 {
-	friend class ZELNLauncher;
-	private:
-		ZELNContactWidget*			Widget;
+	if (!ZEInitializable::InitializeSelf())
+		return false;
 
-		virtual bool				InitializeSelf();
+	Widget = new ZELNContactWidget();
 
-	public:
-		virtual const char*			GetName();
-		virtual QWidget*			GetWidget();
-		Ui_ZELNContactWidget*		GetForm();
-};
+	return true;
+}
+
+QWidget* ZELNContactModule::GetWidget()
+{
+	return Widget;
+}
+
+Ui_ZELNContactWidget* ZELNContactModule::GetForm()
+{
+	return Widget->Form;
+}

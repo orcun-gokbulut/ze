@@ -42,7 +42,7 @@ class Ui_ZELNLogWidget;
 class ZELNLogWidget: public QWidget
 {
 	Q_OBJECT
-	friend class ZELNLog;
+	friend class ZELNLogModule;
 	private:
 		Ui_ZELNLogWidget*		Form;
 

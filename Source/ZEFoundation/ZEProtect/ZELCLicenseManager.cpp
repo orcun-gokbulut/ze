@@ -37,6 +37,7 @@
 
 #include "ZEML\ZEMLReader.h"
 #include "ZEML\ZEMLWriter.h"
+#include "ZEML\ZEMLFormatXMLV1.h"
 
 const ZEArray<ZELCLicense>& ZELCLicenseManager::GetLicenses()
 {
@@ -168,6 +169,7 @@ ZEArray<ZELCLicense> ZELCLicenseManager::LoadLicenseFile(const ZEString& FileNam
 bool ZELCLicenseManager::SaveLicenseFile(const ZEString& FileName, const ZEArray<ZELCLicense>& Licenses)
 {
 	ZEMLWriter Writer;
+	Writer.SetFormat(new ZEMLFormatXMLV1());
 	if (!Writer.Open(FileName))
 		return false;
 
@@ -194,12 +196,12 @@ void ZELCLicenseManager::LoadLicenses()
 {
 	Licenses.Clear();
 
-	ZEArray<ZELCLicense> SystemWideLicenses = LoadLicenseFile("#S:/License.zeLicense");
+	ZEArray<ZELCLicense> SystemWideLicenses = LoadLicenseFile("#S:/License.ZELicense");
 	for(ZESize I = 0; I < SystemWideLicenses.GetCount(); I++)
 		SystemWideLicenses[I].SetSystemWide(true);
 	Licenses.Combine(SystemWideLicenses);
 
-	ZEArray<ZELCLicense> InstanceLicenses = LoadLicenseFile("#US:/License.zeLicense");
+	ZEArray<ZELCLicense> InstanceLicenses = LoadLicenseFile("#US:/License.ZELicense");
 	for(ZESize I = 0; I < InstanceLicenses.GetCount(); I++)
 		InstanceLicenses[I].SetSystemWide(false);
 	Licenses.Combine(InstanceLicenses);
@@ -218,8 +220,8 @@ void ZELCLicenseManager::SaveLicenses()
 			InstanceLicenses.Add(Licenses[I]);
 	}
 
-	SaveLicenseFile("#S:/License.zeLicense", SystemWideLicenses);
-	SaveLicenseFile("#US:/License.zeLicense", InstanceLicenses);
+	SaveLicenseFile("#S:/License.ZELicense", SystemWideLicenses);
+	SaveLicenseFile("#US:/License.ZELicense", InstanceLicenses);
 }
 
 ZEInt ZELCLicenseManager::CompareLicenseOrder(const ZELCLicense& A, const ZELCLicense& B)
