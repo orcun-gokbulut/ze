@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?ZEML VersionMajor="1" VersionMinor="0"?>
+<Node Name="LauncherConfiguration">
+ <Property Name="VersionMajor" Type="UInt8">1</Property>
+ <Property Name="VersionMinor" Type="UInt8">0</Property>
+ <Node Name="Application">
+  <Property Name="Name" Type="String">ZETITrackViewer</Property>
+  <Property Name="VersionMajor" Type="UInt8">1</Property>
+  <Property Name="VersionMinor" Type="UInt8">0</Property>
+  <Property Name="Executable" Type="String">CustATrainIG.exe</Property>
+  <Property Name="CommandLineArguments" Type="String"></Property>
+ </Node>
+ <Node Name="Modules">
+  <Node Name="Module">
+   <Property Name="Name" Type="String">Log</Property>
+   <Property Name="Enabled" Type="Bool">true</Property>
+   <Node Name="Configuration"/>
+  </Node>
+  <Node Name="Module">
+   <Property Name="Name" Type="String">License</Property>
+   <Property Name="Enabled" Type="Bool">true</Property>
+   <Node Name="Configuration"/>
+  </Node>
+  <Node Name="Module">
+   <Property Name="Name" Type="String">Update</Property>
+   <Property Name="Enabled" Type="Bool">false</Property>
+   <Node Name="Configuration"/>
+  </Node>
+  <Node Name="Module">
+   <Property Name="Name" Type="String">Contact</Property>
+   <Property Name="Enabled" Type="Bool">true</Property>
+   <Node Name="Configuration"/>
+  </Node>
+ </Node>
+</Node>

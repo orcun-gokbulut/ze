@@ -67,8 +67,6 @@ ze_symbol_server_init()
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
 
 
-
-
 ## Compiler & Linker Options
 #########################################################################################
 if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
@@ -94,7 +92,7 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/Source
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)
-
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(ze_qt)
 
 add_definitions(-DFREEIMAGE_LIB)

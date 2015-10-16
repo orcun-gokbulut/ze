@@ -41,7 +41,7 @@
 #include "ZEProgressDialogTreeWidget.h"
 #include "ZEFile\ZEFile.h"
 
-void LogCallback(const char* Module, ZELogType Type, const char* LogText)
+void LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	ZEProgressDialog::GetInstance()->Message(Type, LogText);
 }
@@ -78,7 +78,7 @@ ZEProgressDialog::ZEProgressDialog()
 	OldErrorCallback = ZEError::GetInstance()->GetCallBack();
 	OldLogCallBack = ZELog::GetInstance()->GetCallback();
 
-	ZELog::GetInstance()->SetCallback(LogCallback);
+	ZELog::GetInstance()->SetCallback(LogCallback, NULL);
 	ZEError::GetInstance()->SetCallback(NULL);
 }
 
@@ -102,7 +102,7 @@ ZEProgressDialog::~ZEProgressDialog()
 		}
 	}
 
-	ZELog::GetInstance()->SetCallback(OldLogCallBack);
+	ZELog::GetInstance()->SetCallback(OldLogCallBack, NULL);
 	ZEError::GetInstance()->SetCallback(OldErrorCallback);
 	Instance = NULL;
 

@@ -40,6 +40,7 @@
 #include "ZEDS\ZEFormat.h"
 #include "ZEFileInfo.h"
 #include "ZEPathTokenizer.h"
+#include "ZEDirectoryInfo.h"
 
 void ZEPathManager::SetEnginePath(const ZEString& Path)
 {
@@ -53,12 +54,29 @@ void ZEPathManager::SetResourcePath(const ZEString& Path)
 
 void ZEPathManager::SetStoragePath(const ZEString& Path)
 {
-	StoragePath = ZEPathInfo(Path).Normalize();
+	ZEDirectoryInfo DirectoryInfo = ZEDirectoryInfo(Path);
+	if (!DirectoryInfo.IsExists())
+		DirectoryInfo.Create();
+
+	StoragePath = DirectoryInfo.Normalize();
 }
 
 void ZEPathManager::SetUserStoragePath(const ZEString& Path)
 {
-	UserStoragePath = ZEPathInfo(Path).Normalize();
+	ZEDirectoryInfo DirectoryInfo = ZEDirectoryInfo(Path);
+	if (!DirectoryInfo.IsExists())
+		DirectoryInfo.Create();
+
+	UserStoragePath = DirectoryInfo.Normalize();
+}
+
+void ZEPathManager::SetSystemStoragePath(const ZEString& Path)
+{
+	ZEDirectoryInfo DirectoryInfo = ZEDirectoryInfo(Path);
+	if (!DirectoryInfo.IsExists())
+		DirectoryInfo.Create();
+
+	SystemStoragePath = DirectoryInfo.Normalize();
 }
 
 void ZEPathManager::SetAccessControl(bool Enable)
@@ -91,33 +109,39 @@ const ZEString& ZEPathManager::GetUserStoragePath()
 	return UserStoragePath;
 }
 
+const ZEString& ZEPathManager::GetSystemStoragePath()
+{
+	return SystemStoragePath;
+}
+
 #ifdef WIN32
 #include <windows.h>
 #include <shlobj.h>
 
-void ZEPathManager::Initialize()
+bool ZEPathManager::InitializeSelf()
 {
-	char ZinekPath[MAX_PATH];
-	DWORD a = GetCurrentDirectory(MAX_PATH, ZinekPath);
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
+	char Buffer[MAX_PATH];
+	GetModuleFileName(NULL, Buffer, MAX_PATH);
 
 	char AppData[MAX_PATH];
-	SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, AppData);
+	SHGetFolderPath(NULL, CSIDL_LOCAL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, AppData);
 
 	char SystemAppData[MAX_PATH];
-	SHGetFolderPath(NULL, CSIDL_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, SystemAppData);
+	SHGetFolderPath(NULL, CSIDL_COMMON_APPDATA | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, SystemAppData);
 
-	SetEnginePath(ZinekPath);
-	SetResourcePath(ZEFormat::Format("{0}/Resources", ZinekPath));
-	SetStoragePath(ZEFormat::Format("{0}/Storage", ZinekPath));
+	SetEnginePath(ZEFileInfo(Buffer).GetParentDirectory());
+	SetResourcePath(ZEFormat::Format("{0}/Resources", GetEnginePath()));
+	SetStoragePath(ZEFormat::Format("{0}/Storage", GetEnginePath()));
+	SetSystemStoragePath(ZEFormat::Format("{0}/ZinekEngine", SystemAppData));
 	SetUserStoragePath(ZEFormat::Format("{0}/ZinekEngine", AppData));
+
+	return true;
 }
 
 #endif
-
-void ZEPathManager::Deinitialize()
-{
-
-}
 
 ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 {
@@ -146,6 +170,14 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 		Tokenizer.Combine();
 		RealPath.Path = Tokenizer.GetOutput();
 	}
+	else if (stricmp(FirstToken, "#Engine:") == 0 || 	stricmp(FirstToken, "#E:") == 0)
+	{
+		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_ENGINE;
+		Tokenizer.SetToken(0, EnginePath.ToCString());
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
+	}
 	else if (stricmp(FirstToken, "#Resource:") == 0 || 	stricmp(FirstToken, "#R:") == 0)
 	{
 		RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
@@ -170,6 +202,14 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 		Tokenizer.Combine();
 		RealPath.Path = Tokenizer.GetOutput();
 	}
+	else if (stricmp(FirstToken, "#SystemStorage:") == 0 || strcmp(FirstToken, "#SS:") == 0)
+	{
+		RealPath.Access = ZE_PA_READ_WRITE;
+		RealPath.Root = ZE_PR_SYSTEM_STORAGE;
+		Tokenizer.SetToken(0, UserStoragePath.ToCString());
+		Tokenizer.Combine();
+		RealPath.Path = Tokenizer.GetOutput();
+	}
 	else
 	{
 		Tokenizer.Combine();
@@ -177,6 +217,12 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 		{
 			RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
 			RealPath.Root = ZE_PR_RESOURCE;
+			RealPath.Path = Tokenizer.GetOutput();
+		}
+		else if (strnicmp(Tokenizer.GetOutput(), EnginePath.ToCString(), EnginePath.GetLength()) == 0)
+		{
+			RealPath.Access = AccessControl ? ZE_PA_READ : ZE_PA_READ_WRITE;
+			RealPath.Root = ZE_PR_ENGINE;
 			RealPath.Path = Tokenizer.GetOutput();
 		}
 		else if (strnicmp(Tokenizer.GetOutput(), StoragePath.ToCString(), StoragePath.GetLength()) == 0)
@@ -189,6 +235,12 @@ ZERealPath ZEPathManager::TranslateToRealPath(const char* Path)
 		{
 			RealPath.Access = ZE_PA_READ_WRITE;
 			RealPath.Root = ZE_PR_USER_STORAGE;
+			RealPath.Path = Tokenizer.GetOutput();
+		}
+		else if (strnicmp(Tokenizer.GetOutput(), SystemStoragePath.ToCString(), SystemStoragePath.GetLength()) == 0)
+		{
+			RealPath.Access = ZE_PA_READ_WRITE;
+			RealPath.Root = ZE_PR_SYSTEM_STORAGE;
 			RealPath.Path = Tokenizer.GetOutput();
 		}
 		else

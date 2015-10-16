@@ -324,6 +324,8 @@ int JulianDate::GetSecond() const
 void JulianDate::Calculate()
 {
 	int Sign;
+	JDateFraction = 0;
+	JDate = 0;
 
 	if (Month < 3) 
 	{

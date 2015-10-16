@@ -35,11 +35,27 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(md5.cpp   			Sources)
-ze_add_source(md5.h     			Sources)
-ze_add_source(ZEProtect.cpp        	Sources)
-ze_add_source(ZEProtect.h          	Sources)
+ze_add_source(ZELCLicense.cpp						Sources)
+ze_add_source(ZELCLicense.h							Sources)
+ze_add_source(ZELCLicenseManager.cpp				Sources)
+ze_add_source(ZELCLicenseManager.h					Sources)
+ze_add_source(ZELCEncryption.cpp					Sources)
+ze_add_source(ZELCEncryption.h						Sources)
+ze_add_source(ZELCChecker.cpp						Sources)
+ze_add_source(ZELCChecker.h							Sources)
+ze_add_source(ZELCSerialKeyGenerator.cpp			Sources)
+ze_add_source(ZELCSerialKeyGenerator.h				Sources)
+ze_add_source(ZELCActivationData.cpp				Sources)
+ze_add_source(ZELCActivationData.h					Sources)
+ze_add_source(ZELCActivationCodeGenerator.cpp		Sources)
+ze_add_source(ZELCActivationCodeGenerator.h			Sources)
+ze_add_source(ZELCKeys.cpp							Sources)
+ze_add_source(ZELCKeys.h							Sources)
+ze_add_source(ZELCKeysData.cpp						Sources)
+ze_add_source(ZELCUtils.cpp							Sources)
+ze_add_source(ZELCUtils.h							Sources)
 
 ze_add_library(TARGET ZEProtect
 	SOURCES ${Sources} 
-	HEADERS ${Headers})
+	HEADERS ${Headers}
+	LIBS libCryptopp)
