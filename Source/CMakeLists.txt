@@ -41,5 +41,6 @@ ze_add_module(ZEEngine)
 ze_add_module(ZEModules			OPTIONAL DEFAULT)
 ze_add_module(ZEditor			OPTIONAL)
 ze_add_module(ZETools			OPTIONAL DEFAULT)
+ze_add_module(ZELNLauncher		OPTIONAL DEFAULT)
 
 ze_add_cmake_project(ZESource)

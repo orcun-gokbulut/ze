@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZELCUtils.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,14 +30,22 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
+#include "ZEDS\ZEString.h"
 
-ze_add_source(ZEProtectActivator.cpp		Sources)
+#define ZELC_ACTIVATION_CODE_SIZE	128
+#define ZELC_SERIAL_KEY_SIZE		20
 
-ze_add_executable(TARGET ZEProtectActivator
-	CONSOLE
-	SOURCES ${Sources}
-	LIBS ZEFoundation ZEProtect)
+class ZELCUtils
+{
+	public:
+		static bool				CheckSerialCode(const void* SerialKeyBinary);
+		static ZEString			ConvertSerialKey(const void* SerialKeyBinary);
+		static bool				ConvertSerialKey(void* SerialKeyBinary, const ZEString& SerialKeyText);
+
+		static ZEString			ConvertActivationCode(const void* ActivationCodeBinary);
+		static bool				ConvertActivationCode(void* ActivationCodeBinary, const ZEString& ActivationCodeText);
+};

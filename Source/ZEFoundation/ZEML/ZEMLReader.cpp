@@ -55,7 +55,7 @@ ZEMLReaderSubNode::ZEMLReaderSubNode()
 	Size = 0;
 }
 
-const ZEMLFormatElement* ZEMLReaderNode::FindElement(const char* Name, ZEMLElementType Type, ZESize Index)
+const ZEMLFormatElement* ZEMLReaderNode::FindElement(const char* Name, ZEMLElementType Type, ZESize Index) const
 {
 	ZEUInt32 Hash = ZEHashGenerator::Hash(Name);
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
@@ -83,22 +83,22 @@ bool ZEMLReaderNode::Load()
 	return true;
 };
 
-const ZEString& ZEMLReaderNode::GetName()
+const ZEString& ZEMLReaderNode::GetName() const
 {
 	return Node.Name;
 }
 
-const ZEArray<ZEMLFormatElement>& ZEMLReaderNode::GetElements()
+const ZEArray<ZEMLFormatElement>& ZEMLReaderNode::GetElements() const
 {
 	return Elements;
 }
 
-ZESize ZEMLReaderNode::GetNodeCount()
+ZESize ZEMLReaderNode::GetNodeCount() const
 {
 	return NodeCount;
 }
 
-ZESize ZEMLReaderNode::GetNodeCount(const char* Name)
+ZESize ZEMLReaderNode::GetNodeCount(const char* Name) const
 {
 	ZESize Count = 0;
 	ZEUInt32 NameHash = ZEHashGenerator::Hash(Name);
@@ -110,7 +110,7 @@ ZESize ZEMLReaderNode::GetNodeCount(const char* Name)
 	return Count;
 }
 
-ZEMLReaderNode ZEMLReaderNode::GetNode(const char* Name, ZESize Index)
+ZEMLReaderNode ZEMLReaderNode::GetNode(const char* Name, ZESize Index) const
 {
 	ZEUInt32 NameHash = ZEHashGenerator::Hash(Name);
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
@@ -126,7 +126,7 @@ ZEMLReaderNode ZEMLReaderNode::GetNode(const char* Name, ZESize Index)
 	return ZEMLReaderNode();
 }
 
-ZEMLReaderNode ZEMLReaderNode::GetNode(ZESize Index)
+ZEMLReaderNode ZEMLReaderNode::GetNode(ZESize Index) const
 {
 	if (Index >= Elements.GetCount())
 		return ZEMLReaderNode();
@@ -148,22 +148,22 @@ ZEMLReaderNode ZEMLReaderNode::GetNode(ZESize Index)
 	return Node;
 }
 
-bool ZEMLReaderNode::IsValid()
+bool ZEMLReaderNode::IsValid() const
 {
 	return File != NULL && Format != NULL;
 }
 
-bool ZEMLReaderNode::IsPropertyExists(const char* Name)
+bool ZEMLReaderNode::IsPropertyExists(const char* Name) const
 {
 	return FindElement(Name, ZEML_ET_PROPERTY) != NULL;
 }
 
-bool ZEMLReaderNode::IsSubNodeExists(const char* Name)
+bool ZEMLReaderNode::IsSubNodeExists(const char* Name) const
 {
 	return FindElement(Name, ZEML_ET_NODE) != NULL;
 }
 
-ZEValue ZEMLReaderNode::ReadValue(const char* Name)
+ZEValue ZEMLReaderNode::ReadValue(const char* Name) const
 {
 	const ZEMLFormatElement* Property = FindElement(Name, ZEML_ET_PROPERTY);
 
@@ -173,7 +173,7 @@ ZEValue ZEMLReaderNode::ReadValue(const char* Name)
 	return Property->Value;
 }
 
-ZEInt8 ZEMLReaderNode::ReadInt8(const char* Name, ZEInt8 Default)
+ZEInt8 ZEMLReaderNode::ReadInt8(const char* Name, ZEInt8 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 	
@@ -183,7 +183,7 @@ ZEInt8 ZEMLReaderNode::ReadInt8(const char* Name, ZEInt8 Default)
 	return Value.GetInt8();
 }
 
-ZEInt16 ZEMLReaderNode::ReadInt16(const char* Name, ZEInt16 Default)
+ZEInt16 ZEMLReaderNode::ReadInt16(const char* Name, ZEInt16 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -193,7 +193,7 @@ ZEInt16 ZEMLReaderNode::ReadInt16(const char* Name, ZEInt16 Default)
 	return Value.GetInt16();
 }
 
-ZEInt32 ZEMLReaderNode::ReadInt32(const char* Name, ZEInt32 Default)
+ZEInt32 ZEMLReaderNode::ReadInt32(const char* Name, ZEInt32 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -203,7 +203,7 @@ ZEInt32 ZEMLReaderNode::ReadInt32(const char* Name, ZEInt32 Default)
 	return Value.GetInt32();
 }
 
-ZEInt64 ZEMLReaderNode::ReadInt64(const char* Name, ZEInt64 Default)
+ZEInt64 ZEMLReaderNode::ReadInt64(const char* Name, ZEInt64 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -213,7 +213,7 @@ ZEInt64 ZEMLReaderNode::ReadInt64(const char* Name, ZEInt64 Default)
 	return Value.GetInt64();
 }
 
-ZEUInt8 ZEMLReaderNode::ReadUInt8(const char* Name, ZEUInt8 Default)
+ZEUInt8 ZEMLReaderNode::ReadUInt8(const char* Name, ZEUInt8 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -223,7 +223,7 @@ ZEUInt8 ZEMLReaderNode::ReadUInt8(const char* Name, ZEUInt8 Default)
 	return Value.GetUInt8();
 }
 
-ZEUInt16 ZEMLReaderNode::ReadUInt16(const char* Name, ZEUInt16 Default)
+ZEUInt16 ZEMLReaderNode::ReadUInt16(const char* Name, ZEUInt16 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -233,7 +233,7 @@ ZEUInt16 ZEMLReaderNode::ReadUInt16(const char* Name, ZEUInt16 Default)
 	return Value.GetUInt16();
 }
 
-ZEUInt32 ZEMLReaderNode::ReadUInt32(const char* Name, ZEUInt32 Default)
+ZEUInt32 ZEMLReaderNode::ReadUInt32(const char* Name, ZEUInt32 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -243,7 +243,7 @@ ZEUInt32 ZEMLReaderNode::ReadUInt32(const char* Name, ZEUInt32 Default)
 	return Value.GetUInt32();
 }
 
-ZEUInt64 ZEMLReaderNode::ReadUInt64(const char* Name, ZEUInt64 Default)
+ZEUInt64 ZEMLReaderNode::ReadUInt64(const char* Name, ZEUInt64 Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -253,7 +253,7 @@ ZEUInt64 ZEMLReaderNode::ReadUInt64(const char* Name, ZEUInt64 Default)
 	return Value.GetUInt64();
 }
 
-float ZEMLReaderNode::ReadFloat(const char* Name, float Default)
+float ZEMLReaderNode::ReadFloat(const char* Name, float Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -263,7 +263,7 @@ float ZEMLReaderNode::ReadFloat(const char* Name, float Default)
 	return Value.GetFloat();
 }
 
-double ZEMLReaderNode::ReadDouble(const char* Name, double Default)
+double ZEMLReaderNode::ReadDouble(const char* Name, double Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -273,7 +273,7 @@ double ZEMLReaderNode::ReadDouble(const char* Name, double Default)
 	return Value.GetDouble();
 }
 
-bool ZEMLReaderNode::ReadBoolean(const char* Name, bool Default)
+bool ZEMLReaderNode::ReadBoolean(const char* Name, bool Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -283,7 +283,7 @@ bool ZEMLReaderNode::ReadBoolean(const char* Name, bool Default)
 	return Value.GetBoolean();	
 }
 
-ZEVector2 ZEMLReaderNode::ReadVector2(const char* Name, const ZEVector2& Default)
+ZEVector2 ZEMLReaderNode::ReadVector2(const char* Name, const ZEVector2& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -293,7 +293,7 @@ ZEVector2 ZEMLReaderNode::ReadVector2(const char* Name, const ZEVector2& Default
 	return Value.GetVector2();
 }
 
-ZEVector3 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector3& Default)
+ZEVector3 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector3& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -303,7 +303,7 @@ ZEVector3 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector3& Default
 	return Value.GetVector3();
 }
 
-ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default)
+ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -313,7 +313,7 @@ ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default
 	return Value.GetVector4();
 }
 
-ZEQuaternion ZEMLReaderNode::ReadQuaternion(const char* Name, const ZEQuaternion& Default)
+ZEQuaternion ZEMLReaderNode::ReadQuaternion(const char* Name, const ZEQuaternion& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -323,7 +323,7 @@ ZEQuaternion ZEMLReaderNode::ReadQuaternion(const char* Name, const ZEQuaternion
 	return Value.GetQuaternion();
 }
 
-ZEMatrix3x3 ZEMLReaderNode::ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default)
+ZEMatrix3x3 ZEMLReaderNode::ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -333,7 +333,7 @@ ZEMatrix3x3 ZEMLReaderNode::ReadMatrix3x3(const char* Name, const ZEMatrix3x3& D
 	return Value.GetMatrix3x3();
 }
 
-ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default)
+ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -343,7 +343,7 @@ ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& D
 	return Value.GetMatrix4x4();
 }
 
-ZEString ZEMLReaderNode::ReadString(const char* Name, const ZEString& Default)
+ZEString ZEMLReaderNode::ReadString(const char* Name, const ZEString& Default) const
 {
 	ZEValue Value = ReadValue(Name);
 
@@ -353,7 +353,7 @@ ZEString ZEMLReaderNode::ReadString(const char* Name, const ZEString& Default)
 	return Value.GetString();
 }
 
-ZESize ZEMLReaderNode::ReadDataSize(const char* Name)
+ZESize ZEMLReaderNode::ReadDataSize(const char* Name) const
 {
 	const ZEMLFormatElement* Property = FindElement(Name, ZEML_ET_DATA);
 	if (Property == NULL)
@@ -365,7 +365,7 @@ ZESize ZEMLReaderNode::ReadDataSize(const char* Name)
 	return Property->Size;
 }
 
-bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset)
+bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset) const
 {
 	const ZEMLFormatElement* Property = FindElement(Name, ZEML_ET_DATA);
 	if (Property == NULL)
@@ -380,7 +380,7 @@ bool ZEMLReaderNode::ReadData(const char* Name, void* Buffer, ZESize BufferSize,
 	return Format->ReadData(File, *Property, Buffer, Offset, BufferSize);
 }
 
-bool ZEMLReaderNode::ReadDataItems(const char* Name, void* Buffer, ZESize ElementSize, ZESize ElementCount, ZESize Offset)
+bool ZEMLReaderNode::ReadDataItems(const char* Name, void* Buffer, ZESize ElementSize, ZESize ElementCount, ZESize Offset) const
 {
 	return ReadData(Name, Buffer, ElementCount * ElementSize, Offset);
 }
@@ -416,8 +416,12 @@ bool ZEMLReader::Load()
 	RootNode.File = File;
 	RootNode.Format = Format;
 
-	Format->ReadHeader(File);
-	Format->ReadElement(File, RootNode.Node);
+	if (!Format->ReadHeader(File))
+		return false;
+
+	if (!Format->ReadElement(File, RootNode.Node))
+		return false;
+
 	if (RootNode.Node.ElementType != ZEML_ET_NODE)
 		return false;
 
@@ -442,7 +446,6 @@ bool ZEMLReader::Open(const char* FileName)
 	
 	if (!OwnedFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		zeError("Cannot read ZEML file. Cannot open file. File Name: \"%s\"", FileName);
 		return false;
 	}
 

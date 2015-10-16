@@ -101,7 +101,7 @@ static void SetColor(int Type)
 	#endif
 }
 
-static void DefaultCallback(const char* Module, ZELogType Type, const char* LogText)
+static void DefaultCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
 	time_t Temp = time(NULL);                          
 	tm TimeStamp;
@@ -265,9 +265,10 @@ const char* ZELog::GetLogFileName()
 	return LogFileName;
 }
 
-void ZELog::SetCallback(ZELogCallback Callback)
+void ZELog::SetCallback(ZELogCallback Callback, void* ExtraParameters)
 {
 	LogCallback = Callback;
+	LogCallbackExtraParameters = ExtraParameters;
 }
 
 ZELogCallback ZELog::GetCallback()
@@ -309,7 +310,7 @@ void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 	}
 
 	if (LogCallback != NULL)
-		LogCallback(Module, Type, Buffer);
+		LogCallback(Module, Type, Buffer, LogCallbackExtraParameters);
 	
 	Lock.Unlock();
 }
@@ -347,7 +348,7 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 	}
 
 	if (LogCallback != NULL)
-		LogCallback(Module, ZE_LOG_INFO, Buffer);
+		LogCallback(Module, ZE_LOG_INFO, Buffer,LogCallbackExtraParameters);
 	
 	Lock.Unlock();
 }
@@ -357,6 +358,7 @@ ZELog::ZELog()
 	LogFile = NULL;
 	LogFileEnabled = false;
 	LogCallback = DefaultCallback;
+	LogCallbackExtraParameters = NULL;
 	MinimumLogLevel = ZE_LOG_INFO;
 }
 

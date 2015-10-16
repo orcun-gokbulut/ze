@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProtectActivator.cpp
+ Zinek Engine - ZELNLogWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,37 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDS/ZEFormat.h"
-#include <stdio.h>
-#include "ZEProtect/ZEProtect.h"
-#include "ZEFile/ZEPathManager.h"
+#pragma once
 
-int main(int argc, char** argv)
+#include <QtWidgets/QWidget>
+
+class Ui_ZELNLogWidget;
+
+class ZELNLogWidget: public QWidget
 {
-	char Key[256], Name[256], SystemWide[256];
+	Q_OBJECT
+	friend class ZELNLogModule;
+	private:
+		Ui_ZELNLogWidget*		Form;
 
-	printf(" ZinekIG Hardware Activation\n");
-	printf("----------------------------------------------------------------------------------- \n");
-	printf("  Application name : "); scanf("%s", Name);
-	printf("  Key : "); scanf("%s", Key);
-	printf("  System Wide [yes/no] : "); scanf("%s", SystemWide);
-
-	ZEProtect Protect;
-	Protect.SetKey(Key);
-	Protect.SetApplicationName(Name);
-	Protect.SetActivationFileName("Activations.ZEProtect");
-	Protect.SetSystemWide(stricmp(SystemWide, "yes") == 0 ? true : false);
-
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-
-	if (Protect.Activate())
-	{
-		printf("Hardware activated. Activation Code : %s\n", Protect.GenerateActivationCode().ToCString());
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		printf("Error !!! Can not activate hardware.\n");
-		return EXIT_FAILURE;
-	}
-}
+	public:
+									ZELNLogWidget();
+									~ZELNLogWidget();
+};

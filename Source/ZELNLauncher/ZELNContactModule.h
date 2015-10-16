@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEProtect.h
+ Zinek Engine - ZELNContactModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,39 +32,24 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
+
 #pragma once
-#ifndef __ZE_PROTECT_H__
-#define __ZE_PROTECT_H__
 
-#include "ZEDS/ZEString.h"
+#include "ZELNModule.h"
 
-class ZEProtect
+class ZELNContactWidget;
+class Ui_ZELNContactWidget;
+
+class ZELNContactModule  : public ZELNModule
 {
+	ZELN_MODULE
+	friend class ZELNLauncher;
 	private:
-		ZEString			ApplicationName;
-		ZEString			Key;
-		ZEString			ActivationFileName;
-		bool				SystemWide;
+		ZELNContactWidget*			Widget;
+
+		virtual bool				InitializeSelf();
 
 	public:
-		void				SetApplicationName(const char* Name);
-		const ZEString&		GetApplicationName();
-
-		void				SetKey(const char* Key);
-		const ZEString&		GetKey();
-
-		void				SetActivationFileName(const char* FileName);
-		const ZEString&		GetActivationFileName();
-
-		void				SetSystemWide(bool SystemWide);
-		bool				GetSystemWide();
-
-		ZEString			GenerateActivationCode();
-
-		bool				Activate();
-		bool				Verify();
-
-							ZEProtect();
+		virtual QWidget*			GetWidget();
+		Ui_ZELNContactWidget*		GetForm();
 };
-
-#endif
