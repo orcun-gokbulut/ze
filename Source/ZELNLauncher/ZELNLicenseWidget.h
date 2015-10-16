@@ -47,6 +47,7 @@ class ZELNLicenseWidget : public QWidget
 	Q_OBJECT
 	friend class ZELNLicenseModule;
 	private:
+		ZELNLicenseModule*			Module;
 		ZELCLicense					License;
 		Ui_ZELNLicenseWidget*		Form;
 

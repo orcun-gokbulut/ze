@@ -416,8 +416,12 @@ bool ZEMLReader::Load()
 	RootNode.File = File;
 	RootNode.Format = Format;
 
-	Format->ReadHeader(File);
-	Format->ReadElement(File, RootNode.Node);
+	if (!Format->ReadHeader(File))
+		return false;
+
+	if (!Format->ReadElement(File, RootNode.Node))
+		return false;
+
 	if (RootNode.Node.ElementType != ZEML_ET_NODE)
 		return false;
 

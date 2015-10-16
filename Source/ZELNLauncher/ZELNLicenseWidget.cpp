@@ -138,17 +138,8 @@ void ZELNLicenseWidget::btnLicenseManager_clicked()
 	ZELNLicenseManagerDialog LicenseManagerWindow;
 	LicenseManagerWindow.setModal(true);
 	LicenseManagerWindow.exec();
-
-	ZELCLicenseManager LicenseManager;
-	LicenseManager.LoadLicenses();
-
-	const ZELCLicense* UpdatedLicense = LicenseManager.RequestLicense(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
-	if (UpdatedLicense == NULL)
-		License = ZELCLicense();
-	else
-		License = *UpdatedLicense;
-
-	UpdateWidget();
+	
+	Module->LoadLicense();
 }
 
 void ZELNLicenseWidget::SetLicense(const ZELCLicense& License)

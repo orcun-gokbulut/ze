@@ -56,4 +56,6 @@ class ZELNLicenseModule : public ZELNModule
 		virtual bool				GetAllowLaunch();
 		Ui_ZELNLicenseWidget*		GetForm();
 		const ZELNLicenseModule&	GetCurrentLicense();
+
+		void						LoadLicense();
 };

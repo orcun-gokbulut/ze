@@ -40,8 +40,9 @@
 #include "ZETypes.h"
 #include "ZEFileCommon.h"
 #include "ZEDS/ZEString.h"
+#include "ZEInitializable.h"
 
-class ZEPathManager
+class ZEPathManager : public ZEInitializable
 {
 	private:
 		bool					AccessControl;
@@ -50,11 +51,15 @@ class ZEPathManager
 		ZEString				ResourcePath;
 		ZEString				StoragePath;
 		ZEString				UserStoragePath;
+		ZEString				SystemStoragePath;
 
 		void					SetEnginePath(const ZEString& Path);
 		void					SetResourcePath(const ZEString& Path);
 		void					SetStoragePath(const ZEString& Path);
 		void					SetUserStoragePath(const ZEString& Path);
+		void					SetSystemStoragePath(const ZEString& Path);
+
+		virtual bool			InitializeSelf();
 
 	public:
 		void					SetAccessControl(bool Enable);
@@ -64,9 +69,7 @@ class ZEPathManager
 		const ZEString&			GetResourcePath();
 		const ZEString&			GetStoragePath();
 		const ZEString&			GetUserStoragePath();
-
-		void					Initialize();
-		void					Deinitialize();
+		const ZEString&			GetSystemStoragePath();
 
 		ZERealPath				TranslateToRealPath(const char* Path);
 

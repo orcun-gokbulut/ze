@@ -41,13 +41,8 @@
 
 ZELN_MODULE_DECRIPTION(ZELNLicenseModule, "License");
 
-bool ZELNLicenseModule::InitializeSelf()
+void ZELNLicenseModule::LoadLicense()
 {
-	if (!ZEInitializable::InitializeSelf())
-		return false;
-
-	Widget = new ZELNLicenseWidget();
-
 	ZELCLicenseManager LicenseManager;
 	LicenseManager.LoadLicenses();
 	const ZELCLicense* ResultLicense = LicenseManager.RequestLicense(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
@@ -59,9 +54,9 @@ bool ZELNLicenseModule::InitializeSelf()
 	else
 	{
 		ZEArray<ZELCLicense> Licenses = LicenseManager.GetLicenses(ZELNLauncher::GetInstance()->GetApplicationName(), ZELNLauncher::GetInstance()->GetApplicationVersionMajor());
-		if (Licenses.GetCount() != 0)
+		Licenses.Sort2<ZELCLicenseManager::CompareLicenseOrder>();
+		if (Licenses.GetCount() != 0 && Licenses[0].GetEnabled())
 		{
-			Licenses.Sort2<ZELCLicenseManager::CompareLicenseOrder>();
 			License = Licenses[0];
 		}
 		else
@@ -73,6 +68,16 @@ bool ZELNLicenseModule::InitializeSelf()
 	}
 
 	Widget->SetLicense(License);
+}
+
+bool ZELNLicenseModule::InitializeSelf()
+{
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+	
+	Widget = new ZELNLicenseWidget();
+	Widget->Module = this;
+	LoadLicense();
 
 	return true;
 }
