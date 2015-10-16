@@ -50,6 +50,8 @@
 
 	static ZEString WMIQuery(wchar_t* Query, wchar_t* Column)
 	{
+		CoInitialize(NULL);
+
 		ZEString Output;
 		HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
 
