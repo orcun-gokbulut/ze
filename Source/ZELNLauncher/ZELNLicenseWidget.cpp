@@ -131,6 +131,8 @@ void ZELNLicenseWidget::btnActivate_clicked()
 
 	UpdateWidget();
 	SaveLicense();
+
+	Module->LoadLicense();
 }
 
 void ZELNLicenseWidget::btnLicenseManager_clicked()

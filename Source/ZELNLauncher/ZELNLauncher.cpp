@@ -239,7 +239,7 @@ ZEUInt ZELNLauncher::GetApplicationVersionMinor()
 
 void ZELNLauncher::Update()
 {
-	zeLog("Getting launch ready.");
+	bool OldAllowedToLaunch = AllowedToLaunch;
 
 	AllowedToLaunch = true;
 	for (ZESize I = 0; I < Modules.GetCount(); I++)
@@ -255,7 +255,8 @@ void ZELNLauncher::Update()
 		AllowedToLaunch &= ModuleAllowLaunch;
 	}
 
-	zeLog("Launch is %s.", AllowedToLaunch ? "allowed" : "not allowed");
+	if (OldAllowedToLaunch != AllowedToLaunch)
+		zeLog("Launch is %s.", AllowedToLaunch ? "allowed" : "not allowed");
 
 	GetWindow()->GetForm()->btnLaunch->setEnabled(AllowedToLaunch);
 }
