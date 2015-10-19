@@ -38,7 +38,7 @@
 #include "ZELCUtils.h"
 #include "ZELCLicense.h"
 #include "ZERandom.h"
-#include "ZEThread\ZEThread.h"
+#include "ZEError.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 
@@ -46,67 +46,154 @@
 	#include <windows.h>
 	#include <Shlobj.h>
 	#include <WbemCli.h>
+	#include <comutil.h>
 
 	#pragma comment(lib, "wbemuuid.lib")
+	#pragma comment(lib, "comsuppw.lib")
 
-	static ZEString WMIQuery(wchar_t* Query, wchar_t* Column)
+	static bool WMIQuery(ZEString& Output, wchar_t* Query, wchar_t* Column)
 	{
-		ZEString Output;
+		// WARNING !!! WARNING !!! WARNING !!! WARNING !!!
+		// DO NOT CHANGE SINGLE LINE OF THIS CODE !!!
+		// HEAVY PROBLEMS DUE COM INITIALIZATION AND QT
 
-		IWbemLocator* pLocator = NULL;
-		HRESULT hRes = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pLocator));
-		if(FAILED(hRes))
-			return Output;
+		HRESULT hres;
+		hres =  CoInitializeEx(0, COINIT_MULTITHREADED); 
+		hres =  CoInitializeSecurity(
+			NULL, 
+			-1,                          // COM authentication
+			NULL,                        // Authentication services
+			NULL,                        // Reserved
+			RPC_C_AUTHN_LEVEL_DEFAULT,   // Default authentication 
+			RPC_C_IMP_LEVEL_IMPERSONATE, // Default Impersonation  
+			NULL,                        // Authentication info
+			EOAC_NONE,                   // Additional capabilities 
+			NULL                         // Reserved
+			);
 
-		IWbemServices* pService = NULL;
-		hRes = pLocator->ConnectServer(L"root\\CIMV2", NULL, NULL, NULL, WBEM_FLAG_CONNECT_USE_MAX_WAIT, NULL, NULL, &pService);
-		if(FAILED(hRes))
-			return Output;
-
-		IEnumWbemClassObject* pEnumerator = NULL;
-		hRes = pService->ExecQuery(L"WQL", Query, WBEM_FLAG_FORWARD_ONLY, NULL, &pEnumerator);
-		if(FAILED(hRes))
+		// Step 3: ---------------------------------------------------
+		// Obtain the initial locator to WMI -------------------------
+		IWbemLocator *pLoc = NULL;
+		hres = CoCreateInstance(
+			CLSID_WbemLocator,             
+			0, 
+			CLSCTX_INPROC_SERVER, 
+			IID_IWbemLocator, (LPVOID *) &pLoc);
+		if (FAILED(hres))
 		{
-			pLocator->Release();
-			pService->Release();
-			return Output;
+			//CoUninitialize();
+			return false;
 		}
 
-		IWbemClassObject* clsObj = NULL;
-		int numElems;
-		hRes = pEnumerator->Next(WBEM_INFINITE, 1, &clsObj, (ULONG*)&numElems);
-		while(hRes != WBEM_S_FALSE)
+		// Step 4: -----------------------------------------------------
+		// Connect to WMI through the IWbemLocator::ConnectServer method
+		IWbemServices *pSvc = NULL;
+		hres = pLoc->ConnectServer(
+			_bstr_t(L"ROOT\\CIMV2"), // Object path of WMI namespace
+			NULL,                    // User name. NULL = current user
+			NULL,                    // User password. NULL = current
+			0,                       // Locale. NULL indicates current
+			NULL,                    // Security flags.
+			0,                       // Authority (for example, Kerberos)
+			0,                       // Context object 
+			&pSvc                    // pointer to IWbemServices proxy
+			);
+		if (FAILED(hres))
 		{
-			if(FAILED(hRes))
-				break;
+			pLoc->Release();     
+			//CoUninitialize();
+			return false;                // Program has failed.
+		}
 
-			VARIANT vRet;
-			VariantInit(&vRet);
-			if(SUCCEEDED(clsObj->Get(Column, 0, &vRet, NULL, NULL)) && vRet.vt == VT_BSTR)
+		// Step 5: --------------------------------------------------
+		// Set security levels on the proxy -------------------------
+		hres = CoSetProxyBlanket(
+			pSvc,                        // Indicates the proxy to set
+			RPC_C_AUTHN_WINNT,           // RPC_C_AUTHN_xxx
+			RPC_C_AUTHZ_NONE,            // RPC_C_AUTHZ_xxx
+			NULL,                        // Server principal name 
+			RPC_C_AUTHN_LEVEL_CALL,      // RPC_C_AUTHN_LEVEL_xxx 
+			RPC_C_IMP_LEVEL_IMPERSONATE, // RPC_C_IMP_LEVEL_xxx
+			NULL,                        // client identity
+			EOAC_NONE                    // proxy capabilities 
+			);
+
+		if (FAILED(hres))
+		{
+			pSvc->Release();
+			pLoc->Release();     
+			//CoUninitialize();
+			return false;               // Program has failed.
+		}
+
+
+		// Step 6: --------------------------------------------------
+		// Use the IWbemServices pointer to make requests of WMI ----
+
+		// For example, get the name of the operating system
+		IEnumWbemClassObject* pEnumerator = NULL;
+		hres = pSvc->ExecQuery(
+			bstr_t("WQL"), 
+			bstr_t(Query),
+			WBEM_FLAG_FORWARD_ONLY | WBEM_FLAG_RETURN_IMMEDIATELY, 
+			NULL,
+			&pEnumerator);
+
+		if (FAILED(hres))
+		{
+			pSvc->Release();
+			pLoc->Release();
+			//CoUninitialize();
+			return false;               // Program has failed.
+		}
+
+
+		// Step 7: -------------------------------------------------
+		// Get the data from the query in step 6 -------------------
+
+		IWbemClassObject *pclsObj = NULL;
+		ULONG uReturn = 0;
+		while (pEnumerator)
+		{
+			HRESULT hr = pEnumerator->Next(WBEM_INFINITE, 1, &pclsObj, &uReturn);
+			if(0 == uReturn)
 			{
-				Output = vRet.bstrVal;
-				VariantClear(&vRet);
-				break;
+				return false;
 			}
 
-			clsObj->Release();
+			VARIANT vtProp;
+			hr = pclsObj->Get(Column, 0, &vtProp, 0, 0);
+			Output = vtProp.bstrVal;	
+			VariantClear(&vtProp);
+			pclsObj->Release();
+			break;
 		}
 
+		pSvc->Release();
+		pLoc->Release();
 		pEnumerator->Release();
-		pService->Release();
-		pLocator->Release();
-
-		return Output;
+		//CoUninitialize();
+		return true;
 	}
 
-	static ZEUInt32 GetHardDiskSerialNumber()
+	static bool GetHardDiskSerialNumber(ZEUInt32& Output)
 	{
-		return WMIQuery(L"SELECT SerialNumber FROM Win32_PhysicalMedia", L"SerialNumber").Hash();
+		ZEString OutputText;
+		if (!WMIQuery(OutputText, L"SELECT SerialNumber FROM Win32_PhysicalMedia", L"SerialNumber"))
+			return false;
+
+		Output = OutputText.Hash();
+		return true;
 	}
 
-	static ZEUInt32 GetBiosSerialNumber()
+	static bool GetBiosSerialNumber(ZEUInt32& Output)
 	{
-		return WMIQuery(L"SELECT SerialNumber FROM Win32_Bios", L"SerialNumber").Hash();
+		ZEString OutputText;
+		if (!WMIQuery(OutputText, L"SELECT SerialNumber FROM Win32_Bios", L"SerialNumber"))
+			return false;
+
+		Output = OutputText.Hash();
+		return true;
 	}
 
 	static ZEGUID GetMachineSecurityGUID()
@@ -146,15 +233,14 @@
 
 #endif
 
-void GenerateHardwareIds(ZEThread* Thread, void* Extra)
+void GenerateHardwareIds(ZELCActivationData& ActivationData)
 {
-	HRESULT hRes = CoInitialize(NULL);
-	hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
-
-	ZELCActivationData& ActivationData = *(ZELCActivationData*)Extra;
 	ActivationData.MachineSecurityGUID = GetMachineSecurityGUID();
-	ActivationData.HardDiskSerialNumber = GetHardDiskSerialNumber();
-	ActivationData.BiosSerialNumber = GetBiosSerialNumber();
+	if (!GetHardDiskSerialNumber(ActivationData.HardDiskSerialNumber))
+		zeError("Cannot generate activation data.");
+
+	if (!GetBiosSerialNumber(ActivationData.BiosSerialNumber))
+		zeError("Cannot generate activation data.");
 }
 
 bool ZELCActivationData::Generate(ZELCActivationData& ActivationData, const ZELCLicense& License)
@@ -163,12 +249,7 @@ bool ZELCActivationData::Generate(ZELCActivationData& ActivationData, const ZELC
 
 	ActivationData.Random = 0; //ZERandom::GetUInt64();
 	ZELCUtils::ConvertSerialKey(ActivationData.SerialKey, License.GetSerialKey());
-	
-	ZEThread COMThread;
-	COMThread.SetFunction(ZEThreadFunction::Create<GenerateHardwareIds>());
-	COMThread.SetParameter(&ActivationData);
-	COMThread.Run(NULL);
-	COMThread.Wait();
+	GenerateHardwareIds(ActivationData);
 
 	return true;
 }
