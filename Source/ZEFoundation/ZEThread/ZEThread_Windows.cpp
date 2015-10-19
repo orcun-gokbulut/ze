@@ -56,6 +56,7 @@ void ZEThread::Run(void* Parameter)
     if (IsAlive())
 		return;
 
+	Status = ZE_TS_STARING;
 	Handle = CreateThread(NULL, 0, ThreadFunction, this, 0, NULL);
 	if (Handle == NULL)
 		zeCriticalError("Can not create thread.");
@@ -90,9 +91,8 @@ void ZEThread::Wait()
 		return;
 
 	DWORD Result = WaitForSingleObject(Handle, INFINITE);
-	if (Result != WAIT_OBJECT_0 || Result != WAIT_ABANDONED_0 )
+	if (Result != WAIT_OBJECT_0 && Result != WAIT_ABANDONED_0)
 		zeCriticalError("Can not wait thread.");
-
 }
 
 bool ZEThread::Wait(ZEUInt Milliseconds)
