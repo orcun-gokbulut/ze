@@ -68,6 +68,8 @@ void ZELNLicenseModule::LoadLicense()
 	}
 
 	Widget->SetLicense(License);
+
+	ZELNLauncher::GetInstance()->Update();
 }
 
 bool ZELNLicenseModule::InitializeSelf()
