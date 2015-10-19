@@ -38,6 +38,7 @@
 #include "ZELCUtils.h"
 #include "ZELCLicense.h"
 #include "ZERandom.h"
+#include "ZEThread\ZEThread.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 
@@ -53,18 +54,20 @@
 		CoInitialize(NULL);
 
 		ZEString Output;
-		HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
 
 		IWbemLocator* pLocator = NULL;
-		if(FAILED(hRes = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pLocator))))
+		HRESULT hRes = CoCreateInstance(CLSID_WbemLocator, NULL, CLSCTX_ALL, IID_PPV_ARGS(&pLocator));
+		if(FAILED(hRes))
 			return Output;
 
 		IWbemServices* pService = NULL;
-		if(FAILED(hRes = pLocator->ConnectServer(L"root\\CIMV2", NULL, NULL, NULL, WBEM_FLAG_CONNECT_USE_MAX_WAIT, NULL, NULL, &pService)))
+		hRes = pLocator->ConnectServer(L"root\\CIMV2", NULL, NULL, NULL, WBEM_FLAG_CONNECT_USE_MAX_WAIT, NULL, NULL, &pService);
+		if(FAILED(hRes))
 			return Output;
 
 		IEnumWbemClassObject* pEnumerator = NULL;
-		if(FAILED(hRes = pService->ExecQuery(L"WQL", Query, WBEM_FLAG_FORWARD_ONLY, NULL, &pEnumerator)))
+		hRes = pService->ExecQuery(L"WQL", Query, WBEM_FLAG_FORWARD_ONLY, NULL, &pEnumerator);
+		if(FAILED(hRes))
 		{
 			pLocator->Release();
 			pService->Release();
@@ -73,7 +76,8 @@
 
 		IWbemClassObject* clsObj = NULL;
 		int numElems;
-		while((hRes = pEnumerator->Next(WBEM_INFINITE, 1, &clsObj, (ULONG*)&numElems)) != WBEM_S_FALSE)
+		hRes = pEnumerator->Next(WBEM_INFINITE, 1, &clsObj, (ULONG*)&numElems);
+		while(hRes != WBEM_S_FALSE)
 		{
 			if(FAILED(hRes))
 				break;
@@ -144,15 +148,29 @@
 
 #endif
 
+void GenerateHardwareIds(ZEThread* Thread, void* Extra)
+{
+	HRESULT hRes = CoInitialize(NULL);
+	hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
+
+	ZELCActivationData& ActivationData = *(ZELCActivationData*)Extra;
+	ActivationData.MachineSecurityGUID = GetMachineSecurityGUID();
+	ActivationData.HardDiskSerialNumber = GetHardDiskSerialNumber();
+	ActivationData.BiosSerialNumber = GetBiosSerialNumber();
+}
+
 bool ZELCActivationData::Generate(ZELCActivationData& ActivationData, const ZELCLicense& License)
 {
 	memset(&ActivationData, 0, sizeof(ZELCActivationData));
 
 	ActivationData.Random = 0; //ZERandom::GetUInt64();
 	ZELCUtils::ConvertSerialKey(ActivationData.SerialKey, License.GetSerialKey());
-	ActivationData.MachineSecurityGUID = GetMachineSecurityGUID();
-	ActivationData.HardDiskSerialNumber = GetHardDiskSerialNumber();
-	ActivationData.BiosSerialNumber = GetBiosSerialNumber();
+	
+	ZEThread COMThread;
+	COMThread.SetFunction(ZEThreadFunction::Create<GenerateHardwareIds>());
+	COMThread.SetParameter(&ActivationData);
+	COMThread.Run(NULL);
+	COMThread.Wait();
 
 	return true;
 }
