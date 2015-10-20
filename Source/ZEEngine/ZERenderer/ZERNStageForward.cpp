@@ -34,12 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStageForward.h"
-#include "ZERNStageGBuffer.h"
-#include "ZEGraphics\ZEGRContext.h"
 #include "ZERNRenderer.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics\ZEGROutput.h"
+#include "ZEGraphics/ZEGROutput.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRContext.h"
 
 ZEInt ZERNStageForward::GetId()
 {
@@ -49,31 +48,36 @@ ZEInt ZERNStageForward::GetId()
 const ZEString& ZERNStageForward::GetName()
 {
 	static ZEString Name = "Forward";
+
 	return Name;
 }
 
 const ZEGRRenderState& ZERNStageForward::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
-	bool Initialized = false;
+	static bool Initialized = false;
 	if (!Initialized)
 	{
+		Initialized = true;
 		RenderState = ZERNStage::GetRenderState();
 
 		ZEGRDepthStencilState DepthStencilState;
 		DepthStencilState.SetDepthTestEnable(true);
 		DepthStencilState.SetDepthWriteEnable(true);
 		DepthStencilState.SetDepthFunction(ZEGR_CF_LESS);
+
 		RenderState.SetDepthStencilState(DepthStencilState);
 
 		ZEGRRasterizerState Rasterizer;
 		Rasterizer.SetFillMode(ZEGR_FM_SOLID);
 		Rasterizer.SetFrontIsCounterClockwise(false);
 		Rasterizer.SetCullDirection(ZEGR_CD_COUNTER_CLOCKWISE);
+
 		RenderState.SetRasterizerState(Rasterizer);
 
 		ZEGRBlendState BlendState;
 		BlendState.SetBlendEnable(false);
+
 		RenderState.SetBlendState(BlendState);
 
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
@@ -82,8 +86,24 @@ const ZEGRRenderState& ZERNStageForward::GetRenderState()
 	return RenderState;
 }
 
+bool ZERNStageForward::InitializeSelf()
+{
+	return true;
+}
+
 bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	ZEGROutput* Output = Renderer->GetOutput();
+	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	ZEGRDepthStencilBuffer* DepthStencilBuffer = Output->GetDepthStencilBuffer();
+	ZEGRViewport Viewport = Output->GetViewport();
+
+	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
+	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 1.0f, 0x00);
+
+	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
+	Context->SetViewports(1, &Viewport);
+
 	return true;
 }
 
@@ -91,6 +111,7 @@ void ZERNStageForward::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 }
+
 
 ZEInt ZERNStageForwardTransparent::GetId()
 {

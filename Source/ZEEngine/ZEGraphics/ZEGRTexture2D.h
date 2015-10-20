@@ -62,10 +62,11 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt						GetHeight();
 		ZEVector2					GetPixelSize();
 		
-		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
-		virtual void				Unlock(ZEUInt Level) = 0;
 
 		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) = 0;
+
+		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
+		virtual void				Unlock(ZEUInt Level) = 0;
 
 		static ZEGRTexture2D*		CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);
 };

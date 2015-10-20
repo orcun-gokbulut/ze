@@ -153,9 +153,9 @@ void ZECamera::OnTransformChanged()
 
 void ZECamera::SetViewport(const ZEGRViewport& Viewport)
 {
-	this->Viewport = Viewport;
 	if (this->Viewport.GetWidth() != Viewport.GetWidth() ||	this->Viewport.GetHeight() != Viewport.GetHeight())
 	{
+		this->Viewport = Viewport;
 		View.Width = Viewport.GetWidth();
 		View.Height = Viewport.GetHeight();
 		CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~ZE_CDF_VIEW_TRANSFORM);
@@ -285,8 +285,8 @@ const ZERNView& ZECamera::GetView()
 		View.V = GetWorldUp();
 		View.N = GetWorldFront();
 
-		View.Width = 2.0f;
-		View.Height = 2.0f;
+		//View.Width = 624; //2.0f;
+		//View.Height = 441;//2.0f;
 		View.VerticalFOV = GetVerticalFOV();
 		View.HorizontalFOV = GetHorizontalFOV();
 		View.AspectRatio = GetAspectRatio();

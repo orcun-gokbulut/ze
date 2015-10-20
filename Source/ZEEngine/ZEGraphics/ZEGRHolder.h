@@ -95,6 +95,7 @@ void ZEGRHolder<Type>::Assign(Type* const RawPointer)
 		return;
 
 	Resource = (ZEGRResource*)RawPointer;
+	Resource->AddRef();
 }
 
 template<typename Type>

@@ -45,6 +45,7 @@ class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 class ZEGRMonitorMode;
 class ZEWindow;
+class ZEGRViewport;
 
 class ZEGROutput : public ZEGRResource
 {
@@ -57,6 +58,8 @@ class ZEGROutput : public ZEGRResource
 
 		virtual void*						GetHandle() = 0;
 		virtual ZEGRRenderTarget*			GetRenderTarget() = 0;
+		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer() = 0;
+		virtual const ZEGRViewport&			GetViewport() = 0;
 
 		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode) = 0;
 		virtual ZEGRMonitorMode*			GetMonitorMode() = 0;

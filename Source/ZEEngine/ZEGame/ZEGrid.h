@@ -41,6 +41,7 @@
 
 class ZEGRConstantBuffer;
 class ZERNSimpleMaterial;
+class ZERNFixedMaterial;
 
 class ZEGrid : public ZEEntity
 {
@@ -48,7 +49,7 @@ class ZEGrid : public ZEEntity
 	private:
 		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
-		ZEGRHolder<ZERNSimpleMaterial>	Material;
+		ZEGRHolder<ZERNFixedMaterial>	Material;
 		ZERNCommand						RenderCommand;
 
 		struct

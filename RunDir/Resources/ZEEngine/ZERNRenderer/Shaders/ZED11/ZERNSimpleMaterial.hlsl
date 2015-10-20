@@ -92,8 +92,9 @@ struct ZERNSimpleMaterial_PSInput
 ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMaterial_VSInput Input)
 {
 	ZERNSimpleMaterial_VSOutput Output;
-
-	float4x4 WorldViewProjectionTransform = mul(ZERNView_ViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
+	
+	float4x4 WorldViewProjectionTransform = mul(ZERNView_ProjectionTransform, ZERNView_ViewTransform);
+	WorldViewProjectionTransform = mul(WorldViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
 	Output.Position = mul(WorldViewProjectionTransform, float4(Input.Position, 1.0f));
 	Output.Texcoord = Input.Textcoord;
 	

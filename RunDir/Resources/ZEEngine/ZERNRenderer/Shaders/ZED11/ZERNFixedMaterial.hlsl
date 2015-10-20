@@ -102,9 +102,9 @@ SamplerState	 	ZRNFixedMaterial_DetailNormalSampler	 : register(s3);
 struct ZERNFixedMaterial_GBufferStage_VSInput 
 {
 	float3 Position			: POSITION0;
-	float2 Texcoord         : TEXCOORD0;
 	float3 Normal			: NORMAL0;
 	float3 Tangent			: TANGENT0;
+	float2 Texcoord         : TEXCOORD0;
 	
 	#if defined(ZERN_FM_VERTEX_COLOR)
 	float4 Color			: TEXCOORD1;
@@ -122,14 +122,14 @@ struct ZERNFixedMaterial_GBufferStage_VSInput
 
 struct ZERNFixedMaterial_GBufferStage_VSOutput 
 {
-	float4 Position			: POSITION0;
+	float4 Position			: SV_Position;
 	float3 ViewPosition		: TEXCOORD0;
 	float3 Normal			: TEXCOORD1;
 	float3 Binormal			: TEXCOORD2;
 	float3 Tangent			: TEXCOORD3;
 	float2 Texcoord			: TEXCOORD4;
 	#if defined(ZERN_FM_VERTEX_COLOR)
-		float4 Color			: TEXCOORD5;
+		float4 Color		: TEXCOORD5;
 	#endif
 };
 
@@ -144,7 +144,7 @@ struct ZERNFixedMaterial_GBufferStage_PSInput
 	#if defined(ZERN_FM_VERTEX_COLOR)
 		float4 Color		: TEXCOORD5;
 	#endif
-	bool Side				: SV_IsFrontFace;
+	//bool Side				: SV_IsFrontFace;
 };
 
 
@@ -155,7 +155,9 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 {
 	ZERNFixedMaterial_GBufferStage_VSOutput Output;
 
-	float4x4 WorldViewProjTransform = mul(ZERNView_ViewProjectionTransform, ZERNFixedMaterial_WorldTransform);
+	//float4x4 WorldViewProjTransform = mul(ZERNView_ViewProjectionTransform, ZERNFixedMaterial_WorldTransform);
+	float4x4 WorldViewProjTransform = mul(ZERNView_ProjectionTransform, ZERNView_ViewTransform);
+	WorldViewProjTransform = mul(WorldViewProjTransform, ZERNFixedMaterial_WorldTransform);
 	float4x4 WorldViewTransform = mul(ZERNView_ViewTransform, ZERNFixedMaterial_WorldTransform);
 	
 	#if defined(ZERN_FM_SKIN_TRANSFORM)

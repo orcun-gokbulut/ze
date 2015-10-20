@@ -41,9 +41,9 @@ ID3D11RenderTargetView* ZED11RenderTarget::GetView()
 	return View;
 }
 
-ZED11RenderTarget::ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat PixelFormat, ID3D11RenderTargetView* RenderTargtetView) : ZEGRRenderTarget(Width, Height, PixelFormat)
+ZED11RenderTarget::ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat PixelFormat, ID3D11RenderTargetView* RenderTargetView) : ZEGRRenderTarget(Width, Height, PixelFormat)
 {
-	this->View = RenderTargtetView;
+	this->View = RenderTargetView;
 }
 
 ZED11RenderTarget::~ZED11RenderTarget()

@@ -39,10 +39,11 @@
 #include "ZEGraphics\ZEGRHolder.h"
 #include "ZEGraphics\ZEGRRenderState.h"
 
-class ZEGRTexture2D;
-
 class ZERNStageForward : public ZERNStage
 {
+	private:
+		virtual bool					InitializeSelf();
+
 	public:
 		virtual ZEInt					GetId();
 		virtual const ZEString&			GetName();

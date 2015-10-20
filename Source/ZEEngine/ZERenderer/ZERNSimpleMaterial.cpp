@@ -237,6 +237,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	Update();
 
 	Context->SetRenderState(RenderState);
+
 	if (Constants.TextureEnabled)
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureMap.GetTexture());
@@ -245,7 +246,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
-
+	
 	return true;
 }
 

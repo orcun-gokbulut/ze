@@ -56,6 +56,9 @@ void ZEDSHCompileOptionsWindow::btnAddDefinition_OnClick()
 
 void ZEDSHCompileOptionsWindow::btnRemoveDefinition_OnClick()
 {
+	if(Form->DefinitionList->currentItem() == NULL)
+		return;
+
 	Options.Definitions.Remove(Form->DefinitionList->currentRow());
 
 	delete Form->DefinitionList->currentItem();
@@ -72,6 +75,9 @@ void ZEDSHCompileOptionsWindow::btnAddIncludeDirection_OnClick()
 
 void ZEDSHCompileOptionsWindow::btnRemoveIncludeDirection_OnClick()
 {
+	if(Form->IncludeDirList->currentItem() == NULL)
+		return;
+
 	Options.IncludeDirectories.Remove(Form->IncludeDirList->currentRow());
 
 	delete Form->IncludeDirList->currentItem();

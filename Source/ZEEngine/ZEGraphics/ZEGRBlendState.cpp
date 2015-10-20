@@ -123,7 +123,7 @@ void ZEGRBlendRenderTarget::SetToDefault()
 	memset(&StateData, 0, sizeof(ZEBlendStateData));
 
 	StateData.Operation = ZEGR_BE_ADD;
-	StateData.Source = ZEGR_BO_SRC_COLOR;
+	StateData.Source = ZEGR_BO_ONE;
 	StateData.Destination = ZEGR_BO_ZERO;
 	StateData.AlphaOperation = ZEGR_BE_ADD;
 	StateData.SourceAlpha = ZEGR_BO_ONE;
@@ -214,6 +214,11 @@ const ZEGRBlendRenderTarget& ZEGRBlendState::GetRenderTarget(ZEUInt Index) const
 void ZEGRBlendState::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZEGRBlendStateData));
+
+	for (int I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; I++)
+	{	
+		StateData.RenderTargets[I].SetToDefault();
+	}
 }
 
 ZEGRBlendState::ZEGRBlendState()					

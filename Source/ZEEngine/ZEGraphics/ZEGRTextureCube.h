@@ -71,6 +71,7 @@ class ZEGRTextureCube : public ZEGRTexture
 		ZEUInt							GetLength();
 		float							GetPixelSize();
 
+		virtual bool					UpdateSubResource(void* Data, ZESize RowPitch, ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
 		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
 		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
 		

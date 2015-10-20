@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDepthStencilBuffer.cpp
+ Zinek Engine - ZED11StructuredBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,85 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRDepthStencilBuffer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
+#include "ZED11StructuredBuffer.h"
 
-ZESize ZEGRDepthStencilBuffer::GetPixelSize(ZEGRDepthStencilFormat Format)
+#include "ZEError.h"
+#include "ZED11Module.h"
+
+#include <d3d11.h>
+
+ID3D11Buffer* ZED11StructuredBuffer::GetBuffer() const
 {
-	switch(Format)
+	return Buffer;
+}
+
+ID3D11ShaderResourceView* ZED11StructuredBuffer::GetResourceView() const
+{
+	return ResourceView;
+}
+
+bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize)
+{	
+	ZESize BufferSize = ElementCount * ElementSize;
+	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
+	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
+	//zeDebugCheck(BufferSize > 65536, "Buffer too large");
+
+	D3D11_BUFFER_DESC Desc;
+	Desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
+	Desc.Usage = D3D11_USAGE_DYNAMIC;
+	Desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+	Desc.ByteWidth = (UINT)BufferSize;
+	Desc.StructureByteStride = ElementSize;
+
+	HRESULT Result = GetDevice()->CreateBuffer(&Desc, NULL, &Buffer);
+	if (FAILED(Result))
 	{
-		default:
-		case ZEGR_DSF_NONE:
-			return 0;
-
-		case ZEGR_DSF_DEPTH16:
-			return 2;
-
-		case ZEGR_DSF_DEPTH24_STENCIL8:
-		case ZEGR_DSF_DEPTHD32_FLOAT:
-			return 4;
+		zeError("Structured buffer creation failed. ErrorCode: %d.", Result);
+		return false;
 	}
-}
 
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType()
-{
-	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
-}
+	Result = GetDevice()->CreateShaderResourceView(Buffer, NULL, &ResourceView);
+	if (FAILED(Result))
+	{
+		zeError("Shader resource view creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
 
-ZEUInt ZEGRDepthStencilBuffer::GetWidth()
-{
-	return Width;
-}
-
-ZEUInt ZEGRDepthStencilBuffer::GetHeight()
-{
-	return Height;
-}
-
-ZEGRDepthStencilFormat ZEGRDepthStencilBuffer::GetFormat()
-{
-	return Format;
-}
-
-bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	this->Format = Format;
-	this->Height = Height;
-	this->Width = Width;
-	
-	SetSize(Width * Height * GetPixelSize(Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
+	SetSize(BufferSize);
 
 	return true;
 }
 
-void ZEGRDepthStencilBuffer::Deinitialize()
+void ZED11StructuredBuffer::Deinitialize()
 {
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-	
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-	SetSize(0);	
+	ZEGR_RELEASE(Buffer);
+	ZEGR_RELEASE(ResourceView);
+	ZED11StructuredBuffer::Deinitialize();
 }
 
-ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
+bool ZED11StructuredBuffer::Lock(void** Buffer)
 {
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-
-}
-
-ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
-{
-	Deinitialize();
-}
-
-ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	ZEGRDepthStencilBuffer* DepthStencilBuffer = ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
-	if (DepthStencilBuffer == NULL)
-		return NULL;
-
-	if (!DepthStencilBuffer->Initialize(Width, Height, Format, Readable))
+	D3D11_MAPPED_SUBRESOURCE Map;
+	HRESULT Result = GetMainContext()->Map(this->Buffer, 0, D3D11_MAP_WRITE_DISCARD, NULL, &Map);
+	if (FAILED(Result))
 	{
-		DepthStencilBuffer->Destroy();
-		return NULL;
+		zeError("Cannot lock structured buffer.");
+		return false;
 	}
 
-	return DepthStencilBuffer;
+	*Buffer = Map.pData;
+
+	return true;
+}
+void ZED11StructuredBuffer::Unlock()
+{
+	GetMainContext()->Unmap(Buffer, 0);
+}
+
+ZED11StructuredBuffer::ZED11StructuredBuffer()
+{
+	Buffer = NULL;
+	ResourceView = NULL;
 }

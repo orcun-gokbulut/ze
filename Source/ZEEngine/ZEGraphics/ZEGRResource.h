@@ -51,7 +51,8 @@ enum ZEGRResourceType
 	ZEGR_RT_SHADER					= 7,
 	ZEGR_RT_RENDER_STATE			= 8,
 	ZEGR_RT_OUTPUT					= 9,
-	ZEGR_RT_MATERIAL				= 10
+	ZEGR_RT_MATERIAL				= 10,
+	ZEGR_RT_STRUCTURED_BUFFER		= 11
 };
 
 class ZEGRResource

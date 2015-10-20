@@ -65,13 +65,14 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual								~ZED11Context();
 
 	public:
-		ID3D11DeviceContext*				GetContext();
+		ID3D11DeviceContext1*				GetContext();
 
 		virtual void						SetRenderState(ZEGRRenderStateData* State);
 		
 		virtual void						SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
 		virtual void						SetIndexBuffer(ZEGRIndexBuffer* Buffer);
 		
+		virtual void						SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRStructuredBuffer* Buffer);
 		virtual void						SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset = 0, ZEUInt Size = 0);
 		virtual void						SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
 		virtual void						SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);

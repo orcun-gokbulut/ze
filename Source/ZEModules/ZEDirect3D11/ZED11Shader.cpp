@@ -60,6 +60,7 @@ bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESi
 
 		case ZEGR_ST_PIXEL:
 			Result = GetDevice()->CreatePixelShader(ShaderBinary, Size, NULL, &PixelShader);
+			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_COMPUTE:

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDepthStencilBuffer.cpp
+ Zinek Engine - ZERNFiltering.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRDepthStencilBuffer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
+#ifndef __ZERN_FILTERING_H__
+#define __ZERN_FILTERING_H__
 
-ZESize ZEGRDepthStencilBuffer::GetPixelSize(ZEGRDepthStencilFormat Format)
+#include "ZERNScreenCover.hlsl"
+
+Texture2D Input : register(t0);
+
+SamplerState ZERNFiltering_SamplerLinear
 {
-	switch(Format)
-	{
-		default:
-		case ZEGR_DSF_NONE:
-			return 0;
+	Filter = MIN_MAG_MIP_LINEAR;
+    AddressU = CLAMP;
+    AddressV = CLAMP;
+};
 
-		case ZEGR_DSF_DEPTH16:
-			return 2;
-
-		case ZEGR_DSF_DEPTH24_STENCIL8:
-		case ZEGR_DSF_DEPTHD32_FLOAT:
-			return 4;
-	}
-}
-
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType()
+cbuffer ZERNFiltering_Constants : register(b0)
 {
-	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
-}
+	int		ZERNFiltering_KernelSize;
+	int3	ZERNFiltering_Reserved;
+	float4	ZERNFiltering_KernelValues[64];
+};
 
-ZEUInt ZEGRDepthStencilBuffer::GetWidth()
+float4 ZERNFiltering_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	return Width;
-}
-
-ZEUInt ZEGRDepthStencilBuffer::GetHeight()
-{
-	return Height;
-}
-
-ZEGRDepthStencilFormat ZEGRDepthStencilBuffer::GetFormat()
-{
-	return Format;
-}
-
-bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	this->Format = Format;
-	this->Height = Height;
-	this->Width = Width;
+	float4 ResultColor = {0.0f, 0.0f, 0.0f, 1.0f};
+	float2 ScreenSize;
+	Input.GetDimensions(ScreenSize.x, ScreenSize.y);
+	float2 TexelOffset = 1.0f / ScreenSize;
+	float2 TexCoord = PositionViewport.xy * TexelOffset;
 	
-	SetSize(Width * Height * GetPixelSize(Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-
-	return true;
-}
-
-void ZEGRDepthStencilBuffer::Deinitialize()
-{
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-	
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-	SetSize(0);	
-}
-
-ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
-{
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-
-}
-
-ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
-{
-	Deinitialize();
-}
-
-ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	ZEGRDepthStencilBuffer* DepthStencilBuffer = ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
-	if (DepthStencilBuffer == NULL)
-		return NULL;
-
-	if (!DepthStencilBuffer->Initialize(Width, Height, Format, Readable))
+	for(int I = 0; I < ZERNFiltering_KernelSize; ++I)
 	{
-		DepthStencilBuffer->Destroy();
-		return NULL;
+		float4 SampleColor = Input.Sample(ZERNFiltering_SamplerLinear, TexCoord + ZERNFiltering_KernelValues[I].xy * TexelOffset);
+		ResultColor += SampleColor * ZERNFiltering_KernelValues[I].w;
 	}
-
-	return DepthStencilBuffer;
+	
+	return ResultColor;
 }
+
+#endif

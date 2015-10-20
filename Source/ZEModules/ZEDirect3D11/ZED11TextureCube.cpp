@@ -85,10 +85,9 @@ ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZE
 bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {
 	zeDebugCheck(Texture != NULL, "Texture already created.");
-	zeCheckError(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknwon pixel format.");
+	zeCheckError(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknown pixel format.");
 
-	D3D11_USAGE Usage;
-	Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
+	D3D11_USAGE Usage = D3D11_USAGE_DEFAULT;
 
 	UINT CPUAccess = 0;
 	
@@ -110,7 +109,7 @@ bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat F
 	TextureDesc.CPUAccessFlags = CPUAccess;
 	TextureDesc.SampleDesc.Count = 1;
 	TextureDesc.SampleDesc.Quality = 0;
-	TextureDesc.Format = ZED11Texture2D::ConvertFormat(Format);
+	TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;	//ZED11Texture2D::ConvertFormat(Format);
 
 	HRESULT Result = GetDevice()->CreateTexture2D(&TextureDesc, NULL, &Texture);
 	if (FAILED(Result))
@@ -143,6 +142,17 @@ void ZED11TextureCube::Deinitialize()
 	ZEGRTextureCube::Deinitialize();
 }
 
+bool ZED11TextureCube::UpdateSubResource(void* Data, ZESize RowPitch, ZEGRTextureCubeFace Face, ZEUInt Level)
+{
+	zeCheckError(Data == NULL, false, "Data is NULL.");
+	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
+	zeCheckError(Face >= 6, false, "There is no such a cube texture face.");
+
+	GetMainContext()->UpdateSubresource(Texture, Face * GetLevelCount() + Level, NULL, Data, RowPitch, 0);
+
+	return true;
+}
+
 bool ZED11TextureCube::Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level)
 {
 	zeDebugCheck(Texture == NULL, "Texture is not initailized.");
@@ -151,7 +161,7 @@ bool ZED11TextureCube::Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Fa
 	zeCheckError(Face >= 6, false, "There is no such a cube texture face.");
 
 	D3D11_MAPPED_SUBRESOURCE MapData;
-	HRESULT Result = GetMainContext()->Map(Texture, Face * GetLevelCount() + Level, D3D11_MAP_WRITE, D3D11_MAP_FLAG_DO_NOT_WAIT, &MapData);
+	HRESULT Result = GetMainContext()->Map(Texture, Face * GetLevelCount() + Level, D3D11_MAP_WRITE_DISCARD, 0, &MapData);
 	*Buffer = MapData.pData;
 	*Pitch = MapData.RowPitch;
 
