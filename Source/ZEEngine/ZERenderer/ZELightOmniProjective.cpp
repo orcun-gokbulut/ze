@@ -38,10 +38,32 @@
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGame/ZEEntityProvider.h"
+#include "ZETexture\ZETextureCubeResource.h"
 
 ZELightType ZELightOmniProjective::GetLightType()
 {
 	return ZE_LT_OMNIPROJECTIVE;
+}
+
+void ZELightOmniProjective::SetProjectionTextureFile(const ZEString& FileName)
+{
+	ProjectionTextureFile = FileName;
+	//if (IsInitialized())
+	{
+		if (ProjectionTextureResource != NULL)
+			ProjectionTextureResource->Release();
+
+		ProjectionTextureResource = ZETextureCubeResource::LoadSharedResource(ProjectionTextureFile);
+		if (ProjectionTextureResource != NULL)
+			ProjectionTexture = ProjectionTextureResource->GetTextureCube();
+		else
+			zeError("Can not load projection cube texture.");
+	}
+}
+
+const ZEString& ZELightOmniProjective::GetProjectionTextureFile() const
+{
+	return ProjectionTextureFile;
 }
 
 const ZEGRTextureCube* ZELightOmniProjective::GetProjectionTexture()
@@ -88,6 +110,7 @@ const ZEMatrix4x4& ZELightOmniProjective::GetViewTransform(ZESize Index)
 ZELightOmniProjective::ZELightOmniProjective()
 {
 	ProjectionTexture = NULL;
+	ProjectionTextureResource = NULL;
 
 	FrontShadowMap = NULL;
 	BackShadowMap = NULL;

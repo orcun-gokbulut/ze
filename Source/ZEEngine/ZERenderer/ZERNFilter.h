@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDepthStencilBuffer.cpp
+ Zinek Engine - ZERNFilter.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRDepthStencilBuffer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
+#pragma once
 
-ZESize ZEGRDepthStencilBuffer::GetPixelSize(ZEGRDepthStencilFormat Format)
+#include "ZEInitializable.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEMath\ZEVector.h"
+
+class ZEGRTexture2D;
+class ZEGRContext;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRRenderTarget;
+
+class ZERNFilter : public ZEInitializable
 {
-	switch(Format)
-	{
-		default:
-		case ZEGR_DSF_NONE:
-			return 0;
+	private:
+		ZEFlags							DirtyFlags;
 
-		case ZEGR_DSF_DEPTH16:
-			return 2;
+		ZEGRTexture2D*					Input;
+		ZEGRRenderTarget*				Output;
 
-		case ZEGR_DSF_DEPTH24_STENCIL8:
-		case ZEGR_DSF_DEPTHD32_FLOAT:
-			return 4;
-	}
-}
+		ZEGRHolder<ZEGRShader>			VertexShader;
+		ZEGRHolder<ZEGRShader>			PixelShader;
+		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
 
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType()
-{
-	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
-}
+		struct FilterConstants
+		{
+			ZEUInt						KernelSize;
+			ZEUInt						Reserved[3];
+			ZEVector4					KernelValues[64];
+		}Constants;
 
-ZEUInt ZEGRDepthStencilBuffer::GetWidth()
-{
-	return Width;
-}
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-ZEUInt ZEGRDepthStencilBuffer::GetHeight()
-{
-	return Height;
-}
+	private:
 
-ZEGRDepthStencilFormat ZEGRDepthStencilBuffer::GetFormat()
-{
-	return Format;
-}
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
-bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	this->Format = Format;
-	this->Height = Height;
-	this->Width = Width;
-	
-	SetSize(Width * Height * GetPixelSize(Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
+		bool							UpdateShaders();
+		bool							UpdateConstantBuffer();
+		bool							UpdateRenderState();
+		bool							Update();
 
-	return true;
-}
+		void							ComputeLinearFilter(const ZEVector4* Values, ZEUInt KernelSize);
 
-void ZEGRDepthStencilBuffer::Deinitialize()
-{
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-	
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-	SetSize(0);	
-}
+	public:
 
-ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
-{
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
+		void							SetInput(ZEGRTexture2D* Input);
+		ZEGRTexture2D*					GetInput() const;
 
-}
+		void							SetOutput(ZEGRRenderTarget* Output);
+		ZEGRRenderTarget*				GetOutput() const;
 
-ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
-{
-	Deinitialize();
-}
+		ZEUInt							GetKernelSize() const;
 
-ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	ZEGRDepthStencilBuffer* DepthStencilBuffer = ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
-	if (DepthStencilBuffer == NULL)
-		return NULL;
+		void							SetKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
+		const ZEVector4* 				GetKernelValues();				
 
-	if (!DepthStencilBuffer->Initialize(Width, Height, Format, Readable))
-	{
-		DepthStencilBuffer->Destroy();
-		return NULL;
-	}
+		void							Process(ZEGRContext* Context);
 
-	return DepthStencilBuffer;
-}
+										ZERNFilter();
+
+		static void						GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal = true);
+};

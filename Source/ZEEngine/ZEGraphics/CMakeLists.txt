@@ -71,6 +71,8 @@ ze_add_source(ZEGRVertexBuffer.cpp 			Sources)
 ze_add_source(ZEGRVertexBuffer.h 			Sources Headers)
 ze_add_source(ZEGRConstantBuffer.cpp		Sources)
 ze_add_source(ZEGRConstantBuffer.h			Sources Headers)
+ze_add_source(ZEGRStructuredBuffer.cpp		Sources)
+ze_add_source(ZEGRStructuredBuffer.h		Sources Headers)
 
 ze_add_Source(ZEGRFormat.cpp				Sources)
 ze_add_Source(ZEGRFormat.h					Sources Headers)

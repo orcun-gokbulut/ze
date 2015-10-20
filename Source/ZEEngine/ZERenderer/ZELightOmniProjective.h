@@ -40,6 +40,7 @@
 
 class ZEGRTextureCube;
 class ZEGRTexture2D;
+class ZETextureCubeResource;
 
 class ZELightOmniProjective : public ZELight
 {
@@ -52,6 +53,9 @@ class ZELightOmniProjective : public ZELight
 		ZEGRTexture2D*					BackShadowMap;
 		ZEMatrix4x4						ViewProjectionMatrix;
 
+		ZETextureCubeResource*			ProjectionTextureResource;
+		ZEString						ProjectionTextureFile;
+
 		virtual bool					DeinitializeSelf();
 
 										ZELightOmniProjective();
@@ -61,6 +65,9 @@ class ZELightOmniProjective : public ZELight
 		ZELightType						GetLightType();
 
 		const ZEGRTextureCube*			GetShadowMap();
+
+		void							SetProjectionTextureFile(const ZEString& Filename);
+		const ZEString&					GetProjectionTextureFile() const;
 
 		void							SetProjectionTexture(const ZEGRTextureCube* Texture);
 		const ZEGRTextureCube*			GetProjectionTexture();

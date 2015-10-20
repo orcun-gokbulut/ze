@@ -50,7 +50,6 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRHolder<ZEGRTexture2D>			GBuffer1;
 		ZEGRHolder<ZEGRTexture2D>			GBuffer2;
 		ZEGRHolder<ZEGRTexture2D>			GBuffer3;
-		ZEGRRenderState						RenderState;
 		ZEGRViewport						Viewport;
 		ZEGRRenderTarget*					RenderTargets[4];
 
@@ -61,6 +60,12 @@ class ZERNStageGBuffer : public ZERNStage
 		virtual const ZEString&				GetName();
 		
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+		ZEGRTexture2D*						GetDiffuseColorMap();
+		ZEGRTexture2D*						GetSpecularColorMap();
+		ZEGRTexture2D*						GetAccumulationMap();
+		ZEGRDepthStencilBuffer*				GetDepthStencilBuffer();
 
 		static const ZEGRRenderState&		GetRenderState();
 };

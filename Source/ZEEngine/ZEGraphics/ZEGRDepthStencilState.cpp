@@ -247,20 +247,20 @@ void ZEGRDepthStencilState::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZEDepthStencilStateData));
 
-	StateData.DepthTestEnable = false;
-	StateData.DepthWriteEnable = false;
-	StateData.DepthFunction = ZEGR_CF_NEVER;
+	StateData.DepthTestEnable = true;
+	StateData.DepthWriteEnable = true;
+	StateData.DepthFunction = ZEGR_CF_LESS;
 
 	StateData.StencilTestEnable = false;
 	StateData.StencilWriteMask = 0xFF;
 	StateData.StencilReadMask = 0xFF;
 
-	StateData.FrontStencilFunction = ZEGR_CF_NEVER;
+	StateData.FrontStencilFunction = ZEGR_CF_ALWAYS;
 	StateData.FrontStencilPassOperation = ZEGR_SO_KEEP;
 	StateData.FrontStencilFailOperation = ZEGR_SO_KEEP;
 	StateData.FrontStencilDepthFailOperation = ZEGR_SO_KEEP;
 
-	StateData.BackStencilFunction = ZEGR_CF_NEVER;
+	StateData.BackStencilFunction = ZEGR_CF_ALWAYS;
 	StateData.BackStencilPassOperation = ZEGR_SO_KEEP;
 	StateData.BackStencilFailOperation = ZEGR_SO_KEEP;
 	StateData.BackStencilDepthFailOperation = ZEGR_SO_KEEP;

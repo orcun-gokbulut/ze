@@ -358,8 +358,18 @@ ID3D11BlendState* ZED11StatePool::CreateBlendState(const ZEGRBlendState& BlendSt
 
 	if (!BlendState.GetBlendEnable())
 	{
+		BlendDesc.AlphaToCoverageEnable = FALSE;
 		BlendDesc.IndependentBlendEnable = FALSE;
 		BlendDesc.RenderTarget[0].BlendEnable = FALSE;
+		BlendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		BlendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_ONE;
+		BlendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_ZERO;
+
+		BlendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		BlendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		BlendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+
+		BlendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
 	}
 	else
 	{
@@ -367,7 +377,7 @@ ID3D11BlendState* ZED11StatePool::CreateBlendState(const ZEGRBlendState& BlendSt
 		BlendDesc.AlphaToCoverageEnable = BlendState.GetAlphaToCoverageEnable();
 
 		ZESize RenderTargetCount = (!BlendState.GetIndividualBlendEnable() ? 1 : ZEGR_MAX_RENDER_TARGET_SLOT);
-		for (ZESize I = 0; I < ZEGR_MAX_RENDER_TARGET_SLOT; ++I)
+		for (ZESize I = 0; I < RenderTargetCount; ++I)
 		{
 			const ZEGRBlendRenderTarget& Current = BlendState.GetRenderTarget((ZEUInt)I);
 

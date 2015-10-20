@@ -39,8 +39,9 @@
 
 float4 ZERNScreenCover_GetPosition(uint VertexIndex)
 {
-    float x = -1.0 + float((VertexIndex & 1) << 2);
-    float y = -1.0 + float((VertexIndex & 2) << 1);
+    float x = -1.0 + float((VertexIndex & 2) << 1);
+    float y = -1.0 + float((VertexIndex & 1) << 2);
+	
     return float4(x, y, 0.0f, 1.0f);
 }
 
@@ -48,7 +49,7 @@ float2 ZERNScreenCover_GetTexcoords(float4 Position)
 {
 	float2 Texcoords;
 	Texcoords.x = (Position.x + 1.0f) * 0.5f;
-    Texcoords.y = (Position.y + 1.0f) * 0.5f;
+    Texcoords.y = (1.0f - Position.y) * 0.5f;
 
 	return Texcoords;
 }
@@ -66,7 +67,7 @@ void ZERNScreenCover_VertexShader_Position(in uint VertexIndex : SV_VertexId, ou
 void ZERNScreenCover_VertexShader_PositionTexcoords(uint VertexIndex : SV_VertexId, out float4 Position : SV_Position, out float2 Texcoords : TEXCOORD0)
 {
 	Position = ZERNScreenCover_GetPosition(VertexIndex);
-	Texcoord = ZERNScreenCover_GetTexcoords(Position);
+	Texcoords = ZERNScreenCover_GetTexcoords(Position);		//Doesn't work because of the triangle coordinates!
 }
 
 #endif

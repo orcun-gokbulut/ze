@@ -47,7 +47,7 @@
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
-Texture2D<float> ZERNGBuffer_DepthBuffer	: register(t0);
+Texture2D<float4> ZERNGBuffer_DepthBuffer	: register(t0);
 Texture2D<float4> ZERNGBuffer_Buffer0		: register(t1);
 Texture2D<float4> ZERNGBuffer_Buffer1		: register(t2);
 Texture2D<float4> ZERNGBuffer_Buffer2		: register(t3);
@@ -57,7 +57,7 @@ struct ZERNGBuffer
 {
 	float4 Buffer0 : SV_Target0; // xyz:AccumulationBuffer
 	float4 Buffer1 : SV_Target1; // xyz:Normal, w: ShadingModel
-	float4 Buffer2 : SV_Target2; // xyz:DiffuseColor, z:Subsurface Scattering
+	float4 Buffer2 : SV_Target2; // xyz:DiffuseColor, w:Subsurface Scattering
 	float4 Buffer3 : SV_Target3; // xyz:SpecularColor, w:SpacularPower
 };
 
@@ -71,7 +71,7 @@ void ZERNGBuffer_SetDepth(inout ZERNGBuffer GBuffer, float Depth)
 	// FOR FUTURE POSSIBLE USAGES
 }
 
-float ZERNGBuffer_GetDepth(int2 ScreenPos)
+float ZERNGBuffer_GetDepth(uint2 ScreenPos)
 {
 	return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos.xy, 0)).x;
 }
@@ -103,7 +103,7 @@ void ZERNGBuffer_SetAccumulationColor(inout ZERNGBuffer GBuffer, float3 Color)
 
 float3 ZERNGBuffer_GetAccumulationColor(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
+	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -137,7 +137,7 @@ float3 ZERNGBuffer_GetViewNormal(int2 ScreenPos)
 	Normal.xy =	ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xy * 2.0f - 1.0f;
 	Normal.z = (ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w - 1.0f) * sqrt(1.0f - dot(Normal.xy, Normal.xy));
 	return Normal;*/
-	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).xyz;
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
 
@@ -146,12 +146,12 @@ float3 ZERNGBuffer_GetViewNormal(int2 ScreenPos)
 
 void ZERNGBuffer_SetSubsurfaceScattering(inout ZERNGBuffer GBuffer, float SubsurfaceScattering /* Range: [0-1]*/)
 {
-	GBuffer.Buffer2.z = SubsurfaceScattering;
+	GBuffer.Buffer2.w = SubsurfaceScattering;
 }
 
 float ZERNGBuffer_GetSubsurfaceScattering(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).z;
+	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).w;
 }
 
 

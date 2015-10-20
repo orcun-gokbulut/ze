@@ -355,10 +355,13 @@ bool ZEWindow::CreateWindow_()
 
 bool ZEWindow::DestroyWindow()
 {
+	if(!IsWindow((HWND)Handle))
+		return false;
+
 	if (::DestroyWindow((HWND)Handle) == 0)
 	{
-		zeError("Can not destroy window.");
 		ShowWindowError();
+		zeError("Can not destroy window.");
 		return false;
 	}
 	 

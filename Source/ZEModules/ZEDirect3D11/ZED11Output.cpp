@@ -40,6 +40,8 @@
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRAdapter.h"
 #include "ZED11Texture2D.h"
+#include "ZED11RenderTarget.h"
+#include "ZED11DepthStencilBuffer.h"
 
 #include "ZEError.h"
 
@@ -67,7 +69,25 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 	HRESULT Result = SwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D), (void**)&OutputTexture);
 	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
 	OutputTexture->Release();
+
+	if(RenderTarget != NULL)
+	{
+		RenderTarget->Release();
+	}
+	if(DepthStencilBuffer != NULL)
+	{
+		DepthStencilBuffer->Release();
+	}
+
 	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
+	DepthStencilBuffer = ZEGRDepthStencilBuffer::Create(Width, Height, ZEGR_DSF_DEPTH24_STENCIL8);
+
+	Viewport.SetX(0.0f);
+	Viewport.SetY(0.0f);
+	Viewport.SetWidth((float)Width);
+	Viewport.SetHeight((float)Height);
+	Viewport.SetMinDepth(0.0f);
+	Viewport.SetMaxDepth(1.0f);
 
 	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Format);
 	SetSize(Width * Height * FormatDefinition->BlockSize);
@@ -85,24 +105,16 @@ bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, 
 	memset(&SwapChainDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC1));
 	SwapChainDesc.Width = Mode != NULL ? Mode->GetWidth() : Width;
 	SwapChainDesc.Height = Mode != NULL ? Mode->GetHeight() : Height;
-	SwapChainDesc.Format = Mode != NULL ? ZED11ComponentBase::ConvertFormat(Mode->GetFormat()) : DXGI_FORMAT_B8G8R8A8_UNORM;
+	SwapChainDesc.Format = Mode != NULL ? ZED11ComponentBase::ConvertFormat(Mode->GetFormat()) : DXGI_FORMAT_R8G8B8A8_UNORM;
 	SwapChainDesc.Stereo = FALSE;
-	SwapChainDesc.BufferCount = 5;
+	SwapChainDesc.BufferCount = 1;
 	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 	SwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER | DXGI_CPU_ACCESS_NONE | DXGI_USAGE_SHADER_INPUT;
+	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER | DXGI_CPU_ACCESS_NONE;
 	SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	SwapChainDesc.SampleDesc.Count = 1;
 	SwapChainDesc.SampleDesc.Quality = 0;
 	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_DISCARD;
-
-	#if(WINVER >= _WIN32_WINNT_WIN8)
-	SwapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_SEQUENTIAL;
-	#endif
-
-	#ifdef ZE_GRAPHICS_CONTENT_PROTECTION
-	SwapChainDesc.Flags |= DXGI_SWAP_CHAIN_FLAG_DISPLAY_ONLY;
-	#endif
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc;
 	memset(&FullScreenDesc, 0, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
@@ -139,12 +151,18 @@ void ZED11Output::Deinitialize()
 	SwapChain->SetFullscreenState(FALSE, Output);
 	ZEGR_RELEASE(SwapChain);
 	ZEGR_RELEASE(Output);
+
+	RenderTarget->Release();
+	RenderTarget->Release();
 }
 
 ZED11Output::ZED11Output()
 {
 	Handle = NULL;
 	Mode = NULL;
+
+	RenderTarget = NULL;
+	DepthStencilBuffer = NULL;
 }
 
 void* ZED11Output::GetHandle()
@@ -155,6 +173,16 @@ void* ZED11Output::GetHandle()
 ZEGRRenderTarget* ZED11Output::GetRenderTarget()
 {
 	return RenderTarget;
+}
+
+ZEGRDepthStencilBuffer* ZED11Output::GetDepthStencilBuffer()
+{
+	return DepthStencilBuffer;
+}
+
+const ZEGRViewport& ZED11Output::GetViewport()
+{
+	return Viewport;
 }
 
 void ZED11Output::SetMonitorMode(ZEGRMonitorMode* Mode)
@@ -202,9 +230,7 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 	if (RenderTarget->GetWidth() == Width && RenderTarget->GetHeight() == Height)
 		return;
 
-	ZEGR_RELEASE(RenderTarget->View);
-
-	HRESULT Result = SwapChain->ResizeBuffers(0, 0, 0, DXGI_FORMAT_UNKNOWN, 0);
+	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 	UpdateRenderTarget(Width, Height, RenderTarget->GetFormat());
 }
 

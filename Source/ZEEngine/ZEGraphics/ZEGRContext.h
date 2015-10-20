@@ -50,6 +50,7 @@ class ZEGRShader;
 class ZEGRConstantBuffer;
 class ZEGRTexture;
 class ZEGRSamplerState;
+class ZEGRStructuredBuffer;
 
 class ZEGRContext
 {
@@ -63,6 +64,7 @@ class ZEGRContext
 		virtual void			SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer) = 0;
 		virtual void			SetIndexBuffer(ZEGRIndexBuffer* Buffer) = 0;
 
+		virtual void			SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRStructuredBuffer* Buffer) = 0;
 		virtual void			SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset = 0, ZEUInt Size = 0) = 0;
 		virtual void			SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture) = 0;
 		virtual void			SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler) = 0;
@@ -76,7 +78,7 @@ class ZEGRContext
 		virtual void			SetBlendFactors(ZEVector4& Factors) = 0;
 		virtual void			SetBlendMask(ZEUInt Mask) = 0;
 
-		virtual  void			Draw(ZEUInt PrimitiveCount, ZEUInt VertexOffset) = 0;
+		virtual void			Draw(ZEUInt PrimitiveCount, ZEUInt VertexOffset) = 0;
 		virtual void			DrawInstanced(ZEUInt PrimitiveCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
 		
 		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;

@@ -85,6 +85,7 @@ struct ZEGRMemoryUsage
 	ZESize		Shader;
 	ZESize		RenderState;
 	ZESize		ConstantBuffer;	
+	ZESize		StructuredBuffer;
 
 	ZESize		Texture;
 	ZESize		Texture3D;
@@ -106,6 +107,7 @@ struct ZEGRObjectsCount
 	ZESize		Shader;
 	ZESize		RenderState;
 	ZESize		ConstantBuffer;	
+	ZESize		StructuredBuffer;
 
 	ZESize		Texture;
 	ZESize		Texture3D;
@@ -130,7 +132,8 @@ class ZEGRCounter
 	friend class ZEGRTexture2D;
 	friend class ZEGRTexture3D;
 	friend class ZEGRTextureCube;
-	
+	friend class ZEGRStructuredBuffer;
+
 	private:
 		ZELock						UpdateLock;
 

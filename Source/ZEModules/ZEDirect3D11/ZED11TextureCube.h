@@ -60,6 +60,7 @@ class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
 		ID3D11Texture2D*				GetTexture();
 		ID3D11ShaderResourceView*		GetResourceView();
 		
+		virtual bool					UpdateSubResource(void* Data, ZESize RowPitch, ZEGRTextureCubeFace Face, ZEUInt Level);
 		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level);
 		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level);
 

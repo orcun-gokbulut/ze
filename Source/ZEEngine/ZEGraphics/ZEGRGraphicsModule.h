@@ -58,6 +58,7 @@ class ZEGRShaderCompiler;
 class ZEGRConstantBuffer;
 class ZEGRTracer;
 class ZEGROutput;
+class ZEGRStructuredBuffer;
 
 class ZEGRGraphicsModule : public ZEModule
 {
@@ -94,6 +95,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRIndexBuffer*				CreateIndexBuffer() = 0;
 		virtual ZEGRShader*						CreateShader() = 0;
 		virtual ZEGRConstantBuffer*				CreateConstantBuffer() = 0;
+		virtual ZEGRStructuredBuffer*			CreateStructuredBuffer() = 0;
 		virtual ZEGRTexture2D*					CreateTexture2D() = 0;
 		virtual ZEGRTexture3D*					CreateTexture3D() = 0;
 		virtual ZEGRTextureCube*				CreateTextureCube() = 0;

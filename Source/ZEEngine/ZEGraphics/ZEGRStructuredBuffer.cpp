@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDepthStencilBuffer.cpp
+ Zinek Engine - ZEGRStructuredBuffer.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,58 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRDepthStencilBuffer.h"
+#include "ZEGRStructuredBuffer.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
 
-ZESize ZEGRDepthStencilBuffer::GetPixelSize(ZEGRDepthStencilFormat Format)
+ZEGRResourceType ZEGRStructuredBuffer::GetResourceType()
 {
-	switch(Format)
-	{
-		default:
-		case ZEGR_DSF_NONE:
-			return 0;
-
-		case ZEGR_DSF_DEPTH16:
-			return 2;
-
-		case ZEGR_DSF_DEPTH24_STENCIL8:
-		case ZEGR_DSF_DEPTHD32_FLOAT:
-			return 4;
-	}
+	return ZEGR_RT_STRUCTURED_BUFFER;
 }
 
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType()
+bool ZEGRStructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize)
 {
-	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
-}
-
-ZEUInt ZEGRDepthStencilBuffer::GetWidth()
-{
-	return Width;
-}
-
-ZEUInt ZEGRDepthStencilBuffer::GetHeight()
-{
-	return Height;
-}
-
-ZEGRDepthStencilFormat ZEGRDepthStencilBuffer::GetFormat()
-{
-	return Format;
-}
-
-bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	this->Format = Format;
-	this->Height = Height;
-	this->Width = Width;
-	
-	SetSize(Width * Height * GetPixelSize(Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
+	SetSize(ElementCount * ElementSize);
+	ZEGR_COUNTER_RESOURCE_INCREASE(this, StructuredBuffer, Pipeline);
 
 	return true;
 }
 
-void ZEGRDepthStencilBuffer::Deinitialize()
+void ZEGRStructuredBuffer::Deinitialize()
 {
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-	
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-	SetSize(0);	
+	ZEGR_COUNTER_RESOURCE_DECREASE(this, StructuredBuffer, Pipeline);
+	SetSize(0);
 }
 
-ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
+void ZEGRStructuredBuffer::SetData(void* Data)
 {
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
+	void* Buffer;
+	if (!Lock(&Buffer))
+		return;
+
+	memcpy(Buffer, Data, GetSize());
+
+	Unlock();
+}
+
+ZEGRStructuredBuffer::ZEGRStructuredBuffer()
+{
 
 }
 
-ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
+ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
 {
 	Deinitialize();
 }
 
-ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
+ZEGRStructuredBuffer* ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize)
 {
-	ZEGRDepthStencilBuffer* DepthStencilBuffer = ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
-	if (DepthStencilBuffer == NULL)
-		return NULL;
-
-	if (!DepthStencilBuffer->Initialize(Width, Height, Format, Readable))
+	ZEGRStructuredBuffer* StructuredBuffer = ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
+	if (!StructuredBuffer->Initialize(ElementCount, ElementSize))
 	{
-		DepthStencilBuffer->Destroy();
+		StructuredBuffer->Release();
 		return NULL;
 	}
-
-	return DepthStencilBuffer;
+	
+	return StructuredBuffer;
 }

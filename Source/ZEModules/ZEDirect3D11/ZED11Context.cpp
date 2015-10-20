@@ -47,6 +47,7 @@
 #include "ZED11ConstantBuffer.h"
 #include "ZED11DepthStencilBuffer.h"
 #include "ZED11RenderStateData.h"
+#include "ZED11StructuredBuffer.h"
 
 #include <d3d11_1.h>
 #include "ZED11StatePool.h"
@@ -99,6 +100,11 @@ void ZED11Context::Deinitialize()
 	ZEGR_RELEASE(Context);
 }
 
+ID3D11DeviceContext1* ZED11Context::GetContext()
+{
+	return Context;
+}
+
 void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 {
 	if (RenderState == State)
@@ -126,7 +132,6 @@ void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 	_SetupShader(CS, ZEGR_ST_COMPUTE, GetComputeShader)
 	
 	#undef _SetupShader
-
 	Context->RSSetState(RenderState->NativeRasterizerState);
 
 	if (BlendState != RenderState->NativeBlendState)
@@ -147,11 +152,11 @@ void ZED11Context::SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer)
 	ZED11VertexBuffer* D11Buffer = static_cast<ZED11VertexBuffer*>(Buffer);
 	if (D11Buffer != NULL)
 	{
-		Stride = (ZEUInt)Buffer->GetVertexSize();
+		Stride = (ZEUInt)D11Buffer->GetVertexSize();
 		NativeBuffer = D11Buffer->GetBuffer();
 	}
 		
-	Context->IASetVertexBuffers(Index, 1, &NativeBuffer, &Stride, &Offset);
+	Context->IASetVertexBuffers(Index, D11Buffer != NULL ? 1 : 0, &NativeBuffer, &Stride, &Offset);
 }
 
 void ZED11Context::SetIndexBuffer(ZEGRIndexBuffer* Buffer)
@@ -253,6 +258,55 @@ void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
 	Context->RSSetViewports(Count, NativeViewports);
 }
 
+void ZED11Context::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRStructuredBuffer* Buffer)
+{
+	ID3D11ShaderResourceView* ResourceView = NULL;
+	if(Buffer != NULL)
+	{
+		ResourceView = static_cast<ZED11StructuredBuffer*>(Buffer)->GetResourceView();
+	}
+	
+	switch(Shader)
+	{
+		default:
+		case ZEGR_ST_NONE:
+			break;
+
+		case ZEGR_ST_VERTEX:
+			Context->VSSetShaderResources(Index, 1, &ResourceView);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetShaderResources(Index, 1, &ResourceView);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetShaderResources(Index, 1, &ResourceView);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetShaderResources(Index, 1, &ResourceView);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetShaderResources(Index, 1, &ResourceView);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetShaderResources(Index, 1, &ResourceView);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetShaderResources(Index, 1, &ResourceView);
+			Context->PSSetShaderResources(Index, 1, &ResourceView);
+			Context->GSSetShaderResources(Index, 1, &ResourceView);
+			Context->DSSetShaderResources(Index, 1, &ResourceView);
+			Context->HSSetShaderResources(Index, 1, &ResourceView);
+			Context->CSSetShaderResources(Index, 1, &ResourceView);
+			break;
+	}
+}
+
 void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset, ZEUInt Size)
 {
 	zeDebugCheck((StartOffset % 16) != 0, "StartOffset must be multiple of 16.");
@@ -270,7 +324,7 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 	if (Buffer != NULL)
 		 NativeConstants = ((ZED11ConstantBuffer*)Buffer)->GetBuffer();
 
-/*	switch(Shader)
+	/*switch(Shader)
 	{
 		default:
 		case ZEGR_ST_NONE:

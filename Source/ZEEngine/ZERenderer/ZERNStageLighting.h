@@ -36,8 +36,111 @@
 #pragma once
 
 #include "ZERNStage.h"
+#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEMath\ZEMatrix.h"
+
+class ZEGRRenderState;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRStructuredBuffer;
+class ZEGRVertexBuffer;
+class ZELight;
+class ZELightProjective;
+class ZELightPoint;
+class ZELightDirectional;
+class ZELightOmniProjective;
+
+#define MAX_LIGHTS 512
+#define TILE_SIZE_IN_PIXELS 16	//16x16
+
+struct ZERNGPULight
+{
+	ZEVector3	PositionWorld;
+	float		Range;
+	ZEVector3	Color;
+	float		Intensity;
+	ZEVector3	Attenuation;
+	float		Fov;
+	ZEVector3	Direction;
+	int			Type;	
+};
+
+struct ZERNTileInfo
+{
+	ZEUInt	LightIndices[MAX_LIGHTS - 1];
+	ZEUInt	LightCount;
+
+	ZERNTileInfo():LightCount(0)
+	{
+		memset(&LightIndices[0], 0x00, sizeof(ZEUInt) * MAX_LIGHTS);
+	}
+};
+
+struct ZERNLightConstants
+{
+	ZERNGPULight	Light;
+	ZEMatrix4x4		ProjectionMatrix;
+	ZEMatrix4x4		WorldMatrix;
+	ZEMatrix3x3		RotationMatrix;
+	float			Reserved[3];
+};
 
 class ZERNStageLighting : public ZERNStage
 {
+	private:
+		ZEFlags								DirtyFlags;
+		ZEGRHolder<ZEGRShader>				LightingStage_VertexShader;
+		ZEGRHolder<ZEGRShader>				LightingStage_PixelShader;
+		ZEGRHolder<ZEGRRenderStateData>		LightingStage_RenderState;
+		ZEGRHolder<ZEGRStructuredBuffer>	LightBuffer;
+		ZEGRHolder<ZEGRStructuredBuffer>	TileInfoBuffer;
+		ZEGRHolder<ZEGRConstantBuffer>		LightConstantBuffer;
+		ZEGRHolder<ZEGRVertexBuffer>		LightVertexBuffer;
+		ZEArray<ZELight*>					Lights;
+		ZEArray<ZERNTileInfo>				TileInfos;
+
+		ZEUInt								Width;
+		ZEUInt								Height;
+		ZEUInt								PrevWidth;
+		ZEUInt								PrevHeight;
+
+		bool								SetTiledDeferred;
+
+	private:
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
+
+		void								CreateLights();
+		void								CreateLightGeometries();
+
+		bool								UpdateBuffers();
+		bool								UpdateRenderState();
+		bool								UpdateShaders();
+		bool								Update();
+
+		ZEVector4							ComputeClipRegion(const ZEVector3& lightPosView, float lightRadius, float CameraScaleX, float CameraScaleY, float CameraNear);
+		void								UpdateClipRegion(float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
+		void								UpdateClipRegionRoot(float nc, float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
+		void								AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
+
+		void								SetupGbufferResources(ZERNRenderer* Renderer, ZEGRContext* Context);
+		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
+		bool								SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								DrawOmniProjectiveLight(ZELightOmniProjective* OmniProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
+
+	public:
+		virtual ZEInt						GetId();
+		virtual const ZEString&				GetName();
+		
+		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+		static const ZEGRRenderState&		GetRenderState();
 
 };

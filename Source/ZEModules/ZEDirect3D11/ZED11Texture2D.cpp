@@ -131,7 +131,7 @@ bool ZED11Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)
 	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
 
 	D3D11_MAPPED_SUBRESOURCE MapData;
-	HRESULT Result = GetMainContext()->Map(Texture2D, Level, D3D11_MAP_WRITE, D3D11_MAP_FLAG_DO_NOT_WAIT, &MapData);
+	HRESULT Result = GetMainContext()->Map(Texture2D, Level, D3D11_MAP_WRITE_DISCARD, 0, &MapData);
 	*Buffer = MapData.pData;
 	*Pitch = MapData.RowPitch;
 

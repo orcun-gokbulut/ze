@@ -104,7 +104,7 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	RenderState.SetShader(ZEGR_ST_PIXEL, GBufferStage_PixelShader);
 
 	GBufferStage_RenderState = RenderState.Compile();
-	zeCheckError(GBufferStage_RenderState == NULL, false, "Cannot set render state.");
+	zeCheckError(GBufferStage_RenderState == NULL, false, "Cannot set Gbuffer render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -135,7 +135,7 @@ bool ZERNFixedMaterial::Update()
 	if (!UpdateShaders())
 		return false;
 
-	if (UpdateRenderState())
+	if (!UpdateRenderState())
 		return false;
 
 	UpdateConstantBuffer();
@@ -225,7 +225,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 
 ZEUInt ZERNFixedMaterial::GetStageMask()
 {
-	return ZERN_STAGE_GBUFFER;
+	return ZERN_STAGE_GBUFFER ;
 }
 
 void ZERNFixedMaterial::SetName(const ZEString& Name)

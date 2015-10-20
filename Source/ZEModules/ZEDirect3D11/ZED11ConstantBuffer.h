@@ -39,7 +39,6 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 
 struct ID3D11Buffer;
-class ZEGRShaderConstantBuffer;
 
 class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 {

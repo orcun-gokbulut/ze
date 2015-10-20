@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRDepthStencilBuffer.cpp
+ Zinek Engine - ZEGRStructuredBuffer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRDepthStencilBuffer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
+#pragma once
 
-ZESize ZEGRDepthStencilBuffer::GetPixelSize(ZEGRDepthStencilFormat Format)
+#include "ZETypes.h"
+#include "ZEGRResource.h"
+#include "ZEGRDefinitions.h"
+
+class ZEGRStructuredBuffer : public ZEGRResource
 {
-	switch(Format)
-	{
-		default:
-		case ZEGR_DSF_NONE:
-			return 0;
+	protected:
+			virtual bool					Initialize(ZESize ElementCount, ZESize ElementSize);
+			virtual void					Deinitialize();
 
-		case ZEGR_DSF_DEPTH16:
-			return 2;
+											ZEGRStructuredBuffer();
+			virtual							~ZEGRStructuredBuffer();
 
-		case ZEGR_DSF_DEPTH24_STENCIL8:
-		case ZEGR_DSF_DEPTHD32_FLOAT:
-			return 4;
-	}
-}
+	public:
+			ZEGRResourceType				GetResourceType();
 
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType()
-{
-	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
-}
+			void							SetData(void* ConstantData);
 
-ZEUInt ZEGRDepthStencilBuffer::GetWidth()
-{
-	return Width;
-}
+			virtual bool					Lock(void** Buffer) = 0;
+			virtual void					Unlock() = 0;
 
-ZEUInt ZEGRDepthStencilBuffer::GetHeight()
-{
-	return Height;
-}
-
-ZEGRDepthStencilFormat ZEGRDepthStencilBuffer::GetFormat()
-{
-	return Format;
-}
-
-bool ZEGRDepthStencilBuffer::Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	this->Format = Format;
-	this->Height = Height;
-	this->Width = Width;
-	
-	SetSize(Width * Height * GetPixelSize(Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-
-	return true;
-}
-
-void ZEGRDepthStencilBuffer::Deinitialize()
-{
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-	
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, DepthStencilBuffer, Texture);
-	SetSize(0);	
-}
-
-ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
-{
-	Width = 0;
-	Height = 0;
-	Format = ZEGR_DSF_NONE;
-
-}
-
-ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
-{
-	Deinitialize();
-}
-
-ZEGRDepthStencilBuffer* ZEGRDepthStencilBuffer::Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable)
-{
-	ZEGRDepthStencilBuffer* DepthStencilBuffer = ZEGRGraphicsModule::GetInstance()->CreateDepthStencilBuffer();
-	if (DepthStencilBuffer == NULL)
-		return NULL;
-
-	if (!DepthStencilBuffer->Initialize(Width, Height, Format, Readable))
-	{
-		DepthStencilBuffer->Destroy();
-		return NULL;
-	}
-
-	return DepthStencilBuffer;
-}
+			static ZEGRStructuredBuffer*	Create(ZESize ElementCount, ZESize ElementSize);
+};
