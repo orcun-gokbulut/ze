@@ -77,7 +77,7 @@ macro(ze_version_get_revision_number)
 	endif()
 endmacro()
 
-macro (ze_version_init)
+macro(ze_version_init)
 	message(STATUS "[ZEBuild] Collecting version information...")
 
 	ze_version_get(${CMAKE_SOURCE_DIR})
@@ -89,8 +89,10 @@ macro (ze_version_init)
 	set(ZEBUILD_VERSION_INTERNAL ${VERSION_INTERNAL})
 	set(ZEBUILD_VERSION_REVISION ${VERSION_REVISION})
 	set(ZEBUILD_VERSION_BRANCH ${VERSION_BRANCH})
-	set(ZEBUILD_VERSION "${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} (Rev:${ZEBUILD_VERSION_REVISION} Branch:${ZEBUILD_VERSION_BRANCH})")
+	set(ZEBUILD_VERSION "${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} - Rev:${ZEBUILD_VERSION_REVISION} (Branch:${ZEBUILD_VERSION_BRANCH})")
 
+	ze_version_generate_version_txt()
+	ze_version_generate_zeversiondata_h()
 
 	message(STATUS "[ZEBuild] Version           : ${ZEBUILD_VERSION}")
 	message(STATUS "[ZEBuild] Major Version     : ${ZEBUILD_VERSION_MAJOR}")
@@ -101,9 +103,42 @@ macro (ze_version_init)
 	message(STATUS "[ZEBuild] Version information has been collected.")
 	message(STATUS "")
 	message(STATUS "")
-	
+endmacro()
+
+macro(ze_version_generate_version_txt)
+	file(WRITE "${CMAKE_SOURCE_DIR}/Rundir/Version.txt"
+		"Company: Zinek Code House\n"
+		"Product: Zinek Engine\n"
+		"Version: ${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} - Rev:${ZEBUILD_VERSION_REVISION} (Branch:${ZEBUILD_VERSION_BRANCH})")
+endmacro()
+
+macro(ze_version_generate_zeversiondata_h)
+	file(WRITE "${CMAKE_BINARY_DIR}/ZEVersionData.h"
+		"// ZEBuild - Auto Generated Version File - DO NOT MODIFY ! \n"
+		"////////////////////////////////////////////////////////////////////////\n\n"
+		"#pragma once\n\n"
+		"#define ZE_VERSION \"${ZEBUILD_VERSION}\"\n"
+		"#define ZE_VERSION_MAJOR ${ZEBUILD_VERSION_MAJOR}\n"
+		"#define ZE_VERSION_MINOR ${ZEBUILD_VERSION_MINOR}\n"
+		"#define ZE_VERSION_INTERNAL ${ZEBUILD_VERSION_INTERNAL}\n"
+		"#define ZE_VERSION_REVISION ${ZEBUILD_VERSION_REVISION}\n"
+		"#define ZE_VERSION_BRANCH \"${ZEBUILD_VERSION_BRANCH}\"")
+endmacro()
+
+macro(ze_version_generate_zeversion_rc PARAMETER_TARGET PARAMETER_EXTENSION PARAMETER_DESCRIPTION PARAMETER_SOURCES)
+	if(ZEBUILD_PLATFORM_WINDOWS)
+		configure_file(
+			"${CMAKE_SOURCE_DIR}/CMake/ze_version.rc.in"
+			"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc"
+			@ONLY)
+		set(${PARAMETER_SOURCES} ${${PARAMETER_SOURCES}} "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+		source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+	endif()
+endmacro()
+
+macro(ze_version_generate_definitions)
 	set_property(DIRECTORY ${CMAKE_SOURCE_DIR} APPEND PROPERTY COMPILE_DEFINITIONS 
-		ZE_VERSION="${ZEBUILD_VERSION_MAJOR}"
+		ZE_VERSION="${ZEBUILD_VERSION}"
 		ZE_VERSION_MAJOR=${ZEBUILD_VERSION_MAJOR}
 		ZE_VERSION_MINOR=${ZEBUILD_VERSION_MINOR}
 		ZE_VERSION_INTERNAL=${ZEBUILD_VERSION_INTERNAL}

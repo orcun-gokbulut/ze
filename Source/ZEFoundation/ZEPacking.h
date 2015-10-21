@@ -36,6 +36,8 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEPlatform.h"
+
 #if defined(ZE_META_COMPILER)
 	#define ZEPackStruct(Declaration) Declaration
 	#define ZEPackStruct4(Declaration) Declaration

@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 #include "ZELCLicenseToolWindow.h"
 
+#include "ZEPlatform.h"
+
 #include <QtGui/QApplication>
 #include <QtCore/QFile>
 

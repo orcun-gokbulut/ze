@@ -35,8 +35,10 @@
 
 #pragma once
 
-#if ZE_PLATFORM_COMPILER_MSVC
-#define ZE_SUPPRESS_LNK4221 namespace { char dummy; };
+#include "ZEPlatform.h"
+
+#ifdef ZE_PLATFORM_COMPILER_MSVC
+	#define ZE_SUPPRESS_LNK4221 namespace { char dummy; };
 #else
 	#define ZE_SUPPRESS_LNK4221
 #endif

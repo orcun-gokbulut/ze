@@ -35,6 +35,7 @@
 
 #include "ZESerialPort.h"
 #include "ZEError.h"
+#include "ZEPlatform.h"
 
 #include <time.h>
 

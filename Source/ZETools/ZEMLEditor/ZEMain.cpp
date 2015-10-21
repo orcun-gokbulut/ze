@@ -35,6 +35,8 @@
 
 #include "ZEMLEditorWindow.h"
 #include "ZEFile/ZEPathManager.h"
+#include "ZEPlatform.h"
+
 #include <QtGui/QApplication>
 
 #ifdef ZE_PLATFORM_WINDOWS

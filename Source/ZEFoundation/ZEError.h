@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZELog.h"
 #include "ZEDLL.h"
+#include "ZEPlatform.h"
 
 #if defined(ZE_DEBUG_ENABLE) && defined(ZE_PLATFORM_COMPILER_MSVC)
 	#include <intrin.h>

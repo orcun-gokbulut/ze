@@ -127,7 +127,7 @@ endmacro()
 
 
 function(ze_add_executable)
-	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;DESTINATION;${ze_process_source_parameters};${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})
+	parse_arguments(PARAMETER "TARGET;SOURCES;LIBS;DESCRIPTION;DESTINATION;${ze_process_source_parameters};${ze_check_parameters}" "INSTALL;CONSOLE;DLL;BUNDLE" ${ARGV})
 
 	ze_check()
 	if (NOT CHECK_SUCCEEDED)
@@ -147,6 +147,7 @@ function(ze_add_executable)
 	endif()
 
 	ze_process_sources()
+	ze_version_generate_zeversion_rc(${PARAMETER_TARGET} "exe" "${PARAMETER_DESCRIPTION}" PARAMETER_SOURCES)
 	
 	add_executable(${PARAMETER_TARGET} ${VARIABLE_EXECUTABLE_TYPE} ${PARAMETER_SOURCES})
 	
@@ -185,7 +186,8 @@ function(ze_add_plugin)
 	endif()
 
 	ze_process_sources()
-	
+	ze_version_generate_zeversion_rc(${PARAMETER_TARGET} "dll" "${PARAMETER_DESCRIPTION}" PARAMETER_SOURCES)
+
 	add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
 
 	set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_BINARY_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR})
@@ -222,6 +224,7 @@ function (ze_add_library)
 	ze_process_sources()
 	
 	if (PARAMETER_DLL)
+		ze_version_generate_zeversion_rc(${PARAMETER_TARGET} "dll" "${PARAMETER_DESCRIPTION}" PARAMETER_SOURCES)
 		add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
 		set_property(TARGET ${PARAMETER_TARGET} PROPERTY ZEBUILD_TYPE "DLL")
 	else()
