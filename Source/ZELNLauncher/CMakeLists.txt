@@ -86,12 +86,11 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect)
+	LIBS ZEFoundation ZEProtect Qt5::WinMain
+	DESCRIPTION "Zinek Launcher")
 
 qt5_use_modules(ZELNLauncher Core Widgets)
 
-message("${Qt5Core_DIR}/../../../bin/")
-	
 add_custom_command(TARGET ZELNLauncher POST_BUILD
 	# DEBUG
 	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Cored.dll 		${CMAKE_CURRENT_BINARY_DIR}/Debug

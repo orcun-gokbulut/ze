@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEIPAddress.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_COMPILER_GCC
 #undef _WIN32_WINNT

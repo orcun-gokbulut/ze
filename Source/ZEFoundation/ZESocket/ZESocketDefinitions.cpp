@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESocket.h
+ Zinek Engine - ZESocketDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEIPAddress.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 #include <Winsock2.h>

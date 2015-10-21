@@ -36,22 +36,12 @@
 #include "ZELNLauncher.h"
 #include "ZELNLauncherWindow.h"
 #include "ZEFile/ZEPathManager.h"
+#include "ZEPlatform.h"
 
 #include <QtWidgets/QApplication>
 
-#ifdef ZE_PLATFORM_WINDOWS
-#define  WIN32_LEAN_AND_MEAN
-#include <windows.h>
-
-
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
+int main(int argc, char** argv)
 {
-	int argc = 1;
-	char* argv[] =
-	{
-		"ZELNLauncher.exe"
-	};
-
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	QApplication Application(argc, argv);
@@ -60,15 +50,3 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 
 	return Application.exec();
 }
-#else
-int Main(int argc, char** argv)
-{
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-
-	QApplication Application(argc, argv);
-	ZELNLauncher Launcher;
-	Launcher.GetWindow()->show();
-
-	return Application.exec();
-}
-#endif

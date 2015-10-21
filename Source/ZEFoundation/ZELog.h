@@ -37,8 +37,9 @@
 #ifndef __ZE_LOG_H__
 #define __ZE_LOG_H__
 
-#include "ZEDS/ZEString.h"
 #include "ZEDLL.h"
+#include "ZEPlatform.h"
+#include "ZEDS/ZEString.h"
 #include "ZEThread/ZELock.h"
 
 enum ZELogType

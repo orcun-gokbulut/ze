@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMath.h"
+#include "ZEPlatform.h"
 
 #include <math.h>
 
