@@ -40,6 +40,7 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEFlags.h"
 #include "ZEGraphics\ZEGRHolder.h"
+#include "ZERNFilter.h"
 
 class ZEGRShader;
 class ZEGRTexture2D;
@@ -59,152 +60,123 @@ enum ZERNHDRToneMapOperator
 	ZERN_HTMO_FILMIC				= 4
 };
 
+enum ZERNHDRBlurTextureSize
+{
+	ZERN_HBTS_EXACT					= 0,
+	ZERN_HBTS_HALF					= 1,
+	ZERN_HBTS_QUARTER				= 2
+};
+
 class ZERNStageHDR : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
-		ZEGRHolder<ZEGRTexture2D>			CurrentLuminance;
-		ZEGRHolder<ZEGRTexture2D>			PreviousLuminance;
-
-		ZEGRHolder<ZEGRTexture2D>			BrightTexture;
-		ZEGRHolder<ZEGRTexture2D>			LuminanceMips[6];
 
 		ZEGRHolder<ZEGRShader>				VertexShader;
 		ZEGRHolder<ZEGRShader>				CalculateLuminance_PixelShader;
+		ZEGRHolder<ZEGRShader>				CalculateAdaptedLuminance_PixelShader;
 		ZEGRHolder<ZEGRShader>				DownSampling_PixelShader;
 		ZEGRHolder<ZEGRShader>				CalculateBrightness_PixelShader;
 		ZEGRHolder<ZEGRShader>				ToneMapping_PixelShader;
 
 		ZEGRHolder<ZEGRRenderStateData>		CalculateLuminance_RenderState;
+		ZEGRHolder<ZEGRRenderStateData>		CalculateAdaptedLuminance_RenderState;
 		ZEGRHolder<ZEGRRenderStateData>		DownSampling_RenderState;
 		ZEGRHolder<ZEGRRenderStateData>		CalculateBrightness_RenderState;
 		ZEGRHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
 
-		ZEGRHolder<ZEGRTexture2D>			InputTexture;
-		ZEGRHolder<ZEGRRenderTarget>		OutputRenderTarget;
+		ZEGRTexture2D*						InputTexture;
+		ZEGRRenderTarget*					OutputRenderTarget;
 
-		struct
-		{
-			bool						AutoKey;
-			bool						AutoExposure;
-			bool						BloomEnabled;
-			bool						Reserved0;
+		ZERNFilter							Filter;
+		ZEArray<ZEVector4>					HorizontalValues;
+		ZEArray<ZEVector4>					VerticalValues;
 
-			float						Key;
-			float						Exposure;
-			float						WhiteLevel;
-			float						Saturation;
+		ZEGRHolder<ZEGRTexture2D>			BlurTextureTemp1;
+		ZEGRHolder<ZEGRTexture2D>			BlurTextureTemp2;
+		ZEGRHolder<ZEGRTexture2D>			BlurTextureFinal;
+		ZEGRHolder<ZEGRTexture2D>			BrightTexture;
+		ZEArray<ZEGRHolder<ZEGRTexture2D>>	LuminanceMips;
+		ZEGRHolder<ZEGRTexture2D>			CurrentAdaptedLuminance;
+		ZEGRHolder<ZEGRTexture2D>			PreviousAdaptedLuminance;
+		
+		ZEUInt								PrevWidth;
+		ZEUInt								PrevHeight;
 
-			float						LuminanceUpper;
-			float						LuminanceLower;
-			float						AdaptationRate;
-			float						BloomFactor;
+		ZERNHDRBlurTextureSize				BlurTextureSize;
 
-			float						BloomThreshold;
-			float						BloomWeightLarge;
-			float						BloomWeightMedium;
-			float						BloomWeightSmall;
+		struct HDRConstants
+		{	
+			float							Key;
+			float							WhiteLevel;
+			float							BloomFactor;
+			float							BloomThreshold;
 
-			ZEUInt32					ToneMapOperator;
-			ZEUInt32					BloomPassCount;
-			ZEUInt32					Reserved1[2];
-
-			float						BloomFilter[9];
-			float						Reserved2[3];
+			bool							AutoKey;
+			ZEUInt							ToneMapOperator;
+			bool							BloomEnabled;
+			ZEUInt							Reserved;
 		} Constants;
 
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 	private:
 
-		void							CreateRenderStates();
+		bool								UpdateTextures();
+		bool								UpdateShaders();
+		bool								UpdateRenderStates();
+		bool								UpdateConstantBuffer();
+		bool								Update();
 
-		bool							UpdateInputOutput();
-		bool							UpdateRenderTargets();
-		bool							UpdateShaders();
-		bool							UpdateRenderStates();
-		bool							UpdateConstantBuffer();
-		bool							Update();
+		void								DownSample(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
+		void								CalculateLuminance(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
+		void								CalculateAdaptedLuminance(ZEGRContext* Context);
+		void								GenerateMipMaps(ZEGRContext* Context);
+		void								CalculateBrightness(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
+		void								ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
+		void								ToneMapping(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
 
-		void							SwitchLuminanceBuffers();
+		bool								SetupInputOutput(ZERNRenderer* Renderer);
 
-		void							DownSample(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-		void							CalculateLuminance(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-		void							GenerateMipMaps(ZEGRContext* Context);
-		void							CalculateBrightness(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-		void							ToneMapping(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-
-		virtual bool					InitializeSelf();								
-		virtual void					DeinitializeSelf();
+		virtual bool						InitializeSelf();						
+		virtual void						DeinitializeSelf();
 
 	public:
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
+		virtual ZEInt						GetId();
+		virtual const ZEString&				GetName();
 
-		void							SetKey(float Value);
-		float							GetKey() const;
+		void								SetKey(float Value);
+		float								GetKey() const;
 
-		void							SetAutoKey(bool Enabled);
-		bool							GetAutoKey() const;
+		void								SetAutoKey(bool Enabled);
+		bool								GetAutoKey() const;
 
-		void							SetExposure(float Value);
-		float							GetExposure() const;
+		void								SetWhiteLevel(float Value);
+		float								GetWhiteLevel() const;
 
-		void							SetAutoExposure(bool Enabled);
-		bool							GetAutoExposure() const;
+		void								SetBloomEnabled(bool Enabled);
+		bool								GetBloomEnabled() const;
 
-		void							SetAdaptationRate(float Value);
-		float							GetAdaptationRate() const;
+		void								SetBloomFactor(float Value);
+		float								GetBloomFactor() const;
 
-		void							SetWhiteLevel(float Value);
-		float							GetWhiteLevel() const;
+		void								SetBloomThreshold(float Value);
+		float								GetBloomThreshold() const;
 
-		void							SetSaturation(float Value);
-		float							GetSaturation() const;
+		void								SetToneMapOperator(ZERNHDRToneMapOperator Operator);
+		ZERNHDRToneMapOperator				GetToneMapOperator() const;
 
-		void							SetBloomEnabled(bool Enabled);
-		bool							GetBloomEnabled() const;
+		void								SetInput(ZEGRTexture2D* Input);
+		ZEGRTexture2D*						GetInput() const;
 
-		void							SetBloomFactor(float Value);
-		float							GetBloomFactor() const;
+		void								SetOutput(ZEGRRenderTarget* Output);
+		ZEGRRenderTarget*					GetOutput() const;
 
-		void							SetBloomThreshold(float Value);
-		float							GetBloomThreshold() const;
+		void								SetBlurTextureSize(ZERNHDRBlurTextureSize Value);
+		ZERNHDRBlurTextureSize				GetBlurTextureSize() const;
 
-		void							SetBloomWeightLarge(float Value);
-		float							GetBloomWeightLarge() const;
+		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-		void							SetBloomWeightMedium(float Value);
-		float							GetBloomWeightMedium() const;
-
-		void							SetBloomWeightSmall(float Value);
-		float							GetBloomWeightSmall() const;
-
-		void							SetBloomDeviation(float Value);
-		float							GetBloomDeviation() const;
-
-		void							SetLuminanceUpper(float Value);
-		float							GetLuminanceUpper() const;
-
-		void							SetLuminanceLower(float Value);
-		float							GetLuminanceLower() const;
-
-		void							SetBloomPassCount(ZEUInt Value);
-		ZEUInt							GetBloomPassCount() const;
-
-		void							SetToneMapOperator(ZERNHDRToneMapOperator Operator);
-		ZERNHDRToneMapOperator			GetToneMapOperator() const;
-
-		void							SetInput(ZEGRTexture2D* Input);
-		ZEGRTexture2D*					GetInput() const;
-
-		void							SetOutput(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*				GetOutput() const;
-
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
-
-										ZERNStageHDR();
-
-		static const ZEGRRenderState&	GetRenderState();
+											ZERNStageHDR();
 };

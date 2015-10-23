@@ -43,7 +43,6 @@
 #include "ZERNStage.h"
 #include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRHolder.h"
-#include "ZERNFilter.h"
 
 class ZEScene;
 class ZERNStage;
@@ -69,11 +68,14 @@ class ZERNRenderer : public ZEInitializable
 		ZERNView						View;
 		ZEGROutput*						Output;
 		ZEGRHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
-		ZEArray<ZERNStageQueue>			StageQueues;
-		ZERNFilter						Filter;
-		ZEGRHolder<ZEGRTexture2D>		TemporaryTexture;
-		ZEArray<ZEVector4>				HorizontalValues;
-		ZEArray<ZEVector4>				VerticalValues;
+		ZEGRHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
+		ZEArray<ZERNStageQueue>			StageQueues;		
+
+		struct RendererConstants
+		{
+			float Elapsedtime;
+			float Reserved[3];
+		}Constants;
 
 		void							UpdateViewConstantBuffer();
 		void							Cull();
@@ -108,7 +110,7 @@ class ZERNRenderer : public ZEInitializable
 		void							RemoveStage(ZERNStage* Stage);
 		void							CleanStages();
 
-		void							Render();
+		void							Render(float ElapsedTime);
 
 		void							Clear();
 

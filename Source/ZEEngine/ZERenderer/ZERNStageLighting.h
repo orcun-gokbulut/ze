@@ -41,7 +41,6 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEMatrix.h"
 
-class ZEGRRenderState;
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
@@ -52,6 +51,8 @@ class ZELightProjective;
 class ZELightPoint;
 class ZELightDirectional;
 class ZELightOmniProjective;
+class ZEGRRenderTarget;
+class ZEGRTexture2D;
 
 #define MAX_LIGHTS 512
 #define TILE_SIZE_IN_PIXELS 16	//16x16
@@ -92,18 +93,19 @@ class ZERNStageLighting : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
-		ZEGRHolder<ZEGRShader>				LightingStage_VertexShader;
-		ZEGRHolder<ZEGRShader>				LightingStage_PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>		LightingStage_RenderState;
+		ZEGRHolder<ZEGRShader>				VertexShader;
+		ZEGRHolder<ZEGRShader>				PixelShader;
 		ZEGRHolder<ZEGRStructuredBuffer>	LightBuffer;
 		ZEGRHolder<ZEGRStructuredBuffer>	TileInfoBuffer;
 		ZEGRHolder<ZEGRConstantBuffer>		LightConstantBuffer;
 		ZEGRHolder<ZEGRVertexBuffer>		LightVertexBuffer;
 		ZEArray<ZELight*>					Lights;
 		ZEArray<ZERNTileInfo>				TileInfos;
+		ZEGRHolder<ZEGRRenderStateData>		DeferredRenderState;
+		ZEGRHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 
-		ZEUInt								Width;
-		ZEUInt								Height;
+		ZEGRRenderTarget*					OutputRenderTarget;
+
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;
 
@@ -137,10 +139,14 @@ class ZERNStageLighting : public ZERNStage
 	public:
 		virtual ZEInt						GetId();
 		virtual const ZEString&				GetName();
-		
+
+		void								SetOutput(ZEGRRenderTarget* Output);
+		ZEGRRenderTarget*					GetOutput() const;
+
+		void								SetIsTiledDeferred(bool Value);
+		bool								GetIsTiledDefferred() const;
+
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
-
-		static const ZEGRRenderState&		GetRenderState();
 
 };

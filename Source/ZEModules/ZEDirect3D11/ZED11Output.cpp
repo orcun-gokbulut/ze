@@ -70,14 +70,8 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
 	OutputTexture->Release();
 
-	if(RenderTarget != NULL)
-	{
-		RenderTarget->Release();
-	}
-	if(DepthStencilBuffer != NULL)
-	{
-		DepthStencilBuffer->Release();
-	}
+	RenderTarget.Release();
+	DepthStencilBuffer.Release();
 
 	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
 	DepthStencilBuffer = ZEGRDepthStencilBuffer::Create(Width, Height, ZEGR_DSF_DEPTH24_STENCIL8);
@@ -151,18 +145,12 @@ void ZED11Output::Deinitialize()
 	SwapChain->SetFullscreenState(FALSE, Output);
 	ZEGR_RELEASE(SwapChain);
 	ZEGR_RELEASE(Output);
-
-	RenderTarget->Release();
-	RenderTarget->Release();
 }
 
 ZED11Output::ZED11Output()
 {
 	Handle = NULL;
 	Mode = NULL;
-
-	RenderTarget = NULL;
-	DepthStencilBuffer = NULL;
 }
 
 void* ZED11Output::GetHandle()

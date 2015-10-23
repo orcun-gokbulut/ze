@@ -666,7 +666,7 @@ void ZECore::MainLoop()
 	PhysicsModule->UpdateWorlds();
 
 	if (Application != NULL)
-		Application->PostProcess();
+		Application->PostProcess(FrameTime);
 }
 
 void ZECore::Run()

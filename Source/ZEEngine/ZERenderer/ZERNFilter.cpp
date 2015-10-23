@@ -232,7 +232,7 @@ void ZERNFilter::Process(ZEGRContext* Context)
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, Input);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetVertexBuffer(0, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 0, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);
 
 	Context->Draw(3, 0);
