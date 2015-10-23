@@ -47,7 +47,7 @@ SamplerState ZERNFiltering_SamplerLinear
     AddressV = CLAMP;
 };
 
-cbuffer ZERNFiltering_Constants : register(b0)
+cbuffer ZERNFiltering_Constants : register(b8)
 {
 	int		ZERNFiltering_KernelSize;
 	int3	ZERNFiltering_Reserved;

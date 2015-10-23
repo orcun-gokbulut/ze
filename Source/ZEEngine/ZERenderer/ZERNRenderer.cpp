@@ -50,6 +50,7 @@
 #include "ZERNStageGBuffer.h"
 #include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZERNStageHDR.h"
+#include "ZERNStageLighting.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -138,6 +139,7 @@ void ZERNRenderer::RenderStages()
 	//Context->SetConstantBuffer(ZEGR_ST_ALL, 0, GetConstantBuffer());
 	//Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, Scene->GetConstantBuffer());
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
 
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
@@ -171,12 +173,7 @@ bool ZERNRenderer::InitializeSelf()
 			StageQueues[I].Stage->Initialize();
 
 	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
-	TemporaryTexture = ZEGRTexture2D::CreateInstance(624, 441, 1, ZEGR_TF_R11FG11FB10F_FLOAT, true);
-	
-	Filter.Initialize();
-
-	ZERNFilter::GenerateGaussianKernel(HorizontalValues, 11, 2.0f);
-	ZERNFilter::GenerateGaussianKernel(VerticalValues, 11, 2.0f, false);
+	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
 
 	return true;
 }
@@ -187,6 +184,7 @@ void ZERNRenderer::DeinitializeSelf()
 	CleanStages();
 
 	ViewConstantBuffer.Release();
+	RendererConstantBuffer.Release();
 }
 
 void ZERNRenderer::SetDevice(ZEGRContext* Device)
@@ -348,31 +346,14 @@ bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 	return false;
 }
 
-void ZERNRenderer::Render()
+void ZERNRenderer::Render(float ElapsedTime)
 {
+	Constants.Elapsedtime = ElapsedTime;
+	RendererConstantBuffer->SetData(&Constants);
 
 	Cull();
 	SortStageQueues();
 	RenderStages();
-	
-	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
-	ZERNStageGBuffer* Gbuffer = (ZERNStageGBuffer*)GetStage(ZERN_STAGE_GBUFFER);
-	ZERNStageHDR* HDR = (ZERNStageHDR*)GetStage(ZERN_STAGE_HDR);
-
-	HDR->SetInput(Gbuffer->GetAccumulationMap());
-	HDR->SetOutput(Output->GetRenderTarget());
-
-	Filter.SetInput(Gbuffer->GetAccumulationMap());
-	Filter.SetOutput(TemporaryTexture->GetRenderTarget());
-	Filter.SetKernelValues(&HorizontalValues[0], HorizontalValues.GetCount());
-	Filter.Process(Context);
-
-	Filter.SetInput(TemporaryTexture);
-	Filter.SetOutput(Output->GetRenderTarget());
-	Filter.SetKernelValues(&VerticalValues[0], VerticalValues.GetCount());
-	Filter.Process(Context);
-
-
 	Output->Present();
 }
 

@@ -46,7 +46,7 @@ void ZEApplicationModule::Process(float ElapsedTime)
 {
 }
 
-void ZEApplicationModule::PostProcess()
+void ZEApplicationModule::PostProcess(float ElapsedTime)
 {
 }
 
