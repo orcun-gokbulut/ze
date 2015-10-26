@@ -38,6 +38,7 @@
 
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEString.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
@@ -46,14 +47,15 @@
 enum ZEThreadStatus
 {
     ZE_TS_NONE          = 1,
-    ZE_TS_RUNNING       = 2,
-    ZE_TS_WAITING       = 4,
-    ZE_TS_TERMINATED    = 8,
-    ZE_TS_EXITING       = 16,
-    ZE_TS_DONE          = 32
+	ZE_TS_STARING		= 2,
+    ZE_TS_RUNNING       = 4,
+    ZE_TS_WAITING       = 8,
+    ZE_TS_TERMINATED    = 16,
+    ZE_TS_EXITING       = 32,
+    ZE_TS_DONE          = 64
 };
 #define MASK(Value)(Value)
-#define ZE_TS_ALIVE_MASK    MASK(ZE_TS_RUNNING | ZE_TS_WAITING | ZE_TS_EXITING)
+#define ZE_TS_ALIVE_MASK    MASK(ZE_TS_STARING | ZE_TS_RUNNING | ZE_TS_WAITING | ZE_TS_EXITING)
 #define ZE_TS_DEAD_MASK     MASK(ZE_TS_NONE | ZE_TS_TERMINATED | ZE_TS_DONE)
 
 class ZEThread;

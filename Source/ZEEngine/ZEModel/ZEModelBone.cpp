@@ -157,7 +157,7 @@ const ZEMatrix4x4& ZEModelBone::GetInverseTransform() const
 
 const ZEMatrix4x4& ZEModelBone::GetVertexTransform() const
 {
-	ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), BoneResource->InverseTransform);
+	ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), GetInverseTransform());
 	return VertexTransform;
 }
 
@@ -242,7 +242,7 @@ void ZEModelBone::SetWorldPosition(const ZEVector3& WorldPosition)
 	else
 	{
 		ZEVector3 Result;
-		ZEMatrix4x4::Transform(Result, ParentBone->GetWorldTransform(), WorldPosition);
+		ZEMatrix4x4::Transform(Result, ParentBone->GetWorldTransform().Inverse(), WorldPosition);
 		SetPosition(Result);
 	}
 }
@@ -607,6 +607,8 @@ bool ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	Report.PoligonIndex = 0;
 	Report.Normal = Report.Binormal = ZEVector3::Zero;
 	ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
+
+	return true;
 
 	return true;
 }

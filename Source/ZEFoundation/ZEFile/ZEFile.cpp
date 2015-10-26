@@ -38,6 +38,7 @@
 #include "ZEError.h"
 #include "ZEFile.h"
 #include "ZEPathManager.h"
+#include "ZEPlatform.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
@@ -222,7 +223,8 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 			FILE* Valid = FileOpen(RealPath.Path, ZEString("rb"));
 			if (Valid == NULL)
 			{
-				zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), RealPath.Path.ToCString());
+				if (errno != ENOENT)
+					zeError("Error: \"%s\" occurred in file: \"%s\".", GetErrorString(errno).ToCString(), RealPath.Path.ToCString());
 				return false;
 			}
 			else

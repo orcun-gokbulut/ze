@@ -91,14 +91,14 @@ class ZE3dsMaxUtils
 		inline Point3			ZEtoMax(const ZEVector3& Vector);
 		inline Quat				ZEtoMax(const ZEQuaternion& Quaternion);
 
-		static bool				GetProperty(IExportEntity* Object, const char* Property, INode*& Value);
-		static bool				GetProperty(IExportEntity* Object, const char* Property, IGameScene* Scene, IGameNode*& Value);
-		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, bool& Value);
-		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, const char*& Value);
-		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, ZEInt& Value);
-		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, ZEUInt& Value);
-		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, float& Value);
-		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const char* Property, ZEMLProperty& Value);
+		static bool				GetProperty(IExportEntity* Object, const MCHAR* Property, INode*& Value);
+		static bool				GetProperty(IExportEntity* Object, const MCHAR* Property, IGameScene* Scene, IGameNode*& Value);
+		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, bool& Value);
+		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, const MCHAR*& Value);
+		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEInt& Value);
+		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEUInt& Value);
+		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, float& Value);
+		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEMLProperty& Value);
 
 		static void				CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh);
 };

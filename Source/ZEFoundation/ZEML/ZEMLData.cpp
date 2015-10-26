@@ -59,16 +59,6 @@ ZEMLElementType ZEMLData::GetType()
 	return ZEML_ET_DATA;
 }
 
-ZESize ZEMLData::GetSize()
-{
-	ZESize Size = 1 +				// Identifier
-		1 + GetName().GetLength() +	// Name
-		8 +							// Size;
-		DataSize;					// Data
-
-	return Size;
-}
-
 ZEMLElement* ZEMLData::Clone()
 {
 	ZEMLData* CloneData = new ZEMLData(GetName());

@@ -41,6 +41,12 @@ endif()
  
 project(ZinekEngine)
 
+set(ZEBUILD_EDITION "Development" CACHE STRING "Determines Zinek Engine Edition.")
+set_property(CACHE ZEBUILD_EDITION PROPERTY STRINGS "Standard" "Development" "Demo")
+string(TOUPPER ${ZEBUILD_EDITION} ZEBUILD_EDITION_UPPER)
+add_definitions(-DZE_EDITION_${ZEBUILD_EDITION_UPPER})
+add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
+
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
@@ -59,8 +65,6 @@ ze_symbol_server_init()
 ## DLL Options
 #########################################################################################
 set(ZEBUILD_MONOLITHIC FALSE CACHE BOOL "Compile Zinek as monolithic. No dll will be generated and external plugins will be disabled.")
-
-
 
 
 ## Compiler & Linker Options
@@ -85,10 +89,11 @@ endif()
 ## Directories
 #########################################################################################
 include_directories(
+	${CMAKE_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/Source
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)
-
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 include(ze_qt)
 
 add_definitions(-DFREEIMAGE_LIB)

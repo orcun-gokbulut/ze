@@ -39,32 +39,37 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZETypes.h"
+#include "ZEPacking.h"
 
-class ZEGUID
-{
-	public:
-		ZEUInt32			Data1;
-		ZEUInt16			Data2;
-		ZEUInt16			Data3;
-		ZEUInt64			Data4;
+ZEPackStruct(
+	class ZEGUID
+	{
+		public:
+			ZEUInt32			Data1;
+			ZEUInt16			Data2;
+			ZEUInt16			Data3;
+			ZEUInt64			Data4;
 
-		ZEInt				Compare(const ZEGUID& Other) const;
-		bool				Equals(const ZEGUID& Other) const;
+			ZEInt				Compare(const ZEGUID& Other) const;
+			bool				Equals(const ZEGUID& Other) const;
 
-		bool				operator<(const ZEGUID& Other) const;
-		bool				operator>(const ZEGUID& Other) const;
-		bool				operator<=(const ZEGUID& Other) const;
-		bool				operator>=(const ZEGUID& Other) const;
-		bool				operator==(const ZEGUID& Other) const;
-		bool				operator!=(const ZEGUID& Other) const;
+			bool				operator<(const ZEGUID& Other) const;
+			bool				operator>(const ZEGUID& Other) const;
+			bool				operator<=(const ZEGUID& Other) const;
+			bool				operator>=(const ZEGUID& Other) const;
+			bool				operator==(const ZEGUID& Other) const;
+			bool				operator!=(const ZEGUID& Other) const;
 
-		ZEString			ToString();
+			bool				FromString(const ZEString& String);
+			ZEString			ToString() const;
 
-							ZEGUID();
-							ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
-							ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
+								ZEGUID();
+								ZEGUID(const ZEString& String);
+								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt64 Data4);
+								ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
 
-		static ZEGUID		Generate();
-};
+			static ZEGUID		Generate();
+	}
+);
 
 #endif

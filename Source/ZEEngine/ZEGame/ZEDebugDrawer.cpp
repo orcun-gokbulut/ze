@@ -88,7 +88,7 @@ void ZEDebugDrawer::DrawBoundingSphere(const ZEBSphere& BoundingSphere, const ZE
 
 	Canvas.SetTransfomation(WorldMatrix);
 	Canvas.SetColor(Color);
-	Canvas.AddWireframeSphere(1.0f, 8, 8);
+	Canvas.AddWireframeSphere(1.0f, 4, 4);
 }
 
 void ZEDebugDrawer::DrawLineSegment(const ZEVector3& StartPosition, const ZEVector3& EndPosition, const ZEVector4& Color, ZECanvas& Canvas)
@@ -249,7 +249,7 @@ bool ZEDebugDrawer::InitializeSelf()
 	EntityTag = ZEUIDebugDrawTag::CreateInstance();
 	EntityTag->SetPosition(ZEVector2(0.0f, 0.0f));
 	EntityTag->SetFontColor(DrawColor);
-	EntityTag->SetIcon("zinek2.png");
+	//EntityTag->SetIcon("#R:/zinek2.png");
 	EntityTag->SetZOrder(1);
 	zeGame->UIManager->AddControl(EntityTag);
 

@@ -113,7 +113,7 @@ bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 	Helpers.SetCount(InteriorNode.ReadUInt32("HelperCount"));
 	Materials.SetCount(InteriorNode.ReadUInt32("MaterialCount"));
 
-	ZEMLReaderNode MaterialsNode = InteriorNode.GetSubNode("Materials");
+	ZEMLReaderNode MaterialsNode = InteriorNode.GetNode("Materials");
 
 	if (!ReadMaterials(&MaterialsNode))
 	{
@@ -121,7 +121,7 @@ bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 		return false;
 	}
 
-	ZEMLReaderNode RoomsNode = InteriorNode.GetSubNode("Rooms");
+	ZEMLReaderNode RoomsNode = InteriorNode.GetNode("Rooms");
 
 	if (!ReadRooms(&RoomsNode))
 	{
@@ -131,7 +131,7 @@ bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 
 	if (InteriorNode.IsSubNodeExists("Doors"))
 	{
-		ZEMLReaderNode DoorsNode = InteriorNode.GetSubNode("Doors");
+		ZEMLReaderNode DoorsNode = InteriorNode.GetNode("Doors");
 
 		if (!ReadDoors(&DoorsNode))
 		{
@@ -142,7 +142,7 @@ bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
 
 	if (InteriorNode.IsSubNodeExists("Helpers"))
 	{
-		ZEMLReaderNode HelpersNode = InteriorNode.GetSubNode("Helpers");
+		ZEMLReaderNode HelpersNode = InteriorNode.GetNode("Helpers");
 
 		if (!ReadHelpers(&HelpersNode))
 		{
@@ -164,11 +164,11 @@ bool ZEInteriorResource::ReadDoors(ZEMLReaderNode* DoorsNode)
 	if (!DoorsNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = DoorsNode->GetSubNodeCount("Door");
+	ZESize SubNodeCount = DoorsNode->GetNodeCount("Door");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode DoorNode = DoorsNode->GetSubNode("Door", I);
+		ZEMLReaderNode DoorNode = DoorsNode->GetNode("Door", I);
 
 		if (!DoorNode.IsValid())
 			return false;
@@ -227,11 +227,11 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 		ZEInteriorFileVertexChunk	Vertices[3];
 	});
 
-	ZESize SubNodeCount = RoomsNode->GetSubNodeCount("Room");
+	ZESize SubNodeCount = RoomsNode->GetNodeCount("Room");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode RoomNode = RoomsNode->GetSubNode("Room", I);
+		ZEMLReaderNode RoomNode = RoomsNode->GetNode("Room", I);
 
 		if (!RoomNode.IsValid())
 			return false;
@@ -248,7 +248,8 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 
 		ZEArray<ZEInteriorFilePolygonChunk> MapPolygons;
 		MapPolygons.SetCount(RoomNode.ReadDataSize("Polygons") / sizeof(ZEInteriorFilePolygonChunk));
-		RoomNode.ReadData("Polygons", MapPolygons.GetCArray(), RoomNode.ReadDataSize("Polygons"));
+		if (!RoomNode.ReadDataItems("Polygons", MapPolygons.GetCArray(), sizeof(ZEInteriorFilePolygonChunk), MapPolygons.GetCount()))
+			return false;
 		
 		if(MapPolygons.GetCount() == 0)
 			zeError("Polygon count is : 0. Room name : %s", Room->Name);
@@ -300,7 +301,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 
 		if(RoomNode.IsPropertyExists("PhysicalMesh"))
 		{
-			ZEMLReaderNode PhysicalMeshNode = RoomNode.GetSubNode("PhysicalMesh");
+			ZEMLReaderNode PhysicalMeshNode = RoomNode.GetNode("PhysicalMesh");
 
 			Room->PhysicalMesh.PhysicalMeshEnabled = PhysicalMeshNode.ReadBoolean("PhysicalMeshEnabled");
 
@@ -308,10 +309,12 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 				Room->PhysicalMesh.UserDefinedProperties = PhysicalMeshNode.ReadString("UserDefinedProperties");
 
 			Room->PhysicalMesh.Polygons.SetCount(PhysicalMeshNode.ReadDataSize("Polygons") / sizeof(ZEInteriorPhysicalMeshPolygon));
-			PhysicalMeshNode.ReadData("Polygons", Room->PhysicalMesh.Polygons.GetCArray(), PhysicalMeshNode.ReadDataSize("Polygons"));
+			if (!RoomNode.ReadDataItems("Polygons", Room->PhysicalMesh.Polygons.GetCArray(), sizeof(ZEInteriorPhysicalMeshPolygon), Room->PhysicalMesh.Polygons.GetCount()))
+				return false;
 
 			Room->PhysicalMesh.Vertices.SetCount(PhysicalMeshNode.ReadDataSize("Vertices") / sizeof(ZEVector3));
-			PhysicalMeshNode.ReadData("Vertices", Room->PhysicalMesh.Vertices.GetCArray(), PhysicalMeshNode.ReadDataSize("Vertices"));
+			if (!RoomNode.ReadDataItems("Vertices", Room->PhysicalMesh.Vertices.GetCArray(), sizeof(ZEVector3), Room->PhysicalMesh.Vertices.GetCount()))
+				return false;
 
 			Room->HasPhysicalMesh = true;
 		}
@@ -356,11 +359,11 @@ bool ZEInteriorResource::ReadHelpers(ZEMLReaderNode* HelpersNode)
 	if (!HelpersNode->IsValid())
 		return false;
 
-	ZESize SubNodeCount = HelpersNode->GetSubNodeCount("Helper");
+	ZESize SubNodeCount = HelpersNode->GetNodeCount("Helper");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode HelperNode = HelpersNode->GetSubNode("Helper", I);
+		ZEMLReaderNode HelperNode = HelpersNode->GetNode("Helper", I);
 
 		if (!HelperNode.IsValid())
 			return false;
@@ -397,11 +400,11 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
 		Materials[I] = ZEFixedMaterial::CreateInstance();
 
-	ZESize SubNodeCount = MaterialsNode->GetSubNodeCount("Material");
+	ZESize SubNodeCount = MaterialsNode->GetNodeCount("Material");
 
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
-		ZEMLReaderNode MaterialNode = MaterialsNode->GetSubNode("Material", I);
+		ZEMLReaderNode MaterialNode = MaterialsNode->GetNode("Material", I);
 
 		if (!MaterialNode.IsValid())
 			return false;

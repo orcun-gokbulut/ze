@@ -34,16 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_PACKING_H__
-#define __ZE_PACKING_H__
 
 #include "ZETypes.h"
-#if defined(ZE_PLATFORM_COMPILER_MSVC)
+#include "ZEPlatform.h"
+
+#if defined(ZE_META_COMPILER)
+	#define ZEPackStruct(Declaration) Declaration
+	#define ZEPackStruct4(Declaration) Declaration
+#elif defined(ZE_PLATFORM_COMPILER_MSVC)
 	#define ZEPackStruct(Declaration) __pragma(pack(push, 1)) Declaration __pragma(pack(pop))
 	#define ZEPackStruct4(Declaration) __pragma(pack(push, 4)) Declaration __pragma(pack(pop))
 	#define ZEPackStruct16(Declaration) __pragma(pack(push, 16)) Declaration __pragma(pack(pop))
 #elif defined(ZE_PLATFORM_COMPILER_GCC)
 	#define ZEPackStruct(Declaration) Declaration __attribute__((__packed__))
-#endif
-
+	#define ZEPackStruct4(Declaration) Declaration
+#else
+	#error "Unknown compiler packing directives"
 #endif

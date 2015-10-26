@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
 #include "ZEIPAddress.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#ifdef ZE_PLATFORM_ARCHITECTURE_X64

@@ -52,6 +52,7 @@ class ZEMLEditorWindow : public QMainWindow
 	private:
 		static ZEMLEditorWindow* Instance;
 		Ui_ZEMLEditorWindow*	Form;
+		ZEMLFormatDescription*	Format;
 		QLabel*					StatusBarLabel;
 		ZEString				FileName;
 		ZEMLRoot				Root;

@@ -41,6 +41,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
+#include "ZEFile\ZEPathInfo.h"
 
 #define OPTIONS_FILE_MAX_LINE_LENGTH 1024
 #define OPTIONS_FILE_MAX_NAME_LENGTH 256
@@ -51,7 +52,7 @@ bool ZEOptionManager::LoadCommand(ZECommand* Command, const ZECommandParameterLi
 {
 	if(Params->GetCount() == 0)
 	{
-		Load("options.ini");
+		Load("#E:/options.ini");
 		return true;
 	}
 	else if (Params->GetCount() == 1 &&
@@ -78,7 +79,7 @@ bool ZEOptionManager::SaveCommand(ZECommand* Command, const ZECommandParameterLi
  	 switch(Params->GetCount())
 	 {
 		case 0:
-			Save("options.ini");
+			Save("#E:/options.ini");
 			zeOutput("Options saved.");
 			return true;
 		case 1:
@@ -302,7 +303,8 @@ ZESize ZEOptionManager::GetNumberOfSections()
 
 void ZEOptionManager::Save(const ZEString& FileName)
 {
-	FILE* File = fopen(FileName, "w");
+	ZERealPath Path = ZEPathInfo(FileName).GetRealPath();
+	FILE* File = fopen(Path.Path, "w");
 	ZEOptionSection*	CurrentSet;
 	ZEOption*		Current;
 	ZESize I, N;
@@ -443,7 +445,8 @@ ZEOption* ZEOptionManager::GetOption(const ZEString& SectionName, const ZEString
 
 void ZEOptionManager::Load(const ZEString& FileName)
 {
-	FILE* File = fopen(FileName, "r");
+	ZERealPath Path = ZEPathInfo(FileName).GetRealPath();
+	FILE* File = fopen(Path.Path, "r");
 	
 	char		LineBuffer[OPTIONS_FILE_MAX_LINE_LENGTH], 
 				NameBuffer[OPTIONS_FILE_MAX_NAME_LENGTH], 

@@ -56,12 +56,10 @@ class ZEMLElement : public ZEListItem
 		void						SetParent(ZEMLNode* Parent);
 		ZEMLNode*					GetParent();
 
-
 		bool						SetName(const char* Name);
 		const ZEString&				GetName();	
 
 		virtual ZEMLElementType		GetType() = 0;
-		virtual ZESize				GetSize() = 0;
 
 		virtual ZEMLElement*		Clone() = 0;
 

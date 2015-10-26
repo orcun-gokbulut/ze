@@ -56,9 +56,9 @@ enum ZESeekFrom
 // ZE_FOM_READ_WRITE: Both reading and writing
 enum ZEFileOpenMode
 {
-	ZE_FOM_READ				= 0,
-	ZE_FOM_WRITE			= 1,
-	ZE_FOM_READ_WRITE		= 2
+	ZE_FOM_READ				= 1,
+	ZE_FOM_WRITE			= 2,
+	ZE_FOM_READ_WRITE		= 3
 };
 
 

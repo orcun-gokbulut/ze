@@ -54,6 +54,8 @@ class ZEModelMeshLOD
 	private:
 		ZEModel*							Owner;
 		ZEModelMesh*						OwnerMesh;
+		ZEInt32								DrawStartDistance;
+		ZEInt32								DrawEndDistance;
 		const ZEModelResourceMeshLOD*		LODResource;
 		
 		ZEGRHolder<ZEGRIndexBuffer>			IndexBuffer;
@@ -72,6 +74,8 @@ class ZEModelMeshLOD
 
 		const ZEModelResourceMeshLOD*		GetLODResource();
 
+		ZEInt32								GetDrawStartDistance();
+		ZEInt32								GetDrawEndDistance();
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();
 

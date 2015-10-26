@@ -246,6 +246,7 @@ void ZEDMaterialEditor::SaveMaterials()
 
 void ZEDMaterialEditor::Open()
 {
+	ZEPathManager::GetInstance()->SetAccessControl(false);
 	QString SelectedFilePath = QFileDialog::getOpenFileName(0, QString("Load Material"), QString(ZEPathManager::GetInstance()->GetResourcePath().ToCString()), QString("*.ZEMATERIAL"), 0, 0);
 
 	if(SelectedFilePath.count() != 0)

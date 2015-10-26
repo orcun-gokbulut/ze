@@ -40,6 +40,7 @@
 #include "ZEFileInfo.h"
 #include "ZEDirectoryInfo.h"
 #include "ZEPathTokenizer.h"
+#include "ZEPlatform.h"
 
 bool ZEPathInfo::Normalize(ZEPathTokenizer& Tokenizer)
 {
@@ -203,7 +204,7 @@ ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 		return "";
 
 	ZEPathTokenizer ParentPathTokens;
-	PathTokens.Tokenize(ParentPath);
+	ParentPathTokens.Tokenize(ParentPath);
 	if (!Normalize(ParentPathTokens))
 		return "";
 
@@ -212,14 +213,14 @@ ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 	{
 		const char* ParentToken = ParentPathTokens.GetToken(I);
 		const char* PathToken = PathTokens.GetToken(I);
-		if (ParentToken != PathToken)
+		if (strcmp(ParentToken, PathToken) == 0)
 		{
 			for (ZESize N = 0; N <= I; N++)
-				ParentPathTokens.SetToken(N, NULL);
+				PathTokens.SetToken(N, NULL);
 		}
 	}
 
-	ParentPathTokens.Combine();
+	PathTokens.Combine();
 
 	return PathTokens.GetOutput();
 }

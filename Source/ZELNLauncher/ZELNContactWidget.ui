@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZELNContactWidget</class>
+ <widget class="QWidget" name="ZELNContactWidget">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>569</width>
+    <height>531</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Zinek Launcher - Contact</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <property name="bottomMargin">
+    <number>0</number>
+   </property>
+   <item>
+    <widget class="QScrollArea" name="scrollArea_2">
+     <property name="styleSheet">
+      <string notr="true"/>
+     </property>
+     <property name="frameShape">
+      <enum>QFrame::NoFrame</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Plain</enum>
+     </property>
+     <property name="widgetResizable">
+      <bool>true</bool>
+     </property>
+     <widget class="QWidget" name="scrollAreaWidgetContents_2">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>0</y>
+        <width>552</width>
+        <height>541</height>
+       </rect>
+      </property>
+      <property name="styleSheet">
+       <string notr="true"/>
+      </property>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QLabel" name="label_16">
+         <property name="styleSheet">
+          <string notr="true"/>
+         </property>
+         <property name="text">
+          <string>&lt;html&gt;
+&lt;head /&gt;
+&lt;body&gt;
+    &lt;table border=&quot;0px&quot;&gt;
+        &lt;tr&gt;
+            &lt;td&gt;
+                &lt;p&gt;&lt;span style=&quot;font-size: 12pt; font-weight: 600;&quot;&gt;Zinek Code House&lt;/span&gt;&lt;/p&gt;
+                &lt;p&gt;
+                    &lt;span style=&quot;font-weight: 600;&quot;&gt;Address:&lt;br /&gt;
+                    &lt;/span&gt;Bilkent Cyberpark. Cyberplaza.&lt;br /&gt;
+                    A. Blok. No: A303B&lt;br /&gt;
+                    Çankaya - Ankara/TÜRKİYE&lt;br /&gt;
+                    &lt;span style=&quot;font-weight: 600;&quot;&gt;Tel : &lt;/span&gt;+90 312 210 1066&lt;br /&gt;
+                    &lt;span style=&quot;font-weight: 600;&quot;&gt;Fax : &lt;/span&gt;+90 312 210 1043&lt;br /&gt;
+                    &lt;span style=&quot;font-weight: 600;&quot;&gt;E-Mail : &lt;/span&gt;&lt;a href=&quot;mailto:contact@zinekengine.com&quot;&gt;&lt;span style=&quot;text-decoration: underline; color: #0000ff;&quot;&gt;contact@zinekengine.com&lt;br /&gt;
+                    &lt;/span&gt;&lt;/a&gt;&lt;span style=&quot;font-weight: 600;&quot;&gt;WWW : &lt;/span&gt;&lt;a href=&quot;http://www.zinekengine.com&quot;&gt;&lt;span style=&quot;text-decoration: underline; color: #0000ff;&quot;&gt;www.zinekengine.com&lt;br /&gt;
+                    &lt;/span&gt;&lt;/a&gt;&lt;span style=&quot;font-weight: 600;&quot;&gt;Working Hours :&lt;/span&gt; 09:00-18:00 (GMT+2, Weekdays)
+                &lt;/p&gt;
+                &lt;p&gt;
+                    &lt;a href=&quot;http://customer.zinekengine.com&quot;&gt;&lt;span style=&quot;font-size: 10pt; font-weight: 600; text-decoration: underline; color: #0000ff;&quot;&gt;Customer Portal&lt;/span&gt;&lt;/a&gt;&lt;br /&gt;
+                    &lt;a href=&quot;mailto:customer-support@zinekengine.com&quot;&gt;&lt;span style=&quot;text-decoration: underline; color: #0000ff;&quot;&gt;Customer Support&lt;/span&gt;&lt;/a&gt;&lt;br /&gt;
+                    &lt;a href=&quot;technical-support@zinekengine.com&quot;&gt;&lt;span style=&quot;text-decoration: underline; color: #0000ff;&quot;&gt;Techical Support&lt;/span&gt;&lt;/a&gt;&lt;br /&gt;
+                    &lt;a href=&quot;bug-suggestion@zinekengine.com&quot;&gt;&lt;span style=&quot;text-decoration: underline; color: #0000ff;&quot;&gt;Bug / Suggestion Report&lt;/span&gt;&lt;/a&gt;&lt;br /&gt;
+                &lt;/p&gt;
+            &lt;/td&gt;
+            &lt;td align=&quot;right&quot; valign=&quot;top&quot;&gt;
+                &lt;img src=&quot;:/ZELNLauncher/ZinekCodeHouse.png&quot; /&gt;&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td colspan=&quot;2&quot;&gt;
+                &lt;p&gt;Copyright (C) 2008-2015, Zinek Code House. All rights reserved. This software and software package is registered trade mark of Zinek Code House. This software and software package is protected by international copyright and intellectual property laws. This software is sold/licenced only throught special licensing channels and explicit licensing aggremenets between parties. If you bought this software without any license agreement with &amp;quot;Zinek Code House&amp;quot;, you or your bussines may be victim of software counterfeit and piracy. If so, please contact to &amp;quot;Zinek Code House&amp;quot; by using contact information above. Thank you and we wish you plesant day or evening.&lt;/p&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/body&gt;
+&lt;/html&gt;
+</string>
+         </property>
+         <property name="wordWrap">
+          <bool>true</bool>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_4">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>18</width>
+           <height>192</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

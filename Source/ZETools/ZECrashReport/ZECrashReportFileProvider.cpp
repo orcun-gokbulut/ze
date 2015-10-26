@@ -35,7 +35,7 @@
 
 #include "ZECrashReportFileProvider.h"
 
-#include <stdio.h>
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#define WIN32_LEAN_AND_MEAN
@@ -43,6 +43,8 @@
 #elif defined(ZE_PLATFORM_UNIX)
 	#include <unistd.h>
 #endif
+
+#include <stdio.h>
 
 ZECrashReportProviderType ZECrashReportFileProvider::GetProviderType()
 {

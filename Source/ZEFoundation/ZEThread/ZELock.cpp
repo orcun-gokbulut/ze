@@ -35,6 +35,7 @@
 
 #include "ZELock.h"
 #include "ZEError.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 	#include <intrin.h>

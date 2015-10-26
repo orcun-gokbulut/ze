@@ -96,6 +96,10 @@ void ZERealTimeClock::ResetTime()
 
 void ZERealTimeClock::UpdateFrameTime()
 {
+	LARGE_INTEGER Freq;
+	QueryPerformanceFrequency(&Freq);
+	Frequency = Freq.QuadPart;
+
 	LARGE_INTEGER CurrentTick;
 	QueryPerformanceCounter(&CurrentTick);
 	OldFrameTick = FrameTick;

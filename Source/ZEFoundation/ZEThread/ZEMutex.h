@@ -37,6 +37,8 @@
 #define __ZE_MUTEX_H__
 
 #include "ZEDS/ZEString.h"
+#include "ZEPlatform.h"
+
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
 #endif

@@ -40,11 +40,16 @@
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEString.h"
 
+class ZEData;
+
 class ZEApplicationModule : public ZEModule
 {
 	ZE_MODULE(ZEApplicationModule)
 
 	public:
+		virtual ZEData*		GetLoadingScreen();
+		virtual ZEUInt32	GetLoadingScreenColor();
+
 		virtual void		PreProcess();
 		virtual void		Process(float ElapsedTime);
 		virtual void		PostProcess(float ElapsedTime);
