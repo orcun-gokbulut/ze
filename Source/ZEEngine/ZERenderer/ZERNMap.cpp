@@ -118,7 +118,9 @@ bool ZERNMap::IsAvailable()
 
 void ZERNMap::Write(ZEMLWriterNode& ParentNode, const ZEString& Name)
 {
-	ZEMLWriterNode Node = ParentNode.OpenSubNode(Name);
+	ZEMLWriterNode Node;
+	if(ParentNode.OpenNode(Name, Node))
+		return;
 
 	Node.WriteString("Resource", GetTextureFile());
 	Node.WriteUInt8("AddressU", Sampler.GetAddressU());
@@ -138,7 +140,7 @@ void ZERNMap::Write(ZEMLWriterNode& ParentNode, const ZEString& Name)
 
 void ZERNMap::Read(ZEMLReaderNode& ParentNode, const ZEString& Name)
 {
-	ZEMLReaderNode Node = ParentNode.GetSubNode(Name);
+	ZEMLReaderNode Node = ParentNode.GetNode(Name);
 	if (!Node.IsValid())
 	{
 		Texture.Release();

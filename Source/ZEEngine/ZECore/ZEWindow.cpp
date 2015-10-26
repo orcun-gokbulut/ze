@@ -43,6 +43,7 @@
 #define NOMINMAX
 #include <windows.h>
 #include <stdio.h>
+#include "ZEWindowResources.h"
 
 
 static void ManageCursorVisibility(HWND hWnd, LPARAM lParam)

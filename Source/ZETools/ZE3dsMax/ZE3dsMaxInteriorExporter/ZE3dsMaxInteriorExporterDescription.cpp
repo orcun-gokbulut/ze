@@ -35,7 +35,6 @@
 
 #include "ZE3dsMaxInteriorExporterDescription.h"
 #include "ZE3dsMaxInteriorExporter.h"
-#include "ZE3dsMaxInteriorActions.h"
 
 #define ZE3dsMaxInteriorExporter_CLASS_ID	Class_ID(0x3a8ad1e4, 0x973e26ff)
 
@@ -51,7 +50,7 @@ void* ZE3dsMaxInteriorExporterDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxInteriorExporterDescription::ClassName()
 { 
-	return "ZE3dsMaxInteriorExporter"; 
+	return L"ZE3dsMaxInteriorExporter"; 
 }
 
 SClass_ID ZE3dsMaxInteriorExporterDescription::SuperClassID()
@@ -66,12 +65,12 @@ Class_ID ZE3dsMaxInteriorExporterDescription::ClassID()
 
 const TCHAR* ZE3dsMaxInteriorExporterDescription::Category()
 {
-	return "Exporter"; 
+	return L"Exporter"; 
 }
 
 const TCHAR* ZE3dsMaxInteriorExporterDescription::InternalName()
 { 
-	return "ZEInterior Exporter"; 
+	return L"ZEInterior Exporter"; 
 }
 
 HINSTANCE ZE3dsMaxInteriorExporterDescription::HInstance()
@@ -81,20 +80,12 @@ HINSTANCE ZE3dsMaxInteriorExporterDescription::HInstance()
 
 int ZE3dsMaxInteriorExporterDescription::NumActionTables()
 {
-	return 1;
+	return 0;
 }
 
 ActionTable* ZE3dsMaxInteriorExporterDescription::GetActionTable(int i)
 {
-	ActionTable* MainActionTable = GetCOREInterface()->GetActionManager()->FindTable(kActionMainUI);
-
-	ZE3dsMaxInteriorActionAddRoomAttributes* AddZEInteriorRoomAttributesAction = new ZE3dsMaxInteriorActionAddRoomAttributes();
-	MainActionTable->AppendOperation(AddZEInteriorRoomAttributesAction);
-
-	ZE3dsMaxInteriorActionAddDoorAttributes* AddZEInteriorDoorAttributesAction = new ZE3dsMaxInteriorActionAddDoorAttributes();
-	MainActionTable->AppendOperation(AddZEInteriorDoorAttributesAction);
-
-	return MainActionTable;
+	return NULL;
 }
 
 ClassDesc2* ZE3dsMaxInteriorExporterDescription::GetInstance()

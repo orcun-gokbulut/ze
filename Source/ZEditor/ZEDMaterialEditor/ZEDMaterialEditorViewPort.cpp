@@ -190,7 +190,7 @@ void ZEDMaterialEditorViewPort::SetModelResource(ZEModelResource* ModelResource)
 
 void ZEDMaterialEditorViewPort::SetMaterial(ZEString MaterialFile)
 {
-	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource("ZEEngine\\PrimitiveModels\\Box\\Box.ZEMODEL");
+	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource("#R:/ZEEngine/PrimitiveModels/Box/Box.ZEMODEL");
 	SetModelResource(ModelResource);
 	((ZEFixedMaterial*)(ModelResource->GetMaterials()[0]))->ReadFromFile(MaterialFile);
 

@@ -57,6 +57,9 @@
 #include <QtGui\QDesktopServices>
 #include <QtGui\QTreeWidgetItem>
 #include "QtGui\qlabel.h"
+#include "ZEML\ZEMLFormatXMLV1.h"
+#include "ZEMLEditorFormatSelector.h"
+#include "ZEFile\ZEFileInfo.h"
 
 ZEMLEditorWindow* ZEMLEditorWindow::Instance = NULL;
 
@@ -161,7 +164,9 @@ void ZEMLEditorWindow::OpenFile(const ZEString& FileName)
 	if (FileName == "")
 		return;
 
-	ZEMLNode* NewNode = new ZEMLNode();
+	Form->statusbar->showMessage(QString("Loading... File Name: %1").arg(FileName.ToCString()));
+
+		ZEMLNode* NewNode = new ZEMLNode();
 	ZEMLRoot Root;
 	Root.SetRootNode(NewNode);
 	if (!Root.Read(FileName))
@@ -170,6 +175,8 @@ void ZEMLEditorWindow::OpenFile(const ZEString& FileName)
 		return;
 	}
 
+	Format = Root.GetFormat();
+
 	this->FileName = FileName;
 	if (RootNode != NULL)
 		delete RootNode;
@@ -177,6 +184,10 @@ void ZEMLEditorWindow::OpenFile(const ZEString& FileName)
 	RootNode = NewNode;
 
 	ZEDOperationManager::GetInstance()->Clear();
+
+	Form->statusbar->showMessage(QString("File Loaded. File Name: %1").arg(FileName.ToCString()));
+	
+	setWindowTitle(QString("ZEML Editor - %1").arg(ZEFileInfo(FileName).GetFileName().ToCString()));
 
 	LoadTree();
 	ConfigureUI();
@@ -191,8 +202,11 @@ void ZEMLEditorWindow::SaveFile(const ZEString& FileName)
 	if (FileName == NULL)
 		return;
 
+	Form->statusbar->showMessage(QString("Saving... File Name: %1").arg(FileName.ToCString()));
+
 	ZEMLRoot Root;
 	Root.SetRootNode(RootNode);
+	Root.SetFormat(Format);
 	if (!Root.Write(FileName))
 	{
 		QMessageBox::critical(this, "ZEML Editor", "Cannot save ZEML file.", QMessageBox::Ok);
@@ -200,6 +214,10 @@ void ZEMLEditorWindow::SaveFile(const ZEString& FileName)
 	}
 
 	this->FileName = FileName;
+
+	Form->statusbar->showMessage(QString("File Saved. File Name: %1").arg(FileName.ToCString()));
+
+	setWindowTitle(QString("ZEML Editor - %1").arg(ZEFileInfo(FileName).GetFileName().ToCString()));
 
 	RegisterRecentFile(FileName);
 }
@@ -211,7 +229,7 @@ void ZEMLEditorWindow::ConfigureUI()
 
 	Form->actNew->setEnabled(GetEditMode());
 	Form->actSave->setEnabled(GetEditMode() && RootNode != NULL);
-	Form->actSaveAs->setEnabled(GetEditMode() && RootNode != NULL);
+	Form->actSaveAs->setEnabled(RootNode != NULL);
 	Form->trwElementTree->setEnabled(RootNode != NULL);
 	
 	int SelectedItem = Form->trwElementTree->selectedItems().count();
@@ -286,8 +304,10 @@ void ZEMLEditorWindow::New()
 	RootNode = new ZEMLNode();
 	RootNode->SetName("ZEML");
 	Root.SetRootNode(RootNode);
-
+	Format = ZEMLFormat::GetFormats()[0];
 	ZEDOperationManager::GetInstance()->Clear();
+
+	setWindowTitle("ZEML Editor - New File");
 
 	ConfigureUI();
 	LoadTree();
@@ -318,17 +338,31 @@ void ZEMLEditorWindow::Save()
 		return;
 	}
 
-	ZEMLRoot Root;
-	Root.SetRootNode(RootNode);
-	if (!Root.Write(FileName))
+	if ((Format->GetSupport() & ZEML_FS_WRITE) == 0)
 	{
-		QMessageBox::critical(this, "ZEML Editor", "Cannot save ZEML file.", QMessageBox::Ok);
-		return;
+		ZEMLEditorFormatSelector* FormatSelector = new ZEMLEditorFormatSelector();
+		FormatSelector->setModal(true);
+		FormatSelector->SetFormat(Format);
+		QDialog::DialogCode Result = (QDialog::DialogCode)FormatSelector->exec();
+		if (Result == QDialog::Rejected)
+			return;
+		Format = FormatSelector->GetFormat();
 	}
+
+	SaveFile(FileName);
 }
 
 void ZEMLEditorWindow::SaveAs()
 {
+	ZEMLEditorFormatSelector* FormatSelector = new ZEMLEditorFormatSelector();
+	FormatSelector->setModal(true);
+	FormatSelector->SetFormat(Format);
+
+	QDialog::DialogCode Result = (QDialog::DialogCode)FormatSelector->exec();
+	if (Result == QDialog::Rejected)
+		return;
+	Format = FormatSelector->GetFormat();
+
 	QString NewFileName = QFileDialog::getSaveFileName(this, 
 		"Save ZEML File", FileName.ToCString(), 
 		"ZEML Based Files (*.ZEML *.ZE*);;ZEML Files (*.ZEML);;All Files (*.*)");
@@ -346,6 +380,8 @@ void ZEMLEditorWindow::Close()
 
 	ZEDOperationManager::GetInstance()->Clear();
 	
+	setWindowTitle("ZEML Editor");
+
 	LoadTree();
 	ConfigureUI();
 }

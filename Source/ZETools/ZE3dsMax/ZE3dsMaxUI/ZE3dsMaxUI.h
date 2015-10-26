@@ -42,8 +42,10 @@
 #include <bmmlib.h>
 #include <guplib.h>
 
-#define ZECommonUtilsHelperAttributesAdd_Action_ID 980
-#define ZECommonUtilsRemoveAttributes_Action_ID 990
+#define ZECommonUtilsHelperAttributesAdd_Action_ID Class_ID(0x346704d6, 0x5f240495)
+#define ZECommonUtilsRemoveAttributes_Action_ID Class_ID(0x1073561b, 0x4e375559)
+#define ZE3dsMax_Action_Table_ID Class_ID(0x388e24cf, 0x4e944a58)
+#define ZE3dsMax_Menu_Context_ID Class_ID(0x6a122cbe, 0xac55d7d)
 
 extern HINSTANCE hInstance;
 
@@ -99,11 +101,24 @@ public:
 						ZE3dsMaxCommonUtilsRemoveAttributes();
 };
 
+class ZE3dsMaxActionCallback : public ActionCallback
+{
+	public:
+		ActionTable*	ZinekActionTable;
+
+		BOOL			ExecuteAction(int id);
+
+						ZE3dsMaxActionCallback(ActionTable* Table);
+
+};
+
 class ZE3dsMaxUI : public GUP 
 {
 	public:
 		virtual DWORD		Start(); 
 		virtual void		Stop();
+
+		virtual void		DeleteThis();
 
 							ZE3dsMaxUI();
 		virtual				~ZE3dsMaxUI();

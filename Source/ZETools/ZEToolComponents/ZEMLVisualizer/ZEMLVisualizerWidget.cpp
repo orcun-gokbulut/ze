@@ -192,8 +192,8 @@ void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentIte
 		//NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "DataProperty");
 		ZEMLData* CurrentItem = (ZEMLData*)Item;
-		ZEString DataSize = CurrentItem->GetSize();
-		NewItem->setText(2, ("Data Size : " + DataSize + " byte(s)").ToCString());
+		ZEString DataSize = CurrentItem->GetDataSize();
+		NewItem->setText(2, ("Data Size : -" + DataSize + " byte(s)").ToCString());
 	}
 	else if (Item->GetType() == ZEML_ET_PROPERTY)
 	{

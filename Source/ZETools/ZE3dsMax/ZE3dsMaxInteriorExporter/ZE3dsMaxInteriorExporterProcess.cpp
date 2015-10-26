@@ -122,15 +122,15 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
 		zeLog("Processing Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
 		
-		DoorNode->AddProperty("Name")->SetString(CurrentNode->GetName());
+		DoorNode->AddProperty("Name")->SetString(ZEString(CurrentNode->GetName()));
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, "IsOpen", *DoorNode->AddProperty("IsOpen")))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, L"IsOpen", *DoorNode->AddProperty("IsOpen")))
 			zeError("Can not find door property : \"IsOpen\".");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Width", *DoorNode->AddProperty("Width")))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, L"Width", *DoorNode->AddProperty("Width")))
 			zeError("Can not find door property : \"Width\".");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, "Length", *DoorNode->AddProperty("Length")))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, L"Length", *DoorNode->AddProperty("Length")))
 			zeError("Can not find door property : \"Length\".");
 
 		ZEMatrix4x4 ObjectTM;
@@ -154,10 +154,10 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		DoorNode->AddProperty("Rotation")->SetQuaternion(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
 		DoorNode->AddProperty("Scale")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "RoomA", RoomANode))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomA", RoomANode))
 			zeError("Can not find door property: RoomA");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "RoomB", RoomBNode))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomB", RoomBNode))
 			zeError("Can not find door property: RoomB");
 
 		if (RoomANode == NULL || RoomBNode == NULL || RoomANode == RoomBNode)
@@ -184,7 +184,7 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 		if (!UserDefinedPropertiesBuffer.isNull())
-			DoorNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
+			DoorNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 	
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
@@ -273,7 +273,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		INode* PhysicalMeshMaxNode;
 		IGameNode* PhysicalMeshNode;
 
-		RoomNode->AddProperty("Name")->SetString(CurrentNode->GetName());
+		RoomNode->AddProperty("Name")->SetString(ZEString(CurrentNode->GetName()));
 
 		RoomNode->AddProperty("Position")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Translation()));
 		RoomNode->AddProperty("Rotation")->SetQuaternion(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetWorldTM().Rotation()));
@@ -283,24 +283,24 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 		if (!UserDefinedPropertiesBuffer.isNull())
-			RoomNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
+			RoomNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "OctreeEnabled", OctreeEnabled))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"OctreeEnabled", OctreeEnabled))
 			zeError("Can not find room property : \"OctreeEnabled\".");
 		else
 			RoomNode->AddProperty("GenerateOctree")->SetBool(OctreeEnabled);
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshExists", PhysicalMeshExists))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshExists", PhysicalMeshExists))
 			zeError("Can not find room property : \"PhysicalMeshExists\".");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshEnabled", PhysicalMeshEnabled))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshEnabled", PhysicalMeshEnabled))
 			zeError("Can not find room property : \"PhysicalMeshEnabled\".");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, "PhysicalMeshUseSelf", PhysicalMeshUseSelf))
+		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshUseSelf", PhysicalMeshUseSelf))
 			zeError("Can not find room property : \"PhysicalMeshUseSelf\".");
 
 		if(PhysicalMeshEnabled && !PhysicalMeshUseSelf)
-			if(!ZE3dsMaxUtils::GetProperty(CurrentObject, "PhysicalMesh", PhysicalMeshMaxNode))
+			if(!ZE3dsMaxUtils::GetProperty(CurrentObject, L"PhysicalMesh", PhysicalMeshMaxNode))
 				zeError("Can not find room property : \"PhysicalMesh\".");
 
 		if(PhysicalMeshExists)
@@ -314,7 +314,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 				CurrentNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 				if (!UserDefinedPropertiesBuffer.isNull())
-					PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
+					PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
 				ProcessPhysicalMesh(CurrentNode, CurrentNode, PhysicalMeshZEMLNode);
 			}
@@ -335,7 +335,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 					PhysicalMeshNode->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 					if (!UserDefinedPropertiesBuffer.isNull())
-						PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
+						PhysicalMeshZEMLNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
 					ProcessPhysicalMesh(CurrentNode, PhysicalMeshNode, PhysicalMeshZEMLNode);
 				}
@@ -445,13 +445,13 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		ZEProgressDialog::GetInstance()->OpenTask(Node->GetName());
 		zeLog("Processing helper \"%s\".", Node->GetName());
 
-		HelperNode->AddProperty("Name")->SetString(Node->GetName());
+		HelperNode->AddProperty("Name")->SetString(ZEString(Node->GetName()));
 
 		INode* OwnerNode = NULL;
 		ZEInt32 OwnerIndex;
 		ZEInteriorHelperOwnerType OwnerType;
 
-		if(!ZE3dsMaxUtils::GetProperty(Helper, "Owner", OwnerNode))
+		if(!ZE3dsMaxUtils::GetProperty(Helper, L"Owner", OwnerNode))
 			zeError("Can not find helper property: Owner");
 
 		IGameNode* OwnerGameNode = Scene->GetIGameNode(OwnerNode);
@@ -465,11 +465,11 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		}
 		else
 		{
-			const char* Type;
+			const MCHAR* Type;
 
-			ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, "ZEType", Type);
+			ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, L"ZEType", Type);
 
-			if (strcmp(Type, "Room") == 0)
+			if (wcscmp(Type, L"Room") == 0)
 			{
 				OwnerIndex = ZE3dsMaxInteriorExporter::FindRoomIndex(OwnerGameNode);
 				OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_ROOM;
@@ -521,7 +521,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		Node->GetMaxNode()->GetUserPropBuffer(UserDefinedPropertiesBuffer);
 
 		if (!UserDefinedPropertiesBuffer.isNull())
-			HelperNode->AddProperty("UserDefinedProperties")->SetString(UserDefinedPropertiesBuffer.data());
+			HelperNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
 		zeLog("Helper \"%s\" is processed.", Node->GetName());
 		ZEProgressDialog::GetInstance()->CloseTask();
@@ -603,11 +603,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 			case ID_AM: // Ambient
 				break;
 			case ID_DI: // Diffuse
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
-					zeError("Diffuse texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
+					zeError("Diffuse texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
 				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
-					zeError("Diffuse texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+					zeError("Diffuse texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_DIFFUSEMAP;
@@ -624,11 +624,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_SP: // Specular
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
-					zeError("Specular texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
+					zeError("Specular texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
 				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
-					zeError("Specular texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+					zeError("Specular texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_SPECULARMAP;
@@ -645,11 +645,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_SI:	// Emissive
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
-					zeError("Emissive texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
+					zeError("Emissive texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
 				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
-					zeError("Emissive texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+					zeError("Emissive texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_EMISSIVEMAP;
@@ -666,11 +666,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_OP:	// Opacity 
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
-					zeError("Opacity texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
+					zeError("Opacity texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
 				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
-					zeError("Opacity texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+					zeError("Opacity texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_OPACITYMAP;
@@ -689,11 +689,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 			case ID_FI:	// Filter color 
 				break;
 			case ID_BU: // Bump 
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
-					zeError("Bump texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
+					zeError("Bump texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
 				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
-					zeError("Bump texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+					zeError("Bump texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_NORMALMAP;
@@ -710,11 +710,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				}
 				break;
 			case ID_RL: // Reflection - Environment
-				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), MaterialOption))
-					zeError("Environment texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
+					zeError("Environment texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
 				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
-					zeError("Environment texture export path not valid . Resource identifier : %s", ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName().ToCString());
+					zeError("Environment texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
 					MapFlag |= ZE_MTMP_ENVIRONMENTMAP;
@@ -740,19 +740,21 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		zeLog("Writing material file.");
 		ZEMLWriter MaterialWriter;
 		MaterialWriter.Open(&MaterialFile);
-		ZEMLWriterNode MaterialSerialNode = MaterialWriter.WriteRootNode("ZEMaterial");
+		ZEMLWriterNode MaterialSerialNode;
+		MaterialWriter.OpenRootNode("ZEMaterial", MaterialSerialNode);
 		MaterialSerialNode.WriteUInt8("MajorVersion", 1);
 		MaterialSerialNode.WriteUInt8("MinorVersion", 0);
 		MaterialSerialNode.WriteString("Name", MaterialName);
-		ZEMLWriterNode MaterialConfigNode = MaterialSerialNode.OpenSubNode("Configuration");
+		ZEMLWriterNode MaterialConfigNode;
+		MaterialSerialNode.OpenNode("Configuration", MaterialConfigNode);
 
 		MaterialConfigNode.WriteString("Name", "Default");
 		bool TempBooleanValue = false;
-		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "wire", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, L"wire", TempBooleanValue);
 		MaterialConfigNode.WriteBool("Wireframe", TempBooleanValue);
 
 		TempBooleanValue = false;
-		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, "twoSided", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, L"twoSided", TempBooleanValue);
 		MaterialConfigNode.WriteBool("TwoSided", TempBooleanValue);
 
 		MaterialConfigNode.WriteBool("LightningEnabled", true); // Lightning Enabled is forced true;
@@ -845,31 +847,31 @@ bool ZE3dsMaxInteriorExporter::ProcessScene()
 
 	IGameNode* CurrentNode = NULL;
 	IGameObject* CurrentObject = NULL;
-	const char* NodeZEType = NULL;
+	const MCHAR* NodeZEType = NULL;
 
 	for (ZESize I = 0; I < (ZESize)MeshNodes.Count(); I++)
 	{
 		CurrentNode = MeshNodes[I];
 		CurrentObject = CurrentNode->GetIGameObject();
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, L"ZEType", NodeZEType))
 			continue;
 
-		if (strcmp(NodeZEType, "Room") == 0)
+		if (wcscmp(NodeZEType, L"Room") == 0)
 		{
 			RoomNodeCount++;
 			Rooms.Append(1, &CurrentNode);
 		}
-		else if (strcmp(NodeZEType, "Door") == 0)
+		else if (wcscmp(NodeZEType, L"Door") == 0)
 		{
 			DoorNodeCount++;
 			Doors.Append(1, &CurrentNode);
 		}
-		else if (strcmp(NodeZEType, "ZEInteriorFileBrush") == 0)
+		else if (wcscmp(NodeZEType, L"ZEInteriorFileBrush") == 0)
 		{
 			EntityNodeCount++;
 		}
-		else if (strcmp(NodeZEType, "ZEInteriorFileEntity") == 0)
+		else if (wcscmp(NodeZEType, L"ZEInteriorFileEntity") == 0)
 		{
 			//Why is is empty...
 		}
@@ -884,10 +886,10 @@ bool ZE3dsMaxInteriorExporter::ProcessScene()
 		CurrentNode = HelperNodes[I];
 		CurrentObject = CurrentNode->GetIGameObject();
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, L"ZEType", NodeZEType))
 			continue;
 
-		if (strcmp(NodeZEType, "Helper") == 0)
+		if (wcscmp(NodeZEType, L"Helper") == 0)
 		{
 			HelperNodeCount++;
 			Helpers.Append(1, &CurrentNode);
@@ -913,12 +915,12 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 	{
 		IGameNode* CurrentNode = Nodes[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-		const char* NodeZEType;
+		const MCHAR* NodeZEType = NULL;
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, "ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, L"ZEType", NodeZEType))
 			continue;
 
-		if (strcmp(NodeZEType, "Room") == 0)
+		if (wcscmp(NodeZEType, L"Room") == 0)
 		{
 			RoomNodeCount++;
 			ResourceRooms.Append(1, &CurrentNode);
@@ -973,30 +975,30 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 					break;
 
 				case ID_DI: // Diffuse
-					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 					break;
 
 				case ID_SP: // Specular
-					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 					break;
 
 				case ID_SI:	// Emissive
-					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 					break;
 
 				case ID_OP:	// Opacity 
-					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 					break;
 
 				case ID_FI:	// Filter color 
 					break;
 
 				case ID_BU: // Bump 
-					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 					break;
 
 				case ID_RL: // Reflection - Environment
-					ResourceConfigurationDialog->AddResource(ZEFileInfo(CurrentTexture->GetBitmapFileName()).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
+					ResourceConfigurationDialog->AddResource(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), "Image", CurrentTexture->GetBitmapFileName(), ZEString());
 					break;
 
 				case ID_RR: // Refraction 

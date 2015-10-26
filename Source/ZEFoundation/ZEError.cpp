@@ -35,6 +35,8 @@
 
 #include "ZEError.h"
 
+#include "ZEPlatform.h"
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <string.h>

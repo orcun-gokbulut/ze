@@ -468,8 +468,14 @@ class ZEArray
 			qsort(Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))CompareFunction);
 		}
 
+		template<ZEInt CompareFunction(const ZEType&, const ZEType&)>
+		inline void Sort2()
+		{
+			qsort(Items, Count, sizeof(ZEType), (int (*)(const void*, const void*))CompareFunction);
+		}
+
 		template<typename ZESearchValueType, ZEInt CompareFunction(const ZEType&, ZESearchValueType)>
-		ZESSize BinarySearch(ZESearchValueType TargetValue) 
+		ZESSize BinarySearch(ZESearchValueType TargetValue) const
 		{
 			ZESSize Low = 0;
 			ZESSize High = Count;
@@ -478,9 +484,9 @@ class ZEArray
 				ZESSize Middle = Low + (High - Low) / 2;
 				ZEInt Result = CompareFunction(Items[Middle], TargetValue);
 				if (Result > 0)
-					High = Middle - 1;
-				else if (Result < 0)
 					Low = Middle + 1;
+				else if (Result < 0)
+					High = Middle - 1;
 				else
 					return Middle;
 			}

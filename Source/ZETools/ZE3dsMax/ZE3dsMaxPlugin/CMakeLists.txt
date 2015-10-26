@@ -47,7 +47,7 @@ ze_add_source(zineklogo.bmp					Sources ZEFC)
 ze_add_library(TARGET ZE3dsMaxPlugin 
 	SOURCES ${Sources}
 	ZEFC ${ZEFC}
-	LIBS ZEFoundation ZEFile ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI ZE3dsMaxUtils Comctl32 lib3dsMax
+	LIBS ZEFoundation ZEFile ZE3dsMaxModelExporter ZE3dsMaxInteriorExporter ZE3dsMaxUI ZE3dsMaxUtils Comctl32 lib3dsMax2015
 	DLL
 	INSTALL)
 

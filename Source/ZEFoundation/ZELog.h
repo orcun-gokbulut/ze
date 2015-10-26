@@ -37,8 +37,9 @@
 #ifndef __ZE_LOG_H__
 #define __ZE_LOG_H__
 
-#include "ZEDS/ZEString.h"
 #include "ZEDLL.h"
+#include "ZEPlatform.h"
+#include "ZEDS/ZEString.h"
 #include "ZEThread/ZELock.h"
 
 enum ZELogType
@@ -57,7 +58,7 @@ enum ZELogType
     #define __ZINEK_FUNCTION__ __PRETTY_FUNCTION__
 #endif
 
-typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* LogText);
+typedef void (*ZELogCallback)(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 #define zeLog(...)\
 	do\
 	{\
@@ -74,6 +75,7 @@ class ZELog
 		bool				LogFileEnabled;
 		ZEString			LogFileName;
 		ZELogCallback		LogCallback;
+		void*				LogCallbackExtraParameters;
 		ZELogType			MinimumLogLevel;
 		ZELock				Lock;
 
@@ -92,7 +94,7 @@ class ZELog
         void				SetLogFileName(const ZEString& FileName);
         const char*			GetLogFileName();
 
-		void				SetCallback(ZELogCallback Callback);
+		void				SetCallback(ZELogCallback Callback, void* ExtraParameters);
 		ZELogCallback		GetCallback();
 
 		void				Log(const char* Module, ZELogType Type, const char* Format, ...);

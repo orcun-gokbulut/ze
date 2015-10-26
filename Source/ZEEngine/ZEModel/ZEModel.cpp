@@ -58,8 +58,7 @@ void ZEModel::CalculateBoundingBox() const
 	{
 		if (!Meshes[I].MeshResource->IsSkinned)
 		{
-			ZEAABBox CurrentBoundingBox = Meshes[I].GetModelBoundingBox();
-			//ZEAABBox::Transform(CurrentBoundingBox, Meshes[I].GetLocalBoundingBox(), Meshes[I].GetLocalTransform());
+			const ZEAABBox& CurrentBoundingBox = Meshes[I].GetModelBoundingBox();
 
 			for (ZEInt N = 0; N < 8; N++)
 			{
@@ -77,15 +76,19 @@ void ZEModel::CalculateBoundingBox() const
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 	{
-		ZEVector3 BonePosition = Bones[I].GetModelPosition();
+		const ZEAABBox& CurrentBoundingBox = Bones[I].GetModelBoundingBox();
 
-		if (BonePosition.x < BoundingBox.Min.x) BoundingBox.Min.x = BonePosition.x;
-		if (BonePosition.y < BoundingBox.Min.y) BoundingBox.Min.y = BonePosition.y;
-		if (BonePosition.z < BoundingBox.Min.z) BoundingBox.Min.z = BonePosition.z;
+		for (ZEInt N = 0; N < 8; N++)
+		{ 
+			ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
+			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
 
-		if (BonePosition.x > BoundingBox.Max.x) BoundingBox.Max.x = BonePosition.x;
-		if (BonePosition.y > BoundingBox.Max.y) BoundingBox.Max.y = BonePosition.y;
-		if (BonePosition.z > BoundingBox.Max.z) BoundingBox.Max.z = BonePosition.z;
+			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+		}
 	}
 
 	SetBoundingBox(BoundingBox);

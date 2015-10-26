@@ -38,6 +38,16 @@
 
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
 
+ZEData* ZEApplicationModule::GetLoadingScreen()
+{
+	return NULL;
+}
+
+ZEUInt32 ZEApplicationModule::GetLoadingScreenColor()
+{
+	return 0x00000000;
+}
+
 void ZEApplicationModule::PreProcess()
 {
 }

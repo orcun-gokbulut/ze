@@ -35,6 +35,21 @@
 
 #include "ZEInitializable.h"
 
+bool ZEInitializable::InstanceManager(int Operation)
+{
+	return false;
+}
+
+bool ZEInitializable::InitializeGlobal()
+{
+	return false;
+}
+
+void ZEInitializable::DeinitializeGlobal()
+{
+
+}
+
 bool ZEInitializable::InitializeSelf()
 {
 	return true;
@@ -55,8 +70,19 @@ bool ZEInitializable::Initialize()
 	if (Initialized)
 		return true;
 
+	if (InstanceManager(1))
+	{
+		if (!InitializeGlobal())
+			return false;
+	}
+
 	if (!InitializeSelf())
+	{
+		if (InstanceManager(-1))
+			DeinitializeGlobal();
+
 		return false;
+	}
 
 	Initialized = true;
 
@@ -70,6 +96,9 @@ void ZEInitializable::Deinitialize()
 
 	DeinitializeSelf();
 
+	if (InstanceManager(-1))
+		DeinitializeGlobal();
+
 	Initialized = false;
 }
 
@@ -79,12 +108,14 @@ bool ZEInitializable::Reinitialize()
 		return false;
 
 	Deinitialize();
+
 	return Initialize();
 }
 
 ZEInitializable::ZEInitializable()
 {
 	Initialized = false;
+	InstanceManager(0);
 }
 
 ZEInitializable::~ZEInitializable()

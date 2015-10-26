@@ -307,6 +307,8 @@ class ZEModelResourceMeshLOD
 		ZEUInt32								VertexCount;
 
 		ZEInt32									LODLevel;
+		ZEInt32									LODStartDistance;
+		ZEInt32									LODEndDistance;
 		ZEInt32									MaterialId;
 		ZEArray<ZEUInt32>						AffectingBoneIds;
 };

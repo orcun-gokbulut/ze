@@ -612,9 +612,11 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 
 bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 {
-	ZEMLWriterNode EntityNode = Serializer->OpenSubNode("Entity");
+	ZEMLWriterNode EntityNode;
+	Serializer->OpenNode("Entity", EntityNode);
 		EntityNode.WriteString("Class", GetClass()->GetName());
-		ZEMLWriterNode PropertiesNode = EntityNode.OpenSubNode("Properties");
+		ZEMLWriterNode PropertiesNode; 
+		EntityNode.OpenNode("Properties", PropertiesNode);
 			const ZEProperty* Properties = GetClass()->GetProperties();
 			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
 			{
@@ -651,16 +653,17 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 	if (Unserializer->GetName() != "Entity")
 		return false;
 
-	ZEMLReaderNode PropertiesNode = Unserializer->GetSubNode("Properties");
-	const ZESmartArray<ZEMLReaderProperty>& Properties = PropertiesNode.GetProperties();
+	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
+	const ZEArray<ZEMLFormatElement>& Elements = PropertiesNode.GetElements();
 
-	for (ZESize I = 0; I < Properties.GetCount(); I++)
+	for (ZESize I = 0; I < Elements.GetCount(); I++)
 	{
-		if (Properties[I].ElementType == ZEML_ET_DATA)
+		if (Elements[I].ElementType != ZEML_ET_PROPERTY)
 			continue;
 
-		if (!GetClass()->SetProperty(this, Properties[I].Name, ZEVariant(Properties[I].Value)))
-			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Properties[I].Name.ToCString());
+
+		if (!GetClass()->SetProperty(this, Elements[I].Name, ZEVariant(Elements[I].Value)))
+			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Elements[I].Name.ToCString());
 	}
 
 	return true;

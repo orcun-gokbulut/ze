@@ -86,7 +86,7 @@ bool ZEBase64::IsBase64(void* Data, ZESize Size)
 
 ZESize ZEBase64::EncodeSize(ZESize Size)
 {
-	return ZEMath::Ceil(Size / 3) * 4;
+	return ((Size + 2) / 3) * 4; // Round Up Division of (Size / 3) * 4
 }
 
 ZESize ZEBase64::DecodeSize(void* Data, ZESize Size)
@@ -99,7 +99,7 @@ ZESize ZEBase64::DecodeSize(void* Data, ZESize Size)
 		(((ZEBYTE*)Data)[Size - 2] == '=' ? -1 : 0);
 }
 
-void ZEBase64::Encode(void* Output, void* Input, ZESize InputSize)
+void ZEBase64::Encode(void* Output, const void* Input, ZESize InputSize)
 {
 
 	ZESize I;
@@ -136,7 +136,7 @@ void ZEBase64::Encode(void* Output, void* Input, ZESize InputSize)
 	}
 }
 
-bool ZEBase64::Decode(void* Output, void* Input, ZESize InputSize)
+bool ZEBase64::Decode(void* Output, const void* Input, ZESize InputSize)
 {
 	if (InputSize == 0)
 		return true;

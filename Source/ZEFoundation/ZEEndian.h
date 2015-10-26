@@ -39,6 +39,7 @@
 #include "ZECommon.h"
 #include "ZETypes.h"
 #include "ZESwap.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 #include <intrin.h>

@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEString.h"
+#include "ZEPlatform.h"
 
 #include <string.h>
 #include <memory.h>
@@ -1525,7 +1526,7 @@ void ZEString::TrimSelf()
 	ZEDebugCheckMemory();
 }
 
-ZESize ZEString::Hash() const
+ZEUInt ZEString::Hash() const
 {
 	return ZEHashGenerator::Hash(Buffer);
 }
@@ -1837,27 +1838,27 @@ ZEInt64 ZEString::ToInt64() const
     #endif
 }
 
-ZEUInt8 ZEString::ToUInt8() const
+ZEUInt8 ZEString::ToUInt8(int Base) const
 {
-	return (ZEUInt8)strtoul(Buffer, NULL, 10);
+	return (ZEUInt8)strtoul(Buffer, NULL, Base);
 }
 
-ZEUInt16 ZEString::ToUInt16() const
+ZEUInt16 ZEString::ToUInt16(int Base) const
 {
-	return (ZEUInt16)strtoul(Buffer, NULL, 10);
+	return (ZEUInt16)strtoul(Buffer, NULL, Base);
 }
 
-ZEUInt32 ZEString::ToUInt32() const
+ZEUInt32 ZEString::ToUInt32(int Base) const
 {
-	return (ZEUInt32)strtoul(Buffer, NULL, 10);
+	return (ZEUInt32)strtoul(Buffer, NULL, Base);
 }
 
-ZEUInt64 ZEString::ToUInt64() const
+ZEUInt64 ZEString::ToUInt64(int Base) const
 {
 	#ifdef ZE_PLATFORM_COMPILER_MSVC
-		return (ZEUInt64)_strtoui64(Buffer, NULL, 10);
+		return (ZEUInt64)_strtoui64(Buffer, NULL, Base);
 	#else
-		return strtoull(Buffer, NULL, 10);
+		return strtoull(Buffer, NULL, Base);
 	#endif
 }
 
