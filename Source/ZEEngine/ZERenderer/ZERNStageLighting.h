@@ -54,7 +54,7 @@ class ZELightOmniProjective;
 class ZEGRRenderTarget;
 class ZEGRTexture2D;
 
-#define MAX_LIGHTS 512
+#define MAX_LIGHTS 511
 #define TILE_SIZE_IN_PIXELS 16	//16x16
 
 struct ZERNGPULight
@@ -71,7 +71,7 @@ struct ZERNGPULight
 
 struct ZERNTileInfo
 {
-	ZEUInt	LightIndices[MAX_LIGHTS - 1];
+	ZEUInt	LightIndices[MAX_LIGHTS];
 	ZEUInt	LightCount;
 
 	ZERNTileInfo():LightCount(0)
@@ -93,16 +93,18 @@ class ZERNStageLighting : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
-		ZEGRHolder<ZEGRShader>				VertexShader;
-		ZEGRHolder<ZEGRShader>				PixelShader;
+		ZEGRHolder<ZEGRShader>				TiledDeferredVertexShader;
+		ZEGRHolder<ZEGRShader>				TiledDeferredPixelShader;
+		ZEGRHolder<ZEGRShader>				DeferredVertexShader;
+		ZEGRHolder<ZEGRShader>				DeferredPixelShader;
+		ZEGRHolder<ZEGRRenderStateData>		DeferredRenderState;
+		ZEGRHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 		ZEGRHolder<ZEGRStructuredBuffer>	LightBuffer;
 		ZEGRHolder<ZEGRStructuredBuffer>	TileInfoBuffer;
 		ZEGRHolder<ZEGRConstantBuffer>		LightConstantBuffer;
 		ZEGRHolder<ZEGRVertexBuffer>		LightVertexBuffer;
 		ZEArray<ZELight*>					Lights;
 		ZEArray<ZERNTileInfo>				TileInfos;
-		ZEGRHolder<ZEGRRenderStateData>		DeferredRenderState;
-		ZEGRHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 
 		ZEGRRenderTarget*					OutputRenderTarget;
 

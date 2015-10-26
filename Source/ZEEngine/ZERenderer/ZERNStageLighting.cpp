@@ -107,7 +107,6 @@ void ZERNStageLighting::SetIsTiledDeferred(bool Value)
 		return;
 
 	SetTiledDeferred = Value;
-	DirtyFlags.RaiseFlags(ZERN_SLDF_RENDER_STATE);
 }
 
 bool ZERNStageLighting::GetIsTiledDefferred() const
@@ -119,7 +118,7 @@ bool ZERNStageLighting::InitializeSelf()
 {
 	PrevWidth = 0;
 	PrevHeight = 0;
-	SetTiledDeferred = false;
+	SetTiledDeferred = true;
 	LightBuffer = NULL;
 	TileInfoBuffer = NULL;
 	OutputRenderTarget = NULL;
@@ -136,9 +135,11 @@ bool ZERNStageLighting::InitializeSelf()
 
 void ZERNStageLighting::DeinitializeSelf()
 {
-	VertexShader.Release();
-	PixelShader.Release();
+	TiledDeferredVertexShader.Release();
+	TiledDeferredPixelShader.Release();
 	TiledDeferredRenderState.Release();
+	DeferredVertexShader.Release();
+	DeferredPixelShader.Release();
 	DeferredRenderState.Release();
 	LightBuffer.Release();
 	TileInfoBuffer.Release();
@@ -160,7 +161,7 @@ bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* 
 		PrevWidth = CurrentWidth;
 		PrevHeight = CurrentHeight;
 	}
-	
+
 	ZERNView View = Renderer->GetView();
 	AssingLightsToTiles(Renderer, Lights, View.ProjectionTransform.M11, View.ProjectionTransform.M22, View.NearZ);
 
@@ -182,6 +183,10 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 {
 	if(!Update())
 		return false;
+
+	ZEGROutput* Output = Renderer->GetOutput();
+	if(Output->GetRenderTarget() == OutputRenderTarget)
+		Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, LightConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, LightConstantBuffer);
@@ -222,10 +227,8 @@ bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELi
 	ZERNStageHDR* HDR = (ZERNStageHDR*)Renderer->GetStage(ZERN_STAGE_HDR);
 	OutputRenderTarget = (HDR != NULL) ? Gbuffer->GetAccumulationMap()->GetRenderTarget() : Output->GetRenderTarget();
 
-	ZEGRViewport Viewport = Output->GetViewport();
-
+	Context->SetViewports(1, &Output->GetViewport());
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
-	Context->SetViewports(1, &Viewport);
 
 	SetupGbufferResources(Renderer, Context);
 
@@ -366,7 +369,7 @@ void ZERNStageLighting::AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 					ZEUInt TileId = Y * TileCountX + X;
 					ZERNTileInfo& Info = TileInfos[TileId];
 					Info.LightIndices[Info.LightCount] = I;
-					Info.LightCount = (Info.LightCount >= (MAX_LIGHTS - 1)) ? (MAX_LIGHTS - 1) : ++Info.LightCount;
+					Info.LightCount = (Info.LightCount >= (MAX_LIGHTS)) ? (MAX_LIGHTS) : ++Info.LightCount;
 				}
 			}
 		}
@@ -379,7 +382,7 @@ void ZERNStageLighting::AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 					ZEUInt TileId = Y * TileCountX + X;
 					ZERNTileInfo& Info = TileInfos[TileId];
 					Info.LightIndices[Info.LightCount] = I;
-					Info.LightCount = (Info.LightCount >= (MAX_LIGHTS - 1)) ? (MAX_LIGHTS - 1) : ++Info.LightCount;
+					Info.LightCount = (Info.LightCount >= (MAX_LIGHTS)) ? (MAX_LIGHTS) : ++Info.LightCount;
 				}
 			}
 		}
@@ -395,9 +398,9 @@ void ZERNStageLighting::CreateLights()
 		ZELightPoint* PointLight = ZELightPoint::CreateInstance();
 		PointLight->SetIntensity(1.0f);
 		PointLight->SetColor(ZEVector3(ZERandom::GetFloatPositive(), ZERandom::GetFloatPositive(), ZERandom::GetFloatPositive()));
-		PointLight->SetAttenuation(0.00075f, 0.0045f, 1.0f);
-		PointLight->SetPosition(ZEVector3(ZERandom::GetFloat() * 2000.0f, 50.0f, ZERandom::GetFloatPositive() * 2000.0f));
-		PointLight->SetRange(100.0f);
+		PointLight->SetAttenuation(0.5f, 0.6f, 1.0f);
+		PointLight->SetPosition(ZEVector3(ZERandom::GetFloat() * 50.0f, 5.0f, ZERandom::GetFloat() * 50.0f));
+		PointLight->SetRange(10.0f);
 
 		Lights.Add(PointLight);
 	}
@@ -405,7 +408,7 @@ void ZERNStageLighting::CreateLights()
 	ZELightDirectional* DirectionalLight = ZELightDirectional::CreateInstance();
 	DirectionalLight->SetIntensity(1.0f);
 	DirectionalLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	DirectionalLight->SetPosition(ZEVector3(0.0f, 500.0f, 100.0f));
+	DirectionalLight->SetPosition(ZEVector3(0.0f, 10.0f, 10.0f));
 	ZEQuaternion Rotation;
 	ZEQuaternion::CreateFromDirection(Rotation, ZEVector3(0.0001f, 1.0f, 0.0001f));
 	DirectionalLight->SetRotation(Rotation);
@@ -415,15 +418,14 @@ void ZERNStageLighting::CreateLights()
 	/*ZELightOmniProjective* OmniProjectiveLight = ZELightOmniProjective::CreateInstance();
 	OmniProjectiveLight->SetProjectionTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/c.tga");
 	OmniProjectiveLight->SetIntensity(5.0f);
-	OmniProjectiveLight->SetAttenuation(0.00075f, 0.0045f, 1.0f);
-	OmniProjectiveLight->SetRange(100.0f);
-	OmniProjectiveLight->SetPosition(ZEVector3(50.0f, 50.0f, 500.0f));
+	OmniProjectiveLight->SetAttenuation(0.4f, 0.5f, 1.0f);
+	OmniProjectiveLight->SetRange(10.0f);
+	OmniProjectiveLight->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
 
-	Lights.Add(OmniProjectiveLight);*/
+	Lights.Add(OmniProjectiveLight);
 
-	/*ZELightProjective* ProjectiveLight = ZELightProjective::CreateInstance();
-	ProjectiveLight->SetPosition(ZEVector3(150.0f, 100.0f, 0.0f));
-	//ZEQuaternion Rotation;
+	ZELightProjective* ProjectiveLight = ZELightProjective::CreateInstance();
+	ProjectiveLight->SetPosition(ZEVector3(20.0f, 10.0f, 0.0f));
 	ZEQuaternion::CreateFromDirection(Rotation, ZEVector3(0.0001f, -1.0f, 0.0001f));
 	ProjectiveLight->SetRotation(Rotation);
 	ProjectiveLight->SetProjectionTextureFile("#R:/ZEEngine/ZEPostEffects/Textures/BlurMask.png");
@@ -431,7 +433,7 @@ void ZERNStageLighting::CreateLights()
 	ProjectiveLight->SetAspectRatio(1.0f);
 	ProjectiveLight->SetFOV(ZE_PI / 3.0f);
 	ProjectiveLight->SetAttenuation(0.0f, 0.0f, 1.0f);
-	ProjectiveLight->SetRange(100.0f);
+	ProjectiveLight->SetRange(10.0f);
 
 	Lights.Add(ProjectiveLight);*/
 }
@@ -471,10 +473,7 @@ bool ZERNStageLighting::UpdateBuffers()
 {
 	if(DirtyFlags.GetFlags(ZERN_SLDF_LIGHT_BUFFER))
 	{
-		if(LightBuffer != NULL)
-		{
-			LightBuffer->Release();
-		}
+		LightBuffer.Release();
 		LightBuffer = ZEGRStructuredBuffer::Create(MAX_LIGHTS, sizeof(ZERNGPULight));
 
 		DirtyFlags.UnraiseFlags(ZERN_SLDF_LIGHT_BUFFER);
@@ -505,10 +504,7 @@ bool ZERNStageLighting::UpdateBuffers()
 		ZEUInt TileCountX = (OutputRenderTarget->GetWidth() + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
 		ZEUInt TileCountY = (OutputRenderTarget->GetHeight() + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
 		
-		if(TileInfoBuffer != NULL)
-		{
-			TileInfoBuffer->Release();
-		}
+		TileInfoBuffer.Release();
 		TileInfoBuffer = ZEGRStructuredBuffer::Create(TileCountX * TileCountY, sizeof(ZERNTileInfo));
 
 		DirtyFlags.UnraiseFlags(ZERN_SLDF_TILE_BUFFER);
@@ -528,10 +524,11 @@ bool ZERNStageLighting::UpdateRenderState()
 		return true;
 
 	ZEGRRenderState RenderState;
-	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 	RenderState.SetPrimitiveType(ZEGRPrimitiveType::ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetRenderTargetFormat(0, OutputRenderTarget->GetFormat());
+
+	RenderState.SetShader(ZEGR_ST_VERTEX, TiledDeferredVertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, TiledDeferredPixelShader);
 
 	ZEGRDepthStencilState TiledDeferredDepthStencilState;
 	TiledDeferredDepthStencilState.SetDepthTestEnable(false);
@@ -543,8 +540,8 @@ bool ZERNStageLighting::UpdateRenderState()
 	TiledDeferredRenderState = RenderState.Compile();
 	zeCheckError(TiledDeferredRenderState == NULL, false, "Cannot set render state.");
 
-	ZEGRDepthStencilState DeferredDepthStencilState;
-	RenderState.SetDepthStencilState(DeferredDepthStencilState);
+	RenderState.SetShader(ZEGR_ST_VERTEX, DeferredVertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, DeferredPixelShader);
 
 	ZEGRBlendState DeferredBlendState;
 	DeferredBlendState.SetBlendEnable(true);
@@ -571,36 +568,31 @@ bool ZERNStageLighting::UpdateShaders()
 	if(!DirtyFlags.GetFlags(ZERN_SLDF_SHADERS))
 		return true;
 
-	ZEString Filename;
-	ZEString VertexShaderEntryPoint;
-	ZEString PixelShaderEntryPoint;
-
-	if(SetTiledDeferred)
-	{
-		Filename = "ZERNTiledDeferredShading.hlsl";
-		VertexShaderEntryPoint = "ZERNScreenCover_VertexShader_Position";
-		PixelShaderEntryPoint = "ZERNTiledDeferredShading_PixelShader_LightingStage";
-	}
-	else
-	{
-		Filename = "ZERNDeferredShading.hlsl";
-		VertexShaderEntryPoint = "ZERNDeferredShading_VertexShader_LightingStage";
-		PixelShaderEntryPoint = "ZERNDeferredShading_PixelShader_LightingStage";
-	}
-
 	ZEGRShaderCompileOptions Options;
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/" + Filename;
 	Options.Model = ZEGR_SM_5_0;
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTiledDeferredShading.hlsl";
 
 	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = VertexShaderEntryPoint;
-	VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(VertexShader == NULL, false, "Cannot set vertex shader.");
+	Options.EntryPoint = "ZERNScreenCover_VertexShader_Position";
+	TiledDeferredVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(TiledDeferredVertexShader == NULL, false, "Cannot set vertex shader.");
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = PixelShaderEntryPoint;
-	PixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(PixelShader == NULL, false, "Cannot set pixel shader.");
+	Options.EntryPoint = "ZERNTiledDeferredShading_PixelShader_LightingStage";
+	TiledDeferredPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(TiledDeferredPixelShader == NULL, false, "Cannot set pixel shader.");
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNDeferredShading.hlsl";
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNDeferredShading_VertexShader_LightingStage";
+	DeferredVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(DeferredVertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNDeferredShading_PixelShader_LightingStage";
+	DeferredPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(DeferredPixelShader == NULL, false, "Cannot set pixel shader.");
 
 	DirtyFlags.UnraiseFlags(ZERN_SLDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_SLDF_RENDER_STATE);
@@ -628,11 +620,8 @@ bool ZERNStageLighting::Update()
 	if(!UpdateRenderState())
 		return false;
 
-	if(SetTiledDeferred)
-	{
-		if(!UpdateBuffers())
+	if(SetTiledDeferred && !UpdateBuffers())
 			return false;
-	}
 
 	return true;
 }

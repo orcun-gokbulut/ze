@@ -56,11 +56,12 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		virtual void						Deinitialize();
 
 											ZED11Texture2D();
+		virtual								~ZED11Texture2D();
 
 	public:
 		ID3D11Texture2D*					GetTexture();
 		ID3D11ShaderResourceView*			GetResourceView();
-		ZEGRRenderTarget*					GetRenderTarget(ZEUInt Level);
+		virtual ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level);
 
 		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
 		virtual void						Unlock(ZEUInt Level);

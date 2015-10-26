@@ -63,7 +63,7 @@ class ZEGRTexture : public ZEGRResource
 		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
 		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 
-		ZEGRTexture();
+								ZEGRTexture();
 
 	public:
 		virtual ZEGRTextureType	GetTextureType() = 0;

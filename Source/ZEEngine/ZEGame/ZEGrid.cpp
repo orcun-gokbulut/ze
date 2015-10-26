@@ -77,9 +77,9 @@ void ZEGrid::GenerateGrid()
 
 	Canvas.SetColor(ZEVector4(MinorGridColor, 1.0f));
 	for (ZEInt X = -MinorGridLineCountX; X <= MinorGridLineCountX; X++)
-		Canvas.AddLine(ZEVector3(X * MinorGridUnitSize.x, 0.0f, -GridSize.y * 0.5f), ZEVector3(X * MinorGridUnitSize.x, 0.0f, GridSize.y * 0.5f));
+		Canvas.AddLine(ZEVector3(X * MinorGridUnitSize.x, 0.0f, -GridSize.x * 0.5f), ZEVector3(X * MinorGridUnitSize.x, 0.0f, GridSize.x * 0.5f));
 	for (ZEInt Y = -MinorGridLineCountY; Y <= MinorGridLineCountY; Y++)
-		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MinorGridUnitSize.y));
+		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y));
 
 	MinorGridCount = Canvas.Vertices.GetCount() - MinorGridOffset;
 
@@ -98,9 +98,9 @@ void ZEGrid::GenerateGrid()
 
 	Canvas.SetColor(ZEVector4(MajorGridColor, 1.0f));
 	for (ZEInt X = -MajorGridLineCountX; X <= MajorGridLineCountX; X++)
-		Canvas.AddLine(ZEVector3(X * MajorGridUnitSize.x, 0.0f, -GridSize.y * 0.5f), ZEVector3(X * MajorGridUnitSize.x, 0.0f, GridSize.y * 0.5f));
+		Canvas.AddLine(ZEVector3(X * MajorGridUnitSize.x, 0.0f, -GridSize.x * 0.5f), ZEVector3(X * MajorGridUnitSize.x, 0.0f, GridSize.x * 0.5f));
 	for (ZEInt Y = -MajorGridLineCountY; Y <= MajorGridLineCountY; Y++)
-		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
+		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 
 	MajorGridCount = Canvas.Vertices.GetCount() - MajorGridOffset;
 
@@ -241,16 +241,16 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 	if (AxisEnabled)
 	{
 		RenderCommand.Order = 2.0f;
-		ZEVector3 AxisXGridPosition(CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
-		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
-
-		if (AxisYGridPosition.z > -GridSize.y * 0.5f && AxisYGridPosition.z < GridSize.y * 0.5f)
-			ZEMatrix4x4::CreateOrientation(Constants.AxisXTransform, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 1.0f, GridSize.y));
-
-		if (AxisXGridPosition.x > -GridSize.x * 0.5f && AxisXGridPosition.x < GridSize.x * 0.5f)
-			ZEMatrix4x4::CreateOrientation(Constants.AxisYTransform, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 1.0f, GridSize.y));
+		ZEVector3 AxisGridPosition(
+			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
+			0.0f,
+			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
+		if ((AxisGridPosition.x > -GridSize.x * 0.5f && AxisGridPosition.x < GridSize.x * 0.5f) &&
+			(AxisGridPosition.z > -GridSize.y * 0.5f && AxisGridPosition.z < GridSize.y * 0.5f))
+		{
+			ZEMatrix4x4::CreateOrientation(Constants.AxisTransform, AxisGridPosition, GetRotation(), ZEVector3(GridSize.x, 1.0f, GridSize.y));
+		}
 	}
-
 
 	if (MinorGridEnabled)
 	{
@@ -277,11 +277,6 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 	RenderCommand.Order = 0;
 	RenderCommand.StageMask = Material->GetStageMask();
 
-	void* Buffer;
-	ConstantBuffer->Lock(&Buffer);
-	memcpy(Buffer, &Constants, sizeof(Constants));
-	ConstantBuffer->Unlock();
-
 	if(!Parameters->Renderer->ContainsCommand(&RenderCommand))
 	{
 		Parameters->Renderer->AddCommand(&RenderCommand);
@@ -298,25 +293,37 @@ void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* C
 
 	Context->SetVertexBuffer(0, VertexBuffer);
 
+	if (AxisEnabled)
+	{
+		void* Buffer;
+		ConstantBuffer->Lock(&Buffer);
+		memcpy(Buffer, &Constants.AxisTransform, sizeof(ZEMatrix4x4));
+		ConstantBuffer->Unlock();
+
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+		Context->Draw(4, 0);
+	}
+
 	if (MinorGridEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 0, 64);
+		void* Buffer;
+		ConstantBuffer->Lock(&Buffer);
+		memcpy(Buffer, &Constants.MinorGridTransform, sizeof(ZEMatrix4x4));
+		ConstantBuffer->Unlock();
+
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
 		Context->Draw(MinorGridCount, MinorGridOffset);
 	}
 
 	if (MajorGridEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 64, 64);
-		Context->Draw(MajorGridCount, MajorGridOffset);
-	}
+		void* Buffer;
+		ConstantBuffer->Lock(&Buffer);
+		memcpy(Buffer, &Constants.MajorGridTransform, sizeof(ZEMatrix4x4));
+		ConstantBuffer->Unlock();
 
-	if (AxisEnabled)
-	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 128, 64);
-		Context->Draw(2, 0);
-		
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer, 192, 64);
-		Context->Draw(2, 2);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+		Context->Draw(MajorGridCount, MajorGridOffset);
 	}
 
 	Material->CleanupMaterial(Context, Parameters->Stage);
@@ -331,7 +338,7 @@ bool ZEGrid::InitializeSelf()
 	RenderCommand.Priority = 0;
 	RenderCommand.Order = 0;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	Material = ZERNFixedMaterial::CreateInstance();
 	Material->SetVertexColorEnabled(true);
 	Material->Initialize();
@@ -345,7 +352,7 @@ bool ZEGrid::DeinitializeSelf()
 {
 	Material.Release();
 	VertexBuffer.Release();
-	ConstantBuffer->Release();
+	ConstantBuffer.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }

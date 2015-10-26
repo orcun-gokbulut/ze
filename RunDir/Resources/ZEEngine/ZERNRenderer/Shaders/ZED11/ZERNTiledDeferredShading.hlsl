@@ -39,7 +39,7 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNScreenCover.hlsl"
 
-#define MAX_LIGHTS				512
+#define MAX_LIGHTS				511
 #define TILE_SIZE_IN_PIXELS		16
 
 #define ZE_LT_POINT				1
@@ -62,7 +62,7 @@ struct ZERNTiledDeferredShading_Light
 
 struct ZERNTiledDeferredShading_TileInfo
 {
-	uint LightIndices[MAX_LIGHTS - 1];
+	uint LightIndices[MAX_LIGHTS];
 	uint LightCount;
 };
 
@@ -86,11 +86,6 @@ SamplerState ZERNTiledDeferredShading_ProjectionSampler
     Filter = MIN_MAG_MIP_LINEAR;
     AddressU = Wrap;
     AddressV = Wrap;
-};
-
-struct ZERNTiledDeferredShading_PSInput 
-{
-	float4 PositionViewport	: SV_Position;
 };
 
 float3 ZERNTiledDeferredShading_PointLighting(ZERNTiledDeferredShading_Light PointLight, ZERNTiledDeferredShading_Surface Surface)
@@ -167,27 +162,27 @@ float3 ZERNTiledDeferredShading_GetPositionViewFromDepth(float2 PositionScreen, 
 // LIGHTING STAGE - PIXEL SHADER
 ///////////////////////////////////////////////////////////////////////////////
 
-float3 ZERNTiledDeferredShading_PixelShader_LightingStage(ZERNTiledDeferredShading_PSInput Input) : SV_Target0
+float3 ZERNTiledDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
 {	
-	float Depth = ZERNGBuffer_GetDepth(uint2(Input.PositionViewport.xy));
+	float Depth = ZERNGBuffer_GetDepth(uint2(PositionViewport.xy));
 	float DepthView = ZERNView_ProjectionTransform._34 / (Depth - ZERNView_ProjectionTransform._33);
 	
 	float2 GBufferDimension;
 	ZERNGBuffer_DepthBuffer.GetDimensions(GBufferDimension.x, GBufferDimension.y);
 	
-	float2 PositionScreen = (Input.PositionViewport.xy - 0.5f) * (float2(2.0f, -2.0f) / GBufferDimension) + float2(-1.0f, 1.0f);
+	float2 PositionScreen = (PositionViewport.xy - 0.5f) * (float2(2.0f, -2.0f) / GBufferDimension) + float2(-1.0f, 1.0f);
 	
 	ZERNTiledDeferredShading_Surface Surface;
 	Surface.PositionView = ZERNTiledDeferredShading_GetPositionViewFromDepth(PositionScreen, DepthView);
-	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(int2(Input.PositionViewport.xy));
-	Surface.Specular = ZERNGBuffer_GetSpecularColor(int2(Input.PositionViewport.xy));
-	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(int2(Input.PositionViewport.xy));
+	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(int2(PositionViewport.xy));
+	Surface.Specular = ZERNGBuffer_GetSpecularColor(int2(PositionViewport.xy));
+	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(int2(PositionViewport.xy));
 	Surface.SpecularPower *= 64.0f;
 	
 	if(Surface.Diffuse.x != 0.0f)
 	{
-		uint TileX = Input.PositionViewport.x / TILE_SIZE_IN_PIXELS;
-		uint TileY = Input.PositionViewport.y / TILE_SIZE_IN_PIXELS;
+		uint TileX = PositionViewport.x / TILE_SIZE_IN_PIXELS;
+		uint TileY = PositionViewport.y / TILE_SIZE_IN_PIXELS;
 		uint TileCountX = (GBufferDimension.x + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
 		uint TileId = TileY * TileCountX + TileX;
 		

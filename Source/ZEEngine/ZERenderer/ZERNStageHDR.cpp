@@ -383,8 +383,8 @@ ZERNStageHDR::ZERNStageHDR()
 	Constants.Key = 0.35f;
 	Constants.WhiteLevel = 5.0f;
 	Constants.ToneMapOperator = ZERN_HTMO_REINHARD;
-	Constants.BloomFactor = 2.0f;
-	Constants.BloomThreshold = 2.0f;
+	Constants.BloomFactor = 0.9f;
+	Constants.BloomThreshold = 3.5f;
 
 	PrevWidth = 0;
 	PrevHeight = 0;
