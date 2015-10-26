@@ -47,8 +47,8 @@
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
-Texture2D<float4> ZERNGBuffer_DepthBuffer	: register(t0);
-Texture2D<float4> ZERNGBuffer_Buffer0		: register(t1);
+Texture2D<float> ZERNGBuffer_DepthBuffer	: register(t0);
+Texture2D<float3> ZERNGBuffer_Buffer0		: register(t1);
 Texture2D<float4> ZERNGBuffer_Buffer1		: register(t2);
 Texture2D<float4> ZERNGBuffer_Buffer2		: register(t3);
 Texture2D<float4> ZERNGBuffer_Buffer3		: register(t4);
@@ -103,7 +103,7 @@ void ZERNGBuffer_SetAccumulationColor(inout ZERNGBuffer GBuffer, float3 Color)
 
 float3 ZERNGBuffer_GetAccumulationColor(int2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xyz;
+	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0));
 }
 
 

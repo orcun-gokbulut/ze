@@ -141,7 +141,7 @@ bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	ZEUInt Width = OutputRenderTarget->GetWidth();
 	ZEUInt Height = OutputRenderTarget->GetHeight();
 
-	if (!GBuffer0.IsNull() && GBuffer0->GetWidth() != Width && GBuffer0->GetHeight() != Height)
+	if (!GBuffer0.IsNull() && (GBuffer0->GetWidth() != Width || GBuffer0->GetHeight() != Height))
 		DirtyFlags.RaiseFlags(ZERN_GSDF_RENDER_TARGET);
 
 	UpdateRenderTargets(Width, Height);

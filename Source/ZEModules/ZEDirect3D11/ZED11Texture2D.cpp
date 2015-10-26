@@ -121,6 +121,10 @@ void ZED11Texture2D::Deinitialize()
 {
 	ZEGR_RELEASE(ResourceView);
 	ZEGR_RELEASE(Texture2D);
+
+	for(ZEUInt I = 0; I < 14; ++I)
+		RenderTargets[I].Release();
+
 	ZEGRTexture2D::Deinitialize();
 }
 
@@ -155,4 +159,9 @@ ZED11Texture2D::ZED11Texture2D()
 {
 	Texture2D = NULL;
 	ResourceView = NULL;
+}
+
+ZED11Texture2D::~ZED11Texture2D()
+{
+	Deinitialize();
 }

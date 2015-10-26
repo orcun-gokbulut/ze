@@ -64,14 +64,31 @@ void ZED11Output::SwitchToFullscreen()
 
 void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
-	ID3D11RenderTargetView* RenderTargetView;
-	ID3D11Texture2D* OutputTexture;
-	HRESULT Result = SwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D), (void**)&OutputTexture);
-	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
-	OutputTexture->Release();
-
 	RenderTarget.Release();
 	DepthStencilBuffer.Release();
+
+	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot resize swapchain buffers. Error: %d.", Result);
+		return;
+	}
+
+	ID3D11RenderTargetView* RenderTargetView;
+	ID3D11Texture2D* OutputTexture;
+	Result = SwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D), (void**)&OutputTexture);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get swapchain buffers. Error: %d.", Result);
+		return;
+	}
+	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot create render target view. Error: %d.", Result);
+		return;
+	}
+	OutputTexture->Release();
 
 	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
 	DepthStencilBuffer = ZEGRDepthStencilBuffer::Create(Width, Height, ZEGR_DSF_DEPTH24_STENCIL8);
@@ -134,8 +151,9 @@ bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, 
 		return false;
 	}
 
-	UpdateRenderTarget(SwapChainDesc.Width, SwapChainDesc.Height, Mode != NULL ? Mode->GetFormat() : Format);
 	DXGIFactory->Release();
+
+	UpdateRenderTarget(SwapChainDesc.Width, SwapChainDesc.Height, Mode != NULL ? Mode->GetFormat() : Format);
 
 	return true;
 }
@@ -151,6 +169,8 @@ ZED11Output::ZED11Output()
 {
 	Handle = NULL;
 	Mode = NULL;
+	SwapChain = NULL;
+	Output = NULL;
 }
 
 void* ZED11Output::GetHandle()
@@ -218,7 +238,6 @@ void ZED11Output::Resize(ZEUInt Width, ZEUInt Height)
 	if (RenderTarget->GetWidth() == Width && RenderTarget->GetHeight() == Height)
 		return;
 
-	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 	UpdateRenderTarget(Width, Height, RenderTarget->GetFormat());
 }
 

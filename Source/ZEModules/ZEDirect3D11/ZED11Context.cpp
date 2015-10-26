@@ -324,46 +324,6 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 	if (Buffer != NULL)
 		 NativeConstants = ((ZED11ConstantBuffer*)Buffer)->GetBuffer();
 
-	/*switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_VERTEX:
-			Context->VSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			Context->PSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			Context->GSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-
-		case ZEGR_ST_HULL:
-			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-
-		case ZEGR_ST_ALL:
-			Context->VSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			Context->PSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			Context->GSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
-			break;
-	}*/
-
 	switch(Shader)
 	{
 		default:
@@ -371,6 +331,46 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 			break;
 
 		case ZEGR_ST_VERTEX:
+			Context->VSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->PSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->GSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->DSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->HSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			Context->CSSetConstantBuffers1(Index, 1, &NativeConstants, FirstConstant, NumberOfConstant);
+			break;
+	}
+
+	/*switch(Shader)
+	{
+		default:
+		case ZEGR_ST_NONE:
+			break;
+
+		case ZEGR_ST_VERTEX:
 			Context->VSSetConstantBuffers(Index, 1, &NativeConstants);
 			break;
 
@@ -402,7 +402,7 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 			Context->HSSetConstantBuffers(Index, 1, &NativeConstants);
 			Context->CSSetConstantBuffers(Index, 1, &NativeConstants);
 			break;
-	}
+	}*/
 }
 
 void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture)

@@ -54,8 +54,7 @@ class ZEGrid : public ZEEntity
 
 		struct
 		{
-			ZEMatrix4x4				AxisXTransform;
-			ZEMatrix4x4				AxisYTransform;
+			ZEMatrix4x4				AxisTransform;
 			ZEMatrix4x4				MinorGridTransform;
 			ZEMatrix4x4				MajorGridTransform;
 		} Constants;
