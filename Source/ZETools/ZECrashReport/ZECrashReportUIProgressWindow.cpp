@@ -385,7 +385,7 @@ void ZECrashReportUIProgressWindow::SendReport(ZEThread* Thread, void* Output)
 void ZECrashReportUIProgressWindow::Process()
 {
 	InitializeSenderThread();
-	SenderThread->Run(NULL);
+	SenderThread->Run();
 
 	UpdateInformationTimer.setInterval(100);
 	QObject::connect(&UpdateInformationTimer, SIGNAL(timeout()), this, SLOT(UpdateUploadInformation()));

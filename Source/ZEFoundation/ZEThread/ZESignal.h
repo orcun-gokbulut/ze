@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_SIGNAL_H__
-#define __ZE_SIGNAL_H__
+#pragma once
 
-#include "ZEDS/ZEString.h"
+#include "ZECommon.h"
 #include "ZEPlatform.h"
+#include "ZELock.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
@@ -45,6 +45,7 @@
 
 class ZESignal
 {
+	ZE_DISALLOW_COPY(ZESignal)
 	private:
         #ifdef ZE_PLATFORM_WINDOWS
             void*           Handle;
@@ -52,19 +53,15 @@ class ZESignal
             pthread_cond_t  Cond;
         #endif
 
+		ZELock				InitializeLock;
+		void				Initialize();
+
 	public:
         void                Signal();
 
         void                Wait();
         bool				Wait(ZEUInt Milliseconds);
 
-        ZESize              GetWaitCount();
-
-        ZESignal            operator=(const ZESignal& Other);
-
                             ZESignal();
-                            ZESignal(const ZESignal& Other);
                             ~ZESignal();
 };
-
-#endif

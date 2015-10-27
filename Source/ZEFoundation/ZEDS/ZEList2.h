@@ -37,6 +37,7 @@
 #include "ZECommon.h"
 #include "ZETypes.h"
 #include "ZEError.h"
+#include "ZEList2Iterator.h"
 
 template<typename ZEItemType> class ZEList2;
 
@@ -46,26 +47,29 @@ class ZELink
 	//ZE_DISALLOW_COPY(ZELink);
 	friend class ZEList2<ZEItemType>;
 	private:
-		bool						InUse;
-		ZEItemType*					Item;
-		ZELink*						Prev;
-		ZELink*						Next;
+		bool							InUse;
+		ZEItemType*						Item;
+		ZELink*							Prev;
+		ZELink*							Next;
 
 	public:
-		bool						GetInUse() const;
-		ZELink*						GetPrev();
-		const ZELink*				GetPrev() const;
-		ZELink*						GetNext();
-		const ZELink*				GetNext() const;
-		ZEItemType*					GetItem() const;
+		ZEList2Iterator<ZEItemType>		GetIterator();
+		ZEList2IteratorConst<ZEItemType> GetIteratorConst();
 
-		void						InsertBefore(ZELink<ZEItemType>* Item);
-		void						InsertAfter(ZELink<ZEItemType>* Item);
-		void						Remove();
+		bool							GetInUse() const;
+		ZELink*							GetPrev();
+		const ZELink*					GetPrev() const;
+		ZELink*							GetNext();
+		const ZELink*					GetNext() const;
+		ZEItemType*						GetItem() const;
 
-									ZELink();
-									ZELink(ZEItemType* Object);
-									~ZELink();
+		void							InsertBefore(ZELink<ZEItemType>* Item);
+		void							InsertAfter(ZELink<ZEItemType>* Item);
+		void							Remove();
+
+										ZELink();
+										ZELink(ZEItemType* Object);
+										~ZELink();
 };
 
 template<typename ZEItemType>
@@ -73,57 +77,76 @@ class ZEList2
 {
 	//ZE_DISALLOW_COPY(ZEList2)
 	private:
-		ZELink<ZEItemType>*			First;
-		ZELink<ZEItemType>*			Last;
-		ZESize						Count;
+		ZELink<ZEItemType>*				First;
+		ZELink<ZEItemType>*				Last;
+		ZESize							Count;
 
 	public:
-		ZESize						GetCount() const;
+		ZEList2Iterator<ZEItemType>		GetIterator();
+		ZEList2IteratorConst<ZEItemType>	GetIterator() const;
 
-		ZELink<ZEItemType>*			GetFirst();
-		const ZELink<ZEItemType>*	GetFirst() const;
-		ZELink<ZEItemType>*			GetLast();
-		const ZELink<ZEItemType>*	GetLast() const;
+		ZESize							GetCount() const;
 
-		ZEItemType*					GetItem(ZESize Index);
-		ZELink<ZEItemType>*			GetLink(ZESize Index);
-		const ZELink<ZEItemType>*	GetLink(ZESize Index) const;
+		ZELink<ZEItemType>*				GetFirst();
+		const ZELink<ZEItemType>*		GetFirst() const;
+		ZELink<ZEItemType>*				GetLast();
+		const ZELink<ZEItemType>*		GetLast() const;
 
-		ZELink<ZEItemType>*			Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink = NULL);
-		const ZELink<ZEItemType>*	Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink = NULL) const;
-		ZESSize						FindIndex(ZELink<ZEItemType>* Link) const;
+		ZEItemType*						GetItem(ZESize Index);
+		ZELink<ZEItemType>*				GetLink(ZESize Index);
+		const ZELink<ZEItemType>*		GetLink(ZESize Index) const;
 
-		bool						Exists(ZELink<ZEItemType>* Link);
+		ZELink<ZEItemType>*				Find(const ZEItemType* Item, ZELink<ZEItemType>* StartLink = NULL);
+		const ZELink<ZEItemType>*		Find(const ZEItemType* Item, const ZELink<ZEItemType>* StartLink = NULL) const;
+		ZESSize							FindIndex(ZELink<ZEItemType>* Link) const;
 
-		void						AddBegin(ZELink<ZEItemType>* Link);
-		void						AddEnd(ZELink<ZEItemType>* Link);
+		bool							Exists(ZELink<ZEItemType>* Link);
+
+		void							AddBegin(ZELink<ZEItemType>* Link);
+		void							AddEnd(ZELink<ZEItemType>* Link);
 		
-		void						InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink);
-		void						InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink);
+		void							InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink);
+		void							InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink);
 		
-		void						Remove(ZELink<ZEItemType>* Link);
-		void						Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B);
+		void							Remove(ZELink<ZEItemType>* Link);
+		void							Swap(ZELink<ZEItemType>* A, ZELink<ZEItemType>* B);
 
-
-		void						Reverse();
-
+		void							Reverse();
 		template<ZEInt CompareFunction(const ZEItemType*, const ZEItemType*)>
-		void						Sort();
+		void							Sort();
+		void							Clean();
 
-		void						Clean();
+		ZEItemType*						operator[](ZESize Index) const;
 
-		ZEItemType*					operator[](ZESize Index) const;
-
-									ZEList2();
-									~ZEList2();
+										ZEList2();
+										~ZEList2();
 };
+
+
+// ZELink
+/////////////////////////////////////////////////////////////////////////////
+
+template<typename ZEItemType>
+ZEList2Iterator<ZEItemType> ZELink<ZEItemType>::GetIterator()
+{
+	ZEList2Iterator<ZEItemType> Iterator;
+	Iterator.Link = this;
+	return Iterator;
+}
+
+template<typename ZEItemType>
+ZEList2IteratorConst<ZEItemType> ZELink<ZEItemType>::GetIteratorConst()
+{
+	ZEList2IteratorConst<ZEItemType> Iterator;
+	Iterator.Link = this;
+	return Iterator;
+}
 
 template<typename ZEItemType>
 bool ZELink<ZEItemType>::GetInUse() const
 {
 	return InUse;
 }
-
 
 template<typename ZEItemType>
 ZELink<ZEItemType>* ZELink<ZEItemType>::GetPrev()
@@ -177,6 +200,26 @@ template<typename ZEItemType>
 ZELink<ZEItemType>::~ZELink()
 {
 	zeDebugCheck(InUse, "Link has destructed before it it has been removed from the list.");
+}
+
+
+// ZEList2
+/////////////////////////////////////////////////////////////////////////////
+
+template<typename ZEItemType>
+ZEList2Iterator<ZEItemType> ZEList2<ZEItemType>::GetIterator()
+{
+	ZEList2Iterator<ZEItemType> Iterator;
+	Iterator.Link = First;
+	return Iterator;
+}
+
+template<typename ZEItemType>
+ZEList2IteratorConst<ZEItemType> ZEList2<ZEItemType>::GetIterator() const
+{
+	ZEList2IteratorConst<ZEItemType> Iterator;
+	Iterator.Link = First;
+	return Iterator;
 }
 
 template<typename ZEItemType>
