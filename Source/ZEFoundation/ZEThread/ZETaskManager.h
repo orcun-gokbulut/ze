@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZETaskManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,19 +30,42 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-ze_add_source(ZEJob.cpp          		Sources)
-ze_add_source(ZEJob.h            		Sources Headers)
-ze_add_source(ZEJobManager.cpp   		Sources)
-ze_add_source(ZEJobManager.h     		Sources Headers)
-ze_add_source(ZETask.cpp         		Sources)
-ze_add_source(ZETask.h           		Sources Headers)
+#include "ZEDS/ZEArray.h"
+#include "ZETaskPool.h"
 
-ze_add_library(TARGET ZETask
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS)
+class ZETask;
+class ZEThread;
+
+class ZETaskManager
+{
+	private:
+		ZEArray<ZETaskPool*>			Pools;
+
+		ZETaskPool						DefaultPool;
+		ZETaskPool						RealTimePool;
+		ZETaskPool						IOPool;
+		ZETaskPool						ConcurrentPool;
+
+										ZETaskManager();
+										~ZETaskManager();
+
+	public:
+		static ZETaskPool*				GetDefaultPool();
+		static ZETaskPool*				GetRealTimePool();
+		static ZETaskPool*				GetIOPool();
+		static ZETaskPool*				GetConcurrentPool();
+
+		const ZEArray<ZETaskPool*>&		GetPools();
+		ZETaskPool*						GetPool(ZEInt PoolId) const;
+
+		void							RegisterPool(ZETaskPool* Pool);
+		void							UnregisterPool(ZETaskPool* Pool);
+
+		static ZEUInt					GetThreadCount();
+		static ZETaskManager*			GetInstance();
+};

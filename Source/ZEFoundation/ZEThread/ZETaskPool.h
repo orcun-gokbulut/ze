@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParallel.cpp
+ Zinek Engine - ZETaskPool.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETask.h"
+#pragma once
+
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEList2.h"
+#include "ZESignal.h"
+
+class ZETask;
+class ZEThread;
+
+class ZETaskPool
+{
+	private:
+		ZEInt							Id;
+		ZEString						Name;
+		ZEArray<ZEThread*>				Threads;
+		ZEList2<ZETask>					RunningTasks;
+		ZEList2<ZETask>					QueuedTasks;
+		ZEList2<ZETask>					InactiveTasks;
+		ZELock							SchedulerLock;
+		ZESignal						Signal;
+	
+		ZETask*							Schedule(ZETask* CurrentTask);
+		void							ThreadFunction(ZEThread* Thread, void* ExtraParameters);
+
+	public:
+		void							SetId(ZEInt Id);
+		ZEInt							GetId();
+
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName();
+
+		const ZEList2<ZETask>&			GetRunningTasks();
+		const ZEList2<ZETask>&			GetQueuedTasks();
+		const ZEList2<ZETask>&			GetInactiveTasks();
+
+		void							SetThreadCount(ZEUInt Count);
+		ZEUInt							GetThreadCount();
+
+		void							RunTask(ZETask* Task);
+		void							CancelTask(ZETask* Task);
+
+		void							Resume();
+		void							Suspend();
+		void							Wait();
+
+										ZETaskPool();
+};

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParallel.cpp
+ Zinek Engine - ZETask.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,3 +34,67 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETask.h"
+#include "ZETaskPool.h"
+#include "ZETaskManager.h"
+#include "ZEThread.h"
+
+void ZETask::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString ZETask::GetName()
+{
+	return Name;
+}
+
+ZETaskStatus ZETask::GetStatus()
+{
+	return Status;
+}
+
+ZEThread* ZETask::GetThread()
+{
+	return Thread;
+}
+
+void ZETask::SetPriority(ZEInt Priority)
+{
+	this->Priority = Priority;
+}
+
+ZEInt ZETask::GetPriority()
+{
+	return Priority;
+}
+
+void ZETask::Run(ZETaskPool* Pool)
+{
+	if (Pool == NULL)
+		Pool = ZETaskManager::GetDefaultPool();
+
+	Pool->RunTask(this);		
+}
+
+void ZETask::Wait()
+{
+	if (Status == ZE_TS2_NONE)
+		return;
+
+	Signal.Wait();
+}
+
+
+ZETask::ZETask()
+{
+	Pool = NULL;
+	Status = ZE_TS2_NONE;
+	Thread = NULL;
+	Priority = 0;
+}
+
+ZETask::~ZETask()
+{
+	if (Pool != NULL)
+		Pool->CancelTask(this);
+}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParallel.h
+ Zinek Engine - ZETask.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,94 +33,62 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TASK_H__
-#define __ZE_TASK_H__
+#pragma once
 
-#include "ZELock.h"
 #include "ZETypes.h"
+#include "ZESignal.h"
+#include "ZEDS\ZEList2.h"
+#include "ZEDS\ZEDelegate.h"
 
-class ZEListItem<typename ZEType>
+enum  ZETaskPoolId
 {
-	ZEType Type;
-};
-template <typename Type>
-ZEList
-
-
-class ZEParallelPerItemTask : public ZETask
-{
-	friend class ZEParallelPerItem;
-	private:
-		ZEParallelPerItem* OwnerTask;
-		ZELock Lock;
-
-		void Function()
-		{
-			while(true)
-			{
-				int Item = OwnerTask->GetNextIndex();
-				if (Item == -1)
-				{
-					Lock->Unlock();
-					break;
-				}
-				else
-				{
-					// Put code in here !!!
-				}
-			}
-		}
-
-		ZEParallelPerItemTask()
-		{
-			Lock->Lock();
-		}
-};
-
-class ZEParallelPerItem : public ZETask
-{
-	private:
-		ZELock RootTaskLock;
-		ZESize Index;
-
-		ZESSize GetNextIndex()
-		{
-			if (Index >= Count)
-				return -1;
-
-			RootTaskLock->Lock();
-			Index++;
-			RootTaskLock->Unlock();
-			return Index - 1;
-
-		}
-
-		void Function()
-		{
-			ZESize ThreadCount = 4;
-			ZEParallelPerItemTask[16] SubTasks;
-			// Create Tasks
-		
-			for (ZESize I = 0; I < ThreadCount; I++)
-				SubTasks[I]->Lock->Wait();
-
-		}
+	ZE_TP_DEFAULT,
+	ZE_TP_REAL_TIME,
+	ZE_TP_COMPUTE,
+	ZE_TP_IO
 };
 
 enum ZETaskStatus
 {
-	ZE_TS_NONE,
-	ZE_TS_RUNNING,
-	ZE_TS_WAITING,
-	ZE_TS_DONE
+	ZE_TS2_NONE,
+	ZE_TS2_RUNNING,
+	ZE_TS2_WAITING,
 };
+
+class ZETask;
+class ZEThread;
+class ZETaskPool;
+
+typedef ZEDelegate<bool (ZETask* Task, void* ExtraParameters)> ZETaskFunction;
 
 class ZETask
 {
+	friend class ZETaskPool;
+	private:
+		ZEString			Name;
+		ZETaskStatus		Status;
+		ZEThread*			Thread;
+		ZETaskPool*			Pool;
+		ZEInt				Priority;
+		ZETaskFunction		Function;
+		void*				ExtraParameters;
+		ZELink<ZETask>		Link;
+		ZESignal			Signal;
 
-	static ZETask* GetCurrentTask(); // Returns Task
+	public:
+		void				SetName(const ZEString& Name);
+		const ZEString		GetName();
+
+		ZETaskStatus		GetStatus();
+		ZEThread*			GetThread();	
+		ZETaskPool*			GetPool();
+
+		void				SetPriority(ZEInt Priority);
+		ZEInt				GetPriority();
+
+		void				Run(ZETaskPool* Pool = NULL);
+		void				Wait();
+
+							ZETask();
+							~ZETask();
 };
-
-// Thread Manager
-
-#endif

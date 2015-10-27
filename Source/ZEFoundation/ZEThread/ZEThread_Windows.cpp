@@ -47,42 +47,61 @@ DWORD WINAPI ZEThread::ThreadFunction(LPVOID Thread)
 	CurrentThread->Status = ZE_TS_RUNNING;
 	CurrentThread->Function(CurrentThread, CurrentThread->GetParameter());
 	CurrentThread->Exit();
-
 	return 0;
 }
 
-void ZEThread::Run(void* Parameter)
+void ZEThread::Run()
 {
-    if (IsAlive())
+	if (Status == ZE_TS_SUSPENDED)
+	{
+		ResumeThread(Handle);
+		Status = ZE_TS_RUNNING;
 		return;
+	}
+	else
+	{
+		if (IsAlive())
+			return;
 
-	Status = ZE_TS_STARING;
-	Handle = CreateThread(NULL, 0, ThreadFunction, this, 0, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create thread.");
+		Status = ZE_TS_STARING;
+		Handle = CreateThread(NULL, 0, ThreadFunction, this, 0, NULL);
+		if (Handle == NULL)
+			zeCriticalError("Can not create thread.");
+	}
 }
 
 void ZEThread::Terminate()
 {
-	 if (!IsAlive())
+	if (!IsAlive())
 		return;
 
-	DWORD Result = TerminateThread(Handle, 0);
-	if (Result == -1)
-		zeCriticalError("Can not terminate thread.");
+	if (CurrentThread == this)
+	{
+		Exit();
+		return;
+	}
+	else
+	{
+		DWORD Result = TerminateThread(Handle, 0);
+		if (Result == -1)
+			zeCriticalError("Can not terminate thread.");
+	}
 
 	Status = ZE_TS_TERMINATED;
 }
 
-void ZEThread::Sleep(ZEUInt Milliseconds)
+void ZEThread::Suspend()
 {
-	zeDebugCheck(CurrentThread != this, "A thread can only use it's own sleep function.");
-	::Sleep(Milliseconds);
+	if (IsAlive() || Status == ZE_TS_SUSPENDED)
+		return;
+	
+	Status = ZE_TS_SUSPENDED;
+	SuspendThread(Handle);
 }
 
 void ZEThread::Wait()
 {
-	zeDebugCheck(CurrentThread == this, "You can not wait your own thread.");
+	zeCheckError(CurrentThread != this, ZE_VOID, "Cannot call own ZEThread::Wait function. Thread can not wait itself.");
 
 	if (!IsAlive())
 		return;
@@ -97,7 +116,7 @@ void ZEThread::Wait()
 
 bool ZEThread::Wait(ZEUInt Milliseconds)
 {
-	zeDebugCheck(CurrentThread == this, "A thread can not wait its own.");
+	zeCheckError(CurrentThread != this, false, "Cannot call own ZEThread::Wait function. Thread can not wait itself.");
 
 	if (!IsAlive())
 		return false;
@@ -111,10 +130,17 @@ bool ZEThread::Wait(ZEUInt Milliseconds)
 
 bool ZEThread::ControlPoint()
 {
-	zeDebugCheck(CurrentThread != this, "A thread can only use it's own control point function.");
+	zeCheckError(CurrentThread != this, false, "Cannot call another thread's ZEThread::ControlPoint function. Only owner thread can call it's own ControlPoint function.");
 
 	if (Status == ZE_TS_RUNNING)
+	{
 		return true;
+	}
+	else if (Status == ZE_TS_SUSPENDED)
+	{
+		Suspend();
+		return ControlPoint();
+	}
 
 	return false;
 }
@@ -131,9 +157,10 @@ void ZEThread::Exit()
 		CurrentThread->Status = ZE_TS_DONE;
 	}
 	else
+	{
 		Status = ZE_TS_EXITING;
+	}
 }
-
 
 ZEThread::ZEThread()
 {
@@ -146,9 +173,11 @@ ZEThread::~ZEThread()
 	Exit();
 
 	if (Handle != NULL)
-
+	{
 		if (!CloseHandle(Handle))
-		zeCriticalError("Cannot close handle of the thread.");
+			zeCriticalError("Cannot close handle of the thread.");
+		Handle = NULL;
+	}
 }
 
 ZEThread* ZEThread::GetCurrentThread()

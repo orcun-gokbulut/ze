@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEJobManager.cpp
+ Zinek Engine - ZEIterator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEJobManager.h"
-#include "ZEJob.h"
+#pragma once
 
-ZEJobManager::ZEJobManager()
+#define ze_for_each(Variable, Container) for (auto Variable = Container.GetIterator(); !Variable.IsEnd(); ++Variable)
+
+template<typename ZEItemType>
+class ZEIterator
 {
-	Status = ZE_JMS_NONE;
-}
+	public:
+		bool					IsBegin() const;
+		bool					IsEnd() const;
 
-ZEJobManager::~ZEJobManager()
+		ZEItemType&				GetItem() const;
+		void					Prev();
+		void					Next();
+
+		bool					operator==(const ZEIterator& Iterator) const;
+
+		ZEIterator&				operator--();
+		ZEIterator&				operator++();
+
+		ZEItemType&				operator*() const;
+		ZEItemType&				operator->() const;
+};
+
+template<typename ZEItemType>
+class ZEIteratorConst
 {
+	public:
+		bool					IsBegin() const;
+		bool					IsEnd() const;
 
-}
+		const ZEItemType&		GetItem() const;
+		void					Prev();
+		void					Next();
 
-ZEJobManagerStatus ZEJobManager::GetStatus()
-{
-	return Status;
-}
+		bool					operator==(const ZEIteratorConst& Iterator) const;
 
-void ZEJobManager::AddJob(ZEJob* Job)
-{
-	zeDebugCheck(Jobs.Exists(Job), "Job is already exists in jobs list.");
-	Jobs.Add(Job);
-}
+		ZEIteratorConst&		operator--();
+		ZEIteratorConst&		operator++();
 
-void ZEJobManager::RemoveJob(ZEJob* Job)
-{
-	zeDebugCheck(!Jobs.Exists(Job), "Job is not exist in jobs list.");
-	Jobs.RemoveValue(Job);
-}
-
-ZEJob* ZEJobManager::GetJob(const ZEString& Name)
-{
-	for (ZESize I = 0; I < Jobs.GetCount(); I++)
-		if (Jobs[I]->GetName() == Name)
-			return Jobs[I];
-
-	return NULL;
-}
-
-void ZEJobManager::RunJobs()
-{
-
-}
-
-ZEJobManager* ZEJobManager::GetInstance()
-{
-	static ZEJobManager Instnace;
-	return &Instnace;
-}
+		const ZEItemType&		operator*() const;
+		const ZEItemType&		operator->() const;
+};

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEJob.cpp
+ Zinek Engine - ZETaskManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,95 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEJob.h"
+#include "ZETaskManager.h"
 
-void ZEJob::SetName(const ZEString& Name)
+#include "ZETaskPool.h"
+#include "ZEThread\ZEThread.h"
+
+ZETaskPool* ZETaskManager::GetDefaultPool()
 {
-	this->Name = Name;
+	return &GetInstance()->DefaultPool;
 }
 
-const ZEString& ZEJob::GetName()
+ZETaskPool* ZETaskManager::GetRealTimePool()
 {
-	return Name;
+	return &GetInstance()->RealTimePool;
 }
 
-ZEJobStatus ZEJob::GetStatus()
+ZETaskPool* ZETaskManager::GetIOPool()
 {
-	return Status;
+	return &GetInstance()->IOPool;
 }
 
-void ZEJob::SetPriority(ZEJobPriority Priority)
+ZETaskPool* ZETaskManager::GetConcurrentPool()
 {
-	this->Priority = Priority;
+	return &GetInstance()->ConcurrentPool;
 }
 
-ZEJobPriority ZEJob::GetPriority()
+const ZEArray<ZETaskPool*>& ZETaskManager::GetPools()
 {
-	return Priority;
+	return Pools;
 }
 
-void ZEJob::SetRecursive(bool Recursive)
+ZETaskPool* ZETaskManager::GetPool(ZEInt PoolId) const
 {
-	this->Recursive = Recursive;
-}
-bool ZEJob::GetRecursive()
-{
-	return Recursive;
+	ze_for_each(Pool, Pools)
+		if ((*Pool)->GetId() == PoolId)
+			return &(**Pool);
+
+	return NULL;
 }
 
-void ZEJob::AddDependentJob(const ZEString& Job)
+void ZETaskManager::RegisterPool(ZETaskPool* Pool)
 {
-	DependentJobs.Add(Job);
+	if (Pools.Exists(Pool))
+		return;
+
+	Pools.Add(Pool);
 }
 
-void ZEJob::RemoveDependentJob(const ZEString& Job)
+void ZETaskManager::UnregisterPool(ZETaskPool* Pool)
 {
-	DependentJobs.RemoveValue(Job);
+	if (Pool == &DefaultPool ||
+		Pool == &RealTimePool ||
+		Pool == &IOPool ||
+		Pool == &ConcurrentPool)
+	{
+		return;
+	}
+
+	Pools.RemoveValue(Pool);
 }
 
-void ZEJob::Reset()
+ZETaskManager::ZETaskManager()
 {
-	zeDebugCheck(Status == ZE_JS_DONE || Status == ZE_JS_NONE, "Only jobs with status ZE_JS_DONE can be reseted.");
-	if (Status == ZE_JS_DONE)
-		Status = ZE_JS_NONE;
+	Pools.Add(&DefaultPool);
+	Pools.Add(&RealTimePool);
+	Pools.Add(&IOPool);
+	Pools.Add(&ConcurrentPool);
+}
+
+ZETaskManager::~ZETaskManager()
+{
+
+}
+
+#ifdef ZE_PLATFORM_WINDOWS
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+ZEUInt ZETaskManager::GetThreadCount()
+{
+	SYSTEM_INFO SystemInfo;
+	GetSystemInfo(&SystemInfo);
+	return SystemInfo.dwNumberOfProcessors;
+}
+
+#endif
+
+ZETaskManager* ZETaskManager::GetInstance()
+{
+	static ZETaskManager TaskManager;
+	return &TaskManager;
 }

@@ -34,19 +34,42 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESignal.h"
+
 #include "ZEError.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+void ZESignal::Initialize()
+{
+	if (Handle != NULL)
+		return;
+
+	InitializeLock.Lock();
+
+	if (Handle != NULL)
+		return;
+
+	Handle = CreateEvent(NULL, false, false, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create signal.");
+
+	InitializeLock.Unlock();
+}
+
 void ZESignal::Signal()
 {
+	if (Handle == NULL)
+		return;
+
 	if (!SetEvent(Handle))
 		zeCriticalError("Can not signal a signal.");
 }
 
 void ZESignal::Wait()
 {
+	Initialize();
+
 	DWORD Result = WaitForSingleObject(Handle, INFINITE);
 	if (Result != WAIT_OBJECT_0)
 		zeCriticalError("Failed to wait the signal.");
@@ -54,6 +77,8 @@ void ZESignal::Wait()
 
 bool ZESignal::Wait(ZEUInt Milliseconds)
 {
+	Initialize();
+
 	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
 	if (Result != WAIT_OBJECT_0)
 	{
@@ -68,21 +93,14 @@ bool ZESignal::Wait(ZEUInt Milliseconds)
 
 ZESignal::ZESignal()
 {
-	Handle = CreateEvent(NULL, false, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create signal.");
-}
-
-ZESignal::ZESignal(const ZESignal& Other)
-{
-	zeDebugCheckWarning(true, "Signal can not be copied. Creating new signal instead.");
-	Handle = CreateEvent(NULL, false, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create signal.");
+	Handle = NULL;
 }
 
 ZESignal::~ZESignal()
 {
-	if (!CloseHandle(Handle))
-		zeCriticalError("Can not destroy signal.");
+	if (Handle != NULL)
+	{
+		if (!CloseHandle(Handle))
+			zeCriticalError("Can not destroy signal.");
+	}
 }
