@@ -382,7 +382,7 @@ class ZEModelResource : public ZEResource
 		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLReaderNode* PhysicalJointNode);
 
 		const ZEGRTexture2D*						ManageModelMaterialTextures(const ZEString& FileName);
-		bool  										ReadModelFromFile(ZEFile* ResourceFile);
+		bool  										ReadModelFromFileV0(ZEFile* ResourceFile);
 
 		virtual										~ZEModelResource();
 

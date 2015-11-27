@@ -58,9 +58,9 @@ class ZEDebugDrawer : public ZEEntity
 		ZEVector4				DrawColor;
 		ZEFlags					DebugDrawElements;
 
-		ZERNMaterial*				Material;
+		ZERNMaterial*			Material;
 		ZECanvas				DrawCanvas;
-		ZERNCommand			RenderCommand;
+		ZERNCommand				RenderCommand;
 
 	protected:
 		ZEEntity*				Target;

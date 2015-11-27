@@ -40,7 +40,7 @@
 #include "ZERNScreenCover.hlsl"
 
 #define MAX_LIGHTS				511
-#define TILE_SIZE_IN_PIXELS		16
+#define TILE_SIZE_IN_PIXELS		32
 
 #define ZE_LT_POINT				1
 #define ZE_LT_DIRECTIONAL		2
@@ -81,24 +81,17 @@ struct ZERNTiledDeferredShading_Surface
 StructuredBuffer<ZERNTiledDeferredShading_Light>	Lights		:	register(t5);
 StructuredBuffer<ZERNTiledDeferredShading_TileInfo>	TileInfos	:	register(t6);
 
-SamplerState ZERNTiledDeferredShading_ProjectionSampler
-{
-    Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = Wrap;
-    AddressV = Wrap;
-};
-
 float3 ZERNTiledDeferredShading_PointLighting(ZERNTiledDeferredShading_Light PointLight, ZERNTiledDeferredShading_Surface Surface)
 {
 	float3 LightPositionView = mul(ZERNView_ViewTransform, float4(PointLight.PositionWorld, 1.0f)).xyz;
 	float3 LightDir = LightPositionView - Surface.PositionView;
 	float LightDist = length(LightDir);
 	LightDir = LightDir / LightDist;
-	float NdotL = max(0, dot(Surface.NormalView, LightDir));
+	float NdotL = max(0.0f, dot(Surface.NormalView, LightDir));
 	
 	float3 ViewDir = normalize(-Surface.PositionView);
 	float3 HalfVector = normalize(ViewDir + LightDir);
-	float NdotH = max(0, dot(Surface.NormalView, HalfVector));
+	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
 	float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDist, LightDist * LightDist));
 	
 	float3 ResultSpecular = pow(NdotH, Surface.SpecularPower) * Surface.Specular;
@@ -111,11 +104,11 @@ float3 ZERNTiledDeferredShading_DirectionalLighting(ZERNTiledDeferredShading_Lig
 {
 	float3 DirectionView = mul(ZERNView_ViewTransform, float4(DirectionalLight.Direction, 0.0f)).xyz;
 	DirectionView = normalize(DirectionView);
-	float NdotL = max(0, dot(Surface.NormalView, DirectionView));
+	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionView));
 	
 	float3 ViewDir = normalize(-Surface.PositionView);
 	float3 HalfVector = normalize(ViewDir + DirectionView);
-	float NdotH = max(0, dot(Surface.NormalView, HalfVector));
+	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
 	
 	float3 ResultSpecular = pow(NdotH, Surface.SpecularPower) * Surface.Specular;
 	float3 ResultDiffuse = Surface.Diffuse * DirectionalLight.Color * NdotL;
@@ -123,12 +116,12 @@ float3 ZERNTiledDeferredShading_DirectionalLighting(ZERNTiledDeferredShading_Lig
 	return (ResultDiffuse + ResultSpecular) * DirectionalLight.Intensity;
 }
 
-float4 ZERNTiledDeferredShading_Lighting(uint TileId, ZERNTiledDeferredShading_Surface Surface)
+float3 ZERNTiledDeferredShading_Lighting(uint TileId, ZERNTiledDeferredShading_Surface Surface)
 {
 	uint LightCount = TileInfos[TileId].LightCount;
 	
 	if(LightCount == 0)
-		return float4(Surface.Diffuse, 1.0f);
+		return Surface.Diffuse;
 	
 	float3 ResultColor = {0.0f, 0.0f, 0.0f};
 	
@@ -148,23 +141,12 @@ float4 ZERNTiledDeferredShading_Lighting(uint TileId, ZERNTiledDeferredShading_S
 		}
 	}
 	
-	return float4(saturate(ResultColor), 1.0f);
+	return saturate(ResultColor);
 }
 
-float3 ZERNTiledDeferredShading_GetPositionViewFromDepth(float2 PositionScreen, float DepthView)
+float3 ZERNTiledDeferredShading_GetPositionViewFromDepth(float2 PositionViewport)
 {
-	float2 ScreenCoord = PositionScreen / float2(ZERNView_ProjectionTransform._11, ZERNView_ProjectionTransform._22);
-	ScreenCoord = ScreenCoord * DepthView;
-	
-	return float3(ScreenCoord, DepthView);
-}
-
-// LIGHTING STAGE - PIXEL SHADER
-///////////////////////////////////////////////////////////////////////////////
-
-float3 ZERNTiledDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
-{	
-	float Depth = ZERNGBuffer_GetDepth(uint2(PositionViewport.xy));
+	float Depth = ZERNGBuffer_GetDepth(PositionViewport);
 	float DepthView = ZERNView_ProjectionTransform._34 / (Depth - ZERNView_ProjectionTransform._33);
 	
 	float2 GBufferDimension;
@@ -172,26 +154,35 @@ float3 ZERNTiledDeferredShading_PixelShader_LightingStage(float4 PositionViewpor
 	
 	float2 PositionScreen = (PositionViewport.xy - 0.5f) * (float2(2.0f, -2.0f) / GBufferDimension) + float2(-1.0f, 1.0f);
 	
+	float2 PositionView = PositionScreen / float2(ZERNView_ProjectionTransform._11, ZERNView_ProjectionTransform._22);
+	PositionView *= DepthView;
+	
+	return float3(PositionView, DepthView);
+}
+
+// LIGHTING STAGE - PIXEL SHADER
+///////////////////////////////////////////////////////////////////////////////
+
+float3 ZERNTiledDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
+{	
+	
 	ZERNTiledDeferredShading_Surface Surface;
-	Surface.PositionView = ZERNTiledDeferredShading_GetPositionViewFromDepth(PositionScreen, DepthView);
+	Surface.PositionView = ZERNTiledDeferredShading_GetPositionViewFromDepth(PositionViewport.xy);
+	Surface.NormalView = ZERNGBuffer_GetViewNormal(int2(PositionViewport.xy));
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(int2(PositionViewport.xy));
 	Surface.Specular = ZERNGBuffer_GetSpecularColor(int2(PositionViewport.xy));
 	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(int2(PositionViewport.xy));
-	Surface.SpecularPower *= 64.0f;
+	Surface.SpecularPower *= 64.0f;	
 	
-	if(Surface.Diffuse.x != 0.0f)
-	{
-		uint TileX = PositionViewport.x / TILE_SIZE_IN_PIXELS;
-		uint TileY = PositionViewport.y / TILE_SIZE_IN_PIXELS;
-		uint TileCountX = (GBufferDimension.x + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
-		uint TileId = TileY * TileCountX + TileX;
-		
-		Surface.NormalView = mul(ZERNView_ViewTransform, float4(0.0f, 1.0f, 0.0f, 0.0f)).xyz;
-		Surface.NormalView = normalize(Surface.NormalView);
-		return ZERNTiledDeferredShading_Lighting(TileId, Surface).xyz;
-	}
+	float2 OutputDimension;
+	ZERNGBuffer_Buffer0.GetDimensions(OutputDimension.x, OutputDimension.y);
 	
-	return float4(Surface.Diffuse, 1.0f).xyz;
+	uint TileX = PositionViewport.x / TILE_SIZE_IN_PIXELS;
+	uint TileY = PositionViewport.y / TILE_SIZE_IN_PIXELS;
+	uint TileCountX = (OutputDimension.x + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
+	uint TileId = TileY * TileCountX + TileX;
+	
+	return ZERNTiledDeferredShading_Lighting(TileId, Surface);;
 }
 
 #endif

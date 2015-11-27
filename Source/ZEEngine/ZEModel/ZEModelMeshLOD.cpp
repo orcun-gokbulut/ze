@@ -42,6 +42,8 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZERNShaderSlots.h"
 
 void ZEModelMeshLOD::SetMaterial(ZERNMaterial* Material)
 {
@@ -81,22 +83,23 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 	ZEGRContext* Context = RenderParameters->Context;
 	Material->SetupMaterial(Context, RenderParameters->Stage);
 
-	Context->SetIndexBuffer(IndexBuffer);
+	//Context->SetIndexBuffer(IndexBuffer);
 	if (RenderParameters->Type == ZERN_DT_SHADOW)
 	{
-		Context->SetVertexBuffer(0, VertexBuffer);
+		Context->SetVertexBuffers(0, 1, &VertexBuffer);
 		if (Skinned)
-			Context->SetVertexBuffer(1, VertexBufferSkin);
+			Context->SetVertexBuffers(1, 1, &VertexBufferSkin);
 	}
 	else
 	{
-		Context->SetVertexBuffer(0, VertexBuffer);
-		Context->SetVertexBuffer(1, VertexBufferNormals);
+		Context->SetVertexBuffers(0, 1, &VertexBuffer);
+		//Context->SetVertexBuffer(1, VertexBufferNormals);
 		if (Skinned)
-			Context->SetVertexBuffer(1, VertexBufferNormals);
+			Context->SetVertexBuffers(2, 1, &VertexBufferSkin);
 	}
 
-	Context->Draw((ZEUInt)LODResource->TriangleCount, 0);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	Context->Draw((ZEUInt)LODResource->VertexCount, 0);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
@@ -106,8 +109,17 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	this->LODResource = LODResource;
 	DrawStartDistance = LODResource->LODStartDistance;
 	DrawEndDistance = LODResource->LODEndDistance;
+	Material = Model->GetModelResource()->GetMaterials().GetFirstItem();
+	VertexBuffer = LODResource->VertexBuffer;
+	VertexBufferNormals = LODResource->VertexBufferNormals;
+	VertexBufferSkin = LODResource->VertexBufferSkin;
+	IndexBuffer = LODResource->IndexBuffer;
 
-	Skinned = LODResource->VertexBufferSkin->GetVertexCount() == 0 ? true : false;
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	
+	ConstantBuffer->SetData((void*)&Model->GetTransform());
+
+	Skinned = LODResource->VertexBufferSkin.IsNull() ? false : true;
 }
 
 void ZEModelMeshLOD::Deinitialize()

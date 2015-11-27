@@ -77,8 +77,8 @@ ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level)
 
 bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
 {
-	D3D11_USAGE Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
-	UINT CPUAccess = RenderTarget ? 0 : D3D11_CPU_ACCESS_WRITE;
+	//D3D11_USAGE Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
+	//UINT CPUAccess = RenderTarget ? 0 : D3D11_CPU_ACCESS_WRITE;
 	UINT BindFlags = D3D11_BIND_SHADER_RESOURCE | (RenderTarget ? D3D11_BIND_RENDER_TARGET : 0);
 
 	D3D11_TEXTURE2D_DESC TextureDesc;
@@ -87,10 +87,10 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRF
 	TextureDesc.Width = Width;
 	TextureDesc.Height = Height;
 	TextureDesc.MipLevels = Level;
-	TextureDesc.Usage = Usage;
+	TextureDesc.Usage = D3D11_USAGE_DEFAULT;
 	TextureDesc.BindFlags = BindFlags;
-	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.Format = ZED11ComponentBase::ConvertFormat(Format);
+	TextureDesc.CPUAccessFlags = 0;
+	TextureDesc.Format = RenderTarget ? ZED11ComponentBase::ConvertFormat(Format) : DXGI_FORMAT_B8G8R8A8_UNORM;
 	TextureDesc.SampleDesc.Count = 1;
 	TextureDesc.SampleDesc.Quality = 0;
 
@@ -126,6 +126,16 @@ void ZED11Texture2D::Deinitialize()
 		RenderTargets[I].Release();
 
 	ZEGRTexture2D::Deinitialize();
+}
+
+bool ZED11Texture2D::UpdateSubResource(void* Data, ZESize RowPitch, ZEUInt Level) 
+{
+	zeCheckError(Data == NULL, false, "Data is NULL.");
+	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
+
+	GetMainContext()->UpdateSubresource(Texture2D, Level, NULL, Data, RowPitch, 0);
+
+	return true;
 }
 
 bool ZED11Texture2D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Level)

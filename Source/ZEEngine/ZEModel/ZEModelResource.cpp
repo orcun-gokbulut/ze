@@ -60,11 +60,11 @@ ZEGRVertexLayout* ZEModelVertex::GetVertexLayout()
 			{ZEGR_VES_POSITION,	0, ZEGR_VET_FLOAT3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
-			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 36, ZEGR_VU_PER_VERTEX, 0},
-			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 44, ZEGR_VU_PER_VERTEX, 0}
+			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0}
 		};
 
-		VertexLayout.SetElements(ElementArray, 4);
+		VertexLayout.SetElements(ElementArray, 5);
 	}
 
 	return &VertexLayout;
@@ -258,7 +258,7 @@ static void CalculateBoundingBox(ZEAABBox& BoundingBox, void* Vertices, ZESize V
 	{
 		for (ZESize I = 0; I < VertexCount; I++)
 		{
-			ZEVector3& Position = ((ZESkinnedModelVertex*)Vertices)[I].Position;
+			ZEVector3& Position = ((ZEModelVertex*)Vertices)[I].Position;
 
 			if (Position.x < BoundingBox.Min.x) BoundingBox.Min.x = Position.x;
 			if (Position.y < BoundingBox.Min.y) BoundingBox.Min.y = Position.y;
@@ -325,8 +325,8 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 			ZEModelResourceMeshLOD* LOD = Mesh->LODs.Add();
 
 			LOD->LODLevel = LODNode.ReadInt32("LODLevel");
-			LOD->LODStartDistance = LODNode.ReadInt32("LODStartDistance", I * 30);
-			LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 100000);
+			//LOD->LODStartDistance = LODNode.ReadInt32("LODStartDistance", I * 30);
+			//LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 100000);
 			LOD->MaterialId = LODNode.ReadInt32("MaterialId");
 
 			if (Mesh->IsSkinned)
@@ -362,7 +362,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 
 				LOD->VertexCount = (ZEUInt32)(LODNode.ReadDataSize("Vertices") / sizeof(ZEModelVertex));
 				LOD->TriangleCount = LOD->VertexCount / 3;
-				LOD->VertexBuffer = ZEGRVertexBuffer::Create(sizeof(ZEModelVertex), LOD->VertexCount);
+				LOD->VertexBuffer = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZEModelVertex));
 				void* Buffer = NULL;
 				LOD->VertexBuffer->Lock(&Buffer);
 					if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZEModelVertex), LOD->VertexCount))
@@ -687,7 +687,7 @@ bool ZEModelResource::ReadAnimations(ZEMLReaderNode* AnimationsNode)
 	return true;
 }
 
-bool ZEModelResource::ReadModelFromFile(ZEFile* ResourceFile)
+bool ZEModelResource::ReadModelFromFileV0(ZEFile* ResourceFile)
 {
 	ZEMLReader ModelReader;
 	
@@ -846,7 +846,7 @@ ZEModelResource* ZEModelResource::LoadResource(const ZEString& FileName)
 		NewResource->SetFileName(FileName);
 		NewResource->Cached = false;
 		NewResource->ReferenceCount = 0;
-		if (!NewResource->ReadModelFromFile(&ResourceFile))
+		if (!NewResource->ReadModelFromFileV0(&ResourceFile))
 		{
 			zeError("Can not load model file. (FileName : \"%s\")", FileName.ToCString());
 			ResourceFile.Close();

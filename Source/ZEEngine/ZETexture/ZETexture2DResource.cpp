@@ -52,20 +52,23 @@
 
 static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 {
-	ZEUInt LevelCount = TextureData->GetLevelCount();
-	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Output->GetFormat());
+	ZESize Size = Output->GetWidth() * Output->GetHeight() * FormatDefinition->BlockSize;
 
-	// Copy texture data into ZETexture2D
-	void* TargetBuffer = NULL;
-	ZESize TargetPitch = 0;
+	void* TargetBuffer = new unsigned char[Size];
+	ZEUInt Width = Output->GetWidth();
 
-	// There is one surface (surface 0) and n MipMaps
-	for(ZESize Level = 0; Level < (ZESize)LevelCount; Level++)
+	ZESize LevelCount = (ZESize)TextureData->GetLevelCount();
+	ZEArray<ZETextureLevel>& TextureLevels = TextureData->GetSurfaces().GetItem(0).GetLevels();
+	for(ZESize Level = 0; Level < LevelCount; Level++)
 	{
-		Output->Lock(&TargetBuffer, &TargetPitch, (ZEUInt)Level);
-		TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
-		Output->Unlock((ZEUInt)Level);
+		ZESize TargetRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
+		TextureLevels[Level].CopyTo(TargetBuffer, TargetRowPitch);
+
+		Output->UpdateSubResource(TargetBuffer, TargetRowPitch, Level);
 	}
+
+	delete [] TargetBuffer;
 }
 
 const char* ZETexture2DResource::GetResourceType() const

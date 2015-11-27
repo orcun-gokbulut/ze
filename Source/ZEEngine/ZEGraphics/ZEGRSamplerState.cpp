@@ -205,17 +205,17 @@ float ZEGRSamplerState::GetMaxLOD() const
 void ZEGRSamplerState::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZESamplerStateData));
-	StateData.MinFilter = ZEGR_TFM_POINT;
-	StateData.MagFilter = ZEGR_TFM_POINT;
-	StateData.MipFilter = ZEGR_TFM_POINT;
+	StateData.MinFilter = ZEGR_TFM_LINEAR;
+	StateData.MagFilter = ZEGR_TFM_LINEAR;
+	StateData.MipFilter = ZEGR_TFM_LINEAR;
 	StateData.AddressU = ZEGR_TAM_CLAMP;
 	StateData.AddressV = ZEGR_TAM_CLAMP;
 	StateData.AddressW = ZEGR_TAM_CLAMP;
 	StateData.MinLOD = ZE_FLOAT_MIN;
 	StateData.MaxLOD = ZE_FLOAT_MAX;
-	StateData.MaxAnisotropy = 8;
+	StateData.MaxAnisotropy = 1;
 	StateData.MipLODBias = 0.0f;
-	StateData.BorderColor = ZEVector4::Zero;
+	StateData.BorderColor = ZEVector4::One;
 }
 
 ZEGRSamplerState& ZEGRSamplerState::operator=(const ZEGRSamplerState& Source)

@@ -71,9 +71,9 @@ void ZERNGBuffer_SetDepth(inout ZERNGBuffer GBuffer, float Depth)
 	// FOR FUTURE POSSIBLE USAGES
 }
 
-float ZERNGBuffer_GetDepth(uint2 ScreenPos)
+float ZERNGBuffer_GetDepth(float2 ScreenPos)
 {
-	return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos.xy, 0)).x;
+	return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos, 0)).x;
 }
 
 
@@ -126,7 +126,7 @@ uint ZERNGBuffer_GetShadingModel(int2 ScreenPos)
 
 void ZERNGBuffer_SetViewNormal(inout ZERNGBuffer GBuffer, float3 Normal /*Must be Normalized*/)
 {
-	GBuffer.Buffer1.xyz = Normal;
+	GBuffer.Buffer1.xyz = Normal * 0.5f + 0.5f;
 	/*GBuffer.Buffer0.xy = Normal.xy * 0.5f + 0.5f;
 	GBuffer.Buffer3.a = sign(Normal.z) + 1.0f;*/
 }
@@ -137,7 +137,7 @@ float3 ZERNGBuffer_GetViewNormal(int2 ScreenPos)
 	Normal.xy =	ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xy * 2.0f - 1.0f;
 	Normal.z = (ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w - 1.0f) * sqrt(1.0f - dot(Normal.xy, Normal.xy));
 	return Normal;*/
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz * 2.0f - 1.0f;
 }
 
 

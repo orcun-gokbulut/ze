@@ -65,7 +65,7 @@ ZESize ZEGRTexture::CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount
 	Height /= (ZEUInt)FormatDefinition->BlockDimension;
 
 	for (ZESize I = 0; I < LevelCount; I++)
-		Output += (Width << LevelCount) * (Height << LevelCount);
+		Output += (Width >> I) * (Height >> I);
 
 	return Output * FormatDefinition->BlockSize;
 }
@@ -79,20 +79,19 @@ ZESize ZEGRTexture::CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat 
 	Width /= (ZEUInt)FormatDefinition->BlockDimension;
 	Height /= (ZEUInt)FormatDefinition->BlockDimension;
 
-	if (!ZEMath::IsPowerOfTwo(Width) || ZEMath::IsPowerOfTwo(Height))
+	if (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height))
 		return 1;
 
 	ZEUInt Level = 1;
 	while(Width != 1 && Height != 1)
 	{
-		Width <<= 1;
-		Height <<= 1;
+		Width >>= 1;
+		Height >>= 1;
 		Level++;
 	}
 
 	return Level;
 }
-
 
 ZEGRTexture::ZEGRTexture()
 {

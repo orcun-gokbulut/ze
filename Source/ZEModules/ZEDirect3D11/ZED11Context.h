@@ -69,7 +69,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 
 		virtual void						SetRenderState(ZEGRRenderStateData* State);
 		
-		virtual void						SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer);
+		virtual void						SetVertexBuffers(ZEUInt Index, ZEUInt Count, ZEGRVertexBuffer** Buffers);
 		virtual void						SetIndexBuffer(ZEGRIndexBuffer* Buffer);
 		
 		virtual void						SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRStructuredBuffer* Buffer);

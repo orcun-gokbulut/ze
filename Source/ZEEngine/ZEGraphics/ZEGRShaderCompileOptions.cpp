@@ -36,6 +36,16 @@
 #include "ZEGRShaderCompileOptions.h"
 #include "ZECommon.h"
 
+ZEGRShaderDefinition::ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value)
+{
+	this->Name = Name;
+	this->Value = Value;
+}
+
+ZEGRShaderDefinition::ZEGRShaderDefinition()
+{
+}
+
 ZEGRShaderCompileOptions::ZEGRShaderCompileOptions()
 {
 	Type = ZEGR_ST_NONE;

@@ -572,8 +572,9 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	if (!Visible)
 		return false;
 
-	if (CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
-		return false;
+	//if (CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+		//return false;
+
 	float DrawOrder = 0.0f;	ZEInt32 CurrentLOD = 0;
 	float LODDistanceSquare = 0.0f;
 	ZEVector3 WorldPosition;
@@ -598,7 +599,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		}
 	}
 
-	if (EntityDistanceSquare < ZEMath::Power(LODs[CurrentLOD].GetDrawEndDistance(), 2.0))
+	if (EntityDistanceSquare > ZEMath::Power(LODs[CurrentLOD].GetDrawEndDistance(), 2.0))
 		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
@@ -608,9 +609,11 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	RenderCommand.Entity = Owner;
 	RenderCommand.ExtraParameters = MeshLOD;
 	
-	CullParameters->Renderer->AddCommand(&RenderCommand);
-	
-	return true;}
+	if(!CullParameters->Renderer->ContainsCommand(&RenderCommand))
+		CullParameters->Renderer->AddCommand(&RenderCommand);
+
+	return true;
+}
 
 bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {

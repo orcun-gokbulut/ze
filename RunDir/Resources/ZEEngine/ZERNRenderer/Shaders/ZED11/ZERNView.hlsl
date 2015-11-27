@@ -51,27 +51,23 @@ cbuffer ZERNView_Constants : register(ZERN_SHADER_CONSTANT_VIEW)
 	float4x4				ZERNView_InvProjectionTransform;			
 	float4x4				ZERNView_InvViewProjectionTransform;
 
+	float3					ZERNView_Position;
 	float					ZERNView_Width;
-	float					ZERNView_Height;
-	float					ZERNView_VerticalFOV;
-	float					ZERNView_HorizontalFOV;
-
-	float					ZERNView_AspectRatio;
-	float					ZERNView_NearZ;
-	float					ZERNView_FarZ;
-	float					ZERNView_Reserved0;
-
-	float4					ZERNView_Position;
 	float4					ZERNView_RotationQuaternion;
-	float4					ZERNView_RotationEuler;
-
-	float4					ZERNView_UpVector;
-	float4					ZERNView_RightVector;
-	float4					ZERNView_FrontVector;
+	float3					ZERNView_RotationEuler;
+	float					ZERNView_Height;
+	
+	float3					ZERNView_RightVector;
+	float					ZERNView_VerticalFOV;
+	float3					ZERNView_UpVector;
+	float					ZERNView_HorizontalFOV;
+	float3					ZERNView_FrontVector;
+	float					ZERNView_AspectRatio;
 
 	float					ZERNView_ShadowDistance;
 	float					ZERNView_ShadowFadeDistance;
-	float					ZERNView_Reserved1[2];
+	float					ZERNView_NearZ;
+	float					ZERNView_FarZ;
 };
 
 #endif
