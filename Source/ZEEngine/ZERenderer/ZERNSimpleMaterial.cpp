@@ -95,7 +95,7 @@ void ZERNSimpleMaterial::UpdateRenderState()
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 
-	this->RenderState = RenderState.Compile();
+	RenderStateData = RenderState.Compile();
 
 	DirtyFlags.UnraiseFlags(ZERN_SMDF_RENDER_STATE);
 }
@@ -114,16 +114,17 @@ bool ZERNSimpleMaterial::InitializeSelf()
 {
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	Update();
-
-	return true;
+	return Update();
 }
 
 void ZERNSimpleMaterial::DeinitializeSelf()
 {
-	DirtyFlags.RaiseAll();
+	VertexShader.Release();
+	PixelShader.Release();
 	RenderStateData.Release();
 	ConstantBuffer.Release();
+
+	DirtyFlags.RaiseAll();
 }
 
 ZERNSimpleMaterial::ZERNSimpleMaterial()
@@ -234,9 +235,10 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	Update();
+	if(!Update())
+		return false;
 
-	Context->SetRenderState(RenderState);
+	Context->SetRenderState(RenderStateData);
 
 	if (Constants.TextureEnabled)
 	{
@@ -246,8 +248,16 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
-	
+
 	return true;
+}
+
+void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+{
+	Context->SetRenderTargets(0, NULL, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
 }
 
 bool ZERNSimpleMaterial::Update()

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZERNTextureRendering.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_TEXTURE_RENDERING_H__
+#define __ZERN_TEXTURE_RENDERING_H__
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
+#include "ZERNScreenCover.hlsl"
 
-#include "ZEMeta/ZEObject.h"
-
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
-
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
-
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-class ZEParticleSystem : public ZEObject
+SamplerState ZERNTextureRendering_SamplerLinearClamp
 {
-	ZE_OBJECT
-
-	friend class ZEParticleEffect;
-
-	private:
-		ZEParticleEffect*						Owner;
-
-		ZEArray<ZEParticle>						ParticlePool;
-
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
-
-		ZEUInt									MaximumParticleCount;
-
-	public:
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
-
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
-
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
-
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
-
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
-
-		const ZEParticleEffect*					GetOwner() const;
-
-		bool									PreRender(const ZERNCullParameters* CullParameters);
-		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		void									Tick(float ElapsedTime);
-
-												ZEParticleSystem();
-												~ZEParticleSystem();
+	Filter		= MIN_MAG_MIP_LINEAR;
+	AddressU	= CLAMP;
+	AddressV	= CLAMP;
 };
+
+Texture2D InputTexture : register(t0);
+
+float4 ZERNTextureRendering_PixelShader_Main(float4 Position : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target
+{
+	return InputTexture.Sample(ZERNTextureRendering_SamplerLinearClamp, TexCoord);
+}
 
 #endif

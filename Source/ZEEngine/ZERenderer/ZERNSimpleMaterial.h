@@ -53,19 +53,18 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		ZEGRHolder<ZEGRShader>			VertexShader;
 		ZEGRHolder<ZEGRShader>			PixelShader;
-
 		ZEGRHolder<ZEGRRenderStateData> RenderStateData;
+
 		struct
 		{
 			ZEVector4					MaterialColor;
 			bool 						TextureEnabled;
-			ZEBYTE						Reserved0[15];
+			float						Reserved0;
 			bool 						VertexColorEnabled;
-			ZEBYTE						Reserved2[15];
+			float						Reserved1;
 		} Constants;
 
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
-		ZEGRHolder<ZEGRRenderStateData>	RenderState;
 		ZERNMap							TextureMap;
 
 		void							UpdateShaders();
@@ -98,9 +97,10 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		void							SetVertexColorEnabled(bool Enable);
 		bool							GetVertexColorEnabled();
 
-		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-
 		virtual bool					Update();
+
+		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 
 		static ZERNSimpleMaterial*		CreateInstance();
 };

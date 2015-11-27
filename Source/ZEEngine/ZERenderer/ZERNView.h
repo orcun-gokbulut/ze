@@ -52,7 +52,7 @@ enum ZERNProjectionType
 {
 	ZERN_PT_PERSPECTIVE,
 	ZERN_PT_ORTHAGONAL,
-	ZERN_PT_PARABOLOID,
+	ZERN_PT_PARABOLOID
 };
 
 enum ZERNViewType
@@ -107,19 +107,21 @@ struct ZERNViewConstantBuffer
 	ZEMatrix4x4				InvProjectionTransform;			
 	ZEMatrix4x4				InvViewProjectionTransform;
 
+	ZEVector3				Position;
 	float					Width;
+	ZEQuaternion			RotationQuaternion;
+	ZEVector3				RotationEuler;
 	float					Height;
+
+	ZEVector3				RightVector;
 	float					VerticalFOV;
+	ZEVector3				UpVector;
 	float					HorizontalFOV;
+	ZEVector3				FrontVector;
 	float					AspectRatio;
+
+	float					ShadowDistance;
+	float					ShadowFadeDistance;
 	float					NearZ;
 	float					FarZ;
-	float					Reserved0;
-
-	ZEVector3				Position; float	Reserved1;
-	ZEQuaternion			RotationQuaternion;
-	ZEVector3				RotationEuler; float Reserved2;
-	ZEVector3				U; float Reserved3;
-	ZEVector3				V; float Reserved4;
-	ZEVector3				N; float Reserved5;
 };

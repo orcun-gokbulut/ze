@@ -40,49 +40,66 @@
 #include "ZETypes.h"
 #include "ZEParticle.h"
 #include "ZEDS\ZEArray.h"
+#include "ZEInitializable.h"
 
-struct ZEDrawParameters;
 class ZEParticleSystem;
 class ZERNMaterial;
+class ZERNRenderParameters;
+class ZERNCommand;
+class ZEGRVertexLayout;
+struct ZERNCullParameters;
 
-class ZEParticleRenderer
+class ZEParticleVertex
+{
+	private:
+		static ZEGRVertexLayout		VertexLayout;
+
+	public:
+		ZEVector3					Position;
+		ZEVector2					Texcoord;
+		ZEVector4					Color;
+
+		static ZEGRVertexLayout*	GetVertexLayout();
+};
+
+class ZEParticleRenderer : public ZEInitializable
 {
 	friend class ZEParticleSystem;
 
 	private:
+		ZEParticleSystem*			Owner;
+		ZEArray<ZEParticle>			SortTempArray;
 
-		ZEParticleSystem*		Owner;
-		ZEArray<ZEParticle>		SortTempArray;
+		bool						IsSortingEnabled;
+		bool						AreParticlesLocal;
 
-		bool					IsSortingEnabled;
-		bool					AreParticlesLocal;
-
-		void					SortParticles();
-
-		void					SetParticleCount(ZEUInt Count);
+		void						SortParticles();
+		void						SetParticleCount(ZEUInt Count);
 
 	protected:
-
 		ZERNMaterial*				Material;
-		ZEArray<ZEParticle>		Particles;
+		ZEArray<ZEParticle>			Particles;
 
-								ZEParticleRenderer();
-		virtual					~ZEParticleRenderer();
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
+
+									ZEParticleRenderer();
+		virtual						~ZEParticleRenderer();
 
 	public:
+		void						SetParticlesLocal(bool AreParticlesLocal);
+		bool						GetParticlesLocal() const;
 
-		void					SetParticlesLocal(bool AreParticlesLocal);
-		bool					GetParticlesLocal() const;
+		void						SetMaterial(ZERNMaterial* Material);
+		const ZERNMaterial*			GetMaterial() const;
 
-		void					SetMaterial(ZERNMaterial* Material);
-		const ZERNMaterial*		GetMaterial() const;
+		void						SetSortingEnabled(bool Enabled = true);
+		bool						GetSortingEnabled() const;
 
-		void					SetSortingEnabled(bool Enabled = true);
-		bool					GetSortingEnabled() const;
+		const ZEParticleSystem*		GetOwner() const;
 
-		const ZEParticleSystem*	GetOwner() const;
-
-		virtual void			Draw(ZEDrawParameters* DrawParameters);
+		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
+		virtual void				Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 };
 
 #endif

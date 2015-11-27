@@ -266,7 +266,8 @@ ZEInt ZERNStageHDR::GetId()
 
 const ZEString& ZERNStageHDR::GetName()
 {
-	return "HDR Stage";
+	static const ZEString Name = "HDR Stage";
+	return Name;
 }
 
 void ZERNStageHDR::SetKey(float Value)
@@ -382,7 +383,7 @@ ZERNStageHDR::ZERNStageHDR()
 	Constants.BloomEnabled = true;
 	Constants.Key = 0.35f;
 	Constants.WhiteLevel = 5.0f;
-	Constants.ToneMapOperator = ZERN_HTMO_REINHARD;
+	Constants.ToneMapOperator = ZERN_HTMO_UNCHARTED;
 	Constants.BloomFactor = 0.9f;
 	Constants.BloomThreshold = 3.5f;
 
@@ -486,7 +487,7 @@ void ZERNStageHDR::CalculateLuminance(ZEGRContext* Context, ZEGRTexture2D* Input
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, Input);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetRenderState(CalculateLuminance_RenderState);
-	Context->SetVertexBuffer(0, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 
 	Context->Draw(3, 0);
 
@@ -511,7 +512,7 @@ void ZERNStageHDR::CalculateAdaptedLuminance(ZEGRContext* Context)
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, PreviousAdaptedLuminance);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
 	Context->SetRenderState(CalculateAdaptedLuminance_RenderState);
-	Context->SetVertexBuffer(0, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 
 	Context->Draw(3, 0);
 
@@ -534,7 +535,7 @@ void ZERNStageHDR::DownSample(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRe
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, Input);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetRenderState(DownSampling_RenderState);
-	Context->SetVertexBuffer(0, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 
 	Context->Draw(3, 0);
 
@@ -567,7 +568,7 @@ void ZERNStageHDR::CalculateBrightness(ZEGRContext* Context, ZEGRTexture2D* Inpu
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, CurrentAdaptedLuminance);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetRenderState(CalculateBrightness_RenderState);
-	Context->SetVertexBuffer(0, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 
 	Context->Draw(3, 0);
 
@@ -627,7 +628,7 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRR
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, CurrentAdaptedLuminance);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetRenderState(ToneMapping_RenderState);
-	Context->SetVertexBuffer(0, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 
 	Context->Draw(3, 0);
 

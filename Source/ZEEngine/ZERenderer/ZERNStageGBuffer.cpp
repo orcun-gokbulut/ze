@@ -173,6 +173,11 @@ ZEGRTexture2D* ZERNStageGBuffer::GetSpecularColorMap() const
 	return GBuffer3;
 }
 
+ZEGRTexture2D* ZERNStageGBuffer::GetNormalMap() const
+{
+	return GBuffer1;
+}
+
 ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationMap() const
 {
 	return GBuffer0;

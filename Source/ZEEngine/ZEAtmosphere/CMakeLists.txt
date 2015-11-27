@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZERNStageID.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,32 +30,20 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+cmake_minimum_required(VERSION 2.8)
 
-#include "ZETypes.h"
+ze_add_source(ZEATSun.cpp					Sources)
+ze_add_source(ZEATSun.h						Sources Headers)
+ze_add_source(ZEATMoon.cpp					Sources)
+ze_add_source(ZEATMoon.h					Sources Headers)
+ze_add_source(ZEATPeriodicTerms.h			Sources Headers)
+ze_add_source(ZEATCommon.h					Sources Headers)			
 
-typedef ZEUInt32 ZERNStageMask;
-typedef ZEUInt64 ZERNStageID;
-
-// Normal
-#define ZERN_STAGE_ID(ID)						(1<<ID)
-#define ZERN_STAGE_GBUFFER						ZERN_STAGE_ID(1)
-#define ZERN_STAGE_LIGHTING						ZERN_STAGE_ID(2)
-#define ZERN_STAGE_AO							ZERN_STAGE_ID(3)
-#define ZERN_STAGE_FORWARD						ZERN_STAGE_ID(4)
-#define ZERN_STAGE_FORWARD_TRANSPARANT			ZERN_STAGE_ID(5)
-#define ZERN_STAGE_PRE_HDR_EFFECT				ZERN_STAGE_ID(6)
-#define ZERN_STAGE_HDR							ZERN_STAGE_ID(7)
-#define ZERN_STAGE_POST_EFFECT					ZERN_STAGE_ID(8)
-#define ZERN_STAGE_2D							ZERN_STAGE_ID(9)
-#define ZERN_STAGE_POST_2D_EFFECT				ZERN_STAGE_ID(10)
-
-// Shadow Map
-#define ZERN_STAGE_SHADOW_MAP_OMNI				ZERN_STAGE_ID(11)
-#define ZERN_STAGE_SHADOW_MAP_DIRECTIONAL		ZERN_STAGE_ID(12)
-#define ZERN_STAGE_SHADOW_MAP_PROJECTIVE		ZERN_STAGE_ID(13)
-
-#define ZERN_STAGE_TEXTURE_OUTPUT				ZERN_STAGE_ID(14)
+ze_add_library(TARGET ZEAtmosphere 
+	ZEMC ${ZEMC}
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEFoundation)

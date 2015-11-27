@@ -52,6 +52,8 @@ ze_add_source(ZERNRenderParameters.cpp				Sources)
 ze_add_source(ZERNRenderParameters.h				Sources Headers)
 ze_add_source(ZERNFilter.cpp						Sources)
 ze_add_source(ZERNFilter.h							Sources Headers)
+ze_add_source(ZERNLightScattering.cpp				Sources)
+ze_add_source(ZERNLightScattering.h					Sources Headers)
 
 ze_add_source(ZELight.cpp 							Sources)
 ze_add_source(ZELight.h 							Sources Headers ZEMC)
@@ -91,6 +93,10 @@ ze_add_source(ZERNStageHDR.h 						Sources Headers)
 ze_add_source(ZERNStageHDR.cpp 						Sources)
 ze_add_source(ZERNStageForward.h 					Sources Headers)
 ze_add_source(ZERNStageForward.cpp 					Sources)
+ze_add_source(ZERNStageTextureOutput.h 				Sources Headers)
+ze_add_source(ZERNStageTextureOutput.cpp			Sources)
+ze_add_source(ZERNStagePostProcess.h 				Sources Headers)
+ze_add_source(ZERNStagePostProcess.cpp				Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}

@@ -69,7 +69,8 @@ class ZERNMap
 		void							LoadCube(const ZEString& FileName);
 
 		void							Write(ZEMLWriterNode& ParentNode, const ZEString& Name);
-		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name);
+		void							ReadV0(ZEMLReaderNode& ParentNode, const ZEString& Name);
+		void							ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name);
 
 										ZERNMap();
 										ZERNMap(ZEGRTexture* Resource, const ZEGRSamplerState& SamplerState = ZEGRSamplerState());

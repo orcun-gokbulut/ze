@@ -40,7 +40,7 @@
 float ZELight::AttenuationFunction(float RootToTry)
 {
 	float Result = 0.0f;
-	Result = Intensity / (((RootToTry * RootToTry) * Attenuation.z) + (RootToTry * Attenuation.y) + Attenuation.x);
+	Result = Intensity / (Attenuation.x + (Attenuation.y * RootToTry) + (Attenuation.z * RootToTry * RootToTry));
 
 	return Result;
 }
@@ -86,7 +86,7 @@ void ZELight::SetAttenuation(const ZEVector3& Attenuation)
 	SetAttenuation(Attenuation.z, Attenuation.y, Attenuation.x);
 }
 
-void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
+void ZELight::SetAttenuation(float Constant, float Distance, float DistanceSquare)
 {
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;

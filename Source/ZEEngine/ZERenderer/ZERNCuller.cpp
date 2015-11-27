@@ -59,11 +59,13 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity)
 		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
 		{
 			if (CullParameters.View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
-					Statistics.CulledEntityCount++;
+			{
+				Statistics.CulledEntityCount++;
+			}
 			else
 			{
-				if (!Entity->PreRender(&CullParameters))
-					Statistics.DrawedEntityCount++;				
+				if (Entity->PreRender(&CullParameters))
+					Statistics.DrawedEntityCount++;		
 			}
 		}
 		else

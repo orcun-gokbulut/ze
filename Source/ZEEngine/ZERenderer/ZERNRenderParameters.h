@@ -60,15 +60,14 @@ enum ZERNDrawType
 class ZERNRenderParameters
 {
 	public:
-		ZESize							FrameId;
-		float							ElapsedTime;
-		float							Time;
-		ZEScene*						Scene;
-		ZEGRContext*					Context;
-		ZERNView*						View;
-		ZERNRenderer*					Renderer;
-		ZERNDrawType					Type;
-		ZERNStageID						StageID;
-		ZERNStage*						Stage;
-		ZERNCommand*					Command;
+		ZESize						FrameId;
+		float						ElapsedTime;
+		float						Time;
+		ZEScene*					Scene;
+		ZEGRContext*				Context;
+		ZERNView*					View;
+		ZERNRenderer*				Renderer;
+		ZERNDrawType				Type;
+		ZERNStage*					Stage;
+		ZERNCommand*				Command;
 };

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZERNStageTextureOutput.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,78 +35,50 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
-#include "ZEMeta/ZEObject.h"
-
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEVector.h"
+#include "ZERNStage.h"
+#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEGraphics/ZEGRViewport.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
 
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
+class ZEGRTexture2D;
+class ZEGRRenderState;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRRenderTarget;
 
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-class ZEParticleSystem : public ZEObject
+class ZERNStageTextureOutput : public ZERNStage
 {
-	ZE_OBJECT
+private:
+	ZEArray<ZEGRTexture2D*>			InputTextures;
+	ZEGRRenderTarget*				OutputRenderTarget;
 
-	friend class ZEParticleEffect;
+	ZEGRHolder<ZEGRShader>			VertexShader;
+	ZEGRHolder<ZEGRShader>			PixelShader;
+	ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
 
-	private:
-		ZEParticleEffect*						Owner;
+	ZEGRViewport					Viewports[ZEGR_MAX_VIEWPORT_SLOT];
 
-		ZEArray<ZEParticle>						ParticlePool;
+	bool							AutoSplit;
 
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
+	virtual bool					InitializeSelf();
+	virtual void					DeinitializeSelf();
 
-		ZEUInt									MaximumParticleCount;
+public:
+	void							SetInputs(ZEGRTexture2D** Inputs, ZESize Count);
+	ZEGRTexture2D*const*			GetInputs();
 
-	public:
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
+	void							SetOutput(ZEGRRenderTarget* Output);
+	const ZEGRRenderTarget*			GetOutput() const;
 
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
+	void							SetViewports(ZEGRViewport* Viewports, ZESize Count);
+	const ZEGRViewport*				GetViewport() const;
 
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
+	void							SetAutoSplit(bool AutoSplit);
+	bool							IsAutoSplit() const;
 
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
+	virtual ZEInt					GetId();
+	virtual const ZEString&			GetName();
 
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
-
-		const ZEParticleEffect*					GetOwner() const;
-
-		bool									PreRender(const ZERNCullParameters* CullParameters);
-		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		void									Tick(float ElapsedTime);
-
-												ZEParticleSystem();
-												~ZEParticleSystem();
+	virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+	virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 };
-
-#endif

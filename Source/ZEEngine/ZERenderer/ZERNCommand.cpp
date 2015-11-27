@@ -47,5 +47,5 @@ void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 ZERNCommand::ZERNCommand()
 {
 	for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
-		new (&StageQueueLinks[I]) ZELink<ZERNCommand>(this); 
+		new (&StageQueueLinks[I]) ZELink<ZERNCommand>(this);
 }

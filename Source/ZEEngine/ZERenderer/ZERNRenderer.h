@@ -49,7 +49,6 @@ class ZERNStage;
 class ZERNCommand;
 class ZEGRContext;
 class ZEGROutput;
-class ZEGRTexture2D;
 
 class ZERNStageQueue
 {
@@ -69,7 +68,7 @@ class ZERNRenderer : public ZEInitializable
 		ZEGROutput*						Output;
 		ZEGRHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
 		ZEGRHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
-		ZEArray<ZERNStageQueue>			StageQueues;		
+		ZEArray<ZERNStageQueue>			StageQueues;
 
 		struct RendererConstants
 		{

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_INTERIOR_RESOURCE_H__
-#define __ZE_INTERIOR_RESOURCE_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -174,4 +172,3 @@ class ZEInteriorResource : public ZEResource
 		static ZEInteriorResource*					LoadSharedResource(const ZEString& FileName);
 		static void									CacheResource(const ZEString& FileName);
 };
-#endif

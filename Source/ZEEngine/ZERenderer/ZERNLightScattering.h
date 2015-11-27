@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZERNLightScattering.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,78 +35,67 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
-#include "ZEMeta/ZEObject.h"
-
-#include "ZEMath/ZEQuaternion.h"
+#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEFoundation/ZEInitializable.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
 
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
+class ZEGRTexture2D;
+class ZEGRRenderTarget;
+class ZEGRRenderStateData;
+class ZEGRShader;
+class ZEGRContext;
+class ZEGRConstantBuffer;
 
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-class ZEParticleSystem : public ZEObject
+class ZERNLightScattering : public ZEInitializable
 {
-	ZE_OBJECT
-
-	friend class ZEParticleEffect;
-
 	private:
-		ZEParticleEffect*						Owner;
+		ZEGRTexture2D*					InputTexture;
+		ZEGRTexture2D*					DepthTexture;
+		ZEGRRenderTarget*				OutputRenderTarget;
+		
+		ZEGRHolder<ZEGRShader>			VertexShader;
+		ZEGRHolder<ZEGRShader>			PixelShader;
+		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZEArray<ZEParticle>						ParticlePool;
+		struct LightScatteringConstants
+		{
+			ZEVector3					LightDirection;
+			float						LightIntensity;
+			ZEVector3					LightColor;
+			float						MieScatteringStrength;
+		}Constants;
 
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
+		void							CreateShaders();
+		void							CreateRenderState();
 
-		ZEUInt									MaximumParticleCount;
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
 	public:
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
+		void							SetInputTexture(ZEGRTexture2D* InputTexture);
+		const ZEGRTexture2D*			GetInputTexture() const;
 
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
+		void							SetDepthTexture(ZEGRTexture2D* DepthTexture);
+		const ZEGRTexture2D*			GetDepthTexture() const;
 
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
+		void							SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget);
+		const ZEGRRenderTarget*			GetOutputRenderTarget() const;
 
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
+		void							SetLightDirection(const ZEVector3& LightDirection);
+		const ZEVector3&				GetLightDirection() const;
 
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
+		void							SetLightIntensity(float LightIntensity);
+		float							GetLightIntensity() const;
 
-		const ZEParticleEffect*					GetOwner() const;
+		void							SetLightColor(const ZEVector3& LightColor);
+		const ZEVector3&				GetLightColor() const;
 
-		bool									PreRender(const ZERNCullParameters* CullParameters);
-		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		void									Tick(float ElapsedTime);
+		void							SetMieScatteringStrengh(float MieScatteringStrength);
+		float							GetMieScatteringStrengh() const;
 
-												ZEParticleSystem();
-												~ZEParticleSystem();
+		void							Process(ZEGRContext* Context);
+
+										ZERNLightScattering();
+		virtual							~ZERNLightScattering();
 };
-
-#endif
