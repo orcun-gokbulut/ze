@@ -34,10 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleSystem.h"
-#include "ZEGame\ZERNDrawParameters.h"
 #include "ZEParticleRenderer.h"
 #include "ZEParticleOperator.h"
 #include "ZEParticleGenerator.h"
+#include "ZERenderer\ZERNRenderParameters.h"
+#include "ZERenderer\ZERNCommand.h"
+#include "ZERenderer\ZERNCuller.h"
 
 void ZEParticleSystem::SetRenderer(ZEParticleRenderer* Renderer)
 {
@@ -138,12 +140,20 @@ const ZEParticleEffect* ZEParticleSystem::GetOwner() const
 	return Owner;
 }
 
-void ZEParticleSystem::Draw(ZEDrawParameters* DrawParameters)
+bool ZEParticleSystem::PreRender(const ZERNCullParameters* CullParameters)
+{
+	if(Renderer == NULL)
+		return false;
+
+	return Renderer->PreRender(CullParameters);
+}
+
+void ZEParticleSystem::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
 	if(Renderer == NULL)
 		return;
 
-	Renderer->Draw(DrawParameters);
+	Renderer->Render(RenderParameters, Command);
 }
 
 void ZEParticleSystem::Tick(float ElapsedTime)

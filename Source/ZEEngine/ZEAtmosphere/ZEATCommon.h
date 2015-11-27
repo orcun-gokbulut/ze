@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZEATCommon.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,78 +35,76 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
-#include "ZEMeta/ZEObject.h"
-
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
-
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
-
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-class ZEParticleSystem : public ZEObject
+struct ZEATObserver
 {
-	ZE_OBJECT
+	struct
+	{
+		ZEInt8	Hour;
+		ZEInt8	Minute;
+		ZEInt8	Day;
+		ZEInt8	Month;
+		ZEInt	Year;
+		ZEInt	TimeZone;
+		double	DeltaT;
+	}Time;
 
-	friend class ZEParticleEffect;
+	struct
+	{
+		double	Elevation;
+		double	Longtitude;
+		double	Latitude;
 
-	private:
-		ZEParticleEffect*						Owner;
-
-		ZEArray<ZEParticle>						ParticlePool;
-
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
-
-		ZEUInt									MaximumParticleCount;
-
-	public:
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
-
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
-
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
-
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
-
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
-
-		const ZEParticleEffect*					GetOwner() const;
-
-		bool									PreRender(const ZERNCullParameters* CullParameters);
-		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		void									Tick(float ElapsedTime);
-
-												ZEParticleSystem();
-												~ZEParticleSystem();
+		double	AnnualPressure;
+		double	AnnualTemperature;
+	}Space;
 };
 
-#endif
+struct ZEATJulian
+{
+	double Day;
+	double EphemerisDay;
+	double Century;
+	double EphemerisCentury;
+	double EphemerisMillenium;
+};
+
+struct ZEATHeliocentric
+{
+	double Longtitude;
+	double Latitude;
+	double Radius;
+};
+
+struct ZEATGeocentric
+{
+	double Longtitude;
+	double Latitude;
+	double SunRightAscension;
+	double SunDeclination;
+	double Distance;
+};
+
+struct ZEATTopocentric
+{
+	double Zenith;
+	double Azimuth;
+	double SunRightAscension;
+	double SunDeclination;
+	double LocalHourAngle;
+};
+
+struct ZEATNutation
+{
+	double Longtitude;
+	double Obliquity;
+};
+
+static inline double LimitDegreeTo_0_360(double Degree)
+{
+	ZEInt Multiplier = Degree / 360;
+
+	if(Degree < 0 && Multiplier == 0)
+		return (Degree + 360.0);
+
+	return (Degree - Multiplier * 360);
+}

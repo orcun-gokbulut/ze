@@ -42,12 +42,27 @@ const ZEGRRenderState& ZERNStage::GetRenderState()
 	return ZEGRRenderState::Default;
 }
 
+void ZERNStage::SetEnable(bool Enable)
+{
+	this->Enable = Enable;
+}
+
+bool ZERNStage::GetEnable() const
+{
+	return Enable;
+}
+
 bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	return false;
+	return true;
 }
 
 void ZERNStage::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 
+}
+
+ZERNStage::ZERNStage()
+{
+	Enable = true;
 }

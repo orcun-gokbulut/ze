@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZERNStagePostProcess.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,78 +35,47 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
+#include "ZERNStage.h"
+#include "ZERNLightScattering.h"
 
-#include "ZEMeta/ZEObject.h"
+class ZEGRContext;
+class ZEGRTexture2D;
+class ZEGRRenderTarget;
 
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
-
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
-
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-class ZEParticleSystem : public ZEObject
+enum ZERNPostProcessFlags
 {
-	ZE_OBJECT
-
-	friend class ZEParticleEffect;
-
-	private:
-		ZEParticleEffect*						Owner;
-
-		ZEArray<ZEParticle>						ParticlePool;
-
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
-
-		ZEUInt									MaximumParticleCount;
-
-	public:
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
-
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
-
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
-
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
-
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
-
-		const ZEParticleEffect*					GetOwner() const;
-
-		bool									PreRender(const ZERNCullParameters* CullParameters);
-		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		void									Tick(float ElapsedTime);
-
-												ZEParticleSystem();
-												~ZEParticleSystem();
+	ZERN_PPF_LIGHT_SCATTERING = 1
 };
 
-#endif
+class ZERNStagePostProcess : public ZERNStage
+{
+	private:
+		ZEFlags						PostProcessFlags;
+		ZERNLightScattering			LightScattering;
+
+		ZEGRTexture2D*				InputTexture;
+		ZEGRRenderTarget*			OutputRenderTarget;
+
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
+
+	public:
+		virtual ZEInt				GetId();
+		virtual const ZEString&		GetName();
+
+		void						SetPostProcessFlags(ZERNPostProcessFlags PostProcessFlags);
+		ZEUInt						GetPostProcessFlags() const;
+
+		void						SetInputTexture(ZEGRTexture2D* InputTexture);
+		const ZEGRTexture2D*		GetInputTexture() const;
+
+		void						SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget);
+		const ZEGRRenderTarget*		GetOutputRenderTarget() const;
+
+		void						SetLightDirection(const ZEVector3& Direction);
+
+		virtual bool				Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void				CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+									ZERNStagePostProcess();
+};

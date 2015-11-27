@@ -69,6 +69,7 @@ class ZERNStageGBuffer : public ZERNStage
 
 		ZEGRTexture2D*						GetDiffuseColorMap() const;
 		ZEGRTexture2D*						GetSpecularColorMap() const;
+		ZEGRTexture2D*						GetNormalMap() const;
 		ZEGRTexture2D*						GetAccumulationMap() const;
 		ZEGRDepthStencilBuffer*				GetDepthStencilBuffer() const;
 

@@ -55,7 +55,7 @@ class ZEGRRenderTarget;
 class ZEGRTexture2D;
 
 #define MAX_LIGHTS 511
-#define TILE_SIZE_IN_PIXELS 16	//16x16
+#define TILE_SIZE_IN_PIXELS 32	//32x32
 
 struct ZERNGPULight
 {

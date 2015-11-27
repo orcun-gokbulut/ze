@@ -34,57 +34,77 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleRenderer.h"
-#include "ZEGame\ZERNDrawParameters.h"
 #include "ZEGame\ZEScene.h"
 #include "ZERenderer\ZECamera.h"
 #include "ZEParticle\ZEParticleSystem.h"
+#include "ZERenderer\ZERNRenderParameters.h"
+#include "ZEGraphics\ZEGRVertexLayout.h"
+
+ZEGRVertexLayout ZEParticleVertex::VertexLayout;
+ZEGRVertexLayout* ZEParticleVertex::GetVertexLayout()
+{
+
+	if (VertexLayout.GetElementCount() == 0)
+	{
+		ZEGRVertexElement ElementArray[] = 
+		{
+			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 12, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_COLOR,	0, ZEGR_VET_FLOAT4, 0, 20, ZEGR_VU_PER_VERTEX, 0}
+		};
+
+		VertexLayout.SetElements(ElementArray, 3);
+	}
+
+	return &VertexLayout;
+}
 
 void ZEParticleRenderer::SortParticles() // GetSystem Pool Solve!!!
 {
-// 	ZEVector3 CamPos = zeScene->GetActiveCamera()->GetWorldPosition();
-// 	Particles = Owner->GetParticlePool();
-// 	float DistanceSqr;
-// 
-// 	for (ZEInt I = 0; I < 32; I++)
-// 	{
-// 		ZEUInt Radix=(1 << I);
-// 
-// 		ZESize ParticleCount = Particles.GetCount();
-// 
-// 		int Count0=0;
-// 		int Count1=0;
-// 
-// 		for (ZESize J = 0; J < ParticleCount; J++)
-// 		{
-// 			DistanceSqr =	(CamPos.x - Particles[J].Position.x) * (CamPos.x - Particles[J].Position.x) +
-// 				(CamPos.y - Particles[J].Position.y) * (CamPos.y - Particles[J].Position.y) +
-// 				(CamPos.z - Particles[J].Position.z) * (CamPos.z - Particles[J].Position.z);
-// 
-// 			if (!((*(ZEUInt*)&(DistanceSqr))&Radix))
-// 				++Count1;
-// 		}
-// 
-// 		for (ZESize J = 0; J < ParticleCount; J++)
-// 		{
-// 			DistanceSqr =	(CamPos.x - Particles[J].Position.x) * (CamPos.x - Particles[J].Position.x) +
-// 				(CamPos.y - Particles[J].Position.y) * (CamPos.y - Particles[J].Position.y) +
-// 				(CamPos.z - Particles[J].Position.z) * (CamPos.z - Particles[J].Position.z);
-// 
-// 			if ((*(ZEUInt*)&(DistanceSqr))&Radix)
-// 			{
-// 				SortTempArray[Count1]=Particles[J];
-// 				++Count1;
-// 			}
-// 			else 
-// 			{
-// 				SortTempArray[Count0]=Particles[J];
-// 				++Count0;
-// 			}
-// 		}
-// 
-// 		for (ZESize J = 0; J < ParticleCount; J++)
-// 			Particles[J] = SortTempArray[J];
-// 	}
+ 	ZEVector3 CamPos = zeScene->GetActiveCamera()->GetWorldPosition();
+ 	Particles = Owner->GetParticlePool();
+ 	float DistanceSqr;
+ 
+ 	for (ZEInt I = 0; I < 32; I++)
+ 	{
+ 		ZEUInt Radix = (1 << I);
+ 
+ 		ZESize ParticleCount = Particles.GetCount();
+ 
+ 		int Count0 = 0;
+ 		int Count1 = 0;
+ 
+ 		for (ZESize J = 0; J < ParticleCount; J++)
+ 		{
+ 			DistanceSqr =	(CamPos.x - Particles[J].Position.x) * (CamPos.x - Particles[J].Position.x) +
+ 				(CamPos.y - Particles[J].Position.y) * (CamPos.y - Particles[J].Position.y) +
+ 				(CamPos.z - Particles[J].Position.z) * (CamPos.z - Particles[J].Position.z);
+ 
+ 			if (!((*(ZEUInt*)&(DistanceSqr)) & Radix))
+ 				++Count1;
+ 		}
+ 
+ 		for (ZESize J = 0; J < ParticleCount; J++)
+ 		{
+ 			DistanceSqr =	(CamPos.x - Particles[J].Position.x) * (CamPos.x - Particles[J].Position.x) +
+ 				(CamPos.y - Particles[J].Position.y) * (CamPos.y - Particles[J].Position.y) +
+ 				(CamPos.z - Particles[J].Position.z) * (CamPos.z - Particles[J].Position.z);
+ 
+ 			if ((*(ZEUInt*)&(DistanceSqr)) & Radix)
+ 			{
+ 				SortTempArray[Count1] = Particles[J];
+ 				++Count1;
+ 			}
+ 			else 
+ 			{
+ 				SortTempArray[Count0] = Particles[J];
+ 				++Count0;
+ 			}
+ 		}
+ 
+ 		for (ZESize J = 0; J < ParticleCount; J++)
+ 			Particles[J] = SortTempArray[J];
+ 	}
 }
 
 void ZEParticleRenderer::SetParticlesLocal(bool AreParticlesLocal)
@@ -128,10 +148,26 @@ const ZEParticleSystem* ZEParticleRenderer::GetOwner() const
 	return Owner;
 }
 
-void ZEParticleRenderer::Draw(ZEDrawParameters* DrawParameters)
+bool ZEParticleRenderer::PreRender(const ZERNCullParameters* CullParameters)
+{
+	return true;
+}
+
+void ZEParticleRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
 	if(IsSortingEnabled)
 		SortParticles();
+}
+
+bool ZEParticleRenderer::InitializeSelf()
+{
+	return true;
+}
+
+void ZEParticleRenderer::DeinitializeSelf()
+{
+	Material = NULL;
+	Particles.Clear();
 }
 
 ZEParticleRenderer::ZEParticleRenderer()
@@ -144,5 +180,5 @@ ZEParticleRenderer::ZEParticleRenderer()
 
 ZEParticleRenderer::~ZEParticleRenderer()
 {
-	Particles.Clear();
+	Deinitialize();
 }

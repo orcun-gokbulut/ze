@@ -51,6 +51,9 @@
 #include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZERNStageHDR.h"
 #include "ZERNStageLighting.h"
+#include "ZEGraphics\ZEGRShaderCompileOptions.h"
+#include "ZEGraphics\ZEGRShader.h"
+#include "ZEGraphics\ZEGRRenderState.h"
 
 static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
@@ -72,10 +75,10 @@ void ZERNRenderer::UpdateViewConstantBuffer()
 
 	Buffer->ViewTransform = View.ViewTransform;
 	Buffer->ProjectionTransform = View.ProjectionTransform;
-	Buffer->ViewProjectionTransform = View.ProjectionTransform;
+	Buffer->ViewProjectionTransform = View.ViewProjectionTransform;
 	Buffer->InvViewTransform = View.InvViewTransform;
 	Buffer->InvProjectionTransform = View.InvProjectionTransform;			
-	Buffer->InvViewProjectionTransform = View.InvProjectionTransform;
+	Buffer->InvViewProjectionTransform = View.InvViewProjectionTransform;
 
 	Buffer->Width = View.Width;
 	Buffer->Height = View.Height;
@@ -84,18 +87,17 @@ void ZERNRenderer::UpdateViewConstantBuffer()
 	Buffer->AspectRatio = View.AspectRatio;
 	Buffer->NearZ = View.NearZ;
 	Buffer->FarZ = View.FarZ;
-	Buffer->Reserved0 = 0.0f;
 
 	Buffer->Position = View.Position;
 	Buffer->RotationQuaternion = View.Rotation;
 	ZEQuaternion::ConvertToEulerAngles(
 		Buffer->RotationEuler.x,
 		Buffer->RotationEuler.y,
-		Buffer->RotationEuler.z, 
+		Buffer->RotationEuler.z,
 		View.Rotation);
-	Buffer->U = View.U;
-	Buffer->V = View.V;
-	Buffer->N = View.N;
+	Buffer->RightVector = View.U;
+	Buffer->UpVector = View.V;
+	Buffer->FrontVector = View.N;
 
 	ViewConstantBuffer->Unlock();
 }
@@ -136,23 +138,22 @@ void ZERNRenderer::RenderStages()
 
 	UpdateViewConstantBuffer();
 
-	//Context->SetConstantBuffer(ZEGR_ST_ALL, 0, GetConstantBuffer());
-	//Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, Scene->GetConstantBuffer());
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
+
+	Context->ClearRenderTarget(Output->GetRenderTarget(), ZEVector4::Zero);
 
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
 	{
 		ZERNStageQueue* Queue = &StageQueues[I];
-		ZELink<ZERNCommand>* Link = StageQueues[I].Commands.GetFirst();
+		ZERNStage* Stage = Queue->Stage;
 
-		Parameters.StageID =  Queue->Stage->GetId();
-		Parameters.Stage = Queue->Stage;
-
-		if (!Queue->Stage->Setup(this, Context, StageQueues[I].Commands))
+		if (Stage->GetEnable() && !Stage->Setup(this, Context, Queue->Commands))
 			continue;
 
+		Parameters.Stage = Stage;
+		ZELink<ZERNCommand>* Link = Queue->Commands.GetFirst();
 		while (Link != NULL)
 		{
 			ZERNCommand* Command = Link->GetItem();
@@ -161,7 +162,7 @@ void ZERNRenderer::RenderStages()
 			Link = Link->GetNext();
 		}
 
-		Queue->Stage->CleanUp(this, Context);
+		Stage->CleanUp(this, Context);
 	}
 }
 

@@ -37,7 +37,6 @@
 #include "ZEInterior.h"
 #include "ZEInteriorDoor.h"
 #include "ZEInteriorRoom.h"
-#include "ZEGame\ZEDrawParameters.h"
 #include "ZERenderer\ZERNSimpleMaterial.h"
 #include "ZERenderer\ZERNRenderer.h"
 

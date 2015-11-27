@@ -44,18 +44,55 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRTextureCube.h"
-#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZERNStageGBuffer.h"
 #include "ZERNStageID.h"
 #include "ZERNShaderSlots.h"
 #include "ZEModel/ZEModelResource.h"
+#include "ZECanvas.h"
+#include "ZEInterior/ZEInterior.h"
+#include "ZEInterior/ZEInteriorResource.h"
 
 #define ZERN_FMDF_CONSTANT_BUFFER		1
 #define ZERN_FMDF_RENDER_STATE			2
 #define ZERN_FMDF_SHADERS				4
+
+void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options)
+{
+	if (AlphaCullEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
+
+	if (SkinningEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_SKIN_TRANSFORM"));
+
+	if (VertexColorEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_VERTEX_COLOR"));
+
+	if (TransparencyEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_BASE_ALPHA"));
+
+	if(BaseMap.IsAvailable())
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_BASE_MAP"));
+
+	if(NormalMapEnabled && NormalMap.IsAvailable())
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_NORMAL_MAP"));
+
+	if(EmissiveEnabled && EmissiveMap.IsAvailable())
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_EMISSIVE_MAP"));
+
+	if(ReflectionEnabled && EnvironmentMap.IsAvailable())
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_REFLECTION"));
+
+	if(RefractionEnabled && EnvironmentMap.IsAvailable())
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_REFRACTION"));
+
+	if(OpacityMapEnabled && OpacityMap.IsAvailable())
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_MAP"));
+
+}
 
 bool ZERNFixedMaterial::UpdateShaders()
 {
@@ -63,6 +100,9 @@ bool ZERNFixedMaterial::UpdateShaders()
 		return true;
 
 	ZEGRShaderCompileOptions Options;
+
+	UpdateShaderDefinitions(Options);
+
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFixedMaterial.hlsl";
 	Options.Model = ZEGR_SM_5_0;
 
@@ -88,18 +128,18 @@ bool ZERNFixedMaterial::UpdateRenderState()
 		return true;
 
 	ZEGRRenderState RenderState = ZERNStageGBuffer::GetRenderState();
-	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
 	if (SkinningEnabled)
 		RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
 	else
-		RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
+		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
-	RasterizerState.SetCullDirection(TwoSided ? ZEGR_CD_NONE : ZEGR_CD_COUNTER_CLOCKWISE);
+	RasterizerState.SetCullDirection(TwoSided ? ZEGR_CD_NONE : RasterizerState.GetCullDirection());
 	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : ZEGR_FM_SOLID);
 	RenderState.SetRasterizerState(RasterizerState);
-
+	
 	RenderState.SetShader(ZEGR_ST_VERTEX, GBufferStage_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, GBufferStage_PixelShader);
 
@@ -111,23 +151,23 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	return true;
 }
 
-void ZERNFixedMaterial::UpdateConstantBuffer()
+bool ZERNFixedMaterial::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_CONSTANT_BUFFER))
-		return;
+		return true;
 
 	Constants.AmbientColor = (AmbientEnabled ? 1.0f : 0.0f) * AmbientFactor * AmbientColor;
 	Constants.DiffuseColor = (DiffuseEnabled ? 1.0f : 0.0f) * DiffuseFactor * DiffuseColor;
 	Constants.SpecularColor = (SpecularEnabled ? 1.0f : 0.0f) * SpecularFactor * SpecularColor;
-	Constants.EmmisiveColor = (EmmisiveEnabled ? 1.0f : 0.0f) * EmmisiveFactor * EmmisiveColor;
-	Constants.ReflectionColor = ReflectionFactor * ReflectionColor;
-	Constants.RefractionColor = RefractionFactor * RefractionColor;
+	Constants.EmissiveColor = (EmissiveEnabled ? 1.0f : 0.0f) * EmissiveFactor * EmissiveColor;
+	Constants.ReflectionColor = (ReflectionEnabled ? 1.0f : 0.0f) * ReflectionFactor * ReflectionColor;
+	Constants.RefractionColor = (RefractionEnabled ? 1.0f : 0.0f) * RefractionFactor * RefractionColor;
 
-	void* Buffer = NULL;
-	ConstantBuffer->Lock(&Buffer);
-	memcpy(Buffer, &Constants, sizeof(Constants));
-	ConstantBuffer->Unlock();
+	ConstantBuffer->SetData(&Constants);
+
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
+
+	return true;
 }
 
 bool ZERNFixedMaterial::Update()
@@ -138,7 +178,8 @@ bool ZERNFixedMaterial::Update()
 	if (!UpdateRenderState())
 		return false;
 
-	UpdateConstantBuffer();
+	if(!UpdateConstantBuffer())
+		return false;
 
 	return true;
 }
@@ -149,6 +190,7 @@ bool ZERNFixedMaterial::InitializeSelf()
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	DirtyFlags.RaiseAll();
 
 	return Update();
 }
@@ -159,6 +201,7 @@ void ZERNFixedMaterial::DeinitializeSelf()
 	GBufferStage_PixelShader.Release();
 	GBufferStage_RenderState.Release();
 	ConstantBuffer.Release();
+
 	DirtyFlags.RaiseAll();
 
 	ZERNMaterial::DeinitializeSelf();
@@ -171,8 +214,8 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	AlphaCullEnabled = false;
 	SkinningEnabled = false;
 	VertexColorEnabled = false;
-	TransparancyEnabled = false;
-	TransparancyMode = ZERN_TM_NONE;
+	TransparencyEnabled = false;
+	TransparencyMode = ZERN_TM_NONE;
 	AmbientEnabled = true;
 	AmbientFactor = 1.0f;
 	AmbientColor = ZEVector3::One;
@@ -185,16 +228,16 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	NormalMapEnabled = false;
 	HeightMapEnabled = false;
 	HeightMapTechnique = ZERN_HMT_NONE;
-	EmmisiveEnabled = false;
-	EmmisiveFactor = 1.0f;
-	EmmisiveColor = ZEVector3::One;
+	EmissiveEnabled = false;
+	EmissiveFactor = 1.0f;
+	EmissiveColor = ZEVector3::One;
 	ReflectionEnabled = false;
 	ReflectionFactor = 1.0f;
 	ReflectionColor = ZEVector3::One;
 	RefractionEnabled = false;
 	RefractionFactor = 1.0f;
 	RefractionColor = ZEVector3::One;
-	OpacityEnabled = false;
+	OpacityMapEnabled = false;
 	EnvironmentMapEnabled = false;
 	DetailBaseMapEnabled = false;
 	DetailNormalMapEnabled = false;
@@ -209,7 +252,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	Constants.HeightMapScale = 1.0f;
 	Constants.HeightMapOffset = 0.0f;
 	Constants.Reserved0 = 0.0f;
-	Constants.EmmisiveColor = ZEVector3::One;
+	Constants.EmissiveColor = ZEVector3::One;
 	Constants.AlphaCullLimit = 1.0f;
 	Constants.ReflectionColor = ZEVector3::One;
 	Constants.GlobalAmbientEnabled = false;
@@ -219,8 +262,6 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	Constants.DetailNormalMapFactor = 1.0f;
 	Constants.DetailDiffuseMapTiling = ZEVector2::One;
 	Constants.DetailNormalMapTiling = ZEVector2::One;
-
-	DirtyFlags.RaiseAll();
 }
 
 ZEUInt ZERNFixedMaterial::GetStageMask()
@@ -280,7 +321,7 @@ void ZERNFixedMaterial::SetSkinningEnabled(bool Enabled)
 
 	SkinningEnabled = true;
 
-	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_RENDER_STATE);
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 bool ZERNFixedMaterial::GetSkinningEnabled()
@@ -303,34 +344,34 @@ bool ZERNFixedMaterial::GetVertexColorEnabled()
 	return VertexColorEnabled;
 }
 
-void ZERNFixedMaterial::SetTransparancyEnabled(bool Enabled)
+void ZERNFixedMaterial::SetTransparencyEnabled(bool Enabled)
 {
-	if (TransparancyEnabled == Enabled)
+	if (TransparencyEnabled == Enabled)
 		return;
 
-	TransparancyEnabled = Enabled;
+	TransparencyEnabled = Enabled;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetTransparancyEnabled()
+bool ZERNFixedMaterial::GetTransparencyEnabled()
 {
-	return TransparancyEnabled;
+	return TransparencyEnabled;
 }
 
-void ZERNFixedMaterial::SetTransparancyMode(ZERNTransparancyMode Mode)
+void ZERNFixedMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
 {
-	if (TransparancyMode == Mode)
+	if (TransparencyMode == Mode)
 		return;
 
-	TransparancyMode = Mode;
+	TransparencyMode = Mode;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-ZERNTransparancyMode ZERNFixedMaterial::GetTransparancyMode()
+ZERNTransparencyMode ZERNFixedMaterial::GetTransparencyMode()
 {
-	return TransparancyMode;
+	return TransparencyMode;
 }
 
 void ZERNFixedMaterial::SetOpacity(float Value)
@@ -393,9 +434,11 @@ float ZERNFixedMaterial::GetSubSurfaceScatteringFactor() const
 	return Constants.SubSurfaceScatteringFactor;
 }
 
-void ZERNFixedMaterial::SetSubSurfaceScatteringMap(const ZERNMap& SubSurfaceScatteringMap)
+void ZERNFixedMaterial::SetSubSurfaceScatteringMap(const ZERNMap& Map)
 {
-	this->SubSurfaceScatteringMap = SubSurfaceScatteringMap;
+	SubSurfaceScatteringMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetSubSurfaceScatteringMap()
@@ -573,6 +616,7 @@ void ZERNFixedMaterial::SetSpecularMap(const ZERNMap& Map)
 {
 	SpecularMap = Map;
 
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetSpecularMap() const
@@ -583,6 +627,8 @@ const ZERNMap& ZERNFixedMaterial::GetSpecularMap() const
 void ZERNFixedMaterial::SetSpecularPowerMap(const ZERNMap& Map)
 {
 	SpecularPowerMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetSpecularPowerMap() const
@@ -590,59 +636,61 @@ const ZERNMap& ZERNFixedMaterial::GetSpecularPowerMap() const
 	return SpecularPowerMap;
 }
 
-void ZERNFixedMaterial::SetEmmisiveEnabled(bool Enabled)
+void ZERNFixedMaterial::SetEmissiveEnabled(bool Enabled)
 {
-	if (EmmisiveEnabled == Enabled)
+	if (EmissiveEnabled == Enabled)
 		return;
 
-	SpecularEnabled = Enabled;
+	EmissiveEnabled = Enabled;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetEmmisiveEnabled() const
+bool ZERNFixedMaterial::GetEmissiveEnabled() const
 {
-	return EmmisiveEnabled;
+	return EmissiveEnabled;
 }
 
-void ZERNFixedMaterial::SetEmmisiveFactor(float Factor)
+void ZERNFixedMaterial::SetEmissiveFactor(float Factor)
 {
-	if (EmmisiveFactor == Factor)
+	if (EmissiveFactor == Factor)
 		return;
 
-	EmmisiveFactor = Factor;
+	EmissiveFactor = Factor;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetEmmisiveFactor() const
+float ZERNFixedMaterial::GetEmissiveFactor() const
 {
-	return EmmisiveFactor;
+	return EmissiveFactor;
 }
 
-void ZERNFixedMaterial::SetEmmisiveColor(const ZEVector3& Color)
+void ZERNFixedMaterial::SetEmissiveColor(const ZEVector3& Color)
 {
-	if (EmmisiveColor == Color)
+	if (EmissiveColor == Color)
 		return;
 
-	EmmisiveColor = Color;
+	EmissiveColor = Color;
 	
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetEmmisiveColor() const
+const ZEVector3& ZERNFixedMaterial::GetEmissiveColor() const
 {
-	return EmmisiveColor;
+	return EmissiveColor;
 }
 
-void ZERNFixedMaterial::SetEmmisiveMap(const ZERNMap& Map)
+void ZERNFixedMaterial::SetEmissiveMap(const ZERNMap& Map)
 {
-	EmmisiveMap = Map;
+	EmissiveMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-const ZERNMap& ZERNFixedMaterial::GetEmmisiveMap() const
+const ZERNMap& ZERNFixedMaterial::GetEmissiveMap() const
 {
-	return EmmisiveMap;
+	return EmissiveMap;
 }
 
 void ZERNFixedMaterial::SetNormalMapEnabled(bool Enabled)
@@ -663,6 +711,8 @@ bool ZERNFixedMaterial::GetNormalMapEnabled() const
 void ZERNFixedMaterial::SetNormalMap(const ZERNMap& Map)
 {
 	NormalMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetNormalMap() const
@@ -733,6 +783,8 @@ float ZERNFixedMaterial::GetHeightMapScale() const
 void ZERNFixedMaterial::SetHeightMap(const ZERNMap& Map)
 {
 	HeightMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetHeightMap() const
@@ -742,22 +794,24 @@ const ZERNMap& ZERNFixedMaterial::GetHeightMap() const
 
 void ZERNFixedMaterial::SetOpacityMapEnabled(bool Enabled)
 {
-	if (OpacityEnabled == Enabled)
+	if (OpacityMapEnabled == Enabled)
 		return;
 
-	OpacityEnabled = Enabled;
+	OpacityMapEnabled = Enabled;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 bool ZERNFixedMaterial::GetOpacityMapEnabled() const
 {
-	return OpacityEnabled;
+	return OpacityMapEnabled;
 }
 
-void ZERNFixedMaterial::SetOpacityMap(const ZERNMap& Texture)
+void ZERNFixedMaterial::SetOpacityMap(const ZERNMap& Map)
 {
-	OpacityMap = Texture;
+	OpacityMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetOpacityMap() const
@@ -765,9 +819,11 @@ const ZERNMap& ZERNFixedMaterial::GetOpacityMap() const
 	return OpacityMap;
 }
 
-void ZERNFixedMaterial::SetEnvironmentMap(const ZERNMap& Texture)
+void ZERNFixedMaterial::SetEnvironmentMap(const ZERNMap& Map)
 {
-	EnvironmentMap = Texture;
+	EnvironmentMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetEnvironmentMap() const
@@ -782,7 +838,7 @@ void ZERNFixedMaterial::SetReflectionEnabled(bool Enabled)
 
 	ReflectionEnabled = Enabled;
 
-	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_CONSTANT_BUFFER);
 }
 
 bool ZERNFixedMaterial::GetReflectionEnabled() const
@@ -827,7 +883,7 @@ void ZERNFixedMaterial::SetRefractionEnabled(bool Enabled)
 
 	RefractionEnabled = Enabled;
 
-	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_CONSTANT_BUFFER);
 }
 
 bool ZERNFixedMaterial::GetRefractionEnabled() const
@@ -882,13 +938,10 @@ float ZERNFixedMaterial::GetRefractionIndex() const
 
 void ZERNFixedMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
 {
-	if (Constants.DetailDiffuseMapTiling != Tiling ||
-		Constants.DetailNormalMapTiling != Tiling)
-	{
+	if (Constants.DetailDiffuseMapTiling == Tiling && Constants.DetailNormalMapTiling == Tiling)
 		return;
-	}
 
-	Constants.DetailNormalMapTiling = Tiling;
+	Constants.DetailDiffuseMapTiling = Tiling;
 	Constants.DetailNormalMapTiling = Tiling;
 	
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
@@ -944,9 +997,11 @@ const ZEVector2& ZERNFixedMaterial::GetDetailBaseMapTiling() const
 	return Constants.DetailDiffuseMapTiling;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMap(const ZERNMap& Texture)
+void ZERNFixedMaterial::SetDetailBaseMap(const ZERNMap& Map)
 {
-	DetailBaseMap = Texture;
+	DetailBaseMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetDetailBaseMap() const
@@ -999,9 +1054,11 @@ const ZEVector2& ZERNFixedMaterial::GetDetailNormalMapTiling() const
 	return Constants.DetailNormalMapTiling;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMap(const ZERNMap& Texture)
+void ZERNFixedMaterial::SetDetailNormalMap(const ZERNMap& Map)
 {
-	DetailNormalMap = Texture;
+	DetailNormalMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
 const ZERNMap& ZERNFixedMaterial::GetDetailNormalMap() const
@@ -1030,52 +1087,51 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 		TextureSampler = true;
 	}
 
-
-	if (GetDetailNormalMapEnabled() && NormalMap.IsAvailable())
+	if (NormalMapEnabled && NormalMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, NormalMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 1, NormalMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (GetSpecularEnabled() && SpecularMap.IsAvailable())
+	if (SpecularEnabled && SpecularMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, SpecularMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 2, SpecularMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (EmmisiveMap.IsAvailable())
+	if (EmissiveEnabled && EmissiveMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, EmmisiveMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 3, EmissiveMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (GetHeightMapEnabled() && HeightMap.IsAvailable())
+	if (HeightMapEnabled && HeightMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, HeightMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 4, HeightMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (GetOpacityMapEnabled() && OpacityMap.IsAvailable())
+	if (OpacityMapEnabled && OpacityMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, OpacityMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if ((GetReflectionEnabled() || GetRefractionEnabled()) && EnvironmentMap.IsAvailable())
+	if ((ReflectionEnabled || RefractionEnabled) && EnvironmentMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, EnvironmentMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 7, EnvironmentMap.GetTexture());
 		Context->SetSampler(ZEGR_ST_PIXEL, 1, EnvironmentMap.GetSamplerState());
 	}
 
 	if (GetDetailBaseMapEnabled() && DetailBaseMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, DetailBaseMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 8, DetailBaseMap.GetTexture());
 		Context->SetSampler(ZEGR_ST_PIXEL, 2, DetailBaseMap.GetSamplerState());
 	}
 
 	if (GetDetailNormalMapEnabled() && DetailNormalMap.IsAvailable())
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, DetailNormalMap.GetTexture());
+		Context->SetTexture(ZEGR_ST_PIXEL, 9, DetailNormalMap.GetTexture());
 		Context->SetSampler(ZEGR_ST_PIXEL, 3, DetailNormalMap.GetSamplerState());
 	}
 
@@ -1083,6 +1139,23 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 		Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSamplerState());
 
 	return true;
+}
+
+void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+{
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
+
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 9, NULL);
 }
 
 ZERNFixedMaterial* ZERNFixedMaterial::CreateInstance()
@@ -1113,8 +1186,8 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteBool("VertexColorEnabled", GetVertexColorEnabled());
 	ConfigurationNode.WriteBool("SkinningEnabled", GetSkinningEnabled());
 
-	ConfigurationNode.WriteBool("TransparancyEnabled", GetTransparancyEnabled());
-	ConfigurationNode.WriteInt32("TransparencyMode", (ZEInt32)GetTransparancyMode());
+	ConfigurationNode.WriteBool("TransparancyEnabled", GetTransparencyEnabled());
+	ConfigurationNode.WriteInt32("TransparencyMode", (ZEInt32)GetTransparencyMode());
 	ConfigurationNode.WriteFloat("Opacity", GetOpacity());
 	ConfigurationNode.WriteBool("AlphaCullEnabled", GetAlphaCullEnabled());
 	ConfigurationNode.WriteFloat("AlphaCullLimit", GetAlphaCullLimit());
@@ -1137,10 +1210,10 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteVector3("SpecularColor", GetSpecularColor());
 	ConfigurationNode.WriteBool("SpecularEnabled", GetSpecularEnabled());
 
-	ConfigurationNode.WriteBool("EmmisiveEnabled", GetEmmisiveEnabled());
-	ConfigurationNode.WriteFloat("EmmisiveFactor", GetEmmisiveFactor());
-	ConfigurationNode.WriteVector3("EmmisiveColor", GetEmmisiveColor());
-	EmmisiveMap.Write(ConfigurationNode, "EmmisiveMap");
+	ConfigurationNode.WriteBool("EmissiveEnabled", GetEmissiveEnabled());
+	ConfigurationNode.WriteFloat("EmissiveFactor", GetEmissiveFactor());
+	ConfigurationNode.WriteVector3("EmissiveColor", GetEmissiveColor());
+	EmissiveMap.Write(ConfigurationNode, "EmissiveMap");
 
 	ConfigurationNode.WriteBool("NormalMapEnabled", GetNormalMapEnabled());
 	NormalMap.Write(ConfigurationNode, "NormalMap");
@@ -1190,7 +1263,6 @@ void ZERNFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	if(!File.Open(FilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		zeError("Can not open given file. File : %s", FilePath.ToCString());
 
-
 	ZEMLReader MaterialReader;
 	if (!MaterialReader.Open(&File))
 		return;
@@ -1203,6 +1275,23 @@ void ZERNFixedMaterial::ReadFromFile(const ZEString& FilePath)
 	if (MaterialNode.GetName() == "Material")
 		zeWarning("Old depricated ZEMaterial file version detected. Please convert this file to new version for future compability. Current Version: 1.0. Detected Version: 0.0. File Name: \"%s\".", File.GetPath().ToCString());
 
+	if(MaterialNode.ReadUInt8("MajorVersion", 0) == 1)
+		ReadFromFileV1(MaterialNode);
+	else
+		ReadFromFileV0(MaterialNode);
+
+	MaterialReader.Close();
+
+	if(File.IsOpen())
+		File.Close();
+
+	FileName = FilePath;
+
+	InitializeSelf();
+}
+
+void ZERNFixedMaterial::ReadFromFileV0(const ZEMLReaderNode& MaterialNode)
+{
 	SetName(MaterialNode.ReadString("Name"));
 
 	ZESize SubNodeCount = MaterialNode.GetNodeCount("Configuration");
@@ -1224,13 +1313,13 @@ void ZERNFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetSkinningEnabled(ConfigurationNode.ReadBoolean("SkinningEnabled", false));
 		SetVertexColorEnabled(ConfigurationNode.ReadBoolean("VertexColorEnabled", false));
 
-		SetTransparancyEnabled(ConfigurationNode.ReadBoolean("TransparancyEnabled", false));
-		SetTransparancyMode((ZERNTransparancyMode)ConfigurationNode.ReadInt32("TransparencyMode", ZERN_TM_NONE));
+		SetTransparencyEnabled(ConfigurationNode.ReadBoolean("TransparencyEnabled", false));
+		SetTransparencyMode((ZERNTransparencyMode)ConfigurationNode.ReadInt32("TransparencyMode", ZERN_TM_NONE));
 		SetOpacity(ConfigurationNode.ReadFloat("Opacity", 1.0f));
 		SetAlphaCullEnabled(ConfigurationNode.ReadBoolean("AlphaCullEnabled", false));
 		SetAlphaCullLimit(ConfigurationNode.ReadFloat("AlphaCullLimit", 0.5f));
 
-		BaseMap.Read(ConfigurationNode, "BaseMap");
+		BaseMap.ReadV0(ConfigurationNode, "BaseMap");
 
 		SetAmbientEnabled(ConfigurationNode.ReadBoolean("AmbientEnabled", true));
 		SetGlobalAmbientEnabled(ConfigurationNode.ReadBoolean("GlobalAmbientEnabled", false));
@@ -1245,15 +1334,15 @@ void ZERNFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetSpecularFactor(ConfigurationNode.ReadFloat("SpecularFactor", 1.0f));
 		SetSpecularShininess(ConfigurationNode.ReadFloat("SpecularShininess", 1.0f));
 		SetSpecularColor(ConfigurationNode.ReadVector3("SpecularColor", ZEVector3::One));
-		SpecularMap.Read(ConfigurationNode, "SpecularMap");
+		SpecularMap.ReadV0(ConfigurationNode, "SpecularMap");
 
-		SetEmmisiveEnabled(ConfigurationNode.ReadBoolean("EmmisiveEnabled", false));
-		SetEmmisiveFactor(ConfigurationNode.ReadFloat("EmmisiveFactor", 1.0f));
-		SetEmmisiveColor(ConfigurationNode.ReadVector3("EmmisiveColor", ZEVector3::One));
-		EmmisiveMap.Read(ConfigurationNode, "EmmisiveMap");
+		SetEmissiveEnabled(ConfigurationNode.ReadBoolean("EmissiveEnabled", false));
+		SetEmissiveFactor(ConfigurationNode.ReadFloat("EmissiveFactor", 1.0f));
+		SetEmissiveColor(ConfigurationNode.ReadVector3("EmissiveColor", ZEVector3::One));
+		EmissiveMap.ReadV0(ConfigurationNode, "EmissiveMap");
 
 		SetNormalMapEnabled(ConfigurationNode.ReadBoolean("NormalMapEnabled", false));
-		NormalMap.Read(ConfigurationNode, "NormalMap");
+		NormalMap.ReadV0(ConfigurationNode, "NormalMap");
 
 		SetHeightMapEnabled(ConfigurationNode.ReadBoolean("HeightEnabled", false));
 		SetHeightMapTechnique((ZERNHeightMapTechnique)ConfigurationNode.ReadUInt8("HeigthMapTechnique", ZERN_HMT_NONE));
@@ -1261,9 +1350,9 @@ void ZERNFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetHeightMapScale(ConfigurationNode.ReadFloat("HeightMapScale"));
 
 		SetOpacityMapEnabled(ConfigurationNode.ReadBoolean("OpacityMapEnabled", false));
-		OpacityMap.Read(ConfigurationNode, "OpacityMap");
+		OpacityMap.ReadV0(ConfigurationNode, "OpacityMap");
 
-		EnvironmentMap.Read(ConfigurationNode, "EnvironmentMap");
+		EnvironmentMap.ReadV0(ConfigurationNode, "EnvironmentMap");
 
 		SetReflectionEnabled(ConfigurationNode.ReadBoolean("ReflectionEnabled", false));
 		SetReflectionFactor(ConfigurationNode.ReadFloat("ReflectionFactor", 1.0f));
@@ -1278,22 +1367,97 @@ void ZERNFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetDetailBaseMapEnabled(ConfigurationNode.ReadBoolean("DetailBaseMapEnabled", false));
 		SetDetailBaseMapColor(ConfigurationNode.ReadVector3("DetailBaseMapColor", ZEVector3::One));
 		SetDetailMapTiling(ConfigurationNode.ReadVector2("DetailBaseMapTiling", ZEVector2::One));
-		DetailBaseMap.Read(ConfigurationNode, "DetailBaseMap");
+		DetailBaseMap.ReadV0(ConfigurationNode, "DetailBaseMap");
 
 		SetDetailNormalMapEnabled(ConfigurationNode.ReadBoolean("DetailNormalMapEnabled", false));
 		SetDetailNormalMapFactor(ConfigurationNode.ReadFloat("DetailNormalMapFactor", 1.0f));
 		SetDetailNormalMapTiling(ConfigurationNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
-		DetailNormalMap.Read(ConfigurationNode, "DetailNormalMap");
-
-		Update();
+		DetailNormalMap.ReadV0(ConfigurationNode, "DetailNormalMap");
 	}
+}
 
-	MaterialReader.Close();
+void ZERNFixedMaterial::ReadFromFileV1(const ZEMLReaderNode& MaterialNode)
+{
+	SetName(MaterialNode.ReadString("Name"));
 
-	if(File.IsOpen())
-		File.Close();
+	ZESize SubNodeCount = MaterialNode.GetNodeCount("Configuration");
 
-	FileName = FilePath;
-	
-	Update();
+	//When Material Configuration functionality is implemented this reading mechanism should be revised, now it just loads "Default" config.
+
+	for (ZESize I = 0; I < SubNodeCount; I++)
+	{
+		ZEMLReaderNode ConfigurationNode = MaterialNode.GetNode("Configuration", I);
+
+		if (!ConfigurationNode.IsValid())
+		{
+			zeError("Cannot read material configuration");
+			return;
+		}
+
+		SetWireframe(ConfigurationNode.ReadBoolean("Wireframe", false));
+		SetTwoSided(ConfigurationNode.ReadBoolean("TwoSided", false));
+		SetSkinningEnabled(ConfigurationNode.ReadBoolean("SkinningEnabled", false));
+		SetVertexColorEnabled(ConfigurationNode.ReadBoolean("VertexColorEnabled", false));
+
+		SetTransparencyEnabled(ConfigurationNode.ReadBoolean("TransparencyEnabled", false));
+		SetTransparencyMode((ZERNTransparencyMode)ConfigurationNode.ReadInt32("TransparencyMode", ZERN_TM_NONE));
+		SetOpacity(ConfigurationNode.ReadFloat("Opacity", 1.0f));
+		SetAlphaCullEnabled(ConfigurationNode.ReadBoolean("AlphaCullEnabled", false));
+		SetAlphaCullLimit(ConfigurationNode.ReadFloat("AlphaCullLimit", 0.5f));
+
+		BaseMap.ReadV1(ConfigurationNode, "BaseMap");
+
+		SetAmbientEnabled(ConfigurationNode.ReadBoolean("AmbientEnabled", true));
+		SetGlobalAmbientEnabled(ConfigurationNode.ReadBoolean("GlobalAmbientEnabled", false));
+		SetAmbientFactor(ConfigurationNode.ReadFloat("AmbientFactor", 1.0f));
+		SetAmbientColor(ConfigurationNode.ReadVector3("AmbientColor", ZEVector3::One));
+
+		SetDiffuseEnabled(ConfigurationNode.ReadBoolean("DiffuseEnabled", true));
+		SetDiffuseFactor(ConfigurationNode.ReadFloat("DiffuseFactor", 1.0f));
+		SetDiffuseColor(ConfigurationNode.ReadVector3("DiffuseColor", ZEVector3::One));
+
+		SetSpecularEnabled(ConfigurationNode.ReadBoolean("SpecularEnabled", true));
+		SetSpecularFactor(ConfigurationNode.ReadFloat("SpecularFactor", 1.0f));
+		SetSpecularShininess(ConfigurationNode.ReadFloat("SpecularShininess", 1.0f));
+		SetSpecularColor(ConfigurationNode.ReadVector3("SpecularColor", ZEVector3::One));
+		SpecularMap.ReadV1(ConfigurationNode, "SpecularMap");
+
+		SetEmissiveEnabled(ConfigurationNode.ReadBoolean("EmissiveEnabled", false));
+		SetEmissiveFactor(ConfigurationNode.ReadFloat("EmissiveFactor", 1.0f));
+		SetEmissiveColor(ConfigurationNode.ReadVector3("EmissiveColor", ZEVector3::One));
+		EmissiveMap.ReadV1(ConfigurationNode, "EmissiveMap");
+
+		SetNormalMapEnabled(ConfigurationNode.ReadBoolean("NormalMapEnabled", false));
+		NormalMap.ReadV1(ConfigurationNode, "NormalMap");
+
+		SetHeightMapEnabled(ConfigurationNode.ReadBoolean("HeightEnabled", false));
+		SetHeightMapTechnique((ZERNHeightMapTechnique)ConfigurationNode.ReadUInt8("HeigthMapTechnique", ZERN_HMT_NONE));
+		SetHeightMapOffset(ConfigurationNode.ReadFloat("HeightMapOffset"));
+		SetHeightMapScale(ConfigurationNode.ReadFloat("HeightMapScale"));
+
+		SetOpacityMapEnabled(ConfigurationNode.ReadBoolean("OpacityMapEnabled", false));
+		OpacityMap.ReadV1(ConfigurationNode, "OpacityMap");
+
+		EnvironmentMap.ReadV1(ConfigurationNode, "EnvironmentMap");
+
+		SetReflectionEnabled(ConfigurationNode.ReadBoolean("ReflectionEnabled", false));
+		SetReflectionFactor(ConfigurationNode.ReadFloat("ReflectionFactor", 1.0f));
+		SetReflectionColor(ConfigurationNode.ReadVector3("ReflectionColor", ZEVector3::One));
+
+		SetRefractionEnabled(ConfigurationNode.ReadBoolean("RefractionEnabled", false));
+		SetRefractionFactor(ConfigurationNode.ReadFloat("RefractionFactor", 1.0f));
+		SetRefractionColor(ConfigurationNode.ReadVector3("RefractionColor", ZEVector3::One));
+		SetRefractionIndex(ConfigurationNode.ReadFloat("RefractionIndex", 1.0f));
+
+
+		SetDetailBaseMapEnabled(ConfigurationNode.ReadBoolean("DetailBaseMapEnabled", false));
+		SetDetailBaseMapColor(ConfigurationNode.ReadVector3("DetailBaseMapColor", ZEVector3::One));
+		SetDetailMapTiling(ConfigurationNode.ReadVector2("DetailBaseMapTiling", ZEVector2::One));
+		DetailBaseMap.ReadV1(ConfigurationNode, "DetailBaseMap");
+
+		SetDetailNormalMapEnabled(ConfigurationNode.ReadBoolean("DetailNormalMapEnabled", false));
+		SetDetailNormalMapFactor(ConfigurationNode.ReadFloat("DetailNormalMapFactor", 1.0f));
+		SetDetailNormalMapTiling(ConfigurationNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
+		DetailNormalMap.ReadV1(ConfigurationNode, "DetailNormalMap");
+	}
 }

@@ -71,6 +71,7 @@
 #include "ZECanvas.h"
 #include "ZEGraphics\ZEGRTextureCube.h"
 #include "ZERNStageHDR.h"
+#include "ZERNStagePostProcess.h"
 
 #define ZERN_SLDF_LIGHT_BUFFER	1
 #define ZERN_SLDF_TILE_BUFFER	2
@@ -169,7 +170,7 @@ bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* 
 		return false;
 
 	Context->SetRenderState(TiledDeferredRenderState);
-	Context->SetVertexBuffer(0, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 
 	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, LightBuffer);
 	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, TileInfoBuffer);
@@ -184,15 +185,11 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 	if(!Update())
 		return false;
 
-	ZEGROutput* Output = Renderer->GetOutput();
-	if(Output->GetRenderTarget() == OutputRenderTarget)
-		Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
-
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, LightConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, LightConstantBuffer);
 
 	Context->SetRenderState(DeferredRenderState);
-	Context->SetVertexBuffer(0, LightVertexBuffer);
+	Context->SetVertexBuffers(0, 1, &LightVertexBuffer);
 
 	ZESize LightCount = Lights.GetCount();
 	for(ZESize I = 0; I < LightCount; ++I)
@@ -219,13 +216,15 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 
 bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZERNStageGBuffer* Gbuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	ZERNStageGBuffer* StageGbuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
 	ZEGROutput* Output = Renderer->GetOutput();
-	if(Gbuffer == NULL || Output == NULL)
+	if(StageGbuffer == NULL || Output == NULL)
 		return false;
 
-	ZERNStageHDR* HDR = (ZERNStageHDR*)Renderer->GetStage(ZERN_STAGE_HDR);
-	OutputRenderTarget = (HDR != NULL) ? Gbuffer->GetAccumulationMap()->GetRenderTarget() : Output->GetRenderTarget();
+	ZERNStageHDR* StageHDR = (ZERNStageHDR*)Renderer->GetStage(ZERN_STAGE_HDR);
+	ZERNStagePostProcess* StagePostProcess = (ZERNStagePostProcess*)Renderer->GetStage(ZERN_STAGE_POST_EFFECT);
+	OutputRenderTarget = ((StageHDR != NULL && StageHDR->GetEnable()) || (StagePostProcess != NULL && StagePostProcess->GetEnable())) ? 
+							StageGbuffer->GetAccumulationMap()->GetRenderTarget() : Output->GetRenderTarget();
 
 	Context->SetViewports(1, &Output->GetViewport());
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
@@ -249,6 +248,7 @@ void ZERNStageLighting::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, NULL);
 
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
@@ -333,7 +333,9 @@ void ZERNStageLighting::AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 	ZEUInt TileCount = TileCountX * TileCountY;
 	ZEUInt LightCount = Lights.GetCount();
 
-	TileInfos.Resize(TileCount);
+	if(TileInfos.GetCount() != TileCount)
+		TileInfos.Resize(TileCount);
+	
 	memset(&TileInfos[0], 0, sizeof(ZERNTileInfo) * TileCount);
 
 	for(ZEUInt I = 0; I < LightCount; ++I)
@@ -393,24 +395,24 @@ void ZERNStageLighting::CreateLights()
 {
 	ZERandom::Reset();
 
-	for(ZEInt I = 0; I < (MAX_LIGHTS - 3); ++I)
+	for(ZEInt I = 0; I < 20; ++I)
 	{
 		ZELightPoint* PointLight = ZELightPoint::CreateInstance();
-		PointLight->SetIntensity(1.0f);
+		PointLight->SetIntensity(0.3f);
 		PointLight->SetColor(ZEVector3(ZERandom::GetFloatPositive(), ZERandom::GetFloatPositive(), ZERandom::GetFloatPositive()));
-		PointLight->SetAttenuation(0.5f, 0.6f, 1.0f);
-		PointLight->SetPosition(ZEVector3(ZERandom::GetFloat() * 50.0f, 5.0f, ZERandom::GetFloat() * 50.0f));
-		PointLight->SetRange(10.0f);
+		PointLight->SetAttenuation(1.0f, 0.1f, 0.05f);
+		PointLight->SetPosition(ZEVector3(ZERandom::GetFloat() * 10.0f, 5.0f, 0.0f));
+		PointLight->SetRange(10);
 
 		Lights.Add(PointLight);
 	}
 	
 	ZELightDirectional* DirectionalLight = ZELightDirectional::CreateInstance();
-	DirectionalLight->SetIntensity(1.0f);
+	DirectionalLight->SetIntensity(0.5f);
 	DirectionalLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	DirectionalLight->SetPosition(ZEVector3(0.0f, 10.0f, 10.0f));
+	DirectionalLight->SetPosition(ZEVector3(0.0f, 50.0f, 10.0f));
 	ZEQuaternion Rotation;
-	ZEQuaternion::CreateFromDirection(Rotation, ZEVector3(0.0001f, 1.0f, 0.0001f));
+	ZEQuaternion::CreateFromDirection(Rotation, ZEVector3(1.0f, 1.0f, 1.0f));
 	DirectionalLight->SetRotation(Rotation);
 
 	Lights.Add(DirectionalLight);
@@ -418,7 +420,7 @@ void ZERNStageLighting::CreateLights()
 	/*ZELightOmniProjective* OmniProjectiveLight = ZELightOmniProjective::CreateInstance();
 	OmniProjectiveLight->SetProjectionTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/c.tga");
 	OmniProjectiveLight->SetIntensity(5.0f);
-	OmniProjectiveLight->SetAttenuation(0.4f, 0.5f, 1.0f);
+	OmniProjectiveLight->SetAttenuation(1.0f, 0.5f, 0.4f);
 	OmniProjectiveLight->SetRange(10.0f);
 	OmniProjectiveLight->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
 
@@ -432,7 +434,7 @@ void ZERNStageLighting::CreateLights()
 	ProjectiveLight->SetIntensity(5.0f);
 	ProjectiveLight->SetAspectRatio(1.0f);
 	ProjectiveLight->SetFOV(ZE_PI / 3.0f);
-	ProjectiveLight->SetAttenuation(0.0f, 0.0f, 1.0f);
+	ProjectiveLight->SetAttenuation(1.0f, 0.0f, 0.0f);
 	ProjectiveLight->SetRange(10.0f);
 
 	Lights.Add(ProjectiveLight);*/
@@ -603,6 +605,7 @@ bool ZERNStageLighting::UpdateShaders()
 void ZERNStageLighting::SetupGbufferResources(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	ZERNStageGBuffer* GbufferStage = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, GbufferStage->GetNormalMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, GbufferStage->GetDiffuseColorMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, GbufferStage->GetSpecularColorMap());
 

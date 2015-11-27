@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParticleSystem.h
+ Zinek Engine - ZEATSun.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,78 +35,39 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
-#include "ZEMeta/ZEObject.h"
-
-#include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEParticle.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEATCommon.h"
 
-class ZEParticleRenderer;
-class ZEParticleOperator;
-class ZEParticleGenerator;
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
-
-// struct ZENewParticle
-// {
-// 	ZEQuaternion	Rotation3D;
-// 	float			Rotation2D;
-// 
-// 	ZEVector3		Position;
-// 	ZEVector3		Color;
-// 	float			Transparency;
-// 
-// 	ZEVector2		Size2D;
-// 	ZEVector3		Size3D;
-// };
-
-class ZEParticleSystem : public ZEObject
+class ZEATSun : public ZEEntity
 {
-	ZE_OBJECT
-
-	friend class ZEParticleEffect;
-
 	private:
-		ZEParticleEffect*						Owner;
+		ZEVector3			Color;
+		ZEVector3			Direction;
+		float				Intensity;
+		ZEATObserver		Observer;
 
-		ZEArray<ZEParticle>						ParticlePool;
-
-		ZEParticleRenderer*						Renderer;
-		ZEArray<ZEParticleOperator*>			Operators;
-		ZEArray<ZEParticleGenerator*>			Generators;
-
-		ZEUInt									MaximumParticleCount;
+		ZEATJulian			CalculateJulians();
+		ZEATHeliocentric	CalculateHeliocentrics(double JulianEphemerisMillennium);
+		ZEATNutation		CalculateNutations(double JulianEphemerisCentury);
+		double				CalculateTrueObliquityOfEcliptic(double JulianEphemerisMillennium, double ObliquityNutation);
+		ZEATGeocentric		CalculateGeocentrics(ZEATHeliocentric Heliocentric, double LongtitudeNutation, double TrueObliquity);
+		ZEATTopocentric		CalculateTopocentrics(ZEATGeocentric Geocentric, ZEATJulian Julian, double LongtitudeNutation, double TrueObliquity, double HeliocentricRadius);
 
 	public:
-		void									SetRenderer(ZEParticleRenderer* Renderer);
-		const ZEParticleRenderer*				GetRenderer() const;
+		void				SetColor(const ZEVector3& Color);
+		const ZEVector3&	GetColor() const;
 
-		const ZEArray<ZEParticle>&				GetParticlePool() const;
+		void				SetDirection(const ZEVector3& Direction);
+		const ZEVector3&	GetDirection() const;
 
-		const ZEArray<ZEParticleOperator*>&		GetOperators() const;
-		bool									AddOperator(ZEParticleOperator* NewOperator);
-		bool									RemoveOperator(ZEParticleOperator* OperatorToRemove);
+		void				SetIntensity(float Intensity);
+		float				GetIntensity() const;
 
-		const ZEArray<ZEParticleGenerator*>&	GetGenerators() const;
-		bool									AddGenerator(ZEParticleGenerator* NewOperator);
-		bool									RemoveGenerator(ZEParticleGenerator* OperatorToRemove);
+		void				SetObserver(const ZEATObserver& Observer);
+		const ZEATObserver&	GetObserver() const;
 
-		void									SetMaximumParticleCount(ZEUInt	ParticleCount);
-		ZEUInt									GetMaximumParticleCount() const;
+		virtual void		Tick(float ElapsedTime);
 
-		const ZEParticleEffect*					GetOwner() const;
-
-		bool									PreRender(const ZERNCullParameters* CullParameters);
-		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		void									Tick(float ElapsedTime);
-
-												ZEParticleSystem();
-												~ZEParticleSystem();
+							ZEATSun();
 };
-
-#endif

@@ -37,38 +37,51 @@
 #ifndef __ZE_PARTICLE_BILLBOARD_RENDERER_H__
 #define __ZE_PARTICLE_BILLBOARD_RENDERER_H__
 
-#include "ZEParticleEmitter.h"
 #include "ZEParticleRenderer.h"
 #include "ZERenderer\ZERNCommand.h"
+#include "ZEGraphics\ZEGRHolder.h"
 
-class ZESimpleVertex;
-struct ZEDrawParameters;
-class ZEStaticVertexBuffer;
+class ZEGRVertexBuffer;
+class ZERNRenderParameters;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRStructuredBuffer;
+struct ZERNCullParameters;
 
 class ZEParticleBillboardRenderer : public ZEParticleRenderer
 {
 	private:
-
-		ZEParticleBillboardType				BillboardType;
-
-		ZEStaticVertexBuffer*				VertexBuffer;
-		ZERNCommand						RenderCommand;
+		ZERNCommand							RenderCommand;
 		ZEVector3							AxisOfOrientation;
 
-		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
-		void								DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up);
+		struct InstanceAttributes
+		{
+			ZEVector3	Position;
+			float		Size;
+		};
+		ZEGRHolder<ZEGRStructuredBuffer>	InstanceBuffer;
+
+		ZEGRHolder<ZEGRShader>				VertexShader;
+		ZEGRHolder<ZEGRShader>				HullShader;
+		ZEGRHolder<ZEGRShader>				DomainShader;
+		ZEGRHolder<ZEGRShader>				PixelShader;
+
+		ZEGRHolder<ZEGRRenderStateData>		RenderStateData;
+
+		void								CreateShaders();
+		void								CreateRenderState();
+
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
 											ZEParticleBillboardRenderer();
 
 	public:
-
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
 		void								SetAxixOfOrientation(const ZEVector3& AxisOfOrientation);
 		const ZEVector3&					GetAxisOfOrientation() const;
-
-		void								SetBillboardType(ZEParticleBillboardType Type);
-		ZEParticleBillboardType				GetBillboardType() const;
 
 		static ZEParticleBillboardRenderer*	CreateInstance();
 };

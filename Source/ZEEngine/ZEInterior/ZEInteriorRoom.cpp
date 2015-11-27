@@ -40,43 +40,18 @@
 #include "ZERenderer/ZELight.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
-
-void ZEInteriorRoom::DebugDraw(ZERNRenderer* Renderer)
-{
-	if (DebugDrawComponents.Material == NULL)
-	{
-		DebugDrawComponents.Material = ZERNSimpleMaterial::CreateInstance();
-
-		DebugDrawComponents.BoxRenderCommand.SetZero();
-		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
-		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
-		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	}
-
-	DebugDrawComponents.BoxCanvas.Clean();
-	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.7f, 0.5f, 0.0f, 1.0f));
-
-	ZEAABBox BoundingBox = GetBoundingBox();
-	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
-	DebugDrawComponents.BoxCanvas.SetTranslation(ZEVector3::Zero);
-	DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
-	ZEMatrix4x4 LocalMatrix;
-	ZEMatrix4x4::CreateOrientation(LocalMatrix, Position, Rotation, Scale);
-	DebugDrawComponents.BoxRenderCommand.WorldMatrix = Owner->GetWorldTransform() * LocalMatrix;
-	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
-	DebugDrawComponents.BoxRenderCommand.Priority = 4;
-	Renderer->AddCommand(&DebugDrawComponents.BoxRenderCommand);
-}
-
+#include "ZERenderer\ZERNCuller.h"
+#include "ZEGraphics\ZEGRRenderState.h"
+#include "ZEGraphics\ZEGRConstantBuffer.h"
+#include "ZEGraphics\ZEGRContext.h"
+#include "ZERenderer\ZERNShaderSlots.h"
+#include "ZERenderer\ZERNRenderParameters.h"
 
 bool ZEInteriorRoom::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
 {
@@ -350,20 +325,30 @@ void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 	IsPersistentDraw = Enabled;
 }
 
-void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
+void ZEInteriorRoom::PreRender(const ZERNCullParameters* CullParameters)
 {
 	IsDrawn = true;
-
-	for(ZESize I = 0; I < RenderCommands.GetCount(); I++)
+	
+	ZESize RenderCommandCount = RenderCommands.GetCount();
+	for(ZESize I = 0; I < RenderCommandCount; I++)
 	{
-		ZEMatrix4x4 LocalTransform;
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform() * LocalTransform;
-		RenderCommands[I].Lights.Clear();
-		RenderCommands[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
-
-		DrawParameters->Renderer->AddCommand(&RenderCommands[I]);
+		if(!CullParameters->Renderer->ContainsCommand(&RenderCommands[I]))
+			CullParameters->Renderer->AddCommand(&RenderCommands[I]);
 	}
+}
+
+void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	ZEGRContext* Context = Parameters->Context;
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	Context->SetVertexBuffers(0, 1, &VertexBuffer);
+
+	ZEExtraRenderParameters* ExtraParameters = (ZEExtraRenderParameters*)Command->ExtraParameters;
+	ExtraParameters->Material->SetupMaterial(Context, Parameters->Stage);
+
+	Context->Draw(ExtraParameters->VertexCount, ExtraParameters->VertexOffset);
+
+	ExtraParameters->Material->CleanupMaterial(Context, Parameters->Stage);
 }
 
 bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource)
@@ -380,54 +365,52 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 	ZEMatrix4x4 WorldTransform = Owner->GetWorldTransform() * LocalTransform;
 	
+	VertexBuffer = ZEGRVertexBuffer::Create(Resource->Polygons.GetCount() * 3, sizeof(ZEInteriorVertex));
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBuffer->SetData(&WorldTransform);
 
-	// Initialize Render Components
-	if (VertexBuffer == NULL)
-	{
-		RenderCommands.Clear();
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
-		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEInteriorVertex)))
-			return false;
+	ZEArray<bool> Processed;
+	Processed.SetCount(Resource->Polygons.GetCount());
+	Processed.Fill(false);
 
-		ZEArray<bool> Processed;
-		Processed.SetCount(Resource->Polygons.GetCount());
-		Processed.Fill(false);
-
-		ZESize VertexIndex = 0;
-		ZEInteriorVertex* Buffer = (ZEInteriorVertex*)VertexBuffer->Lock();	
-		for (ZESize N = 0; N < Resource->Polygons.GetCount(); N++)
+	ZESize CurrentVertexIndex = 0;
+	ZESize StartVertexIndex = 0;
+	ZEInteriorVertex* Buffer;
+	VertexBuffer->Lock((void**)&Buffer);	
+		ZESize PolygonCount = Resource->Polygons.GetCount();
+		for (ZESize N = 0; N < PolygonCount; N++)
 		{
+			StartVertexIndex = CurrentVertexIndex;
+
 			if (!Processed[N])
 			{
 				ZERNMaterial* Material = Resource->Polygons[N].Material;
-				ZERNCommand* RenderCommand = RenderCommands.Add();
 
-				RenderCommand->SetZero();
-				RenderCommand->Priority = 2;
-				RenderCommand->Order = 1;
-				RenderCommand->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-				RenderCommand->Material = Material;
-				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
-				RenderCommand->VertexBufferOffset = VertexIndex;
-				RenderCommand->VertexBuffer = VertexBuffer;
-				RenderCommand->VertexDeclaration = ZEInteriorVertex::GetVertexLayout();
-				RenderCommand->WorldMatrix = WorldTransform;
-
-				RenderCommand->PrimitiveCount = 0;
-				for (ZESize I = N; I < Resource->Polygons.GetCount(); I++)
+				for (ZESize I = N; I < PolygonCount; I++)
 				{
 					if (Resource->Polygons[I].Material != Material)
 						continue;
 
-					memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
-					VertexIndex += 3;
-					RenderCommand->PrimitiveCount++;
+					memcpy(Buffer + CurrentVertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
+					CurrentVertexIndex += 3;
 					Processed[I] = true;
 				}
+
+				ZEExtraRenderParameters* ExtraParameters = new ZEExtraRenderParameters();
+				ExtraParameters->Material = Material;
+				ExtraParameters->Room = this;
+				ExtraParameters->VertexOffset = StartVertexIndex;
+				ExtraParameters->VertexCount = CurrentVertexIndex - StartVertexIndex;
+
+				ZERNCommand* RenderCommand = RenderCommands.Add();
+				RenderCommand->Entity = Owner;
+				RenderCommand->Order = 1;
+				RenderCommand->Priority = 2;
+				RenderCommand->StageMask = Material->GetStageMask();
+				RenderCommand->ExtraParameters = ExtraParameters;
 			}
 		}
-		VertexBuffer->Unlock();
-	}
+	VertexBuffer->Unlock();
 
 	if (Resource->HasPhysicalMesh)
 	{
@@ -468,22 +451,16 @@ void ZEInteriorRoom::Deinitialize()
 	Owner = NULL;
 	Resource = NULL;
 	RenderCommands.Clear();
-	if (VertexBuffer != NULL)
-	{
-		VertexBuffer->Destroy();
-		VertexBuffer = NULL;
-	}
+
+	VertexBuffer.Release();
+	ConstantBuffer.Release();
+
+	ExtraRenderParameters.Clear();
 
 	if (PhysicalMesh != NULL)
 	{
 		PhysicalMesh->Destroy();
 		PhysicalMesh = NULL;
-	}
-
-	if (DebugDrawComponents.Material != NULL)
-	{
-		DebugDrawComponents.Material->Release();
-		DebugDrawComponents.Material = NULL;
 	}
 }
 
@@ -492,8 +469,6 @@ ZEInteriorRoom::ZEInteriorRoom()
 	Owner = NULL;
 	Resource = NULL;
 	PhysicalMesh = NULL;
-	VertexBuffer = NULL;
-	DebugDrawComponents.Material = NULL;
 
 	CullPass = false;
 	IsDrawn = false;

@@ -40,11 +40,12 @@
 #include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEParticleEmitter.h"
+//#include "ZEParticleEmitter.h"
 #include "ZEParticleSystem.h"
-#include "ZEGame/ZEDrawStatistics.h"
 
-struct ZEDrawParameters;
+class ZERNRenderParameters;
+class ZERNCommand;
+struct ZERNCullParameters;
 
 class ZEParticleEffect : public ZEEntity
 {
@@ -53,37 +54,31 @@ class ZEParticleEffect : public ZEEntity
 	ZE_OBJECT
 
 	private:
-
-		ZEArray<ZEParticleEmitter*>			Emitters;
-		
+		//ZEArray<ZEParticleEmitter*>			Emitters;
 		ZEArray<ZEParticleSystem*>			Systems;
 
-		ZEParticleStatistics				Statistics;
-
 	protected:
-		bool								InitializeSelf();
-		bool								DeinitializeSelf();
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();
 
-
 	public:
 		virtual	ZEDrawFlags					GetDrawFlags() const;
 
-		void								Draw(ZEDrawParameters* DrawParameters);
-		void								Tick(float TimeElapsed);
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		virtual void						Tick(float TimeElapsed);
 
-		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
+		/*const ZEArray<ZEParticleEmitter*>&	GetEmitters();
 		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);
-		void								RemoveEmitter(ZEParticleEmitter* Emitter);
+		void								RemoveEmitter(ZEParticleEmitter* Emitter);*/
 
 		const ZEArray<ZEParticleSystem*>&	GetSystems();
-		void								AddSystem(ZEParticleSystem* Emitter);
-		void								RemoveSystem(ZEParticleSystem* Emitter);
-
-		const ZEParticleStatistics&			GetStatistics();
+		void								AddSystem(ZEParticleSystem* System);
+		void								RemoveSystem(ZEParticleSystem* System);
 
 		static ZEParticleEffect*			CreateInstance();
 
