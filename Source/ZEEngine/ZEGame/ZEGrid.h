@@ -48,7 +48,9 @@ class ZEGrid : public ZEEntity
 	ZE_OBJECT
 	private:
 		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
 		ZEGRHolder<ZERNFixedMaterial>	Material;
 		ZERNCommand						RenderCommand;
 

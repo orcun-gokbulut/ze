@@ -48,6 +48,7 @@ class ZEGRIndexBuffer;
 class ZERNMaterial;
 class ZERNRenderer;
 class ZERNRenderParameters;
+class ZEGRConstantBuffer;
 
 class ZEModelMeshLOD
 {
@@ -62,6 +63,7 @@ class ZEModelMeshLOD
 		ZEGRHolder<ZEGRVertexBuffer>		VertexBuffer;
 		ZEGRHolder<ZEGRVertexBuffer>		VertexBufferNormals;
 		ZEGRHolder<ZEGRVertexBuffer>		VertexBufferSkin;
+		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZEGRHolder<ZERNMaterial>			Material;
 		bool								Skinned;

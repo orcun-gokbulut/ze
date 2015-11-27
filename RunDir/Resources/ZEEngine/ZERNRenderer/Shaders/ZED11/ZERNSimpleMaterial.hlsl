@@ -36,7 +36,6 @@
 #ifndef __ZERN_SIMPLE_MATERIAL_H__
 #define __ZERN_SIMPLE_MATERIAL_H__
 
-#include "ZERNGBuffer.hlsl"
 #include "ZERNView.hlsl"
 #include "ZERNShaderSlots.hlsl"
 
@@ -47,8 +46,9 @@ cbuffer ZERNSimpleMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
 	float4 	ZERNSimpleMaterial_Color;
 	bool 	ZERNSimpleMaterial_EnableTexture;
+	float	ZERNSimpleMaterial_Reserved0;
 	bool 	ZERNSimpleMaterial_EnableVertexColor;
-	float 	ZERNSimpleMaterial_Reserved0[2];
+	float	ZERNSimpleMaterial_Reserved1;
 };
 
 cbuffer ZERNSimpleMaterial_InstanceConstants : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
@@ -56,7 +56,7 @@ cbuffer ZERNSimpleMaterial_InstanceConstants : register(ZERN_SHADER_CONSTANT_DRA
 	float4x4 ZERNSimpleMaterial_WorldTransform;
 };
 
-sampler ZERNSimpleMaterial_Sampler				: register(s0);
+sampler		ZERNSimpleMaterial_Sampler			: register(s0);
 Texture2D<float4> ZERNSimpleMaterial_Texture	: register(t0);
 
 
@@ -93,8 +93,7 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 {
 	ZERNSimpleMaterial_VSOutput Output;
 	
-	float4x4 WorldViewProjectionTransform = mul(ZERNView_ProjectionTransform, ZERNView_ViewTransform);
-	WorldViewProjectionTransform = mul(WorldViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
+	float4x4 WorldViewProjectionTransform = mul(ZERNView_ViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
 	Output.Position = mul(WorldViewProjectionTransform, float4(Input.Position, 1.0f));
 	Output.Texcoord = Input.Textcoord;
 	

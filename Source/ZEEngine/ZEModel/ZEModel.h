@@ -161,7 +161,6 @@ class ZEModel : public ZEEntity
 		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
 		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
-
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);	
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
 		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);

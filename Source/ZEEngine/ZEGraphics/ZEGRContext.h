@@ -61,7 +61,7 @@ class ZEGRContext
 	public:
 		virtual void			SetRenderState(ZEGRRenderStateData* State) = 0;
 
-		virtual void			SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer) = 0;
+		virtual void			SetVertexBuffers(ZEUInt Index, ZEUInt Count, ZEGRVertexBuffer** Buffers) = 0;
 		virtual void			SetIndexBuffer(ZEGRIndexBuffer* Buffer) = 0;
 
 		virtual void			SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRStructuredBuffer* Buffer) = 0;
@@ -78,8 +78,8 @@ class ZEGRContext
 		virtual void			SetBlendFactors(ZEVector4& Factors) = 0;
 		virtual void			SetBlendMask(ZEUInt Mask) = 0;
 
-		virtual void			Draw(ZEUInt PrimitiveCount, ZEUInt VertexOffset) = 0;
-		virtual void			DrawInstanced(ZEUInt PrimitiveCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
+		virtual void			Draw(ZEUInt VertexCount, ZEUInt VertexOffset) = 0;
+		virtual void			DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
 		
 		virtual void			ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
 		virtual void			ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;

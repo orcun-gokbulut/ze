@@ -52,11 +52,12 @@ add_subdirectory(ZEGraphics)
 add_subdirectory(ZERenderer)
 add_subdirectory(ZETexture)
 add_subdirectory(ZEInput)
-#add_subdirectory(ZEInterior)
+add_subdirectory(ZEInterior)
 add_subdirectory(ZEModel)
-#add_subdirectory(ZEParticle)
+add_subdirectory(ZEParticle)
 add_subdirectory(ZEPhysics)
 add_subdirectory(ZESound)
+add_subdirectory(ZEAtmosphere)
 #add_subdirectory(ZEUI)
 #add_subdirectory(ZETerrain)
 
@@ -69,13 +70,13 @@ ze_add_source(ZESDK.cpp 					Sources)
 ze_add_library(TARGET ZEEngine 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZECore ZEGraphics ZEInput ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETexture ZERenderer ZEModel ZEModules)
+	LIBS ZECore ZEGraphics ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere)
 
 ze_add_executable(TARGET ZE 
 	SOURCES ${Sources} ZEMain.cpp ZECore/ZEWindowResources.rc
 	LIBS ZEEngine
 	INSTALL)
 
-ze_meta_register(LIBS ZECore ZEInput ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETerrain ZETexture ZERenderer ZEModel ZEModules)
+ze_meta_register(LIBS ZECore ZEInput ZEInterior ZEParticle ZEMeta ZEPhysics ZESound ZEGame ZEAI ZETerrain ZETexture ZERenderer ZEModel ZEModules ZEAtmosphere)
 
 #ze_combine_libraries(ZEEngine LIBS ZEEngine ZEAI ZECore ZEGame ZEGraphics ZETexture ZEInput ZEMap ZEMeta ZEModel ZEParticle ZEPhysics ZESound ZEUI ZETerrain)

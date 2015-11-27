@@ -88,9 +88,9 @@ float ZEAngle::ArcTan(float Value)
 	return atanf(Value);
 }
 
-float ZEAngle::ArcTan2(float x, float y)
+float ZEAngle::ArcTan2(float Y, float X)
 {
-	return atan2f(x, y);
+	return atan2f(Y, X);
 }
 
 float ZEAngle::ToRadian(float Angle)

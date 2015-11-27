@@ -105,7 +105,7 @@ void ZEModel::UpdateTransforms()
 
 ZEDrawFlags ZEModel::GetDrawFlags() const
 {
-	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
+	return /*ZE_DF_CULL | */ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
 }
 
 void ZEModel::LoadModelResource()

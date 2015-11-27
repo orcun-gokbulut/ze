@@ -141,45 +141,57 @@ void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 		DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
 }
 
-void ZED11Context::SetVertexBuffer(ZEUInt Index, ZEGRVertexBuffer* Buffer)
+void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, ZEGRVertexBuffer** Buffers)
 {
-	zeDebugCheck(Index >= ZEGR_MAX_VERTEX_BUFFER_SLOT, "Vertex buffer count is too much.");
+	zeDebugCheck(Index >= D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Vertex buffer index exceeds the max slot count.");
+	zeDebugCheck(Count >= (D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - Index), "Vertex buffer count is too much.");
 
-	ZEUInt Stride = 0;
-	ZEUInt Offset = 0;
-	ID3D11Buffer* NativeBuffer = NULL;
+	ZEUInt Strides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+	ZEUInt Offsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+	ID3D11Buffer* NativeBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
 
-	ZED11VertexBuffer* D11Buffer = static_cast<ZED11VertexBuffer*>(Buffer);
-	if (D11Buffer != NULL)
+	memset(Strides, 0, sizeof(ZEUInt) * Count);
+	memset(Offsets, 0, sizeof(ZEUInt) * Count);
+	memset(NativeBuffers, NULL, sizeof(ID3D11Buffer*) * Count);
+
+	for(ZEUInt I = 0; I < Count; ++I)
 	{
-		Stride = (ZEUInt)D11Buffer->GetVertexSize();
-		NativeBuffer = D11Buffer->GetBuffer();
+		if (Buffers[I] != NULL)
+		{
+			ZED11VertexBuffer* D11Buffer = static_cast<ZED11VertexBuffer*>(Buffers[I]);
+			Strides[I] = (ZEUInt)D11Buffer->GetVertexSize();
+			NativeBuffers[I] = D11Buffer->GetBuffer();
+		}
 	}
-		
-	Context->IASetVertexBuffers(Index, D11Buffer != NULL ? 1 : 0, &NativeBuffer, &Stride, &Offset);
+
+	Context->IASetVertexBuffers(Index, Count, NativeBuffers, Strides, Offsets);
 }
 
 void ZED11Context::SetIndexBuffer(ZEGRIndexBuffer* Buffer)
 {
 	ID3D11Buffer* NativeBuffer = NULL;
 	ZED11IndexBuffer* D11Buffer = static_cast<ZED11IndexBuffer*>(Buffer);
+	ZEGRIndexBufferFormat Format = ZEGRIndexBufferFormat::ZEGR_IBF_NONE;
 	if (D11Buffer != NULL)
+	{
 		NativeBuffer = D11Buffer->GetBuffer();
-
-	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Buffer->GetFormat()), 0);
+		Format = D11Buffer->GetFormat();
+	}
+	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Format), 0);
 }
 
 void ZED11Context::SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
-	zeDebugCheck(Count >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget index is too much.");
+	zeDebugCheck(Count >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget count is too much.");
 	
 	if (Count >= ZEGR_MAX_RENDER_TARGET_SLOT)
 		Count = ZEGR_MAX_RENDER_TARGET_SLOT;
 
 	ID3D11RenderTargetView* NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+	memset(&NativeRenderTargets[0], NULL, sizeof(ID3D11RenderTargetView*) * Count);
+
 	for (ZESize I = 0; I < Count; I++)
 	{
-		NativeRenderTargets[I] = NULL;
 		if (RenderTargets[I] != NULL)
 			NativeRenderTargets[I] = static_cast<ZED11RenderTarget*>(RenderTargets[I])->GetView();
 	}
@@ -188,7 +200,7 @@ void ZED11Context::SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTarge
 	if (DepthStencilBuffer != NULL)
 		NativeDepthStencil = static_cast<ZED11DepthStencilBuffer*>(DepthStencilBuffer)->GetView();
 
-	Context->OMSetRenderTargets(Count, (Count != 0 ? NativeRenderTargets : NULL), NativeDepthStencil);
+	Context->OMSetRenderTargets(Count, NativeRenderTargets, NativeDepthStencil);
 }
 
 void ZED11Context::SetStencilRef(ZEUInt Reference)
@@ -239,7 +251,7 @@ void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
 
 void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
 {
-	zeDebugCheck(Count > ZEGR_MAX_SCISSOR_SLOT, "Viewport count is too much.");
+	zeDebugCheck(Count > ZEGR_MAX_VIEWPORT_SLOT, "Viewport count is too much.");
 
 	if (Count > ZEGR_MAX_VIEWPORT_SLOT)
 		Count = ZEGR_MAX_VIEWPORT_SLOT;
@@ -408,6 +420,7 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture)
 {
 	ID3D11ShaderResourceView* NativeTexture = NULL;
+
 	if (Texture != NULL)
 	{
 		switch (Texture->GetTextureType())

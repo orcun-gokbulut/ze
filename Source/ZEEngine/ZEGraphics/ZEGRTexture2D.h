@@ -65,6 +65,7 @@ class ZEGRTexture2D : public ZEGRTexture
 
 		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) = 0;
 
+		virtual bool				UpdateSubResource(void* Data, ZESize RowPitch, ZEUInt Level) = 0;
 		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
 		virtual void				Unlock(ZEUInt Level) = 0;
 

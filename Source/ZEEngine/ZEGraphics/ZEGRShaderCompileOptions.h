@@ -50,6 +50,9 @@ struct ZEGRShaderDefinition
 {
 	ZEString		Name;
 	ZEString		Value;
+
+					ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value = "");
+					ZEGRShaderDefinition();
 };
 
 struct ZEGRShaderCompileOptions

@@ -70,6 +70,7 @@ class ZEGRHolder
 
 		Type&					operator*() const;
 		Type*					operator->() const;
+		Type**					operator&() const;
 
 		ZEGRHolder<Type>&		operator=(Type* Source);
 		ZEGRHolder<Type>&		operator=(const ZEGRHolder<Type>& Source);
@@ -185,6 +186,13 @@ Type* ZEGRHolder<Type>::operator->() const
 {
 	zeDebugCheck(Resource == NULL, "ZEPointer does not points any data structure.");
 	return (Type*)Resource;
+}
+
+template<typename Type>
+Type** ZEGRHolder<Type>::operator&() const
+{
+	zeDebugCheck(Resource == NULL, "ZEPointer does not points any data structure.");
+	return (Type**)&Resource;
 }
 
 template<typename Type>

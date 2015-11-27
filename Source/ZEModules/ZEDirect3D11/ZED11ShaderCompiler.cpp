@@ -38,9 +38,10 @@
 #include "ZED11ShaderMetaCompiler.h"
 
 #define ZE_SHADER_COMPILER_DEFAULT_PARAMETERS	(D3DCOMPILE_ENABLE_STRICTNESS | D3DCOMPILE_WARNINGS_ARE_ERRORS | D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR)
+#define ZE_DEBUG_D3D11_DEBUG_SHADERS
 
 #ifdef ZE_DEBUG_D3D11_DEBUG_SHADERS
-	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG)
+	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_OPTIMIZATION_LEVEL0 /*D3DCOMPILE_SKIP_OPTIMIZATION*/ | D3DCOMPILE_DEBUG)
 #else
 	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_OPTIMIZATION_LEVEL3)
 #endif
@@ -63,7 +64,7 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 	ZEGRShaderCompileOptions ResultOptions = Options;
 
 	// Compile
-	HRESULT Result = D3DCompile(Options.SourceData, Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
+	HRESULT Result = D3DCompile(Options.SourceData, Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, 0, &ByteCode, &CompileOutput);
 	if (FAILED(Result))
 	{	
 		if (!ShaderEditorOpen)

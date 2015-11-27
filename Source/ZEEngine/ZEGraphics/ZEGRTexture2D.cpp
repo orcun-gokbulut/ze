@@ -98,7 +98,7 @@ ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt
 	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
 	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
 	zeCheckError(LevelCount == 0, false, "Level cannot be 0.");
-	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || ZEMath::IsPowerOfTwo(Height)), false, "Level must be 1 for non-power of two textures.");
+	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height)), false, "Level must be 1 for non-power of two textures.");
 
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)

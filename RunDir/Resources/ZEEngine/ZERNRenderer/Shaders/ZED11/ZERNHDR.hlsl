@@ -47,6 +47,7 @@
 #define ZERN_HTMO_REINHARD				2
 #define ZERN_HTMO_MODIFIED_REINHARD		3
 #define ZERN_HTMO_FILMIC				4
+#define ZERN_HTMO_UNCHARTED				5
 
 cbuffer ZERNHDR_Constants	:	register(b8)
 {	
@@ -140,6 +141,20 @@ float3 ZERNHDR_ToneMapOperator_ModifiedReinhard(float3 Color)
 	return ScaledColor * (1.0f + ScaledColor / (ZERNHDR_WhiteLevel * ZERNHDR_WhiteLevel)) / (1.0f + ScaledColor);
 }
 
+float3 ZERNHDR_ToneMapOperator_Uncharted(float3 Color)
+{
+	float A = 0.15f;
+	float B = 0.50f;
+	float C = 0.10f;
+	float D = 0.20f;
+	float E = 0.02f;
+	float F = 0.30f;
+	
+	float3 ScaledColor = ZERNHDR_Calculate_ScaledColor(Color) * 2.0f;
+	
+	return ((ScaledColor * (A * ScaledColor + C * B) + D * E) / (ScaledColor * (A * ScaledColor + B) + D * F)) - E / F;
+}
+
 float3 ZERNHDR_ToneMapOperator_Filmic(float3 Color)
 {
 	Color = max(0, Color - 0.004f);
@@ -221,7 +236,10 @@ float4 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, fl
 			break;		
 		case ZERN_HTMO_FILMIC:
 			ResultColor = ZERNHDR_ToneMapOperator_Filmic(Color);
-			break;		
+			break;
+		case ZERN_HTMO_UNCHARTED:
+			ResultColor = ZERNHDR_ToneMapOperator_Uncharted(Color) * ( 1.0f / ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
+			break;
 	}
 	
 	return float4(ResultColor, 1.0f);
