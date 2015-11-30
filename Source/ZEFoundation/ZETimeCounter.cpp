@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETimeCounter.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
     #define WINDOWS_MEAN_AND_LEAN

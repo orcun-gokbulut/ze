@@ -35,6 +35,7 @@
 
 #include "ZETexturePixelConverter.h"
 #include "ZETextureData.h"
+#include "ZEPlatform.h"
 
 void ZETexturePixelConverter::ConvertIndexed(ZEPixelRGBA8* Destination, void* Source, ZESize Count, ZEPixelRGBA8* Palette)
 {

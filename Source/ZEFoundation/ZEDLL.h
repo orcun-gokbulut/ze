@@ -36,6 +36,8 @@
 #ifndef __ZE_DLL_H__
 #define __ZE_DLL_H__
 
+#include "ZEPlatform.h"
+
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 	#ifdef ZE_PLUGIN
 		#define ZE_ENGINE_EXPORT __declspec(dllimport)

@@ -38,6 +38,7 @@
 #include "ZEError.h"
 #include "ZEFile.h"
 #include "ZEPathManager.h"
+#include "ZEPlatform.h"
 
 #pragma warning(push)
 #pragma warning(disable:4996 4267)
