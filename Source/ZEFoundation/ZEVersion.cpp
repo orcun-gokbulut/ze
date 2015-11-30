@@ -34,7 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEVersion.h"
+
+#include "ZEVersionData.h"
 #include "ZEDS/ZEFormat.h"
+#include "ZEPlatform.h"
+
 ZEString ZEVersion::GetShortString() 
 {
 	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04}-{3}", Major, Minor, Internal, Revision, Branch);

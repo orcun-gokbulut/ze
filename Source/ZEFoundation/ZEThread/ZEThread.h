@@ -38,6 +38,7 @@
 
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEString.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>

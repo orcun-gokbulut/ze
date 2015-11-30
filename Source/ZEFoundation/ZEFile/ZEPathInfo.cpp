@@ -40,6 +40,7 @@
 #include "ZEFileInfo.h"
 #include "ZEDirectoryInfo.h"
 #include "ZEPathTokenizer.h"
+#include "ZEPlatform.h"
 
 bool ZEPathInfo::Normalize(ZEPathTokenizer& Tokenizer)
 {

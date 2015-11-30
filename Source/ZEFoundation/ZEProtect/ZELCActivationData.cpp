@@ -39,6 +39,7 @@
 #include "ZELCLicense.h"
 #include "ZERandom.h"
 #include "ZEError.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 

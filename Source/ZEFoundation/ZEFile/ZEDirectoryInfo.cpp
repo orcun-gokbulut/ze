@@ -36,6 +36,7 @@
 #include "ZEDirectoryInfo.h"
 #include "ZEPathManager.h"
 #include "ZEDS\ZEFormat.h"
+#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_WINDOWS
 #include <Windows.h>

@@ -41,6 +41,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEError.h"
 #include "ZERegEx/TRE/config.h"
+#include "ZEPlatform.h"
 
 #include <stdio.h>
 #ifdef ZE_PLATFORM_UNIX

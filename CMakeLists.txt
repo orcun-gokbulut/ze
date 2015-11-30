@@ -89,6 +89,7 @@ endif()
 ## Directories
 #########################################################################################
 include_directories(
+	${CMAKE_BINARY_DIR}
 	${CMAKE_CURRENT_SOURCE_DIR}/Source
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)

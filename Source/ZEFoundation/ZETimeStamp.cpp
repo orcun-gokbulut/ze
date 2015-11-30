@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETimeStamp.h"
+#include "ZEPlatform.h"
 
 ZEUInt ZETimeStamp::GetHour() const
 {
