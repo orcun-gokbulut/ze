@@ -705,7 +705,10 @@ ZED11DepthStencilState* ZED11StatePool::GetDepthStencilState(const ZEGRDepthSten
 
 ZED11VertexLayout* ZED11StatePool::GetVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader)
 {
-	zeDebugCheck(VertexShader == NULL, "VertexShader parameter is NULL.");
+	//zeDebugCheck(VertexShader == NULL, "VertexShader parameter is NULL.");
+	if(VertexShader == NULL)
+		return NULL;
+
 	zeDebugCheck(VertexShader->GetShaderType() != ZEGR_ST_VERTEX, "Wrong shader type.");
 
 	ZED11VertexLayout* Entry = (ZED11VertexLayout*)FindPoolEntry(VertexLayoutPool, VertexLayout);

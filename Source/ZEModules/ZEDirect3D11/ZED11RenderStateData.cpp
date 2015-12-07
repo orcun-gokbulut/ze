@@ -79,8 +79,8 @@ bool ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
 	//	return false;
 
 	VertexLayout = StatePool->GetVertexLayout(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
-	if (VertexLayout == NULL)
-		return false;
+	//if (VertexLayout == NULL)
+		//return false;
 
 	RasterizerState = StatePool->GetRasterizerState(RenderState.GetRasterizerState());
 	if (RasterizerState == NULL)

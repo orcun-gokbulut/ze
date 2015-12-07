@@ -38,7 +38,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEMath/ZEMath.h"
 
-bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -101,7 +101,7 @@ ZEGRTexture3D::~ZEGRTexture3D()
 	Deinitialize();
 }
 
-ZEGRTexture3D* ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+ZEGRTexture3D* ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
@@ -113,7 +113,7 @@ ZEGRTexture3D* ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, 
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, RenderTarget))
+	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, RenderTarget, UAV))
 	{
 		Texture->Destroy();
 		return NULL;

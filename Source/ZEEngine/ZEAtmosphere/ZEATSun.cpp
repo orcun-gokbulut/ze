@@ -363,7 +363,7 @@ const ZEATObserver& ZEATSun::GetObserver() const
 
 void ZEATSun::Tick(float ElapsedTime)
 {
-	/*ZEATJulian Julian = CalculateJulians();
+	ZEATJulian Julian = CalculateJulians();
 	ZEATHeliocentric Heliocentric = CalculateHeliocentrics(Julian.EphemerisMillenium);
 	ZEATNutation Nutation = CalculateNutations(Julian.EphemerisCentury);
 	double TrueObliquity = CalculateTrueObliquityOfEcliptic(Julian.EphemerisMillenium, Nutation.Obliquity);
@@ -375,7 +375,7 @@ void ZEATSun::Tick(float ElapsedTime)
 
 	double ProjectionXZ = ZEAngle::Sin(RadianTopocentricZenith);
 
-	Direction = -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));*/
+	Direction = -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
 }
 
 ZEATSun::ZEATSun()

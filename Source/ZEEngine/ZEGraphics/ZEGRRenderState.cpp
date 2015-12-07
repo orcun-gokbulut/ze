@@ -145,7 +145,7 @@ void ZEGRRenderState::SetToDefault()
 	RasterizerState.SetToDefault();
 	DepthStencilState.SetToDefault();
 
-	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
+	PrimitiveType = ZEGR_PT_NONE;
 }
 
 ZEGRRenderStateData* ZEGRRenderState::Compile()

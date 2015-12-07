@@ -115,6 +115,7 @@ void ZED11Context::SetRenderState(ZEGRRenderStateData* State)
 
 	RenderState = static_cast<ZED11RenderStateData*>(State);
 
+	if(RenderState->VertexLayout != NULL)
 	Context->IASetInputLayout(RenderState->VertexLayout->GetInterface());
 	Context->IASetPrimitiveTopology(RenderState->PrimitiveTopology);
 
@@ -316,6 +317,35 @@ void ZED11Context::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGR
 			Context->HSSetShaderResources(Index, 1, &ResourceView);
 			Context->CSSetShaderResources(Index, 1, &ResourceView);
 			break;
+	}
+}
+
+void ZED11Context::SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture)
+{
+	ID3D11UnorderedAccessView* NativeView = NULL;
+
+	if (Texture != NULL)
+	{
+		switch (Texture->GetTextureType())
+		{
+		case ZEGR_TT_3D:
+			NativeView = static_cast<ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	switch(Shader)
+	{
+	default:
+	case ZEGR_ST_NONE:
+		break;
+
+	case ZEGR_ST_COMPUTE:
+		Context->CSSetUnorderedAccessViews(Index, 1, &NativeView, NULL);
+		break;
 	}
 }
 
@@ -522,6 +552,11 @@ void ZED11Context::DrawInstanced(ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt 
 	GetMainContext()->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
 }
 
+void ZED11Context::Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ)
+{
+	GetMainContext()->Dispatch(GroupCountX, GroupCountY, GroupCountZ);
+}
+
 void ZED11Context::ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
 	GetMainContext()->ClearRenderTargetView(((ZED11RenderTarget*)RenderTarget)->GetView(), ClearColor.M);
@@ -534,6 +569,16 @@ void ZED11Context::ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil,
 	ClearFlag |= Stencil ? D3D11_CLEAR_STENCIL : 0;
 
 	GetMainContext()->ClearDepthStencilView(((ZED11DepthStencilBuffer*)DepthStencil)->GetView(), ClearFlag, DepthValue, StencilValue);
+}
+
+void ZED11Context::ClearUnorderedAccessView(ZEGRTexture* Texture, const ZEVector4& ClearColor)
+{
+	ID3D11UnorderedAccessView* NativeView = NULL;
+	if(Texture != NULL)
+		if(Texture->GetTextureType() == ZEGR_TT_3D)
+			NativeView = static_cast<ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
+
+	GetMainContext()->ClearUnorderedAccessViewFloat(NativeView, ClearColor.M);
 }
 
 ZED11Context::ZED11Context()

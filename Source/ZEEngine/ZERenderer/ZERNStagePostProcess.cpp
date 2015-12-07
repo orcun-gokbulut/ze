@@ -44,7 +44,6 @@
 #include "ZEModules/ZEDirect3D11/ZED11Context.h"
 #include "ZERNStageLighting.h"
 #include "ZERNStageHDR.h"
-#include "ZEAtmosphere/ZEATSun.h"
 
 bool ZERNStagePostProcess::InitializeSelf()
 {
@@ -99,6 +98,11 @@ const ZEGRRenderTarget* ZERNStagePostProcess::GetOutputRenderTarget() const
 	return OutputRenderTarget;
 }
 
+void ZERNStagePostProcess::SetMultipleScattering(bool MultipleScattering)
+{
+	this->MultipleScattering = MultipleScattering;
+}
+
 bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
 	ZERNStageGBuffer* StageGbuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
@@ -126,11 +130,11 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 		LightScattering.SetOutputRenderTarget(OutputRenderTarget);
 
 		//LightScattering.SetLightDirection(ZEVector3(0.0f, -1.0f, 0.0f));
-		LightScattering.SetLightIntensity(30.0f);
+		LightScattering.SetLightIntensity(20.0f);
 		LightScattering.SetLightColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		LightScattering.SetMieScatteringStrengh(0.91f);
+		LightScattering.SetMieScatteringStrengh(0.76f);
 
-		LightScattering.Process(Context);
+		LightScattering.Process(Context, MultipleScattering);
 	}
 
 	return true;
@@ -145,6 +149,8 @@ ZERNStagePostProcess::ZERNStagePostProcess()
 {
 	InputTexture = NULL;
 	OutputRenderTarget = NULL;
+
+	MultipleScattering = false;
 }
 
 void ZERNStagePostProcess::SetLightDirection(const ZEVector3& Direction)
