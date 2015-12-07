@@ -56,6 +56,8 @@ class ZERNStagePostProcess : public ZERNStage
 		ZEGRTexture2D*				InputTexture;
 		ZEGRRenderTarget*			OutputRenderTarget;
 
+		bool						MultipleScattering;
+
 		virtual bool				InitializeSelf();
 		virtual void				DeinitializeSelf();
 
@@ -71,6 +73,8 @@ class ZERNStagePostProcess : public ZERNStage
 
 		void						SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget);
 		const ZEGRRenderTarget*		GetOutputRenderTarget() const;
+
+		void						SetMultipleScattering(bool MultipleScattering);
 
 		void						SetLightDirection(const ZEVector3& Direction);
 

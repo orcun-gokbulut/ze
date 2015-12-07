@@ -303,6 +303,11 @@ void ZERNRenderer::AddCommand(ZERNCommand* Command)
 	if (EmptyLink == NULL)
 		return;
 
+	//Hacked by Ceyhun
+	char* Chp = (char*)EmptyLink;
+	ZEUInt64* Val = (ZEUInt64*)(Chp + 8);
+	*Val = (ZEUInt64)Command;
+
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
 		if ((Command->StageMask & StageQueues[I].Stage->GetId()) != 0)

@@ -52,6 +52,11 @@ ID3D11ShaderResourceView* ZED11Texture3D::GetResourceView()
 	return ResourceView;
 }
 
+ID3D11UnorderedAccessView* ZED11Texture3D::GetUnorderedAccessView()
+{
+	return UnorderedAccessView;
+}
+
 ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level)
 {
 	zeDebugCheck(Texture3D == NULL, "Texture not created.");
@@ -60,17 +65,17 @@ ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level)
 
 	// Create render target view
 	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
-	RenderTargetDesc.Format = ZED11Texture2D::ConvertFormat(GetFormat());
+	RenderTargetDesc.Format = ZED11Texture3D::ConvertFormat(GetFormat());
 	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
 	RenderTargetDesc.Texture3D.MipSlice = Level;
-	RenderTargetDesc.Texture3D.FirstWSlice = 0;
-	RenderTargetDesc.Texture3D.WSize = -1;
+	RenderTargetDesc.Texture3D.FirstWSlice = Depth;
+	RenderTargetDesc.Texture3D.WSize = 1;
 
 	ID3D11RenderTargetView* RenderTargetView = NULL;
 	HRESULT Result = GetDevice()->CreateRenderTargetView(Texture3D, &RenderTargetDesc, &RenderTargetView);
 	if(FAILED(Result))
 	{
-		zeError("D3D10 texture 3D render target creation failed. ErrorCode: %d.", Result);
+		zeError("D3D11 texture 3D render target creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
@@ -85,18 +90,19 @@ ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level)
 }
 
 
-bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
+bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt Level, ZEGRFormat Format, bool RenderTarget, bool UAV)
 {
 	zeDebugCheck(Texture3D != NULL, "Texture already created.");
-	zeCheckError(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknown texture format.");
+	zeCheckError(ZED11Texture3D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknown texture format.");
 
 	D3D11_USAGE Usage;
-	Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
+	Usage = (RenderTarget || UAV) ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
 
 	UINT CPUAccess = 0;
 	UINT BindFlags = 0;
 	BindFlags |= D3D11_BIND_SHADER_RESOURCE;
 	BindFlags |= RenderTarget ? D3D11_BIND_RENDER_TARGET : 0;
+	BindFlags |= UAV ? D3D11_BIND_UNORDERED_ACCESS : 0;
 
 	D3D11_TEXTURE3D_DESC TextureDesc;
 	TextureDesc.MiscFlags = 0;
@@ -107,7 +113,7 @@ bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUIn
 	TextureDesc.Usage = Usage;
 	TextureDesc.BindFlags = BindFlags;
 	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.Format = ZED11Texture2D::ConvertFormat(Format);
+	TextureDesc.Format = ZED11Texture3D::ConvertFormat(Format);
 
 	HRESULT Result = GetDevice()->CreateTexture3D(&TextureDesc, NULL, &Texture3D);
 	if (FAILED(Result))
@@ -130,13 +136,23 @@ bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUIn
 		return false;
 	}
 
-	return ZEGRTexture3D::Initialize(Width, Height, Depth, Level, Format, RenderTarget);
+	if(UAV)
+	{
+		Result = GetDevice()->CreateUnorderedAccessView(Texture3D, NULL, &UnorderedAccessView);
+		if(FAILED(Result))
+		{
+			zeError("Texture 3D unordered access view creation failed. ErrorCode: %d.", Result);
+			return false;
+		}
+	}
+	return ZEGRTexture3D::Initialize(Width, Height, Depth, Level, Format, RenderTarget, UAV);
 }
 
 void ZED11Texture3D::Deinitialize()
 {
 	ZEGR_RELEASE(ResourceView);
 	ZEGR_RELEASE(Texture3D);
+	ZEGR_RELEASE(UnorderedAccessView);
 
 	ZEGRTexture3D::Deinitialize();
 }
@@ -168,4 +184,5 @@ ZED11Texture3D::ZED11Texture3D()
 {
 	Texture3D = NULL;
 	ResourceView = NULL;
+	UnorderedAccessView = NULL;
 }

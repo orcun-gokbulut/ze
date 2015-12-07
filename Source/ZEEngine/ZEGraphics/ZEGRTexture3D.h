@@ -50,7 +50,7 @@ class ZEGRTexture3D : public ZEGRTexture
 		ZEUInt							Height;
 		ZEUInt							Depth;
 
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
 		virtual void					Deinitialize();	
 
 										ZEGRTexture3D();
@@ -70,5 +70,5 @@ class ZEGRTexture3D : public ZEGRTexture
 
 		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) = 0;
 		
-		static ZEGRTexture3D*			Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);	
+		static ZEGRTexture3D*			Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool UAV = false);	
 };

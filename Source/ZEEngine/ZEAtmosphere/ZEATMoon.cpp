@@ -392,7 +392,7 @@ const ZEATObserver& ZEATMoon::GetObserver() const
 
 void ZEATMoon::Tick(float ElapsedTime)
 {
-	/*ZEATJulian Julian = CalculateJulians();
+	ZEATJulian Julian = CalculateJulians();
 	ZEATNutation Nutation = CalculateNutations(Julian.EphemerisCentury);
 	double TrueObliquity = CalculateTrueObliquityOfEcliptic(Julian.EphemerisMillenium, Nutation.Obliquity);
 	ZEATGeocentric Geocentric = CalculateGeocentrics(Julian.EphemerisCentury, Nutation.Longtitude, TrueObliquity);
@@ -403,7 +403,7 @@ void ZEATMoon::Tick(float ElapsedTime)
 
 	double ProjectionXZ = ZEAngle::Sin(RadianTopocentricZenith);
 
-	Direction = -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));*/
+	Direction = -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
 }
 
 ZEATMoon::ZEATMoon()

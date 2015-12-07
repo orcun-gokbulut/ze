@@ -39,12 +39,13 @@
 #include "ZEFoundation/ZEInitializable.h"
 #include "ZEMath/ZEVector.h"
 
-class ZEGRTexture2D;
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
 class ZEGRShader;
 class ZEGRContext;
 class ZEGRConstantBuffer;
+class ZEGRTexture2D;
+class ZEGRTexture3D;
 
 class ZERNLightScattering : public ZEInitializable
 {
@@ -58,6 +59,23 @@ class ZERNLightScattering : public ZEInitializable
 		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
 		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
+		ZEGRHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
+		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
+		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
+		ZEGRHolder<ZEGRShader>			AddOrdersPixelShader;
+
+		ZEGRHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
+		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
+		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
+		ZEGRHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
+
+		ZEGRHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
+		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
+		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
+		ZEGRHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
+
+		ZEGRHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+
 		struct LightScatteringConstants
 		{
 			ZEVector3					LightDirection;
@@ -66,11 +84,21 @@ class ZERNLightScattering : public ZEInitializable
 			float						MieScatteringStrength;
 		}Constants;
 
+		struct PrecomputeScatteringConstants
+		{
+			float Index;
+			float Index2;
+			ZEVector2 Reserved;
+		}PrecomputeConstants;
+
 		void							CreateShaders();
 		void							CreateRenderState();
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
+
+		void							PrecomputeWithPixelShader(ZEGRContext* Context);
+		void							ReleasePrecomputeResources();
 
 	public:
 		void							SetInputTexture(ZEGRTexture2D* InputTexture);
@@ -94,7 +122,7 @@ class ZERNLightScattering : public ZEInitializable
 		void							SetMieScatteringStrengh(float MieScatteringStrength);
 		float							GetMieScatteringStrengh() const;
 
-		void							Process(ZEGRContext* Context);
+		void							Process(ZEGRContext* Context, bool MultipleScattering);
 
 										ZERNLightScattering();
 		virtual							~ZERNLightScattering();

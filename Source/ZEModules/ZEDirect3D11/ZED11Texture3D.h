@@ -48,8 +48,9 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 	private:
 		ID3D11Texture3D*					Texture3D;
 		ID3D11ShaderResourceView*			ResourceView;
+		ID3D11UnorderedAccessView*			UnorderedAccessView;
 
-		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
+		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
 		virtual void						Deinitialize();
 
 											ZED11Texture3D();
@@ -57,6 +58,7 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 	public:
 		ID3D11Texture3D*					GetTexture();
 		ID3D11ShaderResourceView*			GetResourceView();
+		ID3D11UnorderedAccessView*			GetUnorderedAccessView();
 
 		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Depth, ZEUInt Level);
 		virtual void						Unlock(ZEUInt Level);

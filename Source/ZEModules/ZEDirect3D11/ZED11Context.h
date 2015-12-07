@@ -86,9 +86,14 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void						SetBlendFactors(ZEVector4& Factors);
 		virtual void						SetBlendMask(ZEUInt Mask);
 
+		virtual void						SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
+
 		virtual void						Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
 		virtual void						DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);
 
+		virtual void						Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ);
+
 		virtual void						ClearRenderTarget(ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
 		virtual void						ClearDepthStencilBuffer(ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
+		virtual void						ClearUnorderedAccessView(ZEGRTexture* Texture, const ZEVector4& ClearColor);
 };
