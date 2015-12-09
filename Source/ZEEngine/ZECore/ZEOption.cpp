@@ -70,11 +70,11 @@ void ZEOption::SetValue(ZEValue NewValue)
 		return;
 
 	bool Cancel = false;
-	if (!OnChanging.empty())
+	if (!OnChanging.IsNull())
 		OnChanging(this, Cancel);
 
 	bool SectionCancel = false;
-	if (!Section->GetOnChanging().empty())
+	if (!Section->GetOnChanging().IsNull())
 		Section->GetOnChanging()(this, Cancel);
 
 
@@ -84,9 +84,9 @@ void ZEOption::SetValue(ZEValue NewValue)
 		Changed = true;
 		Section->Changed = true;
 
-		if (!OnChanged.empty())
+		if (!OnChanged.IsNull())
 			OnChanged(this);
-		if (!Section->GetOnChanged().empty())
+		if (!Section->GetOnChanged().IsNull())
 			Section->GetOnChanged()(this);
 	}
 

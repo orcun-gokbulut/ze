@@ -78,7 +78,7 @@ ZEProgressDialog::ZEProgressDialog()
 	OldErrorCallback = ZEError::GetInstance()->GetCallBack();
 	OldLogCallBack = ZELog::GetInstance()->GetCallback();
 
-	ZELog::GetInstance()->SetCallback(LogCallback, NULL);
+	ZELog::GetInstance()->SetCallback(LogCallback);
 	ZEError::GetInstance()->SetCallback(NULL);
 }
 
@@ -102,7 +102,7 @@ ZEProgressDialog::~ZEProgressDialog()
 		}
 	}
 
-	ZELog::GetInstance()->SetCallback(OldLogCallBack, NULL);
+	ZELog::GetInstance()->SetCallback(OldLogCallBack);
 	ZEError::GetInstance()->SetCallback(OldErrorCallback);
 	Instance = NULL;
 

@@ -46,10 +46,9 @@ class ZELock
 
 	public:
         bool				IsLocked();
-        bool				TryToLock();
         void				Lock();
         void				Wait();
-		bool				Unlock();
+		void				Unlock();
 
 		ZELock				operator=(const ZELock& Lock);
 
