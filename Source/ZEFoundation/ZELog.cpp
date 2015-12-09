@@ -46,6 +46,9 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
+#include "ZEFile\ZEPathManager.h"
+#include "ZEDS\ZEFormat.h"
+#include "ZETimeStamp.h"
 
 static void DefaultCallback(const char* Module, ZELogType Level, const char* LogText);
 
@@ -216,29 +219,11 @@ ZELogType ZELog::GetMinimumLogLevel()
 
 void ZELog::SetLogFileEnabled(bool Enabled)
 {
+	if (LogFileEnabled == Enabled)
+		return;
+
 	LogFileEnabled = Enabled;
-
-	tm FileTimeStamp;
-	time_t Temp = time(NULL);                          
-	memcpy(&FileTimeStamp, localtime(&Temp), sizeof(tm));
-
-	if (LogFileEnabled && LogFile == NULL && !LogFileName.IsEmpty())
-		LogFile = fopen(LogFileName.ToCString(), "a");
-
-	if (!LogFileEnabled && LogFile != NULL)
-	{
-		fclose((FILE*)LogFile);
-		LogFile = NULL;
-	}
-
-	if (LogFile != NULL)
-	{
-		fprintf((FILE*)LogFile, "\n\n##########################################################\n");
-		fprintf((FILE*)LogFile, " Log Session Start Date/Time : %04d-%02d-%02d %2d:%2d:%2d\n", 
-			1900 + FileTimeStamp.tm_year, FileTimeStamp.tm_mon + 1, FileTimeStamp.tm_mday,
-			FileTimeStamp.tm_hour, FileTimeStamp.tm_min, FileTimeStamp.tm_sec);
-		fprintf((FILE*)LogFile, "##########################################################\n");
-	}
+	OpenLogFile();
 }
 
 bool ZELog::GetLogFileEnabled()
@@ -252,14 +237,7 @@ void ZELog::SetLogFileName(const ZEString& FileName)
 		return;
 
 	LogFileName = FileName;
-	if (LogFile != NULL)
-	{
-		fclose((FILE*)LogFile);
-		LogFile = NULL;
-	}
-
-	if (LogFileEnabled && !LogFileName.IsEmpty())
-		LogFile = fopen(FileName, "a");
+	OpenLogFile();
 }
 
 const char* ZELog::GetLogFileName()
@@ -355,6 +333,45 @@ void ZELog::Log(const char* Module, const char* Format, ...)
 	Lock.Unlock();
 }
 
+void ZELog::OpenLogFile()
+{
+	if (LogFile != NULL)
+	{
+		fclose((FILE*)LogFile);
+		LogFile = NULL;
+	}
+
+	if (!LogFileEnabled || LogFileName.IsEmpty())
+		return;
+
+	char ComputerName[256];
+	DWORD Size = sizeof(ComputerName);
+	GetComputerNameA(ComputerName, &Size);
+
+	ZETimeStamp TimeStamp = ZETimeStamp::Now();
+	ZEString Date = ZEFormat::Format("{0:d:04}{1:d:02}{2:d:02}", TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay());
+	ZERealPath Path = ZEPathManager::GetInstance()->TranslateToRealPath(ZEFormat::Format(LogFileName, Date, ComputerName));
+	if ((Path.Access & ZE_PA_WRITE) == 0)
+		return;
+
+	LogFile = fopen(Path.Path, "a");
+	if (LogFile == NULL)
+		return;
+
+	if (ftell((FILE*)LogFile) != 0)
+		fprintf((FILE*)LogFile, "\n\n");
+
+	fprintf((FILE*)LogFile, 
+		"##########################################################\n"
+		"## Zinek Engine Log \n"
+		"## Computer Name : %s\n"
+		"## Start Date/Time : %04d-%02d-%02d %2d:%2d:%2d\n"
+		"##########################################################\n",
+		ComputerName,
+		TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay(),
+		TimeStamp.GetHour(), TimeStamp.GetMinute(), TimeStamp.GetSecond());
+}
+
 ZELog::ZELog()
 {
 	LogFile = NULL;
@@ -362,6 +379,15 @@ ZELog::ZELog()
 	LogCallback = DefaultCallback;
 	LogCallbackExtraParameters = NULL;
 	MinimumLogLevel = ZE_LOG_INFO;
+}
+
+ZELog::~ZELog()
+{
+	if (LogFile != NULL)
+	{
+		fflush((FILE*)LogFile);
+		fclose((FILE*)LogFile);
+	}
 }
 
 ZELog* ZELog::GetInstance()
