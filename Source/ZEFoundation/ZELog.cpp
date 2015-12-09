@@ -267,6 +267,16 @@ ZELogCallback ZELog::GetCallback()
 	return Callback;
 }
 
+void ZELog::SetCallbackParameter(void* Parameter)
+{
+	CallbackParameter = Parameter;
+}
+
+void* ZELog::GetCallbackParameter()
+{
+	return CallbackParameter;
+}
+
 void ZELog::SetLogFileEnabled(bool Enabled)
 {
 	if (LogFileEnabled == Enabled)

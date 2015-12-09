@@ -62,6 +62,7 @@ bool ZELNLogModule::InitializeSelf()
 
 	Widget = new ZELNLogWidget();
 	
+	ZELog::GetInstance()->SetCallbackParameter(this);
 	ZELog::GetInstance()->SetCallback(&LogCallback);
 	
 	return true;
