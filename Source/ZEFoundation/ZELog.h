@@ -79,7 +79,10 @@ class ZELog
 		ZELogType			MinimumLogLevel;
 		ZELock				Lock;
 
+		void				OpenLogFile();
+
 							ZELog();
+							~ZELog();
 
 	public:
 		static void			GetModuleName(char* Output, const char* FileName, const char* Function);
