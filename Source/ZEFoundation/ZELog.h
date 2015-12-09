@@ -155,7 +155,7 @@ class ZELog
 		void				SetCallback(ZELogCallback Callback);
 		ZELogCallback		GetCallback();
 
-		void				SetCallbackParameter(void* ExtraParameters);
+		void				SetCallbackParameter(void* Parameter);
 		void*				GetCallbackParameter();
 
 		void				SetLogFileEnabled(bool Enabled);
