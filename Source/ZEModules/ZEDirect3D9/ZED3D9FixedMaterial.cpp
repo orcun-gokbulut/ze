@@ -189,12 +189,6 @@ static void SetupClippingPlanes(LPDIRECT3DDEVICE9 Device, const ZEMatrix4x4& Wor
 	if (Planes.GetCount() == 0)
 		return;
 
-/*	ZEMatrix4x4 InvWorldViewProjTransform;
-	ZEMatrix4x4::Inverse(InvWorldViewProjTransform, WorldViewProjTransform);
-
-	ZEMatrix4x4 InvTrspWorldViewProjTransform;
-	ZEMatrix4x4::Transpose(InvTrspWorldViewProjTransform, InvWorldViewProjTransform);*/
-
 	for (ZESize I = 0; I < Planes.GetCount(); I++)
 	{
 		ZEPlane Plane;
@@ -213,7 +207,7 @@ static void SetupClippingPlanes(LPDIRECT3DDEVICE9 Device, const ZEMatrix4x4& Wor
 		Device->SetClipPlane(I, (float*)&NewVector);
 	}
 
-	Device->SetRenderState(D3DRS_CLIPPLANEENABLE, (ZEInt)(1 << (Planes.GetCount() + 1)) - 1);
+	Device->SetRenderState(D3DRS_CLIPPLANEENABLE, (ZEInt)(1 << Planes.GetCount()) - 1);
 }
 
 bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
