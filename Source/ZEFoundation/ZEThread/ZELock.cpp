@@ -40,6 +40,7 @@
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 	#include <intrin.h>
 #endif
+
 static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 {
 	#ifdef ZE_PLATFORM_COMPILER_MSVC
@@ -53,21 +54,8 @@ static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 
 bool ZELock::IsLocked()
 {
-    //CurrentNumber = NextNumber + NumberOfLocks + 1;
     return (CurrentNumber != NextNumber + 1);
 }
-/*
-bool ZELock::TryLock()
-{
-	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
-
-	if (MyNumber != CurrentNumber)
-		return false;
-
-	CurrentNumber = MyNumber;
-
-	return true;
-}*/
 
 void ZELock::Wait()
 {
@@ -80,10 +68,9 @@ void ZELock::Lock()
 	while(MyNumber != CurrentNumber);
 }
 
-bool ZELock::Unlock()
+void ZELock::Unlock()
 {
 	CurrentNumber++;
-	return true;
 }
 
 ZELock ZELock::operator=(const ZELock& Lock)

@@ -36,6 +36,10 @@
 #include "ZELog.h"
 
 #include "ZEPlatform.h"
+#include "ZEFile\ZEPathManager.h"
+#include "ZEDS\ZEFormat.h"
+#include "ZETimeStamp.h"
+#include "ZECore\ZECore.h"
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -46,9 +50,6 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #endif
-#include "ZEFile\ZEPathManager.h"
-#include "ZEDS\ZEFormat.h"
-#include "ZETimeStamp.h"
 
 static void DefaultCallback(const char* Module, ZELogType Level, const char* LogText);
 
@@ -124,87 +125,126 @@ static void DefaultCallback(const char* Module, ZELogType Type, const char* LogT
 	printf("] ");
 
 	SetColor(Type);
-	printf("%s", ZELog::GetLogTypeString(Type));
+	printf("%s", ZELog::UtilityGetLogTypeString(Type));
 
 	SetColor(-1);
 	printf(": %s\n", LogText);
 }
 
-void ZELog::GetModuleName(char* Output, const char* FileName, const char* Function)
+void ZELog::OpenLogFile()
 {
-	ZESize Len = strlen(Function);
-    ZESize Index = 0;
-	for(ZESize I = 0; I <= Len; I++)
-    {
-        if (Function[I] == ' ')
-        {
-            Index = 0;
-            continue;
-        }
+	Lock.Lock();
 
-		if (Function[I] == ':' || Function[I] == '<')
-		{
-            Output[Index] = '\0';
-            return;
-		}
-		else
-        {
-            Output[Index] = Function[I];
-            Index++;
-        }
-    }
+	if (LogFile != NULL)
+	{
+		fclose((FILE*)LogFile);
+		LogFile = NULL;
+	}
 
-	Len = strlen(FileName);
-	bool Found = false;
-    ZESize N = Len - 1;
-    for(; N != 0; N--)
-		if (FileName[N] == '\\' || FileName[N] == '/')
-		{
-			Found = true;
-			N++;
-			break;
-		}
+	if (!LogFileEnabled || LogFilePath.IsEmpty())
+	{
+		Lock.Unlock();
+		return;
+	}
 
-		if (Found)
-			strcpy(Output, FileName + N);
-		else
-			strcpy(Output, FileName);
+
+	char ComputerName[256];
+	DWORD Size = sizeof(ComputerName);
+	GetComputerNameA(ComputerName, &Size);
+
+	ZETimeStamp TimeStamp = ZETimeStamp::Now();
+	ZEString Date = ZEFormat::Format("{0:d:04}{1:d:02}{2:d:02}", TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay());
+	ZERealPath Path = ZEPathManager::GetInstance()->TranslateToRealPath(ZEFormat::Format(LogFilePath, Date, ComputerName));
+	if ((Path.Access & ZE_PA_WRITE) == 0)
+	{
+		Lock.Unlock();
+		return;
+	}
+
+	LogFile = fopen(Path.Path, "a");
+	if (LogFile == NULL)
+	{
+		Lock.Unlock();
+		return;
+	}
+
+	if (ftell((FILE*)LogFile) != 0)
+		fprintf((FILE*)LogFile, "\n\n");
+
+	fprintf((FILE*)LogFile, 
+		"##########################################################\n"
+		"## Zinek Engine Log \n"
+		"## Computer Name : %s\n"
+		"## Start Date/Time : %04d-%02d-%02d %2d:%2d:%2d\n"
+		"##########################################################\n",
+		ComputerName,
+		TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay(),
+		TimeStamp.GetHour(), TimeStamp.GetMinute(), TimeStamp.GetSecond());
+
+	Lock.Unlock();
 }
 
-const char* ZELog::GetLogTypeString(ZELogType Type)
+
+void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, va_list args)
 {
-	switch(Type)
+	#if !defined(ZE_PLATFORM_WINDOWS) || defined(ZE_DEBUG_ENABLE)
+	if ((Type < GetMinimumLevel() || Callback == NULL) &&
+		(Type < GetLogFileMinimumLevel() || LogFile == NULL))
+		return;
+	#endif
+
+	Lock.Lock();
+	
+	char Buffer[4096];
+	vsprintf(Buffer, Format, args);
+
+	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
+		char DebugBuffer[4096];
+		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::UtilityGetLogTypeString(ZE_LOG_INFO), Buffer);
+		OutputDebugString(DebugBuffer);
+	#endif
+
+	if (Type >= GetMinimumLevel() && Callback != NULL)
+		Callback(Module, Type, Buffer,CallbackParameter);
+
+	if (Type >= GetLogFileMinimumLevel() && LogFile != NULL)
 	{
-		case ZE_LOG_CRITICAL_ERROR:
-			return "CRITICAL ERROR";
-			break;
+		time_t Temp = time(NULL);                          
+		tm TimeStamp;
+		memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
 
-        case ZE_LOG_ERROR:
-			return "ERROR";
-			break;
+		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
+			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
+			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
+			Module, UtilityGetLogTypeString(ZE_LOG_INFO), Buffer);
+		fflush((FILE*)LogFile);
+	}
 
-        case ZE_LOG_WARNING:
-			return "Warning";
-			break;
+	Lock.Unlock();
+}
 
-        case ZE_LOG_INFO:
-            return "Info";
-			break;
-		
-        case ZE_LOG_SUCCESS:
-			return "Success";
-			break;
 
-		case ZE_LOG_DEBUG:
-			return "Debug";
-			break;
+ZELog::ZELog()
+{
+	MinimumLogLevel = ZE_LOG_INFO;
+	Callback = DefaultCallback;
+	CallbackParameter = NULL;
+	LogFile = NULL;
+	LogFileEnabled = false;
+	LogFileMinimumLevel = ZE_LOG_INFO;
+}
 
-		default:
-			return "Unknown";
+ZELog::~ZELog()
+{
+	if (LogFile != NULL)
+	{
+		fprintf((FILE*)LogFile, "END OF LOG\n");
+		fflush((FILE*)LogFile);
+		fclose((FILE*)LogFile);
 	}
 }
 
-void ZELog::SetMinimumLogLevel(ZELogType Level)
+void ZELog::SetMinimumLevel(ZELogType Level)
 {
 	if (Level > ZE_LOG_CRITICAL_ERROR)
 		Level = ZE_LOG_CRITICAL_ERROR;
@@ -212,9 +252,19 @@ void ZELog::SetMinimumLogLevel(ZELogType Level)
 	MinimumLogLevel = Level;
 }
 
-ZELogType ZELog::GetMinimumLogLevel()
+ZELogType ZELog::GetMinimumLevel()
 {
 	return MinimumLogLevel;
+}
+
+void ZELog::SetCallback(ZELogCallback Callback)
+{
+	this->Callback = Callback;
+}
+
+ZELogCallback ZELog::GetCallback()
+{
+	return Callback;
 }
 
 void ZELog::SetLogFileEnabled(bool Enabled)
@@ -231,167 +281,126 @@ bool ZELog::GetLogFileEnabled()
 	return LogFileEnabled;
 }
 
-void ZELog::SetLogFileName(const ZEString& FileName)
+void ZELog::SetLogFilePath(const ZEString& FileName)
 {
-	if (LogFileName == FileName)
+	if (LogFilePath == FileName)
 		return;
 
-	LogFileName = FileName;
+	LogFilePath = FileName;
 	OpenLogFile();
 }
 
-const char* ZELog::GetLogFileName()
+const char* ZELog::GetLogFilePath()
 {
-	return LogFileName;
+	return LogFilePath;
 }
 
-void ZELog::SetCallback(ZELogCallback Callback, void* ExtraParameters)
+
+void ZELog::SetLogFileMinimumLevel(ZELogType Level)
 {
-	LogCallback = Callback;
-	LogCallbackExtraParameters = ExtraParameters;
+	LogFileMinimumLevel = Level;
 }
 
-ZELogCallback ZELog::GetCallback()
+ZELogType ZELog::GetLogFileMinimumLevel()
 {
-	return LogCallback;
+	return LogFileMinimumLevel;
 }
+
 
 void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 {
-	Lock.Lock();
-
-	if (Type < GetMinimumLogLevel())
-		return;
-
-	char Buffer[4096];
-
+	char Text[4096];
 	va_list VList;
 	va_start(VList, Format);
-	vsprintf(Buffer, Format, VList);
+	LogInternal(Module, Type, Format, VList);
 	va_end(VList);
-
-	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-		char DebugBuffer[4096];
-		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::GetLogTypeString(ZE_LOG_INFO), Buffer);
-		OutputDebugString(DebugBuffer);
-	#endif
-
-	if (LogFile != NULL)
-	{
-		time_t Temp = time(NULL);                          
-		tm TimeStamp;
-		memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
-
-		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
-			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
-			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
-			Module, GetLogTypeString(Type), Buffer);
-		fflush((FILE*)LogFile);
-	}
-
-	if (LogCallback != NULL)
-		LogCallback(Module, Type, Buffer, LogCallbackExtraParameters);
-	
-	Lock.Unlock();
 }
 
 void ZELog::Log(const char* Module, const char* Format, ...)
 {
-	Lock.Lock();
-
-	if (ZE_LOG_INFO < GetMinimumLogLevel())
-		return;
-
-	char Buffer[4096];
 	va_list VList;
 	va_start(VList, Format);
-	vsprintf(Buffer, Format, VList);
+	LogInternal(Module, ZE_LOG_INFO, Format, VList);
 	va_end(VList);
-
-	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
-		char DebugBuffer[4096];
-		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::GetLogTypeString(ZE_LOG_INFO), Buffer);
-		OutputDebugString(DebugBuffer);
-	#endif
-
-	if (LogFile != NULL)
-	{
-		time_t Temp = time(NULL);                          
-		tm TimeStamp;
-		memcpy(&TimeStamp, localtime(&Temp), sizeof(tm));
-
-		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
-			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
-			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
-			Module, GetLogTypeString(ZE_LOG_INFO), Buffer);
-		fflush((FILE*)LogFile);
-	}
-
-	if (LogCallback != NULL)
-		LogCallback(Module, ZE_LOG_INFO, Buffer,LogCallbackExtraParameters);
-	
-	Lock.Unlock();
-}
-
-void ZELog::OpenLogFile()
-{
-	if (LogFile != NULL)
-	{
-		fclose((FILE*)LogFile);
-		LogFile = NULL;
-	}
-
-	if (!LogFileEnabled || LogFileName.IsEmpty())
-		return;
-
-	char ComputerName[256];
-	DWORD Size = sizeof(ComputerName);
-	GetComputerNameA(ComputerName, &Size);
-
-	ZETimeStamp TimeStamp = ZETimeStamp::Now();
-	ZEString Date = ZEFormat::Format("{0:d:04}{1:d:02}{2:d:02}", TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay());
-	ZERealPath Path = ZEPathManager::GetInstance()->TranslateToRealPath(ZEFormat::Format(LogFileName, Date, ComputerName));
-	if ((Path.Access & ZE_PA_WRITE) == 0)
-		return;
-
-	LogFile = fopen(Path.Path, "a");
-	if (LogFile == NULL)
-		return;
-
-	if (ftell((FILE*)LogFile) != 0)
-		fprintf((FILE*)LogFile, "\n\n");
-
-	fprintf((FILE*)LogFile, 
-		"##########################################################\n"
-		"## Zinek Engine Log \n"
-		"## Computer Name : %s\n"
-		"## Start Date/Time : %04d-%02d-%02d %2d:%2d:%2d\n"
-		"##########################################################\n",
-		ComputerName,
-		TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay(),
-		TimeStamp.GetHour(), TimeStamp.GetMinute(), TimeStamp.GetSecond());
-}
-
-ZELog::ZELog()
-{
-	LogFile = NULL;
-	LogFileEnabled = false;
-	LogCallback = DefaultCallback;
-	LogCallbackExtraParameters = NULL;
-	MinimumLogLevel = ZE_LOG_INFO;
-}
-
-ZELog::~ZELog()
-{
-	if (LogFile != NULL)
-	{
-		fflush((FILE*)LogFile);
-		fclose((FILE*)LogFile);
-	}
 }
 
 ZELog* ZELog::GetInstance()
 {
 	static ZELog Instance;
 	return &Instance;
+}
+
+
+void ZELog::UtilityGetModuleName(char* Output, const char* FileName, const char* Function)
+{
+	ZESize Len = strlen(Function);
+	ZESize Index = 0;
+	for(ZESize I = 0; I <= Len; I++)
+	{
+		if (Function[I] == ' ')
+		{
+			Index = 0;
+			continue;
+		}
+
+		if (Function[I] == ':' || Function[I] == '<')
+		{
+			Output[Index] = '\0';
+			return;
+		}
+		else
+		{
+			Output[Index] = Function[I];
+			Index++;
+		}
+	}
+
+	Len = strlen(FileName);
+	bool Found = false;
+	ZESize N = Len - 1;
+	for(; N != 0; N--)
+		if (FileName[N] == '\\' || FileName[N] == '/')
+		{
+			Found = true;
+			N++;
+			break;
+		}
+
+		if (Found)
+			strcpy(Output, FileName + N);
+		else
+			strcpy(Output, FileName);
+}
+
+const char* ZELog::UtilityGetLogTypeString(ZELogType Type)
+{
+	switch(Type)
+	{
+	case ZE_LOG_CRITICAL_ERROR:
+		return "CRITICAL ERROR";
+		break;
+
+	case ZE_LOG_ERROR:
+		return "ERROR";
+		break;
+
+	case ZE_LOG_WARNING:
+		return "Warning";
+		break;
+
+	case ZE_LOG_INFO:
+		return "Info";
+		break;
+
+	case ZE_LOG_SUCCESS:
+		return "Success";
+		break;
+
+	case ZE_LOG_DEBUG:
+		return "Debug";
+		break;
+
+	default:
+		return "Unknown";
+	}
 }

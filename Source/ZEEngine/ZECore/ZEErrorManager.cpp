@@ -33,10 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEErrorManager.h"
+
 #include "ZECore.h"
 #include "ZEError.h"
 #include "ZEConsole.h"
-#include "ZEErrorManager.h"
 #include "ZEConsoleWindow.h"
 #include "ZEOptionManager.h"
 
@@ -48,14 +49,44 @@
 
 static ZEOptionSection ErrorOptions; 
 
-bool ZEErrorManager::OptionCallback_General(ZEOption* Option, ZETypedValue* Value)
+void ZEErrorManager::OnOptionChanged(ZEOption* Option)
 {
-	if (Option->GetName() == "FileLogging")
+	if (Option->GetName() == "MinimumLevel")
+	{
+		ZEString Value = Option->GetValue().GetString().Lower().Trim();
+		if (Value == "critical" || Value == "critical error" || Value == "criticalerror")
+			ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_CRITICAL_ERROR);
+		else if (Value == "error")
+			ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_ERROR);
+		else if (Value == "warning")
+				ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_WARNING);
+		else if (Value == "info")
+				ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_INFO);
+		else if (Value == "debug")
+				ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_DEBUG);
+	}
+	else if (Option->GetName() == "LogFileEnabled")
+	{
 		ZELog::GetInstance()->SetLogFileEnabled(Option->GetValue().GetBoolean());
-	else if (Option->GetName() == "LogFile")
-		ZELog::GetInstance()->SetLogFileName(Option->GetValue().GetString());
-
-	return true;
+	}
+	else if (Option->GetName() == "LogFilePath")
+	{
+		ZELog::GetInstance()->SetLogFilePath(Option->GetValue().GetString());
+	}
+	else if (Option->GetName() == "LogFileMinimumLevel")
+	{
+		ZEString Value = Option->GetValue().GetString().Lower().Trim();
+		if (Value == "critical" || Value == "critical error" || Value == "criticalerror")
+			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_CRITICAL_ERROR);
+		else if (Value == "error")
+			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_ERROR);
+		else if (Value == "warning")
+			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_WARNING);
+		else if (Value == "info")
+			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_INFO);
+		else if (Value == "debug")
+			ZELog::GetInstance()->SetLogFileMinimumLevel(ZE_LOG_DEBUG);
+	}
 }
 
 void ZEErrorManager::ErrorCallback(ZEErrorType Level)
@@ -82,8 +113,13 @@ ZEErrorManager* ZEErrorManager::GetInstance()
 ZEErrorManager::ZEErrorManager()
 {
 	ErrorOptions.SetName("Error");
-	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", false, ZE_OA_NORMAL));
-	ErrorOptions.AddOption(new ZEOption("LogFileName", "error.log", ZE_OA_NORMAL));
+	ErrorOptions.AddOption(new ZEOption("MinimumLevel", "Info", ZE_OA_NORMAL));
+	ErrorOptions.AddOption(new ZEOption("LogFileEnabled", true, ZE_OA_NORMAL));
+	ErrorOptions.AddOption(new ZEOption("LogFilePath", "#S:/Logs/ZinekEngine-{0}.log", ZE_OA_NORMAL));
+	ErrorOptions.AddOption(new ZEOption("LogFileMinimumLevel", "Warning", ZE_OA_NORMAL));
+	ErrorOptions.SetOnChanged(ZEOptionsChangedEvent::Create<ZEErrorManager, &ZEErrorManager::OnOptionChanged>(this));
+
+
 	ZEOptionManager::GetInstance()->RegisterSection(&ErrorOptions);
 	ZEError::GetInstance()->SetCallback(&ZEErrorManager::ErrorCallback);
 }
