@@ -49,7 +49,7 @@ add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
 
 ## Build system initalization
 #########################################################################################
-set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake" ${CMAKE_MODULE_PATH})
+set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake/External" "${PROJECT_SOURCE_DIR}/CMake" "${CMAKE_MODULE_PATH}")
 
 include(ze)
 ze_init()

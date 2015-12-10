@@ -36,59 +36,102 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZESignal.h"
+#include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEList2.h"
 #include "ZEDS\ZEDelegate.h"
+#include "ZEThread.h"
+#include "ZESignal.h"
 
 enum  ZETaskPoolId
 {
-	ZE_TP_DEFAULT,
-	ZE_TP_REAL_TIME,
-	ZE_TP_COMPUTE,
-	ZE_TP_IO
+	ZE_TPI_REAL_TIME,
+	ZE_TPI_CONCURENT,
+	ZE_TPI_IO,
+	ZE_TPI_DEFAULT = ZE_TPI_CONCURENT
 };
 
 enum ZETaskStatus
 {
 	ZE_TS2_NONE,
-	ZE_TS2_RUNNING,
 	ZE_TS2_WAITING,
+	ZE_TS2_RUNNING,
+	ZE_TS2_DONE
 };
 
 class ZETask;
-class ZEThread;
+class ZETaskThread;
 class ZETaskPool;
 
-typedef ZEDelegate<bool (ZETask* Task, void* ExtraParameters)> ZETaskFunction;
+typedef ZEDelegate<bool (ZETaskThread* TaskThread, ZEInt InstanceIndex, void* ExtraParameters)> ZETaskFunction;
+typedef ZEDelegate<void (ZETaskThread* TaskThread, ZEInt InstanceCount, void* ExtraParameters)> ZETaskPostFunction;
 
 class ZETask
 {
+	friend class Manager;
 	friend class ZETaskPool;
 	private:
-		ZEString			Name;
-		ZETaskStatus		Status;
-		ZEThread*			Thread;
-		ZETaskPool*			Pool;
-		ZEInt				Priority;
-		ZETaskFunction		Function;
-		void*				ExtraParameters;
-		ZELink<ZETask>		Link;
-		ZESignal			Signal;
+		ZETask*					Parent;
+		ZEString				Name;
+		ZETaskStatus			Status;
+		ZEInt					PoolId;
+		ZEInt					Priority;
+		ZELink<ZETask>			Link;
+		ZELink<ZETask>			ParentLink;
+	
+		ZEList2<ZETask>			SubTasks;
+		ZEArray<ZETask*>		Dependencies;
+		ZESize					DependentCount;
+
+		ZETaskFunction			Function;
+		ZETaskPostFunction		PostFunction;
+		void*					Parameter;	
+		ZEInt					InstanceCount;
+		ZEInt					InstanceIndex;
+
+		ZESignal				Signal;
+		ZELock					TaskLock;
+		ZEList2<ZETaskThread>	Threads;
+
+		void					Setup();
+		bool					Activate(ZETaskThread* Thread);
+		void					SubTaskDone(ZETaskThread* SubTask = NULL);
 
 	public:
-		void				SetName(const ZEString& Name);
-		const ZEString		GetName();
+		ZETask*					GetParent() const;
+		ZETaskStatus			GetStatus() const;
+		const ZEList2<ZETaskThread>& GetThreads() const;
 
-		ZETaskStatus		GetStatus();
-		ZEThread*			GetThread();	
-		ZETaskPool*			GetPool();
+		void					SetName(const ZEString& Name);
+		const ZEString			GetName() const;
 
-		void				SetPriority(ZEInt Priority);
-		ZEInt				GetPriority();
+		void					SetPriority(ZEInt Priority);
+		ZEInt					GetPriority() const;
 
-		void				Run(ZETaskPool* Pool = NULL);
-		void				Wait();
+		void					SetInstanceCount(ZEInt InstanceCount);
+		ZEInt					GetInstanceCount() const;
 
-							ZETask();
-							~ZETask();
+		void					SetFunction(const ZETaskFunction& Function);
+		const ZETaskFunction&	GetFunction() const;
+
+		void					SetPostFunction(const ZETaskPostFunction& Function);
+		const ZETaskPostFunction& GetPostFunction() const;
+
+		void					SetParameter(void* Parameter);
+		void*					GetParameter() const;
+
+		void					SetPool(ZEInt PoolId);
+		ZEInt					GetPool() const;
+
+		const ZEArray<ZETask*>&	GetDependencies() const;
+		void					AddDependency(ZETask* Task);
+		void					RemoveDependency(ZETask* Task);
+
+		const ZEList2<ZETask>&	GetSubTasks() const;
+		void					RunSubTask(ZETask* Task);
+
+		void					Run();
+		void					Wait();
+
+								ZETask();
+								~ZETask();
 };

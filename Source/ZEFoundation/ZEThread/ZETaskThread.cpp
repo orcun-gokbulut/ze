@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETaskManager.h
+ Zinek Engine - ZETaskThread.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,38 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZETaskThread.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZETaskPool.h"
-#include "ZEPointer/ZEPointer.h"
+#include "ZETask.h"
 
-class ZETask;
-class ZEThread;
-
-class ZETaskManager
+void ZETaskThread::SetInstanceIndex(ZEUInt InstanceIndex)
 {
-	private:
-		ZEArray<ZETaskPool*>			Pools;
+	this->InstanceIndex = InstanceIndex;
+}
+ZEUInt ZETaskThread::GetInstanceIndex()
+{
+	return InstanceIndex;
+}
 
-		ZETaskPool						DefaultPool;
-		ZETaskPool						RealTimePool;
-		ZETaskPool						IOPool;
-		ZETaskPool						ConcurrentPool;
+void ZETaskThread::SetTask(ZETask* Task)
+{
+	this->Task = Task;
+}
 
-										ZETaskManager();
-										~ZETaskManager();
+ZETask* ZETaskThread::GetTask()
+{
+	return Task;
+}
 
-	public:
-		static ZETaskPool*				GetRealTimePool();
-		static ZETaskPool*				GetIOPool();
-		static ZETaskPool*				GetConcurrentPool();
-		static ZEUInt					GetThreadCount();
-
-		const ZEArray<ZETaskPool*>&		GetPools();
-		ZETaskPool*						GetPool(ZEInt PoolId);
-		void							RegisterPool(ZETaskPool* Pool);
-		void							UnregisterPool(ZEInt PoolId);
-
-		static ZETaskManager*			GetInstance();
-};
+ZETaskThread::ZETaskThread() : TaskLink(this)
+{
+	Task = NULL;
+	InstanceIndex = 0;
+}

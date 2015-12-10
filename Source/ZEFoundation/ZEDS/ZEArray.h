@@ -66,6 +66,16 @@ class ZEArray
 			return IteratorConst(*this, 0);
 		}
 
+		Iterator GetIteratorEnd()
+		{
+			return Iterator(*this, (Count == 0 ? 0 : Count - 1));
+		}
+
+		IteratorConst GetIteratorEnd() const
+		{
+			return IteratorConst(*this, (Count == 0 ? 0 : Count - 1));
+		}
+
 		inline ZESize Circular(ZESSize Index) const
 		{
 			if (Index < 0)
