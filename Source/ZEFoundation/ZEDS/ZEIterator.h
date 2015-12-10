@@ -35,14 +35,14 @@
 
 #pragma once
 
-#define ze_for_each(Variable, Container) for (auto Variable = Container.GetIterator(); !Variable.IsEnd(); ++Variable)
+#define ze_for_each(Variable, Container) for (auto Variable = Container.GetIterator(); Variable.IsValid(); ++Variable)
+#define ze_for_each_reverse(Variable, Container) for (auto Variable = Container.GetIteratorEnd(); Variable.IsValid(); --Variable)
 
 template<typename ZEItemType>
 class ZEIterator
 {
 	public:
-		bool					IsBegin() const;
-		bool					IsEnd() const;
+		bool					IsValid() const;
 
 		ZEItemType&				GetItem() const;
 		void					Prev();
@@ -61,8 +61,7 @@ template<typename ZEItemType>
 class ZEIteratorConst
 {
 	public:
-		bool					IsBegin() const;
-		bool					IsEnd() const;
+		bool					IsValid() const;
 
 		const ZEItemType&		GetItem() const;
 		void					Prev();

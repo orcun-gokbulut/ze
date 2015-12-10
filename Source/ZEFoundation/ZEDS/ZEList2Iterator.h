@@ -51,11 +51,9 @@ class ZEList2Iterator : public ZEIterator<ZEItemType>
 		ZELink<ZEItemType>*			Link;
 
 	public:
-		inline bool					IsBegin() const;
-		inline bool					IsEnd() const;
+		inline bool					IsValid() const;
 
 		inline ZEItemType&			GetItem() const;
-		inline ZESize				GetIndex() const;
 
 		inline void					Prev();
 		inline void					Next();
@@ -67,6 +65,8 @@ class ZEList2Iterator : public ZEIterator<ZEItemType>
 
 		ZEItemType&					operator*() const;
 		ZEItemType*					operator->() const;
+
+									ZEList2Iterator(ZELink<ZEItemType>* Link);
 };
 
 template<typename ZEItemType>
@@ -77,11 +77,9 @@ class ZEList2IteratorConst : public ZEIteratorConst<ZEItemType>
 		const ZELink<ZEItemType>*	Link;
 
 	public:
-		inline bool					IsBegin() const;
-		inline bool					IsEnd() const;
+		inline bool					IsValid() const;
 
 		inline const ZEItemType&	GetItem() const;
-		inline ZESize				GetIndex() const;
 
 		inline void					Prev();
 		inline void					Next();
@@ -92,6 +90,8 @@ class ZEList2IteratorConst : public ZEIteratorConst<ZEItemType>
 		ZEList2IteratorConst&		operator++();
 		const ZEItemType&			operator*() const;
 		const ZEItemType*			operator->() const;
+
+									ZEList2IteratorConst(const ZELink<ZEItemType>* Link);
 };
 
 
@@ -99,16 +99,10 @@ class ZEList2IteratorConst : public ZEIteratorConst<ZEItemType>
 /////////////////////////////////////////////////////////////////////////////
 
 template<typename ZEItemType>
-bool ZEList2Iterator<ZEItemType>::IsBegin() const
+bool ZEList2Iterator<ZEItemType>::IsValid() const
 {
-	return Link == NULL || Link->GetPrev() == NULL;
+	return Link != NULL;
 }
-
-template<typename ZEItemType>
-bool ZEList2Iterator<ZEItemType>::IsEnd() const
-{
-	return Link == NULL;
-} 
 
 template<typename ZEItemType>
 ZEItemType& ZEList2Iterator<ZEItemType>::GetItem() const
@@ -160,31 +154,25 @@ ZEItemType* ZEList2Iterator<ZEItemType>::operator->() const
 	return &GetItem();
 }
 
+template<typename ZEItemType>
+ZEList2Iterator<ZEItemType>::ZEList2Iterator(ZELink<ZEItemType>* Link)
+{
+	this->Link = Link;
+}
+
 // ZEList2IteratorConst
 /////////////////////////////////////////////////////////////////////////////
 
 template<typename ZEItemType>
-bool ZEList2IteratorConst<ZEItemType>::IsBegin() const
+bool ZEList2IteratorConst<ZEItemType>::IsValid() const
 {
-	return Link == NULL || Link->GetPrev() == NULL;
-}
-
-template<typename ZEItemType>
-bool ZEList2IteratorConst<ZEItemType>::IsEnd() const
-{
-	return Link == NULL;
+	return Link != NULL;
 } 
 
 template<typename ZEItemType>
 const ZEItemType& ZEList2IteratorConst<ZEItemType>::GetItem() const
 {
 	return *Link->GetItem();
-}
-
-template<typename ZEItemType>
-ZESize ZEList2IteratorConst<ZEItemType>::GetIndex() const
-{
-	return Index;
 }
 
 template<typename ZEItemType>
@@ -229,4 +217,10 @@ template<typename ZEItemType>
 const ZEItemType* ZEList2IteratorConst<ZEItemType>::operator->() const
 {
 	return &GetItem();
+}
+
+template<typename ZEItemType>
+ZEList2IteratorConst<ZEItemType>::ZEList2IteratorConst(const ZELink<ZEItemType>* Link)
+{
+	this->Link = Link;
 }

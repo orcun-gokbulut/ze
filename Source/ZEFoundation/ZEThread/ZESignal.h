@@ -53,11 +53,13 @@ class ZESignal
             pthread_cond_t  Cond;
         #endif
 
+		bool				InitialState;
 		ZELock				InitializeLock;
 		void				Initialize();
 
 	public:
         void                Signal();
+		void				Reset();
 
         void                Wait();
         bool				Wait(ZEUInt Milliseconds);

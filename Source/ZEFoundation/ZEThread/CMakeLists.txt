@@ -55,15 +55,26 @@ ze_add_source(ZEThread.h				Sources Headers)
 ze_add_source(ZEThreadTests.cpp			Tests)
 ze_add_source(ZETask.cpp         		Sources)
 ze_add_source(ZETask.h           		Sources Headers)
+ze_add_source(ZETaskThread.cpp         	Sources)
+ze_add_source(ZETaskThread.h           	Sources Headers)
 ze_add_source(ZETaskPool.cpp       		Sources)
 ze_add_source(ZETaskPool.h         		Sources Headers)
 ze_add_source(ZETaskManager.cpp   		Sources)
 ze_add_source(ZETaskManager.h     		Sources Headers)
 
+set(ZEBUILD_VTUNE_ENABLED FALSE CACHE BOOL "Enable VTune notify API for better VTune results")
+if (ZEBUILD_VTUNE_ENABLED)
+	find_package(VTune REQUIRED)
+	if (VTUNE_FOUND)
+		add_definitions(-DZE_VTUNE_ENABLED)
+		include_directories(${VTune_INCLUDE_DIRS})
+	endif()
+endif()
+
 ze_add_library(TARGET ZEThread
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS)
+	LIBS ZEDS ${VTune_LIBRARIES})
 
 ze_add_test(TARGET ZEThreadTests
 	SOURCES ${Tests}

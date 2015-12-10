@@ -230,6 +230,7 @@ bool ZEMLFormatXMLV1::ReadGoToNode(ZEFile* File, const ZEMLFormatElement& Elemen
 			Found = true;
 			break;
 		}
+		NextNode = NextNode->NextSibling();
 	}
 
 	if (!Found)
@@ -532,6 +533,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 			Found = true;
 			break;
 		}
+		NextNode = NextNode->NextSibling();
 	}
 		
 	if (!Found)

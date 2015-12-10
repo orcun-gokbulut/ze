@@ -37,9 +37,14 @@
 #include "ZEError.h"
 #include "ZEPlatform.h"
 
+#ifdef ZE_VTUNE_ENABLED
+#include "ittnotify.h"
+#endif
+
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 	#include <intrin.h>
 #endif
+
 static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 {
 	#ifdef ZE_PLATFORM_COMPILER_MSVC
@@ -76,12 +81,24 @@ void ZELock::Wait()
 
 void ZELock::Lock()
 {
-    ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_prepare(this);
+	#endif
+    
+	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
 	while(MyNumber != CurrentNumber);
+
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_acquired(this);
+	#endif
 }
 
 bool ZELock::Unlock()
 {
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_releasing(this);
+	#endif
+
 	CurrentNumber++;
 	return true;
 }
@@ -99,6 +116,10 @@ ZELock::ZELock()
 
 ZELock::ZELock(const ZELock& Lock)
 {
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_create(this, "ZELock", "", 0);
+	#endif
+
 	CurrentNumber = 1;
 	NextNumber = 0;
 }
@@ -106,4 +127,7 @@ ZELock::ZELock(const ZELock& Lock)
 ZELock::~ZELock()
 {
     zeDebugCheck(CurrentNumber != NextNumber + 1, "Destroying lock while it is still locked.");
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_destroy(this);
+	#endif
 }

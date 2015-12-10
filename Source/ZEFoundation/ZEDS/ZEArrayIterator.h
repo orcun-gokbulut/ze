@@ -47,13 +47,12 @@ class ZEArrayIterator : public ZEIterator<ZEItemType>
 	friend class ZEArray<ZEItemType, ZEAllocatorType>;
 	private:
 		ZEArray<ZEItemType, ZEAllocatorType>* Array;
-		ZESize						Index;
+		ZESSize						Index;
 
 									ZEArrayIterator(ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index);
 
 	public:
-		inline bool					IsBegin() const;
-		inline bool					IsEnd() const;
+		inline bool					IsValid() const;
 
 		inline ZEItemType&			GetItem() const;
 		inline ZESize				GetIndex() const;
@@ -76,13 +75,12 @@ class ZEArrayIteratorConst : public ZEIteratorConst<ZEItemType>
 	friend class ZEArray<ZEItemType, ZEAllocatorType>;
 	private:
 		const ZEArray<ZEItemType, ZEAllocatorType>* Array;
-		ZESize						Index;
+		ZESSize						Index;
 
 									ZEArrayIteratorConst(const ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index);
 
 	public:
-		inline bool					IsBegin() const;
-		inline bool					IsEnd() const;
+		inline bool					IsValid() const;
 
 		inline const ZEItemType&	GetItem() const;
 		inline ZESize				GetIndex() const;
@@ -110,45 +108,37 @@ ZEArrayIterator<ZEItemType, ZEAllocatorType>::ZEArrayIterator(ZEArray<ZEItemType
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIterator<ZEItemType, ZEAllocatorType>::IsBegin() const
+bool ZEArrayIterator<ZEItemType, ZEAllocatorType>::IsValid() const
 {
-	return Index == 0;
+	return (Array != NULL && Index >= 0 && Index < (ZESSize)Array->GetCount());
 }
-
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIterator<ZEItemType, ZEAllocatorType>::IsEnd() const
-{
-	return (ZESSize)Index >= (ZESSize)Array->GetCount();
-} 
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZEItemType& ZEArrayIterator<ZEItemType, ZEAllocatorType>::GetItem() const
 {
-	return Array->GetItem(Index);
+	return Array->GetItem((ZESize)Index);
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZESize ZEArrayIterator<ZEItemType, ZEAllocatorType>::GetIndex() const
 {
-	return Index;
+	return (ZESize)Index;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArrayIterator<ZEItemType, ZEAllocatorType>::Prev()
 {
-	if (Index == 0)
-		return;
-
-	Index--;
+	Index++;
+	if (Index < 0)
+		Index = -1;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArrayIterator<ZEItemType, ZEAllocatorType>::Next()
 {	
-	if ((ZESSize)Index >= (ZESSize)Array->GetCount())
-		return;
-	
 	Index++;
+	if (Index >= (ZESSize)Array->GetCount())
+		Index = (ZESSize)Array->GetCount();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
@@ -191,49 +181,41 @@ template<typename ZEItemType, typename ZEAllocatorType>
 ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::ZEArrayIteratorConst(const ZEArray<ZEItemType, ZEAllocatorType>& Array, ZESize Index)
 {
 	this->Array = &Array;
-	this->Index = Index;
+	this->Index = (ZESize)Index;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::IsBegin() const
+bool ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::IsValid() const
 {
-	return Index == 0;
+	return (Array != NULL && Index >= 0 && Index < (ZESSize)Array->GetCount());
 }
-
-template<typename ZEItemType, typename ZEAllocatorType>
-bool ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::IsEnd() const
-{
-	return (ZESSize)Index >= (ZESSize)Array->GetCount();
-} 
 
 template<typename ZEItemType, typename ZEAllocatorType>
 const ZEItemType& ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::GetItem() const
 {
-	return Array->GetItem(Index);
+	return Array->GetItem((ZESize)Index);
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 ZESize ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::GetIndex() const
 {
-	return Index;
+	return (ZESize)Index;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::Prev()
 {
-	if (Index == 0)
-		return;
-
 	Index--;
+	if (Index < 0)
+		Index = -1;
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::Next()
 {	
-	if ((ZESSize)Index >= (ZESSize)Array->GetCount())
-		return;
-
 	Index++;
+	if (Index >= Array->GetCount())
+		Index = Array->GetCount()
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>

@@ -34,14 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZETaskManager.h"
-
 #include "ZETaskPool.h"
-#include "ZEThread\ZEThread.h"
-
-ZETaskPool* ZETaskManager::GetDefaultPool()
-{
-	return &GetInstance()->DefaultPool;
-}
+#include "ZETask.h"
 
 ZETaskPool* ZETaskManager::GetRealTimePool()
 {
@@ -63,11 +57,11 @@ const ZEArray<ZETaskPool*>& ZETaskManager::GetPools()
 	return Pools;
 }
 
-ZETaskPool* ZETaskManager::GetPool(ZEInt PoolId) const
+ZETaskPool* ZETaskManager::GetPool(ZEInt PoolId)
 {
-	ze_for_each(Pool, Pools)
-		if ((*Pool)->GetId() == PoolId)
-			return &(**Pool);
+	for (ZESize I = 0; I < Pools.GetCount(); I++)
+		if (Pools[I]->GetId() == PoolId)
+			return Pools[I];
 
 	return NULL;
 }
@@ -80,24 +74,40 @@ void ZETaskManager::RegisterPool(ZETaskPool* Pool)
 	Pools.Add(Pool);
 }
 
-void ZETaskManager::UnregisterPool(ZETaskPool* Pool)
+void ZETaskManager::UnregisterPool(ZEInt PoolId)
 {
-	if (Pool == &DefaultPool ||
-		Pool == &RealTimePool ||
-		Pool == &IOPool ||
-		Pool == &ConcurrentPool)
+	if (PoolId == ZE_TPI_REAL_TIME ||
+		PoolId == ZE_TPI_CONCURENT ||
+		PoolId == ZE_TPI_IO)
 	{
 		return;
 	}
 
-	Pools.RemoveValue(Pool);
+	for (ZESize I = 0; I < Pools.GetCount(); I++)
+	{
+		if (Pools[I]->GetId() == PoolId)
+		{
+			Pools.Remove(I);
+			return;
+		}
+	}
 }
 
 ZETaskManager::ZETaskManager()
 {
-	Pools.Add(&DefaultPool);
+	RealTimePool.SetId(ZE_TPI_REAL_TIME);
+	RealTimePool.SetName("RealTime Pool");
+	RealTimePool.SetThreadCount(0);
 	Pools.Add(&RealTimePool);
+
+	IOPool.SetId(ZE_TPI_IO);
+	IOPool.SetName("IO Pool");
+	IOPool.SetThreadCount(0);
 	Pools.Add(&IOPool);
+
+	ConcurrentPool.SetId(ZE_TPI_CONCURENT);
+	ConcurrentPool.SetName("Concurrent Pool");
+	ConcurrentPool.SetThreadCount(4);
 	Pools.Add(&ConcurrentPool);
 }
 
@@ -113,6 +123,7 @@ ZETaskManager::~ZETaskManager()
 
 ZEUInt ZETaskManager::GetThreadCount()
 {
+	return 2;
 	SYSTEM_INFO SystemInfo;
 	GetSystemInfo(&SystemInfo);
 	return SystemInfo.dwNumberOfProcessors;

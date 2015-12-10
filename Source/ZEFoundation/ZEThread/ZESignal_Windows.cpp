@@ -44,13 +44,10 @@ void ZESignal::Initialize()
 {
 	if (Handle != NULL)
 		return;
-
+	
 	InitializeLock.Lock();
 
-	if (Handle != NULL)
-		return;
-
-	Handle = CreateEvent(NULL, false, false, NULL);
+	Handle = CreateEvent(NULL, true, InitialState, NULL);
 	if (Handle == NULL)
 		zeCriticalError("Can not create signal.");
 
@@ -59,12 +56,38 @@ void ZESignal::Initialize()
 
 void ZESignal::Signal()
 {
+	InitializeLock.Lock();
+
 	if (Handle == NULL)
+	{
+		InitialState = true;
+		InitializeLock.Unlock();
 		return;
+	}
 
 	if (!SetEvent(Handle))
-		zeCriticalError("Can not signal a signal.");
+		zeCriticalError("Cannot set signal.");
+	
+	InitializeLock.Unlock();
 }
+
+void ZESignal::Reset()
+{
+	InitializeLock.Lock();
+
+	if (Handle == NULL)
+	{
+		InitialState = false;
+		InitializeLock.Unlock();
+		return;
+	}
+
+	if (!ResetEvent(Handle))
+		zeCriticalError("Cannot set signal.");
+
+	InitializeLock.Unlock();
+}
+
 
 void ZESignal::Wait()
 {
@@ -93,14 +116,17 @@ bool ZESignal::Wait(ZEUInt Milliseconds)
 
 ZESignal::ZESignal()
 {
+	InitialState = false;
 	Handle = NULL;
 }
 
 ZESignal::~ZESignal()
 {
+	InitializeLock.Lock();
 	if (Handle != NULL)
 	{
 		if (!CloseHandle(Handle))
 			zeCriticalError("Can not destroy signal.");
 	}
+	InitializeLock.Unlock();
 }

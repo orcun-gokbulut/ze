@@ -39,20 +39,69 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+
+static void SetThreadName(DWORD ThreadId, LPCSTR ThreadName)
+{
+	#ifdef ZE_DEBUG_ENABLE
+		if (ThreadId == -1)
+			return;
+
+		typedef struct tagTHREADNAME_INFO
+		{
+			DWORD dwType; // must be 0x1000
+			LPCSTR szName; // pointer to name (in user addr space)
+			DWORD dwThreadID; // thread ID (-1=caller thread)
+			DWORD dwFlags; // reserved for future use, must be zero
+		} THREADNAME_INFO;
+
+		THREADNAME_INFO Info;
+		Info.dwType = 0x1000;
+		Info.szName = ThreadName;
+		Info.dwThreadID = ThreadId;
+		Info.dwFlags = 0;
+
+		__try
+		{
+			RaiseException(0x406D1388, 0, sizeof(Info) / sizeof(DWORD), (ULONG_PTR*)&Info);
+		}
+		__except(EXCEPTION_CONTINUE_EXECUTION)
+		{
+
+		}
+	#endif
+}
+
 static __declspec(thread) ZEThread* CurrentThread = NULL;
+
+inline void CloseHandleSafe(void*& Handle)
+{
+	void* Temp = Handle;
+	Handle = NULL;
+	CloseHandle(Handle);
+}
 
 DWORD WINAPI ZEThread::ThreadFunction(LPVOID Thread)
 {
 	CurrentThread = (ZEThread*)Thread;
-	CurrentThread->Status = ZE_TS_RUNNING;
 	CurrentThread->Function(CurrentThread, CurrentThread->GetParameter());
 	CurrentThread->Exit();
 	return 0;
 }
 
+ZEInt ZEThread::GetId()
+{
+	return ThreadId;
+}
+
+void ZEThread::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+	SetThreadName(ThreadId, Name);
+}
+
 void ZEThread::Run()
 {
-	if (Status == ZE_TS_SUSPENDED)
+	if (Handle != NULL)
 	{
 		ResumeThread(Handle);
 		Status = ZE_TS_RUNNING;
@@ -60,53 +109,64 @@ void ZEThread::Run()
 	}
 	else
 	{
-		if (IsAlive())
-			return;
-
-		Status = ZE_TS_STARING;
-		Handle = CreateThread(NULL, 0, ThreadFunction, this, 0, NULL);
+		Handle = CreateThread(NULL, 0, ThreadFunction, this, 0, (LPDWORD)&ThreadId);
 		if (Handle == NULL)
 			zeCriticalError("Can not create thread.");
+		SetThreadName(ThreadId, Name);
+		Status = ZE_TS_RUNNING;
 	}
+}
+
+void ZEThread::Suspend()
+{
+	if (Handle == NULL)
+		return;
+
+	Status = ZE_TS_SUSPENDED;
+	SuspendThread(Handle);
 }
 
 void ZEThread::Terminate()
 {
-	if (!IsAlive())
+	if (Handle == NULL)
 		return;
 
 	if (CurrentThread == this)
 	{
 		Exit();
-		return;
 	}
 	else
 	{
-		DWORD Result = TerminateThread(Handle, 0);
-		if (Result == -1)
-			zeCriticalError("Can not terminate thread.");
+		TerminateThread(Handle, 0);
+		Status = ZE_TS_NOT_RUNNING;
+		ThreadId = 0;
+		CloseHandleSafe(Handle);
 	}
-
-	Status = ZE_TS_TERMINATED;
 }
 
-void ZEThread::Suspend()
+void ZEThread::Exit()
 {
-	if (IsAlive() || Status == ZE_TS_SUSPENDED)
+	if (Handle == NULL)
 		return;
-	
-	Status = ZE_TS_SUSPENDED;
-	SuspendThread(Handle);
+
+	if (CurrentThread == this || Status == ZE_TS_SUSPENDED)
+	{
+		ExitThread(EXIT_SUCCESS);
+		Status = ZE_TS_NOT_RUNNING;
+		ThreadId = 0;
+		CloseHandleSafe(Handle);
+	}
+	else if (Status == ZE_TS_RUNNING)
+	{
+		Status = ZE_TS_EXITING;
+	}
 }
 
 void ZEThread::Wait()
 {
-	zeCheckError(CurrentThread != this, ZE_VOID, "Cannot call own ZEThread::Wait function. Thread can not wait itself.");
+	zeCheckError(CurrentThread == this, ZE_VOID, "Cannot call own ZEThread::Wait function. Thread can not wait itself.");
 
-	if (!IsAlive())
-		return;
-
-	if (Status == ZE_TS_TERMINATED)
+	if (Handle == NULL)
 		return;
 
 	DWORD Result = WaitForSingleObject(Handle, INFINITE);
@@ -114,70 +174,17 @@ void ZEThread::Wait()
 		zeCriticalError("Can not wait thread.");
 }
 
-bool ZEThread::Wait(ZEUInt Milliseconds)
-{
-	zeCheckError(CurrentThread != this, false, "Cannot call own ZEThread::Wait function. Thread can not wait itself.");
-
-	if (!IsAlive())
-		return false;
-
-	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
-	if (Result != WAIT_OBJECT_0)
-		return false;
-
-	return true;
-}
-
-bool ZEThread::ControlPoint()
-{
-	zeCheckError(CurrentThread != this, false, "Cannot call another thread's ZEThread::ControlPoint function. Only owner thread can call it's own ControlPoint function.");
-
-	if (Status == ZE_TS_RUNNING)
-	{
-		return true;
-	}
-	else if (Status == ZE_TS_SUSPENDED)
-	{
-		Suspend();
-		return ControlPoint();
-	}
-
-	return false;
-}
-
-void ZEThread::Exit()
-{
-	if (!IsAlive())
-		return;
-
-	if (CurrentThread == this)
-	{
-		Status = ZE_TS_EXITING;
-		ExitThread(EXIT_SUCCESS);
-		CurrentThread->Status = ZE_TS_DONE;
-	}
-	else
-	{
-		Status = ZE_TS_EXITING;
-	}
-}
-
 ZEThread::ZEThread()
 {
 	Handle = NULL;
-	Status = ZE_TS_NONE;
+	Status = ZE_TS_NOT_RUNNING;
+	Parameter = NULL;
+	ThreadId = 0;
 }
 
 ZEThread::~ZEThread()
 {
-	Exit();
-
-	if (Handle != NULL)
-	{
-		if (!CloseHandle(Handle))
-			zeCriticalError("Cannot close handle of the thread.");
-		Handle = NULL;
-	}
+	Terminate();
 }
 
 ZEThread* ZEThread::GetCurrentThread()
