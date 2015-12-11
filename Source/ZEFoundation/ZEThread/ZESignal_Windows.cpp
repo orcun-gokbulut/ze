@@ -34,19 +34,65 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESignal.h"
+
 #include "ZEError.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
+void ZESignal::Initialize()
+{
+	if (Handle != NULL)
+		return;
+	
+	InitializeLock.Lock();
+
+	Handle = CreateEvent(NULL, true, InitialState, NULL);
+	if (Handle == NULL)
+		zeCriticalError("Can not create signal.");
+
+	InitializeLock.Unlock();
+}
+
 void ZESignal::Signal()
 {
+	InitializeLock.Lock();
+
+	if (Handle == NULL)
+	{
+		InitialState = true;
+		InitializeLock.Unlock();
+		return;
+	}
+
 	if (!SetEvent(Handle))
-		zeCriticalError("Can not signal a signal.");
+		zeCriticalError("Cannot set signal.");
+	
+	InitializeLock.Unlock();
 }
+
+void ZESignal::Reset()
+{
+	InitializeLock.Lock();
+
+	if (Handle == NULL)
+	{
+		InitialState = false;
+		InitializeLock.Unlock();
+		return;
+	}
+
+	if (!ResetEvent(Handle))
+		zeCriticalError("Cannot set signal.");
+
+	InitializeLock.Unlock();
+}
+
 
 void ZESignal::Wait()
 {
+	Initialize();
+
 	DWORD Result = WaitForSingleObject(Handle, INFINITE);
 	if (Result != WAIT_OBJECT_0)
 		zeCriticalError("Failed to wait the signal.");
@@ -54,6 +100,8 @@ void ZESignal::Wait()
 
 bool ZESignal::Wait(ZEUInt Milliseconds)
 {
+	Initialize();
+
 	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
 	if (Result != WAIT_OBJECT_0)
 	{
@@ -68,21 +116,17 @@ bool ZESignal::Wait(ZEUInt Milliseconds)
 
 ZESignal::ZESignal()
 {
-	Handle = CreateEvent(NULL, false, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create signal.");
-}
-
-ZESignal::ZESignal(const ZESignal& Other)
-{
-	zeDebugCheckWarning(true, "Signal can not be copied. Creating new signal instead.");
-	Handle = CreateEvent(NULL, false, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create signal.");
+	InitialState = false;
+	Handle = NULL;
 }
 
 ZESignal::~ZESignal()
 {
-	if (!CloseHandle(Handle))
-		zeCriticalError("Can not destroy signal.");
+	InitializeLock.Lock();
+	if (Handle != NULL)
+	{
+		if (!CloseHandle(Handle))
+			zeCriticalError("Can not destroy signal.");
+	}
+	InitializeLock.Unlock();
 }

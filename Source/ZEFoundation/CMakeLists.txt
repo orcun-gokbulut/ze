@@ -51,7 +51,6 @@ add_subdirectory(ZESpatial)
 add_subdirectory(ZESerialPort)
 add_subdirectory(ZETest)
 add_subdirectory(ZEThread)
-add_subdirectory(ZETask)
 add_subdirectory(ZESocket)
 add_subdirectory(ZEML)
 add_subdirectory(ZERegEx)
@@ -100,7 +99,7 @@ ze_add_source(ZEInitializable.h			Sources Headers)
 
 ze_add_library(TARGET ZEFoundation
 	COMBINE
-	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZETask ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta
+	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 
