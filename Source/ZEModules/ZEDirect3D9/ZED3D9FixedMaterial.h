@@ -73,6 +73,7 @@ class ZED3D9FixedMaterial : public ZEFixedMaterial, private ZED3D9ComponentBase
 		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual bool					SetupShadowPass() const;	
+		virtual bool					CleanUp(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 
 		virtual void					UpdateMaterial();
 

@@ -40,6 +40,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEValue.h"
 #include "ZEDS/ZEFastDelegate.h"
+#include "ZEDS/ZEDelegate.h"
 
 enum ZEOptionAttribute
 {
@@ -57,8 +58,8 @@ enum ZEOptionType
 
 class ZEOption;
 
-typedef fastdelegate::FastDelegate2<ZEOption*, bool&, void> ZEOptionsChangingEvent;
-typedef fastdelegate::FastDelegate1<ZEOption*, void> ZEOptionsChangedEvent;
+typedef ZEDelegate<void (ZEOption*, bool&)> ZEOptionsChangingEvent;
+typedef ZEDelegate<void (ZEOption*)> ZEOptionsChangedEvent;
 
 class ZEOptionSection;
 class ZEOption

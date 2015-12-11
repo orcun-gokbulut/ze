@@ -396,10 +396,25 @@ void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (!BoundingBoxIsUserDefined)
-		CalculateBoundingBox();
+	if (!IsStaticModel || !StaticCalculationsDone)
+	{
+		if (!BoundingBoxIsUserDefined)
+			CalculateBoundingBox();
+
+		StaticCalculationsDone = IsStaticModel;
+	}
 
 	return ZEEntity::GetWorldBoundingBox();
+}
+
+void ZEModel::SetStaticModel(bool Value)
+{
+	IsStaticModel = Value;
+}
+
+bool ZEModel::GetStaticModel() const
+{
+	return IsStaticModel;
 }
 
 void ZEModel::SetPosition(const ZEVector3& NewPosition)
@@ -576,6 +591,8 @@ ZEModel::ZEModel()
 	ParentlessBoneBody = NULL;
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
+	IsStaticModel = false;
+	StaticCalculationsDone = false;
 
 	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
@@ -620,4 +637,3 @@ ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
 }
-

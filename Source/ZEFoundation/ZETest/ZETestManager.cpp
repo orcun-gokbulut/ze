@@ -76,7 +76,7 @@ bool ZETestManager::RunTests()
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(false);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(false);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(false);
-	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_ERROR);
+	ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_ERROR);
 
 	bool Result = true;
 	for (ZESize I = 0; I < TestSuiteCount; I++)
@@ -100,7 +100,7 @@ bool ZETestManager::RunTests()
 		printf("%s : error T0003: Test package failed. Package Name : \"%s\". \r\n", GetPackageName(), GetPackageName());
 	}
 
-	ZELog::GetInstance()->SetMinimumLogLevel(ZE_LOG_INFO);
+	ZELog::GetInstance()->SetMinimumLevel(ZE_LOG_INFO);
 	ZEError::GetInstance()->SetBreakOnDebugCheckEnabled(true);
 	ZEError::GetInstance()->SetBreakOnErrorEnabled(true);
 	ZEError::GetInstance()->SetBreakOnWarningEnabled(true);

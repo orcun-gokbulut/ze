@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
-#include "ZEModelMeshLod.h"
+#include "ZEModelMeshLOD.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZERenderCommand.h"
 #include "ZEModelResource.h"
@@ -53,9 +53,8 @@ ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 class ZEModelMesh : public ZEObject
 {
 	friend class ZEModel;
-
+	friend class ZEModelMeshLOD;
 	ZE_OBJECT
-
 	private:
 		ZEModel*							Owner;
 
@@ -90,6 +89,8 @@ class ZEModelMesh : public ZEObject
 		bool								Visible;		
 
 		ZEArray<ZEModelMeshLOD>				LODs;
+
+		ZEArray<ZEPlane>					ClippingPlanes;
 
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
 		void								OnTransformChanged();
@@ -146,6 +147,8 @@ class ZEModelMesh : public ZEObject
 		void								SetAutoLOD(bool Enabled);
 		bool								GetAutoLOD();
 
+		ZEArray<ZEModelMeshLOD>&			GetLODs();
+
 		void								SetVisible(bool Visible);
 		bool								GetVisible();
 
@@ -154,6 +157,13 @@ class ZEModelMesh : public ZEObject
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled() const;
+
+		void								SetClippingPlaneCount(ZESize Count);
+		ZESize								GetClippingPlaneCount();
+		void								SetClippingPlane(ZESize Index, const ZEPlane& Plane);
+		const ZEPlane&						GetClippingPlane(ZESize Index);
+		void								AddClippingPlane(const ZEPlane& Plane);
+		void								RemoveClippingPlane(const ZEPlane& Plane);
 
 		void								SetCustomDrawOrderEnabled(bool Enabled);
 		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);

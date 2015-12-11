@@ -122,7 +122,7 @@ void ZEOptionSection::CommitChanges()
 			(const char*)this->GetName());
 	}
 	else
-		if (!OnChanged.empty())
+		if (!OnChanged.IsNull())
 			OnChanged(NULL);
 }
 

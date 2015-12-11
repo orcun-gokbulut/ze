@@ -55,26 +55,32 @@ void main()
 
 	ZETEPatchDatabase PatchDatabase;
 	PatchDatabase.SetBlockSize(1024);
-	PatchDatabase.SetPixelType(ZETE_PT_ELEVATION);
-	PatchDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Patches");
+// 	PatchDatabase.SetPixelType(ZETE_PT_ELEVATION);
+// 	PatchDatabase.SetPath("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-CustATrainSimulator/RunDir/Resources/ZETrainSimulator/Terrain/Patches");
+	PatchDatabase.SetPixelType(ZETE_PT_COLOR);
+	PatchDatabase.SetPath("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-CustATrainSimulator/RunDir/Resources/ZETrainSimulator/Terrain/Patches");
 	Procesor.SetPatchDatabase(&PatchDatabase);
 
 	ZETEBlockDatabase BlockDatabase;
 	BlockDatabase.SetBlockSize(1024);
-	BlockDatabase.SetPixelType(ZETE_PT_ELEVATION);
-	BlockDatabase.SetPath("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Layers/Elevation");
+// 	BlockDatabase.SetPixelType(ZETE_PT_ELEVATION);
+// 	BlockDatabase.SetPath("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-CustATrainSimulator/RunDir/Resources/ZETrainSimulator/Terrain/Layers/Elevation");
+	BlockDatabase.SetPixelType(ZETE_PT_COLOR);
+	BlockDatabase.SetPath("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-CustATrainSimulator/RunDir/Resources/ZETrainSimulator/Terrain/Layers/Color");
 	Procesor.SetBlockDatabase(&BlockDatabase);
 	
 	ZETEPatch* Patch;
 	Patch = new ZETEPatchFile();
-	Patch->SetSource("C:/Users/orcun.gokbulut/Desktop/ZinekEngine/ZE/branches/v0.6.1-NewTerrain/RunDir/Resources/Terrain/Patches/world_elevation.tif");
+	//Patch->SetSource("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-CustATrainSimulator/RunDir/Resources/ZETrainSimulator/Terrain/Patches/demo_elev_1m_merge_v3.tif");
+	Patch->SetSource("C:/Users/Egemen.Barutcu/Desktop/ZE/branches/v0.6.2-CustATrainSimulator/RunDir/Resources/ZETrainSimulator/Terrain/Patches/demo_altlik_1_2.tif");
 	Patch->SetPriority(0);
-	Patch->SetPositionX(200.5);
-	Patch->SetPositionY(200.5);
-	Patch->SetEndX(26000);
-	Patch->SetEndY(8000);
+	Patch->SetPositionX(0);
+	Patch->SetPositionY(0);
+	Patch->SetEndX(11072);
+	Patch->SetEndY(9399);
 	PatchDatabase.AddPatch(Patch);
 
+	Procesor.SetRegenerate(true);
 	Procesor.Generate();
 
 	BlockDatabase.SaveDatabase();

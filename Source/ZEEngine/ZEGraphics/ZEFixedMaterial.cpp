@@ -1489,7 +1489,7 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetTransparancyMode((ZEMaterialTransparancyMode)ConfigurationNode.ReadInt32("TransparencyMode"));
 
 		SetAmbientEnabled(ConfigurationNode.ReadBoolean("AmbientEnabled"));
-		SetGlobalAmbientEnabled(ConfigurationNode.ReadBoolean("GlobalAmbientEnabled"));
+		SetGlobalAmbientEnabled(ConfigurationNode.ReadBoolean("GlobalAmbientEnabled", true));
 		SetDiffuseEnabled(ConfigurationNode.ReadBoolean("DiffuseEnabled"));
 		SetNormalMapEnabled(ConfigurationNode.ReadBoolean("NormalMapEnabled"));
 		SetParallaxMapEnabled(ConfigurationNode.ReadBoolean("ParallaxMapEnabled"));

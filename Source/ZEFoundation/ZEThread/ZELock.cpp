@@ -58,21 +58,8 @@ static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 
 bool ZELock::IsLocked()
 {
-    //CurrentNumber = NextNumber + NumberOfLocks + 1;
     return (CurrentNumber != NextNumber + 1);
 }
-/*
-bool ZELock::TryLock()
-{
-	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
-
-	if (MyNumber != CurrentNumber)
-		return false;
-
-	CurrentNumber = MyNumber;
-
-	return true;
-}*/
 
 void ZELock::Wait()
 {
@@ -93,14 +80,13 @@ void ZELock::Lock()
 	#endif
 }
 
-bool ZELock::Unlock()
+void ZELock::Unlock()
 {
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_releasing(this);
 	#endif
 
 	CurrentNumber++;
-	return true;
 }
 
 ZELock ZELock::operator=(const ZELock& Lock)

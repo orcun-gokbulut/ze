@@ -45,7 +45,7 @@ void ZELNLogModule::LogCallback(const char* Module, ZELogType Type, const char* 
 {
 	ZELNLogModule* Widget = (ZELNLogModule*)ExtraParameters;
 
-	const char* TypeString = ZELog::GetLogTypeString(Type);
+	const char* TypeString = ZELog::UtilityGetLogTypeString(Type);
 
 	Widget->GetForm()->txtConsole->appendHtml(
 		QString("[%1] <b>%2</b>: %3")
@@ -62,7 +62,8 @@ bool ZELNLogModule::InitializeSelf()
 
 	Widget = new ZELNLogWidget();
 	
-	ZELog::GetInstance()->SetCallback(&LogCallback, this);
+	ZELog::GetInstance()->SetCallbackParameter(this);
+	ZELog::GetInstance()->SetCallback(&LogCallback);
 	
 	return true;
 }
