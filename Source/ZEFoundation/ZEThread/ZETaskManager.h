@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEJobManager.cpp
+ Zinek Engine - ZETaskManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,38 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEJobManager.h"
-#include "ZEJob.h"
+#pragma once
 
-ZEJobManager::ZEJobManager()
+#include "ZEDS/ZEArray.h"
+#include "ZETaskPool.h"
+#include "ZEPointer/ZEPointer.h"
+
+class ZETask;
+class ZEThread;
+
+class ZETaskManager
 {
-	Status = ZE_JMS_NONE;
-}
+	private:
+		ZEArray<ZETaskPool*>			Pools;
 
-ZEJobManager::~ZEJobManager()
-{
+		ZETaskPool						DefaultPool;
+		ZETaskPool						RealTimePool;
+		ZETaskPool						IOPool;
+		ZETaskPool						ConcurrentPool;
 
-}
+										ZETaskManager();
+										~ZETaskManager();
 
-ZEJobManagerStatus ZEJobManager::GetStatus()
-{
-	return Status;
-}
+	public:
+		static ZETaskPool*				GetRealTimePool();
+		static ZETaskPool*				GetIOPool();
+		static ZETaskPool*				GetConcurrentPool();
+		static ZEUInt					GetThreadCount();
 
-void ZEJobManager::AddJob(ZEJob* Job)
-{
-	zeDebugCheck(Jobs.Exists(Job), "Job is already exists in jobs list.");
-	Jobs.Add(Job);
-}
+		const ZEArray<ZETaskPool*>&		GetPools();
+		ZETaskPool*						GetPool(ZEInt PoolId);
+		void							RegisterPool(ZETaskPool* Pool);
+		void							UnregisterPool(ZEInt PoolId);
 
-void ZEJobManager::RemoveJob(ZEJob* Job)
-{
-	zeDebugCheck(!Jobs.Exists(Job), "Job is not exist in jobs list.");
-	Jobs.RemoveValue(Job);
-}
-
-ZEJob* ZEJobManager::GetJob(const ZEString& Name)
-{
-	for (ZESize I = 0; I < Jobs.GetCount(); I++)
-		if (Jobs[I]->GetName() == Name)
-			return Jobs[I];
-
-	return NULL;
-}
-
-void ZEJobManager::RunJobs()
-{
-
-}
-
-ZEJobManager* ZEJobManager::GetInstance()
-{
-	static ZEJobManager Instnace;
-	return &Instnace;
-}
+		static ZETaskManager*			GetInstance();
+};

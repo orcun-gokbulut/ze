@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEParallel.h
+ Zinek Engine - ZEIterator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,94 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TASK_H__
-#define __ZE_TASK_H__
+#pragma once
 
-#include "ZELock.h"
-#include "ZETypes.h"
+#define ze_for_each(Variable, Container) for (auto Variable = Container.GetIterator(); Variable.IsValid(); ++Variable)
+#define ze_for_each_reverse(Variable, Container) for (auto Variable = Container.GetIteratorEnd(); Variable.IsValid(); --Variable)
 
-class ZEListItem<typename ZEType>
+template<typename ZEItemType>
+class ZEIterator
 {
-	ZEType Type;
-};
-template <typename Type>
-ZEList
+	public:
+		bool					IsValid() const;
 
+		ZEItemType&				GetItem() const;
+		void					Prev();
+		void					Next();
 
-class ZEParallelPerItemTask : public ZETask
-{
-	friend class ZEParallelPerItem;
-	private:
-		ZEParallelPerItem* OwnerTask;
-		ZELock Lock;
+		bool					operator==(const ZEIterator& Iterator) const;
 
-		void Function()
-		{
-			while(true)
-			{
-				int Item = OwnerTask->GetNextIndex();
-				if (Item == -1)
-				{
-					Lock->Unlock();
-					break;
-				}
-				else
-				{
-					// Put code in here !!!
-				}
-			}
-		}
+		ZEIterator&				operator--();
+		ZEIterator&				operator++();
 
-		ZEParallelPerItemTask()
-		{
-			Lock->Lock();
-		}
+		ZEItemType&				operator*() const;
+		ZEItemType&				operator->() const;
 };
 
-class ZEParallelPerItem : public ZETask
+template<typename ZEItemType>
+class ZEIteratorConst
 {
-	private:
-		ZELock RootTaskLock;
-		ZESize Index;
+	public:
+		bool					IsValid() const;
 
-		ZESSize GetNextIndex()
-		{
-			if (Index >= Count)
-				return -1;
+		const ZEItemType&		GetItem() const;
+		void					Prev();
+		void					Next();
 
-			RootTaskLock->Lock();
-			Index++;
-			RootTaskLock->Unlock();
-			return Index - 1;
+		bool					operator==(const ZEIteratorConst& Iterator) const;
 
-		}
+		ZEIteratorConst&		operator--();
+		ZEIteratorConst&		operator++();
 
-		void Function()
-		{
-			ZESize ThreadCount = 4;
-			ZEParallelPerItemTask[16] SubTasks;
-			// Create Tasks
-		
-			for (ZESize I = 0; I < ThreadCount; I++)
-				SubTasks[I]->Lock->Wait();
-
-		}
+		const ZEItemType&		operator*() const;
+		const ZEItemType&		operator->() const;
 };
-
-enum ZETaskStatus
-{
-	ZE_TS_NONE,
-	ZE_TS_RUNNING,
-	ZE_TS_WAITING,
-	ZE_TS_DONE
-};
-
-class ZETask
-{
-
-	static ZETask* GetCurrentTask(); // Returns Task
-};
-
-// Thread Manager
-
-#endif

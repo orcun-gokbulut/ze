@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEArrayIterators.cpp
+ Zinek Engine - ZETaskThread.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,4 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEArrayIterators.h"
+#include "ZETaskThread.h"
+
+#include "ZETask.h"
+
+void ZETaskThread::SetInstanceIndex(ZEUInt InstanceIndex)
+{
+	this->InstanceIndex = InstanceIndex;
+}
+ZEUInt ZETaskThread::GetInstanceIndex()
+{
+	return InstanceIndex;
+}
+
+void ZETaskThread::SetTask(ZETask* Task)
+{
+	this->Task = Task;
+}
+
+ZETask* ZETaskThread::GetTask()
+{
+	return Task;
+}
+
+ZETaskThread::ZETaskThread() : TaskLink(this)
+{
+	Task = NULL;
+	InstanceIndex = 0;
+}

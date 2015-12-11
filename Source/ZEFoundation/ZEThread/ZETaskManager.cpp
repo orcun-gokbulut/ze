@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEJob.h
+ Zinek Engine - ZETaskManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,106 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_JOB_H__
-#define __ZE_JOB_H__
+#include "ZETaskManager.h"
+#include "ZETaskPool.h"
+#include "ZETask.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-
-enum ZEJobPriority
+ZETaskPool* ZETaskManager::GetRealTimePool()
 {
-	ZE_JP_HIGH,
-	ZE_JP_MEDIUM,
-	ZE_JP_LOW
-};
+	return &GetInstance()->RealTimePool;
+}
 
-enum ZEJobStatus
+ZETaskPool* ZETaskManager::GetIOPool()
 {
-	ZE_JS_NONE,
-	ZE_JS_RUNNING,
-	ZE_JS_WAITING,
-	ZE_JS_DONE
-};
+	return &GetInstance()->IOPool;
+}
 
-class ZEJob
+ZETaskPool* ZETaskManager::GetConcurrentPool()
 {
-	private:
-		ZEString			Name;
-		ZEJobPriority		Priority;
-		ZEJobStatus			Status;
-		bool				Recursive;
-		ZEArray<ZEString>	DependentJobs;
+	return &GetInstance()->ConcurrentPool;
+}
 
-	protected:
-		virtual void		Function() = 0;
+const ZEArray<ZETaskPool*>& ZETaskManager::GetPools()
+{
+	return Pools;
+}
 
-	public:
-		const ZEString&		GetName();
-		void				SetName(const ZEString& Name);
+ZETaskPool* ZETaskManager::GetPool(ZEInt PoolId)
+{
+	for (ZESize I = 0; I < Pools.GetCount(); I++)
+		if (Pools[I]->GetId() == PoolId)
+			return Pools[I];
 
-		ZEJobStatus			GetStatus();
+	return NULL;
+}
 
-		void				SetPriority(ZEJobPriority Priority);
-		ZEJobPriority		GetPriority();
+void ZETaskManager::RegisterPool(ZETaskPool* Pool)
+{
+	if (Pools.Exists(Pool))
+		return;
 
-		void				SetRecursive(bool Enabled);
-		bool				GetRecursive();
+	Pools.Add(Pool);
+}
 
-		void				AddDependentJob(const ZEString& JobName);
-		void				RemoveDependentJob(const ZEString& JobName);
+void ZETaskManager::UnregisterPool(ZEInt PoolId)
+{
+	if (PoolId == ZE_TPI_REAL_TIME ||
+		PoolId == ZE_TPI_CONCURENT ||
+		PoolId == ZE_TPI_IO)
+	{
+		return;
+	}
 
-		void				Reset();
-};
+	for (ZESize I = 0; I < Pools.GetCount(); I++)
+	{
+		if (Pools[I]->GetId() == PoolId)
+		{
+			Pools.Remove(I);
+			return;
+		}
+	}
+}
+
+ZETaskManager::ZETaskManager()
+{
+	RealTimePool.SetId(ZE_TPI_REAL_TIME);
+	RealTimePool.SetName("RealTime Pool");
+	RealTimePool.SetThreadCount(0);
+	Pools.Add(&RealTimePool);
+
+	IOPool.SetId(ZE_TPI_IO);
+	IOPool.SetName("IO Pool");
+	IOPool.SetThreadCount(0);
+	Pools.Add(&IOPool);
+
+	ConcurrentPool.SetId(ZE_TPI_CONCURENT);
+	ConcurrentPool.SetName("Concurrent Pool");
+	ConcurrentPool.SetThreadCount(4);
+	Pools.Add(&ConcurrentPool);
+}
+
+ZETaskManager::~ZETaskManager()
+{
+
+}
+
+#ifdef ZE_PLATFORM_WINDOWS
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+ZEUInt ZETaskManager::GetThreadCount()
+{
+	return 2;
+	SYSTEM_INFO SystemInfo;
+	GetSystemInfo(&SystemInfo);
+	return SystemInfo.dwNumberOfProcessors;
+}
 
 #endif
+
+ZETaskManager* ZETaskManager::GetInstance()
+{
+	static ZETaskManager TaskManager;
+	return &TaskManager;
+}
