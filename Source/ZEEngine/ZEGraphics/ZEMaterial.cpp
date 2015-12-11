@@ -100,6 +100,11 @@ bool ZEMaterial::SetupShadowPass() const
 	return false;
 }
 
+bool ZEMaterial::CleanUp(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
+{
+	return true;
+}
+
 void ZEMaterial::UpdateMaterial()
 {
 

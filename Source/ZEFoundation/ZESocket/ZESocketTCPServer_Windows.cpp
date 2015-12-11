@@ -42,6 +42,11 @@ ZESocketTCPStatus ZESocketTCPServer::GetStatus()
 	return Status;
 }
 
+SOCKET_TYPE ZESocketTCPServer::GetSocket()
+{
+	return Socket;
+}
+
 void ZESocketTCPServer::Close()
 {
 	if (Socket != NULL)

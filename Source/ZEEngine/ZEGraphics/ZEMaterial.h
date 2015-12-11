@@ -112,7 +112,8 @@ class ZEMaterial : public ZEObject
 		virtual bool					SetupPreZPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual bool					SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 		virtual bool					SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
-		virtual bool					SetupShadowPass() const;	
+		virtual bool					SetupShadowPass() const;
+		virtual bool					CleanUp(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const;
 
 		virtual void					UpdateMaterial();
 

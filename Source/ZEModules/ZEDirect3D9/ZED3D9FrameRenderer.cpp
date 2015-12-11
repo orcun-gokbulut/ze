@@ -625,6 +625,8 @@ void ZED3D9FrameRenderer::DoGBufferPass()
 		PumpStreams(RenderCommand);
 		GeometryCount++;
 
+		RenderCommand->Material->CleanUp(this, RenderCommand);
+
 		zeProfilerEnd();
 	}
 	
@@ -760,6 +762,8 @@ void ZED3D9FrameRenderer::DoForwardPass()
 			zeCriticalError("Can not set material's Forward pass. (Material Type : \"%s\")", RenderCommand->Material->GetClass()->GetName());
 		PumpStreams(RenderCommand);
 		
+		RenderCommand->Material->CleanUp(this, RenderCommand);
+
 		zeProfilerEnd();
 	}
 

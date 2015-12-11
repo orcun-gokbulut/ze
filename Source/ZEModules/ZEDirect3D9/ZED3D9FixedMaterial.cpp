@@ -184,6 +184,32 @@ void ZED3D9FixedMaterial::SetTextureStage(ZEUInt Id, ZETextureAddressMode Addres
 
 }
 
+static void SetupClippingPlanes(LPDIRECT3DDEVICE9 Device, const ZEMatrix4x4& WorldViewTransform, const ZEMatrix4x4& ProjTransform, const ZEArray<ZEPlane>& Planes)
+{
+	if (Planes.GetCount() == 0)
+		return;
+
+	for (ZESize I = 0; I < Planes.GetCount(); I++)
+	{
+		ZEPlane Plane;
+		ZEMatrix4x4::Transform(Plane.p, WorldViewTransform, Planes[I].p);
+		ZEMatrix4x4::Transform3x3(Plane.n, WorldViewTransform, Planes[I].n.Normalize());
+		
+		ZEVector4 Vector;
+		ZEPlane::ToABCD(Plane, Vector.x, Vector.y, Vector.z, Vector.w);
+		
+		ZEVector4 NewVector;
+		NewVector.x = Vector.x / ProjTransform.M11;
+		NewVector.y = Vector.y / ProjTransform.M22;
+		NewVector.z = Vector.w / ProjTransform.M34;
+		NewVector.w = Vector.z  - (Vector.w * ProjTransform.M33) / ProjTransform.M34;
+
+		Device->SetClipPlane(I, (float*)&NewVector);
+	}
+
+	Device->SetRenderState(D3DRS_CLIPPLANEENABLE, (ZEInt)(1 << Planes.GetCount()) - 1);
+}
+
 bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
 {
 	// Update material if its changed. (Recompile shaders, etc.)
@@ -315,6 +341,8 @@ bool ZED3D9FixedMaterial::SetupGBufferPass(ZEFrameRenderer* Renderer, ZERenderCo
 		SetTextureStage(15, DetailNormalMapAddressModeU, DetailNormalMapAddressModeV);
 		GetDevice()->SetTexture(15, ((ZED3D9Texture2D*)DetailNormalMap)->Texture);
 	}
+
+	SetupClippingPlanes(GetDevice(), WorldViewMatrix, Camera->GetProjectionTransform(), RenderCommand->ClippingPlanes);
 
 	GetDevice()->SetPixelShader(GBufferPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(GBufferPassVertexShader->GetVertexShader());
@@ -515,6 +543,8 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 		GetDevice()->SetTexture(15, ((ZED3D9Texture2D*)DetailNormalMap)->Texture);
 	}
 
+	SetupClippingPlanes(GetDevice(), WorldViewMatrix, Camera->GetProjectionTransform(), RenderCommand->ClippingPlanes);
+
 	GetDevice()->SetPixelShader(ForwardPassPixelShader->GetPixelShader());
 	GetDevice()->SetVertexShader(ForwardPassVertexShader->GetVertexShader());
 	
@@ -524,6 +554,14 @@ bool ZED3D9FixedMaterial::SetupForwardPass(ZEFrameRenderer* Renderer, ZERenderCo
 bool ZED3D9FixedMaterial::SetupShadowPass() const
 {
 	return false;
+}
+
+bool ZED3D9FixedMaterial::CleanUp(ZEFrameRenderer* Renderer, ZERenderCommand* RenderCommand) const
+{
+	if (RenderCommand->ClippingPlanes.GetCount() != 0)
+		GetDevice()->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE);
+
+	return true;
 }
 
 void ZED3D9FixedMaterial::UpdateMaterial()
