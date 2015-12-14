@@ -38,37 +38,31 @@
 
 #include "ZERNScreenCover.hlsl"
 
-Texture2D Input : register(t0);
-
-SamplerState ZERNFiltering_SamplerLinear
+cbuffer ZERNFiltering_Constants					: register(b8)
 {
-	Filter = MIN_MAG_MIP_LINEAR;
-    AddressU = CLAMP;
-    AddressV = CLAMP;
+	int			ZERNFiltering_KernelSize;
+	int3		ZERNFiltering_Reserved;
+	float4		ZERNFiltering_KernelValues[64];
 };
 
-cbuffer ZERNFiltering_Constants : register(b8)
-{
-	int		ZERNFiltering_KernelSize;
-	int3	ZERNFiltering_Reserved;
-	float4	ZERNFiltering_KernelValues[64];
-};
+SamplerState	ZERNFiltering_SamplerPointClamp	: register(s0);
+Texture2D		ZERNFiltering_InputTexture		: register(t5);
 
 float4 ZERNFiltering_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
 {
 	float4 ResultColor = {0.0f, 0.0f, 0.0f, 1.0f};
 	float2 ScreenSize;
-	Input.GetDimensions(ScreenSize.x, ScreenSize.y);
+	ZERNFiltering_InputTexture.GetDimensions(ScreenSize.x, ScreenSize.y);
 	float2 TexelOffset = 1.0f / ScreenSize;
 	float2 TexCoord = PositionViewport.xy * TexelOffset;
 	
 	for(int I = 0; I < ZERNFiltering_KernelSize; ++I)
 	{
-		float4 SampleColor = Input.Sample(ZERNFiltering_SamplerLinear, TexCoord + ZERNFiltering_KernelValues[I].xy * TexelOffset);
+		float4 SampleColor = ZERNFiltering_InputTexture.Sample(ZERNFiltering_SamplerPointClamp, TexCoord + ZERNFiltering_KernelValues[I].xy * TexelOffset);
 		ResultColor += SampleColor * ZERNFiltering_KernelValues[I].w;
 	}
 	
-	return ResultColor;
+	return saturate(ResultColor);
 }
 
 #endif

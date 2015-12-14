@@ -63,6 +63,10 @@ bool ZERNFilter::InitializeSelf()
 
 	DirtyFlags.RaiseAll();
 
+	SamplerPointClamp.SetMinFilter(ZEGR_TFM_POINT);
+	SamplerPointClamp.SetMagFilter(ZEGR_TFM_POINT);
+	SamplerPointClamp.SetMipFilter(ZEGR_TFM_POINT);
+
 	return Update();
 }
 
@@ -196,9 +200,16 @@ bool ZERNFilter::UpdateRenderState()
 		return true;
 
 	ZEGRRenderState RenderState;
+
+	ZEGRDepthStencilState DepthStencilState;
+	DepthStencilState.SetDepthTestEnable(false);
+	DepthStencilState.SetDepthWriteEnable(false);
+
+	RenderState.SetDepthStencilState(DepthStencilState);
+
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
-	RenderState.SetPrimitiveType(ZEGRPrimitiveType::ZEGR_PT_TRIANGLE_LIST);
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set render state.");
 
@@ -229,7 +240,8 @@ void ZERNFilter::Process(ZEGRContext* Context)
 	if(!Update())
 		return;
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, Input);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointClamp);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, Input);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);

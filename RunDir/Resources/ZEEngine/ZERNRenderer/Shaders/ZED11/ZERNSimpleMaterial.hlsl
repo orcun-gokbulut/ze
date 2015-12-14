@@ -36,28 +36,28 @@
 #ifndef __ZERN_SIMPLE_MATERIAL_H__
 #define __ZERN_SIMPLE_MATERIAL_H__
 
-#include "ZERNView.hlsl"
-#include "ZERNShaderSlots.hlsl"
+#include "ZERNTransformations.hlsl"
 
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
-cbuffer ZERNSimpleMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNSimpleMaterial_Constants						: register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
-	float4 	ZERNSimpleMaterial_Color;
-	bool 	ZERNSimpleMaterial_EnableTexture;
-	float	ZERNSimpleMaterial_Reserved0;
-	bool 	ZERNSimpleMaterial_EnableVertexColor;
-	float	ZERNSimpleMaterial_Reserved1;
+	float4			ZERNSimpleMaterial_Color;
+	bool			ZERNSimpleMaterial_EnableTexture;
+	float			ZERNSimpleMaterial_Reserved0;
+	bool			ZERNSimpleMaterial_EnableVertexColor;
+	float			ZERNSimpleMaterial_Reserved1;
 };
 
-cbuffer ZERNSimpleMaterial_InstanceConstants : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
+cbuffer ZERNSimpleMaterial_InstanceConstants				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	float4x4 ZERNSimpleMaterial_WorldTransform;
+	float4x4		ZERNSimpleMaterial_WorldTransform;
 };
 
-sampler		ZERNSimpleMaterial_Sampler			: register(s0);
-Texture2D<float4> ZERNSimpleMaterial_Texture	: register(t0);
+SamplerState		ZERNSimpleMaterial_Sampler				: register(s0);
+
+Texture2D<float4>	ZERNSimpleMaterial_Texture				: register(t0);
 
 
 // INPUT OUTPUTS
@@ -65,24 +65,24 @@ Texture2D<float4> ZERNSimpleMaterial_Texture	: register(t0);
 
 struct ZERNSimpleMaterial_VSInput 
 {
-	float3 Position			: POSITION0;
-	float2 Textcoord		: TEXCOORD0;
-	float3 Normal			: NORMAL0;
-	float4 Color			: COLOR0;
+	float3			Position								: POSITION0;
+	float2			Textcoord								: TEXCOORD0;
+	float3			Normal									: NORMAL0;
+	float4			Color									: COLOR0;
 };
 
 struct ZERNSimpleMaterial_VSOutput 
 {
-	float4 Position			: SV_Position;
-	float2 Texcoord			: TEXCOORD0;
-	float4 Color			: COLOR0;
+	float4			Position								: SV_Position;
+	float2			Texcoord								: TEXCOORD0;
+	float4			Color									: COLOR0;
 };
 
 struct ZERNSimpleMaterial_PSInput
 {
-	float4 Position			: SV_Position;
-	float2 Texcoord			: TEXCOORD0;
-	float4 Color		    : COLOR0;
+	float4			Position								: SV_Position;
+	float2			Texcoord								: TEXCOORD0;
+	float4			Color									: COLOR0;
 };
 
 
@@ -93,8 +93,9 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 {
 	ZERNSimpleMaterial_VSOutput Output;
 	
-	float4x4 WorldViewProjectionTransform = mul(ZERNView_ViewProjectionTransform, ZERNSimpleMaterial_WorldTransform);
-	Output.Position = mul(WorldViewProjectionTransform, float4(Input.Position, 1.0f));
+	float4 PositionWorld = mul(ZERNSimpleMaterial_WorldTransform, float4(Input.Position, 1.0f));
+
+	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Texcoord = Input.Textcoord;
 	
 	Output.Color = ZERNSimpleMaterial_Color;
@@ -114,7 +115,7 @@ float4 ZERNSimpleMaterial_PSMain_ForwardStage(ZERNSimpleMaterial_PSInput Input) 
 	float4 Color = Input.Color;
 
 	if (ZERNSimpleMaterial_EnableTexture)
-		Color *= ZERNSimpleMaterial_Texture.Sample(ZERNSimpleMaterial_Sampler, Input.Texcoord);	
+		Color *= ZERNSimpleMaterial_Texture.Sample(ZERNSimpleMaterial_Sampler, Input.Texcoord);
 		
 	return Color;
 }

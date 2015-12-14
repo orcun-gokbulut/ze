@@ -37,7 +37,8 @@
 #define __ZERN_FASTLIGHTSCATTERING_HLSL__
 
 #include "ZERNScreenCover.hlsl"
-#include "ZERNView.hlsl"
+#include "ZERNGBuffer.hlsl"
+#include "ZERNTransformations.hlsl"
 
 #define PI					3.14159265359f
 #define EARTH_RADIUS		6360000.0f
@@ -49,28 +50,20 @@
 #define FLT_MAX				3.402823466e+38f
 #define LUT_DIMENSIONS		float4(32.0f, 128.0f, 64.0f, 16.0f)
 
-cbuffer ZERNFastLightScattering_Constants : register(b8)
+cbuffer ZERNFastLightScattering_Constants								: register(b8)
 {
-	float3	ZERNFastLightScattering_LightDirection;
-	float	ZERNFastLightScattering_Intensity;
-	float3	ZERNFastLightScattering_LightColor;
-	float	ZERNFastLightScattering_MieScatteringStrength;
+	float3			ZERNFastLightScattering_LightDirection;
+	float			ZERNFastLightScattering_Intensity;
+	float3			ZERNFastLightScattering_LightColor;
+	float			ZERNFastLightScattering_MieScatteringStrength;
 };
 
-SamplerState SamplerLinearClamp
-{
-	Filter		= MIN_MAG_MIP_LINEAR;
-	AddressU	= CLAMP;
-	AddressV	= CLAMP;
-	AddressW	= CLAMP;
-};
+SamplerState		ZERNFastLightScattering_SamplerLinearClamp			: register(s0);
 
-Texture2D			InputTexture				: register(t0);
-Texture2D<float>	DepthTexture				: register(t1);
-Texture3D<float3>	MultipleScatteringBuffer	: register(t2);
+Texture3D<float3>	ZERNFastLightScattering_MultipleScatteringBuffer	: register(t5);
 
-static const float3 RayleighScatteringFactor	= float3(5.8e-6, 13.5e-6, 33.1e-6);
-static const float3 MieScatteringFactor			= float3(2.0e-5, 2.0e-5, 2.0e-5);
+static const float3 ZERNFastLightScattering_RayleighScatteringFactor	= float3(5.8e-6, 13.5e-6, 33.1e-6);
+static const float3 ZERNFastLightScattering_MieScatteringFactor			= float3(2.0e-5, 2.0e-5, 2.0e-5);
 
 void ZERNFastLightScattering_IntersectionRaySphere(float3 RayOrigin, float3 RayDirection, float3 SphereCenter, float2 SphereRadius, out float4 StartEndDistance)
 {
@@ -101,7 +94,6 @@ float4 ZERNFastLightScattering_CalculateTexCoordsFromWorldParams(float Height, f
 	float Texel_X = saturate((Height - 16.0f) / (ATMOSPHERE_HEIGHT - 2.0f * 16.0f));
 	Texel_X = pow(Texel_X, 0.5f);
 	
-	//float Texel_X = pow(Height / ATMOSPHERE_HEIGHT, 0.5f);
 	float Texel_Y_Dimension = LUT_DIMENSIONS.y;
 	
 	float CosHorizontal = -sqrt(Height * (2.0f * EARTH_RADIUS + Height)) / (EARTH_RADIUS + Height);
@@ -110,13 +102,11 @@ float4 ZERNFastLightScattering_CalculateTexCoordsFromWorldParams(float Height, f
 	{
 		Texel_Y = pow(saturate((CosViewZenith - CosHorizontal) / (1.0f - CosHorizontal)), 0.2f);
 		Texel_Y = 0.5f + 0.5f / Texel_Y_Dimension + Texel_Y * (Texel_Y_Dimension * 0.5f - 1.0f) / Texel_Y_Dimension;
-		//Texel_Y = Texel_Y * 0.5f + 0.5f;
 	}
 	else
 	{
 		Texel_Y = pow(saturate((CosHorizontal - CosViewZenith) / (1.0f + CosHorizontal)), 0.2f);
 		Texel_Y = 0.5f / Texel_Y_Dimension + Texel_Y * (Texel_Y_Dimension * 0.5f - 1.0f) / Texel_Y_Dimension;
-		//Texel_Y = Texel_Y * 0.5f;
 	}
 	
 	float Texel_Z = 0.5f * (atan(max(CosSunZenith, -0.1975) * tan(1.26f * 1.1f)) / 1.1f + (1.0f - 0.26f));
@@ -124,13 +114,6 @@ float4 ZERNFastLightScattering_CalculateTexCoordsFromWorldParams(float Height, f
 	CosSunView = clamp(CosSunView, -1.0f, +1.0f);
 	float Texel_W = acos(CosSunView) / PI;
 	Texel_W = sign(Texel_W - 0.5f) * pow(abs((Texel_W - 0.5f) * 2.0f), 1.5f) * 0.5f + 0.5f;
-	
-	//float Texel_X = Height / ATMOSPHERE_HEIGHT;
-	//float Texel_Y = CosViewZenith * 0.5f + 0.5f;
-	//float Texel_Z = CosSunZenith * 0.5f + 0.5f;
-	
-	//float2 TexelOffset = 0.5f / LUT_DIMENSIONS.xz;
-	//TexCoord = float3(Texel_X + TexelOffset.x, Texel_Y, Texel_Z + TexelOffset.y);
 	
 	TexCoord = float4(Texel_X, Texel_Y, Texel_Z, Texel_W);
 	TexCoord.xzw = ((TexCoord * (LUT_DIMENSIONS - 1.0f) + 0.5f) / LUT_DIMENSIONS).xzw;
@@ -144,20 +127,6 @@ float2 ZERNFastLightScattering_CalculateDensity(float3 Position)
 	float Height = length(Position - float3(0.0f, -EARTH_RADIUS, 0.0f)) - EARTH_RADIUS;
 	
 	return exp(-(float2(Height, Height) / RAYLEIGH_MIE_HEIGHT));
-}
-
-float3 ZERNFastLightScattering_GetPositionWorld(float2 PositionViewport)
-{	
-	float2 TextureDimension;
-	DepthTexture.GetDimensions(TextureDimension.x, TextureDimension.y);
-	
-	float2 PositionScreen = ((PositionViewport - 0.5f) * float2(2.0f, -2.0f) / TextureDimension) + float2(-1.0f, 1.0f);
-	float Depth = DepthTexture.Load(int3(PositionViewport, 0)).x;
-	
-	float4 PositionWorld = mul(ZERNView_InvViewProjectionTransform, float4(PositionScreen, Depth, 1.0f));
-	PositionWorld /= PositionWorld.w;
-	
-	return PositionWorld.xyz;
 }
 
 float3 ZERNFastLightScattering_CalculateExtinction(float3 Start, float3 End)
@@ -180,7 +149,7 @@ float3 ZERNFastLightScattering_CalculateExtinction(float3 Start, float3 End)
 		PrevRayleighMieDensity = CurRayleighMieDensity;
 	}
 	
-	return (RayleighScatteringFactor * TotalRayleighMieDensity.x + MieScatteringFactor * TotalRayleighMieDensity.y);
+	return (ZERNFastLightScattering_RayleighScatteringFactor * TotalRayleighMieDensity.x + ZERNFastLightScattering_MieScatteringFactor * TotalRayleighMieDensity.y);
 }
 
 float3 ZERNFastLightScattering_LookupPrecomputedScattering(float3 Position, float3 ViewDirection, float3 LightDirection, float3 EarthCenter, inout float PrevTexCoordY)
@@ -210,8 +179,8 @@ float3 ZERNFastLightScattering_LookupPrecomputedScattering(float3 Position, floa
 	float NextSliceOffset = (Slice1 - Slice) / LUT_DIMENSIONS.w;
 	float3 TexCoord2 = TexCoord1 + float3(0.0f, 0.0f, NextSliceOffset);
 	
-	float3 Inscattering1 = MultipleScatteringBuffer.SampleLevel(SamplerLinearClamp, TexCoord1, 0);
-	float3 Inscattering2 = MultipleScatteringBuffer.SampleLevel(SamplerLinearClamp, TexCoord2, 0);
+	float3 Inscattering1 = ZERNFastLightScattering_MultipleScatteringBuffer.SampleLevel(ZERNFastLightScattering_SamplerLinearClamp, TexCoord1, 0);
+	float3 Inscattering2 = ZERNFastLightScattering_MultipleScatteringBuffer.SampleLevel(ZERNFastLightScattering_SamplerLinearClamp, TexCoord2, 0);
 	
 	return lerp(Inscattering1, Inscattering2, Weight);
 }
@@ -220,15 +189,14 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 {
 	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);
 	
-	float Depth = DepthTexture.Load(int3(PositionViewport.xy, 0)).x;
-	float DepthView = ZERNView_ProjectionTransform._34 / (Depth - ZERNView_ProjectionTransform._33);
+	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
+	float DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
 	
-	float2 TextureDimension;
-	DepthTexture.GetDimensions(TextureDimension.x, TextureDimension.y);
+	float2 TextureDimensions = ZERNGBuffer_GetDimensions();
 	
-	float2 PositionScreen = ((PositionViewport.xy) * float2(2.0f, -2.0f) / TextureDimension) + float2(-1.0f, 1.0f);
-	float2 DirectionVector = PositionScreen / float2(ZERNView_ProjectionTransform._11, ZERNView_ProjectionTransform._22);
-	float3 ViewDirection = normalize(DirectionVector.x * ZERNView_RightVector + DirectionVector.y * ZERNView_UpVector + ZERNView_FrontVector);
+	float2 PositionHomogeneous = ZERNTransformations_ViewportToHomogeneous(PositionViewport.xy, TextureDimensions);
+	float2 PositionView = ZERNTransformations_HomogeneousToView(PositionHomogeneous);
+	float3 ViewDirection = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f, 0.0f));
 	
 	float3 LightDirection = -normalize(ZERNFastLightScattering_LightDirection);
 	
@@ -236,8 +204,6 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	ZERNFastLightScattering_IntersectionRaySphere(ZERNView_Position, ViewDirection, EarthCenter, float2(TOTAL_RADIUS, EARTH_RADIUS), StartEndDistance);
 	
 	float3 RayStart = ZERNView_Position + ViewDirection * max(0.0f, StartEndDistance.x);
-	
-	float3 PixelColor = InputTexture.Load(int3(PositionViewport.xy, 0)).rgb;
 	
 	if(StartEndDistance.z < 0.0f && StartEndDistance.w > 0.0f)
 		return PixelColor;
@@ -261,7 +227,7 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	Inscattering -= Extinction * ZERNFastLightScattering_LookupPrecomputedScattering(RayEnd, ViewDirection, LightDirection, EarthCenter, PrevTexCoordY);
 	Inscattering *= ZERNFastLightScattering_Intensity;
 	
-	return PixelColor + Inscattering;
+	return Inscattering;
 }
 
 #endif

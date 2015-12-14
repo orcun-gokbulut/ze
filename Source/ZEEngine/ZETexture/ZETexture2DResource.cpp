@@ -60,7 +60,7 @@ static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 
 	ZESize LevelCount = (ZESize)TextureData->GetLevelCount();
 	ZEArray<ZETextureLevel>& TextureLevels = TextureData->GetSurfaces().GetItem(0).GetLevels();
-	for(ZESize Level = 0; Level < LevelCount; Level++)
+	for(ZESize Level = 0; Level < 1; Level++)
 	{
 		ZESize TargetRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
 		TextureLevels[Level].CopyTo(TargetBuffer, TargetRowPitch);
@@ -309,6 +309,8 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	TextureResource->Shared = false;
 
 	CopyToTexture2D(Texture, FinalTextureData);
+
+	Texture->GenerateMipMaps();
 
 	FinalTextureData = NULL;
 	ProcessedTextureData.Destroy();

@@ -42,6 +42,7 @@
 #include "ZEGraphics/ZEGROutput.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZERNStageGBuffer.h"
 
 bool ZERNStageTextureOutput::InitializeSelf()
 {
@@ -130,21 +131,31 @@ const ZEString& ZERNStageTextureOutput::GetName()
 
 bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	//if(OutputRenderTarget == NULL)
+	ZEGROutput* Output = Renderer->GetOutput();
+	if(Output == NULL)
+		return false;
+
+	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	if(RenderTarget == NULL)
+		return false;
+
+	OutputRenderTarget = RenderTarget;
+
+	if(InputTextures.GetCount() == 0)
 	{
-		ZEGROutput* Output = Renderer->GetOutput();
-		if(Output == NULL)
+		ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+		if(StageGBuffer == NULL)
 			return false;
 
-		OutputRenderTarget = Output->GetRenderTarget();
+		InputTextures.Add(StageGBuffer->GetAccumulationMap());
 	}
 
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);
 
-	ZESize Count = InputTextures.GetCount();
-	for(ZESize I = 0; I < Count; ++I)
+	ZEUInt Count = (ZEUInt)InputTextures.GetCount();
+	for(ZEUInt I = 0; I < Count; ++I)
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 0, InputTextures[I]);
 
@@ -153,10 +164,10 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 			ZEUInt Width = Count == 1 ? OutputRenderTarget->GetWidth() : OutputRenderTarget->GetWidth() / 2;
 			ZEUInt Height = Count <= 2 ? OutputRenderTarget->GetHeight() : OutputRenderTarget->GetHeight() / 2;
 
-			Viewports[I].SetX((I & 1) * Width);
-			Viewports[I].SetY((I >> 1) * Height);
-			Viewports[I].SetWidth(Width);
-			Viewports[I].SetHeight(Height);
+			Viewports[I].SetX((float)((I & 1) * Width));
+			Viewports[I].SetY((float)((I >> 1) * Height));
+			Viewports[I].SetWidth((float)Width);
+			Viewports[I].SetHeight((float)Height);
 			Viewports[I].SetMinDepth(0.0f);
 			Viewports[I].SetMaxDepth(1.0f);
 		}
@@ -165,10 +176,14 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 
 		Context->Draw(3, 0);
 	}
+
+	return true;
 }
 
 void ZERNStageTextureOutput::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
+	InputTextures.Clear();
+
 	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 }

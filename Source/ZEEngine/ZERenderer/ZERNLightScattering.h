@@ -38,6 +38,7 @@
 #include "ZEGraphics/ZEGRHolder.h"
 #include "ZEFoundation/ZEInitializable.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEGraphics/ZEGRSamplerState.h"
 
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
@@ -75,6 +76,8 @@ class ZERNLightScattering : public ZEInitializable
 		ZEGRHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
 
 		ZEGRHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+
+		ZEGRSamplerState				SamplerLinearClamp;
 
 		struct LightScatteringConstants
 		{

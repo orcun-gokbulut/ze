@@ -41,6 +41,7 @@
 #include "ZEDS\ZEFlags.h"
 #include "ZEGraphics\ZEGRHolder.h"
 #include "ZERNFilter.h"
+#include "ZEGraphics/ZEGRSamplerState.h"
 
 class ZEGRShader;
 class ZEGRTexture2D;
@@ -101,6 +102,8 @@ class ZERNStageHDR : public ZERNStage
 		ZEGRHolder<ZEGRTexture2D>			CurrentAdaptedLuminance;
 		ZEGRHolder<ZEGRTexture2D>			PreviousAdaptedLuminance;
 		
+		ZEGRSamplerState					SamplerLinearClamp;
+
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;
 

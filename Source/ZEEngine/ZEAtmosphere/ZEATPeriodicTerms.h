@@ -35,7 +35,9 @@
 
 #pragma once
 
-static float ZEATEarthPeriodicTerms[][3] =
+#include "ZETypes.h"
+
+const double ZEATEarthPeriodicTerms[][3] =
 {
 	//L0 - RowCount: 64
 	{	175347046.0, 0.0, 0.0				},
@@ -260,7 +262,7 @@ static float ZEATEarthPeriodicTerms[][3] =
 
 };
 
-static float ZEATLongtitudeAndObliquityPeriodicTerms[][9] =
+const double ZEATLongtitudeAndObliquityPeriodicTerms[][9] =
 {
 	//Sin & Cos coefficients[5] - Longtitude coefficients[2] - Obliquity coefficients[2]
 	{	0.0, 0.0, 0.0, 0.0, 1.0, -171996.0, -174.2, 92025.0, 8.9	},
@@ -328,7 +330,7 @@ static float ZEATLongtitudeAndObliquityPeriodicTerms[][9] =
 	{	2.0, -1.0, 0.0, 2.0, 2.0, -3.0, 0.0, 0.0, 0.0				}
 };
 
-static ZEInt MoonPeriodicTermsForLongtitudeAndDistance[][6] = 
+const ZEInt MoonPeriodicTermsForLongtitudeAndDistance[][6] = 
 {
 	{	0, 0, 1, 0, 6288774, -20905355		},
 	{	2, 0, -1, 0, 1274027, -3699111		},
@@ -392,7 +394,7 @@ static ZEInt MoonPeriodicTermsForLongtitudeAndDistance[][6] =
 	{	2, 0, -1, -2, 8752, 0				}
 };
 
-static ZEInt MoonPeriodicTermsForLatitude[][5] =
+const ZEInt MoonPeriodicTermsForLatitude[][5] =
 {
 	{	0, 0, 0, 1, 5128122		  },
 	{	0, 0, 1, 1, 280602		  },
@@ -457,6 +459,6 @@ static ZEInt MoonPeriodicTermsForLatitude[][5] =
 
 };
 
-static ZEUInt LongtitudeRowCounts[6] = {64, 34, 20, 7, 3, 1};
-static ZEUInt LatitudeRowCounts[2] = {5, 2};
-static ZEUInt RadiusRowCounts[5] = {40, 10, 6, 2, 1};
+const ZEUInt LongtitudeRowCounts[6] = {64, 34, 20, 7, 3, 1};
+const ZEUInt LatitudeRowCounts[2] = {5, 2};
+const ZEUInt RadiusRowCounts[5] = {40, 10, 6, 2, 1};

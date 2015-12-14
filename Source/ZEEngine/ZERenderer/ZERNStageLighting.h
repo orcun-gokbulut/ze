@@ -40,6 +40,7 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEMatrix.h"
+#include "ZEGraphics\ZEGRSamplerState.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -107,6 +108,8 @@ class ZERNStageLighting : public ZERNStage
 		ZEArray<ZERNTileInfo>				TileInfos;
 
 		ZEGRRenderTarget*					OutputRenderTarget;
+
+		ZEGRSamplerState					SamplerLinearClamp;
 
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;

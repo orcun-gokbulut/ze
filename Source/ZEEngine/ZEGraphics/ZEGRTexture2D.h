@@ -62,6 +62,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt						GetHeight();
 		ZEVector2					GetPixelSize();
 		
+		virtual void				GenerateMipMaps() = 0;
 
 		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) = 0;
 

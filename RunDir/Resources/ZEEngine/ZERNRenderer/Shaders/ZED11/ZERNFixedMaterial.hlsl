@@ -39,54 +39,54 @@
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
 
-cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNFixedMaterial_Constants								: register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
-	float3 	ZERNFixedMaterial_AmbientColor;
-	float 	ZERNFixedMaterial_Opacity;
-	float3 	ZERNFixedMaterial_DiffuseColor;
-	float 	ZERNFixedMaterial_SubSurfaceScatteringFactor;
-	float3 	ZERNFixedMaterial_SpecularColor;
-	float 	ZERNFixedMaterial_SpecularPower;
-	uint	ZERNFixedMaterial_HeightMapTechnique;
-	float	ZERNFixedMaterial_HeightMapScale;
-	float	ZERNFixedMaterial_HeightMapOffset;
-	float	ZERNFixedMaterial_Reserved0;
-	float3 	ZERNFixedMaterial_EmissiveColor;
-	float 	ZERNFixedMaterial_AlphaCullLimit;
-	float3 	ZERNFixedMaterial_ReflectionColor;
-	bool	ZERNFixedMaterial_GlobalAmbient;
-	float3	ZERNFixedMaterial_RefractionColor;
-	float	ZERNFixedMaterial_RefractionIndex;
-	float3	ZERNFixedMaterial_DetailDiffuseMapColor;
-	float	ZERNFixedMaterial_DetailNormalMapFactor;
-	float2 	ZERNFixedMaterial_DetailDiffuseMapTiling;
-	float2	ZERNFixedMaterial_DetailNormalMapTiling;
+	float3			ZERNFixedMaterial_AmbientColor;
+	float			ZERNFixedMaterial_Opacity;
+	float3			ZERNFixedMaterial_DiffuseColor;
+	float			ZERNFixedMaterial_SubSurfaceScatteringFactor;
+	float3			ZERNFixedMaterial_SpecularColor;
+	float			ZERNFixedMaterial_SpecularPower;
+	uint			ZERNFixedMaterial_HeightMapTechnique;
+	float			ZERNFixedMaterial_HeightMapScale;
+	float			ZERNFixedMaterial_HeightMapOffset;
+	float			ZERNFixedMaterial_Reserved0;
+	float3			ZERNFixedMaterial_EmissiveColor;
+	float			ZERNFixedMaterial_AlphaCullLimit;
+	float3			ZERNFixedMaterial_ReflectionColor;
+	bool			ZERNFixedMaterial_GlobalAmbient;
+	float3			ZERNFixedMaterial_RefractionColor;
+	float			ZERNFixedMaterial_RefractionIndex;
+	float3			ZERNFixedMaterial_DetailDiffuseMapColor;
+	float			ZERNFixedMaterial_DetailNormalMapFactor;
+	float2			ZERNFixedMaterial_DetailDiffuseMapTiling;
+	float2			ZERNFixedMaterial_DetailNormalMapTiling;
 };
 
-cbuffer ZERNFixedMaterial_Constant_Draw_Transform : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
+cbuffer ZERNFixedMaterial_Constant_Draw_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	float4x4 ZERNFixedMaterial_WorldTransform;
+	float4x4		ZERNFixedMaterial_WorldTransform;
 };
 
 // SHADER RESOURCES (TEXTURES)
 ///////////////////////////////////////////////////////////////////////////////
 
-Texture2D<float4> 	ZRNFixedMaterial_BaseMap			 	 	: register(t0);
-Texture2D<float3> 	ZRNFixedMaterial_NormalMap				 	: register(t1);
-Texture2D<float3> 	ZRNFixedMaterial_SpecularMap			 	: register(t2);
-Texture2D<float3> 	ZRNFixedMaterial_EmissiveMap			 	: register(t3);
-Texture2D<float>  	ZRNFixedMaterial_HeightMap				 	: register(t4);
-Texture2D<float>  	ZRNFixedMaterial_OpacityMap				 	: register(t5);
-Texture2D<float> 	ZRNFixedMaterial_SubsurfaceScatteringMap 	: register(t6);
-TextureCube<float3> ZRNFixedMaterial_EnvironmentMap			 	: register(t7);
-Texture2D<float3> 	ZRNFixedMaterial_DetailBaseMap			 	: register(t8);
-Texture2D<float3> 	ZRNFixedMaterial_DetailNormalMap			: register(t9);
+Texture2D<float4>	ZRNFixedMaterial_BaseMap			 	 	: register(t0);
+Texture2D<float3>	ZRNFixedMaterial_NormalMap				 	: register(t1);
+Texture2D<float3>	ZRNFixedMaterial_SpecularMap			 	: register(t2);
+Texture2D<float3>	ZRNFixedMaterial_EmissiveMap			 	: register(t3);
+Texture2D<float>	ZRNFixedMaterial_HeightMap				 	: register(t4);
+Texture2D<float>	ZRNFixedMaterial_OpacityMap				 	: register(t5);
+Texture2D<float>	ZRNFixedMaterial_SubsurfaceScatteringMap 	: register(t6);
+TextureCube<float3>	ZRNFixedMaterial_EnvironmentMap			 	: register(t7);
+Texture2D<float3>	ZRNFixedMaterial_DetailBaseMap			 	: register(t8);
+Texture2D<float3>	ZRNFixedMaterial_DetailNormalMap			: register(t9);
 Texture2D<float>	ZRNFixedMaterial_GlossMap					: register(t10);
 
-SamplerState	 	ZRNFixedMaterial_TextureSampler				: register(s0);
+SamplerState		ZRNFixedMaterial_TextureSampler				: register(s0);
 SamplerState		ZRNFixedMaterial_EnvironmentMapSampler		: register(s1);
-SamplerState	 	ZRNFixedMaterial_DetailDiffuseSampler		: register(s2);
-SamplerState	 	ZRNFixedMaterial_DetailNormalSampler		: register(s3);
+SamplerState		ZRNFixedMaterial_DetailDiffuseSampler		: register(s2);
+SamplerState		ZRNFixedMaterial_DetailNormalSampler		: register(s3);
 
 
 
@@ -150,8 +150,8 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 {
 	ZERNFixedMaterial_GBufferStage_VSOutput Output;
 
-	float4x4 WorldViewProjTransform = mul(ZERNView_ViewProjectionTransform, ZERNFixedMaterial_WorldTransform);
 	float4x4 WorldViewTransform = mul(ZERNView_ViewTransform, ZERNFixedMaterial_WorldTransform);
+	float4x4 WorldViewProjTransform = mul(ZERNView_ProjectionTransform, WorldViewTransform);
 	
 	#if defined(ZERN_FM_SKIN_TRANSFORM)
 		WorldViewProjTransform = ZESkin_ApplySkinTransform(WorldViewProjTransform, Input.BoneIndices, Input.BoneTransforms);
@@ -207,7 +207,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	float3 AmbientColor = ZERNFixedMaterial_AmbientColor;
 	#ifdef ZERN_FM_BASE_MAP
 		AmbientColor *= ZRNFixedMaterial_BaseMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;	
-	#endif	
+	#endif
 	
 	float3 DiffuseColor = ZERNFixedMaterial_DiffuseColor;
 	#ifdef ZERN_FM_BASE_MAP

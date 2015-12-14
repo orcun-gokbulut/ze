@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRState.cpp
+ Zinek Engine - ZERNMath.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,45 +33,13 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRState.h"
-#include "ZEGRRenderState.h"
-#include "ZEDS/ZEHashGenerator.h"
+#ifndef __ZERN_MATH_H__
+#define __ZERN_MATH_H__
 
-void ZEGRState::MarkDirty()
-{
+#define PI		3.14159265359f
+#define PIx2	6.28318530717f
 
-}
+#define PI_2	1.57079632679f
+#define PI_4	0.78539816339f
 
-ZEGRState::ZEGRState()
-{
-	Dirty = true;
-}
-
-ZEGRState::~ZEGRState()
-{
-
-}
-
-ZEUInt32 ZEGRState::GetHash() const
-{
-	if (Dirty)
-		Hash = ZEHashGenerator::Hash(GetData(), GetDataSize());
-
-	return Hash;
-}
-
-
-bool ZEGRState::IsDirty() const
-{
-	return Dirty;
-}
-
-void ZEGRState::Update()
-{
-	Dirty = false;
-}
-
-bool ZEGRState::Equals(const ZEGRState& State) const
-{
-	return memcmp(GetData(), State.GetData(), GetDataSize()) == 0;
-}
+#endif
