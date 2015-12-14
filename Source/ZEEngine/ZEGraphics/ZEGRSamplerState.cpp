@@ -134,16 +134,16 @@ ZEGRTextureAddressing ZEGRSamplerState::GetAddressW() const
 
 void ZEGRSamplerState::SetMipLODBias(float LODBias)
 {
-	if (ZEMath::Abs(StateData.MipLODBias - LODBias) <= ZE_ZERO_THRESHOLD)
+	if (ZEMath::Abs(StateData.MipMapLODBias - LODBias) <= ZE_ZERO_THRESHOLD)
 		return;
 
-	StateData.MipLODBias = LODBias;
+	StateData.MipMapLODBias = LODBias;
 	MarkDirty();
 }
 
 float ZEGRSamplerState::GetMipLODBias() const
 {
-	return StateData.MipLODBias;
+	return StateData.MipMapLODBias;
 }
 
 void ZEGRSamplerState::SetMaxAnisotrophy(unsigned int AnisotrophyLevel)
@@ -214,7 +214,7 @@ void ZEGRSamplerState::SetToDefault()
 	StateData.MinLOD = ZE_FLOAT_MIN;
 	StateData.MaxLOD = ZE_FLOAT_MAX;
 	StateData.MaxAnisotropy = 1;
-	StateData.MipLODBias = 0.0f;
+	StateData.MipMapLODBias = 0.0f;
 	StateData.BorderColor = ZEVector4::One;
 }
 

@@ -37,12 +37,9 @@
 
 #include "ZETypes.h"
 
-class ZEGRRenderTarget;
-
 class ZEGRState
 {
 	private:
-		ZEGRRenderTarget*		RenderState;
 		mutable ZEUInt32		Hash;
 		bool					Dirty;
 
@@ -59,7 +56,7 @@ class ZEGRState
 		virtual const void*		GetData() const = 0;
 		virtual ZESize			GetDataSize() const = 0;
 
-		bool					Equals(const ZEGRState& State);
+		bool					Equals(const ZEGRState& State) const;
 
 		virtual void			Update();
 

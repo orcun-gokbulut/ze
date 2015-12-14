@@ -354,7 +354,7 @@ ZECamera::ZECamera()
 	View.ViewVolume = &ViewFrustum;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
 	//SetHorizontalFOV(ZE_PI_2);
-	SetVerticalFOV(45.0f);
+	SetVerticalFOV(ZE_PI_4);
 	AutoAspectRatio = true;
 	
 	//View.ShadowDistance = 1000.0f;

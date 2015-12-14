@@ -38,18 +38,12 @@
 
 #include "ZERNScreenCover.hlsl"
 
-SamplerState ZERNTextureRendering_SamplerLinearClamp
-{
-	Filter		= MIN_MAG_MIP_LINEAR;
-	AddressU	= CLAMP;
-	AddressV	= CLAMP;
-};
+SamplerState	ZERNTextureRendering_SamplerLinearClamp	: register(s0);
+Texture2D		ZERNTextureRendering_InputTexture		: register(t0);
 
-Texture2D InputTexture : register(t0);
-
-float4 ZERNTextureRendering_PixelShader_Main(float4 Position : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target
+float4 ZERNTextureRendering_PixelShader_Main(float4 Position : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
-	return InputTexture.Sample(ZERNTextureRendering_SamplerLinearClamp, TexCoord);
+	return ZERNTextureRendering_InputTexture.Sample(ZERNTextureRendering_SamplerLinearClamp, TexCoord);
 }
 
 #endif

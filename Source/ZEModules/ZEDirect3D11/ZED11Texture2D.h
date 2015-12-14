@@ -63,6 +63,8 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		ID3D11ShaderResourceView*			GetResourceView();
 		virtual ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level);
 
+		virtual void						GenerateMipMaps();
+
 		virtual bool						UpdateSubResource(void* Data, ZESize RowPitch, ZEUInt Level);
 		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
 		virtual void						Unlock(ZEUInt Level);

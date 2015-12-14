@@ -39,8 +39,10 @@ ze_add_source(ZEATSun.cpp					Sources)
 ze_add_source(ZEATSun.h						Sources Headers)
 ze_add_source(ZEATMoon.cpp					Sources)
 ze_add_source(ZEATMoon.h					Sources Headers)
+ze_add_source(ZEATPeriodicTerms.cpp			Sources)
 ze_add_source(ZEATPeriodicTerms.h			Sources Headers)
-ze_add_source(ZEATCommon.h					Sources Headers)			
+ze_add_source(ZEATCommon.cpp				Sources)
+ze_add_source(ZEATCommon.h					Sources Headers)
 
 ze_add_library(TARGET ZEAtmosphere 
 	ZEMC ${ZEMC}

@@ -39,6 +39,7 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEGraphics\ZEGRHolder.h"
 #include "ZEMath\ZEVector.h"
+#include "ZEGraphics\ZEGRSamplerState.h"
 
 class ZEGRTexture2D;
 class ZEGRContext;
@@ -57,7 +58,10 @@ class ZERNFilter : public ZEInitializable
 
 		ZEGRHolder<ZEGRShader>			VertexShader;
 		ZEGRHolder<ZEGRShader>			PixelShader;
+
 		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
+
+		ZEGRSamplerState				SamplerPointClamp;
 
 		struct FilterConstants
 		{
@@ -91,7 +95,7 @@ class ZERNFilter : public ZEInitializable
 		ZEUInt							GetKernelSize() const;
 
 		void							SetKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
-		const ZEVector4* 				GetKernelValues();				
+		const ZEVector4* 				GetKernelValues();
 
 		void							Process(ZEGRContext* Context);
 

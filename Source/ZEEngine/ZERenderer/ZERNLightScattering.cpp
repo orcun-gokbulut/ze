@@ -155,7 +155,18 @@ void ZERNLightScattering::CreateRenderState()
 	DepthStencilState.SetDepthTestEnable(false);
 	DepthStencilState.SetDepthWriteEnable(false);
 
+	ZEGRBlendState BlendState;
+	BlendState.SetBlendEnable(true);
+	ZEGRBlendRenderTarget BlendRenderTarget = BlendState.GetRenderTarget(0);
+	BlendRenderTarget.SetBlendEnable(true);
+	BlendRenderTarget.SetSource(ZEGR_BO_ONE);
+	BlendRenderTarget.SetDestination(ZEGR_BO_ONE);
+	BlendRenderTarget.SetOperation(ZEGR_BE_ADD);
+
+	BlendState.SetRenderTargetBlend(0, BlendRenderTarget);
+
 	RenderState.SetDepthStencilState(DepthStencilState);
+	RenderState.SetBlendState(BlendState);
 
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
@@ -164,6 +175,7 @@ void ZERNLightScattering::CreateRenderState()
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, , "Cannot set render state.");
 
+	RenderState.SetBlendState(ZEGRBlendState());
 	RenderState.SetShader(ZEGR_ST_PIXEL, PrecomputeSingleScatteringPixelShader);
 
 	PrecomputeSingleScatteringRenderStateData = RenderState.Compile();
@@ -178,19 +190,6 @@ void ZERNLightScattering::CreateRenderState()
 
 	PrecomputeHighOrderInScatteringRenderStateData = RenderState.Compile();
 	zeCheckError(PrecomputeHighOrderInScatteringRenderStateData == NULL, , "Cannot set render state.");
-
-	ZEGRBlendState BlendState;
-	BlendState.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTarget = BlendState.GetRenderTarget(0);
-	BlendRenderTarget.SetBlendEnable(true);
-	BlendRenderTarget.SetSource(ZEGR_BO_ONE);
-	BlendRenderTarget.SetDestination(ZEGR_BO_ONE);
-	BlendRenderTarget.SetOperation(ZEGR_BE_ADD);
-	BlendRenderTarget.SetSourceAlpha(ZEGR_BO_ONE);
-	BlendRenderTarget.SetDestinationAlpha(ZEGR_BO_ONE);
-	BlendRenderTarget.SetAlphaOperation(ZEGR_BE_ADD);
-
-	BlendState.SetRenderTargetBlend(0, BlendRenderTarget);
 
 	RenderState.SetBlendState(BlendState);
 	RenderState.SetShader(ZEGR_ST_PIXEL, AddOrdersPixelShader);
@@ -242,9 +241,10 @@ void ZERNLightScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 	Viewport.SetMinDepth(0.0f);
 	Viewport.SetMaxDepth(1.0f);
 
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetViewports(1, &Viewport);
 	Context->SetVertexBuffers(0, 0, NULL);
-
+	
 	ZEArray<ZEGRRenderTarget*> MultipleScatteringRenderTargets;
 	MultipleScatteringRenderTargets.Resize(1024);
 
@@ -300,7 +300,7 @@ void ZERNLightScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 		for(ZEUInt J = 0; J < 1024; ++J)
 		{
 			ZEGRRenderTarget* RenderTarget = MultipleScatteringRenderTargets[J];
-			PrecomputeConstants.Index = J;
+			PrecomputeConstants.Index = (float)J;
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
 			Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, PrecomputeConstantBuffer);
@@ -315,7 +315,7 @@ void ZERNLightScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 	for(ZEUInt K = 0; K < 1024; ++K)
 	{
 		ZEGRRenderTarget* RenderTarget = MultipleScatteringRenderTargets[K];
-		PrecomputeConstants.Index = K;
+		PrecomputeConstants.Index = (float)K;
 		PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
 		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, PrecomputeConstantBuffer);
@@ -378,8 +378,8 @@ void ZERNLightScattering::Process(ZEGRContext* Context, bool MultipleScattering)
 	Context->SetVertexBuffers(0, 0, NULL);
 
 	ZEGRViewport Viewport;
-	Viewport.SetWidth(OutputRenderTarget->GetWidth());
-	Viewport.SetHeight(OutputRenderTarget->GetHeight());
+	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
+	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
 	Viewport.SetX(0.0f);
 	Viewport.SetY(0.0f);
 	Viewport.SetMinDepth(0.0f);

@@ -207,7 +207,7 @@ inline static D3D11_FILTER_TYPE Convert(ZEGRTextureFilter FilterMode)
 
 inline static D3D11_FILTER Convert(ZEGRTextureFilter Min, ZEGRTextureFilter Mag, ZEGRTextureFilter Mip)
 {
-	if (Min == ZEGR_TFM_ANISOTROPY || Mag == ZEGR_TFM_ANISOTROPY || Mip == ZEGR_TFM_ANISOTROPY)
+	if (Min == ZEGR_TFM_ANISOTROPIC || Mag == ZEGR_TFM_ANISOTROPIC || Mip == ZEGR_TFM_ANISOTROPIC)
 		return D3D11_FILTER_ANISOTROPIC;
 
 	return (D3D11_FILTER)(	(Convert(Min) << D3D11_MIN_FILTER_SHIFT) | 
@@ -623,7 +623,7 @@ ZED11StateBase* ZED11StatePool::FindPoolEntry(ZEList<ZED11StateBase>& Pool, cons
 	Entry = Iterator.GetItem();
 	while (!Iterator.IsEnd())
 	{
-		if (Entry->GetStateBase().GetHash() == State.GetHash() && memcmp(Entry->GetStateBase().GetData(), State.GetData(), State.GetDataSize()) == 0)
+		if (Entry->GetStateBase().GetHash() == State.GetHash() && State.Equals(Entry->GetStateBase()))
 			return Entry;
 
 		Entry = Iterator.MoveNext();

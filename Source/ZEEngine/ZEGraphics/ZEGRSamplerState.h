@@ -39,19 +39,19 @@
 
 #include "ZEMath/ZEVector.h"
 
-enum ZEGRTextureAddressing
+enum ZEGRTextureAddressing : ZEUInt
 {
-	ZEGR_TAM_WRAP			    = 1,
-	ZEGR_TAM_MIRROR			    = 2,
-	ZEGR_TAM_CLAMP			    = 3,
-	ZEGR_TAM_BORDER				= 4
+	ZEGR_TAM_WRAP						= 0,
+	ZEGR_TAM_MIRROR						= 1,
+	ZEGR_TAM_CLAMP						= 2,
+	ZEGR_TAM_BORDER						= 3
 };
 
-enum ZEGRTextureFilter
+enum ZEGRTextureFilter : ZEUInt
 {
-	ZEGR_TFM_POINT				= 1,
-	ZEGR_TFM_LINEAR				= 2,
-	ZEGR_TFM_ANISOTROPY			= 3
+	ZEGR_TFM_POINT						= 0,
+	ZEGR_TFM_LINEAR						= 1,
+	ZEGR_TFM_ANISOTROPIC				= 2
 };
 
 class ZEGRSamplerState : public ZEGRState
@@ -59,19 +59,19 @@ class ZEGRSamplerState : public ZEGRState
 	private:
 		struct ZESamplerStateData
 		{
-			ZEGRTextureAddressing	AddressU : 4;
-			ZEGRTextureAddressing	AddressV : 4;
-			ZEGRTextureAddressing	AddressW : 4;
-			ZEGRTextureFilter		MinFilter : 3;
-			ZEGRTextureFilter		MagFilter : 3;
-			ZEGRTextureFilter		MipFilter : 3;
-			ZEUInt32				MaxAnisotropy : 6;
+			ZEGRTextureAddressing	AddressU : 2;
+			ZEGRTextureAddressing	AddressV : 2;
+			ZEGRTextureAddressing	AddressW : 2;
+			ZEGRTextureFilter		MinFilter : 2;
+			ZEGRTextureFilter		MagFilter : 2;
+			ZEGRTextureFilter		MipFilter : 2;
+			ZEUInt8					MaxAnisotropy;
 
 			float					MinLOD;
 			float					MaxLOD;
-			float					MipLODBias;
+			float					MipMapLODBias;
 			ZEVector4				BorderColor;
-		
+
 		} StateData;
 
 	public:

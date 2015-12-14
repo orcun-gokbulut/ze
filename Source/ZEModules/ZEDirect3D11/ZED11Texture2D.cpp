@@ -75,14 +75,19 @@ ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level)
 	return RenderTargets[Level];
 }
 
+void ZED11Texture2D::GenerateMipMaps()
+{
+	GetMainContext()->GenerateMips(ResourceView);
+}
+
 bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget)
 {
 	//D3D11_USAGE Usage = RenderTarget ? D3D11_USAGE_DEFAULT : D3D11_USAGE_DYNAMIC;
 	//UINT CPUAccess = RenderTarget ? 0 : D3D11_CPU_ACCESS_WRITE;
-	UINT BindFlags = D3D11_BIND_SHADER_RESOURCE | (RenderTarget ? D3D11_BIND_RENDER_TARGET : 0);
+	UINT BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET | (RenderTarget ? D3D11_BIND_RENDER_TARGET : 0);
 
 	D3D11_TEXTURE2D_DESC TextureDesc;
-	TextureDesc.MiscFlags = 0;
+	TextureDesc.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
 	TextureDesc.ArraySize = 1;
 	TextureDesc.Width = Width;
 	TextureDesc.Height = Height;

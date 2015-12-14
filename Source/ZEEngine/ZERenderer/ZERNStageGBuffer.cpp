@@ -135,7 +135,11 @@ bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	if(Output == NULL)
 		return false;
 
-	ZEGRRenderTarget* OutputRenderTarget = Output->GetRenderTarget();
+	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	if(RenderTarget == NULL)
+		return false;
+
+	ZEGRRenderTarget* OutputRenderTarget = RenderTarget;
 	ZEGRViewport Viewport = Output->GetViewport();
 
 	ZEUInt Width = OutputRenderTarget->GetWidth();

@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZETypes.h"
+
 struct ZEATObserver
 {
 	struct
