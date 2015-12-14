@@ -415,7 +415,7 @@ ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
 
 void ZEModelMesh::SetClippingPlaneCount(ZESize Count)
 {
-	ClippingPlanes.SetCount(Count);
+	ClippingPlanes.Resize(Count);
 }
 
 ZESize ZEModelMesh::GetClippingPlaneCount()
@@ -431,23 +431,6 @@ void ZEModelMesh::SetClippingPlane(ZESize Index, const ZEPlane& Plane)
 const ZEPlane& ZEModelMesh::GetClippingPlane(ZESize Index)
 {
 	return ClippingPlanes[Index];
-}
-
-void ZEModelMesh::AddClippingPlane(const ZEPlane& Plane)
-{
-	ClippingPlanes.Add(Plane);
-}
-
-void ZEModelMesh::RemoveClippingPlane(const ZEPlane& Plane)
-{
-	for (ZESize I = 0; I < ClippingPlanes.GetCount(); I++)
-	{
-		if(ClippingPlanes[I].n == Plane.n && ClippingPlanes[I].p == Plane.p)
-		{
-			ClippingPlanes.Remove(I);
-			break;
-		}
-	}
 }
 
 void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshResource)
