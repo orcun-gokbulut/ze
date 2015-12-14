@@ -162,8 +162,6 @@ class ZEModelMesh : public ZEObject
 		ZESize								GetClippingPlaneCount();
 		void								SetClippingPlane(ZESize Index, const ZEPlane& Plane);
 		const ZEPlane&						GetClippingPlane(ZESize Index);
-		void								AddClippingPlane(const ZEPlane& Plane);
-		void								RemoveClippingPlane(const ZEPlane& Plane);
 
 		void								SetCustomDrawOrderEnabled(bool Enabled);
 		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);
