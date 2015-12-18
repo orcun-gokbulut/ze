@@ -45,6 +45,8 @@
 #define ZE_UINT_MAX			 4294967295
 #define ZE_FLOAT_MAX		 3.402823466e+38F 
 #define ZE_FLOAT_MIN		-3.402823466e+38F
+#define ZE_DOUBLE_MAX		 1.7976931348623158e+308
+#define ZE_DOUBLE_MIN		 -1.7976931348623158e+308
 #define ZE_E				 2.71828182845904523536f
 #define ZE_LOG2E			 1.44269504088896340736f
 #define ZE_LOG10E			 0.434294481903251827651f
@@ -57,6 +59,7 @@ class ZEMath
 {
 	public:
 		static float		Sqrt(float Value);
+		static double		Sqrtd(double Value);
 
 		template <typename Type>
 		static Type			Abs(Type Value);
@@ -65,6 +68,7 @@ class ZEMath
 		static Type			Sign(Type Value);
 
 		static float		Mod(float Value, float Modulus);
+		static double		Modd(double Value, double Modulus);
 
 		template <typename Type>
 		static Type			Min(Type A, Type B);
@@ -72,23 +76,33 @@ class ZEMath
 		static Type			Max(Type A, Type B);
 
 		static float		Log(float Value);
+		static double		Logd(double Value);
 		static float		Log10(float Value);
+		static double		Log10d(double Value);
 		static float		Power(float Base, float Exponent);
+		static double		Powerd(double Base, double Exponent);
 		static float		Exp(float Value);
+		static double		Expd(double Value);
 
 		static float		Floor(float Value);
+		static double		Floord(double Value);
 		static float		Ceil(float Value);
+		static double		Ceild(double Value);
 		static float		Round(float Value);
+		static double		Roundd(double Value);
 
 		static bool			IsValid(float Value);
+		static bool			IsValidd(double Value);
 		static bool			IsPowerOfTwo(ZEUInt Value);
 		
 		static ZEUInt		NextPowerOfTwo(ZEUInt Value);
 		static ZEUInt		PreviousPowerOfTwo(ZEUInt Value);
 		
 		static float		CopySign(float Value, float Sign);
+		static double		CopySignd(double Value, double Sign);
 
 		static float		Lerp(float A, float B, float Factor);
+		static double		Lerpd(double A, double B, double Factor);
 
 		template <typename TypeA, typename TypeB>
 		static TypeA		Align(TypeA Value, TypeB Alignment);
