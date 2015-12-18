@@ -200,7 +200,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 
 	#if defined(ZE_PLATFORM_WINDOWS) && defined(ZE_DEBUG_ENABLE)
 		char DebugBuffer[4096];
-		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::UtilityGetLogTypeString(ZE_LOG_INFO), Buffer);
+		sprintf(DebugBuffer, "[%s] %s : %s \r\n", Module, ZELog::UtilityGetLogTypeString(Type), Buffer);
 		OutputDebugString(DebugBuffer);
 	#endif
 
@@ -216,7 +216,7 @@ void ZELog::LogInternal(const char* Module, ZELogType Type, const char* Format, 
 		fprintf((FILE*)LogFile, "%02d-%02d-%04d %02d:%02d:%02d [%s] %s : %s\n",
 			1900 + TimeStamp.tm_year, TimeStamp.tm_mon + 1, TimeStamp.tm_mday, 
 			TimeStamp.tm_hour, TimeStamp.tm_min, TimeStamp.tm_sec,
-			Module, UtilityGetLogTypeString(ZE_LOG_INFO), Buffer);
+			Module, UtilityGetLogTypeString(Type), Buffer);
 		fflush((FILE*)LogFile);
 	}
 
@@ -316,10 +316,8 @@ ZELogType ZELog::GetLogFileMinimumLevel()
 	return LogFileMinimumLevel;
 }
 
-
 void ZELog::Log(const char* Module, ZELogType Type, const char* Format, ...)
 {
-	char Text[4096];
 	va_list VList;
 	va_start(VList, Format);
 	LogInternal(Module, Type, Format, VList);
