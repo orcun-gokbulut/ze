@@ -39,9 +39,13 @@
 #include "ZEGraphics\ZEGRHolder.h"
 #include "ZEGraphics\ZEGRRenderState.h"
 
+class ZEGRTexture2D;
+
 class ZERNStageForward : public ZERNStage
 {
 	private:
+		ZEGRHolder<ZEGRTexture2D>		DepthMap;
+
 		virtual bool					InitializeSelf();
 
 	public:

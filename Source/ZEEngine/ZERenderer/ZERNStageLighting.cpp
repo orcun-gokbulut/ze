@@ -125,7 +125,6 @@ bool ZERNStageLighting::InitializeSelf()
 	TileInfoBuffer = NULL;
 	OutputRenderTarget = NULL;
 
-	CreateLights();
 	CreateLightGeometries();
 
 	LightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNLightConstants));
