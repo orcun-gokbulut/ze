@@ -47,7 +47,7 @@ class ZEErrorManager
 {
 	friend class					ZECore;
 	private:
-		bool						OptionCallback_General(ZEOption* Option, ZETypedValue* Value);
+		void						OnOptionChanged(ZEOption* Option);
 		static void					ErrorCallback(ZEErrorType ErrorType);
 
 									ZEErrorManager();

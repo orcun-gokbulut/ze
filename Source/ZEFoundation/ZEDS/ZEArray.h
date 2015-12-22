@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEAllocator.h"
 #include "ZEError.h"
-#include "ZEArrayIterators.h"
+#include "ZEArrayIterator.h"
 
 #include <stdlib.h>
 
@@ -54,15 +54,26 @@ class ZEArray
 
 	public:
 		typedef ZEArrayIterator<ZEType, Allocator_> Iterator;
+		typedef ZEArrayIteratorConst<ZEType, Allocator_> IteratorConst;
+
 		Iterator GetIterator()
 		{
-			return Iterator(this);
+			return Iterator(*this, 0);
 		}
 
-		typedef ZEArrayIteratorConst<ZEType, Allocator_> ConstIterator;
-		ConstIterator GetConstIterator() const
+		IteratorConst GetIterator() const
 		{
-			return ConstIterator(this);
+			return IteratorConst(*this, 0);
+		}
+
+		Iterator GetIteratorEnd()
+		{
+			return Iterator(*this, (Count == 0 ? 0 : Count - 1));
+		}
+
+		IteratorConst GetIteratorEnd() const
+		{
+			return IteratorConst(*this, (Count == 0 ? 0 : Count - 1));
 		}
 
 		inline ZESize Circular(ZESSize Index) const

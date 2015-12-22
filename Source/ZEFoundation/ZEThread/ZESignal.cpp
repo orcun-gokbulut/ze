@@ -34,11 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESignal.h"
-#include "ZEError.h"
-
-
-ZESignal ZESignal::operator=(const ZESignal& Other)
-{
-    zeDebugCheckWarning(true, "You can not assign signal instead new empty signal is created.");
-    return ZESignal();
-}

@@ -52,7 +52,7 @@ static void OnOptionsChanged(ZEOption* Option)
 void ZESoundModule::BaseInitialize()
 {
 	SoundOptions.SetName("Sound");
-	SoundOptions.SetOnChanged(&OnOptionsChanged);
+	SoundOptions.SetOnChanged(ZEOptionsChangedEvent::Create<&OnOptionsChanged>());
 
 	SoundOptions.AddOption(new ZEOption("DeviceId", 0, ZE_OA_NORMAL));
 	SoundOptions.AddOption(new ZEOption("StreamingDisabled", false, ZE_OA_NORMAL));

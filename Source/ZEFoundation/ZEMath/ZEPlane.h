@@ -72,6 +72,8 @@ class ZEPlane
 		static float				DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
 		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
 
+		static void					ToABCD(const ZEPlane& Plane, float& A, float& B, float& C, float &D);
+
 		static void					Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);
 		static void					Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3);
 

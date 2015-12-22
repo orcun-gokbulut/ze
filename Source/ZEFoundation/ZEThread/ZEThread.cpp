@@ -36,14 +36,27 @@
 #include "ZEThread.h"
 #include "ZEError.h"
 
-void ZEThread::SetName(const ZEString& Name)
+bool ZEThread::ControlPoint()
 {
-    this->Name = Name;
-}
+	zeCheckError(GetCurrentThread() != this, false, "Cannot call another thread's ZEThread::ControlPoint function. Only owner thread can call it's own ControlPoint function.");
 
-const ZEString& ZEThread::GetName()
-{
-    return Name;
+	if (Status == ZE_TS_RUNNING)
+	{
+		return true;
+	}
+	else if (Status == ZE_TS_SUSPENDED)
+	{
+		Suspend();
+		return ControlPoint();
+	}
+	else if (Status == ZE_TS_EXITING)
+	{
+		return false;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 ZEThreadStatus ZEThread::GetStatus()
@@ -51,14 +64,13 @@ ZEThreadStatus ZEThread::GetStatus()
 	return Status;
 }
 
- bool ZEThread::IsAlive()
- {
-     return (Status & ZE_TS_ALIVE_MASK) != 0;
- }
+const ZEString& ZEThread::GetName()
+{
+    return Name;
+}
 
 void ZEThread::SetParameter(void* Parameter)
 {
-	zeDebugCheck(Status == ZE_TS_RUNNING, "You cannot change Parameter while thread is running.");
 	this->Parameter = Parameter;
 }
 

@@ -68,6 +68,11 @@ bool ZEModelMesh::GetAutoLOD()
 	return AutoLOD;
 }
 
+ZEArray<ZEModelMeshLOD>& ZEModelMesh::GetLODs()
+{
+	return LODs;
+}
+
 void ZEModelMesh::SetVisible(bool Visible)
 {
 	this->Visible = Visible;
@@ -412,6 +417,26 @@ ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
 	return UserDefinedDrawOrder;
 }
 
+void ZEModelMesh::SetClippingPlaneCount(ZESize Count)
+{
+	ClippingPlanes.Resize(Count);
+}
+
+ZESize ZEModelMesh::GetClippingPlaneCount()
+{
+	return ClippingPlanes.GetCount();
+}
+
+void ZEModelMesh::SetClippingPlane(ZESize Index, const ZEPlane& Plane)
+{
+	ClippingPlanes[Index] = Plane;
+}
+
+const ZEPlane& ZEModelMesh::GetClippingPlane(ZESize Index)
+{
+	return ClippingPlanes[Index];
+}
+
 void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshResource)
 {
 	Owner = Model;
@@ -500,7 +525,27 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 		}
 		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)
 		{
-	
+// 			PhysicalCloth = ZEPhysicalCloth::CreateInstance();
+// 
+// 			ZESize VertexCount = MeshResource->LODs[0].Vertices.GetCount();
+// 			ZEArray<ZEVector3>& ClothVertices = PhysicalCloth->GetVertices();
+// 			ClothVertices.SetCount(VertexCount);
+// 
+// 			for(ZESize I = 0; I < VertexCount; I++)
+// 				ClothVertices[I] = MeshResource->LODs[0].Vertices[I].Position;
+// 
+// 			PhysicalCloth->SetPosition(Owner->GetWorldTransform() * Position);
+// 			ZEQuaternion TempRotation;
+// 			ZEQuaternion::CreateFromMatrix(TempRotation, Owner->GetWorldTransform() * GetLocalTransform());
+// 			PhysicalCloth->SetRotation(TempRotation);
+// 
+// 			PhysicalCloth->SetEnabled(true);
+// 			PhysicalCloth->SetThickness(0.5f);
+// 			PhysicalCloth->SetBendingMode(true);
+// 			PhysicalCloth->SetBendingStiffness(1.0f);
+// 			PhysicalCloth->SetStretchingStiffness(1.0f);
+// 			PhysicalCloth->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+// 			PhysicalCloth->Initialize();
 		}
 	}
 
@@ -579,7 +624,8 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	float LODDistanceSquare = 0.0f;
 	ZEVector3 WorldPosition;
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
-	float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	if (!DrawOrderIsUserDefined)
+	float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	
+	if (!DrawOrderIsUserDefined)
 		DrawOrder = EntityDistanceSquare;
 	else
 		DrawOrder = EntityDistanceSquare * (UserDefinedDrawOrder + 1);
@@ -587,7 +633,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	float CurrentDistanceSquare = 0.0f;
 	for (ZESize I = 0; I < LODs.GetCount(); I++)
 	{
-		LODDistanceSquare = ZEMath::Power(LODs[I].GetDrawStartDistance(), 2.0);
+		LODDistanceSquare = LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance();
 
 		if (LODDistanceSquare < EntityDistanceSquare)
 		{
@@ -599,7 +645,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		}
 	}
 
-	if (EntityDistanceSquare > ZEMath::Power(LODs[CurrentLOD].GetDrawEndDistance(), 2.0))
+	if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
 		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
@@ -642,6 +688,30 @@ bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 			Report.Position = WorldPosition;
 			Report.SubComponent = this;
 			Report.PoligonIndex = PoligonIndex;
+
+// 			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+// 			{
+// 				ZEVector3 V0 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex].Position;
+// 				ZEVector3 V1 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 1].Position;
+// 				ZEVector3 V2 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 2].Position;
+// 
+// 				ZEVector3 Binormal = ZEVector3(V0, V1);
+// 				ZEVector3 Tangent = ZEVector3(V0, V2);
+// 				ZEVector3 Normal;
+// 				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
+// 
+// 				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
+// 				{
+// 					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
+// 					Report.Normal.NormalizeSelf();
+// 				}
+// 
+// 				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+// 				{
+// 					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
+// 					Report.Binormal.NormalizeSelf();
+// 				}
+// 			}
 
 			return true;
 		}

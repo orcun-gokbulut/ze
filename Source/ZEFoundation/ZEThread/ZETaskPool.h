@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEArrayIterators.h
+ Zinek Engine - ZETaskPool.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,111 +34,48 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEDS_ARRAY_ITERATORS_H__
-#define __ZEDS_ARRAY_ITERATORS_H__
 
-#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEList2.h"
 
-template<typename ZEType, typename Allocator_>
-class ZEArray;
+class ZETask;
+class ZEThread;
+class ZETaskThread;
 
-template<typename ZEType, typename Allocator_>
-class ZEArrayIterator
+class ZETaskPool
 {
-	friend class ZEArray<ZEType, Allocator_>;
+	friend class ZETask;
 	private:
-		ZEArray<ZEType, Allocator_>* Array;
-		ZESize Index;
-
-		ZEArrayIterator(ZEArray<ZEType, Allocator_>* Array)
-		{
-			this->Array = Array;
-			Index = 0;
-		};
-
-	public:
-		inline bool IsEnd() const
-		{
-			return (ZESSize)Index >= (ZESSize)Array->GetCount();
-		} 
-
-		inline ZEType* GetItem()
-		{
-			return &Array->GetItem(Index);
-		}
-
-		inline ZEType* MovePrevious()
-		{
-			if (Index == 0)
-				return NULL;
-
-			Index--;
-			return &Array->GetItem(Index);
-		}
-
-		inline ZEType* MoveNext()
-		{	
-			Index++;
-			if ((ZESSize)Index >= (ZESSize)Array->GetCount())
-				return NULL;
+		ZEInt							Id;
+		ZEString						Name;
+		ZEList2<ZETaskThread>			ActiveThreads;
+		ZEList2<ZETaskThread>			SuspendedThreads;
+		ZEList2<ZETaskThread>			DeletedThreads;
+		ZEList2<ZETask>					Tasks;
+		ZESize							ThreadCount;
+		ZELock							SchedulerLock;
 			
-			return &Array->GetItem(Index);
-		}
+		ZETaskThread*					RequestThread();
+		void							ReleaseThread(ZETaskThread*);
+		void							PurgeThreads();
 
+		// MISSING (CURRENT ISSUE): Thread Life Cycle Management 
+		void							Schedule(ZEThread* Thread, void* ExtraParameter);
+		void							Reschedule(ZETask* Task);
+		void							RunTask(ZETask* Task);
 
-		inline ZESize GetIndex()
-		{
-			return Index;
-		}
+public:
+		void							SetId(ZEInt Id);
+		ZEInt							GetId();
+
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName();
+
+		void							SetThreadCount(ZEUInt Count);
+		ZEUInt							GetThreadCount();
+
+		const ZEList2<ZETask>&			GetTasks();
+
+										ZETaskPool();
+										~ZETaskPool();
 };
-
-template<typename ZEType, typename Allocator_>
-class ZEArrayIteratorConst
-{
-	friend class ZEArray<ZEType, Allocator_>;
-	private:
-		const ZEArray<ZEType, Allocator_>* Array;
-		ZESize Index;
-
-		ZEArrayIteratorConst(const ZEArray<ZEType, Allocator_>* Array)
-		{
-			this->Array = Array;
-			Index = 0;
-		};
-
-	public:
-		inline bool IsEnd() const
-		{
-			return (ZESSize)Index >= (ZESSize)Array->GetCount() - 1;
-		} 
-
-		inline const ZEType* GetItem() const
-		{
-			return &Array->GetItem(Index);
-		}
-
-		inline const ZEType* MovePrevious()
-		{
-			if (Index == 0)
-				return NULL;
-
-			Index--;
-			return &Array->GetItem(Index);
-		}
-
-		inline const ZEType* MoveNext()
-		{
-			if ((ZESSize)Index >= (ZESSize)Array->GetCount() - 1)
-				return NULL;
-
-			Index++;
-			return &Array->GetItem(Index);
-		}
-
-		inline ZESize GetIndex()
-		{
-			return Index;
-		}
-};
-
-#endif

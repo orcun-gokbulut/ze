@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEList2Iterator.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,19 +30,7 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-
-ze_add_source(ZEJob.cpp          		Sources)
-ze_add_source(ZEJob.h            		Sources Headers)
-ze_add_source(ZEJobManager.cpp   		Sources)
-ze_add_source(ZEJobManager.h     		Sources Headers)
-ze_add_source(ZETask.cpp         		Sources)
-ze_add_source(ZETask.h           		Sources Headers)
-
-ze_add_library(TARGET ZETask
-	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS ZEDS)
+#include "ZEList2Iterator.h"
