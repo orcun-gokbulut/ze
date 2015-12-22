@@ -42,6 +42,11 @@ ZESocketUDPStatus ZESocketUDP::GetStatus()
 	return Status;
 }
 
+SOCKET_TYPE ZESocketUDP::GetSocket()
+{
+	return Socket;
+}
+
 bool ZESocketUDP::Open()
 {
 	if (Status == ZE_SUS_OPEN)

@@ -59,6 +59,45 @@ ZESocketTCPClientStatus ZESocketTCPClient::GetStatus()
 	return Status;
 }
 
+SOCKET_TYPE ZESocketTCPClient::GetSocket()
+{
+	return Socket;
+}
+
+bool ZESocketTCPClient::Open(SOCKET_TYPE Socket)
+{
+	if (this->Socket == Socket)
+		return true;
+
+	Close();
+
+	if (Socket == INVALID_SOCKET)
+		return false;
+
+	this->Socket = Socket;
+
+	u_long IMode = 1;
+	if(ioctlsocket(Socket, FIONBIO, &IMode) == SOCKET_ERROR)
+	{
+		zeError("Can not set TCP Socket non-blocking mode, WinSock Error code : %d", WSAGetLastError());
+		Close();
+		return false;
+	}
+
+	sockaddr_in ClientInfo;
+	int ClientInfoSize = sizeof(sockaddr_in);
+	getpeername(Socket, (SOCKADDR*)&ClientInfo, &ClientInfoSize);
+	ZEIPAddress::ToSockaddr_in(&ClientInfo, BindIPAddress);
+	Port = htons(ClientInfo.sin_port);
+
+	sockaddr_in ServerInfo;
+	ZEIPAddress::ToSockaddr_in(&ServerInfo, ServerIPAddress);
+	ServerInfo.sin_port = htons(Port);
+
+	Status = ZE_STCS_CONNECTED;
+	return true;
+}
+
 bool ZESocketTCPClient::Open()
 {
 	if (Status != ZE_STCS_DISCONNECTED)

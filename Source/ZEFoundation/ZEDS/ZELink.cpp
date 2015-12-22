@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEJob.cpp
+ Zinek Engine - ZELink.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,55 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEJob.h"
-
-void ZEJob::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString& ZEJob::GetName()
-{
-	return Name;
-}
-
-ZEJobStatus ZEJob::GetStatus()
-{
-	return Status;
-}
-
-void ZEJob::SetPriority(ZEJobPriority Priority)
-{
-	this->Priority = Priority;
-}
-
-ZEJobPriority ZEJob::GetPriority()
-{
-	return Priority;
-}
-
-void ZEJob::SetRecursive(bool Recursive)
-{
-	this->Recursive = Recursive;
-}
-bool ZEJob::GetRecursive()
-{
-	return Recursive;
-}
-
-void ZEJob::AddDependentJob(const ZEString& Job)
-{
-	DependentJobs.Add(Job);
-}
-
-void ZEJob::RemoveDependentJob(const ZEString& Job)
-{
-	DependentJobs.RemoveValue(Job);
-}
-
-void ZEJob::Reset()
-{
-	zeDebugCheck(Status == ZE_JS_DONE || Status == ZE_JS_NONE, "Only jobs with status ZE_JS_DONE can be reseted.");
-	if (Status == ZE_JS_DONE)
-		Status = ZE_JS_NONE;
-}
+#include "ZELink.h"

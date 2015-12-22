@@ -43,6 +43,11 @@ ZESocketTCPServerListenerStatus ZESocketTCPServerListener::GetStatus()
 	return Status;
 }
 
+SOCKET_TYPE ZESocketTCPServerListener::GetSocket()
+{
+	return Socket;
+}
+
 bool ZESocketTCPServerListener::Open()
 {
 	if (Status != ZE_STSLS_NOT_LISTENING)

@@ -139,6 +139,14 @@ float ZEPlane::Distance(const ZEPlane& Plane, const ZEVector3& Point)
 	return  ZEMath::Abs(ZEVector3::DotProduct(Point - Plane.p, Plane.n));
 }
 
+void ZEPlane::ToABCD(const ZEPlane& Plane, float& A, float& B, float& C, float &D)
+{
+	A = Plane.n.x;
+	B = Plane.n.y;
+	C = Plane.n.z;
+	D = -(A * Plane.p.x + B * Plane.p.y + C * Plane.p.z);
+}
+
 inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p)
 {
 	Plane.n = n;

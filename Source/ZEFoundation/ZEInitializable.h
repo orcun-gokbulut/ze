@@ -35,23 +35,12 @@
 
 #pragma once
 
-#include "ZETypes.h"
-
-#define ZE_INITIALIZABLE_GLOBAL(ClassName) \
-	static ZEInt ClassName##InstanceCount; \
-
-
 class ZEInitializable
 {
 	private:
 		bool			Initialized;
-		ZEUInt*			InstanceCount;
 
 	protected:
-
-		virtual bool	InstanceManager(int Operation);
-		virtual bool	InitializeGlobal();
-		virtual void	DeinitializeGlobal();
 		virtual bool	InitializeSelf();
 		virtual void	DeinitializeSelf();
 
@@ -64,5 +53,3 @@ class ZEInitializable
 						ZEInitializable();
 		virtual			~ZEInitializable();
 };
-
-// Reference counting for specific type
