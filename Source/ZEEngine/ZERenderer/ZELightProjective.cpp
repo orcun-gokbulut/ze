@@ -42,16 +42,30 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZETexture/ZETexture2DResource.h"
+#include "ZERNStageShadowmapGeneration.h"
+#include "ZERNRenderParameters.h"
 
-ZELightType ZELightProjective::GetLightType()
+#define ZE_LDF_VIEW_TRANSFORM			1
+#define ZE_LDF_PROJECTION_TRANSFORM		2
+#define ZE_LDF_SHADOW_MAP				4
+#define ZE_LDF_VIEW_VOLUME				8
+
+ZELightType ZELightProjective::GetLightType() const
 {
 	return ZE_LT_PROJECTIVE;
 }
 
 void ZELightProjective::SetFOV(float FOV)
 {
+	if(this->FOV == FOV)
+		return;
+
 	this->FOV = FOV;
+	
+	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
 float ZELightProjective::GetFOV() const
@@ -61,7 +75,12 @@ float ZELightProjective::GetFOV() const
 
 void ZELightProjective::SetAspectRatio(float AspectRatio)
 {
+	if(this->AspectRatio == AspectRatio)
+		return;
+
 	this->AspectRatio = AspectRatio;
+
+	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
 float ZELightProjective::GetAspectRatio() const
@@ -81,18 +100,19 @@ ZEGRTexture2D* ZELightProjective::GetProjectionTexture() const
 
 void ZELightProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
-	ProjectionTextureFile = FileName;
-	if (IsInitialized())
-	{
-		if (ProjectionTextureResource != NULL)
-			ProjectionTextureResource->Release();
+	if(FileName.GetLength() == 0 || ProjectionTextureFile == FileName)
+		return;
 
-		ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
-		if (ProjectionTextureResource != NULL)
-			ProjectionTexture = ProjectionTextureResource->GetTexture2D();
-		else
-			zeError("Can not load projection texture.");
-	}
+	ProjectionTextureFile = FileName;
+
+	if (ProjectionTextureResource != NULL)
+		ProjectionTextureResource->Release();
+
+	ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
+	if (ProjectionTextureResource != NULL)
+		ProjectionTexture = ProjectionTextureResource->GetTexture2D();
+	else
+		zeError("Can not load projection texture.");
 }
 
 const ZEString& ZELightProjective::GetProjectionTextureFile() const
@@ -100,7 +120,7 @@ const ZEString& ZELightProjective::GetProjectionTextureFile() const
 	return ProjectionTextureFile;
 }
 
-ZEGRTexture2D* ZELightProjective::GetShadowMap()
+ZEGRTexture2D* ZELightProjective::GetShadowMap() const
 {
 	return ShadowMap;
 }
@@ -112,10 +132,10 @@ ZESize ZELightProjective::GetViewCount()
 
 const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index)
 {
-	if (UpdateViewVolume)
+	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
-		ViewVolume.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.0f, GetRange());
-		UpdateViewVolume = false;
+		ViewVolume.Create(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.1f, Range);
+		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_VOLUME);
 	}
 
 	return ViewVolume;
@@ -123,7 +143,24 @@ const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index)
 
 const ZEMatrix4x4& ZELightProjective::GetViewTransform(ZESize CascadeIndex)
 {
-	return ViewProjectionMatrix;
+	if(DirtyFlags.GetFlags(ZE_LDF_VIEW_TRANSFORM))
+	{
+		ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation());
+		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_TRANSFORM);
+	}
+
+	return ViewTransform;
+}
+
+const ZEMatrix4x4& ZELightProjective::GetProjectionTransform(ZESize Index)
+{
+	if(DirtyFlags.GetFlags(ZE_LDF_PROJECTION_TRANSFORM))
+	{
+		ZEMatrix4x4::CreatePerspectiveProjection(ProjectionTransform, FOV, AspectRatio, 0.1f, Range);
+		DirtyFlags.UnraiseFlags(ZE_LDF_PROJECTION_TRANSFORM);
+	}
+
+	return ProjectionTransform;
 }
 
 bool ZELightProjective::InitializeSelf()
@@ -131,45 +168,77 @@ bool ZELightProjective::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	if (strlen(ProjectionTextureFile) != 0)
-	{
-		if (ProjectionTextureResource != NULL)
-			ProjectionTextureResource->Release();
+	SetProjectionTextureFile(ProjectionTextureFile);
 
-		ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
-		if (ProjectionTextureResource != NULL)
-			ProjectionTexture = ProjectionTextureResource->GetTexture2D();
-		else
-			zeError("Can not load projection texture.");
-	}
+	ShadowMap = ZEGRTexture2D::CreateInstance(1024, 1024, 1, ZEGR_TF_R16_FLOAT, true);
+
+	ShadowRenderer.SetOutputRenderTarget(ShadowMap->GetRenderTarget());
+	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
+	ShadowRenderer.Initialize();
 
 	return true;
 }
 
 bool ZELightProjective::DeinitializeSelf()
 {
-	if (ProjectionTextureResource != NULL)
-	{
-		ProjectionTextureResource->Release();
-		ProjectionTextureResource = NULL;
-	}
+	ProjectionTexture.Release();
+	ShadowMap.Release();
+
+	ShadowRenderer.Deinitialize();
 
 	return ZEEntity::DeinitializeSelf();
 }
 
 ZELightProjective::ZELightProjective()
 {
-	FOV = ZE_PI_2;
+	FOV = ZE_PI_4;
 	AspectRatio = 1.0f;
-	ShadowMap = NULL;
-	ProjectionTexture = NULL;
 	ProjectionTextureResource = NULL;
-	ViewProjectionMatrix = ZEMatrix4x4::Identity;
+
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_SHADOWING;
 }
 
 ZELightProjective::~ZELightProjective()
 {
+	DeinitializeSelf();
+}
 
+bool ZELightProjective::PreRender(const ZERNCullParameters* CullParameters)
+{
+	return ZELight::PreRender(CullParameters);
+}
+
+void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	static bool Rendered = false;
+	if(!Rendered)
+	{
+		Rendered = true;
+	
+		ZERNView View = ShadowRenderer.GetView();
+		View.Position = GetWorldPosition();
+		View.Rotation = GetWorldRotation();
+		View.Direction = GetWorldFront();
+		View.U = GetWorldRight();
+		View.V = GetWorldUp();
+		View.N = GetWorldFront();
+
+		View.VerticalFOV = FOV;
+		View.HorizontalFOV = FOV;
+		View.AspectRatio = AspectRatio;
+
+		View.NearZ = 0.1f;
+		View.FarZ = GetRange();
+		View.ViewVolume = &GetViewVolume();
+		View.ViewTransform = GetViewTransform();
+		View.ViewProjectionTransform = GetProjectionTransform() * View.ViewTransform;
+
+		ShadowRenderer.SetView(View);
+		ShadowRenderer.SetOutputRenderTarget(ShadowMap->GetRenderTarget());
+
+		ZELight::Render(Parameters, Command);
+	}
 }
 
 ZELightProjective* ZELightProjective::CreateInstance()

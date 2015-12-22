@@ -36,30 +36,17 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEGRTexture.h"
 #include "ZEGRResource.h"
-
-enum ZEGRDepthStencilFormat
-{
-	ZEGR_DSF_NONE				= 0,
-	ZEGR_DSF_DEPTH16			= 1,
-	ZEGR_DSF_DEPTH24_STENCIL8	= 2,
-	ZEGR_DSF_DEPTHD32_FLOAT		= 3,
-};
 
 class ZEGRDepthStencilBuffer : public ZEGRResource
 {
-	private:
+	protected:
 		ZEUInt							Width;
 		ZEUInt							Height;
-		ZEGRDepthStencilFormat			Format;
+		ZEGRFormat						Format;
 
-		static ZESize					GetPixelSize(ZEGRDepthStencilFormat Format);
-
-	protected:	
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable = false);
-		virtual void					Deinitialize();
-
-										ZEGRDepthStencilBuffer();
+										ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 		virtual							~ZEGRDepthStencilBuffer();
 
 	public:
@@ -67,7 +54,5 @@ class ZEGRDepthStencilBuffer : public ZEGRResource
 
 		ZEUInt							GetWidth();
 		ZEUInt							GetHeight();
-		ZEGRDepthStencilFormat			GetFormat();
-
-		static ZEGRDepthStencilBuffer*	Create(ZEUInt Width, ZEUInt Height, ZEGRDepthStencilFormat Format, bool Readable = false);
+		ZEGRFormat						GetFormat();
 };

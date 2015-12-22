@@ -35,6 +35,7 @@
 
 #include "ZERNGBuffer.hlsl"
 #include "ZERNSkin.hlsl"
+#include "ZERNTransformations.hlsl"
 
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
@@ -118,26 +119,24 @@ struct ZERNFixedMaterial_GBufferStage_VSInput
 struct ZERNFixedMaterial_GBufferStage_VSOutput 
 {
 	float4 Position			: SV_Position;
-	float3 ViewPosition		: TEXCOORD0;
-	float3 Normal			: TEXCOORD1;
-	float3 Binormal			: TEXCOORD2;
-	float3 Tangent			: TEXCOORD3;
-	float2 Texcoord			: TEXCOORD4;
+	float3 Normal			: TEXCOORD0;
+	float3 Binormal			: TEXCOORD1;
+	float3 Tangent			: TEXCOORD2;
+	float2 Texcoord			: TEXCOORD3;
 	#if defined(ZERN_FM_VERTEX_COLOR)
-		float4 Color		: TEXCOORD5;
+		float4 Color		: TEXCOORD4;
 	#endif
 };
 
 struct ZERNFixedMaterial_GBufferStage_PSInput
 {
 	float4 Position			: SV_Position;
-	float3 ViewPosition		: TEXCOORD0;
-	float3 Normal			: TEXCOORD1;
-	float3 Binormal			: TEXCOORD2;
-	float3 Tangent			: TEXCOORD3;
-	float2 Texcoord			: TEXCOORD4;
+	float3 Normal			: TEXCOORD0;
+	float3 Binormal			: TEXCOORD1;
+	float3 Tangent			: TEXCOORD2;
+	float2 Texcoord			: TEXCOORD3;
 	#if defined(ZERN_FM_VERTEX_COLOR)
-		float4 Color		: TEXCOORD5;
+		float4 Color		: TEXCOORD4;
 	#endif
 	//bool Side				: SV_IsFrontFace;
 };
@@ -150,18 +149,16 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 {
 	ZERNFixedMaterial_GBufferStage_VSOutput Output;
 
-	float4x4 WorldViewTransform = mul(ZERNView_ViewTransform, ZERNFixedMaterial_WorldTransform);
-	float4x4 WorldViewProjTransform = mul(ZERNView_ProjectionTransform, WorldViewTransform);
+	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 	
 	#if defined(ZERN_FM_SKIN_TRANSFORM)
 		WorldViewProjTransform = ZESkin_ApplySkinTransform(WorldViewProjTransform, Input.BoneIndices, Input.BoneTransforms);
 		WorldViewTransform = ZESkin_ApplySkinTransform(WorldViewTransform, Input.BoneIndices, Input.BoneTransforms);
 	#endif
 
-	Output.Position = mul(WorldViewProjTransform, float4(Input.Position, 1.0f));
-	Output.ViewPosition = mul(WorldViewTransform, float4(Input.Position, 1.0f)).xyz;
-	Output.Normal = mul((float3x3)WorldViewTransform, Input.Normal);
-	Output.Tangent = mul((float3x3)WorldViewTransform, Input.Tangent);
+	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
+	Output.Normal = ZERNTransformations_WorldToView(float4(Input.Normal, 0.0f));
+	Output.Tangent = ZERNTransformations_WorldToView(float4(Input.Tangent, 0.0f));
 	Output.Binormal = cross(Output.Normal, Output.Tangent);
 	
 	Output.Texcoord = Input.Texcoord;
@@ -253,8 +250,6 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	
 	float3 AccumulationColor = AmbientColor + EmissiveColor + ReflectionRefractionColor;
 	
-	ZERNGBuffer_SetDepth(GBuffer, Input.ViewPosition.z);
-	ZERNGBuffer_SetViewPosition(GBuffer, Input.ViewPosition.xyz);
 	ZERNGBuffer_SetViewNormal(GBuffer, Normal);
 	ZERNGBuffer_SetShadingModel(GBuffer,  ZERN_LM_BLINN_PONG);
 	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);

@@ -240,7 +240,6 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 
 	if (AxisEnabled)
 	{
-		RenderCommand.Order = 2.0f;
 		ZEVector3 AxisGridPosition(
 			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
@@ -256,7 +255,6 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 
 	if (MinorGridEnabled)
 	{
-		RenderCommand.Order = 1.0f;
 		ZEVector3 MinorGridPosition(
 			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
@@ -268,7 +266,6 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 
 	if (MajorGridEnabled)
 	{
-		RenderCommand.Order = 1.0f;
 		ZEVector3 MajorGridPosition(
 			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
@@ -278,13 +275,8 @@ bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 
 		ConstantBufferMajorGridTransform->SetData(&Constants.MajorGridTransform);
 	}
-
-	RenderCommand.Priority = 0;
-	RenderCommand.Order = 0;
-	RenderCommand.StageMask = Material->GetStageMask();
-
-	if(!Parameters->Renderer->ContainsCommand(&RenderCommand))
-		Parameters->Renderer->AddCommand(&RenderCommand);
+	
+	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }
@@ -323,10 +315,6 @@ bool ZEGrid::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	RenderCommand.Entity = this;
-	RenderCommand.Priority = 0;
-	RenderCommand.Order = 0;
-
 	ConstantBufferAxisTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
@@ -334,6 +322,12 @@ bool ZEGrid::InitializeSelf()
 	Material = ZERNFixedMaterial::CreateInstance();
 	Material->SetVertexColorEnabled(false);
 	Material->Initialize();
+
+	RenderCommand.Entity = this;
+	RenderCommand.Priority = 0;
+	RenderCommand.Order = 0;
+	RenderCommand.ExtraParameters = NULL;
+	RenderCommand.StageMask = Material->GetStageMask();
 
 	GenerateGrid();
 	

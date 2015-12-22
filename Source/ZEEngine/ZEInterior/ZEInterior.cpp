@@ -54,7 +54,7 @@
 
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
-	return ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
+	return ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER;
 }
 
 void ZEInterior::LoadInteriorResource()

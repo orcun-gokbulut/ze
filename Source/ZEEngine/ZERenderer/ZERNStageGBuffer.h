@@ -41,13 +41,12 @@
 class ZEGRTexture2D;
 class ZEGRRenderState;
 class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
 
 class ZERNStageGBuffer : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
-		ZEGRHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffer;
+		ZEGRHolder<ZEGRTexture2D>			DepthStencilBuffer;
 		ZEGRHolder<ZEGRTexture2D>			GBuffer0;
 		ZEGRHolder<ZEGRTexture2D>			GBuffer1;
 		ZEGRHolder<ZEGRTexture2D>			GBuffer2;
@@ -71,7 +70,7 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRTexture2D*						GetSpecularColorMap() const;
 		ZEGRTexture2D*						GetNormalMap() const;
 		ZEGRTexture2D*						GetAccumulationMap() const;
-		ZEGRDepthStencilBuffer*				GetDepthStencilBuffer() const;
+		ZEGRTexture2D*						GetDepthMap() const;
 
 		static const ZEGRRenderState&		GetRenderState();
 };

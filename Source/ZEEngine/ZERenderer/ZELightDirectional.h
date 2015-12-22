@@ -42,19 +42,24 @@
 class ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
-	private:
-		bool								InitializeSelf();
-		bool								DeinitializeSelf();
 
+	private:
 											ZELightDirectional();
 		virtual								~ZELightDirectional();
 
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
+
 	public:
-		ZELightType							GetLightType();
+		ZELightType							GetLightType() const;
 
 		ZESize								GetViewCount();
 		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
 		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
-		
+		virtual const ZEMatrix4x4&			GetProjectionTransform(ZESize Index = 0);
+
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
 		static ZELightDirectional*			CreateInstance();
 };

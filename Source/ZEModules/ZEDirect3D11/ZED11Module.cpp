@@ -245,11 +245,6 @@ ZEGRTextureCube* ZED11Module::CreateTextureCube()
 	return new ZED11TextureCube();
 }
 
-ZEGRDepthStencilBuffer* ZED11Module::CreateDepthStencilBuffer()
-{
-	return new ZED11DepthStencilBuffer();
-}
-
 ZEGRRenderStateData* ZED11Module::CreateRenderStateData()
 {
 	return new ZED11RenderStateData();

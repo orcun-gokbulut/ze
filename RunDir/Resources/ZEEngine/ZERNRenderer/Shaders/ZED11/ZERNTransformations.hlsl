@@ -72,6 +72,28 @@ float3 ZERNTransformations_HomogeneousToView(float2 VectorHomogeneous, float Dep
 	return float3(VectorView, DepthView);
 }
 
+//FROM PROJECTION TRANSFORMATIONS
+///////////////////////////////////////////////////////////////////////////
+
+float3 ZERNTransformations_ProjectionToHomogeneous(float4 VectorProjection)
+{
+	return VectorProjection.xyz / VectorProjection.w;
+}
+
+float2 ZERNTransformations_ProjectionToTexelCorner(float4 VectorProjection)
+{
+	float3 PositionHomogeneous = ZERNTransformations_ProjectionToHomogeneous(VectorProjection);
+	
+	return ZERNTransformations_HomogeneousToTexelCorner(PositionHomogeneous.xy);
+}
+
+float2 ZERNTransformations_ProjectionToTexelCenter(float4 VectorProjection, float2 Dimensions)
+{
+	float3 PositionHomogeneous = ZERNTransformations_ProjectionToHomogeneous(VectorProjection);
+	
+	return ZERNTransformations_HomogeneousToTexelCenter(PositionHomogeneous.xy, Dimensions);
+}
+
 //FROM TEXEL TRANSFORMATIONS
 ///////////////////////////////////////////////////////////////////////////
 

@@ -75,9 +75,14 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		ZEFlags								DirtyFlags;
 
-		ZEGRHolder<ZEGRShader>				GBufferStage_VertexShader;
-		ZEGRHolder<ZEGRShader>				GBufferStage_PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>		GBufferStage_RenderState;
+		ZEGRHolder<ZEGRShader>				StageGBuffer_VertexShader;
+		ZEGRHolder<ZEGRShader>				StageGBuffer_PixelShader;
+		ZEGRHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
+
+		ZEGRHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
+		ZEGRHolder<ZEGRShader>				StageShadowmapGeneration_PixelShader;
+		ZEGRHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
+
 		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZERNMap								BaseMap;

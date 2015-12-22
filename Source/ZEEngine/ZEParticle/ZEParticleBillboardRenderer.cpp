@@ -100,9 +100,8 @@ bool ZEParticleBillboardRenderer::PreRender(const ZERNCullParameters* CullParame
 	RenderCommand.Priority = 0;
 	RenderCommand.StageMask = Material->GetStageMask();
 	RenderCommand.ExtraParameters = (void*)GetOwner();
-
-	if(!CullParameters->Renderer->ContainsCommand(&RenderCommand))
-		CullParameters->Renderer->AddCommand(&RenderCommand);
+	
+	CullParameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }

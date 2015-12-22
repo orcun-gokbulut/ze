@@ -131,11 +131,7 @@ const ZEString& ZERNStageTextureOutput::GetName()
 
 bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZEGROutput* Output = Renderer->GetOutput();
-	if(Output == NULL)
-		return false;
-
-	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
 

@@ -113,19 +113,12 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 		InputTexture = StageGbuffer->GetAccumulationMap();
 
 	if(OutputRenderTarget == NULL)
-	{
-		ZERNStageHDR* StageHDR = (ZERNStageHDR*)Renderer->GetStage(ZERN_STAGE_HDR);
-		OutputRenderTarget = (StageHDR != NULL && StageHDR->GetEnable()) ? StageGbuffer->GetAccumulationMap()->GetRenderTarget() : Renderer->GetOutput()->GetRenderTarget(); 
-	}
+		OutputRenderTarget = Renderer->GetOutputRenderTarget();
 
 	if(PostProcessFlags.GetFlags(ZERN_PPF_LIGHT_SCATTERING))
 	{
 		LightScattering.SetInputTexture(InputTexture);
-
-		ZED11DepthStencilBuffer* D11DepthStencilBuffer = (ZED11DepthStencilBuffer*)StageGbuffer->GetDepthStencilBuffer();
-		ID3D11ShaderResourceView* NativeTexture =  D11DepthStencilBuffer->GetResourceView();
-		ID3D11DeviceContext1* D11Context = static_cast<ZED11Context*>(Context)->GetContext();
-		D11Context->PSSetShaderResources(1, 1, &NativeTexture);
+		LightScattering.SetDepthTexture(StageGbuffer->GetDepthMap());
 
 		LightScattering.SetOutputRenderTarget(OutputRenderTarget);
 

@@ -39,8 +39,8 @@
 
 class ZEScene;
 class ZEEntity;
-struct ZERNView;
 class ZERNRenderer;
+struct ZERNView;
 
 struct ZERNCullParameters
 {
@@ -48,25 +48,11 @@ struct ZERNCullParameters
 	ZERNView*						View;
 };
 
-struct ZESceneStatistics
-{
-	ZEUInt32						TotalEntityCount;
-	ZEUInt32						DrawableEntityCount;
-
-	ZEUInt32						CulledEntityCount;
-	ZEUInt32						DrawedEntityCount;
-
-	ZEUInt32						TotalLightCount;
-	ZEUInt32						CulledLightCount;
-	ZEUInt32						DrawedLightCount;
-};
-
 class ZESceneCuller
 {
 	private:
 		ZEScene*					Scene;
 		ZERNCullParameters			CullParameters;
-		ZESceneStatistics			Statistics;
 
 		void						CullEntity(ZEEntity* Entity);
 
@@ -76,9 +62,6 @@ class ZESceneCuller
 
 		void						SetCullParameters(const ZERNCullParameters& Parameters);
 		const ZERNCullParameters&	GetCullParameters();
-
-		void						SetStatistics(const ZESceneStatistics& Statistics);
-		const ZESceneStatistics&	GetStatistics() const;
 
 		void						Cull();
 

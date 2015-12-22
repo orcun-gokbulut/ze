@@ -55,6 +55,7 @@
 #include "ZECanvas.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEInterior/ZEInteriorResource.h"
+#include "ZERNStageShadowmapGeneration.h"
 
 #define ZERN_FMDF_CONSTANT_BUFFER		1
 #define ZERN_FMDF_RENDER_STATE			2
@@ -108,13 +109,28 @@ bool ZERNFixedMaterial::UpdateShaders()
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNFixedMaterial_GBufferStage_VertexShader";
-	GBufferStage_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(GBufferStage_VertexShader == NULL, false, "Cannot set vertex shader.");
+	StageGBuffer_VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageGBuffer_VertexShader == NULL, false, "Cannot set vertex shader.");
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNFixedMaterial_GBufferStage_PixelShader";
-	GBufferStage_PixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(GBufferStage_PixelShader == NULL, false, "Cannot set pixel shader.");
+	StageGBuffer_PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageGBuffer_PixelShader == NULL, false, "Cannot set pixel shader.");
+
+	Options.Definitions.Clear();
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNShadowRendering.hlsl";
+	Options.Model = ZEGR_SM_5_0;
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNShadowRendering_GenerateShadowmap_VertexShader_Main";
+	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNShadowRendering_GenerateShadowmap_PixelShader_Main";
+	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
@@ -140,11 +156,20 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : ZEGR_FM_SOLID);
 	RenderState.SetRasterizerState(RasterizerState);
 	
-	RenderState.SetShader(ZEGR_ST_VERTEX, GBufferStage_VertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, GBufferStage_PixelShader);
+	RenderState.SetShader(ZEGR_ST_VERTEX, StageGBuffer_VertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, StageGBuffer_PixelShader);
 
-	GBufferStage_RenderState = RenderState.Compile();
-	zeCheckError(GBufferStage_RenderState == NULL, false, "Cannot set Gbuffer render state.");
+	StageGBuffer_RenderState = RenderState.Compile();
+	zeCheckError(StageGBuffer_RenderState == NULL, false, "Cannot set Gbuffer render state.");
+
+	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
+	RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
+
+	StageShadowmapGeneration_RenderState = RenderState.Compile();
+	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -197,9 +222,14 @@ bool ZERNFixedMaterial::InitializeSelf()
 
 void ZERNFixedMaterial::DeinitializeSelf()
 {
-	GBufferStage_VertexShader.Release();
-	GBufferStage_PixelShader.Release();
-	GBufferStage_RenderState.Release();
+	StageGBuffer_VertexShader.Release();
+	StageGBuffer_PixelShader.Release();
+	StageGBuffer_RenderState.Release();
+
+	StageShadowmapGeneration_VertexShader.Release();
+	StageShadowmapGeneration_PixelShader.Release();
+	StageShadowmapGeneration_RenderState.Release();
+
 	ConstantBuffer.Release();
 
 	DirtyFlags.RaiseAll();
@@ -266,7 +296,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 
 ZEUInt ZERNFixedMaterial::GetStageMask()
 {
-	return ZERN_STAGE_GBUFFER ;
+	return ZERN_STAGE_GBUFFER | ZERN_STAGE_SHADOW_MAP_GENERATION;
 }
 
 void ZERNFixedMaterial::SetName(const ZEString& Name)
@@ -1076,67 +1106,81 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!Update())
 		return false;
 
-	Context->SetRenderState(GBufferStage_RenderState);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+	if(Stage == NULL || !Stage->GetEnable())
+		return false;
 
-	bool TextureSampler = false;
-	if (BaseMap.IsAvailable())
+	ZEUInt StageID = (Stage->GetId() & GetStageMask());
+
+	if(StageID == ZERN_STAGE_GBUFFER)
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap.GetTexture());
-		TextureSampler = true;
-	}
+		Context->SetRenderState(StageGBuffer_RenderState);
 
-	if (NormalMapEnabled && NormalMap.IsAvailable())
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+		Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+
+		bool TextureSampler = false;
+		if (BaseMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap.GetTexture());
+			TextureSampler = true;
+		}
+
+		if (NormalMapEnabled && NormalMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 1, NormalMap.GetTexture());
+			TextureSampler = true;
+		}
+
+		if (SpecularEnabled && SpecularMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 2, SpecularMap.GetTexture());
+			TextureSampler = true;
+		}
+
+		if (EmissiveEnabled && EmissiveMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 3, EmissiveMap.GetTexture());
+			TextureSampler = true;
+		}
+
+		if (HeightMapEnabled && HeightMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 4, HeightMap.GetTexture());
+			TextureSampler = true;
+		}
+
+		if (OpacityMapEnabled && OpacityMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap.GetTexture());
+			TextureSampler = true;
+		}
+
+		if ((ReflectionEnabled || RefractionEnabled) && EnvironmentMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 7, EnvironmentMap.GetTexture());
+			Context->SetSampler(ZEGR_ST_PIXEL, 1, EnvironmentMap.GetSamplerState());
+		}
+
+		if (GetDetailBaseMapEnabled() && DetailBaseMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 8, DetailBaseMap.GetTexture());
+			Context->SetSampler(ZEGR_ST_PIXEL, 2, DetailBaseMap.GetSamplerState());
+		}
+
+		if (GetDetailNormalMapEnabled() && DetailNormalMap.IsAvailable())
+		{
+			Context->SetTexture(ZEGR_ST_PIXEL, 9, DetailNormalMap.GetTexture());
+			Context->SetSampler(ZEGR_ST_PIXEL, 3, DetailNormalMap.GetSamplerState());
+		}
+
+		if (TextureSampler)
+			Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSamplerState());
+
+	}
+	else if(StageID == ZERN_STAGE_SHADOW_MAP_GENERATION)
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 1, NormalMap.GetTexture());
-		TextureSampler = true;
+		Context->SetRenderState(StageShadowmapGeneration_RenderState);
 	}
-
-	if (SpecularEnabled && SpecularMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 2, SpecularMap.GetTexture());
-		TextureSampler = true;
-	}
-
-	if (EmissiveEnabled && EmissiveMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 3, EmissiveMap.GetTexture());
-		TextureSampler = true;
-	}
-
-	if (HeightMapEnabled && HeightMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 4, HeightMap.GetTexture());
-		TextureSampler = true;
-	}
-
-	if (OpacityMapEnabled && OpacityMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap.GetTexture());
-		TextureSampler = true;
-	}
-
-	if ((ReflectionEnabled || RefractionEnabled) && EnvironmentMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 7, EnvironmentMap.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 1, EnvironmentMap.GetSamplerState());
-	}
-
-	if (GetDetailBaseMapEnabled() && DetailBaseMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 8, DetailBaseMap.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 2, DetailBaseMap.GetSamplerState());
-	}
-
-	if (GetDetailNormalMapEnabled() && DetailNormalMap.IsAvailable())
-	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 9, DetailNormalMap.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 3, DetailNormalMap.GetSamplerState());
-	}
-
-	if (TextureSampler)
-		Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSamplerState());
 
 	return true;
 }

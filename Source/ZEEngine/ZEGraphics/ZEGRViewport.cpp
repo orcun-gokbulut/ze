@@ -96,3 +96,18 @@ float ZEGRViewport::GetMaxDepth() const
 {
 	return StateData.MaxDepth;
 }
+
+ZEGRViewport::ZEGRViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
+{
+	StateData.X = X;
+	StateData.Y = Y;
+	StateData.Width = Width;
+	StateData.Height = Height;
+	StateData.MinDepth = MinDepth;
+	StateData.MaxDepth = MaxDepth;
+}
+
+ZEGRViewport::ZEGRViewport()
+{
+	memset(&StateData, 0, sizeof(ZEViewportData));
+}

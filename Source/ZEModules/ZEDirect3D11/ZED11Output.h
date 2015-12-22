@@ -40,14 +40,10 @@
 #include "ZETypes.h"
 #include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRHolder.h"
-#include "ZEGraphics/ZEGRViewport.h"
 
 struct IDXGIOutput;
 struct IDXGISwapChain1;
 class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-class ZED11DepthStencilBuffer;
-class ZED11RenderTarget;
 
 class ZED11Output : public ZEGROutput, ZED11ComponentBase
 {
@@ -56,8 +52,6 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 		void*								Handle;
 		ZEGRMonitorMode*					Mode;
 		ZEGRHolder<ZEGRRenderTarget>		RenderTarget;
-		ZEGRHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffer;
-		ZEGRViewport						Viewport;
 
 		IDXGIOutput*						Output;
 		IDXGISwapChain1*					SwapChain;
@@ -75,8 +69,6 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 	public:
 		virtual void*						GetHandle();
 		virtual ZEGRRenderTarget*			GetRenderTarget();
-		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer();
-		virtual const ZEGRViewport&			GetViewport();
 
 		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode);
 		virtual ZEGRMonitorMode*			GetMonitorMode();

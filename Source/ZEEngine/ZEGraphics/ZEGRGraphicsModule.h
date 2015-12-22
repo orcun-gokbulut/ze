@@ -99,7 +99,6 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRTexture2D*					CreateTexture2D() = 0;
 		virtual ZEGRTexture3D*					CreateTexture3D() = 0;
 		virtual ZEGRTextureCube*				CreateTextureCube() = 0;
-		virtual ZEGRDepthStencilBuffer*			CreateDepthStencilBuffer() = 0;
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler() = 0;
 		virtual ZEGRRenderStateData*			CreateRenderStateData() = 0;
 

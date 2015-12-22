@@ -69,4 +69,7 @@ class ZEGRViewport
 
 		void					SetMaxDepth(float Depth);
 		float					GetMaxDepth() const;
+
+								ZEGRViewport(float X, float Y, float Width, float Height, float MinDepth = 0.0f, float MaxDepth = 1.0f);
+								ZEGRViewport();
 };

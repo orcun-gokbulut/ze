@@ -356,7 +356,7 @@ void ZERNLightScattering::ReleasePrecomputeResources()
 void ZERNLightScattering::Process(ZEGRContext* Context, bool MultipleScattering)
 {
 	zeDebugCheck(InputTexture == NULL, "Input texture cannot be null");
-	//zeDebugCheck(DepthTexture == NULL, "Depth texture cannot be null");
+	zeDebugCheck(DepthTexture == NULL, "Depth texture cannot be null");
 	zeDebugCheck(OutputRenderTarget == NULL, "Output render target cannot be null");
 
 	static bool Precomputed = false;
@@ -370,7 +370,7 @@ void ZERNLightScattering::Process(ZEGRContext* Context, bool MultipleScattering)
 	ConstantBuffer->SetData(&Constants);
 
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, InputTexture);
-	//Context->SetTexture(ZEGR_ST_PIXEL, 1, DepthTexture);
+	Context->SetTexture(ZEGR_ST_PIXEL, 1, DepthTexture);
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, MultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 	Context->SetRenderState(RenderStateData);

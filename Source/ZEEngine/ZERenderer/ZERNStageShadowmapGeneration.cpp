@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageForward.cpp
+ Zinek Engine - ZERNStageShadowmapGeneration.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,97 +33,81 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageForward.h"
-#include "ZERNRenderer.h"
+#include "ZERNStageShadowmapGeneration.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGROutput.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZERNCommand.h"
+#include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZERNRenderer.h"
 
-ZEInt ZERNStageForward::GetId()
-{
-	return ZERN_STAGE_FORWARD;
-}
-
-const ZEString& ZERNStageForward::GetName()
-{
-	static ZEString Name = "Forward";
-
-	return Name;
-}
-
-const ZEGRRenderState& ZERNStageForward::GetRenderState()
-{
-	static ZEGRRenderState RenderState;
-	static bool Initialized = false;
-	if (!Initialized)
-	{
-		Initialized = true;
-		RenderState = ZERNStage::GetRenderState();
-
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthTestEnable(true);
-		DepthStencilState.SetDepthWriteEnable(true);
-		DepthStencilState.SetDepthFunction(ZEGR_CF_LESS);
-
-		RenderState.SetDepthStencilState(DepthStencilState);
-
-		ZEGRRasterizerState Rasterizer;
-		Rasterizer.SetFillMode(ZEGR_FM_SOLID);
-		Rasterizer.SetFrontIsCounterClockwise(false);
-		Rasterizer.SetCullDirection(ZEGR_CD_COUNTER_CLOCKWISE);
-
-		RenderState.SetRasterizerState(Rasterizer);
-
-		ZEGRBlendState BlendState;
-		BlendState.SetBlendEnable(false);
-
-		RenderState.SetBlendState(BlendState);
-
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
-	}
-
-	return RenderState;
-}
-
-bool ZERNStageForward::InitializeSelf()
+bool ZERNStageShadowmapGeneration::InitializeSelf()
 {
 	return true;
 }
 
-bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+void ZERNStageShadowmapGeneration::DeinitializeSelf()
+{
+	DepthBuffer.Release();
+}
+
+ZEInt ZERNStageShadowmapGeneration::GetId()
+{
+	return ZERN_STAGE_SHADOW_MAP_GENERATION;
+}
+
+const ZEString& ZERNStageShadowmapGeneration::GetName()
+{
+	static const ZEString Name = "Shadow map generation";
+	return Name;
+}
+
+bool ZERNStageShadowmapGeneration::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
 	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
 
-	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.5f, 0.5f, 0.5f, 1.0f));
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 1.0f, 0x00);
+	ZEUInt Width = RenderTarget->GetWidth();
+	ZEUInt Height = RenderTarget->GetHeight();
 
-	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	if(DepthBuffer == NULL || DepthBuffer->GetWidth() != Width || DepthBuffer->GetHeight() != Height)
+	{
+		DepthBuffer.Release();
+		DepthBuffer = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D32_FLOAT, false, true);
+	}
+
+	Context->ClearDepthStencilBuffer(DepthBuffer->GetDepthStencilBuffer(), true, true, 1.0f, 0x00);
+	Context->SetRenderTargets(1, &RenderTarget, DepthBuffer->GetDepthStencilBuffer());
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
 	return true;
 }
 
-void ZERNStageForward::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStageShadowmapGeneration::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 
-
-ZEInt ZERNStageForwardTransparent::GetId()
+ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
 {
-	return ZERN_STAGE_FORWARD_TRANSPARANT;
 }
 
-const ZEString& ZERNStageForwardTransparent::GetName()
+const ZEGRRenderState& ZERNStageShadowmapGeneration::GetRenderState()
 {
-	static ZEString Name = "ForwardTransparent";
-	return Name;
+	static ZEGRRenderState RenderState;
+	static bool Initialized = false;
+	
+	if(!Initialized)
+	{
+		Initialized = true;
+
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D32_FLOAT);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R16_FLOAT);
+	}
+
+	return RenderState;
 }
 
-const ZEGRRenderState& ZERNStageForwardTransparent::GetRenderState()
-{
-	return ZERNStageForward::GetRenderState();
-}

@@ -66,9 +66,9 @@ class ZEGRTexture : public ZEGRResource
 								ZEGRTexture();
 
 	public:
-		virtual ZEGRTextureType	GetTextureType() = 0;
-
 		ZEGRFormat				GetFormat();
 		ZEUInt					GetLevelCount();
 		bool					GetIsRenderTarget();
+
+		virtual ZEGRTextureType	GetTextureType() = 0;
 };

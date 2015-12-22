@@ -49,42 +49,45 @@ class ZELightProjective : public ZELight
 	ZE_OBJECT
 
 	private:
-		float							FOV;
-		float							AspectRatio;
-		ZEViewFrustum					ViewVolume;
-		ZEGRHolder<ZEGRTexture2D>		ProjectionTexture;
-		ZEGRHolder<ZEGRTexture2D>		ShadowMap;
-		ZEMatrix4x4						ViewProjectionMatrix;
-		
-		ZETexture2DResource*			ProjectionTextureResource;
-		ZEString						ProjectionTextureFile;
+		float								FOV;
+		float								AspectRatio;
+		ZEViewFrustum						ViewVolume;
+		ZEGRHolder<ZEGRTexture2D>			ProjectionTexture;
+		ZEGRHolder<ZEGRTexture2D>			ShadowMap;
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		ZETexture2DResource*				ProjectionTextureResource;
+		ZEString							ProjectionTextureFile;
 
-										ZELightProjective();
-		virtual							~ZELightProjective();
+											ZELightProjective();
+		virtual								~ZELightProjective();
 
-	public:
-		ZELightType						GetLightType();
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
-		void							SetFOV(float FOV);
-		float							GetFOV() const;
+public:
+	ZELightType								GetLightType() const;
 
-		void							SetAspectRatio(float AspectRatio);
-		float							GetAspectRatio() const;
+	void									SetFOV(float FOV);
+	float									GetFOV() const;
 
-		void							SetProjectionTextureFile(const ZEString& Filename);
-		const ZEString&					GetProjectionTextureFile() const;
+	void									SetAspectRatio(float AspectRatio);
+	float									GetAspectRatio() const;
 
-		void							SetProjectionTexture(ZEGRTexture2D* Texture);
-		ZEGRTexture2D*					GetProjectionTexture() const;
+	void									SetProjectionTextureFile(const ZEString& Filename);
+	const ZEString&							GetProjectionTextureFile() const;
 
-		virtual ZESize					GetViewCount();
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
+	void									SetProjectionTexture(ZEGRTexture2D* Texture);
+	ZEGRTexture2D*							GetProjectionTexture() const;
 
-		ZEGRTexture2D*					GetShadowMap();
+	ZEGRTexture2D*							GetShadowMap() const;
 
-		static ZELightProjective*		CreateInstance();
+	virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+	virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+	virtual ZESize							GetViewCount();
+	virtual const ZEViewVolume&				GetViewVolume(ZESize Index = 0);
+	virtual const ZEMatrix4x4&				GetViewTransform(ZESize Index = 0);
+	virtual const ZEMatrix4x4&				GetProjectionTransform(ZESize Index = 0);
+
+	static ZELightProjective*				CreateInstance();
 };

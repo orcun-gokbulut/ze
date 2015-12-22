@@ -85,7 +85,7 @@ class ZEGRRenderState
 		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
 		ZEGRRasterizerState						RasterizerState;
 		ZEGRDepthStencilState					DepthStencilState;
-		ZEGRDepthStencilFormat					DepthStencilFormat;
+		ZEGRFormat								DepthStencilFormat;
 		ZEGRFormat								RenderTargetFormats[ZEGR_MAX_RENDER_TARGET_SLOT];
 		ZEGRBlendState							BlendState;
 
@@ -104,8 +104,8 @@ class ZEGRRenderState
 		void									SetRenderTargetFormat(ZEUInt Index, ZEGRFormat Format);
 		ZEGRFormat								GetRenderTargetFormat(ZEUInt Index) const;
 
-		void									SetDepthStencilFormat(ZEGRDepthStencilFormat Format);
-		ZEGRDepthStencilFormat					GetDepthStencilFormat() const;
+		void									SetDepthStencilFormat(ZEGRFormat Format);
+		ZEGRFormat								GetDepthStencilFormat() const;
 
 		void									SetRasterizerState(const ZEGRRasterizerState& State);
 		const ZEGRRasterizerState&				GetRasterizerState() const;

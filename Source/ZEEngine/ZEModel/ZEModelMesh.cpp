@@ -609,8 +609,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	RenderCommand.Entity = Owner;
 	RenderCommand.ExtraParameters = MeshLOD;
 	
-	if(!CullParameters->Renderer->ContainsCommand(&RenderCommand))
-		CullParameters->Renderer->AddCommand(&RenderCommand);
+	CullParameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }

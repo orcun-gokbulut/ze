@@ -63,7 +63,7 @@ typedef ZEFlags ZEDrawFlags;
 #define ZE_DF_DRAW								1
 #define ZE_DF_DRAW_COMPONENTS					2
 #define ZE_DF_LIGHT_SOURCE						4
-#define ZE_DF_LIGHT_RECIVER						8
+#define ZE_DF_LIGHT_RECEIVER					8
 #define ZE_DF_CULL								16
 #define ZE_DF_CULL_COMPONENTS					32
 #define ZE_DF_AUTO								64

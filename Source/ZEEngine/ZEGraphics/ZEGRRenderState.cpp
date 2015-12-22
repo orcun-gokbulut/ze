@@ -104,12 +104,12 @@ const ZEGRBlendState& ZEGRRenderState::GetBlendState() const
 	return BlendState;
 }
 
-void ZEGRRenderState::SetDepthStencilFormat(ZEGRDepthStencilFormat Format)
+void ZEGRRenderState::SetDepthStencilFormat(ZEGRFormat Format)
 {
 	DepthStencilFormat = Format;
 }
 
-ZEGRDepthStencilFormat ZEGRRenderState::GetDepthStencilFormat() const
+ZEGRFormat ZEGRRenderState::GetDepthStencilFormat() const
 {
 	return DepthStencilFormat;
 }
@@ -138,7 +138,7 @@ void ZEGRRenderState::SetToDefault()
 {
 	VertexLayout.SetToDefault();
 	memset(Shaders, NULL, sizeof(ZEGRShader*) * ZEGR_SHADER_TYPE_COUNT);
-	DepthStencilFormat = ZEGR_DSF_NONE;
+	DepthStencilFormat = ZEGR_TF_NONE;
 	memset(RenderTargetFormats, ZEGR_TF_NONE, sizeof(ZEGRFormat) * ZEGR_MAX_RENDER_TARGET_SLOT);
 
 	BlendState.SetToDefault();

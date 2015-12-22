@@ -243,11 +243,6 @@ void ZERNStageAO::GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Cont
 	if(StageGBuffer == NULL)
 		return;
 
-	ZED11DepthStencilBuffer* D11DepthStencilBuffer = (ZED11DepthStencilBuffer*)StageGBuffer->GetDepthStencilBuffer();
-	ID3D11ShaderResourceView* NativeTexture =  D11DepthStencilBuffer->GetResourceView();
-	ID3D11DeviceContext1* D11Context = static_cast<ZED11Context*>(Context)->GetContext();
-	D11Context->PSSetShaderResources(0, 1, &NativeTexture);
-
 	ZEGRRenderTarget* RenderTarget = OcclusionMap->GetRenderTarget();
 
 	ConstantBuffer->SetData(&Constants);
@@ -257,6 +252,7 @@ void ZERNStageAO::GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Cont
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointBorder);
 	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointWrap);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, RandomVectorsTexture);
 	Context->SetVertexBuffers(0, 0, NULL);
@@ -536,11 +532,7 @@ const ZEString& ZERNStageAO::GetName()
 
 bool ZERNStageAO::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZEGROutput* Output = Renderer->GetOutput();
-	if(Output == NULL)
-		return false;
-
-	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
 

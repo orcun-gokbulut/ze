@@ -66,8 +66,8 @@ bool ZERNStageGBuffer::UpdateRenderTargets(ZEUInt Width, ZEUInt Height)
 
 	DeinitializeSelf();
 
-	DepthStencilBuffer	= ZEGRDepthStencilBuffer::Create(Width, Height, ZEGR_DSF_DEPTH24_STENCIL8, true);
-	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11FG11FB10F_FLOAT, true);
+	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
+	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
 	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
 	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
@@ -101,29 +101,12 @@ const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
 	{
 		Initialized = true;
 
-		RenderState = ZERNStage::GetRenderState();
-
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthTestEnable(true);
-		DepthStencilState.SetDepthWriteEnable(true);
-		RenderState.SetDepthStencilState(DepthStencilState);
-
-		ZEGRBlendState BlendState;
-		BlendState.SetBlendEnable(false);
-
-		RenderState.SetBlendState(BlendState);
-
-		ZEGRRasterizerState Rasterizer;
-		Rasterizer.SetFillMode(ZEGR_FM_SOLID);
-		Rasterizer.SetFrontIsCounterClockwise(false);
-		Rasterizer.SetCullDirection(ZEGR_CD_COUNTER_CLOCKWISE);
-
-		RenderState.SetRasterizerState(Rasterizer);
-
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11FG11FB10F_FLOAT);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
 		RenderState.SetRenderTargetFormat(1, ZEGR_TF_R8G8B8A8_UNORM);
 		RenderState.SetRenderTargetFormat(2, ZEGR_TF_R8G8B8A8_UNORM);
 		RenderState.SetRenderTargetFormat(3, ZEGR_TF_R8G8B8A8_UNORM);
+
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
 	}
 
 	return RenderState;
@@ -131,33 +114,26 @@ const ZEGRRenderState& ZERNStageGBuffer::GetRenderState()
 
 bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZEGROutput* Output = Renderer->GetOutput();
-	if(Output == NULL)
-		return false;
-
-	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
 
-	ZEGRRenderTarget* OutputRenderTarget = RenderTarget;
-	ZEGRViewport Viewport = Output->GetViewport();
+	ZEUInt Width = RenderTarget->GetWidth();
+	ZEUInt Height = RenderTarget->GetHeight();
 
-	ZEUInt Width = OutputRenderTarget->GetWidth();
-	ZEUInt Height = OutputRenderTarget->GetHeight();
-
-	if (!GBuffer0.IsNull() && (GBuffer0->GetWidth() != Width || GBuffer0->GetHeight() != Height))
+	if (GBuffer0 == NULL || (GBuffer0->GetWidth() != Width || GBuffer0->GetHeight() != Height))
 		DirtyFlags.RaiseFlags(ZERN_GSDF_RENDER_TARGET);
 
 	UpdateRenderTargets(Width, Height);
 
-	Context->SetViewports(1, &Viewport);
 	Context->ClearRenderTarget(GBuffer0->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer3->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 1.0f, 0x00);
+	Context->ClearDepthStencilBuffer(DepthStencilBuffer->GetDepthStencilBuffer(), true, true, 1.0f, 0x00);
 
-	Context->SetRenderTargets(4, RenderTargets, DepthStencilBuffer);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
+	Context->SetRenderTargets(4, RenderTargets, DepthStencilBuffer->GetDepthStencilBuffer());
 
 	return true;
 }
@@ -187,7 +163,7 @@ ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationMap() const
 	return GBuffer0;
 }
 
-ZEGRDepthStencilBuffer* ZERNStageGBuffer::GetDepthStencilBuffer() const
+ZEGRTexture2D* ZERNStageGBuffer::GetDepthMap() const
 {
 	return DepthStencilBuffer;
 }
