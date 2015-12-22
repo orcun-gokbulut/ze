@@ -64,7 +64,7 @@ ZEVector2 ZEGRTexture2D::GetPixelSize()
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil)
 {
 
 	this->Width = Width;
@@ -91,20 +91,21 @@ ZEGRTexture2D::ZEGRTexture2D()
 	Height = 0;
 };
 
-ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil)
 {
-	zeCheckError(Width == 0, false, "Width cannot be 0.");
-	zeCheckError(Height == 0, false, "Height cannot be 0.");
-	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
-	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
-	zeCheckError(LevelCount == 0, false, "Level cannot be 0.");
-	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height)), false, "Level must be 1 for non-power of two textures.");
+	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
+	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
+	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, NULL, "Width is too big.")
+	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, NULL, "Width is too big.")
+	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
+	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height)), NULL, "Level must be 1 for non-power of two textures.");
+	zeCheckError(RenderTarget && DepthStencil, NULL, "Both render target and depth stencil cannot be created");
 
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, LevelCount, Format, RenderTarget))
+	if (!Texture->Initialize(Width, Height, LevelCount, Format, RenderTarget, DepthStencil))
 	{
 		Texture->Destroy();
 		return NULL;

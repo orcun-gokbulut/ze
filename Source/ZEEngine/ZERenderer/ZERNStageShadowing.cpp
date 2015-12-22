@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNRenderer.h
+ Zinek Engine - ZERNStageShadowing.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,50 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#include "ZEInitializable.h"
-
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEList2.h"
-#include "ZERNView.h"
+#include "ZERNStageShadowing.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGRHolder.h"
 
-class ZEScene;
-class ZERNStage;
-class ZERNCommand;
-class ZEGRContext;
-class ZEGRRenderTarget;
+#include "ZERNRenderer.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZELight.h"
 
-class ZERNStageQueue
+ZEInt ZERNStageShadowing::GetId()
 {
-	public:
-		ZERNStage*						Stage;
-		ZEList2<ZERNCommand>			Commands;
-};
+	return ZERN_STAGE_SHADOWING;
+}
 
-class ZERNRenderer : public ZEInitializable
+const ZEString& ZERNStageShadowing::GetName()
 {
-	private:
-		ZEGRContext*					Context;
-		ZEScene*						Scene;
-		ZERNView						View;
-		ZEGRRenderTarget*				OutputRenderTarget;
-		ZEGRHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
-		ZEArray<ZERNStageQueue>			StageQueues;
+	static const ZEString Name = "Shadowing";
+	return Name;
+}
 
-		struct RendererConstants
-		{
-			float Elapsedtime;
-			float Reserved[3];
-		}Constants;
+bool ZERNStageShadowing::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+{
+	return true;
+}
 
-		void							Cull();
-		void							SortStageQueues();
-		void							RenderStage(ZERNStageQueue* Queue);
-		void							RenderStages();
+void ZERNStageShadowing::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+{
 
-		void							UpdateViewConstantBuffer();
+}
 
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+ZERNStageShadowing::ZERNStageShadowing()
+{
 
-	public:
-		void							SetContext(ZEGRContext* Context);
-		ZEGRContext*					GetContext();
+}
 
-		void							SetView(const ZERNView& View);
-		const ZERNView&					GetView();
+const ZEGRRenderState& ZERNStageShadowing::GetRenderState()
+{
+	static ZEGRRenderState RenderState;
+	static bool Initialized = false;
 
-		void							SetScene(ZEScene* Scene);
-		ZEScene*						GetScene();
+	if(!Initialized)
+	{
+		Initialized = true;
+	}
 
-		void							SetOutputRenderTarget(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*				GetOutputRenderTarget();
+	return RenderState;
+}
 
-		ZEArray<ZERNStage*>				GetStages();
-		ZERNStage*						GetStage(ZERNStageID Id);
-		void							AddStage(ZERNStage* Stage);
-		void							RemoveStage(ZERNStage* Stage);
-		void							CleanStages();
-
-		void							AddCommand(ZERNCommand* Command);
-		void							RemoveCommand(ZERNCommand* Command);
-		void							CleanCommands();
-		bool							ContainsCommand(ZERNCommand* Command);
-
-		void							Render(float ElapsedTime);
-
-										ZERNRenderer();
-		virtual							~ZERNRenderer();
-};

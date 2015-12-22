@@ -62,13 +62,12 @@ bool ZERNStageHDR::UpdateRenderStates()
 	ZEGRRenderState RenderState;
 
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11FG11FB10F_FLOAT);
+	RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 
 	ZEGRDepthStencilState DepthStencilState;
 	DepthStencilState.SetDepthTestEnable(false);
 	DepthStencilState.SetDepthWriteEnable(false);
-	DepthStencilState.SetStencilTestEnable(false);
 
 	RenderState.SetDepthStencilState(DepthStencilState);
 
@@ -188,10 +187,10 @@ bool ZERNStageHDR::UpdateTextures()
 	CurrentWidth >>= (ZEUInt)BlurTextureSize;
 	CurrentHeight >>= (ZEUInt)BlurTextureSize;
 
-	BrightTexture = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11FG11FB10F_FLOAT, true);
-	BlurTextureTemp1 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11FG11FB10F_FLOAT, true);
-	BlurTextureTemp2 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11FG11FB10F_FLOAT, true);
-	BlurTextureFinal = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11FG11FB10F_FLOAT, true);
+	BrightTexture = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+	BlurTextureTemp1 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+	BlurTextureTemp2 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+	BlurTextureFinal = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 
 	DirtyFlags.UnraiseFlags(ZERN_HSDF_RESIZE);
 
@@ -398,12 +397,12 @@ ZERNStageHDR::ZERNStageHDR()
 bool ZERNStageHDR::SetupInputOutput(ZERNRenderer* Renderer)
 {
 	ZERNStageGBuffer* Gbuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-	ZEGROutput* Output = Renderer->GetOutput();
-	if(Gbuffer == NULL || Output == NULL)
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
+	if(Gbuffer == NULL || RenderTarget == NULL)
 		return false;
 
 	InputTexture = Gbuffer->GetAccumulationMap();
-	OutputRenderTarget = Output->GetRenderTarget();
+	OutputRenderTarget = RenderTarget;
 
 	return true;
 }

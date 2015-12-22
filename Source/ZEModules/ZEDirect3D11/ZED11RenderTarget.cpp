@@ -36,17 +36,17 @@
 #include "ZED11RenderTarget.h"
 #include "ZEGraphics\ZEGRDefinitions.h"
 
-ID3D11RenderTargetView* ZED11RenderTarget::GetView()
-{
-	return View;
-}
-
 ZED11RenderTarget::ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat PixelFormat, ID3D11RenderTargetView* RenderTargetView) : ZEGRRenderTarget(Width, Height, PixelFormat)
 {
-	this->View = RenderTargetView;
+	View = RenderTargetView;
 }
 
 ZED11RenderTarget::~ZED11RenderTarget()
 {
 	ZEGR_RELEASE(View);
+}
+
+ID3D11RenderTargetView* ZED11RenderTarget::GetView()
+{
+	return View;
 }

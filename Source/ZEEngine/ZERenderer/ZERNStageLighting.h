@@ -47,26 +47,26 @@ class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
 class ZEGRStructuredBuffer;
 class ZEGRVertexBuffer;
+class ZEGRRenderTarget;
+class ZEGRTexture2D;
 class ZELight;
 class ZELightProjective;
 class ZELightPoint;
 class ZELightDirectional;
 class ZELightOmniProjective;
-class ZEGRRenderTarget;
-class ZEGRTexture2D;
 
 #define MAX_LIGHTS 511
 #define TILE_SIZE_IN_PIXELS 32	//32x32
 
 struct ZERNGPULight
 {
-	ZEVector3	PositionWorld;
+	ZEVector3	PositionView;
 	float		Range;
 	ZEVector3	Color;
 	float		Intensity;
 	ZEVector3	Attenuation;
 	float		Fov;
-	ZEVector3	Direction;
+	ZEVector3	DirectionView;
 	int			Type;	
 };
 
@@ -87,7 +87,8 @@ struct ZERNLightConstants
 	ZEMatrix4x4		ProjectionMatrix;
 	ZEMatrix4x4		WorldMatrix;
 	ZEMatrix3x3		RotationMatrix;
-	float			Reserved[3];
+	bool			CastShadow;
+	float			Reserved[2];
 };
 
 class ZERNStageLighting : public ZERNStage
@@ -109,7 +110,8 @@ class ZERNStageLighting : public ZERNStage
 
 		ZEGRRenderTarget*					OutputRenderTarget;
 
-		ZEGRSamplerState					SamplerLinearClamp;
+		ZEGRSamplerState					SamplerLinearBorder;
+		ZEGRSamplerState					SamplerPointBorder;
 
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;
@@ -120,7 +122,6 @@ class ZERNStageLighting : public ZERNStage
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 
-		void								CreateLights();
 		void								CreateLightGeometries();
 
 		bool								UpdateBuffers();
@@ -131,9 +132,8 @@ class ZERNStageLighting : public ZERNStage
 		ZEVector4							ComputeClipRegion(const ZEVector3& lightPosView, float lightRadius, float CameraScaleX, float CameraScaleY, float CameraNear);
 		void								UpdateClipRegion(float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
 		void								UpdateClipRegionRoot(float nc, float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
-		void								AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
+		void								AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
 
-		void								SetupGbufferResources(ZERNRenderer* Renderer, ZEGRContext* Context);
 		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
 		bool								SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
 		void								DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZERNRenderer* Renderer, ZEGRContext* Context);

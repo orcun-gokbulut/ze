@@ -39,6 +39,9 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZERNRenderer.h"
+#include "ZERNView.h"
+#include "ZERNCommand.h"
 
 enum ZELightType
 {
@@ -49,21 +52,19 @@ enum ZELightType
 	ZE_LT_OMNIPROJECTIVE	= 4
 };
 
-class ZEShadowRenderer;
-class ZEScene;
+
 
 class ZELight : public ZEEntity
 {
 	ZE_OBJECT
 
 	private:
-		bool							Enabled;
-
 		float							AttenuationFunction(float RootToTry);
 
 	protected:
+		ZEFlags							DirtyFlags;
+
 		bool							CastsShadows;
-		bool							UpdateViewVolume;
 		
 		float							Range;
 		float							Intensity;
@@ -71,19 +72,20 @@ class ZELight : public ZEEntity
 		ZEVector3						Color;
 		ZEVector3						Attenuation;
 
+		ZEMatrix4x4						ViewTransform;
+		ZEMatrix4x4						ProjectionTransform;
+
+		ZERNRenderer					ShadowRenderer;
+		ZERNCommand						Command;
+
 		virtual void					OnTransformChanged();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
-		virtual	void					SetPosition(const ZEVector3& NewPosition);
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-
 		void							SetIntensity(float NewValue);
 		float							GetIntensity() const;
 
 		void							SetAttenuation(const ZEVector3& Attenuation);
-		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		void							SetAttenuation(float Constant, float Distance, float DistanceSquare);
 		const ZEVector3&				GetAttenuation() const;
 
 		void							SetColor(const ZEVector3& NewColor);
@@ -92,14 +94,23 @@ class ZELight : public ZEEntity
 		void							SetRange(float NewValue);
 		float							GetRange() const;		
 
-		virtual void					SetCastsShadow(bool NewValue);
+		void							SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
-
-		virtual ZELightType				GetLightType() = 0;
-		virtual ZESize					GetViewCount() = 0;
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize CascadeIndex = 0) = 0;
 
 										ZELight();
 		virtual							~ZELight();
+
+		virtual ZEDrawFlags				GetDrawFlags() const;
+
+		virtual	void					SetPosition(const ZEVector3& NewPosition);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
+
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+		virtual ZELightType				GetLightType() const = 0;
+		virtual ZESize					GetViewCount() = 0;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize CascadeIndex = 0) = 0;
+		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) = 0;
 };

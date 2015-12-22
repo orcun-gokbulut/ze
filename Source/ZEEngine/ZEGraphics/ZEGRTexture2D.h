@@ -40,35 +40,38 @@
 #include "ZEMath\ZEVector.h"
 
 class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+
 class ZEGRTexture2D : public ZEGRTexture
 {
 	friend class ZEGRContext;
 	friend class ZEGRGraphicsModule;
 
 	protected:
-		ZEUInt						Width;
-		ZEUInt						Height;
+		ZEUInt								Width;
+		ZEUInt								Height;
 
-		virtual bool				Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget = false);	
-		virtual void				Deinitialize();
+		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);	
+		virtual void						Deinitialize();
 
-									ZEGRTexture2D();
+											ZEGRTexture2D();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType();
-		virtual ZEGRTextureType		GetTextureType();
+		ZEUInt								GetWidth();
+		ZEUInt								GetHeight();
+		ZEVector2							GetPixelSize();
 
-		ZEUInt						GetWidth();
-		ZEUInt						GetHeight();
-		ZEVector2					GetPixelSize();
-		
-		virtual void				GenerateMipMaps() = 0;
+		virtual ZEGRResourceType			GetResourceType();
+		virtual ZEGRTextureType				GetTextureType();
 
-		virtual	ZEGRRenderTarget*	GetRenderTarget(ZEUInt MipLevel = 0) = 0;
+		virtual void						GenerateMipMaps() = 0;
 
-		virtual bool				UpdateSubResource(void* Data, ZESize RowPitch, ZEUInt Level) = 0;
-		virtual bool				Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
-		virtual void				Unlock(ZEUInt Level) = 0;
+		virtual	ZEGRRenderTarget*			GetRenderTarget(ZEUInt MipLevel = 0) = 0;
+		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer() = 0;
 
-		static ZEGRTexture2D*		CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);
+		virtual bool						UpdateSubResource(void* Data, ZESize RowPitch, ZEUInt Level) = 0;
+		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
+		virtual void						Unlock(ZEUInt Level) = 0;
+
+		static ZEGRTexture2D*				CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);
 };

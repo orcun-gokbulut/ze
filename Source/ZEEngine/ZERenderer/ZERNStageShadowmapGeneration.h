@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNRenderer.h
+ Zinek Engine - ZERNStageShadowmapGeneration.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,80 +35,29 @@
 
 #pragma once
 
-#include "ZEInitializable.h"
-
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEList2.h"
-#include "ZERNView.h"
-#include "ZERNStageID.h"
+#include "ZERNStage.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRHolder.h"
 
-class ZEScene;
-class ZERNStage;
-class ZERNCommand;
-class ZEGRContext;
-class ZEGRRenderTarget;
+class ZEGRTexture2D;
 
-class ZERNStageQueue
-{
-	public:
-		ZERNStage*						Stage;
-		ZEList2<ZERNCommand>			Commands;
-};
-
-class ZERNRenderer : public ZEInitializable
+class ZERNStageShadowmapGeneration : public ZERNStage
 {
 	private:
-		ZEGRContext*					Context;
-		ZEScene*						Scene;
-		ZERNView						View;
-		ZEGRRenderTarget*				OutputRenderTarget;
-		ZEGRHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
-		ZEArray<ZERNStageQueue>			StageQueues;
+		ZEGRHolder<ZEGRTexture2D>			DepthBuffer;
 
-		struct RendererConstants
-		{
-			float Elapsedtime;
-			float Reserved[3];
-		}Constants;
-
-		void							Cull();
-		void							SortStageQueues();
-		void							RenderStage(ZERNStageQueue* Queue);
-		void							RenderStages();
-
-		void							UpdateViewConstantBuffer();
-
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
 	public:
-		void							SetContext(ZEGRContext* Context);
-		ZEGRContext*					GetContext();
+		virtual ZEInt						GetId();
+		virtual const ZEString&				GetName();
 
-		void							SetView(const ZERNView& View);
-		const ZERNView&					GetView();
+		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-		void							SetScene(ZEScene* Scene);
-		ZEScene*						GetScene();
+											ZERNStageShadowmapGeneration();
 
-		void							SetOutputRenderTarget(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*				GetOutputRenderTarget();
+		static const ZEGRRenderState&		GetRenderState();
 
-		ZEArray<ZERNStage*>				GetStages();
-		ZERNStage*						GetStage(ZERNStageID Id);
-		void							AddStage(ZERNStage* Stage);
-		void							RemoveStage(ZERNStage* Stage);
-		void							CleanStages();
-
-		void							AddCommand(ZERNCommand* Command);
-		void							RemoveCommand(ZERNCommand* Command);
-		void							CleanCommands();
-		bool							ContainsCommand(ZERNCommand* Command);
-
-		void							Render(float ElapsedTime);
-
-										ZERNRenderer();
-		virtual							~ZERNRenderer();
 };

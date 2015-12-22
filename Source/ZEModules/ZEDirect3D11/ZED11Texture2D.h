@@ -42,6 +42,7 @@
 
 class ZETextureData;
 class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
 
 class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 {
@@ -51,8 +52,9 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		ID3D11Texture2D*					Texture2D;
 		ID3D11ShaderResourceView*			ResourceView;
 		ZEGRHolder<ZEGRRenderTarget>		RenderTargets[14];
+		ZEGRHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffer;
 
-		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget);
+		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Level, ZEGRFormat Format, bool RenderTarget, bool DepthStencil);
 		virtual void						Deinitialize();
 
 											ZED11Texture2D();
@@ -62,6 +64,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		ID3D11Texture2D*					GetTexture();
 		ID3D11ShaderResourceView*			GetResourceView();
 		virtual ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level);
+		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer();
 
 		virtual void						GenerateMipMaps();
 

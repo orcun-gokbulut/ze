@@ -34,36 +34,34 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNCuller.h"
-
 #include "ZERNRenderer.h"
 #include "ZERNStage.h"
 #include "ZERNCommand.h"
 #include "ZERNRenderParameters.h"
-#include "ZERNView.h"
 #include "ZERNShaderSlots.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGame\ZEScene.h"
+#include "ZEGraphics\ZEGRShader.h"
+#include "ZEGraphics\ZEGRRenderState.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZEGraphics\ZEGRContext.h"
 #include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZEGraphics\ZEGROutput.h"
-#include "ZERNStageGBuffer.h"
 #include "ZEGraphics\ZEGRTexture2D.h"
-#include "ZERNStageHDR.h"
-#include "ZERNStageLighting.h"
-#include "ZEGraphics\ZEGRShaderCompileOptions.h"
-#include "ZEGraphics\ZEGRShader.h"
-#include "ZEGraphics\ZEGRRenderState.h"
+#include "ZEGraphics\ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics\ZEGRRenderTarget.h"
 
-static inline ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
+namespace
 {
-	if (A->Priority < B->Priority)
-		return -1;
-	else if (A->Priority > B->Priority)
-		return 1;
-	else
-		return (int)(A->Order - B->Order);
-}
+	ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
+	{
+		if (A->Priority < B->Priority)
+			return -1;
+		else if (A->Priority > B->Priority)
+			return 1;
+		else
+			return (int)(A->Order - B->Order);
+	}
+};
 
 void ZERNRenderer::UpdateViewConstantBuffer()
 {
@@ -104,11 +102,11 @@ void ZERNRenderer::UpdateViewConstantBuffer()
 
 void ZERNRenderer::Cull()
 {
-	ZESceneCuller Culler;
 	ZERNCullParameters CullParameters;
 	CullParameters.Renderer = this;
 	CullParameters.View = &View;
 
+	ZESceneCuller Culler;
 	Culler.SetScene(Scene);
 	Culler.SetCullParameters(CullParameters);
 	Culler.Cull();
@@ -123,25 +121,28 @@ void ZERNRenderer::SortStageQueues()
 
 void ZERNRenderer::RenderStages()
 {
-	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
+	if(Context == NULL)
+		Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
 
 	ZERNRenderParameters Parameters;
 	Parameters.FrameId = 0;
-	Parameters.ElapsedTime = 0;
+	Parameters.ElapsedTime = Constants.Elapsedtime;
 	Parameters.Time = 0;
 	Parameters.Scene = Scene;
 	Parameters.Context = Context;
 	Parameters.View = &View;
 	Parameters.Renderer = this;
 	Parameters.Type = ZERN_DT_NORMAL;
-	Parameters.Command;
 
 	UpdateViewConstantBuffer();
 
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
 
-	Context->ClearRenderTarget(Output->GetRenderTarget(), ZEVector4::Zero);
+	Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
+
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
+	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
@@ -149,7 +150,7 @@ void ZERNRenderer::RenderStages()
 		ZERNStageQueue* Queue = &StageQueues[I];
 		ZERNStage* Stage = Queue->Stage;
 
-		if (Stage->GetEnable() && !Stage->Setup(this, Context, Queue->Commands))
+		if (!Stage->GetEnable() || !Stage->Setup(this, Context, Queue->Commands))
 			continue;
 
 		Parameters.Stage = Stage;
@@ -164,6 +165,12 @@ void ZERNRenderer::RenderStages()
 
 		Stage->CleanUp(this, Context);
 	}
+
+	CleanCommands();
+
+	Context->SetRenderTargets(0, NULL, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, NULL);
 }
 
 bool ZERNRenderer::InitializeSelf()
@@ -188,14 +195,14 @@ void ZERNRenderer::DeinitializeSelf()
 	RendererConstantBuffer.Release();
 }
 
-void ZERNRenderer::SetDevice(ZEGRContext* Device)
+void ZERNRenderer::SetContext(ZEGRContext* Context)
 {
-	this->Device = Device;
+	this->Context = Context;
 }
 
-ZEGRContext* ZERNRenderer::GetDevice()
+ZEGRContext* ZERNRenderer::GetContext()
 {
-	return Device;
+	return Context;
 }
 
 void ZERNRenderer::SetView(const ZERNView& View)
@@ -208,16 +215,6 @@ const ZERNView& ZERNRenderer::GetView()
 	return View;
 }
 
-void ZERNRenderer::SetOutput(ZEGROutput* Output)
-{
-	this->Output = Output;
-}
-
-ZEGROutput* ZERNRenderer::GetOutput()
-{
-	return Output;
-}
-
 void ZERNRenderer::SetScene(ZEScene* Scene)
 {
 	this->Scene = Scene;
@@ -226,6 +223,16 @@ void ZERNRenderer::SetScene(ZEScene* Scene)
 ZEScene* ZERNRenderer::GetScene()
 {
 	return Scene;
+}
+
+void ZERNRenderer::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
+{
+	this->OutputRenderTarget = OutputRenderTarget;
+}
+
+ZEGRRenderTarget* ZERNRenderer::GetOutputRenderTarget()
+{
+	return OutputRenderTarget;
 }
 
 ZEArray<ZERNStage*> ZERNRenderer::GetStages()
@@ -262,13 +269,15 @@ void ZERNRenderer::AddStage(ZERNStage* Stage)
 
 void ZERNRenderer::RemoveStage(ZERNStage* Stage)
 {
+	if(Stage == NULL)
+		return;
+
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
 	{
 		if (StageQueues[I].Stage == Stage)
 		{
-			if (StageQueues[I].Stage != NULL)
-				StageQueues[I].Stage->Deinitialize();
+			StageQueues[I].Stage->Deinitialize();
 
 			StageQueues.Remove(I);
 			return;
@@ -290,28 +299,29 @@ void ZERNRenderer::CleanStages()
 
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
-	ZELink<ZERNCommand>* EmptyLink = NULL;
-	for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
-	{
-		if (!Command->StageQueueLinks[I].GetInUse())
-		{
-			EmptyLink = &Command->StageQueueLinks[I];
-			break;
-		}
-	}
 
-	if (EmptyLink == NULL)
-		return;
-
-	//Hacked by Ceyhun
-	char* Chp = (char*)EmptyLink;
-	ZEUInt64* Val = (ZEUInt64*)(Chp + 8);
-	*Val = (ZEUInt64)Command;
 
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
+	{
 		if ((Command->StageMask & StageQueues[I].Stage->GetId()) != 0)
-			StageQueues[I].Commands.AddEnd(EmptyLink);
+		{
+			for (ZESize J = 0; J < ZERN_MAX_COMMAND_STAGE; J++)
+			{
+				ZELink<ZERNCommand>* LinkCommand = &Command->StageQueueLinks[J];
+				if (!LinkCommand->GetInUse())
+				{
+					//Hacked by Ceyhun
+					char* Chp = (char*)LinkCommand;
+					ZEUInt64* Val = (ZEUInt64*)(Chp + 8);
+					*Val = (ZEUInt64)Command;
+
+					StageQueues[I].Commands.AddEnd(LinkCommand);
+					break;
+				}
+			}
+		}
+	}
 }
 
 void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
@@ -324,7 +334,6 @@ void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
 			if (StageQueues[I].Commands.Exists(&Command->StageQueueLinks[N]))
 			{
 				StageQueues[I].Commands.Remove(&Command->StageQueueLinks[N]);
-				return;
 			}
 		}
 	}
@@ -360,16 +369,16 @@ void ZERNRenderer::Render(float ElapsedTime)
 	Cull();
 	SortStageQueues();
 	RenderStages();
-	Output->Present();
 }
 
 ZERNRenderer::ZERNRenderer()
 {
-	Device = NULL;
+	Context = NULL;
 	Scene = NULL;
+	OutputRenderTarget = NULL;
 }
 
 ZERNRenderer::~ZERNRenderer()
 {
-
+	Deinitialize();
 }

@@ -45,7 +45,6 @@ class ZELightPoint  : public ZELight
 	ZE_OBJECT
 	private:
 		ZEViewSphere					ViewVolume;
-		ZEMatrix4x4						ViewProjectionMatrix;
 
 		virtual bool					DeinitializeSelf();
 
@@ -53,11 +52,12 @@ class ZELightPoint  : public ZELight
 		virtual							~ZELightPoint();
 
 	public:
-		ZELightType						GetLightType();
+		ZELightType						GetLightType() const;
 
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
+		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0);
 
 		static ZELightPoint*			CreateInstance();
 };

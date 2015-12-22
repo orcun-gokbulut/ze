@@ -43,35 +43,27 @@
 
 void ZESceneCuller::CullEntity(ZEEntity* Entity)
 {
-	ZEUInt32 EntityDrawFlags = Entity->GetDrawFlags();
-	Statistics.TotalEntityCount++;
-
-	if ((EntityDrawFlags & ZE_DF_LIGHT_SOURCE) == ZE_DF_LIGHT_SOURCE)
-		Statistics.TotalLightCount++;
-	
 	if (!Entity->GetVisible())
 		return;
 
+	ZEUInt EntityDrawFlags = Entity->GetDrawFlags();
+
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		Statistics.DrawableEntityCount++;
-
 		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
 		{
 			if (CullParameters.View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{
-				Statistics.CulledEntityCount++;
+				//to do when culled
 			}
 			else
 			{
-				if (Entity->PreRender(&CullParameters))
-					Statistics.DrawedEntityCount++;		
+				Entity->PreRender(&CullParameters);
 			}
 		}
 		else
 		{
-			if (Entity->PreRender(&CullParameters))
-				Statistics.DrawedEntityCount++;
+			Entity->PreRender(&CullParameters);
 		}
 	}
 
@@ -82,8 +74,6 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity)
 	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 		CullEntity(ChildEntities[I]);
-
-	return;
 }
 
 void ZESceneCuller::SetScene(ZEScene* Scene)
@@ -106,16 +96,6 @@ const ZERNCullParameters& ZESceneCuller::GetCullParameters()
 	return CullParameters;
 }
 
-void ZESceneCuller::SetStatistics(const ZESceneStatistics& Statistics)
-{
-	this->Statistics = Statistics;
-}
-
-const ZESceneStatistics& ZESceneCuller::GetStatistics() const
-{
-	return Statistics;
-}
-
 void ZESceneCuller::Cull()
 {
 	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
@@ -125,10 +105,14 @@ void ZESceneCuller::Cull()
 
 ZESceneCuller::ZESceneCuller()
 {
-	memset(&Statistics, 0, sizeof(ZESceneStatistics));
+	Scene = NULL;
+	CullParameters.Renderer = NULL;
+	CullParameters.View = NULL;
 }
 
 ZESceneCuller::~ZESceneCuller()
 {
-	
+	Scene = NULL;
+	CullParameters.Renderer = NULL;
+	CullParameters.View = NULL;
 }

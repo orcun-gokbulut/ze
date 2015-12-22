@@ -65,7 +65,6 @@ void ZED11Output::SwitchToFullscreen()
 void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	RenderTarget.Release();
-	DepthStencilBuffer.Release();
 
 	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
 	if(FAILED(Result))
@@ -76,7 +75,7 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 
 	ID3D11RenderTargetView* RenderTargetView;
 	ID3D11Texture2D* OutputTexture;
-	Result = SwapChain->GetBuffer(0, __uuidof( ID3D11Texture2D), (void**)&OutputTexture);
+	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&OutputTexture);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot get swapchain buffers. Error: %d.", Result);
@@ -88,17 +87,9 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 		zeCriticalError("Cannot create render target view. Error: %d.", Result);
 		return;
 	}
-	OutputTexture->Release();
+	ZEGR_RELEASE(OutputTexture);
 
 	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
-	DepthStencilBuffer = ZEGRDepthStencilBuffer::Create(Width, Height, ZEGR_DSF_DEPTH24_STENCIL8);
-
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Viewport.SetWidth((float)Width);
-	Viewport.SetHeight((float)Height);
-	Viewport.SetMinDepth(0.0f);
-	Viewport.SetMaxDepth(1.0f);
 
 	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Format);
 	SetSize(Width * Height * FormatDefinition->BlockSize);
@@ -181,16 +172,6 @@ void* ZED11Output::GetHandle()
 ZEGRRenderTarget* ZED11Output::GetRenderTarget()
 {
 	return RenderTarget;
-}
-
-ZEGRDepthStencilBuffer* ZED11Output::GetDepthStencilBuffer()
-{
-	return DepthStencilBuffer;
-}
-
-const ZEGRViewport& ZED11Output::GetViewport()
-{
-	return Viewport;
 }
 
 void ZED11Output::SetMonitorMode(ZEGRMonitorMode* Mode)

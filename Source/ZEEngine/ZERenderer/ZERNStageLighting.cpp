@@ -71,6 +71,8 @@
 #include "ZECanvas.h"
 #include "ZEGraphics\ZEGRTextureCube.h"
 #include "ZEMath\ZEMath.h"
+#include "ZEGame\ZEScene.h"
+#include "ZEGame\ZEEntity.h"
 
 #define ZERN_SLDF_LIGHT_BUFFER	1
 #define ZERN_SLDF_TILE_BUFFER	2
@@ -118,7 +120,7 @@ bool ZERNStageLighting::InitializeSelf()
 {
 	PrevWidth = 0;
 	PrevHeight = 0;
-	SetTiledDeferred = true;
+	SetTiledDeferred = false;
 	LightBuffer = NULL;
 	TileInfoBuffer = NULL;
 	OutputRenderTarget = NULL;
@@ -129,6 +131,19 @@ bool ZERNStageLighting::InitializeSelf()
 	LightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNLightConstants));
 
 	DirtyFlags.RaiseAll();
+
+	SamplerLinearBorder.SetAddressU(ZEGR_TAM_BORDER);
+	SamplerLinearBorder.SetAddressV(ZEGR_TAM_BORDER);
+	SamplerLinearBorder.SetAddressW(ZEGR_TAM_BORDER);
+	SamplerLinearBorder.SetBorderColor(ZEVector4::Zero);
+
+	SamplerPointBorder.SetMinFilter(ZEGR_TFM_POINT);
+	SamplerPointBorder.SetMagFilter(ZEGR_TFM_POINT);
+	SamplerPointBorder.SetMipFilter(ZEGR_TFM_POINT);
+	SamplerPointBorder.SetAddressU(ZEGR_TAM_BORDER);
+	SamplerPointBorder.SetAddressV(ZEGR_TAM_BORDER);
+	SamplerPointBorder.SetAddressW(ZEGR_TAM_BORDER);
+	SamplerPointBorder.SetBorderColor(ZEVector4::One);
 
 	return true;
 }
@@ -163,7 +178,7 @@ bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* 
 	}
 
 	ZERNView View = Renderer->GetView();
-	AssingLightsToTiles(Renderer, Lights, View.ProjectionTransform.M11, View.ProjectionTransform.M22, View.NearZ);
+	AssignLightsToTiles(Renderer, Lights, View.ProjectionTransform.M11, View.ProjectionTransform.M22, View.NearZ);
 
 	if(!Update())
 		return false;
@@ -215,17 +230,34 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 
 bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZERNStageGBuffer* StageGbuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-	ZEGROutput* Output = Renderer->GetOutput();
-	if(StageGbuffer == NULL || Output == NULL)
+	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	if(StageGBuffer == NULL)
 		return false;
 
-	OutputRenderTarget = StageGbuffer->GetAccumulationMap()->GetRenderTarget();
+	OutputRenderTarget = StageGBuffer->GetAccumulationMap()->GetRenderTarget();
 
-	Context->SetViewports(1, &Output->GetViewport());
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
+
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
 
-	SetupGbufferResources(Renderer, Context);
+	static bool Initialized = false;
+	if(!Initialized)
+	{
+		Initialized = true;
+
+		const ZESmartArray<ZEEntity*>& Entities = Renderer->GetScene()->GetEntities();
+		ZEUInt Count = (ZEUInt)Entities.GetCount();
+		for(ZEUInt I = 0; I < Count; ++I)
+		{
+			ZEEntity* Entity = Entities[I];
+			if(Entity->GetDrawFlags().GetFlags(ZE_DF_LIGHT_SOURCE))
+				Lights.Add((ZELight*)Entity);
+		}
+	}
 
 	if(SetTiledDeferred)
 		return SetupTiledDeferred(Renderer, Context);
@@ -318,7 +350,7 @@ ZEVector4 ZERNStageLighting::ComputeClipRegion(const ZEVector3& lightPosView, fl
     return clipRegion;
 }
 
-void ZERNStageLighting::AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear)
+void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear)
 {
 	ZEUInt Width = OutputRenderTarget->GetWidth();
 	ZEUInt Height = OutputRenderTarget->GetHeight();
@@ -387,54 +419,7 @@ void ZERNStageLighting::AssingLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 	}
 }
 
-void ZERNStageLighting::CreateLights()
-{
-	ZERandom::Reset();
 
-	for(ZEInt I = 0; I < 20; ++I)
-	{
-		ZELightPoint* PointLight = ZELightPoint::CreateInstance();
-		PointLight->SetIntensity(0.3f);
-		PointLight->SetColor(ZEVector3(ZERandom::GetFloatPositive(), ZERandom::GetFloatPositive(), ZERandom::GetFloatPositive()));
-		PointLight->SetAttenuation(1.0f, 0.1f, 0.05f);
-		PointLight->SetPosition(ZEVector3(ZERandom::GetFloat() * 10.0f, 5.0f, 0.0f));
-		PointLight->SetRange(10);
-
-		Lights.Add(PointLight);
-	}
-	
-	ZELightDirectional* DirectionalLight = ZELightDirectional::CreateInstance();
-	DirectionalLight->SetIntensity(0.5f);
-	DirectionalLight->SetColor(ZEVector3(1.0f, 1.0f, 1.0f));
-	DirectionalLight->SetPosition(ZEVector3(0.0f, 50.0f, 10.0f));
-	ZEQuaternion Rotation;
-	ZEQuaternion::CreateFromDirection(Rotation, ZEVector3(1.0f, 1.0f, 1.0f));
-	DirectionalLight->SetRotation(Rotation);
-
-	Lights.Add(DirectionalLight);
-
-	/*ZELightOmniProjective* OmniProjectiveLight = ZELightOmniProjective::CreateInstance();
-	OmniProjectiveLight->SetProjectionTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/c.tga");
-	OmniProjectiveLight->SetIntensity(5.0f);
-	OmniProjectiveLight->SetAttenuation(1.0f, 0.5f, 0.4f);
-	OmniProjectiveLight->SetRange(10.0f);
-	OmniProjectiveLight->SetPosition(ZEVector3(0.0f, 10.0f, 0.0f));
-
-	Lights.Add(OmniProjectiveLight);
-
-	ZELightProjective* ProjectiveLight = ZELightProjective::CreateInstance();
-	ProjectiveLight->SetPosition(ZEVector3(20.0f, 10.0f, 0.0f));
-	ZEQuaternion::CreateFromDirection(Rotation, ZEVector3(0.0001f, -1.0f, 0.0001f));
-	ProjectiveLight->SetRotation(Rotation);
-	ProjectiveLight->SetProjectionTextureFile("#R:/ZEEngine/ZEPostEffects/Textures/BlurMask.png");
-	ProjectiveLight->SetIntensity(5.0f);
-	ProjectiveLight->SetAspectRatio(1.0f);
-	ProjectiveLight->SetFOV(ZE_PI / 3.0f);
-	ProjectiveLight->SetAttenuation(1.0f, 0.0f, 0.0f);
-	ProjectiveLight->SetRange(10.0f);
-
-	Lights.Add(ProjectiveLight);*/
-}
 
 void ZERNStageLighting::CreateLightGeometries()
 {
@@ -483,7 +468,7 @@ bool ZERNStageLighting::UpdateBuffers()
 	ZESize Count = Lights.GetCount();
 	for(ZESize I = 0; I < Count; ++I)
 	{
-		GPULight[I].PositionWorld = Lights[I]->GetPosition();
+		GPULight[I].PositionView = Lights[I]->GetPosition();
 		GPULight[I].Range = Lights[I]->GetRange();
 		GPULight[I].Color = Lights[I]->GetColor();
 		GPULight[I].Intensity = Lights[I]->GetIntensity();
@@ -492,7 +477,7 @@ bool ZERNStageLighting::UpdateBuffers()
 		ZEVector3 Direction;
 		ZEQuaternion::ConvertToEulerAngles(Direction, Lights[I]->GetRotation());
 		Direction.NormalizeSelf();
-		GPULight[I].Direction = Direction;
+		GPULight[I].DirectionView = Direction;
 	}
 
 	LightBuffer->Unlock();
@@ -536,15 +521,14 @@ bool ZERNStageLighting::UpdateRenderState()
 
 	RenderState.SetBlendState(BlendState);
 
-	RenderState.SetShader(ZEGR_ST_VERTEX, TiledDeferredVertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, TiledDeferredPixelShader);
-
 	ZEGRDepthStencilState TiledDeferredDepthStencilState;
 	TiledDeferredDepthStencilState.SetDepthTestEnable(false);
 	TiledDeferredDepthStencilState.SetDepthWriteEnable(false);
-	TiledDeferredDepthStencilState.SetStencilTestEnable(false);
 
 	RenderState.SetDepthStencilState(TiledDeferredDepthStencilState);
+
+	RenderState.SetShader(ZEGR_ST_VERTEX, TiledDeferredVertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, TiledDeferredPixelShader);
 
 	TiledDeferredRenderState = RenderState.Compile();
 	zeCheckError(TiledDeferredRenderState == NULL, false, "Cannot set render state.");
@@ -552,6 +536,10 @@ bool ZERNStageLighting::UpdateRenderState()
 	RenderState.SetShader(ZEGR_ST_VERTEX, DeferredVertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, DeferredPixelShader);
 
+	ZEGRRasterizerState RasterizerState;
+	RasterizerState.SetCullDirection(ZEGR_CD_NONE);
+
+	RenderState.SetRasterizerState(RasterizerState);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
 	DeferredRenderState = RenderState.Compile();
@@ -599,22 +587,6 @@ bool ZERNStageLighting::UpdateShaders()
 	return true;
 }
 
-void ZERNStageLighting::SetupGbufferResources(ZERNRenderer* Renderer, ZEGRContext* Context)
-{
-	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if(StageGBuffer == NULL)
-		return;
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
-
-	ZED11DepthStencilBuffer* D11DepthStencilBuffer = (ZED11DepthStencilBuffer*)StageGBuffer->GetDepthStencilBuffer();
-	ID3D11ShaderResourceView* NativeTexture =  D11DepthStencilBuffer->GetResourceView();
-	ID3D11DeviceContext1* D11Context = static_cast<ZED11Context*>(Context)->GetContext();
-	D11Context->PSSetShaderResources(0, 1, &NativeTexture);
-}
-
 bool ZERNStageLighting::Update()
 {
 	if(!UpdateShaders())
@@ -634,7 +606,7 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 	ZERNLightConstants* LightConstants;
 	LightConstantBuffer->Lock((void**)&LightConstants);
 		ZERNGPULight& GPULight = LightConstants->Light;
-		GPULight.PositionWorld = DirectionalLight->GetPosition();
+		ZEMatrix4x4::Transform(GPULight.PositionView, Renderer->GetView().ViewTransform, DirectionalLight->GetPosition());
 		GPULight.Range = DirectionalLight->GetRange();
 		GPULight.Color = DirectionalLight->GetColor();
 		GPULight.Intensity = DirectionalLight->GetIntensity();
@@ -642,8 +614,10 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		GPULight.Type = DirectionalLight->GetLightType();
 		ZEVector3 Direction;
 		ZEQuaternion::ConvertToEulerAngles(Direction, DirectionalLight->GetRotation());
-		Direction.NormalizeSelf();
-		GPULight.Direction = Direction;
+		ZEMatrix4x4::Transform3x3(GPULight.DirectionView, Renderer->GetView().ViewTransform, Direction);
+		GPULight.DirectionView.NormalizeSelf();
+
+		LightConstants->CastShadow = DirectionalLight->GetCastsShadow();
 	LightConstantBuffer->Unlock();
 
 	Context->Draw(6, 0);
@@ -654,16 +628,13 @@ void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* R
 	ZERNLightConstants* LightConstants;
 	LightConstantBuffer->Lock((void**)&LightConstants);
 		ZERNGPULight& GPULight = LightConstants->Light;
-		GPULight.PositionWorld = PointLight->GetPosition();
+		ZEMatrix4x4::Transform(GPULight.PositionView, Renderer->GetView().ViewTransform, PointLight->GetPosition());
 		GPULight.Range = PointLight->GetRange();
 		GPULight.Color = PointLight->GetColor();
 		GPULight.Intensity = PointLight->GetIntensity();
 		GPULight.Attenuation = PointLight->GetAttenuation();
 		GPULight.Type = PointLight->GetLightType();
-		ZEVector3 Direction;
-		ZEQuaternion::ConvertToEulerAngles(Direction, PointLight->GetRotation());
-		Direction.NormalizeSelf();
-		GPULight.Direction = Direction;
+		GPULight.DirectionView = ZEVector3::Zero;
 
 		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, PointLight->GetPosition(), ZEQuaternion::Identity,
 			ZEVector3(GPULight.Range, GPULight.Range, GPULight.Range));
@@ -674,53 +645,33 @@ void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* R
 
 void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-	ZEMatrix4x4 LightViewMatrix;
-	ZEMatrix4x4::CreateViewTransform(LightViewMatrix, ProjectiveLight->GetWorldPosition(), ProjectiveLight->GetWorldRotation());
-
-	ZEMatrix4x4 LightProjectionMatrix;
-	ZEMatrix4x4::CreatePerspectiveProjection(LightProjectionMatrix, ProjectiveLight->GetFOV(), ProjectiveLight->GetAspectRatio(), Renderer->GetView().NearZ, ProjectiveLight->GetRange());
-
-	ZEMatrix4x4 LightViewProjectionMatrix;
-	ZEMatrix4x4::Multiply(LightViewProjectionMatrix, LightProjectionMatrix, LightViewMatrix);
-
-	ZEMatrix4x4 TextureMatrix;
-	ZEMatrix4x4::Create(TextureMatrix,
-						0.5f, 0.0f, 0.0f, 0.5f,
-						0.0f, -0.5f, 0.0f, 0.5f,
-						0.0f, 0.0f, 1.0f, 0.0f,
-						0.0f, 0.0f, 0.0f, 1.0f);
-
-	ZEMatrix4x4 InvCameraViewMatrix;
-	ZEMatrix4x4::Inverse(InvCameraViewMatrix, Renderer->GetView().ViewTransform);
-
-	ZEMatrix4x4 LightSpaceMatrix;
-	ZEMatrix4x4::Multiply(LightSpaceMatrix, LightViewProjectionMatrix, InvCameraViewMatrix);
-	
-	ZEMatrix4x4 ProjectionMatrix;
-	ZEMatrix4x4::Multiply(ProjectionMatrix, TextureMatrix, LightSpaceMatrix);
-
 	ZERNLightConstants* LightConstants;
 	LightConstantBuffer->Lock((void**)&LightConstants);
 		ZERNGPULight& GPULight = LightConstants->Light;
-		GPULight.PositionWorld = ProjectiveLight->GetPosition();
+		ZEMatrix4x4::Transform(GPULight.PositionView, Renderer->GetView().ViewTransform, ProjectiveLight->GetPosition());
 		GPULight.Range = ProjectiveLight->GetRange();
 		GPULight.Color = ProjectiveLight->GetColor();
 		GPULight.Intensity = ProjectiveLight->GetIntensity();
 		GPULight.Attenuation = ProjectiveLight->GetAttenuation();
 		GPULight.Type = ProjectiveLight->GetLightType();
-		ZEVector3 Direction;
-		ZEQuaternion::ConvertToEulerAngles(Direction, ProjectiveLight->GetRotation());
-		Direction.NormalizeSelf();
-		GPULight.Direction = Direction;
+		GPULight.DirectionView = ZEVector3::Zero;
 
-		LightConstants->ProjectionMatrix = ProjectionMatrix;
+		LightConstants->CastShadow = ProjectiveLight->GetCastsShadow();
+		ZEMatrix4x4 ViewProj;
+		ZEMatrix4x4::Multiply(ViewProj, ProjectiveLight->GetProjectionTransform(), ProjectiveLight->GetViewTransform());
+		ZEMatrix4x4::Multiply(LightConstants->ProjectionMatrix, ViewProj, Renderer->GetView().InvViewTransform);
+		
+		//LightConstants->ProjectionMatrix = ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * Renderer->GetView().InvViewTransform;
+
 		float TanFovRange = ZEAngle::Tan(ProjectiveLight->GetFOV() * 0.5f) * ProjectiveLight->GetRange();
-		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, ProjectiveLight->GetPosition(), ProjectiveLight->GetWorldRotation(),
+		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, ProjectiveLight->GetPosition(), ProjectiveLight->GetRotation(),
 			ZEVector3(TanFovRange * ProjectiveLight->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight->GetRange()));
 	LightConstantBuffer->Unlock();
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, (ZEGRTexture*)ProjectiveLight->GetProjectionTexture());
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointBorder);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, ProjectiveLight->GetShadowMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, ProjectiveLight->GetProjectionTexture());
 
 	Context->Draw(18, 4542);
 }
@@ -738,19 +689,20 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 	ZERNLightConstants* LightConstants;
 	LightConstantBuffer->Lock((void**)&LightConstants);
 		ZERNGPULight& GPULight = LightConstants->Light;
-		GPULight.PositionWorld = OmniProjectiveLight->GetPosition();
+		ZEMatrix4x4::Transform(GPULight.PositionView, Renderer->GetView().ViewTransform, OmniProjectiveLight->GetPosition());
 		GPULight.Range = OmniProjectiveLight->GetRange();
 		GPULight.Color = OmniProjectiveLight->GetColor();
 		GPULight.Intensity = OmniProjectiveLight->GetIntensity();
 		GPULight.Attenuation = OmniProjectiveLight->GetAttenuation();
 		GPULight.Type = OmniProjectiveLight->GetLightType();
-		
+		GPULight.DirectionView = ZEVector3::Zero;
+
 		LightConstants->RotationMatrix = RotationMatrix;
 		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, OmniProjectiveLight->GetPosition(), ZEQuaternion::Identity,
 			ZEVector3(GPULight.Range, GPULight.Range, GPULight.Range));
 	LightConstantBuffer->Unlock();
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, (ZEGRTextureCube*)OmniProjectiveLight->GetProjectionTexture());
 
 	Context->Draw(936, 6);

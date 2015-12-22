@@ -38,7 +38,12 @@
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 
-ZELightType ZELightPoint::GetLightType()
+#define ZE_LDF_VIEW_TRANSFORM			1
+#define ZE_LDF_PROJECTION_TRANSFORM		2
+#define ZE_LDF_SHADOW_MAP				4
+#define ZE_LDF_VIEW_VOLUME				8
+
+ZELightType ZELightPoint::GetLightType() const
 {
 	return ZE_LT_POINT;
 }
@@ -55,10 +60,10 @@ ZESize ZELightPoint::GetViewCount()
 
 const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index)
 {
-	if (UpdateViewVolume)
+	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
 		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
-		UpdateViewVolume = false;
+		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_VOLUME);
 	}
 	
 	return ViewVolume;
@@ -66,12 +71,18 @@ const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index)
 
 const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index)
 {
-	return ViewProjectionMatrix;
+	return ViewTransform;
+}
+
+const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index)
+{
+	return ProjectionTransform;
 }
 
 ZELightPoint::ZELightPoint()
 {
-	ViewProjectionMatrix = ZEMatrix4x4::Identity;
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_SHADOWING;
 }
 
 ZELightPoint::~ZELightPoint()

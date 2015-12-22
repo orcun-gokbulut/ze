@@ -36,6 +36,13 @@
 #include "ZELight.h"
 
 #include "ZERNRenderer.h"
+#include "ZERNCuller.h"
+#include "ZERNRenderParameters.h"
+
+#define ZE_LDF_VIEW_TRANSFORM			1
+#define ZE_LDF_PROJECTION_TRANSFORM		2
+#define ZE_LDF_SHADOW_MAP				4
+#define ZE_LDF_VIEW_VOLUME				8
 
 float ZELight::AttenuationFunction(float RootToTry)
 {
@@ -47,13 +54,19 @@ float ZELight::AttenuationFunction(float RootToTry)
 
 void ZELight::OnTransformChanged()
 {
-	UpdateViewVolume = true;
 	ZEEntity::OnTransformChanged();
+
+	DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
 void ZELight::SetRange(float NewValue)
 {
+	if(Range == NewValue)
+		return;
+
 	Range = NewValue;
+	
+	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
 float ZELight::GetRange() const
@@ -83,7 +96,7 @@ const ZEVector3& ZELight::GetColor() const
 
 void ZELight::SetAttenuation(const ZEVector3& Attenuation)
 {
-	SetAttenuation(Attenuation.z, Attenuation.y, Attenuation.x);
+	SetAttenuation(Attenuation.x, Attenuation.y, Attenuation.z);
 }
 
 void ZELight::SetAttenuation(float Constant, float Distance, float DistanceSquare)
@@ -150,8 +163,9 @@ void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	if (GetPosition() != NewPosition)
 	{
-		UpdateViewVolume = true;
 		ZEEntity::SetPosition(NewPosition);
+
+		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 	}
 }
 
@@ -159,24 +173,43 @@ void ZELight::SetRotation(const ZEQuaternion& NewRotation)
 {
 	if (GetRotation() != NewRotation)
 	{
-		UpdateViewVolume = true;
 		ZEEntity::SetRotation(NewRotation);
+
+		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 	}
+}
+
+bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
+{
+	if(CastsShadows)
+		CullParameters->Renderer->AddCommand(&Command);
+
+	return true;
+}
+
+void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	ShadowRenderer.SetContext(Parameters->Context);
+	ShadowRenderer.SetScene(Parameters->Scene);
+	ShadowRenderer.Render(0.0f);
 }
 
 ZELight::ZELight()
 {
-	Enabled = true;
 	CastsShadows = false;
-	UpdateViewVolume = true;
 
 	Range = 100.0f;
 	Intensity = 1.0f;
 	Color = ZEVector3(1.0f, 1.0f, 1.0f);
-	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+	Attenuation = ZEVector3(1.0f, 0.0f, 0.0f);
+
+	ViewTransform = ZEMatrix4x4::Identity;
+	ProjectionTransform = ZEMatrix4x4::Identity;
+
+	DirtyFlags.RaiseAll();
 }
 
 ZELight::~ZELight()
 {
-	
+
 }

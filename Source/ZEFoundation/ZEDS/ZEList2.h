@@ -457,6 +457,9 @@ inline void ZEList2<ZEItemType>::Clean()
 		Link->InUse = false;
 		Link = Temp;
 	}
+
+	First = NULL;
+	Last = NULL;
 	Count = 0;
 }
 

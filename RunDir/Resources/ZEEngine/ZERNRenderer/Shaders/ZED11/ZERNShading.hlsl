@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNRenderer.h
+ Zinek Engine - ZERNShading.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,82 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_SHADING_H__
+#define __ZERN_SHADING_H__
 
-#include "ZEInitializable.h"
+#include "ZERNTransformations.hlsl"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEList2.h"
-#include "ZERNView.h"
-#include "ZERNStageID.h"
-#include "ZEGraphics/ZEGRHolder.h"
-
-class ZEScene;
-class ZERNStage;
-class ZERNCommand;
-class ZEGRContext;
-class ZEGRRenderTarget;
-
-class ZERNStageQueue
+struct ZERNShading_Light
 {
-	public:
-		ZERNStage*						Stage;
-		ZEList2<ZERNCommand>			Commands;
+	float3						PositionView;
+	float						Range;
+	float3						Color;
+	float						Intensity;
+	float3  					Attenuation;
+	float						Fov;
+	float3						DirectionView;
+	int							Type;
 };
 
-class ZERNRenderer : public ZEInitializable
+struct ZERNShading_Surface
 {
-	private:
-		ZEGRContext*					Context;
-		ZEScene*						Scene;
-		ZERNView						View;
-		ZEGRRenderTarget*				OutputRenderTarget;
-		ZEGRHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
-		ZEArray<ZERNStageQueue>			StageQueues;
-
-		struct RendererConstants
-		{
-			float Elapsedtime;
-			float Reserved[3];
-		}Constants;
-
-		void							Cull();
-		void							SortStageQueues();
-		void							RenderStage(ZERNStageQueue* Queue);
-		void							RenderStages();
-
-		void							UpdateViewConstantBuffer();
-
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
-
-	public:
-		void							SetContext(ZEGRContext* Context);
-		ZEGRContext*					GetContext();
-
-		void							SetView(const ZERNView& View);
-		const ZERNView&					GetView();
-
-		void							SetScene(ZEScene* Scene);
-		ZEScene*						GetScene();
-
-		void							SetOutputRenderTarget(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*				GetOutputRenderTarget();
-
-		ZEArray<ZERNStage*>				GetStages();
-		ZERNStage*						GetStage(ZERNStageID Id);
-		void							AddStage(ZERNStage* Stage);
-		void							RemoveStage(ZERNStage* Stage);
-		void							CleanStages();
-
-		void							AddCommand(ZERNCommand* Command);
-		void							RemoveCommand(ZERNCommand* Command);
-		void							CleanCommands();
-		bool							ContainsCommand(ZERNCommand* Command);
-
-		void							Render(float ElapsedTime);
-
-										ZERNRenderer();
-		virtual							~ZERNRenderer();
+	float3						PositionView;
+	float						Reserved;
+	float3						NormalView;
+	float						Reserved1;
+	float3						Diffuse;
+	float						Reserved2;
+	float3						Specular;
+	float						SpecularPower;
 };
+
+float3 ZERNShading_Diffuse_Lambert(ZERNShading_Light Light, ZERNShading_Surface Surface)
+{
+	float NdotL = max(0.0f, dot(Surface.NormalView, Light.DirectionView));
+	
+	return NdotL * Surface.Diffuse * Light.Color;
+}
+
+float3 ZERNShading_Specular_BlinnPhong(ZERNShading_Light Light, ZERNShading_Surface Surface)
+{	
+	float3 ViewDirection = normalize(-Surface.PositionView);
+	float3 HalfVector = normalize(ViewDirection + Light.DirectionView);
+	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
+	
+	return pow(NdotH, Surface.SpecularPower) * Surface.Specular * Light.Color;
+}
+
+#endif

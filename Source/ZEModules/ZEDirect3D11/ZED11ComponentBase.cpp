@@ -50,7 +50,6 @@ ID3D11Device1* ZED11ComponentBase::GetDevice()
 	return Device;
 }
 
-
 ID3D11DeviceContext1* ZED11ComponentBase::GetMainContext()
 {
 	return Context;
@@ -173,7 +172,7 @@ DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRFormat Format)
 		case ZEGR_TF_R10G10B10A2_UNORM:
 			return DXGI_FORMAT_R10G10B10A2_UNORM;
 
-		case ZEGR_TF_R11FG11FB10F_FLOAT:
+		case ZEGR_TF_R11G11B10_FLOAT:
 			return DXGI_FORMAT_R11G11B10_FLOAT;
 
 

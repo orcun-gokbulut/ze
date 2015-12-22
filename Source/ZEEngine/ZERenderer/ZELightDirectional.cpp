@@ -35,13 +35,21 @@
 
 #include "ZELightDirectional.h"
 
-ZELightType ZELightDirectional::GetLightType()
+ZELightDirectional::ZELightDirectional()
 {
-	return ZE_LT_DIRECTIONAL;
+
+}
+
+ZELightDirectional::~ZELightDirectional()
+{
+	Deinitialize();
 }
 
 bool ZELightDirectional::InitializeSelf()
 {
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_SHADOWING;
+
 	return true;
 }
 
@@ -51,11 +59,15 @@ bool ZELightDirectional::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
+ZELightType ZELightDirectional::GetLightType() const
+{
+	return ZE_LT_DIRECTIONAL;
+}
+
 ZELightDirectional* ZELightDirectional::CreateInstance()
 {
 	return new ZELightDirectional();
 }
-
 
 ZESize ZELightDirectional::GetViewCount()
 {
@@ -70,15 +82,20 @@ const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index)
 
 const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize CascadeIndex)
 {
-	return ZEMatrix4x4::Identity;
+	return ViewTransform;
 }
 
-ZELightDirectional::ZELightDirectional()
+const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index)
 {
-
+	return ProjectionTransform;
 }
 
-ZELightDirectional::~ZELightDirectional()
+bool ZELightDirectional::PreRender(const ZERNCullParameters* CullParameters)
 {
-	Deinitialize();
+	return ZELight::PreRender(CullParameters);
+}
+
+void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+
 }

@@ -97,6 +97,10 @@ ze_add_source(ZERNStageTextureOutput.h 				Sources Headers)
 ze_add_source(ZERNStageTextureOutput.cpp			Sources)
 ze_add_source(ZERNStagePostProcess.h 				Sources Headers)
 ze_add_source(ZERNStagePostProcess.cpp				Sources)
+ze_add_source(ZERNStageShadowmapGeneration.h		Sources Headers)
+ze_add_source(ZERNStageShadowmapGeneration.cpp		Sources)
+ze_add_source(ZERNStageShadowing.h					Sources Headers)
+ze_add_source(ZERNStageShadowing.cpp				Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}
