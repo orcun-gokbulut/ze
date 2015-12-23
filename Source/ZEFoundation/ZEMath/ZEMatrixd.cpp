@@ -1082,6 +1082,14 @@ void ZEMatrix4x4d::GetDecomposition(ZEVector3d& Translation, ZEQuaternion& Rotat
 	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix.ToMatrix4x4());
 }
 
+ZEMatrix4x4 ZEMatrix4x4d::ToMatrix4x4() const
+{
+	return ZEMatrix4x4((float)M11, (float)M12, (float)M13, (float)M14, 
+						(float)M21, (float)M22, (float)M23, (float)M24, 
+						(float)M31, (float)M32, (float)M33, (float)M34,
+						(float)M41, (float)M42, (float)M43, (float)M44);
+}
+
 ZEMatrix4x4d ZEMatrix4x4d::operator+(const ZEMatrix4x4d& RightOperand) const 
 {
 	ZEMatrix4x4d Temp;
