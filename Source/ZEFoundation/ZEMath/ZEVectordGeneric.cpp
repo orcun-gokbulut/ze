@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEVectorGeneric.cpp
+ Zinek Engine - ZEVectordGeneric.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEVector.h"
+#include "ZEVectord.h"
 
-// ZEVector2
+// ZEVector2d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ZEVector2::Divide(ZEVector2 &Out, const ZEVector2 &A, const ZEVector2 &B)
+void ZEVector2d::Divide(ZEVector2d& Out, const ZEVector2d& A, const ZEVector2d& B)
 {
 	Out.x = A.x / B.x;
 	Out.y = A.y / B.y;
 }
 
-float ZEVector2::DotProduct(const ZEVector2 &A, const ZEVector2 &B)
+double ZEVector2d::DotProduct(const ZEVector2d& A, const ZEVector2d& B)
 {
 	return A.x * B.x + A.y * B.y ;
 }
 
-float ZEVector2::DistanceSquare(const ZEVector2 &A, const ZEVector2 &B)
+double ZEVector2d::DistanceSquare(const ZEVector2d& A, const ZEVector2d& B)
 {
 	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y);
 }
 
-void ZEVector2::Normalize(ZEVector2 &Out, const ZEVector2 &A)
+void ZEVector2d::Normalize(ZEVector2d &Out, const ZEVector2d &A)
 {
-	float L = A.Length();
+	double L = A.Length();
 	Out.x = A.x / L;
 	Out.y = A.y / L;
 }
 
-void ZEVector2::Max(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B)
+void ZEVector2d::Max(ZEVector2d& Out, const ZEVector2d& A, const ZEVector2d& B)
 {
 	Out.x = A.x > B.x ? A.x : B.x;
 	Out.y = A.y > B.y ? A.y : B.y;
 }
 
-void ZEVector2::Min(ZEVector2& Out, const ZEVector2& A, const ZEVector2& B)
+void ZEVector2d::Min(ZEVector2d& Out, const ZEVector2d& A, const ZEVector2d& B)
 {
 	Out.x = A.x < B.x ? A.x : B.x;
 	Out.y = A.y < B.y ? A.y : B.y;
 }
 
-void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, float MinValue, float MaxValue)
+void ZEVector2d::Clamp(ZEVector2d& Out, const ZEVector2d& Vector, double MinValue, double MaxValue)
 {
 	if (Vector.x > MaxValue)
 		Out.x = MaxValue;
@@ -89,7 +89,7 @@ void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, float MinValue, f
 		Out.y = Vector.y;
 }
 
-void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, const ZEVector2& MinValue, const ZEVector2& MaxValue)
+void ZEVector2d::Clamp(ZEVector2d& Out, const ZEVector2d& Vector, const ZEVector2d& MinValue, const ZEVector2d& MaxValue)
 {
 	if (Vector.x > MaxValue.x)
 		Out.x = MaxValue.x;
@@ -106,7 +106,7 @@ void ZEVector2::Clamp(ZEVector2& Out, const ZEVector2& Vector, const ZEVector2& 
 		Out.y = Vector.y;
 }
 
-void ZEVector2::Saturate(ZEVector2& Out, const ZEVector2& Vector)
+void ZEVector2d::Saturate(ZEVector2d& Out, const ZEVector2d& Vector)
 {
 	if (Vector.x > 1.0f)
 		Out.x = 1.0f;
@@ -123,48 +123,48 @@ void ZEVector2::Saturate(ZEVector2& Out, const ZEVector2& Vector)
 		Out.y = Vector.y;
 }
 
-// ZEVector3
+// ZEVector3d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ZEVector3::Divide(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+void ZEVector3d::Divide(ZEVector3d& Out, const ZEVector3d& A, const ZEVector3d& B)
 {
 	Out.x = A.x / B.x;
 	Out.y = A.y / B.y;
 	Out.z = A.z / B.z;
 }
 
-float ZEVector3::DotProduct(const ZEVector3& A, const ZEVector3& B) 
+double ZEVector3d::DotProduct(const ZEVector3d& A, const ZEVector3d& B) 
 {
 	return A.x * B.x + A.y * B.y + A.z * B.z;
 }
 
-float ZEVector3::DistanceSquare(const ZEVector3& A, const ZEVector3& B)
+double ZEVector3d::DistanceSquare(const ZEVector3d& A, const ZEVector3d& B)
 {
 	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z);
 }
 
-void ZEVector3::Normalize(ZEVector3& Out, const ZEVector3& Vector)
+void ZEVector3d::Normalize(ZEVector3d& Out, const ZEVector3d& Vector)
 {
-	float L = Vector.Length();
+	double L = Vector.Length();
 	Out.x = Vector.x / L;
 	Out.y = Vector.y / L;
 	Out.z = Vector.z / L;
 }
 
-void ZEVector3::Max(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+void ZEVector3d::Max(ZEVector3d& Out, const ZEVector3d& A, const ZEVector3d& B)
 {
 	Out.x = A.x > B.x ? A.x : B.x;
 	Out.y = A.y > B.y ? A.y : B.y;
 	Out.z = A.z > B.z ? A.z : B.z;
 }
 
-void ZEVector3::Min(ZEVector3& Out, const ZEVector3& A, const ZEVector3& B)
+void ZEVector3d::Min(ZEVector3d& Out, const ZEVector3d& A, const ZEVector3d& B)
 {
 	Out.x = A.x < B.x ? A.x : B.x;
 	Out.y = A.y < B.y ? A.y : B.y;
 	Out.z = A.z < B.z ? A.z : B.z;
 }
 
-void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, float MaxValue)
+void ZEVector3d::Clamp(ZEVector3d& Out, const ZEVector3d& Vector, double MinValue, double MaxValue)
 {
 	if (Vector.x > MaxValue)
 		Out.x = MaxValue;
@@ -188,7 +188,7 @@ void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, float MinValue, f
 		Out.z = Vector.z;
 }
 
-void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue, const ZEVector3& MaxValue)
+void ZEVector3d::Clamp(ZEVector3d& Out, const ZEVector3d& Vector, const ZEVector3d& MinValue, const ZEVector3d& MaxValue)
 {
 	if (Vector.x > MaxValue.x)
 		Out.x = MaxValue.x;
@@ -212,7 +212,7 @@ void ZEVector3::Clamp(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& 
 		Out.z = Vector.z;
 }
 
-void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MinValue)
+void ZEVector3d::ClampLower(ZEVector3d& Out, const ZEVector3d& Vector, const ZEVector3d& MinValue)
 {
 	if (Vector.x < MinValue.x)
 		Out.x = MinValue.x;
@@ -231,7 +231,7 @@ void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, const ZEVect
 		Out.z = Vector.z;
 }
 
-void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, float MinValue)
+void ZEVector3d::ClampLower(ZEVector3d& Out, const ZEVector3d& Vector, double MinValue)
 {
 	if (Vector.x < MinValue)
 		Out.x = MinValue;
@@ -250,7 +250,7 @@ void ZEVector3::ClampLower(ZEVector3& Out, const ZEVector3& Vector, float MinVal
 		Out.z = Vector.z;
 }
 
-void ZEVector3::ClampUpper(ZEVector3& Out, const ZEVector3& Vector, const ZEVector3& MaxValue)
+void ZEVector3d::ClampUpper(ZEVector3d& Out, const ZEVector3d& Vector, const ZEVector3d& MaxValue)
 {
 	if (Vector.x > MaxValue.x)
 		Out.x = MaxValue.x;
@@ -268,7 +268,7 @@ void ZEVector3::ClampUpper(ZEVector3& Out, const ZEVector3& Vector, const ZEVect
 		Out.z = Vector.z;
 }
 
-void ZEVector3::ClampUpper(ZEVector3& Out, const ZEVector3& Vector, float MaxValue)
+void ZEVector3d::ClampUpper(ZEVector3d& Out, const ZEVector3d& Vector, double MaxValue)
 {
 	if (Vector.x > MaxValue)
 		Out.x = MaxValue;
@@ -286,7 +286,7 @@ void ZEVector3::ClampUpper(ZEVector3& Out, const ZEVector3& Vector, float MaxVal
 		Out.z = Vector.z;
 }
 
-void ZEVector3::Saturate(ZEVector3& Out, const ZEVector3& Vector)
+void ZEVector3d::Saturate(ZEVector3d& Out, const ZEVector3d& Vector)
 {
 	if (Vector.x > 1.0f)
 		Out.x = 1.0f;
@@ -310,9 +310,9 @@ void ZEVector3::Saturate(ZEVector3& Out, const ZEVector3& Vector)
 		Out.z = Vector.z;
 }
 
-// ZEVector4
+// ZEVector4d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-void ZEVector4::Add(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+void ZEVector4d::Add(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B)
 {
 	Out.x = A.x + B.x;
 	Out.y = A.y + B.y;
@@ -320,7 +320,7 @@ void ZEVector4::Add(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.w = A.w + B.w;
 }
 
-void ZEVector4::Sub(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+void ZEVector4d::Sub(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B)
 {
 	Out.x = A.x - B.x;
 	Out.y = A.y - B.y;
@@ -328,7 +328,7 @@ void ZEVector4::Sub(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.w = A.w - B.w;
 }
 
-void ZEVector4::Scale(ZEVector4& Out, const ZEVector4& A, float s)
+void ZEVector4d::Scale(ZEVector4d& Out, const ZEVector4d& A, double s)
 {
 	Out.x = A.x * s;
 	Out.y = A.y * s;
@@ -336,7 +336,7 @@ void ZEVector4::Scale(ZEVector4& Out, const ZEVector4& A, float s)
 	Out.w = A.w * s;
 }
 
-void ZEVector4::Multiply(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+void ZEVector4d::Multiply(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B)
 {
 	Out.x = A.x * B.x;
 	Out.y = A.y * B.y;
@@ -344,7 +344,7 @@ void ZEVector4::Multiply(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.w = A.w * B.w;
 }
 
-void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+void ZEVector4d::Divide(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B)
 {
 	Out.x = A.x / B.x;
 	Out.y = A.y / B.y;
@@ -352,7 +352,7 @@ void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.w = A.w / B.w;
 }
 
-void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, float s)
+void ZEVector4d::Divide(ZEVector4d& Out, const ZEVector4d& A, double s)
 {
 	Out.x = A.x / s;
 	Out.y = A.y / s;
@@ -360,26 +360,26 @@ void ZEVector4::Divide(ZEVector4& Out, const ZEVector4& A, float s)
 	Out.w = A.w / s;
 }
 
-float ZEVector4::DotProduct(const ZEVector4& A, const ZEVector4& B) 
+double ZEVector4d::DotProduct(const ZEVector4d& A, const ZEVector4d& B) 
 {
 	return A.x * B.x + A.y * B.y + A.z * B.z + A.w * B.w;
 }
 
-float ZEVector4::DistanceSquare(const ZEVector4& A, const ZEVector4& B)
+double ZEVector4d::DistanceSquare(const ZEVector4d& A, const ZEVector4d& B)
 {
 	return (A.x - B.x) * (A.x - B.x) + (A.y - B.y) * (A.y - B.y) + (A.z - B.z) * (A.z - B.z) + (A.w - B.w) * (A.w - B.w);
 }
 
-void ZEVector4::Normalize(ZEVector4& Out, const ZEVector4& Vector)
+void ZEVector4d::Normalize(ZEVector4d& Out, const ZEVector4d& Vector)
 {
-	float L = Vector.Length();
+	double L = Vector.Length();
 	Out.x = Vector.x / L;
 	Out.y = Vector.y / L;
 	Out.z = Vector.z / L;
 	Out.w = Vector.w / L;
 }
 
-void ZEVector4::Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, float Factor)
+void ZEVector4d::Lerp(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B, double Factor)
 {
 	Out.x = A.x + (B.x - A.x) * Factor;
 	Out.y = A.y + (B.y - A.y) * Factor;
@@ -387,7 +387,7 @@ void ZEVector4::Lerp(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B, flo
 	Out.w = A.w + (B.w - A.w) * Factor;
 }
 
-void ZEVector4::Max(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+void ZEVector4d::Max(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B)
 {
 	Out.x = A.x > B.x ? A.x : B.x;
 	Out.y = A.y > B.y ? A.y : B.y;
@@ -395,7 +395,7 @@ void ZEVector4::Max(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.w = A.w > B.w ? A.w : B.w;
 }
 
-void ZEVector4::Min(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
+void ZEVector4d::Min(ZEVector4d& Out, const ZEVector4d& A, const ZEVector4d& B)
 {
 	Out.x = A.x < B.x ? A.x : B.x;
 	Out.y = A.y < B.y ? A.y : B.y;
@@ -403,7 +403,7 @@ void ZEVector4::Min(ZEVector4& Out, const ZEVector4& A, const ZEVector4& B)
 	Out.w = A.w < B.w ? A.w : B.w;
 }
 
-void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, float MaxValue)
+void ZEVector4d::Clamp(ZEVector4d& Out, const ZEVector4d& Vector, double MinValue, double MaxValue)
 {
 	if (Vector.x > MaxValue)
 		Out.x = MaxValue;
@@ -434,7 +434,7 @@ void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, float MinValue, f
 		Out.w = Vector.w;
 }
 
-void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& MinValue, const ZEVector4& MaxValue)
+void ZEVector4d::Clamp(ZEVector4d& Out, const ZEVector4d& Vector, const ZEVector4d& MinValue, const ZEVector4d& MaxValue)
 {
 	if (Vector.x > MaxValue.x)
 		Out.x = MaxValue.x;
@@ -465,7 +465,7 @@ void ZEVector4::Clamp(ZEVector4& Out, const ZEVector4& Vector, const ZEVector4& 
 		Out.w = Vector.w;
 }
 
-void ZEVector4::Saturate(ZEVector4& Out, const ZEVector4& Vector)
+void ZEVector4d::Saturate(ZEVector4d& Out, const ZEVector4d& Vector)
 {
 	if (Vector.x > 1.0f)
 		Out.x = 1.0f;
