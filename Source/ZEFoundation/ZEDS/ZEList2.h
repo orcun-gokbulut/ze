@@ -100,13 +100,13 @@ class ZEList2
 template<typename ZEItemType>
 ZEList2Iterator<ZEItemType> ZEList2<ZEItemType>::GetIterator()
 {
-	return ZEList2Iterator<ZEItemType>(First());
+	return ZEList2Iterator<ZEItemType>(GetFirst());
 }
 
 template<typename ZEItemType>
 ZEList2IteratorConst<ZEItemType> ZEList2<ZEItemType>::GetIterator() const
 {
-	return ZEList2IteratorConst<ZEItemType>(First());
+	return ZEList2IteratorConst<ZEItemType>(GetFirst());
 }
 
 template<typename ZEItemType>
