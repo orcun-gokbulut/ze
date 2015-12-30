@@ -163,7 +163,7 @@ void ZECrashReportUIProgressWindow::CreateMainWindowRawText()
 
 void ZECrashReportUIProgressWindow::UpdateUploadInformation()
 {
-	if(SenderThread->GetStatus() == ZE_TS_DONE)
+	if (SenderThread->GetStatus() == ZE_TS_NOT_RUNNING)
 	{
 		UploadCompleted();
 		return;

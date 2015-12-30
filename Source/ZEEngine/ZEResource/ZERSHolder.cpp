@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDelegate.h
+ Zinek Engine - ZERSHolder.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+#include "ZERSHolder.h"
+#include "ZECommon.h"
 
-#define ZEDelegateFunction(DelegateClass, Function) DelegateClass::Create<Function>()
-#define ZEDelegateMethod(DelegateClass, Class, Function, Object) DelegateClass::Create<Class, &Class::Function>(Object)
-#define ZEDelegateMethodConst(DelegateClass, class, Function, Object) DelegateClass::CreateConst<Class, &Class::Function>(Object)
-
-template <typename TSignature> 
-class ZEDelegate;
-
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
-
-#endif
+ZE_SUPPRESS_LNK4221

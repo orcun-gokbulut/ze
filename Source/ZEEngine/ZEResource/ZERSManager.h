@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDelegate.h
+ Zinek Engine - ZERSManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,20 +33,40 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_DELEGATE_H__
-#define __ZE_DELEGATE_H__
+#pragma once
 
-#define ZEDelegateFunction(DelegateClass, Function) DelegateClass::Create<Function>()
-#define ZEDelegateMethod(DelegateClass, Class, Function, Object) DelegateClass::Create<Class, &Class::Function>(Object)
-#define ZEDelegateMethodConst(DelegateClass, class, Function, Object) DelegateClass::CreateConst<Class, &Class::Function>(Object)
+#include "ZERSResource.h"
+#include "ZEDS\ZEList2.h"
 
-template <typename TSignature> 
-class ZEDelegate;
+typedef ZERSResource* ZERSInstanciator();
 
-#define ZE_MACRO_INCLUDE_FILE_NAME "ZEDS/ZEDelegateImp.h"
-#define ZE_MACRO_INCLUDE_COUNT 30
-#include "ZEMacro/ZEMacroIncludeRepeater.h"
-#undef ZE_MACRO_INCLUDE_FILE_NAME
-#undef ZE_MACRO_INCLUDE_COUNT
+class ZERSManager
+{
+	private:
+		friend ZERSResource;
 
-#endif
+		ZELock						ManagerLock;
+		ZEList2<ZERSResource>			Resources;
+
+		ZESize						MemoryUsage[ZERS_P_TOTAL];
+		ZESize						CacheSize;
+		ZESize						CacheUsage;
+		
+		ZERSHolder<ZERSResource>		GetResourceInternal(const ZEString& FilePath);
+		ZERSHolder<ZERSResource>		LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions);
+
+		void						RegisterResource(ZERSResource* Resource);
+		void						ReleaseResource(ZERSResource* Resource);
+
+	public:
+		ZESize						GetMemoryUsage(ZERSPool Pool = ZERS_P_TOTAL);
+		ZESize						GetCacheUsage();
+
+		void						SetCacheSize(ZESize Size);
+		ZESize						SetCacheSize();
+
+		ZERSHolder<ZERSResource>		GetResource(const ZEString& FilePath);
+		ZERSHolder<ZERSResource>		GetResource(const ZEGUID& GUID);
+
+		static ZERSManager*	GetInstance();
+};
