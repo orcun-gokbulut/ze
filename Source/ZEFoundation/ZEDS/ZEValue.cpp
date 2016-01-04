@@ -53,24 +53,34 @@
 
 void ZEValue::SetType(ZEValueType NewType)
 {
+	if (this->Type == NewType)
+		return;
 
-	if (this->Type != NewType && Value.Pointer != NULL)
+	switch (Type)
 	{
-		Value.Pointer = NULL;
-		if (Type == ZE_VRT_STRING)
-		{
+		case ZE_VRT_STRING:
 			Value.String.Clear();
-		}
-		else if (Type == ZE_VRT_MATRIX3X3)
-		{
+			break;
+		
+		case ZE_VRT_MATRIX3X3:
 			delete Value.Matrix3x3;
 			Value.Matrix3x3 = NULL;
-		}
-		else if (Type == ZE_VRT_MATRIX4X4)
-		{
+			break;
+
+		case ZE_VRT_MATRIX3X3D:
+			delete Value.Matrix3x3d;
+			Value.Matrix3x3d = NULL;
+			break;
+
+		case ZE_VRT_MATRIX4X4:
 			delete Value.Matrix4x4;
 			Value.Matrix4x4 = NULL;
-		}
+			break;
+
+		case ZE_VRT_MATRIX4X4D:
+			delete Value.Matrix4x4d;
+			Value.Matrix4x4d = NULL;
+			break;
 	}
 
 	switch(NewType)
@@ -78,8 +88,17 @@ void ZEValue::SetType(ZEValueType NewType)
 		case ZE_VRT_MATRIX3X3:
 			Value.Matrix3x3 = new ZEMatrix3x3();
 			break;
+
+		case ZE_VRT_MATRIX3X3D:
+			Value.Matrix3x3d = new ZEMatrix3x3d();
+			break;
+
 		case ZE_VRT_MATRIX4X4:
 			Value.Matrix4x4 = new ZEMatrix4x4();
+			break;
+
+		case ZE_VRT_MATRIX4X4D:
+			Value.Matrix4x4d = new ZEMatrix4x4d();
 			break;
 	}
 
@@ -109,66 +128,107 @@ void ZEValue::SetValue(const ZEValue& NewValue)
 			SetNull();
 			Type = ZE_VRT_UNDEFINED;
 			break;
+
 		case ZE_VRT_NULL:
 			SetNull();
 			break;
+
 		case ZE_VRT_FLOAT:
 			SetFloat(NewValue.GetFloat());
 			break;
+
 		case ZE_VRT_DOUBLE:
 			SetDouble(NewValue.GetDouble());
 			break;
+
 		case ZE_VRT_INTEGER_8:
 			SetInt8(NewValue.GetInt8());
 			break;
+
 		case ZE_VRT_INTEGER_16:
 			SetInt16(NewValue.GetInt16());
 			break;
+
 		case ZE_VRT_INTEGER_32:
 			SetInt32(NewValue.GetInt32());
 			break;
+
 		case ZE_VRT_INTEGER_64:
 			SetInt64(NewValue.GetInt64());
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			SetUInt8(NewValue.GetUInt8());
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_16:
 			SetUInt16(NewValue.GetUInt16());
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_32:
 			SetUInt32(NewValue.GetUInt32());
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_64:
 			SetUInt64(NewValue.GetUInt64());
 			break;
+
 		case ZE_VRT_BOOLEAN:
 			SetBoolean(NewValue.GetBoolean());
 			break;
+
 		case ZE_VRT_STRING:
 			SetString(NewValue.GetString());
 			break;
+
 		case ZE_VRT_QUATERNION:
 			SetQuaternion(NewValue.GetQuaternion());
 			break;
+
 		case ZE_VRT_VECTOR2:
 			SetVector2(NewValue.GetVector2());
 			break;
+
+		case ZE_VRT_VECTOR2D:
+			SetVector2d(NewValue.GetVector2d());
+			break;
+
 		case ZE_VRT_VECTOR3:
 			SetVector3(NewValue.GetVector3());
 			break;
+
+		case ZE_VRT_VECTOR3D:
+			SetVector3d(NewValue.GetVector3d());
+			break;
+
 		case ZE_VRT_VECTOR4:
 			SetVector4(NewValue.GetVector4());
 			break;
+
+		case ZE_VRT_VECTOR4D:
+			SetVector4d(NewValue.GetVector4d());
+			break;
+
 		case ZE_VRT_MATRIX3X3:
 			SetMatrix3x3(NewValue.GetMatrix3x3());
 			break;
+
+		case ZE_VRT_MATRIX3X3D:
+			SetMatrix3x3d(NewValue.GetMatrix3x3d());
+			break;
+
 		case ZE_VRT_MATRIX4X4:
 			SetMatrix4x4(NewValue.GetMatrix4x4());
 			break;
+
+		case ZE_VRT_MATRIX4X4D:
+			SetMatrix4x4d(NewValue.GetMatrix4x4d());
+			break;
+
 		case ZE_VRT_CLASS:
 			SetClass(NewValue.GetClass());
 			break;
+
 		default:
 			zeDebugCheck(true, "ZEValue::SetValue operation failed. Error in Value type.");
 	}
@@ -180,46 +240,82 @@ ZESize ZEValue::SizeOf() const
 	{
 		case ZE_VRT_UNDEFINED:
 			return 0;
+
 		case ZE_VRT_NULL:
 			return 0;
+
 		case ZE_VRT_FLOAT:
 			return sizeof(float);
+
 		case ZE_VRT_DOUBLE:
 			return sizeof(double);
+
 		case ZE_VRT_INTEGER_8:
 			return sizeof(ZEInt8);
+
 		case ZE_VRT_INTEGER_16:
 			return sizeof(ZEInt16);
+
 		case ZE_VRT_INTEGER_32:
 			return sizeof(ZEInt32);
+
 		case ZE_VRT_INTEGER_64:
 			return sizeof(ZEInt64);
+
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			return sizeof(ZEUInt8);
+
 		case ZE_VRT_UNSIGNED_INTEGER_16:
 			return sizeof(ZEUInt16);
+
 		case ZE_VRT_UNSIGNED_INTEGER_32:
 			return sizeof(ZEUInt32);
+
 		case ZE_VRT_UNSIGNED_INTEGER_64:
 			return sizeof(ZEUInt64);
+
 		case ZE_VRT_BOOLEAN:
 			return sizeof(bool);
+
 		case ZE_VRT_STRING:
 			return this->Value.String.GetSize();
+
 		case ZE_VRT_QUATERNION:
 			return sizeof(ZEQuaternion);
+
 		case ZE_VRT_VECTOR2:
 			return sizeof(ZEVector2);
+
+		case ZE_VRT_VECTOR2D:
+			return sizeof(ZEVector2d);
+
 		case ZE_VRT_VECTOR3:
 			return sizeof(ZEVector3);
+
+		case ZE_VRT_VECTOR3D:
+			return sizeof(ZEVector3d);
+
 		case ZE_VRT_VECTOR4:
 			return sizeof(ZEVector4);
+
+		case ZE_VRT_VECTOR4D:
+			return sizeof(ZEVector4d);
+
 		case ZE_VRT_MATRIX3X3:
 			return sizeof(ZEMatrix3x3);
+
+		case ZE_VRT_MATRIX3X3D:
+			return sizeof(ZEMatrix3x3d);
+
 		case ZE_VRT_MATRIX4X4:
 			return sizeof(ZEMatrix4x4);
+
+		case ZE_VRT_MATRIX4X4D:
+			return sizeof(ZEMatrix4x4d);
+
 		case ZE_VRT_CLASS:
 			return sizeof(void*);
+
 		default:
 			zeDebugCheck(true, "ZEValue::SizeOf is wrong type.");
 			return 0;
@@ -232,9 +328,17 @@ void ZEValue::Clear()
 	{
 		memset(Value.Matrix3x3, 0, sizeof(ZEMatrix3x3));
 	}
+	else if (Type == ZE_VRT_MATRIX3X3D)
+	{
+		memset(Value.Matrix3x3d, 0, sizeof(ZEMatrix3x3d));
+	}
 	else if (Type == ZE_VRT_MATRIX4X4)
 	{
 		memset(Value.Matrix4x4, 0, sizeof(ZEMatrix4x4));
+	}
+	else if (Type == ZE_VRT_MATRIX4X4D)
+	{
+		memset(Value.Matrix4x4d, 0, sizeof(ZEMatrix4x4d));
 	}
 	else if (Type == ZE_VRT_STRING)
 	{
@@ -258,65 +362,105 @@ bool ZEValue::Serialize(ZESerializer* Serializer)
 		case ZE_VRT_UNDEFINED:
 		case ZE_VRT_NULL:
 			break;
+
 		case ZE_VRT_FLOAT:
 			Serializer->Write(&Value.Float, sizeof(float), 1);
 			break;
+
 		case ZE_VRT_DOUBLE:
 			Serializer->Write(&Value.Double, sizeof(double), 1);
 			break;
+
 		case ZE_VRT_INTEGER_8:
 			Serializer->Write(&Value.Int32, sizeof(ZEInt8), 1);
 			break;
+
 		case ZE_VRT_INTEGER_16:
 			Serializer->Write(&Value.Int32, sizeof(ZEInt16), 1);
 			break;
+
 		case ZE_VRT_INTEGER_32:
 			Serializer->Write(&Value.Int32, sizeof(ZEInt32), 1);
 			break;
+
 		case ZE_VRT_INTEGER_64:
 			Serializer->Write(&Value.Int64, sizeof(ZEInt64), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			Serializer->Write(&Value.Int32, sizeof(ZEUInt8), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_16:
 			Serializer->Write(&Value.Int32, sizeof(ZEUInt16), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_32:
 			Serializer->Write(&Value.Int32, sizeof(ZEUInt32), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_64:
 			Serializer->Write(&Value.Int64, sizeof(ZEUInt64), 1);
 			break;
+
 		case ZE_VRT_BOOLEAN:
 			Serializer->Write(&Value.Boolean, sizeof(bool), 1);
 			break;
+
 		case ZE_VRT_STRING:
 			StringSize = (ZEUInt32)this->Value.String.GetSize();
 			Serializer->Write(&StringSize, sizeof(ZEUInt32), 1);
 			Serializer->Write(Value.String.GetValue(), sizeof(char), StringSize);
 			break;
+
 		case ZE_VRT_QUATERNION:
 			Serializer->Write(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
+
 		case ZE_VRT_VECTOR2:
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector2), 1);
 			break;
+
+		case ZE_VRT_VECTOR2D:
+			Serializer->Write(&Value.DoubleVectors, sizeof(ZEVector2d), 1);
+			break;
+
 		case ZE_VRT_VECTOR3:
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector3), 1);
 			break;
+
+		case ZE_VRT_VECTOR3D:
+			Serializer->Write(&Value.DoubleVectors, sizeof(ZEVector3d), 1);
+			break;
+
 		case ZE_VRT_VECTOR4:
 			Serializer->Write(&Value.Vectors, sizeof(ZEVector4), 1);
 			break;
+
+		case ZE_VRT_VECTOR4D:
+			Serializer->Write(&Value.DoubleVectors, sizeof(ZEVector4d), 1);
+			break;
+
 		case ZE_VRT_MATRIX3X3:
 			Serializer->Write(Value.Matrix3x3, sizeof(ZEMatrix3x3), 1);
 			break;
+
+		case ZE_VRT_MATRIX3X3D:
+			Serializer->Write(Value.Matrix3x3d, sizeof(ZEMatrix3x3d), 1);
+			break;
+
 		case ZE_VRT_MATRIX4X4:
 			Serializer->Write(Value.Matrix4x4, sizeof(ZEMatrix4x4), 1);
 			break;
+
+		case ZE_VRT_MATRIX4X4D:
+			Serializer->Write(Value.Matrix4x4d, sizeof(ZEMatrix4x4d), 1);
+			break;
+
 		case ZE_VRT_CLASS:
 			zeDebugCheck(true, "Can not unserialize pointer type.");
 			return false;
+
 		default:
 			zeDebugCheck(true, "Wrong Value type.");
 			return false;
@@ -335,53 +479,66 @@ bool ZEValue::Unserialize(ZEUnserializer* Unserializer)
 		case ZE_VRT_UNDEFINED:
 			SetType(ZE_VRT_UNDEFINED);
 			break;
+
 		case ZE_VRT_NULL:
 			SetType(ZE_VRT_NULL);
 			break;
+
 		case ZE_VRT_FLOAT:
 			SetType(ZE_VRT_FLOAT);
 			Unserializer->Read(&Value.Float, sizeof(float), 1);
 			break;
+
 		case ZE_VRT_DOUBLE:
 			SetType(ZE_VRT_DOUBLE);
 			Unserializer->Read(&Value.Double, sizeof(double), 1);
 			break;
+
 		case ZE_VRT_INTEGER_8:
 			SetType(ZE_VRT_INTEGER_8);
 			Unserializer->Read(&Value.Int32, sizeof(ZEInt8), 1);
 			break;
+
 		case ZE_VRT_INTEGER_16:
 			SetType(ZE_VRT_INTEGER_16);
 			Unserializer->Read(&Value.Int32, sizeof(ZEInt16), 1);
 			break;
+
 		case ZE_VRT_INTEGER_32:
 			SetType(ZE_VRT_INTEGER_32);
 			Unserializer->Read(&Value.Int32, sizeof(ZEInt32), 1);
 			break;
+
 		case ZE_VRT_INTEGER_64:
 			SetType(ZE_VRT_INTEGER_64);
 			Unserializer->Read(&Value.Int64, sizeof(ZEInt64), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_8:
 			SetType(ZE_VRT_UNSIGNED_INTEGER_8);
 			Unserializer->Read(&Value.Int32, sizeof(ZEUInt8), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_16:
 			SetType(ZE_VRT_UNSIGNED_INTEGER_16);
 			Unserializer->Read(&Value.Int32, sizeof(ZEUInt16), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_32:
 			SetType(ZE_VRT_UNSIGNED_INTEGER_32);
 			Unserializer->Read(&Value.Int32, sizeof(ZEUInt32), 1);
 			break;
+
 		case ZE_VRT_UNSIGNED_INTEGER_64:
 			SetType(ZE_VRT_UNSIGNED_INTEGER_64);
 			Unserializer->Read(&Value.Int64, sizeof(ZEUInt64), 1);
 			break;
+
 		case ZE_VRT_BOOLEAN:
 			SetType(ZE_VRT_BOOLEAN);
 			Unserializer->Read(&Value.Boolean, sizeof(bool), 1);
 			break;
+
 		case ZE_VRT_STRING:
 		{
 			SetType(ZE_VRT_STRING);
@@ -396,30 +553,62 @@ bool ZEValue::Unserialize(ZEUnserializer* Unserializer)
 			SetType(ZE_VRT_QUATERNION);
 			Unserializer->Read(&Value.Vectors, sizeof(ZEQuaternion), 1);
 			break;
+
 		case ZE_VRT_VECTOR2:
 			SetType(ZE_VRT_VECTOR2);
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector2), 1);
 			break;
+
+		case ZE_VRT_VECTOR2D:
+			SetType(ZE_VRT_VECTOR2D);
+			Unserializer->Read(&Value.DoubleVectors, sizeof(ZEVector2d), 1);
+			break;
+
 		case ZE_VRT_VECTOR3:
 			SetType(ZE_VRT_VECTOR3);
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector3), 1);
 			break;
+
+		case ZE_VRT_VECTOR3D:
+			SetType(ZE_VRT_VECTOR3D);
+			Unserializer->Read(&Value.DoubleVectors, sizeof(ZEVector3d), 1);
+			break;
+
 		case ZE_VRT_VECTOR4:
 			SetType(ZE_VRT_VECTOR4);
 			Unserializer->Read(&Value.Vectors, sizeof(ZEVector4), 1);
 			break;
+
+		case ZE_VRT_VECTOR4D:
+			SetType(ZE_VRT_VECTOR4D);
+			Unserializer->Read(&Value.DoubleVectors, sizeof(ZEVector4d), 1);
+			break;
+
 		case ZE_VRT_MATRIX3X3:
 			SetType(ZE_VRT_MATRIX3X3);
 			Unserializer->Read(Value.Matrix3x3, sizeof(ZEMatrix3x3), 1);
 			break;
+
+		case ZE_VRT_MATRIX3X3D:
+			SetType(ZE_VRT_MATRIX3X3D);
+			Unserializer->Read(Value.Matrix3x3d, sizeof(ZEMatrix3x3d), 1);
+			break;
+
 		case ZE_VRT_MATRIX4X4:
 			SetType(ZE_VRT_MATRIX4X4);
 			Unserializer->Read(Value.Matrix4x4, sizeof(ZEMatrix4x4), 1);
 			break;
+
+		case ZE_VRT_MATRIX4X4D:
+			SetType(ZE_VRT_MATRIX4X4D);
+			Unserializer->Read(Value.Matrix4x4d, sizeof(ZEMatrix4x4d), 1);
+			break;
+
 		case ZE_VRT_CLASS:
 			SetType(ZE_VRT_UNDEFINED);
 			zeDebugCheck(true, "Can not unserialize pointer type.");
 			return false;
+
 		default:
 			SetType(ZE_VRT_UNDEFINED);
 			zeDebugCheck(true, "Wrong Value type.");
@@ -465,9 +654,19 @@ bool ZEValue::IsVector() const
 	return Type == ZE_VRT_VECTOR2 || Type == ZE_VRT_VECTOR3 || Type == ZE_VRT_VECTOR4;
 }
 
+bool ZEValue::IsVectord() const
+{
+	return Type == ZE_VRT_VECTOR2D || Type == ZE_VRT_VECTOR3D || Type == ZE_VRT_VECTOR4D;
+}
+
 bool ZEValue::IsMatrix() const
 {
 	return Type == ZE_VRT_MATRIX3X3 || ZE_VRT_MATRIX4X4;
+}
+
+bool ZEValue::IsMatrixd() const
+{
+	return Type == ZE_VRT_MATRIX3X3D || ZE_VRT_MATRIX4X4D;
 }
 
 ZEInt64 ZEValue::GetIntegerRangeMin() const
@@ -480,9 +679,9 @@ ZEInt64 ZEValue::GetIntegerRangeMin() const
 	else if (Type == ZE_VRT_INTEGER_16)
 		return -32768;
 	else if (Type == ZE_VRT_INTEGER_32)
-		return  -2147483648;
+		return INT_MIN;
 	else if (Type == ZE_VRT_INTEGER_64)
-		return -9223372036854775808;
+		return -9223372036854775808ll;
 
 	return 0;
 }
@@ -593,16 +792,34 @@ void ZEValue::SetVector2(const ZEVector2& Value)
 	(*(ZEVector2*)(&this->Value.Vectors)) = Value;
 }
 
+void ZEValue::SetVector2d(const ZEVector2d& Value)
+{
+	SetType(ZE_VRT_VECTOR2D);
+	(*(ZEVector2d*)(&this->Value.DoubleVectors)) = Value;
+}
+
 void ZEValue::SetVector3(const ZEVector3& Value)
 {
 	SetType(ZE_VRT_VECTOR3);
   	(*(ZEVector3*)(&this->Value.Vectors)) = Value;
 }
 
+void ZEValue::SetVector3d(const ZEVector3d& Value)
+{
+	SetType(ZE_VRT_VECTOR3D);
+	(*(ZEVector3d*)(&this->Value.DoubleVectors)) = Value;
+}
+
 void ZEValue::SetVector4(const ZEVector4& Value)
 {
 	SetType(ZE_VRT_VECTOR4);
   	(*(ZEVector4*)(&this->Value.Vectors)) = Value;
+}
+
+void ZEValue::SetVector4d(const ZEVector4d& Value)
+{
+	SetType(ZE_VRT_VECTOR4D);
+	(*(ZEVector4d*)(&this->Value.DoubleVectors)) = Value;
 }
 
 void ZEValue::SetQuaternion(const ZEQuaternion& Value)
@@ -615,13 +832,24 @@ void ZEValue::SetMatrix3x3(const ZEMatrix3x3& Value)
 {
 	SetType(ZE_VRT_MATRIX3X3);
 	*this->Value.Matrix3x3 = Value;
+}
 
+void ZEValue::SetMatrix3x3d(const ZEMatrix3x3d& Value)
+{
+	SetType(ZE_VRT_MATRIX3X3D);
+	*this->Value.Matrix3x3d = Value;
 }
 
 void ZEValue::SetMatrix4x4(const ZEMatrix4x4& Value)
 {
 	SetType(ZE_VRT_MATRIX4X4);
 	*this->Value.Matrix4x4 = Value;
+}
+
+void ZEValue::SetMatrix4x4d(const ZEMatrix4x4d& Value)
+{
+	SetType(ZE_VRT_MATRIX4X4D);
+	*this->Value.Matrix4x4d = Value;
 }
 
 void ZEValue::SetClass(ZEObject* Value)
@@ -706,10 +934,17 @@ bool ZEValue::GetBoolean() const
 	zeDebugCheck(this->Type != ZE_VRT_BOOLEAN, "ZEValue::GetBoolean operation failed. Value type mismatched.");
 	return Value.Boolean;
 }
+
 const ZEVector2& ZEValue::GetVector2() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR2, "ZEValue::GetVector2 operation failed. Value type mismatched.");
 	return *((ZEVector2*)&Value.Vectors);
+}
+
+const ZEVector2d& ZEValue::GetVector2d() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_VECTOR2D, "ZEValue::GetVector2d operation failed. Value type mismatched.");
+	return *((ZEVector2d*)&Value.DoubleVectors);
 }
 
 const ZEVector3& ZEValue::GetVector3() const
@@ -718,10 +953,22 @@ const ZEVector3& ZEValue::GetVector3() const
 	return *((ZEVector3*)&Value.Vectors);
 }
 
+const ZEVector3d& ZEValue::GetVector3d() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_VECTOR3D, "ZEValue::GetVector3d operation failed. Value type mismatched.");
+	return *((ZEVector3d*)&Value.DoubleVectors);
+}
+
 const ZEVector4& ZEValue::GetVector4() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR4, "ZEValue::GetVector4 operation failed. Value type mismatched.");
 	return *((ZEVector4*)&Value.Vectors);
+}
+
+const ZEVector4d& ZEValue::GetVector4d() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_VECTOR4D, "ZEValue::GetVector4d operation failed. Value type mismatched.");
+	return *((ZEVector4d*)&Value.DoubleVectors);
 }
 
 const ZEQuaternion& ZEValue::GetQuaternion() const
@@ -736,10 +983,22 @@ const ZEMatrix3x3& ZEValue::GetMatrix3x3() const
 	return *Value.Matrix3x3;
 }
 
+const ZEMatrix3x3d& ZEValue::GetMatrix3x3d() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_MATRIX3X3D, "ZEValue::GetMatrix3x3d operation failed. Value type mismatched.");
+	return *Value.Matrix3x3d;
+}
+
 const ZEMatrix4x4& ZEValue::GetMatrix4x4() const
 {
 	zeDebugCheck(this->Type != ZE_VRT_MATRIX4X4, "ZEValue::GetMatrix4x4 operation failed. Value type mismatched.");
 	return *Value.Matrix4x4;
+}
+
+const ZEMatrix4x4d& ZEValue::GetMatrix4x4d() const
+{
+	zeDebugCheck(this->Type != ZE_VRT_MATRIX4X4D, "ZEValue::GetMatrix4x4d operation failed. Value type mismatched.");
+	return *Value.Matrix4x4d;
 }
 
 ZEObject* ZEValue::GetClass() const
@@ -843,15 +1102,33 @@ ZEValue& ZEValue::operator=(const ZEVector2& Vector)
 	return *this;
 }
 
+ZEValue& ZEValue::operator=(const ZEVector2d& Vector)
+{
+	SetVector2d(Vector);
+	return *this;
+}
+
 ZEValue& ZEValue::operator=(const ZEVector3& Vector)
 {
 	SetVector3(Vector);
 	return *this;
 }
 
+ZEValue& ZEValue::operator=(const ZEVector3d& Vector)
+{
+	SetVector3d(Vector);
+	return *this;
+}
+
 ZEValue& ZEValue::operator=(const ZEVector4& Vector)
 {
 	SetVector4(Vector);
+	return *this;
+}
+
+ZEValue& ZEValue::operator=(const ZEVector4d& Vector)
+{
+	SetVector4d(Vector);
 	return *this;
 }
 
@@ -867,9 +1144,21 @@ ZEValue& ZEValue::operator=(const ZEMatrix3x3& Matrix)
 	return *this;
 }
 
+ZEValue& ZEValue::operator=(const ZEMatrix3x3d& Matrix)
+{
+	SetMatrix3x3d(Matrix);
+	return *this;
+}
+
 ZEValue& ZEValue::operator=(const ZEMatrix4x4& Matrix)
 {
 	SetMatrix4x4(Matrix);
+	return *this;
+}
+
+ZEValue& ZEValue::operator=(const ZEMatrix4x4d& Matrix)
+{
+	SetMatrix4x4d(Matrix);
 	return *this;
 }
 
@@ -1239,16 +1528,34 @@ ZEValue::operator ZEVector2()
 	return *((ZEVector2*)(&Value.Vectors));
 }
 
+ZEValue::operator ZEVector2d()
+{
+	zeDebugCheck(this->Type != ZE_VRT_VECTOR2D, "ZEVector2d conversion operation failed. Value type mismatched.");
+	return *((ZEVector2d*)(&Value.DoubleVectors));
+}
+
 ZEValue::operator ZEVector3()
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR3, "ZEVector3 conversion operation failed. Value type mismatched.");
 	return *((ZEVector3*)(&Value.Vectors));
 }
 
+ZEValue::operator ZEVector3d()
+{
+	zeDebugCheck(this->Type != ZE_VRT_VECTOR3D, "ZEVector3d conversion operation failed. Value type mismatched.");
+	return *((ZEVector3d*)(&Value.DoubleVectors));
+}
+
 ZEValue::operator ZEVector4()
 {
 	zeDebugCheck(this->Type != ZE_VRT_VECTOR4, "ZEVector4 conversion operation failed. Value type mismatched.");
 	return *((ZEVector4*)(&Value.Vectors));
+}
+
+ZEValue::operator ZEVector4d()
+{
+	zeDebugCheck(this->Type != ZE_VRT_VECTOR4D, "ZEVector4d conversion operation failed. Value type mismatched.");
+	return *((ZEVector4d*)(&Value.DoubleVectors));
 }
 
 ZEValue::operator ZEQuaternion()
@@ -1264,11 +1571,22 @@ ZEValue::operator ZEMatrix3x3()
 	return *Value.Matrix3x3;
 }
 
+ZEValue::operator ZEMatrix3x3d()
+{
+	zeDebugCheck(this->Type != ZE_VRT_MATRIX3X3D, "ZEMatrix3x3d conversion operation failed. Value type mismatched.");
+	return *Value.Matrix3x3d;
+}
+
 ZEValue::operator ZEMatrix4x4()
 {
-	zeDebugCheck(this->Type != ZE_VRT_MATRIX4X4, "ZEMatrix3x3 conversion operation failed. Value type mismatched.");
+	zeDebugCheck(this->Type != ZE_VRT_MATRIX4X4, "ZEMatrix4x4 conversion operation failed. Value type mismatched.");
 	return *Value.Matrix4x4;
+}
 
+ZEValue::operator ZEMatrix4x4d()
+{
+	zeDebugCheck(this->Type != ZE_VRT_MATRIX4X4D, "ZEMatrix4x4d conversion operation failed. Value type mismatched.");
+	return *Value.Matrix4x4d;
 }
 
 ZEValue::operator ZEObject*()
@@ -1358,14 +1676,29 @@ ZEValue::ZEValue(const ZEVector2& Vector)
 	SetVector2(Vector);
 }
 
+ZEValue::ZEValue(const ZEVector2d& Vector)
+{
+	SetVector2d(Vector);
+}
+
 ZEValue::ZEValue(const ZEVector3& Vector)
 {
 	SetVector3(Vector);
 }
 
+ZEValue::ZEValue(const ZEVector3d& Vector)
+{
+	SetVector3d(Vector);
+}
+
 ZEValue::ZEValue(const ZEVector4& Vector)
 {
 	SetVector4(Vector);
+}
+
+ZEValue::ZEValue(const ZEVector4d& Vector)
+{
+	SetVector4d(Vector);
 }
 
 ZEValue::ZEValue(const ZEQuaternion& Quaternion)
@@ -1378,9 +1711,19 @@ ZEValue::ZEValue(const ZEMatrix3x3& Matrix)
 	SetMatrix3x3(Matrix);
 }
 
+ZEValue::ZEValue(const ZEMatrix3x3d& Matrix)
+{
+	SetMatrix3x3d(Matrix);
+}
+
 ZEValue::ZEValue(const ZEMatrix4x4& Matrix)
 {
 	SetMatrix4x4(Matrix);
+}
+
+ZEValue::ZEValue(const ZEMatrix4x4d& Matrix)
+{
+	SetMatrix4x4d(Matrix);
 }
 
 ZEValue::ZEValue(ZEObject* Class)

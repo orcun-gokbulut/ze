@@ -61,7 +61,7 @@ ZEVector3 ZEAABBox::GetVertex(ZEUInt Index) const
 	return  ZEVector3(Index & X_AXIS ? Max.x : Min.x, Index & Y_AXIS ? Max.y : Min.y, Index & Z_AXIS ? Max.z : Min.z);
 }
 
-float ZEAABBox::GetLenght() const
+float ZEAABBox::GetLength() const
 {
 	ZEVector3 Temp;
 	ZEVector3::Sub(Temp, Max, Min);

@@ -49,11 +49,16 @@
 #include "ZEMeta/ZETypeGenerator.h"
 
 class ZEVector2;
+class ZEVector2d;
 class ZEVector3;
+class ZEVector3d;
 class ZEVector4;
+class ZEVector4d;
 class ZEQuaternion;
 class ZEMatrix3x3;
+class ZEMatrix3x3d;
 class ZEMatrix4x4;
+class ZEMatrix4x4d;
 class ZEClass;
 class ZEObject;
 class ZEReference;
@@ -72,6 +77,7 @@ class ZEVariant
 				ZEInt64					Int64;
 				bool					Boolean;
 				float					Vectors[4];
+				double					DoubleVectors[4];
 
 				void*					Pointer;
 			};
@@ -156,13 +162,25 @@ class ZEVariant
 		void							SetVector2Ref(ZEVector2& Value);
 		void							SetVector2ConstRef(const ZEVector2& Value);
 
+		void							SetVector2d(const ZEVector2d& Value);
+		void							SetVector2dRef(ZEVector2d& Value);
+		void							SetVector2dConstRef(const ZEVector2d& Value);
+
 		void							SetVector3(const ZEVector3& Value);
 		void							SetVector3Ref(ZEVector3& Value);
 		void							SetVector3ConstRef(const ZEVector3& Value);
 
+		void							SetVector3d(const ZEVector3d& Value);
+		void							SetVector3dRef(ZEVector3d& Value);
+		void							SetVector3dConstRef(const ZEVector3d& Value);
+
 		void							SetVector4(const ZEVector4& Value);
 		void							SetVector4Ref(ZEVector4& Value);
 		void							SetVector4ConstRef(const ZEVector4& Value);
+
+		void							SetVector4d(const ZEVector4d& Value);
+		void							SetVector4dRef(ZEVector4d& Value);
+		void							SetVector4dConstRef(const ZEVector4d& Value);
 		
 		void							SetQuaternion(const ZEQuaternion& Value);
 		void							SetQuaternionRef(ZEQuaternion& Value);
@@ -172,9 +190,17 @@ class ZEVariant
 		void							SetMatrix3x3Ref(ZEMatrix3x3& Value);
 		void							SetMatrix3x3ConstRef(const ZEMatrix3x3& Value);
 
+		void							SetMatrix3x3d(const ZEMatrix3x3d& Value);
+		void							SetMatrix3x3dRef(ZEMatrix3x3d& Value);
+		void							SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value);
+
 		void							SetMatrix4x4(const ZEMatrix4x4& Value);
 		void							SetMatrix4x4Ref(ZEMatrix4x4& Value);
 		void							SetMatrix4x4ConstRef(const ZEMatrix4x4& Value);
+
+		void							SetMatrix4x4d(const ZEMatrix4x4d& Value);
+		void							SetMatrix4x4dRef(ZEMatrix4x4d& Value);
+		void							SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value);
 
 		void							SetString(const char* Value);
 		void							SetString(const ZEString& Value);
@@ -257,13 +283,25 @@ class ZEVariant
 		ZEVector2&						GetVector2Ref() const;
 		const ZEVector2&				GetVector2ConstRef() const;
 
+		const ZEVector2d&				GetVector2d() const;
+		ZEVector2d&						GetVector2dRef() const;
+		const ZEVector2d&				GetVector2dConstRef() const;
+
 		const ZEVector3&				GetVector3() const;
 		ZEVector3&						GetVector3Ref() const;
 		const ZEVector3&				GetVector3ConstRef() const;
 
+		const ZEVector3d&				GetVector3d() const;
+		ZEVector3d&						GetVector3dRef() const;
+		const ZEVector3d&				GetVector3dConstRef() const;
+
 		const ZEVector4&				GetVector4() const;
 		ZEVector4&						GetVector4Ref() const;
 		const ZEVector4&				GetVector4ConstRef() const;
+
+		const ZEVector4d&				GetVector4d() const;
+		ZEVector4d&						GetVector4dRef() const;
+		const ZEVector4d&				GetVector4dConstRef() const;
 		
 		const ZEQuaternion&				GetQuaternion() const;
 		ZEQuaternion&					GetQuaternionRef() const;
@@ -273,9 +311,17 @@ class ZEVariant
 		ZEMatrix3x3&					GetMatrix3x3Ref() const;
 		const ZEMatrix3x3&				GetMatrix3x3ConstRef() const;
 
+		const ZEMatrix3x3d&				GetMatrix3x3d() const;
+		ZEMatrix3x3d&					GetMatrix3x3dRef() const;
+		const ZEMatrix3x3d&				GetMatrix3x3dConstRef() const;
+
 		const ZEMatrix4x4&				GetMatrix4x4() const;
 		ZEMatrix4x4&					GetMatrix4x4Ref() const;
 		const ZEMatrix4x4&				GetMatrix4x4ConstRef() const;
+
+		const ZEMatrix4x4d&				GetMatrix4x4d() const;
+		ZEMatrix4x4d&					GetMatrix4x4dRef() const;
+		const ZEMatrix4x4d&				GetMatrix4x4dConstRef() const;
 
 		const ZEString&					GetString() const;
 		ZEString&						GetStringRef() const;
@@ -325,11 +371,16 @@ class ZEVariant
 										ZEVariant(double Value);
 										ZEVariant(bool Value);
 										ZEVariant(const ZEVector2& Value);
+										ZEVariant(const ZEVector2d& Value);
 										ZEVariant(const ZEVector3& Value);
+										ZEVariant(const ZEVector3d& Value);
 										ZEVariant(const ZEVector4& Value);
+										ZEVariant(const ZEVector4d& Value);
 										ZEVariant(const ZEQuaternion& Value);
 										ZEVariant(const ZEMatrix3x3& Value);
+										ZEVariant(const ZEMatrix3x3d& Value);
 										ZEVariant(const ZEMatrix4x4& Value);
+										ZEVariant(const ZEMatrix4x4d& Value);
 										
 										template<typename ZEObjectType>
 										ZEVariant(const ZEObjectType& Value);
@@ -428,6 +479,9 @@ void ZEVariant::SetObject(const ZEObjectType& Object)
 
 	Cloner = ClonerTemplate<ZEObjectType>;
 	Deleter = DeleterTemplate<ZEObjectType>;
+
+	if (Value.Pointer != NULL)
+		Deleter(Value.Pointer);
 
 	Value.Pointer = new ZEObjectType(Object);
 }

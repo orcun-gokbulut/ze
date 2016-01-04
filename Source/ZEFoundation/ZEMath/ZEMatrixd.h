@@ -46,7 +46,6 @@ class ZEVector4d;
 class ZEMatrix3x3d
 {
 	ZE_BUILTIN_OBJECT
-
 	public:
 		union
 		{
@@ -152,7 +151,6 @@ ZEMatrix3x3d operator*(double S, const ZEMatrix3x3d& RightOperand);
 class ZEMatrix4x4d
 {
 	ZE_BUILTIN_OBJECT
-
 	public:
 		union
 		{

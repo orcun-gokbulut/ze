@@ -52,7 +52,7 @@ class ZEAABBox
 
 		ZEVector3					GetCenter() const;
 		ZEVector3					GetVertex(ZEUInt Index) const;
-		float						GetLenght() const;
+		float						GetLength() const;
 
 		static void					GenerateBoundingSphere(ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
 		static void					GenerateOBoundingBox(ZEOBBox& OrientedBoundingBox, const ZEAABBox& BoundingBox);
