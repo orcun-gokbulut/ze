@@ -120,8 +120,10 @@ endif()
 
 set(BuildIn ${BuildIn}
 	ZEMath/ZEVector.h
+	ZEMath/ZEVectord.h
 	ZEMath/ZEQuaternion.h
 	ZEMath/ZEMatrix.h	
+	ZEMath/ZEMatrixd.h
 	PARENT_SCOPE)
 
 ze_add_library(TARGET ZEMath 

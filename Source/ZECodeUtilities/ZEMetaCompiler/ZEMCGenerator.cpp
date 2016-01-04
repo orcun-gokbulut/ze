@@ -176,17 +176,32 @@ const char* ZEMCGenerator::ConvertBaseTypeToEnum(ZEMCBaseType BaseType)
 		case ZEMC_BT_VECTOR2:
 			return "ZE_TT_VECTOR2";
 
+		case ZEMC_BT_VECTOR2D:
+			return "ZE_TT_VECTOR2D";
+
 		case ZEMC_BT_VECTOR3:
 			return "ZE_TT_VECTOR3";
+
+		case ZEMC_BT_VECTOR3D:
+			return "ZE_TT_VECTOR3D";
 
 		case ZEMC_BT_VECTOR4:
 			return "ZE_TT_VECTOR4";
 
+		case ZEMC_BT_VECTOR4D:
+			return "ZE_TT_VECTOR4D";
+
 		case ZEMC_BT_MATRIX3X3:
 			return "ZE_TT_MATRIX3X3";
 
+		case ZEMC_BT_MATRIX3X3D:
+			return "ZE_TT_MATRIX3X3D";
+
 		case ZEMC_BT_MATRIX4X4:
 			return "ZE_TT_MATRIX4X4";
+
+		case ZEMC_BT_MATRIX4X4D:
+			return "ZE_TT_MATRIX4X4D";
 
 		case ZEMC_BT_CLASS:
 			return "ZE_TT_CLASS";
@@ -293,17 +308,32 @@ ZEString ZEMCGenerator::ConvertBaseTypeToName(const ZEMCType& Type)
 		case ZEMC_BT_VECTOR2:
 			return "ZEVector2";
 
+		case ZEMC_BT_VECTOR2D:
+			return "ZEVector2d";
+
 		case ZEMC_BT_VECTOR3:
 			return "ZEVector3";
+
+		case ZEMC_BT_VECTOR3D:
+			return "ZEVector3d";
 
 		case ZEMC_BT_VECTOR4:
 			return "ZEVector4";
 
+		case ZEMC_BT_VECTOR4D:
+			return "ZEVector4d";
+
 		case ZEMC_BT_MATRIX3X3:
 			return "ZEMatrix3x3";
 
+		case ZEMC_BT_MATRIX3X3D:
+			return "ZEMatrix3x3d";
+
 		case ZEMC_BT_MATRIX4X4:
 			return "ZEMatrix4x4";
+
+		case ZEMC_BT_MATRIX4X4D:
+			return "ZEMatrix4x4d";
 
 		case ZEMC_BT_CLASS:
 			return "ZEClass*";
@@ -416,20 +446,40 @@ ZEString ZEMCGenerator::GenerateVariantPostfix(const ZEMCType& Type, ZEString& C
 				Output.Append("Vector2");
 				break;
 
+			case ZEMC_BT_VECTOR2D:
+				Output.Append("Vector2d");
+				break;
+
 			case ZEMC_BT_VECTOR3:
 				Output.Append("Vector3");
+				break;
+
+			case ZEMC_BT_VECTOR3D:
+				Output.Append("Vector3d");
 				break;
 
 			case ZEMC_BT_VECTOR4:
 				Output.Append("Vector4");
 				break;
 
+			case ZEMC_BT_VECTOR4D:
+				Output.Append("Vector4d");
+				break;
+
 			case ZEMC_BT_MATRIX3X3:
 				Output.Append("Matrix3x3");
 				break;
 
+			case ZEMC_BT_MATRIX3X3D:
+				Output.Append("Matrix3x3d");
+				break;
+
 			case ZEMC_BT_MATRIX4X4:
 				Output.Append("Matrix4x4");
+				break;
+
+			case ZEMC_BT_MATRIX4X4D:
+				Output.Append("Matrix4x4d");
 				break;
 
 			case ZEMC_BT_OBJECT_PTR:

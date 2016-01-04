@@ -38,8 +38,6 @@
 #include "ZEMath.h"
 #include "ZEAngle.h"
 
-#define		ZE_VECTOR4_ELEMENT_COUNT	(ZESize)4
-
 // ZEVector2d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ZEVector2d ZEVector2d::Zero = ZEVector2d(0.0, 0.0);
@@ -209,18 +207,12 @@ void ZEVector2d::SaturateSelf()
 
 double ZEVector2d::Min() const
 {
-	if (x < y)
-		return x;
-	else
-		return y;
+	return ZEMath::Min(x, y);
 }
 
 double ZEVector2d::Max() const
 {
-	if (x > y)
-		return x;
-	else
-		return y;
+	return ZEMath::Max(x, y);
 }
 
 bool ZEVector2d::Equals(const ZEVector2d& Vector) const
@@ -618,28 +610,12 @@ void ZEVector3d::SaturateSelf()
 
 double ZEVector3d::Min() const
 {
-	double MinComponent = x;
-
-	if(y < MinComponent)
-		MinComponent = y;
-
-	if(z < MinComponent)
-		MinComponent = z;
-
-	return MinComponent;
+	return ZEMath::Min(ZEMath::Min(x, y), z);
 }
 
 double ZEVector3d::Max() const
 {
-	double MaxComponent = x;
-
-	if(y > MaxComponent)
-		MaxComponent = y;
-
-	if(z > MaxComponent)
-		MaxComponent = z;
-
-	return MaxComponent;
+	return ZEMath::Max(ZEMath::Max(x, y), z);
 }
 
 bool ZEVector3d::Equals(const ZEVector3d& Vector) const
@@ -799,6 +775,7 @@ ZEVector3d operator*(double S, const ZEVector3d& RightOperand)
 
 // ZEVector4d
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 const ZEVector4d ZEVector4d::Zero	= ZEVector4d(0.0, 0.0, 0.0, 0.0);
 const ZEVector4d ZEVector4d::One	= ZEVector4d(1.0, 1.0, 1.0, 1.0);
 const ZEVector4d ZEVector4d::UnitX	= ZEVector4d(1.0, 0.0, 0.0, 0.0);
@@ -933,30 +910,16 @@ void ZEVector4d::SaturateSelf()
 
 double ZEVector4d::Min() const
 {
-	double Min = x;
-	for (ZESize I = 1; I < ZE_VECTOR4_ELEMENT_COUNT; I++)
-	{
-		if (M[I] < Min)
-		{
-			Min = M[I];
-		}
-	}
-
-	return Min;
+	return ZEMath::Min(
+		ZEMath::Min(x, y),
+		ZEMath::Min(z, w));
 }
 
 double ZEVector4d::Max() const
 {
-	double Max = x;
-	for (ZESize I = 1; I < ZE_VECTOR4_ELEMENT_COUNT; I++)
-	{
-		if (M[I] > Max)
-		{
-			Max = M[I];
-		}
-	}
-
-	return Max;
+	return ZEMath::Max(
+		ZEMath::Max(x, y),
+		ZEMath::Max(z, w));
 }
 
 bool ZEVector4d::Equals(const ZEVector4d& Vector) const

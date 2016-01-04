@@ -75,7 +75,9 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	Entity->Owner = this;
+	if (!Entity->SetOwner(this))
+		return false;
+
 	Entity->SetOwnerScene(this->OwnerScene);
 
 	Components.Add(Entity);
@@ -120,7 +122,9 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	Entity->Owner = this;
+	if (!Entity->SetOwner(this))
+		return false;
+
 	Entity->SetOwnerScene(this->OwnerScene);
 
 	ChildEntities.Add(Entity);

@@ -55,14 +55,19 @@ enum ZETypeType
 	ZE_TT_STRING					= 13,
 	ZE_TT_QUATERNION				= 14,
 	ZE_TT_VECTOR2					= 15,
-	ZE_TT_VECTOR3					= 16,
-	ZE_TT_VECTOR4					= 17,
-	ZE_TT_MATRIX3X3					= 18,
-	ZE_TT_MATRIX4X4					= 19,
-	ZE_TT_OBJECT					= 20,
-	ZE_TT_OBJECT_PTR				= 21,
-	ZE_TT_ENUMERATOR				= 22,
-	ZE_TT_CLASS						= 23
+	ZE_TT_VECTOR2D					= 16,
+	ZE_TT_VECTOR3					= 17,
+	ZE_TT_VECTOR3D					= 18,
+	ZE_TT_VECTOR4					= 19,
+	ZE_TT_VECTOR4D					= 20,
+	ZE_TT_MATRIX3X3					= 21,
+	ZE_TT_MATRIX3X3D				= 22,
+	ZE_TT_MATRIX4X4					= 23,
+	ZE_TT_MATRIX4X4D				= 24,
+	ZE_TT_OBJECT					= 25,
+	ZE_TT_OBJECT_PTR				= 26,
+	ZE_TT_ENUMERATOR				= 27,
+	ZE_TT_CLASS						= 28
 };
 
 enum ZETypeQualifier

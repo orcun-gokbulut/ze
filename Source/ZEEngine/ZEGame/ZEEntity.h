@@ -90,7 +90,6 @@ class ZEMLReaderNode;
 
 class ZEEntity : public ZEObject
 {
-
 	friend class ZEScene;
 	friend class ZESceneCuller;
 	friend class ZEDebugDrawer;

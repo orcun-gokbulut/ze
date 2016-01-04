@@ -318,6 +318,26 @@ void ZEReference::SetVector2ConstRef(const ZEVector2& Value)
 	this->Value.Pointer = const_cast<ZEVector2*>(&Value);
 }
 
+void ZEReference::SetVector2dRef(ZEVector2d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR2D;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = &Value;
+}
+
+void ZEReference::SetVector2dConstRef(const ZEVector2d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR2D;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = const_cast<ZEVector2d*>(&Value);
+}
+
 void ZEReference::SetVector3Ref(ZEVector3& Value)
 {
 	ZEType Type;
@@ -338,6 +358,26 @@ void ZEReference::SetVector3ConstRef(const ZEVector3& Value)
 	this->Value.Pointer = const_cast<ZEVector3*>(&Value);
 }
 
+void ZEReference::SetVector3dRef(ZEVector3d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR3D;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = &Value;
+}
+
+void ZEReference::SetVector3dConstRef(const ZEVector3d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR3D;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = const_cast<ZEVector3d*>(&Value);
+}
+
 void ZEReference::SetVector4Ref(ZEVector4& Value)
 {
 	ZEType Type;
@@ -356,6 +396,26 @@ void ZEReference::SetVector4ConstRef(const ZEVector4& Value)
 	SetType(Type);
 
 	this->Value.Pointer = const_cast<ZEVector4*>(&Value);
+}
+
+void ZEReference::SetVector4dRef(ZEVector4d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR4D;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = &Value;
+}
+
+void ZEReference::SetVector4dConstRef(const ZEVector4d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR4D;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = const_cast<ZEVector4d*>(&Value);
 }
 
 void ZEReference::SetQuaternionRef(ZEQuaternion& Value)
@@ -398,6 +458,26 @@ void ZEReference::SetMatrix3x3ConstRef(const ZEMatrix3x3& Value)
 	this->Value.Pointer = const_cast<ZEMatrix3x3*>(&Value);
 }
 
+void ZEReference::SetMatrix3x3dRef(ZEMatrix3x3d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_MATRIX3X3D;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = &Value;
+}
+
+void ZEReference::SetMatrix3x3dConstRef(const ZEMatrix3x3d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_MATRIX3X3D;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = const_cast<ZEMatrix3x3d*>(&Value);
+}
+
 void ZEReference::SetMatrix4x4Ref(ZEMatrix4x4& Value)
 {
 	ZEType Type;
@@ -418,7 +498,25 @@ void ZEReference::SetMatrix4x4ConstRef(const ZEMatrix4x4& Value)
 	this->Value.Pointer = const_cast<ZEMatrix4x4*>(&Value);
 }
 
+void ZEReference::SetMatrix4x4dRef(ZEMatrix4x4d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_MATRIX4X4D;
+	Type.TypeQualifier = ZE_TQ_REFERENCE;
+	SetType(Type);
 
+	this->Value.Pointer = &Value;
+}
+
+void ZEReference::SetMatrix4x4dConstRef(const ZEMatrix4x4d& Value)
+{
+	ZEType Type;
+	Type.Type = ZE_TT_MATRIX4X4D;
+	Type.TypeQualifier = ZE_TQ_CONST_REFERENCE;
+	SetType(Type);
+
+	this->Value.Pointer = const_cast<ZEMatrix4x4d*>(&Value);
+}
 void ZEReference::SetStringRef(ZEString& Value)
 {
 	ZEType Type;
@@ -591,6 +689,16 @@ const ZEVector2& ZEReference::GetVector2ConstRef() const
 	return ConvertConstRef<ZEVector2, ZE_TT_VECTOR2>();
 }
 
+ZEVector2d& ZEReference::GetVector2dRef() const
+{
+	return ConvertRef<ZEVector2d, ZE_TT_VECTOR2D>();
+}
+
+const ZEVector2d& ZEReference::GetVector2dConstRef() const
+{
+	return ConvertConstRef<ZEVector2d, ZE_TT_VECTOR2D>();
+}
+
 ZEVector3& ZEReference::GetVector3Ref() const
 {
 	return ConvertRef<ZEVector3, ZE_TT_VECTOR3>();
@@ -601,6 +709,16 @@ const ZEVector3& ZEReference::GetVector3ConstRef() const
 	return ConvertConstRef<ZEVector3, ZE_TT_VECTOR3>();
 }
 
+ZEVector3d& ZEReference::GetVector3dRef() const
+{
+	return ConvertRef<ZEVector3d, ZE_TT_VECTOR3D>();
+}
+
+const ZEVector3d& ZEReference::GetVector3dConstRef() const
+{
+	return ConvertConstRef<ZEVector3d, ZE_TT_VECTOR3D>();
+}
+
 ZEVector4& ZEReference::GetVector4Ref() const
 {
 	return ConvertRef<ZEVector4, ZE_TT_VECTOR4>();
@@ -609,6 +727,16 @@ ZEVector4& ZEReference::GetVector4Ref() const
 const ZEVector4& ZEReference::GetVector4ConstRef() const
 {
 	return ConvertConstRef<ZEVector4, ZE_TT_VECTOR4>();
+}
+
+ZEVector4d& ZEReference::GetVector4dRef() const
+{
+	return ConvertRef<ZEVector4d, ZE_TT_VECTOR4D>();
+}
+
+const ZEVector4d& ZEReference::GetVector4dConstRef() const
+{
+	return ConvertConstRef<ZEVector4d, ZE_TT_VECTOR4D>();
 }
 
 ZEQuaternion& ZEReference::GetQuaternionRef() const
@@ -631,6 +759,16 @@ const ZEMatrix3x3& ZEReference::GetMatrix3x3ConstRef() const
 	return ConvertConstRef<ZEMatrix3x3, ZE_TT_MATRIX3X3>();
 }
 
+ZEMatrix3x3d& ZEReference::GetMatrix3x3dRef() const
+{
+	return ConvertRef<ZEMatrix3x3d, ZE_TT_MATRIX3X3D>();
+}
+
+const ZEMatrix3x3d& ZEReference::GetMatrix3x3dConstRef() const
+{
+	return ConvertConstRef<ZEMatrix3x3d, ZE_TT_MATRIX3X3D>();
+}
+
 ZEMatrix4x4& ZEReference::GetMatrix4x4Ref() const
 {
 	return ConvertRef<ZEMatrix4x4, ZE_TT_MATRIX4X4>();
@@ -639,6 +777,16 @@ ZEMatrix4x4& ZEReference::GetMatrix4x4Ref() const
 const ZEMatrix4x4& ZEReference::GetMatrix4x4ConstRef() const
 {
 	return ConvertConstRef<ZEMatrix4x4, ZE_TT_MATRIX4X4>();
+}
+
+ZEMatrix4x4d& ZEReference::GetMatrix4x4dRef() const
+{
+	return ConvertRef<ZEMatrix4x4d, ZE_TT_MATRIX4X4D>();
+}
+
+const ZEMatrix4x4d& ZEReference::GetMatrix4x4dConstRef() const
+{
+	return ConvertConstRef<ZEMatrix4x4d, ZE_TT_MATRIX4X4D>();
 }
 
 ZEString& ZEReference::GetStringRef() const
@@ -742,15 +890,33 @@ ZEReference& ZEReference::operator=(ZEVector2& Value)
 	return *this;
 }
 
+ZEReference& ZEReference::operator=(ZEVector2d& Value)
+{
+	SetVector2dRef(Value);
+	return *this;
+}
+
 ZEReference& ZEReference::operator=(ZEVector3& Value)
 {
 	SetVector3Ref(Value);
 	return *this;
 }
 
+ZEReference& ZEReference::operator=(ZEVector3d& Value)
+{
+	SetVector3dRef(Value);
+	return *this;
+}
+
 ZEReference& ZEReference::operator=(ZEVector4& Value)
 {
 	SetVector4Ref(Value);
+	return *this;
+}
+
+ZEReference& ZEReference::operator=(ZEVector4d& Value)
+{
+	SetVector4dRef(Value);
 	return *this;
 }
 
@@ -766,9 +932,21 @@ ZEReference& ZEReference::operator=(ZEMatrix3x3& Value)
 	return *this;
 }
 
+ZEReference& ZEReference::operator=(ZEMatrix3x3d& Value)
+{
+	SetMatrix3x3dRef(Value);
+	return *this;
+}
+
 ZEReference& ZEReference::operator=(ZEMatrix4x4& Value)
 {
 	SetMatrix4x4Ref(Value);
+	return *this;
+}
+
+ZEReference& ZEReference::operator=(ZEMatrix4x4d& Value)
+{
+	SetMatrix4x4dRef(Value);
 	return *this;
 }
 
@@ -783,7 +961,6 @@ ZEReference& ZEReference::operator=(ZEString& Value)
 	SetStringRef(Value);
 	return *this;
 }
-
 
 ZEReference& ZEReference::operator=(const ZEInt8& Value)
 {
@@ -857,15 +1034,33 @@ ZEReference& ZEReference::operator=(const ZEVector2& Value)
 	return *this;
 }
 
+ZEReference& ZEReference::operator=(const ZEVector2d& Value)
+{
+	SetVector2dConstRef(Value);
+	return *this;
+}
+
 ZEReference& ZEReference::operator=(const ZEVector3& Value)
 {
 	SetVector3ConstRef(Value);
 	return *this;
 }
 
+ZEReference& ZEReference::operator=(const ZEVector3d& Value)
+{
+	SetVector3dConstRef(Value);
+	return *this;
+}
+
 ZEReference& ZEReference::operator=(const ZEVector4& Value)
 {
 	SetVector4ConstRef(Value);
+	return *this;
+}
+
+ZEReference& ZEReference::operator=(const ZEVector4d& Value)
+{
+	SetVector4dConstRef(Value);
 	return *this;
 }
 
@@ -881,9 +1076,21 @@ ZEReference& ZEReference::operator=(const ZEMatrix3x3& Value)
 	return *this;
 }
 
+ZEReference& ZEReference::operator=(const ZEMatrix3x3d& Value)
+{
+	SetMatrix3x3dConstRef(Value);
+	return *this;
+}
+
 ZEReference& ZEReference::operator=(const ZEMatrix4x4& Value)
 {
 	SetMatrix4x4ConstRef(Value);
+	return *this;
+}
+
+ZEReference& ZEReference::operator=(const ZEMatrix4x4d& Value)
+{
+	SetMatrix4x4dConstRef(Value);
 	return *this;
 }
 
@@ -959,14 +1166,29 @@ ZEReference::operator ZEVector2&()
 	return GetVector2Ref();
 }
 
+ZEReference::operator ZEVector2d&()
+{
+	return GetVector2dRef();
+}
+
 ZEReference::operator ZEVector3&()
 {
 	return GetVector3Ref();
 }
 
+ZEReference::operator ZEVector3d&()
+{
+	return GetVector3dRef();
+}
+
 ZEReference::operator ZEVector4&()
 {
 	return GetVector4Ref();
+}
+
+ZEReference::operator ZEVector4d&()
+{
+	return GetVector4dRef();
 }
 
 ZEReference::operator ZEQuaternion&()
@@ -979,9 +1201,19 @@ ZEReference::operator ZEMatrix3x3&()
 	return GetMatrix3x3Ref();
 }
 
+ZEReference::operator ZEMatrix3x3d&()
+{
+	return GetMatrix3x3dRef();
+}
+
 ZEReference::operator ZEMatrix4x4&()
 {
 	return GetMatrix4x4Ref();
+}
+
+ZEReference::operator ZEMatrix4x4d&()
+{
+	return GetMatrix4x4dRef();
 }
 
 ZEReference::operator ZEObject*&()
@@ -1049,14 +1281,29 @@ ZEReference::operator const ZEVector2&()
 	return GetVector2ConstRef();
 }
 
+ZEReference::operator const ZEVector2d&()
+{
+	return GetVector2dConstRef();
+}
+
 ZEReference::operator const ZEVector3&()
 {
 	return GetVector3ConstRef();
 }
 
+ZEReference::operator const ZEVector3d&()
+{
+	return GetVector3dConstRef();
+}
+
 ZEReference::operator const ZEVector4&()
 {
 	return GetVector4ConstRef();
+}
+
+ZEReference::operator const ZEVector4d&()
+{
+	return GetVector4dConstRef();
 }
 
 ZEReference::operator const ZEQuaternion&()
@@ -1069,9 +1316,19 @@ ZEReference::operator const ZEMatrix3x3&()
 	return GetMatrix3x3ConstRef();
 }
 
+ZEReference::operator const ZEMatrix3x3d&()
+{
+	return GetMatrix3x3dConstRef();
+}
+
 ZEReference::operator const ZEMatrix4x4&()
 {
 	return GetMatrix4x4ConstRef();
+}
+
+ZEReference::operator const ZEMatrix4x4d&()
+{
+	return GetMatrix4x4dConstRef();
 }
 
 ZEReference::operator ZEObject*const&()
@@ -1151,14 +1408,29 @@ ZEReference::ZEReference(ZEVector2& Value)
 	SetVector2Ref(Value);
 }
 
+ZEReference::ZEReference(ZEVector2d& Value)
+{
+	SetVector2dRef(Value);
+}
+
 ZEReference::ZEReference(ZEVector3& Value)
 {
 	SetVector3Ref(Value);
 }
 
+ZEReference::ZEReference(ZEVector3d& Value)
+{
+	SetVector3dRef(Value);
+}
+
 ZEReference::ZEReference(ZEVector4& Value)
 {
 	SetVector4Ref(Value);
+}
+
+ZEReference::ZEReference(ZEVector4d& Value)
+{
+	SetVector4dRef(Value);
 }
 
 ZEReference::ZEReference(ZEQuaternion& Value)
@@ -1171,9 +1443,19 @@ ZEReference::ZEReference(ZEMatrix3x3& Value)
 	SetMatrix3x3Ref(Value);
 }
 
+ZEReference::ZEReference(ZEMatrix3x3d& Value)
+{
+	SetMatrix3x3dRef(Value);
+}
+
 ZEReference::ZEReference(ZEMatrix4x4& Value)
 {
 	SetMatrix4x4Ref(Value);
+}
+
+ZEReference::ZEReference(ZEMatrix4x4d& Value)
+{
+	SetMatrix4x4dRef(Value);
 }
 
 ZEReference::ZEReference(ZEObject*& Value)
@@ -1246,14 +1528,29 @@ ZEReference::ZEReference(const ZEVector2& Value)
 	SetVector2ConstRef(Value);
 }
 
+ZEReference::ZEReference(const ZEVector2d& Value)
+{
+	SetVector2dConstRef(Value);
+}
+
 ZEReference::ZEReference(const ZEVector3& Value)
 {
 	SetVector3ConstRef(Value);
 }
 
+ZEReference::ZEReference(const ZEVector3d& Value)
+{
+	SetVector3dConstRef(Value);
+}
+
 ZEReference::ZEReference(const ZEVector4& Value)
 {
 	SetVector4ConstRef(Value);
+}
+
+ZEReference::ZEReference(const ZEVector4d& Value)
+{
+	SetVector4dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEQuaternion& Value)
@@ -1266,9 +1563,19 @@ ZEReference::ZEReference(const ZEMatrix3x3& Value)
 	SetMatrix3x3ConstRef(Value);
 }
 
+ZEReference::ZEReference(const ZEMatrix3x3d& Value)
+{
+	SetMatrix3x3dConstRef(Value);
+}
+
 ZEReference::ZEReference(const ZEMatrix4x4& Value)
 {
 	SetMatrix4x4ConstRef(Value);
+}
+
+ZEReference::ZEReference(const ZEMatrix4x4d& Value)
+{
+	SetMatrix4x4dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEObject*& Value)

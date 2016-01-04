@@ -193,35 +193,37 @@ void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 {
 	DrawCanvas.Clean();
 
-	if (Target != NULL)
+	if (!IsInitialized())
+		return;
+
+	if (Target == NULL)
+		return;
+
+	DebugDrawEntity();
+	EntityTag->SetNameField(Target->GetName());
+	EntityTag->SetTypeField(Target->GetClass()->GetName());
+
+	ZEInt32 WindowWidth, WindowHeight;
+	zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
+
+	ZECamera* Camera = zeScene->GetActiveCamera();
+
+	ZEVector4 LabelPositionInViewProj;
+	ZEMatrix4x4::Transform(LabelPositionInViewProj, Camera->GetViewProjectionTransform(), ZEVector4(Target->GetWorldPosition(), 1.0f));
+
+	ZEVector4 LabelPositionInScreen;
+	ZEVector4::Divide(LabelPositionInScreen, LabelPositionInViewProj, LabelPositionInViewProj.w);
+
+	if (LabelPositionInViewProj.z < 0.0f)
+		EntityTag->SetVisiblity(false);
+
+	if (EntityTag->GetVisiblity())
 	{
-		DebugDrawEntity();
-		EntityTag->SetNameField(Target->GetName());
-		EntityTag->SetTypeField(Target->GetClass()->GetName());
+		LabelPositionInScreen.x = (ZEInt32)(((LabelPositionInScreen.x + 1.0f) / 2.0f) * WindowWidth);
+		LabelPositionInScreen.y = (ZEInt32)(((LabelPositionInScreen.y - 1.0f) / -2.0f) * WindowHeight);
 
-		ZEInt32 WindowWidth, WindowHeight;
-		zeCore->GetWindow()->GetWindowSize(WindowWidth, WindowHeight);
-
-		ZECamera* Camera = zeScene->GetActiveCamera();
-
-		ZEVector4 LabelPositionInViewProj;
-		ZEMatrix4x4::Transform(LabelPositionInViewProj, Camera->GetViewProjectionTransform(), ZEVector4(Target->GetWorldPosition(), 1.0f));
-
-		ZEVector4 LabelPositionInScreen;
-		ZEVector4::Divide(LabelPositionInScreen, LabelPositionInViewProj, LabelPositionInViewProj.w);
-
-		if (LabelPositionInViewProj.z < 0.0f)
-			EntityTag->SetVisiblity(false);
-
-		if (EntityTag->GetVisiblity())
-		{
-			LabelPositionInScreen.x = (ZEInt32)(((LabelPositionInScreen.x + 1.0f) / 2.0f) * WindowWidth);
-			LabelPositionInScreen.y = (ZEInt32)(((LabelPositionInScreen.y - 1.0f) / -2.0f) * WindowHeight);
-
-			EntityTag->SetPosition(LabelPositionInScreen.ToVector2());
-			EntityTag->SetZOrder((ZEInt32)-LabelPositionInViewProj.z);
-		}
-
+		EntityTag->SetPosition(LabelPositionInScreen.ToVector2());
+		EntityTag->SetZOrder((ZEInt32)-LabelPositionInViewProj.z);
 	}
 
 	if (DrawCanvas.Vertices.GetCount() == 0)
@@ -259,7 +261,6 @@ bool ZEDebugDrawer::InitializeSelf()
 
 bool ZEDebugDrawer::DeinitializeSelf()
 {
-	Target = NULL;
 	DrawCanvas.Clean();
 	RenderCommand.SetZero();
 
@@ -267,6 +268,15 @@ bool ZEDebugDrawer::DeinitializeSelf()
 	{
 		Material->Release();
 		Material = NULL;
+	}
+
+	if (zeGame->UIManager != NULL)
+		zeGame->UIManager->RemoveControl(EntityTag);
+
+	if (EntityTag != NULL)
+	{
+		EntityTag->Destroy();
+		EntityTag = NULL;
 	}
 
 	return ZEEntity::DeinitializeSelf();

@@ -42,7 +42,6 @@
 class ZEVector2d
 {
 	ZE_BUILTIN_OBJECT
-
 	public:
 		union
 		{
@@ -143,7 +142,6 @@ ZEVector2d operator*(double S, const ZEVector2d& RightOperand);
 class ZEVector3d
 {
 	ZE_BUILTIN_OBJECT
-
 	public:
 		union
 		{
@@ -268,7 +266,6 @@ ZEVector3d operator*(double S, const ZEVector3d& RightOperand);
 class ZEVector4d
 {
 	ZE_BUILTIN_OBJECT
-
 	public:
 		union
 		{
