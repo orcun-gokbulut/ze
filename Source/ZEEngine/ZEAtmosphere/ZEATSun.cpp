@@ -361,6 +361,11 @@ const ZEATObserver& ZEATSun::GetObserver() const
 	return Observer;
 }
 
+ZEDrawFlags ZEATSun::GetDrawFlags() const
+{
+	return ZE_DF_NONE;
+}
+
 void ZEATSun::Tick(float ElapsedTime)
 {
 	ZEATJulian Julian = CalculateJulians();

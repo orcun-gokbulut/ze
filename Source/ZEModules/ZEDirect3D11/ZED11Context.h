@@ -74,10 +74,13 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		
 		virtual void						SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRStructuredBuffer* Buffer);
 		virtual void						SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer* Buffer, ZEUInt StartOffset = 0, ZEUInt Size = 0);
+		virtual void						GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer);
 		virtual void						SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler);
 		virtual void						SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture);
-	
+		virtual void						GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture);
+
 		virtual void						SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		virtual void						GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer** DepthStencilBuffer);
 
 		virtual void						SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts);
 		virtual void						SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects);

@@ -71,8 +71,8 @@ void ZERNStageAO::CreateRandomVectors()
 	}
 
 	RandomVectorsTexture.Release();
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8B8A8_UNORM);
-	RandomVectorsTexture->UpdateSubResource(&Vectors[0], 128 * 4, 0);
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	RandomVectorsTexture->UpdateSubResource(&Vectors[0], 0, 0, 128 * 4);
 }
 
 void ZERNStageAO::CreateOffsetVectors()
@@ -229,8 +229,8 @@ bool ZERNStageAO::UpdateTextures()
 
 	OcclusionMap.Release();
 	BlurTexture.Release();
-	OcclusionMap = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
-	BlurTexture = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
+	OcclusionMap = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
+	BlurTexture = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_TEXTURE);
 

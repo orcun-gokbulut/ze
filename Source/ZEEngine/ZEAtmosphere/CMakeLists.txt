@@ -35,6 +35,10 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+ze_add_source(ZEATAtmosphere.cpp			Sources)
+ze_add_source(ZEATAtmosphere.h				Sources Headers)
+ze_add_source(ZEATAtmosphericScattering.cpp	Sources)
+ze_add_source(ZEATAtmosphericScattering.h	Sources Headers)
 ze_add_source(ZEATSun.cpp					Sources)
 ze_add_source(ZEATSun.h						Sources Headers)
 ze_add_source(ZEATMoon.cpp					Sources)

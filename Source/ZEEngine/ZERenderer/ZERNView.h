@@ -51,7 +51,7 @@ class ZEGRConstantBuffer;
 enum ZERNProjectionType
 {
 	ZERN_PT_PERSPECTIVE,
-	ZERN_PT_ORTHAGONAL,
+	ZERN_PT_ORTHOGONAL,
 	ZERN_PT_PARABOLOID
 };
 
@@ -85,6 +85,8 @@ struct ZERNView
 	float						AspectRatio;
 	float						NearZ;
 	float						FarZ;
+	float						ShadowDistance;
+	float						ShadowFadeDistance;
 
 	// Orientation
 	ZEVector3					Position;

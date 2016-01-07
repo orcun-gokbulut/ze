@@ -37,15 +37,10 @@
 
 #include "ZERNStage.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRHolder.h"
-
-class ZEGRTexture2D;
 
 class ZERNStageShadowmapGeneration : public ZERNStage
 {
 	private:
-		ZEGRHolder<ZEGRTexture2D>			DepthBuffer;
-
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 

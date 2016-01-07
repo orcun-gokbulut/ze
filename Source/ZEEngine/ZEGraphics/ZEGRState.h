@@ -37,6 +37,18 @@
 
 #include "ZETypes.h"
 
+enum ZEGRComparisonFunction : ZEUInt8
+{ 
+	ZEGR_CF_NEVER			= 0,
+	ZEGR_CF_LESS			= 1,
+	ZEGR_CF_EQUAL			= 2,
+	ZEGR_CF_LESS_EQUAL		= 3,
+	ZEGR_CF_GREATER			= 4,
+	ZEGR_CF_NOT_EQUAL		= 5,
+	ZEGR_CF_GREATER_EQUAL	= 6,
+	ZEGR_CF_ALWAYS			= 7 
+};
+
 class ZEGRState
 {
 	private:

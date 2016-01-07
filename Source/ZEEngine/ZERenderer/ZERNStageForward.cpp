@@ -85,7 +85,7 @@ bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	if(DepthMap == NULL || DepthMap->GetWidth() != Width || DepthMap->GetHeight() != Height)
 	{
 		DepthMap.Release();
-		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
+		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
 	}
 
 	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));

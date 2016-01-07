@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELightPoint.h
+ Zinek Engine - ZERNShadowMapRendering.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,30 +33,30 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_SHADOWMAPRENDERING_H__
+#define __ZERN_SHADOWMAPRENDERING_H__
 
-#include "ZELight.h"
-#include "ZEMath/ZEViewSphere.h"
+#include "ZERNTransformations.hlsl"
 
-class ZELightPoint  : public ZELight
+cbuffer ZERNShadowMapRendering_Constants			: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	ZE_OBJECT
-	private:
-		ZEViewSphere					ViewVolume;
-
-		virtual bool					DeinitializeSelf();
-
-										ZELightPoint();
-		virtual							~ZELightPoint();
-
-	public:
-		ZELightType						GetLightType() const;
-
-		virtual ZESize					GetViewCount();
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
-		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0);
-
-		static ZELightPoint*			CreateInstance();
+	float4x4	ZERNShadowMapRendering_WorldMatrix;
 };
+
+struct ZERNShadowMapRendering_VertexShader_Input
+{
+	float3		Position							: POSITION0;
+	float3		Normal								: NORMAL0;
+	float3		Tangent								: TANGENT0;
+	float3		Binormal							: BINORMAL0;
+	float2		Texcoord							: TEXCOORD0;
+};
+
+float4 ZERNShadowMapRendering_VertexShader_Main(ZERNShadowMapRendering_VertexShader_Input Input) : SV_Position
+{
+	float4 PositionWorld = mul(ZERNShadowMapRendering_WorldMatrix, float4(Input.Position, 1.0f));
+	
+	return ZERNTransformations_WorldToProjection(PositionWorld);
+}
+
+#endif

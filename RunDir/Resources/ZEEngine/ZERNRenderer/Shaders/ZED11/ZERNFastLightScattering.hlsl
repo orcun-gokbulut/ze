@@ -45,9 +45,7 @@
 #define ATMOSPHERE_HEIGHT	80000.0f
 #define TOTAL_RADIUS		(EARTH_RADIUS + ATMOSPHERE_HEIGHT)
 #define RAYLEIGH_MIE_HEIGHT float2(7994.0f, 1200.0f)
-#define VIEW_NUM_STEPS		50.0f
 #define EXT_NUM_STEPS		100.0f
-#define FLT_MAX				3.402823466e+38f
 #define LUT_DIMENSIONS		float4(32.0f, 128.0f, 64.0f, 16.0f)
 
 cbuffer ZERNFastLightScattering_Constants								: register(b8)
@@ -61,9 +59,11 @@ cbuffer ZERNFastLightScattering_Constants								: register(b8)
 SamplerState		ZERNFastLightScattering_SamplerLinearClamp			: register(s0);
 
 Texture3D<float3>	ZERNFastLightScattering_MultipleScatteringBuffer	: register(t5);
+Texture2D<float3>	ZERNFastLightScattering_ExtinctionBuffer			: register(t6);
 
-static const float3 ZERNFastLightScattering_RayleighScatteringFactor	= float3(5.8e-6, 13.5e-6, 33.1e-6);
-static const float3 ZERNFastLightScattering_MieScatteringFactor			= float3(2.0e-5, 2.0e-5, 2.0e-5);
+static const float3 ZERNFastLightScattering_RayleighScatteringFactor	= float3(5.8e-6f, 13.5e-6f, 33.1e-6f);
+static const float3 ZERNFastLightScattering_MieScatteringFactor			= float3(2.0e-5f, 2.0e-5f, 2.0e-5f);
+static const float3 ZERNFastLightScattering_BackgroundColor				= float3(0.1f, 0.1f, 0.1f);
 
 void ZERNFastLightScattering_IntersectionRaySphere(float3 RayOrigin, float3 RayDirection, float3 SphereCenter, float2 SphereRadius, out float4 StartEndDistance)
 {
@@ -82,7 +82,7 @@ void ZERNFastLightScattering_IntersectionRaySphere(float3 RayOrigin, float3 RayD
 	if(Discriminant.y >= 0.0f)
 	{
 		StartEndDistance.z = (-B.y - SquareRootDiscriminant.y) / 2.0f * A.y;
-		StartEndDistance.w = (-B.y + SquareRootDiscriminant.y) / 2.0f * A.y;	
+		StartEndDistance.w = (-B.y + SquareRootDiscriminant.y) / 2.0f * A.y;
 	}
 }
 
@@ -144,7 +144,7 @@ float3 ZERNFastLightScattering_CalculateExtinction(float3 Start, float3 End)
 		
 		float2 CurRayleighMieDensity = ZERNFastLightScattering_CalculateDensity(Position);
 		
-		TotalRayleighMieDensity += (CurRayleighMieDensity + PrevRayleighMieDensity) * StepLength * 0.5f;
+		TotalRayleighMieDensity += ((CurRayleighMieDensity + PrevRayleighMieDensity) * 0.5f) * StepLength;
 		
 		PrevRayleighMieDensity = CurRayleighMieDensity;
 	}
@@ -194,9 +194,9 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	
 	float2 TextureDimensions = ZERNGBuffer_GetDimensions();
 	
-	float2 PositionHomogeneous = ZERNTransformations_ViewportToHomogeneous(PositionViewport.xy, TextureDimensions);
-	float2 PositionView = ZERNTransformations_HomogeneousToView(PositionHomogeneous);
-	float3 ViewDirection = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f, 0.0f));
+	float2 PixelPositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions);
+	float3 ViewDirection = ZERNTransformations_ViewToWorld(float4(PixelPositionView, 1.0f, 0.0f));
+	ViewDirection = normalize(ViewDirection);
 	
 	float3 LightDirection = -normalize(ZERNFastLightScattering_LightDirection);
 	
@@ -204,19 +204,13 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	ZERNFastLightScattering_IntersectionRaySphere(ZERNView_Position, ViewDirection, EarthCenter, float2(TOTAL_RADIUS, EARTH_RADIUS), StartEndDistance);
 	
 	float3 RayStart = ZERNView_Position + ViewDirection * max(0.0f, StartEndDistance.x);
-	
-	if(StartEndDistance.z < 0.0f && StartEndDistance.w > 0.0f)
-		return PixelColor;
 		
 	float RayLength = StartEndDistance.y;
-		
-	if(StartEndDistance.x > 0.0f && StartEndDistance.z > 0.0f)
-		RayLength = StartEndDistance.z;
-	else if(StartEndDistance.z > 0.0f)
-		RayLength = min(StartEndDistance.z, RayLength);
 	
-	if(Depth != 1.0f && DepthView < ZERNView_FarZ)
+	if(StartEndDistance.x < 0.0f && DepthView < (ZERNView_FarZ - 1.0f))	//in earth
 		RayLength = DepthView;
+	else if(StartEndDistance.x > 0.0f && StartEndDistance.z > 0.0f)		//in space
+		RayLength = StartEndDistance.z;	
 	
 	float3 RayEnd = ZERNView_Position + ViewDirection * RayLength;
 	
@@ -227,7 +221,12 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	Inscattering -= Extinction * ZERNFastLightScattering_LookupPrecomputedScattering(RayEnd, ViewDirection, LightDirection, EarthCenter, PrevTexCoordY);
 	Inscattering *= ZERNFastLightScattering_Intensity;
 	
-	return Inscattering;
+	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
+	
+	if(DepthView > (ZERNView_FarZ - 1.0f))
+		PixelColor = ZERNFastLightScattering_BackgroundColor * ZERNFastLightScattering_LightColor;
+	
+	return PixelColor * Extinction + Inscattering;
 }
 
 #endif

@@ -61,6 +61,11 @@ ZEGRFormat ZEGRRenderTarget::GetFormat()
 	return Format;
 }
 
+ZEGRRenderTarget::ZEGRRenderTarget()
+{
+
+}
+
 ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	this->Width = Width;

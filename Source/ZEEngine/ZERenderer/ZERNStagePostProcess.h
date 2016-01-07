@@ -36,50 +36,29 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZERNLightScattering.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
-class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
-
-enum ZERNPostProcessFlags
-{
-	ZERN_PPF_LIGHT_SCATTERING = 1
-};
 
 class ZERNStagePostProcess : public ZERNStage
 {
 	private:
-		ZEFlags						PostProcessFlags;
-		ZERNLightScattering			LightScattering;
+		ZEGRHolder<ZEGRTexture2D>		OutputTexture;
 
-		ZEGRTexture2D*				InputTexture;
-		ZEGRRenderTarget*			OutputRenderTarget;
-
-		bool						MultipleScattering;
-
-		virtual bool				InitializeSelf();
-		virtual void				DeinitializeSelf();
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
 	public:
-		virtual ZEInt				GetId();
-		virtual const ZEString&		GetName();
+		ZEGRTexture2D*					GetOutputTexture() const;
 
-		void						SetPostProcessFlags(ZERNPostProcessFlags PostProcessFlags);
-		ZEUInt						GetPostProcessFlags() const;
+										ZERNStagePostProcess();
 
-		void						SetInputTexture(ZEGRTexture2D* InputTexture);
-		const ZEGRTexture2D*		GetInputTexture() const;
+		virtual ZEInt					GetId();
+		virtual const ZEString&			GetName();
 
-		void						SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget);
-		const ZEGRRenderTarget*		GetOutputRenderTarget() const;
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-		void						SetMultipleScattering(bool MultipleScattering);
-
-		void						SetLightDirection(const ZEVector3& Direction);
-
-		virtual bool				Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void				CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
-
-									ZERNStagePostProcess();
+		static const ZEGRRenderState&	GetRenderState();
 };

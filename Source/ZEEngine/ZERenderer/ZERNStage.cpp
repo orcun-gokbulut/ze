@@ -34,12 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStage.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 
-#include "ZEGraphics\ZEGRContext.h"
-
-const ZEGRRenderState& ZERNStage::GetRenderState()
+void ZERNStage::SetOwnerRenderer(ZERNRenderer* Renderer)
 {
-	return ZEGRRenderState::Default;
+	OwnerRenderer = Renderer;
 }
 
 void ZERNStage::SetEnable(bool Enable)
@@ -50,6 +49,11 @@ void ZERNStage::SetEnable(bool Enable)
 bool ZERNStage::GetEnable() const
 {
 	return Enable;
+}
+
+ZERNRenderer* ZERNStage::GetOwnerRenderer() const
+{
+	return OwnerRenderer;
 }
 
 bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
@@ -65,4 +69,10 @@ void ZERNStage::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 ZERNStage::ZERNStage()
 {
 	Enable = true;
+	OwnerRenderer = NULL;
+}
+
+const ZEGRRenderState& ZERNStage::GetRenderState()
+{
+	return ZEGRRenderState::Default;
 }

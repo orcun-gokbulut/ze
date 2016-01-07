@@ -36,11 +36,11 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEGraphics\ZEGRHolder.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEMath\ZEMatrix.h"
-#include "ZEGraphics\ZEGRSamplerState.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEGraphics/ZEGRSamplerState.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -83,46 +83,60 @@ struct ZERNTileInfo
 
 struct ZERNLightConstants
 {
-	ZERNGPULight	Light;
-	ZEMatrix4x4		ProjectionMatrix;
-	ZEMatrix4x4		WorldMatrix;
-	ZEMatrix3x3		RotationMatrix;
-	bool			CastShadow;
-	float			Reserved[2];
+	ZERNGPULight							Light;
+	ZEMatrix4x4								ProjectionMatrix;
+	ZEMatrix4x4								WorldMatrix;
+	ZEMatrix4x4								RotationMatrix;
+	bool									CastShadow;
+	ZEUInt									SampleCount;
+	float									SampleLengthOffset;
+	ZEUInt									Reserved;
+	bool									ShowCascades;
+	ZEUInt									Reserved2[3];
+	ZEVector4								OffsetVectors[8];
 };
 
 class ZERNStageLighting : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
+
 		ZEGRHolder<ZEGRShader>				TiledDeferredVertexShader;
 		ZEGRHolder<ZEGRShader>				TiledDeferredPixelShader;
 		ZEGRHolder<ZEGRShader>				DeferredVertexShader;
 		ZEGRHolder<ZEGRShader>				DeferredPixelShader;
+
 		ZEGRHolder<ZEGRRenderStateData>		DeferredRenderState;
 		ZEGRHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
+
 		ZEGRHolder<ZEGRStructuredBuffer>	LightBuffer;
 		ZEGRHolder<ZEGRStructuredBuffer>	TileInfoBuffer;
 		ZEGRHolder<ZEGRConstantBuffer>		LightConstantBuffer;
 		ZEGRHolder<ZEGRVertexBuffer>		LightVertexBuffer;
+
 		ZEArray<ZELight*>					Lights;
 		ZEArray<ZERNTileInfo>				TileInfos;
+
+		ZEGRHolder<ZEGRTexture2D>			RandomVectorsTexture;
+		ZEVector2							OffsetVectors[16];
 
 		ZEGRRenderTarget*					OutputRenderTarget;
 
 		ZEGRSamplerState					SamplerLinearBorder;
+		ZEGRSamplerState					SamplerComparisonLinearBorder;
+		ZEGRSamplerState					SamplerPointWrap;
 		ZEGRSamplerState					SamplerPointBorder;
 
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;
 
 		bool								SetTiledDeferred;
+		bool								ShowCascades;
 
-	private:
-		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
-
+		void								CreateRandomVectors();
+		void								CreateOffsetVectors();
 		void								CreateLightGeometries();
+		void								CreateSamplers();
 
 		bool								UpdateBuffers();
 		bool								UpdateRenderState();
@@ -136,20 +150,26 @@ class ZERNStageLighting : public ZERNStage
 
 		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
 		bool								SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
+
 		void								DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZERNRenderer* Renderer, ZEGRContext* Context);
 		void								DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
 		void								DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* Renderer, ZEGRContext* Context);
 		void								DrawOmniProjectiveLight(ZELightOmniProjective* OmniProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
 
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
+
 	public:
-		virtual ZEInt						GetId();
-		virtual const ZEString&				GetName();
-
-		void								SetOutput(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*					GetOutput() const;
-
 		void								SetIsTiledDeferred(bool Value);
 		bool								GetIsTiledDefferred() const;
+
+		void								SetShowCascades(bool ShowCascades);
+		bool								GetShowCascades() const;
+
+											ZERNStageLighting();
+
+		virtual ZEInt						GetId();
+		virtual const ZEString&				GetName();
 
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);

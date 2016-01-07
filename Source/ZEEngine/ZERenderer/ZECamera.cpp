@@ -73,6 +73,7 @@ const ZEMatrix4x4& ZECamera::GetViewTransform()
 	{
 		ZEMatrix4x4::CreateViewTransform(View.ViewTransform, GetWorldPosition(), GetWorldRotation());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_TRANSFORM);
+		CameraDirtyFlags.RaiseFlags(ZE_CDF_INV_VIEW_TRANSFORM | ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
 	}
 	
 	return View.ViewTransform;
@@ -84,6 +85,7 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 	{
 		ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
+		CameraDirtyFlags.RaiseFlags(ZE_CDF_INV_PROJECTION_TRANSFORM | ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
 	}
 
 	return View.ProjectionTransform;
@@ -104,7 +106,7 @@ const ZEMatrix4x4& ZECamera::GetInvViewTransform()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_INV_VIEW_TRANSFORM))
 	{
-		ZEMatrix4x4::Transpose(View.InvViewTransform, GetViewTransform());
+		ZEMatrix4x4::Inverse(View.InvViewTransform, GetViewTransform());
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_INV_VIEW_TRANSFORM);
 	}
 
@@ -256,22 +258,32 @@ float ZECamera::GetAspectRatio() const
 
 void ZECamera::SetShadowDistance(float Value)
 {
-	//View.ShadowDistance = Value;
+	if(View.ShadowDistance == Value)
+		return;
+
+	View.ShadowDistance = Value;
+
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW);
 }
 
 float ZECamera::GetShadowDistance() const
 {
-	return 0.0f;//View.ShadowDistance;
+	return View.ShadowDistance;
 }
 
 void ZECamera::SetShadowFadeDistance(float Value)
 {
-	//View.ShadowFadeDistance = Value;
+	if(View.ShadowFadeDistance == Value)
+		return;
+
+	View.ShadowFadeDistance = Value;
+
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_VIEW);
 }
 
 float ZECamera::GetShadowFadeDistance() const
 {
-	return 0.0f;//View.ShadowFadeDistance;
+	return View.ShadowFadeDistance;
 }
 
 const ZERNView& ZECamera::GetView()
@@ -296,6 +308,19 @@ const ZERNView& ZECamera::GetView()
 		GetInvProjectionTransform();
 		GetInvViewProjectionTransform();
 
+		View.NearZ = GetNearZ();
+		View.FarZ = GetFarZ();
+
+		View.Width = GetViewport().GetWidth();
+		View.Height = GetViewport().GetHeight();
+		View.ProjectionType = ZERN_PT_PERSPECTIVE;
+		View.Type = ZERN_VT_CAMERA;
+		View.Viewport = &GetViewport();
+		View.ViewVolume = &GetViewVolume();
+
+		View.ShadowDistance = GetShadowDistance();
+		View.ShadowFadeDistance = GetShadowFadeDistance();
+
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW);
 	}
 
@@ -317,18 +342,17 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 {
 	ZEVector3 V;
 	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();
-	V.x =  (((2.0f * ScreenX ) / Viewport.GetWidth()) - 1) / ProjMatrix.M11;
-	V.y = -(((2.0f * ScreenY ) / Viewport.GetHeight()) - 1) / ProjMatrix.M22;
+	V.x =  (((2.0f * ScreenX ) / (ZEInt)View.Width) - 1) / ProjMatrix.M11;
+	V.y = -(((2.0f * ScreenY ) / (ZEInt)View.Height) - 1) / ProjMatrix.M22;
 	V.z =  1.0f;
 
-	ZEMatrix4x4 InvViewMatrix;
-	ZEMatrix4x4::Inverse(InvViewMatrix, GetViewTransform());
-
+	const ZEMatrix4x4& InvViewMatrix = GetInvViewTransform();
 	ZEMatrix4x4::Transform3x3(Ray.v, InvViewMatrix, V);
 
 	Ray.p.x = InvViewMatrix.M14;
 	Ray.p.y = InvViewMatrix.M24;
 	Ray.p.z = InvViewMatrix.M34; 
+
 	ZEVector3::Normalize(Ray.v, Ray.v);
 }
 
@@ -338,7 +362,10 @@ ZEVector2 ZECamera::GetScreenPosition(const ZEVector3& WorldPosition)
 	ZEMatrix4x4::Transform(ClipPosition, GetViewProjectionTransform(), ZEVector4(WorldPosition, 1.0f));
 	ClipPosition /= ClipPosition.w;
 	
-	return ZEVector2((ClipPosition.x +  0.5f) * (float)Viewport.GetWidth(), (-ClipPosition.y +  0.5f) * (float)Viewport.GetHeight());
+	float HalfWidth = View.Width * 0.5f;
+	float HalfHeight = View.Height * 0.5f;
+
+	return ZEVector2(ClipPosition.x * HalfWidth + HalfWidth, ClipPosition.y * -HalfHeight + HalfHeight);
 }
 
 ZECamera::ZECamera()
@@ -353,12 +380,11 @@ ZECamera::ZECamera()
 	View.Viewport = &Viewport;
 	View.ViewVolume = &ViewFrustum;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
-	//SetHorizontalFOV(ZE_PI_2);
 	SetVerticalFOV(ZE_PI_4);
 	AutoAspectRatio = true;
-	
-	//View.ShadowDistance = 1000.0f;
-	//View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
+
+	View.ShadowDistance = 100.0f;
+	View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
 }
 
 ZECamera* ZECamera::CreateInstance()

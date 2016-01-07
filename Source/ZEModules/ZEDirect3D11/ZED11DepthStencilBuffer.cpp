@@ -39,6 +39,11 @@
 #include "ZED11Module.h"
 #include "ZED11DepthStencilBuffer.h"
 
+ZED11DepthStencilBuffer::ZED11DepthStencilBuffer()
+{
+	View = NULL;
+}
+
 ZED11DepthStencilBuffer::ZED11DepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat PixelFormat, ID3D11DepthStencilView* DepthStencilView) : ZEGRDepthStencilBuffer(Width, Height, PixelFormat)
 {
 	View = DepthStencilView;

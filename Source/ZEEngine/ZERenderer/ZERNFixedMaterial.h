@@ -80,7 +80,6 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZEGRHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
 
 		ZEGRHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
-		ZEGRHolder<ZEGRShader>				StageShadowmapGeneration_PixelShader;
 		ZEGRHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
 
 		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;

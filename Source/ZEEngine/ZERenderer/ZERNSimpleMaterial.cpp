@@ -88,7 +88,7 @@ void ZERNSimpleMaterial::UpdateRenderState()
 	}
 
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
-	RasterizerState.SetCullDirection(TwoSided ? ZEGR_CD_NONE : ZEGR_CD_COUNTER_CLOCKWISE);
+	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
 	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : ZEGR_FM_SOLID);
 	RenderState.SetRasterizerState(RasterizerState);
 

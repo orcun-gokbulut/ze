@@ -61,18 +61,18 @@ ZEGRFillMode ZEGRRasterizerState::GetFillMode() const
 	return StateData.FillMode;
 }
 
-void ZEGRRasterizerState::SetCullDirection(ZEGRCullDirection Direction)
+void ZEGRRasterizerState::SetCullMode(ZEGRCullMode CullMode)
 {
-	if (StateData.CullDirection == Direction)
+	if (StateData.CullMode == CullMode)
 		return;
 
-	StateData.CullDirection = Direction;
+	StateData.CullMode = CullMode;
 	MarkDirty();
 }
 
-ZEGRCullDirection ZEGRRasterizerState::GetCullDirection() const
+ZEGRCullMode ZEGRRasterizerState::GetCullMode() const
 {
-	return StateData.CullDirection;
+	return StateData.CullMode;
 }
 
 void ZEGRRasterizerState::SetFrontIsCounterClockwise(bool IsCounterClockwise)
@@ -89,11 +89,71 @@ bool ZEGRRasterizerState::GetFrontIsCounterClockwise() const
 	return StateData.FrontIsCounterClockwise;
 }
 
+void ZEGRRasterizerState::SetDepthBias(ZEInt DepthBias)
+{
+	if(StateData.DepthBias == DepthBias)
+		return;
+
+	StateData.DepthBias = DepthBias;
+	MarkDirty();
+}
+
+ZEInt ZEGRRasterizerState::GetDepthBias() const
+{
+	return StateData.DepthBias;
+}
+
+void ZEGRRasterizerState::SetDepthBiasClamp(float DepthBiasClamp)
+{
+	if(StateData.DepthBiasClamp == DepthBiasClamp)
+		return;
+
+	StateData.DepthBiasClamp = DepthBiasClamp;
+	MarkDirty();
+}
+
+float ZEGRRasterizerState::GetDepthBiasClamp() const
+{
+	return StateData.DepthBiasClamp;
+}
+
+void ZEGRRasterizerState::SetSlopeScaledDepthBias(float SlopeScaledDepthBias)
+{
+	if(StateData.SlopeScaledDepthBias == SlopeScaledDepthBias)
+		return;
+
+	StateData.SlopeScaledDepthBias = SlopeScaledDepthBias;
+	MarkDirty();
+}
+
+float ZEGRRasterizerState::GetSlopeScaledDepthBias() const
+{
+	return StateData.SlopeScaledDepthBias;
+}
+
+void ZEGRRasterizerState::SetDepthClipEnable(bool DepthClipEnable)
+{
+	if(StateData.DepthClipEnable == DepthClipEnable)
+		return;
+
+	StateData.DepthClipEnable = DepthClipEnable;
+	MarkDirty();
+}
+
+bool ZEGRRasterizerState::GetDepthClipEnable() const
+{
+	return StateData.DepthClipEnable;
+}
+
 void ZEGRRasterizerState::SetToDefault()
 {
 	StateData.FillMode = ZEGR_FM_SOLID;
-	StateData.CullDirection = ZEGR_CD_COUNTER_CLOCKWISE;
+	StateData.CullMode = ZEGR_CMD_BACK;
 	StateData.FrontIsCounterClockwise = false;
+	StateData.DepthBias = 0;
+	StateData.SlopeScaledDepthBias = 0.0f;
+	StateData.DepthBiasClamp = 0.0f;
+	StateData.DepthClipEnable = true;
 }
 
 ZEGRRasterizerState::ZEGRRasterizerState()

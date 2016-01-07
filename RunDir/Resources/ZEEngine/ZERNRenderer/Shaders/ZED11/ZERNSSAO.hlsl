@@ -57,7 +57,7 @@ cbuffer ZERNSSAO_Constants							: register(b8)
 cbuffer ZERNSSAO_BilateralConstants					: register(b9)
 {
 	float			ZERNSSAO_DepthThreshold;		
-	float			ZERNSSAO_IntensityThreshold;		
+	float			ZERNSSAO_IntensityThreshold;
 	float			ZERNSSAO_Reserved2;		
 	uint			ZERNSSAO_KernelSize;		
 	float4			ZERNSSAO_KernelValues[32];		

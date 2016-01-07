@@ -34,12 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRState.h"
-#include "ZEGRRenderState.h"
 #include "ZEDS/ZEHashGenerator.h"
 
 void ZEGRState::MarkDirty()
 {
-
 }
 
 ZEGRState::ZEGRState()
@@ -68,7 +66,6 @@ bool ZEGRState::IsDirty() const
 
 void ZEGRState::Update()
 {
-	Dirty = false;
 }
 
 bool ZEGRState::Equals(const ZEGRState& State) const

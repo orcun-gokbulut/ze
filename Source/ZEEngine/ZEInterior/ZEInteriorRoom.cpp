@@ -359,6 +359,8 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
 
+	Owner->SetBoundingBox(this->BoundingBox);
+
 	ZEMatrix4x4 LocalTransform;
 	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
 	ZEMatrix4x4 LocalTransformOwner = Owner->GetWorldTransform() * LocalTransform;

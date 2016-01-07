@@ -34,27 +34,34 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStagePostProcess.h"
-#include "ZEGraphics/ZEGRContext.h"
 #include "ZERNStageID.h"
 #include "ZERNStageGBuffer.h"
 #include "ZERNRenderer.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGROutput.h"
-#include "ZEModules/ZEDirect3D11/ZED11DepthStencilBuffer.h"
-#include "ZEModules/ZEDirect3D11/ZED11Context.h"
 #include "ZERNStageLighting.h"
 #include "ZERNStageHDR.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGROutput.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEModules/ZEDirect3D11/ZED11DepthStencilBuffer.h"
+#include "ZEModules/ZEDirect3D11/ZED11Context.h"
 
 bool ZERNStagePostProcess::InitializeSelf()
 {
-	LightScattering.Initialize();
-
 	return true;
 }
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {
-	LightScattering.Deinitialize();
+}
+
+ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
+{
+	return OutputTexture;
+}
+
+ZERNStagePostProcess::ZERNStagePostProcess()
+{
 }
 
 ZEInt ZERNStagePostProcess::GetId()
@@ -68,86 +75,60 @@ const ZEString& ZERNStagePostProcess::GetName()
 	return Name;
 }
 
-void ZERNStagePostProcess::SetPostProcessFlags(ZERNPostProcessFlags PostProcessFlags)
-{
-	this->PostProcessFlags.RaiseFlags(PostProcessFlags);
-}
-
-ZEUInt ZERNStagePostProcess::GetPostProcessFlags() const
-{
-	return PostProcessFlags;
-}
-
-void ZERNStagePostProcess::SetInputTexture(ZEGRTexture2D* InputTexture)
-{
-	this->InputTexture = InputTexture;
-}
-
-const ZEGRTexture2D* ZERNStagePostProcess::GetInputTexture() const
-{
-	return InputTexture;
-}
-
-void ZERNStagePostProcess::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
-{
-	this->OutputRenderTarget = OutputRenderTarget;
-}
-
-const ZEGRRenderTarget* ZERNStagePostProcess::GetOutputRenderTarget() const
-{
-	return OutputRenderTarget;
-}
-
-void ZERNStagePostProcess::SetMultipleScattering(bool MultipleScattering)
-{
-	this->MultipleScattering = MultipleScattering;
-}
-
 bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZERNStageGBuffer* StageGbuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-	if(StageGbuffer == NULL)
+	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	if(StageGBuffer == NULL)
 		return false;
 
-	if(InputTexture == NULL)
-		InputTexture = StageGbuffer->GetAccumulationMap();
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 1, StageGBuffer->GetAccumulationMap());
 
-	if(OutputRenderTarget == NULL)
-		OutputRenderTarget = Renderer->GetOutputRenderTarget();
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
+	if(RenderTarget == NULL)
+		return false;
 
-	if(PostProcessFlags.GetFlags(ZERN_PPF_LIGHT_SCATTERING))
+	ZEUInt Width = RenderTarget->GetWidth();
+	ZEUInt Height = RenderTarget->GetHeight();
+
+	if(OutputTexture == NULL || OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 	{
-		LightScattering.SetInputTexture(InputTexture);
-		LightScattering.SetDepthTexture(StageGbuffer->GetDepthMap());
-
-		LightScattering.SetOutputRenderTarget(OutputRenderTarget);
-
-		//LightScattering.SetLightDirection(ZEVector3(0.0f, -1.0f, 0.0f));
-		LightScattering.SetLightIntensity(20.0f);
-		LightScattering.SetLightColor(ZEVector3(1.0f, 1.0f, 1.0f));
-		LightScattering.SetMieScatteringStrengh(0.76f);
-
-		LightScattering.Process(Context, MultipleScattering);
+		OutputTexture.Release();
+		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 	}
+
+	RenderTarget = OutputTexture->GetRenderTarget();
+
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
 
 	return true;
 }
 
 void ZERNStagePostProcess::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
+	Context->SetRenderTargets(0, NULL, NULL);
 }
 
-ZERNStagePostProcess::ZERNStagePostProcess()
+const ZEGRRenderState& ZERNStagePostProcess::GetRenderState()
 {
-	InputTexture = NULL;
-	OutputRenderTarget = NULL;
+	static ZEGRRenderState RenderState;
+	static bool Initialized = false;
 
-	MultipleScattering = false;
+	if(!Initialized)
+	{
+		Initialized = true;
+
+		ZEGRDepthStencilState DepthStencilState;
+		DepthStencilState.SetDepthTestEnable(false);
+		DepthStencilState.SetDepthWriteEnable(false);
+
+		RenderState.SetDepthStencilState(DepthStencilState);
+
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
+	}
+
+	return RenderState;
 }
-
-void ZERNStagePostProcess::SetLightDirection(const ZEVector3& Direction)
-{
-	LightScattering.SetLightDirection(Direction);
-}
-

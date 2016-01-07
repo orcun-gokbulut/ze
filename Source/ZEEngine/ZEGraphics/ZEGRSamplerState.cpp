@@ -162,7 +162,7 @@ unsigned int ZEGRSamplerState::GetMaxAnisotrophy() const
 
 void ZEGRSamplerState::SetBorderColor(const ZEVector4 &Color)
 {
-	if (StateData.BorderColor != Color)
+	if (StateData.BorderColor == Color)
 		return;
 
 	StateData.BorderColor = Color;
@@ -202,6 +202,20 @@ float ZEGRSamplerState::GetMaxLOD() const
 	return StateData.MaxLOD;
 }
 
+void ZEGRSamplerState::SetComparsionFunction(ZEGRComparisonFunction ComparisonFunction)
+{
+	if (StateData.ComparisonFunction == ComparisonFunction)
+		return;
+
+	StateData.ComparisonFunction = ComparisonFunction;
+	MarkDirty();
+}
+
+ZEGRComparisonFunction ZEGRSamplerState::GetComparisonFunction() const
+{
+	return StateData.ComparisonFunction;
+}
+
 void ZEGRSamplerState::SetToDefault()
 {
 	memset(&StateData, 0, sizeof(ZESamplerStateData));
@@ -216,6 +230,7 @@ void ZEGRSamplerState::SetToDefault()
 	StateData.MaxAnisotropy = 1;
 	StateData.MipMapLODBias = 0.0f;
 	StateData.BorderColor = ZEVector4::One;
+	StateData.ComparisonFunction = ZEGR_CF_NEVER;
 }
 
 ZEGRSamplerState& ZEGRSamplerState::operator=(const ZEGRSamplerState& Source)
@@ -231,6 +246,7 @@ ZEGRSamplerState& ZEGRSamplerState::operator=(const ZEGRSamplerState& Source)
 	SetMaxAnisotrophy(Source.GetMaxAnisotrophy());
 	SetMipLODBias(Source.GetMipLODBias());
 	SetBorderColor(Source.GetBorderColor());
+	SetComparsionFunction(Source.GetComparisonFunction());
 
 	return *this;
 }
@@ -247,5 +263,5 @@ ZEGRSamplerState::ZEGRSamplerState()
 
 ZEGRSamplerState::~ZEGRSamplerState()
 {
-	
+
 }

@@ -35,7 +35,6 @@
 
 #include "ZED11Context.h"
 
-#include "ZEGraphics/ZEGRDefinitions.h"
 #include "ZED11Module.h"
 #include "ZED11Shader.h"
 #include "ZED11Texture2D.h"
@@ -48,9 +47,11 @@
 #include "ZED11DepthStencilBuffer.h"
 #include "ZED11RenderStateData.h"
 #include "ZED11StructuredBuffer.h"
+#include "ZED11StatePool.h"
+
+#include "ZEGraphics/ZEGRDefinitions.h"
 
 #include <d3d11_1.h>
-#include "ZED11StatePool.h"
 
 #define ZEGR_CONTEXT_DIRTY_BLEND_STATE		1
 #define ZEGR_CONTEXT_DIRTY_STENCIL_STATE	2
@@ -202,6 +203,38 @@ void ZED11Context::SetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTarge
 		NativeDepthStencil = static_cast<ZED11DepthStencilBuffer*>(DepthStencilBuffer)->GetView();
 
 	Context->OMSetRenderTargets(Count, NativeRenderTargets, NativeDepthStencil);
+}
+
+void ZED11Context::GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer** DepthStencilBuffer)
+{
+	zeDebugCheck(Count >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget count is too much.");
+	zeCheckError(RenderTargets == NULL && DepthStencilBuffer == NULL, ZE_VOID, "Both render target and depth-stencil buffer cannot be NULL.");
+
+	if (Count >= ZEGR_MAX_RENDER_TARGET_SLOT)
+		Count = ZEGR_MAX_RENDER_TARGET_SLOT;
+
+	ID3D11RenderTargetView* NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+	memset(&NativeRenderTargets[0], NULL, sizeof(ID3D11RenderTargetView*) * Count);
+	ID3D11DepthStencilView* NativeDepthStencil = NULL;
+
+	Context->OMGetRenderTargets(Count, NativeRenderTargets, &NativeDepthStencil);
+
+	ZED11RenderTarget* _RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+	ZED11DepthStencilBuffer* _DepthStencilBuffer;
+
+	for(ZEUInt I = 0; I < Count; I++)
+	{
+		_RenderTargets[I] = new ZED11RenderTarget();
+		_RenderTargets[I]->View = NativeRenderTargets[I];
+	}
+
+	_DepthStencilBuffer = new ZED11DepthStencilBuffer();
+	_DepthStencilBuffer->View = NativeDepthStencil;
+
+	if(RenderTargets != NULL)
+		memcpy(RenderTargets, _RenderTargets, sizeof(ZEGRRenderTarget*) * Count);
+	if(DepthStencilBuffer != NULL)
+		*DepthStencilBuffer = _DepthStencilBuffer;
 }
 
 void ZED11Context::SetStencilRef(ZEUInt Reference)
@@ -447,6 +480,45 @@ void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCo
 	}*/
 }
 
+void ZED11Context::GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer)
+{
+	zeCheckError(Buffer == NULL, ZE_VOID,"Constant buffer cannot be NULL.");
+	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL.");
+
+	ID3D11Buffer* NativeBuffer = NULL;
+
+	switch (Shader)
+	{
+	default:
+	case ZEGR_ST_NONE:
+		*Buffer = NULL;
+		break;
+	case ZEGR_ST_VERTEX:
+		Context->VSGetConstantBuffers(Index, 1, &NativeBuffer);
+		break;
+	case ZEGR_ST_PIXEL:
+		Context->PSGetConstantBuffers(Index, 1, &NativeBuffer);
+		break;
+	case ZEGR_ST_GEOMETRY:
+		Context->GSGetConstantBuffers(Index, 1, &NativeBuffer);
+		break;
+	case ZEGR_ST_DOMAIN:
+		Context->DSGetConstantBuffers(Index, 1, &NativeBuffer);
+		break;
+	case ZEGR_ST_HULL:
+		Context->HSGetConstantBuffers(Index, 1, &NativeBuffer);
+		break;
+	case ZEGR_ST_COMPUTE:
+		Context->CSGetConstantBuffers(Index, 1, &NativeBuffer);
+		break;
+	}
+
+	ZED11ConstantBuffer* ConstantBuffer = new ZED11ConstantBuffer();
+	ConstantBuffer->Buffer = NativeBuffer;
+
+	*Buffer = ConstantBuffer;
+}
+
 void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* Texture)
 {
 	ID3D11ShaderResourceView* NativeTexture = NULL;
@@ -501,6 +573,72 @@ void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture* 
 		case ZEGR_ST_COMPUTE:
 			Context->CSSetShaderResources(Index, 1, &NativeTexture);
 			break;
+	}
+}
+
+void ZED11Context::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture)
+{
+	zeCheckError(Texture == NULL, ZE_VOID, "Texture cannot be NULL");
+	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL");
+
+	ID3D11ShaderResourceView* ResourceView = NULL;
+
+	switch(Shader)
+	{
+	default:
+	case ZEGR_ST_NONE:
+		break;
+
+	case ZEGR_ST_VERTEX:
+		Context->VSGetShaderResources(Index, 1, &ResourceView);
+		break;
+
+	case ZEGR_ST_PIXEL:
+		Context->PSGetShaderResources(Index, 1, &ResourceView);
+		break;
+
+	case ZEGR_ST_GEOMETRY:
+		Context->GSGetShaderResources(Index, 1, &ResourceView);
+		break;
+
+	case ZEGR_ST_DOMAIN:
+		Context->DSGetShaderResources(Index, 1, &ResourceView);
+		break;
+
+	case ZEGR_ST_HULL:
+		Context->HSGetShaderResources(Index, 1, &ResourceView);
+		break;
+
+	case ZEGR_ST_COMPUTE:
+		Context->CSGetShaderResources(Index, 1, &ResourceView);
+		break;
+	}
+
+	if(ResourceView != NULL)
+	{
+		ID3D11Resource* Resource;
+		ResourceView->GetResource(&Resource);
+		D3D11_RESOURCE_DIMENSION ResourceDimension;
+		Resource->GetType(&ResourceDimension);
+
+		if(ResourceDimension == D3D11_RESOURCE_DIMENSION_TEXTURE2D)
+		{
+			ZED11Texture2D *Texture2D = new ZED11Texture2D();
+			Texture2D->ResourceView = ResourceView;
+
+			*Texture = Texture2D;
+		}
+		else if(ResourceDimension == D3D11_RESOURCE_DIMENSION_TEXTURE3D)
+		{
+			ZED11Texture3D *Texture3D = new ZED11Texture3D();
+			Texture3D->ResourceView = ResourceView;
+
+			*Texture = Texture3D;
+		}
+	}
+	else
+	{
+		*Texture = NULL;
 	}
 }
 

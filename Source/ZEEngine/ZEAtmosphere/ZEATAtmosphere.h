@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELightPoint.h
+ Zinek Engine - ZEATAtmosphere.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,28 +35,41 @@
 
 #pragma once
 
-#include "ZELight.h"
-#include "ZEMath/ZEViewSphere.h"
+#include "ZEGame/ZEEntity.h"
 
-class ZELightPoint  : public ZELight
+#include "ZEATAtmosphericScattering.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZEATCommon.h"
+
+class ZEATSun;
+class ZEATMoon;
+
+class ZEATAtmosphere : public ZEEntity
 {
-	ZE_OBJECT
 	private:
-		ZEViewSphere					ViewVolume;
+		ZEATSun*					Sun;
+		
+		ZEATObserver				Observer;
+		ZEATAtmosphericScattering	AtmosphericScattering;
+		ZERNCommand					Command;
 
-		virtual bool					DeinitializeSelf();
-
-										ZELightPoint();
-		virtual							~ZELightPoint();
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 	public:
-		ZELightType						GetLightType() const;
+		void						SetObserver(const ZEATObserver& Observer);
+		const ZEATObserver&			GetObserver() const;
 
-		virtual ZESize					GetViewCount();
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
-		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0);
+		void						SetMultipleScattering(bool MultipleScattering);
+		bool						GetMultipleScattering();
 
-		static ZELightPoint*			CreateInstance();
+									ZEATAtmosphere();
+		virtual						~ZEATAtmosphere();
+
+		virtual ZEDrawFlags			GetDrawFlags() const;
+
+		virtual void				Tick(float Time);
+
+		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
+		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 };

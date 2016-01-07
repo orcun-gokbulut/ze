@@ -159,6 +159,47 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
+void ZELight::SetShadowResolution(ZELightShadowResolution ShadowResolution)
+{
+	if(this->ShadowResolution == ShadowResolution)
+		return;
+
+	this->ShadowResolution = ShadowResolution;
+
+	DirtyFlags.RaiseFlags(ZE_LDF_SHADOW_MAP);
+}
+
+ZELightShadowResolution ZELight::GetShadowResolution() const
+{
+	return ShadowResolution;
+}
+
+void ZELight::SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
+{
+	if(this->ShadowSampleCount == ShadowSampleCount)
+		return;
+
+	this->ShadowSampleCount = ShadowSampleCount;
+}
+
+ZELightShadowSampleCount ZELight::GetShadowSampleCount() const
+{
+	return ShadowSampleCount;
+}
+
+void ZELight::SetShadowSampleLengthOffset(float ShadowSampleLengthOffset)
+{
+	if(this->ShadowSampleLengthOffset == ShadowSampleLengthOffset)
+		return;
+
+	this->ShadowSampleLengthOffset = ShadowSampleLengthOffset;
+}
+
+float ZELight::GetShadowSampleLengthOffset() const
+{
+	return ShadowSampleLengthOffset;
+}
+
 void ZELight::SetPosition(const ZEVector3& NewPosition)
 {
 	if (GetPosition() != NewPosition)
@@ -197,6 +238,9 @@ void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 ZELight::ZELight()
 {
 	CastsShadows = false;
+	ShadowResolution = ZE_LSR_LOW;
+	ShadowSampleCount = ZE_LSC_LOW;
+	ShadowSampleLengthOffset = 0.0f;
 
 	Range = 100.0f;
 	Intensity = 1.0f;
@@ -212,4 +256,32 @@ ZELight::ZELight()
 ZELight::~ZELight()
 {
 
+}
+
+ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution)
+{
+	switch (ShadowResolution)
+	{
+	default:
+	case ZE_LSR_LOW:
+		return 256;
+	case ZE_LSR_MEDIUM:
+		return 512;
+	case ZE_LSR_HIGH:
+		return 1024;
+	}
+}
+
+ZEUInt ZELight::ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
+{
+	switch (ShadowSampleCount)
+	{
+	default:
+	case ZE_LSC_LOW:
+		return 4;
+	case ZE_LSC_MEDIUM:
+		return 8;
+	case ZE_LSC_HIGH:
+		return 16;
+	}
 }

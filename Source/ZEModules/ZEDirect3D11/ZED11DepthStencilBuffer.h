@@ -48,10 +48,12 @@ class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11Compo
 	friend class ZED11Module;
 	friend class ZED11Output;
 	friend class ZED11Texture2D;
+	friend class ZED11Context;
 
 	private:
 		ID3D11DepthStencilView*			View;
 
+										ZED11DepthStencilBuffer();
 										ZED11DepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format, ID3D11DepthStencilView* DepthStencilView);
 		virtual							~ZED11DepthStencilBuffer();
 

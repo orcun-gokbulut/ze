@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEVector.h"
 
-enum ZEGRTextureAddressing : ZEUInt
+enum ZEGRTextureAddressing : ZEUInt8
 {
 	ZEGR_TAM_WRAP						= 0,
 	ZEGR_TAM_MIRROR						= 1,
@@ -47,7 +47,7 @@ enum ZEGRTextureAddressing : ZEUInt
 	ZEGR_TAM_BORDER						= 3
 };
 
-enum ZEGRTextureFilter : ZEUInt
+enum ZEGRTextureFilter : ZEUInt8
 {
 	ZEGR_TFM_POINT						= 0,
 	ZEGR_TFM_LINEAR						= 1,
@@ -59,63 +59,67 @@ class ZEGRSamplerState : public ZEGRState
 	private:
 		struct ZESamplerStateData
 		{
-			ZEGRTextureAddressing	AddressU : 2;
-			ZEGRTextureAddressing	AddressV : 2;
-			ZEGRTextureAddressing	AddressW : 2;
-			ZEGRTextureFilter		MinFilter : 2;
-			ZEGRTextureFilter		MagFilter : 2;
-			ZEGRTextureFilter		MipFilter : 2;
-			ZEUInt8					MaxAnisotropy;
+			ZEGRTextureAddressing			AddressU : 2;
+			ZEGRTextureAddressing			AddressV : 2;
+			ZEGRTextureAddressing			AddressW : 2;
+			ZEGRTextureFilter				MinFilter : 2;
+			ZEGRTextureFilter				MagFilter : 2;
+			ZEGRTextureFilter				MipFilter : 2;
+			ZEGRComparisonFunction			ComparisonFunction : 3;
+			ZEUInt8							MaxAnisotropy : 5;
 
-			float					MinLOD;
-			float					MaxLOD;
-			float					MipMapLODBias;
-			ZEVector4				BorderColor;
+			float							MinLOD;
+			float							MaxLOD;
+			float							MipMapLODBias;
+			ZEVector4						BorderColor;
 
 		} StateData;
 
 	public:
-		virtual const void*			GetData() const;
-		virtual ZESize				GetDataSize() const;
+		virtual const void*					GetData() const;
+		virtual ZESize						GetDataSize() const;
 
-		void						SetMinFilter(ZEGRTextureFilter FilterMode);
-		ZEGRTextureFilter			GetMinFilter() const;
-		
-		void						SetMagFilter(ZEGRTextureFilter FilterMode);
-		ZEGRTextureFilter			GetMagFilter() const;
-		
-		void						SetMipFilter(ZEGRTextureFilter FilterMode);
-		ZEGRTextureFilter			GetMipFilter() const;
-		
-		void						SetAddressU(ZEGRTextureAddressing AdressMode);
-		ZEGRTextureAddressing		GetAddressU() const;
-		
-		void						SetAddressV(ZEGRTextureAddressing AdressMode);
-		ZEGRTextureAddressing		GetAddressV() const;
-		
-		void						SetAddressW(ZEGRTextureAddressing AdressMode);
-		ZEGRTextureAddressing		GetAddressW() const;
-		
-		void						SetMipLODBias(float LODBias);
-		float						GetMipLODBias() const;
+		void								SetMinFilter(ZEGRTextureFilter FilterMode);
+		ZEGRTextureFilter					GetMinFilter() const;
 
-		void						SetMaxAnisotrophy(ZEUInt AnisotrophyLevel);
-		ZEUInt						GetMaxAnisotrophy() const;
-		
-		void						SetBorderColor(const ZEVector4& Color);
-		ZEVector4					GetBorderColor() const;
-		
-		void						SetMinLOD(float LOD);
-		float						GetMinLOD() const;
+		void								SetMagFilter(ZEGRTextureFilter FilterMode);
+		ZEGRTextureFilter					GetMagFilter() const;
 
-		void						SetMaxLOD(float LOD);
-		float						GetMaxLOD() const;
+		void								SetMipFilter(ZEGRTextureFilter FilterMode);
+		ZEGRTextureFilter					GetMipFilter() const;
 
-		void						SetToDefault();
+		void								SetAddressU(ZEGRTextureAddressing AdressMode);
+		ZEGRTextureAddressing				GetAddressU() const;
 
-		ZEGRSamplerState&			operator=(const ZEGRSamplerState& State);
+		void								SetAddressV(ZEGRTextureAddressing AdressMode);
+		ZEGRTextureAddressing				GetAddressV() const;
 
-									ZEGRSamplerState();
-									ZEGRSamplerState(const ZEGRSamplerState& State);
-		virtual						~ZEGRSamplerState();
+		void								SetAddressW(ZEGRTextureAddressing AdressMode);
+		ZEGRTextureAddressing				GetAddressW() const;
+
+		void								SetMipLODBias(float LODBias);
+		float								GetMipLODBias() const;
+
+		void								SetMaxAnisotrophy(ZEUInt AnisotrophyLevel);
+		ZEUInt								GetMaxAnisotrophy() const;
+
+		void								SetBorderColor(const ZEVector4& Color);
+		ZEVector4							GetBorderColor() const;
+
+		void								SetMinLOD(float LOD);
+		float								GetMinLOD() const;
+
+		void								SetMaxLOD(float LOD);
+		float								GetMaxLOD() const;
+
+		void								SetComparsionFunction(ZEGRComparisonFunction ComparisonFunction);
+		ZEGRComparisonFunction				GetComparisonFunction() const;
+
+		void								SetToDefault();
+
+		ZEGRSamplerState&					operator=(const ZEGRSamplerState& State);
+
+											ZEGRSamplerState();
+											ZEGRSamplerState(const ZEGRSamplerState& State);
+		virtual								~ZEGRSamplerState();
 };

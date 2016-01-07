@@ -49,30 +49,26 @@
 
 #include "ZERNStageLighting.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRShaderCompileOptions.h"
-#include "ZEError.h"
-#include "ZEGraphics/ZEGRShader.h"
 #include "ZERNRenderer.h"
-#include "ZEGraphics/ZEGROutput.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZERNStageGBuffer.h"
-#include "ZEModules/ZEDirect3D11/ZED11Context.h"
-#include "ZEModules/ZEDirect3D11/ZED11DepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRStructuredBuffer.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEError.h"
+#include "ZERandom.h"
+#include "ZECanvas.h"
 #include "ZELightPoint.h"
 #include "ZELightDirectional.h"
 #include "ZELightProjective.h"
 #include "ZELightOmniProjective.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZERandom.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
-#include "ZEGraphics\ZEGRStructuredBuffer.h"
-#include "ZECanvas.h"
-#include "ZEGraphics\ZEGRTextureCube.h"
-#include "ZEMath\ZEMath.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZEEntity.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntity.h"
 
 #define ZERN_SLDF_LIGHT_BUFFER	1
 #define ZERN_SLDF_TILE_BUFFER	2
@@ -90,24 +86,8 @@ const ZEString& ZERNStageLighting::GetName()
 	return Name;
 }
 
-void ZERNStageLighting::SetOutput(ZEGRRenderTarget* Output)
-{
-	if(OutputRenderTarget == Output)
-		return;
-
-	OutputRenderTarget = Output;
-}
-
-ZEGRRenderTarget* ZERNStageLighting::GetOutput() const
-{
-	return OutputRenderTarget;
-}
-
 void ZERNStageLighting::SetIsTiledDeferred(bool Value)
 {
-	if(SetTiledDeferred == Value)
-		return;
-
 	SetTiledDeferred = Value;
 }
 
@@ -116,33 +96,35 @@ bool ZERNStageLighting::GetIsTiledDefferred() const
 	return SetTiledDeferred;
 }
 
+void ZERNStageLighting::SetShowCascades(bool ShowCascades)
+{
+	this->ShowCascades = ShowCascades;
+}
+
+bool ZERNStageLighting::GetShowCascades() const
+{
+	return ShowCascades;
+}
+
 bool ZERNStageLighting::InitializeSelf()
 {
-	PrevWidth = 0;
-	PrevHeight = 0;
-	SetTiledDeferred = false;
-	LightBuffer = NULL;
-	TileInfoBuffer = NULL;
-	OutputRenderTarget = NULL;
-
+	CreateRandomVectors();
+	CreateOffsetVectors();
 	CreateLightGeometries();
+	CreateSamplers();
 
 	LightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNLightConstants));
 
 	DirtyFlags.RaiseAll();
 
-	SamplerLinearBorder.SetAddressU(ZEGR_TAM_BORDER);
-	SamplerLinearBorder.SetAddressV(ZEGR_TAM_BORDER);
-	SamplerLinearBorder.SetAddressW(ZEGR_TAM_BORDER);
-	SamplerLinearBorder.SetBorderColor(ZEVector4::Zero);
-
-	SamplerPointBorder.SetMinFilter(ZEGR_TFM_POINT);
-	SamplerPointBorder.SetMagFilter(ZEGR_TFM_POINT);
-	SamplerPointBorder.SetMipFilter(ZEGR_TFM_POINT);
-	SamplerPointBorder.SetAddressU(ZEGR_TAM_BORDER);
-	SamplerPointBorder.SetAddressV(ZEGR_TAM_BORDER);
-	SamplerPointBorder.SetAddressW(ZEGR_TAM_BORDER);
-	SamplerPointBorder.SetBorderColor(ZEVector4::One);
+	const ZESmartArray<ZEEntity*>& Entities = GetOwnerRenderer()->GetScene()->GetEntities();
+	ZEUInt Count = (ZEUInt)Entities.GetCount();
+	for(ZEUInt I = 0; I < Count; ++I)
+	{
+		ZEEntity* Entity = Entities[I];
+		if(Entity->GetDrawFlags().GetFlags(ZE_DF_LIGHT_SOURCE))
+			Lights.Add((ZELight*)Entity);
+	}
 
 	return true;
 }
@@ -162,6 +144,10 @@ void ZERNStageLighting::DeinitializeSelf()
 
 	Lights.Clear();
 	TileInfos.Clear();
+
+	RandomVectorsTexture.Release();
+	
+	OutputRenderTarget = NULL;
 }
 
 bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context)
@@ -227,61 +213,6 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 	return true;
 }
 
-bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
-{
-	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-	if(StageGBuffer == NULL)
-		return false;
-
-	OutputRenderTarget = StageGBuffer->GetAccumulationMap()->GetRenderTarget();
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
-
-	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
-
-	static bool Initialized = false;
-	if(!Initialized)
-	{
-		Initialized = true;
-
-		const ZESmartArray<ZEEntity*>& Entities = Renderer->GetScene()->GetEntities();
-		ZEUInt Count = (ZEUInt)Entities.GetCount();
-		for(ZEUInt I = 0; I < Count; ++I)
-		{
-			ZEEntity* Entity = Entities[I];
-			if(Entity->GetDrawFlags().GetFlags(ZE_DF_LIGHT_SOURCE))
-				Lights.Add((ZELight*)Entity);
-		}
-	}
-
-	if(SetTiledDeferred)
-		return SetupTiledDeferred(Renderer, Context);
-	else
-		return SetupDeferred(Renderer, Context);
-}
-
-void ZERNStageLighting::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
-{
-	Context->SetRenderTargets(0, NULL, NULL);
-
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, NULL);
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
-}
-
 void ZERNStageLighting::UpdateClipRegionRoot(float nc,          // Tangent plane x/y normal coordinate (view space)
                           float lc,								// Light x/y coordinate (view space)
                           float lz,								// Light z coordinate (view space)
@@ -299,10 +230,10 @@ void ZERNStageLighting::UpdateClipRegionRoot(float nc,          // Tangent plane
         float c = -nz * cameraScale / nc;
         if (nc > 0.0f) 
 		{	// Left side boundary
-            clipMin = max(clipMin, c);
+            clipMin = ZEMath::Max(clipMin, c);
         } else 
 		{   // Right side boundary
-            clipMax = min(clipMax, c);
+            clipMax = ZEMath::Min(clipMax, c);
         }
     }
 }
@@ -418,7 +349,57 @@ void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 	}
 }
 
+void ZERNStageLighting::CreateRandomVectors()
+{
+	const ZEUInt Size = 128 * 128 * 2;
+	ZEUInt8 Vectors[Size];
+	for(ZEUInt I = 0; I < Size; I += 2)
+	{
+		Vectors[I]		= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+		Vectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+	}
 
+	RandomVectorsTexture.Release();
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, 1, ZEGR_TF_R8G8_UNORM);
+	RandomVectorsTexture->UpdateSubResource(&Vectors[0], 0, 0, 128 * 2);
+}
+
+void ZERNStageLighting::CreateOffsetVectors()
+{
+	float Tan = ZEAngle::Tan(ZEAngle::ToRadian(22.5f));
+
+	ZEVector2 Samples[] =
+	{
+		//4 sample
+		ZEVector2(-1.0f, 1.0f),
+		ZEVector2(1.0f, 1.0f),
+		ZEVector2(1.0f, -1.0f),
+		ZEVector2(-1.0f, -1.0f),
+
+		//8 sample
+		ZEVector2(-1.0f, 0.0f),
+		ZEVector2(1.0f, 0.0f),
+		ZEVector2(0.0f, -1.0f),
+		ZEVector2(0.0f, 1.0f),
+
+		//16 sample
+		ZEVector2(-1.0f, Tan),
+		ZEVector2(-Tan, 1.0f),
+		ZEVector2(Tan, 1.0f),
+		ZEVector2(1.0f, Tan),
+
+		ZEVector2(1.0f, -Tan),
+		ZEVector2(Tan, -1.0f),
+		ZEVector2(-Tan, -1.0f),
+		ZEVector2(-1.0f, -Tan)
+	};
+
+	for (ZEUInt I = 0; I < 16; ++I)
+	{
+		Samples[I].NormalizeSelf();
+		OffsetVectors[I] = Samples[I] * (ZERandom::GetFloatPositive() * 0.75f + 0.25f);		//[0.25, 1.0]
+	}
+}
 
 void ZERNStageLighting::CreateLightGeometries()
 {
@@ -434,10 +415,10 @@ void ZERNStageLighting::CreateLightGeometries()
 	ZECanvas Canvas;
 	// Directional
 	Canvas.AddQuad(
-		ZEVector3(-1.0f, -1.0f, 0.0f),
 		ZEVector3(-1.0f, 1.0f, 0.0f),
-		ZEVector3(1.0f, 1.0f, 0.0f),
-		ZEVector3(1.0f, -1.0f, 0.0f));
+		ZEVector3(-1.0f, -1.0f, 0.0f),
+		ZEVector3(1.0f, -1.0f, 0.0f),
+		ZEVector3(1.0f, 1.0f, 0.0f));
 
 	// Point/OmniProjective
 	Canvas.AddSphere(1.0f, 12, 12);
@@ -449,6 +430,38 @@ void ZERNStageLighting::CreateLightGeometries()
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
 
 	LightVertexBuffer = Canvas.CreateVertexBuffer();
+}
+
+void ZERNStageLighting::CreateSamplers()
+{
+	SamplerLinearBorder.SetAddressU(ZEGR_TAM_BORDER);
+	SamplerLinearBorder.SetAddressV(ZEGR_TAM_BORDER);
+	SamplerLinearBorder.SetAddressW(ZEGR_TAM_BORDER);
+	SamplerLinearBorder.SetBorderColor(ZEVector4::Zero);
+
+	SamplerComparisonLinearBorder.SetMinFilter(ZEGR_TFM_LINEAR);
+	SamplerComparisonLinearBorder.SetMagFilter(ZEGR_TFM_LINEAR);
+	SamplerComparisonLinearBorder.SetMipFilter(ZEGR_TFM_POINT);
+	SamplerComparisonLinearBorder.SetAddressU(ZEGR_TAM_BORDER);
+	SamplerComparisonLinearBorder.SetAddressV(ZEGR_TAM_BORDER);
+	SamplerComparisonLinearBorder.SetAddressW(ZEGR_TAM_BORDER);
+	SamplerComparisonLinearBorder.SetBorderColor(ZEVector4::Zero);
+	SamplerComparisonLinearBorder.SetComparsionFunction(ZEGR_CF_LESS_EQUAL);
+
+	SamplerPointWrap.SetMinFilter(ZEGR_TFM_POINT);
+	SamplerPointWrap.SetMagFilter(ZEGR_TFM_POINT);
+	SamplerPointWrap.SetMipFilter(ZEGR_TFM_POINT);
+	SamplerPointWrap.SetAddressU(ZEGR_TAM_WRAP);
+	SamplerPointWrap.SetAddressV(ZEGR_TAM_WRAP);
+	SamplerPointWrap.SetAddressW(ZEGR_TAM_WRAP);
+
+	SamplerPointBorder.SetMinFilter(ZEGR_TFM_POINT);
+	SamplerPointBorder.SetMagFilter(ZEGR_TFM_POINT);
+	SamplerPointBorder.SetMipFilter(ZEGR_TFM_POINT);
+	SamplerPointBorder.SetAddressU(ZEGR_TAM_BORDER);
+	SamplerPointBorder.SetAddressV(ZEGR_TAM_BORDER);
+	SamplerPointBorder.SetAddressW(ZEGR_TAM_BORDER);
+	SamplerPointBorder.SetBorderColor(ZEVector4::One);
 }
 
 bool ZERNStageLighting::UpdateBuffers()
@@ -536,7 +549,7 @@ bool ZERNStageLighting::UpdateRenderState()
 	RenderState.SetShader(ZEGR_ST_PIXEL, DeferredPixelShader);
 
 	ZEGRRasterizerState RasterizerState;
-	RasterizerState.SetCullDirection(ZEGR_CD_NONE);
+	RasterizerState.SetCullMode(ZEGR_CMD_FRONT);
 
 	RenderState.SetRasterizerState(RasterizerState);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
@@ -612,12 +625,34 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		GPULight.Attenuation = DirectionalLight->GetAttenuation();
 		GPULight.Type = DirectionalLight->GetLightType();
 		ZEVector3 Direction;
-		ZEQuaternion::ConvertToEulerAngles(Direction, DirectionalLight->GetRotation());
-		ZEMatrix4x4::Transform3x3(GPULight.DirectionView, Renderer->GetView().ViewTransform, Direction);
+		ZEQuaternion::ConvertToEulerAngles(Direction, DirectionalLight->GetWorldRotation());
+		ZEMatrix4x4::Transform3x3(GPULight.DirectionView, Renderer->GetView().ViewTransform, -Direction);
 		GPULight.DirectionView.NormalizeSelf();
 
 		LightConstants->CastShadow = DirectionalLight->GetCastsShadow();
+		LightConstants->ShowCascades = ShowCascades;
+		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
+		LightConstants->SampleLengthOffset = DirectionalLight->GetShadowSampleLengthOffset();
+		memcpy(LightConstants->OffsetVectors, OffsetVectors, sizeof(ZEVector2) * LightConstants->SampleCount);
 	LightConstantBuffer->Unlock();
+
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerPointBorder);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, DirectionalLight->GetShadowMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 8, RandomVectorsTexture);
+
+	ZEUInt CascadeCount = DirectionalLight->GetCascadeCount();
+	for(ZEUInt I = 0; I < CascadeCount; I++)
+	{
+		ZELightDirectional::ZECascade& Cascade = DirectionalLight->CascadeConstants.Cascades[I];
+		Cascade.ProjectionTransform = Cascade.ProjectionTransform * DirectionalLight->GetViewTransform() * Renderer->GetView().InvViewTransform;
+	}
+
+	DirectionalLight->CascadeConstantBuffer->SetData(&DirectionalLight->CascadeConstants);
+
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, DirectionalLight->CascadeConstantBuffer);
 
 	Context->Draw(6, 0);
 }
@@ -647,7 +682,7 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 	ZERNLightConstants* LightConstants;
 	LightConstantBuffer->Lock((void**)&LightConstants);
 		ZERNGPULight& GPULight = LightConstants->Light;
-		ZEMatrix4x4::Transform(GPULight.PositionView, Renderer->GetView().ViewTransform, ProjectiveLight->GetPosition());
+		ZEMatrix4x4::Transform(GPULight.PositionView, Renderer->GetView().ViewTransform, ProjectiveLight->GetWorldPosition());
 		GPULight.Range = ProjectiveLight->GetRange();
 		GPULight.Color = ProjectiveLight->GetColor();
 		GPULight.Intensity = ProjectiveLight->GetIntensity();
@@ -656,21 +691,23 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 		GPULight.DirectionView = ZEVector3::Zero;
 
 		LightConstants->CastShadow = ProjectiveLight->GetCastsShadow();
-		ZEMatrix4x4 ViewProj;
-		ZEMatrix4x4::Multiply(ViewProj, ProjectiveLight->GetProjectionTransform(), ProjectiveLight->GetViewTransform());
-		ZEMatrix4x4::Multiply(LightConstants->ProjectionMatrix, ViewProj, Renderer->GetView().InvViewTransform);
-		
-		//LightConstants->ProjectionMatrix = ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * Renderer->GetView().InvViewTransform;
+		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(ProjectiveLight->GetShadowSampleCount());
+		LightConstants->SampleLengthOffset = ProjectiveLight->GetShadowSampleLengthOffset();
+		memcpy(LightConstants->OffsetVectors, OffsetVectors, sizeof(ZEVector2) * LightConstants->SampleCount);
+
+		LightConstants->ProjectionMatrix = ProjectiveLight->GetProjectionTransform() *ProjectiveLight->GetViewTransform() * Renderer->GetView().InvViewTransform;
 
 		float TanFovRange = ZEAngle::Tan(ProjectiveLight->GetFOV() * 0.5f) * ProjectiveLight->GetRange();
-		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, ProjectiveLight->GetPosition(), ProjectiveLight->GetRotation(),
+		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, ProjectiveLight->GetWorldPosition(), ProjectiveLight->GetWorldRotation(),
 			ZEVector3(TanFovRange * ProjectiveLight->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight->GetRange()));
 	LightConstantBuffer->Unlock();
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, ProjectiveLight->GetShadowMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, ProjectiveLight->GetProjectionTexture());
+	Context->SetTexture(ZEGR_ST_PIXEL, 8, RandomVectorsTexture);
 
 	Context->Draw(18, 4542);
 }
@@ -682,8 +719,8 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 	
 	ZEQuaternion::Normalize(ProjectionRotation, ProjectionRotation);
 
-	ZEMatrix3x3 RotationMatrix;
-	ZEMatrix3x3::CreateRotation(RotationMatrix, ProjectionRotation);
+	ZEMatrix4x4 RotationMatrix;
+	ZEMatrix4x4::CreateRotation(RotationMatrix, ProjectionRotation);
 
 	ZERNLightConstants* LightConstants;
 	LightConstantBuffer->Lock((void**)&LightConstants);
@@ -705,4 +742,57 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, (ZEGRTextureCube*)OmniProjectiveLight->GetProjectionTexture());
 
 	Context->Draw(936, 6);
+}
+
+ZERNStageLighting::ZERNStageLighting()
+{
+	PrevWidth = 0;
+	PrevHeight = 0;
+	SetTiledDeferred = false;
+	ShowCascades = false;
+	OutputRenderTarget = NULL;
+}
+
+bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+{
+	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	if(StageGBuffer == NULL)
+		return false;
+
+	ZEGRTexture2D* AccumulationMap = StageGBuffer->GetAccumulationMap();
+	if(AccumulationMap == NULL)
+		return false;
+
+	OutputRenderTarget = AccumulationMap->GetRenderTarget();
+
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
+
+	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
+
+	if(SetTiledDeferred)
+		return SetupTiledDeferred(Renderer, Context);
+	else
+		return SetupDeferred(Renderer, Context);
+}
+
+void ZERNStageLighting::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+{
+	Context->SetRenderTargets(0, NULL, NULL);
+
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+
+	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, NULL);
+	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, NULL);
+
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
 }

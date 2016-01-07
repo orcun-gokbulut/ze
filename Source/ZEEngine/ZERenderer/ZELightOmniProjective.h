@@ -75,6 +75,7 @@ class ZELightOmniProjective : public ZELight
 		
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0);
 

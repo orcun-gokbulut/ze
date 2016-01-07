@@ -39,11 +39,44 @@
 #include "ZEMath/ZEViewCuboid.h"
 #include "ZEMath/ZEViewFrustum.h"
 
+class ZEGRTexture2D;
+class ZEGRConstantBuffer;
+class ZEMatrix4x4;
+class ZEScene;
+
 class ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
 
+	friend class ZERNStageLighting;
+
 	private:
+		struct ZECascade
+		{
+			ZEMatrix4x4						ProjectionTransform;
+			float							NearZView;
+			float							FarZView;
+			ZEVector2						Band;
+		};
+
+		struct ZECascadeConstants
+		{
+			ZECascade						Cascades[4];
+			ZEUInt							CascadeCount;
+			ZEVector3						Reserved;
+		}CascadeConstants;
+
+		ZEGRHolder<ZEGRConstantBuffer>		CascadeConstantBuffer;
+		ZEGRHolder<ZEGRTexture2D>			CascadeShadowMaps;
+		ZEArray<ZEViewCuboid>				CascadeVolumes;
+
+		float								CascadeDistanceFactor;
+
+		void								UpdateCascadeTransforms(ZEScene* Scene, const ZERNView& View);
+		void								UpdateCascadeShadowMaps();
+
+		void								CalculateSceneBoundingBoxLight(ZEAABBox* Out, ZEScene* Scene);
+
 											ZELightDirectional();
 		virtual								~ZELightDirectional();
 
@@ -51,11 +84,17 @@ class ZELightDirectional : public ZELight
 		virtual bool						DeinitializeSelf();
 
 	public:
-		ZELightType							GetLightType() const;
+		void								SetCascadeCount(ZEUInt CascadeCount);
+		ZEUInt								GetCascadeCount() const;
 
-		ZESize								GetViewCount();
-		const ZEViewVolume&					GetViewVolume(ZESize Index = 0);
-		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
+		void								SetCascadeDistanceFactor(float CascadeDistanceFactor);
+		float								GetCascadeDistanceFactor() const;
+
+		virtual ZELightType					GetLightType() const;
+		virtual ZESize						GetViewCount();
+		virtual ZEGRTexture*				GetShadowMap(ZESize Index = 0) const;
+		virtual const ZEViewVolume&			GetViewVolume(ZESize Index = 0);
+		virtual const ZEMatrix4x4&			GetViewTransform(ZESize Index = 0);
 		virtual const ZEMatrix4x4&			GetProjectionTransform(ZESize Index = 0);
 
 		virtual bool						PreRender(const ZERNCullParameters* CullParameters);

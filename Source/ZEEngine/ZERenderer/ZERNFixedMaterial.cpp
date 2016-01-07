@@ -119,18 +119,13 @@ bool ZERNFixedMaterial::UpdateShaders()
 
 	Options.Definitions.Clear();
 
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNShadowRendering.hlsl";
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNShadowMapRendering.hlsl";
 	Options.Model = ZEGR_SM_5_0;
 
 	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNShadowRendering_GenerateShadowmap_VertexShader_Main";
+	Options.EntryPoint = "ZERNShadowMapRendering_VertexShader_Main";
 	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
-
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNShadowRendering_GenerateShadowmap_PixelShader_Main";
-	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
@@ -152,7 +147,7 @@ bool ZERNFixedMaterial::UpdateRenderState()
 		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
-	RasterizerState.SetCullDirection(TwoSided ? ZEGR_CD_NONE : RasterizerState.GetCullDirection());
+	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
 	RasterizerState.SetFillMode(Wireframe ? ZEGR_FM_WIREFRAME : ZEGR_FM_SOLID);
 	RenderState.SetRasterizerState(RasterizerState);
 	
@@ -165,7 +160,6 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
 	RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
@@ -227,7 +221,6 @@ void ZERNFixedMaterial::DeinitializeSelf()
 	StageGBuffer_RenderState.Release();
 
 	StageShadowmapGeneration_VertexShader.Release();
-	StageShadowmapGeneration_PixelShader.Release();
 	StageShadowmapGeneration_RenderState.Release();
 
 	ConstantBuffer.Release();

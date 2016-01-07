@@ -42,32 +42,34 @@
 class ZEATSun : public ZEEntity
 {
 	private:
-		ZEVector3			Color;
-		ZEVector3			Direction;
-		float				Intensity;
-		ZEATObserver		Observer;
+		ZEVector3				Color;
+		ZEVector3				Direction;
+		float					Intensity;
+		ZEATObserver			Observer;
 
-		ZEATJulian			CalculateJulians();
-		ZEATHeliocentric	CalculateHeliocentrics(double JulianEphemerisMillennium);
-		ZEATNutation		CalculateNutations(double JulianEphemerisCentury);
-		double				CalculateTrueObliquityOfEcliptic(double JulianEphemerisMillennium, double ObliquityNutation);
-		ZEATGeocentric		CalculateGeocentrics(ZEATHeliocentric Heliocentric, double LongtitudeNutation, double TrueObliquity);
-		ZEATTopocentric		CalculateTopocentrics(ZEATGeocentric Geocentric, ZEATJulian Julian, double LongtitudeNutation, double TrueObliquity, double HeliocentricRadius);
+		ZEATJulian				CalculateJulians();
+		ZEATHeliocentric		CalculateHeliocentrics(double JulianEphemerisMillennium);
+		ZEATNutation			CalculateNutations(double JulianEphemerisCentury);
+		double					CalculateTrueObliquityOfEcliptic(double JulianEphemerisMillennium, double ObliquityNutation);
+		ZEATGeocentric			CalculateGeocentrics(ZEATHeliocentric Heliocentric, double LongtitudeNutation, double TrueObliquity);
+		ZEATTopocentric			CalculateTopocentrics(ZEATGeocentric Geocentric, ZEATJulian Julian, double LongtitudeNutation, double TrueObliquity, double HeliocentricRadius);
 
 	public:
-		void				SetColor(const ZEVector3& Color);
-		const ZEVector3&	GetColor() const;
+		void					SetColor(const ZEVector3& Color);
+		const ZEVector3&		GetColor() const;
 
-		void				SetDirection(const ZEVector3& Direction);
-		const ZEVector3&	GetDirection() const;
+		void					SetDirection(const ZEVector3& Direction);
+		const ZEVector3&		GetDirection() const;
 
-		void				SetIntensity(float Intensity);
-		float				GetIntensity() const;
+		void					SetIntensity(float Intensity);
+		float					GetIntensity() const;
 
-		void				SetObserver(const ZEATObserver& Observer);
-		const ZEATObserver&	GetObserver() const;
+		void					SetObserver(const ZEATObserver& Observer);
+		const ZEATObserver&		GetObserver() const;
 
-		virtual void		Tick(float ElapsedTime);
+								ZEATSun();
 
-							ZEATSun();
+		virtual ZEDrawFlags		GetDrawFlags() const;
+
+		virtual void			Tick(float ElapsedTime);
 };

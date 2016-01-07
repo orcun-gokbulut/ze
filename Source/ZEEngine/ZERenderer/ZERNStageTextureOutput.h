@@ -40,45 +40,52 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEDS/ZEArray.h"
 
-class ZEGRTexture2D;
+class ZEGRTexture;
 class ZEGRRenderState;
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRRenderTarget;
+class ZEGRConstantBuffer;
 
 class ZERNStageTextureOutput : public ZERNStage
 {
-private:
-	ZEArray<ZEGRTexture2D*>			InputTextures;
-	ZEGRRenderTarget*				OutputRenderTarget;
+	private:
+		ZEArray<ZEGRTexture*>			InputTextures;
+		ZEGRRenderTarget*				OutputRenderTarget;
 
-	ZEGRHolder<ZEGRShader>			VertexShader;
-	ZEGRHolder<ZEGRShader>			PixelShader;
-	ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEGRHolder<ZEGRShader>			VertexShader;
+		ZEGRHolder<ZEGRShader>			PixelShader;
+		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-	ZEGRViewport					Viewports[ZEGR_MAX_VIEWPORT_SLOT];
+		ZEGRViewport					Viewports[ZEGR_MAX_VIEWPORT_SLOT];
 
-	bool							AutoSplit;
+		bool							AutoSplit;
 
-	virtual bool					InitializeSelf();
-	virtual void					DeinitializeSelf();
+		struct
+		{
+			ZEUInt						TextureIndex;
+			ZEUInt						Reserved[3];
+		}Constants;
 
-public:
-	void							SetInputs(ZEGRTexture2D** Inputs, ZESize Count);
-	ZEGRTexture2D*const*			GetInputs();
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
-	void							SetOutput(ZEGRRenderTarget* Output);
-	const ZEGRRenderTarget*			GetOutput() const;
+	public:
+		void							SetInputs(ZEGRTexture** Inputs, ZESize Count);
+		ZEGRTexture**					GetInputs();
 
-	void							SetViewports(ZEGRViewport* Viewports, ZESize Count);
-	const ZEGRViewport*				GetViewport() const;
+		void							SetViewports(ZEGRViewport* Viewports, ZESize Count);
+		const ZEGRViewport*				GetViewport() const;
 
-	void							SetAutoSplit(bool AutoSplit);
-	bool							IsAutoSplit() const;
+		void							SetAutoSplit(bool AutoSplit);
+		bool							IsAutoSplit() const;
 
-	virtual ZEInt					GetId();
-	virtual const ZEString&			GetName();
+										ZERNStageTextureOutput();
 
-	virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-	virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual ZEInt					GetId();
+		virtual const ZEString&			GetName();
+
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 };

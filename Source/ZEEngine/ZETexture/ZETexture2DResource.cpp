@@ -65,7 +65,7 @@ static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 		ZESize TargetRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
 		TextureLevels[Level].CopyTo(TargetBuffer, TargetRowPitch);
 
-		Output->UpdateSubResource(TargetBuffer, TargetRowPitch, Level);
+		Output->UpdateSubResource(TargetBuffer, 0, Level, TargetRowPitch);
 	}
 
 	delete [] TargetBuffer;
@@ -293,7 +293,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Create TextureResource 
 	ZETexture2DResource* TextureResource = new ZETexture2DResource();
-	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false);
+	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false);
 
 	if (Texture == NULL)
 	{
