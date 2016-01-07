@@ -40,7 +40,7 @@ ze_add_source(ZERSHolder.h					Sources Headers)
 ze_add_source(ZERSResource.cpp				Sources)
 ze_add_source(ZERSResource.h				Sources Headers ZEMC)
 ze_add_source(ZERSManager.cpp				Sources)
-ze_add_source(ZERSManager.h					Sources Headers)
+ze_add_source(ZERSManager.h					Sources Headers ZEMC)
 
 ze_add_library(TARGET ZEResource
 	ZEMC ${ZEMC}

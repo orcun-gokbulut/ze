@@ -38,14 +38,14 @@
 #include "ZERSManager.h"
 #include "ZEFile\ZEFileInfo.h"
 
-void ZERSResource::AddReferance()
+void ZERSResource::AddReferance() const
 {
 	ReferenceCounterLock.Lock();
 	ReferenceCount++;
 	ReferenceCounterLock.Unlock();
 }
 
-void ZERSResource::Release()
+void ZERSResource::Release() const
 {
 	ReferenceCounterLock.Lock();
 	ReferenceCount--;
@@ -223,21 +223,7 @@ ZEInt ZERSResource::GetCachePriority() const
 	return CachePriority;
 }
 
-ZEUInt ZERSResource::GetIteration()
-{
-	return Iteration;
-}
-
-void ZERSResource::LockIteration()
-{
-	IterationLock.Lock();
-}
-void ZERSResource::UnlockIteration()
-{
-	IterationLock.Unlock();
-}
-
-void ZERSResource::Wait()
+void ZERSResource::Wait() const
 {
 	WaitSignal.Wait();
 }

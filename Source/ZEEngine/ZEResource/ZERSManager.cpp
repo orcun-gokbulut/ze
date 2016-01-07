@@ -39,7 +39,7 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZERSHolder<ZERSResource> ZERSManager::GetResourceInternal(const ZEString& FilePath)
+ZERSHolder<const ZERSResource> ZERSManager::GetResourceInternal(const ZEString& FilePath)
 {
 	ZEFileInfo FileInfo(FilePath);
 	ZEString FilePathNormalized = FileInfo.Normalize();
@@ -58,29 +58,50 @@ ZERSHolder<ZERSResource> ZERSManager::GetResourceInternal(const ZEString& FilePa
 			return &Resource.GetItem();
 		}
 	}
+
+	return NULL;
 }
 
-ZERSHolder<ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions)
+void ZERSManager::RegisterResourceInternal(const ZERSResource* Resource)
+{
+	if (Resource->ManagerLink.GetInUse())
+		return;
+
+	Resources.AddEnd(&Resource->ManagerLink);
+
+	for (ZESize I = 0; I < ZERS_P_TOTAL; I++)
+		MemoryUsage[I] += Resource->GetSize((ZERSPool)I);
+}
+
+ZERSHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions)
 {
 	ManagerLock.Lock();
 
-	ZERSHolder<ZERSResource> Resource = GetResourceInternal(FilePath);
-	if (Resource != NULL)
+	ZERSHolder<const ZERSResource> AvailableResource = GetResourceInternal(FilePath);
+	if (AvailableResource != NULL)
 	{
 		ManagerLock.Unlock();
-		if (Resource->GetLoadMethod() == ZERS_LM_SYNC)
-			Resource->Wait();
-		return Resource;
+		if (AvailableResource->GetLoadMethod() == ZERS_LM_SYNC)
+			AvailableResource->Wait();
+		return AvailableResource;
 	}
 
+	ZERSHolder<ZERSResource> Resource;
 	Resource = Instanciator();
 	Resource->SetFilePath(FilePath);
-	Resources.AddEnd(&Resource->ManagerLink);
+	RegisterResourceInternal(Resource);
 
 	ManagerLock.Unlock();
 
 	if (Resource->GetLoadMethod() == ZERS_LM_SYNC)
+	{
 		Resource->LoadInternal(LoadingOptions);
+		Resource->WaitSignal.Signal();
+	}
+	else if (Resource->GetLoadMethod() == ZERS_LM_CUSTOM)
+	{
+		Resource->LoadInternal(LoadingOptions);
+	}
 	else
 	{
 		Resource->AsyncLoader.SetParameter(LoadingOptions);
@@ -90,25 +111,14 @@ ZERSHolder<ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZER
 	return Resource;
 }
 
-void ZERSManager::RegisterResource(ZERSResource* Resource)
+void ZERSManager::RegisterResource(const ZERSResource* Resource)
 {
 	ManagerLock.Lock();
-
-	if (Resource->ManagerLink.GetInUse())
-	{
-		ManagerLock.Unlock();
-		return;
-	}
-	
-	Resources.AddEnd(&Resource->ManagerLink);
-
-	for (ZESize I = 0; I < ZERS_P_TOTAL; I++)
-		MemoryUsage[I] += Resource->GetSize((ZERSPool)I);
-
+	RegisterResourceInternal(Resource);
 	ManagerLock.Unlock();
 }
 
-void ZERSManager::ReleaseResource(ZERSResource* Resource)
+void ZERSManager::ReleaseResource(const ZERSResource* Resource)
 {
 	ManagerLock.Lock();
 	if (Resource->GetReferanceCount() != 0)
@@ -130,7 +140,20 @@ void ZERSManager::ReleaseResource(ZERSResource* Resource)
 	ManagerLock.Unlock();
 }
 
-ZERSHolder<ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
+
+ZERSManager::ZERSManager()
+{
+	CacheUsage = 0;
+	CacheSize = 1024*1024*1024;
+	memset(MemoryUsage, 1, sizeof(MemoryUsage));
+}
+
+ZERSManager::~ZERSManager()
+{
+
+}
+
+ZERSHolder<const ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
 {
 	ManagerLock.Lock();
 	ze_for_each(Resource, Resources)
@@ -142,12 +165,14 @@ ZERSHolder<ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
 		}
 	}
 	ManagerLock.Unlock();
+
+	return NULL;
 }
 
-ZERSHolder<ZERSResource> ZERSManager::GetResource(const ZEString& FilePath)
+ZERSHolder<const ZERSResource> ZERSManager::GetResource(const ZEString& FilePath)
 {
 	ManagerLock.Lock();
-	ZERSHolder<ZERSResource> Resource = GetResourceInternal(FilePath);
+	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(FilePath);
 	ManagerLock.Unlock();
 	return Resource;
 }

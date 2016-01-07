@@ -65,7 +65,7 @@ class ZEList2Iterator : public ZEIterator<ZEItemType>
 
 		ZEItemType&					operator*() const;
 		ZEItemType*					operator->() const;
-
+		
 									ZEList2Iterator(ZELink<ZEItemType>* Link);
 };
 
@@ -90,7 +90,7 @@ class ZEList2IteratorConst : public ZEIteratorConst<ZEItemType>
 		ZEList2IteratorConst&		operator++();
 		const ZEItemType&			operator*() const;
 		const ZEItemType*			operator->() const;
-
+									
 									ZEList2IteratorConst(const ZELink<ZEItemType>* Link);
 };
 

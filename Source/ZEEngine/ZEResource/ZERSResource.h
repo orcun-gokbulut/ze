@@ -51,7 +51,7 @@ enum ZERSLoadMethod
 {
 	ZERS_LM_SYNC,
 	ZERS_LM_ASYNC,
-	ZERS_LM_ITERATIVE
+	ZERS_LM_CUSTOM
 };
 
 enum ZERSStatus
@@ -83,81 +83,76 @@ class ZERSResource : public ZEObject
 	template<typename ZEResourceClass>
 	friend class ZERSHolder;
 	private:
-		ZERSStatus				Status;
+		mutable ZEUInt ReferenceCount;
+		mutable ZELock ReferenceCounterLock;
+		mutable ZELink<const ZERSResource> ManagerLink;
 
-		ZEString				FilePath;
-		ZEString				FilePathNormalized;
-		ZEUInt64				Hash;
-		ZEGUID					GUID;
-		ZEUInt					ReferenceCount;
+		ZERSStatus Status;
 
-		bool					Cached;
-		ZEInt					CachePriority;
+		ZEString FilePath;
+		ZEString FilePathNormalized;
+		ZEUInt64 Hash;
+		ZEGUID GUID;
+
+		bool Cached;
+		ZEInt CachePriority;
 		
-		ZEUInt					Iteration;
-		ZEUInt					LoadProgress;
-		ZERSLoadMethod			LoadMethod;
-		ZESize					Size[ZERS_P_TOTAL];
+		ZEUInt LoadProgress;
+		ZERSLoadMethod LoadMethod;
+		ZESize Size[ZERS_P_TOTAL];
 		
 		ZEArray<ZERSHolder<ZERSResource> > SubResources;
 
-		ZELink<ZERSResource>	ManagerLink;
-		ZELock					ReferenceCounterLock;
-		ZELock					IterationLock;
-		ZESignal				WaitSignal;
-		ZETask					AsyncLoader;
+		ZESignal WaitSignal;
+		ZETask AsyncLoader;
 
-		void					AddReferance();
-		void					Release();
-		bool					AsyncLoaderFunction(ZETaskThread* TaskThread, int InstanceIndex, void* Parameters);
-
-		virtual					~ZERSResource();
+		void AddReferance() const;
+		void Release() const;
+		bool AsyncLoaderFunction(ZETaskThread* TaskThread, int InstanceIndex, void* Parameters);
 
 	protected:
-		void					AddSubResource(const ZERSHolder<ZERSResource>& Resource);
-		void					RemoveSubResource(const ZERSHolder<ZERSResource>& Resource);
+		void AddSubResource(const ZERSHolder<ZERSResource>& Resource);
+		void RemoveSubResource(const ZERSHolder<ZERSResource>& Resource);
 
-		void					SetFilePath(const ZEString& FilePath);
-		void					SetGUID(const ZEGUID& GUID);
-		void					SetSize(ZERSPool Pool, ZESize Size);
-		void					SetLoadMethod(ZERSLoadMethod Method);
-		void					SetLoadProgress(ZEUInt Size);
+		void SetFilePath(const ZEString& FilePath);
+		void SetGUID(const ZEGUID& GUID);
+		void SetSize(ZERSPool Pool, ZESize Size);
+		void SetLoadMethod(ZERSLoadMethod Method);
+		void SetLoadProgress(ZEUInt Size);
 
 		// Loading Functions
-		virtual bool			LoadInternal(const ZERSLoadingOptions* Option);
+		virtual bool LoadInternal(const ZERSLoadingOptions* Option);
 		template<typename ZEResourceClass> 
-		static ZERSResource*	Instanciator();
+		static ZERSResource* Instanciator();
 		template<typename ZEResourceClass>
 		static ZERSHolder<ZERSResource>	LoadTemplate(const ZEString& FileName, const ZERSLoadingOptions* Options = NULL);
 
-								ZERSResource();
+		virtual ~ZERSResource();
 
 	public:
-		const ZEString&			GetFilePath() const;
-		ZERSStatus				GetStatus() const;
-		ZEUInt64				GetHash() const;
-		ZEGUID					GetGUID() const;
-		ZESize					GetReferanceCount() const;
+		const ZEString& GetFilePath() const;
+		ZERSStatus GetStatus() const;
+		ZEUInt64 GetHash() const;
+		ZEGUID GetGUID() const;
+		ZESize GetReferanceCount() const;
 
-		ZESize					GetSize(ZERSPool Pool = ZERS_P_TOTAL) const;
-		ZESize					GetTotalSize(ZERSPool Pool = ZERS_P_TOTAL) const;
+		ZESize GetSize(ZERSPool Pool = ZERS_P_TOTAL) const;
+		ZESize GetTotalSize(ZERSPool Pool = ZERS_P_TOTAL) const;
 
-		ZERSLoadMethod			GetLoadMethod() const;
-		ZEUInt					GetLoadProgress() const;
+		ZERSLoadMethod GetLoadMethod() const;
+		ZEUInt GetLoadProgress() const;
 
 		const ZEArray<ZERSHolder<ZERSResource>>& GetSubResources() const;
 
-		void					SetCached(bool Enabled);
-		bool					GetCached() const;
+		void SetCached(bool Enabled);
+		bool GetCached() const;
 
-		void					SetCachePriority(ZEInt Priority);
-		ZEInt					GetCachePriority() const;
+		void SetCachePriority(ZEInt Priority);
+		ZEInt GetCachePriority() const;
 
-		ZEUInt					GetIteration();
-		void					LockIteration();
-		void					UnlockIteration();
+		void Wait() const;
 
-		void					Wait();
+		ZERSResource();
 };
 
 
@@ -173,3 +168,10 @@ ZERSHolder<ZERSResource> ZERSResource::LoadTemplate(const ZEString& FileName, co
 	zeLog("Loading resource. Resource Class: \"%s\", File Path: \"%s\".", GetClass()->GetName(), FileName.ToCString());
 	return ZERSManager::GetInstance()->LoadResource(FileName, Instanciator<ZEResourceClass>(), Options);
 }
+
+// Load Resource Normaly
+// Modify New Format
+// Async Loading
+// Iterative Loading
+	// Load Meshes Lowest Node
+	// Load M
