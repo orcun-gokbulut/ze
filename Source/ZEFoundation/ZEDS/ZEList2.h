@@ -64,6 +64,8 @@ class ZEList2
 		const ZELink<ZEItemType>*		GetLast() const;
 
 		ZEItemType*						GetItem(ZESize Index);
+		const ZEItemType*				GetItem(ZESize Index) const;
+
 		ZELink<ZEItemType>*				GetLink(ZESize Index);
 		const ZELink<ZEItemType>*		GetLink(ZESize Index) const;
 
@@ -87,7 +89,8 @@ class ZEList2
 		void							Sort();
 		void							Clean();
 
-		ZEItemType*						operator[](ZESize Index) const;
+		ZEItemType*						operator[](ZESize Index);
+		const ZEItemType*				operator[](ZESize Index) const;
 
 										ZEList2();
 										~ZEList2();
@@ -423,10 +426,17 @@ void ZEList2<ZEItemType>::Reverse()
 }
 
 template<typename ZEItemType>
-ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index) const
+ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index)
 {
 	return GetItem(Index);
 }
+
+template<typename ZEItemType>
+const ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index) const
+{
+	return GetItem(Index);
+}
+
 
 template<typename ZEItemType>
 ZEList2<ZEItemType>::ZEList2()

@@ -43,48 +43,52 @@ template<typename Type>
 class ZERSHolder
 {
 	private:
-		ZERSResource*				Resource;
+		Type* Resource;
 
 	public:
-		bool					IsNull() const;
-		Type*					GetPointer() const;
+		bool IsNull() const;
+		Type* GetPointer() const;
 
-		void					Assign(Type* RawPointer);
-		void					Release();
+		void Assign(Type* RawPointer);
+		void Release();
 
-		void					Copy(const ZERSHolder<Type>& OtherHolder);
-		Type*					Transfer();
+		void Copy(const ZERSHolder<Type>& OtherHolder);
+		Type* Transfer();
 
 		template<typename TargetType>
-		TargetType*				Cast() const;
+		TargetType* Cast() const;
 		template<typename TargetType>
-		const TargetType*		ConstCast() const;
+		const TargetType* ConstCast() const;
 
-								operator Type*() const;
-								operator const Type*() const;
 
-		// Not available unless "C++11 - Explicit Casting Operators" becomes available.
+		Type& operator*() const;
+		Type* operator->() const;
+		Type** operator&() const;
+
+		ZERSHolder<Type>& operator=(Type* Source);
+		ZERSHolder<Type>& operator=(const ZERSHolder<Type>& Source);
+
+		bool operator==(const Type* RawPointer) const;
+		bool operator==(const ZERSHolder<Type>& Pointer) const;
+		bool operator!=(const Type* RawPointer) const;
+		bool operator!=(const ZERSHolder<Type>& Pointer) const;
+
+
+		operator Type*() const;
+		operator ZERSHolder<const Type>() const;
 		#if ZE_DISABLED_CODE
-		template<typename TargetType>
-		explicit				operator TargetType*();
-		template<typename TargetType>
-		explicit				operator const TargetType*();
+		// Not available unless "C++11 - Explicit Casting Operators" becomes available.
+			template<typename TargetType>
+			explicit operator TargetType*();
+			template<typename TargetType>
+			explicit operator const TargetType*();
 		#endif
 
-		Type&					operator*() const;
-		Type*					operator->() const;
-		Type**					operator&() const;
 
-		ZERSHolder<Type>&		operator=(Type* Source);
-		ZERSHolder<Type>&		operator=(const ZERSHolder<Type>& Source);
-
-		bool					operator==(const Type* RawPointer) const;
-		bool					operator!=(const Type* RawPointer) const;
-
-								ZERSHolder();
-								ZERSHolder(Type* RawPointer);
-		explicit				ZERSHolder(const ZERSHolder<Type>& OtherHolder);
-								~ZERSHolder();
+		ZERSHolder();
+		ZERSHolder(Type* RawPointer);
+		explicit ZERSHolder(const ZERSHolder<Type>& OtherHolder);
+		~ZERSHolder();
 };
 
 template<typename Type>
@@ -152,34 +156,6 @@ const TargetType* ZERSHolder<Type>::ConstCast() const
 }
 
 template<typename Type>
-ZERSHolder<Type>::operator Type*() const
-{
-	return (Type*)Resource;
-}
-
-template<typename Type>
-ZERSHolder<Type>::operator const Type*() const
-{
-	return Resource;
-}
-
-#if ZE_DISABLED
-template<typename Type>
-template<typename TargetType>
-ZERSHolder<Type>::operator TargetType*()
-{
-	return Cast<TargetType>();
-}
-
-template<typename Type>
-template<typename TargetType>
-ZERSHolder<Type>::operator const TargetType*()
-{
-	return ConstCast<TargetType>();
-}
-#endif
-
-template<typename Type>
 Type& ZERSHolder<Type>::operator*() const
 {
 	zeDebugCheck(Resource == NULL, "Holder does not points any data structure.");
@@ -191,13 +167,6 @@ Type* ZERSHolder<Type>::operator->() const
 {
 	zeDebugCheck(Resource == NULL, "Holder does not points any data structure.");
 	return (Type*)Resource;
-}
-
-template<typename Type>
-Type** ZERSHolder<Type>::operator&() const
-{
-	zeDebugCheck(Resource == NULL, "Holder does not points any data structure.");
-	return (Type**)&Resource;
 }
 
 template<typename Type>
@@ -215,9 +184,21 @@ ZERSHolder<Type>& ZERSHolder<Type>::operator=(const ZERSHolder<Type>& Source)
 }
 
 template<typename Type>
+bool ZERSHolder<Type>::operator==(const ZERSHolder<Type>& Holder) const
+{
+	return (Resource == Holder.GetPointer());
+}
+
+template<typename Type>
 bool ZERSHolder<Type>::operator==(const Type* RawPointer) const
 {
 	return (Resource == RawPointer);
+}
+
+template<typename Type>
+bool ZERSHolder<Type>::operator!=(const ZERSHolder<Type>& Holder) const
+{
+	return (Resource != Holder.GetPointer());
 }
 
 template<typename Type>
@@ -225,6 +206,34 @@ bool ZERSHolder<Type>::operator!=(const Type* RawPointer) const
 {
 	return (Resource != RawPointer);
 }
+
+template<typename Type>
+ZERSHolder<Type>::operator Type*() const
+{
+	return (Type*)Resource;
+}
+
+template<typename Type>
+ZERSHolder<Type>::operator ZERSHolder<const Type>() const
+{
+	return ZERSHolder<const Type>((const Type*)Resource);
+}
+
+#if ZE_DISABLED
+template<typename Type>
+template<typename TargetType>
+ZERSHolder<Type>::operator TargetType*()
+{
+	return Cast<TargetType>();
+}
+
+template<typename Type>
+template<typename TargetType>
+ZERSHolder<Type>::operator const TargetType*()
+{
+	return ConstCast<TargetType>();
+}
+#endif
 
 template<typename Type>
 ZERSHolder<Type>::ZERSHolder()

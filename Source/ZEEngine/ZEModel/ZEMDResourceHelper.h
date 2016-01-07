@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESignal_Windows.cpp
+ Zinek Engine - ZEMDResourceHelper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,100 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESignal.h"
+#pragma once
 
-#include "ZEError.h"
+#include "ZETypes.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMeta\ZEObject.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
-void ZESignal::Initialize() const
+enum ZEModelResourceHelperOwnerType
 {
-	if (Handle != NULL)
-		return;
-	
-	InitializeLock.Lock();
+	ZE_MRHOT_MODEL	= 0,
+	ZE_MRHOT_MESH	= 1,
+	ZE_MRHOT_BONE	= 2
+};
 
-	Handle = CreateEvent(NULL, true, InitialState, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create signal.");
-
-	InitializeLock.Unlock();
-}
-
-void ZESignal::Signal()
+class ZEModelResourceHelper : public ZEObject
 {
-	InitializeLock.Lock();
+	ZE_OBJECT
+	friend class ZEModelResource;
+	private:
+		ZELink<ZEModelResourceHelper> Link;
 
-	if (Handle == NULL)
-	{
-		InitialState = true;
-		InitializeLock.Unlock();
-		return;
-	}
+		ZEString Name;
+		ZEModelResourceHelperOwnerType OwnerType;
+		ZEInt32 OwnerId;
+		ZEVector3 Position;
+		ZEQuaternion Rotation;
+		ZEVector3 Scale;
+		ZEString UserDefinedProperties;
 
-	if (!SetEvent(Handle))
-		zeCriticalError("Cannot set signal.");
-	
-	InitializeLock.Unlock();
-}
+	public:
+		void SetName(const ZEString& Name);
+		const ZEString& GetName() const;
 
-void ZESignal::Reset()
-{
-	InitializeLock.Lock();
+		void SetOwnerType(ZEModelResourceHelperOwnerType OwnerType);
+		ZEModelResourceHelperOwnerType GetOwnerType() const;
 
-	if (Handle == NULL)
-	{
-		InitialState = false;
-		InitializeLock.Unlock();
-		return;
-	}
+		void SetOwnerId(ZEInt32 OwnerId);
+		ZEInt32 GetOwnerId() const;
 
-	if (!ResetEvent(Handle))
-		zeCriticalError("Cannot set signal.");
+		void SetPosition(const ZEVector3& Position);
+		const ZEVector3& GetPosition() const;
 
-	InitializeLock.Unlock();
-}
+		void SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion& GetRotation() const;
 
+		void SetScale(const ZEVector3& Scale);
+		const ZEVector3& GetScale() const;
 
-void ZESignal::Wait() const
-{
-	Initialize();
+		void SetUserDefinedProperties(ZEString UserDefinedProperties);
+		ZEString GetUserDefinedProperties() const;
 
-	DWORD Result = WaitForSingleObject(Handle, INFINITE);
-	if (Result != WAIT_OBJECT_0)
-		zeCriticalError("Failed to wait the signal.");
-}
+		bool Load(const ZEMLReaderNode& HelperNode);
+		bool Save(ZEMLWriterNode& HelperNode) const;
 
-bool ZESignal::Wait(ZEUInt Milliseconds) const
-{
-	Initialize();
-
-	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
-	if (Result != WAIT_OBJECT_0)
-	{
-		if (Result == WAIT_TIMEOUT)
-			return false;
-		else
-			zeCriticalError("Failed to wait the signal.");
-	}
-
-	return true;
-}
-
-ZESignal::ZESignal()
-{
-	InitialState = false;
-	Handle = NULL;
-}
-
-ZESignal::~ZESignal()
-{
-	InitializeLock.Lock();
-	if (Handle != NULL)
-	{
-		if (!CloseHandle(Handle))
-			zeCriticalError("Can not destroy signal.");
-	}
-	InitializeLock.Unlock();
-}
+		ZEModelResourceHelper();
+};

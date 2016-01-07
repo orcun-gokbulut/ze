@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESignal_Windows.cpp
+ Zinek Engine - ZEMDResourceAnimation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,100 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESignal.h"
+#pragma once
 
-#include "ZEError.h"
+#include "ZEMeta\ZEObject.h"
 
-#define WIN32_LEAN_AND_MEAN
-#include <Windows.h>
+#include "ZETypes.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
 
-void ZESignal::Initialize() const
+class ZEMLReaderNode;
+class ZEMLWriterNode;
+
+struct ZEModelResourceAnimationKey
 {
-	if (Handle != NULL)
-		return;
-	
-	InitializeLock.Lock();
+	ZEUInt32 ItemId;
+	ZEVector3 Position;
+	ZEQuaternion Rotation;
+	ZEVector3 Scale;
+};
 
-	Handle = CreateEvent(NULL, true, InitialState, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create signal.");
-
-	InitializeLock.Unlock();
-}
-
-void ZESignal::Signal()
+struct ZEModelResourceAnimationFrame
 {
-	InitializeLock.Lock();
+	ZEArray<ZEModelResourceAnimationKey> BoneKeys;
+	ZEArray<ZEModelResourceAnimationKey> MeshKeys;
+};
 
-	if (Handle == NULL)
-	{
-		InitialState = true;
-		InitializeLock.Unlock();
-		return;
-	}
-
-	if (!SetEvent(Handle))
-		zeCriticalError("Cannot set signal.");
-	
-	InitializeLock.Unlock();
-}
-
-void ZESignal::Reset()
+class ZEModelResourceAnimation : public ZEObject
 {
-	InitializeLock.Lock();
+	ZE_OBJECT
+	friend class ZEModelResource;
+	private:
+		ZELink<ZEModelResourceAnimation> Link;
 
-	if (Handle == NULL)
-	{
-		InitialState = false;
-		InitializeLock.Unlock();
-		return;
-	}
+		ZEString Name;
+		ZEArray<ZEModelResourceAnimationFrame> Frames;
 
-	if (!ResetEvent(Handle))
-		zeCriticalError("Cannot set signal.");
+	public:
+		void SetName(const ZEString& Name);
+		const ZEString& GetName() const;
 
-	InitializeLock.Unlock();
-}
+		void SetFrames(ZEArray<ZEModelResourceAnimationFrame>& Frames);
+		const ZEArray<ZEModelResourceAnimationFrame>& GetFrames() const;
+		
+		void AddFrame(const ZEModelResourceAnimationFrame& Frame);
+		void RemoveFrame(ZESize Index);
 
+		bool Load(const ZEMLReaderNode& AnimationNode);
+		bool Save(ZEMLWriterNode& AnimationNode) const;
 
-void ZESignal::Wait() const
-{
-	Initialize();
-
-	DWORD Result = WaitForSingleObject(Handle, INFINITE);
-	if (Result != WAIT_OBJECT_0)
-		zeCriticalError("Failed to wait the signal.");
-}
-
-bool ZESignal::Wait(ZEUInt Milliseconds) const
-{
-	Initialize();
-
-	DWORD Result = WaitForSingleObject(Handle, Milliseconds);
-	if (Result != WAIT_OBJECT_0)
-	{
-		if (Result == WAIT_TIMEOUT)
-			return false;
-		else
-			zeCriticalError("Failed to wait the signal.");
-	}
-
-	return true;
-}
-
-ZESignal::ZESignal()
-{
-	InitialState = false;
-	Handle = NULL;
-}
-
-ZESignal::~ZESignal()
-{
-	InitializeLock.Lock();
-	if (Handle != NULL)
-	{
-		if (!CloseHandle(Handle))
-			zeCriticalError("Can not destroy signal.");
-	}
-	InitializeLock.Unlock();
-}
+		ZEModelResourceAnimation();
+};

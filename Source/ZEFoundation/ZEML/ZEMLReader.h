@@ -112,9 +112,9 @@ class ZEMLReaderNode
 		ZEVector2					ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero) const;
 		ZEVector3					ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero) const;
 		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero) const;
-		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero) const;
-		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero) const;
-		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero) const;
+		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Identity) const;
+		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Identity) const;
+		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Identity) const;
 		ZEString					ReadString(const char* Name, const ZEString& Default = "") const;
 
 		ZESize						ReadDataSize(const char* Name) const;

@@ -35,38 +35,45 @@
 
 #pragma once
 
+#include "ZEMeta\ZEObject.h"
 #include "ZERSResource.h"
 #include "ZEDS\ZEList2.h"
+#include "ZECommon.h"
 
 typedef ZERSResource* ZERSInstanciator();
 
-class ZERSManager
+class ZERSManager : public ZEObject
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERSManager)
+	friend class ZERSResource;
 	private:
-		friend ZERSResource;
+		ZELock ManagerLock;
+		ZEList2<const ZERSResource>	Resources;
 
-		ZELock						ManagerLock;
-		ZEList2<ZERSResource>			Resources;
-
-		ZESize						MemoryUsage[ZERS_P_TOTAL];
-		ZESize						CacheSize;
-		ZESize						CacheUsage;
+		ZESize MemoryUsage[ZERS_P_TOTAL];
+		ZESize CacheSize;
+		ZESize CacheUsage;
 		
-		ZERSHolder<ZERSResource>		GetResourceInternal(const ZEString& FilePath);
-		ZERSHolder<ZERSResource>		LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions);
+		ZERSHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
+		void RegisterResourceInternal(const ZERSResource* Resource);
+		ZERSHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions);
 
-		void						RegisterResource(ZERSResource* Resource);
-		void						ReleaseResource(ZERSResource* Resource);
+		void RegisterResource(const ZERSResource* Resource);
+		void ReleaseResource(const ZERSResource* Resource);
+									
+		ZERSManager();
+		~ZERSManager();
 
 	public:
-		ZESize						GetMemoryUsage(ZERSPool Pool = ZERS_P_TOTAL);
-		ZESize						GetCacheUsage();
+		ZESize GetMemoryUsage(ZERSPool Pool = ZERS_P_TOTAL);
+		ZESize GetCacheUsage();
 
-		void						SetCacheSize(ZESize Size);
-		ZESize						SetCacheSize();
+		void SetCacheSize(ZESize Size);
+		ZESize SetCacheSize();
 
-		ZERSHolder<ZERSResource>		GetResource(const ZEString& FilePath);
-		ZERSHolder<ZERSResource>		GetResource(const ZEGUID& GUID);
+		ZERSHolder<const ZERSResource> GetResource(const ZEString& FilePath);
+		ZERSHolder<const ZERSResource> GetResource(const ZEGUID& GUID);
 
-		static ZERSManager*	GetInstance();
+		static ZERSManager* GetInstance();
 };
