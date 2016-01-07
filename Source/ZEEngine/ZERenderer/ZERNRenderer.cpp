@@ -97,6 +97,9 @@ void ZERNRenderer::UpdateViewConstantBuffer()
 	Buffer->UpVector = View.V;
 	Buffer->FrontVector = View.N;
 
+	Buffer->ShadowDistance = View.ShadowDistance;
+	Buffer->ShadowFadeDistance = View.ShadowFadeDistance;
+
 	ViewConstantBuffer->Unlock();
 }
 
@@ -136,13 +139,21 @@ void ZERNRenderer::RenderStages()
 
 	UpdateViewConstantBuffer();
 
+	ZEGRConstantBuffer* PrevViewConstantBuffer;
+	ZEGRConstantBuffer* PrevRendererConstantBuffer;
+	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_VIEW, &PrevViewConstantBuffer);
+	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, &PrevRendererConstantBuffer);
+
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
 
-	Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
+	if(OutputRenderTarget != NULL)
+	{
+		Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
 
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
-	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
+		Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+	}
 
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
@@ -168,9 +179,8 @@ void ZERNRenderer::RenderStages()
 
 	CleanCommands();
 
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, PrevViewConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, PrevRendererConstantBuffer);
 }
 
 bool ZERNRenderer::InitializeSelf()
@@ -261,6 +271,8 @@ void ZERNRenderer::AddStage(ZERNStage* Stage)
 {
 	ZERNStageQueue Queue;
 	Queue.Stage = Stage;
+	Queue.Stage->SetOwnerRenderer(this);
+
 	StageQueues.Add(Queue);
 
 	if (IsInitialized())

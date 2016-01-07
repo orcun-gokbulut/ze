@@ -50,11 +50,6 @@ ZELightType ZELightOmniProjective::GetLightType() const
 	return ZE_LT_OMNIPROJECTIVE;
 }
 
-const ZEGRTextureCube* ZELightOmniProjective::GetShadowMap() const
-{
-	return NULL;
-}
-
 void ZELightOmniProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
 	ProjectionTextureFile = FileName;
@@ -110,6 +105,11 @@ const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index)
 	}
 
 	return ViewVolume;
+}
+
+ZEGRTexture* ZELightOmniProjective::GetShadowMap(ZESize	Index) const
+{
+	return NULL;
 }
 
 const ZEMatrix4x4& ZELightOmniProjective::GetViewTransform(ZESize Index)

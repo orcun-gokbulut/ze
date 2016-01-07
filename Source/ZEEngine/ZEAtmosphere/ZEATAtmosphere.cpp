@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageShadowmapGeneration.cpp
+ Zinek Engine - ZEATAtmosphere.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,95 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageShadowmapGeneration.h"
-#include "ZERNStageID.h"
-#include "ZERNCommand.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEATAtmosphere.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEATSun.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNStageGBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZERNRenderer.h"
 
-bool ZERNStageShadowmapGeneration::InitializeSelf()
+bool ZEATAtmosphere::InitializeSelf()
 {
+	Sun = new ZEATSun();
+	Sun->SetIntensity(15.0f);
+	Sun->SetColor(ZEVector3::One);
+	Sun->SetObserver(Observer);
+
+	AtmosphericScattering.SetLightIntensity(Sun->GetIntensity());
+	AtmosphericScattering.SetLightColor(Sun->GetColor());
+	AtmosphericScattering.SetMieScatteringStrengh(0.76f);
+	AtmosphericScattering.SetMultipleScattering(true);
+	AtmosphericScattering.SetOrderCount(5);
+
+	AtmosphericScattering.Initialize();
+
 	return true;
 }
 
-void ZERNStageShadowmapGeneration::DeinitializeSelf()
+bool ZEATAtmosphere::DeinitializeSelf()
 {
-}
+	AtmosphericScattering.Deinitialize();
 
-ZEInt ZERNStageShadowmapGeneration::GetId()
-{
-	return ZERN_STAGE_SHADOW_MAP_GENERATION;
-}
+	delete Sun;
+	Sun = NULL;
 
-const ZEString& ZERNStageShadowmapGeneration::GetName()
-{
-	static const ZEString Name = "Shadow map generation";
-	return Name;
-}
-
-bool ZERNStageShadowmapGeneration::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
-{
 	return true;
 }
 
-void ZERNStageShadowmapGeneration::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZEATAtmosphere::SetObserver(const ZEATObserver& Observer)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
+	this->Observer = Observer;
 }
 
-ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
+const ZEATObserver& ZEATAtmosphere::GetObserver() const
 {
+	return Observer;
 }
 
-const ZEGRRenderState& ZERNStageShadowmapGeneration::GetRenderState()
+void ZEATAtmosphere::SetMultipleScattering(bool MultipleScattering)
 {
-	static ZEGRRenderState RenderState;
-	static bool Initialized = false;
-	
-	if(!Initialized)
-	{
-		Initialized = true;
-
-		ZEGRRasterizerState RasterizerState;
-		RasterizerState.SetDepthBias(0.0f);
-		RasterizerState.SetDepthBiasClamp(0.0f);
-		RasterizerState.SetSlopeScaledDepthBias(1.0f);
-		RasterizerState.SetDepthClipEnable(true);
-
-		RenderState.SetRasterizerState(RasterizerState);
-		RenderState.SetDepthStencilFormat(ZEGR_TF_D32_FLOAT);
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
-	}
-
-	return RenderState;
+	AtmosphericScattering.SetMultipleScattering(MultipleScattering);
 }
 
+bool ZEATAtmosphere::GetMultipleScattering()
+{
+	return AtmosphericScattering.GetMultipleScattering();
+}
+
+ZEATAtmosphere::ZEATAtmosphere()
+{
+	Sun = NULL;
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+}
+
+ZEATAtmosphere::~ZEATAtmosphere()
+{
+	DeinitializeSelf();
+}
+
+ZEDrawFlags ZEATAtmosphere::GetDrawFlags() const
+{
+	return ZE_DF_DRAW;
+}
+
+void ZEATAtmosphere::Tick(float Time)
+{
+	Sun->Tick(Time);
+}
+
+bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
+{
+	CullParameters->Renderer->AddCommand(&Command);
+
+	return true;
+}
+
+void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	//AtmosphericScattering.SetLightDirection(Sun->GetDirection());
+	AtmosphericScattering.SetLightDirection(ZEVector3(-1.0f, -1.0f, 0.0f));
+	AtmosphericScattering.Process(Parameters->Context);
+}

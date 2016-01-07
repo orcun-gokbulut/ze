@@ -205,12 +205,13 @@ inline static D3D11_FILTER_TYPE Convert(ZEGRTextureFilter FilterMode)
 	}
 }
 
-inline static D3D11_FILTER Convert(ZEGRTextureFilter Min, ZEGRTextureFilter Mag, ZEGRTextureFilter Mip)
+inline static D3D11_FILTER Convert(ZEGRTextureFilter Min, ZEGRTextureFilter Mag, ZEGRTextureFilter Mip, bool Comparison)
 {
 	if (Min == ZEGR_TFM_ANISOTROPIC || Mag == ZEGR_TFM_ANISOTROPIC || Mip == ZEGR_TFM_ANISOTROPIC)
 		return D3D11_FILTER_ANISOTROPIC;
 
-	return (D3D11_FILTER)(	(Convert(Min) << D3D11_MIN_FILTER_SHIFT) | 
+	return (D3D11_FILTER)(	(Comparison ? D3D11_COMPARISON_FILTERING_BIT : 0) |
+							(Convert(Min) << D3D11_MIN_FILTER_SHIFT) | 
 							(Convert(Mag) << D3D11_MAG_FILTER_SHIFT) | 
 							(Convert(Mip) << D3D11_MIP_FILTER_SHIFT));
 }
@@ -231,20 +232,20 @@ inline static D3D11_FILL_MODE Convert(ZEGRFillMode FillMode)
 
 }
 
-inline static D3D11_CULL_MODE Convert(ZEGRCullDirection CullDirection)
+inline static D3D11_CULL_MODE Convert(ZEGRCullMode CullDirection)
 {
 	switch (CullDirection)
 	{
 		default:
-			zeDebugCheck(true, "Wrong ZEGRCullDirection value.");
+			zeDebugCheck(true, "Wrong ZEGRCullMode value.");
 
-		case ZEGR_CD_NONE:
+		case ZEGR_CMD_NONE:
 			return D3D11_CULL_NONE;
 
-		case ZEGR_CD_CLOCKWISE:
+		case ZEGR_CMD_FRONT:
 			return D3D11_CULL_FRONT;
 
-		case ZEGR_CD_COUNTER_CLOCKWISE:
+		case ZEGR_CMD_BACK:
 			return D3D11_CULL_BACK;
 	}
 }
@@ -423,7 +424,7 @@ ID3D11SamplerState* ZED11StatePool::CreateSamplerState(const ZEGRSamplerState& S
 	SamplerDesc.BorderColor[1] = BorderColor.y;
 	SamplerDesc.BorderColor[2] = BorderColor.z;
 	SamplerDesc.BorderColor[3] = BorderColor.w;
-	SamplerDesc.ComparisonFunc = D3D11_COMPARISON_NEVER;
+	SamplerDesc.ComparisonFunc = Convert(SamplerState.GetComparisonFunction());
 	SamplerDesc.MinLOD = SamplerState.GetMinLOD();
 	SamplerDesc.MaxLOD = SamplerState.GetMaxLOD();
 	SamplerDesc.MipLODBias = SamplerState.GetMipLODBias();
@@ -431,7 +432,7 @@ ID3D11SamplerState* ZED11StatePool::CreateSamplerState(const ZEGRSamplerState& S
 	SamplerDesc.AddressU = Convert(SamplerState.GetAddressU());
 	SamplerDesc.AddressV = Convert(SamplerState.GetAddressV());
 	SamplerDesc.AddressW = Convert(SamplerState.GetAddressW());
-	SamplerDesc.Filter = Convert(SamplerState.GetMinFilter(), SamplerState.GetMagFilter(), SamplerState.GetMipFilter());
+	SamplerDesc.Filter = Convert(SamplerState.GetMinFilter(), SamplerState.GetMagFilter(), SamplerState.GetMipFilter(), (SamplerState.GetComparisonFunction() != ZEGR_CF_NEVER));
 	
 	ID3D11SamplerState* NativeState = NULL;
 	HRESULT Result = GetDevice()->CreateSamplerState(&SamplerDesc, &NativeState);
@@ -458,15 +459,15 @@ ID3D11RasterizerState* ZED11StatePool::CreateRasterizerState(const ZEGRRasterize
 
 	D3D11_RASTERIZER_DESC RasterizerDesc;
 	memset(&RasterizerDesc, 0, sizeof(D3D11_RASTERIZER_DESC));
-	RasterizerDesc.DepthBias = 0;
-	RasterizerDesc.DepthBiasClamp = 0.0f;
-	RasterizerDesc.SlopeScaledDepthBias = 0.0f;
+	RasterizerDesc.DepthBias = RasterizerState.GetDepthBias();
+	RasterizerDesc.DepthBiasClamp = RasterizerState.GetDepthBiasClamp();
+	RasterizerDesc.SlopeScaledDepthBias = RasterizerState.GetSlopeScaledDepthBias();
 	RasterizerDesc.ScissorEnable = false;
-	RasterizerDesc.DepthClipEnable = true;
+	RasterizerDesc.DepthClipEnable = RasterizerState.GetDepthClipEnable();
 	RasterizerDesc.MultisampleEnable = false;
 	RasterizerDesc.AntialiasedLineEnable = false;
 	RasterizerDesc.FillMode = Convert(RasterizerState.GetFillMode());
-	RasterizerDesc.CullMode = Convert(RasterizerState.GetCullDirection());
+	RasterizerDesc.CullMode = Convert(RasterizerState.GetCullMode());
 	RasterizerDesc.FrontCounterClockwise = RasterizerState.GetFrontIsCounterClockwise();
 
 	ID3D11RasterizerState* NativeState = NULL;

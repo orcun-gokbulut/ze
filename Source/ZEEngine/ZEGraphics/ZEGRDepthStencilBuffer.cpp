@@ -55,6 +55,11 @@ ZEGRFormat ZEGRDepthStencilBuffer::GetFormat()
 	return Format;
 }
 
+ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
+{
+
+}
+
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	this->Width = Width;

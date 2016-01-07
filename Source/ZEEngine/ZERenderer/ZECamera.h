@@ -48,34 +48,24 @@
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
 
-enum ZECameraProjectionType
-{
-	ZE_CPT_NONE,
-	ZE_CPT_ORTHOGRAPHICAL,
-	ZE_CPT_PERSPECTIVE
-};
-
-class ZEViewPort;
-class ZEGROutput;
-
 class ZECamera : public ZEEntity
 {
 	ZE_OBJECT
+
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
-
-		ZEGRViewport					Viewport;
 		mutable ZERNView				View;
 
-		bool							AutoAspectRatio;
+		ZEGRViewport					Viewport;
 		ZEViewFrustum					ViewFrustum;
+		bool							AutoAspectRatio;
+
+										ZECamera();
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
 		virtual void					OnTransformChanged();
-
-										ZECamera();
 
 	public:
 		void							SetViewport(const ZEGRViewport& Viewport);
@@ -113,14 +103,14 @@ class ZECamera : public ZEEntity
 		const ZEMatrix4x4&				GetInvProjectionTransform();
 		const ZEMatrix4x4&				GetInvViewProjectionTransform();
 
-		virtual void					SetPosition(const ZEVector3& NewPosition);	
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-
 		const ZERNView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
 		ZEVector2						GetScreenPosition(const ZEVector3& WorldPosition);
+
+		virtual void					SetPosition(const ZEVector3& NewPosition);	
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		static ZECamera*				CreateInstance();
 };

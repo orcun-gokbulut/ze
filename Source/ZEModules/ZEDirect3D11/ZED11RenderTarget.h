@@ -48,13 +48,15 @@ class ZED11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 	friend class ZED11Texture2D;
 	friend class ZED11Texture3D;
 	friend class ZED11TextureCube;
+	friend class ZED11Context;
 
 	private:
 		ID3D11RenderTargetView*			View;
 
+										ZED11RenderTarget();
 										ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format, ID3D11RenderTargetView* RenderTargetView);
 		virtual							~ZED11RenderTarget();
 	
 	public:
-		ID3D11RenderTargetView*			GetView();
+		ID3D11RenderTargetView*			GetView() const;
 };

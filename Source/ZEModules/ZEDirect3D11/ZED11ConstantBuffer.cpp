@@ -38,8 +38,6 @@
 #include "ZEError.h"
 #include "ZED11Module.h"
 
-#include <d3d11.h>
-
 ID3D11Buffer* ZED11ConstantBuffer::GetBuffer() const
 {
 	return Buffer;

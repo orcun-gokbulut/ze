@@ -36,9 +36,9 @@
 #pragma once
 
 #include "ZETypes.h"
-#include "ZEGRTexture.h"
-#include "ZEMath\ZEVector.h"
 #include "ZEGRResource.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEGRFormat.h"
 
 class ZEGRRenderTarget : public ZEGRResource
 {
@@ -47,14 +47,15 @@ class ZEGRRenderTarget : public ZEGRResource
 		ZEUInt						Height;
 		ZEGRFormat					Format;
 
+									ZEGRRenderTarget();
 									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 		virtual						~ZEGRRenderTarget();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType();
-
 		ZEUInt						GetWidth();
 		ZEUInt						GetHeight();
 		ZEGRFormat					GetFormat();
 		ZEVector2					GetPixelSize();
+
+		virtual ZEGRResourceType	GetResourceType();
 };

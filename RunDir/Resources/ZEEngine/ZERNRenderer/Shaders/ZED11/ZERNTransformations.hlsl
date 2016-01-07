@@ -140,6 +140,13 @@ float3 ZERNTransformations_ViewportToView(float2 VectorViewport, float2 Viewport
 	return ZERNTransformations_HomogeneousToView(VectorHomogeneous, DepthHomogeneous);
 }
 
+float2 ZERNTransformations_ViewportToView(float2 VectorViewport, float2 ViewportDimensions)
+{
+	float2 VectorHomogeneous = ZERNTransformations_ViewportToHomogeneous(VectorViewport, ViewportDimensions);
+	
+	return ZERNTransformations_HomogeneousToView(VectorHomogeneous);
+}
+
 //FROM VIEW TRANSFORMATIONS
 ///////////////////////////////////////////////////////////////////////////
 

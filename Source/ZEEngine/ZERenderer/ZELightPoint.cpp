@@ -69,6 +69,11 @@ const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index)
 	return ViewVolume;
 }
 
+ZEGRTexture* ZELightPoint::GetShadowMap(ZESize Index) const
+{
+	return NULL;
+}
+
 const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index)
 {
 	return ViewTransform;

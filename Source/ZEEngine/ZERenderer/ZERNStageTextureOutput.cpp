@@ -34,20 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStageTextureOutput.h"
+
+#include "ZERNRenderer.h"
+#include "ZERNStageID.h"
+#include "ZERNStageGBuffer.h"
+#include "ZERNStageHDR.h"
+#include "ZERNStagePostProcess.h"
+
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZERNStageID.h"
-#include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGROutput.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZERNStageGBuffer.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 bool ZERNStageTextureOutput::InitializeSelf()
 {
-	ZERNStage::InitializeSelf();
-
 	ZEGRShaderCompileOptions Options;
 	Options.Model = ZEGR_SM_5_0;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTextureRendering.hlsl";
@@ -70,8 +73,7 @@ bool ZERNStageTextureOutput::InitializeSelf()
 	RenderStateData= RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set render state");
 
-	OutputRenderTarget = NULL;
-	AutoSplit = true;
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
 	return true;
 }
@@ -81,29 +83,20 @@ void ZERNStageTextureOutput::DeinitializeSelf()
 	VertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
+	ConstantBuffer.Release();
 }
 
-void ZERNStageTextureOutput::SetInputs(ZEGRTexture2D** Inputs, ZESize Count)
+void ZERNStageTextureOutput::SetInputs(ZEGRTexture** Inputs, ZESize Count)
 {
 	zeDebugCheck(Count > ZEGR_MAX_VIEWPORT_SLOT, "Count is too much");
 	
 	InputTextures.Resize(Count);
-	memcpy(&InputTextures[0], &Inputs[0], sizeof(ZEGRTexture2D*) * Count);
+	memcpy(&InputTextures[0], &Inputs[0], sizeof(ZEGRTexture*) * Count);
 }
 
-ZEGRTexture2D*const* ZERNStageTextureOutput::GetInputs()
+ZEGRTexture** ZERNStageTextureOutput::GetInputs()
 {
 	return &InputTextures[0];
-}
-
-void ZERNStageTextureOutput::SetOutput(ZEGRRenderTarget* Output)
-{
-	OutputRenderTarget = Output;
-}
-
-const ZEGRRenderTarget* ZERNStageTextureOutput::GetOutput() const
-{
-	return OutputRenderTarget;
 }
 
 void ZERNStageTextureOutput::SetViewports(ZEGRViewport* Viewports, ZESize Count)
@@ -116,6 +109,22 @@ void ZERNStageTextureOutput::SetViewports(ZEGRViewport* Viewports, ZESize Count)
 const ZEGRViewport* ZERNStageTextureOutput::GetViewport() const
 {
 	return Viewports;
+}
+
+void ZERNStageTextureOutput::SetAutoSplit(bool AutoSplit)
+{
+	this->AutoSplit = AutoSplit;
+}
+
+bool ZERNStageTextureOutput::IsAutoSplit() const
+{
+	return AutoSplit;
+}
+
+ZERNStageTextureOutput::ZERNStageTextureOutput()
+{
+	OutputRenderTarget = NULL;
+	AutoSplit = true;
 }
 
 ZEInt ZERNStageTextureOutput::GetId()
@@ -131,6 +140,10 @@ const ZEString& ZERNStageTextureOutput::GetName()
 
 bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	ZERNStageHDR* StageHDR = (ZERNStageHDR*)Renderer->GetStage(ZERN_STAGE_HDR);
+	if(StageHDR != NULL)
+		return false;
+
 	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
@@ -139,11 +152,19 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 
 	if(InputTextures.GetCount() == 0)
 	{
-		ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-		if(StageGBuffer == NULL)
-			return false;
+		ZERNStagePostProcess* StagePostProcess = (ZERNStagePostProcess*)Renderer->GetStage(ZERN_STAGE_POST_EFFECT);
+		if(StagePostProcess != NULL)
+		{
+			InputTextures.Add(StagePostProcess->GetOutputTexture());
+		}
+		else
+		{		
+			ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+			if(StageGBuffer == NULL)
+				return false;
 
-		InputTextures.Add(StageGBuffer->GetAccumulationMap());
+			InputTextures.Add(StageGBuffer->GetAccumulationMap());
+		}
 	}
 
 	Context->SetRenderState(RenderStateData);
@@ -151,9 +172,26 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 	Context->SetVertexBuffers(0, 0, NULL);
 
 	ZEUInt Count = (ZEUInt)InputTextures.GetCount();
-	for(ZEUInt I = 0; I < Count; ++I)
+	for(ZEUInt I = 0; I < Count; I++)
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, InputTextures[I]);
+		ZEGRTexture* Texture = InputTextures[I];
+		Context->SetTexture(ZEGR_ST_PIXEL, 5, Texture);
+		if(Texture->GetTextureType() == ZEGR_TT_2D)
+		{
+			ZEGRTexture2D* Texture2D = static_cast<ZEGRTexture2D*>(Texture);
+			if(Texture2D->GetArrayCount() > 1)
+			{
+				Constants.TextureIndex = I;
+				ConstantBuffer->SetData(&Constants);
+				Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+			}
+			else
+			{
+				Constants.TextureIndex = 0;
+				ConstantBuffer->SetData(&Constants);
+				Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+			}
+		}
 
 		if(AutoSplit)
 		{
@@ -181,15 +219,6 @@ void ZERNStageTextureOutput::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Contex
 	InputTextures.Clear();
 
 	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-}
-
-void ZERNStageTextureOutput::SetAutoSplit(bool AutoSplit)
-{
-	this->AutoSplit = AutoSplit;
-}
-
-bool ZERNStageTextureOutput::IsAutoSplit() const
-{
-	return AutoSplit;
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
 }

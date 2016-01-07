@@ -43,7 +43,7 @@
 #include "ZERNView.h"
 #include "ZERNCommand.h"
 
-enum ZELightType
+enum ZELightType					: ZEUInt8
 {
 	ZE_LT_NONE				= 0,
 	ZE_LT_POINT				= 1,
@@ -52,7 +52,21 @@ enum ZELightType
 	ZE_LT_OMNIPROJECTIVE	= 4
 };
 
+enum ZELightShadowResolution		: ZEUInt8
+{
+	ZE_LSR_LOW				= 0,
+	ZE_LSR_MEDIUM			= 1,
+	ZE_LSR_HIGH				= 2
+};
 
+enum ZELightShadowSampleCount		: ZEUInt8
+{
+	ZE_LSC_LOW				= 0,
+	ZE_LSC_MEDIUM			= 1,
+	ZE_LSC_HIGH				= 2
+};
+
+class ZEGRTexture;
 
 class ZELight : public ZEEntity
 {
@@ -65,7 +79,11 @@ class ZELight : public ZEEntity
 		ZEFlags							DirtyFlags;
 
 		bool							CastsShadows;
-		
+
+		ZELightShadowResolution			ShadowResolution;
+		ZELightShadowSampleCount		ShadowSampleCount;
+		float							ShadowSampleLengthOffset;
+
 		float							Range;
 		float							Intensity;
 
@@ -97,6 +115,15 @@ class ZELight : public ZEEntity
 		void							SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
 
+		void							SetShadowResolution(ZELightShadowResolution ShadowResolution);
+		ZELightShadowResolution			GetShadowResolution() const;
+
+		void							SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
+		ZELightShadowSampleCount		GetShadowSampleCount() const;
+
+		void							SetShadowSampleLengthOffset(float ShadowSampleLengthOffset);
+		float							GetShadowSampleLengthOffset() const;
+
 										ZELight();
 		virtual							~ZELight();
 
@@ -110,7 +137,11 @@ class ZELight : public ZEEntity
 
 		virtual ZELightType				GetLightType() const = 0;
 		virtual ZESize					GetViewCount() = 0;
+		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize CascadeIndex = 0) = 0;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) = 0;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) = 0;
+
+		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
+		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
 };

@@ -66,11 +66,11 @@ bool ZERNStageGBuffer::UpdateRenderTargets(ZEUInt Width, ZEUInt Height)
 
 	DeinitializeSelf();
 
-	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
-	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
-	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
-	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
+	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
 
 	RenderTargets[0] = GBuffer0->GetRenderTarget();
 	RenderTargets[1] = GBuffer1->GetRenderTarget();

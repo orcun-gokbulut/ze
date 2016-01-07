@@ -47,12 +47,18 @@ class ZERNCommand;
 class ZERNStage : public ZEInitializable
 {
 	friend class ZERNRenderer;
+
 	protected:
 		bool							Enable;
+		ZERNRenderer*					OwnerRenderer;
+
+		void							SetOwnerRenderer(ZERNRenderer* Renderer);
 
 	public:
 		void							SetEnable(bool Enable);
 		bool							GetEnable() const;
+
+		ZERNRenderer*					GetOwnerRenderer() const;
 
 		virtual ZEInt					GetId() = 0;
 		virtual const ZEString&			GetName() = 0;

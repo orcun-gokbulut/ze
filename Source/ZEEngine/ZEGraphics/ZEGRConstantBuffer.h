@@ -42,11 +42,11 @@
 class ZEGRConstantBuffer : public ZEGRResource
 {
 	protected:
-		virtual bool				Initialize(ZESize BufferSize);
-		virtual void				Deinitialize();
-
 									ZEGRConstantBuffer();
 		virtual						~ZEGRConstantBuffer();
+
+		virtual bool				Initialize(ZESize BufferSize);
+		virtual void				Deinitialize();
 
 	public:
 		ZEGRResourceType			GetResourceType();
