@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETypes.h
+ Zinek Engine - ZERNIntersections.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,31 +32,36 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#pragma once
 
-#include <stddef.h>
+#ifndef __ZERN_INTERSECTIONS_H__
+#define __ZERN_INTERSECTIONS_H__
 
-typedef signed char			ZEInt8;
-typedef signed short int	ZEInt16;
-typedef signed int			ZEInt32;
-typedef signed long long	ZEInt64;
-typedef signed int			ZEInt;
+void ZERNIntersections_RaySphere1(float3 RayOrigin, float3 RayDirection, float3 SphereCenter, float SphereRadius, out float2 StartEndDistance)
+{
+	float3 RayOrigin_SphereCenter = RayOrigin - SphereCenter;
+	float2 A = dot(RayDirection, RayDirection);
+	float2 B = 2.0f * dot(RayDirection, RayOrigin_SphereCenter);
+	float2 C = dot(RayOrigin_SphereCenter, RayOrigin_SphereCenter) - SphereRadius * SphereRadius;
+	
+	float2 Discriminant = B * B - 4.0f * A * C;
+	float2 SquareRootDiscriminant = sqrt(Discriminant);
+	
+	if(Discriminant.x >= 0.0f)
+		StartEndDistance = (-B + float2(-1.0f, 1.0f) * SquareRootDiscriminant) / (2.0f * A);
+}
 
-typedef unsigned char		ZEUInt8;
-typedef unsigned short int	ZEUInt16;
-typedef unsigned int		ZEUInt32;
-typedef unsigned long long	ZEUInt64;
-typedef unsigned int		ZEUInt;
+void ZERNIntersections_RaySphere2(float3 RayOrigin, float3 RayDirection, float3 SphereCenter, float2 SphereRadius, out float4 StartEndDistance)
+{
+	float3 RayOrigin_SphereCenter = RayOrigin - SphereCenter;
+	float2 A = dot(RayDirection, RayDirection);
+	float2 B = 2.0f * dot(RayDirection, RayOrigin_SphereCenter);
+	float2 C = dot(RayOrigin_SphereCenter, RayOrigin_SphereCenter) - SphereRadius * SphereRadius;
+	
+	float2 Discriminant = B * B - 4.0f * A * C;
+	float2 SquareRootDiscriminant = sqrt(Discriminant);
+	float2 RealRootMask = (Discriminant >= 0.0f);
+	
+	StartEndDistance = RealRootMask.xxyy * ((-B.xxyy + float4(-1.0f, 1.0f, -1.0f, 1.0f) * SquareRootDiscriminant.xxyy) / (2.0f * A.xxyy));
+}
 
-typedef size_t				ZESize;
-typedef ptrdiff_t			ZESSize;
-
-typedef ZEUInt8				ZEBYTE;
-typedef ZEUInt16			ZEWORD;
-typedef ZEUInt32			ZEDWORD;
-typedef ZEUInt64			ZEQWORD;
-
-typedef ZEUInt8				ZEBool8;
-typedef ZEUInt16			ZEBool16;
-typedef ZEUInt32			ZEBool32;
-typedef ZEUInt64			ZEBool64;
+#endif

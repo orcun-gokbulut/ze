@@ -66,9 +66,7 @@ cbuffer ZERNDeferredShading_LightConstants											: register(b8)
 	bool						ZERNDeferredShading_CastShadow;
 	uint						ZERNDeferredShading_SampleCount;
 	float						ZERNDeferredShading_SampleLengthOffset;
-	uint						ZERNDeferredShading_Reserved;
 	bool						ZERNDeferredShading_ShowCascades;
-	uint3						ZERNDeferredShading_Reserved2;
 	float4						ZERNDeferredShading_OffsetVectors[8];				//max 16 sample
 };
 

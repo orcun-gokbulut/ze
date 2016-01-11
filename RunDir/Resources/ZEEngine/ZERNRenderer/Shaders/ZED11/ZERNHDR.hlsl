@@ -55,12 +55,11 @@ cbuffer ZERNHDR_Constants								: register(b8)
 	float			ZERNHDR_WhiteLevel;
 	float			ZERNHDR_BloomFactor;
 	float			ZERNHDR_BloomThreshold;
-		
+	
 	bool			ZERNHDR_AutoKey;
 	uint			ZERNHDR_ToneMapOperator;
-	uint2			ZERNHDR_Reserved;
 	bool			ZERNHDR_BloomEnabled;
-	uint3			ZERNHDR_Reserved2;
+	uint			ZERNHDR_Reserved;
 };
 
 //static const float3	ZERNHDR_LuminanceWeights = float3(0.299f, 0.587f, 0.114f);
