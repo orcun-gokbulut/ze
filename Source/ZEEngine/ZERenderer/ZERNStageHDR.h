@@ -108,18 +108,17 @@ class ZERNStageHDR : public ZERNStage
 
 		ZERNHDRBlurTextureSize				BlurTextureSize;
 
-		struct HDRConstants
+		struct
 		{	
 			float							Key;
 			float							WhiteLevel;
 			float							BloomFactor;
 			float							BloomThreshold;
 
-			bool							AutoKey;
+			ZEBool32						AutoKey;
 			ZEUInt							ToneMapOperator;
-			ZEVector2						Reserved;
-			bool							BloomEnabled;
-			ZEVector3						Reserved2;
+			ZEBool32						BloomEnabled;
+			ZEUInt							Reserved;
 		} Constants;
 
 		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
@@ -149,14 +148,14 @@ class ZERNStageHDR : public ZERNStage
 		void								SetKey(float Value);
 		float								GetKey() const;
 
-		void								SetAutoKey(bool Enabled);
-		bool								GetAutoKey() const;
+		void								SetAutoKey(ZEBool32 Enabled);
+		ZEBool32							GetAutoKey() const;
 
 		void								SetWhiteLevel(float Value);
 		float								GetWhiteLevel() const;
 
-		void								SetBloomEnabled(bool Enabled);
-		bool								GetBloomEnabled() const;
+		void								SetBloomEnabled(ZEBool32 Enabled);
+		ZEBool32							GetBloomEnabled() const;
 
 		void								SetBloomFactor(float Value);
 		float								GetBloomFactor() const;
