@@ -87,6 +87,12 @@ ze_add_source(ZESea.cpp					Sources)
 ze_add_source(ZESea.h					Sources Headers ZEMC)
 ze_add_source(ZEFoliage.cpp				Sources)
 ze_add_source(ZEFoliage.h				Sources Headers ZEPP)
+ze_add_source(ZEGeographicEntity.cpp	Sources)
+ze_add_source(ZEGeographicEntity.h		Sources Headers ZEMC)
+ze_add_source(ZESector.cpp				Sources)
+ze_add_source(ZESector.h				Sources Headers ZEMC)
+ze_add_source(ZESectorSelector.cpp		Sources)
+ze_add_source(ZESectorSelector.h		Sources Headers ZEMC)
 
 
 ze_add_library(TARGET ZEGame 
