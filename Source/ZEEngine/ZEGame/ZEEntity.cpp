@@ -45,6 +45,7 @@
 #include "ZEEntityProvider.h"
 
 #include <string.h>
+#include "ZEMeta/ZEProvider.h"
 
 
 void ZEEntity::OnTransformChanged()
@@ -597,49 +598,71 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 
 
 bool ZEEntity::Save(ZEMLWriterNode* Serializer)
-{
-	ZEMLWriterNode EntityNode;
-	Serializer->OpenNode("Entity", EntityNode);
-		EntityNode.WriteString("Class", GetClass()->GetName());
-		ZEMLWriterNode PropertiesNode; 
-		EntityNode.OpenNode("Properties", PropertiesNode);
-			const ZEProperty* Properties = GetClass()->GetProperties();
-			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
-			{
-				const ZEProperty* Current = &Properties[I];
-				if (Current->Type.ContainerType != ZE_CT_NONE)
-					continue;
+{	
+	if (Serializer == NULL)
+		return false;
 
-				if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
-					continue;
+	ZEMLWriterNode PropertiesNode; 
+	Serializer->OpenNode("Properties", PropertiesNode);
+	
+	const ZEProperty* Properties = GetClass()->GetProperties();
 
-				if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
-					continue;
+	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
+	{
+		const ZEProperty* Current = &Properties[I];
+		if (Current->Type.ContainerType != ZE_CT_NONE)
+			continue;
 
-				if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
-					continue;
+		if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+			continue;
 
-				ZEVariant Variant;
-				GetClass()->GetProperty(this, Current->ID, Variant);
+		if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+			continue;
 
-				ZEValue Value = Variant.GetValue();
-				if (Value.IsNull())
-					continue;
+		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
+			continue;
 
-				PropertiesNode.WriteValue(Current->Name, Value);
-			}
-		PropertiesNode.CloseNode();
-	EntityNode.CloseNode();
+		ZEVariant Variant;
+		GetClass()->GetProperty(this, Current->ID, Variant);
+
+		ZEValue Value = Variant.GetValue();
+		if (Value.IsNull())
+			continue;
+
+		PropertiesNode.WriteValue(Current->Name, Value);
+	}
+	
+	PropertiesNode.CloseNode();
+
+	if (ChildEntities.GetCount() != 0)
+	{
+		ZEMLWriterNode SubEntitiesNode, EntityNode;
+		Serializer->OpenNode("ChildEntities", SubEntitiesNode);
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			SubEntitiesNode.OpenNode("Entity", EntityNode);
+			EntityNode.WriteString("Class", ChildEntities[I]->GetClass()->GetName());
+			ChildEntities[I]->Save(&EntityNode);
+			EntityNode.CloseNode();
+		}
+
+		SubEntitiesNode.CloseNode();
+	}
 	
 	return true;
 }
 
 bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 {
-	if (Unserializer->GetName() != "Entity")
+	if (Unserializer == NULL)
 		return false;
 
 	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
+
+	if (!PropertiesNode.IsValid())
+		return false;
+
 	const ZEArray<ZEMLFormatElement>& Elements = PropertiesNode.GetElements();
 
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
@@ -647,9 +670,57 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 		if (Elements[I].ElementType != ZEML_ET_PROPERTY)
 			continue;
 
-
 		if (!GetClass()->SetProperty(this, Elements[I].Name, ZEVariant(Elements[I].Value)))
 			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Elements[I].Name.ToCString());
+	}
+
+	ZEMLReaderNode SubEntitiesNode = Unserializer->GetNode("ChildEntities");
+
+	if (!SubEntitiesNode.IsValid())
+		return true;
+
+	ChildEntities.SetCount(SubEntitiesNode.GetNodeCount("Entity"));
+
+	ZEClass* NewSubEntityClass = NULL;
+	ZEEntity* NewSubEntity = NULL;
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	{
+		ZEMLReaderNode SubEntityNode = SubEntitiesNode.GetNode("Entity", I);
+
+		NewSubEntityClass = ZEProvider::GetInstance()->GetClass(SubEntityNode.ReadString("Class"));
+
+		if (NewSubEntityClass == NULL)
+		{
+			zeError("Unserialization failed. Child Entity class is not registered. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			return false;
+		}
+
+		NewSubEntity = (ZEEntity*)NewSubEntityClass->CreateInstance();
+
+		if (NewSubEntity == NULL)
+		{
+			zeError("Unserialization failed. Cannot create instance of a child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			NewSubEntity->Destroy();
+			return false;
+		}
+
+		if (!NewSubEntity->Restore(&SubEntityNode))
+		{
+			zeError("Unserialization failed. Unserialization of child entity has failed. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			NewSubEntity->Destroy();
+			return false;
+		}
+
+		ChildEntities[I] = NewSubEntity;
+
+		if (!NewSubEntity->SetOwner(this))
+		{
+			zeError("Unserialization failed. Cannot add child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			ChildEntities[I] = NULL;
+			NewSubEntity->Destroy();
+			return false;
+		}
 	}
 
 	return true;
