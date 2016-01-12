@@ -70,10 +70,15 @@ class ZEMLProperty : public ZEMLElement
 		void						SetString(const char* Value);
 		void						SetQuaternion(const ZEQuaternion& Value);
 		void						SetVector2(const ZEVector2& Value);
+		void						SetVector2d(const ZEVector2d& Value);
 		void						SetVector3(const ZEVector3& Value);
+		void						SetVector3d(const ZEVector3d& Value);
 		void						SetVector4(const ZEVector4& Value);
+		void						SetVector4d(const ZEVector4d& Value);
 		void						SetMatrix3x3(const ZEMatrix3x3& Value);
+		void						SetMatrix3x3d(const ZEMatrix3x3d& Value);
 		void						SetMatrix4x4(const ZEMatrix4x4& Value);
+		void						SetMatrix4x4d(const ZEMatrix4x4d& Value);
 
 									ZEMLProperty();
 									ZEMLProperty(const char* Name);

@@ -144,7 +144,17 @@ void ZEMLProperty::SetVector2(const ZEVector2& Value)
 	SetValue(ZEValue(Value));
 }
 
+void ZEMLProperty::SetVector2d(const ZEVector2d& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
 void ZEMLProperty::SetVector3(const ZEVector3& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetVector3d(const ZEVector3d& Value)
 {
 	SetValue(ZEValue(Value));
 }
@@ -154,12 +164,27 @@ void ZEMLProperty::SetVector4(const ZEVector4& Value)
 	SetValue(ZEValue(Value));
 }
 
+void ZEMLProperty::SetVector4d(const ZEVector4d& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
 void ZEMLProperty::SetMatrix3x3(const ZEMatrix3x3& Value)
 {
 	SetValue(ZEValue(Value));
 }
 
+void ZEMLProperty::SetMatrix3x3d(const ZEMatrix3x3d& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
 void ZEMLProperty::SetMatrix4x4(const ZEMatrix4x4& Value)
+{
+	SetValue(ZEValue(Value));
+}
+
+void ZEMLProperty::SetMatrix4x4d(const ZEMatrix4x4d& Value)
 {
 	SetValue(ZEValue(Value));
 }
