@@ -114,8 +114,8 @@ class ZEUISceneStatisticsControl : public ZEUIControl
 
 	public:
 
-		void					SetMaterial(ZEMaterial* Material);
-		ZEMaterial*				GetMaterial() const;
+		void					SetMaterial(ZERNMaterial* Material);
+		ZERNMaterial*				GetMaterial() const;
 
 		void					Draw(ZEUIRenderer* Renderer);
 		void					Tick(float ElapsedTime);

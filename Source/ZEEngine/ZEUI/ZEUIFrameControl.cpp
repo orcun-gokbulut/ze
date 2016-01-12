@@ -71,12 +71,12 @@ void ZEUIFrameControl::SetHeight(float Height)
 	Frame.Positions.SetHeight(Height);
 }
 
-ZEMaterial* ZEUIFrameControl::GetMaterial() const
+ZERNMaterial* ZEUIFrameControl::GetMaterial() const
 {
 	return FrameMaterial;
 }
 
-void ZEUIFrameControl::SetMaterial(ZEMaterial* Material)
+void ZEUIFrameControl::SetMaterial(ZERNMaterial* Material)
 {
 	FrameMaterial = (ZEUIMaterial*)Material;
 	Frame.Material = FrameMaterial;

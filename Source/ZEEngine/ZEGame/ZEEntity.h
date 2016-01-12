@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_ENTITY_H__
-#define __ZE_ENTITY_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -54,7 +52,10 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEEnumerator.h"
 
-struct ZEDrawParameters;
+struct ZERNDrawParameters;
+struct ZERNCullParameters;
+class ZERNRenderParameters;
+class ZERNCommand;
 
 // ZEDrawFlags
 typedef ZEFlags ZEDrawFlags;
@@ -62,7 +63,7 @@ typedef ZEFlags ZEDrawFlags;
 #define ZE_DF_DRAW								1
 #define ZE_DF_DRAW_COMPONENTS					2
 #define ZE_DF_LIGHT_SOURCE						4
-#define ZE_DF_LIGHT_RECIVER						8
+#define ZE_DF_LIGHT_RECEIVER					8
 #define ZE_DF_CULL								16
 #define ZE_DF_CULL_COMPONENTS					32
 #define ZE_DF_AUTO								64
@@ -206,9 +207,10 @@ class ZEEntity : public ZEObject
 		virtual bool							Restore(ZEMLReaderNode* Unserializer);
 
 		virtual void							Tick(float Time);
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
+
+		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 };
-#endif

@@ -48,21 +48,13 @@
 #define ZE_TC_BLOCK_HEIGHT	4 // Pixels
 #define ZE_PIXEL_SIZE		4 // Bytes
 
-static bool IsCompressed(ZETexturePixelFormat PixelFormat)
+static bool IsCompressed(ZEGRFormat PixelFormat)
 {
-	switch (PixelFormat)
-	{
-		case ZE_TPF_DXT1:
-		case ZE_TPF_DXT3:
-		case ZE_TPF_DXT5:
-			return true;
-			break;
-		default:
-			return false;
-			break;
-	}
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(PixelFormat);
+	if (FormatDefinition == NULL)
+		return false;
 
-	return false;
+	return FormatDefinition->Compressed;
 }
 
 static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
@@ -89,41 +81,41 @@ static ZEUInt GetDownSampleCount(ZETextureDownSampling DownSample)
 	return 0;
 }
 
-static ZETexturePixelFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionType)
+static ZEGRFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionType)
 {
 	switch (CompressionType)
 	{
 		case ZE_TCT_DXT1:
-			return ZE_TPF_DXT1;
+			return ZEGR_TF_DXT1_UNORM;
 			break;
 		case ZE_TCT_DXT3:
-			return ZE_TPF_DXT3;
+			return ZEGR_TF_DXT3_UNORM;
 			break;
 		case ZE_TCT_DXT5:
-			return ZE_TPF_DXT5;
+			return ZEGR_TF_DXT5_UNORM;
 			break;
 		default:
-			return ZE_TPF_NOTSET;
+			return ZEGR_TF_NONE;
 			break;
 	}
 
-	return ZE_TPF_NOTSET;
+	return ZEGR_TF_NONE;
 }
 
-static ZETextureCompressionType GetCompressionType(ZETexturePixelFormat PixelFormat)
+static ZETextureCompressionType GetCompressionType(ZEGRFormat PixelFormat)
 {
 	switch (PixelFormat)
 	{
-		case ZE_TPF_I8_4:
+		case ZEGR_TF_R8G8B8A8_UNORM:
 			return ZE_TCT_NONE;
 			break;
-		case ZE_TPF_DXT1:
+		case ZEGR_TF_DXT1_UNORM:
 			return ZE_TCT_DXT1;
 			break;
-		case ZE_TPF_DXT3:
+		case ZEGR_TF_DXT3_UNORM:
 			return ZE_TCT_DXT3;
 			break;
-		case ZE_TPF_DXT5:
+		case ZEGR_TF_DXT5_UNORM:
 			return ZE_TCT_DXT5;
 			break;
 		default:
@@ -191,8 +183,8 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	// Create output
 	ZEUInt DestLevelCount					= FinalOptions->MaximumMipmapLevel;
 	ZEUInt SrcSurfaceCount					= TextureData->GetSurfaceCount();
-	ZETextureType SrcTextureType			= TextureData->GetType();
-	ZETexturePixelFormat DestPixelFormat	= GetCompressedPixelFormat(FinalOptions->CompressionType) == ZE_TPF_NOTSET ? TextureData->GetPixelFormat() : GetCompressedPixelFormat(FinalOptions->CompressionType);
+	ZEGRTextureType SrcTextureType			= TextureData->GetType();
+	ZEGRFormat DestPixelFormat	= GetCompressedPixelFormat(FinalOptions->CompressionType) == ZEGR_TF_NONE ? TextureData->GetPixelFormat() : GetCompressedPixelFormat(FinalOptions->CompressionType);
 
 	ZEUInt SrcWidth			= TextureData->GetWidth();
 	ZEUInt SrcHeight		= TextureData->GetHeight();
@@ -209,7 +201,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 		// ----------------------------------------------------------------------
 		// Create single buffer and process single surface
 		// ----------------------------------------------------------------------
-		case ZE_TT_2D:
+		case ZEGR_TT_2D:
 		{
 			// Create the temp buffer
 			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
@@ -316,7 +308,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 		// ----------------------------------------------------------------------
 		// Create single buffer and process 6 surface of cube map
 		// ----------------------------------------------------------------------
-		case ZE_TT_CUBE:
+		case ZEGR_TT_CUBE:
 		{
 			// Create the temp buffer
 			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
@@ -435,7 +427,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 		// ----------------------------------------------------------------------
 		// Create double buffer & a temp TextureData to process n surface of volume texture
 		// ----------------------------------------------------------------------
-		case ZE_TT_3D:
+		case ZEGR_TT_3D:
 		{
 			// Create the temp buffer
 			ZESize BufferSize		= TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetSize();
@@ -448,7 +440,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 			void* TempSUrface3		= NULL; // 1x1 level
 
 			ZETextureData TempTextureData;
-			TempTextureData.Create(ZE_TT_3D, TextureData->GetPixelFormat(), SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
+			TempTextureData.Create(ZEGR_TT_3D, TextureData->GetPixelFormat(), SrcSurfaceCount, DestLevelCount, SrcWidth >> DownSampleCount, SrcHeight >> DownSampleCount);
 			
 			// Compress and generate MipMaps
 			if (Compress && GenerateMipmaps)
@@ -687,7 +679,7 @@ bool ZETextureQualityManager::Process(ZETextureData* Output, ZETextureData* Text
 	return false;
 }
 
-bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOptions, ZEFile* ResourceFile, const ZETextureOptions* UserOptions, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
+bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOptions, ZEFile* ResourceFile, const ZETextureOptions* UserOptions, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZEGRTextureType TextureType)
 {
 	if(UserOptions == NULL || FinalOptions == NULL)
 	{
@@ -695,7 +687,7 @@ bool ZETextureQualityManager::GetFinalTextureOptions(ZETextureOptions* FinalOpti
 		return false;
 	}
 
-	ZETextureOptions *DefaultOptions = zeGraphics->GetTextureOptions();
+	ZETextureOptions *DefaultOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	// Eliminate the auto options
 	FinalOptions->CompressionType		= (UserOptions->CompressionType == ZE_TCT_AUTO)		? DefaultOptions->CompressionType		: UserOptions->CompressionType;

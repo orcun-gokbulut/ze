@@ -37,7 +37,7 @@
 #include "ZEError.h"
 #include "ZECore/ZECore.h"
 #include "ZEUI/ZEUIManager.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZEAngle.h"
 
 #include <string.h>
@@ -51,12 +51,6 @@ ZEScene* ZEGame::GetScene()
 
 bool ZEGame::Initialize()
 {
-	if (UIManager == NULL)
-	{
-		UIManager = ZEUIManager::CreateInstance();
-		UIManager->Initialize();
-	}
-
 	if (Scene != NULL)
 	{
 		Scene->Deinitialize();
@@ -71,12 +65,6 @@ bool ZEGame::Initialize()
 
 bool ZEGame::Deinitialize()
 {
-	if (UIManager != NULL)
-	{
-		UIManager->Destroy();
-		UIManager = NULL;
-	}
-
 	if (Scene != NULL)
 	{
 		Scene->Destroy();
@@ -99,16 +87,11 @@ void ZEGame::Destroy()
 
 void ZEGame::Render(float ElapsedTime)
 {
-	Scene->Render(ElapsedTime);
-	UIManager->Render(Scene->GetRenderer());
-	Scene->GetRenderer()->Render(ElapsedTime);
-	Scene->GetRenderer()->ClearLists();
 }
 
 void ZEGame::Tick(float ElapsedTime)
 {	
 	Scene->Tick(ElapsedTime);
-	UIManager->Tick(ElapsedTime);
 }
 
 ZEGame::ZEGame()

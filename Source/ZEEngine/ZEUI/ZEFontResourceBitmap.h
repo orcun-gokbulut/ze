@@ -39,7 +39,7 @@
 
 #include "ZEFontResource.h"
 
-ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 
 class ZEFontResourceBitmap : public ZEFontResource
@@ -48,7 +48,7 @@ class ZEFontResourceBitmap : public ZEFontResource
 
 	private:
 		ZEArray<ZETexture2DResource*>		TextureResources;
-		ZEArray<const ZETexture2D*>			Textures;
+		ZEArray<const ZEGRTexture2D*>			Textures;
 		ZEArray<ZEFontCharacter>			Characters;
 
 											ZEFontResourceBitmap();

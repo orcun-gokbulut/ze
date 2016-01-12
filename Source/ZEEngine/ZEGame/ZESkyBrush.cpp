@@ -35,11 +35,9 @@
 
 #include "ZESkyBrush.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGraphics/ZESkyBoxMaterial.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZETexture/ZETextureCubeResource.h"
 
 #include <string.h>
@@ -52,9 +50,6 @@ ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 void ZESkyBrush::SetSkyBrightness(float Brightness)
 {
 	SkyBrightness = Brightness;
-
-	if (IsInitialized())
-		SkyMaterial->SetBrightness(Brightness);
 }
 
 float ZESkyBrush::GetSkyBrightness() const
@@ -65,9 +60,6 @@ float ZESkyBrush::GetSkyBrightness() const
 void ZESkyBrush::SetSkyColor(const ZEVector3& Color)
 {
 	SkyColor = Color;
-
-	if (IsInitialized())
-		SkyMaterial->SetColor(Color);
 }
 
 const ZEVector3& ZESkyBrush::GetSkyColor() const
@@ -92,10 +84,6 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 	Options.MipMapping = ZE_TMM_DISABLED;
 
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
-	
-	if (SkyMaterial != NULL)
-		SkyMaterial->SetTexture(SkyTexture == NULL ? NULL : SkyTexture->GetTexture());
-
 }
 
 const char* ZESkyBrush::GetSkyTexture() const
@@ -110,30 +98,12 @@ bool ZESkyBrush::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
-
-	if (SkyMaterial == NULL)
-	{
-		SkyMaterial = ZESkyBoxMaterial::CreateInstance();
-		SkyMaterial->UpdateMaterial();
-	}
-
-	SkyMaterial->SetColor(SkyColor);
-	SkyMaterial->SetBrightness(SkyBrightness);
-	
-	if (SkyTexture != NULL)
-		SkyMaterial->SetTexture(SkyTexture->GetTexture());
 	
 	return true;
 }
 
 bool ZESkyBrush::DeinitializeSelf()
 {
-	if (SkyMaterial != NULL)
-	{
-		SkyMaterial->Destroy();
-		SkyMaterial = NULL;
-	}
-
 	if (SkyTexture != NULL)
 	{
 		SkyTexture->Release();
@@ -141,19 +111,6 @@ bool ZESkyBrush::DeinitializeSelf()
 	}
 
 	return ZEEntity::DeinitializeSelf();
-}
-
-void ZESkyBrush::Draw(ZEDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
-		return;
-
-	if (SkyTexture != NULL)
-	{
-		SkyRenderCommand.Material = SkyMaterial;
-		SkyRenderCommand.WorldMatrix = GetWorldTransform();
-		DrawParameters->Renderer->AddToRenderList(&SkyRenderCommand);
-	}
 }
 
 void ZESkyBrush::Tick(float Time)
@@ -168,15 +125,6 @@ ZESkyBrush::ZESkyBrush()
 	SkyColor = ZEVector3::One;
 	SkyBrightness = 1.0f;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
-	
-	SkyRenderCommand.SetZero();
-	SkyRenderCommand.Priority = 1;
-	SkyRenderCommand.Order = 1.0f;
-	SkyRenderCommand.VertexBuffer = &SkyBox;
-	SkyRenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	SkyRenderCommand.PrimitiveCount = SkyBox.Vertices.GetCount() / 3;
-	SkyRenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	SkyRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
 }
 
 ZESkyBrush::~ZESkyBrush()

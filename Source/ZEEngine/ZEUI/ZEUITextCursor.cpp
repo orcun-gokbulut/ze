@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUITextCursor.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZERenderer/ZEUIMaterial.h"
 
 ZEUITextCursor::ZEUITextCursor()
 {
@@ -123,7 +123,7 @@ const ZEVector2& ZEUITextCursor::GetPosition() const
 	return Positions.LeftUp;
 }
 
-const ZEMaterial* ZEUITextCursor::GetMaterial() const
+const ZERNMaterial* ZEUITextCursor::GetMaterial() const
 {
 	return Material;
 }

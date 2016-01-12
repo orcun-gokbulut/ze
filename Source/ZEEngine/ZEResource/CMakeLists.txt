@@ -35,8 +35,6 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZERSHolder.cpp				Sources)
-ze_add_source(ZERSHolder.h					Sources Headers)
 ze_add_source(ZERSResource.cpp				Sources)
 ze_add_source(ZERSResource.h				Sources Headers ZEMC)
 ze_add_source(ZERSManager.cpp				Sources)

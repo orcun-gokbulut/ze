@@ -42,7 +42,7 @@
 #include "ZETRBlock.h"
 
 class ZETerrain;
-class ZETexture2D;
+class ZEGRTexture2D;
 class ZETRLayer;
 class ZETerrainMaterial;
 
@@ -62,7 +62,7 @@ class ZETRLevel : public ZEInitializable
 	private:
 		ZETRLayer*				Layer;
 		ZEInt					Level;
-		ZETexture2D*			Texture;
+		ZEGRTexture2D*			Texture;
 
 		ZETRLevelBlock			Blocks[3][3];
 		float					LevelScale;
@@ -86,7 +86,7 @@ class ZETRLevel : public ZEInitializable
 		ZESize					GetBlockCount();
 
 		ZETerrainMaterial*		GetMaterial();
-		ZETexture2D*			GetTexture();
+		ZEGRTexture2D*			GetTexture();
 
 		void					Process();
 

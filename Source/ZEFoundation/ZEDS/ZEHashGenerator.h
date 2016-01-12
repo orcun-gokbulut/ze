@@ -43,7 +43,7 @@
 class ZEHashGenerator
 {
 	public:
-		static ZEUInt32		Hash(void* Value, ZESize Size);
+		static ZEUInt32		Hash(const void* Value, ZESize Size);
 		static ZEUInt32		Hash(const char* String);
 		static ZEUInt32		Hash(const ZEString& String);
 };

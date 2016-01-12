@@ -38,9 +38,8 @@
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZETextureTools.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZETexture2DResource.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9TextureResizer.h"
 
 #include <windows.h>
 #include "ZEMath/ZEMath.h"
@@ -68,11 +67,11 @@ bool ZETextureTools::IsCompressible(const ZEUInt Width, const ZEUInt Height, con
 }
 
 // Surface count is used only when texture type is 3D 
-bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
+bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZEGRTextureType TextureType)
 {
 	switch (TextureType)
 	{
-		case ZE_TT_2D:
+		case ZEGR_TT_2D:
 		{
 			if (Width < 2 || Height < 2)
 			{
@@ -86,7 +85,7 @@ bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const
 			break;
 		}
 
-		case ZE_TT_CUBE:
+		case ZEGR_TT_CUBE:
 		{
 			ZEUInt TileWidth = Width / HorizTileCount;
 			ZEUInt TileHeight = Height / VertTileCount;
@@ -103,7 +102,7 @@ bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const
 			break;
 		}
 			
-		case ZE_TT_3D:
+		case ZEGR_TT_3D:
 		{
 			ZEUInt TileWidth = Width / HorizTileCount;
 			ZEUInt TileHeight = Height / VertTileCount;
@@ -130,7 +129,7 @@ bool ZETextureTools::IsResizeable(const ZEUInt Width, const ZEUInt Height, const
 }
 
 // Surface count is used only when texture type is 3D 
-ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZETextureType TextureType)
+ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount, const ZEUInt VertTileCount, const ZEGRTextureType TextureType)
 {
 	if (!IsResizeable(Width, Height, HorizTileCount, VertTileCount, TextureType))
 	{
@@ -139,14 +138,14 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 	
 	switch (TextureType)
 	{
-		case ZE_TT_2D:
+		case ZEGR_TT_2D:
 		{
 			ZEUInt MaxMipX	= (ZEUInt)(ZEMath::Log((float)Width) / ZEMath::Log(2.0f));
 			ZEUInt MaxMipY	= (ZEUInt)(ZEMath::Log((float)Height) / ZEMath::Log(2.0f));
 			return ZEMath::Min(MaxMipX, MaxMipY) + 1;
 			break;
 		}
-		case ZE_TT_CUBE:
+		case ZEGR_TT_CUBE:
 		{
 			ZEUInt TileWidth = Width / HorizTileCount;
 			ZEUInt TileHeight = Height / VertTileCount;
@@ -157,7 +156,7 @@ ZEUInt ZETextureTools::GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height
 			break;
 		}
 			
-		case ZE_TT_3D:
+		case ZEGR_TT_3D:
 		{
 			ZEUInt TileWidth = Width / HorizTileCount;
 			ZEUInt TileHeight = Height / VertTileCount;
@@ -194,11 +193,11 @@ void ZETextureTools::DownSample2x(void* DestinationData, const ZESize Destinatio
 
 	if (UseGpu)
 	{
-		static ZED3D9TextureResizer Resizer;
+/*		static ZED3D9TextureResizer Resizer;
 
 		Resizer.Initialize(DestinationData, DestinationPitch, DestinationWidth, DestinationHeight, SourceData, SourcePitch, SourceWidth, SourceHeight);
 		Resizer.Process();
-		Resizer.Deinitialize();
+		Resizer.Deinitialize();*/
 
 	}
 	else

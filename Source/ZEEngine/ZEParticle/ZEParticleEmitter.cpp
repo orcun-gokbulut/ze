@@ -39,10 +39,10 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZERandom.h"
 
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZEGame/ZERNDrawParameters.h"
 #include "ZEGame/ZEScene.h"
 
 void ZEParticleEmitter::Tick(float TimeElapsed)
@@ -531,12 +531,12 @@ const ZEVector3& ZEParticleEmitter::GetAxisOrientation() const
 	return AxisOrientation;
 }
 
-void ZEParticleEmitter::SetMaterial(ZEMaterial *Material)
+void ZEParticleEmitter::SetMaterial(ZERNMaterial *Material)
 {
 	this->Material = Material;
 }
 
-ZEMaterial* ZEParticleEmitter::GetMaterial() const
+ZERNMaterial* ZEParticleEmitter::GetMaterial() const
 {
 	return Material;
 }
@@ -782,7 +782,7 @@ void ZEParticleEmitter::Draw(ZEDrawParameters* DrawParameters)
 	RenderCommand.Material = Material;
 	RenderCommand.Priority = 1000;
 	RenderCommand.Order = 1001.0f;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 void ZEParticleEmitter::SortParticles()

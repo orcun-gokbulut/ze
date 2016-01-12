@@ -34,26 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_INTERIOR_ROOM_H__
-#define __ZE_INTERIOR_ROOM_H__
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGame/ZERayCast.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZESpatial/ZEOctree.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 class ZEInterior;
 class ZEInteriorDoor;
-struct ZEInteriorResourceRoom;
-class ZEStaticVertexBuffer;
 class ZEPhysicalMesh;
-class ZERenderer;
-struct ZEDrawParameters;
-class ZEViewVolume;
-class ZESimpleMaterial;
+class ZERNRenderer;
+class ZERNMaterial;
+class ZEGRVertexBuffer;
+class ZEGRConstantBuffer;
+class ZEGRContext;
+struct ZEInteriorResourceRoom;
+struct ZERNCullParameters;
+struct ZEExtraRenderParameters;
 
 typedef ZEFlags ZEInteriorRoomDirtyFlags;
 #define ZE_IRDF_NONE							0
@@ -71,10 +71,13 @@ class ZEInteriorRoom
 	private:
 		ZEInterior*							Owner;
 		const ZEInteriorResourceRoom*		Resource;
-		ZEStaticVertexBuffer*				VertexBuffer;
-		ZEArray<ZERenderCommand>			RenderCommands;
+		ZEArray<ZERNCommand>				RenderCommands;
 		ZEArray<ZEInteriorDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
+
+		ZEGRHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEArray<ZEExtraRenderParameters>	ExtraRenderParameters;
 
 		bool								CullPass;
 		bool								IsDrawn;
@@ -92,16 +95,6 @@ class ZEInteriorRoom
 		ZEVector3							Position;
 		ZEQuaternion						Rotation;
 		ZEVector3							Scale;
-
-		struct
-		{
-			ZESimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
-			ZERenderCommand					BoxRenderCommand;
-
-		} DebugDrawComponents;
-
-		void								DebugDraw(ZERenderer* Renderer);
 
 		bool								RayCastPoligons(const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
 		bool								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
@@ -140,11 +133,10 @@ class ZEInteriorRoom
 		void								Deinitialize();
 
 		void								SetPersistentDraw(bool Enabled);
-		void								Draw(ZEDrawParameters* DrawParameters);
-		
+		void								PreRender(const ZERNCullParameters* CullParameters);
+		void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInteriorRoom*				CreateInstance();
 };
-
-#endif

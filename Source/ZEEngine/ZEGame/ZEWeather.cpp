@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEWeather.h"
-#include "ZEGraphics\ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEScene.h"
 #include "ZEGame.h"
@@ -42,8 +42,7 @@
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
 #include "ZECloud.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEMath.h"
 
@@ -98,12 +97,12 @@ ZESkyBrush*	ZEWeather::GetStarMap() const
 	return StarMap;
 }
 
-ZEDirectionalLight* ZEWeather::GetSunLight() const
+ZELightDirectional* ZEWeather::GetSunLight() const
 {
 	return SunLight;
 }
 
-ZEDirectionalLight* ZEWeather::GetMoonLight() const
+ZELightDirectional* ZEWeather::GetMoonLight() const
 {
 	return MoonLight;
 }
@@ -121,8 +120,6 @@ float ZEWeather::GetMoonHeight() const
 void ZEWeather::SetFogFactor(float Value)
 {
 	FogFactor = Value;
-
-	((ZED3D9FrameRenderer*)zeScene->GetRenderer())->FogProcessor.SetFogFactor(Value);
 }
 
 float ZEWeather::GetFogFactor() const
@@ -282,7 +279,7 @@ bool ZEWeather::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZEWeather::Draw(ZEDrawParameters* DrawParameters)
+void ZEWeather::Draw(ZERNDrawParameters* DrawParameters)
 {
 	
 }
@@ -334,7 +331,7 @@ ZEWeather::ZEWeather()
 	ZEQuaternion::CreateFromDirection(SunRotation, SunDirection);
 
 	// Sun Light
-	SunLight = ZEDirectionalLight::CreateInstance();
+	SunLight = ZELightDirectional::CreateInstance();
 	SunLight->SetName("SunLight");
 	SunLight->SetVisible(true);
 	SunLight->SetEnabled(true);
@@ -342,7 +339,6 @@ ZEWeather::ZEWeather()
 	SunLight->SetColor(SunLightColor);
 	SunLight->SetIntensity(SunLightIntensity);
 	SunLight->SetCastsShadow(false);
-	SunLight->SetShadowFactor(0.8f);
 	SunLight->SetRange(600.0f);
 	this->AddComponent(SunLight);
 
@@ -350,7 +346,7 @@ ZEWeather::ZEWeather()
 	ZEQuaternion::CreateFromDirection(MoonRotation, -SunDirection);
 
 	// Moon Light
-	MoonLight = ZEDirectionalLight::CreateInstance();
+	MoonLight = ZELightDirectional::CreateInstance();
 	MoonLight->SetName("MoonLight");
 	MoonLight->SetEnabled(true);
 	MoonLight->SetVisible(true);

@@ -48,7 +48,9 @@
 class ZEParticleRenderer;
 class ZEParticleOperator;
 class ZEParticleGenerator;
-struct ZEDrawParameters;
+class ZERNRenderParameters;
+class ZERNCommand;
+struct ZERNCullParameters;
 
 // struct ZENewParticle
 // {
@@ -70,7 +72,6 @@ class ZEParticleSystem : public ZEObject
 	friend class ZEParticleEffect;
 
 	private:
-
 		ZEParticleEffect*						Owner;
 
 		ZEArray<ZEParticle>						ParticlePool;
@@ -82,7 +83,6 @@ class ZEParticleSystem : public ZEObject
 		ZEUInt									MaximumParticleCount;
 
 	public:
-
 		void									SetRenderer(ZEParticleRenderer* Renderer);
 		const ZEParticleRenderer*				GetRenderer() const;
 
@@ -101,8 +101,9 @@ class ZEParticleSystem : public ZEObject
 
 		const ZEParticleEffect*					GetOwner() const;
 
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-		virtual void							Tick(float ElapsedTime);
+		bool									PreRender(const ZERNCullParameters* CullParameters);
+		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		void									Tick(float ElapsedTime);
 
 												ZEParticleSystem();
 												~ZEParticleSystem();

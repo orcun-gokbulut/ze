@@ -53,7 +53,7 @@
 #include "ZEProfiler.h"
 #include "ZETimerManager.h"
 
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZESound/ZESoundModule.h"
@@ -117,11 +117,6 @@ ZEConsole* ZECore::GetConsole()
 	return Console;
 }
 
-ZEWindow* ZECore::GetWindow()
-{
-	return Window;
-}
-
 ZEModuleManager* ZECore::GetModuleManager()
 {
 	return ModuleManager;
@@ -166,13 +161,13 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 {
 	if (Module != NULL)
 	{
-		if (Module->GetDescription() != ZEGraphicsModule::Description() && Module->GetDescription()->GetParent() != ZEGraphicsModule::Description())
+		if (Module->GetDescription() != ZEGRGraphicsModule::Description() && Module->GetDescription()->GetParent() != ZEGRGraphicsModule::Description())
 		{
 			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
 				(const char*)Module->GetDescription()->GetName());
 			return false;
 		}
-		GraphicsModule = (ZEGraphicsModule*)Module;
+		GraphicsModule = (ZEGRGraphicsModule*)Module;
 	}
 	else
 		GraphicsModule = NULL;
@@ -180,7 +175,7 @@ bool ZECore::SetGraphicsModule(ZEModule* Module)
 	return true;
 }
 
-ZEGraphicsModule* ZECore::GetGraphicsModule()
+ZEGRGraphicsModule* ZECore::GetGraphicsModule()
 {
 	return GraphicsModule;
 }
@@ -447,7 +442,7 @@ bool ZECore::InitializeModules()
 	zeLog("Initializing modules.");
 
 	if (GraphicsModule == NULL)
-		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGraphicsModule::Description()));
+		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGRGraphicsModule::Description()));
 	
 	if (SoundModule == NULL)
 		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModuleInstance(ZESoundModule::Description()));
@@ -563,13 +558,6 @@ bool ZECore::StartUp(void* WindowHandle)
 	zeLog("Loading ZEMeta classes.");
 	LoadClasses();
 
-	zeLog("Initializing main window...");
-	if (WindowHandle != NULL)
-		Window->SetComponentWindowHandle(WindowHandle);
-
-	if (Window->Initialize() == false)
-		zeCriticalError("Can not create main window.");
-
 	zeLog("Initializing Modules...");
 	if (!InitializeModules())
 		zeCriticalError("Can not initialize modules.");
@@ -638,9 +626,7 @@ void ZECore::ShutDown()
 		PhysicsModule->Destroy();
 	}
 
-	Window->Deinitialize();
 	zeLog("Core deinitialized.");
-
 	zeLog("Terminating engine.");
 
 	CrashHandler->Deinitialize();
@@ -666,24 +652,21 @@ void ZECore::MainLoop()
 	// Game Logic
 	InputModule->Process();
 
-	if (Game != NULL)
-		Game->Tick(FrameTime);
-	
 	if (Application != NULL)
 		Application->Process(FrameTime);
-	Game->GetScene()->GetPhysicalWorld()->Draw(Game->GetScene()->GetRenderer());
+
+	if (Game != NULL)
+		Game->Tick(FrameTime);
 
 	// Engine Logic
 	PhysicsModule->Process(FrameTime);
 	SoundModule->ProcessSound(FrameTime);
-	GraphicsModule->ClearFrameBuffer();
 	if (Game != NULL)
 		Game->Render(FrameTime);
-	GraphicsModule->UpdateScreen();
 	PhysicsModule->UpdateWorlds();
 
 	if (Application != NULL)
-		Application->PostProcess();
+		Application->PostProcess(FrameTime);
 }
 
 void ZECore::Run()
@@ -731,12 +714,11 @@ ZECore::ZECore()
 	ModuleManager			= new ZEModuleManager();
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
-	Window					= new ZEWindow();
 	Game					= new ZEGame();
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 
-	ZEGraphicsModule::BaseInitialize();
+	ZEGRGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
 	ZEInputModule::BaseInitialize();
 
@@ -745,12 +727,11 @@ ZECore::ZECore()
 ZECore::~ZECore()
 {
 	
-	ZEGraphicsModule::BaseDeinitialize();
+	ZEGRGraphicsModule::BaseDeinitialize();
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 
 	delete Game;
-	delete Window;
 	delete PluginManager;
 	delete ExtensionManager;
 	delete ModuleManager;

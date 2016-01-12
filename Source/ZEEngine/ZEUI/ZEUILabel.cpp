@@ -35,7 +35,7 @@
 
 #include "ZEUILabel.h"
 #include "ZEFontResource.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 
 void ZEUILabel::UpdateCharacters()
 {

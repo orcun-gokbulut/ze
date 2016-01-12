@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZETextureData.h"
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZEConsole.h"
@@ -50,22 +50,25 @@
 #include <stdio.h>
 #include <string.h>
 
-static void CopyToTexture2D(ZETexture2D* Output, ZETextureData* TextureData)
+static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 {
-	ZEUInt LevelCount = TextureData->GetLevelCount();
-	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Output->GetFormat());
+	ZESize Size = Output->GetWidth() * Output->GetHeight() * FormatDefinition->BlockSize;
 
-	// Copy texture data into ZETexture2D
-	void* TargetBuffer = NULL;
-	ZESize TargetPitch = 0;
+	void* TargetBuffer = new unsigned char[Size];
+	ZEUInt Width = Output->GetWidth();
 
-	// There is one surface (surface 0) and n MipMaps
-	for(ZESize Level = 0; Level < (ZESize)LevelCount; Level++)
+	ZESize LevelCount = (ZESize)TextureData->GetLevelCount();
+	ZEArray<ZETextureLevel>& TextureLevels = TextureData->GetSurfaces().GetItem(0).GetLevels();
+	for(ZESize Level = 0; Level < 1; Level++)
 	{
-		Output->Lock(&TargetBuffer, &TargetPitch, (ZEUInt)Level);
-		TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetPitch);
-		Output->Unlock((ZEUInt)Level);
+		ZESize TargetRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
+		TextureLevels[Level].CopyTo(TargetBuffer, TargetRowPitch);
+
+		Output->UpdateSubResource(TargetBuffer, 0, Level, TargetRowPitch);
 	}
+
+	delete [] TargetBuffer;
 }
 
 const char* ZETexture2DResource::GetResourceType() const
@@ -73,12 +76,17 @@ const char* ZETexture2DResource::GetResourceType() const
 	return "Texture Resource";
 }
 
-ZETextureType ZETexture2DResource::GetTextureType() const 
+ZEGRTextureType ZETexture2DResource::GetTextureType() const
 {
-	return ZE_TT_2D;
+	return ZEGR_TT_2D;
 }
 
-const ZETexture2D* ZETexture2DResource::GetTexture() const
+ZEGRTexture* ZETexture2DResource::GetTexture() const
+{
+	return Texture;
+}
+
+ZEGRTexture2D* ZETexture2DResource::GetTexture2D() const
 {
 	return Texture;
 }
@@ -100,7 +108,7 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& Fil
 	if(NewResource == NULL)
 	{		
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if(NewResource != NULL)
@@ -129,7 +137,7 @@ void ZETexture2DResource::CacheResource(const ZEString& FileName, const ZETextur
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
@@ -150,7 +158,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	if(Result)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		TextureResource = LoadResource(&File, UserOptions);
 		File.Close();
@@ -167,7 +175,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
 	if(UserOptions == NULL)
-		UserOptions = zeGraphics->GetTextureOptions();
+		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	ZETextureData	TextureData;
 	ZETextureData	ProcessedTextureData;
@@ -183,7 +191,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	bool IdentifierExists	= false;
 
 	// Decide final texture options
-	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 1, 1, ZE_TT_2D);
+	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 1, 1, ZEGR_TT_2D);
 	
 	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
@@ -285,23 +293,24 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Create TextureResource 
 	ZETexture2DResource* TextureResource = new ZETexture2DResource();
-	ZETexture2D* Texture = TextureResource->Texture = ZETexture2D::CreateInstance();
+	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false);
+
+	if (Texture == NULL)
+	{
+		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
+		ProcessedTextureData.Destroy();
+		delete TextureResource;
+		return NULL;
+	}
 
 	// Set Other Variables
 	TextureResource->SetFileName(ResourceFile->GetPath());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
-	// Create the Texture
-	if(!Texture->Create(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false))
-	{
-		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
-		TextureData.Destroy();
-		delete TextureResource;
-		return NULL;
-	}
-
 	CopyToTexture2D(Texture, FinalTextureData);
+
+	Texture->GenerateMipMaps();
 
 	FinalTextureData = NULL;
 	ProcessedTextureData.Destroy();

@@ -36,7 +36,7 @@
 #include "ZETRPrimitives.h"
 
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEVertexDeclaration.h"
 #include "ZERandom.h"
 
@@ -54,7 +54,7 @@ static void CreateQuad(ZETRVertex* Output, ZEInt x, ZEInt y)
 bool ZETRPrimitiveBuffer::CreateVertexDeclaration()
 {
 	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
-	ZEVertexElement Elements[] = 
+	ZEGRVertexElement Elements[] = 
 	{
 		{ZE_VES_POSITION, ZE_VET_FLOAT3, 0}
 	};
@@ -332,7 +332,7 @@ ZEUInt ZETRPrimitiveBuffer::GetPrimitiveSize()
 	return PrimitiveSize;
 }
 
-ZEVertexBuffer* ZETRPrimitiveBuffer::GetVertexBuffer()
+ZEGRVertexBuffer* ZETRPrimitiveBuffer::GetVertexBuffer()
 {
 	return VertexBuffer;
 }

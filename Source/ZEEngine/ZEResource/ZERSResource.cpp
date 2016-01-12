@@ -64,7 +64,7 @@ ZERSResource::~ZERSResource()
 
 }
 
-void ZERSResource::AddSubResource(const ZERSHolder<ZERSResource>& Resource)
+void ZERSResource::AddSubResource(const ZEHolder<ZERSResource>& Resource)
 {
 	if (SubResources.Exists(Resource))
 		return;
@@ -72,7 +72,7 @@ void ZERSResource::AddSubResource(const ZERSHolder<ZERSResource>& Resource)
 	SubResources.Add(Resource);
 }
 
-void ZERSResource::RemoveSubResource(const ZERSHolder<ZERSResource>& Resource)
+void ZERSResource::RemoveSubResource(const ZEHolder<ZERSResource>& Resource)
 {
 	SubResources.RemoveValue(Resource);
 }
@@ -198,7 +198,7 @@ ZEUInt ZERSResource::GetLoadProgress() const
 	return (LoadProgress + TotalProgress) / ((ZEUInt)SubResources.GetCount() + 1);
 }
 
-const ZEArray<ZERSHolder<ZERSResource>>& ZERSResource::GetSubResources() const
+const ZEArray<ZEHolder<ZERSResource>>& ZERSResource::GetSubResources() const
 {
 	return SubResources;
 }

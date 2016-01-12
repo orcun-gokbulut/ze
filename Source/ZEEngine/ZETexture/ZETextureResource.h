@@ -39,7 +39,7 @@
 
 #include "ZECore/ZEResource.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZETextureOptions.h"
 
 class ZEFileCacheManager
@@ -54,7 +54,8 @@ class ZETextureResource : public ZEResource
 	ZE_OBJECT
 
 	public:
-		virtual ZETextureType				GetTextureType() const = 0;
+		virtual ZEGRTextureType				GetTextureType() const = 0;
+		virtual ZEGRTexture*				GetTexture() const = 0;
 };
 
 #endif

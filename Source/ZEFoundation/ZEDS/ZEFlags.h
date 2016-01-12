@@ -33,8 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_FLAGS_H__
-#define __ZE_FLAGS_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZEError.h"
@@ -215,4 +214,3 @@ class ZEFlagsBase
 
 typedef ZEFlagsBase<ZEUInt> ZEFlags;
 
-#endif

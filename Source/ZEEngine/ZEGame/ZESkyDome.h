@@ -34,12 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKY_DOME_H__
-#define __ZE_SKY_DOME_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics\ZECanvas.h"
-#include "ZEGraphics\ZERenderCommand.h"
+#include "ZERenderer\ZECanvas.h"
+#include "ZERenderer\ZERNCommand.h"
 #include "ZETypes.h"
 
 ZE_META_FORWARD_DECLARE(ZESkyDomeMaterial, "ZEGraphics/ZESkyDomeMaterial.h")
@@ -70,7 +68,7 @@ class ZESkyDome : public ZEEntity
 														// with a fixed camera height. No need to use real time camera position.
 		ZECanvas				SkyDomeGeometry;
 		ZESkyDomeMaterial*		SkyDomeMaterial;
-		ZERenderCommand			SkyDomeRenderCommand;
+		ZERNCommand			SkyDomeRenderCommand;
 
 		virtual bool			InitializeSelf();
 		virtual bool			DeinitializeSelf();
@@ -119,10 +117,7 @@ class ZESkyDome : public ZEEntity
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
-		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
 
 		static ZESkyDome*		CreateInstance();
 };
-
-#endif // __ZE_SKY_DOME_H__

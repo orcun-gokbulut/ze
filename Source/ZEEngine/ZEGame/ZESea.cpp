@@ -34,21 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESea.h"
-#include "ZEGraphics/ZEVertexDeclaration.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZESeaMaterial.h"
-#include "ZEGraphics/ZETexture2D.h"
-#include "ZEDrawParameters.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEEntityProvider.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEMath/ZEMath.h"
 
 ZESea::ZESea()
 {
-	Material = ZESeaMaterial::CreateInstance();
+	/*Material = ZESeaMaterial::CreateInstance();
 	SetScale(ZEVector3::One * 200);
 	
 	ZETextureOptions Options;
@@ -59,8 +56,8 @@ ZESea::ZESea()
 	Options.MipMapping = ZE_TMM_ENABLED;
 	Options.MaximumMipmapLevel = 14;
 
-	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaDiffuse.jpg", &Options)->GetTexture());
-	SetNormalTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaNormal.jpg", &Options)->GetTexture());
+	SetDiffuseTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaDiffuse.jpg", &Options)->GetTexture2D());
+	SetNormalTexture(ZETexture2DResource::LoadSharedResource("#R:/ZEEngine/Sea/SeaNormal.jpg", &Options)->GetTexture2D());
 
 	DiffuseVelocity = ZEVector2::One;
 	NormalVelocity	= -ZEVector2::One;
@@ -73,7 +70,7 @@ ZESea::ZESea()
 
 	VertexDeclaration = ZEVertexDeclaration::CreateInstance();
 
-	ZEVertexElement ElementArray[] = {
+	ZEGRVertexElement ElementArray[] = {
 		{ZE_VES_POSITION, ZE_VET_FLOAT4, 0},
 		{ZE_VES_TEXTCOORD, ZE_VET_FLOAT2, 0},
 		{ZE_VES_NORMAL, ZE_VET_FLOAT3, 0},
@@ -139,7 +136,7 @@ ZESea::ZESea()
 		Vertices[5].Tangent = ZEVector3::UnitZ;
 		Vertices[5].TextureCoordinate = ZEVector2(0.0f, 1.0f);
 		*/
-		
+		/*
 		Vertices[0].Position = ZEVector4(-0.5f, 0.0f, 0.5f, 1.0f);
 		Vertices[0].Normal = ZEVector3::UnitY;
 		Vertices[0].BiNormal = ZEVector3::UnitX;
@@ -177,105 +174,20 @@ ZESea::ZESea()
 		Vertices[5].TextureCoordinate = ZEVector2(0.0f, 1.0f);
 	}
 
-	VertexBuffer->Unlock();
+	VertexBuffer->Unlock();*/
 }
 
 ZESea::~ZESea()
 {
-	Material->Destroy();
-}
 
-void ZESea::SetAmbientColor(const ZEVector3& Color)
-{
-	Material->SetAmbientColor(ZEVector4(Color, 1.0f));
-}
-
-ZEVector3 ZESea::GetAmbientColor() const
-{
-	return Material->GetAmbientColor().ToVector3();
-}
-
-void ZESea::SetAmbientFactor(float Factor)
-{
-	Material->SetAmbientFactor(Factor);
-}
-
-float ZESea::GetAmbientFactor() const
-{
-	return Material->GetAmbientFactor();
-}
-
-void ZESea::SetDiffuseVelocity(const ZEVector2& Velocity)
-{
-	DiffuseVelocity = Velocity;
-}
-
-ZEVector2 ZESea::GetDiffuseVelocity() const
-{
-	return DiffuseVelocity;
-}
-
-void ZESea::SetNormalVelocity(const ZEVector2& Velocity)
-{
-	NormalVelocity = Velocity;
-}
-
-ZEVector2 ZESea::GetNormalVelocity() const
-{
-	return NormalVelocity;
-}
-
-void ZESea::SetDiffuseTexture(const ZETexture2D* Texture)
-{
-	Material->SetDiffuseTexture(Texture);
-}
-
-void  ZESea::SetNormalTexture(const ZETexture2D* Texture)
-{
-	Material->SetNormalTexture(Texture);
 }
 
 void ZESea::Tick(float ElapsedTime)
 {
-	if(Material->GetGlobalAmbientEnabled())
-	{
-		SetAmbientFactor(zeScene->GetAmbientFactor());
-		SetAmbientColor(zeScene->GetAmbientColor());
-	}
-
 	DiffuseOffset += DiffuseVelocity * ElapsedTime;
 	NormalOffset += NormalVelocity * ElapsedTime;
 
-	Material->DiffuseTextureOffset = DiffuseOffset;
-	Material->NormalTextureOffset = NormalOffset;
-	Material->EntityXZScale.x = GetScale().x;
-	Material->EntityXZScale.y = GetScale().z;
-	Material->NormalTextureTile = NormalTextureTile;
-	Material->DiffuseTextureTile = DiffuseTextureTile;
-
 	ZEEntity::Tick(ElapsedTime);
-}
-
-void ZESea::Draw(ZEDrawParameters* DrawParameters)
-{
-	
-	Command.SetZero();
-
-	Command.Material = Material;
-	Command.PrimitiveType = ZE_ROPT_TRIANGLE;
-	Command.PrimitiveCount = 2;
-	Command.WorldMatrix = GetWorldTransform();
-	Command.VertexBuffer = VertexBuffer;
-	Command.VertexBufferOffset = 0;
-	Command.VertexDeclaration = VertexDeclaration;
-	Command.Order = 100.0f;
-	Command.Priority = 1;
-	Command.IndexBuffer = NULL;
-	Command.Pipeline = ZE_RORP_3D;
-	Command.PrimitiveParameters = 0;
-	Command.Flags = 0;
-
-	DrawParameters->Renderer->AddToRenderList(&Command);
 }
 
 ZEDrawFlags ZESea::GetDrawFlags() const
@@ -286,76 +198,6 @@ ZEDrawFlags ZESea::GetDrawFlags() const
 ZESea* ZESea::CreateInstance()
 {
 	return new ZESea();
-}
-
-void ZESea::SetDiffuseTile(const ZEVector2& Tile)
-{
-	DiffuseTextureTile = Tile;
-}
-
-ZEVector2 ZESea::GetDiffuseTile() const
-{
-	return DiffuseTextureTile;
-}
-
-void ZESea::SetDiffuseColor(const ZEVector3& Color)
-{
-	Material->SetDiffuseColor(ZEVector4(Color, 1.0f));
-}
-
-ZEVector3 ZESea::GetDiffuseColor() const
-{
-	return Material->GetDiffuseColor().ToVector3();
-}
-
-void ZESea::SetDiffuseFactor(float Factor)
-{
-	Material->SetDiffuseFactor(Factor);
-}
-
-float ZESea::GetDiffuseFactor() const
-{
-	return Material->GetDiffuseFactor();
-}
-
-void ZESea::SetSpecularFactor(float Factor)
-{
-	Material->SetSpecularFactor(Factor);
-}
-
-float ZESea::GetSpecularFactor() const
-{
-	return Material->GetSpecularFactor();
-}
-
-void ZESea::SetSpecularShineness(float Shineness)
-{
-	Material->SetSpecularShineness(Shineness);
-}
-
-float ZESea::GetSpecularShineness() const
-{
-	return Material->GetSpecularShineness();
-}
-
-void ZESea::SetSpecularColor(const ZEVector3& Color)
-{
-	Material->SetSpecularColor(ZEVector4(Color, 1.0f));
-}
-
-ZEVector3 ZESea::GetSpecularColor() const
-{
-	return Material->GetSpecularColor().ToVector3();
-}
-
-void ZESea::SetNormalTile(const ZEVector2& Tile)
-{
-	NormalTextureTile = Tile;
-}
-
-ZEVector2 ZESea::GetNormalTile() const
-{
-	return NormalTextureTile;
 }
 
 bool ZESea::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

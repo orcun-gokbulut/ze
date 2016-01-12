@@ -37,9 +37,9 @@
 #ifndef __ZE_UI_FRAME_CONTROL__
 #define __ZE_UI_FRAME_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUIRectangle.h"
+#include "ZERenderer/ZEUIMaterial.h"
 
 class ZEUIFrameControl : public ZEUIControl
 {
@@ -63,8 +63,8 @@ class ZEUIFrameControl : public ZEUIControl
 		virtual void		SetWidth(float Width);
 		virtual void		SetHeight(float Height);
 
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZERNMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZERNMaterial* Material);
 
 		virtual void		SetPosition(const ZEVector2& Position);
 

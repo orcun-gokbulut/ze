@@ -83,6 +83,11 @@ bool ZEMLReaderNode::Load()
 	return true;
 };
 
+const ZEFile* ZEMLReaderNode::GetFile() const
+{
+	return File;
+}
+
 const ZEString& ZEMLReaderNode::GetName() const
 {
 	return Node.Name;

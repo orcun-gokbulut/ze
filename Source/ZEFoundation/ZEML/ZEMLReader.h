@@ -84,9 +84,12 @@ class ZEMLReaderNode
 		bool						Load();
 		 
 	public:
+		const ZEFile*						GetFile() const;
 		const ZEString&						GetName() const;
 		const ZEArray<ZEMLFormatElement>&	GetElements() const;
 
+		const ZESmartArray<ZEMLReaderSubNode>& GetSubNodes();
+		const ZESmartArray<ZEMLReaderProperty>& GetProperties();	
 		ZESize						GetNodeCount() const;
 		ZESize						GetNodeCount(const char* Name) const;
 

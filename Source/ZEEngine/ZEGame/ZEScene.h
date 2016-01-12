@@ -38,10 +38,7 @@
 #define __ZE_SCENE_H__
 
 #include "ZEDS/ZEArray.h"
-#include "ZESceneDebugDraw.h"
-#include "ZESceneCuller.h"
 #include "ZETypes.h"
-#include "ZEDrawParameters.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZERayCast.h"
 
@@ -55,6 +52,7 @@ ZE_META_FORWARD_DECLARE(ZEInteriorResource,	"ZEInterior/ZEInteriorResource.h")
 ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
 
 class ZEPhysicalWorld;
+class ZERNRenderer;
 
 #define ZE_RCF_ENTITY							1
 #define ZE_RCF_COMPONENT						2
@@ -70,23 +68,11 @@ class ZEScene : public ZEObject
 
 	private:
 		bool									Initialized;
-
 		ZEUInt									LastEntityId;
-
-		ZESceneCuller							Culler;
-
 		ZESmartArray<ZEEntity*>					Entities;
-
 		ZEPhysicalWorld*						PhysicalWorld;
-
-		ZEDrawParameters						FrameDrawParameters;
-
-		ZEFrameRenderer*						Renderer;
-		ZEShadowRenderer*						ShadowRenderer;
-		ZEPostProcessor*						PostProcessor;
 		ZECamera*								ActiveCamera;
 		ZEListener*								ActiveListener;
-
 		bool									Enabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
@@ -102,8 +88,8 @@ class ZEScene : public ZEObject
 
 		void									ClearEntities();
 
-		ZERenderer*								GetRenderer();
-		ZERenderer*								GetShadowRenderer();
+		ZERNRenderer*							GetRenderer();
+		ZERNRenderer*							GetShadowRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);
@@ -114,9 +100,6 @@ class ZEScene : public ZEObject
 
 		void									SetEnabled(bool Enabled);
 		bool									GetEnabled() const;
-
-		ZESceneCuller&							GetSceneCuller();
-		const ZESceneStatistics&				GetStatistics() const;
 
 		bool									Save(const ZEString& FileName);
 		bool									Load(const ZEString& FileName);

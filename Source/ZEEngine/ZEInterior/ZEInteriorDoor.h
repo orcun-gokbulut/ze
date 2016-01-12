@@ -38,16 +38,16 @@
 #define __ZE_INTERIOR_DOOR_H__
 
 #include "ZEMath/ZERectangle3D.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZERenderer/ZECanvas.h"
 
 class ZEInterior;
 class ZEInteriorRoom;
 struct ZEInteriorResourceDoor;
-class ZESimpleMaterial;
+class ZERNSimpleMaterial;
 class ZECanvas;
-class ZERenderer;
-class ZERenderCommand;
+class ZERNRenderer;
+class ZERNCommand;
 
 class ZEInteriorDoor
 {
@@ -72,14 +72,14 @@ class ZEInteriorDoor
 
 		struct
 		{
-			ZESimpleMaterial*				Material;
+			ZERNSimpleMaterial*				Material;
 			ZECanvas						BoxCanvas;
-			ZERenderCommand					BoxRenderCommand;
+			ZERNCommand					BoxRenderCommand;
 
 		} DebugDrawComponents;
 
 
-		void							DebugDraw(ZERenderer* Renderer);
+		void							DebugDraw(ZERNRenderer* Renderer);
 		void							CalculateRectangle();
 
 										ZEInteriorDoor();

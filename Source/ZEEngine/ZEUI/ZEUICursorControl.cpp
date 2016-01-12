@@ -164,12 +164,12 @@ void ZEUICursorControl::SetZOrder(ZEInt32 Z)
 	Cursor.ZOrder = Z;
 }
 
-ZEMaterial* ZEUICursorControl::GetMaterial() const
+ZERNMaterial* ZEUICursorControl::GetMaterial() const
 {
 	return CursorMaterial;
 }
 
-void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
+void ZEUICursorControl::SetMaterial(ZERNMaterial* Material)
 {
 	Cursor.Material = (ZEUIMaterial*)Material;
 }
@@ -202,7 +202,7 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("#R:/ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("#R:/ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture2D());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 

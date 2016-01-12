@@ -34,35 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_2D_RESOURCE_H__
-#define __ZE_TEXTURE_2D_RESOURCE_H__
 
 #include "ZETextureResource.h"
+#include "ZEGraphics\ZEGRHolder.h"
 
-ZE_META_FORWARD_DECLARE(ZETexture2D, "ZEGraphics/ZETexture2D.h")
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
 
 class ZETexture2DResource : public ZETextureResource
 {
 	ZE_OBJECT
-
 	private:
-		ZETexture2D*						Texture;
+		ZEGRHolder<ZEGRTexture2D>			Texture;
 
 	protected:
 											ZETexture2DResource();
 		virtual 							~ZETexture2DResource();
 
 	public:
-		const ZETexture2D*					GetTexture() const;
 		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
+		virtual ZEGRTextureType				GetTextureType() const;
+
+		virtual ZEGRTexture*				GetTexture() const;
+		ZEGRTexture2D*						GetTexture2D() const;
+
+		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 
 		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		
 		static ZETexture2DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETexture2DResource*			LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
-
 };
-
-#endif
