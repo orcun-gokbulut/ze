@@ -67,43 +67,43 @@
 #define		ZE_I8_4_INPUT_BLOCK_SIZE			4	// Bytes
 #define		ZE_I8_4_OUTPUT_BLOCK_SIZE			4	// Bytes
 
-// Uncompressed ZE_TPF_I8 size
+// Uncompressed ZEGR_TF_I8 size
 #define		ZE_I8_COMPRESSION_BLOCK_WIDTH		1	// Pixels
 #define		ZE_I8_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
 #define		ZE_I8_INPUT_BLOCK_SIZE				1	// Bytes
 #define		ZE_I8_OUTPUT_BLOCK_SIZE				1	// Bytes
 
-// Uncompressed ZE_TPF_I16 size
+// Uncompressed ZEGR_TF_I16 size
 #define		ZE_I16_COMPRESSION_BLOCK_WIDTH		1	// Pixels
 #define		ZE_I16_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
 #define		ZE_I16_INPUT_BLOCK_SIZE				2	// Bytes
 #define		ZE_I16_OUTPUT_BLOCK_SIZE			2	// Bytes
 
-// Uncompressed ZE_TPF_I16_2 size
+// Uncompressed ZEGR_TF_I16_2 size
 #define		ZE_I16_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
 #define		ZE_I16_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
 #define		ZE_I16_2_INPUT_BLOCK_SIZE			2	// Bytes
 #define		ZE_I16_2_OUTPUT_BLOCK_SIZE			2	// Bytes
 
-// Uncompressed ZE_TPF_I32 size
+// Uncompressed ZEGR_TF_I32 size
 #define		ZE_I32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
 #define		ZE_I32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
 #define		ZE_I32_INPUT_BLOCK_SIZE				2	// Bytes
 #define		ZE_I32_OUTPUT_BLOCK_SIZE			2	// Bytes
 
-// Uncompressed ZE_TPF_F32 size
+// Uncompressed ZEGR_TF_F32 size
 #define		ZE_F32_COMPRESSION_BLOCK_WIDTH		1	// Pixels
 #define		ZE_F32_COMPRESSION_BLOCK_HEIGHT		1	// Pixels
 #define		ZE_F32_INPUT_BLOCK_SIZE				4	// Bytes
 #define		ZE_F32_OUTPUT_BLOCK_SIZE			4	// Bytes
 
-// Uncompressed ZE_TPF_F32_2 size
+// Uncompressed ZEGR_TF_F32_2 size
 #define		ZE_F32_2_COMPRESSION_BLOCK_WIDTH	1	// Pixels
 #define		ZE_F32_2_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
 #define		ZE_F32_2_INPUT_BLOCK_SIZE			8	// Bytes
 #define		ZE_F32_2_OUTPUT_BLOCK_SIZE			8	// Bytes
 
-// Uncompressed ZE_TPF_F32_4 size
+// Uncompressed ZEGR_TF_F32_4 size
 #define		ZE_F32_4_COMPRESSION_BLOCK_WIDTH	1	// Pixels
 #define		ZE_F32_4_COMPRESSION_BLOCK_HEIGHT	1	// Pixels
 #define		ZE_F32_4_INPUT_BLOCK_SIZE			16	// Bytes
@@ -115,9 +115,9 @@ static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
 	return Surface % (ZEUInt)ZEMath::Power(2.0f, (float)Level) == 0;
 }
 
-static bool IsCompressed(ZETexturePixelFormat Format)
+static bool IsCompressed(ZEGRFormat Format)
 {
-	return Format == ZE_TPF_DXT1 || Format == ZE_TPF_DXT3 || Format == ZE_TPF_DXT5;
+	return Format == ZEGR_TF_DXT1_UNORM || Format == ZEGR_TF_DXT1_UNORM || Format == ZEGR_TF_DXT1_UNORM;
 }
 
 // Returns owner surface of level
@@ -136,16 +136,16 @@ ZEUInt ZETextureLevel::GetLevel()
 ZEUInt ZETextureLevel::GetWidth()
 {
 	ZEUInt OwnerSurface			= Owner->GetSurface();
-	ZETextureType TextureType	= Owner->GetOwner()->GetType();
+	ZEGRTextureType TextureType	= Owner->GetOwner()->GetType();
 	
 	// If texture is 3D and the level is empty return 0
-	if (TextureType == ZE_TT_3D && !IsLevelValid(OwnerSurface, Level))
+	if (TextureType == ZEGR_TT_3D && !IsLevelValid(OwnerSurface, Level))
 	{
 		return 0;
 	}
 
 	ZEUInt TextureWidth			= Owner->GetOwner()->GetWidth();
-	ZETexturePixelFormat Format = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat Format = Owner->GetOwner()->GetPixelFormat();
 	ZEUInt LevelWidth			= TextureWidth >> Level;
 	
 	// Width of last 2 level of compressed textures (2x2 and 1x1) must be 4x4
@@ -164,15 +164,15 @@ ZEUInt ZETextureLevel::GetWidth()
 ZEUInt ZETextureLevel::GetHeight()
 {
 	ZEUInt OwnerSurface			= Owner->GetSurface();
-	ZETextureType TextureType	= Owner->GetOwner()->GetType();
+	ZEGRTextureType TextureType	= Owner->GetOwner()->GetType();
 
 	// If texture is 3D and the level is empty return 0
-	if (TextureType == ZE_TT_3D && !IsLevelValid(OwnerSurface, Level))
+	if (TextureType == ZEGR_TT_3D && !IsLevelValid(OwnerSurface, Level))
 	{
 		return 0;
 	}
 
-	ZETexturePixelFormat Format = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat Format = Owner->GetOwner()->GetPixelFormat();
 	ZEUInt TextureHeight		= Owner->GetOwner()->GetHeight();
 	ZEUInt LevelHeight			= TextureHeight >> Level;
 	
@@ -193,54 +193,11 @@ ZESize ZETextureLevel::GetPitch()
 {
 	ZESize Pitch = 0;
 	ZEUInt LevelWidth = this->GetWidth();
-	ZETexturePixelFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 	
-	switch (PixelFormat)
-	{		
-		case ZE_TPF_I8:
-			Pitch = ((ZESize)LevelWidth / ZE_I8_COMPRESSION_BLOCK_WIDTH) * ZE_I8_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_I16:
-			Pitch = ((ZESize)LevelWidth / ZE_I16_COMPRESSION_BLOCK_WIDTH) * ZE_I16_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_I16_2:
-			Pitch = ((ZESize)LevelWidth / ZE_I16_2_COMPRESSION_BLOCK_WIDTH) * ZE_I16_2_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_I32:
-			Pitch = ((ZESize)LevelWidth / ZE_I32_COMPRESSION_BLOCK_WIDTH) * ZE_I32_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_F32:
-			Pitch = ((ZESize)LevelWidth / ZE_F32_COMPRESSION_BLOCK_WIDTH) * ZE_F32_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_F32_2:
-			Pitch = ((ZESize)LevelWidth / ZE_F32_2_COMPRESSION_BLOCK_WIDTH) * ZE_F32_2_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_F32_4:
-			Pitch = ((ZESize)LevelWidth / ZE_F32_4_COMPRESSION_BLOCK_WIDTH) * ZE_F32_4_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_I8_4:
-			Pitch = ((ZESize)LevelWidth / ZE_I8_4_COMPRESSION_BLOCK_WIDTH) * ZE_I8_4_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_DXT1:
-			Pitch = ((ZESize)LevelWidth / ZE_DXT_1_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_1_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_DXT3:
-			Pitch = ((ZESize)LevelWidth / ZE_DXT_3_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_3_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_DXT5:
-			Pitch = ((ZESize)LevelWidth / ZE_DXT_5_COMPRESSION_BLOCK_WIDTH) * ZE_DXT_5_OUTPUT_BLOCK_SIZE;
-			break;
-		case ZE_TPF_F16:
-		case ZE_TPF_F16_2:
-		case ZE_TPF_F16_4:
-			zeCriticalError("16 Bit floating point data is not supported.");
-			break;
-		case ZE_TPF_NOTSET:
-		default:
-			zeCriticalError("Unknown Pixel Format");
-			break;
-
-	}
+	const ZEGRFormatDefinition* Definition = ZEGRFormatDefinition::GetDefinition(PixelFormat);
+	if (Definition != NULL)
+		Pitch = ((ZESize)LevelWidth / Definition->BlockDimension) * Definition->BlockSize;
 
 	return Pitch;
 }
@@ -250,53 +207,11 @@ ZEUInt ZETextureLevel::GetRowCount()
 {
 	ZEUInt RowCount = 0;
 	ZEUInt LevelHeight = this->GetHeight();
-	ZETexturePixelFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
+	ZEGRFormat PixelFormat = Owner->GetOwner()->GetPixelFormat();
 
-	switch (PixelFormat)
-	{
-		case ZE_TPF_I8:
-			RowCount = LevelHeight / ZE_I8_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_I16:
-			RowCount = LevelHeight / ZE_I16_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_I16_2:
-			RowCount = LevelHeight / ZE_I16_2_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_I32:
-			RowCount = LevelHeight / ZE_I32_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_F32:
-			RowCount = LevelHeight / ZE_F32_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_F32_2:
-			RowCount = LevelHeight / ZE_F32_2_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_F32_4:
-			RowCount = LevelHeight / ZE_F32_4_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_I8_4:
-			RowCount = LevelHeight / ZE_I8_4_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_DXT1:
-			RowCount = LevelHeight / ZE_DXT_1_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_DXT3:
-			RowCount = LevelHeight / ZE_DXT_3_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_DXT5:
-			RowCount = LevelHeight / ZE_DXT_5_COMPRESSION_BLOCK_HEIGHT;
-			break;
-		case ZE_TPF_F16:
-		case ZE_TPF_F16_2:
-		case ZE_TPF_F16_4:
-			zeCriticalError("16 Bit floating point data is not supported.");
-			break;
-		case ZE_TPF_NOTSET:
-		default:
-			zeCriticalError("Unknown Pixel Format");
-			break;
-	}
+	const ZEGRFormatDefinition* Definition = ZEGRFormatDefinition::GetDefinition(PixelFormat);
+	if (Definition != NULL)
+		RowCount = (ZESize)LevelHeight / Definition->BlockDimension;
 
 	return RowCount;
 
@@ -413,7 +328,7 @@ ZETextureSurface::~ZETextureSurface()
 }
 
 // Creates the texture by allocating surface, levels and enough memory based on texture type
-void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
+void ZETextureData::Create(ZEGRTextureType TextureType, ZEGRFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height)
 {
 	if (!this->IsEmpty())
 	{
@@ -437,7 +352,7 @@ void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat Pixel
 
 	switch (this->Info.Type)
 	{
-		case ZE_TT_3D:
+		case ZEGR_TT_3D:
 		{				
 			// Surface 0 level count
 			ZEUInt InitialLevelCount = LevelCount;
@@ -470,8 +385,8 @@ void ZETextureData::Create(ZETextureType TextureType, ZETexturePixelFormat Pixel
 			break;
 		}
 
-		case ZE_TT_2D:
-		case ZE_TT_CUBE:
+		case ZEGR_TT_2D:
+		case ZEGR_TT_CUBE:
 		{
 			// Create Levels of each Surface
 			for (ZESize I = 0; I < TempSurfaceCount; ++I)
@@ -592,8 +507,8 @@ void ZETextureData::Destroy()
 	this->Info.Height		= 0;
 	this->Info.LevelCount	= 0;
 	this->Info.SurfaceCount	= 0;
-	this->Info.Type			= ZE_TT_2D;
-	this->Info.PixelFormat	= ZE_TPF_NOTSET;
+	this->Info.Type			= ZEGR_TT_2D;
+	this->Info.PixelFormat	= ZEGR_TF_NONE;
 
 }
 
@@ -639,13 +554,13 @@ ZEUInt ZETextureData::GetSurfaceCount()
 }
 
 // Returns texture type
-ZETextureType ZETextureData::GetType()
+ZEGRTextureType ZETextureData::GetType()
 {
 	return Info.Type;
 }
 
 // Returns pixel format
-ZETexturePixelFormat ZETextureData::GetPixelFormat()
+ZEGRFormat ZETextureData::GetPixelFormat()
 {
 	return Info.PixelFormat;
 }
@@ -702,8 +617,8 @@ ZETextureData::ZETextureData()
 	Info.Height			= 0;
 	Info.LevelCount		= 0;
 	Info.SurfaceCount	= 0;
-	Info.Type			= ZE_TT_2D;
-	Info.PixelFormat	= ZE_TPF_NOTSET;
+	Info.Type			= ZEGR_TT_2D;
+	Info.PixelFormat	= ZEGR_TF_NONE;
 
 	Surfaces.Clear(false);
 }
@@ -733,7 +648,7 @@ void ZETextureData::ConvertToCubeTextureData(ZETextureData* Output, ZETextureDat
 	}
 
 	// Create output
-	Output->Create(ZE_TT_CUBE, TextureData->GetPixelFormat(), 6, 1, TargetWidth, TargetHeight);
+	Output->Create(ZEGR_TT_CUBE, TextureData->GetPixelFormat(), 6, 1, TargetWidth, TargetHeight);
 
 	struct
 	{
@@ -785,7 +700,7 @@ void ZETextureData::ConvertToVolumeTextureData(ZETextureData* Output, ZETextureD
 		Output->Destroy();
 	}
 
-	Output->Create(ZE_TT_3D, TextureData->GetPixelFormat(), HorizTileCount * VertTileCount, 1, TargetWidth, TargetHeight);
+	Output->Create(ZEGR_TT_3D, TextureData->GetPixelFormat(), HorizTileCount * VertTileCount, 1, TargetWidth, TargetHeight);
 
 
 	ZESize TempTargetHeight		= (ZESize)TargetHeight;

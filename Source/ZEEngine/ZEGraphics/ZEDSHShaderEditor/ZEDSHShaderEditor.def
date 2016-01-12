@@ -1,0 +1,4 @@
+LIBRARY ZEDSHShaderEditorDll
+
+EXPORTS
+ZEDSHEditor_RunEditor

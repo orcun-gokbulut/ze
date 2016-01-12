@@ -154,33 +154,33 @@ ZESize GetPixelSize(ZETIFFPixelFormat Format)
 
 }
 
-static ZETexturePixelFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
+static ZEGRFormat GetTextureFormat(ZETIFFPixelFormat PixelFormat)
 {
 	switch(PixelFormat)
 	{
 		case ZE_TIFF_PT_L8:
-			return ZE_TPF_L8;
+			return ZEGR_TF_R8_UNORM;
 
 		case ZE_TIFF_PT_LA8:
-			return ZE_TPF_LA8;
+			return ZEGR_TF_R8G8_UNORM;
 
 		case ZE_TIFF_PT_L16:
-			return ZE_TPF_L16;
+			return ZEGR_TF_R16_UNORM;
 
 		case ZE_TIFF_PT_LA16:
-			return ZE_TPF_LA16;
+			return ZEGR_TF_R16G16_UNORM;
 
 		case ZE_TIFF_PT_INDEXED:
 		case ZE_TIFF_PT_RGB8:
 		case ZE_TIFF_PT_RGBA8:
-			return ZE_TPF_RGBA8;
+			return ZEGR_TF_R8G8B8A8_UNORM;
 
 		case ZE_TIFF_PT_RGB16:
 		case ZE_TIFF_PT_RGBA16:
-			return ZE_TPF_RGBA16;
+			return ZEGR_TF_R16G16B16A16_UNORM;
 	}
 
-	return ZE_TPF_NOTSET;
+	return ZEGR_TF_NONE;
 }
 
 static bool LoadEntryArray(ZEArray<ZEUInt32> Output, ZETIFFEntry* Entry, ZEFile* File, ZEEndianness Endianness)
@@ -611,7 +611,7 @@ static ZETextureData* LoadData(ZEFile* File, ZETIFFInfo* Info)
 {
 	ZEPointer<ZETextureData> Texture = new ZETextureData();
 
-	Texture->Create(ZE_TT_2D, GetTextureFormat(Info->PixelFormat), 1, 1, Info->Width, Info->Height);
+	Texture->Create(ZEGR_TT_2D, GetTextureFormat(Info->PixelFormat), 1, 1, Info->Width, Info->Height);
 
 	ZESize PixelSize = GetPixelSize(Info->PixelFormat);
 	ZEUInt8* DestinationData = (ZEUInt8*)Texture->GetSurfaces()[0].GetLevels()[0].GetData();
@@ -763,7 +763,7 @@ bool ZETextureFileTIFF::LoadInfo(ZETextureDataInfo* Info, ZEFile* File)
 
 
 	Info->PixelFormat = GetTextureFormat(TIFFInfo.PixelFormat);
-	Info->Type = ZE_TT_2D;
+	Info->Type = ZEGR_TT_2D;
 	Info->SurfaceCount = 1;
 	Info->LevelCount = 1;
 

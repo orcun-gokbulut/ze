@@ -40,8 +40,8 @@
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEVector.h"
 
-#include "ZEGraphics\ZETexture2D.h"
-#include "ZEGraphics\ZEUIMaterial.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
+#include "ZERenderer\ZEUIMaterial.h"
 #include "ZEUI\ZEFontResource.h"
 #include "ZEUI\ZEUIRectangle.h"
 
@@ -68,7 +68,7 @@ class ZEFontResourceDynamic : public ZEFontResource
 		ZEUInt32							LastTextureId;
 		ZEUInt32							LastTextureLine;
 
-		ZEArray<ZETexture2D*>				Textures;
+		ZEArray<ZEGRTexture2D*>				Textures;
 
 		void								SetFontFile(ZEString FontFilePath);
 		void								SetFontSize(ZEUInt32 FontSize);
@@ -86,7 +86,7 @@ class ZEFontResourceDynamic : public ZEFontResource
 		virtual const ZEFontCharacter&		GetCharacter(char Character);
 		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance);
 
-		ZETexture2D*						GetTexture(ZEUInt32 TextureId);
+		ZEGRTexture2D*						GetTexture(ZEUInt32 TextureId);
 
 		static ZEFontResourceDynamic*		LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize);
 		static void							CacheResource(const ZEString& FileName, ZEUInt32 FontSize);

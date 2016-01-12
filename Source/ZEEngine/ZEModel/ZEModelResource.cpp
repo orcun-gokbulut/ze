@@ -38,8 +38,9 @@
 #include "ZEError.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZERNFixedMaterial.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEGraphics/ZEGRHolder.h"
 
 static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 {
@@ -52,9 +53,9 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 
 	ze_for_each(CurrentLOD, Mesh->GetLODs())
 	{
-		if (Mesh->GetSkinned())
+		if (CurrentLOD->GetVertexType() == ZEMD_VT_SKINNED)
 		{
-			const ZEArray<ZESkinnedModelVertex>& Vertices = CurrentLOD->GetVerticesSkin();
+			const ZEArray<ZEMDVertexSkin>& Vertices = CurrentLOD->GetVerticesSkin();
 			for (ZESize N = 0; N < Vertices.GetCount(); N++)
 			{
 				const ZEVector3& Position = Vertices[N].Position;
@@ -69,7 +70,7 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 		}
 		else
 		{
-			const ZEArray<ZEModelVertex>& Vertices = CurrentLOD->GetVertices();
+			const ZEArray<ZEMDVertex>& Vertices = CurrentLOD->GetVertices();
 			for (ZESize N = 0; N < Vertices.GetCount(); N++)
 			{
 				const ZEVector3& Position = Vertices[N].Position;
@@ -118,6 +119,8 @@ bool ZEModelResource::ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId)
 				return false;
 		}
 	}
+
+	return true;
 }
 
 bool ZEModelResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
@@ -223,6 +226,7 @@ bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 	zeCheckError(!MaterialsNode.IsValid(), false, "Invalid Materials node.");
 	zeCheckError(MaterialsNode.GetName() == "Materials", false, "Invalid Materials node name.");
 
+	ZEArray<ZEGRHolder<ZERNFixedMaterial>> Materials;
 	ZESize SubNodeCount = MaterialsNode.GetNodeCount("Material");
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -232,34 +236,29 @@ bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
-		ZEFixedMaterial* CurrentMaterial = ZEFixedMaterial::CreateInstance();
+		ZEGRHolder<ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
 		Materials.Add(CurrentMaterial);
 	}
 
+	ze_for_each(Mesh, Meshes)
+	{
+		ze_for_each(LOD, Mesh->GetLODs())
+		{
+			if (LOD->MaterialID >= 0 && LOD->MaterialID <= Materials.GetCount())
+				LOD->SetMaterial(Materials[LOD->MaterialID].Cast<ZERNMaterial>());
+		}
+	}
 	return true;
 }
 
 bool ZEModelResource::LoadInternal(const ZERSLoadingOptions* Option)
 {
-	enum ModelResourceState
-	{
-		ZEMD_RSL_NONE,
-		ZEMD_RLS_STRUCTURE,
-		ZEMD_RLS_MESH_DATA
-	} State;
+	ZEMLReader Reader;
+	if (!Reader.Open(GetFilePath()))
+		return false;
 
-	switch(State)
-	{
-		case ZEMD_RSL_NONE:
-		case ZEMD_RLS_STRUCTURE:
-		case ZEMD_RLS_MESH_DATA:
-	}
-
-	// Load Internal Structure and Start Loading Materials
-	// Load Meshes
-
-	return false;
+	return Load(Reader.GetRootNode());
 }
 
 bool ZEModelResource::Load(const ZEMLReaderNode& ModelNode)
@@ -328,9 +327,14 @@ const ZEAABBox& ZEModelResource::GetUserDefinedBoundingBox() const
 	return UserDefinedBoundingBox;
 }
 
-const ZEList2<ZEModelResourceMesh>& ZEModelResource::GetMeshes() const
+const ZEList2<ZEModelResourceMesh>& ZEModelResource::GetMeshes()
 {
 	return Meshes;
+}
+
+const ZEList2<const ZEModelResourceMesh>& ZEModelResource::GetMeshes() const
+{
+	return Meshes.ToInspector();
 }
 
 void ZEModelResource::AddMesh(ZEModelResourceMesh* Mesh)
@@ -344,9 +348,14 @@ void ZEModelResource::RemoveMesh(ZEModelResourceMesh* Mesh)
 	Meshes.Remove(&Mesh->Link);
 }
 
-const ZEList2<ZEModelResourceBone>& ZEModelResource::GetBones() const
+const ZEList2<ZEModelResourceBone>& ZEModelResource::GetBones() 
 {
 	return Bones;
+}
+
+const ZEList2<const ZEModelResourceBone>& ZEModelResource::GetBones() const
+{
+	return Bones.ToInspector();
 }
 
 void ZEModelResource::AddBone(ZEModelResourceBone* Bone)
@@ -360,9 +369,14 @@ void ZEModelResource::RemoveBone(ZEModelResourceBone* Bone)
 	Bones.Remove(&Bone->Link);
 }
 
-const ZEList2<ZEModelResourceAnimation>& ZEModelResource::GetAnimations() const
+const ZEList2<ZEModelResourceAnimation>& ZEModelResource::GetAnimations()
 {
 	return Animations;
+}
+
+const ZEList2<const ZEModelResourceAnimation>& ZEModelResource::GetAnimations() const
+{
+	return Animations.ToInspector();
 }
 
 void ZEModelResource::AddAnimation(ZEModelResourceAnimation* Animation)
@@ -376,9 +390,9 @@ void ZEModelResource::RemoveAnimation(ZEModelResourceAnimation* Animation)
 	Animations.Remove(&Animation->Link);
 }
 
-const ZEList2<ZEModelResourceHelper>& ZEModelResource::GetHelpers() const
+const ZEList2<const ZEModelResourceHelper>& ZEModelResource::GetHelpers() const
 {
-	return Helpers;
+	return Helpers.ToInspector();
 }
 
 void ZEModelResource::AddHelper(ZEModelResourceHelper* Helper)

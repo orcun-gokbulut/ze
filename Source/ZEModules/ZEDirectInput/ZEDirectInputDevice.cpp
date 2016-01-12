@@ -152,17 +152,17 @@ bool ZEDirectInputDevice::InitializeSelf()
 
 	if (Description.Type == ZE_IDT_KEYBOARD)
 	{
-		Result = DirectInputDevice->SetCooperativeLevel((HWND)ZEWindow::GetInstance()->GetHandle(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		Result = DirectInputDevice->SetCooperativeLevel(::GetDesktopWindow(), DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
 		DirectInputDevice->SetDataFormat(&c_dfDIKeyboard);
 	}
 	else if (Description.Type == ZE_IDT_MOUSE)
 	{
-		Result = DirectInputDevice->SetCooperativeLevel((HWND)ZEWindow::GetInstance()->GetHandle(), DISCL_FOREGROUND | DISCL_NONEXCLUSIVE);
+		Result = DirectInputDevice->SetCooperativeLevel(::GetDesktopWindow(), DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
 		DirectInputDevice->SetDataFormat(&c_dfDIMouse2);
 	}
 	else if (Description.Type == ZE_IDT_GAMEPAD || Description.Type == ZE_IDT_JOYSTICK || Description.Type == ZE_IDT_WHEEL)
 	{
-		Result = DirectInputDevice->SetCooperativeLevel((HWND)ZEWindow::GetInstance()->GetHandle(), DISCL_FOREGROUND | DISCL_EXCLUSIVE);
+		Result = DirectInputDevice->SetCooperativeLevel(::GetDesktopWindow(), DISCL_BACKGROUND | DISCL_NONEXCLUSIVE);
 		DirectInputDevice->EnumObjects(&ConfigureAxisRanges, DirectInputDevice, DIDFT_AXIS);
 		DirectInputDevice->SetDataFormat(&c_dfDIJoystick);
 	}

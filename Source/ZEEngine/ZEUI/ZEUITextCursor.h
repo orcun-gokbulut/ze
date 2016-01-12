@@ -40,7 +40,7 @@
 #include "ZEUIRectangle.h"
 #include "ZECore/ZETimer.h"
 
-ZE_META_FORWARD_DECLARE(ZEMaterial, "ZEGraphics/ZEMaterial.h")
+ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZEGraphics/ZEMaterial.h")
 
 class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {
@@ -70,7 +70,7 @@ class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 		void				SetPostion(const ZEVector2& Position);
 		const ZEVector2&	GetPosition() const;
 
-		const ZEMaterial*	GetMaterial() const;
+		const ZERNMaterial*	GetMaterial() const;
 
 							ZEUITextCursor();
 							~ZEUITextCursor();

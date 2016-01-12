@@ -52,7 +52,7 @@ class ZEApplicationModule : public ZEModule
 
 		virtual void		PreProcess();
 		virtual void		Process(float ElapsedTime);
-		virtual void		PostProcess();
+		virtual void		PostProcess(float ElapsedTime);
 		
 		virtual void		StartUp();
 		virtual void		ShutDown();

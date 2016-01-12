@@ -38,11 +38,9 @@
 #define __ZE_PHYSICAL_CLOTH_H__
 
 #include "ZETypes.h"
-
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 #include "ZEDS/ZEFlags.h"
 
 enum ZEClothVertexAttachmentStatus

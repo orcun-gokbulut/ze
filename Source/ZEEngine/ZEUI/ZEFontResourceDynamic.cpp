@@ -67,8 +67,8 @@ void ZEFontResourceDynamic::SetFontSize(ZEUInt32 FontSize)
 void ZEFontResourceDynamic::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
 {
 	Textures.Add();
-	Textures.GetLastItem() = ZETexture2D::CreateInstance();
-	Textures.GetLastItem()->Create(Width, Height, 1, ZE_TPF_I8_4);
+	Textures.GetLastItem() = ZEGRTexture2D::CreateInstance();
+	Textures.GetLastItem()->Create(Width, Height, 1, ZEGR_TF_R8G8B8A8);
 }
 
 const char* ZEFontResourceDynamic::GetResourceType() const
@@ -224,7 +224,7 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 	return FontCharacters[LastItem];
 }
 
-ZETexture2D* ZEFontResourceDynamic::GetTexture(ZEUInt32 TextureId)
+ZEGRTexture2D* ZEFontResourceDynamic::GetTexture(ZEUInt32 TextureId)
 {
 	return Textures[TextureId];
 }

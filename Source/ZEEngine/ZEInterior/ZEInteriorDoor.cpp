@@ -37,37 +37,8 @@
 #include "ZEInteriorResource.h"
 #include "ZEInterior.h"
 #include "ZEInteriorRoom.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
-#include "ZEGraphics\ZERenderer.h"
-
-void ZEInteriorDoor::DebugDraw(ZERenderer* Renderer)
-{
-	if (DebugDrawComponents.Material == NULL)
-	{
-		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
-
-		DebugDrawComponents.BoxRenderCommand.SetZero();
-		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
-		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
-		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	}
-
-	DebugDrawComponents.BoxCanvas.Clean();
-	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.254902f, 0.411765f, 0.882353f, 1.0f));
-
-	ZERectangle3D Rectangle = GetRectangle();
-	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
-	DebugDrawComponents.BoxCanvas.SetTranslation(ZEVector3::Zero);
-	DebugDrawComponents.BoxCanvas.AddWireframeQuad(Rectangle.P1, Rectangle.P2, Rectangle.P3, Rectangle.P4);
-	ZEMatrix4x4 LocalMatrix;
-	ZEMatrix4x4::CreateOrientation(LocalMatrix, Position, Rotation);
-	DebugDrawComponents.BoxRenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
-	DebugDrawComponents.BoxRenderCommand.Priority = 4;
-	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
-}
+#include "ZERenderer\ZERNSimpleMaterial.h"
+#include "ZERenderer\ZERNRenderer.h"
 
 void ZEInteriorDoor::CalculateRectangle()
 {

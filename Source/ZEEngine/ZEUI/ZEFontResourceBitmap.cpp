@@ -37,8 +37,8 @@
 #include "ZEFontResourceBitmap.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEFile/ZEPartialFile.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZERenderer/ZEUIMaterial.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureOptions.h"
 #include "ZECore/ZEResourceManager.h"
@@ -91,7 +91,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadSharedResource(const ZEString& F
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
@@ -117,7 +117,7 @@ void ZEFontResourceBitmap::CacheResource(const ZEString& FileName, const ZETextu
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, UserOptions);
 		if (NewResource != NULL)
@@ -139,7 +139,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(const ZEString& FileNam
 	if (Result)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		FontResource = LoadResource(&File, UserOptions);
 		File.Close();
@@ -158,7 +158,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 	zeLog("Loading font file \"%s\".", ResourceFile->GetPath().GetValue());
 
 	if(UserOptions == NULL)
-		UserOptions = zeGraphics->GetTextureOptions();
+		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	// Font files should not be resized or mipmapped
 	ZETextureOptions ModifiedOptions = {UserOptions->CompressionType, 
@@ -205,7 +205,7 @@ ZEFontResourceBitmap* ZEFontResourceBitmap::LoadResource(ZEFile* ResourceFile, c
 		ZEString TexturePath = "../" + ZEDirectoryInfo(ResourceFile->GetPath()).GetParentDirectory() + "/" + TextureFileName;
 
 		NewResource->TextureResources[I] = ZETexture2DResource::LoadSharedResource(TexturePath);
-		NewResource->Textures[I] = NewResource->TextureResources[I]->GetTexture();
+		NewResource->Textures[I] = NewResource->TextureResources[I]->GetTexture2D();
 	}
 
 	ZEMLReaderNode CharactersNode = RootNode.GetNode("Characters");

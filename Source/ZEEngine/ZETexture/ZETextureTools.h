@@ -39,12 +39,12 @@
 
 #include "ZETypes.h"
 #include "ZETexture/ZETextureOptions.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZETexture/ZETextureResource.h"
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZETexture/ZETextureLoader.h"
 
-class ZETexture2D;
+class ZEGRTexture2D;
 
 class ZETextureTools
 {
@@ -54,8 +54,8 @@ class ZETextureTools
 
 	public:
 		static bool					IsCompressible(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1);
-		static bool					IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZETextureType TextureType = ZE_TT_2D);
-		static ZEUInt				GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZETextureType TextureType = ZE_TT_2D);
+		static bool					IsResizeable(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZEGRTextureType TextureType = ZEGR_TT_2D);
+		static ZEUInt				GetMaxMipmapCount(const ZEUInt Width, const ZEUInt Height, const ZEUInt HorizTileCount = 1, const ZEUInt VertTileCount = 1, const ZEGRTextureType TextureType = ZEGR_TT_2D);
 
 		static void					CompressTexture(void* DestinationData, const ZESize DestinationPitch, const void* SourceData, const ZESize SourcePitch, 
 													const ZEUInt SourceWidth, const ZEUInt SourceHeight, const ZETextureOptions* CompressionOptions = NULL);

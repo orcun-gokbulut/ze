@@ -36,7 +36,7 @@
 #include "ZEParticleModifier.h"
 #include "ZEParticleEmitter.h"
 #include "ZEParticleEffect.h"
-#include "ZEGraphics\ZEFixedMaterial.h"
+#include "ZERenderer\ZERNFixedMaterial.h"
 #include "ZERandom.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEMath\ZEMath.h"
@@ -466,7 +466,7 @@ void ZEParticleDiffuseMapChangerModifier::AddTextureResource(ZETexture2DResource
 
 void ZEParticleDiffuseMapChangerModifier::Tick(float ElapsedTime)
 {
-	((ZEFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture());
+	((ZEFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture2D());
 
 	if(TotalTime >= Interval)
 	{

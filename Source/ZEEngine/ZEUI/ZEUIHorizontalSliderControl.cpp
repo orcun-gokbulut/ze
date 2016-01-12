@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIHorizontalSliderControl.h"
-#include "ZEGraphics\ZEUIMaterial.h"
+
+#include "ZERenderer\ZEUIMaterial.h"
 
 void ZEUIHorizontalSliderControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {

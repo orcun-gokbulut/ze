@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
-#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZEGRTexture.h"
 
 class ZEFile;
 class ZETextureData;

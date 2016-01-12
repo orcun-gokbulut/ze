@@ -37,6 +37,7 @@
 
 #include "ZEMeta\ZEObject.h"
 
+#include "ZEMDVertex.h"
 #include "ZEMDResourcePhysics.h"
 
 #include "ZETypes.h"
@@ -44,81 +45,125 @@
 #include "ZEMath\ZEVector.h"
 #include "ZEMath\ZEQuaternion.h"
 #include "ZEMath\ZEAABBox.h"
-#include "ZEGraphics\ZEVertexTypes.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
-class ZEStaticVertexBuffer;
-class ZEStaticIndexBuffer;
-class ZEMaterial;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
+class ZERNMaterial;
+
+class ZEMDResourceDraw : public ZEObject
+{
+	ZE_OBJECT
+	private:
+		ZESize Offset;
+		ZESize Count;
+		ZEGRHolder<ZERNMaterial> Material;
+
+	public:
+		void SetOffset(ZESize Offset);
+		ZESize GetOffset() const;
+
+		void SetCount(ZESize Count);
+		ZESize GetCount() const;
+
+		void SetMaterial(ZEGRHolder<ZERNMaterial> Material);
+		ZEGRHolder<ZERNMaterial> GetMaterial() const;
+
+		bool Load(ZEMLReaderNode& DrawNode);
+		bool Save(ZEMLWriterNode& DrawNode) const;
+
+		ZEMDResourceDraw();
+};
 
 class ZEModelResourceMeshLOD : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEModelResourceMesh;
+	friend class ZEModelResource;
 	private:
 		ZELink<ZEModelResourceMeshLOD> Link;
 
 		ZEInt32 Level;
-		ZEInt32 StartDistance;
-		ZEInt32 EndDistance;
+		float StartDistance;
+		float EndDistance;
 		ZEArray<ZEUInt16> AffectingBoneIds;
 
-		ZEArray<ZEModelVertex> Vertices;
-		ZEArray<ZESkinnedModelVertex> VerticesSkin;
+		ZEMDVertexType VertexType;
+		ZEArray<ZEMDVertex> Vertices;
+		ZEArray<ZEMDVertexSkin> VerticesSkin;
+		ZEArray<ZEMDResourceDraw> Draws;
+		
+		ZEMDVertexIndexType IndexType;
 		ZEArray<ZEUInt16> Indices;
+		ZEArray<ZEUInt32> Indices32;
 
-		ZEStaticVertexBuffer* VertexBuffer;
-		ZEStaticVertexBuffer* VertexBufferSkin;
-		ZEStaticIndexBuffer* IndexBuffer;
+		ZEGRHolder<ZEGRVertexBuffer> VertexBufferBase;
+		ZEGRHolder<ZEGRVertexBuffer> VertexBufferNormals;
+		ZEGRHolder<ZEGRVertexBuffer> VertexBufferSkin;
+		ZEGRHolder<ZEGRVertexBuffer> VertexBufferExtra;
+		ZEGRHolder<ZEGRIndexBuffer> IndexBuffer;
 
-		ZEInt MaterialId;
-		ZEString MaterialFilePath;
-		ZEMaterial* Material;
+		ZEInt MaterialID; // Backwards Compatibility
+		ZEGRHolder<ZERNMaterial> Material;
 
 	public:
 		void SetLevel(ZEInt32 LODLevel);
 		ZEInt32 GetLevel() const;
 
-		void SetStartDistance(ZEInt32 LODStartDistance);
-		ZEInt32 GetStartDistance() const;
+		void SetStartDistance(float StartDistance);
+		float GetStartDistance() const;
 
-		void SetEndDistance(ZEInt32 LODEndDistance);
-		ZEInt32 GetEndDistance() const;
+		void SetEndDistance(float EndDistance);
+		float GetEndDistance() const;
 
-		void SetVertices(const ZEArray<ZEModelVertex>& Vertices);
-		const ZEArray<ZEModelVertex>& GetVertices() const;
+		void SetVertexType(ZEMDVertexType VertexType);
+		ZEMDVertexType GetVertexType() const;
 
-		void SetVerticesSkin(const ZEArray<ZESkinnedModelVertex>& VerticesSkin);
-		const ZEArray<ZESkinnedModelVertex>& GetVerticesSkin() const;
+		void SetIndexType(ZEMDVertexIndexType IndexType);
+		ZEMDVertexIndexType GetIndexType() const;
+
+		void SetVertices(const ZEArray<ZEMDVertex>& Vertices);
+		const ZEArray<ZEMDVertex>& GetVertices() const;
+
+		void SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin);
+		const ZEArray<ZEMDVertexSkin>& GetVerticesSkin() const;
 	
 		void SetIndices(const ZEArray<ZEUInt16>& Indices);
 		const ZEArray<ZEUInt16>& GetIndices() const;
 
+		void SetIndices32(const ZEArray<ZEUInt32>& Indices);
+		const ZEArray<ZEUInt32>& GetIndices32() const;
+
 		void SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds);
 		const ZEArray<ZEUInt16>& GetAffectingBoneIds() const;
 
-		void SetVertexBuffer(ZEStaticVertexBuffer* VertexBuffer);
-		ZEStaticVertexBuffer* GetVertexBuffer() const;
+		void SetVertexBufferBase(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer);
+		ZEGRHolder<ZEGRVertexBuffer> GetVertexBufferBase() const;
 
-		void SetVertexBufferSkin(ZEStaticVertexBuffer* VertexBufferSkin);
-		ZEStaticVertexBuffer* GetVertexBufferSkin() const;
+		void SetVertexBufferNormals(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer);
+		ZEGRHolder<ZEGRVertexBuffer> GetVertexBufferNormals() const;
 
-		void SetIndexBuffer(ZEStaticIndexBuffer* IndexBuffer);
-		ZEStaticIndexBuffer* GetIndexBuffer() const;
-		
-		void SetMaterialId(ZEInt32 MaterialId);
-		ZEInt32 GetMaterialId() const;
+		void SetVertexBufferSkin(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer);
+		ZEGRHolder<ZEGRVertexBuffer> GetVertexBufferSkin() const;
+
+		void SetVertexBufferExtra(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer);
+		ZEGRHolder<ZEGRVertexBuffer> GetVertexBufferExtra() const;
+
+		void SetIndexBuffer(ZEGRHolder<ZEGRIndexBuffer> IndexBuffer);
+		ZEGRHolder<ZEGRIndexBuffer> GetIndexBuffer() const;
 
 		void SetMaterialFilePath(const ZEString& MaterialFilePath);
 		const ZEString& GetMaterialFilePath();
 
-		void SetMaterial(ZEMaterial* Material);
-		ZEMaterial* GetMaterial();
+		void SetMaterial(ZEGRHolder<ZERNMaterial> Material);
+		ZEGRHolder<const ZERNMaterial> GetMaterial() const;
 
-		void UpdateVertexBuffer() const;
-		void UpdateVertexBufferSkin() const;
-		void UpdateIndexBuffer() const;
+		const ZEArray<ZEMDResourceDraw>& GetDraws() const;
+		void AddDraw(const ZEMDResourceDraw& Draw);
+		void RemoveDraw(ZESize Index);
+
+		void GenerateBuffers();
 
 		bool Load(const ZEMLReaderNode& LODNode);
 		bool Save(ZEMLWriterNode& LODNode) const;

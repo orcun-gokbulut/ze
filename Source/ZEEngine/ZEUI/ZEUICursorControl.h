@@ -37,10 +37,10 @@
 #ifndef __ZE_UI_CURSOR_CONTROL__
 #define __ZE_UI_CURSOR_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUIRectangle.h"
 #include "ZEInput/ZEInputMap.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZERenderer/ZEUIMaterial.h"
 
 class ZEUICursorControl : public ZEUIControl
 {
@@ -59,8 +59,8 @@ class ZEUICursorControl : public ZEUIControl
 		virtual void		Draw(ZEUIRenderer* Renderer);
 		virtual void		Tick(float ElapsedTime);
 
-		virtual ZEMaterial* GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual ZERNMaterial* GetMaterial() const;
+		virtual void		SetMaterial(ZERNMaterial* Material);
 
 		ZEUIMouseKey		GetCurrentButton();
 

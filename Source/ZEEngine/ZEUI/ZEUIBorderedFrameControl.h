@@ -86,12 +86,12 @@ struct ZEUIControlStyle
 	ZEVector2		MainAreaUVLeftUp;
 	ZEVector2		MainAreaUVRightDown;
 
-	ZETexture2D*	BackgroundTexture;
-	ZETexture2D*	BorderCornerTexture;
-	ZETexture2D*	BorderEdgeTexture;
-	ZETexture2D*	HoveredTexture;
-	ZETexture2D*	PressedTexture;
-	ZETexture2D*	DisabledTexture;
+	ZEGRTexture2D*	BackgroundTexture;
+	ZEGRTexture2D*	BorderCornerTexture;
+	ZEGRTexture2D*	BorderEdgeTexture;
+	ZEGRTexture2D*	HoveredTexture;
+	ZEGRTexture2D*	PressedTexture;
+	ZEGRTexture2D*	DisabledTexture;
 
 	ZEFontResource*	Font;
 
@@ -168,8 +168,8 @@ class ZEUIBorderedFrameControl : public ZEUIControl
 
 		void				SetBorderThickness(float Thickness);
 
-		virtual void		SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*	GetMaterial() const;
+		virtual void		SetMaterial(ZERNMaterial* Material);
+		virtual ZERNMaterial*	GetMaterial() const;
 
 							ZEUIBorderedFrameControl();
 

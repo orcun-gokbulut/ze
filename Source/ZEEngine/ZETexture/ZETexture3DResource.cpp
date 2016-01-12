@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEGraphics/ZETexture3D.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRTexture3D.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZETexture3DResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZEFile/ZEFile.h"
@@ -48,7 +48,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZETextureTools.h"
 
-static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
+static void CopyToTexture3D(ZEGRTexture3D* Texture, ZETextureData* TextureData)
 {
 	// Copy texture data into ZETexture3D
 	void* TargetBuffer	= NULL;
@@ -58,11 +58,10 @@ static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
 	// Get texture specs
 	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetLevelCount();
 	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetSurfaceCount();
-
-
-	for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
+	
+	/*for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
 	{
-		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt	)Level);
+		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt)Level);
 
 		for (ZESize Surface = 0, SurfaceCopyCount = 0; Surface < TextureSurfaceCount; Surface += SurfaceIncrement, ++SurfaceCopyCount)
 		{
@@ -70,8 +69,7 @@ static void CopyToTexture3D(ZETexture3D* Texture, ZETextureData* TextureData)
 		}
 
 		Texture->Unlock((ZEUInt	)Level);
-	}
-
+	}*/
 }
 
 const char* ZETexture3DResource::GetResourceType() const
@@ -79,12 +77,17 @@ const char* ZETexture3DResource::GetResourceType() const
 	return "Volume Texture Resource";
 }
 
-ZETextureType ZETexture3DResource::GetTextureType() const
+ZEGRTextureType ZETexture3DResource::GetTextureType() const
 {
-	return ZE_TT_3D;
+	return ZEGR_TT_3D;
 }
 
-const ZETexture3D* ZETexture3DResource::GetTexture() const
+ZEGRTexture* ZETexture3DResource::GetTexture() const
+{
+	return Texture;
+}
+
+ZEGRTexture3D* ZETexture3DResource::GetTexture3D() const
 {
 	return Texture;
 }
@@ -96,8 +99,7 @@ ZETexture3DResource::ZETexture3DResource()
 
 ZETexture3DResource::~ZETexture3DResource()
 {
-	if (Texture != NULL)
-		Texture->Destroy();
+
 }
 
 ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
@@ -106,7 +108,7 @@ ZETexture3DResource* ZETexture3DResource::LoadSharedResource(const ZEString& Fil
 	if(NewResource == NULL)
 	{		
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, HorizTileCount, VertTileCount, UserOptions);
 		if(NewResource != NULL)
@@ -137,7 +139,7 @@ void ZETexture3DResource::CacheResource(const ZEString& FileName, ZEUInt HorizTi
 	if (NewResource == NULL)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		NewResource = LoadResource(FileName, HorizTileCount, VertTileCount, UserOptions);
 		if (NewResource != NULL)
@@ -158,7 +160,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName,
 	if(Result)
 	{
 		if(UserOptions == NULL)
-			UserOptions = zeGraphics->GetTextureOptions();
+			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 		TextureResource = LoadResource(&File, HorizTileCount, VertTileCount, UserOptions);
 		File.Close();
@@ -177,7 +179,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(const ZEString& FileName,
 ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEUInt HorizTileCount, ZEUInt VertTileCount, const ZETextureOptions* UserOptions)
 {
 	if(UserOptions == NULL)
-		UserOptions = zeGraphics->GetTextureOptions();
+		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
 	ZETextureData	TempTextureData;
 	ZETextureData	ProcessedTextureData;
@@ -193,7 +195,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	bool IdentifierExists	= false;
 
 	// Decide final texture options
-	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, HorizTileCount, VertTileCount, ZE_TT_3D);
+	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, HorizTileCount, VertTileCount, ZEGR_TT_3D);
 
 	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
@@ -297,7 +299,7 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 
 	// Create Texture3DResource 
 	ZETexture3DResource* TextureResource = new ZETexture3DResource();
-	ZETexture3D* Texture = TextureResource->Texture = ZETexture3D::CreateInstance();
+	ZEGRTexture3D* Texture = TextureResource->Texture = ZEGRTexture3D::Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat());
 	if (Texture == NULL)
 	{
 		delete TextureResource;
@@ -310,16 +312,6 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 	TextureResource->SetFileName(ResourceFile->GetPath().GetValue());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
-
-	// Create the Texture
-	if (!Texture->Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetHeight(), ProcessedTextureData.GetSurfaceCount(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat()))
-	{
-		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
-		ProcessedTextureData.Destroy();
-		TempTextureData.Destroy();
-		delete TextureResource;
-		return NULL;
-	}
 
 	CopyToTexture3D(Texture, &ProcessedTextureData);
 

@@ -43,6 +43,9 @@
 #include "ZEError.h"
 #include "ZEScene.h"
 #include "ZEEntityProvider.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNView.h"
+#include "ZEMath/ZEViewVolume.h"
 
 #include <string.h>
 
@@ -553,9 +556,25 @@ void ZEEntity::Tick(float Time)
 
 }
 
-void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
+bool ZEEntity::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!GetVisible())
+		return false;
 
+	ZEDrawFlags Flags = GetDrawFlags();
+	if (!Flags.GetFlags(ZE_DF_DRAW))
+		return false;
+
+	//two times cull test
+	//if (Flags.GetFlags(ZE_DF_CULL) && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+		//return false;
+
+	return true;
+}
+
+void ZEEntity::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	
 }
 
 bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

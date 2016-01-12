@@ -34,12 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SKYBRUSH_H__
-#define __ZE_SKYBRUSH_H__
 
 #include "ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERNCommand.h"
 
 class ZETextureCubeResource;
 class ZESkyBoxMaterial;
@@ -52,7 +50,7 @@ class ZESkyBrush : public ZEEntity
 		ZECanvas							SkyBox;
 		ZETextureCubeResource*				SkyTexture;
 		ZESkyBoxMaterial*					SkyMaterial;
-		ZERenderCommand						SkyRenderCommand;
+		ZERNCommand							SkyRenderCommand;
 
 		ZEVector3							SkyColor;
 		float								SkyBrightness;
@@ -75,10 +73,8 @@ class ZESkyBrush : public ZEEntity
 		virtual void						SetSkyColor(const ZEVector3& Color);
 		const ZEVector3&					GetSkyColor() const;
 
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
 
 		static ZESkyBrush*					CreateInstance();
 
 };
-#endif

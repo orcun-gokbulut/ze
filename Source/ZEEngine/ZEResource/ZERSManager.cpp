@@ -39,7 +39,7 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 
-ZERSHolder<const ZERSResource> ZERSManager::GetResourceInternal(const ZEString& FilePath)
+ZEHolder<const ZERSResource> ZERSManager::GetResourceInternal(const ZEString& FilePath)
 {
 	ZEFileInfo FileInfo(FilePath);
 	ZEString FilePathNormalized = FileInfo.Normalize();
@@ -73,11 +73,11 @@ void ZERSManager::RegisterResourceInternal(const ZERSResource* Resource)
 		MemoryUsage[I] += Resource->GetSize((ZERSPool)I);
 }
 
-ZERSHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions)
+ZEHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions)
 {
 	ManagerLock.Lock();
 
-	ZERSHolder<const ZERSResource> AvailableResource = GetResourceInternal(FilePath);
+	ZEHolder<const ZERSResource> AvailableResource = GetResourceInternal(FilePath);
 	if (AvailableResource != NULL)
 	{
 		ManagerLock.Unlock();
@@ -86,7 +86,7 @@ ZERSHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePat
 		return AvailableResource;
 	}
 
-	ZERSHolder<ZERSResource> Resource;
+	ZEHolder<ZERSResource> Resource;
 	Resource = Instanciator();
 	Resource->SetFilePath(FilePath);
 	RegisterResourceInternal(Resource);
@@ -153,7 +153,7 @@ ZERSManager::~ZERSManager()
 
 }
 
-ZERSHolder<const ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
+ZEHolder<const ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
 {
 	ManagerLock.Lock();
 	ze_for_each(Resource, Resources)
@@ -169,10 +169,10 @@ ZERSHolder<const ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
 	return NULL;
 }
 
-ZERSHolder<const ZERSResource> ZERSManager::GetResource(const ZEString& FilePath)
+ZEHolder<const ZERSResource> ZERSManager::GetResource(const ZEString& FilePath)
 {
 	ManagerLock.Lock();
-	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(FilePath);
+	ZEHolder<const ZERSResource> Resource = GetResourceInternal(FilePath);
 	ManagerLock.Unlock();
 	return Resource;
 }

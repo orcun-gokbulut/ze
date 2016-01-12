@@ -40,7 +40,7 @@
 #include "ZETypes.h"
 #include "ZEEndian.h"
 #include "ZEPacking.h"
-#include "ZEGraphics/ZETexture.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEDS/ZEArray.h"
 
 class ZETextureData;
@@ -53,8 +53,8 @@ struct ZETextureDataInfo
 	ZEUInt							LevelCount;
 	ZEUInt							Width;
 	ZEUInt							Height;
-	ZETexturePixelFormat			PixelFormat;
-	ZETextureType					Type;
+	ZEGRFormat			PixelFormat;
+	ZEGRTextureType					Type;
 };
 
 class ZETextureLevel
@@ -129,13 +129,13 @@ class ZETextureData
 		ZEUInt							GetHeight();
 		ZEUInt							GetLevelCount();
 		ZEUInt							GetSurfaceCount();
-		ZETextureType					GetType();
-		ZETexturePixelFormat			GetPixelFormat();
+		ZEGRTextureType					GetType();
+		ZEGRFormat					GetPixelFormat();
 
 		ZESize							GetSize();
 		ZESize							GetSizeOnDisk();
 
-		void							Create(ZETextureType TextureType, ZETexturePixelFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height);
+		void							Create(ZEGRTextureType TextureType, ZEGRFormat PixelFormat, ZEUInt SurfaceCount, ZEUInt LevelCount, ZEUInt Width, ZEUInt Height);
 		void							Create(ZETextureData& TextureData);
 		void							Destroy();
 

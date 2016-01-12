@@ -40,6 +40,9 @@
 #include "ZEMDResourceBone.h"
 #include "ZEMDResourceAnimation.h"
 #include "ZEMDResourceHelper.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEDS/ZEString.h"
 
 class ZETexture2DResource;
 class ZETexture2D;
@@ -53,23 +56,17 @@ class ZEModelResource : public ZERSResource
 		ZEList2<ZEModelResourceBone> Bones;
 		ZEList2<ZEModelResourceHelper> Helpers;
 		ZEList2<ZEModelResourceAnimation> Animations;
-		ZEArray<ZEMaterial*> Materials;
 
 		bool BoundingBoxIsUserDefined;
 		ZEAABBox UserDefinedBoundingBox;
 
 		bool ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
-
 		bool ReadMeshes(const ZEMLReaderNode& MeshesNode);
 		bool ReadBones(const ZEMLReaderNode& BonesNode);
 		bool ReadAnimations(const ZEMLReaderNode& AnimationsNode);
 		bool ReadHelpers(const ZEMLReaderNode& HelpersNode);
 		bool ReadMaterials(const ZEMLReaderNode& MaterialsNode);
-
 		virtual bool LoadInternal(const ZERSLoadingOptions* Option);
-
-		const ZETexture2D* ManageModelMaterialTextures(const ZEString& FileName);
-		bool ReadModelFromFile(ZEFile* ResourceFile);
 
 		virtual ~ZEModelResource();
 
@@ -77,28 +74,30 @@ class ZEModelResource : public ZERSResource
 		bool GetUserDefinedBoundingBoxEnabled() const;
 		const ZEAABBox& GetUserDefinedBoundingBox() const;
 
-		const ZEList2<ZEModelResourceMesh>& GetMeshes() const;
+		const ZEList2<ZEModelResourceMesh>& GetMeshes();
+		const ZEList2<const ZEModelResourceMesh>& GetMeshes() const;
 		void AddMesh(ZEModelResourceMesh* Mesh);
 		void RemoveMesh(ZEModelResourceMesh* Mesh);
 
-		const ZEList2<ZEModelResourceBone>& GetBones() const;
+		const ZEList2<ZEModelResourceBone>& GetBones();
+		const ZEList2<const ZEModelResourceBone>& GetBones() const;
 		void AddBone(ZEModelResourceBone* Bone);
 		void RemoveBone(ZEModelResourceBone* Bone);
 
-		const ZEList2<ZEModelResourceAnimation>& GetAnimations() const;
+		const ZEList2<ZEModelResourceAnimation>& GetAnimations();
+		const ZEList2<const ZEModelResourceAnimation>& GetAnimations() const;
 		void AddAnimation(ZEModelResourceAnimation* Animation);
 		void RemoveAnimation(ZEModelResourceAnimation* Animation);
 
-		const ZEList2<ZEModelResourceHelper>& GetHelpers() const;
+		const ZEList2<ZEModelResourceHelper>& GetHelpers();
+		const ZEList2<const ZEModelResourceHelper>& GetHelpers() const;
 		void AddHelper(ZEModelResourceHelper* Helper);
 		void RemoveHelper(ZEModelResourceHelper* Helper);
-
-		const ZEArray<ZEMaterial*>& GetMaterials() const;
 
 		bool Load(const ZEMLReaderNode& ModelNode);
 		bool Save(ZEMLWriterNode& ModelNode) const;
 
 		ZEModelResource();
 
-		static ZERSHolder<ZEModelResource> Load(const ZEString& FileName);
+		static ZEHolder<ZEModelResource> Load(const ZEString& FileName);
 };

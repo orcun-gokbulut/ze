@@ -34,29 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GRID_H__
-#define __ZE_GRID_H__
 
 #include "ZECanvasBrush.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZEListener;
-class ZEScene;
-class ZESimpleMaterial;
+class ZEGRConstantBuffer;
+class ZERNSimpleMaterial;
+class ZERNFixedMaterial;
 
 class ZEGrid : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
-		ZECanvas					MinorGrid;
-		ZECanvas					MajorGrid;
-		ZECanvas					AxisX;
-		ZECanvas					AxisZ;
+		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
+		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
+		ZEGRHolder<ZERNFixedMaterial>	Material;
+		ZERNCommand						RenderCommand;
 
-		ZESimpleMaterial*			Material;
-		ZERenderCommand				RenderCommand;
+		struct
+		{
+			ZEMatrix4x4				AxisTransform;
+			ZEMatrix4x4				MinorGridTransform;
+			ZEMatrix4x4				MajorGridTransform;
+		} Constants;
+
+		ZESize						MinorGridOffset;
+		ZESize						MinorGridCount;
+
+		ZESize						MajorGridOffset;
+		ZESize						MajorGridCount;
 
 		ZEVector2					GridSize;
 		bool						FollowerGrid;
@@ -103,9 +112,9 @@ class ZEGrid : public ZEEntity
 		bool						GetAxisEnabled();
 		void						SetAxisColor(const ZEVector3& Color);
 		const ZEVector3&			GetAxisColor();
-
-		virtual void				Draw(ZEDrawParameters* Parameters);
-
+		
+		virtual	bool				PreRender(const ZERNCullParameters* CullParameters);
+		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		
 		static ZEGrid*				CreateInstance();
 };
-#endif

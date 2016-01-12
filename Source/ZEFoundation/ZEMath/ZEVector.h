@@ -252,6 +252,7 @@ class ZEVector3
 		float						operator[](ZESize Index) const;
 		float&						operator[](ZESize Index);
 
+		explicit					ZEVector3(float Value);
 									ZEVector3(float x, float y, float z);
 									ZEVector3(ZEVector2& Base, float z);
 									ZEVector3(const ZEVector3& Start, const ZEVector3& End);

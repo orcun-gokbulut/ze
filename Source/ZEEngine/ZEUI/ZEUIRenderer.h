@@ -41,15 +41,15 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMeta/ZEObject.h"
-#include "ZEGraphics/ZERenderer.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 class ZEVertexDeclaration;
 
 class ZEUIRenderer
 {
 	private:
-		ZESmartArray<ZERenderCommand>	RenderCommands;
-		ZEMaterial*						DefaultMaterial;
+		ZESmartArray<ZERNCommand>	RenderCommands;
+		ZERNMaterial*						DefaultMaterial;
 		ZEVertexDeclaration*			VertexDeclaration;
 		ZEMatrix4x4						ScreenTransform;
 
@@ -64,7 +64,7 @@ class ZEUIRenderer
 		void							Destroy();
 
 		void							AddRectangle(const ZEUIRectangle& Rectangle);
-		void							Render(ZERenderer* Renderer);
+		void							Render(ZERNRenderer* Renderer);
 		void							Clean();
 
 		static ZEUIRenderer*			CreateInstance();

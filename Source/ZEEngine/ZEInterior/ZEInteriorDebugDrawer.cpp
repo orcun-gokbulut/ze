@@ -34,12 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInteriorDebugDrawer.h"
-#include "ZEGraphics\ZESimpleMaterial.h"
 #include "ZEInterior.h"
 #include "ZEInteriorDoor.h"
 #include "ZEInteriorRoom.h"
-#include "ZEGame\ZEDrawParameters.h"
-#include "ZEGraphics\ZERenderer.h"
+#include "ZERenderer\ZERNSimpleMaterial.h"
+#include "ZERenderer\ZERNRenderer.h"
 
 void ZEInteriorDebugDrawer::DebugDrawEntity()
 {
@@ -101,7 +100,7 @@ void ZEInteriorDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	InteriorRenderCommand.PrimitiveCount = InteriorDrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&InteriorRenderCommand);
+	DrawParameters->Renderer->AddCommand(&InteriorRenderCommand);
 }
 
 bool ZEInteriorDebugDrawer::InitializeSelf()
@@ -110,7 +109,7 @@ bool ZEInteriorDebugDrawer::InitializeSelf()
 		return false;
 
 	if (InteriorMaterial == NULL)
-		InteriorMaterial = ZESimpleMaterial::CreateInstance();
+		InteriorMaterial = ZERNSimpleMaterial::CreateInstance();
 
 	InteriorRenderCommand.SetZero();
 	InteriorRenderCommand.Material = InteriorMaterial;

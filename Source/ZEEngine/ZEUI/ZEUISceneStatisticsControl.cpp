@@ -37,7 +37,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEUI/ZEFontResource.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZEInput/ZEInputDefinitions.h"
@@ -103,12 +103,12 @@
 #define GreenTextColor						ZEVector4(0.0f, 0.7f, 0.0f, 1.0f)
 #define RedTextColor						ZEVector4(7.0f, 0.0f, 0.0f, 1.0f)
 
-void ZEUISceneStatisticsControl::SetMaterial(ZEMaterial* Material)
+void ZEUISceneStatisticsControl::SetMaterial(ZERNMaterial* Material)
 {
 
 }
 
-ZEMaterial* ZEUISceneStatisticsControl::GetMaterial() const
+ZERNMaterial* ZEUISceneStatisticsControl::GetMaterial() const
 {
 	return NULL;
 }

@@ -55,9 +55,9 @@ class ZERSManager : public ZEObject
 		ZESize CacheSize;
 		ZESize CacheUsage;
 		
-		ZERSHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
+		ZEHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
 		void RegisterResourceInternal(const ZERSResource* Resource);
-		ZERSHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions);
+		ZEHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions);
 
 		void RegisterResource(const ZERSResource* Resource);
 		void ReleaseResource(const ZERSResource* Resource);
@@ -72,8 +72,8 @@ class ZERSManager : public ZEObject
 		void SetCacheSize(ZESize Size);
 		ZESize SetCacheSize();
 
-		ZERSHolder<const ZERSResource> GetResource(const ZEString& FilePath);
-		ZERSHolder<const ZERSResource> GetResource(const ZEGUID& GUID);
+		ZEHolder<const ZERSResource> GetResource(const ZEString& FilePath);
+		ZEHolder<const ZERSResource> GetResource(const ZEGUID& GUID);
 
 		static ZERSManager* GetInstance();
 };

@@ -97,13 +97,13 @@ void ZEUISequencePlayer::SetFramesSequence(const ZEString& FolderPath, ZEUInt Fr
 	for(ZESize I = 1; I <= FrameCount; I++)
 	{
 		if(I < 10)
-			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance000") + I + ".jpg")->GetTexture());
+			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance000") + I + ".jpg")->GetTexture2D());
 		else if(I < 100)
-			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance00") + I + ".jpg")->GetTexture());
+			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance00") + I + ".jpg")->GetTexture2D());
 		else if(I < 1000)
-			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance0") + I + ".jpg")->GetTexture());
+			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance0") + I + ".jpg")->GetTexture2D());
 		else
-			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance") + I + ".jpg")->GetTexture());
+			Frames.Add(ZETexture2DResource::LoadSharedResource(FolderPath + ZEString("/") + ZEString("VideoSequance") + I + ".jpg")->GetTexture2D());
 	}
 }
 

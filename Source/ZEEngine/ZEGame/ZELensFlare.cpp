@@ -35,28 +35,19 @@
 
 #include "ZELensFlare.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGraphics/ZESkyBoxMaterial.h"
-#include "ZEGraphics/ZEDirectionalLight.h"
+#include "ZERenderer/ZELightDirectional.h"
 #include "ZETexture/ZETextureCubeResource.h"
-
-
-#include <string.h>
 #include "ZEWeather.h"
 
-ZEDrawFlags ZELensFlare::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
+#include <string.h>
 
 bool ZELensFlare::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	
 	return true;
 }
 
@@ -64,35 +55,6 @@ bool ZELensFlare::DeinitializeSelf()
 {
 
 	return ZEEntity::DeinitializeSelf();
-}
-
-void ZELensFlare::Draw(ZEDrawParameters* DrawParameters)
-{
-	if (DrawParameters->Pass == ZE_RP_SHADOW_MAP)
-		return;
-
-	// Find Sun
-
-	ZEArray<ZEEntity*> Entities = ZEScene::GetInstance()->GetEntities(ZEWeather::Class());
-	if (Entities.GetSize() == 0)
-		return;
-
-	ZEWeather* Weather = static_cast<ZEWeather*>(Entities[0]);
-	ZEVector3 SunDirection = Weather->GetSunDirection();
-
-	ZECamera* Camera = ZEScene::GetInstance()->GetActiveCamera();
-	
-	ZEVector4 SunDirectionScreen;
-	ZEMatrix4x4::Transform(SunDirectionScreen, Camera->GetViewProjectionTransform(), ZEVector4(SunDirection, 1.0f));
-
-	SunDirectionScreen.x /= SunDirectionScreen.w;
-	SunDirectionScreen.y /= SunDirectionScreen.w;
-
-	float Length = SunDirectionScreen.Length();
-	
-
-
-
 }
 
 void ZELensFlare::Tick(float Time)

@@ -37,7 +37,7 @@
 #include "ZEUIRenderer.h"
 #include "ZEUIControl.h"
 #include "ZEError.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEInput/ZEInputDefinitions.h"
 #include "ZEFontResourceBitmap.h"
 #include "ZEFontResourceDynamic.h"
@@ -584,7 +584,7 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 	return ParentControl;
 }
 
-void ZEUIManager::Render(ZERenderer* Renderer)
+void ZEUIManager::Render(ZERNRenderer* Renderer)
 {
 	UIRenderer->Clean();
 	for (size_t I = 0; I < Controls.GetCount(); I++)
