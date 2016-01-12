@@ -40,7 +40,7 @@
 #include "ZEMLNode.h"
 
 class ZEFile;
-class ZEMLFormatDescription;
+struct ZEMLFormatDescription;
 
 class ZEMLRoot
 {
