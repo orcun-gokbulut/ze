@@ -36,10 +36,11 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEDS/ZEList2.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
@@ -54,23 +55,23 @@ class ZERNStageAO : public ZERNStage
 private:
 	ZEFlags								DirtyFlags;
 
-	ZEGRHolder<ZEGRTexture2D>			OcclusionMap;
-	ZEGRHolder<ZEGRTexture2D>			BlurTexture;
-	ZEGRHolder<ZEGRTexture2D>			RandomVectorsTexture;
+	ZEHolder<ZEGRTexture2D>			OcclusionMap;
+	ZEHolder<ZEGRTexture2D>			BlurTexture;
+	ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
 
-	ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
-	ZEGRHolder<ZEGRConstantBuffer>		BilateralConstantBuffer;
+	ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+	ZEHolder<ZEGRConstantBuffer>		BilateralConstantBuffer;
 
-	ZEGRHolder<ZEGRShader>				VertexShader;
-	ZEGRHolder<ZEGRShader>				BlendVertexShader;
+	ZEHolder<ZEGRShader>				VertexShader;
+	ZEHolder<ZEGRShader>				BlendVertexShader;
 
-	ZEGRHolder<ZEGRShader>				PixelShader;
-	ZEGRHolder<ZEGRShader>				BlendPixelShader;
-	ZEGRHolder<ZEGRShader>				BilateralPixelShader;
+	ZEHolder<ZEGRShader>				PixelShader;
+	ZEHolder<ZEGRShader>				BlendPixelShader;
+	ZEHolder<ZEGRShader>				BilateralPixelShader;
 
-	ZEGRHolder<ZEGRRenderStateData>		RenderStateData;
-	ZEGRHolder<ZEGRRenderStateData>		BlendRenderStateData;
-	ZEGRHolder<ZEGRRenderStateData>		BilateralRenderStateData;
+	ZEHolder<ZEGRRenderStateData>		RenderStateData;
+	ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
+	ZEHolder<ZEGRRenderStateData>		BilateralRenderStateData;
 
 	ZEGRSamplerState					SamplerPointBorder;
 	ZEGRSamplerState					SamplerPointWrap;

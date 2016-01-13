@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZECommon.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGRVertexLayout.h"
 #include "ZEGRDefinitions.h"
 #include "ZEGRBlendState.h"
@@ -45,7 +46,6 @@
 #include "ZEGRDepthStencilState.h"
 #include "ZEGRScissorRect.h"
 #include "ZEGRViewPort.h"
-#include "ZEGRHolder.h"
 #include "ZEGRDepthStencilBuffer.h"
 #include "ZEGRFormat.h"
 
@@ -82,7 +82,7 @@ class ZEGRRenderState
 	private:
 		ZEGRPrimitiveType						PrimitiveType;
 		ZEGRVertexLayout						VertexLayout;
-		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
 		ZEGRRasterizerState						RasterizerState;
 		ZEGRDepthStencilState					DepthStencilState;
 		ZEGRFormat								DepthStencilFormat;

@@ -67,6 +67,41 @@
 
 ZE_MODULE_DESCRIPTION(ZED11Module, ZEGRGraphicsModule, NULL)
 
+static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device1* Device)
+{
+	IDXGIDevice1* DXGIDevice;
+	HRESULT Result = Device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&DXGIDevice);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot query IDXGIDevice1. Error: %d", Result);
+		DXGIDevice->Release();
+		return NULL;
+	}
+
+	IDXGIAdapter1* DXGIAdapter;
+	Result = DXGIDevice->GetParent(__uuidof(IDXGIAdapter1), (void**)&DXGIAdapter);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get IDXGIAdapter1. Error: %d", Result);
+		DXGIAdapter->Release();
+		return NULL;
+	}
+
+	IDXGIFactory2* DXGIFactory;
+	Result = DXGIAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get IDXGIFactory2. Error: %d", Result);
+		DXGIFactory->Release();
+		return NULL;
+	}
+
+	DXGIDevice->Release();
+	DXGIAdapter->Release();
+
+	return DXGIFactory;
+}
+
 bool ZED11Module::InitializeSelf()
 {
 	if (!ZEGRGraphicsModule::InitializeSelf())
@@ -91,27 +126,59 @@ bool ZED11Module::InitializeSelf()
 		DeviceFlags |= D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
 	#endif*/
 	
+	IDXGIFactory2* Factory;
+	HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&Factory);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot create factory. Error: %d", Result);
+		return false;
+	}
+
+	IDXGIAdapter1* Adapter;
+	UINT AdapterIndex = 0;
+	bool AdapterFound = false;
+	while(Factory->EnumAdapters1(AdapterIndex++, &Adapter) != DXGI_ERROR_NOT_FOUND)
+	{
+		DXGI_ADAPTER_DESC1 AdapterDesc;
+		Adapter->GetDesc1(&AdapterDesc);
+
+		if(AdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+			continue;
+
+		HRESULT Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, NULL, NULL, NULL);
+		if(SUCCEEDED(Result))
+		{
+			AdapterFound = true;
+			break;
+		}
+	}
+
+	Factory->Release();
+
+	if(!AdapterFound)
+	{
+		zeCriticalError("There is no hardware that supports Directx 11.");
+		Adapter->Release();
+		return false;
+	}
+
+	CurrentAdapter = new ZED11Adapter(Adapter);
+
 	ID3D11Device* DeviceTemp;
-	HRESULT Result = D3D11CreateDevice(NULL, 
-		D3D_DRIVER_TYPE_HARDWARE, NULL, DeviceFlags, 
-		FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, 
-		&DeviceTemp, NULL, NULL);
-		
+	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &DeviceTemp, NULL, NULL);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot create device. Error: %d", Result);
-		Deinitialize();
 		return false;
 	}
 
 	Result = DeviceTemp->QueryInterface(__uuidof(ID3D11Device1), (void**)&Device);
-	if (FAILED(Result) || Device == NULL)
+	DeviceTemp->Release();
+	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot query Direct3D11 Interface.");
+		zeCriticalError("Cannot query ID3D11Device1. Error: %d", Result);
 		return false;
 	}
-
-	DeviceTemp->Release();
 
 	ID3D11DeviceContext1* NativeContext;
 	Device->GetImmediateContext1(&NativeContext);
@@ -134,11 +201,16 @@ bool ZED11Module::InitializeSelf()
 
 bool ZED11Module::DeinitializeSelf()
 {
+	ZEGR_RELEASE(Device);
+
+	delete (ZED11Adapter*)CurrentAdapter;
+
 	Context.Deinitialize();
 
-	Adapters.Clear();
 	for (ZESize I = 0; I < Adapters.GetCount(); I++)
 		delete (ZED11Adapter*)Adapters[I];
+
+	Adapters.Clear();
 
 	return ZEGRGraphicsModule::DeinitializeSelf();
 }
@@ -146,6 +218,11 @@ bool ZED11Module::DeinitializeSelf()
 ZED11StatePool* ZED11Module::GetStatePool()
 {
 	return &StatePool;
+}
+
+ZEGRAdapter* ZED11Module::GetCurrentAdapter()
+{
+	return CurrentAdapter;
 }
 
 ZEGRTracer* ZED11Module::GetTracer()
@@ -157,27 +234,14 @@ const ZEArray<ZEGRAdapter*>& ZED11Module::GetAdapters()
 {
 	if (Adapters.GetCount() == 0)
 	{
-		IDXGIFactory2* DXGIFactory = NULL;
-		HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
+		IDXGIFactory2* Factory = GetFactoryOfDevice(Device);
 
-		IDXGIAdapter2* DXGIAdapter = NULL;
+		IDXGIAdapter1* DXGIAdapter;
 		ZEUInt AdapterId = 0;
-		while (DXGIFactory->EnumAdapters1(AdapterId++, (IDXGIAdapter1**)&DXGIAdapter) != DXGI_ERROR_NOT_FOUND)
-		{
-			ZED11Adapter* Adapter = new ZED11Adapter(DXGIAdapter);
-			Adapters.Add(Adapter);
-		}
+		while (Factory->EnumAdapters1(AdapterId++, &DXGIAdapter) != DXGI_ERROR_NOT_FOUND)
+			Adapters.Add(new ZED11Adapter(DXGIAdapter));
 
-		if (Adapters.GetCount() == 0)
-		{
-			zeCriticalError("Cannot enumerate adapters. Error: %d", DXGI_ERROR_NOT_FOUND);
-			Deinitialize();
-			return Adapters;
-		}
-
-		#ifdef ZE_GRAPHIC_LOG_ENABLE
-		zeLog("Adaptors are enumerated.");
-		#endif
+		Factory->Release();
 	}
 	
 	return Adapters;
@@ -257,7 +321,6 @@ ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
 
 ZED11Module::ZED11Module()
 {
-	Context = Context;
 }
 
 ZED11Module::~ZED11Module()

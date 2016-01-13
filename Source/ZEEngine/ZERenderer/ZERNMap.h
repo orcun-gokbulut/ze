@@ -36,7 +36,7 @@
 #pragma once
 
 #include "ZEGraphics\ZEGRSamplerState.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture;
 class ZETextureResource;
@@ -47,7 +47,7 @@ class ZERNMap
 {
 	private:
 		ZETextureResource*				Resource;
-		ZEGRHolder<ZEGRTexture>			Texture;
+		ZEHolder<ZEGRTexture>			Texture;
 		ZEGRSamplerState				Sampler;
 
 	public:
@@ -73,7 +73,7 @@ class ZERNMap
 		void							ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name);
 
 										ZERNMap();
-										ZERNMap(ZEGRTexture* Resource, const ZEGRSamplerState& SamplerState = ZEGRSamplerState());
+										ZERNMap(ZEGRTexture* Texture, const ZEGRSamplerState& SamplerState = ZEGRSamplerState());
 										ZERNMap(ZETextureResource* Resource, const ZEGRSamplerState& SamplerState = ZEGRSamplerState());
 										~ZERNMap();
 };

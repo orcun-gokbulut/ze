@@ -36,7 +36,7 @@
 #pragma once
 
 #include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZED11ComponentBase.h"
 #include "ZED11State.h"
 
@@ -55,15 +55,15 @@ class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBa
 	friend class ZED11Context;
 	friend class ZED11StatePool;
 	private:
-		ZEGRHolder<ZED11VertexLayout>			VertexLayout;
-		ZEGRHolder<ZED11RasterizerState>		RasterizerState;
-		ZEGRHolder<ZED11DepthStencilState>		DepthStencilState;
-		ZEGRHolder<ZED11DepthStencilBuffer>		DepthStencilBuffer;
-		ZEGRHolder<ZED11BlendState>				BlendState;
+		ZEHolder<ZED11VertexLayout>				VertexLayout;
+		ZEHolder<ZED11RasterizerState>			RasterizerState;
+		ZEHolder<ZED11DepthStencilState>		DepthStencilState;
+		ZEHolder<ZED11DepthStencilBuffer>		DepthStencilBuffer;
+		ZEHolder<ZED11BlendState>				BlendState;
 
 		D3D11_PRIMITIVE_TOPOLOGY				PrimitiveTopology;
 
-		ZEGRHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
 		ID3D11RasterizerState*					NativeRasterizerState;
 		ID3D11DepthStencilState*				NativeDepthStencilState;
 		ID3D11BlendState*						NativeBlendState;

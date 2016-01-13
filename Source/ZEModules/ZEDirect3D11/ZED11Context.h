@@ -49,7 +49,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		ID3D11DeviceContext1*				Context;
 		
 		ZEFlags								DirtyFlags;
-		ZEGRHolder<ZED11RenderStateData>	RenderState;
+		ZEHolder<ZED11RenderStateData>	RenderState;
 		ID3D11BlendState*					BlendState;
 		ZEVector4							BlendFactors;
 		ZEUInt								BlendMask;

@@ -99,14 +99,11 @@ ZEGRIndexBuffer::~ZEGRIndexBuffer()
 	Deinitialize();
 }
 
-ZEGRIndexBuffer* ZEGRIndexBuffer::Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+ZEHolder<ZEGRIndexBuffer> ZEGRIndexBuffer::Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
 {
-	ZEGRIndexBuffer* IndexBuffer = ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
+	ZEHolder<ZEGRIndexBuffer> IndexBuffer = ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
 	if (!IndexBuffer->Initialize(IndexCount, Format))
-	{
-		IndexBuffer->Release();
 		return NULL;
-	}
 
 	return IndexBuffer;
 }

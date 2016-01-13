@@ -58,6 +58,7 @@ class ZED11Module : public ZEGRGraphicsModule
 	protected:
 		ID3D11Device1*							Device;
 		ZED11Context							Context;
+		ZEGRAdapter*							CurrentAdapter;
 		ZEArray<ZEGRAdapter*>					Adapters;
 		ZED11StatePool							StatePool;
 		ZED11Tracer								Tracer;
@@ -70,9 +71,11 @@ class ZED11Module : public ZEGRGraphicsModule
 
 	public:
 		ZED11StatePool*							GetStatePool();
+
 		virtual ZEGRTracer*						GetTracer();
 		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters();
 		virtual ZEGRContext*					GetMainContext();
+		virtual ZEGRAdapter*					GetCurrentAdapter();
 
 		virtual ZEGROutput*						CreateOutput();
 		virtual ZEGRContext*					CreateContext();

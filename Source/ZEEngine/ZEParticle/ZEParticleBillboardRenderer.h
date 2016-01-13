@@ -39,7 +39,7 @@
 
 #include "ZEParticleRenderer.h"
 #include "ZERenderer\ZERNCommand.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRVertexBuffer;
 class ZERNRenderParameters;
@@ -59,14 +59,14 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 			ZEVector3	Position;
 			float		Size;
 		};
-		ZEGRHolder<ZEGRStructuredBuffer>	InstanceBuffer;
+		ZEHolder<ZEGRStructuredBuffer>	InstanceBuffer;
 
-		ZEGRHolder<ZEGRShader>				VertexShader;
-		ZEGRHolder<ZEGRShader>				HullShader;
-		ZEGRHolder<ZEGRShader>				DomainShader;
-		ZEGRHolder<ZEGRShader>				PixelShader;
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				HullShader;
+		ZEHolder<ZEGRShader>				DomainShader;
+		ZEHolder<ZEGRShader>				PixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 
 		void								CreateShaders();
 		void								CreateRenderState();

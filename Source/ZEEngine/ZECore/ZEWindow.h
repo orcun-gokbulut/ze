@@ -39,9 +39,8 @@
 #include "ZETypes.h"
 #include "ZEDS\ZEString.h"
 #include "ZEMath\ZEVector.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
-class ZEGRMonitorMode;
 class ZEGROutput;
 
 class ZEWindow : public ZEInitializable
@@ -49,7 +48,7 @@ class ZEWindow : public ZEInitializable
 	friend class ZEWindowCallback;
 	private:
 		void*					Handle;
-		ZEGRHolder<ZEGROutput>	Output;
+		ZEHolder<ZEGROutput>	Output;
 
 		ZEString				Title;
 		ZEInt					Left;
@@ -62,7 +61,6 @@ class ZEWindow : public ZEInitializable
 		bool					BorderlessMode;
 		bool					Resizable;
 		bool					Fullscreen;
-		ZEGRMonitorMode*		MonitorMode;
 		
 		bool					HideCursor;
 		bool					LockCursor;
@@ -109,9 +107,6 @@ class ZEWindow : public ZEInitializable
 
 		void					SetFullScreen(bool Enabled);
 		bool					GetFullscreen();
-
-		void					SetMonitorMode(ZEGRMonitorMode* Mode);
-		ZEGRMonitorMode*		GetMonitorMode();
 
 		void					SetHideCursor(bool Visibility);
 		bool					GetHideCursor();

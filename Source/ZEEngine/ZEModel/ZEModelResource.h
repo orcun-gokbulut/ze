@@ -48,7 +48,7 @@
 #include "ZEPhysics/ZEPhysicalJoint.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEDS/ZEString.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
@@ -298,10 +298,10 @@ struct ZEModelResourceAnimation
 class ZEModelResourceMeshLOD
 {
 	public:
-		ZEGRHolder<ZEGRVertexBuffer>			VertexBuffer;
-		ZEGRHolder<ZEGRVertexBuffer>			VertexBufferNormals;
-		ZEGRHolder<ZEGRVertexBuffer>			VertexBufferSkin;
-		ZEGRHolder<ZEGRIndexBuffer>				IndexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBufferNormals;
+		ZEHolder<ZEGRVertexBuffer>			VertexBufferSkin;
+		ZEHolder<ZEGRIndexBuffer>				IndexBuffer;
 		
 		ZEUInt32								TriangleCount;
 		ZEUInt32								VertexCount;

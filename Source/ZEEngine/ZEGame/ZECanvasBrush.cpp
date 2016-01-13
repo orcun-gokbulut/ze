@@ -36,10 +36,20 @@
 #include "ZECanvasBrush.h"
 #include "ZEError.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNMaterial.h"
+
+void ZECanvasBrush::SetMaterial(ZERNMaterial* Material)
+{
+	this->Material = Material;
+}
+
+ZERNMaterial* ZECanvasBrush::GetMaterial() const
+{
+	return Material;
+}
 
 ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
 {

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRConstantBuffer.cpp
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRConstantBuffer.h"
-
-#include "ZEPointer\ZEPointer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
-
-ZEGRResourceType ZEGRConstantBuffer::GetResourceType()
-{
-	return ZEGR_RT_CONSTANT_BUFFER;
-}
-
-bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
-{
-	SetSize(BufferSize);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, ConstantBuffer, Pipeline);
-	return true;
-}
-
-void ZEGRConstantBuffer::Deinitialize()
-{
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
-	SetSize(0);
-}
-
-void ZEGRConstantBuffer::SetData(void* Data)
-{
-	void* Buffer;
-	if (!Lock(&Buffer))
-		return;
-
-	memcpy(Buffer, Data, GetSize());
-
-	Unlock();
-}
-
-ZEGRConstantBuffer::ZEGRConstantBuffer()
-{
-
-}
-
-ZEGRConstantBuffer::~ZEGRConstantBuffer()
-{
-	Deinitialize();
-}
-
-ZEHolder<ZEGRConstantBuffer> ZEGRConstantBuffer::Create(ZESize BufferSize)
-{
-	ZEHolder<ZEGRConstantBuffer> ConstantBuffer = ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
-	if (!ConstantBuffer->Initialize(BufferSize))
-		return NULL;
-	
-	return ConstantBuffer;
-}

@@ -40,7 +40,8 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -63,18 +64,18 @@ class ZERNStageLighting : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEGRHolder<ZEGRShader>				TiledDeferredVertexShader;
-		ZEGRHolder<ZEGRShader>				TiledDeferredPixelShader;
-		ZEGRHolder<ZEGRShader>				DeferredVertexShader;
-		ZEGRHolder<ZEGRShader>				DeferredPixelShader;
+		ZEHolder<ZEGRShader>				TiledDeferredVertexShader;
+		ZEHolder<ZEGRShader>				TiledDeferredPixelShader;
+		ZEHolder<ZEGRShader>				DeferredVertexShader;
+		ZEHolder<ZEGRShader>				DeferredPixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData>		DeferredRenderState;
-		ZEGRHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
+		ZEHolder<ZEGRRenderStateData>		DeferredRenderState;
+		ZEHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 
-		ZEGRHolder<ZEGRStructuredBuffer>	LightStructuredBuffer;
-		ZEGRHolder<ZEGRStructuredBuffer>	TileStructuredBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>		LightConstantBuffer;
-		ZEGRHolder<ZEGRVertexBuffer>		LightVertexBuffer;
+		ZEHolder<ZEGRStructuredBuffer>	LightStructuredBuffer;
+		ZEHolder<ZEGRStructuredBuffer>	TileStructuredBuffer;
+		ZEHolder<ZEGRConstantBuffer>		LightConstantBuffer;
+		ZEHolder<ZEGRVertexBuffer>		LightVertexBuffer;
 
 		struct LightStruct
 		{
@@ -110,7 +111,7 @@ class ZERNStageLighting : public ZERNStage
 		ZEArray<ZELight*>					Lights;
 		ZEArray<TileStruct>					Tiles;
 
-		ZEGRHolder<ZEGRTexture2D>			RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
 		ZEVector2							OffsetVectors[16];
 
 		ZEGRRenderTarget*					OutputRenderTarget;

@@ -51,9 +51,9 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool							Wireframe;
 		bool							DepthTestDisabled;
 
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
-		ZEGRHolder<ZEGRRenderStateData> RenderStateData;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData> RenderStateData;
 
 		struct
 		{
@@ -64,7 +64,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 			float						Reserved1;
 		} Constants;
 
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 		ZERNMap							TextureMap;
 
 		void							UpdateShaders();

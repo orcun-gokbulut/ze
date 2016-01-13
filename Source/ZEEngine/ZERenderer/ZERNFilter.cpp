@@ -72,10 +72,10 @@ bool ZERNFilter::InitializeSelf()
 
 void ZERNFilter::DeinitializeSelf()
 {
-	VertexShader->Release();
-	PixelShader->Release();
-	RenderStateData->Release();
-	ConstantBuffer->Release();
+	VertexShader.Release();
+	PixelShader.Release();
+	RenderStateData.Release();
+	ConstantBuffer.Release();
 }
 
 void ZERNFilter::SetInput(ZEGRTexture2D* Input)

@@ -37,7 +37,7 @@
 
 #include "ZEInitializable.h"
 #include "ZEGraphics/ZEGRResource.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 #define ZEGR_MAX_RENDERER_STAGE_COUNT 10
 
@@ -50,7 +50,7 @@ class ZERNMaterialStage
 {
 	public:
 		ZERNStage*						Stage;
-		ZEGRHolder<ZEGRRenderStateData> RenderState;
+		ZEHolder<ZEGRRenderStateData> RenderState;
 
 										ZERNMaterialStage();
 };

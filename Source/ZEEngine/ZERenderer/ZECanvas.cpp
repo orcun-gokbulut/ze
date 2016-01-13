@@ -798,9 +798,9 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 	return true;
 }
 
-ZEGRVertexBuffer* ZECanvas::CreateVertexBuffer()
+ZEHolder<ZEGRVertexBuffer> ZECanvas::CreateVertexBuffer()
 {
-	ZEGRVertexBuffer* Buffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZECanvasVertex));
+	ZEHolder<ZEGRVertexBuffer> Buffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZECanvasVertex));
 	void* BufferPtr = NULL;
 	if (!Buffer->Lock(&BufferPtr))
 		return NULL;

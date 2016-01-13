@@ -35,6 +35,7 @@
 
 #include "ZEGRRenderState.h"
 #include "ZEGRGraphicsModule.h"
+#include "ZEGRShader.h"
 
 ZEGRRenderState ZEGRRenderState::Default;
 

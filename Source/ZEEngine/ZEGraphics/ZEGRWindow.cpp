@@ -35,6 +35,7 @@
 
 #include "ZEGRWindow.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGROutput.h"
 
 void ZEGRWindow::OnCreate()
 {
@@ -111,9 +112,34 @@ void* ZEGRWindow::GetHandle() const
 	return Handle;
 }
 
-const char* ZEGRWindow::GetTitle() const
+const ZEString& ZEGRWindow::GetTitle() const
 {
 	return Title.ToCString();
+}
+
+void ZEGRWindow::SetWidth(ZEUInt Width)
+{
+	this->Width = Width;
+}
+
+ZEUInt ZEGRWindow::GetWidth() const
+{
+	return Width;
+}
+
+void ZEGRWindow::SetHeight(ZEUInt Height)
+{
+	this->Height = Height;
+}
+
+ZEUInt ZEGRWindow::GetHeight() const
+{
+	return Height;
+}
+
+ZEGROutput* ZEGRWindow::GetOutput() const
+{
+	return Output;
 }
 
 const ZEWindowStyle& ZEGRWindow::GetStyle() const
@@ -162,14 +188,19 @@ bool ZEGRWindow::GetFullScreen() const
 	return FullScreen;
 }
 
-bool ZEGRWindow::GetVSynchEnabed() const
+bool ZEGRWindow::GetVSynchEnable() const
 {
-	return VSynchEnabed;
+	return VSynchEnable;
 }
 
-bool ZEGRWindow::IsDisabled() const
+ZEGRMonitor* ZEGRWindow::GetContainingMonitor() const
 {
-	return !Enabled;
+	return Output->GetMonitor();
+}
+
+bool ZEGRWindow::GetEnable() const
+{
+	return Enabled;
 }
 
 bool ZEGRWindow::IsFocused() const
@@ -197,22 +228,25 @@ bool ZEGRWindow::GetCursorLock() const
 	return LastCursorLock == this;
 }
 
-bool ZEGRWindow::IsInitialized() const
-{
-	return Handle != NULL;
-}
-
-void ZEGRWindow::Destroy()
-{
-	delete this;
-}
-
 static ZEUInt NextWindowId = 0;
 ZEUInt ZEGRWindow::WindowCount = 0;
 ZEGRWindow* ZEGRWindow::LastCursorLock = NULL;
 
 ZEGRWindow::ZEGRWindow()
 {
+	Id = NextWindowId++;
+	Handle = NULL;
+	Title = "Zinek Engine Window";
+	
+	memset(&Style, 0, sizeof(ZEWindowStyle));
+	Style.Type = ZE_GWT_CAPTION;
+	Style.Caption.OnTop = true;
+	Style.Caption.Resizable = true;
+	Style.Caption.Maximizable = true;
+	Style.Caption.Minimizable = true;
+
+	Flags = ZE_GWF_NONE;
+
 	Width = 800;
 	Height = 600;
 	PositionX = 100;
@@ -224,27 +258,12 @@ ZEGRWindow::ZEGRWindow()
 	Maximized = false;
 
 	FullScreen = false;
-	FullScreenMonitor = NULL;
-
-	VSynchEnabed = false;
-
-	Flags = 0;
-
-	Handle = NULL;
-	Id = NextWindowId++;
-	Title = "Zinek Engine Window";
-	
-	memset(&Style, 0, sizeof(ZEWindowStyle));
-	Style.Type = ZE_GWT_CAPTION;
-	Style.Caption.OnTop = false;
-	Style.Caption.Resizable = true;
-	Style.Caption.Maximizable = true;
-	Style.Caption.Minimizable = true;
+	VSynchEnable = false;
 }
 
 ZEGRWindow::~ZEGRWindow()
 {
-	DeInitialize();
+	DeinitializeSelf();
 }
 
 ZEUInt ZEGRWindow::GetWindowCount()
@@ -254,5 +273,5 @@ ZEUInt ZEGRWindow::GetWindowCount()
 
 ZEGRWindow* ZEGRWindow::CreateInstance()
 {
-	return NULL;
+	return new ZEGRWindow();
 }

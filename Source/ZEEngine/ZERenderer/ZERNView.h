@@ -39,7 +39,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEPacking.h"
 
 class ZEViewVolume;

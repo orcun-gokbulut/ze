@@ -33,8 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef	__ZE_GRAPHICS_MODULE_H__
-#define __ZE_GRAPHICS_MODULE_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZECore/ZEModule.h"
@@ -86,7 +85,7 @@ class ZEGRGraphicsModule : public ZEModule
 		ZEGRCounter&							GetCounter();
 		virtual const ZEArray<ZEGRAdapter*>&	GetAdapters() = 0;
 		virtual ZEGRTracer*						GetTracer() = 0;
-
+		virtual ZEGRAdapter*					GetCurrentAdapter() = 0;
 		virtual ZEGRContext*					GetMainContext() = 0;
 
 		virtual ZEGROutput*						CreateOutput() = 0;
@@ -104,5 +103,3 @@ class ZEGRGraphicsModule : public ZEModule
 
 		static ZEGRGraphicsModule*				GetInstance();
 };
-
-#endif

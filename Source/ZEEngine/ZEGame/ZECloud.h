@@ -38,7 +38,7 @@
 #include "ZEEntity.h"
 #include "ZETypes.h"
 #include "ZERenderer\ZERNCommand.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 ZE_META_FORWARD_DECLARE(ZECloudMaterial, "ZEGraphics/ZECloudMaterial.h")
@@ -66,7 +66,7 @@ class ZECloud : public ZEEntity
 		float					EarthRadius;
 		float					AtmosphereHeight;
 
-		ZEGRHolder<ZETexture2DResource>	CloudFormationTexture;
+		ZEHolder<ZETexture2DResource>	CloudFormationTexture;
 
 		ZERNCommand				CloudRenderCommand;
 

@@ -40,42 +40,43 @@
 
 #include <dxgi1_2.h>
 
-ZED11Monitor::ZED11Monitor(ZED11Adapter* Adapter, IDXGIOutput1* Output)
+ZED11Monitor::ZED11Monitor(const ZED11Adapter* Adapter, IDXGIOutput1* Output)
 {
-	DXGI_OUTPUT_DESC Descriptor;
-	memset(&Descriptor, 0, sizeof(DXGI_OUTPUT_DESC));
+	DXGI_OUTPUT_DESC OutputDescription;
+	memset(&OutputDescription, 0, sizeof(DXGI_OUTPUT_DESC));
 	
-	HRESULT Result = Output->GetDesc(&Descriptor);
+	HRESULT Result = Output->GetDesc(&OutputDescription);
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot get monitor info.");
 		return;
 	}
 
-	Area.LeftUp.x = (float)Descriptor.DesktopCoordinates.left;
-	Area.LeftUp.y = (float)Descriptor.DesktopCoordinates.top;
-	Area.RightDown.x = (float)Descriptor.DesktopCoordinates.right;
-	Area.RightDown.y = (float)Descriptor.DesktopCoordinates.bottom;
+	Area.LeftUp.x = (float)OutputDescription.DesktopCoordinates.left;
+	Area.LeftUp.y = (float)OutputDescription.DesktopCoordinates.top;
+	Area.RightDown.x = (float)OutputDescription.DesktopCoordinates.right;
+	Area.RightDown.y = (float)OutputDescription.DesktopCoordinates.bottom;
 
 	this->Adapter = Adapter;
 	this->Output = Output;
-	Name = Descriptor.DeviceName;
-	Handle = Descriptor.Monitor;
+
+	Name = OutputDescription.DeviceName;
+	Handle = OutputDescription.Monitor;
 }
 
 ZED11Monitor::~ZED11Monitor()
 {
-	
+	ZEGR_RELEASE(Output);
 }
 
-IDXGIOutput1* ZED11Monitor::GetOutput()
+IDXGIOutput1* ZED11Monitor::GetOutput() const
 {
 	return Output;
 }
 
-const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes()
+const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes() const
 {
-	if (Modes.GetCount() != 0)
+	if (Modes.GetCount() == 0)
 	{
 		ZEArray<DXGI_MODE_DESC1> ModeDesc;
 		ZEUInt DisplayModeCount = 0;
@@ -109,14 +110,14 @@ const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes()
 	return Modes;
 }
 
-ZED11Adapter::ZED11Adapter(IDXGIAdapter2* Adapter)
+ZED11Adapter::ZED11Adapter(IDXGIAdapter1* Adapter)
 {
 	this->Adapter = Adapter;
-	DXGI_ADAPTER_DESC Desc;
-	Adapter->GetDesc(&Desc);
+	DXGI_ADAPTER_DESC1 AdapterDesc;
+	Adapter->GetDesc1(&AdapterDesc);
 
-	Name = Desc.Description;
-	Id = *(ZEUInt64*)&Desc.AdapterLuid;
+	Name = AdapterDesc.Description;
+	Id = *(ZEUInt64*)&AdapterDesc.AdapterLuid;
 }
 
 ZED11Adapter::~ZED11Adapter()
@@ -125,25 +126,26 @@ ZED11Adapter::~ZED11Adapter()
 		delete (ZED11Monitor*)Monitors[I];
 	
 	Monitors.Clear();
+
+	ZEGR_RELEASE(Adapter);
 }
 
 
-IDXGIAdapter2* ZED11Adapter::GetAdapter()
+IDXGIAdapter1* ZED11Adapter::GetAdapter() const
 {
 	return Adapter;
 }
 
-const ZEArray<ZEGRMonitor*>& ZED11Adapter::GetMonitors()
+const ZEArray<ZEGRMonitor*>& ZED11Adapter::GetMonitors() const
 {
 	ZEUInt OutputId = 0;
 	if (Monitors.GetCount() == 0)
 	{
-		IDXGIOutput1* Output = NULL;
-		while (Adapter->EnumOutputs(OutputId, (IDXGIOutput**)&Output) != DXGI_ERROR_NOT_FOUND)
+		IDXGIOutput1* Output;
+		while (Adapter->EnumOutputs(OutputId++, (IDXGIOutput**)&Output) != DXGI_ERROR_NOT_FOUND)
 		{
 			ZED11Monitor* Monitor = new ZED11Monitor(this, Output);
 			Monitors.Add(Monitor);
-			OutputId++;
 		}
 
 		if (Monitors.GetCount() == 0)

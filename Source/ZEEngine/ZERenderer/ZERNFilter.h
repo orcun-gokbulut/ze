@@ -36,9 +36,11 @@
 #pragma once
 
 #include "ZEInitializable.h"
+
 #include "ZEDS\ZEArray.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEDS\ZEFlags.h"
 #include "ZEMath\ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics\ZEGRSamplerState.h"
 
 class ZEGRTexture2D;
@@ -56,10 +58,10 @@ class ZERNFilter : public ZEInitializable
 		ZEGRTexture2D*					Input;
 		ZEGRRenderTarget*				Output;
 
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 
 		ZEGRSamplerState				SamplerPointClamp;
 
@@ -70,7 +72,7 @@ class ZERNFilter : public ZEInitializable
 			ZEVector4					KernelValues[64];
 		}Constants;
 
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 	private:
 

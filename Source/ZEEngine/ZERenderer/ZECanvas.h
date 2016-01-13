@@ -42,6 +42,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEQuaternion.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 
 class ZEGRVertexLayout;
@@ -135,7 +136,7 @@ class ZECanvas
 		bool							IsEmpty();
 		void							Clean();
 
-		ZEGRVertexBuffer*				CreateVertexBuffer();
+		ZEHolder<ZEGRVertexBuffer>		CreateVertexBuffer();
 
 		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);

@@ -47,11 +47,11 @@ class ZEGrid : public ZEEntity
 {
 	ZE_OBJECT
 	private:
-		ZEGRHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
-		ZEGRHolder<ZERNFixedMaterial>	Material;
+		ZEHolder<ZEGRVertexBuffer>	VertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
+		ZEHolder<ZERNFixedMaterial>	Material;
 		ZERNCommand						RenderCommand;
 
 		struct
