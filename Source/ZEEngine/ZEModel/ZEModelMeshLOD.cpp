@@ -38,7 +38,7 @@
 #include "ZEModel.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZEGraphics/ZEGRContext.h"
@@ -132,6 +132,11 @@ void ZEModelMeshLOD::Deinitialize()
 	LODResource = NULL;
 	Material = NULL;
 	Skinned = false;
+}
+
+void ZEModelMeshLOD::ResetMaterial()
+{
+	SetMaterial(Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId]);
 }
 
 ZEModelMeshLOD::ZEModelMeshLOD()

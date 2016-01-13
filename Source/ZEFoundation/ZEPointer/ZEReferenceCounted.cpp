@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRHolder.cpp
+ Zinek Engine - ZEReferenceCounted.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRHolder.h"
-#include "ZECommon.h"
+#include "ZEReferenceCounted.h"
 
-ZE_SUPPRESS_LNK4221
+void ZEReferenceCounted::Reference() const
+{
+	ReferenceCountLock.Lock();
+	ReferenceCount++;
+	ReferenceCountLock.Unlock();
+}
+
+void ZEReferenceCounted::Release() const
+{
+	ReferenceCountLock.Lock();
+	ReferenceCount--;
+	if (ReferenceCount == 0)
+	{
+		ReferenceCountLock.Unlock();
+		Destroy();
+		return;
+	}
+	ReferenceCountLock.Unlock();
+}
+
+void ZEReferenceCounted::Destroy() const
+{
+	delete this;
+}
+
+ZEReferenceCounted::ZEReferenceCounted()
+{
+	ReferenceCount = 0;
+}
+
+ZEReferenceCounted::ZEReferenceCounted(const ZEReferenceCounted& Object)
+{
+	ReferenceCount = 0;
+}

@@ -195,7 +195,10 @@ void ZERNMap::ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name)
 ZERNMap::ZERNMap()
 {
 	Resource = NULL;
-	Texture = NULL;
+
+	Sampler.SetAddressU(ZEGR_TAM_WRAP);
+	Sampler.SetAddressV((ZEGR_TAM_WRAP));
+	Sampler.SetAddressW((ZEGR_TAM_WRAP));
 }
 
 ZERNMap::~ZERNMap()

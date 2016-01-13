@@ -56,5 +56,5 @@ class ZEGRStructuredBuffer : public ZEGRResource
 			virtual bool					Lock(void** Buffer) = 0;
 			virtual void					Unlock() = 0;
 
-			static ZEGRStructuredBuffer*	Create(ZESize ElementCount, ZESize ElementSize);
+			static ZEHolder<ZEGRStructuredBuffer> Create(ZESize ElementCount, ZESize ElementSize);
 };

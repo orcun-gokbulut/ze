@@ -59,5 +59,5 @@ class ZEGRVertexBuffer : public ZEGRResource
 		virtual void					Unlock() = 0;
 		virtual bool					Lock(void** Data) = 0;
 		
-		static ZEGRVertexBuffer*		Create(ZEUInt VertexCount, ZESize VertexSize);
+		static ZEHolder<ZEGRVertexBuffer> Create(ZEUInt VertexCount, ZESize VertexSize);
 };

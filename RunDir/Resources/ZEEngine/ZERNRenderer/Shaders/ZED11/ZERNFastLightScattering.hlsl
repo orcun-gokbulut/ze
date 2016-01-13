@@ -123,7 +123,7 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 		
 		PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
 		
-		//PixelColor += (SkyAmbient + SunColor * SunDiffuse) * 0.2f;
+		//PixelColor += (SkyAmbient + SunColor * SunDiffuse) * 0.002f;
 	}
 	else
 	{

@@ -36,36 +36,36 @@
 #pragma once
 
 #include "ZEGRDefinitions.h"
+#include "ZEGRFormat.h"
 #include "ZETypes.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGRFormat.h"
 
 class ZEGRAdapter;
 class ZEGRMonitor;
 
 struct ZEGRRefreshRate
 {
-	ZEUInt			Numerator;
-	ZEUInt			Denominator;
+	ZEUInt										Numerator;
+	ZEUInt										Denominator;
 };
 
 class ZEGRMonitorMode
 {
 	public:
-		ZEGRMonitor*							Monitor;
+		const ZEGRMonitor*						Monitor;
 		ZEUInt									Width;
 		ZEUInt									Height;
 		ZEGRFormat								Format;
 		ZEGRRefreshRate							RefreshRate;
 
 	public:
-		ZEGRMonitor*							GetMonitor();
-		ZEUInt									GetWidth();
-		ZEUInt									GetHeight();
-		ZEGRFormat								GetFormat();
-		ZEGRRefreshRate							GetRefreshRate();
+		const ZEGRMonitor*						GetMonitor() const;
+		ZEUInt									GetWidth() const;
+		ZEUInt									GetHeight() const;
+		ZEGRFormat								GetFormat() const;
+		ZEGRRefreshRate							GetRefreshRate() const;
 
 												ZEGRMonitorMode();
 
@@ -74,19 +74,21 @@ class ZEGRMonitorMode
 class ZEGRMonitor
 {
 	protected:
-		ZEGRAdapter*							Adapter;
-		ZEString								Name;
+		const ZEGRAdapter*						Adapter;
 		void*									Handle;
+		ZEString								Name;
 		ZERectangle								Area;
-	
+
 												ZEGRMonitor();
 		virtual									~ZEGRMonitor();
 
 	public:
-		ZEGRAdapter*							GetAdapter();
-		const char*								GetName();
-		const ZERectangle&						GetArea();
-		virtual	const ZEArray<ZEGRMonitorMode>&	GetModes() = 0;
+		const ZEGRAdapter*						GetAdapter() const;
+		void*									GetHandle() const;
+		const char*								GetName() const;
+		const ZERectangle&						GetArea() const;
+
+		virtual	const ZEArray<ZEGRMonitorMode>&	GetModes() const = 0;
 };
 
 class ZEGRAdapter
@@ -100,10 +102,8 @@ class ZEGRAdapter
 		virtual									~ZEGRAdapter();
 
 	public:
-		ZEUInt									GetId();
-		const ZEString&							GetName();
+		ZEUInt64								GetId() const;
+		const ZEString&							GetName() const;
 
-		virtual const ZEArray<ZEGRMonitor*>&	GetMonitors() = 0;
-
-		static const ZEArray<ZEGRAdapter*>&		GetAdapters();
+		virtual const ZEArray<ZEGRMonitor*>&	GetMonitors() const = 0;
 };

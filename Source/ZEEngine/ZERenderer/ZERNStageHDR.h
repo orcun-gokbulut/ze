@@ -39,7 +39,7 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZERNFilter.h"
 
 class ZEGRShader;
@@ -73,18 +73,18 @@ class ZERNStageHDR : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEGRHolder<ZEGRShader>				VertexShader;
-		ZEGRHolder<ZEGRShader>				CalculateLuminance_PixelShader;
-		ZEGRHolder<ZEGRShader>				CalculateAdaptedLuminance_PixelShader;
-		ZEGRHolder<ZEGRShader>				DownSampling_PixelShader;
-		ZEGRHolder<ZEGRShader>				CalculateBrightness_PixelShader;
-		ZEGRHolder<ZEGRShader>				ToneMapping_PixelShader;
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				CalculateLuminance_PixelShader;
+		ZEHolder<ZEGRShader>				CalculateAdaptedLuminance_PixelShader;
+		ZEHolder<ZEGRShader>				DownSampling_PixelShader;
+		ZEHolder<ZEGRShader>				CalculateBrightness_PixelShader;
+		ZEHolder<ZEGRShader>				ToneMapping_PixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData>		CalculateLuminance_RenderState;
-		ZEGRHolder<ZEGRRenderStateData>		CalculateAdaptedLuminance_RenderState;
-		ZEGRHolder<ZEGRRenderStateData>		DownSampling_RenderState;
-		ZEGRHolder<ZEGRRenderStateData>		CalculateBrightness_RenderState;
-		ZEGRHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
+		ZEHolder<ZEGRRenderStateData>		CalculateLuminance_RenderState;
+		ZEHolder<ZEGRRenderStateData>		CalculateAdaptedLuminance_RenderState;
+		ZEHolder<ZEGRRenderStateData>		DownSampling_RenderState;
+		ZEHolder<ZEGRRenderStateData>		CalculateBrightness_RenderState;
+		ZEHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
 
 		ZEGRTexture2D*						InputTexture;
 		ZEGRRenderTarget*					OutputRenderTarget;
@@ -93,13 +93,13 @@ class ZERNStageHDR : public ZERNStage
 		ZEArray<ZEVector4>					HorizontalValues;
 		ZEArray<ZEVector4>					VerticalValues;
 
-		ZEGRHolder<ZEGRTexture2D>			BlurTextureTemp1;
-		ZEGRHolder<ZEGRTexture2D>			BlurTextureTemp2;
-		ZEGRHolder<ZEGRTexture2D>			BlurTextureFinal;
-		ZEGRHolder<ZEGRTexture2D>			BrightTexture;
-		ZEArray<ZEGRHolder<ZEGRTexture2D>>	LuminanceMips;
-		ZEGRHolder<ZEGRTexture2D>			CurrentAdaptedLuminance;
-		ZEGRHolder<ZEGRTexture2D>			PreviousAdaptedLuminance;
+		ZEHolder<ZEGRTexture2D>			BlurTextureTemp1;
+		ZEHolder<ZEGRTexture2D>			BlurTextureTemp2;
+		ZEHolder<ZEGRTexture2D>			BlurTextureFinal;
+		ZEHolder<ZEGRTexture2D>			BrightTexture;
+		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceMips;
+		ZEHolder<ZEGRTexture2D>			CurrentAdaptedLuminance;
+		ZEHolder<ZEGRTexture2D>			PreviousAdaptedLuminance;
 		
 		ZEGRSamplerState					SamplerLinearClamp;
 
@@ -121,7 +121,7 @@ class ZERNStageHDR : public ZERNStage
 			ZEUInt							Reserved;
 		} Constants;
 
-		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 	private:
 

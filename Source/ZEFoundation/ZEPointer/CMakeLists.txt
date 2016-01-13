@@ -46,6 +46,10 @@ ze_add_source(ZEWeakPointer.h			Sources Headers)
 ze_add_source(ZEWeakPointerTests.cpp	Tests)
 ze_add_source(ZEPointerTestClass.h		Tests)
 ze_add_source(ZEPointerTestClass.cpp	Tests)
+ze_add_source(ZEReferenceCounted.cpp	Sources)
+ze_add_source(ZEReferenceCounted.h		Headers)
+ze_add_source(ZEHolder.cpp				Sources)
+ze_add_source(ZEHolder.h				Headers)
 
 ze_add_library(TARGET ZEPointer 
 	SOURCES ${Sources} 

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRConstantBuffer.cpp
+ Zinek Engine - ZEReferenceCounted.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRConstantBuffer.h"
+#pragma once
 
-#include "ZEPointer\ZEPointer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
+#include <ZETypes.h>
+#include <ZEThread/ZELock.h>
 
-ZEGRResourceType ZEGRConstantBuffer::GetResourceType()
+class ZEReferenceCounted
 {
-	return ZEGR_RT_CONSTANT_BUFFER;
-}
-
-bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
-{
-	SetSize(BufferSize);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, ConstantBuffer, Pipeline);
-	return true;
-}
-
-void ZEGRConstantBuffer::Deinitialize()
-{
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
-	SetSize(0);
-}
-
-void ZEGRConstantBuffer::SetData(void* Data)
-{
-	void* Buffer;
-	if (!Lock(&Buffer))
-		return;
-
-	memcpy(Buffer, Data, GetSize());
-
-	Unlock();
-}
-
-ZEGRConstantBuffer::ZEGRConstantBuffer()
-{
-
-}
-
-ZEGRConstantBuffer::~ZEGRConstantBuffer()
-{
-	Deinitialize();
-}
-
-ZEHolder<ZEGRConstantBuffer> ZEGRConstantBuffer::Create(ZESize BufferSize)
-{
-	ZEHolder<ZEGRConstantBuffer> ConstantBuffer = ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
-	if (!ConstantBuffer->Initialize(BufferSize))
-		return NULL;
+	template<typename ZEReferenceCountedClass>
+	friend class ZEHolder;
+	private:
+		mutable ZELock	ReferenceCountLock;
+		mutable ZESize	ReferenceCount;
 	
-	return ConstantBuffer;
-}
+		void			Release() const;
+		void			Reference() const;
+	
+	protected:
+		virtual void	Destroy() const;
+
+	public:
+						ZEReferenceCounted();
+						ZEReferenceCounted(const ZEReferenceCounted& Object);
+};

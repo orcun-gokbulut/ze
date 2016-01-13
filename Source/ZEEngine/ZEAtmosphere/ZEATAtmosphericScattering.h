@@ -37,8 +37,9 @@
 
 #include "ZEFoundation/ZEInitializable.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
@@ -54,35 +55,35 @@ class ZEATAtmosphericScattering : public ZEInitializable
 	private:
 		ZEFlags							DirtyFlags;
 		
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZEGRHolder<ZEGRShader>			PrecomputeDensityPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			AddOrdersPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeSkyAmbientPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeDensityPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
+		ZEHolder<ZEGRShader>			AddOrdersPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSkyAmbientPixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData>	PrecomputeDensityRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeDensityRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
 
-		ZEGRHolder<ZEGRTexture2D>		PrecomputedDensityBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
-		ZEGRHolder<ZEGRTexture2D>		PrecomputedSkyAmbientBuffer;
+		ZEHolder<ZEGRTexture2D>		PrecomputedDensityBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture2D>		PrecomputedSkyAmbientBuffer;
 
-		ZEGRHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
 
-		ZEGRHolder<ZEGRTexture2D>		RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>		RandomVectorsTexture;
 
 		ZEGRSamplerState				SamplerLinearClamp;
 

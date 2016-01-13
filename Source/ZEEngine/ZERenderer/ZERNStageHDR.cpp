@@ -573,7 +573,7 @@ ZERNStageHDR::ZERNStageHDR()
 {
 	Constants.AutoKey = ZEGR_FALSE;
 	Constants.BloomEnabled = ZEGR_FALSE;
-	Constants.Key = 0.45f;
+	Constants.Key = 0.40f;
 	Constants.WhiteLevel = 5.0f;
 	Constants.ToneMapOperator = ZERN_HTMO_REINHARD;
 	Constants.BloomFactor = 2.5f;
@@ -626,7 +626,7 @@ bool ZERNStageHDR::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<Z
 
 	ToneMapping(Context, InputTexture, OutputRenderTarget);
 
-	ZEGRHolder<ZEGRTexture2D> Temporary = PreviousAdaptedLuminance;
+	ZEHolder<ZEGRTexture2D> Temporary = PreviousAdaptedLuminance;
 	PreviousAdaptedLuminance = CurrentAdaptedLuminance;
 	CurrentAdaptedLuminance = Temporary;
 

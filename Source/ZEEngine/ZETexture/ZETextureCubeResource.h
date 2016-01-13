@@ -34,11 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_CUBE_RESOURCE_H__
-#define __ZE_TEXTURE_CUBE_RESOURCE_H__
 
 #include "ZETextureResource.h"
-#include "ZEGraphics\ZEGRHolder.h"
+
+#include "ZEPointer/ZEHolder.h"
 
 ZE_META_FORWARD_DECLARE(ZEGRTextureCube, "ZEGraphics/ZETextureCube.h")
 
@@ -46,7 +45,7 @@ class ZETextureCubeResource : public ZETextureResource
 {
 	ZE_OBJECT
 	private:
-		ZEGRHolder<ZEGRTextureCube>			Texture;
+		ZEHolder<ZEGRTextureCube>			Texture;
 
 	protected:
 		 									ZETextureCubeResource();
@@ -65,5 +64,3 @@ class ZETextureCubeResource : public ZETextureResource
 		static ZETextureCubeResource*		LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETextureCubeResource*		LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
 };
-
-#endif

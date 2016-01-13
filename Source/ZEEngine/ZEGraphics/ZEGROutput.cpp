@@ -35,25 +35,22 @@
 
 #include "ZEGROutput.h"
 #include "ZEGRGraphicsModule.h"
+#include "ZEGRWindow.h"
 
 ZEGRResourceType ZEGROutput::GetResourceType()
 {
 	return ZEGR_RT_OUTPUT;
 }
 
-ZEGROutput* ZEGROutput::Create(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
+ZEGROutput* ZEGROutput::Create(ZEGRWindow* Window, ZEGRFormat Format)
 {
-	zeCheckError(Handle == NULL, false, "Width cannot be 0.");
-	zeCheckError(Width == 0, false, "Width cannot be 0.");
-	zeCheckError(Height == 0, false, "Height cannot be 0.");
-	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
-	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, false, "Width is too big.")
+	zeCheckError(Window == NULL, NULL, "Window cannot be NULL.");
 
 	ZEGROutput* Output = ZEGRGraphicsModule::GetInstance()->CreateOutput();
 	if (Output == NULL)
 		return NULL;
 
-	if (!Output->Initialize(Handle, Mode, Width, Height, Format))
+	if (!Output->Initialize(Window->GetHandle(), Window->GetWidth(), Window->GetHeight(), Format))
 	{
 		delete Output;
 		return NULL;

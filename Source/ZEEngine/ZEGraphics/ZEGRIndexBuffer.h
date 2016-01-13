@@ -69,7 +69,7 @@ class ZEGRIndexBuffer : public ZEGRResource
 		virtual bool				Lock(void** Data) = 0;
 		virtual void				Unlock() = 0;
 	
-		static ZEGRIndexBuffer*		Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		static ZEHolder<ZEGRIndexBuffer> Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
 };
 
 #endif

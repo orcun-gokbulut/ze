@@ -34,11 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_MESH_LOD_H__
-#define __ZE_MODEL_MESH_LOD_H__
 
 #include "ZERenderer/ZERNCommand.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEModel;
 class ZEModelMesh;
@@ -59,13 +57,13 @@ class ZEModelMeshLOD
 		ZEInt32								DrawEndDistance;
 		const ZEModelResourceMeshLOD*		LODResource;
 		
-		ZEGRHolder<ZEGRIndexBuffer>			IndexBuffer;
-		ZEGRHolder<ZEGRVertexBuffer>		VertexBuffer;
-		ZEGRHolder<ZEGRVertexBuffer>		VertexBufferNormals;
-		ZEGRHolder<ZEGRVertexBuffer>		VertexBufferSkin;
-		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRIndexBuffer>			IndexBuffer;
+		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>		VertexBufferNormals;
+		ZEHolder<ZEGRVertexBuffer>		VertexBufferSkin;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
-		ZEGRHolder<ZERNMaterial>			Material;
+		ZEHolder<ZERNMaterial>			Material;
 		bool								Skinned;
 
 	public:
@@ -78,12 +76,14 @@ class ZEModelMeshLOD
 
 		ZEInt32								GetDrawStartDistance();
 		ZEInt32								GetDrawEndDistance();
+
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();
+
+		void								ResetMaterial();
 
 		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
 											ZEModelMeshLOD();
 											~ZEModelMeshLOD();
 };
-#endif

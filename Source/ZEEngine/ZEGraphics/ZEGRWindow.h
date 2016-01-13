@@ -45,7 +45,6 @@ class ZEGRWindow;
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
 class ZEGRMonitor;
-class ZEGRDepthStencilBuffer;
 
 #define ZE_GWF_NONE					0
 #define ZE_GWF_CREATED				1 << 0
@@ -115,12 +114,17 @@ struct ZEWindowStyle
 	};
 };
 
+#include "ZEInitializable.h"
+#include "ZEPointer/ZEHolder.h"
+class ZEGROutput;
 
-class ZEGRWindow
+class ZEGRWindow : public ZEInitializable
 {
 	protected:
 		static ZEUInt							WindowCount;
 		static ZEGRWindow*						LastCursorLock;
+
+		ZEHolder<ZEGROutput>					Output;
 
 		ZEUInt									Id;
 
@@ -131,8 +135,8 @@ class ZEGRWindow
 		ZEMutex									FlagLock;
 		ZEGraphicsWindowFlags					Flags;
 
-		ZEInt									Width;
-		ZEInt									Height;
+		ZEUInt									Width;
+		ZEUInt									Height;
 
 		ZEInt									PositionX;
 		ZEInt									PositionY;
@@ -143,9 +147,7 @@ class ZEGRWindow
 		bool									Maximized;
 
 		bool									FullScreen;
-		const ZEGRMonitor*						FullScreenMonitor;
-
-		bool									VSynchEnabed;
+		bool									VSynchEnable;
 
 		virtual void							OnEnable();
 		virtual void							OnDisable();
@@ -161,6 +163,9 @@ class ZEGRWindow
 		virtual void							OnMove();
 		virtual void							OnSize();
 		
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
+
 												ZEGRWindow();
 		virtual									~ZEGRWindow();
 
@@ -171,8 +176,16 @@ class ZEGRWindow
 		virtual bool							SetStyle(const ZEWindowStyle& Style);
 		const ZEWindowStyle&					GetStyle() const;
 		
-		virtual bool							SetTitle(const char* String);
-		const char*								GetTitle() const;
+		virtual bool							SetTitle(const ZEString& Title);
+		const ZEString&							GetTitle() const;
+
+		void									SetWidth(ZEUInt Width);
+		ZEUInt									GetWidth() const;
+
+		void									SetHeight(ZEUInt Height);
+		ZEUInt									GetHeight() const;
+
+		ZEGROutput*								GetOutput() const;
 
 		virtual bool							SetPosition(ZEInt X, ZEInt Y);
 		void									GetPosition(ZEInt& X, ZEInt& Y) const;
@@ -184,18 +197,17 @@ class ZEGRWindow
 
 		void									GetRectangle(ZERectangle& Rectangle) const;
 
-		virtual bool							SetFullScreen(bool Value, const ZEGRMonitor* Monitor = NULL);
+		virtual bool							SetFullScreen(bool FullScreen);
 		bool									GetFullScreen() const;
 
-		virtual bool							SetVSynchEnabed(bool Value);
-		bool									GetVSynchEnabed() const;
+		virtual bool							SetVSynchEnable(bool VSynchEnable);
+		bool									GetVSynchEnable() const;
 
-		const ZEGRMonitor*						GetContainingMonitor() const;
-
-		virtual void							Enable();
-		virtual void							Disable();
-		bool									IsDisabled() const;
+		virtual void							SetEnable(bool Enable);
+		bool									GetEnable() const;
 		
+		ZEGRMonitor*							GetContainingMonitor() const;
+
 		virtual void							Focus();
 		bool									IsFocused() const;
 
@@ -211,19 +223,9 @@ class ZEGRWindow
 
 		virtual ZESSize							HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);
 
-		virtual bool							Initialize();
-		virtual bool							Initialize(void* Handle);
-		bool									IsInitialized() const;
-
-		virtual bool							DeInitialize();
 		virtual void							Destroy();
 
 		virtual bool							Update();
-		virtual bool							Present() = 0;
-
-		virtual const ZEGRTexture2D*			GetBackBufferTexture() = 0;
-		virtual const ZEGRRenderTarget*			GetBackBuffer() = 0;
-		virtual const ZEGRDepthStencilBuffer*	GetDepthBuffer() = 0;
 
 		static ZEUInt							GetWindowCount();
 		static ZEGRWindow*						CreateInstance();

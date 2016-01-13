@@ -37,16 +37,6 @@
 
 #include "ZEError.h"
 
-void ZEGRResource::AddRef()
-{
-	ReferenceCount++;
-}
-
-void ZEGRResource::Destroy()
-{
-	delete this;
-}
-
 void ZEGRResource::SetSize(ZESize Size)
 {
 	this->Size = Size;
@@ -57,41 +47,22 @@ ZESize ZEGRResource::GetSize() const
 	return Size;
 }
 
-ZESize ZEGRResource::GetReferenceCount() const
+void ZEGRResource::SetName(const ZEString& Name)
 {
-	return ReferenceCount;
+	this->Name = Name;
 }
 
-void ZEGRResource::SetName(const char* Name)
+const ZEString& ZEGRResource::GetName() const
 {
-	#ifdef ZE_DEBUG_ENABLE
-		Name = Name;
-	#endif
-}
-
-const char* ZEGRResource::GetName() const
-{
-	#ifdef ZE_DEBUG_ENABLE
-		return Name.ToCString();
-	#else
-		return NULL;
-	#endif
-}
-
-void ZEGRResource::Release()
-{
-	ReferenceCount--;
-	if (ReferenceCount == 0)
-		Destroy();
+	return Name;
 }
 
 ZEGRResource::ZEGRResource()
 {
 	Size = 0;
-	ReferenceCount = 0;
 }
 
 ZEGRResource::~ZEGRResource()
 {
-	zeDebugCheck(ReferenceCount != 0, "There are holders still referencing object that being deleted.");
+
 }

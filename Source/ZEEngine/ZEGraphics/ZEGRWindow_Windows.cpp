@@ -42,6 +42,7 @@
 #include "ZECore/ZECore.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGROutput.h"
 
 #define ZE_WIN32_ERROR_STRING_LENGHT	1024
 #define	ZE_WIN32_APP_WINDOW_CLASS_NAME	"ZE_APP_WINDOW_CLASS"
@@ -271,7 +272,7 @@ static bool ConvertClientToWindowSize(ZEUInt Style, ZEUInt StyleExt, ZEInt Clien
 {
 	RECT Viewport = {ClientX, ClientY, ClientX + ClientWidth, ClientY + ClientHeight};
 
-	BOOL Result = ::AdjustWindowRectEx(&Viewport, Style, false, StyleExt);
+	BOOL Result = ::AdjustWindowRectEx(&Viewport, Style, FALSE, StyleExt);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
@@ -403,22 +404,22 @@ bool ZEGRWindow::SetStyle(const ZEWindowStyle& Style)
 	return true;
 }
 
-bool ZEGRWindow::SetTitle(const char* String)
+bool ZEGRWindow::SetTitle(const ZEString& Title)
 {
 	if (!IsInitialized())
 	{
-		Title = String;
+		this->Title = Title;
 		return false;
 	}
 
-	BOOL Result = ::SetWindowText((HWND)Handle, String);
+	BOOL Result = ::SetWindowText((HWND)Handle, Title);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
 		return false;
 	}
 
-	Title = String;
+	this->Title = Title;
 	return true;
 }
 
@@ -512,46 +513,39 @@ bool ZEGRWindow::SetSize(ZEInt Width, ZEInt Height)
 	return true;
 }
 
-bool ZEGRWindow::SetFullScreen(bool Value, const ZEGRMonitor* Monitor)
+bool ZEGRWindow::SetFullScreen(bool FullScreen)
 {
-	if (FullScreen == Value)
+	if (this->FullScreen == FullScreen)
 		return true;
 
-	if (Value) // Going full screen
+	this->FullScreen = FullScreen;
+
+	if (FullScreen) // Going full screen
 	{
-		FullScreen = true;
 		FlagLock.Lock();
 		Flags.RaiseFlags(ZE_GWF_FULLSCREEN);
 		FlagLock.Unlock();
-		FullScreenMonitor = Monitor == NULL ? GetContainingMonitor() : Monitor;
 	}
 	else // Going windowed
 	{
-		FullScreen = false;
 		FlagLock.Lock();
 		Flags.RaiseFlags(ZE_GWF_WINDOWED);
 		FlagLock.Unlock();
-		FullScreenMonitor = NULL;
 	}
 
 	return IsInitialized();
 }
 
-bool ZEGRWindow::SetVSynchEnabed(bool Value)
+bool ZEGRWindow::SetVSynchEnable(bool VSynchEnable)
 {
-	VSynchEnabed = Value;
+	this->VSynchEnable = VSynchEnable;
+
 	return IsInitialized();
 }
 
-
-void ZEGRWindow::Enable()
+void ZEGRWindow::SetEnable(bool Enable)
 {
-	::EnableWindow((HWND)Handle, true);
-}
-
-void ZEGRWindow::Disable()
-{
-	::EnableWindow((HWND)Handle, false);
+	::EnableWindow((HWND)Handle, Enable);
 }
 
 void ZEGRWindow::Focus()
@@ -849,18 +843,20 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 	return Return;
 }
 
-bool ZEGRWindow::Initialize()
+void ZEGRWindow::Destroy()
 {
-	if (IsInitialized())
-		return false;
-	
+	DeinitializeSelf();
+}
+
+bool ZEGRWindow::InitializeSelf()
+{
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
 	GetWin32Style(Style, Win32StyleExt, Win32Style);
 		
-	Win32Style |= !Enabled ? WS_DISABLED : 0;
-	Win32Style |= Maximized ? WS_MAXIMIZE : 0;
-	Win32Style |= Minimized ? WS_MINIMIZE : 0;
+	//Win32Style |= !Enabled ? WS_DISABLED : 0;
+	//Win32Style |= Maximized ? WS_MAXIMIZE : 0;
+	//Win32Style |= Minimized ? WS_MINIMIZE : 0;
 
 	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();
 	
@@ -903,68 +899,74 @@ bool ZEGRWindow::Initialize()
 
 	WindowCount++;
 
-	return true;
-}
-
-bool ZEGRWindow::Initialize(void* Handle)
-{
-	char TempString[128];
-	BOOL CharCount = ::GetWindowText((HWND)Handle, TempString, 128);
-	if (CharCount == 0)
-	{
-		HandleWin32Error(GetLastError());
+	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM);
+	if(Output == NULL)
 		return false;
-	}
 
-	LONG_PTR Win32Style = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
-	if (Win32Style == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	LONG_PTR Win32StyleEx = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
-	if (Win32StyleEx == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	RECT Rectangle = {0};
-	BOOL Result = GetClientRect((HWND)Handle, &Rectangle);
-	if (Result == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-	
-	Title = TempString;
-	
-	this->Handle = Handle;
-	
-	PositionX = Rectangle.left;
-	PositionY = Rectangle.top;
-	
-	Width = Rectangle.right - Rectangle.left;
-	Height = Rectangle.bottom - Rectangle.top;
-
-	Style.Type = ZE_GWT_UNKNOWN;
-	Style.Unknown.Properties0 = (ZEUInt32)Win32Style;
-	Style.Unknown.Properties1 = (ZEUInt32)Win32StyleEx;
+	ShowWindow((HWND)Handle, SW_SHOWNORMAL);
 
 	return true;
 }
 
-bool ZEGRWindow::DeInitialize()
+//bool ZEGRWindow::Initialize(void* Handle)
+//{
+//	char TempString[128];
+//	BOOL CharCount = ::GetWindowText((HWND)Handle, TempString, 128);
+//	if (CharCount == 0)
+//	{
+//		HandleWin32Error(GetLastError());
+//		return false;
+//	}
+//
+//	LONG_PTR Win32Style = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
+//	if (Win32Style == 0)
+//	{
+//		HandleWin32Error(GetLastError());
+//		return false;
+//	}
+//
+//	LONG_PTR Win32StyleEx = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
+//	if (Win32StyleEx == 0)
+//	{
+//		HandleWin32Error(GetLastError());
+//		return false;
+//	}
+//
+//	RECT Rectangle = {0};
+//	BOOL Result = GetClientRect((HWND)Handle, &Rectangle);
+//	if (Result == 0)
+//	{
+//		HandleWin32Error(GetLastError());
+//		return false;
+//	}
+//	
+//	Title = TempString;
+//	
+//	this->Handle = Handle;
+//	
+//	PositionX = Rectangle.left;
+//	PositionY = Rectangle.top;
+//	
+//	Width = Rectangle.right - Rectangle.left;
+//	Height = Rectangle.bottom - Rectangle.top;
+//
+//	Style.Type = ZE_GWT_UNKNOWN;
+//	Style.Unknown.Properties0 = (ZEUInt32)Win32Style;
+//	Style.Unknown.Properties1 = (ZEUInt32)Win32StyleEx;
+//
+//	return true;
+//}
+
+void ZEGRWindow::DeinitializeSelf()
 {
 	if (Handle == NULL)
-		return true;
+		return;
 
 	BOOL Result = DestroyWindow((HWND)Handle);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return;
 	}
 	
 	WindowCount--;
@@ -974,10 +976,10 @@ bool ZEGRWindow::DeInitialize()
 	if (!UnRegisterWindowClass(Instance))
 	{
 		zeError("Cannot unregister class.");
-		return false;
+		return;
 	}
 
-	return true;
+	return;
 }
 
 bool ZEGRWindow::Update()

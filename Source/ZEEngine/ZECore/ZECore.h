@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CORE_H__
-#define __ZE_CORE_H__
 
 #include "ZEAPI.h"
 #include "ZETypes.h"
@@ -201,4 +199,3 @@ class ZECore
 
 		ZEAPI static ZECore*			GetInstance();
 };
-#endif

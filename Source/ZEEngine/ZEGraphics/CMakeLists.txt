@@ -62,8 +62,6 @@ ze_add_source(ZEGRVertexLayout.h			Sources Headers)
 
 ze_add_source(ZEGRResource.cpp				Sources)
 ze_add_source(ZEGRResource.h				Sources Headers)
-ze_add_source(ZEGRHolder.cpp				Sources)
-ze_add_source(ZEGRHolder.h					Sources Headers)
 
 ze_add_source(ZEGRIndexBuffer.cpp 			Sources)
 ze_add_source(ZEGRIndexBuffer.h 			Sources Headers)
