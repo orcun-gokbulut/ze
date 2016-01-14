@@ -50,26 +50,26 @@ class ZEGRIndexBuffer : public ZEGRResource
 {
 	friend class ZEGRGraphicsModule;
 	private:
-		ZESize						IndexCount;
-		ZEGRIndexBufferFormat		Format;
+		ZESize								IndexCount;
+		ZEGRIndexBufferFormat				Format;
 
 	protected:
-		virtual bool				Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
-		virtual void				Deinitialize();
+		virtual bool						Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		virtual void						Deinitialize();
 
-									ZEGRIndexBuffer();
-		virtual						~ZEGRIndexBuffer();
+											ZEGRIndexBuffer();
+		virtual								~ZEGRIndexBuffer();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType();
+		virtual ZEGRResourceType			GetResourceType() const;
 
-		ZESize						GetIndexCount();
-		ZEGRIndexBufferFormat		GetFormat();
+		ZESize								GetIndexCount() const;
+		ZEGRIndexBufferFormat				GetFormat() const;
 
-		virtual bool				Lock(void** Data) = 0;
-		virtual void				Unlock() = 0;
+		virtual bool						Lock(void** Data) = 0;
+		virtual void						Unlock() = 0;
 	
-		static ZEHolder<ZEGRIndexBuffer> Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		static ZEHolder<ZEGRIndexBuffer>	Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
 };
 
 #endif

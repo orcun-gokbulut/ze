@@ -42,19 +42,19 @@
 class ZEGRConstantBuffer : public ZEGRResource
 {
 	protected:
-									ZEGRConstantBuffer();
-		virtual						~ZEGRConstantBuffer();
+		virtual bool						Initialize(ZESize BufferSize);
+		virtual void						Deinitialize();
 
-		virtual bool				Initialize(ZESize BufferSize);
-		virtual void				Deinitialize();
+											ZEGRConstantBuffer();
+		virtual								~ZEGRConstantBuffer();
 
 	public:
-		ZEGRResourceType			GetResourceType();
+		ZEGRResourceType					GetResourceType() const;
 
-		void						SetData(void* ConstantData);
+		void								SetData(void* ConstantData);
 
-		virtual bool				Lock(void** Buffer) = 0;
-		virtual void				Unlock() = 0;
+		virtual bool						Lock(void** Buffer) = 0;
+		virtual void						Unlock() = 0;
 
-		static ZEHolder<ZEGRConstantBuffer> Create(ZESize BufferSize);
+		static ZEHolder<ZEGRConstantBuffer>	Create(ZESize BufferSize);
 };

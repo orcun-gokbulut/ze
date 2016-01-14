@@ -67,17 +67,17 @@ ZEGRVertexBuffer::~ZEGRVertexBuffer()
 	Deinitialize();
 }
 
-ZEGRResourceType ZEGRVertexBuffer::GetResourceType()
+ZEGRResourceType ZEGRVertexBuffer::GetResourceType() const
 {
 	return ZEGR_RT_VERTEX_BUFFER;
 }
 
-ZESize ZEGRVertexBuffer::GetVertexSize()
+ZESize ZEGRVertexBuffer::GetVertexSize() const
 {
 	return VertexSize;
 }
 
-ZESize ZEGRVertexBuffer::GetVertexCount()
+ZESize ZEGRVertexBuffer::GetVertexCount() const
 {
 	return VertexCount;
 }

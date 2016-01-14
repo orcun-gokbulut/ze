@@ -100,17 +100,17 @@ ZEGRTexture::ZEGRTexture()
 	IsRenderTarget = false;
 }
 
-ZEGRFormat ZEGRTexture::GetFormat()
+ZEGRFormat ZEGRTexture::GetFormat() const
 {
 	return Format;
 }
 
-ZEUInt ZEGRTexture::GetLevelCount()
+ZEUInt ZEGRTexture::GetLevelCount() const
 {
 	return LevelCount;
 }
 
-bool ZEGRTexture::GetIsRenderTarget()
+bool ZEGRTexture::GetIsRenderTarget() const
 {
 	return IsRenderTarget;
 }

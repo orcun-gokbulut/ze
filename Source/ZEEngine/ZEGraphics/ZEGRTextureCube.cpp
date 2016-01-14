@@ -59,22 +59,22 @@ void ZEGRTextureCube::Deinitialize()
 }
 
 
-ZEGRResourceType ZEGRTextureCube::GetResourceType()
+ZEGRResourceType ZEGRTextureCube::GetResourceType() const
 {
 	return ZEGR_RT_TEXTURE;
 }
 
-ZEGRTextureType ZEGRTextureCube::GetTextureType()
+ZEGRTextureType ZEGRTextureCube::GetTextureType() const
 {
 	return ZEGR_TT_CUBE;
 }
 
-ZEUInt ZEGRTextureCube::GetLength()
+ZEUInt ZEGRTextureCube::GetLength() const
 {
 	return Length;
 }
 
-float ZEGRTextureCube::GetPixelSize()
+float ZEGRTextureCube::GetPixelSize() const
 {
 	return 1.0f / (float)GetLength();
 }
@@ -86,10 +86,9 @@ ZEGRTextureCube::ZEGRTextureCube()
 
 ZEGRTextureCube::~ZEGRTextureCube()
 {
-	Deinitialize();
 }
 
-ZEGRTextureCube* ZEGRTextureCube::Create(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
 {	
 	zeCheckError(Length == 0, NULL, "Width cannot be 0.");
 	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");

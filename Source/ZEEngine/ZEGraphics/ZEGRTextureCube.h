@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_TEXTURE_CUBE_H__
-#define __ZE_TEXTURE_CUBE_H__
+#pragma once
+
+#include "ZEGRTexture.h"
 
 #include "ZETypes.h"
-#include "ZEGRTexture.h"
 
 enum ZEGRTextureCubeFace
 {
@@ -49,35 +49,30 @@ enum ZEGRTextureCubeFace
 	ZEGR_TCF_NEGATIVEZ		= 5
 };
 
-class ZETextureData;
 class ZEGRRenderTarget;
 
 class ZEGRTextureCube : public ZEGRTexture
 {
 	private:
-		ZEUInt							Length;
+		ZEUInt										Length;
 
 	protected:
-		virtual	bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget) = 0;
-		virtual void					Deinitialize();
+		virtual	bool								Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget) = 0;
+		virtual void								Deinitialize();
 
-										ZEGRTextureCube();
-		virtual							~ZEGRTextureCube();
+													ZEGRTextureCube();
+		virtual										~ZEGRTextureCube();
 
 	public:
-		ZEGRResourceType				GetResourceType();
-		ZEGRTextureType					GetTextureType();
+		ZEGRResourceType							GetResourceType() const;
+		ZEGRTextureType								GetTextureType() const;
 
-		ZEUInt							GetLength();
-		float							GetPixelSize();
+		ZEUInt										GetLength() const;
+		float										GetPixelSize() const;
 
-		virtual bool					UpdateSubResource(void* Data, ZESize RowPitch, ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
-		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
-		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level) = 0;
+		virtual bool								UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
 		
-		virtual	ZEGRRenderTarget*		GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) = 0;
+		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) const = 0;
 
-		static ZEGRTextureCube*			Create(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);
+		static ZEHolder<ZEGRTextureCube>			CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false);
 };
-
-#endif

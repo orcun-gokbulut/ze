@@ -38,7 +38,7 @@
 #include "ZEGRTexture.h"
 
 #include "ZETypes.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
 
 class ZEGRRenderTarget;
 class ZETextureData;
@@ -46,29 +46,25 @@ class ZETextureData;
 class ZEGRTexture3D : public ZEGRTexture
  {
 	protected:
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEUInt							Depth;
+		ZEUInt										Width;
+		ZEUInt										Height;
+		ZEUInt										Depth;
 
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
-		virtual void					Deinitialize();	
+		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
+		virtual void								Deinitialize();	
 
-										ZEGRTexture3D();
-		virtual							~ZEGRTexture3D();
+													ZEGRTexture3D();
 
-	public:
-		virtual ZEGRResourceType		GetResourceType();
-		virtual ZEGRTextureType			GetTextureType();
+	 public:
+		 virtual ZEGRResourceType					GetResourceType() const;
+		 virtual ZEGRTextureType					GetTextureType() const;
 
-		ZEUInt							GetWidth();
-		ZEUInt							GetHeight();
-		ZEUInt							GetDepth();
-		ZEVector3						GetPixelSize();
+		 ZEUInt										GetWidth() const;
+		 ZEUInt										GetHeight() const;
+		 ZEUInt										GetDepth() const;
+		 ZEVector3									GetPixelSize() const;
 
-		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEUInt Depth, ZEUInt Level) = 0;
-		virtual void					Unlock(ZEUInt Level) = 0;
-
-		virtual ZEGRRenderTarget*		GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) = 0;
+		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
 		
-		static ZEGRTexture3D*			Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool UAV = false);	
+		static ZEHolder<ZEGRTexture3D>				Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool UAV = false);	
 };

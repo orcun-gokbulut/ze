@@ -39,32 +39,32 @@
 #include "ZETexture/ZETextureData.h"
 #include "ZEMath/ZEMath.h"
 
-ZEGRResourceType ZEGRTexture2D::GetResourceType()
+ZEGRResourceType ZEGRTexture2D::GetResourceType() const
 {
 	return ZEGR_RT_TEXTURE;
 }
 
-ZEGRTextureType ZEGRTexture2D::GetTextureType()
+ZEGRTextureType ZEGRTexture2D::GetTextureType() const
 {
 	return ZEGR_TT_2D;
 }
 
-ZEUInt ZEGRTexture2D::GetWidth()
+ZEUInt ZEGRTexture2D::GetWidth() const
 {
 	return Width;
 }
 
-ZEUInt ZEGRTexture2D::GetHeight()
+ZEUInt ZEGRTexture2D::GetHeight() const
 {
 	return Height;
 }
 
-ZEUInt ZEGRTexture2D::GetArrayCount()
+ZEUInt ZEGRTexture2D::GetArrayCount() const
 {
 	return ArrayCount;
 }
 
-ZEVector2 ZEGRTexture2D::GetPixelSize()
+ZEVector2 ZEGRTexture2D::GetPixelSize() const
 {
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
@@ -97,7 +97,7 @@ ZEGRTexture2D::ZEGRTexture2D()
 	ArrayCount = 1;
 };
 
-ZEGRTexture2D* ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil)
+ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");

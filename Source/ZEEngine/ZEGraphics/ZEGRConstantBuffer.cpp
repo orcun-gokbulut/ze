@@ -39,7 +39,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
 
-ZEGRResourceType ZEGRConstantBuffer::GetResourceType()
+ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
 {
 	return ZEGR_RT_CONSTANT_BUFFER;
 }

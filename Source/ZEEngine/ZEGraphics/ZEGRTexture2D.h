@@ -35,8 +35,9 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZEGRTexture.h"
+
+#include "ZETypes.h"
 #include "ZEMath\ZEVector.h"
 
 class ZEGRRenderTarget;
@@ -48,32 +49,30 @@ class ZEGRTexture2D : public ZEGRTexture
 	friend class ZEGRGraphicsModule;
 
 	protected:
-		ZEUInt								Width;
-		ZEUInt								Height;
-		ZEUInt								ArrayCount;
+		ZEUInt											Width;
+		ZEUInt											Height;
+		ZEUInt											ArrayCount;
 
-		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);	
-		virtual void						Deinitialize();
+		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);	
+		virtual void									Deinitialize();
 
-											ZEGRTexture2D();
+														ZEGRTexture2D();
 
 	public:
-		ZEUInt								GetWidth();
-		ZEUInt								GetHeight();
-		ZEUInt								GetArrayCount();
-		ZEVector2							GetPixelSize();
+		ZEUInt											GetWidth() const;
+		ZEUInt											GetHeight() const;
+		ZEUInt											GetArrayCount() const;
+		ZEVector2										GetPixelSize() const;
 
-		virtual ZEGRResourceType			GetResourceType();
-		virtual ZEGRTextureType				GetTextureType();
+		virtual ZEGRResourceType						GetResourceType() const;
+		virtual ZEGRTextureType							GetTextureType() const;
 
-		virtual void						GenerateMipMaps() = 0;
+		virtual void									GenerateMipMaps() = 0;
 
-		virtual	ZEGRRenderTarget*			GetRenderTarget(ZEUInt MipLevel = 0) = 0;
-		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer(ZEUInt ArrayIndex = 0) = 0;
+		virtual	ZEHolder<const ZEGRRenderTarget>		GetRenderTarget(ZEUInt MipLevel = 0) const = 0;
+		virtual ZEHolder<const ZEGRDepthStencilBuffer>	GetDepthStencilBuffer(ZEUInt ArrayIndex = 0) const = 0;
 
-		virtual bool						UpdateSubResource(void* Data, ZEUInt ArrayIndex, ZEUInt Level, ZESize RowPitch) = 0;
-		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level) = 0;
-		virtual void						Unlock(ZEUInt Level) = 0;
+		virtual bool									UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
 
-		static ZEGRTexture2D*				CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);
+		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);
 };

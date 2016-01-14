@@ -35,12 +35,13 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZECore/ZEModule.h"
-#include "ZEGRAdapter.h"
-#include "ZEGRRenderState.h"
+
+#include "ZETypes.h"
 #include "ZECore/ZEOptionSection.h"
 #include "ZETexture/ZETextureOptions.h"
+#include "ZEGRAdapter.h"
+#include "ZEGRRenderState.h"
 #include "ZEGRCounter.h"
 
 class ZEGRRenderState;
