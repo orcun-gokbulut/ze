@@ -99,6 +99,7 @@ const ZEArray<ZEGRMonitorMode>& ZED11Monitor::GetModes() const
 		Modes.SetCount(ModeDesc.GetCount());
 		for (ZESize I = 0; I < ModeDesc.GetCount(); I++)
 		{
+			Modes[I].Monitor = this;
 			Modes[I].Width = ModeDesc[I].Width;
 			Modes[I].Height = ModeDesc[I].Height;
 			Modes[I].Format = ZEGR_TF_R8G8B8A8_UNORM;
@@ -138,14 +139,15 @@ IDXGIAdapter1* ZED11Adapter::GetAdapter() const
 
 const ZEArray<ZEGRMonitor*>& ZED11Adapter::GetMonitors() const
 {
-	ZEUInt OutputId = 0;
 	if (Monitors.GetCount() == 0)
 	{
-		IDXGIOutput1* Output;
+		ZEUInt OutputId = 0;
+		IDXGIOutput* Output;
 		while (Adapter->EnumOutputs(OutputId++, (IDXGIOutput**)&Output) != DXGI_ERROR_NOT_FOUND)
 		{
-			ZED11Monitor* Monitor = new ZED11Monitor(this, Output);
-			Monitors.Add(Monitor);
+			IDXGIOutput1* Output1;
+			if(SUCCEEDED(Output->QueryInterface(__uuidof(IDXGIOutput1), (void**)&Output1)))
+				Monitors.Add(new ZED11Monitor(this, Output1));
 		}
 
 		if (Monitors.GetCount() == 0)

@@ -99,6 +99,8 @@ void ZEGRWindow::OnMove()
 
 void ZEGRWindow::OnSize()
 {
+	Output->Resize(Width, Height);
+
 	zeLog("Window resized.");
 }
 
@@ -112,14 +114,14 @@ void* ZEGRWindow::GetHandle() const
 	return Handle;
 }
 
-const ZEString& ZEGRWindow::GetTitle() const
+const ZEWindowStyle& ZEGRWindow::GetStyle() const
 {
-	return Title.ToCString();
+	return Style;
 }
 
-void ZEGRWindow::SetWidth(ZEUInt Width)
+const ZEString& ZEGRWindow::GetTitle() const
 {
-	this->Width = Width;
+	return Title;
 }
 
 ZEUInt ZEGRWindow::GetWidth() const
@@ -127,24 +129,19 @@ ZEUInt ZEGRWindow::GetWidth() const
 	return Width;
 }
 
-void ZEGRWindow::SetHeight(ZEUInt Height)
-{
-	this->Height = Height;
-}
-
 ZEUInt ZEGRWindow::GetHeight() const
 {
 	return Height;
 }
 
-ZEGROutput* ZEGRWindow::GetOutput() const
+ZEInt ZEGRWindow::GetPositionX() const
 {
-	return Output;
+	return PositionX;
 }
 
-const ZEWindowStyle& ZEGRWindow::GetStyle() const
+ZEInt ZEGRWindow::GetPositionY() const
 {
-	return Style;
+	return PositionY;
 }
 
 void ZEGRWindow::GetPosition(ZEInt& X, ZEInt& Y) const
@@ -171,7 +168,7 @@ void ZEGRWindow::GetSize(ZEVector2& Size) const
 	Size.y = (float)Height;
 }
 
-void ZEGRWindow::GetRectangle(ZERectangle& Rectangle) const
+ZERectangle ZEGRWindow::GetRectangle() const
 {
 	ZEVector2 Size;
 	ZEVector2 Position;
@@ -179,8 +176,7 @@ void ZEGRWindow::GetRectangle(ZERectangle& Rectangle) const
 	GetSize(Size);
 	GetPosition(Position);
 
-	Rectangle.LeftUp = Position;
-	Rectangle.RightDown = Position + Size;
+	return ZERectangle(Position, Position + Size);
 }
 
 bool ZEGRWindow::GetFullScreen() const
@@ -196,6 +192,11 @@ bool ZEGRWindow::GetVSynchEnable() const
 ZEGRMonitor* ZEGRWindow::GetContainingMonitor() const
 {
 	return Output->GetMonitor();
+}
+
+ZEGROutput* ZEGRWindow::GetOutput() const
+{
+	return Output;
 }
 
 bool ZEGRWindow::GetEnable() const
@@ -240,7 +241,7 @@ ZEGRWindow::ZEGRWindow()
 	
 	memset(&Style, 0, sizeof(ZEWindowStyle));
 	Style.Type = ZE_GWT_CAPTION;
-	Style.Caption.OnTop = true;
+	Style.Caption.OnTop = false;
 	Style.Caption.Resizable = true;
 	Style.Caption.Maximizable = true;
 	Style.Caption.Minimizable = true;

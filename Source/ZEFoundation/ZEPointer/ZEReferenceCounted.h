@@ -55,4 +55,5 @@ class ZEReferenceCounted
 	public:
 						ZEReferenceCounted();
 						ZEReferenceCounted(const ZEReferenceCounted& Object);
+		virtual			~ZEReferenceCounted();
 };
