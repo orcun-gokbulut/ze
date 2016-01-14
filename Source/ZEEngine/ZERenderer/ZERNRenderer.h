@@ -41,7 +41,7 @@
 #include "ZEDS/ZEList2.h"
 #include "ZERNView.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEScene;
 class ZERNStage;
@@ -63,8 +63,8 @@ class ZERNRenderer : public ZEInitializable
 		ZEScene*						Scene;
 		ZERNView						View;
 		ZEGRRenderTarget*				OutputRenderTarget;
-		ZEGRHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
 		ZEArray<ZERNStageQueue>			StageQueues;
 
 		struct RendererConstants

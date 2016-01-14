@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEFoundation/ZEInitializable.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
@@ -55,27 +55,27 @@ class ZERNLightScattering : public ZEInitializable
 		ZEGRTexture2D*					DepthTexture;
 		ZEGRRenderTarget*				OutputRenderTarget;
 		
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZEGRHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			AddOrdersPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
+		ZEHolder<ZEGRShader>			AddOrdersPixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
 
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
 
-		ZEGRHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
 
 		ZEGRSamplerState				SamplerLinearClamp;
 

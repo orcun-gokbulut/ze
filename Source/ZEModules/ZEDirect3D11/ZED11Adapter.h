@@ -39,37 +39,36 @@
 
 #include "ZEDS/ZEArray.h"
 
-struct IDXGIAdapter2;			
+struct IDXGIAdapter1;			
 struct IDXGIOutput1;
 
 class ZED11Monitor : public ZEGRMonitor
 {
 	friend class ZED11Adapter;
+	friend class ZED11Output;
 	protected:
-		IDXGIOutput1*			Output;
-		ZEArray<ZEGRMonitorMode>		Modes;
+		IDXGIOutput1*							Output;
+		mutable ZEArray<ZEGRMonitorMode>		Modes;
 
-								ZED11Monitor(ZED11Adapter* Adapter, IDXGIOutput1* Output);
-		virtual					~ZED11Monitor();
+												ZED11Monitor(const ZED11Adapter* Adapter, IDXGIOutput1* Output);
+		virtual									~ZED11Monitor();
 
 	public:
-		IDXGIOutput1*			GetOutput();
-		virtual const 
-		ZEArray<ZEGRMonitorMode>&		GetModes();
+		IDXGIOutput1*							GetOutput() const;
+		virtual const ZEArray<ZEGRMonitorMode>&	GetModes() const;
 };
 
 class ZED11Adapter : public ZEGRAdapter
 {
 	friend class ZED11Module;
 	private:
-		IDXGIAdapter2*			Adapter;
-		ZEArray<ZEGRMonitor*>	Monitors;
+		IDXGIAdapter1*							Adapter;
+		mutable ZEArray<ZEGRMonitor*>			Monitors;
 
-								ZED11Adapter(IDXGIAdapter2* Adapter);
-		virtual					~ZED11Adapter();
+												ZED11Adapter(IDXGIAdapter1* Adapter);
+		virtual									~ZED11Adapter();
 
 	public:
-		IDXGIAdapter2*			GetAdapter();
-		virtual const 
-		ZEArray<ZEGRMonitor*>&	GetMonitors();
+		IDXGIAdapter1*							GetAdapter() const;
+		virtual const ZEArray<ZEGRMonitor*>&	GetMonitors() const;
 };

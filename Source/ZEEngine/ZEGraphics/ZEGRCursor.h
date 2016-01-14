@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRConstantBuffer.cpp
+ Zinek Engine - ZEGRCursor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,56 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGRConstantBuffer.h"
+#pragma once
 
-#include "ZEPointer\ZEPointer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
+#include "ZETypes.h"
+#include "ZEMath\ZERectangle.h"
 
-ZEGRResourceType ZEGRConstantBuffer::GetResourceType()
+class ZEGRWindow;
+
+class ZEGRCursor
 {
-	return ZEGR_RT_CONSTANT_BUFFER;
-}
+	private:
+		bool				Locked;
+		bool				Visible;
 
-bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
-{
-	SetSize(BufferSize);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, ConstantBuffer, Pipeline);
-	return true;
-}
+							ZEGRCursor();
+							~ZEGRCursor();
 
-void ZEGRConstantBuffer::Deinitialize()
-{
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
-	SetSize(0);
-}
+	public:
+		bool				SetVisible(bool Value);
+		bool				GetVisible();
 
-void ZEGRConstantBuffer::SetData(void* Data)
-{
-	void* Buffer;
-	if (!Lock(&Buffer))
-		return;
+		bool				SetPosition(ZEInt PosX, ZEInt PosY);
+		bool				GetPosition(ZEInt& PosX, ZEInt& PosY);
+		bool				GetPosition(ZEGRWindow* Window, ZEInt& PosX, ZEInt& PosY);
 
-	memcpy(Buffer, Data, GetSize());
+		bool				SetLockRectangle(const ZERectangle* Rectangle);
+		bool				GetLockRectangle(ZERectangle& Rectangle);
 
-	Unlock();
-}
+		bool				GetLocked();
 
-ZEGRConstantBuffer::ZEGRConstantBuffer()
-{
+		bool				CollisionCheck(const ZERectangle& Rectangle);
+		bool				CollisionCheck(const ZEGRWindow* Window);
 
-}
-
-ZEGRConstantBuffer::~ZEGRConstantBuffer()
-{
-	Deinitialize();
-}
-
-ZEHolder<ZEGRConstantBuffer> ZEGRConstantBuffer::Create(ZESize BufferSize)
-{
-	ZEHolder<ZEGRConstantBuffer> ConstantBuffer = ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
-	if (!ConstantBuffer->Initialize(BufferSize))
-		return NULL;
-	
-	return ConstantBuffer;
-}
+		static ZEGRCursor*	GetInstance();
+};

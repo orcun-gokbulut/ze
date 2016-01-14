@@ -36,9 +36,10 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 
 class ZEGRTexture;
 class ZEGRRenderState;
@@ -53,10 +54,10 @@ class ZERNStageTextureOutput : public ZERNStage
 		ZEArray<ZEGRTexture*>			InputTextures;
 		ZEGRRenderTarget*				OutputRenderTarget;
 
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZEGRViewport					Viewports[ZEGR_MAX_VIEWPORT_SLOT];
 

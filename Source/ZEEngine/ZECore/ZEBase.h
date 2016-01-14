@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_BASE_H__
-#define __ZE_BASE_H__
 
 enum ZEInitializationState
 {
@@ -65,5 +63,3 @@ class ZEBase
 
 		virtual void			Destroy();
 };
-
-#endif

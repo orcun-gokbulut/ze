@@ -42,15 +42,13 @@
 #include "ZEGRFormat.h"
 
 class ZEGRRenderTarget;
-class ZEGRDepthStencilBuffer;
-class ZEGRMonitorMode;
-class ZEWindow;
-class ZEGRViewport;
+class ZEGRMonitor;
+class ZEGRWindow;
 
 class ZEGROutput : public ZEGRResource
 {
 	protected:
-		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format) = 0;
+		virtual bool						Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format) = 0;
 		virtual void						Deinitialize() = 0;
 
 	public:
@@ -59,8 +57,8 @@ class ZEGROutput : public ZEGRResource
 		virtual void*						GetHandle() = 0;
 		virtual ZEGRRenderTarget*			GetRenderTarget() = 0;
 
-		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode) = 0;
-		virtual ZEGRMonitorMode*			GetMonitorMode() = 0;
+		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor) = 0;
+		virtual ZEGRMonitor*				GetMonitor() = 0;
 
 		virtual void						SetFullscreen(bool Enabled) = 0;
 		virtual bool						GetFullscreen() = 0;
@@ -69,5 +67,5 @@ class ZEGROutput : public ZEGRResource
 
 		virtual void						Present() = 0;
 
-		static ZEGROutput*					Create(void* Window, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		static ZEGROutput*					Create(ZEGRWindow* Window, ZEGRFormat Format);
 };

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_APPLICATION_MODULE_H__
-#define __ZE_APPLICATION_MODULE_H__
 
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEString.h"
@@ -66,5 +64,3 @@ class ZEApplicationModule : public ZEModule
 							ZEApplicationModule();
 		virtual				~ZEApplicationModule();
 };
-
-#endif

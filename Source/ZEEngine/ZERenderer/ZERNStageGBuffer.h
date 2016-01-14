@@ -36,7 +36,8 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEGraphics\ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderState;
@@ -46,11 +47,11 @@ class ZERNStageGBuffer : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
-		ZEGRHolder<ZEGRTexture2D>			DepthStencilBuffer;
-		ZEGRHolder<ZEGRTexture2D>			GBuffer0;
-		ZEGRHolder<ZEGRTexture2D>			GBuffer1;
-		ZEGRHolder<ZEGRTexture2D>			GBuffer2;
-		ZEGRHolder<ZEGRTexture2D>			GBuffer3;
+		ZEHolder<ZEGRTexture2D>			DepthStencilBuffer;
+		ZEHolder<ZEGRTexture2D>			GBuffer0;
+		ZEHolder<ZEGRTexture2D>			GBuffer1;
+		ZEHolder<ZEGRTexture2D>			GBuffer2;
+		ZEHolder<ZEGRTexture2D>			GBuffer3;
 		ZEGRRenderTarget*					RenderTargets[4];
 
 	private:

@@ -469,6 +469,31 @@ const ZERNMap& ZERNFixedMaterial::GetSubSurfaceScatteringMap()
 	return SubSurfaceScatteringMap;
 }
 
+void ZERNFixedMaterial::SetBaseMap(const ZERNMap& Map)
+{
+	BaseMap = Map;
+
+	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
+}
+
+const ZERNMap& ZERNFixedMaterial::GetBaseMap() const
+{
+	return BaseMap;
+}
+
+void ZERNFixedMaterial::SetBaseMapFile(const ZEString& Filename)
+{
+	if(Filename.IsEmpty())
+		return;
+
+	BaseMap.Load2D(FileName);
+}
+
+const ZEString& ZERNFixedMaterial::GetBaseMapFile() const
+{
+	return BaseMap.GetTextureFile();
+}
+
 void ZERNFixedMaterial::SetAmbientEnabled(bool Enabled)
 {
 	if (AmbientEnabled == Enabled)

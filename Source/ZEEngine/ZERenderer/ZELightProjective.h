@@ -39,7 +39,7 @@
 
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEViewFrustum.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
 class ZETexture2DResource;
@@ -52,8 +52,8 @@ class ZELightProjective : public ZELight
 		float						FOV;
 		float						AspectRatio;
 		ZEViewFrustum				ViewVolume;
-		ZEGRHolder<ZEGRTexture2D>	ProjectionTexture;
-		ZEGRHolder<ZEGRTexture2D>	ShadowMap;
+		ZEHolder<ZEGRTexture2D>	ProjectionTexture;
+		ZEHolder<ZEGRTexture2D>	ShadowMap;
 
 		ZETexture2DResource*		ProjectionTextureResource;
 		ZEString					ProjectionTextureFilename;								

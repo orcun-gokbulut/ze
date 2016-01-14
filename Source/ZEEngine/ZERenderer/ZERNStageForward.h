@@ -36,7 +36,8 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEGraphics\ZEGRHolder.h"
+
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics\ZEGRRenderState.h"
 
 class ZEGRTexture2D;
@@ -44,7 +45,7 @@ class ZEGRTexture2D;
 class ZERNStageForward : public ZERNStage
 {
 	private:
-		ZEGRHolder<ZEGRTexture2D>		DepthMap;
+		ZEHolder<ZEGRTexture2D>		DepthMap;
 
 		virtual bool					InitializeSelf();
 

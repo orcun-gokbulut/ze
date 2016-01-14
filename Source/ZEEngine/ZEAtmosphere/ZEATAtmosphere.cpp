@@ -45,13 +45,12 @@
 bool ZEATAtmosphere::InitializeSelf()
 {
 	Sun = new ZEATSun();
-	Sun->SetIntensity(15.0f);
+	Sun->SetIntensity(10.0f);
 	Sun->SetColor(ZEVector3::One);
 	Sun->SetObserver(Observer);
 
 	AtmosphericScattering.SetLightIntensity(Sun->GetIntensity());
 	AtmosphericScattering.SetLightColor(Sun->GetColor());
-	AtmosphericScattering.SetMieScatteringStrengh(0.76f);
 	AtmosphericScattering.SetMultipleScattering(true);
 	AtmosphericScattering.SetOrderCount(5);
 

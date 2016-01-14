@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEPointer/ZEReferenceCounted.h"
+
 #include "ZEGRDefinitions.h"
 #include "ZEDS/ZEString.h"
 #include "ZECommon.h"
@@ -55,26 +57,16 @@ enum ZEGRResourceType
 	ZEGR_RT_STRUCTURED_BUFFER		= 11
 };
 
-class ZEGRResource
+class ZEGRResource : public ZEReferenceCounted
 {
 	ZE_DISALLOW_COPY(ZEGRResource)
-
-	template <typename Type> friend class ZEGRHolder;
 	friend class ZEGRGraphicsModule;
-
 	private:
-		ZESSize							ReferenceCount;
+		ZEString						Name;
 		ZESize							Size;
 
 	protected:
 		void							SetSize(ZESize Size);
-
-		#ifdef ZE_DEBUG_ENABLE
-		ZEString						Name;
-		#endif
-
-		void							AddRef();
-		virtual void					Destroy();
 
 										ZEGRResource();
 		virtual 						~ZEGRResource();
@@ -84,8 +76,6 @@ class ZEGRResource
 		ZESize							GetSize() const;
 		ZESize							GetReferenceCount() const;
 
-		void							SetName(const char* Name);
-		const char*						GetName() const;
-
-		void							Release();
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;
 };

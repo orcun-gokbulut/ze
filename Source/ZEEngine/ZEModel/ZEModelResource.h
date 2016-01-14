@@ -41,7 +41,7 @@
 #include "ZEMDResourceAnimation.h"
 #include "ZEMDResourceHelper.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEDS/ZEString.h"
 
 class ZETexture2DResource;

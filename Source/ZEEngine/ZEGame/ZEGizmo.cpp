@@ -49,7 +49,7 @@
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
-ZERNSimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
+ZEHolder<ZERNSimpleMaterial> ZEGizmo::GizmoMaterial;
 
 void ZEGizmo::UpdateMoveGizmo()
 {
@@ -1051,12 +1051,7 @@ bool ZEGizmo::InitializeSelf()
 
 bool ZEGizmo::DeinitializeSelf()
 {	
-	if (GizmoMaterial != NULL)
-	{
-		GizmoMaterial->Release();
-		GizmoMaterial = NULL;
-	}
-
+	GizmoMaterial = NULL;
 	return ZEEntity::DeinitializeSelf();
 }
 

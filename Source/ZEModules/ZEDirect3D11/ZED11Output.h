@@ -36,32 +36,33 @@
 #pragma once
 
 #include "ZEGraphics/ZEGROutput.h"
+#include "ZEPointer/ZEHolder.h"
 
 #include "ZETypes.h"
 #include "ZED11ComponentBase.h"
-#include "ZEGraphics/ZEGRHolder.h"
 
-struct IDXGIOutput;
 struct IDXGISwapChain1;
 class ZEGRRenderTarget;
+class ZED11Monitor;
 
 class ZED11Output : public ZEGROutput, ZED11ComponentBase
 {
-	friend ZED11Module;
+	friend class ZED11Module;
 	private:
 		void*								Handle;
-		ZEGRMonitorMode*					Mode;
-		ZEGRHolder<ZEGRRenderTarget>		RenderTarget;
+		ZEGRMonitor*						Monitor;
 
-		IDXGIOutput*						Output;
+		ZEHolder<ZEGRRenderTarget>			RenderTarget;
+
 		IDXGISwapChain1*					SwapChain;
 
 		bool								Fullscreen;
+		bool								RestrictedToMonitor;
 
 		void								SwitchToFullscreen();
 		void								UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 
-		virtual bool						Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		virtual bool						Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 		virtual	void						Deinitialize();
 
 											ZED11Output();
@@ -70,8 +71,8 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 		virtual void*						GetHandle();
 		virtual ZEGRRenderTarget*			GetRenderTarget();
 
-		virtual void						SetMonitorMode(ZEGRMonitorMode* Mode);
-		virtual ZEGRMonitorMode*			GetMonitorMode();
+		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor);
+		virtual ZEGRMonitor*				GetMonitor();
 
 		virtual void						SetFullscreen(bool Enabled);
 		virtual bool						GetFullscreen();
