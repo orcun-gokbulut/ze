@@ -37,6 +37,10 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGROutput.h"
 
+static ZEUInt NextWindowId = 0;
+ZEUInt ZEGRWindow::WindowCount = 0;
+ZEGRWindow* ZEGRWindow::LastCursorLock = NULL;
+
 void ZEGRWindow::OnCreate()
 {
 	zeLog("Window is being created.");
@@ -57,12 +61,12 @@ void ZEGRWindow::OnFocusLoose()
 	zeLog("Window lost focus.");
 }
 
-void ZEGRWindow::OnEnable()
+void ZEGRWindow::OnEnabled()
 {
 	zeLog("Window enabled.");
 }
 
-void ZEGRWindow::OnDisable()
+void ZEGRWindow::OnDisabled()
 {
 	zeLog("Window disabled.");
 }
@@ -99,8 +103,6 @@ void ZEGRWindow::OnMove()
 
 void ZEGRWindow::OnSize()
 {
-	Output->Resize(Width, Height);
-
 	zeLog("Window resized.");
 }
 
@@ -114,7 +116,7 @@ void* ZEGRWindow::GetHandle() const
 	return Handle;
 }
 
-const ZEWindowStyle& ZEGRWindow::GetStyle() const
+const ZEGRWindowStyle& ZEGRWindow::GetStyle() const
 {
 	return Style;
 }
@@ -204,22 +206,22 @@ bool ZEGRWindow::GetEnable() const
 	return Enabled;
 }
 
-bool ZEGRWindow::IsFocused() const
+bool ZEGRWindow::GetFocused() const
 {
 	return Focused;
 }
 
-bool ZEGRWindow::IsRestored() const
+bool ZEGRWindow::GetRestored() const
 {
 	return !Maximized && !Minimized;
 }
 
-bool ZEGRWindow::IsMaximized() const
+bool ZEGRWindow::GetMaximized() const
 {
 	return Maximized;
 }
 
-bool ZEGRWindow::IsMinimized() const
+bool ZEGRWindow::GetMinimized() const
 {
 	return Minimized;
 }
@@ -229,25 +231,12 @@ bool ZEGRWindow::GetCursorLock() const
 	return LastCursorLock == this;
 }
 
-static ZEUInt NextWindowId = 0;
-ZEUInt ZEGRWindow::WindowCount = 0;
-ZEGRWindow* ZEGRWindow::LastCursorLock = NULL;
-
 ZEGRWindow::ZEGRWindow()
 {
 	Id = NextWindowId++;
 	Handle = NULL;
-	Title = "Zinek Engine Window";
+	Title = "Zinek Engine";
 	
-	memset(&Style, 0, sizeof(ZEWindowStyle));
-	Style.Type = ZE_GWT_CAPTION;
-	Style.Caption.OnTop = false;
-	Style.Caption.Resizable = true;
-	Style.Caption.Maximizable = true;
-	Style.Caption.Minimizable = true;
-
-	Flags = ZE_GWF_NONE;
-
 	Width = 800;
 	Height = 600;
 	PositionX = 100;
