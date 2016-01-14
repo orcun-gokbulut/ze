@@ -52,10 +52,10 @@ class ZEGRRenderTarget : public ZEGRResource
 		virtual						~ZEGRRenderTarget();
 
 	public:
-		ZEUInt						GetWidth();
-		ZEUInt						GetHeight();
-		ZEGRFormat					GetFormat();
-		ZEVector2					GetPixelSize();
+		ZEUInt						GetWidth() const;
+		ZEUInt						GetHeight() const;
+		ZEGRFormat					GetFormat() const;
+		ZEVector2					GetPixelSize() const;
 
-		virtual ZEGRResourceType	GetResourceType();
+		virtual ZEGRResourceType	GetResourceType() const;
 };

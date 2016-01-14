@@ -42,17 +42,13 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEThread/ZEMutex.h"
 
-enum ZEGRWindowType
+enum ZEGRWindowType : ZEUInt8
 {
 	ZEGR_WT_NORMAL		= 0,
-	ZEGR_WT_POPUP		= 1,
+	ZEGR_WT_POPUP		= 1
 };
 
-class ZEGRWindow;
-class ZEGRTexture2D;
-class ZEGRRenderTarget;
 class ZEGRMonitor;
 class ZEGROutput;
 
@@ -61,7 +57,7 @@ class ZEGRWindowStyle
 	public:
 		ZEGRWindowType			Type;
 		bool					TitleBar;
-		bool					TitleBarIcon;
+		bool					WindowMenu;
 		bool					MinimizeButton;
 		bool					MaximizeButton;
 		bool					Resizable;

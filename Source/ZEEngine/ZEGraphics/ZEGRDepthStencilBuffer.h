@@ -51,9 +51,9 @@ class ZEGRDepthStencilBuffer : public ZEGRResource
 		virtual							~ZEGRDepthStencilBuffer();
 
 	public:
-		ZEUInt							GetWidth();
-		ZEUInt							GetHeight();
-		ZEGRFormat						GetFormat();
+		virtual ZEGRResourceType		GetResourceType() const;
 
-		virtual ZEGRResourceType		GetResourceType();
+		ZEUInt							GetWidth() const;
+		ZEUInt							GetHeight() const;
+		ZEGRFormat						GetFormat() const;
 };

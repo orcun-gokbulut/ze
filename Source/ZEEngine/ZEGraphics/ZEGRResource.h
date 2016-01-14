@@ -72,7 +72,7 @@ class ZEGRResource : public ZEReferenceCounted
 		virtual 						~ZEGRResource();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() = 0;
+		virtual ZEGRResourceType		GetResourceType() const = 0;
 		ZESize							GetSize() const;
 		ZESize							GetReferenceCount() const;
 

@@ -37,8 +37,6 @@
 
 #include "ZEGRShaderCompileOptions.h"
 
-class ZEGRShader;
-
 class ZEGRShaderCompiler
 {
 	public:

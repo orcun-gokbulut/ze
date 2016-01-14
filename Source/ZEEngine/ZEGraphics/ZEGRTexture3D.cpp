@@ -43,6 +43,7 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 	this->Width = Width;
 	this->Height = Height;
 	this->Depth = Depth;
+
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
 	SetIsRenderTarget(RenderTarget);
@@ -59,32 +60,32 @@ void ZEGRTexture3D::Deinitialize()
 	ZEGR_COUNTER_RESOURCE_DECREASE(this, Texture3D, Texture);
 }
 
-ZEGRResourceType ZEGRTexture3D::GetResourceType()
+ZEGRResourceType ZEGRTexture3D::GetResourceType() const
 {
 	return ZEGR_RT_TEXTURE;
 }
 
-ZEGRTextureType ZEGRTexture3D::GetTextureType()
+ZEGRTextureType ZEGRTexture3D::GetTextureType() const
 {
 	return ZEGR_TT_3D;
 }
 
-ZEUInt ZEGRTexture3D::GetWidth()
+ZEUInt ZEGRTexture3D::GetWidth() const
 {
 	return Width;
 }
 
-ZEUInt ZEGRTexture3D::GetHeight()
+ZEUInt ZEGRTexture3D::GetHeight() const
 {
 	return Height;
 }
 
-ZEUInt ZEGRTexture3D::GetDepth()
+ZEUInt ZEGRTexture3D::GetDepth() const
 {
 	return Depth;
 }
 
-ZEVector3 ZEGRTexture3D::GetPixelSize()
+ZEVector3 ZEGRTexture3D::GetPixelSize() const
 {
 	return ZEVector3(1.0f / (float)Width, 1.0f / (float)Height, 1.0f / (float)Depth);
 }
@@ -96,12 +97,7 @@ ZEGRTexture3D::ZEGRTexture3D()
 	Depth = 0;
 }
 
-ZEGRTexture3D::~ZEGRTexture3D()
-{
-	Deinitialize();
-}
-
-ZEGRTexture3D* ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
+ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");

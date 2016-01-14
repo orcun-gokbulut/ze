@@ -54,6 +54,8 @@ static HCURSOR NESWSizeIcon = LoadCursor(NULL, IDC_SIZENESW);
 static HCURSOR NWSESizeIcon = LoadCursor(NULL, IDC_SIZENWSE);
 static HCURSOR DefaultCursor = LoadCursor(NULL, IDC_ARROW);
 
+static HICON DefaultIcon = LoadIcon(NULL, IDI_APPLICATION);
+
 static void HandleWin32Error(DWORD ErrorCode)
 {
 	char ErrorString[ZE_WIN32_ERROR_STRING_LENGTH] = {0};
@@ -134,19 +136,17 @@ static bool ConvertClientToWindowSize(ZEUInt Style, ZEUInt StyleExt, ZEInt Clien
 static void GetWin32Style(const ZEGRWindowStyle& Style, DWORD& Win32StyleExt, DWORD& Win32Style)
 {
 	if (Style.Type == ZEGR_WT_NORMAL)
+	{
 		Win32Style |= WS_OVERLAPPED;
-	else if (Style.Type == ZEGR_WT_NORMAL)
+		Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
+		Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;
+	}
+	else if (Style.Type == ZEGR_WT_POPUP)
+	{
 		Win32Style |= WS_POPUP;
-
-	Win32Style |= 
-		Win32Style |= Style.TitleBar ? WS_CAPTION : 0;
-	Win32Style |= Style.TitleBar ? WS_SYSMENU : 0;
-	Win32Style |= Style.Resizable ? WS_SIZEBOX : 0;
-	Win32Style |= Style.MinimizeButton ? WS_MINIMIZEBOX : 0;
-	Win32Style |= Style.MaximizeButton ? WS_MAXIMIZEBOX : 0;
-	Win32Style |= Style.Bordered ? WS_BORDER : 0;
-	Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
-	Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;	
+		Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
+		Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;
+	}	
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -179,14 +179,14 @@ static bool RegisterWindowClass(HINSTANCE Instance)
 	if (ZEGRWindow::GetWindowCount() > 0)
 		return true;
 
-	WNDCLASSEX WindowClass;
+	WNDCLASSEX WindowClass = {};
 	WindowClass.cbSize			= sizeof(WNDCLASSEX);
 	WindowClass.style			= CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	WindowClass.lpfnWndProc		= &WindowProc;
 	WindowClass.cbClsExtra		= 0;
 	WindowClass.cbWndExtra		= 0;
 	WindowClass.hInstance		= Instance;
-	WindowClass.hIcon			= NULL;
+	WindowClass.hIcon			= DefaultIcon;
 	WindowClass.hCursor			= DefaultCursor;
 	WindowClass.hbrBackground	= DefaultBackGround;
 	WindowClass.lpszMenuName	= NULL;
@@ -222,7 +222,7 @@ ZEGRWindowStyle::ZEGRWindowStyle()
 {
 	Type = ZEGR_WT_NORMAL;
 	TitleBar = true;
-	TitleBarIcon = true;
+	WindowMenu = true;
 	MinimizeButton = true;
 	MaximizeButton = true;
 	Resizable = true;
@@ -731,15 +731,15 @@ bool ZEGRWindow::InitializeEmbedded(void* ExistingHandle)
 	Width = Rectangle.right - Rectangle.left;
 	Height = Rectangle.bottom - Rectangle.top;
 
-	Style.Type = (Win32Style & WS_POPUP) == 0 ? ZEGR_WT_NORMAL : ZEGR_WT_POPUP;
-	Style.TitleBar = (Win32Style & WS_CAPTION) == 0;
-	Style.TitleBarIcon = (Win32Style & WS_SYSMENU) == 0;
-	Style.MinimizeButton = (Win32Style & WS_MINIMIZEBOX)  ==  0;
-	Style.MaximizeButton = (Win32Style & WS_MAXIMIZEBOX) == 0;
-	Style.Resizable = (Win32Style & WS_SIZEBOX) == 0;
-	Style.Bordered = (Win32Style & WS_BORDER) == 0;
-	Style.ShowInTaskbar =  (Win32StyleEx & WS_EX_APPWINDOW) == 0;	
-	Style.AlwaysOnTop =  (Win32StyleEx & WS_EX_TOPMOST) == 0;	
+	Style.Type = (Win32Style & WS_POPUP) == WS_POPUP ? ZEGR_WT_POPUP : ZEGR_WT_NORMAL;
+	Style.TitleBar = (Win32Style & WS_CAPTION) == WS_CAPTION;
+	Style.WindowMenu = (Win32Style & WS_SYSMENU) == WS_SYSMENU;
+	Style.MinimizeButton = (Win32Style & WS_MINIMIZEBOX) == WS_MINIMIZEBOX;
+	Style.MaximizeButton = (Win32Style & WS_MAXIMIZEBOX) == WS_MAXIMIZEBOX;
+	Style.Resizable = (Win32Style & WS_SIZEBOX) == WS_SIZEBOX;
+	Style.Bordered = (Win32Style & WS_BORDER) == WS_BORDER;
+	Style.ShowInTaskbar = (Win32StyleEx & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
+	Style.AlwaysOnTop = (Win32StyleEx & WS_EX_TOPMOST) == WS_EX_TOPMOST;
 
 	return true;
 }

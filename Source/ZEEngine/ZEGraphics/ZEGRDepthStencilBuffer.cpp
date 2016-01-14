@@ -35,22 +35,22 @@
 
 #include "ZEGRDepthStencilBuffer.h"
 
-ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType()
+ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType() const
 {
 	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
 }
 
-ZEUInt ZEGRDepthStencilBuffer::GetWidth()
+ZEUInt ZEGRDepthStencilBuffer::GetWidth() const
 {
 	return Width;
 }
 
-ZEUInt ZEGRDepthStencilBuffer::GetHeight()
+ZEUInt ZEGRDepthStencilBuffer::GetHeight() const
 {
 	return Height;
 }
 
-ZEGRFormat ZEGRDepthStencilBuffer::GetFormat()
+ZEGRFormat ZEGRDepthStencilBuffer::GetFormat() const
 {
 	return Format;
 }

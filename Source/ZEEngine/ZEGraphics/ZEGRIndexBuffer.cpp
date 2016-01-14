@@ -74,17 +74,17 @@ void ZEGRIndexBuffer::Deinitialize()
 	SetSize(0);
 }
 
-ZEGRResourceType ZEGRIndexBuffer::GetResourceType()
+ZEGRResourceType ZEGRIndexBuffer::GetResourceType() const
 {
 	return ZEGR_RT_INDEX_BUFFER;
 }
 
-ZESize ZEGRIndexBuffer::GetIndexCount()
+ZESize ZEGRIndexBuffer::GetIndexCount() const
 {
 	return IndexCount;
 }
 
-ZEGRIndexBufferFormat ZEGRIndexBuffer::GetFormat()
+ZEGRIndexBufferFormat ZEGRIndexBuffer::GetFormat() const
 {
 	return Format;
 }
