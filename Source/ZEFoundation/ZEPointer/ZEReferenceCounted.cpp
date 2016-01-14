@@ -69,3 +69,8 @@ ZEReferenceCounted::ZEReferenceCounted(const ZEReferenceCounted& Object)
 {
 	ReferenceCount = 0;
 }
+
+ZEReferenceCounted::~ZEReferenceCounted()
+{
+
+}

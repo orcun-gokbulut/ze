@@ -116,7 +116,7 @@ bool ZED11Output::Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRForm
 	SwapChainDesc.Height = Height;
 	SwapChainDesc.Format = ZED11ComponentBase::ConvertFormat(Format);
 	SwapChainDesc.Stereo = FALSE;
-	SwapChainDesc.BufferCount = 2;
+	SwapChainDesc.BufferCount = 1;
 	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 	SwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
@@ -227,6 +227,9 @@ ZEGRMonitor* ZED11Output::GetMonitor()
 	IDXGIOutput* CurrentOutputMonitor;
 	SwapChain->GetContainingOutput(&CurrentOutputMonitor);
 
+	DXGI_OUTPUT_DESC CurrentOutputDescription;
+	CurrentOutputMonitor->GetDesc(&CurrentOutputDescription);
+
 	if(Monitor == NULL)
 	{
 		ZEGRAdapter* CurrentAdapter = ZEGRGraphicsModule::GetInstance()->GetCurrentAdapter();
@@ -234,23 +237,19 @@ ZEGRMonitor* ZED11Output::GetMonitor()
 		const ZEArray<ZEGRMonitor*>& Monitors = CurrentAdapter->GetMonitors();
 		for(ZEUInt I = 0; I < Monitors.GetCount(); I++)
 		{
-			ZED11Monitor* Monitor = static_cast<ZED11Monitor*>(Monitors[I]);
-			if(Monitor->GetOutput() == CurrentOutputMonitor)
-				return Monitor;
+			if(Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
+				Monitor = Monitors[I];
 		}
 	}
 	else
 	{
-		ZED11Monitor* D11Monitor = static_cast<ZED11Monitor*>(Monitor);
-
-		if(D11Monitor->GetOutput() != CurrentOutputMonitor)
+		if(Monitor->GetHandle() != CurrentOutputDescription.Monitor)
 		{
-			const ZEArray<ZEGRMonitor*>& Monitors = D11Monitor->GetAdapter()->GetMonitors();
+			const ZEArray<ZEGRMonitor*>& Monitors = Monitor->GetAdapter()->GetMonitors();
 			for(ZEUInt I = 0; I < Monitors.GetCount(); I++)
 			{
-				ZED11Monitor* Monitor = static_cast<ZED11Monitor*>(Monitors[I]);
-				if(Monitor->GetOutput() == CurrentOutputMonitor)
-					return Monitor;
+				if(Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
+					Monitor = Monitors[I];
 			}
 		}
 	}

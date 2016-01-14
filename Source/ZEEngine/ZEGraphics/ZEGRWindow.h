@@ -179,13 +179,11 @@ class ZEGRWindow : public ZEInitializable
 		virtual bool							SetTitle(const ZEString& Title);
 		const ZEString&							GetTitle() const;
 
-		void									SetWidth(ZEUInt Width);
 		ZEUInt									GetWidth() const;
-
-		void									SetHeight(ZEUInt Height);
 		ZEUInt									GetHeight() const;
 
-		ZEGROutput*								GetOutput() const;
+		ZEInt									GetPositionX() const;
+		ZEInt									GetPositionY() const;
 
 		virtual bool							SetPosition(ZEInt X, ZEInt Y);
 		void									GetPosition(ZEInt& X, ZEInt& Y) const;
@@ -195,7 +193,7 @@ class ZEGRWindow : public ZEInitializable
 		void									GetSize(ZEInt& Width, ZEInt& Height) const;
 		void									GetSize(ZEVector2& Size) const;
 
-		void									GetRectangle(ZERectangle& Rectangle) const;
+		ZERectangle								GetRectangle() const;
 
 		virtual bool							SetFullScreen(bool FullScreen);
 		bool									GetFullScreen() const;
@@ -203,29 +201,30 @@ class ZEGRWindow : public ZEInitializable
 		virtual bool							SetVSynchEnable(bool VSynchEnable);
 		bool									GetVSynchEnable() const;
 
-		virtual void							SetEnable(bool Enable);
+		virtual bool							SetEnable(bool Enable);
 		bool									GetEnable() const;
 		
 		ZEGRMonitor*							GetContainingMonitor() const;
+		ZEGROutput*								GetOutput() const;
 
-		virtual void							Focus();
+		virtual bool							Focus();
 		bool									IsFocused() const;
 
-		virtual bool							Restore();
-		bool									IsRestored() const;
 		virtual bool							Maximize();
 		bool									IsMaximized() const;
 		virtual bool							Minimize();
 		bool									IsMinimized() const;
+		virtual bool							Restore();
+		bool									IsRestored() const;
 
-		virtual bool							SetCursorLock(bool Value);
+		virtual bool							SetCursorLock(bool CursorLock);
 		bool									GetCursorLock() const;
 
 		virtual ZESSize							HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);
 
+		virtual bool							InitializeEmbedded(void* ExistingHandle);
+		virtual bool							Show();
 		virtual void							Destroy();
-
-		virtual bool							Update();
 
 		static ZEUInt							GetWindowCount();
 		static ZEGRWindow*						CreateInstance();
