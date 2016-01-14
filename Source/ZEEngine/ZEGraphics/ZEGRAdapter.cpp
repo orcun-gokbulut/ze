@@ -35,29 +35,27 @@
 
 #include "ZEGRAdapter.h"
 
-#include "ZEGRGraphicsModule.h"
-
-ZEGRMonitor* ZEGRMonitorMode::GetMonitor()
+const ZEGRMonitor* ZEGRMonitorMode::GetMonitor() const
 {
 	return Monitor;
 }
 
-ZEUInt ZEGRMonitorMode::GetWidth()
+ZEUInt ZEGRMonitorMode::GetWidth() const
 {
 	return Width;
 }
 
-ZEUInt ZEGRMonitorMode::GetHeight()
+ZEUInt ZEGRMonitorMode::GetHeight() const
 {
 	return Height;
 }
 
-ZEGRFormat ZEGRMonitorMode::GetFormat()
+ZEGRFormat ZEGRMonitorMode::GetFormat() const
 {
 	return Format;
 }
 
-ZEGRRefreshRate ZEGRMonitorMode::GetRefreshRate()
+ZEGRRefreshRate ZEGRMonitorMode::GetRefreshRate() const
 {
 	return RefreshRate;
 }
@@ -70,6 +68,8 @@ ZEGRMonitorMode::ZEGRMonitorMode()
 ZEGRMonitor::ZEGRMonitor()
 {
 	Adapter = NULL;
+	Handle = NULL;
+
 	memset(&Area, 0, sizeof(ZERectangle));
 }
 
@@ -78,17 +78,22 @@ ZEGRMonitor::~ZEGRMonitor()
 
 }
 
-ZEGRAdapter* ZEGRMonitor::GetAdapter()
+const ZEGRAdapter* ZEGRMonitor::GetAdapter() const
 {
 	return Adapter;
 }
 
-const char* ZEGRMonitor::GetName()
+void* ZEGRMonitor::GetHandle() const
+{
+	return Handle;
+}
+
+const char* ZEGRMonitor::GetName() const
 {
 	return Name.ToCString();
 }
 
-const ZERectangle& ZEGRMonitor::GetArea()
+const ZERectangle& ZEGRMonitor::GetArea() const
 {
 	return Area;
 }
@@ -103,12 +108,12 @@ ZEGRAdapter::~ZEGRAdapter()
 
 }
 
-const ZEString& ZEGRAdapter::GetName()
+ZEUInt64 ZEGRAdapter::GetId() const
 {
-	return Name;
+	return Id;
 }
 
-const ZEArray<ZEGRAdapter*>& ZEGRAdapter::GetAdapters()
+const ZEString& ZEGRAdapter::GetName() const
 {
-	return ZEGRGraphicsModule::GetInstance()->GetAdapters();
+	return Name;
 }

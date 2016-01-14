@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRStructuredBuffer.h"
+
+#include "ZEPointer\ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
 
@@ -77,14 +79,11 @@ ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
 	Deinitialize();
 }
 
-ZEGRStructuredBuffer* ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize)
+ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize)
 {
-	ZEGRStructuredBuffer* StructuredBuffer = ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
+	ZEHolder<ZEGRStructuredBuffer> StructuredBuffer = ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
 	if (!StructuredBuffer->Initialize(ElementCount, ElementSize))
-	{
-		StructuredBuffer->Release();
 		return NULL;
-	}
 	
 	return StructuredBuffer;
 }

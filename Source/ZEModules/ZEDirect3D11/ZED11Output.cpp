@@ -35,22 +35,24 @@
 
 #include "ZED11Output.h"
 
+#include "ZEError.h"
+
 #include "ZEGraphics\ZEGRDefinitions.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
-#include "ZEGraphics\ZEGRAdapter.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
+
 #include "ZED11Texture2D.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11DepthStencilBuffer.h"
-
-#include "ZEError.h"
+#include "ZED11Adapter.h"
 
 #include <d3d11.h>
 #include <dxgi1_2.h>
 
 void ZED11Output::SwitchToFullscreen()
 {
-	DXGI_MODE_DESC Description;
+	/*DXGI_MODE_DESC Description;
 	Description.Width = Mode->GetWidth();
 	Description.Height = Mode->GetWidth();
 	Description.RefreshRate.Numerator = Mode->GetRefreshRate().Numerator;
@@ -58,7 +60,12 @@ void ZED11Output::SwitchToFullscreen()
 	Description.Format = ConvertFormat(Mode->GetFormat());
 	Description.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	Description.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	SwapChain->ResizeTarget(&Description);
+	SwapChain->ResizeTarget(&Description);*/
+
+	IDXGIOutput1* Output = NULL;
+	if(RestrictedToMonitor)
+		Output = static_cast<ZED11Monitor*>(Monitor)->GetOutput();
+
 	SwapChain->SetFullscreenState(TRUE, Output);
 }
 
@@ -66,7 +73,7 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 {
 	RenderTarget.Release();
 
-	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, DXGI_FORMAT_R8G8B8A8_UNORM, 0);
+	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertFormat(Format), 0);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot resize swapchain buffers. Error: %d.", Result);
@@ -81,6 +88,7 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 		zeCriticalError("Cannot get swapchain buffers. Error: %d.", Result);
 		return;
 	}
+
 	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
 	if(FAILED(Result))
 	{
@@ -95,24 +103,23 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 	SetSize(Width * Height * FormatDefinition->BlockSize);
 }
 
-bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
+bool ZED11Output::Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
 	zeDebugCheck(Handle == NULL, "Handle parameter cannot be null.");
 	zeDebugCheck(Width == 0 || Height == 0, "Width and Height cannot be null.");
 
 	this->Handle = Handle;
-	this->Mode = Mode;
 
 	DXGI_SWAP_CHAIN_DESC1 SwapChainDesc;
 	memset(&SwapChainDesc, 0, sizeof(DXGI_SWAP_CHAIN_DESC1));
-	SwapChainDesc.Width = Mode != NULL ? Mode->GetWidth() : Width;
-	SwapChainDesc.Height = Mode != NULL ? Mode->GetHeight() : Height;
-	SwapChainDesc.Format = Mode != NULL ? ZED11ComponentBase::ConvertFormat(Mode->GetFormat()) : DXGI_FORMAT_R8G8B8A8_UNORM;
+	SwapChainDesc.Width = Width;
+	SwapChainDesc.Height = Height;
+	SwapChainDesc.Format = ZED11ComponentBase::ConvertFormat(Format);
 	SwapChainDesc.Stereo = FALSE;
 	SwapChainDesc.BufferCount = 1;
 	SwapChainDesc.Scaling = DXGI_SCALING_STRETCH;
 	SwapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
-	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT | DXGI_USAGE_BACK_BUFFER | DXGI_CPU_ACCESS_NONE;
+	SwapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	SwapChainDesc.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH;
 	SwapChainDesc.SampleDesc.Count = 1;
 	SwapChainDesc.SampleDesc.Quality = 0;
@@ -120,48 +127,75 @@ bool ZED11Output::Initialize(void* Handle, ZEGRMonitorMode* Mode, ZEUInt Width, 
 
 	DXGI_SWAP_CHAIN_FULLSCREEN_DESC FullScreenDesc;
 	memset(&FullScreenDesc, 0, sizeof(DXGI_SWAP_CHAIN_FULLSCREEN_DESC));
-	FullScreenDesc.Windowed = Mode == NULL;
+	FullScreenDesc.Windowed = TRUE;
 	FullScreenDesc.Scaling = DXGI_MODE_SCALING_UNSPECIFIED;
 	FullScreenDesc.ScanlineOrdering = DXGI_MODE_SCANLINE_ORDER_UNSPECIFIED;
-	FullScreenDesc.RefreshRate.Numerator = Mode != NULL ? Mode->GetRefreshRate().Numerator : 0;
-	FullScreenDesc.RefreshRate.Denominator = Mode != NULL ? Mode->GetRefreshRate().Denominator : 0;
+	FullScreenDesc.RefreshRate.Numerator = 0;
+	FullScreenDesc.RefreshRate.Denominator = 0;
 
-	IDXGIFactory2* DXGIFactory = NULL;
-	HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
+	IDXGIDevice1* DXGIDevice;
+	HRESULT Result = GetDevice()->QueryInterface(__uuidof(IDXGIDevice1), (void**)&DXGIDevice);
 	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot create graphics interface factory. Error: %d.", Result);
+		zeCriticalError("Cannot query IDXGIDevice1. Error: %d", Result);
+		DXGIDevice->Release();
 		return false;
 	}
 
-	IDXGIOutput* Output = NULL;
-	Result = DXGIFactory->CreateSwapChainForHwnd(GetDevice(), (HWND)Handle, &SwapChainDesc, &FullScreenDesc, Output, &SwapChain);
+	IDXGIAdapter1* DXGIAdapter;
+	Result = DXGIDevice->GetParent(__uuidof(IDXGIAdapter1), (void**)&DXGIAdapter);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get IDXGIAdapter1. Error: %d", Result);
+		DXGIAdapter->Release();
+		return false;
+	}
+
+	IDXGIFactory2* DXGIFactory;
+	Result = DXGIAdapter->GetParent(__uuidof(IDXGIFactory2), (void**)&DXGIFactory);
+	if(FAILED(Result))
+	{
+		zeCriticalError("Cannot get IDXGIFactory2. Error: %d", Result);
+		DXGIFactory->Release();
+		return false;
+	}
+
+	Result = DXGIFactory->CreateSwapChainForHwnd(GetDevice(), (HWND)Handle, &SwapChainDesc, &FullScreenDesc, NULL, &SwapChain);
 	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create swap chain. Error: %d", Result);
+		DXGIDevice->Release();
+		DXGIAdapter->Release();
+		DXGIFactory->Release();
 		return false;
 	}
 
+	DXGIDevice->Release();
+	DXGIAdapter->Release();
 	DXGIFactory->Release();
 
-	UpdateRenderTarget(SwapChainDesc.Width, SwapChainDesc.Height, Mode != NULL ? Mode->GetFormat() : Format);
+	UpdateRenderTarget(SwapChainDesc.Width, SwapChainDesc.Height, Format);
 
 	return true;
 }
 
 void ZED11Output::Deinitialize()
 {
-	SwapChain->SetFullscreenState(FALSE, Output);
+	Handle = NULL;
+	Monitor = NULL;
+
+	SwapChain->SetFullscreenState(FALSE, NULL);
 	ZEGR_RELEASE(SwapChain);
-	ZEGR_RELEASE(Output);
 }
 
 ZED11Output::ZED11Output()
 {
 	Handle = NULL;
-	Mode = NULL;
+	Monitor = NULL;
 	SwapChain = NULL;
-	Output = NULL;
+
+	Fullscreen = false;
+	RestrictedToMonitor = false;
 }
 
 void* ZED11Output::GetHandle()
@@ -174,20 +208,55 @@ ZEGRRenderTarget* ZED11Output::GetRenderTarget()
 	return RenderTarget;
 }
 
-void ZED11Output::SetMonitorMode(ZEGRMonitorMode* Mode)
+void ZED11Output::SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor)
 {
-	if (this->Mode == Mode)
+	if (this->Monitor == Monitor && RestrictedToMonitor == RestrictToMonitor)
 		return;
 	
-	this->Mode = Mode;
+	this->Monitor = Monitor;
 	
 	if (Fullscreen)
 		SwitchToFullscreen();
 }
 
-ZEGRMonitorMode* ZED11Output::GetMonitorMode()
+ZEGRMonitor* ZED11Output::GetMonitor()
 {
-	return Mode;
+	if(RestrictedToMonitor)
+		return Monitor;
+
+	IDXGIOutput* CurrentOutputMonitor;
+	SwapChain->GetContainingOutput(&CurrentOutputMonitor);
+
+	DXGI_OUTPUT_DESC CurrentOutputDescription;
+	CurrentOutputMonitor->GetDesc(&CurrentOutputDescription);
+
+	if(Monitor == NULL)
+	{
+		ZEGRAdapter* CurrentAdapter = ZEGRGraphicsModule::GetInstance()->GetCurrentAdapter();
+
+		const ZEArray<ZEGRMonitor*>& Monitors = CurrentAdapter->GetMonitors();
+		for(ZEUInt I = 0; I < Monitors.GetCount(); I++)
+		{
+			if(Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
+				Monitor = Monitors[I];
+		}
+	}
+	else
+	{
+		if(Monitor->GetHandle() != CurrentOutputDescription.Monitor)
+		{
+			const ZEArray<ZEGRMonitor*>& Monitors = Monitor->GetAdapter()->GetMonitors();
+			for(ZEUInt I = 0; I < Monitors.GetCount(); I++)
+			{
+				if(Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
+					Monitor = Monitors[I];
+			}
+		}
+	}
+
+	CurrentOutputMonitor->Release();
+
+	return Monitor;
 }
 
 void ZED11Output::SetFullscreen(bool Enabled)
@@ -200,7 +269,7 @@ void ZED11Output::SetFullscreen(bool Enabled)
 	if (Enabled)
 		SwitchToFullscreen();
 	else
-		SwapChain->SetFullscreenState(FALSE, Output);
+		SwapChain->SetFullscreenState(FALSE, NULL);
 }
 
 bool ZED11Output::GetFullscreen()

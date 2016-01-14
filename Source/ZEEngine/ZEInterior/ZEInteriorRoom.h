@@ -41,7 +41,7 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZESpatial/ZEOctree.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEInterior;
 class ZEInteriorDoor;
@@ -75,8 +75,8 @@ class ZEInteriorRoom
 		ZEArray<ZEInteriorDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 
-		ZEGRHolder<ZEGRVertexBuffer>		VertexBuffer;
-		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEArray<ZEExtraRenderParameters>	ExtraRenderParameters;
 
 		bool								CullPass;

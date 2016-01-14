@@ -42,7 +42,7 @@
 #include "ZEDefinitions.h"
 #include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
 
 class ZEGRRenderStateData;
@@ -75,14 +75,14 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		ZEFlags								DirtyFlags;
 
-		ZEGRHolder<ZEGRShader>				StageGBuffer_VertexShader;
-		ZEGRHolder<ZEGRShader>				StageGBuffer_PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
+		ZEHolder<ZEGRShader>				StageGBuffer_VertexShader;
+		ZEHolder<ZEGRShader>				StageGBuffer_PixelShader;
+		ZEHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
 
-		ZEGRHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
-		ZEGRHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
+		ZEHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
+		ZEHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
 
-		ZEGRHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZERNMap								BaseMap;
 		ZERNMap								SpecularMap;
@@ -204,6 +204,9 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void								SetBaseMap(const ZERNMap& Map);
 		const ZERNMap&						GetBaseMap() const;
+
+		void								SetBaseMapFile(const ZEString& Filename);
+		const ZEString&						GetBaseMapFile() const;
 
 		void								SetAmbientEnabled(bool Enabled);
 		bool								GetAmbientEnabled() const;

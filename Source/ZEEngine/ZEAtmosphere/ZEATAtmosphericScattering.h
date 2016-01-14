@@ -37,8 +37,9 @@
 
 #include "ZEFoundation/ZEInitializable.h"
 #include "ZEGraphics/ZEGRSamplerState.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
@@ -54,35 +55,37 @@ class ZEATAtmosphericScattering : public ZEInitializable
 	private:
 		ZEFlags							DirtyFlags;
 		
-		ZEGRHolder<ZEGRShader>			VertexShader;
-		ZEGRHolder<ZEGRShader>			PixelShader;
-		ZEGRHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEGRHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZEGRHolder<ZEGRShader>			PrecomputeExtinctionPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
-		ZEGRHolder<ZEGRShader>			AddOrdersPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeDensityPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
+		ZEHolder<ZEGRShader>			AddOrdersPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSkyAmbientPixelShader;
 
-		ZEGRHolder<ZEGRRenderStateData>	PrecomputeExtinctionRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
-		ZEGRHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeDensityRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
 
-		ZEGRHolder<ZEGRTexture2D>		PrecomputedExtinctionBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
-		ZEGRHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture2D>		PrecomputedDensityBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture2D>		PrecomputedSkyAmbientBuffer;
 
-		ZEGRHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
 
-		ZEGRHolder<ZEGRTexture2D>		RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>		RandomVectorsTexture;
 
 		ZEGRSamplerState				SamplerLinearClamp;
-		ZEGRSamplerState				SamplerPointWrap;
 
 		ZEUInt							OrderCount;
 		bool							UseMultipleScattering;
@@ -92,25 +95,32 @@ class ZEATAtmosphericScattering : public ZEInitializable
 			ZEVector3					LightDirection;
 			float						LightIntensity;
 			ZEVector3					LightColor;
-			float						MieScatteringStrength;
+			float						Reserved;
 		}Constants;
 
 		struct
 		{
-			float						Index;
-			float						Index2;
+			float						IndexZ;
+			float						IndexW;
 			ZEVector2					Reserved;
-			ZEVector4					OffsetVectors[14];
+
+			ZEVector4					CornetteShanksG;
+
+			ZEVector4					RayleighAngularFactor;
+			ZEVector4					MieAngularFactor;
+
+			ZEVector4					RayleighScatteringFactor;
+			ZEVector4					MieScatteringFactor;
 		}PrecomputeConstants;
 
 		void							CreateRandomVectors();
-		void							CreateOffsetVectors();
 
 		bool							UpdateShaders();
 		bool							UpdateRenderState();
 		bool							UpdateConstantBuffers();
 		bool							Update();
 
+		void							ComputeRayleighMiePhaseFactors();
 		void							PrecomputeWithPixelShader(ZEGRContext* Context);
 		void							ReleasePrecomputeResources();
 
@@ -126,9 +136,6 @@ class ZEATAtmosphericScattering : public ZEInitializable
 
 		void							SetLightColor(const ZEVector3& LightColor);
 		const ZEVector3&				GetLightColor() const;
-
-		void							SetMieScatteringStrengh(float MieScatteringStrength);
-		float							GetMieScatteringStrengh() const;
 
 		void							SetOrderCount(ZEUInt OrderCount);
 		ZEUInt							GetOrderCount() const;

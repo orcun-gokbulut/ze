@@ -82,17 +82,14 @@ ZESize ZEGRVertexBuffer::GetVertexCount()
 	return VertexCount;
 }
 
-ZEGRVertexBuffer* ZEGRVertexBuffer::Create(ZEUInt VertexCount, ZESize VertexSize)
+ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::Create(ZEUInt VertexCount, ZESize VertexSize)
 {
-	ZEGRVertexBuffer* VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
+	ZEHolder<ZEGRVertexBuffer> VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
 	if (VertexBuffer == NULL)
 		return NULL;
 
 	if (!VertexBuffer->Initialize(VertexCount, VertexSize))
-	{
-		VertexBuffer->Release();
 		return NULL;
-	}
 
 	return VertexBuffer;
 }

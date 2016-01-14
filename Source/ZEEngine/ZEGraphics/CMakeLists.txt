@@ -62,8 +62,6 @@ ze_add_source(ZEGRVertexLayout.h			Sources Headers)
 
 ze_add_source(ZEGRResource.cpp				Sources)
 ze_add_source(ZEGRResource.h				Sources Headers)
-ze_add_source(ZEGRHolder.cpp				Sources)
-ze_add_source(ZEGRHolder.h					Sources Headers)
 
 ze_add_source(ZEGRIndexBuffer.cpp 			Sources)
 ze_add_source(ZEGRIndexBuffer.h 			Sources Headers)
@@ -108,10 +106,16 @@ ze_add_source(ZEGRAdapter.h					Sources Headers)
 ze_add_source(ZEGRAdapter.cpp				Sources)
 ze_add_source(ZEGROutput.h					Sources Headers)
 ze_add_source(ZEGROutput.cpp				Sources)
+
 ze_add_source(ZEGRWindow.h					Sources Headers)
 ze_add_source(ZEGRWindow.cpp				Sources)
 ze_add_source(ZEGRWindow_Unix.cpp			Sources PLATFORMS Unix)
 ze_add_source(ZEGRWindow_Windows.cpp		Sources PLATFORMS Windows)
+
+ze_add_source(ZEGRCursor.h					Sources Headers)
+ze_add_source(ZEGRCursor.cpp				Sources)
+ze_add_source(ZEGRCursor_Unix.cpp			Sources PLATFORMS Unix)
+ze_add_source(ZEGRCursor_Windows.cpp		Sources PLATFORMS Windows)
 
 ze_add_source(ZEGRCounter.cpp				Sources)
 ze_add_source(ZEGRCounter.h					Sources Headers)

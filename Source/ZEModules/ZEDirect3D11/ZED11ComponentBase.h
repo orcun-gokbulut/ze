@@ -44,7 +44,7 @@ class ZED11ComponentBase
 {
 	friend class ZED11Module;
 	private:
-		static ZED11Module*	Module;
+		static ZED11Module*				Module;
 		static ID3D11Device1*			Device;
 		static ID3D11DeviceContext1*	Context;
 

@@ -241,7 +241,6 @@ ZEWindow::ZEWindow()
 	BorderlessMode = false;
 	Resizable = true;
 	Fullscreen = false;
-	MonitorMode = NULL;
 
 	HideCursor = false;
 	LockCursor = false;
@@ -276,10 +275,10 @@ void ZEWindow::ChangeWindowConfiguration()
 	if (Output == NULL)
 		return;
 
-	if (Fullscreen && MonitorMode != NULL)
+	if (Fullscreen)
 	{
-		MoveWindow((HWND)Handle, 0, 0, MonitorMode->GetWidth(), MonitorMode->GetHeight(), FALSE);
-		Output->SetMonitorMode(MonitorMode);
+		//MoveWindow((HWND)Handle, 0, 0, MonitorMode->GetWidth(), MonitorMode->GetHeight(), FALSE);
+		//Output->SetMonitorMode(MonitorMode);
 		Output->SetFullscreen(true);
 	}
 	else if (!Fullscreen && Output->GetFullscreen())
@@ -374,7 +373,7 @@ bool ZEWindow::InitializeSelf()
 	if (!CreateWindow_())
 		return false;
 
-	Output = ZEGROutput::Create(Handle, Fullscreen ? MonitorMode : NULL, Width, Height, ZEGR_TF_R8G8B8A8_UNORM);
+	//Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM);
 }
 
 void ZEWindow::DeinitializeSelf()
@@ -528,33 +527,12 @@ void ZEWindow::SetFullScreen(bool Enabled)
 
 	Fullscreen = Enabled;
 
-	if (MonitorMode == NULL)
-		return;
-
 	ChangeWindowConfiguration();
 }
 
 bool ZEWindow::GetFullscreen()
 {
 	return Fullscreen;
-}
-
-void ZEWindow::SetMonitorMode(ZEGRMonitorMode* Mode)
-{
-	if (MonitorMode == Mode)
-		return;
-
-	MonitorMode = Mode;
-	
-	if (!Fullscreen)
-		return;
-
-	ChangeWindowConfiguration();
-}
-
-ZEGRMonitorMode* ZEWindow::GetMonitorMode()
-{
-	return MonitorMode;
 }
 
 ZEVector2 ZEWindow::GetCursorPosition()

@@ -35,23 +35,31 @@
 
 #include "ZEGRWindow.h"
 
+#include "ZEGRCursor.h"
+#include "ZECore/ZECore.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGROutput.h"
+
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include "ZECore/ZECore.h"
-#include "ZEMath/ZEMath.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-
-#define ZE_WIN32_ERROR_STRING_LENGHT	1024
+#define ZE_WIN32_ERROR_STRING_LENGTH	1024
 #define	ZE_WIN32_APP_WINDOW_CLASS_NAME	"ZE_APP_WINDOW_CLASS"
+
+static HCURSOR SNSizeIcon = LoadCursor(NULL, IDC_SIZENS);
+static HCURSOR WESizeIcon = LoadCursor(NULL, IDC_SIZEWE);
+static HCURSOR NESWSizeIcon = LoadCursor(NULL, IDC_SIZENESW);
+static HCURSOR NWSESizeIcon = LoadCursor(NULL, IDC_SIZENWSE);
+static HCURSOR DefaultCursor = LoadCursor(NULL, IDC_ARROW);
 
 static void HandleWin32Error(DWORD ErrorCode)
 {
-	char ErrorString[ZE_WIN32_ERROR_STRING_LENGHT] = {0};
+	char ErrorString[ZE_WIN32_ERROR_STRING_LENGTH] = {0};
 
 	DWORD Flags = FORMAT_MESSAGE_FROM_SYSTEM;
-	DWORD Result = ::FormatMessage(Flags, NULL, ErrorCode, 0, ErrorString, ZE_WIN32_ERROR_STRING_LENGHT, NULL);
+	DWORD Result = ::FormatMessage(Flags, NULL, ErrorCode, 0, ErrorString, ZE_WIN32_ERROR_STRING_LENGTH, NULL);
 	if (Result == 0)
 	{
 		zeError("Unknwon Win32 error with code %u.", ErrorCode);
@@ -68,192 +76,29 @@ static bool ExitValidation(ZEGRWindow* Window)
 	
 	if (Result == IDYES)
 	{
-		PostQuitMessage(EXIT_SUCCESS);
-		return false;
-	}
-
-	return true;
-}
-
-/************************************************************/
-/*					ZEGraphicsCursorNew						*/
-/************************************************************/
-HCURSOR SNSizeIcon = LoadCursor(NULL, IDC_SIZENS);
-HCURSOR WESizeIcon = LoadCursor(NULL, IDC_SIZEWE);
-HCURSOR NESWSizeIcon = LoadCursor(NULL, IDC_SIZENESW);
-HCURSOR NWSESizeIcon = LoadCursor(NULL, IDC_SIZENWSE);
-HCURSOR DefaultCursor = LoadCursor(NULL, IDC_ARROW);
-
-bool ZEGraphicsCursor::SetVisible(bool Value)
-{
-	if (Visible == Value)
+		DestroyWindow(Handle);
 		return true;
-
-	if (Value) // Show
-	{
-		int Result = -1;
-		while (Result < 0)
-		{
-			Result = ShowCursor(true);
-		}
-	}
-	else // Hide
-	{
-		int Result = 1;
-		while (Result >= 0)
-		{
-			Result = ShowCursor(false);
-		}
 	}
 
-	Visible = Value;
-
-	return true;
+	return false;
 }
 
-bool ZEGraphicsCursor::GetVisible()
-{
-	return Visible;
-}
+static void ManageCursorLock(ZEGRWindow* Window, bool Focused)
+{	
+	if (!Window->GetCursorLock())
+		return;
 
-bool ZEGraphicsCursor::SetPosition(ZEInt PosX, ZEInt PosY)
-{
-	BOOL Result = ::SetCursorPos(PosX, PosY);
-	if (Result == 0)
+	if (Focused)
 	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	return true;
-}
-
-bool ZEGraphicsCursor::GetPosition(ZEInt& PosX, ZEInt& PosY)
-{
-	POINT CursorPos;
-	
-	BOOL Result = GetCursorPos(&CursorPos);
-	if (Result == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	PosX = CursorPos.x;
-	PosY = CursorPos.y;
-
-	return true;
-}
-
-bool ZEGraphicsCursor::GetPosition(ZEGRWindow* Window, ZEInt& PosX, ZEInt& PosY)
-{
-	zeDebugCheck(Window == NULL, "NULL Pointer.");
-	zeDebugCheck(Window->GetHandle() == NULL, "Window is not creted.");
-
-	ZEInt ClientX, ClientY;
-	Window->GetPosition(ClientX, ClientY);
-
-	ZEInt CursorX, CursorY;
-	GetPosition(CursorX, CursorY);
-
-	PosX = ClientX - (ZEInt)CursorX;
-	PosY = ClientY - (ZEInt)CursorY;
-
-	return true;
-}
-
-bool ZEGraphicsCursor::CollisionCheck(const ZERectangle& Rectangle)
-{
-	ZEInt CursorX, CursorY;
-	GetPosition(CursorX, CursorY);
-
-	ZEInt Left = (ZEInt)(Rectangle.LeftUp.x + 0.5f);
-	ZEInt Top = (ZEInt)(Rectangle.LeftUp.y + 0.5f);
-	ZEInt Right = (ZEInt)(Rectangle.RightDown.x + 0.5f);
-	ZEInt Bottom = (ZEInt)(Rectangle.RightDown.y + 0.5f);
-
-	bool VerticalCheck = (CursorY >= Top) && (CursorY < Bottom);
-	bool HorizontalCheck = (CursorX >= Left) && (CursorX < Right);
-
-	return VerticalCheck && HorizontalCheck;
-}
-
-bool ZEGraphicsCursor::CollisionCheck(const ZEGRWindow* Window)
-{
-	POINT Pt;
-	GetPosition((ZEInt&)Pt.x, (ZEInt&)Pt.y);
-	
-	return Window->GetHandle() == WindowFromPoint(Pt);
-}
-
-bool ZEGraphicsCursor::GetLocked()
-{
-	return Locked;
-}
-
-bool ZEGraphicsCursor::SetLockRectangle(const ZERectangle* Rectangle)
-{
-	RECT ClientRect = {0};
-	RECT* FinalRectangle = NULL;
-	if (Rectangle != NULL)
-	{
-		ClientRect.left = (ZEInt)(Rectangle->LeftUp.x + 0.5f);
-		ClientRect.top = (ZEInt)(Rectangle->LeftUp.y + 0.5f);
-		ClientRect.right = (ZEInt)(Rectangle->RightDown.x + 0.5f);
-		ClientRect.bottom = (ZEInt)(Rectangle->RightDown.y + 0.5f);
-
-		FinalRectangle = &ClientRect;
+		ZERectangle Rect = Window->GetRectangle();
+		ZEGRCursor::GetInstance()->SetLockRectangle(&Rect);
 	}
 	else
 	{
-		FinalRectangle = NULL;
+		ZEGRCursor::GetInstance()->SetLockRectangle(NULL);
 	}
-
-	BOOL Result = ClipCursor(FinalRectangle);
-	if (Result == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	Locked = Result != 0;
-
-	return true;
 }
 
-bool ZEGraphicsCursor::GetLockRectangle(ZERectangle& Rectangle)
-{
-	RECT ClipRect = {0};
-	
-	BOOL Result = GetClipCursor(&ClipRect);
-	if (Result == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	Rectangle.LeftUp.x = (float)ClipRect.left;
-	Rectangle.LeftUp.y = (float)ClipRect.top;
-	Rectangle.RightDown.x = (float)ClipRect.right;
-	Rectangle.RightDown.y = (float)ClipRect.bottom;
-
-	return true;
-}
-
-bool ZEGraphicsCursor::Visible = true;
-bool ZEGraphicsCursor::Locked = false;
-
-ZEGraphicsCursor::ZEGraphicsCursor()
-{
-}
-
-ZEGraphicsCursor::~ZEGraphicsCursor()
-{
-}
-
-/************************************************************/
-/*					ZEGraphicsWindowNew						*/
-/************************************************************/
 HBRUSH DefaultBackGround = CreateSolidBrush(RGB(128, 128, 128));
 
 static void SetWindowUserData(HWND Handle, void* DataPtr)
@@ -271,7 +116,7 @@ static bool ConvertClientToWindowSize(ZEUInt Style, ZEUInt StyleExt, ZEInt Clien
 {
 	RECT Viewport = {ClientX, ClientY, ClientX + ClientWidth, ClientY + ClientHeight};
 
-	BOOL Result = ::AdjustWindowRectEx(&Viewport, Style, false, StyleExt);
+	BOOL Result = ::AdjustWindowRectEx(&Viewport, Style, FALSE, StyleExt);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
@@ -282,38 +127,26 @@ static bool ConvertClientToWindowSize(ZEUInt Style, ZEUInt StyleExt, ZEInt Clien
 	WindowY = Viewport.top;
 	WindowHeight = Viewport.bottom - Viewport.top;
 	WindowWidth = Viewport.right -  Viewport.left;
-	
+
 	return true;
 }
 
-static void GetWin32Style(const ZEWindowStyle& Style, DWORD& Win32StyleExt, DWORD& Win32Style)
+static void GetWin32Style(const ZEGRWindowStyle& Style, DWORD& Win32StyleExt, DWORD& Win32Style)
 {
-	switch (Style.Type)
-	{
-		case ZE_GWT_CAPTION:
-			Win32Style |= WS_CAPTION | WS_SYSMENU;
-			Win32Style |= Style.Caption.Resizable ? WS_SIZEBOX : 0;
-			Win32Style |= Style.Caption.Maximizable ? WS_MAXIMIZEBOX : 0;
-			Win32Style |= Style.Caption.Minimizable ? WS_MINIMIZEBOX : 0;
-			
-			Win32StyleExt |= WS_EX_APPWINDOW;
-			Win32StyleExt |= Style.Caption.OnTop ? WS_EX_TOPMOST : 0;
-			
-			break;
-		case ZE_GWT_POPUP:
-			Win32Style |= WS_POPUP;
-			Win32Style |= Style.Popup.Bordered ? WS_BORDER : 0;
-			Win32Style |= Style.Popup.Resizable ? WS_SIZEBOX : 0;
+	if (Style.Type == ZEGR_WT_NORMAL)
+		Win32Style |= WS_OVERLAPPED;
+	else if (Style.Type == ZEGR_WT_NORMAL)
+		Win32Style |= WS_POPUP;
 
-			Win32StyleExt |= WS_EX_APPWINDOW;
-			Win32StyleExt |= Style.Popup.OnTop ? WS_EX_TOPMOST : 0;
-			break;
-
-		case ZE_GWT_UNKNOWN:
-			Win32Style = Style.Unknown.Properties0;
-			Win32StyleExt = Style.Unknown.Properties1;
-			break;
-	};
+	Win32Style |= 
+		Win32Style |= Style.TitleBar ? WS_CAPTION : 0;
+	Win32Style |= Style.TitleBar ? WS_SYSMENU : 0;
+	Win32Style |= Style.Resizable ? WS_SIZEBOX : 0;
+	Win32Style |= Style.MinimizeButton ? WS_MINIMIZEBOX : 0;
+	Win32Style |= Style.MaximizeButton ? WS_MAXIMIZEBOX : 0;
+	Win32Style |= Style.Bordered ? WS_BORDER : 0;
+	Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
+	Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;	
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -335,30 +168,30 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	{
 		GetWindowUserData(hwnd, (void**)&Window);
 	}
-	
+
 	// Will skip the messages until WM_CREATE message comes
 	return Window == NULL ? DefWindowProc(hwnd, uMsg, wParam, lParam) : 
-							Window->HandleMessage(uMsg, wParam, lParam);						
+		Window->HandleMessage(uMsg, wParam, lParam);						
 }
 
 static bool RegisterWindowClass(HINSTANCE Instance)
 {
 	if (ZEGRWindow::GetWindowCount() > 0)
 		return true;
-		
+
 	WNDCLASSEX WindowClass;
 	WindowClass.cbSize			= sizeof(WNDCLASSEX);
 	WindowClass.style			= CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
 	WindowClass.lpfnWndProc		= &WindowProc;
-    WindowClass.cbClsExtra		= 0;
-    WindowClass.cbWndExtra		= 0;
+	WindowClass.cbClsExtra		= 0;
+	WindowClass.cbWndExtra		= 0;
 	WindowClass.hInstance		= Instance;
-    WindowClass.hIcon			= NULL;
-    WindowClass.hCursor			= DefaultCursor;
-    WindowClass.hbrBackground	= DefaultBackGround;
-    WindowClass.lpszMenuName	= NULL;
-    WindowClass.lpszClassName	= ZE_WIN32_APP_WINDOW_CLASS_NAME;
-    WindowClass.hIconSm			= NULL;
+	WindowClass.hIcon			= NULL;
+	WindowClass.hCursor			= DefaultCursor;
+	WindowClass.hbrBackground	= DefaultBackGround;
+	WindowClass.lpszMenuName	= NULL;
+	WindowClass.lpszClassName	= ZE_WIN32_APP_WINDOW_CLASS_NAME;
+	WindowClass.hIconSm			= NULL;
 
 	BOOL Result = RegisterClassEx(&WindowClass);
 	if(Result == 0)
@@ -385,13 +218,25 @@ static bool UnRegisterWindowClass(HINSTANCE Instance)
 	return true;
 }
 
-bool ZEGRWindow::SetStyle(const ZEWindowStyle& Style)
+ZEGRWindowStyle::ZEGRWindowStyle()
 {
+	Type = ZEGR_WT_NORMAL;
+	TitleBar = true;
+	TitleBarIcon = true;
+	MinimizeButton = true;
+	MaximizeButton = true;
+	Resizable = true;
+	Bordered = true;
+	ShowInTaskbar = false;
+	AlwaysOnTop = false;
+}
+
+void ZEGRWindow::SetStyle(const ZEGRWindowStyle& Style)
+{
+	this->Style = Style;
+
 	if (!IsInitialized())
-	{
-		this->Style = Style;
-		return false;
-	}
+		return;
 
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
@@ -399,44 +244,38 @@ bool ZEGRWindow::SetStyle(const ZEWindowStyle& Style)
 
 	SetWindowLongPtr((HWND)Handle, GWL_STYLE, Win32Style);
 	SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, Win32StyleExt);
-
-	return true;
 }
 
-bool ZEGRWindow::SetTitle(const char* String)
+void ZEGRWindow::SetTitle(const ZEString& Title)
 {
-	if (!IsInitialized())
-	{
-		Title = String;
-		return false;
-	}
+	this->Title = Title;
 
-	BOOL Result = ::SetWindowText((HWND)Handle, String);
+	if (!IsInitialized())
+		return;
+
+	BOOL Result = ::SetWindowText((HWND)Handle, Title);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return;
 	}
-
-	Title = String;
-	return true;
 }
 
-bool ZEGRWindow::SetPosition(ZEInt X, ZEInt Y)
+void ZEGRWindow::SetPosition(ZEInt X, ZEInt Y)
 {
-	if (!IsInitialized())
-	{
-		PositionX = X;
-		PositionY = Y;
-		return false;
-	}
+	PositionX = X;
+	PositionY = Y;
 
-	WINDOWINFO WindowInfo;
+	if (!IsInitialized())
+		return;
+
+	WINDOWINFO WindowInfo = {0};
+	WindowInfo.cbSize = sizeof(WINDOWINFO);
 	BOOL Result = ::GetWindowInfo((HWND)Handle, &WindowInfo);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return;
 	}
 
 	ZEInt WindowPosX, WindowPosY;
@@ -459,29 +298,23 @@ bool ZEGRWindow::SetPosition(ZEInt X, ZEInt Y)
 							WindowHeight, 
 							TRUE);
 	if (Result == 0)
-	{
 		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	return true;
 }
 
-bool ZEGRWindow::SetSize(ZEInt Width, ZEInt Height)
+void ZEGRWindow::SetSize(ZEInt Width, ZEInt Height)
 {
+	this->Width = Width;
+	this->Height = Height;
+
 	if (!IsInitialized())
-	{
-		this->Width = Width;
-		this->Height = Height;
-		return false;
-	}
-	
+		return;
+
 	WINDOWINFO WindowInfo = {0};
+	WindowInfo.cbSize = sizeof(WINDOWINFO);
 	BOOL Result = ::GetWindowInfo((HWND)Handle, &WindowInfo);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
 	}
 
 	ZEInt WindowPosX, WindowPosY;
@@ -504,150 +337,92 @@ bool ZEGRWindow::SetSize(ZEInt Width, ZEInt Height)
 							WindowHeight,
 							TRUE);
 	if (Result == 0)
-	{
 		HandleWin32Error(GetLastError());
-		return false;
-	}
-	
-	return true;
 }
 
-bool ZEGRWindow::SetFullScreen(bool Value, const ZEGRMonitor* Monitor)
+void ZEGRWindow::SetFullScreen(bool FullScreen)
 {
-	if (FullScreen == Value)
-		return true;
+	if (this->FullScreen == FullScreen)
+		return;
 
-	if (Value) // Going full screen
-	{
-		FullScreen = true;
-		FlagLock.Lock();
-		Flags.RaiseFlags(ZE_GWF_FULLSCREEN);
-		FlagLock.Unlock();
-		FullScreenMonitor = Monitor == NULL ? GetContainingMonitor() : Monitor;
-	}
-	else // Going windowed
-	{
-		FullScreen = false;
-		FlagLock.Lock();
-		Flags.RaiseFlags(ZE_GWF_WINDOWED);
-		FlagLock.Unlock();
-		FullScreenMonitor = NULL;
-	}
-
-	return IsInitialized();
+	this->FullScreen = FullScreen;
 }
 
-bool ZEGRWindow::SetVSynchEnabed(bool Value)
+void ZEGRWindow::SetVSynchEnable(bool VSynchEnable)
 {
-	VSynchEnabed = Value;
-	return IsInitialized();
+	this->VSynchEnable = VSynchEnable;
 }
 
-
-void ZEGRWindow::Enable()
+void ZEGRWindow::SetEnable(bool Enabled)
 {
-	::EnableWindow((HWND)Handle, true);
-}
+	this->Enabled = Enabled;
 
-void ZEGRWindow::Disable()
-{
-	::EnableWindow((HWND)Handle, false);
+	if (!IsInitialized())
+		return;
+
+	::EnableWindow((HWND)Handle, (BOOL)Enabled);
 }
 
 void ZEGRWindow::Focus()
 {
+	Focused = true;
+
 	if (!IsInitialized())
-	{
-		Focused = true;
 		return;
-	}
 
 	::SetFocus((HWND)Handle);
 }
 
-bool ZEGRWindow::Maximize()
+void ZEGRWindow::Maximize()
 {
+	Maximized = true;
+	Minimized = false;
+	FullScreen = false;
+
 	if (!IsInitialized())
-	{
-		Maximized = true;
-		Minimized = false;
-		return false;
-	}
-	
+		return;
+
 	::ShowWindow((HWND)Handle, SW_SHOWMAXIMIZED);
 	::UpdateWindow((HWND)Handle);
-
-	return true;
 }
 
-bool ZEGRWindow::Minimize()
+void ZEGRWindow::Minimize()
 {
+	Minimized = true;
+	Maximized = false;
+	FullScreen = false;
+
 	if (!IsInitialized())
-	{
-		Maximized = false;
-		Minimized = true;
-		return false;
-	}
+		return;
 
 	BOOL Result =  CloseWindow((HWND)Handle);
 	if (Result == 0)
-	{
 		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	return true;
 }
 
-bool ZEGRWindow::Restore()
+void ZEGRWindow::Restore()
 {
+	Minimized = false;
+	Maximized = false;
+	FullScreen = false;
+
 	if (!IsInitialized())
-	{
-		Minimized = false;
-		Maximized = false;
-		return false;
-	}
+		return;
 
 	BOOL Result =  OpenIcon((HWND)Handle);
 	if (Result == 0)
-	{
 		HandleWin32Error(GetLastError());
-		return false;
-	}
-
-	return true;
 }
 
-static void ManageCursorLock(ZEGRWindow* Window, bool Focused)
-{	
-	if (!Window->GetCursorLock())
+void ZEGRWindow::SetCursorLock(bool CursorLock)
+{
+	ZERectangle ClientRect = GetRectangle();
+
+	bool Result = ZEGRCursor::GetInstance()->SetLockRectangle(CursorLock ? &ClientRect : NULL);
+	if (!Result)
 		return;
 
-	if (Focused)
-	{
-		ZERectangle Rect;
-		Window->GetRectangle(Rect);
-		ZEGraphicsCursor::SetLockRectangle(&Rect);
-	}
-	else
-	{
-		ZEGraphicsCursor::SetLockRectangle(NULL);
-	}
-}
-
-bool ZEGRWindow::SetCursorLock(bool Value)
-{
-	ZERectangle ClientRect;
-	GetRectangle(ClientRect);
-
-	bool Result = ZEGraphicsCursor::SetLockRectangle(Value ? &ClientRect : NULL);
-	if (!Result)
-	{
-		return false;
-	}
-
-	LastCursorLock = Value ? this : NULL;
-	return true;
+	LastCursorLock = CursorLock ? this : NULL;
 }
 
 ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lParam)
@@ -656,7 +431,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 
 	switch (Message)
 	{
-		// window notification
+		// Window notification
 		case WM_MOVE:
 		{
 			PositionX = (short)LOWORD(lParam);
@@ -666,7 +441,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 			break;
 		}
 
-		// window notification
+		// Window notification
 		case WM_SIZE:
 		{
 			ZEInt TempWidth =  (short)LOWORD(lParam);
@@ -678,10 +453,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 			Width =  TempWidth;
 			Height = TempHeight;
 
-			FlagLock.Lock();
-			Flags.RaiseFlags(ZE_GWF_RESIZED);
-			FlagLock.Unlock();
-
+			Output->Resize(Width, Height);
 			OnSize();
 
 			switch (wParam)
@@ -691,11 +463,13 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 					Maximized = true;
 					OnMaximize();
 					break;
+
 				case SIZE_MINIMIZED:
 					Minimized = true;
 					Maximized = false;
 					OnMinimize();
 					break;
+
 				case SIZE_RESTORED:
 					Minimized = false;
 					Maximized = false;
@@ -715,27 +489,27 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 			ManageCursorLock(this, true);
 			break;
 
-		// window notification
+		// Window notification
 		case WM_ENABLE:
 			if (wParam)
 			{
 				Enabled = true;
-				OnEnable();
+				OnEnabled();
 			}
 			else
 			{
 				Enabled = false;
 				ManageCursorLock(this, false);
-				OnDisable();
+				OnDisabled();
 			}
 			break;
 
-		// paint/display message
+		// Paint/display message
 		case WM_PAINT:
 			ValidateRect((HWND)Handle, NULL);
 			break;
 			
-		// cursor notification
+		// Cursor notification
 		case WM_SETCURSOR:
 		{
 			ZEInt32 HitCode = (ZEInt32)(short)LOWORD(lParam);
@@ -746,22 +520,27 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 					// User defined cursor can be set here
 					SetCursor(DefaultCursor);
 					break;
+
 				case HTTOP:
 				case HTBOTTOM:
 					SetCursor(SNSizeIcon);
 					break;
+
 				case HTLEFT:
 				case HTRIGHT:
 					SetCursor(WESizeIcon);
 					break;
+
 				case HTTOPRIGHT:
 				case HTBOTTOMLEFT:
 					SetCursor(NESWSizeIcon);
 					break;
+
 				case HTTOPLEFT:
 				case HTBOTTOMRIGHT:
 					SetCursor(NWSESizeIcon);
 					break;
+
 				default:
 					SetCursor(DefaultCursor);
 					break;
@@ -781,6 +560,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 					Focused = true;
 					OnFocusGain();
 					break;
+
 				case WA_INACTIVE:
 					Focused = false;
 					ManageCursorLock(this, false);
@@ -811,6 +591,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 							OnFullScreen();
 						}
 						break;
+
 					case VK_F4:
 						ExitValidation(this);
 						break;
@@ -819,26 +600,20 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 			break;
 		}
 
-		// window notification
+		// Window notification
 		case WM_CLOSE:
 			ExitValidation(this);
 			break;
 
-		// window notification
+		// Window notification
 		case WM_CREATE:
-			FlagLock.Lock();
-			Flags.RaiseFlags(ZE_GWF_CREATED);
-			FlagLock.Unlock();
 			OnCreate();
 			break;
 		
-		// window notification
+		// Window notification
 		case WM_DESTROY:
-			FlagLock.Lock();
-			Flags.RaiseFlags(ZE_GWF_DESTROYED);
-			FlagLock.Unlock();
-
 			OnDestroy();
+			PostQuitMessage(EXIT_SUCCESS);
 			break;
 		
 		default:
@@ -849,15 +624,17 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 	return Return;
 }
 
-bool ZEGRWindow::Initialize()
+void ZEGRWindow::Destroy()
 {
-	if (IsInitialized())
-		return false;
-	
+	delete this;
+}
+
+bool ZEGRWindow::InitializeSelf()
+{
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
 	GetWin32Style(Style, Win32StyleExt, Win32Style);
-		
+	
 	Win32Style |= !Enabled ? WS_DISABLED : 0;
 	Win32Style |= Maximized ? WS_MAXIMIZE : 0;
 	Win32Style |= Minimized ? WS_MINIMIZE : 0;
@@ -903,27 +680,33 @@ bool ZEGRWindow::Initialize()
 
 	WindowCount++;
 
+	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM);
+	if(Output == NULL)
+		return false;
+
 	return true;
 }
 
-bool ZEGRWindow::Initialize(void* Handle)
+bool ZEGRWindow::InitializeEmbedded(void* ExistingHandle)
 {
+	HWND Handle = (HWND)ExistingHandle;
+
 	char TempString[128];
-	BOOL CharCount = ::GetWindowText((HWND)Handle, TempString, 128);
+	BOOL CharCount = ::GetWindowText(Handle, TempString, 128);
 	if (CharCount == 0)
 	{
 		HandleWin32Error(GetLastError());
 		return false;
 	}
 
-	LONG_PTR Win32Style = GetWindowLongPtr((HWND)Handle, GWL_STYLE);
+	LONG_PTR Win32Style = GetWindowLongPtr(Handle, GWL_STYLE);
 	if (Win32Style == 0)
 	{
 		HandleWin32Error(GetLastError());
 		return false;
 	}
 
-	LONG_PTR Win32StyleEx = GetWindowLongPtr((HWND)Handle, GWL_EXSTYLE);
+	LONG_PTR Win32StyleEx = GetWindowLongPtr(Handle, GWL_EXSTYLE);
 	if (Win32StyleEx == 0)
 	{
 		HandleWin32Error(GetLastError());
@@ -931,40 +714,43 @@ bool ZEGRWindow::Initialize(void* Handle)
 	}
 
 	RECT Rectangle = {0};
-	BOOL Result = GetClientRect((HWND)Handle, &Rectangle);
+	BOOL Result = GetClientRect(Handle, &Rectangle);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
 		return false;
 	}
-	
+
 	Title = TempString;
-	
+
 	this->Handle = Handle;
-	
+
 	PositionX = Rectangle.left;
 	PositionY = Rectangle.top;
-	
+
 	Width = Rectangle.right - Rectangle.left;
 	Height = Rectangle.bottom - Rectangle.top;
 
-	Style.Type = ZE_GWT_UNKNOWN;
-	Style.Unknown.Properties0 = (ZEUInt32)Win32Style;
-	Style.Unknown.Properties1 = (ZEUInt32)Win32StyleEx;
+	Style.Type = (Win32Style & WS_POPUP) == 0 ? ZEGR_WT_NORMAL : ZEGR_WT_POPUP;
+	Style.TitleBar = (Win32Style & WS_CAPTION) == 0;
+	Style.TitleBarIcon = (Win32Style & WS_SYSMENU) == 0;
+	Style.MinimizeButton = (Win32Style & WS_MINIMIZEBOX)  ==  0;
+	Style.MaximizeButton = (Win32Style & WS_MAXIMIZEBOX) == 0;
+	Style.Resizable = (Win32Style & WS_SIZEBOX) == 0;
+	Style.Bordered = (Win32Style & WS_BORDER) == 0;
+	Style.ShowInTaskbar =  (Win32StyleEx & WS_EX_APPWINDOW) == 0;	
+	Style.AlwaysOnTop =  (Win32StyleEx & WS_EX_TOPMOST) == 0;	
 
 	return true;
 }
 
-bool ZEGRWindow::DeInitialize()
+void ZEGRWindow::DeinitializeSelf()
 {
-	if (Handle == NULL)
-		return true;
-
 	BOOL Result = DestroyWindow((HWND)Handle);
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return;
 	}
 	
 	WindowCount--;
@@ -974,16 +760,14 @@ bool ZEGRWindow::DeInitialize()
 	if (!UnRegisterWindowClass(Instance))
 	{
 		zeError("Cannot unregister class.");
-		return false;
+		return;
 	}
-
-	return true;
 }
 
-bool ZEGRWindow::Update()
+void ZEGRWindow::Show()
 {
-	::ShowWindow((HWND)Handle, SW_SHOW);
-	::UpdateWindow((HWND)Handle);
+	if(!IsInitialized())
+		return;
 
-	return true;
+	::ShowWindow((HWND)Handle, SW_SHOW);
 }

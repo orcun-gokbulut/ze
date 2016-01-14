@@ -36,7 +36,8 @@
 #pragma once
 
 #include "ZETextureResource.h"
-#include "ZEGraphics\ZEGRHolder.h"
+
+#include "ZEPointer/ZEHolder.h"
 
 class ZEFile;
 class ZEGRTexture3D;
@@ -46,7 +47,7 @@ struct ZETextureOptions;
 class ZETexture3DResource : public ZETextureResource
 {
 	private:
-		ZEGRHolder<ZEGRTexture3D>			Texture;
+		ZEHolder<ZEGRTexture3D>			Texture;
 
 	protected:
 											ZETexture3DResource();

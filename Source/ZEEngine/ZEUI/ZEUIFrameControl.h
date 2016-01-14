@@ -34,12 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_FRAME_CONTROL__
-#define __ZE_UI_FRAME_CONTROL__
 
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
-#include "ZERenderer/ZEUIMaterial.h"
+//#include "ZERenderer/ZEUIMaterial.h"
 
 class ZEUIFrameControl : public ZEUIControl
 {
@@ -52,23 +50,21 @@ class ZEUIFrameControl : public ZEUIControl
 
 	protected:
 
-		ZEUIRectangle		Frame;
-		ZEUIMaterial*		FrameMaterial;
+		ZEUIRectangle			Frame;
+		//ZEUIMaterial*			FrameMaterial;
 
 	public:
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void			Draw(ZEUIRenderer* Renderer);
 
-		virtual	void		SetSize(const ZEVector2& Size);
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
+		virtual	void			SetSize(const ZEVector2& Size);
+		virtual void			SetWidth(float Width);
+		virtual void			SetHeight(float Height);
 
 		virtual ZERNMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZERNMaterial* Material);
+		virtual void			SetMaterial(ZERNMaterial* Material);
 
-		virtual void		SetPosition(const ZEVector2& Position);
+		virtual void			SetPosition(const ZEVector2& Position);
 
-							ZEUIFrameControl();
+								ZEUIFrameControl();
 };
-
-#endif

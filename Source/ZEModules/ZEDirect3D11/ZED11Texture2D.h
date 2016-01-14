@@ -38,7 +38,7 @@
 #include "ZETypes.h"
 #include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZETextureData;
 class ZEGRRenderTarget;
@@ -52,8 +52,8 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 	protected:
 		ID3D11Texture2D*					Texture2D;
 		ID3D11ShaderResourceView*			ResourceView;
-		ZEGRHolder<ZEGRRenderTarget>		RenderTargets[14];
-		ZEGRHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffers[14];
+		ZEHolder<ZEGRRenderTarget>			RenderTargets[14];
+		ZEHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffers[14];
 
 		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt Level, ZEGRFormat Format, bool RenderTarget, bool DepthStencil);
 		virtual void						Deinitialize();

@@ -36,7 +36,7 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
@@ -44,7 +44,7 @@ class ZEGRRenderTarget;
 class ZERNStagePostProcess : public ZERNStage
 {
 	private:
-		ZEGRHolder<ZEGRTexture2D>		OutputTexture;
+		ZEHolder<ZEGRTexture2D>		OutputTexture;
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();

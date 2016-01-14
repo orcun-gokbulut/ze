@@ -93,14 +93,13 @@ ZEGRTexture2D* ZETexture2DResource::GetTexture2D() const
 
 ZETexture2DResource::ZETexture2DResource()
 {
-	Texture = NULL;
-};
+
+}
 
 ZETexture2DResource::~ZETexture2DResource()
 {
-	if (Texture != NULL)
-		Texture->Release();
-};
+
+}
 
 ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {	

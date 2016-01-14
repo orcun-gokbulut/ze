@@ -101,3 +101,6 @@ enum ZEGRShaderType
 typedef ZEFlagsBase<ZEUInt8>	ZEGRColorMask;
 
 #define ZEGR_RELEASE(x) {if ((x) != NULL) {(x)->Release(); (x) = NULL;}}
+
+#define ZEGR_TRUE		1
+#define ZEGR_FALSE		0
