@@ -36,11 +36,11 @@
 #include "ZEModelResource.h"
 
 #include "ZEError.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
-#include "ZERenderer/ZERNFixedMaterial.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZEGraphics/ZEGRHolder.h"
+#include "ZERenderer/ZERNFixedMaterial.h"
 
 static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 {
@@ -88,41 +88,6 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 	Mesh->SetBoundingBox(BoundingBox);
 }
 
-bool ZEModelResource::ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId)
-{
-	ZEMatrix4x4 Temp;
-	ZEMatrix4x4::CreateOrientation(Temp, Bone->GetPosition(), Bone->GetRotation(), Bone->GetScale());
-	Bone->SetLocalTransform(Temp);
-
-	if (Bone->GetParentBone() != -1)
-	{
-		zeCheckError(Bone->GetParentBone() >= Bones.GetCount(), false, "Invalid Bone index.");
-
-		ZEModelResourceBone* ParentBone = Bones[(ZESize)Bone->GetParentBone()];
-		ZEMatrix4x4::Multiply(Temp, ParentBone->GetForwardTransform(), Bone->GetLocalTransform());
-		Bone->SetForwardTransform(Temp);
-
-		Temp.InverseSelf();
-		Bone->SetInverseTransform(Temp);
-	}
-	else
-	{
-		Bone->SetForwardTransform(Bone->GetLocalTransform());
-		Bone->SetInverseTransform(Bone->GetLocalTransform().Inverse());
-	}
-
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-	{
-		if (Bones[I]->GetParentBone() == BoneId)
-		{
-			if (!ProcessBones(Bones[I], (ZEInt)I))
-				return false;
-		}
-	}
-
-	return true;
-}
-
 bool ZEModelResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 {
 	zeCheckError(!MeshesNode.IsValid(), false, "Invalid Meshes node.");
@@ -162,15 +127,6 @@ bool ZEModelResource::ReadBones(const ZEMLReaderNode& BonesNode)
 			return false;
 
 		AddBone(Bone);
-	}
-
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-	{
-		if (Bones[I]->GetParentBone() == -1)
-		{
-			if (!ProcessBones(Bones[I], (ZEInt)I))
-				return false;
-		}
 	}
 
 	return true;
@@ -226,7 +182,7 @@ bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 	zeCheckError(!MaterialsNode.IsValid(), false, "Invalid Materials node.");
 	zeCheckError(MaterialsNode.GetName() == "Materials", false, "Invalid Materials node name.");
 
-	ZEArray<ZEGRHolder<ZERNFixedMaterial>> Materials;
+	ZEArray<ZEHolder<ZERNFixedMaterial>> Materials;
 	ZESize SubNodeCount = MaterialsNode.GetNodeCount("Material");
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -236,7 +192,7 @@ bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
-		ZEGRHolder<ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::CreateInstance();
+		ZEHolder<ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
 		Materials.Add(CurrentMaterial);
 	}

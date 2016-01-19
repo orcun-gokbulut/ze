@@ -34,3 +34,5 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESharedPointer.h"
+
+ZE_SUPPRESS_LNK4221

@@ -667,99 +667,94 @@ bool ZEGameCharacter::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	Model->SetModelResource(ZEModelResource::LoadResource("soldier.zemodel"));
+	Model->SetModelResource(ZEModelResource::Load("soldier.zemodel"));
 
-	IdleAnimationTrack = Model->GetAnimationTracks().Add();
-	IdleAnimationTrack->SetOwner(Model);
-	IdleAnimationTrack->SetAnimationByName("Test");
+	// Idle
+	IdleAnimationTrack = new ZEModelAnimationTrack();
+	IdleAnimationTrack->SetModel(Model);
+	IdleAnimationTrack->SetAnimationName("Test");
 	IdleAnimationTrack->SetSpeed(30.0f);
 	IdleAnimationTrack->SetStartFrame(2560);
 	IdleAnimationTrack->SetEndFrame(2660);
 	IdleAnimationTrack->SetLooping(true);
 	IdleAnimationTrack->SetBlendFactor(0.0f);
-	//IdleAnimationTrack->Play();
+	Model->AddAnimationTrack(IdleAnimationTrack);
 
-
-	// Walk
-	WalkAnimationTrack = Model->GetAnimationTracks().Add();
-	WalkAnimationTrack->SetOwner(Model);
-	WalkAnimationTrack->SetAnimationByName("Test");
+	WalkAnimationTrack = new ZEModelAnimationTrack();
+	WalkAnimationTrack->SetModel(Model);
+	WalkAnimationTrack->SetAnimationName("Test");
 	WalkAnimationTrack->SetSpeed(30.0f);
 	WalkAnimationTrack->SetStartFrame(1960);
 	WalkAnimationTrack->SetEndFrame(2000);
 	WalkAnimationTrack->SetLooping(true);
 	WalkAnimationTrack->SetBlendFactor(0.0f);
-	//WalkAnimationTrack->Play();
-
+	Model->AddAnimationTrack(WalkAnimationTrack);
+	
 	// Run
-	RunAnimationTrack = Model->GetAnimationTracks().Add();
-	RunAnimationTrack->SetOwner(Model);
-	RunAnimationTrack->SetAnimationByName("Test");
+	RunAnimationTrack = new ZEModelAnimationTrack();
+	RunAnimationTrack->SetModel(Model);
+	RunAnimationTrack->SetAnimationName("Test");
 	RunAnimationTrack->SetSpeed(30.0f);
 	RunAnimationTrack->SetStartFrame(2050);
 	RunAnimationTrack->SetEndFrame(2080);
 	RunAnimationTrack->SetLooping(true);
 	RunAnimationTrack->SetBlendFactor(0.0f);
+	Model->AddAnimationTrack(RunAnimationTrack);
 
 	// Turn Left
-	TurnLeftAnimationTrack = Model->GetAnimationTracks().Add();
-	TurnLeftAnimationTrack->SetOwner(Model);
-	TurnLeftAnimationTrack->SetAnimationByName("Test");
+	TurnLeftAnimationTrack = new ZEModelAnimationTrack();
+	TurnLeftAnimationTrack->SetModel(Model);
+	TurnLeftAnimationTrack->SetAnimationName("Test");
 	TurnLeftAnimationTrack->SetSpeed(30.0f);
 	TurnLeftAnimationTrack->SetStartFrame(2115);
 	TurnLeftAnimationTrack->SetEndFrame(2145);
 	TurnLeftAnimationTrack->SetLooping(true);
 	TurnLeftAnimationTrack->SetBlendFactor(0.0f);
+	Model->AddAnimationTrack(TurnLeftAnimationTrack);
 
 	// Turn Right
-	TurnRightAnimationTrack = Model->GetAnimationTracks().Add();
-	TurnRightAnimationTrack->SetOwner(Model);
-	TurnRightAnimationTrack->SetAnimationByName("Test");
+	TurnRightAnimationTrack = new ZEModelAnimationTrack();
+	TurnRightAnimationTrack->SetModel(Model);
+	TurnRightAnimationTrack->SetAnimationName("Test");
 	TurnRightAnimationTrack->SetSpeed(30.0f);
 	TurnRightAnimationTrack->SetStartFrame(2145);
 	TurnRightAnimationTrack->SetEndFrame(2175);
 	TurnRightAnimationTrack->SetLooping(true);
 	TurnRightAnimationTrack->SetBlendFactor(0.0f);
+	Model->AddAnimationTrack(TurnRightAnimationTrack);
 
 	// Strafe Left
-	StrafeLeftAnimationTrack = Model->GetAnimationTracks().Add();
-	StrafeLeftAnimationTrack->SetOwner(Model);
-	StrafeLeftAnimationTrack->SetAnimationByName("Test");
+	StrafeLeftAnimationTrack = new ZEModelAnimationTrack();
+	StrafeLeftAnimationTrack->SetModel(Model);
+	StrafeLeftAnimationTrack->SetAnimationName("Test");
 	StrafeLeftAnimationTrack->SetSpeed(30.0f);
 	StrafeLeftAnimationTrack->SetStartFrame(2190);
 	StrafeLeftAnimationTrack->SetEndFrame(2220);
 	StrafeLeftAnimationTrack->SetLooping(true);
 	StrafeLeftAnimationTrack->SetBlendFactor(0.0f);
+	Model->AddAnimationTrack(StrafeLeftAnimationTrack);
 
 	// Strafe Right
-	StrafeRightAnimationTrack = Model->GetAnimationTracks().Add();
-	StrafeRightAnimationTrack->SetOwner(Model);
-	StrafeRightAnimationTrack->SetAnimationByName("Test");
+	ZEPointer<ZEModelAnimationTrack> StrafeRightAnimationTrack = new ZEModelAnimationTrack();
+	StrafeRightAnimationTrack->SetModel(Model);
+	StrafeRightAnimationTrack->SetAnimationName("Test");
 	StrafeRightAnimationTrack->SetSpeed(30.0f);
 	StrafeRightAnimationTrack->SetStartFrame(2225);
 	StrafeRightAnimationTrack->SetEndFrame(2255);
 	StrafeRightAnimationTrack->SetLooping(true);
 	StrafeRightAnimationTrack->SetBlendFactor(0.0f);
+	Model->AddAnimationTrack(StrafeRightAnimationTrack);
 
 	// Walk Backward
-	WalkBackwardAnimationTrack = Model->GetAnimationTracks().Add();
-	WalkBackwardAnimationTrack->SetOwner(Model);
-	WalkBackwardAnimationTrack->SetAnimationByName("Test");
+	WalkBackwardAnimationTrack = new ZEModelAnimationTrack();
+	WalkBackwardAnimationTrack->SetModel(Model);
+	WalkBackwardAnimationTrack->SetAnimationName("Test");
 	WalkBackwardAnimationTrack->SetSpeed(30.0f);
 	WalkBackwardAnimationTrack->SetStartFrame(2005);
 	WalkBackwardAnimationTrack->SetEndFrame(2045);
 	WalkBackwardAnimationTrack->SetLooping(true);
 	WalkBackwardAnimationTrack->SetBlendFactor(0.0f);
-
-
-	IdleAnimationTrack = &Model->GetAnimationTracks()[0];
-	WalkAnimationTrack = &Model->GetAnimationTracks()[1];
-	RunAnimationTrack = &Model->GetAnimationTracks()[2];
-	TurnLeftAnimationTrack = &Model->GetAnimationTracks()[3];
-	TurnRightAnimationTrack = &Model->GetAnimationTracks()[4];
-	StrafeLeftAnimationTrack = &Model->GetAnimationTracks()[5];
-	StrafeRightAnimationTrack = &Model->GetAnimationTracks()[6];
-	WalkBackwardAnimationTrack = &Model->GetAnimationTracks()[7];
+	Model->AddAnimationTrack(WalkBackwardAnimationTrack);
 
 	return true;
 }

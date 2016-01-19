@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEError.h"
+#include "ZEReferenceCounted.h"
 
 template<typename Type>
 class ZEHolder
@@ -101,7 +102,7 @@ void ZEHolder<Type>::Assign(Type* RawPointer)
 		return;
 
 	Pointer = RawPointer;
-	Pointer->Reference();
+	reinterpret_cast<const ZEReferenceCounted*>(Pointer)->Reference();
 }
 
 template<typename Type>
@@ -120,7 +121,7 @@ template<typename Type>
 void ZEHolder<Type>::Release()
 {
 	if (Pointer != NULL)
-		Pointer->Release();
+		reinterpret_cast<const ZEReferenceCounted*>(Pointer)->Release();
 
 	Pointer = NULL;
 }

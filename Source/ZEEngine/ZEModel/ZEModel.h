@@ -34,14 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_H__
-#define __ZE_MODEL_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
@@ -49,130 +47,116 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
-#include "ZEGame/ZEDrawStatistics.h"
+#include "ZEPointer/ZEPointer.h"
+#include "ZEMath/ZEQuaternion.h"
 
 class ZEQuaternion;
 class ZEMatrix4x4;
-class ZEFixedMaterial;
-class ZESimpleMaterial;
+class ZERNFixedMaterial;
+class ZERNSimpleMaterial;
 
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
+class ZEPhysicalBoxShape;
 
-struct ZEDrawParameters;
+struct ZERNDrawParameters;
 
 class ZEModel : public ZEEntity
 {	
+	ZE_OBJECT
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
 
-	ZE_OBJECT
-
 	private:
-		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
-		const ZEModelResource*				ModelResource;
-		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERenderCommand>			LODRenderCommands;
-		
-		ZEModelStatistics					Statistics;
+		ZEList2<ZEModelMesh>			Meshes;
+		ZEList2<ZEModelBone>			Bones;
+		ZEList2<ZEModelHelper>			Helpers;
+		ZEList2<ZEModelIKChain>			IKChains;
 
-		ZEArray<ZEModelMesh>				Meshes;
-		ZEArray<ZEModelBone>				Bones;
-		ZEArray<ZEModelHelper>				Helpers;
+		ZEModelAnimationType			AnimationType;
+		ZEModelAnimationUpdateMode		AnimationUpdateMode;
+		ZEList2<ZEModelAnimationTrack>	AnimationTracks;
+		ZEPointer<ZEModelAnimationTrack> AnimationTrack;
 
-		ZEPhysicalRigidBody*				ParentlessBoneBody;
-		ZEPhysicalBoxShape*					ParentlessBoneShape;
-		ZEVector3							ParentlessBoneBodyPosition;
+		bool							PhysicsEnabled;
+		bool							BoundingBoxIsUserDefined;
+		bool							IsStaticModel;
+		mutable bool					StaticCalculationsDone;
 
-		ZEUInt								ActiveLOD;
-		bool								Visibility;
-		bool								AutoLOD;
-		bool								PhysicsEnabled;
+		ZEHolder<const ZEModelResource> Resource;
 
-		ZEModelAnimationType				AnimationType;
-		ZEModelAnimationUpdateMode			AnimationUpdateMode;
-
-		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
-
-		bool								BoundingBoxIsUserDefined;
-		bool								IsStaticModel;
-		mutable bool						StaticCalculationsDone;
-
-		void								CalculateBoundingBox() const;
-		void								UpdateTransforms();
+		void							CalculateBoundingBox() const;
+		void							UpdateTransforms();
 	
-		void								LoadModelResource();
+		void							LoadResource();
+		void							SetupResource();
+		void							CleanUp();
 
 	protected:
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
-											ZEModel();
-		virtual								~ZEModel();
+										ZEModel();
+		virtual							~ZEModel();
 
 	public:
-		ZEArray<ZEModelIKChain>				IKChains;
+		virtual	ZEDrawFlags				GetDrawFlags() const;
 
-		virtual	ZEDrawFlags					GetDrawFlags() const;
+		virtual void					SetPosition(const ZEVector3& NewPosition);
+		virtual void					SetRotation(const ZEQuaternion& NewRotation);
+		virtual void					SetScale(const ZEVector3& NewScale);
 
-		virtual const ZEModelStatistics&	GetStatistics() const;
+		const ZEList2<ZEModelMesh>&		GetMeshes();
+		ZEModelBone*					GetMesh(ZEUInt32 Id);
+		ZEModelMesh*					GetMesh(const char* Name);
+		void							AddMesh(ZEModelMesh* Mesh);
+		ZEModelMesh*					RemoveMesh(ZEModelMesh* Mesh);
 
-		void								SetUserDefinedBoundingBoxEnabled(bool Value);
-		virtual const ZEAABBox&				GetWorldBoundingBox() const;
+		const ZEList2<ZEModelBone>&		GetBones();
+		ZEModelBone*					GetBone(ZEUInt32 Id);
+		ZEModelBone*					GetBone(const char* Name);
+		void							AddBone(ZEModelBone* Bone);
+		void							RemoveBone(ZEModelBone* Bone);
 
-		void								SetStaticModel(bool Value);
-		bool								GetStaticModel() const;
+		ZEArray<ZEModelHelper>&			GetHelpers();
+		ZEModelHelper*					GetHelper(ZEUInt32 Id);
+		ZEModelHelper*					GetHelper(const char* Name);
+		void							AddHelper(ZEModelHelper* Helper);
+		void							RemoveHelper(ZEModelHelper* Helper);
 
-		void								SetModelFile(const ZEString& ModelFile);
-		const ZEString&						GetModelFile() const;
+		const ZEList2<ZEModelAnimationTrack>& GetAnimationTracks();
+		void							AddAnimationTrack(ZEModelAnimationTrack* Track);
+		void							RemoveAnimationTrack(ZEModelAnimationTrack* Track);
 
-		void								SetModelResource(const ZEModelResource* ModelResource);	
-		const ZEModelResource*				GetModelResource();
+		void							SetAnimationTrack(ZEModelAnimationTrack* Track);
+		ZEModelAnimationTrack*			GetAnimationTrack();
+
+		void							SetUserDefinedBoundingBoxEnabled(bool Value);
+		virtual const ZEAABBox&			GetWorldBoundingBox() const;
+
+		void							SetStaticModel(bool Value);
+		bool							GetStaticModel() const;
+
+		void							SetModelFile(const ZEString& ModelFile);
+		const ZEString&					GetModelFile() const;
+
+		void							SetModelResource(ZEHolder<const ZEModelResource> ModelResource);	
+		ZEHolder<const ZEModelResource> GetModelResource() const;
 		
-		const ZEArray<ZEModelBone*>&		GetSkeleton();
+		void							SetAnimationType(ZEModelAnimationType AnimationType);
+		ZEModelAnimationType			GetAnimationType();
 
-		ZEArray<ZEModelBone>&				GetBones();
-		const ZEArray<ZEModelMesh>&			GetMeshes();
-		const ZEArray<ZEModelHelper>&		GetHelpers();
-		const ZEArray<ZEModelAnimation>*	GetAnimations();
+		void							SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode);
+		ZEModelAnimationUpdateMode		GetAnimationUpdateMode();
 
-		ZEModelBone*						GetBone(const char* Name);
-		ZEModelMesh*						GetMesh(ZESize Index);
-		ZEModelMesh*						GetMesh(const char* Name);
-		ZEModelHelper*						GetHelper(const char* Name);
-
-		void								SetAnimationType(ZEModelAnimationType AnimationType);
-		ZEModelAnimationType				GetAnimationType();
-
-		void								SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode);
-		ZEModelAnimationUpdateMode			GetAnimationUpdateMode();
-
-		ZEArray<ZEModelAnimationTrack>&		GetAnimationTracks();
-
-		void								SetAutoLOD(bool Enabled);
-		bool								GetAutoLOD();
-
-		void								SetActiveLOD(ZEUInt LOD);
-		ZEUInt								GetActiveLOD();
-
-		void								SetPhysicsEnabled(bool Enabled);
-		bool								GetPhysicsEnabled();
-
-		virtual void						SetPosition(const ZEVector3& NewPosition);
-		virtual void						SetRotation(const ZEQuaternion& NewRotation);
-		virtual void						SetScale(const ZEVector3& NewScale);
-
-		void								Tick(float ElapsedTime);
-		void								Draw(ZEDrawParameters* DrawParameters);
-		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
+		void							Tick(float ElapsedTime);
 		
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
-		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
+		virtual bool					RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
-		static ZEModel*						CreateInstance();
+		static ZEModel*					CreateInstance();
 };
-
-#endif

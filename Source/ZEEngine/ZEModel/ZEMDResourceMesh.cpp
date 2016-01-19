@@ -63,12 +63,12 @@ ZESize ZEMDResourceDraw::GetCount() const
 	return Count;
 }
 
-void ZEMDResourceDraw::SetMaterial(ZEGRHolder<ZERNMaterial> Material)
+void ZEMDResourceDraw::SetMaterial(ZEHolder<ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
 
-ZEGRHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
+ZEHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
 {
 	return Material;
 }
@@ -203,62 +203,62 @@ const ZEArray<ZEUInt16>& ZEModelResourceMeshLOD::GetAffectingBoneIds() const
 	return AffectingBoneIds;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferBase(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEModelResourceMeshLOD::SetVertexBufferBase(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferBase = VertexBuffer;
 }
 
-ZEGRHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferBase() const
+ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferBase() const
 {
 	return VertexBufferBase;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferNormals(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEModelResourceMeshLOD::SetVertexBufferNormals(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferNormals = VertexBuffer;
 }
 
-ZEGRHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferNormals() const
+ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferNormals() const
 {
 	return VertexBufferNormals;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferSkin(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEModelResourceMeshLOD::SetVertexBufferSkin(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferSkin = VertexBuffer;
 }
 
-ZEGRHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferSkin() const
+ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferSkin() const
 {
 	return VertexBufferSkin;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferExtra(ZEGRHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEModelResourceMeshLOD::SetVertexBufferExtra(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferExtra = VertexBuffer;
 }
 
-ZEGRHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferExtra() const
+ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferExtra() const
 {
 	return VertexBufferExtra;
 }
 
-void ZEModelResourceMeshLOD::SetIndexBuffer(ZEGRHolder<ZEGRIndexBuffer> IndexBuffer)
+void ZEModelResourceMeshLOD::SetIndexBuffer(ZEHolder<ZEGRIndexBuffer> IndexBuffer)
 {
 	this->IndexBuffer = IndexBuffer;
 }
 
-ZEGRHolder<ZEGRIndexBuffer> ZEModelResourceMeshLOD::GetIndexBuffer() const
+ZEHolder<ZEGRIndexBuffer> ZEModelResourceMeshLOD::GetIndexBuffer() const
 {
 	return IndexBuffer;
 }
 
-void ZEModelResourceMeshLOD::SetMaterial(ZEGRHolder<ZERNMaterial> Material)
+void ZEModelResourceMeshLOD::SetMaterial(ZEHolder<ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
 
-ZEGRHolder<const ZERNMaterial> ZEModelResourceMeshLOD::GetMaterial() const
+ZEHolder<const ZERNMaterial> ZEModelResourceMeshLOD::GetMaterial() const
 {
 	return Material;
 }
@@ -533,10 +533,10 @@ bool ZEModelResourceMesh::Save(ZEMLWriterNode& MeshNode) const
 ZEModelResourceMesh::ZEModelResourceMesh() : Link(this)
 {
 	ParentMesh = -1;
-	BoundingBox.Min = ZEVector3::Zero;
 	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
+	BoundingBox = ZEAABBox::Zero;
 	Visible = true;
 	Skinned = false;
 }

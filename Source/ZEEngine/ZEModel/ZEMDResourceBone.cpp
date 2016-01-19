@@ -91,33 +91,6 @@ const ZEVector3& ZEModelResourceBone::GetScale() const
 {
 	return Scale;
 }
-void ZEModelResourceBone::SetLocalTransform(const ZEMatrix4x4& Transform)
-{
-	LocalTransform = Transform;
-}
-
-const ZEMatrix4x4& ZEModelResourceBone::GetLocalTransform() const 
-{
-	return LocalTransform;
-}
-void ZEModelResourceBone::SetForwardTransform(const ZEMatrix4x4& Transform)
-{
-	ForwardTransform = Transform;
-}
-
-const ZEMatrix4x4& ZEModelResourceBone::GetForwardTransform() const 
-{
-	return ForwardTransform;
-}
-void ZEModelResourceBone::SetInverseTransform(const ZEMatrix4x4& Transform)
-{
-	InverseTransform = Transform;
-}
-
-const ZEMatrix4x4& ZEModelResourceBone::GetInverseTransform() const 
-{
-	return InverseTransform;
-}
 
 const ZEModelResourcePhysicalBody& ZEModelResourceBone::GetPhysicalBody() const
 {
@@ -209,12 +182,8 @@ bool ZEModelResourceBone::Save(ZEMLWriterNode& BoneNode) const
 ZEModelResourceBone::ZEModelResourceBone() : Link(this)
 {
 	ParentBone = -1;
-	BoundingBox.Min = ZEVector3::Zero;
-	BoundingBox.Max = ZEVector3::Zero;
 	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
-	LocalTransform = ZEMatrix4x4::Identity;
-	ForwardTransform = ZEMatrix4x4::Identity;
-	InverseTransform = ZEMatrix4x4::Identity;
+	BoundingBox = ZEAABBox::Zero;
 }

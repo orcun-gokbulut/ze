@@ -51,7 +51,7 @@ class ZERSManager : public ZEObject
 		ZELock ManagerLock;
 		ZEList2<const ZERSResource>	Resources;
 
-		ZESize MemoryUsage[ZERS_P_TOTAL];
+		ZESize MemoryUsage[ZERS_MP_TOTAL];
 		ZESize CacheSize;
 		ZESize CacheUsage;
 		
@@ -66,7 +66,7 @@ class ZERSManager : public ZEObject
 		~ZERSManager();
 
 	public:
-		ZESize GetMemoryUsage(ZERSPool Pool = ZERS_P_TOTAL);
+		ZESize GetMemoryUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 		ZESize GetCacheUsage();
 
 		void SetCacheSize(ZESize Size);

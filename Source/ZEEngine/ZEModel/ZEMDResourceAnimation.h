@@ -47,6 +47,33 @@
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
+
+struct Key
+{
+	ZEVector3 Key;
+	float Duration;
+};
+
+struct Animation
+{
+	ZEMDObjectType Type;
+	ZEString ObjectName;
+	ZEArray<Key> PositionKeys;
+	ZEArray<Key> RotationKeys;
+	ZEArray<Key> ScaleKeys;
+};
+
+class ZEModelMesh
+ZEQuaternion KeyToQuad(ZEVector3 Key)
+{
+	ZEQuaternion Output;
+	Output.x = Key.x;
+	Output.y = Key.y;
+	Output.z = Key.z;
+	Output.w = sqrt(1.0f - Key.x * Key.x - Key.y * Key.y - Key.z * Key.z);
+	return Output;
+}
+
 struct ZEModelResourceAnimationKey
 {
 	ZEUInt32 ItemId;
@@ -70,6 +97,7 @@ class ZEModelResourceAnimation : public ZEObject
 
 		ZEString Name;
 		ZEArray<ZEModelResourceAnimationFrame> Frames;
+		ZEArray<ZEGUID> ItemGUIDS;
 
 	public:
 		void SetName(const ZEString& Name);

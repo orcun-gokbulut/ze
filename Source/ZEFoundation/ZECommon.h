@@ -55,3 +55,12 @@
 	private: \
 		ClassName(const ClassName&); \
 		ClassName& operator=(const ClassName&);
+
+#define ZE_COPY_NO_ACTION(ClassName) \
+	private: \
+		ClassName(const ClassName&); \
+		ClassName& operator=(const ClassName&);
+
+#define ZE_COPY_NO_ACTION_IMP(ClassName) \
+	ClassName::ClassName(const ClassName&) {new (this) ClassName();} \
+	ClassName& ClassName::operator=(const ClassName&) {return *this;}

@@ -43,7 +43,6 @@
 template<typename ZEItemType>
 class ZEList2
 {
-	//ZE_DISALLOW_COPY(ZEList2)
 	private:
 		ZELink<ZEItemType>* First;
 		ZELink<ZEItemType>* Last;
@@ -91,8 +90,11 @@ class ZEList2
 
 		const ZEList2<const ZEItemType>& ToInspector() const;
 
-		ZEItemType* operator[](ZESize Index);
-		const ZEItemType* operator[](ZESize Index) const;
+		ZEItemType* operator[](ZESize Index) const;
+
+		//ZE_COPY_NO_ACTION
+		ZEList2& operator=(const ZEList2& Other);
+		ZEList2(const ZEList2& Other);
 
 		ZEList2();
 		~ZEList2();
@@ -437,17 +439,22 @@ void ZEList2<ZEItemType>::Reverse()
 }
 
 template<typename ZEItemType>
-ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index)
+ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index) const
 {
 	return GetItem(Index);
 }
 
 template<typename ZEItemType>
-const ZEItemType* ZEList2<ZEItemType>::operator[](ZESize Index) const
+ZEList2<ZEItemType>& ZEList2<ZEItemType>::operator=(const ZEList2<ZEItemType>& Other)
 {
-	return GetItem(Index);
+	return *this;
 }
 
+template<typename ZEItemType>
+ZEList2<ZEItemType>::ZEList2(const ZEList2& Other)
+{
+	new (this)ZEList2<ZEItemType>();
+}
 
 template<typename ZEItemType>
 ZEList2<ZEItemType>::ZEList2()

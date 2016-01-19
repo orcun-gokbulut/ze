@@ -37,7 +37,6 @@
 
 #include "ZETypes.h"
 #include "ZEMath\ZEVector.h"
-#include "ZEGraphics\ZEGRHolder.h"
 
 class ZEGRVertexLayout;
 
@@ -57,10 +56,10 @@ enum ZEMDVertexIndexType
 struct ZEMDVertex
 {
 	ZEVector3 Position;
+	ZEVector3 Texcoords;
 	ZEVector3 Normal;
 	ZEVector3 Tangent;
 	ZEVector3 Binormal;
-	ZEVector3 Texcoords;
 
 	static const ZEGRVertexLayout& GetVertexLayout();
 };

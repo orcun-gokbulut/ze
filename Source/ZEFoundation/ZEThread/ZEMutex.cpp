@@ -36,12 +36,9 @@
 #include "ZEMutex.h"
 #include "ZEError.h"
 
+ZE_COPY_NO_ACTION_IMP(ZEMutex)
+
 bool ZEMutex::IsLocked()
 {
     return Locked;
-}
-
-ZEMutex ZEMutex::operator=(const ZEMutex& Lock)
-{
-    return ZEMutex();
 }

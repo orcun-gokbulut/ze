@@ -60,7 +60,6 @@ class ZEModelResource : public ZERSResource
 		bool BoundingBoxIsUserDefined;
 		ZEAABBox UserDefinedBoundingBox;
 
-		bool ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
 		bool ReadMeshes(const ZEMLReaderNode& MeshesNode);
 		bool ReadBones(const ZEMLReaderNode& BonesNode);
 		bool ReadAnimations(const ZEMLReaderNode& AnimationsNode);

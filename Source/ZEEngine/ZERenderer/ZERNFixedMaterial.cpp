@@ -142,7 +142,9 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
 	if (SkinningEnabled)
-		RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
+	{
+	//	RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
+	}
 	else
 		RenderState.SetVertexLayout(*ZEInteriorVertex::GetVertexLayout());
 
