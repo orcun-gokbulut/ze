@@ -33,12 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModelDebugDrawer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+/*#include "ZEModelDebugDrawer.h"
 #include "ZEModel.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
 
+#include "ZERenderer/ZERNSimpleMaterial.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 void ZEModelDebugDrawer::DebugDrawEntity()
 {
@@ -110,7 +109,7 @@ ZEVector4 ZEModelDebugDrawer::GetBonePathColor() const
 	return BonePathColor;
 }
 
-void ZEModelDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
+void ZEModelDebugDrawer::Draw(ZERNDrawParameters* DrawParameters)
 {
 	ModelDrawCanvas.Clean();
 
@@ -120,7 +119,7 @@ void ZEModelDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	ModelRenderCommand.PrimitiveCount = ModelDrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&ModelRenderCommand);
+	DrawParameters->Renderer->AddCommand(&ModelRenderCommand);
 }
 
 bool ZEModelDebugDrawer::InitializeSelf()
@@ -129,7 +128,7 @@ bool ZEModelDebugDrawer::InitializeSelf()
 		return false;
 
 	if (ModelMaterial == NULL)
-		ModelMaterial = ZESimpleMaterial::CreateInstance();
+		ModelMaterial = ZERNSimpleMaterial::CreateInstance();
 
 	ModelRenderCommand.SetZero();
 	ModelRenderCommand.Material = ModelMaterial;
@@ -174,3 +173,4 @@ ZEModelDebugDrawer* ZEModelDebugDrawer::CreateInstance()
 {
 	return new ZEModelDebugDrawer();
 }
+*/

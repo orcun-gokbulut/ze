@@ -48,6 +48,8 @@
 #define		Y_AXIS		(ZEUInt)0x02
 #define		Z_AXIS		(ZEUInt)0x04
 
+const ZEAABBox ZEAABBox::Zero = ZEAABBox(ZEVector3::Zero, ZEVector3::Zero);
+
 ZEVector3 ZEAABBox::GetCenter() const
 {
 	ZEVector3 Center;

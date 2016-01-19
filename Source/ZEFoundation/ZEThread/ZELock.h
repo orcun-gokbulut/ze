@@ -33,13 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_LOCK_H__
-#define __ZE_LOCK_H__
+#pragma once
 
 #include "ZETypes.h"
+#include "ZECommon.h"
 
 class ZELock
 {
+	ZE_COPY_NO_ACTION(ZELock)
 	private:
 		volatile ZEInt32	CurrentNumber;
 		volatile ZEInt32	NextNumber;
@@ -50,11 +51,6 @@ class ZELock
         void				Wait();
 		void				Unlock();
 
-		ZELock				operator=(const ZELock& Lock);
-
 							ZELock();
-							ZELock(const ZELock& Lock);
 							~ZELock();
 };
-
-#endif

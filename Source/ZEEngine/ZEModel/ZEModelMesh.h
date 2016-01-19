@@ -34,91 +34,107 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_MESH_H__
-#define __ZE_MODEL_MESH_H__
 
-#include "ZETypes.h"
-#include "ZEModelAnimation.h"
-#include "ZEModelMeshLOD.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEModelResource.h"
 #include "ZEMeta/ZEObject.h"
-#include "ZEGame/ZERayCast.h"
 
-class ZEPhysicalCloth;
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEModelAnimation.h"
+#include "ZERenderer/ZERNCommand.h"
+
+struct ZERNCullParameters;
+struct ZERayCastParameters;
+struct ZERayCastReport;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
+ZE_META_FORWARD_DECLARE(ZEModelMeshLOD, "ZEModelMeshLOD.h")
+ZE_META_FORWARD_DECLARE(ZEModelResource, "ZEModelResource.h")
+ZE_META_FORWARD_DECLARE(ZEModelResourceMesh, "ZEMDResourceMesh.h")
 
 class ZEModelMesh : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEModel;
 	friend class ZEModelMeshLOD;
-	ZE_OBJECT
 	private:
-		ZEModel*							Owner;
-
-		const ZEModelResourceMesh*			MeshResource;
-		ZEModelMesh*						ParentMesh;
-		ZEArray<ZEModelMesh*>				ChildMeshes;
-
-		mutable ZEAABBox					LocalBoundingBox;
-		mutable ZEAABBox					ModelBoundingBox;
-		mutable ZEAABBox					WorldBoundingBox;
+		ZEModel*							Model;
+		
+		ZEString							Name;
+		ZEModelMesh*						Parent;
+		ZELink<ZEModelMesh>					ParentLink;
 
 		ZEVector3							Position;
 		ZEVector3							Scale;
 		ZEQuaternion						Rotation;
 
-		mutable ZEMatrix4x4					LocalTransform;
+		mutable ZEFlags						DirtyFlags;
+
+		mutable ZEAABBox					BoundingBox;
+		mutable ZEAABBox					ModelBoundingBox;
+		mutable ZEAABBox					WorldBoundingBox;
+
+		mutable ZEMatrix4x4					Transform;
+		mutable ZEMatrix4x4					InvTransform;
 		mutable ZEMatrix4x4					ModelTransform;
+		mutable ZEMatrix4x4					InvModelTransform;
 		mutable ZEMatrix4x4					WorldTransform;
 		mutable ZEMatrix4x4					InvWorldTransform;
-
-		bool								PhysicsEnabled;
-		ZEPhysicalRigidBody*				PhysicalBody;
-		ZEPhysicalCloth*					PhysicalCloth;
-
-		bool								AutoLOD;
-		ZEUInt								ActiveLOD;
-
-		bool								DrawOrderIsUserDefined;
-		ZEUInt8								UserDefinedDrawOrder;
 
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
 
-		ZEArray<ZEModelMeshLOD>				LODs;
+		ZEList2<ZEModelMesh>				ChildMeshes;
+		ZEList2<ZEModelMeshLOD>				LODs;
 
+		bool								CustomDrawOrderEnabled;
+		ZEUInt8								CustomDrawOrder;
 		ZEArray<ZEPlane>					ClippingPlanes;
+		
+		ZEHolder<const ZEModelResource>		ModelResource;
+		const ZEModelResourceMesh*			MeshResource;
+		
+		void								SetParent(ZEModelMesh* Mesh);
+
+		void								ParentChanged();
+		void								TransformChangedLocal();
+		void								TransformChangedModel();
+		void								TransformChangedWorld();
 
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
-		void								OnTransformChanged();
 
 	public:
-		ZEModelMesh*						GetParentMesh();
-		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
-		const char*							GetName();
-		ZEPhysicalRigidBody*				GetPhysicalBody();
-		ZEPhysicalCloth*					GetPhysicalCloth();
+		ZEModel*							GetModel() const;
+		ZEModelMesh*						GetParent() const;
 
-		const ZEAABBox&						GetLocalBoundingBox() const;
+		void								SetName(const ZEString& Name);
+		const ZEString&						GetName() const;
+
+		void								SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox&						GetBoundingBox() const;
+
 		const ZEAABBox&						GetModelBoundingBox() const;
 		const ZEAABBox&						GetWorldBoundingBox() const;
 
-		const ZEMatrix4x4&					GetLocalTransform() const;
+		const ZEMatrix4x4&					GetTransform() const;
+		const ZEMatrix4x4&					GetInvTransform() const;
+
 		const ZEMatrix4x4&					GetModelTransform() const;
+		const ZEMatrix4x4&					GetInvModelTransform() const;
+
 		const ZEMatrix4x4&					GetWorldTransform() const;
 		const ZEMatrix4x4&					GetInvWorldTransform() const;
 
-		void								SetLocalPosition(const ZEVector3& LocalPosition);
-		const ZEVector3&					GetLocalPosition() const;
+		void								SetPosition(const ZEVector3& LocalPosition);
+		const ZEVector3&					GetPosition() const;
 
-		void								SetLocalRotation(const ZEQuaternion& LocalRotation);
+		void								SetRotation(const ZEQuaternion& LocalRotation);
 		const ZEQuaternion&					GetLocalRotation() const;
 
-		void								SetLocalScale(const ZEVector3& LocalScale);
-		const ZEVector3&					GetLocalScale() const;
+		void								SetScale(const ZEVector3& LocalScale);
+		const ZEVector3&					GetScale() const;
 
 		void								SetModelPosition(const ZEVector3& ModelPosition);
 		const ZEVector3						GetModelPosition() const;
@@ -139,43 +155,35 @@ class ZEModelMesh : public ZEObject
 		const ZEVector3						GetWorldScale() const;
 
 		void								SetAnimationType(ZEModelAnimationType AnimationType);
-		ZEModelAnimationType				GetAnimationType();
-
-		void								SetActiveLOD(ZEUInt LOD);
-		ZEUInt								GetActiveLOD();
-
-		void								SetAutoLOD(bool Enabled);
-		bool								GetAutoLOD();
-
-		ZEArray<ZEModelMeshLOD>&			GetLODs();
+		ZEModelAnimationType				GetAnimationType() const;
 
 		void								SetVisible(bool Visible);
-		bool								GetVisible();
+		bool								GetVisible() const;
 
-		void								AddChild(ZEModelMesh* Mesh);
-		void								RemoveChild(ZEModelMesh* Mesh);
+		const ZEList2<ZEModelMeshLOD>&		GetLODs();
+		void								AddLOD(ZEModelMeshLOD* LOD);
+		void								RemoveLOD(ZEModelMeshLOD* LOD);
 
-		void								SetPhysicsEnabled(bool Enabled);
-		bool								GetPhysicsEnabled() const;
+		const ZEList2<ZEModelMesh>&			GetChildMeshes();
+		void								AddChildMesh(ZEModelMesh* Mesh);
+		void								RemoveChildMesh(ZEModelMesh* Mesh);
 
 		void								SetClippingPlaneCount(ZESize Count);
-		ZESize								GetClippingPlaneCount();
+		ZESize								GetClippingPlaneCount() const;
 		void								SetClippingPlane(ZESize Index, const ZEPlane& Plane);
-		const ZEPlane&						GetClippingPlane(ZESize Index);
-		void								AddClippingPlane(const ZEPlane& Plane);
-		void								RemoveClippingPlane(const ZEPlane& Plane);
+		const ZEPlane&						GetClippingPlane(ZESize Index) const;
 
 		void								SetCustomDrawOrderEnabled(bool Enabled);
+		bool								GetCustomDrawOrderEnabled() const;
+
 		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);
-		ZEUInt8								GetCustomDrawOrder();
+		ZEUInt8								GetCustomDrawOrder() const;
 
-		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
-		void								Deinitialize();
-
-		void								Draw(ZEDrawParameters* DrawParameters);
+		bool								PreRender(const ZERNCullParameters* CullParameters);
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		void								LoadResource(ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMesh* MeshResource);
 
 											ZEModelMesh();
 											~ZEModelMesh();
 };
-#endif

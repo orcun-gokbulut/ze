@@ -34,20 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModel.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEError.h"
 
 #include <stdio.h>
 #include <string.h>
 #include <float.h>
-
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZEMath/ZEViewVolume.h"
 
 void ZEModel::CalculateBoundingBox() const
 {
@@ -58,7 +53,6 @@ void ZEModel::CalculateBoundingBox() const
 	}
 
 	ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
-
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
 		if (!Meshes[I].MeshResource->IsSkinned)
@@ -110,46 +104,69 @@ void ZEModel::UpdateTransforms()
 
 ZEDrawFlags ZEModel::GetDrawFlags() const
 {
-	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
+	return /*ZE_DF_CULL | */ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER;
 }
 
-const ZEModelStatistics& ZEModel::GetStatistics() const
+void ZEModel::CleanUp()
 {
-	return Statistics;
-}
-
-void ZEModel::LoadModelResource()
-{
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].Deinitialize();
-	Meshes.SetCount(0);
-
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-		Bones[I].Deinitialize();
-	Bones.SetCount(0);
-
-	Skeleton.SetCount(0);
-
-	for (ZESize I = 0; I < Helpers.GetCount(); I++)
-		Helpers[I].Deinitialize();
-	Helpers.SetCount(0);
-
-	if (ModelResource == NULL)
-		return;
-
-	if (ModelResource->GetUserDefinedBoundingBoxEnabled())
+	ze_for_each(Mesh, Meshes)
 	{
-		BoundingBoxIsUserDefined = true;
-		SetBoundingBox(ModelResource->GetUserDefinedBoundingBox());
+		RemoveMesh(Mesh.GetPointer());
+		delete Mesh.GetPointer();
 	}
 
-	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
-
-	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
+	ze_for_each(Bone, Bones)
 	{
-		if (ModelResource->GetMeshes()[I].ParentMesh != -1)
+		RemoveBone(Bone.GetPointer());
+		delete Bone.GetPointer();
+	}
+
+
+	ze_for_each(Helper, Helpers)
+	{
+		RemoveHelper(Helper.GetPointer());
+		delete Helper.GetPointer();
+	}
+
+	ze_for_each(IKChain, IKChains)
+	{
+		RemoveIKChain(IKChain.GetPointer());
+		delete IKChain.GetPointer();
+	}
+
+	ze_for_each(AnimationTrack, AnimationTracks)
+	{
+		RemoveAnimationTrack(AnimationTrack.GetPointer());
+		delete AnimationTrack.GetPointer();
+	}
+
+	AnimationTrack = NULL;
+
+	Skeleton.Clear();
+}
+
+void ZEModel::LoadResource()
+{
+	if (Resource == NULL)
+		return;
+
+	CleanUp();
+
+	BoundingBoxIsUserDefined = Resource->GetUserDefinedBoundingBoxEnabled())
+	SetBoundingBox(Resource->GetUserDefinedBoundingBox());
+
+	ze_for_each(ResourceMesh, Resource->GetMeshes())
+	{
+		ZEPointer<ZEModelMesh> Mesh = new ZEModelMesh();
+		Mesh->Initialize(this, ResourceMesh.GetPointer());
+		AddMesh(Mesh.Transfer());
+	}
+
+	ze_for_each(ResorceMesh, Resource->GetMeshes())
+	{
+		if (ResorceMesh->GetParentMesh() != -1)
 		{
-			Meshes[(ZESize)ModelResource->GetMeshes()[I].ParentMesh].AddChild(&Meshes[I]);
+			Meshes[(ZESize)ResorceMesh->GetParentMesh()]->AddChild(ResorceMesh.GetPointer());
 		}
 	}
 
@@ -218,125 +235,77 @@ void ZEModel::LoadModelResource()
 
 void ZEModel::SetModelFile(const ZEString& ModelFile)
 {
-	ZEModelResource* ModelResource = ZEModelResource::LoadSharedResource(ModelFile);
-
-	if (ModelResource == NULL)
-	{
-		zeError("Can not load model file. File Name : \"%s\"", ModelFile.ToCString());
-		return;
-	}
-
+	ZEHolder<const ZEModelResource> ModelResource = ZEModelResource::Load(ModelFile);
 	SetModelResource(ModelResource);
 }
 
 const ZEString& ZEModel::GetModelFile() const
 {
-	if (ModelResource != NULL)
-		return ModelResource->GetFileName();
+	if (Resource != NULL)
+		return Resource->GetFileName();
 	else
 		return ZEString::Empty;
 }
 
 void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 {
-	if (this->ModelResource != NULL)
-		((ZEModelResource*)this->ModelResource)->Release();
-
-	ModelResource->AddReferance();
-
-	this->ModelResource = ModelResource;
+	Resource = ModelResource;
 
 	if (IsInitialized())
 		LoadModelResource();
 }
 
-const ZEModelResource* ZEModel::GetModelResource()
+ZEHolder<const ZEModelResource> ZEModel::GetModelResource() const
 {
-	return ModelResource;
+	return Resource;
 }
 
-const ZEArray<ZEModelBone*>& ZEModel::GetSkeleton()
-{
-	return Skeleton;
-}
 
-ZEArray<ZEModelBone>& ZEModel::GetBones()
-{
-	return Bones;
-}
 
-const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
+
+const ZEList2<ZEModelMesh>& ZEModel::GetMeshes()
 {
 	return Meshes;
 }
 
-const ZEArray<ZEModelHelper>& ZEModel::GetHelpers()
+ZEModelMesh* ZEModel::GetMesh(const char* Name)
 {
-	return Helpers;
-}
-
-const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
-{
-	if (ModelResource == NULL)
-		return  NULL;
-
-	return &ModelResource->GetAnimations();
-}
-
-void ZEModel::SetActiveLOD(ZEUInt LOD)
-{
-	ActiveLOD = LOD;
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	ze_for_each(Mesh, GetMeshes())
 	{
-		Meshes[I].SetActiveLOD(LOD);
-	}
-}
-
-ZEUInt ZEModel::GetActiveLOD()
-{
-	return ActiveLOD;
-}
-
-void ZEModel::SetPhysicsEnabled(bool Enabled)
-{
-	PhysicsEnabled = Enabled;
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-	{
-		Bones[I].SetPhysicsEnabled(Enabled);
+		if (Mesh->GetName() == Name)
+			return Mesh.GetPointer();
 	}
 
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-	{
-		Meshes[I].SetPhysicsEnabled(Enabled);
-	}
+	return NULL;
 }
 
-bool ZEModel::GetPhysicsEnabled()
+void ZEModel::AddMesh(ZEModelMesh* Mesh)
 {
-	return PhysicsEnabled;
+	if (Mesh->GetModelPosition())
+	Meshes.AddEnd(&Mesh->Link);
+}
+
+void ZEModel::RemoveMesh(ZEModelMesh* Mesh);
+const ZEList2<ZEModelBone>& ZEModel::GetBones()
+{
+	return Bones;
 }
 
 ZEModelBone* ZEModel::GetBone(const char* Name)
 {
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-		if (strcmp(Bones[I].GetName(), Name) == 0)
-			return &Bones[I];
+	ze_for_each(Bone, GetBones())
+	{
+		if (Bone->GetName() == Name)
+			return Bone.GetPointer();
+	}
 
 	return NULL;
 }
 
-ZEModelMesh* ZEModel::GetMesh(ZESize Index)
-{
-	return &Meshes[Index];
-}
 
-ZEModelMesh* ZEModel::GetMesh(const char* Name)
+const ZEList2<ZEModelHelper>& ZEModel::GetHelpers()
 {
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		if (strcmp(Meshes[I].GetName(), Name) == 0)
-			return &Meshes[I];
-
-	return NULL;
+	return Helpers;
 }
 
 ZEModelHelper* ZEModel::GetHelper(const char* Name)
@@ -372,23 +341,6 @@ ZEModelAnimationUpdateMode ZEModel::GetAnimationUpdateMode()
 	return AnimationUpdateMode;
 }
 
-ZEArray<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
-{
-	return AnimationTracks;
-}
-
-void ZEModel::SetAutoLOD(bool Enabled)
-{
-	AutoLOD = Enabled;
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].SetAutoLOD(Enabled);
-}
-
-bool ZEModel::GetAutoLOD()
-{
-	return AutoLOD;
-}
-
 void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 {
 	BoundingBoxIsUserDefined = Value;
@@ -419,11 +371,6 @@ bool ZEModel::GetStaticModel() const
 
 void ZEModel::SetPosition(const ZEVector3& NewPosition)
 {
-	if (ParentlessBoneBody != NULL && Bones.GetCount() > 0)
-	{
-		ParentlessBoneBody->SetPosition(NewPosition + ParentlessBoneBodyPosition);
-	}
-
 	ZEEntity::SetPosition(NewPosition);
 	UpdateTransforms();
 }
@@ -440,167 +387,69 @@ void ZEModel::SetScale(const ZEVector3& NewScale)
 	UpdateTransforms();
 }
 
-void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
+bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
 {
-	ZEPhysicalJoint* ParentlessBoneJoint = ZEPhysicalJoint::CreateInstance();
-
-	ParentlessBoneJoint->SetBodyA(ParentlessBone->PhysicalBody);
-	ParentlessBoneJoint->SetBodyB(ParentlessBoneBody);
-
-	ParentlessBoneJoint->SetPosition(ParentlessBoneBody->GetPosition());
-	ParentlessBoneJoint->SetRotation(ParentlessBoneBody->GetRotation());
-
-	ParentlessBoneJoint->SetXMotion(ZE_PJMOTION_LOCKED);
-	ParentlessBoneJoint->SetYMotion(ZE_PJMOTION_LOCKED);
-	ParentlessBoneJoint->SetZMotion(ZE_PJMOTION_LOCKED);
-
-	ParentlessBoneJoint->SetSwing1Motion(ZE_PJMOTION_LOCKED);
-	ParentlessBoneJoint->SetSwing2Motion(ZE_PJMOTION_LOCKED);
-	ParentlessBoneJoint->SetTwistMotion(ZE_PJMOTION_LOCKED);
-
-	ParentlessBoneJoint->SetMassInertiaTensor(ZEVector3(1,1,1)); // For solid joint connection
-
-	ParentlessBoneJoint->SetPhysicalWorld(zeScene->GetPhysicalWorld());
-	ParentlessBoneJoint->Initialize();
-}
-
-void ZEModel::Draw(ZEDrawParameters* DrawParameters)
-{
-	if(!GetVisible())
-		return;
-
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		memset(&Statistics, 0, sizeof(ZEModelStatistics));
-
-		Statistics.TotalMeshCount = Meshes.GetCount();
-	}
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
 
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
 	{
-		for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
-			AnimationTracks[I].UpdateAnimation();
+		if (AnimationTrack != NULL)
+			AnimationTrack->UpdateAnimation();
+
+		ze_for_each(AnimationTrack, GetAnimationTracks())
+			AnimationTrack->UpdateAnimation();
 	}
 
-	ZEUInt32 EntityDrawFlags = GetDrawFlags();
-
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+	bool Result = false;
+	ze_for_each(Mesh, GetMeshes())
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && !Meshes[I].LODs[0].IsSkinned())
-		{
-			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
-			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.CulledMeshCount++;
-
-				continue;
-			}
-			else
-			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.DrawnMeshCount++;
-
-				Meshes[I].Draw(DrawParameters);
-			}
-		}
-		else
-		{
-			if (DrawParameters->Pass == ZE_RP_COLOR)
-				Statistics.DrawnMeshCount++;
-
-			Meshes[I].Draw(DrawParameters);
-		}
+		if (Mesh->PreRender(CullParameters))
+			Result = true;
 	}
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		DrawParameters->Statistics.ModelStatistics.TotalMeshCount += Statistics.TotalMeshCount;
-		DrawParameters->Statistics.ModelStatistics.CulledMeshCount += Statistics.CulledMeshCount;
-		DrawParameters->Statistics.ModelStatistics.DrawnMeshCount += Statistics.DrawnMeshCount;
-	}
+	return Result;
+}
 
-// 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-// 		Meshes[I].Draw(DrawParameters);
-	
-// 	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
-// 		DebugDraw(DrawParameters->Renderer);
+void ZEModel::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
+{
+	ZEModelMeshLOD* MeshLOD = (ZEModelMeshLOD*)Command->ExtraParameters;
+	MeshLOD->Render(RenderParameters, Command);
 }
 
 void ZEModel::Tick(float ElapsedTime)
 {
-	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+	if (AnimationTrack != NULL)
 	{
-		AnimationTracks[I].Tick(ElapsedTime);
-
+		AnimationTrack->Tick(ElapsedTime);
 		if (AnimationUpdateMode == ZE_MAUM_LOGICAL)
-			AnimationTracks[I].UpdateAnimation();
+			AnimationTrack->UpdateAnimation();
 	}
 
-	for(ZESize I = 0; I < IKChains.GetCount(); I++)
-		IKChains[I].Process();
-	
-}
-
-void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation)
-{
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
+	ze_for_each(AnimationTrack, AnimationTracks)
 	{
-		if(Bones[I].GetParentBone() != NULL)
-		{
-			ZEQuaternion Inverse;
-			ZEQuaternion::Conjugate(Inverse, Bones[I].GetParentBone()->GetWorldRotation());
 
-			ZEMatrix4x4 InvParent;
-			ZEMatrix4x4::Inverse(InvParent, Bones[I].GetParentBone()->GetWorldTransform());
-			ZEVector3 Position;
-			ZEMatrix4x4::Transform(Position, InvParent, Bones[I].PhysicalBody->GetPosition());
-
-			Bones[I].SetPosition(Position);
-			Inverse.NormalizeSelf();
-			Bones[I].SetRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
-		}
-		else
-		{
-			ZEQuaternion Inverse;
-			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
-			Bones[I].SetPosition(Bones[I].PhysicalBody->GetPosition() - GetWorldPosition());
-			Inverse.NormalizeSelf();
-			Bones[I].SetRotation(Inverse * Bones[I].PhysicalBody->GetRotation());
-		}
+		AnimationTrack->Tick(ElapsedTime);
+		if (AnimationUpdateMode == ZE_MAUM_LOGICAL)
+			AnimationTrack->UpdateAnimation();
 	}
 
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-	{
-		if (Meshes[I].GetPhysicalBody() != NULL)
-		{
-			ZEQuaternion Inverse;
-			ZEQuaternion::Conjugate(Inverse, this->GetWorldRotation());
-			Meshes[I].SetLocalPosition(Meshes[I].GetPhysicalBody()->GetPosition() - GetWorldPosition());
-			Inverse.NormalizeSelf();
-			Meshes[I].SetLocalRotation(Inverse * Meshes[I].GetPhysicalBody()->GetRotation());
-		}
-	}
+	ze_for_each(IKChain, IKChains)
+		IKChain->Process();
 }
 
 ZEModel::ZEModel()
 {
-	ModelResource = NULL;
-	Visibility = true;
-	AutoLOD = true;
-	ActiveLOD = 0;
 	ParentlessBoneBody = NULL;
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
 	IsStaticModel = false;
 	StaticCalculationsDone = false;
-
-	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }
 
 ZEModel::~ZEModel()
 {
-	if (ModelResource != NULL)
-		((ZEModelResource*)ModelResource)->Release();
+	CleanUp();
 }
 
 bool ZEModel::InitializeSelf()
@@ -608,7 +457,7 @@ bool ZEModel::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	LoadModelResource();
+	LoadResource();
 
 	return true;
 }
@@ -621,11 +470,11 @@ bool ZEModel::DeinitializeSelf()
 bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	bool Result = false;
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Result |= Meshes[I].RayCast(Report, Parameters);
+	ze_for_each(Mesh, GetMeshes())
+		Result |= Mesh->RayCast(Report, Parameters);
 
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-		Result |= Bones[I].RayCast(Report, Parameters);
+	ze_for_each(Bone, GetBones())
+		Result |= Bone->RayCast(Report, Parameters);
 	
 	if (Result)
 		Report.Entity = this;
@@ -637,3 +486,4 @@ ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
 }
+

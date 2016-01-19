@@ -89,9 +89,9 @@ void ZERSResource::SetGUID(const ZEGUID& GUID)
 	this->GUID = GUID;
 }
 
-void ZERSResource::SetSize(ZERSPool Pool, ZESize NewSize)
+void ZERSResource::SetSize(ZERSMemoryPool Pool, ZESize NewSize)
 {
-	if (Pool >= ZERS_P_TOTAL)
+	if (Pool >= ZERS_MP_TOTAL)
 		return;
 
 	Size[Pool] = NewSize;
@@ -156,16 +156,16 @@ ZESize ZERSResource::GetReferanceCount() const
 	return ReferenceCount;
 }
 
-ZESize ZERSResource::GetSize(ZERSPool Pool) const
+ZESize ZERSResource::GetSize(ZERSMemoryPool Pool) const
 {
-	if (Pool > ZERS_P_TOTAL)
+	if (Pool > ZERS_MP_TOTAL)
 	{
 		return 0;
 	}
-	else if (Pool == ZERS_P_TOTAL)
+	else if (Pool == ZERS_MP_TOTAL)
 	{
 		ZESize Sum = 0;
-		for (ZESize I = 0; I < ZERS_P_TOTAL; I++)
+		for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
 			Sum += Size[I];
 		return Sum;
 	}
@@ -175,10 +175,10 @@ ZESize ZERSResource::GetSize(ZERSPool Pool) const
 	}
 }
 
-ZESize ZERSResource::GetTotalSize(ZERSPool Pool) const
+ZESize ZERSResource::GetTotalSize(ZERSMemoryPool Pool) const
 {
 	ZESize Sum = GetSize(Pool);
-	for (ZESize I = 0; I < ZERS_P_TOTAL; I++)
+	for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
 		Sum += SubResources[I]->GetTotalSize(Pool);
 	
 	return Sum;

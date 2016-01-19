@@ -34,3 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESignal.h"
+
+ZESignal::ZESignal(const ZESignal& Other) 
+{
+	Handle = NULL;
+	InitialState = Other.InitialState;
+} 
+
+ZESignal& ZESignal::operator=(const ZESignal&) 
+{
+	return *this;
+}

@@ -35,6 +35,10 @@
 
 #include "ZEReferenceCounted.h"
 
+#include "ZEError.h"
+
+ZE_COPY_NO_ACTION_IMP(ZEReferenceCounted)
+
 void ZEReferenceCounted::Reference() const
 {
 	ReferenceCountLock.Lock();
@@ -60,12 +64,13 @@ void ZEReferenceCounted::Destroy() const
 	delete this;
 }
 
+
 ZEReferenceCounted::ZEReferenceCounted()
 {
 	ReferenceCount = 0;
 }
 
-ZEReferenceCounted::ZEReferenceCounted(const ZEReferenceCounted& Object)
+ZEReferenceCounted::~ZEReferenceCounted()
 {
-	ReferenceCount = 0;
+	zeDebugCheck(ReferenceCount == 0, "ReferenceCount is not zero. There are still holders referencing this object.");
 }

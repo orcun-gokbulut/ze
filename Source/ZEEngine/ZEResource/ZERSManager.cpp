@@ -69,8 +69,8 @@ void ZERSManager::RegisterResourceInternal(const ZERSResource* Resource)
 
 	Resources.AddEnd(&Resource->ManagerLink);
 
-	for (ZESize I = 0; I < ZERS_P_TOTAL; I++)
-		MemoryUsage[I] += Resource->GetSize((ZERSPool)I);
+	for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
+		MemoryUsage[I] += Resource->GetSize((ZERSMemoryPool)I);
 }
 
 ZEHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions)
@@ -134,8 +134,8 @@ void ZERSManager::ReleaseResource(const ZERSResource* Resource)
 	}
 
 	Resources.Remove(&Resource->ManagerLink);
-	for (ZESize I = 0; I < ZERS_P_TOTAL; I++)
-		MemoryUsage[I] -= Resource->GetSize((ZERSPool)I);
+	for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
+		MemoryUsage[I] -= Resource->GetSize((ZERSMemoryPool)I);
 
 	ManagerLock.Unlock();
 }

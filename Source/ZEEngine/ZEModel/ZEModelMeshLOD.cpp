@@ -34,241 +34,190 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelMeshLOD.h"
+
 #include "ZEModel.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNMaterial.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZERNShaderSlots.h"
 
-void ZEModelMeshLOD::ResetMaterial()
+ZEModel* ZEModelMeshLOD::GetModel()
 {
-	RenderCommand.Material = Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId];
+	return Model;
 }
 
-void ZEModelMeshLOD::SetMaterial(const ZEMaterial* Material)
+ZEModelMesh* ZEModelMeshLOD::GetMesh()
 {
-	RenderCommand.Material = Material;
+	return Mesh;
 }
 
-const ZEMaterial* ZEModelMeshLOD::GetMaterial()
+void ZEModelMeshLOD::SetVertexType(ZEMDVertexType Type)
 {
-	return RenderCommand.Material;
+	VertexType = Type;
 }
 
-const ZEModelResourceMeshLOD* ZEModelMeshLOD::GetLODResource()
+ZEMDVertexType ZEModelMeshLOD::GetVertexType() const
 {
-	return LODResource;
+	return VertexType;
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawStartDistance()
+void ZEModelMeshLOD::SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
-	return DrawStartDistance;
+	VertexBufferBase = VertexBuffer;
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawEndDistance()
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferBase() const
 {
-	return DrawEndDistance;
+	return VertexBufferBase;
 }
 
-bool ZEModelMeshLOD::IsSkinned()
+void ZEModelMeshLOD::SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
-	return Skinned;
+	VertexBufferNormals = VertexBufferNormals;
 }
 
-void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferNormals() const
 {
-	if (VertexBuffer == NULL)
+	return VertexBufferNormals;
+}
+
+void ZEModelMeshLOD::SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+{
+	VertexBufferSkin = VertexBufferSkin;
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferSkin() const
+{
+	return VertexBufferSkin;
+}
+
+void ZEModelMeshLOD::SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+{
+
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferExtra() const
+{
+	return NULL;
+}
+
+void ZEModelMeshLOD::SetIndexType(ZEMDVertexIndexType Type)
+{
+	IndexType = Type;
+}
+
+ZEMDVertexIndexType ZEModelMeshLOD::GetIndexType() const
+{
+	return IndexType;
+}
+
+void ZEModelMeshLOD::SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer)
+{
+	this->IndexBuffer = IndexBuffer;
+}
+
+ZEHolder<const ZEGRIndexBuffer> ZEModelMeshLOD::GetIndexBuffer() const
+{
+	return IndexBuffer;
+}
+
+void ZEModelMeshLOD::SetStartDistance(float Distance)
+{
+	StartDistance = Distance;
+}
+
+float ZEModelMeshLOD::GetStartDistance() const
+{
+	return StartDistance;
+}
+
+void ZEModelMeshLOD::SetEndDistance(float Distance)
+{
+	EndDistance = Distance;
+}
+
+float ZEModelMeshLOD::GetEndDistance() const 
+{
+	return EndDistance;
+}
+
+const ZEArray<ZEModelDraw>& ZEModelMeshLOD::GetDraws()
+{
+	return Draws;
+}
+
+void ZEModelMeshLOD::AddDraw(const ZEModelDraw& Draw)
+{
+	Draws.Add(Draw);
+}
+
+void ZEModelMeshLOD::RemoveDraw(ZESize Index)
+{
+	Draws.Remove(Index);
+}
+
+void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
+{
+	if (VertexBufferBase.IsNull())
 		return;
 
-	if (!Owner->GetStaticModel() || !StaticCalculationsDone)
+	ZEGRContext* Context = RenderParameters->Context;
+
+	Context->SetIndexBuffer(IndexBuffer);
+	if (RenderParameters->Type == ZERN_DT_SHADOW)
 	{
-		if (Skinned)
-		{
-			RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
-			for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
-			{
-				ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
-			}
-
-			RenderCommand.WorldMatrix = Owner->GetWorldTransform();
-		}
-		else if(OwnerMesh->GetPhysicalCloth() != NULL)
-		{
-			RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-		}
-		else
-		{
-			RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
-		}
-
-		StaticCalculationsDone = Owner->GetStaticModel();
+		Context->SetVertexBuffers(0, 1, &VertexBufferBase);
+		if (GetVertexType() == ZEMD_VT_SKINNED)
+			Context->SetVertexBuffers(2, 1, &VertexBufferSkin);
+	}
+	else
+	{
+		Context->SetVertexBuffers(0, 1, &VertexBufferBase);
+		Context->SetVertexBuffers(1, 1, &VertexBufferNormals);
+		if (GetVertexType() == ZEMD_VT_SKINNED)
+			Context->SetVertexBuffers(2, 1, &VertexBufferSkin);
 	}
 
-	RenderCommand.Order = DrawOrder;
-	RenderCommand.ClippingPlanes = OwnerMesh->ClippingPlanes;
-
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	ze_for_each(Draw, Draws)
+	{
+		Draw->GetMaterial()->SetupMaterial(RenderParameters->Context, RenderParameters->Stage);
+		Context->Draw(Draw->GetCount() * 3, Draw->GetOffset() * 3);
+		Draw->GetMaterial()->CleanupMaterial(RenderParameters->Context, RenderParameters->Stage);
+	}
 }
 
-bool ZEModelMeshLOD::UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices)
+void ZEModelMeshLOD::LoadResource(ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMeshLOD* Resource)
 {
-	ZEStaticVertexBuffer* Buffer = LODResource->GetSharedVertexBuffer();
+	this->ModelResource = ModelResource;
+	SetStartDistance(Resource->GetStartDistance());
+	SetEndDistance(Resource->GetEndDistance());
+	SetVertexBufferBase(Resource->GetVertexBufferBase());
+	SetVertexBufferNormals(Resource->GetVertexBufferNormals());
+	SetVertexBufferSkin(Resource->GetVertexBufferSkin());
+	SetIndexBuffer(Resource->GetIndexBuffer());
 	
-	if(Buffer == NULL)
-		return false;
-
-	ZESize VertexCount = Vertices.GetCount();
-	ZEArray<ZEVector3> Normals;
-	Normals.SetCount(VertexCount);
-
-	ZEModelVertex* VertexData = (ZEModelVertex*)Buffer->Lock();
-	if (VertexData == NULL)
-	{
-		zeError("Can not lock static vertex buffer.");
-		return false;
-	}
-	
-	ZEVector4 TempVector;
-	for (ZESize I = 0; I < VertexCount; I += 3)
-	{
-		ZEVector3 Vertex0 = Vertices[Indices[I + 0]];
-		ZEVector3 Vertex1 = Vertices[Indices[I + 1]];
-		ZEVector3 Vertex2 = Vertices[Indices[I + 2]];
-
-		VertexData[I + 0].Position = Vertex0;
-		VertexData[I + 1].Position = Vertex1;
-		VertexData[I + 2].Position = Vertex2;
-	
-		//First Vertex Normal
-		Normals[I] = ZEVector3::Zero;
-
-		ZEVector3 EdgeA = Vertex1 - Vertex0;
-		ZEVector3 EdgeB = Vertex2 - Vertex0;
-		ZEVector3 TriangleNormal;
-
-		ZEVector3::CrossProduct(TriangleNormal, EdgeA, EdgeB);
-		float Weight = ZEVector3::DotProduct(EdgeA.Normalize(), EdgeB.Normalize()) * -0.5f + 0.5f;
-		Normals[Indices[I]] += TriangleNormal * Weight;
-
-		//Second Vertex Normal
-		Normals[I + 1] = ZEVector3::Zero;
-
-		EdgeA = Vertex2 - Vertex1;
-		EdgeB = Vertex0 - Vertex1;
-
-		ZEVector3::CrossProduct(TriangleNormal, EdgeA, EdgeB);
-		Weight = ZEVector3::DotProduct(EdgeA.Normalize(), EdgeB.Normalize()) * -0.5f + 0.5f;
-		Normals[Indices[I + 1]] += TriangleNormal * Weight;
-
-		//Third Vertex Normal
-		Normals[I + 2] = ZEVector3::Zero;
-
-		EdgeA = Vertex0 - Vertex2;
-		EdgeB = Vertex1 - Vertex2;
-
-		ZEVector3::CrossProduct(TriangleNormal, EdgeA, EdgeB);
-		Weight = ZEVector3::DotProduct(EdgeA.Normalize(), EdgeB.Normalize()) * -0.5f + 0.5f;
-		Normals[Indices[I + 2]] += TriangleNormal * Weight;
-	}
-
-	for (ZESize I = 0; I < VertexCount; I += 3)
-	{
-		VertexData[I + 0].Normal = Normals[Indices[I + 0]].Normalize();
-		VertexData[I + 1].Normal = Normals[Indices[I + 1]].Normalize();
-		VertexData[I + 2].Normal = Normals[Indices[I + 2]].Normalize();
-
-		ZEVector3 VectorP = VertexData[I + 2].Position - VertexData[I + 0].Position;
-		ZEVector3 VectorQ = VertexData[I + 1].Position - VertexData[I + 0].Position;
-
-		ZEVector2 TextureCoord0 = this->GetLODResource()->Vertices[I + 0].Texcoord;
-		ZEVector2 TextureCoord1 = this->GetLODResource()->Vertices[I + 1].Texcoord;
-		ZEVector2 TextureCoord2 = this->GetLODResource()->Vertices[I + 2].Texcoord;
-
-		float S1 = TextureCoord2.x - TextureCoord0.x;
-		float S2 = TextureCoord1.x - TextureCoord0.x;
-		float T1 = TextureCoord2.y - TextureCoord0.y;
-		float T2 = TextureCoord1.y - TextureCoord0.y;
-
-		float Handedness = 0.0f;
-
-		if(fabs(S1 * T2 - S2 * T1))
-			Handedness = 1.0f;
-		else
-			Handedness = 1.0f / (S1 * T2 - S2 * T1);
-
-		ZEVector3 Tangent;
-		Tangent.x = (T2 * VectorP.x - T1 * VectorQ.x);
-		Tangent.y = (T2 * VectorP.y - T1 * VectorQ.y);
-		Tangent.z = (T2 * VectorP.z - T1 * VectorQ.z);
-		Tangent *= Handedness;
-
-		ZEVector3 Binormal;
-		Binormal.x = (S1 * VectorQ.x - S2 * VectorP.x);
-		Binormal.y = (S1 * VectorQ.y - S2 * VectorP.y);
-		Binormal.z = (S1 * VectorQ.z - S2 * VectorP.z);
-		Binormal *= Handedness;
-
-		VertexData[I + 0].Tangent = Tangent.Normalize();
-		VertexData[I + 1].Tangent = VertexData[I + 0].Tangent;
-		VertexData[I + 2].Tangent = VertexData[I + 0].Tangent;
-
-		VertexData[I + 0].Binormal = Binormal.Normalize();
-		VertexData[I + 1].Binormal = VertexData[I + 0].Binormal;
-		VertexData[I + 2].Binormal = VertexData[I + 0].Binormal;
-	}
-	Buffer->Unlock();
-
-	return true;
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBuffer->SetData((void*)&Model->GetTransform());
 }
 
-void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
+ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
 {
-	Owner = Model;
-	OwnerMesh = Mesh;
-	this->LODResource = LODResource;
-	DrawStartDistance = LODResource->LODStartDistance;
-	DrawEndDistance = LODResource->LODEndDistance;
-
-	Skinned = LODResource->Vertices.GetCount() == 0 ? true : false;
-
-	RenderCommand.SetZero();
-	RenderCommand.Priority = 3;
-	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING | (Skinned ? ZE_ROF_SKINNED : 0);
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.VertexBuffer = VertexBuffer = LODResource->GetSharedVertexBuffer();
-	RenderCommand.PrimitiveCount = Skinned ? LODResource->SkinnedVertices.GetCount() / 3: LODResource->Vertices.GetCount() / 3;
-	RenderCommand.VertexDeclaration = Skinned ? ZESkinnedModelVertex::GetVertexDeclaration() : ZEModelVertex::GetVertexDeclaration();
-	RenderCommand.Material = Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId];
-}
-
-void ZEModelMeshLOD::Deinitialize()
-{
-	Owner = NULL;
-	OwnerMesh = NULL;
-	DrawStartDistance = 0;
-	DrawEndDistance = 0;
-	RenderCommand.SetZero();
-	VertexBuffer = NULL;
+	Model = NULL;
+	Mesh = NULL;
 	LODResource = NULL;
-	Material = NULL;
-	Skinned = false;
-	StaticCalculationsDone = false;
-}
 
-ZEModelMeshLOD::ZEModelMeshLOD()
-{
-	Skinned = false;
-	Owner = NULL;
-	OwnerMesh = NULL;
-	DrawStartDistance = 0;
-	DrawEndDistance = 0;
-	RenderCommand.SetZero();
-	VertexBuffer = NULL;
-	LODResource = NULL;
-	Material = NULL;
-	StaticCalculationsDone = false;
+	StartDistance = 0;
+	EndDistance = 0;
+	VertexType = ZEMD_VT_NORMAL;
+	IndexType = ZEMD_VIT_NONE;
 }
 
 ZEModelMeshLOD::~ZEModelMeshLOD()
 {
-	Deinitialize();
+
 }

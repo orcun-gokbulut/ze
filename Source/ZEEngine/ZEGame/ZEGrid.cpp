@@ -53,7 +53,7 @@ ZEDrawFlags ZEGrid::GetDrawFlags() const
 
 void ZEGrid::GenerateGrid()
 {
-	if (GetState() == ZE_ES_NOT_INITIALIZED || GetState() == ZE_ES_DEINITIALIZING)
+	if (GetInitalizationState() == ZE_ES_NOT_INITIALIZED || GetInitalizationState() == ZE_ES_DEINITIALIZING)
 		return;
 
 	ZECanvas Canvas;

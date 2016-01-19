@@ -34,55 +34,111 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_MESH_LOD_H__
-#define __ZE_MODEL_MESH_LOD_H__
 
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEMeta/ZEObject.h"
 
-struct ZEDrawParameters;
+#include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEMDVertex.h"
+#include "ZERenderer/ZERNCommand.h"
+
 class ZEModel;
-class ZEMaterial;
 class ZEModelMesh;
+class ZEModelResource;
 class ZEModelResourceMeshLOD;
-class ZERenderer;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
+class ZERNMaterial;
+class ZERNRenderer;
+class ZERNRenderParameters;
+class ZEGRConstantBuffer;
 
-class ZEModelMeshLOD
+class ZEModelDraw : public ZEObject
 {
+	ZE_OBJECT
+	friend class ZEModelMesh;
 	private:
-		ZEModel*							Owner;
-		ZEModelMesh*						OwnerMesh;
-		ZEInt32								DrawStartDistance;
-		ZEInt32								DrawEndDistance;
-		const ZEModelResourceMeshLOD*		LODResource;
-		ZEVertexBuffer*						VertexBuffer;
-		ZERenderCommand						RenderCommand;
-		const ZEMaterial*					Material;
-		bool								Skinned;
-
-		bool								StaticCalculationsDone;
-		ZEMatrix4x4							StaticTransform;
-		ZEArray<ZEMatrix4x4>				StaticSkinnedTransforms;
+		ZESize								Offset;
+		ZESize								Count;
+		ZEHolder<const ZERNMaterial>		Material;
+		mutable ZERNCommand					RenderCommand;
 
 	public:
-		void								ResetMaterial();
-		void								SetMaterial(const ZEMaterial* Material);
-		const ZEMaterial*					GetMaterial();
+		void								SetMaterial(ZEHolder<const ZERNMaterial>& Material);
+		ZEHolder<const ZERNMaterial>&		GetMaterial();
 
-		const ZEModelResourceMeshLOD*		GetLODResource();
+		void								SetOffset(ZESize Offset);
+		ZESize								GetOffset() const;
 
-		ZEInt32								GetDrawStartDistance();
-		ZEInt32								GetDrawEndDistance();
+		void								SetCount(ZESize Count);
+		ZESize								GetCount() const;
+};
 
-		bool								IsSkinned();
+class ZEModelMeshLOD : public ZEObject
+{
+	ZE_OBJECT
+	friend class ZEModelMesh;
+	private:
+		ZEModel*							Model;
+		ZEModelMesh*						Mesh;
+		ZELink<ZEModelMeshLOD>				MeshLink;
 
-		void								Draw(ZEDrawParameters* DrawParameters, float DrawOrder);
-
-		bool								UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices);
+		float								StartDistance;
+		float								EndDistance;
 		
-		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
-		void								Deinitialize();
+		ZEMDVertexType						VertexType;
+		ZEHolder<const ZEGRVertexBuffer>	VertexBufferBase;
+		ZEHolder<const ZEGRVertexBuffer>	VertexBufferNormals;
+		ZEHolder<const ZEGRVertexBuffer>	VertexBufferSkin;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		
+		ZEMDVertexIndexType					IndexType;
+		ZEHolder<const ZEGRIndexBuffer>		IndexBuffer;
+
+		ZEArray<ZEModelDraw>				Draws;
+
+		ZEHolder<const ZEModelResource>		ModelResource;
+		const ZEModelResourceMeshLOD*		LODResource;
+
+	public:
+		ZEModel*							GetModel();
+		ZEModelMesh*						GetMesh();
+
+		void								SetVertexType(ZEMDVertexType Type);
+		ZEMDVertexType						GetVertexType() const;
+
+		void								SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>	GetVertexBufferBase() const;
+
+		void								SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>	GetVertexBufferNormals() const;
+
+		void								SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>	GetVertexBufferSkin() const;
+
+		void								SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>	GetVertexBufferExtra() const;
+
+		void								SetIndexType(ZEMDVertexIndexType Type);
+		ZEMDVertexIndexType					GetIndexType() const;
+
+		void								SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer);
+		ZEHolder<const ZEGRIndexBuffer>		GetIndexBuffer() const;
+
+		void								SetStartDistance(float Distance);
+		float								GetStartDistance() const;
+
+		void								SetEndDistance(float Distance);
+		float								GetEndDistance() const;
+
+		const ZEArray<ZEModelDraw>&			GetDraws();
+		void								AddDraw(const ZEModelDraw& Draw);
+		void								RemoveDraw(ZESize Index);
+
+		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+
+		void								LoadResource(ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMeshLOD* LODResource);
 
 											ZEModelMeshLOD();
 											~ZEModelMeshLOD();
 };
-#endif

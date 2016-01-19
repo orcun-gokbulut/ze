@@ -54,14 +54,11 @@ class ZEModelResourceBone : public ZEObject
 		ZELink<ZEModelResourceBone> Link;
 
 		ZEString Name;
-		ZEAABBox BoundingBox;
 		ZEInt32 ParentBone;
 		ZEVector3 Position;
 		ZEQuaternion Rotation;
 		ZEVector3 Scale;
-		ZEMatrix4x4 LocalTransform;
-		ZEMatrix4x4 ForwardTransform;
-		ZEMatrix4x4 InverseTransform;
+		ZEAABBox BoundingBox;
 		ZEModelResourcePhysicalBody PhysicalBody;
 		ZEModelResourcePhysicalJoint PhysicalJoint;
 		ZEString UserDefinedProperties;
@@ -84,15 +81,6 @@ class ZEModelResourceBone : public ZEObject
 
 		void SetScale(const ZEVector3& Scale);
 		const ZEVector3& GetScale() const;
-
-		void SetLocalTransform(const ZEMatrix4x4& Transform);
-		const ZEMatrix4x4& GetLocalTransform() const;
-
-		void SetForwardTransform(const ZEMatrix4x4& Transform);
-		const ZEMatrix4x4& GetForwardTransform() const;
-
-		void SetInverseTransform(const ZEMatrix4x4& Transform);
-		const ZEMatrix4x4& GetInverseTransform() const;
 
 		void SetPhysicalJoint(const ZEModelResourcePhysicalBody& Body);
 		const ZEModelResourcePhysicalBody& GetPhysicalBody() const;

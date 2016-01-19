@@ -45,7 +45,7 @@
 
 class ZESignal
 {
-	ZE_DISALLOW_COPY(ZESignal)
+	ZE_COPY_NO_ACTION(ZESignal)
 	private:
         #ifdef ZE_PLATFORM_WINDOWS
             mutable void* Handle;
