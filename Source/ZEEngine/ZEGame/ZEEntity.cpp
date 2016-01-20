@@ -54,6 +54,7 @@
 #define ZE_EDF_WORLD_TRANSFORM				0x04
 #define ZE_EDF_INV_WORLD_TRANSFORM			0x08
 #define ZE_EDF_WORLD_BOUNDING_BOX			0x10
+#define ZE_EDF_LOADING_STATE				0x11
 
 void ZEEntity::ParentChanged()
 {
@@ -107,6 +108,7 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 		return false;
 
 	Components.AddEnd(&Entity->ParentLink);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOADING_STATE);
 
 	Entity->Parent = this;
 	Entity->ParentChanged();
@@ -132,6 +134,7 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 	Entity->ParentChanged();
 
 	Components.Remove(&Entity->ParentLink);
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOADING_STATE);
 }
 
 
@@ -148,7 +151,8 @@ void ZEEntity::DeinitializeSelf()
 
 bool ZEEntity::LoadSelf()
 {
-	LoadingState = ZE_ELS_LOADING;
+	LoadingState = ZE_ELS_LOADED;
+	return true;
 }
 
 void ZEEntity::UnloadSelf()
@@ -159,6 +163,7 @@ void ZEEntity::UnloadSelf()
 
 ZEEntity::ZEEntity() : ParentLink(this)
 {
+	EntityDirtyFlags.RaiseAll();
 	Parent = NULL;
 	Scene = NULL;
 	State = ZE_ES_NOT_INITIALIZED;
@@ -180,11 +185,11 @@ ZEEntity::~ZEEntity()
 	Deinitialize();
 	Unload();
 
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->Destroy();
+	ze_for_each(Component, Components)
+		Component->Destroy();
 
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->Destroy();
+	ze_for_each(ChildEntity, ChildEntities)
+		ChildEntity->Destroy();
 }
 
 ZEEntity* ZEEntity::GetParent() const
@@ -202,9 +207,81 @@ ZEEntityState ZEEntity::GetInitalizationState() const
 	return State;
 }
 
+ZEUInt ZEEntity::GetLoadProgress() const
+{
+	ZEUInt TotalProgress = 0;
+	ze_for_each(Resource, Resources)
+		TotalProgress += Resource->GetPointer()->GetLoadProgress();
+
+	return TotalProgress / Resources.GetCount();
+}
+
+ZEEntityLoadingState ZEEntity::GetLoadingState() const
+{
+	if (LoadingState == ZE_ELS_ERROR || LoadingState == ZERS_S_NOT_LOADED || LoadingState == ZE_ELS_LOADING || LoadingState == ZE_ELS_UNLOADING)
+		return LoadingState;
+
+	bool HasLoaded = false;
+	bool HasLoading = false;
+	bool HasIterating = false;
+	bool HasNotFound = false;
+	bool HasNotLoaded = false;
+	ze_for_each(Resource, Resources)
+	{
+		if (Resource->GetPointer()->GetStatus() == ZERS_S_LOADED)
+			HasLoaded = true;
+		else if (Resource->GetPointer()->GetStatus() == ZERS_S_LOADING)
+			HasLoading = true;
+		else if (Resource->GetPointer()->GetStatus() == ZERS_S_ITERATING)
+			HasIterating = true;
+		else if (Resource->GetPointer()->GetStatus() == ZERS_S_NOT_FOUND)
+			HasNotFound = true;
+		else if (Resource->GetPointer()->GetStatus() == ZERS_S_NOT_LOADED)
+			HasNotLoaded = true;
+	}
+
+	ze_for_each(Component, Components)
+	{
+		if (Component->GetLoadingState() == ZERS_S_LOADED)
+			HasLoaded = true;
+		else if (Component->GetLoadingState() == ZERS_S_LOADING)
+			HasLoading = true;
+		else if (Component->GetLoadingState() == ZERS_S_ITERATING)
+			HasIterating = true;
+		else if (Component->GetLoadingState() == ZERS_S_NOT_FOUND)
+			HasNotFound = true;
+		else if (Component->GetLoadingState() == ZERS_S_NOT_LOADED)
+			HasNotLoaded = true;
+	}
+
+	if (!HasLoading && !HasIterating && !HasNotFound)
+	{
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_LOADING_STATE);
+		return ZE_ELS_LOADED;
+	}
+	else if (HasIterating)
+	{
+		LoadingState = ZE_ELS_ITERATING;
+	}
+	else if (HasLoading && !HasIterating)
+	{
+		LoadingState =  ZE_ELS_LOADING;
+	}
+	else if (HasNotLoaded)
+	{
+		LoadingState =  ZE_ELS_LOADING;
+	}
+	else if (HasNotFound)
+	{
+		LoadingState = ZE_ELS_ERROR;
+		EntityDirtyFlags.UnraiseFlags(ZE_EDF_LOADING_STATE);
+	}
+
+}
+
 ZEEntityFlags ZEEntity::GetFlags() const
 {
-	return EntiyFlags;
+	return EntityFlags;
 }
 
 void ZEEntity::SetEntityId(ZEInt EntityId)
@@ -460,7 +537,7 @@ ZEVector3 ZEEntity::GetWorldUp() const
 	return GetWorldRotation() * ZEVector3::UnitY;
 }
 
-const ZEArray<ZEEntity*>& ZEEntity::GetChildEntities() const
+const ZEList2<ZEEntity>& ZEEntity::GetChildEntities() const
 {
 	return ChildEntities; 
 }
@@ -482,7 +559,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	ChildEntities.Add(Entity);
+	ChildEntities.AddEnd(&Entity->ParentLink);
 
 	Entity->Parent = this;
 	Entity->ParentChanged();
@@ -507,7 +584,7 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 	Entity->Parent = NULL;
 	Entity->ParentChanged();
 
-	ChildEntities.RemoveValue(Entity);
+	ChildEntities.Remove(&Entity->ParentLink);
 }
 
 bool ZEEntity::IsInitialized()
@@ -559,24 +636,23 @@ void ZEEntity::Deinitialize()
 
 bool ZEEntity::Load()
 {
-	if (LoadingState == ZE_ELS_LOADING || 
-		LoadingState == ZE_ELS_LOADED ||  
-		LoadingState == ZE_ELS_SEMI_LOADED)
-	{
+	if (LoadingState != ZE_ELS_NOT_LOADED)
 		return false;
-	}
 
 	ze_for_each(Component, Components)
 		if(!Component->Load())
 			return false;
 
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOADING_STATE);
+	LoadingState = ZE_ELS_LOADING;
+	
 	if (!LoadSelf())
 		return false;
 
 	zeDebugCheck(
 		LoadingState != ZE_ELS_LOADING && 
 		LoadingState != ZE_ELS_LOADED &&  
-		LoadingState != ZE_ELS_SEMI_LOADED, "This entity class has broken LoadSelf chain problem.");
+		LoadingState != ZE_ELS_ITERATING, "This entity class has broken LoadSelf chain problem.");
 
 	ze_for_each(ChildEntity, ChildEntities)
 		if(!ChildEntity->Load())
@@ -600,7 +676,7 @@ void ZEEntity::Unload()
 	zeDebugCheck(LoadingState != ZE_ELS_NOT_LOADED, "This entity class has broken UnloadSelf chain problem.");
 
 	ze_for_each(ChildEntity, ChildEntities)
-		ChildEntity->Deinitialize();
+		ChildEntity->Unload();
 }
 
 void ZEEntity::Destroy()

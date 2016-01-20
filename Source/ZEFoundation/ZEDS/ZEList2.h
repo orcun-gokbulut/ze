@@ -62,8 +62,7 @@ class ZEList2
 		ZELink<ZEItemType>* GetLast();
 		const ZELink<ZEItemType>* GetLast() const;
 
-		ZEItemType* GetItem(ZESize Index);
-		const ZEItemType* GetItem(ZESize Index) const;
+		ZEItemType* GetItem(ZESize Index) const;
 
 		ZELink<ZEItemType>* GetLink(ZESize Index);
 		const ZELink<ZEItemType>* GetLink(ZESize Index) const;
@@ -254,7 +253,7 @@ const ZELink<ZEItemType>* ZEList2<ZEItemType>::GetLink(ZESize Index) const
 }
 
 template<typename ZEItemType>
-ZEItemType* ZEList2<ZEItemType>::GetItem(ZESize Index)
+ZEItemType* ZEList2<ZEItemType>::GetItem(ZESize Index) const
 {
 	return GetLink(Index)->GetItem();
 }

@@ -63,7 +63,8 @@ struct Animation
 	ZEArray<Key> ScaleKeys;
 };
 
-class ZEModelMesh
+class ZEModelMesh;
+
 ZEQuaternion KeyToQuad(ZEVector3 Key)
 {
 	ZEQuaternion Output;
