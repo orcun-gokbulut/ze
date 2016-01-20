@@ -51,8 +51,10 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEResource/ZERSResource.h"
 
 struct ZERNDrawParameters;
 struct ZERNCullParameters;
@@ -62,10 +64,11 @@ class ZERNCommand;
 
 // ZEDrawFlags
 typedef ZEFlags ZEEntityFlags;
-#define ZE_EF_TICKABLE		0x01
-#define ZE_EF_RENDERABLE	0x02
-#define ZE_EF_CULLABLE		0x03
-
+#define ZE_EF_TICKABLE				0x01
+#define ZE_EF_RENDERABLE			0x02
+#define ZE_EF_CULLABLE				0x03
+#define ZE_EF_PARTIAL_LOADING_SUPPORTED		0x08
+#define ZE_EF_OUTSIDE_LOADING_CYCLE 0x10
 
 ZE_ENUM(ZEEntityState)
 {
@@ -80,8 +83,9 @@ ZE_ENUM(ZEEntityLoadingState)
 	ZE_ELS_NOT_LOADED				= 0,
 	ZE_ELS_LOADING					= 1,
 	ZE_ELS_LOADED					= 2,
-	ZE_ELS_SEMI_LOADED				= 3,
-	ZE_ELS_UNLOADING				= 4
+	ZE_ELS_ITERATING				= 3,
+	ZE_ELS_ERROR					= 3,
+	ZE_ELS_UNLOADING				= 4,
 };
 
 class ZEScene;
@@ -99,7 +103,7 @@ class ZEEntity : public ZEObject
 		ZEEntity*								Parent;
 		ZELink<ZEEntity>						ParentLink;
 		ZEScene*								Scene;
-		ZEEntityFlags							EntiyFlags;
+		ZEEntityFlags							EntityFlags;
 
 		ZEString								Name;
 		ZEInt									EntityId;
@@ -108,7 +112,7 @@ class ZEEntity : public ZEObject
 		ZEVector3								Scale;
 
 		ZEEntityState							State;
-		ZEEntityLoadingState					LoadingState;
+		mutable ZEEntityLoadingState			LoadingState;
 
 		bool									Enabled;
 		bool									Visible;
@@ -158,7 +162,9 @@ class ZEEntity : public ZEObject
 		virtual ZEEntity*						GetParent() const;
 		ZEScene*								GetScene() const;
 		ZEEntityState							GetInitalizationState() const;
-
+		ZEUInt									GetLoadProgress() const;
+		ZEEntityLoadingState					GetLoadingState() const;
+	
 		ZEEntityFlags							GetFlags() const;
 
 		void									SetEntityId(ZEInt EntityId);
@@ -209,7 +215,7 @@ class ZEEntity : public ZEObject
 		ZEVector3								GetWorldRight() const;
 		ZEVector3								GetWorldUp() const;
 
-		const ZEArray<ZEEntity*>&				GetChildEntities() const;
+		const ZEList2<ZEEntity>&				GetChildEntities() const;
 		bool									AddChildEntity(ZEEntity* Entity);
 		void									RemoveChildEntity(ZEEntity* Entity);
 
