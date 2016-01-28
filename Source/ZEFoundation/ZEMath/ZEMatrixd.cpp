@@ -419,6 +419,13 @@ void ZEMatrix3x3d::Get2DDecomposition(ZEVector2d& Translation, double& Rotation,
 	Rotation = ZEAngle::ArcTan2((float)Matrix.M12, (float)Matrix.M22);
 }
 
+void ZEMatrix3x3d::FromMatrix3x3(const ZEMatrix3x3& Matrix)
+{
+	for (ZESize I = 0; I < 3; I++)
+		for (ZESize J = 0; J < 3; J++)
+			this->M[I][J] = (double)Matrix.M[I][J];
+}
+
 ZEMatrix3x3 ZEMatrix3x3d::ToMatrix3x3() const
 {
 	return ZEMatrix3x3((float)M11, (float)M12, (float)M13, 
@@ -1080,6 +1087,13 @@ void ZEMatrix4x4d::GetDecomposition(ZEVector3d& Translation, ZEQuaternion& Rotat
 	ZEMatrix4x4d RotationMatrix = Matrix * TempScaleMatrix.Inverse();
 
 	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix.ToMatrix4x4());
+}
+
+void ZEMatrix4x4d::FromMatrix4x4(const ZEMatrix4x4& Matrix)
+{
+	for (ZESize I = 0; I < 4; I++)
+		for (ZESize J = 0; J < 4; J++)
+			this->M[I][J] = (double)Matrix.M[I][J];
 }
 
 ZEMatrix4x4 ZEMatrix4x4d::ToMatrix4x4() const

@@ -115,6 +115,7 @@ class ZEMatrix3x3d
 		ZEVector2d						Get2DScale();
 		static void						Get2DDecomposition(ZEVector2d& Translation, double& Rotation, ZEVector2d& Scale, const ZEMatrix3x3d& Matrix);
 
+		void							FromMatrix3x3(const ZEMatrix3x3& Matrix);
 		ZEMatrix3x3						ToMatrix3x3() const;
 
 		ZEMatrix3x3d					operator+(const ZEMatrix3x3d& RightOperand) const;
@@ -222,6 +223,7 @@ class ZEMatrix4x4d
 		ZEVector3d						GetScale();
 		static void						GetDecomposition(ZEVector3d& Translation, ZEQuaternion& Rotation, ZEVector3d& Scale, const ZEMatrix4x4d& Matrix);
 
+		void							FromMatrix4x4(const ZEMatrix4x4& Matrix);
 		ZEMatrix4x4						ToMatrix4x4() const;
 
 		ZEMatrix4x4d					operator+(const ZEMatrix4x4d& RightOperand) const;
