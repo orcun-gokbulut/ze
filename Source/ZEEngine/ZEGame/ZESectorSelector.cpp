@@ -141,7 +141,7 @@ ZESector* ZESectorSelector::DetermineSector(ZEGeographicEntity* Entity)
 		}
 	}
 
-	zeBreak((ResultSector != NULL) && (ResultSector != ClosestSector));
+//	zeBreak((ResultSector != NULL) && (ResultSector != ClosestSector));
 
 	if (ResultSector == NULL)
 		ResultSector = ClosestSector;
@@ -162,8 +162,11 @@ void ZESectorSelector::SetReferenceSector(ZESector* ReferenceSector)
 		{
 			if (CurrentSector->CheckAdjacency(ReferenceSector, ReferenceSector->GetAdjacencyDepth()))
 			{
-				if (!CurrentSector->IsInitialized())
-					CurrentSector->Initialize();
+				if (!CurrentSector->GetEnabled())
+				{
+					CurrentSector->SetEnabled(true);
+					CurrentSector->SetVisible(true);
+				}
 
 				const ZEMatrix4x4d& InvGeoTransform = ReferenceSector->GetInvGeographicTransform();
 				ZEMatrix4x4d Result;
@@ -174,7 +177,8 @@ void ZESectorSelector::SetReferenceSector(ZESector* ReferenceSector)
 			}
 			else
 			{
-				CurrentSector->Deinitialize();
+				CurrentSector->SetEnabled(false);
+				CurrentSector->SetVisible(false);
 			}
 		}
 		else

@@ -190,8 +190,6 @@ const ZEArray<ZEGUID>& ZESector::GetAdjacentSectorIds() const
 
 bool ZESector::AddAdjacentSector(ZESector* Sector)
 {
-	if (IsInitialized())
-		return false;
 
 	if (Sector == this)
 		return false;
@@ -209,8 +207,6 @@ bool ZESector::AddAdjacentSector(ZESector* Sector)
 
 bool ZESector::RemoveAdjacentSector(ZESector* Sector)
 {
-	if (IsInitialized())
-		return false;
 
 	if (Sector == this)
 		return false;

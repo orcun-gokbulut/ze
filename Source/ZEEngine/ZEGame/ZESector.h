@@ -49,8 +49,8 @@ class ZESector : public ZEGeographicEntity
 		ZEArray<ZEGUID> AdjacentSectorIds;
 		ZEInt8 AdjacencyDepth;
 
-		bool SaveSector(ZEMLWriterNode* Serializer);
-		bool RestoreSector(ZEMLReaderNode* Unserializer);
+		virtual bool SaveSector(ZEMLWriterNode* Serializer);
+		virtual bool RestoreSector(ZEMLReaderNode* Unserializer);
 
 		virtual bool SetOwner(ZEEntity* Owner);
 		virtual bool InitializeSelf();
