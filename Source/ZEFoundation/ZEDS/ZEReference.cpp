@@ -1345,246 +1345,295 @@ ZEReference::ZEReference()
 
 ZEReference::ZEReference(const ZEReference& Value)
 {
+	new (this) ZEReference();
 	SetReference(Value);
 }
 
 ZEReference::ZEReference(ZEInt8& Value)
 {
+	new (this) ZEReference();
 	SetInt8Ref(Value);
 }
 
 ZEReference::ZEReference(ZEInt16& Value)
 {
+	new (this) ZEReference();
 	SetInt16Ref(Value);
 }
 
 ZEReference::ZEReference(ZEInt32& Value)
 {
+	new (this) ZEReference();
 	SetInt32Ref(Value);
 }
 
 ZEReference::ZEReference(ZEInt64& Value)
 {
+	new (this) ZEReference();
 	SetInt64Ref(Value);
 }
 
 ZEReference::ZEReference(ZEUInt8& Value)
 {
+	new (this) ZEReference();
 	SetUInt8Ref(Value);
 }
 
 ZEReference::ZEReference(ZEUInt16& Value)
 {
+	new (this) ZEReference();
 	SetUInt16Ref(Value);
 }
 
 ZEReference::ZEReference(ZEUInt32& Value)
 {
+	new (this) ZEReference();
 	SetUInt32Ref(Value);
 }
 
 ZEReference::ZEReference(ZEUInt64& Value)
 {
+	new (this) ZEReference();
 	SetUInt64Ref(Value);
 }
 
 ZEReference::ZEReference(float& Value)
 {
+	new (this) ZEReference();
 	SetFloatRef(Value);
 }
 
 ZEReference::ZEReference(double& Value)
 {
+	new (this) ZEReference();
 	SetDoubleRef(Value);
 }
 
 ZEReference::ZEReference(bool& Value)
 {
+	new (this) ZEReference();
 	SetBooleanRef(Value);
 }
 
 ZEReference::ZEReference(ZEVector2& Value)
 {
+	new (this) ZEReference();
 	SetVector2Ref(Value);
 }
 
 ZEReference::ZEReference(ZEVector2d& Value)
 {
+	new (this) ZEReference();
 	SetVector2dRef(Value);
 }
 
 ZEReference::ZEReference(ZEVector3& Value)
 {
+	new (this) ZEReference();
 	SetVector3Ref(Value);
 }
 
 ZEReference::ZEReference(ZEVector3d& Value)
 {
+	new (this) ZEReference();
 	SetVector3dRef(Value);
 }
 
 ZEReference::ZEReference(ZEVector4& Value)
 {
+	new (this) ZEReference();
 	SetVector4Ref(Value);
 }
 
 ZEReference::ZEReference(ZEVector4d& Value)
 {
+	new (this) ZEReference();
 	SetVector4dRef(Value);
 }
 
 ZEReference::ZEReference(ZEQuaternion& Value)
 {
+	new (this) ZEReference();
 	SetQuaternionRef(Value);
 }
 
 ZEReference::ZEReference(ZEMatrix3x3& Value)
 {
+	new (this) ZEReference();
 	SetMatrix3x3Ref(Value);
 }
 
 ZEReference::ZEReference(ZEMatrix3x3d& Value)
 {
+	new (this) ZEReference();
 	SetMatrix3x3dRef(Value);
 }
 
 ZEReference::ZEReference(ZEMatrix4x4& Value)
 {
+	new (this) ZEReference();
 	SetMatrix4x4Ref(Value);
 }
 
 ZEReference::ZEReference(ZEMatrix4x4d& Value)
 {
+	new (this) ZEReference();
 	SetMatrix4x4dRef(Value);
 }
 
 ZEReference::ZEReference(ZEObject*& Value)
 {
+	new (this) ZEReference();
 	SetObjectPtrRef(Value);
 }
 
 ZEReference::ZEReference(ZEString& Value)
 {
+	new (this) ZEReference();
 	SetStringRef(Value);
 }
 
 ZEReference::ZEReference(const ZEInt8& Value)
 {
+	new (this) ZEReference();
 	SetInt8ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEInt16& Value)
 {
+	new (this) ZEReference();
 	SetInt16ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEInt32& Value)
 {
+	new (this) ZEReference();
 	SetInt32ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEInt64& Value)
 {
+	new (this) ZEReference();
 	SetInt64ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEUInt8& Value)
 {
+	new (this) ZEReference();
 	SetUInt8ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEUInt16& Value)
 {
+	new (this) ZEReference();
 	SetUInt16ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEUInt32& Value)
 {
+	new (this) ZEReference();
 	SetUInt32ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEUInt64& Value)
 {
+	new (this) ZEReference();
 	SetUInt64ConstRef(Value);
 }
 
 ZEReference::ZEReference(const float& Value)
 {
+	new (this) ZEReference();
 	SetFloatConstRef(Value);
 }
 
 ZEReference::ZEReference(const double& Value)
 {
+	new (this) ZEReference();
 	SetDoubleConstRef(Value);
 }
 
 ZEReference::ZEReference(const bool& Value)
 {
+	new (this) ZEReference();
 	SetBoolConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEVector2& Value)
 {
+	new (this) ZEReference();
 	SetVector2ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEVector2d& Value)
 {
+	new (this) ZEReference();
 	SetVector2dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEVector3& Value)
 {
+	new (this) ZEReference();
 	SetVector3ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEVector3d& Value)
 {
+	new (this) ZEReference();
 	SetVector3dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEVector4& Value)
 {
+	new (this) ZEReference();
 	SetVector4ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEVector4d& Value)
 {
+	new (this) ZEReference();
 	SetVector4dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEQuaternion& Value)
 {
+	new (this) ZEReference();
 	SetQuaternionConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEMatrix3x3& Value)
 {
+	new (this) ZEReference();
 	SetMatrix3x3ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEMatrix3x3d& Value)
 {
+	new (this) ZEReference();
 	SetMatrix3x3dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEMatrix4x4& Value)
 {
+	new (this) ZEReference();
 	SetMatrix4x4ConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEMatrix4x4d& Value)
 {
+	new (this) ZEReference();
 	SetMatrix4x4dConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEObject*& Value)
 {
+	new (this) ZEReference();
 	SetObjectPtrConstRef(Value);
 }
 
 ZEReference::ZEReference(const ZEString& Value)
 {
+	new (this) ZEReference();
 	SetStringConstRef(Value);
 }
 

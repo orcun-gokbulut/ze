@@ -1639,141 +1639,169 @@ ZEVariant::ZEVariant()
 
 ZEVariant::ZEVariant(const ZEVariant& Value)
 {
+	new (this) ZEVariant();
 	SetVariant(Value);
 }
 
 ZEVariant::ZEVariant(const ZEValue& Value)
 {
+	new (this) ZEVariant();
 	SetValue(Value);
 }
 
 ZEVariant::ZEVariant(const ZEReference& Value)
 {
+	new (this) ZEVariant();
 	SetReference(Value);
 }
 
 ZEVariant::ZEVariant(const char* Value)
 {
+	new (this) ZEVariant();
 	SetString(Value);
 }
 
 ZEVariant::ZEVariant(const ZEString& String)
 {
+	new (this) ZEVariant();
 	SetString(String);
 }
 
 ZEVariant::ZEVariant(ZEInt8 Value)
 {
+	new (this) ZEVariant();
 	SetInt32(Value);
 }
 
 ZEVariant::ZEVariant(ZEInt16 Value)
 {
+	new (this) ZEVariant();
 	SetInt16(Value);
 }
 
 ZEVariant::ZEVariant(ZEInt32 Value)
 {
+	new (this) ZEVariant();
 	SetInt32(Value);
 }
 
 ZEVariant::ZEVariant(ZEInt64 Value)
 {
+	new (this) ZEVariant();
 	SetInt64(Value);
 }
 
 ZEVariant::ZEVariant(ZEUInt8 Value)
 {
+	new (this) ZEVariant();
 	SetUInt8(Value);
 }
 
 ZEVariant::ZEVariant(ZEUInt16 Value)
 {
+	new (this) ZEVariant();
 	SetUInt16(Value);
 }
 
 ZEVariant::ZEVariant(ZEUInt32 Value)
 {
+	new (this) ZEVariant();
 	SetUInt32(Value);
 }
 
 ZEVariant::ZEVariant(ZEUInt64 Value)
 {
+	new (this) ZEVariant();
 	SetUInt64(Value);
 }
 
 ZEVariant::ZEVariant(float Value)
 {
+	new (this) ZEVariant();
 	SetFloat(Value);
 }
 
 ZEVariant::ZEVariant(double Value)
 {
+	new (this) ZEVariant();
 	SetDouble(Value);
 }
 
 ZEVariant::ZEVariant(bool Value)
 {
+	new (this) ZEVariant();
 	SetBool(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector2& Value)
 {
+	new (this) ZEVariant();
 	SetVector2(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector2d& Value)
 {
+	new (this) ZEVariant();
 	SetVector2d(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector3& Value)
 {
+	new (this) ZEVariant();
 	SetVector3(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector3d& Value)
 {
+	new (this) ZEVariant();
 	SetVector3d(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector4& Value)
 {
+	new (this) ZEVariant();
 	SetVector4(Value);
 }
 
 ZEVariant::ZEVariant(const ZEVector4d& Value)
 {
+	new (this) ZEVariant();
 	SetVector4d(Value);
 }
 
 ZEVariant::ZEVariant(const ZEQuaternion& Value)
 {
+	new (this) ZEVariant();
 	SetQuaternion(Value);
 }
 
 ZEVariant::ZEVariant(const ZEMatrix3x3& Value)
 {
+	new (this) ZEVariant();
 	SetMatrix3x3(Value);
 }
 
 ZEVariant::ZEVariant(const ZEMatrix3x3d& Value)
 {
+	new (this) ZEVariant();
 	SetMatrix3x3d(Value);
 }
 
 ZEVariant::ZEVariant(const ZEMatrix4x4& Matrix)
 {
+	new (this) ZEVariant();
 	SetMatrix4x4(Matrix);
 }
 
 ZEVariant::ZEVariant(const ZEMatrix4x4d& Matrix)
 {
+	new (this) ZEVariant();
 	SetMatrix4x4d(Matrix);
 }
 
 ZEVariant::ZEVariant(ZEClass* Class)
 {
+	new (this) ZEVariant();
 	SetClass(Class);
 }
 

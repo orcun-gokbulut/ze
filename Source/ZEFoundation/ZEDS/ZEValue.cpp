@@ -1603,131 +1603,157 @@ ZEValue::ZEValue()
 
 ZEValue::ZEValue(const ZEValue& Value)
 {
+	new (this) ZEValue();
 	SetValue(Value);
 }
 
 ZEValue::ZEValue(const char* Value)
 {
+	new (this) ZEValue();
 	SetString(Value);
 }
 
 ZEValue::ZEValue(const ZEString& String)
 {
+	new (this) ZEValue();
 	SetString(String);
 }
 
 ZEValue::ZEValue(ZEInt8 Value)
 {
+	new (this) ZEValue();
 	SetInt8(Value);
 }
 
 ZEValue::ZEValue(ZEInt16 Value)
 {
+	new (this) ZEValue();
 	SetInt16(Value);
 }
 
 ZEValue::ZEValue(ZEInt32 Value)
 {
+	new (this) ZEValue();
 	SetInt32(Value);
 }
 
 ZEValue::ZEValue(ZEInt64 Value)
 {
+	new (this) ZEValue();
 	SetInt64(Value);
 }
 
 ZEValue::ZEValue(ZEUInt8 Value)
 {
+	new (this) ZEValue();
 	SetUInt8(Value);
 }
 
 ZEValue::ZEValue(ZEUInt16 Value)
 {
+	new (this) ZEValue();
 	SetUInt16(Value);
 }
 
 ZEValue::ZEValue(ZEUInt32 Value)
 {
+	new (this) ZEValue();
 	SetUInt32(Value);
 }
 
 ZEValue::ZEValue(ZEUInt64 Value)
 {
+	new (this) ZEValue();
 	SetUInt64(Value);
 }
 
 ZEValue::ZEValue(float Value)
 {
+	new (this) ZEValue();
 	SetFloat(Value);
 }
 
 ZEValue::ZEValue(double Value)
 {
+	new (this) ZEValue();
 	SetDouble(Value);
 }
 
 ZEValue::ZEValue(bool Value)
 {
+	new (this) ZEValue();
 	SetBoolean(Value);
 }
 
 ZEValue::ZEValue(const ZEVector2& Vector)
 {
+	new (this) ZEValue();
 	SetVector2(Vector);
 }
 
 ZEValue::ZEValue(const ZEVector2d& Vector)
 {
+	new (this) ZEValue();
 	SetVector2d(Vector);
 }
 
 ZEValue::ZEValue(const ZEVector3& Vector)
 {
+	new (this) ZEValue();
 	SetVector3(Vector);
 }
 
 ZEValue::ZEValue(const ZEVector3d& Vector)
 {
+	new (this) ZEValue();
 	SetVector3d(Vector);
 }
 
 ZEValue::ZEValue(const ZEVector4& Vector)
 {
+	new (this) ZEValue();
 	SetVector4(Vector);
 }
 
 ZEValue::ZEValue(const ZEVector4d& Vector)
 {
+	new (this) ZEValue();
 	SetVector4d(Vector);
 }
 
 ZEValue::ZEValue(const ZEQuaternion& Quaternion)
 {
+	new (this) ZEValue();
 	SetQuaternion(Quaternion);
 }
 
 ZEValue::ZEValue(const ZEMatrix3x3& Matrix)
 {
+	new (this) ZEValue();
 	SetMatrix3x3(Matrix);
 }
 
 ZEValue::ZEValue(const ZEMatrix3x3d& Matrix)
 {
+	new (this) ZEValue();
 	SetMatrix3x3d(Matrix);
 }
 
 ZEValue::ZEValue(const ZEMatrix4x4& Matrix)
 {
+	new (this) ZEValue();
 	SetMatrix4x4(Matrix);
 }
 
 ZEValue::ZEValue(const ZEMatrix4x4d& Matrix)
 {
+	new (this) ZEValue();
 	SetMatrix4x4d(Matrix);
 }
 
 ZEValue::ZEValue(ZEObject* Class)
 {
+	new (this) ZEValue();
 	SetClass(Class);
 }
 
