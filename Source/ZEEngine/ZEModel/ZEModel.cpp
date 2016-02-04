@@ -396,13 +396,11 @@ void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (!IsStaticModel || !StaticCalculationsDone)
-	{
-		if (!BoundingBoxIsUserDefined)
-			CalculateBoundingBox();
+	if (BoundingBoxIsUserDefined)
+		return ZEEntity::GetWorldBoundingBox();
 
-		StaticCalculationsDone = IsStaticModel;
-	}
+	if (!IsStaticModel || GetDirtyFlags().GetFlags(ZE_EDF_WORLD_TRANSFORM))
+		CalculateBoundingBox();
 
 	return ZEEntity::GetWorldBoundingBox();
 }
@@ -592,7 +590,6 @@ ZEModel::ZEModel()
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
 	IsStaticModel = false;
-	StaticCalculationsDone = false;
 
 	memset(&Statistics, 0, sizeof(ZEModelStatistics));
 }

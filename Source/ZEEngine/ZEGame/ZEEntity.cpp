@@ -224,6 +224,11 @@ ZEEntity::~ZEEntity()
 		ChildEntities[I]->Destroy();
 }
 
+ZEEntityDirtyFlags ZEEntity::GetDirtyFlags() const
+{
+	return EntityDirtyFlags;
+}
+
 ZEDrawFlags ZEEntity::GetDrawFlags() const
 {
 	return ZE_DF_NONE;

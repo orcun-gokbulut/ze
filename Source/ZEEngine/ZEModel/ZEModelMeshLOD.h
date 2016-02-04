@@ -59,10 +59,6 @@ class ZEModelMeshLOD
 		const ZEMaterial*					Material;
 		bool								Skinned;
 
-		bool								StaticCalculationsDone;
-		ZEMatrix4x4							StaticTransform;
-		ZEArray<ZEMatrix4x4>				StaticSkinnedTransforms;
-
 	public:
 		void								ResetMaterial();
 		void								SetMaterial(const ZEMaterial* Material);
