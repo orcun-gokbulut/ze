@@ -98,7 +98,6 @@ class ZEModel : public ZEEntity
 
 		bool								BoundingBoxIsUserDefined;
 		bool								IsStaticModel;
-		mutable bool						StaticCalculationsDone;
 
 		void								CalculateBoundingBox() const;
 		void								UpdateTransforms();
@@ -120,6 +119,7 @@ class ZEModel : public ZEEntity
 		virtual const ZEModelStatistics&	GetStatistics() const;
 
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
+
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
 
 		void								SetStaticModel(bool Value);

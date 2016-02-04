@@ -152,6 +152,7 @@ class ZEEntity : public ZEObject
 		ZEString								GetName() const;
 
 		virtual ZEDrawFlags						GetDrawFlags() const;
+		virtual ZEEntityDirtyFlags				GetDirtyFlags() const;
 
 		const ZEArray<ZEEntity*>&				GetChildEntities() const;
 		bool									AddChildEntity(ZEEntity* Entity);
