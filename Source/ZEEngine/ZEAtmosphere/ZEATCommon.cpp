@@ -34,3 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEATCommon.h"
+
+ZEATObserver::ZEATObserver()
+{
+	Time.Hour = 12;
+	Time.Minute = 00;
+	Time.Day = 1;
+	Time.Month = 1;
+	Time.Year = 2016;
+	Time.TimeZone = 2;
+	Time.DeltaT = 67.9547;
+	Space.Elevation = 850.0;
+	Space.Longtitude = 39.933333;
+	Space.Latitude = 32.866667;
+	Space.AnnualPressure = 913;
+	Space.AnnualTemperature = 11.7;
+}

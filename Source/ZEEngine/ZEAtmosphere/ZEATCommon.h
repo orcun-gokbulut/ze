@@ -48,17 +48,18 @@ struct ZEATObserver
 		ZEInt	Year;
 		ZEInt	TimeZone;
 		double	DeltaT;
-	}Time;
+	} Time;
 
 	struct
 	{
 		double	Elevation;
 		double	Longtitude;
 		double	Latitude;
-
 		double	AnnualPressure;
 		double	AnnualTemperature;
-	}Space;
+	} Space;
+
+	ZEATObserver();
 };
 
 struct ZEATJulian
