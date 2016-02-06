@@ -38,6 +38,7 @@
 #include "ZEGraphics\ZEGRContext.h"
 #include "ZEGraphics\ZEGRShaderCompileOptions.h"
 #include "ZEGraphics\ZEGRShader.h"
+#include "ZEGraphics\ZEGRSampler.h"
 #include "ZEGraphics\ZEGRRenderState.h"
 #include "ZEGraphics\ZEGRConstantBuffer.h"
 #include "ZEMath\ZEMath.h"
@@ -63,9 +64,12 @@ bool ZERNFilter::InitializeSelf()
 
 	DirtyFlags.RaiseAll();
 
-	SamplerPointClamp.SetMinFilter(ZEGR_TFM_POINT);
-	SamplerPointClamp.SetMagFilter(ZEGR_TFM_POINT);
-	SamplerPointClamp.SetMipFilter(ZEGR_TFM_POINT);
+	ZEGRSamplerDescription SamplerDescription;
+	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
+
+	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescription);
 
 	return Update();
 }
@@ -78,22 +82,22 @@ void ZERNFilter::DeinitializeSelf()
 	ConstantBuffer.Release();
 }
 
-void ZERNFilter::SetInput(ZEGRTexture2D* Input)
+void ZERNFilter::SetInput(const ZEGRTexture2D* Input)
 {
 	this->Input = Input;
 }
 
-ZEGRTexture2D* ZERNFilter::GetInput() const
+const ZEGRTexture2D* ZERNFilter::GetInput() const
 {
 	return Input;
 }
 
-void ZERNFilter::SetOutput(ZEGRRenderTarget* Output)
+void ZERNFilter::SetOutput(const ZEGRRenderTarget* Output)
 {
 	this->Output = Output;
 }
 
-ZEGRRenderTarget* ZERNFilter::GetOutput() const
+const ZEGRRenderTarget* ZERNFilter::GetOutput() const
 {
 	return Output;
 }
@@ -240,7 +244,7 @@ void ZERNFilter::Process(ZEGRContext* Context)
 	if(!Update())
 		return;
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointClamp.GetPointer());
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, Input);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);

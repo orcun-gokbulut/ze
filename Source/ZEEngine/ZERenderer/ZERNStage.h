@@ -36,13 +36,15 @@
 #pragma once
 
 #include "ZEInitializable.h"
-#include "ZEDS\ZEString.h"
-#include "ZEDS\ZEList2.h"
+
+#include "ZETypes.h"
 
 class ZEGRContext;
 class ZERNRenderer;
 class ZEGRRenderState;
 class ZERNCommand;
+class ZEString;
+template<typename Type> class ZEList2;
 
 class ZERNStage : public ZEInitializable
 {
@@ -60,13 +62,13 @@ class ZERNStage : public ZEInitializable
 
 		ZERNRenderer*					GetOwnerRenderer() const;
 
-		virtual ZEInt					GetId() = 0;
-		virtual const ZEString&			GetName() = 0;
+		virtual ZEInt					GetId() const = 0;
+		virtual const ZEString&			GetName() const = 0;
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 										ZERNStage();
 
-		static const ZEGRRenderState&	GetRenderState();
+		static ZEGRRenderState			GetRenderState();
 };

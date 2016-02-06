@@ -35,39 +35,30 @@
 
 #pragma once
 
+#include "ZEPointer/ZEReferenceCounted.h"
+
 #include "ZETypes.h"
-#include "ZEDS/ZEList.h"
+#include "ZEDS/ZEList2.h"
 #include "ZEGraphics/ZEGRBlendState.h"
-#include "ZEGraphics/ZEGRSamplerState.h"
-#include "ZEGraphics/ZEGRDepthStencilState.h"
-#include "ZEGraphics/ZEGRRasterizerState.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEGraphics/ZEGRRasterizerState.h"
+#include "ZEGraphics/ZEGRDepthStencilState.h"
 
 struct IUnknown;
 struct ID3D11BlendState;
-struct ID3D11SamplerState;
 struct ID3D11DepthStencilState;
 struct ID3D11RasterizerState;
 struct ID3D11InputLayout;
 
-class ZED11StateBase : public ZEListItem, public ZEGRResource
+class ZED11StateBase : public ZEReferenceCounted
 {
-	friend class ZED11RenderStateData;
-	private:
-		ZESize						ReferenceCount;
-
-		void						AddRef();
-		void						Release();
-
 	protected:
 									ZED11StateBase();
-									~ZED11StateBase();
+		virtual						~ZED11StateBase();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType();
-		ZESize						GetReferenceCount();
-		virtual IUnknown*			GetInterfaceBase() = 0;
-		virtual const ZEGRState&	GetStateBase() = 0;
+		virtual IUnknown*			GetInterfaceBase() const = 0;
+		virtual const ZEGRState&	GetStateBase() const = 0;
 };
 
 template<typename _ZEGRState, typename _IInterface>
@@ -75,45 +66,47 @@ class ZED11State : public ZED11StateBase
 {
 	friend class ZED11StatePool;
 	private:
+		ZELink<ZED11StateBase>*		Link;
+		const ZED11StatePool*		Owner;
+
 		_IInterface*				Interface;
 		_ZEGRState					State;
 
 	public:
-		virtual IUnknown*			GetInterfaceBase();
-		virtual const ZEGRState&	GetStateBase();
-		_IInterface*				GetInterface();
-		const _ZEGRState&			GetState();
+		virtual IUnknown*			GetInterfaceBase() const;
+		virtual const ZEGRState&	GetStateBase() const;
+		_IInterface*				GetInterface() const;
+		const _ZEGRState&			GetState() const;
 
 									ZED11State();
-									~ZED11State();
+		virtual						~ZED11State();
 };
 
 typedef ZED11State<ZEGRBlendState, ID3D11BlendState> ZED11BlendState;
-typedef ZED11State<ZEGRSamplerState, ID3D11SamplerState> ZED11SamplerState;
 typedef ZED11State<ZEGRDepthStencilState, ID3D11DepthStencilState> ZED11DepthStencilState;
 typedef ZED11State<ZEGRRasterizerState, ID3D11RasterizerState> ZED11RasterizerState;
 typedef ZED11State<ZEGRVertexLayout,ID3D11InputLayout> ZED11VertexLayout;
 
 template<typename _ZEGRState, typename _IInterface>
-IUnknown* ZED11State<_ZEGRState, _IInterface>::GetInterfaceBase() 
+IUnknown* ZED11State<_ZEGRState, _IInterface>::GetInterfaceBase() const
 {
 	return Interface;
 }
 
 template<typename _ZEGRState, typename _IInterface>
-const ZEGRState& ZED11State<_ZEGRState, _IInterface>::GetStateBase()
+const ZEGRState& ZED11State<_ZEGRState, _IInterface>::GetStateBase() const
 {
 	return State;
 }
 
 template<typename _ZEGRState, typename _IInterface>
-_IInterface* ZED11State<_ZEGRState, _IInterface>::GetInterface() 
+_IInterface* ZED11State<_ZEGRState, _IInterface>::GetInterface() const
 {
 	return Interface;
 }
 
 template<typename _ZEGRState, typename _IInterface>
-const _ZEGRState& ZED11State<_ZEGRState, _IInterface>::GetState()
+const _ZEGRState& ZED11State<_ZEGRState, _IInterface>::GetState() const
 {
 	return State;
 }
@@ -122,11 +115,31 @@ template<typename _ZEGRState, typename _IInterface>
 ZED11State<_ZEGRState, _IInterface>::ZED11State()
 {
 	Interface = NULL;
+	Link = new ZELink<ZED11StateBase>(this);
 }
 
 template<typename _ZEGRState, typename _IInterface>
 ZED11State<_ZEGRState, _IInterface>::~ZED11State() 
 {
-	if (Interface != NULL) 
-		Interface->Release();
+	ZEGRStateType StateType = this->GetState().GetStateType();
+
+	switch (StateType)
+	{
+	case ZEGRStateType::ZEGR_ST_VERTEX_LAYOUT:
+		Owner->VertexLayoutPool.Remove(Link);
+		break;
+	case ZEGRStateType::ZEGR_ST_RASTERIZER:
+		Owner->RasterizerStatePool.Remove(Link);
+		break;
+	case ZEGRStateType::ZEGR_ST_DEPTH_STENCIL:
+		Owner->DepthStencilStatePool.Remove(Link);
+		break;
+	case ZEGRStateType::ZEGR_ST_BLEND:
+		Owner->BlendStatePool.Remove(Link);
+		break;
+	default:
+		break;
+	}
+
+	ZEGR_RELEASE(Interface);
 }

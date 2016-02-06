@@ -94,19 +94,19 @@ void ZERNStageTextureOutput::SetInputs(ZEGRTexture** Inputs, ZESize Count)
 	memcpy(&InputTextures[0], &Inputs[0], sizeof(ZEGRTexture*) * Count);
 }
 
-ZEGRTexture** ZERNStageTextureOutput::GetInputs()
+const ZEGRTexture*const* ZERNStageTextureOutput::GetInputs() const
 {
 	return &InputTextures[0];
 }
 
-void ZERNStageTextureOutput::SetViewports(ZEGRViewport* Viewports, ZESize Count)
+void ZERNStageTextureOutput::SetViewports(const ZEGRViewport* Viewports, ZESize Count)
 {
 	zeDebugCheck(Count > ZEGR_MAX_VIEWPORT_SLOT, "Count is too much");
 
 	memcpy(this->Viewports, Viewports, sizeof(ZEGRViewport) * Count);
 }
 
-const ZEGRViewport* ZERNStageTextureOutput::GetViewport() const
+const ZEGRViewport* ZERNStageTextureOutput::GetViewports() const
 {
 	return Viewports;
 }
@@ -127,12 +127,12 @@ ZERNStageTextureOutput::ZERNStageTextureOutput()
 	AutoSplit = true;
 }
 
-ZEInt ZERNStageTextureOutput::GetId()
+ZEInt ZERNStageTextureOutput::GetId() const
 {
 	return ZERN_STAGE_TEXTURE_OUTPUT;
 }
 
-const ZEString& ZERNStageTextureOutput::GetName()
+const ZEString& ZERNStageTextureOutput::GetName() const
 {
 	static ZEString Name = "Texture Output";
 	return Name;
@@ -174,11 +174,11 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 	ZEUInt Count = (ZEUInt)InputTextures.GetCount();
 	for(ZEUInt I = 0; I < Count; I++)
 	{
-		ZEGRTexture* Texture = InputTextures[I];
+		const ZEGRTexture* Texture = InputTextures[I];
 		Context->SetTexture(ZEGR_ST_PIXEL, 5, Texture);
 		if(Texture->GetTextureType() == ZEGR_TT_2D)
 		{
-			ZEGRTexture2D* Texture2D = static_cast<ZEGRTexture2D*>(Texture);
+			const ZEGRTexture2D* Texture2D = static_cast<const ZEGRTexture2D*>(Texture);
 			if(Texture2D->GetArrayCount() > 1)
 			{
 				Constants.TextureIndex = I;

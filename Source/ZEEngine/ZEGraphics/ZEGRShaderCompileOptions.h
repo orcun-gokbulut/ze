@@ -35,13 +35,10 @@
 
 #pragma once
 
-#include "ZEGRDefinitions.h"
-
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
-
-struct ZEGRShaderMeta;
+#include "ZEGRDefinitions.h"
 
 #define ZEGR_SCF_DEBUG
 #define ZEGR_SCF_STRIPT
@@ -51,8 +48,8 @@ struct ZEGRShaderDefinition
 	ZEString		Name;
 	ZEString		Value;
 
-					ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value = "");
 					ZEGRShaderDefinition();
+					ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value = "");
 };
 
 struct ZEGRShaderCompileOptions

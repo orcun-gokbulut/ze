@@ -54,6 +54,7 @@ class ZEGRVertexLayout;
 class ZEGRContext;
 class ZEGRWindow;
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRShaderCompiler;
 class ZEGRConstantBuffer;
 class ZEGRTracer;
@@ -89,6 +90,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRAdapter*					GetCurrentAdapter() = 0;
 		virtual ZEGRContext*					GetMainContext() = 0;
 
+		virtual ZEGRSampler*					CreateSamplerState() = 0;
 		virtual ZEGROutput*						CreateOutput() = 0;
 		virtual ZEGRContext*					CreateContext() = 0;
 		virtual ZEGRVertexBuffer*				CreateVertexBuffer() = 0;

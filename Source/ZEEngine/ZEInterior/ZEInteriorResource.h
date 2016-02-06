@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZECore/ZEResource.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
@@ -42,7 +44,6 @@
 #include "ZEMath/ZERectangle3D.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDefinitions.h"
-#include "ZECore/ZEResource.h"
 #include "ZESpatial/ZEOctree.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
 
@@ -50,8 +51,8 @@ class ZERNMaterial;
 class ZEMLReaderNode;
 class ZEGRTexture2D;
 class ZETexture2DResource;
-struct ZEInteriorResourceDoor;
 class ZEGRVertexLayout;
+struct ZEInteriorResourceDoor;
 
 enum ZEInteriorResourceHelperOwnerType
 {
@@ -144,7 +145,7 @@ class ZEInteriorResource : public ZEResource
 {
 	private:
 		ZEArray<ZETexture2DResource*>				TextureResources;
-		ZEArray<ZERNMaterial*>						Materials;
+		ZEArray<ZEHolder<ZERNMaterial>>				Materials;
 		ZEArray<ZEInteriorResourceDoor>				Doors;
 		ZEArray<ZEInteriorResourceRoom>				Rooms;
 		ZEArray<ZEInteriorResourceHelper>			Helpers;
@@ -163,7 +164,7 @@ class ZEInteriorResource : public ZEResource
 		const char*									GetResourceType() const;
 
 		const ZEArray<ZETexture2DResource*>&		GetTextures() const;
-		const ZEArray<ZERNMaterial*>&				GetMaterials() const;
+		const ZEArray<ZEHolder<ZERNMaterial>>&		GetMaterials() const;
 		const ZEArray<ZEInteriorResourceRoom>&		GetRooms() const;
 		const ZEArray<ZEInteriorResourceDoor>&		GetDoors() const;
 		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers() const;

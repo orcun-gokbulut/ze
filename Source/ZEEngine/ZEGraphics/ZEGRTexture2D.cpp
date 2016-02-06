@@ -69,7 +69,7 @@ ZEVector2 ZEGRTexture2D::GetPixelSize() const
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil)
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -97,7 +97,7 @@ ZEGRTexture2D::ZEGRTexture2D()
 	ArrayCount = 1;
 };
 
-ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil)
+ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
@@ -111,7 +111,7 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Heigh
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, ArrayCount, LevelCount, Format, RenderTarget, DepthStencil))
+	if (!Texture->Initialize(Width, Height, ArrayCount, LevelCount, SampleCount, Format, RenderTarget, DepthStencil, UAV))
 	{
 		Texture->Destroy();
 		return NULL;

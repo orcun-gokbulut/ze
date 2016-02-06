@@ -36,14 +36,16 @@
 #pragma once
 
 #include "ZERNStage.h"
+
+#include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEGraphics/ZEGRSamplerState.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEDS/ZEFlags.h"
+#include "ZEPointer/ZESharedPointer.h"
 
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
 class ZEGRStructuredBuffer;
@@ -72,10 +74,10 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		DeferredRenderState;
 		ZEHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 
-		ZEHolder<ZEGRStructuredBuffer>	LightStructuredBuffer;
-		ZEHolder<ZEGRStructuredBuffer>	TileStructuredBuffer;
+		ZEHolder<ZEGRStructuredBuffer>		LightStructuredBuffer;
+		ZEHolder<ZEGRStructuredBuffer>		TileStructuredBuffer;
 		ZEHolder<ZEGRConstantBuffer>		LightConstantBuffer;
-		ZEHolder<ZEGRVertexBuffer>		LightVertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			LightVertexBuffer;
 
 		struct LightStruct
 		{
@@ -111,15 +113,15 @@ class ZERNStageLighting : public ZERNStage
 		ZEArray<ZELight*>					Lights;
 		ZEArray<TileStruct>					Tiles;
 
-		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
 		ZEVector2							OffsetVectors[16];
 
-		ZEGRRenderTarget*					OutputRenderTarget;
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
-		ZEGRSamplerState					SamplerLinearBorder;
-		ZEGRSamplerState					SamplerComparisonLinearBorder;
-		ZEGRSamplerState					SamplerPointWrap;
-		ZEGRSamplerState					SamplerPointBorder;
+		ZESharedPointer<ZEGRSampler>		SamplerLinearBorder;
+		ZESharedPointer<ZEGRSampler>		SamplerComparisonLinearBorder;
+		ZESharedPointer<ZEGRSampler>		SamplerPointWrap;
+		ZESharedPointer<ZEGRSampler>		SamplerPointBorder;
 
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;
@@ -154,18 +156,18 @@ class ZERNStageLighting : public ZERNStage
 		virtual void						DeinitializeSelf();
 
 	public:
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
+
 		void								SetTiledDeferred(bool UseTileDeferred);
 		bool								GetTiledDefferred() const;
 
 		void								SetShowCascades(bool ShowCascades);
 		bool								GetShowCascades() const;
 
-											ZERNStageLighting();
-
-		virtual ZEInt						GetId();
-		virtual const ZEString&				GetName();
-
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+											ZERNStageLighting();
 
 };

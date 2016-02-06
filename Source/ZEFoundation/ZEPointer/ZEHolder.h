@@ -42,7 +42,7 @@ template<typename Type>
 class ZEHolder
 {
 	private:
-		ZEReferenceCounted* Pointer;
+		Type* Pointer;
 
 	public:
 		bool IsNull() const;
@@ -86,14 +86,14 @@ class ZEHolder
 
 		ZEHolder();
 		ZEHolder(Type* RawPointer);
-		explicit ZEHolder(const ZEHolder<Type>& OtherHolder);
+		ZEHolder(const ZEHolder<Type>& OtherHolder);
 		~ZEHolder();
 };
 
 template<typename Type>
 void ZEHolder<Type>::Assign(Type* RawPointer)
 {
-	if (reinterpret_cast<Type*>(Pointer) == RawPointer)
+	if (Pointer == RawPointer)
 		return;
 
 	Release();
@@ -101,8 +101,8 @@ void ZEHolder<Type>::Assign(Type* RawPointer)
 	if (RawPointer == NULL)
 		return;
 
-	Pointer = (ZEReferenceCounted*)RawPointer;
-	Pointer->Reference();
+	Pointer = RawPointer;
+	reinterpret_cast<const ZEReferenceCounted*>(Pointer)->Reference();
 }
 
 template<typename Type>
@@ -121,7 +121,7 @@ template<typename Type>
 void ZEHolder<Type>::Release()
 {
 	if (Pointer != NULL)
-		Pointer->Release();
+		reinterpret_cast<const ZEReferenceCounted*>(Pointer)->Release();
 
 	Pointer = NULL;
 }

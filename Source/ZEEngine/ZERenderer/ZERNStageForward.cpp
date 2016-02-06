@@ -34,43 +34,33 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStageForward.h"
+
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics/ZEGROutput.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-
-ZEInt ZERNStageForward::GetId()
-{
-	return ZERN_STAGE_FORWARD;
-}
-
-const ZEString& ZERNStageForward::GetName()
-{
-	static ZEString Name = "Forward";
-
-	return Name;
-}
-
-const ZEGRRenderState& ZERNStageForward::GetRenderState()
-{
-	static ZEGRRenderState RenderState;
-	static bool Initialized = false;
-	if (!Initialized)
-	{
-		Initialized = true;
-
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
-		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
-	}
-
-	return RenderState;
-}
+#include "ZEGraphics/ZEGRRenderTarget.h"
 
 bool ZERNStageForward::InitializeSelf()
 {
 	return true;
+}
+
+void ZERNStageForward::DeinitializeSelf()
+{
+}
+
+ZEInt ZERNStageForward::GetId() const
+{
+	return ZERN_STAGE_FORWARD;
+}
+
+const ZEString& ZERNStageForward::GetName() const
+{
+	static ZEString Name = "Forward";
+
+	return Name;
 }
 
 bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
@@ -85,10 +75,10 @@ bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	if(DepthMap == NULL || DepthMap->GetWidth() != Width || DepthMap->GetHeight() != Height)
 	{
 		DepthMap.Release();
-		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
+		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
 	}
 
-	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
+	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.0f, 0.5f, 0.0f, 1.0f));
 	Context->ClearDepthStencilBuffer(DepthMap->GetDepthStencilBuffer(), true, true, 1.0f, 0x00);
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
@@ -102,19 +92,41 @@ void ZERNStageForward::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 
+ZERNStageForward::ZERNStageForward()
+{
+}
 
-ZEInt ZERNStageForwardTransparent::GetId()
+ZEGRRenderState ZERNStageForward::GetRenderState()
+{
+	static ZEGRRenderState RenderState;
+	static bool Initialized = false;
+	if (!Initialized)
+	{
+		Initialized = true;
+
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
+	}
+
+	return RenderState;
+}
+
+ZEInt ZERNStageForwardTransparent::GetId() const
 {
 	return ZERN_STAGE_FORWARD_TRANSPARENT;
 }
 
-const ZEString& ZERNStageForwardTransparent::GetName()
+const ZEString& ZERNStageForwardTransparent::GetName() const
 {
 	static ZEString Name = "ForwardTransparent";
 	return Name;
 }
 
-const ZEGRRenderState& ZERNStageForwardTransparent::GetRenderState()
+ZERNStageForwardTransparent::ZERNStageForwardTransparent()
+{
+}
+
+ZEGRRenderState ZERNStageForwardTransparent::GetRenderState()
 {
 	return ZERNStageForward::GetRenderState();
 }

@@ -41,7 +41,7 @@
 #define ZE_DEBUG_D3D11_DEBUG_SHADERS
 
 #ifdef ZE_DEBUG_D3D11_DEBUG_SHADERS
-	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_OPTIMIZATION_LEVEL0 /*D3DCOMPILE_SKIP_OPTIMIZATION*/ | D3DCOMPILE_DEBUG)
+	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_SKIP_OPTIMIZATION | D3DCOMPILE_DEBUG)
 #else
 	#define ZE_SHADER_COMPILER_PARAMETERS		(ZE_SHADER_COMPILER_DEFAULT_PARAMETERS | D3DCOMPILE_OPTIMIZATION_LEVEL3)
 #endif
@@ -127,9 +127,6 @@ bool ZED11ShaderCompiler::PrepareOptions(const ZEGRShaderCompileOptions& Options
 {
 	zeDebugCheck(Options.SourceData.IsEmpty(), "No shader source available.");
 	zeDebugCheck(Options.EntryPoint.IsEmpty(), "Shader entry point is not available");
-	//zeDebugCheck(Options.Type == ZEGR_ST_COMPUTE, "Shader type is not supported.");
-	zeDebugCheck(Options.Type == ZEGR_ST_DOMAIN, "Shader type is not supported.");
-	zeDebugCheck(Options.Type == ZEGR_ST_HULL, "Shader type is not supported.");
 	zeDebugCheck(Options.Model < ZEGR_SM_4_0, "Shader model is not supported by this module.");
 	
 	// Decide shader type
@@ -206,10 +203,8 @@ bool ZED11ShaderCompiler::PrepareOptions(const ZEGRShaderCompileOptions& Options
 
 ZED11ShaderCompiler::ZED11ShaderCompiler()
 {
-
 }
 
 ZED11ShaderCompiler::~ZED11ShaderCompiler()
 {
-
 }

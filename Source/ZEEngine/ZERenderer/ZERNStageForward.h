@@ -38,30 +38,37 @@
 #include "ZERNStage.h"
 
 #include "ZEPointer/ZEHolder.h"
-#include "ZEGraphics\ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 
 class ZEGRTexture2D;
 
 class ZERNStageForward : public ZERNStage
 {
 	private:
-		ZEHolder<ZEGRTexture2D>		DepthMap;
+		ZEHolder<ZEGRTexture2D>			DepthMap;
 
 		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
 	public:
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
-		static  const ZEGRRenderState&	GetRenderState();
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+										ZERNStageForward();
+
+		static ZEGRRenderState			GetRenderState();
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
 	public:
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
-		static const ZEGRRenderState&	GetRenderState();
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
+
+										ZERNStageForwardTransparent();
+
+		static ZEGRRenderState			GetRenderState();
 };

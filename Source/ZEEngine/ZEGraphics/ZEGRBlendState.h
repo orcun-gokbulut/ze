@@ -75,45 +75,45 @@ class ZEGRBlendRenderTarget
 	private:
 		struct ZEBlendStateData
 		{
-			bool					BlendEnable : 1;
-			ZEGRBlendOperation		Operation : 4;
-			ZEGRBlend				Source : 6;
-			ZEGRBlend				Destination : 6;
-			ZEGRBlendOperation		AlphaOperation : 4;
-			ZEGRBlend				SourceAlpha : 6;
-			ZEGRBlend				DestinationAlpha : 6;
-			ZEGRColorMask			WriteMask;
+			bool						BlendEnable : 1;
+			ZEGRBlendOperation			Operation : 4;
+			ZEGRBlend					Source : 6;
+			ZEGRBlend					Destination : 6;
+			ZEGRBlendOperation			AlphaOperation : 4;
+			ZEGRBlend					SourceAlpha : 6;
+			ZEGRBlend					DestinationAlpha : 6;
+			ZEGRColorMask				WriteMask;
 		} StateData;
 
 	public:
-		void						SetBlendEnable(bool Enabled);
-		bool						GetBlendEnable() const;
+		void							SetBlendEnable(bool Enabled);
+		bool							GetBlendEnable() const;
 
-		void						SetOperation(ZEGRBlendOperation Equation);
-		ZEGRBlendOperation			GetOperation() const;
+		void							SetOperation(ZEGRBlendOperation Equation);
+		ZEGRBlendOperation				GetOperation() const;
 
-		void						SetSource(ZEGRBlend Option);
-		ZEGRBlend					GetSource() const;
+		void							SetSource(ZEGRBlend Option);
+		ZEGRBlend						GetSource() const;
 
-		void						SetDestination(ZEGRBlend Option);
-		ZEGRBlend					GetDestination() const;
+		void							SetDestination(ZEGRBlend Option);
+		ZEGRBlend						GetDestination() const;
 
-		void						SetAlphaOperation(ZEGRBlendOperation Equation);
-		ZEGRBlendOperation			GetAlphaOperation() const;
+		void							SetAlphaOperation(ZEGRBlendOperation Equation);
+		ZEGRBlendOperation				GetAlphaOperation() const;
 
-		void						SetSourceAlpha(ZEGRBlend Option);
-		ZEGRBlend					GetSourceAlpha() const;
+		void							SetSourceAlpha(ZEGRBlend Option);
+		ZEGRBlend						GetSourceAlpha() const;
 
-		void						SetDestinationAlpha(ZEGRBlend Option);
-		ZEGRBlend					GetDestinationAlpha() const;
+		void							SetDestinationAlpha(ZEGRBlend Option);
+		ZEGRBlend						GetDestinationAlpha() const;
 
-		void						SetWriteMask(ZEGRColorMask Mask);
-		ZEGRColorMask				GetWriteMask() const;
+		void							SetWriteMask(ZEGRColorMask Mask);
+		ZEGRColorMask					GetWriteMask() const;
 
-		void						SetToDefault();
+		void							SetToDefault();
 
-									ZEGRBlendRenderTarget();
-									~ZEGRBlendRenderTarget();
+										ZEGRBlendRenderTarget();
+										~ZEGRBlendRenderTarget();
 };
 
 
@@ -122,30 +122,31 @@ class ZEGRBlendState : public ZEGRState
 	private:
 		struct ZEGRBlendStateData
 		{
-			bool					BlendEnable;
-			bool					IndividualBlendEnable;
-			bool					AlphaToCoverageEnable;
-			ZEGRBlendRenderTarget	RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+			bool						BlendEnable;
+			bool						IndividualBlendEnable;
+			bool						AlphaToCoverageEnable;
+			ZEGRBlendRenderTarget		RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
 		} StateData;
 		
 	public:
-		virtual const void*			GetData() const;
-		virtual ZESize				GetDataSize() const;
+		virtual ZEGRStateType			GetStateType() const;
+		virtual const void*				GetData() const;
+		virtual ZESize					GetDataSize() const;
 
-		void						SetBlendEnable(bool Enable);
-		bool						GetBlendEnable() const;
+		void							SetBlendEnable(bool Enable);
+		bool							GetBlendEnable() const;
 
-		void						SetIndividualBlendEnable(bool Enable);
-		bool						GetIndividualBlendEnable() const;
+		void							SetIndividualBlendEnable(bool Enable);
+		bool							GetIndividualBlendEnable() const;
 
-		void						SetAlphaToCoverageEnable(bool Enable);
-		bool						GetAlphaToCoverageEnable() const;
+		void							SetAlphaToCoverageEnable(bool Enable);
+		bool							GetAlphaToCoverageEnable() const;
 
-		void						SetRenderTargetBlend(ZEUInt Index, const ZEGRBlendRenderTarget& RenderTargetState);
-		const ZEGRBlendRenderTarget& GetRenderTarget(ZEUInt Index) const;
+		void							SetRenderTargetBlend(ZEUInt Index, const ZEGRBlendRenderTarget& RenderTargetState);
+		const ZEGRBlendRenderTarget&	GetRenderTarget(ZEUInt Index) const;
 
-		void						SetToDefault();
+		void							SetToDefault();
 
-									ZEGRBlendState();
-									~ZEGRBlendState();
+										ZEGRBlendState();
+		virtual							~ZEGRBlendState();
 };

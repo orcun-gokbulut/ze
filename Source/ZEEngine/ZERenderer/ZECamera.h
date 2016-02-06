@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEGame/ZEEntity.h"
+
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZEMath/ZEViewFrustum.h"
@@ -61,9 +62,6 @@ class ZECamera : public ZEEntity
 		bool							AutoAspectRatio;
 
 										ZECamera();
-
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
 
 		virtual void					OnTransformChanged();
 
@@ -94,6 +92,21 @@ class ZECamera : public ZEEntity
 
 		void							SetShadowFadeDistance(float Value);
 		float							GetShadowFadeDistance() const;
+
+		void							SetProjectionType(ZERNProjectionType ProjectionType);
+		ZERNProjectionType				GetProjectionType() const;
+
+		void							SetVerticalFovTop(float VerticalFovTop);
+		float							GetVerticalFovTop() const;
+
+		void							SetVerticalFovBottom(float VerticalFovBottom);
+		float							GetVerticalFovBottom() const;
+
+		void							SetHorizontalFovRight(float HorizontalFovRight);
+		float							GetHorizontalFovRight() const;
+
+		void							SetHorizontalFovLeft(float HorizontalFovLeft);
+		float							GetHorizontalFovLeft() const;
 
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetProjectionTransform();

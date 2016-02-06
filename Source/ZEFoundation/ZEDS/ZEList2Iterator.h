@@ -34,14 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 #pragma once
 
-#include "ZETypes.h"
 #include "ZEIterator.h"
 
-template<typename ZEItemType>
-class ZEList2;
+#include "ZETypes.h"
 
-template<typename ZEItemType>
-class ZELink;
+template<typename ZEItemType> class ZEList2;
+template<typename ZEItemType> class ZELink;
 
 template<typename ZEItemType>
 class ZEList2Iterator : public ZEIterator<ZEItemType>

@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZELight.h"
+
 #include "ZEMath/ZEViewCuboid.h"
 #include "ZEMath/ZEViewFrustum.h"
 
@@ -48,15 +49,12 @@ class ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
 
-	friend class ZERNStageLighting;
-
 	private:
 		struct ZECascade
 		{
 			ZEMatrix4x4						ProjectionTransform;
-			float							NearZView;
-			float							FarZView;
-			ZEVector2						Band;
+			ZEVector4						Borders;
+			ZEVector4						Band;
 		};
 
 		struct ZECascadeConstants
@@ -67,7 +65,7 @@ class ZELightDirectional : public ZELight
 		}CascadeConstants;
 
 		ZEHolder<ZEGRConstantBuffer>		CascadeConstantBuffer;
-		ZEHolder<ZEGRTexture2D>			CascadeShadowMaps;
+		ZEHolder<ZEGRTexture2D>				CascadeShadowMaps;
 		ZEArray<ZEViewCuboid>				CascadeVolumes;
 
 		float								CascadeDistanceFactor;
@@ -75,7 +73,7 @@ class ZELightDirectional : public ZELight
 		void								UpdateCascadeTransforms(ZEScene* Scene, const ZERNView& View);
 		void								UpdateCascadeShadowMaps();
 
-		void								CalculateSceneBoundingBoxLight(ZEAABBox* Out, ZEScene* Scene);
+		ZEAABBox							GetSceneBoundingBoxLight(ZEScene* Scene);
 
 											ZELightDirectional();
 		virtual								~ZELightDirectional();
@@ -89,6 +87,8 @@ class ZELightDirectional : public ZELight
 
 		void								SetCascadeDistanceFactor(float CascadeDistanceFactor);
 		float								GetCascadeDistanceFactor() const;
+
+		void								BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 		virtual ZELightType					GetLightType() const;
 		virtual ZESize						GetViewCount();

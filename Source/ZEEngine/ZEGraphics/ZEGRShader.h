@@ -35,26 +35,26 @@
 
 #pragma once
 
-#include "ZEGRResource.h"
+#include "ZEPointer/ZEReferenceCounted.h"
 
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGRShaderCompileOptions.h"
 
-class ZEGRShader : public ZEGRResource
+class ZEGRShader : public ZEReferenceCounted
 {
 	private:
 		ZEGRShaderType				ShaderType;
 
 	protected:
-		virtual bool				Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
+		virtual bool				Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
 		virtual void				Deinitialize();
 
 									ZEGRShader();
 		virtual						~ZEGRShader();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType();
-		virtual ZEGRShaderType		GetShaderType();
+		virtual ZEGRShaderType		GetShaderType() const;
 
-		static ZEGRShader*			Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
-		static ZEGRShader*			Compile(const ZEGRShaderCompileOptions& Options);
+		static ZEHolder<ZEGRShader>	CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
+		static ZEHolder<ZEGRShader>	Compile(const ZEGRShaderCompileOptions& Options);
 };

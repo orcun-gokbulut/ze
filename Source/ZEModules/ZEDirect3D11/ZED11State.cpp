@@ -35,33 +35,10 @@
 
 #include "ZED11StatePool.h"
 
-void ZED11StateBase::AddRef()
-{
-	ReferenceCount++;
-}
-
-void ZED11StateBase::Release()
-{
-	if (ReferenceCount == 0)
-		delete this;
-}
-
-ZEGRResourceType ZED11StateBase::GetResourceType()
-{
-	return ZEGR_RT_RENDER_STATE;
-}
-
-ZESize ZED11StateBase::GetReferenceCount()
-{
-	return ReferenceCount;
-}
-
 ZED11StateBase::ZED11StateBase()
 {
-	ReferenceCount = 0;
 }
 
 ZED11StateBase::~ZED11StateBase()
 {
-
 }

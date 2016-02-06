@@ -34,18 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleBillboardRenderer.h"
-#include "ZEParticle\ZEParticleSystem.h"
-#include "ZEGraphics\ZEGRVertexBuffer.h"
-#include "ZERenderer\ZECamera.h"
-#include "ZERenderer\ZERNView.h"
-#include "ZERenderer\ZERNRenderParameters.h"
-#include "ZEGraphics\ZEGRShaderCompileOptions.h"
-#include "ZEGraphics\ZEGRShader.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEGraphics\ZEGRContext.h"
-#include "ZEGraphics\ZEGRStructuredBuffer.h"
-#include "ZERenderer\ZERNCuller.h"
-#include "ZERenderer\ZERNMaterial.h"
+
+#include "ZEParticle/ZEParticleSystem.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERNView.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNMaterial.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRStructuredBuffer.h"
 
 void ZEParticleBillboardRenderer::CreateShaders()
 {

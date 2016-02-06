@@ -80,13 +80,13 @@ enum ZEGRPrimitiveType
 	ZEGR_PT_32_CONTROL_POINT_PATCHLIST	= 36
 };
 
-enum ZEGRFillMode : ZEUInt
+enum ZEGRFillMode : ZEUInt8
 {
 	ZEGR_FM_SOLID						= 0,
 	ZEGR_FM_WIREFRAME					= 1
 };
 
-enum ZEGRCullMode : ZEUInt
+enum ZEGRCullMode : ZEUInt8
 {
 	ZEGR_CMD_NONE						= 0,
 	ZEGR_CMD_FRONT						= 1,
@@ -108,6 +108,7 @@ class ZEGRRasterizerState : public ZEGRState
 		} StateData;
 
 	public:
+		virtual ZEGRStateType		GetStateType() const;
 		virtual const void*			GetData() const;
 		virtual ZESize				GetDataSize() const;
 

@@ -93,6 +93,8 @@ ze_add_source(ZED11TextureCube.cpp				Sources)
 ze_add_source(ZED11TextureCube.h				Sources)
 ze_add_source(ZED11VertexBuffer.cpp				Sources)
 ze_add_source(ZED11VertexBuffer.h				Sources)
+ze_add_source(ZED11Sampler.cpp					Sources)
+ze_add_source(ZED11Sampler.h					Sources)
 
 ze_add_library(TARGET ZEDirect3D11
 	SOURCES ${Sources}

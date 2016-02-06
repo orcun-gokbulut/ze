@@ -35,9 +35,6 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
 #include "ZEMeta/ZEObject.h"
 
 #include "ZEMath/ZEQuaternion.h"
@@ -106,7 +103,5 @@ class ZEParticleSystem : public ZEObject
 		void									Tick(float ElapsedTime);
 
 												ZEParticleSystem();
-												~ZEParticleSystem();
+		virtual									~ZEParticleSystem();
 };
-
-#endif

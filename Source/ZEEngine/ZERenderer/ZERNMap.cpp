@@ -35,20 +35,21 @@
 
 #include "ZERNMap.h"
 
-#include "ZETexture/ZETexture2DResource.h"
-#include "ZETexture/ZETexture3DResource.h"
-#include "ZETexture/ZETextureCubeResource.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZETexture/ZETexture2DResource.h"
+#include "ZETexture/ZETexture3DResource.h"
+#include "ZETexture/ZETextureCubeResource.h"
+#include "ZEGraphics/ZEGRSampler.h"
 
-void ZERNMap::SetSamplerState(const ZEGRSamplerState& Sampler)
+void ZERNMap::SetSampler(ZEGRSampler* Sampler)
 {
 	this->Sampler = Sampler;
 }
 
-const ZEGRSamplerState& ZERNMap::GetSamplerState()
+ZESharedPointer<ZEGRSampler> ZERNMap::GetSampler() const
 {
 	return Sampler;
 }
@@ -63,7 +64,7 @@ void ZERNMap::SetTexture(ZEGRTexture* Texture)
 	}
 }
 
-ZEGRTexture* ZERNMap::GetTexture() const
+ZEHolder<const ZEGRTexture> ZERNMap::GetTexture() const
 {
 	if (Resource != NULL)
 		return Resource->GetTexture();
@@ -115,7 +116,7 @@ const ZEString& ZERNMap::GetTextureFile() const
 	return Resource->GetFileName();
 }
 
-bool ZERNMap::IsAvailable()
+bool ZERNMap::IsAvailable() const
 {
 	return !Texture.IsNull();
 }
@@ -126,18 +127,20 @@ void ZERNMap::Write(ZEMLWriterNode& ParentNode, const ZEString& Name)
 	if(ParentNode.OpenNode(Name, Node))
 		return;
 
+	const ZEGRSamplerDescription& SamplerDescription = Sampler->GetDescription();
+
 	Node.WriteString("Resource", GetTextureFile());
-	Node.WriteUInt8("AddressU", Sampler.GetAddressU());
-	Node.WriteUInt8("AddressV", Sampler.GetAddressV());
-	Node.WriteUInt8("AddressW", Sampler.GetAddressW());
-	Node.WriteUInt8("MinFilter", Sampler.GetMinFilter());
-	Node.WriteUInt8("MagFilter", Sampler.GetMagFilter());
-	Node.WriteUInt8("MipFilter", Sampler.GetMipFilter());
-	Node.WriteUInt8("MaxAnisotropy", Sampler.GetMaxAnisotrophy());
-	Node.WriteFloat("MinLOD", Sampler.GetMinLOD());
-	Node.WriteFloat("MaxLOD", Sampler.GetMaxLOD());
-	Node.WriteFloat("MipLODBias", Sampler.GetMipLODBias());
-	Node.WriteVector4("BorderColor", Sampler.GetBorderColor());
+	Node.WriteUInt8("AddressU", SamplerDescription.AddressU);
+	Node.WriteUInt8("AddressV", SamplerDescription.AddressV);
+	Node.WriteUInt8("AddressW", SamplerDescription.AddressW);
+	Node.WriteUInt8("MinFilter", SamplerDescription.MinFilter);
+	Node.WriteUInt8("MagFilter", SamplerDescription.MagFilter);
+	Node.WriteUInt8("MipFilter", SamplerDescription.MipFilter);
+	Node.WriteUInt8("MaxAnisotropy", SamplerDescription.MaxAnisotropy);
+	Node.WriteFloat("MinLOD", SamplerDescription.MinLOD);
+	Node.WriteFloat("MaxLOD", SamplerDescription.MaxLOD);
+	Node.WriteFloat("MipLODBias", SamplerDescription.MipMapLODBias);
+	Node.WriteVector4("BorderColor", SamplerDescription.BorderColor);
 
 	ParentNode.CloseNode();
 }
@@ -148,22 +151,26 @@ void ZERNMap::ReadV0(ZEMLReaderNode& ParentNode, const ZEString& Name)
 	if (!Node.IsValid())
 	{
 		Texture.Release();
-		Sampler.SetToDefault();
+		Sampler.Release();
 		return;
 	}
 
 	Load2D(Node.ReadString("Resource", ""));
-	Sampler.SetAddressU((ZEGRTextureAddressing)Node.ReadUInt8("AddressU", ZEGR_TAM_CLAMP));
-	Sampler.SetAddressV((ZEGRTextureAddressing)Node.ReadUInt8("AddressV", ZEGR_TAM_CLAMP));
-	Sampler.SetAddressW((ZEGRTextureAddressing)Node.ReadUInt8("AddressW", ZEGR_TAM_CLAMP));
-	Sampler.SetMinFilter((ZEGRTextureFilter)Node.ReadUInt8("MinFilter", ZEGR_TFM_POINT));
-	Sampler.SetMagFilter((ZEGRTextureFilter)Node.ReadUInt8("MagFilter", ZEGR_TFM_POINT));
-	Sampler.SetMipFilter((ZEGRTextureFilter)Node.ReadUInt8("MipFilter", ZEGR_TFM_POINT));
-	Sampler.SetMaxAnisotrophy(Node.ReadUInt8("MaxAnisotropy", 8));
-	Sampler.SetMinLOD(Node.ReadFloat("MinLOD", ZE_FLOAT_MIN));
-	Sampler.SetMaxLOD(Node.ReadFloat("MaxLOD", ZE_FLOAT_MAX));
-	Sampler.SetMipLODBias(Node.ReadFloat("MipLODBias", 0.0f));
-	Sampler.SetBorderColor(Node.ReadVector4("BorderColor", ZEVector4::Zero));
+
+	ZEGRSamplerDescription SamplerDescription;
+	SamplerDescription.AddressU = (ZEGRTextureAddressing)Node.ReadUInt8("AddressU", ZEGR_TAM_CLAMP);
+	SamplerDescription.AddressV =(ZEGRTextureAddressing)Node.ReadUInt8("AddressV", ZEGR_TAM_CLAMP);
+	SamplerDescription.AddressW =(ZEGRTextureAddressing)Node.ReadUInt8("AddressW", ZEGR_TAM_CLAMP);
+	SamplerDescription.MinFilter =(ZEGRTextureFilter)Node.ReadUInt8("MinFilter", ZEGR_TFM_POINT);
+	SamplerDescription.MagFilter =(ZEGRTextureFilter)Node.ReadUInt8("MagFilter", ZEGR_TFM_POINT);
+	SamplerDescription.MipFilter =(ZEGRTextureFilter)Node.ReadUInt8("MipFilter", ZEGR_TFM_POINT);
+	SamplerDescription.MaxAnisotropy = Node.ReadUInt8("MaxAnisotropy", 8);
+	SamplerDescription.MinLOD = Node.ReadFloat("MinLOD", ZE_FLOAT_MIN);
+	SamplerDescription.MaxLOD = Node.ReadFloat("MaxLOD", ZE_FLOAT_MAX);
+	SamplerDescription.MipMapLODBias = Node.ReadFloat("MipLODBias", 0.0f);
+	SamplerDescription.BorderColor = Node.ReadVector4("BorderColor", ZEVector4::Zero);
+
+	Sampler = ZEGRSampler::GetSampler(SamplerDescription);
 }
 
 void ZERNMap::ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name)
@@ -171,7 +178,7 @@ void ZERNMap::ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name)
 	if(!ParentNode.IsPropertyExists(Name))
 	{
 		Texture.Release();
-		Sampler.SetToDefault();
+		Sampler.Release();
 		return;
 	}
 
@@ -179,7 +186,7 @@ void ZERNMap::ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name)
 	if(Filename == "")
 	{
 		Texture.Release();
-		Sampler.SetToDefault();
+		Sampler.Release();
 		return;
 	}
 
@@ -187,21 +194,33 @@ void ZERNMap::ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name)
 	ZEString FilePath = ZEFileInfo(File->GetPath()).GetParentDirectory() + "/" + Filename;
 	Load2D(FilePath);
 
-	Sampler.SetAddressU(ZEGR_TAM_WRAP);
-	Sampler.SetAddressV((ZEGR_TAM_WRAP));
-	Sampler.SetAddressW((ZEGR_TAM_WRAP));
+	ZEGRSamplerDescription SamplerDescription;
+	SamplerDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerDescription.AddressW = ZEGR_TAM_WRAP;
+
+	Sampler = ZEGRSampler::GetSampler(SamplerDescription);
 }
 
 ZERNMap::ZERNMap()
 {
 	Resource = NULL;
+}
 
-	Sampler.SetAddressU(ZEGR_TAM_WRAP);
-	Sampler.SetAddressV((ZEGR_TAM_WRAP));
-	Sampler.SetAddressW((ZEGR_TAM_WRAP));
+ZERNMap::ZERNMap(ZEGRTexture* Texture, ZEGRSampler* Sampler)
+{
+	this->Texture = Texture;
+	this->Sampler = Sampler;
+}
+
+ZERNMap::ZERNMap(ZETextureResource* Resource, ZEGRSampler* Sampler)
+{
+	this->Resource = Resource;
+	this->Sampler = Sampler;
 }
 
 ZERNMap::~ZERNMap()
 {
 	Texture.Release();
+	Sampler.Release();
 }

@@ -53,8 +53,6 @@ ze_add_source(ZEGRBlendState.cpp			Sources)
 ze_add_source(ZEGRBlendState.h				Sources Headers)
 ze_add_source(ZEGRDepthStencilState.cpp		Sources)
 ze_add_source(ZEGRDepthStencilState.h		Sources Headers)
-ze_add_source(ZEGRSamplerState.cpp 			Sources)
-ze_add_source(ZEGRSamplerState.h 			Sources Headers)
 ze_add_source(ZEGRRasterizerState.cpp 		Sources)
 ze_add_source(ZEGRRasterizerState.h 		Sources Headers)
 ze_add_source(ZEGRVertexLayout.cpp			Sources)
@@ -62,6 +60,9 @@ ze_add_source(ZEGRVertexLayout.h			Sources Headers)
 
 ze_add_source(ZEGRResource.cpp				Sources)
 ze_add_source(ZEGRResource.h				Sources Headers)
+
+ze_add_source(ZEGRSampler.cpp 				Sources)
+ze_add_source(ZEGRSampler.h 				Sources Headers)
 
 ze_add_source(ZEGRIndexBuffer.cpp 			Sources)
 ze_add_source(ZEGRIndexBuffer.h 			Sources Headers)

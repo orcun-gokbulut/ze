@@ -37,15 +37,16 @@
 
 #include "ZEInitializable.h"
 
-#include "ZEDS\ZEArray.h"
-#include "ZEDS\ZEFlags.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEGraphics\ZEGRSamplerState.h"
+#include "ZEPointer/ZESharedPointer.h"
 
 class ZEGRTexture2D;
 class ZEGRContext;
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
 class ZEGRRenderTarget;
@@ -55,15 +56,15 @@ class ZERNFilter : public ZEInitializable
 	private:
 		ZEFlags							DirtyFlags;
 
-		ZEGRTexture2D*					Input;
-		ZEGRRenderTarget*				Output;
+		const ZEGRTexture2D*			Input;
+		const ZEGRRenderTarget*			Output;
 
 		ZEHolder<ZEGRShader>			VertexShader;
 		ZEHolder<ZEGRShader>			PixelShader;
 
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 
-		ZEGRSamplerState				SamplerPointClamp;
+		ZESharedPointer<ZEGRSampler>	SamplerPointClamp;
 
 		struct FilterConstants
 		{
@@ -88,11 +89,11 @@ class ZERNFilter : public ZEInitializable
 
 	public:
 
-		void							SetInput(ZEGRTexture2D* Input);
-		ZEGRTexture2D*					GetInput() const;
+		void							SetInput(const ZEGRTexture2D* Input);
+		const ZEGRTexture2D*			GetInput() const;
 
-		void							SetOutput(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*				GetOutput() const;
+		void							SetOutput(const ZEGRRenderTarget* Output);
+		const ZEGRRenderTarget*			GetOutput() const;
 
 		ZEUInt							GetKernelSize() const;
 

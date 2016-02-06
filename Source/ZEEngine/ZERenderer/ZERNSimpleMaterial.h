@@ -35,72 +35,76 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZERNMaterial.h"
+
+#include "ZETypes.h"
+#include "ZEMath/ZEVector.h"
 #include "ZERNMap.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEPacking.h"
+
+class ZEGRConstantBuffer;
+class ZEGRRenderStateData;
+class ZEGRShader;
 
 class ZERNSimpleMaterial : public ZERNMaterial
 {
 	private:
-		ZEFlags							DirtyFlags;
+		ZEFlags								DirtyFlags;
 
-		bool							TwoSided;
-		bool							Wireframe;
-		bool							DepthTestDisabled;
+		bool								TwoSided;
+		bool								Wireframe;
+		bool								DepthTestDisabled;
 
-		ZEHolder<ZEGRShader>			VertexShader;
-		ZEHolder<ZEGRShader>			PixelShader;
-		ZEHolder<ZEGRRenderStateData> RenderStateData;
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				PixelShader;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 
 		struct
 		{
-			ZEVector4					MaterialColor;
-			bool 						TextureEnabled;
-			float						Reserved0;
-			bool 						VertexColorEnabled;
-			float						Reserved1;
+			ZEVector4						MaterialColor;
+			bool 							TextureEnabled;
+			float							Reserved0;
+			bool 							VertexColorEnabled;
+			float							Reserved1;
 		} Constants;
 
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
-		ZERNMap							TextureMap;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZERNMap								TextureMap;
 
-		void							UpdateShaders();
-		void							UpdateRenderState();
-		void							UpdateConstantBuffer();
+		void								UpdateShaders();
+		void								UpdateRenderState();
+		void								UpdateConstantBuffer();
 	
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
-										ZERNSimpleMaterial();
+											ZERNSimpleMaterial();
 
 	public:
-		virtual ZERNStageMask			GetStageMask();
+		virtual ZERNStageMask				GetStageMask() const;
 
-		void							SetTwoSided(bool Enable);
-		bool							GetTwoSided() const;
+		void								SetTwoSided(bool Enable);
+		bool								GetTwoSided() const;
 
-		void							SetWireframe(bool Enable);
-		bool							GetWireframe() const;
+		void								SetWireframe(bool Enable);
+		bool								GetWireframe() const;
 
-		void							SetDepthTestDisabled(bool Disabled);
-		bool							GetDepthTestDisabled();
+		void								SetDepthTestDisabled(bool Disabled);
+		bool								GetDepthTestDisabled() const;
 
-		void							SetMaterialColor(const ZEVector4& Color);
-		const ZEVector4&				GetMaterialColor() const;
+		void								SetMaterialColor(const ZEVector4& Color);
+		const ZEVector4&					GetMaterialColor() const;
 
-		void							SetTexture(const ZERNMap& Sampler);
-		const ZERNMap&					GetTexture() const;
+		void								SetTexture(const ZERNMap& Sampler);
+		const ZERNMap&						GetTexture() const;
 	
-		void							SetVertexColorEnabled(bool Enable);
-		bool							GetVertexColorEnabled();
+		void								SetVertexColorEnabled(bool Enable);
+		bool								GetVertexColorEnabled() const;
 
-		virtual bool					Update();
+		virtual bool						Update();
 
-		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+		virtual bool						SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+		virtual void						CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
 
-		static ZERNSimpleMaterial*		CreateInstance();
+		static ZEHolder<ZERNSimpleMaterial>	CreateInstance();
 };

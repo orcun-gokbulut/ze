@@ -58,12 +58,13 @@ class ZEModelMeshLOD
 		const ZEModelResourceMeshLOD*		LODResource;
 		
 		ZEHolder<ZEGRIndexBuffer>			IndexBuffer;
-		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
-		ZEHolder<ZEGRVertexBuffer>		VertexBufferNormals;
-		ZEHolder<ZEGRVertexBuffer>		VertexBufferSkin;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBufferNormals;
+		ZEHolder<ZEGRVertexBuffer>			VertexBufferSkin;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBufferSkin;
 
-		ZEHolder<ZERNMaterial>			Material;
+		ZEHolder<ZERNMaterial>				Material;
 		bool								Skinned;
 
 	public:

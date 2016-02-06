@@ -162,7 +162,6 @@ class ZEGRWindow : public ZEInitializable
 		bool					GetMaximized() const;
 		bool					GetRestored() const;
 
-
 		void					Focus();
 		void					Minimize();
 		void					Maximize();

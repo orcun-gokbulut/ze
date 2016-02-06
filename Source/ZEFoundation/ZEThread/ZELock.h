@@ -50,7 +50,7 @@ class ZELock
         void				Wait();
 		void				Unlock();
 
-		ZELock				operator=(const ZELock& Lock);
+		ZELock&				operator=(const ZELock& Lock);
 
 							ZELock();
 							ZELock(const ZELock& Lock);

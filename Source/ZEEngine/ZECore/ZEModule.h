@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODULE_H__
-#define __ZE_MODULE_H__
 
 #include "ZEExtension.h"
 
@@ -64,5 +62,3 @@ class ZEModule : public ZEExtension
 
 		virtual void					Destroy();
 };
-
-#endif

@@ -36,23 +36,24 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEPointer/ZEHolder.h"
+
 #include "ZEDS/ZEFlags.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
-class ZEGRRenderState;
 class ZEGRRenderTarget;
 
 class ZERNStageGBuffer : public ZERNStage
 {
 	private:
 		ZEFlags								DirtyFlags;
-		ZEHolder<ZEGRTexture2D>			DepthStencilBuffer;
-		ZEHolder<ZEGRTexture2D>			GBuffer0;
-		ZEHolder<ZEGRTexture2D>			GBuffer1;
-		ZEHolder<ZEGRTexture2D>			GBuffer2;
-		ZEHolder<ZEGRTexture2D>			GBuffer3;
-		ZEGRRenderTarget*					RenderTargets[4];
+
+		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
+		ZEHolder<ZEGRTexture2D>				GBuffer0;
+		ZEHolder<ZEGRTexture2D>				GBuffer1;
+		ZEHolder<ZEGRTexture2D>				GBuffer2;
+		ZEHolder<ZEGRTexture2D>				GBuffer3;
+		const ZEGRRenderTarget*				RenderTargets[4];
 
 	private:
 		virtual bool						InitializeSelf();
@@ -61,11 +62,8 @@ class ZERNStageGBuffer : public ZERNStage
 		bool								UpdateRenderTargets(ZEUInt Width, ZEUInt Height);
 
 	public:
-		virtual ZEInt						GetId();
-		virtual const ZEString&				GetName();
-		
-		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
 		ZEGRTexture2D*						GetDiffuseColorMap() const;
 		ZEGRTexture2D*						GetSpecularColorMap() const;
@@ -73,5 +71,10 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEGRTexture2D*						GetAccumulationMap() const;
 		ZEGRTexture2D*						GetDepthMap() const;
 
-		static const ZEGRRenderState&		GetRenderState();
+		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+											ZERNStageGBuffer();
+
+		static ZEGRRenderState				GetRenderState();
 };

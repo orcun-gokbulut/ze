@@ -34,11 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_BILLBOARD_RENDERER_H__
-#define __ZE_PARTICLE_BILLBOARD_RENDERER_H__
 
 #include "ZEParticleRenderer.h"
-#include "ZERenderer\ZERNCommand.h"
+
+#include "ZERenderer/ZERNCommand.h"
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRVertexBuffer;
@@ -59,7 +58,7 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 			ZEVector3	Position;
 			float		Size;
 		};
-		ZEHolder<ZEGRStructuredBuffer>	InstanceBuffer;
+		ZEHolder<ZEGRStructuredBuffer>		InstanceBuffer;
 
 		ZEHolder<ZEGRShader>				VertexShader;
 		ZEHolder<ZEGRShader>				HullShader;
@@ -85,5 +84,3 @@ class ZEParticleBillboardRenderer : public ZEParticleRenderer
 
 		static ZEParticleBillboardRenderer*	CreateInstance();
 };
-
-#endif

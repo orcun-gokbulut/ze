@@ -44,6 +44,11 @@
 #include "ZEDS/ZEHashGenerator.h"
 #include "ZEGRShaderMeta.h"
 
+ZEGRStateType ZEGRVertexLayout::GetStateType() const
+{
+	return ZEGRStateType::ZEGR_ST_VERTEX_LAYOUT;
+}
+
 const void* ZEGRVertexLayout::GetData() const
 {
 	return &StateData;

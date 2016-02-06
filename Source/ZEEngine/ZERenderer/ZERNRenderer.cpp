@@ -33,22 +33,24 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNCuller.h"
 #include "ZERNRenderer.h"
+
+#include "ZERNCuller.h"
 #include "ZERNStage.h"
 #include "ZERNCommand.h"
-#include "ZERNRenderParameters.h"
 #include "ZERNShaderSlots.h"
-#include "ZEGame\ZEEntity.h"
+#include "ZERNRenderParameters.h"
 #include "ZEGame\ZEScene.h"
+#include "ZEGame\ZEEntity.h"
 #include "ZEGraphics\ZEGRShader.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZEGraphics\ZEGRContext.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
+#include "ZEGraphics\ZEGRViewport.h"
 #include "ZEGraphics\ZEGRTexture2D.h"
-#include "ZEGraphics\ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics\ZEGRRenderState.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
+#include "ZEGraphics\ZEGRConstantBuffer.h"
+#include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 
 namespace
 {
@@ -78,8 +80,8 @@ void ZERNRenderer::UpdateViewConstantBuffer()
 	Buffer->InvProjectionTransform = View.InvProjectionTransform;			
 	Buffer->InvViewProjectionTransform = View.InvViewProjectionTransform;
 
-	Buffer->Width = View.Width;
-	Buffer->Height = View.Height;
+	Buffer->Width = View.Viewport != NULL ? View.Viewport->GetWidth() : 0.0f;
+	Buffer->Height = View.Viewport != NULL ? View.Viewport->GetHeight() : 0.0f;
 	Buffer->VerticalFOV = View.VerticalFOV;
 	Buffer->HorizontalFOV = View.HorizontalFOV;
 	Buffer->AspectRatio = View.AspectRatio;
@@ -311,8 +313,6 @@ void ZERNRenderer::CleanStages()
 
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
-
-
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
 	{

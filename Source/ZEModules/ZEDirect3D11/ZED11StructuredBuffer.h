@@ -54,6 +54,7 @@ class ZED11StructuredBuffer : public ZEGRStructuredBuffer, public ZED11Component
 		virtual void				Deinitialize();
 
 									ZED11StructuredBuffer();
+		virtual						~ZED11StructuredBuffer();
 
 	public:
 		ID3D11Buffer*				GetBuffer() const;

@@ -34,11 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_EFFECT_H__
-#define __ZE_PARTICLE_EFFECT_H__
+
+#include "ZEGame/ZEEntity.h"
 
 #include "ZETypes.h"
-#include "ZEGame/ZEEntity.h"
 #include "ZEDS/ZEArray.h"
 //#include "ZEParticleEmitter.h"
 #include "ZEParticleSystem.h"
@@ -49,7 +48,7 @@ struct ZERNCullParameters;
 
 class ZEParticleEffect : public ZEEntity
 {
-	friend class ZEParticleEmitter;
+	//friend class ZEParticleEmitter;
 	
 	ZE_OBJECT
 
@@ -83,5 +82,3 @@ class ZEParticleEffect : public ZEEntity
 		static ZEParticleEffect*			CreateInstance();
 
 };
-
-#endif

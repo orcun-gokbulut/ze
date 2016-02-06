@@ -36,6 +36,21 @@
 #include "ZEGRRenderTarget.h"
 #include "ZEError.h"
 
+ZEGRRenderTarget::ZEGRRenderTarget()
+{
+}
+
+ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
+{
+	this->Width = Width;
+	this->Height = Height;
+	this->Format = Format;
+}
+
+ZEGRRenderTarget::~ZEGRRenderTarget()
+{
+}
+
 ZEGRResourceType ZEGRRenderTarget::GetResourceType() const
 {
 	return ZEGR_RT_RENDER_TARGET;
@@ -59,20 +74,4 @@ ZEVector2 ZEGRRenderTarget::GetPixelSize() const
 ZEGRFormat ZEGRRenderTarget::GetFormat() const
 {
 	return Format;
-}
-
-ZEGRRenderTarget::ZEGRRenderTarget()
-{
-
-}
-
-ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
-{
-	this->Width = Width;
-	this->Height = Height;
-	this->Format = Format;
-}
-
-ZEGRRenderTarget::~ZEGRRenderTarget()
-{
 }

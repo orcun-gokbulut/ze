@@ -77,13 +77,18 @@ void ZEInterior::LoadInteriorResource()
 	if (InteriorResource == NULL)
 		return;
 
+	ZEAABBox TempBoundingBox(ZEVector3(FLT_MAX), ZEVector3(FLT_MIN));
+
 	ZESize RoomCount = InteriorResource->GetRooms().GetCount();
 	Rooms.SetCount(RoomCount);
 	for (ZESize I = 0; I < RoomCount; I++)
 	{
 		Rooms[I] = ZEInteriorRoom::CreateInstance();
 		Rooms[I]->Initialize(this, (ZEInteriorResourceRoom*)&InteriorResource->GetRooms()[I]);
+		ZEAABBox::Combine(TempBoundingBox, TempBoundingBox, Rooms[I]->GetBoundingBox());
 	}
+
+	this->SetBoundingBox(TempBoundingBox);
 
 	ZESize DoorCount = InteriorResource->GetDoors().GetCount();
 	Doors.SetCount(DoorCount);

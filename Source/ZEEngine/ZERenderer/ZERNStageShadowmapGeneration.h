@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZERNStage.h"
+
 #include "ZEGraphics/ZEGRRenderState.h"
 
 class ZERNStageShadowmapGeneration : public ZERNStage
@@ -45,14 +46,14 @@ class ZERNStageShadowmapGeneration : public ZERNStage
 		virtual void						DeinitializeSelf();
 
 	public:
-		virtual ZEInt						GetId();
-		virtual const ZEString&				GetName();
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 											ZERNStageShadowmapGeneration();
 
-		static const ZEGRRenderState&		GetRenderState();
+		static ZEGRRenderState				GetRenderState();
 
 };

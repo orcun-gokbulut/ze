@@ -42,22 +42,22 @@
 
 #include <d3d11.h>
 
-ID3D11Texture3D* ZED11Texture3D::GetTexture()
+ID3D11Texture3D* ZED11Texture3D::GetTexture() const
 {
 	return Texture3D;
 }
 
-ID3D11ShaderResourceView* ZED11Texture3D::GetResourceView()
+ID3D11ShaderResourceView* ZED11Texture3D::GetResourceView() const
 {
 	return ResourceView;
 }
 
-ID3D11UnorderedAccessView* ZED11Texture3D::GetUnorderedAccessView()
+ID3D11UnorderedAccessView* ZED11Texture3D::GetUnorderedAccessView() const
 {
 	return UnorderedAccessView;
 }
 
-ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level)
+ZEHolder<const ZEGRRenderTarget> ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level) const
 {
 	zeDebugCheck(Texture3D == NULL, "Texture not created.");
 	zeCheckError(!GetIsRenderTarget(), NULL, "Texture is not created as a render target.");
@@ -78,9 +78,9 @@ ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level)
 		zeError("D3D11 texture 3D render target creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
-
-	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
 	
+	ZEGRRenderTarget* RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
+
 	#ifdef ZE_GRAPHIC_LOG_ENABLE
 	zeLog("Render target view created. Texture3D: %p, MipLevel: %u, Width: %u, Height: %u, Depth: %u", 
 			this, Level, RenderTarget->Width, RenderTarget->Height, RenderTarget->Depth);
@@ -145,6 +145,7 @@ bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUIn
 			return false;
 		}
 	}
+
 	return ZEGRTexture3D::Initialize(Width, Height, Depth, Level, Format, RenderTarget, UAV);
 }
 
@@ -157,32 +158,14 @@ void ZED11Texture3D::Deinitialize()
 	ZEGRTexture3D::Deinitialize();
 }
 
-bool ZED11Texture3D::Lock(void** Buffer, ZESize* Pitch, ZEUInt Depth, ZEUInt Level)
-{
-	zeDebugCheck(Texture3D == NULL, "Texture is not initailized.");
-	zeCheckError(Buffer == NULL || Pitch == NULL, false, "Buffer is NULL.");
-	zeCheckError(Depth >= GetDepth(), false, "There is no such a texture depth.");
-	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
-
-	D3D11_MAPPED_SUBRESOURCE MapData;
-	HRESULT Result = GetMainContext()->Map(Texture3D, Level , D3D11_MAP_WRITE, D3D11_MAP_FLAG_DO_NOT_WAIT, &MapData);
-	*Buffer = (ZEBYTE*)MapData.pData + MapData.DepthPitch * Depth;
-	*Pitch = MapData.RowPitch;
-
-	return SUCCEEDED(Result);
-}
-
-void ZED11Texture3D::Unlock(ZEUInt Level)
-{
-	zeDebugCheck(Texture3D == NULL, "Texture is not initailized.");
-	zeCheckError(Level >= GetLevelCount(), ZE_VOID, "There is no such a texture level.");
-
-	GetMainContext()->Unmap(Texture3D, Level);
-}
-
 ZED11Texture3D::ZED11Texture3D()
 {
 	Texture3D = NULL;
 	ResourceView = NULL;
 	UnorderedAccessView = NULL;
+}
+
+ZED11Texture3D::~ZED11Texture3D()
+{
+	Deinitialize();
 }

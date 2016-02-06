@@ -36,9 +36,10 @@
 #pragma once
 
 #include "ZERNStage.h"
+
+#include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
 
 class ZEGRTexture;
@@ -51,7 +52,7 @@ class ZEGRConstantBuffer;
 class ZERNStageTextureOutput : public ZERNStage
 {
 	private:
-		ZEArray<ZEGRTexture*>			InputTextures;
+		ZEArray<const ZEGRTexture*>		InputTextures;
 		ZEGRRenderTarget*				OutputRenderTarget;
 
 		ZEHolder<ZEGRShader>			VertexShader;
@@ -74,18 +75,18 @@ class ZERNStageTextureOutput : public ZERNStage
 
 	public:
 		void							SetInputs(ZEGRTexture** Inputs, ZESize Count);
-		ZEGRTexture**					GetInputs();
+		const ZEGRTexture*const*		GetInputs() const;
 
-		void							SetViewports(ZEGRViewport* Viewports, ZESize Count);
-		const ZEGRViewport*				GetViewport() const;
+		void							SetViewports(const ZEGRViewport* Viewports, ZESize Count);
+		const ZEGRViewport*				GetViewports() const;
 
 		void							SetAutoSplit(bool AutoSplit);
 		bool							IsAutoSplit() const;
 
 										ZERNStageTextureOutput();
 
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);

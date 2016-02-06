@@ -35,16 +35,17 @@
 
 #include "ZERNSimpleMaterial.h"
 
+#include "ZECanvas.h"
 #include "ZERNRenderer.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRShaderCompileOptions.h"
-#include "ZEGraphics/ZEGRShader.h"
 #include "ZERNStageManager.h"
 #include "ZERNStage.h"
-#include "ZEGraphics/ZEGRContext.h"
 #include "ZERNShaderConfig.h"
 #include "ZERNStageForward.h"
-#include "ZECanvas.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRShaderCompileOptions.h"
 
 #define ZERN_SMDF_RENDER_STATE		1
 #define ZERN_SMDF_CONSTANT_BUFFER	2
@@ -138,7 +139,7 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	DirtyFlags.RaiseAll();
 }
 
-ZERNStageMask ZERNSimpleMaterial::GetStageMask()
+ZERNStageMask ZERNSimpleMaterial::GetStageMask() const
 {
 	return ZERN_STAGE_FORWARD;
 }
@@ -180,7 +181,7 @@ void ZERNSimpleMaterial::SetDepthTestDisabled(bool Disabled)
 	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
 }
 
-bool ZERNSimpleMaterial::GetDepthTestDisabled()
+bool ZERNSimpleMaterial::GetDepthTestDisabled() const
 {
 	return DepthTestDisabled;
 }
@@ -194,7 +195,7 @@ void ZERNSimpleMaterial::SetVertexColorEnabled(bool Enable)
 	DirtyFlags.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNSimpleMaterial::GetVertexColorEnabled()
+bool ZERNSimpleMaterial::GetVertexColorEnabled() const
 {
 	return Constants.VertexColorEnabled;
 }
@@ -243,7 +244,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (Constants.TextureEnabled)
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureMap.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureMap.GetSamplerState());
+		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureMap.GetSampler().GetPointer());
 	}
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
@@ -269,7 +270,7 @@ bool ZERNSimpleMaterial::Update()
 	return true;
 }
 
-ZERNSimpleMaterial* ZERNSimpleMaterial::CreateInstance()
+ZEHolder<ZERNSimpleMaterial> ZERNSimpleMaterial::CreateInstance()
 {
 	return new ZERNSimpleMaterial();
 }

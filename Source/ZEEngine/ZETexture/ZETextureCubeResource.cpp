@@ -54,19 +54,19 @@ static void CopyToTextureCube(ZEGRTextureCube* Output, ZETextureData* TextureDat
 	ZEUInt Length = Output->GetLength();
 
 	// Copy texture data into ZETextureCube
-	void* TargetBuffer = new unsigned char[Length * Length * 4];
-	ZESize TargetRowPitch = Length * 4;
+	void* SrcBuffer = new unsigned char[Length * Length * 4];
+	ZESize SrcRowPitch = Length * 4;
 
 	for (ZESize Surface = 0; Surface < 6; Surface++)
 	{
 		for (ZESize Level = 0; Level < (ZESize)LevelCount; Level++)
 		{
-			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(TargetBuffer, TargetRowPitch);
-			Output->UpdateSubResource(TargetBuffer, TargetRowPitch, (ZEGRTextureCubeFace)Surface, (ZEUInt)Level);
+			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(SrcBuffer, SrcRowPitch);
+			Output->UpdateSubResource((ZEGRTextureCubeFace)Surface, (ZEUInt)Level, SrcBuffer, SrcRowPitch);
 		}
 	}
 
-	delete [] TargetBuffer;
+	delete [] SrcBuffer;
 }
 
 static void CopyCubeFaceTo(void* Destination, ZESize DestPitch, void* SourceBuffer, ZESize SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
@@ -268,7 +268,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	
 	// Create TextureCubeResource 
 	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::Create(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false);
+	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::CreateInstance(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false);
 	if (Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());

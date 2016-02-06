@@ -253,7 +253,6 @@ ZEGRWindow::ZEGRWindow()
 
 ZEGRWindow::~ZEGRWindow()
 {
-	DeinitializeSelf();
 }
 
 ZEUInt ZEGRWindow::GetWindowCount()

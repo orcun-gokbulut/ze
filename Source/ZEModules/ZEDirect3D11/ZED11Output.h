@@ -50,7 +50,7 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 	friend class ZED11Module;
 	private:
 		void*								Handle;
-		ZEGRMonitor*						Monitor;
+		mutable ZEGRMonitor*				Monitor;
 
 		ZEHolder<ZEGRRenderTarget>			RenderTarget;
 
@@ -68,14 +68,14 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 											ZED11Output();
 
 	public:
-		virtual void*						GetHandle();
-		virtual ZEGRRenderTarget*			GetRenderTarget();
+		virtual void*						GetHandle() const;
+		virtual ZEGRRenderTarget*			GetRenderTarget() const;
 
 		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor);
-		virtual ZEGRMonitor*				GetMonitor();
+		virtual ZEGRMonitor*				GetMonitor() const;
 
 		virtual void						SetFullscreen(bool Enabled);
-		virtual bool						GetFullscreen();
+		virtual bool						GetFullscreen() const;
 
 		virtual void						Resize(ZEUInt Width, ZEUInt Height);
 

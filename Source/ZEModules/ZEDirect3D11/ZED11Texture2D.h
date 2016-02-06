@@ -35,12 +35,12 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZED11ComponentBase.h"
+
+#include "ZETypes.h"
 #include "ZEPointer/ZEHolder.h"
 
-class ZETextureData;
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 
@@ -50,26 +50,26 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 	friend class ZED11Context;
 
 	protected:
-		ID3D11Texture2D*					Texture2D;
-		ID3D11ShaderResourceView*			ResourceView;
-		ZEHolder<ZEGRRenderTarget>			RenderTargets[14];
-		ZEHolder<ZEGRDepthStencilBuffer>	DepthStencilBuffers[14];
+		ID3D11Texture2D*								Texture2D;
+		ID3D11ShaderResourceView*						ResourceView;
+		ID3D11UnorderedAccessView*						UnorderedAccessView;
+		mutable ZEHolder<ZEGRRenderTarget>				RenderTargets[15];	//maximum mip count is 15 in directx 11
+		mutable ZEHolder<ZEGRDepthStencilBuffer>		DepthStencilBuffers[10];
 
-		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt Level, ZEGRFormat Format, bool RenderTarget, bool DepthStencil);
-		virtual void						Deinitialize();
+		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt Level, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV);
+		virtual void									Deinitialize();
 
-											ZED11Texture2D();
-		virtual								~ZED11Texture2D();
+														ZED11Texture2D();
+		virtual											~ZED11Texture2D();
 
 	public:
-		ID3D11Texture2D*					GetTexture();
-		ID3D11ShaderResourceView*			GetResourceView();
-		virtual ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level);
-		virtual ZEGRDepthStencilBuffer*		GetDepthStencilBuffer(ZEUInt ArrayIndex = 0);
+		ID3D11Texture2D*								GetTexture() const;
+		ID3D11ShaderResourceView*						GetResourceView() const;
 
-		virtual void						GenerateMipMaps();
+		virtual ZEHolder<const ZEGRRenderTarget>		GetRenderTarget(ZEUInt Level) const;
+		virtual ZEHolder<const ZEGRDepthStencilBuffer>	GetDepthStencilBuffer(ZEUInt ArrayIndex = 0) const;
 
-		virtual bool						UpdateSubResource(void* Data, ZEUInt ArrayIndex, ZEUInt Level, ZESize RowPitch);
-		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Level);
-		virtual void						Unlock(ZEUInt Level);
+		virtual void									GenerateMipMaps();
+
+		virtual bool									UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
 };

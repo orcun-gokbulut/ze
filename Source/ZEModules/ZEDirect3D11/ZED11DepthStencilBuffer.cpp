@@ -54,7 +54,7 @@ ZED11DepthStencilBuffer::~ZED11DepthStencilBuffer()
 	ZEGR_RELEASE(View);
 }
 
-ID3D11DepthStencilView* ZED11DepthStencilBuffer::GetView()
+ID3D11DepthStencilView* ZED11DepthStencilBuffer::GetView() const
 {
 	return View;
 }

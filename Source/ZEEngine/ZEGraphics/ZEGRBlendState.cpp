@@ -141,6 +141,11 @@ ZEGRBlendRenderTarget::~ZEGRBlendRenderTarget()
 
 }
 
+ZEGRStateType ZEGRBlendState::GetStateType() const
+{
+	return ZEGRStateType::ZEGR_ST_BLEND;
+}
+
 const void* ZEGRBlendState::GetData() const
 {
 	return &StateData;

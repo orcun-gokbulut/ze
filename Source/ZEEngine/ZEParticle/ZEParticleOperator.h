@@ -34,35 +34,26 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_OPERATOR_H__
-#define __ZE_PARTICLE_OPERATOR_H__
+
+#include "ZEMeta\ZEObject.h"
 
 #include "ZETypes.h"
 #include "ZEParticle.h"
 #include "ZEDS\ZEArray.h"
 
-#include "ZEMeta\ZEObject.h"
-
 class ZEParticleOperator : public ZEObject
 {
 	friend class ZEParticleSystem;
-
 	ZE_OBJECT
-
 	private:
-
 		ZEParticleSystem*		Owner;
 
 	protected:
-
 								ZEParticleOperator();
 
 	public:
-
 		virtual void			Tick(float ElapsedTime, ZEArray<ZEParticle>& OwnerParticlePool) = 0;
 		virtual void			ResizeCustomDataPool(ZESize NewPoolSize) = 0;
 
 		const ZEParticleSystem*	GetOwner() const;
 };
-
-#endif

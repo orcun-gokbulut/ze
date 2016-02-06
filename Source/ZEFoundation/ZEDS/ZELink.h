@@ -47,28 +47,29 @@ class ZELink
 	//ZE_DISALLOW_COPY(ZELink);
 	friend class ZEList2<ZEItemType>;
 	private:
-		bool							InUse;
-		ZEItemType*						Item;
-		ZELink*							Prev;
-		ZELink*							Next;
+		bool								InUse;
+		ZEItemType*							Item;
+		ZELink*								Prev;
+		ZELink*								Next;
 
 	public:
-		ZEList2Iterator<ZEItemType>		GetIterator();
-		ZEList2IteratorConst<ZEItemType> GetIteratorConst();
+		ZEList2Iterator<ZEItemType>			GetIterator();
+		ZEList2IteratorConst<ZEItemType>	GetIteratorConst() const;
 
-		ZEList2Iterator<ZEItemType>		GetIteratorEnd();
-		ZEList2IteratorConst<ZEItemType> GetIteratorEndConst() const;
+		ZEList2Iterator<ZEItemType>			GetIteratorEnd();
+		ZEList2IteratorConst<ZEItemType>	GetIteratorEndConst() const;
 
-		bool							GetInUse() const;
-		ZELink*							GetPrev();
-		const ZELink*					GetPrev() const;
-		ZELink*							GetNext();
-		const ZELink*					GetNext() const;
-		ZEItemType*						GetItem() const;
+		bool								GetInUse() const;
+		ZELink*								GetPrev();
+		const ZELink*						GetPrev() const;
+		ZELink*								GetNext();
+		const ZELink*						GetNext() const;
+		ZEItemType*							GetItem();
+		const ZEItemType*					GetItem() const;
 
-										ZELink();
-										ZELink(ZEItemType* Object);
-										~ZELink();
+											ZELink();
+											ZELink(ZEItemType* Object);
+											~ZELink();
 };
 
 
@@ -82,7 +83,7 @@ ZEList2Iterator<ZEItemType> ZELink<ZEItemType>::GetIterator()
 }
 
 template<typename ZEItemType>
-ZEList2IteratorConst<ZEItemType> ZELink<ZEItemType>::GetIteratorConst()
+ZEList2IteratorConst<ZEItemType> ZELink<ZEItemType>::GetIteratorConst() const
 {
 	return ZEList2IteratorConst<ZEItemType>(this);
 }
@@ -118,7 +119,13 @@ const ZELink<ZEItemType>* ZELink<ZEItemType>::GetNext() const
 }
 
 template<typename ZEItemType>
-ZEItemType* ZELink<ZEItemType>::GetItem() const
+ZEItemType* ZELink<ZEItemType>::GetItem()
+{
+	return Item;
+}
+
+template<typename ZEItemType>
+const ZEItemType* ZELink<ZEItemType>::GetItem() const
 {
 	return Item;
 }

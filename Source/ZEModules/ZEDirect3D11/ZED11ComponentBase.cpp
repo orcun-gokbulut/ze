@@ -45,12 +45,12 @@ ZED11Module* ZED11ComponentBase::GetModule()
 	return Module;
 }
 
-ID3D11Device1* ZED11ComponentBase::GetDevice()
+ID3D11Device1* ZED11ComponentBase::GetDevice() const
 {
 	return Device;
 }
 
-ID3D11DeviceContext1* ZED11ComponentBase::GetMainContext()
+ID3D11DeviceContext1* ZED11ComponentBase::GetMainContext() const
 {
 	return Context;
 }

@@ -36,7 +36,6 @@
 #pragma once
 
 #include "ZEGRBlendState.h"
-#include "ZEGRSamplerState.h"
 #include "ZEGRVertexLayout.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRRasterizerState.h"
@@ -51,6 +50,9 @@ class ZEGRConstantBuffer;
 class ZEGRTexture;
 class ZEGRSamplerState;
 class ZEGRStructuredBuffer;
+class ZEGRSampler;
+class ZEGRViewport;
+class ZEGRScissorRect;
 
 class ZEGRContext
 {
@@ -69,7 +71,7 @@ class ZEGRContext
 		virtual void			GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer) = 0;
 		virtual void			SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture) = 0;
 		virtual void			GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture) = 0;
-		virtual void			SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSamplerState& Sampler) = 0;
+		virtual void			SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler) = 0;
 		
 		virtual void			SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer) = 0;
 		virtual void			GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer** DepthStencilBuffer) = 0;

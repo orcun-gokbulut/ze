@@ -89,13 +89,17 @@ void ZELock::Unlock()
 	CurrentNumber++;
 }
 
-ZELock ZELock::operator=(const ZELock& Lock)
+ZELock& ZELock::operator=(const ZELock& Lock)
 {
-	return ZELock();
+	return *this;
 }
 
 ZELock::ZELock()
 {
+	#ifdef ZE_VTUNE_ENABLED
+	__itt_sync_create(this, "ZELock", "", 0);
+	#endif
+
 	CurrentNumber = 1;
 	NextNumber = 0;
 }

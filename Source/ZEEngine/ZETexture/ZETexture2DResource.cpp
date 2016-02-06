@@ -53,22 +53,22 @@
 static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 {
 	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Output->GetFormat());
-	ZESize Size = Output->GetWidth() * Output->GetHeight() * FormatDefinition->BlockSize;
-
-	void* TargetBuffer = new unsigned char[Size];
 	ZEUInt Width = Output->GetWidth();
+	ZESize Size = Width * Output->GetHeight() * FormatDefinition->BlockSize;
 
-	ZESize LevelCount = (ZESize)TextureData->GetLevelCount();
+	void* SrcBuffer = new unsigned char[Size];
+
+	ZEUInt LevelCount = TextureData->GetLevelCount();
 	ZEArray<ZETextureLevel>& TextureLevels = TextureData->GetSurfaces().GetItem(0).GetLevels();
 	for(ZESize Level = 0; Level < 1; Level++)
 	{
-		ZESize TargetRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
-		TextureLevels[Level].CopyTo(TargetBuffer, TargetRowPitch);
+		ZESize SrcRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
+		TextureLevels[Level].CopyTo(SrcBuffer, SrcRowPitch);
 
-		Output->UpdateSubResource(TargetBuffer, 0, Level, TargetRowPitch);
+		Output->UpdateSubResource(0, Level, SrcBuffer, SrcRowPitch);
 	}
 
-	delete [] TargetBuffer;
+	delete [] SrcBuffer;
 }
 
 const char* ZETexture2DResource::GetResourceType() const
@@ -292,7 +292,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Create TextureResource 
 	ZETexture2DResource* TextureResource = new ZETexture2DResource();
-	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), false);
+	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), 1, FinalTextureData->GetPixelFormat(), false);
 
 	if (Texture == NULL)
 	{

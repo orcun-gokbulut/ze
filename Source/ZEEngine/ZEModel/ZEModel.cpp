@@ -105,7 +105,7 @@ void ZEModel::UpdateTransforms()
 
 ZEDrawFlags ZEModel::GetDrawFlags() const
 {
-	return /*ZE_DF_CULL | */ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER;
+	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER;
 }
 
 void ZEModel::LoadModelResource()
@@ -143,11 +143,6 @@ void ZEModel::LoadModelResource()
 		}
 	}
 
-	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
-	{
-		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
-	}
-
 	Bones.SetCount(ModelResource->GetBones().GetCount());
 
 	for (ZESize I = 0; I < ModelResource->GetBones().GetCount(); I++)
@@ -165,6 +160,11 @@ void ZEModel::LoadModelResource()
 		{
 			Skeleton.Add(&Bones[I]);
 		}
+	}
+
+	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
+	{
+		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
 	}
 
 	if(Skeleton.GetCount() > 1)

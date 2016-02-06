@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRSamplerState.h
+ Zinek Engine - ZEGRSampler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,9 +35,11 @@
 
 #pragma once
 
-#include "ZEGRState.h"
-
 #include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZESharedPointer.h"
+#include "ZEDS/ZEList2.h"
+
+#include "ZEGRState.h"
 
 enum ZEGRTextureAddressing : ZEUInt8
 {
@@ -54,72 +56,43 @@ enum ZEGRTextureFilter : ZEUInt8
 	ZEGR_TFM_ANISOTROPIC				= 2
 };
 
-class ZEGRSamplerState : public ZEGRState
+struct ZEGRSamplerDescription
+{
+	ZEGRTextureAddressing			AddressU;
+	ZEGRTextureAddressing			AddressV;
+	ZEGRTextureAddressing			AddressW;
+	ZEGRTextureFilter				MinFilter;
+	ZEGRTextureFilter				MagFilter;
+	ZEGRTextureFilter				MipFilter;
+	ZEGRComparisonFunction			ComparisonFunction;
+	ZEUInt8							MaxAnisotropy;
+
+	float							MinLOD;
+	float							MaxLOD;
+	float							MipMapLODBias;
+	ZEVector4						BorderColor;
+
+	void							SetToDefault();
+									ZEGRSamplerDescription();
+};
+
+class ZEGRSampler
 {
 	private:
-		struct ZESamplerStateData
-		{
-			ZEGRTextureAddressing			AddressU : 2;
-			ZEGRTextureAddressing			AddressV : 2;
-			ZEGRTextureAddressing			AddressW : 2;
-			ZEGRTextureFilter				MinFilter : 2;
-			ZEGRTextureFilter				MagFilter : 2;
-			ZEGRTextureFilter				MipFilter : 2;
-			ZEGRComparisonFunction			ComparisonFunction : 3;
-			ZEUInt8							MaxAnisotropy : 5;
+		static ZEList2<ZEGRSampler>			SamplerUniqueList;
 
-			float							MinLOD;
-			float							MaxLOD;
-			float							MipMapLODBias;
-			ZEVector4						BorderColor;
+	protected:
+		ZEGRSamplerDescription				Description;
 
-		} StateData;
+		virtual bool						Initialize(const ZEGRSamplerDescription& SamplerDescription);
+		virtual void						Deinitialize();
+
+											ZEGRSampler();
 
 	public:
-		virtual const void*					GetData() const;
-		virtual ZESize						GetDataSize() const;
+		const ZEGRSamplerDescription&		GetDescription() const;
 
-		void								SetMinFilter(ZEGRTextureFilter FilterMode);
-		ZEGRTextureFilter					GetMinFilter() const;
+		virtual								~ZEGRSampler();
 
-		void								SetMagFilter(ZEGRTextureFilter FilterMode);
-		ZEGRTextureFilter					GetMagFilter() const;
-
-		void								SetMipFilter(ZEGRTextureFilter FilterMode);
-		ZEGRTextureFilter					GetMipFilter() const;
-
-		void								SetAddressU(ZEGRTextureAddressing AdressMode);
-		ZEGRTextureAddressing				GetAddressU() const;
-
-		void								SetAddressV(ZEGRTextureAddressing AdressMode);
-		ZEGRTextureAddressing				GetAddressV() const;
-
-		void								SetAddressW(ZEGRTextureAddressing AdressMode);
-		ZEGRTextureAddressing				GetAddressW() const;
-
-		void								SetMipLODBias(float LODBias);
-		float								GetMipLODBias() const;
-
-		void								SetMaxAnisotrophy(ZEUInt AnisotrophyLevel);
-		ZEUInt								GetMaxAnisotrophy() const;
-
-		void								SetBorderColor(const ZEVector4& Color);
-		ZEVector4							GetBorderColor() const;
-
-		void								SetMinLOD(float LOD);
-		float								GetMinLOD() const;
-
-		void								SetMaxLOD(float LOD);
-		float								GetMaxLOD() const;
-
-		void								SetComparsionFunction(ZEGRComparisonFunction ComparisonFunction);
-		ZEGRComparisonFunction				GetComparisonFunction() const;
-
-		void								SetToDefault();
-
-		ZEGRSamplerState&					operator=(const ZEGRSamplerState& State);
-
-											ZEGRSamplerState();
-											ZEGRSamplerState(const ZEGRSamplerState& State);
-		virtual								~ZEGRSamplerState();
+		static ZESharedPointer<ZEGRSampler>	GetSampler(const ZEGRSamplerDescription& SamplerDescription);
 };

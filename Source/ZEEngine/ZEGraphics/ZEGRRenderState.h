@@ -35,43 +35,32 @@
 
 #pragma once
 
+#include "ZEPointer/ZEReferenceCounted.h"
+
 #include "ZETypes.h"
 #include "ZECommon.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEGRVertexLayout.h"
+#include "ZEGRFormat.h"
 #include "ZEGRDefinitions.h"
+#include "ZEGRVertexLayout.h"
 #include "ZEGRBlendState.h"
-#include "ZEGRSamplerState.h"
 #include "ZEGRRasterizerState.h"
 #include "ZEGRDepthStencilState.h"
-#include "ZEGRScissorRect.h"
-#include "ZEGRViewPort.h"
-#include "ZEGRDepthStencilBuffer.h"
-#include "ZEGRFormat.h"
-
-class ZEGRVertexLayout;
-class ZEGRVertexBuffer;
-class ZEGRIndexBuffer;
-class ZEGRShader;
-class ZEGRTexture;
-class ZEGRRenderTarget;
-class ZEGRConstantBuffer;
-class ZEGRDepthStencilBuffer;
-class ZEGRContext;
 
 typedef ZEGRColorMask ColorBlendMask;
 
+class ZEGRShader;
+class ZEGRContext;
 class ZEGRRenderState;
 
-class ZEGRRenderStateData : public ZEGRResource
+class ZEGRRenderStateData : public ZEReferenceCounted
 {
 	friend class ZEGRRenderState;
+
 	protected:
 		virtual bool							Initialize(const ZEGRRenderState& RenderState) = 0;
 
 	public:
-		virtual ZEGRResourceType				GetResourceType();
-
 		static ZEGRRenderStateData*				Create(const ZEGRRenderState& RenderState);
 };
 
@@ -99,7 +88,7 @@ class ZEGRRenderState
 		ZEGRPrimitiveType						GetPrimitiveType() const;
 
 		void									SetShader(ZEGRShaderType Type, ZEGRShader* Shader);
-		ZEGRShader*								GetShader(ZEGRShaderType Type) const;
+		ZEHolder<ZEGRShader>					GetShader(ZEGRShaderType Type) const;
 
 		void									SetRenderTargetFormat(ZEUInt Index, ZEGRFormat Format);
 		ZEGRFormat								GetRenderTargetFormat(ZEUInt Index) const;

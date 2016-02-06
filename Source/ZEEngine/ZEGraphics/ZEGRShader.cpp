@@ -34,26 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRShader.h"
-#include "ZEGRCounter.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEFile\ZEFile.h"
-#include "ZEGRShaderCompiler.h"
-#include "ZEPointer\ZEPointer.h"
 
-bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
+#include "ZEFile/ZEFile.h"
+#include "ZEPointer/ZEPointer.h"
+#include "ZEGRGraphicsModule.h"
+#include "ZEGRShaderCompiler.h"
+
+bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
 	this->ShaderType = ShaderType;
-
-	SetSize(Size);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, Shader, Pipeline);
 
 	return true;
 }
 
 void ZEGRShader::Deinitialize()
 {
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, Shader, Pipeline);
-	SetSize(0);
 }
 
 ZEGRShader::ZEGRShader()
@@ -66,17 +61,12 @@ ZEGRShader::~ZEGRShader()
 	Deinitialize();
 }
 
-ZEGRResourceType ZEGRShader::GetResourceType()
-{
-	return ZEGR_RT_SHADER;
-}
-
-ZEGRShaderType ZEGRShader::GetShaderType()
+ZEGRShaderType ZEGRShader::GetShaderType() const
 {
 	return ShaderType;
 }
 
-ZEGRShader* ZEGRShader::Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
+ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
 	ZEGRShader* Shader = ZEGRGraphicsModule::GetInstance()->CreateShader();
 	if (Shader == NULL)
@@ -91,7 +81,7 @@ ZEGRShader* ZEGRShader::Create(ZEGRShaderType ShaderType, void* ShaderBinary, ZE
 	return Shader;
 }
 
-ZEGRShader* ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
+ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 {
 	ZEFile File;
 	if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
@@ -110,11 +100,12 @@ ZEGRShader* ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 		zeError("Cannot read shader file. File Name: \"%s", Options.FileName.ToCString());
 		return NULL;
 	}
+
 	Buffer[Size] = '\0';
 	File.Close();
 
 	ZEGRShaderCompileOptions UpdatedOptions = Options;
-	UpdatedOptions.SourceData = (char*)Buffer;
+	UpdatedOptions.SourceData = reinterpret_cast<char*>(Buffer);
 
 	#ifdef ZEGR_DEBUG_SHADERS
 		UpdatedOptions.Debug = true;
@@ -126,5 +117,5 @@ ZEGRShader* ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 	if (!Compiler->Compile(OutputShaderBinary, UpdatedOptions, NULL, NULL))
 		return NULL;
 
-	return ZEGRShader::Create(Options.Type, OutputShaderBinary.GetCArray(), OutputShaderBinary.GetCount());
+	return ZEGRShader::CreateInstance(Options.Type, OutputShaderBinary.GetConstCArray(), OutputShaderBinary.GetCount());
 }

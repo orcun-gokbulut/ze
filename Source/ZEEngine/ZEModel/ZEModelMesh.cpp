@@ -617,8 +617,8 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	if (!Visible)
 		return false;
 
-	//if (CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
-		//return false;
+	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+		return false;
 
 	float DrawOrder = 0.0f;	ZEInt32 CurrentLOD = 0;
 	float LODDistanceSquare = 0.0f;
@@ -645,8 +645,8 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		}
 	}
 
-	if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
-		return false;
+	//if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
+		//return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
 	RenderCommand.Priority = 0;
@@ -654,7 +654,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	RenderCommand.StageMask = MeshLOD->GetMaterial()->GetStageMask();
 	RenderCommand.Entity = Owner;
 	RenderCommand.ExtraParameters = MeshLOD;
-	
+
 	CullParameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;

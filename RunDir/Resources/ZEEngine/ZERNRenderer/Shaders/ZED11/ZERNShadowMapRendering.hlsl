@@ -43,20 +43,16 @@ cbuffer ZERNShadowMapRendering_Constants			: register(ZERN_SHADER_CONSTANT_DRAW_
 	float4x4	ZERNShadowMapRendering_WorldMatrix;
 };
 
-struct ZERNShadowMapRendering_VertexShader_Input
+float4 ZERNShadowMapRendering_VertexShader_Main(float3 Position : POSITION0) : SV_Position
 {
-	float3		Position							: POSITION0;
-	float3		Normal								: NORMAL0;
-	float3		Tangent								: TANGENT0;
-	float3		Binormal							: BINORMAL0;
-	float2		Texcoord							: TEXCOORD0;
-};
-
-float4 ZERNShadowMapRendering_VertexShader_Main(ZERNShadowMapRendering_VertexShader_Input Input) : SV_Position
-{
-	float4 PositionWorld = mul(ZERNShadowMapRendering_WorldMatrix, float4(Input.Position, 1.0f));
+	float4 PositionWorld = mul(ZERNShadowMapRendering_WorldMatrix, float4(Position, 1.0f));
 	
 	return ZERNTransformations_WorldToProjection(PositionWorld);
+}
+
+float4 ZERNShadowMapRendering_AlphaCut_PixelShader_Main(float3 Position : POSITION0) : SV_Position
+{
+	//To do when alpha cutting
 }
 
 #endif

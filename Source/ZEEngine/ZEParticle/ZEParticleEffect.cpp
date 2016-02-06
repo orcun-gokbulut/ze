@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleEffect.h"
+
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNCommand.h"

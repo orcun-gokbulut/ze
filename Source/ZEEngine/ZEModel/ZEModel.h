@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_H__
-#define __ZE_MODEL_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -172,5 +170,3 @@ class ZEModel : public ZEEntity
 		
 		static ZEModel*						CreateInstance();
 };
-
-#endif
