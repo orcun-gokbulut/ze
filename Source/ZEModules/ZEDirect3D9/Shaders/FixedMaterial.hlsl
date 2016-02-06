@@ -54,21 +54,25 @@ float4x4 BoneMatrices[58]			: register(vs, c32);
 float4 ScreenToTextureParams		: register(ps, c9);
 float4 MaterialParametersPS[20]		: register(ps, c10);
 
-#define	MaterialAmbientColor        		MaterialParametersPS[0].xyz
-#define	MaterialOpacity						MaterialParametersPS[0].w
-#define	MaterialDiffuseColor        		MaterialParametersPS[1].xyz
-#define	MaterialSpecularColor       		MaterialParametersPS[2].xyz
-#define	MaterialSpecularFactor				MaterialParametersPS[2].w
-#define	MaterialEmmisiveColor       		MaterialParametersPS[3].xyz
-#define	MaterialEmmisiveFactor				MaterialParametersPS[3].w
-#define	MaterialReflectionFactor			MaterialParametersPS[4].x
-#define	MaterialRefractionFactor    		MaterialParametersPS[4].y
-#define	MaterialDetailMapTiling     		MaterialParametersPS[4].zw
-
-#define MaterialSubSurfaceScatteringFactor	MaterialParametersPS[5].x
-#define MaterialAlphaCullLimit				MaterialParametersPS[5].y
-
-
+#define	MaterialAmbientColor        				MaterialParametersPS[0].xyz
+#define	MaterialOpacity								MaterialParametersPS[0].w
+#define	MaterialDiffuseColor        				MaterialParametersPS[1].xyz
+#define	MaterialSpecularColor       				MaterialParametersPS[2].xyz
+#define	MaterialSpecularFactor						MaterialParametersPS[2].w
+#define	MaterialEmmisiveColor       				MaterialParametersPS[3].xyz
+#define	MaterialEmmisiveFactor						MaterialParametersPS[3].w
+#define	MaterialReflectionFactor					MaterialParametersPS[4].x
+#define	MaterialRefractionFactor    				MaterialParametersPS[4].y
+#define MaterialSubSurfaceScatteringFactor			MaterialParametersPS[4].z
+#define MaterialAlphaCullLimit						MaterialParametersPS[4].w
+#define	MaterialDetailBaseMapTiling     			MaterialParametersPS[5].xy
+#define MaterialDetailBaseMapAttenuationStart		MaterialParametersPS[5].z
+#define MaterialDetailBaseMapAttenuationFactor		MaterialParametersPS[5].w
+#define	MaterialDetailNormalMapTiling     			MaterialParametersPS[6].xy
+#define MaterialDetailNormalMapAttenuationStart		MaterialParametersPS[6].z
+#define MaterialDetailNormalMapAttenuationFactor	MaterialParametersPS[6].w
+#define MaterialDetailBaseMapColor					MaterialParametersPS[7].xyz
+#define MaterialDetailNormalMapFactor				MaterialParametersPS[7].w
 // Textures
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -155,17 +159,14 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 // Pixel Shader
 struct ZEFixedMaterial_GBuffer_PSInput
 {
-	float Side				: VFACE;
-	float3 Position			: TEXCOORD0;
-	float3 Normal			: TEXCOORD1;
-	
-	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP) || defined(ZE_SHADER_NORMAL_MAP) || defined(ZE_SHADER_ALPHA_CULL)
-		float2 Texcoord		: TEXCOORD2;
-	#endif
+	float Side		: VFACE;
+	float3 Position	: TEXCOORD0;
+	float3 Normal	: TEXCOORD1;
+	float2 Texcoord	: TEXCOORD2;
 	
 	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal		: TEXCOORD3;
-		float3 Tangent		: TEXCOORD4;
+		float3 Binormal	: TEXCOORD3;
+		float3 Tangent	: TEXCOORD4;
 	#endif
 };
 
@@ -191,13 +192,25 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 		
 	ZEGBuffer_SetViewPosition(GBuffer, Input.Position);
 
+	float3 Normal;
 	#if defined(ZE_SHADER_NORMAL_MAP)
 		float3 NormalSample = tex2D(NormalMap, Input.Texcoord) * 2.0f - 1.0f;
-		float3 Normal = normalize(NormalSample.x * Input.Tangent + NormalSample.y * Input.Binormal + NormalSample.z * Input.Normal);
-		ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	
+		Normal = normalize(NormalSample.x * Input.Tangent + NormalSample.y * Input.Binormal + NormalSample.z * Input.Normal) * Input.Side;
 	#else
-		ZEGBuffer_SetViewNormal(GBuffer, Input.Normal * Input.Side);
-	#endif	
+		Normal = Input.Normal * Input.Side;
+	#endif
+
+	#ifdef ZE_SHADER_DETAIL_NORMAL_MAP
+		float3 DetailNormalSample = tex2D(DetailNormalMap, Input.Texcoord * MaterialDetailNormalMapTiling) * 2.0f - 1.0f;
+		float3 DetailNormal = normalize(DetailNormalSample.x * Input.Tangent + DetailNormalSample.y * Input.Binormal + DetailNormalSample.z * Input.Normal) * Input.Side;
+		DetailNormal = lerp(Normal, DetailNormal, MaterialDetailNormalMapFactor);	
+
+		float InvDetailAttenuation = min(length(Input.Position) - MaterialDetailNormalMapAttenuationStart, 0.0f);
+		InvDetailAttenuation = max(InvDetailAttenuation * MaterialDetailNormalMapAttenuationFactor, 1.0f);
+		Normal = normalize(lerp(DetailNormal, Normal, InvDetailAttenuation));
+	#endif
+
+	ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	
 	
 	#if defined(ZE_SHADER_SPECULAR_GLOSS_MAP)
 		ZEGBuffer_SetSpecularGlossiness(GBuffer, MaterialSpecularFactor * tex2D(GlossMap, Input.Texcoord).x);
@@ -220,24 +233,15 @@ struct ZEFixedMaterial_ForwardPass_VSOutput
 {
 	float4 Position				: POSITION0;
 	float2 Texcoord				: TEXCOORD0;
-	
-	#ifdef ZE_SHADER_DETAIL_MAP
-		float2 DetailTexcoord	: TEXCOORD1;
-	#endif
-	
-	#ifdef ZE_SHADER_LIGHT_MAP
-		float2 LightMapTexcoord : TEXCOORD2;
-	#endif
+	float4 Color				: TEXCOORD1;
 	
 	#ifdef ZE_SHADER_REFLECTION
-		float3 ReflectionVector : TEXCOORD3;
+		float3 ReflectionVector : TEXCOORD2;
 	#endif
 
 	#ifdef ZE_SHADER_REFRACTION
-		float3 RefractionVector : TEXCOORD4;
+		float3 RefractionVector : TEXCOORD3;
 	#endif
-
-	float4 Color : TEXCOORD5;
 };
 
 ZEFixedMaterial_ForwardPass_VSOutput ZEFixedMaterial_ForwardPass_VertexShader(ZEFixedMaterial_VSInput Input)
@@ -274,25 +278,18 @@ struct ZEFixedMaterial_ForwardPass_PSOutput
 
 struct ZEFixedMaterial_ForwardPass_PSInput
 {
-	float3 ScreenPosition			: VPOS;
-	float2 Texcoord					: TEXCOORD0;
-	
-	#ifdef ZE_SHADER_DETAIL_MAP
-		float2 DetailTexcoord		: TEXCOORD1;
-	#endif
-	
-	#ifdef ZE_SHADER_LIGHT_MAP
-		float2 LightMapTexcoord     : TEXCOORD2;
-	#endif
-	
+	float3 ScreenPosition	: VPOS;
+	float2 Texcoord			: TEXCOORD0;
+	float4 Color			: TEXCOORD1;
+
 	#ifdef ZE_SHADER_REFLECTION
-		float3 ReflectionVector     : TEXCOORD3;
+		float3 ReflectionVector : TEXCOORD2;
 	#endif
 
 	#ifdef ZE_SHADER_REFRACTION
-		float3 RefractionVector     : TEXCOORD4;
+		float3 RefractionVector : TEXCOORD3;
 	#endif	
-	float4 Color : TEXCOORD5;
+	
 };
 
 ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEFixedMaterial_ForwardPass_PSInput Input)
@@ -317,8 +314,21 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	
 	float2 ScreenPosition = Input.ScreenPosition * ScreenToTextureParams.xy + ScreenToTextureParams.zw;		
 
+	float3 BaseColor = float3(1.0f, 1.0f, 1.0f);
+	#ifdef ZE_SHADER_BASE_MAP
+		BaseColor *= tex2D(BaseMap, Input.Texcoord).rgb;	
+	#endif	
+
+	#ifdef ZE_SHADER_DETAIL_BASE_MAP
+		float3 DetailBaseColor = DetailBaseMapColor * tex2D(DetailBaseMap, Input.Texcoord * MaterialDetailBaseMapTiling);
+
+		float InvDetailAttenuation = min(length(Input.Position) - MaterialDetailBaseMapAttenuationStart, 0.0f);
+		InvDetailAttenuation = max(InvDetailAttenuation * MaterialDetailBaseMapAttenuationFactor, 1.0f);
+		BaseColor = lerp(DetailBaseColor, BaseColor, InvDetailAttenuation);
+	#endif
+
 	#ifdef ZE_SHADER_AMBIENT
-		float3 AmbientColor = MaterialAmbientColor;
+		float3 AmbientColor = BaseColor * MaterialAmbientColor;
 		#ifdef ZE_SHADER_SSAO
 			AmbientColor *= tex2D(SSAOBuffer, ScreenPosition).r;
 		#endif
@@ -332,16 +342,14 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 	#endif
 
 	#ifdef ZE_SHADER_DIFFUSE
-		float3 DiffuseColor = MaterialDiffuseColor;
+		float3 DiffuseColor = BaseColor * MaterialDiffuseColor;
 		DiffuseColor *= ZELBuffer_GetDiffuse(ScreenPosition);
-		#ifdef ZE_SHADER_BASE_MAP
-			DiffuseColor *= tex2D(BaseMap, Input.Texcoord).rgb;	
-		#endif	
+
 		Output.Color.rgb += DiffuseColor;
 	#endif
 	
 	#ifdef ZE_SHADER_SPECULAR
-		float3 SpecularColor = MaterialSpecularColor;
+		float3 SpecularColor = BaseColor * MaterialSpecularColor;
 		#ifdef ZE_SHADER_SPECULAR_MAP
 			SpecularColor *= tex2D(SpecularMap, Input.Texcoord).rgb;
 		#endif

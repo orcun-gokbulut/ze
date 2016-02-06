@@ -346,6 +346,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2& Argument,
 	return true;
 }
 
+bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector2d& Argument, const char* ArgumentFormat)
+{
+	return Format(Output, Argument.ToVector2(), ArgumentFormat);
+}
+
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat)
 {
 	char PreFix[256] = "<";
@@ -371,6 +376,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3& Argument,
 	Output.Append(PostFix);
 
 	return true;
+}
+
+bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector3d& Argument, const char* ArgumentFormat)
+{
+	return Format(Output, Argument.ToVector3(), ArgumentFormat);
 }
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat)
@@ -400,6 +410,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4& Argument,
 	Output.Append(PostFix);
 
 	return true;
+}
+
+bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEVector4d& Argument, const char* ArgumentFormat)
+{
+	return Format(Output, Argument.ToVector4(), ArgumentFormat);
 }
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat)
@@ -475,6 +490,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3& Argumen
 	return true;
 }
 
+bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix3x3d& Argument, const char* ArgumentFormat)
+{
+	return Format(Output, Argument.ToMatrix3x3(), ArgumentFormat);
+}
+
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument,const char* ArgumentFormat)
 {
 	char PreFix[256] = "<";
@@ -529,6 +549,11 @@ bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4& Argumen
 	Output.Append(PostFix);
 
 	return true;
+}
+
+bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEMatrix4x4d& Argument, const char* ArgumentFormat)
+{
+	return Format(Output, Argument.ToMatrix4x4(), ArgumentFormat);
 }
 
 bool ZEFormatArgument::Format(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat)
@@ -593,17 +618,32 @@ bool ZEFormatArgument::FormatVariant(ZEStringWriter& Output, const ZEValue& Argu
 		case ZE_VRT_VECTOR2:
 			return Format(Output, Argument.GetVector2(), ArgumentFormat);
 
+		case ZE_VRT_VECTOR2D:
+			return Format(Output, Argument.GetVector2d(), ArgumentFormat);
+
 		case ZE_VRT_VECTOR3:
 			return Format(Output, Argument.GetVector3(), ArgumentFormat);
+
+		case ZE_VRT_VECTOR3D:
+			return Format(Output, Argument.GetVector3d(), ArgumentFormat);
 
 		case ZE_VRT_VECTOR4:
 			return Format(Output, Argument.GetVector4(), ArgumentFormat);
 
+		case ZE_VRT_VECTOR4D:
+			return Format(Output, Argument.GetVector4d(), ArgumentFormat);
+
 		case ZE_VRT_MATRIX3X3:
 			return Format(Output, Argument.GetMatrix3x3(), ArgumentFormat);
 
+		case ZE_VRT_MATRIX3X3D:
+			return Format(Output, Argument.GetMatrix3x3d(), ArgumentFormat);
+
 		case ZE_VRT_MATRIX4X4:
 			return Format(Output, Argument.GetMatrix4x4(), ArgumentFormat);
+
+		case ZE_VRT_MATRIX4X4D:
+			return Format(Output, Argument.GetMatrix4x4d(), ArgumentFormat);
 
 		case ZE_VRT_CLASS:
 			return Format(Output, Argument.GetClass(), ArgumentFormat);

@@ -138,13 +138,25 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		{
 			Output.BaseType = ZEMC_BT_VECTOR2;
 		}
+		else if (ClassDecl->getName() == "ZEVector2d")
+		{
+			Output.BaseType = ZEMC_BT_VECTOR2D;
+		}
 		else if (ClassDecl->getName() == "ZEVector3")
 		{
 			Output.BaseType = ZEMC_BT_VECTOR3;
 		}
+		else if (ClassDecl->getName() == "ZEVector3d")
+		{
+			Output.BaseType = ZEMC_BT_VECTOR3D;
+		}
 		else if (ClassDecl->getName() == "ZEVector4")
 		{
 			Output.BaseType = ZEMC_BT_VECTOR4;
+		}
+		else if (ClassDecl->getName() == "ZEVector4d")
+		{
+			Output.BaseType = ZEMC_BT_VECTOR4D;
 		}
 		else if (ClassDecl->getName() == "ZEQuaternion")
 		{
@@ -154,9 +166,17 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 		{
 			Output.BaseType = ZEMC_BT_MATRIX3X3;
 		}
+		else if (ClassDecl->getName() == "ZEMatrix3x3d")
+		{
+			Output.BaseType = ZEMC_BT_MATRIX3X3D;
+		}
 		else if (ClassDecl->getName() == "ZEMatrix4x4")
 		{
 			Output.BaseType = ZEMC_BT_MATRIX4X4;
+		}
+		else if (ClassDecl->getName() == "ZEMatrix4x4d")
+		{
+			Output.BaseType = ZEMC_BT_MATRIX4X4D;
 		}
 		else
 		{

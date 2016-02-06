@@ -79,28 +79,23 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 	if (VertexBuffer == NULL)
 		return;
 
-	if (!Owner->GetStaticModel() || !StaticCalculationsDone)
+	if (Skinned)
 	{
-		if (Skinned)
+		RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
+		for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
 		{
-			RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
-			for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
-			{
-				ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
-			}
-
-			RenderCommand.WorldMatrix = Owner->GetWorldTransform();
-		}
-		else if(OwnerMesh->GetPhysicalCloth() != NULL)
-		{
-			RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
-		}
-		else
-		{
-			RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
+			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
 		}
 
-		StaticCalculationsDone = Owner->GetStaticModel();
+		RenderCommand.WorldMatrix = Owner->GetWorldTransform();
+	}
+	else if(OwnerMesh->GetPhysicalCloth() != NULL)
+	{
+		RenderCommand.WorldMatrix = ZEMatrix4x4::Identity;
+	}
+	else
+	{
+		RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
 	}
 
 	RenderCommand.Order = DrawOrder;
@@ -251,7 +246,6 @@ void ZEModelMeshLOD::Deinitialize()
 	LODResource = NULL;
 	Material = NULL;
 	Skinned = false;
-	StaticCalculationsDone = false;
 }
 
 ZEModelMeshLOD::ZEModelMeshLOD()
@@ -265,7 +259,6 @@ ZEModelMeshLOD::ZEModelMeshLOD()
 	VertexBuffer = NULL;
 	LODResource = NULL;
 	Material = NULL;
-	StaticCalculationsDone = false;
 }
 
 ZEModelMeshLOD::~ZEModelMeshLOD()

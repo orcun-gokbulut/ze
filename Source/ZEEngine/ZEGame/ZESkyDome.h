@@ -76,10 +76,7 @@ class ZESkyDome : public ZEEntity
 		virtual bool			DeinitializeSelf();
 
 								ZESkyDome();
-		virtual					~ZESkyDome();
-
-	private:
-		
+	
 	public:
 		void					SetSetMieConstant(float Value);
 		float					GetGetMieConstant() const;
@@ -121,6 +118,8 @@ class ZESkyDome : public ZEEntity
 
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
+
+		virtual					~ZESkyDome();
 
 		static ZESkyDome*		CreateInstance();
 };

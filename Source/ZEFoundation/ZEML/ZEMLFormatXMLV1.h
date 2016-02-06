@@ -50,6 +50,7 @@ class ZEMLFormatXMLV1 : public ZEMLFormat
 
 		void							PrintC14NSpace(ZEFile* File);
 		bool							ReadVectors(ZEFile* File, float* Output, const char** Members, ZESize MemberCount);
+		bool							ReadDoubleVectors(ZEFile* File, double* Output, const char** Members, ZESize MemberCount);
 
 	public:
 		static ZEMLFormatDescription*	Description();

@@ -67,6 +67,8 @@ public:
 	void						Draw(ZEUIRenderer* Renderer);
 	void						Tick(float ElapsedTime);
 
+	void						Destroy();
+
 	static ZEUIDebugDrawTag*	CreateInstance();
 
 

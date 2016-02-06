@@ -343,12 +343,30 @@ bool ZEMLFormatBinaryV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				break;
 			}
 
+			case ZEML_VT_VECTOR2D:
+			{
+				ZEVector2d Temp;
+				if (File->Read(&Temp, sizeof(ZEVector2d), 1) != 1)
+					return false;
+				Element.Value.SetVector2d(Temp);
+				break;
+			}
+
 			case ZEML_VT_VECTOR3:
 			{
 				ZEVector3 Temp;
 				if (File->Read(&Temp, sizeof(ZEVector3), 1) != 1)
 					return false;
 				Element.Value.SetVector3(Temp);
+				break;
+			}
+
+			case ZEML_VT_VECTOR3D:
+			{
+				ZEVector3d Temp;
+				if (File->Read(&Temp, sizeof(ZEVector3d), 1) != 1)
+					return false;
+				Element.Value.SetVector3d(Temp);
 				break;
 			}
 
@@ -361,6 +379,15 @@ bool ZEMLFormatBinaryV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				break;
 			}
 
+			case ZEML_VT_VECTOR4D:
+			{
+				ZEVector4d Temp;
+				if (File->Read(&Temp, sizeof(ZEVector4d), 1) != 1)
+					return false;
+				Element.Value.SetVector4d(Temp);
+				break;
+			}
+
 			case ZEML_VT_MATRIX3X3:
 			{
 				ZEMatrix3x3 Temp;
@@ -370,12 +397,30 @@ bool ZEMLFormatBinaryV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				break;
 			}
 
+			case ZEML_VT_MATRIX3X3D:
+			{
+				ZEMatrix3x3d Temp;
+				if (File->Read(&Temp, sizeof(ZEMatrix3x3d), 1) != 1)
+					return false;
+				Element.Value.SetMatrix3x3d(Temp);
+				break;
+			}
+
 			case ZEML_VT_MATRIX4X4:
 			{
 				ZEMatrix4x4 Temp;
 				if (File->Read(&Temp, sizeof(ZEMatrix4x4), 1) != 1)
 					return false;
 				Element.Value.SetMatrix4x4(Temp);
+				break;
+			}
+
+			case ZEML_VT_MATRIX4X4D:
+			{
+				ZEMatrix4x4d Temp;
+				if (File->Read(&Temp, sizeof(ZEMatrix4x4d), 1) != 1)
+					return false;
+				Element.Value.SetMatrix4x4d(Temp);
 				break;
 			}
 
@@ -580,10 +625,27 @@ bool ZEMLFormatBinaryV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				break;
 			}
 
+			case ZEML_VT_VECTOR2D:
+			{
+				ZEVector2d ValueTemp = Element.Value.GetVector2d();
+				if (File->Write(&ValueTemp, sizeof(ZEVector2d), 1) != 1)
+					return false;
+				break;
+			}
+
+
 			case ZEML_VT_VECTOR3:
 			{
 				ZEVector3 ValueTemp = Element.Value.GetVector3();
 				if (File->Write(&ValueTemp, sizeof(ZEVector3), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_VECTOR3D:
+			{
+				ZEVector3d ValueTemp = Element.Value.GetVector3d();
+				if (File->Write(&ValueTemp, sizeof(ZEVector3d), 1) != 1)
 					return false;
 				break;
 			}
@@ -596,6 +658,14 @@ bool ZEMLFormatBinaryV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				break;
 			}
 
+			case ZEML_VT_VECTOR4D:
+			{
+				ZEVector4d ValueTemp = Element.Value.GetVector4d();
+				if (File->Write(&ValueTemp, sizeof(ZEVector4d), 1) != 1)
+					return false;
+				break;
+			}
+
 			case ZEML_VT_MATRIX3X3:
 			{
 				ZEMatrix3x3 ValueTemp = Element.Value.GetMatrix3x3();
@@ -604,10 +674,26 @@ bool ZEMLFormatBinaryV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				break;
 			}
 
+			case ZEML_VT_MATRIX3X3D:
+			{
+				ZEMatrix3x3d ValueTemp = Element.Value.GetMatrix3x3d();
+				if (File->Write(&ValueTemp, sizeof(ZEMatrix3x3d), 1) != 1)
+					return false;
+				break;
+			}
+
 			case ZEML_VT_MATRIX4X4:
 			{
 				ZEMatrix4x4 ValueTemp = Element.Value.GetMatrix4x4();
 				if (File->Write(&ValueTemp, sizeof(ZEMatrix4x4), 1) != 1)
+					return false;
+				break;
+			}
+
+			case ZEML_VT_MATRIX4X4D:
+			{
+				ZEMatrix4x4d ValueTemp = Element.Value.GetMatrix4x4d();
+				if (File->Write(&ValueTemp, sizeof(ZEMatrix4x4d), 1) != 1)
 					return false;
 				break;
 			}
