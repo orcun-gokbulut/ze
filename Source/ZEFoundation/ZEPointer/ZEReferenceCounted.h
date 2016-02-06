@@ -43,17 +43,19 @@ class ZEReferenceCounted
 	template<typename ZEReferenceCountedClass>
 	friend class ZEHolder;
 	private:
-		mutable ZELock	ReferenceCountLock;
-		mutable ZESize	ReferenceCount;
+		mutable ZELock			ReferenceCountLock;
+		mutable ZESize			ReferenceCount;
 	
-		void			Release() const;
-		void			Reference() const;
+		void					Release() const;
+		void					Reference() const;
 	
 	protected:
-		virtual void	Destroy() const;
+		virtual void			Destroy() const;
 
 	public:
-						ZEReferenceCounted();
-						ZEReferenceCounted(const ZEReferenceCounted& Object);
-		virtual			~ZEReferenceCounted();
+		ZEReferenceCounted&		operator=(const ZEReferenceCounted& Other);
+
+								ZEReferenceCounted();
+								ZEReferenceCounted(const ZEReferenceCounted& Object);
+		virtual					~ZEReferenceCounted();
 };

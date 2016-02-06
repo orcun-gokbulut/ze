@@ -253,7 +253,7 @@ class ZEArray
 
 			ZEDebugCheckMemory();
 
-			return &Items[Count - 1];
+			return reinterpret_cast<ZEType*>(&Items[Count - 1]);
 		}
 
 		inline ZEType* AddOrderedInc(ZEType NewItem)

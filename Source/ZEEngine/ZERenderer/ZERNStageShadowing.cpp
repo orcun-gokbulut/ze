@@ -34,19 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStageShadowing.h"
-#include "ZERNStageID.h"
 
+#include "ZERNStageID.h"
 #include "ZERNRenderer.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZELight.h"
 
-ZEInt ZERNStageShadowing::GetId()
+ZEInt ZERNStageShadowing::GetId() const
 {
 	return ZERN_STAGE_SHADOWING;
 }
 
-const ZEString& ZERNStageShadowing::GetName()
+const ZEString& ZERNStageShadowing::GetName() const
 {
 	static const ZEString Name = "Shadowing";
 	return Name;
@@ -64,19 +64,4 @@ void ZERNStageShadowing::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 
 ZERNStageShadowing::ZERNStageShadowing()
 {
-
 }
-
-const ZEGRRenderState& ZERNStageShadowing::GetRenderState()
-{
-	static ZEGRRenderState RenderState;
-	static bool Initialized = false;
-
-	if(!Initialized)
-	{
-		Initialized = true;
-	}
-
-	return RenderState;
-}
-

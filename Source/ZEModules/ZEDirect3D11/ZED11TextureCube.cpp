@@ -40,17 +40,17 @@
 
 #include "ZEError.h"
 
-ID3D11Texture2D* ZED11TextureCube::GetTexture()
+ID3D11Texture2D* ZED11TextureCube::GetTexture() const
 {
 	return Texture;
 }
 
-ID3D11ShaderResourceView* ZED11TextureCube::GetResourceView()
+ID3D11ShaderResourceView* ZED11TextureCube::GetResourceView() const
 {
 	return ResourceView;
 }
 
-ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level)
+ZEHolder<const ZEGRRenderTarget> ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const
 {
 	zeDebugCheck(Texture == NULL, "Empty texture.");
 	zeCheckError(!GetIsRenderTarget(), NULL, "Texture not created with render target flag");
@@ -72,7 +72,7 @@ ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZE
 		return NULL;
 	}
 
-	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(GetLength() >> Level, GetLength() >> Level, GetFormat(), RenderTargetView);
+	ZEHolder<ZEGRRenderTarget> RenderTarget = new ZED11RenderTarget(GetLength() >> Level, GetLength() >> Level, GetFormat(), RenderTargetView);
 
 	#ifdef ZE_GRAPHIC_LOG_ENABLE
 	zeLog("Render target view created. TextureCube: %p, MipLevel: %u, Width: %u, Height: %u, Depth: %u", 
@@ -139,52 +139,22 @@ void ZED11TextureCube::Deinitialize()
 {
 	ZEGR_RELEASE(ResourceView);
 	ZEGR_RELEASE(Texture);
+
 	ZEGRTextureCube::Deinitialize();
 }
 
-bool ZED11TextureCube::UpdateSubResource(void* Data, ZESize RowPitch, ZEGRTextureCubeFace Face, ZEUInt Level)
+bool ZED11TextureCube::UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch)
 {
-	zeCheckError(Data == NULL, false, "Data is NULL.");
-	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
-	zeCheckError(Face >= 6, false, "There is no such a cube texture face.");
+	zeCheckError(DestFace >= 6, false, "There is no such a cube texture face.");
+	zeCheckError(DestLevel >= GetLevelCount(), false, "There is no such a texture level.");
 
-	GetMainContext()->UpdateSubresource(Texture, Face * GetLevelCount() + Level, NULL, Data, RowPitch, 0);
+	GetMainContext()->UpdateSubresource(Texture, DestFace * GetLevelCount() + DestLevel, NULL, SrcData, SrcRowPitch, 0);
 
 	return true;
 }
 
-bool ZED11TextureCube::Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level)
-{
-	zeDebugCheck(Texture == NULL, "Texture is not initailized.");
-	zeCheckError(Buffer == NULL || Pitch == NULL, false, "Buffer is NULL.");
-	zeCheckError(Level >= GetLevelCount(), false, "There is no such a texture level.");
-	zeCheckError(Face >= 6, false, "There is no such a cube texture face.");
-
-	D3D11_MAPPED_SUBRESOURCE MapData;
-	HRESULT Result = GetMainContext()->Map(Texture, Face * GetLevelCount() + Level, D3D11_MAP_WRITE_DISCARD, 0, &MapData);
-	*Buffer = MapData.pData;
-	*Pitch = MapData.RowPitch;
-
-	if (FAILED(Result) && Result != D3D11_MAP_FLAG_DO_NOT_WAIT)
-	{
-		zeError("Cannot lock texture 2d resource.");
-		return false;
-	}
-
-	return SUCCEEDED(Result);
-}
-
-void ZED11TextureCube::Unlock(ZEGRTextureCubeFace Face, ZEUInt Level)
-{
-	zeDebugCheck(Texture == NULL, "Texture is not initailized.");
-	zeCheckError(Level >= GetLevelCount(), ZE_VOID, "There is no such a texture level.");
-	zeCheckError(Face >= 6, ZE_VOID, "There is no such a cube texture face.");
-
-	GetMainContext()->Unmap(Texture, Face * GetLevelCount() + Level);
-}
 ZED11TextureCube::ZED11TextureCube()
 {
 	Texture = NULL;
 	ResourceView = NULL;
 }
-

@@ -37,6 +37,11 @@
 
 #include <memory.h>
 
+ZEGRStateType ZEGRRasterizerState::GetStateType() const
+{
+	return ZEGRStateType::ZEGR_ST_RASTERIZER;
+}
+
 const void* ZEGRRasterizerState::GetData() const
 {
 	return &StateData;

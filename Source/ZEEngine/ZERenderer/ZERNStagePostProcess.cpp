@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStagePostProcess.h"
+
 #include "ZERNStageID.h"
 #include "ZERNStageGBuffer.h"
 #include "ZERNRenderer.h"
@@ -53,23 +54,15 @@ bool ZERNStagePostProcess::InitializeSelf()
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {
+	OutputTexture.Release();
 }
 
-ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
-{
-	return OutputTexture;
-}
-
-ZERNStagePostProcess::ZERNStagePostProcess()
-{
-}
-
-ZEInt ZERNStagePostProcess::GetId()
+ZEInt ZERNStagePostProcess::GetId() const
 {
 	return ZERN_STAGE_POST_EFFECT;
 }
 
-const ZEString& ZERNStagePostProcess::GetName()
+const ZEString& ZERNStagePostProcess::GetName() const
 {
 	static const ZEString Name = "Post Process Stage";
 	return Name;
@@ -85,7 +78,7 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, StageGBuffer->GetAccumulationMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
 
-	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
+	const ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
 
@@ -95,7 +88,7 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 	if(OutputTexture == NULL || OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 	{
 		OutputTexture.Release();
-		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 	}
 
 	RenderTarget = OutputTexture->GetRenderTarget();
@@ -113,7 +106,16 @@ void ZERNStagePostProcess::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 
-const ZEGRRenderState& ZERNStagePostProcess::GetRenderState()
+ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
+{
+	return OutputTexture;
+}
+
+ZERNStagePostProcess::ZERNStagePostProcess()
+{
+}
+
+ZEGRRenderState ZERNStagePostProcess::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;

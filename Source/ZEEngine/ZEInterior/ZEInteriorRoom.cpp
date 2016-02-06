@@ -337,6 +337,7 @@ void ZEInteriorRoom::PreRender(const ZERNCullParameters* CullParameters)
 void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	ZEGRContext* Context = Parameters->Context;
+	ConstantBuffer->SetData(&GetWorldTransform());
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
 	Context->SetVertexBuffers(0, 1, &VertexBuffer);
 
@@ -358,16 +359,9 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Position = Resource->Position;
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
-
-	Owner->SetBoundingBox(this->BoundingBox);
-
-	ZEMatrix4x4 LocalTransform;
-	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-	ZEMatrix4x4 LocalTransformOwner = Owner->GetWorldTransform() * LocalTransform;
 	
 	VertexBuffer = ZEGRVertexBuffer::Create(Resource->Polygons.GetCount() * 3, sizeof(ZEInteriorVertex));
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
-	ConstantBuffer->SetData(&LocalTransformOwner);
 
 	ZEArray<bool> Processed;
 	Processed.SetCount(Resource->Polygons.GetCount());

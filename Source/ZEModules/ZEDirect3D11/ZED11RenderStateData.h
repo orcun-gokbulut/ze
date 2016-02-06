@@ -35,19 +35,13 @@
 
 #pragma once
 
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 #include "ZED11ComponentBase.h"
+
+#include "ZEPointer/ZEHolder.h"
 #include "ZED11State.h"
 
 #include <d3d11.h>
-
-class ZED11DepthStencilBuffer;
-class ZED11RenderTarget;
-class ZED11VertexBuffer;
-class ZED11IndexBuffer;
-class ZED11ConstantBuffer;
-class ZEGRTexture;
 
 class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBase
 {
@@ -55,18 +49,14 @@ class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBa
 	friend class ZED11Context;
 	friend class ZED11StatePool;
 	private:
-		ZEHolder<ZED11VertexLayout>				VertexLayout;
-		ZEHolder<ZED11RasterizerState>			RasterizerState;
-		ZEHolder<ZED11DepthStencilState>		DepthStencilState;
-		ZEHolder<ZED11DepthStencilBuffer>		DepthStencilBuffer;
-		ZEHolder<ZED11BlendState>				BlendState;
+		ZEHolder<const ZED11VertexLayout>		VertexLayout;
+		ZEHolder<const ZED11RasterizerState>	RasterizerState;
+		ZEHolder<const ZED11DepthStencilState>	DepthStencilState;
+		ZEHolder<const ZED11BlendState>			BlendState;
 
 		D3D11_PRIMITIVE_TOPOLOGY				PrimitiveTopology;
 
 		ZEHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
-		ID3D11RasterizerState*					NativeRasterizerState;
-		ID3D11DepthStencilState*				NativeDepthStencilState;
-		ID3D11BlendState*						NativeBlendState;
 
 		virtual bool							Initialize(const ZEGRRenderState& RenderState);
 };

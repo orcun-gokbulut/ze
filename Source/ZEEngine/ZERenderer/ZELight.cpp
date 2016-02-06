@@ -205,7 +205,6 @@ void ZELight::SetPosition(const ZEVector3& NewPosition)
 	if (GetPosition() != NewPosition)
 	{
 		ZEEntity::SetPosition(NewPosition);
-
 		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 	}
 }
@@ -249,8 +248,6 @@ ZELight::ZELight()
 
 	ViewTransform = ZEMatrix4x4::Identity;
 	ProjectionTransform = ZEMatrix4x4::Identity;
-
-	DirtyFlags.RaiseAll();
 }
 
 ZELight::~ZELight()

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNMaterial.h
+ Zinek Engine - ZED11Sampler.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,45 +35,22 @@
 
 #pragma once
 
-#include "ZEInitializable.h"
-#include "ZEGraphics/ZEGRResource.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZEGraphics/ZEGRSampler.h"
+#include "ZED11ComponentBase.h"
 
-#define ZEGR_MAX_RENDERER_STAGE_COUNT 10
-
-class ZEGRContext;
-class ZERNRenderer;
-class ZERNStage;
-class ZEGRRenderStateData;
-
-class ZERNMaterialStage
+class ZED11Sampler : public ZEGRSampler, public ZED11ComponentBase
 {
-	public:
-		ZERNStage*						Stage;
-		ZEHolder<ZEGRRenderStateData>	RenderState;
-
-										ZERNMaterialStage();
-};
-
-class ZERNMaterial : public ZEGRResource, public ZEInitializable
-{
+	friend class ZED11Context;
+	friend class ZED11Module;
 	private:
-		ZERNMaterialStage				Stages[ZEGR_MAX_RENDERER_STAGE_COUNT];
-		ZESize							StageCount;
+		ID3D11SamplerState*			NativeSampler;
 
-		void							AddStage(ZERNStage* Stage, ZEGRRenderStateData* State);
-		ZEGRRenderStateData*			GetRenderState(ZERNStage* Stage);
+		ID3D11SamplerState*			GetInterface() const;
 
 	protected:
-										ZERNMaterial();
-		virtual							~ZERNMaterial();
+		virtual bool				Initialize(const ZEGRSamplerDescription& SamplerDescription);
+		virtual void				Deinitialize();
 
-	public:
-		virtual ZEGRResourceType		GetResourceType() const;
-		virtual ZEUInt					GetStageMask() const;
-
-		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-
-		virtual bool					Update();
+									ZED11Sampler();
+		virtual						~ZED11Sampler();
 };

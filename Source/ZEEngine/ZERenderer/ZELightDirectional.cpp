@@ -34,18 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELightDirectional.h"
+
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERNCuller.h"
 #include "ZERNView.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEMath/ZEMath.h"
 #include "ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERNStageShadowmapGeneration.h"
-#include "ZEGraphics/ZEGRContext.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRContext.h"
+#include "ZECamera.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -55,56 +59,54 @@
 
 void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView& View)
 {
+	ZEAABBox SceneAABBLight = GetSceneBoundingBoxLight(Scene);
 
-	ZEAABBox SceneAABBLight;
-	CalculateSceneBoundingBoxLight(&SceneAABBLight, Scene);
-
-	ZEViewFrustum* Frustum = (ZEViewFrustum*)View.ViewVolume;
+	const ZEViewFrustum* Frustum = static_cast<const ZEViewFrustum*>(View.ViewVolume);
 	float ViewFrustumFovTangent = ZEAngle::Tan(Frustum->GetFOV() * 0.5f);
 	float ViewFrustumAspectRatio = Frustum->GetAspectRatio();
 
+	ZEVector3 LightDirectionWorld = GetWorldRotation() * ZEVector3::UnitZ;
 	ZEVector3 CascadeFrustumVerticesView[8];
 	ZEVector3 CascadeFrustumVerticesLight[8];
-
 	for(ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
 		ZECascade& Cascade = CascadeConstants.Cascades[CascadeIndex];
 
 		float CascadeNumberDividedByCount = (float)(CascadeIndex + 1) / CascadeConstants.CascadeCount;
-		Cascade.NearZView = (CascadeIndex == 0) ? View.NearZ : CascadeConstants.Cascades[CascadeIndex - 1].FarZView;
-		Cascade.FarZView = CascadeDistanceFactor * (View.NearZ * ZEMath::Power(View.ShadowDistance / View.NearZ, CascadeNumberDividedByCount)) + 
+		Cascade.Borders.z = (CascadeIndex == 0) ? View.NearZ : CascadeConstants.Cascades[CascadeIndex - 1].Borders.w;
+		Cascade.Borders.w = CascadeDistanceFactor * (View.NearZ * ZEMath::Power(View.ShadowDistance / View.NearZ, CascadeNumberDividedByCount)) + 
 				  (1.0f - CascadeDistanceFactor) * (View.NearZ + (View.ShadowDistance - View.NearZ) * CascadeNumberDividedByCount);
 
-		float FarY = Cascade.FarZView * ViewFrustumFovTangent;
+		float NearY = Cascade.Borders.z * ViewFrustumFovTangent;
+		float NearX = NearY * ViewFrustumAspectRatio;
+
+		float FarY = Cascade.Borders.w * ViewFrustumFovTangent;
 		float FarX = FarY * ViewFrustumAspectRatio;
 
-		float NearZDividedByFarZ = Cascade.NearZView / Cascade.FarZView;
-		float NearX = FarX * NearZDividedByFarZ;
-		float NearY = FarY * NearZDividedByFarZ;
+		CascadeFrustumVerticesView[0] = ZEVector3(-NearX, -NearY, Cascade.Borders.z);
+		CascadeFrustumVerticesView[1] = ZEVector3(-NearX, NearY, Cascade.Borders.z);
+		CascadeFrustumVerticesView[2] = ZEVector3(NearX, NearY, Cascade.Borders.z);
+		CascadeFrustumVerticesView[3] = ZEVector3(NearX, -NearY, Cascade.Borders.z);
 
-		CascadeFrustumVerticesView[0] = ZEVector3(-NearX, -NearY, Cascade.NearZView);
-		CascadeFrustumVerticesView[1] = ZEVector3(-NearX, NearY, Cascade.NearZView);
-		CascadeFrustumVerticesView[2] = ZEVector3(NearX, NearY, Cascade.NearZView);
-		CascadeFrustumVerticesView[3] = ZEVector3(NearX, -NearY, Cascade.NearZView);
+		CascadeFrustumVerticesView[4] = ZEVector3(-FarX, -FarY, Cascade.Borders.w);
+		CascadeFrustumVerticesView[5] = ZEVector3(-FarX, FarY, Cascade.Borders.w);
+		CascadeFrustumVerticesView[6] = ZEVector3(FarX, FarY, Cascade.Borders.w);
+		CascadeFrustumVerticesView[7] = ZEVector3(FarX, -FarY, Cascade.Borders.w);
 
-		CascadeFrustumVerticesView[4] = ZEVector3(-FarX, -FarY, Cascade.FarZView);
-		CascadeFrustumVerticesView[5] = ZEVector3(-FarX, FarY, Cascade.FarZView);
-		CascadeFrustumVerticesView[6] = ZEVector3(FarX, FarY, Cascade.FarZView);
-		CascadeFrustumVerticesView[7] = ZEVector3(FarX, -FarY, Cascade.FarZView);
-
-		ZEAABBox CascadeFrustumAABBLight(ZEVector3(FLT_MAX), ZEVector3(FLT_MIN));
+		ZEAABBox CascadeFrustumAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
 		for(ZEUInt I = 0; I < 8; I++)
 		{
-			CascadeFrustumVerticesLight[I] = GetViewTransform() * View.InvViewTransform * CascadeFrustumVerticesView[I];
+			CascadeFrustumVerticesLight[I] =  GetViewTransform() * View.InvViewTransform * CascadeFrustumVerticesView[I];
 
 			ZEVector3::Min(CascadeFrustumAABBLight.Min, CascadeFrustumAABBLight.Min, CascadeFrustumVerticesLight[I]);
 			ZEVector3::Max(CascadeFrustumAABBLight.Max, CascadeFrustumAABBLight.Max, CascadeFrustumVerticesLight[I]);
 		}
 
-		//Find the radius of minimal enclosing circle of Cascade frustum x-y coordinates in light space
+		float Diameter = ZEVector3::Length(CascadeFrustumVerticesLight[0] - CascadeFrustumVerticesLight[6]);
+		float UnitPerShadowTexel = Diameter / CascadeShadowMaps->GetWidth();
+
 		//Offset cascade frustum aabb in light space to enclose the circle
-		float Radius = ZEVector3::Length(CascadeFrustumVerticesLight[0] - CascadeFrustumVerticesLight[6]);
-		ZEVector3 Offset = (ZEVector3(Radius) - (CascadeFrustumAABBLight.Max - CascadeFrustumAABBLight.Min)) * 0.5f;
+		ZEVector3 Offset = (ZEVector3(Diameter) - (CascadeFrustumAABBLight.Max - CascadeFrustumAABBLight.Min)) * 0.5f;
 
 		Offset.z = 0.0f;
 
@@ -112,8 +114,6 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 		CascadeFrustumAABBLight.Min -= Offset;
 
 		//round cascade frustum aabb x-y coordinate in light space to corresponding shadow texel unit
-		float UnitPerShadowTexel = Radius / CascadeShadowMaps->GetWidth();
-
 		CascadeFrustumAABBLight.Min.x /= UnitPerShadowTexel;
 		CascadeFrustumAABBLight.Min.y /= UnitPerShadowTexel;
 
@@ -151,16 +151,17 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 
 		if(CascadeIndex != (CascadeConstants.CascadeCount - 1))
 		{
-			float BandLength = (Cascade.FarZView - Cascade.NearZView) * 0.05f;
-			Cascade.Band = ZEVector2(Cascade.FarZView - BandLength, Cascade.FarZView + BandLength);
+			float BandLength = (Cascade.Borders.w - Cascade.Borders.z) * 0.05f;
+			Cascade.Band = ZEVector4(Cascade.Borders.x - BandLength, Cascade.Borders.x + BandLength, Cascade.Borders.w - BandLength, Cascade.Borders.w + BandLength);
 		}
 		else
 		{
-			Cascade.Band = ZEVector2(Cascade.FarZView - View.ShadowFadeDistance, Cascade.FarZView);
+			Cascade.Band = ZEVector4(Cascade.Borders.x - View.ShadowFadeDistance, Cascade.Borders.x + View.ShadowFadeDistance, Cascade.Borders.w - View.ShadowFadeDistance, Cascade.Borders.w);
 		}
 
+		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
+		//Should be in world space
 		CascadeVolumes[CascadeIndex].Create(ZEVector3::Zero, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
-
 	}
 }
 
@@ -172,14 +173,14 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
 
 	CascadeShadowMaps.Release();
-	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, CascadeConstants.CascadeCount, 1, ZEGR_TF_D32_FLOAT, false, true);
+	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, CascadeConstants.CascadeCount, 1, 1, ZEGR_TF_D32_FLOAT, false, true);
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
 
-void ZELightDirectional::CalculateSceneBoundingBoxLight(ZEAABBox* Out, ZEScene* Scene)
+ZEAABBox ZELightDirectional::GetSceneBoundingBoxLight(ZEScene* Scene)
 {
-	ZEAABBox SceneAABBWorld(ZEVector3(FLT_MAX), ZEVector3(FLT_MIN));
+	ZEAABBox SceneAABBWorld(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
 
 	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
 	ZEUInt EntityCount = Entities.GetCount();
@@ -189,19 +190,22 @@ void ZELightDirectional::CalculateSceneBoundingBoxLight(ZEAABBox* Out, ZEScene* 
 		if(Entity->GetDrawFlags().GetFlags(ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER))
 			ZEAABBox::Combine(SceneAABBWorld, Entity->GetWorldBoundingBox(), SceneAABBWorld);
 	}
+	
+	ZEVector3 LightDirectionWorld = GetWorldRotation() * ZEVector3::UnitZ;
+	ZEVector3 LightPositionWorld = SceneAABBWorld.GetCenter() + LightDirectionWorld * -SceneAABBWorld.GetLength() * 0.5f;
+	SetPosition(LightPositionWorld);
 
-	ZEAABBox SceneAABBLight(ZEVector3(FLT_MAX), ZEVector3(FLT_MIN));
+	ZEAABBox SceneAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
 	for(ZEUInt I = 0; I < 8; I++)
 	{
 		ZEVector3 SceneAABBVertexLight = GetViewTransform() * SceneAABBWorld.GetVertex(I);
 
-		ZEVector3::Min(SceneAABBLight.Min, SceneAABBLight.Min, GetViewTransform() * SceneAABBVertexLight);
-		ZEVector3::Max(SceneAABBLight.Max, SceneAABBLight.Max, GetViewTransform() * SceneAABBVertexLight);
+		ZEVector3::Min(SceneAABBLight.Min, SceneAABBLight.Min, SceneAABBVertexLight);
+		ZEVector3::Max(SceneAABBLight.Max, SceneAABBLight.Max, SceneAABBVertexLight);
 	}
 
-	*Out = SceneAABBLight;
+	return SceneAABBLight;
 }
-
 
 ZELightDirectional::ZELightDirectional()
 {
@@ -213,7 +217,6 @@ ZELightDirectional::ZELightDirectional()
 
 ZELightDirectional::~ZELightDirectional()
 {
-	DeinitializeSelf();
 }
 
 bool ZELightDirectional::InitializeSelf()
@@ -225,6 +228,8 @@ bool ZELightDirectional::InitializeSelf()
 
 	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
 	ShadowRenderer.Initialize();
+
+	DirtyFlags.RaiseAll();
 
 	return true;
 }
@@ -248,7 +253,7 @@ void ZELightDirectional::SetCascadeCount(ZEUInt CascadeCount)
 	CascadeConstants.CascadeCount = CascadeCount;
 	CascadeVolumes.Resize(CascadeCount);
 
-	DirtyFlags.RaiseFlags(ZE_LDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZE_LDF_CONSTANT_BUFFER | ZE_LDF_SHADOW_MAP);
 }
 
 ZEUInt ZELightDirectional::GetCascadeCount() const
@@ -264,6 +269,26 @@ void ZELightDirectional::SetCascadeDistanceFactor(float CascadeDistanceFactor)
 float ZELightDirectional::GetCascadeDistanceFactor() const
 {
 	return CascadeDistanceFactor;
+}
+
+void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context)
+{
+	ZEMatrix4x4 TextureTransform;
+	ZEMatrix4x4::Create(TextureTransform,
+		0.5f, 0.0f, 0.0f, 0.5f,
+		0.0f, -0.5f, 0.0f, 0.5f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f);
+
+	for(ZEUInt I = 0; I < CascadeConstants.CascadeCount; I++)
+	{
+		ZECascade& Cascade = CascadeConstants.Cascades[I];
+		Cascade.ProjectionTransform = TextureTransform * Cascade.ProjectionTransform * Renderer->GetView().InvViewTransform;
+	}
+	
+	CascadeConstantBuffer->SetData(&CascadeConstants);
+
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, CascadeConstantBuffer);
 }
 
 ZELightType ZELightDirectional::GetLightType() const
@@ -301,7 +326,7 @@ const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index)
 {
 	if(DirtyFlags.GetFlags(ZE_LDF_VIEW_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateViewTransform(ViewTransform, ZEVector3::Zero, GetWorldRotation());
+		ZEMatrix4x4::CreateViewTransform(ViewTransform, GetPosition(), GetRotation());
 		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_TRANSFORM);
 	}
 
@@ -311,7 +336,9 @@ const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index)
 const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index)
 {
 	if(Index >= CascadeConstants.CascadeCount)
-		return ProjectionTransform;
+	{
+		return ZEMatrix4x4();
+	}
 
 	return CascadeConstants.Cascades[Index].ProjectionTransform;
 }
@@ -337,14 +364,15 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		View.V = GetWorldUp();
 		View.N = GetWorldFront();
 
-		View.ViewVolume = &GetViewVolume(CascadeIndex);
-		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex) * GetViewTransform();
+		View.Viewport = NULL;
+		View.ViewVolume = NULL;//&GetViewVolume(CascadeIndex);
+		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
 
 		ShadowRenderer.SetView(View);
 
 		ZEGRContext* Context = Parameters->Context;
 
-		ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(CascadeIndex);
+		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(CascadeIndex);
 		Context->ClearDepthStencilBuffer(DepthBuffer, true, false, 1.0f, 0x00);
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));

@@ -36,18 +36,17 @@
 #pragma once
 
 #include "ZERNStage.h"
+
 #include "ZEGraphics/ZEGRRenderState.h"
 
 class ZERNStageShadowing : public ZERNStage
 {
 	public:
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 										ZERNStageShadowing();
-
-		static const ZEGRRenderState&	GetRenderState();
 };

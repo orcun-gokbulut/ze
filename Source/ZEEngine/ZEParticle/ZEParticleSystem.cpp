@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleSystem.h"
+
 #include "ZEParticleRenderer.h"
 #include "ZEParticleOperator.h"
 #include "ZEParticleGenerator.h"
@@ -120,14 +121,10 @@ void ZEParticleSystem::SetMaximumParticleCount(ZEUInt ParticleCount)
 	ParticlePool.Resize((ZESize)MaximumParticleCount);
 
 	for (ZESize I = 0; I < Operators.GetCount(); I++)
-	{
 		Operators[I]->ResizeCustomDataPool((ZESize)MaximumParticleCount); 
-	}
 
 	if(Renderer != NULL)
-	{
 		Renderer->SetParticleCount(MaximumParticleCount);
-	}
 }
 
 ZEUInt ZEParticleSystem::GetMaximumParticleCount() const
@@ -161,31 +158,24 @@ void ZEParticleSystem::Tick(float ElapsedTime)
 	for (ZESize I = 0; I < (ZESize)MaximumParticleCount; I++)
 	{
 		if(ParticlePool[I].State == ZE_PAS_NEW)
-		{
 			ParticlePool[I].State = ZE_PAS_ALIVE;
-		}
 	}
 
 	for (ZESize I = 0; I < Generators.GetCount(); I++)
-	{
 		Generators[I]->Tick(ElapsedTime, ParticlePool);
-	}
 
 	for (ZESize I = 0; I < Operators.GetCount(); I++)
-	{
 		Operators[I]->Tick(ElapsedTime, ParticlePool);
-	}
 }
 
 ZEParticleSystem::ZEParticleSystem()
 {
 	Renderer = NULL;
+	Owner = NULL;
 	ParticlePool.Clear();
 	Operators.Clear();
-	Owner = NULL;
 }
 
 ZEParticleSystem::~ZEParticleSystem()
 {
-
 }

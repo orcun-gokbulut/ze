@@ -34,9 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11Shader.h"
+
 #include "ZED11Module.h"
 
-bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size)
+bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
 	HRESULT Result;
 	switch (ShaderType)
@@ -114,37 +115,37 @@ ZED11Shader::ZED11Shader()
 	VertexShader = NULL;
 }
 
-const ZEArray<ZEBYTE>& ZED11Shader::GetByteCode()
+const ZEArray<ZEBYTE>& ZED11Shader::GetByteCode() const
 {
 	return ByteCode;
 }
 
-ID3D11VertexShader* ZED11Shader::GetVertexShader()
+ID3D11VertexShader* ZED11Shader::GetVertexShader() const
 {
 	return VertexShader;
 }
 
-ID3D11GeometryShader* ZED11Shader::GetGeometryShader()
+ID3D11GeometryShader* ZED11Shader::GetGeometryShader() const
 {
 	return GeometryShader;
 }
 
-ID3D11DomainShader* ZED11Shader::GetDomainShader()
+ID3D11DomainShader* ZED11Shader::GetDomainShader() const
 {
 	return DomainShader;
 }
 
-ID3D11HullShader* ZED11Shader::GetHullShader()
+ID3D11HullShader* ZED11Shader::GetHullShader() const
 {
 	return HullShader;
 }
 
-ID3D11PixelShader* ZED11Shader::GetPixelShader()
+ID3D11PixelShader* ZED11Shader::GetPixelShader() const
 {
 	return PixelShader;
 }
 
-ID3D11ComputeShader* ZED11Shader::GetComputeShader()
+ID3D11ComputeShader* ZED11Shader::GetComputeShader() const
 {
 	return ComputeShader;
 }

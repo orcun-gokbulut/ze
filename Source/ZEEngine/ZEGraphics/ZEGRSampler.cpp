@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNMaterial.h
+ Zinek Engine - ZEGRSampler.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,78 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEGRSampler.h"
 
-#include "ZEInitializable.h"
-#include "ZEGraphics/ZEGRResource.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZEMath/ZEMath.h"
+#include "ZEGRGraphicsModule.h"
 
-#define ZEGR_MAX_RENDERER_STAGE_COUNT 10
+#include <memory.h>
 
-class ZEGRContext;
-class ZERNRenderer;
-class ZERNStage;
-class ZEGRRenderStateData;
+ZEList2<ZEGRSampler> ZEGRSampler::SamplerUniqueList;
 
-class ZERNMaterialStage
+void ZEGRSamplerDescription::SetToDefault()
 {
-	public:
-		ZERNStage*						Stage;
-		ZEHolder<ZEGRRenderStateData>	RenderState;
+	MinFilter = ZEGR_TFM_LINEAR;
+	MagFilter = ZEGR_TFM_LINEAR;
+	MipFilter = ZEGR_TFM_LINEAR;
+	AddressU = ZEGR_TAM_CLAMP;
+	AddressV = ZEGR_TAM_CLAMP;
+	AddressW = ZEGR_TAM_CLAMP;
+	MinLOD = ZE_FLOAT_MIN;
+	MaxLOD = ZE_FLOAT_MAX;
+	MaxAnisotropy = 1;
+	MipMapLODBias = 0.0f;
+	BorderColor = ZEVector4::One;
+	ComparisonFunction = ZEGR_CF_NEVER;
+}
 
-										ZERNMaterialStage();
-};
-
-class ZERNMaterial : public ZEGRResource, public ZEInitializable
+ZEGRSamplerDescription::ZEGRSamplerDescription()
 {
-	private:
-		ZERNMaterialStage				Stages[ZEGR_MAX_RENDERER_STAGE_COUNT];
-		ZESize							StageCount;
+	SetToDefault();
+}
 
-		void							AddStage(ZERNStage* Stage, ZEGRRenderStateData* State);
-		ZEGRRenderStateData*			GetRenderState(ZERNStage* Stage);
+bool ZEGRSampler::Initialize(const ZEGRSamplerDescription& SamplerDescription)
+{
+	return true;
+}
 
-	protected:
-										ZERNMaterial();
-		virtual							~ZERNMaterial();
+void ZEGRSampler::Deinitialize()
+{
 
-	public:
-		virtual ZEGRResourceType		GetResourceType() const;
-		virtual ZEUInt					GetStageMask() const;
+}
 
-		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+ZEGRSampler::ZEGRSampler()
+{
+}
 
-		virtual bool					Update();
-};
+ZEGRSampler::~ZEGRSampler()
+{
+	ZELink<ZEGRSampler>* Link = SamplerUniqueList.Find(this);
+	if(Link != NULL)
+		SamplerUniqueList.Remove(Link);
+}
+
+const ZEGRSamplerDescription& ZEGRSampler::GetDescription() const
+{
+	return Description;
+}
+
+ZESharedPointer<ZEGRSampler> ZEGRSampler::GetSampler(const ZEGRSamplerDescription& SamplerDescription)
+{
+	ze_for_each(Entry, SamplerUniqueList)
+	{
+		if(memcmp(&Entry->Description, &SamplerDescription, sizeof(ZEGRSamplerDescription)) == 0)
+			return &(*Entry);
+	}
+
+	ZEGRSampler* Sampler = ZEGRGraphicsModule::GetInstance()->CreateSamplerState();
+	if(!Sampler->Initialize(SamplerDescription))
+	{
+		delete Sampler;
+		return NULL;
+	}
+
+	SamplerUniqueList.AddEnd(new ZELink<ZEGRSampler>(Sampler));
+
+	return Sampler;
+}

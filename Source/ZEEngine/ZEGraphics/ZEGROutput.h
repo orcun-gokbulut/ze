@@ -52,16 +52,16 @@ class ZEGROutput : public ZEGRResource
 		virtual void						Deinitialize() = 0;
 
 	public:
-		virtual ZEGRResourceType			GetResourceType();
+		virtual ZEGRResourceType			GetResourceType() const;
 
-		virtual void*						GetHandle() = 0;
-		virtual ZEGRRenderTarget*			GetRenderTarget() = 0;
+		virtual void*						GetHandle() const = 0;
+		virtual ZEGRRenderTarget*			GetRenderTarget() const = 0;
 
 		virtual void						SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor) = 0;
-		virtual ZEGRMonitor*				GetMonitor() = 0;
+		virtual ZEGRMonitor*				GetMonitor() const = 0;
 
 		virtual void						SetFullscreen(bool Enabled) = 0;
-		virtual bool						GetFullscreen() = 0;
+		virtual bool						GetFullscreen() const = 0;
 
 		virtual void						Resize(ZEUInt Width, ZEUInt Height) = 0;
 

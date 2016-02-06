@@ -198,12 +198,12 @@ ZED11Output::ZED11Output()
 	RestrictedToMonitor = false;
 }
 
-void* ZED11Output::GetHandle()
+void* ZED11Output::GetHandle() const
 {
 	return Handle;
 }
 
-ZEGRRenderTarget* ZED11Output::GetRenderTarget()
+ZEGRRenderTarget* ZED11Output::GetRenderTarget() const
 {
 	return RenderTarget;
 }
@@ -219,7 +219,7 @@ void ZED11Output::SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor)
 		SwitchToFullscreen();
 }
 
-ZEGRMonitor* ZED11Output::GetMonitor()
+ZEGRMonitor* ZED11Output::GetMonitor() const
 {
 	if(RestrictedToMonitor)
 		return Monitor;
@@ -272,7 +272,7 @@ void ZED11Output::SetFullscreen(bool Enabled)
 		SwapChain->SetFullscreenState(FALSE, NULL);
 }
 
-bool ZED11Output::GetFullscreen()
+bool ZED11Output::GetFullscreen() const
 {
 	return Fullscreen;
 }

@@ -45,47 +45,46 @@
 #define ZE_LT_DIRECTIONAL		2
 #define ZE_LT_PROJECTIVE		3
 #define ZE_LT_OMNIPROJECTIVE	4
-	
+
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
 struct ZERNDeferredShading_Cascade
 {
-	float4x4					ProjectionTransform;
-	float						NearZView;
-	float						FarZView;
-	float2						Band;
+	float4x4						ProjectionTransform;
+	float4							Borders;
+	float4							Band;
 };
 
 cbuffer ZERNDeferredShading_LightConstants											: register(b8)
 {	
-	ZERNShading_Light			ZERNDeferredShading_LightInstance;					//64
-	float4x4					ZERNDeferredShading_LightProjectionMatrix;			//64
-	float4x4					ZERNDeferredShading_LightWorldMatrix;				//64
-	float4x4					ZERNDeferredShading_LightRotation;					//64
-	bool						ZERNDeferredShading_CastShadow;
-	uint						ZERNDeferredShading_SampleCount;
-	float						ZERNDeferredShading_SampleLengthOffset;
-	bool						ZERNDeferredShading_ShowCascades;
-	float4						ZERNDeferredShading_OffsetVectors[8];				//max 16 sample
+	ZERNShading_Light				ZERNDeferredShading_LightInstance;					//64
+	float4x4						ZERNDeferredShading_LightProjectionMatrix;			//64
+	float4x4						ZERNDeferredShading_LightWorldMatrix;				//64
+	float4x4						ZERNDeferredShading_LightRotation;					//64
+	bool							ZERNDeferredShading_CastShadow;
+	uint							ZERNDeferredShading_SampleCount;
+	float							ZERNDeferredShading_SampleLengthOffset;
+	bool							ZERNDeferredShading_ShowCascades;
+	float4							ZERNDeferredShading_OffsetVectors[8];				//max 16 sample
 };
 
 cbuffer ZERNDeferredShading_CascadeConstants										: register(b9)
 {
-	ZERNDeferredShading_Cascade ZERNDeferredShading_Cascades[4];
-	uint						ZERNDeferredShading_CascadeCount;
-	float3						ZERNDeferredShading_Reserved3;
-};
-
-SamplerState					ZERNDeferredShading_SamplerLinearBorder				: register(s0);
-SamplerComparisonState			ZERNDeferredShading_SamplerComparisonLinearBorder	: register(s1);
-SamplerState					ZERNDeferredShading_SamplerPointWrap				: register(s2);
-SamplerState					ZERNDeferredShading_SamplerPointBorder				: register(s3);
-
-Texture2DArray<float>			ZERNDeferredShading_ShadowMaps						: register(t5);
-Texture2D						ZERNDeferredShading_ProjectionMap					: register(t6);
-TextureCube						ZERNDeferredShading_OmniProjectionMap				: register(t7);
-Texture2D<float2>				ZERNDeferredShading_RandomVectors					: register(t8);
+	ZERNDeferredShading_Cascade 	ZERNDeferredShading_Cascades[4];
+	uint							ZERNDeferredShading_CascadeCount;
+	float3							ZERNDeferredShading_Reserved3;
+};	
+	
+SamplerState						ZERNDeferredShading_SamplerLinearBorder				: register(s0);
+SamplerComparisonState				ZERNDeferredShading_SamplerComparisonLinearBorder	: register(s1);
+SamplerState						ZERNDeferredShading_SamplerPointWrap				: register(s2);
+SamplerState						ZERNDeferredShading_SamplerPointBorder				: register(s3);
+	
+Texture2DArray<float>				ZERNDeferredShading_ShadowMaps						: register(t5);
+Texture2D							ZERNDeferredShading_ProjectionMap					: register(t6);
+TextureCube							ZERNDeferredShading_OmniProjectionMap				: register(t7);
+Texture2D<float2>					ZERNDeferredShading_RandomVectors					: register(t8);
 
 static const float3 ZERNDeferredShading_CascadeColors[] = 
 {
@@ -95,43 +94,54 @@ static const float3 ZERNDeferredShading_CascadeColors[] =
 	float3(0.0f, 0.0f, 0.0f),
 };
 
-static const float ZERNDeferredShading_DepthBias = 0.0015f;
+static const float2 ZERNDeferredShading_PoissonDiskSamples[] = 
+{
+	float2(0.7336021f, -0.6101369f),
+	float2(0.9601513f, -0.0785616f),
+	float2(0.3773608f, -0.8469894f),
+	float2(0.5185271f, 0.1443706f),
+	float2(0.03093804f, -0.4597275f),
+	float2(-0.4946301f, 0.1093941f),
+	float2(-0.08905835f, -0.9754086f),
+	float2(-0.3824577f, -0.6261504f),
+	float2(-0.05106043f, 0.2872932f),
+	float2(0.4576186f, -0.2664742f),
+	float2(-0.05316915f, 0.723882f),
+	float2(0.5617343f, 0.7523296f),
+	float2(-0.5127173f, 0.826395f),
+	float2(-0.8760068f, -0.2534642f),
+	float2(-0.8184632f, 0.431774f),
+	float2(0.8985078f, 0.4366908f)
+};
 
-float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 PositionView, float2 ShadowMapDimensions)
-{	
-	float4 PositionProjectionLight = mul(ZERNDeferredShading_Cascades[CascadeIndex].ProjectionTransform, float4(PositionView, 1.0f));
-	
-	if(PositionProjectionLight.x < -PositionProjectionLight.w || PositionProjectionLight.x > PositionProjectionLight.w || 
-		PositionProjectionLight.y < -PositionProjectionLight.w || PositionProjectionLight.y > PositionProjectionLight.w)
-		return 0.0f;
-	
-	float3 PositionHomogeneous = ZERNTransformations_ProjectionToHomogeneous(PositionProjectionLight);
-	float2 TexCoord = ZERNTransformations_HomogeneousToTexelCorner(PositionHomogeneous.xy);
-			
-	float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
-	RandomVector = normalize(RandomVector);
-	
+static const float ZERNDeferredShading_DepthBias = 0.00008f; 
+
+float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
+{		
 	float Visibility = 0.0f;
 	
-	uint SampleCount = ZERNDeferredShading_SampleCount / 2;
-	for(uint I = 0; I < SampleCount; I++)
-	{	
-		float2 OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].xy, RandomVector);
-		OffsetVector += ZERNDeferredShading_SampleLengthOffset;
-		OffsetVector /= ShadowMapDimensions;
-		
-		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, CascadeIndex), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
-		
-		OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].zw, RandomVector);
-		OffsetVector += ZERNDeferredShading_SampleLengthOffset;
-		OffsetVector /= ShadowMapDimensions;
-		
-		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, CascadeIndex), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
+	//float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
+	//RandomVector = normalize(RandomVector);
+	
+	for(uint I = 0; I < 16; I++)
+	{
+		float2 Offset = ZERNDeferredShading_PoissonDiskSamples[I] * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
+		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z - ZERNDeferredShading_DepthBias);
 	}
-
-	Visibility /= ZERNDeferredShading_SampleCount;
+		
+	Visibility /= 16;
 	
 	return Visibility;
+}
+
+bool ZERNDeferredShading_InsideCascade(float4x4 CascadeProjectionTransform, float3 PositionView, out float3 OutTexCoordDepth)
+{
+	OutTexCoordDepth = mul(CascadeProjectionTransform, float4(PositionView, 1.0f)).xyz;
+	
+	if(OutTexCoordDepth.x >= 0.0f && OutTexCoordDepth.x <= 1.0f && OutTexCoordDepth.y >= 0.0f && OutTexCoordDepth.y <= 1.0f)
+		return true;
+	else
+		return false;
 }
 
 float4 ZERNDeferredShading_VertexShader_LightingStage(float3 Position : POSITION0)	: SV_Position
@@ -159,42 +169,13 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 			ZERNDeferredShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 		
 			for(uint CascadeIndex = 0; CascadeIndex < ZERNDeferredShading_CascadeCount; CascadeIndex++)
-			{
+			{	
 				ZERNDeferredShading_Cascade Cascade = ZERNDeferredShading_Cascades[CascadeIndex];
-				float DepthView = Surface.PositionView.z;
 				
-				if(DepthView > Cascade.Band.x && DepthView < Cascade.Band.y)
+				float3 TexCoordDepth;
+				if(ZERNDeferredShading_InsideCascade(Cascade.ProjectionTransform, Surface.PositionView, TexCoordDepth))
 				{
-					float VisibilityCurrentCascade = ZERNDeferredShading_CalculateVisibility(CascadeIndex, Surface.PositionView, ShadowMapDimensions);
-					if((CascadeIndex + 1) != ZERNDeferredShading_CascadeCount)
-					{
-						float VisibilityNextCascade = ZERNDeferredShading_CalculateVisibility(CascadeIndex + 1, Surface.PositionView, ShadowMapDimensions);
-						
-						if(VisibilityCurrentCascade != 0.0f)
-						{
-							float TotalWeight = Cascade.Band.y - Cascade.Band.x;
-							float WeightCurrentCascade = Cascade.Band.y - DepthView;
-							float WeightNextCascade = DepthView - Cascade.Band.x;
-							Visibility = (WeightCurrentCascade * VisibilityCurrentCascade + WeightNextCascade * VisibilityNextCascade) / TotalWeight;
-						}
-						else
-						{
-							Visibility = VisibilityNextCascade;
-						}
-						
-						CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex] + ZERNDeferredShading_CascadeColors[CascadeIndex + 1];
-					}
-					else
-					{
-						Visibility = VisibilityCurrentCascade * (Cascade.Band.y - DepthView) / (Cascade.Band.y - Cascade.Band.x);
-						CascadeColor = float3(0.5f, 0.5f, 0.5f);
-					}
-					
-					break;
-				}
-				else if(DepthView > Cascade.NearZView && DepthView < Cascade.FarZView)
-				{
-					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, Surface.PositionView, ShadowMapDimensions);
+					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, TexCoordDepth, ShadowMapDimensions);
 					CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex];
 					
 					break;
@@ -234,59 +215,64 @@ float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShadi
 float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight, ZERNShading_Surface Surface)
 {
 	float4 PositionProjectionLight = mul(ZERNDeferredShading_LightProjectionMatrix, float4(Surface.PositionView, 1.0f));
-	float3 PositionHomogeneous = ZERNTransformations_ProjectionToHomogeneous(PositionProjectionLight);
 	
-	if(PositionHomogeneous.x < -1.0f || PositionHomogeneous.x > 1.0f || PositionHomogeneous.y < -1.0f || PositionHomogeneous.y > 1.0f)
-		return (float3)0.0f;
+	float3 ResultColor = (float3)0.0f;
 	
-	float2 TexCoord = ZERNTransformations_HomogeneousToTexelCorner(PositionHomogeneous.xy);
-	
-	float Visibility = 1.0f;
-		
-	if(ZERNDeferredShading_CastShadow)
+	if((PositionProjectionLight.x >= -PositionProjectionLight.w && PositionProjectionLight.x <= PositionProjectionLight.w) && 
+		(PositionProjectionLight.y >= -PositionProjectionLight.w && PositionProjectionLight.y <= PositionProjectionLight.w))
 	{
-		if(Surface.PositionView.z < ZERNView_ShadowDistance)
+		float3 PositionHomogeneous = ZERNTransformations_ProjectionToHomogeneous(PositionProjectionLight);
+		float2 TexCoord = ZERNTransformations_HomogeneousToTexelCorner(PositionHomogeneous.xy);
+		
+		float Visibility = 1.0f;
+			
+		if(ZERNDeferredShading_CastShadow)
 		{
-			float2 ShadowMapDimensions;
-			float Index = 0.0f;
-			ZERNDeferredShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
-			
-			float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
-			RandomVector = normalize(RandomVector);
-			
-			uint SampleCount = ZERNDeferredShading_SampleCount / 2;
-			for(uint I = 0; I < SampleCount; I++)
-			{	
-				float2 OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].xy, RandomVector);
-				OffsetVector += ZERNDeferredShading_SampleLengthOffset;
-				OffsetVector /= ShadowMapDimensions;
+			if(Surface.PositionView.z < ZERNView_ShadowDistance)
+			{
+				float2 ShadowMapDimensions;
+				float Index = 0.0f;
+				ZERNDeferredShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 				
-				Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, 0), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
+				float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
+				RandomVector = normalize(RandomVector);
 				
-				OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].zw, RandomVector);
-				OffsetVector += ZERNDeferredShading_SampleLengthOffset;
-				OffsetVector /= ShadowMapDimensions;
-				
-				Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, 0), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
+				uint SampleCount = ZERNDeferredShading_SampleCount / 2;
+				for(uint I = 0; I < SampleCount; I++)
+				{	
+					float2 OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].xy, RandomVector);
+					OffsetVector += ZERNDeferredShading_SampleLengthOffset;
+					OffsetVector /= ShadowMapDimensions;
+					
+					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, 0), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
+					
+					OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].zw, RandomVector);
+					OffsetVector += ZERNDeferredShading_SampleLengthOffset;
+					OffsetVector /= ShadowMapDimensions;
+					
+					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, 0), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
+				}
+	
+				Visibility /= ZERNDeferredShading_SampleCount;
 			}
-
-			Visibility /= ZERNDeferredShading_SampleCount;
 		}
+		
+		ProjectiveLight.Color = ZERNDeferredShading_ProjectionMap.SampleLevel(ZERNDeferredShading_SamplerLinearBorder, TexCoord, 0).rgb;
+		
+		float3 LightVectorView = ProjectiveLight.PositionView - Surface.PositionView;
+		float LightDistanceView = length(LightVectorView);
+		
+		ProjectiveLight.DirectionView = LightVectorView / LightDistanceView;
+		
+		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(ProjectiveLight, Surface);
+		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(ProjectiveLight, Surface);
+		
+		float DistanceAttenuation = 1.0f / dot(ProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
+		
+		ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * ProjectiveLight.Intensity * DistanceAttenuation;
 	}
 	
-	ProjectiveLight.Color = ZERNDeferredShading_ProjectionMap.SampleLevel(ZERNDeferredShading_SamplerLinearBorder, TexCoord, 0).rgb;
-	
-	float3 LightVectorView = ProjectiveLight.PositionView - Surface.PositionView;
-	float LightDistanceView = length(LightVectorView);
-	
-	ProjectiveLight.DirectionView = LightVectorView / LightDistanceView;
-	
-	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(ProjectiveLight, Surface);
-	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(ProjectiveLight, Surface);
-	
-	float DistanceAttenuation = 1.0f / dot(ProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
-	
-	return (ResultDiffuse + ResultSpecular) * Visibility * ProjectiveLight.Intensity * DistanceAttenuation;
+	return ResultColor;
 }
 
 float3 ZERNDeferredShading_OmniProjectiveLighting(ZERNShading_Light OmniProjectiveLight, ZERNShading_Surface Surface)
@@ -339,9 +325,9 @@ float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : S
 	ZERNShading_Surface Surface;
 	
 	float2 Dimensions = ZERNGBuffer_GetDimensions();
-	float DepthClip = ZERNGBuffer_GetDepth(PositionViewport.xy);
+	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
 	
-	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, Dimensions, DepthClip);
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, Dimensions, DepthHomogeneous);
 	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);
 	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy);

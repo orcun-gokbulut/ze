@@ -35,12 +35,11 @@
 
 #pragma once
 
-#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRShaderCompiler.h"
 
 #include <d3dcompiler.h>
 
-class ZEGRShader;
+class ZED11Module;
 class ZED11ShaderCompilerIncludeInterface;
 
 class ZED11ShaderCompiler : public ZEGRShaderCompiler

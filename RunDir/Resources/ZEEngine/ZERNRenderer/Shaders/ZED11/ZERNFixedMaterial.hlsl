@@ -55,7 +55,7 @@ cbuffer ZERNFixedMaterial_Constants								: register(ZERN_SHADER_CONSTANT_MATER
 	float3			ZERNFixedMaterial_EmissiveColor;
 	float			ZERNFixedMaterial_AlphaCullLimit;
 	float3			ZERNFixedMaterial_ReflectionColor;
-	bool			ZERNFixedMaterial_GlobalAmbient;
+	bool			ZERNFixedMaterial_GlobalAmbientEnabled;
 	float3			ZERNFixedMaterial_RefractionColor;
 	float			ZERNFixedMaterial_RefractionIndex;
 	float3			ZERNFixedMaterial_DetailDiffuseMapColor;
@@ -89,8 +89,6 @@ SamplerState		ZRNFixedMaterial_EnvironmentMapSampler		: register(s1);
 SamplerState		ZRNFixedMaterial_DetailDiffuseSampler		: register(s2);
 SamplerState		ZRNFixedMaterial_DetailNormalSampler		: register(s3);
 
-
-
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -107,12 +105,8 @@ struct ZERNFixedMaterial_GBufferStage_VSInput
 	#endif
 	
 	#if defined(ZERN_FM_SKIN_TRANSFORM)
-		int4 BoneIndices    : BLENDINDICES0;
-		float4 BoneWeights  : BLENDWEIGHT0;
-	#endif
-	
-	#if defined(ZERN_FM_INSTANCING)
-		float4x4 WorldTransform : INSTANCE0;	
+		uint4 BoneIndices	: BLENDINDICES;
+		float4 BoneWeights	: BLENDWEIGHTS;
 	#endif
 };
 
@@ -123,6 +117,7 @@ struct ZERNFixedMaterial_GBufferStage_VSOutput
 	float3 Binormal			: TEXCOORD1;
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
+	
 	#if defined(ZERN_FM_VERTEX_COLOR)
 		float4 Color		: TEXCOORD4;
 	#endif
@@ -135,10 +130,10 @@ struct ZERNFixedMaterial_GBufferStage_PSInput
 	float3 Binormal			: TEXCOORD1;
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
+	
 	#if defined(ZERN_FM_VERTEX_COLOR)
 		float4 Color		: TEXCOORD4;
 	#endif
-	//bool Side				: SV_IsFrontFace;
 };
 
 
@@ -147,15 +142,14 @@ struct ZERNFixedMaterial_GBufferStage_PSInput
 
 ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexShader(ZERNFixedMaterial_GBufferStage_VSInput Input)
 {
-	ZERNFixedMaterial_GBufferStage_VSOutput Output;
+	ZERNFixedMaterial_GBufferStage_VSOutput Output = (ZERNFixedMaterial_GBufferStage_VSOutput)0;
+	
+	#if defined(ZERN_FM_SKIN_TRANSFORM)
+		Input.Position = mul(ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights), float4(Input.Position, 1.0f)).xyz;
+	#endif
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 	
-	#if defined(ZERN_FM_SKIN_TRANSFORM)
-		WorldViewProjTransform = ZESkin_ApplySkinTransform(WorldViewProjTransform, Input.BoneIndices, Input.BoneTransforms);
-		WorldViewTransform = ZESkin_ApplySkinTransform(WorldViewTransform, Input.BoneIndices, Input.BoneTransforms);
-	#endif
-
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Normal = ZERNTransformations_WorldToView(float4(Input.Normal, 0.0f));
 	Output.Tangent = ZERNTransformations_WorldToView(float4(Input.Tangent, 0.0f));
@@ -251,7 +245,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	float3 AccumulationColor = AmbientColor + EmissiveColor + ReflectionRefractionColor;
 	
 	ZERNGBuffer_SetViewNormal(GBuffer, Normal);
-	ZERNGBuffer_SetShadingModel(GBuffer,  ZERN_LM_BLINN_PONG);
+	ZERNGBuffer_SetShadingModel(GBuffer, ZERN_LM_BLINN_PONG);
 	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);
 	ZERNGBuffer_SetDiffuseColor(GBuffer, DiffuseColor);
 	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor);

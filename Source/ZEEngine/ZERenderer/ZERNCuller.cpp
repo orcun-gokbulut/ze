@@ -50,7 +50,7 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity)
 
 	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL)
+		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && CullParameters.View->ViewVolume != NULL)
 		{
 			if (CullParameters.View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{

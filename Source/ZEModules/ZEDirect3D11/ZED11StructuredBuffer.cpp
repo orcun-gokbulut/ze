@@ -38,8 +38,6 @@
 #include "ZEError.h"
 #include "ZED11Module.h"
 
-#include <d3d11.h>
-
 ID3D11Buffer* ZED11StructuredBuffer::GetBuffer() const
 {
 	return Buffer;
@@ -87,7 +85,8 @@ void ZED11StructuredBuffer::Deinitialize()
 {
 	ZEGR_RELEASE(Buffer);
 	ZEGR_RELEASE(ResourceView);
-	ZED11StructuredBuffer::Deinitialize();
+
+	ZEGRStructuredBuffer::Deinitialize();
 }
 
 bool ZED11StructuredBuffer::Lock(void** Buffer)
@@ -113,4 +112,9 @@ ZED11StructuredBuffer::ZED11StructuredBuffer()
 {
 	Buffer = NULL;
 	ResourceView = NULL;
+}
+
+ZED11StructuredBuffer::~ZED11StructuredBuffer()
+{
+	Deinitialize();
 }

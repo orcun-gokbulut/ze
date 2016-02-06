@@ -42,19 +42,19 @@
 class ZEGRStructuredBuffer : public ZEGRResource
 {
 	protected:
-			virtual bool					Initialize(ZESize ElementCount, ZESize ElementSize);
-			virtual void					Deinitialize();
+			virtual bool							Initialize(ZESize ElementCount, ZESize ElementSize);
+			virtual void							Deinitialize();
 
-											ZEGRStructuredBuffer();
-			virtual							~ZEGRStructuredBuffer();
+													ZEGRStructuredBuffer();
+			virtual									~ZEGRStructuredBuffer();
 
 	public:
-			ZEGRResourceType				GetResourceType();
+			ZEGRResourceType						GetResourceType() const;
 
-			void							SetData(void* ConstantData);
+			void									SetData(void* ConstantData);
 
-			virtual bool					Lock(void** Buffer) = 0;
-			virtual void					Unlock() = 0;
+			virtual bool							Lock(void** Buffer) = 0;
+			virtual void							Unlock() = 0;
 
-			static ZEHolder<ZEGRStructuredBuffer> Create(ZESize ElementCount, ZESize ElementSize);
+			static ZEHolder<ZEGRStructuredBuffer>	Create(ZESize ElementCount, ZESize ElementSize);
 };

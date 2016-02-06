@@ -43,11 +43,10 @@ cbuffer ZERNFixedMaterial_Constants_Draw_Skin : register(ZERN_SHADER_CONSTANT_DR
 	float4x4 ZERNSkin_BoneTransforms[150];
 };
 
-
 // SKIN FUNCTIONS
 ///////////////////////////////////////////////////////////////////////////////
 
-float4x4 ZERNSkin_GetSkinTransform(in float4 Weights, in int4 Indices)
+float4x4 ZERNSkin_GetSkinTransform(uint4 Indices, float4 Weights)
 {
 	float4x4 Matrix;
 	Matrix	= ZERNSkin_BoneTransforms[Indices[0]] * Weights[0];
@@ -56,9 +55,4 @@ float4x4 ZERNSkin_GetSkinTransform(in float4 Weights, in int4 Indices)
 	Matrix += ZERNSkin_BoneTransforms[Indices[3]] * Weights[3];
 	
 	return Matrix;
-}
-
-float4x4 ZERNSkin_ApplySkinTransform(in float4x4 PostTransform, in int4 Indices, in float4 Weights)
-{
-	return mul(PostTransform, ZERNSkin_GetSkinTransform(Weights, Indices));
 }

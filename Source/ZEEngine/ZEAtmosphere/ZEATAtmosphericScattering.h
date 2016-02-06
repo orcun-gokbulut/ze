@@ -35,15 +35,17 @@
 
 #pragma once
 
-#include "ZEFoundation/ZEInitializable.h"
-#include "ZEGraphics/ZEGRSamplerState.h"
-#include "ZEPointer/ZEHolder.h"
-#include "ZEMath/ZEVector.h"
+#include "ZEInitializable.h"
+
 #include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEPointer/ZESharedPointer.h"
 
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRContext;
 class ZEGRConstantBuffer;
 class ZEGRTexture2D;
@@ -68,24 +70,24 @@ class ZEATAtmosphericScattering : public ZEInitializable
 		ZEHolder<ZEGRShader>			PrecomputeSkyAmbientPixelShader;
 
 		ZEHolder<ZEGRRenderStateData>	PrecomputeDensityRenderStateData;
-		ZEHolder<ZEGRRenderStateData> PrecomputeSingleScatteringRenderStateData;
-		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderScatteringRenderStateData;
-		ZEHolder<ZEGRRenderStateData> PrecomputeHighOrderInScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeSingleScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeHighOrderScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeHighOrderInScatteringRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
 
-		ZEHolder<ZEGRTexture2D>		PrecomputedDensityBuffer;
-		ZEHolder<ZEGRTexture3D>		PrecomputedSingleScatteringBuffer;
-		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderScatteringBuffer;
-		ZEHolder<ZEGRTexture3D>		PrecomputedHighOrderInScatteringBuffer;
-		ZEHolder<ZEGRTexture3D>		PrecomputedMultipleScatteringBuffer;
-		ZEHolder<ZEGRTexture2D>		PrecomputedSkyAmbientBuffer;
+		ZEHolder<ZEGRTexture2D>			PrecomputedDensityBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedSingleScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedHighOrderScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedHighOrderInScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture2D>			PrecomputedSkyAmbientBuffer;
 
 		ZEHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>		RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
 
-		ZEGRSamplerState				SamplerLinearClamp;
+		ZESharedPointer<ZEGRSampler>	SamplerLinearClamp;
 
 		ZEUInt							OrderCount;
 		bool							UseMultipleScattering;

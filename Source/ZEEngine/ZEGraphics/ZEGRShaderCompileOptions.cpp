@@ -34,7 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRShaderCompileOptions.h"
-#include "ZECommon.h"
+
+ZEGRShaderDefinition::ZEGRShaderDefinition()
+{
+}
 
 ZEGRShaderDefinition::ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value)
 {
@@ -42,14 +45,10 @@ ZEGRShaderDefinition::ZEGRShaderDefinition(const ZEString& Name, const ZEString&
 	this->Value = Value;
 }
 
-ZEGRShaderDefinition::ZEGRShaderDefinition()
-{
-}
-
 ZEGRShaderCompileOptions::ZEGRShaderCompileOptions()
 {
 	Type = ZEGR_ST_NONE;
 	Model = ZEGR_SM_NONE;
 	Debug = false;
-	OptimizationLevel = 5;
+	OptimizationLevel = 3;
 }

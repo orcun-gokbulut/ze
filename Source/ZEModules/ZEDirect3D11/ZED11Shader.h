@@ -36,9 +36,9 @@
 #pragma once
 
 #include "ZEGraphics/ZEGRShader.h"
+#include "ZED11ComponentBase.h"
 
 #include "ZETypes.h"
-#include "ZED11ComponentBase.h"
 
 struct ID3D11VertexShader;
 struct ID3D11GeometryShader;
@@ -63,17 +63,17 @@ class ZED11Shader : public ZEGRShader, public ZED11ComponentBase
 
 		ZEArray<ZEBYTE>				ByteCode;
 
-		virtual bool				Initialize(ZEGRShaderType ShaderType, void* ShaderBinary, ZESize Size);
+		virtual bool				Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);
 		virtual void				Deinitialize();
 
 									ZED11Shader();
 
 	public:
-		const ZEArray<ZEBYTE>&		GetByteCode();
-		ID3D11VertexShader*			GetVertexShader();
-		ID3D11GeometryShader*		GetGeometryShader();
-		ID3D11DomainShader*			GetDomainShader();
-		ID3D11HullShader*			GetHullShader();
-		ID3D11PixelShader*			GetPixelShader();
-		ID3D11ComputeShader*		GetComputeShader();
+		const ZEArray<ZEBYTE>&		GetByteCode() const;
+		ID3D11VertexShader*			GetVertexShader() const;
+		ID3D11GeometryShader*		GetGeometryShader() const;
+		ID3D11DomainShader*			GetDomainShader() const;
+		ID3D11HullShader*			GetHullShader() const;
+		ID3D11PixelShader*			GetPixelShader() const;
+		ID3D11ComputeShader*		GetComputeShader() const;
 };

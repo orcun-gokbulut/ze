@@ -38,11 +38,12 @@
 #include "ZERNStage.h"
 
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEGRSamplerState.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEPointer/ZESharedPointer.h"
 #include "ZERNFilter.h"
 
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRTexture2D;
 class ZEGRConstantBuffer;
 class ZEGRContext;
@@ -86,22 +87,22 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		CalculateBrightness_RenderState;
 		ZEHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
 
-		ZEGRTexture2D*						InputTexture;
-		ZEGRRenderTarget*					OutputRenderTarget;
+		const ZEGRTexture2D*				InputTexture;
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		ZERNFilter							Filter;
 		ZEArray<ZEVector4>					HorizontalValues;
 		ZEArray<ZEVector4>					VerticalValues;
 
-		ZEHolder<ZEGRTexture2D>			BlurTextureTemp1;
-		ZEHolder<ZEGRTexture2D>			BlurTextureTemp2;
-		ZEHolder<ZEGRTexture2D>			BlurTextureFinal;
-		ZEHolder<ZEGRTexture2D>			BrightTexture;
+		ZEHolder<ZEGRTexture2D>				BlurTextureTemp1;
+		ZEHolder<ZEGRTexture2D>				BlurTextureTemp2;
+		ZEHolder<ZEGRTexture2D>				BlurTextureFinal;
+		ZEHolder<ZEGRTexture2D>				BrightTexture;
 		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceMips;
-		ZEHolder<ZEGRTexture2D>			CurrentAdaptedLuminance;
-		ZEHolder<ZEGRTexture2D>			PreviousAdaptedLuminance;
+		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
+		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
 		
-		ZEGRSamplerState					SamplerLinearClamp;
+		ZESharedPointer<ZEGRSampler>		SamplerLinearClamp;
 
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;
@@ -131,13 +132,13 @@ class ZERNStageHDR : public ZERNStage
 		bool								UpdateConstantBuffer();
 		bool								Update();
 
-		void								CalculateLuminance(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-		void								DownSample(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
+		void								CalculateLuminance(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
+		void								DownSample(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
 		void								GenerateMipMaps(ZEGRContext* Context);
 		void								CalculateAdaptedLuminance(ZEGRContext* Context);
-		void								CalculateBrightness(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-		void								ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
-		void								ToneMapping(ZEGRContext* Context, ZEGRTexture2D* Input, ZEGRRenderTarget* Output);
+		void								CalculateBrightness(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
+		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
+		void								ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
 
 		bool								SetupInputOutput(ZERNRenderer* Renderer);
 
@@ -145,6 +146,9 @@ class ZERNStageHDR : public ZERNStage
 		virtual void						DeinitializeSelf();
 
 	public:
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
+
 		void								SetKey(float Value);
 		float								GetKey() const;
 
@@ -166,20 +170,17 @@ class ZERNStageHDR : public ZERNStage
 		void								SetToneMapOperator(ZERNHDRToneMapOperator Operator);
 		ZERNHDRToneMapOperator				GetToneMapOperator() const;
 
-		void								SetInputTexture(ZEGRTexture2D* Input);
-		ZEGRTexture2D*						GetInputTexture() const;
+		void								SetInputTexture(const ZEGRTexture2D* Input);
+		const ZEGRTexture2D*				GetInputTexture() const;
 
-		void								SetOutputRenderTarget(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*					GetOutputRenderTarget() const;
+		void								SetOutputRenderTarget(const ZEGRRenderTarget* Output);
+		const ZEGRRenderTarget*				GetOutputRenderTarget() const;
 
 		void								SetBlurTextureSize(ZERNHDRBlurTextureSize Value);
 		ZERNHDRBlurTextureSize				GetBlurTextureSize() const;
 
-											ZERNStageHDR();
-
-		virtual ZEInt						GetId();
-		virtual const ZEString&				GetName();
-
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+											ZERNStageHDR();
 };

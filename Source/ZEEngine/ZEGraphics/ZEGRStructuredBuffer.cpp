@@ -39,7 +39,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
 
-ZEGRResourceType ZEGRStructuredBuffer::GetResourceType()
+ZEGRResourceType ZEGRStructuredBuffer::GetResourceType() const
 {
 	return ZEGR_RT_STRUCTURED_BUFFER;
 }

@@ -35,6 +35,7 @@
 
 #include "ZED11Module.h"
 
+#include "ZEError.h"
 #include "ZED11Shader.h"
 #include "ZED11StatePool.h"
 #include "ZED11Texture2D.h"
@@ -53,12 +54,12 @@
 #include "ZED11Adapter.h"
 #include "ZED11DepthStencilBuffer.h"
 #include "ZED11RenderStateData.h"
+#include "ZED11Output.h"
+#include "ZED11Sampler.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZECore/ZEModule.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEError.h"
-#include "ZED11Output.h"
 
 #include <d3d11_1.h>
 #include <dxgi1_2.h>
@@ -250,6 +251,11 @@ const ZEArray<ZEGRAdapter*>& ZED11Module::GetAdapters()
 ZEGRContext*  ZED11Module::GetMainContext()
 {
 	return &Context;
+}
+
+ZEGRSampler* ZED11Module::CreateSamplerState()
+{
+	return new ZED11Sampler();
 }
 
 ZEGROutput* ZED11Module::CreateOutput()

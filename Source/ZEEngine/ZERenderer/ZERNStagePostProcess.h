@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZERNStage.h"
+
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
@@ -44,21 +45,21 @@ class ZEGRRenderTarget;
 class ZERNStagePostProcess : public ZERNStage
 {
 	private:
-		ZEHolder<ZEGRTexture2D>		OutputTexture;
+		ZEHolder<ZEGRTexture2D>			OutputTexture;
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
 
 	public:
-		ZEGRTexture2D*					GetOutputTexture() const;
-
-										ZERNStagePostProcess();
-
-		virtual ZEInt					GetId();
-		virtual const ZEString&			GetName();
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
 
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-		static const ZEGRRenderState&	GetRenderState();
+		ZEGRTexture2D*					GetOutputTexture() const;
+
+										ZERNStagePostProcess();
+
+		static ZEGRRenderState			GetRenderState();
 };

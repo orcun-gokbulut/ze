@@ -35,17 +35,12 @@
 
 #include "ZED11RenderStateData.h"
 
-#include "ZEGraphics\ZEGRRenderState.h"
 #include "ZED11Context.h"
-#include "ZED11VertexBuffer.h"
-#include "ZED11IndexBuffer.h"
-#include "ZED11ConstantBuffer.h"
-#include "ZED11RenderTarget.h"
 #include "ZED11Shader.h"
 #include "ZED11StatePool.h"
-#include "ZED11DepthStencilBuffer.h"
 #include "ZED11Module.h"
 #include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRRenderState.h"
 
 #include <d3d11.h>
 
@@ -74,29 +69,11 @@ static D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitveType(ZEGRPrimitiveType Type)
 bool ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
 {
 	ZED11StatePool* StatePool = GetModule()->GetStatePool();
-	
-	//if (RenderState.GetVertexLayout().GetElementCount() == 0)
-	//	return false;
 
 	VertexLayout = StatePool->GetVertexLayout(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
-	//if (VertexLayout == NULL)
-		//return false;
-
 	RasterizerState = StatePool->GetRasterizerState(RenderState.GetRasterizerState());
-	if (RasterizerState == NULL)
-		return false;
-	NativeRasterizerState = RasterizerState->GetInterface();
-
 	DepthStencilState = StatePool->GetDepthStencilState(RenderState.GetDepthStencilState());
-	if (DepthStencilState == NULL)
-		return false;
-	NativeDepthStencilState = DepthStencilState->GetInterface();
-
 	BlendState = StatePool->GetBlendState(RenderState.GetBlendState());
-	if (BlendState == NULL)
-		return false;
-	NativeBlendState = BlendState->GetInterface();
-
 	PrimitiveTopology = ConvertPrimitveType(RenderState.GetPrimitiveType());
 	
 	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)

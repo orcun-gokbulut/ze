@@ -51,7 +51,7 @@ class ZEGRConstantBuffer : public ZEGRResource
 	public:
 		ZEGRResourceType					GetResourceType() const;
 
-		void								SetData(void* ConstantData);
+		void								SetData(const void* ConstantData);
 
 		virtual bool						Lock(void** Buffer) = 0;
 		virtual void						Unlock() = 0;

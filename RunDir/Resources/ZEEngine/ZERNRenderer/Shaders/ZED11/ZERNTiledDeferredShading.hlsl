@@ -33,8 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_DEFERRED_SHADING_H__
-#define __ZERN_DEFERRED_SHADING_H__
+#ifndef __ZERN_TILED_DEFERRED_SHADING_H__
+#define __ZERN_TILED_DEFERRED_SHADING_H__
 
 #include "ZERNGBuffer.hlsl"
 #include "ZERNScreenCover.hlsl"
@@ -120,25 +120,28 @@ float3 ZERNTiledDeferredShading_DirectionalLighting(ZERNTiledDeferredShading_Lig
 float3 ZERNTiledDeferredShading_Lighting(uint TileIndex, ZERNTiledDeferredShading_Surface Surface)
 {
 	uint LightCount = ZERNTiledDeferredShading_TileInfos[TileIndex].LightCount;
-	
-	if(LightCount == 0)
-		return Surface.Diffuse;
-	
 	float3 ResultColor = {0.0f, 0.0f, 0.0f};
 	
-	for(uint I = 0; I < LightCount; ++I)
+	if(LightCount == 0)
 	{
-		uint LightId = ZERNTiledDeferredShading_TileInfos[TileIndex].LightIndices[I];
+		ResultColor = Surface.Diffuse;
+	}
+	else
+	{
+		for(uint I = 0; I < LightCount; I++)
+		{
+			uint LightId = ZERNTiledDeferredShading_TileInfos[TileIndex].LightIndices[I];
 
-		ZERNTiledDeferredShading_Light CurrentLight = ZERNTiledDeferredShading_Lights[LightId];
-		
-		if(CurrentLight.Type == ZE_LT_POINT)
-		{
-			ResultColor += ZERNTiledDeferredShading_PointLighting(CurrentLight, Surface);
-		}
-		else if(CurrentLight.Type == ZE_LT_DIRECTIONAL)
-		{
-			ResultColor += ZERNTiledDeferredShading_DirectionalLighting(CurrentLight, Surface);
+			ZERNTiledDeferredShading_Light CurrentLight = ZERNTiledDeferredShading_Lights[LightId];
+			
+			if(CurrentLight.Type == ZE_LT_POINT)
+			{
+				ResultColor += ZERNTiledDeferredShading_PointLighting(CurrentLight, Surface);
+			}
+			else if(CurrentLight.Type == ZE_LT_DIRECTIONAL)
+			{
+				ResultColor += ZERNTiledDeferredShading_DirectionalLighting(CurrentLight, Surface);
+			}
 		}
 	}
 	
@@ -150,7 +153,6 @@ float3 ZERNTiledDeferredShading_Lighting(uint TileIndex, ZERNTiledDeferredShadin
 
 float3 ZERNTiledDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
 {	
-	
 	ZERNTiledDeferredShading_Surface Surface;
 	
 	float2 Dimensions = ZERNGBuffer_GetDimensions();

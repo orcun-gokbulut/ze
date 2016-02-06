@@ -82,11 +82,11 @@ ZEGRVertexLayout* ZESkinnedModelVertex::GetVertexLayout()
 			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0},
-			{ZEGR_VES_BLEND_INDEXES, 0, ZEGR_VET_UINT4,	 0, 56, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BLEND_INDICES, 0, ZEGR_VET_UINT4,	 0, 56, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_BLEND_WEIGHTS, 0, ZEGR_VET_FLOAT4, 0, 60, ZEGR_VU_PER_VERTEX, 0},
 		};
 
-		VertexLayout.SetElements(ElementArray, 4);
+		VertexLayout.SetElements(ElementArray, 7);
 	}
 
 	return &VertexLayout;
@@ -134,9 +134,10 @@ bool ZEModelResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
-		ZERNFixedMaterial* CurrentMaterial = ZERNFixedMaterial::CreateInstance();
+		ZEHolder<ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::CreateInstance();
 		CurrentMaterial->ReadFromFile(MaterialPath);
-		Materials.Add(CurrentMaterial);
+		CurrentMaterial->Initialize();
+		Materials.Add(CurrentMaterial.GetPointer());
 
 	}
 
@@ -325,8 +326,8 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 			ZEModelResourceMeshLOD* LOD = Mesh->LODs.Add();
 
 			LOD->LODLevel = LODNode.ReadInt32("LODLevel");
-			//LOD->LODStartDistance = LODNode.ReadInt32("LODStartDistance", I * 30);
-			//LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 100000);
+			LOD->LODStartDistance = LODNode.ReadInt32("LODStartDistance", I * 30);
+			LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 100000);
 			LOD->MaterialId = LODNode.ReadInt32("MaterialId");
 
 			if (Mesh->IsSkinned)
@@ -343,17 +344,17 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 
 				LOD->VertexCount = (ZEUInt32)(LODNode.ReadDataSize("Vertices") / sizeof(ZESkinnedModelVertex));
 				LOD->TriangleCount = LOD->VertexCount / 3;
-				LOD->VertexBuffer = ZEGRVertexBuffer::Create(sizeof(ZESkinnedModelVertex), LOD->VertexCount);
+				LOD->VertexBufferSkin = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZESkinnedModelVertex));
 				void* Buffer = NULL;
-				LOD->VertexBuffer->Lock(&Buffer);
+				LOD->VertexBufferSkin->Lock(&Buffer);
 					if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZESkinnedModelVertex), LOD->VertexCount))
 					{
-						LOD->VertexBuffer->Unlock();
+						LOD->VertexBufferSkin->Unlock();
 						return false;
 					}
 				
 					CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, true);
-				LOD->VertexBuffer->Unlock();
+				LOD->VertexBufferSkin->Unlock();
 			}
 			else
 			{
@@ -502,7 +503,6 @@ void ZEModelResource::ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId)
 
 	if (Bone->ParentBone != -1)
 	{
-
 		ZEMatrix4x4::Multiply(Bone->ForwardTransform, Bones[(ZESize)Bone->ParentBone].ForwardTransform, Bone->LocalTransform);
 		ZEMatrix4x4::Inverse(Bone->InverseTransform, Bone->ForwardTransform);
 	}
@@ -775,7 +775,7 @@ const ZESmartArray<ZETexture2DResource*>& ZEModelResource::GetTextures() const
 	return TextureResources;
 }
 
-const ZEArray<ZERNMaterial*>& ZEModelResource::GetMaterials() const
+const ZEArray<ZEHolder<ZERNMaterial>>& ZEModelResource::GetMaterials() const
 {
 	return Materials;
 }

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_RESOURCE_H__
-#define __ZE_MODEL_RESOURCE_H__
 
 #include "ZETypes.h"
 #include "ZECore/ZEResource.h"
@@ -112,7 +110,7 @@ struct ZESkinnedModelVertex
 		ZEVector3						Tangent;
 		ZEVector3						Binormal;
 		ZEVector2						Texcoord;
-		unsigned char					BoneIndices[4];
+		ZEUInt8							BoneIndices[4];
 		float							BoneWeights[4];
 
 		static ZEGRVertexLayout*		GetVertexLayout();
@@ -298,9 +296,9 @@ struct ZEModelResourceAnimation
 class ZEModelResourceMeshLOD
 {
 	public:
-		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
-		ZEHolder<ZEGRVertexBuffer>			VertexBufferNormals;
-		ZEHolder<ZEGRVertexBuffer>			VertexBufferSkin;
+		ZEHolder<ZEGRVertexBuffer>				VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>				VertexBufferNormals;
+		ZEHolder<ZEGRVertexBuffer>				VertexBufferSkin;
 		ZEHolder<ZEGRIndexBuffer>				IndexBuffer;
 		
 		ZEUInt32								TriangleCount;
@@ -367,7 +365,7 @@ class ZEModelResource : public ZEResource
 		ZEArray<ZEModelResourceHelper>				Helpers;
 		ZEArray<ZEModelResourceAnimation>			Animations;
 		ZESmartArray<ZETexture2DResource*>			TextureResources;
-		ZEArray<ZERNMaterial*>						Materials;
+		ZEArray<ZEHolder<ZERNMaterial>>				Materials;
 
 		bool										BoundingBoxIsUserDefined;
 		ZEAABBox									UserDefinedBoundingBox;
@@ -392,7 +390,7 @@ class ZEModelResource : public ZEResource
 		bool										GetUserDefinedBoundingBoxEnabled() const;
 		const ZEAABBox&								GetUserDefinedBoundingBox() const;
 		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
-		const ZEArray<ZERNMaterial*>&				GetMaterials() const;
+		const ZEArray<ZEHolder<ZERNMaterial>>&		GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;
 		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
 		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;
@@ -402,5 +400,3 @@ class ZEModelResource : public ZEResource
 		static ZEModelResource*						LoadSharedResource(const ZEString& FileName);
 		static void									CacheResource(const ZEString& FileName);
 };
-
-#endif

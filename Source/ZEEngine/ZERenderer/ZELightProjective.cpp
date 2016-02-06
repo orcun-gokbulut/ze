@@ -36,18 +36,20 @@
 #include "ZELightProjective.h"
 
 #include "ZEError.h"
+#include "ZERandom.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZETexture/ZETexture2DResource.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERNStageShadowmapGeneration.h"
 #include "ZERNRenderParameters.h"
-#include "ZERandom.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -62,7 +64,7 @@ void ZELightProjective::UpdateShadowMap()
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
 
 	ShadowMap.Release();
-	ShadowMap = ZEGRTexture2D::CreateInstance(Size, Size, 1, 1, ZEGR_TF_D32_FLOAT, false, true);
+	ShadowMap = ZEGRTexture2D::CreateInstance(Size, Size, 1, 1, 1, ZEGR_TF_D32_FLOAT, false, true);
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
@@ -187,6 +189,8 @@ bool ZELightProjective::InitializeSelf()
 	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
 	ShadowRenderer.Initialize();
 
+	DirtyFlags.RaiseAll();
+
 	return true;
 }
 
@@ -244,7 +248,7 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	UpdateShadowMap();
 
 	ZEGRContext* Context = Parameters->Context;
-	ZEGRDepthStencilBuffer* DepthBuffer = ShadowMap->GetDepthStencilBuffer();
+	const ZEGRDepthStencilBuffer* DepthBuffer = ShadowMap->GetDepthStencilBuffer();
 
 	Context->ClearDepthStencilBuffer(DepthBuffer, true, false, 1.0f, 0x00);
 	Context->SetRenderTargets(0, NULL, DepthBuffer);

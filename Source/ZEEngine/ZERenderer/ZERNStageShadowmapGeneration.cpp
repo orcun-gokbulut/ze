@@ -34,14 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStageShadowmapGeneration.h"
+
 #include "ZERNStageID.h"
 #include "ZERNCommand.h"
+#include "ZERNRenderer.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZERNRenderer.h"
 
 bool ZERNStageShadowmapGeneration::InitializeSelf()
 {
@@ -52,12 +53,12 @@ void ZERNStageShadowmapGeneration::DeinitializeSelf()
 {
 }
 
-ZEInt ZERNStageShadowmapGeneration::GetId()
+ZEInt ZERNStageShadowmapGeneration::GetId() const
 {
 	return ZERN_STAGE_SHADOW_MAP_GENERATION;
 }
 
-const ZEString& ZERNStageShadowmapGeneration::GetName()
+const ZEString& ZERNStageShadowmapGeneration::GetName() const
 {
 	static const ZEString Name = "Shadow map generation";
 	return Name;
@@ -77,7 +78,7 @@ ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
 {
 }
 
-const ZEGRRenderState& ZERNStageShadowmapGeneration::GetRenderState()
+ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
@@ -99,4 +100,3 @@ const ZEGRRenderState& ZERNStageShadowmapGeneration::GetRenderState()
 
 	return RenderState;
 }
-

@@ -50,8 +50,8 @@ class ZED11ComponentBase
 
 	public:
 		static ZED11Module*				GetModule();
-		ID3D11Device1*					GetDevice();
-		ID3D11DeviceContext1*			GetMainContext();
+		ID3D11Device1*					GetDevice() const;
+		ID3D11DeviceContext1*			GetMainContext() const;
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 };

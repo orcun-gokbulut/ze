@@ -926,12 +926,28 @@ void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, fl
 		0.0f, 0.0f, 1.0f, 0.0f);
 }
 
+void ZEMatrix4x4::CreatePerspectiveProjectionOffCenter(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ)
+{
+	float Width = Right - Left;
+	float Height = Top - Bottom;
+	float Depth = FarZ - NearZ;
+	float OffsetX = (Left + Right) / -Width;
+	float OffsetY = (Bottom + Top) / -Height;
+	float OffsetZ = NearZ * FarZ / -Depth;
+
+	Create(Matrix,
+		2.0f * NearZ / Width, 0.0f, OffsetX, 0.0f,
+		0.0f, 2.0f * NearZ / Height, OffsetY, 0.0f,
+		0.0f, 0.0f, FarZ / Depth, OffsetZ,
+		0.0f, 0.0f, 1.0f, 0.0f);
+}
+
 void ZEMatrix4x4::CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Top, float Bottom, float NearZ, float FarZ)
 {
 	Create(Matrix,
-			2.0f/(Right - Left), 0.0f, 0.0f, (Left + Right)/(Left - Right), 
-			0.0f, 2.0f/(Top - Bottom), 0.0f, (Top + Bottom)/(Bottom - Top), 
-			0.0f, 0.0f, 1.0f/(FarZ - NearZ), NearZ/(NearZ - FarZ), 
+			2.0f / (Right - Left), 0.0f, 0.0f, (Left + Right) / (Left - Right), 
+			0.0f, 2.0f / (Top - Bottom), 0.0f, (Top + Bottom) / (Bottom - Top), 
+			0.0f, 0.0f, 1.0f / (FarZ - NearZ), NearZ / (NearZ - FarZ), 
 			0.0f, 0.0f, 0.0f, 1.0f);
 }
 

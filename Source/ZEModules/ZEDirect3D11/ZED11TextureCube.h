@@ -48,21 +48,19 @@ class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	private:
-		ID3D11Texture2D*				Texture;
-		ID3D11ShaderResourceView*		ResourceView;
+		ID3D11Texture2D*					Texture;
+		ID3D11ShaderResourceView*			ResourceView;
 
-		virtual bool					Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
-		virtual void					Deinitialize();
+		virtual bool						Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
+		virtual void						Deinitialize();
 
-										ZED11TextureCube();
+											ZED11TextureCube();
 
 	public:		
-		ID3D11Texture2D*				GetTexture();
-		ID3D11ShaderResourceView*		GetResourceView();
+		ID3D11Texture2D*					GetTexture() const;
+		ID3D11ShaderResourceView*			GetResourceView() const;
 		
-		virtual bool					UpdateSubResource(void* Data, ZESize RowPitch, ZEGRTextureCubeFace Face, ZEUInt Level);
-		virtual bool					Lock(void** Buffer, ZESize* Pitch, ZEGRTextureCubeFace Face, ZEUInt Level);
-		virtual void					Unlock(ZEGRTextureCubeFace Face, ZEUInt Level);
+		virtual bool						UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
 
-		ZEGRRenderTarget*				GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level);
+		ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const;
 };

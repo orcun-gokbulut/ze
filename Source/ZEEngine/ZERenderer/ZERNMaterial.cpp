@@ -79,12 +79,12 @@ ZERNMaterial::~ZERNMaterial()
 
 }
 
-ZEGRResourceType ZERNMaterial::GetResourceType()
+ZEGRResourceType ZERNMaterial::GetResourceType() const
 {
 	return ZEGR_RT_MATERIAL;
 }
 
-ZEUInt ZERNMaterial::GetStageMask()
+ZEUInt ZERNMaterial::GetStageMask() const
 {
 	return 0;
 }

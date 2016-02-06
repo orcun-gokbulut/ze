@@ -47,22 +47,20 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 	friend class ZED11Context;
 
 	private:
-		ID3D11Texture3D*					Texture3D;
-		ID3D11ShaderResourceView*			ResourceView;
-		ID3D11UnorderedAccessView*			UnorderedAccessView;
+		ID3D11Texture3D*							Texture3D;
+		ID3D11ShaderResourceView*					ResourceView;
+		ID3D11UnorderedAccessView*					UnorderedAccessView;
 
-		virtual bool						Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
-		virtual void						Deinitialize();
+		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
+		virtual void								Deinitialize();
 
-											ZED11Texture3D();
+													ZED11Texture3D();
+		virtual										~ZED11Texture3D();
 
 	public:
-		ID3D11Texture3D*					GetTexture();
-		ID3D11ShaderResourceView*			GetResourceView();
-		ID3D11UnorderedAccessView*			GetUnorderedAccessView();
+		ID3D11Texture3D*							GetTexture() const;
+		ID3D11ShaderResourceView*					GetResourceView() const;
+		ID3D11UnorderedAccessView*					GetUnorderedAccessView() const;
 
-		virtual bool						Lock(void** Buffer, ZESize* Pitch, ZEUInt Depth, ZEUInt Level);
-		virtual void						Unlock(ZEUInt Level);
-
-		virtual ZEGRRenderTarget*			GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel);
+		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel) const;
 };

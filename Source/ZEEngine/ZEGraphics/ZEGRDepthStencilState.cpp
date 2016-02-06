@@ -37,6 +37,11 @@
 
 #include <memory.h>
 
+ZEGRStateType ZEGRDepthStencilState::GetStateType() const
+{
+	return ZEGRStateType::ZEGR_ST_DEPTH_STENCIL;
+}
+
 const void* ZEGRDepthStencilState::GetData() const
 {
 	return &StateData;

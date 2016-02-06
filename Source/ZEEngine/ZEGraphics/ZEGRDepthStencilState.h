@@ -76,6 +76,7 @@ class ZEGRDepthStencilState : public ZEGRState
 		} StateData;
 	
 	public:
+		virtual ZEGRStateType			GetStateType() const;
 		virtual const void*				GetData() const;
 		virtual ZESize					GetDataSize() const;
 
@@ -124,5 +125,5 @@ class ZEGRDepthStencilState : public ZEGRState
 		void							SetToDefault();
 
 										ZEGRDepthStencilState();
-										~ZEGRDepthStencilState();
+		virtual							~ZEGRDepthStencilState();
 };

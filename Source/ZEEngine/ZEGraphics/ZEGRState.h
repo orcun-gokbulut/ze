@@ -49,6 +49,14 @@ enum ZEGRComparisonFunction : ZEUInt8
 	ZEGR_CF_ALWAYS			= 7 
 };
 
+enum class ZEGRStateType : ZEUInt8
+{
+	ZEGR_ST_VERTEX_LAYOUT	= 0,
+	ZEGR_ST_RASTERIZER		= 1,
+	ZEGR_ST_DEPTH_STENCIL	= 2,
+	ZEGR_ST_BLEND			= 3
+};
+
 class ZEGRState
 {
 	private:
@@ -62,6 +70,8 @@ class ZEGRState
 		virtual					~ZEGRState();
 
 	public:
+		virtual ZEGRStateType	GetStateType() const = 0;
+
 		bool					IsDirty() const;
 
 		ZEUInt32				GetHash() const;

@@ -35,11 +35,11 @@
 
 #include "ZEGRWindow.h"
 
-#include "ZEGRCursor.h"
-#include "ZECore/ZECore.h"
 #include "ZEMath/ZEMath.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEGROutput.h"
+#include "ZECore/ZECore.h"
+#include "ZEGROutput.h"
+#include "ZEGRCursor.h"
+#include "ZEGRGraphicsModule.h"
 
 #define STRICT
 #define WIN32_LEAN_AND_MEAN
@@ -137,13 +137,13 @@ static void GetWin32Style(const ZEGRWindowStyle& Style, DWORD& Win32StyleExt, DW
 {
 	if (Style.Type == ZEGR_WT_NORMAL)
 	{
-		Win32Style |= WS_OVERLAPPED;
+		Win32Style |= WS_OVERLAPPEDWINDOW;
 		Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
 		Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;
 	}
 	else if (Style.Type == ZEGR_WT_POPUP)
 	{
-		Win32Style |= WS_POPUP;
+		Win32Style |= WS_POPUPWINDOW;
 		Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
 		Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;
 	}	

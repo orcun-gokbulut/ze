@@ -34,6 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNStage.h"
+
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEList2.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 
 void ZERNStage::SetOwnerRenderer(ZERNRenderer* Renderer)
@@ -72,7 +75,7 @@ ZERNStage::ZERNStage()
 	OwnerRenderer = NULL;
 }
 
-const ZEGRRenderState& ZERNStage::GetRenderState()
+ZEGRRenderState ZERNStage::GetRenderState()
 {
 	return ZEGRRenderState::Default;
 }

@@ -34,15 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRRenderState.h"
+
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRShader.h"
 
 ZEGRRenderState ZEGRRenderState::Default;
-
-ZEGRResourceType ZEGRRenderStateData::GetResourceType()
-{
-	return ZEGR_RT_RENDER_STATE;
-}
 
 ZEGRRenderStateData* ZEGRRenderStateData::Create(const ZEGRRenderState& RenderState)
 {
@@ -67,7 +63,7 @@ void ZEGRRenderState::SetShader(ZEGRShaderType Type, ZEGRShader* Shader)
 	Shaders[Type] = Shader;
 }
 
-ZEGRShader* ZEGRRenderState::GetShader(ZEGRShaderType Type) const
+ZEHolder<ZEGRShader> ZEGRRenderState::GetShader(ZEGRShaderType Type) const
 {
 	zeCheckError(Type >= ZEGR_SHADER_TYPE_COUNT, NULL, "Unknown shader type.");
 	return Shaders[Type];
@@ -138,7 +134,6 @@ ZEGRPrimitiveType ZEGRRenderState::GetPrimitiveType() const
 void ZEGRRenderState::SetToDefault()
 {
 	VertexLayout.SetToDefault();
-	memset(Shaders, NULL, sizeof(ZEGRShader*) * ZEGR_SHADER_TYPE_COUNT);
 	DepthStencilFormat = ZEGR_TF_NONE;
 	memset(RenderTargetFormats, ZEGR_TF_NONE, sizeof(ZEGRFormat) * ZEGR_MAX_RENDER_TARGET_SLOT);
 
@@ -146,7 +141,7 @@ void ZEGRRenderState::SetToDefault()
 	RasterizerState.SetToDefault();
 	DepthStencilState.SetToDefault();
 
-	PrimitiveType = ZEGR_PT_NONE;
+	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
 }
 
 ZEGRRenderStateData* ZEGRRenderState::Compile()
@@ -188,5 +183,6 @@ ZEGRRenderState::ZEGRRenderState(const ZEGRRenderState& RenderState)
 
 ZEGRRenderState::~ZEGRRenderState()
 {
-
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		Shaders[I].Release();
 }

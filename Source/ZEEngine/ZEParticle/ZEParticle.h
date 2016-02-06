@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
 
 #include "ZEMath/ZEVector.h"
 #include "ZERandom.h"
@@ -54,7 +52,6 @@ class ZEParticle : public ZEObject
 {
 	ZE_OBJECT
 	public:
-
 		ZEVector2		Size2D;
 		float			TotalLife;
 		float			Life;
@@ -77,5 +74,3 @@ class ZEParticle : public ZEObject
 		
 		ZEParticleState	State;
 };
-
-#endif

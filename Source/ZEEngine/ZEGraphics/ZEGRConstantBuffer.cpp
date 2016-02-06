@@ -57,7 +57,7 @@ void ZEGRConstantBuffer::Deinitialize()
 	SetSize(0);
 }
 
-void ZEGRConstantBuffer::SetData(void* Data)
+void ZEGRConstantBuffer::SetData(const void* Data)
 {
 	void* Buffer;
 	if (!Lock(&Buffer))

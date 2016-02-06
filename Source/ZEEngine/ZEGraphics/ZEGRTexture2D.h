@@ -38,7 +38,7 @@
 #include "ZEGRTexture.h"
 
 #include "ZETypes.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
 
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
@@ -53,7 +53,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt											Height;
 		ZEUInt											ArrayCount;
 
-		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);	
+		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false, bool UAV = false);	
 		virtual void									Deinitialize();
 
 														ZEGRTexture2D();
@@ -74,5 +74,5 @@ class ZEGRTexture2D : public ZEGRTexture
 
 		virtual bool									UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
 
-		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false);
+		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false, bool UAV = false);
 };

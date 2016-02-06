@@ -58,5 +58,5 @@ class ZED11DepthStencilBuffer : public ZEGRDepthStencilBuffer, public ZED11Compo
 		virtual							~ZED11DepthStencilBuffer();
 
 	public:
-		ID3D11DepthStencilView*			GetView();
+		ID3D11DepthStencilView*			GetView() const;
 };

@@ -36,122 +36,119 @@
 #pragma once
 
 #include "ZERNStage.h"
-#include "ZEPointer/ZEHolder.h"
-#include "ZEDS/ZEList2.h"
-#include "ZEGraphics/ZEGRSamplerState.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEPointer/ZESharedPointer.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
 class ZEGRRenderStateData;
 class ZEGRShader;
+class ZEGRSampler;
 class ZEGRContext;
 class ZEGRConstantBuffer;
 class ZERNRenderer;
 
 class ZERNStageAO : public ZERNStage
 {
-private:
-	ZEFlags								DirtyFlags;
+	private:
+		ZEFlags								DirtyFlags;
 
-	ZEHolder<ZEGRTexture2D>			OcclusionMap;
-	ZEHolder<ZEGRTexture2D>			BlurTexture;
-	ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>				OcclusionMap;
+		ZEHolder<ZEGRTexture2D>				BlurTexture;
+		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
 
-	ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
-	ZEHolder<ZEGRConstantBuffer>		BilateralConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		BilateralConstantBuffer;
 
-	ZEHolder<ZEGRShader>				VertexShader;
-	ZEHolder<ZEGRShader>				BlendVertexShader;
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				BlendVertexShader;
 
-	ZEHolder<ZEGRShader>				PixelShader;
-	ZEHolder<ZEGRShader>				BlendPixelShader;
-	ZEHolder<ZEGRShader>				BilateralPixelShader;
+		ZEHolder<ZEGRShader>				PixelShader;
+		ZEHolder<ZEGRShader>				BlendPixelShader;
+		ZEHolder<ZEGRShader>				BilateralPixelShader;
 
-	ZEHolder<ZEGRRenderStateData>		RenderStateData;
-	ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
-	ZEHolder<ZEGRRenderStateData>		BilateralRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		BilateralRenderStateData;
 
-	ZEGRSamplerState					SamplerPointBorder;
-	ZEGRSamplerState					SamplerPointWrap;
-	ZEGRSamplerState					SamplerPointClamp;
-	ZEGRSamplerState					SamplerLinearClamp;
+		ZESharedPointer<ZEGRSampler>		SamplerPointBorder;
+		ZESharedPointer<ZEGRSampler>		SamplerPointWrap;
+		ZESharedPointer<ZEGRSampler>		SamplerPointClamp;
+		ZESharedPointer<ZEGRSampler>		SamplerLinearClamp;
 
-	ZEArray<ZEVector4>					HorizontalValues;
-	ZEArray<ZEVector4>					VerticalValues;
+		ZEArray<ZEVector4>					HorizontalValues;
+		ZEArray<ZEVector4>					VerticalValues;
 
-	ZEUInt								Width;
-	ZEUInt								Height;
+		ZEUInt								Width;
+		ZEUInt								Height;
 
-	struct SSAOConstants
-	{
-		ZEVector4						OffsetVectors[14];
-		float							OcclusionRadius;
-		float							DistanceMax;
-		float							DistanceMin;
-		float							Intensity;
-		float							DownScale;
-		ZEVector3						Reserved;
-	}Constants;
+		struct SSAOConstants
+		{
+			ZEVector4						OffsetVectors[14];
+			float							OcclusionRadius;
+			float							MinDepthBias;
+			float							Intensity;
+			float							DownScale;
+		}Constants;
 
-	struct SSAOBilateralConstants
-	{
-		float							DepthThreshold;
-		float							IntensityThreshold;
-		float							Reserved;
-		ZEUInt							KernelSize;
-		ZEVector4						KernelValues[32];
-	}BilateralConstants;
+		struct SSAOBilateralConstants
+		{
+			float							DepthThreshold;
+			float							IntensityThreshold;
+			float							Reserved;
+			ZEUInt							KernelSize;
+			ZEVector4						KernelValues[32];
+		}BilateralConstants;
 
-	void								CreateRandomVectors();
-	void								CreateOffsetVectors();
+		void								CreateRandomVectors();
+		void								CreateOffsetVectors();
 
-	bool								Update();
-	bool								UpdateConstantBuffers();
-	bool								UpdateShaders();
-	bool								UpdateRenderStates();
-	bool								UpdateTextures();
+		bool								Update();
+		bool								UpdateConstantBuffers();
+		bool								UpdateShaders();
+		bool								UpdateRenderStates();
+		bool								UpdateTextures();
 
-	void								GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Context);
-	void								ApplyBlur(ZEGRContext* Context);
-	void								BlendWithAccumulationBuffer(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								ApplyBlur(ZEGRContext* Context);
+		void								BlendWithAccumulationBuffer(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-	virtual bool						InitializeSelf();						
-	virtual void						DeinitializeSelf();
+		virtual bool						InitializeSelf();						
+		virtual void						DeinitializeSelf();
 
-public:
-	ZEGRTexture2D*						GetOcclusionMap();
+	public:
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
-	void								SetDistanceMin(float DistanceMin);
-	float								GetDistanceMin() const;
+		const ZEGRTexture2D*				GetOcclusionMap() const;
 
-	void								SetDistanceMax(float DistanceMax);
-	float								GetDistanceMax() const;
+		void								SetOcclusionRadius(float Radius);
+		float								GetOcclusionRadius() const;
 
-	void								SetIntensity(float Intensity);
-	float								GetIntensity() const;
+		void								SetMinDepthBias(float MinDepthBias);
+		float								GetMinDepthBias() const;
 
-	void								SetOcclusionRadius(float Radius);
-	float								GetOcclusionRadius() const;
+		void								SetIntensity(float Intensity);
+		float								GetIntensity() const;
 
-	void								SetBilateralDepthThreshold(float DepthThreshold);
-	float								GetBilateralDepthThreshold() const;
+		void								SetOcclusionMapDownScale(float DownScale);
+		float								GetOcclusionMapDownScale() const;
 
-	void								SetBilateralIntensityThreshold(float IntensityThreshold);
-	float								GetBilateralIntensityThreshold() const;
+		void								SetBilateralDepthThreshold(float DepthThreshold);
+		float								GetBilateralDepthThreshold() const;
 
-	void								SetBilateralKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
-	const ZEVector4* 					GetBilateralKernelValues();
+		void								SetBilateralIntensityThreshold(float IntensityThreshold);
+		float								GetBilateralIntensityThreshold() const;
 
-	void								SetOcclusionMapDownScale(float DownScale);
-	float								GetOcclusionMapDownScale() const;
+		void								SetBilateralKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
+		const ZEVector4* 					GetBilateralKernelValues() const;
 
-	virtual ZEInt						GetId();
-	virtual const ZEString&				GetName();
+		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-	virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-	virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
-
-										ZERNStageAO();
+											ZERNStageAO();
 };

@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticlePhysicsOperator.h"
+
 #include "ZEParticle.h"
 
 void ZEParticlePhysicsOperator::SetMinAcceleration(const ZEVector3& Acceleration)
@@ -97,8 +98,8 @@ void ZEParticlePhysicsOperator::Tick(float ElapsedTime, ZEArray<ZEParticle>& Own
 
 		case ZE_PAS_ALIVE:
 
-			OwnerParticlePool[I].Position			+= CustomData[I].Velocity * ElapsedTime;
-			CustomData[I].Velocity					+= CustomData[I].Acceleration * ElapsedTime;
+			OwnerParticlePool[I].Position += CustomData[I].Velocity * ElapsedTime;
+			CustomData[I].Velocity += CustomData[I].Acceleration * ElapsedTime;
 
 			break;
 
