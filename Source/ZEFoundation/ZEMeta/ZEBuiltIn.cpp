@@ -35,9 +35,11 @@
 
 #include "ZEBuiltIn.h"
 
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEDS\ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEVectord.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEMatrixd.h"
+#include "ZEDS/ZEString.h"
 
 ZESize ZEBuiltInClassProvider::GetClassCount()
 {
@@ -49,11 +51,16 @@ ZEClass** ZEBuiltInClassProvider::GetClasses()
 	static ZEClass* Classes[] =
 	{
 		ZEVector2::Class(),
+		ZEVector2d::Class(),
 		ZEVector3::Class(),
+		ZEVector3d::Class(),
 		ZEVector4::Class(),
+		ZEVector4d::Class(),
 		ZEQuaternion::Class(),
 		ZEMatrix3x3::Class(),
+		ZEMatrix3x3d::Class(),
 		ZEMatrix4x4::Class(),
+		ZEMatrix4x4d::Class(),
 		ZEString::Class()
 	};
 

@@ -38,8 +38,6 @@
 #include "ZEMath.h"
 #include "ZEAngle.h"
 
-#define		ZE_VECTOR4_ELEMENT_COUNT	(ZESize)4
-
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 const ZEVector2 ZEVector2::Zero = ZEVector2(0.0f, 0.0f);
@@ -204,18 +202,12 @@ void ZEVector2::SaturateSelf()
 
 float ZEVector2::Min() const
 {
-	if (x < y)
-		return x;
-	else
-		return y;
+	return ZEMath::Min(x, y);
 }
 
 float ZEVector2::Max() const
 {
-	if (x > y)
-		return x;
-	else
-		return y;
+	return ZEMath::Max(x, y);
 }
 
 bool ZEVector2::Equals(const ZEVector2& Vector) const
@@ -615,28 +607,12 @@ void ZEVector3::SaturateSelf()
 
 float ZEVector3::Min() const
 {
-	float MinComponent = x;
-
-	if(y < MinComponent)
-		MinComponent = y;
-
-	if(z < MinComponent)
-		MinComponent = z;
-
-	return MinComponent;
+	return ZEMath::Min(ZEMath::Min(x, y), z);
 }
 
 float ZEVector3::Max() const
 {
-	float MaxComponent = x;
-
-	if(y > MaxComponent)
-		MaxComponent = y;
-
-	if(z > MaxComponent)
-		MaxComponent = z;
-
-	return MaxComponent;
+	return ZEMath::Max(ZEMath::Max(x, y), z);
 }
 
 bool ZEVector3::Equals(const ZEVector3& Vector) const
@@ -920,30 +896,16 @@ void ZEVector4::SaturateSelf()
 
 float ZEVector4::Min() const
 {
-	float Min = x;
-	for (ZESize I = 1; I < ZE_VECTOR4_ELEMENT_COUNT; I++)
-	{
-		if (M[I] < Min)
-		{
-			Min = M[I];
-		}
-	}
-
-	return Min;
+	return ZEMath::Min(
+		ZEMath::Min(x, y),
+		ZEMath::Min(z, w));
 }
 
 float ZEVector4::Max() const
 {
-	float Max = x;
-	for (ZESize I = 1; I < ZE_VECTOR4_ELEMENT_COUNT; I++)
-	{
-		if (M[I] > Max)
-		{
-			Max = M[I];
-		}
-	}
-
-	return Max;
+	return ZEMath::Max(
+		ZEMath::Max(x, y),
+		ZEMath::Max(z, w));
 }
 
 bool ZEVector4::Equals(const ZEVector4& Vector) const

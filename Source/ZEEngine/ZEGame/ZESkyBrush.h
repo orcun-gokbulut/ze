@@ -61,7 +61,6 @@ class ZESkyBrush : public ZEEntity
 		virtual bool						DeinitializeSelf();
 
 											ZESkyBrush();
-		virtual								~ZESkyBrush();
 
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;
@@ -77,6 +76,8 @@ class ZESkyBrush : public ZEEntity
 
 		virtual void						Draw(ZEDrawParameters* DrawParameters);
 		virtual void						Tick(float Time);
+
+		virtual								~ZESkyBrush();
 
 		static ZESkyBrush*					CreateInstance();
 

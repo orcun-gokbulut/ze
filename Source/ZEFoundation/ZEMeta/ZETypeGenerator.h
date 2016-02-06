@@ -41,10 +41,15 @@
 #include "ZEType.h"
 
 class ZEVector2;
+class ZEVector2d;
 class ZEVector3;
+class ZEVector3d;
 class ZEVector4;
+class ZEVector4d;
 class ZEMatrix3x3;
+class ZEMatrix3x3d;
 class ZEMatrix4x4;
+class ZEMatrix4x4d;
 class ZEQuaternion;
 class ZEString;
 class ZEClass;
@@ -223,6 +228,13 @@ class ZETypeGenerator<ZEVector2>
 };
 
 template <>
+class ZETypeGenerator<ZEVector2d>
+{
+public:
+	static ZEType GetType();
+};
+
+template <>
 class ZETypeGenerator<ZEVector3>
 {
 	public:
@@ -230,7 +242,21 @@ class ZETypeGenerator<ZEVector3>
 };
 
 template <>
+class ZETypeGenerator<ZEVector3d>
+{
+	public:
+		static ZEType GetType();
+};
+
+template <>
 class ZETypeGenerator<ZEVector4>
+{
+	public:
+		static ZEType GetType();
+};
+
+template <>
+class ZETypeGenerator<ZEVector4d>
 {
 	public:
 		static ZEType GetType();
@@ -251,7 +277,21 @@ class ZETypeGenerator<ZEMatrix3x3>
 };
 
 template <>
+class ZETypeGenerator<ZEMatrix3x3d>
+{
+	public:
+		static ZEType GetType();
+};
+
+template <>
 class ZETypeGenerator<ZEMatrix4x4>
+{
+	public:
+		static ZEType GetType();
+};
+
+template <>
+class ZETypeGenerator<ZEMatrix4x4d>
 {
 	public:
 		static ZEType GetType();

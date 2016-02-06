@@ -52,13 +52,12 @@
 #include "ZEGraphics/ZEFrameRenderer.h"
 #include "ZEGraphics/ZEShadowRenderer.h"
 #include "ZEInterior/ZEInterior.h"
-#include "ZESerialization/ZEFileSerializer.h"
-#include "ZESerialization/ZEFileUnserializer.h"
 #include "ZEInterior/ZEInteriorResource.h"
-
-#include <memory.h>
 #include "ZEMeta/ZEProvider.h"
 #include "ZEML/ZEMLReader.h"
+#include "ZEML/ZEMLWriter.h"
+#include <memory.h>
+
 
 bool ZEScene::Initialize()
 {
@@ -348,47 +347,60 @@ bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parame
 bool ZEScene::Save(const ZEString& FileName)
 {
 	zeLog("Saving scene file \"%s\".", FileName.GetValue());
-	ZEFile Serializer;
-	if (Serializer.Open(FileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+
+	ZEFile SceneFile;
+	if (!SceneFile.Open(FileName, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 	{
-		ZEUInt32 EntityCount = (ZEUInt32)Entities.GetCount();
-		Serializer.Write(&EntityCount, sizeof(ZEUInt32), 1);
-		
-		Serializer.Write(&LastEntityId, sizeof(ZEInt), 1);
-
-		// Will be removed
-		char NameBuffer[ZE_MAX_NAME_SIZE];
-		memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
-		Serializer.Write(&NameBuffer, sizeof(char), ZE_MAX_FILE_NAME_SIZE);
-
-		for (ZESize I = 0; I < Entities.GetCount(); I++)
-		{
-			char NameBuffer[ZE_MAX_NAME_SIZE];
-			memset(NameBuffer, 0, ZE_MAX_NAME_SIZE);
-			strcpy(NameBuffer, Entities[I]->GetClass()->GetName());
-			Serializer.Write((void*)NameBuffer, sizeof(char), ZE_MAX_NAME_SIZE);
-
-			//ZEMETADEBUGCHECK!!!
-			/*if (!Entities[I]->Serialize((ZESerializer*)&Serializer))
-			{
-				zeError("Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
-				zeError("Serialization failed.");
-				Serializer.Close();
-				return false;
-			}*/
-		}
-
-		Serializer.Close();
-		
-		zeLog("Scene file \"%s\" saved.", FileName.GetValue());
-		Serializer.Close();
-		return true;
-	}
-	else
-	{
-		zeError("Serialization failed.");
+		zeError("Cannot save scene. Cannot write to scene file. File Name: \"%s\".", FileName.ToCString());
 		return false;
 	}
+
+	ZEMLWriter Writer;
+	Writer.Open(&SceneFile);
+	ZEMLWriterNode SceneNode;
+	Writer.OpenRootNode("ZEScene", SceneNode);
+
+	SceneNode.WriteUInt8("VersionMajor", 1);
+	SceneNode.WriteUInt8("VersionMinor", 0);
+
+	ZEMLWriterNode EntitiesNode;
+	SceneNode.OpenNode("Entities", EntitiesNode);
+
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+	{	
+		if (Entities[I]->GetClass() == NULL)
+		{
+			zeError("Serialization of entity \"%s\" has failed. Entity class is not registered." , Entities[I]->GetName());
+			zeError("Serialization failed.");
+			return false;
+		}
+
+		ZEMLWriterNode EntityNode;
+		EntitiesNode.OpenNode("Entity", EntityNode);
+		EntityNode.WriteString("Class", Entities[I]->GetClass()->GetName());
+
+		if (!Entities[I]->Save(&EntityNode))
+		{
+			zeError("Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
+			zeError("Serialization failed.");
+			EntityNode.CloseNode();
+			EntitiesNode.CloseNode();
+			SceneNode.CloseNode();
+			Writer.Close();
+			SceneFile.Close();
+			return false;
+		}
+
+		EntityNode.CloseNode();
+	}
+
+	EntitiesNode.CloseNode();
+	SceneNode.CloseNode();
+	Writer.Close();
+	SceneFile.Close();		
+	zeLog("Scene file \"%s\" has been saved.", FileName.GetValue());
+
+	return true;
 }
 
 bool ZEScene::Load(const ZEString& FileName)

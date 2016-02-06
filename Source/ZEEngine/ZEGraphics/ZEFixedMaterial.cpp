@@ -109,6 +109,18 @@ ZEFixedMaterial::ZEFixedMaterial()
 	DiffuseColor = ZEVector3::One;
 	SpecularColor = ZEVector3::One;
 	EmmisiveColor = ZEVector3::One;
+
+	DetailBaseMapTiling = ZEVector2::One;
+	DetailBaseMapFactor = 1.0f;
+	DetailBaseMapColor = ZEVector3::One;
+	DetailBaseMapAttenuationStart = 10.0f;
+	DetailBaseMapAttenuationFactor = 0.05f;
+
+	DetailNormalMapTiling = ZEVector2::One;
+	DetailNormalMapFactor = 1.0f;
+	DetailNormalMapAttenuationStart = 10.0f;
+	DetailNormalMapAttenuationFactor = 0.05f;
+
 	SubSurfaceScatteringFactor = 0.0f;
 	MaterialComponentMask = ~0;
 	GlobalAmbientEnabled = true;
@@ -985,15 +997,6 @@ float ZEFixedMaterial::GetRefractionFactor() const
 	return RefractionFactor;
 }
 
-void ZEFixedMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
-{
-	DetailMapTiling = Tiling;
-}
-
-const ZEVector2& ZEFixedMaterial::GetDetailMapTiling() const
-{
-	return DetailMapTiling;
-}
 
 void ZEFixedMaterial::SetDetailBaseMapEnabled(bool Enabled)
 {
@@ -1006,6 +1009,58 @@ void ZEFixedMaterial::SetDetailBaseMapEnabled(bool Enabled)
 bool ZEFixedMaterial::GetDetailBaseMapEnabled() const
 {
 	return (MaterialComponents & ZE_SHADER_DETAIL_BASE_MAP) != 0;
+}
+
+void ZEFixedMaterial::SetDetailBaseMapTiling(const ZEVector2& Tiling)
+{
+	DetailBaseMapTiling = Tiling;
+}
+
+const ZEVector2& ZEFixedMaterial::GetDetailBaseMapTiling() const
+{
+	return DetailBaseMapTiling;
+}
+
+void ZEFixedMaterial::SetDetailBaseMapAttenuationStart(float Start)
+{
+	DetailBaseMapAttenuationStart = Start;
+}
+
+float ZEFixedMaterial::GetDetailBaseMapAttenuationStart() const
+{
+	return DetailBaseMapAttenuationStart;
+}
+
+void ZEFixedMaterial::SetDetailBaseMapAttenuationFactor(float Factor)
+{
+	DetailBaseMapAttenuationFactor = Factor;
+}
+
+float ZEFixedMaterial::GetDetailBaseMapAttenuationFactor() const
+{
+	return DetailBaseMapAttenuationFactor;
+}
+
+void ZEFixedMaterial::SetDetailBaseMapFactor(float Factor)
+{
+	DetailBaseMapFactor = Factor;
+	ZEVector3::Scale(DetailBaseMapColorSC, DetailBaseMapColor, DetailBaseMapFactor);
+}
+
+float ZEFixedMaterial::GetDetailBaseMapFactor() const
+{
+	return DetailBaseMapFactor;
+}
+
+void ZEFixedMaterial::SetDetailBaseMapColor(const ZEVector3& DiffuseColor)
+{
+	DetailBaseMapColor = DiffuseColor;
+	ZEVector3::Scale(DetailBaseMapColorSC, DetailBaseMapColor, DetailBaseMapFactor);
+}
+
+const ZEVector3& ZEFixedMaterial::GetDetailBaseMapColor() const
+{
+	return DetailBaseMapColor;
 }
 
 void ZEFixedMaterial::SetDetailBaseMap(const ZETexture2D* Texture)
@@ -1081,6 +1136,46 @@ void ZEFixedMaterial::SetDetailNormalMapEnabled(bool Enabled)
 bool ZEFixedMaterial::GetDetailNormalMapEnabled() const
 {
 	return (MaterialComponents & ZE_SHADER_DETAIL_NORMAL_MAP) != 0;
+}
+
+void ZEFixedMaterial::SetDetailNormalMapTiling(const ZEVector2& Tiling)
+{
+	DetailNormalMapTiling = Tiling;
+}
+
+const ZEVector2& ZEFixedMaterial::GetDetailNormalMapTiling() const
+{
+	return DetailNormalMapTiling;
+}
+
+void ZEFixedMaterial::SetDetailNormalMapFactor(float Factor)
+{
+	DetailNormalMapFactor = Factor;
+}
+
+float ZEFixedMaterial::GetDetailNormalMapFactor() const
+{
+	return DetailNormalMapFactor;
+}
+
+void ZEFixedMaterial::SetDetailNormalMapAttenuationStart(float Start)
+{
+	DetailNormalMapAttenuationStart = Start;
+}
+
+float ZEFixedMaterial::GetDetailNormalMapAttenuationStart() const
+{
+	return DetailNormalMapAttenuationStart;
+}
+
+void ZEFixedMaterial::SetDetailNormalMapAttenuationFactor(float Factor)
+{
+	DetailNormalMapAttenuationFactor = Factor;
+}
+
+float ZEFixedMaterial::GetDetailNormalMapAttenuationFactor() const
+{
+	return DetailNormalMapAttenuationFactor;
 }
 
 void ZEFixedMaterial::SetDetailNormalMap(const ZETexture2D* Texture)
@@ -1392,7 +1487,6 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteFloat("Opacity", GetOpacity());
 	ConfigurationNode.WriteInt32("OpacityComponent", (ZEInt32)GetOpacityComponent());
 	ConfigurationNode.WriteFloat("AlphaCullLimit", GetAlphaCullLimit());
-	ConfigurationNode.WriteVector2("DetailMapTiling", GetDetailMapTiling());
 	ConfigurationNode.WriteFloat("SpecularShininess", GetSpecularShininess());
 	ConfigurationNode.WriteFloat("SubSurfaceScatteringFactor", GetDiffuseSubSurfaceScatteringFactor());
 
@@ -1439,6 +1533,17 @@ void ZEFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteString("LightMap", GetLightMapFile());
 	ConfigurationNode.WriteInt32("LightMapAddressModeU", GetLightMapAddressModeU());
 	ConfigurationNode.WriteInt32("LightMapAddressModeV", GetLightMapAddressModeV());
+
+	ConfigurationNode.WriteFloat("DetailBaseMapFactor", GetDetailBaseMapFactor());
+	ConfigurationNode.WriteVector3("DetailBaseMapColor", GetDetailBaseMapColor());
+	ConfigurationNode.WriteVector2("DetailBaseMapTiling", GetDetailBaseMapTiling());
+	ConfigurationNode.WriteFloat("DetailBaseMapAttenuationStart", GetDetailBaseMapAttenuationStart());
+	ConfigurationNode.WriteFloat("DetailBaseMapAttenuationFactor", GetDetailBaseMapAttenuationFactor());
+	
+	ConfigurationNode.WriteFloat("DetailNormalMapFactor", GetDetailNormalMapFactor());
+	ConfigurationNode.WriteVector2("DetailNormalMapTiling", GetDetailNormalMapTiling());
+	ConfigurationNode.WriteFloat("DetailNormalMapAttenuationStart", GetDetailNormalMapAttenuationStart());
+	ConfigurationNode.WriteFloat("DetailNormalMapAttenuationFactor", GetDetailNormalMapAttenuationFactor());
 
 	ConfigurationNode.CloseNode();
 	MaterialNode.CloseNode();
@@ -1506,7 +1611,6 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 
 		SetOpacity(ConfigurationNode.ReadFloat("Opacity", 1.0f));
 		SetOpacityComponent((ZEMaterialOpacityComponent)ConfigurationNode.ReadInt32("OpacityComponent"));
-		SetDetailMapTiling(ConfigurationNode.ReadVector2("DetailMapTiling", ZEVector2::One));
 		SetAmbientColor(ConfigurationNode.ReadVector3("AmbientColor", ZEVector3::One));
 		SetAmbientFactor(ConfigurationNode.ReadFloat("AmbientFactor", 1.0f));
 		SetSpecularColor(ConfigurationNode.ReadVector3("SpecularColor", ZEVector3::One));
@@ -1554,6 +1658,17 @@ void ZEFixedMaterial::ReadFromFile(const ZEString& FilePath)
 		SetDetailNormalMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("DetailNormalMap")).GetPath());
 		SetEnvironmentMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("EnvironmentMap")).GetPath());
 		SetLightMapFile(ZEFileInfo(FilePath, ConfigurationNode.ReadString("LightMap")).GetPath());
+
+		SetDetailBaseMapFactor(ConfigurationNode.ReadFloat("DetailBaseMapFactor", 1.0f));
+		SetDetailBaseMapColor(ConfigurationNode.ReadVector3("DetailBaseMapColor", ZEVector3::One));
+		SetDetailBaseMapTiling(ConfigurationNode.ReadVector2("DetailBaseMapTiling", ZEVector2::One));
+		SetDetailBaseMapAttenuationStart(ConfigurationNode.ReadFloat("DetailBaseMapAttenuationStart", 10.0f));
+		SetDetailBaseMapAttenuationFactor(ConfigurationNode.ReadFloat("DetailBaseMapAttenuationFactor", 0.05f));
+
+		SetDetailNormalMapFactor(ConfigurationNode.ReadFloat("DetailNormalMapFactor", 1.0f));
+		SetDetailNormalMapTiling(ConfigurationNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
+		SetDetailNormalMapAttenuationStart(ConfigurationNode.ReadFloat("DetailNormalMapAttenuationStart", 10.0f));
+		SetDetailNormalMapAttenuationFactor(ConfigurationNode.ReadFloat("DetailNormalMapAttenuationFactor", 0.05f));
 	}
 
 	MaterialReader.Close();

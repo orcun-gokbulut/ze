@@ -98,5 +98,20 @@ ZEMLValueType ZEMLUtils::ConvertValueType(ZEValueType Type)
 
 		case ZE_VRT_MATRIX4X4:
 			return ZEML_VT_MATRIX4X4;
+
+		case ZE_VRT_VECTOR2D:
+			return ZEML_VT_VECTOR2D;
+
+		case ZE_VRT_VECTOR3D:
+			return ZEML_VT_VECTOR3D;
+
+		case ZE_VRT_VECTOR4D:
+			return ZEML_VT_VECTOR4D;
+
+		case ZE_VRT_MATRIX3X3D:
+			return ZEML_VT_MATRIX3X3D;
+
+		case ZE_VRT_MATRIX4X4D:
+			return ZEML_VT_MATRIX4X4D;
 	}
 }

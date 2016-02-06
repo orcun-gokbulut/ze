@@ -130,6 +130,13 @@ ZEType ZETypeGenerator<ZEVector2>::GetType()
 	return Type;
 }
 
+ZEType ZETypeGenerator<ZEVector2d>::GetType()
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR2D;
+	return Type;
+}
+
 ZEType ZETypeGenerator<ZEVector3>::GetType()
 {
 	ZEType Type;
@@ -137,10 +144,24 @@ ZEType ZETypeGenerator<ZEVector3>::GetType()
 	return Type;
 }
 
-ZEType ZETypeGenerator<ZEVector4>:: GetType()
+ZEType ZETypeGenerator<ZEVector3d>::GetType()
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR3D;
+	return Type;
+}
+
+ZEType ZETypeGenerator<ZEVector4>::GetType()
 {
 	ZEType Type;
 	Type.Type = ZE_TT_VECTOR4;
+	return Type;
+}
+
+ZEType ZETypeGenerator<ZEVector4d>::GetType()
+{
+	ZEType Type;
+	Type.Type = ZE_TT_VECTOR4D;
 	return Type;
 }
 
@@ -158,10 +179,24 @@ ZEType ZETypeGenerator<ZEMatrix3x3>::GetType()
 	return Type;
 }
 
+ZEType ZETypeGenerator<ZEMatrix3x3d>::GetType()
+{
+	ZEType Type;
+	Type.Type = ZE_TT_MATRIX3X3D;
+	return Type;
+}
+
 ZEType ZETypeGenerator<ZEMatrix4x4>::GetType()
 {
 	ZEType Type;
 	Type.Type = ZE_TT_MATRIX4X4;
+	return Type;
+}
+
+ZEType ZETypeGenerator<ZEMatrix4x4d>::GetType()
+{
+	ZEType Type;
+	Type.Type = ZE_TT_MATRIX4X4D;
 	return Type;
 }
 

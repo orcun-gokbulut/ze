@@ -75,9 +75,13 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 
 	regmatch_t NativeMatches[256];
 
+	ZESize OldOffset = 0;
+	if (OldMatch != NULL)
+		OldOffset = OldMatch->Offset + OldMatch->Size;
+
 	int Result = 
 		regexec((regex_t*)Code, 
-			String.ToCString() + (OldMatch != NULL ? OldMatch->Offset + OldMatch->Size : 0), 
+			String.ToCString() + OldOffset, 
 			((regex_t*)Code)->re_nsub + 1, 
 			NativeMatches, 
 			(OldMatch != NULL && OldMatch->Offset != 0 ? REG_NOTBOL : 0));
@@ -85,7 +89,7 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 	if (Result != REG_OK)
 		return false;
 	
-	Match.Offset = NativeMatches[0].rm_so;
+	Match.Offset = OldOffset + NativeMatches[0].rm_so;
 	Match.Size = NativeMatches[0].rm_eo - NativeMatches[0].rm_so;
 
 	if (Flags.GetFlags(ZE_REF_NO_MATCH_STRING) == 0)
@@ -97,7 +101,7 @@ bool ZERegEx::Match(const ZEString& String, ZERegExMatch& Match, ZERegExFlags Fl
 		for (ZESize I = 0; I < ((regex_t*)Code)->re_nsub; I++)
 		{
 			ZERegExSubMatch& SubMatch = Match.SubMatches[I];
-			SubMatch.Offset = NativeMatches[I + 1].rm_so;
+			SubMatch.Offset = OldOffset + NativeMatches[I + 1].rm_so;
 			SubMatch.Size = NativeMatches[I + 1].rm_eo - NativeMatches[I + 1].rm_so;
 			if (Flags.GetFlags(ZE_REF_NO_MATCH_STRING) == 0)
 				SubMatch.String.SetValue(String.ToCString() + SubMatch.Offset, SubMatch.Size);

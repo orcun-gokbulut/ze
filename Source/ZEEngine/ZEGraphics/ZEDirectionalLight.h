@@ -62,9 +62,7 @@ struct ZEDirectionalLightCascade
 class ZEDirectionalLight : public ZELight
 {
 	ZE_OBJECT
-
 	private:
-		
 		float								SplitBias;
 		ZESize								CascadeCount;
 		ZEDirectionalLightCascade			Cascades[MAX_CASCADE_COUNT];
@@ -76,7 +74,6 @@ class ZEDirectionalLight : public ZELight
 		bool								DeinitializeSelf();
 
 											ZEDirectionalLight();
-		virtual								~ZEDirectionalLight();
 
 	public:
 		ZELightType							GetLightType();
@@ -96,6 +93,9 @@ class ZEDirectionalLight : public ZELight
 		const ZEMatrix4x4&					GetViewTransform(ZESize CascadeIndex = 0);
 		
 		void								Draw(ZEDrawParameters* DrawParameters);
+
+		virtual								~ZEDirectionalLight();
+
 		static ZEDirectionalLight*			CreateInstance();
 };
 

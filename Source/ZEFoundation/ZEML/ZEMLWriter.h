@@ -72,13 +72,20 @@ class ZEMLWriterNode
 		bool				WriteString(const char* Name, const char* Value);
 		bool				WriteQuaternion(const char* Name, const ZEQuaternion& Value);
 		bool				WriteVector2(const char* Name, const ZEVector2& Value);
+		bool				WriteVector2d(const char* Name, const ZEVector2d& Value);
 		bool				WriteVector3(const char* Name, const ZEVector3& Value);
+		bool				WriteVector3d(const char* Name, const ZEVector3d& Value);
 		bool				WriteVector4(const char* Name, const ZEVector4& Value);
+		bool				WriteVector4d(const char* Name, const ZEVector4d& Value);
 		bool				WriteMatrix3x3(const char* Name, const ZEMatrix3x3& Value);
+		bool				WriteMatrix3x3d(const char* Name, const ZEMatrix3x3d& Value);
 		bool				WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value);
+		bool				WriteMatrix4x4d(const char* Name, const ZEMatrix4x4d& Value);
 		bool				WriteData(const char* Name, const void* Data, ZEUInt64 DataSize);
 
 		bool				CloseNode();
+
+		const ZEFile*		GetFile() const;
 
 							ZEMLWriterNode();
 							~ZEMLWriterNode();
