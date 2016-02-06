@@ -81,6 +81,9 @@ class ZEFixedMaterial : public ZEMaterial
 		ZEVector3						EmmisiveColor;
 		float							EmmisiveFactor;
 
+		ZEVector3						DetailBaseMapColor;
+		float							DetailBaseMapFactor;
+
 		bool							GlobalAmbientEnabled;
 
 		#ifndef ZE_META_COMPILER
@@ -102,14 +105,22 @@ class ZEFixedMaterial : public ZEMaterial
 
 				float					ReflectionFactor;
 				float					RefractionFactor;
-				ZEVector2				DetailMapTiling;
-
 				float					SubSurfaceScatteringFactor;
 				float					AlphaCullLimit;
-				float					Reserved1;
-				float					Reserved2;
+
+				ZEVector2				DetailBaseMapTiling;
+				float					DetailBaseMapAttenuationStart;
+				float					DetailBaseMapAttenuationFactor;
+
+				ZEVector2				DetailNormalMapTiling;
+				float					DetailNormalMapAttenuationStart;
+				float					DetailNormalMapAttenuationFactor;
+
+				ZEVector3				DetailBaseMapColorSC;
+				float					DetailNormalMapFactor;
+
 			};
-			float						PixelShaderConstants[24];
+			float						PixelShaderConstants[32];
 		};
 
 		union
@@ -354,12 +365,19 @@ class ZEFixedMaterial : public ZEMaterial
 		void							SetRefractionFactor(float Factor);
 		float							GetRefractionFactor() const;
 
-		// Detail Map  
-
-		void							SetDetailMapTiling(const ZEVector2& Tiling);
-		const ZEVector2&				GetDetailMapTiling() const;
+		// Detail Base Map  
 		void							SetDetailBaseMapEnabled(bool Enabled); 
 		bool							GetDetailBaseMapEnabled() const;
+		void							SetDetailBaseMapTiling(const ZEVector2& Tiling);
+		const ZEVector2&				GetDetailBaseMapTiling() const;
+		void							SetDetailBaseMapFactor(float Factor);
+		float							GetDetailBaseMapFactor() const;
+		void							SetDetailBaseMapColor(const ZEVector3& DiffuseColor);
+		const ZEVector3&				GetDetailBaseMapColor() const;
+		void							SetDetailBaseMapAttenuationStart(float Start);
+		float							GetDetailBaseMapAttenuationStart() const;
+		void							SetDetailBaseMapAttenuationFactor(float Factor);
+		float							GetDetailBaseMapAttenuationFactor() const;
 		void							SetDetailBaseMap(const ZETexture2D* Texture);
 		const ZETexture2D*				GetDetailBaseMap() const;
 		void							SetDetailBaseMapFile(const char* Filename);
@@ -368,8 +386,18 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			GetDetailBaseMapAddressModeU() const;
 		void							SetDetailBaseMapAddressModeV(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetDetailBaseMapAddressModeV() const;
+		
+		// Detail Normal Map
 		void							SetDetailNormalMapEnabled(bool Enabled); 
 		bool							GetDetailNormalMapEnabled() const;
+		void							SetDetailNormalMapTiling(const ZEVector2& Tiling);
+		const ZEVector2&				GetDetailNormalMapTiling() const;
+		void							SetDetailNormalMapFactor(float Factor);
+		float							GetDetailNormalMapFactor() const;
+		void							SetDetailNormalMapAttenuationStart(float Start);
+		float							GetDetailNormalMapAttenuationStart() const;
+		void							SetDetailNormalMapAttenuationFactor(float Factor);
+		float							GetDetailNormalMapAttenuationFactor() const;
 		void							SetDetailNormalMap(const ZETexture2D* Texture);
 		const ZETexture2D*				GetDetailNormalMap() const;
 		void							SetDetailNormalMapFile(const char* Filename);
@@ -378,6 +406,7 @@ class ZEFixedMaterial : public ZEMaterial
 		ZETextureAddressMode			GetDetailNormalMapAddressModeU() const;
 		void							SetDetailNormalMapAddressModeV(ZETextureAddressMode Mode);
 		ZETextureAddressMode			GetDetailNormalMapAddressModeV() const;
+
 
 		// LightMap/Ambient Occlusion Map
 		void							SetLightMapEnabled(bool Enabled);

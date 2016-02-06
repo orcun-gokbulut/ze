@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CLOUD_H__
-#define __ZE_CLOUD_H__
 
 #include "ZEEntity.h"
 #include "ZEGraphics\ZECanvas.h"
@@ -78,7 +76,6 @@ class ZECloud : public ZEEntity
 		virtual bool			DeinitializeSelf();
 
 								ZECloud();
-		virtual					~ZECloud();
 
 	public:
 
@@ -132,9 +129,7 @@ class ZECloud : public ZEEntity
 		virtual void			Draw(ZEDrawParameters* DrawParameters);
 		virtual void			Tick(float Time);
 
+		virtual					~ZECloud();
+
 		static ZECloud*			CreateInstance();
-
-}; // class ZECloud
-
-
-#endif
+};

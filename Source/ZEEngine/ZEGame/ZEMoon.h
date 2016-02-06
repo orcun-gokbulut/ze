@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_MOON_H__
-#define __ZE_MOON_H__
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
@@ -64,7 +62,6 @@ class ZEMoon : public ZEEntity
 		virtual bool				DeinitializeSelf();
 
 									ZEMoon();
-		virtual						~ZEMoon();
 
 	private:
 
@@ -95,7 +92,7 @@ class ZEMoon : public ZEEntity
 		virtual void				Draw(ZEDrawParameters* DrawParameters);
 		virtual void				Tick(float Time);
 
+		virtual						~ZEMoon();
+
 		static ZEMoon*				CreateInstance();
 };
-
-#endif // __ZE_MOON_H__
