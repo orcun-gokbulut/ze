@@ -56,6 +56,8 @@
 #include "ZETexture/ZETexture2DResource.h"
 #include "ZERandom.h"
 #include <time.h>
+#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZED3D9FixedMaterial.h"
 
 ZED3D9VertexShader* OmniLightVS = NULL;
 ZED3D9PixelShader* OmniLightPS = NULL;
@@ -63,6 +65,26 @@ ZED3D9VertexShader*	ProjectiveLightVS = NULL;
 ZED3D9PixelShader* ProjectiveLightPS = NULL;
 ZED3D9VertexShader*	DirectionalLightVS = NULL;
 ZED3D9PixelShader* DirectionalLightPS = NULL;
+
+static void SetupClippingPlanes(LPDIRECT3DDEVICE9 Device, const ZEMatrix4x4& WorldViewProjTransform, const ZEArray<ZEPlane>& Planes)
+{
+	if (Planes.GetCount() == 0)
+		return;
+
+	for (ZESize I = 0; I < Planes.GetCount(); I++)
+	{
+		ZEPlane Plane;
+		ZEMatrix4x4::Transform(Plane.p, WorldViewProjTransform, Planes[I].p);
+		ZEMatrix4x4::Transform3x3(Plane.n, WorldViewProjTransform, Planes[I].n.Normalize());
+
+		ZEVector4 Vector;
+		ZEPlane::ToABCD(Plane, Vector.x, Vector.y, Vector.z, Vector.w);
+
+		Device->SetClipPlane(I, (float*)&Vector);
+	}
+
+	Device->SetRenderState(D3DRS_CLIPPLANEENABLE, (ZEInt)(1 << Planes.GetCount()) - 1);
+}
 
 void ZED3D9ShadowRenderer::SetViewPort(ZEViewPort* ViewPort)
 {
@@ -376,11 +398,21 @@ void ZED3D9ShadowRenderer::RenderDirectionalLight()
 		GetDevice()->SetVertexShaderConstantB(0, &SkinEnabled, 1);
 		GetDevice()->SetVertexShaderConstantF(0, LightShadowMatrix.MA, 4);
 
+		/*if (RenderCommand->Material->GetClass() == ZEFixedMaterial::Class())
+		{
+			ZED3D9FixedMaterial* FixedMaterial = (ZED3D9FixedMaterial*)RenderCommand->Material;
+			if (FixedMaterial->GetAlphaCullEnabled())
+		}*/
+
+		SetupClippingPlanes(GetDevice(), LightShadowMatrix, RenderCommand->ClippingPlanes);
+
 		ZED3D9FrameRenderer::PumpStreams(RenderCommand);
+
+		if (RenderCommand->ClippingPlanes.GetCount() != 0)
+			GetDevice()->SetRenderState(D3DRS_CLIPPLANEENABLE, FALSE);
 	}
 
 	GetDevice()->EndScene();
-	
 }
 
 void ZED3D9ShadowRenderer::RenderPointLight()

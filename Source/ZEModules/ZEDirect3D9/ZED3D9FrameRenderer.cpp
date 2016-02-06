@@ -1214,12 +1214,11 @@ void ZED3D9FrameRenderer::Render(float ElaspedTime)
 		DoGBufferPass();
 		DoLightningPass();
 		DoForwardPass();
-		/*
+	
 		AerialPerspectiveProcessor.SetInputDepth(GBuffer1);
 		AerialPerspectiveProcessor.SetInputColor(ABuffer);
 		AerialPerspectiveProcessor.SetOutput((ZED3D9ViewPort*)AerialPrespectiveBuffer->GetViewPort());
 		AerialPerspectiveProcessor.Process();
-		*/
 		
 		HDRProcessor.SetInput(ABuffer);
 		HDRProcessor.SetOutput((ZED3D9ViewPort*)MLAABuffer->GetViewPort());
