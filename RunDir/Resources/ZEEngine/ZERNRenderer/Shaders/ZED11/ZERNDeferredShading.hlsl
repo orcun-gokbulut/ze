@@ -114,7 +114,7 @@ static const float2 ZERNDeferredShading_PoissonDiskSamples[] =
 	float2(0.8985078f, 0.4366908f)
 };
 
-static const float ZERNDeferredShading_DepthBias = 0.00008f; 
+static const float ZERNDeferredShading_DepthBias = 0.00003f; 
 
 float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
 {		

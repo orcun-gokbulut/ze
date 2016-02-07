@@ -66,9 +66,9 @@ float2 ZERNTransformations_HomogeneousToView(float2 VectorHomogeneous)
 float3 ZERNTransformations_HomogeneousToView(float2 VectorHomogeneous, float DepthHomogeneous)
 {
 	float DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
-	VectorHomogeneous -= DepthView * float2(ZERNView_ProjectionTransform._31, ZERNView_ProjectionTransform._32);
+	VectorHomogeneous *= DepthView;
+	VectorHomogeneous -= DepthView * float2(ZERNView_ProjectionTransform._13, ZERNView_ProjectionTransform._23);
 	float2 VectorView = ZERNTransformations_HomogeneousToView(VectorHomogeneous);
-	VectorView *= DepthView;
 	
 	return float3(VectorView, DepthView);
 }

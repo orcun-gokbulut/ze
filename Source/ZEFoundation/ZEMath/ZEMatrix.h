@@ -182,10 +182,11 @@ class ZEMatrix4x4
 		static const ZEMatrix4x4		Zero;
 		static const ZEMatrix4x4		Identity;
 
-		static void						Create(ZEMatrix4x4& Matrix, float M11, float M12, float M13, float M14,
-											   float M21, float M22, float M23, float M24,
-											   float M31, float M32, float M33, float M34,
-											   float M41, float M42, float M43, float M44);
+		static void						Create(ZEMatrix4x4& Matrix, 
+											float M11, float M12, float M13, float M14,
+											float M21, float M22, float M23, float M24,
+											float M31, float M32, float M33, float M34,
+											float M41, float M42, float M43, float M44);
 		static void						Create(ZEMatrix4x4& Matrix, float* M);
 		static void						CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);

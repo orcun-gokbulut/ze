@@ -61,9 +61,10 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 {
 	ZEAABBox SceneAABBLight = GetSceneBoundingBoxLight(Scene);
 
-	const ZEViewFrustum* Frustum = static_cast<const ZEViewFrustum*>(View.ViewVolume);
-	float ViewFrustumFovTangent = ZEAngle::Tan(Frustum->GetFOV() * 0.5f);
-	float ViewFrustumAspectRatio = Frustum->GetAspectRatio();
+	float VerticalTopFovTangent = ZEAngle::Tan(View.VerticalFOVTop);
+	float VerticalBottomFovTangent = ZEAngle::Tan(View.VerticalFOVBottom);
+	float HorizontalRightTangent = ZEAngle::Tan(View.HorizontalFOVRight);
+	float HorizontalLeftTangent = ZEAngle::Tan(View.HorizontalFOVLeft);
 
 	ZEVector3 LightDirectionWorld = GetWorldRotation() * ZEVector3::UnitZ;
 	ZEVector3 CascadeFrustumVerticesView[8];
@@ -77,26 +78,32 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 		Cascade.Borders.w = CascadeDistanceFactor * (View.NearZ * ZEMath::Power(View.ShadowDistance / View.NearZ, CascadeNumberDividedByCount)) + 
 				  (1.0f - CascadeDistanceFactor) * (View.NearZ + (View.ShadowDistance - View.NearZ) * CascadeNumberDividedByCount);
 
-		float NearY = Cascade.Borders.z * ViewFrustumFovTangent;
-		float NearX = NearY * ViewFrustumAspectRatio;
+		float NearTop = Cascade.Borders.z * VerticalTopFovTangent;
+		float NearBottom = -Cascade.Borders.z * VerticalBottomFovTangent;
 
-		float FarY = Cascade.Borders.w * ViewFrustumFovTangent;
-		float FarX = FarY * ViewFrustumAspectRatio;
+		float NearRight = Cascade.Borders.z * HorizontalRightTangent;
+		float NearLeft = -Cascade.Borders.z * HorizontalLeftTangent;
 
-		CascadeFrustumVerticesView[0] = ZEVector3(-NearX, -NearY, Cascade.Borders.z);
-		CascadeFrustumVerticesView[1] = ZEVector3(-NearX, NearY, Cascade.Borders.z);
-		CascadeFrustumVerticesView[2] = ZEVector3(NearX, NearY, Cascade.Borders.z);
-		CascadeFrustumVerticesView[3] = ZEVector3(NearX, -NearY, Cascade.Borders.z);
+		float FarTop = Cascade.Borders.w * VerticalTopFovTangent;
+		float FarBottom = -Cascade.Borders.w * VerticalBottomFovTangent;
 
-		CascadeFrustumVerticesView[4] = ZEVector3(-FarX, -FarY, Cascade.Borders.w);
-		CascadeFrustumVerticesView[5] = ZEVector3(-FarX, FarY, Cascade.Borders.w);
-		CascadeFrustumVerticesView[6] = ZEVector3(FarX, FarY, Cascade.Borders.w);
-		CascadeFrustumVerticesView[7] = ZEVector3(FarX, -FarY, Cascade.Borders.w);
+		float FarRight = Cascade.Borders.w * HorizontalRightTangent;
+		float FarLeft = -Cascade.Borders.w * HorizontalLeftTangent;
+
+		CascadeFrustumVerticesView[0] = ZEVector3(NearLeft, NearBottom, Cascade.Borders.z);
+		CascadeFrustumVerticesView[1] = ZEVector3(NearLeft, NearTop, Cascade.Borders.z);
+		CascadeFrustumVerticesView[2] = ZEVector3(NearRight, NearTop, Cascade.Borders.z);
+		CascadeFrustumVerticesView[3] = ZEVector3(NearRight, NearBottom, Cascade.Borders.z);
+		
+		CascadeFrustumVerticesView[4] = ZEVector3(FarLeft, FarBottom, Cascade.Borders.w);
+		CascadeFrustumVerticesView[5] = ZEVector3(FarLeft, FarTop, Cascade.Borders.w);
+		CascadeFrustumVerticesView[6] = ZEVector3(FarRight, FarTop, Cascade.Borders.w);
+		CascadeFrustumVerticesView[7] = ZEVector3(FarRight, FarBottom, Cascade.Borders.w);
 
 		ZEAABBox CascadeFrustumAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
 		for(ZEUInt I = 0; I < 8; I++)
 		{
-			CascadeFrustumVerticesLight[I] =  GetViewTransform() * View.InvViewTransform * CascadeFrustumVerticesView[I];
+			CascadeFrustumVerticesLight[I] = GetViewTransform() * View.InvViewTransform * CascadeFrustumVerticesView[I];
 
 			ZEVector3::Min(CascadeFrustumAABBLight.Min, CascadeFrustumAABBLight.Min, CascadeFrustumVerticesLight[I]);
 			ZEVector3::Max(CascadeFrustumAABBLight.Max, CascadeFrustumAABBLight.Max, CascadeFrustumVerticesLight[I]);

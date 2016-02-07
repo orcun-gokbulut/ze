@@ -218,6 +218,8 @@ void ZECamera::SetHorizontalFOV(float FOV)
 		return;
 
 	View.HorizontalFOV = FOV;
+	View.HorizontalFOVRight = FOV * 0.5f;
+	View.HorizontalFOVLeft = FOV * 0.5f;
 	SetVerticalFOV(2.0f * ZEAngle::ArcTan(ZEAngle::Tan(FOV * 0.5f) / View.AspectRatio));
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~(ZE_CDF_VIEW_TRANSFORM | ZE_CDF_INV_VIEW_TRANSFORM));
 }
@@ -233,6 +235,8 @@ void ZECamera::SetVerticalFOV(float FOV)
 		return;
 
 	View.VerticalFOV = FOV;
+	View.VerticalFOVTop = FOV * 0.5f;
+	View.VerticalFOVBottom = FOV * 0.5f;
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~(ZE_CDF_VIEW_TRANSFORM | ZE_CDF_INV_VIEW_TRANSFORM));
 }
 
@@ -398,6 +402,7 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_FRUSTUM))
 	{
 		ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
+
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_FRUSTUM);
 	}
 
