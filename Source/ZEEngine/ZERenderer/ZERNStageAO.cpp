@@ -560,6 +560,6 @@ ZERNStageAO::ZERNStageAO()
 	Constants.DownScale = 2.0f;
 
 	BilateralConstants.DepthThreshold = 1.0f;
-	BilateralConstants.IntensityThreshold = 0.9f;
+	BilateralConstants.IntensityThreshold = 0.5f;
 	BilateralConstants.KernelSize = 11;
 }
