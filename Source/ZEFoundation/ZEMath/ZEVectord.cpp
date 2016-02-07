@@ -227,6 +227,12 @@ bool ZEVector2d::Equals(const ZEVector2d& Vector, double Threshold) const
 		(ZEMath::Abs(this->y - Vector.y) < Threshold));
 }
 
+void ZEVector2d::FromVector2(const ZEVector2& Vector)
+{
+	this->x = (double)Vector.x;
+	this->y = (double)Vector.y;
+}
+
 ZEVector2 ZEVector2d::ToVector2() const
 {
 	return ZEVector2((float)x, (float)y);
@@ -632,6 +638,13 @@ bool ZEVector3d::Equals(const ZEVector3d& Vector, double Threshold) const
 		(ZEMath::Abs(this->z - Vector.z) < Threshold));
 }
 
+void ZEVector3d::FromVector3(const ZEVector3& Vector)
+{
+	this->x = (double)Vector.x;
+	this->y = (double)Vector.y;
+	this->z = (double)Vector.z;
+}
+
 ZEVector2d ZEVector3d::ToVector2d() const
 {
 	return ZEVector2d(x, y);
@@ -936,6 +949,14 @@ bool ZEVector4d::Equals(const ZEVector4d& Vector, double Threshold) const
 		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
 		(ZEMath::Abs(this->z - Vector.z) < Threshold) &&
 		(ZEMath::Abs(this->w - Vector.w) < Threshold));
+}
+
+void ZEVector4d::FromVector4(const ZEVector4& Vector)
+{
+	this->x = (double)Vector.x;
+	this->y = (double)Vector.y;
+	this->z = (double)Vector.z;
+	this->w = (double)Vector.w;
 }
 
 ZEVector2d ZEVector4d::ToVector2d() const
