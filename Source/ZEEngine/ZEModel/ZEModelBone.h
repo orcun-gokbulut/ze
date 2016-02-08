@@ -43,46 +43,46 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
+#include "ZEDS/ZEFlags.h"
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
 
 class ZEModelBone : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEModel;
 	friend class ZEModelIKChain;
-
-	ZE_OBJECT
-
 	private:
-		ZEModel*							Owner;
-		const ZEModelResourceBone*			BoneResource;
-		ZEModelBone*						ParentBone;
+		ZEModel*							Model;
+		ZEModelBone*						Parent;
 		ZEArray<ZEModelBone*>				ChildBones;
+		const ZEModelResourceBone*			BoneResource;
 
 		ZEVector3							Position;
 		ZEQuaternion						Rotation;
 
-		mutable ZEMatrix4x4					InitialLocalTransform;
+		mutable ZEFlags						DirtyFlags;
+		mutable ZEMatrix4x4					InverseTransform;
 		mutable ZEMatrix4x4					LocalTransform;
+		mutable ZEMatrix4x4					InvLocalTransform;
 		mutable ZEMatrix4x4					ModelTransform;
+		mutable ZEMatrix4x4					InvModelTransform;
 		mutable ZEMatrix4x4					WorldTransform;
 		mutable ZEMatrix4x4					InvWorldTransform;
-
 		mutable ZEMatrix4x4					VertexTransform;
-
 		mutable ZEAABBox					LocalBoundingBox;
 		mutable ZEAABBox					ModelBoundingBox;
 		mutable ZEAABBox					WorldBoundingBox;
 
+		bool								PhysicsEnabled;
 		ZEPhysicalRigidBody*				PhysicalBody;
 		ZEPhysicalJoint*					PhysicalJoint;
 
-		bool								PhysicsEnabled;
-
 		ZEModelAnimationType				AnimationType;
 
-		void								OnTransformChanged();
+		void								LocalTransformChanged();
+		void								ParentTransformChanged();
 
 	public:
 		ZEModelBone*						GetParentBone();
@@ -96,18 +96,18 @@ class ZEModelBone : public ZEObject
 		const ZEAABBox&						GetModelBoundingBox() const;
 		const ZEAABBox&						GetWorldBoundingBox() const;
 
-		const ZEMatrix4x4&					GetTransform() const;
+		const ZEMatrix4x4&					GetLocalTransform() const;
+		const ZEMatrix4x4&					GetInvLocalTransform() const;
 		const ZEMatrix4x4&					GetModelTransform() const;
+		const ZEMatrix4x4&					GetInvModelTransform() const;
 		const ZEMatrix4x4&					GetWorldTransform() const;		
 		const ZEMatrix4x4&					GetInvWorldTransform() const;		
-
 
 		const ZEVector3&					GetInitialPosition() const;
 		const ZEQuaternion&					GetInitialRotation() const;
 
-		const ZEMatrix4x4&					GetInitialTransform() const;
+		const ZEMatrix4x4&					GetForwardTrasnform() const;
 		const ZEMatrix4x4&					GetInverseTransform() const;
-		const ZEMatrix4x4&					GetForwardTransform() const;
 		const ZEMatrix4x4&					GetVertexTransform() const;
 
 		void								SetPosition(const ZEVector3& Position);

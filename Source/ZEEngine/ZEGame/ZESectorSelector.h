@@ -45,9 +45,10 @@ class ZESectorSelector : public ZEGeographicEntity
 
 	private:
 		bool IsProcessing;
-
+		void UpdateSectors();
 	protected:
-		virtual void OnTransformChanged();
+		virtual void ParentTransformChanged();
+		virtual void LocalTransformChanged();
 		virtual bool SetOwner(ZEEntity* Owner);
 
 		ZESectorSelector();

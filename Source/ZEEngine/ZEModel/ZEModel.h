@@ -63,12 +63,13 @@ struct ZEDrawParameters;
 
 class ZEModel : public ZEEntity
 {	
+	ZE_OBJECT
 	friend class ZEPhysicalEnvironment;
+	friend class ZEModelBone;
+	friend class ZEModelMesh;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
-
-	ZE_OBJECT
 
 	private:
 		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
@@ -96,13 +97,17 @@ class ZEModel : public ZEEntity
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
+		mutable bool						DirtyBoundingBox;
 		bool								BoundingBoxIsUserDefined;
-		bool								IsStaticModel;
 
 		void								CalculateBoundingBox() const;
 		void								UpdateTransforms();
 	
 		void								LoadModelResource();
+
+		virtual void						ChildBoundingBoxChanged();
+		virtual void						LocalTransformChanged();
+		virtual void						ParentTransformChanged();
 
 	protected:
 		virtual bool						InitializeSelf();
@@ -115,15 +120,11 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelIKChain>				IKChains;
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
-
 		virtual const ZEModelStatistics&	GetStatistics() const;
 
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
-
+		virtual const ZEAABBox&				GetBoundingBox() const;
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
-
-		void								SetStaticModel(bool Value);
-		bool								GetStaticModel() const;
 
 		void								SetModelFile(const ZEString& ModelFile);
 		const ZEString&						GetModelFile() const;
@@ -159,10 +160,6 @@ class ZEModel : public ZEEntity
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
-
-		virtual void						SetPosition(const ZEVector3& NewPosition);
-		virtual void						SetRotation(const ZEQuaternion& NewRotation);
-		virtual void						SetScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
 		void								Draw(ZEDrawParameters* DrawParameters);

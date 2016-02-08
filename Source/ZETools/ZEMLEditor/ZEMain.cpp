@@ -42,9 +42,12 @@
 #ifdef ZE_PLATFORM_WINDOWS
 	#define  WIN32_LEAN_AND_MEAN
 	#include <windows.h>
+#include "ZEBase64.h"
 
 	int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 	{
+		char Output[256];
+		ZEBase64::Decode(Output, "AAAAAAUAAABgOtAI0z7YwDvfT42XaohAE0uidi6tUEEBAAAABQAAAHDgb", sizeof("AAAAAAUAAABgOtAI0z7YwDvfT42XaohAE0uidi6tUEEBAAAABQAAAHDgb")-1);
 		int argc = 1;
 		char* argv[] =
 		{
