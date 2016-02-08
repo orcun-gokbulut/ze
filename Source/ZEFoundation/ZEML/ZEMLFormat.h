@@ -98,4 +98,7 @@ class ZEMLFormat
 
 		static ZESize					GetFormatCount();
 		static ZEMLFormatDescription*const* GetFormats();
+		static ZEMLFormatDescription*	GetDefaultFormat();
+		static ZEMLFormatDescription*	GetDefaultBinaryFormat();
+		static ZEMLFormatDescription*	GetDefaultTextFormat();
 };
