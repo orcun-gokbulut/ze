@@ -46,10 +46,10 @@ float ZELight::AttenuationFunction(float RootToTry)
 	return Result;
 }
 
-void ZELight::OnTransformChanged()
+void ZELight::ParentTransformChanged()
 {
+	ZEEntity::ParentTransformChanged();
 	UpdateViewVolume = true;
-	ZEEntity::OnTransformChanged();
 }
 
 void ZELight::SetRange(float NewValue)
