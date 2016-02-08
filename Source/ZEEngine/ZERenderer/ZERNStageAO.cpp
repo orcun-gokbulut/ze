@@ -229,8 +229,8 @@ bool ZERNStageAO::UpdateTextures()
 
 	OcclusionMap.Release();
 	BlurTexture.Release();
-	OcclusionMap = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, 1, 1,ZEGR_TF_R32G32B32A32_FLOAT, true);
-	BlurTexture = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, true);
+	OcclusionMap = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, 1, 1,ZEGR_TF_R16G16B16A16_FLOAT, true);
+	BlurTexture = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_TEXTURE);
 
@@ -554,9 +554,9 @@ ZERNStageAO::ZERNStageAO()
 	Width = 0;
 	Height = 0;
 
-	Constants.OcclusionRadius = 0.75f;
-	Constants.MinDepthBias = 0.5f;
-	Constants.Intensity = 4.0f;
+	Constants.OcclusionRadius = 0.3f;
+	Constants.MinDepthBias = 0.1f;
+	Constants.Intensity = 8.0f;
 	Constants.DownScale = 2.0f;
 
 	BilateralConstants.DepthThreshold = 1.0f;

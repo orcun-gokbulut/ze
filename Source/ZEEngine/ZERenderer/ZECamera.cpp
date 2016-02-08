@@ -76,7 +76,7 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 		switch (View.ProjectionType)
 		{
 			case ZERN_PT_PERSPECTIVE:
-				ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
+				ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
 				break;
 
 			case ZERN_PT_PERSPECTIVE_OFFCENTER:
@@ -90,7 +90,6 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 				break;
 			}
 
-
 			case ZERN_PT_ORTHOGONAL:
 				break;
 
@@ -100,7 +99,7 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 		}
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
-		CameraDirtyFlags.RaiseFlags(ZE_CDF_INV_PROJECTION_TRANSFORM | ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
+		CameraDirtyFlags.RaiseFlags(ZE_CDF_INV_PROJECTION_TRANSFORM | ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM | ZE_CDF_VIEW_FRUSTUM);
 	}
 
 	return View.ProjectionTransform;
@@ -220,13 +219,12 @@ void ZECamera::SetHorizontalFOV(float FOV)
 	View.HorizontalFOV = FOV;
 	View.HorizontalFOVRight = FOV * 0.5f;
 	View.HorizontalFOVLeft = FOV * 0.5f;
-	SetVerticalFOV(2.0f * ZEAngle::ArcTan(ZEAngle::Tan(FOV * 0.5f) / View.AspectRatio));
 	CameraDirtyFlags.RaiseFlags(ZE_CDF_ALL & ~(ZE_CDF_VIEW_TRANSFORM | ZE_CDF_INV_VIEW_TRANSFORM));
 }
 
 float ZECamera::GetHorizontalFOV() const
 {
-	return 2.0f * ZEAngle::ArcTan(ZEAngle::Tan(View.VerticalFOV * 0.5f) * View.AspectRatio);
+	return (View.HorizontalFOVRight + View.HorizontalFOVLeft);
 }
 
 void ZECamera::SetVerticalFOV(float FOV)
@@ -242,7 +240,7 @@ void ZECamera::SetVerticalFOV(float FOV)
 
 float ZECamera::GetVerticalFOV() const
 {
-	return View.VerticalFOV;
+	return (View.VerticalFOVTop + View.VerticalFOVBottom);
 }
 
 void ZECamera::SetAutoAspectRatio(bool Enabled)
@@ -268,7 +266,7 @@ void ZECamera::SetAspectRatio(float AspectRatio)
 float ZECamera::GetAspectRatio() const
 {
 	if (AutoAspectRatio)
-		View.AspectRatio = (float)Viewport.GetWidth() / (float)Viewport.GetHeight();
+		View.AspectRatio = Viewport.GetWidth() / Viewport.GetHeight();
 
 	return View.AspectRatio;
 }
@@ -320,7 +318,12 @@ ZERNProjectionType ZECamera::GetProjectionType() const
 
 void ZECamera::SetVerticalFovTop(float VerticalFovTop)
 {
+	if(View.VerticalFOVTop == VerticalFovTop)
+		return;
+
 	View.VerticalFOVTop = VerticalFovTop;
+	
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
 }
 
 float ZECamera::GetVerticalFovTop() const
@@ -330,7 +333,12 @@ float ZECamera::GetVerticalFovTop() const
 
 void ZECamera::SetVerticalFovBottom(float VerticalFovBottom)
 {
+	if(View.VerticalFOVBottom == VerticalFovBottom)
+		return;
+
 	View.VerticalFOVBottom = VerticalFovBottom;
+
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
 }
 
 float ZECamera::GetVerticalFovBottom() const
@@ -340,7 +348,12 @@ float ZECamera::GetVerticalFovBottom() const
 
 void ZECamera::SetHorizontalFovRight(float HorizontalFovRight)
 {
+	if(View.HorizontalFOVRight == HorizontalFovRight)
+		return;
+
 	View.HorizontalFOVRight = HorizontalFovRight;
+
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
 }
 
 float ZECamera::GetHorizontalFovRight() const
@@ -350,7 +363,12 @@ float ZECamera::GetHorizontalFovRight() const
 
 void ZECamera::SetHorizontalFovLeft(float HorizontalFovLeft)
 {
+	if(View.HorizontalFOVLeft == HorizontalFovLeft)
+		return;
+
 	View.HorizontalFOVLeft = HorizontalFovLeft;
+
+	CameraDirtyFlags.RaiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
 }
 
 float ZECamera::GetHorizontalFovLeft() const

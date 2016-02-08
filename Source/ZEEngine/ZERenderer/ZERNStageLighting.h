@@ -107,19 +107,17 @@ class ZERNStageLighting : public ZERNStage
 			ZEUInt							SampleCount;
 			float							SampleLengthOffset;
 			ZEBool32						ShowCascades;
-			ZEVector4						OffsetVectors[8];
 		};
 
 		ZEArray<ZELight*>					Lights;
 		ZEArray<TileStruct>					Tiles;
 
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
-		ZEVector2							OffsetVectors[16];
 
 		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		ZESharedPointer<ZEGRSampler>		SamplerLinearBorder;
-		ZESharedPointer<ZEGRSampler>		SamplerComparisonLinearBorder;
+		ZESharedPointer<ZEGRSampler>		SamplerComparisonLinearPointClamp;
 		ZESharedPointer<ZEGRSampler>		SamplerPointWrap;
 		ZESharedPointer<ZEGRSampler>		SamplerPointBorder;
 
@@ -130,7 +128,6 @@ class ZERNStageLighting : public ZERNStage
 		bool								ShowCascades;
 
 		void								CreateRandomVectors();
-		void								CreateOffsetVectors();
 		void								CreateLightGeometries();
 		void								CreateSamplers();
 

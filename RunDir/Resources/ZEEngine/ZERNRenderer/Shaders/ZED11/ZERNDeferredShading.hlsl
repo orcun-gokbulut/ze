@@ -56,35 +56,34 @@ struct ZERNDeferredShading_Cascade
 	float4							Band;
 };
 
-cbuffer ZERNDeferredShading_LightConstants											: register(b8)
+cbuffer ZERNDeferredShading_LightConstants													: register(b8)
 {	
-	ZERNShading_Light				ZERNDeferredShading_LightInstance;					//64
-	float4x4						ZERNDeferredShading_LightProjectionMatrix;			//64
-	float4x4						ZERNDeferredShading_LightWorldMatrix;				//64
-	float4x4						ZERNDeferredShading_LightRotation;					//64
+	ZERNShading_Light				ZERNDeferredShading_LightInstance;						//64
+	float4x4						ZERNDeferredShading_LightProjectionMatrix;				//64
+	float4x4						ZERNDeferredShading_LightWorldMatrix;					//64
+	float4x4						ZERNDeferredShading_LightRotation;						//64
 	bool							ZERNDeferredShading_CastShadow;
 	uint							ZERNDeferredShading_SampleCount;
 	float							ZERNDeferredShading_SampleLengthOffset;
 	bool							ZERNDeferredShading_ShowCascades;
-	float4							ZERNDeferredShading_OffsetVectors[8];				//max 16 sample
 };
 
-cbuffer ZERNDeferredShading_CascadeConstants										: register(b9)
+cbuffer ZERNDeferredShading_CascadeConstants												: register(b9)
 {
 	ZERNDeferredShading_Cascade 	ZERNDeferredShading_Cascades[4];
 	uint							ZERNDeferredShading_CascadeCount;
 	float3							ZERNDeferredShading_Reserved3;
 };	
 	
-SamplerState						ZERNDeferredShading_SamplerLinearBorder				: register(s0);
-SamplerComparisonState				ZERNDeferredShading_SamplerComparisonLinearBorder	: register(s1);
-SamplerState						ZERNDeferredShading_SamplerPointWrap				: register(s2);
-SamplerState						ZERNDeferredShading_SamplerPointBorder				: register(s3);
+SamplerState						ZERNDeferredShading_SamplerLinearBorder					: register(s0);
+SamplerComparisonState				ZERNDeferredShading_SamplerComparisonLinearPointClamp	: register(s1);
+SamplerState						ZERNDeferredShading_SamplerPointWrap					: register(s2);
+SamplerState						ZERNDeferredShading_SamplerPointBorder					: register(s3);
 	
-Texture2DArray<float>				ZERNDeferredShading_ShadowMaps						: register(t5);
-Texture2D							ZERNDeferredShading_ProjectionMap					: register(t6);
-TextureCube							ZERNDeferredShading_OmniProjectionMap				: register(t7);
-Texture2D<float2>					ZERNDeferredShading_RandomVectors					: register(t8);
+Texture2DArray<float>				ZERNDeferredShading_ShadowMaps							: register(t5);
+Texture2D							ZERNDeferredShading_ProjectionMap						: register(t6);
+TextureCube							ZERNDeferredShading_OmniProjectionMap					: register(t7);
+Texture2D<float2>					ZERNDeferredShading_RandomVectors						: register(t8);
 
 static const float3 ZERNDeferredShading_CascadeColors[] = 
 {
@@ -114,7 +113,7 @@ static const float2 ZERNDeferredShading_PoissonDiskSamples[] =
 	float2(0.8985078f, 0.4366908f)
 };
 
-static const float ZERNDeferredShading_DepthBias = 0.00003f; 
+static const float ZERNDeferredShading_DepthBias = 0.00008f;
 
 float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
 {		
@@ -126,10 +125,10 @@ float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoord
 	for(uint I = 0; I < 16; I++)
 	{
 		float2 Offset = ZERNDeferredShading_PoissonDiskSamples[I] * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
-		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z - ZERNDeferredShading_DepthBias);
+		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z - ZERNDeferredShading_DepthBias);
 	}
 		
-	Visibility /= 16;
+	Visibility /= 16.0f;
 	
 	return Visibility;
 }
@@ -234,26 +233,19 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 				float Index = 0.0f;
 				ZERNDeferredShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 				
-				float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
-				RandomVector = normalize(RandomVector);
+				//float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
+				//RandomVector = normalize(RandomVector);
 				
-				uint SampleCount = ZERNDeferredShading_SampleCount / 2;
-				for(uint I = 0; I < SampleCount; I++)
+				Visibility = 0.0f;
+				
+				for(uint I = 0; I < 16; I++)
 				{	
-					float2 OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].xy, RandomVector);
-					OffsetVector += ZERNDeferredShading_SampleLengthOffset;
-					OffsetVector /= ShadowMapDimensions;
+					float2 Offset = ZERNDeferredShading_PoissonDiskSamples[I] * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
+					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoord.xy + Offset, 0), PositionHomogeneous.z - 0.005f);
 					
-					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, 0), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
-					
-					OffsetVector = reflect(ZERNDeferredShading_OffsetVectors[I].zw, RandomVector);
-					OffsetVector += ZERNDeferredShading_SampleLengthOffset;
-					OffsetVector /= ShadowMapDimensions;
-					
-					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearBorder, float3(TexCoord + OffsetVector, 0), PositionHomogeneous.z - ZERNDeferredShading_DepthBias);
 				}
 	
-				Visibility /= ZERNDeferredShading_SampleCount;
+				Visibility /= 16.0f;
 			}
 		}
 		
