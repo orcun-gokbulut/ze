@@ -97,12 +97,8 @@ struct ZEFixedMaterial_VSInput
 {
 	float4 Position			: POSITION0;
 	float3 Normal			: NORMAL0;
-	
-	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal		: BINORMAL0;
-		float3 Tangent		: TANGENT0;
-	#endif
-	
+	float3 Binormal			: BINORMAL0;
+	float3 Tangent			: TANGENT0;
 	float2 Texcoord         : TEXCOORD0;
 
 	//#if defined(ZE_SHADER_SKIN_TRANSFORM)
@@ -125,12 +121,9 @@ struct ZEFixedMaterial_GBuffer_VSOutput
 	float4 Position_	: POSITION0;
 	float3 Position		: TEXCOORD0;
 	float3 Normal		: TEXCOORD1;
-	float2 Texcoord		: TEXCOORD2;
-	
-	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal : TEXCOORD3;
-		float3 Tangent	: TEXCOORD4;
-	#endif
+	float3 Tangent		: TEXCOORD2;
+	float3 Binormal		: TEXCOORD3;
+	float2 Texcoord		: TEXCOORD4;
 };
 
 
@@ -145,11 +138,8 @@ ZEFixedMaterial_GBuffer_VSOutput ZEFixedMaterial_GBuffer_VertexShader(ZEFixedMat
 	
 	Output.Position = mul(WorldViewMatrix, Input.Position).xyz;
 	Output.Normal.xyz = mul((float3x3)WorldViewInvTrpsMatrix, Input.Normal).xyz;
-	
-	#if defined(ZE_SHADER_TANGENT_SPACE)
-		Output.Tangent = mul((float3x3)WorldViewInvTrpsMatrix, Input.Tangent).xyz;
-		Output.Binormal = mul((float3x3)WorldViewInvTrpsMatrix, Input.Binormal).xyz;
-	#endif
+	Output.Tangent = mul((float3x3)WorldViewInvTrpsMatrix, Input.Tangent).xyz;
+	Output.Binormal = mul((float3x3)WorldViewInvTrpsMatrix, Input.Binormal).xyz;
 	
 	Output.Texcoord = Input.Texcoord;
 
@@ -162,12 +152,9 @@ struct ZEFixedMaterial_GBuffer_PSInput
 	float Side		: VFACE;
 	float3 Position	: TEXCOORD0;
 	float3 Normal	: TEXCOORD1;
-	float2 Texcoord	: TEXCOORD2;
-	
-	#if defined(ZE_SHADER_TANGENT_SPACE)
-		float3 Binormal	: TEXCOORD3;
-		float3 Tangent	: TEXCOORD4;
-	#endif
+	float3 Tangent	: TEXCOORD2;
+	float3 Binormal	: TEXCOORD3;
+	float2 Texcoord	: TEXCOORD4;
 };
 
 ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput Input)
@@ -203,11 +190,11 @@ ZEGBuffer ZEFixedMaterial_GBuffer_PixelShader(ZEFixedMaterial_GBuffer_PSInput In
 	#ifdef ZE_SHADER_DETAIL_NORMAL_MAP
 		float3 DetailNormalSample = tex2D(DetailNormalMap, Input.Texcoord * MaterialDetailNormalMapTiling) * 2.0f - 1.0f;
 		float3 DetailNormal = normalize(DetailNormalSample.x * Input.Tangent + DetailNormalSample.y * Input.Binormal + DetailNormalSample.z * Input.Normal) * Input.Side;
-		DetailNormal = lerp(Normal, DetailNormal, MaterialDetailNormalMapFactor);	
+		DetailNormal = normalize(Normal + DetailNormal);	
 
-		float InvDetailAttenuation = min(length(Input.Position) - MaterialDetailNormalMapAttenuationStart, 0.0f);
-		InvDetailAttenuation = max(InvDetailAttenuation * MaterialDetailNormalMapAttenuationFactor, 1.0f);
-		Normal = normalize(lerp(DetailNormal, Normal, InvDetailAttenuation));
+		float DetailPixelDistance = length(Input.Position) - MaterialDetailNormalMapAttenuationStart;
+		float DetailAttenuation = saturate(1.0f /  (1.0f + DetailPixelDistance * MaterialDetailNormalMapAttenuationFactor));
+		Normal = normalize(lerp(Normal, DetailNormal, DetailAttenuation));
 	#endif
 
 	ZEGBuffer_SetViewNormal(GBuffer, Normal * Input.Side);	
@@ -321,10 +308,9 @@ ZEFixedMaterial_ForwardPass_PSOutput ZEFixedMaterial_ForwardPass_PixelShader(ZEF
 
 	#ifdef ZE_SHADER_DETAIL_BASE_MAP
 		float3 DetailBaseColor = DetailBaseMapColor * tex2D(DetailBaseMap, Input.Texcoord * MaterialDetailBaseMapTiling);
-
-		float InvDetailAttenuation = min(length(Input.Position) - MaterialDetailBaseMapAttenuationStart, 0.0f);
-		InvDetailAttenuation = max(InvDetailAttenuation * MaterialDetailBaseMapAttenuationFactor, 1.0f);
-		BaseColor = lerp(DetailBaseColor, BaseColor, InvDetailAttenuation);
+		float DetailPixelDistance = length(Input.Position) - MaterialDetailNormalMapAttenuationStart;
+		float DetailAttenuation = saturate(1.0f /  (1.0f + DetailPixelDistance * MaterialDetailNormalMapAttenuationFactor));
+		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailAttenuation);
 	#endif
 
 	#ifdef ZE_SHADER_AMBIENT
