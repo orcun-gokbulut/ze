@@ -69,20 +69,17 @@ SamplerState 		ZERNSSAO_SamplerLinearClamp		: register(s3);
 float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {	
 	float2 OutputDimensions = ZERNGBuffer_GetDimensions() / ZERNSSAO_DownScale;
-	float2 TexCoord = ZERNTransformations_ViewportToTexelCenter(PositionViewport.xy, OutputDimensions);
+	float2 TexCoord = ZERNTransformations_ViewportToTexelCorner(PositionViewport.xy, OutputDimensions);
+	float3 PositionView = ZERNTransformations_TexelToView(TexCoord, ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, TexCoord));
 	
-	float3 PositionView = ZERNTransformations_TexelToView(TexCoord, ZERNGBuffer_GetDepth(PositionViewport.xy));
-	
-	if(PositionView.z < ZERNView_ShadowDistance)
+	if(PositionView.z < 100.0f)
 	{
 		float3 RandomVector = ZERNSSAO_RandomVectorsTexture.Sample(ZERNSSAO_SamplerPointWrap, 8.0f * TexCoord) * 2.0f - 1.0f;
 		RandomVector = normalize(RandomVector);
 		
-		float3 NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
-			
-		//float NormalizedDepth = PositionView.z;
-		//float NormalizedMaxDepth = ZERNView_FarZ;
-		//float DepthBias = pow(abs(NormalizedDepth / NormalizedMaxDepth), 1.5f) + ZERNSSAO_MinDepthBias;
+		float3 NormalView = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, TexCoord);
+		
+		float DepthBias = pow(abs(PositionView.z / 100.0f), 3.0f) + ZERNSSAO_MinDepthBias;
 		
 		float TotalOcclusion = 0.0f;
 		for(uint I = 0; I < 14; I++)
@@ -95,14 +92,16 @@ float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Tar
 			
 			float OccluderDepthHomogeneous = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointBorder, SamplePositionTexelCenter);
 			float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(OccluderDepthHomogeneous);
+			OccluderDepthView += DepthBias;
 			float3 OccluderPositionView = SamplePositionView * (OccluderDepthView / SamplePositionView.z);
 			
-			float3 BiasVector = ZERNSSAO_MinDepthBias * -NormalView;
-			float3 BiasedOccluderPositionView = OccluderPositionView + BiasVector;
-			float Angle = max(0.0f, dot(NormalView, normalize(BiasedOccluderPositionView - PositionView)));
+			float Angle = max(0.0f, dot(NormalView, normalize(OccluderPositionView - PositionView)));
 			
-			float DistanceEuclidian = length(BiasedOccluderPositionView - PositionView);
-			TotalOcclusion += Angle * saturate((ZERNSSAO_OcclusionRadius - DistanceEuclidian) / ZERNSSAO_OcclusionRadius);
+			if(Angle >= 0.75f)
+			{
+				float DistanceEuclidian = length(OccluderPositionView - PositionView);
+				TotalOcclusion += Angle * saturate((ZERNSSAO_OcclusionRadius - DistanceEuclidian) / ZERNSSAO_OcclusionRadius);
+			}
 		}
 		
 		TotalOcclusion /= 14.0f;

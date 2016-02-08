@@ -93,43 +93,6 @@ void ZERNStageLighting::CreateRandomVectors()
 	RandomVectorsTexture->UpdateSubResource(0, 0, &Vectors[0], 128 * 2);
 }
 
-void ZERNStageLighting::CreateOffsetVectors()
-{
-	float Tan = ZEAngle::Tan(ZEAngle::ToRadian(22.5f));
-
-	ZEVector2 Samples[] =
-	{
-		//4 sample
-		ZEVector2(-1.0f, 1.0f),
-		ZEVector2(1.0f, 1.0f),
-		ZEVector2(1.0f, -1.0f),
-		ZEVector2(-1.0f, -1.0f),
-
-		//8 sample
-		ZEVector2(-1.0f, 0.0f),
-		ZEVector2(1.0f, 0.0f),
-		ZEVector2(0.0f, -1.0f),
-		ZEVector2(0.0f, 1.0f),
-
-		//16 sample
-		ZEVector2(-1.0f, Tan),
-		ZEVector2(-Tan, 1.0f),
-		ZEVector2(Tan, 1.0f),
-		ZEVector2(1.0f, Tan),
-
-		ZEVector2(1.0f, -Tan),
-		ZEVector2(Tan, -1.0f),
-		ZEVector2(-Tan, -1.0f),
-		ZEVector2(-1.0f, -Tan)
-	};
-
-	for (ZEUInt I = 0; I < 16; I++)
-	{
-		Samples[I].NormalizeSelf();
-		OffsetVectors[I] = Samples[I] * (ZERandom::GetFloatPositive() * 0.75f + 0.25f);		//[0.25, 1.0]
-	}
-}
-
 void ZERNStageLighting::CreateLightGeometries()
 {
 	/*
@@ -177,13 +140,12 @@ void ZERNStageLighting::CreateSamplers()
 	SamplerDescription.MinFilter = ZEGR_TFM_LINEAR;
 	SamplerDescription.MagFilter = ZEGR_TFM_LINEAR;
 	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressW = ZEGR_TAM_BORDER;
-	SamplerDescription.BorderColor = ZEVector4::One;
+	SamplerDescription.AddressU = ZEGR_TAM_CLAMP;
+	SamplerDescription.AddressV = ZEGR_TAM_CLAMP;
+	SamplerDescription.AddressW = ZEGR_TAM_CLAMP;
 	SamplerDescription.ComparisonFunction = ZEGR_CF_LESS_EQUAL;
 
-	SamplerComparisonLinearBorder = ZEGRSampler::GetSampler(SamplerDescription);
+	SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerDescription);
 
 	SamplerDescription.SetToDefault();
 	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
@@ -567,17 +529,16 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
  		ZEMatrix4x4::Transform3x3(Light.DirectionView, Renderer->GetView().ViewTransform, -Direction);
 		Light.DirectionView.NormalizeSelf();
 
-		LightConstants->CastShadow = (ZEBool32)DirectionalLight->GetCastsShadow();
-		LightConstants->ShowCascades = (ZEBool32)ShowCascades;
+		LightConstants->CastShadow = static_cast<ZEBool32>(DirectionalLight->GetCastsShadow());
+		LightConstants->ShowCascades = static_cast<ZEBool32>(ShowCascades);
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
 		LightConstants->SampleLengthOffset = DirectionalLight->GetShadowSampleLengthOffset();
-		memcpy(LightConstants->OffsetVectors, OffsetVectors, sizeof(ZEVector2) * LightConstants->SampleCount);
 	LightConstantBuffer->Unlock();
 
 	DirectionalLight->BindCascades(Renderer, Context);
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder.GetPointer());
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearBorder.GetPointer());
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearPointClamp.GetPointer());
 	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointWrap.GetPointer());
 	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerPointBorder.GetPointer());
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, DirectionalLight->GetShadowMap());
@@ -619,10 +580,9 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 		Light.Type = ProjectiveLight->GetLightType();
 		Light.DirectionView = ZEVector3::Zero;
 
-		LightConstants->CastShadow = (ZEBool32)ProjectiveLight->GetCastsShadow();
+		LightConstants->CastShadow = static_cast<ZEBool32>(ProjectiveLight->GetCastsShadow());
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(ProjectiveLight->GetShadowSampleCount());
 		LightConstants->SampleLengthOffset = ProjectiveLight->GetShadowSampleLengthOffset();
-		memcpy(LightConstants->OffsetVectors, OffsetVectors, sizeof(ZEVector2) * LightConstants->SampleCount);
 
 		LightConstants->ProjectionMatrix = ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * Renderer->GetView().InvViewTransform;
 
@@ -632,7 +592,7 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 	LightConstantBuffer->Unlock();
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder.GetPointer());
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearBorder.GetPointer());
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearPointClamp.GetPointer());
 	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointWrap.GetPointer());
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, ProjectiveLight->GetShadowMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, ProjectiveLight->GetProjectionTexture());
@@ -676,7 +636,6 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 bool ZERNStageLighting::InitializeSelf()
 {
 	CreateRandomVectors();
-	CreateOffsetVectors();
 	CreateLightGeometries();
 	CreateSamplers();
 
