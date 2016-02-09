@@ -60,3 +60,8 @@ typedef ZEUInt8				ZEBool8;
 typedef ZEUInt16			ZEBool16;
 typedef ZEUInt32			ZEBool32;
 typedef ZEUInt64			ZEBool64;
+
+#define ZE_SIZE_KB 1024
+#define ZE_SIZE_MB 1048576
+#define ZE_SIZE_GB 1073741824
+#define ZE_SIZE_TB 1099511627776
