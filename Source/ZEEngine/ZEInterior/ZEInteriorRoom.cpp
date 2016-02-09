@@ -188,7 +188,7 @@ bool ZEInteriorRoom::RayCast(ZERayCastReport& Report, const ZERayCastParameters&
 }
 
 
-void ZEInteriorRoom::OnTransformChanged()
+void ZEInteriorRoom::ParentTransformChanged()
 {
 	DirtyFlags.RaiseFlags(ZE_IRDF_ALL);
 

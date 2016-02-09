@@ -59,11 +59,16 @@ class ZEFormatArgument
 		static bool			Format(ZEStringWriter& Output, float Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, bool Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEVector2& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEVector2d& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEVector3& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEVector3d& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEVector4& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEVector4d& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEQuaternion& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEMatrix3x3& Argument, const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEMatrix3x3d& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEMatrix4x4& Argument,const char* ArgumentFormat);
+		static bool			Format(ZEStringWriter& Output, const ZEMatrix4x4d& Argument,const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, const ZEString& Argument, const char* ArgumentFormat);
 		static bool			Format(ZEStringWriter& Output, ZEObject* Argument,	const char* ArgumentFormat);
 		static bool			FormatVariant(ZEStringWriter& Output, const ZEValue& Argument, const char* ArgumentFormat);

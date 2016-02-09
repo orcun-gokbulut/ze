@@ -160,12 +160,8 @@ bool ZEUIControl::GetMoveable() const
 }
 
 void ZEUIControl::SetParent(ZEUIControl* Parent)
-{
-	if (ParentControl != NULL)
-		ParentControl->RemoveChildControl(this);
-	
+{	
 	this->ParentControl = Parent; 
-	ParentControl->AddChildControl(this);
 }
 
 const ZEArray<ZEUIControl*>& ZEUIControl::GetChildControls()

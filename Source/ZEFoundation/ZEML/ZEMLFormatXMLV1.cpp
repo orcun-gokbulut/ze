@@ -180,6 +180,49 @@ bool ZEMLFormatXMLV1::ReadVectors(ZEFile* File, float* Output, const char** Memb
 	return true;
 }
 
+bool ZEMLFormatXMLV1::ReadDoubleVectors(ZEFile* File, double* Output, const char** Members, ZESize MemberCount)
+{
+	bool ReadedMembers[32];
+	memset(&ReadedMembers, 0, sizeof(bool) * MemberCount);
+
+	TiXmlNode* Node = CurrentNode->FirstChild();
+	while(Node != NULL)
+	{
+		if (Node->Type() != TiXmlNode::TINYXML_ELEMENT)
+			continue;
+
+		const char* Name = Node->Value();
+		for (ZESize I = 0; I < MemberCount; I++)
+		{
+			if (strcmp(Members[I], Name) == 0)
+			{
+				if (ReadedMembers[I] == true)
+				{
+					FormatError("Multiple entries for the same vector/matrix elements detected.");
+					return false;
+				}
+
+				const char* Value = ((TiXmlElement*)Node)->GetText();
+				Output[I] = ZEString(Value).ToDouble();
+				ReadedMembers[I] = true;
+				break;
+			}
+		}
+
+		Node = Node->NextSibling();
+	}
+
+	for (ZESize I = 0; I < MemberCount; I++)
+	{
+		if (!ReadedMembers[I])
+		{
+			FormatError("Missing vector/matrix entires in vector/matrix property have detected.");
+			return false;
+		}
+	}
+
+	return true;
+}
 
 bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 {
@@ -437,6 +480,16 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				return false;
 			Element.Value.SetVector2(*(ZEVector2*)Output);
 		}
+		else if (strcmp(Type, "Vector2d") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR2D;
+
+			const char* Members[2] = {"x", "y"};
+			double Output[2];
+			if (!ReadDoubleVectors(File, Output, Members, 2))
+				return false;
+			Element.Value.SetVector2d(*(ZEVector2d*)Output);
+		}
 		else if (strcmp(Type, "Vector3") == 0)
 		{
 			Element.ValueType = ZEML_VT_VECTOR3;
@@ -447,6 +500,16 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				return false;
 			Element.Value.SetVector3(*(ZEVector3*)Output);
 		}
+		else if (strcmp(Type, "Vector3d") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR3D;
+
+			const char* Members[3] = {"x", "y", "z"};
+			double Output[3];
+			if (!ReadDoubleVectors(File, Output, Members, 3))
+				return false;
+			Element.Value.SetVector3d(*(ZEVector3d*)Output);
+		}
 		else if (strcmp(Type, "Vector4") == 0)
 		{
 			Element.ValueType = ZEML_VT_VECTOR4;
@@ -456,6 +519,16 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 			if (!ReadVectors(File, Output, Members, 4))
 				return false;
 			Element.Value.SetVector4(*(ZEVector4*)Output);
+		}
+		else if (strcmp(Type, "Vector4d") == 0)
+		{
+			Element.ValueType = ZEML_VT_VECTOR4D;
+
+			const char* Members[4] = {"x", "y", "z", "w"};
+			double Output[4];
+			if (!ReadDoubleVectors(File, Output, Members, 4))
+				return false;
+			Element.Value.SetVector4d(*(ZEVector4d*)Output);
 		}
 		else if (strcmp(Type, "Quaternion") == 0)
 		{
@@ -482,6 +555,21 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				return false;
 			Element.Value.SetMatrix3x3(*(ZEMatrix3x3*)Output);
 		}
+		else if (strcmp(Type, "Matrix3x3d") == 0)
+		{
+			Element.ValueType = ZEML_VT_MATRIX3X3D;
+
+			const char* Members[9] = 
+			{
+				"M11", "M21", "M31",
+				"M12", "M22", "M32",
+				"M13", "M23", "M33",
+			};
+			double Output[9];
+			if (!ReadDoubleVectors(File, Output, Members, 9))
+				return false;
+			Element.Value.SetMatrix3x3d(*(ZEMatrix3x3d*)Output);
+		}
 		else if (strcmp(Type, "Matrix4x4") == 0)
 		{
 			Element.ValueType = ZEML_VT_MATRIX4X4;
@@ -497,6 +585,22 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 			if (!ReadVectors(File, Output, Members, 16))
 				return false;
 			Element.Value.SetMatrix4x4(*(ZEMatrix4x4*)Output);
+		}
+		else if (strcmp(Type, "Matrix4x4d") == 0)
+		{
+			Element.ValueType = ZEML_VT_MATRIX4X4D;
+
+			const char* Members[16] = 
+			{
+				"M11", "M21", "M31", "M41",
+				"M12", "M22", "M32", "M42",
+				"M13", "M23", "M33", "M43",
+				"M14", "M24", "M34", "M44"
+			};
+			double Output[16];
+			if (!ReadDoubleVectors(File, Output, Members, 16))
+				return false;
+			Element.Value.SetMatrix4x4d(*(ZEMatrix4x4d*)Output);
 		}
 		else
 		{
@@ -637,17 +741,32 @@ static const char* Convert(ZEMLValueType Type)
 		case ZEML_VT_VECTOR2:
 			return "Vector2";
 
+		case ZEML_VT_VECTOR2D:
+			return "Vector2d";
+
 		case ZEML_VT_VECTOR3:
 			return "Vector3";
+
+		case ZEML_VT_VECTOR3D:
+			return "Vector3d";
 
 		case ZEML_VT_VECTOR4:
 			return "Vector4";
 
+		case ZEML_VT_VECTOR4D:
+			return "Vector4d";
+
 		case ZEML_VT_MATRIX3X3:
 			return "Matrix3x3";
 
+		case ZEML_VT_MATRIX3X3D:
+			return "Matrix3x3d";
+
 		case ZEML_VT_MATRIX4X4:
 			return "Matrix4x4";
+
+		case ZEML_VT_MATRIX4X4D:
+			return "Matrix4x4d";
 	}
 }
 
@@ -707,12 +826,42 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 						return false;
 					break;
 				}
+
+				case ZEML_VT_VECTOR2D:
+				{
+					const ZEVector2d& Vector = Element.Value.GetVector2d();
+					ZEString Output	= ZEFormat::Format(
+						"<Property Name=\"{0}\" Type=\"Vector2d\">"
+						"<x>{1}</x><y>{2}</y>"
+						"</Property>\n", 
+						Element.Name,
+						Vector.x, Vector.y);
+
+					if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
+						return false;
+					break;
+				}
 				
 				case ZEML_VT_VECTOR3:
 				{
 					const ZEVector3& Vector = Element.Value.GetVector3();
 					ZEString Output	= ZEFormat::Format(
 						"<Property Name=\"{0}\" Type=\"Vector3\">"
+						"<x>{1}</x><y>{2}</y><z>{3}</z>"
+						"</Property>\n", 
+						Element.Name, 
+						Vector.x, Vector.y, Vector.z);
+
+					if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
+						return false;
+					break;
+				}
+
+				case ZEML_VT_VECTOR3D:
+				{
+					const ZEVector3d& Vector = Element.Value.GetVector3d();
+					ZEString Output	= ZEFormat::Format(
+						"<Property Name=\"{0}\" Type=\"Vector3d\">"
 						"<x>{1}</x><y>{2}</y><z>{3}</z>"
 						"</Property>\n", 
 						Element.Name, 
@@ -735,6 +884,22 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 
 					if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
 						return false;
+					break;
+				}
+
+				case ZEML_VT_VECTOR4D:
+				{
+					const ZEVector4d& Vector = Element.Value.GetVector4d();
+					ZEString Output	= ZEFormat::Format(
+						"<Property Name=\"{0}\" Type=\"Vector4d\">"
+						"<x>{1}</x><y>{2}</y><z>{3}</z><w>{4}</w>"
+						"</Property>\n", 
+						Element.Name,
+						Vector.x, Vector.y, Vector.z, Vector.w);
+
+					if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
+						return false;
+					break;
 				}
 				
 				case ZEML_VT_QUATERNION:
@@ -770,10 +935,50 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 						return false;
 					break;
 				}
+
+				case ZEML_VT_MATRIX3X3D:
+				{
+					const ZEMatrix3x3d& Matrix = Element.Value.GetMatrix3x3d();
+					ZEString Output	= ZEFormat::Format(
+						"<Property Name=\"{0}\" Type=\"Matrix3x3d\">"
+						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13>"
+						"<m21>{4}</m21><m22>{5}</m22><m23>{6}</m23>"
+						"<m31>{7}</m31><m32>{8}</m32><m33>{9}</m33>"
+						"</Property>\n", 
+						Element.Name,
+						Matrix.M11, Matrix.M12, Matrix.M13,
+						Matrix.M21, Matrix.M22, Matrix.M23,
+						Matrix.M31, Matrix.M32, Matrix.M33);
+
+					if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
+						return false;
+					break;
+				}
 				
 				case ZEML_VT_MATRIX4X4:
 				{
 					const ZEMatrix4x4& Matrix = Element.Value.GetMatrix4x4();
+					ZEString Output	= ZEFormat::Format(
+						"<Property Name=\"{0}\" Type=\"Matrix3x3\">"
+						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13><m14>{4}</m14>"
+						"<m21>{5}</m21><m22>{6}</m22><m23>{7}</m23><m24>{8}</m24>"
+						"<m31>{9}</m31><m32>{10}</m32><m33>{11}</m33><m34>{12}</m34>"
+						"<m31>{13}</m31><m32>{14}</m32><m33>{15}</m33><m34>{16}</m34>"
+						"</Property>\n", 
+						Element.Name,
+						Matrix.M11, Matrix.M12, Matrix.M13, Matrix.M14,
+						Matrix.M21, Matrix.M22, Matrix.M23, Matrix.M24,
+						Matrix.M31, Matrix.M32, Matrix.M33, Matrix.M34,
+						Matrix.M41, Matrix.M42, Matrix.M43, Matrix.M44);
+
+					if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
+						return false;
+					break;
+				}
+
+				case ZEML_VT_MATRIX4X4D:
+				{
+					const ZEMatrix4x4d& Matrix = Element.Value.GetMatrix4x4d();
 					ZEString Output	= ZEFormat::Format(
 						"<Property Name=\"{0}\" Type=\"Matrix3x3\">"
 						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13><m14>{4}</m14>"

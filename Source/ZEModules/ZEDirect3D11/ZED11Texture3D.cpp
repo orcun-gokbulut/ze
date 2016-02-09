@@ -96,7 +96,7 @@ bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUIn
 	zeCheckError(ZED11Texture3D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknown texture format.");
 
 	D3D11_USAGE Usage;
-	Usage = (RenderTarget || UAV) ? D3D11_USAGE_DEFAULT : D3D11_USAGE_IMMUTABLE;
+	Usage = D3D11_USAGE_DEFAULT;
 
 	UINT CPUAccess = 0;
 	UINT BindFlags = 0;

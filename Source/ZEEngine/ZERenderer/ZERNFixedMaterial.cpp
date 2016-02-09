@@ -87,9 +87,9 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 	if(RefractionEnabled && EnvironmentMap.IsAvailable())
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_REFRACTION"));
 
-	if(OpacityFactorType == ZERN_OFT_OPACITY_MAP && OpacityMap.IsAvailable())
+	if(OpacityFactorType == ZERN_OFS_OPACITY_MAP && OpacityMap.IsAvailable())
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_MAP"));
-	else if(OpacityFactorType == ZERN_OFT_BASE_MAP && BaseMap.IsAvailable())
+	else if(OpacityFactorType == ZERN_OFS_BASE_MAP_ALPHA && BaseMap.IsAvailable())
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_OPACITY_BASE_ALPHA"));
 
 }
@@ -190,6 +190,9 @@ bool ZERNFixedMaterial::UpdateConstantBuffer()
 
 bool ZERNFixedMaterial::Update()
 {
+	if (!IsInitialized())
+		return false;
+
 	if (!UpdateShaders())
 		return false;
 
@@ -210,7 +213,16 @@ bool ZERNFixedMaterial::InitializeSelf()
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	DirtyFlags.RaiseAll();
 
-	return Update();
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderState())
+		return false;
+
+	if(!UpdateConstantBuffer())
+		return false;
+
+	return true;
 }
 
 void ZERNFixedMaterial::DeinitializeSelf()
@@ -259,7 +271,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	RefractionEnabled = false;
 	RefractionFactor = 1.0f;
 	RefractionColor = ZEVector3::One;
-	OpacityFactorType = ZERN_OFT_CONSTANT;
+	OpacityFactorType = ZERN_OFS_CONSTANT;
 	EnvironmentMapEnabled = false;
 	DetailBaseMapEnabled = false;
 	DetailNormalMapEnabled = false;
@@ -834,7 +846,7 @@ const ZERNMap& ZERNFixedMaterial::GetHeightMap() const
 	return HeightMap;
 }
 
-void ZERNFixedMaterial::SetOpacityFactorType(ZERNOpacityFactorType Type)
+void ZERNFixedMaterial::SetOpacityFactorSource(ZERNOpacityFactorSource Type)
 {
 	if(OpacityFactorType == Type)
 		return;
@@ -844,7 +856,7 @@ void ZERNFixedMaterial::SetOpacityFactorType(ZERNOpacityFactorType Type)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-ZERNOpacityFactorType ZERNFixedMaterial::GetOpacityFactorType() const
+ZERNOpacityFactorSource ZERNFixedMaterial::GetOpacityFactorSource() const
 {
 	return OpacityFactorType;
 }
@@ -1176,7 +1188,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 			TextureSampler = true;
 		}
 
-		if (OpacityFactorType == ZERN_OFT_OPACITY_MAP && OpacityMap.IsAvailable())
+		if (OpacityFactorType == ZERN_OFS_OPACITY_MAP && OpacityMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap.GetTexture());
 			TextureSampler = true;
@@ -1294,7 +1306,7 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteFloat("HeightMapScale", GetHeightMapScale());
 	HeightMap.Write(ConfigurationNode, "HeightMap");
 
-	ConfigurationNode.WriteUInt8("OpacityFactorType", GetOpacityFactorType());
+	ConfigurationNode.WriteUInt8("OpacityFactorType", GetOpacityFactorSource());
 	OpacityMap.Write(ConfigurationNode, "OpacityMap");
 	ConfigurationNode.WriteFloat("Opacity", GetOpacity());
 
@@ -1416,7 +1428,7 @@ void ZERNFixedMaterial::ReadFromFileV0(const ZEMLReaderNode& MaterialNode)
 		SetHeightMapOffset(ConfigurationNode.ReadFloat("HeightMapOffset"));
 		SetHeightMapScale(ConfigurationNode.ReadFloat("HeightMapScale"));
 
-		SetOpacityFactorType((ZERNOpacityFactorType)ConfigurationNode.ReadUInt8("OpacityFactorType", ZERN_OFT_CONSTANT));
+		SetOpacityFactorSource((ZERNOpacityFactorSource)ConfigurationNode.ReadUInt8("OpacityFactorType", ZERN_OFS_CONSTANT));
 		OpacityMap.ReadV1(ConfigurationNode, "OpacityMap");
 		SetOpacity(ConfigurationNode.ReadFloat("Opacity", 1.0f));
 
@@ -1503,7 +1515,7 @@ void ZERNFixedMaterial::ReadFromFileV1(const ZEMLReaderNode& MaterialNode)
 		SetHeightMapOffset(ConfigurationNode.ReadFloat("HeightMapOffset"));
 		SetHeightMapScale(ConfigurationNode.ReadFloat("HeightMapScale"));
 
-		SetOpacityFactorType((ZERNOpacityFactorType)ConfigurationNode.ReadUInt8("OpacityFactorType", ZERN_OFT_CONSTANT));
+		SetOpacityFactorSource((ZERNOpacityFactorSource)ConfigurationNode.ReadUInt8("OpacityFactorType", ZERN_OFS_CONSTANT));
 		OpacityMap.ReadV1(ConfigurationNode, "OpacityMap");
 		SetOpacity(ConfigurationNode.ReadFloat("Opacity", 1.0f));
 

@@ -35,11 +35,8 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZECanvas.h"
+
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
@@ -48,24 +45,21 @@
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
 
-class ZEQuaternion;
-class ZEMatrix4x4;
-class ZERNFixedMaterial;
-class ZERNSimpleMaterial;
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
 
-struct ZERNDrawParameters;
-
 class ZEModel : public ZEEntity
 {	
+	ZE_OBJECT
 	friend class ZEPhysicalEnvironment;
+	friend class ZEModelBone;
+	friend class ZEModelMesh;
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
-
-	ZE_OBJECT
 
 	private:
 		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
@@ -91,9 +85,8 @@ class ZEModel : public ZEEntity
 
 		ZEArray<ZEModelAnimationTrack>		AnimationTracks;
 
+		mutable bool						DirtyBoundingBox;
 		bool								BoundingBoxIsUserDefined;
-		bool								IsStaticModel;
-		mutable bool						StaticCalculationsDone;
 
 		ZERNCommand							RenderCommand;
 
@@ -101,6 +94,10 @@ class ZEModel : public ZEEntity
 		void								UpdateTransforms();
 	
 		void								LoadModelResource();
+
+		virtual void						ChildBoundingBoxChanged();
+		virtual void						LocalTransformChanged();
+		virtual void						ParentTransformChanged();
 
 	protected:
 		virtual bool						InitializeSelf();
@@ -113,12 +110,9 @@ class ZEModel : public ZEEntity
 		ZEArray<ZEModelIKChain>				IKChains;
 
 		virtual	ZEDrawFlags					GetDrawFlags() const;
-
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
+		virtual const ZEAABBox&				GetBoundingBox() const;
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
-
-		void								SetStaticModel(bool Value);
-		bool								GetStaticModel() const;
 
 		void								SetModelFile(const ZEString& ModelFile);
 		const ZEString&						GetModelFile() const;
@@ -154,10 +148,6 @@ class ZEModel : public ZEEntity
 
 		void								SetPhysicsEnabled(bool Enabled);
 		bool								GetPhysicsEnabled();
-
-		virtual void						SetPosition(const ZEVector3& NewPosition);
-		virtual void						SetRotation(const ZEQuaternion& NewRotation);
-		virtual void						SetScale(const ZEVector3& NewScale);
 
 		void								Tick(float ElapsedTime);
 		

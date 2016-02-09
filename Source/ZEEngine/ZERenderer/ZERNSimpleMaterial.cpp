@@ -43,6 +43,7 @@
 #include "ZERNStageForward.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"

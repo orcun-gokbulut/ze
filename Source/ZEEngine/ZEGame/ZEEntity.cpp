@@ -35,30 +35,55 @@
 
 #include "ZEEntity.h"
 
+#include "ZEError.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEViewVolume.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
-#include "ZEError.h"
+#include "ZEMeta/ZEProvider.h"
+
 #include "ZEScene.h"
-#include "ZEEntityProvider.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNView.h"
-#include "ZEMath/ZEViewVolume.h"
 
-#include <string.h>
+#define ZE_EDF_LOCAL_TRANSFORM					0x0001
+#define ZE_EDF_INV_LOCAL_TRANSFORM				0x0002
+#define ZE_EDF_WORLD_TRANSFORM					0x0004
+#define ZE_EDF_INV_WORLD_TRANSFORM				0x0008
+#define ZE_EDF_WORLD_BOUNDING_BOX				0x0010
 
-
-void ZEEntity::OnTransformChanged()
+void ZEEntity::LocalTransformChanged()
 {
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL & ~ZE_EDF_LOCAL_TRANSFORM);
+	EntityDirtyFlags.RaiseFlags(
+		ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_INV_LOCAL_TRANSFORM	|
+		ZE_EDF_WORLD_TRANSFORM | ZE_EDF_INV_WORLD_TRANSFORM	|
+		ZE_EDF_WORLD_BOUNDING_BOX);
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->OnTransformChanged();
+		Components[I]->ParentTransformChanged();
 
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->OnTransformChanged();
+		ChildEntities[I]->ParentTransformChanged();
+}
+
+void ZEEntity::ParentTransformChanged()
+{
+	EntityDirtyFlags.RaiseFlags(
+		ZE_EDF_WORLD_TRANSFORM | ZE_EDF_INV_WORLD_TRANSFORM	|
+		ZE_EDF_WORLD_BOUNDING_BOX);
+
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->ParentTransformChanged();
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		ChildEntities[I]->ParentTransformChanged();
+}
+
+void ZEEntity::BoundingBoxChanged()
+{
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
@@ -78,7 +103,9 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	Entity->Owner = this;
+	if (!Entity->SetOwner(this))
+		return false;
+
 	Entity->SetOwnerScene(this->OwnerScene);
 
 	Components.Add(Entity);
@@ -123,9 +150,10 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	Entity->Owner = this;
-	Entity->SetOwnerScene(this->OwnerScene);
+	if (!Entity->SetOwner(this))
+		return false;
 
+	Entity->SetOwnerScene(this->OwnerScene);
 	ChildEntities.Add(Entity);
 
 	if (State == ZE_ES_INITIALIZED)
@@ -151,17 +179,10 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 	Entity->SetOwnerScene(NULL);
 }
 
-void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
-{
-	this->BoundingBox = BoundingBox;
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
-}
-
 bool ZEEntity::SetOwner(ZEEntity* Owner)
 {
 	this->Owner = Owner;
-	OnTransformChanged();
-
+	ParentTransformChanged();
 	return true;
 }
 
@@ -180,10 +201,10 @@ void ZEEntity::SetOwnerScene(ZEScene* Scene)
 		ChildEntities[I]->SetOwnerScene(Scene);
 }
 
-void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox) const
+void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
 	this->BoundingBox = BoundingBox;
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	BoundingBoxChanged();
 }
 
 bool ZEEntity::InitializeSelf()
@@ -202,13 +223,13 @@ ZEEntity::ZEEntity()
 {
 	Owner = NULL;
 	OwnerScene = NULL;
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL);
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
 	State = ZE_ES_NOT_INITIALIZED;
+	LocalTransformChanged();
 }
 
 ZEEntity::~ZEEntity()
@@ -356,9 +377,7 @@ bool ZEEntity::GetEnabled() const
 void ZEEntity::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
-
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
-	OnTransformChanged();
+	LocalTransformChanged();
 }
 
 const ZEVector3& ZEEntity::GetPosition() const
@@ -375,7 +394,9 @@ void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 		SetPosition(Result);
 	}
 	else
+	{
 		SetPosition(NewPosition);
+	}
 }
 
 const ZEVector3 ZEEntity::GetWorldPosition() const
@@ -393,9 +414,7 @@ const ZEVector3 ZEEntity::GetWorldPosition() const
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
-
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
-	OnTransformChanged();
+	LocalTransformChanged();
 }
 
 const ZEQuaternion& ZEEntity::GetRotation() const
@@ -413,7 +432,9 @@ void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 		SetRotation(Result);
 	}
 	else
+	{
 		SetRotation(NewRotation);
+	}
 }
 
 const ZEQuaternion ZEEntity::GetWorldRotation() const
@@ -432,9 +453,7 @@ const ZEQuaternion ZEEntity::GetWorldRotation() const
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
-
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
-	OnTransformChanged();
+	LocalTransformChanged();
 }
 
 const ZEVector3& ZEEntity::GetScale() const
@@ -451,7 +470,9 @@ void ZEEntity::SetWorldScale(const ZEVector3& NewScale)
 		SetScale(Temp);
 	}
 	else
+	{
 		SetScale(NewScale);
+	}
 }
 
 const ZEVector3 ZEEntity::GetWorldScale() const
@@ -612,49 +633,71 @@ bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 
 
 bool ZEEntity::Save(ZEMLWriterNode* Serializer)
-{
-	ZEMLWriterNode EntityNode;
-	Serializer->OpenNode("Entity", EntityNode);
-		EntityNode.WriteString("Class", GetClass()->GetName());
-		ZEMLWriterNode PropertiesNode; 
-		EntityNode.OpenNode("Properties", PropertiesNode);
-			const ZEProperty* Properties = GetClass()->GetProperties();
-			for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
-			{
-				const ZEProperty* Current = &Properties[I];
-				if (Current->Type.ContainerType != ZE_CT_NONE)
-					continue;
+{	
+	if (Serializer == NULL)
+		return false;
 
-				if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
-					continue;
+	ZEMLWriterNode PropertiesNode; 
+	Serializer->OpenNode("Properties", PropertiesNode);
+	
+	const ZEProperty* Properties = GetClass()->GetProperties();
 
-				if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
-					continue;
+	for (ZESize I = 0; I < GetClass()->GetPropertyCount(); I++)
+	{
+		const ZEProperty* Current = &Properties[I];
+		if (Current->Type.ContainerType != ZE_CT_NONE)
+			continue;
 
-				if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
-					continue;
+		if (Current->Type.TypeQualifier != ZE_TQ_VALUE)
+			continue;
 
-				ZEVariant Variant;
-				GetClass()->GetProperty(this, Current->ID, Variant);
+		if (Current->Type.Type == ZE_TT_OBJECT || Current->Type.Type == ZE_TT_OBJECT_PTR)
+			continue;
 
-				ZEValue Value = Variant.GetValue();
-				if (Value.IsNull())
-					continue;
+		if ((Current->Access & ZEMT_PA_READ_WRITE) != ZEMT_PA_READ_WRITE)
+			continue;
 
-				PropertiesNode.WriteValue(Current->Name, Value);
-			}
-		PropertiesNode.CloseNode();
-	EntityNode.CloseNode();
+		ZEVariant Variant;
+		GetClass()->GetProperty(this, Current->ID, Variant);
+
+		ZEValue Value = Variant.GetValue();
+		if (Value.IsNull())
+			continue;
+
+		PropertiesNode.WriteValue(Current->Name, Value);
+	}
+	
+	PropertiesNode.CloseNode();
+
+	if (ChildEntities.GetCount() != 0)
+	{
+		ZEMLWriterNode SubEntitiesNode, EntityNode;
+		Serializer->OpenNode("ChildEntities", SubEntitiesNode);
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			SubEntitiesNode.OpenNode("Entity", EntityNode);
+			EntityNode.WriteString("Class", ChildEntities[I]->GetClass()->GetName());
+			ChildEntities[I]->Save(&EntityNode);
+			EntityNode.CloseNode();
+		}
+
+		SubEntitiesNode.CloseNode();
+	}
 	
 	return true;
 }
 
 bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 {
-	if (Unserializer->GetName() != "Entity")
+	if (Unserializer == NULL)
 		return false;
 
 	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
+
+	if (!PropertiesNode.IsValid())
+		return false;
+
 	const ZEArray<ZEMLFormatElement>& Elements = PropertiesNode.GetElements();
 
 	for (ZESize I = 0; I < Elements.GetCount(); I++)
@@ -662,9 +705,57 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 		if (Elements[I].ElementType != ZEML_ET_PROPERTY)
 			continue;
 
-
 		if (!GetClass()->SetProperty(this, Elements[I].Name, ZEVariant(Elements[I].Value)))
 			zeWarning("Cannot restore property. Entity: \"%s\", Property: \"%s\".", GetClass()->GetName(), Elements[I].Name.ToCString());
+	}
+
+	ZEMLReaderNode SubEntitiesNode = Unserializer->GetNode("ChildEntities");
+
+	if (!SubEntitiesNode.IsValid())
+		return true;
+
+	ChildEntities.SetCount(SubEntitiesNode.GetNodeCount("Entity"));
+
+	ZEClass* NewSubEntityClass = NULL;
+	ZEEntity* NewSubEntity = NULL;
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	{
+		ZEMLReaderNode SubEntityNode = SubEntitiesNode.GetNode("Entity", I);
+
+		NewSubEntityClass = ZEProvider::GetInstance()->GetClass(SubEntityNode.ReadString("Class"));
+
+		if (NewSubEntityClass == NULL)
+		{
+			zeError("Unserialization failed. Child Entity class is not registered. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			return false;
+		}
+
+		NewSubEntity = (ZEEntity*)NewSubEntityClass->CreateInstance();
+
+		if (NewSubEntity == NULL)
+		{
+			zeError("Unserialization failed. Cannot create instance of a child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			NewSubEntity->Destroy();
+			return false;
+		}
+
+		if (!NewSubEntity->Restore(&SubEntityNode))
+		{
+			zeError("Unserialization failed. Unserialization of child entity has failed. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			NewSubEntity->Destroy();
+			return false;
+		}
+
+		ChildEntities[I] = NewSubEntity;
+
+		if (!NewSubEntity->SetOwner(this))
+		{
+			zeError("Unserialization failed. Cannot add child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
+			ChildEntities[I] = NULL;
+			NewSubEntity->Destroy();
+			return false;
+		}
 	}
 
 	return true;

@@ -38,7 +38,7 @@
 
 ZEUInt ZETimeStamp::GetHour() const
 {
-	return (Value / (1000LL * 1000LL * 60LL * 60LL)) % 60LL;
+	return (Value / (1000LL * 1000LL * 60LL * 60LL)) % 24LL;
 }
 
 ZEUInt ZETimeStamp::GetMinute() const
@@ -100,59 +100,104 @@ ZEUInt ZETimeStamp::GetDayOfTheYear() const
 	return Temp.tm_yday;
 }
 
+void ZETimeStamp::SetYear(ZEUInt Year)
+{
+	SetDateTime(Year, GetMonth(), GetDay(), GetHour(), GetMinute(), GetSecond(), GetMillisecond(), GetMicrosecond());
+}
+
+void ZETimeStamp::SetMonth(ZEUInt Month)
+{
+	SetDateTime(GetYear(), Month, GetDay(), GetHour(), GetMinute(), GetSecond(), GetMillisecond(), GetMicrosecond());
+}
+
+void ZETimeStamp::SetDay(ZEUInt Day)
+{
+	SetDateTime(GetYear(), GetMonth(), GetDay(), GetHour(), GetMinute(), GetSecond(), GetMillisecond(), GetMicrosecond());
+}
+
 void ZETimeStamp::SetHour(ZEUInt Hour)
 {
-	AddHours((ZEInt)Hour - (ZEInt)GetHour());
+	AddHoursSelf((ZEInt)Hour - (ZEInt)GetHour());
 }
 
 void ZETimeStamp::SetMinute(ZEUInt Minute)
 {
-	AddMinutes((ZEInt)Minute - (ZEInt)GetHour());
+	AddMinutesSelf((ZEInt)Minute - (ZEInt)GetHour());
 }
 
 void ZETimeStamp::SetSecond(ZEUInt Second)
 {
-	AddSeconds((ZEInt)Second - (ZEInt)GetSecond());
+	AddSecondsSelf((ZEInt)Second - (ZEInt)GetSecond());
 }
 
 void ZETimeStamp::SetMillisecond(ZEUInt Millisecond)
 {
-	AddSeconds((ZEInt)Millisecond - (ZEInt)GetMillisecond());
+	AddMillisecondsSelf((ZEInt)Millisecond - (ZEInt)GetMillisecond());
 }
 
 void ZETimeStamp::SetMicroseconds(ZEUInt Microseconds)
 {
-	AddSeconds((ZEInt)Microseconds - (ZEInt)GetMicrosecond());
+	AddMicrosecondsSelf((ZEInt)Microseconds - (ZEInt)GetMicrosecond());
 }
 
-void ZETimeStamp::AddDays(ZEInt Days)
+ZETimeStamp ZETimeStamp::AddDays(ZEInt Days) const
 {
-	Value += Days * 24LL * 60LL * 60LL * 1000LL * 1000LL;
+	return ZETimeStamp(Value + (ZEInt64)Days * 24LL * 60LL * 60LL * 1000LL * 1000LL);
 }
 
-void ZETimeStamp::AddHours(ZEInt Hours) 
+ZETimeStamp ZETimeStamp::AddHours(ZEInt Hours)  const
 {
-	Value += Hours * 60LL * 60LL * 1000LL * 1000LL;
+	return ZETimeStamp(Value + (ZEInt64)Hours * 60LL * 60LL * 1000LL * 1000LL);
 }
 
-void ZETimeStamp::AddMinutes(ZEInt Minutes)
+ZETimeStamp ZETimeStamp::AddMinutes(ZEInt Minutes) const
 {
-	Value += Minutes * 60LL * 1000LL * 1000LL;
+	return ZETimeStamp(Value + (ZEInt64)Minutes * 60LL * 1000LL * 1000LL);
 }
 
-void ZETimeStamp::AddSeconds(ZEInt Seconds)
+ZETimeStamp ZETimeStamp::AddSeconds(ZEInt Seconds) const
 {
-	Value += Seconds * 1000LL * 1000LL;
+	return ZETimeStamp(Value + (ZEInt64)Seconds * 1000LL * 1000LL);
 }
 
-void ZETimeStamp::AddMilliseconds(ZEInt Milliseconds)
+ZETimeStamp ZETimeStamp::AddMilliseconds(ZEInt Milliseconds) const
 {
-	Value += Milliseconds * 1000LL;
+	return ZETimeStamp(Value + (ZEInt64)Milliseconds * 1000LL);
 }
 
-void ZETimeStamp::AddMicroseconds(ZEInt Microseconds)
+ZETimeStamp ZETimeStamp::AddMicroseconds(ZEInt Microseconds) const
 {
-	Value += Microseconds;
+	return ZETimeStamp(Value +(ZEInt64) Microseconds);
+}
+
+void ZETimeStamp::AddDaysSelf(ZEInt Days)
+{
+	Value += (ZEInt64)Days * 24LL * 60LL * 60LL * 1000LL * 1000LL;
+}
+
+void ZETimeStamp::AddHoursSelf(ZEInt Hours) 
+{
+	Value += (ZEInt64)Hours * 60LL * 60LL * 1000LL * 1000LL;
+}
+
+void ZETimeStamp::AddMinutesSelf(ZEInt Minutes)
+{
+	Value += (ZEInt64)Minutes * 60LL * 1000LL * 1000LL;
+}
+
+void ZETimeStamp::AddSecondsSelf(ZEInt Seconds)
+{
+	Value += (ZEInt64)Seconds * 1000LL * 1000LL;
+}
+
+void ZETimeStamp::AddMillisecondsSelf(ZEInt Milliseconds)
+{
+	Value += (ZEInt64)Milliseconds * 1000LL;
+}
+
+void ZETimeStamp::AddMicrosecondsSelf(ZEInt Microseconds)
+{
+	Value += (ZEInt64)Microseconds;
 }
 
 void ZETimeStamp::SetDate(ZEUInt Year, ZEUInt Month, ZEUInt Day)
@@ -227,7 +272,6 @@ bool ZETimeStamp::operator>=(ZETimeStamp Other) const
 	return Value >= Other.Value;
 }
 
-
 ZETimeStamp ZETimeStamp::operator+=(ZETimeStamp Other)
 {
 	this->Value += Other.Value;
@@ -258,12 +302,12 @@ ZETimeStamp ZETimeStamp::operator=(const time_t& Other)
 	return *this;
 }
 
-ZETimeStamp::operator tm()
+ZETimeStamp::operator tm() const
 {
 	return ToTM();
 }
 
-ZETimeStamp::operator time_t()
+ZETimeStamp::operator time_t() const
 {
 	return ToCTime();
 }
@@ -325,13 +369,6 @@ ZETimeStamp::ZETimeStamp(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEU
 	SetDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond);
 }
 
-ZETimeStamp ZETimeStamp::CreateDateTime(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond, ZEUInt Microsecond)
-{
-	ZETimeStamp Temp;
-	Temp.SetDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond);
-	return Temp;
-}
-
 ZETimeStamp ZETimeStamp::CreateTime(ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond, ZEUInt Microsecond)
 {
 	ZETimeStamp Temp;
@@ -345,6 +382,14 @@ ZETimeStamp ZETimeStamp::CreateDate(ZEUInt Year, ZEUInt Month, ZEUInt Day)
 	Temp.SetDate(Year, Month, Day);
 	return Temp;
 }
+
+ZETimeStamp ZETimeStamp::CreateDateTime(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond, ZEUInt Microsecond)
+{
+	ZETimeStamp Temp;
+	Temp.SetDateTime(Year, Month, Day, Hour, Minute, Second, Millisecond);
+	return Temp;
+}
+
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#include <windows.h>

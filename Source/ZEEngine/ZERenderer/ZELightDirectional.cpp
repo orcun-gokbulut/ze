@@ -217,6 +217,8 @@ ZEAABBox ZELightDirectional::GetSceneBoundingBoxLight(ZEScene* Scene)
 ZELightDirectional::ZELightDirectional()
 {
 	CascadeDistanceFactor = 0.5f;
+	CascadeConstants.CascadeCount = 3;
+	CascadeVolumes.Resize(3);
 
 	Command.Entity = this;
 	Command.StageMask = ZERN_STAGE_SHADOWING;

@@ -446,17 +446,16 @@ void ZEInterior::CullRooms(const ZERNCullParameters* CullParameters)
 	}
 }
 
-void ZEInterior::OnTransformChanged()
+void ZEInterior::ParentTransformChanged()
 {
-	ZESize RoomCount = Rooms.GetCount();
-	for (ZESize I = 0; I < RoomCount; I++)
-		Rooms[I]->OnTransformChanged();
+	ZEEntity::ParentTransformChanged();
+
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
+		Rooms[I]->ParentTransformChanged();
 
 	ZESize DoorCount = Doors.GetCount();
 	for (ZESize I = 0; I < DoorCount; I++)
 		Doors[I]->TransformChanged = true;
-
-	ZEEntity::OnTransformChanged();
 }
 
 void ZEInterior::SetCullMode(ZEInteriorCullMode Value)

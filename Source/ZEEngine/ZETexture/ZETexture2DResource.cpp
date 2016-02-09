@@ -49,6 +49,7 @@
 #include <sys/stat.h>
 #include <stdio.h>
 #include <string.h>
+#include "ZEPointer/ZEPointer.h"
 
 static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 {
@@ -291,14 +292,12 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	}
 
 	// Create TextureResource 
-	ZETexture2DResource* TextureResource = new ZETexture2DResource();
-	ZEGRTexture2D* Texture = TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), 1, FinalTextureData->GetPixelFormat(), false);
+	ZEPointer<ZETexture2DResource, ZEReleaseDeletor<ZETexture2DResource>> TextureResource = new ZETexture2DResource();
+	TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), 1, FinalTextureData->GetPixelFormat(), false);
 
-	if (Texture == NULL)
+	if (TextureResource->Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
-		ProcessedTextureData.Destroy();
-		delete TextureResource;
 		return NULL;
 	}
 
@@ -307,13 +306,13 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
 
-	CopyToTexture2D(Texture, FinalTextureData);
+	CopyToTexture2D(TextureResource->Texture, FinalTextureData);
 
-	Texture->GenerateMipMaps();
+	TextureResource->Texture->GenerateMipMaps();
 
 	FinalTextureData = NULL;
 	ProcessedTextureData.Destroy();
 	TextureData.Destroy();
 
-	return TextureResource;
+	return TextureResource.Transfer();
 }

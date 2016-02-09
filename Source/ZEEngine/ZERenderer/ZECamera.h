@@ -63,7 +63,9 @@ class ZECamera : public ZEEntity
 
 										ZECamera();
 
-		virtual void					OnTransformChanged();
+		virtual void					LocalTransformChanged();
+		virtual void					ParentTransformChanged();
+		void							ProjectionTransformChanged();
 
 	public:
 		void							SetViewport(const ZEGRViewport& Viewport);
@@ -109,21 +111,16 @@ class ZECamera : public ZEEntity
 		float							GetHorizontalFovLeft() const;
 
 		const ZEMatrix4x4&				GetViewTransform();
-		const ZEMatrix4x4&				GetProjectionTransform();
-		const ZEMatrix4x4&				GetViewProjectionTransform();
-
 		const ZEMatrix4x4&				GetInvViewTransform();
+		const ZEMatrix4x4&				GetProjectionTransform();
 		const ZEMatrix4x4&				GetInvProjectionTransform();
+		const ZEMatrix4x4&				GetViewProjectionTransform();
 		const ZEMatrix4x4&				GetInvViewProjectionTransform();
-
 		const ZERNView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
 		ZEVector2						GetScreenPosition(const ZEVector3& WorldPosition);
-
-		virtual void					SetPosition(const ZEVector3& NewPosition);	
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
 
 		static ZECamera*				CreateInstance();
 };

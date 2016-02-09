@@ -72,8 +72,8 @@ class ZERNMaterial : public ZEGRResource, public ZEInitializable
 		virtual ZEGRResourceType		GetResourceType() const;
 		virtual ZEUInt					GetStageMask() const;
 
-		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 
 		virtual bool					Update();
 };

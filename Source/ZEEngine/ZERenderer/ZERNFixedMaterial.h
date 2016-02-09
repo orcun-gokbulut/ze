@@ -67,11 +67,11 @@ enum ZERNTransparencyMode : ZEUInt8
 	ZERN_TM_ADDITIVE
 };
 
-enum ZERNOpacityFactorType : ZEUInt8
+enum ZERNOpacityFactorSource : ZEUInt8
 {
-	ZERN_OFT_CONSTANT,
-	ZERN_OFT_BASE_MAP,
-	ZERN_OFT_OPACITY_MAP
+	ZERN_OFS_CONSTANT,
+	ZERN_OFS_BASE_MAP_ALPHA,
+	ZERN_OFS_OPACITY_MAP
 };
 
 class ZERNFixedMaterial : public ZERNMaterial
@@ -156,7 +156,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool								RefractionEnabled;
 		float								RefractionFactor;
 		ZEVector3							RefractionColor;
-		ZERNOpacityFactorType				OpacityFactorType;
+		ZERNOpacityFactorSource				OpacityFactorType;
 		bool								EnvironmentMapEnabled;
 		bool								DetailBaseMapEnabled;
 		bool								DetailNormalMapEnabled;
@@ -272,13 +272,12 @@ class ZERNFixedMaterial : public ZERNMaterial
 		void								SetHeightMap(const ZERNMap& Map);
 		const ZERNMap&						GetHeightMap() const;
 
-		void								SetOpacityFactorType(ZERNOpacityFactorType Type);
-		ZERNOpacityFactorType				GetOpacityFactorType() const;
-
 		void								SetOpacity(float Value);
 		float								GetOpacity() const;
 		void								SetOpacityMap(const ZERNMap& Map);
 		const ZERNMap&						GetOpacityMap() const;
+		void								SetOpacityFactorSource(ZERNOpacityFactorSource Type);
+		ZERNOpacityFactorSource				GetOpacityFactorSource() const;
 
 		void								SetEnvironmentMap(const ZERNMap& Map);
 		const ZERNMap&						GetEnvironmentMap() const;

@@ -64,14 +64,14 @@ class ZEModelMeshLOD
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBufferSkin;
 
-		ZEHolder<ZERNMaterial>				Material;
+		ZEHolder<const ZERNMaterial>		Material;
 		bool								Skinned;
 
 	public:
 		bool								IsSkinned();
 
-		void								SetMaterial(ZERNMaterial* Material);
-		ZERNMaterial*						GetMaterial();
+		void								SetMaterial(ZEHolder<const ZERNMaterial> Material);
+		ZEHolder<const ZERNMaterial>		GetMaterial();
 
 		const ZEModelResourceMeshLOD*		GetLODResource();
 

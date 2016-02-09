@@ -35,25 +35,25 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelMeshLOD.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZERenderer/ZERNCommand.h"
 #include "ZEModelResource.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEGame/ZERayCast.h"
+#include "ZERenderer/ZERNCommand.h"
 
+struct ZERNCullParameters;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 
 class ZEModelMesh : public ZEObject
 {
-	friend class ZEModel;
-
-	friend class ZEModelMeshLOD;
 	ZE_OBJECT
+	friend class ZEModel;
+	friend class ZEModelMeshLOD;
 
 	private:
 		ZEModel*							Owner;
@@ -62,14 +62,14 @@ class ZEModelMesh : public ZEObject
 		ZEModelMesh*						ParentMesh;
 		ZEArray<ZEModelMesh*>				ChildMeshes;
 
-		mutable ZEAABBox					LocalBoundingBox;
-		mutable ZEAABBox					ModelBoundingBox;
-		mutable ZEAABBox					WorldBoundingBox;
-
 		ZEVector3							Position;
 		ZEVector3							Scale;
 		ZEQuaternion						Rotation;
 
+		mutable ZEFlags						DirtyFlags;
+		mutable ZEAABBox					LocalBoundingBox;
+		mutable ZEAABBox					ModelBoundingBox;
+		mutable ZEAABBox					WorldBoundingBox;
 		mutable ZEMatrix4x4					LocalTransform;
 		mutable ZEMatrix4x4					ModelTransform;
 		mutable ZEMatrix4x4					WorldTransform;
@@ -94,19 +94,21 @@ class ZEModelMesh : public ZEObject
 		ZERNCommand							RenderCommand;
 		
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
-		void								OnTransformChanged();
+
+		void								LocalTransformChanged();
+		void								ParentTransformChanged();
 
 	public:
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();
+
 		ZEPhysicalRigidBody*				GetPhysicalBody();
 		ZEPhysicalCloth*					GetPhysicalCloth();
 
 		const ZEAABBox&						GetLocalBoundingBox() const;
 		const ZEAABBox&						GetModelBoundingBox() const;
 		const ZEAABBox&						GetWorldBoundingBox() const;
-
 		const ZEMatrix4x4&					GetLocalTransform() const;
 		const ZEMatrix4x4&					GetModelTransform() const;
 		const ZEMatrix4x4&					GetWorldTransform() const;

@@ -89,12 +89,12 @@ ZEUInt ZERNMaterial::GetStageMask() const
 	return 0;
 }
 
-bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
 	return true;
 }
 
-void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
 
 }

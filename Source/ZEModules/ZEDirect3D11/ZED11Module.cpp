@@ -122,7 +122,7 @@ bool ZED11Module::InitializeSelf()
 
 	UINT DeviceFlags = 0;
 	//#ifdef ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
-		//DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
+		DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
 	/*#else
 		DeviceFlags |= D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
 	#endif*/
@@ -167,6 +167,7 @@ bool ZED11Module::InitializeSelf()
 
 	ID3D11Device* DeviceTemp;
 	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &DeviceTemp, NULL, NULL);
+	//Result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &DeviceTemp, NULL, NULL);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot create device. Error: %d", Result);

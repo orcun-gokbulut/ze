@@ -59,7 +59,6 @@ class ZEMoon : public ZEEntity
 		virtual bool				DeinitializeSelf();
 
 									ZEMoon();
-		virtual						~ZEMoon();
 
 	public:
 		virtual void				SetPhase(float Phase);
@@ -84,6 +83,8 @@ class ZEMoon : public ZEEntity
 		const ZEString				GetTexture() const;
 
 		virtual void				Tick(float ElapsedTime);
+
+		virtual						~ZEMoon();
 
 		static ZEMoon*				CreateInstance();
 };

@@ -43,9 +43,19 @@ float ZEMath::Sqrt(float Value)
 	return sqrtf(Value);
 }
 
+double ZEMath::Sqrtd(double Value)
+{
+	return sqrt(Value);
+}
+
 float ZEMath::Mod(float Value, float Modulus)
 {
 	return fmodf(Value, Modulus);
+}
+
+double ZEMath::Modd(double Value, double Modulus)
+{
+	return fmod(Value, Modulus);
 }
 
 float ZEMath::Log(float Value)
@@ -53,9 +63,19 @@ float ZEMath::Log(float Value)
 	return logf(Value);
 }
 
+double ZEMath::Logd(double Value)
+{
+	return log(Value);
+}
+
 float ZEMath::Log10(float Value)
 {
 	return log10f(Value);
+}
+
+double ZEMath::Log10d(double Value)
+{
+	return log10(Value);
 }
 
 float ZEMath::Power(float Base, float Exponent)
@@ -63,9 +83,19 @@ float ZEMath::Power(float Base, float Exponent)
 	return powf(Base, Exponent);
 }
 
-float ZEMath::Exp(float Exponent)
+double ZEMath::Powerd(double Base, double Exponent)
 {
-	return expf(Exponent);
+	return pow(Base, Exponent);
+}
+
+float ZEMath::Exp(float Value)
+{
+	return expf(Value);
+}
+
+double ZEMath::Expd(double Value)
+{
+	return exp(Value);
 }
 
 float ZEMath::Floor(float Value)
@@ -73,9 +103,19 @@ float ZEMath::Floor(float Value)
 	return floorf(Value);
 }
 
+double ZEMath::Floord(double Value)
+{
+	return floor(Value);
+}
+
 float ZEMath::Ceil(float Value)
 {
 	return ceilf(Value);
+}
+
+double ZEMath::Ceild(double Value)
+{
+	return ceil(Value);
 }
 
 float ZEMath::Round(float Value)
@@ -83,7 +123,17 @@ float ZEMath::Round(float Value)
 	return (float)(int)(Value + 0.5f);
 }
 
+double ZEMath::Roundd(double Value)
+{
+	return (double)(int)(Value + 0.5);
+}
+
 bool ZEMath::IsValid(float Value)
+{
+	return Value == Value;
+}
+
+bool ZEMath::IsValidd(double Value)
 {
 	return Value == Value;
 }
@@ -126,6 +176,11 @@ float ZEMath::Lerp(float A, float B, float Factor)
 	return A + (B - A) * Factor;
 }
 
+double ZEMath::Lerpd(double A, double B, double Factor)
+{
+	return A + (B - A) * Factor;
+}
+
 float ZEMath::CopySign(float Value, float Sign)
 {
     #ifdef ZE_PLATFORM_COMPILER_MSVC
@@ -133,4 +188,13 @@ float ZEMath::CopySign(float Value, float Sign)
     #else
         return copysignf(Value, Sign);
     #endif
+}
+
+double ZEMath::CopySignd(double Value, double Sign)
+{
+#ifdef ZE_PLATFORM_COMPILER_MSVC
+	return _copysign(Value, Sign);
+#else
+	return copysign(Value, Sign);
+#endif
 }

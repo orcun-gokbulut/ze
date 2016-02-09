@@ -61,8 +61,22 @@ ZESize ZEMLFormat::GetFormatCount()
 	return sizeof(Formats) / sizeof(ZEMLFormatDescription);
 }
 
-ZEMLFormatDescription*const*  ZEMLFormat::GetFormats()
+ZEMLFormatDescription*const* ZEMLFormat::GetFormats()
 {
-
 	return Formats;
+}
+
+ZEMLFormatDescription* ZEMLFormat::GetDefaultFormat()
+{
+	return Formats[0];
+}
+
+ZEMLFormatDescription* ZEMLFormat::GetDefaultBinaryFormat()
+{
+	return Formats[0];
+}
+
+ZEMLFormatDescription* ZEMLFormat::GetDefaultTextFormat()
+{
+	return Formats[2];
 }
