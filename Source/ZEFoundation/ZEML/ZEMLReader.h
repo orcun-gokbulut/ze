@@ -113,11 +113,16 @@ class ZEMLReaderNode
 		double						ReadDouble(const char* Name, double Default = 0.0) const;
 		bool						ReadBoolean(const char* Name, bool Default = false) const;
 		ZEVector2					ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero) const;
+		ZEVector2d					ReadVector2d(const char* Name, const ZEVector2d& Default = ZEVector2d::Zero) const;
 		ZEVector3					ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero) const;
+		ZEVector3d					ReadVector3d(const char* Name, const ZEVector3d& Default = ZEVector3d::Zero) const;
 		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero) const;
+		ZEVector4d					ReadVector4d(const char* Name, const ZEVector4d& Default = ZEVector4d::Zero) const;
 		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero) const;
 		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero) const;
+		ZEMatrix3x3d				ReadMatrix3x3d(const char* Name, const ZEMatrix3x3d& Default = ZEMatrix3x3d::Zero) const;
 		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero) const;
+		ZEMatrix4x4d				ReadMatrix4x4d(const char* Name, const ZEMatrix4x4d& Default = ZEMatrix4x4d::Zero) const;
 		ZEString					ReadString(const char* Name, const ZEString& Default = "") const;
 
 		ZESize						ReadDataSize(const char* Name) const;

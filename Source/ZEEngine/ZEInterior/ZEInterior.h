@@ -86,7 +86,7 @@ class ZEInterior : public ZEEntity
 		void									CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullParameters, ZEViewVolume* ViewVolume);
 		void									CullRooms(const ZERNCullParameters* CullParameters);
 
-		virtual	void							OnTransformChanged();
+		virtual	void							ParentTransformChanged();
 
 	protected:
 		virtual bool							InitializeSelf();

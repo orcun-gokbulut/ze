@@ -43,6 +43,7 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 #define ZERN_GSDF_RENDER_TARGET		1
 

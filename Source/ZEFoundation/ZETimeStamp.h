@@ -60,6 +60,9 @@ class ZETimeStamp
 		ZEUInt					GetDayOfTheWeek() const;
 		ZEUInt					GetDayOfTheYear() const;
 
+		void					SetYear(ZEUInt Month);
+		void					SetMonth(ZEUInt Month);
+		void					SetDay(ZEUInt Month);
 		void					SetHour(ZEUInt Hour);
 		void					SetMinute(ZEUInt Minute);
 		void					SetSecond(ZEUInt Second);
@@ -70,12 +73,19 @@ class ZETimeStamp
 		void					SetTime(ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond = 0, ZEUInt Microsecond = 0);
 		void					SetDateTime(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond = 0, ZEUInt Microsecond = 0);
 
-		void					AddDays(ZEInt Days);
-		void					AddHours(ZEInt Hours);
-		void					AddMinutes(ZEInt Minutes);
-		void					AddSeconds(ZEInt Seconds);
-		void					AddMilliseconds(ZEInt Milliseconds);
-		void					AddMicroseconds(ZEInt Microseconds);
+		ZETimeStamp				AddDays(ZEInt Days) const;
+		ZETimeStamp				AddHours(ZEInt Hours) const;
+		ZETimeStamp				AddMinutes(ZEInt Minutes) const;
+		ZETimeStamp				AddSeconds(ZEInt Seconds) const;
+		ZETimeStamp				AddMilliseconds(ZEInt Milliseconds) const;
+		ZETimeStamp				AddMicroseconds(ZEInt Microseconds) const;
+
+		void					AddDaysSelf(ZEInt Days);
+		void					AddHoursSelf(ZEInt Hours);
+		void					AddMinutesSelf(ZEInt Minutes);
+		void					AddSecondsSelf(ZEInt Seconds);
+		void					AddMillisecondsSelf(ZEInt Milliseconds);
+		void					AddMicrosecondsSelf(ZEInt Microseconds);
 
 		ZETimeStamp				operator+(ZETimeStamp Other) const;
 		ZETimeStamp				operator-(ZETimeStamp Other) const;
@@ -94,8 +104,8 @@ class ZETimeStamp
 		ZETimeStamp				operator=(const tm& Other);
 		ZETimeStamp				operator=(const time_t& Other);
 		
-								operator tm();
-								operator time_t();
+								operator tm() const;
+								operator time_t() const;
 
 		tm						ToTM() const;
 		time_t					ToCTime() const;
@@ -107,12 +117,12 @@ class ZETimeStamp
 
 								ZETimeStamp();
 								ZETimeStamp(ZEInt64 Value);
-								ZETimeStamp(ZEUInt Year, ZEUInt Day, ZEUInt Month, 
+								ZETimeStamp(ZEUInt Year, ZEUInt Month, ZEUInt Day, 
 									ZEUInt Hour = 0, ZEUInt Minute = 0, ZEUInt Second = 0, ZEUInt Millisecond = 0, ZEUInt Microsecond = 0);
 
-		static ZETimeStamp		CreateDateTime(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond = 0, ZEUInt Microsecond = 0);
 		static ZETimeStamp		CreateTime(ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond = 0, ZEUInt Microsecond = 0);
 		static ZETimeStamp		CreateDate(ZEUInt Year, ZEUInt Month, ZEUInt Day);
+		static ZETimeStamp		CreateDateTime(ZEUInt Year, ZEUInt Month, ZEUInt Day, ZEUInt Hour, ZEUInt Minute, ZEUInt Second, ZEUInt Millisecond = 0, ZEUInt Microsecond = 0);
 
 		static ZETimeStamp		Now();
 };

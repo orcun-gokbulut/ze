@@ -4,10 +4,10 @@
  <Property Name="VersionMajor" Type="UInt8">1</Property>
  <Property Name="VersionMinor" Type="UInt8">0</Property>
  <Node Name="Application">
-  <Property Name="Name" Type="String">CustATrainIG</Property>
+  <Property Name="Name" Type="String">ZETrainIG</Property>
   <Property Name="VersionMajor" Type="UInt8">0</Property>
   <Property Name="VersionMinor" Type="UInt8">6</Property>
-  <Property Name="Executable" Type="String">CustATrainIG.exe</Property>
+  <Property Name="Executable" Type="String">ZETrainIG.exe</Property>
   <Property Name="CommandLineArguments" Type="String"></Property>
  </Node>
  <Node Name="Modules">

@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 bool ZERNStageForward::InitializeSelf()
 {

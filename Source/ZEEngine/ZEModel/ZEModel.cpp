@@ -34,21 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModel.h"
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZERenderer/ZERNSimpleMaterial.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEError.h"
 
-#include <stdio.h>
-#include <string.h>
-#include <float.h>
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZEGame/ZEScene.h"
 
 void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
 	{
-		SetBoundingBox(ZEAABBox(ZEVector3::Zero, ZEVector3::Zero));
+		const_cast<ZEModel*>(this)->SetBoundingBox(ZEAABBox(ZEVector3::Zero, ZEVector3::Zero));
 		return;
 	}
 
@@ -91,16 +85,8 @@ void ZEModel::CalculateBoundingBox() const
 		}
 	}
 
-	SetBoundingBox(BoundingBox);
-}
-
-void ZEModel::UpdateTransforms()
-{
-	for (ZESize I = 0; I < Bones.GetCount(); I++)
-		Bones[I].OnTransformChanged();
-
-	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Meshes[I].OnTransformChanged();
+	const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox);
+	DirtyBoundingBox = false;
 }
 
 ZEDrawFlags ZEModel::GetDrawFlags() const
@@ -204,6 +190,41 @@ void ZEModel::LoadModelResource()
 	{
 		Helpers[I].Initialize(this, &ModelResource->GetHelpers()[I]);
 	}
+}
+
+void ZEModel::ChildBoundingBoxChanged()
+{
+	BoundingBoxChanged();
+	DirtyBoundingBox = true;
+}
+
+void ZEModel::LocalTransformChanged()
+{
+	ZEEntity::LocalTransformChanged();
+
+	if (ParentlessBoneBody != NULL && Bones.GetCount() > 0)
+		ParentlessBoneBody->SetPosition(GetWorldPosition() + ParentlessBoneBodyPosition);
+
+	for (ZESize I = 0; I < Skeleton.GetCount(); I++)
+		Skeleton[I]->ParentTransformChanged();
+	
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+		Meshes[I].ParentTransformChanged();
+
+	DirtyBoundingBox = true;
+}
+
+void ZEModel::ParentTransformChanged()
+{
+	ZEEntity::ParentTransformChanged();
+
+	for (ZESize I = 0; I < Skeleton.GetCount(); I++)
+		Skeleton[I]->ParentTransformChanged();
+
+	for (ZESize I = 0; I < Meshes.GetCount(); I++)
+		Meshes[I].ParentTransformChanged();
+
+	DirtyBoundingBox = true;
 }
 
 void ZEModel::SetModelFile(const ZEString& ModelFile)
@@ -384,50 +405,29 @@ void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 	BoundingBoxIsUserDefined = Value;
 }
 
+const ZEAABBox& ZEModel::GetBoundingBox() const
+{
+	if (DirtyBoundingBox && !BoundingBoxIsUserDefined)
+	{
+		CalculateBoundingBox();
+		DirtyBoundingBox = false;
+	}
+
+	return ZEEntity::GetBoundingBox();
+}
+
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (!IsStaticModel || !StaticCalculationsDone)
-	{
-		if (!BoundingBoxIsUserDefined)
-			CalculateBoundingBox();
+	if (BoundingBoxIsUserDefined)
+		return ZEEntity::GetWorldBoundingBox();
 
-		StaticCalculationsDone = IsStaticModel;
+	if (DirtyBoundingBox && !BoundingBoxIsUserDefined)
+	{
+		CalculateBoundingBox();
+		DirtyBoundingBox = false;
 	}
 
 	return ZEEntity::GetWorldBoundingBox();
-}
-
-void ZEModel::SetStaticModel(bool Value)
-{
-	IsStaticModel = Value;
-}
-
-bool ZEModel::GetStaticModel() const
-{
-	return IsStaticModel;
-}
-
-void ZEModel::SetPosition(const ZEVector3& NewPosition)
-{
-	if (ParentlessBoneBody != NULL && Bones.GetCount() > 0)
-	{
-		ParentlessBoneBody->SetPosition(NewPosition + ParentlessBoneBodyPosition);
-	}
-
-	ZEEntity::SetPosition(NewPosition);
-	UpdateTransforms();
-}
-
-void ZEModel::SetRotation(const ZEQuaternion& NewRotation)
-{
-	ZEEntity::SetRotation(NewRotation);
-	UpdateTransforms();
-}
-
-void ZEModel::SetScale(const ZEVector3& NewScale)
-{
-	ZEEntity::SetScale(NewScale);
-	UpdateTransforms();
 }
 
 void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
@@ -545,8 +545,7 @@ ZEModel::ZEModel()
 	ParentlessBoneBody = NULL;
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
-	IsStaticModel = false;
-	StaticCalculationsDone = false;
+	DirtyBoundingBox = true;
 }
 
 ZEModel::~ZEModel()

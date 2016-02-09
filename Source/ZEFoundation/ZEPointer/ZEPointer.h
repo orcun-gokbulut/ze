@@ -34,117 +34,153 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_POINTER_H__
-#define __ZE_POINTER_H__
 
 #include "ZEError.h"
+#include "ZEDeletor.h"
 
-template<typename Type>
+template<typename Type, typename Deletor = ZEDeletor<Type>>
 class ZEPointer
 {
 	private:
-		Type* Pointer;
+		Type*					Pointer;
 
 	public:
-		void Create(Type* RawPointer)
-		{
-			if (RawPointer == Pointer)
-				return;
+		Type*					GetPointer() const;
+		bool					IsNull() const;
 
-			Release();
+		void					Assign(Type* RawPointer);
+		void					Release();
+		void					Copy(ZEPointer& OtherPointer);
+		Type*					Transfer();
 
-			if (RawPointer == NULL)
-				return;
+		operator				Type*();
+		Type&					operator*();
+		Type*					operator->();
 
-			Pointer = RawPointer;
-		}
+		ZEPointer&				operator=(Type* RawPointer);
+		ZEPointer&				operator=(ZEPointer& OtherPointer);
 
-		void Copy(ZEPointer<Type>& OtherPointer)
-		{
-			if (OtherPointer.Pointer == NULL)
-				Release();
-			else
-			{
-				Pointer = OtherPointer.Pointer;
-				OtherPointer.Pointer = NULL;
-			}
-		}
+								ZEPointer();
+								ZEPointer(Type* RawPointer);
+		explicit				ZEPointer(ZEPointer& OtherPointer);
+								~ZEPointer();
 
-		bool IsNull() const
-		{
-			return Pointer == NULL;
-		}
 
-		void Release()
-		{
-			if (Pointer != NULL)
-				delete Pointer;
-
-			Pointer = NULL;
-		}
-
-		Type* GetPointer() const
-		{
-			return Pointer;
-		}
-
-		Type* Transfer()
-		{
-			Type* Temp = Pointer;
-			Pointer = NULL;
-			return Temp;
-		}
-
-		operator Type*()
-		{
-			return Pointer;
-		}
-
-		Type& operator*()
-		{
-			zeDebugCheck(Pointer == NULL, "ZEPointer does not points any data structure.");
-			return *Pointer;
-		}
-
-		Type* operator->()
-		{
-			zeDebugCheck(Pointer == NULL, "ZEPointer does not points any data structure.");
-			return Pointer;
-		}
-
-		ZEPointer<Type>& operator=(Type* RawPointer)
-		{
-			Create(RawPointer);
-			return *this;
-		}
-
-		ZEPointer<Type>& operator=(ZEPointer<Type>& OtherPointer)
-		{
-			Copy(OtherPointer);
-			return *this;
-		}
-
-		ZEPointer()
-		{
-			Pointer = NULL;
-		}
-
-		ZEPointer(Type* RawPointer)
-		{
-			Pointer = NULL;
-			Create(RawPointer);
-		}
-
-		explicit ZEPointer(ZEPointer<Type>& OtherPointer)
-		{
-			Pointer = NULL;
-			Copy(OtherPointer);
-		}
-
-		~ZEPointer()
-		{
-			Release();
-		}
 };
 
-#endif
+template<typename Type, typename Deletor>
+bool ZEPointer<Type, Deletor>::IsNull() const
+{
+	return Pointer == NULL;
+}
+
+template<typename Type, typename Deletor>
+Type* ZEPointer<Type, Deletor>::GetPointer() const
+{
+	return Pointer;
+}
+
+template<typename Type, typename Deletor>
+void ZEPointer<Type, Deletor>::Assign(Type* RawPointer)
+{
+	if (RawPointer == Pointer)
+		return;
+
+	Release();
+
+	if (RawPointer == NULL)
+		return;
+
+	Pointer = RawPointer;
+}
+
+template<typename Type, typename Deletor>
+void ZEPointer<Type, Deletor>::Release()
+{
+	if (Pointer != NULL)
+		Deletor::Delete(Pointer);
+
+	Pointer = NULL;
+}
+
+template<typename Type, typename Deletor>
+void ZEPointer<Type, Deletor>::Copy(ZEPointer<Type, Deletor>& OtherPointer)
+{
+	if (OtherPointer.Pointer == NULL)
+	{
+		Release();
+	}
+	else
+	{
+		Pointer = OtherPointer.Pointer;
+		OtherPointer.Pointer = NULL;
+	}
+}
+
+template<typename Type, typename Deletor>
+Type* ZEPointer<Type, Deletor>::Transfer()
+{
+	Type* Temp = Pointer;
+	Pointer = NULL;
+	return Temp;
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>::operator Type*()
+{
+	return Pointer;
+}
+
+template<typename Type, typename Deletor>
+Type& ZEPointer<Type, Deletor>::operator*()
+{
+	zeDebugCheck(Pointer == NULL, "ZEPointer does not points any data structure.");
+	return *Pointer;
+}
+
+template<typename Type, typename Deletor>
+Type* ZEPointer<Type, Deletor>::operator->()
+{
+	zeDebugCheck(Pointer == NULL, "ZEPointer does not points any data structure.");
+	return Pointer;
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>& ZEPointer<Type, Deletor>::operator=(Type* RawPointer)
+{
+	Assign(RawPointer);
+	return *this;
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>& ZEPointer<Type, Deletor>::operator=(ZEPointer<Type, Deletor>& OtherPointer)
+{
+	Copy(OtherPointer);
+	return *this;
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>::ZEPointer()
+{
+	Pointer = NULL;
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>::ZEPointer(Type* RawPointer)
+{
+	Pointer = NULL;
+	Assign(RawPointer);
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>::ZEPointer(ZEPointer<Type, Deletor>& OtherPointer)
+{
+	Pointer = NULL;
+	Copy(OtherPointer);
+}
+
+template<typename Type, typename Deletor>
+ZEPointer<Type, Deletor>::~ZEPointer()
+{
+	Release();
+}

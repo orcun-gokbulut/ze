@@ -298,6 +298,16 @@ ZEVector2 ZEMLReaderNode::ReadVector2(const char* Name, const ZEVector2& Default
 	return Value.GetVector2();
 }
 
+ZEVector2d ZEMLReaderNode::ReadVector2d(const char* Name, const ZEVector2d& Default) const
+{
+	ZEValue Value = ReadValue(Name);
+
+	if (Value.IsNull() || Value.GetType() != ZE_VRT_VECTOR2D)
+		return Default;
+
+	return Value.GetVector2d();
+}
+
 ZEVector3 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector3& Default) const
 {
 	ZEValue Value = ReadValue(Name);
@@ -308,6 +318,16 @@ ZEVector3 ZEMLReaderNode::ReadVector3(const char* Name, const ZEVector3& Default
 	return Value.GetVector3();
 }
 
+ZEVector3d ZEMLReaderNode::ReadVector3d(const char* Name, const ZEVector3d& Default) const
+{
+	ZEValue Value = ReadValue(Name);
+
+	if (Value.IsNull() || Value.GetType() != ZE_VRT_VECTOR3D)
+		return Default;
+
+	return Value.GetVector3d();
+}
+
 ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default) const
 {
 	ZEValue Value = ReadValue(Name);
@@ -316,6 +336,16 @@ ZEVector4 ZEMLReaderNode::ReadVector4(const char* Name, const ZEVector4& Default
 		return Default;
 
 	return Value.GetVector4();
+}
+
+ZEVector4d ZEMLReaderNode::ReadVector4d(const char* Name, const ZEVector4d& Default) const
+{
+	ZEValue Value = ReadValue(Name);
+
+	if (Value.IsNull() || Value.GetType() != ZE_VRT_VECTOR4D)
+		return Default;
+
+	return Value.GetVector4d();
 }
 
 ZEQuaternion ZEMLReaderNode::ReadQuaternion(const char* Name, const ZEQuaternion& Default) const
@@ -338,6 +368,16 @@ ZEMatrix3x3 ZEMLReaderNode::ReadMatrix3x3(const char* Name, const ZEMatrix3x3& D
 	return Value.GetMatrix3x3();
 }
 
+ZEMatrix3x3d ZEMLReaderNode::ReadMatrix3x3d(const char* Name, const ZEMatrix3x3d& Default) const
+{
+	ZEValue Value = ReadValue(Name);
+
+	if (Value.IsNull() || Value.GetType() != ZE_VRT_MATRIX3X3D)
+		return Default;
+
+	return Value.GetMatrix3x3d();
+}
+
 ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default) const
 {
 	ZEValue Value = ReadValue(Name);
@@ -346,6 +386,16 @@ ZEMatrix4x4 ZEMLReaderNode::ReadMatrix4x4(const char* Name, const ZEMatrix4x4& D
 		return Default;
 
 	return Value.GetMatrix4x4();
+}
+
+ZEMatrix4x4d ZEMLReaderNode::ReadMatrix4x4d(const char* Name, const ZEMatrix4x4d& Default) const
+{
+	ZEValue Value = ReadValue(Name);
+
+	if (Value.IsNull() || Value.GetType() != ZE_VRT_MATRIX4X4D)
+		return Default;
+
+	return Value.GetMatrix4x4d();
 }
 
 ZEString ZEMLReaderNode::ReadString(const char* Name, const ZEString& Default) const

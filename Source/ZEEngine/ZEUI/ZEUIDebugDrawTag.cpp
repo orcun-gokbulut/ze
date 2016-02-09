@@ -127,8 +127,12 @@ ZEUIDebugDrawTag::ZEUIDebugDrawTag()
 
 }
 
+void ZEUIDebugDrawTag::Destroy()
+{
+	delete this;
+}
+
 ZEUIDebugDrawTag* ZEUIDebugDrawTag::CreateInstance()
 {
 	return new ZEUIDebugDrawTag(); 
 }
-

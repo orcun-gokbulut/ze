@@ -36,21 +36,22 @@
 #include "ZEModelMeshLOD.h"
 
 #include "ZEModel.h"
-#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNFixedMaterial.h"
+#include "ZERenderer/ZERNShaderSlots.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
 
-void ZEModelMeshLOD::SetMaterial(ZERNMaterial* Material)
+void ZEModelMeshLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
 
-ZERNMaterial* ZEModelMeshLOD::GetMaterial()
+ZEHolder<const ZERNMaterial> ZEModelMeshLOD::GetMaterial()
 {
 	return Material;
 }
@@ -81,31 +82,20 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 	Material->SetupMaterial(Context, RenderParameters->Stage);
 
 	//Context->SetIndexBuffer(IndexBuffer);
-	if (RenderParameters->Type == ZERN_DT_SHADOW)
+	//Context->SetVertexBuffer(1, VertexBufferNormals);
+	if (Skinned)
 	{
-		Context->SetVertexBuffers(0, 1, &VertexBuffer);
-		if (Skinned)
-			Context->SetVertexBuffers(1, 1, &VertexBufferSkin);
+		Context->SetVertexBuffers(0, 1, &VertexBufferSkin);
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_SKIN, ConstantBufferSkin);
+		ConstantBuffer->SetData(&Owner->GetWorldTransform());
 	}
 	else
 	{
-		//Context->SetVertexBuffer(1, VertexBufferNormals);
-		if (Skinned)
-		{
-			Context->SetVertexBuffers(0, 1, &VertexBufferSkin);
-			Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_SKIN, ConstantBufferSkin);
-
-			ConstantBuffer->SetData(&Owner->GetWorldTransform());
-		}
-		else
-		{
-			Context->SetVertexBuffers(0, 1, &VertexBuffer);
-			ConstantBuffer->SetData(&OwnerMesh->GetWorldTransform());
-		}
+		Context->SetVertexBuffers(0, 1, &VertexBuffer);
+		ConstantBuffer->SetData(&OwnerMesh->GetWorldTransform());
 	}
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-
 	Context->Draw((ZEUInt)LODResource->VertexCount, 0);
 
 	Material->CleanupMaterial(Context, RenderParameters->Stage);
@@ -118,7 +108,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	this->LODResource = LODResource;
 	DrawStartDistance = LODResource->LODStartDistance;
 	DrawEndDistance = LODResource->LODEndDistance;
-	Material = Model->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId];
+	Material = Model->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId].GetPointer();
 	VertexBuffer = LODResource->VertexBuffer;
 	VertexBufferNormals = LODResource->VertexBufferNormals;
 	VertexBufferSkin = LODResource->VertexBufferSkin;
@@ -139,7 +129,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 
 		ConstantBufferSkin->SetData(&BoneTransforms[0]);
 
-		static_cast<ZERNFixedMaterial*>(Material.GetPointer())->SetSkinningEnabled(Skinned);
+		static_cast<ZERNFixedMaterial*>(const_cast<ZERNMaterial*>(Material.GetPointer()))->SetSkinningEnabled(Skinned);
 	}
 }
 

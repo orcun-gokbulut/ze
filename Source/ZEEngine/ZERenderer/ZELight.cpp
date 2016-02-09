@@ -52,11 +52,16 @@ float ZELight::AttenuationFunction(float RootToTry)
 	return Result;
 }
 
-void ZELight::OnTransformChanged()
+void ZELight::LocalTransformChanged()
 {
-	ZEEntity::OnTransformChanged();
-
+	ZEEntity::LocalTransformChanged();
 	DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
+}
+
+void ZELight::ParentTransformChanged()
+{
+	ZEEntity::ParentTransformChanged();
+		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
 void ZELight::SetRange(float NewValue)
@@ -198,25 +203,6 @@ void ZELight::SetShadowSampleLengthOffset(float ShadowSampleLengthOffset)
 float ZELight::GetShadowSampleLengthOffset() const
 {
 	return ShadowSampleLengthOffset;
-}
-
-void ZELight::SetPosition(const ZEVector3& NewPosition)
-{
-	if (GetPosition() != NewPosition)
-	{
-		ZEEntity::SetPosition(NewPosition);
-		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
-	}
-}
-
-void ZELight::SetRotation(const ZEQuaternion& NewRotation)
-{
-	if (GetRotation() != NewRotation)
-	{
-		ZEEntity::SetRotation(NewRotation);
-
-		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
-	}
 }
 
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)

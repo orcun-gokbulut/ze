@@ -66,7 +66,7 @@ class ZECloud : public ZEEntity
 		float					EarthRadius;
 		float					AtmosphereHeight;
 
-		ZEHolder<ZETexture2DResource>	CloudFormationTexture;
+		ZETexture2DResource*	CloudFormationTexture;
 
 		ZERNCommand				CloudRenderCommand;
 
@@ -74,7 +74,6 @@ class ZECloud : public ZEEntity
 		virtual bool			DeinitializeSelf();
 
 								ZECloud();
-		virtual					~ZECloud();
 
 	public:
 
@@ -121,11 +120,13 @@ class ZECloud : public ZEEntity
 		ZECamera*				GetCamera();
 
 		virtual void			SetCloudFormationTexture(const ZEString& FileName);
-		const ZEString			GetCloudFormationTexture() const;
+		const ZEString&			GetCloudFormationTexture() const;
 
 		virtual ZEDrawFlags		GetDrawFlags() const;
 
 		virtual void			Tick(float Time);
+
+		virtual					~ZECloud();
 
 		static ZECloud*			CreateInstance();
 

@@ -172,9 +172,9 @@ float ZEFoliage::GetMaxScale() const
 
 void ZEFoliage::Tile()
 {
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	for (ZESize I = 0; I < GetChildEntities().GetCount(); I++)
 	{
-		ZEEntity* CurrentChild = ChildEntities[I];
+		ZEEntity* CurrentChild = GetChildEntities()[I];
 		RemoveChildEntity(CurrentChild);
 		CurrentChild->Destroy();
 		I--;
@@ -222,9 +222,9 @@ void ZEFoliage::Realign()
 	ZERayCastParameters Parameters;
 	ZERayCastReport		Report;
 
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	for (ZESize I = 0; I < GetChildEntities().GetCount(); I++)
 	{
-		ZEVector3 OldPosition = ChildEntities[I]->GetWorldPosition();
+		ZEVector3 OldPosition = GetChildEntities()[I]->GetWorldPosition();
 
 		Parameters.MaximumDistance = 10000.0f;
 		Parameters.MinimumDistance = 0.1f;
@@ -234,7 +234,7 @@ void ZEFoliage::Realign()
 
 		Ground->RayCast(Report, Parameters);
 
-		ChildEntities[I]->SetWorldPosition(ZEVector3(OldPosition.x, Report.Position.y, OldPosition.z));
+		GetChildEntities()[I]->SetWorldPosition(ZEVector3(OldPosition.x, Report.Position.y, OldPosition.z));
 	}
 }
 

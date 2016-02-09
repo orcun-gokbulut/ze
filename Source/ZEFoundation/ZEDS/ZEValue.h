@@ -42,7 +42,9 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEMatrixd.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEVectord.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEDS/ZEString.h"
 
@@ -67,18 +69,18 @@ enum ZEValueType
 	ZE_VRT_STRING,
 	ZE_VRT_QUATERNION,
 	ZE_VRT_VECTOR2,
+	ZE_VRT_VECTOR2D,
 	ZE_VRT_VECTOR3,
+	ZE_VRT_VECTOR3D,
 	ZE_VRT_VECTOR4,
+	ZE_VRT_VECTOR4D,
 	ZE_VRT_MATRIX3X3,
+	ZE_VRT_MATRIX3X3D,
 	ZE_VRT_MATRIX4X4,
+	ZE_VRT_MATRIX4X4D,
 	ZE_VRT_CLASS
 };
 
-class ZEMatrix4x4;
-class ZEMatrix4x4;
-class ZEVector2;
-class ZEVector3;
-class ZEVector4;
 class ZEObject;
 
 class ZEValue
@@ -102,8 +104,15 @@ class ZEValue
 					float		A, B, C, D;
 				} Vectors;
 
+				struct
+				{
+					double		A, B, C, D;
+				} DoubleVectors;
+
 				ZEMatrix3x3*	Matrix3x3;
+				ZEMatrix3x3d*	Matrix3x3d;
 				ZEMatrix4x4*	Matrix4x4;
+				ZEMatrix4x4d*	Matrix4x4d;
 			};
 			ZEString			String;
 		};
@@ -124,7 +133,9 @@ class ZEValue
 		bool					IsUnsignedInteger() const;
 		bool					IsSignedInteger() const;
 		bool					IsVector() const;
+		bool					IsVectord() const;
 		bool					IsMatrix() const;
+		bool					IsMatrixd() const;
 
 		ZEInt64					GetIntegerRangeMin() const;
 		ZEUInt64				GetIntegerRangeMax() const;
@@ -143,11 +154,16 @@ class ZEValue
 		void					SetDouble(double Value);
 		void					SetBoolean(bool Value);
 		void					SetVector2(const ZEVector2& Value);
+		void					SetVector2d(const ZEVector2d& Value);
 		void					SetVector3(const ZEVector3& Value);
+		void					SetVector3d(const ZEVector3d& Value);
 		void					SetVector4(const ZEVector4& Value);
+		void					SetVector4d(const ZEVector4d& Value);
 		void					SetQuaternion(const ZEQuaternion& Value);
 		void					SetMatrix3x3(const ZEMatrix3x3& Value);
+		void					SetMatrix3x3d(const ZEMatrix3x3d& Value);
 		void					SetMatrix4x4(const ZEMatrix4x4& Value);
+		void					SetMatrix4x4d(const ZEMatrix4x4d& Value);
 		void					SetClass(ZEObject* Value);
 		void					SetNull();
 		void					SetValue(const ZEValue& Value);
@@ -165,11 +181,16 @@ class ZEValue
 		double					GetDouble() const;
 		bool					GetBoolean() const;
 		const ZEVector2&		GetVector2() const;
+		const ZEVector2d&		GetVector2d() const;
 		const ZEVector3&		GetVector3() const;
+		const ZEVector3d&		GetVector3d() const;
 		const ZEVector4&		GetVector4() const;
+		const ZEVector4d&		GetVector4d() const;
 		const ZEQuaternion&		GetQuaternion() const;
 		const ZEMatrix3x3&		GetMatrix3x3() const;
+		const ZEMatrix3x3d&		GetMatrix3x3d() const;
 		const ZEMatrix4x4&		GetMatrix4x4() const;
+		const ZEMatrix4x4d&		GetMatrix4x4d() const;
 		ZEObject*				GetClass() const;
 		
 		bool					IsNull() const;
@@ -195,11 +216,16 @@ class ZEValue
 		ZEValue&				operator=(double Value);
 		ZEValue&				operator=(bool Value);
 		ZEValue&				operator=(const ZEVector2& Value);
+		ZEValue&				operator=(const ZEVector2d& Value);
 		ZEValue&				operator=(const ZEVector3& Value);
+		ZEValue&				operator=(const ZEVector3d& Value);
 		ZEValue&				operator=(const ZEVector4& Value);
+		ZEValue&				operator=(const ZEVector4d& Value);
 		ZEValue&				operator=(const ZEQuaternion& Value);
 		ZEValue&				operator=(const ZEMatrix3x3& Value);
+		ZEValue&				operator=(const ZEMatrix3x3d& Value);
 		ZEValue&				operator=(const ZEMatrix4x4& Value);
+		ZEValue&				operator=(const ZEMatrix4x4d& Value);
 		ZEValue&				operator=(ZEObject* Value);
 
 								operator const char*();
@@ -216,11 +242,16 @@ class ZEValue
 								operator double();
 								operator bool();
 								operator ZEVector2();
+								operator ZEVector2d();
 								operator ZEVector3();
+								operator ZEVector3d();
 								operator ZEVector4();
+								operator ZEVector4d();
 								operator ZEQuaternion();
 								operator ZEMatrix3x3();
+								operator ZEMatrix3x3d();
 								operator ZEMatrix4x4();
+								operator ZEMatrix4x4d();
 								operator ZEObject*();
 
 								ZEValue();
@@ -239,11 +270,16 @@ class ZEValue
 								ZEValue(double Value);
 								ZEValue(bool Value);
 								ZEValue(const ZEVector2& Value);
+								ZEValue(const ZEVector2d& Value);
 								ZEValue(const ZEVector3& Value);
+								ZEValue(const ZEVector3d& Value);
 								ZEValue(const ZEVector4& Value);
+								ZEValue(const ZEVector4d& Value);
 								ZEValue(const ZEQuaternion& Quaternion);
 								ZEValue(const ZEMatrix3x3& Value);
+								ZEValue(const ZEMatrix3x3d& Value);
 								ZEValue(const ZEMatrix4x4& Value);
+								ZEValue(const ZEMatrix4x4d& Value);
 								ZEValue(ZEObject* Value);
 								~ZEValue();
 };

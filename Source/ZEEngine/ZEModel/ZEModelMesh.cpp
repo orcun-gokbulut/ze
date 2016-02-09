@@ -34,18 +34,63 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelMesh.h"
-#include "ZEModel.h"
-#include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEPhysics/ZEPhysicalCloth.h"
+
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEMath.h"
-#include "ZERenderer/ZERNView.h"
 #include "ZEMath/ZEViewVolume.h"
-#include "ZERenderer/ZERNCuller.h"
+
+#include "ZEModel.h"
 #include "ZEModelMeshLOD.h"
+#include "ZEGame/ZEScene.h"
+#include "ZERenderer/ZERNView.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNMaterial.h"
+#include "ZEPhysics/ZEPhysicalCloth.h"
+
+#define ZEMD_MDF_LOCAL_TRANSFORM			0x0001
+#define ZEMD_MDF_INV_LOCAL_TRANSFORM		0x0002
+#define ZEMD_MDF_MODEL_TRANSFORM			0x0004
+#define ZEMD_MDF_INV_MODEL_TRANSFORM		0x0008
+#define ZEMD_MDF_WORLD_TRANSFORM			0x0010
+#define ZEMD_MDF_INV_WORLD_TRANSFORM		0x0020
+#define ZEMD_MDF_MODEL_BOUNDING_BOX			0x0040
+#define ZEMD_MDF_WORLD_BOUNDING_BOX			0x0080
+
+void ZEModelMesh::LocalTransformChanged()
+{
+	DirtyFlags.RaiseFlags(
+		ZEMD_MDF_LOCAL_TRANSFORM | ZEMD_MDF_INV_LOCAL_TRANSFORM |
+		ZEMD_MDF_MODEL_TRANSFORM | ZEMD_MDF_INV_MODEL_TRANSFORM |
+		ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_INV_WORLD_TRANSFORM |
+		ZEMD_MDF_MODEL_BOUNDING_BOX |
+		ZEMD_MDF_WORLD_BOUNDING_BOX);
+
+	for (ZESize I = 0; I < ChildMeshes.GetCount(); I++)
+		ChildMeshes[I]->ParentTransformChanged();
+
+	if (Owner != NULL)
+		Owner->ChildBoundingBoxChanged();
+}
+
+void ZEModelMesh::ParentTransformChanged()
+{
+	if (PhysicalBody != NULL)
+	{
+		PhysicalBody->SetPosition(Owner->GetWorldPosition());
+		PhysicalBody->SetRotation(Owner->GetWorldRotation());
+	}
+
+	DirtyFlags.RaiseFlags(
+		ZEMD_MDF_MODEL_TRANSFORM | ZEMD_MDF_INV_MODEL_TRANSFORM |
+		ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_INV_WORLD_TRANSFORM |
+		ZEMD_MDF_MODEL_BOUNDING_BOX |
+		ZEMD_MDF_WORLD_BOUNDING_BOX);
+
+	for (ZESize I = 0; I < ChildMeshes.GetCount(); I++)
+		ChildMeshes[I]->ParentTransformChanged();
+}
 
 void ZEModelMesh::SetActiveLOD(ZEUInt LOD)
 {
@@ -115,53 +160,74 @@ const ZEAABBox& ZEModelMesh::GetLocalBoundingBox() const
 
 const ZEAABBox& ZEModelMesh::GetModelBoundingBox() const
 {
-	ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+	if (DirtyFlags.GetFlags(ZEMD_MDF_MODEL_BOUNDING_BOX))
+	{
+		ZEAABBox::Transform(ModelBoundingBox, LocalBoundingBox, GetModelTransform());
+		DirtyFlags.UnraiseFlags(ZEMD_MDF_MODEL_BOUNDING_BOX);
+	}
 
 	return ModelBoundingBox;
 }
 
 const ZEAABBox& ZEModelMesh::GetWorldBoundingBox() const
 {
-	ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
+	if (DirtyFlags.GetFlags(ZEMD_MDF_WORLD_BOUNDING_BOX))
+	{
+		ZEAABBox::Transform(WorldBoundingBox, LocalBoundingBox, GetWorldTransform());
+		DirtyFlags.UnraiseFlags(ZEMD_MDF_WORLD_BOUNDING_BOX);
+	}
 
 	return WorldBoundingBox;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetLocalTransform() const
 {
-	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
+	if (DirtyFlags.GetFlags(ZEMD_MDF_LOCAL_TRANSFORM))
+	{
+		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
+		DirtyFlags.UnraiseFlags(ZEMD_MDF_LOCAL_TRANSFORM);
+	}
 
 	return LocalTransform;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetModelTransform() const
 {
-	if (ParentMesh == NULL)
-		return GetLocalTransform();
-	else
+	if (DirtyFlags.GetFlags(ZEMD_MDF_MODEL_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(ModelTransform, ParentMesh->GetModelTransform(), GetLocalTransform());
-		return ModelTransform;
+		if (ParentMesh == NULL)
+			return GetLocalTransform();
+		else
+			ZEMatrix4x4::Multiply(ModelTransform, ParentMesh->GetModelTransform(), GetLocalTransform());
+
+		DirtyFlags.UnraiseFlags(ZEMD_MDF_MODEL_TRANSFORM);
 	}
+	
+	return ModelTransform;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetWorldTransform() const
 {
-	if (ParentMesh == NULL)
+	if (DirtyFlags.GetFlags(ZEMD_MDF_WORLD_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetLocalTransform());
-		return WorldTransform;
+		if (Owner != NULL)
+			ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetModelTransform());
+		else
+			WorldTransform = GetModelTransform();
+
+		DirtyFlags.UnraiseFlags(ZEMD_MDF_WORLD_TRANSFORM);
 	}
-	else
-	{
-		ZEMatrix4x4::Multiply(WorldTransform, ParentMesh->GetWorldTransform(), GetLocalTransform());
-		return WorldTransform;
-	}
+
+	return WorldTransform;
 }
 
 const ZEMatrix4x4& ZEModelMesh::GetInvWorldTransform() const
 {
-	ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+	if (DirtyFlags.GetFlags(ZEMD_MDF_INV_WORLD_TRANSFORM))
+	{
+		ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
+		DirtyFlags.UnraiseFlags(ZEMD_MDF_INV_WORLD_TRANSFORM);
+	}
 
 	return InvWorldTransform;
 }
@@ -450,9 +516,9 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	Visible = MeshResource->IsVisible;
 	LocalBoundingBox = MeshResource->BoundingBox;
 	PhysicsEnabled = false;
+	LocalTransformChanged();
 
 	ZEArray<ZEPhysicalShape*> ShapeList;
-
 	if(PhysicalBody == NULL)
 	{
 		if (MeshResource->PhysicalBody.Type == ZE_MRPBT_RIGID)
@@ -556,8 +622,6 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	for (ZESize I = 0; I < ShapeList.GetCount(); I++)
 		delete ShapeList[I];
 	ShapeList.Clear();
-
-
 }
 
 void ZEModelMesh::Deinitialize()
@@ -573,15 +637,6 @@ void ZEModelMesh::Deinitialize()
 
 	ChildMeshes.Clear();
 	LODs.Clear();
-}
-
-void ZEModelMesh::OnTransformChanged()
-{
-	if (PhysicalBody != NULL)
-	{
-		PhysicalBody->SetPosition(Owner->GetWorldPosition());
-		PhysicalBody->SetRotation(Owner->GetWorldRotation());
-	}
 }
 
 
@@ -720,7 +775,6 @@ bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	return false;
 }
 
-
 ZEModelMesh::ZEModelMesh()
 {
 	Owner = NULL;
@@ -735,6 +789,7 @@ ZEModelMesh::ZEModelMesh()
 	AnimationType = ZE_MAT_NOANIMATION;
 	DrawOrderIsUserDefined = false;
 	UserDefinedDrawOrder = 0;
+	LocalTransformChanged();
 }
 
 ZEModelMesh::~ZEModelMesh()

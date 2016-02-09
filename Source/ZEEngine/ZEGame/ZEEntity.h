@@ -68,15 +68,6 @@ typedef ZEFlags ZEDrawFlags;
 #define ZE_DF_CULL_COMPONENTS					32
 #define ZE_DF_AUTO								64
 
-// Entity Dirty Flags
-typedef ZEFlags ZEEntityDirtyFlags;
-#define ZE_EDF_NONE								0
-#define ZE_EDF_LOCAL_TRANSFORM					1
-#define ZE_EDF_WORLD_TRANSFORM					2
-#define ZE_EDF_WORLD_BOUNDING_BOX				4
-#define ZE_EDF_INV_WORLD_TRANSFORM				8
-#define ZE_EDF_ALL								0xFFFFFFFF
-
 ZE_ENUM(ZEEntityState)
 {
 	ZE_ES_NOT_INITIALIZED				= 0,
@@ -91,7 +82,6 @@ class ZEMLReaderNode;
 
 class ZEEntity : public ZEObject
 {
-
 	friend class ZEScene;
 	friend class ZESceneCuller;
 	friend class ZEDebugDrawer;
@@ -103,42 +93,39 @@ class ZEEntity : public ZEObject
 		ZEScene*								OwnerScene;
 
 		ZEString								Name;
+		ZEEntityState							State;
 		ZEInt									EntityId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
-
-		ZEEntityState							State;
-
 		bool									Enabled;
 		bool									Visible;
 
-		mutable ZEEntityDirtyFlags				EntityDirtyFlags;
-
+		mutable ZEFlags							EntityDirtyFlags;
 		mutable ZEMatrix4x4						Transform;
+		mutable ZEMatrix4x4						InvTransform;
 		mutable ZEMatrix4x4						WorldTransform;
 		mutable ZEMatrix4x4						InvWorldTransform;
-
 		mutable ZEAABBox						BoundingBox;
 		mutable ZEAABBox						WorldBoundingBox;
 		
-	protected:
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
-		virtual void							OnTransformChanged();
-
-		bool									AddComponent(ZEEntity* Entity); 
-		void									RemoveComponent(ZEEntity* Entity);
-		const ZEArray<ZEEntity*>&				GetComponents() const;
-
+	protected:
 		virtual bool							SetOwner(ZEEntity* Owner);
 		void									SetOwnerScene(ZEScene* Scene);
 
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
 
-		void									SetBoundingBox(const ZEAABBox& BoundingBox) const;
+		bool									AddComponent(ZEEntity* Entity); 
+		void									RemoveComponent(ZEEntity* Entity);
+		const ZEArray<ZEEntity*>&				GetComponents() const;
+
+		virtual void							LocalTransformChanged();
+		virtual void							ParentTransformChanged();
+		virtual void							BoundingBoxChanged();
 
 												ZEEntity();
 		virtual									~ZEEntity();
@@ -159,7 +146,7 @@ class ZEEntity : public ZEObject
 		bool									AddChildEntity(ZEEntity* Entity);
 		void									RemoveChildEntity(ZEEntity* Entity);
 
-		virtual void							SetBoundingBox(const ZEAABBox& BoundingBox);
+		void									SetBoundingBox(const ZEAABBox& BoundingBox);
 		virtual const ZEAABBox&					GetBoundingBox() const;
 		virtual const ZEAABBox&					GetWorldBoundingBox() const;
 

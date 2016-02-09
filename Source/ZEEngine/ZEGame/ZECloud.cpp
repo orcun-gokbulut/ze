@@ -193,9 +193,9 @@ void ZECloud::SetCloudFormationTexture(const ZEString& FileName)
 	CloudFormationTexture = ZETexture2DResource::LoadResource(FileName, &TextureOption);
 }
 
-const ZEString ZECloud::GetCloudFormationTexture() const
+const ZEString& ZECloud::GetCloudFormationTexture() const
 {
-	return CloudFormationTexture.IsNull() ? "" : CloudFormationTexture->GetFileName();
+	return CloudFormationTexture == NULL ? ZEString::Empty : CloudFormationTexture->GetFileName();
 }
 
 ZEDrawFlags ZECloud::GetDrawFlags() const
@@ -229,22 +229,22 @@ ZECloud* ZECloud::CreateInstance()
 
 ZECloud::ZECloud()
 {
-	Camera					= NULL;
-	G						= 0.7f;
-	LightScale				= 8.0f;
-	AmbientScale			= 0.1f;
-	EarthRadius				= 21600000.0f;
-	AtmosphereHeight		= 30000.0f;
-	CloudCover				= 0.3f;
-	CloudPlaneHeight		= 600.0f;
-	WindVelocity			= ZEVector2(0.005f, 0.005f);
-	SunLightDirection		= ZEVector3(0.0f, -1.0f, 0.0f);
-	AmbientColor			= ZEVector3(0.3f, 0.35f, 0.4f);
-	SunLightColor			= ZEVector3(1.2f, 1.2f,  1.2f);
-	Rayleigh				= ZEVector3(0.3f, 0.45f, 6.5f);
-	Mie						= ZEVector3(0.3f, 0.3f,  0.3f);
+	Camera = NULL;
+	G = 0.7f;
+	LightScale = 8.0f;
+	AmbientScale = 0.1f;
+	EarthRadius = 21600000.0f;
+	AtmosphereHeight = 30000.0f;
+	CloudCover = 0.3f;
+	CloudPlaneHeight = 600.0f;
+	WindVelocity = ZEVector2(0.005f, 0.005f);
+	SunLightDirection = ZEVector3(0.0f, -1.0f, 0.0f);
+	AmbientColor = ZEVector3(0.3f, 0.35f, 0.4f);
+	SunLightColor = ZEVector3(1.2f, 1.2f,  1.2f);
+	Rayleigh = ZEVector3(0.3f, 0.45f, 6.5f);
+	Mie = ZEVector3(0.3f, 0.3f,  0.3f);
 	
-	CloudFormationTexture	= NULL;
+	CloudFormationTexture = NULL;
 
 }
 

@@ -48,11 +48,16 @@
 
 
 class ZEVector2;
+class ZEVector2d;
 class ZEVector3;
+class ZEVector3d;
 class ZEVector4;
+class ZEVector4d;
 class ZEQuaternion;
 class ZEMatrix3x3;
+class ZEMatrix3x3d;
 class ZEMatrix4x4;
+class ZEMatrix4x4d;
 class ZEObject;
 class ZEString;
 
@@ -110,17 +115,27 @@ class ZEReference
 
 		void							SetVector2Ref(ZEVector2& Reference);
 		void							SetVector2ConstRef(const ZEVector2& Reference);
+		void							SetVector2dRef(ZEVector2d& Reference);
+		void							SetVector2dConstRef(const ZEVector2d& Reference);
 		void							SetVector3Ref(ZEVector3& Reference);
 		void							SetVector3ConstRef(const ZEVector3& Reference);
+		void							SetVector3dRef(ZEVector3d& Reference);
+		void							SetVector3dConstRef(const ZEVector3d& Reference);
 		void							SetVector4Ref(ZEVector4& Reference);
 		void							SetVector4ConstRef(const ZEVector4& Reference);
+		void							SetVector4dRef(ZEVector4d& Reference);
+		void							SetVector4dConstRef(const ZEVector4d& Reference);
 		void							SetQuaternionRef(ZEQuaternion& Reference);
 		void							SetQuaternionConstRef(const ZEQuaternion& Reference);
 
 		void							SetMatrix3x3Ref(ZEMatrix3x3& Reference);
 		void							SetMatrix3x3ConstRef(const ZEMatrix3x3& Reference);
+		void							SetMatrix3x3dRef(ZEMatrix3x3d& Reference);
+		void							SetMatrix3x3dConstRef(const ZEMatrix3x3d& Reference);
 		void							SetMatrix4x4Ref(ZEMatrix4x4& Reference);
 		void							SetMatrix4x4ConstRef(const ZEMatrix4x4& Reference);
+		void							SetMatrix4x4dRef(ZEMatrix4x4d& Reference);
+		void							SetMatrix4x4dConstRef(const ZEMatrix4x4d& Reference);
 
 		void							SetStringRef(ZEString& Value);
 		void							SetStringConstRef(const ZEString& Value);
@@ -169,17 +184,27 @@ class ZEReference
 
 		ZEVector2&						GetVector2Ref() const;
 		const ZEVector2&				GetVector2ConstRef() const;
+		ZEVector2d&						GetVector2dRef() const;
+		const ZEVector2d&				GetVector2dConstRef() const;
 		ZEVector3&						GetVector3Ref() const;
 		const ZEVector3&				GetVector3ConstRef() const;
+		ZEVector3d&						GetVector3dRef() const;
+		const ZEVector3d&				GetVector3dConstRef() const;
 		ZEVector4&						GetVector4Ref() const;
 		const ZEVector4&				GetVector4ConstRef() const;
+		ZEVector4d&						GetVector4dRef() const;
+		const ZEVector4d&				GetVector4dConstRef() const;
 		ZEQuaternion&					GetQuaternionRef() const;
 		const ZEQuaternion&				GetQuaternionConstRef() const;
 
 		ZEMatrix3x3&					GetMatrix3x3Ref() const;
 		const ZEMatrix3x3&				GetMatrix3x3ConstRef() const;
+		ZEMatrix3x3d&					GetMatrix3x3dRef() const;
+		const ZEMatrix3x3d&				GetMatrix3x3dConstRef() const;
 		ZEMatrix4x4&					GetMatrix4x4Ref() const;
 		const ZEMatrix4x4&				GetMatrix4x4ConstRef() const;
+		ZEMatrix4x4d&					GetMatrix4x4dRef() const;
+		const ZEMatrix4x4d&				GetMatrix4x4dConstRef() const;
 
 		ZEString&						GetStringRef() const;
 		const ZEString&					GetStringConstRef() const;
@@ -216,11 +241,16 @@ class ZEReference
 		ZEReference&					operator=(double& Value);
 		ZEReference&					operator=(bool& Value);
 		ZEReference&					operator=(ZEVector2& Value);
+		ZEReference&					operator=(ZEVector2d& Value);
 		ZEReference&					operator=(ZEVector3& Value);
+		ZEReference&					operator=(ZEVector3d& Value);
 		ZEReference&					operator=(ZEVector4& Value);
+		ZEReference&					operator=(ZEVector4d& Value);
 		ZEReference&					operator=(ZEQuaternion& Value);
 		ZEReference&					operator=(ZEMatrix3x3& Value);
+		ZEReference&					operator=(ZEMatrix3x3d& Value);
 		ZEReference&					operator=(ZEMatrix4x4& Value);
+		ZEReference&					operator=(ZEMatrix4x4d& Value);
 		ZEReference&					operator=(ZEObject*& Value);
 		ZEReference&					operator=(ZEString& Value);
 
@@ -236,11 +266,16 @@ class ZEReference
 		ZEReference&					operator=(const double& Value);
 		ZEReference&					operator=(const bool& Value);
 		ZEReference&					operator=(const ZEVector2& Value);
+		ZEReference&					operator=(const ZEVector2d& Value);
 		ZEReference&					operator=(const ZEVector3& Value);
+		ZEReference&					operator=(const ZEVector3d& Value);
 		ZEReference&					operator=(const ZEVector4& Value);
+		ZEReference&					operator=(const ZEVector4d& Value);
 		ZEReference&					operator=(const ZEQuaternion& Value);
 		ZEReference&					operator=(const ZEMatrix3x3& Value);
+		ZEReference&					operator=(const ZEMatrix3x3d& Value);
 		ZEReference&					operator=(const ZEMatrix4x4& Value);
+		ZEReference&					operator=(const ZEMatrix4x4d& Value);
 		ZEReference&					operator=(const ZEObject*& Value);
 		ZEReference&					operator=(const ZEString& Value);
 
@@ -256,11 +291,16 @@ class ZEReference
 										operator double&();
 										operator bool&();
 										operator ZEVector2&();
+										operator ZEVector2d&();
 										operator ZEVector3&();
+										operator ZEVector3d&();
 										operator ZEVector4&();
+										operator ZEVector4d&();
 										operator ZEQuaternion&();
 										operator ZEMatrix3x3&();
+										operator ZEMatrix3x3d&();
 										operator ZEMatrix4x4&();
+										operator ZEMatrix4x4d&();
 										operator ZEObject*&();
 
 										operator const ZEInt8&();
@@ -275,11 +315,16 @@ class ZEReference
 										operator const double&();
 										operator const bool&();
 										operator const ZEVector2&();
+										operator const ZEVector2d&();
 										operator const ZEVector3&();
+										operator const ZEVector3d&();
 										operator const ZEVector4&();
+										operator const ZEVector4d&();
 										operator const ZEQuaternion&();
 										operator const ZEMatrix3x3&();
+										operator const ZEMatrix3x3d&();
 										operator const ZEMatrix4x4&();
+										operator const ZEMatrix4x4d&();
 										operator ZEObject* const&();
 
 										ZEReference();
@@ -297,11 +342,16 @@ class ZEReference
 										ZEReference(double& Value);
 										ZEReference(bool& Value);
 										ZEReference(ZEVector2& Value);
+										ZEReference(ZEVector2d& Value);
 										ZEReference(ZEVector3& Value);
+										ZEReference(ZEVector3d& Value);
 										ZEReference(ZEVector4& Value);
+										ZEReference(ZEVector4d& Value);
 										ZEReference(ZEQuaternion& Value);
 										ZEReference(ZEMatrix3x3& Value);
+										ZEReference(ZEMatrix3x3d& Value);
 										ZEReference(ZEMatrix4x4& Value);
+										ZEReference(ZEMatrix4x4d& Value);
 										ZEReference(ZEObject*& Value);
 										ZEReference(ZEString& Value);
 
@@ -317,11 +367,16 @@ class ZEReference
 										ZEReference(const double& Value);
 										ZEReference(const bool& Value);
 										ZEReference(const ZEVector2& Value);
+										ZEReference(const ZEVector2d& Value);
 										ZEReference(const ZEVector3& Value);
+										ZEReference(const ZEVector3d& Value);
 										ZEReference(const ZEVector4& Value);
+										ZEReference(const ZEVector4d& Value);
 										ZEReference(const ZEQuaternion& Value);
 										ZEReference(const ZEMatrix3x3& Value);
+										ZEReference(const ZEMatrix3x3d& Value);
 										ZEReference(const ZEMatrix4x4& Value);
+										ZEReference(const ZEMatrix4x4d& Value);
 										ZEReference(const ZEObject*& Value);
 										ZEReference(const ZEString& Value);
 

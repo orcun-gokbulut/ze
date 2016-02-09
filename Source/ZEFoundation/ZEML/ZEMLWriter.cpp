@@ -131,7 +131,17 @@ bool ZEMLWriterNode::WriteVector2(const char* Name, const ZEVector2& Value)
 	return WriteValue(Name, ZEValue(Value));
 }
 
+bool ZEMLWriterNode::WriteVector2d(const char* Name, const ZEVector2d& Value)
+{
+	return WriteValue(Name, ZEValue(Value));
+}
+
 bool ZEMLWriterNode::WriteVector3(const char* Name, const ZEVector3& Value)
+{
+	return WriteValue(Name, ZEValue(Value));
+}
+
+bool ZEMLWriterNode::WriteVector3d(const char* Name, const ZEVector3d& Value)
 {
 	return WriteValue(Name, ZEValue(Value));
 }
@@ -141,12 +151,27 @@ bool ZEMLWriterNode::WriteVector4(const char* Name, const ZEVector4& Value)
 	return WriteValue(Name, ZEValue(Value));
 }
 
+bool ZEMLWriterNode::WriteVector4d(const char* Name, const ZEVector4d& Value)
+{
+	return WriteValue(Name, ZEValue(Value));
+}
+
 bool ZEMLWriterNode::WriteMatrix3x3(const char* Name, const ZEMatrix3x3& Value)
 {
 	return WriteValue(Name, ZEValue(Value));
 }
 
+bool ZEMLWriterNode::WriteMatrix3x3d(const char* Name, const ZEMatrix3x3d& Value)
+{
+	return WriteValue(Name, ZEValue(Value));
+}
+
 bool ZEMLWriterNode::WriteMatrix4x4(const char* Name, const ZEMatrix4x4& Value)
+{
+	return WriteValue(Name, ZEValue(Value));
+}
+
+bool ZEMLWriterNode::WriteMatrix4x4d(const char* Name, const ZEMatrix4x4d& Value)
 {
 	return WriteValue(Name, ZEValue(Value));
 }
@@ -209,6 +234,11 @@ bool ZEMLWriterNode::CloseNode()
 		Parent->SubNodeIsOpen = false;
 
 	return true;
+}
+
+const ZEFile* ZEMLWriterNode::GetFile() const
+{
+	return File;
 }
 
 ZEMLWriterNode::ZEMLWriterNode()
