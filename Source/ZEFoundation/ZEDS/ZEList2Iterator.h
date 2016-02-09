@@ -187,7 +187,7 @@ ZEItemType& ZEList2IteratorConst<ZEItemType>::GetItem() const
 template<typename ZEItemType>
 ZEItemType* ZEList2IteratorConst<ZEItemType>::GetPointer() const
 {
-	return Link->GetPointer();
+	return Link->GetItem();
 }
 
 template<typename ZEItemType>

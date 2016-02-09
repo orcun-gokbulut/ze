@@ -57,9 +57,10 @@
 		ClassName& operator=(const ClassName&);
 
 #define ZE_COPY_NO_ACTION(ClassName) \
-	private: \
+	public: \
 		ClassName(const ClassName&); \
-		ClassName& operator=(const ClassName&);
+		ClassName& operator=(const ClassName&); \
+	private:
 
 #define ZE_COPY_NO_ACTION_IMP(ClassName) \
 	ClassName::ClassName(const ClassName&) {new (this) ClassName();} \
