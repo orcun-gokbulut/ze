@@ -44,10 +44,10 @@ void ZERNIntersections_RaySphere1(float3 RayOrigin, float3 RayDirection, float3 
 	float2 C = dot(RayOrigin_SphereCenter, RayOrigin_SphereCenter) - SphereRadius * SphereRadius;
 	
 	float2 Discriminant = B * B - 4.0f * A * C;
-	float2 SquareRootDiscriminant = sqrt(Discriminant);
+	float2 SquareRootDiscriminant = sqrt(Discriminant);	
+	float2 RealRootMask = (Discriminant >= 0.0f);
 	
-	if(Discriminant.x >= 0.0f)
-		StartEndDistance = (-B + float2(-1.0f, 1.0f) * SquareRootDiscriminant) / (2.0f * A);
+	StartEndDistance = RealRootMask * ((-B + float2(-1.0f, 1.0f) * SquareRootDiscriminant) / (2.0f * A));
 }
 
 void ZERNIntersections_RaySphere2(float3 RayOrigin, float3 RayDirection, float3 SphereCenter, float2 SphereRadius, out float4 StartEndDistance)

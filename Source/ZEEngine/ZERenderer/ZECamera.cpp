@@ -111,7 +111,7 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 		switch (View.ProjectionType)
 		{
 			case ZERN_PT_PERSPECTIVE:
-				ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
+				ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, GetVerticalFOV(), GetAspectRatio(), View.NearZ, View.FarZ);
 				break;
 
 			case ZERN_PT_PERSPECTIVE_OFFCENTER:
@@ -134,7 +134,6 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 		}
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_PROJECTION_TRANSFORM);
-		CameraDirtyFlags.RaiseFlags(ZE_CDF_INV_PROJECTION_TRANSFORM | ZE_CDF_INV_VIEW_PROJECTION_TRANSFORM | ZE_CDF_VIEW_PROJECTION_TRANSFORM);
 	}
 
 	return View.ProjectionTransform;
@@ -240,6 +239,8 @@ void ZECamera::SetVerticalFOV(float FOV)
 		return;
 
 	View.VerticalFOV = FOV;
+	View.VerticalFOVTop = FOV * 0.5f;
+	View.VerticalFOVBottom = FOV * 0.5f;
 	ProjectionTransformChanged();
 }
 
@@ -264,6 +265,9 @@ bool ZECamera::GetAutoAspectRatio() const
 
 void ZECamera::SetAspectRatio(float AspectRatio)
 {
+	if(View.AspectRatio == AspectRatio)
+		return;
+
 	View.AspectRatio = AspectRatio;
 	ProjectionTransformChanged();
 }
@@ -465,15 +469,17 @@ ZECamera::ZECamera()
 	View.Type = ZERN_VT_CAMERA;
 	View.Entity = this;
 	View.FarZ = 1000.0f;
-	View.NearZ = 0.1f;
+	View.NearZ = 1.0f;
 	View.AspectRatio = 1.0f;
 	View.Viewport = &Viewport;
 	View.ViewVolume = &ViewFrustum;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
-	SetVerticalFOV(ZE_PI_4);
-	AutoAspectRatio = true;
 	View.ShadowDistance = 100.0f;
 	View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
+
+	SetVerticalFOV(ZE_PI_4);
+	AutoAspectRatio = true;
+
 	ProjectionTransformChanged();
 }
 
