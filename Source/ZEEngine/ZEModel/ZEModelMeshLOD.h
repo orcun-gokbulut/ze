@@ -71,7 +71,7 @@ class ZEModelMeshLOD
 		bool								IsSkinned();
 
 		void								SetMaterial(ZEHolder<const ZERNMaterial> Material);
-		ZEHolder<const ZERNMaterial>		GetMaterial();
+		ZEHolder<const ZERNMaterial>		GetMaterial() const;
 
 		const ZEModelResourceMeshLOD*		GetLODResource();
 

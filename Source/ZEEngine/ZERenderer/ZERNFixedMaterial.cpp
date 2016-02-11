@@ -61,7 +61,7 @@
 #define ZERN_FMDF_RENDER_STATE			2
 #define ZERN_FMDF_SHADERS				4
 
-void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options)
+void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const
 {
 	if (AlphaCullEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
@@ -94,7 +94,7 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 
 }
 
-bool ZERNFixedMaterial::UpdateShaders()
+bool ZERNFixedMaterial::UpdateShaders() const
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_SHADERS))
 		return true;
@@ -132,7 +132,7 @@ bool ZERNFixedMaterial::UpdateShaders()
 	return true;
 }
 
-bool ZERNFixedMaterial::UpdateRenderState()
+bool ZERNFixedMaterial::UpdateRenderState() const
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_RENDER_STATE))
 		return true;
@@ -169,7 +169,7 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	return true;
 }
 
-bool ZERNFixedMaterial::UpdateConstantBuffer()
+bool ZERNFixedMaterial::UpdateConstantBuffer() const
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_CONSTANT_BUFFER))
 		return true;
@@ -188,7 +188,7 @@ bool ZERNFixedMaterial::UpdateConstantBuffer()
 	return true;
 }
 
-bool ZERNFixedMaterial::Update()
+bool ZERNFixedMaterial::Update() const
 {
 	if (!IsInitialized())
 		return false;
@@ -1140,7 +1140,7 @@ void ZERNFixedMaterial::Tick(float ElapsedTime)
 
 }
 
-bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
 	if (!Update())
 		return false;
@@ -1224,7 +1224,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	return true;
 }
 
-void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);

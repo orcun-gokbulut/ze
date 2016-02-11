@@ -127,7 +127,7 @@ bool ZERNStageAO::UpdateConstantBuffers()
 		return true;
 
 	ConstantBuffer->SetData(&Constants);
-	BilateralConstantBuffer->SetData(&BilateralConstants);
+	FilterConstantBuffer->SetData(&FilterConstants);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_CONSTANT_BUFFER);
 
@@ -160,8 +160,8 @@ bool ZERNStageAO::UpdateShaders()
 	BlendPixelShader = ZEGRShader::Compile(Options);
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNSSAO_Bilateral_PixelShader";
-	BilateralPixelShader = ZEGRShader::Compile(Options);
+	Options.EntryPoint = "ZERNSSAO_Filter_PixelShader";
+	FilterPixelShader = ZEGRShader::Compile(Options);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_SHADER);
 	DirtyFlags.RaiseFlags(ZERN_AODF_RENDER_STATE);
@@ -210,10 +210,10 @@ bool ZERNStageAO::UpdateRenderStates()
 	RenderState.SetBlendState(BlendState);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, BilateralPixelShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, FilterPixelShader);
 
-	BilateralRenderStateData = RenderState.Compile();
-	zeCheckError(BilateralRenderStateData == NULL, false, "Cannot set render state.");
+	FilterRenderStateData = RenderState.Compile();
+	zeCheckError(FilterRenderStateData == NULL, false, "Cannot set render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_RENDER_STATE);
 
@@ -267,33 +267,49 @@ void ZERNStageAO::GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Cont
 
 void ZERNStageAO::ApplyBlur(ZEGRContext* Context)
 {
-	const ZEGRRenderTarget* RenderTarget = BlurTexture->GetRenderTarget();
+	const ZEGRRenderTarget* BlurRenderTarget = BlurTexture->GetRenderTarget();
+	const ZEGRRenderTarget* OcclusionRenderTarget = OcclusionMap->GetRenderTarget();
 
-	Context->SetRenderState(BilateralRenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetRenderState(FilterRenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointClamp.GetPointer());
 	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerLinearClamp.GetPointer());
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
 	Context->SetVertexBuffers(0, 0, NULL);
 
-	SetBilateralKernelValues(&HorizontalValues[0], (ZEUInt)HorizontalValues.GetCount());
-	BilateralConstantBuffer->SetData(&BilateralConstants);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, BilateralConstantBuffer);
+	Context->SetRenderTargets(1, &BlurRenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
+
+	SetFilterKernelValues(&HorizontalValues[0], (ZEUInt)HorizontalValues.GetCount());
+	FilterConstantBuffer->SetData(&FilterConstants);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
 
 	Context->Draw(3, 0);
 
-
-	RenderTarget = OcclusionMap->GetRenderTarget();
-
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetRenderTargets(1, &OcclusionRenderTarget, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, BlurTexture);
 
-	SetBilateralKernelValues(&VerticalValues[0], (ZEUInt)VerticalValues.GetCount());
-	BilateralConstantBuffer->SetData(&BilateralConstants);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, BilateralConstantBuffer);
+	SetFilterKernelValues(&VerticalValues[0], (ZEUInt)VerticalValues.GetCount());
+	FilterConstantBuffer->SetData(&FilterConstants);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
 
 	Context->Draw(3, 0);
 
+	Context->SetRenderTargets(1, &BlurRenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
+
+	SetFilterKernelValues(&HorizontalValues[0], (ZEUInt)HorizontalValues.GetCount());
+	FilterConstantBuffer->SetData(&FilterConstants);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
+
+	Context->Draw(3, 0);
+
+	Context->SetRenderTargets(1, &OcclusionRenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, BlurTexture);
+
+	SetFilterKernelValues(&VerticalValues[0], (ZEUInt)VerticalValues.GetCount());
+	FilterConstantBuffer->SetData(&FilterConstants);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
+
+	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
@@ -329,13 +345,11 @@ bool ZERNStageAO::InitializeSelf()
 	CreateOffsetVectors();
 	CreateRandomVectors();
 
-	ZERNFilter::GenerateGaussianKernel(HorizontalValues, 11, 0.5f);
-	ZERNFilter::GenerateGaussianKernel(VerticalValues, 11, 0.5f, false);
-
-	BilateralConstants.KernelSize = 11;
+	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 2.0f);
+	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 2.0f, false);
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOConstants));
-	BilateralConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOBilateralConstants));
+	FilterConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOFilterConstants));
 
 	ZEGRSamplerDescription SamplerDescription;
 
@@ -381,9 +395,9 @@ void ZERNStageAO::DeinitializeSelf()
 	BlendRenderStateData.Release();
 	BlendPixelShader.Release();
 	RandomVectorsTexture.Release();
-	BilateralConstantBuffer.Release();
-	BilateralPixelShader.Release();
-	BilateralRenderStateData.Release();
+	FilterConstantBuffer.Release();
+	FilterPixelShader.Release();
+	FilterRenderStateData.Release();
 
 	HorizontalValues.Clear();
 	VerticalValues.Clear();
@@ -450,50 +464,20 @@ float ZERNStageAO::GetIntensity() const
 	return Constants.Intensity;
 }
 
-void ZERNStageAO::SetBilateralDepthThreshold(float DepthThreshold)
+void ZERNStageAO::SetFilterKernelValues(const ZEVector4* Values, ZEUInt KernelSize)
 {
-	if(BilateralConstants.DepthThreshold == DepthThreshold)
+	if(memcmp(FilterConstants.KernelValues, Values, KernelSize * sizeof(ZEVector4)) == 0)
 		return;
 
-	BilateralConstants.DepthThreshold = DepthThreshold;
+	memcpy(FilterConstants.KernelValues, Values, KernelSize * sizeof(ZEVector4));
+	FilterConstants.KernelSize = KernelSize;
 
 	DirtyFlags.RaiseFlags(ZERN_AODF_CONSTANT_BUFFER);
 }
 
-float ZERNStageAO::GetBilateralDepthThreshold() const
+const ZEVector4* ZERNStageAO::GetFilterKernelValues() const
 {
-	return BilateralConstants.DepthThreshold;
-}
-
-void ZERNStageAO::SetBilateralIntensityThreshold(float IntensityThreshold)
-{
-	if(BilateralConstants.IntensityThreshold == IntensityThreshold)
-		return;
-
-	BilateralConstants.IntensityThreshold = IntensityThreshold;
-
-	DirtyFlags.RaiseFlags(ZERN_AODF_CONSTANT_BUFFER);
-}
-
-float ZERNStageAO::GetBilateralIntensityThreshold() const
-{
-	return BilateralConstants.IntensityThreshold;
-}
-
-void ZERNStageAO::SetBilateralKernelValues(const ZEVector4* Values, ZEUInt KernelSize)
-{
-	if(memcmp(BilateralConstants.KernelValues, Values, KernelSize * sizeof(ZEVector4)) == 0)
-		return;
-
-	memcpy(BilateralConstants.KernelValues, Values, KernelSize * sizeof(ZEVector4));
-	BilateralConstants.KernelSize = KernelSize;
-
-	DirtyFlags.RaiseFlags(ZERN_AODF_CONSTANT_BUFFER);
-}
-
-const ZEVector4* ZERNStageAO::GetBilateralKernelValues() const
-{
-	return BilateralConstants.KernelValues;
+	return FilterConstants.KernelValues;
 }
 
 void ZERNStageAO::SetOcclusionMapDownScale(float DownScale)
@@ -531,7 +515,7 @@ bool ZERNStageAO::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZE
 		return false;
 
 	GenerateOcclusionMap(Renderer, Context);
-	//ApplyBlur(Context);
+	ApplyBlur(Context);
 	BlendWithAccumulationBuffer(Renderer, Context);
 
 	return true;
@@ -554,12 +538,10 @@ ZERNStageAO::ZERNStageAO()
 	Width = 0;
 	Height = 0;
 
-	Constants.OcclusionRadius = 0.3f;
+	Constants.OcclusionRadius = 0.25f;
 	Constants.MinDepthBias = 0.1f;
-	Constants.Intensity = 8.0f;
+	Constants.Intensity = 16.0f;
 	Constants.DownScale = 2.0f;
 
-	BilateralConstants.DepthThreshold = 1.0f;
-	BilateralConstants.IntensityThreshold = 0.5f;
-	BilateralConstants.KernelSize = 11;
+	FilterConstants.KernelSize = 9;
 }

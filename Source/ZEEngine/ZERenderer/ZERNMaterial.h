@@ -55,7 +55,7 @@ class ZERNMaterialStage
 										ZERNMaterialStage();
 };
 
-class ZERNMaterial : public ZEGRResource, public ZEInitializable
+class ZERNMaterial : public ZEReferenceCounted, public ZEInitializable
 {
 	private:
 		ZERNMaterialStage				Stages[ZEGR_MAX_RENDERER_STAGE_COUNT];
@@ -75,5 +75,5 @@ class ZERNMaterial : public ZEGRResource, public ZEInitializable
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 
-		virtual bool					Update();
+		virtual bool					Update() const;
 };
