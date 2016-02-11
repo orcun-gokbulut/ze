@@ -109,7 +109,7 @@ class ZEModel : public ZEEntity
 	public:
 		ZEArray<ZEModelIKChain>				IKChains;
 
-		virtual	ZEDrawFlags					GetDrawFlags() const;
+		virtual ZEDrawFlags					GetDrawFlags() const;
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetBoundingBox() const;
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;

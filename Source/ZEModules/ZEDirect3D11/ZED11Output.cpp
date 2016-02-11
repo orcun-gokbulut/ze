@@ -81,21 +81,21 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 	}
 
 	ID3D11RenderTargetView* RenderTargetView;
-	ID3D11Texture2D* OutputTexture;
-	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&OutputTexture);
+	ID3D11Texture2D* BackBuffer;
+	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&BackBuffer);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot get swapchain buffers. Error: %d.", Result);
 		return;
 	}
 
-	Result = GetDevice()->CreateRenderTargetView(OutputTexture, NULL, &RenderTargetView);
+	Result = GetDevice()->CreateRenderTargetView(BackBuffer, NULL, &RenderTargetView);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot create render target view. Error: %d.", Result);
 		return;
 	}
-	ZEGR_RELEASE(OutputTexture);
+	ZEGR_RELEASE(BackBuffer);
 
 	RenderTarget = new ZED11RenderTarget(Width, Height, Format, RenderTargetView);
 

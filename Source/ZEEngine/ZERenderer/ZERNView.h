@@ -80,8 +80,6 @@ struct ZERNView
 
 	// Parameters
 	ZERNProjectionType			ProjectionType;
-	float						Width;
-	float						Height;
 	float						VerticalFOV;
 	float						VerticalFOVTop;
 	float						VerticalFOVBottom;
@@ -101,7 +99,6 @@ struct ZERNView
 	ZEVector3					U, V, N;
 
 	// Others
-	ZEGROutput*					Output;
 	const ZEGRViewport*			Viewport;
 	const ZEViewVolume*			ViewVolume;
 };

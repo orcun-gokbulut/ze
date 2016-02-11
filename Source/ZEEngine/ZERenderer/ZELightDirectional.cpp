@@ -167,7 +167,7 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 		}
 
 		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
-		//Should be in world space
+		//Should be in world space and according to scene bounding-box not for each cascade
 		CascadeVolumes[CascadeIndex].Create(ZEVector3::Zero, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
 	}
 }
@@ -200,7 +200,7 @@ ZEAABBox ZELightDirectional::GetSceneBoundingBoxLight(ZEScene* Scene)
 	
 	ZEVector3 LightDirectionWorld = GetWorldRotation() * ZEVector3::UnitZ;
 	ZEVector3 LightPositionWorld = SceneAABBWorld.GetCenter() + LightDirectionWorld * -SceneAABBWorld.GetLength() * 0.5f;
-	SetPosition(LightPositionWorld);
+	//SetPosition(LightPositionWorld);
 
 	ZEAABBox SceneAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
 	for(ZEUInt I = 0; I < 8; I++)
