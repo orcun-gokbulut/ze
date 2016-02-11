@@ -51,7 +51,7 @@ void ZEModelMeshLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 	this->Material = Material;
 }
 
-ZEHolder<const ZERNMaterial> ZEModelMeshLOD::GetMaterial()
+ZEHolder<const ZERNMaterial> ZEModelMeshLOD::GetMaterial() const
 {
 	return Material;
 }

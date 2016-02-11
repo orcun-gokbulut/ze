@@ -62,18 +62,18 @@ class ZERNStageAO : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>		BilateralConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		FilterConstantBuffer;
 
 		ZEHolder<ZEGRShader>				VertexShader;
 		ZEHolder<ZEGRShader>				BlendVertexShader;
 
 		ZEHolder<ZEGRShader>				PixelShader;
 		ZEHolder<ZEGRShader>				BlendPixelShader;
-		ZEHolder<ZEGRShader>				BilateralPixelShader;
+		ZEHolder<ZEGRShader>				FilterPixelShader;
 
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
-		ZEHolder<ZEGRRenderStateData>		BilateralRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		FilterRenderStateData;
 
 		ZESharedPointer<ZEGRSampler>		SamplerPointBorder;
 		ZESharedPointer<ZEGRSampler>		SamplerPointWrap;
@@ -95,14 +95,12 @@ class ZERNStageAO : public ZERNStage
 			float							DownScale;
 		}Constants;
 
-		struct SSAOBilateralConstants
+		struct SSAOFilterConstants
 		{
-			float							DepthThreshold;
-			float							IntensityThreshold;
-			float							Reserved;
-			ZEUInt							KernelSize;
 			ZEVector4						KernelValues[32];
-		}BilateralConstants;
+			ZEUInt							KernelSize;
+			ZEVector3						Reserved;
+		}FilterConstants;
 
 		void								CreateRandomVectors();
 		void								CreateOffsetVectors();
@@ -138,14 +136,8 @@ class ZERNStageAO : public ZERNStage
 		void								SetOcclusionMapDownScale(float DownScale);
 		float								GetOcclusionMapDownScale() const;
 
-		void								SetBilateralDepthThreshold(float DepthThreshold);
-		float								GetBilateralDepthThreshold() const;
-
-		void								SetBilateralIntensityThreshold(float IntensityThreshold);
-		float								GetBilateralIntensityThreshold() const;
-
-		void								SetBilateralKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
-		const ZEVector4* 					GetBilateralKernelValues() const;
+		void								SetFilterKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
+		const ZEVector4* 					GetFilterKernelValues() const;
 
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);

@@ -80,14 +80,14 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZEString							Name;
 		ZEString							FileName;
 
-		ZEFlags								DirtyFlags;
-
-		ZEHolder<ZEGRShader>				StageGBuffer_VertexShader;
-		ZEHolder<ZEGRShader>				StageGBuffer_PixelShader;
-		ZEHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
-
-		ZEHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
-		ZEHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
+		mutable ZEFlags								DirtyFlags;
+		 
+		mutable ZEHolder<ZEGRShader>				StageGBuffer_VertexShader;
+		mutable ZEHolder<ZEGRShader>				StageGBuffer_PixelShader;
+		mutable ZEHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
+		 
+		mutable ZEHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
+		mutable ZEHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
@@ -103,7 +103,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZERNMap								DetailBaseMap;
 		ZERNMap								DetailNormalMap;
 		
-		struct
+		mutable struct
 		{
 			ZEVector3						AmbientColor;
 			float							Opacity;
@@ -161,10 +161,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool								DetailBaseMapEnabled;
 		bool								DetailNormalMapEnabled;
 		
-		void								UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options);
-		bool								UpdateShaders();
-		bool								UpdateConstantBuffer();
-		bool								UpdateRenderState();
+		void								UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
+		bool								UpdateShaders() const;
+		bool								UpdateConstantBuffer() const;
+		bool								UpdateRenderState() const;
 
 		void								ReadFromFileV0(const ZEMLReaderNode& MaterialNode);
 		void								ReadFromFileV1(const ZEMLReaderNode& MaterialNode);
@@ -321,10 +321,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void								Tick(float ElapsedTime);
 
-		virtual bool						SetupMaterial(ZEGRContext* Context, ZERNStage* Stage);
-		virtual void						CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage);
+		virtual bool						SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual void						CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 
-		virtual bool						Update();
+		virtual bool						Update() const;
 
 		void								WriteToFile(const ZEString& FileName);
 		void								ReadFromFile(const ZEString& FileName);
