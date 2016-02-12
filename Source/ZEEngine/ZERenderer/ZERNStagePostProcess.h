@@ -47,7 +47,6 @@ class ZERNStagePostProcess : public ZERNStage
 	private:
 		ZEHolder<ZEGRTexture2D>			OutputTexture;
 
-		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();
 
 	public:

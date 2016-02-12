@@ -46,8 +46,6 @@ class ZEGRRenderTarget;
 class ZERNStageGBuffer : public ZERNStage
 {
 	private:
-		ZEFlags								DirtyFlags;
-
 		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
 		ZEHolder<ZEGRTexture2D>				GBuffer0;
 		ZEHolder<ZEGRTexture2D>				GBuffer1;
@@ -56,10 +54,10 @@ class ZERNStageGBuffer : public ZERNStage
 		const ZEGRRenderTarget*				RenderTargets[4];
 
 	private:
-		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 
 		bool								UpdateRenderTargets(ZEUInt Width, ZEUInt Height);
+		void								CleanRenderTargets();
 
 	public:
 		virtual ZEInt						GetId() const;

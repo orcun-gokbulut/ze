@@ -116,7 +116,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
-	Skinned = LODResource->VertexBufferSkin.IsNull() ? false : true;
+	Skinned = !LODResource->VertexBufferSkin.IsNull();
 	if(Skinned)
 	{
 		ZESize BoneCount = LODResource->AffectingBoneIds.GetCount();

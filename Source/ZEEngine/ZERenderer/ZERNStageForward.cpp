@@ -43,15 +43,6 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-bool ZERNStageForward::InitializeSelf()
-{
-	return true;
-}
-
-void ZERNStageForward::DeinitializeSelf()
-{
-}
-
 ZEInt ZERNStageForward::GetId() const
 {
 	return ZERN_STAGE_FORWARD;
@@ -66,6 +57,9 @@ const ZEString& ZERNStageForward::GetName() const
 
 bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	if (!ZERNStage::Setup(Renderer, Context, Commands))
+		return false;
+
 	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
@@ -91,6 +85,8 @@ bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 void ZERNStageForward::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
+
+	ZERNStage::CleanUp(Renderer, Context);
 }
 
 ZERNStageForward::ZERNStageForward()

@@ -47,14 +47,11 @@
 #include "ZEModules/ZEDirect3D11/ZED11DepthStencilBuffer.h"
 #include "ZEModules/ZEDirect3D11/ZED11Context.h"
 
-bool ZERNStagePostProcess::InitializeSelf()
-{
-	return true;
-}
-
 void ZERNStagePostProcess::DeinitializeSelf()
 {
 	OutputTexture.Release();
+
+	ZERNStage::Deinitialize();
 }
 
 ZEInt ZERNStagePostProcess::GetId() const
@@ -70,6 +67,9 @@ const ZEString& ZERNStagePostProcess::GetName() const
 
 bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	if (!ZERNStage::Setup(Renderer, Context, Commands))
+		return false;
+
 	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
 	if(StageGBuffer == NULL)
 		return false;
@@ -104,6 +104,8 @@ void ZERNStagePostProcess::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 	Context->SetRenderTargets(0, NULL, NULL);
+
+	ZERNStage::CleanUp(Renderer, Context);
 }
 
 ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
@@ -113,6 +115,7 @@ ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
 
 ZERNStagePostProcess::ZERNStagePostProcess()
 {
+
 }
 
 ZEGRRenderState ZERNStagePostProcess::GetRenderState()
