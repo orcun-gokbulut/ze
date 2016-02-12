@@ -635,13 +635,17 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 
 bool ZERNStageLighting::InitializeSelf()
 {
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	DirtyFlags.RaiseAll();
+
 	CreateRandomVectors();
 	CreateLightGeometries();
 	CreateSamplers();
 
 	LightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(LightConstantsStruct));
 
-	DirtyFlags.RaiseAll();
 
 	const ZESmartArray<ZEEntity*>& Entities = GetOwnerRenderer()->GetScene()->GetEntities();
 	ZEUInt Count = (ZEUInt)Entities.GetCount();
@@ -674,6 +678,8 @@ void ZERNStageLighting::DeinitializeSelf()
 	RandomVectorsTexture.Release();
 
 	OutputRenderTarget = NULL;
+
+	ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageLighting::GetId() const
@@ -709,6 +715,9 @@ bool ZERNStageLighting::GetShowCascades() const
 
 bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	if (!ZERNStage::Setup(Renderer, Context, Commands))
+		return false;
+
 	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
 	if(StageGBuffer == NULL)
 		return false;
@@ -749,10 +758,13 @@ void ZERNStageLighting::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
+
+	ZERNStage::CleanUp(Renderer, Context);
 }
 
 ZERNStageLighting::ZERNStageLighting()
 {
+	DirtyFlags.RaiseAll();
 	PrevWidth = 0;
 	PrevHeight = 0;
 	UseTiledDeferred = false;

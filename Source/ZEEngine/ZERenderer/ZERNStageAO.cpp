@@ -342,6 +342,11 @@ void ZERNStageAO::BlendWithAccumulationBuffer(ZERNRenderer* Renderer, ZEGRContex
 
 bool ZERNStageAO::InitializeSelf()
 {
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	DirtyFlags.RaiseAll();
+
 	CreateOffsetVectors();
 	CreateRandomVectors();
 
@@ -380,8 +385,6 @@ bool ZERNStageAO::InitializeSelf()
 
 	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescription);
 
-	DirtyFlags.RaiseAll();
-
 	return true;
 }
 
@@ -401,6 +404,8 @@ void ZERNStageAO::DeinitializeSelf()
 
 	HorizontalValues.Clear();
 	VerticalValues.Clear();
+
+	ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageAO::GetId() const
@@ -497,6 +502,9 @@ float ZERNStageAO::GetOcclusionMapDownScale() const
 
 bool ZERNStageAO::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	if (!ZERNStage::Setup(Renderer, Context, Commands))
+		return false;
+
 	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
 	if(RenderTarget == NULL)
 		return false;
@@ -504,14 +512,14 @@ bool ZERNStageAO::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZE
 	ZEUInt CurrentWidth = RenderTarget->GetWidth();
 	ZEUInt CurrentHeight = RenderTarget->GetHeight();
 
-	if(Width != CurrentWidth || Height != CurrentHeight)
+	if (Width != CurrentWidth || Height != CurrentHeight)
 	{
 		DirtyFlags.RaiseFlags(ZERN_AODF_TEXTURE);
 		Width = CurrentWidth;
 		Height = CurrentHeight;
 	}
 
-	if(!Update())
+	if (!Update())
 		return false;
 
 	GenerateOcclusionMap(Renderer, Context);
@@ -531,6 +539,8 @@ void ZERNStageAO::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, NULL);
+	
+	ZERNStage::CleanUp(Renderer, Context);
 }
 
 ZERNStageAO::ZERNStageAO()

@@ -119,7 +119,12 @@ class ZERNStageHDR : public ZERNStage
 			ZEBool32						AutoKey;
 			ZEUInt							ToneMapOperator;
 			ZEBool32						BloomEnabled;
-			ZEUInt							Reserved;
+			ZEUInt							Reserved0;
+
+			float							LuminanceMin;
+			float							LuminanceMax;
+			float							Reserved1;
+			float							Reserved2;
 		} Constants;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
@@ -166,6 +171,12 @@ class ZERNStageHDR : public ZERNStage
 
 		void								SetBloomThreshold(float Value);
 		float								GetBloomThreshold() const;
+
+		void								SetLuminanceMin(float Value);
+		float								GetLuminanceMin() const;
+
+		void								SetLuminanceMax(float Value);
+		float								GetLuminanceMax() const;
 
 		void								SetToneMapOperator(ZERNHDRToneMapOperator Operator);
 		ZERNHDRToneMapOperator				GetToneMapOperator() const;

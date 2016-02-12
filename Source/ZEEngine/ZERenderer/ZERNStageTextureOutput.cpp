@@ -51,6 +51,9 @@
 
 bool ZERNStageTextureOutput::InitializeSelf()
 {
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
 	ZEGRShaderCompileOptions Options;
 	Options.Model = ZEGR_SM_5_0;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTextureRendering.hlsl";
@@ -84,6 +87,8 @@ void ZERNStageTextureOutput::DeinitializeSelf()
 	PixelShader.Release();
 	RenderStateData.Release();
 	ConstantBuffer.Release();
+
+	ZERNStage::Deinitialize();
 }
 
 void ZERNStageTextureOutput::SetInputs(ZEGRTexture** Inputs, ZESize Count)
@@ -140,8 +145,7 @@ const ZEString& ZERNStageTextureOutput::GetName() const
 
 bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
-	ZERNStageHDR* StageHDR = (ZERNStageHDR*)Renderer->GetStage(ZERN_STAGE_HDR);
-	if(StageHDR != NULL)
+	if (!ZERNStage::Setup(Renderer, Context, Commands))
 		return false;
 
 	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
@@ -221,4 +225,6 @@ void ZERNStageTextureOutput::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Contex
 	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+
+	ZERNStage::CleanUp(Renderer, Context);
 }

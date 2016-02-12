@@ -172,14 +172,16 @@ void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertex
 
 void ZED11Context::SetIndexBuffer(const ZEGRIndexBuffer* Buffer)
 {
-	ID3D11Buffer* NativeBuffer = NULL;
 	const ZED11IndexBuffer* D11Buffer = static_cast<const ZED11IndexBuffer*>(Buffer);
+
+	ID3D11Buffer* NativeBuffer = NULL;
 	ZEGRIndexBufferFormat Format = ZEGRIndexBufferFormat::ZEGR_IBF_NONE;
 	if (D11Buffer != NULL)
 	{
 		NativeBuffer = D11Buffer->GetBuffer();
 		Format = D11Buffer->GetFormat();
 	}
+
 	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Format), 0);
 }
 
@@ -545,33 +547,33 @@ void ZED11Context::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture**
 
 	switch(Shader)
 	{
-	default:
-	case ZEGR_ST_NONE:
-		break;
+		default:
+		case ZEGR_ST_NONE:
+			break;
 
-	case ZEGR_ST_VERTEX:
-		Context->VSGetShaderResources(Index, 1, &ResourceView);
-		break;
+		case ZEGR_ST_VERTEX:
+			Context->VSGetShaderResources(Index, 1, &ResourceView);
+			break;
 
-	case ZEGR_ST_PIXEL:
-		Context->PSGetShaderResources(Index, 1, &ResourceView);
-		break;
+		case ZEGR_ST_PIXEL:
+			Context->PSGetShaderResources(Index, 1, &ResourceView);
+			break;
 
-	case ZEGR_ST_GEOMETRY:
-		Context->GSGetShaderResources(Index, 1, &ResourceView);
-		break;
+		case ZEGR_ST_GEOMETRY:
+			Context->GSGetShaderResources(Index, 1, &ResourceView);
+			break;
 
-	case ZEGR_ST_DOMAIN:
-		Context->DSGetShaderResources(Index, 1, &ResourceView);
-		break;
+		case ZEGR_ST_DOMAIN:
+			Context->DSGetShaderResources(Index, 1, &ResourceView);
+			break;
 
-	case ZEGR_ST_HULL:
-		Context->HSGetShaderResources(Index, 1, &ResourceView);
-		break;
+		case ZEGR_ST_HULL:
+			Context->HSGetShaderResources(Index, 1, &ResourceView);
+			break;
 
-	case ZEGR_ST_COMPUTE:
-		Context->CSGetShaderResources(Index, 1, &ResourceView);
-		break;
+		case ZEGR_ST_COMPUTE:
+			Context->CSGetShaderResources(Index, 1, &ResourceView);
+			break;
 	}
 
 	if(ResourceView != NULL)
@@ -605,7 +607,10 @@ void ZED11Context::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture**
 void ZED11Context::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler)
 {
 	const ZED11Sampler* D11Sampler = static_cast<const ZED11Sampler*>(Sampler);
-	ID3D11SamplerState* NativeSampler = D11Sampler->GetInterface();
+
+	ID3D11SamplerState* NativeSampler = NULL;
+	if (D11Sampler != NULL)
+		NativeSampler = D11Sampler->GetInterface();
 
 	switch(Shader)
 	{

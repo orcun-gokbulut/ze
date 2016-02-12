@@ -52,16 +52,7 @@ const ZEString& ZERNStageShadowing::GetName() const
 	return Name;
 }
 
-bool ZERNStageShadowing::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
-{
-	return true;
-}
-
-void ZERNStageShadowing::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
-{
-
-}
-
 ZERNStageShadowing::ZERNStageShadowing()
 {
+
 }

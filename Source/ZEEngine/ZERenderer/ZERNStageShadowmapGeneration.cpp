@@ -44,15 +44,6 @@
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 
-bool ZERNStageShadowmapGeneration::InitializeSelf()
-{
-	return true;
-}
-
-void ZERNStageShadowmapGeneration::DeinitializeSelf()
-{
-}
-
 ZEInt ZERNStageShadowmapGeneration::GetId() const
 {
 	return ZERN_STAGE_SHADOW_MAP_GENERATION;
@@ -64,18 +55,16 @@ const ZEString& ZERNStageShadowmapGeneration::GetName() const
 	return Name;
 }
 
-bool ZERNStageShadowmapGeneration::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
-{
-	return true;
-}
-
 void ZERNStageShadowmapGeneration::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
+
+	ZERNStage::CleanUp(Renderer, Context);
 }
 
 ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
 {
+
 }
 
 ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()

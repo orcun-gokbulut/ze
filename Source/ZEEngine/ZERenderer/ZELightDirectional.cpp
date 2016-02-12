@@ -226,6 +226,7 @@ ZELightDirectional::ZELightDirectional()
 
 ZELightDirectional::~ZELightDirectional()
 {
+
 }
 
 bool ZELightDirectional::InitializeSelf()

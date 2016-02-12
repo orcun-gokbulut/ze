@@ -163,8 +163,14 @@ void ZERNRenderer::RenderStages()
 		ZERNStageQueue* Queue = &StageQueues[I];
 		ZERNStage* Stage = Queue->Stage;
 
-		if (!Stage->GetEnable() || !Stage->Setup(this, Context, Queue->Commands))
+		if (!Stage->GetEnable())
 			continue;
+
+		 if (!Stage->Setup(this, Context, Queue->Commands))
+		 {
+			 zeError("Cannot setup stage. Stage Name: \"%s\"", Stage->GetName().ToCString());
+			 return;
+		 }
 
 		Parameters.Stage = Stage;
 		ZELink<ZERNCommand>* Link = Queue->Commands.GetFirst();
@@ -189,8 +195,16 @@ bool ZERNRenderer::InitializeSelf()
 {
 	ZESize Count = StageQueues.GetCount();
 	for (ZESize I = 0; I < Count; I++)
+	{
 		if (StageQueues[I].Stage != NULL)
-			StageQueues[I].Stage->Initialize();
+		{
+			if (!StageQueues[I].Stage->Initialize())
+			{
+				zeError("Cannot initialize stage. Stage Name: \"%s\"", StageQueues[I].Stage->GetName().ToCString());
+				return false;
+			}
+		}
+	}
 
 	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
 	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
