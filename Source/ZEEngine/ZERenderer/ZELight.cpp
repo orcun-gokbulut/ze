@@ -223,8 +223,8 @@ void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 ZELight::ZELight()
 {
 	CastsShadows = false;
-	ShadowResolution = ZE_LSR_LOW;
-	ShadowSampleCount = ZE_LSC_LOW;
+	ShadowResolution = ZE_LSR_MEDIUM;
+	ShadowSampleCount = ZE_LSC_MEDIUM;
 	ShadowSampleLengthOffset = 0.0f;
 
 	Range = 100.0f;
