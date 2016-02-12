@@ -140,8 +140,10 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 		CascadeFrustumAABBLight.Max.y *= UnitPerShadowTexel;
 
 		//Extend cascade frustum aabb minz and maxz to scene aabb minz and maxz in light space, if required
-		CascadeFrustumAABBLight.Min.z = ZEMath::Min(CascadeFrustumAABBLight.Min.z, SceneAABBLight.Min.z);
-		CascadeFrustumAABBLight.Max.z = ZEMath::Max(CascadeFrustumAABBLight.Max.z, SceneAABBLight.Max.z);
+		//CascadeFrustumAABBLight.Min.z = ZEMath::Min(CascadeFrustumAABBLight.Min.z, SceneAABBLight.Min.z);
+		//CascadeFrustumAABBLight.Max.z = ZEMath::Max(CascadeFrustumAABBLight.Max.z, SceneAABBLight.Max.z);
+		CascadeFrustumAABBLight.Min.z -= Range;
+		CascadeFrustumAABBLight.Max.z += Range;
 
 		float Width = CascadeFrustumAABBLight.Max.x - CascadeFrustumAABBLight.Min.x;
 		float Height = CascadeFrustumAABBLight.Max.y - CascadeFrustumAABBLight.Min.y;

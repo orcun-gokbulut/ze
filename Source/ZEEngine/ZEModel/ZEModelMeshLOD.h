@@ -37,6 +37,8 @@
 
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMatrix.h"
 
 class ZEModel;
 class ZEModelMesh;
@@ -66,6 +68,7 @@ class ZEModelMeshLOD
 
 		ZEHolder<const ZERNMaterial>		Material;
 		bool								Skinned;
+		ZEArray<ZEMatrix4x4>				BoneTransforms;
 
 	public:
 		bool								IsSkinned();
