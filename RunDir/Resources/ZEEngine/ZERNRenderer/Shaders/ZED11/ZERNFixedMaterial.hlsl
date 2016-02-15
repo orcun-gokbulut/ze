@@ -40,31 +40,44 @@
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
 
-cbuffer ZERNFixedMaterial_Constants								: register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
 	float3			ZERNFixedMaterial_AmbientColor;
 	float			ZERNFixedMaterial_Opacity;
+	
 	float3			ZERNFixedMaterial_DiffuseColor;
 	float			ZERNFixedMaterial_SubSurfaceScatteringFactor;
+	
 	float3			ZERNFixedMaterial_SpecularColor;
 	float			ZERNFixedMaterial_SpecularPower;
+	
 	uint			ZERNFixedMaterial_HeightMapTechnique;
 	float			ZERNFixedMaterial_HeightMapScale;
 	float			ZERNFixedMaterial_HeightMapOffset;
 	float			ZERNFixedMaterial_Reserved0;
+
 	float3			ZERNFixedMaterial_EmissiveColor;
 	float			ZERNFixedMaterial_AlphaCullLimit;
+
 	float3			ZERNFixedMaterial_ReflectionColor;
 	bool			ZERNFixedMaterial_GlobalAmbientEnabled;
+
 	float3			ZERNFixedMaterial_RefractionColor;
 	float			ZERNFixedMaterial_RefractionIndex;
-	float3			ZERNFixedMaterial_DetailDiffuseMapColor;
+
+	float3			ZERNFixedMaterial_DetailBaseMapColor;
 	float			ZERNFixedMaterial_DetailNormalMapFactor;
-	float2			ZERNFixedMaterial_DetailDiffuseMapTiling;
+
+	float2			ZERNFixedMaterial_DetailBaseMapTiling;
 	float2			ZERNFixedMaterial_DetailNormalMapTiling;
+
+	float			ZERNFixedMaterial_DetailBaseMapAttenuationStart;
+	float			ZERNFixedMaterial_DetailBaseMapAttenuationFactor;
+	float			ZERNFixedMaterial_DetailNormalMapAttenuationStart;
+	float			ZERNFixedMaterial_DetailNormalMapAttenuationFactor;
 };
 
-cbuffer ZERNFixedMaterial_Constant_Draw_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
+cbuffer ZERNFixedMaterial_Constant_Draw_Transform : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
 	float4x4		ZERNFixedMaterial_WorldTransform;
 };
@@ -86,8 +99,15 @@ Texture2D<float>	ZRNFixedMaterial_GlossMap					: register(t10);
 
 SamplerState		ZRNFixedMaterial_TextureSampler				: register(s0);
 SamplerState		ZRNFixedMaterial_EnvironmentMapSampler		: register(s1);
-SamplerState		ZRNFixedMaterial_DetailDiffuseSampler		: register(s2);
+SamplerState		ZRNFixedMaterial_DetailBaseSampler			: register(s2);
 SamplerState		ZRNFixedMaterial_DetailNormalSampler		: register(s3);
+
+// COMMON FUNCTIONS
+///////////////////////////////////////////////////////////////////////////////
+
+float ZERNFixelMaterial_CalculateDetailAttenuation()
+{
+}
 
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
@@ -117,10 +137,12 @@ struct ZERNFixedMaterial_GBufferStage_VSOutput
 	float3 Binormal			: TEXCOORD1;
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
-	
+
 	#if defined(ZERN_FM_VERTEX_COLOR)
 		float4 Color		: TEXCOORD4;
 	#endif
+
+	float3 ViewPosition		: TEXCOORD5;
 };
 
 struct ZERNFixedMaterial_GBufferStage_PSInput
@@ -134,6 +156,8 @@ struct ZERNFixedMaterial_GBufferStage_PSInput
 	#if defined(ZERN_FM_VERTEX_COLOR)
 		float4 Color		: TEXCOORD4;
 	#endif
+
+	float3 ViewPosition		: TEXCOORD5;
 };
 
 
@@ -154,8 +178,8 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 	Output.Normal = ZERNTransformations_WorldToView(float4(Input.Normal, 0.0f));
 	Output.Tangent = ZERNTransformations_WorldToView(float4(Input.Tangent, 0.0f));
 	Output.Binormal = cross(Output.Normal, Output.Tangent);
-	
 	Output.Texcoord = Input.Texcoord;
+	Output.ViewPosition = PositionWorld.xyz - ZERNView_Position;
 
 	#ifdef ZERN_FM_VERTEX_COLOR
 		Output.Color = Input.Color;
@@ -188,29 +212,45 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	#endif
 	
 	float3 Normal = normalize(Input.Normal);
-	#if defined(ZERN_FM_NORMAL_MAP)
+	#ifdef ZERN_FM_NORMAL_MAP
 		float3 NormalSample = ZRNFixedMaterial_NormalMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).xyz * 2.0f - 1.0f;
 		float3 Tangent = normalize(Input.Tangent);
 		float3 Binormal = normalize(Input.Binormal);
 		Normal = normalize(NormalSample.x * Tangent + NormalSample.y * Binormal + NormalSample.z * Normal);
 	#endif
+
+	float DistanceToView = length(Input.ViewPosition);
+
+	#ifdef ZERN_FM_DETAIL_NORMAL_MAP
+		float3 DetailNormalSample = ZRNFixedMaterial_DetailNormalMap.Sample(ZRNFixedMaterial_DetailNormalSampler, Input.Texcoord * ZERNFixedMaterial_DetailNormalMapTiling) * 2.0f - 1.0f;
+		float3 DetailNormal = normalize(DetailNormalSample.x * Input.Tangent + DetailNormalSample.y * Input.Binormal + DetailNormalSample.z * Input.Normal);
+		DetailNormal = normalize(Normal + DetailNormal);	
 	
-	float3 AmbientColor = ZERNFixedMaterial_AmbientColor;
-	#ifdef ZERN_FM_BASE_MAP
-		AmbientColor *= ZRNFixedMaterial_BaseMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;	
+		float DetailNormalPixelDistance = DistanceToView - ZERNFixedMaterial_DetailNormalMapAttenuationStart;
+		float DetailNormalAttenuation = saturate(1.0f /  (1.0f + DetailNormalPixelDistance * ZERNFixedMaterial_DetailNormalMapAttenuationFactor));
+
+		Normal = DetailNormal; //normalize(lerp(Normal, DetailNormal, DetailNormalAttenuation));
 	#endif
-	
-	float3 DiffuseColor = ZERNFixedMaterial_DiffuseColor;
+
+	float3 BaseColor = float3(1.0f, 1.0f, 1.0f);
 	#ifdef ZERN_FM_BASE_MAP
-		DiffuseColor *= ZRNFixedMaterial_BaseMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;	
-	#endif	
-	
-	float3 SpecularColor = ZERNFixedMaterial_SpecularColor;
-	#ifdef ZERN_FM_SPECULAR_MAP
-		SpecularColor *= ZRNFixedMaterial_SpecularMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
+		BaseColor *= ZRNFixedMaterial_BaseMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;	
 	#endif
-	
-	float3 EmissiveColor = ZERNFixedMaterial_EmissiveColor;
+
+	#ifdef ZERN_FM_DETAIL_BASE_MAP
+		float3 DetailBaseColor = ZERNFixedMaterial_DetailBaseMapColor * ZRNFixedMaterial_DetailBaseMap.Sample(ZRNFixedMaterial_DetailBaseSampler, Input.Texcoord * ZERNFixedMaterial_DetailBaseMapTiling);
+		
+		float DetailBasePixelDistance = DistanceToView - ZERNFixedMaterial_DetailBaseMapAttenuationStart;
+		float DetailBaseAttenuation = saturate(1.0f /  (1.0f + DetailBasePixelDistance * ZERNFixedMaterial_DetailBaseMapAttenuationFactor));
+
+		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailBaseAttenuation);
+	#endif
+
+	float3 AmbientColor = BaseColor * ZERNFixedMaterial_AmbientColor;
+	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
+	float3 SpecularColor = BaseColor * ZERNFixedMaterial_SpecularColor;
+	float3 EmissiveColor = BaseColor * ZERNFixedMaterial_EmissiveColor;
+
 	#ifdef ZERN_FM_EMISSIVE_MAP
 		EmissiveColor *= ZRNFixedMaterial_EmissiveMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
 	#endif
