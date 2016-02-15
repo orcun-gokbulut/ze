@@ -44,12 +44,15 @@
 #endif
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
-	#define ZE_FORCE_INLINE __forceinline
+	#define ZE_INLINE __forceinline
 #elif defined(ZE_PLATFORM_COMPILER_GCC)
-	#define ZE_FORCE_INLINE inline
+	#define ZE_INLINE inline
 #else
-	#define ZE_FORCE_INLINE inline
+	#define ZE_INLINE inline
 #endif
+
+#define ZE_FINAL final
+#define ZE_OVERRIDE override
 
 #define ZE_DISALLOW_COPY(ClassName) \
 	private: \
