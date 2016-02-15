@@ -141,7 +141,8 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 	ZERectangle TempRenderRect = TextRenderingArea;
 	ZEVector2 CharacterPosIncrement, LineStartPosition, ScreenPos = GetScreenPosition();
 	TempRenderRect.SetPosition(ScreenPos);
-	ZERectangle::IntersectionTest(GetVisibleRectangle(), TextRenderingArea, TempRenderRect);
+	ZERectangle ResultRenderRect;
+	ZERectangle::IntersectionTest(GetVisibleRectangle(), TempRenderRect, ResultRenderRect);
 	ZEInt32 TempTextZOrder = GetZOrder() + 1;
 
 	LineStartPosition = CalculateLineStartPoint(0);
@@ -161,7 +162,7 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 		TempCharacter.ZOrder = TempTextZOrder;
 
 		ZERectangle Intersection;
-		if(ZERectangle::IntersectionTest(TempRenderRect, GetVisibleRectangle(), Intersection))
+		if(ZERectangle::IntersectionTest(ResultRenderRect, GetVisibleRectangle(), Intersection))
 			if(!ZEUIRectangle::Clip(OutputCharacter, TempCharacter, Intersection))
 				Renderer->AddRectangle(OutputCharacter);
 	}
