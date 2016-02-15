@@ -116,10 +116,10 @@ class ZERNStageLighting : public ZERNStage
 
 		const ZEGRRenderTarget*				OutputRenderTarget;
 
-		ZESharedPointer<ZEGRSampler>		SamplerLinearBorder;
-		ZESharedPointer<ZEGRSampler>		SamplerComparisonLinearPointClamp;
-		ZESharedPointer<ZEGRSampler>		SamplerPointWrap;
-		ZESharedPointer<ZEGRSampler>		SamplerPointBorder;
+		ZEHolder<ZEGRSampler>				SamplerLinearBorder;
+		ZEHolder<ZEGRSampler>				SamplerComparisonLinearPointClamp;
+		ZEHolder<ZEGRSampler>				SamplerPointWrap;
+		ZEHolder<ZEGRSampler>				SamplerPointBorder;
 
 		ZEUInt								PrevWidth;
 		ZEUInt								PrevHeight;

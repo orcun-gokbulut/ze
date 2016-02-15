@@ -36,9 +36,9 @@
 #ifndef __ZE_DELEGATE_H__
 #define __ZE_DELEGATE_H__
 
-#define ZEBindFunction(Delegate, Function) do {Delegate.Bind<Function>());} while(false)
-#define ZEBindMethod(Delegate, Class, Function, Object) do {Delegate.Bind<Class, Function>(Object));} while(false)
-#define ZEBindMethodConst(Delegate, class, Function, Object) do {Delegate.BindConst<Class, Function>(Object));} while(false)
+#define ZEDelegateFunction(DelegateClass, Function) DelegateClass::Create<Function>()
+#define ZEDelegateMethod(DelegateClass, Class, Function, Object) DelegateClass::Create<Class, &Class::Function>(Object)
+#define ZEDelegateMethodConst(DelegateClass, class, Function, Object) DelegateClass::CreateConst<Class, &Class::Function>(Object)
 
 template <typename TSignature> 
 class ZEDelegate;

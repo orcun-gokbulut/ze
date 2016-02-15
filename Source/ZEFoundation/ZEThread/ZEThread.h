@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_THREAD_H__
-#define __ZE_THREAD_H__
+#pragma once
 
+#include "ZECommon.h"
+#include "ZEPlatform.h"
 #include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEString.h"
-#include "ZEPlatform.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
@@ -58,6 +58,7 @@ typedef ZEDelegate<void (ZEThread*, void*)> ZEThreadFunction;
 
 class ZEThread
 {
+	ZE_COPY_NO_ACTION(ZEThread)
     private:
         ZEString            Name;
         #ifdef ZE_PLATFORM_WINDOWS
@@ -99,5 +100,3 @@ class ZEThread
 
         static ZEThread*    GetCurrentThread();
 };
-
-#endif

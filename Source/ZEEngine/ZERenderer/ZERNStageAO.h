@@ -75,10 +75,10 @@ class ZERNStageAO : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		FilterRenderStateData;
 
-		ZESharedPointer<ZEGRSampler>		SamplerPointBorder;
-		ZESharedPointer<ZEGRSampler>		SamplerPointWrap;
-		ZESharedPointer<ZEGRSampler>		SamplerPointClamp;
-		ZESharedPointer<ZEGRSampler>		SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>				SamplerPointBorder;
+		ZEHolder<ZEGRSampler>				SamplerPointWrap;
+		ZEHolder<ZEGRSampler>				SamplerPointClamp;
+		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
 
 		ZEArray<ZEVector4>					HorizontalValues;
 		ZEArray<ZEVector4>					VerticalValues;

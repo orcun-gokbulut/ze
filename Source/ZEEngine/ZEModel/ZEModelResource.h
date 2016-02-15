@@ -324,6 +324,7 @@ struct ZEModelResourceMesh
 	ZEArray<ZEModelResourceMeshLOD>				LODs;
 	ZEModelResourcePhysicalBody					PhysicalBody;
 	ZEString									UserDefinedProperties;
+	ZEArray<ZEVector3>							Geometry;
 };
 
 struct ZEModelResourceBone

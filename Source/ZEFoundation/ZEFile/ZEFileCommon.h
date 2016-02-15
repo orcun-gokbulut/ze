@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_FILE_COMMON_H__
-#define __ZE_FILE_COMMON_H__
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
@@ -68,21 +66,3 @@ class ZERealPath
 
 		ZERealPath();
 };
-
-
-struct ZEFileTime
-{
-	public:
-		ZEInt	Year;
-		ZEInt	Month;
-		ZEInt	DayOfWeek;
-		ZEInt	Day;
-		ZEInt	Hour;
-		ZEInt	Minute;
-		ZEInt	Second;
-		ZEInt	Milliseconds;
-
-				ZEFileTime();
-};
-
-#endif

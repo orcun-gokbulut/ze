@@ -38,6 +38,7 @@
 #define __ZE_PATH_INFO_H__
 
 #include "ZETypes.h"
+#include "ZETimeStamp.h"
 #include "ZEFileCommon.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
@@ -62,7 +63,6 @@ class ZEPathInfo
 
 	public:
 		void						SetPath(const char* Path);
-		void						SetRelativePath(const char* ParentPath, const char* RelativePath);
 
 		const ZEString&				GetPath() const;
 		ZEString					GetFileName() const;
@@ -81,8 +81,8 @@ class ZEPathInfo
 		bool						IsParent(const char* ParentPath) const;
 		ZEString					GetRelativeTo(const char* ParentPath) const;
 
-		ZEFileTime					GetCreationDate() const;
-		ZEFileTime					GetModificationTime() const;
+		ZETimeStamp					GetCreationDate() const;
+		ZETimeStamp					GetModificationTime() const;
 
 		ZEString					Normalize();
 
@@ -92,9 +92,9 @@ class ZEPathInfo
 
 									ZEPathInfo();
 									ZEPathInfo(const char* Path);
-									ZEPathInfo(const char* ParentPath, const char* RelativePath);
 
 		static bool					Normalize(ZEPathTokenizer& Tokenizer);
+		static ZEString				CombineRelativePath(const char* ParentFilePath, const char* Path);
 };
 
 #endif

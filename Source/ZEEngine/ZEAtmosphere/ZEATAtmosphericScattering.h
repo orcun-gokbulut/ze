@@ -87,7 +87,7 @@ class ZEATAtmosphericScattering : public ZEInitializable
 
 		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
 
-		ZESharedPointer<ZEGRSampler>	SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>			SamplerLinearClamp;
 
 		ZEUInt							OrderCount;
 		bool							UseMultipleScattering;

@@ -44,7 +44,7 @@ ZERayCastParameters::ZERayCastParameters()
 	MinimumDistance = 0.0f;
 	MaximumDistance = ZE_FLOAT_MAX;
 	FilterFunctionParameter = NULL;
-	Extras = ZE_RCRE_ALL;
+	Extras = ZE_RCRE_NONE;
 }
 
 ZERayCastReport::ZERayCastReport()

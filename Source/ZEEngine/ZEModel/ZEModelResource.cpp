@@ -346,6 +346,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 				LOD->TriangleCount = LOD->VertexCount / 3;
 				LOD->VertexBufferSkin = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZESkinnedModelVertex));
 				void* Buffer = NULL;
+				
 				LOD->VertexBufferSkin->Lock(&Buffer);
 					if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZESkinnedModelVertex), LOD->VertexCount))
 					{
@@ -353,6 +354,13 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 						return false;
 					}
 				
+					if (I == 0)
+					{
+						Mesh->Geometry.SetCount(LOD->VertexCount);
+						for (ZESize N = 0; N < LOD->VertexCount; N++)
+							Mesh->Geometry[N] = ((ZESkinnedModelVertex*)Buffer)[N].Position;
+					}
+
 					CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, true);
 				LOD->VertexBufferSkin->Unlock();
 			}
@@ -373,6 +381,14 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 					}
 
 					CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, false);
+
+					if (I == 0)
+					{
+						Mesh->Geometry.SetCount(LOD->VertexCount);
+						for (ZESize N = 0; N < LOD->VertexCount; N++)
+							Mesh->Geometry[N] = ((ZEModelVertex*)Buffer)[N].Position;
+					}
+
 				LOD->VertexBuffer->Unlock();
 			}
 		}

@@ -357,6 +357,7 @@ void ZETimeStamp::Clear()
 
 ZETimeStamp::ZETimeStamp()
 {
+	Value = 0;
 }
 
 ZETimeStamp::ZETimeStamp(ZEInt64 Value)

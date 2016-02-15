@@ -646,11 +646,11 @@ bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& Poligon
 		return false;
 
 	bool HaveIntersection = false;
-	/*const ZEArray<ZEModelVertex>& Vertices = MeshResource->LODs[0].Vertices;
 
+	const ZEArray<ZEVector3>& Vertices = MeshResource->Geometry;
 	for (ZESize I = 0; I < Vertices.GetCount(); I += 3)
 	{
-		ZETriangle Triangle(Vertices[I].Position, Vertices[I + 1].Position, Vertices[I + 2].Position);
+		ZETriangle Triangle(Vertices[I], Vertices[I + 1], Vertices[I + 2]);
 
 		float RayT;
 		if (ZETriangle::IntersectionTest(Triangle, Ray, RayT))
@@ -662,7 +662,7 @@ bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& Poligon
 				HaveIntersection = true;
 			}
 		}
-	}*/
+	}
 
 	return HaveIntersection;
 }
@@ -744,29 +744,29 @@ bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 			Report.SubComponent = this;
 			Report.PoligonIndex = PoligonIndex;
 
-// 			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
-// 			{
-// 				ZEVector3 V0 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex].Position;
-// 				ZEVector3 V1 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 1].Position;
-// 				ZEVector3 V2 = MeshResource->LODs[0].Vertices[3 * Report.PoligonIndex + 2].Position;
-// 
-// 				ZEVector3 Binormal = ZEVector3(V0, V1);
-// 				ZEVector3 Tangent = ZEVector3(V0, V2);
-// 				ZEVector3 Normal;
-// 				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
-// 
-// 				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
-// 				{
-// 					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
-// 					Report.Normal.NormalizeSelf();
-// 				}
-// 
-// 				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
-// 				{
-// 					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
-// 					Report.Binormal.NormalizeSelf();
-// 				}
-// 			}
+ 			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+ 			{
+ 				ZEVector3 V0 = MeshResource->Geometry[3 * Report.PoligonIndex];
+ 				ZEVector3 V1 = MeshResource->Geometry[3 * Report.PoligonIndex + 1];
+ 				ZEVector3 V2 = MeshResource->Geometry[3 * Report.PoligonIndex + 2];
+ 
+ 				ZEVector3 Binormal = ZEVector3(V0, V1);
+ 				ZEVector3 Tangent = ZEVector3(V0, V2);
+ 				ZEVector3 Normal;
+ 				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
+ 
+ 				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
+ 				{
+ 					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
+ 					Report.Normal.NormalizeSelf();
+ 				}
+ 
+ 				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+ 				{
+ 					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
+ 					Report.Binormal.NormalizeSelf();
+ 				}
+ 			}
 
 			return true;
 		}

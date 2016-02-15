@@ -44,7 +44,6 @@ template<typename ZEItemType> class ZEList2;
 template<typename ZEItemType>
 class ZELink
 {
-	//ZE_DISALLOW_COPY(ZELink);
 	friend class ZEList2<ZEItemType>;
 	private:
 		bool								InUse;
@@ -66,6 +65,10 @@ class ZELink
 		const ZELink*						GetNext() const;
 		ZEItemType*							GetItem();
 		const ZEItemType*					GetItem() const;
+
+		// ZE_COPY_NO_ACTION
+		ZELink&								operator=(const ZELink& Other);
+											ZELink(const ZELink& Other);
 
 											ZELink();
 											ZELink(ZEItemType* Object);
@@ -125,9 +128,15 @@ ZEItemType* ZELink<ZEItemType>::GetItem()
 }
 
 template<typename ZEItemType>
-const ZEItemType* ZELink<ZEItemType>::GetItem() const
+ZELink<ZEItemType>& ZELink<ZEItemType>::operator=(const ZELink<ZEItemType>& Other)
 {
-	return Item;
+	return *this;
+}
+
+template<typename ZEItemType>
+ZELink<ZEItemType>::ZELink(const ZELink& Other)
+{
+	new (this)ZELink<ZEItemType>();
 }
 
 template<typename ZEItemType>

@@ -58,7 +58,6 @@ class ZEDestroyDeletor
 		static void		Delete(Type* Pointer);
 };
 
-
 template<typename Type>
 void ZEDeletor<Type>::Delete(Type* Pointer)
 {

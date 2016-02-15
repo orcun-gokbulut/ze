@@ -61,10 +61,8 @@ class ZERNFilter : public ZEInitializable
 
 		ZEHolder<ZEGRShader>			VertexShader;
 		ZEHolder<ZEGRShader>			PixelShader;
-
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-
-		ZESharedPointer<ZEGRSampler>	SamplerPointClamp;
+		ZEHolder<ZEGRSampler>			SamplerPointClamp;
 
 		struct FilterConstants
 		{

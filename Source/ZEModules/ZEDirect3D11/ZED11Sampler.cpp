@@ -118,7 +118,7 @@ static D3D11_FILTER Convert(ZEGRTextureFilter Min, ZEGRTextureFilter Mag, ZEGRTe
 		(Convert(Mip) << D3D11_MIP_FILTER_SHIFT));
 }
 
-bool ZED11Sampler::Initialize(const ZEGRSamplerDescription& Description)
+bool ZED11Sampler::InitializeSelf()
 {
 	this->Description = Description;
 
@@ -148,7 +148,7 @@ bool ZED11Sampler::Initialize(const ZEGRSamplerDescription& Description)
 	return true;
 }
 
-void ZED11Sampler::Deinitialize()
+void ZED11Sampler::DeinitializeSelf()
 {
 	ZEGR_RELEASE(NativeSampler);
 }
