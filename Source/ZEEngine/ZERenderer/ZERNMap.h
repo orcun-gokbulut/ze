@@ -36,7 +36,7 @@
 #pragma once
 
 #include "ZEPointer/ZEHolder.h"
-#include "ZEPointer/ZESharedPointer.h"
+#include "ZEGraphics/ZEGRTexture.h"
 
 class ZEGRTexture;
 class ZEGRSampler;
@@ -48,12 +48,14 @@ class ZERNMap
 {
 	private:
 		ZETextureResource*				Resource;
-		ZEHolder<ZEGRTexture>			Texture;
-		ZESharedPointer<ZEGRSampler>	Sampler;
+		ZEHolder<const ZEGRTexture>		Texture;
+		ZEHolder<const ZEGRSampler>		Sampler;
+
+		void							Clean();
 
 	public:
-		void							SetSampler(ZEGRSampler* Sampler);
-		ZESharedPointer<ZEGRSampler>	GetSampler() const;
+		void							SetSampler(ZEHolder<const ZEGRSampler> Sampler);
+		ZEHolder<const ZEGRSampler>		GetSampler() const;
 
 		void							SetTexture(ZEGRTexture* Texture);
 		ZEHolder<const ZEGRTexture>		GetTexture() const;
@@ -70,10 +72,10 @@ class ZERNMap
 		void							LoadCube(const ZEString& FileName);
 
 		void							Write(ZEMLWriterNode& ParentNode, const ZEString& Name);
-		void							ReadV0(ZEMLReaderNode& ParentNode, const ZEString& Name);
-		void							ReadV1(ZEMLReaderNode& ParentNode, const ZEString& Name);
+		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name);
 
 										ZERNMap();
+										ZERNMap(const char* FileName, ZEGRTextureType Type = ZEGR_TT_2D, ZEGRSampler* Sampler = NULL);
 										ZERNMap(ZEGRTexture* Texture, ZEGRSampler* Sampler = NULL);
 										ZERNMap(ZETextureResource* Resource, ZEGRSampler* Sampler = NULL);
 										~ZERNMap();

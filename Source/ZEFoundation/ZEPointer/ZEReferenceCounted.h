@@ -35,13 +35,14 @@
 
 #pragma once
 
-#include <ZETypes.h>
-#include <ZEThread/ZELock.h>
+#include "ZETypes.h"
+#include "ZECommon.h"
+#include "ZEThread/ZELock.h"
 
 class ZEReferenceCounted
 {
-	template<typename ZEReferenceCountedClass>
-	friend class ZEHolder;
+	ZE_COPY_NO_ACTION(ZEReferenceCounted)
+	template<typename ZEReferenceCountedClass> friend class ZEHolder;
 	private:
 		mutable ZELock			ReferenceCountLock;
 		mutable ZESize			ReferenceCount;
@@ -53,9 +54,6 @@ class ZEReferenceCounted
 		virtual void			Destroy() const;
 
 	public:
-		ZEReferenceCounted&		operator=(const ZEReferenceCounted& Other);
-
 								ZEReferenceCounted();
-								ZEReferenceCounted(const ZEReferenceCounted& Object);
 		virtual					~ZEReferenceCounted();
 };

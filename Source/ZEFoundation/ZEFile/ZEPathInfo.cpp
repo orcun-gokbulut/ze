@@ -81,26 +81,6 @@ void ZEPathInfo::SetPath(const char* Path)
 	this->Path = Path;
 }
 
-void ZEPathInfo::SetRelativePath(const char* ParentPath, const char* RelativePath)
-{
-	if (RelativePath == NULL || RelativePath[0] == '\0')
-	{
-		Path = "";
-		return;
-	}
-
-	ZEPathInfo ParentPathInfo = ZEPathInfo(ParentPath);
-	if (ParentPathInfo.IsFile()) // Relative To File
-	{
-		ZEString ParentDirectory = ParentPathInfo.GetParentDirectory();
-		Path = ZEFormat::Format("{0}/{1}", ParentDirectory, RelativePath);
-	}
-	else
-	{
-		Path = ZEFormat::Format("{0}/{1}", ParentPath, RelativePath);
-	}
-}
-
 const ZEString&	ZEPathInfo::GetPath() const
 {
 	return Path;
@@ -270,20 +250,20 @@ bool ZEPathInfo::IsDirectory() const
 		return false;
 }
 
-ZEFileTime ZEPathInfo::GetCreationDate() const
+ZETimeStamp ZEPathInfo::GetCreationDate() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
-		return ZEFileTime();
+		return ZETimeStamp();
 
 	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
-		return ZEFileTime();
+		return ZETimeStamp();
 
 	FILETIME CreationTime, Temp0, Temp1;
 	if (!GetFileTime(Handle, &CreationTime, &Temp0, &Temp1))
 	{
 		CloseHandle(Handle);
-		return ZEFileTime();
+		return ZETimeStamp();
 	}
 
 	CloseHandle(Handle);
@@ -291,33 +271,23 @@ ZEFileTime ZEPathInfo::GetCreationDate() const
 	SYSTEMTIME Time;
 	FileTimeToSystemTime(&CreationTime, &Time);
 
-	ZEFileTime Output;
-	Output.Year = Time.wYear;
-	Output.Month = Time.wMonth;
-	Output.DayOfWeek = Time.wDayOfWeek;
-	Output.Day = Time.wDay;
-	Output.Hour = Time.wHour;
-	Output.Minute = Time.wMinute;
-	Output.Second = Time.wSecond;
-	Output.Milliseconds = Time.wMilliseconds;
-
-	return Output;
+	return ZETimeStamp(Time.wYear, Time.wMonth, Time.wDay, Time.wHour, Time.wMinute, Time.wSecond, Time.wMilliseconds);
 }
 
-ZEFileTime ZEPathInfo::GetModificationTime() const
+ZETimeStamp ZEPathInfo::GetModificationTime() const
 {
 	if ((GetAccess() & ZE_PA_READ) == 0)
-		return ZEFileTime();
+		return ZETimeStamp();
 
 	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
-		return ZEFileTime();
+		return ZETimeStamp();
 
 	FILETIME ModificationTime, Temp0, Temp1;
 	if (!GetFileTime(Handle, &Temp0, &Temp1, &ModificationTime))
 	{
 		CloseHandle(Handle);
-		return ZEFileTime();
+		return ZETimeStamp();
 	}
 
 	CloseHandle(Handle);
@@ -325,17 +295,7 @@ ZEFileTime ZEPathInfo::GetModificationTime() const
 	SYSTEMTIME Time;
 	FileTimeToSystemTime(&ModificationTime, &Time);
 
-	ZEFileTime Output;
-	Output.Year = Time.wYear;
-	Output.Month = Time.wMonth;
-	Output.DayOfWeek = Time.wDayOfWeek;
-	Output.Day = Time.wDay;
-	Output.Hour = Time.wHour;
-	Output.Minute = Time.wMinute;
-	Output.Second = Time.wSecond;
-	Output.Milliseconds = Time.wMilliseconds;
-
-	return Output;
+	return ZETimeStamp(Time.wYear, Time.wMonth, Time.wDay, Time.wHour, Time.wMinute, Time.wSecond, Time.wMilliseconds);
 }
 
 #endif
@@ -416,7 +376,18 @@ ZEPathInfo::ZEPathInfo(const char* Path)
 	SetPath(Path);
 }
 
-ZEPathInfo::ZEPathInfo(const char* ParentPath, const char* Path)
+ZEString ZEPathInfo::CombineRelativePath(const char* ParentFilePath, const char* Path)
 {
-	SetRelativePath(ParentPath, Path);
+	if (ZEPathInfo(Path).GetRoot() == ZE_PR_UNKOWN)
+	{
+		// No root in path. Relative.
+		ZEPathInfo ParentPathInfo(ParentFilePath);
+		ZEString ParentDirectory = ParentPathInfo.GetParentDirectory();
+		return ZEFormat::Format("{0}/{1}", ParentDirectory, Path);
+	}
+	else
+	{
+		// Root available in path. Absolute path.
+		return Path;
+	}
 }

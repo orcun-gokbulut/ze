@@ -356,34 +356,31 @@ bool ZERNStageAO::InitializeSelf()
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOConstants));
 	FilterConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOFilterConstants));
 
-	ZEGRSamplerDescription SamplerDescription;
+	ZEGRSamplerDescription LinearSamplerDescription;
+	SamplerLinearClamp = ZEGRSampler::GetSampler(LinearSamplerDescription);
 
-	SamplerLinearClamp = ZEGRSampler::GetSampler(SamplerDescription);
+	ZEGRSamplerDescription SamplerPointBorderDescription;
+	SamplerPointBorderDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointBorderDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointBorderDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointBorderDescription.AddressU = ZEGR_TAM_BORDER;
+	SamplerPointBorderDescription.AddressV = ZEGR_TAM_BORDER;
+	SamplerPointBorderDescription.BorderColor = ZEVector4(1.0f, 0.0f, 0.0f, 0.0f);
+	SamplerPointBorder = ZEGRSampler::GetSampler(SamplerPointBorderDescription);
 
-	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
-	SamplerDescription.BorderColor = ZEVector4(1.0f, 0.0f, 0.0f, 0.0f);
+	ZEGRSamplerDescription SamplerPointWrapDescription;
+	SamplerPointWrapDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerPointWrapDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerPointWrap = ZEGRSampler::GetSampler(SamplerPointWrapDescription);
 
-	SamplerPointBorder = ZEGRSampler::GetSampler(SamplerDescription);
-
-	SamplerDescription.SetToDefault();
-	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerDescription.AddressU = ZEGR_TAM_WRAP;
-	SamplerDescription.AddressV = ZEGR_TAM_WRAP;
-
-	SamplerPointWrap = ZEGRSampler::GetSampler(SamplerDescription);
-
-	SamplerDescription.SetToDefault();
-	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-
-	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescription);
+	ZEGRSamplerDescription SamplerPointClampDescription;
+	SamplerPointClampDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointClampDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointClampDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerPointClampDescription);
 
 	return true;
 }

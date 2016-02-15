@@ -37,6 +37,8 @@
 
 #include "ZEError.h"
 
+ZE_COPY_NO_ACTION_IMP(ZEReferenceCounted)
+
 void ZEReferenceCounted::Reference() const
 {
 	ReferenceCountLock.Lock();
@@ -62,17 +64,7 @@ void ZEReferenceCounted::Destroy() const
 	delete this;
 }
 
-ZEReferenceCounted& ZEReferenceCounted::operator=(const ZEReferenceCounted& Other)
-{
-	return *this;
-}
-
 ZEReferenceCounted::ZEReferenceCounted()
-{
-	ReferenceCount = 0;
-}
-
-ZEReferenceCounted::ZEReferenceCounted(const ZEReferenceCounted& Object)
 {
 	ReferenceCount = 0;
 }

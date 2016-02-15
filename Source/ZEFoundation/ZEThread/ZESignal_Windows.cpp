@@ -40,7 +40,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <Windows.h>
 
-void ZESignal::Initialize()
+void ZESignal::Initialize() const
 {
 	if (Handle != NULL)
 		return;
@@ -89,7 +89,7 @@ void ZESignal::Reset()
 }
 
 
-void ZESignal::Wait()
+void ZESignal::Wait() const
 {
 	Initialize();
 
@@ -98,7 +98,7 @@ void ZESignal::Wait()
 		zeCriticalError("Failed to wait the signal.");
 }
 
-bool ZESignal::Wait(ZEUInt Milliseconds)
+bool ZESignal::Wait(ZEUInt Milliseconds) const
 {
 	Initialize();
 

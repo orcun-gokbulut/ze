@@ -48,8 +48,8 @@ class ZED11Sampler : public ZEGRSampler, public ZED11ComponentBase
 		ID3D11SamplerState*			GetInterface() const;
 
 	protected:
-		virtual bool				Initialize(const ZEGRSamplerDescription& SamplerDescription);
-		virtual void				Deinitialize();
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
 
 									ZED11Sampler();
 		virtual						~ZED11Sampler();

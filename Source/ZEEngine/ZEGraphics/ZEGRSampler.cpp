@@ -36,13 +36,14 @@
 #include "ZEGRSampler.h"
 
 #include "ZEMath/ZEMath.h"
+#include "ZEPointer/ZEPointer.h"
+
 #include "ZEGRGraphicsModule.h"
 
-#include <memory.h>
+ZEList2<ZEGRSampler> ZEGRSampler::SamplerCache;
+ZELock ZEGRSampler::SamplerCacheLock;
 
-ZEList2<ZEGRSampler> ZEGRSampler::SamplerUniqueList;
-
-void ZEGRSamplerDescription::SetToDefault()
+ZEGRSamplerDescription::ZEGRSamplerDescription()
 {
 	MinFilter = ZEGR_TFM_LINEAR;
 	MagFilter = ZEGR_TFM_LINEAR;
@@ -58,30 +59,16 @@ void ZEGRSamplerDescription::SetToDefault()
 	ComparisonFunction = ZEGR_CF_NEVER;
 }
 
-ZEGRSamplerDescription::ZEGRSamplerDescription()
-{
-	SetToDefault();
-}
-
-bool ZEGRSampler::Initialize(const ZEGRSamplerDescription& SamplerDescription)
-{
-	return true;
-}
-
-void ZEGRSampler::Deinitialize()
+ZEGRSampler::ZEGRSampler() : SamplerCacheLink(this)
 {
 
-}
-
-ZEGRSampler::ZEGRSampler()
-{
 }
 
 ZEGRSampler::~ZEGRSampler()
 {
-	ZELink<ZEGRSampler>* Link = SamplerUniqueList.Find(this);
-	if(Link != NULL)
-		SamplerUniqueList.Remove(Link);
+	SamplerCacheLock.Lock();
+	SamplerCache.Remove(&SamplerCacheLink);
+	SamplerCacheLock.Unlock();
 }
 
 const ZEGRSamplerDescription& ZEGRSampler::GetDescription() const
@@ -89,22 +76,51 @@ const ZEGRSamplerDescription& ZEGRSampler::GetDescription() const
 	return Description;
 }
 
-ZESharedPointer<ZEGRSampler> ZEGRSampler::GetSampler(const ZEGRSamplerDescription& SamplerDescription)
+ZEHolder<ZEGRSampler> ZEGRSampler::GetSampler(const ZEGRSamplerDescription& SamplerDescription)
 {
-	ze_for_each(Entry, SamplerUniqueList)
+	SamplerCacheLock.Lock();
+	ze_for_each(Entry, SamplerCache)
 	{
-		if(memcmp(&Entry->Description, &SamplerDescription, sizeof(ZEGRSamplerDescription)) == 0)
+		if (Entry->Description.AddressU == SamplerDescription.AddressU &&
+			Entry->Description.AddressV == SamplerDescription.AddressV &&
+			Entry->Description.AddressW == SamplerDescription.AddressW &&
+			Entry->Description.MinFilter == SamplerDescription.MinFilter &&
+			Entry->Description.MagFilter == SamplerDescription.MagFilter &&
+			Entry->Description.MipFilter == SamplerDescription.MipFilter &&
+			Entry->Description.ComparisonFunction == SamplerDescription.ComparisonFunction &&
+			Entry->Description.MaxAnisotropy == SamplerDescription.MaxAnisotropy &&
+			Entry->Description.MinLOD == SamplerDescription.MinLOD &&
+			Entry->Description.MaxLOD == SamplerDescription.MaxLOD &&
+			Entry->Description.MipMapLODBias == SamplerDescription.MipMapLODBias &&
+			Entry->Description.BorderColor == SamplerDescription.BorderColor)
+		{
+			SamplerCacheLock.Unlock();
 			return &(*Entry);
+		}
 	}
 
 	ZEGRSampler* Sampler = ZEGRGraphicsModule::GetInstance()->CreateSamplerState();
-	if(!Sampler->Initialize(SamplerDescription))
+	Sampler->Description = SamplerDescription;
+	SamplerCache.AddEnd(&Sampler->SamplerCacheLink);
+	SamplerCacheLock.Unlock();
+
+	if (!Sampler->Initialize())
 	{
 		delete Sampler;
 		return NULL;
 	}
 
-	SamplerUniqueList.AddEnd(new ZELink<ZEGRSampler>(Sampler));
-
 	return Sampler;
+}
+
+ZEHolder<ZEGRSampler> ZEGRSampler::GetDefaultSampler()
+{
+	static ZEHolder<ZEGRSampler> DefaultSampler;
+	if (DefaultSampler.IsNull())
+	{
+		ZEGRSamplerDescription DefaultDescription;
+		DefaultSampler = ZEGRSampler::GetSampler(DefaultDescription);
+	}
+
+	return DefaultSampler;
 }

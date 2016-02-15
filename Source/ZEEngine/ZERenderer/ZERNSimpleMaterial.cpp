@@ -44,6 +44,7 @@
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRTexture.h"
+#include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"

@@ -42,6 +42,8 @@
 #include "ZEPathTokenizer.h"
 #include "ZEDirectoryInfo.h"
 
+#pragma warning(disable:4996)
+
 void ZEPathManager::SetEnginePath(const ZEString& Path)
 {
 	EnginePath = ZEPathInfo(Path).Normalize();

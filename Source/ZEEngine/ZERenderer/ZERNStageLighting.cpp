@@ -127,46 +127,41 @@ void ZERNStageLighting::CreateLightGeometries()
 
 void ZERNStageLighting::CreateSamplers()
 {
-	ZEGRSamplerDescription SamplerDescription;
+	ZEGRSamplerDescription SamplerLinearBorderDescription;
+	SamplerLinearBorderDescription.AddressU = ZEGR_TAM_BORDER;
+	SamplerLinearBorderDescription.AddressV = ZEGR_TAM_BORDER;
+	SamplerLinearBorderDescription.AddressW = ZEGR_TAM_BORDER;
+	SamplerLinearBorderDescription.BorderColor = ZEVector4::Zero;
+	SamplerLinearBorder = ZEGRSampler::GetSampler(SamplerLinearBorderDescription);
 
-	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressW = ZEGR_TAM_BORDER;
-	SamplerDescription.BorderColor = ZEVector4::Zero;
+	ZEGRSamplerDescription SamplerComparisonLinearPointClampDescription;
+	SamplerComparisonLinearPointClampDescription.MinFilter = ZEGR_TFM_LINEAR;
+	SamplerComparisonLinearPointClampDescription.MagFilter = ZEGR_TFM_LINEAR;
+	SamplerComparisonLinearPointClampDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerComparisonLinearPointClampDescription.AddressU = ZEGR_TAM_CLAMP;
+	SamplerComparisonLinearPointClampDescription.AddressV = ZEGR_TAM_CLAMP;
+	SamplerComparisonLinearPointClampDescription.AddressW = ZEGR_TAM_CLAMP;
+	SamplerComparisonLinearPointClampDescription.ComparisonFunction = ZEGR_CF_LESS_EQUAL;
+	SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerComparisonLinearPointClampDescription);
 
-	SamplerLinearBorder = ZEGRSampler::GetSampler(SamplerDescription);
+	ZEGRSamplerDescription SamplerPointWrapDescription;
+	SamplerPointWrapDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerPointWrapDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerPointWrapDescription.AddressW = ZEGR_TAM_WRAP;
+	SamplerPointWrap = ZEGRSampler::GetSampler(SamplerPointWrapDescription);
 
-	SamplerDescription.SetToDefault();
-	SamplerDescription.MinFilter = ZEGR_TFM_LINEAR;
-	SamplerDescription.MagFilter = ZEGR_TFM_LINEAR;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerDescription.AddressU = ZEGR_TAM_CLAMP;
-	SamplerDescription.AddressV = ZEGR_TAM_CLAMP;
-	SamplerDescription.AddressW = ZEGR_TAM_CLAMP;
-	SamplerDescription.ComparisonFunction = ZEGR_CF_LESS_EQUAL;
-
-	SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerDescription);
-
-	SamplerDescription.SetToDefault();
-	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerDescription.AddressU = ZEGR_TAM_WRAP;
-	SamplerDescription.AddressV = ZEGR_TAM_WRAP;
-	SamplerDescription.AddressW = ZEGR_TAM_WRAP;
-
-	SamplerPointWrap = ZEGRSampler::GetSampler(SamplerDescription);
-
-	SamplerDescription.SetToDefault();
-	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
-	SamplerDescription.AddressW = ZEGR_TAM_BORDER;
-	SamplerDescription.BorderColor = ZEVector4::One;
-
-	SamplerPointBorder = ZEGRSampler::GetSampler(SamplerDescription);
+	ZEGRSamplerDescription SamplerPointBorderDescription;
+	SamplerPointBorderDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointBorderDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointBorderDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointBorderDescription.AddressU = ZEGR_TAM_BORDER;
+	SamplerPointBorderDescription.AddressV = ZEGR_TAM_BORDER;
+	SamplerPointBorderDescription.AddressW = ZEGR_TAM_BORDER;
+	SamplerPointBorderDescription.BorderColor = ZEVector4::One;
+	SamplerPointBorder = ZEGRSampler::GetSampler(SamplerPointBorderDescription);
 }
 
 bool ZERNStageLighting::UpdateBuffers()

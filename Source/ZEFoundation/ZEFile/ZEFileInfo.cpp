@@ -138,6 +138,8 @@ bool ZEFileInfo::Touch() const
 	return true;
 }
 
+#endif
+
 ZEFileInfo::ZEFileInfo()
 {
 
@@ -147,10 +149,3 @@ ZEFileInfo::ZEFileInfo(const char* Path)
 {
 	SetPath(Path);
 }
-
-ZEFileInfo::ZEFileInfo(const char* ParentPath, const char* Path)
-{
-	SetRelativePath(ParentPath, Path);
-}
-
-#endif

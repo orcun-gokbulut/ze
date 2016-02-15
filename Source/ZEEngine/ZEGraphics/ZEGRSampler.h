@@ -35,9 +35,12 @@
 
 #pragma once
 
-#include "ZEMath/ZEVector.h"
-#include "ZEPointer/ZESharedPointer.h"
+#include "ZEInitializable.h"
+#include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEReferenceCounted.h"
+#include "ZEPointer/ZEHolder.h"
 
 #include "ZEGRState.h"
 
@@ -58,41 +61,39 @@ enum ZEGRTextureFilter : ZEUInt8
 
 struct ZEGRSamplerDescription
 {
-	ZEGRTextureAddressing			AddressU;
-	ZEGRTextureAddressing			AddressV;
-	ZEGRTextureAddressing			AddressW;
-	ZEGRTextureFilter				MinFilter;
-	ZEGRTextureFilter				MagFilter;
-	ZEGRTextureFilter				MipFilter;
-	ZEGRComparisonFunction			ComparisonFunction;
-	ZEUInt8							MaxAnisotropy;
+	ZEGRTextureAddressing					AddressU;
+	ZEGRTextureAddressing					AddressV;
+	ZEGRTextureAddressing					AddressW;
+	ZEGRTextureFilter						MinFilter;
+	ZEGRTextureFilter						MagFilter;
+	ZEGRTextureFilter						MipFilter;
+	ZEGRComparisonFunction					ComparisonFunction;
+	ZEUInt8									MaxAnisotropy;
 
-	float							MinLOD;
-	float							MaxLOD;
-	float							MipMapLODBias;
-	ZEVector4						BorderColor;
+	float									MinLOD;
+	float									MaxLOD;
+	float									MipMapLODBias;
+	ZEVector4								BorderColor;
 
-	void							SetToDefault();
-									ZEGRSamplerDescription();
+											ZEGRSamplerDescription();
 };
 
-class ZEGRSampler
+class ZEGRSampler : public ZEInitializable, public ZEReferenceCounted
 {
 	private:
-		static ZEList2<ZEGRSampler>			SamplerUniqueList;
+		static ZEList2<ZEGRSampler>			SamplerCache;
+		static ZELock						SamplerCacheLock;
+		ZELink<ZEGRSampler>					SamplerCacheLink;
 
 	protected:
 		ZEGRSamplerDescription				Description;
 
-		virtual bool						Initialize(const ZEGRSamplerDescription& SamplerDescription);
-		virtual void						Deinitialize();
-
 											ZEGRSampler();
+		virtual								~ZEGRSampler();
 
 	public:
 		const ZEGRSamplerDescription&		GetDescription() const;
 
-		virtual								~ZEGRSampler();
-
-		static ZESharedPointer<ZEGRSampler>	GetSampler(const ZEGRSamplerDescription& SamplerDescription);
+		static ZEHolder<ZEGRSampler>		GetSampler(const ZEGRSamplerDescription& SamplerDescription);
+		static ZEHolder<ZEGRSampler>		GetDefaultSampler();
 };

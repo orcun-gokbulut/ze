@@ -67,33 +67,26 @@ enum ZERNTransparencyMode : ZEUInt8
 	ZERN_TM_ADDITIVE
 };
 
-enum ZERNOpacityFactorSource : ZEUInt8
-{
-	ZERN_OFS_CONSTANT,
-	ZERN_OFS_BASE_MAP_ALPHA,
-	ZERN_OFS_OPACITY_MAP
-};
-
 class ZERNFixedMaterial : public ZERNMaterial
 {
 	protected:
 		ZEString							Name;
 		ZEString							FileName;
 
-		mutable ZEFlags								DirtyFlags;
+		mutable ZEFlags							DirtyFlags;
 		 
-		mutable ZEHolder<ZEGRShader>				StageGBuffer_VertexShader;
-		mutable ZEHolder<ZEGRShader>				StageGBuffer_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>		StageGBuffer_RenderState;
+		mutable ZEHolder<ZEGRShader>			StageGBuffer_VertexShader;
+		mutable ZEHolder<ZEGRShader>			StageGBuffer_PixelShader;
+		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_RenderState;
 		 
-		mutable ZEHolder<ZEGRShader>				StageShadowmapGeneration_VertexShader;
-		mutable ZEHolder<ZEGRRenderStateData>		StageShadowmapGeneration_RenderState;
+		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_VertexShader;
+		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZERNMap								BaseMap;
 		ZERNMap								SpecularMap;
-		ZERNMap								SpecularPowerMap;
+		ZERNMap								SpecularGlossMap;
 		ZERNMap								EmissiveMap;
 		ZERNMap								NormalMap;
 		ZERNMap								HeightMap;
@@ -107,24 +100,37 @@ class ZERNFixedMaterial : public ZERNMaterial
 		{
 			ZEVector3						AmbientColor;
 			float							Opacity;
+			
 			ZEVector3						DiffuseColor;
 			float							SubSurfaceScatteringFactor;
+			
 			ZEVector3						SpecularColor;
 			float							SpecularPower;
+			
 			ZEUInt32						HeightMapTechnique;
 			float							HeightMapScale;
 			float							HeightMapOffset;
 			float							Reserved0;
+			
 			ZEVector3						EmissiveColor;
 			float							AlphaCullLimit;
+			
 			ZEVector3						ReflectionColor;
 			ZEBool32						GlobalAmbientEnabled;
+			
 			ZEVector3						RefractionColor;
 			float							RefractionIndex;
-			ZEVector3						DetailDiffuseMapColor;
+			
+			ZEVector3						DetailBaseMapColor;
 			float							DetailNormalMapFactor;
-			ZEVector2						DetailDiffuseMapTiling;
+			
+			ZEVector2						DetailBaseMapTiling;
 			ZEVector2						DetailNormalMapTiling;
+			
+			float							DetailBaseMapAttenuationStart;
+			float							DetailBaseMapAttenuationFactor;
+			float							DetailNormalMapAttenuationStart;
+			float							DetailNormalMapAttenuationFactor;
 		} Constants;
 
 		bool								ShadowCaster;
@@ -135,6 +141,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool								VertexColorEnabled;
 		bool								TransparencyEnabled;
 		ZERNTransparencyMode				TransparencyMode;
+		bool								BaseMapEnabled;
 		bool								AmbientEnabled;
 		float								AmbientFactor;
 		ZEVector3							AmbientColor;
@@ -142,6 +149,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float								DiffuseFactor;
 		ZEVector3							DiffuseColor;
 		bool								SpecularEnabled;
+		bool								SpecularMapEnabled;
+		bool								SpecularGlossMapEnabled;
 		float								SpecularFactor;
 		ZEVector3							SpecularColor;
 		bool								NormalMapEnabled;
@@ -150,13 +159,15 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool								EmissiveEnabled;
 		float								EmissiveFactor;
 		ZEVector3							EmissiveColor;
+		bool								EmissiveMapEnabled;
+		bool								SubSurfaceScatteringMapEnabled;
 		bool								ReflectionEnabled;
 		float								ReflectionFactor;
 		ZEVector3							ReflectionColor;
 		bool								RefractionEnabled;
 		float								RefractionFactor;
 		ZEVector3							RefractionColor;
-		ZERNOpacityFactorSource				OpacityFactorType;
+		bool								OpacityMapEnabled;
 		bool								EnvironmentMapEnabled;
 		bool								DetailBaseMapEnabled;
 		bool								DetailNormalMapEnabled;
@@ -166,8 +177,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool								UpdateConstantBuffer() const;
 		bool								UpdateRenderState() const;
 
-		void								ReadFromFileV0(const ZEMLReaderNode& MaterialNode);
-		void								ReadFromFileV1(const ZEMLReaderNode& MaterialNode);
+		void								Load(const ZEMLReaderNode& MaterialNode);
 
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
@@ -209,12 +219,16 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void								SetSubSurfaceScatteringFactor(float Factor);
 		float								GetSubSurfaceScatteringFactor() const;
+		void								SetSubSurfaceScatteringMapEnabled(bool Enabled);
+		bool								GetSubSurfaceScatteringMapEnabled() const;
 		void								SetSubSurfaceScatteringMap(const ZERNMap& Map);
 		const ZERNMap&						GetSubSurfaceScatteringMap() const;
 
+
+		void								SetBaseMapEnabled(bool Enabled);
+		bool								GetBaseMapEnabled() const;
 		void								SetBaseMap(const ZERNMap& Map);
 		const ZERNMap&						GetBaseMap() const;
-
 		void								SetBaseMapFile(const ZEString& Filename);
 		const ZEString&						GetBaseMapFile() const;
 
@@ -242,10 +256,14 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float								GetSpecularShininess() const;
 		void								SetSpecularColor(const ZEVector3& Color);
 		const ZEVector3&					GetSpecularColor() const;
+		void								SetSpecularMapEnabled(bool Enabled);
+		bool								GetSpecularMapEnabled() const;
 		void								SetSpecularMap(const ZERNMap& Map);
 		const ZERNMap&						GetSpecularMap() const;
-		void								SetSpecularPowerMap(const ZERNMap& Map);
-		const ZERNMap&						GetSpecularPowerMap() const;
+		void								SetSpecularGlossMapEnabled(bool Enabled);
+		bool								GetSpecularGlossMapEnabled() const;
+		void								SetSpecularGlossMap(const ZERNMap& Map);
+		const ZERNMap&						GetSpecularGlossMap() const;
 
 		void								SetEmissiveEnabled(bool Enabled);
 		bool								GetEmissiveEnabled() const;
@@ -253,6 +271,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float								GetEmissiveFactor() const;
 		void								SetEmissiveColor(const ZEVector3& Color);
 		const ZEVector3&					GetEmissiveColor() const;
+		void								SetEmissiveMapEnabled(bool Enabled);
+		bool								GetEmissiveMapEnabled() const;
 		void								SetEmissiveMap(const ZERNMap& Map);
 		const ZERNMap&						GetEmissiveMap() const;
 
@@ -274,10 +294,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void								SetOpacity(float Value);
 		float								GetOpacity() const;
+		void								SetOpacityMapEnabled(bool Enabled);
+		bool								GetOpacityMapEnabled() const;
 		void								SetOpacityMap(const ZERNMap& Map);
 		const ZERNMap&						GetOpacityMap() const;
-		void								SetOpacityFactorSource(ZERNOpacityFactorSource Type);
-		ZERNOpacityFactorSource				GetOpacityFactorSource() const;
 
 		void								SetEnvironmentMap(const ZERNMap& Map);
 		const ZERNMap&						GetEnvironmentMap() const;
@@ -307,6 +327,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 		const ZEVector3&					GetDetailBaseMapColor() const;
 		void								SetDetailBaseMapTiling(const ZEVector2& Tiling);
 		const ZEVector2&					GetDetailBaseMapTiling() const;
+		void								SetDetailBaseMapAttenuationStart(float Start);
+		float								GetDetailBaseMapAttenuationStart() const;
+		void								SetDetailBaseMapAttenuationFactor(float Factor);
+		float								GetDetailBaseMapAttenuationFactor() const;
 		void								SetDetailBaseMap(const ZERNMap& Map);
 		const ZERNMap&						GetDetailBaseMap() const;
 
@@ -316,6 +340,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float								GetDetailNormalMapFactor() const;
 		void								SetDetailNormalMapTiling(const ZEVector2& Tiling);
 		const ZEVector2&					GetDetailNormalMapTiling() const;
+		void								SetDetailNormalMapAttenuationStart(float Start);
+		float								GetDetailNormalMapAttenuationStart() const;
+		void								SetDetailNormalMapAttenuationFactor(float Factor);
+		float								GetDetailNormalMapAttenuationFactor() const;
 		void								SetDetailNormalMap(const ZERNMap& Map);
 		const ZERNMap&						GetDetailNormalMap() const;
 
