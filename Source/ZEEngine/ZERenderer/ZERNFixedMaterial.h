@@ -116,7 +116,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 			float							AlphaCullLimit;
 			
 			ZEVector3						ReflectionColor;
-			ZEBool32						GlobalAmbientEnabled;
+			ZEBool32						SceneAmbientEnabled;
 			
 			ZEVector3						RefractionColor;
 			float							RefractionIndex;
@@ -234,8 +234,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void								SetAmbientEnabled(bool Enabled);
 		bool								GetAmbientEnabled() const;
-		void								SetGlobalAmbientEnabled(bool Enabled);
-		bool								GetGlobalAmbientEnabled() const;
+		void								SetSceneAmbientEnabled(bool Enabled);
+		bool								GetSceneAmbientEnabled() const;
 		void								SetAmbientFactor(float Factor);
 		float								GetAmbientFactor() const;
 		void								SetAmbientColor(const ZEVector3& Color);

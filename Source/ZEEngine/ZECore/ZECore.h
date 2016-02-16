@@ -98,6 +98,7 @@ class ZECore
 
 		ZERealTimeClock*				RealTimeClock;
 		ZEProfiler*						Profiler;
+		float							ElapsedTime;
 
 		ZECrashHandler*					CrashHandler;
 		ZEModuleManager*				ModuleManager;
@@ -170,8 +171,9 @@ class ZECore
 		void							SetApplicationModule(ZEApplicationModule* Module);
 		ZEApplicationModule*			GetApplicationModule();
 
-		float							GetRuningTime();
 		ZESize							GetFrameId();
+		float							GetElapsedTime();
+		float							GetRuningTime();
 		
 		void							SetDebugMode(bool Enabled);
 		bool							GetDebugMode();

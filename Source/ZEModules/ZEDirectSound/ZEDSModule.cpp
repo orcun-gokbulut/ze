@@ -59,8 +59,8 @@ static BOOL CALLBACK DSEnumProc(LPGUID GUID, LPCTSTR DeviceName, LPCTSTR DriverN
 
 	ZESoundDevice* Device = Module->DeviceList.Add();
 	Device->DeviceId = Module->DeviceList.GetCount();
-	strncpy(Device->DeviceName, DeviceName, ZE_MAX_DEVICE_NAME_SIZE);
-	strncpy(Device->DriverName, DriverName, ZE_MAX_DEVICE_NAME_SIZE);
+	Device->DeviceName = DeviceName;
+	Device->DriverName = DriverName;
 	Module->DeviceGUIDList.Add(*GUID);
 
 	zeLog("Found Sound Device; "

@@ -36,7 +36,7 @@
 #include "ZEMLFormatBinaryV1.h"
 #include "ZEFile\ZEFile.h"
 #include "ZEEndian.h"
-#include "ZEPointer\ZEPointer.h"
+#include "ZEDS\ZEArray.h"
 
 #define ZEML_ITEM_FILE_IDENTIFIER	'Z'
 #define ZEML_MAX_NAME_SIZE			256
@@ -316,11 +316,12 @@ bool ZEMLFormatBinaryV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 				}
 				else
 				{
-					ZEPointer<char> Temp = new char[StringSize + 1];
-					if (File->Read(Temp, StringSize, 1) != 1)
+					ZEArray<char> Temp;
+					Temp.SetCount(StringSize + 1);
+					if (File->Read(Temp.GetCArray(), StringSize, 1) != 1)
 						return false;
 					Temp[StringSize] = '\0';
-					Element.Value.SetString(Temp);
+					Element.Value.SetString(Temp.GetConstCArray());
 				}
 				break;
 			}

@@ -51,6 +51,7 @@
 #include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZEGraphics\ZEGRConstantBuffer.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
+#include "ZECore\ZECore.h"
 
 namespace
 {
@@ -65,7 +66,7 @@ namespace
 	}
 };
 
-void ZERNRenderer::UpdateViewConstantBuffer()
+void ZERNRenderer::UpdateConstantBuffers()
 {
 	ZERNViewConstantBuffer* Buffer;
 	if (!ViewConstantBuffer->Lock((void**)&Buffer))
@@ -103,6 +104,14 @@ void ZERNRenderer::UpdateViewConstantBuffer()
 	Buffer->ShadowFadeDistance = View.ShadowFadeDistance;
 
 	ViewConstantBuffer->Unlock();
+
+	RendererConstants.Time = ZECore::GetInstance()->GetRuningTime();
+	RendererConstants.Elapsedtime = ZECore::GetInstance()->GetElapsedTime();
+	RendererConstants.FrameId = ZECore::GetInstance()->GetFrameId();
+	RendererConstantBuffer->SetData(&RendererConstants);
+
+	SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();
+	SceneConstantBuffer->SetData(&SceneConstants);
 }
 
 void ZERNRenderer::Cull()
@@ -131,7 +140,7 @@ void ZERNRenderer::RenderStages()
 
 	ZERNRenderParameters Parameters;
 	Parameters.FrameId = 0;
-	Parameters.ElapsedTime = Constants.Elapsedtime;
+	Parameters.ElapsedTime = RendererConstants.Elapsedtime;
 	Parameters.Time = 0;
 	Parameters.Scene = Scene;
 	Parameters.Context = Context;
@@ -139,7 +148,7 @@ void ZERNRenderer::RenderStages()
 	Parameters.Renderer = this;
 	Parameters.Type = ZERN_DT_NORMAL;
 
-	UpdateViewConstantBuffer();
+	UpdateConstantBuffers();
 
 	ZEGRConstantBuffer* PrevViewConstantBuffer;
 	ZEGRConstantBuffer* PrevRendererConstantBuffer;
@@ -148,6 +157,7 @@ void ZERNRenderer::RenderStages()
 
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, SceneConstantBuffer);
 
 	if(OutputRenderTarget != NULL)
 	{
@@ -208,6 +218,7 @@ bool ZERNRenderer::InitializeSelf()
 
 	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
 	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
+	SceneConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SceneConstants));
 
 	return true;
 }
@@ -219,6 +230,7 @@ void ZERNRenderer::DeinitializeSelf()
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
+	SceneConstantBuffer.Release();
 }
 
 void ZERNRenderer::SetContext(ZEGRContext* Context)
@@ -389,8 +401,11 @@ bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 
 void ZERNRenderer::Render(float ElapsedTime)
 {
-	Constants.Elapsedtime = ElapsedTime;
-	RendererConstantBuffer->SetData(&Constants);
+	if (!IsInitialized())
+		return;
+
+	if (Scene == NULL)
+		return;
 
 	Cull();
 	SortStageQueues();
