@@ -46,9 +46,6 @@
 #include "ZEThread/ZESignal.h"
 #include "ZEThread/ZETask.h"
 
-
-ZE_META_FORWARD_DECLARE(ZERSManager, "ZEResourceManager.h")
-
 enum ZERSLoadMethod
 {
 	ZERS_LM_SYNC,
@@ -56,13 +53,13 @@ enum ZERSLoadMethod
 	ZERS_LM_CUSTOM
 };
 
-enum ZERSStatus
+enum ZERSState
 {
 	ZERS_S_NOT_LOADED,
 	ZERS_S_LOADING,
 	ZERS_S_ITERATING,
 	ZERS_S_LOADED,
-	ZERS_S_NOT_FOUND
+	ZERS_S_ERROR
 };
 
 enum ZERSMemoryPool
@@ -77,6 +74,8 @@ class ZERSLoadingOptions
 
 };
 
+class ZERSManager;
+
 class ZERSResource : public ZEObject, public ZEReferenceCounted
 {
 	ZE_OBJECT
@@ -89,7 +88,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		mutable ZELock ReferenceCounterLock;
 		mutable ZELink<const ZERSResource> ManagerLink;
 
-		ZERSStatus Status;
+		ZERSState State;
 
 		ZEString FilePath;
 		ZEString FilePathNormalized;
@@ -128,12 +127,12 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		template<typename ZEResourceClass> 
 		static ZERSResource* Instanciator();
 		template<typename ZEResourceClass>
-		static ZEHolder<ZERSResource> LoadTemplate(const ZEString& FileName, const ZERSLoadingOptions* Options = NULL);
+		static ZEHolder<const ZEResourceClass> LoadTemplate(const ZEString& FileName, const ZERSLoadingOptions* Options = NULL);
 
 		virtual ~ZERSResource();
 
 	public:
-		ZERSStatus GetStatus() const;
+		ZERSState GetState() const;
 		ZEGUID GetGUID() const;
 		const ZEString& GetFilePath() const;
 		ZESize GetReferanceCount() const;
@@ -165,8 +164,8 @@ ZERSResource*	ZERSResource::Instanciator()
 }
 
 template<typename ZEResourceClass>
-ZEHolder<ZERSResource> ZERSResource::LoadTemplate(const ZEString& FileName, const ZERSLoadingOptions* Options)
+ZEHolder<const ZEResourceClass> ZERSResource::LoadTemplate(const ZEString& FileName, const ZERSLoadingOptions* Options)
 {
-	zeLog("Loading resource. Resource Class: \"%s\", File Path: \"%s\".", GetClass()->GetName(), FileName.ToCString());
-	return ZERSManager::GetInstance()->LoadResource(FileName, Instanciator<ZEResourceClass>(), Options);
+	zeLog("Loading resource. Resource Class: \"%s\", File Path: \"%s\".", ZEResourceClass::Class()->GetName(), FileName.ToCString());
+	return ZERSManager::GetInstance()->LoadResource(FileName, Instanciator<ZEResourceClass>, Options).Cast<const ZEResourceClass>();
 }
