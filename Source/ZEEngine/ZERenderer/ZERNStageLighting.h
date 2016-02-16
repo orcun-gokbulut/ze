@@ -43,6 +43,7 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEPointer/ZESharedPointer.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -78,6 +79,8 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRStructuredBuffer>		TileStructuredBuffer;
 		ZEHolder<ZEGRConstantBuffer>		LightConstantBuffer;
 		ZEHolder<ZEGRVertexBuffer>			LightVertexBuffer;
+
+		ZEGRViewport						Viewport;
 
 		struct LightStruct
 		{

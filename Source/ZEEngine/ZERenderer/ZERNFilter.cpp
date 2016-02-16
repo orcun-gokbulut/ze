@@ -107,7 +107,7 @@ ZEUInt ZERNFilter::GetKernelSize() const
 	return Constants.KernelSize;
 }
 
-void ZERNFilter::SetKernelValues(const ZEVector4* Values, ZEUInt KernelSize)
+void ZERNFilter::SetKernelValues(const ZEVector4* Values, ZESize KernelSize)
 {
 	zeDebugCheck(Values == NULL, "Kernel Values cannot be NULL");
 	zeDebugCheck(KernelSize == 0, "Kernel size cannot be zero");
@@ -130,12 +130,12 @@ const ZEVector4* ZERNFilter::GetKernelValues()
 	return &Constants.KernelValues[0];
 }
 
-void ZERNFilter::ComputeLinearFilter(const ZEVector4* Values, ZEUInt KernelSize)
+void ZERNFilter::ComputeLinearFilter(const ZEVector4* Values, ZESize KernelSize)
 {
 	ZEUInt HalfWidth = KernelSize / 2;
 	ZEUInt IterationCount = HalfWidth / 2;
 
-	for(ZEUInt I = 0; I < IterationCount; ++I)
+	for(ZEUInt I = 0; I < IterationCount; I++)
 	{
 		ZEUInt Index = I * 2;
 

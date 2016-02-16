@@ -41,6 +41,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEPointer/ZESharedPointer.h"
 #include "ZERNFilter.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -88,7 +89,7 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
 
 		const ZEGRTexture2D*				InputTexture;
-		const ZEGRRenderTarget*				OutputRenderTarget;
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
 
 		ZERNFilter							Filter;
 		ZEArray<ZEVector4>					HorizontalValues;
@@ -104,10 +105,8 @@ class ZERNStageHDR : public ZERNStage
 		
 		ZEHolder<ZEGRSampler>			SamplerLinearClamp;
 
-		ZEUInt								PrevWidth;
-		ZEUInt								PrevHeight;
-
 		ZERNHDRBlurTextureSize				BlurTextureSize;
+		ZEGRViewport						Viewport;
 
 		struct
 		{	
@@ -116,10 +115,10 @@ class ZERNStageHDR : public ZERNStage
 			float							BloomFactor;
 			float							BloomThreshold;
 
-			ZEBool32						AutoKey;
+			ZEBool32						AutoKeyEnabled;
 			ZEUInt							ToneMapOperator;
 			ZEBool32						BloomEnabled;
-			ZEUInt							Reserved0;
+			float							Saturation;
 
 			float							LuminanceMin;
 			float							LuminanceMax;
@@ -154,29 +153,32 @@ class ZERNStageHDR : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		void								SetKey(float Value);
+		void								SetKey(float Key);
 		float								GetKey() const;
 
-		void								SetAutoKey(ZEBool32 Enabled);
-		ZEBool32							GetAutoKey() const;
+		void								SetAutoKey(bool AutoKeyEnabled);
+		bool								GetAutoKey() const;
 
-		void								SetWhiteLevel(float Value);
+		void								SetWhiteLevel(float WhiteLevel);
 		float								GetWhiteLevel() const;
 
-		void								SetBloomEnabled(ZEBool32 Enabled);
-		ZEBool32							GetBloomEnabled() const;
+		void								SetBloomEnabled(bool BloomEnabled);
+		bool								GetBloomEnabled() const;
 
-		void								SetBloomFactor(float Value);
+		void								SetBloomFactor(float BloomFactor);
 		float								GetBloomFactor() const;
 
-		void								SetBloomThreshold(float Value);
+		void								SetBloomThreshold(float BloomThreshold);
 		float								GetBloomThreshold() const;
 
-		void								SetLuminanceMin(float Value);
+		void								SetLuminanceMin(float LuminanceMin);
 		float								GetLuminanceMin() const;
 
-		void								SetLuminanceMax(float Value);
+		void								SetLuminanceMax(float LuminanceMax);
 		float								GetLuminanceMax() const;
+
+		void								SetSaturation(float Saturation);
+		float								GetSaturation() const;
 
 		void								SetToneMapOperator(ZERNHDRToneMapOperator Operator);
 		ZERNHDRToneMapOperator				GetToneMapOperator() const;
@@ -184,8 +186,7 @@ class ZERNStageHDR : public ZERNStage
 		void								SetInputTexture(const ZEGRTexture2D* Input);
 		const ZEGRTexture2D*				GetInputTexture() const;
 
-		void								SetOutputRenderTarget(const ZEGRRenderTarget* Output);
-		const ZEGRRenderTarget*				GetOutputRenderTarget() const;
+		ZEHolder<ZEGRTexture2D>				GetOutputTexture() const;
 
 		void								SetBlurTextureSize(ZERNHDRBlurTextureSize Value);
 		ZERNHDRBlurTextureSize				GetBlurTextureSize() const;

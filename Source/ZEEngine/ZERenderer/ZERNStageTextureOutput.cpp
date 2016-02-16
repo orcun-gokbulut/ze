@@ -147,26 +147,27 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 {
 	if (!ZERNStage::Setup(Renderer, Context, Commands))
 		return false;
-
-	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
-	if(RenderTarget == NULL)
+	
+	OutputRenderTarget = Renderer->GetOutputRenderTarget();
+	
+	if(OutputRenderTarget == NULL)
 		return false;
-
-	OutputRenderTarget = RenderTarget;
 
 	if(InputTextures.GetCount() == 0)
 	{
-		ZERNStagePostProcess* StagePostProcess = (ZERNStagePostProcess*)Renderer->GetStage(ZERN_STAGE_POST_EFFECT);
-		if(StagePostProcess != NULL)
+		ZERNStageHDR* StageHDR = static_cast<ZERNStageHDR*>(Renderer->GetStage(ZERN_STAGE_HDR));
+		ZERNStagePostProcess* StagePostProcess = static_cast<ZERNStagePostProcess*>(Renderer->GetStage(ZERN_STAGE_POST_EFFECT));
+		ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
+		if (StageHDR != NULL)
+		{
+			InputTextures.Add(StageHDR->GetOutputTexture());
+		}
+		else if (StagePostProcess != NULL)
 		{
 			InputTextures.Add(StagePostProcess->GetOutputTexture());
 		}
-		else
+		else if (StageGBuffer != NULL)
 		{		
-			ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
-			if(StageGBuffer == NULL)
-				return false;
-
 			InputTextures.Add(StageGBuffer->GetAccumulationMap());
 		}
 	}

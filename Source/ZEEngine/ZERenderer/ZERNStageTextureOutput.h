@@ -53,7 +53,7 @@ class ZERNStageTextureOutput : public ZERNStage
 {
 	private:
 		ZEArray<const ZEGRTexture*>		InputTextures;
-		ZEGRRenderTarget*				OutputRenderTarget;
+		const ZEGRRenderTarget*			OutputRenderTarget;
 
 		ZEHolder<ZEGRShader>			VertexShader;
 		ZEHolder<ZEGRShader>			PixelShader;

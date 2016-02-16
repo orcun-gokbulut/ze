@@ -723,13 +723,16 @@ bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELi
 
 	OutputRenderTarget = AccumulationMap->GetRenderTarget();
 
+	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
+	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
+
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
 
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
+	Context->SetViewports(1, &Viewport);
 
 	if(UseTiledDeferred)
 		return SetupTiledDeferred(Renderer, Context);

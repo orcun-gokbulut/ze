@@ -83,7 +83,7 @@ class ZERNFilter : public ZEInitializable
 		bool							UpdateRenderState();
 		bool							Update();
 
-		void							ComputeLinearFilter(const ZEVector4* Values, ZEUInt KernelSize);
+		void							ComputeLinearFilter(const ZEVector4* Values, ZESize KernelSize);
 
 	public:
 
@@ -95,7 +95,7 @@ class ZERNFilter : public ZEInitializable
 
 		ZEUInt							GetKernelSize() const;
 
-		void							SetKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
+		void							SetKernelValues(const ZEVector4* Values, ZESize KernelSize);
 		const ZEVector4* 				GetKernelValues();
 
 		void							Process(ZEGRContext* Context);
