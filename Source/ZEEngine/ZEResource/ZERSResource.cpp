@@ -118,7 +118,7 @@ bool ZERSResource::LoadInternal(const ZERSLoadingOptions* Option)
 
 ZERSResource::ZERSResource() : ManagerLink(this)
 {
-	Status = ZERS_S_NOT_LOADED;
+	State = ZERS_S_NOT_LOADED;
 	Hash = 0;
 	ReferenceCount = 0;
 	Cached = true;
@@ -136,14 +136,9 @@ const ZEString& ZERSResource::GetFilePath() const
 	return FilePath;
 }
 
-ZERSStatus ZERSResource::GetStatus() const
+ZERSState ZERSResource::GetState() const
 {
-	return Status;
-}
-
-ZEUInt64 ZERSResource::GetHash() const
-{
-	return Hash;
+	return State;
 }
 
 ZEGUID ZERSResource::GetGUID() const

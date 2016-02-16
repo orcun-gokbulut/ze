@@ -52,12 +52,12 @@ class ZERSManager : public ZEObject
 		ZEList2<const ZERSResource>	Resources;
 
 		ZESize MemoryUsage[ZERS_MP_TOTAL];
-		ZESize CacheSize;
-		ZESize CacheUsage;
+		ZESize CacheSize[ZERS_MP_TOTAL];
+		ZESize CacheUsage[ZERS_MP_TOTAL];
 		
 		ZEHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
 		void RegisterResourceInternal(const ZERSResource* Resource);
-		ZEHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions);
+		ZEHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, const ZERSLoadingOptions* LoadingOptions);
 
 		void RegisterResource(const ZERSResource* Resource);
 		void ReleaseResource(const ZERSResource* Resource);
@@ -67,10 +67,10 @@ class ZERSManager : public ZEObject
 
 	public:
 		ZESize GetMemoryUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
-		ZESize GetCacheUsage();
+		ZESize GetCacheUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 
-		void SetCacheSize(ZESize Size);
-		ZESize SetCacheSize();
+		void SetCacheSize(ZERSMemoryPool Pool, ZESize Size);
+		ZESize SetCacheSize(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 
 		ZEHolder<const ZERSResource> GetResource(const ZEString& FilePath);
 		ZEHolder<const ZERSResource> GetResource(const ZEGUID& GUID);

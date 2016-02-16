@@ -52,7 +52,7 @@ ZEHolder<const ZERSResource> ZERSManager::GetResourceInternal(const ZEString& Fi
 
 	ze_for_each(Resource, Resources)
 	{
-		if (Resource->GetHash() == Hash && Resource->FilePathNormalized == FilePathNormalized)
+		if (Resource->Hash == Hash && Resource->FilePathNormalized == FilePathNormalized)
 		{
 			ManagerLock.Unlock();
 			return &Resource.GetItem();
@@ -73,7 +73,7 @@ void ZERSManager::RegisterResourceInternal(const ZERSResource* Resource)
 		MemoryUsage[I] += Resource->GetSize((ZERSMemoryPool)I);
 }
 
-ZEHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, ZERSLoadingOptions* LoadingOptions)
+ZEHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, const ZERSLoadingOptions* LoadingOptions)
 {
 	ManagerLock.Lock();
 
@@ -104,7 +104,7 @@ ZEHolder<const ZERSResource> ZERSManager::LoadResource(const ZEString& FilePath,
 	}
 	else
 	{
-		Resource->AsyncLoader.SetParameter(LoadingOptions);
+		Resource->AsyncLoader.SetParameter((void*)LoadingOptions);
 		Resource->AsyncLoader.Run();
 	}
 
@@ -143,14 +143,81 @@ void ZERSManager::ReleaseResource(const ZERSResource* Resource)
 
 ZERSManager::ZERSManager()
 {
-	CacheUsage = 0;
-	CacheSize = 1024*1024*1024;
+	for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
+	{
+		CacheUsage[I] = 0;
+		CacheSize[I] = ZE_SIZE_GB;
+	}
+	memset(CacheUsage, 0, sizeof(CacheUsage));
+	memset(CacheSize, 0, sizeof(CacheUsage));
 	memset(MemoryUsage, 1, sizeof(MemoryUsage));
 }
 
 ZERSManager::~ZERSManager()
 {
 
+}
+
+ZESize ZERSManager::GetMemoryUsage(ZERSMemoryPool Pool)
+{
+	if (Pool < 0 || Pool > ZERS_MP_TOTAL)
+	{
+		return 0;
+	}
+	else if (Pool == ZERS_MP_TOTAL)
+	{
+		ZESize Total = 0;
+		for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
+			Total += MemoryUsage[I];
+	}
+	else
+	{
+		return MemoryUsage[Pool];
+	}
+}
+
+void ZERSManager::SetCacheSize(ZERSMemoryPool Pool, ZESize Size)
+{
+	if (Pool < 0 || Pool >= ZERS_MP_TOTAL)
+		return;
+
+	CacheSize[Pool] = Size;
+}
+
+ZESize ZERSManager::SetCacheSize(ZERSMemoryPool Pool)
+{
+	if (Pool < 0 || Pool > ZERS_MP_TOTAL)
+	{
+		return 0;
+	}
+	else if (Pool == ZERS_MP_TOTAL)
+	{
+		ZESize Total = 0;
+		for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
+			Total += CacheUsage[I];
+	}
+	else
+	{
+		return CacheUsage[Pool];
+	}
+}
+
+ZESize ZERSManager::GetCacheUsage(ZERSMemoryPool Pool)
+{
+	if (Pool < 0 || Pool > ZERS_MP_TOTAL)
+	{
+		return 0;
+	}
+	else if (Pool == ZERS_MP_TOTAL)
+	{
+		ZESize Total = 0;
+		for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
+			Total += CacheUsage[I];
+	}
+	else
+	{
+		return CacheUsage[Pool];
+	}
 }
 
 ZEHolder<const ZERSResource> ZERSManager::GetResource(const ZEGUID& GUID)
