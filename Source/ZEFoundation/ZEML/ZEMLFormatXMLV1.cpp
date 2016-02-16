@@ -229,8 +229,9 @@ bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 	File->Seek(0, ZE_SF_BEGINING);
 
 	ZESize FileSize = File->GetSize();
-	ZEPointer<char> Buffer = new char[FileSize + 1];
-	if (File->Read(Buffer, FileSize, 1) != 1)
+	ZEArray<char> Buffer;
+	Buffer.SetCount(FileSize + 1);
+	if (File->Read(Buffer.GetCArray(), FileSize, 1) != 1)
 	{
 		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
@@ -238,7 +239,7 @@ bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 
 	Buffer[FileSize] = '\0';
 	Document = new TiXmlDocument();
-	Document->Parse(Buffer, 0, TIXML_ENCODING_UTF8);
+	Document->Parse(Buffer.GetConstCArray(), 0, TIXML_ENCODING_UTF8);
 	if (Document->Error())
 	{
 		zeError("Cannot parse XML in ZEML file. Corrupted ZEML file. File Name: \"%s\". Error Description: %s", File->GetPath().ToCString(), Document->ErrorDesc());

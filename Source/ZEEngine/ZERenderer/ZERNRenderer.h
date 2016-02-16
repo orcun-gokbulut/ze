@@ -65,20 +65,29 @@ class ZERNRenderer : public ZEInitializable
 		ZEGRRenderTarget*				OutputRenderTarget;
 		ZEHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	SceneConstantBuffer;
 		ZEArray<ZERNStageQueue>			StageQueues;
 
 		struct RendererConstants
 		{
-			float Elapsedtime;
-			float Reserved[3];
-		}Constants;
+			float						Elapsedtime;
+			float						Time;
+			ZEUInt32					FrameId;
+			ZEUInt32					Reserved0;
+		} RendererConstants;
+
+		struct SceneConstants
+		{
+			ZEVector3					AmbientColor;
+			float						Reserved0;
+		} SceneConstants;
 
 		void							Cull();
 		void							SortStageQueues();
 		void							RenderStage(ZERNStageQueue* Queue);
 		void							RenderStages();
 
-		void							UpdateViewConstantBuffer();
+		void							UpdateConstantBuffers();
 
 		virtual bool					InitializeSelf();
 		virtual void					DeinitializeSelf();

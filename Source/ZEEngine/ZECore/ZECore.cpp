@@ -305,6 +305,10 @@ float ZECore::GetRuningTime()
 	return (float)((PerformanceCount.QuadPart - StartPerformanceCount.QuadPart) / PerformanceCounterFreq.QuadPart);
 }
 
+float ZECore::GetElapsedTime()
+{
+	return ElapsedTime;
+}
 
 void ZECore::SetDebugMode(bool Enabled)
 {
@@ -639,13 +643,15 @@ void ZECore::MainLoop()
 	if (Application != NULL)
 		Application->PreProcess();
 
-	FrameId++;
-	
 	RealTimeClock->UpdateFrameTime();
+	ElapsedTime = (float)RealTimeClock->GetFrameDeltaTime() / 1000000.0f;
 
-	float FrameTime = (float)RealTimeClock->GetFrameDeltaTime() / 1000000.0f;
+	if (ElapsedTime > 5.0f)
+		ElapsedTime = 0.01f;
 
-	TimerManager->Tick(FrameTime);
+	FrameId++;
+
+	TimerManager->Tick(ElapsedTime);
 	
 	SystemMessageManager->ProcessMessages();
 
@@ -653,20 +659,20 @@ void ZECore::MainLoop()
 	InputModule->Process();
 
 	if (Application != NULL)
-		Application->Process(FrameTime);
+		Application->Process(ElapsedTime);
 
 	if (Game != NULL)
-		Game->Tick(FrameTime);
+		Game->Tick(ElapsedTime);
 
 	// Engine Logic
-	PhysicsModule->Process(FrameTime);
-	SoundModule->ProcessSound(FrameTime);
+	PhysicsModule->Process(ElapsedTime);
+	SoundModule->ProcessSound(ElapsedTime);
 	if (Game != NULL)
-		Game->Render(FrameTime);
+		Game->Render(ElapsedTime);
 	PhysicsModule->UpdateWorlds();
 
 	if (Application != NULL)
-		Application->PostProcess(FrameTime);
+		Application->PostProcess(ElapsedTime);
 }
 
 void ZECore::Run()
@@ -715,6 +721,8 @@ ZECore::ZECore()
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
 	Game					= new ZEGame();
+	
+	ElapsedTime				= 0.0f;
 
 	SystemMessageManager->RegisterMessageHandler(SystemMessageHandler);
 

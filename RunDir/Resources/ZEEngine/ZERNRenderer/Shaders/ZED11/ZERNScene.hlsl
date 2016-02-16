@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDeletor.h
+ Zinek Engine - ZERNScene.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,59 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_SCENE_H__
+#define __ZERN_SCENE_H__
 
-#include "ZEError.h"
+#include "ZERNShaderSlots.hlsl"
 
-template<typename Type>
-class ZEDeletor
+
+// SHADER RESOURCES
+///////////////////////////////////////////////////////////////////////////////
+
+cbuffer ZERNScene_Constants	: register(ZERN_SHADER_CONSTANT_SCENE)
 {
-	public:
-		static void		Delete(Type* Pointer);
+	float	ZERNScene_AmbientColor;
+	float	ZERNScene_Reserved0;
 };
 
-template<typename Type>
-class ZEDeletorArray
-{
-	public:
-		static void		Delete(Type* Pointer);
-};
-
-template<typename Type>
-class ZEDeletorRelease
-{
-	public:
-		static void		Delete(Type* Pointer);
-};
-
-template<typename Type>
-class ZEDeletorDestroy
-{
-	public:
-		static void		Delete(Type* Pointer);
-};
-
-template<typename Type>
-void ZEDeletor<Type>::Delete(Type* Pointer)
-{
-	delete Pointer;
-}
-
-template<typename Type>
-void ZEDeletorArray<Type>::Delete(Type* Pointer)
-{
-	delete[] Pointer;
-}
-
-template<typename Type>
-void ZEDeletorRelease<Type>::Delete(Type* Pointer)
-{
-	Pointer->Release();
-}
-
-template<typename Type>
-void ZEDeletorDestroy<Type>::Delete(Type* Pointer)
-{
-	Pointer->Destroy();
-}
-
+#endif

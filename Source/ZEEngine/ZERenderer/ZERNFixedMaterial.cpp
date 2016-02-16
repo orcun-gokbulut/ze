@@ -186,7 +186,7 @@ bool ZERNFixedMaterial::UpdateConstantBuffer() const
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_CONSTANT_BUFFER))
 		return true;
 
-	Constants.AmbientColor = /*(AmbientEnabled ? 1.0f : 0.0f) * */ AmbientFactor * AmbientColor;
+	Constants.AmbientColor = (AmbientEnabled ? 1.0f : 0.0f) * AmbientFactor * AmbientColor;
 	Constants.DiffuseColor = (DiffuseEnabled ? 1.0f : 0.0f) * DiffuseFactor * DiffuseColor;
 	Constants.SpecularColor = (SpecularEnabled ? 1.0f : 0.0f) * SpecularFactor * SpecularColor;
 	Constants.EmissiveColor = (EmissiveEnabled ? 1.0f : 0.0f) * EmissiveFactor * EmissiveColor;
@@ -264,7 +264,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	TransparencyMode = ZERN_TM_NONE;
 	SubSurfaceScatteringMapEnabled = false;	
 	BaseMapEnabled = false;
-	AmbientEnabled = true;
+	AmbientEnabled = false;
 	AmbientFactor = 1.0f;
 	AmbientColor = ZEVector3::One;
 	DiffuseEnabled = true;
@@ -306,7 +306,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	Constants.EmissiveColor = ZEVector3::One;
 	Constants.AlphaCullLimit = 1.0f;
 	Constants.ReflectionColor = ZEVector3::One;
-	Constants.GlobalAmbientEnabled = false;
+	Constants.SceneAmbientEnabled = false;
 	Constants.RefractionColor = ZEVector3::One;
 	Constants.RefractionIndex = 1.0f;
 	Constants.DetailBaseMapColor = ZEVector3::One;
@@ -562,19 +562,19 @@ bool ZERNFixedMaterial::GetAmbientEnabled() const
 	return AmbientEnabled;
 }
 
-void ZERNFixedMaterial::SetGlobalAmbientEnabled(bool Enabled)
+void ZERNFixedMaterial::SetSceneAmbientEnabled(bool Enabled)
 {
-	if ((Constants.GlobalAmbientEnabled != 0) == Enabled)
+	if ((Constants.SceneAmbientEnabled != 0) == Enabled)
 		return;
 
-	Constants.GlobalAmbientEnabled = Enabled;
+	Constants.SceneAmbientEnabled = Enabled;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetGlobalAmbientEnabled() const
+bool ZERNFixedMaterial::GetSceneAmbientEnabled() const
 {
-	return Constants.GlobalAmbientEnabled != 0;
+	return Constants.SceneAmbientEnabled != 0;
 }
 
 void ZERNFixedMaterial::SetAmbientFactor(float Factor)
@@ -1410,7 +1410,7 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 
 	ConfigurationNode.WriteBool("AmbientEnabled", GetAmbientEnabled());
 	ConfigurationNode.WriteFloat("AmbientFactor", GetAmbientFactor());
-	ConfigurationNode.WriteBool("GlobalAmbientEnabled", GetGlobalAmbientEnabled());
+	ConfigurationNode.WriteBool("SceneAmbientEnabled", GetSceneAmbientEnabled());
 	ConfigurationNode.WriteVector3("AmbientColor", GetAmbientColor());
 
 	ConfigurationNode.WriteBool("DiffuseEnabled", GetDiffuseEnabled());
@@ -1539,8 +1539,8 @@ void ZERNFixedMaterial::Load(const ZEMLReaderNode& MaterialNode)
 		BaseMap.Read(ConfigurationNode, "BaseMap");
 		SetBaseMapEnabled(ConfigurationNode.ReadBoolean("BaseMapEnabled", BaseMap.IsAvailable()));
 
-		SetAmbientEnabled(ConfigurationNode.ReadBoolean("AmbientEnabled", true));
-		SetGlobalAmbientEnabled(ConfigurationNode.ReadBoolean("GlobalAmbientEnabled", false));
+		SetAmbientEnabled(ConfigurationNode.ReadBoolean("AmbientEnabled", false));
+		SetSceneAmbientEnabled(ConfigurationNode.ReadBoolean("SceneAmbientEnabled", true));
 		SetAmbientFactor(ConfigurationNode.ReadFloat("AmbientFactor", 1.0f));
 		SetAmbientColor(ConfigurationNode.ReadVector3("AmbientColor", ZEVector3::One));
 

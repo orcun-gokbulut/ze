@@ -36,6 +36,7 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNSkin.hlsl"
 #include "ZERNTransformations.hlsl"
+#include "ZERNScene.hlsl"
 
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
@@ -60,7 +61,7 @@ cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 	float			ZERNFixedMaterial_AlphaCullLimit;
 
 	float3			ZERNFixedMaterial_ReflectionColor;
-	bool			ZERNFixedMaterial_GlobalAmbientEnabled;
+	bool			ZERNFixedMaterial_SceneAmbientEnabled;
 
 	float3			ZERNFixedMaterial_RefractionColor;
 	float			ZERNFixedMaterial_RefractionIndex;
@@ -246,10 +247,12 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailBaseAttenuation);
 	#endif
 
-	float3 AmbientColor = BaseColor * ZERNFixedMaterial_AmbientColor;
+
+	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? ZERNScene_AmbientColor : ZERNFixedMaterial_AmbientColor);
 	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
 	float3 SpecularColor = BaseColor * ZERNFixedMaterial_SpecularColor;
 	float3 EmissiveColor = BaseColor * ZERNFixedMaterial_EmissiveColor;
+
 
 	#ifdef ZERN_FM_EMISSIVE_MAP
 		EmissiveColor *= ZRNFixedMaterial_EmissiveMap.Sample(ZRNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
@@ -268,7 +271,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	float3 ReflectionRefractionColor = float3(0.0f, 0.0f, 0.0f);
 	#ifdef ZERN_FM_REFLECTION
 		float3 ReflectionDirection = normalize(reflect(float3(0.0f, 0.0f, -1.0f), Normal));
-		ReflectionRefractionColor += ZERNFixedMaterial_ReflectionColor * ZRNFixedMaterial_EnvironmentMap.Sample(ZRNFixedMaterial_EnvironmentMapSampler, ).rgb;
+		ReflectionRefractionColor += ZERNFixedMaterial_ReflectionColor * ZRNFixedMaterial_EnvironmentMap.Sample(ZRNFixedMaterial_EnvironmentMapSampler, normalize(Input.ReflectionVector)).rgb;
 	#endif
 		
 	#ifdef ZERN_FM_REFRACTION

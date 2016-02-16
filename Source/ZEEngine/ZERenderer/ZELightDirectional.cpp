@@ -348,9 +348,7 @@ const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index)
 const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index)
 {
 	if(Index >= CascadeConstants.CascadeCount)
-	{
-		return ZEMatrix4x4();
-	}
+		return ZEMatrix4x4::Identity;
 
 	return CascadeConstants.Cascades[Index].ProjectionTransform;
 }

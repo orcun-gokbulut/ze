@@ -45,7 +45,9 @@
 cbuffer ZERNRenderer_Constants	: register(ZERN_SHADER_CONSTANT_RENDERER)
 {
 	float	ZERNRenderer_ElapsedTime;
-	float3	ZERNRenderer_Reserved;
+	float	ZERNRenderer_DeltaTime;
+	uint	ZERNRenderer_FrameId;
+	uint	ZERNRenderer_Reserved0;
 };
 
 #endif
