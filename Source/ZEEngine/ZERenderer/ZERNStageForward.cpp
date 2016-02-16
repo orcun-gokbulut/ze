@@ -73,11 +73,14 @@ bool ZERNStageForward::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
 	}
 
-	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.0f, 0.5f, 0.0f, 1.0f));
+	Viewport.SetWidth(static_cast<float>(Width));
+	Viewport.SetHeight(static_cast<float>(Height));
+
+	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
 	Context->ClearDepthStencilBuffer(DepthMap->GetDepthStencilBuffer(), true, true, 1.0f, 0x00);
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	Context->SetViewports(1, &Viewport);
 
 	return true;
 }

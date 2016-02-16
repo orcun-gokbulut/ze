@@ -47,6 +47,7 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZEMath.h"
 #include "ZERandom.h"
 
 #define ZEAT_ASDF_SHADERS			1
@@ -67,7 +68,7 @@ void ZEATAtmosphericScattering::CreateRandomVectors()
 		{
 			float X = ProjXZ * ZEAngle::Sin(J);
 			float Z = ProjXZ * ZEAngle::Cos(J);
-
+	
 			SphereSamples.Add(ZEVector4(X, Y, Z, 0.0f));
 		}
 	}
@@ -532,5 +533,4 @@ ZEATAtmosphericScattering::ZEATAtmosphericScattering()
 
 ZEATAtmosphericScattering::~ZEATAtmosphericScattering()
 {
-	DeinitializeSelf();
 }

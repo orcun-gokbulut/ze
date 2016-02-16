@@ -42,7 +42,7 @@
 // SHADER INPUT OUTPUT
 ///////////////////////////////////////////////////////////////////////////////
 
-#define ZERN_HTMO_LOGARITMIC			0
+#define ZERN_HTMO_LOGARITHMIC			0
 #define ZERN_HTMO_EXPONENTIAL			1
 #define ZERN_HTMO_REINHARD				2
 #define ZERN_HTMO_MODIFIED_REINHARD		3
@@ -59,7 +59,7 @@ cbuffer ZERNHDR_Constants								: register(b8)
 	bool			ZERNHDR_AutoKey;
 	uint			ZERNHDR_ToneMapOperator;
 	bool			ZERNHDR_BloomEnabled;
-	uint			ZERNHDR_Reserved0;
+	float			ZERNHDR_Saturation;
 
 	float			ZERNHDR_LuminanceMin;
 	float			ZERNHDR_LuminanceMax;
@@ -67,8 +67,8 @@ cbuffer ZERNHDR_Constants								: register(b8)
 	float			ZERNHDR_Reserved2;
 };
 
-//static const float3	ZERNHDR_LuminanceWeights = float3(0.299f, 0.587f, 0.114f);
-static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.072169f);
+static const float3	ZERNHDR_LuminanceWeights = float3(0.299f, 0.587f, 0.114f);
+//static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.072169f);
 
 // TEXTURES
 ///////////////////////////////////////////////////////////////////////////////
@@ -90,7 +90,7 @@ float ZERNHDR_Calculate_Luminance(float3 Color)
 	return max(dot(Color, ZERNHDR_LuminanceWeights), 0.00000001f);
 }
 
-// KEY CALCULATE
+// AUTO KEY CALCULATE
 ///////////////////////////////////////////////////////////////////////////////
 
 float ZERNHDR_Calculate_Key(float AvgLuminance)
@@ -98,22 +98,19 @@ float ZERNHDR_Calculate_Key(float AvgLuminance)
 	return max(0.0f, 1.5f - (1.5f / (AvgLuminance * 0.1f + 1.0f))) + 0.1f;
 }
 
-// SCALED COLOR CALCULATE(aka Linear Mapping)
+// SCALED LUMINANCE CALCULATE
 ///////////////////////////////////////////////////////////////////////////////
 
-float ZERNHDR_Calculate_ScaledLuminance(float3 Color)
+float ZERNHDR_Calculate_ScaledLuminance(float PixelLuminance)
 {
 	float AverageLuminance = ZERNHDR_CurrentLuminanceTexture.Load(int3(0, 0, 0));
-	float Key;
-	
 	AverageLuminance = clamp(AverageLuminance, ZERNHDR_LuminanceMin, ZERNHDR_LuminanceMax);
 	
+	float Key = ZERNHDR_Key;
 	if(ZERNHDR_AutoKey)
 		Key = ZERNHDR_Calculate_Key(AverageLuminance);
-	else
-		Key = ZERNHDR_Key;
 	
-	float ScaledLuminance = Key * ZERNHDR_Calculate_Luminance(Color) / AverageLuminance;
+	float ScaledLuminance = Key * PixelLuminance / AverageLuminance;
 	
 	return ScaledLuminance;
 }
@@ -121,46 +118,45 @@ float ZERNHDR_Calculate_ScaledLuminance(float3 Color)
 // TONE MAP OPERATORS
 ///////////////////////////////////////////////////////////////////////////////
 
-float3 ZERNHDR_ToneMapOperator_Logaritmic(float3 Color)
+float3 ZERNHDR_ToneMapOperator_Logarithmic(float3 PixelColor, float PixelLuminance, float ScaledLuminance)
 {
-	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Color);
-	return (log10(1.0f + ScaledLuminance) / log10(1.0f + ZERNHDR_WhiteLevel)) * Color;
+	float ToneMappedLuminance = (log10(1.0f + ScaledLuminance) / log10(1.0f + ZERNHDR_WhiteLevel));
+	return ToneMappedLuminance * pow(abs(PixelColor / PixelLuminance), ZERNHDR_Saturation);
 }
 
-float3 ZERNHDR_ToneMapOperator_Exponential(float3 Color)
+float3 ZERNHDR_ToneMapOperator_Exponential(float3 PixelColor, float PixelLuminance, float ScaledLuminance)
 {
-	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Color);
-	return (1.0f - exp(-ScaledLuminance)) * Color;
+	float ToneMappedLuminance = (1.0f - exp(-ScaledLuminance));
+	return ToneMappedLuminance * pow(abs(PixelColor / PixelLuminance), ZERNHDR_Saturation);
 }
 
-float3 ZERNHDR_ToneMapOperator_Reinhard(float3 Color)
+float3 ZERNHDR_ToneMapOperator_Reinhard(float3 PixelColor, float PixelLuminance, float ScaledLuminance)
 {
-	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Color);
-	float PixelLuminance = ZERNHDR_Calculate_Luminance(Color);
-	return (ScaledLuminance / (ScaledLuminance + 1.0f)) * pow(abs(Color / PixelLuminance), 1.0f);
+	float ToneMappedLuminance = (ScaledLuminance / (ScaledLuminance + 1.0f));
+	return ToneMappedLuminance * pow(abs(PixelColor / PixelLuminance), ZERNHDR_Saturation);
 }
 
-float3 ZERNHDR_ToneMapOperator_ModifiedReinhard(float3 Color)
+float3 ZERNHDR_ToneMapOperator_ModifiedReinhard(float3 PixelColor, float PixelLuminance, float ScaledLuminance)
 {
-	float3 ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Color);
-	return (ScaledLuminance * (1.0f + ScaledLuminance / (ZERNHDR_WhiteLevel * ZERNHDR_WhiteLevel)) / (1.0f + ScaledLuminance)) * Color;
+	float ToneMappedLuminance = (ScaledLuminance * (1.0f + ScaledLuminance / (ZERNHDR_WhiteLevel * ZERNHDR_WhiteLevel)) / (1.0f + ScaledLuminance));
+	return ToneMappedLuminance * pow(abs(PixelColor / PixelLuminance), ZERNHDR_Saturation);
 }
 
-float3 ZERNHDR_ToneMapOperator_Uncharted(float3 Color)
+float3 ZERNHDR_ToneMapOperator_Uncharted(float3 PixelColor)
 {
-	float A = 0.15f;
-	float B = 0.50f;
-	float C = 0.10f;
-	float D = 0.20f;
-	float E = 0.02f;
-	float F = 0.30f;
+	float A = 0.22f;	//Shoulder Strength
+	float B = 0.30f;	//Linear Strength
+	float C = 0.10f;	//Linear Angle
+	float D = 0.20f;	//Toe Strength
+	float E = 0.01f;	//Toe Numerator
+	float F = 0.30f;	//Toe Denumerator	E / F = Toe Angle
 	
-	return ((Color * (A * Color + C * B) + D * E) / (Color * (A * Color + B) + D * F)) - E / F;
+	return ((PixelColor * (A * PixelColor + C * B) + D * E) / (PixelColor * (A * PixelColor + B) + D * F)) - E / F;
 }
 
-float3 ZERNHDR_ToneMapOperator_Filmic(float3 Color)
+float3 ZERNHDR_ToneMapOperator_Filmic(float3 PixelColor, float ScaledLuminance)
 {
-	float3 ScaledColor = ZERNHDR_Calculate_ScaledLuminance(Color) * Color;
+	float3 ScaledColor = ScaledLuminance * PixelColor;
 	
 	ScaledColor = max(0, ScaledColor - 0.004f);
 	ScaledColor = (ScaledColor * (6.2f * ScaledColor + 0.5f)) / 
@@ -208,7 +204,7 @@ float ZERNHDR_Luminance_CalculateAdapted_PixelShader() : SV_Target0
 float3 ZERNHDR_Bright_Calculate_PixelShader(float4 ScreenCoordinate : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
 	float3 Color = ZERNHDR_InputTexture.Sample(ZERNHDR_SamplerLinearClamp, TexCoord);
-	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Color);
+	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(ZERNHDR_Calculate_Luminance(Color));
 	
 	float Bright = max(ScaledLuminance - ZERNHDR_BloomThreshold, 0.0f);
 	
@@ -221,35 +217,39 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 ScreenCoordinate : SV_Positio
 float4 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
 	float3 Color = ZERNHDR_InputTexture.Load(int3(ScreenCoordinate.xy, 0));
+	float Luminance = ZERNHDR_Calculate_Luminance(Color);
+	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
 	
 	float3 ResultColor = (float3)0.0f;
 	switch(ZERNHDR_ToneMapOperator)
 	{
 		default:
-		case ZERN_HTMO_LOGARITMIC:
-			ResultColor = ZERNHDR_ToneMapOperator_Logaritmic(Color);
+		case ZERN_HTMO_LOGARITHMIC:
+			ResultColor = ZERNHDR_ToneMapOperator_Logarithmic(Color, Luminance, ScaledLuminance);
 			break;
 			
 		case ZERN_HTMO_EXPONENTIAL:
-			ResultColor = ZERNHDR_ToneMapOperator_Exponential(Color);
+			ResultColor = ZERNHDR_ToneMapOperator_Exponential(Color, Luminance, ScaledLuminance);
 			break;
 			
 		case ZERN_HTMO_REINHARD:
-			ResultColor = ZERNHDR_ToneMapOperator_Reinhard(Color);
+			ResultColor = ZERNHDR_ToneMapOperator_Reinhard(Color, Luminance, ScaledLuminance);
 			break;
 			
 		case ZERN_HTMO_MODIFIED_REINHARD:
-			ResultColor = ZERNHDR_ToneMapOperator_ModifiedReinhard(Color);
+			ResultColor = ZERNHDR_ToneMapOperator_ModifiedReinhard(Color, Luminance, ScaledLuminance);
 			break;
 			
 		case ZERN_HTMO_FILMIC:
-			ResultColor = ZERNHDR_ToneMapOperator_Filmic(Color);
+			ResultColor = ZERNHDR_ToneMapOperator_Filmic(Color, ScaledLuminance);
 			break;
 			
 		case ZERN_HTMO_UNCHARTED:
-			float3 ScaledColor = ZERNHDR_Calculate_ScaledLuminance(Color) * Color * 2.0f;
+		{
+			float3 ScaledColor = ScaledLuminance * Color;
 			ResultColor = ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * ( 1.0f / ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
 			break;
+		}
 	}
 	
 	if(ZERNHDR_BloomEnabled)

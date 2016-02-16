@@ -110,4 +110,5 @@ ZEGRViewport::ZEGRViewport(float X, float Y, float Width, float Height, float Mi
 ZEGRViewport::ZEGRViewport()
 {
 	memset(&StateData, 0, sizeof(ZEViewportData));
+	StateData.MaxDepth = 1.0f;
 }

@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
@@ -52,6 +53,8 @@ class ZERNStageGBuffer : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				GBuffer2;
 		ZEHolder<ZEGRTexture2D>				GBuffer3;
 		const ZEGRRenderTarget*				RenderTargets[4];
+
+		ZEGRViewport						Viewport;
 
 	private:
 		virtual void						DeinitializeSelf();

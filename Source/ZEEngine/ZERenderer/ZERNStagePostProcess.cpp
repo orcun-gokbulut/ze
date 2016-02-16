@@ -70,7 +70,7 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 	if (!ZERNStage::Setup(Renderer, Context, Commands))
 		return false;
 
-	ZERNStageGBuffer* StageGBuffer = (ZERNStageGBuffer*)Renderer->GetStage(ZERN_STAGE_GBUFFER);
+	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
 	if(StageGBuffer == NULL)
 		return false;
 

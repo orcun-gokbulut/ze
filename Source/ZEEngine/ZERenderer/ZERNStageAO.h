@@ -42,6 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEPointer/ZESharedPointer.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
@@ -51,6 +52,13 @@ class ZEGRSampler;
 class ZEGRContext;
 class ZEGRConstantBuffer;
 class ZERNRenderer;
+
+enum ZERNSSAO_SampleCount : ZEUInt8
+{
+	ZERN_AOSC_LOW		= 0,
+	ZERN_AOSC_MEDIUM	= 1,
+	ZERN_AOSC_HIGH		= 2
+};
 
 class ZERNStageAO : public ZERNStage
 {
@@ -83,12 +91,18 @@ class ZERNStageAO : public ZERNStage
 		ZEArray<ZEVector4>					HorizontalValues;
 		ZEArray<ZEVector4>					VerticalValues;
 
+		ZEGRViewport						Viewport;
+
 		ZEUInt								Width;
 		ZEUInt								Height;
 
+		ZERNSSAO_SampleCount				SampleCount;
+
 		struct SSAOConstants
 		{
-			ZEVector4						OffsetVectors[14];
+			ZEVector4						SphereSamples[32];
+			ZEUInt							SampleCount;
+			ZEVector3						Reserved;
 			float							OcclusionRadius;
 			float							MinDepthBias;
 			float							Intensity;
@@ -103,7 +117,7 @@ class ZERNStageAO : public ZERNStage
 		}FilterConstants;
 
 		void								CreateRandomVectors();
-		void								CreateOffsetVectors();
+		void								CreateSphereSamples();
 
 		bool								Update();
 		bool								UpdateConstantBuffers();
@@ -136,7 +150,10 @@ class ZERNStageAO : public ZERNStage
 		void								SetOcclusionMapDownScale(float DownScale);
 		float								GetOcclusionMapDownScale() const;
 
-		void								SetFilterKernelValues(const ZEVector4* Values, ZEUInt KernelSize);
+		void								SetSampleCount(ZERNSSAO_SampleCount SampleCount);
+		ZERNSSAO_SampleCount				GetSampleCount() const;
+
+		void								SetFilterKernelValues(const ZEVector4* Values, ZESize KernelSize);
 		const ZEVector4* 					GetFilterKernelValues() const;
 
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);

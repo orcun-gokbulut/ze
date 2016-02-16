@@ -61,12 +61,14 @@ ZERNRenderer* ZERNStage::GetOwnerRenderer() const
 
 bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
 {
+	if(Renderer == NULL || Context == NULL)
+		return false;
+
 	return true;
 }
 
 void ZERNStage::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-
 }
 
 ZERNStage::ZERNStage()
