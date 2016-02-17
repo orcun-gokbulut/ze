@@ -130,8 +130,8 @@ float2 ZERNTransformations_ViewportToTexelCenter(float2 VectorViewport, float2 V
 
 float2 ZERNTransformations_ViewportToHomogeneous(float2 VectorViewport, float2 ViewportDimensions)
 {
-	float2 TexelCorner = ZERNTransformations_ViewportToTexelCorner(VectorViewport, ViewportDimensions);
-	return ZERNTransformations_TexelToHomogeneous(TexelCorner);
+	float2 TexelCenter = ZERNTransformations_ViewportToTexelCenter(VectorViewport, ViewportDimensions);
+	return ZERNTransformations_TexelToHomogeneous(TexelCenter);
 }
 
 float3 ZERNTransformations_ViewportToView(float2 VectorViewport, float2 ViewportDimensions, float DepthHomogeneous)

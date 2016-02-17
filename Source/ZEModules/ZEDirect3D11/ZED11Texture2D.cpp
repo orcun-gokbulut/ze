@@ -107,6 +107,11 @@ ID3D11ShaderResourceView* ZED11Texture2D::GetResourceView() const
 	return ResourceView;
 }
 
+ID3D11UnorderedAccessView* ZED11Texture2D::GetUnorderedAccessView() const
+{
+	return UnorderedAccessView;
+}
+
 ZEHolder<const ZEGRRenderTarget> ZED11Texture2D::GetRenderTarget(ZEUInt Level) const
 {
 	zeDebugCheck(!GetIsRenderTarget(), "Texture is not created with render target flag");

@@ -36,8 +36,6 @@
 #ifndef __ZERN_SHADING_H__
 #define __ZERN_SHADING_H__
 
-#include "ZERNTransformations.hlsl"
-
 struct ZERNShading_Light
 {
 	float3						PositionView;

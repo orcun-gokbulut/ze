@@ -314,11 +314,10 @@ float3 ZERNDeferredShading_Lighting(ZERNShading_Surface Surface)
 
 float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
 {	
-	ZERNShading_Surface Surface;
-	
 	float2 Dimensions = ZERNGBuffer_GetDimensions();
 	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
 	
+	ZERNShading_Surface Surface;
 	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, Dimensions, DepthHomogeneous);
 	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);

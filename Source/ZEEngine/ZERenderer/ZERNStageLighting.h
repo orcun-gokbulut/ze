@@ -59,8 +59,15 @@ class ZELightPoint;
 class ZELightDirectional;
 class ZELightOmniProjective;
 
-#define MAX_LIGHTS 511
-#define TILE_SIZE_IN_PIXELS 32	//32x32
+#define MAX_LIGHTS 255
+#define TILE_SIZE_IN_PIXELS 16	//32x32
+
+enum ZERNRenderModel
+{
+	ZERN_RM_DEFERRED				= 0,
+	ZERN_RM_TILED_DEFERRED			= 1,
+	ZERN_RM_COMPUTE_TILED_DEFERRED	= 2
+};
 
 class ZERNStageLighting : public ZERNStage
 {
@@ -71,14 +78,18 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRShader>				TiledDeferredPixelShader;
 		ZEHolder<ZEGRShader>				DeferredVertexShader;
 		ZEHolder<ZEGRShader>				DeferredPixelShader;
+		ZEHolder<ZEGRShader>				TiledDeferredComputeShader;
 
 		ZEHolder<ZEGRRenderStateData>		DeferredRenderState;
 		ZEHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
+		ZEHolder<ZEGRRenderStateData>		TiledDeferredComputeRenderState;
 
 		ZEHolder<ZEGRStructuredBuffer>		LightStructuredBuffer;
 		ZEHolder<ZEGRStructuredBuffer>		TileStructuredBuffer;
 		ZEHolder<ZEGRConstantBuffer>		LightConstantBuffer;
 		ZEHolder<ZEGRVertexBuffer>			LightVertexBuffer;
+
+		ZEHolder<ZEGRTexture2D>				TiledDeferredComputeOutputTexture;
 
 		ZEGRViewport						Viewport;
 
@@ -124,10 +135,10 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRSampler>				SamplerPointWrap;
 		ZEHolder<ZEGRSampler>				SamplerPointBorder;
 
-		ZEUInt								PrevWidth;
-		ZEUInt								PrevHeight;
+		ZEUInt								Width;
+		ZEUInt								Height;
 
-		bool								UseTiledDeferred;
+		ZERNRenderModel						RenderModel;
 		bool								ShowCascades;
 
 		void								CreateRandomVectors();
@@ -144,8 +155,9 @@ class ZERNStageLighting : public ZERNStage
 		void								UpdateClipRegionRoot(float nc, float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
 		void								AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
 
-		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
 		bool								SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
+		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
+		bool								SetupComputeTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 		void								DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZERNRenderer* Renderer, ZEGRContext* Context);
 		void								DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
@@ -159,11 +171,13 @@ class ZERNStageLighting : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		void								SetTiledDeferred(bool UseTileDeferred);
-		bool								GetTiledDefferred() const;
+		void								SetRenderModel(ZERNRenderModel RenderModel);
+		ZERNRenderModel						GetRenderModel() const;
 
 		void								SetShowCascades(bool ShowCascades);
 		bool								GetShowCascades() const;
+
+		ZEGRTexture2D*						GetOutputTexture() const;
 
 		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);

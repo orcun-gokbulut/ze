@@ -39,27 +39,13 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
+#include "ZERNShading.hlsl"
 
-#define MAX_LIGHTS				511
-#define TILE_SIZE_IN_PIXELS		32
-
-#define ZE_LT_POINT				1
-#define ZE_LT_DIRECTIONAL		2
+#define MAX_LIGHTS				255
+#define TILE_SIZE_IN_PIXELS		16
 	
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
-
-struct ZERNTiledDeferredShading_Light
-{
-	float3											PositionWorld;
-	float											Range;
-	float3											Color;
-	float											Intensity;
-	float3  										Attenuation;
-	float											Fov;
-	float3											Direction;
-	int												Type;
-};
 
 struct ZERNTiledDeferredShading_TileInfo
 {
@@ -67,81 +53,35 @@ struct ZERNTiledDeferredShading_TileInfo
 	uint											LightCount;
 };
 
-struct ZERNTiledDeferredShading_Surface
-{
-	float3											PositionView;
-	float											Reserved;
-	float3											NormalView;
-	float											Reserved1;
-	float3											Diffuse;
-	float											Reserved2;
-	float3											Specular;
-	float											SpecularPower;
-};
-
-StructuredBuffer<ZERNTiledDeferredShading_Light>	ZERNTiledDeferredShading_Lights		:	register(t5);
+StructuredBuffer<ZERNShading_Light>					ZERNTiledDeferredShading_Lights		:	register(t5);
 StructuredBuffer<ZERNTiledDeferredShading_TileInfo>	ZERNTiledDeferredShading_TileInfos	:	register(t6);
 
-float3 ZERNTiledDeferredShading_PointLighting(ZERNTiledDeferredShading_Light PointLight, ZERNTiledDeferredShading_Surface Surface)
+float3 ZERNTiledDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)
 {
-	float3 LightPositionView = ZERNTransformations_WorldToView(float4(PointLight.PositionWorld, 1.0f));
-	float3 LightDir = LightPositionView - Surface.PositionView;
-	float LightDist = length(LightDir);
-	LightDir = LightDir / LightDist;
-	float NdotL = max(0.0f, dot(Surface.NormalView, LightDir));
+	float3 LightVectorView = PointLight.PositionView - Surface.PositionView;
+	float LightDistanceView = length(LightVectorView);
 	
-	float3 ViewDir = normalize(-Surface.PositionView);
-	float3 HalfVector = normalize(ViewDir + LightDir);
-	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
-	float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDist, LightDist * LightDist));
+	PointLight.DirectionView = LightVectorView / LightDistanceView;
 	
-	float3 ResultSpecular = pow(NdotH, Surface.SpecularPower) * Surface.Specular;
-	float3 ResultDiffuse = NdotL * PointLight.Color * Surface.Diffuse;
+	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
+	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
+	
+	float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 	
 	return (ResultDiffuse + ResultSpecular) * PointLight.Intensity * DistanceAttenuation;
 }
 
-float3 ZERNTiledDeferredShading_DirectionalLighting(ZERNTiledDeferredShading_Light DirectionalLight, ZERNTiledDeferredShading_Surface Surface)
+float3 ZERNTiledDeferredShading_Lighting(uint TileIndex, ZERNShading_Surface Surface)
 {
-	float3 DirectionView = ZERNTransformations_WorldToView(float4(DirectionalLight.Direction, 0.0f));
-	DirectionView = normalize(DirectionView);
-	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionView));
-	
-	float3 ViewDir = normalize(-Surface.PositionView);
-	float3 HalfVector = normalize(ViewDir + DirectionView);
-	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
-	
-	float3 ResultSpecular = pow(NdotH, Surface.SpecularPower) * Surface.Specular;
-	float3 ResultDiffuse = Surface.Diffuse * DirectionalLight.Color * NdotL;
-	
-	return (ResultDiffuse + ResultSpecular) * DirectionalLight.Intensity;
-}
-
-float3 ZERNTiledDeferredShading_Lighting(uint TileIndex, ZERNTiledDeferredShading_Surface Surface)
-{
-	uint LightCount = ZERNTiledDeferredShading_TileInfos[TileIndex].LightCount;
 	float3 ResultColor = {0.0f, 0.0f, 0.0f};
+	uint LightCount = ZERNTiledDeferredShading_TileInfos[TileIndex].LightCount;
 	
-	if(LightCount == 0)
-	{
-		ResultColor = Surface.Diffuse;
-	}
-	else
+	if(LightCount > 0)
 	{
 		for(uint I = 0; I < LightCount; I++)
 		{
 			uint LightId = ZERNTiledDeferredShading_TileInfos[TileIndex].LightIndices[I];
-
-			ZERNTiledDeferredShading_Light CurrentLight = ZERNTiledDeferredShading_Lights[LightId];
-			
-			if(CurrentLight.Type == ZE_LT_POINT)
-			{
-				ResultColor += ZERNTiledDeferredShading_PointLighting(CurrentLight, Surface);
-			}
-			else if(CurrentLight.Type == ZE_LT_DIRECTIONAL)
-			{
-				ResultColor += ZERNTiledDeferredShading_DirectionalLighting(CurrentLight, Surface);
-			}
+			ResultColor += ZERNTiledDeferredShading_PointLighting(ZERNTiledDeferredShading_Lights[LightId], Surface);
 		}
 	}
 	
@@ -153,19 +93,18 @@ float3 ZERNTiledDeferredShading_Lighting(uint TileIndex, ZERNTiledDeferredShadin
 
 float3 ZERNTiledDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
 {	
-	ZERNTiledDeferredShading_Surface Surface;
+	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
+	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
 	
-	float2 Dimensions = ZERNGBuffer_GetDimensions();
-	float DepthClip = ZERNGBuffer_GetDepth(PositionViewport.xy);
-	
-	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, Dimensions, DepthClip);
-	Surface.NormalView = ZERNGBuffer_GetViewNormal(int2(PositionViewport.xy));
-	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(int2(PositionViewport.xy));
-	Surface.Specular = ZERNGBuffer_GetSpecularColor(int2(PositionViewport.xy));
-	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(int2(PositionViewport.xy));
+	ZERNShading_Surface Surface;
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, DepthHomogeneous);
+	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
+	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);
+	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy);
+	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PositionViewport.xy);
 	
 	uint2 TileId = PositionViewport.xy / TILE_SIZE_IN_PIXELS;
-	uint TileCountX = (Dimensions.x + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
+	uint TileCountX = (GBufferDimensions.x + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
 	uint TileIndex = TileId.y * TileCountX + TileId.x;
 	
 	return ZERNTiledDeferredShading_Lighting(TileIndex, Surface);
