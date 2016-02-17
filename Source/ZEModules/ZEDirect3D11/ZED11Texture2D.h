@@ -65,6 +65,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 	public:
 		ID3D11Texture2D*								GetTexture() const;
 		ID3D11ShaderResourceView*						GetResourceView() const;
+		ID3D11UnorderedAccessView*						GetUnorderedAccessView() const;
 
 		virtual ZEHolder<const ZEGRRenderTarget>		GetRenderTarget(ZEUInt Level) const;
 		virtual ZEHolder<const ZEGRDepthStencilBuffer>	GetDepthStencilBuffer(ZEUInt ArrayIndex = 0) const;

@@ -364,24 +364,27 @@ void ZED11Context::SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, c
 	{
 		switch (Texture->GetTextureType())
 		{
-		case ZEGR_TT_3D:
-			NativeView = static_cast<const ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
-			break;
+			case ZEGR_TT_2D:
+				NativeView = static_cast<const ZED11Texture2D*>(Texture)->GetUnorderedAccessView();
+				break;
+			case ZEGR_TT_3D:
+				NativeView = static_cast<const ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 	}
 
 	switch(Shader)
 	{
-	default:
-	case ZEGR_ST_NONE:
-		break;
+		default:
+		case ZEGR_ST_NONE:
+			break;
 
-	case ZEGR_ST_COMPUTE:
-		Context->CSSetUnorderedAccessViews(Index, 1, &NativeView, NULL);
-		break;
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetUnorderedAccessViews(Index, 1, &NativeView, NULL);
+			break;
 	}
 }
 
