@@ -84,6 +84,7 @@ Texture2DArray<float>				ZERNDeferredShading_ShadowMaps							: register(t5);
 Texture2D							ZERNDeferredShading_ProjectionMap						: register(t6);
 TextureCube							ZERNDeferredShading_OmniProjectionMap					: register(t7);
 Texture2D<float2>					ZERNDeferredShading_RandomVectors						: register(t8);
+Texture2D<float3>					ZERNDeferredShading_TiledComputerColorBuffer			: register(t9);
 
 static const float3 ZERNDeferredShading_CascadeColors[] = 
 {
@@ -325,6 +326,11 @@ float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : S
 	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PositionViewport.xy);
 	
 	return ZERNDeferredShading_Lighting(Surface);
+}
+
+float3 ZERNDeferredShading_Accumulate_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	return ZERNDeferredShading_TiledComputerColorBuffer.Load(int3(PositionViewport.xy, 0));
 }
 
 #endif
