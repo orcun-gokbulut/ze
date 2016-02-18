@@ -164,7 +164,7 @@
 
 			VARIANT vtProp;
 			hr = pclsObj->Get(Column, 0, &vtProp, 0, 0);
-			Output = vtProp.bstrVal;	
+			Output = vtProp.bstrVal;
 			VariantClear(&vtProp);
 			pclsObj->Release();
 			break;
@@ -180,7 +180,7 @@
 	static bool GetHardDiskSerialNumber(ZEUInt32& Output)
 	{
 		ZEString OutputText;
-		if (!WMIQuery(OutputText, L"SELECT SerialNumber FROM Win32_PhysicalMedia", L"SerialNumber"))
+		if (!WMIQuery(OutputText, L"SELECT SerialNumber FROM Win32_DiskDrive WHERE InterfaceType != \"USB\"", L"SerialNumber"))
 			return false;
 
 		Output = OutputText.Hash();

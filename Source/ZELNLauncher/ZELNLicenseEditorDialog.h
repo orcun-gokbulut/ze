@@ -54,8 +54,10 @@ class ZELNLicenseEditorDialog : public QDialog
 		void						SaveLicense();
 
 	private slots:
-		void						btnSave_clicked();
+		void						btnPasteActivationCode_clicked();
+		void						btnOpenActivationCode_clicked();
 		void						btnGeneratePreActivationCode_clicked();
+		void						btnSave_clicked();
 
 	public:
 		void						SetLicense(const ZELCLicense& License);

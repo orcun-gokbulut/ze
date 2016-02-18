@@ -58,6 +58,10 @@ class ZELNLicenseWidget : public QWidget
 		void						btnEnter_clicked();
 		void						btnActivate_clicked();
 		void						btnLicenseManager_clicked();
+		void						btnCopyPreActivationCode_clicked();
+		void						btnSavePreActivationCode_clicked();
+		void						btnPasteActivationCode_clicked();
+		void						btnOpenActivationCode_clicked();
 
 	public:
 		void						SetLicense(const ZELCLicense& License);
