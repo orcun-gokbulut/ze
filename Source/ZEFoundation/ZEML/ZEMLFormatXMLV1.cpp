@@ -145,7 +145,10 @@ bool ZEMLFormatXMLV1::ReadVectors(ZEFile* File, float* Output, const char** Memb
 	while(Node != NULL)
 	{
 		if (Node->Type() != TiXmlNode::TINYXML_ELEMENT)
+		{
+			Node = Node->NextSibling();
 			continue;
+		}
 
 		const char* Name = Node->Value();
 		for (ZESize I = 0; I < MemberCount; I++)
@@ -189,7 +192,10 @@ bool ZEMLFormatXMLV1::ReadDoubleVectors(ZEFile* File, double* Output, const char
 	while(Node != NULL)
 	{
 		if (Node->Type() != TiXmlNode::TINYXML_ELEMENT)
+		{
+			Node = Node->NextSibling();
 			continue;
+		}
 
 		const char* Name = Node->Value();
 		for (ZESize I = 0; I < MemberCount; I++)

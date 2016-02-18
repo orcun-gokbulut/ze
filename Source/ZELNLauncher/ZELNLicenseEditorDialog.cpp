@@ -38,9 +38,13 @@
 
 #include "ZELNLauncher.h"
 #include "ZELNLicenseModule.h"
-#include "ZEProtect\ZELCLicenseManager.h"
+#include "ZEProtect/ZELCLicenseManager.h"
 
-#include <QtWidgets\QMessageBox>
+#include <QtCore/QMimeData>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QMessageBox>
+#include <QtWidgets/QDialogButtonBox>
 
 void ZELNLicenseEditorDialog::UpdateWidget()
 {
@@ -70,6 +74,34 @@ void ZELNLicenseEditorDialog::btnGeneratePreActivationCode_clicked()
 
 	Dialog.setLayout(Layout);
 	Dialog.exec();
+}
+
+void ZELNLicenseEditorDialog::btnPasteActivationCode_clicked()
+{
+	QClipboard* Clipboard = QApplication::clipboard();
+	if (!Clipboard->mimeData()->hasText())
+		return;
+
+	Form->txtActivationCode->setPlainText(Clipboard->text());
+}
+
+void ZELNLicenseEditorDialog::btnOpenActivationCode_clicked()
+{
+	QString FileName = QFileDialog::getOpenFileName(this, "Open Activation Code File", QString(), "Text files (*.txt);;All files (*.*)");
+	if (FileName.isEmpty())
+		return;
+
+	QFile File(FileName);
+	bool Result = File.open(QIODevice::ReadOnly | QIODevice::Text);
+	if (!Result)
+	{
+		QMessageBox::critical(this, "Open Activation Code File", "Cannot read file.", QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
+		return;
+	}
+
+	Form->txtActivationCode->setPlainText(File.readAll());
+
+	File.close();
 }
 
 void ZELNLicenseEditorDialog::btnSave_clicked()
@@ -105,6 +137,8 @@ ZELNLicenseEditorDialog::ZELNLicenseEditorDialog(QWidget* Parent) : QDialog(Pare
 	connect(Form->btnSave, SIGNAL(clicked()), this, SLOT(btnSave_clicked()));
 	connect(Form->btnGeneratePreActivationCode, SIGNAL(clicked()), this, SLOT(btnGeneratePreActivationCode_clicked()));
 	connect(Form->btnClose, SIGNAL(clicked()), this, SLOT(reject()));
+	connect(Form->btnPasteActivationCode, SIGNAL(clicked()), this, SLOT(btnPasteActivationCode_clicked()));
+	connect(Form->btnOpenActivationCode, SIGNAL(clicked()), this, SLOT(btnOpenActivationCode_clicked()));
 }
 
 ZELNLicenseEditorDialog::~ZELNLicenseEditorDialog()
