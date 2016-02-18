@@ -61,16 +61,20 @@ void ZELight::LocalTransformChanged()
 void ZELight::ParentTransformChanged()
 {
 	ZEEntity::ParentTransformChanged();
-		DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
+	DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
 void ZELight::SetRange(float NewValue)
 {
-	if(Range == NewValue)
+	if (Range == NewValue)
 		return;
 
 	Range = NewValue;
-	
+
+	ZEVector3 Extent(Range, Range, Range);
+	ZEVector3 Position = GetPosition();
+	SetBoundingBox(ZEAABBox(Position - Extent, Position + Extent));
+
 	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
@@ -151,7 +155,7 @@ const ZEVector3& ZELight::GetAttenuation() const
 
 ZEDrawFlags ZELight::GetDrawFlags() const
 {
-	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE | ZE_DF_CULL;
 }
 
 void ZELight::SetCastsShadow(bool NewValue)
@@ -208,7 +212,13 @@ float ZELight::GetShadowSampleLengthOffset() const
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 {
 	if(CastsShadows)
-		CullParameters->Renderer->AddCommand(&Command);
+	{
+		Command.StageMask |= ZERN_STAGE_SHADOWING;
+	}
+
+	Command.StageMask |= ZERN_STAGE_LIGHTING;
+
+	CullParameters->Renderer->AddCommand(&Command);
 
 	return true;
 }

@@ -122,7 +122,7 @@ void ZERNStageLighting::CreateLightGeometries()
 	Canvas.SetTranslation(ZEVector3::UnitZ);
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
 
-	LightVertexBuffer = Canvas.CreateVertexBuffer();
+	DeferredLightVertexBuffer = Canvas.CreateVertexBuffer();
 }
 
 void ZERNStageLighting::CreateSamplers()
@@ -162,47 +162,6 @@ void ZERNStageLighting::CreateSamplers()
 	SamplerPointBorderDescription.AddressW = ZEGR_TAM_BORDER;
 	SamplerPointBorderDescription.BorderColor = ZEVector4::One;
 	SamplerPointBorder = ZEGRSampler::GetSampler(SamplerPointBorderDescription);
-}
-
-bool ZERNStageLighting::UpdateBuffers()
-{
-	LightStruct* Light;
-	LightStructuredBuffer->Lock(reinterpret_cast<void**>(&Light));
-
-	ZESize LightCount = Lights.GetCount();
-	for(ZESize I = 0; I < LightCount; I++)
-	{
-		ZEMatrix4x4::Transform(Light[I].PositionView, GetOwnerRenderer()->GetView().ViewTransform, Lights[I]->GetWorldPosition());
-		Light[I].Range = Lights[I]->GetRange();
-		Light[I].Color = Lights[I]->GetColor();
-		Light[I].Intensity = Lights[I]->GetIntensity();
-		Light[I].Attenuation = Lights[I]->GetAttenuation();
-		Light[I].Type = Lights[I]->GetLightType();
-		Light[I].DirectionView = ZEVector3::Zero;
-	}
-
-	LightStructuredBuffer->Unlock();
-
-	if(RenderModel == ZERN_RM_TILED_DEFERRED)
-	{	
-		if(DirtyFlags.GetFlags(ZERN_SLDF_TILE_BUFFER))
-		{
-			ZEUInt TileCountX = (Width + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
-			ZEUInt TileCountY = (Height + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
-
-			TileStructuredBuffer.Release();
-			TileStructuredBuffer = ZEGRStructuredBuffer::Create(TileCountX * TileCountY, sizeof(TileStruct));
-
-			DirtyFlags.UnraiseFlags(ZERN_SLDF_TILE_BUFFER);
-		}
-
-		TileStruct* Tile;
-		TileStructuredBuffer->Lock((void**)&Tile);
-		memcpy(Tile, &Tiles[0], Tiles.GetCount() * sizeof(TileStruct));
-		TileStructuredBuffer->Unlock();
-	}
-
-	return true;
 }
 
 bool ZERNStageLighting::UpdateRenderState()
@@ -312,9 +271,6 @@ bool ZERNStageLighting::Update()
 	if(!UpdateRenderState())
 		return false;
 
-	if(!UpdateBuffers())
-		return false;
-
 	return true;
 }
 
@@ -385,7 +341,7 @@ ZEVector4 ZERNStageLighting::ComputeClipRegion(const ZEVector3& lightPosView, fl
 	return clipRegion;
 }
 
-void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear)
+void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEList2<ZELight>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear)
 {
 	ZEUInt TileCountX = (Width + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
 	ZEUInt TileCountY = (Height + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
@@ -398,9 +354,11 @@ void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 
 	memset(&Tiles[0], 0, sizeof(TileStruct) * TileCount);
 
-	for(ZEUInt I = 0; I < LightCount; I++)
+	ZEUInt LightIndex = 0;
+	const ZELink<ZELight>* Link = Lights.GetFirst();
+	while(Link != NULL)
 	{
-		ZELight* Light = Lights[I];
+		const ZELight* Light = Link->GetItem();
 		if(Light->GetLightType() == ZELightType::ZE_LT_POINT)
 		{
 			ZEVector3 LightPositionView = Renderer->GetView().ViewTransform * Light->GetWorldPosition();
@@ -430,11 +388,14 @@ void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArra
 				{
 					ZEUInt TileId = Y * TileCountX + X;
 					TileStruct& Tile = Tiles[TileId];
-					Tile.LightIndices[Tile.LightCount] = I;
-					Tile.LightCount = (Tile.LightCount >= (MAX_LIGHTS)) ? (MAX_LIGHTS) : ++Tile.LightCount;
+					Tile.LightIndices[Tile.LightCount] = LightIndex;
+					Tile.LightCount = (Tile.LightCount >= (MAX_LIGHT)) ? (MAX_LIGHT) : ++Tile.LightCount;
 				}
 			}
 		}
+
+		LightIndex++;
+		Link = Link->GetNext();
 	}
 }
 
@@ -443,31 +404,40 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 	if(!Update())
 		return false;
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, LightConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, LightConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, DeferredLightConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, DeferredLightConstantBuffer);
 
 	Context->SetRenderState(DeferredRenderState);
-	Context->SetVertexBuffers(0, 1, &LightVertexBuffer);
+	Context->SetVertexBuffers(0, 1, &DeferredLightVertexBuffer);
 
-	ZESize LightCount = Lights.GetCount();
-	for(ZESize I = 0; I < LightCount; I++)
+	ZELink<ZELight>* Link = DeferredLightList.GetFirst();
+	while(Link != NULL)
 	{
-		switch(Lights[I]->GetLightType())
+		ZELight* Light = Link->GetItem();
+		switch(Light->GetLightType())
 		{
 		case ZE_LT_POINT:
-			DrawPointLight((ZELightPoint*)Lights[I], Renderer, Context);
+			DrawPointLight(static_cast<ZELightPoint*>(Light), Renderer, Context);
 			break;
 		case ZE_LT_DIRECTIONAL:
-			DrawDirectionalLight((ZELightDirectional*)Lights[I], Renderer, Context);
+			DrawDirectionalLight(static_cast<ZELightDirectional*>(Light), Renderer, Context);
 			break;
 		case ZE_LT_PROJECTIVE:
-			DrawProjectiveLight((ZELightProjective*)Lights[I], Renderer, Context);
+			DrawProjectiveLight(static_cast<ZELightProjective*>(Light), Renderer, Context);
 			break;
 		case ZE_LT_OMNIPROJECTIVE:
-			DrawOmniProjectiveLight((ZELightOmniProjective*)Lights[I], Renderer, Context);
+			DrawOmniProjectiveLight(static_cast<ZELightOmniProjective*>(Light), Renderer, Context);
 			break;
 		}
+
+		Link = Link->GetNext();
 	}
+
+	DeferredLightList.Clean();
+
+	Context->SetVertexBuffers(0, 0, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 
 	return true;
 }
@@ -482,25 +452,42 @@ bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* 
 		DirtyFlags.RaiseFlags(ZERN_SLDF_TILE_BUFFER);
 		Width = CurrentWidth;
 		Height = CurrentHeight;
+
+		if(DirtyFlags.GetFlags(ZERN_SLDF_TILE_BUFFER))
+		{
+			ZEUInt TileCountX = (Width + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
+			ZEUInt TileCountY = (Height + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
+
+			TiledDeferredTileStructuredBuffer.Release();
+			TiledDeferredTileStructuredBuffer = ZEGRStructuredBuffer::Create(TileCountX * TileCountY, sizeof(TileStruct));
+
+			DirtyFlags.UnraiseFlags(ZERN_SLDF_TILE_BUFFER);
+		}
+
+		TileStruct* Tile;
+		TiledDeferredTileStructuredBuffer->Lock((void**)&Tile);
+		memcpy(Tile, &Tiles[0], Tiles.GetCount() * sizeof(TileStruct));
+		TiledDeferredTileStructuredBuffer->Unlock();
+
 	}
 
 	ZERNView View = Renderer->GetView();
-	AssignLightsToTiles(Renderer, Lights, View.ProjectionTransform.M11, View.ProjectionTransform.M22, View.NearZ);
+	AssignLightsToTiles(Renderer, TiledDeferredLightList, View.ProjectionTransform.M11, View.ProjectionTransform.M22, View.NearZ);
 
 	if(!Update())
 		return false;
 
 	Context->SetRenderState(TiledDeferredRenderState);
 
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, LightStructuredBuffer);
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, TileStructuredBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, TiledDeferredLightConstantBuffer);
+	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, TiledDeferredTileStructuredBuffer);
 
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->Draw(3, 0);
 
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, NULL);
 	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, NULL);
-
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	
 	return true;
 }
 
@@ -520,9 +507,33 @@ bool ZERNStageLighting::SetupComputeTiledDeferred(ZERNRenderer* Renderer, ZEGRCo
 	if(!Update())
 		return false;
 
+	const ZERNView& View = Renderer->GetView();
+	ZEUInt LightIndex = 0;
+	ZELink<ZELight>* Link = TiledDeferredLightList.GetFirst();
+	while(Link != NULL)
+	{
+		ZELight* SrcLight = Link->GetItem();
+		LightStruct& DestLight = TiledDeferredLightConstants.Lights[LightIndex];
+
+		ZEMatrix4x4::Transform(DestLight.PositionView, View.ViewTransform, SrcLight->GetWorldPosition());
+		DestLight.Range = SrcLight->GetRange();
+		DestLight.Color = SrcLight->GetColor();
+		DestLight.Intensity = SrcLight->GetIntensity();
+		DestLight.Attenuation = SrcLight->GetAttenuation();
+		DestLight.Type = SrcLight->GetLightType();
+		DestLight.DirectionView = ZEVector3::Zero;
+
+		LightIndex++;
+		Link = Link->GetNext();
+	}
+
+	TiledDeferredLightConstants.LightCount = TiledDeferredLightList.GetCount();
+
+	TiledDeferredLightConstantBuffer->SetData(&TiledDeferredLightConstants);
+
 	Context->SetRenderState(TiledDeferredComputeRenderState);
 
-	Context->SetStructuredBuffer(ZEGR_ST_COMPUTE, 5, LightStructuredBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, TiledDeferredLightConstantBuffer);
 	Context->SetUnorderedAccessView(ZEGR_ST_COMPUTE, 0, TiledDeferredComputeOutputTexture);
 
 	ZEUInt TileCountX = (CurrentWidth + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
@@ -530,14 +541,16 @@ bool ZERNStageLighting::SetupComputeTiledDeferred(ZERNRenderer* Renderer, ZEGRCo
 
 	Context->Dispatch(TileCountX, TileCountY, 1);
 
-	Context->SetStructuredBuffer(ZEGR_ST_COMPUTE, 5, NULL);
+	TiledDeferredLightList.Clean();
+
 	Context->SetUnorderedAccessView(ZEGR_ST_COMPUTE, 0, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, NULL);
 }
 
 void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-	LightConstantsStruct* LightConstants;
-	LightConstantBuffer->Lock((void**)&LightConstants);
+	DeferredLightConstantsStruct* LightConstants;
+	DeferredLightConstantBuffer->Lock((void**)&LightConstants);
 		LightStruct& Light = LightConstants->Light;
 		Light.Color = DirectionalLight->GetColor();
 		Light.Intensity = DirectionalLight->GetIntensity();
@@ -550,7 +563,7 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		LightConstants->ShowCascades = static_cast<ZEBool32>(ShowCascades);
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
 		LightConstants->SampleLengthOffset = DirectionalLight->GetShadowSampleLengthOffset();
-	LightConstantBuffer->Unlock();
+	DeferredLightConstantBuffer->Unlock();
 
 	DirectionalLight->BindCascades(Renderer, Context);
 
@@ -566,8 +579,8 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 
 void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-	LightConstantsStruct* LightConstants;
-	LightConstantBuffer->Lock((void**)&LightConstants);
+	DeferredLightConstantsStruct* LightConstants;
+	DeferredLightConstantBuffer->Lock((void**)&LightConstants);
 		LightStruct& Light = LightConstants->Light;
 		ZEMatrix4x4::Transform(Light.PositionView, Renderer->GetView().ViewTransform, PointLight->GetPosition());
 		Light.Range = PointLight->GetRange();
@@ -579,15 +592,15 @@ void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* R
 
 		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, PointLight->GetPosition(), ZEQuaternion::Identity,
 			ZEVector3(Light.Range, Light.Range, Light.Range));
-	LightConstantBuffer->Unlock();
+	DeferredLightConstantBuffer->Unlock();
 
 	Context->Draw(3600, 942);
 }
 
 void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context)
 {
-	LightConstantsStruct* LightConstants;
-	LightConstantBuffer->Lock((void**)&LightConstants);
+	DeferredLightConstantsStruct* LightConstants;
+	DeferredLightConstantBuffer->Lock((void**)&LightConstants);
 		LightStruct& Light = LightConstants->Light;
 		ZEMatrix4x4::Transform(Light.PositionView, Renderer->GetView().ViewTransform, ProjectiveLight->GetWorldPosition());
 		Light.Range = ProjectiveLight->GetRange();
@@ -606,7 +619,7 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 		float TanFovRange = ZEAngle::Tan(ProjectiveLight->GetFOV() * 0.5f) * ProjectiveLight->GetRange();
 		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, ProjectiveLight->GetWorldPosition(), ProjectiveLight->GetWorldRotation(),
 			ZEVector3(TanFovRange * ProjectiveLight->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight->GetRange()));
-	LightConstantBuffer->Unlock();
+	DeferredLightConstantBuffer->Unlock();
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder.GetPointer());
 	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearPointClamp.GetPointer());
@@ -628,8 +641,8 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 	ZEMatrix4x4 RotationMatrix;
 	ZEMatrix4x4::CreateRotation(RotationMatrix, ProjectionRotation);
 
-	LightConstantsStruct* LightConstants;
-	LightConstantBuffer->Lock((void**)&LightConstants);
+	DeferredLightConstantsStruct* LightConstants;
+	DeferredLightConstantBuffer->Lock((void**)&LightConstants);
 		LightStruct& Light = LightConstants->Light;
 		ZEMatrix4x4::Transform(Light.PositionView, Renderer->GetView().ViewTransform, OmniProjectiveLight->GetPosition());
 		Light.Range = OmniProjectiveLight->GetRange();
@@ -642,7 +655,7 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 		LightConstants->RotationMatrix = RotationMatrix;
 		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, OmniProjectiveLight->GetPosition(), ZEQuaternion::Identity,
 			ZEVector3(Light.Range, Light.Range, Light.Range));
-	LightConstantBuffer->Unlock();
+	DeferredLightConstantBuffer->Unlock();
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder.GetPointer());
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, (ZEGRTextureCube*)OmniProjectiveLight->GetProjectionTexture());
@@ -655,42 +668,32 @@ bool ZERNStageLighting::InitializeSelf()
 	if (!ZERNStage::InitializeSelf())
 		return false;
 
-	DirtyFlags.RaiseAll();
-
 	CreateRandomVectors();
 	CreateLightGeometries();
 	CreateSamplers();
 
-	LightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(LightConstantsStruct));
-
-	const ZESmartArray<ZEEntity*>& Entities = GetOwnerRenderer()->GetScene()->GetEntities();
-	ZEUInt EntityCount = (ZEUInt)Entities.GetCount();
-	for(ZEUInt I = 0; I < EntityCount; I++)
-	{
-		ZEEntity* Entity = Entities[I];
-		if(Entity->GetDrawFlags().GetFlags(ZE_DF_LIGHT_SOURCE))
-			Lights.Add(static_cast<ZELight*>(Entity));
-	}
-
-	LightStructuredBuffer = ZEGRStructuredBuffer::Create(Lights.GetCount(), sizeof(LightStruct));
+	DeferredLightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(DeferredLightConstantsStruct));
+	TiledDeferredLightConstantBuffer = ZEGRConstantBuffer::Create(sizeof(TiledDeferredLightConstantsStruct));
 
 	return true;
 }
 
 void ZERNStageLighting::DeinitializeSelf()
 {
-	TiledDeferredVertexShader.Release();
-	TiledDeferredPixelShader.Release();
-	TiledDeferredRenderState.Release();
+	DirtyFlags.RaiseAll();
+
 	DeferredVertexShader.Release();
 	DeferredPixelShader.Release();
 	DeferredRenderState.Release();
-	LightStructuredBuffer.Release();
-	TileStructuredBuffer.Release();
-	LightConstantBuffer.Release();
-	LightVertexBuffer.Release();
+	DeferredLightConstantBuffer.Release();
+	DeferredLightVertexBuffer.Release();
 
-	Lights.Clear();
+	TiledDeferredVertexShader.Release();
+	TiledDeferredPixelShader.Release();
+	TiledDeferredRenderState.Release();
+	TiledDeferredLightConstantBuffer.Release();
+	TiledDeferredTileStructuredBuffer.Release();
+
 	Tiles.Clear();
 
 	RandomVectorsTexture.Release();
@@ -742,13 +745,31 @@ bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELi
 		return false;
 
 	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if(StageGBuffer == NULL)
+	if (StageGBuffer == NULL)
 		return false;
 
 	ZEGRTexture2D* AccumulationMap = StageGBuffer->GetAccumulationMap();
-	if(AccumulationMap == NULL)
+	if (AccumulationMap == NULL)
 		return false;
 
+	ZELink<ZERNCommand>* Link = Commands.GetFirst();
+	while (Link != NULL)
+	{
+		ZELight* Light = static_cast<ZELight*>(Link->GetItem()->Entity);
+
+		switch (Light->GetLightType())
+		{
+			case ZE_LT_DIRECTIONAL:
+			case ZE_LT_PROJECTIVE:
+			case ZE_LT_OMNIPROJECTIVE:
+				DeferredLightList.AddEnd(new ZELink<ZELight>(Light));
+				break;
+			//case ZE_LT_POINT:
+				//TiledDeferredLightList.AddEnd(new ZELink<ZELight>(Light));
+		}
+
+		Link = Link->GetNext();
+	}
 	Commands.Clean();
 
 	OutputRenderTarget = AccumulationMap->GetRenderTarget();
@@ -764,32 +785,25 @@ bool ZERNStageLighting::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELi
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 	Context->SetViewports(1, &Viewport);
 
-	switch (RenderModel)
-	{
-	default:
-	case ZERN_RM_DEFERRED:
-		return SetupDeferred(Renderer, Context);
-	case ZERN_RM_TILED_DEFERRED:
-		return SetupTiledDeferred(Renderer, Context);
-	case ZERN_RM_COMPUTE_TILED_DEFERRED:
-		return SetupComputeTiledDeferred(Renderer, Context);
-	}	
+	bool Result = true;
+
+	if(DeferredLightList.GetCount() > 0)
+		Result = SetupDeferred(Renderer, Context);
+
+	if(TiledDeferredLightList.GetCount() > 0)
+		Result = SetupComputeTiledDeferred(Renderer, Context);
+
+	return Result;
 }
 
 void ZERNStageLighting::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 6, NULL);
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
+	Context->SetTexture(ZEGR_ST_ALL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_ALL, 2, NULL);
+	Context->SetTexture(ZEGR_ST_ALL, 3, NULL);
+	Context->SetTexture(ZEGR_ST_ALL, 4, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
 
@@ -799,6 +813,7 @@ void ZERNStageLighting::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 ZERNStageLighting::ZERNStageLighting()
 {
 	DirtyFlags.RaiseAll();
+
 	Width = 0;
 	Height = 0;
 	ShowCascades = false;

@@ -48,19 +48,12 @@ template<typename Type> class ZEList2;
 
 class ZERNStage : public ZEInitializable
 {
-	friend class ZERNRenderer;
-
 	protected:
 		bool							Enable;
-		ZERNRenderer*					OwnerRenderer;
-
-		void							SetOwnerRenderer(ZERNRenderer* Renderer);
 
 	public:
 		void							SetEnable(bool Enable);
 		bool							GetEnable() const;
-
-		ZERNRenderer*					GetOwnerRenderer() const;
 
 		virtual ZEInt					GetId() const = 0;
 		virtual const ZEString&			GetName() const = 0;

@@ -39,6 +39,7 @@
 
 #include "ZEDS/ZEFlags.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEList2.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
@@ -59,8 +60,8 @@ class ZELightPoint;
 class ZELightDirectional;
 class ZELightOmniProjective;
 
-#define MAX_LIGHTS 255
-#define TILE_SIZE_IN_PIXELS 16	//32x32
+#define MAX_LIGHT			255
+#define TILE_SIZE_IN_PIXELS	16	//32x32
 
 enum ZERNRenderModel
 {
@@ -74,20 +75,20 @@ class ZERNStageLighting : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<ZEGRShader>				TiledDeferredVertexShader;
-		ZEHolder<ZEGRShader>				TiledDeferredPixelShader;
 		ZEHolder<ZEGRShader>				DeferredVertexShader;
 		ZEHolder<ZEGRShader>				DeferredPixelShader;
+		ZEHolder<ZEGRShader>				TiledDeferredVertexShader;
+		ZEHolder<ZEGRShader>				TiledDeferredPixelShader;
 		ZEHolder<ZEGRShader>				TiledDeferredComputeShader;
 
 		ZEHolder<ZEGRRenderStateData>		DeferredRenderState;
 		ZEHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 		ZEHolder<ZEGRRenderStateData>		TiledDeferredComputeRenderState;
 
-		ZEHolder<ZEGRStructuredBuffer>		LightStructuredBuffer;
-		ZEHolder<ZEGRStructuredBuffer>		TileStructuredBuffer;
-		ZEHolder<ZEGRConstantBuffer>		LightConstantBuffer;
-		ZEHolder<ZEGRVertexBuffer>			LightVertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>		DeferredLightConstantBuffer;
+		ZEHolder<ZEGRVertexBuffer>			DeferredLightVertexBuffer;
+		ZEHolder<ZEGRStructuredBuffer>		TiledDeferredTileStructuredBuffer;
+		ZEHolder<ZEGRConstantBuffer>		TiledDeferredLightConstantBuffer;
 
 		ZEHolder<ZEGRTexture2D>				TiledDeferredComputeOutputTexture;
 
@@ -107,11 +108,11 @@ class ZERNStageLighting : public ZERNStage
 
 		struct TileStruct
 		{
-			ZEUInt							LightIndices[MAX_LIGHTS];
+			ZEUInt							LightIndices[MAX_LIGHT];
 			ZEUInt							LightCount;
 		};
 
-		struct LightConstantsStruct
+		struct DeferredLightConstantsStruct
 		{
 			LightStruct						Light;
 			ZEMatrix4x4						ProjectionMatrix;
@@ -123,8 +124,16 @@ class ZERNStageLighting : public ZERNStage
 			ZEBool32						ShowCascades;
 		};
 
-		ZEArray<ZELight*>					Lights;
+		struct TiledDeferredLightConstantsStruct
+		{
+			LightStruct						Lights[MAX_LIGHT];
+			ZEUInt							LightCount;
+			ZEVector3						Reserved;
+		}TiledDeferredLightConstants;
+
 		ZEArray<TileStruct>					Tiles;
+		ZEList2<ZELight>					DeferredLightList;
+		ZEList2<ZELight>					TiledDeferredLightList;
 
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
 
@@ -145,7 +154,6 @@ class ZERNStageLighting : public ZERNStage
 		void								CreateLightGeometries();
 		void								CreateSamplers();
 
-		bool								UpdateBuffers();
 		bool								UpdateRenderState();
 		bool								UpdateShaders();
 		bool								Update();
@@ -153,7 +161,7 @@ class ZERNStageLighting : public ZERNStage
 		ZEVector4							ComputeClipRegion(const ZEVector3& lightPosView, float lightRadius, float CameraScaleX, float CameraScaleY, float CameraNear);
 		void								UpdateClipRegion(float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
 		void								UpdateClipRegionRoot(float nc, float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
-		void								AssignLightsToTiles(ZERNRenderer* Renderer, const ZEArray<ZELight*>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
+		void								AssignLightsToTiles(ZERNRenderer* Renderer, const ZEList2<ZELight>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
 
 		bool								SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
 		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);

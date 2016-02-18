@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELightPoint.h"
+
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
@@ -87,7 +88,7 @@ const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index)
 ZELightPoint::ZELightPoint()
 {
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_SHADOWING;
+	Command.Priority = 1;
 }
 
 ZELightPoint::~ZELightPoint()

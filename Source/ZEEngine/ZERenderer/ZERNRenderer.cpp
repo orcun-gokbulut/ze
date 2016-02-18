@@ -296,7 +296,6 @@ void ZERNRenderer::AddStage(ZERNStage* Stage)
 {
 	ZERNStageQueue Queue;
 	Queue.Stage = Stage;
-	Queue.Stage->SetOwnerRenderer(this);
 
 	StageQueues.Add(Queue);
 

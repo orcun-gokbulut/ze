@@ -42,16 +42,22 @@
 
 #define TILE_DIMENSION	16
 #define TILE_SIZE		(TILE_DIMENSION * TILE_DIMENSION)
-#define MAX_LIGHT		256
+#define MAX_LIGHT		255
 
-StructuredBuffer<ZERNShading_Light>	Lights				: register(t5);
-RWTexture2D<float3>					OutputColorBuffer	: register(u0);
+cbuffer ZERNTiledDeferredShadingCompute_Constants							: register(b8)
+{
+	ZERNShading_Light	ZERNTiledDeferredShadingCompute_Lights[MAX_LIGHT];
+	uint				ZERNTiledDeferredShadingCompute_LightCount;
+	float3				ZERNTiledDeferredShadingCompute_Reserved;
+};
 
-groupshared uint					TileMinDepth;
-groupshared uint					TileMaxDepth;
-					
-groupshared uint					TileLightCount;
-groupshared uint					TileLightIndices[MAX_LIGHT];
+RWTexture2D<float3>		ZERNTiledDeferredShadingCompute_OutputColorBuffer	: register(u0);
+
+groupshared uint		TileMinDepth;
+groupshared uint		TileMaxDepth;
+			
+groupshared uint		TileLightCount;
+groupshared uint		TileLightIndices[MAX_LIGHT];
 
 float3 ZERNTiledDeferredShadingCompute_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)
 {
@@ -132,18 +138,15 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 	for(uint I = 0; I < 4; I++)
 		TileFrustumPlanes[I] *= rcp(length(TileFrustumPlanes[I].xyz));
 	
-	uint GlobalLightCount;
-	uint Stride;
-	Lights.GetDimensions(GlobalLightCount, Stride);
-	
-	for(uint LightIndex = GroupIndex; LightIndex < GlobalLightCount; LightIndex += TILE_SIZE)
+	for(uint LightIndex = GroupIndex; LightIndex < ZERNTiledDeferredShadingCompute_LightCount; LightIndex += TILE_SIZE)
 	{
 		bool InsideFrustum = true;
 		//float3 LightPositionView = ZERNTransformations_WorldToView(float4(Lights[LightIndex].PositionView, 1.0f));
 		
 		for(uint I = 0; I < 6; I++)
 		{
-			if((dot(TileFrustumPlanes[I], float4(Lights[LightIndex].PositionView, 1.0f))) < -Lights[LightIndex].Range)
+			ZERNShading_Light Light = ZERNTiledDeferredShadingCompute_Lights[LightIndex];
+			if((dot(TileFrustumPlanes[I], float4(Light.PositionView, 1.0f))) < -Light.Range)
 			{
 				InsideFrustum = false;
 				break;
@@ -175,7 +178,7 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 			
 			for(uint I = 0; I < LightCount; I++)
 			{
-				ZERNShading_Light CurrentLight = Lights[TileLightIndices[I]];
+				ZERNShading_Light CurrentLight = ZERNTiledDeferredShadingCompute_Lights[TileLightIndices[I]];
 			
 				if(CurrentLight.Type == 1)
 				{
@@ -185,7 +188,7 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 		}
 	}
 	
-	OutputColorBuffer[PixelCoord] = saturate(ResultColor);
+	ZERNTiledDeferredShadingCompute_OutputColorBuffer[PixelCoord] = saturate(ResultColor);
 }
 
 #endif

@@ -211,7 +211,7 @@ ZELightProjective::ZELightProjective()
 	ProjectionTextureResource = NULL;
 
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_SHADOWING;
+	Command.Priority = 2;
 }
 
 ZELightProjective::~ZELightProjective()

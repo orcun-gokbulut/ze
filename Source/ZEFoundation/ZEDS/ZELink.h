@@ -128,6 +128,12 @@ ZEItemType* ZELink<ZEItemType>::GetItem()
 }
 
 template<typename ZEItemType>
+const ZEItemType* ZELink<ZEItemType>::GetItem() const
+{
+	return Item;
+}
+
+template<typename ZEItemType>
 ZELink<ZEItemType>& ZELink<ZEItemType>::operator=(const ZELink<ZEItemType>& Other)
 {
 	return *this;
