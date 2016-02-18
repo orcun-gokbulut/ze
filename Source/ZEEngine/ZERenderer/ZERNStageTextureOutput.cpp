@@ -39,7 +39,6 @@
 #include "ZERNStageID.h"
 #include "ZERNStageHDR.h"
 #include "ZERNStageGBuffer.h"
-#include "ZERNStageLighting.h"
 #include "ZERNStagePostProcess.h"
 
 #include "ZEGraphics/ZEGRShader.h"
@@ -159,7 +158,6 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 		ZERNStageHDR* StageHDR = static_cast<ZERNStageHDR*>(Renderer->GetStage(ZERN_STAGE_HDR));
 		ZERNStagePostProcess* StagePostProcess = static_cast<ZERNStagePostProcess*>(Renderer->GetStage(ZERN_STAGE_POST_EFFECT));
 		ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-		ZERNStageLighting* StageLighting = static_cast<ZERNStageLighting*>(Renderer->GetStage(ZERN_STAGE_LIGHTING));
 
 		if (StageHDR != NULL)
 		{
@@ -168,13 +166,6 @@ bool ZERNStageTextureOutput::Setup(ZERNRenderer* Renderer, ZEGRContext* Context,
 		else if (StagePostProcess != NULL)
 		{
 			InputTextures.Add(StagePostProcess->GetOutputTexture());
-		}
-		else if (StageLighting != NULL)
-		{
-			if(StageLighting->GetRenderModel() == ZERN_RM_COMPUTE_TILED_DEFERRED)
-				InputTextures.Add(StageLighting->GetOutputTexture());
-			else
-				InputTextures.Add(StageGBuffer->GetAccumulationMap());
 		}
 		else if (StageGBuffer != NULL)
 		{		

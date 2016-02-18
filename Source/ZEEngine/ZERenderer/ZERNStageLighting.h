@@ -75,15 +75,17 @@ class ZERNStageLighting : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
+		ZEHolder<ZEGRShader>				ScreenCoverVertexShader;
 		ZEHolder<ZEGRShader>				DeferredVertexShader;
 		ZEHolder<ZEGRShader>				DeferredPixelShader;
-		ZEHolder<ZEGRShader>				TiledDeferredVertexShader;
 		ZEHolder<ZEGRShader>				TiledDeferredPixelShader;
 		ZEHolder<ZEGRShader>				TiledDeferredComputeShader;
+		ZEHolder<ZEGRShader>				AccumulatePixelShader;
 
 		ZEHolder<ZEGRRenderStateData>		DeferredRenderState;
 		ZEHolder<ZEGRRenderStateData>		TiledDeferredRenderState;
 		ZEHolder<ZEGRRenderStateData>		TiledDeferredComputeRenderState;
+		ZEHolder<ZEGRRenderStateData>		AccumulateRenderState;
 
 		ZEHolder<ZEGRConstantBuffer>		DeferredLightConstantBuffer;
 		ZEHolder<ZEGRVertexBuffer>			DeferredLightVertexBuffer;

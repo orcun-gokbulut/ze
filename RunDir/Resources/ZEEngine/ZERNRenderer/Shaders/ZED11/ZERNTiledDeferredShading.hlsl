@@ -60,7 +60,7 @@ cbuffer ZERNTiledDeferredShading_Constants														: register(b8)
 	float3											ZERNTiledDeferredShading_Reserved;
 };
 
-StructuredBuffer<ZERNTiledDeferredShading_TileInfo>	ZERNTiledDeferredShading_TileInfos					: register(t6);
+StructuredBuffer<ZERNTiledDeferredShading_TileInfo>	ZERNTiledDeferredShading_TileInfos			: register(t5);
 
 float3 ZERNTiledDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)
 {
