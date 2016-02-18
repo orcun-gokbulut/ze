@@ -35,14 +35,8 @@
 
 #include "ZERNStage.h"
 
-#include "ZEDS/ZEString.h"
 #include "ZEDS/ZEList2.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-
-void ZERNStage::SetOwnerRenderer(ZERNRenderer* Renderer)
-{
-	OwnerRenderer = Renderer;
-}
 
 void ZERNStage::SetEnable(bool Enable)
 {
@@ -52,11 +46,6 @@ void ZERNStage::SetEnable(bool Enable)
 bool ZERNStage::GetEnable() const
 {
 	return Enable;
-}
-
-ZERNRenderer* ZERNStage::GetOwnerRenderer() const
-{
-	return OwnerRenderer;
 }
 
 bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
@@ -74,7 +63,6 @@ void ZERNStage::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 ZERNStage::ZERNStage()
 {
 	Enable = true;
-	OwnerRenderer = NULL;
 }
 
 ZEGRRenderState ZERNStage::GetRenderState()

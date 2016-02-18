@@ -51,7 +51,7 @@ class ZELightPoint  : public ZELight
 
 	public:
 		ZELightType						GetLightType() const;
-
+		
 		virtual ZESize					GetViewCount();
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;

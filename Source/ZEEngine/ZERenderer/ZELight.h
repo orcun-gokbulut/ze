@@ -115,7 +115,7 @@ class ZELight : public ZEEntity
 		const ZEVector3&				GetColor() const;
 
 		void							SetRange(float NewValue);
-		float							GetRange() const;		
+		float							GetRange() const;
 
 		void							SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
@@ -133,11 +133,11 @@ class ZELight : public ZEEntity
 
 		void							SetShadowSampleLengthOffset(float ShadowSampleLengthOffset);
 		float							GetShadowSampleLengthOffset() const;
-
 		
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
-				ZELight();
+									
+										ZELight();
 		virtual							~ZELight();
 
 		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);

@@ -131,7 +131,7 @@ ZELightOmniProjective::ZELightOmniProjective()
 	BackShadowMap = NULL;
 
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_SHADOWING;
+	Command.Priority = 2;
 }
 
 ZELightOmniProjective::~ZELightOmniProjective()

@@ -82,6 +82,8 @@ class ZELightDirectional : public ZELight
 		virtual bool						DeinitializeSelf();
 
 	public:
+		virtual ZEDrawFlags					GetDrawFlags() const;
+
 		void								SetCascadeCount(ZEUInt CascadeCount);
 		ZEUInt								GetCascadeCount() const;
 

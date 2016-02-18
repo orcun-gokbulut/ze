@@ -41,7 +41,7 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNShading.hlsl"
 
-#define MAX_LIGHTS				255
+#define MAX_LIGHT				255
 #define TILE_SIZE_IN_PIXELS		16
 	
 // INPUT OUTPUTS
@@ -49,12 +49,18 @@
 
 struct ZERNTiledDeferredShading_TileInfo
 {
-	uint											LightIndices[MAX_LIGHTS];
+	uint											LightIndices[MAX_LIGHT];
 	uint											LightCount;
 };
 
-StructuredBuffer<ZERNShading_Light>					ZERNTiledDeferredShading_Lights		:	register(t5);
-StructuredBuffer<ZERNTiledDeferredShading_TileInfo>	ZERNTiledDeferredShading_TileInfos	:	register(t6);
+cbuffer ZERNTiledDeferredShading_Constants														: register(b8)
+{
+	ZERNShading_Light								ZERNTiledDeferredShading_Lights[MAX_LIGHT];
+	uint											ZERNTiledDeferredShading_LightCount;
+	float3											ZERNTiledDeferredShading_Reserved;
+};
+
+StructuredBuffer<ZERNTiledDeferredShading_TileInfo>	ZERNTiledDeferredShading_TileInfos					: register(t6);
 
 float3 ZERNTiledDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)
 {

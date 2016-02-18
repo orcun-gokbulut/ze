@@ -223,7 +223,7 @@ ZELightDirectional::ZELightDirectional()
 	CascadeVolumes.Resize(3);
 
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_SHADOWING;
+	Command.Priority = 2;
 }
 
 ZELightDirectional::~ZELightDirectional()
@@ -255,6 +255,11 @@ bool ZELightDirectional::DeinitializeSelf()
 	ShadowRenderer.Deinitialize();
 
 	return ZEEntity::DeinitializeSelf();
+}
+
+ZEDrawFlags ZELightDirectional::GetDrawFlags() const
+{
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
 }
 
 void ZELightDirectional::SetCascadeCount(ZEUInt CascadeCount)
