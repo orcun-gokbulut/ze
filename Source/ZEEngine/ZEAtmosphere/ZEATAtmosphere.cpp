@@ -51,7 +51,7 @@ bool ZEATAtmosphere::InitializeSelf()
 
 	AtmosphericScattering.SetLightIntensity(Sun->GetIntensity());
 	AtmosphericScattering.SetLightColor(Sun->GetColor());
-	AtmosphericScattering.SetMultipleScattering(true);
+	AtmosphericScattering.SetMultipleScattering(false);
 	AtmosphericScattering.SetOrderCount(5);
 
 	AtmosphericScattering.Initialize();
@@ -92,8 +92,9 @@ bool ZEATAtmosphere::GetMultipleScattering()
 ZEATAtmosphere::ZEATAtmosphere()
 {
 	Sun = NULL;
+
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.StageMask = ZERN_STAGE_PRE_EFFECT | ZERN_STAGE_POST_EFFECT;
 }
 
 ZEATAtmosphere::~ZEATAtmosphere()
@@ -122,5 +123,15 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 {
 	//AtmosphericScattering.SetLightDirection(Sun->GetDirection());
 	AtmosphericScattering.SetLightDirection(ZEVector3(-1.0f, -1.0f, 0.0f));
-	AtmosphericScattering.Process(Parameters->Context);
+
+	ZEUInt StageID = (Parameters->Stage->GetId() & Command->StageMask);
+
+	if(StageID == ZERN_STAGE_PRE_EFFECT)
+	{
+		AtmosphericScattering.PreProcess(Parameters->Context);
+	}
+	else if(StageID == ZERN_STAGE_POST_EFFECT)
+	{
+		AtmosphericScattering.PostProcess(Parameters->Context);
+	}
 }
