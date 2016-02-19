@@ -79,7 +79,8 @@ ZEHolder<const ZEGRRenderTarget> ZED11Texture3D::GetRenderTarget(ZEUInt Depth, Z
 		return NULL;
 	}
 	
-	ZEGRRenderTarget* RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
+	ZEHolder<ZEGRRenderTarget> RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
+	RenderTargets.Add(RenderTarget);
 
 	#ifdef ZE_GRAPHIC_LOG_ENABLE
 	zeLog("Render target view created. Texture3D: %p, MipLevel: %u, Width: %u, Height: %u, Depth: %u", 
@@ -155,6 +156,8 @@ void ZED11Texture3D::Deinitialize()
 	ZEGR_RELEASE(Texture3D);
 	ZEGR_RELEASE(UnorderedAccessView);
 
+	RenderTargets.Clear();
+
 	ZEGRTexture3D::Deinitialize();
 }
 
@@ -167,5 +170,4 @@ ZED11Texture3D::ZED11Texture3D()
 
 ZED11Texture3D::~ZED11Texture3D()
 {
-	Deinitialize();
 }

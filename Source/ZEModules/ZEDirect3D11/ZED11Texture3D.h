@@ -37,7 +37,10 @@
 
 #include "ZEGraphics/ZEGRTexture3D.h"
 #include "ZED11ComponentBase.h"
+
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRRenderTarget;
 
@@ -50,6 +53,7 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 		ID3D11Texture3D*							Texture3D;
 		ID3D11ShaderResourceView*					ResourceView;
 		ID3D11UnorderedAccessView*					UnorderedAccessView;
+		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>	RenderTargets;
 
 		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
 		virtual void								Deinitialize();

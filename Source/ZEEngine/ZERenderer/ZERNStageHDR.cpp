@@ -692,15 +692,15 @@ ZERNStageHDR::ZERNStageHDR()
 	DirtyFlags.RaiseAll();
 
 	Constants.AutoKeyEnabled = ZEGR_FALSE;
-	Constants.BloomEnabled = ZEGR_TRUE;
-	Constants.Key = 0.50f;
-	Constants.WhiteLevel = 2.0f;
-	Constants.ToneMapOperator = ZERN_HTMO_UNCHARTED;
+	Constants.BloomEnabled = ZEGR_FALSE;
+	Constants.Key = 0.55f;
+	Constants.WhiteLevel = 3.0f;
+	Constants.ToneMapOperator = ZERN_HTMO_REINHARD;
 	Constants.BloomFactor = 2.0f;
 	Constants.BloomThreshold = 3.0f;
 	Constants.LuminanceMin = 0.1f;
 	Constants.LuminanceMax = 10.0f;
-	Constants.Saturation = 1.0f;
+	Constants.Saturation = 0.7f;
 
 	BlurTextureSize = ZERN_HBTS_HALF;
 }

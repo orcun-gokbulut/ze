@@ -63,13 +63,13 @@ void ZERNLightScatteringCommon_CalculateWorldParamsFromTexCoords(in float4 TexCo
 	float CosHorizontal = -sqrt(Height * (2.0f * EARTH_RADIUS + Height)) / (EARTH_RADIUS + Height);
 	if(TexCoord.y > 0.5f)
 	{
-		TexCoord.y = (TexCoord.y - (0.5f + 0.5f / Texel_Y_Dimension )) * Texel_Y_Dimension / (Texel_Y_Dimension * 0.5f - 1.0f);
-		CosViewZenith = max(CosHorizontal + pow(TexCoord.y, 5.0f) * (1.0f - CosHorizontal), CosHorizontal + 0.0001f);
+		TexCoord.y = saturate((TexCoord.y - (0.5f + 0.5f / Texel_Y_Dimension )) * Texel_Y_Dimension / (Texel_Y_Dimension * 0.5f - 1.0f));
+		CosViewZenith = max(CosHorizontal + pow(TexCoord.y, 5.0f) * (1.0f - CosHorizontal), CosHorizontal + 1.e-4f);
 	}
 	else
 	{
-		TexCoord.y = (TexCoord.y - 0.5f / Texel_Y_Dimension) * Texel_Y_Dimension / (Texel_Y_Dimension * 0.5f - 1.0f);
-		CosViewZenith = min(CosHorizontal - pow(TexCoord.y , 5.0f) * (1.0f + CosHorizontal), CosHorizontal - 0.0001f);
+		TexCoord.y = saturate((TexCoord.y - 0.5f / Texel_Y_Dimension) * Texel_Y_Dimension / (Texel_Y_Dimension * 0.5f - 1.0f));
+		CosViewZenith = min(CosHorizontal - pow(TexCoord.y , 5.0f) * (1.0f + CosHorizontal), CosHorizontal - 1.e-4f);
 	}
 	
 	CosSunZenith = tan((2.0f * TexCoord.z - 1.0f + 0.26f) * 1.1f) / tan(1.26f * 1.1f);
@@ -146,7 +146,7 @@ float2 ZERNLightScatteringCommon_IntegrateDensity(float3 Start, float3 End)
 		
 		float2 CurRayleighMieDensity = ZERNLightScatteringCommon_CalculateDensity(Position);
 		
-		TotalRayleighMieDensity += ((CurRayleighMieDensity + PrevRayleighMieDensity) * 0.5f) * StepLength;
+		TotalRayleighMieDensity += (CurRayleighMieDensity + PrevRayleighMieDensity) * 0.5f * StepLength;
 		
 		PrevRayleighMieDensity = CurRayleighMieDensity;
 	}

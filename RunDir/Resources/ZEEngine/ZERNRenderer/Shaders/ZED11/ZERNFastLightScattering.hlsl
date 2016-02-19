@@ -51,8 +51,6 @@ cbuffer ZERNFastLightScattering_Constants								: register(b8)
 };
 
 Texture3D<float3>	ZERNFastLightScattering_ScatteringBuffer			: register(t5);
-Texture2D<float3>	ZERNFastLightScattering_ExtinctionBuffer			: register(t6);
-Texture2D<float3>	ZERNFastLightScattering_SkyAmbientBuffer			: register(t7);
 
 float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
@@ -79,7 +77,7 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	if(StartEndDistance.x < 0.0f && DepthView < (ZERNView_FarZ - 1.0f))	//in earth
 		RayLength = DepthView;
 	else if(StartEndDistance.x > 0.0f && StartEndDistance.z > 0.0f)		//in space
-		RayLength = StartEndDistance.z;	
+		RayLength = StartEndDistance.z;
 	
 	float3 RayEnd = ZERNView_Position + ViewDirection * RayLength;
 	
@@ -93,41 +91,12 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	
 	float3 PixelColor = (float3)0.0f;
 	if(DepthView < (ZERNView_FarZ - 1.0f))
-	{
-		/*float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions, DepthHomogeneous);
-		float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
-		
-		float3 EarthNormalWorld = normalize(PositionWorld - EarthCenter);
-		
-		float Height = clamp(PositionWorld.y, 16.0f, ATMOSPHERE_HEIGHT - 16.0f);
-		float2 TexCoord;
-		TexCoord.x = (Height - 16) / (ATMOSPHERE_HEIGHT - 2.0f * 16.0f);
-		TexCoord.y = dot(ViewDirection, EarthNormalWorld) * 0.5f + 0.5f;
-		TexCoord = (TexCoord * (LUT_DIMENSIONS.xy - 1.0f) + 0.5f) / LUT_DIMENSIONS.xy;
-		
-		float3 ExtinctionToAtmosphere = ZERNFastLightScattering_ExtinctionBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0);
-		
-		float TexCoordX = dot(LightDirectionWorld, EarthNormalWorld) * 0.5f + 0.5f;
-		TexCoordX = (TexCoordX * 127.0f + 0.5f) / 128.0f;
-		
-		float3 SkyAmbient = ZERNFastLightScattering_SkyAmbientBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, float2(TexCoordX, 0.5f), 0);
-		
-		SkyAmbient *= ZERNFastLightScattering_LightColor * ZERNFastLightScattering_Intensity;
-		float3 SunColor = ZERNFastLightScattering_LightColor * ZERNFastLightScattering_Intensity * ExtinctionToAtmosphere;
-		
-		float3 SurfaceNormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
-		float3 SurfaceNormalWorld = ZERNTransformations_ViewToWorld(float4(SurfaceNormalView, 0.0f));
-		SurfaceNormalWorld = normalize(SurfaceNormalWorld);
-		
-		float3 SunDiffuse = max(0.0f, dot(LightDirectionWorld, SurfaceNormalWorld));*/
-		
-		PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
-		
-		//PixelColor += (SkyAmbient + SunColor * SunDiffuse) * 0.002f;
+	{	
+		PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);	
 	}
 	else
 	{
-		//PixelColor *= ZERNFastLightScattering_LightColor * ZERNFastLightScattering_Intensity;
+		//PixelColor = float3(0.09f, 0.09f, 0.09f) * 5.0f; //ZERNFastLightScattering_LightColor * ZERNFastLightScattering_Intensity;
 	}
 	
 	return PixelColor * Extinction + Inscattering;

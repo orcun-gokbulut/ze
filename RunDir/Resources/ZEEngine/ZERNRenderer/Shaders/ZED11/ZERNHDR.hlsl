@@ -144,11 +144,11 @@ float3 ZERNHDR_ToneMapOperator_ModifiedReinhard(float3 PixelColor, float PixelLu
 
 float3 ZERNHDR_ToneMapOperator_Uncharted(float3 PixelColor)
 {
-	float A = 0.22f;	//Shoulder Strength
-	float B = 0.30f;	//Linear Strength
+	float A = 0.15f;	//Shoulder Strength
+	float B = 0.50f;	//Linear Strength
 	float C = 0.10f;	//Linear Angle
 	float D = 0.20f;	//Toe Strength
-	float E = 0.01f;	//Toe Numerator
+	float E = 0.02f;	//Toe Numerator
 	float F = 0.30f;	//Toe Denumerator	E / F = Toe Angle
 	
 	return ((PixelColor * (A * PixelColor + C * B) + D * E) / (PixelColor * (A * PixelColor + B) + D * F)) - E / F;

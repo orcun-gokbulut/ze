@@ -57,9 +57,11 @@ class ZEATAtmosphericScattering : public ZEInitializable
 	private:
 		ZEFlags							DirtyFlags;
 		
-		ZEHolder<ZEGRShader>			VertexShader;
-		ZEHolder<ZEGRShader>			PixelShader;
-		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRShader>			ScreenCoverVertexShader;
+		ZEHolder<ZEGRShader>			SkyLightingPixelShader;
+		ZEHolder<ZEGRShader>			SkyAndAerialPerspectivePixelShader;
+		ZEHolder<ZEGRRenderStateData>	SkyLightingRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	SkyAndAerialPerspectiveRenderStateData;
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZEHolder<ZEGRShader>			PrecomputeDensityPixelShader;
@@ -145,7 +147,8 @@ class ZEATAtmosphericScattering : public ZEInitializable
 		void							SetMultipleScattering(bool UseMultipleScattering);
 		float							GetMultipleScattering() const;
 
-		void							Process(ZEGRContext* Context);
+		void							PreProcess(ZEGRContext* Context);
+		void							PostProcess(ZEGRContext* Context);
 
 										ZEATAtmosphericScattering();
 		virtual							~ZEATAtmosphericScattering();
