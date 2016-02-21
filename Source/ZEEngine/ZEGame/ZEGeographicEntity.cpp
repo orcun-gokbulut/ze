@@ -35,13 +35,13 @@
 
 #include "ZEGeographicEntity.h"
 
-bool ZEGeographicEntity::SetOwner(ZEEntity* Owner)
+/*bool ZEGeographicEntity::SetParent(ZEEntity* Owner)
 {
 	if (!ZEClass::IsDerivedFrom(ZEGeographicEntity::Class(), Owner->GetClass()))
 		return false;
 
-	return ZEEntity::SetOwner(Owner);
-}
+	return ZEEntity::SetParent(Owner);
+}*/
 
 ZEGeographicEntity::ZEGeographicEntity()
 {
@@ -56,9 +56,9 @@ const ZEMatrix4x4d& ZEGeographicEntity::GetGeographicTransform() const
 	ZEMatrix4x4d TempGeographicTransform;
 	ZEMatrix4x4d::CreateOrientation(TempGeographicTransform, GeographicPosition, GeographicRotation, GeographicScale);
 
-	if (GetOwner() != NULL)
+	if (GetParent() != NULL)
 	{
-		ZEMatrix4x4d::Multiply(GeographicTransform, ((ZEGeographicEntity*)GetOwner())->GetGeographicTransform(), TempGeographicTransform);
+		ZEMatrix4x4d::Multiply(GeographicTransform, ((ZEGeographicEntity*)GetParent())->GetGeographicTransform(), TempGeographicTransform);
 	}
 	else
 	{
@@ -76,7 +76,7 @@ const ZEMatrix4x4d& ZEGeographicEntity::GetInvGeographicTransform() const
 
 void ZEGeographicEntity::SetGeographicPosition(const ZEVector3d& Position)
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
+	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetParent();
 
 	if (Owner != NULL)
 	{
@@ -93,7 +93,7 @@ void ZEGeographicEntity::SetGeographicPosition(const ZEVector3d& Position)
 
 ZEVector3d ZEGeographicEntity::GetGeographicPosition() const
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
+	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetParent();
 
 	if (Owner != NULL)
 	{
@@ -107,7 +107,7 @@ ZEVector3d ZEGeographicEntity::GetGeographicPosition() const
 
 void ZEGeographicEntity::SetGeographicRotation(const ZEQuaternion& Rotation)
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
+	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetParent();
 
 	if (Owner != NULL)
 	{
@@ -126,7 +126,7 @@ void ZEGeographicEntity::SetGeographicRotation(const ZEQuaternion& Rotation)
 
 ZEQuaternion ZEGeographicEntity::GetGeographicRotation() const
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
+	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetParent();
 
 	if (Owner != NULL)
 	{
@@ -141,7 +141,7 @@ ZEQuaternion ZEGeographicEntity::GetGeographicRotation() const
 
 void ZEGeographicEntity::SetGeographicScale(const ZEVector3d& Scale)
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
+	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetParent();
 
 	if (Owner != NULL)
 	{
@@ -160,7 +160,7 @@ void ZEGeographicEntity::SetGeographicScale(const ZEVector3d& Scale)
 
 ZEVector3d ZEGeographicEntity::GetGeographicScale() const
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
+	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetParent();
 
 	if (Owner != NULL)
 	{

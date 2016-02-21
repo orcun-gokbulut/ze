@@ -88,13 +88,13 @@ void ZEEntity::BoundingBoxChanged()
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
 {
-	if (Entity->Owner != NULL)
+	if (Entity->Parent != NULL)
 	{
 		zeError("Component already has an owner. Can not register component.");
 		return false;
 	}
 
-	if (!(Entity->OwnerScene == NULL || Entity->OwnerScene == this->OwnerScene))
+	if (!(Entity->Scene == NULL || Entity->Scene == this->Scene))
 	{
 		zeError("Component already has been entitled to another scene. Can not register component.");
 		return false;
@@ -103,17 +103,17 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	if (!Entity->SetOwner(this))
+	if (!Entity->SetParent(this))
 		return false;
 
-	Entity->SetOwnerScene(this->OwnerScene);
+	Entity->SetScene(this->Scene);
 
 	Components.Add(Entity);
 
 	if (State == ZE_ES_INITIALIZING || State == ZE_ES_INITIALIZED)
 		Entity->Initialize();
 
-	if(Entity->GetName().GetLength() == 0)
+	if(Entity->GetName().IsEmpty())
 		Entity->SetName(GetName() + "->" +  Entity->GetClass()->GetName());
 
 	return true;
@@ -121,7 +121,7 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 
 void ZEEntity::RemoveComponent(ZEEntity* Entity)
 {
-	if (Entity->Owner != this)
+	if (Entity->Parent != this)
 	{
 		zeError("Can not remove non-component entity.");
 		return;
@@ -129,19 +129,19 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 
 	Components.RemoveValue(Entity);
 
-	Entity->Owner = NULL;
-	Entity->SetOwnerScene(NULL);
+	Entity->Parent = NULL;
+	Entity->SetScene(NULL);
 }
 
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 {
-	if (Entity->Owner != NULL)
+	if (Entity->Parent != NULL)
 	{
 		zeError("Entity already has an owner. Can not register entity.");
 		return false;
 	}
 
-	if (!(Entity->OwnerScene == NULL || Entity->OwnerScene == this->OwnerScene))
+	if (!(Entity->Scene == NULL || Entity->Scene == this->Scene))
 	{
 		zeError("Child entity already has been entitled to another scene. Can not register child entity.");
 		return false;
@@ -150,16 +150,16 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	if (!Entity->SetOwner(this))
+	if (!Entity->SetParent(this))
 		return false;
 
-	Entity->SetOwnerScene(this->OwnerScene);
+	Entity->SetScene(this->Scene);
 	ChildEntities.Add(Entity);
 
 	if (State == ZE_ES_INITIALIZED)
 		Entity->Initialize();
 
-	if(Entity->GetName().GetLength() == 0)
+	if(Entity->GetName().IsEmpty())
 		Entity->SetName(GetName() + "->" +  Entity->GetClass()->GetName());
 
 	return true;
@@ -167,7 +167,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 
 void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 {
-	if (Entity->Owner != this)
+	if (Entity->Parent != this)
 	{
 		zeError("Can not remove non-child entity.");
 		return;
@@ -175,30 +175,28 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 
 	ChildEntities.RemoveValue(Entity);
 
-	Entity->Owner = NULL;
-	Entity->SetOwnerScene(NULL);
+	Entity->Parent = NULL;
+	Entity->SetScene(NULL);
 }
 
-bool ZEEntity::SetOwner(ZEEntity* Owner)
+bool ZEEntity::SetParent(ZEEntity* Owner)
 {
-	this->Owner = Owner;
+	this->Parent = Owner;
 	ParentTransformChanged();
 	return true;
 }
 
-void ZEEntity::SetOwnerScene(ZEScene* Scene)
+void ZEEntity::SetScene(ZEScene* Scene)
 {
-	this->OwnerScene = Scene;
+	this->Scene = Scene;
 
 	ZESize SubItemCount = Components.GetCount();
-
 	for (ZESize I = 0; I < SubItemCount; I++)
-		Components[I]->SetOwnerScene(Scene);
+		Components[I]->SetScene(Scene);
 
 	SubItemCount = ChildEntities.GetCount();
-
 	for (ZESize I = 0; I < SubItemCount; I++)
-		ChildEntities[I]->SetOwnerScene(Scene);
+		ChildEntities[I]->SetScene(Scene);
 }
 
 void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
@@ -207,27 +205,289 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 	BoundingBoxChanged();
 }
 
+ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, void* Parameters)
+{
+
+	zeLog("%s::ManageStates, State: %s, TargetState:%s", 
+		GetName().ToCString(), 
+		ZEEntityState_Declaration()->ToText(State, "Unknown"), 
+		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));
+
+	if (State == ZE_ES_NONE)
+	{
+		if (TargetState == ZE_ES_LOADED || TargetState == ZE_ES_INITIALIZED)
+		{
+			State = ZE_ES_LOADING;
+			if (LoadSelf())
+			{
+				for (ZESize I = 0; I < Components.GetCount(); I++)
+					Components[I]->Load();
+
+				for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+					ChildEntities[I]->Load();
+
+				return ZE_TR_COOPERATING;
+			}
+			else
+			{
+				State = ZE_ES_ERROR_LOADING;
+				return ZE_TR_FAILED;
+			}
+		}
+	}
+	else if (State == ZE_ES_LOADED)
+	{
+		if (TargetState == ZE_ES_NONE)
+		{
+			State = ZE_ES_UNLOADING;
+
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Unload();
+
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Unload();
+
+
+			return ZE_TR_COOPERATING;
+		}
+		else if (TargetState == ZE_ES_INITIALIZED)
+		{
+			State = ZE_ES_INITIALIZING;
+
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Initialize();
+
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Initialize();
+
+			return ZE_TR_COOPERATING;
+		}
+	}
+	else if (State == ZE_ES_INITIALIZED)
+	{
+		if (TargetState == ZE_ES_LOADED || TargetState == ZE_ES_NONE)
+		{
+			State = ZE_ES_DEINITIALIZING;
+
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Deinitialize();
+
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Deinitialize();
+
+			return ZE_TR_COOPERATING;
+		}
+	}
+	else if (State == ZE_ES_LOADING)
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetState() == ZE_ES_ERROR_LOADING)
+			{
+				State = ZE_ES_ERROR_LOADING;
+				return ZE_TR_FAILED;
+			}
+			else if (Components[I]->GetState() < ZE_ES_LOADED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetState() == ZE_ES_ERROR_LOADING)
+			{
+				State = ZE_ES_ERROR_LOADING;
+				return ZE_TR_FAILED;
+			}
+			else if (ChildEntities[I]->GetState() < ZE_ES_LOADED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+	
+		if (PostLoadSelf())
+		{
+			State = ZE_ES_LOADED;
+			return ZE_TR_COOPERATING;
+		}
+		else
+		{
+			State = ZE_ES_ERROR_LOADING;
+			return ZE_TR_FAILED;
+		}
+	}
+	else if (State == ZE_ES_UNLOADING)
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetState() == ZE_ES_ERROR_UNLOADING)
+			{
+				State = ZE_ES_ERROR_UNLOADING;
+				return ZE_TR_FAILED;
+			}
+			else if (Components[I]->GetState() > ZE_ES_NOT_LOADED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetState()  == ZE_ES_ERROR_UNLOADING)
+			{
+				State = ZE_ES_ERROR_UNLOADING;
+				return ZE_TR_FAILED;
+			}
+			else if (ChildEntities[I]->GetState() > ZE_ES_NOT_LOADED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		if (UnloadSelf())
+		{
+			State = ZE_ES_NOT_LOADED;
+			return ZE_TR_COOPERATING;
+		}
+		else
+		{
+			State = ZE_ES_ERROR_UNLOADING;
+			return ZE_TR_FAILED;
+		}
+	}
+	else if (State == ZE_ES_INITIALIZING)
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetState() == ZE_ES_ERROR_INITIALIZATION)
+			{
+				State = ZE_ES_ERROR_INITIALIZATION;
+				return ZE_TR_FAILED;
+			}
+			else if (Components[I]->GetState() != ZE_ES_INITIALIZED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetState() == ZE_ES_ERROR_INITIALIZATION)
+			{
+				State = ZE_ES_ERROR_INITIALIZATION;
+				return ZE_TR_FAILED;
+			}
+			if (ChildEntities[I]->GetState() != ZE_ES_INITIALIZED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		if (InitializeSelf())
+		{
+			State = ZE_ES_INITIALIZED;
+			return ZE_TR_COOPERATING;
+		}
+		else
+		{
+			State = ZE_ES_ERROR_INITIALIZATION;
+			return ZE_TR_FAILED;
+		}
+	}
+	else if (State == ZE_ES_DEINITIALIZING)
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+		{
+			if (Components[I]->GetState() == ZE_ES_ERROR_DEINITIALIZATION)
+			{
+				State = ZE_ES_ERROR_DEINITIALIZATION;
+				return ZE_TR_FAILED;
+			}
+			else if (Components[I]->GetState() > ZE_ES_LOADED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		{
+			if (ChildEntities[I]->GetState() == ZE_ES_ERROR_DEINITIALIZATION)
+			{
+				State = ZE_ES_ERROR_DEINITIALIZATION;
+				return ZE_TR_FAILED;
+			}
+			else if (ChildEntities[I]->GetState() > ZE_ES_LOADED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		if (DeinitializeSelf())
+		{
+			State = ZE_ES_LOADED;
+			return ZE_TR_COOPERATING;
+		}
+		else
+		{
+			State = ZE_ES_ERROR_DEINITIALIZATION;
+			return ZE_TR_FAILED;
+		}
+	}
+
+	return ZE_TR_DONE;
+}
+
+void ZEEntity::ManagetStatesSerial()
+{
+	while (ManageStates(NULL, 0, NULL) == ZE_TR_COOPERATING);
+}
+
+void ZEEntity::SetSerialOperation(bool SerialOperation)
+{
+	this->SerialOperation = SerialOperation;
+}
+
+bool ZEEntity::GetSerialOperation() const 
+{
+	return SerialOperation;
+}
+
+bool ZEEntity::LoadSelf()
+{
+	return true;
+}
+
+bool ZEEntity::PostLoadSelf()
+{
+	return true;
+}
+
+bool ZEEntity::UnloadSelf()
+{
+	return true;
+}
+
 bool ZEEntity::InitializeSelf()
 {
-	State = ZE_ES_INITIALIZING;
 	return true;
 }
 
 bool ZEEntity::DeinitializeSelf()
 {
-	State = ZE_ES_NOT_INITIALIZED;
 	return true;
 }
 
 ZEEntity::ZEEntity()
 {
-	Owner = NULL;
-	OwnerScene = NULL;
+	Parent = NULL;
+	Scene = NULL;
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
+	SerialOperation = true;
 	State = ZE_ES_NOT_INITIALIZED;
 	LocalTransformChanged();
 }
@@ -248,14 +508,14 @@ ZEDrawFlags ZEEntity::GetDrawFlags() const
 	return ZE_DF_NONE;
 }
 
-ZEEntity* ZEEntity::GetOwner() const
+ZEEntity* ZEEntity::GetParent() const
 {
-	return Owner;
+	return Parent;
 }
 
-ZEScene* ZEEntity::GetOwnerScene() const
+ZEScene* ZEEntity::GetScene() const
 {
-	return OwnerScene;
+	return Scene;
 }
 
 const ZEArray<ZEEntity*>& ZEEntity::GetComponents() const
@@ -297,7 +557,7 @@ const ZEMatrix4x4& ZEEntity::GetTransform() const
 
 const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
 {
-	if (Owner == NULL)
+	if (Parent == NULL)
 	{
 		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
 		return GetTransform();
@@ -305,7 +565,7 @@ const ZEMatrix4x4& ZEEntity::GetWorldTransform() const
 
 	if (EntityDirtyFlags.GetFlags(ZE_EDF_WORLD_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(WorldTransform, Owner->GetWorldTransform(), GetTransform());
+		ZEMatrix4x4::Multiply(WorldTransform, Parent->GetWorldTransform(), GetTransform());
 		EntityDirtyFlags.UnraiseFlags(ZE_EDF_WORLD_TRANSFORM);
 	}
 
@@ -322,16 +582,6 @@ const ZEMatrix4x4& ZEEntity::GetInvWorldTransform() const
 	}
 
 	return InvWorldTransform;
-}
-
-bool ZEEntity::IsInitialized()
-{
-	return (State == ZE_ES_INITIALIZED);
-}
-
-ZEEntityState ZEEntity::GetState()
-{
-	return State;
 }
 
 void ZEEntity::SetEntityId(ZEInt EntityId)
@@ -387,10 +637,10 @@ const ZEVector3& ZEEntity::GetPosition() const
 
 void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 {
-	if (Owner != NULL)
+	if (Parent != NULL)
 	{
 		ZEVector3 Result;
-		ZEMatrix4x4::Transform(Result, Owner->GetInvWorldTransform(), NewPosition);
+		ZEMatrix4x4::Transform(Result, Parent->GetInvWorldTransform(), NewPosition);
 		SetPosition(Result);
 	}
 	else
@@ -401,10 +651,10 @@ void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 
 const ZEVector3 ZEEntity::GetWorldPosition() const
 {
-	if (Owner != NULL)
+	if (Parent != NULL)
 	{
 		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, Owner->GetWorldTransform(), GetPosition());
+		ZEMatrix4x4::Transform(Temp, Parent->GetWorldTransform(), GetPosition());
 		return Temp;
 	}
 
@@ -424,10 +674,10 @@ const ZEQuaternion& ZEEntity::GetRotation() const
 
 void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 {
-	if (Owner != NULL)
+	if (Parent != NULL)
 	{
 		ZEQuaternion Temp, Result;
-		ZEQuaternion::Conjugate(Temp, Owner->GetWorldRotation());
+		ZEQuaternion::Conjugate(Temp, Parent->GetWorldRotation());
 		ZEQuaternion::Product(Result, Temp, NewRotation);
 		SetRotation(Result);
 	}
@@ -439,10 +689,10 @@ void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 
 const ZEQuaternion ZEEntity::GetWorldRotation() const
 {
-	if (Owner != NULL)
+	if (Parent != NULL)
 	{
 		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Owner->GetWorldRotation(), GetRotation());
+		ZEQuaternion::Product(Temp, Parent->GetWorldRotation(), GetRotation());
 		ZEQuaternion::Normalize(Temp, Temp);
 		return Temp;
 	}
@@ -463,10 +713,10 @@ const ZEVector3& ZEEntity::GetScale() const
 
 void ZEEntity::SetWorldScale(const ZEVector3& NewScale)
 {
-	if (Owner != NULL)
+	if (Parent != NULL)
 	{
 		ZEVector3 Temp;
-		ZEVector3::Divide(Temp, NewScale, Owner->GetWorldScale());
+		ZEVector3::Divide(Temp, NewScale, Parent->GetWorldScale());
 		SetScale(Temp);
 	}
 	else
@@ -477,27 +727,27 @@ void ZEEntity::SetWorldScale(const ZEVector3& NewScale)
 
 const ZEVector3 ZEEntity::GetWorldScale() const
 {
-	if (Owner != NULL)
+	if (Parent != NULL)
 	{
 		ZEVector3 Temp;
-		ZEVector3::Multiply(Temp, Owner->GetWorldScale(), GetScale());
+		ZEVector3::Multiply(Temp, Parent->GetWorldScale(), GetScale());
 		return Temp;
 	}
 
 	return GetScale();
 }
 
-ZEVector3 ZEEntity::GetFront()
+ZEVector3 ZEEntity::GetFront() const
 {
 	return Rotation * ZEVector3::UnitZ;
 }
 
-ZEVector3 ZEEntity::GetRight()
+ZEVector3 ZEEntity::GetRight() const
 {
 	return Rotation * ZEVector3::UnitX;
 }
 
-ZEVector3 ZEEntity::GetUp()
+ZEVector3 ZEEntity::GetUp() const
 {
 	return Rotation * ZEVector3::UnitY;
 }
@@ -517,54 +767,75 @@ ZEVector3 ZEEntity::GetWorldUp() const
 	return GetWorldRotation() * ZEVector3::UnitY;
 }
 
-bool ZEEntity::Initialize()
+ZEEntityState ZEEntity::GetState() const
 {
-	if (IsInitialized())
-		return false;
-
-	//Owner Scene mevzusu addChild/Comp da ve AddtoScene de olcak
-
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		if(!Components[I]->Initialize())
-			return false;
-
-	if (!InitializeSelf())
-		return false;
-
-	if (State != ZE_ES_INITIALIZING)
-		return false;
-
-	State = ZE_ES_INITIALIZED;
-
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		if(!ChildEntities[I]->Initialize())
-			return false;
-
-	return true;
+	return State;
 }
 
-bool ZEEntity::Deinitialize()
+bool ZEEntity::IsLoaded() const
 {
-	if (!IsInitialized())
-		return true;
+	return State >= ZE_ES_LOADED && State != ZE_ES_ERROR_LOADING && State != ZE_ES_ERROR_UNLOADING;
+}
+
+bool ZEEntity::IsInitialized() const
+{
+	return State == ZE_ES_INITIALIZED;
+}
+
+void ZEEntity::Initialize()
+{
+	if (TargetState == ZE_ES_INITIALIZED)
+		return;
+
+	TargetState = ZE_ES_INITIALIZED;
+
+	if (SerialOperation)
+		ManagetStatesSerial();
+	else
+		ManageTask.Run();
 	
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		if(!ChildEntities[I]->Deinitialize())
-			return false;
+}
 
-	State = ZE_ES_DEINITIALIZING;
+void ZEEntity::Deinitialize()
+{
+	if (TargetState == ZE_ES_DEINITIALIZED)
+		return;
 
-	if (!DeinitializeSelf())
-		return false;
+	if (TargetState >= ZE_ES_LOADED)
+		TargetState = ZE_ES_LOADED;
+	else
+		TargetState = ZE_ES_NONE;
 
-	if (State != ZE_ES_NOT_INITIALIZED)
-		return false;
+	if (SerialOperation)
+		ManagetStatesSerial();
+	else
+		ManageTask.Run();
+}
 
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		if(!Components[I]->Deinitialize())
-			return false;
+void ZEEntity::Load()
+{
+	if (TargetState == ZE_ES_LOADED)
+		return;
 
-	return true;
+	TargetState = ZE_ES_LOADED;
+	
+	if (SerialOperation)
+		ManagetStatesSerial();
+	else
+		ManageTask.Run();
+}
+
+void ZEEntity::Unload()
+{
+	if (TargetState == ZE_ES_NONE)
+		return;
+
+	TargetState = ZE_ES_NONE;
+	
+	if (SerialOperation)
+		ManagetStatesSerial();
+	else
+		ManageTask.Run();
 }
 
 void ZEEntity::Destroy()
@@ -749,7 +1020,7 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 
 		ChildEntities[I] = NewSubEntity;
 
-		if (!NewSubEntity->SetOwner(this))
+		if (!NewSubEntity->SetParent(this))
 		{
 			zeError("Unserialization failed. Cannot add child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
 			ChildEntities[I] = NULL;

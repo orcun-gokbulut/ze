@@ -52,7 +52,7 @@ class ZESector : public ZEGeographicEntity
 		virtual bool SaveSector(ZEMLWriterNode* Serializer);
 		virtual bool RestoreSector(ZEMLReaderNode* Unserializer);
 
-		virtual bool SetOwner(ZEEntity* Owner);
+		virtual bool SetParent(ZEEntity* Owner);
 		virtual bool InitializeSelf();
 
 		ZESector();

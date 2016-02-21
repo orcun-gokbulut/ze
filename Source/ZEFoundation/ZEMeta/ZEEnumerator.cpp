@@ -34,3 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEEnumerator.h"
+
+const char* ZEEnumerator::ToText(ZEInt Value, const char* Default)
+{
+	ZESize Count = GetItemCount();
+	const ZEEnumeratorItem* Items = GetItems();
+	for (ZESize I = 0; I < Count; I++)
+	{
+		if (Items[I].Value == Value)
+			return Items[I].Name;
+	}
+}

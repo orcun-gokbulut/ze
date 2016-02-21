@@ -58,11 +58,18 @@ enum ZETaskStatus
 	ZE_TS2_DONE
 };
 
+enum ZETaskResult
+{
+	ZE_TR_DONE,
+	ZE_TR_COOPERATING,
+	ZE_TR_FAILED
+};
+
 class ZETask;
 class ZETaskThread;
 class ZETaskPool;
 
-typedef ZEDelegate<bool (ZETaskThread* TaskThread, ZEInt InstanceIndex, void* ExtraParameters)> ZETaskFunction;
+typedef ZEDelegate<ZETaskResult (ZETaskThread* TaskThread, ZEInt InstanceIndex, void* ExtraParameters)> ZETaskFunction;
 typedef ZEDelegate<void (ZETaskThread* TaskThread, ZEInt InstanceCount, void* ExtraParameters)> ZETaskPostFunction;
 
 class ZETask

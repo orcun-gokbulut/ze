@@ -109,12 +109,13 @@ bool ZESector::RestoreSector(ZEMLReaderNode* Unserializer)
 	return true;
 }
 
-bool ZESector::SetOwner(ZEEntity* Owner)
+bool ZESector::SetParent(ZEEntity* Owner)
 {
-	if (Owner != NULL)
+	/*if (Owner != NULL)
 		return false;
 
-	return ZEGeographicEntity::SetOwner(Owner);
+	return ZEGeographicEntity::SetParent(Owner);*/
+	return true;
 }
 
 bool ZESector::InitializeSelf()

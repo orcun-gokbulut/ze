@@ -69,15 +69,16 @@ bool ZETask::Activate(ZETaskThread* Thread)
 	Status = ZE_TS2_RUNNING;
 	TaskLock.Unlock();
 
-	bool Finished = true;
+	ZETaskResult Result = ZE_TR_DONE;
 	if (!Function.IsNull())
-		Finished = Function(Thread, Thread->GetInstanceIndex(), Parameter);
+		Result = Function(Thread, Thread->GetInstanceIndex(), Parameter);
+
 
 	TaskLock.Lock();
 	Threads.Remove(&Thread->TaskLink);
 
 	bool Requeue = false;
-	if (Finished && InstanceIndex >= InstanceCount && Threads.GetCount() == 0 && SubTasks.GetCount() == 0)
+	if (Result == ZE_TR_DONE && InstanceIndex >= InstanceCount && Threads.GetCount() == 0 && SubTasks.GetCount() == 0)
 	{
 		if (!PostFunction.IsNull())
 			PostFunction(Thread, InstanceCount, Parameter);
@@ -90,7 +91,7 @@ bool ZETask::Activate(ZETaskThread* Thread)
 
 		Requeue = false;
 	}
-	else if (Finished && InstanceIndex >= InstanceCount)
+	else if (Result == ZE_TR_DONE && InstanceIndex >= InstanceCount)
 	{
 		Status = ZE_TS2_WAITING;
 		Requeue = false;

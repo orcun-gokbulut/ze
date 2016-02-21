@@ -48,7 +48,7 @@ void ZESectorSelector::UpdateSectors()
 		return;
 
 	ZESector* TargetSector = DetermineSector(this);
-	ZESector* OwnerSector = (ZESector*)GetOwner();
+	ZESector* OwnerSector = (ZESector*)GetParent();
 
 	if (TargetSector == NULL)
 		return;
@@ -90,13 +90,14 @@ void ZESectorSelector::ParentTransformChanged()
 	UpdateSectors();
 }
 
-bool ZESectorSelector::SetOwner(ZEEntity* Owner)
+bool ZESectorSelector::SetParent(ZEEntity* Owner)
 {
-	if (Owner != NULL)
+	/*if (Owner != NULL)
 		if (!ZEClass::IsDerivedFrom(ZESector::Class(), Owner->GetClass()))
 			return false;
 
-	return ZEGeographicEntity::SetOwner(Owner);
+	return ZEGeographicEntity::SetParent(Owner);*/
+	return true;
 }
 
 ZESectorSelector::ZESectorSelector()
@@ -202,7 +203,7 @@ void ZESectorSelector::SetReferenceSector(ZESector* ReferenceSector)
 
 ZESector* ZESectorSelector::GetReferenceSector()
 {
-	return (ZESector*)GetOwner();
+	return (ZESector*)GetParent();
 }
 
 ZESectorSelector* ZESectorSelector::CreateInstance()

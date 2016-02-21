@@ -75,8 +75,10 @@ class ZEEnumerator
 		virtual ZEGUID					GetGUID() = 0;
 
 
-	virtual const ZEEnumeratorItem*		GetItems() = 0;
-	virtual ZESize						GetItemCount() = 0;
+		virtual const ZEEnumeratorItem*		GetItems() = 0;
+		virtual ZESize						GetItemCount() = 0;
+
+		const char*							ToText(ZEInt Value, const char* Default);
 };
 
 

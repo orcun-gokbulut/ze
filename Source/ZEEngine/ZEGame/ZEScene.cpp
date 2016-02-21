@@ -77,7 +77,7 @@ bool ZEScene::Initialize()
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
-		Entities[I]->SetOwnerScene(this);
+		Entities[I]->SetScene(this);
 		Entities[I]->Initialize();
 	}
 
@@ -124,7 +124,7 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 
 	Entity->SetEntityId(LastEntityId++);
 	Entities.Add(Entity);
-	Entity->SetOwnerScene(this);
+	Entity->SetScene(this);
 
 	if(Entity->GetName().GetLength() == 0)
 		Entity->SetName(Entity->GetClass()->GetName() + ZEString(LastEntityId));
@@ -140,7 +140,7 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 		return;
 	}
 
-	Entity->SetOwnerScene(NULL);
+	Entity->SetScene(NULL);
 
 	Entities.RemoveValue(Entity);
 }
