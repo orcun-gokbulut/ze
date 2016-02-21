@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEGeographicEntity.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,41 +30,18 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZEGame/ZEEntity.h"
-#include "ZEMath/ZEVectord.h"
-#include "ZEMath/ZEMatrixd.h"
+ze_add_source(ZERSResource.cpp				Sources)
+ze_add_source(ZERSResource.h				Sources Headers ZEMC)
+ze_add_source(ZERSManager.cpp				Sources)
+ze_add_source(ZERSManager.h					Sources Headers ZEMC)
 
-class ZEGeographicEntity : public ZEEntity
-{
-	ZE_OBJECT;
-
-	protected:
-		ZEVector3d GeographicPosition;
-		ZEQuaternion GeographicRotation;
-		ZEVector3d GeographicScale;
-
-		mutable ZEMatrix4x4d GeographicTransform;
-		mutable ZEMatrix4x4d InvGeographicTransform;
-
-		//virtual bool SetParent(ZEEntity* Owner);
-
-		ZEGeographicEntity();
-
-	public:
-		const ZEMatrix4x4d& GetGeographicTransform() const;
-		const ZEMatrix4x4d& GetInvGeographicTransform() const;
-
-		virtual void SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d GetGeographicPosition() const;
-
-		virtual void SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion GetGeographicRotation() const;
-
-		virtual void SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d GetGeographicScale() const;
-};
+ze_add_library(TARGET ZEResource
+	ZEMC ${ZEMC}
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEFoundation)

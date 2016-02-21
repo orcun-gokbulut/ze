@@ -49,7 +49,7 @@ class ZESectorSelector : public ZEGeographicEntity
 	protected:
 		virtual void ParentTransformChanged();
 		virtual void LocalTransformChanged();
-		virtual bool SetOwner(ZEEntity* Owner);
+		virtual bool SetParent(ZEEntity* Owner);
 
 		ZESectorSelector();
 

@@ -51,6 +51,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEEnumerator.h"
+#include "ZEThread/ZETask.h"
 
 struct ZERNDrawParameters;
 struct ZERNCullParameters;
@@ -70,10 +71,20 @@ typedef ZEFlags ZEDrawFlags;
 
 ZE_ENUM(ZEEntityState)
 {
+	ZE_ES_ERROR_DEINITIALIZATION		= -4,
+	ZE_ES_ERROR_INITIALIZATION			= -3,
+	ZE_ES_ERROR_UNLOADING				= -2,
+	ZE_ES_ERROR_LOADING					= -1,
 	ZE_ES_NOT_INITIALIZED				= 0,
-	ZE_ES_INITIALIZING					= 1,
-	ZE_ES_INITIALIZED					= 2,
-	ZE_ES_DEINITIALIZING				= 3
+	ZE_ES_NOT_LOADED					= 0,
+	ZE_ES_NONE							= 0,
+	ZE_ES_UNLOADING						= 1,
+	ZE_ES_DEINITIALIZED					= 2,
+	ZE_ES_DEINITIALIZING				= 4,
+	ZE_ES_LOADING						= 5,
+	ZE_ES_LOADED						= 6,
+	ZE_ES_INITIALIZING					= 7,
+	ZE_ES_INITIALIZED					= 8
 };
 
 class ZEScene;
@@ -82,25 +93,26 @@ class ZEMLReaderNode;
 
 class ZEEntity : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEScene;
 	friend class ZESceneCuller;
 	friend class ZEDebugDrawer;
-
-	ZE_OBJECT
-
 	private: 
-		ZEEntity*								Owner;
-		ZEScene*								OwnerScene;
+		ZEEntity*								Parent;
+		ZEScene*								Scene;
+
 
 		ZEString								Name;
 		ZEEntityState							State;
+		ZEEntityState							TargetState;
 		ZEInt									EntityId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
 		bool									Enabled;
 		bool									Visible;
-
+		bool									SerialOperation;
+		
 		mutable ZEFlags							EntityDirtyFlags;
 		mutable ZEMatrix4x4						Transform;
 		mutable ZEMatrix4x4						InvTransform;
@@ -112,9 +124,20 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
+		ZETask									ManageTask;
+		ZETaskResult							ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, void* Parameters);
+		void									ManagetStatesSerial();
+
+		virtual bool							SetParent(ZEEntity* Parent);
+		void									SetScene(ZEScene* Scene);
+
 	protected:
-		virtual bool							SetOwner(ZEEntity* Owner);
-		void									SetOwnerScene(ZEScene* Scene);
+		void									SetSerialOperation(bool SerialOperation);
+		bool									GetSerialOperation() const;
+
+		virtual bool							LoadSelf();
+		virtual bool							PostLoadSelf();
+		virtual bool							UnloadSelf();
 
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
@@ -127,12 +150,13 @@ class ZEEntity : public ZEObject
 		virtual void							ParentTransformChanged();
 		virtual void							BoundingBoxChanged();
 
+
 												ZEEntity();
 		virtual									~ZEEntity();
 
 	public:
-		virtual ZEEntity*						GetOwner() const;
-		ZEScene*								GetOwnerScene() const;
+		ZEEntity*								GetParent() const;
+		ZEScene*								GetScene() const;
 		
 		void									SetEntityId(ZEInt EntityId);
 		ZEInt									GetEntityId() const;
@@ -153,9 +177,6 @@ class ZEEntity : public ZEObject
 		const ZEMatrix4x4&						GetTransform() const;
 		const ZEMatrix4x4&						GetWorldTransform() const;
 		const ZEMatrix4x4&						GetInvWorldTransform() const;
-
-		bool									IsInitialized();
-		ZEEntityState							GetState();
 
 		virtual void							SetVisible(bool Visibility);
 		bool									GetVisible() const;
@@ -178,18 +199,24 @@ class ZEEntity : public ZEObject
 		void									SetWorldScale(const ZEVector3& NewScale);
 		const ZEVector3							GetWorldScale() const;
 
-		ZEVector3								GetFront();
-		ZEVector3								GetRight();
-		ZEVector3								GetUp();
+		ZEVector3								GetFront() const;
+		ZEVector3								GetRight() const;
+		ZEVector3								GetUp() const;
 
 		ZEVector3								GetWorldFront() const;
 		ZEVector3								GetWorldRight() const;
 		ZEVector3								GetWorldUp() const;
 
-		bool									Initialize();
-		bool									Deinitialize();
-		virtual void							Destroy();
-		
+		ZEEntityState							GetState() const;
+		bool									IsLoaded() const;
+		bool									IsInitialized() const;
+
+		void									Initialize();
+		void									Deinitialize();
+
+		void									Load();
+		void									Unload();
+			
 		virtual bool							Save(ZEMLWriterNode* Serializer);
 		virtual bool							Restore(ZEMLReaderNode* Unserializer);
 
@@ -200,4 +227,5 @@ class ZEEntity : public ZEObject
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
+		virtual void							Destroy();
 };

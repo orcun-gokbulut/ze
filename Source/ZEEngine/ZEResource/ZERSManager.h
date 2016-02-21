@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGeographicEntity.h
+ Zinek Engine - ZERSManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,36 +35,45 @@
 
 #pragma once
 
-#include "ZEGame/ZEEntity.h"
-#include "ZEMath/ZEVectord.h"
-#include "ZEMath/ZEMatrixd.h"
+#include "ZEMeta\ZEObject.h"
+#include "ZERSResource.h"
+#include "ZEDS\ZEList2.h"
+#include "ZECommon.h"
 
-class ZEGeographicEntity : public ZEEntity
+typedef ZERSResource* ZERSInstanciator();
+
+class ZERSManager : public ZEObject
 {
-	ZE_OBJECT;
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERSManager)
+	friend class ZERSResource;
+	private:
+		ZELock ManagerLock;
+		ZEList2<const ZERSResource>	Resources;
 
-	protected:
-		ZEVector3d GeographicPosition;
-		ZEQuaternion GeographicRotation;
-		ZEVector3d GeographicScale;
+		ZESize MemoryUsage[ZERS_MP_TOTAL];
+		ZESize CacheSize[ZERS_MP_TOTAL];
+		ZESize CacheUsage[ZERS_MP_TOTAL];
+		
+		ZEHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
+		void RegisterResourceInternal(const ZERSResource* Resource);
+		ZEHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, const ZERSLoadingOptions* LoadingOptions);
 
-		mutable ZEMatrix4x4d GeographicTransform;
-		mutable ZEMatrix4x4d InvGeographicTransform;
-
-		//virtual bool SetParent(ZEEntity* Owner);
-
-		ZEGeographicEntity();
+		void RegisterResource(const ZERSResource* Resource);
+		void ReleaseResource(const ZERSResource* Resource);
+									
+		ZERSManager();
+		~ZERSManager();
 
 	public:
-		const ZEMatrix4x4d& GetGeographicTransform() const;
-		const ZEMatrix4x4d& GetInvGeographicTransform() const;
+		ZESize GetMemoryUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
+		ZESize GetCacheUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 
-		virtual void SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d GetGeographicPosition() const;
+		void SetCacheSize(ZERSMemoryPool Pool, ZESize Size);
+		ZESize SetCacheSize(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 
-		virtual void SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion GetGeographicRotation() const;
+		ZEHolder<const ZERSResource> GetResource(const ZEString& FilePath);
+		ZEHolder<const ZERSResource> GetResource(const ZEGUID& GUID);
 
-		virtual void SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d GetGeographicScale() const;
+		static ZERSManager* GetInstance();
 };
