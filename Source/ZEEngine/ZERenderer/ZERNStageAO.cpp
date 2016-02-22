@@ -277,9 +277,10 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context)
 	const ZEGRRenderTarget* OcclusionRenderTarget = OcclusionMap->GetRenderTarget();
 
 	Context->SetRenderState(FilterRenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointClamp.GetPointer());
-	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerLinearClamp.GetPointer());
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerLinearClamp);
 	Context->SetVertexBuffers(0, 0, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OcclusionRenderTarget->GetWidth(), OcclusionRenderTarget->GetHeight()));
 
 	Context->SetRenderTargets(1, &BlurRenderTarget, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
@@ -363,8 +364,8 @@ bool ZERNStageAO::InitializeSelf()
 	CreateSphereSamples();
 	CreateRandomVectors();
 
-	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 2.5f);
-	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 2.5f, false);
+	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 2.0f);
+	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 2.0f, false);
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOConstants));
 	FilterConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOFilterConstants));
@@ -582,9 +583,9 @@ ZERNStageAO::ZERNStageAO()
 	SampleCount = ZERN_AOSC_MEDIUM;
 
 	Constants.SampleCount = ConvertSampleCount(SampleCount);
-	Constants.OcclusionRadius = 0.25f;
-	Constants.MinDepthBias = 0.1f;
-	Constants.Intensity = 8.0f;
+	Constants.OcclusionRadius = 0.2f;
+	Constants.MinDepthBias = 0.15f;
+	Constants.Intensity = 64.0f;
 	Constants.DownScale = 2.0f;
 
 	FilterConstants.KernelSize = 11;

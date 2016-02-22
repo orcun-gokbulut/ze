@@ -45,7 +45,7 @@
 bool ZEATAtmosphere::InitializeSelf()
 {
 	Sun = new ZEATSun();
-	Sun->SetIntensity(10.0f);
+	Sun->SetIntensity(20.0f);
 	Sun->SetColor(ZEVector3::One);
 	Sun->SetObserver(Observer);
 
