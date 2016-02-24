@@ -69,6 +69,13 @@ typedef ZEFlags ZEDrawFlags;
 #define ZE_DF_CULL_COMPONENTS					32
 #define ZE_DF_AUTO								64
 
+ZE_ENUM(ZEEntityResult)
+{
+	ZE_ER_DONE,
+	ZE_ER_WAIT,
+	ZE_ER_FAILED
+};
+
 ZE_ENUM(ZEEntityState)
 {
 	ZE_ES_ERROR_DEINITIALIZATION		= -4,
@@ -100,7 +107,6 @@ class ZEEntity : public ZEObject
 	private: 
 		ZEEntity*								Parent;
 		ZEScene*								Scene;
-
 
 		ZEString								Name;
 		ZEEntityState							State;
@@ -135,12 +141,13 @@ class ZEEntity : public ZEObject
 		void									SetSerialOperation(bool SerialOperation);
 		bool									GetSerialOperation() const;
 
-		virtual bool							LoadSelf();
-		virtual bool							PostLoadSelf();
-		virtual bool							UnloadSelf();
-
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
+
+		virtual ZEEntityResult					LoadInternal();
+		virtual ZEEntityResult					UnloadInternal();
+		virtual ZEEntityResult					InitializeInternal();
+		virtual ZEEntityResult					DeinitializeInternal();
 
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
