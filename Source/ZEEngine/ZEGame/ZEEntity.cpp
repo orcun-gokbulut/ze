@@ -110,7 +110,9 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 
 	Components.Add(Entity);
 
-	if (State == ZE_ES_INITIALIZING || State == ZE_ES_INITIALIZED)
+	if (State == ZE_ES_LOADED || State == ZE_ES_LOADING)
+		Entity->Load();
+	else if (State == ZE_ES_INITIALIZING || State == ZE_ES_INITIALIZED)
 		Entity->Initialize();
 
 	if(Entity->GetName().IsEmpty())
@@ -127,6 +129,7 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 		return;
 	}
 
+	Entity->Deinitialize();
 	Components.RemoveValue(Entity);
 
 	Entity->Parent = NULL;
@@ -156,7 +159,9 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	Entity->SetScene(this->Scene);
 	ChildEntities.Add(Entity);
 
-	if (State == ZE_ES_INITIALIZED)
+	if (State == ZE_ES_LOADED || State == ZE_ES_LOADING)
+		Entity->Load();
+	else if (State == ZE_ES_INITIALIZED || State == ZE_ES_INITIALIZING)
 		Entity->Initialize();
 
 	if(Entity->GetName().IsEmpty())
@@ -207,32 +212,23 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 
 ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, void* Parameters)
 {
-
-	zeLog("%s::ManageStates, State: %s, TargetState:%s", 
+	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
 		GetName().ToCString(), 
 		ZEEntityState_Declaration()->ToText(State, "Unknown"), 
-		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));
+		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));*/
 
 	if (State == ZE_ES_NONE)
 	{
 		if (TargetState == ZE_ES_LOADED || TargetState == ZE_ES_INITIALIZED)
 		{
 			State = ZE_ES_LOADING;
-			if (LoadSelf())
-			{
-				for (ZESize I = 0; I < Components.GetCount(); I++)
-					Components[I]->Load();
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Load();
 
-				for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-					ChildEntities[I]->Load();
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Load();
 
-				return ZE_TR_COOPERATING;
-			}
-			else
-			{
-				State = ZE_ES_ERROR_LOADING;
-				return ZE_TR_FAILED;
-			}
+			return ZE_TR_COOPERATING;
 		}
 	}
 	else if (State == ZE_ES_LOADED)
@@ -280,35 +276,14 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, v
 	}
 	else if (State == ZE_ES_LOADING)
 	{
-		for (ZESize I = 0; I < Components.GetCount(); I++)
-		{
-			if (Components[I]->GetState() == ZE_ES_ERROR_LOADING)
-			{
-				State = ZE_ES_ERROR_LOADING;
-				return ZE_TR_FAILED;
-			}
-			else if (Components[I]->GetState() < ZE_ES_LOADED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		{
-			if (ChildEntities[I]->GetState() == ZE_ES_ERROR_LOADING)
-			{
-				State = ZE_ES_ERROR_LOADING;
-				return ZE_TR_FAILED;
-			}
-			else if (ChildEntities[I]->GetState() < ZE_ES_LOADED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-	
-		if (PostLoadSelf())
+		ZEEntityResult Result = LoadInternal();
+		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_LOADED;
+			return ZE_TR_COOPERATING;
+		}
+		else if (Result == ZE_ER_WAIT)
+		{
 			return ZE_TR_COOPERATING;
 		}
 		else
@@ -319,35 +294,14 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, v
 	}
 	else if (State == ZE_ES_UNLOADING)
 	{
-		for (ZESize I = 0; I < Components.GetCount(); I++)
-		{
-			if (Components[I]->GetState() == ZE_ES_ERROR_UNLOADING)
-			{
-				State = ZE_ES_ERROR_UNLOADING;
-				return ZE_TR_FAILED;
-			}
-			else if (Components[I]->GetState() > ZE_ES_NOT_LOADED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		{
-			if (ChildEntities[I]->GetState()  == ZE_ES_ERROR_UNLOADING)
-			{
-				State = ZE_ES_ERROR_UNLOADING;
-				return ZE_TR_FAILED;
-			}
-			else if (ChildEntities[I]->GetState() > ZE_ES_NOT_LOADED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		if (UnloadSelf())
+		ZEEntityResult Result = UnloadInternal();
+		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_NOT_LOADED;
+			return ZE_TR_COOPERATING;
+		}
+		else if (Result == ZE_ER_WAIT)
+		{
 			return ZE_TR_COOPERATING;
 		}
 		else
@@ -358,35 +312,14 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, v
 	}
 	else if (State == ZE_ES_INITIALIZING)
 	{
-		for (ZESize I = 0; I < Components.GetCount(); I++)
-		{
-			if (Components[I]->GetState() == ZE_ES_ERROR_INITIALIZATION)
-			{
-				State = ZE_ES_ERROR_INITIALIZATION;
-				return ZE_TR_FAILED;
-			}
-			else if (Components[I]->GetState() != ZE_ES_INITIALIZED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		{
-			if (ChildEntities[I]->GetState() == ZE_ES_ERROR_INITIALIZATION)
-			{
-				State = ZE_ES_ERROR_INITIALIZATION;
-				return ZE_TR_FAILED;
-			}
-			if (ChildEntities[I]->GetState() != ZE_ES_INITIALIZED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		if (InitializeSelf())
+		ZEEntityResult Result = InitializeInternal();
+		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_INITIALIZED;
+			return ZE_TR_COOPERATING;
+		}
+		else if (Result == ZE_ER_WAIT)
+		{
 			return ZE_TR_COOPERATING;
 		}
 		else
@@ -397,35 +330,14 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, v
 	}
 	else if (State == ZE_ES_DEINITIALIZING)
 	{
-		for (ZESize I = 0; I < Components.GetCount(); I++)
-		{
-			if (Components[I]->GetState() == ZE_ES_ERROR_DEINITIALIZATION)
-			{
-				State = ZE_ES_ERROR_DEINITIALIZATION;
-				return ZE_TR_FAILED;
-			}
-			else if (Components[I]->GetState() > ZE_ES_LOADED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		{
-			if (ChildEntities[I]->GetState() == ZE_ES_ERROR_DEINITIALIZATION)
-			{
-				State = ZE_ES_ERROR_DEINITIALIZATION;
-				return ZE_TR_FAILED;
-			}
-			else if (ChildEntities[I]->GetState() > ZE_ES_LOADED)
-			{
-				return ZE_TR_COOPERATING;
-			}
-		}
-
-		if (DeinitializeSelf())
+		ZEEntityResult Result = DeinitializeInternal();
+		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_LOADED;
+			return ZE_TR_COOPERATING;
+		}
+		else if (Result == ZE_ER_WAIT)
+		{
 			return ZE_TR_COOPERATING;
 		}
 		else
@@ -453,21 +365,6 @@ bool ZEEntity::GetSerialOperation() const
 	return SerialOperation;
 }
 
-bool ZEEntity::LoadSelf()
-{
-	return true;
-}
-
-bool ZEEntity::PostLoadSelf()
-{
-	return true;
-}
-
-bool ZEEntity::UnloadSelf()
-{
-	return true;
-}
-
 bool ZEEntity::InitializeSelf()
 {
 	return true;
@@ -476,6 +373,26 @@ bool ZEEntity::InitializeSelf()
 bool ZEEntity::DeinitializeSelf()
 {
 	return true;
+}
+
+ZEEntityResult ZEEntity::LoadInternal()
+{
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZEEntity::UnloadInternal()
+{
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZEEntity::InitializeInternal()
+{
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZEEntity::DeinitializeInternal()
+{
+	return ZE_ER_DONE;
 }
 
 ZEEntity::ZEEntity()
@@ -489,12 +406,13 @@ ZEEntity::ZEEntity()
 	Visible = true;
 	SerialOperation = true;
 	State = ZE_ES_NOT_INITIALIZED;
+	ManageTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, ManageStates, this));
 	LocalTransformChanged();
 }
 
 ZEEntity::~ZEEntity()
 {
-	Deinitialize();
+	Unload();
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Destroy();
