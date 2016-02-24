@@ -128,15 +128,17 @@ bool ZERNFixedMaterial::UpdateShaders() const
 	StageGBuffer_PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageGBuffer_PixelShader == NULL, false, "Cannot set pixel shader.");
 
-	Options.Definitions.Clear();
-
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNShadowMapRendering.hlsl";
-	Options.Model = ZEGR_SM_5_0;
-
 	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNShadowMapRendering_VertexShader_Main";
+	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main";
 	StageShadowmapGeneration_VertexShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_VertexShader == NULL, false, "Cannot set vertex shader.");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main";
+	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
+
+	Options.Definitions.Clear();
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
@@ -171,6 +173,8 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageShadowmapGeneration_VertexShader);
+	if(AlphaCullEnabled)
+		RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
 	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
 
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
@@ -1284,7 +1288,6 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 	{
 		Context->SetRenderState(StageGBuffer_RenderState);
 
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 		Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 
 		bool TextureSampler = false;
@@ -1327,27 +1330,38 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 		if ((ReflectionEnabled || RefractionEnabled) && EnvironmentMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 7, EnvironmentMap.GetTexture());
-			Context->SetSampler(ZEGR_ST_PIXEL, 1, EnvironmentMap.GetSampler().GetPointer());
+			Context->SetSampler(ZEGR_ST_PIXEL, 1, EnvironmentMap.GetSampler());
 		}
 
 		if (GetDetailBaseMapEnabled() && DetailBaseMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 8, DetailBaseMap.GetTexture());
-			Context->SetSampler(ZEGR_ST_PIXEL, 2, DetailBaseMap.GetSampler().GetPointer());
+			Context->SetSampler(ZEGR_ST_PIXEL, 2, DetailBaseMap.GetSampler());
 		}
 
 		if (GetDetailNormalMapEnabled() && DetailNormalMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 9, DetailNormalMap.GetTexture());
-			Context->SetSampler(ZEGR_ST_PIXEL, 3, DetailNormalMap.GetSampler().GetPointer());
+			Context->SetSampler(ZEGR_ST_PIXEL, 3, DetailNormalMap.GetSampler());
 		}
 
 		if (TextureSampler)
-			Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSampler().GetPointer());
+			Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSampler());
 
 	}
 	else if(StageID == ZERN_STAGE_SHADOW_MAP_GENERATION)
 	{
+		if(AlphaCullEnabled)
+		{
+			Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+
+			if (OpacityMapEnabled)
+			{
+				Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSampler());
+				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap.GetTexture());
+			}
+		}
+
 		Context->SetRenderState(StageShadowmapGeneration_RenderState);
 	}
 

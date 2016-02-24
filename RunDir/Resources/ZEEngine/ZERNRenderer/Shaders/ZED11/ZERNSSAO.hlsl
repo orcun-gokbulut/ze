@@ -61,10 +61,9 @@ cbuffer ZERNSSAO_FilterConstants					: register(b9)
 	float3			ZERNSSAO_Reserved1;
 };
 
-SamplerState 		ZERNSSAO_SamplerPointBorder		: register(s0);
-SamplerState 		ZERNSSAO_SamplerPointWrap		: register(s1);
-SamplerState 		ZERNSSAO_SamplerPointClamp		: register(s2);
-SamplerState 		ZERNSSAO_SamplerLinearClamp		: register(s3);
+SamplerState 		ZERNSSAO_SamplerPointWrap		: register(s0);
+SamplerState 		ZERNSSAO_SamplerPointClamp		: register(s1);
+SamplerState 		ZERNSSAO_SamplerLinearClamp		: register(s2);
 
 float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {	
@@ -90,7 +89,7 @@ float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Tar
 			float3 SamplePositionView = PositionView + Flip * SampleOffsetVector * ZERNSSAO_OcclusionRadius;
 			float2 SamplePositionTexelCenter = ZERNTransformations_ViewToTexelCenter(SamplePositionView, OutputDimensions);
 			
-			float OccluderDepthHomogeneous = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointBorder, SamplePositionTexelCenter);
+			float OccluderDepthHomogeneous = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, SamplePositionTexelCenter);
 			float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(OccluderDepthHomogeneous);
 			float3 OccluderPositionView = SamplePositionView * (OccluderDepthView / SamplePositionView.z);
 			

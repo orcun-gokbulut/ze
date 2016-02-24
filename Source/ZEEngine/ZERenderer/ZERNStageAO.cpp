@@ -127,7 +127,7 @@ bool ZERNStageAO::UpdateConstantBuffers()
 	if (!DirtyFlags.GetFlags(ZERN_AODF_CONSTANT_BUFFER))
 		return true;
 
-	ConstantBuffer->SetData(&Constants);
+	SSAOConstantBuffer->SetData(&Constants);
 	FilterConstantBuffer->SetData(&FilterConstants);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_CONSTANT_BUFFER);
@@ -146,15 +146,15 @@ bool ZERNStageAO::UpdateShaders()
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_Position";
-	VertexShader = ZEGRShader::Compile(Options);
+	ScreenCoverVertexShaderPosition = ZEGRShader::Compile(Options);
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
-	BlendVertexShader = ZEGRShader::Compile(Options);
+	ScreenCoverVertexShaderPositionTexCoord = ZEGRShader::Compile(Options);
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSSAO_PixelShader_Main";
-	PixelShader = ZEGRShader::Compile(Options);
+	SSAOPixelShader = ZEGRShader::Compile(Options);
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSSAO_Blend_PixelShader";
@@ -184,11 +184,11 @@ bool ZERNStageAO::UpdateRenderStates()
 	RenderState.SetDepthStencilState(DepthStencilState);
 
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShaderPosition);
+	RenderState.SetShader(ZEGR_ST_PIXEL, SSAOPixelShader);
 
-	RenderStateData = RenderState.Compile();
-	zeCheckError(RenderStateData == NULL, false, "Cannot set render state.");
+	SSAORenderStateData = RenderState.Compile();
+	zeCheckError(SSAORenderStateData == NULL, false, "Cannot set render state.");
 
 	ZEGRBlendState BlendState;
 	BlendState.SetBlendEnable(true);
@@ -201,7 +201,7 @@ bool ZERNStageAO::UpdateRenderStates()
 	BlendState.SetRenderTargetBlend(0, BlendRenderTarget);
 
 	RenderState.SetBlendState(BlendState);
-	RenderState.SetShader(ZEGR_ST_VERTEX, BlendVertexShader);
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShaderPositionTexCoord);
 	RenderState.SetShader(ZEGR_ST_PIXEL, BlendPixelShader);
 
 	BlendRenderStateData = RenderState.Compile();
@@ -210,7 +210,7 @@ bool ZERNStageAO::UpdateRenderStates()
 	BlendState.SetToDefault();
 	RenderState.SetBlendState(BlendState);
 
-	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShaderPosition);
 	RenderState.SetShader(ZEGR_ST_PIXEL, FilterPixelShader);
 
 	FilterRenderStateData = RenderState.Compile();
@@ -251,12 +251,11 @@ void ZERNStageAO::GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Cont
 	Viewport.SetWidth(static_cast<float>(RenderTarget->GetWidth()));
 	Viewport.SetHeight(static_cast<float>(RenderTarget->GetHeight()));
 
-	Context->SetRenderState(RenderStateData);
+	Context->SetRenderState(SSAORenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointBorder.GetPointer());
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointWrap.GetPointer());
-	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointClamp.GetPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, SSAOConstantBuffer);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointClamp);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, RandomVectorsTexture);
@@ -276,11 +275,14 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context)
 	const ZEGRRenderTarget* BlurRenderTarget = BlurTexture->GetRenderTarget();
 	const ZEGRRenderTarget* OcclusionRenderTarget = OcclusionMap->GetRenderTarget();
 
+	Viewport.SetWidth((float)(OcclusionRenderTarget->GetWidth()));
+	Viewport.SetHeight((float)(OcclusionRenderTarget->GetHeight()));
+
 	Context->SetRenderState(FilterRenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointClamp);
-	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerLinearClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerLinearClamp);
 	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OcclusionRenderTarget->GetWidth(), OcclusionRenderTarget->GetHeight()));
+	Context->SetViewports(1, &Viewport);
 
 	Context->SetRenderTargets(1, &BlurRenderTarget, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
@@ -319,8 +321,6 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context)
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, NULL);
 }
@@ -339,12 +339,12 @@ void ZERNStageAO::BlendWithAccumulationBuffer(ZERNRenderer* Renderer, ZEGRContex
 	if (RenderTarget == NULL)
 		return;
 
-	Viewport.SetWidth(static_cast<float>(Width));
-	Viewport.SetHeight(static_cast<float>(Height));
+	Viewport.SetWidth((float)(Width));
+	Viewport.SetHeight((float)(Height));
 
 	Context->SetRenderState(BlendRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerLinearClamp.GetPointer());
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerLinearClamp);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
 	Context->SetVertexBuffers(0, 0, NULL);
 
@@ -353,7 +353,7 @@ void ZERNStageAO::BlendWithAccumulationBuffer(ZERNRenderer* Renderer, ZEGRContex
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
 }
 
 bool ZERNStageAO::InitializeSelf()
@@ -364,23 +364,14 @@ bool ZERNStageAO::InitializeSelf()
 	CreateSphereSamples();
 	CreateRandomVectors();
 
-	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 2.0f);
-	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 2.0f, false);
+	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 3.0f);
+	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 3.0f, false);
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOConstants));
+	SSAOConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOConstants));
 	FilterConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOFilterConstants));
 
-	ZEGRSamplerDescription LinearSamplerDescription;
-	SamplerLinearClamp = ZEGRSampler::GetSampler(LinearSamplerDescription);
-
-	ZEGRSamplerDescription SamplerPointBorderDescription;
-	SamplerPointBorderDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerPointBorderDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerPointBorderDescription.MipFilter = ZEGR_TFM_POINT;
-	SamplerPointBorderDescription.AddressU = ZEGR_TAM_BORDER;
-	SamplerPointBorderDescription.AddressV = ZEGR_TAM_BORDER;
-	SamplerPointBorderDescription.BorderColor = ZEVector4(1.0f, 0.0f, 0.0f, 0.0f);
-	SamplerPointBorder = ZEGRSampler::GetSampler(SamplerPointBorderDescription);
+	ZEGRSamplerDescription SamplerLinearClampDescription;
+	SamplerLinearClamp = ZEGRSampler::GetSampler(SamplerLinearClampDescription);
 
 	ZEGRSamplerDescription SamplerPointWrapDescription;
 	SamplerPointWrapDescription.MinFilter = ZEGR_TFM_POINT;
@@ -403,17 +394,27 @@ void ZERNStageAO::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
-	VertexShader.Release();
-	PixelShader.Release();
-	RenderStateData.Release();
 	OcclusionMap.Release();
 	BlurTexture.Release();
-	BlendRenderStateData.Release();
-	BlendPixelShader.Release();
 	RandomVectorsTexture.Release();
+
+	SSAOConstantBuffer.Release();
 	FilterConstantBuffer.Release();
+
+	ScreenCoverVertexShaderPosition.Release();
+	ScreenCoverVertexShaderPositionTexCoord.Release();
+
+	SSAOPixelShader.Release();
+	BlendPixelShader.Release();
 	FilterPixelShader.Release();
+
+	SSAORenderStateData.Release();
+	BlendRenderStateData.Release();
 	FilterRenderStateData.Release();
+
+	SamplerPointWrap.Release();
+	SamplerPointClamp.Release();
+	SamplerLinearClamp.Release();
 
 	HorizontalValues.Clear();
 	VerticalValues.Clear();
@@ -586,7 +587,7 @@ ZERNStageAO::ZERNStageAO()
 	Constants.OcclusionRadius = 0.2f;
 	Constants.MinDepthBias = 0.15f;
 	Constants.Intensity = 64.0f;
-	Constants.DownScale = 2.0f;
+	Constants.DownScale = 1.0f;
 
 	FilterConstants.KernelSize = 11;
 }

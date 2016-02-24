@@ -142,7 +142,7 @@ bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer3->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer->GetDepthStencilBuffer(), true, false, 1.0f, 0x00);
+	Context->ClearDepthStencilBuffer(DepthStencilBuffer->GetDepthStencilBuffer(), true, false, 0.0f, 0x00);
 
 	Context->SetViewports(1, &Viewport);
 	Context->SetRenderTargets(4, RenderTargets, DepthStencilBuffer->GetDepthStencilBuffer());
@@ -169,6 +169,11 @@ ZEGRRenderState ZERNStageGBuffer::GetRenderState()
 	if (!Initialized)
 	{
 		Initialized = true;
+
+		ZEGRDepthStencilState DepthStencilStateReverseZ;
+		DepthStencilStateReverseZ.SetDepthFunction(ZEGR_CF_GREATER_EQUAL);
+
+		RenderState.SetDepthStencilState(DepthStencilStateReverseZ);
 
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
 		RenderState.SetRenderTargetFormat(1, ZEGR_TF_R8G8B8A8_UNORM);

@@ -170,7 +170,7 @@ bool ZERNStageLighting::UpdateRenderState()
 		return true;
 
 	ZEGRRenderState RenderState;
-	RenderState.SetPrimitiveType(ZEGRPrimitiveType::ZEGR_PT_TRIANGLE_LIST);
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetRenderTargetFormat(0, OutputRenderTarget->GetFormat());
 
 	ZEGRBlendState BlendStateAdditive;
@@ -475,7 +475,6 @@ bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* 
 
 	if(Width != CurrentWidth || Height != CurrentHeight)
 	{
-		//DirtyFlags.RaiseFlags(ZERN_SLDF_TILE_BUFFER);
 		Width = CurrentWidth;
 		Height = CurrentHeight;
 
@@ -521,13 +520,13 @@ bool ZERNStageLighting::SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* 
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, TiledDeferredLightConstantBuffer);
 	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, TiledDeferredTileStructuredBuffer);
-
 	Context->SetVertexBuffers(0, 0, NULL);
+
 	Context->Draw(3, 0);
 
 	Context->SetStructuredBuffer(ZEGR_ST_PIXEL, 5, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-	
+
 	return true;
 }
 
@@ -638,7 +637,7 @@ void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* R
 		Light.DirectionView = ZEVector3::Zero;
 
 		ZEMatrix4x4::CreateOrientation(LightConstants->WorldMatrix, PointLight->GetPosition(), ZEQuaternion::Identity,
-			ZEVector3(Light.Range, Light.Range, Light.Range));
+										ZEVector3(Light.Range, Light.Range, Light.Range));
 	DeferredLightConstantBuffer->Unlock();
 
 	Context->Draw(3600, 942);
@@ -739,23 +738,37 @@ void ZERNStageLighting::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
+	ScreenCoverVertexShader.Release();
 	DeferredVertexShader.Release();
 	DeferredPixelShader.Release();
+	TiledDeferredPixelShader.Release();
+	TiledDeferredComputeShader.Release();
+	AccumulatePixelShader.Release();
+
 	DeferredRenderState.Release();
+	TiledDeferredRenderState.Release();
+	TiledDeferredComputeRenderState.Release();
+	AccumulateRenderState.Release();
+
 	DeferredLightConstantBuffer.Release();
 	DeferredLightVertexBuffer.Release();
-
-	ScreenCoverVertexShader.Release();
-	TiledDeferredPixelShader.Release();
-	TiledDeferredRenderState.Release();
-	TiledDeferredLightConstantBuffer.Release();
 	TiledDeferredTileStructuredBuffer.Release();
+	TiledDeferredLightConstantBuffer.Release();
+
+	TiledDeferredComputeOutputTexture.Release();
 
 	Tiles.Clear();
+	DeferredLightList.Clean();
+	TiledDeferredLightList.Clean();
 
 	RandomVectorsTexture.Release();
 
 	OutputRenderTarget = NULL;
+
+	SamplerLinearBorder.Release();
+	SamplerComparisonLinearPointClamp.Release();
+	SamplerPointWrap.Release();
+	SamplerPointBorder.Release();
 
 	ZERNStage::DeinitializeSelf();
 }

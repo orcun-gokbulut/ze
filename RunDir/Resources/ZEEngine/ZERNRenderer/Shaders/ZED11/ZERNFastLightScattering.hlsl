@@ -74,9 +74,9 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 		
 	float RayLength = StartEndDistance.y;
 	
-	if(StartEndDistance.x < 0.0f && DepthView < (ZERNView_FarZ - 1.0f))	//in earth
+	if(StartEndDistance.x < 0.0f && DepthHomogeneous != 0.0f)	//in earth
 		RayLength = DepthView;
-	else if(StartEndDistance.x > 0.0f && StartEndDistance.z > 0.0f)		//in space
+	else if(StartEndDistance.x > 0.0f && StartEndDistance.z > 0.0f)	//in space
 		RayLength = StartEndDistance.z;
 	
 	float3 RayEnd = ZERNView_Position + ViewDirection * RayLength;
@@ -88,16 +88,7 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	Inscattering -= Extinction * ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, RayEnd, ViewDirection, LightDirectionWorld, EarthCenter, PrevTexCoordY);
 	Inscattering *= ZERNFastLightScattering_Intensity;
 	
-	
-	float3 PixelColor = (float3)0.0f;
-	if(DepthView < (ZERNView_FarZ - 1.0f))
-	{	
-		PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);	
-	}
-	else
-	{
-		//PixelColor = float3(0.09f, 0.09f, 0.09f) * 5.0f; //ZERNFastLightScattering_LightColor * ZERNFastLightScattering_Intensity;
-	}
+	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);	
 	
 	return PixelColor * Extinction + Inscattering;
 }

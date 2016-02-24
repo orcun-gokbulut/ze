@@ -60,8 +60,8 @@ bool ZERNStageTextureOutput::InitializeSelf()
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
-	VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(VertexShader == NULL, false, "Cannot set vertex shader.");
+	ScreenCoverVertexShaderPositionTexcoord = ZEGRShader::Compile(Options);
+	zeCheckError(ScreenCoverVertexShaderPositionTexcoord == NULL, false, "Cannot set vertex shader.");
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNTextureRendering_PixelShader_Main";
@@ -70,7 +70,7 @@ bool ZERNStageTextureOutput::InitializeSelf()
 
 	ZEGRRenderState RenderState;
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
+	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShaderPositionTexcoord);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 
 	RenderStateData= RenderState.Compile();
@@ -83,7 +83,7 @@ bool ZERNStageTextureOutput::InitializeSelf()
 
 void ZERNStageTextureOutput::DeinitializeSelf()
 {
-	VertexShader.Release();
+	ScreenCoverVertexShaderPositionTexcoord.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
 	ConstantBuffer.Release();

@@ -232,10 +232,12 @@ void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 
 ZELight::ZELight()
 {
+	DirtyFlags.RaiseAll();
+
 	CastsShadows = false;
 	ShadowResolution = ZE_LSR_MEDIUM;
 	ShadowSampleCount = ZE_LSC_MEDIUM;
-	ShadowSampleLengthOffset = 0.0f;
+	ShadowSampleLengthOffset = 1.0f;
 
 	Range = 100.0f;
 	Intensity = 1.0f;
@@ -262,6 +264,8 @@ ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution
 		return 512;
 	case ZE_LSR_HIGH:
 		return 1024;
+	case ZE_LSR_VERY_HIGH:
+		return 2048;
 	}
 }
 
@@ -275,6 +279,8 @@ ZEUInt ZELight::ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCo
 	case ZE_LSC_MEDIUM:
 		return 8;
 	case ZE_LSC_HIGH:
+		return 16;
+	case ZE_LSC_VERY_HIGH:
 		return 16;
 	}
 }

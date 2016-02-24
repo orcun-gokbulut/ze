@@ -37,11 +37,6 @@
 
 #include "ZERNStage.h"
 
-#include "ZEPointer/ZEHolder.h"
-
-class ZEGRTexture2D;
-class ZEGRRenderTarget;
-
 class ZERNStagePreProcess : public ZERNStage
 {
 	public:

@@ -55,7 +55,7 @@ class ZERNStageTextureOutput : public ZERNStage
 		ZEArray<const ZEGRTexture*>		InputTextures;
 		const ZEGRRenderTarget*			OutputRenderTarget;
 
-		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			ScreenCoverVertexShaderPositionTexcoord;
 		ZEHolder<ZEGRShader>			PixelShader;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
@@ -74,6 +74,9 @@ class ZERNStageTextureOutput : public ZERNStage
 		virtual void					DeinitializeSelf();
 
 	public:
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
+
 		void							SetInputs(ZEGRTexture** Inputs, ZESize Count);
 		const ZEGRTexture*const*		GetInputs() const;
 
@@ -83,11 +86,8 @@ class ZERNStageTextureOutput : public ZERNStage
 		void							SetAutoSplit(bool AutoSplit);
 		bool							IsAutoSplit() const;
 
-										ZERNStageTextureOutput();
-
-		virtual ZEInt					GetId() const;
-		virtual const ZEString&			GetName() const;
-
 		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
 		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+										ZERNStageTextureOutput();
 };

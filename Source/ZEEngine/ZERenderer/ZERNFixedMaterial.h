@@ -70,8 +70,8 @@ enum ZERNTransparencyMode : ZEUInt8
 class ZERNFixedMaterial : public ZERNMaterial
 {
 	protected:
-		ZEString							Name;
-		ZEString							FileName;
+		ZEString								Name;
+		ZEString								FileName;
 
 		mutable ZEFlags							DirtyFlags;
 		 
@@ -80,6 +80,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_RenderState;
 		 
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_VertexShader;
+		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;

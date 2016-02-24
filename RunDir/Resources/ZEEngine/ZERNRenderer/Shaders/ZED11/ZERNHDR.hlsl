@@ -67,8 +67,7 @@ cbuffer ZERNHDR_Constants								: register(b8)
 	float			ZERNHDR_Reserved2;
 };
 
-static const float3	ZERNHDR_LuminanceWeights = float3(0.299f, 0.587f, 0.114f);
-//static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.072169f);
+static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.072169f);
 
 // TEXTURES
 ///////////////////////////////////////////////////////////////////////////////

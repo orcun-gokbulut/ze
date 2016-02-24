@@ -51,7 +51,7 @@ bool ZEATAtmosphere::InitializeSelf()
 
 	AtmosphericScattering.SetLightIntensity(Sun->GetIntensity());
 	AtmosphericScattering.SetLightColor(Sun->GetColor());
-	AtmosphericScattering.SetMultipleScattering(false);
+	AtmosphericScattering.SetMultipleScattering(true);
 	AtmosphericScattering.SetOrderCount(5);
 
 	AtmosphericScattering.Initialize();
@@ -99,7 +99,7 @@ ZEATAtmosphere::ZEATAtmosphere()
 
 ZEATAtmosphere::~ZEATAtmosphere()
 {
-	DeinitializeSelf();
+
 }
 
 ZEDrawFlags ZEATAtmosphere::GetDrawFlags() const
@@ -121,8 +121,8 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 
 void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
-	//AtmosphericScattering.SetLightDirection(Sun->GetDirection());
-	AtmosphericScattering.SetLightDirection(ZEVector3(-1.0f, -1.0f, 0.0f));
+	AtmosphericScattering.SetLightDirection(Sun->GetDirection());
+	//AtmosphericScattering.SetLightDirection(ZEVector3(-1.0f, -1.0f, 0.0f));
 
 	ZEUInt StageID = (Parameters->Stage->GetId() & Command->StageMask);
 

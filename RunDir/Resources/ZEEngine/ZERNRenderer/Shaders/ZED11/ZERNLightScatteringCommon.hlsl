@@ -100,7 +100,7 @@ float4 ZERNLightScatteringCommon_CalculateTexCoordsFromWorldParams(float Height,
 	
 	float CosHorizontal = -sqrt(Height * (2.0f * EARTH_RADIUS + Height)) / (EARTH_RADIUS + Height);
 	float Texel_Y;
-	if((PrevTexCoordY >= 0.5f || !(PrevTexCoordY >= 0.0f && PrevTexCoordY < 0.5f)) && CosViewZenith > CosHorizontal)
+	if((PrevTexCoordY >= 0.5f || PrevTexCoordY < 0.0f) && CosViewZenith > CosHorizontal)
 	{
 		Texel_Y = pow(saturate((CosViewZenith - CosHorizontal) / (1.0f - CosHorizontal)), 0.2f);
 		Texel_Y = 0.5f + 0.5f / Texel_Y_Dimension + Texel_Y * (Texel_Y_Dimension * 0.5f - 1.0f) / Texel_Y_Dimension;

@@ -40,7 +40,6 @@
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
-class ZEGRRenderTarget;
 
 class ZERNStagePostProcess : public ZERNStage
 {

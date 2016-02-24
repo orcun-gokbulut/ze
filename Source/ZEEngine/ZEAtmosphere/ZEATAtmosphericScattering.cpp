@@ -56,36 +56,19 @@
 
 void ZEATAtmosphericScattering::CreateRandomVectors()
 {
-	ZEArray<ZEVector4> SphereSamples;
-	//SphereSamples.Resize(128);
-	//ZEVector4 SphereSamples[128];
-
-	//for(ZEUInt I = 0; I < 128; I++)
-	//{
-	//	float Z = ZERandom::GetFloatPositive() * 2.0f - 1.0f;
-	//	float Theta = ZERandom::GetFloatPositive() * ZE_PIx2;
-	//	float Radius = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f - Z * Z));
-	//
-	//	SphereSamples[I].x = Radius * ZEAngle::Cos(Theta);
-	//	SphereSamples[I].y = Radius * ZEAngle::Sin(Theta);
-	//	SphereSamples[I].z = Z;
-	//	SphereSamples[I].w = 0.0f;
-	//}
-
-	float ZenithStepAngle = ZE_PI / 8.0f;
-	float AzimuthStepAngle = ZE_PIx2 / 16.0f;
-	for(float I = 0.0f; I < ZE_PI; I += ZenithStepAngle)
+	ZEVector4 SphereSamples[128];
+	for(ZEUInt I = 0; I < 128; I++)
 	{
-		float Y = ZEAngle::Cos(I);
-		float ProjXZ = ZEAngle::Sin(I);
-		for(float J = 0.0f; J < ZE_PIx2; J += AzimuthStepAngle)
-		{
-			float X = ProjXZ * ZEAngle::Sin(J);
-			float Z = ProjXZ * ZEAngle::Cos(J);
-	
-			SphereSamples.Add(ZEVector4(X, Y, Z, 0.0f));
-		}
+		float Z = ZERandom::GetFloatPositive() * 2.0f - 1.0f;
+		float Theta = ZERandom::GetFloatPositive() * ZE_PIx2;
+		float Radius = ZEMath::Sqrt(ZEMath::Max(0.0f, 1.0f - Z * Z));
+
+		SphereSamples[I].x = Radius * ZEAngle::Cos(Theta);
+		SphereSamples[I].y = Radius * ZEAngle::Sin(Theta);
+		SphereSamples[I].z = Z;
+		SphereSamples[I].w = 0.0f;
 	}
+
 
 	RandomVectorsTexture.Release();
 	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT);
@@ -207,17 +190,7 @@ bool ZEATAtmosphericScattering::UpdateRenderState()
 	PrecomputeSkyAmbientRenderStateData = RenderState.Compile();
 	zeCheckError(PrecomputeSkyAmbientRenderStateData == NULL, false, "Cannot set render state.");
 
-	ZEGRBlendState BlendState;
-	BlendState.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTarget = BlendState.GetRenderTarget(0);
-	BlendRenderTarget.SetBlendEnable(true);
-	BlendRenderTarget.SetSource(ZEGR_BO_ONE);
-	BlendRenderTarget.SetDestination(ZEGR_BO_ONE);
-	BlendRenderTarget.SetOperation(ZEGR_BE_ADD);
-
-	BlendState.SetRenderTargetBlend(0, BlendRenderTarget);
-
-	RenderState.SetBlendState(BlendState);
+	RenderState.SetBlendState(BlendStateAdditive);
 	RenderState.SetShader(ZEGR_ST_PIXEL, AddOrdersPixelShader);
 
 	AddOrdersRenderStateData = RenderState.Compile();
@@ -280,11 +253,16 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 	Context->GetRenderTargets(1, &PreviousRenderTarget, NULL);
 
 	ZEGRTexture* PreviousTexture0;
-	ZEGRTexture* PreviousTexture1;
 	ZEGRTexture* PreviousTexture2;
+	ZEGRTexture* PreviousTexture3;
+	ZEGRTexture* PreviousTexture4;
 	Context->GetTexture(ZEGR_ST_PIXEL, 0, &PreviousTexture0);
-	Context->GetTexture(ZEGR_ST_PIXEL, 1, &PreviousTexture1);
 	Context->GetTexture(ZEGR_ST_PIXEL, 2, &PreviousTexture2);
+	Context->GetTexture(ZEGR_ST_PIXEL, 3, &PreviousTexture3);
+	Context->GetTexture(ZEGR_ST_PIXEL, 4, &PreviousTexture4);
+
+	ZEArray<ZEHolder<const ZEGRRenderTarget>> MultipleScatteringRenderTargets;
+	MultipleScatteringRenderTargets.Resize(1024);	//64 * 16
 
 	const ZEGRRenderTarget* DensityRenderTarget = PrecomputedDensityBuffer->GetRenderTarget();
 	Context->SetRenderState(PrecomputeDensityRenderStateData);
@@ -294,20 +272,81 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 
 	Context->Draw(3, 0);
 
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, PrecomputeConstantBuffer);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
-
+	
 	for(ZEUInt I = 0; I < 1024; I++)
 	{
 		ZEHolder<const ZEGRRenderTarget> RenderTarget = PrecomputedSingleScatteringBuffer->GetRenderTarget(I);
+		MultipleScatteringRenderTargets[I] = PrecomputedMultipleScatteringBuffer->GetRenderTarget(I);
+		Context->ClearRenderTarget(MultipleScatteringRenderTargets[I], ZEVector4::Zero);
 
 		PrecomputeConstants.IndexZ = ((float)(I % 64) + 0.5f) / 64.0f;
 		PrecomputeConstants.IndexW = ((float)(I / 64) + 0.5f) / 16.0f;
 		PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
-		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, PrecomputeConstantBuffer);
 		Context->SetRenderState(PrecomputeSingleScatteringRenderStateData);
 		Context->SetRenderTargets(1, &RenderTarget, NULL);
 
+		Context->Draw(3, 0);
+	}
+
+	for(ZEUInt S = 1; S < OrderCount; S++)
+	{
+		for(ZEUInt J = 0; J < 1024; J++)
+		{
+			ZEHolder<const ZEGRRenderTarget> RenderTarget = PrecomputedHighOrderScatteringBuffer->GetRenderTarget(J);
+			PrecomputeConstants.IndexZ = ((float)(J % 64) + 0.5f) / 64.0f;
+			PrecomputeConstants.IndexW = ((float)(J / 64) + 0.5f) / 16.0f;
+			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
+	
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, (S == 1) ? PrecomputedSingleScatteringBuffer : PrecomputedHighOrderInScatteringBuffer);
+			Context->SetTexture(ZEGR_ST_PIXEL, 3, RandomVectorsTexture);
+			Context->SetRenderTargets(1, &RenderTarget, NULL);
+			Context->SetRenderState(PrecomputeHighOrderScatteringRenderStateData);
+		
+			Context->Draw(3, 0);
+		}
+	
+		for(ZEUInt J = 0; J < 1024; J++)
+		{
+			ZEHolder<const ZEGRRenderTarget> RenderTarget = PrecomputedHighOrderInScatteringBuffer->GetRenderTarget(J);
+			PrecomputeConstants.IndexZ = ((float)(J % 64) + 0.5f) / 64.0f;
+			PrecomputeConstants.IndexW = ((float)(J / 64) + 0.5f) / 16.0f;
+			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
+	
+			Context->SetTexture(ZEGR_ST_PIXEL, 1, PrecomputedHighOrderScatteringBuffer);
+			Context->SetRenderTargets(1, &RenderTarget, NULL);
+			Context->SetRenderState(PrecomputeHighOrderInScatteringRenderStateData);
+	
+			Context->Draw(3, 0);
+		}
+	
+		for(ZEUInt J = 0; J < 1024; J++)
+		{
+			ZEHolder<const ZEGRRenderTarget> RenderTarget = MultipleScatteringRenderTargets[J];
+			PrecomputeConstants.IndexZ = (float)J;
+			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
+	
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedHighOrderInScatteringBuffer);
+			Context->SetRenderTargets(1, &RenderTarget, NULL);
+			Context->SetRenderState(AddOrdersRenderStateData);
+	
+			Context->Draw(3, 0);
+		}
+	}
+	
+	for(ZEUInt K = 0; K < 1024; K++)
+	{
+		ZEHolder<const ZEGRRenderTarget> RenderTarget = MultipleScatteringRenderTargets[K];
+		PrecomputeConstants.IndexZ = (float)K;
+		PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
+	
+		Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedSingleScatteringBuffer);
+		Context->SetRenderTargets(1, &RenderTarget, NULL);
+		Context->SetRenderState(AddOrdersRenderStateData);
+	
 		Context->Draw(3, 0);
 	}
 
@@ -317,21 +356,18 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 
 	Context->SetRenderState(PrecomputeSkyAmbientRenderStateData);
 	Context->SetRenderTargets(1, &SkyAmbientRenderTarget, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedSingleScatteringBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, RandomVectorsTexture);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 1024.0f, 1.0f));
 
 	Context->Draw(3, 0);
 
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
 
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, PreviousTexture0);
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, PreviousTexture1);
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, PreviousTexture2);
+	Context->SetTexture(ZEGR_ST_PIXEL, 3, PreviousTexture3);
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, PreviousTexture4);
 
 	Context->SetRenderTargets(1, &PreviousRenderTarget, NULL);
 
@@ -499,7 +535,7 @@ void ZEATAtmosphericScattering::PostProcess(ZEGRContext* Context)
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(SkyAndAerialPerspectiveRenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, PrecomputedSingleScatteringBuffer);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 800.0f, 600.0f));
 
