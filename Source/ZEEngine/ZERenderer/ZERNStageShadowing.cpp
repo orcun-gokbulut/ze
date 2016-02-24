@@ -36,10 +36,7 @@
 #include "ZERNStageShadowing.h"
 
 #include "ZERNStageID.h"
-#include "ZERNRenderer.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZELight.h"
+#include "ZEDS/ZEString.h"
 
 ZEInt ZERNStageShadowing::GetId() const
 {

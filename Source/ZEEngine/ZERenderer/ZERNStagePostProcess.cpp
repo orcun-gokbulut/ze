@@ -35,17 +35,12 @@
 
 #include "ZERNStagePostProcess.h"
 
+#include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 #include "ZERNStageGBuffer.h"
-#include "ZERNRenderer.h"
-#include "ZERNStageLighting.h"
-#include "ZERNStageHDR.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZEGraphics/ZEGROutput.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEModules/ZEDirect3D11/ZED11DepthStencilBuffer.h"
-#include "ZEModules/ZEDirect3D11/ZED11Context.h"
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {

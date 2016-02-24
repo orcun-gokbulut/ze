@@ -69,21 +69,20 @@ class ZERNStageAO : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				BlurTexture;
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
 
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		SSAOConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>		FilterConstantBuffer;
 
-		ZEHolder<ZEGRShader>				VertexShader;
-		ZEHolder<ZEGRShader>				BlendVertexShader;
+		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPosition;
+		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexCoord;
 
-		ZEHolder<ZEGRShader>				PixelShader;
+		ZEHolder<ZEGRShader>				SSAOPixelShader;
 		ZEHolder<ZEGRShader>				BlendPixelShader;
 		ZEHolder<ZEGRShader>				FilterPixelShader;
 
-		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEHolder<ZEGRRenderStateData>		SSAORenderStateData;
 		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		FilterRenderStateData;
 
-		ZEHolder<ZEGRSampler>				SamplerPointBorder;
 		ZEHolder<ZEGRSampler>				SamplerPointWrap;
 		ZEHolder<ZEGRSampler>				SamplerPointClamp;
 		ZEHolder<ZEGRSampler>				SamplerLinearClamp;

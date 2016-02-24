@@ -75,7 +75,7 @@ class ZERNStageHDR : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexcoord;
 		ZEHolder<ZEGRShader>				CalculateLuminance_PixelShader;
 		ZEHolder<ZEGRShader>				CalculateAdaptedLuminance_PixelShader;
 		ZEHolder<ZEGRShader>				DownSampling_PixelShader;
@@ -92,6 +92,7 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
 
 		ZERNFilter							Filter;
+
 		ZEArray<ZEVector4>					HorizontalValues;
 		ZEArray<ZEVector4>					VerticalValues;
 
@@ -103,7 +104,7 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
 		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
 		
-		ZEHolder<ZEGRSampler>			SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
 
 		ZERNHDRBlurTextureSize				BlurTextureSize;
 		ZEGRViewport						Viewport;

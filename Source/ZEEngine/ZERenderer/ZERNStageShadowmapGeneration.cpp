@@ -36,13 +36,6 @@
 #include "ZERNStageShadowmapGeneration.h"
 
 #include "ZERNStageID.h"
-#include "ZERNCommand.h"
-#include "ZERNRenderer.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 
 ZEInt ZERNStageShadowmapGeneration::GetId() const
 {
@@ -53,13 +46,6 @@ const ZEString& ZERNStageShadowmapGeneration::GetName() const
 {
 	static const ZEString Name = "Shadow map generation";
 	return Name;
-}
-
-void ZERNStageShadowmapGeneration::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
-{
-	Context->SetRenderTargets(0, NULL, NULL);
-
-	ZERNStage::CleanUp(Renderer, Context);
 }
 
 ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()

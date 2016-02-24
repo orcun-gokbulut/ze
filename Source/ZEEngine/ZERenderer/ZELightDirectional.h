@@ -70,10 +70,8 @@ class ZELightDirectional : public ZELight
 
 		float								CascadeDistanceFactor;
 
-		void								UpdateCascadeTransforms(ZEScene* Scene, const ZERNView& View);
+		void								UpdateCascadeTransforms(const ZERNView& View);
 		void								UpdateCascadeShadowMaps();
-
-		ZEAABBox							GetSceneBoundingBoxLight(ZEScene* Scene);
 
 											ZELightDirectional();
 		virtual								~ZELightDirectional();

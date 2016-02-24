@@ -56,14 +56,16 @@ enum ZELightShadowResolution : ZEUInt8
 {
 	ZE_LSR_LOW				= 0,
 	ZE_LSR_MEDIUM			= 1,
-	ZE_LSR_HIGH				= 2
+	ZE_LSR_HIGH				= 2,
+	ZE_LSR_VERY_HIGH		= 3
 };
 
 enum ZELightShadowSampleCount : ZEUInt8
 {
 	ZE_LSC_LOW				= 0,
 	ZE_LSC_MEDIUM			= 1,
-	ZE_LSC_HIGH				= 2
+	ZE_LSC_HIGH				= 2,
+	ZE_LSC_VERY_HIGH		= 3
 };
 
 class ZEGRTexture;

@@ -675,7 +675,8 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
 		return false;
 
-	float DrawOrder = 0.0f;	ZEInt32 CurrentLOD = 0;
+	float DrawOrder = 0.0f;
+	ZEInt32 CurrentLOD = 0;
 	float LODDistanceSquare = 0.0f;
 	ZEVector3 WorldPosition;
 	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
@@ -700,8 +701,8 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		}
 	}
 
-	//if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
-		//return false;
+	if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
+		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
 	RenderCommand.Priority = 0;

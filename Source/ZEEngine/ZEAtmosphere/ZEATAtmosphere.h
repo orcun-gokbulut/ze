@@ -38,8 +38,8 @@
 #include "ZEGame/ZEEntity.h"
 
 #include "ZEATAtmosphericScattering.h"
-#include "ZERenderer/ZERNCommand.h"
 #include "ZEATCommon.h"
+#include "ZERenderer/ZERNCommand.h"
 
 class ZEATSun;
 class ZEATMoon;

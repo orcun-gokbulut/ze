@@ -57,16 +57,13 @@
 #define ZE_LDF_VIEW_VOLUME				8
 #define ZE_LDF_CONSTANT_BUFFER			16
 
-void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView& View)
+void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 {
-	ZEAABBox SceneAABBLight = GetSceneBoundingBoxLight(Scene);
-
 	float VerticalTopFovTangent = ZEAngle::Tan(View.VerticalFOVTop);
 	float VerticalBottomFovTangent = ZEAngle::Tan(View.VerticalFOVBottom);
 	float HorizontalRightTangent = ZEAngle::Tan(View.HorizontalFOVRight);
 	float HorizontalLeftTangent = ZEAngle::Tan(View.HorizontalFOVLeft);
 
-	ZEVector3 LightDirectionWorld = GetWorldRotation() * ZEVector3::UnitZ;
 	ZEVector3 CascadeFrustumVerticesView[8];
 	ZEVector3 CascadeFrustumVerticesLight[8];
 	for(ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
@@ -139,9 +136,6 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 		CascadeFrustumAABBLight.Max.x *= UnitPerShadowTexel;
 		CascadeFrustumAABBLight.Max.y *= UnitPerShadowTexel;
 
-		//Extend cascade frustum aabb minz and maxz to scene aabb minz and maxz in light space, if required
-		//CascadeFrustumAABBLight.Min.z = ZEMath::Min(CascadeFrustumAABBLight.Min.z, SceneAABBLight.Min.z);
-		//CascadeFrustumAABBLight.Max.z = ZEMath::Max(CascadeFrustumAABBLight.Max.z, SceneAABBLight.Max.z);
 		CascadeFrustumAABBLight.Min.z -= Range;
 		CascadeFrustumAABBLight.Max.z += Range;
 
@@ -169,7 +163,8 @@ void ZELightDirectional::UpdateCascadeTransforms(ZEScene* Scene, const ZERNView&
 		}
 
 		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
-		//Should be in world space and according to scene bounding-box not for each cascade
+
+		//Should be in world space
 		CascadeVolumes[CascadeIndex].Create(ZEVector3::Zero, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
 	}
 }
@@ -185,35 +180,6 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, CascadeConstants.CascadeCount, 1, 1, ZEGR_TF_D32_FLOAT, false, true);
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
-}
-
-ZEAABBox ZELightDirectional::GetSceneBoundingBoxLight(ZEScene* Scene)
-{
-	ZEAABBox SceneAABBWorld(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
-
-	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
-	ZEUInt EntityCount = Entities.GetCount();
-	for(ZEUInt I = 0; I < EntityCount; I++)
-	{
-		ZEEntity* Entity = Entities[I];
-		if(Entity->GetDrawFlags().GetFlags(ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER))
-			ZEAABBox::Combine(SceneAABBWorld, Entity->GetWorldBoundingBox(), SceneAABBWorld);
-	}
-	
-	ZEVector3 LightDirectionWorld = GetWorldRotation() * ZEVector3::UnitZ;
-	ZEVector3 LightPositionWorld = SceneAABBWorld.GetCenter() + LightDirectionWorld * -SceneAABBWorld.GetLength() * 0.5f;
-	//SetPosition(LightPositionWorld);
-
-	ZEAABBox SceneAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
-	for(ZEUInt I = 0; I < 8; I++)
-	{
-		ZEVector3 SceneAABBVertexLight = GetViewTransform() * SceneAABBWorld.GetVertex(I);
-
-		ZEVector3::Min(SceneAABBLight.Min, SceneAABBLight.Min, SceneAABBVertexLight);
-		ZEVector3::Max(SceneAABBLight.Max, SceneAABBLight.Max, SceneAABBVertexLight);
-	}
-
-	return SceneAABBLight;
 }
 
 ZELightDirectional::ZELightDirectional()
@@ -240,8 +206,6 @@ bool ZELightDirectional::InitializeSelf()
 
 	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
 	ShadowRenderer.Initialize();
-
-	DirtyFlags.RaiseAll();
 
 	return true;
 }
@@ -366,13 +330,13 @@ bool ZELightDirectional::PreRender(const ZERNCullParameters* CullParameters)
 void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	UpdateCascadeShadowMaps();
-	UpdateCascadeTransforms(Parameters->Scene, *Parameters->View);
+	UpdateCascadeTransforms(*Parameters->View);
 
-	ZEUInt Count = (ZEUInt)CascadeConstants.CascadeCount;
+	ZEUInt Count = CascadeConstants.CascadeCount;
 	for(ZEUInt CascadeIndex = 0; CascadeIndex < Count; CascadeIndex++)
 	{
 		ZERNView View = ShadowRenderer.GetView();
-		View.Position = ZEVector3::Zero;
+		View.Position = Parameters->View->Position;
 		View.Rotation = GetWorldRotation();
 		View.Direction = GetWorldFront();
 		View.U = GetWorldRight();

@@ -916,24 +916,33 @@ void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width,
 
 void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
+	float Temp = FarZ;
+	FarZ = NearZ;
+	NearZ = Temp;
+
 	float Ys = 1.0f / ZEAngle::Tan(FOV * 0.5f);
 	float Xs = Ys / AspectRatio;
+	float Range = FarZ - NearZ;
 
 	Create(Matrix, 
 		Xs, 0.0f, 0.0f, 0.0f,
 		0.0f, Ys, 0.0f, 0.0f,
-		0.0f, 0.0f, FarZ / (FarZ - NearZ), -NearZ * FarZ / (FarZ - NearZ),
+		0.0f, 0.0f, FarZ / Range, -FarZ * NearZ / Range,
 		0.0f, 0.0f, 1.0f, 0.0f);
 }
 
 void ZEMatrix4x4::CreatePerspectiveProjectionOffCenter(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ)
 {
+	float Temp = FarZ;
+	FarZ = NearZ;
+	NearZ = Temp;
+
 	float Width = Right - Left;
 	float Height = Top - Bottom;
 	float Depth = FarZ - NearZ;
 	float OffsetX = (Left + Right) / -Width;
 	float OffsetY = (Bottom + Top) / -Height;
-	float OffsetZ = NearZ * FarZ / -Depth;
+	float OffsetZ = FarZ * NearZ / -Depth;
 
 	Create(Matrix,
 		2.0f * NearZ / Width, 0.0f, OffsetX, 0.0f,

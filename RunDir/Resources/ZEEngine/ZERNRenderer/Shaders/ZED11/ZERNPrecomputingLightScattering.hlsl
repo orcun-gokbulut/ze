@@ -67,20 +67,15 @@ cbuffer ZERNPrecomputingLightScattering_PreConstants								: register(b9)
 
 Texture3D<float3>	ZERNPrecomputingLightScattering_PreviousInScatteringBuffer		: register(t0);
 Texture3D<float3>	ZERNPrecomputingLightScattering_HighOrderScatteringBuffer		: register(t1);
-Texture2D<float2>	ZERNPrecomputingLightScattering_DensityBuffer					: register(t5);
 Texture2D<float3>	ZERNPrecomputingLightScattering_RandomVectorsTexture			: register(t3);
+Texture2D<float2>	ZERNPrecomputingLightScattering_DensityBuffer					: register(t5);
 Texture2D<float3>	ZERNPrecomputingLightScattering_SkyAmbientBuffer				: register(t6);
 
 void ZERNPrecomputingLightScattering_MultiplyWithPhases(in float3 SunDirection, in float3 ViewDirection, inout float3 RayleighInScattering, inout float3 MieInScattering)
 {
 	float CosAngle = dot(SunDirection, ViewDirection);
 	
-	//float3 PhaseRayleigh = ZERNPrecomputingLightScattering_RayleighAngularFactor.xyz * (1.0f + CosAngle * CosAngle);
-	//
-	//float3 PhaseMie = ZERNPrecomputingLightScattering_MieAngularFactor.xyz * 
-	//				(ZERNPrecomputingLightScattering_CornetteShanksG.x * (1.0f + CosAngle * CosAngle) /
-	//				ZERNPrecomputingLightScattering_CornetteShanksG.y * pow(abs(ZERNPrecomputingLightScattering_CornetteShanksG.z - ZERNPrecomputingLightScattering_CornetteShanksG.w * CosAngle), 1.5f));
-	
+
 	float3 PhaseRayleigh =  (3.0f / (16.0f * PI)) * (1.0f + CosAngle * CosAngle);
 	
 	float GG = 0.76f * 0.76f;
@@ -174,6 +169,8 @@ float3 ZERNPrecomputingLightScattering_SingleScattering_PixelShader_Main(float4 
 		ZERNIntersections_RaySphere1(Position, SunDirection, EarthCenter, TOTAL_RADIUS, StartEndDistance.xy);
 		if(StartEndDistance.x < 0.0f && StartEndDistance.y > 0.0f)
 		{
+			StartEndDistance.y = clamp(StartEndDistance.y, 50.0f, ATMOSPHERE_HEIGHT - 50.0f);
+			
 			float3 LightEntryPoint = Position + SunDirection * StartEndDistance.y;
 			Extinction += ZERNLightScatteringCommon_CalculateExtinction(Position, LightEntryPoint);
 		}
@@ -229,7 +226,7 @@ float3 ZERNPrecomputingLightScattering_HighOrderScattering_PixelShader_Main(floa
 
 		ZERNPrecomputingLightScattering_MultiplyWithPhases(-Direction, ViewDirection, RayleighInScattering, MieInScattering);
 		
-		TotalScattering += RayleighInScattering + MieInScattering;
+		TotalScattering += (RayleighInScattering * ZERNPrecomputingLightScattering_RayleighScatteringFactor.xyz + MieInScattering * ZERNPrecomputingLightScattering_MieScatteringFactor.xyz);
 	}
 	
 	return TotalScattering * 4.0f * PI / 128.0f;
@@ -275,7 +272,7 @@ float3 ZERNPrecomputingLightScattering_HighOrderInScattering_PixelShader_Main(fl
 		float CurHeight = length(Position - EarthCenter) - EARTH_RADIUS;
 		float2 CurParticleDensity = exp(-CurHeight / RAYLEIGH_MIE_HEIGHT);
 		
-		TotalParticleDensity += ((CurParticleDensity + PrevParticleDensity) * 0.5f) * StepLength;
+		TotalParticleDensity += (CurParticleDensity + PrevParticleDensity) * 0.5f * StepLength;
 		
 		float3 RayleighExtinction = ZERNPrecomputingLightScattering_RayleighScatteringFactor.xyz * TotalParticleDensity.x;
 		float3 MieExtinction = ZERNPrecomputingLightScattering_MieScatteringFactor.xyz * TotalParticleDensity.y;
@@ -284,7 +281,7 @@ float3 ZERNPrecomputingLightScattering_HighOrderInScattering_PixelShader_Main(fl
 		float Dummy2 = -1.0f;
 		float3 CurInScattering = Extinction * ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNPrecomputingLightScattering_HighOrderScatteringBuffer, Position, ViewDirection, SunDirection, EarthCenter, Dummy2);
 
-		TotalInScattering += ((CurInScattering + PrevInScattering) * 0.5f) * StepLength;
+		TotalInScattering += (CurInScattering + PrevInScattering) * 0.5f * StepLength;
 		
 		PrevParticleDensity = CurParticleDensity;
 		PrevInScattering = CurInScattering;

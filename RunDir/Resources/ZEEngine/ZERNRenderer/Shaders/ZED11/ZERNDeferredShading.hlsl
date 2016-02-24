@@ -114,18 +114,19 @@ static const float2 ZERNDeferredShading_PoissonDiskSamples[] =
 	float2(0.8985078f, 0.4366908f)
 };
 
-static const float ZERNDeferredShading_DepthBias = 0.00008f;
+static const float ZERNDeferredShading_DepthBias = 0.0001f;
 
 float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
 {		
 	float Visibility = 0.0f;
 	
-	//float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
-	//RandomVector = normalize(RandomVector);
+	float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, 32.0f * TexCoordDepth.xy, 0) * 2.0f - 1.0f;
+	RandomVector = normalize(RandomVector);
 	
 	for(uint I = 0; I < 16; I++)
 	{
-		float2 Offset = ZERNDeferredShading_PoissonDiskSamples[I] * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
+		float2 RandomOrientedSample = reflect(ZERNDeferredShading_PoissonDiskSamples[I], RandomVector);
+		float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
 		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z - ZERNDeferredShading_DepthBias);
 	}
 		
@@ -184,17 +185,15 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 		}
 	}
 	
+	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
+	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
+	
+	float3 ResultColor = (ResultDiffuse + ResultSpecular) * DirectionalLight.Intensity;
+	
 	if(ZERNDeferredShading_ShowCascades)
-	{
-		return CascadeColor;
-	}
+		return ResultColor * CascadeColor;
 	else
-	{
-		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
-		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
-		
-		return (ResultDiffuse + ResultSpecular) * Visibility * DirectionalLight.Intensity;
-	}
+		return ResultColor * Visibility;
 }
 
 float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)

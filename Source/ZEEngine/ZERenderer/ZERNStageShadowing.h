@@ -37,8 +37,6 @@
 
 #include "ZERNStage.h"
 
-#include "ZEGraphics/ZEGRRenderState.h"
-
 class ZERNStageShadowing : public ZERNStage
 {
 	public:
