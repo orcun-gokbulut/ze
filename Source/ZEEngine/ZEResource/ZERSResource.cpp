@@ -54,7 +54,7 @@ void ZERSResource::Release() const
 	ReferenceCounterLock.Unlock();
 }
 
-ZETaskResult ZERSResource::AsyncLoaderFunction(ZETaskThread* TaskThread, ZEInt InstanceIndex, void* Parameters)
+ZETaskResult ZERSResource::AsyncLoaderFunction(ZETaskThread* TaskThread, void* Parameters)
 {
 	return LoadInternal((ZERSLoadingOptions*)Parameters) == false ? ZE_TR_DONE : ZE_TR_COOPERATING;
 }

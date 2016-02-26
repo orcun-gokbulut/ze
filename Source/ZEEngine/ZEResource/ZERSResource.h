@@ -109,7 +109,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 
 		void AddReferance() const;
 		void Release() const;
-		ZETaskResult AsyncLoaderFunction(ZETaskThread* TaskThread, int InstanceIndex, void* Parameters);
+		ZETaskResult AsyncLoaderFunction(ZETaskThread* TaskThread, void* Parameters);
 
 	protected:
 		void AddSubResource(const ZEHolder<ZERSResource>& Resource);

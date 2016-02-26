@@ -56,7 +56,7 @@ ZETask* ZETaskThread::GetTask()
 	return Task;
 }
 
-ZETaskThread::ZETaskThread() : TaskLink(this)
+ZETaskThread::ZETaskThread() : PoolLink(this)
 {
 	Task = NULL;
 	InstanceIndex = 0;

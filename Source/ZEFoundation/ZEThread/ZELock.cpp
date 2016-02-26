@@ -75,6 +75,7 @@ void ZELock::Lock()
 	#endif
     
 	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
+
 	while(MyNumber != CurrentNumber);
 
 	#ifdef ZE_VTUNE_ENABLED
@@ -90,7 +91,6 @@ void ZELock::Unlock()
 
 	CurrentNumber++;
 }
-
 
 ZELock::ZELock()
 {

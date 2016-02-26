@@ -45,47 +45,47 @@ void ZESignal::Initialize() const
 	if (Handle != NULL)
 		return;
 	
-	InitializeLock.Lock();
+	SignalLock.Lock();
 
 	Handle = CreateEvent(NULL, true, InitialState, NULL);
 	if (Handle == NULL)
 		zeCriticalError("Can not create signal.");
 
-	InitializeLock.Unlock();
+	SignalLock.Unlock();
 }
 
 void ZESignal::Signal()
 {
-	InitializeLock.Lock();
+	SignalLock.Lock();
 
 	if (Handle == NULL)
 	{
 		InitialState = true;
-		InitializeLock.Unlock();
+		SignalLock.Unlock();
 		return;
 	}
 
 	if (!SetEvent(Handle))
 		zeCriticalError("Cannot set signal.");
 	
-	InitializeLock.Unlock();
+	SignalLock.Unlock();
 }
 
 void ZESignal::Reset()
 {
-	InitializeLock.Lock();
+	SignalLock.Lock();
 
 	if (Handle == NULL)
 	{
 		InitialState = false;
-		InitializeLock.Unlock();
+		SignalLock.Unlock();
 		return;
 	}
 
 	if (!ResetEvent(Handle))
 		zeCriticalError("Cannot set signal.");
 
-	InitializeLock.Unlock();
+	SignalLock.Unlock();
 }
 
 
@@ -122,11 +122,11 @@ ZESignal::ZESignal()
 
 ZESignal::~ZESignal()
 {
-	InitializeLock.Lock();
+	SignalLock.Lock();
 	if (Handle != NULL)
 	{
 		if (!CloseHandle(Handle))
 			zeCriticalError("Can not destroy signal.");
 	}
-	InitializeLock.Unlock();
+	SignalLock.Unlock();
 }

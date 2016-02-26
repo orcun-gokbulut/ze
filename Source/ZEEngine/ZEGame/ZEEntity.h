@@ -131,7 +131,7 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>						ChildEntities;
 
 		ZETask									ManageTask;
-		ZETaskResult							ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, void* Parameters);
+		ZETaskResult							ManageStates(ZETaskThread* Thread, void* Parameters);
 		void									ManagetStatesSerial();
 
 		virtual bool							SetParent(ZEEntity* Parent);
