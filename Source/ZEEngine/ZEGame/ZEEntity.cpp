@@ -210,7 +210,7 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 	BoundingBoxChanged();
 }
 
-ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, void* Parameters)
+ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 {
 	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
 		GetName().ToCString(), 
@@ -352,7 +352,7 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, ZEInt InstanceIndex, v
 
 void ZEEntity::ManagetStatesSerial()
 {
-	while (ManageStates(NULL, 0, NULL) == ZE_TR_COOPERATING);
+	while (ManageStates(NULL, 0) == ZE_TR_COOPERATING);
 }
 
 void ZEEntity::SetSerialOperation(bool SerialOperation)
