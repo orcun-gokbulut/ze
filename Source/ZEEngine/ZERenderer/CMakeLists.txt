@@ -74,6 +74,8 @@ ze_add_source(ZERNSimpleMaterial.cpp 				Sources)
 ze_add_source(ZERNSimpleMaterial.h 					Sources Headers)
 ze_add_source(ZERNFixedMaterial.cpp 				Sources)
 ze_add_source(ZERNFixedMaterial.h 					Sources Headers ZEMC)
+ze_add_source(ZERNParticleMaterial.cpp 				Sources)
+ze_add_source(ZERNParticleMaterial.h 				Sources Headers ZEMC)
 
 ze_add_source(ZERNStage.h 							Sources Headers)
 ze_add_source(ZERNStage.cpp 						Sources)
@@ -101,6 +103,8 @@ ze_add_source(ZERNStageShadowmapGeneration.h		Sources Headers)
 ze_add_source(ZERNStageShadowmapGeneration.cpp		Sources)
 ze_add_source(ZERNStageShadowing.h					Sources Headers)
 ze_add_source(ZERNStageShadowing.cpp				Sources)
+ze_add_source(ZERNStageParticleRendering.h			Sources Headers)
+ze_add_source(ZERNStageParticleRendering.cpp		Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}

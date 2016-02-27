@@ -36,41 +36,19 @@
 #pragma once
 
 #include "ZEInitializable.h"
-#include "ZEGraphics/ZEGRResource.h"
-#include "ZEPointer/ZEHolder.h"
-
-#define ZEGR_MAX_RENDERER_STAGE_COUNT 10
+#include "ZEPointer/ZEReferenceCounted.h"
 
 class ZEGRContext;
-class ZERNRenderer;
 class ZERNStage;
-class ZEGRRenderStateData;
-
-class ZERNMaterialStage
-{
-	public:
-		ZERNStage*						Stage;
-		ZEHolder<ZEGRRenderStateData>	RenderState;
-
-										ZERNMaterialStage();
-};
 
 class ZERNMaterial : public ZEReferenceCounted, public ZEInitializable
 {
-	private:
-		ZERNMaterialStage				Stages[ZEGR_MAX_RENDERER_STAGE_COUNT];
-		ZESize							StageCount;
-
-		void							AddStage(ZERNStage* Stage, ZEGRRenderStateData* State);
-		ZEGRRenderStateData*			GetRenderState(ZERNStage* Stage);
-
 	protected:
 										ZERNMaterial();
 		virtual							~ZERNMaterial();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() const;
-		virtual ZEUInt					GetStageMask() const;
+		virtual ZEUInt					GetStageMask() const = 0;
 
 		virtual bool					SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;

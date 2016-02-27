@@ -34,12 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleModifier.h"
+
 #include "ZEParticleEmitter.h"
 #include "ZEParticleEffect.h"
-#include "ZERenderer\ZERNFixedMaterial.h"
 #include "ZERandom.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEMath\ZEMath.h"
+#include "ZERenderer\ZERNFixedMaterial.h"
 
 void ZEParticleModifier::SetName(const ZEString& Name)
 {
@@ -466,7 +467,7 @@ void ZEParticleDiffuseMapChangerModifier::AddTextureResource(ZETexture2DResource
 
 void ZEParticleDiffuseMapChangerModifier::Tick(float ElapsedTime)
 {
-	((ZEFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture2D());
+	//((ZERNFixedMaterial*)(GetOwner()->GetMaterial()))->SetBaseMap(Textures[Textures.Circular((ZESize)CurrentTextureIndex)]->GetTexture2D());
 
 	if(TotalTime >= Interval)
 	{

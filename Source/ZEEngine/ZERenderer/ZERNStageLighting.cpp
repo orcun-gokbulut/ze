@@ -360,11 +360,11 @@ ZEVector4 ZERNStageLighting::ComputeClipRegion(const ZEVector3& lightPosView, fl
 
 void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEList2<ZELight>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear)
 {
-	ZEUInt Width = OutputRenderTarget->GetWidth();
-	ZEUInt Height = OutputRenderTarget->GetHeight();
+	ZEUInt Widthh = OutputRenderTarget->GetWidth();
+	ZEUInt Heightt = OutputRenderTarget->GetHeight();
 
-	ZEUInt TileCountX = (Width + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
-	ZEUInt TileCountY = (Height + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
+	ZEUInt TileCountX = (Widthh + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
+	ZEUInt TileCountY = (Heightt + TILE_SIZE_IN_PIXELS - 1) / TILE_SIZE_IN_PIXELS;
 
 	ZEUInt TileCount = TileCountX * TileCountY;
 	ZESize LightCount = Lights.GetCount();
@@ -391,7 +391,7 @@ void ZERNStageLighting::AssignLightsToTiles(ZERNRenderer* Renderer, const ZEList
 			ClipSpaceQuad *= ZEVector4(0.5f, -0.5f, 0.5f, -0.5f);
 			ClipSpaceQuad += ZEVector4(0.5f, 0.5f, 0.5f, 0.5f);
 
-			ZEVector4 ScreenSpaceQuad = ZEVector4(ClipSpaceQuad.x * Width, ClipSpaceQuad.y * Height, ClipSpaceQuad.z * Width, ClipSpaceQuad.w * Height);
+			ZEVector4 ScreenSpaceQuad = ZEVector4(ClipSpaceQuad.x * Widthh, ClipSpaceQuad.y * Heightt, ClipSpaceQuad.z * Widthh, ClipSpaceQuad.w * Heightt);
 
 			if(ScreenSpaceQuad.z > ScreenSpaceQuad.x && ScreenSpaceQuad.w > ScreenSpaceQuad.y)
 			{
@@ -914,5 +914,5 @@ ZERNStageLighting::ZERNStageLighting()
 	ShowCascades = false;
 	OutputRenderTarget = NULL;
 
-	RenderModel = ZERN_RM_DEFERRED;
+	RenderModel = ZERN_RM_COMPUTE_TILED_DEFERRED;
 }

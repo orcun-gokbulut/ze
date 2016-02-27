@@ -72,6 +72,8 @@ void ZELight::SetRange(float NewValue)
 	Range = NewValue;
 
 	ZEVector3 Extent(Range, Range, Range);
+	ZEVector3::Normalize(Extent, Extent);
+	Extent *= Range;
 	ZEVector3 Position = GetPosition();
 	SetBoundingBox(ZEAABBox(Position - Extent, Position + Extent));
 

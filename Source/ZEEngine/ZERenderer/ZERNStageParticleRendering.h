@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNShading.hlsl
+ Zinek Engine - ZERNStageParticleRendering.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_SHADING_H__
-#define __ZERN_SHADING_H__
+#pragma once
 
-struct ZERNShading_Light
+#include "ZERNStage.h"
+
+#include "ZEGraphics/ZEGRViewport.h"
+
+class ZERNStageParticleRendering : public ZERNStage
 {
-	float3						PositionView;
-	float						Range;
-	float3						Color;
-	float						Intensity;
-	float3  					Attenuation;
-	float						Fov;
-	float3						DirectionView;
-	int							Type;
+	private:
+		ZEGRViewport					Viewport;
+
+	public:
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
+
+		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
+		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+
+										ZERNStageParticleRendering();
+
+		static ZEGRRenderState			GetRenderState();
 };
-
-struct ZERNShading_Surface
-{
-	float3						PositionView;
-	float						Reserved;
-	float3						NormalView;
-	float						Reserved1;
-	float3						Diffuse;
-	float						Reserved2;
-	float3						Specular;
-	float						SpecularPower;
-};
-
-float3 ZERNShading_Diffuse_Lambert(ZERNShading_Light Light, ZERNShading_Surface Surface)
-{
-	float NdotL = max(0.0f, dot(Surface.NormalView, Light.DirectionView));
-	
-	return NdotL * Surface.Diffuse;
-}
-
-float3 ZERNShading_Specular_BlinnPhong(ZERNShading_Light Light, ZERNShading_Surface Surface)
-{	
-	float3 ViewDirection = normalize(-Surface.PositionView);
-	float3 HalfVector = normalize(ViewDirection + Light.DirectionView);
-	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
-	
-	return pow(NdotH, Surface.SpecularPower) * Surface.Specular;
-}
-
-#endif
