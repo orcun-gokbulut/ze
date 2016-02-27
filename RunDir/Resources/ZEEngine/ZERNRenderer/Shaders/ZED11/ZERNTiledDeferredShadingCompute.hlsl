@@ -64,14 +64,21 @@ float3 ZERNTiledDeferredShadingCompute_PointLighting(ZERNShading_Light PointLigh
 	float3 LightVectorView = PointLight.PositionView - Surface.PositionView;
 	float LightDistanceView = length(LightVectorView);
 	
-	PointLight.DirectionView = LightVectorView / LightDistanceView;
+	float3 ResultColor = 0.0f;
 	
-	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
-	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
+	if(LightDistanceView < PointLight.Range)
+	{
+		PointLight.DirectionView = LightVectorView / LightDistanceView;
+		
+		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
+		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
+		
+		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
+		
+		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * PointLight.Intensity * DistanceAttenuation;
+	}
 	
-	float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
-	
-	return (ResultDiffuse + ResultSpecular) * PointLight.Intensity * DistanceAttenuation;
+	return saturate(ResultColor);
 }
 
 [numthreads(TILE_DIMENSION, TILE_DIMENSION, 1)]
@@ -90,12 +97,10 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 	float MinDepth = ZERNView_FarZ;
 	float MaxDepth = ZERNView_NearZ;
 	
-	float DepthView = Surface.PositionView.z;
-	
-	if(DepthView >= ZERNView_NearZ && DepthView <= ZERNView_FarZ)
+	if(DepthHomogeneous != 0.0f)
 	{
-		MinDepth = min(MinDepth, DepthView);
-		MaxDepth = max(MaxDepth, DepthView);
+		MinDepth = min(MinDepth, Surface.PositionView.z);
+		MaxDepth = max(MaxDepth, Surface.PositionView.z);
 	}
 	
 	uint GroupIndex = GroupThreadId.y * TILE_DIMENSION + GroupThreadId.x;
@@ -141,7 +146,6 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 	for(uint LightIndex = GroupIndex; LightIndex < ZERNTiledDeferredShadingCompute_LightCount; LightIndex += TILE_SIZE)
 	{
 		bool InsideFrustum = true;
-		//float3 LightPositionView = ZERNTransformations_WorldToView(float4(Lights[LightIndex].PositionView, 1.0f));
 		
 		for(uint I = 0; I < 6; I++)
 		{
@@ -179,11 +183,8 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 			for(uint I = 0; I < LightCount; I++)
 			{
 				ZERNShading_Light CurrentLight = ZERNTiledDeferredShadingCompute_Lights[TileLightIndices[I]];
-			
-				if(CurrentLight.Type == 1)
-				{
-					ResultColor += ZERNTiledDeferredShadingCompute_PointLighting(CurrentLight, Surface);
-				}
+				
+				ResultColor += ZERNTiledDeferredShadingCompute_PointLighting(CurrentLight, Surface);
 			}
 		}
 	}

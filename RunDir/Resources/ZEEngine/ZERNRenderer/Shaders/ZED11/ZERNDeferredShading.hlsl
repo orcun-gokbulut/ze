@@ -188,7 +188,7 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
 	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
 	
-	float3 ResultColor = (ResultDiffuse + ResultSpecular) * DirectionalLight.Intensity;
+	float3 ResultColor = (ResultDiffuse + ResultSpecular) * DirectionalLight.Color * DirectionalLight.Intensity;
 	
 	if(ZERNDeferredShading_ShowCascades)
 		return ResultColor * CascadeColor;
@@ -201,14 +201,21 @@ float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShadi
 	float3 LightVectorView = PointLight.PositionView - Surface.PositionView;
 	float LightDistanceView = length(LightVectorView);
 	
-	PointLight.DirectionView = LightVectorView / LightDistanceView;
+	float3 ResultColor = 0.0f;
 	
-	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
-	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
+	if(LightDistanceView < PointLight.Range)
+	{
+		PointLight.DirectionView = LightVectorView / LightDistanceView;
+		
+		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
+		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
+		
+		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
+		
+		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * PointLight.Intensity * DistanceAttenuation;
+	}
 	
-	float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
-	
-	return (ResultDiffuse + ResultSpecular) * PointLight.Intensity * DistanceAttenuation;
+	return saturate(ResultColor);
 }
 
 float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight, ZERNShading_Surface Surface)
@@ -261,7 +268,7 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 		
 		float DistanceAttenuation = 1.0f / dot(ProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 		
-		ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * ProjectiveLight.Intensity * DistanceAttenuation;
+		ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * ProjectiveLight.Color * ProjectiveLight.Intensity * DistanceAttenuation;
 	}
 	
 	return ResultColor;
@@ -282,7 +289,7 @@ float3 ZERNDeferredShading_OmniProjectiveLighting(ZERNShading_Light OmniProjecti
 	
 	float DistanceAttenuation = 1.0f / dot(OmniProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 	
-	return (ResultDiffuse + ResultSpecular) * OmniProjectiveLight.Intensity * DistanceAttenuation;
+	return (ResultDiffuse + ResultSpecular) * OmniProjectiveLight.Color * OmniProjectiveLight.Intensity * DistanceAttenuation;
 }
 
 float3 ZERNDeferredShading_Lighting(ZERNShading_Surface Surface)

@@ -34,10 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_CONTROLLER_H__
-#define __ZE_PARTICLE_CONTROLLER_H__
 
-#include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 #include "ZETexture/ZETexture2DResource.h"
@@ -48,16 +45,13 @@ class ZEParticleEmitter;
 class ZEParticleModifier
 {
 	private:
-
 		ZEString							Name;
 		ZEParticleEmitter*					Owner;
 
 	protected: 
-
 		ZEArray<ZEParticle>&				GetOwnerParticlePool();
 
 	public:
-
 		void								SetName(const ZEString& Name);
 		const ZEString&						GetName();
 
@@ -272,5 +266,3 @@ class ZEParticleUVModifier : public ZEParticleModifier
 										ZEParticleUVModifier();
 										~ZEParticleUVModifier();
 };
-
-#endif

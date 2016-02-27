@@ -35,39 +35,8 @@
 
 #include "ZERNMaterial.h"
 
-#include "ZECore/ZECore.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZERNStage.h"
 #include "ZEGraphics/ZEGRContext.h"
-
-ZERNMaterialStage::ZERNMaterialStage()
-{
-	Stage = NULL;
-}
-
-void ZERNMaterial::AddStage(ZERNStage* Stage, ZEGRRenderStateData* State)
-{
-	bool Found = false;
-	for (ZESize I = 0; I < StageCount; I++)
-	{
-		if (Stages[I].Stage == Stage)
-		{
-			Stages[I].RenderState = State;
-			Found = true;
-		}
-	}
-
-	if (!Found)
-	{
-		Stages[StageCount].Stage = Stage;
-		Stages[StageCount].RenderState = State;
-		StageCount++;
-	}
-}
-
-ZEGRRenderStateData* ZERNMaterial::GetRenderState(ZERNStage* Stage)
-{
-	return NULL;
-}
 
 ZERNMaterial::ZERNMaterial()
 {
@@ -77,16 +46,6 @@ ZERNMaterial::ZERNMaterial()
 ZERNMaterial::~ZERNMaterial()
 {
 
-}
-
-ZEGRResourceType ZERNMaterial::GetResourceType() const
-{
-	return ZEGR_RT_MATERIAL;
-}
-
-ZEUInt ZERNMaterial::GetStageMask() const
-{
-	return 0;
 }
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const

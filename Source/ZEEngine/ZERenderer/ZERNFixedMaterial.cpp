@@ -56,6 +56,7 @@
 #include "ZEInterior/ZEInterior.h"
 #include "ZEInterior/ZEInteriorResource.h"
 #include "ZERNStageShadowmapGeneration.h"
+#include "ZERNStageParticleRendering.h"
 
 #define ZERN_FMDF_CONSTANT_BUFFER		1
 #define ZERN_FMDF_RENDER_STATE			2
@@ -63,6 +64,8 @@
 
 void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const
 {
+	Options.Definitions.Clear();
+
 	if (AlphaCullEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_ALPHA_CULL"));
 
@@ -137,8 +140,6 @@ bool ZERNFixedMaterial::UpdateShaders() const
 	Options.EntryPoint = "ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main";
 	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
-
-	Options.Definitions.Clear();
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
@@ -546,6 +547,7 @@ void ZERNFixedMaterial::SetBaseMapFile(const ZEString& Filename)
 		return;
 
 	BaseMap.Load2D(Filename);
+
 }
 
 const ZEString& ZERNFixedMaterial::GetBaseMapFile() const

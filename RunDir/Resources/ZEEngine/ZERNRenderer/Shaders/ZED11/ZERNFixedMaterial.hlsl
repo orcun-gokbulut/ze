@@ -308,7 +308,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	#endif
 		
 	#ifdef ZE_FM_VERTEX_COLOR
-		AmientColor *= Input.Color;
+		AmbientColor *= Input.Color;
 		DiffuseColor *= Input.Color;
 		SpecularColor *= Input.Color;
 	#endif

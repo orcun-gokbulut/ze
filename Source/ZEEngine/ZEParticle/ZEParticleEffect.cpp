@@ -35,10 +35,11 @@
 
 #include "ZEParticleEffect.h"
 
-#include "ZEGame/ZEEntityProvider.h"
+#include "ZEMath/ZEViewVolume.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNCuller.h"
+
 
 ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 {
@@ -60,72 +61,56 @@ bool ZEParticleEffect::DeinitializeSelf()
 
 bool ZEParticleEffect::PreRender(const ZERNCullParameters* CullParameters)
 {
-	for(ZESize I = 0; I < Systems.GetCount(); I++)
-		Systems[I]->PreRender(CullParameters);
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+	{
+		//if (CullParameters->View->ViewVolume != NULL && 
+			//!CullParameters->View->ViewVolume->CullTest(Emitters[I]->GetBoundingBox()))
+		{
+			Emitters[I]->PreRender(CullParameters);
+		}
+	}
 
 	return true;
 }
 
 void ZEParticleEffect::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
-	if(!GetVisible())
+	if (!GetVisible())
 		return;
 
-	//for(ZESize I = 0; I < Emitters.GetCount(); I++)
-		//Emitters[I]->Draw(DrawParameters);
+	ZEParticleEmitter* Emitter = static_cast<ZEParticleEmitter*>(Command->ExtraParameters);
+	if(Emitter == NULL)
+		return;
 
-	ZEParticleSystem* System = (ZEParticleSystem*)Command->ExtraParameters;
-	System->Render(RenderParameters, Command);
-
-	//for(ZESize I = 0; I < Systems.GetCount(); I++)
-		//Systems[I]->Render(RenderParameters, Command);
+	Emitter->Render(RenderParameters, Command);
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)
 {
-	//for(ZESize I = 0; I < Emitters.GetCount(); I++)
-		//Emitters[I]->Tick(TimeElapsed);
-
-	for(ZESize I = 0; I < Systems.GetCount(); I++)
-		Systems[I]->Tick(TimeElapsed);
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Tick(TimeElapsed);
 }
 
-//void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
-//{
-//	Emitter->SetOwner(this);
-//	Emitters.Add(Emitter);
-//}
-//
-//void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
-//{
-//	Emitters.RemoveValue(Emitter);
-//}
-//
-//const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
-//{
-//	return Emitters;
-//}
-//
-//void ZEParticleEffect::ResetEmitters()
-//{
-//	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-//		Emitters[I]->Reset();
-//}
-
-const ZEArray<ZEParticleSystem*>& ZEParticleEffect::GetSystems()
+void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
 {
-	return Systems;
+	Emitter->SetOwner(this);
+	Emitters.Add(Emitter);
 }
 
-void ZEParticleEffect::AddSystem(ZEParticleSystem* System)
+void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 {
-	System->Owner = this;
-	Systems.Add(System);
+	Emitters.RemoveValue(Emitter);
 }
 
-void ZEParticleEffect::RemoveSystem(ZEParticleSystem* System)
+const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
 {
-	Systems.RemoveValue(System);
+	return Emitters;
+}
+
+void ZEParticleEffect::ResetEmitters()
+{
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Reset();
 }
 
 ZEParticleEffect::ZEParticleEffect()
@@ -135,6 +120,7 @@ ZEParticleEffect::ZEParticleEffect()
 
 ZEParticleEffect::~ZEParticleEffect()
 {
+
 }
 
 ZEParticleEffect* ZEParticleEffect::CreateInstance()

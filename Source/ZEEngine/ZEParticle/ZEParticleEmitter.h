@@ -34,18 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_EMITTER_H__
-#define __ZE_PARTICLE_EMITTER_H__
+
+#include "ZEMeta/ZEObject.h"
 
 #include "ZETypes.h"
+#include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEParticle.h"
-#include "ZEMath/ZEAABBox.h"
-
-#include "ZEMeta/ZEObject.h"
 
 enum ZEParticleEmitterType
 {
@@ -60,22 +59,26 @@ enum ZEParticleBillboardType
 {
 	ZE_PBT_AXIS_ORIENTED		= 0,
 	ZE_PBT_SCREEN_ALIGNED		= 1,
-	ZE_PBT_VIEW_POINT_ORIENTED	= 2,
+	ZE_PBT_VIEW_POINT_ORIENTED	= 2
 };
 
-class ZEStaticVertexBuffer;
+class ZEGRConstantBuffer;
+class ZEGRStructuredBuffer;
 class ZEParticleEffect;
 class ZEParticleModifier;
-struct ZEDrawParameters;
+class ZERNParticleMaterial;
+class ZERNRenderParameters;
+struct ZERNCullParameters;
 
 class ZEParticleEmitter : public ZEObject
 {
 	friend class ZEParticleModifier;
+	friend class ZEParticlePhysicsModifier;
+	friend class ZEParticleEffect;
 
 	ZE_OBJECT
 
 	private:
-
 		ZEString							Name;
 		ZEParticleEffect*					Owner;
 
@@ -83,11 +86,20 @@ class ZEParticleEmitter : public ZEObject
 		ZEArray<ZEParticle>					SortArray;
 		ZEArray<ZEParticleModifier*>		Modifiers;
 
-		ZERNMaterial*						Material;
-		ZEStaticVertexBuffer*				VertexBuffer;
+		ZEHolder<ZERNParticleMaterial>		Material;
 		ZERNCommand							RenderCommand;
-
 		ZEParticleBillboardType				BillboardType;
+		ZEHolder<ZEGRConstantBuffer>		InstanceBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+
+		struct InstanceAttributes
+		{
+			ZEVector3						Position;
+			float							Reserved0;
+			ZEVector2						Size;
+			ZEVector2						Reserved1;
+			ZEVector4						Color;
+		};
 
 		ZEVector3							AxisOrientation;
 
@@ -97,9 +109,9 @@ class ZEParticleEmitter : public ZEObject
 		ZEUInt								EmittedParticleCount;
 		ZEUInt								AliveParticleCount;
 
-		bool								IsEmmiterLocal;
-		bool								IsSortingEnabled;
-		bool								IsParticleFixedAspectRatio;
+		bool								EmitterLocal;
+		bool								SortingEnabled;
+		bool								ParticleFixedAspectRatio;
 
 		ZEAABBox							BoundingBox;		
 		ZEVector3							Position;
@@ -117,36 +129,33 @@ class ZEParticleEmitter : public ZEObject
 		float								MinLife;
 		float								MaxLife;
 
-		bool								IsContinuous;
+		bool								Continuity;
 
 		void 								InitializeParticlePool();
 		void								GenerateParticle(ZEParticle &Particle);
-		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
-
-		void								SortParticles();
-
-											ZEParticleEmitter();
-											~ZEParticleEmitter();
-
-	protected:
-
-		ZEArray<ZEParticle>&				GetParticlePool();
-
-	public:
-
-		void								SetName(const ZEString& Name);
-		const ZEString&						GetName() const;	
 
 		void								SetOwner(ZEParticleEffect* Owner);
 		ZEParticleEffect*					GetOwner() const;
 
-		void								SetEmmiterLocal(bool IsLocal);
-		bool								GetIsEmmiterLocal() const;
+		void								SortParticles();
 
-		void								SetSortingEnabled(bool IsSorted);
+											ZEParticleEmitter();
+		virtual								~ZEParticleEmitter();
+
+	protected:
+		ZEArray<ZEParticle>&				GetParticlePool();
+
+	public:
+		void								SetName(const ZEString& Name);
+		const ZEString&						GetName() const;
+
+		void								SetEmitterLocal(bool EmitterLocal);
+		bool								GetEmitterLocal() const;
+
+		void								SetSortingEnabled(bool SortingEnabled);
 		bool								GetSortingEnabled() const;
 
-		void								SetParticleFixedAspectRatio(bool IsParticleFixedAspectRatio);
+		void								SetParticleFixedAspectRatio(bool ParticleFixedAspectRatio);
 		bool								GetParticleFixedAspectRatio() const;
 
 		void								SetPosition(const ZEVector3& Position);
@@ -158,7 +167,7 @@ class ZEParticleEmitter : public ZEObject
 		void								AddModifier(ZEParticleModifier* Modifier);
 		void								RemoveModifier(ZEParticleModifier* Modifier);
 
-		void								SetParticlesPerSecond(ZEUInt Value);
+		void								SetParticlesPerSecond(ZEUInt ParticlesPerSecond);
 		ZEUInt								GetParticlesPerSecond() const;
 
 		ZEUInt								GetAliveParticleCount() const;
@@ -206,12 +215,12 @@ class ZEParticleEmitter : public ZEObject
 		void								SetAxisOrientation(const ZEVector3& Orientation);
 		const ZEVector3&					GetAxisOrientation() const;
 
-		void								SetMaterial(ZERNMaterial *Material);
-		ZERNMaterial*						GetMaterial() const;
+		void								SetMaterial(ZEHolder<ZERNParticleMaterial> Material);
+		ZEHolder<ZERNParticleMaterial>		GetMaterial() const;
 
-		void								Tick(float TimeElapsed);
-		void								Draw(ZEDrawParameters* DrawParameters);
+		bool								PreRender(const ZERNCullParameters* CullParameters);
+		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		void								Tick(float ElapsedTime);
 
 		static ZEParticleEmitter*			CreateInstance();
 };
-#endif

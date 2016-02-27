@@ -39,8 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-//#include "ZEParticleEmitter.h"
-#include "ZEParticleSystem.h"
+#include "ZEParticleEmitter.h"
 
 class ZERNRenderParameters;
 class ZERNCommand;
@@ -48,14 +47,12 @@ struct ZERNCullParameters;
 
 class ZEParticleEffect : public ZEEntity
 {
-	//friend class ZEParticleEmitter;
+	friend class ZEParticleEmitter;
 	
 	ZE_OBJECT
 
 	private:
-		//ZEArray<ZEParticleEmitter*>			Emitters;
-		ZEArray<ZEParticleSystem*>			Systems;
-
+		ZEArray<ZEParticleEmitter*>			Emitters;
 	protected:
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
@@ -70,14 +67,10 @@ class ZEParticleEffect : public ZEEntity
 		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 		virtual void						Tick(float TimeElapsed);
 
-		/*const ZEArray<ZEParticleEmitter*>&	GetEmitters();
+		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
 		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);
-		void								RemoveEmitter(ZEParticleEmitter* Emitter);*/
-
-		const ZEArray<ZEParticleSystem*>&	GetSystems();
-		void								AddSystem(ZEParticleSystem* System);
-		void								RemoveSystem(ZEParticleSystem* System);
+		void								RemoveEmitter(ZEParticleEmitter* Emitter);
 
 		static ZEParticleEffect*			CreateInstance();
 
