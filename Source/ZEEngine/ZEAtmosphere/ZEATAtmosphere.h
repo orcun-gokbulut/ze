@@ -37,21 +37,26 @@
 
 #include "ZEGame/ZEEntity.h"
 
+#include "ZEMath/ZEVector.h"
 #include "ZEATAtmosphericScattering.h"
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
 
 class ZEATSun;
 class ZEATMoon;
+class ZELightDirectional;
 
 class ZEATAtmosphere : public ZEEntity
 {
 	private:
-		ZEATSun*					Sun;
-		
 		ZEATObserver				Observer;
 		ZEATAtmosphericScattering	AtmosphericScattering;
 		ZERNCommand					Command;
+		ZEVector3					LightDirection;
+		ZEATSun*					Sun;
+		ZEATMoon*					Moon;
+		ZELightDirectional*			SunLight;
+		ZELightDirectional*			MoonLight;
 
 		virtual bool				InitializeSelf();
 		virtual bool				DeinitializeSelf();
@@ -62,6 +67,9 @@ class ZEATAtmosphere : public ZEEntity
 
 		void						SetMultipleScattering(bool MultipleScattering);
 		bool						GetMultipleScattering();
+
+		void						SetLightDirection(const ZEVector3 LightDirection);
+		const ZEVector3&			GetLightDirection() const;
 
 									ZEATAtmosphere();
 		virtual						~ZEATAtmosphere();

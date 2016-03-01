@@ -68,7 +68,7 @@ class ZERNMap
 		bool							IsAvailable() const;
 
 		void							Load2D(const ZEString& FileName);
-		void							Load3D(const ZEString& FileName);
+		void							Load3D(const ZEString& FileName, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount);
 		void							LoadCube(const ZEString& FileName);
 
 		void							Write(ZEMLWriterNode& ParentNode, const ZEString& Name);

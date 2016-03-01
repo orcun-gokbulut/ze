@@ -125,7 +125,6 @@ float3 ZERNSSAO_Filter_PixelShader(float4 PositionViewport : SV_Position) : SV_T
 	
 	float Depth = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, TexCoord);
 	float3 Normal = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, TexCoord);
-	Normal = normalize(Normal);
 	
 	float3 ResultColor = 0.0f;
 	float TotalWeight = 0.0f;
@@ -135,7 +134,6 @@ float3 ZERNSSAO_Filter_PixelShader(float4 PositionViewport : SV_Position) : SV_T
 		
 		float SampleDepth = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, NeighborTexCoord);
 		float3 SampleNormal = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, NeighborTexCoord);
-		SampleNormal = normalize(SampleNormal);
 		
 		if(abs(Depth - SampleDepth) <= 0.2f && dot(Normal, SampleNormal) >= 0.8f)
 		{

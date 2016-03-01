@@ -61,9 +61,13 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	
 	float2 TextureDimensions = ZERNGBuffer_GetDimensions();
 	
-	float2 PixelPositionViewNormalized = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions);
-	float3 ViewDirection = ZERNTransformations_ViewToWorld(float4(PixelPositionViewNormalized, 1.0f, 0.0f));
-	ViewDirection = normalize(ViewDirection);
+	//float2 PixelPositionViewNormalized = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions);
+	//float3 ViewDirection = ZERNTransformations_ViewToWorld(float4(PixelPositionViewNormalized, DepthView, 0.0f));
+	//ViewDirection = normalize(ViewDirection);
+	
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions, DepthHomogeneous);
+	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
+	float3 ViewDirection = normalize(PositionWorld - ZERNView_Position);
 	
 	float3 LightDirectionWorld = -normalize(ZERNFastLightScattering_LightDirection);
 	
@@ -90,7 +94,10 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	
 	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);	
 	
-	return PixelColor * Extinction + Inscattering;
+	if (DepthHomogeneous != 0.0f)
+		return PixelColor * Extinction + Inscattering;
+	else
+		return 0.0f * Extinction + Inscattering;
 }
 
 #endif

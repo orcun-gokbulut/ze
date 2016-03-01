@@ -101,13 +101,3 @@ struct ZEATNutation
 	double Longtitude;
 	double Obliquity;
 };
-
-static inline double LimitDegreeTo_0_360(double Degree)
-{
-	ZEInt Multiplier = Degree / 360;
-
-	if(Degree < 0 && Multiplier == 0)
-		return (Degree + 360.0);
-
-	return (Degree - Multiplier * 360);
-}
