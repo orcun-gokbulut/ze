@@ -110,9 +110,9 @@ void ZERNMap::Load2D(const ZEString& FileName)
 	SetTextureResource(ZETexture2DResource::LoadSharedResource(FileName));
 }
 
-void ZERNMap::Load3D(const ZEString& FileName)
+void ZERNMap::Load3D(const ZEString& FileName, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount)
 {
-	SetTextureResource(ZETexture3DResource::LoadSharedResource(FileName, 1, 1));
+	SetTextureResource(ZETexture3DResource::LoadSharedResource(FileName, HorizontalTileCount, VerticalTileCount));
 }
 
 void ZERNMap::LoadCube(const ZEString& FileName)
@@ -214,7 +214,7 @@ ZERNMap::ZERNMap(const char* FileName, ZEGRTextureType Type, ZEGRSampler* Sample
 			break;
 
 		case ZEGR_TT_3D:
-			Load3D(FileName);
+			Load3D(FileName, 1, 1);
 			break;
 
 		case ZEGR_TT_CUBE:

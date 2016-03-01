@@ -191,14 +191,12 @@ bool ZERNFixedMaterial::UpdateConstantBuffer() const
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_CONSTANT_BUFFER))
 		return true;
 
-	Constants.AmbientColor = ZEVector3(0.3f);//(AmbientEnabled ? 1.0f : 0.0f) * AmbientFactor * AmbientColor;
+	Constants.AmbientColor = (AmbientEnabled ? 1.0f : 0.0f) * AmbientFactor * AmbientColor;
 	Constants.DiffuseColor = (DiffuseEnabled ? 1.0f : 0.0f) * DiffuseFactor * DiffuseColor;
 	Constants.SpecularColor = (SpecularEnabled ? 1.0f : 0.0f) * SpecularFactor * SpecularColor;
 	Constants.EmissiveColor = (EmissiveEnabled ? 1.0f : 0.0f) * EmissiveFactor * EmissiveColor;
 	Constants.ReflectionColor = (ReflectionEnabled ? 1.0f : 0.0f) * ReflectionFactor * ReflectionColor;
 	Constants.RefractionColor = (RefractionEnabled ? 1.0f : 0.0f) * RefractionFactor * RefractionColor;
-
-	Constants.SceneAmbientEnabled = false;
 
 	ConstantBuffer->SetData(&Constants);
 

@@ -499,7 +499,7 @@ float ZEATAtmosphericScattering::GetMultipleScattering() const
 	return UseMultipleScattering;
 }
 
-void ZEATAtmosphericScattering::PreProcess(ZEGRContext* Context)
+void ZEATAtmosphericScattering::PreProcess(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	if(!Update())
 		return;
@@ -511,25 +511,33 @@ void ZEATAtmosphericScattering::PreProcess(ZEGRContext* Context)
 		PrecomputeWithPixelShader(Context);
 	}
 
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
+	if (RenderTarget == NULL)
+		return;
+
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 	Context->SetRenderState(SkyLightingRenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, PrecomputedDensityBuffer);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, PrecomputedSkyAmbientBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 800.0f, 600.0f));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	Context->Draw(3, 0);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
 }
 
-void ZEATAtmosphericScattering::PostProcess(ZEGRContext* Context)
+void ZEATAtmosphericScattering::PostProcess(ZERNRenderer* Renderer, ZEGRContext* Context)
 {
 	if(!Update())
+		return;
+
+	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
+	if (RenderTarget == NULL)
 		return;
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
@@ -537,7 +545,7 @@ void ZEATAtmosphericScattering::PostProcess(ZEGRContext* Context)
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 800.0f, 600.0f));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	Context->Draw(3, 0);
 
@@ -559,4 +567,5 @@ ZEATAtmosphericScattering::ZEATAtmosphericScattering()
 
 ZEATAtmosphericScattering::~ZEATAtmosphericScattering()
 {
+
 }

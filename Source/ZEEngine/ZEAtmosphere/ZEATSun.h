@@ -39,6 +39,8 @@
 #include "ZEGame/ZEEntity.h"
 #include "ZEATCommon.h"
 
+class ZELightDirectional;
+
 class ZEATSun : public ZEEntity
 {
 	private:

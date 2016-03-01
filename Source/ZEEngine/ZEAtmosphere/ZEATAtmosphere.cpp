@@ -34,23 +34,46 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEATAtmosphere.h"
+
+#include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEATSun.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNStageGBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEATSun.h"
+#include "ZEATMoon.h"
+#include "ZERenderer/ZELightDirectional.h"
+#include "ZEGame\ZEMoon.h"
 
 bool ZEATAtmosphere::InitializeSelf()
 {
-	Sun = new ZEATSun();
-	Sun->SetIntensity(20.0f);
-	Sun->SetColor(ZEVector3::One);
-	Sun->SetObserver(Observer);
+	SunLight = ZELightDirectional::CreateInstance();
+	SunLight->SetName("SunLight");
+	SunLight->SetCastsShadow(true);
+	SunLight->SetCascadeCount(4);
+	SunLight->SetCascadeDistanceFactor(0.5f);
+	SunLight->SetShadowResolution(ZE_LSR_VERY_HIGH);
+	SunLight->SetShadowSampleCount(ZE_LSC_VERY_HIGH);
+	SunLight->SetShadowSampleLengthOffset(1.0f);
+	zeScene->AddEntity(SunLight);
 
-	AtmosphericScattering.SetLightIntensity(Sun->GetIntensity());
-	AtmosphericScattering.SetLightColor(Sun->GetColor());
+	MoonLight = ZELightDirectional::CreateInstance();
+	MoonLight->SetName("MoonLight");
+	MoonLight->SetCastsShadow(true);
+	MoonLight->SetCascadeCount(4);
+	MoonLight->SetCascadeDistanceFactor(0.5f);
+	MoonLight->SetShadowResolution(ZE_LSR_VERY_HIGH);
+	MoonLight->SetShadowSampleCount(ZE_LSC_VERY_HIGH);
+	MoonLight->SetShadowSampleLengthOffset(1.0f);
+	//zeScene->AddEntity(MoonLight);
+
+	Sun = new ZEATSun();
+	Moon = new ZEATMoon();
+
+	Moon->SetTextureFile("#R:\\ZEEngine\\ZEAtmosphere\\Textures\\MoonFrame.png", 53, 1);
+
 	AtmosphericScattering.SetMultipleScattering(true);
 	AtmosphericScattering.SetOrderCount(5);
 
@@ -63,15 +86,14 @@ bool ZEATAtmosphere::DeinitializeSelf()
 {
 	AtmosphericScattering.Deinitialize();
 
-	delete Sun;
-	Sun = NULL;
-
 	return true;
 }
 
 void ZEATAtmosphere::SetObserver(const ZEATObserver& Observer)
 {
 	this->Observer = Observer;
+	Sun->SetObserver(Observer);
+	Moon->SetObserver(Observer);
 }
 
 const ZEATObserver& ZEATAtmosphere::GetObserver() const
@@ -89,17 +111,24 @@ bool ZEATAtmosphere::GetMultipleScattering()
 	return AtmosphericScattering.GetMultipleScattering();
 }
 
+void ZEATAtmosphere::SetLightDirection(const ZEVector3 LightDirection)
+{
+	this->LightDirection = LightDirection;
+}
+
+const ZEVector3& ZEATAtmosphere::GetLightDirection() const
+{
+	return LightDirection;
+}
+
 ZEATAtmosphere::ZEATAtmosphere()
 {
-	Sun = NULL;
-
 	Command.Entity = this;
 	Command.StageMask = ZERN_STAGE_PRE_EFFECT | ZERN_STAGE_POST_EFFECT;
 }
 
 ZEATAtmosphere::~ZEATAtmosphere()
 {
-
 }
 
 ZEDrawFlags ZEATAtmosphere::GetDrawFlags() const
@@ -110,6 +139,45 @@ ZEDrawFlags ZEATAtmosphere::GetDrawFlags() const
 void ZEATAtmosphere::Tick(float Time)
 {
 	Sun->Tick(Time);
+	Moon->Tick(Time);
+
+	ZEVector3 SunDirection = Sun->GetDirection();
+	float SunAngularAttenuation = ZEMath::Clamp(0.15f + ZEVector3::DotProduct(-SunDirection, ZEVector3::UnitY), 0.0f, 0.9f);
+	bool Day = SunAngularAttenuation > 0.0f;
+
+	ZEVector3 MoonDirection = Moon->GetDirection();
+	float MoonAngularAttenuation = ZEMath::Saturate(ZEVector3::DotProduct(-MoonDirection, ZEVector3::UnitY));
+	bool MoonVisible = MoonAngularAttenuation > 0.0f;
+
+	ZEQuaternion SunRotation;
+	ZEQuaternion::CreateFromDirection(SunRotation, SunDirection);
+
+	ZEQuaternion MoonRotation;
+	ZEQuaternion::CreateFromDirection(MoonRotation, MoonDirection);
+
+	SunLight->SetWorldRotation(SunRotation);
+	SunLight->SetIntensity(5.0f);
+	SunLight->SetColor(ZEVector3::One);
+	SunLight->SetVisible(Day);
+
+	MoonLight->SetWorldRotation(MoonRotation);
+	MoonLight->SetColor(ZEVector3::One);
+	MoonLight->SetIntensity(0.3f);
+	MoonLight->SetVisible(false);
+	//MoonLight->SetVisible(!Day && MoonVisible);
+
+	//if (Day)
+	{
+		AtmosphericScattering.SetLightDirection(SunDirection);
+		AtmosphericScattering.SetLightIntensity(20.0f);
+		AtmosphericScattering.SetLightColor(ZEVector3::One);
+	}
+	//else if (MoonVisible)
+	//{
+	//	AtmosphericScattering.SetLightDirection(MoonDirection);
+	//	AtmosphericScattering.SetLightIntensity(2.0f);
+	//	AtmosphericScattering.SetLightColor(ZEVector3::One);
+	//}
 }
 
 bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
@@ -121,17 +189,14 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 
 void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
-	AtmosphericScattering.SetLightDirection(Sun->GetDirection());
-	//AtmosphericScattering.SetLightDirection(ZEVector3(-1.0f, -1.0f, 0.0f));
-
 	ZEUInt StageID = (Parameters->Stage->GetId() & Command->StageMask);
 
 	if(StageID == ZERN_STAGE_PRE_EFFECT)
 	{
-		AtmosphericScattering.PreProcess(Parameters->Context);
+		AtmosphericScattering.PreProcess(Parameters->Renderer, Parameters->Context);
 	}
 	else if(StageID == ZERN_STAGE_POST_EFFECT)
 	{
-		AtmosphericScattering.PostProcess(Parameters->Context);
+		AtmosphericScattering.PostProcess(Parameters->Renderer, Parameters->Context);
 	}
 }

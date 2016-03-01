@@ -60,7 +60,7 @@ cbuffer ZERNPrecomputingLightScattering_Constants									: register(b8)
 cbuffer ZERNPrecomputingLightScattering_PreConstants								: register(b9)
 {
 	float3			ZERNPrecomputingLightScattering_SunDirection;
-	float			ZERNPrecomputingLightScattering_Reserved1;
+	float			ZERNPrecomputingLightScattering_SunIntensity;
 	float3			ZERNPrecomputingLightScattering_SunColor;
 	float			ZERNPrecomputingLightScattering_Reserved2;
 };
@@ -323,18 +323,19 @@ float3 ZERNPrecomputingLightScattering_SkyAmbient_PixelShader_Main(float4 Positi
 
 float3 ZERNPrecomputingLightScattering_SkyAmbientLighting_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
 	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
-	
-	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, DepthHomogeneous);
-	
-	if(PositionView.z > (ZERNView_FarZ - 10.0f))
+	if(DepthHomogeneous == 0.0f)
 		return 0.0f;
 	
+	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, DepthHomogeneous);
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
+
+	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);	
+	float3 EarthToPosition = PositionWorld - EarthCenter;
+	float EarthToPositionLength = length(EarthToPosition);
 	
-	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);
-	float3 EarthNormal = normalize(PositionWorld - EarthCenter);
+	float3 EarthNormal = EarthToPosition / EarthToPositionLength;
 	float3 SunDirection = normalize(-ZERNPrecomputingLightScattering_SunDirection);
 	
 	float CosSunZenith = dot(SunDirection, EarthNormal) * 0.5f + 0.5f;
@@ -343,40 +344,33 @@ float3 ZERNPrecomputingLightScattering_SkyAmbientLighting_PixelShader_Main(float
 	TexCoord.y = 0.5f;
 	float3 SkyAmbientColor = ZERNPrecomputingLightScattering_SkyAmbientBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
 	
-	float HeightAboveEarth = length(PositionWorld - EarthCenter) - EARTH_RADIUS;
+	float HeightAboveEarth = EarthToPositionLength - EARTH_RADIUS;
 	TexCoord.x = HeightAboveEarth / ATMOSPHERE_HEIGHT;
 	TexCoord.y = CosSunZenith;
 	
 	float2 RayleighMieDensityToAtmosphere = ZERNPrecomputingLightScattering_DensityBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
+	
 	float3 RayleighExtinction = ZERNPrecomputingLightScattering_RayleighScatteringFactor.xyz * RayleighMieDensityToAtmosphere.x;
 	float3 MieExtinction = ZERNPrecomputingLightScattering_MieScatteringFactor.xyz * RayleighMieDensityToAtmosphere.y;
 	float3 TotalExtinction = exp(-(RayleighExtinction + MieExtinction));
 	
-	float3 SunColor = ZERNPrecomputingLightScattering_SunColor * TotalExtinction;
-	float3 SkyAmbient = ZERNPrecomputingLightScattering_SunColor * SkyAmbientColor;
+	float3 SunColor = ZERNPrecomputingLightScattering_SunColor * 5.0f * TotalExtinction;
+	float3 SkyAmbient = ZERNPrecomputingLightScattering_SunColor * 5.0f * SkyAmbientColor;
 	
 	ZERNShading_Surface Surface;
 	Surface.PositionView = PositionView;
 	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);
-	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy);
-	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PositionViewport.xy);
 	
 	float3 SunDirectionView = ZERNTransformations_WorldToView(float4(SunDirection, 0.0f));
 	SunDirectionView = normalize(SunDirectionView);
 	
 	float NdotL = max(0.0f, dot(Surface.NormalView, SunDirectionView));
+	//float ENdotL = saturate(dot(EarthNormal, SunDirection) * 0.5f + 0.5f);
 	
-	float3 DiffuseColor = NdotL * Surface.Diffuse * SunColor;
-	
-	float3 ViewDirection = normalize(-Surface.PositionView);
-	float3 HalfVector = normalize(ViewDirection + SunDirectionView);
-	float NdotH = max(0.0f, dot(Surface.NormalView, HalfVector));
-	
-	float3 SpecularColor = pow(NdotH, Surface.SpecularPower) * Surface.Specular * SunColor;
-	
-	float3 AmbientColor = Surface.Diffuse * SkyAmbient;
-	
-	return (AmbientColor + DiffuseColor + SpecularColor);
+	float3 DiffuseColor = Surface.Diffuse;
+	return 0.0f;
+	//return DiffuseColor * SkyAmbient; //DiffuseColor * (SunColor * NdotL + SkyAmbient);
 }
+
 #endif

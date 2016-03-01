@@ -147,8 +147,8 @@ class ZEATAtmosphericScattering : public ZEInitializable
 		void							SetMultipleScattering(bool UseMultipleScattering);
 		float							GetMultipleScattering() const;
 
-		void							PreProcess(ZEGRContext* Context);
-		void							PostProcess(ZEGRContext* Context);
+		void							PreProcess(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void							PostProcess(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 										ZEATAtmosphericScattering();
 		virtual							~ZEATAtmosphericScattering();

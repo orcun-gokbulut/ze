@@ -76,6 +76,8 @@ ze_add_source(ZERNFixedMaterial.cpp 				Sources)
 ze_add_source(ZERNFixedMaterial.h 					Sources Headers ZEMC)
 ze_add_source(ZERNParticleMaterial.cpp 				Sources)
 ze_add_source(ZERNParticleMaterial.h 				Sources Headers ZEMC)
+ze_add_source(ZERNAtmosphereMaterial.cpp			Sources)
+ze_add_source(ZERNAtmosphereMaterial.h 				Sources Headers)
 
 ze_add_source(ZERNStage.h 							Sources Headers)
 ze_add_source(ZERNStage.cpp 						Sources)

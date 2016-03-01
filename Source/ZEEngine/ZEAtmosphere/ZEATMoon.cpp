@@ -34,9 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEATMoon.h"
-#include "ZEATPeriodicTerms.h"
+
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEATPeriodicTerms.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZEGame/ZEMoon.h"
+
+static inline double LimitDegreeTo_0_360(double Degree)
+{
+	ZEInt Multiplier = Degree / 360;
+
+	if(Degree < 0 && Multiplier == 0)
+		return (Degree + 360.0);
+
+	return (Degree - Multiplier * 360);
+}
 
 ZEATJulian ZEATMoon::CalculateJulians()
 {
@@ -350,6 +364,16 @@ ZEATTopocentric ZEATMoon::CalculateTopocentrics(ZEATGeocentric Geocentric, ZEATJ
 	return Topocentric;
 }
 
+bool ZEATMoon::InitializeSelf()
+{
+	return true;
+}
+
+bool ZEATMoon::DeinitializeSelf()
+{
+	return true;
+}
+
 void ZEATMoon::SetColor(const ZEVector3& Color)
 {
 	this->Color = Color;
@@ -390,6 +414,16 @@ const ZEATObserver& ZEATMoon::GetObserver() const
 	return Observer;
 }
 
+void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
+{
+	Texture.Load3D(FileName, HorizTileCount, VertTileCount);
+}
+
+const ZEString& ZEATMoon::GetTextureFile() const
+{
+	return Texture.GetTextureFile();
+}
+
 void ZEATMoon::Tick(float ElapsedTime)
 {
 	ZEATJulian Julian = CalculateJulians();
@@ -404,6 +438,11 @@ void ZEATMoon::Tick(float ElapsedTime)
 	double ProjectionXZ = ZEAngle::Sin(RadianTopocentricZenith);
 
 	Direction = -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
+}
+
+void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+
 }
 
 ZEATMoon::ZEATMoon()

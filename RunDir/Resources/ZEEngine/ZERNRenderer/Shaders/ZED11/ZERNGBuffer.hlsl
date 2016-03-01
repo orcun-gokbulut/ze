@@ -160,7 +160,7 @@ float3 ZERNGBuffer_GetViewNormal(float2 ScreenPos)
 	Normal.xy =	ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0)).xy * 2.0f - 1.0f;
 	Normal.z = (ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w - 1.0f) * sqrt(1.0f - dot(Normal.xy, Normal.xy));
 	return Normal;*/
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).xyz * 2.0f - 1.0f;
+	return normalize(ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).xyz * 2.0f - 1.0f);
 }
 
 float3 ZERNGBuffer_GetViewNormal(SamplerState Sampler, float2 TexCoord)

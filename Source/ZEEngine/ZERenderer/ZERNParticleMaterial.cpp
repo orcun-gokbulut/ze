@@ -683,6 +683,8 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 	Context->SetRenderState(StageParticleRendering_RenderState);
+
+	return true;
 }
 
 void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
