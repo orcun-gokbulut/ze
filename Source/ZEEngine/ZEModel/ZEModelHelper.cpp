@@ -47,6 +47,11 @@ ZEModelHelperOwnerType ZEModelHelper::GetOwnerType() const
 	return OwnerType;
 }
 
+const ZEString& ZEModelHelper::GetUserDefinedProperties() const
+{
+	return HelperResource->UserDefinedProperties;
+}
+
 ZEModelMesh* ZEModelHelper::GetMeshOwner() const
 {
 	return OwnerMesh;

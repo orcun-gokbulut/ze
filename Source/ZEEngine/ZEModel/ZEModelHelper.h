@@ -79,6 +79,7 @@ class ZEModelHelper : public ZEObject
 		const char*							GetName() const;
 
 		ZEModelHelperOwnerType				GetOwnerType() const;
+		const ZEString&						GetUserDefinedProperties() const;
 
 		ZEModelMesh*						GetMeshOwner() const;
 		ZEModelBone*						GetBoneOwner() const;
