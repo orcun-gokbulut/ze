@@ -50,26 +50,23 @@
 
 static void CopyToTexture3D(ZEGRTexture3D* Texture, ZETextureData* TextureData)
 {
-	// Copy texture data into ZETexture3D
-	void* TargetBuffer	= NULL;
-	ZESize SlicePitch	= 0;
-	ZESize RowPitch		= 0;
+	ZEUInt Width = Texture->GetWidth();
+	ZEUInt Height = Texture->GetHeight();
+	ZEUInt Depth = Texture->GetDepth();
+	ZEUInt LevelCount = Texture->GetLevelCount();
+	const ZEGRFormatDefinition* FormatDefinition = ZEGRFormatDefinition::GetDefinition(Texture->GetFormat());
+	ZESize Size = Width * Height * Depth * 8;
 
-	// Get texture specs
-	ZESize SurfaceLevelCount	= (ZESize)TextureData->GetLevelCount();
-	ZESize TextureSurfaceCount	= (ZESize)TextureData->GetSurfaceCount();
+	unsigned char* SrcBuffer = new unsigned char[Size];
+	ZESize SrcRowPitch = Width * 8;
+	ZESize SrcDepthPitch = SrcRowPitch * Height;
+
+	for (ZEUInt I = 0; I < Depth; I++)
+		TextureData->GetSurfaces().GetItem(I).GetLevels().GetItem(0).CopyTo(SrcBuffer + (I * SrcDepthPitch), SrcRowPitch);
 	
-	/*for (ZESize Level = 0,  SurfaceIncrement = 1; Level < SurfaceLevelCount; ++Level, SurfaceIncrement *= 2)
-	{
-		Texture->Lock(&TargetBuffer, &RowPitch, &SlicePitch, (ZEUInt)Level);
+	Texture->UpdateSubResource(0, SrcBuffer, SrcRowPitch, SrcDepthPitch);
 
-		for (ZESize Surface = 0, SurfaceCopyCount = 0; Surface < TextureSurfaceCount; Surface += SurfaceIncrement, ++SurfaceCopyCount)
-		{
-			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo((void*)((ZEUInt8*)TargetBuffer + SlicePitch * SurfaceCopyCount), RowPitch);
-		}
-
-		Texture->Unlock((ZEUInt	)Level);
-	}*/
+	delete [] SrcBuffer;
 }
 
 const char* ZETexture3DResource::GetResourceType() const

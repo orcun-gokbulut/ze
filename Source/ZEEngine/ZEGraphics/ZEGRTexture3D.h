@@ -44,7 +44,7 @@ class ZEGRRenderTarget;
 class ZETextureData;
 
 class ZEGRTexture3D : public ZEGRTexture
- {
+{
 	protected:
 		ZEUInt										Width;
 		ZEUInt										Height;
@@ -53,18 +53,19 @@ class ZEGRTexture3D : public ZEGRTexture
 		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
 		virtual void								Deinitialize();	
 
-													ZEGRTexture3D();
+		ZEGRTexture3D();
+ 
+	public:
+		virtual ZEGRResourceType					GetResourceType() const;
+		virtual ZEGRTextureType						GetTextureType() const;
 
-	 public:
-		 virtual ZEGRResourceType					GetResourceType() const;
-		 virtual ZEGRTextureType					GetTextureType() const;
+		ZEUInt										GetWidth() const;
+		ZEUInt										GetHeight() const;
+		ZEUInt										GetDepth() const;
+		ZEVector3									GetPixelSize() const;
 
-		 ZEUInt										GetWidth() const;
-		 ZEUInt										GetHeight() const;
-		 ZEUInt										GetDepth() const;
-		 ZEVector3									GetPixelSize() const;
+		virtual bool								UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch) = 0;
 
 		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
-		
 		static ZEHolder<ZEGRTexture3D>				Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget = false, bool UAV = false);	
 };

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZERNSunMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,50 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#ifndef __ZERN_SUN_MATERIAL_H__
+#define __ZERN_SUN_MATERIAL_H__
 
-ze_add_source(ZEATAtmosphere.cpp			Sources)
-ze_add_source(ZEATAtmosphere.h				Sources Headers)
-ze_add_source(ZEATAtmosphericScattering.cpp	Sources)
-ze_add_source(ZEATAtmosphericScattering.h	Sources Headers)
-ze_add_source(ZEATSun.cpp					Sources)
-ze_add_source(ZEATSun.h						Sources Headers)
-ze_add_source(ZEATMoon.cpp					Sources)
-ze_add_source(ZEATMoon.h					Sources Headers)
-ze_add_source(ZEATPeriodicTerms.cpp			Sources)
-ze_add_source(ZEATPeriodicTerms.h			Sources Headers)
-ze_add_source(ZEATCommon.cpp				Sources)
-ze_add_source(ZEATCommon.h					Sources Headers)
-ze_add_source(ZEATAstronomy.cpp				Sources)
-ze_add_source(ZEATAstronomy.h				Sources Headers)
+#include "ZERNTransformations.hlsl"
 
-ze_add_library(TARGET ZEAtmosphere 
-	ZEMC ${ZEMC}
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+cbuffer ZERNSunMaterial_Constants	: register(b8)
+{
+	float2	ZERNSunMaterial_SunPositionScreen;
+	float2	ZERNSunMaterial_SunSizeScreen;
+};
+
+struct ZERNSunMaterial_RenderSun_VertexShader_Output
+{
+	float4 PositionProjection	: SV_Position;
+	float2 PositionProjectionXY	: TEXCOORD0;
+};
+
+struct ZERNSunMaterial_RenderSun_PixelShader_Input
+{
+	float4 PositionProjection	: SV_Position;
+	float2 PositionProjectionXY	: TEXCOORD0;
+};
+
+ZERNSunMaterial_RenderSun_VertexShader_Output ZERNSunMaterial_RenderSun_VertexShader_Main(uint VertexID : SV_VertexID)
+{
+	float2 Vertex = ((VertexID & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
+	
+	float2 SunVertexPositionScreen = ZERNSunMaterial_SunPositionScreen + Vertex * ZERNSunMaterial_SunSizeScreen;
+	
+	ZERNSunMaterial_RenderSun_VertexShader_Output Output;
+	Output.PositionProjection = float4(SunVertexPositionScreen, 0.0f, 1.0f);
+	Output.PositionProjectionXY = SunVertexPositionScreen;
+	
+	return Output;
+}
+
+float4 ZERNSunMaterial_RenderSun_PixelShader_Main(ZERNSunMaterial_RenderSun_PixelShader_Input Input) : SV_Target0
+{	
+	float2 VectorScreen = (Input.PositionProjectionXY - ZERNSunMaterial_SunPositionScreen) / ZERNSunMaterial_SunSizeScreen;
+	
+	return sqrt(saturate(1.0f - dot(VectorScreen, VectorScreen)));
+}
+
+#endif

@@ -700,7 +700,7 @@ ZERNStageHDR::ZERNStageHDR()
 	DirtyFlags.RaiseAll();
 
 	Constants.AutoKeyEnabled = ZEGR_FALSE;
-	Constants.BloomEnabled = ZEGR_TRUE;
+	Constants.BloomEnabled = ZEGR_FALSE;
 	Constants.Key = 0.55f;
 	Constants.WhiteLevel = 3.0f;
 	Constants.ToneMapOperator = ZERN_HTMO_REINHARD;

@@ -82,8 +82,8 @@ struct ZEATGeocentric
 {
 	double Longtitude;
 	double Latitude;
-	double SunRightAscension;
-	double SunDeclination;
+	double RightAscension;
+	double Declination;
 	double Distance;
 };
 
@@ -91,8 +91,8 @@ struct ZEATTopocentric
 {
 	double Zenith;
 	double Azimuth;
-	double SunRightAscension;
-	double SunDeclination;
+	double RightAscension;
+	double Declination;
 	double LocalHourAngle;
 };
 

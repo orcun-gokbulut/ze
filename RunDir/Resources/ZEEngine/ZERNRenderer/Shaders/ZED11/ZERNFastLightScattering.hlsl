@@ -92,12 +92,9 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	Inscattering -= Extinction * ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, RayEnd, ViewDirection, LightDirectionWorld, EarthCenter, PrevTexCoordY);
 	Inscattering *= ZERNFastLightScattering_Intensity;
 	
-	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);	
+	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
 	
-	if (DepthHomogeneous != 0.0f)
-		return PixelColor * Extinction + Inscattering;
-	else
-		return 0.0f * Extinction + Inscattering;
+	return PixelColor * Extinction + Inscattering;
 }
 
 #endif

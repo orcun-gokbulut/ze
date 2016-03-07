@@ -35,43 +35,46 @@
 
 #pragma once
 
-#include "ZEMath/ZEVector.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEATCommon.h"
 
-class ZELightDirectional;
+#include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEATCommon.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZERenderer/ZERNView.h"
+
+class ZERNSunMaterial;
 
 class ZEATSun : public ZEEntity
 {
 	private:
-		ZEVector3				Color;
-		ZEVector3				Direction;
-		float					Intensity;
-		ZEATObserver			Observer;
+		ZEHolder<ZERNSunMaterial>	Material;
+		ZERNCommand					Command;
+		ZEATObserver				Observer;
 
-		ZEATJulian				CalculateJulians();
-		ZEATHeliocentric		CalculateHeliocentrics(double JulianEphemerisMillennium);
-		ZEATNutation			CalculateNutations(double JulianEphemerisCentury);
-		double					CalculateTrueObliquityOfEcliptic(double JulianEphemerisMillennium, double ObliquityNutation);
-		ZEATGeocentric			CalculateGeocentrics(ZEATHeliocentric Heliocentric, double LongtitudeNutation, double TrueObliquity);
-		ZEATTopocentric			CalculateTopocentrics(ZEATGeocentric Geocentric, ZEATJulian Julian, double LongtitudeNutation, double TrueObliquity, double HeliocentricRadius);
+		ZEVector3					Color;
+		ZEVector3					Direction;
+		float						Intensity;
+
+		bool						CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector);
+
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 	public:
-		void					SetColor(const ZEVector3& Color);
-		const ZEVector3&		GetColor() const;
+		virtual ZEDrawFlags			GetDrawFlags() const;
 
-		void					SetDirection(const ZEVector3& Direction);
-		const ZEVector3&		GetDirection() const;
+		void						SetColor(const ZEVector3& Color);
+		const ZEVector3&			GetColor() const;
 
-		void					SetIntensity(float Intensity);
-		float					GetIntensity() const;
+		void						SetDirection(const ZEVector3& Direction);
+		const ZEVector3&			GetDirection() const;
 
-		void					SetObserver(const ZEATObserver& Observer);
-		const ZEATObserver&		GetObserver() const;
+		void						SetIntensity(float Intensity);
+		float						GetIntensity() const;
 
-								ZEATSun();
+		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
+		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		virtual ZEDrawFlags		GetDrawFlags() const;
-
-		virtual void			Tick(float ElapsedTime);
+									ZEATSun();
 };

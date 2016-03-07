@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZERNSunMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,28 +30,60 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+#pragma once
 
-ze_add_source(ZEATAtmosphere.cpp			Sources)
-ze_add_source(ZEATAtmosphere.h				Sources Headers)
-ze_add_source(ZEATAtmosphericScattering.cpp	Sources)
-ze_add_source(ZEATAtmosphericScattering.h	Sources Headers)
-ze_add_source(ZEATSun.cpp					Sources)
-ze_add_source(ZEATSun.h						Sources Headers)
-ze_add_source(ZEATMoon.cpp					Sources)
-ze_add_source(ZEATMoon.h					Sources Headers)
-ze_add_source(ZEATPeriodicTerms.cpp			Sources)
-ze_add_source(ZEATPeriodicTerms.h			Sources Headers)
-ze_add_source(ZEATCommon.cpp				Sources)
-ze_add_source(ZEATCommon.h					Sources Headers)
-ze_add_source(ZEATAstronomy.cpp				Sources)
-ze_add_source(ZEATAstronomy.h				Sources Headers)
+#include "ZERNMaterial.h"
 
-ze_add_library(TARGET ZEAtmosphere 
-	ZEMC ${ZEMC}
-	SOURCES ${Sources}
-	HEADERS ${Headers}
-	LIBS ZEFoundation)
+#include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+
+class ZERNSunMaterial : public ZERNMaterial
+{
+private:
+	mutable ZEFlags							DirtyFlags;
+
+	mutable ZEHolder<ZEGRShader>			VertexShader;
+	mutable ZEHolder<ZEGRShader>			PixelShader;
+	mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
+
+	ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+
+	struct 
+	{
+		ZEVector2							SunPositionScreen;
+		ZEVector2							SunSizeScreen;
+	} Constants;
+
+	bool									UpdateShaders() const;
+	bool									UpdateRenderState() const;
+	bool									UpdateConstantBuffer() const;
+
+	virtual bool							InitializeSelf();
+	virtual void							DeinitializeSelf();
+
+	ZERNSunMaterial();
+
+public:
+	virtual ZEUInt							GetStageMask() const;
+
+	void									SetSunPositionScreen(const ZEVector2& SunPositionScreen);
+	const ZEVector2&						GetSunPositionScreen() const;
+
+	void									SetSunSizeScreen(const ZEVector2& SunSizeScreen);
+	const ZEVector2&						GetSunSizeScreen() const;
+
+	virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+	virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+
+	virtual bool							Update() const;
+
+	static ZEHolder<ZERNSunMaterial>		CreateInstance();
+};

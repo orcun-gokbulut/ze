@@ -38,51 +38,48 @@
 #include "ZEGame/ZEEntity.h"
 
 #include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZERNMap.h"
+#include "ZERenderer/ZERNView.h"
 
-class ZETexture3DResource;
+class ZERNMoonMaterial;
 class ZERNRenderParameters;
 struct ZERNCullParameters;
 
 class ZEATMoon : public ZEEntity
 {
 	private:
-		ZEATObserver			Observer;
+		ZEHolder<ZERNMoonMaterial>	Material;
+		ZERNCommand					Command;
+		ZEATObserver				Observer;
 
-		ZERNMap					Texture;
-		ZEVector3				Color;
-		ZEVector3				Direction;
-		float					Intensity;
+		ZEVector3					Color;
+		ZEVector3					Direction;
+		float						Intensity;
 
-		ZEATJulian				CalculateJulians();
-		ZEATGeocentric			CalculateGeocentrics(double JulianEphemerisCentury, double LongtitudeNutation, double TrueObliquity);
-		ZEATNutation			CalculateNutations(double JulianEphemerisCentury);
-		double					CalculateTrueObliquityOfEcliptic(double JulianEphemerisMillennium, double ObliquityNutation);
-		ZEATTopocentric			CalculateTopocentrics(ZEATGeocentric Geocentric, ZEATJulian Julian, double LongtitudeNutation, double TrueObliquity);
+		bool						CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector);
 
-		virtual bool			InitializeSelf();
-		virtual bool			DeinitializeSelf();
+		virtual bool				InitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 	public:
-		void					SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
-		const ZEString&			GetTextureFile() const;
+		virtual ZEDrawFlags			GetDrawFlags() const;
 
-		void					SetColor(const ZEVector3& Color);
-		const ZEVector3&		GetColor() const;
+		void						SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		const ZEString&				GetTextureFile() const;
 
-		void					SetDirection(const ZEVector3& Direction);
-		const ZEVector3&		GetDirection() const;
+		void						SetColor(const ZEVector3& Color);
+		const ZEVector3&			GetColor() const;
 
-		void					SetIntensity(float Intensity);
-		float					GetIntensity() const;
+		void						SetDirection(const ZEVector3& Direction);
+		const ZEVector3&			GetDirection() const;
 
-		void					SetObserver(const ZEATObserver& Observer);
-		const ZEATObserver&		GetObserver() const;
+		void						SetIntensity(float Intensity);
+		float						GetIntensity() const;
 
-		virtual void			Tick(float ElapsedTime);
-		virtual void			Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
+		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-								ZEATMoon();
+									ZEATMoon();
 };

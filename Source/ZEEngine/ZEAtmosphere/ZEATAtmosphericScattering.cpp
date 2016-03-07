@@ -140,6 +140,8 @@ bool ZEATAtmosphericScattering::UpdateRenderState()
 	DepthStencilStateNoTestWrite.SetDepthTestEnable(false);
 	DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
 
+	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
+
 	ZEGRBlendState BlendStateAdditive;
 	BlendStateAdditive.SetBlendEnable(true);
 	ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
@@ -149,7 +151,6 @@ bool ZEATAtmosphericScattering::UpdateRenderState()
 	BlendRenderTargetAdditive.SetBlendEnable(true);
 	BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
 
-	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 	RenderState.SetBlendState(BlendStateAdditive);
 
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Texture3D.h
+ Zinek Engine - ZERNMoonMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,38 +35,68 @@
 
 #pragma once
 
-#include "ZEGraphics/ZEGRTexture3D.h"
-#include "ZED11ComponentBase.h"
+#include "ZERNMaterial.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+#include "ZERNMap.h"
 
-class ZEGRRenderTarget;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRSampler;
 
-class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
+class ZERNMoonMaterial : public ZERNMaterial
 {
-	friend class ZED11Module;
-	friend class ZED11Context;
-
 	private:
-		ID3D11Texture3D*							Texture3D;
-		ID3D11ShaderResourceView*					ResourceView;
-		ID3D11UnorderedAccessView*					UnorderedAccessView;
-		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>	RenderTargets;
+		mutable ZEFlags							DirtyFlags;
 
-		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
-		virtual void								Deinitialize();
+		mutable ZEHolder<ZEGRShader>			VertexShader;
+		mutable ZEHolder<ZEGRShader>			PixelShader;
+		mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
 
-													ZED11Texture3D();
-		virtual										~ZED11Texture3D();
+		ZEHolder<ZEGRSampler>					SamplerLinerClamp;
+		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+
+		ZERNMap									PhaseTexture;
+
+		struct 
+		{
+			ZEVector2							MoonPositionScreen;
+			ZEVector2							MoonSizeScreen;
+			float								MoonPhase;
+			ZEVector3							Reserved0;
+		} Constants;
+
+		bool									UpdateShaders() const;
+		bool									UpdateRenderState() const;
+		bool									UpdateConstantBuffer() const;
+
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
+
+												ZERNMoonMaterial();
 
 	public:
-		ID3D11Texture3D*							GetTexture() const;
-		ID3D11ShaderResourceView*					GetResourceView() const;
-		ID3D11UnorderedAccessView*					GetUnorderedAccessView() const;
+		virtual ZEUInt							GetStageMask() const;
 
-		virtual bool								UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch);
+		void									SetMoonPositionScreen(const ZEVector2& MoonPositionScreen);
+		const ZEVector2&						GetMoonPositionScreen() const;
 
-		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel) const;
+		void									SetMoonSizeScreen(const ZEVector2& MoonSizeScreen);
+		const ZEVector2&						GetMoonSizeScreen() const;
+
+		void									SetMoonPhase(float MoonPhase);
+		float									GetMoonPhase() const;
+
+		void									SetPhaseTextureFile(const ZEString& Filename, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount);
+		const ZEString&							GetPhaseTextureFile() const;
+
+		virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+
+		virtual bool							Update() const;
+
+		static ZEHolder<ZERNMoonMaterial>		CreateInstance();
 };

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZED11Texture3D.h
+ Zinek Engine - ZERNMoonMaterial.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,40 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_MOON_MATERIAL_H__
+#define __ZERN_MOON_MATERIAL_H__
 
-#include "ZEGraphics/ZEGRTexture3D.h"
-#include "ZED11ComponentBase.h"
+#include "ZERNTransformations.hlsl"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEPointer/ZEHolder.h"
-
-class ZEGRRenderTarget;
-
-class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
+cbuffer ZERNMoonMaterial_Constants	: register(b8)
 {
-	friend class ZED11Module;
-	friend class ZED11Context;
-
-	private:
-		ID3D11Texture3D*							Texture3D;
-		ID3D11ShaderResourceView*					ResourceView;
-		ID3D11UnorderedAccessView*					UnorderedAccessView;
-		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>	RenderTargets;
-
-		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
-		virtual void								Deinitialize();
-
-													ZED11Texture3D();
-		virtual										~ZED11Texture3D();
-
-	public:
-		ID3D11Texture3D*							GetTexture() const;
-		ID3D11ShaderResourceView*					GetResourceView() const;
-		ID3D11UnorderedAccessView*					GetUnorderedAccessView() const;
-
-		virtual bool								UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch);
-
-		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel) const;
+	float2	ZERNMoonMaterial_MoonPositionScreen;
+	float2	ZERNMoonMaterial_MoonSizeScreen;
+	float	ZERNMoonMaterial_MoonPhase;
+	float3	ZERNMoonMaterial_Reserved0;
 };
+
+struct ZERNMoonMaterial_RenderMoon_VertexShader_Output
+{
+	float4 PositionProjection	: SV_Position;
+	float2 PositionProjectionXY	: TEXCOORD0;
+	float2 Texcoord				: TEXCOORD1;
+};
+
+struct ZERNMoonMaterial_RenderMoon_PixelShader_Input
+{
+	float4 PositionProjection	: SV_Position;
+	float2 PositionProjectionXY	: TEXCOORD0;
+	float2 Texcoord				: TEXCOORD1;
+};
+
+SamplerState	ZERNMoonMaterial_SamplerLinearClamp	: register(s0);
+Texture3D		ZERNMoonMaterial_MoonTexture		: register(t5);
+
+ZERNMoonMaterial_RenderMoon_VertexShader_Output ZERNMoonMaterial_RenderMoon_VertexShader_Main(uint VertexID : SV_VertexID)
+{
+	float2 Vertex = ((VertexID & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
+	
+	float2 MoonVertexPositionScreen = ZERNMoonMaterial_MoonPositionScreen + Vertex * ZERNMoonMaterial_MoonSizeScreen;
+	
+	ZERNMoonMaterial_RenderMoon_VertexShader_Output Output;
+	Output.PositionProjection = float4(MoonVertexPositionScreen, 0.0f, 1.0f);
+	Output.PositionProjectionXY = MoonVertexPositionScreen;
+	Output.Texcoord = (uint2(VertexID + 1, VertexID) & uint2(1, 2)) >> uint2(0, 1);
+	
+	return Output;
+}
+
+float4 ZERNMoonMaterial_RenderMoon_PixelShader_Main(ZERNMoonMaterial_RenderMoon_PixelShader_Input Input) : SV_Target0
+{	
+	float2 VectorScreen = (Input.PositionProjectionXY - ZERNMoonMaterial_MoonPositionScreen) / ZERNMoonMaterial_MoonSizeScreen;
+	
+	float Value = sqrt(saturate(1.0f - dot(VectorScreen, VectorScreen)));
+	
+	return ZERNMoonMaterial_MoonTexture.SampleLevel(ZERNMoonMaterial_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoonMaterial_MoonPhase), 0.0f);
+}
+
+#endif
