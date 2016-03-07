@@ -42,55 +42,6 @@
 
 #include <d3d11.h>
 
-ID3D11Texture3D* ZED11Texture3D::GetTexture() const
-{
-	return Texture3D;
-}
-
-ID3D11ShaderResourceView* ZED11Texture3D::GetResourceView() const
-{
-	return ResourceView;
-}
-
-ID3D11UnorderedAccessView* ZED11Texture3D::GetUnorderedAccessView() const
-{
-	return UnorderedAccessView;
-}
-
-ZEHolder<const ZEGRRenderTarget> ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level) const
-{
-	zeDebugCheck(Texture3D == NULL, "Texture not created.");
-	zeCheckError(!GetIsRenderTarget(), NULL, "Texture is not created as a render target.");
-	zeCheckError(Level >= GetLevelCount(), NULL, "Texture dont have specified Mipmap level.");
-
-	// Create render target view
-	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
-	RenderTargetDesc.Format = ZED11Texture3D::ConvertFormat(GetFormat());
-	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
-	RenderTargetDesc.Texture3D.MipSlice = Level;
-	RenderTargetDesc.Texture3D.FirstWSlice = Depth;
-	RenderTargetDesc.Texture3D.WSize = 1;
-
-	ID3D11RenderTargetView* RenderTargetView = NULL;
-	HRESULT Result = GetDevice()->CreateRenderTargetView(Texture3D, &RenderTargetDesc, &RenderTargetView);
-	if(FAILED(Result))
-	{
-		zeError("D3D11 texture 3D render target creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-	
-	ZEHolder<ZEGRRenderTarget> RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
-	RenderTargets.Add(RenderTarget);
-
-	#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Render target view created. Texture3D: %p, MipLevel: %u, Width: %u, Height: %u, Depth: %u", 
-			this, Level, RenderTarget->Width, RenderTarget->Height, RenderTarget->Depth);
-	#endif
-
-	return RenderTarget;
-}
-
-
 bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt Level, ZEGRFormat Format, bool RenderTarget, bool UAV)
 {
 	zeDebugCheck(Texture3D != NULL, "Texture already created.");
@@ -106,15 +57,15 @@ bool ZED11Texture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUIn
 	BindFlags |= UAV ? D3D11_BIND_UNORDERED_ACCESS : 0;
 
 	D3D11_TEXTURE3D_DESC TextureDesc;
-	TextureDesc.MiscFlags = 0;
 	TextureDesc.Width = Width;
 	TextureDesc.Height = Height;
 	TextureDesc.Depth = Depth;
 	TextureDesc.MipLevels = Level;
+	TextureDesc.Format = ZED11Texture3D::ConvertFormat(Format);
 	TextureDesc.Usage = Usage;
 	TextureDesc.BindFlags = BindFlags;
 	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.Format = ZED11Texture3D::ConvertFormat(Format);
+	TextureDesc.MiscFlags = 0;
 
 	HRESULT Result = GetDevice()->CreateTexture3D(&TextureDesc, NULL, &Texture3D);
 	if (FAILED(Result))
@@ -170,4 +121,61 @@ ZED11Texture3D::ZED11Texture3D()
 
 ZED11Texture3D::~ZED11Texture3D()
 {
+}
+
+ID3D11Texture3D* ZED11Texture3D::GetTexture() const
+{
+	return Texture3D;
+}
+
+ID3D11ShaderResourceView* ZED11Texture3D::GetResourceView() const
+{
+	return ResourceView;
+}
+
+ID3D11UnorderedAccessView* ZED11Texture3D::GetUnorderedAccessView() const
+{
+	return UnorderedAccessView;
+}
+
+bool ZED11Texture3D::UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch)
+{
+	zeCheckError(DestLevel >= GetLevelCount(), false, "There is no such a texture level.");
+
+	GetMainContext()->UpdateSubresource(Texture3D, DestLevel, NULL, SrcData, SrcRowPitch, SrcDepthPitch);
+
+	return true;
+}
+
+ZEHolder<const ZEGRRenderTarget> ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Level) const
+{
+	zeDebugCheck(Texture3D == NULL, "Texture not created.");
+	zeCheckError(!GetIsRenderTarget(), NULL, "Texture is not created as a render target.");
+	zeCheckError(Level >= GetLevelCount(), NULL, "Texture dont have specified Mipmap level.");
+
+	// Create render target view
+	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
+	RenderTargetDesc.Format = ZED11Texture3D::ConvertFormat(GetFormat());
+	RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE3D;
+	RenderTargetDesc.Texture3D.MipSlice = Level;
+	RenderTargetDesc.Texture3D.FirstWSlice = Depth;
+	RenderTargetDesc.Texture3D.WSize = 1;
+
+	ID3D11RenderTargetView* RenderTargetView = NULL;
+	HRESULT Result = GetDevice()->CreateRenderTargetView(Texture3D, &RenderTargetDesc, &RenderTargetView);
+	if(FAILED(Result))
+	{
+		zeError("D3D11 texture 3D render target creation failed. ErrorCode: %d.", Result);
+		return NULL;
+	}
+	
+	ZEHolder<ZEGRRenderTarget> RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
+	RenderTargets.Add(RenderTarget);
+
+	#ifdef ZE_GRAPHIC_LOG_ENABLE
+	zeLog("Render target view created. Texture3D: %p, MipLevel: %u, Width: %u, Height: %u, Depth: %u", 
+			this, Level, RenderTarget->Width, RenderTarget->Height, RenderTarget->Depth);
+	#endif
+
+	return RenderTarget;
 }

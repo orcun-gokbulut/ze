@@ -74,6 +74,7 @@ bool ZERNStagePreProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZE
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
 
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	return true;
 }
