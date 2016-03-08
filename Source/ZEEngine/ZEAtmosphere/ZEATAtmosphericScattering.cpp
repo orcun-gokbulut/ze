@@ -288,7 +288,7 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 		PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
 		Context->SetRenderState(PrecomputeSingleScatteringRenderStateData);
-		Context->SetRenderTargets(1, &RenderTarget, NULL);
+		Context->SetRenderTargets(1, RenderTarget.GetPointerToPointer(), NULL);
 
 		Context->Draw(3, 0);
 	}
@@ -304,7 +304,8 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 	
 			Context->SetTexture(ZEGR_ST_PIXEL, 0, (S == 1) ? PrecomputedSingleScatteringBuffer : PrecomputedHighOrderInScatteringBuffer);
 			Context->SetTexture(ZEGR_ST_PIXEL, 3, RandomVectorsTexture);
-			Context->SetRenderTargets(1, &RenderTarget, NULL);
+			const ZEGRRenderTarget* RenderTarget3 = RenderTarget.GetPointer();
+			Context->SetRenderTargets(1, &RenderTarget3, NULL);
 			Context->SetRenderState(PrecomputeHighOrderScatteringRenderStateData);
 		
 			Context->Draw(3, 0);
@@ -318,7 +319,7 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 	
 			Context->SetTexture(ZEGR_ST_PIXEL, 1, PrecomputedHighOrderScatteringBuffer);
-			Context->SetRenderTargets(1, &RenderTarget, NULL);
+			Context->SetRenderTargets(1, RenderTarget.GetPointerToPointer(), NULL);
 			Context->SetRenderState(PrecomputeHighOrderInScatteringRenderStateData);
 	
 			Context->Draw(3, 0);
@@ -331,7 +332,7 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 	
 			Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedHighOrderInScatteringBuffer);
-			Context->SetRenderTargets(1, &RenderTarget, NULL);
+			Context->SetRenderTargets(1, RenderTarget.GetPointerToPointer(), NULL);
 			Context->SetRenderState(AddOrdersRenderStateData);
 	
 			Context->Draw(3, 0);
@@ -345,7 +346,7 @@ void ZEATAtmosphericScattering::PrecomputeWithPixelShader(ZEGRContext* Context)
 		PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 	
 		Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedSingleScatteringBuffer);
-		Context->SetRenderTargets(1, &RenderTarget, NULL);
+		Context->SetRenderTargets(1, RenderTarget.GetPointerToPointer(), NULL);
 		Context->SetRenderState(AddOrdersRenderStateData);
 	
 		Context->Draw(3, 0);

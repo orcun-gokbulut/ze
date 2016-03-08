@@ -339,7 +339,7 @@ void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	ZEGRContext* Context = Parameters->Context;
 	ConstantBuffer->SetData(&GetWorldTransform());
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->SetVertexBuffers(0, 1, &VertexBuffer);
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	ZEExtraRenderParameters* ExtraParameters = static_cast<ZEExtraRenderParameters*>(Command->ExtraParameters);
 	ExtraParameters->Material->SetupMaterial(Context, Parameters->Stage);

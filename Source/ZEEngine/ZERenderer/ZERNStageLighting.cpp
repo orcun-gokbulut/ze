@@ -428,7 +428,7 @@ bool ZERNStageLighting::SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Conte
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, DeferredLightConstantBuffer);
 
 	Context->SetRenderState(DeferredRenderState);
-	Context->SetVertexBuffers(0, 1, &DeferredLightVertexBuffer);
+	Context->SetVertexBuffers(0, 1, DeferredLightVertexBuffer.GetPointerToPointer());
 
 	ZELink<ZELight>* Link = DeferredLightList.GetFirst();
 	while(Link != NULL)

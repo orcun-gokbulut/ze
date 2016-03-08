@@ -66,7 +66,7 @@ ZEHolder<const ZEGRSampler> ZERNMap::GetSampler() const
 	return Sampler;
 }
 
-void ZERNMap::SetTexture(ZEGRTexture* Texture)
+void ZERNMap::SetTexture(const ZEGRTexture* Texture)
 {
 	this->Texture = Texture;
 	if (Resource != NULL)
