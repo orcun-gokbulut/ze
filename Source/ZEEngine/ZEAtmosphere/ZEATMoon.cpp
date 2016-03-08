@@ -50,8 +50,8 @@ bool ZEATMoon::CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutV
 	ZEVector3 MoonDirectionView;
 	Direction.NormalizeSelf();
 	ZEMatrix4x4::Transform3x3(MoonDirectionView, View.ViewTransform, -Direction);
-	float MoonPositionScreenX = MoonDirectionView.x * View.ProjectionTransform.M11;
-	float MoonPositionScreenY = MoonDirectionView.y * View.ProjectionTransform.M22;
+	float MoonPositionScreenX = MoonDirectionView.x * View.ProjectionTransform.M11 / MoonDirectionView.z;
+	float MoonPositionScreenY = MoonDirectionView.y * View.ProjectionTransform.M22 / MoonDirectionView.z;
 
 	if (MoonPositionScreenX >= -1.0f && MoonPositionScreenX <= 1.0f &&
 		MoonPositionScreenY >= -1.0f && MoonPositionScreenY <= 1.0f &&
@@ -89,16 +89,6 @@ ZEDrawFlags ZEATMoon::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-void ZEATMoon::SetColor(const ZEVector3& Color)
-{
-	this->Color = Color;
-}
-
-const ZEVector3& ZEATMoon::GetColor() const
-{
-	return Color;
-}
-
 void ZEATMoon::SetDirection(const ZEVector3& Direction)
 {
 	this->Direction = Direction;
@@ -109,14 +99,14 @@ const ZEVector3& ZEATMoon::GetDirection() const
 	return Direction;
 }
 
-void ZEATMoon::SetIntensity(float Intensity)
+void ZEATMoon::SetDiskRadius(float DiskRadius)
 {
-	this->Intensity = Intensity;
+	this->DiskRadius = DiskRadius;
 }
 
-float ZEATMoon::GetIntensity() const
+float ZEATMoon::GetDiskRadius() const
 {
-	return Intensity;
+	return DiskRadius;
 }
 
 void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
@@ -137,8 +127,7 @@ bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 	if (!CalculateMoonPositionScreen(View, MoonPositionScreen))
 		return false;
 
-	ZEVector2 MoonSizeScreen = ZEAngle::Tan(ZEAngle::ToRadian(0.55f * 0.5f)) * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
-	MoonSizeScreen *= 5.0f;
+	ZEVector2 MoonSizeScreen = DiskRadius * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
 
 	Material->SetMoonPositionScreen(MoonPositionScreen);
 	Material->SetMoonSizeScreen(MoonSizeScreen);
@@ -169,7 +158,5 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 
 ZEATMoon::ZEATMoon()
 {
-	Color = ZEVector3::One;
 	Direction = ZEVector3(0.0f, -1.0f, 0.0f);
-	Intensity = 1.0f;
 }

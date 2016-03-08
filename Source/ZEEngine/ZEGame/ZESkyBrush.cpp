@@ -34,13 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESkyBrush.h"
-#include "ZEGame/ZEScene.h"
-#include "ZERenderer/ZECamera.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZERenderer/ZELightDirectional.h"
-#include "ZETexture/ZETextureCubeResource.h"
 
-#include <string.h>
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRSampler.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZELightDirectional.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZETexture/ZETextureCubeResource.h"
+#include "ZERenderer/ZERNStagePostProcess.h"
+
+#define	ZERN_SBDF_SHADERS			1
+#define	ZERN_SBDF_RENDER_STATE		2
+#define	ZERN_SBDF_CONSTANT_BUFFER	4
 
 ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 {
@@ -49,25 +61,35 @@ ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 
 void ZESkyBrush::SetSkyBrightness(float Brightness)
 {
-	SkyBrightness = Brightness;
+	if (Constants.SkyBrightness == Brightness)
+		return;
+
+	Constants.SkyBrightness = Brightness;
+
+	DirtyFlags.RaiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
 }
 
 float ZESkyBrush::GetSkyBrightness() const
 {
-	return SkyBrightness;
+	return Constants.SkyBrightness;
 }
 
 void ZESkyBrush::SetSkyColor(const ZEVector3& Color)
 {
-	SkyColor = Color;
+	if (Constants.SkyColor == Color)
+		return;
+
+	Constants.SkyColor = Color;
+
+	DirtyFlags.RaiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
 }
 
 const ZEVector3& ZESkyBrush::GetSkyColor() const
 {
-	return SkyColor;
+	return Constants.SkyColor;
 }
 
-void ZESkyBrush::SetSkyTexture(const char* FileName)
+void ZESkyBrush::SetSkyTexture(const ZEString& FileName)
 {
 	if (SkyTexture != NULL)
 	{
@@ -86,10 +108,10 @@ void ZESkyBrush::SetSkyTexture(const char* FileName)
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
 }
 
-const char* ZESkyBrush::GetSkyTexture() const
+const ZEString& ZESkyBrush::GetSkyTexture() const
 {
 	if (SkyTexture == NULL)
-		return "";
+		return ZEString::Empty;
 	
 	return SkyTexture->GetFileName();
 }
@@ -98,12 +120,26 @@ bool ZESkyBrush::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
-	
+
+	SkyBox.AddBox(2.0f, 2.0, 2.0f);
+	VertexBuffer = SkyBox.CreateVertexBuffer();
+
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBufferTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+
+	ZEGRSamplerDescription SamplerDescriptionLinearWrap;
+	SamplerDescriptionLinearWrap.AddressU = ZEGR_TAM_WRAP;
+	SamplerDescriptionLinearWrap.AddressV = ZEGR_TAM_WRAP;
+	SamplerDescriptionLinearWrap.AddressW = ZEGR_TAM_WRAP;
+	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerDescriptionLinearWrap);
+
 	return true;
 }
 
 bool ZESkyBrush::DeinitializeSelf()
 {
+	DirtyFlags.RaiseAll();
+
 	if (SkyTexture != NULL)
 	{
 		SkyTexture->Release();
@@ -113,23 +149,131 @@ bool ZESkyBrush::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZESkyBrush::Tick(float Time)
+bool ZESkyBrush::UpdateShaders()
 {
+	if (!DirtyFlags.GetFlags(ZERN_SBDF_SHADERS))
+		return true;
 
+	ZEGRShaderCompileOptions Options;
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSkyBox.hlsl";
+	Options.Model = ZEGR_SM_5_0;
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNSkyBox_VertexShader_Main";
+	VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(VertexShader == NULL, false, "Skybox vertex shader cannot compile");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSkyBox_PixelShader_Main";
+	PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(PixelShader == NULL, false, "Skybox pixel shader cannot compile");
+
+	DirtyFlags.UnraiseFlags(ZERN_SBDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_SBDF_RENDER_STATE);
+	
+	return true;
+}
+
+bool ZESkyBrush::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZERN_SBDF_RENDER_STATE))
+		return true;
+
+	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
+
+	ZEGRRasterizerState RasterizerStateFrontCCW;
+	RasterizerStateFrontCCW.SetFrontIsCounterClockwise(true);
+	RenderState.SetRasterizerState(RasterizerStateFrontCCW);
+	
+	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
+
+	RenderStateData = RenderState.Compile();
+	zeCheckError(RenderStateData == NULL,false, "Skybox render state cannot compile");
+
+	DirtyFlags.UnraiseFlags(ZERN_SBDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZESkyBrush::UpdateConstantBuffers()
+{
+	if (!DirtyFlags.GetFlags(ZERN_SBDF_CONSTANT_BUFFER))
+		return true;
+
+	ConstantBuffer->SetData(&Constants);
+
+	DirtyFlags.UnraiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
+
+	return true;
+}
+
+bool ZESkyBrush::Update()
+{
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderStates())
+		return false;
+
+	if (!UpdateConstantBuffers())
+		return false;
+
+	return true;
 }
 
 ZESkyBrush::ZESkyBrush()
 {
-	SkyMaterial = NULL;
+	DirtyFlags.RaiseAll();
+
 	SkyTexture = NULL;
-	SkyColor = ZEVector3::One;
-	SkyBrightness = 1.0f;
-	SkyBox.AddBox(2.0f, 2.0, 2.0f);
+	Constants.SkyColor = ZEVector3::One;
+	Constants.SkyBrightness = 1.0f;
+
+	SkyRenderCommand.Entity = this;
+	SkyRenderCommand.StageMask = ZERN_STAGE_POST_EFFECT;
 }
 
 ZESkyBrush::~ZESkyBrush()
 {
 
+}
+
+bool ZESkyBrush::PreRender(const ZERNCullParameters* CullParameters)
+{
+	CullParameters->Renderer->AddCommand(&SkyRenderCommand);
+
+	return true;
+}
+
+void ZESkyBrush::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	if (!Update())
+		return;
+
+	ZEVector3 CameraPositionWorld = Parameters->View->Position;
+	ZEMatrix4x4 WorldMatrix;
+	ZEMatrix4x4::CreateOrientation(WorldMatrix, CameraPositionWorld, ZEVector3::One);
+
+	ConstantBufferTransform->SetData(&WorldMatrix);
+
+	ZEGRContext* Context = Parameters->Context;
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferTransform);
+	Context->SetRenderState(RenderStateData);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture->GetTexture());
+	Context->SetVertexBuffers(0, 1, &VertexBuffer);
+
+	Context->Draw(VertexBuffer->GetVertexCount(), 0);
+
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 }
 
 ZESkyBrush* ZESkyBrush::CreateInstance()

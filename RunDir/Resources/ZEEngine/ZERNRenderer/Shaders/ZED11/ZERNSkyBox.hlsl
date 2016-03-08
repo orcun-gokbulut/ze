@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNMoonMaterial.hlsl
+ Zinek Engine - ZERNSkyBox.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,48 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_MOON_MATERIAL_H__
-#define __ZERN_MOON_MATERIAL_H__
+#ifndef __ZERN_SKY_BOX_H__
+#define __ZERN_SKY_BOX_H__
 
 #include "ZERNTransformations.hlsl"
+#include "ZERNShaderSlots.hlsl"
 
-cbuffer ZERNMoonMaterial_Constants	: register(b8)
+cbuffer ZERNSkyBox_Constants						: register(b8)
 {
-	float2	ZERNMoonMaterial_MoonPositionScreen;
-	float2	ZERNMoonMaterial_MoonSizeScreen;
-	float	ZERNMoonMaterial_MoonPhase;
-	float3	ZERNMoonMaterial_Reserved0;
+	float3			ZERNSkyBox_SkyColor;
+	float			ZERNSkyBox_SkyBrightness;	
 };
 
-struct ZERNMoonMaterial_RenderMoon_VertexShader_Output
+cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	float4 PositionProjection	: SV_Position;
-	float2 PositionProjectionXY	: TEXCOORD0;
-	float2 Texcoord				: TEXCOORD1;
+	float4x4		ZERNSkyBox_WorldTransform;
 };
 
-struct ZERNMoonMaterial_RenderMoon_PixelShader_Input
+SamplerState		ZERNSkyBox_SamplerLinearWrap	: register(s0);
+TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
+
+struct ZERNSkyBox_VertexShader_Output 
 {
-	float4 PositionProjection	: SV_Position;
-	float2 PositionProjectionXY	: TEXCOORD0;
-	float2 Texcoord				: TEXCOORD1;
+	float4			Position		: SV_Position;
+	float3			CubeTexcoord	: TEXCOORD0;
 };
 
-SamplerState	ZERNMoonMaterial_SamplerLinearClamp	: register(s0);
-Texture3D		ZERNMoonMaterial_MoonTexture		: register(t5);
-
-ZERNMoonMaterial_RenderMoon_VertexShader_Output ZERNMoonMaterial_RenderMoon_VertexShader_Main(uint VertexID : SV_VertexID)
+ZERNSkyBox_VertexShader_Output ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
 {
-	float2 Vertex = ((VertexID & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
-	
-	float2 MoonVertexPositionScreen = ZERNMoonMaterial_MoonPositionScreen + Vertex * ZERNMoonMaterial_MoonSizeScreen;
-	
-	ZERNMoonMaterial_RenderMoon_VertexShader_Output Output;
-	Output.PositionProjection = float4(MoonVertexPositionScreen, 0.0f, 1.0f);
-	Output.PositionProjectionXY = MoonVertexPositionScreen;
-	Output.Texcoord = (uint2(VertexID + 1, VertexID) & uint2(1, 2)) >> uint2(0, 1);
+	ZERNSkyBox_VertexShader_Output Output;
+
+	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Position, 1.0f));
+	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
+	Output.Position.z = 0.0f;
+	Output.Position.w = 1.0f;
+	Output.CubeTexcoord = Position.xyz;
 	
 	return Output;
 }
 
-float4 ZERNMoonMaterial_RenderMoon_PixelShader_Main(ZERNMoonMaterial_RenderMoon_PixelShader_Input Input) : SV_Target0
-{	
-	float2 VectorScreen = (Input.PositionProjectionXY - ZERNMoonMaterial_MoonPositionScreen) / ZERNMoonMaterial_MoonSizeScreen;
-	if(dot(VectorScreen, VectorScreen) <= 1.0f)
-		return ZERNMoonMaterial_MoonTexture.SampleLevel(ZERNMoonMaterial_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoonMaterial_MoonPhase), 0.0f);
-	else
-		return 0.0f;
+float3 ZERNSkyBox_PixelShader_Main(float4 PositionViewport : SV_Position, float3 CubeTexcoord : TEXCOORD0) : SV_Target0
+{
+	return ZERNSkyBox_SkyBrightness * ZERNSkyBox_SkyColor * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, normalize(CubeTexcoord), 0.0f);
 }
 
 #endif
