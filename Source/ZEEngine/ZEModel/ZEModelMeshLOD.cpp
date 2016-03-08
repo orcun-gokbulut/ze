@@ -95,13 +95,13 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 
 		ConstantBufferSkin->SetData(&BoneTransforms[0]);
 
-		Context->SetVertexBuffers(0, 1, &VertexBufferSkin);
+		Context->SetVertexBuffers(0, 1, VertexBufferSkin.GetPointerToPointer());
 		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_SKIN, ConstantBufferSkin);
 		ConstantBuffer->SetData(&Owner->GetWorldTransform());
 	}
 	else
 	{
-		Context->SetVertexBuffers(0, 1, &VertexBuffer);
+		Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 		ConstantBuffer->SetData(&OwnerMesh->GetWorldTransform());
 	}
 

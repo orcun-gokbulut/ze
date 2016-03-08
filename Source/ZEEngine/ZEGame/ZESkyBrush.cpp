@@ -265,7 +265,7 @@ void ZESkyBrush::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	Context->SetRenderState(RenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture->GetTexture());
-	Context->SetVertexBuffers(0, 1, &VertexBuffer);
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	Context->Draw(VertexBuffer->GetVertexCount(), 0);
 

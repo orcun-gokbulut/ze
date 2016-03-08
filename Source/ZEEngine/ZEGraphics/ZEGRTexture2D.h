@@ -39,6 +39,7 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;

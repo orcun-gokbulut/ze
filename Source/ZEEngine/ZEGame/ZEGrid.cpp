@@ -287,7 +287,7 @@ void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* C
 
 	Material->SetupMaterial(Context, Parameters->Stage);
 
-	Context->SetVertexBuffers(0, 1, &VertexBuffer);
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	if (AxisEnabled)
 	{

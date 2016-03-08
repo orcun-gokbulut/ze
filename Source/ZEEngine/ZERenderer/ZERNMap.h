@@ -57,7 +57,7 @@ class ZERNMap
 		void							SetSampler(ZEHolder<const ZEGRSampler> Sampler);
 		ZEHolder<const ZEGRSampler>		GetSampler() const;
 
-		void							SetTexture(ZEGRTexture* Texture);
+		void							SetTexture(const ZEGRTexture* Texture);
 		ZEHolder<const ZEGRTexture>		GetTexture() const;
 
 		void							SetTextureResource(ZETextureResource* Resource);

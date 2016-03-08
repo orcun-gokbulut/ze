@@ -47,6 +47,7 @@ class ZEHolder
 	public:
 		bool						IsNull() const;
 		Type*						GetPointer() const;
+		Type**						GetPointerToPointer() const;
 
 		void						Assign(Type* RawPointer);
 		void						Release();
@@ -60,7 +61,6 @@ class ZEHolder
 
 		Type&						operator*() const;
 		Type*						operator->() const;
-		Type**						operator&() const;
 
 		ZEHolder<Type>&				operator=(Type* Source);
 		ZEHolder<Type>&				operator=(const ZEHolder<Type>& Source);
@@ -99,6 +99,12 @@ template<typename Type>
 Type* ZEHolder<Type>::GetPointer() const
 {
 	return static_cast<Type*>(const_cast<ZEReferenceCounted*>(Pointer));
+}
+
+template<typename Type>
+Type** ZEHolder<Type>::GetPointerToPointer() const
+{
+	return (Type**)&Pointer;
 }
 
 template<typename Type>
@@ -168,13 +174,6 @@ Type* ZEHolder<Type>::operator->() const
 {
 	zeDebugCheck(Pointer == NULL, "Holder does not points any data structure.");
 	return GetPointer();
-}
-
-template<typename Type>
-Type** ZEHolder<Type>::operator&() const
-{
-	zeDebugCheck(Pointer == NULL, "Holder does not points any data structure.");
-	return (Type**)&Pointer;
 }
 
 template<typename Type>

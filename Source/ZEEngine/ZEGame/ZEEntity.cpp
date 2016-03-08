@@ -222,6 +222,7 @@ bool ZEEntity::DeinitializeSelf()
 ZEEntity::ZEEntity()
 {
 	Owner = NULL;
+	Name.Clear();
 	OwnerScene = NULL;
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
