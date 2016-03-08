@@ -93,8 +93,9 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	Inscattering *= ZERNFastLightScattering_Intensity;
 	
 	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
+	float3 Color = PixelColor * Extinction;
 	
-	return PixelColor * Extinction + Inscattering;
+	return (DepthHomogeneous != 0.0f) ? Color : Color + Inscattering;
 }
 
 #endif

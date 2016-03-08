@@ -87,16 +87,6 @@ ZEDrawFlags ZEATSun::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-void ZEATSun::SetColor(const ZEVector3& Color)
-{
-	this->Color = Color;
-}
-
-const ZEVector3& ZEATSun::GetColor() const
-{
-	return Color;
-}
-
 void ZEATSun::SetDirection(const ZEVector3& Direction)
 {
 	this->Direction = Direction;
@@ -107,14 +97,14 @@ const ZEVector3& ZEATSun::GetDirection() const
 	return Direction;
 }
 
-void ZEATSun::SetIntensity(float Intensity)
+void ZEATSun::SetDiskRadius(float DiskRadius)
 {
-	this->Intensity = Intensity;
+	this->DiskRadius = DiskRadius;
 }
 
-float ZEATSun::GetIntensity() const
+float ZEATSun::GetDiskRadius() const
 {
-	return Intensity;
+	return DiskRadius;
 }
 
 bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
@@ -125,8 +115,7 @@ bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 	if (!CalculateSunPositionScreen(View, SunPositionScreen))
 		return false;
 
-	ZEVector2 SunSizeScreen = ZEAngle::Tan(ZEAngle::ToRadian(0.53f * 0.5f)) * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
-	SunSizeScreen *= 3.0f;
+	ZEVector2 SunSizeScreen = DiskRadius * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
 
 	Material->SetSunPositionScreen(SunPositionScreen);
 	Material->SetSunSizeScreen(SunSizeScreen);
@@ -156,7 +145,5 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 
 ZEATSun::ZEATSun()
 {
-	Color = ZEVector3::One;
 	Direction = ZEVector3(0.0f, -1.0f, 0.0f);
-	Intensity = 1.0f;
 }

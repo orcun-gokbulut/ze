@@ -52,7 +52,7 @@ class ZEATAtmosphere : public ZEEntity
 		ZEATObserver				Observer;
 		ZEATAtmosphericScattering	AtmosphericScattering;
 		ZERNCommand					Command;
-		ZEVector3					LightDirection;
+
 		ZEATSun*					Sun;
 		ZEATMoon*					Moon;
 		ZELightDirectional*			SunLight;
@@ -61,23 +61,21 @@ class ZEATAtmosphere : public ZEEntity
 		virtual bool				InitializeSelf();
 		virtual bool				DeinitializeSelf();
 
+									ZEATAtmosphere();
+		virtual						~ZEATAtmosphere();
+
 	public:
+		virtual ZEDrawFlags			GetDrawFlags() const;
+
 		void						SetObserver(const ZEATObserver& Observer);
 		const ZEATObserver&			GetObserver() const;
 
 		void						SetMultipleScattering(bool MultipleScattering);
 		bool						GetMultipleScattering();
 
-		void						SetLightDirection(const ZEVector3 LightDirection);
-		const ZEVector3&			GetLightDirection() const;
-
-									ZEATAtmosphere();
-		virtual						~ZEATAtmosphere();
-
-		virtual ZEDrawFlags			GetDrawFlags() const;
-
 		virtual void				Tick(float Time);
-
 		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
 		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+		static ZEATAtmosphere*		CreateInstance();
 };

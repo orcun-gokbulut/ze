@@ -49,6 +49,9 @@
 #include "ZEATSun.h"
 #include "ZEATMoon.h"
 #include "ZEATAstronomy.h"
+#include "ZEMath/ZEAngle.h"
+
+#define EARTH_RADIUS	6371000.0f	//In meters
 
 bool ZEATAtmosphere::InitializeSelf()
 {
@@ -56,33 +59,27 @@ bool ZEATAtmosphere::InitializeSelf()
 	SunLight->SetName("SunLight");
 	SunLight->SetCastsShadow(true);
 	SunLight->SetCascadeCount(4);
-	SunLight->SetCascadeDistanceFactor(0.5f);
 	SunLight->SetShadowResolution(ZE_LSR_VERY_HIGH);
 	SunLight->SetShadowSampleCount(ZE_LSC_VERY_HIGH);
-	SunLight->SetShadowSampleLengthOffset(1.0f);
-	zeScene->AddEntity(SunLight);
+	//zeScene->AddEntity(SunLight);
 
 	MoonLight = ZELightDirectional::CreateInstance();
 	MoonLight->SetName("MoonLight");
 	MoonLight->SetCastsShadow(true);
 	MoonLight->SetCascadeCount(4);
-	MoonLight->SetCascadeDistanceFactor(0.5f);
 	MoonLight->SetShadowResolution(ZE_LSR_VERY_HIGH);
 	MoonLight->SetShadowSampleCount(ZE_LSC_VERY_HIGH);
-	MoonLight->SetShadowSampleLengthOffset(1.0f);
-	zeScene->AddEntity(MoonLight);
+	//zeScene->AddEntity(MoonLight);
 
 	Sun = new ZEATSun();
 	zeScene->AddEntity(Sun);
 
 	Moon = new ZEATMoon();
 	zeScene->AddEntity(Moon);
-
 	Moon->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
 
 	AtmosphericScattering.SetMultipleScattering(true);
 	AtmosphericScattering.SetOrderCount(5);
-
 	AtmosphericScattering.Initialize();
 
 	return true;
@@ -113,16 +110,6 @@ void ZEATAtmosphere::SetMultipleScattering(bool MultipleScattering)
 bool ZEATAtmosphere::GetMultipleScattering()
 {
 	return AtmosphericScattering.GetMultipleScattering();
-}
-
-void ZEATAtmosphere::SetLightDirection(const ZEVector3 LightDirection)
-{
-	this->LightDirection = LightDirection;
-}
-
-const ZEVector3& ZEATAtmosphere::GetLightDirection() const
-{
-	return LightDirection;
 }
 
 ZEATAtmosphere::ZEATAtmosphere()
@@ -157,13 +144,23 @@ void ZEATAtmosphere::Tick(float Time)
 	ZEQuaternion MoonRotation;
 	ZEQuaternion::CreateFromDirection(MoonRotation, MoonDirection);
 
+	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
+
+	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
+	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
+
 	Sun->SetDirection(SunDirection);
+	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	SunLight->SetWorldRotation(SunRotation);
 	SunLight->SetIntensity(2.0f);
 	SunLight->SetColor(ZEVector3::One);
 	SunLight->SetVisible(Day);
 
+	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
+	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
+
 	Moon->SetDirection(MoonDirection);
+	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
 	MoonLight->SetWorldRotation(MoonRotation);
 	MoonLight->SetColor(ZEVector3::One);
 	MoonLight->SetIntensity(0.3f);
@@ -180,9 +177,6 @@ void ZEATAtmosphere::Tick(float Time)
 
 	ZEUInt SunsetHour = (ZEUInt)Sunset % 24;
 	ZEUInt SunsetMinute = (ZEUInt)(Sunset * 60.0) % 60;
-
-	float SunDiskRadius = ZEATAstronomy::GetSunDiskRadius(Observer);
-	float MoonDiskRadius = ZEATAstronomy::GetMoonDiskRadius(Observer);
 
 	if (Day)
 	{
@@ -222,4 +216,9 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	{
 		AtmosphericScattering.PostProcess(Parameters->Renderer, Parameters->Context);
 	}
+}
+
+ZEATAtmosphere* ZEATAtmosphere::CreateInstance()
+{
+	return new ZEATAtmosphere();
 }

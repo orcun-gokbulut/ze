@@ -36,35 +36,59 @@
 #pragma once
 
 #include "ZEEntity.h"
+
+#include "ZEDS/ZEString.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
 class ZETextureCubeResource;
-class ZESkyBoxMaterial;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRVertexBuffer;
+class ZEGRConstantBuffer;
+class ZEGRSampler;
 
 class ZESkyBrush : public ZEEntity
 {
 	ZE_OBJECT
 
 	private:
+		ZEFlags								DirtyFlags;
+
 		ZECanvas							SkyBox;
 		ZETextureCubeResource*				SkyTexture;
-		ZESkyBoxMaterial*					SkyMaterial;
 		ZERNCommand							SkyRenderCommand;
+		
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				PixelShader;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBufferTransform;
+		ZEHolder<ZEGRSampler>				SamplerLinearWrap;;
 
-		ZEVector3							SkyColor;
-		float								SkyBrightness;
+		struct  
+		{
+			ZEVector3						SkyColor;
+			float							SkyBrightness;
+		} Constants;
 
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
+
+		bool								UpdateShaders();
+		bool								UpdateRenderStates();
+		bool								UpdateConstantBuffers();
+		bool								Update();
 
 											ZESkyBrush();
 
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;
 
-		virtual void						SetSkyTexture(const char* FileName);
-		const char*							GetSkyTexture() const;
+		virtual void						SetSkyTexture(const ZEString& FileName);
+		const ZEString&						GetSkyTexture() const;
 	
 		virtual void						SetSkyBrightness(float Brightness);
 		float								GetSkyBrightness() const;
@@ -72,9 +96,10 @@ class ZESkyBrush : public ZEEntity
 		virtual void						SetSkyColor(const ZEVector3& Color);
 		const ZEVector3&					GetSkyColor() const;
 
-		virtual void						Tick(float Time);
-
 		virtual								~ZESkyBrush();
+
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZESkyBrush*					CreateInstance();
 

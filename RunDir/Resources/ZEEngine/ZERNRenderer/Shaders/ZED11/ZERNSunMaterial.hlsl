@@ -72,8 +72,7 @@ ZERNSunMaterial_RenderSun_VertexShader_Output ZERNSunMaterial_RenderSun_VertexSh
 float4 ZERNSunMaterial_RenderSun_PixelShader_Main(ZERNSunMaterial_RenderSun_PixelShader_Input Input) : SV_Target0
 {	
 	float2 VectorScreen = (Input.PositionProjectionXY - ZERNSunMaterial_SunPositionScreen) / ZERNSunMaterial_SunSizeScreen;
-	
-	return sqrt(saturate(1.0f - dot(VectorScreen, VectorScreen)));
+	return dot(VectorScreen, VectorScreen) <= 1.0f ? 1.0f : 0.0f;
 }
 
 #endif

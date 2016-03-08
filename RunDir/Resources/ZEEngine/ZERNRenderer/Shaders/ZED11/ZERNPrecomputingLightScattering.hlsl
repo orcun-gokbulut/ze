@@ -78,8 +78,8 @@ void ZERNPrecomputingLightScattering_MultiplyWithPhases(in float3 SunDirection, 
 
 	float3 PhaseRayleigh =  (3.0f / (16.0f * PI)) * (1.0f + CosAngle * CosAngle);
 	
-	float GG = 0.76f * 0.76f;
-	float G = 0.76f;
+	float GG = 0.5f * 0.5f;
+	float G = 0.5f;
 	float3 PhaseMie = (3.0f / (8.0f * PI)) * ((1.0f - GG) * (1.0f + CosAngle * CosAngle)) / ((2.0f + GG) * pow(1.0f + GG - 2.0f * G * CosAngle, 3.0f / 2.0f));
 	
 	RayleighInScattering *= PhaseRayleigh;

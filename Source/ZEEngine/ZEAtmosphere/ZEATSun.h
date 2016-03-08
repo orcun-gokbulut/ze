@@ -50,11 +50,9 @@ class ZEATSun : public ZEEntity
 	private:
 		ZEHolder<ZERNSunMaterial>	Material;
 		ZERNCommand					Command;
-		ZEATObserver				Observer;
 
-		ZEVector3					Color;
 		ZEVector3					Direction;
-		float						Intensity;
+		float						DiskRadius;
 
 		bool						CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector);
 
@@ -64,14 +62,11 @@ class ZEATSun : public ZEEntity
 	public:
 		virtual ZEDrawFlags			GetDrawFlags() const;
 
-		void						SetColor(const ZEVector3& Color);
-		const ZEVector3&			GetColor() const;
-
 		void						SetDirection(const ZEVector3& Direction);
 		const ZEVector3&			GetDirection() const;
 
-		void						SetIntensity(float Intensity);
-		float						GetIntensity() const;
+		void						SetDiskRadius(float DiskRadius);
+		float						GetDiskRadius() const;
 
 		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
 		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
