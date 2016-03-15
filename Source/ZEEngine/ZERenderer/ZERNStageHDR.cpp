@@ -41,8 +41,6 @@
 
 #include "ZERNStageID.h"
 #include "ZERNRenderer.h"
-#include "ZERNStageGBuffer.h"
-#include "ZERNStagePostProcess.h"
 #include "ZEGraphics/ZEGROutput.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRSampler.h"
@@ -167,13 +165,37 @@ bool ZERNStageHDR::UpdateConstantBuffer()
 	return true;
 }
 
+bool ZERNStageHDR::UpdateInputOutput()
+{
+	InputTexture = GetPrevOutput(ZERN_SO_COLOR);
+	if (InputTexture == NULL)
+		return false;
+
+	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
+	if (OutputRenderTarget == NULL)
+	{
+		// No Provided Output - Create Own Buffer
+		if (OutputTexture == NULL || OutputTexture->GetWidth() != InputTexture->GetWidth() || OutputTexture->GetHeight() != InputTexture->GetHeight())
+			OutputTexture = ZEGRTexture2D::CreateInstance(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+
+		OutputRenderTarget = OutputTexture->GetRenderTarget();
+	}
+	else
+	{
+		// Output is provided - Release own output texture and use provided one.
+		OutputTexture.Release();
+	}
+
+	return true;
+}
+
 bool ZERNStageHDR::UpdateTextures()
 {
 	if(!DirtyFlags.GetFlags(ZERN_HSDF_RESIZE))
 		return true;
 
-	ZEUInt CurrentWidth = OutputTexture->GetWidth();
-	ZEUInt CurrentHeight = OutputTexture->GetHeight();
+	ZEUInt CurrentWidth = OutputRenderTarget->GetWidth();
+	ZEUInt CurrentHeight = OutputRenderTarget->GetHeight();
 
 	ZEInt ExponentWidth = (ZEInt)(ZEMath::Log10((float)CurrentWidth) / ZEMath::Log10(2.0f));
 	ZEInt ExponentHeight = (ZEInt)(ZEMath::Log10((float)CurrentHeight) / ZEMath::Log10(2.0f));
@@ -228,10 +250,13 @@ bool ZERNStageHDR::Update()
 	if (!UpdateRenderStates())
 		return false;
 
-	if (!UpdateTextures())
+	if (!UpdateConstantBuffer())
 		return false;
 
-	if (!UpdateConstantBuffer())
+	if (!UpdateInputOutput())
+		return false;
+
+	if (!UpdateTextures())
 		return false;
 
 	return true;
@@ -386,35 +411,6 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* Input,
 	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
 }
 
-bool ZERNStageHDR::SetupInputOutput(ZERNRenderer* Renderer)
-{
-	ZERNStagePostProcess* StagePostProcess = static_cast<ZERNStagePostProcess*>(Renderer->GetStage(ZERN_STAGE_POST_EFFECT));
-	if (StagePostProcess != NULL)
-	{
-		InputTexture = StagePostProcess->GetOutputTexture();
-	}
-	else
-	{
-		ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-		if(StageGBuffer == NULL)
-			return false;
-
-		InputTexture = StageGBuffer->GetAccumulationMap();
-	}
-
-	ZEUInt Width = InputTexture->GetWidth();
-	ZEUInt Height = InputTexture->GetHeight();
-
-	if (OutputTexture == NULL || 
-		OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-	{
-		OutputTexture.Release();
-		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, InputTexture->GetFormat(), true);
-	}
-
-	return true;
-}
-
 bool ZERNStageHDR::InitializeSelf()
 {
 	if (!ZERNStage::InitializeSelf())
@@ -433,6 +429,10 @@ bool ZERNStageHDR::InitializeSelf()
 
 void ZERNStageHDR::DeinitializeSelf()
 {
+	InputTexture.Release();
+	OutputTexture.Release();
+	OutputRenderTarget.Release();
+
 	CurrentAdaptedLuminance.Release();
 	PreviousAdaptedLuminance.Release();
 
@@ -448,9 +448,6 @@ void ZERNStageHDR::DeinitializeSelf()
 	DownSampling_RenderState.Release();
 	CalculateBrightness_RenderState.Release();
 	ToneMapping_RenderState.Release();
-
-	InputTexture = NULL;
-	OutputTexture.Release();
 
 	Filter.Deinitialize();
 
@@ -500,7 +497,7 @@ float ZERNStageHDR::GetKey() const
 
 void ZERNStageHDR::SetAutoKey(bool AutoKeyEnabled)
 {
-	if (Constants.AutoKeyEnabled == static_cast<ZEBool32>(AutoKeyEnabled))
+	if ((bool)Constants.AutoKeyEnabled == AutoKeyEnabled)
 		return;
 
 	Constants.AutoKeyEnabled = static_cast<ZEBool32>(AutoKeyEnabled);
@@ -510,12 +507,12 @@ void ZERNStageHDR::SetAutoKey(bool AutoKeyEnabled)
 
 bool ZERNStageHDR::GetAutoKey() const
 {
-	return static_cast<ZEBool32>(Constants.AutoKeyEnabled);
+	return Constants.AutoKeyEnabled != ZEGR_FALSE;
 }
 
 void ZERNStageHDR::SetBloomEnabled(bool BloomEnabled)
 {
-	if (Constants.BloomEnabled == static_cast<ZEBool32>(BloomEnabled))
+	if ((bool)Constants.BloomEnabled == BloomEnabled)
 		return;
 
 	Constants.BloomEnabled = static_cast<ZEBool32>(BloomEnabled);
@@ -525,7 +522,7 @@ void ZERNStageHDR::SetBloomEnabled(bool BloomEnabled)
 
 bool ZERNStageHDR::GetBloomEnabled() const
 {
-	return static_cast<ZEBool32>(Constants.BloomEnabled);
+	return Constants.BloomEnabled != ZEGR_FALSE;
 }
 
 void ZERNStageHDR::SetBloomFactor(float BloomFactor)
@@ -633,21 +630,6 @@ ZERNHDRToneMapOperator ZERNStageHDR::GetToneMapOperator() const
 	return (ZERNHDRToneMapOperator)Constants.ToneMapOperator;
 }
 
-void ZERNStageHDR::SetInputTexture(const ZEGRTexture2D* Input)
-{
-	InputTexture = Input;
-}
-
-const ZEGRTexture2D* ZERNStageHDR::GetInputTexture() const
-{
-	return InputTexture;
-}
-
-ZEHolder<ZEGRTexture2D> ZERNStageHDR::GetOutputTexture() const
-{
-	return OutputTexture;
-}
-
 void ZERNStageHDR::SetBlurTextureSize(ZERNHDRBlurTextureSize BlurTextureSize)
 {
 	this->BlurTextureSize = BlurTextureSize;
@@ -658,12 +640,25 @@ ZERNHDRBlurTextureSize ZERNStageHDR::GetBlurTextureSize() const
 	return BlurTextureSize;
 }
 
-bool ZERNStageHDR::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+const ZEGRRenderTarget* ZERNStageHDR::GetProvidedInput(ZERNStageBuffer Input) const
 {
-	if (!ZERNStage::Setup(Renderer, Context, Commands))
-		return false;
+	if (GetEnabled() && (Input == ZERN_SO_COLOR))
+		return NULL;
 
-	if (!SetupInputOutput(Renderer))
+	return ZERNStage::GetProvidedInput(Input);
+}
+
+const ZEGRTexture2D* ZERNStageHDR::GetOutput(ZERNStageBuffer Output) const
+{
+	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_HDR))
+		return OutputTexture;
+
+	return ZERNStage::GetOutput(Output);
+}
+
+bool ZERNStageHDR::Setup(ZEGRContext* Context)
+{
+	if (!ZERNStage::Setup(Context))
 		return false;
 
 	if (!Update())
@@ -679,7 +674,7 @@ bool ZERNStageHDR::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<Z
 		ApplyBlur(Context, BrightTexture, BlurTextureFinal->GetRenderTarget());
 	}
 
-	ToneMapping(Context, InputTexture, OutputTexture->GetRenderTarget());
+	ToneMapping(Context, InputTexture, OutputRenderTarget);
 
 	ZEHolder<ZEGRTexture2D> Temporary = PreviousAdaptedLuminance;
 	PreviousAdaptedLuminance = CurrentAdaptedLuminance;
@@ -688,11 +683,11 @@ bool ZERNStageHDR::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<Z
 	return true;
 }
 
-void ZERNStageHDR::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStageHDR::CleanUp(ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 
-	ZERNStage::CleanUp(Renderer, Context);
+	ZERNStage::CleanUp(Context);
 }
 
 ZERNStageHDR::ZERNStageHDR()

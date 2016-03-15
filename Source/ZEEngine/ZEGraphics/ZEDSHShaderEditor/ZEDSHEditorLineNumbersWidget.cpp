@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRShaderCompiler.h
+ Zinek Engine - ZEDSHEditorLineNumbersWidget.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDSHEditorLineNumbersWidget.h"
+#include "ZEDSHEditorWidget.h"
 
-#include "ZEGRShaderCompileOptions.h"
-
-struct ZEGRShaderMeta;
-
-class ZEGRShaderCompiler
+void ZEDSHEditorLineNumbersWidget::paintEvent(QPaintEvent* Event) 
 {
-	public:
-		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
+	Editor->DrawLineNumbers(Event);
+}
 
-		static ZEGRShaderCompiler*	CreateInstance();
-};
+QSize ZEDSHEditorLineNumbersWidget::sizeHint() const 
+{
+	return QSize(Editor->lineNumberAreaWidth(), 0);
+}
+
+ZEDSHEditorLineNumbersWidget::ZEDSHEditorLineNumbersWidget(ZEDSHEditorWidget* Editor) : QWidget(Editor)
+{
+	this->Editor = Editor;
+}

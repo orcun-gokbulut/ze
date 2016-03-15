@@ -650,7 +650,7 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!Update())
 		return false;
 
-	if(Stage == NULL || !Stage->GetEnable())
+	if(Stage == NULL || !Stage->GetEnabled())
 		return false;
 
 	bool TextureSampler = false;

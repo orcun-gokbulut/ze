@@ -44,20 +44,21 @@ class ZEGRTexture2D;
 class ZERNStagePostProcess : public ZERNStage
 {
 	private:
-		ZEHolder<ZEGRTexture2D>			OutputTexture;
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
 
-		virtual void					DeinitializeSelf();
+		virtual void						DeinitializeSelf();
 
 	public:
-		virtual ZEInt					GetId() const;
-		virtual const ZEString&			GetName() const;
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
 
-		ZEGRTexture2D*					GetOutputTexture() const;
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input);
+		virtual const ZEGRTexture2D*		GetOutputTexture() const;
 
-										ZERNStagePostProcess();
+											ZERNStagePostProcess();
 
-		static ZEGRRenderState			GetRenderState();
+		static ZEGRRenderState				GetRenderState();
 };

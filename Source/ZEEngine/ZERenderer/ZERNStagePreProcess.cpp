@@ -41,7 +41,6 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 ZEInt ZERNStagePreProcess::GetId() const
 {
@@ -54,36 +53,31 @@ const ZEString& ZERNStagePreProcess::GetName() const
 	return Name;
 }
 
-bool ZERNStagePreProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+bool ZERNStagePreProcess::Setup(ZEGRContext* Context)
 {
-	if (!ZERNStage::Setup(Renderer, Context, Commands))
+	if (!ZERNStage::Setup(Context))
 		return false;
 
-	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if (StageGBuffer == NULL)
+	if (GetCommands().GetCount() == 0)
 		return false;
 
-	ZEGRTexture2D* AccumulationMap = StageGBuffer->GetAccumulationMap();
-	if (AccumulationMap == NULL)
+	const ZEGRTexture2D* AccumulationMap = GetPrevOutput(ZERN_SO_COLOR);
+	if(AccumulationMap == NULL)
 		return false;
 
-	ZEGRTexture2D* DepthMap = StageGBuffer->GetDepthMap();
-	if (DepthMap == NULL)
-		return false;
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, GetPrevOutput(ZERN_SO_DEPTH));
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, GetPrevOutput(ZERN_SO_NORMAL));
+	Context->SetTexture(ZEGR_ST_PIXEL, 3, GetPrevOutput(ZERN_SO_GBUFFER_DIFFUSE));
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, GetPrevOutput(ZERN_SO_GBUFFER_SPECULAR));
 
 	const ZEGRRenderTarget* RenderTarget = AccumulationMap->GetRenderTarget();
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
-
-	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)RenderTarget->GetWidth(), (float)RenderTarget->GetHeight()));
 
 	return true;
 }
 
-void ZERNStagePreProcess::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStagePreProcess::CleanUp(ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 
@@ -92,7 +86,7 @@ void ZERNStagePreProcess::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
 
-	ZERNStage::CleanUp(Renderer, Context);
+	ZERNStage::CleanUp(Context);
 }
 
 ZERNStagePreProcess::ZERNStagePreProcess()

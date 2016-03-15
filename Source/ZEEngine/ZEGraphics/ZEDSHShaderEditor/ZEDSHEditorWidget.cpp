@@ -34,9 +34,101 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSHEditorWidget.h"
-#include "ZEDSHSyntaxHighlighter.h"
 
-ZEDSHEditorWidget::ZEDSHEditorWidget(QWidget* Parent) : QTextEdit(Parent)
+#include "ZEDSHSyntaxHighlighter.h"
+#include "ZEDSHEditorLineNumbersWidget.h"
+
+#include <QtGui\QPainter>
+#include <QtGui\qevent.h>
+#include <QtCore\qglobal.h>
+
+void ZEDSHEditorWidget::HighlightCurrentLine()
+{
+	QList<QTextEdit::ExtraSelection> extraSelections;
+
+	if (!isReadOnly()) 
+	{
+		QTextEdit::ExtraSelection selection;
+
+		QColor lineColor = QColor(255, 248, 239);
+
+		selection.format.setBackground(lineColor);
+		selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+		selection.cursor = textCursor();
+		selection.cursor.clearSelection();
+		extraSelections.append(selection);
+	}
+
+	setExtraSelections(extraSelections);
+}
+
+void ZEDSHEditorWidget::resizeEvent(QResizeEvent *e)
+{
+	QPlainTextEdit::resizeEvent(e);
+
+	QRect cr = contentsRect();
+	LineNumbers->setGeometry(QRect(cr.left(), cr.top(), lineNumberAreaWidth(), cr.height()));
+}
+
+void ZEDSHEditorWidget::UpdateLineNumbers(const QRect &rect, int dy)
+{
+	if (dy)
+		LineNumbers->scroll(0, dy);
+	else
+		LineNumbers->update(0, rect.y(), LineNumbers->width(), rect.height());
+
+	if (rect.contains(viewport()->rect()))
+		UpdateLineNumbersWidth(0);
+}
+
+void ZEDSHEditorWidget::UpdateLineNumbersWidth(int)
+{
+	setViewportMargins(lineNumberAreaWidth(), 0, 0 , 0);
+}
+
+int ZEDSHEditorWidget::lineNumberAreaWidth()
+{
+	int digits = 1;
+	int max = qMax(1, blockCount());
+	while (max >= 10) 
+	{
+		max /= 10;
+		digits++;
+	}
+
+	int space = 25 + fontMetrics().width(QLatin1Char('9')) * digits;
+
+	return space;
+}
+
+void ZEDSHEditorWidget::DrawLineNumbers(QPaintEvent* Event)
+{
+	QPainter painter(LineNumbers);
+	painter.fillRect(Event->rect(), QColor(245, 245, 240));
+
+	QPen Pen(QColor(43, 145, 175));
+	QTextBlock block = firstVisibleBlock();
+	int blockNumber = block.blockNumber();
+	int top = (int) blockBoundingGeometry(block).translated(contentOffset()).top();
+	int bottom = top + (int) blockBoundingRect(block).height();
+
+	while (block.isValid() && top <= Event->rect().bottom()) 
+	{
+		if (block.isVisible() && bottom >= Event->rect().top())
+		{
+			QString number = QString::number(blockNumber + 1);
+			painter.setPen(Pen);
+			painter.drawText(0, top, LineNumbers->width() - 10, fontMetrics().height(), Qt::AlignRight, number);
+		}
+
+		block = block.next();
+		top = bottom;
+		bottom = top + (int) blockBoundingRect(block).height();
+		blockNumber++;
+	}
+}
+
+ZEDSHEditorWidget::ZEDSHEditorWidget(QWidget* Parent) : QPlainTextEdit(Parent)
 {
 	new ZEDSHSyntaxHightlighter(document());
 	setFont(QFont("Consolas", 10));
@@ -46,4 +138,13 @@ ZEDSHEditorWidget::ZEDSHEditorWidget(QWidget* Parent) : QTextEdit(Parent)
 	setTabStopWidth(tabStop * metrics.width(' '));
 
 	setWordWrapMode(QTextOption::NoWrap);
+
+	LineNumbers = new ZEDSHEditorLineNumbersWidget(this);
+
+	connect(this, SIGNAL(blockCountChanged(int)), this, SLOT(UpdateLineNumbersWidth(int)));
+	connect(this, SIGNAL(updateRequest(QRect,int)), this, SLOT(UpdateLineNumbers(QRect,int)));
+	connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(HighlightCurrentLine()));
+
+	UpdateLineNumbersWidth(0);
+	HighlightCurrentLine();
 }

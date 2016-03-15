@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRShaderCompiler.h
+ Zinek Engine - ZERNStageOutput.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,14 +35,15 @@
 
 #pragma once
 
-#include "ZEGRShaderCompileOptions.h"
+#include "ZERNStage.h"
 
-struct ZEGRShaderMeta;
-
-class ZEGRShaderCompiler
+class ZERNStageOutput : public ZERNStage
 {
 	public:
-		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
-		static ZEGRShaderCompiler*	CreateInstance();
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
+		
+		virtual void						CleanUp(ZEGRContext* Context);
 };

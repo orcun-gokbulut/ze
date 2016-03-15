@@ -63,8 +63,7 @@ class ZELink
 		const ZELink*						GetPrev() const;
 		ZELink*								GetNext();
 		const ZELink*						GetNext() const;
-		ZEItemType*							GetItem();
-		const ZEItemType*					GetItem() const;
+		ZEItemType*							GetItem() const;
 
 		// ZE_COPY_NO_ACTION
 		ZELink&								operator=(const ZELink& Other);
@@ -122,13 +121,7 @@ const ZELink<ZEItemType>* ZELink<ZEItemType>::GetNext() const
 }
 
 template<typename ZEItemType>
-ZEItemType* ZELink<ZEItemType>::GetItem()
-{
-	return Item;
-}
-
-template<typename ZEItemType>
-const ZEItemType* ZELink<ZEItemType>::GetItem() const
+ZEItemType* ZELink<ZEItemType>::GetItem() const
 {
 	return Item;
 }

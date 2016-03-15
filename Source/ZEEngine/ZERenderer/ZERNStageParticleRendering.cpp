@@ -42,7 +42,6 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERNStageGBuffer.h"
 
 ZEInt ZERNStageParticleRendering::GetId() const
 {
@@ -55,27 +54,26 @@ const ZEString& ZERNStageParticleRendering::GetName() const
 	return Name;
 }
 
-bool ZERNStageParticleRendering::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 {
-	if (!ZERNStage::Setup(Renderer, Context, Commands))
+	if (!ZERNStage::Setup(Context))
 		return false;
 
-	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if (StageGBuffer == NULL)
+	if (GetCommands().GetCount() == 0)
 		return false;
 
-	ZEGRTexture2D* AccumulationMap = StageGBuffer->GetAccumulationMap();
+	const ZEGRTexture2D* AccumulationMap = GetPrevOutput(ZERN_SO_COLOR);
 	if (AccumulationMap == NULL)
 		return false;
 
-	ZEGRTexture2D* DepthMap = StageGBuffer->GetDepthMap();
+	const ZEGRTexture2D* DepthMap = GetPrevOutput(ZERN_SO_DEPTH);
 	if (DepthMap == NULL)
 		return false;
 
 	const ZEGRRenderTarget* RenderTarget = AccumulationMap->GetRenderTarget();
 	
-	Viewport.SetWidth(RenderTarget->GetWidth());
-	Viewport.SetHeight(RenderTarget->GetHeight());
+	Viewport.SetWidth((float)RenderTarget->GetWidth());
+	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
 	Context->SetVertexBuffers(0, 0, NULL);
@@ -84,13 +82,12 @@ bool ZERNStageParticleRendering::Setup(ZERNRenderer* Renderer, ZEGRContext* Cont
 	return true;
 }
 
-void ZERNStageParticleRendering::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStageParticleRendering::CleanUp(ZEGRContext* Context)
 {
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-
 	Context->SetRenderTargets(0, NULL, NULL);
 
-	ZERNStage::CleanUp(Renderer, Context);
+	ZERNStage::CleanUp(Context);
 }
 
 ZERNStageParticleRendering::ZERNStageParticleRendering()

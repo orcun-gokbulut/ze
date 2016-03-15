@@ -104,7 +104,7 @@ void ZERNRenderer::UpdateConstantBuffers()
 
 	RendererConstants.Time = ZECore::GetInstance()->GetRuningTime();
 	RendererConstants.Elapsedtime = ZECore::GetInstance()->GetElapsedTime();
-	RendererConstants.FrameId = ZECore::GetInstance()->GetFrameId();
+	RendererConstants.FrameId = (ZEUInt32)ZECore::GetInstance()->GetFrameId();
 	RendererConstantBuffer->SetData(&RendererConstants);
 
 	SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();
@@ -125,9 +125,9 @@ void ZERNRenderer::Cull()
 
 void ZERNRenderer::SortStageQueues()
 {
-	ZESize Count = StageQueues.GetCount();
+	ZESize Count = Stages.GetCount();
 	for (ZESize I = 0; I < Count; I++)
-		StageQueues[I].Commands.Sort<CompareCommands>();
+		Stages[I]->Commands.Sort<CompareCommands>();
 }
 
 void ZERNRenderer::RenderStages()
@@ -160,36 +160,26 @@ void ZERNRenderer::RenderStages()
 	{
 		Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
 
-		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
+		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)OutputRenderTarget->GetWidth(), (float)OutputRenderTarget->GetHeight()));
 		Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 	}
 
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
+	ze_for_each(Stage, Stages)
 	{
-		ZERNStageQueue* Queue = &StageQueues[I];
-		ZERNStage* Stage = Queue->Stage;
-
-		if (!Stage->GetEnable())
+		if (!Stage->GetEnabled())
 			continue;
 
-		 if (!Stage->Setup(this, Context, Queue->Commands))
-		 {
-			 zeError("Cannot setup stage. Stage Name: \"%s\"", Stage->GetName().ToCString());
-			 return;
-		 }
+		 if (!Stage->Setup(Context))
+			 continue;
 
-		Parameters.Stage = Stage;
-		ZELink<ZERNCommand>* Link = Queue->Commands.GetFirst();
-		while (Link != NULL)
+		Parameters.Stage = Stage.GetPointer();
+		ze_for_each(Command, Stage->Commands)
 		{
-			ZERNCommand* Command = Link->GetItem();
-			Parameters.Command = Command;
+			Parameters.Command = Command.GetPointer();
 			Command->Execute(&Parameters);
-			Link = Link->GetNext();
 		}
 
-		Stage->CleanUp(this, Context);
+		Stage->CleanUp(Context);
 	}
 
 	CleanCommands();
@@ -200,16 +190,12 @@ void ZERNRenderer::RenderStages()
 
 bool ZERNRenderer::InitializeSelf()
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
+	ze_for_each(Stage, Stages)
 	{
-		if (StageQueues[I].Stage != NULL)
+		if (!Stage->Initialize())
 		{
-			if (!StageQueues[I].Stage->Initialize())
-			{
-				zeError("Cannot initialize stage. Stage Name: \"%s\"", StageQueues[I].Stage->GetName().ToCString());
-				return false;
-			}
+			zeError("Cannot initialize stage. Stage Name: \"%s\"", Stage->GetName().ToCString());
+			return false;
 		}
 	}
 
@@ -270,124 +256,99 @@ ZEGRRenderTarget* ZERNRenderer::GetOutputRenderTarget()
 	return OutputRenderTarget;
 }
 
-ZEArray<ZERNStage*> ZERNRenderer::GetStages()
+const ZEList2<ZERNStage>& ZERNRenderer::GetStages()
 {
-	ZEArray<ZERNStage*> Stages;
-	ZESize Count = StageQueues.GetCount();
-	Stages.SetCount(Count);
-
-	for (ZESize I = 0; I < Count; I++)
-		Stages[I] = StageQueues[I].Stage;
-
 	return Stages;
 }
 
 ZERNStage* ZERNRenderer::GetStage(ZERNStageID Id)
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
-		if (StageQueues[I].Stage->GetId() == Id)
-			return StageQueues[I].Stage;
+	ze_for_each(Stage, Stages)
+	{
+		if (Stage->GetId() == Id)
+			return Stage.GetPointer();
+	}
 
 	return NULL;
 }
 
 void ZERNRenderer::AddStage(ZERNStage* Stage)
 {
-	ZERNStageQueue Queue;
-	Queue.Stage = Stage;
-
-	StageQueues.Add(Queue);
-
+	zeCheckError(Stage == NULL, ZE_VOID, "Stage cannot be null.");
+	zeCheckError(Stage->GetRenderer() != NULL, ZE_VOID, "Stage is already added to a renderer.");
+	
+	Stages.AddEnd(&Stage->Link);
+	Stage->Renderer = this;
+	
 	if (IsInitialized())
 		Stage->Initialize();
 }
 
 void ZERNRenderer::RemoveStage(ZERNStage* Stage)
 {
-	if(Stage == NULL)
-		return;
+	zeCheckError(Stage == NULL, ZE_VOID, "Stage cannot be null.");
+	zeCheckError(Stage->GetRenderer() != this, ZE_VOID, "Stage doesn't belong to this renderer.");
 
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
-	{
-		if (StageQueues[I].Stage == Stage)
-		{
-			StageQueues[I].Stage->Deinitialize();
-
-			StageQueues.Remove(I);
-			return;
-		}
-	}
+	Stage->Deinitialize();
+	Stage->Renderer = NULL;
+	Stages.Remove(&Stage->Link);
 }
 
 void ZERNRenderer::CleanStages()
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
+	ZESize Count = Stages.GetCount();
+	while(Stages.GetFirst() != NULL)
 	{
-		if (StageQueues[I].Stage != NULL)
-			StageQueues[I].Stage->Deinitialize();
+		ZERNStage* Stage = Stages.GetFirst()->GetItem();
+		RemoveStage(Stage);
+		delete Stage;
 	}
-
-	StageQueues.Clear();
 }
 
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
+	ze_for_each(Stage, Stages)
 	{
-		if ((Command->StageMask & StageQueues[I].Stage->GetId()) != 0)
-		{
-			for (ZESize J = 0; J < ZERN_MAX_COMMAND_STAGE; J++)
-			{
-				ZELink<ZERNCommand>* LinkCommand = &Command->StageQueueLinks[J];
-				if (!LinkCommand->GetInUse())
-				{
-					//Hacked by Ceyhun
-					char* Chp = (char*)LinkCommand;
-					ZEUInt64* Val = (ZEUInt64*)(Chp + 8);
-					*Val = (ZEUInt64)Command;
+		if ((Command->StageMask & Stage->GetId()) == 0)
+			continue;
 
-					StageQueues[I].Commands.AddEnd(LinkCommand);
-					break;
-				}
-			}
+		for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
+		{
+			ZELink<ZERNCommand>* LinkCommand = &Command->StageQueueLinks[I];
+			if (LinkCommand->GetInUse())
+				continue;
+
+			Stage->Commands.AddEnd(LinkCommand);
+			break;
 		}
 	}
 }
 
 void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
+	ze_for_each(Stage, Stages)
 	{
-		for (ZESize N = 0; N < ZERN_MAX_COMMAND_STAGE; N++)
+		for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
 		{
-			if (StageQueues[I].Commands.Exists(&Command->StageQueueLinks[N]))
-			{
-				StageQueues[I].Commands.Remove(&Command->StageQueueLinks[N]);
-			}
+			if (Stage->Commands.Exists(&Command->StageQueueLinks[I]))
+				Stage->Commands.Remove(&Command->StageQueueLinks[I]);
 		}
 	}
 }
 
 void ZERNRenderer::CleanCommands()
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
-		StageQueues[I].Commands.Clean();
+	ze_for_each(Stage, Stages)
+		Stage->Commands.Clean();
 }
 
 bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 {
-	ZESize Count = StageQueues.GetCount();
-	for (ZESize I = 0; I < Count; I++)
+	ze_for_each(Stage, Stages)
 	{
-		for (ZESize N = 0; N < ZERN_MAX_COMMAND_STAGE; N++)
+		for (ZESize I = 0; I < ZERN_MAX_COMMAND_STAGE; I++)
 		{
-			if (StageQueues[I].Commands.Exists(&Command->StageQueueLinks[N]))
+			if (Stage->Commands.Exists(&Command->StageQueueLinks[I]))
 				return true;
 		}
 	}

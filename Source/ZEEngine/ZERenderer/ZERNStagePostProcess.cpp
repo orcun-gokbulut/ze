@@ -37,11 +37,9 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-#include "ZERNStageGBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
-#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {
@@ -61,55 +59,63 @@ const ZEString& ZERNStagePostProcess::GetName() const
 	return Name;
 }
 
-bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 {
-	if (!ZERNStage::Setup(Renderer, Context, Commands))
+	if (!ZERNStage::Setup(Context))
 		return false;
 
-	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if (StageGBuffer == NULL)
+	if (GetCommands().GetCount() == 0)
 		return false;
 
-	ZEGRTexture2D* DepthMap = StageGBuffer->GetDepthMap();
-	if (DepthMap == NULL)
-		return false;
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, GetPrevOutput(ZERN_SO_DEPTH));
+	Context->SetTexture(ZEGR_ST_PIXEL, 1, GetPrevOutput(ZERN_SO_COLOR));
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, GetPrevOutput(ZERN_SO_NORMAL));
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, StageGBuffer->GetAccumulationMap());
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
-
-	const ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
+	const ZEGRRenderTarget* RenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (RenderTarget == NULL)
-		return false;
+	{
+		ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
+		ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
+		if (OutputTexture == NULL || 
+			OutputTexture->GetWidth() != Width || 
+			OutputTexture->GetHeight() != Height)
+		{
 
-	ZEUInt Width = RenderTarget->GetWidth();
-	ZEUInt Height = RenderTarget->GetHeight();
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+		}
 
-	if (OutputTexture == NULL || 
-		OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
+		RenderTarget = OutputTexture->GetRenderTarget();
+	}
+	else
 	{
 		OutputTexture.Release();
-		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 	}
 
 	RenderTarget = OutputTexture->GetRenderTarget();
-
-	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.1f, 0.1f, 0.1f, 1.0f));
-	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
 
 	return true;
 }
 
-void ZERNStagePostProcess::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 {
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 	Context->SetRenderTargets(0, NULL, NULL);
 
-	ZERNStage::CleanUp(Renderer, Context);
+	ZERNStage::CleanUp(Context);
 }
 
-ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
+const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input)
+{
+	if (GetEnabled() && (Input == ZERN_SO_COLOR))
+		return NULL;
+
+	return ZERNStage::GetProvidedInput(Input);
+}
+
+const ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
 {
 	return OutputTexture;
 }

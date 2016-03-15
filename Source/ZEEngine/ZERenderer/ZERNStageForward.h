@@ -45,31 +45,38 @@ class ZEGRTexture2D;
 class ZERNStageForward : public ZERNStage
 {
 	private:
-		ZEHolder<ZEGRTexture2D>			DepthMap;
-		ZEGRViewport					Viewport;
+		ZEHolder<ZEGRTexture2D>				ColorBuffer;
+		ZEHolder<const ZEGRRenderTarget>	ColorRenderTarget;
+		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
+		ZEHolder<const ZEGRTexture2D>		DepthOutput;
+		ZEGRViewport						Viewport;
 
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual void						DeinitializeSelf();
+
+		bool								UpdateRenderTargets();
+		bool								Update();
 
 	public:
-		virtual ZEInt					GetId() const;
-		virtual const ZEString&			GetName() const;
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
 
-										ZERNStageForward();
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 
-		static ZEGRRenderState			GetRenderState();
+											ZERNStageForward();
+
+		static ZEGRRenderState				GetRenderState();
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
 	public:
-		virtual ZEInt					GetId() const;
-		virtual const ZEString&			GetName() const;
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
-										ZERNStageForwardTransparent();
+											ZERNStageForwardTransparent();
 
-		static ZEGRRenderState			GetRenderState();
+		static ZEGRRenderState				GetRenderState();
 };

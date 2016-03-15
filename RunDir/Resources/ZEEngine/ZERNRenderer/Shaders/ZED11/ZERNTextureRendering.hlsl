@@ -39,17 +39,11 @@
 #include "ZERNScreenCover.hlsl"
 
 SamplerState	ZERNTextureRendering_SamplerLinearClamp	: register(s0);
-Texture2DArray	ZERNTextureRendering_InputTexture		: register(t5);
+Texture2D		ZERNTextureRendering_InputTexture		: register(t5);
 
-cbuffer ZERNTextureRendering_Constants					: register(b8)
+float4 ZERNTextureRendering_PixelShader_Main(float4 Position : SV_Position, float2 Texcoord : TEXCOORD0) : SV_Target0
 {
-	uint		ZERNTextureRendering_TextureIndex;
-	float3		ZERNTextureRendering_Reserved;
-};
-
-float4 ZERNTextureRendering_PixelShader_Main(float4 Position : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
-{
-	return ZERNTextureRendering_InputTexture.SampleLevel(ZERNTextureRendering_SamplerLinearClamp, float3(TexCoord, ZERNTextureRendering_TextureIndex), 0);
+	return ZERNTextureRendering_InputTexture.SampleLevel(ZERNTextureRendering_SamplerLinearClamp, Texcoord, 0);
 }
 
 #endif

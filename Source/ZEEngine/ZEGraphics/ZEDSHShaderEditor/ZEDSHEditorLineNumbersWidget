@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRShaderCompiler.h
+ Zinek Engine - ZEData.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,3 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#include "ZEGRShaderCompileOptions.h"
-
-struct ZEGRShaderMeta;
-
-class ZEGRShaderCompiler
-{
-	public:
-		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
-
-		static ZEGRShaderCompiler*	CreateInstance();
-};

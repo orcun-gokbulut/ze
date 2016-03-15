@@ -37,18 +37,72 @@
 
 #include "ZEDS/ZEList2.h"
 #include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEDS/ZELink.h"
 
-void ZERNStage::SetEnable(bool Enable)
+const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Output) const
 {
-	this->Enable = Enable;
+	if (GetPrevStage() == NULL)
+		return NULL;
+
+	return GetPrevStage()->GetOutput(Output);
 }
 
-bool ZERNStage::GetEnable() const
+
+const ZEGRRenderTarget* ZERNStage::GetNextProvidedInput(ZERNStageBuffer RenderTarget) const
 {
-	return Enable;
+	if (GetNextStage() == NULL)
+		return NULL;
+
+	return GetNextStage()->GetProvidedInput(RenderTarget);
 }
 
-bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+ZERNRenderer* ZERNStage::GetRenderer() const
+{
+	return Renderer;
+}
+
+void ZERNStage::SetEnabled(bool Enable)
+{
+	this->Enabled = Enable;
+}
+
+bool ZERNStage::GetEnabled() const
+{
+	return Enabled;
+}
+
+const ZEList2<ZERNCommand>& ZERNStage::GetCommands()
+{
+	return Commands;
+}
+
+ZERNStage* ZERNStage::GetPrevStage() const
+{
+	return (Link.GetPrev() != NULL ? Link.GetPrev()->GetItem() : NULL);
+}
+
+ZERNStage* ZERNStage::GetNextStage() const
+{
+	return (Link.GetNext() != NULL ? Link.GetNext()->GetItem() : NULL);
+}
+
+const ZEGRTexture2D* ZERNStage::GetOutput(ZERNStageBuffer Output) const
+{
+	if (GetPrevStage() == NULL)
+		return NULL;
+
+	return GetPrevStage()->GetOutput(Output);
+}
+
+const ZEGRRenderTarget* ZERNStage::GetProvidedInput(ZERNStageBuffer Input) const
+{
+	if (GetNextStage() == NULL)
+		return NULL;
+	
+	return GetNextStage()->GetProvidedInput(Input);
+}
+
+bool ZERNStage::Setup(ZEGRContext* Context)
 {
 	if(Renderer == NULL || Context == NULL)
 		return false;
@@ -56,13 +110,14 @@ bool ZERNStage::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERN
 	return true;
 }
 
-void ZERNStage::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStage::CleanUp(ZEGRContext* Context)
 {
 }
 
-ZERNStage::ZERNStage()
+ZERNStage::ZERNStage() : Link(this)
 {
-	Enable = true;
+	Renderer = NULL;
+	Enabled = true;
 }
 
 ZEGRRenderState ZERNStage::GetRenderState()

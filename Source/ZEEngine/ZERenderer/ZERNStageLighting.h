@@ -163,16 +163,16 @@ class ZERNStageLighting : public ZERNStage
 		ZEVector4							ComputeClipRegion(const ZEVector3& lightPosView, float lightRadius, float CameraScaleX, float CameraScaleY, float CameraNear);
 		void								UpdateClipRegion(float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
 		void								UpdateClipRegionRoot(float nc, float lc, float lz, float lightRadius, float cameraScale, float& clipMin, float& clipMax);
-		void								AssignLightsToTiles(ZERNRenderer* Renderer, const ZEList2<ZELight>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
+		void								AssignLightsToTiles(const ZEList2<ZELight>& Lights, float CameraScaleX, float CameraScaleY, float CameraNear);
 
-		bool								SetupDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
-		bool								SetupTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
-		bool								SetupComputeTiledDeferred(ZERNRenderer* Renderer, ZEGRContext* Context);
+		bool								SetupDeferred( ZEGRContext* Context);
+		bool								SetupTiledDeferred(ZEGRContext* Context);
+		bool								SetupComputeTiledDeferred(ZEGRContext* Context);
 
-		void								DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZERNRenderer* Renderer, ZEGRContext* Context);
-		void								DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
-		void								DrawPointLight(ZELightPoint* PointLight, ZERNRenderer* Renderer, ZEGRContext* Context);
-		void								DrawOmniProjectiveLight(ZELightOmniProjective* OmniProjectiveLight, ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								DrawDirectionalLight(ZELightDirectional* DirectionalLight, ZEGRContext* Context);
+		void								DrawProjectiveLight(ZELightProjective* ProjectiveLight, ZEGRContext* Context);
+		void								DrawPointLight(ZELightPoint* PointLight, ZEGRContext* Context);
+		void								DrawOmniProjectiveLight(ZELightOmniProjective* OmniProjectiveLight, ZEGRContext* Context);
 
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
@@ -187,10 +187,8 @@ class ZERNStageLighting : public ZERNStage
 		void								SetShowCascades(bool ShowCascades);
 		bool								GetShowCascades() const;
 
-		ZEGRTexture2D*						GetOutputTexture() const;
-
-		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageLighting();
 

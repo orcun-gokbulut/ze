@@ -38,30 +38,67 @@
 #include "ZEInitializable.h"
 
 #include "ZETypes.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEList2.h"
 
 class ZEGRContext;
 class ZERNRenderer;
 class ZEGRRenderState;
 class ZERNCommand;
 class ZEString;
+class ZEGRTexture2D;
+class ZEGRRenderTarget;
+
 template<typename Type> class ZEList2;
+
+// GBuffer
+
+enum ZERNStageBuffer
+{
+	ZERN_SO_NONE,
+	ZERN_SO_COLOR,
+	ZERN_SO_DEPTH,
+	ZERN_SO_NORMAL,
+	ZERN_SO_GBUFFER_DIFFUSE,
+	ZERN_SO_GBUFFER_SPECULAR,
+	ZERN_SO_ACCUMULATION,
+	ZERN_SO_HDR,
+	ZERN_SO_AMBIENT_OCCLUSION
+};
 
 class ZERNStage : public ZEInitializable
 {
+	friend class ZERNRenderer;
+	private:
+		ZERNRenderer*						Renderer;
+		ZELink<ZERNStage>					Link;
+		ZEList2<ZERNCommand>				Commands;
+		bool								Enabled;
+		
 	protected:
-		bool							Enable;
+		const ZEGRTexture2D*				GetPrevOutput(ZERNStageBuffer Input) const;
+		const ZEGRRenderTarget*				GetNextProvidedInput(ZERNStageBuffer RenderTarget) const;
 
 	public:
-		void							SetEnable(bool Enable);
-		bool							GetEnable() const;
+		virtual ZEInt						GetId() const = 0;
+		virtual const ZEString&				GetName() const = 0;
+		ZERNRenderer*						GetRenderer() const;
 
-		virtual ZEInt					GetId() const = 0;
-		virtual const ZEString&			GetName() const = 0;
+		ZERNStage*							GetPrevStage() const;
+		ZERNStage*							GetNextStage() const;
 
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								SetEnabled(bool Enable);
+		bool								GetEnabled() const;
 
-										ZERNStage();
+		const ZEList2<ZERNCommand>&			GetCommands();
 
-		static ZEGRRenderState			GetRenderState();
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
+
+											ZERNStage();
+
+		static ZEGRRenderState				GetRenderState();
 };

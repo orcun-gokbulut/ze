@@ -41,49 +41,49 @@
 
 struct ZERNParticleMaterial_Instance_Attributes
 {
-	float3										Position;
-	float										Reserved0;
-	float2										Size;
-	float2										Reserved1;
-	float4										Color;
+	float3			Position;
+	float			Reserved0;
+	float2			Size;
+	float2			Reserved1;
+	float4			Color;
 };
 
 struct ZERNParticleMaterial_VertexShader_Output
 {
-	float4										Position									: SV_Position;
-	float2										Texcoord									: TEXCOORD0;
-	float4										Color										: COLOR0;
-	float										DepthView									: TEXCOORD1;
+	float4			Position			: SV_Position;
+	float2			Texcoord			: TEXCOORD0;
+	float4			Color				: COLOR0;
+	float			DepthView			: TEXCOORD1;
 };                                                                      					
 			
 struct ZERNParticleMaterial_PixelShader_Input                           					
 {                                                                       					
-	float4										PositionViewport							: SV_Position;
-	float2										Texcoord									: TEXCOORD0;
-	float4										Color										: COLOR0;
-	float										DepthView									: TEXCOORD1;
+	float4			PositionViewport	: SV_Position;
+	float2			Texcoord			: TEXCOORD0;
+	float4			Color				: COLOR0;
+	float			DepthView			: TEXCOORD1;
 };		
 		
-cbuffer ZERNParticleMaterial_Constants_Material												: register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNParticleMaterial_Constants_Material : register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
-	float3										ZERNParticleMaterial_AmbientColor;
-	float										ZERNParticleMaterial_Opacity;
+	float3			ZERNParticleMaterial_AmbientColor;
+	float			ZERNParticleMaterial_Opacity;
 
-	float3										ZERNParticleMaterial_DiffuseColor;
-	bool										ZERNParticleMaterial_SceneAmbientEnabled;
+	float3			ZERNParticleMaterial_DiffuseColor;
+	bool			ZERNParticleMaterial_SceneAmbientEnabled;
 
-	float3										ZERNParticleMaterial_EmissiveColor;
-	float										ZERNParticleMaterial_AlphaCullLimit;
+	float3			ZERNParticleMaterial_EmissiveColor;
+	float			ZERNParticleMaterial_AlphaCullLimit;
 	
-	bool										ZERNParticleMaterial_SoftParticle;
-	float										ZERNParticleMaterial_DistanceMax;
-	float										ZERNParticleMaterial_ContrastPower;
-	float										ZERNParticleMaterial_Reserved0;
+	bool			ZERNParticleMaterial_SoftParticle;
+	float			ZERNParticleMaterial_DistanceMax;
+	float			ZERNParticleMaterial_ContrastPower;
+	float			ZERNParticleMaterial_Reserved0;
 };
 
-cbuffer ZERNParticleMaterial_Constants_Draw_Transform										: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
+cbuffer ZERNParticleMaterial_Constants_Draw_Transform : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	float4x4									ZERNParticleMaterial_WorldMatrix;
+	float4x4	ZERNParticleMaterial_WorldMatrix;
 };
 
 cbuffer ZERNParticleMaterial_ParticleConstants												: register(b8)
