@@ -219,10 +219,13 @@ float4 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, fl
 	float Luminance = ZERNHDR_Calculate_Luminance(Color);
 	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
 	
-	float3 ResultColor = (float3)0.0f;
+	float3 ResultColor = 0.0f;
+	
+	if(ZERNHDR_BloomEnabled)
+		ResultColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNHDR_SamplerLinearClamp, TexCoord).rgb;
+	
 	switch(ZERNHDR_ToneMapOperator)
 	{
-		default:
 		case ZERN_HTMO_LOGARITHMIC:
 			ResultColor = ZERNHDR_ToneMapOperator_Logarithmic(Color, Luminance, ScaledLuminance);
 			break;
@@ -242,17 +245,17 @@ float4 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, fl
 		case ZERN_HTMO_FILMIC:
 			ResultColor = ZERNHDR_ToneMapOperator_Filmic(Color, ScaledLuminance);
 			break;
-			
+		
+		default:
 		case ZERN_HTMO_UNCHARTED:
 		{
 			float3 ScaledColor = ScaledLuminance * Color;
-			ResultColor = ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * ( 1.0f / ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
+			ResultColor = ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * (1.0f / ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
 			break;
 		}
 	}
 	
-	if(ZERNHDR_BloomEnabled)
-		ResultColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNHDR_SamplerLinearClamp, TexCoord).rgb;
+	ResultColor = pow(ResultColor, 1.0f / 2.2f);
 	
 	return float4(ResultColor, 1.0f);
 }

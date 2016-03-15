@@ -933,21 +933,22 @@ void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, fl
 
 void ZEMatrix4x4::CreatePerspectiveProjectionOffCenter(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ)
 {
+	float OriginalNearZ = NearZ;
 	float Temp = FarZ;
 	FarZ = NearZ;
 	NearZ = Temp;
 
 	float Width = Right - Left;
 	float Height = Top - Bottom;
-	float Depth = FarZ - NearZ;
+	float Range = FarZ - NearZ;
 	float OffsetX = (Left + Right) / -Width;
 	float OffsetY = (Bottom + Top) / -Height;
-	float OffsetZ = FarZ * NearZ / -Depth;
+	float OffsetZ = FarZ * NearZ / -Range;
 
 	Create(Matrix,
-		2.0f * NearZ / Width, 0.0f, OffsetX, 0.0f,
-		0.0f, 2.0f * NearZ / Height, OffsetY, 0.0f,
-		0.0f, 0.0f, FarZ / Depth, OffsetZ,
+		2.0f * OriginalNearZ / Width, 0.0f, OffsetX, 0.0f,
+		0.0f, 2.0f * OriginalNearZ / Height, OffsetY, 0.0f,
+		0.0f, 0.0f, FarZ / Range, OffsetZ,
 		0.0f, 0.0f, 1.0f, 0.0f);
 }
 

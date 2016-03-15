@@ -35,9 +35,10 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEGRTexture.h"
 #include "ZEGRResource.h"
+
+#include "ZETypes.h"
+#include "ZEGRFormat.h"
 
 class ZEGRDepthStencilBuffer : public ZEGRResource
 {
