@@ -53,6 +53,8 @@ class ZED11RenderTarget : public ZEGRRenderTarget, public ZED11ComponentBase
 	private:
 		ID3D11RenderTargetView*			View;
 
+		void							ForcedRelease();
+
 										ZED11RenderTarget();
 										ZED11RenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format, ID3D11RenderTargetView* RenderTargetView);
 		virtual							~ZED11RenderTarget();

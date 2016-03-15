@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRShaderCompiler.h
+ Zinek Engine - ZERNStageMultiplexer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,14 +35,73 @@
 
 #pragma once
 
-#include "ZEGRShaderCompileOptions.h"
+#include "ZERNStage.h"
 
-struct ZEGRShaderMeta;
+#include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRDefinitions.h"
 
-class ZEGRShaderCompiler
+enum ZERNStageMultiplexerMode
 {
-	public:
-		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
+	ZERN_SMM_NONE,
+	ZERN_SMM_SINGLE,
+	ZERN_SMM_VERTICAL,
+	ZERN_SMM_HORIZONTAL,
+	ZERN_SMM_2x2,
+	ZERN_SMM_CUSTOM
+};
 
-		static ZEGRShaderCompiler*	CreateInstance();
+class ZEGRTexture;
+class ZEGRRenderState;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRRenderTarget;
+class ZEGRConstantBuffer;
+
+class ZERNStageMultiplexer : public ZERNStage
+{
+	private:
+		ZERNStageBuffer						Inputs[ZEGR_MAX_VIEWPORT_SLOT];
+		ZEHolder<const ZEGRTexture>			InputTextures[ZEGR_MAX_VIEWPORT_SLOT];
+		ZEGRViewport						CustomViewports[ZEGR_MAX_VIEWPORT_SLOT];
+
+		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
+
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+
+		ZERNStageMultiplexerMode			Mode;
+
+		bool								UpdateInputOutputs();
+
+		void								DrawSingle(ZEGRContext* Context);
+		void								DrawVertical2(ZEGRContext* Context);
+		void								DrawHorizontal2(ZEGRContext* Context);
+		void								Draw2x2(ZEGRContext* Context);
+
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
+
+	public:
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
+
+		void								SetMode(ZERNStageMultiplexerMode Mode);
+		ZERNStageMultiplexerMode			GetMode();
+
+		void								SetInput(ZEUInt Index, ZERNStageBuffer Buffer);
+		void								SetInput(ZEUInt Index, ZEGRTexture* Input);
+		const ZEGRTexture*					GetInput(ZEUInt Index) const;
+
+		void								SetCustomViewport(ZEUInt Index, const ZEGRViewport& Viewport);
+		const ZEGRViewport&					GetCustomViewport(ZEUInt Index) const;
+
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
+
+											ZERNStageMultiplexer();
 };

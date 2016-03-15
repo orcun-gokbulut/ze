@@ -71,7 +71,11 @@ void ZED11Output::SwitchToFullscreen()
 
 void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
-	RenderTarget.Release();
+	if (RenderTarget != NULL)
+	{
+		RenderTarget.Cast<ZED11RenderTarget>()->ForcedRelease();
+		RenderTarget.Release();
+	}
 
 	HRESULT Result = SwapChain->ResizeBuffers(1, Width, Height, ConvertFormat(Format), 0);
 	if(FAILED(Result))

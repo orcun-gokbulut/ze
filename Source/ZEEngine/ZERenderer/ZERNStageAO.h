@@ -65,6 +65,11 @@ class ZERNStageAO : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
+		ZEHolder<const ZEGRTexture2D>		InputColor;
+		ZEHolder<const ZEGRTexture2D>		InputDepth;
+		ZEHolder<const ZEGRTexture2D>		InputNormal;
+		ZEHolder<const ZEGRRenderTarget>	OutputColor;
+
 		ZEHolder<ZEGRTexture2D>				OcclusionMap;
 		ZEHolder<ZEGRTexture2D>				BlurTexture;
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
@@ -119,14 +124,15 @@ class ZERNStageAO : public ZERNStage
 		void								CreateSphereSamples();
 
 		bool								Update();
+		bool								UpdateInputOutput();
 		bool								UpdateConstantBuffers();
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();
 		bool								UpdateTextures();
 
-		void								GenerateOcclusionMap(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								GenerateOcclusionMap(ZEGRContext* Context);
 		void								ApplyBlur(ZEGRContext* Context);
-		void								BlendWithAccumulationBuffer(ZERNRenderer* Renderer, ZEGRContext* Context);
+		void								BlendWithAccumulationBuffer(ZEGRContext* Context);
 
 		virtual bool						InitializeSelf();						
 		virtual void						DeinitializeSelf();
@@ -155,8 +161,8 @@ class ZERNStageAO : public ZERNStage
 		void								SetFilterKernelValues(const ZEVector4* Values, ZESize KernelSize);
 		const ZEVector4* 					GetFilterKernelValues() const;
 
-		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageAO();
 };

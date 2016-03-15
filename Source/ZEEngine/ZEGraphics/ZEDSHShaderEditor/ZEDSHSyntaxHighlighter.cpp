@@ -161,7 +161,7 @@ ZEDSHSyntaxHightlighter::ZEDSHSyntaxHightlighter(QTextDocument* Document) : QSyn
 	KeywordElements.Name = "Keywords";
 	KeywordElements.Font = QFont("Consolas", 10);
 	KeywordElements.Font.setBold(true);
-	KeywordElements.Foreground = QColor(Qt::darkBlue);
+	KeywordElements.Foreground = QColor(QColor(0, 0, 255));
 	KeywordElements.ExpressionEnabled = true;
 	KeywordElements.Expression = RegExpCompile(Keywords, sizeof(Keywords) / sizeof(const char*), "\\b(", "|", ")\\b");
 	AddSyntaxElement(KeywordElements);
@@ -181,7 +181,7 @@ ZEDSHSyntaxHightlighter::ZEDSHSyntaxHightlighter(QTextDocument* Document) : QSyn
 	ZEDSHSyntaxElement SemanticsElements;
 	SemanticsElements.Name = "Semantics";
 	SemanticsElements.Font = QFont("Consolas", 10);
-	SemanticsElements.Foreground = QColor(Qt::darkMagenta);
+	SemanticsElements.Foreground = QColor(43, 145, 175);
 	SemanticsElements.ExpressionEnabled = true;
 	SemanticsElements.Expression = RegExpCompile(Semantics, sizeof(Semantics) / sizeof(const char*), "\\b(", "|", ")\\b");
 	AddSyntaxElement(SemanticsElements);
@@ -208,24 +208,25 @@ ZEDSHSyntaxHightlighter::ZEDSHSyntaxHightlighter(QTextDocument* Document) : QSyn
 	ZEDSHSyntaxElement IntrinsicsElements;
 	IntrinsicsElements.Name = "Intrinsics";
 	IntrinsicsElements.Font = QFont("Consolas", 10);
-	IntrinsicsElements.Foreground = QColor(Qt::darkBlue);
+	IntrinsicsElements.Foreground = QColor(43, 145, 175);
 	IntrinsicsElements.ExpressionEnabled = true;
 	IntrinsicsElements.Expression = RegExpCompile(Intrinsics, sizeof(Intrinsics) / sizeof(const char*), "\\b(", "|", ")\\b");
 	AddSyntaxElement(IntrinsicsElements);
 
 
-	const char* Preporcessor[] =
+	const char* Preprocessor[] =
 	{
-		"\\#define", "\\#undef", "\\#include", "\\#if", "\\#else", "\\#elif", "\\#endif", "\\#pragma", "\\#line", "\\#error"
+		/*"\\s*#\\s*"*/"\\#define"/*, "\\s*\\#\\s*undef", "\\s*\\#\\s*include", "\\s*\\#\\s*if", "\\s*\\#\\s*else", 
+		"\\s*\\#\\s*elif", "\\s*\\#\\s*endif", "\\s*\\#\\s*pragma", "\\s*\\#\\s*line", "\\s*\\#\\s*error", "defined"*/
 	};
 
 	ZEDSHSyntaxElement PreprocessorElements;
 	PreprocessorElements.Name = "Preporcessor";
 	PreprocessorElements.Font = QFont("Consolas", 10);
 	PreprocessorElements.Font.setBold(true);
-	PreprocessorElements.Foreground = QColor(Qt::darkBlue);
+	PreprocessorElements.Foreground = QColor(Qt::blue);
 	PreprocessorElements.ExpressionEnabled = true;
-	PreprocessorElements.Expression = RegExpCompile(Preporcessor, sizeof(Preporcessor) / sizeof(const char*), "\\s(", "|", ")\\s");
+	PreprocessorElements.Expression = RegExpCompile(Preprocessor, sizeof(Preprocessor) / sizeof(const char*), "\\b(", "|", ")\\b");
 	AddSyntaxElement(PreprocessorElements);
 
 	ZEDSHSyntaxElement CommentElements;

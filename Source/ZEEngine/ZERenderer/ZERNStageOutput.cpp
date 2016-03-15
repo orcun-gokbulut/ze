@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGRShaderCompiler.h
+ Zinek Engine - ZERNStageOutput.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZERNStageOutput.h"
 
-#include "ZEGRShaderCompileOptions.h"
+#include "ZERNRenderer.h"
+#include "ZERNStageID.h"
+#include "ZEGraphics\ZEGRContext.h"
 
-struct ZEGRShaderMeta;
-
-class ZEGRShaderCompiler
+ZEInt ZERNStageOutput::GetId() const
 {
-	public:
-		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
+	return ZERN_STAGE_OUTPUT;
+}
 
-		static ZEGRShaderCompiler*	CreateInstance();
-};
+const ZEString& ZERNStageOutput::GetName() const
+{
+	static ZEString Name = "Output";
+	return Name;
+}
+
+const ZEGRRenderTarget* ZERNStageOutput::GetProvidedInput(ZERNStageBuffer Buffer) const
+{
+	if (Buffer == ZERN_SO_COLOR)
+	{
+		if (GetRenderer() == NULL)
+			return NULL;
+
+		return GetRenderer()->GetOutputRenderTarget();
+	}
+	else
+	{
+		return ZERNStage::GetProvidedInput(Buffer);
+	}
+}
+
+void ZERNStageOutput::CleanUp(ZEGRContext* Context)
+{
+	Context->SetRenderTargets(0, NULL, NULL);
+}

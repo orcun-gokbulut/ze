@@ -43,8 +43,8 @@ class ZERNStagePreProcess : public ZERNStage
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
 
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual bool					Setup(ZEGRContext* Context);
+		virtual void					CleanUp(ZEGRContext* Context);
 
 										ZERNStagePreProcess();
 

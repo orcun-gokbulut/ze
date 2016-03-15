@@ -208,7 +208,7 @@ bool ZERNFixedMaterial::UpdateConstantBuffer() const
 bool ZERNFixedMaterial::Update() const
 {
 	if (!IsInitialized())
-		return false;
+		return true;
 
 	if (!UpdateShaders())
 		return false;
@@ -1279,7 +1279,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 	if (!Update())
 		return false;
 
-	if(Stage == NULL || !Stage->GetEnable())
+	if(Stage == NULL || !Stage->GetEnabled())
 		return false;
 
 	ZEUInt StageID = (Stage->GetId() & GetStageMask());

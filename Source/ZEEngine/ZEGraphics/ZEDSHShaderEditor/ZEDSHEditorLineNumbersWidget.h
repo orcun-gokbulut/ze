@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageTextureOutput.h
+ Zinek Engine - ZEDSHEditorLineNumbersWidget.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,59 +35,20 @@
 
 #pragma once
 
-#include "ZERNStage.h"
+#include <QtGui/QWidget>
 
-#include "ZEDS/ZEArray.h"
-#include "ZEPointer/ZEHolder.h"
-#include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRDefinitions.h"
+class ZEDSHEditorWidget;
 
-class ZEGRTexture;
-class ZEGRRenderState;
-class ZEGRShader;
-class ZEGRRenderStateData;
-class ZEGRRenderTarget;
-class ZEGRConstantBuffer;
-
-class ZERNStageTextureOutput : public ZERNStage
+class ZEDSHEditorLineNumbersWidget : public QWidget
 {
 	private:
-		ZEArray<const ZEGRTexture*>		InputTextures;
-		const ZEGRRenderTarget*			OutputRenderTarget;
+		ZEDSHEditorWidget*		Editor;
 
-		ZEHolder<ZEGRShader>			ScreenCoverVertexShaderPositionTexcoord;
-		ZEHolder<ZEGRShader>			PixelShader;
-		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
-
-		ZEGRViewport					Viewports[ZEGR_MAX_VIEWPORT_SLOT];
-
-		bool							AutoSplit;
-
-		struct
-		{
-			ZEUInt						TextureIndex;
-			ZEUInt						Reserved[3];
-		}Constants;
-
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual void			paintEvent(QPaintEvent* Event);
 
 	public:
-		virtual ZEInt					GetId() const;
-		virtual const ZEString&			GetName() const;
+		virtual QSize			sizeHint() const;
 
-		void							SetInputs(ZEGRTexture** Inputs, ZESize Count);
-		const ZEGRTexture*const*		GetInputs() const;
+								ZEDSHEditorLineNumbersWidget(ZEDSHEditorWidget* Editor);
 
-		void							SetViewports(const ZEGRViewport* Viewports, ZESize Count);
-		const ZEGRViewport*				GetViewports() const;
-
-		void							SetAutoSplit(bool AutoSplit);
-		bool							IsAutoSplit() const;
-
-		virtual bool					Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void					CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
-
-										ZERNStageTextureOutput();
 };

@@ -214,7 +214,7 @@ bool ZERNMoonMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) con
 	if (!Update())
 		return false;
 
-	if(Stage == NULL || !Stage->GetEnable())
+	if(Stage == NULL || !Stage->GetEnabled())
 		return false;
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);

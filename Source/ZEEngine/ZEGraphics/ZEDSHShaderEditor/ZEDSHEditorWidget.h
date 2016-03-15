@@ -35,10 +35,27 @@
 
 #pragma once
 
-#include <QtGui/QTextEdit>
+#include <QtGui/QPlainTextEdit>
 
-class ZEDSHEditorWidget : public QTextEdit
+class ZEDSHEditorLineNumbersWidget;
+
+class ZEDSHEditorWidget : public QPlainTextEdit
 {
+	Q_OBJECT
+	friend class ZEDSHEditorLineNumbersWidget;
+	private:
+		ZEDSHEditorLineNumbersWidget*	LineNumbers;
+
+		void							DrawLineNumbers(QPaintEvent* Event);
+		int								lineNumberAreaWidth();
+
+		virtual void					resizeEvent(QResizeEvent* Event);
+
+	private slots:
+		void							UpdateLineNumbersWidth(int newBlockCount);
+		void							HighlightCurrentLine();
+		void							UpdateLineNumbers(const QRect&, int);
+
 	public:
-		ZEDSHEditorWidget(QWidget* Parent = NULL);
+										ZEDSHEditorWidget(QWidget* Parent = NULL);
 };

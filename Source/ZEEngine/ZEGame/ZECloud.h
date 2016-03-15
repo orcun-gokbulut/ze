@@ -109,7 +109,7 @@ class ZECloud : public ZEEntity
 		bool							UpdateConstantBuffers();
 		bool							Update();
 
-		void							RenderClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void							RenderClouds(ZEGRContext* Context, const ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 		void							ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 		void							LightingClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 

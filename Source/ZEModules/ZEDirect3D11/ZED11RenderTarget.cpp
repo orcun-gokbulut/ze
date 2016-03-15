@@ -41,6 +41,12 @@ ID3D11RenderTargetView* ZED11RenderTarget::GetView() const
 	return View;
 }
 
+void ZED11RenderTarget::ForcedRelease()
+{
+	View->Release();
+	View = NULL;
+}
+
 ZED11RenderTarget::ZED11RenderTarget()
 {
 	View = NULL;

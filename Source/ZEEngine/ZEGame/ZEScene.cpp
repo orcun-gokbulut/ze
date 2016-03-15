@@ -116,11 +116,7 @@ void ZEScene::Destroy()
 
 void ZEScene::AddEntity(ZEEntity* Entity)
 {
-	if (Entities.Exists(Entity))
-	{
-		zeError("Can not add an already native entity.");
-		return;
-	}
+	zeCheckError(Entity->GetOwnerScene() != NULL, ZE_VOID, "Entity is already added to a scene.");
 
 	Entity->SetEntityId(LastEntityId++);
 	Entities.Add(Entity);
@@ -134,6 +130,8 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
+	zeCheckError(Entity->GetOwnerScene() != this, ZE_VOID, "Entity does not belong to this scene.");
+
 	if (!Entities.Exists(Entity))
 	{
 		zeError("Can not remove a foreign entity.");
@@ -141,7 +139,6 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 	}
 
 	Entity->SetOwnerScene(NULL);
-
 	Entities.RemoveValue(Entity);
 }
 

@@ -98,7 +98,7 @@ void ZEGRWindow::OnFullScreen()
 
 void ZEGRWindow::OnMove()
 {
-	zeLog("Window mooved.");
+	zeLog("Window moved.");
 }
 
 void ZEGRWindow::OnSize()

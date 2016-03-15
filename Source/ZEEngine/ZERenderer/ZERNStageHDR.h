@@ -75,6 +75,10 @@ class ZERNStageHDR : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
+		ZEHolder<const ZEGRTexture2D>		InputTexture;
+		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
+
 		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexcoord;
 		ZEHolder<ZEGRShader>				CalculateLuminance_PixelShader;
 		ZEHolder<ZEGRShader>				CalculateAdaptedLuminance_PixelShader;
@@ -87,10 +91,7 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		DownSampling_RenderState;
 		ZEHolder<ZEGRRenderStateData>		CalculateBrightness_RenderState;
 		ZEHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
-
-		const ZEGRTexture2D*				InputTexture;
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
-
+	
 		ZERNFilter							Filter;
 
 		ZEArray<ZEVector4>					HorizontalValues;
@@ -129,8 +130,7 @@ class ZERNStageHDR : public ZERNStage
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
-	private:
-
+		bool								UpdateInputOutput();
 		bool								UpdateTextures();
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();
@@ -184,16 +184,14 @@ class ZERNStageHDR : public ZERNStage
 		void								SetToneMapOperator(ZERNHDRToneMapOperator Operator);
 		ZERNHDRToneMapOperator				GetToneMapOperator() const;
 
-		void								SetInputTexture(const ZEGRTexture2D* Input);
-		const ZEGRTexture2D*				GetInputTexture() const;
-
-		ZEHolder<ZEGRTexture2D>				GetOutputTexture() const;
-
 		void								SetBlurTextureSize(ZERNHDRBlurTextureSize Value);
 		ZERNHDRBlurTextureSize				GetBlurTextureSize() const;
 
-		virtual bool						Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands);
-		virtual void						CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context);
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Output) const;
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageHDR();
 };

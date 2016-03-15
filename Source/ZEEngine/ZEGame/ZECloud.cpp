@@ -267,7 +267,7 @@ bool ZECloud::Update()
 	return true;
 }
 
-void ZECloud::RenderClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer)
+void ZECloud::RenderClouds(ZEGRContext* Context, const ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
 	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
 
@@ -496,17 +496,13 @@ void ZECloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	Context->SetVertexBuffers(0, 1, &VertexBuffer);
 	
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
-
-	ZERNStagePostProcess* StagePostProcess = static_cast<ZERNStagePostProcess*>(Parameters->Stage);
-	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Parameters->Renderer->GetStage(ZERN_STAGE_GBUFFER));
-
-	Context->ClearDepthStencilBuffer(StageGBuffer->GetDepthMap()->GetDepthStencilBuffer(), false, true, 0.0f, 0x00);
+	Context->ClearDepthStencilBuffer(Parameters->Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(), false, true, 0.0f, 0x00);
 
 	ZEGRRenderTarget* PrevRenderTarget;
 	ZEGRDepthStencilBuffer* PrevDepthStencilBuffer;
 	Context->GetRenderTargets(1, &PrevRenderTarget, &PrevDepthStencilBuffer);
 
-	RenderClouds(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
+	RenderClouds(Context, Parameters->Stage->GetOutput(ZERN_SO_COLOR), PrevDepthStencilBuffer);
 	//ApplyBlur(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
 	//LightingClouds(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
 

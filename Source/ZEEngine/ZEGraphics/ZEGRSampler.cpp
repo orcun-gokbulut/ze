@@ -48,9 +48,9 @@ ZEGRSamplerDescription::ZEGRSamplerDescription()
 	MinFilter = ZEGR_TFM_LINEAR;
 	MagFilter = ZEGR_TFM_LINEAR;
 	MipFilter = ZEGR_TFM_LINEAR;
-	AddressU = ZEGR_TAM_CLAMP;
-	AddressV = ZEGR_TAM_CLAMP;
-	AddressW = ZEGR_TAM_CLAMP;
+	AddressU = ZEGR_TAM_WRAP;
+	AddressV = ZEGR_TAM_WRAP;
+	AddressW = ZEGR_TAM_WRAP;
 	MinLOD = ZE_FLOAT_MIN;
 	MaxLOD = ZE_FLOAT_MAX;
 	MaxAnisotropy = 1;

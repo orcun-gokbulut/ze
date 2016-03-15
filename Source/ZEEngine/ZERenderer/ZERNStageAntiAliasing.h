@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.h
+ Zinek Engine - ZERNStageAntiAliasing.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,45 +37,87 @@
 
 #include "ZERNStage.h"
 
+#include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEPointer/ZESharedPointer.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
 class ZEGRTexture2D;
 class ZEGRRenderTarget;
+class ZEGRRenderStateData;
+class ZEGRShader;
+class ZEGRSampler;
+class ZEGRContext;
+class ZEGRConstantBuffer;
+class ZERNRenderer;
 
-class ZERNStageGBuffer : public ZERNStage
+class ZERNStageAntiAliasing : public ZERNStage
 {
 	private:
-		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
-		ZEHolder<ZEGRTexture2D>				GBuffer0;
-		ZEHolder<ZEGRTexture2D>				GBuffer1;
-		ZEHolder<ZEGRTexture2D>				GBuffer2;
-		ZEHolder<ZEGRTexture2D>				GBuffer3;
-		const ZEGRRenderTarget*				RenderTargets[4];
+		ZEFlags								DirtyFlags;
+
+		ZEHolder<const ZEGRTexture2D>		InputTexture;
+		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
+
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+
+		ZEHolder<ZEGRShader>				EdgeDetectionVertexShader;
+		ZEHolder<ZEGRShader>				EdgeDetectionPixelShader;
+		ZEHolder<ZEGRShader>				BlendingWeightCalculationVertexShader;
+		ZEHolder<ZEGRShader>				BlendingWeightCalculationPixelShader;
+		ZEHolder<ZEGRShader>				NeighborhoodBlendingVertexShader;
+		ZEHolder<ZEGRShader>				NeighborhoodBlendingPixelShader;
+
+		ZEHolder<ZEGRRenderStateData>		EdgeDetectionPassRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		BlendingWeightCalculationPassRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		NeighborhoodBlendingPassRenderStateData;
+
+		ZEHolder<ZEGRTexture2D>				EdgeTexture;
+		ZEHolder<ZEGRTexture2D>				BlendTexture;
+		ZEHolder<const ZEGRRenderTarget>	EdgeRenderTarget;
+		ZEHolder<const ZEGRRenderTarget>	BlendRenderTarget;
+		ZEHolder<ZEGRTexture2D>				AreaTexture;
+		ZEHolder<ZEGRTexture2D>				SearchTexture;
+
+		ZEHolder<ZEGRSampler>				SamplerLinear;
+		ZEHolder<ZEGRSampler>				SamplerPoint;
+
 		ZEGRViewport						Viewport;
 
-		bool								UpdateRenderTargets();
+		struct SMAAConstants
+		{
+			ZEVector2						OutputSize;
+			ZEVector2						Reserved0;
+		} Constants;
+
+		bool								UpdateInputOutput();
+		bool								UpdateConstantBuffers();
+		bool								UpdateShaders();
+		bool								UpdateRenderStates();
+		bool								UpdateTextures();
 		bool								Update();
 
+		void								ClearTextures(ZEGRContext* Context);
+		void								DoEdgeDetection(ZEGRContext* Context);
+		void								DoBlendingWeightCalculation(ZEGRContext* Context);
+		void								DoNeighborhoodBlending(ZEGRContext* Context);
+
+		virtual bool						InitializeSelf();						
 		virtual void						DeinitializeSelf();
 
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		ZEGRTexture2D*						GetDiffuseColorMap() const;
-		ZEGRTexture2D*						GetSpecularColorMap() const;
-		ZEGRTexture2D*						GetNormalMap() const;
-		ZEGRTexture2D*						GetAccumulationMap() const;
-		ZEGRTexture2D*						GetDepthMap() const;
 
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Output) const;
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);
 
-											ZERNStageGBuffer();
-
-		static ZEGRRenderState				GetRenderState();
+											ZERNStageAntiAliasing();
 };

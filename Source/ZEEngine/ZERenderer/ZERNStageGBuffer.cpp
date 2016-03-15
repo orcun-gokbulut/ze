@@ -35,7 +35,6 @@
 
 #include "ZERNStageGBuffer.h"
 
-#include "ZEDS/ZEString.h"
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 #include "ZEGraphics/ZEGROutput.h"
@@ -45,16 +44,23 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-void ZERNStageGBuffer::DeinitializeSelf()
+bool ZERNStageGBuffer::UpdateRenderTargets()
 {
-	CleanRenderTargets();
+	const ZEGRRenderTarget* RenderTarget = GetRenderer()->GetOutputRenderTarget();
+	if(RenderTarget == NULL)
+		return false;
 
-	ZERNStage::DeinitializeSelf();
-}
+	ZEUInt Width = RenderTarget->GetWidth();
+	ZEUInt Height = RenderTarget->GetHeight();
 
-bool ZERNStageGBuffer::UpdateRenderTargets(ZEUInt Width, ZEUInt Height)
-{
-	CleanRenderTargets();
+	if (GBuffer0 != NULL &&
+		GBuffer0->GetWidth() == Width && GBuffer0->GetHeight() == Height)
+	{
+		return true;
+	}
+
+	Viewport.SetWidth((float)Width);
+	Viewport.SetHeight((float)Height);
 
 	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
 	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
@@ -70,14 +76,23 @@ bool ZERNStageGBuffer::UpdateRenderTargets(ZEUInt Width, ZEUInt Height)
 	return true;
 }
 
+bool ZERNStageGBuffer::Update()
+{
+	if (!UpdateRenderTargets())
+		return false;
 
-void ZERNStageGBuffer::CleanRenderTargets()
+	return true;
+}
+
+void ZERNStageGBuffer::DeinitializeSelf()
 {
 	DepthStencilBuffer.Release();
 	GBuffer0.Release();
 	GBuffer1.Release();
 	GBuffer2.Release();
 	GBuffer3.Release();
+
+	ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageGBuffer::GetId() const
@@ -116,28 +131,41 @@ ZEGRTexture2D* ZERNStageGBuffer::GetDepthMap() const
 	return DepthStencilBuffer;
 }
 
-bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZEList2<ZERNCommand>& Commands)
+const ZEGRTexture2D* ZERNStageGBuffer::GetOutput(ZERNStageBuffer Output) const 
 {
-	if (!ZERNStage::Setup(Renderer, Context, Commands))
-		return false;
-
-	ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
-	if(RenderTarget == NULL)
-		return false;
-
-	ZEUInt Width = RenderTarget->GetWidth();
-	ZEUInt Height = RenderTarget->GetHeight();
-
-	if (GBuffer0 == NULL || 
-		GBuffer0->GetWidth() != Width || GBuffer0->GetHeight() != Height)
+	if (GetEnabled())
 	{
-		if(!UpdateRenderTargets(Width, Height))
-			return false;
+		switch (Output)
+		{
+			case ZERN_SO_COLOR:
+			case ZERN_SO_ACCUMULATION:
+				return GetAccumulationMap();
+
+			case ZERN_SO_DEPTH:
+				return GetDepthMap();
+
+			case ZERN_SO_NORMAL:
+				return GetNormalMap();	
+
+			case ZERN_SO_GBUFFER_DIFFUSE:
+				return GetDiffuseColorMap();
+
+			case ZERN_SO_GBUFFER_SPECULAR:
+				return GetSpecularColorMap();
+		}
 	}
 
-	Viewport.SetWidth(static_cast<float>(Width));
-	Viewport.SetHeight(static_cast<float>(Height));
+	return ZERNStage::GetOutput(Output);
+}
 
+bool ZERNStageGBuffer::Setup(ZEGRContext* Context)
+{
+	if (!ZERNStage::Setup(Context))
+		return false;
+
+	if (!Update())
+		return false;
+	
 	Context->ClearRenderTarget(GBuffer0->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(), ZEVector4::Zero);
@@ -150,11 +178,11 @@ bool ZERNStageGBuffer::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZELis
 	return true;
 }
 
-void ZERNStageGBuffer::CleanUp(ZERNRenderer* Renderer, ZEGRContext* Context)
+void ZERNStageGBuffer::CleanUp(ZEGRContext* Context)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 
-	ZERNStage::CleanUp(Renderer, Context);
+	ZERNStage::CleanUp(Context);
 }
 
 ZERNStageGBuffer::ZERNStageGBuffer()
