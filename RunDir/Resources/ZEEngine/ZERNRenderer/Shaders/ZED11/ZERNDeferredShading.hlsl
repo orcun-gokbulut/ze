@@ -135,11 +135,11 @@ float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoord
 	return Visibility;
 }
 
-bool ZERNDeferredShading_InsideCascade(float4x4 CascadeProjectionTransform, float3 PositionView, out float3 OutTexCoordDepth)
+bool ZERNDeferredShading_InsideCascade(float4x4 CascadeProjectionTransform, float3 PositionView, inout float3 OutTexCoordDepth)
 {
 	OutTexCoordDepth = mul(CascadeProjectionTransform, float4(PositionView, 1.0f)).xyz;
 	
-	if(OutTexCoordDepth.x >= 0.0f && OutTexCoordDepth.x <= 1.0f && OutTexCoordDepth.y >= 0.0f && OutTexCoordDepth.y <= 1.0f)
+	if (all(OutTexCoordDepth >= 0.0f && OutTexCoordDepth <= 1.0f))
 		return true;
 	else
 		return false;
@@ -240,14 +240,15 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 				float Index = 0.0f;
 				ZERNDeferredShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 				
-				//float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, TexCoord, 0) * 2.0f - 1.0f;
-				//RandomVector = normalize(RandomVector);
+				float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, 32.0f * TexCoord, 0) * 2.0f - 1.0f;
+				RandomVector = normalize(RandomVector);
 				
 				Visibility = 0.0f;
 				
 				for(uint I = 0; I < 16; I++)
 				{	
-					float2 Offset = ZERNDeferredShading_PoissonDiskSamples[I] * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
+					float2 RandomOrientedSample = reflect(ZERNDeferredShading_PoissonDiskSamples[I], RandomVector);
+					float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
 					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoord.xy + Offset, 0), PositionHomogeneous.z - 0.005f);
 					
 				}

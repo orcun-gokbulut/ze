@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 ZEInt ZERNStagePreProcess::GetId() const
 {
@@ -59,21 +60,24 @@ bool ZERNStagePreProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, ZE
 		return false;
 
 	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if(StageGBuffer == NULL)
+	if (StageGBuffer == NULL)
 		return false;
 
 	ZEGRTexture2D* AccumulationMap = StageGBuffer->GetAccumulationMap();
-	if(AccumulationMap == NULL)
+	if (AccumulationMap == NULL)
+		return false;
+
+	ZEGRTexture2D* DepthMap = StageGBuffer->GetDepthMap();
+	if (DepthMap == NULL)
 		return false;
 
 	const ZEGRRenderTarget* RenderTarget = AccumulationMap->GetRenderTarget();
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, StageGBuffer->GetDiffuseColorMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, StageGBuffer->GetSpecularColorMap());
 
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	return true;

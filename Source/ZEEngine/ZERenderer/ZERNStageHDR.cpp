@@ -701,11 +701,11 @@ ZERNStageHDR::ZERNStageHDR()
 
 	Constants.AutoKeyEnabled = ZEGR_FALSE;
 	Constants.BloomEnabled = ZEGR_FALSE;
-	Constants.Key = 0.55f;
-	Constants.WhiteLevel = 3.0f;
-	Constants.ToneMapOperator = ZERN_HTMO_REINHARD;
-	Constants.BloomFactor = 1.0f;
-	Constants.BloomThreshold = 3.0f;
+	Constants.Key = 0.18f;
+	Constants.WhiteLevel = 1.0f;
+	Constants.ToneMapOperator = ZERN_HTMO_UNCHARTED;
+	Constants.BloomFactor = 5.0f;
+	Constants.BloomThreshold = 1.0f;
 	Constants.LuminanceMin = 0.1f;
 	Constants.LuminanceMax = 10.0f;
 	Constants.Saturation = 0.7f;

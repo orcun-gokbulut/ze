@@ -58,7 +58,7 @@ float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	
 	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
 	float DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
-	
+		
 	float2 TextureDimensions = ZERNGBuffer_GetDimensions();
 	
 	//float2 PixelPositionViewNormalized = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions);

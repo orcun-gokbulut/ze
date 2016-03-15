@@ -45,8 +45,8 @@ ZEATObserver::ZEATObserver()
 	Time.TimeZone = 2;
 	Time.DeltaT = 67.9547;
 	Space.Elevation = 850.0;
-	Space.Longtitude = 39.933333;
-	Space.Latitude = 32.866667;
+	Space.Longtitude = 32.83;
+	Space.Latitude = 39.92;
 	Space.AnnualPressure = 913;
 	Space.AnnualTemperature = 11.7;
 }

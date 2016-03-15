@@ -143,7 +143,7 @@ void ZEWeather::SetCloudCover(float Value)
 {
 	CloudCover = Value;
 
-	Cloud->SetCloudCover(Value);
+	//Cloud->SetCloudCover(Value);
 }
 
 float ZEWeather::GetCloudCover() const
@@ -200,7 +200,7 @@ void ZEWeather::SetSunDirection(const ZEVector3& Value)
 	SunDirection = Value.Normalize();
 	SunHeight = SunDirection.y;
 	
-	Cloud->SetSunLightDirection(SunDirection);
+	//Cloud->SetSunLightDirection(SunDirection);
 	SkyDome->SetSunLightDirection(SunDirection);
 
 	// Also set the directional sun light
@@ -240,7 +240,7 @@ void ZEWeather::SetSunLightColor(const ZEVector3& Value)
 {
 	SunLightColor = Value;
 
-	Cloud->SetSunLightColor(Value);
+	//Cloud->SetSunLightColor(Value);
 	SunLight->SetColor(Value);
 }
 
@@ -253,7 +253,7 @@ void ZEWeather::SetMoonLightColor(const ZEVector3& Value)
 {
 	MoonLightColor = Value;
 
-	Cloud->SetSunLightColor(Value);
+	//Cloud->SetSunLightColor(Value);
 	
 }
 
@@ -397,12 +397,12 @@ ZEWeather::ZEWeather()
 	Cloud->SetName("PlanarCloud");
 	Cloud->SetEnabled(true);
 	Cloud->SetVisible(true);
-	Cloud->SetCloudFormationTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
-	Cloud->SetCamera(zeScene->GetActiveCamera());
-	Cloud->SetCloudPlaneHeight(600.0f);
-	Cloud->SetSunLightDirection(SunDirection);
-	Cloud->SetSunLightColor(SunLightColor);
-	Cloud->SetCloudCover(CloudCover);
+	//Cloud->SetCloudFormationTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
+	//Cloud->SetCamera(zeScene->GetActiveCamera());
+	//Cloud->SetCloudPlaneHeight(600.0f);
+	//Cloud->SetSunLightDirection(SunDirection);
+	//Cloud->SetSunLightColor(SunLightColor);
+	//Cloud->SetCloudCover(CloudCover);
 	this->AddComponent(Cloud);
 }
 

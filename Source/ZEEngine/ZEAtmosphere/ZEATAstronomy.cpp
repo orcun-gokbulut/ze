@@ -82,12 +82,12 @@ static inline double LimitDegreeTo_0_180M(double Degree)
 
 static double CalculateJulianDay(const ZEATObserver& Observer)
 {
-	ZEUInt Hour = Observer.Time.Hour;
-	ZEUInt Minute = Observer.Time.Minute;
-	ZEUInt Day = Observer.Time.Day;
-	ZEUInt Month = Observer.Time.Month;
-	ZEUInt Year = Observer.Time.Year;
-	ZEUInt TimeZone = Observer.Time.TimeZone;
+	ZEInt Hour = Observer.Time.Hour;
+	ZEInt Minute = Observer.Time.Minute;
+	ZEInt Day = Observer.Time.Day;
+	ZEInt Month = Observer.Time.Month;
+	ZEInt Year = Observer.Time.Year;
+	ZEInt TimeZone = Observer.Time.TimeZone;
 
 	if(Month <= 2)
 	{
@@ -308,17 +308,22 @@ static ZEATGeocentric CalculateSunGeocentrics(const ZEATHeliocentric& Heliocentr
 	double RadianTrueObliquity = ZEAngle::ToRadian(TrueObliquity);
 
 	Geocentric.RightAscension = 
-		ZEAngle::ArcTan2(ZEAngle::Sin(RadianApparentSunLongtitude) * ZEAngle::Cos(RadianTrueObliquity) - 
+		ZEAngle::ArcTan2
+		(
+		ZEAngle::Sin(RadianApparentSunLongtitude) * ZEAngle::Cos(RadianTrueObliquity) - 
 		ZEAngle::Tan(RadianGeocentricLatitude) * ZEAngle::Sin(RadianTrueObliquity),
-		ZEAngle::Cos(RadianApparentSunLongtitude));
+		ZEAngle::Cos(RadianApparentSunLongtitude)
+		);
 
 	Geocentric.RightAscension = ZEAngle::ToDegree(Geocentric.RightAscension);
 	Geocentric.RightAscension = LimitDegreeTo_0_360(Geocentric.RightAscension);
 
 	Geocentric.Declination = 
-		ZEAngle::ArcSin(ZEAngle::Sin(RadianGeocentricLatitude) * ZEAngle::Cos(RadianTrueObliquity) +
-		ZEAngle::Cos(RadianGeocentricLatitude) * ZEAngle::Sin(RadianTrueObliquity) * 
-		ZEAngle::Sin(RadianApparentSunLongtitude));
+		ZEAngle::ArcSin
+		(
+		ZEAngle::Sin(RadianGeocentricLatitude) * ZEAngle::Cos(RadianTrueObliquity) +
+		ZEAngle::Cos(RadianGeocentricLatitude) * ZEAngle::Sin(RadianTrueObliquity) * ZEAngle::Sin(RadianApparentSunLongtitude)
+		);
 
 	Geocentric.Declination = ZEAngle::ToDegree(Geocentric.Declination);
 
@@ -333,8 +338,8 @@ static ZEATTopocentric CalculateSunTopocentrics(const ZEATObserver& Observer, co
 	double CosLatitude = ZEAngle::Cos(RadianObserverLatitude);
 
 	double U = ZEAngle::ArcTan(0.99664719 * (SinLatitude / CosLatitude));
-	double X = ZEAngle::Cos(U) + (ElevationOverEarthRadius) * CosLatitude;
-	double Y = 0.99664719 * ZEAngle::Sin(U) + (ElevationOverEarthRadius) * SinLatitude;
+	double X = ZEAngle::Cos(U) + ElevationOverEarthRadius * CosLatitude;
+	double Y = 0.99664719 * ZEAngle::Sin(U) + ElevationOverEarthRadius * SinLatitude;
 
 	double ApparentSiderealtimeGreenwich = CalculateApparentSiderealTimeAtGreenwich(Julian.Day, Julian.Century, LongtitudeNutation, TrueObliquity);
 

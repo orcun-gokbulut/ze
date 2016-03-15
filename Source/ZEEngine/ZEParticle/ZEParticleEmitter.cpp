@@ -618,14 +618,14 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 		return;
 
 	ZEMatrix4x4 WorldMatrix = ZEMatrix4x4::Identity;
-	if(EmitterLocal)
+	if (EmitterLocal)
 		ZEMatrix4x4::CreateOrientation(WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());
 
 	ConstantBuffer->SetData(&WorldMatrix);
 
 	InstanceAttributes* InstanceAttribute;
 	InstanceBuffer->Lock(reinterpret_cast<void**>(&InstanceAttribute));
-	for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
+	for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
 	{
 		if (ParticlePool[I].State == ZE_PAS_ALIVE || ParticlePool[I].State == ZE_PAS_NEW)
 		{

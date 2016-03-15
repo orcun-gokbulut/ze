@@ -116,7 +116,7 @@ ZEATAtmosphere::ZEATAtmosphere()
 {
 	Command.Entity = this;
 	Command.StageMask = ZERN_STAGE_PRE_EFFECT | ZERN_STAGE_POST_EFFECT;
-	Command.Priority = 1;
+	Command.Priority = 2;
 }
 
 ZEATAtmosphere::~ZEATAtmosphere()
@@ -181,13 +181,13 @@ void ZEATAtmosphere::Tick(float Time)
 	if (Day)
 	{
 		AtmosphericScattering.SetLightDirection(SunDirection);
-		AtmosphericScattering.SetLightIntensity(20.0f);
+		AtmosphericScattering.SetLightIntensity(10.0f);
 		AtmosphericScattering.SetLightColor(ZEVector3::One);
 	}
 	else if (MoonVisible)
 	{
 		AtmosphericScattering.SetLightDirection(MoonDirection);
-		AtmosphericScattering.SetLightIntensity(0.25f);
+		AtmosphericScattering.SetLightIntensity(0.1f);
 		AtmosphericScattering.SetLightColor(ZEVector3::One);
 	}
 	else

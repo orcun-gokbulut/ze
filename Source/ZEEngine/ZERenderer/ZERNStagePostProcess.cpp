@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {
@@ -66,21 +67,25 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 		return false;
 
 	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
-	if(StageGBuffer == NULL)
+	if (StageGBuffer == NULL)
 		return false;
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
+	ZEGRTexture2D* DepthMap = StageGBuffer->GetDepthMap();
+	if (DepthMap == NULL)
+		return false;
+
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, StageGBuffer->GetAccumulationMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, StageGBuffer->GetNormalMap());
 
 	const ZEGRRenderTarget* RenderTarget = Renderer->GetOutputRenderTarget();
-	if(RenderTarget == NULL)
+	if (RenderTarget == NULL)
 		return false;
 
 	ZEUInt Width = RenderTarget->GetWidth();
 	ZEUInt Height = RenderTarget->GetHeight();
 
-	if(OutputTexture == NULL || OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
+	if (OutputTexture == NULL || 
+		OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 	{
 		OutputTexture.Release();
 		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
@@ -88,7 +93,8 @@ bool ZERNStagePostProcess::Setup(ZERNRenderer* Renderer, ZEGRContext* Context, Z
 
 	RenderTarget = OutputTexture->GetRenderTarget();
 
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->ClearRenderTarget(RenderTarget, ZEVector4(0.1f, 0.1f, 0.1f, 1.0f));
+	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
 
 	return true;
 }

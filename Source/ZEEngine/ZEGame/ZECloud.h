@@ -36,98 +36,107 @@
 #pragma once
 
 #include "ZEEntity.h"
+
 #include "ZETypes.h"
-#include "ZERenderer\ZERNCommand.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZERNCommand.h"
 
 ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
-ZE_META_FORWARD_DECLARE(ZECloudMaterial, "ZEGraphics/ZECloudMaterial.h")
-ZE_META_FORWARD_DECLARE(ZECamera, "ZEGraphics/ZECamera.h")
+
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRVertexBuffer;
+class ZEGRSampler;
+class ZEGRContext;
+class ZEGRTexture2D;
+class ZEGRDepthStencilBuffer;
 
 class ZECloud : public ZEEntity
 {
 	ZE_OBJECT
 
-	protected:
-		float					CloudCover;
-		float					CloudPlaneHeight;
+	private:
+		ZEFlags							DirtyFlags;
+		ZERNCommand						RenderCommand;
+
+		ZEHolder<ZEGRShader>			PlaneVertexShader;
+		ZEHolder<ZEGRShader>			PlaneHullShader;
+		ZEHolder<ZEGRShader>			PlaneDomainShader;
+		ZEHolder<ZEGRShader>			PlanePixelShader;
+		ZEHolder<ZEGRRenderStateData>	PlaneRenderStateData;
+		ZEHolder<ZEGRVertexBuffer>		PlaneVertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>	PlaneConstantBuffer;
+
+		ZEHolder<ZEGRShader>			BlurVertexShader;
+		ZEHolder<ZEGRShader>			BlurPixelShader;
+		ZEHolder<ZEGRRenderStateData>	BlurRenderStateData;
+
+		ZEHolder<ZEGRShader>			LightingPixelShader;
+		ZEHolder<ZEGRRenderStateData>	LightingRenderStateData;
+
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+
+		ZEHolder<ZEGRSampler>			SamplerLinearWrap;
 		
-		ZEVector2				WindVelocity;
-		ZEVector3				SunLightDirection;
-		ZEVector3				SunLightColor;
-		ZEVector3				AmbientColor;
-		ZECamera*				Camera;
+		ZEHolder<ZEGRConstantBuffer>	VerticalConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>	HorizontalConstantBuffer;
 
-		ZEVector3				Rayleigh;
-		ZEVector3				Mie;
-		float					G;
-		float					LightScale;
-		float					AmbientScale;
-		float					EarthRadius;
-		float					AtmosphereHeight;
+		ZEArray<ZEVector4>				HorizontalValues;
+		ZEArray<ZEVector4>				VerticalValues;
 
-		ZETexture2DResource*	CloudFormationTexture;
+		ZEHolder<ZEGRTexture2D>			TempTexture;
+		ZEHolder<ZEGRTexture2D>			BlurredTexture;
+		ZETexture2DResource*			CloudTexture;
 
-		ZERNCommand				CloudRenderCommand;
+		struct  
+		{
+			float						PlaneSubdivision;
+			ZEUInt						CloudCoverage;
+			float						CloudDensity;
+			float						Reserved;
 
-		virtual bool			InitializeSelf();
-		virtual bool			DeinitializeSelf();
+			ZEVector3					SunDirection;
+			float						SunIntensity;
+		} Constants;
 
-								ZECloud();
+		void							CreatePlane();
+
+		bool							UpdateShaders();
+		bool							UpdateRenderStates();
+		bool							UpdateConstantBuffers();
+		bool							Update();
+
+		void							RenderClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void							ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void							LightingClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
+										ZECloud();
 
 	public:
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		void					SetAmbientColor(ZEVector3 Color);
-		ZEVector3				GetAmbientColor();
+		void							SetCloudTexture(const ZEString& FileName);
+		const ZEString&					GetCloudTexture() const;
 
-		void					SetSunLightColor(ZEVector3 Color);
-		ZEVector3				GetSunLightColor();
-		
-		void					SetRayleigh(ZEVector3  Vector);
-		ZEVector3				GetRayleigh();
-		
-		void					SetMie(ZEVector3 Vector);
-		ZEVector3				GetMie();
-		
-		void					SetG(float Value);
-		float					GetG();
+		void							SetSunDirection(const ZEVector3& SunDirection);
+		const ZEVector3&				GetSunDirection() const;
 
-		void					SetLightScale(float Value);
-		float					GetLightScale();
-		
-		void					SetAmbientScale(float Value);
-		float					GetAmbientScale();
-		
-		void					SetEarthRadius(float Value);
-		float					GetEarthRadius();
-		
-		void					SetAtmosphereHeight(float Value);
-		float					GetAtmosphereHeight();
+		void							SetCloudCoverage(ZEUInt CloudCoverage);
+		ZEUInt							GetCloudCoverage() const;
 
-		void					SetCloudCover(float Value);
-		float					GetCloudCover();
+		void							SetCloudDensity(float CloudDensity);
+		float							GetCloudDensity() const;
 
-		void					SetCloudPlaneHeight(float Value);
-		float					GetCloudPlaneHeight();
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		void					SetWindVelocity(ZEVector2 Value);
-		ZEVector2				GetWindVelocity();
+		virtual							~ZECloud();
 
-		void					SetSunLightDirection(ZEVector3 Value);
-		ZEVector3				GetSunLightDirection();
-
-		void					SetCamera(ZECamera* Camera);
-		ZECamera*				GetCamera();
-
-		virtual void			SetCloudFormationTexture(const ZEString& FileName);
-		const ZEString&			GetCloudFormationTexture() const;
-
-		virtual ZEDrawFlags		GetDrawFlags() const;
-
-		virtual void			Tick(float Time);
-
-		virtual					~ZECloud();
-
-		static ZECloud*			CreateInstance();
-
+		static ZECloud*					CreateInstance();
 };

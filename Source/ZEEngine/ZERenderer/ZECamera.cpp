@@ -222,9 +222,8 @@ void ZECamera::SetHorizontalFOV(float FOV)
 	if (View.HorizontalFOV == FOV)
 		return;
 
-	View.HorizontalFOV = FOV;
-	View.HorizontalFOVRight = FOV * 0.5f;
-	View.HorizontalFOVLeft = FOV * 0.5f;
+	View.HorizontalFOVRight = View.HorizontalFOVLeft = FOV * 0.5f;
+
 	ProjectionTransformChanged();
 }
 
@@ -238,9 +237,9 @@ void ZECamera::SetVerticalFOV(float FOV)
 	if (View.VerticalFOV == FOV)
 		return;
 
-	View.VerticalFOV = FOV;
-	View.VerticalFOVTop = FOV * 0.5f;
-	View.VerticalFOVBottom = FOV * 0.5f;
+	View.VerticalFOVTop = View.VerticalFOVBottom = FOV * 0.5f;
+	View.HorizontalFOVLeft = View.HorizontalFOVRight = ZEAngle::ArcTan(ZEAngle::Tan(View.VerticalFOVTop) * View.AspectRatio);
+
 	ProjectionTransformChanged();
 }
 
@@ -470,15 +469,16 @@ ZECamera::ZECamera()
 	View.Entity = this;
 	View.FarZ = 1000.0f;
 	View.NearZ = 1.0f;
-	View.AspectRatio = 1.0f;
+	View.AspectRatio = 1.333333f;
 	View.Viewport = &Viewport;
 	View.ViewVolume = &ViewFrustum;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
 	View.ShadowDistance = 100.0f;
 	View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
 
-	SetVerticalFOV(ZE_PI_4);
 	AutoAspectRatio = true;
+
+	SetVerticalFOV(ZE_PI_4);
 
 	ProjectionTransformChanged();
 }

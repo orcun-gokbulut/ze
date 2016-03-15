@@ -49,6 +49,7 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 #include "ZERandom.h"
+#include "ZERenderer/ZERNStageGBuffer.h"
 
 #define ZEAT_ASDF_SHADERS			1
 #define ZEAT_ASDF_RENDER_STATE		2
@@ -542,6 +543,16 @@ void ZEATAtmosphericScattering::PostProcess(ZERNRenderer* Renderer, ZEGRContext*
 	if (RenderTarget == NULL)
 		return;
 
+	ZERNStageGBuffer* StageGBuffer = static_cast<ZERNStageGBuffer*>(Renderer->GetStage(ZERN_STAGE_GBUFFER));
+	if (StageGBuffer == NULL)
+		return;
+
+	ZEGRRenderTarget* PrevRenderTarget;
+	ZEGRDepthStencilBuffer* PrevDepthStencilBuffer;
+	Context->GetRenderTargets(1, &PrevRenderTarget, &PrevDepthStencilBuffer);
+	Context->SetRenderTargets(1, &PrevRenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, StageGBuffer->GetDepthMap());
+
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(SkyAndAerialPerspectiveRenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
@@ -550,6 +561,9 @@ void ZEATAtmosphericScattering::PostProcess(ZERNRenderer* Renderer, ZEGRContext*
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	Context->Draw(3, 0);
+
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetRenderTargets(1, &PrevRenderTarget, PrevDepthStencilBuffer);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
