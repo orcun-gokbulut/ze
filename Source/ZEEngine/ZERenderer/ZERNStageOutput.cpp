@@ -37,7 +37,7 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-#include "ZEGraphics\ZEGRContext.h"
+#include "ZEGraphics/ZEGRContext.h"
 
 ZEInt ZERNStageOutput::GetId() const
 {
@@ -46,7 +46,7 @@ ZEInt ZERNStageOutput::GetId() const
 
 const ZEString& ZERNStageOutput::GetName() const
 {
-	static ZEString Name = "Output";
+	static const ZEString Name = "Output";
 	return Name;
 }
 
@@ -63,9 +63,4 @@ const ZEGRRenderTarget* ZERNStageOutput::GetProvidedInput(ZERNStageBuffer Buffer
 	{
 		return ZERNStage::GetProvidedInput(Buffer);
 	}
-}
-
-void ZERNStageOutput::CleanUp(ZEGRContext* Context)
-{
-	Context->SetRenderTargets(0, NULL, NULL);
 }

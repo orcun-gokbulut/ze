@@ -136,12 +136,12 @@ const ZEString& ZELightProjective::GetProjectionTextureFilename() const
 	return ProjectionTextureFilename;
 }
 
-ZESize ZELightProjective::GetViewCount()
+ZESize ZELightProjective::GetViewCount() const
 {
 	return 1;
 }
 
-const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index)
+const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index) const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
@@ -157,7 +157,7 @@ ZEGRTexture* ZELightProjective::GetShadowMap(ZESize Index) const
 	return ShadowMap;
 }
 
-const ZEMatrix4x4& ZELightProjective::GetViewTransform(ZESize Index)
+const ZEMatrix4x4& ZELightProjective::GetViewTransform(ZESize Index) const
 {
 	if(DirtyFlags.GetFlags(ZE_LDF_VIEW_TRANSFORM))
 	{
@@ -168,7 +168,7 @@ const ZEMatrix4x4& ZELightProjective::GetViewTransform(ZESize Index)
 	return ViewTransform;
 }
 
-const ZEMatrix4x4& ZELightProjective::GetProjectionTransform(ZESize Index)
+const ZEMatrix4x4& ZELightProjective::GetProjectionTransform(ZESize Index) const
 {
 	if(DirtyFlags.GetFlags(ZE_LDF_PROJECTION_TRANSFORM))
 	{

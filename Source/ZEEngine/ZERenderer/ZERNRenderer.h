@@ -76,7 +76,7 @@ class ZERNRenderer : public ZEInitializable
 		} SceneConstants;
 
 		void							Cull();
-		void							SortStageQueues();
+		void							SortStageCommands();
 		void							RenderStage(ZERNStage* Queue);
 		void							RenderStages();
 

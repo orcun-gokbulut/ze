@@ -44,6 +44,4 @@ class ZERNStageOutput : public ZERNStage
 		virtual const ZEString&				GetName() const;
 
 		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
-		
-		virtual void						CleanUp(ZEGRContext* Context);
 };

@@ -113,6 +113,8 @@ ze_add_source(ZERNStageAntiAliasing.h				Sources Headers)
 ze_add_source(ZERNStageAntiAliasing.cpp				Sources)
 ze_add_source(ZERNStageOutput.h 					Sources Headers)
 ze_add_source(ZERNStageOutput.cpp					Sources)
+ze_add_source(ZERNStageDebug.h 						Sources Headers)
+ze_add_source(ZERNStageDebug.cpp					Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}

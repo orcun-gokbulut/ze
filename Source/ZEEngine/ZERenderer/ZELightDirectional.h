@@ -38,11 +38,11 @@
 #include "ZELight.h"
 
 #include "ZEMath/ZEViewCuboid.h"
-#include "ZEMath/ZEViewFrustum.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEVector.h"
 
 class ZEGRTexture2D;
 class ZEGRConstantBuffer;
-class ZEMatrix4x4;
 class ZEScene;
 
 class ZELightDirectional : public ZELight
@@ -81,6 +81,8 @@ class ZELightDirectional : public ZELight
 
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;
+		virtual ZELightType					GetLightType() const;
+		virtual ZESize						GetViewCount() const;
 
 		void								SetCascadeCount(ZEUInt CascadeCount);
 		ZEUInt								GetCascadeCount() const;
@@ -90,12 +92,10 @@ class ZELightDirectional : public ZELight
 
 		void								BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context);
 
-		virtual ZELightType					GetLightType() const;
-		virtual ZESize						GetViewCount();
 		virtual ZEGRTexture*				GetShadowMap(ZESize Index = 0) const;
-		virtual const ZEViewVolume&			GetViewVolume(ZESize Index = 0);
-		virtual const ZEMatrix4x4&			GetViewTransform(ZESize Index = 0);
-		virtual const ZEMatrix4x4&			GetProjectionTransform(ZESize Index = 0);
+		virtual const ZEViewVolume&			GetViewVolume(ZESize Index = 0) const;
+		virtual const ZEMatrix4x4&			GetViewTransform(ZESize Index = 0) const;
+		virtual const ZEMatrix4x4&			GetProjectionTransform(ZESize Index = 0) const;
 
 		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

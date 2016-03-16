@@ -42,16 +42,14 @@
 #include "ZEDS\ZEList2.h"
 
 class ZEGRContext;
-class ZERNRenderer;
-class ZEGRRenderState;
-class ZERNCommand;
-class ZEString;
 class ZEGRTexture2D;
+class ZEGRRenderState;
 class ZEGRRenderTarget;
+class ZERNCommand;
+class ZERNRenderer;
+class ZEString;
 
 template<typename Type> class ZEList2;
-
-// GBuffer
 
 enum ZERNStageBuffer
 {

@@ -64,7 +64,7 @@ cbuffer ZERNDeferredShading_LightConstants													: register(b8)
 	float4x4						ZERNDeferredShading_LightRotation;						//64
 	bool							ZERNDeferredShading_CastShadow;
 	uint							ZERNDeferredShading_SampleCount;
-	float							ZERNDeferredShading_SampleLengthOffset;
+	float							ZERNDeferredShading_SampleLength;
 	bool							ZERNDeferredShading_ShowCascades;
 };
 
@@ -84,7 +84,7 @@ Texture2DArray<float>				ZERNDeferredShading_ShadowMaps							: register(t5);
 Texture2D							ZERNDeferredShading_ProjectionMap						: register(t6);
 TextureCube							ZERNDeferredShading_OmniProjectionMap					: register(t7);
 Texture2D<float2>					ZERNDeferredShading_RandomVectors						: register(t8);
-Texture2D<float3>					ZERNDeferredShading_TiledComputerColorBuffer			: register(t9);
+Texture2D<float3>					ZERNDeferredShading_TiledComputeColorBuffer				: register(t9);
 
 static const float3 ZERNDeferredShading_CascadeColors[] = 
 {
@@ -126,7 +126,7 @@ float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoord
 	for(uint I = 0; I < 16; I++)
 	{
 		float2 RandomOrientedSample = reflect(ZERNDeferredShading_PoissonDiskSamples[I], RandomVector);
-		float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
+		float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLength / ShadowMapDimensions;
 		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z - ZERNDeferredShading_DepthBias);
 	}
 		
@@ -248,7 +248,7 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 				for(uint I = 0; I < 16; I++)
 				{	
 					float2 RandomOrientedSample = reflect(ZERNDeferredShading_PoissonDiskSamples[I], RandomVector);
-					float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLengthOffset / ShadowMapDimensions;
+					float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLength / ShadowMapDimensions;
 					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoord.xy + Offset, 0), PositionHomogeneous.z - 0.005f);
 					
 				}
@@ -337,7 +337,7 @@ float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : S
 
 float3 ZERNDeferredShading_Accumulate_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	return ZERNDeferredShading_TiledComputerColorBuffer.Load(int3(PositionViewport.xy, 0));
+	return ZERNDeferredShading_TiledComputeColorBuffer.Load(int3(PositionViewport.xy, 0));
 }
 
 #endif

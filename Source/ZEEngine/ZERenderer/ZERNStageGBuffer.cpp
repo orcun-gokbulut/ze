@@ -102,7 +102,7 @@ ZEInt ZERNStageGBuffer::GetId() const
 
 const ZEString& ZERNStageGBuffer::GetName() const
 {
-	static ZEString Name = "GBuffer";
+	static const ZEString Name = "GBuffer";
 	return Name;
 }
 
@@ -197,11 +197,6 @@ ZEGRRenderState ZERNStageGBuffer::GetRenderState()
 	if (!Initialized)
 	{
 		Initialized = true;
-
-		ZEGRDepthStencilState DepthStencilStateReverseZ;
-		DepthStencilStateReverseZ.SetDepthFunction(ZEGR_CF_GREATER_EQUAL);
-
-		RenderState.SetDepthStencilState(DepthStencilStateReverseZ);
 
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
 		RenderState.SetRenderTargetFormat(1, ZEGR_TF_R8G8B8A8_UNORM);

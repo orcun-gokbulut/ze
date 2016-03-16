@@ -604,7 +604,7 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		LightConstants->CastShadow = static_cast<ZEBool32>(DirectionalLight->GetCastsShadow());
 		LightConstants->ShowCascades = static_cast<ZEBool32>(ShowCascades);
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
-		LightConstants->SampleLengthOffset = DirectionalLight->GetShadowSampleLengthOffset();
+		LightConstants->SampleLength = DirectionalLight->GetShadowSampleLength();
 	DeferredLightConstantBuffer->Unlock();
 
 	DirectionalLight->BindCascades(GetRenderer(), Context);	//TODO: Another way to do this?
@@ -661,7 +661,7 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 
 		LightConstants->CastShadow = static_cast<ZEBool32>(ProjectiveLight->GetCastsShadow());
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(ProjectiveLight->GetShadowSampleCount());
-		LightConstants->SampleLengthOffset = ProjectiveLight->GetShadowSampleLengthOffset();
+		LightConstants->SampleLength = ProjectiveLight->GetShadowSampleLength();
 
 		LightConstants->ProjectionMatrix = ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * GetRenderer()->GetView().InvViewTransform;
 
@@ -815,6 +815,7 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	const ZEGRTexture2D* AccumulationMap = GetPrevOutput(ZERN_SO_ACCUMULATION);
 	if (AccumulationMap == NULL)
 		return false;
+
 	OutputRenderTarget = AccumulationMap->GetRenderTarget();
 
 	ze_for_each(Command, GetCommands()) 
@@ -877,8 +878,6 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 			Result = SetupTiledDeferred(Context);
 		}
 	}
-
-	CleanUp(Context);
 
 	return false;
 }

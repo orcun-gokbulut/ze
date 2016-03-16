@@ -35,15 +35,16 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
+
+#include "ZETypes.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEViewVolume.h"
 #include "ZERNRenderer.h"
 #include "ZERNView.h"
 #include "ZERNCommand.h"
 
-enum ZELightType : ZEUInt8
+enum ZELightType				: ZEUInt8
 {
 	ZE_LT_NONE				= 0,
 	ZE_LT_POINT				= 1,
@@ -52,7 +53,7 @@ enum ZELightType : ZEUInt8
 	ZE_LT_OMNIPROJECTIVE	= 4
 };
 
-enum ZELightShadowResolution : ZEUInt8
+enum ZELightShadowResolution	: ZEUInt8
 {
 	ZE_LSR_LOW				= 0,
 	ZE_LSR_MEDIUM			= 1,
@@ -60,7 +61,7 @@ enum ZELightShadowResolution : ZEUInt8
 	ZE_LSR_VERY_HIGH		= 3
 };
 
-enum ZELightShadowSampleCount : ZEUInt8
+enum ZELightShadowSampleCount	: ZEUInt8
 {
 	ZE_LSC_LOW				= 0,
 	ZE_LSC_MEDIUM			= 1,
@@ -78,13 +79,13 @@ class ZELight : public ZEEntity
 		float							AttenuationFunction(float RootToTry);
 
 	protected:
-		ZEFlags							DirtyFlags;
+		mutable ZEFlags					DirtyFlags;
 
 		bool							CastsShadows;
 
 		ZELightShadowResolution			ShadowResolution;
 		ZELightShadowSampleCount		ShadowSampleCount;
-		float							ShadowSampleLengthOffset;
+		float							ShadowSampleLength;
 
 		float							Range;
 		float							Intensity;
@@ -92,8 +93,8 @@ class ZELight : public ZEEntity
 		ZEVector3						Color;
 		ZEVector3						Attenuation;
 
-		ZEMatrix4x4						ViewTransform;
-		ZEMatrix4x4						ProjectionTransform;
+		mutable ZEMatrix4x4				ViewTransform;
+		mutable ZEMatrix4x4				ProjectionTransform;
 
 		ZERNRenderer					ShadowRenderer;
 		ZERNCommand						Command;
@@ -103,8 +104,9 @@ class ZELight : public ZEEntity
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
+
 		virtual ZELightType				GetLightType() const = 0;
-		virtual ZESize					GetViewCount() = 0;
+		virtual ZESize					GetViewCount() const = 0;
 
 		void							SetIntensity(float NewValue);
 		float							GetIntensity() const;
@@ -123,9 +125,9 @@ class ZELight : public ZEEntity
 		bool							GetCastsShadow() const;
 
 		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) = 0;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) = 0;
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) = 0;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const = 0;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
+		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
 
 		void							SetShadowResolution(ZELightShadowResolution ShadowResolution);
 		ZELightShadowResolution			GetShadowResolution() const;
@@ -133,8 +135,8 @@ class ZELight : public ZEEntity
 		void							SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
 		ZELightShadowSampleCount		GetShadowSampleCount() const;
 
-		void							SetShadowSampleLengthOffset(float ShadowSampleLengthOffset);
-		float							GetShadowSampleLengthOffset() const;
+		void							SetShadowSampleLength(float ShadowSampleLength);
+		float							GetShadowSampleLength() const;
 		
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

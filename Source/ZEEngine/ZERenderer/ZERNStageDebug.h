@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageID.h
+ Zinek Engine - ZERNStageDebug.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,28 +35,14 @@
 
 #pragma once
 
-#include "ZETypes.h"
+#include "ZERNStage.h"
 
-typedef ZEUInt32 ZERNStageMask;
-typedef ZEUInt64 ZERNStageID;
+class ZERNStageDebug : public ZERNStage
+{
+	public:
+		virtual ZEInt				GetId() const;
+		virtual const ZEString&		GetName() const;
 
-// Normal
-#define ZERN_STAGE_ID(ID)						(1<<ID)
-#define ZERN_STAGE_GBUFFER						ZERN_STAGE_ID(1)
-#define ZERN_STAGE_LIGHTING						ZERN_STAGE_ID(2)
-#define ZERN_STAGE_AO							ZERN_STAGE_ID(3)
-#define ZERN_STAGE_FORWARD						ZERN_STAGE_ID(4)
-#define ZERN_STAGE_FORWARD_TRANSPARENT			ZERN_STAGE_ID(5)
-#define ZERN_STAGE_PRE_HDR_EFFECT				ZERN_STAGE_ID(6)
-#define ZERN_STAGE_HDR							ZERN_STAGE_ID(7)
-#define ZERN_STAGE_POST_EFFECT					ZERN_STAGE_ID(8)
-#define ZERN_STAGE_2D							ZERN_STAGE_ID(9)
-#define ZERN_STAGE_POST_2D_EFFECT				ZERN_STAGE_ID(10)
-#define ZERN_STAGE_ANTI_ALIASING				ZERN_STAGE_ID(11)
-#define ZERN_STAGE_SHADOWING					ZERN_STAGE_ID(12)
-#define ZERN_STAGE_SHADOW_MAP_GENERATION		ZERN_STAGE_ID(13)
-#define ZERN_STAGE_TEXTURE_OUTPUT				ZERN_STAGE_ID(14)
-#define ZERN_STAGE_PRE_EFFECT					ZERN_STAGE_ID(15)
-#define ZERN_STAGE_PARTICLE_RENDERING			ZERN_STAGE_ID(16)
-#define ZERN_STAGE_OUTPUT						ZERN_STAGE_ID(17)
-#define ZERN_STAGE_DEBUG						ZERN_STAGE_ID(18)
+		virtual bool				Setup(ZEGRContext* Context);
+		virtual void				CleanUp(ZEGRContext* Context);
+};

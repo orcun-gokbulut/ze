@@ -37,14 +37,13 @@
 
 #include "ZEGame/ZEEntity.h"
 
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZECanvas.h"
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEGraphics/ZEGRViewport.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 typedef ZEFlags ZECameraDirtyFlags;
 typedef ZEFlags ZECameraSettingFlags;
