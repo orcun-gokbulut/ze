@@ -91,12 +91,12 @@ bool ZELightOmniProjective::DeinitializeSelf()
 	return ZELight::DeinitializeSelf();
 }
 
-ZESize ZELightOmniProjective::GetViewCount()
+ZESize ZELightOmniProjective::GetViewCount() const
 {
 	return 1;
 }
 
-const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index)
+const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index) const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
@@ -112,12 +112,12 @@ ZEGRTexture* ZELightOmniProjective::GetShadowMap(ZESize	Index) const
 	return NULL;
 }
 
-const ZEMatrix4x4& ZELightOmniProjective::GetViewTransform(ZESize Index)
+const ZEMatrix4x4& ZELightOmniProjective::GetViewTransform(ZESize Index) const
 {	
 	return ViewTransform;
 }
 
-const ZEMatrix4x4& ZELightOmniProjective::GetProjectionTransform(ZESize Index)
+const ZEMatrix4x4& ZELightOmniProjective::GetProjectionTransform(ZESize Index) const
 {
 	return ProjectionTransform;
 }

@@ -61,7 +61,7 @@ class ZELightDirectional;
 class ZELightOmniProjective;
 
 #define MAX_LIGHT			255
-#define TILE_SIZE_IN_PIXELS	16	//32x32
+#define TILE_SIZE_IN_PIXELS	16
 
 enum ZERNRenderModel
 {
@@ -122,7 +122,7 @@ class ZERNStageLighting : public ZERNStage
 			ZEMatrix4x4						RotationMatrix;
 			ZEBool32						CastShadow;
 			ZEUInt							SampleCount;
-			float							SampleLengthOffset;
+			float							SampleLength;
 			ZEBool32						ShowCascades;
 		};
 
@@ -131,7 +131,7 @@ class ZERNStageLighting : public ZERNStage
 			LightStruct						Lights[MAX_LIGHT];
 			ZEUInt							LightCount;
 			ZEVector3						Reserved;
-		}TiledDeferredLightConstants;
+		} TiledDeferredLightConstants;
 
 		ZEArray<TileStruct>					Tiles;
 		ZEList2<ZELight>					DeferredLightList;

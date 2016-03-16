@@ -36,27 +36,26 @@
 #pragma once
 
 #include "ZELight.h"
+
 #include "ZEMath/ZEViewSphere.h"
 
 class ZELightPoint  : public ZELight
 {
 	ZE_OBJECT
 	private:
-		ZEViewSphere					ViewVolume;
-
-		virtual bool					DeinitializeSelf();
+		mutable ZEViewSphere			ViewVolume;
 
 										ZELightPoint();
 		virtual							~ZELightPoint();
 
 	public:
-		ZELightType						GetLightType() const;
-		
-		virtual ZESize					GetViewCount();
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
+		virtual ZELightType				GetLightType() const;
+		virtual ZESize					GetViewCount() const;
+
 		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0);
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const;
+		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const;
 
 		static ZELightPoint*			CreateInstance();
 };

@@ -53,7 +53,6 @@ enum ZERNStageMultiplexerMode
 };
 
 class ZEGRTexture;
-class ZEGRRenderState;
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRRenderTarget;

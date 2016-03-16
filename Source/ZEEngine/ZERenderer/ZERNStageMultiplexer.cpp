@@ -37,7 +37,6 @@
 
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
@@ -49,10 +48,8 @@
 bool ZERNStageMultiplexer::UpdateInputOutputs()
 {
 	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-	{
 		if (Inputs[I] != ZERN_SO_NONE)
 			InputTextures[I] = GetPrevOutput(Inputs[I]);
-	}
 
 	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (OutputRenderTarget == NULL)
@@ -84,7 +81,7 @@ void ZERNStageMultiplexer::DrawSingle(ZEGRContext* Context)
 	Viewport.SetX(0.0f);
 	Viewport.SetY(0.0f);
 	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
-	Viewport.SetHeight((float)OutputRenderTarget->GetWidth());
+	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
 	Context->SetViewports(1, &Viewport);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
 	Context->Draw(3, 0);
@@ -92,30 +89,8 @@ void ZERNStageMultiplexer::DrawSingle(ZEGRContext* Context)
 
 void ZERNStageMultiplexer::DrawVertical2(ZEGRContext* Context)
 {
-	ZEUInt ViewportWidth = OutputRenderTarget->GetWidth();
-	ZEUInt ViewportHeight = OutputRenderTarget->GetHeight() / 2;
-
-	ZEGRViewport Viewport;
-	Viewport.SetWidth((float)ViewportWidth);
-	Viewport.SetHeight((float)ViewportHeight);
-
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
-	Context->Draw(3, 0);
-
-	Viewport.SetX(0.0f);
-	Viewport.SetY((float)ViewportHeight);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[1]);
-	Context->Draw(3, 0);
-}
-
-void ZERNStageMultiplexer::DrawHorizontal2(ZEGRContext* Context)
-{
-	ZESize ViewportWidth = OutputRenderTarget->GetWidth() / 2;
-	ZESize ViewportHeight = OutputRenderTarget->GetHeight();
+	ZEUInt ViewportWidth = OutputRenderTarget->GetWidth() / 2;
+	ZEUInt ViewportHeight = OutputRenderTarget->GetHeight();
 
 	ZEGRViewport Viewport;
 	Viewport.SetWidth((float)ViewportWidth);
@@ -129,6 +104,28 @@ void ZERNStageMultiplexer::DrawHorizontal2(ZEGRContext* Context)
 
 	Viewport.SetX((float)ViewportWidth);
 	Viewport.SetY(0.0f);
+	Context->SetViewports(1, &Viewport);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[1]);
+	Context->Draw(3, 0);
+}
+
+void ZERNStageMultiplexer::DrawHorizontal2(ZEGRContext* Context)
+{
+	ZESize ViewportWidth = OutputRenderTarget->GetWidth();
+	ZESize ViewportHeight = OutputRenderTarget->GetHeight() / 2;
+
+	ZEGRViewport Viewport;
+	Viewport.SetWidth((float)ViewportWidth);
+	Viewport.SetHeight((float)ViewportHeight);
+
+	Viewport.SetX(0.0f);
+	Viewport.SetY(0.0f);
+	Context->SetViewports(1, &Viewport);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
+	Context->Draw(3, 0);
+
+	Viewport.SetX(0.0f);
+	Viewport.SetY((float)ViewportHeight);
 	Context->SetViewports(1, &Viewport);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[1]);
 	Context->Draw(3, 0);
@@ -202,8 +199,6 @@ bool ZERNStageMultiplexer::InitializeSelf()
 
 void ZERNStageMultiplexer::DeinitializeSelf()
 {
-	RenderStateData.Release();
-
 	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
 	{
 		if (Inputs[I] == ZERN_SO_NONE)
@@ -212,8 +207,31 @@ void ZERNStageMultiplexer::DeinitializeSelf()
 
 	OutputRenderTarget.Release();
 	OutputTexture.Release();
+	
+	RenderStateData.Release();
 
 	ZERNStage::Deinitialize();
+}
+
+ZEInt ZERNStageMultiplexer::GetId() const
+{
+	return ZERN_STAGE_TEXTURE_OUTPUT;
+}
+
+const ZEString& ZERNStageMultiplexer::GetName() const
+{
+	static const ZEString Name = "Texture Output";
+	return Name;
+}
+
+void ZERNStageMultiplexer::SetMode(ZERNStageMultiplexerMode Mode)
+{
+	this->Mode = Mode;
+}
+
+ZERNStageMultiplexerMode ZERNStageMultiplexer::GetMode()
+{
+	return Mode;
 }
 
 void ZERNStageMultiplexer::SetInput(ZEUInt Index, ZERNStageBuffer Buffer)
@@ -263,37 +281,6 @@ const ZEGRTexture2D* ZERNStageMultiplexer::GetOutput(ZERNStageBuffer Output) con
 		return ZERNStage::GetOutput(Output);
 }
 
-ZERNStageMultiplexer::ZERNStageMultiplexer()
-{
-	Mode = ZERN_SMM_SINGLE;
-	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-		Inputs[I] = ZERN_SO_NONE;
-
-	Inputs[0] = ZERN_SO_COLOR;
-}
-
-ZEInt ZERNStageMultiplexer::GetId() const
-{
-	return ZERN_STAGE_TEXTURE_OUTPUT;
-}
-
-const ZEString& ZERNStageMultiplexer::GetName() const
-{
-	static ZEString Name = "Texture Output";
-	return Name;
-}
-
-
-void ZERNStageMultiplexer::SetMode(ZERNStageMultiplexerMode Mode)
-{
-	this->Mode = Mode;
-}
-
-ZERNStageMultiplexerMode ZERNStageMultiplexer::GetMode()
-{
-	return Mode;
-}
-
 bool ZERNStageMultiplexer::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
@@ -341,3 +328,11 @@ void ZERNStageMultiplexer::CleanUp(ZEGRContext* Context)
 	ZERNStage::CleanUp(Context);
 }
 
+ZERNStageMultiplexer::ZERNStageMultiplexer()
+{
+	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
+		Inputs[I] = ZERN_SO_NONE;
+
+	Inputs[0] = ZERN_SO_COLOR;
+	Mode = ZERN_SMM_SINGLE;
+}

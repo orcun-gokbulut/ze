@@ -37,14 +37,13 @@
 
 #include "ZEDS/ZEList2.h"
 #include "ZEGraphics/ZEGRRenderState.h"
-#include "ZEDS/ZELink.h"
 
-const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Output) const
+const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Input) const
 {
 	if (GetPrevStage() == NULL)
 		return NULL;
 
-	return GetPrevStage()->GetOutput(Output);
+	return GetPrevStage()->GetOutput(Input);
 }
 
 
@@ -112,6 +111,7 @@ bool ZERNStage::Setup(ZEGRContext* Context)
 
 void ZERNStage::CleanUp(ZEGRContext* Context)
 {
+
 }
 
 ZERNStage::ZERNStage() : Link(this)

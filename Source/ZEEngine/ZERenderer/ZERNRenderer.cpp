@@ -123,7 +123,7 @@ void ZERNRenderer::Cull()
 	Culler.Cull();
 }
 
-void ZERNRenderer::SortStageQueues()
+void ZERNRenderer::SortStageCommands()
 {
 	ZESize Count = Stages.GetCount();
 	for (ZESize I = 0; I < Count; I++)
@@ -168,9 +168,9 @@ void ZERNRenderer::RenderStages()
 	{
 		if (!Stage->GetEnabled())
 			continue;
-
-		 if (!Stage->Setup(Context))
-			 continue;
+		
+		if (!Stage->Setup(Context))
+			continue;
 
 		Parameters.Stage = Stage.GetPointer();
 		ze_for_each(Command, Stage->Commands)
@@ -276,10 +276,10 @@ void ZERNRenderer::AddStage(ZERNStage* Stage)
 {
 	zeCheckError(Stage == NULL, ZE_VOID, "Stage cannot be null.");
 	zeCheckError(Stage->GetRenderer() != NULL, ZE_VOID, "Stage is already added to a renderer.");
-	
+
 	Stages.AddEnd(&Stage->Link);
 	Stage->Renderer = this;
-	
+
 	if (IsInitialized())
 		Stage->Initialize();
 }
@@ -365,7 +365,7 @@ void ZERNRenderer::Render(float ElapsedTime)
 		return;
 
 	Cull();
-	SortStageQueues();
+	SortStageCommands();
 	RenderStages();
 }
 

@@ -282,41 +282,41 @@ ZELightDirectional* ZELightDirectional::CreateInstance()
 	return new ZELightDirectional();
 }
 
-ZESize ZELightDirectional::GetViewCount()
+ZESize ZELightDirectional::GetViewCount() const
 {
 	return 1;
 }
 
 ZEGRTexture* ZELightDirectional::GetShadowMap(ZESize Index) const
 {
-	if(Index >= CascadeConstants.CascadeCount)
+	if (Index >= CascadeConstants.CascadeCount)
 		return NULL;
 
 	return CascadeShadowMaps;
 }
 
-const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index)
+const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index) const
 {
-	if(Index >= CascadeConstants.CascadeCount)
+	if (Index >= CascadeConstants.CascadeCount)
 		return ZEViewCuboid();
 
 	return CascadeVolumes[Index];
 }
 
-const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index)
+const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index) const
 {
-	if(DirtyFlags.GetFlags(ZE_LDF_VIEW_TRANSFORM))
+	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateViewTransform(ViewTransform, GetPosition(), GetRotation());
+		ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation());
 		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_TRANSFORM);
 	}
 
 	return ViewTransform;
 }
 
-const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index)
+const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index) const
 {
-	if(Index >= CascadeConstants.CascadeCount)
+	if (Index >= CascadeConstants.CascadeCount)
 		return ZEMatrix4x4::Identity;
 
 	return CascadeConstants.Cascades[Index].ProjectionTransform;

@@ -187,9 +187,6 @@ ZELightShadowResolution ZELight::GetShadowResolution() const
 
 void ZELight::SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
 {
-	if(this->ShadowSampleCount == ShadowSampleCount)
-		return;
-
 	this->ShadowSampleCount = ShadowSampleCount;
 }
 
@@ -198,17 +195,14 @@ ZELightShadowSampleCount ZELight::GetShadowSampleCount() const
 	return ShadowSampleCount;
 }
 
-void ZELight::SetShadowSampleLengthOffset(float ShadowSampleLengthOffset)
+void ZELight::SetShadowSampleLength(float ShadowSampleLength)
 {
-	if(this->ShadowSampleLengthOffset == ShadowSampleLengthOffset)
-		return;
-
-	this->ShadowSampleLengthOffset = ShadowSampleLengthOffset;
+	this->ShadowSampleLength = ShadowSampleLength;
 }
 
-float ZELight::GetShadowSampleLengthOffset() const
+float ZELight::GetShadowSampleLength() const
 {
-	return ShadowSampleLengthOffset;
+	return ShadowSampleLength;
 }
 
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
@@ -239,7 +233,7 @@ ZELight::ZELight()
 	CastsShadows = false;
 	ShadowResolution = ZE_LSR_MEDIUM;
 	ShadowSampleCount = ZE_LSC_MEDIUM;
-	ShadowSampleLengthOffset = 1.0f;
+	ShadowSampleLength = 1.0f;
 
 	Range = 100.0f;
 	Intensity = 1.0f;

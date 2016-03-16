@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZELight.h"
+
 #include "ZEMath/ZEViewSphere.h"
 
 class ZEGRTextureCube;
@@ -48,7 +49,7 @@ class ZELightOmniProjective : public ZELight
 
 	private:
 		const ZEGRTextureCube*			ProjectionTexture;
-		ZEViewSphere					ViewVolume;
+		mutable ZEViewSphere			ViewVolume;
 		ZEGRTexture2D*					FrontShadowMap;
 		ZEGRTexture2D*					BackShadowMap;
 
@@ -61,7 +62,8 @@ class ZELightOmniProjective : public ZELight
 		virtual							~ZELightOmniProjective();
 
 	public:
-		ZELightType						GetLightType() const;
+		virtual ZELightType				GetLightType() const;
+		virtual ZESize					GetViewCount() const;
 
 		const ZEGRTextureCube*			GetShadowMap() const;
 
@@ -73,11 +75,10 @@ class ZELightOmniProjective : public ZELight
 
 		virtual void					SetCastsShadow(bool NewValue);
 		
-		virtual ZESize					GetViewCount();
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0);
 		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0);
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0);
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const;
+		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const;
 
 		static ZELightOmniProjective*	CreateInstance();
 };

@@ -49,17 +49,12 @@ ZELightType ZELightPoint::GetLightType() const
 	return ZE_LT_POINT;
 }
 
-bool ZELightPoint::DeinitializeSelf()
-{
-	return ZELight::DeinitializeSelf();
-}
-
-ZESize ZELightPoint::GetViewCount()
+ZESize ZELightPoint::GetViewCount() const
 {
 	return 1;
 }
 
-const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index)
+const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index) const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
@@ -75,12 +70,12 @@ ZEGRTexture* ZELightPoint::GetShadowMap(ZESize Index) const
 	return NULL;
 }
 
-const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index)
+const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index) const
 {
 	return ViewTransform;
 }
 
-const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index)
+const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index) const
 {
 	return ProjectionTransform;
 }
