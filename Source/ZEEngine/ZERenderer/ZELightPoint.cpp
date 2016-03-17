@@ -84,6 +84,7 @@ ZELightPoint::ZELightPoint()
 {
 	Command.Entity = this;
 	Command.Priority = 1;
+	Command.StageMask = ZERN_STAGE_DEBUG;
 }
 
 ZELightPoint::~ZELightPoint()

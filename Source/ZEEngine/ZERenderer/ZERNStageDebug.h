@@ -37,12 +37,71 @@
 
 #include "ZERNStage.h"
 
+#include "ZETypes.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
+
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRVertexBuffer;
+class ZEGRTexture2D;
+
 class ZERNStageDebug : public ZERNStage
 {
-	public:
-		virtual ZEInt				GetId() const;
-		virtual const ZEString&		GetName() const;
+	private:
+		ZEFlags							DirtyFlags;
 
-		virtual bool				Setup(ZEGRContext* Context);
-		virtual void				CleanUp(ZEGRContext* Context);
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			GeometryShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+
+		ZEHolder<ZEGRShader>			BoundingBoxVertexShader;
+		ZEHolder<ZEGRShader>			BoundingBoxGeometryShader;
+		ZEHolder<ZEGRRenderStateData>	BoundingBoxRenderStateData;
+		ZEHolder<ZEGRVertexBuffer>		BoundingBoxVertexBuffer;
+
+		ZEHolder<ZEGRTexture2D>			DepthMap;
+
+		struct  
+		{
+			ZEBool32					ShowNormalVectors;
+			ZEBool32					ShowBoundingBox;
+			ZEBool32					ShowWireframe;
+			ZEBool32					CullBackface;
+		} Constants;
+
+		bool							UpdateShaders();
+		bool							UpdateRenderStates();
+		bool							UpdateConstantBuffers();
+		bool							Update();
+
+		bool							SetupBoundingBoxVertexBuffer();
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+	public:
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
+
+		void							SetShowNormalVectors(bool ShowNormalVectors);
+		bool							GetShowNormalVectors() const;
+
+		void							SetShowBoundingBox(bool ShowBoundingBox);
+		bool							GetShowBoundingBox() const;
+
+		void							SetShowWireframe(bool ShowWireframe);
+		bool							GetShowWireframe() const;
+
+		void							SetCullBackface(bool CullBackface);
+		bool							GetCullBackface() const;
+
+		virtual bool					Setup(ZEGRContext* Context);
+		virtual void					CleanUp(ZEGRContext* Context);
+
+										ZERNStageDebug();
 };

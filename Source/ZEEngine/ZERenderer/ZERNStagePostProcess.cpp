@@ -40,6 +40,7 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {
@@ -93,6 +94,7 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 
 	RenderTarget = OutputTexture->GetRenderTarget();
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	return true;
 }
@@ -107,17 +109,20 @@ void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 	ZERNStage::CleanUp(Context);
 }
 
-const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input)
+const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
 {
-	if (GetEnabled() && (Input == ZERN_SO_COLOR))
+	if (!GetEnabled() && (Input == ZERN_SO_COLOR))
 		return NULL;
 
 	return ZERNStage::GetProvidedInput(Input);
 }
 
-const ZEGRTexture2D* ZERNStagePostProcess::GetOutputTexture() const
+const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) const
 {
-	return OutputTexture;
+	if (GetEnabled())
+		return OutputTexture;
+
+	return ZERNStage::GetOutput(Output);
 }
 
 ZERNStagePostProcess::ZERNStagePostProcess()

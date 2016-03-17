@@ -423,7 +423,39 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 {
 	if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW_FRUSTUM))
 	{
-		ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
+		if (GetProjectionType() == ZERN_PT_PERSPECTIVE)
+		{
+			ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
+		}
+		else if (GetProjectionType() == ZERN_PT_PERSPECTIVE_OFFCENTER)
+		{
+			const ZEMatrix4x4& ProjectionTransform = GetProjectionTransform();
+			ZEVector3 Column1 = ZEVector3(ProjectionTransform.M11, ProjectionTransform.M12, ProjectionTransform.M13);
+			ZEVector3 Column2 = ZEVector3(ProjectionTransform.M21, ProjectionTransform.M22, ProjectionTransform.M23);
+			ZEVector3 Column4 = ZEVector3::UnitZ;
+
+			ZEPlane FrustumPlanes[6];
+			FrustumPlanes[0] = ZEPlane(Column4 - Column1, ZEVector3::Zero);						//Right
+			FrustumPlanes[1] = ZEPlane(Column4 + Column1, ZEVector3::Zero);						//Left
+			FrustumPlanes[2] = ZEPlane(Column4 - Column2, ZEVector3::Zero);						//Top
+			FrustumPlanes[3] = ZEPlane(Column4 + Column2, ZEVector3::Zero);						//Bottom
+			FrustumPlanes[4] = ZEPlane(ZEVector3::UnitZ, ZEVector3(0.0f, 0.0f, GetNearZ()));	//Near
+			FrustumPlanes[5] = ZEPlane(-ZEVector3::UnitZ, ZEVector3(0.0f, 0.0f, GetFarZ()));	//Far
+
+			const ZEMatrix4x4 InverseViewTransform = GetInvViewTransform();
+			for (ZEUInt I = 0; I < 6; I++)
+			{
+				ZEVector3 Normal = FrustumPlanes[I].n;
+				ZEVector3 Point = FrustumPlanes[I].p;
+
+				FrustumPlanes[I].n.NormalizeSelf();
+				ZEMatrix4x4::Transform3x3(FrustumPlanes[I].n, InverseViewTransform, Normal);
+				ZEMatrix4x4::Transform(FrustumPlanes[I].p, InverseViewTransform, Point);
+				FrustumPlanes[I].n.NormalizeSelf();
+			}
+
+			ViewFrustum.Create(FrustumPlanes[0], FrustumPlanes[3], FrustumPlanes[1], FrustumPlanes[2], FrustumPlanes[5], FrustumPlanes[4]);
+		}
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_FRUSTUM);
 	}

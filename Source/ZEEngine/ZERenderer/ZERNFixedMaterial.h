@@ -83,11 +83,6 @@ class ZERNFixedMaterial : public ZERNMaterial
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
 
-		mutable ZEHolder<ZEGRShader>			StageDebug_VertexShader;
-		mutable ZEHolder<ZEGRShader>			StageDebug_GeometryShader;
-		mutable ZEHolder<ZEGRShader>			StageDebug_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	StageDebug_RenderState;
-
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZERNMap								BaseMap;

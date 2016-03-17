@@ -72,10 +72,7 @@ void ZELight::SetRange(float NewValue)
 	Range = NewValue;
 
 	ZEVector3 Extent(Range, Range, Range);
-	ZEVector3::Normalize(Extent, Extent);
-	Extent *= Range;
-	ZEVector3 Position = GetPosition();
-	SetBoundingBox(ZEAABBox(Position - Extent, Position + Extent));
+	SetBoundingBox(ZEAABBox(-Extent, Extent));
 
 	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }

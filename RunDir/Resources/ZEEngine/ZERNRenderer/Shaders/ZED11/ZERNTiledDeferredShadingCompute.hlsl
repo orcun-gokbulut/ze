@@ -127,8 +127,8 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 	float2 TileScale = GBufferDimensions * rcp(2.0f * TILE_DIMENSION);
 	float2 TileBias = TileScale - float2(GroupId.xy);
 	
-	float4 ProjectionMatrixColumn0 = float4(ZERNView_ProjectionTransform._11 * TileScale.x, 0.0f, TileBias.x, 0.0f);
-	float4 ProjectionMatrixColumn1 = float4(0.0f, -ZERNView_ProjectionTransform._22 * TileScale.y, TileBias.y, 0.0f);
+	float4 ProjectionMatrixColumn0 = float4(ZERNView_ProjectionTransform._11 * TileScale.x, 0.0f, ZERNView_ProjectionTransform._13 * TileScale.x + TileBias.x, 0.0f);
+	float4 ProjectionMatrixColumn1 = float4(0.0f, ZERNView_ProjectionTransform._22 * -TileScale.y, ZERNView_ProjectionTransform._23 * -TileScale.y + TileBias.y, 0.0f);
 	float4 ProjectionMatrixColumn3 = float4(0.0f, 0.0f, 1.0f, 0.0f);
 	
 	float4 TileFrustumPlanes[6];
