@@ -142,23 +142,6 @@ bool ZERNFixedMaterial::UpdateShaders() const
 	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
 
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFixedMaterialDebug.hlsl";
-
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNFixedMaterial_DebugStage_VertexShader_Main";
-	StageDebug_VertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageDebug_VertexShader == NULL, false, "Cannot set vertex shader.");
-
-	Options.Type = ZEGR_ST_GEOMETRY;
-	Options.EntryPoint = "ZERNFixedMaterial_DebugStage_GeometryShader_Main";
-	StageDebug_GeometryShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageDebug_GeometryShader == NULL, false, "Cannot set geometry shader.");
-
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNFixedMaterial_DebugStage_PixelShader_Main";
-	StageDebug_PixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(StageDebug_PixelShader == NULL, false, "Cannot set pixel shader.");
-
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -198,16 +181,6 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
 	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
-
-	RenderState = ZERNStageDebug::GetRenderState();
-	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetShader(ZEGR_ST_VERTEX, StageDebug_VertexShader);
-	RenderState.SetShader(ZEGR_ST_GEOMETRY, StageDebug_GeometryShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, StageDebug_PixelShader);
-	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
-
-	StageDebug_RenderState = RenderState.Compile();
-	zeCheckError(StageDebug_RenderState == NULL, false, "Cannot set debug render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -1391,10 +1364,6 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 		}
 
 		Context->SetRenderState(StageShadowmapGeneration_RenderState);
-	}
-	else if (StageID == ZERN_STAGE_DEBUG)
-	{
-		Context->SetRenderState(StageDebug_RenderState);
 	}
 
 	return true;

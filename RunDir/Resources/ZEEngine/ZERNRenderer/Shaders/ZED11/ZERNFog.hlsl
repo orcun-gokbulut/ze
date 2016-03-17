@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageShadowmapGeneration.cpp
+ Zinek Engine - ZERNFog.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageShadowmapGeneration.h"
+#ifndef __ZERN_FOG_H__
+#define __ZERN_FOG_H__
 
-#include "ZERNStageID.h"
+#include "ZERNGBuffer.hlsl"
+#include "ZERNScreenCover.hlsl"
+#include "ZERNTransformations.hlsl"
 
-ZEInt ZERNStageShadowmapGeneration::GetId() const
+cbuffer ZERNFog_Constants	: register(b8)
 {
-	return ZERN_STAGE_SHADOW_MAP_GENERATION;
-}
-
-const ZEString& ZERNStageShadowmapGeneration::GetName() const
-{
-	static const ZEString Name = "Shadow map generation";
-	return Name;
-}
-
-ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
-{
-
-}
-
-ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
-{
-	static ZEGRRenderState RenderState;
-	static bool Initialized = false;
+	float	ZERNFog_Density;
+	float	ZERNFog_Range;
+	float2	ZERNFog_Reserved0;
 	
-	if(!Initialized)
-	{
-		Initialized = true;
+	float3	ZERNFog_Color;
+	float	ZERNFog_Reserved1;
+};
 
-		ZEGRRasterizerState RasterizerState;
-		RasterizerState.SetDepthBias(0.0f);
-		RasterizerState.SetDepthBiasClamp(0.0f);
-		RasterizerState.SetSlopeScaledDepthBias(1.0f);
-		RasterizerState.SetDepthClipEnable(true);
-		RasterizerState.SetCullMode(ZEGR_CMD_NONE);
-
-		RenderState.SetRasterizerState(RasterizerState);
-
-		ZEGRDepthStencilState DepthStencilStateLessEqual;
-		DepthStencilStateLessEqual.SetDepthFunction(ZEGR_CF_LESS_EQUAL);
-
-		RenderState.SetDepthStencilState(DepthStencilStateLessEqual);
-
-		RenderState.SetDepthStencilFormat(ZEGR_TF_D32_FLOAT);
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
-	}
-
-	return RenderState;
+float3 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+{	
+	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, ZERNGBuffer_GetDepth(PositionViewport.xy));
+	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
+	
+	float Distance = distance(ZERNView_Position, PositionWorld);
+	Distance = max(0.0f,Distance - ZERNFog_Range);
+	float FogFactor = exp(-pow(ZERNFog_Density * Distance, 2.0f));
+	
+	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
+	
+	return lerp(ZERNFog_Color, PixelColor, FogFactor);
 }
+
+#endif

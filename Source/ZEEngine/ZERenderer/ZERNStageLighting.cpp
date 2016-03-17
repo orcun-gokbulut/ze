@@ -601,7 +601,9 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
  		ZEMatrix4x4::Transform3x3(Light.DirectionView, GetRenderer()->GetView().ViewTransform, -Direction);
 		Light.DirectionView.NormalizeSelf();
 
-		LightConstants->CastShadow = static_cast<ZEBool32>(DirectionalLight->GetCastsShadow());
+		ZERNStage* StageShadowing = GetRenderer()->GetStage(ZERN_STAGE_SHADOWING);
+		bool ShadowingEnabled = (StageShadowing != NULL && StageShadowing->GetEnabled());
+		LightConstants->CastShadow = static_cast<ZEBool32>(DirectionalLight->GetCastsShadow() & ShadowingEnabled);
 		LightConstants->ShowCascades = static_cast<ZEBool32>(ShowCascades);
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
 		LightConstants->SampleLength = DirectionalLight->GetShadowSampleLength();
@@ -878,6 +880,8 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 			Result = SetupTiledDeferred(Context);
 		}
 	}
+
+	CleanUp(Context);
 
 	return false;
 }

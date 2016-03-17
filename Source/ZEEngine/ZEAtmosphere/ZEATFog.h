@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageShadowmapGeneration.cpp
+ Zinek Engine - ZEATFog.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,52 +33,65 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStageShadowmapGeneration.h"
+#pragma once
 
-#include "ZERNStageID.h"
+#include "ZEGame/ZEEntity.h"
 
-ZEInt ZERNStageShadowmapGeneration::GetId() const
+#include "ZEDS/ZEFlags.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZERNCommand.h"
+
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+
+class ZEATFog : public ZEEntity
 {
-	return ZERN_STAGE_SHADOW_MAP_GENERATION;
-}
+	private:
+		ZEFlags							DirtyFlags;
+		ZERNCommand						Command;
 
-const ZEString& ZERNStageShadowmapGeneration::GetName() const
-{
-	static const ZEString Name = "Shadow map generation";
-	return Name;
-}
+		ZEHolder<ZEGRShader>			ScreenCoverVertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
-{
+		struct 
+		{
+			float						Density;
+			float						Range;
+			ZEVector2					Reserved0;
 
-}
+			ZEVector3					Color;
+			float						Reserved1;
+		} Constants;
 
-ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
-{
-	static ZEGRRenderState RenderState;
-	static bool Initialized = false;
-	
-	if(!Initialized)
-	{
-		Initialized = true;
+		bool							UpdateShaders();
+		bool							UpdateRenderStates();
+		bool							UpdateConstantBuffers();
+		bool							Update();
 
-		ZEGRRasterizerState RasterizerState;
-		RasterizerState.SetDepthBias(0.0f);
-		RasterizerState.SetDepthBiasClamp(0.0f);
-		RasterizerState.SetSlopeScaledDepthBias(1.0f);
-		RasterizerState.SetDepthClipEnable(true);
-		RasterizerState.SetCullMode(ZEGR_CMD_NONE);
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
-		RenderState.SetRasterizerState(RasterizerState);
+										ZEATFog();
+		virtual							~ZEATFog();
 
-		ZEGRDepthStencilState DepthStencilStateLessEqual;
-		DepthStencilStateLessEqual.SetDepthFunction(ZEGR_CF_LESS_EQUAL);
+	public:
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		RenderState.SetDepthStencilState(DepthStencilStateLessEqual);
+		void							SetDensity(float Density);
+		float							GetDensity() const;
 
-		RenderState.SetDepthStencilFormat(ZEGR_TF_D32_FLOAT);
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
-	}
+		void							SetRange(float Range);
+		float							GetRange() const;
 
-	return RenderState;
-}
+		void							SetColor(const ZEVector3& Color);
+		const ZEVector3&				GetColor() const;
+
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+		static ZEATFog*					CreateInstance();
+};

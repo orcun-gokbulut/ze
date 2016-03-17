@@ -52,11 +52,11 @@ class ZERNStagePostProcess : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);
-
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input);
-		virtual const ZEGRTexture2D*		GetOutputTexture() const;
 
 											ZERNStagePostProcess();
 
