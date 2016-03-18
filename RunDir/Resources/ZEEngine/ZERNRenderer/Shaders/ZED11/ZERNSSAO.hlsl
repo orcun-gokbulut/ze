@@ -77,7 +77,6 @@ float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Tar
 		RandomVector = normalize(RandomVector);
 		
 		float3 NormalView = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, TexCoord);
-		NormalView = normalize(NormalView);
 		float3 NormalBiasedPositionView = PositionView + NormalView * ZERNSSAO_MinDepthBias;
 		
 		float TotalOcclusion = 0.0f;

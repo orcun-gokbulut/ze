@@ -150,6 +150,16 @@ void ZEScene::ClearEntities()
 	Entities.Clear();
 }
 
+void ZEScene::SetRenderer(ZERNRenderer* Renderer)
+{
+	this->Renderer = Renderer;
+}
+
+ZERNRenderer* ZEScene::GetRenderer()
+{
+	return Renderer;
+}
+
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
 {
 	return Entities;

@@ -217,13 +217,13 @@ bool ZEATAtmosphericScattering::UpdateConstantBuffers()
 
 bool ZEATAtmosphericScattering::Update()
 {
-	if(!UpdateShaders())
+	if (!UpdateShaders())
 		return false;
 
-	if(!UpdateRenderState())
+	if (!UpdateRenderState())
 		return false;
 
-	if(!UpdateConstantBuffers())
+	if (!UpdateConstantBuffers())
 		return false;
 
 	return true;

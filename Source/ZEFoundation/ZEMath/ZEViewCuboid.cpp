@@ -78,9 +78,10 @@ void ZEViewCuboid::Create(const ZEVector3& Position, const ZEQuaternion& Rotatio
 	ZEQuaternion::VectorProduct(Box.Front, Rotation, ZEVector3::UnitZ);
 
 	Box.HalfSize = ZEVector3(Width * 0.5f, Height * 0.5f, (FarZ - NearZ) * 0.5f);
+	Box.Center = Position;
 
-	ZEVector3 Center;
-	ZEQuaternion::VectorProduct(Center, Rotation, ZEVector3(0.0f, 0.0f, FarZ - NearZ));
-
-	ZEVector3::Multiply(Box.Center, Position, Center);
+	//ZEVector3 Center;
+	//ZEQuaternion::VectorProduct(Center, Rotation, ZEVector3(0.0f, 0.0f, FarZ - NearZ));
+	//
+	//ZEVector3::Multiply(Box.Center, Position, Center);
 }

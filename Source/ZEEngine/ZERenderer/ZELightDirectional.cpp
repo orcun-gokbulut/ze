@@ -65,7 +65,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 	float HorizontalLeftTangent = ZEAngle::Tan(View.HorizontalFOVLeft);
 
 	ZEVector3 CascadeFrustumVerticesView[8];
-	ZEVector3 CascadeFrustumVerticesLight[8];
+	ZEVector3 CascadeFrustumVerticesWorld[8];
 	for(ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
 		ZECascade& Cascade = CascadeConstants.Cascades[CascadeIndex];
@@ -100,13 +100,14 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 		ZEAABBox CascadeFrustumAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
 		for(ZEUInt I = 0; I < 8; I++)
 		{
-			CascadeFrustumVerticesLight[I] = GetViewTransform() * View.InvViewTransform * CascadeFrustumVerticesView[I];
+			CascadeFrustumVerticesWorld[I] = View.InvViewTransform * CascadeFrustumVerticesView[I];
+			ZEVector3 CascadeFrustumVertexLight = GetViewTransform() * CascadeFrustumVerticesWorld[I];
 
-			ZEVector3::Min(CascadeFrustumAABBLight.Min, CascadeFrustumAABBLight.Min, CascadeFrustumVerticesLight[I]);
-			ZEVector3::Max(CascadeFrustumAABBLight.Max, CascadeFrustumAABBLight.Max, CascadeFrustumVerticesLight[I]);
+			ZEVector3::Min(CascadeFrustumAABBLight.Min, CascadeFrustumAABBLight.Min, CascadeFrustumVertexLight);
+			ZEVector3::Max(CascadeFrustumAABBLight.Max, CascadeFrustumAABBLight.Max, CascadeFrustumVertexLight);
 		}
 
-		float Diameter = ZEVector3::Length(CascadeFrustumVerticesLight[0] - CascadeFrustumVerticesLight[6]);
+		float Diameter = ZEVector3::Length(CascadeFrustumVerticesWorld[0] - CascadeFrustumVerticesWorld[6]);
 		float UnitPerShadowTexel = Diameter / CascadeShadowMaps->GetWidth();
 
 		//Offset cascade frustum aabb in light space to enclose the circle
@@ -141,10 +142,10 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 
 		float Width = CascadeFrustumAABBLight.Max.x - CascadeFrustumAABBLight.Min.x;
 		float Height = CascadeFrustumAABBLight.Max.y - CascadeFrustumAABBLight.Min.y;
-		float Depth = CascadeFrustumAABBLight.Max.z - CascadeFrustumAABBLight.Min.z;
+		float Depth = CascadeFrustumAABBLight.Min.z - CascadeFrustumAABBLight.Max.z;
 		float OffsetX = (CascadeFrustumAABBLight.Max.x + CascadeFrustumAABBLight.Min.x) / -Width;
 		float OffsetY = (CascadeFrustumAABBLight.Max.y + CascadeFrustumAABBLight.Min.y) / -Height;
-		float OffsetZ = CascadeFrustumAABBLight.Min.z / -Depth;
+		float OffsetZ = CascadeFrustumAABBLight.Max.z / -Depth;
 
 		ZEMatrix4x4::Create(Cascade.ProjectionTransform,
 			2.0f / Width, 0.0f, 0.0f, OffsetX,
@@ -164,8 +165,9 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 
 		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
 
-		//Should be in world space
-		CascadeVolumes[CascadeIndex].Create(ZEVector3::Zero, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
+		ZEVector3 CascadePositionWorld = (CascadeFrustumVerticesWorld[0] + CascadeFrustumVerticesWorld[6]) * 0.5f;
+
+		CascadeVolumes[CascadeIndex].Create(CascadePositionWorld, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
 	}
 }
 
@@ -344,7 +346,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		View.N = GetWorldFront();
 
 		View.Viewport = NULL;
-		View.ViewVolume = NULL;//&GetViewVolume(CascadeIndex);
+		View.ViewVolume = &GetViewVolume(CascadeIndex);
 		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
 
 		ShadowRenderer.SetView(View);
@@ -352,7 +354,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		ZEGRContext* Context = Parameters->Context;
 
 		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(CascadeIndex);
-		Context->ClearDepthStencilBuffer(DepthBuffer, true, false, 1.0f, 0x00);
+		Context->ClearDepthStencilBuffer(DepthBuffer, true, false, 0.0f, 0x00);
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 

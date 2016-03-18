@@ -66,13 +66,15 @@ cbuffer ZERNDeferredShading_LightConstants													: register(b8)
 	uint							ZERNDeferredShading_SampleCount;
 	float							ZERNDeferredShading_SampleLength;
 	bool							ZERNDeferredShading_ShowCascades;
+	float							ZERNDeferredShading_DepthBias;
+	float3							ZERNDeferredShading_Reserved0;
 };
 
 cbuffer ZERNDeferredShading_CascadeConstants												: register(b9)
 {
 	ZERNDeferredShading_Cascade 	ZERNDeferredShading_Cascades[4];
 	uint							ZERNDeferredShading_CascadeCount;
-	float3							ZERNDeferredShading_Reserved3;
+	float3							ZERNDeferredShading_Reserved1;
 };	
 	
 SamplerState						ZERNDeferredShading_SamplerLinearBorder					: register(s0);
@@ -114,20 +116,18 @@ static const float2 ZERNDeferredShading_PoissonDiskSamples[] =
 	float2(0.8985078f, 0.4366908f)
 };
 
-static const float ZERNDeferredShading_DepthBias = 0.0001f;
-
 float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
 {		
 	float Visibility = 0.0f;
 	
-	float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, 32.0f * TexCoordDepth.xy, 0) * 2.0f - 1.0f;
+	float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, 4.0f * TexCoordDepth.xy, 0) * 2.0f - 1.0f;
 	RandomVector = normalize(RandomVector);
 	
 	for(uint I = 0; I < 16; I++)
 	{
 		float2 RandomOrientedSample = reflect(ZERNDeferredShading_PoissonDiskSamples[I], RandomVector);
 		float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLength / ShadowMapDimensions;
-		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z - ZERNDeferredShading_DepthBias);
+		Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, CascadeIndex), TexCoordDepth.z + ZERNDeferredShading_DepthBias);
 	}
 		
 	Visibility /= 16.0f;
@@ -176,6 +176,10 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 				float3 TexCoordDepth;
 				if(ZERNDeferredShading_InsideCascade(Cascade.ProjectionTransform, Surface.PositionView, TexCoordDepth))
 				{
+					//float3 NormalCascade = mul(Cascade.ProjectionTransform, float4(Surface.NormalView, 0.0f)).xyz;
+					//NormalCascade = normalize(NormalCascade);
+					//TexCoordDepth.z += NormalCascade.z * 0.1f;
+					TexCoordDepth.z += CascadeIndex / (DirectionalLight.Range * 100.0f);
 					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, TexCoordDepth, ShadowMapDimensions);
 					CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex];
 					
@@ -240,7 +244,7 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 				float Index = 0.0f;
 				ZERNDeferredShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 				
-				float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, 32.0f * TexCoord, 0) * 2.0f - 1.0f;
+				float2 RandomVector = ZERNDeferredShading_RandomVectors.SampleLevel(ZERNDeferredShading_SamplerPointWrap, 4.0f * TexCoord, 0) * 2.0f - 1.0f;
 				RandomVector = normalize(RandomVector);
 				
 				Visibility = 0.0f;
@@ -249,7 +253,7 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 				{	
 					float2 RandomOrientedSample = reflect(ZERNDeferredShading_PoissonDiskSamples[I], RandomVector);
 					float2 Offset = RandomOrientedSample * ZERNDeferredShading_SampleLength / ShadowMapDimensions;
-					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoord.xy + Offset, 0), PositionHomogeneous.z - 0.005f);
+					Visibility += ZERNDeferredShading_ShadowMaps.SampleCmpLevelZero(ZERNDeferredShading_SamplerComparisonLinearPointClamp, float3(TexCoord.xy + Offset, 0), PositionHomogeneous.z + ZERNDeferredShading_DepthBias);
 					
 				}
 	

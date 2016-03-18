@@ -167,6 +167,16 @@ bool ZELight::GetCastsShadow() const
 	return CastsShadows;
 }
 
+void ZELight::SetShadowDepthBias(float ShadowDepthBias)
+{
+	this->ShadowDepthBias = ShadowDepthBias;
+}
+
+float ZELight::GetShadowDepthBias() const
+{
+	return ShadowDepthBias;
+}
+
 void ZELight::SetShadowResolution(ZELightShadowResolution ShadowResolution)
 {
 	if(this->ShadowResolution == ShadowResolution)
@@ -231,6 +241,7 @@ ZELight::ZELight()
 	ShadowResolution = ZE_LSR_MEDIUM;
 	ShadowSampleCount = ZE_LSC_MEDIUM;
 	ShadowSampleLength = 1.0f;
+	ShadowDepthBias = 0.005f;
 
 	Range = 100.0f;
 	Intensity = 1.0f;
