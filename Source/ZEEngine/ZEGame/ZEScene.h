@@ -76,6 +76,7 @@ class ZEScene : public ZEObject
 		bool									Enabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
+		ZERNRenderer*							Renderer;
 
 		void									Tick(ZEEntity* Entity, float ElapsedTime);
 
@@ -88,6 +89,7 @@ class ZEScene : public ZEObject
 
 		void									ClearEntities();
 
+		void									SetRenderer(ZERNRenderer* Renderer);
 		ZERNRenderer*							GetRenderer();
 		ZERNRenderer*							GetShadowRenderer();
 		ZEPhysicalWorld*						GetPhysicalWorld();

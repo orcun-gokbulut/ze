@@ -115,7 +115,7 @@ class ZEATAtmosphericScattering : public ZEInitializable
 
 			ZEVector4					RayleighScatteringFactor;
 			ZEVector4					MieScatteringFactor;
-		}PrecomputeConstants;
+		} PrecomputeConstants;
 
 		void							CreateRandomVectors();
 

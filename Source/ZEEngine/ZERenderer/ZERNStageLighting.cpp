@@ -140,8 +140,7 @@ void ZERNStageLighting::CreateSamplers()
 	SamplerComparisonLinearPointClampDescription.MipFilter = ZEGR_TFM_POINT;
 	SamplerComparisonLinearPointClampDescription.AddressU = ZEGR_TAM_CLAMP;
 	SamplerComparisonLinearPointClampDescription.AddressV = ZEGR_TAM_CLAMP;
-	SamplerComparisonLinearPointClampDescription.AddressW = ZEGR_TAM_CLAMP;
-	SamplerComparisonLinearPointClampDescription.ComparisonFunction = ZEGR_CF_LESS_EQUAL;
+	SamplerComparisonLinearPointClampDescription.ComparisonFunction = ZEGR_CF_GREATER;
 	SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerComparisonLinearPointClampDescription);
 
 	ZEGRSamplerDescription SamplerPointWrapDescription;
@@ -597,6 +596,7 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		Light.Color = DirectionalLight->GetColor();
 		Light.Intensity = DirectionalLight->GetIntensity();
 		Light.Type = DirectionalLight->GetLightType();
+		Light.Range = DirectionalLight->GetRange();
 		ZEVector3 Direction = DirectionalLight->GetWorldRotation() * ZEVector3::UnitZ;
  		ZEMatrix4x4::Transform3x3(Light.DirectionView, GetRenderer()->GetView().ViewTransform, -Direction);
 		Light.DirectionView.NormalizeSelf();
@@ -607,6 +607,7 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		LightConstants->ShowCascades = static_cast<ZEBool32>(ShowCascades);
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
 		LightConstants->SampleLength = DirectionalLight->GetShadowSampleLength();
+		LightConstants->ShadowDepthBias = DirectionalLight->GetShadowDepthBias();
 	DeferredLightConstantBuffer->Unlock();
 
 	DirectionalLight->BindCascades(GetRenderer(), Context);	//TODO: Another way to do this?
@@ -664,6 +665,7 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 		LightConstants->CastShadow = static_cast<ZEBool32>(ProjectiveLight->GetCastsShadow());
 		LightConstants->SampleCount = ZELight::ConvertShadowSampleCount(ProjectiveLight->GetShadowSampleCount());
 		LightConstants->SampleLength = ProjectiveLight->GetShadowSampleLength();
+		LightConstants->ShadowDepthBias = ProjectiveLight->GetShadowDepthBias();
 
 		LightConstants->ProjectionMatrix = ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * GetRenderer()->GetView().InvViewTransform;
 

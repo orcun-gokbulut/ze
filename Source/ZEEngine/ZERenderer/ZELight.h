@@ -86,6 +86,7 @@ class ZELight : public ZEEntity
 		ZELightShadowResolution			ShadowResolution;
 		ZELightShadowSampleCount		ShadowSampleCount;
 		float							ShadowSampleLength;
+		float							ShadowDepthBias;
 
 		float							Range;
 		float							Intensity;
@@ -123,6 +124,9 @@ class ZELight : public ZEEntity
 
 		void							SetCastsShadow(bool NewValue);
 		bool							GetCastsShadow() const;
+
+		void							SetShadowDepthBias(float ShadowDepthBias);
+		float							GetShadowDepthBias() const;
 
 		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const = 0;

@@ -369,8 +369,8 @@ bool ZERNStageAO::InitializeSelf()
 	CreateSphereSamples();
 	CreateRandomVectors();
 
-	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 3.0f);
-	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 3.0f, false);
+	ZERNFilter::GenerateGaussianKernel(HorizontalValues, FilterConstants.KernelSize, 2.0f);
+	ZERNFilter::GenerateGaussianKernel(VerticalValues, FilterConstants.KernelSize, 2.0f, false);
 
 	SSAOConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOConstants));
 	FilterConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SSAOFilterConstants));
@@ -390,6 +390,9 @@ bool ZERNStageAO::InitializeSelf()
 	SamplerPointClampDescription.MinFilter = ZEGR_TFM_POINT;
 	SamplerPointClampDescription.MagFilter = ZEGR_TFM_POINT;
 	SamplerPointClampDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointClampDescription.AddressU = ZEGR_TAM_BORDER;
+	SamplerPointClampDescription.AddressV = ZEGR_TAM_BORDER;
+	SamplerPointClampDescription.BorderColor = ZEVector4::Zero;
 	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerPointClampDescription);
 
 	return true;

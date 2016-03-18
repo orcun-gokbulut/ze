@@ -202,10 +202,12 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 	#endif
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
+	float4 NormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Normal, 0.0f));
+	float4 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Tangent, 0.0f));
 	
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	Output.Normal = ZERNTransformations_WorldToView(float4(Input.Normal, 0.0f));
-	Output.Tangent = ZERNTransformations_WorldToView(float4(Input.Tangent, 0.0f));
+	Output.Normal = ZERNTransformations_WorldToView(NormalWorld);
+	Output.Tangent = ZERNTransformations_WorldToView(TangentWorld);
 	Output.Binormal = cross(Output.Normal, Output.Tangent);
 	Output.Texcoord = Input.Texcoord;
 	Output.ViewDistance = length(PositionWorld.xyz - ZERNView_Position);

@@ -74,7 +74,7 @@ ZERNDebug_GeometryShader_Input ZERNDebug_VertexShader_Main(ZERNDebug_VertexShade
 	ZERNDebug_GeometryShader_Input Output;
 	
 	Output.Position = mul(ZERNDebug_WorldTransform, float4(Input.Position, 1.0f)).xyz;
-	Output.Normal = Input.Normal;
+	Output.Normal = mul(ZERNDebug_WorldTransform, float4(Input.Normal, 0.0f)).xyz;
 	
 	return Output;
 }
@@ -85,7 +85,10 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 	if (ZERNDebug_CullBackface)
 	{
 		float3 SurfaceNormal = normalize(cross(Input[1].Position - Input[0].Position, Input[2].Position - Input[0].Position));
-		if (dot(SurfaceNormal, -ZERNView_FrontVector) <= 0.0f)
+		float3 SurfacePosition = 0.333333f * (Input[0].Position + Input[1].Position + Input[2].Position);
+		float3 ViewDirection = normalize(ZERNView_Position - SurfacePosition);
+		
+		if (dot(SurfaceNormal, ViewDirection) <= 0.0f)
 			return;
 	}
 	
@@ -95,10 +98,10 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 	{
 		Output.Color = float3(0.0f, 1.0f, 0.0f);
 		
-		float LineLength = 0.1f;
+		float LineLength = 0.2f;
 		
 		float3 LineStartWorld = Input[0].Position;
-		float3 LineEndWorld = LineStartWorld + Input[0].Normal * LineLength;
+		float3 LineEndWorld = LineStartWorld + normalize(Input[0].Normal) * LineLength;
 		
 		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
 		OutputStream.Append(Output);
@@ -107,7 +110,7 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 		OutputStream.RestartStrip();
 		
 		LineStartWorld = Input[1].Position;
-		LineEndWorld = LineStartWorld + Input[1].Normal * LineLength;
+		LineEndWorld = LineStartWorld + normalize(Input[1].Normal) * LineLength;
 		
 		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
 		OutputStream.Append(Output);
@@ -116,7 +119,7 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 		OutputStream.RestartStrip();
 		
 		LineStartWorld = Input[2].Position;
-		LineEndWorld = LineStartWorld + Input[2].Normal * LineLength;
+		LineEndWorld = LineStartWorld + normalize(Input[2].Normal) * LineLength;
 		
 		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
 		OutputStream.Append(Output);

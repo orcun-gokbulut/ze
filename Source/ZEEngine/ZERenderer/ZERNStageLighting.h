@@ -124,6 +124,8 @@ class ZERNStageLighting : public ZERNStage
 			ZEUInt							SampleCount;
 			float							SampleLength;
 			ZEBool32						ShowCascades;
+			float							ShadowDepthBias;
+			ZEVector3						Reserved;
 		};
 
 		struct TiledDeferredLightConstantsStruct

@@ -55,6 +55,9 @@
 
 bool ZEATAtmosphere::InitializeSelf()
 {
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
 	SunLight = ZELightDirectional::CreateInstance();
 	SunLight->SetName("SunLight");
 	SunLight->SetCastsShadow(true);
@@ -89,7 +92,7 @@ bool ZEATAtmosphere::DeinitializeSelf()
 {
 	AtmosphericScattering.Deinitialize();
 
-	return true;
+	return ZEEntity::DeinitializeSelf();
 }
 
 void ZEATAtmosphere::SetObserver(const ZEATObserver& Observer)
@@ -121,6 +124,7 @@ ZEATAtmosphere::ZEATAtmosphere()
 
 ZEATAtmosphere::~ZEATAtmosphere()
 {
+
 }
 
 ZEDrawFlags ZEATAtmosphere::GetDrawFlags() const
@@ -151,6 +155,7 @@ void ZEATAtmosphere::Tick(float Time)
 
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
+
 	SunLight->SetWorldRotation(SunRotation);
 	SunLight->SetIntensity(2.0f);
 	SunLight->SetColor(ZEVector3::One);
@@ -161,6 +166,7 @@ void ZEATAtmosphere::Tick(float Time)
 
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
+
 	MoonLight->SetWorldRotation(MoonRotation);
 	MoonLight->SetColor(ZEVector3::One);
 	MoonLight->SetIntensity(0.3f);

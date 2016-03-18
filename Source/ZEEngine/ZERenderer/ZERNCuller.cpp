@@ -55,6 +55,7 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity)
 			if (CullParameters.View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{
 				//to do when culled
+				return;
 			}
 			else
 			{
