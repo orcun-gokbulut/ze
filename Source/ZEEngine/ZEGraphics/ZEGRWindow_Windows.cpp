@@ -37,8 +37,8 @@
 
 #include "ZEMath/ZEMath.h"
 #include "ZECore/ZECore.h"
+
 #include "ZEGROutput.h"
-#include "ZEGRCursor.h"
 #include "ZEGRGraphicsModule.h"
 
 #define STRICT
@@ -74,8 +74,14 @@ static void HandleWin32Error(DWORD ErrorCode)
 static bool ExitValidation(ZEGRWindow* Window)
 {
 	HWND Handle = (HWND)Window->GetHandle();
+
+	if (!Window->GetValidateQuit())
+	{
+		DestroyWindow(Handle);
+		return true;
+	}
+
 	int Result = ::MessageBox(Handle, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO);
-	
 	if (Result == IDYES)
 	{
 		DestroyWindow(Handle);
@@ -85,20 +91,33 @@ static bool ExitValidation(ZEGRWindow* Window)
 	return false;
 }
 
-static void ManageCursorLock(ZEGRWindow* Window, bool Focused)
+static void ManageCursorLock(ZEGRWindow* Window, bool Lock)
 {	
-	if (!Window->GetCursorLock())
+	if (!Lock || !Window->GetCursorLocked())
+	{
+		ClipCursor(NULL);
 		return;
+	}
 
-	if (Focused)
-	{
-		ZERectangle Rect = Window->GetRectangle();
-		ZEGRCursor::GetInstance()->SetLockRectangle(&Rect);
-	}
-	else
-	{
-		ZEGRCursor::GetInstance()->SetLockRectangle(NULL);
-	}
+	RECT Rect;
+	GetClientRect((HWND)Window->GetHandle(), &Rect);
+
+	RECT ScreenRect;
+	POINT Point;
+
+	Point.x = Rect.left; 
+	Point.y = Rect.top;
+	ClientToScreen((HWND)Window->GetHandle(), &Point);
+	ScreenRect.left = Point.x; 
+	ScreenRect.top = Point.y;
+
+	Point.x = Rect.right; 
+	Point.y = Rect.bottom;
+	ClientToScreen((HWND)Window->GetHandle(), &Point);
+	ScreenRect.right = Point.x; 
+	ScreenRect.bottom = Point.y;
+
+	ClipCursor(&ScreenRect);
 }
 
 HBRUSH DefaultBackGround = CreateSolidBrush(RGB(128, 128, 128));
@@ -133,20 +152,26 @@ static bool ConvertClientToWindowSize(ZEUInt Style, ZEUInt StyleExt, ZEInt Clien
 	return true;
 }
 
-static void GetWin32Style(const ZEGRWindowStyle& Style, DWORD& Win32StyleExt, DWORD& Win32Style)
+static void GetWin32Style(ZEGRWindow*  Window, DWORD& Win32StyleExt, DWORD& Win32Style)
 {
-	if (Style.Type == ZEGR_WT_NORMAL)
+	Win32Style = NULL;
+	Win32StyleExt = NULL;
+
+	if (Window->GetFullScreen())
 	{
-		Win32Style |= WS_OVERLAPPEDWINDOW;
-		Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
-		Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;
+		Win32Style = WS_POPUP;
 	}
-	else if (Style.Type == ZEGR_WT_POPUP)
+	else
 	{
-		Win32Style |= WS_POPUPWINDOW;
-		Win32StyleExt |= Style.ShowInTaskbar ? WS_EX_APPWINDOW : 0;
-		Win32StyleExt |= Style.AlwaysOnTop ? WS_EX_TOPMOST : 0;
-	}	
+		Win32Style |= Window->GetTitleBar() ? WS_OVERLAPPED | WS_CAPTION : WS_POPUP;
+		Win32Style |= Window->GetTitleBar() && Window->GetIconVisible() ? WS_SYSMENU : 0;
+		Win32Style |= Window->GetTitleBar() && Window->GetMinimizeButton() ? WS_MINIMIZEBOX : 0;
+		Win32Style |= Window->GetTitleBar() && Window->GetMaximizeButton() ?  WS_MAXIMIZEBOX : 0;
+		Win32Style |= Window->GetResizable() ? WS_SIZEBOX : 0;
+		Win32Style |= Window->GetBordered() ? WS_BORDER : 0;
+		Win32StyleExt |= Window->GetShowInTaskbar() ? WS_EX_APPWINDOW : 0;
+		Win32StyleExt |= Window->GetAlwaysOnTop() ? WS_EX_TOPMOST : 0;
+	}
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -170,7 +195,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 	}
 
 	// Will skip the messages until WM_CREATE message comes
-	return Window == NULL ? DefWindowProc(hwnd, uMsg, wParam, lParam) : 
+	return Window == NULL ? 
+		DefWindowProc(hwnd, uMsg, wParam, lParam) : 
 		Window->HandleMessage(uMsg, wParam, lParam);						
 }
 
@@ -218,29 +244,14 @@ static bool UnRegisterWindowClass(HINSTANCE Instance)
 	return true;
 }
 
-ZEGRWindowStyle::ZEGRWindowStyle()
+void ZEGRWindow::UpdateStyle()
 {
-	Type = ZEGR_WT_NORMAL;
-	TitleBar = true;
-	WindowMenu = true;
-	MinimizeButton = true;
-	MaximizeButton = true;
-	Resizable = true;
-	Bordered = true;
-	ShowInTaskbar = false;
-	AlwaysOnTop = false;
-}
-
-void ZEGRWindow::SetStyle(const ZEGRWindowStyle& Style)
-{
-	this->Style = Style;
-
 	if (!IsInitialized())
 		return;
 
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
-	GetWin32Style(Style, Win32StyleExt, Win32Style);
+	GetWin32Style(this, Win32StyleExt, Win32Style);
 
 	SetWindowLongPtr((HWND)Handle, GWL_STYLE, Win32Style);
 	SetWindowLongPtr((HWND)Handle, GWL_EXSTYLE, Win32StyleExt);
@@ -263,8 +274,8 @@ void ZEGRWindow::SetTitle(const ZEString& Title)
 
 void ZEGRWindow::SetPosition(ZEInt X, ZEInt Y)
 {
-	PositionX = X;
-	PositionY = Y;
+	Left = X;
+	Top = Y;
 
 	if (!IsInitialized())
 		return;
@@ -321,8 +332,8 @@ void ZEGRWindow::SetSize(ZEInt Width, ZEInt Height)
 	ZEInt WindowWidth, WindowHeight;
 	ConvertClientToWindowSize(	WindowInfo.dwStyle,
 								WindowInfo.dwExStyle,
-								PositionX,
-								PositionY,
+								Left,
+								Top,
 								Width,
 								Height,
 								WindowPosX,
@@ -348,12 +359,22 @@ void ZEGRWindow::SetFullScreen(bool FullScreen)
 	this->FullScreen = FullScreen;
 }
 
-void ZEGRWindow::SetVSynchEnable(bool VSynchEnable)
+void ZEGRWindow::SetVSynchEnabled(bool VSynchEnable)
 {
-	this->VSynchEnable = VSynchEnable;
+	this->VSynchEnabled = VSynchEnable;
 }
 
-void ZEGRWindow::SetEnable(bool Enabled)
+void ZEGRWindow::SetVisible(bool Visible)
+{
+	this->Visible = Visible;
+
+	if (!IsInitialized())
+		return;
+
+	::ShowWindow((HWND)Handle, (Visible ? SW_SHOWNA : SW_HIDE));
+}
+
+void ZEGRWindow::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 
@@ -414,15 +435,10 @@ void ZEGRWindow::Restore()
 		HandleWin32Error(GetLastError());
 }
 
-void ZEGRWindow::SetCursorLock(bool CursorLock)
+void ZEGRWindow::SetCursorLocked(bool Enabled)
 {
-	ZERectangle ClientRect = GetRectangle();
-
-	bool Result = ZEGRCursor::GetInstance()->SetLockRectangle(CursorLock ? &ClientRect : NULL);
-	if (!Result)
-		return;
-
-	LastCursorLock = CursorLock ? this : NULL;
+	ManageCursorLock(this, Enabled);
+	CursorLocked = Enabled;
 }
 
 ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lParam)
@@ -434,8 +450,8 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		// Window notification
 		case WM_MOVE:
 		{
-			PositionX = (short)LOWORD(lParam);
-			PositionY = (short)HIWORD(lParam);
+			Left = (short)LOWORD(lParam);
+			Top = (short)HIWORD(lParam);
 			OnMove();
 
 			break;
@@ -453,7 +469,9 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 			Width =  TempWidth;
 			Height = TempHeight;
 
-			Output->Resize(Width, Height);
+			if (IsInitialized())
+				Output->Resize(Width, Height);
+
 			OnSize();
 
 			switch (wParam)
@@ -518,7 +536,10 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 			{
 				case HTCLIENT:
 					// User defined cursor can be set here
-					SetCursor(DefaultCursor);
+					if (!CursorVisible)
+						SetCursor(NULL);
+					else
+						SetCursor(DefaultCursor);
 					break;
 
 				case HTTOP:
@@ -613,7 +634,8 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		// Window notification
 		case WM_DESTROY:
 			OnDestroy();
-			PostQuitMessage(EXIT_SUCCESS);
+			if (QuitWhenClosed)
+				PostQuitMessage(EXIT_SUCCESS);
 			break;
 		
 		default:
@@ -633,7 +655,7 @@ bool ZEGRWindow::InitializeSelf()
 {
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
-	GetWin32Style(Style, Win32StyleExt, Win32Style);
+	GetWin32Style(this, Win32StyleExt, Win32Style);
 	
 	Win32Style |= !Enabled ? WS_DISABLED : 0;
 	Win32Style |= Maximized ? WS_MAXIMIZE : 0;
@@ -650,8 +672,8 @@ bool ZEGRWindow::InitializeSelf()
 	ZEInt WindowPosX, WindowPosY, WindowWidth, WindowHeight;
 	ConvertClientToWindowSize(	Win32Style,
 								Win32StyleExt,
-								PositionX,
-								PositionY,
+								Left,
+								Top,
 								Width,
 								Height,
 								WindowPosX,
@@ -687,7 +709,7 @@ bool ZEGRWindow::InitializeSelf()
 	return true;
 }
 
-bool ZEGRWindow::InitializeEmbedded(void* ExistingHandle)
+ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 {
 	HWND Handle = (HWND)ExistingHandle;
 
@@ -696,21 +718,21 @@ bool ZEGRWindow::InitializeEmbedded(void* ExistingHandle)
 	if (CharCount == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return NULL;
 	}
 
 	LONG_PTR Win32Style = GetWindowLongPtr(Handle, GWL_STYLE);
 	if (Win32Style == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return NULL;
 	}
 
 	LONG_PTR Win32StyleEx = GetWindowLongPtr(Handle, GWL_EXSTYLE);
 	if (Win32StyleEx == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return NULL;
 	}
 
 	RECT Rectangle = {0};
@@ -718,30 +740,28 @@ bool ZEGRWindow::InitializeEmbedded(void* ExistingHandle)
 	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
-		return false;
+		return NULL;
 	}
 
-	Title = TempString;
+	ZEGRWindow* Window = new ZEGRWindow();
+	Window->Title = TempString;
+	Window->Handle = Handle;
 
-	this->Handle = Handle;
+	Window->Left = Rectangle.left;
+	Window->Top = Rectangle.top;
+	Window->Width = Rectangle.right - Rectangle.left;
+	Window->Height = Rectangle.bottom - Rectangle.top;
 
-	PositionX = Rectangle.left;
-	PositionY = Rectangle.top;
+	Window->TitleBar = (Win32Style & WS_CAPTION) == WS_CAPTION;
+	Window->IconVisible = (Win32Style & WS_SYSMENU) == WS_SYSMENU;
+	Window->MinimizeButton = (Win32Style & WS_MINIMIZEBOX) == WS_MINIMIZEBOX;
+	Window->MaximizeButton = (Win32Style & WS_MAXIMIZEBOX) == WS_MAXIMIZEBOX;
+	Window->Resizable = (Win32Style & WS_SIZEBOX) == WS_SIZEBOX;
+	Window->Bordered = (Win32Style & WS_BORDER) == WS_BORDER;
+	Window->ShowInTaskbar = (Win32StyleEx & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
+	Window->AlwaysOnTop = (Win32StyleEx & WS_EX_TOPMOST) == WS_EX_TOPMOST;
 
-	Width = Rectangle.right - Rectangle.left;
-	Height = Rectangle.bottom - Rectangle.top;
-
-	Style.Type = (Win32Style & WS_POPUP) == WS_POPUP ? ZEGR_WT_POPUP : ZEGR_WT_NORMAL;
-	Style.TitleBar = (Win32Style & WS_CAPTION) == WS_CAPTION;
-	Style.WindowMenu = (Win32Style & WS_SYSMENU) == WS_SYSMENU;
-	Style.MinimizeButton = (Win32Style & WS_MINIMIZEBOX) == WS_MINIMIZEBOX;
-	Style.MaximizeButton = (Win32Style & WS_MAXIMIZEBOX) == WS_MAXIMIZEBOX;
-	Style.Resizable = (Win32Style & WS_SIZEBOX) == WS_SIZEBOX;
-	Style.Bordered = (Win32Style & WS_BORDER) == WS_BORDER;
-	Style.ShowInTaskbar = (Win32StyleEx & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
-	Style.AlwaysOnTop = (Win32StyleEx & WS_EX_TOPMOST) == WS_EX_TOPMOST;
-
-	return true;
+	return Window;
 }
 
 void ZEGRWindow::DeinitializeSelf()
@@ -769,5 +789,6 @@ void ZEGRWindow::Show()
 	if(!IsInitialized())
 		return;
 
-	::ShowWindow((HWND)Handle, SW_SHOW);
+	if (GetVisible())
+		::ShowWindow((HWND)Handle, SW_SHOW);
 }

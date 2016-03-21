@@ -48,6 +48,7 @@ class ZEGRShader;
 
 class ZERNSimpleMaterial : public ZERNMaterial
 {
+	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
 

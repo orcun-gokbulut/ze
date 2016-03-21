@@ -42,6 +42,7 @@
 
 class ZERNStageParticleRendering : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEGRViewport					Viewport;
 

@@ -116,10 +116,10 @@ const ZEMatrix4x4& ZECamera::GetProjectionTransform()
 
 			case ZERN_PT_PERSPECTIVE_OFFCENTER:
 			{
-				float Top = View.NearZ * ZEAngle::Tan(GetVerticalFovTop());
-				float Bottom = -View.NearZ * ZEAngle::Tan(GetVerticalFovBottom());
-				float Right = View.NearZ * ZEAngle::Tan(GetHorizontalFovRight());
-				float Left = -View.NearZ * ZEAngle::Tan(GetHorizontalFovLeft());
+				float Top = View.NearZ * ZEAngle::Tan(GetTopFOV());
+				float Bottom = -View.NearZ * ZEAngle::Tan(GetBottomFOV());
+				float Right = View.NearZ * ZEAngle::Tan(GetRightFOV());
+				float Left = -View.NearZ * ZEAngle::Tan(GetLeftFOV());
 
 				ZEMatrix4x4::CreatePerspectiveProjectionOffCenter(View.ProjectionTransform, Left, Right, Bottom, Top, View.NearZ, View.FarZ);
 				break;
@@ -324,7 +324,7 @@ ZERNProjectionType ZECamera::GetProjectionType() const
 	return View.ProjectionType;
 }
 
-void ZECamera::SetVerticalFovTop(float VerticalFovTop)
+void ZECamera::SetTopFOV(float VerticalFovTop)
 {
 	if(View.VerticalFOVTop == VerticalFovTop)
 		return;
@@ -333,12 +333,12 @@ void ZECamera::SetVerticalFovTop(float VerticalFovTop)
 	ProjectionTransformChanged();
 }
 
-float ZECamera::GetVerticalFovTop() const
+float ZECamera::GetTopFOV() const
 {
 	return View.VerticalFOVTop;
 }
 
-void ZECamera::SetVerticalFovBottom(float VerticalFovBottom)
+void ZECamera::SetBottomFOV(float VerticalFovBottom)
 {
 	if(View.VerticalFOVBottom == VerticalFovBottom)
 		return;
@@ -347,12 +347,12 @@ void ZECamera::SetVerticalFovBottom(float VerticalFovBottom)
 	ProjectionTransformChanged();
 }
 
-float ZECamera::GetVerticalFovBottom() const
+float ZECamera::GetBottomFOV() const
 {
 	return View.VerticalFOVBottom;
 }
 
-void ZECamera::SetHorizontalFovRight(float HorizontalFovRight)
+void ZECamera::SetRightFOV(float HorizontalFovRight)
 {
 	if(View.HorizontalFOVRight == HorizontalFovRight)
 		return;
@@ -361,12 +361,12 @@ void ZECamera::SetHorizontalFovRight(float HorizontalFovRight)
 	ProjectionTransformChanged();
 }
 
-float ZECamera::GetHorizontalFovRight() const
+float ZECamera::GetRightFOV() const
 {
 	return View.HorizontalFOVRight;
 }
 
-void ZECamera::SetHorizontalFovLeft(float HorizontalFovLeft)
+void ZECamera::SetLeftFOV(float HorizontalFovLeft)
 {
 	if(View.HorizontalFOVLeft == HorizontalFovLeft)
 		return;
@@ -375,7 +375,7 @@ void ZECamera::SetHorizontalFovLeft(float HorizontalFovLeft)
 	ProjectionTransformChanged();
 }
 
-float ZECamera::GetHorizontalFovLeft() const
+float ZECamera::GetLeftFOV() const
 {
 	return View.HorizontalFOVLeft;
 }

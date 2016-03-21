@@ -234,23 +234,88 @@ ZERNStageMultiplexerMode ZERNStageMultiplexer::GetMode()
 	return Mode;
 }
 
-void ZERNStageMultiplexer::SetInput(ZEUInt Index, ZERNStageBuffer Buffer)
+void ZERNStageMultiplexer::SetInput0(ZERNStageBuffer Buffer)
 {
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Wrong input index.");
-	Inputs[Index] = Buffer;
+	Inputs[0] = Buffer;
 }
 
-void ZERNStageMultiplexer::SetInput(ZEUInt Index, ZEGRTexture* Input)
+ZERNStageBuffer ZERNStageMultiplexer::GetInput0() const
 {
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Wrong input index.");
-	Inputs[Index] = ZERN_SO_NONE;
-	InputTextures[Index] = Input;
+	return Inputs[0];
 }
 
-const ZEGRTexture* ZERNStageMultiplexer::GetInput(ZEUInt Index) const
+void ZERNStageMultiplexer::SetInput0Texture(ZEGRTexture* Input)
 {
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, NULL, "Wrong input index.");
-	return InputTextures[Index];
+	Inputs[0] = ZERN_SO_NONE;
+	InputTextures[0] = Input;
+}
+
+const ZEGRTexture* ZERNStageMultiplexer::GetInput0Texture() const
+{
+	return InputTextures[0];
+}
+
+void ZERNStageMultiplexer::SetInput1(ZERNStageBuffer Buffer)
+{
+	Inputs[1] = Buffer;
+}
+
+ZERNStageBuffer ZERNStageMultiplexer::GetInput1() const
+{
+	return Inputs[1];
+}
+
+void ZERNStageMultiplexer::SetInput1Texture(ZEGRTexture* Input)
+{
+	Inputs[1] = ZERN_SO_NONE;
+	InputTextures[1] = Input;
+}
+
+const ZEGRTexture* ZERNStageMultiplexer::GetInput1Texture() const
+{
+	return InputTextures[1];
+}
+
+void ZERNStageMultiplexer::SetInput2(ZERNStageBuffer Buffer)
+{
+	Inputs[2] = Buffer;
+}
+
+ZERNStageBuffer ZERNStageMultiplexer::GetInput2() const
+{
+	return Inputs[2];
+}
+
+void ZERNStageMultiplexer::SetInput2Texture(ZEGRTexture* Input)
+{
+	Inputs[2] = ZERN_SO_NONE;
+	InputTextures[2] = Input;
+}
+
+const ZEGRTexture* ZERNStageMultiplexer::GetInput2Texture() const
+{
+	return InputTextures[2];
+}
+
+void ZERNStageMultiplexer::SetInput3(ZERNStageBuffer Buffer)
+{
+	Inputs[3] = Buffer;
+}
+
+ZERNStageBuffer ZERNStageMultiplexer::GetInput3() const
+{
+	return Inputs[3];
+}
+
+void ZERNStageMultiplexer::SetInput3Texture(ZEGRTexture* Input)
+{
+	Inputs[3] = ZERN_SO_NONE;
+	InputTextures[3] = Input;
+}
+
+const ZEGRTexture* ZERNStageMultiplexer::GetInput3Texture() const
+{
+	return InputTextures[3];
 }
 
 void ZERNStageMultiplexer::SetCustomViewport(ZEUInt Index, const ZEGRViewport& Viewport)

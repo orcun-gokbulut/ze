@@ -43,6 +43,14 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
+void ZERNStageForward::DeinitializeSelf()
+{
+	ColorBuffer.Release();
+	ColorRenderTarget.Release();
+	DepthStencilBuffer.Release();
+	DepthOutput.Release();
+}
+
 bool ZERNStageForward::UpdateRenderTargets()
 {
 	ColorRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);

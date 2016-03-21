@@ -35,20 +35,31 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEEnumerator.h"
+
 #include "ZETypes.h"
+#include "ZEPacking.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEPacking.h"
 
 class ZEViewVolume;
 class ZEEntity;
 class ZEGROutput;
-class ZEGRViewport;
 class ZEGRConstantBuffer;
+ZE_META_FORWARD_DECLARE(ZEGRViewport, "ZEGRViewport.h");
 
-enum ZERNProjectionType
+ZE_ENUM(ZERNViewType)
+{
+	ZERN_VT_NONE,
+	ZERN_VT_CAMERA,
+	ZERN_VT_SHADOW_CASTER,
+	ZERN_VT_PROBE
+};
+
+ZE_ENUM(ZERNProjectionType)
 {
 	ZERN_PT_PERSPECTIVE,
 	ZERN_PT_PERSPECTIVE_OFFCENTER,
@@ -57,50 +68,44 @@ enum ZERNProjectionType
 	ZERN_PT_PARABOLOID
 };
 
-enum ZERNViewType
+class ZERNView : public ZEObject
 {
-	ZERN_VT_NONE,
-	ZERN_VT_CAMERA,
-	ZERN_VT_SHADOW_CASTER,
-	ZERN_VT_PROBE
-};
+	ZE_OBJECT
+	public:
+		ZERNViewType				Type;
+		ZEEntity*					Entity;
 
-struct ZERNView
-{
-	ZERNViewType				Type;
-	ZEEntity*					Entity;
+		// Transforms
+		ZEMatrix4x4					ViewTransform;
+		ZEMatrix4x4					ProjectionTransform;		
+		ZEMatrix4x4					ViewProjectionTransform;
+		ZEMatrix4x4					InvViewTransform;
+		ZEMatrix4x4					InvProjectionTransform;			
+		ZEMatrix4x4					InvViewProjectionTransform;
 
-	// Transforms
-	ZEMatrix4x4					ViewTransform;
-	ZEMatrix4x4					ProjectionTransform;		
-	ZEMatrix4x4					ViewProjectionTransform;
-	ZEMatrix4x4					InvViewTransform;
-	ZEMatrix4x4					InvProjectionTransform;			
-	ZEMatrix4x4					InvViewProjectionTransform;
+		// Parameters
+		ZERNProjectionType			ProjectionType;
+		float						VerticalFOV;
+		float						VerticalFOVTop;
+		float						VerticalFOVBottom;
+		float						HorizontalFOV;
+		float						HorizontalFOVRight;
+		float						HorizontalFOVLeft;
+		float						AspectRatio;
+		float						NearZ;
+		float						FarZ;
+		float						ShadowDistance;
+		float						ShadowFadeDistance;
 
-	// Parameters
-	ZERNProjectionType			ProjectionType;
-	float						VerticalFOV;
-	float						VerticalFOVTop;
-	float						VerticalFOVBottom;
-	float						HorizontalFOV;
-	float						HorizontalFOVRight;
-	float						HorizontalFOVLeft;
-	float						AspectRatio;
-	float						NearZ;
-	float						FarZ;
-	float						ShadowDistance;
-	float						ShadowFadeDistance;
+		// Orientation
+		ZEVector3					Position;
+		ZEQuaternion				Rotation;
+		ZEVector3					Direction;
+		ZEVector3					U, V, N;
 
-	// Orientation
-	ZEVector3					Position;
-	ZEQuaternion				Rotation;
-	ZEVector3					Direction;
-	ZEVector3					U, V, N;
-
-	// Others
-	const ZEGRViewport*			Viewport;
-	const ZEViewVolume*			ViewVolume;
+		// Others
+		const ZEGRViewport*			Viewport;
+		const ZEViewVolume*			ViewVolume;
 };
 
 struct ZERNViewConstantBuffer

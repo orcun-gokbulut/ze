@@ -199,5 +199,4 @@ class ZEEntity : public ZEObject
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
 };

@@ -35,15 +35,17 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEList2.h"
 
 #define ZERN_MAX_COMMAND_STAGE 5
 
-class ZEEntity;
-class ZERNRenderParameters;
+ZE_META_FORWARD_DECLARE(ZEEntity, "ZEGame/ZEEntity.h");
+ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");
 
-class ZERNCommand
+class ZERNCommand : public ZEObject
 {
+	ZE_OBJECT
 	//ZE_DISALLOW_COPY(ZERNCommand);
 	friend class ZERNRenderer;
 	private:

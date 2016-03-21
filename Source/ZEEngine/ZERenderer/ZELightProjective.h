@@ -47,7 +47,6 @@ class ZETexture2DResource;
 class ZELightProjective : public ZELight
 {
 	ZE_OBJECT
-
 	private:
 		float							FOV;
 		float							AspectRatio;

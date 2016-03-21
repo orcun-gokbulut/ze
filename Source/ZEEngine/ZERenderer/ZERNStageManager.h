@@ -35,13 +35,16 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
-#include "ZEDS\ZEArray.h"
+
+#include "ZEDS/ZEArray.h"
 
 class ZERNStage;
 
-class ZERNStageManager : public ZEInitializable
+class ZERNStageManager : public ZEObject, public ZEInitializable
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZERNStage*>				Stages;
 

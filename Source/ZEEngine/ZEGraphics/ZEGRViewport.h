@@ -35,10 +35,12 @@
 
 #pragma once
 
+#include "ZEMeta\ZEObject.h"
 #include "ZETypes.h"
 
-class ZEGRViewport
+class ZEGRViewport : public ZEObject
 {
+	ZE_OBJECT
 	public:
 		struct ZEViewportData
 		{

@@ -39,6 +39,7 @@
 
 class TiXmlElement;
 class TiXmlDocument;
+class TiXmlNode;
 
 class ZEMLFormatXMLV1 : public ZEMLFormat
 {
@@ -51,6 +52,9 @@ class ZEMLFormatXMLV1 : public ZEMLFormat
 		void							PrintC14NSpace(ZEFile* File);
 		bool							ReadVectors(ZEFile* File, float* Output, const char** Members, ZESize MemberCount);
 		bool							ReadDoubleVectors(ZEFile* File, double* Output, const char** Members, ZESize MemberCount);
+
+		bool							Include(ZEFile* File, TiXmlElement* IncludeNode);
+		bool							ParseIncludes(ZEFile* File, TiXmlElement* Node);
 
 	public:
 		static ZEMLFormatDescription*	Description();

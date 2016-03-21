@@ -54,21 +54,22 @@ enum ZEMLFormatType
 	ZEML_FT_XML_SIMPLIFIED
 };
 
-struct ZEMLFormatElement
+class ZEMLFormatElement
 {
-	ZEMLElementType			ElementType;
-	ZEString				Name;
-	ZEUInt32				NameHash;
-	ZEUInt64				Offset;
-	ZEUInt64				Count;
-	ZESize					Size;
-	ZEMLValueType			ValueType;
-	ZEValue					Value;
+	public:
+		ZEMLElementType					ElementType;
+		ZEString						Name;
+		ZEUInt32						NameHash;
+		ZEUInt64						Offset;
+		ZEUInt64						Count;
+		ZESize							Size;
+		ZEMLValueType					ValueType;
+		ZEValue							Value;
 
-							ZEMLFormatElement();
+										ZEMLFormatElement();
 };
 
-struct ZEMLFormatDescription
+class ZEMLFormatDescription
 {
 	public:
 		virtual const char*				GetName() const = 0;

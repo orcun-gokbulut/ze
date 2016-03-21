@@ -53,8 +53,9 @@ class ZEGRContext;
 class ZEGRConstantBuffer;
 class ZERNRenderer;
 
-class ZERNStageAntiAliasing : public ZERNStage
+class ZERNStageAntiAliasing  : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
 

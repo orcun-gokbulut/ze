@@ -209,7 +209,6 @@ bool ZERNRenderer::InitializeSelf()
 void ZERNRenderer::DeinitializeSelf()
 {
 	CleanCommands();
-	CleanStages();
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
@@ -296,7 +295,6 @@ void ZERNRenderer::RemoveStage(ZERNStage* Stage)
 
 void ZERNRenderer::CleanStages()
 {
-	ZESize Count = Stages.GetCount();
 	while(Stages.GetFirst() != NULL)
 	{
 		ZERNStage* Stage = Stages.GetFirst()->GetItem();
@@ -378,5 +376,6 @@ ZERNRenderer::ZERNRenderer()
 
 ZERNRenderer::~ZERNRenderer()
 {
-	Deinitialize();
+	CleanCommands();
+	CleanStages();
 }

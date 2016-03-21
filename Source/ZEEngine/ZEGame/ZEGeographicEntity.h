@@ -42,29 +42,31 @@
 class ZEGeographicEntity : public ZEEntity
 {
 	ZE_OBJECT;
+	private:
+		ZEVector3d							GeographicPosition;
+		ZEQuaternion						GeographicRotation;
+		ZEVector3d							GeographicScale;
+
+		mutable ZEMatrix4x4d				GeographicTransform;
+		mutable ZEMatrix4x4d				InvGeographicTransform;
 
 	protected:
-		ZEVector3d GeographicPosition;
-		ZEQuaternion GeographicRotation;
-		ZEVector3d GeographicScale;
+		virtual bool						SetOwner(ZEEntity* Owner);
 
-		mutable ZEMatrix4x4d GeographicTransform;
-		mutable ZEMatrix4x4d InvGeographicTransform;
-
-		virtual bool SetOwner(ZEEntity* Owner);
-
-		ZEGeographicEntity();
+											ZEGeographicEntity();
 
 	public:
-		const ZEMatrix4x4d& GetGeographicTransform() const;
-		const ZEMatrix4x4d& GetInvGeographicTransform() const;
+		const ZEMatrix4x4d&					GetGeographicTransform() const;
+		const ZEMatrix4x4d&					GetInvGeographicTransform() const;
 
-		virtual void SetGeographicPosition(const ZEVector3d& Position);
-		ZEVector3d GetGeographicPosition() const;
+		virtual void						SetGeographicPosition(const ZEVector3d& Position);
+		ZEVector3d							GetGeographicPosition() const;
 
-		virtual void SetGeographicRotation(const ZEQuaternion& Rotation);
-		ZEQuaternion GetGeographicRotation() const;
+		virtual void						SetGeographicRotation(const ZEQuaternion& Rotation);
+		ZEQuaternion						GetGeographicRotation() const;
 
-		virtual void SetGeographicScale(const ZEVector3d& Scale);
-		ZEVector3d GetGeographicScale() const;
+		virtual void						SetGeographicScale(const ZEVector3d& Scale);
+		ZEVector3d							GetGeographicScale() const;
+
+		static ZEGeographicEntity*			CreateInstance();
 };

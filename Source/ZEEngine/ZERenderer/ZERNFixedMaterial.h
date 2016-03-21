@@ -69,6 +69,7 @@ enum ZERNTransparencyMode : ZEUInt8
 
 class ZERNFixedMaterial : public ZERNMaterial
 {
+	ZE_OBJECT
 	protected:
 		ZEString								Name;
 		ZEString								FileName;
@@ -347,8 +348,6 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float								GetDetailNormalMapAttenuationFactor() const;
 		void								SetDetailNormalMap(const ZERNMap& Map);
 		const ZERNMap&						GetDetailNormalMap() const;
-
-		void								Tick(float ElapsedTime);
 
 		virtual bool						SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 		virtual void						CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;

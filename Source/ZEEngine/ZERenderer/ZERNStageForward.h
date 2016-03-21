@@ -44,6 +44,7 @@ class ZEGRTexture2D;
 
 class ZERNStageForward : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEHolder<ZEGRTexture2D>				ColorBuffer;
 		ZEHolder<const ZEGRRenderTarget>	ColorRenderTarget;
@@ -72,6 +73,7 @@ class ZERNStageForward : public ZERNStage
 
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
+	ZE_OBJECT
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;

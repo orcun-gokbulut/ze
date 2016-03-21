@@ -74,7 +74,6 @@ class ZEGRTexture;
 class ZELight : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
 		float							AttenuationFunction(float RootToTry);
 

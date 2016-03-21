@@ -35,22 +35,24 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZERNView.h"
 #include "ZERNStageID.h"
-#include "ZEPointer/ZEHolder.h"
 
-class ZEScene;
-class ZERNStage;
+ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h");
+ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
 class ZERNCommand;
 class ZEGRContext;
 class ZEGRRenderTarget;
 
-class ZERNRenderer : public ZEInitializable
+class ZERNRenderer : public ZEObject, public ZEInitializable
 {
+	ZE_OBJECT
 	private:
 		ZEGRContext*					Context;
 		ZEScene*						Scene;
