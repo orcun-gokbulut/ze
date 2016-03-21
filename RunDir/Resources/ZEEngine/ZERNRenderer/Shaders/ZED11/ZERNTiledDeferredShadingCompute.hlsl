@@ -75,7 +75,7 @@ float3 ZERNTiledDeferredShadingCompute_PointLighting(ZERNShading_Light PointLigh
 		
 		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 		
-		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * PointLight.Intensity * DistanceAttenuation;
+		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * DistanceAttenuation;
 	}
 	
 	return saturate(ResultColor);

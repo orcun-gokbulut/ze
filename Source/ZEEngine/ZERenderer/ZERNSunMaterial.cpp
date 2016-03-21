@@ -144,7 +144,7 @@ ZERNSunMaterial::ZERNSunMaterial()
 
 ZEUInt ZERNSunMaterial::GetStageMask() const
 {
-	return ZERN_STAGE_PRE_EFFECT;
+	return ZERN_STAGE_POST_EFFECT;
 }
 
 void ZERNSunMaterial::SetSunPositionScreen(const ZEVector2& SunPositionScreen)
@@ -183,9 +183,6 @@ bool ZERNSunMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) cons
 		return false;
 
 	if (!Update())
-		return false;
-
-	if(Stage == NULL || !Stage->GetEnabled())
 		return false;
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);

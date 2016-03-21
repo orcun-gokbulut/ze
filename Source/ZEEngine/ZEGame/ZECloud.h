@@ -53,6 +53,7 @@ class ZEGRSampler;
 class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRDepthStencilBuffer;
+class ZEGRRenderTarget;
 
 class ZECloud : public ZEEntity
 {
@@ -94,12 +95,15 @@ class ZECloud : public ZEEntity
 		struct  
 		{
 			float						PlaneSubdivision;
-			ZEUInt						CloudCoverage;
+			float						CloudCoverage;
 			float						CloudDensity;
 			float						Reserved;
 
 			ZEVector3					SunDirection;
 			float						SunIntensity;
+
+			ZEVector2					Translation;
+			ZEVector2					Reserved1;
 		} Constants;
 
 		void							CreatePlane();
@@ -109,7 +113,7 @@ class ZECloud : public ZEEntity
 		bool							UpdateConstantBuffers();
 		bool							Update();
 
-		void							RenderClouds(ZEGRContext* Context, const ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void							RenderClouds(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
 		void							ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 		void							LightingClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 
@@ -133,6 +137,10 @@ class ZECloud : public ZEEntity
 		void							SetCloudDensity(float CloudDensity);
 		float							GetCloudDensity() const;
 
+		void							SetTranslation(const ZEVector2& Translation);
+		const ZEVector2&				GetTranslation() const;
+
+		virtual void					Tick(float Time);
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 

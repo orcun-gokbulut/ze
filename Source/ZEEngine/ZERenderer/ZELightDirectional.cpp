@@ -192,6 +192,9 @@ ZELightDirectional::ZELightDirectional()
 
 	Command.Entity = this;
 	Command.Priority = 2;
+
+	UseSunLight = false;
+	UseMoonLight = false;
 }
 
 ZELightDirectional::~ZELightDirectional()
@@ -252,6 +255,46 @@ void ZELightDirectional::SetCascadeDistanceFactor(float CascadeDistanceFactor)
 float ZELightDirectional::GetCascadeDistanceFactor() const
 {
 	return CascadeDistanceFactor;
+}
+
+void ZELightDirectional::SetUseSunLight(bool UseSunLight)
+{
+	this->UseSunLight = UseSunLight;
+}
+
+bool ZELightDirectional::GetUseSunLight() const
+{
+	return UseSunLight;
+}
+
+void ZELightDirectional::SetUseMoonLight(bool UseMoonLight)
+{
+	this->UseMoonLight = UseMoonLight;
+}
+
+bool ZELightDirectional::GetUseMoonLight() const
+{
+	return UseMoonLight;
+}
+
+void ZELightDirectional::SetDensityBuffer(const ZEGRTexture2D* DensityBuffer)
+{
+	this->DensityBuffer = DensityBuffer;
+}
+
+const ZEGRTexture2D* ZELightDirectional::GetDensityBuffer() const
+{
+	return DensityBuffer;
+}
+
+void ZELightDirectional::SetAmbientBuffer(const ZEGRTexture2D* AmbientBuffer)
+{
+	this->AmbientBuffer = AmbientBuffer;
+}
+
+const ZEGRTexture2D* ZELightDirectional::GetAmbientBuffer() const
+{
+	return AmbientBuffer;
 }
 
 void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context)

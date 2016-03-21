@@ -50,19 +50,19 @@ cbuffer ZERNFog_Constants	: register(b8)
 	float	ZERNFog_Reserved1;
 };
 
-float3 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+float4 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {	
 	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
-	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, ZERNGBuffer_GetDepth(PositionViewport.xy));
+	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, DepthHomogeneous);
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	
 	float Distance = distance(ZERNView_Position, PositionWorld);
-	Distance = max(0.0f,Distance - ZERNFog_Range);
-	float FogFactor = exp(-pow(ZERNFog_Density * Distance, 2.0f));
+	float RelativeDistance = max(0.0f, Distance - ZERNFog_Range);
+	float FogFactor = exp(-pow(ZERNFog_Density * RelativeDistance, 2.0f));
 	
-	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
-	
-	return lerp(ZERNFog_Color, PixelColor, FogFactor);
+
+	return float4(ZERNFog_Color, FogFactor);
 }
 
 #endif

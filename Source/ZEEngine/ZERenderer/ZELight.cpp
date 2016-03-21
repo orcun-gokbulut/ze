@@ -107,7 +107,7 @@ void ZELight::SetAttenuation(const ZEVector3& Attenuation)
 	SetAttenuation(Attenuation.x, Attenuation.y, Attenuation.z);
 }
 
-void ZELight::SetAttenuation(float Constant, float Distance, float DistanceSquare)
+void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
 	Attenuation.x = Constant;
 	Attenuation.y = Distance;
@@ -246,7 +246,7 @@ ZELight::ZELight()
 	Range = 100.0f;
 	Intensity = 1.0f;
 	Color = ZEVector3(1.0f, 1.0f, 1.0f);
-	Attenuation = ZEVector3(1.0f, 0.0f, 0.0f);
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
 
 	ViewTransform = ZEMatrix4x4::Identity;
 	ProjectionTransform = ZEMatrix4x4::Identity;

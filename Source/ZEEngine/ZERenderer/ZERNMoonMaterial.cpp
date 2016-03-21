@@ -145,7 +145,7 @@ ZERNMoonMaterial::ZERNMoonMaterial()
 
 ZEUInt ZERNMoonMaterial::GetStageMask() const
 {
-	return ZERN_STAGE_PRE_EFFECT;
+	return ZERN_STAGE_POST_EFFECT;
 }
 
 void ZERNMoonMaterial::SetMoonPositionScreen(const ZEVector2& MoonPositionScreen)
@@ -212,9 +212,6 @@ bool ZERNMoonMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) con
 		return false;
 
 	if (!Update())
-		return false;
-
-	if(Stage == NULL || !Stage->GetEnabled())
 		return false;
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);

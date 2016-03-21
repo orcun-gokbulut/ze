@@ -113,7 +113,7 @@ class ZELight : public ZEEntity
 		float							GetIntensity() const;
 
 		void							SetAttenuation(const ZEVector3& Attenuation);
-		void							SetAttenuation(float Constant, float Distance, float DistanceSquare);
+		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
 		const ZEVector3&				GetAttenuation() const;
 
 		void							SetColor(const ZEVector3& NewColor);
