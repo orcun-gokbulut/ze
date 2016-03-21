@@ -205,7 +205,7 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 					//float3 NormalCascade = mul(Cascade.ProjectionTransform, float4(Surface.NormalView, 0.0f)).xyz;
 					//NormalCascade = normalize(NormalCascade);
 					//TexCoordDepth.z += NormalCascade.z * 0.1f;
-					//TexCoordDepth.z += CascadeIndex / (DirectionalLight.Range);
+					TexCoordDepth.z += CascadeIndex * 0.0003f;
 					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, TexCoordDepth, ShadowMapDimensions);
 					CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex];
 					
