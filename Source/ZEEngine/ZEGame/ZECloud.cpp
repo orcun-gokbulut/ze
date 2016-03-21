@@ -381,9 +381,9 @@ ZECloud::ZECloud()
 
 	CloudTexture = NULL;
 
-	Constants.PlaneSubdivision = 5.0f;
-	Constants.CloudCoverage = 0.2f;
-	Constants.CloudDensity = 2.0f;
+	Constants.PlaneSubdivision = 10.0f;
+	Constants.CloudCoverage = 0.1f;
+	Constants.CloudDensity = 1.0f;
 	Constants.SunDirection = ZEVector3(-1.0f);
 	Constants.SunIntensity = 5.0f;
 	Constants.Translation = ZEVector2(0.0f, 0.0f);
