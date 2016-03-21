@@ -96,7 +96,7 @@ static const float3 ZERNDeferredShading_CascadeColors[] =
 	float3(1.0f, 0.0f, 0.0f),
 	float3(0.0f, 1.0f, 0.0f),
 	float3(0.0f, 0.0f, 1.0f),
-	float3(0.0f, 0.0f, 0.0f),
+	float3(1.0f, 1.0f, 0.0f),
 };
 
 static const float2 ZERNDeferredShading_PoissonDiskSamples[] = 
@@ -214,15 +214,6 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 			}
 		}
 	}
-	
-	//float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
-	//float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);	
-	//float3 ResultColor = (ResultDiffuse + ResultSpecular) * DirectionalLight.Color * DirectionalLight.Intensity;
-	//
-	//if(ZERNDeferredShading_ShowCascades)
-	//	return ResultColor * CascadeColor;
-	//else
-	//	return ResultColor * Visibility;
 
 	float3 LightDirectionWorld = ZERNTransformations_ViewToWorld(float4(DirectionalLight.DirectionView, 0.0f));
 	LightDirectionWorld = normalize(LightDirectionWorld);
@@ -246,7 +237,12 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionalLight.DirectionView));
 	float ENdotL = saturate(CosSunZenith);
 	
-	return Surface.Diffuse * (AmbientColor * ENdotL + LightColor * NdotL * Visibility);
+	float3 ResultColor = Surface.Diffuse * (AmbientColor * ENdotL + LightColor * NdotL * Visibility);
+	
+	if(ZERNDeferredShading_ShowCascades)
+		return ResultColor * CascadeColor;
+	else
+		return ResultColor;
 }
 
 float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)

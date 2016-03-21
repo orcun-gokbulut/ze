@@ -389,7 +389,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		View.N = GetWorldFront();
 
 		View.Viewport = NULL;
-		View.ViewVolume = &GetViewVolume(CascadeIndex);
+		View.ViewVolume = NULL; //&GetViewVolume(CascadeIndex);
 		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
 
 		ShadowRenderer.SetView(View);
