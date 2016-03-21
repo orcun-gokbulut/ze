@@ -57,7 +57,7 @@
 #define ZERN_AODF_RENDER_STATE		4
 #define ZERN_AODF_TEXTURE			8
 
-static ZEUInt ConvertSampleCount(ZERNSSAO_SampleCount SampleCount)
+static ZEUInt ConvertSampleCount(ZERNSSAOSampleCount SampleCount)
 {
 	switch (SampleCount)
 	{
@@ -522,7 +522,7 @@ float ZERNStageAO::GetOcclusionMapDownScale() const
 	return Constants.DownScale;
 }
 
-void ZERNStageAO::SetSampleCount(ZERNSSAO_SampleCount SampleCount)
+void ZERNStageAO::SetSampleCount(ZERNSSAOSampleCount SampleCount)
 {
 	if(this->SampleCount == SampleCount)
 		return;
@@ -534,7 +534,7 @@ void ZERNStageAO::SetSampleCount(ZERNSSAO_SampleCount SampleCount)
 	DirtyFlags.RaiseFlags(ZERN_AODF_CONSTANT_BUFFER);
 }
 
-ZERNSSAO_SampleCount ZERNStageAO::GetSampleCount() const
+ZERNSSAOSampleCount ZERNStageAO::GetSampleCount() const
 {
 	return SampleCount;
 }

@@ -68,6 +68,22 @@ class ZEPointer
 
 };
 
+template<typename Type>
+class ZEPointerObject : public ZEPointer<Type, ZEDeletorDestroy<Type>>
+{
+	public:
+		ZEPointerObject&		operator=(Type* RawPointer);
+		ZEPointerObject&		operator=(ZEPointerObject& OtherPointer);
+};
+
+template<typename Type>
+class ZEPointerResource : public ZEPointer<Type, ZEDeletorRelease<Type>>
+{
+	public:
+		ZEPointerResource&		operator=(Type* RawPointer);
+		ZEPointerResource&		operator=(ZEPointerResource& OtherPointer);
+};
+
 template<typename Type, typename Deletor>
 bool ZEPointer<Type, Deletor>::IsNull() const
 {
@@ -183,4 +199,32 @@ template<typename Type, typename Deletor>
 ZEPointer<Type, Deletor>::~ZEPointer()
 {
 	Release();
+}
+
+template<typename Type>
+ZEPointerObject<Type>& ZEPointerObject<Type>::operator=(Type* RawPointer)
+{
+	Assign(RawPointer);
+	return *this;
+}
+
+template<typename Type>
+ZEPointerObject<Type>& ZEPointerObject<Type>::operator=(ZEPointerObject<Type>& OtherPointer)
+{
+	Copy(OtherPointer);
+	return *this;
+}
+
+template<typename Type>
+ZEPointerResource<Type>& ZEPointerResource<Type>::operator=(Type* RawPointer)
+{
+	Assign(RawPointer);
+	return *this;
+}
+
+template<typename Type>
+ZEPointerResource<Type>& ZEPointerResource<Type>::operator=(ZEPointerResource<Type>& OtherPointer)
+{
+	Copy(OtherPointer);
+	return *this;
 }

@@ -116,14 +116,29 @@ void* ZEGRWindow::GetHandle() const
 	return Handle;
 }
 
-const ZEGRWindowStyle& ZEGRWindow::GetStyle() const
+void ZEGRWindow::SetLeft(ZEUInt Left)
 {
-	return Style;
+	SetPosition(Left, Top);
 }
 
-const ZEString& ZEGRWindow::GetTitle() const
+ZEInt ZEGRWindow::GetLeft() const
 {
-	return Title;
+	return Left;
+}
+
+void ZEGRWindow::SetTop(ZEUInt Top)
+{
+	SetPosition(Left, Top);
+}
+
+ZEInt ZEGRWindow::GetTop() const
+{
+	return Top;
+}
+
+void ZEGRWindow::SetWidth(ZEUInt Width)
+{
+	SetSize(Width, Height);
 }
 
 ZEUInt ZEGRWindow::GetWidth() const
@@ -131,54 +146,139 @@ ZEUInt ZEGRWindow::GetWidth() const
 	return Width;
 }
 
+void ZEGRWindow::SetHeight(ZEUInt Height)
+{
+	SetSize(Width, Height);
+}
+
 ZEUInt ZEGRWindow::GetHeight() const
 {
 	return Height;
 }
 
-ZEInt ZEGRWindow::GetPositionX() const
+const ZEString& ZEGRWindow::GetTitle() const
 {
-	return PositionX;
+	return Title;
 }
 
-ZEInt ZEGRWindow::GetPositionY() const
+void ZEGRWindow::SetTitleBar(bool Enabled)
 {
-	return PositionY;
+	TitleBar = Enabled;
+	UpdateStyle();
 }
 
-void ZEGRWindow::GetPosition(ZEInt& X, ZEInt& Y) const
+bool ZEGRWindow::GetTitleBar() const
 {
-	X = PositionX;
-	Y = PositionY;
+	return TitleBar;
 }
 
-void ZEGRWindow::GetPosition(ZEVector2& Position) const
+void ZEGRWindow::SetIconVisible(bool Visible)
 {
-	Position.x = (float)PositionX;
-	Position.y = (float)PositionY;
+	IconVisible = Visible;
+	UpdateStyle();
 }
 
-void ZEGRWindow::GetSize(ZEInt& Width, ZEInt& Height) const
+bool ZEGRWindow::GetIconVisible() const
 {
-	Width = this->Width;
-	Height = this->Height;
+	return IconVisible;
 }
 
-void ZEGRWindow::GetSize(ZEVector2& Size) const
+void ZEGRWindow::SetMinimizeButton(bool Enabled)
 {
-	Size.x = (float)Width;
-	Size.y = (float)Height;
+	MinimizeButton = Enabled;
+	UpdateStyle();
 }
 
-ZERectangle ZEGRWindow::GetRectangle() const
+bool ZEGRWindow::GetMinimizeButton() const
 {
-	ZEVector2 Size;
-	ZEVector2 Position;
+	return MinimizeButton;
+}
 
-	GetSize(Size);
-	GetPosition(Position);
+void ZEGRWindow::SetMaximizeButton(bool Enabled)
+{
+	MaximizeButton = Enabled;
+	UpdateStyle();
+}
 
-	return ZERectangle(Position, Position + Size);
+bool ZEGRWindow::GetMaximizeButton() const
+{
+	return MaximizeButton;
+}
+
+void ZEGRWindow::SetCloseButton(bool Enabled)
+{
+	CloseButton = Enabled;
+	UpdateStyle();
+}
+
+bool ZEGRWindow::GetCloseButton() const
+{
+	return CloseButton;
+}
+
+void ZEGRWindow::SetResizable(bool Enabled)
+{
+	Resizable = Enabled;
+	UpdateStyle();
+}
+
+bool ZEGRWindow::GetResizable() const
+{
+	return Resizable;
+}
+
+void ZEGRWindow::SetBordered(bool Enabled)
+{
+	Bordered = Enabled;
+	UpdateStyle();
+}
+
+bool ZEGRWindow::GetBordered() const
+{
+	return Bordered;
+}
+
+void ZEGRWindow::SetShowInTaskbar(bool Enabled)
+{
+	ShowInTaskbar = Enabled;
+	UpdateStyle();
+}
+
+bool ZEGRWindow::GetShowInTaskbar() const
+{
+	return ShowInTaskbar;
+}
+
+void ZEGRWindow::SetAlwaysOnTop(bool Enabled)
+{
+	AlwaysOnTop = Enabled;
+	UpdateStyle();
+}
+
+bool ZEGRWindow::GetAlwaysOnTop() const
+{
+	return AlwaysOnTop;
+}
+
+void ZEGRWindow::SetQuitWhenClosed(bool Enabled)
+{
+	QuitWhenClosed = Enabled;
+	UpdateStyle();
+}
+
+bool ZEGRWindow::GetQuitWhenClosed() const
+{
+	return QuitWhenClosed;
+}
+
+void ZEGRWindow::SetValidateQuit(bool Enabled)
+{
+	ValidateQuit = Enabled;
+}
+
+bool ZEGRWindow::GetValidateQuit() const
+{
+	return ValidateQuit;
 }
 
 bool ZEGRWindow::GetFullScreen() const
@@ -186,9 +286,25 @@ bool ZEGRWindow::GetFullScreen() const
 	return FullScreen;
 }
 
-bool ZEGRWindow::GetVSynchEnable() const
+void ZEGRWindow::SetCursorVisible(bool Visible)
 {
-	return VSynchEnable;
+	CursorVisible = Visible;
+}
+
+bool ZEGRWindow::GetCursorVisible() const
+{
+	return CursorVisible;
+}
+
+bool ZEGRWindow::GetCursorLocked() const
+{
+	//return CursorLocked;
+	return LastCursorLock == this;
+}
+
+bool ZEGRWindow::GetVSynchEnabled() const
+{
+	return VSynchEnabled;
 }
 
 ZEGRMonitor* ZEGRWindow::GetContainingMonitor() const
@@ -201,7 +317,12 @@ ZEGROutput* ZEGRWindow::GetOutput() const
 	return Output;
 }
 
-bool ZEGRWindow::GetEnable() const
+bool ZEGRWindow::GetVisible() const
+{
+	return Visible;
+}
+
+bool ZEGRWindow::GetEnabled() const
 {
 	return Enabled;
 }
@@ -226,21 +347,30 @@ bool ZEGRWindow::GetMinimized() const
 	return Minimized;
 }
 
-bool ZEGRWindow::GetCursorLock() const
-{
-	return LastCursorLock == this;
-}
-
 ZEGRWindow::ZEGRWindow()
 {
 	Id = NextWindowId++;
 	Handle = NULL;
+	QuitWhenClosed = true;
 	Title = "Zinek Engine";
 	
 	Width = 800;
 	Height = 600;
-	PositionX = 100;
-	PositionY = 100;
+	Left = 100;
+	Top = 100;
+
+	TitleBar = true;
+	IconVisible = true;
+	MinimizeButton = true;
+	MaximizeButton = true;
+	Resizable = true;
+	Bordered = true;
+	ShowInTaskbar = true;
+	AlwaysOnTop = false;
+	QuitWhenClosed = true;
+	ValidateQuit = true;
+	CursorVisible = false;
+	CursorLocked = false;
 
 	Enabled = true;
 	Focused = false;
@@ -248,7 +378,7 @@ ZEGRWindow::ZEGRWindow()
 	Maximized = false;
 
 	FullScreen = false;
-	VSynchEnable = false;
+	VSynchEnabled = false;
 }
 
 ZEGRWindow::~ZEGRWindow()

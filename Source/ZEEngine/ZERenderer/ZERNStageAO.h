@@ -53,7 +53,7 @@ class ZEGRContext;
 class ZEGRConstantBuffer;
 class ZERNRenderer;
 
-enum ZERNSSAO_SampleCount : ZEUInt8
+ZE_ENUM(ZERNSSAOSampleCount)
 {
 	ZERN_AOSC_LOW		= 0,
 	ZERN_AOSC_MEDIUM	= 1,
@@ -62,6 +62,7 @@ enum ZERNSSAO_SampleCount : ZEUInt8
 
 class ZERNStageAO : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
 
@@ -100,7 +101,7 @@ class ZERNStageAO : public ZERNStage
 		ZEUInt								Width;
 		ZEUInt								Height;
 
-		ZERNSSAO_SampleCount				SampleCount;
+		ZERNSSAOSampleCount					SampleCount;
 
 		struct SSAOConstants
 		{
@@ -111,14 +112,14 @@ class ZERNStageAO : public ZERNStage
 			float							MinDepthBias;
 			float							Intensity;
 			float							DownScale;
-		}Constants;
+		} Constants;
 
 		struct SSAOFilterConstants
 		{
 			ZEVector4						KernelValues[32];
 			ZEUInt							KernelSize;
 			ZEVector3						Reserved;
-		}FilterConstants;
+		} FilterConstants;
 
 		void								CreateRandomVectors();
 		void								CreateSphereSamples();
@@ -155,8 +156,8 @@ class ZERNStageAO : public ZERNStage
 		void								SetOcclusionMapDownScale(float DownScale);
 		float								GetOcclusionMapDownScale() const;
 
-		void								SetSampleCount(ZERNSSAO_SampleCount SampleCount);
-		ZERNSSAO_SampleCount				GetSampleCount() const;
+		void								SetSampleCount(ZERNSSAOSampleCount SampleCount);
+		ZERNSSAOSampleCount					GetSampleCount() const;
 
 		void								SetFilterKernelValues(const ZEVector4* Values, ZESize KernelSize);
 		const ZEVector4* 					GetFilterKernelValues() const;

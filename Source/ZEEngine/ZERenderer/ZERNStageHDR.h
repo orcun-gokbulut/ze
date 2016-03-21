@@ -53,7 +53,7 @@ class ZEGRRenderState;
 class ZERNRenderer;
 class ZEGRRenderTarget;
 
-enum ZERNHDRToneMapOperator
+ZE_ENUM(ZERNHDRToneMapOperator)
 {
 	ZERN_HTMO_LOGARITMIC			= 0,
 	ZERN_HTMO_EXPONENTIAL			= 1,
@@ -63,7 +63,7 @@ enum ZERNHDRToneMapOperator
 	ZERN_HTMO_UNCHARTED				= 5
 };
 
-enum ZERNHDRBlurTextureSize
+ZE_ENUM(ZERNHDRBlurTextureSize)
 {
 	ZERN_HBTS_EXACT					= 0,
 	ZERN_HBTS_HALF					= 1,
@@ -72,6 +72,7 @@ enum ZERNHDRBlurTextureSize
 
 class ZERNStageHDR : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
 

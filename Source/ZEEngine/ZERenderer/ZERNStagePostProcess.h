@@ -43,6 +43,7 @@ class ZEGRTexture2D;
 
 class ZERNStagePostProcess : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
 

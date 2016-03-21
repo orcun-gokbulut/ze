@@ -46,6 +46,7 @@ class ZEGRRenderTarget;
 
 class ZERNStageGBuffer : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
 		ZEHolder<ZEGRTexture2D>				GBuffer0;

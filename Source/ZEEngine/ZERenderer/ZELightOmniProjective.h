@@ -46,7 +46,6 @@ class ZETextureCubeResource;
 class ZELightOmniProjective : public ZELight
 {
 	ZE_OBJECT
-
 	private:
 		const ZEGRTextureCube*			ProjectionTexture;
 		mutable ZEViewSphere			ViewVolume;

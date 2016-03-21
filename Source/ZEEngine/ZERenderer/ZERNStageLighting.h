@@ -72,6 +72,7 @@ enum ZERNRenderModel
 
 class ZERNStageLighting : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
 

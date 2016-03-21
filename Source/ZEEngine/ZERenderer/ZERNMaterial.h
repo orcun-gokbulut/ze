@@ -35,14 +35,16 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 #include "ZEPointer/ZEReferenceCounted.h"
 
 class ZEGRContext;
 class ZERNStage;
 
-class ZERNMaterial : public ZEReferenceCounted, public ZEInitializable
+class ZERNMaterial : public ZEObject, public ZEReferenceCounted, public ZEInitializable
 {
+	ZE_OBJECT
 	protected:
 										ZERNMaterial();
 		virtual							~ZERNMaterial();

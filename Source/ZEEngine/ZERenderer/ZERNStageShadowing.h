@@ -39,6 +39,7 @@
 
 class ZERNStageShadowing : public ZERNStage
 {
+	ZE_OBJECT
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;

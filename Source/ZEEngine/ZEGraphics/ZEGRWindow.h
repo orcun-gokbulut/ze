@@ -35,6 +35,7 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
 #include "ZETypes.h"
@@ -52,127 +53,168 @@ enum ZEGRWindowType : ZEUInt8
 class ZEGRMonitor;
 class ZEGROutput;
 
-class ZEGRWindowStyle
+class ZEGRWindow : public ZEObject, public ZEInitializable
 {
-	public:
-		ZEGRWindowType			Type;
-		bool					TitleBar;
-		bool					WindowMenu;
-		bool					MinimizeButton;
-		bool					MaximizeButton;
-		bool					Resizable;
-		bool					Bordered;
-		bool					ShowInTaskbar;
-		bool					AlwaysOnTop;
-
-								ZEGRWindowStyle();
-};
-
-class ZEGRWindow : public ZEInitializable
-{
+	ZE_OBJECT
 	private:
-		ZEUInt					Id;
-		static ZEUInt			WindowCount;
-		static ZEGRWindow*		LastCursorLock;
+		ZEUInt							Id;
+		static ZEUInt					WindowCount;
+		static ZEGRWindow*				LastCursorLock;
 
-		ZEHolder<ZEGROutput>	Output;
+		ZEHolder<ZEGROutput>			Output;
 
-		void*					Handle;
-		ZEString				Title;
-		ZEGRWindowStyle			Style;
+		void*							Handle;
 
-		ZEUInt					Width;
-		ZEUInt					Height;
+		ZEUInt							Width;
+		ZEUInt							Height;
 
-		ZEInt					PositionX;
-		ZEInt					PositionY;
+		ZEInt							Left;
+		ZEInt							Top;
 
-		bool					Enabled;
-		bool					Focused;
-		bool					Minimized;
-		bool					Maximized;
+		bool							Enabled;
+		bool							Visible;
 
-		bool					FullScreen;
-		bool					VSynchEnable;
+		ZEString						Title;
+		bool							TitleBar;
+		bool							IconVisible;
+		bool							CloseButton;
+		bool							MinimizeButton;
+		bool							MaximizeButton;
+		bool							Resizable;
+		bool							Bordered;
+		bool							ShowInTaskbar;
+		bool							AlwaysOnTop;
+		bool							QuitWhenClosed;
+		bool							ValidateQuit;
+		bool							CursorVisible;
+		bool							CursorLocked;
+		
+		bool							CursorVisibleState;
+		bool							CursorLockedState;
+
+		bool							FullScreen;
+		bool							VSynchEnabled;
+
+		bool							Focused;
+		bool							Minimized;
+		bool							Maximized;
+
+		void							UpdateStyle();
 
 	protected:
-		virtual void			OnEnabled();
-		virtual void			OnDisabled();
-		virtual void			OnCreate();
-		virtual void			OnDestroy();
-		virtual void			OnFocusGain();
-		virtual void			OnFocusLoose();
-		virtual void			OnRestore();
-		virtual void			OnMinimize();
-		virtual void			OnMaximize();
-		virtual void			OnWindowed();
-		virtual void			OnFullScreen();
-		virtual void			OnMove();
-		virtual void			OnSize();
+		virtual void					OnEnabled();
+		virtual void					OnDisabled();
+		virtual void					OnCreate();
+		virtual void					OnDestroy();
+		virtual void					OnFocusGain();
+		virtual void					OnFocusLoose();
+		virtual void					OnRestore();
+		virtual void					OnMinimize();
+		virtual void					OnMaximize();
+		virtual void					OnWindowed();
+		virtual void					OnFullScreen();
+		virtual void					OnMove();
+		virtual void					OnSize();
 
-		virtual bool			InitializeSelf();
-		virtual void			DeinitializeSelf();
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
 
-								ZEGRWindow();
-		virtual					~ZEGRWindow();
+										ZEGRWindow();
+		virtual							~ZEGRWindow();
 
 	public:
-		ZEUInt					GetId() const;
-		void*					GetHandle() const;
+		ZEUInt							GetId() const;
+		void*							GetHandle() const;
 		
-		void					SetStyle(const ZEGRWindowStyle& Style);
-		const ZEGRWindowStyle&	GetStyle() const;
+		void							SetPosition(ZEInt Left, ZEInt Top);
+
+		void							SetLeft(ZEUInt Left);
+		ZEInt							GetLeft() const;
+
+		void							SetTop(ZEUInt Top);
+		ZEInt							GetTop() const;
+
+		void							SetSize(ZEInt Width, ZEInt Height);
+
+		void							SetWidth(ZEUInt Width);
+		ZEUInt							GetWidth() const;
 		
-		void					SetTitle(const ZEString& Title);
-		const ZEString&			GetTitle() const;
+		void							SetHeight(ZEUInt Width);
+		ZEUInt							GetHeight() const;
 
-		ZEUInt					GetWidth() const;
-		ZEUInt					GetHeight() const;
+		void							SetFullScreen(bool FullScreen);
+		bool							GetFullScreen() const;
 
-		ZEInt					GetPositionX() const;
-		ZEInt					GetPositionY() const;
+		void							SetVSynchEnabled(bool Enabled);
+		bool							GetVSynchEnabled() const;
 
-		void					SetPosition(ZEInt X, ZEInt Y);
-		void					GetPosition(ZEInt& X, ZEInt& Y) const;
-		void					GetPosition(ZEVector2& Position) const;
+		void							SetVisible(bool Visible);
+		bool							GetVisible() const;
 
-		void					SetSize(ZEInt Width, ZEInt Height);
-		void					GetSize(ZEInt& Width, ZEInt& Height) const;
-		void					GetSize(ZEVector2& Size) const;
+		void							SetEnabled(bool Enable);
+		bool							GetEnabled() const;
 
-		ZERectangle				GetRectangle() const;
+		void							SetTitle(const ZEString& Title);
+		const ZEString&					GetTitle() const;
 
-		void					SetFullScreen(bool FullScreen);
-		bool					GetFullScreen() const;
+		void							SetTitleBar(bool Enabled);
+		bool							GetTitleBar() const;
 
-		void					SetVSynchEnable(bool VSynchEnable);
-		bool					GetVSynchEnable() const;
+		void							SetIconVisible(bool Visible);
+		bool							GetIconVisible() const;
 
-		void					SetEnable(bool Enable);
-		bool					GetEnable() const;
+		void							SetMinimizeButton(bool Enabled);
+		bool							GetMinimizeButton() const;
+
+		void							SetMaximizeButton(bool Enabled);
+		bool							GetMaximizeButton() const;
+
+		void							SetCloseButton(bool Enabled);
+		bool							GetCloseButton() const;
+
+		void							SetResizable(bool Enabled);
+		bool							GetResizable() const;
+
+		void							SetBordered(bool Enabled);
+		bool							GetBordered() const;
+
+		void							SetShowInTaskbar(bool Enabled);
+		bool							GetShowInTaskbar() const;
+
+		void							SetAlwaysOnTop(bool Enabled);
+		bool							GetAlwaysOnTop() const;
+
+		void							SetQuitWhenClosed(bool Enabled);
+		bool							GetQuitWhenClosed() const;
 		
-		ZEGRMonitor*			GetContainingMonitor() const;
-		ZEGROutput*				GetOutput() const;
+		void							SetValidateQuit(bool Enabled);
+		bool							GetValidateQuit() const;
 
-		void					SetCursorLock(bool Enabled);
-		bool					GetCursorLock() const;
+		void							SetCursorVisible(bool Visible);
+		bool							GetCursorVisible() const;
 
-		bool					GetFocused() const;
-		bool					GetMinimized() const;
-		bool					GetMaximized() const;
-		bool					GetRestored() const;
+		void							SetCursorLocked(bool Enabled);
+		bool							GetCursorLocked() const;
 
-		void					Focus();
-		void					Minimize();
-		void					Maximize();
-		void					Restore();
+		ZEGRMonitor*					GetContainingMonitor() const;
+		ZEGROutput*						GetOutput() const;
+		
+		bool							GetFocused() const;
+		bool							GetMinimized() const;
+		bool							GetMaximized() const;
+		bool							GetRestored() const;
 
-		virtual ZESSize			HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);
+		void							Focus();
+		void							Minimize();
+		void							Maximize();
+		void							Restore();
 
-		virtual bool			InitializeEmbedded(void* ExistingHandle);
-		void					Show();
-		virtual void			Destroy();
+		void							Show();
+		virtual void					Destroy();
 
-		static ZEUInt			GetWindowCount();
-		static ZEGRWindow*		CreateInstance();
+		static ZEUInt					GetWindowCount();
+		virtual ZESSize					HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);
+
+		static ZEGRWindow*				WrapHandle(void* ExistingHandle);
+		static ZEGRWindow*				CreateInstance();
 };

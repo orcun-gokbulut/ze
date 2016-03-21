@@ -35,9 +35,7 @@
 
 #pragma once
 
-#include "ZERNView.h"
-#include "ZEDS/ZEFlags.h"
-#include "ZEDS/ZEList2.h"
+#include "ZEMeta/ZEObject.h"
 
 typedef ZEFlags ZERNRenderFlags;
 #define ZERN_RF_NONE				0x0
@@ -45,11 +43,12 @@ typedef ZEFlags ZERNRenderFlags;
 #define ZERN_RF_CULL				0x2
 #define ZERN_RF_PROBE				0x4
 
-class ZERNRenderer;
-class ZERNStage;
-class ZERNCommand;
 class ZEGRContext;
-class ZEScene;
+ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h");
+ZE_META_FORWARD_DECLARE(ZERNRenderer, "ZERNRenderer.h");
+ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
+ZE_META_FORWARD_DECLARE(ZERNCommand, "ZERNCommand.h");
+ZE_META_FORWARD_DECLARE(ZERNView, "ZERNView.h");
 
 enum ZERNDrawType
 {
@@ -57,8 +56,9 @@ enum ZERNDrawType
 	ZERN_DT_SHADOW
 };
 
-class ZERNRenderParameters
+class ZERNRenderParameters : public ZEObject
 {
+	ZE_OBJECT
 	public:
 		ZESize						FrameId;
 		float						ElapsedTime;

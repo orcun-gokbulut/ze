@@ -271,11 +271,8 @@ bool ZEOptionManager::RegisterSection(ZEOptionSection* Ref)
 bool ZEOptionManager::UnregisterSection(ZEOptionSection* Ref)
 {
 	if (GetSection(Ref->GetName()) == NULL)
-	{
-		zeError("Can not unregister option section. There is no such a registered option section. (Option Section Name : \"%s\")", 
-			Ref->GetName().ToCString());
 		return false;
-	}
+
 	Sections.RemoveValue(Ref);
 	return true;
 }

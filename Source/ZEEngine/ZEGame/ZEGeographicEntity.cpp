@@ -171,3 +171,8 @@ ZEVector3d ZEGeographicEntity::GetGeographicScale() const
 
 	return GeographicScale;
 }
+
+ZEGeographicEntity* ZEGeographicEntity::CreateInstance()
+{
+	return new ZEGeographicEntity();
+}

@@ -35,12 +35,14 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
 #include "ZETypes.h"
-#include "ZEDS\ZELink.h"
-#include "ZEDS\ZEList2.h"
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEList2.h"
 
+class ZEString;
 class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRRenderState;
@@ -48,10 +50,12 @@ class ZEGRRenderTarget;
 class ZERNCommand;
 class ZERNRenderer;
 class ZEString;
+class ZERNRenderer;
+class ZERNCommand;
 
 template<typename Type> class ZEList2;
 
-enum ZERNStageBuffer
+ZE_ENUM(ZERNStageBuffer)
 {
 	ZERN_SO_NONE,
 	ZERN_SO_COLOR,
@@ -64,8 +68,9 @@ enum ZERNStageBuffer
 	ZERN_SO_AMBIENT_OCCLUSION
 };
 
-class ZERNStage : public ZEInitializable
+class ZERNStage : public ZEObject, public ZEInitializable
 {
+	ZE_OBJECT
 	friend class ZERNRenderer;
 	private:
 		ZERNRenderer*						Renderer;

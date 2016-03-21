@@ -92,7 +92,7 @@ ze_add_source(ZEGRRenderTarget.h 			Sources Headers)
 ze_add_source(ZEGRScissorRect.cpp			Sources)
 ze_add_source(ZEGRScissorRect.h				Sources Headers)
 ze_add_source(ZEGRViewport.cpp				Sources)
-ze_add_source(ZEGRViewport.h				Sources Headers)
+ze_add_source(ZEGRViewport.h				Sources Headers ZEMC)
 
 ze_add_source(ZEGRShader.cpp 				Sources)
 ze_add_source(ZEGRShader.h 					Sources Headers)
@@ -108,15 +108,10 @@ ze_add_source(ZEGRAdapter.cpp				Sources)
 ze_add_source(ZEGROutput.h					Sources Headers)
 ze_add_source(ZEGROutput.cpp				Sources)
 
-ze_add_source(ZEGRWindow.h					Sources Headers)
+ze_add_source(ZEGRWindow.h					Sources Headers ZEMC)
 ze_add_source(ZEGRWindow.cpp				Sources)
 ze_add_source(ZEGRWindow_Unix.cpp			Sources PLATFORMS Unix)
 ze_add_source(ZEGRWindow_Windows.cpp		Sources PLATFORMS Windows)
-
-ze_add_source(ZEGRCursor.h					Sources Headers)
-ze_add_source(ZEGRCursor.cpp				Sources)
-ze_add_source(ZEGRCursor_Unix.cpp			Sources PLATFORMS Unix)
-ze_add_source(ZEGRCursor_Windows.cpp		Sources PLATFORMS Windows)
 
 ze_add_source(ZEGRCounter.cpp				Sources)
 ze_add_source(ZEGRCounter.h					Sources Headers)
@@ -128,4 +123,5 @@ ze_add_source(ZEGRTracerEvent.h				Sources Headers)
 ze_add_library(TARGET ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libFreeImage)
+	LIBS ZEFoundation libFreeImage
+	ZEMC ${ZEMC})

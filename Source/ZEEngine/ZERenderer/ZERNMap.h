@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRTexture.h"
 
@@ -44,8 +46,9 @@ class ZETextureResource;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
-class ZERNMap
+class ZERNMap : public ZEObject
 {
+	ZE_OBJECT
 	private:
 		ZETextureResource*				Resource;
 		ZEHolder<const ZEGRTexture>		Texture;

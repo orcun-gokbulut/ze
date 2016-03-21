@@ -37,10 +37,14 @@
 
 #include "ZEGame/ZEEntity.h"
 
-#include "ZEMath/ZEViewFrustum.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZEMath/ZEViewFrustum.h"
+
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZECanvas.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -97,17 +101,17 @@ class ZECamera : public ZEEntity
 		void							SetProjectionType(ZERNProjectionType ProjectionType);
 		ZERNProjectionType				GetProjectionType() const;
 
-		void							SetVerticalFovTop(float VerticalFovTop);
-		float							GetVerticalFovTop() const;
+		void							SetTopFOV(float VerticalFovTop);
+		float							GetTopFOV() const;
 
-		void							SetVerticalFovBottom(float VerticalFovBottom);
-		float							GetVerticalFovBottom() const;
+		void							SetBottomFOV(float VerticalFovBottom);
+		float							GetBottomFOV() const;
 
-		void							SetHorizontalFovRight(float HorizontalFovRight);
-		float							GetHorizontalFovRight() const;
+		void							SetRightFOV(float HorizontalFovRight);
+		float							GetRightFOV() const;
 
-		void							SetHorizontalFovLeft(float HorizontalFovLeft);
-		float							GetHorizontalFovLeft() const;
+		void							SetLeftFOV(float HorizontalFovLeft);
+		float							GetLeftFOV() const;
 
 		const ZEMatrix4x4&				GetViewTransform();
 		const ZEMatrix4x4&				GetInvViewTransform();

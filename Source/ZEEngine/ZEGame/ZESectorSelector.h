@@ -42,22 +42,21 @@ class ZESector;
 class ZESectorSelector : public ZEGeographicEntity
 {
 	ZE_OBJECT;
-
 	private:
-		bool IsProcessing;
-		void UpdateSectors();
-	protected:
-		virtual void ParentTransformChanged();
-		virtual void LocalTransformChanged();
-		virtual bool SetOwner(ZEEntity* Owner);
+		bool						IsProcessing;
+		void						UpdateSectors();
+		ZESector*					DetermineSector(ZEGeographicEntity* Entity);
+		void						SetReferenceSector(ZESector* Sector);
 
-		ZESectorSelector();
+		virtual void				ParentTransformChanged();
+		virtual void				LocalTransformChanged();
+		virtual bool				SetOwner(ZEEntity* Owner);
+
+	protected:
+									ZESectorSelector();
 
 	public:
-		ZESector* DetermineSector(ZEGeographicEntity* Entity);
+		ZESector*					GetReferenceSector();
 
-		void SetReferenceSector(ZESector* Sector);
-		ZESector* GetReferenceSector();
-
-		static ZESectorSelector* CreateInstance();
+		static ZESectorSelector*	CreateInstance();
 };

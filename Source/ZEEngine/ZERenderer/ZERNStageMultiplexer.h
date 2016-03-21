@@ -42,7 +42,7 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
 
-enum ZERNStageMultiplexerMode
+ZE_ENUM(ZERNStageMultiplexerMode)
 {
 	ZERN_SMM_NONE,
 	ZERN_SMM_SINGLE,
@@ -60,6 +60,7 @@ class ZEGRConstantBuffer;
 
 class ZERNStageMultiplexer : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZERNStageBuffer						Inputs[ZEGR_MAX_VIEWPORT_SLOT];
 		ZEHolder<const ZEGRTexture>			InputTextures[ZEGR_MAX_VIEWPORT_SLOT];
@@ -89,9 +90,29 @@ class ZERNStageMultiplexer : public ZERNStage
 		void								SetMode(ZERNStageMultiplexerMode Mode);
 		ZERNStageMultiplexerMode			GetMode();
 
-		void								SetInput(ZEUInt Index, ZERNStageBuffer Buffer);
-		void								SetInput(ZEUInt Index, ZEGRTexture* Input);
-		const ZEGRTexture*					GetInput(ZEUInt Index) const;
+		void								SetInput0(ZERNStageBuffer Buffer);
+		ZERNStageBuffer						GetInput0() const;
+
+		void								SetInput0Texture(ZEGRTexture* Input);
+		const ZEGRTexture*					GetInput0Texture() const;
+
+		void								SetInput1(ZERNStageBuffer Buffer);
+		ZERNStageBuffer						GetInput1() const;
+
+		void								SetInput1Texture(ZEGRTexture* Input);
+		const ZEGRTexture*					GetInput1Texture() const;
+
+		void								SetInput2(ZERNStageBuffer Buffer);
+		ZERNStageBuffer						GetInput2() const;
+
+		void								SetInput2Texture(ZEGRTexture* Input);
+		const ZEGRTexture*					GetInput2Texture() const;
+
+		void								SetInput3(ZERNStageBuffer Buffer);
+		ZERNStageBuffer						GetInput3() const;
+
+		void								SetInput3Texture(ZEGRTexture* Input);
+		const ZEGRTexture*					GetInput3Texture() const;
 
 		void								SetCustomViewport(ZEUInt Index, const ZEGRViewport& Viewport);
 		const ZEGRViewport&					GetCustomViewport(ZEUInt Index) const;

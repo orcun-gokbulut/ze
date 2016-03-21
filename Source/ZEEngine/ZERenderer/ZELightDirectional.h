@@ -48,7 +48,6 @@ class ZEScene;
 class ZELightDirectional : public ZELight
 {
 	ZE_OBJECT
-
 	private:
 		struct ZECascade
 		{

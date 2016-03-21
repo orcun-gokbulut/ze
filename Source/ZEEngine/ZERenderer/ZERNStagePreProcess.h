@@ -37,8 +37,9 @@
 
 #include "ZERNStage.h"
 
-class ZERNStagePreProcess : public ZERNStage
+class ZERNStagePreProcess :  public ZERNStage
 {
+	ZE_OBJECT
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;

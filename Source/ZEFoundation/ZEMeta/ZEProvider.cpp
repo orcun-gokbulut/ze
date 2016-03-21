@@ -37,6 +37,8 @@
 
 #include "ZEClass.h"
 #include "ZEEnumerator.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEObject.h"
 
 bool ZEProvider::RegisterClass(ZEClass* Class)
 {
@@ -118,6 +120,38 @@ ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
 	}
 
 	return NULL;
+}
+
+ZEObject* ZEProvider::CreateInstance(const char* ClassName)
+{
+	ZEClass* Class = GetClass(ClassName);
+	if (Class == NULL)
+		return NULL;
+
+	return Class->CreateInstance();
+}
+
+ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName)
+{
+	ZEClass* Class = GetClass(ClassName);
+	if (Class == NULL)
+		return NULL;
+
+	if (!ZEClass::IsDerivedFrom(BaseClass, Class))
+		return NULL;
+
+	return Class->CreateInstance();
+}
+
+ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& ObjectNode)
+{
+	ZEObject* Object = CreateDerivedInstance(BaseClass, ObjectNode.ReadString("Class"));
+	if (Object == NULL)
+		return NULL;
+
+	Object->GetClass()->Unserialize(Object, ObjectNode);
+
+	return Object;
 }
 
 ZEProvider* ZEProvider::GetInstance()
