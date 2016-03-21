@@ -79,12 +79,15 @@ cbuffer ZERNCloud_Plane_Constant_Draw_Transform					: register(ZERN_SHADER_CONST
 cbuffer ZERNCloud_Plane_Constants								: register(b8)
 {
 	float			ZERNCloud_PlaneSubdivision;
-	uint			ZERNCloud_CloudCoverage;
+	float			ZERNCloud_CloudCoverage;
 	float			ZERNCloud_CloudDensity;
 	float			ZERNCloud_Reserved;
 	
-	float3			ZERNCloud_SunDirection;
-	float			ZERNCloud_SunIntensity;
+	float3			ZERNCloud_LightDirection;
+	float			ZERNCloud_LightIntensity;
+	
+	float2			ZERNCloud_Translation;
+	float2			ZERNCloud_Reserved2;
 };
 
 cbuffer ZERNCloud_Blur_Constants								: register(b9)
@@ -192,20 +195,24 @@ ZERNCloud_Plane_PixelShader_Input ZERNCloud_Plane_DomainShader_Main(ZERNCloud_Pl
 
 float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input) : SV_Target0
 {
-	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, 5.0f * Input.TexCoord, 0.0f);
-	float CloudLayer = CloudSample[ZERNCloud_CloudCoverage];
-	//float CloudDensity = max(0.0f, CloudLayer - ZERNCloud_CloudDensity);
+	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
+	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, 5.0f * TexCoord, 0.0f);
+	
+	float4 CloudCoverage = max(0.0f, CloudSample - ZERNCloud_CloudCoverage);
+	if (all(CloudCoverage.x == 0.0f))
+		discard;
 	
 	float3 ViewDirection = normalize(ZERNView_Position - Input.PositionWorld);
-	float3 SunDirectionWorld = normalize(ZERNCloud_SunDirection);
-	float CosSunView = dot(SunDirectionWorld, ViewDirection);
+	float3 LightDirectionWorld = normalize(ZERNCloud_LightDirection);
+	float CosSunView = dot(LightDirectionWorld, ViewDirection);
 	
-	float G = 0.3f;
+	float G = 0.1f;
 	float GG = G * G;
 	float3 PhaseMie = (3.0f / (8.0f * PI)) * ((1.0f - GG) * (1.0f + CosSunView * CosSunView)) / ((2.0f + GG) * pow(1.0f + GG - 2.0f * G * CosSunView, 3.0f / 2.0f));
 	
-	float MieDensity = ZERNCloud_CloudDensity * CloudLayer;
-	float3 ResultColor = PhaseMie * MieDensity * ZERNCloud_SunIntensity;
+	//float CloudDensity = 0.5f * dot(CloudCoverage, float4(0.90f, 0.80f, 0.20f, 0.10f));
+	float MieDensity = exp(-ZERNCloud_CloudDensity * CloudCoverage.x);
+	float3 ResultColor = PhaseMie * MieDensity * ZERNCloud_LightIntensity;
 	
 	return saturate(float4(ResultColor, 1.0f));
 }

@@ -49,7 +49,7 @@
 static const float3 ZERNLightScatteringCommon_RayleighScatteringFactor	= float3(5.8e-6, 13.5e-6, 33.1e-6);
 static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= float3(2.0e-5, 2.0e-5, 2.0e-5);
 
-SamplerState ZERNLightScatteringCommon_SamplerLinearClamp : register(s0);
+SamplerState		ZERNLightScatteringCommon_SamplerLinearClamp	: register(s0);
 
 void ZERNLightScatteringCommon_CalculateWorldParamsFromTexCoords(in float4 TexCoord, out float Height, out float CosViewZenith, out float CosSunZenith, out float CosSunView)
 {

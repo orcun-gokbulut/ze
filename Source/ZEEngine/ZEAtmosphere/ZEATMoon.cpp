@@ -38,12 +38,16 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEATPeriodicTerms.h"
+#include "ZEGame/ZEMoon.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEMoon.h"
 #include "ZERenderer/ZERNMoonMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRContext.h"
+#include "ZERenderer/ZERNStage.h"
 
 bool ZEATMoon::CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector)
 {
@@ -135,7 +139,7 @@ bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 
 	Command.Entity = this;
 	Command.StageMask = Material->GetStageMask();
-	Command.Priority = 3;
+	Command.Priority = 2;
 
 	CullParameters->Renderer->AddCommand(&Command);
 
@@ -150,8 +154,16 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	if (!Material->SetupMaterial(Context, Stage))
 		return;
 
+	const ZEGRTexture2D* ColorTexture = Stage->GetOutput(ZERN_SO_ACCUMULATION);
+	const ZEGRRenderTarget* RenderTarget = ColorTexture->GetRenderTarget();
+
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	
 	Context->Draw(4, 0);
+
+	Context->SetRenderTargets(0, NULL, NULL);
 
 	Material->CleanupMaterial(Context, Stage);
 }

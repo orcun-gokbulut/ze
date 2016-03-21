@@ -41,9 +41,9 @@ struct ZERNShading_Light
 	float3						PositionView;
 	float						Range;
 	float3						Color;
-	float						Intensity;
-	float3  					Attenuation;
 	float						Fov;
+	float3  					Attenuation;
+	bool						CastShadow;
 	float3						DirectionView;
 	int							Type;
 };

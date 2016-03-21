@@ -37,6 +37,10 @@
 
 #include "ZETypes.h"
 
+#define EARTH_RADIUS			6360000.0f
+#define ATMOSPHERE_HEIGHT		80000.0f
+#define TOTAL_RADIUS			(EARTH_RADIUS + ATMOSPHERE_HEIGHT)
+
 struct ZEATObserver
 {
 	struct

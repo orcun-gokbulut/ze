@@ -34,14 +34,19 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEATSun.h"
+
 #include "ZEATPeriodicTerms.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNSunMaterial.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRContext.h"
+#include "ZERenderer/ZERNStage.h"
 
 bool ZEATSun::CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector)
 {
@@ -137,8 +142,15 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	if (!Material->SetupMaterial(Context, Stage))
 		return;
 
+	const ZEGRTexture2D* ColorTexture = Stage->GetOutput(ZERN_SO_ACCUMULATION);
+	const ZEGRRenderTarget* RenderTarget = ColorTexture->GetRenderTarget();
+
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 	Context->Draw(4, 0);
+
+	Context->SetRenderTargets(0, NULL, NULL);
 
 	Material->CleanupMaterial(Context, Stage);
 }

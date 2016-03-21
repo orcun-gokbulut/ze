@@ -37,45 +37,124 @@
 
 #include "ZEGame/ZEEntity.h"
 
-#include "ZEMath/ZEVector.h"
-#include "ZEATAtmosphericScattering.h"
-#include "ZEATCommon.h"
+#include "ZEDS/ZEFlags.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEATCommon.h"
 
+class ZELightDirectional;
+class ZEGRRenderStateData;
+class ZEGRShader;
+class ZEGRSampler;
+class ZEGRContext;
+class ZEGRConstantBuffer;
+class ZEGRTexture2D;
+class ZEGRTexture3D;
 class ZEATSun;
 class ZEATMoon;
-class ZELightDirectional;
 
 class ZEATAtmosphere : public ZEEntity
 {
 	private:
-		ZEATObserver				Observer;
-		ZEATAtmosphericScattering	AtmosphericScattering;
-		ZERNCommand					Command;
+		ZEFlags							DirtyFlags;
+		ZERNCommand						Command;
+		ZEATObserver					Observer;
 
-		ZEATSun*					Sun;
-		ZEATMoon*					Moon;
-		ZELightDirectional*			SunLight;
-		ZELightDirectional*			MoonLight;
+		ZEATSun*						Sun;
+		ZEATMoon*						Moon;
 
-		virtual bool				InitializeSelf();
-		virtual bool				DeinitializeSelf();
+		ZEHolder<ZEGRShader>			ScreenCoverVertexShader;
 
-									ZEATAtmosphere();
-		virtual						~ZEATAtmosphere();
+		ZEHolder<ZEGRShader>			SkyPixelShader;
+		ZEHolder<ZEGRRenderStateData>	SkyRenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	SkyConstantBuffer;
+
+		ZEHolder<ZEGRShader>			PrecomputeDensityPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
+		ZEHolder<ZEGRShader>			AddOrdersPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeSkyAmbientPixelShader;
+
+		ZEHolder<ZEGRRenderStateData>	PrecomputeDensityRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeSingleScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeHighOrderScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeHighOrderInScatteringRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
+
+		ZEHolder<ZEGRTexture2D>			PrecomputedDensityBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedSingleScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedHighOrderScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedHighOrderInScatteringBuffer;
+		ZEHolder<ZEGRTexture3D>			PrecomputedMultipleScatteringBuffer;
+		ZEHolder<ZEGRTexture2D>			PrecomputedSkyAmbientBuffer;
+
+		ZEHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+
+		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
+
+		ZEHolder<ZEGRSampler>			SamplerLinearClamp;
+
+		ZEUInt							OrderCount;
+		bool							UseMultipleScattering;
+
+		struct
+		{
+			ZEVector3					SunDirection;
+			float						SunIntensity;
+			ZEVector3					SunColor;
+			float						Reserved0;
+
+			ZEVector3					MoonDirection;
+			float						MoonIntensity;
+			ZEVector3					MoonColor;
+			float						Reserved1;
+		} Constants;
+
+		struct
+		{
+			float						IndexZ;
+			float						IndexW;
+			ZEVector2					Reserved0;
+		} PrecomputeConstants;
+
+		ZELightDirectional*				SunLight;
+		ZELightDirectional*				MoonLight;
+
+		void							CreateRandomVectors();
+
+		bool							UpdateShaders();
+		bool							UpdateRenderState();
+		bool							UpdateConstantBuffers();
+		bool							Update();
+
+		void							PrecomputeBuffers(ZEGRContext* Context);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
+										ZEATAtmosphere();
+		virtual							~ZEATAtmosphere();
 
 	public:
-		virtual ZEDrawFlags			GetDrawFlags() const;
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		void						SetObserver(const ZEATObserver& Observer);
-		const ZEATObserver&			GetObserver() const;
+		void							SetObserver(const ZEATObserver& Observer);
+		const ZEATObserver&				GetObserver() const;
 
-		void						SetMultipleScattering(bool MultipleScattering);
-		bool						GetMultipleScattering();
+		void							SetMultipleScattering(bool MultipleScattering);
+		bool							GetMultipleScattering();
 
-		virtual void				Tick(float Time);
-		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
-		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		void							SetSunLight(ZELightDirectional* SunLight);
+		ZELightDirectional*				GetSunLight();
 
-		static ZEATAtmosphere*		CreateInstance();
+		void							SetMoonLight(ZELightDirectional* MoonLight);
+		ZELightDirectional*				GetMoonLight();
+
+		virtual void					Tick(float Time);
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+		static ZEATAtmosphere*			CreateInstance();
 };

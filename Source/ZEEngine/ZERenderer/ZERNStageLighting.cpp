@@ -502,8 +502,7 @@ bool ZERNStageLighting::SetupTiledDeferred(ZEGRContext* Context)
 
 		ZEMatrix4x4::Transform(DestLight.PositionView, View.ViewTransform, SrcLight->GetWorldPosition());
 		DestLight.Range = SrcLight->GetRange();
-		DestLight.Color = SrcLight->GetColor();
-		DestLight.Intensity = SrcLight->GetIntensity();
+		DestLight.Color = SrcLight->GetColor() * SrcLight->GetIntensity();
 		DestLight.Attenuation = SrcLight->GetAttenuation();
 		DestLight.Type = SrcLight->GetLightType();
 		DestLight.DirectionView = ZEVector3::Zero;
@@ -558,8 +557,7 @@ bool ZERNStageLighting::SetupComputeTiledDeferred(ZEGRContext* Context)
 
 		ZEMatrix4x4::Transform(DestLight.PositionView, View.ViewTransform, SrcLight->GetWorldPosition());
 		DestLight.Range = SrcLight->GetRange();
-		DestLight.Color = SrcLight->GetColor();
-		DestLight.Intensity = SrcLight->GetIntensity();
+		DestLight.Color = SrcLight->GetColor() * SrcLight->GetIntensity();
 		DestLight.Attenuation = SrcLight->GetAttenuation();
 		DestLight.Type = SrcLight->GetLightType();
 		DestLight.DirectionView = ZEVector3::Zero;
@@ -593,8 +591,7 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 	DeferredLightConstantsStruct* LightConstants;
 	DeferredLightConstantBuffer->Lock((void**)&LightConstants);
 		LightStruct& Light = LightConstants->Light;
-		Light.Color = DirectionalLight->GetColor();
-		Light.Intensity = DirectionalLight->GetIntensity();
+		Light.Color = DirectionalLight->GetColor() * DirectionalLight->GetIntensity();
 		Light.Type = DirectionalLight->GetLightType();
 		Light.Range = DirectionalLight->GetRange();
 		ZEVector3 Direction = DirectionalLight->GetWorldRotation() * ZEVector3::UnitZ;
@@ -610,12 +607,19 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 		LightConstants->ShadowDepthBias = DirectionalLight->GetShadowDepthBias();
 	DeferredLightConstantBuffer->Unlock();
 
-	DirectionalLight->BindCascades(GetRenderer(), Context);	//TODO: Another way to do this?
+	DirectionalLight->BindCascades(GetRenderer(), Context); //TODO: Another way to do this?
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearPointClamp);
-	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointWrap);
-	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerPointBorder);
+	if (DirectionalLight->GetUseSunLight() || DirectionalLight->GetUseMoonLight())
+	{
+		Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
+		Context->SetTexture(ZEGR_ST_PIXEL, 10, DirectionalLight->GetDensityBuffer());
+		Context->SetTexture(ZEGR_ST_PIXEL, 11, DirectionalLight->GetAmbientBuffer());
+	}
+
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerComparisonLinearPointClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerPointWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 4, SamplerPointBorder);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, DirectionalLight->GetShadowMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 8, RandomVectorsTexture);
 
@@ -625,8 +629,11 @@ void ZERNStageLighting::DrawDirectionalLight(ZELightDirectional* DirectionalLigh
 	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 2, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 3, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 4, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 11, NULL);
 }
 
 void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZEGRContext* Context)
@@ -636,8 +643,7 @@ void ZERNStageLighting::DrawPointLight(ZELightPoint* PointLight, ZEGRContext* Co
 		LightStruct& Light = LightConstants->Light;
 		ZEMatrix4x4::Transform(Light.PositionView, GetRenderer()->GetView().ViewTransform, PointLight->GetPosition());
 		Light.Range = PointLight->GetRange();
-		Light.Color = PointLight->GetColor();
-		Light.Intensity = PointLight->GetIntensity();
+		Light.Color = PointLight->GetColor() * PointLight->GetIntensity();
 		Light.Attenuation = PointLight->GetAttenuation();
 		Light.Type = PointLight->GetLightType();
 		Light.DirectionView = ZEVector3::Zero;
@@ -656,8 +662,7 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 		LightStruct& Light = LightConstants->Light;
 		ZEMatrix4x4::Transform(Light.PositionView, GetRenderer()->GetView().ViewTransform, ProjectiveLight->GetWorldPosition());
 		Light.Range = ProjectiveLight->GetRange();
-		Light.Color = ProjectiveLight->GetColor();
-		Light.Intensity = ProjectiveLight->GetIntensity();
+		Light.Color = ProjectiveLight->GetColor() * ProjectiveLight->GetIntensity();
 		Light.Attenuation = ProjectiveLight->GetAttenuation();
 		Light.Type = ProjectiveLight->GetLightType();
 		Light.DirectionView = ZEVector3::Zero;
@@ -674,18 +679,18 @@ void ZERNStageLighting::DrawProjectiveLight(ZELightProjective* ProjectiveLight, 
 			ZEVector3(TanFovRange * ProjectiveLight->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight->GetRange()));
 	DeferredLightConstantBuffer->Unlock();
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerComparisonLinearPointClamp);
-	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerPointWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, SamplerComparisonLinearPointClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 3, SamplerPointWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, ProjectiveLight->GetShadowMap());
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, ProjectiveLight->GetProjectionTexture());
 	Context->SetTexture(ZEGR_ST_PIXEL, 8, RandomVectorsTexture);
 
 	Context->Draw(18, 4542);
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 2, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 3, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 8, NULL);
@@ -706,8 +711,7 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 		LightStruct& Light = LightConstants->Light;
 		ZEMatrix4x4::Transform(Light.PositionView, GetRenderer()->GetView().ViewTransform, OmniProjectiveLight->GetPosition());
 		Light.Range = OmniProjectiveLight->GetRange();
-		Light.Color = OmniProjectiveLight->GetColor();
-		Light.Intensity = OmniProjectiveLight->GetIntensity();
+		Light.Color = OmniProjectiveLight->GetColor() * OmniProjectiveLight->GetIntensity();
 		Light.Attenuation = OmniProjectiveLight->GetAttenuation();
 		Light.Type = OmniProjectiveLight->GetLightType();
 		Light.DirectionView = ZEVector3::Zero;
@@ -717,13 +721,13 @@ void ZERNStageLighting::DrawOmniProjectiveLight(ZELightOmniProjective* OmniProje
 			ZEVector3(Light.Range, Light.Range, Light.Range));
 	DeferredLightConstantBuffer->Unlock();
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearBorder);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearBorder);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, OmniProjectiveLight->GetProjectionTexture());
 
 	Context->Draw(936, 6);
 
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 bool ZERNStageLighting::InitializeSelf()

@@ -68,7 +68,13 @@ class ZELightDirectional : public ZELight
 		ZEHolder<ZEGRTexture2D>				CascadeShadowMaps;
 		ZEArray<ZEViewCuboid>				CascadeVolumes;
 
+		ZEHolder<const ZEGRTexture2D>		DensityBuffer;
+		ZEHolder<const ZEGRTexture2D>		AmbientBuffer;
+		ZEHolder<const ZEGRTexture2D>		Scatteringbuffer;
+
 		float								CascadeDistanceFactor;
+		bool								UseSunLight;
+		bool								UseMoonLight;
 
 		void								UpdateCascadeTransforms(const ZERNView& View);
 		void								UpdateCascadeShadowMaps();
@@ -89,6 +95,18 @@ class ZELightDirectional : public ZELight
 
 		void								SetCascadeDistanceFactor(float CascadeDistanceFactor);
 		float								GetCascadeDistanceFactor() const;
+
+		void								SetUseSunLight(bool UseSunLight);
+		bool								GetUseSunLight() const;
+
+		void								SetUseMoonLight(bool UseMoonLight);
+		bool								GetUseMoonLight() const;
+
+		void								SetDensityBuffer(const ZEGRTexture2D* DensityBuffer);
+		const ZEGRTexture2D*				GetDensityBuffer() const;
+
+		void								SetAmbientBuffer(const ZEGRTexture2D* AmbientBuffer);
+		const ZEGRTexture2D*				GetAmbientBuffer() const;
 
 		void								BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context);
 

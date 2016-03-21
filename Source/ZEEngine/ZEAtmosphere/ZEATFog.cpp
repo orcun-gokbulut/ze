@@ -39,6 +39,7 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCuller.h"
@@ -80,6 +81,18 @@ bool ZEATFog::UpdateRenderStates()
 
 	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+
+	ZEGRBlendState BlendStateAlphaBlend;
+	BlendStateAlphaBlend.SetBlendEnable(true);
+	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlend = BlendStateAlphaBlend.GetRenderTarget(0);
+	BlendRenderTargetAlphaBlend.SetSource(ZEGR_BO_INV_SRC_ALPHA);
+	BlendRenderTargetAlphaBlend.SetDestination(ZEGR_BO_SRC_ALPHA);
+	BlendRenderTargetAlphaBlend.SetOperation(ZEGR_BE_ADD);
+	BlendRenderTargetAlphaBlend.SetBlendEnable(true);
+	BlendStateAlphaBlend.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlend);
+
+	RenderState.SetBlendState(BlendStateAlphaBlend);
+
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 
@@ -218,14 +231,21 @@ void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
+	ZERNStage* Stage = Parameters->Stage;
+
+	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, Stage->GetOutput(ZERN_SO_DEPTH));
 	Context->SetVertexBuffers(0, 0, NULL);
 	
 	Context->Draw(3, 0);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetRenderTargets(0, NULL, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 ZEATFog* ZEATFog::CreateInstance()

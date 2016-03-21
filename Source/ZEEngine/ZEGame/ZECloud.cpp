@@ -51,7 +51,6 @@
 #include "ZERenderer/ZERNStagePostProcess.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNFilter.h"
-#include "ZERenderer/ZERNStageGBuffer.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_CDF_SHADERS			1
@@ -181,27 +180,26 @@ bool ZECloud::UpdateRenderStates()
 	RenderState.SetRasterizerState(RasterizerStateFrontCCW);
 
 	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
-	DepthStencilStateTestNoWrite.SetDepthFunction(ZEGR_CF_GREATER_EQUAL);
 	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
-	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
-	DepthStencilStateTestNoWrite.SetStencilTestEnable(true);
-	DepthStencilStateTestNoWrite.SetFrontStencilFail(ZEGR_SO_REPLACE);
-	DepthStencilStateTestNoWrite.SetFrontStencilDepthFail(ZEGR_SO_KEEP);
-	DepthStencilStateTestNoWrite.SetFrontStencilPass(ZEGR_SO_REPLACE);
-	DepthStencilStateTestNoWrite.SetFrontStencilFunction(ZEGR_CF_ALWAYS);
-
+	//DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
+	//DepthStencilStateTestNoWrite.SetStencilTestEnable(true);
+	//DepthStencilStateTestNoWrite.SetFrontStencilFail(ZEGR_SO_REPLACE);
+	//DepthStencilStateTestNoWrite.SetFrontStencilDepthFail(ZEGR_SO_KEEP);
+	//DepthStencilStateTestNoWrite.SetFrontStencilPass(ZEGR_SO_REPLACE);
+	//DepthStencilStateTestNoWrite.SetFrontStencilFunction(ZEGR_CF_ALWAYS);
+	//
 	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
-	ZEGRBlendState BlendStateAdditive;
-	BlendStateAdditive.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
-	BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_ONE);
-	BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
-	BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
-	BlendRenderTargetAdditive.SetBlendEnable(true);
-	BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
-
-	RenderState.SetBlendState(BlendStateAdditive);
+	//ZEGRBlendState BlendStateAdditive;
+	//BlendStateAdditive.SetBlendEnable(true);
+	//ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
+	//BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_ONE);
+	//BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
+	//BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	//BlendRenderTargetAdditive.SetBlendEnable(true);
+	//BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
+	//
+	//RenderState.SetBlendState(BlendStateAdditive);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, PlaneVertexShader);
 	RenderState.SetShader(ZEGR_ST_HULL, PlaneHullShader);
@@ -268,10 +266,8 @@ bool ZECloud::Update()
 	return true;
 }
 
-void ZECloud::RenderClouds(ZEGRContext* Context, const ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer)
+void ZECloud::RenderClouds(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
-	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
-
 	Context->SetStencilRef(1.0f);
 	Context->SetRenderState(PlaneRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
@@ -380,16 +376,17 @@ ZECloud::ZECloud()
 	DirtyFlags.RaiseAll();
 
 	RenderCommand.Entity = this;
-	RenderCommand.Priority = 3;
+	RenderCommand.Priority = 4;
 	RenderCommand.StageMask = ZERN_STAGE_POST_EFFECT;
 
 	CloudTexture = NULL;
 
 	Constants.PlaneSubdivision = 5.0f;
-	Constants.CloudCoverage = 1;
+	Constants.CloudCoverage = 0.2f;
 	Constants.CloudDensity = 2.0f;
 	Constants.SunDirection = ZEVector3(-1.0f);
-	Constants.SunIntensity = 1.0f;
+	Constants.SunIntensity = 5.0f;
+	Constants.Translation = ZEVector2(0.0f, 0.0f);
 }
 
 ZEDrawFlags ZECloud::GetDrawFlags() const
@@ -462,6 +459,35 @@ float ZECloud::GetCloudDensity() const
 	return Constants.CloudDensity;
 }
 
+void ZECloud::SetTranslation(const ZEVector2& Translation)
+{
+	if (Constants.Translation == Translation)
+		return;
+
+	Constants.Translation = Translation;
+
+	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+}
+
+const ZEVector2& ZECloud::GetTranslation() const
+{
+	return Constants.Translation;
+}
+
+void ZECloud::Tick(float Time)
+{
+	static ZEVector2 Translation = ZEVector2(0.0f, 0.0f);
+	Translation += Time * ZEVector2(0.0001f, 0.0003f);
+
+	if (Translation.x > 1.0f)
+		Translation.x = 0.0f;
+
+	if (Translation.y > 1.0f)
+		Translation.y = 0.0f;
+
+	SetTranslation(Translation);
+}
+
 bool ZECloud::PreRender(const ZERNCullParameters* CullParameters)
 {
 	CullParameters->Renderer->AddCommand(&RenderCommand);
@@ -474,7 +500,10 @@ void ZECloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	if (!Update())
 		return;
 
-	ZEGRRenderTarget* RenderTarget = Parameters->Renderer->GetOutputRenderTarget();
+	ZERNStage* Stage = Parameters->Stage;
+
+	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
+
 	if (TempTexture == NULL || 
 		TempTexture->GetWidth() != RenderTarget->GetWidth() || TempTexture->GetHeight() != RenderTarget->GetHeight())
 	{
@@ -493,17 +522,15 @@ void ZECloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	PlaneConstantBuffer->SetData(&WorldMatrix);
 
 	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, PlaneConstantBuffer);
-	ZEGRVertexBuffer* VertexBuffer = PlaneVertexBuffer;
-	Context->SetVertexBuffers(0, 1, &VertexBuffer);
+	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
 	
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
-	Context->ClearDepthStencilBuffer(Parameters->Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(), false, true, 0.0f, 0x00);
 
-	ZEGRRenderTarget* PrevRenderTarget;
-	ZEGRDepthStencilBuffer* PrevDepthStencilBuffer;
-	Context->GetRenderTargets(1, &PrevRenderTarget, &PrevDepthStencilBuffer);
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
 
-	RenderClouds(Context, Parameters->Stage->GetOutput(ZERN_SO_COLOR), PrevDepthStencilBuffer);
+	Context->ClearDepthStencilBuffer(DepthStencilBuffer, false, true, 0.0f, 0x00);
+
+	RenderClouds(Context, RenderTarget, DepthStencilBuffer);
 	//ApplyBlur(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
 	//LightingClouds(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
 

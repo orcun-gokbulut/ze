@@ -68,58 +68,38 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, GetPrevOutput(ZERN_SO_DEPTH));
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, GetPrevOutput(ZERN_SO_COLOR));
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, GetPrevOutput(ZERN_SO_NORMAL));
+	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
 
-	const ZEGRRenderTarget* RenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
-	if (RenderTarget == NULL)
-	{
-		ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
-		ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
-		if (OutputTexture == NULL || 
-			OutputTexture->GetWidth() != Width || 
-			OutputTexture->GetHeight() != Height)
-		{
-
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-		}
-
-		RenderTarget = OutputTexture->GetRenderTarget();
-	}
-	else
+	if (OutputTexture == NULL || 
+		OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 	{
 		OutputTexture.Release();
+		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 	}
 
-	RenderTarget = OutputTexture->GetRenderTarget();
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputTexture->GetWidth(), OutputTexture->GetHeight()));
 
 	return true;
 }
 
 void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 {
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 
 const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
 {
-	if (!GetEnabled() && (Input == ZERN_SO_COLOR))
-		return NULL;
+	if (GetEnabled() && (Input == ZERN_SO_COLOR))
+		return OutputTexture->GetRenderTarget();
 
 	return ZERNStage::GetProvidedInput(Input);
 }
 
 const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) const
 {
-	if (GetEnabled())
+	if (GetEnabled() && Output == ZERN_SO_COLOR)
 		return OutputTexture;
 
 	return ZERNStage::GetOutput(Output);

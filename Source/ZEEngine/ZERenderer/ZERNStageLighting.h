@@ -101,9 +101,9 @@ class ZERNStageLighting : public ZERNStage
 			ZEVector3						PositionView;
 			float							Range;
 			ZEVector3						Color;
-			float							Intensity;
-			ZEVector3						Attenuation;
 			float							Fov;
+			ZEVector3						Attenuation;
+			bool							CastShadow;
 			ZEVector3						DirectionView;
 			int								Type;
 		};

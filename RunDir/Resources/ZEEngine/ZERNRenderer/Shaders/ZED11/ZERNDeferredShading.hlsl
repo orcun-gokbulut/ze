@@ -40,6 +40,7 @@
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNShading.hlsl"
+#include "ZERNLightScatteringCommon.hlsl"
 
 #define ZE_LT_POINT				1
 #define ZE_LT_DIRECTIONAL		2
@@ -77,16 +78,18 @@ cbuffer ZERNDeferredShading_CascadeConstants												: register(b9)
 	float3							ZERNDeferredShading_Reserved1;
 };	
 	
-SamplerState						ZERNDeferredShading_SamplerLinearBorder					: register(s0);
-SamplerComparisonState				ZERNDeferredShading_SamplerComparisonLinearPointClamp	: register(s1);
-SamplerState						ZERNDeferredShading_SamplerPointWrap					: register(s2);
-SamplerState						ZERNDeferredShading_SamplerPointBorder					: register(s3);
-	
+SamplerState						ZERNDeferredShading_SamplerLinearBorder					: register(s1);
+SamplerComparisonState				ZERNDeferredShading_SamplerComparisonLinearPointClamp	: register(s2);
+SamplerState						ZERNDeferredShading_SamplerPointWrap					: register(s3);
+SamplerState						ZERNDeferredShading_SamplerPointBorder					: register(s4);
+
 Texture2DArray<float>				ZERNDeferredShading_ShadowMaps							: register(t5);
 Texture2D							ZERNDeferredShading_ProjectionMap						: register(t6);
 TextureCube							ZERNDeferredShading_OmniProjectionMap					: register(t7);
 Texture2D<float2>					ZERNDeferredShading_RandomVectors						: register(t8);
 Texture2D<float3>					ZERNDeferredShading_TiledComputeColorBuffer				: register(t9);
+Texture2D<float2>					ZERNDeferredShading_DensityBuffer						: register(t10);
+Texture2D<float3>					ZERNDeferredShading_AmbientBuffer						: register(t11);
 
 static const float3 ZERNDeferredShading_CascadeColors[] = 
 {
@@ -115,6 +118,29 @@ static const float2 ZERNDeferredShading_PoissonDiskSamples[] =
 	float2(-0.8184632f, 0.431774f),
 	float2(0.8985078f, 0.4366908f)
 };
+
+float3 ZERNDeferredShading_GetAmbientColor(float CosSunZenith)
+{
+	float2 TexCoord;
+	TexCoord.x = CosSunZenith;
+	TexCoord.y = 0.5f;
+	
+	return ZERNDeferredShading_AmbientBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
+}
+
+float3 ZERNDeferredShading_GetExtinction(float CosSunZenith, float HeightAboveEarth)
+{
+	float2 TexCoord;
+	TexCoord.x = HeightAboveEarth / ATMOSPHERE_HEIGHT;
+	TexCoord.y = CosSunZenith;
+	
+	float2 RayleighMieDensityToAtmosphere = ZERNDeferredShading_DensityBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
+	
+	float3 RayleighExtinction = ZERNLightScatteringCommon_RayleighScatteringFactor * RayleighMieDensityToAtmosphere.x;
+	float3 MieExtinction = ZERNLightScatteringCommon_MieScatteringFactor * RayleighMieDensityToAtmosphere.y;
+	
+	return exp(-(RayleighExtinction + MieExtinction));
+}
 
 float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
 {		
@@ -179,7 +205,7 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 					//float3 NormalCascade = mul(Cascade.ProjectionTransform, float4(Surface.NormalView, 0.0f)).xyz;
 					//NormalCascade = normalize(NormalCascade);
 					//TexCoordDepth.z += NormalCascade.z * 0.1f;
-					TexCoordDepth.z += CascadeIndex / (DirectionalLight.Range * 100.0f);
+					//TexCoordDepth.z += CascadeIndex / (DirectionalLight.Range);
 					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, TexCoordDepth, ShadowMapDimensions);
 					CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex];
 					
@@ -189,15 +215,38 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 		}
 	}
 	
-	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
-	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
+	//float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
+	//float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);	
+	//float3 ResultColor = (ResultDiffuse + ResultSpecular) * DirectionalLight.Color * DirectionalLight.Intensity;
+	//
+	//if(ZERNDeferredShading_ShowCascades)
+	//	return ResultColor * CascadeColor;
+	//else
+	//	return ResultColor * Visibility;
+
+	float3 LightDirectionWorld = ZERNTransformations_ViewToWorld(float4(DirectionalLight.DirectionView, 0.0f));
+	LightDirectionWorld = normalize(LightDirectionWorld);
 	
-	float3 ResultColor = (ResultDiffuse + ResultSpecular) * DirectionalLight.Color * DirectionalLight.Intensity;
+	float3 SurfacePositionWorld = ZERNTransformations_ViewToWorld(float4(Surface.PositionView, 1.0f));
 	
-	if(ZERNDeferredShading_ShowCascades)
-		return ResultColor * CascadeColor;
-	else
-		return ResultColor * Visibility;
+	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);	
+	float3 EarthToPosition = SurfacePositionWorld - EarthCenter;
+	float EarthToPositionLength = length(EarthToPosition);
+	
+	float3 EarthNormal = EarthToPosition / EarthToPositionLength;
+	float CosSunZenith = dot(LightDirectionWorld, EarthNormal) * 0.5f + 0.5f;
+	float HeightAboveEarth = EarthToPositionLength - EARTH_RADIUS;
+	
+	float3 AmbientColor = ZERNDeferredShading_GetAmbientColor(CosSunZenith);
+	float3 Extinction = ZERNDeferredShading_GetExtinction(CosSunZenith, HeightAboveEarth);
+	
+	float3 LightColor = DirectionalLight.Color * Extinction;	
+	AmbientColor *= DirectionalLight.Color;
+	
+	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionalLight.DirectionView));
+	float ENdotL = saturate(CosSunZenith);
+	
+	return Surface.Diffuse * (AmbientColor * ENdotL + LightColor * NdotL * Visibility);
 }
 
 float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)
@@ -216,7 +265,7 @@ float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShadi
 		
 		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 		
-		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * PointLight.Intensity * DistanceAttenuation;
+		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * DistanceAttenuation;
 	}
 	
 	return saturate(ResultColor);
@@ -273,7 +322,7 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 		
 		float DistanceAttenuation = 1.0f / dot(ProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 		
-		ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * ProjectiveLight.Color * ProjectiveLight.Intensity * DistanceAttenuation;
+		ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * ProjectiveLight.Color * DistanceAttenuation;
 	}
 	
 	return ResultColor;
@@ -294,7 +343,7 @@ float3 ZERNDeferredShading_OmniProjectiveLighting(ZERNShading_Light OmniProjecti
 	
 	float DistanceAttenuation = 1.0f / dot(OmniProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 	
-	return (ResultDiffuse + ResultSpecular) * OmniProjectiveLight.Color * OmniProjectiveLight.Intensity * DistanceAttenuation;
+	return (ResultDiffuse + ResultSpecular) * OmniProjectiveLight.Color * DistanceAttenuation;
 }
 
 float3 ZERNDeferredShading_Lighting(ZERNShading_Surface Surface)
