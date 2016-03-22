@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStage.h
+ Zinek Engine - ZERNStageOutputTexture.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,83 +35,46 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
+#include "ZERNStage.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZELink.h"
-#include "ZEDS/ZEList2.h"
+#include "ZEPointer\ZEHolder.h"
+#include "ZEGraphics\ZEGRFormat.h"
 
-class ZEString;
-class ZEGRContext;
-class ZEGRTexture2D;
-class ZEGRRenderState;
-class ZEGRRenderTarget;
-class ZERNCommand;
-class ZERNRenderer;
-class ZEString;
-class ZERNRenderer;
-class ZERNCommand;
-
-template<typename Type> class ZEList2;
-
-ZE_ENUM(ZERNStageBuffer)
-{
-	ZERN_SO_NONE,
-	ZERN_SO_COLOR,
-	ZERN_SO_DEPTH,
-	ZERN_SO_NORMAL,
-	ZERN_SO_GBUFFER_DIFFUSE,
-	ZERN_SO_GBUFFER_SPECULAR,
-	ZERN_SO_ACCUMULATION,
-	ZERN_SO_HDR,
-	ZERN_SO_AMBIENT_OCCLUSION,
-	ZERN_SO_CUSTOM_0,
-	ZERN_SO_CUSTOM_1,
-	ZERN_SO_CUSTOM_2,
-	ZERN_SO_CUSTOM_3,
-	ZERN_SO_CUSTOM_4,
-	ZERN_SO_CUSTOM_5,
-	ZERN_SO_CUSTOM_6,
-	ZERN_SO_CUSTOM_7,
-	ZERN_SO_CUSTOM_8,
-	ZERN_SO_CUSTOM_9
-};
-
-class ZERNStage : public ZEObject, public ZEInitializable
+class ZERNStageOutputTexture : public ZERNStage
 {
 	ZE_OBJECT
-	friend class ZERNRenderer;
 	private:
-		ZERNRenderer*						Renderer;
-		ZELink<ZERNStage>					Link;
-		ZEList2<ZERNCommand>				Commands;
-		bool								Enabled;
+		bool								Dirty;
+
+		ZEHolder<ZEGRTexture2D>				Texture;
+		ZEHolder<const ZEGRRenderTarget>	RenderTarget;
+
+		ZERNStageBuffer						TargetBuffer;
+		ZEUInt								Width;
+		ZEUInt								Height;
+		ZEGRFormat							Format;
+
+		bool								Update();
+
+											ZERNStageOutputTexture();
 		
-	protected:
-		const ZEGRTexture2D*				GetPrevOutput(ZERNStageBuffer Input) const;
-		const ZEGRRenderTarget*				GetNextProvidedInput(ZERNStageBuffer RenderTarget) const;
-
 	public:
-		virtual ZEInt						GetId() const = 0;
-		virtual const ZEString&				GetName() const = 0;
-		ZERNRenderer*						GetRenderer() const;
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
 
-		ZERNStage*							GetPrevStage() const;
-		ZERNStage*							GetNextStage() const;
+		void								SetTargetBuffer(ZERNStageBuffer Buffer);
+		ZERNStageBuffer						GetTargetBuffer() const;
 
-		void								SetEnabled(bool Enable);
-		bool								GetEnabled() const;
+		void								SetWidth(ZEUInt Width);
+		ZEUInt								GetWidth() const;
 
-		const ZEList2<ZERNCommand>&			GetCommands();
+		void								SetHeight(ZEUInt Height);
+		ZEUInt								GetHeight() const;
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+		void								SetFormat(ZEGRFormat Format);
+		ZEGRFormat							GetFormat() const;
 
 		virtual bool						Setup(ZEGRContext* Context);
-		virtual void						CleanUp(ZEGRContext* Context);
 
-											ZERNStage();
-
-		static ZEGRRenderState				GetRenderState();
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Buffer) const;
 };

@@ -359,11 +359,12 @@ void ZERNRenderer::Render(float ElapsedTime)
 	if (!IsInitialized())
 		return;
 
-	if (Scene == NULL)
-		return;
+	if (Scene != NULL)
+	{
+		Cull();
+		SortStageCommands();
+	}
 
-	Cull();
-	SortStageCommands();
 	RenderStages();
 }
 
