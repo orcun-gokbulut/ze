@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZERNStagePreProcess.h"
+#include "ZERNStagePostProcess.h"
 
 #define ZERN_SMDF_CONSTANT_BUFFER		1
 #define ZERN_SMDF_RENDER_STATE			2
@@ -78,12 +78,17 @@ bool ZERNSunMaterial::UpdateRenderState() const
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_RENDER_STATE))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStagePreProcess::GetRenderState();
+	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
+
+	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
+	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
+
+	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
-
-	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
 
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set sun render state.");

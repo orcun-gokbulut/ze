@@ -131,7 +131,7 @@ ZELightOmniProjective::ZELightOmniProjective()
 	BackShadowMap = NULL;
 
 	Command.Entity = this;
-	Command.Priority = 2;
+	Command.Priority = 1;
 }
 
 ZELightOmniProjective::~ZELightOmniProjective()

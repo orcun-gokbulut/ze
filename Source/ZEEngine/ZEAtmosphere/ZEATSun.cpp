@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNSunMaterial.h"
 #include "ZERenderer/ZERNCuller.h"
@@ -144,8 +145,9 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 
 	const ZEGRTexture2D* ColorTexture = Stage->GetOutput(ZERN_SO_ACCUMULATION);
 	const ZEGRRenderTarget* RenderTarget = ColorTexture->GetRenderTarget();
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
 
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 	Context->Draw(4, 0);

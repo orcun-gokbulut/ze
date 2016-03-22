@@ -131,8 +131,8 @@ class ZECloud : public ZEEntity
 		void							SetSunDirection(const ZEVector3& SunDirection);
 		const ZEVector3&				GetSunDirection() const;
 
-		void							SetCloudCoverage(ZEUInt CloudCoverage);
-		ZEUInt							GetCloudCoverage() const;
+		void							SetCloudCoverage(float CloudCoverage);
+		float							GetCloudCoverage() const;
 
 		void							SetCloudDensity(float CloudDensity);
 		float							GetCloudDensity() const;
