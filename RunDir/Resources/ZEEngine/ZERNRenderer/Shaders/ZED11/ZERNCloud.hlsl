@@ -206,13 +206,14 @@ float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input)
 	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
 	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, 10.0f * TexCoord, 0.0f);
 	
-	float4 CloudCoverage = max(0.0f, CloudSample - ZERNCloud_CloudCoverage);
-	float CloudDensity = 0.5f * dot(CloudCoverage, float4(0.70f, 0.70f, 0.30f, 0.30f));
-	
-	float MieDensity = exp(-(ZERNCloud_CloudDensity * CloudDensity) * (ZERNCloud_CloudDensity * CloudDensity));
+	float4 CloudCoverage = ZERNCloud_CloudCoverage - float4(1.0f, 0.75f, 0.50f, 0.25f);
+	float4 CloudDensity = CloudCoverage * 0.666666f;
+	float FinalDensity = dot(CloudSample, CloudDensity) * ZERNCloud_CloudDensity;
+
+	float MieDensity = exp(-FinalDensity * FinalDensity);
 	float3 ResultColor = PhaseMie * MieDensity * ZERNCloud_LightIntensity;
 	
-	return saturate(float4(ResultColor, CloudDensity));
+	return saturate(float4(ResultColor, FinalDensity));
 }
 
 float4 ZERNCloud_Blur_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input) : SV_Target0

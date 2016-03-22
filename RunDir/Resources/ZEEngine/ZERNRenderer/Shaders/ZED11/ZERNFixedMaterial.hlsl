@@ -263,7 +263,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 
 	float3 BaseColor = float3(1.0f, 1.0f, 1.0f);
 	#ifdef ZERN_FM_BASE_MAP
-		BaseColor *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).rgb;	
+		BaseColor *= ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
 	#endif
 
 	#ifdef ZERN_FM_DETAIL_BASE_MAP
