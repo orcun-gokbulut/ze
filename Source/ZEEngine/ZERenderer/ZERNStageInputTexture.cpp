@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStage.h
+ Zinek Engine - ZERNStageInputTexture.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,85 +33,52 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZERNStageInputTexture.h"
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
+#include "ZERNStageID.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZELink.h"
-#include "ZEDS/ZEList2.h"
-
-class ZEString;
-class ZEGRContext;
-class ZEGRTexture2D;
-class ZEGRRenderState;
-class ZEGRRenderTarget;
-class ZERNCommand;
-class ZERNRenderer;
-class ZEString;
-class ZERNRenderer;
-class ZERNCommand;
-
-template<typename Type> class ZEList2;
-
-ZE_ENUM(ZERNStageBuffer)
+ZERNStageInputTexture::ZERNStageInputTexture()
 {
-	ZERN_SO_NONE,
-	ZERN_SO_COLOR,
-	ZERN_SO_DEPTH,
-	ZERN_SO_NORMAL,
-	ZERN_SO_GBUFFER_DIFFUSE,
-	ZERN_SO_GBUFFER_SPECULAR,
-	ZERN_SO_ACCUMULATION,
-	ZERN_SO_HDR,
-	ZERN_SO_AMBIENT_OCCLUSION,
-	ZERN_SO_CUSTOM_0,
-	ZERN_SO_CUSTOM_1,
-	ZERN_SO_CUSTOM_2,
-	ZERN_SO_CUSTOM_3,
-	ZERN_SO_CUSTOM_4,
-	ZERN_SO_CUSTOM_5,
-	ZERN_SO_CUSTOM_6,
-	ZERN_SO_CUSTOM_7,
-	ZERN_SO_CUSTOM_8,
-	ZERN_SO_CUSTOM_9
-};
+	Buffer = ZERN_SO_COLOR;
+}
 
-class ZERNStage : public ZEObject, public ZEInitializable
+ZEInt ZERNStageInputTexture::GetId() const
 {
-	ZE_OBJECT
-	friend class ZERNRenderer;
-	private:
-		ZERNRenderer*						Renderer;
-		ZELink<ZERNStage>					Link;
-		ZEList2<ZERNCommand>				Commands;
-		bool								Enabled;
-		
-	protected:
-		const ZEGRTexture2D*				GetPrevOutput(ZERNStageBuffer Input) const;
-		const ZEGRRenderTarget*				GetNextProvidedInput(ZERNStageBuffer RenderTarget) const;
+	return ZERN_STAGE_INPUT;
+}
 
-	public:
-		virtual ZEInt						GetId() const = 0;
-		virtual const ZEString&				GetName() const = 0;
-		ZERNRenderer*						GetRenderer() const;
+const ZEString& ZERNStageInputTexture::GetName() const
+{
+	static const ZEString Name = "Input";
+	return Name;
+}
 
-		ZERNStage*							GetPrevStage() const;
-		ZERNStage*							GetNextStage() const;
+void ZERNStageInputTexture::SetBuffer(ZERNStageBuffer Output)
+{
+	this->Buffer = Output;
+}
 
-		void								SetEnabled(bool Enable);
-		bool								GetEnabled() const;
+ZERNStageBuffer ZERNStageInputTexture::GetBuffer() const
+{
+	return Buffer;
+}
 
-		const ZEList2<ZERNCommand>&			GetCommands();
+void ZERNStageInputTexture::SetTexture(const ZEGRTexture2D* Texture)
+{
+	this->Texture = Texture;
+}
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+const ZEGRTexture2D* ZERNStageInputTexture::GetTexture() const
+{
+	return Texture;
+}
 
-		virtual bool						Setup(ZEGRContext* Context);
-		virtual void						CleanUp(ZEGRContext* Context);
+const ZEGRTexture2D* ZERNStageInputTexture::GetOutput(ZERNStageBuffer Output) const
+{
+	if (GetBuffer() == Output)
+		return Texture;
 
-											ZERNStage();
-
-		static ZEGRRenderState				GetRenderState();
-};
+	return ZERNStage::GetOutput(Output);
+}
