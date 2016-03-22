@@ -62,18 +62,18 @@ groupshared uint		TileLightIndices[MAX_LIGHT];
 float3 ZERNTiledDeferredShadingCompute_PointLighting(ZERNShading_Light PointLight, ZERNShading_Surface Surface)
 {
 	float3 LightVectorView = PointLight.PositionView - Surface.PositionView;
-	float LightDistanceView = length(LightVectorView);
+	float LightDistance = length(LightVectorView);
 	
 	float3 ResultColor = 0.0f;
 	
-	if(LightDistanceView < PointLight.Range)
+	if(LightDistance < PointLight.Range)
 	{
-		PointLight.DirectionView = LightVectorView / LightDistanceView;
+		PointLight.DirectionView = LightVectorView / LightDistance;
 		
 		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
 		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
 		
-		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
+		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistance, LightDistance * LightDistance));
 		
 		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * DistanceAttenuation;
 	}

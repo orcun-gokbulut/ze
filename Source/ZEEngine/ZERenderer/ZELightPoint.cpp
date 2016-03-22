@@ -83,7 +83,7 @@ const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index) const
 ZELightPoint::ZELightPoint()
 {
 	Command.Entity = this;
-	Command.Priority = 1;
+	Command.Priority = 2;
 	Command.StageMask = ZERN_STAGE_DEBUG;
 }
 

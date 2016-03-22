@@ -190,16 +190,16 @@ bool ZECloud::UpdateRenderStates()
 	//
 	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
-	//ZEGRBlendState BlendStateAdditive;
-	//BlendStateAdditive.SetBlendEnable(true);
-	//ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
-	//BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_ONE);
-	//BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
-	//BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
-	//BlendRenderTargetAdditive.SetBlendEnable(true);
-	//BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
-	//
-	//RenderState.SetBlendState(BlendStateAdditive);
+	ZEGRBlendState BlendStateAdditive;
+	BlendStateAdditive.SetBlendEnable(true);
+	ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
+	BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
+	BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
+	BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	BlendRenderTargetAdditive.SetBlendEnable(true);
+	BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
+
+	RenderState.SetBlendState(BlendStateAdditive);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, PlaneVertexShader);
 	RenderState.SetShader(ZEGR_ST_HULL, PlaneHullShader);
@@ -382,7 +382,7 @@ ZECloud::ZECloud()
 	CloudTexture = NULL;
 
 	Constants.PlaneSubdivision = 10.0f;
-	Constants.CloudCoverage = 0.1f;
+	Constants.CloudCoverage = 0.5f;
 	Constants.CloudDensity = 1.0f;
 	Constants.SunDirection = ZEVector3(-1.0f);
 	Constants.SunIntensity = 5.0f;
@@ -429,7 +429,7 @@ const ZEVector3& ZECloud::GetSunDirection() const
 	return Constants.SunDirection;
 }
 
-void ZECloud::SetCloudCoverage(ZEUInt CloudCoverage)
+void ZECloud::SetCloudCoverage(float CloudCoverage)
 {
 	if (Constants.CloudCoverage == CloudCoverage)
 		return;
@@ -439,7 +439,7 @@ void ZECloud::SetCloudCoverage(ZEUInt CloudCoverage)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-ZEUInt ZECloud::GetCloudCoverage() const
+float ZECloud::GetCloudCoverage() const
 {
 	return Constants.CloudCoverage;
 }

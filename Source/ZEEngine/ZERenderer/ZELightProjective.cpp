@@ -211,7 +211,7 @@ ZELightProjective::ZELightProjective()
 	ProjectionTextureResource = NULL;
 
 	Command.Entity = this;
-	Command.Priority = 2;
+	Command.Priority = 1;
 }
 
 ZELightProjective::~ZELightProjective()

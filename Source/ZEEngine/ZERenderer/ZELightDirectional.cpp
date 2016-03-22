@@ -165,9 +165,13 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 
 		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
 
-		ZEVector3 CascadePositionWorld = (CascadeFrustumVerticesWorld[0] + CascadeFrustumVerticesWorld[6]) * 0.5f;
+		ZEMatrix4x4 InvLightViewTransform;
+		ZEMatrix4x4::Inverse(InvLightViewTransform, GetViewTransform());
 
-		CascadeVolumes[CascadeIndex].Create(CascadePositionWorld, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
+		ZEVector4 CascadePositionWorld;
+		ZEMatrix4x4::Transform(CascadePositionWorld, InvLightViewTransform, ZEVector4(CascadeFrustumAABBLight.GetCenter(), 1.0f));
+
+		CascadeVolumes[CascadeIndex].Create(CascadePositionWorld.ToVector3(), GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
 	}
 }
 
@@ -191,7 +195,7 @@ ZELightDirectional::ZELightDirectional()
 	CascadeVolumes.Resize(3);
 
 	Command.Entity = this;
-	Command.Priority = 2;
+	Command.Priority = 1;
 
 	UseSunLight = false;
 	UseMoonLight = false;
@@ -389,7 +393,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		View.N = GetWorldFront();
 
 		View.Viewport = NULL;
-		View.ViewVolume = NULL; //&GetViewVolume(CascadeIndex);
+		View.ViewVolume = &GetViewVolume(CascadeIndex);
 		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
 
 		ShadowRenderer.SetView(View);
