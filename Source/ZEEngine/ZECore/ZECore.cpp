@@ -634,6 +634,7 @@ void ZECore::ShutDown()
 	zeLog("Terminating engine.");
 
 	CrashHandler->Deinitialize();
+
 	exit(0);
 }
 
