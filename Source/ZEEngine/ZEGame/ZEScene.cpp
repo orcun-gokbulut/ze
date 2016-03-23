@@ -132,14 +132,12 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
 	zeCheckError(Entity->GetOwnerScene() != this, ZE_VOID, "Entity does not belong to this scene.");
 
-	if (!Entities.Exists(Entity))
-	{
-		zeError("Can not remove a foreign entity.");
-		return;
-	}
+	if (Entity->GetOwner() != NULL)
+		Entity->GetOwner()->RemoveChildEntity(Entity);
+	else
+		Entities.RemoveValue(Entity);
 
 	Entity->SetOwnerScene(NULL);
-	Entities.RemoveValue(Entity);
 }
 
 void ZEScene::ClearEntities()

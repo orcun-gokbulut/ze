@@ -586,12 +586,21 @@ void ZECore::ShutDown()
 	SetCoreState(ZE_CS_SHUTDOWN);
 
 	if (Application != NULL)
+	{
 		Application->ShutDown();
+		Application->Deinitialize();
+		Application->Destroy();
+		Application = NULL;
+	}
 
 	// Destroy game
 	zeLog("Deinitializing Running Games.");
 	if (Game != NULL)
+	{
 		Game->Deinitialize();
+		Game->Destroy();
+		Game = NULL;
+	}
 
 	zeLog("Saving options.");
 	if (CoreState == ZE_CS_CRITICAL_ERROR)
@@ -610,24 +619,28 @@ void ZECore::ShutDown()
 	{
 		zeLog("Destroying Input Module.");
 		InputModule->Destroy();
+		InputModule = NULL;
 	}
 
 	if (SoundModule != NULL)
 	{
 		zeLog("Destroying Sound Module.");
 		SoundModule->Destroy();
+		SoundModule = NULL;
 	}
 
 	if (GraphicsModule != NULL)
 	{
 		zeLog("Destroying Graphics Module.");
 		GraphicsModule->Destroy();
+		GraphicsModule = NULL;
 	}
 
 	if (PhysicsModule != NULL)
 	{
 		zeLog("Destroying Physics Module.");
 		PhysicsModule->Destroy();
+		PhysicsModule = NULL;
 	}
 
 	zeLog("Core deinitialized.");
@@ -635,6 +648,7 @@ void ZECore::ShutDown()
 
 	CrashHandler->Deinitialize();
 
+	TerminateProcess(GetCurrentProcess(), EXIT_SUCCESS);
 	exit(0);
 }
 
