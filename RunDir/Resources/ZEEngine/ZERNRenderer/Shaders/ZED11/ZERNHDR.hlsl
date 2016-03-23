@@ -255,7 +255,7 @@ float3 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, fl
 		}
 	}
 	
-	return saturate(ResultColor);
+	return ResultColor;
 }
 
 #endif
