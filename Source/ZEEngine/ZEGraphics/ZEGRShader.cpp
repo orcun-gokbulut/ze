@@ -39,6 +39,9 @@
 #include "ZEPointer/ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRShaderCompiler.h"
+#include "ZEProtect/ZELCEncryption.h"
+#include "ZEFile/ZEPathManager.h"
+#include "ZEFile/ZEFileInfo.h"
 
 bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
@@ -84,28 +87,66 @@ ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const
 ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 {
 	ZEFile File;
-	if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
+	if (!File.Open(Options.FileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
-		return NULL;
+		if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
+		{
+			zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
+			return NULL;
+		}
 	}
 
 	File.Seek(0, ZE_SF_END);
 	ZEUInt64 Size = File.Tell();
 	File.Seek(0, ZE_SF_BEGINING);
 
-	ZEBYTE* Buffer = new ZEBYTE[Size + 1];
-	if (File.Read(Buffer, Size, 1) != 1)
+	ZEArray<ZEBYTE> Buffer;
+	Buffer.SetCount(Size + 1);
+
+	if (File.Read(Buffer.GetCArray(), Size, 1) != 1)
 	{
 		zeError("Cannot read shader file. File Name: \"%s", Options.FileName.ToCString());
 		return NULL;
 	}
-
-	Buffer[Size] = '\0';
 	File.Close();
 
+	const ZEBYTE Key[32] =
+	{
+		0x49, 0x5d, 0xea, 0xff, 0x97, 0x48, 0x08, 0xd4, 
+		0xc8, 0xa9,	0xcd, 0xf6, 0x49, 0xb0, 0xa3, 0x72, 
+		0xa6, 0xa1, 0xf5, 0xf9, 0xf3, 0xeb, 0xa4, 0xfe, 
+		0x56, 0xc4, 0x1c, 0x09, 0x42, 0xa8, 0x4c, 0xd8
+	};
+
 	ZEGRShaderCompileOptions UpdatedOptions = Options;
-	UpdatedOptions.SourceData = reinterpret_cast<char*>(Buffer);
+	if (*(ZEUInt32*)Buffer.GetCArray() == 'ZEEN')
+	{
+		ZEArray<ZEBYTE> Output;
+		ZELCEncryption::AESDecrypt(Output, Buffer.GetCArray() + 4, Size, Key, 32);
+		Output.Add('\0');
+		UpdatedOptions.SourceData = reinterpret_cast<char*>(Output.GetCArray());
+	}
+	else
+	{
+		Buffer[Size] = '\0';
+		UpdatedOptions.SourceData = reinterpret_cast<char*>(Buffer.GetCArray());
+
+		ZEArray<ZEBYTE> Output;
+		ZELCEncryption::AESEncrypt(Output, Buffer.GetCArray(), Buffer.GetCount(), Key, 32);
+
+		bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
+		ZEPathManager::GetInstance()->SetAccessControl(false);
+		ZEFile File;
+		if (File.Open(Options.FileName + ".ZEEnc", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		{
+			ZEUInt32 Header = 'ZEEN';
+			File.Write(&Header, sizeof(ZEUInt32), 1);
+				
+			File.Write(Output.GetCArray(), Output.GetCount(), 1);
+			File.Close();
+		}
+		ZEPathManager::GetInstance()->SetAccessControl(AccessControl);
+	}
 
 	#ifdef ZEGR_DEBUG_SHADERS
 		UpdatedOptions.Debug = true;
