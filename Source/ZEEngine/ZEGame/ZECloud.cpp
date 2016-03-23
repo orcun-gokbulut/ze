@@ -190,16 +190,16 @@ bool ZECloud::UpdateRenderStates()
 	//
 	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
-	ZEGRBlendState BlendStateAdditive;
-	BlendStateAdditive.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
-	BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
-	BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
-	BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
-	BlendRenderTargetAdditive.SetBlendEnable(true);
-	BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
+	ZEGRBlendState BlendStateAlphaBlending;
+	BlendStateAlphaBlending.SetBlendEnable(true);
+	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlending = BlendStateAlphaBlending.GetRenderTarget(0);
+	BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
+	BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
+	BlendRenderTargetAlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	BlendRenderTargetAlphaBlending.SetBlendEnable(true);
+	BlendStateAlphaBlending.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlending);
 
-	RenderState.SetBlendState(BlendStateAdditive);
+	RenderState.SetBlendState(BlendStateAlphaBlending);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, PlaneVertexShader);
 	RenderState.SetShader(ZEGR_ST_HULL, PlaneHullShader);
@@ -384,8 +384,8 @@ ZECloud::ZECloud()
 	Constants.PlaneSubdivision = 10.0f;
 	Constants.CloudCoverage = 0.5f;
 	Constants.CloudDensity = 1.0f;
-	Constants.SunDirection = ZEVector3(-1.0f);
-	Constants.SunIntensity = 5.0f;
+	Constants.LightDirection = ZEVector3(-1.0f);
+	Constants.LightIntensity = 5.0f;
 	Constants.Translation = ZEVector2(0.0f, 0.0f);
 }
 
@@ -412,21 +412,6 @@ void ZECloud::SetCloudTexture(const ZEString& FileName)
 const ZEString& ZECloud::GetCloudTexture() const
 {
 	return CloudTexture == NULL ? ZEString::Empty : CloudTexture->GetFileName();
-}
-
-void ZECloud::SetSunDirection(const ZEVector3& SunDirection)
-{
-	if (Constants.SunDirection == SunDirection)
-		return;
-
-	Constants.SunDirection = SunDirection;
-
-	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
-}
-
-const ZEVector3& ZECloud::GetSunDirection() const
-{
-	return Constants.SunDirection;
 }
 
 void ZECloud::SetCloudCoverage(float CloudCoverage)
@@ -457,6 +442,36 @@ void ZECloud::SetCloudDensity(float CloudDensity)
 float ZECloud::GetCloudDensity() const
 {
 	return Constants.CloudDensity;
+}
+
+void ZECloud::SetLightDirection(const ZEVector3& LightDirection)
+{
+	if (Constants.LightDirection == LightDirection)
+		return;
+
+	Constants.LightDirection = LightDirection;
+
+	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+}
+
+const ZEVector3& ZECloud::GetLightDirection() const
+{
+	return Constants.LightDirection;
+}
+
+void ZECloud::SetLightIntensity(float LightIntensity)
+{
+	if (Constants.LightIntensity == LightIntensity)
+		return;
+
+	Constants.LightIntensity = LightIntensity;
+
+	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+}
+
+float ZECloud::GetLightIntensity() const
+{
+	return Constants.LightIntensity;
 }
 
 void ZECloud::SetTranslation(const ZEVector2& Translation)

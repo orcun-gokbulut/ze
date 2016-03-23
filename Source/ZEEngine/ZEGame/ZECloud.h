@@ -99,8 +99,8 @@ class ZECloud : public ZEEntity
 			float						CloudDensity;
 			float						Reserved;
 
-			ZEVector3					SunDirection;
-			float						SunIntensity;
+			ZEVector3					LightDirection;
+			float						LightIntensity;
 
 			ZEVector2					Translation;
 			ZEVector2					Reserved1;
@@ -128,14 +128,17 @@ class ZECloud : public ZEEntity
 		void							SetCloudTexture(const ZEString& FileName);
 		const ZEString&					GetCloudTexture() const;
 
-		void							SetSunDirection(const ZEVector3& SunDirection);
-		const ZEVector3&				GetSunDirection() const;
-
 		void							SetCloudCoverage(float CloudCoverage);
 		float							GetCloudCoverage() const;
 
 		void							SetCloudDensity(float CloudDensity);
 		float							GetCloudDensity() const;
+
+		void							SetLightDirection(const ZEVector3& SunDirection);
+		const ZEVector3&				GetLightDirection() const;
+
+		void							SetLightIntensity(float LightIntensity);
+		float							GetLightIntensity() const;
 
 		void							SetTranslation(const ZEVector2& Translation);
 		const ZEVector2&				GetTranslation() const;

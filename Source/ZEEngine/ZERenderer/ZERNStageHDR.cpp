@@ -176,7 +176,7 @@ bool ZERNStageHDR::UpdateInputOutput()
 	{
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || OutputTexture->GetWidth() != InputTexture->GetWidth() || OutputTexture->GetHeight() != InputTexture->GetHeight())
-			OutputTexture = ZEGRTexture2D::CreateInstance(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+			OutputTexture = ZEGRTexture2D::CreateInstance(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}

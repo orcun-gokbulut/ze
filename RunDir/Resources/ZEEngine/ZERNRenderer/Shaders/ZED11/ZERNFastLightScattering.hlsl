@@ -41,6 +41,7 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNIntersections.hlsl"
+#include "ZERNHDR.hlsl"
 
 cbuffer ZERNFastLightScattering_Constants						: register(b8)
 {
@@ -57,56 +58,40 @@ cbuffer ZERNFastLightScattering_Constants						: register(b8)
 
 Texture3D<float3>	ZERNFastLightScattering_ScatteringBuffer	: register(t5);
 
-float3 ZERNFastLightScattering_GetInscattering(float3 RayStart, float3 RayEnd, float3 ViewDirection, float3 LightDirection, float3 EarthCenter, float3 Extinction)
-{
-	float PrevTexCoordY = -1.0f;
-	float3 Inscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, RayStart, ViewDirection, LightDirection, EarthCenter, PrevTexCoordY);
-	Inscattering -= Extinction * ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, RayEnd, ViewDirection, LightDirection, EarthCenter, PrevTexCoordY);
-	
-	return Inscattering;
-}
-
-float3 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
-{
-	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);
-	
+float4 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+{	
+	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
 	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
-	float DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
-		
+	if (DepthHomogeneous != 0.0f)
+		return float4(PixelColor, 1.0f);
+	
 	float2 TextureDimensions = ZERNGBuffer_GetDimensions();
 	
 	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, TextureDimensions, DepthHomogeneous);
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	float3 ViewDirection = normalize(PositionWorld - ZERNView_Position);
 	
-	float4 StartEndDistance = (float4)0.0f;
-	ZERNIntersections_RaySphere2(ZERNView_Position, ViewDirection, EarthCenter, float2(TOTAL_RADIUS, EARTH_RADIUS), StartEndDistance);
-	
-	float3 RayStart = ZERNView_Position + ViewDirection * max(0.0f, StartEndDistance.x);
-		
-	float RayLength = StartEndDistance.y;
-	
-	if(StartEndDistance.x < 0.0f && DepthHomogeneous != 0.0f)	//in earth
-		RayLength = DepthView;
-	else if(StartEndDistance.x > 0.0f && StartEndDistance.z > 0.0f)	//in space
-		RayLength = StartEndDistance.z;
-	
-	float3 RayEnd = ZERNView_Position + ViewDirection * RayLength;
-	
-	float3 Extinction = exp(-ZERNLightScatteringCommon_CalculateExtinction(RayStart, RayEnd));
-
 	float3 SunDirectionWorld = -normalize(ZERNFastLightScattering_SunDirection);
-	float3 SunInscattering = ZERNFastLightScattering_GetInscattering(RayStart, RayEnd, ViewDirection, SunDirectionWorld, EarthCenter, Extinction);
+	float3 MoonDirectionWorld = -normalize(ZERNFastLightScattering_MoonDirection);
+	
+	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);	
+	float3 EarthToPosition = PositionWorld - EarthCenter;
+	float EarthToPositionLength = length(EarthToPosition);
+	float3 EarthNormal = EarthToPosition / EarthToPositionLength;
+	
+	float CosSunZenith = dot(SunDirectionWorld, EarthNormal) * 0.5f + 0.5f;
+	float HeightAboveEarth = EarthToPositionLength - EARTH_RADIUS;
+	
+	float PrevTexCoordY = -1.0f;
+	float3 SunInscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, ZERNView_Position, ViewDirection, SunDirectionWorld, EarthCenter, PrevTexCoordY);
 	SunInscattering *= ZERNFastLightScattering_SunColor;
 	
-	float3 MoonDirectionWorld = -normalize(ZERNFastLightScattering_MoonDirection);
-	float3 MoonInscattering = ZERNFastLightScattering_GetInscattering(RayStart, RayEnd, ViewDirection, MoonDirectionWorld, EarthCenter, Extinction);
+	PrevTexCoordY = -1.0f;
+	float3 MoonInscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, ZERNView_Position, ViewDirection, SunDirectionWorld, EarthCenter, PrevTexCoordY);
 	MoonInscattering *= ZERNFastLightScattering_MoonColor;
 	
-	float3 PixelColor = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
-	PixelColor *= Extinction;
-	
-	return (DepthHomogeneous != 0.0f) ? PixelColor : PixelColor + SunInscattering + MoonInscattering;
+	float3 ResultColor = PixelColor + SunInscattering + MoonInscattering;
+	return float4(ResultColor, 1.0f/*ZERNHDR_Calculate_Luminance(ResultColor)*/);
 }
 
 #endif

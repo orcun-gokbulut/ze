@@ -219,7 +219,7 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, 
 	BindFlags = DepthStencil ? ( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL) : BindFlags;
 	BindFlags = UAV ? (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS) : BindFlags;
 
-	DXGI_FORMAT TextureFormat = (Format == ZEGR_TF_R8G8B8A8_UNORM) ? DXGI_FORMAT_B8G8R8A8_UNORM_SRGB : ConvertFormat(Format);	//format of .tga
+	DXGI_FORMAT TextureFormat = (Format == ZEGR_TF_R8G8B8A8_UNORM) ? DXGI_FORMAT_B8G8R8A8_UNORM : ConvertFormat(Format);	//format of .tga
 	TextureFormat = RenderTarget ?  ConvertFormat(Format) : TextureFormat;
 	TextureFormat = DepthStencil ? ConvertDepthStencilFormat(Format) : TextureFormat;
 	TextureFormat = UAV ?  ConvertFormat(Format) : TextureFormat;

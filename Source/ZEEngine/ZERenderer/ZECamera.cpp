@@ -448,10 +448,10 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 				ZEVector3 Normal = FrustumPlanes[I].n;
 				ZEVector3 Point = FrustumPlanes[I].p;
 
-				FrustumPlanes[I].n.NormalizeSelf();
+				Normal.NormalizeSelf();
 				ZEMatrix4x4::Transform3x3(FrustumPlanes[I].n, InverseViewTransform, Normal);
-				ZEMatrix4x4::Transform(FrustumPlanes[I].p, InverseViewTransform, Point);
 				FrustumPlanes[I].n.NormalizeSelf();
+				ZEMatrix4x4::Transform(FrustumPlanes[I].p, InverseViewTransform, Point);
 			}
 
 			ViewFrustum.Create(FrustumPlanes[0], FrustumPlanes[3], FrustumPlanes[1], FrustumPlanes[2], FrustumPlanes[5], FrustumPlanes[4]);
