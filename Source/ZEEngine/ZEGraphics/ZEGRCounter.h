@@ -40,28 +40,36 @@
 
 #define ZEGR_COUNTER_RESOURCE_INCREASE(Pointer, Type, SuperType) \
 	{ \
-		ZEGRCounter& Counter = ZEGRGraphicsModule::GetInstance()->GetCounter(); \
-		Counter.UpdateLock.Lock(); \
-		Counter.ObjectCount.Object++; \
-		Counter.ObjectCount.Type++; \
-		Counter.ObjectCount.SuperType++; \
-		Counter.MemoryUsage.Resource += Pointer->GetSize(); \
-		Counter.MemoryUsage.Type += Pointer->GetSize(); \
-		Counter.MemoryUsage.SuperType += Pointer->GetSize(); \
-		Counter.UpdateLock.Unlock(); \
+		ZEGRGraphicsModule* Module = ZEGRGraphicsModule::GetInstance(); \
+		if (Module != NULL) \
+		{ \
+			ZEGRCounter& Counter = Module->GetCounter(); \
+			Counter.UpdateLock.Lock(); \
+			Counter.ObjectCount.Object++; \
+			Counter.ObjectCount.Type++; \
+			Counter.ObjectCount.SuperType++; \
+			Counter.MemoryUsage.Resource += Pointer->GetSize(); \
+			Counter.MemoryUsage.Type += Pointer->GetSize(); \
+			Counter.MemoryUsage.SuperType += Pointer->GetSize(); \
+			Counter.UpdateLock.Unlock(); \
+		} \
 	}
 		
 #define ZEGR_COUNTER_RESOURCE_DECREASE(Pointer, Type, SuperType) \
 	{ \
-		ZEGRCounter& Counter = ZEGRGraphicsModule::GetInstance()->GetCounter(); \
-		Counter.UpdateLock.Lock(); \
-		Counter.ObjectCount.Object--; \
-		Counter.ObjectCount.Type--; \
-		Counter.ObjectCount.SuperType--; \
-		Counter.MemoryUsage.Resource -= Pointer->GetSize(); \
-		Counter.MemoryUsage.Type -= Pointer->GetSize(); \
-		Counter.MemoryUsage.SuperType -= Pointer->GetSize(); \
-		Counter.UpdateLock.Unlock(); \
+		ZEGRGraphicsModule* Module = ZEGRGraphicsModule::GetInstance(); \
+		if (Module != NULL) \
+		{ \
+			ZEGRCounter& Counter = ZEGRGraphicsModule::GetInstance()->GetCounter(); \
+			Counter.UpdateLock.Lock(); \
+			Counter.ObjectCount.Object--; \
+			Counter.ObjectCount.Type--; \
+			Counter.ObjectCount.SuperType--; \
+			Counter.MemoryUsage.Resource -= Pointer->GetSize(); \
+			Counter.MemoryUsage.Type -= Pointer->GetSize(); \
+			Counter.MemoryUsage.SuperType -= Pointer->GetSize(); \
+			Counter.UpdateLock.Unlock(); \
+		} \
 	}
 
 struct ZEGRDrawStatistics

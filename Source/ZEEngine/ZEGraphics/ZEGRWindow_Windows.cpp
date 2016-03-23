@@ -634,6 +634,7 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 		// Window notification
 		case WM_DESTROY:
 			OnDestroy();
+			Handle = NULL;
 			if (QuitWhenClosed)
 				PostQuitMessage(EXIT_SUCCESS);
 			break;
@@ -766,13 +767,18 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 
 void ZEGRWindow::DeinitializeSelf()
 {
-	BOOL Result = DestroyWindow((HWND)Handle);
-	if (Result == 0)
+	if (Handle != NULL)
 	{
-		HandleWin32Error(GetLastError());
-		return;
-	}
+		BOOL Result = DestroyWindow((HWND)Handle);
+		if (Result == 0)
+		{
+			HandleWin32Error(GetLastError());
+			return;
+		}
 	
+		Handle = NULL;
+	}
+
 	WindowCount--;
 
 	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();

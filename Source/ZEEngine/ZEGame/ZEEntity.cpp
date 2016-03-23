@@ -167,11 +167,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 
 void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 {
-	if (Entity->Owner != this)
-	{
-		zeError("Can not remove non-child entity.");
-		return;
-	}
+	zeCheckError(Entity->Owner != this, ZE_VOID, "Can not remove non-child entity.");
 
 	ChildEntities.RemoveValue(Entity);
 
