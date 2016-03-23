@@ -36,6 +36,7 @@
 #pragma once
 
 #include <d3dcommon.h>
+#include "ZEDS\ZEString.h"
 
 struct ZEGRShaderCompileOptions;
 
@@ -43,6 +44,8 @@ class ZED11ShaderCompilerIncludeInterface : public ID3DInclude
 {
 	private:
 		const ZEGRShaderCompileOptions*	CompileOptions;
+
+		bool							ReadInclude(const ZEString& pFileName, LPCVOID* ppData, UINT * pBytes);
 
 	public:
 		void							SetCompileOptions(const ZEGRShaderCompileOptions* Options);
