@@ -240,7 +240,7 @@ ZERNMap::ZERNMap(ZEGRTexture* Texture, ZEGRSampler* Sampler)
 
 ZERNMap::ZERNMap(ZETextureResource* Resource, ZEGRSampler* Sampler)
 {
-	Resource = NULL;
+	this->Resource = NULL;
 	SetTextureResource(Resource);
 	if (Sampler != NULL)
 		SetSampler(Sampler);
