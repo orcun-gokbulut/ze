@@ -702,7 +702,7 @@ bool ZEGRWindow::InitializeSelf()
 
 	WindowCount++;
 
-	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM);
+	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	if(Output == NULL)
 		return false;
 

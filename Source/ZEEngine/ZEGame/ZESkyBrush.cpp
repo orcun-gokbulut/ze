@@ -41,6 +41,9 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -183,8 +186,15 @@ bool ZESkyBrush::UpdateRenderStates()
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
+	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
+	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
+
+	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
+
 	ZEGRRasterizerState RasterizerStateFrontCCW;
 	RasterizerStateFrontCCW.SetFrontIsCounterClockwise(true);
+
 	RenderState.SetRasterizerState(RasterizerStateFrontCCW);
 	
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
@@ -261,9 +271,15 @@ void ZESkyBrush::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ConstantBufferTransform->SetData(&WorldMatrix);
 
 	ZEGRContext* Context = Parameters->Context;
+	ZERNStage* Stage = Parameters->Stage;
+
+	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
+
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferTransform);
 	Context->SetRenderState(RenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture->GetTexture());
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());

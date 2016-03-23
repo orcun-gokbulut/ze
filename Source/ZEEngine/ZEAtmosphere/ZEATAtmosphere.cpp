@@ -150,10 +150,23 @@ bool ZEATAtmosphere::UpdateRenderState()
 
 	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 
+	ZEGRBlendState BlendStateAlphaBlending;
+	BlendStateAlphaBlending.SetBlendEnable(true);
+	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlending = BlendStateAlphaBlending.GetRenderTarget(0);
+	BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
+	BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
+	BlendRenderTargetAlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	BlendRenderTargetAlphaBlending.SetBlendEnable(true);
+	BlendStateAlphaBlending.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlending);
+
+	RenderState.SetBlendState(BlendStateAlphaBlending);
+
 	RenderState.SetShader(ZEGR_ST_PIXEL, SkyPixelShader);
 
 	SkyRenderStateData = RenderState.Compile();
 	zeCheckError(SkyRenderStateData == NULL, false, "Cannot set render state.");
+
+	RenderState.SetBlendState(ZEGRBlendState());
 
 	RenderState.SetShader(ZEGR_ST_PIXEL, PrecomputeDensityPixelShader);
 
@@ -486,15 +499,15 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 
+	float CosSunAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -SunDirection);
+	bool SunVisible = CosSunAltitude >= 0.0f;
+
 	if (SunLight != NULL)
 	{
 		ZEQuaternion SunRotation;
 		ZEQuaternion::CreateFromDirection(SunRotation, SunDirection);
 		
 		SunLight->SetWorldRotation(SunRotation);
-
-		float CosSunAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -SunDirection);
-		bool SunVisible = CosSunAltitude >= 0.0f;
 
 		SunLight->SetVisible(SunVisible);
 	}
@@ -507,17 +520,17 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
 
+	float CosMoonAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -MoonDirection);
+	bool MoonVisible = CosMoonAltitude >= 0.0f;
+
 	if (MoonLight != NULL)
 	{
 		ZEQuaternion MoonRotation;
 		ZEQuaternion::CreateFromDirection(MoonRotation, MoonDirection);
 
 		MoonLight->SetWorldRotation(MoonRotation);
-
-		float CosMoonAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -MoonDirection);
-		bool MoonVisible = CosMoonAltitude >= 0.0f;
-
 		MoonLight->SetVisible(MoonVisible);
+		MoonLight->SetCastsShadow(!SunVisible);
 	}
 
 	double SunTransit, Sunrise, Sunset;

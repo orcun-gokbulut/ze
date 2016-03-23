@@ -58,9 +58,8 @@ float4 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Targ
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	
 	float Distance = distance(ZERNView_Position, PositionWorld);
-	float RelativeDistance = max(0.0f, Distance - ZERNFog_Range);
-	float FogFactor = exp(-pow(ZERNFog_Density * RelativeDistance, 2.0f));
-	
+	float RelativeDistance = max(0.0f, Distance - ZERNFog_Range) * ZERNFog_Density;
+	float FogFactor = exp(-RelativeDistance * RelativeDistance);
 
 	return float4(ZERNFog_Color, FogFactor);
 }

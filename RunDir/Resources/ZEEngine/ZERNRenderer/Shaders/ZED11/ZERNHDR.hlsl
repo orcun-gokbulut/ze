@@ -213,7 +213,7 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 ScreenCoordinate : SV_Positio
 // TONE MAPPING PIXEL SHADER
 ///////////////////////////////////////////////////////////////////////////////
 
-float4 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
+float3 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
 	float3 Color = ZERNHDR_InputTexture.Load(int3(ScreenCoordinate.xy, 0));
 	float Luminance = ZERNHDR_Calculate_Luminance(Color);
@@ -255,9 +255,7 @@ float4 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, fl
 		}
 	}
 	
-	ResultColor = pow(ResultColor, 1.0f / 2.2f);
-	
-	return saturate(float4(ResultColor, 1.0f));
+	return saturate(ResultColor);
 }
 
 #endif

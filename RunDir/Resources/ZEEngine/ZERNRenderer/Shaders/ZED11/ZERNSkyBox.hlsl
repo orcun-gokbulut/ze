@@ -53,15 +53,15 @@ cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_T
 SamplerState		ZERNSkyBox_SamplerLinearWrap	: register(s0);
 TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
 
-struct ZERNSkyBox_VertexShader_Output 
+struct ZERNSkyBox_PixelShader_Input
 {
 	float4			Position		: SV_Position;
 	float3			CubeTexcoord	: TEXCOORD0;
 };
 
-ZERNSkyBox_VertexShader_Output ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
+ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
 {
-	ZERNSkyBox_VertexShader_Output Output;
+	ZERNSkyBox_PixelShader_Input Output;
 
 	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Position, 1.0f));
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
@@ -72,9 +72,9 @@ ZERNSkyBox_VertexShader_Output ZERNSkyBox_VertexShader_Main(float3 Position : PO
 	return Output;
 }
 
-float3 ZERNSkyBox_PixelShader_Main(float4 PositionViewport : SV_Position, float3 CubeTexcoord : TEXCOORD0) : SV_Target0
+float3 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Target0
 {
-	return ZERNSkyBox_SkyBrightness * ZERNSkyBox_SkyColor * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, normalize(CubeTexcoord), 0.0f);
+	return ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, normalize(Input.CubeTexcoord), 0.0f);
 }
 
 #endif

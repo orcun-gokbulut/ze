@@ -88,8 +88,6 @@ Texture2D							ZERNDeferredShading_ProjectionMap						: register(t6);
 TextureCube							ZERNDeferredShading_OmniProjectionMap					: register(t7);
 Texture2D<float2>					ZERNDeferredShading_RandomVectors						: register(t8);
 Texture2D<float3>					ZERNDeferredShading_TiledComputeColorBuffer				: register(t9);
-Texture2D<float2>					ZERNDeferredShading_DensityBuffer						: register(t10);
-Texture2D<float3>					ZERNDeferredShading_AmbientBuffer						: register(t11);
 
 static const float3 ZERNDeferredShading_CascadeColors[] = 
 {
@@ -118,29 +116,6 @@ static const float2 ZERNDeferredShading_PoissonDiskSamples[] =
 	float2(-0.8184632f, 0.431774f),
 	float2(0.8985078f, 0.4366908f)
 };
-
-float3 ZERNDeferredShading_GetAmbientColor(float CosSunZenith)
-{
-	float2 TexCoord;
-	TexCoord.x = CosSunZenith;
-	TexCoord.y = 0.5f;
-	
-	return ZERNDeferredShading_AmbientBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
-}
-
-float3 ZERNDeferredShading_GetExtinction(float CosSunZenith, float HeightAboveEarth)
-{
-	float2 TexCoord;
-	TexCoord.x = HeightAboveEarth / ATMOSPHERE_HEIGHT;
-	TexCoord.y = CosSunZenith;
-	
-	float2 RayleighMieDensityToAtmosphere = ZERNDeferredShading_DensityBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
-	
-	float3 RayleighExtinction = ZERNLightScatteringCommon_RayleighScatteringFactor * RayleighMieDensityToAtmosphere.x;
-	float3 MieExtinction = ZERNLightScatteringCommon_MieScatteringFactor * RayleighMieDensityToAtmosphere.y;
-	
-	return exp(-(RayleighExtinction + MieExtinction));
-}
 
 float ZERNDeferredShading_CalculateVisibility(uint CascadeIndex, float3 TexCoordDepth, float2 ShadowMapDimensions)
 {		
@@ -205,7 +180,7 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 					//float3 NormalCascade = mul(Cascade.ProjectionTransform, float4(Surface.NormalView, 0.0f)).xyz;
 					//NormalCascade = normalize(NormalCascade);
 					//TexCoordDepth.z += NormalCascade.z * 0.1f;
-					TexCoordDepth.z += CascadeIndex * 0.0003f;
+					TexCoordDepth.z += CascadeIndex * 0.0001f;
 					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, TexCoordDepth, ShadowMapDimensions);
 					CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex];
 					
@@ -223,15 +198,15 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);	
 	float3 EarthToPosition = SurfacePositionWorld - EarthCenter;
 	float EarthToPositionLength = length(EarthToPosition);
-	
 	float3 EarthNormal = EarthToPosition / EarthToPositionLength;
+	
 	float CosSunZenith = dot(LightDirectionWorld, EarthNormal) * 0.5f + 0.5f;
 	float HeightAboveEarth = EarthToPositionLength - EARTH_RADIUS;
 	
-	float3 AmbientColor = ZERNDeferredShading_GetAmbientColor(CosSunZenith);
-	float3 Extinction = ZERNDeferredShading_GetExtinction(CosSunZenith, HeightAboveEarth);
+	float3 AmbientColor = ZERNLightScatteringCommon_GetAmbientColor(CosSunZenith);
+	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(CosSunZenith, HeightAboveEarth);
 	
-	float3 LightColor = DirectionalLight.Color * Extinction;	
+	float3 LightColor = DirectionalLight.Color * Extinction;
 	AmbientColor *= DirectionalLight.Color;
 	
 	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionalLight.DirectionView));
@@ -371,11 +346,12 @@ float3 ZERNDeferredShading_Lighting(ZERNShading_Surface Surface)
 
 float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
 {	
-	float2 Dimensions = ZERNGBuffer_GetDimensions();
 	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
+	if (DepthHomogeneous == 0.0f)
+		return 0.0f;
 	
 	ZERNShading_Surface Surface;
-	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, Dimensions, DepthHomogeneous);
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), DepthHomogeneous);
 	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);
 	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy);

@@ -50,6 +50,8 @@ static const float3 ZERNLightScatteringCommon_RayleighScatteringFactor	= float3(
 static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= float3(2.0e-5, 2.0e-5, 2.0e-5);
 
 SamplerState		ZERNLightScatteringCommon_SamplerLinearClamp	: register(s0);
+Texture2D<float2>	ZERNLightScatteringCommon_DensityBuffer			: register(t10);
+Texture2D<float3>	ZERNLightScatteringCommon_AmbientBuffer			: register(t11);
 
 void ZERNLightScatteringCommon_CalculateWorldParamsFromTexCoords(in float4 TexCoord, out float Height, out float CosViewZenith, out float CosSunZenith, out float CosSunView)
 {
@@ -159,6 +161,29 @@ float3 ZERNLightScatteringCommon_CalculateExtinction(float3 Start, float3 End)
 	float2 Density = ZERNLightScatteringCommon_IntegrateDensity(Start, End);
 	
 	return ZERNLightScatteringCommon_RayleighScatteringFactor * Density.x + ZERNLightScatteringCommon_MieScatteringFactor * Density.y;
+}
+
+float3 ZERNLightScatteringCommon_GetAmbientColor(float CosSunZenith)
+{
+	float2 TexCoord;
+	TexCoord.x = CosSunZenith;
+	TexCoord.y = 0.5f;
+	
+	return ZERNLightScatteringCommon_AmbientBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
+}
+
+float3 ZERNLightScatteringCommon_GetExtinctionToAtmosphere(float CosSunZenith, float HeightAboveEarth)
+{
+	float2 TexCoord;
+	TexCoord.x = HeightAboveEarth / ATMOSPHERE_HEIGHT;
+	TexCoord.y = CosSunZenith;
+	
+	float2 RayleighMieDensityToAtmosphere = ZERNLightScatteringCommon_DensityBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
+	
+	float3 RayleighExtinction = ZERNLightScatteringCommon_RayleighScatteringFactor * RayleighMieDensityToAtmosphere.x;
+	float3 MieExtinction = ZERNLightScatteringCommon_MieScatteringFactor * RayleighMieDensityToAtmosphere.y;
+	
+	return exp(-(RayleighExtinction + MieExtinction));
 }
 
 float3 ZERNLightScatteringCommon_LookupPrecomputedScattering(Texture3D<float3> ScatteringBuffer, float3 Position, float3 ViewDirection, float3 SunDirection, float3 EarthCenter, inout float PrevTexCoordY)
