@@ -96,10 +96,7 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 		}
 	}
 
-	File.Seek(0, ZE_SF_END);
-	ZEUInt64 Size = File.Tell();
-	File.Seek(0, ZE_SF_BEGINING);
-
+	ZEUInt64 Size = File.GetSize();
 	ZEArray<ZEBYTE> Buffer;
 	Buffer.SetCount(Size + 1);
 
@@ -122,7 +119,7 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 	if (*(ZEUInt32*)Buffer.GetCArray() == 'ZEEN')
 	{
 		ZEArray<ZEBYTE> Output;
-		ZELCEncryption::AESDecrypt(Output, Buffer.GetCArray() + 4, Size, Key, 32);
+		ZELCEncryption::AESDecrypt(Output, Buffer.GetCArray() + 4, Size - 4, Key, 32);
 		Output.Add('\0');
 		UpdatedOptions.SourceData = reinterpret_cast<char*>(Output.GetCArray());
 	}
@@ -132,7 +129,7 @@ ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options
 		UpdatedOptions.SourceData = reinterpret_cast<char*>(Buffer.GetCArray());
 
 		ZEArray<ZEBYTE> Output;
-		ZELCEncryption::AESEncrypt(Output, Buffer.GetCArray(), Buffer.GetCount(), Key, 32);
+		ZELCEncryption::AESEncrypt(Output, Buffer.GetCArray(), Size, Key, 32);
 
 		bool AccessControl = ZEPathManager::GetInstance()->GetAccessControl();
 		ZEPathManager::GetInstance()->SetAccessControl(false);
