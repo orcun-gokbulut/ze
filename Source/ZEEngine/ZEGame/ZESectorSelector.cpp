@@ -161,41 +161,57 @@ ZESector* ZESectorSelector::DetermineSector(ZEGeographicEntity* Entity)
 
 void ZESectorSelector::SetReferenceSector(ZESector* ReferenceSector)
 {
-	ZEArray<ZEEntity*> Sectors = ZEScene::GetInstance()->GetEntities(ZESector::Class());
-	ZESector* CurrentSector = NULL;
+	ZEArray<ZEEntity*> GeographicEntities = ZEScene::GetInstance()->GetEntities(ZEGeographicEntity::Class());
+	//ZEArray<ZEEntity*> Sectors = ZEScene::GetInstance()->GetEntities(ZESector::Class());
 
-	for (ZESize I = 0; I < Sectors.GetCount(); I++)
+	ZEGeographicEntity* CurrentGeoEntity = NULL;
+
+	for (ZESize I = 0; I < GeographicEntities.GetCount(); I++)
 	{
-		CurrentSector = (ZESector*)Sectors[I];
+		CurrentGeoEntity = (ZEGeographicEntity*)GeographicEntities[I];
 
 		if (ReferenceSector != NULL)
 		{
-			if (CurrentSector->CheckAdjacency(ReferenceSector, ReferenceSector->GetAdjacencyDepth()))
+			if (ZEClass::IsDerivedFrom(ZESector::Class(), CurrentGeoEntity->GetClass()))
 			{
-				if (!CurrentSector->GetEnabled())
-				{
-					CurrentSector->SetEnabled(true);
-					CurrentSector->SetVisible(true);
-				}
+				ZESector* CurrentSector = (ZESector*)CurrentGeoEntity;
 
-				const ZEMatrix4x4d& InvGeoTransform = ReferenceSector->GetInvGeographicTransform();
-				ZEMatrix4x4d Result;
-				ZEMatrix4x4d::Multiply(Result, ReferenceSector->GetInvGeographicTransform(), CurrentSector->GetGeographicTransform());
-				CurrentSector->SetPosition(Result.GetTranslation().ToVector3());
-				CurrentSector->SetRotation(Result.GetRotation());
-				CurrentSector->SetScale(Result.GetScale().ToVector3());
+				if (CurrentSector->CheckAdjacency(ReferenceSector, ReferenceSector->GetAdjacencyDepth()))
+				{
+					if (!CurrentSector->GetEnabled())
+					{
+						CurrentSector->SetEnabled(true);
+						CurrentSector->SetVisible(true);
+					}
+
+					//const ZEMatrix4x4d& InvGeoTransform = ReferenceSector->GetInvGeographicTransform();
+					ZEMatrix4x4d Result;
+					ZEMatrix4x4d::Multiply(Result, ReferenceSector->GetInvGeographicTransform(), CurrentSector->GetGeographicTransform());
+					CurrentSector->SetPosition(Result.GetTranslation().ToVector3());
+					CurrentSector->SetRotation(Result.GetRotation());
+					CurrentSector->SetScale(Result.GetScale().ToVector3());
+				}
+				else
+				{
+					CurrentSector->SetEnabled(false);
+					CurrentSector->SetVisible(false);
+				}
 			}
 			else
 			{
-				CurrentSector->SetEnabled(false);
-				CurrentSector->SetVisible(false);
+				//const ZEMatrix4x4d& InvGeoTransform = ReferenceSector->GetInvGeographicTransform();
+				ZEMatrix4x4d Result;
+				ZEMatrix4x4d::Multiply(Result, ReferenceSector->GetInvGeographicTransform(), CurrentGeoEntity->GetGeographicTransform());
+				CurrentGeoEntity->SetPosition(Result.GetTranslation().ToVector3());
+				CurrentGeoEntity->SetRotation(Result.GetRotation());
+				CurrentGeoEntity->SetScale(Result.GetScale().ToVector3());
 			}
 		}
 		else
 		{
-			CurrentSector->SetGeographicPosition(CurrentSector->GetGeographicPosition());
-			CurrentSector->SetGeographicRotation(CurrentSector->GetGeographicRotation());
-			CurrentSector->SetGeographicScale(CurrentSector->GetGeographicScale());
+			CurrentGeoEntity->SetGeographicPosition(CurrentGeoEntity->GetGeographicPosition());
+			CurrentGeoEntity->SetGeographicRotation(CurrentGeoEntity->GetGeographicRotation());
+			CurrentGeoEntity->SetGeographicScale(CurrentGeoEntity->GetGeographicScale());
 		}
 	}
 }
