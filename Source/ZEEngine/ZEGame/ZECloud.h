@@ -69,27 +69,12 @@ class ZECloud : public ZEEntity
 		ZEHolder<ZEGRShader>			PlanePixelShader;
 		ZEHolder<ZEGRRenderStateData>	PlaneRenderStateData;
 		ZEHolder<ZEGRVertexBuffer>		PlaneVertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>	PlaneConstantBuffer;
-
-		ZEHolder<ZEGRShader>			BlurVertexShader;
-		ZEHolder<ZEGRShader>			BlurPixelShader;
-		ZEHolder<ZEGRRenderStateData>	BlurRenderStateData;
-
-		ZEHolder<ZEGRShader>			LightingPixelShader;
-		ZEHolder<ZEGRRenderStateData>	LightingRenderStateData;
+		ZEHolder<ZEGRConstantBuffer>	PlaneTransformConstantBuffer;
 
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZEHolder<ZEGRSampler>			SamplerLinearWrap;
-		
-		ZEHolder<ZEGRConstantBuffer>	VerticalConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>	HorizontalConstantBuffer;
 
-		ZEArray<ZEVector4>				HorizontalValues;
-		ZEArray<ZEVector4>				VerticalValues;
-
-		ZEHolder<ZEGRTexture2D>			TempTexture;
-		ZEHolder<ZEGRTexture2D>			BlurredTexture;
 		ZETexture2DResource*			CloudTexture;
 
 		struct  
@@ -112,10 +97,6 @@ class ZECloud : public ZEEntity
 		bool							UpdateRenderStates();
 		bool							UpdateConstantBuffers();
 		bool							Update();
-
-		void							RenderClouds(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
-		void							ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
-		void							LightingClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer);
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();

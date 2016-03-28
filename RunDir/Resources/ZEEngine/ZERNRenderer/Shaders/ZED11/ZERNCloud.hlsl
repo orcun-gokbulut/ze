@@ -90,15 +90,9 @@ cbuffer ZERNCloud_Plane_Constants								: register(b8)
 	float2			ZERNCloud_Reserved2;
 };
 
-cbuffer ZERNCloud_Blur_Constants								: register(b9)
-{
-	float4			ZERNCloud_Blur_KernelValues[11];
-};
-
 SamplerState		ZERNCloud_SamplerLinearWrap					: register(s0);
 
 Texture2D			ZERNCloud_CloudTexture						: register(t5);
-Texture2D<float3>	ZERNCloud_ColorTexture						: register(t6);
 
 ZERNCloud_Plane_HullShader_Input ZERNCloud_Plane_VertexShader_Main(ZERNCloud_Plane_VertexShader_Input Input)
 {
@@ -197,59 +191,24 @@ float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input)
 {	
 	float3 ViewDirection = normalize(ZERNView_Position - Input.PositionWorld);
 	float3 LightDirectionWorld = normalize(ZERNCloud_LightDirection);
-	float CosSunView = dot(LightDirectionWorld, ViewDirection);
+	float CosLightView = dot(LightDirectionWorld, ViewDirection);
 	
-	float G = 0.2f;
+	float G = 0.9f;
 	float GG = G * G;
-	float3 PhaseMie = (3.0f / (8.0f * PI)) * ((1.0f - GG) * (1.0f + CosSunView * CosSunView)) / ((2.0f + GG) * pow(1.0f + GG - 2.0f * G * CosSunView, 3.0f / 2.0f));
+	float AngularFactor = (1.0f / (128.0f * PI));
+	//float PhaseMie = AngularFactor * ((1.0f - GG) * (1.0f + CosLightView * CosLightView)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f));
+	float PhaseMie = AngularFactor * (1.0f - GG) / pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f);
 	
 	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
-	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, 10.0f * TexCoord, 0.0f);
+	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, ZERNCloud_PlaneSubdivision * TexCoord, 0.0f);
 	
-	float4 CloudCoverage = max(0.0f, ZERNCloud_CloudCoverage - float4(1.0f, 0.75f, 0.50f, 0.25f));
-	float CloudDensity = (dot(CloudSample, CloudCoverage) * 0.666666f) * ZERNCloud_CloudDensity;
+	float4 CloudCoverage = ZERNCloud_CloudCoverage - float4(0.0f, 0.20f, 0.50f, 0.70f);
+	float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
 
 	float MieDensity = exp(-CloudDensity * CloudDensity);
 	float3 ResultColor = PhaseMie * MieDensity * ZERNCloud_LightIntensity;
 	
 	return saturate(float4(ResultColor, CloudDensity));
-}
-
-float4 ZERNCloud_Blur_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input) : SV_Target0
-{	
-	float2 TextureSize;
-	ZERNCloud_CloudTexture.GetDimensions(TextureSize.x, TextureSize.y);
-	float2 TexelOffset = 1.0f / TextureSize;
-	float2 TexCoord = Input.Position.xy * TexelOffset;
-	
-	float4 ResultColor = 0.0f;
-	for(int I = 0; I < 11; I++)
-	{
-		float4 SampleColor = ZERNCloud_CloudTexture.Sample(ZERNCloud_SamplerLinearWrap, TexCoord + ZERNCloud_Blur_KernelValues[I].xy * TexelOffset);
-		ResultColor += SampleColor * ZERNCloud_Blur_KernelValues[I].w;
-	}
-	
-	return saturate(ResultColor);
-}
-
-float3 ZERNCloud_Lighting_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input) : SV_Target0
-{
-	float2 TextureDimensions;
-	ZERNCloud_ColorTexture.GetDimensions(TextureDimensions.x, TextureDimensions.y);
-	
-	float3 PositionView = ZERNTransformations_ViewportToView(Input.Position.xy, TextureDimensions, 0.0f);
-	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
-	float3 ViewDirection = normalize(PositionWorld - ZERNView_Position);
-	
-	float3 RayStart = ZERNView_Position;
-	float RayLength = ZERNCloud_ColorTexture.Load(int3(Input.Position.xy, 0)).x * 1000.0f;
-	float3 RayEnd = ZERNView_Position + ViewDirection * RayLength;
-	
-	//float3 Extinction = exp(-ZERNCloud_CalculateExtinction(RayStart, RayEnd));
-	
-	return 5.0f;
-	
-	//return 1.0f - ZERNCloud_ColorTexture.Load(int3(Input.Position.xy, 0)).x;
 }
 
 #endif

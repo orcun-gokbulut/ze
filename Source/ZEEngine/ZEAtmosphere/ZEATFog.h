@@ -60,7 +60,7 @@ class ZEATFog : public ZEEntity
 		struct 
 		{
 			float						Density;
-			float						Range;
+			float						StartDistance;
 			ZEVector2					Reserved0;
 
 			ZEVector3					Color;
@@ -84,8 +84,8 @@ class ZEATFog : public ZEEntity
 		void							SetDensity(float Density);
 		float							GetDensity() const;
 
-		void							SetRange(float Range);
-		float							GetRange() const;
+		void							SetStartDistance(float Range);
+		float							GetStartDistance() const;
 
 		void							SetColor(const ZEVector3& Color);
 		const ZEVector3&				GetColor() const;

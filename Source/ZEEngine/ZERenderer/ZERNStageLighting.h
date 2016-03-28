@@ -91,6 +91,7 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRConstantBuffer>		DeferredLightConstantBuffer;
 		ZEHolder<ZEGRVertexBuffer>			DeferredLightVertexBuffer;
 		ZEHolder<ZEGRStructuredBuffer>		TiledDeferredTileStructuredBuffer;
+		ZEHolder<ZEGRStructuredBuffer>		TiledDeferredLightStructuredBuffer;
 		ZEHolder<ZEGRConstantBuffer>		TiledDeferredLightConstantBuffer;
 
 		ZEHolder<ZEGRTexture2D>				TiledDeferredComputeOutputTexture;
@@ -104,7 +105,7 @@ class ZERNStageLighting : public ZERNStage
 			ZEVector3						Color;
 			float							Fov;
 			ZEVector3						Attenuation;
-			bool							CastShadow;
+			ZEBool32						CastShadow;
 			ZEVector3						DirectionView;
 			int								Type;
 		};
@@ -131,7 +132,7 @@ class ZERNStageLighting : public ZERNStage
 
 		struct TiledDeferredLightConstantsStruct
 		{
-			LightStruct						Lights[MAX_LIGHT];
+			//LightStruct						Lights[MAX_LIGHT];
 			ZEUInt							LightCount;
 			ZEVector3						Reserved;
 		} TiledDeferredLightConstants;

@@ -71,7 +71,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		virtual void									GenerateMipMaps() = 0;
 
 		virtual	ZEHolder<const ZEGRRenderTarget>		GetRenderTarget(ZEUInt MipLevel = 0) const = 0;
-		virtual ZEHolder<const ZEGRDepthStencilBuffer>	GetDepthStencilBuffer(ZEUInt ArrayIndex = 0) const = 0;
+		virtual ZEHolder<const ZEGRDepthStencilBuffer>	GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const = 0;
 
 		virtual bool									UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
 

@@ -50,6 +50,7 @@ class ZEGRTexture2D;
 
 class ZERNStageDebug : public ZERNStage
 {
+	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
 

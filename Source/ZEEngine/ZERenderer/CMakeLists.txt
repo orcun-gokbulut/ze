@@ -117,7 +117,7 @@ ze_add_source(ZERNStageParticleRendering.h			Sources Headers ZEMC)
 ze_add_source(ZERNStageParticleRendering.cpp		Sources)
 ze_add_source(ZERNStageAntiAliasing.h				Sources Headers ZEMC)
 ze_add_source(ZERNStageAntiAliasing.cpp				Sources)
-ze_add_source(ZERNStageDebug.h 						Sources Headers)
+ze_add_source(ZERNStageDebug.h 						Sources Headers ZEMC)
 ze_add_source(ZERNStageDebug.cpp					Sources)
 
 ze_add_library(TARGET ZERenderer 

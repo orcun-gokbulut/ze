@@ -140,7 +140,7 @@ bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 
 	Command.Entity = this;
 	Command.StageMask = Material->GetStageMask();
-	Command.Priority = 2;
+	Command.Priority = 1;
 
 	CullParameters->Renderer->AddCommand(&Command);
 

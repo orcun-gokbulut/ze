@@ -319,6 +319,7 @@ void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Conte
 	CascadeConstantBuffer->SetData(&CascadeConstants);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, CascadeConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 9, CascadeConstantBuffer);
 }
 
 ZELightType ZELightDirectional::GetLightType() const
@@ -400,7 +401,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 
 		ZEGRContext* Context = Parameters->Context;
 
-		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(CascadeIndex);
+		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
 		Context->ClearDepthStencilBuffer(DepthBuffer, true, false, 0.0f, 0x00);
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
