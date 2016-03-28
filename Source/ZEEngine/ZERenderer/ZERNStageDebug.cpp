@@ -51,6 +51,7 @@
 #include "ZEModel/ZEModelResource.h"
 #include "ZERNCommand.h"
 #include "ZEGame/ZEEntity.h"
+#include "ZEModel/ZEModel.h"
 
 #define ZERN_SDDF_SHADERS			1
 #define ZERN_SDDF_RENDER_STATES		2
@@ -169,22 +170,30 @@ bool ZERNStageDebug::Update()
 	return true;
 }
 
+#include "ZEModel/ZEModel.h"
+#include "ZEModel/ZEModelMesh.h"
+#include "ZEModel/ZEModelMeshLOD.h"
+#include "ZEDS/ZEArray.h"
+
 bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 {
 	const ZEList2<ZERNCommand>& Commands = GetCommands();
 
-	ZESize VertexCount = Commands.GetCount() * 2;
-	ZEArray<ZEVector3> Vertices;
-	Vertices.Resize(VertexCount);
-
-	ZEUInt Index = 0;
+	ZESmartArray<ZEVector3> Vertices;
 	ze_for_each(Command, Commands)
 	{
 		ZEEntity* Entity = Command->Entity;
-		ZEAABBox Box = Entity->GetWorldBoundingBox();
-		Vertices[Index++] = Box.Min;
-		Vertices[Index++] = Box.Max;
+		if (Entity->GetClass() == ZEModel::Class())
+		{
+			ZEAABBox Box = Entity->GetWorldBoundingBox();
+			Vertices.Add(Box.Min);
+			Vertices.Add(Box.Max);
+		}
 	}
+
+	ZESize VertexCount = Vertices.GetCount();
+	if (VertexCount == 0)
+		return false;
 
 	if (BoundingBoxVertexBuffer == NULL || 
 		BoundingBoxVertexBuffer->GetVertexCount() != VertexCount)
@@ -327,13 +336,15 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 
 	if (Constants.ShowBoundingBox)
 	{
-		SetupBoundingBoxVertexBuffer();
-		Context->SetRenderState(BoundingBoxRenderStateData);
-		Context->SetVertexBuffers(0, 1, BoundingBoxVertexBuffer.GetPointerToPointer());
-		Context->Draw(BoundingBoxVertexBuffer->GetVertexCount(), 0);
+		if (SetupBoundingBoxVertexBuffer())
+		{
+			Context->SetRenderState(BoundingBoxRenderStateData);
+			Context->SetVertexBuffers(0, 1, BoundingBoxVertexBuffer.GetPointerToPointer());
+			Context->Draw(BoundingBoxVertexBuffer->GetVertexCount(), 0);
 
-		Context->SetVertexBuffers(0, 0, NULL);
-		CleanUp(Context);
+			Context->SetVertexBuffers(0, 0, NULL);
+			CleanUp(Context);
+		}
 
 		return false;
 	}

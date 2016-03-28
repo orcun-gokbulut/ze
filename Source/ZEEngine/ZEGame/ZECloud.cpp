@@ -144,21 +144,6 @@ bool ZECloud::UpdateShaders()
 	PlanePixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PlanePixelShader == NULL, false, "Cloud plane pixel shader cannot compile");
 
-	Options.Type = ZEGR_ST_VERTEX;
-	Options.EntryPoint = "ZERNScreenCover_VertexShader_Position";
-	BlurVertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(BlurVertexShader == NULL, false, "Cloud blur vertex shader cannot compile");
-
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNCloud_Blur_PixelShader_Main";
-	BlurPixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(BlurPixelShader == NULL, false, "Cloud blur pixel shader cannot compile");
-
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNCloud_Lighting_PixelShader_Main";
-	LightingPixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(LightingPixelShader == NULL, false, "Cloud lighting pixel shader cannot compile");
-
 	DirtyFlags.UnraiseFlags(ZE_CDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZE_CDF_RENDER_STATES);
 
@@ -181,13 +166,7 @@ bool ZECloud::UpdateRenderStates()
 
 	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
 	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
-	//DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
-	//DepthStencilStateTestNoWrite.SetStencilTestEnable(true);
-	//DepthStencilStateTestNoWrite.SetFrontStencilFail(ZEGR_SO_REPLACE);
-	//DepthStencilStateTestNoWrite.SetFrontStencilDepthFail(ZEGR_SO_KEEP);
-	//DepthStencilStateTestNoWrite.SetFrontStencilPass(ZEGR_SO_REPLACE);
-	//DepthStencilStateTestNoWrite.SetFrontStencilFunction(ZEGR_CF_ALWAYS);
-	//
+	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
 	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
 	ZEGRBlendState BlendStateAlphaBlending;
@@ -208,32 +187,6 @@ bool ZECloud::UpdateRenderStates()
 
 	PlaneRenderStateData = RenderState.Compile();
 	zeCheckError(PlaneRenderStateData == NULL, false, "Cloud plane render state cannot compile");
-
-	RenderState = ZEGRRenderState::Default;
-
-	ZEGRDepthStencilState DepthStencilStateStencilTest;
-	DepthStencilStateStencilTest.SetDepthFunction(ZEGR_CF_ALWAYS);
-	DepthStencilStateStencilTest.SetDepthTestEnable(false);
-	DepthStencilStateStencilTest.SetDepthWriteEnable(false);
-	DepthStencilStateStencilTest.SetStencilTestEnable(true);
-	DepthStencilStateStencilTest.SetStencilWriteMask(0);
-	DepthStencilStateStencilTest.SetFrontStencilFail(ZEGR_SO_KEEP);
-	DepthStencilStateStencilTest.SetFrontStencilDepthFail(ZEGR_SO_KEEP);
-	DepthStencilStateStencilTest.SetFrontStencilPass(ZEGR_SO_KEEP);
-	DepthStencilStateStencilTest.SetFrontStencilFunction(ZEGR_CF_EQUAL);
-
-	RenderState.SetDepthStencilState(DepthStencilStateStencilTest);
-
-	RenderState.SetShader(ZEGR_ST_VERTEX, BlurVertexShader);
-	RenderState.SetShader(ZEGR_ST_PIXEL, BlurPixelShader);
-
-	BlurRenderStateData = RenderState.Compile();
-	zeCheckError(BlurRenderStateData == NULL, false, "Cloud blur render state cannot compile");
-
-	RenderState.SetShader(ZEGR_ST_PIXEL, LightingPixelShader);
-
-	LightingRenderStateData = RenderState.Compile();
-	zeCheckError(LightingRenderStateData == NULL, false, "Cloud lighting render state cannot compile");
 
 	DirtyFlags.UnraiseFlags(ZE_CDF_RENDER_STATES);
 
@@ -266,70 +219,6 @@ bool ZECloud::Update()
 	return true;
 }
 
-void ZECloud::RenderClouds(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
-{
-	Context->SetStencilRef(1.0f);
-	Context->SetRenderState(PlaneRenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, CloudTexture->GetTexture());
-
-	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
-
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-}
-
-void ZECloud::ApplyBlur(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer)
-{
-	const ZEGRRenderTarget* TempRenderTarget = OutputTexture->GetRenderTarget();
-	const ZEGRRenderTarget* BlurredRenderTarget = BlurredTexture->GetRenderTarget();
-
-	Context->SetStencilRef(1.0f);
-	Context->SetRenderState(BlurRenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, VerticalConstantBuffer);
-	Context->SetRenderTargets(1, &BlurredRenderTarget, DepthStencilBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, OutputTexture);
-	Context->Draw(3, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, HorizontalConstantBuffer);
-	Context->SetRenderTargets(1, &TempRenderTarget, DepthStencilBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, BlurredTexture);
-	Context->Draw(3, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, VerticalConstantBuffer);
-	Context->SetRenderTargets(1, &BlurredRenderTarget, DepthStencilBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, OutputTexture);
-	Context->Draw(3, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, HorizontalConstantBuffer);
-	Context->SetRenderTargets(1, &TempRenderTarget, DepthStencilBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, BlurredTexture);
-	Context->Draw(3, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-}
-
-void ZECloud::LightingClouds(ZEGRContext* Context, ZEGRTexture2D* OutputTexture, ZEGRDepthStencilBuffer* DepthStencilBuffer)
-{
-	const ZEGRRenderTarget* RenderTarget = OutputTexture->GetRenderTarget();
-	Context->SetStencilRef(1.0f);
-	Context->SetRenderState(LightingRenderStateData);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, TempTexture);
-	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-
-	Context->Draw(3, 0);
-
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
-}
-
 bool ZECloud::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
@@ -337,21 +226,13 @@ bool ZECloud::InitializeSelf()
 
 	CreatePlane();
 
-	PlaneConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	PlaneTransformConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	VerticalConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEVector4) * 11);
-	HorizontalConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEVector4) * 11);
 
 	ZEGRSamplerDescription SamplerDescriptionLinearWrap;
 	SamplerDescriptionLinearWrap.AddressU = ZEGR_TAM_WRAP;
 	SamplerDescriptionLinearWrap.AddressV = ZEGR_TAM_WRAP;
 	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerDescriptionLinearWrap);
-
-	ZERNFilter::GenerateGaussianKernel(HorizontalValues, 11, 2.0f);
-	ZERNFilter::GenerateGaussianKernel(VerticalValues, 11, 2.0f, false);
-
-	VerticalConstantBuffer->SetData(&VerticalValues[0]);
-	HorizontalConstantBuffer->SetData(&HorizontalValues[0]);
 
 	return true;
 }
@@ -364,8 +245,9 @@ bool ZECloud::DeinitializeSelf()
 	PlanePixelShader.Release();
 	PlaneRenderStateData.Release();
 	PlaneVertexBuffer.Release();
-	PlaneConstantBuffer.Release();
+	PlaneTransformConstantBuffer.Release();
 	
+	ConstantBuffer.Release();
 	SamplerLinearWrap.Release();
 
 	return ZEEntity::DeinitializeSelf();
@@ -515,43 +397,34 @@ void ZECloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	if (!Update())
 		return;
 
+	ZEMatrix4x4 WorldMatrix;
+	ZEMatrix4x4::CreateOrientation(WorldMatrix, Parameters->View->Position, ZEVector3::One);
+
+	PlaneTransformConstantBuffer->SetData(&WorldMatrix);
+
+	ZEGRContext* Context = Parameters->Context;	
 	ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-
-	if (TempTexture == NULL || 
-		TempTexture->GetWidth() != RenderTarget->GetWidth() || TempTexture->GetHeight() != RenderTarget->GetHeight())
-	{
-		TempTexture.Release();
-		TempTexture = ZEGRTexture2D::CreateInstance(RenderTarget->GetWidth(), RenderTarget->GetHeight(), 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-
-		BlurredTexture.Release();
-		BlurredTexture = ZEGRTexture2D::CreateInstance(RenderTarget->GetWidth(), RenderTarget->GetHeight(), 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	}
-
-	ZEGRContext* Context = Parameters->Context;
-
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, Parameters->View->Position, ZEVector3::One);
-	
-	PlaneConstantBuffer->SetData(&WorldMatrix);
-
-	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, PlaneConstantBuffer);
-	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
-	
-	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
-
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
 
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer, false, true, 0.0f, 0x00);
+	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, PlaneTransformConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
+	Context->SetRenderState(PlaneRenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, CloudTexture->GetTexture());
+	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
 
-	RenderClouds(Context, RenderTarget, DepthStencilBuffer);
-	//ApplyBlur(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
-	//LightingClouds(Context, StagePostProcess->GetOutputTexture(), PrevDepthStencilBuffer);
+	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
 
 	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
-	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, NULL);
+
+	Context->SetRenderTargets(0, NULL, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+	Context->SetVertexBuffers(0, 0, NULL);
 }
 
 ZECloud::~ZECloud()

@@ -254,7 +254,7 @@ void ZEGRDepthStencilState::SetToDefault()
 
 	StateData.DepthTestEnable = true;
 	StateData.DepthWriteEnable = true;
-	StateData.DepthFunction = ZEGR_CF_GREATER_EQUAL;
+	StateData.DepthFunction = ZEGR_CF_GREATER;
 
 	StateData.StencilTestEnable = false;
 	StateData.StencilWriteMask = 0xFF;

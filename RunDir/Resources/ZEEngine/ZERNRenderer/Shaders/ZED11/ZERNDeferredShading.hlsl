@@ -177,9 +177,6 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 				float3 TexCoordDepth;
 				if(ZERNDeferredShading_InsideCascade(Cascade.ProjectionTransform, Surface.PositionView, TexCoordDepth))
 				{
-					//float3 NormalCascade = mul(Cascade.ProjectionTransform, float4(Surface.NormalView, 0.0f)).xyz;
-					//NormalCascade = normalize(NormalCascade);
-					//TexCoordDepth.z += NormalCascade.z * 0.1f;
 					TexCoordDepth.z += CascadeIndex * 0.0001f;
 					Visibility = ZERNDeferredShading_CalculateVisibility(CascadeIndex, TexCoordDepth, ShadowMapDimensions);
 					CascadeColor = ZERNDeferredShading_CascadeColors[CascadeIndex];
@@ -345,13 +342,9 @@ float3 ZERNDeferredShading_Lighting(ZERNShading_Surface Surface)
 ///////////////////////////////////////////////////////////////////////////////
 
 float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
-{	
-	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
-	if (DepthHomogeneous == 0.0f)
-		return 0.0f;
-	
+{
 	ZERNShading_Surface Surface;
-	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), DepthHomogeneous);
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy));
 	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);
 	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy);

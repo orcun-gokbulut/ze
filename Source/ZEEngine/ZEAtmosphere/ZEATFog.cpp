@@ -159,8 +159,8 @@ ZEATFog::ZEATFog()
 	Command.StageMask = ZERN_STAGE_POST_EFFECT;
 
 	Constants.Density = 0.5f;
-	Constants.Range = 1000.0f;
-	Constants.Color = ZEVector3(0.15f);
+	Constants.StartDistance = 10.0f;
+	Constants.Color = ZEVector3(0.5f);
 }
 
 ZEATFog::~ZEATFog()
@@ -188,19 +188,19 @@ float ZEATFog::GetDensity() const
 	return Constants.Density;
 }
 
-void ZEATFog::SetRange(float Range)
+void ZEATFog::SetStartDistance(float StartDistance)
 {
-	if (Constants.Range == Range)
+	if (Constants.StartDistance == StartDistance)
 		return;
 
-	Constants.Range = Range;
+	Constants.StartDistance = StartDistance;
 
 	DirtyFlags.RaiseFlags(ZEAT_FDF_CONSTANT_BUFFERS);
 }
 
-float ZEATFog::GetRange() const
+float ZEATFog::GetStartDistance() const
 {
-	return Constants.Range;
+	return Constants.StartDistance;
 }
 
 void ZEATFog::SetColor(const ZEVector3& Color)

@@ -49,6 +49,7 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRTexture3D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -145,8 +146,9 @@ bool ZEATAtmosphere::UpdateRenderState()
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
 
 	ZEGRDepthStencilState DepthStencilStateNoTestWrite;
-	DepthStencilStateNoTestWrite.SetDepthTestEnable(false);
+	DepthStencilStateNoTestWrite.SetDepthTestEnable(true);
 	DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
+	DepthStencilStateNoTestWrite.SetDepthFunction(ZEGR_CF_GREATER_EQUAL);
 
 	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 
@@ -500,7 +502,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 
 	float CosSunAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -SunDirection);
-	bool SunVisible = CosSunAltitude >= 0.0f;
+	bool SunVisible = CosSunAltitude >= ZEAngle::ToRadian(-0.833f);
 
 	if (SunLight != NULL)
 	{
@@ -598,7 +600,7 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, SkyConstantBuffer);
 	Context->SetRenderState(SkyRenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, DepthTexture);
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, ColorTexture);

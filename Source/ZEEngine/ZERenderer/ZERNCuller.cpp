@@ -40,6 +40,8 @@
 #include "ZEMath/ZEViewVolume.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZERNRenderer.h"
+#include "ZEModel/ZEModel.h"
+#include "ZEApplications/ZETrainIG/ZETIPole.h"
 
 void ZESceneCuller::CullEntity(ZEEntity* Entity)
 {
@@ -55,7 +57,6 @@ void ZESceneCuller::CullEntity(ZEEntity* Entity)
 			if (CullParameters.View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			{
 				//to do when culled
-				return;
 			}
 			else
 			{

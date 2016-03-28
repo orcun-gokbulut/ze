@@ -43,7 +43,7 @@
 cbuffer ZERNFog_Constants	: register(b8)
 {
 	float	ZERNFog_Density;
-	float	ZERNFog_Range;
+	float	ZERNFog_StartDistance;
 	float2	ZERNFog_Reserved0;
 	
 	float3	ZERNFog_Color;
@@ -58,8 +58,9 @@ float4 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Targ
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	
 	float Distance = distance(ZERNView_Position, PositionWorld);
-	float RelativeDistance = max(0.0f, Distance - ZERNFog_Range) * ZERNFog_Density;
-	float FogFactor = exp(-RelativeDistance * RelativeDistance);
+	
+	float Value = max(0.0f, Distance - ZERNFog_StartDistance) * ZERNFog_Density;
+	float FogFactor = exp(-Value * Value);
 
 	return float4(ZERNFog_Color, FogFactor);
 }

@@ -33,11 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include <d3d11.h>
+#include "ZED11DepthStencilBuffer.h"
 
 #include "ZEError.h"
 #include "ZED11Module.h"
-#include "ZED11DepthStencilBuffer.h"
+
+#include <d3d11.h>
 
 ZED11DepthStencilBuffer::ZED11DepthStencilBuffer()
 {
