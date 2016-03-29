@@ -73,11 +73,7 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 
 	OutputTexture = GetPrevOutput(ZERN_SO_COLOR);
 
-	//if (OutputTexture == NULL)
-	//	OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	//else
-	//	OutputTexture.Release();
-
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputTexture->GetWidth(), OutputTexture->GetHeight()));
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
 	return true;

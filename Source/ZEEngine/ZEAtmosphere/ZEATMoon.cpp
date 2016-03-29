@@ -291,6 +291,11 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 
+ZEATMoon* ZEATMoon::CreateInstance()
+{
+	return new ZEATMoon();
+}
+
 ZEATMoon::ZEATMoon()
 {
 	DirtyFlags.RaiseAll();

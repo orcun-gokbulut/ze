@@ -394,7 +394,7 @@ bool ZEATAtmosphere::InitializeSelf()
 	Sun = new ZEATSun();
 	zeScene->AddEntity(Sun);
 
-	Moon = new ZEATMoon();
+	Moon = ZEATMoon::CreateInstance();
 	zeScene->AddEntity(Moon);
 	Moon->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
 
