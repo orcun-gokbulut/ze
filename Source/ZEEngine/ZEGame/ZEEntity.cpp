@@ -100,6 +100,18 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 		return false;
 	}
 
+	if (!Entity->CheckParent(this))
+	{
+		zeError("Child entity's parent check failed.");
+		return false;
+	}
+
+	if (!CheckComponent(this))
+	{
+		zeError("Component entity check failed.");
+		return false;
+	}
+
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
@@ -150,6 +162,18 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 		return false;
 	}
 
+	if (!Entity->CheckParent(this))
+	{
+		zeError("Child entity's parent check failed.");
+		return false;
+	}
+
+	if (!CheckChildEntity(this))
+	{
+		zeError("Component entity check failed.");
+		return false;
+	}
+
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
@@ -184,12 +208,28 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 	Entity->SetScene(NULL);
 }
 
+bool ZEEntity::CheckParent(ZEEntity* Parent)
+{
+	return true;
+}
+
+bool ZEEntity::CheckComponent(ZEEntity* Parent)
+{
+	return true;
+}
+
+bool ZEEntity::CheckChildEntity(ZEEntity* Parent)
+{
+	return true;
+}
+
 bool ZEEntity::SetParent(ZEEntity* Owner)
 {
 	this->Parent = Owner;
 	ParentTransformChanged();
 	return true;
 }
+
 
 void ZEEntity::SetScene(ZEScene* Scene)
 {
