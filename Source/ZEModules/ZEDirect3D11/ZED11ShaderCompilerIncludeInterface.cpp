@@ -54,12 +54,24 @@ const ZEGRShaderCompileOptions* ZED11ShaderCompilerIncludeInterface::GetCompileO
 
 bool ZED11ShaderCompilerIncludeInterface::ReadInclude(const ZEString& pFileName, LPCVOID* ppData, UINT * pBytes)
 {
-	ZEFile IncludeFile;
-	if (!IncludeFile.Open(pFileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
-	{
-		if (!IncludeFile.Open(pFileName, ZE_FOM_READ, ZE_FCM_NONE))
-			return false;
-	}
+
+	#ifdef ZE_DEBUG_ENABLE
+		ZEFile IncludeFile;
+		if (!IncludeFile.Open(pFileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
+		{
+			if (!IncludeFile.Open(pFileName, ZE_FOM_READ, ZE_FCM_NONE))
+				return false;
+		}
+	#else
+		if (!File.Open(Options.FileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
+		{
+			if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
+			{
+				zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
+				return NULL;
+			}
+		}
+	#endif
 
 	ZEArray<ZEBYTE> Buffer;
 	Buffer.SetCount(IncludeFile.GetSize());

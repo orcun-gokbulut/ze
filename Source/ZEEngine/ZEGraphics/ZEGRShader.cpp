@@ -87,14 +87,26 @@ ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const
 ZEHolder<ZEGRShader> ZEGRShader::Compile(const ZEGRShaderCompileOptions& Options)
 {
 	ZEFile File;
-	if (!File.Open(Options.FileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
-	{
+
+	#ifdef ZE_DEBUG_ENABLE
 		if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
 		{
-			zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
-			return NULL;
+			if (!File.Open(Options.FileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
+			{
+				zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
+				return NULL;
+			}
 		}
-	}
+	#else
+		if (!File.Open(Options.FileName + ".ZEEnc", ZE_FOM_READ, ZE_FCM_NONE))
+		{
+			if (!File.Open(Options.FileName, ZE_FOM_READ, ZE_FCM_NONE))
+			{
+				zeError("Cannot open shader file. File Name: \"%s", Options.FileName.ToCString());
+				return NULL;
+			}
+		}
+	#endif
 
 	ZEUInt64 Size = File.GetSize();
 	ZEArray<ZEBYTE> Buffer;

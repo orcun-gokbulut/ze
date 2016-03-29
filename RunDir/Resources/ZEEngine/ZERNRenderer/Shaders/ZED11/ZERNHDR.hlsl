@@ -80,6 +80,7 @@ Texture2D<float>	ZERNHDR_PreviousLuminanceTexture	: register(t8);
 ///////////////////////////////////////////////////////////////////////////////
 
 SamplerState 		ZERNHDR_SamplerLinearClamp			: register(s0);
+SamplerState		ZERNHDR_SamplerLinearBorder			: register(s1);
 
 // LUMINANCE CALCULATE
 ///////////////////////////////////////////////////////////////////////////////
@@ -215,47 +216,38 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 ScreenCoordinate : SV_Positio
 
 float3 ZERNHDR_ToneMapping_PixelShader(float4 ScreenCoordinate : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
-	float3 Color = ZERNHDR_InputTexture.Load(int3(ScreenCoordinate.xy, 0));
-	float Luminance = ZERNHDR_Calculate_Luminance(Color);
-	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
-	
-	float3 ResultColor = 0.0f;
+	float3 PixelColor = ZERNHDR_InputTexture.Load(int3(ScreenCoordinate.xy, 0));
 	
 	if(ZERNHDR_BloomEnabled)
-		ResultColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNHDR_SamplerLinearClamp, TexCoord).rgb;
+		PixelColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNHDR_SamplerLinearBorder, TexCoord).rgb;
+	
+	float Luminance = ZERNHDR_Calculate_Luminance(PixelColor);
+	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
 	
 	switch(ZERNHDR_ToneMapOperator)
 	{
 		case ZERN_HTMO_LOGARITHMIC:
-			ResultColor = ZERNHDR_ToneMapOperator_Logarithmic(Color, Luminance, ScaledLuminance);
-			break;
+			return ZERNHDR_ToneMapOperator_Logarithmic(PixelColor, Luminance, ScaledLuminance);
 			
 		case ZERN_HTMO_EXPONENTIAL:
-			ResultColor = ZERNHDR_ToneMapOperator_Exponential(Color, Luminance, ScaledLuminance);
-			break;
+			return ZERNHDR_ToneMapOperator_Exponential(PixelColor, Luminance, ScaledLuminance);
 			
 		case ZERN_HTMO_REINHARD:
-			ResultColor = ZERNHDR_ToneMapOperator_Reinhard(Color, Luminance, ScaledLuminance);
-			break;
+			return ZERNHDR_ToneMapOperator_Reinhard(PixelColor, Luminance, ScaledLuminance);
 			
 		case ZERN_HTMO_MODIFIED_REINHARD:
-			ResultColor = ZERNHDR_ToneMapOperator_ModifiedReinhard(Color, Luminance, ScaledLuminance);
-			break;
+			return ZERNHDR_ToneMapOperator_ModifiedReinhard(PixelColor, Luminance, ScaledLuminance);
 			
 		case ZERN_HTMO_FILMIC:
-			ResultColor = ZERNHDR_ToneMapOperator_Filmic(Color, ScaledLuminance);
-			break;
+			return ZERNHDR_ToneMapOperator_Filmic(PixelColor, ScaledLuminance);
 		
 		default:
 		case ZERN_HTMO_UNCHARTED:
 		{
-			float3 ScaledColor = ScaledLuminance * Color;
-			ResultColor = ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * (1.0f / ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
-			break;
+			float3 ScaledColor = ScaledLuminance * PixelColor;
+			return ZERNHDR_ToneMapOperator_Uncharted(ScaledColor) * (1.0f / ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
 		}
 	}
-	
-	return ResultColor;
 }
 
 #endif
