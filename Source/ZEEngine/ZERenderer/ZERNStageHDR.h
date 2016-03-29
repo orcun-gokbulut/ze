@@ -107,6 +107,9 @@ class ZERNStageHDR : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
 		
 		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>				SamplerLinearBorder;
+
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZERNHDRBlurTextureSize				BlurTextureSize;
 		ZEGRViewport						Viewport;
@@ -128,8 +131,6 @@ class ZERNStageHDR : public ZERNStage
 			float							Reserved1;
 			float							Reserved2;
 		} Constants;
-
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		bool								UpdateInputOutput();
 		bool								UpdateTextures();

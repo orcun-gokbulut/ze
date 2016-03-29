@@ -171,12 +171,19 @@ bool ZERNStageHDR::UpdateInputOutput()
 	if (InputTexture == NULL)
 		return false;
 
+	ZEUInt Width = InputTexture->GetWidth();
+	ZEUInt Height = InputTexture->GetHeight();
+
+	if (Viewport.GetWidth() != Width || Viewport.GetHeight() != Height)
+		DirtyFlags.RaiseFlags(ZERN_HSDF_RESIZE);
+
 	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (OutputRenderTarget == NULL)
 	{
 		// No Provided Output - Create Own Buffer
-		if (OutputTexture == NULL || OutputTexture->GetWidth() != InputTexture->GetWidth() || OutputTexture->GetHeight() != InputTexture->GetHeight())
-			OutputTexture = ZEGRTexture2D::CreateInstance(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+		if (OutputTexture == NULL || 
+			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -191,7 +198,7 @@ bool ZERNStageHDR::UpdateInputOutput()
 
 bool ZERNStageHDR::UpdateTextures()
 {
-	if(!DirtyFlags.GetFlags(ZERN_HSDF_RESIZE))
+	if (!DirtyFlags.GetFlags(ZERN_HSDF_RESIZE))
 		return true;
 
 	ZEUInt CurrentWidth = OutputRenderTarget->GetWidth();
@@ -395,6 +402,7 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* Input,
 	Context->SetRenderState(ToneMapping_RenderState);
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearBorder);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, Input);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, BlurTextureFinal);
 	Context->SetTexture(ZEGR_ST_PIXEL, 7, CurrentAdaptedLuminance);
@@ -405,7 +413,8 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* Input,
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 7, NULL);
@@ -423,6 +432,12 @@ bool ZERNStageHDR::InitializeSelf()
 	ZERNFilter::GenerateGaussianKernel(HorizontalValues, 11, 2.0f);
 	ZERNFilter::GenerateGaussianKernel(VerticalValues, 11, 2.0f, false);
 	SamplerLinearClamp = ZEGRSampler::GetSampler(ZEGRSamplerDescription());
+
+	ZEGRSamplerDescription SamplerDescriptionLinearBorder;
+	SamplerDescriptionLinearBorder.AddressU = ZEGR_TAM_BORDER;
+	SamplerDescriptionLinearBorder.AddressV = ZEGR_TAM_BORDER;
+	SamplerDescriptionLinearBorder.BorderColor = ZEVector4::Zero;
+	SamplerLinearBorder = ZEGRSampler::GetSampler(SamplerDescriptionLinearBorder);
 
 	return true;
 }
