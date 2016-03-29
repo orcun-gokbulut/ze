@@ -51,6 +51,8 @@ ze_add_source(ZEATAstronomy.cpp				Sources)
 ze_add_source(ZEATAstronomy.h				Sources Headers)
 ze_add_source(ZEATFog.cpp					Sources)
 ze_add_source(ZEATFog.h						Sources Headers)
+ze_add_source(ZEATCloud.cpp					Sources)
+ze_add_source(ZEATCloud.h					Sources Headers)
 
 ze_add_library(TARGET ZEAtmosphere 
 	ZEMC ${ZEMC}

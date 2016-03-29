@@ -144,6 +144,18 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 		DirtyFlags.RaiseFlags(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
 }
 
+void ZED11Context::SetComputeRenderState(const ZEGRComputeRenderStateData* State)
+{
+	if (State == NULL)
+		return;
+
+	const ZEGRShader* ComputeShader = static_cast<const ZED11ComputeRenderStateData*>(State)->ComputeShader;
+	if (ComputeShader == NULL)
+		return;
+
+	Context->CSSetShader(static_cast<const ZED11Shader*>(ComputeShader)->GetComputeShader(), NULL, 0);
+}
+
 void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers)
 {
 	zeDebugCheck(Index >= D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Vertex buffer index exceeds the max slot count.");

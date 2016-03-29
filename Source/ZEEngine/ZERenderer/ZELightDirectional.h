@@ -114,7 +114,6 @@ class ZELightDirectional : public ZELight
 		virtual const ZEMatrix4x4&			GetViewTransform(ZESize Index = 0) const;
 		virtual const ZEMatrix4x4&			GetProjectionTransform(ZESize Index = 0) const;
 
-		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZELightDirectional*			CreateInstance();

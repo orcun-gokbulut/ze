@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECloud.cpp
+ Zinek Engine - ZEATCloud.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECloud.h"
+#include "ZEATCloud.h"
 
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShader.h"
@@ -74,7 +74,7 @@ ZEGRVertexLayout GetPositionTexcoordVertexLayout()
 	return VertexLayout;
 }
 
-void ZECloud::CreatePlane()
+void ZEATCloud::CreatePlane()
 {
 	struct Vertex
 	{
@@ -115,7 +115,7 @@ void ZECloud::CreatePlane()
 	PlaneVertexBuffer->Unlock();
 }
 
-bool ZECloud::UpdateShaders()
+bool ZEATCloud::UpdateShaders()
 {
 	if (!DirtyFlags.GetFlags(ZE_CDF_SHADERS))
 		return true;
@@ -150,7 +150,7 @@ bool ZECloud::UpdateShaders()
 	return true;
 }
 
-bool ZECloud::UpdateRenderStates()
+bool ZEATCloud::UpdateRenderStates()
 {
 	if (!DirtyFlags.GetFlags(ZE_CDF_RENDER_STATES))
 		return true;
@@ -193,7 +193,7 @@ bool ZECloud::UpdateRenderStates()
 	return true;
 }
 
-bool ZECloud::UpdateConstantBuffers()
+bool ZEATCloud::UpdateConstantBuffers()
 {
 	if (!DirtyFlags.GetFlags(ZE_CDF_CONSTANT_BUFFER))
 		return true;
@@ -205,7 +205,7 @@ bool ZECloud::UpdateConstantBuffers()
 	return true;
 }
 
-bool ZECloud::Update()
+bool ZEATCloud::Update()
 {
 	if (!UpdateShaders())
 		return false;
@@ -219,7 +219,7 @@ bool ZECloud::Update()
 	return true;
 }
 
-bool ZECloud::InitializeSelf()
+bool ZEATCloud::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
@@ -237,7 +237,7 @@ bool ZECloud::InitializeSelf()
 	return true;
 }
 
-bool ZECloud::DeinitializeSelf()
+bool ZEATCloud::DeinitializeSelf()
 {
 	PlaneVertexShader.Release();
 	PlaneHullShader.Release();
@@ -253,7 +253,7 @@ bool ZECloud::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-ZECloud::ZECloud()
+ZEATCloud::ZEATCloud()
 {
 	DirtyFlags.RaiseAll();
 
@@ -271,12 +271,12 @@ ZECloud::ZECloud()
 	Constants.Translation = ZEVector2(0.0f, 0.0f);
 }
 
-ZEDrawFlags ZECloud::GetDrawFlags() const
+ZEDrawFlags ZEATCloud::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }
 
-void ZECloud::SetCloudTexture(const ZEString& FileName)
+void ZEATCloud::SetCloudTexture(const ZEString& FileName)
 {
 	ZETextureOptions TextureOption = 
 	{
@@ -291,12 +291,12 @@ void ZECloud::SetCloudTexture(const ZEString& FileName)
 	CloudTexture = ZETexture2DResource::LoadResource(FileName, &TextureOption);
 }
 
-const ZEString& ZECloud::GetCloudTexture() const
+const ZEString& ZEATCloud::GetCloudTexture() const
 {
 	return CloudTexture == NULL ? ZEString::Empty : CloudTexture->GetFileName();
 }
 
-void ZECloud::SetCloudCoverage(float CloudCoverage)
+void ZEATCloud::SetCloudCoverage(float CloudCoverage)
 {
 	if (Constants.CloudCoverage == CloudCoverage)
 		return;
@@ -306,12 +306,12 @@ void ZECloud::SetCloudCoverage(float CloudCoverage)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-float ZECloud::GetCloudCoverage() const
+float ZEATCloud::GetCloudCoverage() const
 {
 	return Constants.CloudCoverage;
 }
 
-void ZECloud::SetCloudDensity(float CloudDensity)
+void ZEATCloud::SetCloudDensity(float CloudDensity)
 {
 	if (Constants.CloudDensity == CloudDensity)
 		return;
@@ -321,12 +321,12 @@ void ZECloud::SetCloudDensity(float CloudDensity)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-float ZECloud::GetCloudDensity() const
+float ZEATCloud::GetCloudDensity() const
 {
 	return Constants.CloudDensity;
 }
 
-void ZECloud::SetLightDirection(const ZEVector3& LightDirection)
+void ZEATCloud::SetLightDirection(const ZEVector3& LightDirection)
 {
 	if (Constants.LightDirection == LightDirection)
 		return;
@@ -336,12 +336,12 @@ void ZECloud::SetLightDirection(const ZEVector3& LightDirection)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZECloud::GetLightDirection() const
+const ZEVector3& ZEATCloud::GetLightDirection() const
 {
 	return Constants.LightDirection;
 }
 
-void ZECloud::SetLightIntensity(float LightIntensity)
+void ZEATCloud::SetLightIntensity(float LightIntensity)
 {
 	if (Constants.LightIntensity == LightIntensity)
 		return;
@@ -351,12 +351,12 @@ void ZECloud::SetLightIntensity(float LightIntensity)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-float ZECloud::GetLightIntensity() const
+float ZEATCloud::GetLightIntensity() const
 {
 	return Constants.LightIntensity;
 }
 
-void ZECloud::SetTranslation(const ZEVector2& Translation)
+void ZEATCloud::SetTranslation(const ZEVector2& Translation)
 {
 	if (Constants.Translation == Translation)
 		return;
@@ -366,12 +366,12 @@ void ZECloud::SetTranslation(const ZEVector2& Translation)
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-const ZEVector2& ZECloud::GetTranslation() const
+const ZEVector2& ZEATCloud::GetTranslation() const
 {
 	return Constants.Translation;
 }
 
-void ZECloud::Tick(float Time)
+void ZEATCloud::Tick(float Time)
 {
 	static ZEVector2 Translation = ZEVector2(0.0f, 0.0f);
 	Translation += Time * ZEVector2(0.0001f, 0.0003f);
@@ -385,14 +385,14 @@ void ZECloud::Tick(float Time)
 	SetTranslation(Translation);
 }
 
-bool ZECloud::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATCloud::PreRender(const ZERNCullParameters* CullParameters)
 {
 	CullParameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }
 
-void ZECloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	if (!Update())
 		return;
@@ -427,12 +427,12 @@ void ZECloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	Context->SetVertexBuffers(0, 0, NULL);
 }
 
-ZECloud::~ZECloud()
+ZEATCloud::~ZEATCloud()
 {
 
 }
 
-ZECloud* ZECloud::CreateInstance()
+ZEATCloud* ZEATCloud::CreateInstance()
 {
-	return new ZECloud();
+	return new ZEATCloud();
 }

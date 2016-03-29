@@ -41,7 +41,6 @@
 #include "ZESkyBrush.h"
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
-#include "ZECloud.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEMath/ZEMath.h"
@@ -273,7 +272,7 @@ bool ZEWeather::DeinitializeSelf()
 	SunLight->Deinitialize();
 	StarMap->Deinitialize();
 	SkyDome->Deinitialize();
-	Cloud->Deinitialize();
+	//Cloud->Deinitialize();
 	Moon->Deinitialize();
 
 	return ZEEntity::DeinitializeSelf();
@@ -393,17 +392,17 @@ ZEWeather::ZEWeather()
 	this->AddComponent(SkyDome);
 
 	// Planar Cloud
-	Cloud = ZECloud::CreateInstance();
-	Cloud->SetName("PlanarCloud");
-	Cloud->SetEnabled(true);
-	Cloud->SetVisible(true);
+	//Cloud = ZECloud::CreateInstance();
+	//Cloud->SetName("PlanarCloud");
+	//Cloud->SetEnabled(true);
+	//Cloud->SetVisible(true);
 	//Cloud->SetCloudFormationTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
 	//Cloud->SetCamera(zeScene->GetActiveCamera());
 	//Cloud->SetCloudPlaneHeight(600.0f);
 	//Cloud->SetSunLightDirection(SunDirection);
 	//Cloud->SetSunLightColor(SunLightColor);
 	//Cloud->SetCloudCover(CloudCover);
-	this->AddComponent(Cloud);
+	//this->AddComponent(Cloud);
 }
 
 ZEWeather::~ZEWeather()

@@ -66,7 +66,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 
 	ZEVector3 CascadeFrustumVerticesView[8];
 	ZEVector3 CascadeFrustumVerticesWorld[8];
-	for(ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
+	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
 		ZECascade& Cascade = CascadeConstants.Cascades[CascadeIndex];
 
@@ -98,7 +98,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 		CascadeFrustumVerticesView[7] = ZEVector3(FarRight, FarBottom, Cascade.Borders.w);
 
 		ZEAABBox CascadeFrustumAABBLight(ZEVector3(FLT_MAX), ZEVector3(-FLT_MAX));
-		for(ZEUInt I = 0; I < 8; I++)
+		for (ZEUInt I = 0; I < 8; I++)
 		{
 			CascadeFrustumVerticesWorld[I] = View.InvViewTransform * CascadeFrustumVerticesView[I];
 			ZEVector3 CascadeFrustumVertexLight = GetViewTransform() * CascadeFrustumVerticesWorld[I];
@@ -153,7 +153,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 			0.0f, 0.0f, 1.0f / Depth, OffsetZ,
 			0.0f, 0.0f, 0.0f, 1.0f);
 
-		if(CascadeIndex != (CascadeConstants.CascadeCount - 1))
+		if (CascadeIndex != (CascadeConstants.CascadeCount - 1))
 		{
 			float BandLength = (Cascade.Borders.w - Cascade.Borders.z) * 0.05f;
 			Cascade.Band = ZEVector4(Cascade.Borders.x - BandLength, Cascade.Borders.x + BandLength, Cascade.Borders.w - BandLength, Cascade.Borders.w + BandLength);
@@ -166,7 +166,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
 
 		ZEMatrix4x4 InvLightViewTransform;
-		ZEMatrix4x4::Inverse(InvLightViewTransform, GetViewTransform());
+		ZEMatrix4x4::Transpose(InvLightViewTransform, GetViewTransform());
 
 		ZEVector4 CascadePositionWorld;
 		ZEMatrix4x4::Transform(CascadePositionWorld, InvLightViewTransform, ZEVector4(CascadeFrustumAABBLight.GetCenter(), 1.0f));
@@ -177,7 +177,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 
 void ZELightDirectional::UpdateCascadeShadowMaps()
 {
-	if(!DirtyFlags.GetFlags(ZE_LDF_SHADOW_MAP))
+	if (!DirtyFlags.GetFlags(ZE_LDF_SHADOW_MAP))
 		return;
 
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
@@ -237,7 +237,7 @@ ZEDrawFlags ZELightDirectional::GetDrawFlags() const
 
 void ZELightDirectional::SetCascadeCount(ZEUInt CascadeCount)
 {
-	if(CascadeConstants.CascadeCount == CascadeCount)
+	if (CascadeConstants.CascadeCount == CascadeCount)
 		return;
 
 	CascadeConstants.CascadeCount = CascadeCount;
@@ -310,7 +310,7 @@ void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Conte
 		0.0f, 0.0f, 1.0f, 0.0f,
 		0.0f, 0.0f, 0.0f, 1.0f);
 
-	for(ZEUInt I = 0; I < CascadeConstants.CascadeCount; I++)
+	for (ZEUInt I = 0; I < CascadeConstants.CascadeCount; I++)
 	{
 		ZECascade& Cascade = CascadeConstants.Cascades[I];
 		Cascade.ProjectionTransform = TextureTransform * Cascade.ProjectionTransform * Renderer->GetView().InvViewTransform;
@@ -357,7 +357,7 @@ const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index) const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateViewTransform(ViewTransform, GetWorldPosition(), GetWorldRotation());
+		ZEMatrix4x4::CreateViewTransform(ViewTransform, ZEVector3::Zero, GetWorldRotation());
 		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_TRANSFORM);
 	}
 
@@ -372,18 +372,12 @@ const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index) cons
 	return CascadeConstants.Cascades[Index].ProjectionTransform;
 }
 
-bool ZELightDirectional::PreRender(const ZERNCullParameters* CullParameters)
-{
-	return ZELight::PreRender(CullParameters);
-}
-
 void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	UpdateCascadeShadowMaps();
 	UpdateCascadeTransforms(*Parameters->View);
 
-	ZEUInt Count = CascadeConstants.CascadeCount;
-	for(ZEUInt CascadeIndex = 0; CascadeIndex < Count; CascadeIndex++)
+	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
 		ZERNView View = ShadowRenderer.GetView();
 		View.Position = Parameters->View->Position;

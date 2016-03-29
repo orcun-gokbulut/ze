@@ -62,6 +62,7 @@ class ZEGRContext
 
 	public:
 		virtual void			SetRenderState(const ZEGRRenderStateData* State) = 0;
+		virtual void			SetComputeRenderState(const ZEGRComputeRenderStateData* State) = 0;
 
 		virtual void			SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers) = 0;
 		virtual void			SetIndexBuffer(const ZEGRIndexBuffer* Buffer) = 0;

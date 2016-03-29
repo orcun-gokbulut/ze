@@ -84,3 +84,10 @@ bool ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
 	
 	return true;
 }
+
+bool ZED11ComputeRenderStateData::Initialize(const ZEGRComputeRenderState& RenderState)
+{
+	this->ComputeShader = RenderState.GetComputeShader();
+
+	return true;
+}

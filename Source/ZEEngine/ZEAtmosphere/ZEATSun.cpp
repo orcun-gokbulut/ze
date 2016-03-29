@@ -43,23 +43,108 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZERenderer/ZERNSunMaterial.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRSampler.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
+#include "ZERenderer/ZERNStagePostProcess.h"
+
+#define ZEAT_SDF_SHADERS				1
+#define ZEAT_SDF_RENDER_STATES			2
+#define ZEAT_SDF_CONSTANT_BUFFERS		4
+
+bool ZEATSun::UpdateShaders()
+{
+	if (!DirtyFlags.GetFlags(ZEAT_SDF_SHADERS))
+		return true;
+
+	ZEGRShaderCompileOptions Options;
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSun.hlsl";
+	Options.Model = ZEGR_SM_5_0;
+
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZERNSun_VertexShader_Main";
+	VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(VertexShader == NULL, false, "Can not compile vertex shader");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSun_PixelShader_Main";
+	PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(PixelShader == NULL, false, "Can not compile pixel shader");
+
+	DirtyFlags.UnraiseFlags(ZEAT_SDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZEAT_SDF_RENDER_STATES);
+
+	return true;
+}
+
+bool ZEATSun::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZEAT_SDF_RENDER_STATES))
+		return true;
+
+	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
+
+	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
+	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
+
+	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
+
+	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
+
+	RenderStateData = RenderState.Compile();
+	zeCheckError(RenderStateData == NULL, false, "Cannot set sun render state.");
+
+	DirtyFlags.UnraiseFlags(ZEAT_SDF_RENDER_STATES);
+
+	return true;
+}
+
+bool ZEATSun::UpdateConstantBuffers()
+{
+	if (!DirtyFlags.GetFlags(ZEAT_SDF_CONSTANT_BUFFERS))
+		return true;
+
+	ConstantBuffer->SetData(&Constants);
+
+	DirtyFlags.UnraiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
+
+	return true;
+}
+
+bool ZEATSun::Update()
+{
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderStates())
+		return false;
+
+	if (!UpdateConstantBuffers())
+		return false;
+
+	return true;
+}
 
 bool ZEATSun::CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector)
 {
 	ZEVector3 SunDirectionView;
 	Direction.NormalizeSelf();
-	ZEMatrix4x4::Transform3x3(SunDirectionView, View.ViewTransform, -Direction);
+	ZEMatrix4x4::Transform3x3(SunDirectionView, View.ViewTransform, Direction);
 	float SunPositionScreenX = SunDirectionView.x * View.ProjectionTransform.M11 / SunDirectionView.z;
 	float SunPositionScreenY = SunDirectionView.y * View.ProjectionTransform.M22 / SunDirectionView.z;
 
 	if (SunPositionScreenX >= -1.0f && SunPositionScreenX <= 1.0f &&
 		SunPositionScreenY >= -1.0f && SunPositionScreenY <= 1.0f &&
-		ZEVector3::DotProduct(View.N, -Direction) > 0.0f)
+		ZEVector3::DotProduct(View.N, Direction) > 0.0f)
 	{
 		OutVector.x = SunPositionScreenX;
 		OutVector.y = SunPositionScreenY;
@@ -74,16 +159,21 @@ bool ZEATSun::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
-
-	Material = ZERNSunMaterial::CreateInstance();
-	Material->Initialize();
+	
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
 	return true;
 }
 
 bool ZEATSun::DeinitializeSelf()
 {
-	Material.Release();
+	DirtyFlags.RaiseAll();
+
+	VertexShader.Release();
+	PixelShader.Release();
+	RenderStateData.Release();
+
+	ConstantBuffer.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }
@@ -113,6 +203,16 @@ float ZEATSun::GetDiskRadius() const
 	return DiskRadius;
 }
 
+void ZEATSun::SetDensityBuffer(ZEGRTexture2D* DensityBuffer)
+{
+	this->DensityBuffer = DensityBuffer;
+}
+
+const ZEGRTexture2D* ZEATSun::GetDensityBuffer() const
+{
+	return DensityBuffer;
+}
+
 bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 {
 	const ZERNView& View = *CullParameters->View;
@@ -122,13 +222,23 @@ bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 		return false;
 
 	ZEVector2 SunSizeScreen = DiskRadius * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
+	float CosSunZenith = ZEVector3::DotProduct(Direction, ZEVector3::UnitY) * 0.5f + 0.5f;
 
-	Material->SetSunPositionScreen(SunPositionScreen);
-	Material->SetSunSizeScreen(SunSizeScreen);
-
-	Command.Entity = this;
-	Command.StageMask = Material->GetStageMask();
-	Command.Priority = 1;
+	if (Constants.PositionScreen != SunPositionScreen)
+	{
+		Constants.PositionScreen = SunPositionScreen;
+		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
+	}
+	if (Constants.SizeScreen != SunSizeScreen)
+	{
+		Constants.SizeScreen = SunSizeScreen;
+		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
+	}
+	if (Constants.CosZenith != CosSunZenith)
+	{
+		Constants.CosZenith = CosSunZenith;
+		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
+	}
 
 	CullParameters->Renderer->AddCommand(&Command);
 
@@ -137,27 +247,44 @@ bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 
 void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
+	if (!Update())
+		return;
+
 	ZEGRContext* Context = Parameters->Context;
 	ZERNStage* Stage = Parameters->Stage;
 
-	if (!Material->SetupMaterial(Context, Stage))
-		return;
+	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
-	const ZEGRTexture2D* ColorTexture = Stage->GetOutput(ZERN_SO_ACCUMULATION);
-	const ZEGRRenderTarget* RenderTarget = ColorTexture->GetRenderTarget();
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
-
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetRenderState(RenderStateData);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, DensityBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+
 	Context->Draw(4, 0);
 
-	Context->SetRenderTargets(0, NULL, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, NULL);
 
-	Material->CleanupMaterial(Context, Stage);
+	Context->SetRenderTargets(0, NULL, NULL);
 }
 
 ZEATSun::ZEATSun()
 {
-	Direction = ZEVector3(0.0f, -1.0f, 0.0f);
+	DirtyFlags.RaiseAll();
+
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.Priority = 1;
+
+	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
+	DiskRadius = 0.266f;
+
+	Constants.Intensity = 5.0f;
 }

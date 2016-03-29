@@ -115,3 +115,24 @@ class ZEGRRenderState
 												ZEGRRenderState(const ZEGRRenderState& RenderState);
 		virtual									~ZEGRRenderState();
 };
+
+class ZEGRComputeRenderStateData : public ZEReferenceCounted
+{
+	friend class ZEGRComputeRenderState;
+
+	protected:
+		virtual bool							Initialize(const ZEGRComputeRenderState& RenderState) = 0;
+};
+
+class ZEGRComputeRenderState
+{
+	private:
+		ZEHolder<ZEGRShader>					ComputeShader;
+	
+	public:
+		void									SetComputeShader(ZEGRShader* ComputeShader);
+		const ZEGRShader*						GetComputeShader() const;
+
+		ZEGRComputeRenderStateData*				Compile();
+
+};

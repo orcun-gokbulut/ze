@@ -37,44 +37,76 @@
 
 #include "ZEGame/ZEEntity.h"
 
+#include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
+#include "ZERenderer/ZERNMap.h"
 
-class ZERNMoonMaterial;
-class ZERNRenderParameters;
-struct ZERNCullParameters;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRTexture2D;
 
 class ZEATMoon : public ZEEntity
 {
 	private:
-		ZEHolder<ZERNMoonMaterial>	Material;
-		ZERNCommand					Command;
+		ZEFlags							DirtyFlags;
+		ZERNCommand						Command;
 
-		ZEVector3					Direction;
-		float						DiskRadius;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 
-		bool						CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector);
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		virtual bool				InitializeSelf();
-		virtual bool				DeinitializeSelf();
+		ZEHolder<const ZEGRTexture2D>	DensityBuffer;
+
+		ZERNMap							PhaseTexture;
+
+		ZEVector3						Direction;
+		float							DiskRadius;
+
+		struct 
+		{
+			ZEVector2					PositionScreen;
+			ZEVector2					SizeScreen;
+
+			float						Phase;
+			float						CosZenith;
+			float						Intensity;
+			float						Reserved;
+		} Constants;
+
+		bool							UpdateShaders();
+		bool							UpdateRenderStates();
+		bool							UpdateConstantBuffers();
+		bool							Update();
+
+		bool							CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 	public:
-		virtual ZEDrawFlags			GetDrawFlags() const;
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		void						SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
-		const ZEString&				GetTextureFile() const;
+		void							SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		const ZEString&					GetTextureFile() const;
 
-		void						SetDirection(const ZEVector3& Direction);
-		const ZEVector3&			GetDirection() const;
+		void							SetDirection(const ZEVector3& Direction);
+		const ZEVector3&				GetDirection() const;
 
-		void						SetDiskRadius(float DiskRadius);
-		float						GetDiskRadius() const;
+		void							SetDiskRadius(float DiskRadius);
+		float							GetDiskRadius() const;
 
-		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
-		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		void							SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
+		const ZEGRTexture2D*			GetDensityBuffer() const;
 
-									ZEATMoon();
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+										ZEATMoon();
 };

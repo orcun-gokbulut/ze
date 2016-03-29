@@ -45,9 +45,12 @@
 #define TILE_SIZE			(TILE_DIMENSION * TILE_DIMENSION)
 #define MAX_LIGHT			255
 
-#define ZE_LT_POINT			1
-#define ZE_LT_DIRECTIONAL	2
-	
+#define ZE_LT_NONE				0
+#define ZE_LT_POINT				1
+#define ZE_LT_DIRECTIONAL		2
+#define ZE_LT_PROJECTIVE		3
+#define ZE_LT_OMNIPROJECTIVE	4
+
 struct ZERNTiledDeferredShadingCompute_Cascade
 {
 	float4x4									ProjectionTransform;
@@ -55,34 +58,34 @@ struct ZERNTiledDeferredShadingCompute_Cascade
 	float4										Band;
 };
 
-cbuffer ZERNTiledDeferredShadingCompute_Constants													: register(b8)
+cbuffer ZERNTiledDeferredShadingCompute_Constants																	: register(b8)
 {
-	//ZERNShading_Light							ZERNTiledDeferredShadingCompute_Lights[MAX_LIGHT];
 	uint										ZERNTiledDeferredShadingCompute_LightCount;
 	float3										ZERNTiledDeferredShadingCompute_Reserved;
 };
 
-StructuredBuffer<ZERNShading_Light>				ZERNTiledDeferredShadingCompute_Lights				: register(t12);
-
-cbuffer ZERNTiledDeferredShadingCompute_CascadeConstants											: register(b9)
+cbuffer ZERNTiledDeferredShadingCompute_CascadeConstants															: register(b9)
 {
 	ZERNTiledDeferredShadingCompute_Cascade 	ZERNTiledDeferredShadingCompute_Cascades[4];
 	uint										ZERNTiledDeferredShadingCompute_CascadeCount;
 	float3										ZERNTiledDeferredShadingCompute_Reserved1;
 };
 
-SamplerComparisonState	ZERNTiledDeferredShadingCompute_SamplerComparisonLinearPointClamp			: register(s2);
-SamplerState			ZERNTiledDeferredShadingCompute_SamplerPointWrap							: register(s3);
+SamplerComparisonState							ZERNTiledDeferredShadingCompute_SamplerComparisonLinearPointClamp	: register(s2);
+SamplerState									ZERNTiledDeferredShadingCompute_SamplerPointWrap					: register(s3);
 
-RWTexture2D<float3>		ZERNTiledDeferredShadingCompute_OutputColorBuffer							: register(u0);
-Texture2DArray<float>	ZERNTiledDeferredShadingCompute_ShadowMaps									: register(t5);
-Texture2D<float2>		ZERNTiledDeferredShadingCompute_RandomVectors								: register(t8);
+StructuredBuffer<ZERNShading_Light>				ZERNTiledDeferredShadingCompute_Lights								: register(t12);
 
-groupshared uint		TileMinDepth;
-groupshared uint		TileMaxDepth;
-			
-groupshared uint		TileLightCount;
-groupshared uint		TileLightIndices[MAX_LIGHT];
+Texture2DArray<float>							ZERNTiledDeferredShadingCompute_ShadowMaps							: register(t5);
+TextureCube										ZERNTiledDeferredShadingCompute_OmniProjectionMap					: register(t7);
+Texture2D<float2>								ZERNTiledDeferredShadingCompute_RandomVectors						: register(t8);
+RWTexture2D<float3>								ZERNTiledDeferredShadingCompute_OutputColorBuffer					: register(u0);
+
+groupshared uint								TileMinDepth;
+groupshared uint								TileMaxDepth;
+
+groupshared uint								TileLightCount;
+groupshared uint								TileLightIndices[MAX_LIGHT];
 
 static const float2 ZERNTiledDeferredShadingCompute_PoissonDiskSamples[] = 
 {
@@ -152,7 +155,7 @@ float3 ZERNTiledDeferredShadingCompute_PointLighting(ZERNShading_Light PointLigh
 		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * DistanceAttenuation;
 	}
 	
-	return saturate(ResultColor);
+	return ResultColor;
 }
 
 float3 ZERNTiledDeferredShadingCompute_DirectionalLighting(ZERNShading_Light DirectionalLight, ZERNShading_Surface Surface)
@@ -206,6 +209,28 @@ float3 ZERNTiledDeferredShadingCompute_DirectionalLighting(ZERNShading_Light Dir
 	float ENdotL = saturate(CosSunZenith);
 	
 	float3 ResultColor = Surface.Diffuse * (AmbientColor * ENdotL + LightColor * NdotL * Visibility);
+	
+	return ResultColor;
+}
+
+float3 ZERNTiledDeferredShadingCompute_OmniProjectiveLighting(ZERNShading_Light OmniProjectiveLight, ZERNShading_Surface Surface)
+{	
+	float3 LightVectorView = OmniProjectiveLight.PositionView - Surface.PositionView;
+	float LightDistance = length(LightVectorView);
+	
+	float3 ResultColor = 0.0f;
+	
+	if(LightDistance < OmniProjectiveLight.Range)
+	{
+		OmniProjectiveLight.DirectionView = LightVectorView / LightDistance;
+		
+		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(OmniProjectiveLight, Surface);
+		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(OmniProjectiveLight, Surface);
+		
+		float DistanceAttenuation = 1.0f / dot(OmniProjectiveLight.Attenuation, float3(1.0f, LightDistance, LightDistance * LightDistance));
+		
+		ResultColor = (ResultDiffuse + ResultSpecular) * OmniProjectiveLight.Color * DistanceAttenuation;
+	}
 	
 	return ResultColor;
 }
@@ -275,13 +300,13 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 	for(uint LightIndex = GroupIndex; LightIndex < ZERNTiledDeferredShadingCompute_LightCount; LightIndex += TILE_SIZE)
 	{
 		bool InsideFrustum = true;
-		
 		ZERNShading_Light Light = ZERNTiledDeferredShadingCompute_Lights[LightIndex];
-		if (Light.Type == ZE_LT_POINT)
+		
+		if (Light.Type == ZE_LT_POINT || Light.Type == ZE_LT_OMNIPROJECTIVE)
 		{
 			for(uint I = 0; I < 6; I++)
 			{
-				if((dot(TileFrustumPlanes[I], float4(Light.PositionView, 1.0f))) < -Light.Range)
+				if(dot(TileFrustumPlanes[I], float4(Light.PositionView, 1.0f)) < -Light.Range)
 				{
 					InsideFrustum = false;
 					break;
@@ -320,6 +345,8 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 					ResultColor += ZERNTiledDeferredShadingCompute_PointLighting(CurrentLight, Surface);
 				else if (CurrentLight.Type == ZE_LT_DIRECTIONAL)
 					ResultColor += ZERNTiledDeferredShadingCompute_DirectionalLighting(CurrentLight, Surface);
+				else if (CurrentLight.Type == ZE_LT_OMNIPROJECTIVE)
+					ResultColor += ZERNTiledDeferredShadingCompute_OmniProjectiveLighting(CurrentLight, Surface);
 			}
 		}
 	}

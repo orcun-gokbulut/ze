@@ -64,16 +64,13 @@ float4 ZERNFastLightScattering_PixelShader_Main(float4 PositionViewport : SV_Pos
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	float3 ViewDirection = normalize(PositionWorld - ZERNView_Position);
 	
-	float3 SunDirectionWorld = -normalize(ZERNFastLightScattering_SunDirection);
-	float3 MoonDirectionWorld = -normalize(ZERNFastLightScattering_MoonDirection);
-	
 	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);	
 	float PrevTexCoordY = -1.0f;
-	float3 SunInscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, ZERNView_Position, ViewDirection, SunDirectionWorld, EarthCenter, PrevTexCoordY);
+	float3 SunInscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, ZERNView_Position, ViewDirection, ZERNFastLightScattering_SunDirection, EarthCenter, PrevTexCoordY);
 	SunInscattering *= ZERNFastLightScattering_SunColor;
 	
 	PrevTexCoordY = -1.0f;
-	float3 MoonInscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, ZERNView_Position, ViewDirection, SunDirectionWorld, EarthCenter, PrevTexCoordY);
+	float3 MoonInscattering = ZERNLightScatteringCommon_LookupPrecomputedScattering(ZERNFastLightScattering_ScatteringBuffer, ZERNView_Position, ViewDirection, ZERNFastLightScattering_MoonDirection, EarthCenter, PrevTexCoordY);
 	MoonInscattering *= ZERNFastLightScattering_MoonColor;
 	
 	float3 ResultColor = SunInscattering + MoonInscattering;
