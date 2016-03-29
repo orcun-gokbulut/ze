@@ -70,8 +70,8 @@ class ZESkyBrush : public ZEEntity
 
 		struct  
 		{
-			ZEVector3						SkyColor;
-			float							SkyBrightness;
+			ZEVector3						Color;
+			float							Brightness;
 		} Constants;
 
 		virtual bool						InitializeSelf();
@@ -87,14 +87,14 @@ class ZESkyBrush : public ZEEntity
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;
 
-		virtual void						SetSkyTexture(const ZEString& FileName);
-		const ZEString&						GetSkyTexture() const;
+		virtual void						SetTexture(const ZEString& FileName);
+		const ZEString&						GetTexture() const;
 	
-		virtual void						SetSkyBrightness(float Brightness);
-		float								GetSkyBrightness() const;
+		virtual void						SetBrightness(float Brightness);
+		float								GetBrightness() const;
 
-		virtual void						SetSkyColor(const ZEVector3& Color);
-		const ZEVector3&					GetSkyColor() const;
+		virtual void						SetColor(const ZEVector3& Color);
+		const ZEVector3&					GetColor() const;
 
 		virtual								~ZESkyBrush();
 

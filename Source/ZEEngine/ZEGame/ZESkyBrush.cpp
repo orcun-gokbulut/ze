@@ -62,37 +62,37 @@ ZEDrawFlags ZESkyBrush::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-void ZESkyBrush::SetSkyBrightness(float Brightness)
+void ZESkyBrush::SetBrightness(float Brightness)
 {
-	if (Constants.SkyBrightness == Brightness)
+	if (Constants.Brightness == Brightness)
 		return;
 
-	Constants.SkyBrightness = Brightness;
+	Constants.Brightness = Brightness;
 
 	DirtyFlags.RaiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
 }
 
-float ZESkyBrush::GetSkyBrightness() const
+float ZESkyBrush::GetBrightness() const
 {
-	return Constants.SkyBrightness;
+	return Constants.Brightness;
 }
 
-void ZESkyBrush::SetSkyColor(const ZEVector3& Color)
+void ZESkyBrush::SetColor(const ZEVector3& Color)
 {
-	if (Constants.SkyColor == Color)
+	if (Constants.Color == Color)
 		return;
 
-	Constants.SkyColor = Color;
+	Constants.Color = Color;
 
 	DirtyFlags.RaiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZESkyBrush::GetSkyColor() const
+const ZEVector3& ZESkyBrush::GetColor() const
 {
-	return Constants.SkyColor;
+	return Constants.Color;
 }
 
-void ZESkyBrush::SetSkyTexture(const ZEString& FileName)
+void ZESkyBrush::SetTexture(const ZEString& FileName)
 {
 	if (SkyTexture != NULL)
 	{
@@ -111,7 +111,7 @@ void ZESkyBrush::SetSkyTexture(const ZEString& FileName)
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
 }
 
-const ZEString& ZESkyBrush::GetSkyTexture() const
+const ZEString& ZESkyBrush::GetTexture() const
 {
 	if (SkyTexture == NULL)
 		return ZEString::Empty;
@@ -239,8 +239,8 @@ ZESkyBrush::ZESkyBrush()
 	DirtyFlags.RaiseAll();
 
 	SkyTexture = NULL;
-	Constants.SkyColor = ZEVector3::One;
-	Constants.SkyBrightness = 1.0f;
+	Constants.Color = ZEVector3::One;
+	Constants.Brightness = 1.0f;
 
 	SkyRenderCommand.Entity = this;
 	SkyRenderCommand.Priority = 2;

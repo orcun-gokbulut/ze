@@ -41,17 +41,17 @@
 
 cbuffer ZERNSkyBox_Constants						: register(b8)
 {
-	float3			ZERNSkyBox_SkyColor;
-	float			ZERNSkyBox_SkyBrightness;	
+	float3					ZERNSkyBox_Color;
+	float					ZERNSkyBox_Brightness;
 };
 
 cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
-	float4x4		ZERNSkyBox_WorldTransform;
+	float4x4				ZERNSkyBox_WorldTransform;
 };
 
-SamplerState		ZERNSkyBox_SamplerLinearWrap	: register(s0);
-TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
+SamplerState				ZERNSkyBox_SamplerLinearWrap	: register(s0);
+TextureCube<float3>			ZERNSkyBox_Texture				: register(t5);
 
 struct ZERNSkyBox_PixelShader_Input
 {
@@ -72,9 +72,11 @@ ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSI
 	return Output;
 }
 
-float3 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Target0
+float4 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Target0
 {
-	return ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, normalize(Input.CubeTexcoord), 0.0f);
+	float3 Sample = ZERNSkyBox_Texture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, normalize(Input.CubeTexcoord), 0.0f);
+	float Intensity = dot(Sample.rgb, float3(0.33, 0.34, 0.33));
+	return float4(ZERNSkyBox_Brightness * ZERNSkyBox_Color * Sample.rgb, 1.0f);
 }
 
 #endif
