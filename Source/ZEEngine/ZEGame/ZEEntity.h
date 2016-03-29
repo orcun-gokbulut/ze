@@ -134,6 +134,10 @@ class ZEEntity : public ZEObject
 		ZETaskResult							ManageStates(ZETaskThread* Thread, void* Parameters);
 		void									ManagetStatesSerial();
 
+		virtual bool							CheckParent(ZEEntity* Parent);
+		virtual bool							CheckComponent(ZEEntity* Parent);
+		virtual bool							CheckChildEntity(ZEEntity* Parent);
+
 		virtual bool							SetParent(ZEEntity* Parent);
 		void									SetScene(ZEScene* Scene);
 
