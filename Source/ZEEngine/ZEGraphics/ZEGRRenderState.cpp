@@ -186,3 +186,22 @@ ZEGRRenderState::~ZEGRRenderState()
 	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
 		Shaders[I].Release();
 }
+
+void ZEGRComputeRenderState::SetComputeShader(ZEGRShader* ComputeShader)
+{
+	this->ComputeShader = ComputeShader;
+}
+
+const ZEGRShader* ZEGRComputeRenderState::GetComputeShader() const
+{
+	return ComputeShader;
+}
+
+ZEGRComputeRenderStateData* ZEGRComputeRenderState::Compile()
+{
+	ZEGRComputeRenderStateData* RenderState = ZEGRGraphicsModule::GetInstance()->CreateComputeRenderStateData();
+	if (!RenderState->Initialize(*this))
+		return false;
+
+	return RenderState;
+}

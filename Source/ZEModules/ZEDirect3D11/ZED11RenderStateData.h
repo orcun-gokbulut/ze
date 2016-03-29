@@ -60,3 +60,12 @@ class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBa
 
 		virtual bool							Initialize(const ZEGRRenderState& RenderState);
 };
+
+class ZED11ComputeRenderStateData : public ZEGRComputeRenderStateData, public ZED11ComponentBase
+{
+	friend class ZED11Context;
+	private:
+		ZEHolder<const ZEGRShader>				ComputeShader;
+
+		virtual bool							Initialize(const ZEGRComputeRenderState& RenderState);
+};

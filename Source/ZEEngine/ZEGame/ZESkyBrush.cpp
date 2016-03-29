@@ -243,7 +243,7 @@ ZESkyBrush::ZESkyBrush()
 	Constants.SkyBrightness = 1.0f;
 
 	SkyRenderCommand.Entity = this;
-	SkyRenderCommand.Priority = 1;
+	SkyRenderCommand.Priority = 2;
 	SkyRenderCommand.StageMask = ZERN_STAGE_POST_EFFECT;
 }
 

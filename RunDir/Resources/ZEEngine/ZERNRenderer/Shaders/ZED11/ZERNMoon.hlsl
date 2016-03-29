@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNMoonMaterial.hlsl
+ Zinek Engine - ZERNMoon.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_MOON_MATERIAL_H__
-#define __ZERN_MOON_MATERIAL_H__
+#ifndef __ZERN_MOON_H__
+#define __ZERN_MOON_H__
 
 #include "ZERNTransformations.hlsl"
+#include "ZERNLightScatteringCommon.hlsl"
 
-cbuffer ZERNMoonMaterial_Constants	: register(b8)
+cbuffer ZERNMoon_Constants						: register(b8)
 {
-	float2	ZERNMoonMaterial_MoonPositionScreen;
-	float2	ZERNMoonMaterial_MoonSizeScreen;
-	float	ZERNMoonMaterial_MoonPhase;
-	float3	ZERNMoonMaterial_Reserved0;
+	float2		ZERNMoon_PositionScreen;
+	float2		ZERNMoon_SizeScreen;
+	
+	float		ZERNMoon_Phase;
+	float		ZERNMoon_CosZenith;
+	float		ZERNMoon_Intensity;
+	float		ZERNMoon_Reserved;
 };
 
-struct ZERNMoonMaterial_RenderMoon_VertexShader_Output
+struct ZERNMoon_VertexShader_Output
 {
-	float4 PositionProjection	: SV_Position;
-	float2 PositionProjectionXY	: TEXCOORD0;
-	float2 Texcoord				: TEXCOORD1;
+	float4		PositionProjection				: SV_Position;
+	float2		PositionProjectionXY			: TEXCOORD0;
+	float2		Texcoord						: TEXCOORD1;
 };
 
-struct ZERNMoonMaterial_RenderMoon_PixelShader_Input
+struct ZERNMoon_PixelShader_Input
 {
-	float4 PositionProjection	: SV_Position;
-	float2 PositionProjectionXY	: TEXCOORD0;
-	float2 Texcoord				: TEXCOORD1;
+	float4		PositionProjection				: SV_Position;
+	float2		PositionProjectionXY			: TEXCOORD0;
+	float2		Texcoord						: TEXCOORD1;
 };
 
-SamplerState	ZERNMoonMaterial_SamplerLinearClamp	: register(s0);
-Texture3D		ZERNMoonMaterial_MoonTexture		: register(t5);
+Texture3D<float3>	ZERNMoon_MoonTexture		: register(t5);
 
-ZERNMoonMaterial_RenderMoon_VertexShader_Output ZERNMoonMaterial_RenderMoon_VertexShader_Main(uint VertexID : SV_VertexID)
+ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_VertexID)
 {
 	float2 Vertex = ((VertexID & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
 	
-	float2 MoonVertexPositionScreen = ZERNMoonMaterial_MoonPositionScreen + Vertex * ZERNMoonMaterial_MoonSizeScreen;
+	float2 VertexPositionScreen = ZERNMoon_PositionScreen + Vertex * ZERNMoon_SizeScreen;
 	
-	ZERNMoonMaterial_RenderMoon_VertexShader_Output Output;
-	Output.PositionProjection = float4(MoonVertexPositionScreen, 0.0f, 1.0f);
-	Output.PositionProjectionXY = MoonVertexPositionScreen;
+	ZERNMoon_VertexShader_Output Output;
+	Output.PositionProjection = float4(VertexPositionScreen, 0.0f, 1.0f);
+	Output.PositionProjectionXY = VertexPositionScreen;
 	Output.Texcoord = (uint2(VertexID + 1, VertexID) & uint2(1, 2)) >> uint2(0, 1);
 	
 	return Output;
 }
 
-float4 ZERNMoonMaterial_RenderMoon_PixelShader_Main(ZERNMoonMaterial_RenderMoon_PixelShader_Input Input) : SV_Target0
+float3 ZERNMoon_PixelShader_Main(ZERNMoon_PixelShader_Input Input) : SV_Target0
 {	
-	float2 VectorScreen = (Input.PositionProjectionXY - ZERNMoonMaterial_MoonPositionScreen) / ZERNMoonMaterial_MoonSizeScreen;
-	if(dot(VectorScreen, VectorScreen) <= 1.0f)
-		return ZERNMoonMaterial_MoonTexture.SampleLevel(ZERNMoonMaterial_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoonMaterial_MoonPhase), 0.0f);
-	else
-		return 0.0f;
+	float2 VectorScreen = (Input.PositionProjectionXY - ZERNMoon_PositionScreen) / ZERNMoon_SizeScreen;
+	if (dot(VectorScreen, VectorScreen) <= 1.0f)
+	{
+		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNMoon_CosZenith, ZERNView_Position.y);
+		return ZERNMoon_Intensity * Extinction * ZERNMoon_MoonTexture.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
+	}
+	
+	return 0.0f;
 }
 
 #endif

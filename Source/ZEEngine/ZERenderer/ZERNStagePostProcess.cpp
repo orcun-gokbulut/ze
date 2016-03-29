@@ -68,20 +68,17 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	//ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
-	//ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
+	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
 
 	OutputTexture = GetPrevOutput(ZERN_SO_COLOR);
 
-	//if (OutputTexture == NULL || 
-	//	OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-	//{
-	//	OutputTexture.Release();
+	//if (OutputTexture == NULL)
 	//	OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	//}
+	//else
+	//	OutputTexture.Release();
 
-	//Context->ClearRenderTarget(OutputTexture->GetRenderTarget(), ZEVector4::Zero);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, OutputTexture->GetWidth(), OutputTexture->GetHeight()));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
 	return true;
 }

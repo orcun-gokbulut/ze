@@ -321,6 +321,11 @@ ZEGRRenderStateData* ZED11Module::CreateRenderStateData()
 	return new ZED11RenderStateData();
 }
 
+ZEGRComputeRenderStateData* ZED11Module::CreateComputeRenderStateData()
+{
+	return new ZED11ComputeRenderStateData();
+}
+
 ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
 {
 	return new ZED11ShaderCompiler();

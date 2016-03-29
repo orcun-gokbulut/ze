@@ -103,6 +103,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRTextureCube*				CreateTextureCube() = 0;
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler() = 0;
 		virtual ZEGRRenderStateData*			CreateRenderStateData() = 0;
+		virtual ZEGRComputeRenderStateData*		CreateComputeRenderStateData() = 0;
 
 		static ZEGRGraphicsModule*				GetInstance();
 };

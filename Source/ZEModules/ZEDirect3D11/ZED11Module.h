@@ -91,4 +91,5 @@ class ZED11Module : public ZEGRGraphicsModule
 		virtual ZEGRTextureCube*				CreateTextureCube();
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
 		virtual ZEGRRenderStateData*			CreateRenderStateData();
+		virtual ZEGRComputeRenderStateData*		CreateComputeRenderStateData();
 };

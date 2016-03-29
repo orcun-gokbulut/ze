@@ -214,6 +214,9 @@ float ZELight::GetShadowSampleLength() const
 
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!GetEnabled() || !GetVisible())
+		return false;
+
 	if(CastsShadows)
 	{
 		Command.StageMask |= ZERN_STAGE_SHADOWING;

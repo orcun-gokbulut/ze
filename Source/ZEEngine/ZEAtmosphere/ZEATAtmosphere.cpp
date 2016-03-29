@@ -67,7 +67,7 @@
 void ZEATAtmosphere::CreateRandomVectors()
 {
 	ZEVector4 SphereSamples[128];
-	for(ZEUInt I = 0; I < 128; I++)
+	for (ZEUInt I = 0; I < 128; I++)
 	{
 		float Z = ZERandom::GetFloatPositive() * 2.0f - 1.0f;
 		float Theta = ZERandom::GetFloatPositive() * ZE_PIx2;
@@ -86,7 +86,7 @@ void ZEATAtmosphere::CreateRandomVectors()
 
 bool ZEATAtmosphere::UpdateShaders()
 {
-	if(!DirtyFlags.GetFlags(ZEAT_ADF_SHADERS))
+	if (!DirtyFlags.GetFlags(ZEAT_ADF_SHADERS))
 		return true;
 
 	ZEGRShaderCompileOptions Options;
@@ -137,7 +137,7 @@ bool ZEATAtmosphere::UpdateShaders()
 
 bool ZEATAtmosphere::UpdateRenderState()
 {
-	if(!DirtyFlags.GetFlags(ZEAT_ADF_RENDER_STATE))
+	if (!DirtyFlags.GetFlags(ZEAT_ADF_RENDER_STATE))
 		return true;
 
 	ZEGRRenderState RenderState;
@@ -148,15 +148,14 @@ bool ZEATAtmosphere::UpdateRenderState()
 	ZEGRDepthStencilState DepthStencilStateNoTestWrite;
 	DepthStencilStateNoTestWrite.SetDepthTestEnable(true);
 	DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
-	DepthStencilStateNoTestWrite.SetDepthFunction(ZEGR_CF_GREATER_EQUAL);
 
 	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 
 	ZEGRBlendState BlendStateAlphaBlending;
 	BlendStateAlphaBlending.SetBlendEnable(true);
 	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlending = BlendStateAlphaBlending.GetRenderTarget(0);
-	BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
-	BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
+	BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_ONE);
+	BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
 	BlendRenderTargetAlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
 	BlendRenderTargetAlphaBlending.SetBlendEnable(true);
 	BlendStateAlphaBlending.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlending);
@@ -217,7 +216,7 @@ bool ZEATAtmosphere::UpdateRenderState()
 
 bool ZEATAtmosphere::UpdateConstantBuffers()
 {
-	if(!DirtyFlags.GetFlags(ZEAT_ADF_CONSTANT_BUFFER))
+	if (!DirtyFlags.GetFlags(ZEAT_ADF_CONSTANT_BUFFER))
 		return true;
 
 	SkyConstantBuffer->SetData(&Constants);
@@ -258,7 +257,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
 
-	for(ZEUInt I = 0; I < 1024; I++)
+	for (ZEUInt I = 0; I < 1024; I++)
 	{
 		ZEHolder<const ZEGRRenderTarget> RenderTarget = PrecomputedSingleScatteringBuffer->GetRenderTarget(I);
 		MultipleScatteringRenderTargets[I] = PrecomputedMultipleScatteringBuffer->GetRenderTarget(I);
@@ -274,7 +273,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		Context->Draw(3, 0);
 	}
 
-	for(ZEUInt S = 1; S < OrderCount; S++)
+	for (ZEUInt S = 1; S < OrderCount; S++)
 	{
 		for(ZEUInt J = 0; J < 1024; J++)
 		{
@@ -292,7 +291,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 			Context->Draw(3, 0);
 		}
 
-		for(ZEUInt J = 0; J < 1024; J++)
+		for (ZEUInt J = 0; J < 1024; J++)
 		{
 			ZEHolder<const ZEGRRenderTarget> RenderTarget = PrecomputedHighOrderInScatteringBuffer->GetRenderTarget(J);
 			PrecomputeConstants.IndexZ = ((float)(J % 64) + 0.5f) / 64.0f;
@@ -306,7 +305,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 			Context->Draw(3, 0);
 		}
 
-		for(ZEUInt J = 0; J < 1024; J++)
+		for (ZEUInt J = 0; J < 1024; J++)
 		{
 			ZEHolder<const ZEGRRenderTarget> RenderTarget = MultipleScatteringRenderTargets[J];
 			PrecomputeConstants.IndexZ = (float)J;
@@ -320,7 +319,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		}
 	}
 
-	for(ZEUInt K = 0; K < 1024; K++)
+	for (ZEUInt K = 0; K < 1024; K++)
 	{
 		ZEHolder<const ZEGRRenderTarget> RenderTarget = MultipleScatteringRenderTargets[K];
 		PrecomputeConstants.IndexZ = (float)K;
@@ -390,7 +389,7 @@ bool ZEATAtmosphere::InitializeSelf()
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT, true, false);
 	PrecomputedSkyAmbientBuffer = ZEGRTexture2D::CreateInstance(1024, 1, 1, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
 
-	SamplerLinearClamp = ZEGRSampler::GetSampler(ZEGRSamplerDescription());
+	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
 	Sun = new ZEATSun();
 	zeScene->AddEntity(Sun);
@@ -501,16 +500,15 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 
-	float CosSunAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -SunDirection);
-	bool SunVisible = CosSunAltitude >= ZEAngle::ToRadian(-0.833f);
+	float CosSunAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
+	bool SunVisible = CosSunAltitude >= 0.0f;
 
 	if (SunLight != NULL)
 	{
 		ZEQuaternion SunRotation;
-		ZEQuaternion::CreateFromDirection(SunRotation, SunDirection);
+		ZEQuaternion::CreateFromDirection(SunRotation, -SunDirection);
 		
 		SunLight->SetWorldRotation(SunRotation);
-
 		SunLight->SetVisible(SunVisible);
 	}
 
@@ -522,13 +520,13 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
 
-	float CosMoonAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, -MoonDirection);
+	float CosMoonAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, MoonDirection);
 	bool MoonVisible = CosMoonAltitude >= 0.0f;
 
 	if (MoonLight != NULL)
 	{
 		ZEQuaternion MoonRotation;
-		ZEQuaternion::CreateFromDirection(MoonRotation, MoonDirection);
+		ZEQuaternion::CreateFromDirection(MoonRotation, -MoonDirection);
 
 		MoonLight->SetWorldRotation(MoonRotation);
 		MoonLight->SetVisible(MoonVisible);
@@ -556,7 +554,8 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 		SunLight->SetDensityBuffer(PrecomputedDensityBuffer);
 
 		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * 5.0f;
-		Constants.SunDirection = SunLight->GetWorldRotation() * ZEVector3::UnitZ;
+		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
+		Constants.SunDirection.NormalizeSelf();
 
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
@@ -567,7 +566,8 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 		MoonLight->SetDensityBuffer(PrecomputedDensityBuffer);
 
 		Constants.MoonColor = MoonLight->GetColor() * MoonLight->GetIntensity() * 5.0f;
-		Constants.MoonDirection = MoonLight->GetWorldRotation() * ZEVector3::UnitZ;
+		Constants.MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
+		Constants.MoonDirection.NormalizeSelf();
 
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
@@ -589,6 +589,9 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	{
 		Precomputed = true;
 		PrecomputeBuffers(Context);
+
+		Sun->SetDensityBuffer(PrecomputedDensityBuffer);
+		Moon->SetDensityBuffer(PrecomputedDensityBuffer);
 	}
 
 	ZERNStage* Stage = Parameters->Stage;

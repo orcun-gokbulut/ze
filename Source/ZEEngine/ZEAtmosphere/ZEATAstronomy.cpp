@@ -631,7 +631,7 @@ ZEVector3 ZEATAstronomy::GetSunDirection(const ZEATObserver& Observer)
 
 	double ProjectionXZ = ZEAngle::Sin(RadianTopocentricZenith);
 
-	return -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
+	return ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
 }
 
 ZEVector3 ZEATAstronomy::GetMoonDirection(const ZEATObserver& Observer)
@@ -648,7 +648,7 @@ ZEVector3 ZEATAstronomy::GetMoonDirection(const ZEATObserver& Observer)
 
 	double ProjectionXZ = ZEAngle::Sin(RadianTopocentricZenith);
 
-	return -ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
+	return ZEVector3(ProjectionXZ * ZEAngle::Sin(RadianTopocentricAzimuth), ZEAngle::Cos(RadianTopocentricZenith), ProjectionXZ * ZEAngle::Cos(RadianTopocentricAzimuth));
 }
 
 void ZEATAstronomy::GetSunTransitSunriseSunsetTime(double& SunTransitTime, double& SunriseTime, double& SunsetTime, const ZEATObserver& Observer)

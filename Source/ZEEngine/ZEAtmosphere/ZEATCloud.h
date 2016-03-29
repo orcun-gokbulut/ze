@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECloud.h
+ Zinek Engine - ZEATCloud.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,15 +35,13 @@
 
 #pragma once
 
-#include "ZEEntity.h"
+#include "ZEGame/ZEEntity.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
-
-ZE_META_FORWARD_DECLARE(ZETexture2DResource, "ZETexture/ZETexture2DResource.h")
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -54,11 +52,10 @@ class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRDepthStencilBuffer;
 class ZEGRRenderTarget;
+class ZETexture2DResource;
 
-class ZECloud : public ZEEntity
+class ZEATCloud : public ZEEntity
 {
-	ZE_OBJECT
-
 	private:
 		ZEFlags							DirtyFlags;
 		ZERNCommand						RenderCommand;
@@ -101,7 +98,7 @@ class ZECloud : public ZEEntity
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
-										ZECloud();
+										ZEATCloud();
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
@@ -128,7 +125,7 @@ class ZECloud : public ZEEntity
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		virtual							~ZECloud();
+		virtual							~ZEATCloud();
 
-		static ZECloud*					CreateInstance();
+		static ZEATCloud*				CreateInstance();
 };

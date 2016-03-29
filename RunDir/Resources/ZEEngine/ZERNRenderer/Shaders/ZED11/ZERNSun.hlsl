@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNMoonMaterial.h
+ Zinek Engine - ZERNSun.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,70 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#ifndef __ZERN_SUN_H__
+#define __ZERN_SUN_H__
 
-#include "ZERNMaterial.h"
+#include "ZERNTransformations.hlsl"
+#include "ZERNLightScatteringCommon.hlsl"
 
-#include "ZEPointer/ZEHolder.h"
-#include "ZEDS/ZEFlags.h"
-#include "ZEMath/ZEVector.h"
-#include "ZERNMap.h"
-
-class ZEGRShader;
-class ZEGRRenderStateData;
-class ZEGRConstantBuffer;
-class ZEGRSampler;
-
-class ZERNMoonMaterial : public ZERNMaterial
+cbuffer ZERNSun_Constants				: register(b8)
 {
-	private:
-		mutable ZEFlags							DirtyFlags;
-
-		mutable ZEHolder<ZEGRShader>			VertexShader;
-		mutable ZEHolder<ZEGRShader>			PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
-
-		ZEHolder<ZEGRSampler>					SamplerLinerClamp;
-		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
-
-		ZERNMap									PhaseTexture;
-
-		struct 
-		{
-			ZEVector2							MoonPositionScreen;
-			ZEVector2							MoonSizeScreen;
-			float								MoonPhase;
-			ZEVector3							Reserved0;
-		} Constants;
-
-		bool									UpdateShaders() const;
-		bool									UpdateRenderState() const;
-		bool									UpdateConstantBuffer() const;
-
-		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
-
-												ZERNMoonMaterial();
-
-	public:
-		virtual ZEUInt							GetStageMask() const;
-
-		void									SetMoonPositionScreen(const ZEVector2& MoonPositionScreen);
-		const ZEVector2&						GetMoonPositionScreen() const;
-
-		void									SetMoonSizeScreen(const ZEVector2& MoonSizeScreen);
-		const ZEVector2&						GetMoonSizeScreen() const;
-
-		void									SetMoonPhase(float MoonPhase);
-		float									GetMoonPhase() const;
-
-		void									SetPhaseTextureFile(const ZEString& Filename, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount);
-		const ZEString&							GetPhaseTextureFile() const;
-
-		virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
-		virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
-
-		virtual bool							Update() const;
-
-		static ZEHolder<ZERNMoonMaterial>		CreateInstance();
+	float2	ZERNSun_PositionScreen;
+	float2	ZERNSun_SizeScreen;
+	
+	float	ZERNSun_CosZenith;
+	float	ZERNSun_Intensity;
+	float2	ZERNSun_Reserved;
 };
+
+struct ZERNSun_VertexShader_Output
+{
+	float4 PositionProjection			: SV_Position;
+	float2 PositionProjectionXY			: TEXCOORD0;
+};
+
+struct ZERNSun_PixelShader_Input
+{
+	float4 PositionProjection			: SV_Position;
+	float2 PositionProjectionXY			: TEXCOORD0;
+};
+
+ZERNSun_VertexShader_Output ZERNSun_VertexShader_Main(uint VertexID : SV_VertexID)
+{
+	float2 Vertex = ((VertexID & uint2(2, 1)) << uint2(0, 1)) - 1.0f;
+	
+	float2 VertexPositionScreen = ZERNSun_PositionScreen + Vertex * ZERNSun_SizeScreen;
+	
+	ZERNSun_VertexShader_Output Output;
+	Output.PositionProjection = float4(VertexPositionScreen, 0.0f, 1.0f);
+	Output.PositionProjectionXY = VertexPositionScreen;
+	
+	return Output;
+}
+
+float3 ZERNSun_PixelShader_Main(ZERNSun_PixelShader_Input Input) : SV_Target0
+{	
+	float2 VectorScreen = (Input.PositionProjectionXY - ZERNSun_PositionScreen) / ZERNSun_SizeScreen;
+	if (dot(VectorScreen, VectorScreen) <= 1.0f)
+	{
+		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNSun_CosZenith, ZERNView_Position.y);
+		return ZERNSun_Intensity * Extinction; 
+	}
+	
+	return 0.0f;
+}
+
+#endif

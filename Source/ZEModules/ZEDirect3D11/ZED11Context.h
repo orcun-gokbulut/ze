@@ -68,7 +68,8 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		ID3D11DeviceContext1*					GetContext() const;
 
 		virtual void							SetRenderState(const ZEGRRenderStateData* State);
-		
+		virtual void							SetComputeRenderState(const ZEGRComputeRenderStateData* State);
+
 		virtual void							SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers);
 		virtual void							SetIndexBuffer(const ZEGRIndexBuffer* Buffer);
 		

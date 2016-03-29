@@ -37,39 +37,69 @@
 
 #include "ZEGame/ZEEntity.h"
 
+#include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
 
-class ZERNSunMaterial;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRConstantBuffer;
+class ZEGRTexture2D;
 
 class ZEATSun : public ZEEntity
 {
 	private:
-		ZEHolder<ZERNSunMaterial>	Material;
-		ZERNCommand					Command;
+		ZEFlags							DirtyFlags;
+		ZERNCommand						Command;
 
-		ZEVector3					Direction;
-		float						DiskRadius;
+		ZEHolder<ZEGRShader>			VertexShader;
+		ZEHolder<ZEGRShader>			PixelShader;
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 
-		bool						CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector);
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		
+		ZEHolder<const ZEGRTexture2D>	DensityBuffer;
 
-		virtual bool				InitializeSelf();
-		virtual bool				DeinitializeSelf();
+		ZEVector3						Direction;
+		float							DiskRadius;
+
+		struct 
+		{
+			ZEVector2					PositionScreen;
+			ZEVector2					SizeScreen;
+
+			float						CosZenith;
+			float						Intensity;
+			ZEVector2					Reserved;
+		} Constants;
+
+		bool							UpdateShaders();
+		bool							UpdateRenderStates();
+		bool							UpdateConstantBuffers();
+		bool							Update();
+
+		bool							CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector);
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 	public:
-		virtual ZEDrawFlags			GetDrawFlags() const;
+		virtual ZEDrawFlags				GetDrawFlags() const;
 
-		void						SetDirection(const ZEVector3& Direction);
-		const ZEVector3&			GetDirection() const;
+		void							SetDirection(const ZEVector3& Direction);
+		const ZEVector3&				GetDirection() const;
 
-		void						SetDiskRadius(float DiskRadius);
-		float						GetDiskRadius() const;
+		void							SetDiskRadius(float DiskRadius);
+		float							GetDiskRadius() const;
 
-		virtual bool				PreRender(const ZERNCullParameters* CullParameters);
-		virtual void				Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		void							SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
+		const ZEGRTexture2D*			GetDensityBuffer() const;
 
-									ZEATSun();
+		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+										ZEATSun();
 };

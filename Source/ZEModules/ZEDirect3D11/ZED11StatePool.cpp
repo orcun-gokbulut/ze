@@ -550,9 +550,6 @@ ZED11StatePool::~ZED11StatePool()
 
 ZEHolder<const ZED11BlendState> ZED11StatePool::GetBlendState(const ZEGRBlendState& BlendState) const
 {
-	static ZELock CriticalSection;
-	CriticalSection.Lock();
-
 	ZEHolder<ZED11BlendState> Entry = static_cast<ZED11BlendState*>(FindPoolEntry(BlendStatePool, BlendState));
 	if (Entry == NULL)
 	{
@@ -560,19 +557,20 @@ ZEHolder<const ZED11BlendState> ZED11StatePool::GetBlendState(const ZEGRBlendSta
 		Entry->Owner = this;
 		Entry->State = BlendState;
 		Entry->Interface = CreateBlendState(BlendState);
-		BlendStatePool.AddEnd(Entry->Link);
-	}
 
-	CriticalSection.Unlock();
+		static ZELock CriticalSection;
+		CriticalSection.Lock();
+
+		BlendStatePool.AddEnd(Entry->Link);
+
+		CriticalSection.Unlock();
+	}
 
 	return Entry;
 }
 
 ZEHolder<const ZED11RasterizerState> ZED11StatePool::GetRasterizerState(const ZEGRRasterizerState& RasterizerState) const
 {
-	static ZELock CriticalSection;
-	CriticalSection.Lock();
-
 	ZED11RasterizerState* Entry = static_cast<ZED11RasterizerState*>(FindPoolEntry(RasterizerStatePool, RasterizerState));
 	if (Entry == NULL)
 	{
@@ -580,18 +578,19 @@ ZEHolder<const ZED11RasterizerState> ZED11StatePool::GetRasterizerState(const ZE
 		Entry->Owner = this;
 		Entry->State = RasterizerState;
 		Entry->Interface = CreateRasterizerState(RasterizerState);
-		RasterizerStatePool.AddEnd(Entry->Link);
-	}
 
-	CriticalSection.Unlock();
+		static ZELock CriticalSection;
+		CriticalSection.Lock();
+
+		RasterizerStatePool.AddEnd(Entry->Link);
+
+		CriticalSection.Unlock();
+	}
 	
 	return Entry;
 }
 ZEHolder<const ZED11DepthStencilState> ZED11StatePool::GetDepthStencilState(const ZEGRDepthStencilState& DepthStencilState) const
 {
-	static ZELock CriticalSection;
-	CriticalSection.Lock();
-
 	ZED11DepthStencilState* Entry = static_cast<ZED11DepthStencilState*>(FindPoolEntry(DepthStencilStatePool, DepthStencilState));
 	if (Entry == NULL)
 	{
@@ -599,23 +598,26 @@ ZEHolder<const ZED11DepthStencilState> ZED11StatePool::GetDepthStencilState(cons
 		Entry->Owner = this;
 		Entry->State = DepthStencilState;
 		Entry->Interface = CreateDepthStencilState(DepthStencilState);
-		DepthStencilStatePool.AddEnd(Entry->Link);
-	}
 
-	CriticalSection.Unlock();
+		static ZELock CriticalSection;
+		CriticalSection.Lock();
+
+		DepthStencilStatePool.AddEnd(Entry->Link);
+
+		CriticalSection.Unlock();
+	}
 
 	return Entry;
 }
 
 ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader) const
 {
-	static ZELock CriticalSection;
-	CriticalSection.Lock();
+	zeCheckCriticalError(VertexShader == NULL, NULL, "Vertex shader cannot be NULL");
+	zeCheckCriticalError(VertexShader->GetShaderType() != ZEGR_ST_VERTEX, NULL, "Wrong shader type.");
 
 	ZED11VertexLayout* Entry = NULL;
-	if(VertexLayout.GetElementCount() > 0 && VertexShader != NULL)
+	if(VertexLayout.GetElementCount() > 0)
 	{
-		zeDebugCheck(VertexShader->GetShaderType() != ZEGR_ST_VERTEX, "Wrong shader type.");
 
 		Entry = static_cast<ZED11VertexLayout*>(FindPoolEntry(VertexLayoutPool, VertexLayout));
 		if (Entry == NULL)
@@ -624,11 +626,15 @@ ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVert
 			Entry->Owner = this;
 			Entry->State = VertexLayout;
 			Entry->Interface =  CreateVertexLayout(VertexLayout, VertexShader);
+
+			static ZELock CriticalSection;
+			CriticalSection.Lock();
+
 			VertexLayoutPool.AddEnd(Entry->Link);
+
+			CriticalSection.Unlock();
 		}
 	}
-
-	CriticalSection.Unlock();
 
 	return Entry;
 }
