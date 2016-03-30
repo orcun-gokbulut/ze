@@ -81,6 +81,8 @@ ze_add_source(ZEGeographicEntity.cpp	Sources)
 ze_add_source(ZEGeographicEntity.h		Sources Headers ZEMC)
 ze_add_source(ZESector.cpp				Sources)
 ze_add_source(ZESector.h				Sources Headers ZEMC)
+ze_add_source(ZESectorManager.cpp		Sources)
+ze_add_source(ZESectorManager.h			Sources Headers ZEMC)
 ze_add_source(ZESectorSelector.cpp		Sources)
 ze_add_source(ZESectorSelector.h		Sources Headers ZEMC)
 

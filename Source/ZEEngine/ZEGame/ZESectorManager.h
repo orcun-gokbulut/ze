@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESector.h
+ Zinek Engine - ZESectorManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,51 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEEntity.h"
 
-#include "ZEGame/ZEGeographicEntity.h"
-#include "ZEFoundation/ZEGUID.h"
+class ZESector;
+class ZESectorSelector;
+class ZEGeographicEntity;
 
-class ZESector : public ZEGeographicEntity
+class ZESectorManager : public ZEEntity
 {
+	friend class ZEGeographicEntity;
 	ZE_OBJECT;
 
 	protected:
-		ZEGUID						GUID;
-		ZEString					SectorFile;
+		ZESector* 							OriginSector;
+		ZEArray<ZESector*>					Sectors;
+		ZEArray<ZESectorSelector*>			Selectors;
+		ZEArray<ZEGeographicEntity*>		GeographicEntities;
 
-		ZEArray<ZEGUID>				AdjacentSectorIds;
-		ZEInt8						AdjacencyDepth;
+		void								UpdateTransformation(ZEGeographicEntity* Entity);
+		void								UpdateTransformations();
+		void								UpdateActiveSectors();
 
-		virtual bool				SaveSector(ZEMLWriterNode* Serializer);
-		virtual bool				RestoreSector(ZEMLReaderNode* Unserializer);
+		virtual bool						InitializeSelf();
 
-		virtual bool				InitializeSelf();
-
-									ZESector();
+											ZESectorManager();
 
 	public:
-		void						SetGUID(const ZEGUID& GUID);
-		const ZEGUID&				GetGUID() const;
+		const ZEArray<ZESector*>&			GetSectors() const;
+		ZEArray<ZESector*>					GetSectors(const ZEVector3d& Position) const;
+		ZESector*							GetSector(const ZEGUID& Id) const;
+		ZESector*							GetSector(const ZEVector3d& Position, bool Proximity = false) const;
+		ZESector*							GetOriginSector();
+		bool								AddSector(ZESector* Sector);
+		void								RemoveSector(ZESector* Sector);
 
-		void						SetSectorFile(const ZEString& FileName);
-		const ZEString&				GetSectorFile() const;
+		const ZEArray<ZESectorSelector*>&	GetSelectors() const;
+		bool								AddSelector(ZESectorSelector* Selector);
+		void								RemoveSelector(ZESectorSelector* Selector);
 
-		bool						CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
-		const ZEArray<ZEGUID>&		GetAdjacentSectorIds() const;
-		bool						AddAdjacentSector(ZESector* Sector);
-		bool						RemoveAdjacentSector(ZESector* Sector);
-		
-		void						SetAdjacencyDepth(ZEInt8 Value);
-		ZEInt8						GetAdjacencyDepth() const;
+		const ZEArray<ZEGeographicEntity*>&	GetGeographicEntities() const;
+		bool								AddGeographicEntity(ZEGeographicEntity* Entity);
+		void								RemoveGeographicEntity(ZEGeographicEntity* Entity);
 
-		virtual bool				Save(ZEMLWriterNode* Serializer);
-		virtual bool				Restore(ZEMLReaderNode* Unserializer);
+		virtual void						Tick(float Time);
 
-		virtual void				Destroy();
+		virtual void						Destroy();
 
-		static ZESector*			CreateInstance();
+		static ZESectorManager*				CreateInstance();
 };
