@@ -34,13 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGeographicEntity.h"
+#include "ZESectorManager.h"
+
+#define ZE_GEDF_GEOGRAPHIC_TRANSFORM			0x0001
+#define ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM		0x0002
+
 
 bool ZEGeographicEntity::SetOwner(ZEEntity* Owner)
 {
-	if (!ZEClass::IsDerivedFrom(ZEGeographicEntity::Class(), Owner->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZESectorManager::Class(), Owner->GetClass()))
 		return false;
 
 	return ZEEntity::SetOwner(Owner);
+}
+
+void ZEGeographicEntity::GeographicTransformChanged()
+{
+	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM);
+
+	ZESectorManager* Owner = (ZESectorManager*)GetOwner();
+
+	if (Owner == NULL)
+		return;
+
+	Owner->UpdateTransformation(this);
 }
 
 ZEGeographicEntity::ZEGeographicEntity()
@@ -49,20 +66,15 @@ ZEGeographicEntity::ZEGeographicEntity()
 	GeographicRotation = ZEQuaternion::Identity;
 	GeographicScale = ZEVector3d::One;
 	GeographicTransform = ZEMatrix4x4d::Identity;
+	InvGeographicTransform = ZEMatrix4x4d::Identity;
 }
 
 const ZEMatrix4x4d& ZEGeographicEntity::GetGeographicTransform() const
 {
-	ZEMatrix4x4d TempGeographicTransform;
-	ZEMatrix4x4d::CreateOrientation(TempGeographicTransform, GeographicPosition, GeographicRotation, GeographicScale);
-
-	if (GetOwner() != NULL)
+	if (GeographicEntityDirtyFlags.GetFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM))
 	{
-		ZEMatrix4x4d::Multiply(GeographicTransform, ((ZEGeographicEntity*)GetOwner())->GetGeographicTransform(), TempGeographicTransform);
-	}
-	else
-	{
-		GeographicTransform = TempGeographicTransform;
+		ZEMatrix4x4d::CreateOrientation(GeographicTransform, GeographicPosition, GeographicRotation, GeographicScale);
+		GeographicEntityDirtyFlags.UnraiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM);
 	}
 
 	return GeographicTransform;
@@ -70,105 +82,45 @@ const ZEMatrix4x4d& ZEGeographicEntity::GetGeographicTransform() const
 
 const ZEMatrix4x4d& ZEGeographicEntity::GetInvGeographicTransform() const
 {
-	ZEMatrix4x4d::Inverse(InvGeographicTransform, GetGeographicTransform());
+	if (GeographicEntityDirtyFlags.GetFlags(ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM))
+	{
+		ZEMatrix4x4d::Inverse(InvGeographicTransform, GetGeographicTransform());
+		GeographicEntityDirtyFlags.UnraiseFlags(ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM);
+	}
+
 	return InvGeographicTransform;
 }
 
 void ZEGeographicEntity::SetGeographicPosition(const ZEVector3d& Position)
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
-
-	if (Owner != NULL)
-	{
-		ZEVector3d Result = Owner->GetInvGeographicTransform() * Position;
-		SetPosition(Result.ToVector3());
-		GeographicPosition = Result;
-	}
-	else
-	{
-		SetPosition(Position.ToVector3());
-		GeographicPosition = Position;
-	}
+	GeographicPosition = Position;
+	GeographicTransformChanged();
 }
 
 ZEVector3d ZEGeographicEntity::GetGeographicPosition() const
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
-
-	if (Owner != NULL)
-	{
-		ZEVector3d Temp;
-		ZEMatrix4x4d::Transform(Temp, Owner->GetGeographicTransform(), GeographicPosition);
-		return Temp;
-	}
-
 	return GeographicPosition;
 }
 
 void ZEGeographicEntity::SetGeographicRotation(const ZEQuaternion& Rotation)
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
-
-	if (Owner != NULL)
-	{
-		ZEQuaternion Temp, Result;
-		ZEQuaternion::Conjugate(Temp, Owner->GetGeographicRotation());
-		ZEQuaternion::Product(Result, Temp, Rotation);
-		SetRotation(Result);
-		GeographicRotation = Result;
-	}
-	else
-	{
-		SetRotation(Rotation);
-		GeographicRotation = Rotation;
-	}
+	GeographicRotation = Rotation;
+	GeographicTransformChanged();
 }
 
 ZEQuaternion ZEGeographicEntity::GetGeographicRotation() const
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
-
-	if (Owner != NULL)
-	{
-		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Owner->GetGeographicRotation(), GeographicRotation);
-		ZEQuaternion::Normalize(Temp, Temp);
-		return Temp;
-	}
-
 	return GeographicRotation;
 }
 
 void ZEGeographicEntity::SetGeographicScale(const ZEVector3d& Scale)
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
-
-	if (Owner != NULL)
-	{
-		ZEVector3d Temp;
-		ZEVector3d::Divide(Temp, Scale, Owner->GetGeographicScale());
-		SetScale(Temp.ToVector3());
-		GeographicScale = Temp;
-	}
-	else
-	{
-		SetScale(Scale.ToVector3());
-		GeographicScale = Scale;
-	}
-
+	GeographicScale = Scale;
+	GeographicTransformChanged();
 }
 
 ZEVector3d ZEGeographicEntity::GetGeographicScale() const
 {
-	ZEGeographicEntity* Owner = (ZEGeographicEntity*)GetOwner();
-
-	if (Owner != NULL)
-	{
-		ZEVector3d Temp;
-		ZEVector3d::Multiply(Temp, Owner->GetGeographicScale(), GeographicScale);
-		return Temp;
-	}
-
 	return GeographicScale;
 }
 

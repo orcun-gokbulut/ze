@@ -43,6 +43,8 @@ class ZEGeographicEntity : public ZEEntity
 {
 	ZE_OBJECT;
 	private:
+		mutable ZEFlags						GeographicEntityDirtyFlags;
+
 		ZEVector3d							GeographicPosition;
 		ZEQuaternion						GeographicRotation;
 		ZEVector3d							GeographicScale;
@@ -51,7 +53,9 @@ class ZEGeographicEntity : public ZEEntity
 		mutable ZEMatrix4x4d				InvGeographicTransform;
 
 	protected:
-		virtual bool						SetOwner(ZEEntity* Owner);
+		virtual	bool						SetOwner(ZEEntity* Owner);
+
+		virtual void						GeographicTransformChanged();
 
 											ZEGeographicEntity();
 

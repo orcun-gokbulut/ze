@@ -34,13 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESector.h"
-#include "ZEGame.h"
-#include "ZESectorSelector.h"
+#include "ZESectorManager.h"
 #include "ZEML\ZEMLWriter.h"
 #include "ZEML\ZEMLReader.h"
 #include "ZEFile\ZEPathInfo.h"
-#include "ZEDS\ZEFormat.h"
 #include "ZEFile\ZEPathManager.h"
+#include "ZEDS\ZEFormat.h"
 
 bool ZESector::SaveSector(ZEMLWriterNode* Serializer)
 {
@@ -109,14 +108,6 @@ bool ZESector::RestoreSector(ZEMLReaderNode* Unserializer)
 	return true;
 }
 
-bool ZESector::SetOwner(ZEEntity* Owner)
-{
-	if (Owner != NULL)
-		return false;
-
-	return ZEGeographicEntity::SetOwner(Owner);
-}
-
 bool ZESector::InitializeSelf()
 {
 // 	if (!SectorFile.IsEmpty())
@@ -149,7 +140,7 @@ bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
 
 	for (ZESize I = 0; I < SectorIds.GetCount(); I++)
 	{
-		CurrentSector = ZESector::FindSector(SectorIds[I]);
+		CurrentSector = ((ZESectorManager*)GetOwner())->GetSector(SectorIds[I]);
 
 		if (CheckAdjacency(CurrentSector, (Depth - 1)))
 			return true;
@@ -168,7 +159,7 @@ void ZESector::SetGUID(const ZEGUID& GUID)
 	this->GUID = GUID;
 }
 
-const ZEGUID& ZESector::GetGUID()
+const ZEGUID& ZESector::GetGUID() const
 {
 	return GUID;
 }
@@ -190,7 +181,6 @@ const ZEArray<ZEGUID>& ZESector::GetAdjacentSectorIds() const
 
 bool ZESector::AddAdjacentSector(ZESector* Sector)
 {
-
 	if (Sector == this)
 		return false;
 
@@ -220,17 +210,6 @@ bool ZESector::RemoveAdjacentSector(ZESector* Sector)
 	AdjacentSectorIds.RemoveValue(Sector->GetGUID());
 
 	return true;
-}
-
-ZESector* ZESector::FindSector(const ZEGUID& Id)
-{
-	const ZEArray<ZEEntity*>& Sectors = ZEGame::GetInstance()->GetScene()->GetEntities(ZESector::Class());
-
-	for (ZESize I = 0; I < Sectors.GetCount(); I++)
-		if (((ZESector*)Sectors[I])->GetGUID() == Id)
-			return (ZESector*)Sectors[I];
-
-	return NULL;
 }
 
 void ZESector::SetAdjacencyDepth(ZEInt8 Value)
