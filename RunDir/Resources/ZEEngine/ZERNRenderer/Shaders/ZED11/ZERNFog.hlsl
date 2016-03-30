@@ -51,10 +51,8 @@ cbuffer ZERNFog_Constants	: register(b8)
 };
 
 float4 ZERNFog_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
-{	
-	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
-	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy);
-	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, DepthHomogeneous);
+{
+	float3 PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy));
 	float3 PositionWorld = ZERNTransformations_ViewToWorld(float4(PositionView, 1.0f));
 	
 	float Distance = distance(ZERNView_Position, PositionWorld);
