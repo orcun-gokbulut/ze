@@ -184,7 +184,7 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 	}
 	
 	float3 AmbientColor = ZERNLightScatteringCommon_GetAmbientColor(DirectionalLight.CosZenith);
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(DirectionalLight.CosZenith, ZERNView_Position.y);
+	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(DirectionalLight.CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));
 	
 	float3 LightDiffuseColor = DirectionalLight.Color * Extinction;
 	float3 LightAmbientColor = DirectionalLight.Color * AmbientColor;
