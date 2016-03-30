@@ -155,11 +155,11 @@ ZEATFog::ZEATFog()
 	DirtyFlags.RaiseAll();
 
 	Command.Entity = this;
-	Command.Priority = 4;
+	Command.Priority = 5;
 	Command.StageMask = ZERN_STAGE_POST_EFFECT;
 
 	Constants.Density = 0.5f;
-	Constants.StartDistance = 10.0f;
+	Constants.StartDistance = 0.0f;
 	Constants.Color = ZEVector3(0.5f);
 }
 
