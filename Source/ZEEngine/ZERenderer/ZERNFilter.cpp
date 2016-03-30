@@ -64,12 +64,12 @@ bool ZERNFilter::InitializeSelf()
 
 	DirtyFlags.RaiseAll();
 
-	ZEGRSamplerDescription SamplerDescription;
-	SamplerDescription.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescription.MipFilter = ZEGR_TFM_POINT;
+	ZEGRSamplerDescription SamplerDescriptionPointClamp;
+	SamplerDescriptionPointClamp.MinFilter = ZEGR_TFM_POINT;
+	SamplerDescriptionPointClamp.MagFilter = ZEGR_TFM_POINT;
+	SamplerDescriptionPointClamp.MipFilter = ZEGR_TFM_POINT;
 
-	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescription);
+	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescriptionPointClamp);
 
 	return Update();
 }
