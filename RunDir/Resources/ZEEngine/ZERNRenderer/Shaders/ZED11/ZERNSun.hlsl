@@ -79,7 +79,7 @@ float3 ZERNSun_PixelShader_Main(ZERNSun_PixelShader_Input Input) : SV_Target0
 	float2 VectorScreen = (Input.PositionProjectionXY - ZERNSun_PositionScreen) / ZERNSun_SizeScreen;
 	if (dot(VectorScreen, VectorScreen) <= 1.0f)
 	{
-		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNSun_CosZenith, ZERNView_Position.y);
+		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNSun_CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));
 		return ZERNSun_Intensity * Extinction;
 	}
 	

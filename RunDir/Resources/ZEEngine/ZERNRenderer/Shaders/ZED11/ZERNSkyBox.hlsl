@@ -77,7 +77,7 @@ float3 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Targ
 {
 	float3 Direction = normalize(Input.CubeTexcoord);
 	float CosZenith = dot(Direction, float3(0.0f, 1.0f, 0.0f)) * 0.5f + 0.5f;
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(CosZenith, ZERNView_Position.y);
+	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));
 	
 	return ZERNSkyBox_SkyBrightness * Extinction * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, Direction, 0.0f);
 }
