@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.cpp
+ Zinek Engine - ZEATSkyBox.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZESkyBrush.h"
+#include "ZEATSkyBox.h"
 
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRShader.h"
@@ -50,49 +50,59 @@
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
-#include "ZETexture/ZETextureCubeResource.h"
 #include "ZERenderer/ZERNStagePostProcess.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
-#define	ZERN_SBDF_SHADERS			1
-#define	ZERN_SBDF_RENDER_STATE		2
-#define	ZERN_SBDF_CONSTANT_BUFFER	4
+#define	ZEAT_SBDF_SHADERS			1
+#define	ZEAT_SBDF_RENDER_STATE		2
+#define	ZEAT_SBDF_CONSTANT_BUFFER	4
 
-ZEDrawFlags ZESkyBrush::GetDrawFlags() const
+ZEDrawFlags ZEATSkyBox::GetDrawFlags() const
 {
 	return ZE_DF_DRAW;
 }
 
-void ZESkyBrush::SetBrightness(float Brightness)
+void ZEATSkyBox::SetBrightness(float Brightness)
 {
 	if (Constants.Brightness == Brightness)
 		return;
 
 	Constants.Brightness = Brightness;
 
-	DirtyFlags.RaiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
 }
 
-float ZESkyBrush::GetBrightness() const
+float ZEATSkyBox::GetBrightness() const
 {
 	return Constants.Brightness;
 }
 
-void ZESkyBrush::SetColor(const ZEVector3& Color)
+void ZEATSkyBox::SetColor(const ZEVector3& Color)
 {
 	if (Constants.Color == Color)
 		return;
 
 	Constants.Color = Color;
 
-	DirtyFlags.RaiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZESkyBrush::GetColor() const
+const ZEVector3& ZEATSkyBox::GetColor() const
 {
 	return Constants.Color;
 }
 
-void ZESkyBrush::SetTexture(const ZEString& FileName)
+void ZEATSkyBox::SetDensityBuffer(ZEGRTexture2D* DensityBuffer)
+{
+	this->DensityBuffer = DensityBuffer;
+}
+
+const ZEGRTexture2D* ZEATSkyBox::GetDensityBuffer() const
+{
+	return DensityBuffer;
+}
+
+void ZEATSkyBox::SetTexture(const ZEString& FileName)
 {
 	if (SkyTexture != NULL)
 	{
@@ -111,7 +121,7 @@ void ZESkyBrush::SetTexture(const ZEString& FileName)
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
 }
 
-const ZEString& ZESkyBrush::GetTexture() const
+const ZEString& ZEATSkyBox::GetTexture() const
 {
 	if (SkyTexture == NULL)
 		return ZEString::Empty;
@@ -119,11 +129,12 @@ const ZEString& ZESkyBrush::GetTexture() const
 	return SkyTexture->GetFileName();
 }
 
-bool ZESkyBrush::InitializeSelf()
+bool ZEATSkyBox::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
+	ZECanvas SkyBox;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
 	VertexBuffer = SkyBox.CreateVertexBuffer();
 
@@ -133,15 +144,22 @@ bool ZESkyBrush::InitializeSelf()
 	ZEGRSamplerDescription SamplerDescriptionLinearWrap;
 	SamplerDescriptionLinearWrap.AddressU = ZEGR_TAM_WRAP;
 	SamplerDescriptionLinearWrap.AddressV = ZEGR_TAM_WRAP;
-	SamplerDescriptionLinearWrap.AddressW = ZEGR_TAM_WRAP;
 	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerDescriptionLinearWrap);
 
 	return true;
 }
 
-bool ZESkyBrush::DeinitializeSelf()
+bool ZEATSkyBox::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
+
+	VertexShader.Release();
+	PixelShader.Release();
+	RenderStateData.Release();
+	VertexBuffer.Release();
+	ConstantBuffer.Release();
+	ConstantBufferTransform.Release();
+	SamplerLinearWrap.Release();
 
 	if (SkyTexture != NULL)
 	{
@@ -152,9 +170,9 @@ bool ZESkyBrush::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-bool ZESkyBrush::UpdateShaders()
+bool ZEATSkyBox::UpdateShaders()
 {
-	if (!DirtyFlags.GetFlags(ZERN_SBDF_SHADERS))
+	if (!DirtyFlags.GetFlags(ZEAT_SBDF_SHADERS))
 		return true;
 
 	ZEGRShaderCompileOptions Options;
@@ -171,15 +189,15 @@ bool ZESkyBrush::UpdateShaders()
 	PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Skybox pixel shader cannot compile");
 
-	DirtyFlags.UnraiseFlags(ZERN_SBDF_SHADERS);
-	DirtyFlags.RaiseFlags(ZERN_SBDF_RENDER_STATE);
+	DirtyFlags.UnraiseFlags(ZEAT_SBDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_RENDER_STATE);
 	
 	return true;
 }
 
-bool ZESkyBrush::UpdateRenderStates()
+bool ZEATSkyBox::UpdateRenderStates()
 {
-	if (!DirtyFlags.GetFlags(ZERN_SBDF_RENDER_STATE))
+	if (!DirtyFlags.GetFlags(ZEAT_SBDF_RENDER_STATE))
 		return true;
 
 	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
@@ -203,24 +221,24 @@ bool ZESkyBrush::UpdateRenderStates()
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL,false, "Skybox render state cannot compile");
 
-	DirtyFlags.UnraiseFlags(ZERN_SBDF_RENDER_STATE);
+	DirtyFlags.UnraiseFlags(ZEAT_SBDF_RENDER_STATE);
 
 	return true;
 }
 
-bool ZESkyBrush::UpdateConstantBuffers()
+bool ZEATSkyBox::UpdateConstantBuffers()
 {
-	if (!DirtyFlags.GetFlags(ZERN_SBDF_CONSTANT_BUFFER))
+	if (!DirtyFlags.GetFlags(ZEAT_SBDF_CONSTANT_BUFFER))
 		return true;
 
 	ConstantBuffer->SetData(&Constants);
 
-	DirtyFlags.UnraiseFlags(ZERN_SBDF_CONSTANT_BUFFER);
+	DirtyFlags.UnraiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
 
 	return true;
 }
 
-bool ZESkyBrush::Update()
+bool ZEATSkyBox::Update()
 {
 	if (!UpdateShaders())
 		return false;
@@ -234,7 +252,7 @@ bool ZESkyBrush::Update()
 	return true;
 }
 
-ZESkyBrush::ZESkyBrush()
+ZEATSkyBox::ZEATSkyBox()
 {
 	DirtyFlags.RaiseAll();
 
@@ -243,23 +261,26 @@ ZESkyBrush::ZESkyBrush()
 	Constants.Brightness = 1.0f;
 
 	SkyRenderCommand.Entity = this;
-	SkyRenderCommand.Priority = 2;
+	SkyRenderCommand.Priority = 1;
 	SkyRenderCommand.StageMask = ZERN_STAGE_POST_EFFECT;
 }
 
-ZESkyBrush::~ZESkyBrush()
+ZEATSkyBox::~ZEATSkyBox()
 {
 
 }
 
-bool ZESkyBrush::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATSkyBox::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
 	CullParameters->Renderer->AddCommand(&SkyRenderCommand);
 
 	return true;
 }
 
-void ZESkyBrush::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	if (!Update())
 		return;
@@ -274,26 +295,31 @@ void ZESkyBrush::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferTransform);
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture->GetTexture());
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, DensityBuffer);
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	Context->Draw(VertexBuffer->GetVertexCount(), 0);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
+	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);
 }
 
-ZESkyBrush* ZESkyBrush::CreateInstance()
+ZEATSkyBox* ZEATSkyBox::CreateInstance()
 {
-	return new ZESkyBrush();
+	return new ZEATSkyBox();
 }

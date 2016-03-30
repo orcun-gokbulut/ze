@@ -220,6 +220,9 @@ const ZEVector3& ZEATFog::GetColor() const
 
 bool ZEATFog::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
 	CullParameters->Renderer->AddCommand(&Command);
 
 	return true;

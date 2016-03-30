@@ -139,8 +139,8 @@ bool ZEATSun::CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVec
 	ZEVector3 SunDirectionView;
 	Direction.NormalizeSelf();
 	ZEMatrix4x4::Transform3x3(SunDirectionView, View.ViewTransform, Direction);
-	float SunPositionScreenX = SunDirectionView.x * View.ProjectionTransform.M11 / SunDirectionView.z;
-	float SunPositionScreenY = SunDirectionView.y * View.ProjectionTransform.M22 / SunDirectionView.z;
+	float SunPositionScreenX = (SunDirectionView.x * View.ProjectionTransform.M11 + SunDirectionView.z * View.ProjectionTransform.M13) / SunDirectionView.z;
+	float SunPositionScreenY = (SunDirectionView.y * View.ProjectionTransform.M22 + SunDirectionView.z * View.ProjectionTransform.M23) / SunDirectionView.z;
 
 	if (SunPositionScreenX >= -1.0f && SunPositionScreenX <= 1.0f &&
 		SunPositionScreenY >= -1.0f && SunPositionScreenY <= 1.0f &&
@@ -176,6 +176,25 @@ bool ZEATSun::DeinitializeSelf()
 	ConstantBuffer.Release();
 
 	return ZEEntity::DeinitializeSelf();
+}
+
+ZEATSun::ZEATSun()
+{
+	DirtyFlags.RaiseAll();
+
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.Priority = 2;
+
+	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
+	DiskRadius = 0.266f;
+
+	Constants.Intensity = 10.0f;
+}
+
+ZEATSun::~ZEATSun()
+{
+
 }
 
 ZEDrawFlags ZEATSun::GetDrawFlags() const
@@ -215,6 +234,9 @@ const ZEGRTexture2D* ZEATSun::GetDensityBuffer() const
 
 bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
 	const ZERNView& View = *CullParameters->View;
 
 	ZEVector2 SunPositionScreen;
@@ -275,16 +297,7 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 
-ZEATSun::ZEATSun()
+ZEATSun* ZEATSun::CreateInstance()
 {
-	DirtyFlags.RaiseAll();
-
-	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_POST_EFFECT;
-	Command.Priority = 1;
-
-	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
-	DiskRadius = 0.266f;
-
-	Constants.Intensity = 5.0f;
+	return new ZEATSun();
 }

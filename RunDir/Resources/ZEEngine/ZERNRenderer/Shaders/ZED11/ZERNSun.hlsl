@@ -80,9 +80,10 @@ float3 ZERNSun_PixelShader_Main(ZERNSun_PixelShader_Input Input) : SV_Target0
 	if (dot(VectorScreen, VectorScreen) <= 1.0f)
 	{
 		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNSun_CosZenith, ZERNView_Position.y);
-		return ZERNSun_Intensity * Extinction; 
+		return ZERNSun_Intensity * Extinction;
 	}
 	
+	discard;
 	return 0.0f;
 }
 

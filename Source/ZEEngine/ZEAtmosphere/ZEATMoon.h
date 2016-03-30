@@ -89,9 +89,9 @@ class ZEATMoon : public ZEEntity
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
-
-		
+	
 										ZEATMoon();
+		virtual							~ZEATMoon();
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
@@ -112,5 +112,4 @@ class ZEATMoon : public ZEEntity
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEATMoon*				CreateInstance();
-
 };

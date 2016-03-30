@@ -214,7 +214,7 @@ float ZELight::GetShadowSampleLength() const
 
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 {
-	if (!GetEnabled() || !GetVisible())
+	if (!ZEEntity::PreRender(CullParameters))
 		return false;
 
 	if(CastsShadows)

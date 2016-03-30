@@ -52,6 +52,9 @@ class ZEGRTexture2D;
 class ZEGRTexture3D;
 class ZEATSun;
 class ZEATMoon;
+class ZEATFog;
+class ZEATCloud;
+class ZEATSkyBox;
 
 class ZEATAtmosphere : public ZEEntity
 {
@@ -62,6 +65,9 @@ class ZEATAtmosphere : public ZEEntity
 
 		ZEATSun*						Sun;
 		ZEATMoon*						Moon;
+		ZEATFog*						Fog;
+		ZEATCloud*						Cloud;
+		ZEATSkyBox*						Stars;
 
 		ZEHolder<ZEGRShader>			ScreenCoverVertexShader;
 
@@ -99,6 +105,9 @@ class ZEATAtmosphere : public ZEEntity
 		ZEUInt							OrderCount;
 		bool							UseMultipleScattering;
 
+		ZELightDirectional*				SunLight;
+		ZELightDirectional*				MoonLight;
+
 		struct
 		{
 			ZEVector3					SunDirection;
@@ -118,9 +127,6 @@ class ZEATAtmosphere : public ZEEntity
 			float						IndexW;
 			ZEVector2					Reserved0;
 		} PrecomputeConstants;
-
-		ZELightDirectional*				SunLight;
-		ZELightDirectional*				MoonLight;
 
 		void							CreateRandomVectors();
 
@@ -151,6 +157,15 @@ class ZEATAtmosphere : public ZEEntity
 
 		void							SetMoonLight(ZELightDirectional* MoonLight);
 		ZELightDirectional*				GetMoonLight();
+
+		void							SetCloudCoverage(float CloudCoverage);
+		float							GetCloudCoverage() const;
+
+		void							SetCloudDensity(float CloudDensity);
+		float							GetCloudDensity() const;
+
+		void							SetFogDensity(float FogDensity);
+		float							GetFogDensity() const;
 
 		virtual void					Tick(float Time);
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);

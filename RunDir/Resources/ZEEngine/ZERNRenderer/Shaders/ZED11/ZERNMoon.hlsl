@@ -64,7 +64,7 @@ struct ZERNMoon_PixelShader_Input
 	float2		Texcoord						: TEXCOORD1;
 };
 
-Texture3D<float3>	ZERNMoon_MoonTexture		: register(t5);
+Texture3D		ZERNMoon_MoonTexture			: register(t5);
 
 ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_VertexID)
 {
@@ -82,14 +82,10 @@ ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_Verte
 
 float3 ZERNMoon_PixelShader_Main(ZERNMoon_PixelShader_Input Input) : SV_Target0
 {	
-	float2 VectorScreen = (Input.PositionProjectionXY - ZERNMoon_PositionScreen) / ZERNMoon_SizeScreen;
-	if (dot(VectorScreen, VectorScreen) <= 1.0f)
-	{
-		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNMoon_CosZenith, ZERNView_Position.y);
-		return ZERNMoon_Intensity * Extinction * ZERNMoon_MoonTexture.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
-	}
-	
-	return 0.0f;
+	float4 PixelColor = ZERNMoon_MoonTexture.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
+	clip(PixelColor.a - 0.1f);
+	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNMoon_CosZenith, ZERNView_Position.y);	
+	return ZERNMoon_Intensity * Extinction * PixelColor.rgb;
 }
 
 #endif
