@@ -35,6 +35,7 @@
 
 #include "ZEATCloud.h"
 
+#include "ZEMath/ZEMath.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderState.h"
@@ -266,9 +267,15 @@ ZEATCloud::ZEATCloud()
 	Constants.PlaneSubdivision = 10.0f;
 	Constants.CloudCoverage = 0.5f;
 	Constants.CloudDensity = 1.0f;
-	Constants.LightDirection = ZEVector3(-1.0f);
+	Constants.LightDirection = ZEVector3(1.0f);
 	Constants.LightIntensity = 5.0f;
 	Constants.Translation = ZEVector2(0.0f, 0.0f);
+	Constants.Inscattering = 0.05f;
+}
+
+ZEATCloud::~ZEATCloud()
+{
+
 }
 
 ZEDrawFlags ZEATCloud::GetDrawFlags() const
@@ -298,6 +305,8 @@ const ZEString& ZEATCloud::GetCloudTexture() const
 
 void ZEATCloud::SetCloudCoverage(float CloudCoverage)
 {
+	CloudCoverage = ZEMath::Max(0.0f, CloudCoverage);
+
 	if (Constants.CloudCoverage == CloudCoverage)
 		return;
 
@@ -313,6 +322,8 @@ float ZEATCloud::GetCloudCoverage() const
 
 void ZEATCloud::SetCloudDensity(float CloudDensity)
 {
+	CloudDensity = ZEMath::Max(0.0f, CloudDensity);
+
 	if (Constants.CloudDensity == CloudDensity)
 		return;
 
@@ -371,6 +382,31 @@ const ZEVector2& ZEATCloud::GetTranslation() const
 	return Constants.Translation;
 }
 
+void ZEATCloud::SetDensityBuffer(ZEGRTexture2D* DensityBuffer)
+{
+	this->DensityBuffer = DensityBuffer;
+}
+
+const ZEGRTexture2D* ZEATCloud::GetDensityBuffer() const
+{
+	return DensityBuffer;
+}
+
+void ZEATCloud::SetInscattering(float Inscattering)
+{
+	if (Constants.Inscattering == Inscattering)
+		return;
+
+	Constants.Inscattering = Inscattering;
+
+	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+}
+
+float ZEATCloud::GetInscattering() const
+{
+	return Constants.Inscattering;
+}
+
 void ZEATCloud::Tick(float Time)
 {
 	static ZEVector2 Translation = ZEVector2(0.0f, 0.0f);
@@ -387,6 +423,16 @@ void ZEATCloud::Tick(float Time)
 
 bool ZEATCloud::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
+	float CosLightZenith = ZEVector3::DotProduct(-Constants.LightDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
+	if (Constants.CosLightZenith != CosLightZenith)
+	{
+		Constants.CosLightZenith = CosLightZenith;
+		DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+	}
+
 	CullParameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
@@ -412,8 +458,10 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
 	Context->SetRenderState(PlaneRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, CloudTexture->GetTexture());
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, DensityBuffer);
 	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
 
 	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
@@ -425,11 +473,6 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
 	Context->SetVertexBuffers(0, 0, NULL);
-}
-
-ZEATCloud::~ZEATCloud()
-{
-
 }
 
 ZEATCloud* ZEATCloud::CreateInstance()

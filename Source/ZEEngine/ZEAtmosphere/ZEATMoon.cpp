@@ -140,8 +140,8 @@ bool ZEATMoon::CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutV
 	ZEVector3 MoonDirectionView;
 	Direction.NormalizeSelf();
 	ZEMatrix4x4::Transform3x3(MoonDirectionView, View.ViewTransform, Direction);
-	float MoonPositionScreenX = MoonDirectionView.x * View.ProjectionTransform.M11 / MoonDirectionView.z;
-	float MoonPositionScreenY = MoonDirectionView.y * View.ProjectionTransform.M22 / MoonDirectionView.z;
+	float MoonPositionScreenX = (MoonDirectionView.x * View.ProjectionTransform.M11 + MoonDirectionView.z * View.ProjectionTransform.M13) / MoonDirectionView.z;
+	float MoonPositionScreenY = (MoonDirectionView.y * View.ProjectionTransform.M22 + MoonDirectionView.z * View.ProjectionTransform.M23) / MoonDirectionView.z;
 
 	if (MoonPositionScreenX >= -1.0f && MoonPositionScreenX <= 1.0f &&
 		MoonPositionScreenY >= -1.0f && MoonPositionScreenY <= 1.0f &&
@@ -177,6 +177,26 @@ bool ZEATMoon::DeinitializeSelf()
 	ConstantBuffer.Release();
 
 	return ZEEntity::DeinitializeSelf();
+}
+
+ZEATMoon::ZEATMoon()
+{
+	DirtyFlags.RaiseAll();
+
+	Command.Entity = this;
+	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.Priority = 2;
+
+	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
+	DiskRadius = 0.257f;
+
+	Constants.Phase = 31.5f / 53.0f;
+	Constants.Intensity = 1.0f;
+}
+
+ZEATMoon::~ZEATMoon()
+{
+
 }
 
 ZEDrawFlags ZEATMoon::GetDrawFlags() const
@@ -229,6 +249,9 @@ const ZEString& ZEATMoon::GetTextureFile() const
 
 bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
 	const ZERNView& View = *CullParameters->View;
 
 	ZEVector2 MoonPositionScreen;
@@ -294,19 +317,4 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 ZEATMoon* ZEATMoon::CreateInstance()
 {
 	return new ZEATMoon();
-}
-
-ZEATMoon::ZEATMoon()
-{
-	DirtyFlags.RaiseAll();
-
-	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_POST_EFFECT;
-	Command.Priority = 1;
-
-	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
-	DiskRadius = 0.257f;
-
-	Constants.Phase = 31.5f / 53.0f;
-	Constants.Intensity = 1.0f;
 }

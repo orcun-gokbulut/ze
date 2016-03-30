@@ -71,6 +71,7 @@ class ZEATCloud : public ZEEntity
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZEHolder<ZEGRSampler>			SamplerLinearWrap;
+		ZEHolder<const ZEGRTexture2D>	DensityBuffer;
 
 		ZETexture2DResource*			CloudTexture;
 
@@ -79,13 +80,14 @@ class ZEATCloud : public ZEEntity
 			float						PlaneSubdivision;
 			float						CloudCoverage;
 			float						CloudDensity;
-			float						Reserved;
+			float						CosLightZenith;
 
 			ZEVector3					LightDirection;
 			float						LightIntensity;
 
 			ZEVector2					Translation;
-			ZEVector2					Reserved1;
+			float						Inscattering;
+			float						Reserved;
 		} Constants;
 
 		void							CreatePlane();
@@ -99,6 +101,7 @@ class ZEATCloud : public ZEEntity
 		virtual bool					DeinitializeSelf();
 
 										ZEATCloud();
+		virtual							~ZEATCloud();
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
@@ -121,11 +124,15 @@ class ZEATCloud : public ZEEntity
 		void							SetTranslation(const ZEVector2& Translation);
 		const ZEVector2&				GetTranslation() const;
 
+		void							SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
+		const ZEGRTexture2D*			GetDensityBuffer() const;
+
+		void							SetInscattering(float Inscattering);
+		float							GetInscattering() const;
+
 		virtual void					Tick(float Time);
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
-
-		virtual							~ZEATCloud();
 
 		static ZEATCloud*				CreateInstance();
 };

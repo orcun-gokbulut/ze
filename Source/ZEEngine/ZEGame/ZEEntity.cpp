@@ -576,7 +576,7 @@ void ZEEntity::Tick(float Time)
 
 bool ZEEntity::PreRender(const ZERNCullParameters* CullParameters)
 {
-	if (!GetVisible())
+	if (!GetEnabled() || !GetVisible())
 		return false;
 
 	ZEDrawFlags Flags = GetDrawFlags();

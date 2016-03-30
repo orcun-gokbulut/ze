@@ -59,6 +59,9 @@
 #include "ZEATAstronomy.h"
 #include "ZEATSun.h"
 #include "ZEATMoon.h"
+#include "ZEATFog.h"
+#include "ZEATCloud.h"
+#include "ZEATSkyBox.h"
 
 #define ZEAT_ADF_SHADERS			1
 #define ZEAT_ADF_RENDER_STATE		2
@@ -391,12 +394,31 @@ bool ZEATAtmosphere::InitializeSelf()
 
 	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
-	Sun = new ZEATSun();
+	Sun = ZEATSun::CreateInstance();
 	zeScene->AddEntity(Sun);
 
 	Moon = ZEATMoon::CreateInstance();
-	zeScene->AddEntity(Moon);
 	Moon->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	zeScene->AddEntity(Moon);
+
+	Fog = ZEATFog::CreateInstance();
+	Fog->SetDensity(0.0f);
+	Fog->SetStartDistance(0.0f);
+	Fog->SetColor(ZEVector3(0.5f));
+	zeScene->AddEntity(Fog);
+
+	Cloud = ZEATCloud::CreateInstance();
+	Cloud->SetCloudTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
+	zeScene->AddEntity(Cloud);
+
+	Stars = ZEATSkyBox::CreateInstance();
+	Stars->SetName("StarMap");
+	Stars->SetVisible(true);
+	Stars->SetEnabled(true);
+	Stars->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	Stars->SetColor(ZEVector3::One);
+	Stars->SetBrightness(0.1f);
+	zeScene->AddEntity(Stars);
 
 	return true;
 }
@@ -407,10 +429,16 @@ bool ZEATAtmosphere::DeinitializeSelf()
 
 	ScreenCoverVertexShader.Release();
 
+	SkyPixelShader.Release();
+	SkyRenderStateData.Release();
+	SkyConstantBuffer.Release();
+
 	PrecomputedDensityBuffer.Release();
 	PrecomputedSingleScatteringBuffer.Release();
 	PrecomputedMultipleScatteringBuffer.Release();
 	PrecomputedSkyAmbientBuffer.Release();
+
+	SamplerLinearClamp.Release();
 
 	SunLight = NULL;
 	MoonLight = NULL;
@@ -489,9 +517,40 @@ ZELightDirectional* ZEATAtmosphere::GetMoonLight()
 	return MoonLight;
 }
 
+void ZEATAtmosphere::SetCloudCoverage(float CloudCoverage)
+{
+	Cloud->SetCloudCoverage(CloudCoverage);
+}
+
+float ZEATAtmosphere::GetCloudCoverage() const
+{
+	return Cloud->GetCloudCoverage();
+}
+
+void ZEATAtmosphere::SetCloudDensity(float CloudDensity)
+{
+	Cloud->SetCloudDensity(CloudDensity);
+}
+
+float ZEATAtmosphere::GetCloudDensity() const
+{
+	return Cloud->GetCloudDensity();
+}
+
+void ZEATAtmosphere::SetFogDensity(float FogDensity)
+{
+	Fog->SetDensity(FogDensity);
+}
+
+float ZEATAtmosphere::GetFogDensity() const
+{
+	return Fog->GetDensity();
+}
+
 void ZEATAtmosphere::Tick(float ElapsedTime)
 {
 	ZEVector3 SunDirection = ZEATAstronomy::GetSunDirection(Observer);
+	SunDirection.NormalizeSelf();
 
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
@@ -513,6 +572,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	}
 
 	ZEVector3 MoonDirection = ZEATAstronomy::GetMoonDirection(Observer);
+	MoonDirection.NormalizeSelf();
 
 	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
 	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
@@ -533,6 +593,23 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		MoonLight->SetCastsShadow(!SunVisible);
 	}
 
+	if (SunVisible)
+	{
+		float InscatteringSun = 0.5f * (ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
+		Cloud->SetLightDirection(-SunDirection);
+		Cloud->SetLightIntensity(10.0f);
+		Cloud->SetInscattering(InscatteringSun);
+		Stars->SetBrightness(0.0f);
+	}
+	else
+	{
+		float InscatteringMoon = 0.05f * (ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
+		Cloud->SetLightDirection(-MoonDirection);
+		Cloud->SetLightIntensity(1.0f);
+		Cloud->SetInscattering(InscatteringMoon);
+		Stars->SetBrightness(0.1f);
+	}
+
 	double SunTransit, Sunrise, Sunset;
 	ZEATAstronomy::GetSunTransitSunriseSunsetTime(SunTransit, Sunrise, Sunset, Observer);
 
@@ -548,6 +625,9 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
 	if (SunLight != NULL)
 	{
 		SunLight->SetAmbientBuffer(PrecomputedSkyAmbientBuffer);
@@ -592,6 +672,8 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 
 		Sun->SetDensityBuffer(PrecomputedDensityBuffer);
 		Moon->SetDensityBuffer(PrecomputedDensityBuffer);
+		Stars->SetDensityBuffer(PrecomputedDensityBuffer);
+		Cloud->SetDensityBuffer(PrecomputedDensityBuffer);
 	}
 
 	ZERNStage* Stage = Parameters->Stage;

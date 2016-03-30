@@ -38,7 +38,6 @@
 #include "ZEMath\ZEAngle.h"
 #include "ZEScene.h"
 #include "ZEGame.h"
-#include "ZESkyBrush.h"
 #include "ZEMoon.h"
 #include "ZESkyDome.h"
 #include "ZERenderer/ZECamera.h"
@@ -270,7 +269,7 @@ bool ZEWeather::DeinitializeSelf()
 {
 	MoonLight->Deinitialize();
 	SunLight->Deinitialize();
-	StarMap->Deinitialize();
+	//StarMap->Deinitialize();
 	SkyDome->Deinitialize();
 	//Cloud->Deinitialize();
 	Moon->Deinitialize();
@@ -357,14 +356,14 @@ ZEWeather::ZEWeather()
 	this->AddComponent(MoonLight);
 
 	// Star Map
-	StarMap = ZESkyBrush::CreateInstance();
-	StarMap->SetName("StarMap");
-	StarMap->SetVisible(true);
-	StarMap->SetEnabled(true);
-	StarMap->SetTexture("#R:\\ZEEngine\\ZEAtmosphere\\Textures\\StarMap.png");
-	StarMap->SetColor(ZEVector3::One);
-	StarMap->SetBrightness(1.0f);
-	this->AddComponent(StarMap);
+	//StarMap = ZESkyBrush::CreateInstance();
+	//StarMap->SetName("StarMap");
+	//StarMap->SetVisible(true);
+	//StarMap->SetEnabled(true);
+	//StarMap->SetTexture("#R:\\ZEEngine\\ZEAtmosphere\\Textures\\StarMap.png");
+	//StarMap->SetColor(ZEVector3::One);
+	//StarMap->SetBrightness(1.0f);
+	//this->AddComponent(StarMap);
 
 	// Moon
 	Moon = ZEMoon::CreateInstance();

@@ -41,7 +41,6 @@
 #include "ZERNGBuffer.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNIntersections.hlsl"
-#include "ZERNHDR.hlsl"
 
 cbuffer ZERNFastLightScattering_Constants						: register(b8)
 {

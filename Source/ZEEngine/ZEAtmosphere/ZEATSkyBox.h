@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESkyBrush.h
+ Zinek Engine - ZEATSkyBox.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,9 +35,8 @@
 
 #pragma once
 
-#include "ZEEntity.h"
+#include "ZEGame/ZEEntity.h"
 
-#include "ZEDS/ZEString.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
@@ -48,16 +47,12 @@ class ZEGRRenderStateData;
 class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
 class ZEGRSampler;
+class ZEGRTexture2D;
 
-class ZESkyBrush : public ZEEntity
+class ZEATSkyBox : public ZEEntity
 {
-	ZE_OBJECT
-
 	private:
 		ZEFlags								DirtyFlags;
-
-		ZECanvas							SkyBox;
-		ZETextureCubeResource*				SkyTexture;
 		ZERNCommand							SkyRenderCommand;
 		
 		ZEHolder<ZEGRShader>				VertexShader;
@@ -66,7 +61,12 @@ class ZESkyBrush : public ZEEntity
 		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBufferTransform;
-		ZEHolder<ZEGRSampler>				SamplerLinearWrap;;
+
+		ZEHolder<ZEGRSampler>				SamplerLinearWrap;
+
+		ZEHolder<const ZEGRTexture2D>		DensityBuffer;
+
+		ZETextureCubeResource*				SkyTexture;
 
 		struct  
 		{
@@ -82,25 +82,26 @@ class ZESkyBrush : public ZEEntity
 		bool								UpdateConstantBuffers();
 		bool								Update();
 
-											ZESkyBrush();
+											ZEATSkyBox();
+		virtual								~ZEATSkyBox();
 
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;
 
-		virtual void						SetTexture(const ZEString& FileName);
+		void								SetTexture(const ZEString& FileName);
 		const ZEString&						GetTexture() const;
 	
-		virtual void						SetBrightness(float Brightness);
+		void								SetBrightness(float Brightness);
 		float								GetBrightness() const;
 
-		virtual void						SetColor(const ZEVector3& Color);
+		void								SetColor(const ZEVector3& Color);
 		const ZEVector3&					GetColor() const;
 
-		virtual								~ZESkyBrush();
+		void								SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
+		const ZEGRTexture2D*				GetDensityBuffer() const;
 
 		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		static ZESkyBrush*					CreateInstance();
-
+		static ZEATSkyBox*					CreateInstance();
 };

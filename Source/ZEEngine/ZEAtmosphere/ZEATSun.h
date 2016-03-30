@@ -86,6 +86,9 @@ class ZEATSun : public ZEEntity
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
+										ZEATSun();
+		virtual							~ZEATSun();
+
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
 
@@ -101,5 +104,5 @@ class ZEATSun : public ZEEntity
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-										ZEATSun();
+		static ZEATSun*					CreateInstance();
 };
