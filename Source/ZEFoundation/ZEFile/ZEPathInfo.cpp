@@ -279,7 +279,7 @@ ZETimeStamp ZEPathInfo::GetModificationTime() const
 	if ((GetAccess() & ZE_PA_READ) == 0)
 		return ZETimeStamp();
 
-	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_WRITE, FILE_SHARE_WRITE,	NULL, OPEN_EXISTING, FILE_FLAG_BACKUP_SEMANTICS, NULL);
+	HANDLE Handle = CreateFile(GetRealPath().Path, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_FLAG_NO_BUFFERING, NULL);
 	if (Handle == INVALID_HANDLE_VALUE)
 		return ZETimeStamp();
 
