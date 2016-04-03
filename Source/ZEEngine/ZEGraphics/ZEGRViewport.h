@@ -37,6 +37,7 @@
 
 #include "ZEMeta\ZEObject.h"
 #include "ZETypes.h"
+#include "ZEMath\ZEVector.h"
 
 class ZEGRViewport : public ZEObject
 {
@@ -44,16 +45,20 @@ class ZEGRViewport : public ZEObject
 	public:
 		struct ZEViewportData
 		{
-			float				X;
-			float				Y;
-			float				Width;
-			float				Height;
+			ZEVector2			Position;
+			ZEVector2			Size;
 			float				MinDepth;
 			float				MaxDepth;
 
 		} StateData;
 
 	public:
+		void					SetPosition(const ZEVector2& Position);
+		const ZEVector2&		GetPosition();
+
+		void					SetSize(const ZEVector2& Size);
+		const ZEVector2&		GetSize();
+
 		void					SetX(float x);
 		float					GetX() const;
 
@@ -72,6 +77,7 @@ class ZEGRViewport : public ZEObject
 		void					SetMaxDepth(float Depth);
 		float					GetMaxDepth() const;
 
+								ZEGRViewport(const ZEVector2& Position, const ZEVector2& Size, float MinDepth = 0.0f, float MaxDepth = 1.0f);
 								ZEGRViewport(float X, float Y, float Width, float Height, float MinDepth = 0.0f, float MaxDepth = 1.0f);
 								ZEGRViewport();
 };

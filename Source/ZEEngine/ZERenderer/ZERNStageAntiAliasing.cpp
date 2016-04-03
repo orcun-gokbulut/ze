@@ -35,15 +35,15 @@
 
 #include "ZERNStageAntiAliasing.h"
 
+#include "ZERNRenderer.h"
 #include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGame/ZEGizmo.h"
-#include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 
 #include "ZERNStageSMAAAreaTexture.h"
@@ -60,6 +60,15 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 	InputTexture = GetPrevOutput(ZERN_SO_COLOR);
 	if (InputTexture == NULL)
 		return false;
+
+	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthTexture == NULL)
+		return false;
+
+	NormalTexture = GetPrevOutput(ZERN_SO_NORMAL);
+	if (NormalTexture == NULL)
+		return false;
+
 
 	ZEHolder<const ZEGRRenderTarget> NewOutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (NewOutputRenderTarget == NULL)
@@ -146,24 +155,40 @@ bool ZERNStageAntiAliasing::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZERN_AADF_RENDER_STATE))
 		return true;
 
-	ZEGRDepthStencilState EdgeDetectionDepthStencilState;
-	EdgeDetectionDepthStencilState.SetDepthTestEnable(false);
-	EdgeDetectionDepthStencilState.SetDepthWriteEnable(false);
+	ZEGRDepthStencilState GenerateStencilState;
+	GenerateStencilState.SetDepthTestEnable(false);
+	GenerateStencilState.SetDepthWriteEnable(false);
+	GenerateStencilState.SetStencilTestEnable(true);
+	GenerateStencilState.SetFrontStencilPass(ZEGR_SO_REPLACE);
+
+	ZEGRDepthStencilState TestStencilState;
+	TestStencilState.SetDepthTestEnable(false);
+	TestStencilState.SetDepthWriteEnable(false);
+	TestStencilState.SetStencilTestEnable(true);
+	TestStencilState.SetFrontStencilFunction(ZEGR_CF_EQUAL);
+
+	ZEGRDepthStencilState DisableStencilState;
+	DisableStencilState.SetDepthTestEnable(false);
+	DisableStencilState.SetDepthWriteEnable(false);
+	DisableStencilState.SetStencilTestEnable(false);
 
 	ZEGRRenderState RenderState;
+	RenderState.SetDepthStencilState(GenerateStencilState);
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetDepthStencilState(EdgeDetectionDepthStencilState);
-
 	RenderState.SetShader(ZEGR_ST_VERTEX, EdgeDetectionVertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, EdgeDetectionPixelShader);
 	EdgeDetectionPassRenderStateData = RenderState.Compile();
 	zeCheckError(EdgeDetectionPassRenderStateData == NULL, false, "Cannot set render state.");
 
+
+	RenderState.SetDepthStencilState(TestStencilState);
 	RenderState.SetShader(ZEGR_ST_VERTEX, BlendingWeightCalculationVertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, BlendingWeightCalculationPixelShader);
 	BlendingWeightCalculationPassRenderStateData = RenderState.Compile();
 	zeCheckError(BlendingWeightCalculationPassRenderStateData == NULL, false, "Cannot set render state.");
 
+
+	RenderState.SetDepthStencilState(DisableStencilState);
 	RenderState.SetShader(ZEGR_ST_VERTEX, NeighborhoodBlendingVertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, NeighborhoodBlendingPixelShader);
 	NeighborhoodBlendingPassRenderStateData= RenderState.Compile();
@@ -225,7 +250,7 @@ void ZERNStageAntiAliasing::ClearTextures(ZEGRContext* Context)
 void ZERNStageAntiAliasing::DoEdgeDetection(ZEGRContext* Context)
 {
 	Context->SetRenderState(EdgeDetectionPassRenderStateData);
-	Context->SetRenderTargets(1, EdgeRenderTarget.GetPointerToPointer(), NULL);
+	Context->SetRenderTargets(1, EdgeRenderTarget.GetPointerToPointer(), DepthTexture->GetDepthStencilBuffer());
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, InputTexture);
 
 	Context->Draw(3, 0);
@@ -234,7 +259,7 @@ void ZERNStageAntiAliasing::DoEdgeDetection(ZEGRContext* Context)
 void ZERNStageAntiAliasing::DoBlendingWeightCalculation(ZEGRContext* Context)
 {
 	Context->SetRenderState(BlendingWeightCalculationPassRenderStateData);
-	Context->SetRenderTargets(1, BlendRenderTarget.GetPointerToPointer(), NULL);
+	Context->SetRenderTargets(1, BlendRenderTarget.GetPointerToPointer(), DepthTexture->GetDepthStencilBuffer());
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, EdgeTexture);
 
 	Context->Draw(3, 0);
@@ -285,6 +310,8 @@ void ZERNStageAntiAliasing::DeinitializeSelf()
 	InputTexture.Release();
 	OutputTexture.Release();
 	OutputRenderTarget.Release();
+	DepthTexture.Release();
+	NormalTexture.Release();
 
 	EdgeRenderTarget.Release();
 	EdgeTexture.Release();
@@ -354,6 +381,8 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinear);
 	Context->SetTexture(ZEGR_ST_PIXEL, 3, AreaTexture);
 	Context->SetTexture(ZEGR_ST_PIXEL, 4, SearchTexture);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, NormalTexture);
+	Context->SetStencilRef(1);
 
 	ClearTextures(Context);
 	DoEdgeDetection(Context);

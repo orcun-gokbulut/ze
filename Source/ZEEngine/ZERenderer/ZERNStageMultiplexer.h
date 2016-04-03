@@ -41,6 +41,8 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
+#include "ZEGraphics/ZEGRSampler.h"
+#include "ZEMath/ZEMatrix.h"
 
 ZE_ENUM(ZERNStageMultiplexerMode)
 {
@@ -53,25 +55,21 @@ ZE_ENUM(ZERNStageMultiplexerMode)
 };
 
 class ZEGRTexture;
-class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRRenderTarget;
-class ZEGRConstantBuffer;
+class ZERNStageMultiplexerInput;
 
 class ZERNStageMultiplexer : public ZERNStage
 {
 	ZE_OBJECT
+	friend class ZERNStageMultiplexerInput;
 	private:
-		ZERNStageBuffer						Inputs[ZEGR_MAX_VIEWPORT_SLOT];
-		ZEHolder<const ZEGRTexture>			InputTextures[ZEGR_MAX_VIEWPORT_SLOT];
-		ZEGRViewport						CustomViewports[ZEGR_MAX_VIEWPORT_SLOT];
-
 		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
-
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
-
 		ZERNStageMultiplexerMode			Mode;
+
+		ZEList2<ZERNStageMultiplexerInput>	Inputs;
 
 		bool								UpdateInputOutputs();
 
@@ -79,6 +77,7 @@ class ZERNStageMultiplexer : public ZERNStage
 		void								DrawVertical2(ZEGRContext* Context);
 		void								DrawHorizontal2(ZEGRContext* Context);
 		void								Draw2x2(ZEGRContext* Context);
+		void								DrawCustom(ZEGRContext* Context);
 
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
@@ -90,32 +89,9 @@ class ZERNStageMultiplexer : public ZERNStage
 		void								SetMode(ZERNStageMultiplexerMode Mode);
 		ZERNStageMultiplexerMode			GetMode();
 
-		void								SetInput0(ZERNStageBuffer Buffer);
-		ZERNStageBuffer						GetInput0() const;
-
-		void								SetInput0Texture(ZEGRTexture* Input);
-		const ZEGRTexture*					GetInput0Texture() const;
-
-		void								SetInput1(ZERNStageBuffer Buffer);
-		ZERNStageBuffer						GetInput1() const;
-
-		void								SetInput1Texture(ZEGRTexture* Input);
-		const ZEGRTexture*					GetInput1Texture() const;
-
-		void								SetInput2(ZERNStageBuffer Buffer);
-		ZERNStageBuffer						GetInput2() const;
-
-		void								SetInput2Texture(ZEGRTexture* Input);
-		const ZEGRTexture*					GetInput2Texture() const;
-
-		void								SetInput3(ZERNStageBuffer Buffer);
-		ZERNStageBuffer						GetInput3() const;
-
-		void								SetInput3Texture(ZEGRTexture* Input);
-		const ZEGRTexture*					GetInput3Texture() const;
-
-		void								SetCustomViewport(ZEUInt Index, const ZEGRViewport& Viewport);
-		const ZEGRViewport&					GetCustomViewport(ZEUInt Index) const;
+		const ZEList2<ZERNStageMultiplexerInput>& GetInputs();
+		void								AddInput(ZERNStageMultiplexerInput* Input);
+		void								RemoveInput(ZERNStageMultiplexerInput* Input);
 
 		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
@@ -124,4 +100,5 @@ class ZERNStageMultiplexer : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageMultiplexer();
+											~ZERNStageMultiplexer();
 };

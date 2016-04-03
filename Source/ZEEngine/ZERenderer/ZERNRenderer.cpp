@@ -260,6 +260,17 @@ const ZEList2<ZERNStage>& ZERNRenderer::GetStages()
 	return Stages;
 }
 
+ZERNStage* ZERNRenderer::GetStage(ZEClass* Class)
+{
+	ze_for_each(Stage, Stages)
+	{
+		if (Stage->GetClass() == Class)
+			return Stage.GetPointer();
+	}
+
+	return NULL;
+}
+
 ZERNStage* ZERNRenderer::GetStage(ZERNStageID Id)
 {
 	ze_for_each(Stage, Stages)

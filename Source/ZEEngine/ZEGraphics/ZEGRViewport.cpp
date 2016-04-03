@@ -37,44 +37,64 @@
 
 #include <memory>
 
+void ZEGRViewport::SetPosition(const ZEVector2& Position)
+{
+	StateData.Position = Position;
+}
+
+const ZEVector2& ZEGRViewport::GetPosition()
+{
+	return StateData.Position;
+}
+
+void ZEGRViewport::SetSize(const ZEVector2& Size)
+{
+	StateData.Size = Size;
+}
+
+const ZEVector2& ZEGRViewport::GetSize()
+{
+	return StateData.Size;
+}
+
 void ZEGRViewport::SetX(float x)
 {
-	StateData.X = x;
+	StateData.Position.x = x;
 }
 
 float ZEGRViewport::GetX() const
 {
-	return StateData.X;
+	return StateData.Position.x;
 }
 
 void ZEGRViewport::SetY(float y)
 {
-	StateData.Y = y;
+	StateData.Position.y = y;
 }
 
 float ZEGRViewport::GetY() const
 {
-	return StateData.Y;
+	return StateData.Position.y;
 }
 
 void ZEGRViewport::SetWidth(float Width)
 {
-	StateData.Width = Width;
+	StateData.Size.x = Width;
 }
 
 float ZEGRViewport::GetWidth() const
 {
-	return StateData.Width;
+	return StateData.Size.x;
 }
 
 void ZEGRViewport::SetHeight(float Height)
 {
-	StateData.Height = Height;
+	StateData.Size.y = Height;
 }
 
 float ZEGRViewport::GetHeight() const
 {
-	return StateData.Height;
+	return StateData.Size.y;
 }
 
 void ZEGRViewport::SetMinDepth(float Depth)
@@ -97,18 +117,28 @@ float ZEGRViewport::GetMaxDepth() const
 	return StateData.MaxDepth;
 }
 
+ZEGRViewport::ZEGRViewport(const ZEVector2& Position, const ZEVector2& Size, float MinDepth /*= 0.0f*/, float MaxDepth /*= 1.0f*/)
+{
+	StateData.Position = Position;
+	StateData.Size =Size;
+	StateData.MinDepth = MinDepth;
+	StateData.MaxDepth = MaxDepth;
+}
+
 ZEGRViewport::ZEGRViewport(float X, float Y, float Width, float Height, float MinDepth, float MaxDepth)
 {
-	StateData.X = X;
-	StateData.Y = Y;
-	StateData.Width = Width;
-	StateData.Height = Height;
+	StateData.Position.x = X;
+	StateData.Position.y = Y;
+	StateData.Size.x = Width;
+	StateData.Size.y = Height;
 	StateData.MinDepth = MinDepth;
 	StateData.MaxDepth = MaxDepth;
 }
 
 ZEGRViewport::ZEGRViewport()
 {
-	memset(&StateData, 0, sizeof(ZEViewportData));
+	StateData.Position = ZEVector2::Zero;
+	StateData.Size = ZEVector2::Zero;
+	StateData.MinDepth = 0.0f;
 	StateData.MaxDepth = 1.0f;
 }

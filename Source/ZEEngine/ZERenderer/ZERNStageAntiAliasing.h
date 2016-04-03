@@ -60,6 +60,8 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEFlags								DirtyFlags;
 
 		ZEHolder<const ZEGRTexture2D>		InputTexture;
+		ZEHolder<const ZEGRTexture2D>		DepthTexture;
+		ZEHolder<const ZEGRTexture2D>		NormalTexture;
 		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
 

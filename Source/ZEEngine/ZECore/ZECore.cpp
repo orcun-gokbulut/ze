@@ -556,7 +556,7 @@ bool ZECore::StartUp(void* WindowHandle)
 	SetCoreState(ZE_CS_STARTUP);
 	SetUserLevel(ZE_UL_DEVELOPPER);
 
-	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString());
+	zeLog("Zinek Engine %s.", ZEVersion::GetZinekVersion().GetLongString().ToCString());
 	zeLog("Initializing core...");
 
 	zeLog("Loading ZEMeta classes.");

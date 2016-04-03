@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - PixelWorldPositionProcessor.hlsl
+ Zinek Engine - ZERNStageMultiplexer.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
-#define __ZE_PIXEL_WORLD_POSITION_PROCESSOR_HLSL__
+#ifndef __ZERN_STAGE_MULTIPLEXER_H__
+#define __ZERN_STAGE_MULTIPLEXER_H__
 
-#include	"GBuffer.hlsl"
+#include "ZERNScreenCover.hlsl"
+#include "ZERNShaderSlots.hlsl"
 
-float2		SampleCoord				: register(c0);
+SamplerState	ZERNStageMultiplexer_Sampler	: register(s0);
+Texture2D		ZERNStageMultiplexer_Texture	: register(t5);
 
-struct VSInput
+cbuffer	ZERNStageMultiplexer_Constants : register(ZERN_SHADER_CONSTANT_STAGE)
 {
-	float3 Position		: POSITION0;
-	float2 TexCoord		: TEXCOORD0;
-};
-
-float4 VSMain(VSInput Input) : POSITION0
-{
-	return float4(sign(Input.Position).xyz, 1.0f);
+	float3x3 ZERNStageMultiplexer_Transform;
+	float2 ZERNStageMultiplexer_InputSize;
 }
 
-float4 PSMain() : COLOR0
+
+float4 ZERNStageMultiplexer_PixelShader(float4 Position : SV_Position, float2 Texcoord : TEXCOORD0) : SV_Target0
 {
-	return ZEGBuffer_GetDepth(SampleCoord).xxxx;
+	float2 TexcoordTransformed = mul(ZERNStageMultiplexer_Transform, float3(Texcoord, 1.0f)).xy;
+
+	if (any(TexcoordTransformed < float2(0.0f, 0.0f)) ||
+		any(TexcoordTransformed > ZERNStageMultiplexer_InputSize))
+	{
+		discard;
+		return float4(0.0f, 0.0f, 0.0f, 0.0f);
+	}
+
+	return ZERNStageMultiplexer_Texture.SampleLevel(ZERNStageMultiplexer_Sampler, TexcoordTransformed, 0);
 }
 
 #endif

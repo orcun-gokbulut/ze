@@ -43,7 +43,7 @@
 #include "ZEGraphics/ZEGRSampler.h"
 
 #include "ZERNStageParticleRendering.h"
-#include "ZERNShaderConfig.h"
+#include "ZERNShaderSlots.h"
 
 #define ZERN_PMDF_CONSTANT_BUFFER		1
 #define ZERN_PMDF_RENDER_STATE			2

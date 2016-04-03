@@ -102,6 +102,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 
 		const ZEList2<ZERNStage>&		GetStages();
 		ZERNStage*						GetStage(ZERNStageID Id);
+		ZERNStage*						GetStage(ZEClass* Class);
 		void							AddStage(ZERNStage* Stage);
 		void							RemoveStage(ZERNStage* Stage);
 		void							CleanStages();
