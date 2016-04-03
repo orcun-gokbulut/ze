@@ -170,7 +170,7 @@ bool ZERNStageGBuffer::Setup(ZEGRContext* Context)
 	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer3->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer->GetDepthStencilBuffer(), true, false, 0.0f, 0x00);
+	Context->ClearDepthStencilBuffer(DepthStencilBuffer->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
 
 	Context->SetViewports(1, &Viewport);
 	Context->SetRenderTargets(4, RenderTargets, DepthStencilBuffer->GetDepthStencilBuffer());

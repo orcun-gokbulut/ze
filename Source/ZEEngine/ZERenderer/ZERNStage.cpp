@@ -40,19 +40,21 @@
 
 const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Input) const
 {
-	if (GetPrevStage() == NULL)
+	ZERNStage* PrevStage = GetPrevStage();
+	if (PrevStage == NULL)
 		return NULL;
 
-	return GetPrevStage()->GetOutput(Input);
+	return PrevStage->GetOutput(Input);
 }
 
 
 const ZEGRRenderTarget* ZERNStage::GetNextProvidedInput(ZERNStageBuffer RenderTarget) const
 {
-	if (GetNextStage() == NULL)
+	ZERNStage* NextStage = GetNextStage();
+	if (NextStage == NULL)
 		return NULL;
 
-	return GetNextStage()->GetProvidedInput(RenderTarget);
+	return NextStage->GetProvidedInput(RenderTarget);
 }
 
 ZERNRenderer* ZERNStage::GetRenderer() const

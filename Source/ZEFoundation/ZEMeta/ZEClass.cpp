@@ -39,6 +39,8 @@
 #include "ZEDS/ZEReference.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEFormat.h"
 
 ZESSize ZEClass::Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString& Name)
 {
@@ -411,6 +413,8 @@ bool ZEClass::Serialize(ZEObject* Object, ZEMLWriterNode& ObjectNode)
 		return false;
 
 	PropertiesNode.CloseNode();
+
+	return true;
 }
 
 bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNode)
@@ -455,9 +459,24 @@ bool ZEClass::SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNo
 bool ZEClass::Unserialize(ZEObject* Object, const ZEMLReaderNode& ObjectNode)
 {
 	if (ObjectNode.ReadString("Class") != Object->GetClass()->GetName())
-		return false;
+	{
+		zeWarning("Cannot find Class node in object node. Class: \"%s\", ZEML Path: \"%s\", .", 
+			Object->GetClass()->GetName(),
+			ObjectNode.GetPath().ToCString());
 
-	return UnserializeProperties(Object, ObjectNode.GetNode("Properties"));
+		return false;
+	}
+
+	ZEMLReaderNode Properties = ObjectNode.GetNode("Properties");
+	if (!Properties.IsValid())
+	{
+		zeWarning("Cannot find Properties node in object node. Class: \"%s\", ZEML Path: \"%s\".", 
+			Object->GetClass()->GetName(),
+			ObjectNode.GetPath().ToCString());
+		return false;
+	}
+
+	return UnserializeProperties(Object, Properties);
 }
 
 bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& PropertiesNode)
@@ -472,7 +491,13 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 
 		const ZEProperty* PropertyDescription = GetPropertyDescription(Element->Name);
 		if (PropertyDescription == NULL)
+		{
+			zeWarning("Property not found. Class Name: \"%s\", Property Name: \"%s\", ZEML Path: \"%s\".", 
+				Object->GetClass()->GetName(), 
+				Element->Name.ToCString(),
+				ZEFormat::Format("{0}/{1}", PropertiesNode.GetPath(), Element->Name).ToCString());
 			continue;
+		}
 
 		// Handle Enumerations
 		if (Element->ValueType == ZEML_VT_STRING && PropertyDescription->Type.Enumerator != NULL)
@@ -485,13 +510,26 @@ bool ZEClass::UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& Prop
 				if (EnumeratorItems[N].Name != Element->Value.GetString())
 					continue;
 
-				SetProperty(Object, PropertyDescription->ID, EnumeratorItems[N].Value);
+				if (!SetProperty(Object, PropertyDescription->ID, EnumeratorItems[N].Value))
+				{
+					zeWarning("SetProperty failed. Class Name: \"%s\", Property Name: \"%s\", ZEML Path: \"%s\".", 
+						Object->GetClass()->GetName(), 
+						Element->Name,
+						ZEFormat::Format("{0}/{1}", PropertiesNode.GetPath(), Element->Name).ToCString());
+				}
 				break;
 			}
 		}
 		else
 		{
-			SetProperty(Object, PropertyDescription->ID, ZEVariant(Element->Value));
+			if (!SetProperty(Object, PropertyDescription->ID, ZEVariant(Element->Value)))
+			{
+				zeWarning("SetProperty failed. Class Name: \"%s\", Property Name: \"%s\", ZEML Path: \"%s\".", 
+					Object->GetClass()->GetName(),
+					Element->Name.ToCString(),
+					ZEFormat::Format("{0}/{1}", PropertiesNode.GetPath(), Element->Name).ToCString());
+				continue;
+			}
 		}
 	}
 

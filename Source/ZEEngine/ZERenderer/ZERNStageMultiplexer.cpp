@@ -44,13 +44,10 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERNStageMultiplexerInput.h"
 
 bool ZERNStageMultiplexer::UpdateInputOutputs()
 {
-	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-		if (Inputs[I] != ZERN_SO_NONE)
-			InputTextures[I] = GetPrevOutput(Inputs[I]);
-
 	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (OutputRenderTarget == NULL)
 	{
@@ -77,14 +74,16 @@ bool ZERNStageMultiplexer::UpdateInputOutputs()
 
 void ZERNStageMultiplexer::DrawSingle(ZEGRContext* Context)
 {
-	ZEGRViewport Viewport;
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
-	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
-	Context->Draw(3, 0);
+	if (Inputs.GetCount() == 0)
+		return;
+
+	if (Mode != ZERN_SMM_CUSTOM)
+	{
+		Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
+		Inputs[0]->SetOutputSize(ZEVector2(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
+	}
+
+	Inputs[0]->Draw(Context);
 }
 
 void ZERNStageMultiplexer::DrawVertical2(ZEGRContext* Context)
@@ -92,21 +91,27 @@ void ZERNStageMultiplexer::DrawVertical2(ZEGRContext* Context)
 	ZEUInt ViewportWidth = OutputRenderTarget->GetWidth() / 2;
 	ZEUInt ViewportHeight = OutputRenderTarget->GetHeight();
 
-	ZEGRViewport Viewport;
-	Viewport.SetWidth((float)ViewportWidth);
-	Viewport.SetHeight((float)ViewportHeight);
+	if (Inputs.GetCount() > 0)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
+			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
 
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
-	Context->Draw(3, 0);
+		Inputs[0]->Draw(Context);
+	}
 
-	Viewport.SetX((float)ViewportWidth);
-	Viewport.SetY(0.0f);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[1]);
-	Context->Draw(3, 0);
+	if (Inputs.GetCount() > 1)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[1]->SetOutputOffset(ZEVector2(ViewportWidth, 0.0f));
+			Inputs[1]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
+
+		Inputs[1]->Draw(Context);
+	}
 }
 
 void ZERNStageMultiplexer::DrawHorizontal2(ZEGRContext* Context)
@@ -114,22 +119,27 @@ void ZERNStageMultiplexer::DrawHorizontal2(ZEGRContext* Context)
 	ZESize ViewportWidth = OutputRenderTarget->GetWidth();
 	ZESize ViewportHeight = OutputRenderTarget->GetHeight() / 2;
 
-	ZEGRViewport Viewport;
-	Viewport.SetWidth((float)ViewportWidth);
-	Viewport.SetHeight((float)ViewportHeight);
+	if (Inputs.GetCount() > 0)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
+			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
 
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
-	Context->Draw(3, 0);
+		Inputs[0]->Draw(Context);
+	}
 
-	Viewport.SetX(0.0f);
-	Viewport.SetY((float)ViewportHeight);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[1]);
-	Context->Draw(3, 0);
+	if (Inputs.GetCount() > 1)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, ViewportHeight));
+			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
 
+		Inputs[1]->Draw(Context);
+	}
 }
 
 void ZERNStageMultiplexer::Draw2x2(ZEGRContext* Context)
@@ -137,35 +147,56 @@ void ZERNStageMultiplexer::Draw2x2(ZEGRContext* Context)
 	ZESize ViewportWidth = OutputRenderTarget->GetWidth() / 2;
 	ZESize ViewportHeight = OutputRenderTarget->GetHeight() / 2;
 
-	ZEGRViewport Viewport;
-	Viewport.SetWidth((float)ViewportWidth);
-	Viewport.SetHeight((float)ViewportHeight);
+	if (Inputs.GetCount() > 0)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
+			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
 
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[0]);
-	Context->Draw(3, 0);
+		Inputs[0]->Draw(Context);
+	}
 
-	Viewport.SetX((float)ViewportWidth);
-	Viewport.SetY(0.0f);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[1]);
-	Context->Draw(3, 0);
+	if (Inputs.GetCount() > 1)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[1]->SetOutputOffset(ZEVector2(ViewportHeight, 0.0f));
+			Inputs[1]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
 
-	Viewport.SetX(0.0f);
-	Viewport.SetY((float)ViewportHeight);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[2]);
-	Context->Draw(3, 0);
+		Inputs[1]->Draw(Context);
+	}
 
-	Viewport.SetX((float)ViewportWidth);
-	Viewport.SetY((float)ViewportHeight);
-	Context->SetViewports(1, &Viewport);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTextures[3]);
-	Context->Draw(3, 0);
+	if (Inputs.GetCount() > 2)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[2]->SetOutputOffset(ZEVector2(0.0f, ViewportHeight));
+			Inputs[2]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
+
+		Inputs[2]->Draw(Context);
+	}
+
+	if (Inputs.GetCount() > 3)
+	{
+		if (Mode != ZERN_SMM_CUSTOM)
+		{
+			Inputs[3]->SetOutputOffset(ZEVector2(ViewportHeight, ViewportHeight));
+			Inputs[3]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
+		}
+
+		Inputs[3]->Draw(Context);
+	}
 }
 
+void ZERNStageMultiplexer::DrawCustom(ZEGRContext* Context)
+{
+	ze_for_each(Input, Inputs)
+		Input->Draw(Context);
+}
 
 bool ZERNStageMultiplexer::InitializeSelf()
 {
@@ -174,7 +205,7 @@ bool ZERNStageMultiplexer::InitializeSelf()
 
 	ZEGRShaderCompileOptions Options;
 	Options.Model = ZEGR_SM_5_0;
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTextureRendering.hlsl";
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNStageMultiplexer.hlsl";
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
@@ -182,7 +213,7 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	zeCheckError(VertexShader == NULL, false, "Cannot set vertex shader.");
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNTextureRendering_PixelShader_Main";
+	Options.EntryPoint = "ZERNStageMultiplexer_PixelShader";
 	ZEHolder<ZEGRShader> PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(PixelShader == NULL, false, "Cannot set pixel shader.");
 
@@ -194,20 +225,19 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set render state");
 
+	ze_for_each(Input, Inputs)
+		Input->Initialize();
+
 	return true;
 }
 
 void ZERNStageMultiplexer::DeinitializeSelf()
 {
-	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-	{
-		if (Inputs[I] == ZERN_SO_NONE)
-			InputTextures[I].Release();
-	}
+	ze_for_each(Input, Inputs)
+		Input->Deinitialize();
 
 	OutputRenderTarget.Release();
 	OutputTexture.Release();
-	
 	RenderStateData.Release();
 
 	ZERNStage::Deinitialize();
@@ -234,100 +264,28 @@ ZERNStageMultiplexerMode ZERNStageMultiplexer::GetMode()
 	return Mode;
 }
 
-void ZERNStageMultiplexer::SetInput0(ZERNStageBuffer Buffer)
+const ZEList2<ZERNStageMultiplexerInput>& ZERNStageMultiplexer::GetInputs()
 {
-	Inputs[0] = Buffer;
+	return Inputs;
 }
 
-ZERNStageBuffer ZERNStageMultiplexer::GetInput0() const
+void ZERNStageMultiplexer::AddInput(ZERNStageMultiplexerInput* Input)
 {
-	return Inputs[0];
+	zeCheckError(Input->Owner != NULL, ZE_VOID, "Multiplexer input is already registered with a stage.");
+	
+	Inputs.AddEnd(&Input->StageLink);
+	Input->Owner = this;
+	if (IsInitialized())
+		Input->Initialize();
 }
 
-void ZERNStageMultiplexer::SetInput0Texture(ZEGRTexture* Input)
+void ZERNStageMultiplexer::RemoveInput(ZERNStageMultiplexerInput* Input)
 {
-	Inputs[0] = ZERN_SO_NONE;
-	InputTextures[0] = Input;
-}
+	zeCheckError(Input->Owner != this, ZE_VOID, "Multiplexer input is not associated with a stage.");
 
-const ZEGRTexture* ZERNStageMultiplexer::GetInput0Texture() const
-{
-	return InputTextures[0];
-}
-
-void ZERNStageMultiplexer::SetInput1(ZERNStageBuffer Buffer)
-{
-	Inputs[1] = Buffer;
-}
-
-ZERNStageBuffer ZERNStageMultiplexer::GetInput1() const
-{
-	return Inputs[1];
-}
-
-void ZERNStageMultiplexer::SetInput1Texture(ZEGRTexture* Input)
-{
-	Inputs[1] = ZERN_SO_NONE;
-	InputTextures[1] = Input;
-}
-
-const ZEGRTexture* ZERNStageMultiplexer::GetInput1Texture() const
-{
-	return InputTextures[1];
-}
-
-void ZERNStageMultiplexer::SetInput2(ZERNStageBuffer Buffer)
-{
-	Inputs[2] = Buffer;
-}
-
-ZERNStageBuffer ZERNStageMultiplexer::GetInput2() const
-{
-	return Inputs[2];
-}
-
-void ZERNStageMultiplexer::SetInput2Texture(ZEGRTexture* Input)
-{
-	Inputs[2] = ZERN_SO_NONE;
-	InputTextures[2] = Input;
-}
-
-const ZEGRTexture* ZERNStageMultiplexer::GetInput2Texture() const
-{
-	return InputTextures[2];
-}
-
-void ZERNStageMultiplexer::SetInput3(ZERNStageBuffer Buffer)
-{
-	Inputs[3] = Buffer;
-}
-
-ZERNStageBuffer ZERNStageMultiplexer::GetInput3() const
-{
-	return Inputs[3];
-}
-
-void ZERNStageMultiplexer::SetInput3Texture(ZEGRTexture* Input)
-{
-	Inputs[3] = ZERN_SO_NONE;
-	InputTextures[3] = Input;
-}
-
-const ZEGRTexture* ZERNStageMultiplexer::GetInput3Texture() const
-{
-	return InputTextures[3];
-}
-
-void ZERNStageMultiplexer::SetCustomViewport(ZEUInt Index, const ZEGRViewport& Viewport)
-{
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZE_VOID, "Wrong input index.");
-	CustomViewports[Index] = Viewport;
-}
-
-const ZEGRViewport& ZERNStageMultiplexer::GetCustomViewport(ZEUInt Index) const
-{
-	zeCheckError(Index >= ZEGR_MAX_VIEWPORT_SLOT, ZEGRViewport(), "Wrong input index.");
-	return CustomViewports[Index];
+	Input->Deinitialize();
+	Input->Owner = NULL;
+	Inputs.Remove(&Input->StageLink);
 }
 
 const ZEGRRenderTarget* ZERNStageMultiplexer::GetProvidedInput(ZERNStageBuffer Input) const
@@ -378,6 +336,10 @@ bool ZERNStageMultiplexer::Setup(ZEGRContext* Context)
 			Draw2x2(Context);
 			break;
 
+		case ZERN_SMM_CUSTOM:
+			DrawCustom(Context);
+			break;
+
 		default:
 			break;
 	}
@@ -395,9 +357,16 @@ void ZERNStageMultiplexer::CleanUp(ZEGRContext* Context)
 
 ZERNStageMultiplexer::ZERNStageMultiplexer()
 {
-	for (ZEUInt I = 0; I < ZEGR_MAX_VIEWPORT_SLOT; I++)
-		Inputs[I] = ZERN_SO_NONE;
-
-	Inputs[0] = ZERN_SO_COLOR;
 	Mode = ZERN_SMM_SINGLE;
 }
+
+ZERNStageMultiplexer::~ZERNStageMultiplexer()
+{
+	while(Inputs.GetFirst() != NULL)
+	{
+		ZERNStageMultiplexerInput* Input = Inputs.GetFirst()->GetItem();
+		Inputs.Remove(&Input->StageLink);
+		delete Input;
+	}
+}
+

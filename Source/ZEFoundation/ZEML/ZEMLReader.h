@@ -75,6 +75,7 @@ class ZEMLReaderNode
 		ZEFile*							File;
 		ZEMLFormat*						Format;
 		ZEMLFormatElement				Node;
+		ZEString						Path;
 
 		ZEArray<ZEMLFormatElement>		Elements;
 		ZESize							NodeCount;
@@ -85,6 +86,8 @@ class ZEMLReaderNode
 	public:
 		const ZEFile*					GetFile() const;
 		const ZEString&					GetName() const;
+		const ZEString&					GetPath() const;
+
 		const ZEArray<ZEMLFormatElement>& GetElements() const;
 
 		ZESize							GetNodeCount() const;

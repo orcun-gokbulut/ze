@@ -126,7 +126,10 @@ ZEObject* ZEProvider::CreateInstance(const char* ClassName)
 {
 	ZEClass* Class = GetClass(ClassName);
 	if (Class == NULL)
+	{
+		zeError("Cannot create object instace because class is not available. Class Name: \"%s\".", ClassName);
 		return NULL;
+	}
 
 	return Class->CreateInstance();
 }
@@ -135,10 +138,18 @@ ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, const char* Clas
 {
 	ZEClass* Class = GetClass(ClassName);
 	if (Class == NULL)
+	{
+		zeError("Cannot create object instace because base class is not available. Class Name: \"%s\".", ClassName);
 		return NULL;
+	}
 
 	if (!ZEClass::IsDerivedFrom(BaseClass, Class))
+	{
+		zeError("Cannot create object instace because class is not derived from base class. Base Class Name: \"%s\", Class Name: \"%s\".", 
+			BaseClass->GetName(), 
+			ClassName);
 		return NULL;
+	}
 
 	return Class->CreateInstance();
 }
@@ -149,7 +160,11 @@ ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& 
 	if (Object == NULL)
 		return NULL;
 
-	Object->GetClass()->Unserialize(Object, ObjectNode);
+	if (!Object->GetClass()->Unserialize(Object, ObjectNode))
+	{
+		zeError("Failed to unserialize class.");
+		return false;
+	}
 
 	return Object;
 }

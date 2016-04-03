@@ -39,7 +39,7 @@
 #include "ZERNRenderer.h"
 #include "ZERNStageManager.h"
 #include "ZERNStage.h"
-#include "ZERNShaderConfig.h"
+#include "ZERNShaderSlots.h"
 #include "ZERNStageForward.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
