@@ -57,19 +57,19 @@ ZE_ENUM(ZERNStageMultiplexerMode)
 class ZEGRTexture;
 class ZEGRRenderStateData;
 class ZEGRRenderTarget;
-class ZERNStageMultiplexerInput;
+class ZERNStageDisplay;
 
 class ZERNStageMultiplexer : public ZERNStage
 {
 	ZE_OBJECT
-	friend class ZERNStageMultiplexerInput;
+	friend class ZERNStageDisplay;
 	private:
 		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 		ZERNStageMultiplexerMode			Mode;
 
-		ZEList2<ZERNStageMultiplexerInput>	Inputs;
+		ZEList2<ZERNStageDisplay>			Displays;
 
 		bool								UpdateInputOutputs();
 
@@ -89,9 +89,9 @@ class ZERNStageMultiplexer : public ZERNStage
 		void								SetMode(ZERNStageMultiplexerMode Mode);
 		ZERNStageMultiplexerMode			GetMode();
 
-		const ZEList2<ZERNStageMultiplexerInput>& GetInputs();
-		void								AddInput(ZERNStageMultiplexerInput* Input);
-		void								RemoveInput(ZERNStageMultiplexerInput* Input);
+		const ZEList2<ZERNStageDisplay>&	GetInputs();
+		void								AddInput(ZERNStageDisplay* Input);
+		void								RemoveInput(ZERNStageDisplay* Input);
 
 		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
