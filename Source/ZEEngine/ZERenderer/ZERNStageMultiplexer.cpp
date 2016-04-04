@@ -44,7 +44,7 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZERNStageMultiplexerInput.h"
+#include "ZERNStageDisplay.h"
 
 bool ZERNStageMultiplexer::UpdateInputOutputs()
 {
@@ -74,16 +74,23 @@ bool ZERNStageMultiplexer::UpdateInputOutputs()
 
 void ZERNStageMultiplexer::DrawSingle(ZEGRContext* Context)
 {
-	if (Inputs.GetCount() == 0)
+	if (Displays.GetCount() == 0)
 		return;
 
 	if (Mode != ZERN_SMM_CUSTOM)
 	{
-		Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
-		Inputs[0]->SetOutputSize(ZEVector2(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight()));
-	}
+		ZEGRViewport Viewport;
+		Viewport.SetX(0.0f);
+		Viewport.SetY(0.0f);
+		Viewport.SetWidth(OutputRenderTarget->GetWidth());
+		Viewport.SetHeight(OutputRenderTarget->GetHeight());
 
-	Inputs[0]->Draw(Context);
+		Displays[0]->Setup(Context, Viewport);
+	}
+	else
+	{
+		Displays[0]->Setup(Context);
+	}
 }
 
 void ZERNStageMultiplexer::DrawVertical2(ZEGRContext* Context)
@@ -91,26 +98,40 @@ void ZERNStageMultiplexer::DrawVertical2(ZEGRContext* Context)
 	ZEUInt ViewportWidth = OutputRenderTarget->GetWidth() / 2;
 	ZEUInt ViewportHeight = OutputRenderTarget->GetHeight();
 
-	if (Inputs.GetCount() > 0)
+	if (Displays.GetCount() > 0)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
-			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(0.0f);
+			Viewport.SetY(0.0f);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[0]->Draw(Context);
+			Displays[0]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[0]->Setup(Context);
+		}
 	}
 
-	if (Inputs.GetCount() > 1)
+	if (Displays.GetCount() > 1)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[1]->SetOutputOffset(ZEVector2(ViewportWidth, 0.0f));
-			Inputs[1]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(ViewportWidth);
+			Viewport.SetY(0.0f);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[1]->Draw(Context);
+			Displays[1]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[1]->Setup(Context);
+		}
 	}
 }
 
@@ -119,26 +140,40 @@ void ZERNStageMultiplexer::DrawHorizontal2(ZEGRContext* Context)
 	ZESize ViewportWidth = OutputRenderTarget->GetWidth();
 	ZESize ViewportHeight = OutputRenderTarget->GetHeight() / 2;
 
-	if (Inputs.GetCount() > 0)
+	if (Displays.GetCount() > 0)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
-			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(0.0f);
+			Viewport.SetY(0.0f);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[0]->Draw(Context);
+			Displays[0]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[0]->Setup(Context);
+		}
 	}
 
-	if (Inputs.GetCount() > 1)
+	if (Displays.GetCount() > 1)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, ViewportHeight));
-			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(0.0f);
+			Viewport.SetY(ViewportHeight);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[1]->Draw(Context);
+			Displays[1]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[1]->Setup(Context);
+		}
 	}
 }
 
@@ -147,55 +182,84 @@ void ZERNStageMultiplexer::Draw2x2(ZEGRContext* Context)
 	ZESize ViewportWidth = OutputRenderTarget->GetWidth() / 2;
 	ZESize ViewportHeight = OutputRenderTarget->GetHeight() / 2;
 
-	if (Inputs.GetCount() > 0)
+	if (Displays.GetCount() > 0)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[0]->SetOutputOffset(ZEVector2(0.0f, 0.0f));
-			Inputs[0]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(0.0f);
+			Viewport.SetY(0.0f);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[0]->Draw(Context);
+			Displays[0]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[0]->Setup(Context);
+		}
 	}
 
-	if (Inputs.GetCount() > 1)
+	if (Displays.GetCount() > 1)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[1]->SetOutputOffset(ZEVector2(ViewportHeight, 0.0f));
-			Inputs[1]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(ViewportWidth);
+			Viewport.SetY(0.0f);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[1]->Draw(Context);
+			Displays[1]->Setup(Context, Viewport);
+
+		}
+		else
+		{
+			Displays[1]->Setup(Context);
+		}
 	}
 
-	if (Inputs.GetCount() > 2)
+	if (Displays.GetCount() > 2)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[2]->SetOutputOffset(ZEVector2(0.0f, ViewportHeight));
-			Inputs[2]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(0.0f);
+			Viewport.SetY(ViewportHeight);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[2]->Draw(Context);
+			Displays[2]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[2]->Setup(Context);
+		}
 	}
 
-	if (Inputs.GetCount() > 3)
+	if (Displays.GetCount() > 3)
 	{
 		if (Mode != ZERN_SMM_CUSTOM)
 		{
-			Inputs[3]->SetOutputOffset(ZEVector2(ViewportHeight, ViewportHeight));
-			Inputs[3]->SetOutputSize(ZEVector2(ViewportWidth, ViewportHeight));
-		}
+			ZEGRViewport Viewport;
+			Viewport.SetX(ViewportWidth);
+			Viewport.SetY(ViewportHeight);
+			Viewport.SetWidth(ViewportWidth);
+			Viewport.SetHeight(ViewportHeight);
 
-		Inputs[3]->Draw(Context);
+			Displays[3]->Setup(Context, Viewport);
+		}
+		else
+		{
+			Displays[3]->Setup(Context);
+		}
 	}
 }
 
 void ZERNStageMultiplexer::DrawCustom(ZEGRContext* Context)
 {
-	ze_for_each(Input, Inputs)
-		Input->Draw(Context);
+	ze_for_each(Input, Displays)
+		Input->Setup(Context);
 }
 
 bool ZERNStageMultiplexer::InitializeSelf()
@@ -225,16 +289,16 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set render state");
 
-	ze_for_each(Input, Inputs)
-		Input->Initialize();
+	ze_for_each(Display, Displays)
+		Display->Initialize();
 
 	return true;
 }
 
 void ZERNStageMultiplexer::DeinitializeSelf()
 {
-	ze_for_each(Input, Inputs)
-		Input->Deinitialize();
+	ze_for_each(Display, Displays)
+		Display->Deinitialize();
 
 	OutputRenderTarget.Release();
 	OutputTexture.Release();
@@ -264,28 +328,28 @@ ZERNStageMultiplexerMode ZERNStageMultiplexer::GetMode()
 	return Mode;
 }
 
-const ZEList2<ZERNStageMultiplexerInput>& ZERNStageMultiplexer::GetInputs()
+const ZEList2<ZERNStageDisplay>& ZERNStageMultiplexer::GetInputs()
 {
-	return Inputs;
+	return Displays;
 }
 
-void ZERNStageMultiplexer::AddInput(ZERNStageMultiplexerInput* Input)
+void ZERNStageMultiplexer::AddInput(ZERNStageDisplay* Input)
 {
 	zeCheckError(Input->Owner != NULL, ZE_VOID, "Multiplexer input is already registered with a stage.");
 	
-	Inputs.AddEnd(&Input->StageLink);
+	Displays.AddEnd(&Input->StageLink);
 	Input->Owner = this;
 	if (IsInitialized())
 		Input->Initialize();
 }
 
-void ZERNStageMultiplexer::RemoveInput(ZERNStageMultiplexerInput* Input)
+void ZERNStageMultiplexer::RemoveInput(ZERNStageDisplay* Input)
 {
 	zeCheckError(Input->Owner != this, ZE_VOID, "Multiplexer input is not associated with a stage.");
 
 	Input->Deinitialize();
 	Input->Owner = NULL;
-	Inputs.Remove(&Input->StageLink);
+	Displays.Remove(&Input->StageLink);
 }
 
 const ZEGRRenderTarget* ZERNStageMultiplexer::GetProvidedInput(ZERNStageBuffer Input) const
@@ -362,10 +426,10 @@ ZERNStageMultiplexer::ZERNStageMultiplexer()
 
 ZERNStageMultiplexer::~ZERNStageMultiplexer()
 {
-	while(Inputs.GetFirst() != NULL)
+	while(Displays.GetFirst() != NULL)
 	{
-		ZERNStageMultiplexerInput* Input = Inputs.GetFirst()->GetItem();
-		Inputs.Remove(&Input->StageLink);
+		ZERNStageDisplay* Input = Displays.GetFirst()->GetItem();
+		Displays.Remove(&Input->StageLink);
 		delete Input;
 	}
 }
