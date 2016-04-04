@@ -38,12 +38,11 @@
 
 #include "ZERNGBuffer.hlsl"
 #include "ZERNTransformations.hlsl"
-#include "ZERNLightScatteringCommon.hlsl"
 
 cbuffer ZERNSkyBox_Constants						: register(b8)
 {
-	float3			ZERNSkyBox_SkyColor;
-	float			ZERNSkyBox_SkyBrightness;	
+	float3			ZERNSkyBox_Color;
+	float			ZERNSkyBox_Reserved;	
 };
 
 cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
@@ -51,7 +50,7 @@ cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_T
 	float4x4		ZERNSkyBox_WorldTransform;
 };
 
-SamplerState		ZERNSkyBox_SamplerLinearWrap	: register(s1);
+SamplerState		ZERNSkyBox_SamplerLinearWrap	: register(s0);
 TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
 
 struct ZERNSkyBox_PixelShader_Input
@@ -75,11 +74,7 @@ ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSI
 
 float3 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Target0
 {
-	float3 Direction = normalize(Input.CubeTexcoord);
-	float CosZenith = dot(Direction, float3(0.0f, 1.0f, 0.0f)) * 0.5f + 0.5f;
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));
-	
-	return ZERNSkyBox_SkyBrightness * Extinction * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, Direction, 0.0f);
+	return ZERNSkyBox_Color * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSkyBox_SamplerLinearWrap, Input.CubeTexcoord, 0.0f);
 }
 
 #endif

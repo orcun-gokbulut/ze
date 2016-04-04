@@ -66,10 +66,8 @@ class ZERNStageAO : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>		InputColor;
 		ZEHolder<const ZEGRTexture2D>		InputDepth;
 		ZEHolder<const ZEGRTexture2D>		InputNormal;
-		ZEHolder<const ZEGRRenderTarget>	OutputColor;
 
 		ZEHolder<ZEGRTexture2D>				OcclusionMap;
 		ZEHolder<ZEGRTexture2D>				BlurTexture;
@@ -82,16 +80,13 @@ class ZERNStageAO : public ZERNStage
 		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexCoord;
 
 		ZEHolder<ZEGRShader>				SSAOPixelShader;
-		ZEHolder<ZEGRShader>				BlendPixelShader;
 		ZEHolder<ZEGRShader>				FilterPixelShader;
 
 		ZEHolder<ZEGRRenderStateData>		SSAORenderStateData;
-		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		FilterRenderStateData;
 
 		ZEHolder<ZEGRSampler>				SamplerPointWrap;
 		ZEHolder<ZEGRSampler>				SamplerPointClamp;
-		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
 
 		ZEArray<ZEVector4>					HorizontalValues;
 		ZEArray<ZEVector4>					VerticalValues;
@@ -124,16 +119,15 @@ class ZERNStageAO : public ZERNStage
 		void								CreateRandomVectors();
 		void								CreateSphereSamples();
 
-		bool								Update();
-		bool								UpdateInputOutput();
-		bool								UpdateConstantBuffers();
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();
+		bool								UpdateConstantBuffers();
+		bool								UpdateInputOutputs();
 		bool								UpdateTextures();
+		bool								Update();
 
 		void								GenerateOcclusionMap(ZEGRContext* Context);
 		void								ApplyBlur(ZEGRContext* Context);
-		void								BlendWithAccumulationBuffer(ZEGRContext* Context);
 
 		virtual bool						InitializeSelf();						
 		virtual void						DeinitializeSelf();
@@ -161,6 +155,8 @@ class ZERNStageAO : public ZERNStage
 
 		void								SetFilterKernelValues(const ZEVector4* Values, ZESize KernelSize);
 		const ZEVector4* 					GetFilterKernelValues() const;
+
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);

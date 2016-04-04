@@ -97,14 +97,29 @@ static DXGI_FORMAT ConvertToShaderResourceViewFormat(ZEGRFormat Format)
 	}
 }
 
+ID3D11Resource* ZED11Texture2D::GetResource() const
+{
+	ID3D11Resource* Resource = NULL;
+
+	//if (ShaderResourceView != NULL)
+	//	ShaderResourceView->GetResource(&Resource);
+	//
+	//return Resource;
+
+	if (Texture2D != NULL)
+		Texture2D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
+
+	return Resource;
+}
+
 ID3D11Texture2D* ZED11Texture2D::GetTexture() const
 {
 	return Texture2D;
 }
 
-ID3D11ShaderResourceView* ZED11Texture2D::GetResourceView() const
+ID3D11ShaderResourceView* ZED11Texture2D::GetShaderResourceView() const
 {
-	return ResourceView;
+	return ShaderResourceView;
 }
 
 ID3D11UnorderedAccessView* ZED11Texture2D::GetUnorderedAccessView() const
@@ -222,32 +237,30 @@ ZEHolder<const ZEGRDepthStencilBuffer> ZED11Texture2D::GetDepthStencilBuffer(boo
 
 void ZED11Texture2D::GenerateMipMaps()
 {
-	GetMainContext()->GenerateMips(ResourceView);
+	GetMainContext()->GenerateMips(ShaderResourceView);
 }
 
-bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV)
+bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
-	UINT BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-	BindFlags = DepthStencil ? ( D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL) : BindFlags;
-	BindFlags = UAV ? (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS) : BindFlags;
+	bool DepthStencil = (BindFlag & ZEGR_RBF_DEPTH_STENCIL);
+	bool UnorderedAccess = (BindFlag & ZEGR_RBF_UNORDERED_ACCESS);
 
 	DXGI_FORMAT TextureFormat = (Format == ZEGR_TF_R8G8B8A8_UNORM) ? DXGI_FORMAT_B8G8R8A8_UNORM : ConvertFormat(Format);	//format of .tga
-	TextureFormat = RenderTarget ?  ConvertFormat(Format) : TextureFormat;
+	TextureFormat = ((BindFlag & ZEGR_RBF_RENDER_TARGET) || UnorderedAccess) ?  ConvertFormat(Format) : TextureFormat;
 	TextureFormat = DepthStencil ? ConvertDepthStencilFormat(Format) : TextureFormat;
-	TextureFormat = UAV ?  ConvertFormat(Format) : TextureFormat;
 
 	D3D11_TEXTURE2D_DESC TextureDesc = {};
-	TextureDesc.MiscFlags = (DepthStencil || UAV) ? 0 : D3D11_RESOURCE_MISC_GENERATE_MIPS;
-	TextureDesc.ArraySize = ArrayCount;
 	TextureDesc.Width = Width;
 	TextureDesc.Height = Height;
 	TextureDesc.MipLevels = LevelCount;
-	TextureDesc.Usage = D3D11_USAGE_DEFAULT;
-	TextureDesc.BindFlags = BindFlags;
-	TextureDesc.CPUAccessFlags = 0;
+	TextureDesc.ArraySize = ArrayCount;
 	TextureDesc.Format = TextureFormat;
 	TextureDesc.SampleDesc.Count = SampleCount;
 	TextureDesc.SampleDesc.Quality = 0;
+	TextureDesc.Usage = ConvertUsage(Usage);
+	TextureDesc.BindFlags = (BindFlag == ZEGR_RBF_SHADER_RESOURCE) ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : ConvertBindFlag(BindFlag);
+	TextureDesc.CPUAccessFlags = (Usage == ZEGR_RU_CPU_READ_WRITE) ? (D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE) : (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
+	TextureDesc.MiscFlags = (BindFlag & ZEGR_RBF_SHADER_RESOURCE) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 	HRESULT Result = GetDevice()->CreateTexture2D(&TextureDesc, NULL, &Texture2D);
 	if (FAILED(Result))
@@ -256,47 +269,50 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, 
 		return false;
 	}
 
-	D3D11_SHADER_RESOURCE_VIEW_DESC ResourceDesc = {};
-	ResourceDesc.Format = DepthStencil ? ConvertToShaderResourceViewFormat(Format) :  TextureDesc.Format;
-	if(ArrayCount > 1)
+	if (Usage != ZEGR_RU_CPU_READ_WRITE)
 	{
-		if(SampleCount > 1)
+		D3D11_SHADER_RESOURCE_VIEW_DESC ResourceDesc = {};
+		ResourceDesc.Format = DepthStencil ? ConvertToShaderResourceViewFormat(Format) : TextureDesc.Format;
+		if (ArrayCount > 1)
 		{
-			ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
-			ResourceDesc.Texture2DMSArray.ArraySize = ArrayCount;
-			ResourceDesc.Texture2DMSArray.FirstArraySlice = 0;
+			if (SampleCount > 1)
+			{
+				ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMSARRAY;
+				ResourceDesc.Texture2DMSArray.ArraySize = ArrayCount;
+				ResourceDesc.Texture2DMSArray.FirstArraySlice = 0;
+			}
+			else
+			{
+				ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
+				ResourceDesc.Texture2DArray.ArraySize = ArrayCount;
+				ResourceDesc.Texture2DArray.FirstArraySlice = 0;
+				ResourceDesc.Texture2DArray.MostDetailedMip = 0;
+				ResourceDesc.Texture2DArray.MipLevels = LevelCount;
+			}
 		}
 		else
 		{
-			ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DARRAY;
-			ResourceDesc.Texture2DArray.ArraySize = ArrayCount;
-			ResourceDesc.Texture2DArray.FirstArraySlice = 0;
-			ResourceDesc.Texture2DArray.MostDetailedMip = 0;
-			ResourceDesc.Texture2DArray.MipLevels = LevelCount;
+			if (SampleCount > 1)
+			{
+				ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
+			}
+			else
+			{
+				ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				ResourceDesc.Texture2D.MostDetailedMip = 0;
+				ResourceDesc.Texture2D.MipLevels = LevelCount;
+			}
 		}
-	}
-	else
-	{
-		if(SampleCount > 1)
-		{
-			ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2DMS;
-		}
-		else
-		{
-			ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
-			ResourceDesc.Texture2D.MostDetailedMip = 0;
-			ResourceDesc.Texture2D.MipLevels = LevelCount;
-		}
-	}
 
-	Result = GetDevice()->CreateShaderResourceView(Texture2D, &ResourceDesc, &ResourceView);
-	if(FAILED(Result))
-	{
-		zeError("Texture 2D shader resource view creation failed. ErrorCode: %d.", Result);
-		return false;
+		Result = GetDevice()->CreateShaderResourceView(Texture2D, &ResourceDesc, &ShaderResourceView);
+		if (FAILED(Result))
+		{
+			zeError("Texture 2D shader resource view creation failed. ErrorCode: %d.", Result);
+			return false;
+		}
 	}
-
-	if(UAV)
+	
+	if (UnorderedAccess)
 	{
 		D3D11_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessViewDesc;
 		UnorderedAccessViewDesc.Format = TextureDesc.Format;
@@ -304,20 +320,21 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, 
 		UnorderedAccessViewDesc.Texture2D.MipSlice = 0;
 
 		Result = GetDevice()->CreateUnorderedAccessView(Texture2D, &UnorderedAccessViewDesc, &UnorderedAccessView);
-		if(FAILED(Result))
+		if (FAILED(Result))
 		{
 			zeError("Texture 2D unordered access view creation failed. ErrorCode: %d.", Result);
 			return false;
 		}
 	}
 
-	return ZEGRTexture2D::Initialize(Width, Height, ArrayCount, LevelCount, SampleCount, Format, RenderTarget, DepthStencil, UAV);
+	return ZEGRTexture2D::Initialize(Width, Height, LevelCount, Format, Usage, BindFlag, ArrayCount, SampleCount);
 }
 
 void ZED11Texture2D::Deinitialize()
 {
-	ZEGR_RELEASE(ResourceView);
 	ZEGR_RELEASE(Texture2D);
+	ZEGR_RELEASE(ShaderResourceView);
+	ZEGR_RELEASE(UnorderedAccessView);
 
 	for(ZEUInt I = 0; I < 15; I++)
 		RenderTargets[I].Release();
@@ -341,10 +358,47 @@ bool ZED11Texture2D::UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, 
 	return true;
 }
 
+bool ZED11Texture2D::Lock(void** Buffer, ZESize* RowPitch)
+{
+	zeCheckError(Texture2D == NULL, false, "Texture is not initialized.");
+	zeCheckError(GetLevelCount() > 1 || GetArrayCount() > 1, false, "Texture having subresource cannot be mapped");
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_ONLY || GetResourceUsage() == ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, "Texture has not been created for mapping");
+
+	D3D11_MAP MapType;
+	if (GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE)
+		MapType = D3D11_MAP_READ_WRITE;
+	else if (GetResourceUsage() == ZEGR_RU_GPU_READ_CPU_WRITE)
+		MapType = D3D11_MAP_WRITE_DISCARD;
+	else
+		return false;
+
+	D3D11_MAPPED_SUBRESOURCE MapData = {};
+	HRESULT Result = GetMainContext()->Map(Texture2D, 0, MapType, 0, &MapData);
+	if (FAILED(Result))
+	{
+		zeError("Cannot lock texture 2d resource.");
+		return false;
+	}
+
+	*Buffer = MapData.pData;
+	if (RowPitch != NULL)
+		*RowPitch = MapData.RowPitch;
+
+	return true;
+}
+
+void ZED11Texture2D::Unlock()
+{
+	zeDebugCheck(Texture2D == NULL, "Texture is not initailized.");
+
+	GetMainContext()->Unmap(Texture2D, 0);
+}
+
 ZED11Texture2D::ZED11Texture2D()
 {
 	Texture2D = NULL;
-	ResourceView = NULL;
+	ShaderResourceView = NULL;
+	UnorderedAccessView = NULL;
 }
 
 ZED11Texture2D::~ZED11Texture2D()

@@ -36,17 +36,13 @@
 #ifndef __ZERN_SUN_H__
 #define __ZERN_SUN_H__
 
-#include "ZERNTransformations.hlsl"
-#include "ZERNLightScatteringCommon.hlsl"
-
 cbuffer ZERNSun_Constants				: register(b8)
 {
 	float2	ZERNSun_PositionScreen;
 	float2	ZERNSun_SizeScreen;
 	
-	float	ZERNSun_CosZenith;
-	float	ZERNSun_Intensity;
-	float2	ZERNSun_Reserved;
+	float3	ZERNSun_Color;
+	float	ZERNSun_Reserved;
 };
 
 struct ZERNSun_VertexShader_Output
@@ -78,10 +74,7 @@ float3 ZERNSun_PixelShader_Main(ZERNSun_PixelShader_Input Input) : SV_Target0
 {	
 	float2 VectorScreen = (Input.PositionProjectionXY - ZERNSun_PositionScreen) / ZERNSun_SizeScreen;
 	if (dot(VectorScreen, VectorScreen) <= 1.0f)
-	{
-		float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNSun_CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));
-		return ZERNSun_Intensity * Extinction;
-	}
+		return ZERNSun_Color;
 	
 	discard;
 	return 0.0f;

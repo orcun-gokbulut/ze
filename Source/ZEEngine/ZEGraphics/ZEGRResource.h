@@ -43,18 +43,35 @@
 
 enum ZEGRResourceType
 {
-	ZEGR_RT_NONE					= 0,
-	ZEGR_RT_VERTEX_BUFFER			= 1,
-	ZEGR_RT_INDEX_BUFFER			= 2,
-	ZEGR_RT_CONSTANT_BUFFER			= 3,
-	ZEGR_RT_TEXTURE					= 4,
-	ZEGR_RT_RENDER_TARGET			= 5,
-	ZEGR_RT_DEPTH_STENCIL_BUFFER	= 6,
-	ZEGR_RT_SHADER					= 7,
-	ZEGR_RT_RENDER_STATE			= 8,
-	ZEGR_RT_OUTPUT					= 9,
-	ZEGR_RT_MATERIAL				= 10,
-	ZEGR_RT_STRUCTURED_BUFFER		= 11
+	ZEGR_RT_NONE						= 0,
+	ZEGR_RT_VERTEX_BUFFER				= 1,
+	ZEGR_RT_INDEX_BUFFER				= 2,
+	ZEGR_RT_CONSTANT_BUFFER				= 3,
+	ZEGR_RT_TEXTURE						= 4,
+	ZEGR_RT_RENDER_TARGET				= 5,
+	ZEGR_RT_DEPTH_STENCIL_BUFFER		= 6,
+	ZEGR_RT_SHADER						= 7,
+	ZEGR_RT_RENDER_STATE				= 8,
+	ZEGR_RT_OUTPUT						= 9,
+	ZEGR_RT_MATERIAL					= 10,
+	ZEGR_RT_STRUCTURED_BUFFER			= 11
+};
+
+enum ZEGRResourceUsage
+{
+	ZEGR_RU_GPU_READ_ONLY				= 0,
+	ZEGR_RU_GPU_READ_WRITE_CPU_WRITE	= 1,
+	ZEGR_RU_GPU_READ_CPU_WRITE			= 2,
+	ZEGR_RU_CPU_READ_WRITE				= 3
+};
+
+enum ZEGRResourceBindFlag
+{
+	ZEGR_RBF_NONE						= 0,
+	ZEGR_RBF_SHADER_RESOURCE			= 1,
+	ZEGR_RBF_RENDER_TARGET				= 2,
+	ZEGR_RBF_DEPTH_STENCIL				= 4,
+	ZEGR_RBF_UNORDERED_ACCESS			= 8
 };
 
 class ZEGRResource : public ZEReferenceCounted
@@ -64,18 +81,24 @@ class ZEGRResource : public ZEReferenceCounted
 	private:
 		ZEString						Name;
 		ZESize							Size;
+		ZEGRResourceUsage				Usage;
+		ZEGRResourceBindFlag			BindFlag;
 
 	protected:
 		void							SetSize(ZESize Size);
+		void							SetResourceUsage(ZEGRResourceUsage Usage);
+		void							SetResourceBindFlag(ZEGRResourceBindFlag BindFlag);	
 
 										ZEGRResource();
 		virtual 						~ZEGRResource();
 
 	public:
 		virtual ZEGRResourceType		GetResourceType() const = 0;
-		ZESize							GetSize() const;
-		ZESize							GetReferenceCount() const;
 
 		void							SetName(const ZEString& Name);
 		const ZEString&					GetName() const;
+
+		ZESize							GetSize() const;
+		ZEGRResourceUsage				GetResourceUsage() const;
+		ZEGRResourceBindFlag			GetResourceBindFlag() const;
 };

@@ -64,7 +64,7 @@ void ZELightProjective::UpdateShadowMap()
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
 
 	ShadowMap.Release();
-	ShadowMap = ZEGRTexture2D::CreateInstance(Size, Size, 1, 1, 1, ZEGR_TF_D32_FLOAT, false, true);
+	ShadowMap = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }

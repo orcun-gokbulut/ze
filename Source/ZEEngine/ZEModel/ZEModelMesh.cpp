@@ -675,11 +675,10 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
 		return false;
 
-	float DrawOrder = 0.0f;
 	ZEInt32 CurrentLOD = 0;
+	float DrawOrder = 0.0f;
 	float LODDistanceSquare = 0.0f;
-	ZEVector3 WorldPosition;
-	ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), ZEVector3::Zero);
+
 	float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	
 	if (!DrawOrderIsUserDefined)
 		DrawOrder = EntityDistanceSquare;
@@ -718,7 +717,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 
 bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	if (MeshResource == NULL || MeshResource->IsSkinned == true)
+	if (MeshResource == NULL || MeshResource->IsSkinned)
 		return false;
 
 	ZERay LocalRay;

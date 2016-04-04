@@ -48,7 +48,6 @@
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
-class ZEGRTexture2D;
 
 class ZEATMoon : public ZEEntity
 {
@@ -62,22 +61,18 @@ class ZEATMoon : public ZEEntity
 
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZEHolder<const ZEGRTexture2D>	DensityBuffer;
-
 		ZERNMap							PhaseTexture;
 
 		ZEVector3						Direction;
 		float							DiskRadius;
 
-		struct 
+		struct
 		{
 			ZEVector2					PositionScreen;
 			ZEVector2					SizeScreen;
 
 			float						Phase;
-			float						CosZenith;
-			float						Intensity;
-			float						Reserved;
+			ZEVector3					Color;
 		} Constants;
 
 		bool							UpdateShaders();
@@ -105,8 +100,8 @@ class ZEATMoon : public ZEEntity
 		void							SetDiskRadius(float DiskRadius);
 		float							GetDiskRadius() const;
 
-		void							SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
-		const ZEGRTexture2D*			GetDensityBuffer() const;
+		void							SetColor(const ZEVector3& Color);
+		const ZEVector3&				GetColor() const;
 
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

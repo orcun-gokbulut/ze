@@ -189,7 +189,7 @@ ZEATSun::ZEATSun()
 	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
 	DiskRadius = 0.266f;
 
-	Constants.Intensity = 10.0f;
+	Constants.Color = ZEVector3::One;
 }
 
 ZEATSun::~ZEATSun()
@@ -222,14 +222,19 @@ float ZEATSun::GetDiskRadius() const
 	return DiskRadius;
 }
 
-void ZEATSun::SetDensityBuffer(ZEGRTexture2D* DensityBuffer)
+void ZEATSun::SetColor(const ZEVector3& Color)
 {
-	this->DensityBuffer = DensityBuffer;
+	if (Constants.Color == Color)
+		return;
+
+	Constants.Color = Color;
+
+	DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
 }
 
-const ZEGRTexture2D* ZEATSun::GetDensityBuffer() const
+const ZEVector3& ZEATSun::GetColor() const
 {
-	return DensityBuffer;
+	return Constants.Color;
 }
 
 bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
@@ -244,7 +249,6 @@ bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 		return false;
 
 	ZEVector2 SunSizeScreen = DiskRadius * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
-	float CosSunZenith = ZEVector3::DotProduct(Direction, ZEVector3::UnitY) * 0.5f + 0.5f;
 
 	if (Constants.PositionScreen != SunPositionScreen)
 	{
@@ -254,11 +258,6 @@ bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 	if (Constants.SizeScreen != SunSizeScreen)
 	{
 		Constants.SizeScreen = SunSizeScreen;
-		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
-	}
-	if (Constants.CosZenith != CosSunZenith)
-	{
-		Constants.CosZenith = CosSunZenith;
 		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
 	}
 
@@ -281,8 +280,6 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
-	Context->SetTexture(ZEGR_ST_PIXEL, 10, DensityBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
@@ -291,9 +288,6 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 10, NULL);
-
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 

@@ -70,9 +70,8 @@ void ZEATAtmosphericScattering::CreateRandomVectors()
 		SphereSamples[I].w = 0.0f;
 	}
 
-
 	RandomVectorsTexture.Release();
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT);
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
 	RandomVectorsTexture->UpdateSubResource(0, 0, &SphereSamples[0], 128 * sizeof(ZEVector4));
 }
 
@@ -406,12 +405,12 @@ bool ZEATAtmosphericScattering::InitializeSelf()
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	PrecomputeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(PrecomputeConstants));
 
-	PrecomputedDensityBuffer = ZEGRTexture2D::CreateInstance(1024, 1024, 1, 1, 1, ZEGR_TF_R32G32_FLOAT, true);
+	PrecomputedDensityBuffer = ZEGRTexture2D::CreateInstance(1024, 1024, 1, ZEGR_TF_R32G32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	PrecomputedSingleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT, true, false);
 	PrecomputedHighOrderScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT, true, false);
 	PrecomputedHighOrderInScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT, true, false);
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT, true, false);
-	PrecomputedSkyAmbientBuffer = ZEGRTexture2D::CreateInstance(1024, 1, 1, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
+	PrecomputedSkyAmbientBuffer = ZEGRTexture2D::CreateInstance(1024, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 	SamplerLinearClamp = ZEGRSampler::GetSampler(ZEGRSamplerDescription());
 

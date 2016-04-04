@@ -35,26 +35,27 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZEGRResource.h"
+
+#include "ZETypes.h"
 #include "ZEGRDefinitions.h"
 
 class ZEGRStructuredBuffer : public ZEGRResource
 {
 	protected:
-			virtual bool							Initialize(ZESize ElementCount, ZESize ElementSize);
-			virtual void							Deinitialize();
+		virtual bool							Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag);
+		virtual void							Deinitialize();
 
-													ZEGRStructuredBuffer();
-			virtual									~ZEGRStructuredBuffer();
+												ZEGRStructuredBuffer();
+		virtual									~ZEGRStructuredBuffer();
 
 	public:
-			ZEGRResourceType						GetResourceType() const;
+		ZEGRResourceType						GetResourceType() const;
 
-			void									SetData(void* ConstantData);
+		void									SetData(void* ConstantData);
 
-			virtual bool							Lock(void** Buffer) = 0;
-			virtual void							Unlock() = 0;
+		virtual bool							Lock(void** Buffer) = 0;
+		virtual void							Unlock() = 0;
 
-			static ZEHolder<ZEGRStructuredBuffer>	Create(ZESize ElementCount, ZESize ElementSize);
+		static ZEHolder<ZEGRStructuredBuffer>	Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_SHADER_RESOURCE);
 };

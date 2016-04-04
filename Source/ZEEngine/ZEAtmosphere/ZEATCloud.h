@@ -49,7 +49,6 @@ class ZEGRConstantBuffer;
 class ZEGRVertexBuffer;
 class ZEGRSampler;
 class ZEGRContext;
-class ZEGRTexture2D;
 class ZEGRDepthStencilBuffer;
 class ZEGRRenderTarget;
 class ZETexture2DResource;
@@ -71,7 +70,6 @@ class ZEATCloud : public ZEEntity
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZEHolder<ZEGRSampler>			SamplerLinearWrap;
-		ZEHolder<const ZEGRTexture2D>	DensityBuffer;
 
 		ZETexture2DResource*			CloudTexture;
 
@@ -80,14 +78,16 @@ class ZEATCloud : public ZEEntity
 			float						PlaneSubdivision;
 			float						CloudCoverage;
 			float						CloudDensity;
-			float						CosLightZenith;
+			float						Reserved0;
+
+			ZEVector3					LightColor;
+			float						Inscattering;
 
 			ZEVector3					LightDirection;
-			float						LightIntensity;
+			float						Reserved1;
 
 			ZEVector2					Translation;
-			float						Inscattering;
-			float						Reserved;
+			ZEVector2					Reserved2;
 		} Constants;
 
 		void							CreatePlane();
@@ -115,20 +115,17 @@ class ZEATCloud : public ZEEntity
 		void							SetCloudDensity(float CloudDensity);
 		float							GetCloudDensity() const;
 
-		void							SetLightDirection(const ZEVector3& SunDirection);
-		const ZEVector3&				GetLightDirection() const;
-
-		void							SetLightIntensity(float LightIntensity);
-		float							GetLightIntensity() const;
-
-		void							SetTranslation(const ZEVector2& Translation);
-		const ZEVector2&				GetTranslation() const;
-
-		void							SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
-		const ZEGRTexture2D*			GetDensityBuffer() const;
+		void							SetLightColor(const ZEVector3& LightColor);
+		const ZEVector3&				GetLightColor() const;
 
 		void							SetInscattering(float Inscattering);
 		float							GetInscattering() const;
+
+		void							SetLightDirection(const ZEVector3& SunDirection);
+		const ZEVector3&				GetLightDirection() const;
+
+		void							SetTranslation(const ZEVector2& Translation);
+		const ZEVector2&				GetTranslation() const;
 
 		virtual void					Tick(float Time);
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);

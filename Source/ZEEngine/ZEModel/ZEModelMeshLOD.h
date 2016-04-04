@@ -71,15 +71,15 @@ class ZEModelMeshLOD
 		ZEArray<ZEMatrix4x4>				BoneTransforms;
 
 	public:
-		bool								IsSkinned();
+		bool								IsSkinned() const;
 
 		void								SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>		GetMaterial() const;
 
-		const ZEModelResourceMeshLOD*		GetLODResource();
+		const ZEModelResourceMeshLOD*		GetLODResource() const;
 
-		ZEInt32								GetDrawStartDistance();
-		ZEInt32								GetDrawEndDistance();
+		ZEInt32								GetDrawStartDistance() const;
+		ZEInt32								GetDrawEndDistance() const;
 
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();

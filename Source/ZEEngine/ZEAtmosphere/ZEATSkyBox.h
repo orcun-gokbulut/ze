@@ -47,7 +47,6 @@ class ZEGRRenderStateData;
 class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
 class ZEGRSampler;
-class ZEGRTexture2D;
 
 class ZEATSkyBox : public ZEEntity
 {
@@ -64,14 +63,14 @@ class ZEATSkyBox : public ZEEntity
 
 		ZEHolder<ZEGRSampler>				SamplerLinearWrap;
 
-		ZEHolder<const ZEGRTexture2D>		DensityBuffer;
-
 		ZETextureCubeResource*				SkyTexture;
+
+		float								Brightness;
 
 		struct  
 		{
 			ZEVector3						Color;
-			float							Brightness;
+			float							Reserved;
 		} Constants;
 
 		virtual bool						InitializeSelf();
@@ -96,9 +95,6 @@ class ZEATSkyBox : public ZEEntity
 
 		void								SetColor(const ZEVector3& Color);
 		const ZEVector3&					GetColor() const;
-
-		void								SetDensityBuffer(ZEGRTexture2D* DensityBuffer);
-		const ZEGRTexture2D*				GetDensityBuffer() const;
 
 		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

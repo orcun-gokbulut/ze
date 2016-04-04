@@ -36,10 +36,10 @@
 #ifndef __ZERN_MATH_H__
 #define __ZERN_MATH_H__
 
-#define PI		3.14159265359f
-#define PIx2	6.28318530717f
+#define ZERNMath_PI		3.14159265359f
+#define ZERNMath_PIx2	6.28318530717f
 
-#define PI_2	1.57079632679f
-#define PI_4	0.78539816339f
+#define ZERNMath_PI_2	1.57079632679f
+#define ZERNMath_PI_4	0.78539816339f
 
 #endif

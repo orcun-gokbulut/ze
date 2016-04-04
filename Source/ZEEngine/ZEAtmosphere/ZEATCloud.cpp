@@ -267,10 +267,10 @@ ZEATCloud::ZEATCloud()
 	Constants.PlaneSubdivision = 10.0f;
 	Constants.CloudCoverage = 0.5f;
 	Constants.CloudDensity = 1.0f;
-	Constants.LightDirection = ZEVector3(1.0f);
-	Constants.LightIntensity = 5.0f;
-	Constants.Translation = ZEVector2(0.0f, 0.0f);
+	Constants.LightColor = ZEVector3::One;
 	Constants.Inscattering = 0.05f;
+	Constants.LightDirection = ZEVector3::One;
+	Constants.Translation = ZEVector2::Zero;
 }
 
 ZEATCloud::~ZEATCloud()
@@ -337,59 +337,19 @@ float ZEATCloud::GetCloudDensity() const
 	return Constants.CloudDensity;
 }
 
-void ZEATCloud::SetLightDirection(const ZEVector3& LightDirection)
+void ZEATCloud::SetLightColor(const ZEVector3& LightColor)
 {
-	if (Constants.LightDirection == LightDirection)
+	if (Constants.LightColor == LightColor)
 		return;
 
-	Constants.LightDirection = LightDirection;
+	Constants.LightColor = LightColor;
 
 	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZEATCloud::GetLightDirection() const
+const ZEVector3& ZEATCloud::GetLightColor() const
 {
-	return Constants.LightDirection;
-}
-
-void ZEATCloud::SetLightIntensity(float LightIntensity)
-{
-	if (Constants.LightIntensity == LightIntensity)
-		return;
-
-	Constants.LightIntensity = LightIntensity;
-
-	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
-}
-
-float ZEATCloud::GetLightIntensity() const
-{
-	return Constants.LightIntensity;
-}
-
-void ZEATCloud::SetTranslation(const ZEVector2& Translation)
-{
-	if (Constants.Translation == Translation)
-		return;
-
-	Constants.Translation = Translation;
-
-	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
-}
-
-const ZEVector2& ZEATCloud::GetTranslation() const
-{
-	return Constants.Translation;
-}
-
-void ZEATCloud::SetDensityBuffer(ZEGRTexture2D* DensityBuffer)
-{
-	this->DensityBuffer = DensityBuffer;
-}
-
-const ZEGRTexture2D* ZEATCloud::GetDensityBuffer() const
-{
-	return DensityBuffer;
+	return Constants.LightColor;
 }
 
 void ZEATCloud::SetInscattering(float Inscattering)
@@ -405,6 +365,36 @@ void ZEATCloud::SetInscattering(float Inscattering)
 float ZEATCloud::GetInscattering() const
 {
 	return Constants.Inscattering;
+}
+
+void ZEATCloud::SetLightDirection(const ZEVector3& LightDirection)
+{
+	if (Constants.LightDirection == LightDirection)
+		return;
+
+	Constants.LightDirection = LightDirection;
+
+	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+}
+
+const ZEVector3& ZEATCloud::GetLightDirection() const
+{
+	return Constants.LightDirection;
+}
+
+void ZEATCloud::SetTranslation(const ZEVector2& Translation)
+{
+	if (Constants.Translation == Translation)
+		return;
+
+	Constants.Translation = Translation;
+
+	DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
+}
+
+const ZEVector2& ZEATCloud::GetTranslation() const
+{
+	return Constants.Translation;
 }
 
 void ZEATCloud::Tick(float Time)
@@ -425,13 +415,6 @@ bool ZEATCloud::PreRender(const ZERNCullParameters* CullParameters)
 {
 	if (!ZEEntity::PreRender(CullParameters))
 		return false;
-
-	float CosLightZenith = ZEVector3::DotProduct(-Constants.LightDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
-	if (Constants.CosLightZenith != CosLightZenith)
-	{
-		Constants.CosLightZenith = CosLightZenith;
-		DirtyFlags.RaiseFlags(ZE_CDF_CONSTANT_BUFFER);
-	}
 
 	CullParameters->Renderer->AddCommand(&RenderCommand);
 
@@ -458,17 +441,14 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
 	Context->SetRenderState(PlaneRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerLinearWrap);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, CloudTexture->GetTexture());
-	Context->SetTexture(ZEGR_ST_PIXEL, 10, DensityBuffer);
 	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
 
 	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
 
 	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, NULL);
-
 	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);

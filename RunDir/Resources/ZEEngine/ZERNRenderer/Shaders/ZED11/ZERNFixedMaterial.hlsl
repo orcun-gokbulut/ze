@@ -278,9 +278,8 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 
 	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? ZERNScene_AmbientColor : ZERNFixedMaterial_AmbientColor);
 	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
-	float3 SpecularColor = BaseColor * ZERNFixedMaterial_SpecularColor;
-	float3 EmissiveColor = BaseColor * ZERNFixedMaterial_EmissiveColor;
-
+	float SpecularColor = ZERNFixedMaterial_SpecularColor.x;
+	float3 EmissiveColor = ZERNFixedMaterial_EmissiveColor;
 
 	#ifdef ZERN_FM_EMISSIVE_MAP
 		EmissiveColor *= ZERNFixedMaterial_EmissiveMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
@@ -310,18 +309,15 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	#ifdef ZE_FM_VERTEX_COLOR
 		AmbientColor *= Input.Color;
 		DiffuseColor *= Input.Color;
-		SpecularColor *= Input.Color;
 	#endif
 	
-	float3 AccumulationColor = AmbientColor + EmissiveColor + ReflectionRefractionColor;
-	
+	ZERNGBuffer_SetAccumulationColor(GBuffer, AmbientColor);
 	ZERNGBuffer_SetViewNormal(GBuffer, Normal);
-	ZERNGBuffer_SetShadingModel(GBuffer, ZERN_LM_BLINN_PONG);
-	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);
-	ZERNGBuffer_SetDiffuseColor(GBuffer, DiffuseColor);
 	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor);
+	ZERNGBuffer_SetDiffuseColor(GBuffer, DiffuseColor);
+	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);
+	ZERNGBuffer_SetEmissiveColor(GBuffer, EmissiveColor);
 	ZERNGBuffer_SetSpecularPower(GBuffer, SpecularPower);
-	ZERNGBuffer_SetAccumulationColor(GBuffer, AccumulationColor);
 
 	return GBuffer;
 }

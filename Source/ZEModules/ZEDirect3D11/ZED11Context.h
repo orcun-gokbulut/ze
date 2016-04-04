@@ -90,7 +90,10 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void							SetBlendFactors(ZEVector4& Factors);
 		virtual void							SetBlendMask(ZEUInt Mask);
 
-		virtual void							SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture);
+		virtual void							SetRWTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture);
+		virtual void							SetRWStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer);
+
+		virtual void							CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource);
 
 		virtual void							Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
 		virtual void							DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);

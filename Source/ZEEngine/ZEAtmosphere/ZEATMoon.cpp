@@ -191,7 +191,7 @@ ZEATMoon::ZEATMoon()
 	DiskRadius = 0.257f;
 
 	Constants.Phase = 31.5f / 53.0f;
-	Constants.Intensity = 1.0f;
+	Constants.Color = ZEVector3::One;
 }
 
 ZEATMoon::~ZEATMoon()
@@ -224,14 +224,19 @@ float ZEATMoon::GetDiskRadius() const
 	return DiskRadius;
 }
 
-void ZEATMoon::SetDensityBuffer(ZEGRTexture2D* DensityBuffer)
+void ZEATMoon::SetColor(const ZEVector3& Color)
 {
-	this->DensityBuffer = DensityBuffer;
+	if (Constants.Color == Color)
+		return;
+
+	Constants.Color = Color;
+
+	DirtyFlags.RaiseFlags(ZEAT_MDF_CONSTANT_BUFFERS);
 }
 
-const ZEGRTexture2D* ZEATMoon::GetDensityBuffer() const
+const ZEVector3& ZEATMoon::GetColor() const
 {
-	return DensityBuffer;
+	return Constants.Color;
 }
 
 void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
@@ -259,7 +264,6 @@ bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 		return false;
 
 	ZEVector2 MoonSizeScreen = DiskRadius * ZEVector2(View.ProjectionTransform.M11, View.ProjectionTransform.M22);
-	float CosMoonZenith = ZEVector3::DotProduct(Direction, ZEVector3::UnitY) * 0.5f + 0.5f;
 
 	if (Constants.PositionScreen != MoonPositionScreen)
 	{
@@ -269,11 +273,6 @@ bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 	if (Constants.SizeScreen != MoonSizeScreen)
 	{
 		Constants.SizeScreen = MoonSizeScreen;
-		DirtyFlags.RaiseFlags(ZEAT_MDF_CONSTANT_BUFFERS);
-	}
-	if (Constants.CosZenith != CosMoonZenith)
-	{
-		Constants.CosZenith = CosMoonZenith;
 		DirtyFlags.RaiseFlags(ZEAT_MDF_CONSTANT_BUFFERS);
 	}
 
@@ -298,7 +297,6 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	Context->SetRenderState(RenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, PhaseTexture.GetTexture());
-	Context->SetTexture(ZEGR_ST_PIXEL, 10, DensityBuffer);
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
@@ -310,7 +308,6 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 10, NULL);
 	Context->SetRenderTargets(0, NULL, NULL);
 }
 

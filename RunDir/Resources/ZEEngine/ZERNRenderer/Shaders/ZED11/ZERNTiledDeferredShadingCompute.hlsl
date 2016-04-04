@@ -185,30 +185,11 @@ float3 ZERNTiledDeferredShadingCompute_DirectionalLighting(ZERNShading_Light Dir
 			}
 		}
 	}
-
-	float3 LightDirectionWorld = ZERNTransformations_ViewToWorld(float4(DirectionalLight.DirectionView, 0.0f));
-	LightDirectionWorld = normalize(LightDirectionWorld);
 	
-	float3 SurfacePositionWorld = ZERNTransformations_ViewToWorld(float4(Surface.PositionView, 1.0f));
+	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
+	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
 	
-	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);	
-	float3 EarthToPosition = SurfacePositionWorld - EarthCenter;
-	float EarthToPositionLength = length(EarthToPosition);
-	float3 EarthNormal = EarthToPosition / EarthToPositionLength;
-	
-	float CosSunZenith = dot(LightDirectionWorld, EarthNormal) * 0.5f + 0.5f;
-	float HeightAboveEarth = EarthToPositionLength - EARTH_RADIUS;
-	
-	float3 AmbientColor = ZERNLightScatteringCommon_GetAmbientColor(CosSunZenith);
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(CosSunZenith, HeightAboveEarth);
-	
-	float3 LightColor = DirectionalLight.Color * Extinction;
-	AmbientColor *= DirectionalLight.Color;
-	
-	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionalLight.DirectionView));
-	float ENdotL = saturate(CosSunZenith);
-	
-	float3 ResultColor = Surface.Diffuse * (AmbientColor * ENdotL + LightColor * NdotL * Visibility);
+	float3 ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * DirectionalLight.Color;
 	
 	return ResultColor;
 }

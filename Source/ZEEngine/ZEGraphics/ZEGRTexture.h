@@ -51,24 +51,24 @@ enum ZEGRTextureType
 class ZEGRTexture : public ZEGRResource
 {
 	private:
-		ZEGRFormat				Format;
-		ZEUInt					LevelCount;
-		bool					IsRenderTarget;
+		ZEGRFormat					Format;
+		ZEUInt						LevelCount;
+		bool						IsRenderTarget;
 
 	protected:
-		void					SetFormat(ZEGRFormat Format);	
-		void					SetLevelCount(ZEUInt LevelCount);
-		void					SetIsRenderTarget(bool RenderTarget);
+		void						SetFormat(ZEGRFormat Format);
+		void						SetLevelCount(ZEUInt LevelCount);
+		void						SetIsRenderTarget(bool RenderTarget);
 
-		static ZESize			CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
-		static ZESize			CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		static ZESize				CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
+		static ZESize				CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
 
-								ZEGRTexture();
+									ZEGRTexture();
 
 	public:
-		ZEGRFormat				GetFormat() const;
-		ZEUInt					GetLevelCount() const;
-		bool					GetIsRenderTarget() const;
+		ZEGRFormat					GetFormat() const;
+		ZEUInt						GetLevelCount() const;
+		bool						GetIsRenderTarget() const;
 
-		virtual ZEGRTextureType	GetTextureType() const = 0;
+		virtual ZEGRTextureType		GetTextureType() const = 0;
 };

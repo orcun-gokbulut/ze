@@ -84,7 +84,10 @@ class ZEGRContext
 		virtual void			SetBlendFactors(ZEVector4& Factors) = 0;
 		virtual void			SetBlendMask(ZEUInt Mask) = 0;
 
-		virtual void			SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture) = 0;
+		virtual void			SetRWTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture) = 0;
+		virtual void			SetRWStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer) = 0;
+
+		virtual	void			CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource) = 0;
 
 		virtual void			Draw(ZEUInt VertexCount, ZEUInt VertexOffset) = 0;
 		virtual void			DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;

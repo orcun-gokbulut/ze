@@ -49,28 +49,30 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 	friend class ZED11Module;
 	friend class ZED11Context;
 
-	protected:
+	private:
 		ID3D11Texture2D*										Texture2D;
-		ID3D11ShaderResourceView*								ResourceView;
+		ID3D11ShaderResourceView*								ShaderResourceView;
 		ID3D11UnorderedAccessView*								UnorderedAccessView;
-		mutable ZEHolder<ZEGRRenderTarget>						RenderTargets[15];		//maximum mip count is 15 in directx 11
+		mutable ZEHolder<ZEGRRenderTarget>						RenderTargets[15];			//maximum mip count is 15 in directx 11
 		mutable ZEHolder<ZEGRDepthStencilBuffer>				DepthStencilBuffers[4][2];
 
-		virtual bool											Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt Level, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV);
+		virtual bool											Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_ONLY, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_SHADER_RESOURCE, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);
 		virtual void											Deinitialize();
+
+		ID3D11Resource*											GetResource() const;
+		ID3D11Texture2D*										GetTexture() const;
+		ID3D11ShaderResourceView*								GetShaderResourceView() const;
+		ID3D11UnorderedAccessView*								GetUnorderedAccessView() const;
 
 																ZED11Texture2D();
 		virtual													~ZED11Texture2D();
 
 	public:
-		ID3D11Texture2D*										GetTexture() const;
-		ID3D11ShaderResourceView*								GetResourceView() const;
-		ID3D11UnorderedAccessView*								GetUnorderedAccessView() const;
-
 		virtual ZEHolder<const ZEGRRenderTarget>				GetRenderTarget(ZEUInt Level) const;
 		virtual ZEHolder<const ZEGRDepthStencilBuffer>			GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const;
 
 		virtual void											GenerateMipMaps();
-
 		virtual bool											UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
+		virtual bool											Lock(void** Buffer, ZESize* RowPitch);
+		virtual void											Unlock();
 };

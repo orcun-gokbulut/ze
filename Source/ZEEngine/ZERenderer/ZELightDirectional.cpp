@@ -183,7 +183,7 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
 
 	CascadeShadowMaps.Release();
-	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, CascadeConstants.CascadeCount, 1, 1, ZEGR_TF_D32_FLOAT, false, true);
+	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL, CascadeConstants.CascadeCount);
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
@@ -281,24 +281,14 @@ bool ZELightDirectional::GetUseMoonLight() const
 	return UseMoonLight;
 }
 
-void ZELightDirectional::SetDensityBuffer(const ZEGRTexture2D* DensityBuffer)
+void ZELightDirectional::SetTerrestrialColor(const ZEVector3& TerrestrialColor)
 {
-	this->DensityBuffer = DensityBuffer;
+	this->TerrestrialColor = TerrestrialColor;
 }
 
-const ZEGRTexture2D* ZELightDirectional::GetDensityBuffer() const
+const ZEVector3& ZELightDirectional::GetTerrestrialColor() const
 {
-	return DensityBuffer;
-}
-
-void ZELightDirectional::SetAmbientBuffer(const ZEGRTexture2D* AmbientBuffer)
-{
-	this->AmbientBuffer = AmbientBuffer;
-}
-
-const ZEGRTexture2D* ZELightDirectional::GetAmbientBuffer() const
-{
-	return AmbientBuffer;
+	return TerrestrialColor;
 }
 
 void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context)

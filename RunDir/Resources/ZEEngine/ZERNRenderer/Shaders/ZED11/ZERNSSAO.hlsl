@@ -63,7 +63,6 @@ cbuffer ZERNSSAO_FilterConstants					: register(b9)
 
 SamplerState 		ZERNSSAO_SamplerPointWrap		: register(s0);
 SamplerState 		ZERNSSAO_SamplerPointClamp		: register(s1);
-SamplerState 		ZERNSSAO_SamplerLinearClamp		: register(s2);
 
 float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {	
@@ -108,11 +107,6 @@ float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Tar
 	{
 		return (float3)1.0f;
 	}
-}
-
-float3 ZERNSSAO_Blend_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
-{
-	return ZERNSSAO_OcclusionTexture.Sample(ZERNSSAO_SamplerLinearClamp, TexCoord);
 }
 
 float3 ZERNSSAO_Filter_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0

@@ -46,7 +46,7 @@ bool ZERNStageOutputTexture::Update()
 	if (!Dirty)
 		return true;
 
-	Texture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, Format, true);
+	Texture = ZEGRTexture2D::CreateInstance(Width, Height, 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	if (Texture == NULL)
 		return false;
 

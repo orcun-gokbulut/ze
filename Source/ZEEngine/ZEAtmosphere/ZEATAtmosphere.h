@@ -62,6 +62,8 @@ class ZEATAtmosphere : public ZEEntity
 		ZEFlags							DirtyFlags;
 		ZERNCommand						Command;
 		ZEATObserver					Observer;
+		ZEVector4						SkyAmbient[1024];
+		ZEVector4						Extinction[32][128];
 
 		ZEATSun*						Sun;
 		ZEATMoon*						Moon;
@@ -75,28 +77,23 @@ class ZEATAtmosphere : public ZEEntity
 		ZEHolder<ZEGRRenderStateData>	SkyRenderStateData;
 		ZEHolder<ZEGRConstantBuffer>	SkyConstantBuffer;
 
-		ZEHolder<ZEGRShader>			PrecomputeDensityPixelShader;
+		ZEHolder<ZEGRShader>			PrecomputeExtinctionPixelShader;
 		ZEHolder<ZEGRShader>			PrecomputeSingleScatteringPixelShader;
 		ZEHolder<ZEGRShader>			PrecomputeHighOrderScatteringPixelShader;
 		ZEHolder<ZEGRShader>			PrecomputeHighOrderInScatteringPixelShader;
 		ZEHolder<ZEGRShader>			AddOrdersPixelShader;
 		ZEHolder<ZEGRShader>			PrecomputeSkyAmbientPixelShader;
 
-		ZEHolder<ZEGRRenderStateData>	PrecomputeDensityRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	PrecomputeExtinctionRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	PrecomputeSingleScatteringRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	PrecomputeHighOrderScatteringRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	PrecomputeHighOrderInScatteringRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	AddOrdersRenderStateData;
 		ZEHolder<ZEGRRenderStateData>	PrecomputeSkyAmbientRenderStateData;
 
-		ZEHolder<ZEGRTexture2D>			PrecomputedDensityBuffer;
 		ZEHolder<ZEGRTexture3D>			PrecomputedSingleScatteringBuffer;
-		ZEHolder<ZEGRTexture3D>			PrecomputedHighOrderScatteringBuffer;
-		ZEHolder<ZEGRTexture3D>			PrecomputedHighOrderInScatteringBuffer;
 		ZEHolder<ZEGRTexture3D>			PrecomputedMultipleScatteringBuffer;
-		ZEHolder<ZEGRTexture2D>			PrecomputedSkyAmbientBuffer;
-
-		ZEHolder<ZEGRConstantBuffer>	PrecomputeConstantBuffer;
+		ZEHolder<ZEGRTexture2D>			PrecomputedExtinctionBuffer;
 
 		ZEHolder<ZEGRTexture2D>			RandomVectorsTexture;
 
@@ -166,6 +163,11 @@ class ZEATAtmosphere : public ZEEntity
 
 		void							SetFogDensity(float FogDensity);
 		float							GetFogDensity() const;
+
+		ZEVector3						GetTerrestrialSunColor();
+		ZEVector3						GetTerrestrialSunAmbientColor();
+		ZEVector3						GetTerrestrialMoonColor();
+		ZEVector3						GetTerrestrialMoonAmbientColor();
 
 		virtual void					Tick(float Time);
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);

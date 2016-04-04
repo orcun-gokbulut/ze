@@ -69,6 +69,7 @@ class ZERNStageLighting : public ZERNStage
 	private:
 		ZEFlags									DirtyFlags;
 		ZEGRViewport							Viewport;
+		ZEHolder<ZEGRTexture2D>					OutputTexture;
 
 		ZEHolder<ZEGRShader>					ScreenCoverVertexShader;
 		ZEHolder<ZEGRShader>					DeferredVertexShader;
@@ -92,16 +93,12 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRSampler>					SamplerComparisonLinearPointClamp;
 		ZEHolder<ZEGRSampler>					SamplerPointWrap;
 		ZEHolder<ZEGRSampler>					SamplerPointBorder;
+		ZEHolder<ZEGRSampler>					SamplerPointClamp;
 
 		ZEList2<ZELight>						DeferredLightList;
 		ZEList2<ZELight>						TiledDeferredLightList;
 
-		ZEUInt									Width;
-		ZEUInt									Height;
-
 		bool									ShowCascades;
-
-		const ZEGRRenderTarget*					OutputRenderTarget;
 
 		struct LightStruct
 		{
@@ -155,6 +152,8 @@ class ZERNStageLighting : public ZERNStage
 
 		void									SetShowCascades(bool ShowCascades);
 		bool									GetShowCascades() const;
+
+		virtual const ZEGRTexture2D*			GetOutput(ZERNStageBuffer Output) const;
 
 		virtual bool							Setup(ZEGRContext* Context);
 		virtual void							CleanUp(ZEGRContext* Context);

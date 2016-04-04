@@ -38,28 +38,18 @@
 #include "ZEError.h"
 #include "ZED11Module.h"
 
-ID3D11Buffer* ZED11StructuredBuffer::GetBuffer() const
-{
-	return Buffer;
-}
-
-ID3D11ShaderResourceView* ZED11StructuredBuffer::GetResourceView() const
-{
-	return ResourceView;
-}
-
-bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize)
+bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag)
 {	
 	ZESize BufferSize = ElementCount * ElementSize;
 	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
 	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
 
 	D3D11_BUFFER_DESC Desc;
-	Desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
-	Desc.Usage = D3D11_USAGE_DYNAMIC;
-	Desc.BindFlags = D3D11_BIND_SHADER_RESOURCE;
-	Desc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 	Desc.ByteWidth = (UINT)BufferSize;
+	Desc.Usage = ConvertUsage(Usage);
+	Desc.BindFlags = ConvertBindFlag(BindFlag);
+	Desc.CPUAccessFlags = (Usage == ZEGR_RU_CPU_READ_WRITE) ? (D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE) : (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
+	Desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	Desc.StructureByteStride = ElementSize;
 
 	HRESULT Result = GetDevice()->CreateBuffer(&Desc, NULL, &Buffer);
@@ -69,30 +59,80 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize)
 		return false;
 	}
 
-	Result = GetDevice()->CreateShaderResourceView(Buffer, NULL, &ResourceView);
-	if (FAILED(Result))
+	if (BindFlag & ZEGR_RBF_SHADER_RESOURCE)
 	{
-		zeError("Shader resource view creation failed. ErrorCode: %d.", Result);
-		return false;
+		Result = GetDevice()->CreateShaderResourceView(Buffer, NULL, &ShaderResourceView);
+		if (FAILED(Result))
+		{
+			zeError("Structured buffer shader resource view creation failed. ErrorCode: %d.", Result);
+			return false;
+		}
 	}
 
-	SetSize(BufferSize);
+	if (BindFlag & ZEGR_RBF_UNORDERED_ACCESS)
+	{
+		Result = GetDevice()->CreateUnorderedAccessView(Buffer, NULL, &UnorderedAccessView);
+		if (FAILED(Result))
+		{
+			zeError("Structured buffer unordered access view creation failed. ErrorCode: %d.", Result);
+			return false;
+		}
+	}
 
-	return true;
+	return ZEGRStructuredBuffer::Initialize(ElementCount, ElementSize, Usage, BindFlag);
 }
 
 void ZED11StructuredBuffer::Deinitialize()
 {
 	ZEGR_RELEASE(Buffer);
-	ZEGR_RELEASE(ResourceView);
+	ZEGR_RELEASE(ShaderResourceView);
+	ZEGR_RELEASE(UnorderedAccessView);
 
 	ZEGRStructuredBuffer::Deinitialize();
 }
 
+ZED11StructuredBuffer::ZED11StructuredBuffer()
+{
+	Buffer = NULL;
+	ShaderResourceView = NULL;
+	UnorderedAccessView = NULL;
+}
+
+ZED11StructuredBuffer::~ZED11StructuredBuffer()
+{
+
+}
+
+ID3D11Buffer* ZED11StructuredBuffer::GetBuffer() const
+{
+	return Buffer;
+}
+
+ID3D11ShaderResourceView* ZED11StructuredBuffer::GetShaderResourceView() const
+{
+	return ShaderResourceView;
+}
+
+ID3D11UnorderedAccessView* ZED11StructuredBuffer::GetUnorderedAccessView() const
+{
+	return UnorderedAccessView;
+}
+
 bool ZED11StructuredBuffer::Lock(void** Buffer)
 {
+	zeCheckError(this->Buffer == NULL, false, "Structured buffer is not initialized.");
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_ONLY || GetResourceUsage() == ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, "Structured buffer has not been created for mapping");
+
+	D3D11_MAP MapType;
+	if (GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE)
+		MapType = D3D11_MAP_READ_WRITE;
+	else if (GetResourceUsage() == ZEGR_RU_GPU_READ_CPU_WRITE)
+		MapType = D3D11_MAP_WRITE_DISCARD;
+	else
+		return false;
+
 	D3D11_MAPPED_SUBRESOURCE Map;
-	HRESULT Result = GetMainContext()->Map(this->Buffer, 0, D3D11_MAP_WRITE_DISCARD, NULL, &Map);
+	HRESULT Result = GetMainContext()->Map(this->Buffer, 0, MapType, 0, &Map);
 	if (FAILED(Result))
 	{
 		zeError("Cannot lock structured buffer.");
@@ -105,16 +145,7 @@ bool ZED11StructuredBuffer::Lock(void** Buffer)
 }
 void ZED11StructuredBuffer::Unlock()
 {
+	zeCheckError(this->Buffer == NULL, ZE_VOID, "Structured buffer is not initialized.");
+
 	GetMainContext()->Unmap(Buffer, 0);
-}
-
-ZED11StructuredBuffer::ZED11StructuredBuffer()
-{
-	Buffer = NULL;
-	ResourceView = NULL;
-}
-
-ZED11StructuredBuffer::~ZED11StructuredBuffer()
-{
-	Deinitialize();
 }
