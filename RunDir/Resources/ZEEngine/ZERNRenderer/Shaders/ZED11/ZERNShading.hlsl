@@ -51,7 +51,7 @@ struct ZERNShading_Light
 struct ZERNShading_Surface
 {
 	float3						PositionView;
-	float						Reserved;
+	float						Reserved0;
 	float3						NormalView;
 	float						Reserved1;
 	float3						Diffuse;

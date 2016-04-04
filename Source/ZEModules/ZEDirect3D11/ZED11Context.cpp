@@ -324,7 +324,7 @@ void ZED11Context::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, cons
 	ID3D11ShaderResourceView* ResourceView = NULL;
 	if(Buffer != NULL)
 	{
-		ResourceView = static_cast<const ZED11StructuredBuffer*>(Buffer)->GetResourceView();
+		ResourceView = static_cast<const ZED11StructuredBuffer*>(Buffer)->GetShaderResourceView();
 	}
 	
 	switch(Shader)
@@ -368,7 +368,7 @@ void ZED11Context::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, cons
 	}
 }
 
-void ZED11Context::SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
+void ZED11Context::SetRWTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
 {
 	ID3D11UnorderedAccessView* NativeView = NULL;
 
@@ -396,6 +396,26 @@ void ZED11Context::SetUnorderedAccessView(ZEGRShaderType Shader, ZEUInt Index, c
 
 		case ZEGR_ST_COMPUTE:
 			Context->CSSetUnorderedAccessViews(Index, 1, &NativeView, NULL);
+			break;
+	}
+}
+
+void ZED11Context::SetRWStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
+{
+	ID3D11UnorderedAccessView* UnorderedAccessView = NULL;
+	if(UnorderedAccessView != NULL)
+	{
+		UnorderedAccessView = static_cast<const ZED11StructuredBuffer*>(Buffer)->GetUnorderedAccessView();
+	}
+
+	switch (Shader)
+	{
+		default:
+		case ZEGR_ST_NONE:
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetUnorderedAccessViews(Index, 1, &UnorderedAccessView, NULL);
 			break;
 	}
 }
@@ -496,7 +516,7 @@ void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTex
 		switch (Texture->GetTextureType())
 		{
 			case ZEGR_TT_2D:
-				NativeTexture = static_cast<const ZED11Texture2D*>(Texture)->GetResourceView();
+				NativeTexture = static_cast<const ZED11Texture2D*>(Texture)->GetShaderResourceView();
 				break;
 
 			case ZEGR_TT_3D:
@@ -601,7 +621,7 @@ void ZED11Context::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture**
 		if(ResourceDimension == D3D11_RESOURCE_DIMENSION_TEXTURE2D)
 		{
 			ZED11Texture2D *Texture2D = new ZED11Texture2D();
-			Texture2D->ResourceView = ResourceView;
+			Texture2D->ShaderResourceView = ResourceView;
 
 			*Texture = Texture2D;
 		}
@@ -657,6 +677,42 @@ void ZED11Context::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSam
 			Context->CSSetSamplers(Index, 1, &NativeSampler);
 			break;
 	}
+}
+
+void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource)
+{
+	ID3D11Resource* DestNativeResource = NULL;
+	ID3D11Resource* SrcNativeResource = NULL;
+
+	switch (DestResource->GetResourceType())
+	{
+		case ZEGR_RT_TEXTURE:
+			{
+				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(DestResource);
+				if (Texture->GetTextureType() == ZEGR_TT_2D)
+					DestNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+
+				break;
+			}
+		default:
+			return;
+	}
+
+	switch (SrcResource->GetResourceType())
+	{
+		case ZEGR_RT_TEXTURE:
+			{
+				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(SrcResource);
+				if (Texture->GetTextureType() == ZEGR_TT_2D)
+					SrcNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+
+				break;
+			}
+		default:
+			return;
+	}
+
+	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
 }
 
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)

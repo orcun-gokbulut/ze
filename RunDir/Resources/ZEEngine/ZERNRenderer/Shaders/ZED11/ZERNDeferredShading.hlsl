@@ -40,7 +40,6 @@
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNShading.hlsl"
-#include "ZERNLightScatteringCommon.hlsl"
 
 #define ZE_LT_NONE				0
 #define ZE_LT_POINT				1
@@ -79,9 +78,11 @@ cbuffer ZERNDeferredShading_CascadeConstants												: register(b9)
 SamplerState						ZERNDeferredShading_SamplerLinearBorder					: register(s1);
 SamplerComparisonState				ZERNDeferredShading_SamplerComparisonLinearPointClamp	: register(s2);
 SamplerState						ZERNDeferredShading_SamplerPointWrap					: register(s3);
+SamplerState						ZERNDeferredShading_SamplerPointClamp					: register(s4);
 
 Texture2DArray<float>				ZERNDeferredShading_ShadowMaps							: register(t5);
 Texture2D<float4>					ZERNDeferredShading_ProjectionMap						: register(t6);
+Texture2D<float>					ZERNDeferredShading_AmbientOcclusionMap					: register(t7);
 Texture2D<float2>					ZERNDeferredShading_RandomVectors						: register(t8);
 Texture2D<float3>					ZERNDeferredShading_TiledComputeColorBuffer				: register(t9);
 
@@ -183,18 +184,13 @@ float3 ZERNDeferredShading_DirectionalLighting(ZERNShading_Light DirectionalLigh
 		}
 	}
 	
-	float3 AmbientColor = ZERNLightScatteringCommon_GetAmbientColor(DirectionalLight.CosZenith);
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(DirectionalLight.CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));
+	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
+	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
 	
-	float3 LightDiffuseColor = DirectionalLight.Color * Extinction;
-	float3 LightAmbientColor = DirectionalLight.Color * AmbientColor;
-	
-	float NdotL = max(0.0f, dot(Surface.NormalView, DirectionalLight.DirectionView));
-	
-	float3 ResultColor = Surface.Diffuse * (LightAmbientColor * DirectionalLight.CosZenith + LightDiffuseColor * NdotL * Visibility);
+	float3 ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * DirectionalLight.Color;
 	
 	if(ZERNDeferredShading_ShowCascades)
-		return ResultColor * CascadeColor;
+		return ResultDiffuse * CascadeColor;
 	else
 		return ResultColor;
 }
@@ -279,14 +275,22 @@ float3 ZERNDeferredShading_Lighting(ZERNShading_Surface Surface)
 
 float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : SV_Position) : SV_Target0
 {
+	float2 GBufferDimensions = ZERNGBuffer_GetDimensions();
+	
 	ZERNShading_Surface Surface;
-	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy));
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, GBufferDimensions, ZERNGBuffer_GetDepth(PositionViewport.xy));
 	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
 	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy);
 	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy);
 	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PositionViewport.xy);
 	
-	return ZERNDeferredShading_Lighting(Surface);
+	float3 Emissive = ZERNGBuffer_GetEmissiveColor(PositionViewport.xy);
+	float3 Ambient = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
+	//Ambient *= ZERNDeferredShading_AmbientOcclusionMap.SampleLevel(ZERNDeferredShading_SamplerPointClamp, PositionViewport / GBufferDimensions, 0.0f);
+	
+	float3 TotalDiffuseSpecular = ZERNDeferredShading_Lighting(Surface);
+	
+	return Emissive + Ambient + TotalDiffuseSpecular;
 }
 
 float3 ZERNDeferredShading_Accumulate_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0

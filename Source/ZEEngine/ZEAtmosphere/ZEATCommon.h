@@ -36,10 +36,15 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEMath/ZEVector.h"
 
 #define EARTH_RADIUS			6360000.0f
 #define ATMOSPHERE_HEIGHT		80000.0f
 #define TOTAL_RADIUS			(EARTH_RADIUS + ATMOSPHERE_HEIGHT)
+#define RAYLEIGH_MIE_HEIGHT 	ZEVector2(7994.0f, 1200.0f)
+
+static const ZEVector3 ZEATRayleighScatteringFactor	= ZEVector3(5.8e-6, 13.5e-6, 33.1e-6);
+static const ZEVector3 ZEATMieScatteringFactor		= ZEVector3(2.0e-5, 2.0e-5, 2.0e-5);
 
 struct ZEATObserver
 {

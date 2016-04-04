@@ -183,7 +183,7 @@ bool ZERNStageHDR::UpdateInputOutput()
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -217,16 +217,16 @@ bool ZERNStageHDR::UpdateTextures()
 	{
 		ZEUInt Size = (ZEUInt)ZEMath::Power(2.0f, (float)I);
 		LuminanceMips[Index].Release();
-		LuminanceMips[Index++] = ZEGRTexture2D::CreateInstance(Size, Size, 1, 1, 1, ZEGR_TF_R16_FLOAT, true);
+		LuminanceMips[Index++] = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_R16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	}
 
 	LuminanceMips[Index].Release();
 	CurrentAdaptedLuminance.Release();
 	PreviousAdaptedLuminance.Release();
 
-	LuminanceMips[Index] = ZEGRTexture2D::CreateInstance(1, 1, 1, 1, 1, ZEGR_TF_R16_FLOAT, true);
-	CurrentAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, 1, 1, ZEGR_TF_R16_FLOAT, true);
-	PreviousAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, 1, 1, ZEGR_TF_R16_FLOAT, true);
+	LuminanceMips[Index] = ZEGRTexture2D::CreateInstance(1, 1, 1, ZEGR_TF_R16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	CurrentAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, ZEGR_TF_R16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	PreviousAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, ZEGR_TF_R16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 	ZEUInt16 One = 1;
 	PreviousAdaptedLuminance->UpdateSubResource(0, 0, &One, 1);
@@ -239,10 +239,10 @@ bool ZERNStageHDR::UpdateTextures()
 	CurrentWidth >>= ConvertBlurTextureSize(BlurTextureSize);
 	CurrentHeight >>= ConvertBlurTextureSize(BlurTextureSize);
 
-	BrightTexture = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, 1, 1,ZEGR_TF_R11G11B10_FLOAT, true);
-	BlurTextureTemp1 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	BlurTextureTemp2 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	BlurTextureFinal = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+	BrightTexture = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	BlurTextureTemp1 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	BlurTextureTemp2 = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	BlurTextureFinal = ZEGRTexture2D::CreateInstance(CurrentWidth, CurrentHeight, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 	DirtyFlags.UnraiseFlags(ZERN_HSDF_RESIZE);
 

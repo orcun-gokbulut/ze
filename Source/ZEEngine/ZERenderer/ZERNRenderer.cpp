@@ -60,7 +60,7 @@ static ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 	else if (A->Priority > B->Priority)
 		return 1;
 	else
-		return (int)(A->Order - B->Order);
+		return (ZEInt)(A->Order - B->Order);
 }
 
 void ZERNRenderer::UpdateConstantBuffers()

@@ -59,7 +59,7 @@ bool ZERNStageMultiplexer::UpdateInputOutputs()
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != RenderTarget->GetWidth() || 
 			OutputTexture->GetHeight() !=  RenderTarget->GetHeight())
-			OutputTexture = ZEGRTexture2D::CreateInstance(RenderTarget->GetWidth(), RenderTarget->GetHeight(), 1, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+			OutputTexture = ZEGRTexture2D::CreateInstance(RenderTarget->GetWidth(), RenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}

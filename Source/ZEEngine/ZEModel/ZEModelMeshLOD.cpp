@@ -56,22 +56,22 @@ ZEHolder<const ZERNMaterial> ZEModelMeshLOD::GetMaterial() const
 	return Material;
 }
 
-const ZEModelResourceMeshLOD* ZEModelMeshLOD::GetLODResource()
+const ZEModelResourceMeshLOD* ZEModelMeshLOD::GetLODResource() const
 {
 	return LODResource;
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawStartDistance()
+ZEInt32 ZEModelMeshLOD::GetDrawStartDistance() const
 {
 	return DrawStartDistance;
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawEndDistance()
+ZEInt32 ZEModelMeshLOD::GetDrawEndDistance() const
 {
 	return DrawEndDistance;
 }
 
-bool ZEModelMeshLOD::IsSkinned()
+bool ZEModelMeshLOD::IsSkinned() const
 {
 	return Skinned;
 }
@@ -79,7 +79,8 @@ bool ZEModelMeshLOD::IsSkinned()
 void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
 	ZEGRContext* Context = RenderParameters->Context;
-	if (!Material->SetupMaterial(Context, RenderParameters->Stage))
+	ZERNStage* Stage = RenderParameters->Stage;
+	if (!Material->SetupMaterial(Context, Stage))
 	{
 		zeError("Cannot setup material");
 		return;
@@ -106,9 +107,9 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 	}
 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->Draw((ZEUInt)LODResource->VertexCount, 0);
+	Context->Draw(LODResource->VertexCount, 0);
 
-	Material->CleanupMaterial(Context, RenderParameters->Stage);
+	Material->CleanupMaterial(Context, Stage);
 }
 
 void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)

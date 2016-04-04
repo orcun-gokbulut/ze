@@ -35,16 +35,31 @@
 
 #include "ZEGRResource.h"
 
-#include "ZEError.h"
-
 void ZEGRResource::SetSize(ZESize Size)
 {
 	this->Size = Size;
 }
 
-ZESize ZEGRResource::GetSize() const
+void ZEGRResource::SetResourceUsage(ZEGRResourceUsage Usage)
 {
-	return Size;
+	this->Usage = Usage;
+}
+
+void ZEGRResource::SetResourceBindFlag(ZEGRResourceBindFlag BindFlag)
+{
+	this->BindFlag = BindFlag;
+}
+
+ZEGRResource::ZEGRResource()
+{
+	Size = 0;
+	Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE;
+	BindFlag = ZEGR_RBF_SHADER_RESOURCE;
+}
+
+ZEGRResource::~ZEGRResource()
+{
+
 }
 
 void ZEGRResource::SetName(const ZEString& Name)
@@ -57,12 +72,17 @@ const ZEString& ZEGRResource::GetName() const
 	return Name;
 }
 
-ZEGRResource::ZEGRResource()
+ZESize ZEGRResource::GetSize() const
 {
-	Size = 0;
+	return Size;
 }
 
-ZEGRResource::~ZEGRResource()
+ZEGRResourceUsage ZEGRResource::GetResourceUsage() const
 {
+	return Usage;
+}
 
+ZEGRResourceBindFlag ZEGRResource::GetResourceBindFlag() const
+{
+	return BindFlag;
 }

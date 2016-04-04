@@ -50,6 +50,7 @@
 #include "ZEGraphics/ZEGRTexture3D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRStructuredBuffer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
@@ -83,7 +84,7 @@ void ZEATAtmosphere::CreateRandomVectors()
 	}
 
 	RandomVectorsTexture.Release();
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT);
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
 	RandomVectorsTexture->UpdateSubResource(0, 0, &SphereSamples[0], 128 * sizeof(ZEVector4));
 }
 
@@ -109,8 +110,8 @@ bool ZEATAtmosphere::UpdateShaders()
 	ScreenCoverVertexShader = ZEGRShader::Compile(Options);
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNPrecomputingLightScattering_Density_PixelShader_Main";
-	PrecomputeDensityPixelShader = ZEGRShader::Compile(Options);
+	Options.EntryPoint = "ZERNPrecomputingLightScattering_Extinction_PixelShader_Main";
+	PrecomputeExtinctionPixelShader = ZEGRShader::Compile(Options);
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNPrecomputingLightScattering_SingleScattering_PixelShader_Main";
@@ -172,10 +173,10 @@ bool ZEATAtmosphere::UpdateRenderState()
 
 	RenderState.SetBlendState(ZEGRBlendState());
 
-	RenderState.SetShader(ZEGR_ST_PIXEL, PrecomputeDensityPixelShader);
+	RenderState.SetShader(ZEGR_ST_PIXEL, PrecomputeExtinctionPixelShader);
 
-	PrecomputeDensityRenderStateData = RenderState.Compile();
-	zeCheckError(PrecomputeDensityRenderStateData == NULL, false, "Cannot set render state.");
+	PrecomputeExtinctionRenderStateData = RenderState.Compile();
+	zeCheckError(PrecomputeExtinctionRenderStateData == NULL, false, "Cannot set render state.");
 
 	RenderState.SetShader(ZEGR_ST_PIXEL, PrecomputeSingleScatteringPixelShader);
 
@@ -245,19 +246,14 @@ bool ZEATAtmosphere::Update()
 
 void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 {
+	ZEHolder<ZEGRConstantBuffer> PrecomputeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(PrecomputeConstants));
+
 	ZEArray<ZEHolder<const ZEGRRenderTarget>> MultipleScatteringRenderTargets;
 	MultipleScatteringRenderTargets.Resize(1024);	//64 * 16
 
-	const ZEGRRenderTarget* DensityRenderTarget = PrecomputedDensityBuffer->GetRenderTarget();
-	Context->SetRenderState(PrecomputeDensityRenderStateData);
-	Context->SetRenderTargets(1, &DensityRenderTarget, NULL);
-	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 1024.0f, 1024.0f));
-
-	Context->Draw(3, 0);
-
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, PrecomputeConstantBuffer);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, RandomVectorsTexture);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
 
 	for (ZEUInt I = 0; I < 1024; I++)
@@ -276,6 +272,9 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		Context->Draw(3, 0);
 	}
 
+	ZEHolder<ZEGRTexture3D> PrecomputedHighOrderScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT, true, false);
+	ZEHolder<ZEGRTexture3D> PrecomputedHighOrderInScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT, true, false);
+
 	for (ZEUInt S = 1; S < OrderCount; S++)
 	{
 		for(ZEUInt J = 0; J < 1024; J++)
@@ -286,7 +285,6 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
 			Context->SetTexture(ZEGR_ST_PIXEL, 0, (S == 1) ? PrecomputedSingleScatteringBuffer : PrecomputedHighOrderInScatteringBuffer);
-			Context->SetTexture(ZEGR_ST_PIXEL, 2, RandomVectorsTexture);
 
 			Context->SetRenderTargets(1, RenderTarget.GetPointerToPointer(), NULL);
 			Context->SetRenderState(PrecomputeHighOrderScatteringRenderStateData);
@@ -336,7 +334,10 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	}
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
 
+	ZEHolder<ZEGRTexture2D> PrecomputedSkyAmbientBuffer = ZEGRTexture2D::CreateInstance(1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	ZEHolder<const ZEGRRenderTarget> SkyAmbientRenderTarget = PrecomputedSkyAmbientBuffer->GetRenderTarget();
 
 	Context->SetRenderState(PrecomputeSkyAmbientRenderStateData);
@@ -346,31 +347,56 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 
 	Context->Draw(3, 0);
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 	Context->SetRenderTargets(0, NULL, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 
-	PrecomputeDensityPixelShader.Release();
+	ZEHolder<ZEGRTexture2D> AmbientBuffer = ZEGRTexture2D::CreateInstance(1024, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_CPU_READ_WRITE, ZEGR_RBF_NONE);
+
+	Context->CopyResource(AmbientBuffer, PrecomputedSkyAmbientBuffer);
+
+	float* Data;
+	AmbientBuffer->Lock(reinterpret_cast<void**>(&Data), NULL);
+		memcpy(&SkyAmbient, Data, sizeof(ZEVector4) * 1024);
+	AmbientBuffer->Unlock();
+
+	//PrecomputedExtinctionBuffer = ZEGRTexture2D::CreateInstance(32, 128, 1,  ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	//const ZEGRRenderTarget* ExtinctionRenderTarget = PrecomputedExtinctionBuffer->GetRenderTarget();
+	//Context->SetRenderState(PrecomputeExtinctionRenderStateData);
+	//Context->SetRenderTargets(1, &ExtinctionRenderTarget, NULL);
+	//Context->SetVertexBuffers(0, 0, NULL);
+	//Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
+	//
+	//Context->Draw(3, 0);
+	//
+	//Context->SetRenderTargets(0, NULL, NULL);
+	//
+	//ZEHolder<ZEGRTexture2D> ExtinctionBuffer = ZEGRTexture2D::CreateInstance(32, 128, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_CPU_READ_WRITE, ZEGR_RBF_NONE);
+	//
+	//Context->CopyResource(ExtinctionBuffer, PrecomputedExtinctionBuffer);
+	//
+	//ZESize RowPitch;
+	//ExtinctionBuffer->Lock(reinterpret_cast<void**>(&Data), &RowPitch);
+	//	//for (ZEUInt I = 0; I < 1024; I++)
+	//	//{
+	//	//	memcpy(Extinction[I], Data + I * 1024, RowPitch);
+	//	//}
+	//memcpy(Extinction, Data, sizeof(ZEVector4) * 32 * 128);
+	//ExtinctionBuffer->Unlock();
+
+	PrecomputeExtinctionPixelShader.Release();
 	PrecomputeSingleScatteringPixelShader.Release();
 	PrecomputeHighOrderScatteringPixelShader.Release();
 	PrecomputeHighOrderInScatteringPixelShader.Release();
 	AddOrdersPixelShader.Release();
 	PrecomputeSkyAmbientPixelShader.Release();
 
-	PrecomputeDensityRenderStateData.Release();
+	PrecomputeExtinctionRenderStateData.Release();
 	PrecomputeSingleScatteringRenderStateData.Release();
 	PrecomputeHighOrderScatteringRenderStateData.Release();
 	PrecomputeHighOrderInScatteringRenderStateData.Release();
 	AddOrdersRenderStateData.Release();
 	PrecomputeSkyAmbientRenderStateData.Release();
-
-	PrecomputedHighOrderScatteringBuffer.Release();
-	PrecomputedHighOrderInScatteringBuffer.Release();
-
-	PrecomputeConstantBuffer.Release();
 
 	RandomVectorsTexture.Release();
 }
@@ -383,14 +409,9 @@ bool ZEATAtmosphere::InitializeSelf()
 	CreateRandomVectors();
 
 	SkyConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	PrecomputeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(PrecomputeConstants));
 
-	PrecomputedDensityBuffer = ZEGRTexture2D::CreateInstance(1024, 1024, 1, 1, 1, ZEGR_TF_R32G32_FLOAT, true);
 	PrecomputedSingleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT, true, false);
-	PrecomputedHighOrderScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT, true, false);
-	PrecomputedHighOrderInScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R32G32B32A32_FLOAT, true, false);
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT, true, false);
-	PrecomputedSkyAmbientBuffer = ZEGRTexture2D::CreateInstance(1024, 1, 1, 1, 1, ZEGR_TF_R16G16B16A16_FLOAT, true);
 
 	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
@@ -405,11 +426,11 @@ bool ZEATAtmosphere::InitializeSelf()
 	Fog->SetDensity(0.0f);
 	Fog->SetStartDistance(0.0f);
 	Fog->SetColor(ZEVector3(0.5f));
-	zeScene->AddEntity(Fog);
+	//zeScene->AddEntity(Fog);
 
 	Cloud = ZEATCloud::CreateInstance();
 	Cloud->SetCloudTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
-	zeScene->AddEntity(Cloud);
+	//zeScene->AddEntity(Cloud);
 
 	Stars = ZEATSkyBox::CreateInstance();
 	Stars->SetName("StarMap");
@@ -418,7 +439,7 @@ bool ZEATAtmosphere::InitializeSelf()
 	Stars->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	Stars->SetColor(ZEVector3::One);
 	Stars->SetBrightness(0.1f);
-	zeScene->AddEntity(Stars);
+	//zeScene->AddEntity(Stars);
 
 	return true;
 }
@@ -433,10 +454,8 @@ bool ZEATAtmosphere::DeinitializeSelf()
 	SkyRenderStateData.Release();
 	SkyConstantBuffer.Release();
 
-	PrecomputedDensityBuffer.Release();
 	PrecomputedSingleScatteringBuffer.Release();
 	PrecomputedMultipleScatteringBuffer.Release();
-	PrecomputedSkyAmbientBuffer.Release();
 
 	SamplerLinearClamp.Release();
 
@@ -547,6 +566,158 @@ float ZEATAtmosphere::GetFogDensity() const
 	return Fog->GetDensity();
 }
 
+static ZEVector2 CalculateDensity(const ZEVector3& Position)
+{
+	float Height = (Position - ZEVector3(0.0f, -EARTH_RADIUS, 0.0f)).Length() - EARTH_RADIUS;
+
+	float RayleighDensity = ZEMath::Exp(-Height / RAYLEIGH_MIE_HEIGHT.x);
+	float MieDensity = ZEMath::Exp(-Height / RAYLEIGH_MIE_HEIGHT.y);
+
+	return ZEVector2(RayleighDensity, MieDensity);
+}
+
+static ZEVector2 IntegrateDensity(const ZEVector3& Start, const ZEVector3& End)
+{
+	static const float STEPCOUNT = 20;
+	ZEVector2 PrevRayleighMieDensity = CalculateDensity(Start);
+	ZEVector2 TotalRayleighMieDensity = ZEVector2::Zero;
+
+	ZEVector3 StartToEnd = End - Start;
+	ZEVector3 Direction = StartToEnd.Normalize();
+	float StepLength = StartToEnd.Length() / STEPCOUNT;
+
+	for(float S = 1.0f; S <= STEPCOUNT; S += 1.0f)
+	{
+		ZEVector3 Position = Start + Direction * S * StepLength;
+
+		ZEVector2 CurRayleighMieDensity = CalculateDensity(Position);
+
+		TotalRayleighMieDensity += (CurRayleighMieDensity + PrevRayleighMieDensity) * 0.5f * StepLength;
+
+		PrevRayleighMieDensity = CurRayleighMieDensity;
+	}
+
+	return TotalRayleighMieDensity;
+}
+
+ZEVector3 ZEATAtmosphere::GetTerrestrialSunColor()
+{
+	if (SunLight == NULL)
+		return ZEVector3::Zero;
+	
+	ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
+	SunDirection.NormalizeSelf();
+
+	//float CosSunZenith = ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
+	//float HeightAboveEarth = zeScene->GetActiveCamera()->GetWorldPosition().y;
+	//
+	//ZEUInt Index1 = ((HeightAboveEarth - 20.0f) / (ATMOSPHERE_HEIGHT - 2.0f * 20.0f)) * 31.0f + 0.5f;
+	//ZEUInt Index2 = CosSunZenith * 127.0f + 0.5f;
+	//
+	//ZEVector3 LUTResult = SunLight->GetColor() * Extinction[Index1][Index2].ToVector3();
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	ZEVector3 StartPositionWorld = zeScene->GetActiveCamera()->GetWorldPosition();
+
+	ZEBSphere Sphere(ZEVector3(0.0f, -EARTH_RADIUS, 0.0f), TOTAL_RADIUS);
+	ZERay Ray(SunDirection, StartPositionWorld);
+	float Length;
+	ZEBSphere::IntersectionTest(Sphere, Ray, Length);
+	ZEVector3 EndPositionWorld = StartPositionWorld + SunDirection * Length;
+
+	ZEVector2 Density = IntegrateDensity(StartPositionWorld, EndPositionWorld);
+	ZEVector3 Extinction = ZEATRayleighScatteringFactor * Density.x + ZEATMieScatteringFactor * Density.y;
+
+	float R = ZEMath::Exp(-Extinction.x);
+	float G = ZEMath::Exp(-Extinction.y);
+	float B = ZEMath::Exp(-Extinction.z);
+
+	ZEVector3 ComputeResult = SunLight->GetColor() * ZEVector3(R, G, B);
+
+	return ComputeResult;
+}
+
+ZEVector3 ZEATAtmosphere::GetTerrestrialSunAmbientColor()
+{
+	if (SunLight == NULL)
+		return ZEVector3::Zero;
+
+	ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
+	SunDirection.NormalizeSelf();
+	float CosSunZenith = ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
+
+	float TexelWidth = 1.0f / 1024.0f;
+	float TexelIndex1 = CosSunZenith - TexelWidth;
+	float TexelIndex2 = CosSunZenith + TexelWidth;
+	ZEUInt Index1 = TexelIndex1 * 1023.0f + 0.5f;
+	ZEUInt Index2 = TexelIndex2 * 1023.0f + 0.5f;
+	float Weight1 = CosSunZenith - ((Index1 + 0.5f) / 1024.0f);
+	float Weight2 = ((Index2 + 0.5f) / 1024.0f) - CosSunZenith;
+
+	ZEVector4 InterpolatedAmbient = (Weight1 * SkyAmbient[Index1] + Weight2 * SkyAmbient[Index2]) / (Weight1 + Weight2);
+
+	return SunLight->GetColor() * InterpolatedAmbient.ToVector3();
+}
+
+ZEVector3 ZEATAtmosphere::GetTerrestrialMoonColor()
+{
+	if (MoonLight == NULL)
+		return ZEVector3::Zero;
+
+	ZEVector3 MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
+	MoonDirection.NormalizeSelf();
+
+	//float CosMoonZenith = ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
+	//float HeightAboveEarth = zeScene->GetActiveCamera()->GetWorldPosition().y;
+	//
+	//ZEUInt Index1 = ((HeightAboveEarth - 20.0f) / (ATMOSPHERE_HEIGHT - 2.0f * 20.0f)) * 1023.0f + 0.5f;
+	//ZEUInt Index2 = CosMoonZenith * 1023.0f + 0.5f;
+	//
+	//ZEVector3 LUTResult = MoonLight->GetColor() * Extinction[Index1][Index2].ToVector3();
+
+	ZEVector3 StartPositionWorld = zeScene->GetActiveCamera()->GetWorldPosition();
+
+	ZEBSphere Sphere(ZEVector3(0.0f, -EARTH_RADIUS, 0.0f), TOTAL_RADIUS);
+	ZERay Ray(MoonDirection, StartPositionWorld);
+	float Length;
+	ZEBSphere::IntersectionTest(Sphere, Ray, Length);
+	ZEVector3 EndPositionWorld = StartPositionWorld + MoonDirection * Length;
+
+	ZEVector2 Density = IntegrateDensity(StartPositionWorld, EndPositionWorld);
+	ZEVector3 Extinction = ZEATRayleighScatteringFactor * Density.x + ZEATMieScatteringFactor * Density.y;
+
+	float R = ZEMath::Exp(-Extinction.x);
+	float G = ZEMath::Exp(-Extinction.y);
+	float B = ZEMath::Exp(-Extinction.z);
+
+	ZEVector3 ComputeResult = SunLight->GetColor() * ZEVector3(R, G, B);
+
+	return ComputeResult;
+}
+
+ZEVector3 ZEATAtmosphere::GetTerrestrialMoonAmbientColor()
+{
+	if (MoonLight == NULL)
+		return ZEVector3::Zero;
+
+	ZEVector3 MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
+	MoonDirection.NormalizeSelf();
+	float CosMoonZenith = ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
+
+	float TexelWidth = 1.0f / 1024.0f;
+	float TexelIndex1 = CosMoonZenith - TexelWidth;
+	float TexelIndex2 = CosMoonZenith + TexelWidth;
+	ZEUInt Index1 = TexelIndex1 * 1023.0f + 0.5f;
+	ZEUInt Index2 = TexelIndex2 * 1023.0f + 0.5f;
+	float Weight1 = CosMoonZenith - ((Index1 + 0.5f) / 1024.0f);
+	float Weight2 = ((Index2 + 0.5f) / 1024.0f) - CosMoonZenith;
+
+	ZEVector4 InterpolatedAmbient = (Weight1 * SkyAmbient[Index1] + Weight2 * SkyAmbient[Index2]) / (Weight1 + Weight2);
+
+	return MoonLight->GetColor() * InterpolatedAmbient.ToVector3();
+}
+
 void ZEATAtmosphere::Tick(float ElapsedTime)
 {
 	ZEVector3 SunDirection = ZEATAstronomy::GetSunDirection(Observer);
@@ -597,15 +768,15 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	{
 		float InscatteringSun = 0.5f * (ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
 		Cloud->SetLightDirection(-SunDirection);
-		Cloud->SetLightIntensity(10.0f);
+		Cloud->SetLightColor(ZEVector3(10));
 		Cloud->SetInscattering(InscatteringSun);
 		Stars->SetBrightness(0.0f);
 	}
 	else
 	{
-		float InscatteringMoon = 0.05f * (ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
+		float InscatteringMoon = 0.1f * (ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
 		Cloud->SetLightDirection(-MoonDirection);
-		Cloud->SetLightIntensity(1.0f);
+		Cloud->SetLightColor(ZEVector3(1.0f));
 		Cloud->SetInscattering(InscatteringMoon);
 		Stars->SetBrightness(0.1f);
 	}
@@ -630,9 +801,6 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 
 	if (SunLight != NULL)
 	{
-		SunLight->SetAmbientBuffer(PrecomputedSkyAmbientBuffer);
-		SunLight->SetDensityBuffer(PrecomputedDensityBuffer);
-
 		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * 5.0f;
 		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.SunDirection.NormalizeSelf();
@@ -642,9 +810,6 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 
 	if (MoonLight != NULL)
 	{
-		MoonLight->SetAmbientBuffer(PrecomputedSkyAmbientBuffer);
-		MoonLight->SetDensityBuffer(PrecomputedDensityBuffer);
-
 		Constants.MoonColor = MoonLight->GetColor() * MoonLight->GetIntensity() * 5.0f;
 		Constants.MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.MoonDirection.NormalizeSelf();
@@ -669,27 +834,32 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	{
 		Precomputed = true;
 		PrecomputeBuffers(Context);
-
-		Sun->SetDensityBuffer(PrecomputedDensityBuffer);
-		Moon->SetDensityBuffer(PrecomputedDensityBuffer);
-		Stars->SetDensityBuffer(PrecomputedDensityBuffer);
-		Cloud->SetDensityBuffer(PrecomputedDensityBuffer);
 	}
+
+	if (SunLight != NULL)
+		SunLight->SetTerrestrialColor(GetTerrestrialSunColor());
+
+	if (MoonLight != NULL)
+		MoonLight->SetTerrestrialColor(GetTerrestrialMoonColor());
+
+	ZEVector3 SunAmbient = GetTerrestrialSunAmbientColor() * SunLight->GetIntensity();
+	ZEVector3 MoonAmbient = GetTerrestrialMoonAmbientColor() * MoonLight->GetIntensity();
+
+	zeScene->SetAmbientColor(SunAmbient + MoonAmbient);
+	zeScene->SetAmbientFactor(2.0f);
 
 	ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-
 	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
-	const ZEGRTexture2D* ColorTexture = Stage->GetPrevStage()->GetOutput(ZERN_SO_COLOR);
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, SkyConstantBuffer);
 	Context->SetRenderState(SkyRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, DepthTexture);
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, ColorTexture);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
+	Context->SetTexture(ZEGR_ST_PIXEL, 6, PrecomputedExtinctionBuffer);
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
@@ -699,7 +869,6 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
 }
 

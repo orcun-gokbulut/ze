@@ -60,7 +60,7 @@ bool ZERNStageForward::UpdateRenderTargets()
 		if (OriginalRenderTarget == NULL)
 			return false;
 
-		ColorBuffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
+		ColorBuffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 		ColorRenderTarget = ColorBuffer->GetRenderTarget();
 	}
 	else
@@ -74,7 +74,7 @@ bool ZERNStageForward::UpdateRenderTargets()
 		if (DepthStencilBuffer == NULL || 
 			DepthStencilBuffer->GetWidth() != ColorRenderTarget->GetWidth() || 
 			DepthStencilBuffer->GetHeight() != ColorRenderTarget->GetHeight())
-			DepthStencilBuffer = ZEGRTexture2D::CreateInstance(ColorRenderTarget->GetWidth(), ColorRenderTarget->GetHeight(), 1, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
+			DepthStencilBuffer = ZEGRTexture2D::CreateInstance(ColorRenderTarget->GetWidth(), ColorRenderTarget->GetHeight(), 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
 	}
 	else
 	{

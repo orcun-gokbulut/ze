@@ -39,6 +39,8 @@
 
 class ZED11Module;
 enum ZEGRFormat;
+enum ZEGRResourceUsage;
+enum ZEGRResourceBindFlag;
 
 class ZED11ComponentBase
 {
@@ -54,4 +56,6 @@ class ZED11ComponentBase
 		ID3D11DeviceContext1*			GetMainContext() const;
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
+		static D3D11_USAGE				ConvertUsage(ZEGRResourceUsage Usage);
+		static UINT						ConvertBindFlag(ZEGRResourceBindFlag BindFlag);
 };

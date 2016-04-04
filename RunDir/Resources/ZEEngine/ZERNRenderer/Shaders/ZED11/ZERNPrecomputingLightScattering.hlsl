@@ -59,56 +59,39 @@ void ZERNPrecomputingLightScattering_MultiplyWithPhases(in float3 SunDirection, 
 {
 	float CosAngle = dot(SunDirection, ViewDirection);
 
-	float3 PhaseRayleigh =  (3.0f / (16.0f * PI)) * (1.0f + CosAngle * CosAngle);
+	float3 PhaseRayleigh =  (3.0f / (16.0f * ZERNMath_PI)) * (1.0f + CosAngle * CosAngle);
 	
-	float G = 0.65f;
+	float G = 0.7f;
 	float GG = G * G;
-	float3 PhaseMie = (3.0f / (8.0f * PI)) * ((1.0f - GG) * (1.0f + CosAngle * CosAngle)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosAngle), 1.5f));
+	float3 PhaseMie = (3.0f / (8.0f * ZERNMath_PI)) * ((1.0f - GG) * (1.0f + CosAngle * CosAngle)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosAngle), 1.5f));
 	//float3 PhaseMie = (1.0f / (6.0f * PI)) * (1.0f - GG) / pow(abs(1.0f + GG - 2.0f * G * CosAngle), 1.5f);
 	
 	RayleighInScattering *= PhaseRayleigh;
 	MieInScattering *= PhaseMie;
 }
 
-float2 ZERNPrecomputingLightScattering_Density_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+float3 ZERNPrecomputingLightScattering_Extinction_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
 {
-	float2 TexCoord = (PositionViewport.xy - 0.5f) / float2(1023.0f, 1023.0f);
+	float2 TexCoord = (PositionViewport.xy - 0.5f) / float2(31.0f, 127.0f);
 	
-	float Height = TexCoord.x * (ATMOSPHERE_HEIGHT - 2.0f * 16) + 16.0f;
-	
-	float CosViewZenith = TexCoord.y * 2.0f - 1.0f;
+	float Height = TexCoord.x * (ATMOSPHERE_HEIGHT - 2.0f * 20) + 20.0f;
+	float CosLightZenith = TexCoord.y * 2.0f - 1.0f;
 	
 	float3 PositionWorld = float3(0.0f, Height, 0.0f);
 	float3 EarthCenter = float3(0.0f, -EARTH_RADIUS, 0.0f);
-	float3 ViewDirection = float3(sqrt(1.0f - CosViewZenith * CosViewZenith), CosViewZenith, 0.0f);
+	float3 LightDirection = float3(sqrt(1.0f - CosLightZenith * CosLightZenith), CosLightZenith, 0.0f);
 	
 	float4 StartEndDistance = (float4)0.0f;
-	ZERNIntersections_RaySphere2(PositionWorld, ViewDirection, EarthCenter, float2(TOTAL_RADIUS, EARTH_RADIUS), StartEndDistance);
+	ZERNIntersections_RaySphere2(PositionWorld, LightDirection, EarthCenter, float2(TOTAL_RADIUS, EARTH_RADIUS), StartEndDistance);
 	
-	float3 RayStart = PositionWorld + ViewDirection * max(0.0f, StartEndDistance.x);
+	float3 RayStart = PositionWorld + LightDirection * max(0.0f, StartEndDistance.x);
 	float RayLength = StartEndDistance.y;
 	if(StartEndDistance.z > 0.0f)	//if hits the earth
 		RayLength = min(RayLength, StartEndDistance.z);
 		
-	float3 RayEnd = PositionWorld + ViewDirection * RayLength;
+	float3 RayEnd = PositionWorld + LightDirection * RayLength;
 	
-	float StepLength = length(RayEnd - RayStart) / EXTINCTION_NUM_STEPS;
-	
-	float2 PrevRayleighMieDensity = ZERNLightScatteringCommon_CalculateDensity(RayStart);
-	float2 TotalRayleighMieDensity = 0.0f;
-	
-	for(float S = 1.0f; S <= EXTINCTION_NUM_STEPS; S += 1.0f)
-	{
-		float3 Position = RayStart + ViewDirection * S * StepLength;
-		
-		float2 CurRayleighMieDensity = ZERNLightScatteringCommon_CalculateDensity(Position);
-		
-		TotalRayleighMieDensity += (CurRayleighMieDensity + PrevRayleighMieDensity) * 0.5f * StepLength;
-		
-		PrevRayleighMieDensity = CurRayleighMieDensity;
-	}
-	
-	return TotalRayleighMieDensity;
+	return exp(-ZERNLightScatteringCommon_CalculateExtinction(RayStart, RayEnd));
 }
 
 float3 ZERNPrecomputingLightScattering_SingleScattering_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
@@ -153,7 +136,7 @@ float3 ZERNPrecomputingLightScattering_SingleScattering_PixelShader_Main(float4 
 		ZERNIntersections_RaySphere1(Position, SunDirection, EarthCenter, TOTAL_RADIUS, StartEndDistance.xy);
 		if(StartEndDistance.x < 0.0f && StartEndDistance.y > 0.0f)
 		{
-			StartEndDistance.y = clamp(StartEndDistance.y, 50.0f, ATMOSPHERE_HEIGHT - 50.0f);
+			StartEndDistance.y = clamp(StartEndDistance.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f);
 			
 			float3 LightEntryPoint = Position + SunDirection * StartEndDistance.y;
 			Extinction += ZERNLightScatteringCommon_CalculateExtinction(Position, LightEntryPoint);
@@ -213,7 +196,7 @@ float3 ZERNPrecomputingLightScattering_HighOrderScattering_PixelShader_Main(floa
 		TotalScattering += (RayleighInScattering * ZERNLightScatteringCommon_RayleighScatteringFactor + MieInScattering * ZERNLightScatteringCommon_MieScatteringFactor);
 	}
 	
-	return TotalScattering * 4.0f * PI / 128.0f;
+	return TotalScattering * 4.0f * ZERNMath_PI / 128.0f;
 }
 
 float3 ZERNPrecomputingLightScattering_HighOrderInScattering_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
@@ -302,6 +285,6 @@ float3 ZERNPrecomputingLightScattering_SkyAmbient_PixelShader_Main(float4 Positi
 		TotalSkyAmbient += Inscattering * dot(Direction, float3(0.0f, 1.0f, 0.0f));
 	}
 	
-	return TotalSkyAmbient * 2.0f * PI / 128.0f;
+	return TotalSkyAmbient * 2.0f * ZERNMath_PI / 128.0f;
 }
 #endif

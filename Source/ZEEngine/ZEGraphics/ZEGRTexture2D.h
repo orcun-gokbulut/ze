@@ -53,8 +53,9 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt											Width;
 		ZEUInt											Height;
 		ZEUInt											ArrayCount;
+		ZEUInt											SampleCount;
 
-		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false, bool UAV = false);	
+		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_ONLY, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_SHADER_RESOURCE, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);	
 		virtual void									Deinitialize();
 
 														ZEGRTexture2D();
@@ -63,6 +64,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt											GetWidth() const;
 		ZEUInt											GetHeight() const;
 		ZEUInt											GetArrayCount() const;
+		ZEUInt											GetSampleCount() const;
 		ZEVector2										GetPixelSize() const;
 
 		virtual ZEGRResourceType						GetResourceType() const;
@@ -74,6 +76,8 @@ class ZEGRTexture2D : public ZEGRTexture
 		virtual ZEHolder<const ZEGRDepthStencilBuffer>	GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const = 0;
 
 		virtual bool									UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
+		virtual bool									Lock(void** Buffer, ZESize* RowPitch) = 0;
+		virtual void									Unlock() = 0;
 
-		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget = false, bool DepthStencil = false, bool UAV = false);
+		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_RENDER_TARGET, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);
 };

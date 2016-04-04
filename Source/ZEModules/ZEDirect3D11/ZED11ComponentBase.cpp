@@ -209,3 +209,44 @@ DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRFormat Format)
 			return DXGI_FORMAT_BC3_UNORM;
 	}
 }
+
+D3D11_USAGE ZED11ComponentBase::ConvertUsage(ZEGRResourceUsage Usage)
+{
+	switch (Usage)
+	{
+		default:
+		case ZEGR_RU_GPU_READ_ONLY:
+			return D3D11_USAGE_IMMUTABLE;
+
+		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
+			return D3D11_USAGE_DEFAULT;
+
+		case ZEGR_RU_GPU_READ_CPU_WRITE:
+			return D3D11_USAGE_DYNAMIC;
+
+		case ZEGR_RU_CPU_READ_WRITE:
+			return D3D11_USAGE_STAGING;
+	}
+}
+
+UINT ZED11ComponentBase::ConvertBindFlag(ZEGRResourceBindFlag BindFlag)
+{
+	switch (BindFlag)
+	{
+		case ZEGR_RBF_NONE:
+			return 0;
+
+		default:
+		case ZEGR_RBF_SHADER_RESOURCE:
+			return D3D11_BIND_SHADER_RESOURCE;
+
+		case ZEGR_RBF_RENDER_TARGET:
+			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+
+		case ZEGR_RBF_DEPTH_STENCIL:
+			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+
+		case ZEGR_RBF_UNORDERED_ACCESS:
+			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
+	}
+}

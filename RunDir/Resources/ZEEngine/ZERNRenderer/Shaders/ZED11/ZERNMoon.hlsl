@@ -36,18 +36,13 @@
 #ifndef __ZERN_MOON_H__
 #define __ZERN_MOON_H__
 
-#include "ZERNTransformations.hlsl"
-#include "ZERNLightScatteringCommon.hlsl"
-
 cbuffer ZERNMoon_Constants						: register(b8)
 {
 	float2		ZERNMoon_PositionScreen;
 	float2		ZERNMoon_SizeScreen;
 	
 	float		ZERNMoon_Phase;
-	float		ZERNMoon_CosZenith;
-	float		ZERNMoon_Intensity;
-	float		ZERNMoon_Reserved;
+	float3		ZERNMoon_Color;
 };
 
 struct ZERNMoon_VertexShader_Output
@@ -64,6 +59,7 @@ struct ZERNMoon_PixelShader_Input
 	float2		Texcoord						: TEXCOORD1;
 };
 
+SamplerState	ZERNMoon_SamplerLinearClamp		: register(s0);
 Texture3D		ZERNMoon_MoonTexture			: register(t5);
 
 ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_VertexID)
@@ -82,10 +78,11 @@ ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_Verte
 
 float3 ZERNMoon_PixelShader_Main(ZERNMoon_PixelShader_Input Input) : SV_Target0
 {	
-	float4 PixelColor = ZERNMoon_MoonTexture.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
+	float4 PixelColor = ZERNMoon_MoonTexture.SampleLevel(ZERNMoon_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
+	
 	clip(PixelColor.a - 0.1f);
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNMoon_CosZenith, clamp(ZERNView_Position.y, 20.0f, ATMOSPHERE_HEIGHT - 20.0f));	
-	return ZERNMoon_Intensity * Extinction * PixelColor.rgb;
+	
+	return ZERNMoon_Color * PixelColor.rgb;
 }
 
 #endif

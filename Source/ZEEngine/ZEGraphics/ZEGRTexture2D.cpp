@@ -64,19 +64,27 @@ ZEUInt ZEGRTexture2D::GetArrayCount() const
 	return ArrayCount;
 }
 
+ZEUInt ZEGRTexture2D::GetSampleCount() const
+{
+	return SampleCount;
+}
+
 ZEVector2 ZEGRTexture2D::GetPixelSize() const
 {
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV)
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
 	this->Width = Width;
 	this->Height = Height;
 	this->ArrayCount = ArrayCount;
-	SetLevelCount(LevelCount);
+	this->SampleCount = SampleCount;
 	SetFormat(Format);
-	SetIsRenderTarget(RenderTarget);
+	SetResourceUsage(Usage);
+	SetResourceBindFlag(BindFlag);
+	SetLevelCount(LevelCount);
+	SetIsRenderTarget(BindFlag == ZEGR_RBF_RENDER_TARGET);
 
 	SetSize(CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);
@@ -95,9 +103,10 @@ ZEGRTexture2D::ZEGRTexture2D()
 	Width = 0;
 	Height = 0;
 	ArrayCount = 1;
+	SampleCount = 1;
 };
 
-ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt ArrayCount, ZEUInt LevelCount, ZEUInt SampleCount, ZEGRFormat Format, bool RenderTarget, bool DepthStencil, bool UAV)
+ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
@@ -105,13 +114,12 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Heigh
 	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, NULL, "Width is too big.")
 	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
 	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height)), NULL, "Level must be 1 for non-power of two textures.");
-	zeCheckError(RenderTarget && DepthStencil, NULL, "Both render target and depth stencil cannot be created");
 
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, ArrayCount, LevelCount, SampleCount, Format, RenderTarget, DepthStencil, UAV))
+	if (!Texture->Initialize(Width, Height, LevelCount, Format, Usage, BindFlag, ArrayCount, SampleCount))
 	{
 		Texture->Destroy();
 		return NULL;

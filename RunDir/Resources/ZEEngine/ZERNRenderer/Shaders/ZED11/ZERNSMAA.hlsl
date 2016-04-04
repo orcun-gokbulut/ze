@@ -33,25 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#ifndef __ZERN_SMAA_H__
+#define __ZERN_SMAA_H__
+
 #include "ZERNScreenCover.hlsl"
 #include "ZERNShaderSlots.hlsl"
 
-cbuffer ZERNSMAA_Constant_Buffer : register(ZERN_SHADER_CONSTANT_MATERIAL)
+cbuffer ZERNSMAA_Constant_Buffer	: register(ZERN_SHADER_CONSTANT_MATERIAL)
 {
-	float2			ZERNSMAA_OutputSize;
+	float2	ZERNSMAA_OutputSize;
 };
 
-#define SMAA_RT_METRICS float4((float2)1.0 / ZERNSMAA_OutputSize.xy, ZERNSMAA_OutputSize.xy)
-#define SMAA_HLSL_4
+#define		SMAA_RT_METRICS float4((float2)1.0 / ZERNSMAA_OutputSize.xy, ZERNSMAA_OutputSize.xy)
+#define		SMAA_HLSL_4
 #define SMAA_PREDICATION 1
-#define SMAA_PRESET_ULTRA
+#define		SMAA_PRESET_ULTRA
+
 #include "SMAA.hlsl"
 
-Texture2D ZERNSMAA_InputTexture			: register(t0);
-Texture2D ZERNSMAA_EdgeTexture			: register(t1);
-Texture2D ZERNSMAA_BlendTexture			: register(t2);
-Texture2D ZERNSMAA_AreaTexture			: register(t3);
-Texture2D ZERNSMAA_SearchTexture		: register(t4);
+Texture2D	ZERNSMAA_InputTexture	: register(t0);
+Texture2D	ZERNSMAA_EdgeTexture	: register(t1);
+Texture2D	ZERNSMAA_BlendTexture	: register(t2);
+Texture2D	ZERNSMAA_AreaTexture	: register(t3);
+Texture2D	ZERNSMAA_SearchTexture	: register(t4);
 Texture2D ZERNSMAA_PredicationTexture	: register(t5);
 
 void ZERNSMAA_EdgeDetection_VertexShader(
@@ -121,3 +125,5 @@ float4 ZERNSMAA_NeighborhoodBlending_PixelShader(
 {
 	return SMAANeighborhoodBlendingPS(Texcoord, Offset, ZERNSMAA_InputTexture, ZERNSMAA_BlendTexture);
 }
+
+#endif

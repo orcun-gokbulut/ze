@@ -293,7 +293,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 
 	// Create TextureResource 
 	ZEPointer<ZETexture2DResource, ZEDeletorRelease<ZETexture2DResource>> TextureResource = new ZETexture2DResource();
-	TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), 1, FinalTextureData->GetLevelCount(), 1, FinalTextureData->GetPixelFormat(), false);
+	TextureResource->Texture = ZEGRTexture2D::CreateInstance(FinalTextureData->GetWidth(), FinalTextureData->GetHeight(), FinalTextureData->GetLevelCount(), FinalTextureData->GetPixelFormat(), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
 
 	if (TextureResource->Texture == NULL)
 	{

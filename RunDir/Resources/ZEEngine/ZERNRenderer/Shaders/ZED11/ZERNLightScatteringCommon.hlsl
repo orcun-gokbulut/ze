@@ -50,8 +50,6 @@ static const float3 ZERNLightScatteringCommon_RayleighScatteringFactor	= float3(
 static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= float3(2.0e-5, 2.0e-5, 2.0e-5);
 
 SamplerState		ZERNLightScatteringCommon_SamplerLinearClamp	: register(s0);
-Texture2D<float2>	ZERNLightScatteringCommon_DensityBuffer			: register(t10);
-Texture2D<float3>	ZERNLightScatteringCommon_AmbientBuffer			: register(t11);
 
 void ZERNLightScatteringCommon_CalculateWorldParamsFromTexCoords(in float4 TexCoord, out float Height, out float CosViewZenith, out float CosSunZenith, out float CosSunView)
 {
@@ -77,7 +75,7 @@ void ZERNLightScatteringCommon_CalculateWorldParamsFromTexCoords(in float4 TexCo
 	CosSunZenith = tan((2.0f * TexCoord.z - 1.0f + 0.26f) * 1.1f) / tan(1.26f * 1.1f);
 	
 	TexCoord.w = sign(TexCoord.w - 0.5f) * pow(abs((TexCoord.w - 0.5f) * 2.0f), 2.0f / 3.0f) * 0.5f + 0.5f;
-	CosSunView = cos(TexCoord.w * PI);
+	CosSunView = cos(TexCoord.w * ZERNMath_PI);
 	
 	CosViewZenith = clamp(CosViewZenith, -1.0f, +1.0f);
 	CosSunZenith = clamp(CosSunZenith, -1.0f, +1.0f);
@@ -116,7 +114,7 @@ float4 ZERNLightScatteringCommon_CalculateTexCoordsFromWorldParams(float Height,
 	float Texel_Z = 0.5f * (atan(max(CosSunZenith, -0.1975) * tan(1.26f * 1.1f)) / 1.1f + (1.0f - 0.26f));
 	
 	CosSunView = clamp(CosSunView, -1.0f, +1.0f);
-	float Texel_W = acos(CosSunView) / PI;
+	float Texel_W = acos(CosSunView) / ZERNMath_PI;
 	Texel_W = sign(Texel_W - 0.5f) * pow(abs((Texel_W - 0.5f) * 2.0f), 1.5f) * 0.5f + 0.5f;
 	
 	TexCoord = float4(Texel_X, Texel_Y, Texel_Z, Texel_W);
@@ -163,39 +161,16 @@ float3 ZERNLightScatteringCommon_CalculateExtinction(float3 Start, float3 End)
 	return ZERNLightScatteringCommon_RayleighScatteringFactor * Density.x + ZERNLightScatteringCommon_MieScatteringFactor * Density.y;
 }
 
-float3 ZERNLightScatteringCommon_GetAmbientColor(float CosSunZenith)
-{
-	float2 TexCoord;
-	TexCoord.x = CosSunZenith;
-	TexCoord.y = 0.5f;
-	
-	return ZERNLightScatteringCommon_AmbientBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
-}
-
-float3 ZERNLightScatteringCommon_GetExtinctionToAtmosphere(float CosSunZenith, float HeightAboveEarth)
-{
-	float2 TexCoord;
-	TexCoord.x = HeightAboveEarth / ATMOSPHERE_HEIGHT;
-	TexCoord.y = CosSunZenith;
-	
-	float2 RayleighMieDensityToAtmosphere = ZERNLightScatteringCommon_DensityBuffer.SampleLevel(ZERNLightScatteringCommon_SamplerLinearClamp, TexCoord, 0.0f);
-	
-	float3 RayleighExtinction = ZERNLightScatteringCommon_RayleighScatteringFactor * RayleighMieDensityToAtmosphere.x;
-	float3 MieExtinction = ZERNLightScatteringCommon_MieScatteringFactor * RayleighMieDensityToAtmosphere.y;
-	
-	return exp(-(RayleighExtinction + MieExtinction));
-}
-
-float3 ZERNLightScatteringCommon_LookupPrecomputedScattering(Texture3D<float3> ScatteringBuffer, float3 Position, float3 ViewDirection, float3 SunDirection, float3 EarthCenter, inout float PrevTexCoordY)
+float3 ZERNLightScatteringCommon_LookupPrecomputedScattering(Texture3D<float3> ScatteringBuffer, float3 Position, float3 ViewDirection, float3 LightDirection, float3 EarthCenter, inout float PrevTexCoordY)
 {
 	float3 EarthCenterToPosition = Position - EarthCenter;
 	float3 EarthCenterToPositionDirection = normalize(EarthCenterToPosition);
 	float Height = length(EarthCenterToPosition) - EARTH_RADIUS;
 	float CosViewZenith = dot(ViewDirection, EarthCenterToPositionDirection);
-	float CosSunZenith = dot(SunDirection, EarthCenterToPositionDirection);
-	float CosSunView = dot(SunDirection, ViewDirection);
+	float CosLightZenith = dot(LightDirection, EarthCenterToPositionDirection);
+	float CosLightView = dot(LightDirection, ViewDirection);
 	
-	float4 TexCoord = ZERNLightScatteringCommon_CalculateTexCoordsFromWorldParams(Height, CosViewZenith, CosSunZenith, CosSunView, PrevTexCoordY);
+	float4 TexCoord = ZERNLightScatteringCommon_CalculateTexCoordsFromWorldParams(Height, CosViewZenith, CosLightZenith, CosLightView, PrevTexCoordY);
 	
 	PrevTexCoordY = TexCoord.y;
 	

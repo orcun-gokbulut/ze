@@ -91,7 +91,7 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 	if (SpecularGlossMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_SPECULAR_GLOSS_MAP"));
 
-	if (EmissiveEnabled)
+	if (EmissiveMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_EMISSIVE_MAP"));
 
 	if (ReflectionEnabled)
@@ -1304,13 +1304,13 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 			TextureSampler = true;
 		}
 
-		if (SpecularEnabled && SpecularMap.IsAvailable())
+		if (SpecularMapEnabled && SpecularMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 2, SpecularMap.GetTexture());
 			TextureSampler = true;
 		}
 
-		if (EmissiveEnabled && EmissiveMap.IsAvailable())
+		if (EmissiveMapEnabled && EmissiveMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 3, EmissiveMap.GetTexture());
 			TextureSampler = true;
@@ -1574,10 +1574,12 @@ void ZERNFixedMaterial::Load(const ZEMLReaderNode& MaterialNode)
 		SpecularGlossMap.Read(ConfigurationNode, "SpecularPowerMap");
 		SetSpecularGlossMapEnabled(ConfigurationNode.ReadBoolean("SpecularGlossMapEnabled", SpecularGlossMap.IsAvailable()));
 
-		SetEmissiveEnabled(ConfigurationNode.ReadBoolean("EmissiveEnabled", false));
-		SetEmissiveFactor(ConfigurationNode.ReadFloat("EmissiveFactor", 1.0f));
-		SetEmissiveColor(ConfigurationNode.ReadVector3("EmissiveColor", ZEVector3::One));
+		SetEmissiveEnabled(ConfigurationNode.ReadBoolean("EmissiveEnabled", ConfigurationNode.ReadBoolean("EmmisiveEnabled")));
+		SetEmissiveFactor(ConfigurationNode.ReadFloat("EmissiveFactor", ConfigurationNode.ReadFloat("EmmisiveFactor")));
+		SetEmissiveColor(ConfigurationNode.ReadVector3("EmissiveColor", ConfigurationNode.ReadVector3("EmmisiveColor")));
 		EmissiveMap.Read(ConfigurationNode, "EmissiveMap");
+		if (!EmissiveMap.IsAvailable())
+			EmissiveMap.Read(ConfigurationNode, "EmmisiveMap");
 		SetEmissiveMapEnabled(ConfigurationNode.ReadBoolean("EmissiveMapEnabled", EmissiveMap.IsAvailable()));
 
 		NormalMap.Read(ConfigurationNode, "NormalMap");

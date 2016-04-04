@@ -38,7 +38,7 @@
 
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
-#include "ZERNLightScatteringCommon.hlsl"
+#include "ZERNMath.hlsl"
 
 struct ZERNCloud_Plane_VertexShader_Input
 {
@@ -81,17 +81,19 @@ cbuffer ZERNCloud_Plane_Constants								: register(b8)
 	float			ZERNCloud_PlaneSubdivision;
 	float			ZERNCloud_CloudCoverage;
 	float			ZERNCloud_CloudDensity;
-	float			ZERNCloud_CosLightZenith;
+	float			ZERNCloud_Reserved0;
+	
+	float3			ZERNCloud_LightColor;
+	float			ZERNCloud_Inscattering;
 	
 	float3			ZERNCloud_LightDirection;
-	float			ZERNCloud_LightIntensity;
+	float			ZERNCloud_Reserved1;
 	
 	float2			ZERNCloud_Translation;
-	float			ZERNCloud_Inscattering;
-	float			ZERNCloud_Reserved;
+	float2			ZERNCloud_Reserved2;
 };
 
-SamplerState		ZERNCloud_SamplerLinearWrap					: register(s1);
+SamplerState		ZERNCloud_SamplerLinearWrap					: register(s0);
 
 Texture2D			ZERNCloud_CloudTexture						: register(t5);
 
@@ -190,16 +192,13 @@ ZERNCloud_Plane_PixelShader_Input ZERNCloud_Plane_DomainShader_Main(ZERNCloud_Pl
 
 float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input) : SV_Target0
 {	
-	float3 Extinction = ZERNLightScatteringCommon_GetExtinctionToAtmosphere(ZERNCloud_CosLightZenith, 1000.0f);
-
 	float3 ViewDirection = normalize(ZERNView_Position - Input.PositionWorld);
 	float CosLightView = dot(ZERNCloud_LightDirection, ViewDirection);
 	
 	float G = 0.9f;
 	float GG = G * G;
-	float AngularFactor = (1.0f / (64.0f * PI));
+	float AngularFactor = (1.0f / (64.0f * ZERNMath_PI));
 	float PhaseMie = AngularFactor * ((1.0f - GG) * (1.0f + CosLightView * CosLightView)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f));
-	//float PhaseMie = AngularFactor * (1.0f - GG) / pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f);
 	
 	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
 	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, ZERNCloud_PlaneSubdivision * TexCoord, 0.0f);
@@ -208,7 +207,7 @@ float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input)
 	float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
 
 	float MieDensity = exp(-CloudDensity * CloudDensity);
-	float3 ResultColor = ZERNCloud_LightIntensity * Extinction * PhaseMie * MieDensity + ZERNCloud_Inscattering;
+	float3 ResultColor = ZERNCloud_LightColor * PhaseMie * MieDensity + ZERNCloud_Inscattering;
 	
 	return float4(ResultColor, (CloudDensity / (CloudDensity + 1.0f)));
 }

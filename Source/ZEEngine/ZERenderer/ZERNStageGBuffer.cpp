@@ -62,11 +62,11 @@ bool ZERNStageGBuffer::UpdateRenderTargets()
 	Viewport.SetWidth((float)Width);
 	Viewport.SetHeight((float)Height);
 
-	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_D24_UNORM_S8_UINT, false, true);
-	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R11G11B10_FLOAT, true);
-	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
-	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
-	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, 1, 1, ZEGR_TF_R8G8B8A8_UNORM, true);
+	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
+	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 	RenderTargets[0] = GBuffer0->GetRenderTarget();
 	RenderTargets[1] = GBuffer1->GetRenderTarget();

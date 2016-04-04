@@ -35,11 +35,12 @@
 
 #pragma once
 
-#include "ZED11ComponentBase.h"
 #include "ZEGraphics/ZEGRStructuredBuffer.h"
+#include "ZED11ComponentBase.h"
 
 struct ID3D11Buffer;
 struct ID3D11ShaderResourceView;
+struct ID3D11UnorderedAccessView;
 
 class ZED11StructuredBuffer : public ZEGRStructuredBuffer, public ZED11ComponentBase
 {
@@ -48,18 +49,20 @@ class ZED11StructuredBuffer : public ZEGRStructuredBuffer, public ZED11Component
 
 	protected:
 		ID3D11Buffer*				Buffer;	
-		ID3D11ShaderResourceView*	ResourceView;
+		ID3D11ShaderResourceView*	ShaderResourceView;
+		ID3D11UnorderedAccessView*	UnorderedAccessView;
 
-		virtual bool				Initialize(ZESize ElementCount, ZESize ElementSize);
+		virtual bool				Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag);
 		virtual void				Deinitialize();
 
 									ZED11StructuredBuffer();
 		virtual						~ZED11StructuredBuffer();
 
-	public:
 		ID3D11Buffer*				GetBuffer() const;
-		ID3D11ShaderResourceView*	GetResourceView() const;
+		ID3D11ShaderResourceView*	GetShaderResourceView() const;
+		ID3D11UnorderedAccessView*	GetUnorderedAccessView() const;
 
-		virtual bool				Lock(void** Lock);
+	public:
+		virtual bool				Lock(void** Buffer);
 		virtual void				Unlock();
 };
