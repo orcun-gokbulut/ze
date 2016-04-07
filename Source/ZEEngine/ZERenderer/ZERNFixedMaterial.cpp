@@ -729,7 +729,7 @@ void ZERNFixedMaterial::SetSpecularMapEnabled(bool Enabled)
 	if (SpecularMapEnabled == Enabled)
 		return;
 
-	SpecularGlossMapEnabled = Enabled;
+	SpecularMapEnabled = Enabled;
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
@@ -1587,7 +1587,7 @@ void ZERNFixedMaterial::Load(const ZEMLReaderNode& MaterialNode)
 		SetSpecularColor(ConfigurationNode.ReadVector3("SpecularColor", ZEVector3::One));
 		SpecularMap.Read(ConfigurationNode, "SpecularMap");
 		SetSpecularMapEnabled(ConfigurationNode.ReadBoolean("SpecularMapEnabled", SpecularMap.IsAvailable()));
-		SpecularGlossMap.Read(ConfigurationNode, "SpecularPowerMap");
+		SpecularGlossMap.Read(ConfigurationNode, "SpecularGlossMap");
 		SetSpecularGlossMapEnabled(ConfigurationNode.ReadBoolean("SpecularGlossMapEnabled", SpecularGlossMap.IsAvailable()));
 
 		SetEmissiveEnabled(ConfigurationNode.ReadBoolean("EmissiveEnabled", ConfigurationNode.ReadBoolean("EmmisiveEnabled")));
