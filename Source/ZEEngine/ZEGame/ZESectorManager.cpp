@@ -290,11 +290,6 @@ void ZESectorManager::Tick(float Time)
 	UpdateActiveSectors();
 }
 
-void ZESectorManager::Destroy()
-{
-	ZEEntity::Destroy();
-}
-
 ZESectorManager* ZESectorManager::CreateInstance()
 {
 	return new ZESectorManager();

@@ -77,7 +77,5 @@ class ZESectorManager : public ZEEntity
 
 		virtual void						Tick(float Time);
 
-		virtual void						Destroy();
-
 		static ZESectorManager*				CreateInstance();
 };

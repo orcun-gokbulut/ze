@@ -426,11 +426,11 @@ bool ZEATAtmosphere::InitializeSelf()
 	Fog->SetDensity(0.0f);
 	Fog->SetStartDistance(0.0f);
 	Fog->SetColor(ZEVector3(0.5f));
-	//zeScene->AddEntity(Fog);
+	zeScene->AddEntity(Fog);
 
 	Cloud = ZEATCloud::CreateInstance();
 	Cloud->SetCloudTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
-	//zeScene->AddEntity(Cloud);
+	zeScene->AddEntity(Cloud);
 
 	Stars = ZEATSkyBox::CreateInstance();
 	Stars->SetName("StarMap");
@@ -439,7 +439,7 @@ bool ZEATAtmosphere::InitializeSelf()
 	Stars->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	Stars->SetColor(ZEVector3::One);
 	Stars->SetBrightness(0.1f);
-	//zeScene->AddEntity(Stars);
+	zeScene->AddEntity(Stars);
 
 	return true;
 }
