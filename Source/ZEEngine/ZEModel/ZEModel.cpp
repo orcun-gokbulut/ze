@@ -37,6 +37,8 @@
 
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRResource.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 void ZEModel::CalculateBoundingBox() const
 {
@@ -190,6 +192,30 @@ void ZEModel::LoadModelResource()
 	{
 		Helpers[I].Initialize(this, &ModelResource->GetHelpers()[I]);
 	}
+
+	DirtyConstantBufferSkin = true;
+	DirtyBoundingBox = true;
+}
+
+
+void ZEModel::UpdateConstantBufferBoneTransforms()
+{
+	if (!DirtyConstantBufferSkin)
+		return;
+
+	ZESize BoneCount = Bones.GetCount();
+	if (ConstantBufferBoneTransforms.IsNull() || ConstantBufferBoneTransforms->GetSize() != BoneCount * sizeof(ZEMatrix4x4))
+		ConstantBufferBoneTransforms = ZEGRConstantBuffer::Create(BoneCount * sizeof(ZEMatrix4x4));
+
+	void* Buffer;
+	ConstantBufferBoneTransforms->Lock(&Buffer);
+	
+		for (ZESize I = 0; I < BoneCount; I++)
+			static_cast<ZEMatrix4x4*>(Buffer)[I] = Bones[I].GetVertexTransform();
+
+	ConstantBufferBoneTransforms->Unlock();
+
+	DirtyConstantBufferSkin = false;
 }
 
 void ZEModel::ChildBoundingBoxChanged()

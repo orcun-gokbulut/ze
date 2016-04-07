@@ -84,6 +84,11 @@ cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 cbuffer ZERNFixedMaterial_Constant_Draw_Transform : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
 	float4x4		ZERNFixedMaterial_WorldTransform;
+	float4x4		ZERNFixedMaterial_PreSkinTransform;
+	float4			ZERNFixedMaterial_ClippingPlane0;
+	float4			ZERNFixedMaterial_ClippingPlane1;
+	float4			ZERNFixedMaterial_ClippingPlane2;
+	float4			ZERNFixedMaterial_ClippingPlane3;
 };
 
 // SHADER RESOURCES (TEXTURES)
@@ -124,11 +129,11 @@ struct ZERNFixedMaterial_GBufferStage_VSInput
 	float3 Binormal			: BINORMAL0;
 	float2 Texcoord         : TEXCOORD0;
 	
-	#if defined(ZERN_FM_VERTEX_COLOR)
+	#ifdef ZERN_FM_VERTEX_COLOR
 		float4 Color		: COLOR0;
 	#endif
 	
-	#if defined(ZERN_FM_SKIN_TRANSFORM)
+	#ifdef ZERN_FM_SKIN_TRANSFORM
 		uint4 BoneIndices	: BLENDINDICES;
 		float4 BoneWeights	: BLENDWEIGHTS;
 	#endif
@@ -141,12 +146,15 @@ struct ZERNFixedMaterial_GBufferStage_VSOutput
 	float3 Binormal			: TEXCOORD1;
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
-
-	#if defined(ZERN_FM_VERTEX_COLOR)
-		float4 Color		: TEXCOORD4;
+	float ViewDistance		: TEXCOORD4;
+	
+	#ifdef ZERN_FM_VERTEX_COLOR
+		float4 Color		: TEXCOORD5;
 	#endif
-
-	float ViewDistance		: TEXCOORD5;
+	
+	#ifdef ZERN_FM_CLIPPING_PLANES
+		float4 ClipDistance	: SV_ClipDistance;
+	#endif
 };
 
 struct ZERNFixedMaterial_GBufferStage_PSInput
@@ -156,12 +164,11 @@ struct ZERNFixedMaterial_GBufferStage_PSInput
 	float3 Binormal			: TEXCOORD1;
 	float3 Tangent			: TEXCOORD2;
 	float2 Texcoord			: TEXCOORD3;
+	float ViewDistance		: TEXCOORD4;
 	
-	#if defined(ZERN_FM_VERTEX_COLOR)
-		float4 Color		: TEXCOORD4;
+	#ifdef ZERN_FM_VERTEX_COLOR
+		float4 Color		: TEXCOORD5;
 	#endif
-
-	float ViewDistance		: TEXCOORD5;
 };
 
 struct ZERNFixedMaterial_ShadowMapGenerationStage_VSInput
@@ -172,7 +179,7 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_VSInput
 	float3 Binormal			: BINORMAL0;
 	float2 Texcoord         : TEXCOORD0;
 	
-	#if defined(ZERN_FM_SKIN_TRANSFORM)
+	#ifdef ZERN_FM_SKIN_TRANSFORM
 		uint4 BoneIndices	: BLENDINDICES;
 		float4 BoneWeights	: BLENDWEIGHTS;
 	#endif
@@ -182,6 +189,9 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput
 {
 	float4 Position			: SV_Position;
 	float2 Texcoord         : TEXCOORD0;
+	#ifdef ZERN_FM_CLIPPING_PLANES
+		float4 ClipDistance	: SV_ClipDistance;
+	#endif
 };
 
 struct ZERNFixedMaterial_ShadowMapGenerationStage_PSInput
@@ -197,8 +207,12 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 {
 	ZERNFixedMaterial_GBufferStage_VSOutput Output = (ZERNFixedMaterial_GBufferStage_VSOutput)0;
 	
-	#if defined(ZERN_FM_SKIN_TRANSFORM)
-		Input.Position = mul(ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights), float4(Input.Position, 1.0f)).xyz;
+	#ifdef ZERN_FM_SKIN_TRANSFORM
+		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
+		float4x4 ModelSkinTransform = mul(SkinTransform, ZERNFixedMaterial_PreSkinTransform);
+		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
+		Input.Normal = mul(SkinTransform, float4(Input.Normal, 0.0f)).xyz;
+		Input.Tangent = mul(SkinTransform, float4(Input.Tangent, 0.0f)).xyz;
 	#endif
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
@@ -216,6 +230,13 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 		Output.Color = Input.Color;
 	#endif
 
+	#ifdef ZERN_FM_CLIPPING_PLANES
+		Output.ClipDistance.x = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane0);
+		Output.ClipDistance.y = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane1);
+		Output.ClipDistance.z = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane2);
+		Output.ClipDistance.w = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane3);
+	#endif
+		
 	return Output;
 }
 
@@ -332,6 +353,13 @@ ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapG
 	ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput Output;
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Texcoord = Input.Texcoord;
+	
+	#ifdef ZERN_FM_CLIPPING_PLANES
+		Output.ClipDistance.x = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane0);
+		Output.ClipDistance.y = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane1);
+		Output.ClipDistance.z = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane2);
+		Output.ClipDistance.w = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane3);
+	#endif
 	
 	return Output;
 }

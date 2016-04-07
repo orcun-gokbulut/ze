@@ -60,25 +60,26 @@ class ZERay;
 class ZEPlane
 {
 	public:
-		ZEVector3 p;
-		ZEVector3 n;
+		ZEVector3				p;
+		ZEVector3				n;
 
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t);
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSegment, float &t);
-		static bool					IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t);
-		static bool					IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line);
+		ZEVector4				ToABCD() const;
 
-		static ZEHalfSpace			TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point);
-		static float				DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
-		static float				Distance(const ZEPlane& Plane, const ZEVector3& Point);
+								ZEPlane();
+								ZEPlane(const ZEVector3& n, const ZEVector3& p);
 
-		static void					ToABCD(const ZEPlane& Plane, float& A, float& B, float& C, float &D);
+		static bool				IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t);
+		static bool				IntersectionTest(const ZEPlane& Plane, const ZELineSegment& LineSegment, float &t);
+		static bool				IntersectionTest(const ZEPlane& Plane, const ZERay& Ray, float &t);
+		static bool				IntersectionTest(const ZEPlane & Plane1, const ZEPlane & Plane2, ZELine & Line);
 
-		static void					Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);
-		static void					Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2,const ZEVector3 &P3);
+		static ZEHalfSpace		TestHalfSpace(const ZEPlane& Plane, const ZEVector3& Point);
+		static float			DistanceSigned(const ZEPlane& Plane, const ZEVector3& Point);
+		static float			Distance(const ZEPlane& Plane, const ZEVector3& Point);
 
-									ZEPlane();
-									ZEPlane(const ZEVector3& n, const ZEVector3& p);
+		static void				Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p);
+		static void				Create(ZEPlane& Plane,const ZEVector3 &P1,const ZEVector3 &P2, const ZEVector3 &P3);
+
 };
 
 #endif

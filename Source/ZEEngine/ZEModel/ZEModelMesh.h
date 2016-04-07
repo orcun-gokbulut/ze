@@ -75,6 +75,8 @@ class ZEModelMesh : public ZEObject
 		mutable ZEMatrix4x4					WorldTransform;
 		mutable ZEMatrix4x4					InvWorldTransform;
 
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+
 		bool								PhysicsEnabled;
 		ZEPhysicalRigidBody*				PhysicalBody;
 		ZEPhysicalCloth*					PhysicalCloth;
@@ -94,6 +96,8 @@ class ZEModelMesh : public ZEObject
 		ZERNCommand							RenderCommand;
 		
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
+
+		void								UpdateConstantBuffer();
 
 		void								LocalTransformChanged();
 		void								ParentTransformChanged();

@@ -338,8 +338,9 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 				if (!LODNode.IsPropertyExists("AffectingBoneIds"))
 					return false;
 
-				LOD->AffectingBoneIds.SetCount(LODNode.ReadDataSize("AffectingBoneIds") / sizeof(ZEUInt32));
-				if (!LODNode.ReadDataItems("AffectingBoneIds", LOD->AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), LOD->AffectingBoneIds.GetCount()))
+				ZEArray<ZEUInt32> AffectingBoneIds;
+				AffectingBoneIds.SetCount(LODNode.ReadDataSize("AffectingBoneIds") / sizeof(ZEUInt32));
+				if (!LODNode.ReadDataItems("AffectingBoneIds", AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), AffectingBoneIds.GetCount()))
 					return false;
 
 				LOD->VertexCount = (ZEUInt32)(LODNode.ReadDataSize("Vertices") / sizeof(ZESkinnedModelVertex));
@@ -359,6 +360,15 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 						Mesh->Geometry.SetCount(LOD->VertexCount);
 						for (ZESize N = 0; N < LOD->VertexCount; N++)
 							Mesh->Geometry[N] = ((ZESkinnedModelVertex*)Buffer)[N].Position;
+					}
+
+					ZESkinnedModelVertex* BufferVertex = (ZESkinnedModelVertex*)Buffer;
+					for (ZESize N = 0; N < LOD->VertexCount; N++)
+					{
+						BufferVertex[N].BoneIndices[0] = AffectingBoneIds[BufferVertex[N].BoneIndices[0]];
+						BufferVertex[N].BoneIndices[1] = AffectingBoneIds[BufferVertex[N].BoneIndices[1]];
+						BufferVertex[N].BoneIndices[2] = AffectingBoneIds[BufferVertex[N].BoneIndices[2]];
+						BufferVertex[N].BoneIndices[3] = AffectingBoneIds[BufferVertex[N].BoneIndices[3]];
 					}
 
 					CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, true);

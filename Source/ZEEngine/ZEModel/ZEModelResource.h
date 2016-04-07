@@ -308,7 +308,6 @@ class ZEModelResourceMeshLOD
 		ZEInt32									LODStartDistance;
 		ZEInt32									LODEndDistance;
 		ZEInt32									MaterialId;
-		ZEArray<ZEUInt32>						AffectingBoneIds;
 };
 
 struct ZEModelResourceMesh
