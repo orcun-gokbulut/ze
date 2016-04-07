@@ -60,6 +60,7 @@ class ZEModel : public ZEEntity
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
+	friend class ZEModelMeshLOD;
 
 	private:
 		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
@@ -74,6 +75,9 @@ class ZEModel : public ZEEntity
 		ZEPhysicalRigidBody*				ParentlessBoneBody;
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
 		ZEVector3							ParentlessBoneBodyPosition;
+
+		mutable bool						DirtyConstantBufferSkin;
+		mutable ZEHolder<ZEGRConstantBuffer> ConstantBufferBoneTransforms;
 
 		ZEUInt								ActiveLOD;
 		bool								Visibility;
@@ -94,6 +98,8 @@ class ZEModel : public ZEEntity
 		void								UpdateTransforms();
 	
 		void								LoadModelResource();
+
+		virtual void						UpdateConstantBufferBoneTransforms();
 
 		virtual void						ChildBoundingBoxChanged();
 		virtual void						LocalTransformChanged();

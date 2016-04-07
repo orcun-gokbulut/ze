@@ -66,7 +66,10 @@ void ZEModelBone::LocalTransformChanged()
 		ChildBones[I]->ParentTransformChanged();
 
 	if (Model != NULL)
+	{
 		Model->ChildBoundingBoxChanged();
+		Model->DirtyConstantBufferSkin = true;
+	}
 }
 
 void ZEModelBone::ParentTransformChanged()

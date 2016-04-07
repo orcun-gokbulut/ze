@@ -63,13 +63,9 @@ class ZEModelMeshLOD
 		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
 		ZEHolder<ZEGRVertexBuffer>			VertexBufferNormals;
 		ZEHolder<ZEGRVertexBuffer>			VertexBufferSkin;
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>		ConstantBufferSkin;
 
 		ZEHolder<const ZERNMaterial>		Material;
 		bool								Skinned;
-		ZEArray<ZEMatrix4x4>				BoneTransforms;
-
 	public:
 		bool								IsSkinned() const;
 

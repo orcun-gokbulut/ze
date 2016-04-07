@@ -84,278 +84,282 @@ class ZERNFixedMaterial : public ZERNMaterial
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
 
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 
-		ZERNMap								BaseMap;
-		ZERNMap								SpecularMap;
-		ZERNMap								SpecularGlossMap;
-		ZERNMap								EmissiveMap;
-		ZERNMap								NormalMap;
-		ZERNMap								HeightMap;
-		ZERNMap								OpacityMap;
-		ZERNMap								SubSurfaceScatteringMap;
-		ZERNMap								EnvironmentMap;
-		ZERNMap								DetailBaseMap;
-		ZERNMap								DetailNormalMap;
+		ZERNMap									BaseMap;
+		ZERNMap									SpecularMap;
+		ZERNMap									SpecularGlossMap;
+		ZERNMap									EmissiveMap;
+		ZERNMap									NormalMap;
+		ZERNMap									HeightMap;
+		ZERNMap									OpacityMap;
+		ZERNMap									SubSurfaceScatteringMap;
+		ZERNMap									EnvironmentMap;
+		ZERNMap									DetailBaseMap;
+		ZERNMap									DetailNormalMap;
 		
 		mutable struct
 		{
-			ZEVector3						AmbientColor;
-			float							Opacity;
+			ZEVector3							AmbientColor;
+			float								Opacity;
 			
-			ZEVector3						DiffuseColor;
-			float							SubSurfaceScatteringFactor;
+			ZEVector3							DiffuseColor;
+			float								SubSurfaceScatteringFactor;
 			
-			ZEVector3						SpecularColor;
-			float							SpecularPower;
+			ZEVector3							SpecularColor;
+			float								SpecularPower;
 			
-			ZEUInt32						HeightMapTechnique;
-			float							HeightMapScale;
-			float							HeightMapOffset;
-			float							Reserved0;
+			ZEUInt32							HeightMapTechnique;
+			float								HeightMapScale;
+			float								HeightMapOffset;
+			float								Reserved0;
 			
-			ZEVector3						EmissiveColor;
-			float							AlphaCullLimit;
+			ZEVector3							EmissiveColor;
+			float								AlphaCullLimit;
 			
-			ZEVector3						ReflectionColor;
-			ZEBool32						SceneAmbientEnabled;
+			ZEVector3							ReflectionColor;
+			ZEBool32							SceneAmbientEnabled;
 			
-			ZEVector3						RefractionColor;
-			float							RefractionIndex;
+			ZEVector3							RefractionColor;
+			float								RefractionIndex;
 			
-			ZEVector3						DetailBaseMapColor;
-			float							DetailNormalMapFactor;
+			ZEVector3							DetailBaseMapColor;
+			float								DetailNormalMapFactor;
 			
-			ZEVector2						DetailBaseMapTiling;
-			ZEVector2						DetailNormalMapTiling;
+			ZEVector2							DetailBaseMapTiling;
+			ZEVector2							DetailNormalMapTiling;
 			
-			float							DetailBaseMapAttenuationStart;
-			float							DetailBaseMapAttenuationFactor;
-			float							DetailNormalMapAttenuationStart;
-			float							DetailNormalMapAttenuationFactor;
+			float								DetailBaseMapAttenuationStart;
+			float								DetailBaseMapAttenuationFactor;
+			float								DetailNormalMapAttenuationStart;
+			float								DetailNormalMapAttenuationFactor;
 		} Constants;
 
-		bool								ShadowCaster;
-		bool								TwoSided;
-		bool								Wireframe;
-		bool								AlphaCullEnabled;
-		bool								SkinningEnabled;
-		bool								VertexColorEnabled;
-		bool								TransparencyEnabled;
-		ZERNTransparencyMode				TransparencyMode;
-		bool								BaseMapEnabled;
-		bool								AmbientEnabled;
-		float								AmbientFactor;
-		ZEVector3							AmbientColor;
-		bool								DiffuseEnabled;
-		float								DiffuseFactor;
-		ZEVector3							DiffuseColor;
-		bool								SpecularEnabled;
-		bool								SpecularMapEnabled;
-		bool								SpecularGlossMapEnabled;
-		float								SpecularFactor;
-		ZEVector3							SpecularColor;
-		bool								NormalMapEnabled;
-		bool								HeightMapEnabled;
-		ZERNHeightMapTechnique				HeightMapTechnique;
-		bool								EmissiveEnabled;
-		float								EmissiveFactor;
-		ZEVector3							EmissiveColor;
-		bool								EmissiveMapEnabled;
-		bool								SubSurfaceScatteringMapEnabled;
-		bool								ReflectionEnabled;
-		float								ReflectionFactor;
-		ZEVector3							ReflectionColor;
-		bool								RefractionEnabled;
-		float								RefractionFactor;
-		ZEVector3							RefractionColor;
-		bool								OpacityMapEnabled;
-		bool								EnvironmentMapEnabled;
-		bool								DetailBaseMapEnabled;
-		bool								DetailNormalMapEnabled;
+		bool									ShadowCaster;
+		bool									TwoSided;
+		bool									Wireframe;
+		bool									AlphaCullEnabled;
+		bool									SkinningEnabled;
+		bool									VertexColorEnabled;
+		bool									TransparencyEnabled;
+		ZERNTransparencyMode					TransparencyMode;
+		bool									BaseMapEnabled;
+		bool									AmbientEnabled;
+		float									AmbientFactor;
+		ZEVector3								AmbientColor;
+		bool									DiffuseEnabled;
+		float									DiffuseFactor;
+		ZEVector3								DiffuseColor;
+		bool									SpecularEnabled;
+		bool									SpecularMapEnabled;
+		bool									SpecularGlossMapEnabled;
+		float									SpecularFactor;
+		ZEVector3								SpecularColor;
+		bool									NormalMapEnabled;
+		bool									HeightMapEnabled;
+		ZERNHeightMapTechnique					HeightMapTechnique;
+		bool									EmissiveEnabled;
+		float									EmissiveFactor;
+		ZEVector3								EmissiveColor;
+		bool									EmissiveMapEnabled;
+		bool									SubSurfaceScatteringMapEnabled;
+		bool									ReflectionEnabled;
+		float									ReflectionFactor;
+		ZEVector3								ReflectionColor;
+		bool									RefractionEnabled;
+		float									RefractionFactor;
+		ZEVector3								RefractionColor;
+		bool									OpacityMapEnabled;
+		bool									EnvironmentMapEnabled;
+		bool									DetailBaseMapEnabled;
+		bool									DetailNormalMapEnabled;
+		bool									ClippingPlanesEnabled;
 		
-		void								UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
-		bool								UpdateShaders() const;
-		bool								UpdateConstantBuffer() const;
-		bool								UpdateRenderState() const;
+		void									UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
+		bool									UpdateShaders() const;
+		bool									UpdateConstantBuffer() const;
+		bool									UpdateRenderState() const;
 
-		void								Load(const ZEMLReaderNode& MaterialNode);
+		void									Load(const ZEMLReaderNode& MaterialNode);
 
-		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
 
-											ZERNFixedMaterial();
+												ZERNFixedMaterial();
 
 	public:
-		virtual ZEUInt						GetStageMask() const;
+		virtual ZEUInt							GetStageMask() const;
 
-		void								SetName(const ZEString& Name);
-		const ZEString&						GetName() const;
+		void									SetName(const ZEString& Name);
+		const ZEString&							GetName() const;
 
-		const ZEString&						GetFileName() const;
+		const ZEString&							GetFileName() const;
 
-		void								SetShadowCaster(bool ShadowCaster);
-		bool								GetShadowCaster() const;
+		void									SetShadowCaster(bool ShadowCaster);
+		bool									GetShadowCaster() const;
 
-		void								SetTwoSided(bool Enable);
-		bool								GetTwoSided() const;
+		void									SetTwoSided(bool Enable);
+		bool									GetTwoSided() const;
 
-		void								SetWireframe(bool Enable);
-		bool								GetWireframe() const;
+		void									SetWireframe(bool Enable);
+		bool									GetWireframe() const;
 
-		void								SetSkinningEnabled(bool SkinningEnabled);
-		bool								GetSkinningEnabled() const;
+		void									SetSkinningEnabled(bool SkinningEnabled);
+		bool									GetSkinningEnabled() const;
 
-		void								SetVertexColorEnabled(bool Enabled);
-		bool								GetVertexColorEnabled() const;
+		void									SetVertexColorEnabled(bool Enabled);
+		bool									GetVertexColorEnabled() const;
 
-		void								SetTransparencyEnabled(bool Enabled);
-		bool								GetTransparencyEnabled() const;
-		void								SetTransparencyMode(ZERNTransparencyMode Mode);
-		ZERNTransparencyMode				GetTransparencyMode() const;
+		void									SetTransparencyEnabled(bool Enabled);
+		bool									GetTransparencyEnabled() const;
+		void									SetTransparencyMode(ZERNTransparencyMode Mode);
+		ZERNTransparencyMode					GetTransparencyMode() const;
 
-		void								SetAlphaCullEnabled(bool Enabled);
-		bool								GetAlphaCullEnabled() const;
-		void								SetAlphaCullLimit(float Limit);
-		float								GetAlphaCullLimit() const;
+		void									SetAlphaCullEnabled(bool Enabled);
+		bool									GetAlphaCullEnabled() const;
+		void									SetAlphaCullLimit(float Limit);
+		float									GetAlphaCullLimit() const;
 
-		void								SetSubSurfaceScatteringFactor(float Factor);
-		float								GetSubSurfaceScatteringFactor() const;
-		void								SetSubSurfaceScatteringMapEnabled(bool Enabled);
-		bool								GetSubSurfaceScatteringMapEnabled() const;
-		void								SetSubSurfaceScatteringMap(const ZERNMap& Map);
-		const ZERNMap&						GetSubSurfaceScatteringMap() const;
+		void									SetSubSurfaceScatteringFactor(float Factor);
+		float									GetSubSurfaceScatteringFactor() const;
+		void									SetSubSurfaceScatteringMapEnabled(bool Enabled);
+		bool									GetSubSurfaceScatteringMapEnabled() const;
+		void									SetSubSurfaceScatteringMap(const ZERNMap& Map);
+		const ZERNMap&							GetSubSurfaceScatteringMap() const;
 
 
-		void								SetBaseMapEnabled(bool Enabled);
-		bool								GetBaseMapEnabled() const;
-		void								SetBaseMap(const ZERNMap& Map);
-		const ZERNMap&						GetBaseMap() const;
-		void								SetBaseMapFile(const ZEString& Filename);
-		const ZEString&						GetBaseMapFile() const;
+		void									SetBaseMapEnabled(bool Enabled);
+		bool									GetBaseMapEnabled() const;
+		void									SetBaseMap(const ZERNMap& Map);
+		const ZERNMap&							GetBaseMap() const;
+		void									SetBaseMapFile(const ZEString& Filename);
+		const ZEString&							GetBaseMapFile() const;
 
-		void								SetAmbientEnabled(bool Enabled);
-		bool								GetAmbientEnabled() const;
-		void								SetSceneAmbientEnabled(bool Enabled);
-		bool								GetSceneAmbientEnabled() const;
-		void								SetAmbientFactor(float Factor);
-		float								GetAmbientFactor() const;
-		void								SetAmbientColor(const ZEVector3& Color);
-		const ZEVector3&					GetAmbientColor() const;
+		void									SetAmbientEnabled(bool Enabled);
+		bool									GetAmbientEnabled() const;
+		void									SetSceneAmbientEnabled(bool Enabled);
+		bool									GetSceneAmbientEnabled() const;
+		void									SetAmbientFactor(float Factor);
+		float									GetAmbientFactor() const;
+		void									SetAmbientColor(const ZEVector3& Color);
+		const ZEVector3&						GetAmbientColor() const;
 		
-		void								SetDiffuseEnabled(bool Enabled);
-		bool								GetDiffuseEnabled() const;
-		void								SetDiffuseFactor(float Factor);
-		float								GetDiffuseFactor() const;
-		void								SetDiffuseColor(const ZEVector3& Color);
-		const ZEVector3&					GetDiffuseColor() const;
+		void									SetDiffuseEnabled(bool Enabled);
+		bool									GetDiffuseEnabled() const;
+		void									SetDiffuseFactor(float Factor);
+		float									GetDiffuseFactor() const;
+		void									SetDiffuseColor(const ZEVector3& Color);
+		const ZEVector3&						GetDiffuseColor() const;
 
-		void								SetSpecularEnabled(bool Enabled);
-		bool								GetSpecularEnabled() const;
-		void								SetSpecularFactor(float Factor);
-		float								GetSpecularFactor() const;
-		void								SetSpecularShininess(float Shininess);
-		float								GetSpecularShininess() const;
-		void								SetSpecularColor(const ZEVector3& Color);
-		const ZEVector3&					GetSpecularColor() const;
-		void								SetSpecularMapEnabled(bool Enabled);
-		bool								GetSpecularMapEnabled() const;
-		void								SetSpecularMap(const ZERNMap& Map);
-		const ZERNMap&						GetSpecularMap() const;
-		void								SetSpecularGlossMapEnabled(bool Enabled);
-		bool								GetSpecularGlossMapEnabled() const;
-		void								SetSpecularGlossMap(const ZERNMap& Map);
-		const ZERNMap&						GetSpecularGlossMap() const;
+		void									SetSpecularEnabled(bool Enabled);
+		bool									GetSpecularEnabled() const;
+		void									SetSpecularFactor(float Factor);
+		float									GetSpecularFactor() const;
+		void									SetSpecularShininess(float Shininess);
+		float									GetSpecularShininess() const;
+		void									SetSpecularColor(const ZEVector3& Color);
+		const ZEVector3&						GetSpecularColor() const;
+		void									SetSpecularMapEnabled(bool Enabled);
+		bool									GetSpecularMapEnabled() const;
+		void									SetSpecularMap(const ZERNMap& Map);
+		const ZERNMap&							GetSpecularMap() const;
+		void									SetSpecularGlossMapEnabled(bool Enabled);
+		bool									GetSpecularGlossMapEnabled() const;
+		void									SetSpecularGlossMap(const ZERNMap& Map);
+		const ZERNMap&							GetSpecularGlossMap() const;
 
-		void								SetEmissiveEnabled(bool Enabled);
-		bool								GetEmissiveEnabled() const;
-		void								SetEmissiveFactor(float Factor);
-		float								GetEmissiveFactor() const;
-		void								SetEmissiveColor(const ZEVector3& Color);
-		const ZEVector3&					GetEmissiveColor() const;
-		void								SetEmissiveMapEnabled(bool Enabled);
-		bool								GetEmissiveMapEnabled() const;
-		void								SetEmissiveMap(const ZERNMap& Map);
-		const ZERNMap&						GetEmissiveMap() const;
+		void									SetEmissiveEnabled(bool Enabled);
+		bool									GetEmissiveEnabled() const;
+		void									SetEmissiveFactor(float Factor);
+		float									GetEmissiveFactor() const;
+		void									SetEmissiveColor(const ZEVector3& Color);
+		const ZEVector3&						GetEmissiveColor() const;
+		void									SetEmissiveMapEnabled(bool Enabled);
+		bool									GetEmissiveMapEnabled() const;
+		void									SetEmissiveMap(const ZERNMap& Map);
+		const ZERNMap&							GetEmissiveMap() const;
 
-		void								SetNormalMapEnabled(bool Enabled);
-		bool								GetNormalMapEnabled() const;
-		void								SetNormalMap(const ZERNMap& Map);
-		const ZERNMap&						GetNormalMap() const;
+		void									SetNormalMapEnabled(bool Enabled);
+		bool									GetNormalMapEnabled() const;
+		void									SetNormalMap(const ZERNMap& Map);
+		const ZERNMap&							GetNormalMap() const;
 
-		void								SetHeightMapEnabled(bool Enabled);
-		bool								GetHeightMapEnabled() const;
-		void								SetHeightMapTechnique(ZERNHeightMapTechnique Technique);
-		ZERNHeightMapTechnique				GetHeightMapTechnique() const;
-		void								SetHeightMapOffset(float Offset);
-		float								GetHeightMapOffset() const;
-		void								SetHeightMapScale(float Scale);
-		float								GetHeightMapScale() const;
-		void								SetHeightMap(const ZERNMap& Map);
-		const ZERNMap&						GetHeightMap() const;
+		void									SetHeightMapEnabled(bool Enabled);
+		bool									GetHeightMapEnabled() const;
+		void									SetHeightMapTechnique(ZERNHeightMapTechnique Technique);
+		ZERNHeightMapTechnique					GetHeightMapTechnique() const;
+		void									SetHeightMapOffset(float Offset);
+		float									GetHeightMapOffset() const;
+		void									SetHeightMapScale(float Scale);
+		float									GetHeightMapScale() const;
+		void									SetHeightMap(const ZERNMap& Map);
+		const ZERNMap&							GetHeightMap() const;
 
-		void								SetOpacity(float Value);
-		float								GetOpacity() const;
-		void								SetOpacityMapEnabled(bool Enabled);
-		bool								GetOpacityMapEnabled() const;
-		void								SetOpacityMap(const ZERNMap& Map);
-		const ZERNMap&						GetOpacityMap() const;
+		void									SetOpacity(float Value);
+		float									GetOpacity() const;
+		void									SetOpacityMapEnabled(bool Enabled);
+		bool									GetOpacityMapEnabled() const;
+		void									SetOpacityMap(const ZERNMap& Map);
+		const ZERNMap&							GetOpacityMap() const;
 
-		void								SetEnvironmentMap(const ZERNMap& Map);
-		const ZERNMap&						GetEnvironmentMap() const;
+		void									SetEnvironmentMap(const ZERNMap& Map);
+		const ZERNMap&							GetEnvironmentMap() const;
 
-		void								SetReflectionEnabled(bool Enabled);
-		bool								GetReflectionEnabled() const;
-		void								SetReflectionFactor(float Factor);
-		float								GetReflectionFactor() const;
-		void								SetReflectionColor(const ZEVector3& Color);
-		const ZEVector3&					GetReflectionColor() const;
+		void									SetReflectionEnabled(bool Enabled);
+		bool									GetReflectionEnabled() const;
+		void									SetReflectionFactor(float Factor);
+		float									GetReflectionFactor() const;
+		void									SetReflectionColor(const ZEVector3& Color);
+		const ZEVector3&						GetReflectionColor() const;
 
-		void								SetRefractionEnabled(bool Enabled);
-		bool								GetRefractionEnabled() const;
-		void								SetRefractionFactor(float Factor);
-		float								GetRefractionFactor() const;
-		void								SetRefractionColor(const ZEVector3& Color);
-		const ZEVector3&					GetRefractionColor() const;
-		void								SetRefractionIndex(float Index);
-		float								GetRefractionIndex() const;
+		void									SetRefractionEnabled(bool Enabled);
+		bool									GetRefractionEnabled() const;
+		void									SetRefractionFactor(float Factor);
+		float									GetRefractionFactor() const;
+		void									SetRefractionColor(const ZEVector3& Color);
+		const ZEVector3&						GetRefractionColor() const;
+		void									SetRefractionIndex(float Index);
+		float									GetRefractionIndex() const;
 
-		void								SetDetailMapTiling(const ZEVector2& Tiling);
-		const ZEVector2&					GetDetailMapTiling() const;
+		void									SetDetailMapTiling(const ZEVector2& Tiling);
+		const ZEVector2&						GetDetailMapTiling() const;
 
-		void								SetDetailBaseMapEnabled(bool Enabled); 
-		bool								GetDetailBaseMapEnabled() const;
-		void								SetDetailBaseMapColor(const ZEVector3& Color);
-		const ZEVector3&					GetDetailBaseMapColor() const;
-		void								SetDetailBaseMapTiling(const ZEVector2& Tiling);
-		const ZEVector2&					GetDetailBaseMapTiling() const;
-		void								SetDetailBaseMapAttenuationStart(float Start);
-		float								GetDetailBaseMapAttenuationStart() const;
-		void								SetDetailBaseMapAttenuationFactor(float Factor);
-		float								GetDetailBaseMapAttenuationFactor() const;
-		void								SetDetailBaseMap(const ZERNMap& Map);
-		const ZERNMap&						GetDetailBaseMap() const;
+		void									SetDetailBaseMapEnabled(bool Enabled); 
+		bool									GetDetailBaseMapEnabled() const;
+		void									SetDetailBaseMapColor(const ZEVector3& Color);
+		const ZEVector3&						GetDetailBaseMapColor() const;
+		void									SetDetailBaseMapTiling(const ZEVector2& Tiling);
+		const ZEVector2&						GetDetailBaseMapTiling() const;
+		void									SetDetailBaseMapAttenuationStart(float Start);
+		float									GetDetailBaseMapAttenuationStart() const;
+		void									SetDetailBaseMapAttenuationFactor(float Factor);
+		float									GetDetailBaseMapAttenuationFactor() const;
+		void									SetDetailBaseMap(const ZERNMap& Map);
+		const ZERNMap&							GetDetailBaseMap() const;
 
-		void								SetDetailNormalMapEnabled(bool Enabled); 
-		bool								GetDetailNormalMapEnabled() const;
-		void								SetDetailNormalMapFactor(float Factor);
-		float								GetDetailNormalMapFactor() const;
-		void								SetDetailNormalMapTiling(const ZEVector2& Tiling);
-		const ZEVector2&					GetDetailNormalMapTiling() const;
-		void								SetDetailNormalMapAttenuationStart(float Start);
-		float								GetDetailNormalMapAttenuationStart() const;
-		void								SetDetailNormalMapAttenuationFactor(float Factor);
-		float								GetDetailNormalMapAttenuationFactor() const;
-		void								SetDetailNormalMap(const ZERNMap& Map);
-		const ZERNMap&						GetDetailNormalMap() const;
+		void									SetDetailNormalMapEnabled(bool Enabled); 
+		bool									GetDetailNormalMapEnabled() const;
+		void									SetDetailNormalMapFactor(float Factor);
+		float									GetDetailNormalMapFactor() const;
+		void									SetDetailNormalMapTiling(const ZEVector2& Tiling);
+		const ZEVector2&						GetDetailNormalMapTiling() const;
+		void									SetDetailNormalMapAttenuationStart(float Start);
+		float									GetDetailNormalMapAttenuationStart() const;
+		void									SetDetailNormalMapAttenuationFactor(float Factor);
+		float									GetDetailNormalMapAttenuationFactor() const;
+		void									SetDetailNormalMap(const ZERNMap& Map);
+		const ZERNMap&							GetDetailNormalMap() const;
 
-		virtual bool						SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
-		virtual void						CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		void									SetClippingPlanesEnabled(bool Enabled);
+		bool									GetClippingPlanesEnabled() const;
 
-		virtual bool						Update() const;
+		virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 
-		void								WriteToFile(const ZEString& FileName);
-		void								ReadFromFile(const ZEString& FileName);
+		virtual bool							Update() const;
 
-		static ZEHolder<ZERNFixedMaterial>	CreateInstance();
+		void									WriteToFile(const ZEString& FileName);
+		void									ReadFromFile(const ZEString& FileName);
+
+		static ZEHolder<ZERNFixedMaterial>		CreateInstance();
 };

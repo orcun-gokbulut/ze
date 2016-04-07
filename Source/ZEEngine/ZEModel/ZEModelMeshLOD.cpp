@@ -86,27 +86,19 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 		return;
 	}
 
-	//Context->SetIndexBuffer(IndexBuffer);
-	//Context->SetVertexBuffer(1, VertexBufferNormals);
 	if (Skinned)
 	{
-		ZESize BoneCount = BoneTransforms.GetCount();
-		for (ZESize I = 0; I < BoneCount; I++)
-			ZEMatrix4x4::Multiply(BoneTransforms[I], Owner->GetBones()[LODResource->AffectingBoneIds[I]].GetVertexTransform(), OwnerMesh->GetLocalTransform());
-
-		ConstantBufferSkin->SetData(&BoneTransforms[0]);
-
+		Owner->UpdateConstantBufferBoneTransforms();
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_BONE_TRANSFORMS, Owner->ConstantBufferBoneTransforms);
 		Context->SetVertexBuffers(0, 1, VertexBufferSkin.GetPointerToPointer());
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_SKIN, ConstantBufferSkin);
-		ConstantBuffer->SetData(&Owner->GetWorldTransform());
 	}
 	else
 	{
 		Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
-		ConstantBuffer->SetData(&OwnerMesh->GetWorldTransform());
 	}
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	OwnerMesh->UpdateConstantBuffer();
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, OwnerMesh->ConstantBuffer);
 	Context->Draw(LODResource->VertexCount, 0);
 
 	Material->CleanupMaterial(Context, Stage);
@@ -124,18 +116,11 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	VertexBufferNormals = LODResource->VertexBufferNormals;
 	VertexBufferSkin = LODResource->VertexBufferSkin;
 	IndexBuffer = LODResource->IndexBuffer;
-
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
-
 	Skinned = !LODResource->VertexBufferSkin.IsNull();
+
 	if (Skinned)
 	{
 		static_cast<ZERNFixedMaterial*>(const_cast<ZERNMaterial*>(Material.GetPointer()))->SetSkinningEnabled(Skinned);
-		
-		ZESize BoneCount = LODResource->AffectingBoneIds.GetCount();
-		ConstantBufferSkin = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4) * BoneCount);
-
-		BoneTransforms.Resize(BoneCount);
 	}
 }
 

@@ -108,6 +108,9 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 
 	if (DetailNormalMapEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DETAIL_NORMAL_MAP"));
+
+	if (ClippingPlanesEnabled)
+		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
 }
 
 bool ZERNFixedMaterial::UpdateShaders() const
@@ -298,6 +301,7 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	EnvironmentMapEnabled = false;
 	DetailBaseMapEnabled = false;
 	DetailNormalMapEnabled = false;
+	ClippingPlanesEnabled = false;
 
 	Constants.AmbientColor = ZEVector3::One;
 	Constants.Opacity = 1.0f;
@@ -1275,6 +1279,16 @@ const ZERNMap& ZERNFixedMaterial::GetDetailNormalMap() const
 	return DetailNormalMap;
 }
 
+void ZERNFixedMaterial::SetClippingPlanesEnabled(bool Enabled)
+{
+	ClippingPlanesEnabled = Enabled;
+}
+
+bool ZERNFixedMaterial::GetClippingPlanesEnabled() const
+{
+	return ClippingPlanesEnabled;
+}
+
 bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
 	if (!Update())
@@ -1484,6 +1498,8 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteFloat("DetailNormalMapAttenuationFactor", GetDetailNormalMapAttenuationFactor());
 	DetailNormalMap.Write(ConfigurationNode, "DetailNormalMap");
 	
+	ConfigurationNode.WriteBool("ClippingPlanesEnabled", GetClippingPlanesEnabled());
+
 	ConfigurationNode.CloseNode();
 	MaterialNode.CloseNode();
 	MaterialWriter.Close();
@@ -1617,5 +1633,7 @@ void ZERNFixedMaterial::Load(const ZEMLReaderNode& MaterialNode)
 		SetDetailNormalMapTiling(ConfigurationNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
 		SetDetailNormalMapAttenuationStart(ConfigurationNode.ReadFloat("DetailNormalMapAttenuationStart", 10.0f));
 		SetDetailNormalMapAttenuationFactor(ConfigurationNode.ReadFloat("DetailNormalMapAttenuationFactor", 0.01f));
+
+		SetClippingPlanesEnabled(ConfigurationNode.ReadBoolean("ClippingPlanesEnabled", false));
 	}
 }

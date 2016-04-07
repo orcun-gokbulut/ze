@@ -48,6 +48,7 @@
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 #define ZEMD_MDF_LOCAL_TRANSFORM			0x0001
 #define ZEMD_MDF_INV_LOCAL_TRANSFORM		0x0002
@@ -57,6 +58,52 @@
 #define ZEMD_MDF_INV_WORLD_TRANSFORM		0x0020
 #define ZEMD_MDF_MODEL_BOUNDING_BOX			0x0040
 #define ZEMD_MDF_WORLD_BOUNDING_BOX			0x0080
+#define ZEMD_MDF_CONSTANT_BUFFER			0x0100
+
+struct ZEModelMeshConstants
+{
+	ZEMatrix4x4						WorldTransform;
+	ZEMatrix4x4						PreSkinTransform;
+	ZEVector4						ClippingPlane0;
+	ZEVector4						ClippingPlane1;
+	ZEVector4						ClippingPlane2;
+	ZEVector4						ClippingPlane3;
+};
+
+void ZEModelMesh::UpdateConstantBuffer()
+{
+	if (!DirtyFlags.GetFlags(ZEMD_MDF_CONSTANT_BUFFER))
+		return;
+
+	ZEModelMeshConstants Constants;
+
+	Constants.WorldTransform = GetWorldTransform();
+	Constants.PreSkinTransform = GetModelTransform();
+
+	if (ClippingPlanes.GetCount() > 0)
+		Constants.ClippingPlane0 = GetInvWorldTransform().Transpose() * ClippingPlanes[0].ToABCD();
+	else
+		Constants.ClippingPlane0 = ZEVector4::Zero;
+
+	if (ClippingPlanes.GetCount() > 1)
+		Constants.ClippingPlane1 = GetWorldTransform() * ClippingPlanes[1].ToABCD();
+	else
+		Constants.ClippingPlane1 = ZEVector4::Zero;
+
+	if (ClippingPlanes.GetCount() > 2)
+		Constants.ClippingPlane2 = GetWorldTransform() * ClippingPlanes[2].ToABCD();
+	else
+		Constants.ClippingPlane2 = ZEVector4::Zero;
+
+	if (ClippingPlanes.GetCount() > 3)
+		Constants.ClippingPlane3 = GetWorldTransform() * ClippingPlanes[3].ToABCD();
+	else
+		Constants.ClippingPlane3 = ZEVector4::Zero;
+
+	ConstantBuffer->SetData(&Constants);
+
+	DirtyFlags.UnraiseFlags(ZEMD_MDF_CONSTANT_BUFFER);
+}
 
 void ZEModelMesh::LocalTransformChanged()
 {
@@ -64,8 +111,8 @@ void ZEModelMesh::LocalTransformChanged()
 		ZEMD_MDF_LOCAL_TRANSFORM | ZEMD_MDF_INV_LOCAL_TRANSFORM |
 		ZEMD_MDF_MODEL_TRANSFORM | ZEMD_MDF_INV_MODEL_TRANSFORM |
 		ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_INV_WORLD_TRANSFORM |
-		ZEMD_MDF_MODEL_BOUNDING_BOX |
-		ZEMD_MDF_WORLD_BOUNDING_BOX);
+		ZEMD_MDF_MODEL_BOUNDING_BOX | ZEMD_MDF_WORLD_BOUNDING_BOX |
+		ZEMD_MDF_CONSTANT_BUFFER);
 
 	for (ZESize I = 0; I < ChildMeshes.GetCount(); I++)
 		ChildMeshes[I]->ParentTransformChanged();
@@ -85,8 +132,8 @@ void ZEModelMesh::ParentTransformChanged()
 	DirtyFlags.RaiseFlags(
 		ZEMD_MDF_MODEL_TRANSFORM | ZEMD_MDF_INV_MODEL_TRANSFORM |
 		ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_INV_WORLD_TRANSFORM |
-		ZEMD_MDF_MODEL_BOUNDING_BOX |
-		ZEMD_MDF_WORLD_BOUNDING_BOX);
+		ZEMD_MDF_MODEL_BOUNDING_BOX | ZEMD_MDF_WORLD_BOUNDING_BOX |
+		ZEMD_MDF_CONSTANT_BUFFER);
 
 	for (ZESize I = 0; I < ChildMeshes.GetCount(); I++)
 		ChildMeshes[I]->ParentTransformChanged();
@@ -235,6 +282,7 @@ const ZEMatrix4x4& ZEModelMesh::GetInvWorldTransform() const
 void ZEModelMesh::SetLocalPosition(const ZEVector3& LocalPosition)
 {
 	Position = LocalPosition;
+	LocalTransformChanged();
 }
 
 const ZEVector3& ZEModelMesh::GetLocalPosition() const
@@ -245,6 +293,7 @@ const ZEVector3& ZEModelMesh::GetLocalPosition() const
 void ZEModelMesh::SetLocalRotation(const ZEQuaternion& LocalRotation)
 {
 	Rotation = LocalRotation;
+	LocalTransformChanged();
 }
 
 const ZEQuaternion& ZEModelMesh::GetLocalRotation() const
@@ -255,6 +304,7 @@ const ZEQuaternion& ZEModelMesh::GetLocalRotation() const
 void ZEModelMesh::SetLocalScale(const ZEVector3& LocalScale)
 {
 	Scale = LocalScale;
+	LocalTransformChanged();
 }
 
 const ZEVector3& ZEModelMesh::GetLocalScale() const
@@ -485,7 +535,14 @@ ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
 
 void ZEModelMesh::SetClippingPlaneCount(ZESize Count)
 {
+	if (ClippingPlanes.GetCount() == Count)
+		return;
+
+	if (Count > 4)
+		return;
+
 	ClippingPlanes.Resize(Count);
+	DirtyFlags.RaiseFlags(ZEMD_MDF_CONSTANT_BUFFER);
 }
 
 ZESize ZEModelMesh::GetClippingPlaneCount()
@@ -495,7 +552,11 @@ ZESize ZEModelMesh::GetClippingPlaneCount()
 
 void ZEModelMesh::SetClippingPlane(ZESize Index, const ZEPlane& Plane)
 {
+	if (Index > ClippingPlanes.GetCount())
+		return;
+
 	ClippingPlanes[Index] = Plane;
+	DirtyFlags.RaiseFlags(ZEMD_MDF_CONSTANT_BUFFER);
 }
 
 const ZEPlane& ZEModelMesh::GetClippingPlane(ZESize Index)
@@ -517,6 +578,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 	LocalBoundingBox = MeshResource->BoundingBox;
 	PhysicsEnabled = false;
 	LocalTransformChanged();
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEModelMeshConstants));
 
 	ZEArray<ZEPhysicalShape*> ShapeList;
 	if(PhysicalBody == NULL)
@@ -637,6 +699,8 @@ void ZEModelMesh::Deinitialize()
 
 	ChildMeshes.Clear();
 	LODs.Clear();
+
+	DirtyFlags.RaiseAll();
 }
 
 
@@ -777,6 +841,7 @@ bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 
 ZEModelMesh::ZEModelMesh()
 {
+	DirtyFlags.RaiseAll();
 	Owner = NULL;
 	ParentMesh = NULL;
 	MeshResource = NULL;
