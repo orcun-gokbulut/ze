@@ -104,7 +104,7 @@ Texture2D<float>	ZERNFixedMaterial_SubsurfaceScatteringMap 	: register(t6);
 TextureCube<float3>	ZERNFixedMaterial_EnvironmentMap			: register(t7);
 Texture2D<float3>	ZERNFixedMaterial_DetailBaseMap			 	: register(t8);
 Texture2D<float3>	ZERNFixedMaterial_DetailNormalMap			: register(t9);
-Texture2D<float>	ZERNFixedMaterial_GlossMap					: register(t10);
+Texture2D<float>	ZERNFixedMaterial_SpecularGlossMap			: register(t10);
 
 SamplerState		ZERNFixedMaterial_TextureSampler			: register(s0);
 SamplerState		ZERNFixedMaterial_EnvironmentMapSampler		: register(s1);
@@ -213,16 +213,18 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
 		Input.Normal = mul(SkinTransform, float4(Input.Normal, 0.0f)).xyz;
 		Input.Tangent = mul(SkinTransform, float4(Input.Tangent, 0.0f)).xyz;
+		Input.Binormal = mul(SkinTransform, float4(Input.Binormal, 0.0f)).xyz;
 	#endif
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 	float4 NormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Normal, 0.0f));
 	float4 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Tangent, 0.0f));
+	float4 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Binormal, 0.0f));
 	
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Normal = ZERNTransformations_WorldToView(NormalWorld);
 	Output.Tangent = ZERNTransformations_WorldToView(TangentWorld);
-	Output.Binormal = cross(Output.Normal, Output.Tangent);
+	Output.Binormal = ZERNTransformations_WorldToView(BinormalWorld); //cross(Output.Tangent, Output.Normal);
 	Output.Texcoord = Input.Texcoord;
 	Output.ViewDistance = length(PositionWorld.xyz - ZERNView_Position);
 
@@ -299,18 +301,22 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 
 	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? ZERNScene_AmbientColor : ZERNFixedMaterial_AmbientColor);
 	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
-	float SpecularColor = ZERNFixedMaterial_SpecularColor.x;
+	float3 SpecularColor = ZERNFixedMaterial_SpecularColor;
 	float3 EmissiveColor = ZERNFixedMaterial_EmissiveColor;
+	float SpecularPower = ZERNFixedMaterial_SpecularPower;
 
 	#ifdef ZERN_FM_EMISSIVE_MAP
 		EmissiveColor *= ZERNFixedMaterial_EmissiveMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
 	#endif
-	
-	float SpecularPower = ZERNFixedMaterial_SpecularPower;
-	#if defined(ZERN_FM_SPECULAR_GLOSS_MAP)
-		SpecularPower *= ZERNFixedMaterial_GlossMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r);
+
+	#if defined(ZERN_FM_SPECULAR_MAP)
+		SpecularColor *= ZERNFixedMaterial_SpecularMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).rgb;
 	#endif
-	
+
+	#if defined(ZERN_FM_SPECULAR_GLOSS_MAP)
+		SpecularPower *= ZERNFixedMaterial_SpecularGlossMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r;
+	#endif
+
 	float SubsurfaceScattering = ZERNFixedMaterial_SubSurfaceScatteringFactor;
 	#if defined(ZERN_FM_SUBSURFACE_SCATTERING_MAP)
 		SubSurfaceScattering = ZERNFixedMaterial_SubsurfaceScatteringMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r);
@@ -334,7 +340,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	
 	ZERNGBuffer_SetAccumulationColor(GBuffer, AmbientColor);
 	ZERNGBuffer_SetViewNormal(GBuffer, Normal);
-	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor);
+	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor.x);
 	ZERNGBuffer_SetDiffuseColor(GBuffer, DiffuseColor);
 	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);
 	ZERNGBuffer_SetEmissiveColor(GBuffer, EmissiveColor);
