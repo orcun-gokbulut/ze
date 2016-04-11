@@ -37,10 +37,11 @@
 
 #include <d3d11_1.h>
 
+#include "ZEDS/ZEFlags.h"
+
 class ZED11Module;
 enum ZEGRFormat;
 enum ZEGRResourceUsage;
-enum ZEGRResourceBindFlag;
 
 class ZED11ComponentBase
 {
@@ -57,5 +58,5 @@ class ZED11ComponentBase
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 		static D3D11_USAGE				ConvertUsage(ZEGRResourceUsage Usage);
-		static UINT						ConvertBindFlag(ZEGRResourceBindFlag BindFlag);
+		static UINT						ConvertBindFlags(ZEFlags BindFlags);
 };

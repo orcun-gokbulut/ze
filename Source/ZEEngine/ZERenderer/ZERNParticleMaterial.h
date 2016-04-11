@@ -213,8 +213,6 @@ class ZERNParticleMaterial : public ZERNMaterial
 		void									SetAlphaCullLimit(float Limit);
 		float									GetAlphaCullLimit() const;
 
-		void									Tick(float ElapsedTime);
-
 		virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 		virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
 

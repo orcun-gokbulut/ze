@@ -44,6 +44,17 @@
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
 
+ZELightPoint::ZELightPoint()
+{
+	Command.Entity = this;
+	Command.Priority = 2;
+}
+
+ZELightPoint::~ZELightPoint()
+{
+
+}
+
 ZELightType ZELightPoint::GetLightType() const
 {
 	return ZE_LT_POINT;
@@ -52,6 +63,11 @@ ZELightType ZELightPoint::GetLightType() const
 ZESize ZELightPoint::GetViewCount() const
 {
 	return 1;
+}
+
+ZEGRTexture* ZELightPoint::GetShadowMap(ZESize Index) const
+{
+	return NULL;
 }
 
 const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index) const
@@ -65,11 +81,6 @@ const ZEViewVolume& ZELightPoint::GetViewVolume(ZESize Index) const
 	return ViewVolume;
 }
 
-ZEGRTexture* ZELightPoint::GetShadowMap(ZESize Index) const
-{
-	return NULL;
-}
-
 const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index) const
 {
 	return ViewTransform;
@@ -78,18 +89,6 @@ const ZEMatrix4x4& ZELightPoint::GetViewTransform(ZESize Index) const
 const ZEMatrix4x4& ZELightPoint::GetProjectionTransform(ZESize Index) const
 {
 	return ProjectionTransform;
-}
-
-ZELightPoint::ZELightPoint()
-{
-	Command.Entity = this;
-	Command.Priority = 2;
-	Command.StageMask = ZERN_STAGE_DEBUG;
-}
-
-ZELightPoint::~ZELightPoint()
-{
-
 }
 
 ZELightPoint* ZELightPoint::CreateInstance()

@@ -59,23 +59,20 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	if (GetCommands().GetCount() == 0)
-		return false;
-
-	const ZEGRTexture2D* AccumulationMap = GetPrevOutput(ZERN_SO_COLOR);
-	if (AccumulationMap == NULL)
+	const ZEGRTexture2D* ColorMap = GetPrevOutput(ZERN_SO_COLOR);
+	if (ColorMap == NULL)
 		return false;
 
 	const ZEGRTexture2D* DepthMap = GetPrevOutput(ZERN_SO_DEPTH);
 	if (DepthMap == NULL)
 		return false;
 
-	const ZEGRRenderTarget* RenderTarget = AccumulationMap->GetRenderTarget();
+	const ZEGRRenderTarget* RenderTarget = ColorMap->GetRenderTarget();
 	
 	Viewport.SetWidth((float)RenderTarget->GetWidth());
 	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
-	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer());
+	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer(true));
 	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &Viewport);
 
@@ -84,7 +81,6 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 
 void ZERNStageParticleRendering::CleanUp(ZEGRContext* Context)
 {
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetRenderTargets(0, NULL, NULL);
 
 	ZERNStage::CleanUp(Context);
@@ -113,18 +109,12 @@ ZEGRRenderState ZERNStageParticleRendering::GetRenderState()
 		BlendRenderTargetAlphaBlended.SetBlendEnable(true);
 		BlendStateAlphaBlended.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlended);
 		RenderState.SetBlendState(BlendStateAlphaBlended);
-
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthFunction(ZEGR_CF_GREATER_EQUAL);
-		DepthStencilState.SetDepthTestEnable(true);
-		DepthStencilState.SetDepthWriteEnable(false);
-		RenderState.SetDepthStencilState(DepthStencilState);
 		
 		ZEGRRasterizerState RasterizerStateWireframe;
 		RasterizerStateWireframe.SetFillMode(ZEGR_FM_WIREFRAME);
 		//RenderState.SetRasterizerState(RasterizerStateWireframe);
 
-		RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+		RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
 	}
 
 	return RenderState;

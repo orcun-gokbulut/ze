@@ -39,7 +39,6 @@
 #include "ZERNShading.hlsl"
 #include "ZERNGBuffer.hlsl"
 #include "ZERNTransformations.hlsl"
-#include "ZERNLightScatteringCommon.hlsl"
 
 #define TILE_DIMENSION		16
 #define TILE_SIZE			(TILE_DIMENSION * TILE_DIMENSION)
@@ -151,8 +150,11 @@ float3 ZERNTiledDeferredShadingCompute_PointLighting(ZERNShading_Light PointLigh
 		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
 		
 		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistance, LightDistance * LightDistance));
+		float NdotL = dot(Surface.NormalView, PointLight.DirectionView);
+		NdotL = (Surface.SubsurfaceScattering != 0.0f) ? abs(NdotL) : max(0.0f, NdotL);
+		float3 LightColor = PointLight.Color * DistanceAttenuation * NdotL;
 		
-		ResultColor = (ResultDiffuse + ResultSpecular) * PointLight.Color * DistanceAttenuation;
+		ResultColor = (ResultDiffuse + ResultSpecular) * LightColor;
 	}
 	
 	return ResultColor;
@@ -186,10 +188,14 @@ float3 ZERNTiledDeferredShadingCompute_DirectionalLighting(ZERNShading_Light Dir
 		}
 	}
 	
+	float NdotL = dot(Surface.NormalView, DirectionalLight.DirectionView);
+	NdotL = (Surface.SubsurfaceScattering != 0.0f) ? abs(NdotL) : max(0.0f, NdotL);
+	float3 LightColor = NdotL * DirectionalLight.Color;
+	
 	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(DirectionalLight, Surface);
 	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(DirectionalLight, Surface);
 	
-	float3 ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * DirectionalLight.Color;
+	float3 ResultColor = (ResultDiffuse + ResultSpecular) * Visibility * LightColor;
 	
 	return ResultColor;
 }
@@ -209,8 +215,11 @@ float3 ZERNTiledDeferredShadingCompute_OmniProjectiveLighting(ZERNShading_Light 
 		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(OmniProjectiveLight, Surface);
 		
 		float DistanceAttenuation = 1.0f / dot(OmniProjectiveLight.Attenuation, float3(1.0f, LightDistance, LightDistance * LightDistance));
+		float NdotL = dot(Surface.NormalView, OmniProjectiveLight.DirectionView);
+		NdotL = (Surface.SubsurfaceScattering != 0.0f) ? abs(NdotL) : max(0.0f, NdotL);
+		float3 LightColor = OmniProjectiveLight.Color * DistanceAttenuation * NdotL;
 		
-		ResultColor = (ResultDiffuse + ResultSpecular) * OmniProjectiveLight.Color * DistanceAttenuation;
+		ResultColor = (ResultDiffuse + ResultSpecular) * LightColor;
 	}
 	
 	return ResultColor;
@@ -307,13 +316,16 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
     
 	float3 ResultColor = 0.0f;
 	
-	if(all(PixelCoord < GBufferDimensions))
-	{	
+	if(all(PixelCoord < GBufferDimensions) && DepthHomogeneous != 0.0f)
+	{
 		uint LightCount = TileLightCount;
 	
 		if(LightCount > 0)
-		{		
+		{	
+			//ZERNShading_Surface Surface;
+			//Surface.PositionView = ZERNTransformations_ViewportToView(PixelCoord + 0.5f, GBufferDimensions, DepthHomogeneous);
 			Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PixelCoord);
+			Surface.SubsurfaceScattering = ZERNGBuffer_GetSubsurfaceScattering(PixelCoord);
 			Surface.NormalView = ZERNGBuffer_GetViewNormal(PixelCoord);
 			Surface.Specular = ZERNGBuffer_GetSpecularColor(PixelCoord);
 			Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PixelCoord);
@@ -329,10 +341,12 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId          :
 				else if (CurrentLight.Type == ZE_LT_OMNIPROJECTIVE)
 					ResultColor += ZERNTiledDeferredShadingCompute_OmniProjectiveLighting(CurrentLight, Surface);
 			}
+			
+			ZERNTiledDeferredShadingCompute_OutputColorBuffer[PixelCoord] = ResultColor;
 		}
 	}
 	
-	ZERNTiledDeferredShadingCompute_OutputColorBuffer[PixelCoord] = ResultColor;
+	//ZERNTiledDeferredShadingCompute_OutputColorBuffer[PixelCoord] = ResultColor;
 }
 
 #endif

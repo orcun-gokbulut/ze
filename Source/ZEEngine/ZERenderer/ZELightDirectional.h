@@ -43,7 +43,6 @@
 
 class ZEGRTexture2D;
 class ZEGRConstantBuffer;
-class ZEScene;
 
 class ZELightDirectional : public ZELight
 {
@@ -76,11 +75,11 @@ class ZELightDirectional : public ZELight
 		void								UpdateCascadeTransforms(const ZERNView& View);
 		void								UpdateCascadeShadowMaps();
 
-											ZELightDirectional();
-		virtual								~ZELightDirectional();
-
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
+
+											ZELightDirectional();
+		virtual								~ZELightDirectional();
 
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;

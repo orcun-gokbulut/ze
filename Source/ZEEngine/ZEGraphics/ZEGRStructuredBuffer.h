@@ -43,7 +43,7 @@
 class ZEGRStructuredBuffer : public ZEGRResource
 {
 	protected:
-		virtual bool							Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag);
+		virtual bool							Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags);
 		virtual void							Deinitialize();
 
 												ZEGRStructuredBuffer();
@@ -57,5 +57,5 @@ class ZEGRStructuredBuffer : public ZEGRResource
 		virtual bool							Lock(void** Buffer) = 0;
 		virtual void							Unlock() = 0;
 
-		static ZEHolder<ZEGRStructuredBuffer>	Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_SHADER_RESOURCE);
+		static ZEHolder<ZEGRStructuredBuffer>	Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE);
 };

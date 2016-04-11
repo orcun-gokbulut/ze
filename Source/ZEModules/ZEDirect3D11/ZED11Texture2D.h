@@ -56,7 +56,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		mutable ZEHolder<ZEGRRenderTarget>						RenderTargets[15];			//maximum mip count is 15 in directx 11
 		mutable ZEHolder<ZEGRDepthStencilBuffer>				DepthStencilBuffers[4][2];
 
-		virtual bool											Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_ONLY, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_SHADER_RESOURCE, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);
+		virtual bool											Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount);
 		virtual void											Deinitialize();
 
 		ID3D11Resource*											GetResource() const;

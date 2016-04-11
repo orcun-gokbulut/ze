@@ -106,7 +106,6 @@ bool ZERNParticleMaterial::UpdateRenderState() const
 		return true;
 
 	ZEGRRenderState RenderState = ZERNStageParticleRendering::GetRenderState();
-
 	RenderState.SetShader(ZEGR_ST_VERTEX, StageParticleRendering_VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageParticleRendering_PixelShader);
 
@@ -193,6 +192,12 @@ ZERNParticleMaterial::ZERNParticleMaterial()
 	Constants.SoftParticle = false;
 	Constants.DistanceMax = 2.0f;
 	Constants.ContrastPower = 2.0f;
+
+	ZEGRSamplerDescription SamplerLinearWrapDescription;
+	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.AddressW = ZEGR_TAM_WRAP;
+	Sampler = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
 }
 
 ZEUInt ZERNParticleMaterial::GetStageMask() const
@@ -637,11 +642,6 @@ float ZERNParticleMaterial::GetAlphaCullLimit() const
 	return Constants.AlphaCullLimit;
 }
 
-void ZERNParticleMaterial::Tick(float ElapsedTime)
-{
-
-}
-
 bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
@@ -650,29 +650,26 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!Update())
 		return false;
 
-	if(Stage == NULL || !Stage->GetEnabled())
-		return false;
-
 	bool TextureSampler = false;
-	if (DiffuseMapEnabled)
+	if (DiffuseMapEnabled && DiffuseMap.IsAvailable())
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 5, DiffuseMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (EmissiveMapEnabled)
+	if (EmissiveMapEnabled && EmissiveMap.IsAvailable())
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 6, EmissiveMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (NormalMapEnabled)
+	if (NormalMapEnabled && NormalMap.IsAvailable())
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 7, NormalMap.GetTexture());
 		TextureSampler = true;
 	}
 
-	if (OpacityMapEnabled)
+	if (OpacityMapEnabled && OpacityMap.IsAvailable())
 	{
 		Context->SetTexture(ZEGR_ST_PIXEL, 8, OpacityMap.GetTexture());
 		TextureSampler = true;
@@ -712,7 +709,7 @@ bool ZERNParticleMaterial::Update() const
 	if (!UpdateRenderState())
 		return false;
 
-	if(!UpdateConstantBuffer())
+	if (!UpdateConstantBuffer())
 		return false;
 
 	return true;

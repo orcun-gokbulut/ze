@@ -55,7 +55,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt											ArrayCount;
 		ZEUInt											SampleCount;
 
-		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_ONLY, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_SHADER_RESOURCE, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);	
+		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount);	
 		virtual void									Deinitialize();
 
 														ZEGRTexture2D();
@@ -79,5 +79,5 @@ class ZEGRTexture2D : public ZEGRTexture
 		virtual bool									Lock(void** Buffer, ZESize* RowPitch) = 0;
 		virtual void									Unlock() = 0;
 
-		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGRResourceBindFlag BindFlag = ZEGR_RBF_RENDER_TARGET, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);
+		static ZEHolder<ZEGRTexture2D>					CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_RENDER_TARGET, ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1);
 };

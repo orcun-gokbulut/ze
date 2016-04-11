@@ -101,11 +101,6 @@ ID3D11Resource* ZED11Texture2D::GetResource() const
 {
 	ID3D11Resource* Resource = NULL;
 
-	//if (ShaderResourceView != NULL)
-	//	ShaderResourceView->GetResource(&Resource);
-	//
-	//return Resource;
-
 	if (Texture2D != NULL)
 		Texture2D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
 
@@ -131,7 +126,8 @@ ZEHolder<const ZEGRRenderTarget> ZED11Texture2D::GetRenderTarget(ZEUInt Level) c
 {
 	zeDebugCheck(!GetIsRenderTarget(), "Texture is not created with render target flag");
 	zeDebugCheck(Level >= GetLevelCount(), "Texture dont have specified Mipmap level");
-	
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE, "Texture cannot be bound as input or output");
+
 	if (RenderTargets[Level] == NULL)
 	{
 		D3D11_TEXTURE2D_DESC TextureDesc;
@@ -167,6 +163,8 @@ ZEHolder<const ZEGRRenderTarget> ZED11Texture2D::GetRenderTarget(ZEUInt Level) c
 
 ZEHolder<const ZEGRDepthStencilBuffer> ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnly, ZEUInt ArrayIndex) const
 {
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE, "Texture cannot be bound as input or output");
+
 	UINT Flags = 0;
 	ZEUInt BufferIndex = 0;
 
@@ -240,13 +238,15 @@ void ZED11Texture2D::GenerateMipMaps()
 	GetMainContext()->GenerateMips(ShaderResourceView);
 }
 
-bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount)
+bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
-	bool DepthStencil = (BindFlag & ZEGR_RBF_DEPTH_STENCIL);
-	bool UnorderedAccess = (BindFlag & ZEGR_RBF_UNORDERED_ACCESS);
+	bool DepthStencil = BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL);
+	bool UnorderedAccess = BindFlags.GetFlags(ZEGR_RBF_UNORDERED_ACCESS);
+	bool RenderTarget = BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET);
+	bool ShaderResource = BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE);
 
 	DXGI_FORMAT TextureFormat = (Format == ZEGR_TF_R8G8B8A8_UNORM) ? DXGI_FORMAT_B8G8R8A8_UNORM : ConvertFormat(Format);	//format of .tga
-	TextureFormat = ((BindFlag & ZEGR_RBF_RENDER_TARGET) || UnorderedAccess) ?  ConvertFormat(Format) : TextureFormat;
+	TextureFormat = (RenderTarget || UnorderedAccess) ?  ConvertFormat(Format) : TextureFormat;
 	TextureFormat = DepthStencil ? ConvertDepthStencilFormat(Format) : TextureFormat;
 
 	D3D11_TEXTURE2D_DESC TextureDesc = {};
@@ -258,9 +258,9 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, 
 	TextureDesc.SampleDesc.Count = SampleCount;
 	TextureDesc.SampleDesc.Quality = 0;
 	TextureDesc.Usage = ConvertUsage(Usage);
-	TextureDesc.BindFlags = (BindFlag == ZEGR_RBF_SHADER_RESOURCE) ? D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET : ConvertBindFlag(BindFlag);
+	TextureDesc.BindFlags = (ShaderResource && !RenderTarget) ? (D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET) : ConvertBindFlags(BindFlags);
 	TextureDesc.CPUAccessFlags = (Usage == ZEGR_RU_CPU_READ_WRITE) ? (D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE) : (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
-	TextureDesc.MiscFlags = (BindFlag & ZEGR_RBF_SHADER_RESOURCE) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+	TextureDesc.MiscFlags = (ShaderResource && !RenderTarget) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
 
 	HRESULT Result = GetDevice()->CreateTexture2D(&TextureDesc, NULL, &Texture2D);
 	if (FAILED(Result))
@@ -310,24 +310,24 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, 
 			zeError("Texture 2D shader resource view creation failed. ErrorCode: %d.", Result);
 			return false;
 		}
-	}
-	
-	if (UnorderedAccess)
-	{
-		D3D11_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessViewDesc;
-		UnorderedAccessViewDesc.Format = TextureDesc.Format;
-		UnorderedAccessViewDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
-		UnorderedAccessViewDesc.Texture2D.MipSlice = 0;
 
-		Result = GetDevice()->CreateUnorderedAccessView(Texture2D, &UnorderedAccessViewDesc, &UnorderedAccessView);
-		if (FAILED(Result))
+		if (UnorderedAccess)
 		{
-			zeError("Texture 2D unordered access view creation failed. ErrorCode: %d.", Result);
-			return false;
+			D3D11_UNORDERED_ACCESS_VIEW_DESC UnorderedAccessViewDesc;
+			UnorderedAccessViewDesc.Format = TextureDesc.Format;
+			UnorderedAccessViewDesc.ViewDimension = D3D11_UAV_DIMENSION_TEXTURE2D;
+			UnorderedAccessViewDesc.Texture2D.MipSlice = 0;
+
+			Result = GetDevice()->CreateUnorderedAccessView(Texture2D, &UnorderedAccessViewDesc, &UnorderedAccessView);
+			if (FAILED(Result))
+			{
+				zeError("Texture 2D unordered access view creation failed. ErrorCode: %d.", Result);
+				return false;
+			}
 		}
 	}
 
-	return ZEGRTexture2D::Initialize(Width, Height, LevelCount, Format, Usage, BindFlag, ArrayCount, SampleCount);
+	return ZEGRTexture2D::Initialize(Width, Height, LevelCount, Format, Usage, BindFlags, ArrayCount, SampleCount);
 }
 
 void ZED11Texture2D::Deinitialize()

@@ -47,14 +47,13 @@ class ZELightOmniProjective : public ZELight
 {
 	ZE_OBJECT
 	private:
-		const ZEGRTextureCube*			ProjectionTexture;
+		ZEHolder<const ZEGRTextureCube>	ProjectionTexture;
 		mutable ZEViewSphere			ViewVolume;
-		ZEGRTexture2D*					FrontShadowMap;
-		ZEGRTexture2D*					BackShadowMap;
 
 		ZETextureCubeResource*			ProjectionTextureResource;
 		ZEString						ProjectionTextureFile;
 
+		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
 										ZELightOmniProjective();
@@ -64,15 +63,11 @@ class ZELightOmniProjective : public ZELight
 		virtual ZELightType				GetLightType() const;
 		virtual ZESize					GetViewCount() const;
 
-		const ZEGRTextureCube*			GetShadowMap() const;
-
 		void							SetProjectionTextureFile(const ZEString& Filename);
 		const ZEString&					GetProjectionTextureFile() const;
 
 		void							SetProjectionTexture(const ZEGRTextureCube* Texture);
 		const ZEGRTextureCube*			GetProjectionTexture();
-
-		virtual void					SetCastsShadow(bool NewValue);
 		
 		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const;

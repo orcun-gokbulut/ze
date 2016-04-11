@@ -38,7 +38,7 @@
 #include "ZEError.h"
 #include "ZED11Module.h"
 
-bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag)
+bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {	
 	ZESize BufferSize = ElementCount * ElementSize;
 	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
@@ -47,7 +47,7 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, 
 	D3D11_BUFFER_DESC Desc;
 	Desc.ByteWidth = (UINT)BufferSize;
 	Desc.Usage = ConvertUsage(Usage);
-	Desc.BindFlags = ConvertBindFlag(BindFlag);
+	Desc.BindFlags = ConvertBindFlags(BindFlags);
 	Desc.CPUAccessFlags = (Usage == ZEGR_RU_CPU_READ_WRITE) ? (D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE) : (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
 	Desc.MiscFlags = D3D11_RESOURCE_MISC_BUFFER_STRUCTURED;
 	Desc.StructureByteStride = ElementSize;
@@ -59,7 +59,7 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, 
 		return false;
 	}
 
-	if (BindFlag & ZEGR_RBF_SHADER_RESOURCE)
+	if (BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE))
 	{
 		Result = GetDevice()->CreateShaderResourceView(Buffer, NULL, &ShaderResourceView);
 		if (FAILED(Result))
@@ -69,7 +69,7 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, 
 		}
 	}
 
-	if (BindFlag & ZEGR_RBF_UNORDERED_ACCESS)
+	if (BindFlags.GetFlags(ZEGR_RBF_UNORDERED_ACCESS))
 	{
 		Result = GetDevice()->CreateUnorderedAccessView(Buffer, NULL, &UnorderedAccessView);
 		if (FAILED(Result))
@@ -79,7 +79,7 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, 
 		}
 	}
 
-	return ZEGRStructuredBuffer::Initialize(ElementCount, ElementSize, Usage, BindFlag);
+	return ZEGRStructuredBuffer::Initialize(ElementCount, ElementSize, Usage, BindFlags);
 }
 
 void ZED11StructuredBuffer::Deinitialize()

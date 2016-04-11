@@ -131,19 +131,19 @@ float3 ZERNGBuffer_GetViewNormal(SamplerState Sampler, float2 TexCoord)
 // SPECULAR COLOR
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float SpecularColor)
+void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float3 SpecularColor)
 {
-	GBuffer.Buffer1.w = SpecularColor;
+	GBuffer.Buffer1.w = SpecularColor.x;
 }
 
-float ZERNGBuffer_GetSpecularColor(float2 ScreenPos)
+float3 ZERNGBuffer_GetSpecularColor(float2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).w;
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).www;
 }
 
-float ZERNGBuffer_GetSpecularColor(SamplerState Sampler, float2 TexCoord)
+float3 ZERNGBuffer_GetSpecularColor(SamplerState Sampler, float2 TexCoord)
 {
-	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).w;
+	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).www;
 }
 
 // DIFFUSE COLOR

@@ -39,6 +39,7 @@
 
 #include "ZEGRDefinitions.h"
 #include "ZEDS/ZEString.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZECommon.h"
 
 enum ZEGRResourceType
@@ -82,12 +83,12 @@ class ZEGRResource : public ZEReferenceCounted
 		ZEString						Name;
 		ZESize							Size;
 		ZEGRResourceUsage				Usage;
-		ZEGRResourceBindFlag			BindFlag;
+		ZEFlags							BindFlags;
 
 	protected:
 		void							SetSize(ZESize Size);
 		void							SetResourceUsage(ZEGRResourceUsage Usage);
-		void							SetResourceBindFlag(ZEGRResourceBindFlag BindFlag);	
+		void							SetResourceBindFlags(ZEFlags BindFlags);	
 
 										ZEGRResource();
 		virtual 						~ZEGRResource();
@@ -100,5 +101,5 @@ class ZEGRResource : public ZEReferenceCounted
 
 		ZESize							GetSize() const;
 		ZEGRResourceUsage				GetResourceUsage() const;
-		ZEGRResourceBindFlag			GetResourceBindFlag() const;
+		ZEFlags							GetResourceBindFlags() const;
 };

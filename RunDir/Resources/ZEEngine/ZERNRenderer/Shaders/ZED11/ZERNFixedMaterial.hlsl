@@ -340,7 +340,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	
 	ZERNGBuffer_SetAccumulationColor(GBuffer, AmbientColor);
 	ZERNGBuffer_SetViewNormal(GBuffer, Normal);
-	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor.x);
+	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor);
 	ZERNGBuffer_SetDiffuseColor(GBuffer, DiffuseColor);
 	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);
 	ZERNGBuffer_SetEmissiveColor(GBuffer, EmissiveColor);

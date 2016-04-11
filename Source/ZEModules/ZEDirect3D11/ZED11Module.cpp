@@ -129,7 +129,7 @@ bool ZED11Module::InitializeSelf()
 	
 	IDXGIFactory2* Factory;
 	HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&Factory);
-	if(FAILED(Result))
+	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create factory. Error: %d", Result);
 		return false;
@@ -138,16 +138,16 @@ bool ZED11Module::InitializeSelf()
 	IDXGIAdapter1* Adapter;
 	UINT AdapterIndex = 0;
 	bool AdapterFound = false;
-	while(Factory->EnumAdapters1(AdapterIndex++, &Adapter) != DXGI_ERROR_NOT_FOUND)
+	while (Factory->EnumAdapters1(AdapterIndex++, &Adapter) != DXGI_ERROR_NOT_FOUND)
 	{
 		DXGI_ADAPTER_DESC1 AdapterDesc;
 		Adapter->GetDesc1(&AdapterDesc);
 
-		if(AdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
+		if (AdapterDesc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE)
 			continue;
 
 		HRESULT Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, NULL, NULL, NULL);
-		if(SUCCEEDED(Result))
+		if (SUCCEEDED(Result))
 		{
 			AdapterFound = true;
 			break;
@@ -167,7 +167,6 @@ bool ZED11Module::InitializeSelf()
 
 	ID3D11Device* DeviceTemp;
 	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &DeviceTemp, NULL, NULL);
-	//Result = D3D11CreateDevice(NULL, D3D_DRIVER_TYPE_WARP, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &DeviceTemp, NULL, NULL);
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot create device. Error: %d", Result);

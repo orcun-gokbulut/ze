@@ -38,6 +38,7 @@
 #include "ZERNRenderer.h"
 #include "ZERNCuller.h"
 #include "ZERNRenderParameters.h"
+#include "ZERNStageShadowmapGeneration.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -52,6 +53,23 @@ float ZELight::AttenuationFunction(float RootToTry)
 	return Result;
 }
 
+bool ZELight::InitializeSelf()
+{
+	if (!ZEEntity::InitializeSelf())
+		return false;
+
+	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
+
+	return ShadowRenderer.Initialize();
+}
+
+bool ZELight::DeinitializeSelf()
+{
+	ShadowRenderer.Deinitialize();
+
+	return ZEEntity::DeinitializeSelf();
+}
+
 void ZELight::LocalTransformChanged()
 {
 	ZEEntity::LocalTransformChanged();
@@ -62,6 +80,47 @@ void ZELight::ParentTransformChanged()
 {
 	ZEEntity::ParentTransformChanged();
 	DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
+}
+
+ZELight::ZELight()
+{
+	DirtyFlags.RaiseAll();
+
+	CastsShadows = false;
+	ShadowResolution = ZE_LSR_MEDIUM;
+	ShadowSampleCount = ZE_LSC_MEDIUM;
+	ShadowSampleLength = 1.0f;
+	ShadowDepthBias = 0.005f;
+
+	Range = 100.0f;
+	Intensity = 1.0f;
+	Color = ZEVector3::One;
+	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
+
+	ViewTransform = ZEMatrix4x4::Identity;
+	ProjectionTransform = ZEMatrix4x4::Identity;
+
+	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
+}
+
+ZELight::~ZELight()
+{
+
+}
+
+ZEDrawFlags ZELight::GetDrawFlags() const
+{
+	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE | ZE_DF_CULL;
+}
+
+void ZELight::SetCastsShadow(bool NewValue)
+{
+	CastsShadows = NewValue;
+}
+
+bool ZELight::GetCastsShadow() const
+{
+	return CastsShadows;
 }
 
 void ZELight::SetRange(float NewValue)
@@ -90,6 +149,51 @@ void ZELight::SetIntensity(float NewValue)
 float ZELight::GetIntensity() const
 {
 	return Intensity;
+}
+
+void ZELight::SetShadowResolution(ZELightShadowResolution ShadowResolution)
+{
+	if(this->ShadowResolution == ShadowResolution)
+		return;
+
+	this->ShadowResolution = ShadowResolution;
+
+	DirtyFlags.RaiseFlags(ZE_LDF_SHADOW_MAP);
+}
+
+ZELightShadowResolution ZELight::GetShadowResolution() const
+{
+	return ShadowResolution;
+}
+
+void ZELight::SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
+{
+	this->ShadowSampleCount = ShadowSampleCount;
+}
+
+ZELightShadowSampleCount ZELight::GetShadowSampleCount() const
+{
+	return ShadowSampleCount;
+}
+
+void ZELight::SetShadowSampleLength(float ShadowSampleLength)
+{
+	this->ShadowSampleLength = ShadowSampleLength;
+}
+
+float ZELight::GetShadowSampleLength() const
+{
+	return ShadowSampleLength;
+}
+
+void ZELight::SetShadowDepthBias(float ShadowDepthBias)
+{
+	this->ShadowDepthBias = ShadowDepthBias;
+}
+
+float ZELight::GetShadowDepthBias() const
+{
+	return ShadowDepthBias;
 }
 
 void ZELight::SetColor(const ZEVector3& NewColor)
@@ -152,77 +256,13 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
-ZEDrawFlags ZELight::GetDrawFlags() const
-{
-	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE | ZE_DF_CULL;
-}
-
-void ZELight::SetCastsShadow(bool NewValue)
-{
-	CastsShadows = NewValue;
-}
-
-bool ZELight::GetCastsShadow() const
-{
-	return CastsShadows;
-}
-
-void ZELight::SetShadowDepthBias(float ShadowDepthBias)
-{
-	this->ShadowDepthBias = ShadowDepthBias;
-}
-
-float ZELight::GetShadowDepthBias() const
-{
-	return ShadowDepthBias;
-}
-
-void ZELight::SetShadowResolution(ZELightShadowResolution ShadowResolution)
-{
-	if(this->ShadowResolution == ShadowResolution)
-		return;
-
-	this->ShadowResolution = ShadowResolution;
-
-	DirtyFlags.RaiseFlags(ZE_LDF_SHADOW_MAP);
-}
-
-ZELightShadowResolution ZELight::GetShadowResolution() const
-{
-	return ShadowResolution;
-}
-
-void ZELight::SetShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount)
-{
-	this->ShadowSampleCount = ShadowSampleCount;
-}
-
-ZELightShadowSampleCount ZELight::GetShadowSampleCount() const
-{
-	return ShadowSampleCount;
-}
-
-void ZELight::SetShadowSampleLength(float ShadowSampleLength)
-{
-	this->ShadowSampleLength = ShadowSampleLength;
-}
-
-float ZELight::GetShadowSampleLength() const
-{
-	return ShadowSampleLength;
-}
-
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 {
 	if (!ZEEntity::PreRender(CullParameters))
 		return false;
 
-	if(CastsShadows)
-	{
+	if (CastsShadows)
 		Command.StageMask |= ZERN_STAGE_SHADOWING;
-	}
-
-	Command.StageMask |= ZERN_STAGE_LIGHTING;
 
 	CullParameters->Renderer->AddCommand(&Command);
 
@@ -234,30 +274,6 @@ void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	ShadowRenderer.SetContext(Parameters->Context);
 	ShadowRenderer.SetScene(Parameters->Scene);
 	ShadowRenderer.Render(0.0f);
-}
-
-ZELight::ZELight()
-{
-	DirtyFlags.RaiseAll();
-
-	CastsShadows = false;
-	ShadowResolution = ZE_LSR_MEDIUM;
-	ShadowSampleCount = ZE_LSC_MEDIUM;
-	ShadowSampleLength = 1.0f;
-	ShadowDepthBias = 0.005f;
-
-	Range = 100.0f;
-	Intensity = 1.0f;
-	Color = ZEVector3(1.0f, 1.0f, 1.0f);
-	Attenuation = ZEVector3(0.0f, 0.0f, 1.0f);
-
-	ViewTransform = ZEMatrix4x4::Identity;
-	ProjectionTransform = ZEMatrix4x4::Identity;
-}
-
-ZELight::~ZELight()
-{
-
 }
 
 ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution)

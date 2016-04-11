@@ -34,25 +34,65 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELightOmniProjective.h"
+
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRTexture.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZETexture\ZETextureCubeResource.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZETexture/ZETextureCubeResource.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
 
+bool ZELightOmniProjective::InitializeSelf()
+{
+	if (!ZELight::InitializeSelf())
+		return false;
+
+	SetProjectionTextureFile(ProjectionTextureFile);
+
+	return true;
+}
+
+bool ZELightOmniProjective::DeinitializeSelf()
+{
+	ProjectionTexture.Release();
+
+	return ZELight::DeinitializeSelf();
+}
+
+ZELightOmniProjective::ZELightOmniProjective()
+{
+	ProjectionTexture = NULL;
+	ProjectionTextureResource = NULL;
+
+	Command.Entity = this;
+	Command.Priority = 1;
+}
+
+ZELightOmniProjective::~ZELightOmniProjective()
+{
+
+}
+
 ZELightType ZELightOmniProjective::GetLightType() const
 {
 	return ZE_LT_OMNIPROJECTIVE;
 }
 
+ZESize ZELightOmniProjective::GetViewCount() const
+{
+	return 1;
+}
+
 void ZELightOmniProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
+	if (FileName.GetLength() == 0 || ProjectionTextureFile == FileName)
+		return;
+
 	ProjectionTextureFile = FileName;
+
 	if (IsInitialized())
 	{
 		if (ProjectionTextureResource != NULL)
@@ -81,19 +121,9 @@ void ZELightOmniProjective::SetProjectionTexture(const ZEGRTextureCube* Texture)
 	ProjectionTexture = Texture;
 }
 
-void ZELightOmniProjective::SetCastsShadow(bool NewValue)
+ZEGRTexture* ZELightOmniProjective::GetShadowMap(ZESize	Index) const
 {
-	ZELight::SetCastsShadow(NewValue);
-}
-
-bool ZELightOmniProjective::DeinitializeSelf()
-{
-	return ZELight::DeinitializeSelf();
-}
-
-ZESize ZELightOmniProjective::GetViewCount() const
-{
-	return 1;
+	return NULL;
 }
 
 const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index) const
@@ -107,11 +137,6 @@ const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index) const
 	return ViewVolume;
 }
 
-ZEGRTexture* ZELightOmniProjective::GetShadowMap(ZESize	Index) const
-{
-	return NULL;
-}
-
 const ZEMatrix4x4& ZELightOmniProjective::GetViewTransform(ZESize Index) const
 {	
 	return ViewTransform;
@@ -120,23 +145,6 @@ const ZEMatrix4x4& ZELightOmniProjective::GetViewTransform(ZESize Index) const
 const ZEMatrix4x4& ZELightOmniProjective::GetProjectionTransform(ZESize Index) const
 {
 	return ProjectionTransform;
-}
-
-ZELightOmniProjective::ZELightOmniProjective()
-{
-	ProjectionTexture = NULL;
-	ProjectionTextureResource = NULL;
-
-	FrontShadowMap = NULL;
-	BackShadowMap = NULL;
-
-	Command.Entity = this;
-	Command.Priority = 1;
-}
-
-ZELightOmniProjective::~ZELightOmniProjective()
-{
-
 }
 
 ZELightOmniProjective* ZELightOmniProjective::CreateInstance()

@@ -122,6 +122,11 @@ void ZERandom::Reset()
 	srand(Mix(getpid(), time(NULL), clock()));
 }
 
+void ZERandom::SetSeed(ZEUInt Seed)
+{
+	srand(Seed);
+}
+
 class ZERandomInitializer
 {
 	public:

@@ -63,7 +63,10 @@ class ZEATAtmosphere : public ZEEntity
 		ZERNCommand						Command;
 		ZEATObserver					Observer;
 		ZEVector4						SkyAmbient[1024];
-		ZEVector4						Extinction[32][128];
+		ZEVector3						TerrestrialSunColor;
+		ZEVector3						TerrestrialSunAmbientColor;
+		ZEVector3						TerrestrialMoonColor;
+		ZEVector3						TerrestrialMoonAmbientColor;
 
 		ZEATSun*						Sun;
 		ZEATMoon*						Moon;
@@ -132,7 +135,11 @@ class ZEATAtmosphere : public ZEEntity
 		bool							UpdateConstantBuffers();
 		bool							Update();
 
+		ZEVector3						GetAmbientColorFromLUT(float CosLightZenith);
+
 		void							PrecomputeBuffers(ZEGRContext* Context);
+		void							ComputeTerrestrialColors(const ZEVector3& SunDirection, const ZEVector3& MoonDirection);
+		void							ComputeAmbientColors(float CosSunZenith, float CosMoonZenith);
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();

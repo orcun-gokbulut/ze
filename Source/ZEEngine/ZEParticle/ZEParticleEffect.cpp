@@ -39,11 +39,11 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNCuller.h"
-
+#include "ZERenderer/ZERNView.h"
 
 ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
 {
-	return ZE_DF_DRAW | ZE_DF_CULL;
+	return ZE_DF_DRAW;
 }
 
 bool ZEParticleEffect::InitializeSelf()
@@ -61,23 +61,17 @@ bool ZEParticleEffect::DeinitializeSelf()
 
 bool ZEParticleEffect::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
+
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-	{
-		//if (CullParameters->View->ViewVolume != NULL && 
-			//!CullParameters->View->ViewVolume->CullTest(Emitters[I]->GetBoundingBox()))
-		{
 			Emitters[I]->PreRender(CullParameters);
-		}
-	}
 
 	return true;
 }
 
 void ZEParticleEffect::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
-	if (!GetVisible())
-		return;
-
 	ZEParticleEmitter* Emitter = static_cast<ZEParticleEmitter*>(Command->ExtraParameters);
 	if(Emitter == NULL)
 		return;
@@ -115,7 +109,7 @@ void ZEParticleEffect::ResetEmitters()
 
 ZEParticleEffect::ZEParticleEffect()
 {
-	SetBoundingBox(ZEAABBox(-ZEVector3::One * 10, ZEVector3::One * 10));
+
 }
 
 ZEParticleEffect::~ZEParticleEffect()

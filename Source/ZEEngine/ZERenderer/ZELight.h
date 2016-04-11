@@ -99,8 +99,14 @@ class ZELight : public ZEEntity
 		ZERNRenderer					ShadowRenderer;
 		ZERNCommand						Command;
 
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
 		virtual void					LocalTransformChanged();
 		virtual void					ParentTransformChanged();
+
+										ZELight();
+		virtual							~ZELight();
 
 	public:
 		virtual ZEDrawFlags				GetDrawFlags() const;
@@ -108,29 +114,14 @@ class ZELight : public ZEEntity
 		virtual ZELightType				GetLightType() const = 0;
 		virtual ZESize					GetViewCount() const = 0;
 
-		void							SetIntensity(float NewValue);
-		float							GetIntensity() const;
-
-		void							SetAttenuation(const ZEVector3& Attenuation);
-		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
-		const ZEVector3&				GetAttenuation() const;
-
-		void							SetColor(const ZEVector3& NewColor);
-		const ZEVector3&				GetColor() const;
+		void							SetCastsShadow(bool NewValue);
+		bool							GetCastsShadow() const;
 
 		void							SetRange(float NewValue);
 		float							GetRange() const;
 
-		void							SetCastsShadow(bool NewValue);
-		bool							GetCastsShadow() const;
-
-		void							SetShadowDepthBias(float ShadowDepthBias);
-		float							GetShadowDepthBias() const;
-
-		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
-		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const = 0;
-		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
-		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
+		void							SetIntensity(float NewValue);
+		float							GetIntensity() const;
 
 		void							SetShadowResolution(ZELightShadowResolution ShadowResolution);
 		ZELightShadowResolution			GetShadowResolution() const;
@@ -140,12 +131,24 @@ class ZELight : public ZEEntity
 
 		void							SetShadowSampleLength(float ShadowSampleLength);
 		float							GetShadowSampleLength() const;
+
+		void							SetShadowDepthBias(float ShadowDepthBias);
+		float							GetShadowDepthBias() const;
+
+		void							SetColor(const ZEVector3& NewColor);
+		const ZEVector3&				GetColor() const;
+
+		void							SetAttenuation(const ZEVector3& Attenuation);
+		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
+		const ZEVector3&				GetAttenuation() const;
+
+		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
+		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const = 0;
+		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
+		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
 		
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
-									
-										ZELight();
-		virtual							~ZELight();
 
 		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
 		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);

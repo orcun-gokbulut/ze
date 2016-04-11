@@ -74,7 +74,7 @@ ZEVector2 ZEGRTexture2D::GetPixelSize() const
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount)
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -82,9 +82,9 @@ bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 	this->SampleCount = SampleCount;
 	SetFormat(Format);
 	SetResourceUsage(Usage);
-	SetResourceBindFlag(BindFlag);
+	SetResourceBindFlags(BindFlags);
 	SetLevelCount(LevelCount);
-	SetIsRenderTarget(BindFlag == ZEGR_RBF_RENDER_TARGET);
+	SetIsRenderTarget(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET));
 
 	SetSize(CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);
@@ -106,7 +106,7 @@ ZEGRTexture2D::ZEGRTexture2D()
 	SampleCount = 1;
 };
 
-ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount)
+ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
@@ -119,7 +119,7 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Heigh
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, LevelCount, Format, Usage, BindFlag, ArrayCount, SampleCount))
+	if (!Texture->Initialize(Width, Height, LevelCount, Format, Usage, BindFlags, ArrayCount, SampleCount))
 	{
 		Texture->Destroy();
 		return NULL;
