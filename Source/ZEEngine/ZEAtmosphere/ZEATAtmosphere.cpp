@@ -68,6 +68,16 @@
 #define ZEAT_ADF_RENDER_STATE		2
 #define ZEAT_ADF_CONSTANT_BUFFER	4
 
+static ZEVector2 CalculateDensity(const ZEVector3& Position)
+{
+	float Height = (Position - ZEVector3(0.0f, -EARTH_RADIUS, 0.0f)).Length() - EARTH_RADIUS;
+
+	float RayleighDensity = ZEMath::Exp(-Height / RAYLEIGH_MIE_HEIGHT.x);
+	float MieDensity = ZEMath::Exp(-Height / RAYLEIGH_MIE_HEIGHT.y);
+
+	return ZEVector2(RayleighDensity, MieDensity);
+}
+
 void ZEATAtmosphere::CreateRandomVectors()
 {
 	ZEVector4 SphereSamples[128];
@@ -244,6 +254,23 @@ bool ZEATAtmosphere::Update()
 	return true;
 }
 
+ZEVector3 ZEATAtmosphere::GetAmbientColorFromLUT(float CosLightZenith)
+{
+	CosLightZenith = CosLightZenith * 0.5f + 0.5f;
+
+	float TexelWidth = 1.0f / 1024.0f;
+	float TexelIndex1 = CosLightZenith - TexelWidth;
+	float TexelIndex2 = CosLightZenith + TexelWidth;
+	ZEUInt Index1 = TexelIndex1 * 1023.0f + 0.5f;
+	ZEUInt Index2 = TexelIndex2 * 1023.0f + 0.5f;
+	float Weight1 = CosLightZenith - ((Index1 + 0.5f) / 1024.0f);
+	float Weight2 = ((Index2 + 0.5f) / 1024.0f) - CosLightZenith;
+
+	ZEVector4 InterpolatedAmbient = (Weight1 * SkyAmbient[Index1] + Weight2 * SkyAmbient[Index2]) / (Weight1 + Weight2);
+
+	return InterpolatedAmbient.ToVector3();
+}
+
 void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 {
 	ZEHolder<ZEGRConstantBuffer> PrecomputeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(PrecomputeConstants));
@@ -360,30 +387,6 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		memcpy(&SkyAmbient, Data, sizeof(ZEVector4) * 1024);
 	AmbientBuffer->Unlock();
 
-	//PrecomputedExtinctionBuffer = ZEGRTexture2D::CreateInstance(32, 128, 1,  ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-	//const ZEGRRenderTarget* ExtinctionRenderTarget = PrecomputedExtinctionBuffer->GetRenderTarget();
-	//Context->SetRenderState(PrecomputeExtinctionRenderStateData);
-	//Context->SetRenderTargets(1, &ExtinctionRenderTarget, NULL);
-	//Context->SetVertexBuffers(0, 0, NULL);
-	//Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
-	//
-	//Context->Draw(3, 0);
-	//
-	//Context->SetRenderTargets(0, NULL, NULL);
-	//
-	//ZEHolder<ZEGRTexture2D> ExtinctionBuffer = ZEGRTexture2D::CreateInstance(32, 128, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_CPU_READ_WRITE, ZEGR_RBF_NONE);
-	//
-	//Context->CopyResource(ExtinctionBuffer, PrecomputedExtinctionBuffer);
-	//
-	//ZESize RowPitch;
-	//ExtinctionBuffer->Lock(reinterpret_cast<void**>(&Data), &RowPitch);
-	//	//for (ZEUInt I = 0; I < 1024; I++)
-	//	//{
-	//	//	memcpy(Extinction[I], Data + I * 1024, RowPitch);
-	//	//}
-	//memcpy(Extinction, Data, sizeof(ZEVector4) * 32 * 128);
-	//ExtinctionBuffer->Unlock();
-
 	PrecomputeExtinctionPixelShader.Release();
 	PrecomputeSingleScatteringPixelShader.Release();
 	PrecomputeHighOrderScatteringPixelShader.Release();
@@ -399,6 +402,72 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	PrecomputeSkyAmbientRenderStateData.Release();
 
 	RandomVectorsTexture.Release();
+}
+
+void ZEATAtmosphere::ComputeTerrestrialColors(const ZEVector3& SunDirection, const ZEVector3& MoonDirection)
+{
+	static const float STEPCOUNT = 20;
+
+	ZEVector3 StartPositionWorld = ZEVector3(0.0f, Observer.Space.Elevation, 0.0f);
+	ZEBSphere Sphere(ZEVector3(0.0f, -EARTH_RADIUS, 0.0f), TOTAL_RADIUS);
+
+	ZERay Ray(SunDirection, StartPositionWorld);
+	float Length;
+	ZEBSphere::IntersectionTest(Sphere, Ray, Length);
+	ZEVector3 SunEndPositionWorld = StartPositionWorld + SunDirection * Length;
+
+	Ray.v = MoonDirection;
+	ZEBSphere::IntersectionTest(Sphere, Ray, Length);
+	ZEVector3 MoonEndPositionWorld = StartPositionWorld + MoonDirection * Length;
+
+
+	ZEVector2 SunPrevRayleighMieDensity = CalculateDensity(StartPositionWorld);
+	ZEVector2 SunTotalRayleighMieDensity = ZEVector2::Zero;
+	ZEVector2 MoonPrevRayleighMieDensity = SunPrevRayleighMieDensity;
+	ZEVector2 MoonTotalRayleighMieDensity = ZEVector2::Zero;
+
+	ZEVector3 SunStartToEnd = SunEndPositionWorld - StartPositionWorld;
+	ZEVector3 SunDirectionStep = SunStartToEnd / STEPCOUNT;
+	float SunStepLength = SunDirectionStep.Length();
+
+	ZEVector3 MoonStartToEnd = MoonEndPositionWorld - StartPositionWorld;
+	ZEVector3 MoonDirectionStep = MoonStartToEnd / STEPCOUNT;
+	float MoonStepLength = MoonDirectionStep.Length();
+
+	for(float S = 1.0f; S <= STEPCOUNT; S += 1.0f)
+	{
+		ZEVector3 SunPositionStep = StartPositionWorld + SunDirectionStep * S;
+		ZEVector3 MoonPositionStep = StartPositionWorld + MoonDirectionStep * S;
+
+		ZEVector2 SunCurRayleighMieDensity = CalculateDensity(SunPositionStep);
+		ZEVector2 MoonCurRayleighMieDensity = CalculateDensity(MoonPositionStep);
+
+		SunTotalRayleighMieDensity += (SunCurRayleighMieDensity + SunPrevRayleighMieDensity) * 0.5f * SunStepLength;
+		MoonTotalRayleighMieDensity += (MoonCurRayleighMieDensity + MoonPrevRayleighMieDensity) * 0.5f * MoonStepLength;
+
+		SunPrevRayleighMieDensity = SunCurRayleighMieDensity;
+		MoonPrevRayleighMieDensity = MoonCurRayleighMieDensity;
+	}
+
+	ZEVector3 SunExtinction = ZEATRayleighScatteringFactor * SunTotalRayleighMieDensity.x + ZEATMieScatteringFactor * SunTotalRayleighMieDensity.y;
+	ZEVector3 MoonExtinction = ZEATRayleighScatteringFactor * MoonTotalRayleighMieDensity.x + ZEATMieScatteringFactor * MoonTotalRayleighMieDensity.y;
+
+	float SunR = ZEMath::Exp(-SunExtinction.x);
+	float SunG = ZEMath::Exp(-SunExtinction.y);
+	float SunB = ZEMath::Exp(-SunExtinction.z);
+
+	float MoonR = ZEMath::Exp(-MoonExtinction.x);
+	float MoonG = ZEMath::Exp(-MoonExtinction.y);
+	float MoonB = ZEMath::Exp(-MoonExtinction.z);
+
+	TerrestrialSunColor = ZEVector3(SunR, SunG, SunB);
+	TerrestrialMoonColor = ZEVector3(MoonR, MoonG, MoonB);
+}
+
+void ZEATAtmosphere::ComputeAmbientColors(float CosSunZenith, float CosMoonZenith)
+{
+	TerrestrialSunAmbientColor = GetAmbientColorFromLUT(CosSunZenith);
+	TerrestrialMoonAmbientColor = GetAmbientColorFromLUT(CosMoonZenith);
 }
 
 bool ZEATAtmosphere::InitializeSelf()
@@ -493,6 +562,11 @@ ZEATAtmosphere::ZEATAtmosphere()
 	Command.StageMask = ZERN_STAGE_POST_EFFECT;
 	Command.Priority = 3;
 
+	TerrestrialSunColor = ZEVector3::Zero;
+	TerrestrialSunAmbientColor = ZEVector3::Zero;
+	TerrestrialMoonColor = ZEVector3::Zero;
+	TerrestrialMoonAmbientColor = ZEVector3::Zero;
+
 	OrderCount = 4;
 	UseMultipleScattering = true;
 
@@ -566,193 +640,55 @@ float ZEATAtmosphere::GetFogDensity() const
 	return Fog->GetDensity();
 }
 
-static ZEVector2 CalculateDensity(const ZEVector3& Position)
-{
-	float Height = (Position - ZEVector3(0.0f, -EARTH_RADIUS, 0.0f)).Length() - EARTH_RADIUS;
-
-	float RayleighDensity = ZEMath::Exp(-Height / RAYLEIGH_MIE_HEIGHT.x);
-	float MieDensity = ZEMath::Exp(-Height / RAYLEIGH_MIE_HEIGHT.y);
-
-	return ZEVector2(RayleighDensity, MieDensity);
-}
-
-static ZEVector2 IntegrateDensity(const ZEVector3& Start, const ZEVector3& End)
-{
-	static const float STEPCOUNT = 20;
-	ZEVector2 PrevRayleighMieDensity = CalculateDensity(Start);
-	ZEVector2 TotalRayleighMieDensity = ZEVector2::Zero;
-
-	ZEVector3 StartToEnd = End - Start;
-	ZEVector3 Direction = StartToEnd.Normalize();
-	float StepLength = StartToEnd.Length() / STEPCOUNT;
-
-	for(float S = 1.0f; S <= STEPCOUNT; S += 1.0f)
-	{
-		ZEVector3 Position = Start + Direction * S * StepLength;
-
-		ZEVector2 CurRayleighMieDensity = CalculateDensity(Position);
-
-		TotalRayleighMieDensity += (CurRayleighMieDensity + PrevRayleighMieDensity) * 0.5f * StepLength;
-
-		PrevRayleighMieDensity = CurRayleighMieDensity;
-	}
-
-	return TotalRayleighMieDensity;
-}
-
 ZEVector3 ZEATAtmosphere::GetTerrestrialSunColor()
 {
-	if (SunLight == NULL)
-		return ZEVector3::Zero;
-	
-	ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
-	SunDirection.NormalizeSelf();
-
-	//float CosSunZenith = ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
-	//float HeightAboveEarth = zeScene->GetActiveCamera()->GetWorldPosition().y;
-	//
-	//ZEUInt Index1 = ((HeightAboveEarth - 20.0f) / (ATMOSPHERE_HEIGHT - 2.0f * 20.0f)) * 31.0f + 0.5f;
-	//ZEUInt Index2 = CosSunZenith * 127.0f + 0.5f;
-	//
-	//ZEVector3 LUTResult = SunLight->GetColor() * Extinction[Index1][Index2].ToVector3();
-
-	///////////////////////////////////////////////////////////////////////////////////////////////
-
-	ZEVector3 StartPositionWorld = zeScene->GetActiveCamera()->GetWorldPosition();
-
-	ZEBSphere Sphere(ZEVector3(0.0f, -EARTH_RADIUS, 0.0f), TOTAL_RADIUS);
-	ZERay Ray(SunDirection, StartPositionWorld);
-	float Length;
-	ZEBSphere::IntersectionTest(Sphere, Ray, Length);
-	ZEVector3 EndPositionWorld = StartPositionWorld + SunDirection * Length;
-
-	ZEVector2 Density = IntegrateDensity(StartPositionWorld, EndPositionWorld);
-	ZEVector3 Extinction = ZEATRayleighScatteringFactor * Density.x + ZEATMieScatteringFactor * Density.y;
-
-	float R = ZEMath::Exp(-Extinction.x);
-	float G = ZEMath::Exp(-Extinction.y);
-	float B = ZEMath::Exp(-Extinction.z);
-
-	ZEVector3 ComputeResult = SunLight->GetColor() * ZEVector3(R, G, B);
-
-	return ComputeResult;
+	return TerrestrialSunColor;
 }
 
 ZEVector3 ZEATAtmosphere::GetTerrestrialSunAmbientColor()
 {
-	if (SunLight == NULL)
-		return ZEVector3::Zero;
-
-	ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
-	SunDirection.NormalizeSelf();
-	float CosSunZenith = ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
-
-	float TexelWidth = 1.0f / 1024.0f;
-	float TexelIndex1 = CosSunZenith - TexelWidth;
-	float TexelIndex2 = CosSunZenith + TexelWidth;
-	ZEUInt Index1 = TexelIndex1 * 1023.0f + 0.5f;
-	ZEUInt Index2 = TexelIndex2 * 1023.0f + 0.5f;
-	float Weight1 = CosSunZenith - ((Index1 + 0.5f) / 1024.0f);
-	float Weight2 = ((Index2 + 0.5f) / 1024.0f) - CosSunZenith;
-
-	ZEVector4 InterpolatedAmbient = (Weight1 * SkyAmbient[Index1] + Weight2 * SkyAmbient[Index2]) / (Weight1 + Weight2);
-
-	return SunLight->GetColor() * InterpolatedAmbient.ToVector3();
+	return TerrestrialSunAmbientColor;
 }
 
 ZEVector3 ZEATAtmosphere::GetTerrestrialMoonColor()
 {
-	if (MoonLight == NULL)
-		return ZEVector3::Zero;
-
-	ZEVector3 MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
-	MoonDirection.NormalizeSelf();
-
-	//float CosMoonZenith = ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
-	//float HeightAboveEarth = zeScene->GetActiveCamera()->GetWorldPosition().y;
-	//
-	//ZEUInt Index1 = ((HeightAboveEarth - 20.0f) / (ATMOSPHERE_HEIGHT - 2.0f * 20.0f)) * 1023.0f + 0.5f;
-	//ZEUInt Index2 = CosMoonZenith * 1023.0f + 0.5f;
-	//
-	//ZEVector3 LUTResult = MoonLight->GetColor() * Extinction[Index1][Index2].ToVector3();
-
-	ZEVector3 StartPositionWorld = zeScene->GetActiveCamera()->GetWorldPosition();
-
-	ZEBSphere Sphere(ZEVector3(0.0f, -EARTH_RADIUS, 0.0f), TOTAL_RADIUS);
-	ZERay Ray(MoonDirection, StartPositionWorld);
-	float Length;
-	ZEBSphere::IntersectionTest(Sphere, Ray, Length);
-	ZEVector3 EndPositionWorld = StartPositionWorld + MoonDirection * Length;
-
-	ZEVector2 Density = IntegrateDensity(StartPositionWorld, EndPositionWorld);
-	ZEVector3 Extinction = ZEATRayleighScatteringFactor * Density.x + ZEATMieScatteringFactor * Density.y;
-
-	float R = ZEMath::Exp(-Extinction.x);
-	float G = ZEMath::Exp(-Extinction.y);
-	float B = ZEMath::Exp(-Extinction.z);
-
-	ZEVector3 ComputeResult = SunLight->GetColor() * ZEVector3(R, G, B);
-
-	return ComputeResult;
+	return TerrestrialMoonColor;
 }
 
 ZEVector3 ZEATAtmosphere::GetTerrestrialMoonAmbientColor()
 {
-	if (MoonLight == NULL)
-		return ZEVector3::Zero;
-
-	ZEVector3 MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
-	MoonDirection.NormalizeSelf();
-	float CosMoonZenith = ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f;
-
-	float TexelWidth = 1.0f / 1024.0f;
-	float TexelIndex1 = CosMoonZenith - TexelWidth;
-	float TexelIndex2 = CosMoonZenith + TexelWidth;
-	ZEUInt Index1 = TexelIndex1 * 1023.0f + 0.5f;
-	ZEUInt Index2 = TexelIndex2 * 1023.0f + 0.5f;
-	float Weight1 = CosMoonZenith - ((Index1 + 0.5f) / 1024.0f);
-	float Weight2 = ((Index2 + 0.5f) / 1024.0f) - CosMoonZenith;
-
-	ZEVector4 InterpolatedAmbient = (Weight1 * SkyAmbient[Index1] + Weight2 * SkyAmbient[Index2]) / (Weight1 + Weight2);
-
-	return MoonLight->GetColor() * InterpolatedAmbient.ToVector3();
+	return TerrestrialMoonAmbientColor;
 }
 
 void ZEATAtmosphere::Tick(float ElapsedTime)
 {
 	ZEVector3 SunDirection = ZEATAstronomy::GetSunDirection(Observer);
 	SunDirection.NormalizeSelf();
+	ZEVector3 MoonDirection = ZEATAstronomy::GetMoonDirection(Observer);
+	MoonDirection.NormalizeSelf();
 
-	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
-	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
-	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
+	ComputeTerrestrialColors(SunDirection, MoonDirection);
 
-	Sun->SetDirection(SunDirection);
-	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
+	float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
+	float CosMoonZenith = ZEVector3::DotProduct(ZEVector3::UnitY, MoonDirection);
 
-	float CosSunAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
-	bool SunVisible = CosSunAltitude >= 0.0f;
+	ComputeAmbientColors(CosSunZenith, CosMoonZenith);
+
+	zeScene->SetAmbientColor(ZEVector3(0.1f) + TerrestrialSunAmbientColor * 10.0f + TerrestrialMoonAmbientColor * 1.0f);
+	zeScene->SetAmbientFactor(1.0f);
+
+	bool SunVisible = CosSunZenith >= 0.0f;
+	bool MoonVisible = CosMoonZenith >= 0.0f;
 
 	if (SunLight != NULL)
 	{
 		ZEQuaternion SunRotation;
 		ZEQuaternion::CreateFromDirection(SunRotation, -SunDirection);
-		
+
 		SunLight->SetWorldRotation(SunRotation);
 		SunLight->SetVisible(SunVisible);
+		SunLight->SetTerrestrialColor(TerrestrialSunColor);
 	}
-
-	ZEVector3 MoonDirection = ZEATAstronomy::GetMoonDirection(Observer);
-	MoonDirection.NormalizeSelf();
-
-	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
-	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
-
-	Moon->SetDirection(MoonDirection);
-	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
-
-	float CosMoonAltitude = ZEVector3::DotProduct(ZEVector3::UnitY, MoonDirection);
-	bool MoonVisible = CosMoonAltitude >= 0.0f;
 
 	if (MoonLight != NULL)
 	{
@@ -762,23 +698,38 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		MoonLight->SetWorldRotation(MoonRotation);
 		MoonLight->SetVisible(MoonVisible);
 		MoonLight->SetCastsShadow(!SunVisible);
+		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
 	}
+
+	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
+
+	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
+	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
+	Sun->SetColor(TerrestrialSunColor * 10.0f);
+	Sun->SetDirection(SunDirection);
+	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
+
+	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
+	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
+	Moon->SetColor(TerrestrialMoonColor * 1.0f);
+	Moon->SetDirection(MoonDirection);
+	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
 
 	if (SunVisible)
 	{
-		float InscatteringSun = 0.5f * (ZEVector3::DotProduct(SunDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
+		float InscatteringSun = 0.5f * (CosSunZenith * 0.5f + 0.5f);
 		Cloud->SetLightDirection(-SunDirection);
-		Cloud->SetLightColor(ZEVector3(10));
+		Cloud->SetLightColor(TerrestrialSunColor * 10.0f);
 		Cloud->SetInscattering(InscatteringSun);
 		Stars->SetBrightness(0.0f);
 	}
 	else
 	{
-		float InscatteringMoon = 0.1f * (ZEVector3::DotProduct(MoonDirection, ZEVector3::UnitY) * 0.5f + 0.5f);
+		float InscatteringMoon = 0.1f * (CosMoonZenith * 0.5f + 0.5f);
 		Cloud->SetLightDirection(-MoonDirection);
-		Cloud->SetLightColor(ZEVector3(1.0f));
+		Cloud->SetLightColor(TerrestrialMoonColor * 1.0f);
 		Cloud->SetInscattering(InscatteringMoon);
-		Stars->SetBrightness(0.1f);
+		Stars->SetBrightness(1.1f);
 	}
 
 	double SunTransit, Sunrise, Sunset;
@@ -828,6 +779,7 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
+	ZERNStage* Stage = Parameters->Stage;
 
 	static bool Precomputed = false;
 	if(!Precomputed)
@@ -835,20 +787,6 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 		Precomputed = true;
 		PrecomputeBuffers(Context);
 	}
-
-	if (SunLight != NULL)
-		SunLight->SetTerrestrialColor(GetTerrestrialSunColor());
-
-	if (MoonLight != NULL)
-		MoonLight->SetTerrestrialColor(GetTerrestrialMoonColor());
-
-	ZEVector3 SunAmbient = GetTerrestrialSunAmbientColor() * SunLight->GetIntensity();
-	ZEVector3 MoonAmbient = GetTerrestrialMoonAmbientColor() * MoonLight->GetIntensity();
-
-	zeScene->SetAmbientColor(SunAmbient + MoonAmbient);
-	zeScene->SetAmbientFactor(2.0f);
-
-	ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);

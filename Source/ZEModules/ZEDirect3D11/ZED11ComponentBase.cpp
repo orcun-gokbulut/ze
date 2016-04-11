@@ -229,24 +229,24 @@ D3D11_USAGE ZED11ComponentBase::ConvertUsage(ZEGRResourceUsage Usage)
 	}
 }
 
-UINT ZED11ComponentBase::ConvertBindFlag(ZEGRResourceBindFlag BindFlag)
+UINT ZED11ComponentBase::ConvertBindFlags(ZEFlags BindFlags)
 {
-	switch (BindFlag)
-	{
-		case ZEGR_RBF_NONE:
-			return 0;
+	if (BindFlags == ZEGR_RBF_NONE)
+		return 0;
 
-		default:
-		case ZEGR_RBF_SHADER_RESOURCE:
-			return D3D11_BIND_SHADER_RESOURCE;
+	UINT Flags = D3D11_BIND_SHADER_RESOURCE;
 
-		case ZEGR_RBF_RENDER_TARGET:
-			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+	if (BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE))
+		Flags |= D3D11_BIND_SHADER_RESOURCE;
 
-		case ZEGR_RBF_DEPTH_STENCIL:
-			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_DEPTH_STENCIL;
+	if (BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET))
+		Flags |= D3D11_BIND_RENDER_TARGET;
 
-		case ZEGR_RBF_UNORDERED_ACCESS:
-			return D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_UNORDERED_ACCESS;
-	}
+	if (BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL))
+		Flags |= D3D11_BIND_DEPTH_STENCIL;
+
+	if (BindFlags.GetFlags(ZEGR_RBF_UNORDERED_ACCESS))
+		Flags |= D3D11_BIND_UNORDERED_ACCESS;
+
+	return Flags;
 }

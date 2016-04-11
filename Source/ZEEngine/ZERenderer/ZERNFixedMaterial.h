@@ -43,11 +43,11 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERNMap.h"
-#include "ZEGraphics/ZEGRSampler.h"
 
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
 class ZEGRShader;
+class ZEGRSampler;
 class ZEMLReaderNode;
 struct ZEGRShaderCompileOptions;
 
@@ -85,6 +85,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+		ZEHolder<ZEGRSampler>					Sampler;
 
 		ZERNMap									BaseMap;
 		ZERNMap									SpecularMap;
@@ -194,6 +195,9 @@ class ZERNFixedMaterial : public ZERNMaterial
 		const ZEString&							GetName() const;
 
 		const ZEString&							GetFileName() const;
+
+		void									SetSampler(ZEHolder<ZEGRSampler> Sampler);
+		ZEHolder<ZEGRSampler>					GetSampler() const;
 
 		void									SetShadowCaster(bool ShadowCaster);
 		bool									GetShadowCaster() const;

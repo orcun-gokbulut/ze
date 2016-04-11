@@ -50,6 +50,9 @@ ZERNMaterial::~ZERNMaterial()
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
+	if(Stage == NULL || !Stage->GetEnabled())
+		return false;
+
 	return true;
 }
 

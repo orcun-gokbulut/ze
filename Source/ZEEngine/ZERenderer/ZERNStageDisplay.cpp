@@ -54,7 +54,6 @@ void ZERNStageDisplay::DeinitializeSelf()
 
 bool ZERNStageDisplay::UpdateInputOutput()
 {
-
 	if (Input != ZERN_SO_NONE)
 	{
 		const ZEGRTexture2D* NewTexture = Owner->GetPrevOutput(Input);
@@ -232,6 +231,8 @@ bool ZERNStageDisplay::Update()
 
 	if (!UpdateConstantBuffer())
 		return false;
+
+	return true;
 }
 
 bool ZERNStageDisplay::Draw(ZEGRContext* Context)

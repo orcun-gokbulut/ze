@@ -59,6 +59,7 @@ class ZERandom
 		static bool			GetBool();
 
 		static void			Reset();
+		static void			SetSeed(ZEUInt Seed);
 };
 
 #endif

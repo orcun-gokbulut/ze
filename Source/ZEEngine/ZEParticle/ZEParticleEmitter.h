@@ -38,10 +38,10 @@
 #include "ZEMeta/ZEObject.h"
 
 #include "ZETypes.h"
-#include "ZEMath/ZEAABBox.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZEParticle.h"
@@ -57,9 +57,9 @@ enum ZEParticleEmitterType
 
 enum ZEParticleBillboardType
 {
-	ZE_PBT_AXIS_ORIENTED		= 0,
-	ZE_PBT_SCREEN_ALIGNED		= 1,
-	ZE_PBT_VIEW_POINT_ORIENTED	= 2
+	ZE_PBT_AXIS_ORIENTED,
+	ZE_PBT_SCREEN_ALIGNED,
+	ZE_PBT_VIEW_POINT_ORIENTED
 };
 
 class ZEGRConstantBuffer;
@@ -77,7 +77,6 @@ class ZEParticleEmitter : public ZEObject
 	friend class ZEParticleEffect;
 
 	ZE_OBJECT
-
 	private:
 		ZEString							Name;
 		ZEParticleEffect*					Owner;
@@ -97,7 +96,7 @@ class ZEParticleEmitter : public ZEObject
 			ZEVector3						Position;
 			float							Reserved0;
 			ZEVector2						Size;
-			ZEVector2						Reserved1;
+			ZEVector2						Cos_NegSin;
 			ZEVector4						Color;
 		};
 
@@ -113,7 +112,7 @@ class ZEParticleEmitter : public ZEObject
 		bool								SortingEnabled;
 		bool								ParticleFixedAspectRatio;
 
-		ZEAABBox							BoundingBox;		
+		ZEAABBox							BoundingBox;
 		ZEVector3							Position;
 		ZEParticleEmitterType				Type;
 
@@ -161,7 +160,7 @@ class ZEParticleEmitter : public ZEObject
 		void								SetPosition(const ZEVector3& Position);
 		const ZEVector3&					GetPosition() const;
 
-		const ZEAABBox&						GetBoundingBox();
+		const ZEAABBox&						GetBoundingBox() const;
 
 		const ZEArray<ZEParticleModifier*>&	GetModifiers();
 		void								AddModifier(ZEParticleModifier* Modifier);

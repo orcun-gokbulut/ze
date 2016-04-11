@@ -41,7 +41,7 @@ struct ZERNShading_Light
 	float3						PositionView;
 	float						Range;
 	float3						Color;
-	float						CosZenith;
+	float						Reserved0;
 	float3  					Attenuation;
 	bool						CastShadow;
 	float3						DirectionView;
@@ -55,16 +55,14 @@ struct ZERNShading_Surface
 	float3						NormalView;
 	float						Reserved1;
 	float3						Diffuse;
-	float						Reserved2;
+	float						SubsurfaceScattering;
 	float3						Specular;
 	float						SpecularPower;
 };
 
 float3 ZERNShading_Diffuse_Lambert(ZERNShading_Light Light, ZERNShading_Surface Surface)
-{
-	float NdotL = max(0.0f, dot(Surface.NormalView, Light.DirectionView));
-	
-	return NdotL * Surface.Diffuse;
+{	
+	return (1.0f - Surface.SubsurfaceScattering) * Surface.Diffuse;
 }
 
 float3 ZERNShading_Specular_BlinnPhong(ZERNShading_Light Light, ZERNShading_Surface Surface)

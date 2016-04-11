@@ -75,11 +75,13 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRShader>					DeferredVertexShader;
 		ZEHolder<ZEGRShader>					DeferredPixelShader;
 		ZEHolder<ZEGRShader>					TiledDeferredComputeShader;
-		ZEHolder<ZEGRShader>					AccumulatePixelShader;
+		ZEHolder<ZEGRShader>					AccumulateDeferredTiledDeferredPixelShader;
+		ZEHolder<ZEGRShader>					AccumulateAmbientEmissivePixelShader;
 
 		ZEHolder<ZEGRRenderStateData>			DeferredRenderState;
 		ZEHolder<ZEGRComputeRenderStateData>	TiledDeferredComputeRenderState;
-		ZEHolder<ZEGRRenderStateData>			AccumulateRenderState;
+		ZEHolder<ZEGRRenderStateData>			AccumulateDeferredTiledDeferredRenderState;
+		ZEHolder<ZEGRRenderStateData>			AccumulateAmbientEmissiveRenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			DeferredLightConstantBuffer;
 		ZEHolder<ZEGRVertexBuffer>				DeferredLightVertexBuffer;
@@ -105,7 +107,7 @@ class ZERNStageLighting : public ZERNStage
 			ZEVector3							PositionView;
 			float								Range;
 			ZEVector3							Color;
-			float								CosZenith;
+			float								Reserved0;
 			ZEVector3							Attenuation;
 			ZEBool32							CastShadow;
 			ZEVector3							DirectionView;

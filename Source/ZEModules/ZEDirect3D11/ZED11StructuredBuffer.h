@@ -52,7 +52,7 @@ class ZED11StructuredBuffer : public ZEGRStructuredBuffer, public ZED11Component
 		ID3D11ShaderResourceView*	ShaderResourceView;
 		ID3D11UnorderedAccessView*	UnorderedAccessView;
 
-		virtual bool				Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag);
+		virtual bool				Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags);
 		virtual void				Deinitialize();
 
 									ZED11StructuredBuffer();

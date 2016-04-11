@@ -414,6 +414,8 @@ void ZEAABBox::Combine(ZEAABBox& Output, const ZEAABBox& A, const ZEAABBox& B)
 
 ZEAABBox::ZEAABBox()
 {
+	this->Min = ZEVector3(FLT_MAX);
+	this->Max = ZEVector3(-FLT_MAX);
 }
 
 ZEAABBox::ZEAABBox(const ZEVector3& Min, const ZEVector3& Max)

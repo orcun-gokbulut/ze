@@ -51,19 +51,19 @@ class ZELightProjective : public ZELight
 		float							FOV;
 		float							AspectRatio;
 		mutable ZEViewFrustum			ViewVolume;
-		ZEHolder<ZEGRTexture2D>			ProjectionTexture;
+		ZEHolder<const ZEGRTexture2D>	ProjectionTexture;
 		ZEHolder<ZEGRTexture2D>			ShadowMap;
 
 		ZETexture2DResource*			ProjectionTextureResource;
-		ZEString						ProjectionTextureFilename;								
+		ZEString						ProjectionTextureFile;
 
 		void							UpdateShadowMap();
 
-										ZELightProjective();
-		virtual							~ZELightProjective();
-
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
+
+										ZELightProjective();
+		virtual							~ZELightProjective();
 
 	public:
 		virtual ZELightType				GetLightType() const;
@@ -75,13 +75,12 @@ class ZELightProjective : public ZELight
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
 
-		void							SetProjectionTextureFilename(const ZEString& Filename);
-		const ZEString&					GetProjectionTextureFilename() const;
+		void							SetProjectionTextureFile(const ZEString& Filename);
+		const ZEString&					GetProjectionTextureFile() const;
 
-		void							SetProjectionTexture(ZEGRTexture2D* Texture);
-		ZEGRTexture2D*					GetProjectionTexture() const;
+		void							SetProjectionTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*			GetProjectionTexture() const;
 
-		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		virtual ZEGRTexture*			GetShadowMap(ZESize	Index = 0) const;

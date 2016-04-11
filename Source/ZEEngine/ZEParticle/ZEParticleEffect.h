@@ -41,18 +41,14 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEParticleEmitter.h"
 
-class ZERNRenderParameters;
-class ZERNCommand;
-struct ZERNCullParameters;
-
 class ZEParticleEffect : public ZEEntity
 {
 	friend class ZEParticleEmitter;
 	
 	ZE_OBJECT
-
 	private:
 		ZEArray<ZEParticleEmitter*>			Emitters;
+
 	protected:
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
@@ -63,14 +59,14 @@ class ZEParticleEffect : public ZEEntity
 	public:
 		virtual	ZEDrawFlags					GetDrawFlags() const;
 
-		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
-		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		virtual void						Tick(float TimeElapsed);
-
 		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
 		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
+
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		virtual void						Tick(float TimeElapsed);
 
 		static ZEParticleEffect*			CreateInstance();
 

@@ -44,11 +44,11 @@ ZEGRResourceType ZEGRStructuredBuffer::GetResourceType() const
 	return ZEGR_RT_STRUCTURED_BUFFER;
 }
 
-bool ZEGRStructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag)
+bool ZEGRStructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {
 	SetSize(ElementCount * ElementSize);
 	SetResourceUsage(Usage);
-	SetResourceBindFlag(BindFlag);
+	SetResourceBindFlags(BindFlags);
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, StructuredBuffer, Pipeline);
 
 	return true;
@@ -81,10 +81,10 @@ ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
 	Deinitialize();
 }
 
-ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEGRResourceBindFlag BindFlag)
+ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {
 	ZEHolder<ZEGRStructuredBuffer> StructuredBuffer = ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
-	if (!StructuredBuffer->Initialize(ElementCount, ElementSize, Usage, BindFlag))
+	if (!StructuredBuffer->Initialize(ElementCount, ElementSize, Usage, BindFlags))
 		return NULL;
 	
 	return StructuredBuffer;

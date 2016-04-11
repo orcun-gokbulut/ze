@@ -45,16 +45,16 @@ void ZEGRResource::SetResourceUsage(ZEGRResourceUsage Usage)
 	this->Usage = Usage;
 }
 
-void ZEGRResource::SetResourceBindFlag(ZEGRResourceBindFlag BindFlag)
+void ZEGRResource::SetResourceBindFlags(ZEFlags BindFlags)
 {
-	this->BindFlag = BindFlag;
+	this->BindFlags = BindFlags;
 }
 
 ZEGRResource::ZEGRResource()
 {
 	Size = 0;
 	Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE;
-	BindFlag = ZEGR_RBF_SHADER_RESOURCE;
+	BindFlags = ZEGR_RBF_SHADER_RESOURCE;
 }
 
 ZEGRResource::~ZEGRResource()
@@ -82,7 +82,7 @@ ZEGRResourceUsage ZEGRResource::GetResourceUsage() const
 	return Usage;
 }
 
-ZEGRResourceBindFlag ZEGRResource::GetResourceBindFlag() const
+ZEFlags ZEGRResource::GetResourceBindFlags() const
 {
-	return BindFlag;
+	return BindFlags;
 }

@@ -39,7 +39,7 @@
 
 #include "ZEMath/ZEViewSphere.h"
 
-class ZELightPoint  : public ZELight
+class ZELightPoint : public ZELight
 {
 	ZE_OBJECT
 	private:

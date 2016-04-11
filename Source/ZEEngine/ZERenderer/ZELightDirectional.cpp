@@ -188,6 +188,25 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
 
+bool ZELightDirectional::InitializeSelf()
+{
+	if (!ZELight::InitializeSelf())
+		return false;
+
+	CascadeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZECascadeConstants));
+
+	return true;
+}
+
+bool ZELightDirectional::DeinitializeSelf()
+{
+	CascadeConstantBuffer.Release();
+	CascadeShadowMaps.Release();
+	CascadeVolumes.Clear();
+
+	return ZELight::DeinitializeSelf();
+}
+
 ZELightDirectional::ZELightDirectional()
 {
 	CascadeDistanceFactor = 0.5f;
@@ -204,30 +223,6 @@ ZELightDirectional::ZELightDirectional()
 ZELightDirectional::~ZELightDirectional()
 {
 
-}
-
-bool ZELightDirectional::InitializeSelf()
-{
-	if (!ZEEntity::InitializeSelf())
-		return false;
-
-	CascadeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZECascadeConstants));
-
-	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
-	ShadowRenderer.Initialize();
-
-	return true;
-}
-
-bool ZELightDirectional::DeinitializeSelf()
-{
-	CascadeConstantBuffer.Release();
-	CascadeShadowMaps.Release();
-	CascadeVolumes.Clear();
-
-	ShadowRenderer.Deinitialize();
-
-	return ZEEntity::DeinitializeSelf();
 }
 
 ZEDrawFlags ZELightDirectional::GetDrawFlags() const
@@ -317,11 +312,6 @@ ZELightType ZELightDirectional::GetLightType() const
 	return ZE_LT_DIRECTIONAL;
 }
 
-ZELightDirectional* ZELightDirectional::CreateInstance()
-{
-	return new ZELightDirectional();
-}
-
 ZESize ZELightDirectional::GetViewCount() const
 {
 	return 1;
@@ -367,29 +357,36 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	UpdateCascadeShadowMaps();
 	UpdateCascadeTransforms(*Parameters->View);
 
+	ZEGRContext* Context = Parameters->Context;
+
+	ZERNView View = ShadowRenderer.GetView();
+	View.Position = Parameters->View->Position;
+	View.Rotation = GetWorldRotation();
+	View.Direction = GetWorldFront();
+	View.U = GetWorldRight();
+	View.V = GetWorldUp();
+	View.N = GetWorldFront();
+	View.Viewport = NULL;
+
 	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
-		ZERNView View = ShadowRenderer.GetView();
-		View.Position = Parameters->View->Position;
-		View.Rotation = GetWorldRotation();
-		View.Direction = GetWorldFront();
-		View.U = GetWorldRight();
-		View.V = GetWorldUp();
-		View.N = GetWorldFront();
-
-		View.Viewport = NULL;
 		View.ViewVolume = &GetViewVolume(CascadeIndex);
 		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
 
 		ShadowRenderer.SetView(View);
 
-		ZEGRContext* Context = Parameters->Context;
-
 		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
-		Context->ClearDepthStencilBuffer(DepthBuffer, true, false, 0.0f, 0x00);
+		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
 		ZELight::Render(Parameters, Command);
 	}
+
+	Context->SetRenderTargets(0, NULL, NULL);
+}
+
+ZELightDirectional* ZELightDirectional::CreateInstance()
+{
+	return new ZELightDirectional();
 }

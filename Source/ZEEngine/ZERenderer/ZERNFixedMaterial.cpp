@@ -47,6 +47,7 @@
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRShaderCompileOptions.h"
 #include "ZERNStageGBuffer.h"
 #include "ZERNStageID.h"
@@ -232,7 +233,6 @@ bool ZERNFixedMaterial::InitializeSelf()
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	DirtyFlags.RaiseAll();
 
 	if (!UpdateShaders())
 		return false;
@@ -264,6 +264,8 @@ void ZERNFixedMaterial::DeinitializeSelf()
 
 ZERNFixedMaterial::ZERNFixedMaterial()
 {
+	DirtyFlags.RaiseAll();
+
 	TwoSided = false;
 	Wireframe = false;
 	AlphaCullEnabled = false;
@@ -327,6 +329,12 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	Constants.DetailBaseMapAttenuationFactor = 0.01f;
 	Constants.DetailNormalMapAttenuationStart = 10.0f;
 	Constants.DetailNormalMapAttenuationFactor = 0.01f;
+
+	ZEGRSamplerDescription SamplerLinearWrapDescription;
+	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.AddressW = ZEGR_TAM_WRAP;
+	Sampler = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
 }
 
 ZEUInt ZERNFixedMaterial::GetStageMask() const
@@ -347,6 +355,16 @@ const ZEString& ZERNFixedMaterial::GetName() const
 const ZEString&	ZERNFixedMaterial::GetFileName() const
 {
 	return FileName;
+}
+
+void ZERNFixedMaterial::SetSampler(ZEHolder<ZEGRSampler> Sampler)
+{
+	this->Sampler = Sampler;
+}
+
+ZEHolder<ZEGRSampler> ZERNFixedMaterial::GetSampler() const
+{
+	return Sampler;
 }
 
 void ZERNFixedMaterial::SetShadowCaster(bool ShadowCaster)
@@ -550,7 +568,6 @@ void ZERNFixedMaterial::SetBaseMapFile(const ZEString& Filename)
 		return;
 
 	BaseMap.Load2D(Filename);
-
 }
 
 const ZEString& ZERNFixedMaterial::GetBaseMapFile() const
@@ -1291,10 +1308,10 @@ bool ZERNFixedMaterial::GetClippingPlanesEnabled() const
 
 bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
-	if (!Update())
+	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	if(Stage == NULL || !Stage->GetEnabled())
+	if (!Update())
 		return false;
 
 	ZEUInt StageID = (Stage->GetId() & GetStageMask());
@@ -1306,7 +1323,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 		Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 
 		bool TextureSampler = false;
-		if (BaseMap.IsAvailable())
+		if (BaseMapEnabled && BaseMap.IsAvailable())
 		{
 			Context->SetTexture(ZEGR_ST_PIXEL, 0, BaseMap.GetTexture());
 			TextureSampler = true;
@@ -1361,7 +1378,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 		}
 
 		if (TextureSampler)
-			Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSampler());
+			Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 
 	}
 	else if(StageID == ZERN_STAGE_SHADOW_MAP_GENERATION)
@@ -1372,7 +1389,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 
 			if (OpacityMapEnabled)
 			{
-				Context->SetSampler(ZEGR_ST_PIXEL, 0, BaseMap.GetSampler());
+				Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap.GetTexture());
 			}
 		}
@@ -1388,6 +1405,10 @@ void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) 
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
 
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 2, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 3, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);

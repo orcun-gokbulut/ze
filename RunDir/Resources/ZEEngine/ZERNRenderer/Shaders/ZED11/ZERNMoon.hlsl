@@ -71,7 +71,7 @@ ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_Verte
 	ZERNMoon_VertexShader_Output Output;
 	Output.PositionProjection = float4(VertexPositionScreen, 0.0f, 1.0f);
 	Output.PositionProjectionXY = VertexPositionScreen;
-	Output.Texcoord = (uint2(VertexID + 1, VertexID) & uint2(1, 2)) >> uint2(0, 1);
+	Output.Texcoord = (uint2(VertexID, VertexID + 1) & uint2(2, 1)) >> uint2(1, 0);
 	
 	return Output;
 }

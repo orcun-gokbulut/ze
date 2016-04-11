@@ -328,7 +328,7 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = DepthMap->GetDepthStencilBuffer();
 
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, false, 0.0f, 0x00);
+	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 0.0f, 0x00);
 
 	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, ConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);

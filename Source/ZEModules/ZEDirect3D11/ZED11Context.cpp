@@ -750,8 +750,13 @@ void ZED11Context::ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZE
 {
 	ID3D11UnorderedAccessView* NativeView = NULL;
 	if(Texture != NULL)
+	{
 		if(Texture->GetTextureType() == ZEGR_TT_3D)
 			NativeView = static_cast<const ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
+
+		else if (Texture->GetTextureType() == ZEGR_TT_2D)
+			NativeView = static_cast<const ZED11Texture2D*>(Texture)->GetUnorderedAccessView();
+	}
 
 	GetMainContext()->ClearUnorderedAccessViewFloat(NativeView, ClearColor.M);
 }
