@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFontResource.h
+ Zinek Engine - ZERNStage2D.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,59 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FONT_RESOURCE_H__
-#define __ZE_FONT_RESOURCE_H__
 
-#include "ZETypes.h"
-#include "ZECore/ZEResource.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEMath/ZERectangle.h"
-#include "ZETexture/ZETextureOptions.h"
+#include "ZERNStage.h"
 
-#define ZE_FONT_CHARACTER_COUNT				256
+#include "ZECommon.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
-ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
-
-struct ZEFontCharacterMetric
-{
-	ZEUInt32	FontSize;
-	ZEUInt32	MaximumHeight;
-
-	ZEInt32		Height;
-	ZEInt32		Width;
-
-	ZEInt32		HorizontalAdvance;
-	ZEInt32		VerticalAdvance;
-
-	ZEInt32		HorizontalBearingX;
-	ZEInt32		HorizontalBearingY;
-
-	ZEInt32		VerticalBearingX;
-	ZEInt32		VerticalBearingY;
-};
-
-enum ZEFontResourceType
-{
-	ZE_FRT_BITMAP,
-	ZE_FRT_DYNAMIC
-};
-
-struct ZEFontCharacter
-{
-	const ZEGRTexture2D*		Texture;
-	ZEUInt32				GlyphIndex;
-	char					Character;
-	ZEFontCharacterMetric	CharacterMetric;
-	ZERectangle				CoordinateRectangle;
-};
-
-class ZEFontResource : public ZEResource
+class ZERNStage2D : public ZERNStage
 {
 	ZE_OBJECT
+	private:
+		ZEGRViewport						Viewport;
+		
+		bool								UpdateInputOutput();
 
 	public:
-		virtual ZEFontResourceType			GetFontResourceType() const = 0;
-		virtual const ZEFontCharacter&		GetCharacter(char Character) = 0;
-		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance) = 0;
+		virtual ZEInt						GetId() const;
+		virtual const ZEString&				GetName() const;
+
+		virtual bool						Setup(ZEGRContext* Context);
+		virtual void						CleanUp(ZEGRContext* Context);
+
+											ZERNStage2D();
+
+		static ZEGRRenderState				GetRenderState();
 };
-#endif

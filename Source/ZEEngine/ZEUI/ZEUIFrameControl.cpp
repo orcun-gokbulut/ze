@@ -35,7 +35,7 @@
 
 #include "ZEUIFrameControl.h"
 #include "ZEUIRenderer.h"
-#include "ZEIUCheckBoxControl.h"
+#include "ZEUICheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
@@ -48,7 +48,7 @@ void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 	ZEUIRectangle Output;
 
 	if(!ZEUIRectangle::Clip(Output, TempRect, GetVisibleRectangle()))
-		Renderer->AddRectangle(Output);
+		Renderer->AddRectangle(&Output);
 
 	ZEUIControl::Draw(Renderer);
 }
@@ -71,17 +71,6 @@ void ZEUIFrameControl::SetHeight(float Height)
 	Frame.Positions.SetHeight(Height);
 }
 
-ZERNMaterial* ZEUIFrameControl::GetMaterial() const
-{
-	return FrameMaterial;
-}
-
-void ZEUIFrameControl::SetMaterial(ZERNMaterial* Material)
-{
-	FrameMaterial = (ZEUIMaterial*)Material;
-	Frame.Material = FrameMaterial;
-}
-
 void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 {
 	ZEUIControl::SetPosition(Position);
@@ -90,8 +79,6 @@ void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 
 ZEUIFrameControl::ZEUIFrameControl()
 {
-	FrameMaterial = ZEUIMaterial::CreateInstance();
-	Frame.Material = FrameMaterial;
 	Frame.Color = ZEUIManager::GetDefaultBackgroundColor();
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;
 	Frame.Texcoords.RightDown = ZEVector2::One;

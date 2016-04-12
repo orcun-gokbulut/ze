@@ -55,6 +55,26 @@ enum ZERotationOrder
 	ZE_RO_ZYX
 };
 
+// ZEMatrix3x3Shader - ShaderStorage
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ZEMatrix3x3Shader
+{
+	public:
+		union
+		{
+			struct
+			{
+				float	M11, M21, M31, Unused0,
+						M12, M22, M32, Unused1,
+						M13, M23, M33, Unused2;
+			};
+
+			float M[4][3];
+			float MA[12];
+		};
+};
+
+
 // ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix3x3
@@ -129,6 +149,8 @@ class ZEMatrix3x3
 		float							Get2DRotation();
 		ZEVector2						Get2DScale();
 		static void						Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix);
+
+		ZEMatrix3x3Shader				ToMatrix3x3Shader();
 
 		ZEMatrix3x3						operator+(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator-(const ZEMatrix3x3 &RightOperand) const;

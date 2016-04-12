@@ -47,7 +47,7 @@ ZEScene* ZEGame::GetScene()
 	return Scene;
 }
 
-#include "ZEUI/ZEFontResource.h"
+#include "ZEUI/ZEUIFont.h"
 
 bool ZEGame::Initialize()
 {
@@ -70,6 +70,9 @@ bool ZEGame::Deinitialize()
 		Scene->Destroy();
 		Scene = NULL;
 	}
+
+	UIManager = ZEUIManager::CreateInstance();
+	UIManager->Initialize();
 
 	return true;
 }

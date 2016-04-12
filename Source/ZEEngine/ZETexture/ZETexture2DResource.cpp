@@ -66,7 +66,7 @@ static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 		ZESize SrcRowPitch = (Width >> Level) * FormatDefinition->BlockSize;
 		TextureLevels[Level].CopyTo(SrcBuffer, SrcRowPitch);
 
-		Output->UpdateSubResource(0, Level, SrcBuffer, SrcRowPitch);
+		Output->UpdateSubResource(0, Level, NULL, SrcBuffer, SrcRowPitch);
 	}
 
 	delete [] SrcBuffer;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEIUCheckBoxControl.cpp
+ Zinek Engine - ZEUICheckBoxControl.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEIUCheckBoxControl.h"
+#include "ZEUICheckBoxControl.h"
 #include "ZEUIManager.h"
 #include "ZEUILabel.h"
 
@@ -53,7 +53,7 @@ void ZEUICheckBoxControl::Draw(ZEUIRenderer* Renderer)
 	Output.ZOrder = GetZOrder() + 1;
 
 	if(!ZEUIRectangle::Clip(Output, Box, GetRectangle()))
-		Renderer->AddRectangle(Output);
+		Renderer->AddRectangle(&Output);
 
 	ZEUIControl::Draw(Renderer);
 }
@@ -128,8 +128,6 @@ ZEUICheckBoxControl::ZEUICheckBoxControl()
 	Box.Positions.RightDown = GetPosition() + ZEVector2::One * 22;
 	Label->SetText("Check Box");
 	Label->SetHeight(16);
-	BoxMaterial = ZEUIMaterial::CreateInstance();
-	Box.Material = BoxMaterial;
 	SetPosition(ZEVector2::Zero);
 	SetWidth(120);
 	SetHeight(22);

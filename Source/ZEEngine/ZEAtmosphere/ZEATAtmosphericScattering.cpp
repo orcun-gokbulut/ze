@@ -72,7 +72,7 @@ void ZEATAtmosphericScattering::CreateRandomVectors()
 
 	RandomVectorsTexture.Release();
 	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
-	RandomVectorsTexture->UpdateSubResource(0, 0, &SphereSamples[0], 128 * sizeof(ZEVector4));
+	RandomVectorsTexture->UpdateSubResource(0, 0, NULL, &SphereSamples[0], 128 * sizeof(ZEVector4));
 }
 
 bool ZEATAtmosphericScattering::UpdateShaders()

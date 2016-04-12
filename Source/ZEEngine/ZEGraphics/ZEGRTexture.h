@@ -48,6 +48,12 @@ enum ZEGRTextureType
 	ZEGR_TT_CUBE	= 3
 };
 
+struct ZERect
+{
+	ZEInt x, y;
+	ZEInt Width, Height;
+};
+
 class ZEGRTexture : public ZEGRResource
 {
 	private:

@@ -147,16 +147,6 @@ void ZEUIBorderedFrameControl::SetWidth(float Width)
  	MainArea.SetWidth(MainArea.GetWidth() + WidthDifference);
 }
 
-void ZEUIBorderedFrameControl::SetMaterial(ZERNMaterial* Material)
-{
-
-}
-
-ZERNMaterial*	ZEUIBorderedFrameControl::GetMaterial() const
-{
-	return NULL;
-}
-
 void ZEUIBorderedFrameControl::AddChildControl(ZEUIControl* Control)
 {
 	MainArea.AddChildControl(Control);

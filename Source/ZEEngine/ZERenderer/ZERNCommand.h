@@ -37,11 +37,16 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEDS/ZEDelegate.h"
 
 #define ZERN_MAX_COMMAND_STAGE 5
 
 ZE_META_FORWARD_DECLARE(ZEEntity, "ZEGame/ZEEntity.h");
 ZE_META_FORWARD_DECLARE(ZERNRenderParameters, "ZERNRenderParameters.h");
+
+class ZERNCommand;
+
+typedef ZEDelegate<void (const ZERNRenderParameters*, const ZERNCommand*)> ZERNCommandCallback;
 
 class ZERNCommand : public ZEObject
 {
@@ -52,6 +57,7 @@ class ZERNCommand : public ZEObject
 		ZELink<ZERNCommand>				StageQueueLinks[ZERN_MAX_COMMAND_STAGE];
 
 	public:
+		ZERNCommandCallback				Callback;
 		ZEEntity*						Entity;
 
 		ZEInt							Priority;

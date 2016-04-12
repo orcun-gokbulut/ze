@@ -229,7 +229,7 @@ bool ZERNStageHDR::UpdateTextures()
 	PreviousAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, ZEGR_TF_R16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 
 	ZEUInt16 One = 1;
-	PreviousAdaptedLuminance->UpdateSubResource(0, 0, &One, 1);
+	PreviousAdaptedLuminance->UpdateSubResource(0, 0, NULL, &One, 1);
 
 	BrightTexture.Release();
 	BlurTextureTemp1.Release();

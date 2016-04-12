@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFontResourceDynamic.cpp
+ Zinek Engine - ZEUIFontTrueType.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,11 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEFontResourceDynamic.h"
+#include "ZEUIFontTrueType.h"
+
 #include "ZECore\ZEResourceManager.h"
 #include "ZEError.h"
 #include "ZEFile\zepartialfile.h"
-#include "ZEFreeType.h"
+
+#include <ft2build.h>
+#include <freetype\freetype.h>
+#include <freetype\ftglyph.h>
+
+struct ZEFreeType
+{
+	FT_Library	Library;
+	FT_Face		Face;
+};
 
 #define UTF8_SPACE_CHARACTER 0x00020
 #define CHARACTER_SPACING 4
@@ -50,7 +60,7 @@ struct ZEFontPixel
 	ZEUInt8	A;
 };
 
-void ZEFontResourceDynamic::SetFontFile(ZEString FontFilePath)
+void ZEUIFontTrueType::SetFontFile(ZEString FontFilePath)
 {
 	this->FontFile = FontFilePath;
 
@@ -59,42 +69,40 @@ void ZEFontResourceDynamic::SetFontFile(ZEString FontFilePath)
 	FontSupportsKerning = FT_HAS_KERNING(FreeType->Face);
 }
 
-void ZEFontResourceDynamic::SetFontSize(ZEUInt32 FontSize)
+void ZEUIFontTrueType::SetFontSize(ZEUInt32 FontSize)
 {
 	this->FontSize = FontSize;
 }
 
-void ZEFontResourceDynamic::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
+void ZEUIFontTrueType::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
 {
 	Textures.Add();
-	Textures.GetLastItem() = ZEGRTexture2D::CreateInstance();
-	Textures.GetLastItem()->Create(Width, Height, 1, ZEGR_TF_R8G8B8A8);
+	Textures.GetLastItem() = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 }
 
-const char* ZEFontResourceDynamic::GetResourceType() const
+const char* ZEUIFontTrueType::GetResourceType() const
 {
 	return "ZEFontResourceDynamic";
 }
 
-ZEFontResourceType ZEFontResourceDynamic::GetFontResourceType() const
+ZEUIFontType ZEUIFontTrueType::GetFontResourceType() const
 {
-	return ZE_FRT_DYNAMIC;
+	return ZEUI_FT_TRUE_TYPE;
 }
 
-ZEUInt32 ZEFontResourceDynamic::GetFontSize() const
+ZEUInt32 ZEUIFontTrueType::GetFontSize() const
 {
 	return this->FontSize;
 }
 
-const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character)
+const ZEUIFontCharacter& ZEUIFontTrueType::GetCharacter(char Character)
 {
 	ZEInt64 KerningDistance;
 	return GetCharacter(Character, Character, KerningDistance);
 }
 
-const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char PreviousCharacter, ZEInt64& KerningDistance)
+const ZEUIFontCharacter& ZEUIFontTrueType::GetCharacter(char Character, char PreviousCharacter, ZEInt64& KerningDistance)
 {
-	ZEFontPixel* Buffer;
 	ZESize TexturePitch;
 	ZEUInt32 LastItem = 0;
 	ZEUInt32 CurrentGlyphIndex, PreviousGlyphIndex;
@@ -180,28 +188,25 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 	}
 
 	LastCharacterPosition.y = FontSize * LastTextureLine;
+	
+	ZEArray<ZEUInt32> Buffer;
+	Buffer.SetCount(FTBitmap.rows * FTBitmap.width);
 
-	Textures[LastTextureId]->Lock((void**)&Buffer, &TexturePitch, 0);
-	ZEFontPixel* CurrentCharPix = Buffer + (ZEUInt32)LastCharacterPosition.x + ((ZEUInt32)(LastCharacterPosition.y * TexturePitch / 4));
 	for (ZESize y = 0; y < FTBitmap.rows; y++)
 	{
-		ZEFontPixel* CurrentLine = CurrentCharPix + y * (TexturePitch / 4);
-
 		for (ZESize x = 0; x <  FTBitmap.width; x++)
 		{
-			if(FTBitmap.buffer[FTBitmap.pitch * y + x] != 0)
-			{
-				ZEFontPixel* CurrentPixel = CurrentLine + x;
-
-				unsigned char Value = FTBitmap.buffer[FTBitmap.pitch * y + x];
-				CurrentPixel->R = Value;
-				CurrentPixel->G = Value;
-				CurrentPixel->B = Value;
-				CurrentPixel->A = Value;
-			}
+			ZEUInt32 Color = FTBitmap.buffer[FTBitmap.pitch * y + x];
+			Buffer[FTBitmap.width * y + x] = (Color << 24) | 0xFFFFFF;
 		}
 	}
-	Textures[LastTextureId]->Unlock(0);
+
+	ZERect DestRect;
+	DestRect.x = LastCharacterPosition.x;
+	DestRect.y = LastCharacterPosition.y;
+	DestRect.Width = FTBitmap.width;
+	DestRect.Height = FTBitmap.rows;
+	Textures[LastTextureId]->UpdateSubResource(0, 0, &DestRect, Buffer.GetCArray(), FTBitmap.width * sizeof(ZEUInt32));
 
 	FontCharacters[LastItem].CoordinateRectangle.LeftUp.x = LastCharacterPosition.x  / Textures[LastTextureId]->GetWidth();
 	FontCharacters[LastItem].CoordinateRectangle.LeftUp.y = (LastCharacterPosition.y) / Textures[LastTextureId]->GetHeight();
@@ -219,19 +224,19 @@ const ZEFontCharacter& ZEFontResourceDynamic::GetCharacter(char Character, char 
 
 	LastCharacterPosition.x += FontCharacters[LastItem].CharacterMetric.HorizontalAdvance + CHARACTER_SPACING;
 
-	FontCharacters[LastItem].Texture = Textures[LastTextureId];
+	FontCharacters[LastItem].Texture = Textures[LastTextureId].GetPointer();
 
 	return FontCharacters[LastItem];
 }
 
-ZEGRTexture2D* ZEFontResourceDynamic::GetTexture(ZEUInt32 TextureId)
+const ZEGRTexture2D* ZEUIFontTrueType::GetTexture(ZEUInt32 TextureId)
 {
 	return Textures[TextureId];
 }
 
-ZEFontResourceDynamic* ZEFontResourceDynamic::LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize)
+ZEUIFontTrueType* ZEUIFontTrueType::LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	ZEFontResourceDynamic* NewResource = (ZEFontResourceDynamic*)zeResources->GetResource(FileName.GetValue());
+	ZEUIFontTrueType* NewResource = (ZEUIFontTrueType*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
 		NewResource = LoadResource(FileName, FontSize);
@@ -252,9 +257,9 @@ ZEFontResourceDynamic* ZEFontResourceDynamic::LoadSharedResource(const ZEString&
 		return NewResource;
 }
 
-void ZEFontResourceDynamic::CacheResource(const ZEString& FileName, ZEUInt32 FontSize)
+void ZEUIFontTrueType::CacheResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	ZEFontResourceDynamic* NewResource = (ZEFontResourceDynamic*)zeResources->GetResource(FileName.GetValue());
+	ZEUIFontTrueType* NewResource = (ZEUIFontTrueType*)zeResources->GetResource(FileName.GetValue());
 	if (NewResource == NULL)
 	{
 		NewResource = LoadResource(FileName, FontSize);
@@ -267,10 +272,10 @@ void ZEFontResourceDynamic::CacheResource(const ZEString& FileName, ZEUInt32 Fon
 	}
 }
 
-ZEFontResourceDynamic* ZEFontResourceDynamic::LoadResource(const ZEString& FileName, ZEUInt32 FontSize)
+ZEUIFontTrueType* ZEUIFontTrueType::LoadResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
 	bool Result;
-	ZEFontResourceDynamic* FontResource;
+	ZEUIFontTrueType* FontResource;
 
 	ZEFile File;
 	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
@@ -288,11 +293,11 @@ ZEFontResourceDynamic* ZEFontResourceDynamic::LoadResource(const ZEString& FileN
 	}
 }
 
-ZEFontResourceDynamic* ZEFontResourceDynamic::LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize)
+ZEUIFontTrueType* ZEUIFontTrueType::LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize)
 {
 	zeLog("Loading font file \"%s\".", ResourceFile->GetPath().GetValue());
 
-	ZEFontResourceDynamic* NewResource = new ZEFontResourceDynamic();
+	ZEUIFontTrueType* NewResource = new ZEUIFontTrueType();
 	NewResource->SetFileName(ResourceFile->GetPath());
 
 	NewResource->SetFontFile(ResourceFile->GetPath());
@@ -303,7 +308,7 @@ ZEFontResourceDynamic* ZEFontResourceDynamic::LoadResource(ZEFile* ResourceFile,
 	return NewResource;
 }
 
-ZEFontResourceDynamic::ZEFontResourceDynamic()
+ZEUIFontTrueType::ZEUIFontTrueType()
 {
 	FreeType = new ZEFreeType();
 	FreeType->Face = NULL;
@@ -321,7 +326,7 @@ ZEFontResourceDynamic::ZEFontResourceDynamic()
 	CreateNewTexture(512, 512);
 }
 
-ZEFontResourceDynamic::~ZEFontResourceDynamic()
+ZEUIFontTrueType::~ZEUIFontTrueType()
 {
 	delete FreeType;
 	FreeType = 0;

@@ -52,10 +52,14 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEEnumerator.h"
 
-struct ZERNDrawParameters;
-struct ZERNCullParameters;
+class ZEScene;
+class ZERNDrawParameters;
+class ZERNCullParameters;
 class ZERNRenderParameters;
 class ZERNCommand;
+class ZEMLWriterNode;
+class ZEMLReaderNode;
+
 
 // ZEDrawFlags
 typedef ZEFlags ZEDrawFlags;
@@ -75,10 +79,6 @@ ZE_ENUM(ZEEntityState)
 	ZE_ES_INITIALIZED					= 2,
 	ZE_ES_DEINITIALIZING				= 3
 };
-
-class ZEScene;
-class ZEMLWriterNode;
-class ZEMLReaderNode;
 
 class ZEEntity : public ZEObject
 {

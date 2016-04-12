@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUTextEditControl.h"
-#include "ZEFontResource.h"
+#include "ZEUIFont.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 
 void ZEUITextEditControl::KeyPressed(ZEUIInputKey Key)
@@ -258,7 +258,7 @@ void ZEUITextEditControl::Draw(ZEUIRenderer* Renderer)
 		ZEUIRectangle Output;
 	
 		if(!ZEUIRectangle::Clip(Output, Cursor, GetVisibleRectangle()))
-			Renderer->AddRectangle(Output);
+			Renderer->AddRectangle(&Output);
 	}
 }
 
@@ -267,11 +267,6 @@ ZEUITextEditControl::ZEUITextEditControl()
 	SetFocusable(true);
 	SetMoveable(true);
 	IsTextDirty = false;
-}
-
-const ZERNMaterial* ZEUITextEditControl::GetCursorMaterial() const
-{
-	return Cursor.Material; 
 }
 
 void ZEUITextEditControl::SetCursorColor(const ZEVector4& Color)

@@ -34,10 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIButtonControl.h"
-#include "ZERenderer/ZEFixedMaterial.h"
-#include "ZEUI/ZEUIRenderer.h"
+
+#include "ZEUIRenderer.h"
 #include "ZEUILabel.h"
-#include "ZEFontResourceDynamic.h"
+#include "ZEUIFontTrueType.h"
 
 void ZEUIButtonControl::Draw(ZEUIRenderer* Renderer)
 {

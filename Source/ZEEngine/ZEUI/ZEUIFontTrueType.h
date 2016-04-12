@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEFontResourceDynamic.h
+ Zinek Engine - ZEUIFontTrueType.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,23 +34,20 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_FONT_RESOURCE_DYNAMIC_H__
-#define __ZE_FONT_RESOURCE_DYNAMIC_H__
 
 #include "ZEDS\ZEArray.h"
 #include "ZEMath\ZEVector.h"
+#include "ZEPointer\ZEHolder.h"
 
-#include "ZEGraphics\ZEGRTexture2D.h"
-#include "ZERenderer\ZEUIMaterial.h"
-#include "ZEUI\ZEFontResource.h"
+#include "ZEUI\ZEUIFont.h"
 #include "ZEUI\ZEUIRectangle.h"
+#include "ZEGraphics\ZEGRTexture2D.h"
 
 struct ZEFreeType;
 
-class ZEFontResourceDynamic : public ZEFontResource
+class ZEUIFontTrueType : public ZEUIFont
 {
 	ZE_OBJECT
-
 	private:
 		ZEFreeType*							FreeType;
 
@@ -62,37 +59,36 @@ class ZEFontResourceDynamic : public ZEFontResource
 		ZEUInt32							FontSize;
 		bool								FontSupportsKerning;
 
-		ZEArray<ZEFontCharacter>			FontCharacters;
+		ZEArray<ZEUIFontCharacter>			FontCharacters;
 		ZEVector2							LastCharacterPosition;
 
 		ZEUInt32							LastTextureId;
 		ZEUInt32							LastTextureLine;
 
-		ZEArray<ZEGRTexture2D*>				Textures;
+		ZEArray<ZEHolder<ZEGRTexture2D>>	Textures;
 
 		void								SetFontFile(ZEString FontFilePath);
 		void								SetFontSize(ZEUInt32 FontSize);
 		void								CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height);
 
-											ZEFontResourceDynamic();
-											~ZEFontResourceDynamic();
+											ZEUIFontTrueType();
+											~ZEUIFontTrueType();
 
 	public:
 		virtual const char*					GetResourceType() const;
-		virtual ZEFontResourceType			GetFontResourceType() const;
+		virtual ZEUIFontType			GetFontResourceType() const;
 
 		ZEUInt32							GetFontSize() const;
 
-		virtual const ZEFontCharacter&		GetCharacter(char Character);
-		virtual const ZEFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance);
+		virtual const ZEUIFontCharacter&		GetCharacter(char Character);
+		virtual const ZEUIFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance);
 
-		ZEGRTexture2D*						GetTexture(ZEUInt32 TextureId);
+		const ZEGRTexture2D*				GetTexture(ZEUInt32 TextureId);
 
-		static ZEFontResourceDynamic*		LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize);
+		static ZEUIFontTrueType*		LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize);
 		static void							CacheResource(const ZEString& FileName, ZEUInt32 FontSize);
 
-		static ZEFontResourceDynamic*		LoadResource(const ZEString& FileName, ZEUInt32 FontSize);
-		static ZEFontResourceDynamic*		LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize);
+		static ZEUIFontTrueType*		LoadResource(const ZEString& FileName, ZEUInt32 FontSize);
+		static ZEUIFontTrueType*		LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize);
 
 };
-#endif

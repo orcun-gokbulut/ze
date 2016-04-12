@@ -91,7 +91,7 @@ void ZERNStageLighting::CreateRandomVectors()
 
 	RandomVectorsTexture.Release();
 	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
-	RandomVectorsTexture->UpdateSubResource(0, 0, &Vectors[0], 128 * 2);
+	RandomVectorsTexture->UpdateSubResource(0, 0, NULL, &Vectors[0], 128 * 2);
 }
 
 void ZERNStageLighting::CreateLightGeometries()

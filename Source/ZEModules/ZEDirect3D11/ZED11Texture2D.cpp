@@ -348,12 +348,26 @@ void ZED11Texture2D::Deinitialize()
 	ZEGRTexture2D::Deinitialize();
 }
 
-bool ZED11Texture2D::UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) 
+bool ZED11Texture2D::UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch) 
 {
 	zeCheckError(DestArrayIndex >= GetArrayCount(), false, "Destination array index is out of range.");
 	zeCheckError(DestLevel >= GetLevelCount(), false, "There is no such a texture level.");
-
-	GetMainContext()->UpdateSubresource(Texture2D, DestArrayIndex * GetLevelCount() + DestLevel, NULL, SrcData, SrcRowPitch, 0);
+	
+	if (DestRect != NULL)
+	{
+		D3D11_BOX D11Rect;
+		D11Rect.left = DestRect->x;
+		D11Rect.top = DestRect->y;
+		D11Rect.right = DestRect->x + DestRect->Width;
+		D11Rect.bottom = DestRect->y + DestRect->Height;
+		D11Rect.front = 0;
+		D11Rect.back = 1;
+		GetMainContext()->UpdateSubresource(Texture2D, DestArrayIndex * GetLevelCount() + DestLevel, &D11Rect, SrcData, SrcRowPitch, 0);
+	}
+	else
+	{
+		GetMainContext()->UpdateSubresource(Texture2D, DestArrayIndex * GetLevelCount() + DestLevel, NULL, SrcData, SrcRowPitch, 0);
+	}
 
 	return true;
 }

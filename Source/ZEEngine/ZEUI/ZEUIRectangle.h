@@ -34,31 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_RECTANGLE_H__
-#define __ZE_UI_RECTANGLE_H__
 
+#include "ZETypes.h"
+#include "ZEDS/ZELink.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZEPointer/ZEHolder.h"
 
 struct ZEUIVertex;
-
-class ZERNMaterial;
+class ZEGRTexture2D;
 
 class ZEUIRectangle
 {
+	friend class ZEUIRenderer;
+	private:
+		ZELink<ZEUIRectangle>			RendererLink;
+
 	public:
-		ZERectangle			Positions;
-		ZERectangle			Texcoords;
-		const ZERNMaterial*	Material;
-		ZEVector4			Color;
-		ZEInt32				ZOrder;
+		ZERectangle						Positions;
+		ZERectangle						Texcoords;
+		ZEHolder<const ZEGRTexture2D>	Texture;
+		ZEVector4						Color;
+		ZEInt32							ZOrder;
 
-		static bool			Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
-		void				ConvertToVertices(ZEUIVertex* Buffer) const;
+		void							ConvertToVertices(ZEUIVertex* Output) const;
+
+										ZEUIRectangle();
+
+		static bool						Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle);
 };
-#endif
-
-
-
-
