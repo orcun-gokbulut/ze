@@ -72,7 +72,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		virtual ZEHolder<const ZEGRDepthStencilBuffer>			GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const;
 
 		virtual void											GenerateMipMaps();
-		virtual bool											UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
+		virtual bool											UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch);
 		virtual bool											Lock(void** Buffer, ZESize* RowPitch);
 		virtual void											Unlock();
 };

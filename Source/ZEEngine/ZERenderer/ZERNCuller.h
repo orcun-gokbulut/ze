@@ -40,12 +40,13 @@
 class ZEScene;
 class ZEEntity;
 class ZERNRenderer;
-struct ZERNView;
+class ZERNView;
 
-struct ZERNCullParameters
+class ZERNCullParameters
 {
-	ZERNRenderer*					Renderer;
-	ZERNView*						View;
+	public:
+		ZERNRenderer*				Renderer;
+		ZERNView*					View;
 };
 
 class ZESceneCuller

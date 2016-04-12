@@ -304,10 +304,10 @@ bool ZERNStageAntiAliasing::InitializeSelf()
 	SamplerPoint = ZEGRSampler::GetSampler(SamplerDescription);
 
 	AreaTexture = ZEGRTexture2D::CreateInstance(AREATEX_WIDTH, AREATEX_HEIGHT, 1, ZEGR_TF_R8G8_UNORM);
-	AreaTexture->UpdateSubResource(0, 0, areaTexBytes, AREATEX_PITCH);
+	AreaTexture->UpdateSubResource(0, 0, NULL, areaTexBytes, AREATEX_PITCH);
 
 	SearchTexture = ZEGRTexture2D::CreateInstance(SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, 1, ZEGR_TF_R8_UNORM);
-	SearchTexture->UpdateSubResource(0, 0, searchTexBytes, SEARCHTEX_PITCH);
+	SearchTexture->UpdateSubResource(0, 0, NULL, searchTexBytes, SEARCHTEX_PITCH);
 
 	return true;
 }

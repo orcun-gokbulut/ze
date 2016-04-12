@@ -34,40 +34,69 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_RENDERER_H__
-#define __ZE_UI_RENDERER_H__
 
-#include "ZEUIRectangle.h"
+#include "ZEInitializable.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMeta/ZEObject.h"
-#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZEVertexDeclaration;
+#include "ZEUIRectangle.h"
 
-class ZEUIRenderer
+class ZEGRVertexBuffer;
+class ZEGRRenderStateData;
+class ZEGRSampler;
+class ZERNRenderer;
+class ZERNRenderParameters;
+class ZERNCullParameters;
+
+struct ZEUIVertex
 {
-	private:
-		ZESmartArray<ZERNCommand>	RenderCommands;
-		ZERNMaterial*						DefaultMaterial;
-		ZEVertexDeclaration*			VertexDeclaration;
-		ZEMatrix4x4						ScreenTransform;
-
-	protected:
-										ZEUIRenderer();
-										~ZEUIRenderer();
-
-	public:
-		void							Initialize();
-		void							Deinitialize();
-		
-		void							Destroy();
-
-		void							AddRectangle(const ZEUIRectangle& Rectangle);
-		void							Render(ZERNRenderer* Renderer);
-		void							Clean();
-
-		static ZEUIRenderer*			CreateInstance();
+	ZEVector2			Position;
+	ZEVector2			Texcoord;
+	ZEVector4			Color;
 };
 
-#endif
+class ZEUIRendererBatch
+{
+	public:
+		ZEUInt								Offset;
+		ZEUInt								Count;
+		ZEHolder<const ZEGRTexture2D>		Texture;
+		ZERNCommand*						CustomCommand;
+
+											ZEUIRendererBatch();
+};
+
+class ZEUIRenderer : public ZEInitializable
+{
+	private:
+		ZERNCommand							Command;
+		ZEArray<ZEUIRectangle>				Rectangles;
+		ZESmartArray<ZEUIRendererBatch>		Batches;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+		ZEHolder<ZEGRSampler>				Sampler;
+
+	protected:
+		void								UpdateBatches();
+
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
+
+											ZEUIRenderer();
+											~ZEUIRenderer();
+
+	public:
+		void								AddRectangle(ZEUIRectangle* Rectangle);
+		void								AddCustomCommand(ZEUInt ZOrder, ZERNCommand* Command);
+		void								Clean();
+
+		void								Setup(ZERNRenderer* Renderer);
+		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+
+		void								Destroy();
+
+		static ZEUIRenderer*				CreateInstance();
+};

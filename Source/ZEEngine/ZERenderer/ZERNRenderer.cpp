@@ -105,6 +105,23 @@ void ZERNRenderer::UpdateConstantBuffers()
 	RendererConstants.Time = ZECore::GetInstance()->GetRuningTime();
 	RendererConstants.Elapsedtime = ZECore::GetInstance()->GetElapsedTime();
 	RendererConstants.FrameId = (ZEUInt32)ZECore::GetInstance()->GetFrameId();
+	if (OutputRenderTarget != NULL)
+	{
+		RendererConstants.OutputSize = ZEVector2((float)OutputRenderTarget->GetWidth(), (float)OutputRenderTarget->GetHeight());
+		RendererConstants.InvOutputSize = ZEVector2::One / RendererConstants.OutputSize;
+	}
+	else
+	{
+		RendererConstants.OutputSize = ZEVector2::Zero;
+		RendererConstants.InvOutputSize = ZEVector2::Zero;
+	}
+
+	ZEMatrix3x3 ScreenTransform;
+	ZEMatrix3x3::Create(ScreenTransform,
+		2.0f / RendererConstants.OutputSize.x, 0.0f, -1.0f,
+		0.0f, -2.0f / RendererConstants.OutputSize.y, 1.0f,
+		0.0f, 0.0f, 1.0f);
+	RendererConstants.ScreenTransform = ScreenTransform.ToMatrix3x3Shader();
 	RendererConstantBuffer->SetData(&RendererConstants);
 
 	SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();

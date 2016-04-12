@@ -419,6 +419,28 @@ void ZEMatrix3x3::Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZE
 	Rotation = ZEAngle::ArcTan2(Matrix.M12, Matrix.M22);
 }
 
+
+ZEMatrix3x3Shader ZEMatrix3x3::ToMatrix3x3Shader()
+{
+	ZEMatrix3x3Shader Matrix;
+	Matrix.M11 = M11;
+	Matrix.M21 = M21;
+	Matrix.M31 = M31;
+	Matrix.Unused0 = 0.0f;
+
+	Matrix.M12 = M12;
+	Matrix.M22 = M22;
+	Matrix.M32 = M32;
+	Matrix.Unused1 = 0.0f;
+
+	Matrix.M13 = M13;
+	Matrix.M23 = M23;
+	Matrix.M33 = M33;
+	Matrix.Unused2 = 0.0f;
+
+	return Matrix;
+}
+
 ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const 
 {
 	ZEMatrix3x3 Temp;

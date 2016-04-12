@@ -34,129 +34,216 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRenderer.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGraphics/ZEVertexDeclaration.h"
-#include "ZERenderer/ZEFixedMaterial.h"
-#include "ZEGraphics/ZEVertexTypes.h"
-#include "ZERenderer/ZERNCommand.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
 
-ZEInt32 CompareCommandOrder(const ZERNCommand* Command1, const ZERNCommand* Command2)
+#include "ZEMath/ZEMath.h"
+
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRSampler.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZERenderer/ZERNStageID.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNStage2D.h"
+
+
+static ZEInt CompareRectangle(const ZEUIRectangle* A, const ZEUIRectangle* B)
 {
-	if(Command1->Order > Command2->Order)
+	if(A->ZOrder > B->ZOrder)
+	{
 		return 1;
-	else if(Command1->Order < Command2->Order)
+	}
+	else if(A->ZOrder < B->ZOrder)
+	{
 		return -1;
+	}
 	else
-		return 0;
+	{
+		if (A->Texture == B->Texture)
+			return 0;
+		else if (A->Texture.GetPointer() > B->Texture.GetPointer())
+			return 1;
+		else
+			return -1;
+	}
+}
+
+ZEUIRendererBatch::ZEUIRendererBatch()
+{
+	Offset = 0;
+	Count = 0;
+	Texture = NULL;
+	CustomCommand = NULL;
+}
+
+void ZEUIRenderer::UpdateBatches()
+{
+	Rectangles.Sort<CompareRectangle>();
+
+	ZESize VertexBufferSize = Rectangles.GetCount() * 6 * sizeof(ZEUIVertex);
+	if (VertexBuffer == NULL ||
+		VertexBuffer->GetSize() < VertexBufferSize)
+	{
+		VertexBuffer = ZEGRVertexBuffer::Create((ZEUInt)Rectangles.GetCount() * 6, sizeof(ZEUIVertex));
+	}
+
+	Batches.Clear();
+
+	ZEUIVertex* Vertices;
+	VertexBuffer->Lock((void**)&Vertices);
+	{
+		ZEUIRendererBatch* LastBatch = NULL;
+		ze_for_each(Rectangle, Rectangles)
+		{
+			if (Rectangle->Texture == NULL)
+				continue;
+
+			if (LastBatch == NULL || Rectangle->Texture != LastBatch->Texture)
+			{
+				// New Batch
+				ZEUIRendererBatch Batch;
+				if (LastBatch != NULL)
+					Batch.Offset = LastBatch->Offset + LastBatch->Count;
+				else
+					Batch.Offset = 0;
+
+				Batch.Count = 0;
+				Batch.Texture = Rectangle->Texture;
+				Batches.Add(Batch);
+				LastBatch = &Batches.GetLastItem();
+			}
+		
+			Rectangle->ConvertToVertices(Vertices);
+			Vertices += 6;
+			LastBatch->Count += 6;
+		}
+	}
+	VertexBuffer->Unlock();
+}
+
+bool ZEUIRenderer::InitializeSelf()
+{
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
+	ZEGRRenderState RenderState = ZERNStage2D::GetRenderState();
+
+	// Layout
+	ZEGRVertexElement ElementArray[] = 
+	{
+		{ZEGR_VES_POSITION,	0, ZEGR_VET_FLOAT2, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+		{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 8,  ZEGR_VU_PER_VERTEX, 0},
+		{ZEGR_VES_TEXCOORD,	1, ZEGR_VET_FLOAT4, 0, 16, ZEGR_VU_PER_VERTEX, 0},
+	};
+
+
+	ZEGRVertexLayout VertexLayout;
+	VertexLayout.SetElements(ElementArray, 3);
+	RenderState.SetVertexLayout(VertexLayout);
+
+	// Shaders
+	ZEGRShaderCompileOptions Options;
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZEUIRenderer.hlsl";
+	Options.Model = ZEGR_SM_5_0;
+	Options.Type = ZEGR_ST_VERTEX;
+	Options.EntryPoint = "ZEUIRenderer_VertexShader";
+	RenderState.SetShader(ZEGR_ST_VERTEX, ZEGRShader::Compile(Options));
+	zeCheckError(RenderState.GetShader(ZEGR_ST_VERTEX) == NULL, false, "Cannot compile vertex shader.");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZEUIRenderer_PixelShader";
+	RenderState.SetShader(ZEGR_ST_PIXEL, ZEGRShader::Compile(Options));
+	zeCheckError(RenderState.GetShader(ZEGR_ST_PIXEL) == NULL, false, "Cannot compile pixel shader.");
+
+	RenderStateData = RenderState.Compile();
+	zeCheckError(RenderState.Compile() == NULL, false, "Cannot compile render state.");
+
+	// Sampler
+	ZEGRSamplerDescription SamplerDescription;
+	SamplerDescription.MinFilter = ZEGR_TFM_LINEAR;
+	SamplerDescription.MagFilter = ZEGR_TFM_LINEAR;
+	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
+	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
+	SamplerDescription.BorderColor = ZEVector4::Zero;
+
+	Sampler = ZEGRSampler::GetSampler(SamplerDescription);
+
+	return true;
+}
+
+void ZEUIRenderer::DeinitializeSelf()
+{
+	VertexBuffer.Release();
+	RenderStateData.Release();
+	Sampler.Release();
 }
 
 ZEUIRenderer::ZEUIRenderer()
 {
-	VertexDeclaration = NULL;
-	DefaultMaterial = NULL;
+
 }
 
 ZEUIRenderer::~ZEUIRenderer()
 {
-	Deinitialize();
+
 }
 
-void ZEUIRenderer::Initialize()
+void ZEUIRenderer::AddRectangle(ZEUIRectangle* Rectangle)
 {
-	if (VertexDeclaration == NULL)
-		VertexDeclaration = ZEUIVertex::GetVertexDeclaration();
-
-// 	if (DefaultMaterial == NULL)
-// 	{
-// 		DefaultMaterial = ZEFixedMaterial::CreateInstance();
-// 		((ZEFixedMaterial*)DefaultMaterial)->SetLightningEnabled(false);
-// 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientEnabled(true);
-// 		((ZEFixedMaterial*)DefaultMaterial)->SetAmbientColor(ZEVector3(1.0f, 1.0f, 0.0f));
-// 		((ZEFixedMaterial*)DefaultMaterial)->UpdateMaterial();
-// 	}
-
-	ZEMatrix4x4::CreateViewPortTransform(ScreenTransform, 0.0f, (float)ZEGRGraphicsModule::GetInstance()->GetScreenWidth(), 0.0f, (float)ZEGRGraphicsModule::GetInstance()->GetScreenHeight(), 0.0f, 1.0f);
-	
+	Rectangles.Add(*Rectangle);
 }
 
-void ZEUIRenderer::Deinitialize()
+void ZEUIRenderer::AddCustomCommand(ZEUInt ZOrder, ZERNCommand* Command)
 {
-	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
-		if (RenderCommands[I].VertexBuffer != NULL)
-			delete RenderCommands[I].VertexBuffer;
 
-	if (VertexDeclaration != NULL)
+}
+
+void ZEUIRenderer::Clean()
+{
+	Rectangles.Clear();
+}
+
+void ZEUIRenderer::Setup(ZERNRenderer* Renderer)
+{
+	Command.Priority = ZE_INT_MAX;
+	Command.Order = ZE_FLOAT_MAX;
+	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEUIRenderer, Render, this);
+	Command.StageMask = ZERN_STAGE_2D;
+
+	UpdateBatches();
+
+	Renderer->AddCommand(&Command);
+}
+
+void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
+{
+	ZEGRContext* Context = RenderParameters->Context;
+	Context->SetRenderState(RenderStateData);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+
+	ze_for_each(Batch, Batches)
 	{
-		VertexDeclaration->Release();
-		VertexDeclaration = NULL;
+		if (Batch->Texture != NULL)
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, Batch->Texture.Cast<const ZEGRTexture>());
+		else
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+
+		Context->Draw(Batch->Count, Batch->Offset);
 	}
 
-	if (DefaultMaterial != NULL)
-	{
-		DefaultMaterial->Release();
-		DefaultMaterial = NULL;
-	}
-
+	Context->SetVertexBuffers(0, 0, NULL);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, 0);
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 void ZEUIRenderer::Destroy()
 {
 	delete this;
-}
-
-void ZEUIRenderer::AddRectangle(const ZEUIRectangle& Rectangle)
-{
-	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
-		if (RenderCommands[I].Material == Rectangle.Material || (Rectangle.Material == NULL && RenderCommands[I].Material == DefaultMaterial))
-		{
-			RenderCommands[I].PrimitiveCount += 2;
-			ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->MassAdd(6);
-			Rectangle.ConvertToVertices(Buffer);
-			RenderCommands[I].Priority = (float)Rectangle.ZOrder;
-			RenderCommands[I].Order = Rectangle.ZOrder;
-			return;
-		}
-
-	ZERNCommand* NewRenderCommand = RenderCommands.Add();
-	NewRenderCommand->WorldMatrix = ScreenTransform;
-	NewRenderCommand->Material = Rectangle.Material;
-	NewRenderCommand->Pipeline = ZE_RORP_2D;
-	NewRenderCommand->VertexBuffer = new ZEArrayVertexBuffer<ZEUIVertex>();
-	NewRenderCommand->Flags = ZE_ROF_ENABLE_Z_CULLING | ZE_ROF_ENABLE_WORLD_TRANSFORM;
-	NewRenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
-	NewRenderCommand->VertexDeclaration = VertexDeclaration;
-	NewRenderCommand->VertexBufferOffset = 0;
-	NewRenderCommand->IndexBuffer = NULL;
-	NewRenderCommand->PrimitiveCount = 2;
-	NewRenderCommand->Order = (float)Rectangle.ZOrder;
-	NewRenderCommand->Priority = (float)Rectangle.ZOrder;
-	ZEUIVertex* Buffer = ((ZEArrayVertexBuffer<ZEUIVertex>*)NewRenderCommand->VertexBuffer)->MassAdd(6);
-	Rectangle.ConvertToVertices(Buffer);
-}
-
-void ZEUIRenderer::Render(ZERNRenderer* Renderer)
-{
-	RenderCommands.Sort(&CompareCommandOrder);
-	
-	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
-	{
-		RenderCommands[I].Priority = (ZEInt32)RenderCommands[I].Order;
-
-		if (RenderCommands[I].Material == NULL)
-			RenderCommands[I].Material = DefaultMaterial;
-		Renderer->AddCommand(&RenderCommands[I]);
-	}
-}
-
-void ZEUIRenderer::Clean()
-{
-	for (ZESize I = 0; I < RenderCommands.GetCount(); I++)
-		if (RenderCommands[I].VertexBuffer != NULL)
-		{
-			((ZEArrayVertexBuffer<ZEUIVertex>*)RenderCommands[I].VertexBuffer)->Clear();
-			RenderCommands[I].PrimitiveCount = 0;
-		}
 }
 
 ZEUIRenderer* ZEUIRenderer::CreateInstance()

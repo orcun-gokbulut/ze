@@ -69,6 +69,9 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 			float						Time;
 			ZEUInt32					FrameId;
 			ZEUInt32					Reserved0;
+			ZEVector2					OutputSize;
+			ZEVector2					InvOutputSize;
+			ZEMatrix3x3Shader			ScreenTransform;
 		} RendererConstants;
 
 		struct SceneConstants

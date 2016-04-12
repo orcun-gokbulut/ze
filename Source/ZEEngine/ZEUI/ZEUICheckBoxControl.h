@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIInteriorStatisticsControl.h
+ Zinek Engine - ZEUICheckBoxControl.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,36 +34,48 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_INTERIOR_STATISTICS_CONTROL_H__
-#define __ZE_UI_INTERIOR_STATISTICS_CONTROL_H__
 
-#include "ZEUI/ZEUIControl.h"
-#include "ZEUI/ZEUILabel.h"
+#include "ZEUIControl.h"
 
-
-class ZEUIInteriorStatisticsControl : public ZEUIControl
+enum ZEUICheckBoxState
 {
-private:
-
-	ZEUILabel*				TotalRoomCount;
-	ZEUILabel*				CulledRoomCount;
-	ZEUILabel*				DrawedRoomCount;
-
-	ZEUILabel*				TotalPolygonCount;
-	ZEUILabel*				CulledPolygonCount;
-	ZEUILabel*				DrawedPolygonCount;
-
-public:
-
-	void					SetMaterial(ZEMaterial* Material);
-	ZEMaterial*				GetMaterial() const;
-
-	void					Draw(ZEUIRenderer* Renderer);
-	void					Tick(float ElapsedTime);
-
-							ZEUIInteriorStatisticsControl();
-
-
+	ZE_UI_CBS_UNCHECKED		= 0,
+	ZE_UI_CBS_CHECKED		= 1
 };
 
-#endif
+ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
+ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
+ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
+
+class ZEUICheckBoxControl : public ZEUIControl
+{
+	ZE_OBJECT
+	friend class ZEUIManager;
+	private:
+		ZEUICheckBoxState	State;
+		ZEUILabel*			Label;
+		ZEUIRectangle		Box;
+
+	protected:
+
+		virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+
+	public:
+
+		virtual void		Draw(ZEUIRenderer* Renderer);
+
+		void				SetState(ZEUICheckBoxState State);
+		ZEUICheckBoxState	GetState() const;	
+
+		void				SetText(ZEString Text);
+		ZEString			GetText();
+
+		virtual void		SetWidth(float Width);
+		virtual void		SetHeight(float Height);
+
+		virtual void		SetPosition(const ZEVector2& Position);
+
+							ZEUICheckBoxControl();
+							~ZEUICheckBoxControl();
+
+};

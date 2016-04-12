@@ -52,10 +52,10 @@ cbuffer ZERNView_Constants : register(ZERN_SHADER_CONSTANT_VIEW)
 	float4x4				ZERNView_InvViewProjectionTransform;
 
 	float3					ZERNView_Position;
-	float					ZERNView_Width;
+	float					ZERNView_Reserved0;
 	float4					ZERNView_RotationQuaternion;
 	float3					ZERNView_RotationEuler;
-	float					ZERNView_Height;
+	float					ZERNView_Reserved1;
 	
 	float3					ZERNView_RightVector;
 	float					ZERNView_VerticalFOV;

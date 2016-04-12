@@ -38,7 +38,7 @@
 #define __ZE_UI_LABEL__
 
 #include "ZEUIFrameControl.h"
-#include "ZEFontResource.h"
+#include "ZEUIFont.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
 
@@ -52,7 +52,7 @@ enum ZEUITextAlignment
 struct ZEUITextCharacter
 {
 	char				CChar;
-	ZEFontCharacter		FontCharacter;
+	ZEUIFontCharacter		FontCharacter;
 	ZEUIRectangle		RenderableCharacter;
 	ZEInt32				Line;
 	bool				IsSelected;
@@ -67,8 +67,7 @@ class ZEUILabel : public ZEUIFrameControl
 		ZEArray<ZEUITextCharacter>			Characters;
 		ZEArray<ZEInt32>					LineTextWidths;
 
-		ZEFontResource*						FontResource;
-		ZERNMaterial*							FontMaterial;
+		ZEUIFont*						FontResource;
 		ZEVector4							FontColor;
 
 		ZERectangle							TextRenderingArea;
@@ -86,8 +85,8 @@ class ZEUILabel : public ZEUIFrameControl
 	public:
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
-		void								SetFontResource(ZEFontResource* Resource);
-		ZEFontResource*						GetFontResource();
+		void								SetFontResource(ZEUIFont* Resource);
+		ZEUIFont*						GetFontResource();
 
 		void								SetFontColor(const ZEVector4& Color);
 		const ZEVector4&					GetFontColor() const;

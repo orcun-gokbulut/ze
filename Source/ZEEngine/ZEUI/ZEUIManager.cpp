@@ -37,10 +37,8 @@
 #include "ZEUIRenderer.h"
 #include "ZEUIControl.h"
 #include "ZEError.h"
-#include "ZERenderer/ZEFixedMaterial.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEFontResourceBitmap.h"
-#include "ZEFontResourceDynamic.h"
+#include "ZEUIFontTrueType.h"
 
 ZEVector4 ZEUIManager::DefaultBackgroundColor = ZEVector4(0.2f, 0.2f, 0.2f, 1.0f);
 ZEVector4 ZEUIManager::DefaultForegroundColor = ZEVector4(0.0f, 0.8f, 0.0f, 1.0f);
@@ -56,9 +54,9 @@ const ZEVector4& ZEUIManager::GetDefaultForegroundColor()
 	return DefaultForegroundColor;
 }
 
-ZEFontResource* ZEUIManager::GetDefaultFontResource()
+ZEUIFont* ZEUIManager::GetDefaultFontResource()
 {
-	return ZEFontResourceDynamic::LoadSharedResource("#R:/ZEEngine/ZEGUI/Fonts/arialbd.ttf", 12);
+	return ZEUIFontTrueType::LoadSharedResource("#R:/ZEEngine/ZEGUI/Fonts/arialbd.ttf", 12);
 }
 
 ZEUIManager::ZEUIManager() 
@@ -225,7 +223,7 @@ ZEArray<ZEUIControl*>& ZEUIManager::GetControls()
 	return Controls;
 }
 
-#include "ZEFontResource.h"
+#include "ZEUIFont.h"
 #include "ZEUICursorControl.h"
 #include "ZEUIButtonControl.h"
 
@@ -591,7 +589,7 @@ void ZEUIManager::Render(ZERNRenderer* Renderer)
 		if (Controls[I]->GetVisiblity())
 			Controls[I]->Draw(UIRenderer);
 
-	UIRenderer->Render(Renderer);
+	UIRenderer->Setup(Renderer);
 }
 
 void ZEUIManager::Tick(float ElapsedTime)

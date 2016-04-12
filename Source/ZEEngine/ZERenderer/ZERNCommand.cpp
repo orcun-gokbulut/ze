@@ -38,10 +38,10 @@
 
 void ZERNCommand::Execute(const ZERNRenderParameters* Parameters)
 {
-	if (Entity == NULL)
-		return;
-
-	Entity->Render(Parameters, this);
+	if (Entity != NULL)
+		Entity->Render(Parameters, this);
+	else if (!Callback.IsNull())
+		Callback(Parameters, this);
 }
 
 ZERNCommand::ZERNCommand()

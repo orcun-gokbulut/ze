@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEIUCheckBoxControl.h
+ Zinek Engine - ZEUIRenderer.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,57 +33,56 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef __ZE_UI_CHECK_BOX_CONTROL__
-#define __ZE_UI_CHECK_BOX_CONTROL__
+#ifndef __ZEUI_RENDERER_H__
+#define __ZEUI_RENDERER_H__
 
-#include "ZEUIControl.h"
+#include "ZERNRenderer.hlsl"
 
-enum ZEUICheckBoxState
+Texture2D<float4>	ZEUIRenderer_Texture	: register(t0);
+SamplerState		ZEUIRenderer_Sampler 	: register(s0);
+
+struct ZEUIRenderer_VSInput 
 {
-	ZE_UI_CBS_UNCHECKED		= 0,
-	ZE_UI_CBS_CHECKED		= 1
+	float2 Position             : POSITION0;
+	float2 Texcoord             : TEXCOORD0;
+	float4 Color                : TEXCOORD1;
 };
 
-ZE_META_FORWARD_DECLARE(ZEUILabel, "ZEUILabel.h")
-ZE_META_FORWARD_DECLARE(ZEUIRectangle, "ZEUIRectangle.h")
-ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
-
-class ZEUICheckBoxControl : public ZEUIControl
+struct ZEUIRenderer_VSOutput 
 {
-	friend class ZEUIManager;
-
-	ZE_OBJECT
-
-	private:
-
-		ZEUICheckBoxState	State;
-		ZEUILabel*			Label;
-		ZEUIRectangle		Box;
-		ZEUIMaterial*		BoxMaterial;
-
-	protected:
-
-		virtual void 		MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-
-	public:
-
-		virtual void		Draw(ZEUIRenderer* Renderer);
-
-		void				SetState(ZEUICheckBoxState State);
-		ZEUICheckBoxState	GetState() const;	
-
-		void				SetText(ZEString Text);
-		ZEString			GetText();
-
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-
-		virtual void		SetPosition(const ZEVector2& Position);
-
-							ZEUICheckBoxControl();
-							~ZEUICheckBoxControl();
-
+	float4 Position             : SV_Position;
+	float2 Texcoord             : TEXCOORD0;
+	float4 Color				: TEXCOORD1;
 };
+
+struct ZEUIRenderer_PSInput
+{
+	float4 Position				: SV_Position;
+	float2 Texcoord             : TEXCOORD0;
+	float4 Color			    : TEXCOORD1;
+};
+
+ZEUIRenderer_VSOutput ZEUIRenderer_VertexShader(ZEUIRenderer_VSInput Input)
+{
+	ZEUIRenderer_VSOutput Output;
+
+	Output.Position = float4(mul((float3x3)ZERNRenderer_ScreenTransform, float3(Input.Position, 1.0f)).xy, 0.0f, 1.0f);
+	Output.Texcoord = Input.Texcoord;
+	Output.Color = Input.Color;
+	
+	return Output;
+}
+
+float4 ZEUIRenderer_PixelShader(ZEUIRenderer_PSInput Input) : SV_Target0
+{
+	uint Width;
+	uint Height;
+	ZEUIRenderer_Texture.GetDimensions(Width, Height);
+
+	if (Width != 0)
+		Input.Color *= ZEUIRenderer_Texture.Sample(ZEUIRenderer_Sampler, Input.Texcoord);
+
+	return Input.Color;
+}
 
 #endif

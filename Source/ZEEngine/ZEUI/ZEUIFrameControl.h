@@ -37,34 +37,22 @@
 
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
-//#include "ZERenderer/ZEUIMaterial.h"
+
 
 class ZEUIFrameControl : public ZEUIControl
 {
-	friend class ZEUIBorderedFrameControl;
-	friend class ZEUIVerticalScrollbar;
-	friend class ZEUIHorizontalScrollbar;
-	friend class ZEUIScrollArea;
-
 	ZE_OBJECT
-
-	protected:
-
-		ZEUIRectangle			Frame;
-		//ZEUIMaterial*			FrameMaterial;
+	public:
+		ZEUIRectangle				Frame;
 
 	public:
+		virtual	void				SetSize(const ZEVector2& Size);
+		virtual void				SetWidth(float Width);
+		virtual void				SetHeight(float Height);
 
-		virtual void			Draw(ZEUIRenderer* Renderer);
+		virtual void				SetPosition(const ZEVector2& Position);
 
-		virtual	void			SetSize(const ZEVector2& Size);
-		virtual void			SetWidth(float Width);
-		virtual void			SetHeight(float Height);
+		virtual void				Draw(ZEUIRenderer* Renderer);
 
-		virtual ZERNMaterial*	GetMaterial() const;
-		virtual void			SetMaterial(ZERNMaterial* Material);
-
-		virtual void			SetPosition(const ZEVector2& Position);
-
-								ZEUIFrameControl();
+									ZEUIFrameControl();
 };

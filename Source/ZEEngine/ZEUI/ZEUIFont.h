@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEUIDebugDrawTag.h
+ Zinek Engine - ZEUIFont.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,44 +34,55 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_DEBUG_DRAW_TAG_H__
-#define __ZE_UI_DEBUG_DRAW_TAG_H__
 
+#include "ZECore/ZEResource.h"
 
-#include "ZEUI/ZEUILabel.h"
-#include "ZEUI/ZEUIFrameControl.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZERectangle.h"
+#include "ZEPointer/ZEHolder.h"
 
-class ZEUIDebugDrawTag : public ZEUIFrameControl
+class ZEGRTexture2D;
+
+enum ZEUIFontType
 {
-private:
-
-	ZEUIFrameControl*			Icon;
-	ZEUILabel*					Name;
-	ZEUILabel*					Type;
-
-	ZEVector4					FontColor;
-
-								ZEUIDebugDrawTag();
-
-public:
-
-	void						SetFontColor(ZEVector4 Color);
-	ZEVector4					GetFontColor() const;
-
-	void						SetNameField(const ZEString& Name);
-	void						SetTypeField(const ZEString& Type);
-	void						SetIcon(const ZEString& IconPath);
-
-	void						SetPosition(const ZEVector2& Position);
-
-	void						Draw(ZEUIRenderer* Renderer);
-	void						Tick(float ElapsedTime);
-
-	void						Destroy();
-
-	static ZEUIDebugDrawTag*	CreateInstance();
-
-
+	ZEUI_FT_NONE,
+	ZEUI_FT_BITMAP,
+	ZEUI_FT_TRUE_TYPE
 };
 
-#endif
+struct ZEUIFontCharacterMetric
+{
+	ZEUInt32							FontSize;
+	ZEUInt32							MaximumHeight;
+
+	ZEInt32								Height;
+	ZEInt32								Width;
+
+	ZEInt32								HorizontalAdvance;
+	ZEInt32								VerticalAdvance;
+
+	ZEInt32								HorizontalBearingX;
+	ZEInt32								HorizontalBearingY;
+
+	ZEInt32								VerticalBearingX;
+	ZEInt32								VerticalBearingY;
+};
+
+struct ZEUIFontCharacter
+{
+	ZEHolder<const ZEGRTexture2D>		Texture;
+	ZEUInt32							GlyphIndex;
+	char								Character;
+	ZEUIFontCharacterMetric				CharacterMetric;
+	ZERectangle							CoordinateRectangle;
+};
+
+class ZEUIFont : public ZEResource
+{
+	ZE_OBJECT
+	public:
+		virtual ZEUIFontType					GetFontResourceType() const = 0;
+		virtual const ZEUIFontCharacter&		GetCharacter(char Character) = 0;
+		virtual const ZEUIFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance) = 0;
+};
