@@ -50,7 +50,6 @@ macro(ze_version_get)
 	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*")
 		set(VERSION_INTERNAL ${CMAKE_MATCH_1})
 	endif()
-
 endmacro()
 
 macro(ze_version_get_branch)
@@ -101,8 +100,6 @@ macro(ze_version_init)
 	
 	message(STATUS "")
 	message(STATUS "")
-	
-
 endmacro()
 
 macro(ze_version_generate_version_txt)
@@ -126,7 +123,6 @@ macro(ze_version_generate_zeversiondata_h)
 		"#define ZE_VERSION_REVISION ${ZEBUILD_VERSION_REVISION}\n"
 		"#define ZE_VERSION_BRANCH \"${ZEBUILD_VERSION_BRANCH}\"")
 endmacro()
-
 
 macro(ze_version_generate_zeversion_rc PARAMETER_TARGET PARAMETER_EXTENSION PARAMETER_DESCRIPTION PARAMETER_SOURCES)
 	if(ZEBUILD_PLATFORM_WINDOWS)

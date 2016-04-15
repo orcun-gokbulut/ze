@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZE3dsMaxUtils/ZE3dsMaxUtils.h"
+#include "ZE3dsMaxUtils.h"
 
 extern HINSTANCE hInstance;
 
