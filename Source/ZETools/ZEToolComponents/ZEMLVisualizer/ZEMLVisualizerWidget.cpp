@@ -34,31 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMLVisualizerWidget.h"
-#include "QtGui/QWidget"
+
 #include "ui_ZEMLVisualizerWidget.h"
+#include "ZEMLVisualizerTreeWidget.h"
+
 #include "ZETypes.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLElement.h"
 #include "ZEML/ZEMLNode.h"
 #include "ZEML/ZEMLRoot.h"
 #include "ZEML/ZEMLProperty.h"
 #include "ZEML/ZEMLData.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMLVisualizerTreeWidget.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEDS/ZEFormat.h"
 
-ZEMLVisualizerQt::ZEMLVisualizerQt(QWidget* Parent)
+#include <QWidget>
+
+ZEMLVisualizerWidget::ZEMLVisualizerWidget(QWidget* Parent)
 {
-	QApplicationCreated = false;
-	Application = NULL;
-
-	if(QApplication::instance() == NULL)
-	{
-		ZEInt32	Argc = 0;
-		void*	Argv = NULL;
-		Application = new QApplication(Argc, NULL);
-		QApplicationCreated = true;
-	}
+	Node = NULL;
 
 	Widget = new QWidget(Parent);
 	Form = new Ui::ZEMLVisualizerWidgetUI();
@@ -68,63 +62,14 @@ ZEMLVisualizerQt::ZEMLVisualizerQt(QWidget* Parent)
 	Widget->layout()->addWidget(Tree);
 }
 
-ZEMLVisualizerQt::~ZEMLVisualizerQt()
-{
-	Widget->hide();
-	delete Widget;
-	Widget = NULL;
-
-	delete Form;
-	Form = NULL;
-
-	if(QApplicationCreated)
-	{
-		Application->quit();
-		delete Application;
-		Application = NULL;
-	}
-}
-
-ZEMLVisualizerWidget::ZEMLVisualizerWidget(QWidget* Parent)
-{
-	Node = NULL;
-	QtComponents = new ZEMLVisualizerQt(Parent);
-}
-
 ZEMLVisualizerWidget::~ZEMLVisualizerWidget()
 {
-	if (QtComponents != NULL)
-	{
-		delete QtComponents;
-		QtComponents = NULL;
-	}
 
-	if (Node != NULL)
-	{
-		delete Node;
-		Node = NULL;
-	}
-
-	if (Root != NULL)
-	{
-		delete Root;
-		Root = NULL;
-	}
-}
-
-void ZEMLVisualizerWidget::Show()
-{
-	QtComponents->Widget->show();
-}
-
-void ZEMLVisualizerWidget::Hide()
-{
-	QtComponents->Widget->hide();
 }
 
 void ZEMLVisualizerWidget::SetZEMLNode(ZEMLNode* Node)
 {
-	if(this->Node != NULL)
+	if (this->Node != NULL)
 	{
 		delete this->Node;
 		this->Node = NULL;
@@ -138,7 +83,7 @@ void ZEMLVisualizerWidget::SetZEMLFile(const ZEString& FileName)
 {
 	ZEFile File;
 
-	if(!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
+	if (!File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE))
 		zeError("Can not open given file. File name : %s", FileName.ToCString());
 
 	Root = new ZEMLRoot();
@@ -152,7 +97,7 @@ void ZEMLVisualizerWidget::SetZEMLFile(const ZEString& FileName)
 
 void ZEMLVisualizerWidget::Refresh()
 {
-	QtComponents->Tree->clear();
+	Tree->clear();
 	AddItem(Node);
 }
 
@@ -161,7 +106,7 @@ void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentIte
 	QTreeWidgetItem* NewItem = new QTreeWidgetItem();
 	NewItem->setTextAlignment(1, Qt::AlignmentFlag::AlignCenter);
 
-	if(Item->GetType() == ZEML_ET_NODE)
+	if (Item->GetType() == ZEML_ET_NODE)
 	{
 		//NewItem->setText(0, (ZEString(Item->GetFilePosition()) + " - " +Item->GetName()).ToCString());
 		NewItem->setText(1, "node");
@@ -298,8 +243,8 @@ void ZEMLVisualizerWidget::AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentIte
 		NewItem->setText(2, ZEFormat::Format("Code: 0x{0:x:2} ", Item->GetType()).ToCString());
 	}
 
-	if(ParentItem == NULL)
-		QtComponents->Tree->addTopLevelItem(NewItem);
+	if (ParentItem == NULL)
+		Tree->addTopLevelItem(NewItem);
 	else
 		ParentItem->addChild(NewItem);
 

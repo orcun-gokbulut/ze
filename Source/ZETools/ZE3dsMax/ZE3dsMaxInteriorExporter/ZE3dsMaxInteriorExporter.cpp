@@ -36,19 +36,20 @@
 #include "ZE3dsMaxInteriorExporter.h"
 //#include "data_mappings.h"
 
-#include <tchar.h>
-#include "QWinWidget/qwinwidget.h"
-#include "QtGui/QApplication"
-#include "ZE3dsMaxInteriorExporterOptionsDialog.h"
-#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
-#include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
+
+#include "ZE3dsMaxInteriorExporterOptionsDialog.h"
+#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
+#include "ZEToolComponents/ZEResourceConfigurator/ZEResourceConfiguratorWidget.h"
+
+#include <tchar.h>
+#include <QApplication>
+#include <QWindow>
 
 ZE3dsMaxInteriorExporter::ZE3dsMaxInteriorExporter()
 {
 	Scene = NULL;
-	QtApplication = NULL;
 	ExportOptions = NULL;
 	WinWidget = NULL;
 	OptionsDialog = NULL;
@@ -58,37 +59,30 @@ ZE3dsMaxInteriorExporter::ZE3dsMaxInteriorExporter()
 
 ZE3dsMaxInteriorExporter::~ZE3dsMaxInteriorExporter() 
 {
-	if(ExportOptions != NULL)
+	if (ExportOptions != NULL)
 	{
 		delete ExportOptions;
 		ExportOptions = NULL;
 	}
 
-	if(ProgressDialog != NULL)
+	if (ProgressDialog != NULL)
 	{
 		delete ProgressDialog;
 		ProgressDialog = NULL;
 	}
  
-	if(OptionsDialog != NULL)
+	if (OptionsDialog != NULL)
 	{
 		OptionsDialog->hide();
 		delete OptionsDialog;
 		OptionsDialog = NULL;
 	}
 
-	if(WinWidget != NULL)
+	if (WinWidget != NULL)
 	{
 		WinWidget->hide();
 		delete WinWidget;
 		WinWidget = NULL;
-	}
- 
-	if(QtApplication != NULL)
-	{
-		QtApplication->quit();
-		delete QtApplication;
-		QtApplication = NULL;
 	}
 }
 
@@ -169,14 +163,14 @@ void ZE3dsMaxInteriorExporter::LoadOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
-	if(strlen(FilePath) != 0)
+	if (strlen(FilePath) != 0)
 	{
 		ZEFile OptionsFile;
 
-		if(ExportOptions == NULL)
+		if (ExportOptions == NULL)
 			ExportOptions = new ZEMLNode("Options");
 
-		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ, ZE_FCM_NONE))
+		if (OptionsFile.Open(OptionsFilePath, ZE_FOM_READ, ZE_FCM_NONE))
 		{
 			InteriorRoot.SetRootNode(ExportOptions);
 			InteriorRoot.Read(&OptionsFile);
@@ -191,10 +185,10 @@ void ZE3dsMaxInteriorExporter::SaveOptions(const char* FilePath)
 {
 	ZEString OptionsFilePath((ZEString(FilePath)) + ".zecfg");
 
-	if(ExportOptions != NULL)
+	if (ExportOptions != NULL)
 	{
 		ZEFile OptionsFile;
-		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
+		if (OptionsFile.Open(OptionsFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
 			InteriorRoot.SetRootNode(OptionsDialog->GetOptions());
 			InteriorRoot.Write(&OptionsFile);
@@ -211,25 +205,18 @@ void ZE3dsMaxInteriorExporter::SaveOptions(const char* FilePath)
 
 bool ZE3dsMaxInteriorExporter::ShowOptionsDialog(HWND ParentWindow)
 {
-	int Argc = 0;
-	if(QApplication::instance() == NULL)
-		QtApplication = new QApplication(Argc, NULL);
-	else
-		QtApplication = (QApplication*)QApplication::instance();
+	if (WinWidget == NULL)
+		WinWidget = QWindow::fromWinId((WId)ParentWindow);
 
-	if(WinWidget == NULL)
-		WinWidget = new QWinWidget(ParentWindow);
+	if (OptionsDialog == NULL)
+		OptionsDialog = new ZE3dsMaxInteriorExporterOptionsDialog(NULL);
 
-	if(OptionsDialog == NULL)
-		OptionsDialog = new ZE3dsMaxInteriorExporterOptionsDialog(WinWidget);
-
-	if(ExportOptions != NULL)
+	if (ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
 
-	WinWidget->showCentered();
 	ZEInt32 DialogResult = OptionsDialog->exec();
 
-	if(DialogResult == QDialog::Rejected)
+	if (DialogResult == QDialog::Rejected)
 		return false;
 
 	return true;
@@ -237,26 +224,19 @@ bool ZE3dsMaxInteriorExporter::ShowOptionsDialog(HWND ParentWindow)
 
 bool ZE3dsMaxInteriorExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath, ZEString ExportPath)
 {
-	int Argc = 0;
-	if(QApplication::instance() == NULL)
-		QtApplication = new QApplication(Argc, NULL);
-	else
-		QtApplication = (QApplication*)QApplication::instance();
+	if (WinWidget == NULL)
+		WinWidget = QWindow::fromWinId((WId)ParentWindow);
 
-	if(WinWidget == NULL)
-		WinWidget = new QWinWidget(ParentWindow);
-
-	if(ResourceConfigurationDialog == NULL)
-		ResourceConfigurationDialog = new ZEResourceConfigurationWidget(WinWidget);
+	if (ResourceConfigurationDialog == NULL)
+		ResourceConfigurationDialog = new ZEResourceConfiguratorWidget(NULL);
 
 	ResourceConfigurationDialog->SetDefaultExportPath(ExportPath);
 	ResourceConfigurationDialog->LoadPreset(ZEString(MaxFilePath) + ".ZEPRESET");
 	CollectResources();
 
-	WinWidget->showCentered();
-	ZEInt32 DialogResult = ResourceConfigurationDialog->Show();
-
-	if(DialogResult == QDialog::Rejected)
+	//WinWidget->showCentered();
+	ZEInt32 DialogResult = ResourceConfigurationDialog->exec();
+	if (DialogResult == QDialog::Rejected)
 		return false;
 
 	ResourceConfigurationDialog->SavePreset(ZEString(MaxFilePath) + ".ZEPRESET");
@@ -275,10 +255,10 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	Scene = GetIGameInterface();	
 	Scene->InitialiseIGame(lNodes);
 
-	if(!ShowOptionsDialog(i->GetMAXHWnd()))
+	if (!ShowOptionsDialog(i->GetMAXHWnd()))
 		return true;
 
-	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath().ToCStr(), ExportPath))
+	if (!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath().ToCStr(), ExportPath))
 		return true;
 
 	SaveOptions(i->GetCurFilePath().ToCStr());
@@ -290,7 +270,7 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	InteriorNode.AddProperty("MajorVersion")->SetUInt8(MajorVersion);
 	InteriorNode.AddProperty("MinorVersion")->SetUInt8(MinorVersion);
 
-	if(ProgressDialog == NULL)
+	if (ProgressDialog == NULL)
 		ProgressDialog = ZEProgressDialog::CreateInstance();
 
 	ProgressDialog->SetTitle("Interior Export Progress");
@@ -349,7 +329,7 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	ProgressDialog->OpenTask("Writing File");
 	zeLog("Writing ZEInterior to file...");
 	ZEFile ExportFile;
-	if(ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
+	if (ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 	{
 		InteriorRoot.Write(&ExportFile);
 		ExportFile.Close();

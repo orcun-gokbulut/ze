@@ -34,9 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxInteriorExporterOptionsDialog.h"
-#include "QtGui\QFileDialog"
+
 #include "ZEML\ZEMLProperty.h"
-#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
+#include "ZEToolComponents\ZEResourceConfigurator\ZEResourceConfiguratorWidget.h"
+
+#include <QFileDialog>
 
 ZE3dsMaxInteriorExporterOptionsDialog::ZE3dsMaxInteriorExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
@@ -58,22 +60,22 @@ ZE3dsMaxInteriorExporterOptionsDialog::~ZE3dsMaxInteriorExporterOptionsDialog()
 
 void ZE3dsMaxInteriorExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
-	if(Options == NULL)
+	if (Options == NULL)
 		return;
 
 	this->Options = Options;
 
 	const ZEMLElement* CurrentProperty = NULL;
 	CurrentProperty = Options->GetProperty("ZinekEngineWorkingDirectory");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->txtEngineWorkingDirectory->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
 	CurrentProperty = Options->GetProperty("LogFilePath");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->txtLogFilePath->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
 	CurrentProperty = Options->GetProperty("IsFileLoggingEnabled");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 }
 
@@ -94,7 +96,7 @@ void ZE3dsMaxInteriorExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
-	if(SelectedDirectory.length() == 0)
+	if (SelectedDirectory.length() == 0)
 		return;
 
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
@@ -104,7 +106,7 @@ void ZE3dsMaxInteriorExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
 	QString SaveFilePath = QFileDialog::getSaveFileName(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text(), QString("*.txt"));
 
-	if(SaveFilePath.length() == 0)
+	if (SaveFilePath.length() == 0)
 		return;
 
 	Form->txtLogFilePath->setText(SaveFilePath);
@@ -112,7 +114,7 @@ void ZE3dsMaxInteriorExporterOptionsDialog::ShowLoggingFilePathDialog()
 
 void ZE3dsMaxInteriorExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
-	if(CheckBoxState == Qt::Checked)
+	if (CheckBoxState == Qt::Checked)
 		ToggleFileLogging(true);
 	else
 		ToggleFileLogging(false);
@@ -120,7 +122,7 @@ void ZE3dsMaxInteriorExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxSt
 
 void ZE3dsMaxInteriorExporterOptionsDialog::CollectOptionsFromForm()
 {
-	if(Options == NULL)
+	if (Options == NULL)
 	{
 		Options = new ZEMLNode("Options");
 		Options->AddProperty("ZinekEngineWorkingDirectory")->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());
@@ -129,17 +131,17 @@ void ZE3dsMaxInteriorExporterOptionsDialog::CollectOptionsFromForm()
 	}
 	else
 	{
-		if(Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
+		if (Options->GetProperty("ZinekEngineWorkingDirectory") !=  NULL)
 			((ZEMLProperty*)(Options->GetProperty("ZinekEngineWorkingDirectory")))->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());
 		else
 			Options->AddProperty("ZinekEngineWorkingDirectory")->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());
 
-		if(Options->GetProperty("IsFileLoggingEnabled") != NULL)
+		if (Options->GetProperty("IsFileLoggingEnabled") != NULL)
 			((ZEMLProperty*)(Options->GetProperty("IsFileLoggingEnabled")))->SetBool(Form->ckbFileLoggingEnabled->isChecked());
 		else
 			Options->AddProperty("IsFileLoggingEnabled")->SetBool(Form->ckbFileLoggingEnabled->isChecked());
 
-		if(Options->GetProperty("LogFilePath") != NULL)
+		if (Options->GetProperty("LogFilePath") != NULL)
 			((ZEMLProperty*)(Options->GetProperty("LogFilePath")))->SetString(Form->txtLogFilePath->text().toUtf8().constData());
 		else
 			Options->AddProperty("LogFilePath")->SetString(Form->txtLogFilePath->text().toUtf8().constData());

@@ -34,12 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_OPERATION_CUT_H__
-#define __ZE_OPERATION_CUT_H__
 
 #include "ZEDOperation.h"
 #include "ZEDS/ZEArray.h"
-#include <QtGui/QTreeWidgetItem>
+
+#include <QTreeWidgetItem>
 
 class ZEMLNode;
 class ZEMLElement;
@@ -64,5 +63,3 @@ class ZEOperationCut : public ZEDOperation
 		ZEOperationCut(ZEMLNode* ClipBoard, const QList<QTreeWidgetItem*>& Items);
 
 };
-
-#endif

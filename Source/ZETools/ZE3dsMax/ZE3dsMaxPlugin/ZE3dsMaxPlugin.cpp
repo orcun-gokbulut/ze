@@ -34,30 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxPlugin.h"
-#include "ZE3dsMaxModelExporter/ZE3dsMaxModelExporterDescription.h"
-#include "ZE3dsMaxInteriorExporter/ZE3dsMaxInteriorExporterDescription.h"
-#include "ZE3dsMaxUI/ZE3dsMaxUIDescription.h"
+
 #include "ZETypes.h"
+#include "ZEFile/ZEFileInfo.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEDirectoryInfo.h"
 #include "ZEFile/ZEPathManager.h"
+
+#include "ZE3dsMaxModelExporter/ZE3dsMaxModelExporterDescription.h"
+#include "ZE3dsMaxInteriorExporter/ZE3dsMaxInteriorExporterDescription.h"
+#include "ZE3dsMaxUI/ZE3dsMaxUIDescription.h"
 #include "ZEToolbarIcons_16a.bmp.h"
 #include "ZEToolbarIcons_16i.bmp.h"
 #include "ZEToolbarIcons_24a.bmp.h"
 #include "ZEToolbarIcons_24i.bmp.h"
 #include "zineklogo.bmp.h"
-#include <IPathConfigMgr.h> 
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include "ZEFile/ZEFileInfo.h"
+#include <QApplication>
+#include <IPathConfigMgr.h> 
+
+QApplication* QtApplication;
 
 HINSTANCE hInstance;
 ZEInt controlsInit = FALSE;
 
 BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 {
-	if( fdwReason == DLL_PROCESS_ATTACH )
+	if ( fdwReason == DLL_PROCESS_ATTACH )
 	{
 		hInstance = hinstDLL;
 		DisableThreadLibraryCalls(hInstance);
@@ -144,6 +149,10 @@ __declspec( dllexport ) ZEInt LibInitialize(void)
 		IconFile.Write(ZinekLogo.GetData(), ZinekLogo.GetSize(), 1);
 		IconFile.Close();
 	}
+
+	int Argc = 0;
+	if (QApplication::instance() == NULL)
+		QtApplication = new QApplication(Argc, NULL);
 
 	return TRUE;
 }

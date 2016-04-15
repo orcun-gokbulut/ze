@@ -39,8 +39,10 @@
 
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
+
 #include "ZERNMap.h"
 #include "ZERNStageID.h"
+#include "ZEGraphics/ZEGRRasterizerState.h"
 
 class ZEGRConstantBuffer;
 class ZEGRRenderStateData;
@@ -55,6 +57,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool								TwoSided;
 		bool								Wireframe;
 		bool								DepthTestDisabled;
+		ZEGRPrimitiveType					PrimitiveType;
 
 		ZEHolder<ZEGRShader>				VertexShader;
 		ZEHolder<ZEGRShader>				PixelShader;
@@ -89,6 +92,9 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		void								SetWireframe(bool Enable);
 		bool								GetWireframe() const;
+
+		void								SetPrimitiveType(ZEGRPrimitiveType Type);
+		ZEGRPrimitiveType					SetPrimitiveType() const;
 
 		void								SetDepthTestDisabled(bool Disabled);
 		bool								GetDepthTestDisabled() const;

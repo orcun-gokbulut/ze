@@ -44,11 +44,16 @@ ze_add_source(ZE3dsMaxInteriorExporterOptionsDialog.h		Sources QtMocs)
 ze_add_source(ZE3dsMaxInteriorExporterOptionsDialog.cpp		Sources)
 ze_add_source(ZE3dsMaxInteriorExporterOptionsWidget.ui		Sources QtUI)
 
-qt4_add_resources(QtResourceFiles ${QtResources})
-qt4_wrap_ui(QtUIFiles ${QtUI})
-qt4_wrap_cpp(QtMocFiles  ${QtMocs})
+qt5_add_resources(QtResourceFiles ${QtResources})
+qt5_wrap_ui(QtUIFiles ${QtUI})
+qt5_wrap_cpp(QtMocFiles  ${QtMocs})
+
+source_group("Generated" FILES ${QtResourceFiles} ${QtMocFiles} ${QtUIFiles})
 
 ze_add_library(TARGET ZE3dsMaxInteriorExporter 
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurationWidget libQt lib3dsMax2015 QWinWidget)
+	LIBS ZEFoundation ZE3dsMaxUtils ZEProgressDialog ZEResourceConfigurator lib3dsMax2015)
+	
+qt5_use_modules(ZE3dsMaxInteriorExporter Widgets)
+
 set_property(TARGET ZE3dsMaxInteriorExporter APPEND PROPERTY COMPILE_FLAGS " /GR")

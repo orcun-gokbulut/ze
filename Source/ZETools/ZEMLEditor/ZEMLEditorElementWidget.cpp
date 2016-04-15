@@ -43,7 +43,7 @@
 #include "ZEML\ZEMLData.h"
 #include "ZEFile\ZEFile.h"
 
-#include <QtGui\QFileDialog>
+#include <QFileDialog>
 
 int ZEMLEditorElementWidget::GetTypeIndex(ZEValueType ValueType)
 {

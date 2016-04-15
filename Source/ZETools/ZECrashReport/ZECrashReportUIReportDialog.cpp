@@ -43,7 +43,7 @@
 
 class ZECrashReportUIMainWindow;
 
-ZECrashReportUIReportDialog::ZECrashReportUIReportDialog(QWidget *Parent, Qt::WFlags Flags) : QDialog(Parent)
+ZECrashReportUIReportDialog::ZECrashReportUIReportDialog(QWidget *Parent, Qt::WindowFlags Flags) : QDialog(Parent)
 {
 	ParentWidget = Parent;
 	ReportDialog = new Ui::ReportDialogUI();

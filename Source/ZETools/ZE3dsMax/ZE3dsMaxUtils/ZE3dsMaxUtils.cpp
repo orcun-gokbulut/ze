@@ -127,7 +127,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 	if (Prop != NULL)
 	{
-		if(Type == ZE_BOOL_PROP)
+		if (Type == ZE_BOOL_PROP)
 			Type = ZE_INT_PROP;
 
 		if (Prop->GetType() == Type)
@@ -166,7 +166,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 
 	if (Prop != NULL)
 	{
-		if(Type == ZE_BOOL_PROP)
+		if (Type == ZE_BOOL_PROP)
 			Type = ZE_INT_PROP;
 
 		if (Prop->GetType() == Type)
@@ -197,7 +197,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 	if (Prop != NULL)
 	{
-		if(Type == ZE_BOOL_PROP)
+		if (Type == ZE_BOOL_PROP)
 			Type = ZE_INT_PROP;
 
 		if (Prop->GetType() == Type)
@@ -229,14 +229,14 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 	if (Object == NULL)
 		return false;
 
-	if(Type == ZE_BOOL_PROP)
+	if (Type == ZE_BOOL_PROP)
 		Type = ZE_INT_PROP;
 
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 
 	if (Prop != NULL)
 	{
-		if(Type == ZE_BOOL_PROP)
+		if (Type == ZE_BOOL_PROP)
 			Type = ZE_INT_PROP;
 
 		if (Prop->GetType() == Type)
@@ -274,7 +274,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 	IGameProperty* Prop = Object->GetIPropertyContainer()->QueryProperty(Property);
 	if (Prop != NULL)
 	{
-		if(Type == ZE_BOOL_PROP)
+		if (Type == ZE_BOOL_PROP)
 			Type = ZE_INT_PROP;
 
 		if (Prop->GetType() == Type)
@@ -307,7 +307,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 
 	bool IsPropertyBoolean = false;
 
-	if(Type == ZE_BOOL_PROP)
+	if (Type == ZE_BOOL_PROP)
 	{
 		Type = ZE_INT_PROP;
 		IsPropertyBoolean = true;

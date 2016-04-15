@@ -35,24 +35,25 @@
 
 #include "ZE3dsMaxModelExporter.h"
 
-#include <tchar.h>
-#include "ZEToolComponents/QWinWidget/qwinwidget.h"
-#include "QtGui/QApplication"
 #include "ZE3dsMaxModelExporterOptionsDialog.h"
 #include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
-#include "ZEToolComponents/ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
+#include "ZEToolComponents/ZEResourceConfigurator/ZEResourceConfiguratorWidget.h"
+
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"
+
+#include <tchar.h>
+#include <QApplication>
+#include <QWindow>
 
 ZE3dsMaxModelExporter::ZE3dsMaxModelExporter()
 {
 	Scene = NULL;
-	QtApplication = NULL;
 	ExportOptions = NULL;
 	WinWidget = NULL;
 	OptionsDialog = NULL;
 	ProgressDialog = NULL;
-	ResourceConfigurationDialog = NULL;
+	ResourceConfiguratorDialog = NULL;
 
 	TotalFrameCount = 0;
 	TicksPerFrame = 0;
@@ -60,37 +61,29 @@ ZE3dsMaxModelExporter::ZE3dsMaxModelExporter()
 
 ZE3dsMaxModelExporter::~ZE3dsMaxModelExporter() 
 {
-	if(ExportOptions != NULL)
+	if (ExportOptions != NULL)
 	{
 		delete ExportOptions;
 		ExportOptions = NULL;
 	}
 
-	if(ProgressDialog != NULL)
+	if (ProgressDialog != NULL)
 	{
 		delete ProgressDialog;
 		ProgressDialog = NULL;
 	}
 
-	if(OptionsDialog != NULL)
+	if (OptionsDialog != NULL)
 	{
 		OptionsDialog->hide();
 		delete OptionsDialog;
 		OptionsDialog = NULL;
 	}
 
-	if(WinWidget != NULL)
+	if (WinWidget != NULL)
 	{
-		WinWidget->hide();
 		delete WinWidget;
 		WinWidget = NULL;
-	}
-
-	if(QtApplication != NULL)
-	{
-		QtApplication->quit();
-		delete QtApplication;
-		QtApplication = NULL;
 	}
 }
 
@@ -170,17 +163,17 @@ ZEInt32 ZE3dsMaxModelExporter::GetSceneNodes(INodeTab& i_nodeTab, INode* i_curre
 
 void ZE3dsMaxModelExporter::LoadOptions(const char* FilePath)
 {
-	if(strlen(FilePath) != 0)
+	if (strlen(FilePath) != 0)
 	{
 		ZEString OptionsFilePath(FilePath);
 		OptionsFilePath += ".zecfg";
 
 		ZEFile OptionsFile;
 
-		if(ExportOptions == NULL)
+		if (ExportOptions == NULL)
 			ExportOptions = new ZEMLNode("Options");
 
-		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
+		if (OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_NONE))
 		{
 			ModelRoot.SetRootNode(ExportOptions);
 			ModelRoot.Read(&OptionsFile);
@@ -194,10 +187,10 @@ void ZE3dsMaxModelExporter::SaveOptions(const char* FilePath)
 	ZEString OptionsFilePath(FilePath);
 	OptionsFilePath += ".zecfg";
 
-	if(ExportOptions != NULL)
+	if (ExportOptions != NULL)
 	{
 		ZEFile OptionsFile;
-		if(OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
+		if (OptionsFile.Open(OptionsFilePath, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 		{
 			ModelRoot.SetRootNode(OptionsDialog->GetOptions());
 			ModelRoot.Write(&OptionsFile);
@@ -212,25 +205,17 @@ void ZE3dsMaxModelExporter::SaveOptions(const char* FilePath)
 
 bool ZE3dsMaxModelExporter::ShowOptionsDialog(HWND ParentWindow)
 {
-	int Argc = 0;
-	if(QApplication::instance() == NULL)
-		QtApplication = new QApplication(Argc, NULL);
-	else
-		QtApplication = (QApplication*)QApplication::instance();
+	if (WinWidget == NULL)
+		WinWidget = QWindow::fromWinId((WId)ParentWindow);
 
-	if(WinWidget == NULL)
-		WinWidget = new QWinWidget(ParentWindow);
+	if (OptionsDialog == NULL)
+		OptionsDialog = new ZE3dsMaxModelExporterOptionsDialog(NULL);
 
-	if(OptionsDialog == NULL)
-		OptionsDialog = new ZE3dsMaxModelExporterOptionsDialog(WinWidget);
-
-	if(ExportOptions != NULL)
+	if (ExportOptions != NULL)
 		OptionsDialog->SetOptions(ExportOptions);
 
-	WinWidget->showCentered();
 	ZEInt32 DialogResult = OptionsDialog->exec();
-
-	if(DialogResult == QDialog::Rejected)
+	if (DialogResult == QDialog::Rejected)
 		return false;
 
 	return true;
@@ -238,28 +223,20 @@ bool ZE3dsMaxModelExporter::ShowOptionsDialog(HWND ParentWindow)
 
 bool ZE3dsMaxModelExporter::ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath)
 {
-	int Argc = 0;
-	if(QApplication::instance() == NULL)
-		QtApplication = new QApplication(Argc, NULL);
-	else
-		QtApplication = (QApplication*)QApplication::instance();
+	if (WinWidget == NULL)
+		WinWidget = QWindow::fromWinId((WId)ParentWindow);
 
-	if(WinWidget == NULL)
-		WinWidget = new QWinWidget(ParentWindow);
+	if (ResourceConfiguratorDialog == NULL)
+		ResourceConfiguratorDialog = new ZEResourceConfiguratorWidget(NULL);
 
-	if(ResourceConfigurationDialog == NULL)
-		ResourceConfigurationDialog = new ZEResourceConfigurationWidget(WinWidget);
-
-	ResourceConfigurationDialog->LoadPreset(ZEString(MaxFilePath) + ".ZEPRESET");
+	ResourceConfiguratorDialog->LoadPreset(ZEString(MaxFilePath) + ".ZEPRESET");
 	CollectResources();
 
-	WinWidget->showCentered();
-	ZEInt32 DialogResult = ResourceConfigurationDialog->Show();
-
-	if(DialogResult == QDialog::Rejected)
+	ZEInt32 DialogResult = ResourceConfiguratorDialog->exec();
+	if (DialogResult == QDialog::Rejected)
 		return false;
 
-	ResourceConfigurationDialog->SavePreset(ZEString(MaxFilePath) + ".ZEPRESET");
+	ResourceConfiguratorDialog->SavePreset(ZEString(MaxFilePath) + ".ZEPRESET");
 	return true;
 }
 
@@ -278,10 +255,10 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	TicksPerFrame = Scene->GetSceneTicks();
 	TotalFrameCount = Scene->GetSceneEndTime() / TicksPerFrame;
 
-	if(!ShowOptionsDialog(i->GetMAXHWnd()))
+	if (!ShowOptionsDialog(i->GetMAXHWnd()))
 		return true;
 
-	if(!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath().ToCStr()))
+	if (!ShowResourceConfigurationDialog(i->GetMAXHWnd(), i->GetCurFilePath().ToCStr()))
 		return true;
 
 	SaveOptions(i->GetCurFilePath().ToCStr());
@@ -293,7 +270,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	ModelNode.AddProperty("MajorVersion")->SetUInt8(MajorVersion);
 	ModelNode.AddProperty("MinorVersion")->SetUInt8(MinorVersion);
 
-	if(ProgressDialog == NULL)
+	if (ProgressDialog == NULL)
 		ProgressDialog = ZEProgressDialog::CreateInstance();
 
 	ProgressDialog->SetTitle("Model Export Progress");
@@ -340,7 +317,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	ProgressDialog->CloseTask();
 
 	ProgressDialog->OpenTask("Helper Process", true);
-	if(!ProcessHelpers())
+	if (!ProcessHelpers())
 	{
 		zeError("Processing helpers failed.");
 		return false;
@@ -353,7 +330,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 
 	if (IsAnimationExportEnabled)
 	{
-		if(!ProcessAnimations(ModelNode.AddNode("Animations")))
+		if (!ProcessAnimations(ModelNode.AddNode("Animations")))
 		{
 			zeError("Processing animations failed.");
 			return false;

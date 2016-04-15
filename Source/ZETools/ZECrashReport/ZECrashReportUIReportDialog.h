@@ -37,13 +37,13 @@
 #ifndef __ZE_CRASHREPORT_REPORTDIALOG_H__
 #define __ZE_CRASHREPORT_REPORTDIALOG_H__
 
-#include <QtGui/QDialog>
-#include <QtCore/QFile>
-#include <QtCore/QDir>
-#include <QtGui/QMessageBox>
-#include <QtGui/QFileDialog>
-#include <QtCore/QObject>
-#include <QtCore/QModelIndex>
+#include <QDialog>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QFile>
+#include <QDir>
+#include <QObject>
+#include <QModelIndex>
 
 namespace Ui
 {
@@ -55,7 +55,7 @@ class ZECrashReportUIReportDialog : public QDialog
 	Q_OBJECT
 
 	public:		
-								ZECrashReportUIReportDialog(QWidget *Parent = 0, Qt::WFlags Flags = 0);
+								ZECrashReportUIReportDialog(QWidget *Parent = 0, Qt::WindowFlags Flags = 0);
 								~ZECrashReportUIReportDialog();
 	private:
 		Ui::ReportDialogUI*		ReportDialog;

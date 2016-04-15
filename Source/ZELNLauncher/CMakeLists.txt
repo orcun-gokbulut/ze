@@ -78,9 +78,7 @@ ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
 ze_add_source(../ZEEngine/ZECore/ZEWindowResources.rc 	Sources)
 
 set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
-
-find_package(Qt5Core)
-find_package(Qt5Widgets)
+find_package(Qt5 COMPONENTS Widgets)
 
 qt5_wrap_ui(QtUIOutputs ${QtUIs})
 qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
@@ -91,7 +89,7 @@ ze_add_executable(TARGET ZELNLauncher
 	LIBS ZEFoundation ZEProtect Qt5::WinMain
 	DESCRIPTION "Zinek Launcher")
 
-qt5_use_modules(ZELNLauncher Core Widgets)
+qt5_use_modules(ZELNLauncher Widgets)
 
 add_custom_command(TARGET ZELNLauncher POST_BUILD
 	# DEBUG

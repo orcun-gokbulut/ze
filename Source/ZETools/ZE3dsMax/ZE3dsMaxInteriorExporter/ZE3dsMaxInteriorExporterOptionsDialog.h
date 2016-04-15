@@ -34,43 +34,37 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_INTERIOR_EXPORTER_OPTIONS_DIALOG_H__
-#define __ZE_INTERIOR_EXPORTER_OPTIONS_DIALOG_H__
 
 #include "ui_ZE3dsMaxInteriorExporterOptionsWidget.h"
-#include "QtGui\QDialog"
+
 #include "ZEDS\ZEString.h"
 #include "ZEML\ZEMLNode.h"
+
+#include <QDialog>
 
 class ZE3dsMaxInteriorExporterOptionsDialog : public QDialog
 {
 	Q_OBJECT
-
 	private:
-
 		Ui::ZE3dsMaxInteriorExporterOptionsDialogUI*	Form;
 		ZEMLNode*										Options;
 
-		void					ToggleFileLogging(bool IsEnabled);
-		void					ToggleApplicationPathOptions(bool IsEnabled);
-		void					CollectOptionsFromForm();
+		void						ToggleFileLogging(bool IsEnabled);
+		void						ToggleApplicationPathOptions(bool IsEnabled);
+		void						CollectOptionsFromForm();
 
 	private slots:
-
-		void					ShowEngineDirectoryDialog();
-		void					ShowLoggingFilePathDialog();
-		void					SetFileLoggingEnabled(int CheckBoxState);
+		void						ShowEngineDirectoryDialog();
+		void						ShowLoggingFilePathDialog();
+		void						SetFileLoggingEnabled(int CheckBoxState);
 
 	public:
+		bool						GetFileLoggingEnabled();
+		ZEString					GetLogFilePath();
 
-								ZE3dsMaxInteriorExporterOptionsDialog(QWidget* Parent);
-								~ZE3dsMaxInteriorExporterOptionsDialog();
+		void						SetOptions(ZEMLNode* Options);
+		ZEMLNode*					GetOptions();
 
-	bool						GetFileLoggingEnabled();
-	ZEString					GetLogFilePath();
-
-	void						SetOptions(ZEMLNode* Options);
-	ZEMLNode*					GetOptions();
+									ZE3dsMaxInteriorExporterOptionsDialog(QWidget* Parent);
+									~ZE3dsMaxInteriorExporterOptionsDialog();
 };
-
-#endif

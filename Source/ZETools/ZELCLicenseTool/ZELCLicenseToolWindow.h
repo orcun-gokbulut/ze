@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 class Ui_ZELCLicenseToolWindow;
 

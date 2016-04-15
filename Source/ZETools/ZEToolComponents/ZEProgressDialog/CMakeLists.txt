@@ -45,10 +45,13 @@ ze_add_source(ZEProgresDialogSignalHandler.cpp		Sources)
 ze_add_source(ZEProgressDialogTreeWidget.h			Sources)
 ze_add_source(ZEProgressDialogTreeWidget.cpp		Sources)
 
-qt4_add_resources(QtResourceFiles ${QtResources})
-qt4_wrap_ui(QtUIFiles ${QtUI})
-qt4_wrap_cpp(QtMocFiles  ${QtMocs})
+qt5_add_resources(QtResourceFiles ${QtResources})
+qt5_wrap_ui(QtUIFiles ${QtUI})
+qt5_wrap_cpp(QtMocFiles  ${QtMocs})
+
+source_group("Generated" FILES ${QtResourceFiles} ${QtMocFiles} ${QtUIFiles})
 
 ze_add_library(TARGET ZEProgressDialog 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS libQt)
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+	
+qt5_use_modules(ZEProgressDialog Widgets)

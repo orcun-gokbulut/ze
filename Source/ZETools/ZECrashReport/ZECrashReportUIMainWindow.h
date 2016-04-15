@@ -34,14 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CRASHREPORT_CRASHMAINWINDOW_H__
-#define __ZE_CRASHREPORT_CRASHMAINWINDOW_H__
-
-#include <QtGui/QMainWindow>
-#include <QtGui/QMessageBox>
-#include <QtGui/QLayout>
-#include <QtGui/QSystemTrayIcon>
-#include <QtGui/QMenu>
 
 #include "ZECrashReportUIClickableLabel.h"
 #include "ZECrashReportUIProgressWindow.h"
@@ -50,6 +42,12 @@
 #include "ZECrashReport/ZECrashReport.h"
 #include "ZECrashReport/ZECrashReportUserCommentProvider.h"
 #include "ZEDS/ZEString.h"
+
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QLayout>
+#include <QSystemTrayIcon>
+#include <QMenu>
 
 namespace Ui
 {
@@ -70,7 +68,7 @@ class ZECrashReportUIMainWindow : public QMainWindow
 		ZECrashReport						CrashReport;
 		ZEString							UploadUrl;
 		
-											ZECrashReportUIMainWindow(QWidget *Parent = 0, Qt::WFlags Flags = 0);
+											ZECrashReportUIMainWindow(QWidget *Parent = 0, Qt::WindowFlags Flags = 0);
 											ZECrashReportUIMainWindow(ZECrashReport& CrashReport, const ZEString& UploadURL);
 											~ZECrashReportUIMainWindow();	
 
@@ -111,5 +109,3 @@ class ZECrashReportUIMainWindow : public QMainWindow
 		void								ShowProgress();
 		void								TrayRestore();		
 };
-
-#endif

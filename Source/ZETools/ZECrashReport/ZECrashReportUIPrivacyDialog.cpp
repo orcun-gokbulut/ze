@@ -36,7 +36,7 @@
 #include "ZECrashReportUIPrivacyDialog.h"
 #include "ui_PrivacyDialog.h"
 
-ZECrashReportUIPrivacyDialog::ZECrashReportUIPrivacyDialog(QWidget *Parent, Qt::WFlags Flags) : QDialog(Parent, Flags)
+ZECrashReportUIPrivacyDialog::ZECrashReportUIPrivacyDialog(QWidget *Parent, Qt::WindowFlags Flags) : QDialog(Parent, Flags)
 {
 	PrivacyDialog = new Ui::PrivacyDialogUI();
 	PrivacyDialog->setupUi(this);

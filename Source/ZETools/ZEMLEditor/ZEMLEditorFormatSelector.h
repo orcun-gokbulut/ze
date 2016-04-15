@@ -37,10 +37,10 @@
 #ifndef	__ZEML_EDITOR_FORMAT_SELECTOR_H__
 #define __ZEML_EDITOR_FORMAT_SELECTOR_H__
 
-#include <QtGui/QDialog>
-
 #include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLRoot.h"
+
+#include <QDialog>
 
 class Ui_ZEMLEditorFormatSelector;
 class ZEMLFormatDescription;

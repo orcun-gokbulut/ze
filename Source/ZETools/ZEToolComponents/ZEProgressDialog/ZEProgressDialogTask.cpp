@@ -34,9 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProgressDialogTask.h"
-#include "QtGui\QTreeWidget"
-#include "QtGui\qtreewidget.h"
-#include "QtGui\qcolor.h"
+
+#include <QTreeWidget>
+#include <QColor>
 
 void ZEProgressDialogTask::SetUpTreeItem()
 {
@@ -102,13 +102,13 @@ ZEProgressDialogTask::~ZEProgressDialogTask()
 
 void  ZEProgressDialogTask::SetState(ZEProgressDialogTaskState State)
 {
-	if(State == ZE_PDTS_PENDING)
+	if (State == ZE_PDTS_PENDING)
 		TreeItem->setBackgroundColor(1, QColor(184, 204, 228));
-	else if(State == ZE_PDTS_WARNING)
+	else if (State == ZE_PDTS_WARNING)
 		TreeItem->setBackgroundColor(1, QColor(255, 235, 156));
-	else if(State == ZE_PDTS_ERROR)
+	else if (State == ZE_PDTS_ERROR)
 		TreeItem->setBackgroundColor(1, QColor(255, 199, 206));
-	else if(State == ZE_PDTS_OK)
+	else if (State == ZE_PDTS_OK)
 		TreeItem->setBackgroundColor(1, QColor(198, 239, 206));	
 
 	this->State = State;
@@ -123,7 +123,7 @@ void ZEProgressDialogTask::SetIsTitle(bool IsTitle)
 {
 	this->IsTitle = IsTitle;
 
-	if(IsTitle)
+	if (IsTitle)
 		TreeItem->setBackgroundColor(1, Qt::white);
 	else
 		SetState(ZE_PDTS_PENDING);
@@ -173,7 +173,7 @@ void ZEProgressDialogTask::SetValue(ZEInt8 Value)
 {
 	TaskPersentage = Value;
 	
-	if(Value > 0)
+	if (Value > 0)
 		TreeItem->setText(1, (ZEString(Value) + "%").ToCString());
 }
 
@@ -207,7 +207,7 @@ void ZEProgressDialogTask::SetLogVisible(bool IsVisible)
 {
 	IsLogVisible = IsVisible;
 
-	if(TaskLog.GetLength() != 0)
+	if (TaskLog.GetLength() != 0)
 		LogItem->setHidden(!IsLogVisible);
 }
 

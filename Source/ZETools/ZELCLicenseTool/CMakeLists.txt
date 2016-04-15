@@ -41,10 +41,14 @@ ze_add_source(ZELCLicenseToolWindow.h		Sources QtMocs)
 ze_add_source(ZELCLicenseToolWindow.ui		Sources QtUIs)
 ze_add_source(ZELCStyle.qrc					Sources QtResources)
 
-qt4_wrap_ui(QtUIOutputs ${QtUIs})
-qt4_wrap_cpp(QtMocOutputs  ${QtMocs})
-qt4_add_resources(QtResourceOutputs ${QtResources})
+qt5_wrap_ui(QtUIOutputs ${QtUIs})
+qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
+qt5_add_resources(QtResourceOutputs ${QtResources})
+
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
 ze_add_executable(TARGET ZELCLicensingTool
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect libMSVCRv100 libQt)
+	LIBS ZEFoundation ZEProtect)
+	
+qt5_use_modules(ZELCLicensingTool Widgets)

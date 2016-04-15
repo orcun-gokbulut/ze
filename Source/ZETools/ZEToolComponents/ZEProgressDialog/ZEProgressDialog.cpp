@@ -54,7 +54,7 @@ ZEProgressDialog::ZEProgressDialog()
 	QApplicationCreated = false;
 	LogFile = NULL;
 
-	if(QApplication::instance() == NULL)
+	if (QApplication::instance() == NULL)
 	{
 		ZEInt32	Argc = 0;
 		void*	Argv = NULL;
@@ -92,9 +92,9 @@ ZEProgressDialog::~ZEProgressDialog()
 
 	Tasks.Clear();
 
-	if(LogFile != NULL)
+	if (LogFile != NULL)
 	{
-		if(LogFile->IsOpen())
+		if (LogFile->IsOpen())
 		{
 			LogFile->Close();
 			delete LogFile;
@@ -119,7 +119,7 @@ ZEProgressDialog::~ZEProgressDialog()
 	delete Form;
 	Form = NULL;
 
-	if(QApplicationCreated)
+	if (QApplicationCreated)
 	{
 		Application->quit();
 		delete Application;
@@ -136,7 +136,7 @@ ZEProgressDialogTask* ZEProgressDialog::OpenTask(const ZEString& Name, bool IsTi
 {
 	ZEProgressDialogTask* NewTask = NULL;
 
-	if(RootTask == NULL)
+	if (RootTask == NULL)
 	{
 		NewTask = new ZEProgressDialogTask(TasksTreeWidget, Name);
 		RootTask = NewTask;
@@ -160,10 +160,10 @@ ZEProgressDialogTask* ZEProgressDialog::OpenTask(const ZEString& Name, bool IsTi
 
 void ZEProgressDialog::CloseTask()
 {
-	if(CurrentTask == RootTask && CurrentTask->GetParentTask() != NULL)
+	if (CurrentTask == RootTask && CurrentTask->GetParentTask() != NULL)
 		return;
 
-	if(CurrentTask->GetState() == ZE_PDTS_PENDING && !CurrentTask->GetIsTitle())
+	if (CurrentTask->GetState() == ZE_PDTS_PENDING && !CurrentTask->GetIsTitle())
 		CurrentTask->SetState(ZE_PDTS_OK);
 
 	CurrentTask = CurrentTask->GetParentTask();
@@ -180,7 +180,7 @@ void ZEProgressDialog::End()
 	Form->buttonBox->setStandardButtons(QDialogButtonBox::StandardButton::Close);
 	Form->lblCurrentTaskName->setText("Finished");
 
-	if(!IsWaitForClose)
+	if (!IsWaitForClose)
 		Dialog->close();
 	else
 		Dialog->exec();
@@ -203,22 +203,22 @@ void ZEProgressDialog::SetTaskProgress(ZEInt8 Progress)
 
 void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 {
-	if(Type == ZE_LOG_WARNING && CurrentTask->GetState() != ZE_PDTS_ERROR)
+	if (Type == ZE_LOG_WARNING && CurrentTask->GetState() != ZE_PDTS_ERROR)
 		CurrentTask->SetState(ZE_PDTS_WARNING);
-	if(Type == ZE_LOG_ERROR)
+	if (Type == ZE_LOG_ERROR)
 		CurrentTask->SetState(ZE_PDTS_ERROR);
-	if(Type == ZE_LOG_CRITICAL_ERROR)
+	if (Type == ZE_LOG_CRITICAL_ERROR)
 		CurrentTask->SetState(ZE_PDTS_ERROR);
 
 	CurrentTask->AppendLog(Text);
 	QTextCursor TextCursor(Form->txtLog->document());
 	QTextBlockFormat BlockFormat = TextCursor.blockFormat();
 	
-	if(Type == ZE_LOG_WARNING)
+	if (Type == ZE_LOG_WARNING)
 		BlockFormat.setBackground(QBrush(QColor(255, 235, 156)));
-	else if(Type == ZE_LOG_ERROR)
+	else if (Type == ZE_LOG_ERROR)
 		BlockFormat.setBackground(QBrush(QColor(255, 199, 206)));
-	else if(Type == ZE_LOG_CRITICAL_ERROR)
+	else if (Type == ZE_LOG_CRITICAL_ERROR)
 		BlockFormat.setBackground(QBrush(QColor(255, 199, 206)));
 	else
 		BlockFormat.clearBackground();
@@ -229,15 +229,15 @@ void ZEProgressDialog::Message(ZELogType Type, const char* Text)
 	QTextCharFormat CharFormat;
 	TextCursor.insertText(Text, CharFormat);
 
-	if(LogFile == NULL && IsFileLoggingEnabled == true)
+	if (LogFile == NULL && IsFileLoggingEnabled == true)
 		LogFile = new ZEFile();
 
-	if(LogFile != NULL)
+	if (LogFile != NULL)
 	{
-		if(LogFile->IsOpen() == false)
+		if (LogFile->IsOpen() == false)
 			LogFile->Open(LogFilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE);
 
-		if(LogFile->IsOpen())
+		if (LogFile->IsOpen())
 		{
 			ZEString LogMessage;
 			LogMessage = Text;
@@ -254,7 +254,7 @@ ZEProgressDialog* ZEProgressDialog::GetInstance()
 
 ZEProgressDialog* ZEProgressDialog::CreateInstance()
 {
-	if(Instance != NULL)
+	if (Instance != NULL)
 		return Instance;
 
 	return new ZEProgressDialog();

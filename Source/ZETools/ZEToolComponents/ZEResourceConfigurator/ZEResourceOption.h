@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_OPTION_H__
-#define __ZE_RESOURCE_OPTION_H__
 
 #include "ZEDS\ZEString.h"
 
@@ -60,5 +58,3 @@ class ZEResourceOption
 
 										ZEResourceOption();
 };
-
-#endif

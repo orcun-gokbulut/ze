@@ -35,24 +35,21 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEDEntitySelectionItem.cpp		Sources)
-ze_add_source(ZEDEntitySelectionItem.h			Sources)
-ze_add_source(ZEDEntitySelector.cpp				Sources)
-ze_add_source(ZEDEntitySelector.h				Sources QtMocs)
-ze_add_source(ZEDSceneEditor.cpp				Sources)
-ze_add_source(ZEDSceneEditor.ui					Sources QtUI)
-ze_add_source(ZEDSceneEditor.h					Sources QtMocs)
-ze_add_source(ZEDSceneList.cpp					Sources)
-ze_add_source(ZEDSceneList.h					Sources)
-ze_add_source(ZEDSelectionItem.cpp				Sources)
-ze_add_source(ZEDSelectionItem.h				Sources)
-ze_add_source(ZEDSelectionItemPlugin.cpp		Sources)
-ze_add_source(ZEDSelectionItemPlugin.h			Sources)
+ze_add_source(ZEDMainEditor.ui						Sources QtUI)
+ze_add_source(ZEDMainEditor.cpp						Sources)
+ze_add_source(ZEDMainEditor.h						Sources QtMocs)
+ze_add_source(ZEDMainBrowser.ui						Sources QtUI)
+ze_add_source(ZEDMainBrowser.cpp					Sources)
+ze_add_source(ZEDMainBrowser.h						Sources QtMocs)
+ze_add_source(ZEDAddToSceneOperation.cpp			Sources)
+ze_add_source(ZEDAddToSceneOperation.h				Sources)
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+
+qt5_add_resources(QtResourceFiles ${QtResources})
+qt5_wrap_ui(QtUIFiles ${QtUI})
+qt5_wrap_cpp(QtMocFiles  ${QtMocs})
 
 ze_add_library(TARGET ZEDSceneEditor 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS libQt)
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles})
+
+qt5_use_modules(ZEDSceneEditor Widgets)

@@ -37,7 +37,7 @@
 #include "ZEML/ZEMLElement.h"
 #include "ZEMLEditorWindow.h"
 
-#include <QtGui/QTreeWidgetItem>
+#include <QTreeWidgetItem>
 
 bool ZEOperationChangeElementName::Apply()
 {

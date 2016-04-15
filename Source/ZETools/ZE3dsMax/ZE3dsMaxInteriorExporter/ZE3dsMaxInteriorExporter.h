@@ -34,34 +34,28 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_INTERIOR_EXPORTER_H__
-#define __ZE3DS_INTERIOR_EXPORTER_H__
 
 #include "ZE3dsMaxUtils/ZE3dsMaxUtils.h"
 
 extern HINSTANCE hInstance;
 
+class ZEMLNode;
+class ZEProgressDialog;
+class ZEResourceConfiguratorWidget;
 class ZE3dsMaxInteriorExporterOptionsDialog;
 class QApplication;
-class QWinWidget;
-class ZEProgressDialog;
-class ZEMLNode;
-class ZEResourceConfigurationWidget;
-
+class QWindow;
 
 class ZE3dsMaxInteriorExporter : public SceneExport 
 {
 	private:
-
-		QApplication*								QtApplication;
-
 		ZE3dsMaxInteriorExporterOptionsDialog*		OptionsDialog;
-		ZEResourceConfigurationWidget*				ResourceConfigurationDialog;
+		ZEResourceConfiguratorWidget*				ResourceConfigurationDialog;
 
 		ZEMLRoot									InteriorRoot;
 		ZEMLNode*									ExportOptions;
 		ZEMLNode									InteriorNode;
-		QWinWidget*									WinWidget;
+		QWindow*									WinWidget;
 		ZEProgressDialog*							ProgressDialog;
 		ZEString									ExportPath;
 
@@ -73,45 +67,43 @@ class ZE3dsMaxInteriorExporter : public SceneExport
 		Tab<IGameNode*>								Helpers;
 		Tab<IGameMaterial*>							Materials;
 
-		void						CollectResources();
+		void										CollectResources();
 
-		void						LoadOptions(const char* FilePath);
-		void						SaveOptions(const char* FilePath);
-		bool						ShowOptionsDialog(HWND ParentWindow);
-		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath, ZEString ExportPath);
+		void										LoadOptions(const char* FilePath);
+		void										SaveOptions(const char* FilePath);
+		bool										ShowOptionsDialog(HWND ParentWindow);
+		bool										ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath, ZEString ExportPath);
 
-		ZEInt32						FindRoomIndex(IGameNode* Node);
-		ZEInt32						ProcessFaceMaterial(IGameMaterial* Material);
+		ZEInt32										FindRoomIndex(IGameNode* Node);
+		ZEInt32										ProcessFaceMaterial(IGameMaterial* Material);
 
-		bool						ProcessScene();
-		bool						ProcessMaterials(const char* FileName);
-		bool						ProcessRooms();
-		void						ProcessPhysicalMesh(IGameNode* ParentNode, IGameNode* Node, ZEMLNode* PhysicalMeshNode);
-		bool						ProcessDoors();
-		bool						ProcessHelpers();
+		bool										ProcessScene();
+		bool										ProcessMaterials(const char* FileName);
+		bool										ProcessRooms();
+		void										ProcessPhysicalMesh(IGameNode* ParentNode, IGameNode* Node, ZEMLNode* PhysicalMeshNode);
+		bool										ProcessDoors();
+		bool										ProcessHelpers();
 
 	protected:
-		ZEInt32						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode = NULL);
+		ZEInt32										GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode = NULL);
 
 	public:	
-		virtual ZEInt				ExtCount();
-		virtual const TCHAR *		Ext(ZEInt n);
-		virtual const TCHAR *		LongDesc();
-		virtual const TCHAR *		ShortDesc();
-		virtual const TCHAR *		AuthorName();
-		virtual const TCHAR *		CopyrightMessage();
-		virtual const TCHAR *		OtherMessage1();
-		virtual const TCHAR *		OtherMessage2();
-		virtual ZEUInt				Version();
-		virtual void				ShowAbout(HWND hWnd);
+		virtual ZEInt								ExtCount();
+		virtual const TCHAR *						Ext(ZEInt n);
+		virtual const TCHAR *						LongDesc();
+		virtual const TCHAR *						ShortDesc();
+		virtual const TCHAR *						AuthorName();
+		virtual const TCHAR *						CopyrightMessage();
+		virtual const TCHAR *						OtherMessage1();
+		virtual const TCHAR *						OtherMessage2();
+		virtual ZEUInt								Version();
+		virtual void								ShowAbout(HWND hWnd);
 
-		virtual BOOL				SupportsOptions(ZEInt ext, DWORD options);
-		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts = FALSE, DWORD options = 0);
+		virtual BOOL								SupportsOptions(ZEInt ext, DWORD options);
+		virtual ZEInt								DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts = FALSE, DWORD options = 0);
 
-									ZE3dsMaxInteriorExporter();
-		virtual						~ZE3dsMaxInteriorExporter();
+													ZE3dsMaxInteriorExporter();
+		virtual										~ZE3dsMaxInteriorExporter();
 
 
 };
-
-#endif

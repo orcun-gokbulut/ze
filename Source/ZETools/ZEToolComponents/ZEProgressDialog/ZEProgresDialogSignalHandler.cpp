@@ -34,12 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProgresDialogSignalHandler.h"
+
 #include "ui_ZEProgressDialog.h"
 #include "ZEProgressDialogTask.h"
-#include "QtGui\QFileDialog"
-#include "QtCore\QTextStream"
-#include "QtGui\QApplication"
-#include "QtGui\QClipboard"
+
+#include <QFileDialog>
+#include <QTextStream>
+#include <QApplication>
+#include <QClipboard>
 
 ZEProgressDialogSignalHandler::ZEProgressDialogSignalHandler(ZEProgressDialog* ProgressDialog, QObject* Parent) : QObject(Parent)
 {
@@ -60,9 +62,9 @@ void ZEProgressDialogSignalHandler::TreeItemDoubleClicled(QTreeWidgetItem* Item,
 {
 	for (ZESize I = 0; I < ProgressDialog->Tasks.GetCount(); I++)
 	{
-		if(Item == ProgressDialog->Tasks[I]->TreeItem)
+		if (Item == ProgressDialog->Tasks[I]->TreeItem)
 		{
-			if(ProgressDialog->Tasks[I]->GetLogVisible())
+			if (ProgressDialog->Tasks[I]->GetLogVisible())
 				ProgressDialog->Tasks[I]->SetLogVisible(false);
 			else
 				ProgressDialog->Tasks[I]->SetLogVisible(true);
@@ -79,7 +81,7 @@ void ZEProgressDialogSignalHandler::SaveLog()
 {
 	QString FileName = QFileDialog::getSaveFileName(ProgressDialog->Dialog, "Save", QString(), QString("*.txt"));
 
-	if(FileName.length() == 0)
+	if (FileName.length() == 0)
 		return;
 
 	QFile File(FileName);

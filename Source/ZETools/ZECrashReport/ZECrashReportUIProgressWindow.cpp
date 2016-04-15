@@ -48,7 +48,7 @@
 #include "ZEDS/ZEFormat.h"
 #include "ZEThread/ZELock.h"
 
-ZECrashReportUIProgressWindow::ZECrashReportUIProgressWindow(QWidget* Parent, Qt::WFlags Flags) : QMainWindow(Parent, Flags)
+ZECrashReportUIProgressWindow::ZECrashReportUIProgressWindow(QWidget* Parent, Qt::WindowFlags Flags) : QMainWindow(Parent, Flags)
 {
 	
 }
@@ -163,7 +163,7 @@ void ZECrashReportUIProgressWindow::CreateMainWindowRawText()
 
 void ZECrashReportUIProgressWindow::UpdateUploadInformation()
 {
-	if(SenderThread->GetStatus() == ZE_TS_DONE)
+	if(SenderThread->GetStatus() == ZE_TS_NOT_RUNNING)
 	{
 		UploadCompleted();
 		return;

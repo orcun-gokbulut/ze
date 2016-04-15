@@ -35,8 +35,9 @@
 
 #include "ZEProgressDialogTreeWidget.h"
 #include "ZETypes.h"
-#include "QtGui/QHeaderView"
-#include "QtGui/QScrollBar"
+
+#include <QHeaderView>
+#include <QScrollBar>
 
 ZEProgressDialogTreeWidget::ZEProgressDialogTreeWidget(QWidget* Parent) : QTreeWidget(Parent)
 {
@@ -60,9 +61,9 @@ void ZEProgressDialogTreeWidget::drawRow(QPainter* Painter, const QStyleOptionVi
 	for(ZEInt I = 0; I < columnCount(); I++)
 	{
 		QModelIndex CurrentIndex = Index.sibling(Index.row(), I);
-		if(CurrentIndex.isValid())
+		if (CurrentIndex.isValid())
 		{
-			if(I == 0)
+			if (I == 0)
 			{
 				QRect GridRect = visualRect(CurrentIndex);
 				GridRect.setTopLeft(QPoint(0, GridRect.topLeft().y()));
@@ -87,7 +88,7 @@ void ZEProgressDialogTreeWidget::resizeEvent(QResizeEvent* Event)
 	setColumnWidth(1, 39);
 	ZEInt FirstColumnWith = this->width() - 40;
 
-	if(verticalScrollBar()->isVisible())
+	if (verticalScrollBar()->isVisible())
 		FirstColumnWith -= verticalScrollBar()->width();
 
 	setColumnWidth(0, FirstColumnWith); 

@@ -40,14 +40,11 @@ ze_set_project_folder("ZETools/ZEToolComponents")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(ZEProgressDialog)
-add_subdirectory(ZEResourceConfigurationWidget)
 add_subdirectory(ZEResourceConfigurator)
 add_subdirectory(ZEMLVisualizer)
-add_subdirectory(QWinWidget)
 
 ze_add_source(ZEToolComponentsMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEToolComponents 
 	SOURCES ${Sources}
-	LIBS ZEFoundation ZEProgressDialog ZEResourceConfigurationWidget ZEMLVisualizerWidget ZEResourceConfigurator
-		libQt)
+	LIBS ZEFoundation ZEProgressDialog ZEMLVisualizerWidget ZEResourceConfigurator)
