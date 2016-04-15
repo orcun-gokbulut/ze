@@ -41,9 +41,9 @@
 #include "ZEFile/ZEDirectoryInfo.h"
 #include "ZEFile/ZEPathManager.h"
 
-#include "ZE3dsMaxModelExporter/ZE3dsMaxModelExporterDescription.h"
-#include "ZE3dsMaxInteriorExporter/ZE3dsMaxInteriorExporterDescription.h"
-#include "ZE3dsMaxUI/ZE3dsMaxUIDescription.h"
+#include "ZE3dsMaxModelExporterDescription.h"
+#include "ZE3dsMaxInteriorExporterDescription.h"
+#include "ZE3dsMaxUIDescription.h"
 #include "ZEToolbarIcons_16a.bmp.h"
 #include "ZEToolbarIcons_16i.bmp.h"
 #include "ZEToolbarIcons_24a.bmp.h"

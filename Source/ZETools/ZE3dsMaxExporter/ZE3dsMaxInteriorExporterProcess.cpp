@@ -42,8 +42,8 @@
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEML\ZEMLWriter.h"
 
-#include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
-#include "ZEToolComponents\ZEResourceConfigurator\ZEResourceConfiguratorWidget.h"
+#include "ZEProgressDialog.h"
+#include "ZEResourceConfiguratorWidget.h"
 
 enum ZEInteriorHelperOwnerType
 {

@@ -42,9 +42,8 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
 
 find_package(Qt5 COMPONENTS Widgets)
 
-ze_add_module(ZE3dsMax)
+ze_add_module(ZE3dsMaxExporter)
 ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
 ze_add_module(ZECrashReport)
 ze_add_module(ZESceneConverter)
 ze_add_module(ZEMLEditor)

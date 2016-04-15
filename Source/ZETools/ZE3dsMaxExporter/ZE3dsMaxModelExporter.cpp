@@ -36,8 +36,8 @@
 #include "ZE3dsMaxModelExporter.h"
 
 #include "ZE3dsMaxModelExporterOptionsDialog.h"
-#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
-#include "ZEToolComponents/ZEResourceConfigurator/ZEResourceConfiguratorWidget.h"
+#include "ZEProgressDialog.h"
+#include "ZEResourceConfiguratorWidget.h"
 
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileInfo.h"

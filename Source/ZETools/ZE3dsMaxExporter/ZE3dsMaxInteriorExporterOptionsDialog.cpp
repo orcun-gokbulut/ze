@@ -36,7 +36,7 @@
 #include "ZE3dsMaxInteriorExporterOptionsDialog.h"
 
 #include "ZEML\ZEMLProperty.h"
-#include "ZEToolComponents\ZEResourceConfigurator\ZEResourceConfiguratorWidget.h"
+#include "ZEResourceConfiguratorWidget.h"
 
 #include <QFileDialog>
 

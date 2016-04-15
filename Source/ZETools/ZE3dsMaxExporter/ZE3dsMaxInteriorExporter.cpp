@@ -40,8 +40,8 @@
 #include "ZEFile/ZEFileInfo.h"
 
 #include "ZE3dsMaxInteriorExporterOptionsDialog.h"
-#include "ZEToolComponents/ZEProgressDialog/ZEProgressDialog.h"
-#include "ZEToolComponents/ZEResourceConfigurator/ZEResourceConfiguratorWidget.h"
+#include "ZEProgressDialog.h"
+#include "ZEResourceConfiguratorWidget.h"
 
 #include <tchar.h>
 #include <QApplication>
