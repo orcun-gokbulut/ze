@@ -35,10 +35,26 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEResourceOption.h			    Sources)
-ze_add_source(ZEResourceOption.cpp			    Sources)
-ze_add_source(ZEResourceConfigurator.h			Sources)
-ze_add_source(ZEResourceConfigurator.cpp		Sources)
+ze_add_source(ZEResourceOption.h			 		Sources)
+ze_add_source(ZEResourceOption.cpp			  		Sources)
+ze_add_source(ZEResourceOptionWidget.ui				Sources QtUI)
+ze_add_source(ZEResourceOptionWidget.h				Sources QtMocs)
+ze_add_source(ZEResourceOptionWidget.cpp			Sources)
+ze_add_source(ZEResourceOptionTreeItem.cpp			Sources)
+ze_add_source(ZEResourceOptionTreeItem.h			Sources)
+ze_add_source(ZEResourceConfigurator.h				Sources)
+ze_add_source(ZEResourceConfigurator.cpp			Sources)
+ze_add_source(ZEResourceConfiguratorWidget.ui		Sources QtUI)
+ze_add_source(ZEResourceConfiguratorWidget.h		Sources QtMocs)
+ze_add_source(ZEResourceConfiguratorWidget.cpp		Sources)
+
+qt5_add_resources(QtResourceFiles ${QtResources})
+qt5_wrap_ui(QtUIFiles ${QtUI})
+qt5_wrap_cpp(QtMocFiles ${QtMocs})
+
+source_group("Generated" FILES ${QtResourceFiles} ${QtMocFiles} ${QtUIFiles})
 
 ze_add_library(TARGET ZEResourceConfigurator 
-	SOURCES ${Sources})
+	SOURCES ${Sources} ${QtUIFiles} ${QtMocFiles})
+	
+qt5_use_modules(ZEResourceConfigurator Widgets)

@@ -34,61 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_VISUALIZER_WIDGET_H__
-#define __ZEML_VISUALIZER_WIDGET_H__
 
-#include "QtGui/QWidget"
 #include "ZEDS/ZEString.h"
+
+#include <QWidget>
 
 class ZEMLNode;
 class ZEMLRoot;
-class QApplication;
 class ZEMLElement;
-class QTreeWidgetItem;
 class ZEMLVisualizerTreeWidget;
+class QApplication;
+class QTreeWidgetItem;
 
 namespace Ui
 {
 	class ZEMLVisualizerWidgetUI;
 }
 
-class ZEMLVisualizerQt
-{
-	friend class ZEMLVisualizerWidget;
-
-	private:
-
-		bool							QApplicationCreated;
-		Ui::ZEMLVisualizerWidgetUI*		Form;
-		QWidget*						Widget;
-		ZEMLVisualizerTreeWidget*		Tree;
-		QApplication*					Application;
-
-										ZEMLVisualizerQt(QWidget* Parent = NULL);
-										~ZEMLVisualizerQt();
-};
-
-class ZEMLVisualizerWidget
+class ZEMLVisualizerWidget : public QWidget
 {
 	private:
+		Ui::ZEMLVisualizerWidgetUI*				Form;
+		QWidget*								Widget;
+		ZEMLVisualizerTreeWidget*				Tree;
 
-		ZEMLVisualizerQt*				QtComponents;
-		ZEMLRoot*						Root;
-		ZEMLNode*						Node;
+		ZEMLRoot*								Root;
+		ZEMLNode*								Node;
 
-		void							AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentItem = NULL);
+		void									AddItem(ZEMLElement* Item, QTreeWidgetItem* ParentItem = NULL);
 
 	public:
+		void									SetZEMLFile(const ZEString& FileName);
+		void									SetZEMLNode(ZEMLNode* Node);
+		void									Refresh();
 
-		void							Show();
-		void							Hide();
-
-		void							SetZEMLFile(const ZEString& FileName);
-		void							SetZEMLNode(ZEMLNode* Node);
-		void							Refresh();
-
-										ZEMLVisualizerWidget(QWidget* Parent = NULL);
-										~ZEMLVisualizerWidget();
+												ZEMLVisualizerWidget(QWidget* Parent = NULL);
+												~ZEMLVisualizerWidget();
 };
-
-#endif

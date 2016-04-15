@@ -40,7 +40,7 @@
 #include "ZECrashReport/ZECrashReportFileProvider.h"
 #include "ZECrashReportUploadThread.h"
 
-ZECrashReportUIMainWindow::ZECrashReportUIMainWindow(QWidget *Parent, Qt::WFlags Flags) : QMainWindow(Parent, Flags)
+ZECrashReportUIMainWindow::ZECrashReportUIMainWindow(QWidget *Parent, Qt::WindowFlags Flags) : QMainWindow(Parent, Flags)
 {
 	
 }

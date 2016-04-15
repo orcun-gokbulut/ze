@@ -37,10 +37,10 @@
 #ifndef	__ZE_PROGRESS_DIALOG_TREE_WIDGET_H__
 #define __ZE_PROGRESS_DIALOG_TREE_WIDGET_H__
 
-#include "QtGui\QTreeWidget"
-#include "QtGui\QPainter"
-#include "QtGui\QStyleOption"
-#include "QtCore\QAbstractItemModel"
+#include <QTreeWidget>
+#include <QPainter>
+#include <QStyleOption>
+#include <QAbstractItemModel>
 
 class ZEProgressDialogTreeWidget : public QTreeWidget
 {

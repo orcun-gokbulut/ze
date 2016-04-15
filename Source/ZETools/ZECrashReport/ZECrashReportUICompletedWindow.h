@@ -38,9 +38,10 @@
 #ifndef _ZE_CRUI_COMPLETEDWINDOW_H_
 #define _ZE_CRUI_COMPLETEDWINDOW_H_
 
-#include <QtGui/QMainWindow>
 #include "ZECrashReportUIClickableLabel.h"
 #include "ZECrashReport/ZECrashReport.h"
+
+#include <QMainWindow>
 
 namespace Ui
 {

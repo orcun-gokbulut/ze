@@ -34,8 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEOperationPaste.h"
+
 #include "ZEML/ZEMLNode.h"
-#include <QtGui\QTreeWidgetItem>
+
+#include <QTreeWidgetItem>
 
 bool ZEOperationPaste::PasteToTree(ZEMLElement* Element, ZEMLNode* ParentNode)
 {

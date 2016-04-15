@@ -141,13 +141,13 @@ class ZEMatrix3x3
 		void							InverseSelf();
 		void							TransposeSelf();
 
-		ZEQuaternion					GetRotation();
-		ZEVector3						GetScale();
+		ZEQuaternion					GetRotation() const;
+		ZEVector3						GetScale() const;
 		static void						GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix3x3& Matrix);
 
-		ZEVector2						Get2DTranslation();
-		float							Get2DRotation();
-		ZEVector2						Get2DScale();
+		ZEVector2						Get2DTranslation() const;
+		float							Get2DRotation() const;
+		ZEVector2						Get2DScale() const;
 		static void						Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix);
 
 		ZEMatrix3x3Shader				ToMatrix3x3Shader();
@@ -255,9 +255,9 @@ class ZEMatrix4x4
 		void							InverseSelf();
 		void							TransposeSelf();
 
-		ZEVector3						GetTranslation();
-		ZEQuaternion					GetRotation();
-		ZEVector3						GetScale();
+		ZEVector3						GetTranslation() const;
+		ZEQuaternion					GetRotation() const;
+		ZEVector3						GetScale() const;
 		static void						GetDecomposition(ZEVector3& Translation, ZEQuaternion& Rotation, ZEVector3& Scale, const ZEMatrix4x4& Matrix);
 
 		ZEMatrix4x4						operator+(const ZEMatrix4x4& RightOperand) const;

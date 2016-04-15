@@ -34,31 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_VISUALIZER_TREE_WIDGET_H__
-#define __ZEML_VISUALIZER_TREE_WIDGET_H__
 
-#include "QtGui\QTreeWidget"
-#include "QtGui\QPainter"
-#include "QtGui\QStyleOption"
-#include "QtCore\QAbstractItemModel"
+#include <QTreeWidget>
+#include <QPainter>
+#include <QStyleOption>
+#include <QAbstractItemModel>
 
 class QMimeData;
 class QTreeWidgetItem;
 
 class ZEMLVisualizerTreeWidget : public QTreeWidget
 {
-	protected:
-
-		QWidget*		ParentWidget;
-
-		virtual void	drawRow(QPainter* Painter, const QStyleOptionViewItem &Option, const QModelIndex &Index) const;
-		virtual void	dragEnterEvent(QDragEnterEvent* Event);
-		void			dropEvent(QDropEvent* Event);
-		virtual bool	dropMimeData(QTreeWidgetItem* Parent, int Index, const QMimeData* Data, Qt::DropAction Action);
+	private:
+		virtual void			drawRow(QPainter* Painter, const QStyleOptionViewItem &Option, const QModelIndex &Index) const;
+		virtual void			dragEnterEvent(QDragEnterEvent* Event);
+		void					dropEvent(QDropEvent* Event);
+		virtual bool			dropMimeData(QTreeWidgetItem* Parent, int Index, const QMimeData* Data, Qt::DropAction Action);
 
 	public:
-
-						ZEMLVisualizerTreeWidget(QWidget* Parent = NULL);
+								ZEMLVisualizerTreeWidget(QWidget* Parent = NULL);
 };
-
-#endif

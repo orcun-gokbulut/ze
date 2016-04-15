@@ -80,7 +80,7 @@ void ZERNSimpleMaterial::UpdateRenderState()
 		return;
 
 	ZEGRRenderState RenderState = ZERNStageForward::GetRenderState();
-	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	RenderState.SetPrimitiveType(PrimitiveType);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
 	if (DepthTestDisabled)
@@ -138,6 +138,8 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	Constants.VertexColorEnabled = true;
 	Constants.TextureEnabled = false;
 	Constants.MaterialColor = ZEVector4::One;
+	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
+
 	DirtyFlags.RaiseAll();
 }
 
@@ -172,6 +174,20 @@ void ZERNSimpleMaterial::SetWireframe(bool Enable)
 bool ZERNSimpleMaterial::GetWireframe() const
 {
 	return Wireframe;
+}
+
+void ZERNSimpleMaterial::SetPrimitiveType(ZEGRPrimitiveType Type)
+{
+	if (PrimitiveType == Type)
+		return;
+
+	PrimitiveType = Type;
+	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
+}
+
+ZEGRPrimitiveType ZERNSimpleMaterial::SetPrimitiveType() const
+{
+	return PrimitiveType;
 }
 
 void ZERNSimpleMaterial::SetDepthTestDisabled(bool Disabled)

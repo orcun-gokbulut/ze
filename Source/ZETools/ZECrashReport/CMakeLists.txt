@@ -75,10 +75,14 @@ ze_add_source(ReportDialog.ui 										Sources QtUI)
 ze_add_source(zecrashreportui.qrc									Sources QtResources)
 ze_add_source(ZECrashReportUIMain.cpp								Sources)
 
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+qt5_add_resources (QtResourceFiles ${QtResources})
+qt5_wrap_ui (QtUIFiles ${QtUI})
+qt5_wrap_cpp (QtMocFiles  ${QtMocs})
+
+source_group("Generated" FILES ${QtResourceFiles} ${QtMocFiles} ${QtUIFiles})
 
 ze_add_executable(TARGET ZECrashReport
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS ZEFoundation libQt libTinyXML libZLib libCurl Ws2_32)
+	LIBS ZEFoundation libTinyXML libZLib libCurl Ws2_32)
+
+qt5_use_modules(ZECrashReport Widgets)

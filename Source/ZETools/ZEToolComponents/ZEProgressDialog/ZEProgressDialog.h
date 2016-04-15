@@ -37,10 +37,11 @@
 #ifndef	__ZE_PROGRESS_DIALOG_H__
 #define __ZE_PROGRESS_DIALOG_H__
 
-#include "QtGui\QDialog"
-#include "ZEDS\ZEString.h"
 #include "ZEError.h"
+#include "ZEDS\ZEString.h"
 #include "ZEDS\ZEArray.h"
+
+#include <QDialog>
 
 namespace Ui
 {

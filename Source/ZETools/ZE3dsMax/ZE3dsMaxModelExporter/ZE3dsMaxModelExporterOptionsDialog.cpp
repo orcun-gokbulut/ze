@@ -34,9 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxModelExporterOptionsDialog.h"
-#include "QtGui\QFileDialog"
+
 #include "ZEML\ZEMLProperty.h"
-#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
+#include "ZEToolComponents\ZEResourceConfigurator\ZEResourceConfiguratorWidget.h"
+
+#include <QFileDialog>
 
 ZE3dsMaxModelExporterOptionsDialog::ZE3dsMaxModelExporterOptionsDialog(QWidget* Parent) : QDialog(Parent)
 {
@@ -57,38 +59,38 @@ ZE3dsMaxModelExporterOptionsDialog::ZE3dsMaxModelExporterOptionsDialog(QWidget* 
 
 void ZE3dsMaxModelExporterOptionsDialog::SetOptions(ZEMLNode* Options)
 {
-	if(Options == NULL)
+	if (Options == NULL)
 		return;
 
 	this->Options = Options;
 
 	const ZEMLElement* CurrentProperty = NULL;
 	CurrentProperty = Options->GetProperty("ZinekEngineWorkingDirectory");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->txtEngineWorkingDirectory->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
 	CurrentProperty = Options->GetProperty("LogFilePath");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->txtLogFilePath->setText(((ZEMLProperty*)CurrentProperty)->GetValue().GetString().ToCString());
 
 	CurrentProperty = Options->GetProperty("IsFileLoggingEnabled");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		ToggleFileLogging(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
 	CurrentProperty = Options->GetProperty("IsBoneExportEnabled");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->grpExportBones->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
 	CurrentProperty = Options->GetProperty("IsBonePhysicalBodyExportEnabled");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->ckbExportBonePhysicalBodies->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
 	CurrentProperty = Options->GetProperty("IsMeshExportEnabled");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->grpExportMeshes->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
 	CurrentProperty = Options->GetProperty("IsMeshPhysicalBodyExportEnabled");
-	if(CurrentProperty != NULL)
+	if (CurrentProperty != NULL)
 		Form->ckbExportMeshPhysicalBodies->setChecked(((ZEMLProperty*)CurrentProperty)->GetValue().GetBoolean());
 
 	CurrentProperty = Options->GetProperty("IsAnimationExportEnabled");
@@ -136,7 +138,7 @@ void ZE3dsMaxModelExporterOptionsDialog::ShowEngineDirectoryDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
-	if(SelectedDirectory.length() == 0)
+	if (SelectedDirectory.length() == 0)
 		return;
 
 	Form->txtEngineWorkingDirectory->setText(SelectedDirectory);
@@ -146,7 +148,7 @@ void ZE3dsMaxModelExporterOptionsDialog::ShowLoggingFilePathDialog()
 {
 	QString SelectedDirectory = QFileDialog::getExistingDirectory(this, QString("Select Directory"), Form->txtEngineWorkingDirectory->text());
 
-	if(SelectedDirectory.length() == 0)
+	if (SelectedDirectory.length() == 0)
 		return;
 
 	Form->txtLogFilePath->setText(SelectedDirectory);
@@ -154,7 +156,7 @@ void ZE3dsMaxModelExporterOptionsDialog::ShowLoggingFilePathDialog()
 
 void ZE3dsMaxModelExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState)
 {
-	if(CheckBoxState == Qt::CheckState::Checked)
+	if (CheckBoxState == Qt::CheckState::Checked)
 		ToggleFileLogging(true);
 	else
 		ToggleFileLogging(false);
@@ -162,13 +164,13 @@ void ZE3dsMaxModelExporterOptionsDialog::SetFileLoggingEnabled(int CheckBoxState
 
 void ZE3dsMaxModelExporterOptionsDialog::SetExportBonesEnabled(bool IsChecked)
 {
-	if(!IsChecked)
+	if (!IsChecked)
 		Form->ckbExportBonePhysicalBodies->setChecked(false);
 }
 
 void ZE3dsMaxModelExporterOptionsDialog::SetExportMeshesEnabled(bool IsChecked)
 {
-	if(!IsChecked)
+	if (!IsChecked)
 		Form->ckbExportMeshPhysicalBodies->setChecked(false);
 }
 
@@ -191,7 +193,7 @@ void ZE3dsMaxModelExporterOptionsDialog::AddAnimation()
 
 void ZE3dsMaxModelExporterOptionsDialog::RemoveAnimation()
 {
-	if(Form->AnimationTreeWidget->currentItem() == NULL)
+	if (Form->AnimationTreeWidget->currentItem() == NULL)
 		return;
 
 	ZEInt32 IndexOfItem = Form->AnimationTreeWidget->indexOfTopLevelItem(Form->AnimationTreeWidget->currentItem());
@@ -200,7 +202,7 @@ void ZE3dsMaxModelExporterOptionsDialog::RemoveAnimation()
 
 void ZE3dsMaxModelExporterOptionsDialog::CollectOptionsFromForm()
 {
-	if(Options == NULL)
+	if (Options == NULL)
 	{
 		Options = new ZEMLNode("Options");
 		Options->AddProperty("ZinekEngineWorkingDirectory")->SetString(Form->txtEngineWorkingDirectory->text().toUtf8().constData());

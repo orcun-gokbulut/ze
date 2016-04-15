@@ -38,40 +38,42 @@
 #define __ZE_3DS_MODEL_EXPORTER_OPTIONS_DIALOG_H__
 
 #include "ui_ZE3dsMaxModelExporterOptionsWidget.h"
-#include "QtGui\QDialog"
+
 #include "ZEDS\ZEString.h"
 #include "ZEML\ZEMLNode.h"
+
+#include <QDialog>
 
 class ZE3dsMaxModelExporterOptionsDialog : public QDialog
 {
 	Q_OBJECT
 
 	private:
-		Ui::ZE3dsMaxModelExporterOptionsDialogUI*		Form;
-		ZEMLNode*										Options;
+		Ui::ZE3dsMaxModelExporterOptionsDialogUI*	Form;
+		ZEMLNode*									Options;
 	
-		void			ToggleFileLogging(bool IsEnabled);
-		void			ToggleApplicationPathOptions(bool IsEnabled);
-		void			CollectOptionsFromForm();
+		void										ToggleFileLogging(bool IsEnabled);
+		void										ToggleApplicationPathOptions(bool IsEnabled);
+		void										CollectOptionsFromForm();
 
 	private slots:
-		void			ShowEngineDirectoryDialog();
-		void			ShowLoggingFilePathDialog();
-		void			SetFileLoggingEnabled(int CheckBoxState);
-		void			SetExportBonesEnabled(bool IsChecked);
-		void			SetExportMeshesEnabled(bool IsChecked);
+		void										ShowEngineDirectoryDialog();
+		void										ShowLoggingFilePathDialog();
+		void										SetFileLoggingEnabled(int CheckBoxState);
+		void										SetExportBonesEnabled(bool IsChecked);
+		void										SetExportMeshesEnabled(bool IsChecked);
 
-		void			AddAnimation();
-		void			RemoveAnimation();
+		void										AddAnimation();
+		void										RemoveAnimation();
 
 	public:
-						ZE3dsMaxModelExporterOptionsDialog(QWidget* Parent);
+													ZE3dsMaxModelExporterOptionsDialog(QWidget* Parent);
 
-		bool			GetFileLoggingEnabled();
-		ZEString		GetLogFilePath();
+		bool										GetFileLoggingEnabled();
+		ZEString									GetLogFilePath();
 
-		void			SetOptions(ZEMLNode* Options);
-		ZEMLNode*		GetOptions();
+		void										SetOptions(ZEMLNode* Options);
+		ZEMLNode*									GetOptions();
 };
 
 #endif

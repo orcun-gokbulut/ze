@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_RESOURCE_CONFIGURATOR_H__
-#define __ZE_RESOURCE_CONFIGURATOR_H__
 
 #include "ZEDS\ZEArray.h"
 #include "ZEDS\ZEString.h"
@@ -48,14 +46,12 @@ class ZEFile;
 class ZEResourceConfigurator
 {
 	private:
-
 		ZEArray<ZEResourceOption*>			Options;
 		ZEString							WorkingDirectory;
 		ZEMLNode*							Preset;
 		ZEMLRoot							Root;
 
 	public:
-
 		bool								GetResourceCopyState(ZEResourceOption Option);
 		bool								GetResourceCopyState(const ZEString& FileName);
 
@@ -80,5 +76,3 @@ class ZEResourceConfigurator
 											ZEResourceConfigurator();
 											~ZEResourceConfigurator();
 };
-
-#endif

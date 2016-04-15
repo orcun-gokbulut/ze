@@ -34,14 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
-
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
 
 #include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLRoot.h"
+
+#include <QMainWindow>
+#include <QTreeWidget>
 
 class Ui_ZEMLEditorWindow;
 class QLabel;
@@ -115,5 +113,3 @@ class ZEMLEditorWindow : public QMainWindow
 
 		static ZEMLEditorWindow* GetInstance();
 };
-
-#endif

@@ -35,20 +35,21 @@
 
 #pragma once
 
+#include "ZETypes.h"
+#include "ZEML/ZEMLNode.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEPathManager.h"
+
+#include "ZEProgressDialog/ZEProgressDialog.h"
+#include "ZEProgressDialog/ZEProgressDialogTask.h"
+#include "ZEResourceConfigurator/ZEResourceConfiguratorWidget.h"
+#include "ZEMLVisualizer/ZEMLVisualizerWidget.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <shellapi.h>
 
-#include <QtGui/QApplication>
-#include "ZETypes.h"
-#include "ZEProgressDialog/ZEProgressDialog.h"
-#include "ZEProgressDialog/ZEProgressDialogTask.h"
-#include "ZEResourceConfigurationWidget/ZEResourceConfigurationWidget.h"
-#include "ZEMLVisualizer/ZEMLVisualizerWidget.h"
-#include "ZEFile/ZEFile.h"
-#include "ZEML/ZEMLNode.h"
-#include "ZEFile/ZEPathManager.h"
-
+#include <QApplication>
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {	
@@ -75,7 +76,7 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 
 	w.SetZEMLFile(ZEString(ArgList[1]));
 
-	w.Show();
+	w.show();
 
 // 	ZEResourceConfigurationWidget w;
 // 	w.AddResource("Material1", "C:\\", "D:\\", ZE_ROAA_COPY_OVERWRITE, true);

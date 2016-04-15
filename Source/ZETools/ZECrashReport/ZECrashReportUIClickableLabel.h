@@ -34,27 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef _ZE_CRASHREPORT_CLICKABLELABEL_H__
-#define _ZE_CRASHREPORT_CLICKABLELABEL_H__
 
-#include "QtGui\qlabel.h"
+#include <QLabel>
 
 class ZECrashReportUIClickableLabel : public QLabel
 {
 	Q_OBJECT
-		
-		public:
-			explicit ZECrashReportUIClickableLabel (const QString text = "", QWidget* parent = 0);
-			~ZECrashReportUIClickableLabel();
+	protected:
+		void					mousePressEvent(QMouseEvent* Event);
+	
+	public:
+		explicit				ZECrashReportUIClickableLabel (const QString text = "", QWidget* parent = 0);
+								~ZECrashReportUIClickableLabel();
 
-			signals:
-				void clicked();
-
-			protected:
-				void mousePressEvent(QMouseEvent* Event);
+	signals:
+		void					clicked();
 };
-
-#endif
-
 
 

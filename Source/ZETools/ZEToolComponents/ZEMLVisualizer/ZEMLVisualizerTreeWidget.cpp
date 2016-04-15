@@ -34,15 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMLVisualizerTreeWidget.h"
+
 #include "ZETypes.h"
-#include "QtGui/QHeaderView"
-#include "QtGui/QScrollBar"
-#include "QtCore/qmimedata.h"
-#include "ZEMLVisualizerWidget.h"
-#include "QtGui/Qevent.h"
-#include "QtCore/QUrl"
-#include "QtCore/QString"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEMLVisualizerWidget.h"
+
+#include <QMimeData>
+#include <QUrl>
+#include <QString>
+#include <QHeaderView>
+#include <QScrollBar>
+#include <qevent.h>
 
 ZEMLVisualizerTreeWidget::ZEMLVisualizerTreeWidget(QWidget* Parent) : QTreeWidget(Parent)
 {
@@ -50,7 +52,6 @@ ZEMLVisualizerTreeWidget::ZEMLVisualizerTreeWidget(QWidget* Parent) : QTreeWidge
 	Header->setText(0, "Name");
 	Header->setText(1, "Type");
 	Header->setText(2, "Value");
-	ParentWidget = Parent;
 	setAcceptDrops(true);
 	setDragDropMode(DragDrop);
 }
@@ -62,9 +63,9 @@ void ZEMLVisualizerTreeWidget::drawRow(QPainter* Painter, const QStyleOptionView
 	for(ZEInt I = 0; I < columnCount(); I++)
 	{
 		QModelIndex CurrentIndex = Index.sibling(Index.row(), I);
-		if(CurrentIndex.isValid())
+		if (CurrentIndex.isValid())
 		{
-			if(I == 0)
+			if (I == 0)
 			{
 				QRect GridRect = visualRect(CurrentIndex);
 				GridRect.setTopLeft(QPoint(0, GridRect.topLeft().y()));
@@ -84,16 +85,16 @@ void ZEMLVisualizerTreeWidget::drawRow(QPainter* Painter, const QStyleOptionView
 
 void ZEMLVisualizerTreeWidget::dragEnterEvent(QDragEnterEvent* Event)
 {
-	if(Event->mimeData()->hasUrls())
+	if (Event->mimeData()->hasUrls())
 		Event->acceptProposedAction();
 }
 
 void ZEMLVisualizerTreeWidget::dropEvent(QDropEvent* Event)
 {
-	if(!ZEFileInfo((const char*)Event->mimeData()->urls()[0].path().toLatin1()).IsFile())
+	if (!ZEFileInfo((const char*)Event->mimeData()->urls()[0].path().toLatin1()).IsFile())
 		return;
 
-	((ZEMLVisualizerWidget*)ParentWidget)->SetZEMLFile((const char*)Event->mimeData()->urls()[0].path().toLatin1());
+	static_cast<ZEMLVisualizerWidget*>(parent())->SetZEMLFile((const char*)Event->mimeData()->urls()[0].path().toLatin1());
 }
 
 bool ZEMLVisualizerTreeWidget::dropMimeData(QTreeWidgetItem* Parent, int Index, const QMimeData* Data, Qt::DropAction Action)

@@ -34,95 +34,88 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MODEL_EXPORTER_H__
-#define __ZE3DS_MODEL_EXPORTER_H__
 
 #include "ZE3dsMaxUtils/ZE3dsMaxUtils.h"
 
 extern HINSTANCE hInstance;
-class QApplication;
-class QWinWidget;
+
 class ZEProgressDialog;
 class ZE3dsMaxModelExporterOptionsDialog;
-class ZEResourceConfigurationWidget;
+class ZEResourceConfiguratorWidget;
+class QApplication;
+class QWindow;
 
 class ZE3dsMaxModelExporter : public SceneExport 
 {
 	private:
-
-		QApplication*						QtApplication;
-
 		ZE3dsMaxModelExporterOptionsDialog*	OptionsDialog;
-		ZEResourceConfigurationWidget*		ResourceConfigurationDialog;
+		ZEResourceConfiguratorWidget*		ResourceConfiguratorDialog;
 
 		ZEMLNode*							ExportOptions;
-		QWinWidget*							WinWidget;
+		QWindow*							WinWidget;
 		ZEProgressDialog*					ProgressDialog;
 		ZEString							ExportPath;
 
-		IGameScene*					Scene;
-		ZEMLRoot					ModelRoot;
-		ZEMLNode					ModelNode;
+		IGameScene*							Scene;
+		ZEMLRoot							ModelRoot;
+		ZEMLNode							ModelNode;
 
-		Tab<IGameNode*>				ProcessedBones;
-		Tab<IGameNode*>				ProcessedMeshes;
-		Tab<IGameNode*>				ProcessedMasterMeshes;
-		Tab<IGameNode*>				ProcessedHelpers;
-		Tab<IGameMaterial*>			ProcessedMaterials;
+		Tab<IGameNode*>						ProcessedBones;
+		Tab<IGameNode*>						ProcessedMeshes;
+		Tab<IGameNode*>						ProcessedMasterMeshes;
+		Tab<IGameNode*>						ProcessedHelpers;
+		Tab<IGameMaterial*>					ProcessedMaterials;
 
-		ZEInt32						TotalFrameCount;
-		ZEInt32						TicksPerFrame;
+		ZEInt32								TotalFrameCount;
+		ZEInt32								TicksPerFrame;
 
-		void						CollectResources();
-		void						LoadOptions(const char* FilePath);
-		void						SaveOptions(const char* FilePath);
-		bool						ShowOptionsDialog(HWND ParentWindow);
-		bool						ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
+		void								CollectResources();
+		void								LoadOptions(const char* FilePath);
+		void								SaveOptions(const char* FilePath);
+		bool								ShowOptionsDialog(HWND ParentWindow);
+		bool								ShowResourceConfigurationDialog(HWND ParentWindow, const char* MaxFilePath);
 
-		bool						ProcessBone(IGameNode* Node, ZEMLNode* BonesNode);
-		bool						ProcessBones();
-		ZEInt32						ProcessMeshMaterial(IGameMaterial* Material);
-		bool						ProcessMaterials(const char* FileName);
-		bool						ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
-		void						ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
-		bool						ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode);
-		void						ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode);
-		bool						ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode);
-		bool						ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode);
-		bool						ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode);
-		bool						ProcessMeshes();
-		void						ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode);
-		bool						ProcessAnimations(ZEMLNode* AnimationsNode);
-		bool						ProcessHelpers();
-		bool						ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode);
+		bool								ProcessBone(IGameNode* Node, ZEMLNode* BonesNode);
+		bool								ProcessBones();
+		ZEInt32								ProcessMeshMaterial(IGameMaterial* Material);
+		bool								ProcessMaterials(const char* FileName);
+		bool								ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
+		void								ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
+		bool								ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode);
+		void								ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode);
+		bool								ProcessPhysicalJoint(IGameNode* Node, ZEMLNode* PhysicalJointNode);
+		bool								ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesNode);
+		bool								ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNode);
+		bool								ProcessMeshes();
+		void								ProcessAnimationFrames(ZESize AnimationStartFrame, ZESize AnimationFrameCount, ZEMLNode* AnimationNode);
+		bool								ProcessAnimations(ZEMLNode* AnimationsNode);
+		bool								ProcessHelpers();
+		bool								ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode);
 
-		ZEInt32						GetBoneId(IGameNode* Node);
-		ZEInt32						GetMeshId(IGameNode* Node);
+		ZEInt32								GetBoneId(IGameNode* Node);
+		ZEInt32								GetMeshId(IGameNode* Node);
 
 	protected:
-		ZEInt32						GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
+		ZEInt32								GetSceneNodes(INodeTab& i_nodeTab, INode* i_currentNode =NULL);
 
 	public:
+		virtual ZEInt						ExtCount();
+		virtual const TCHAR*				Ext(ZEInt n);
+		virtual const TCHAR*				LongDesc();
+		virtual const TCHAR*				ShortDesc();
+		virtual const TCHAR*				AuthorName();
+		virtual const TCHAR*				CopyrightMessage();
+		virtual const TCHAR*				OtherMessage1();
+		virtual const TCHAR*				OtherMessage2();
+		virtual ZEUInt						Version();
+		virtual void						ShowAbout(HWND hWnd);
 		
-		virtual ZEInt				ExtCount();
-		virtual const TCHAR*		Ext(ZEInt n);
-		virtual const TCHAR*		LongDesc();
-		virtual const TCHAR*		ShortDesc();
-		virtual const TCHAR*		AuthorName();
-		virtual const TCHAR*		CopyrightMessage();
-		virtual const TCHAR*		OtherMessage1();
-		virtual const TCHAR*		OtherMessage2();
-		virtual ZEUInt				Version();
-		virtual void				ShowAbout(HWND hWnd);
-		
-		virtual	BOOL				SupportsOptions(ZEInt ext, DWORD options);	
-		virtual ZEInt				DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
+		virtual	BOOL						SupportsOptions(ZEInt ext, DWORD options);	
+		virtual ZEInt						DoExport(const TCHAR *name,ExpInterface *ei,Interface *i, BOOL suppressPrompts=FALSE, DWORD options=0);
 
-		virtual	bool				WriteToFile(const char* FilePath);
+		virtual	bool						WriteToFile(const char* FilePath);
 		
 
-									ZE3dsMaxModelExporter();
-		virtual						~ZE3dsMaxModelExporter();
+											ZE3dsMaxModelExporter();
+		virtual								~ZE3dsMaxModelExporter();
 };
-
-#endif

@@ -35,13 +35,15 @@
 
 
 #include "ZE3dsMaxInteriorExporter.h"
-#include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
-#include "ZEToolComponents\ZEResourceConfigurationWidget\ZEResourceConfigurationWidget.h"
+
+#include "ZEMath\ZEAngle.h"
 #include "ZEFile\ZEFile.h"
 #include "ZEFile\ZEFileInfo.h"
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEML\ZEMLWriter.h"
-#include "ZEMath\ZEAngle.h"
+
+#include "ZEToolComponents\ZEProgressDialog\ZEProgressDialog.h"
+#include "ZEToolComponents\ZEResourceConfigurator\ZEResourceConfiguratorWidget.h"
 
 enum ZEInteriorHelperOwnerType
 {
@@ -154,10 +156,10 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		DoorNode->AddProperty("Rotation")->SetQuaternion(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
 		DoorNode->AddProperty("Scale")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomA", RoomANode))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomA", RoomANode))
 			zeError("Can not find door property: RoomA");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomB", RoomBNode))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomB", RoomBNode))
 			zeError("Can not find door property: RoomB");
 
 		if (RoomANode == NULL || RoomBNode == NULL || RoomANode == RoomBNode)
@@ -168,14 +170,14 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 
 		ZEInt32 RoomAIndex = FindRoomIndex(Scene->GetIGameNode(RoomANode));
 		
-		if(RoomAIndex < 0)
+		if (RoomAIndex < 0)
 			zeError("Can nor find RoomAIndex.");
 		
 		DoorNode->AddProperty("RoomAIndex")->SetInt32(RoomAIndex);
 
 		ZEInt32 RoomBIndex = FindRoomIndex(Scene->GetIGameNode(RoomBNode));
 
-		if(RoomBIndex < 0)
+		if (RoomBIndex < 0)
 			zeError("Can nor find RoomBIndex.");
 
 		DoorNode->AddProperty("RoomBIndex")->SetInt32(RoomBIndex);
@@ -196,13 +198,13 @@ void ZE3dsMaxInteriorExporter::ProcessPhysicalMesh(IGameNode* ParentNode, IGameN
 {
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
 
-	if(!Mesh->InitializeData())
+	if (!Mesh->InitializeData())
 		zeError("Can not initialize mesh data for phsical mesh.");
 
 	ZEArray<ZEInteriorFilePhysicalMeshPolygon> Polygons;
 	Polygons.SetCount((ZESize)Mesh->GetNumberOfFaces());
 
-	if(Mesh->GetNumberOfFaces() == 0)
+	if (Mesh->GetNumberOfFaces() == 0)
 		zeError("Physical mesh face count is : 0.");
 
 	for (ZESize I = 0; I < (ZESize)Mesh->GetNumberOfFaces(); I++)
@@ -285,25 +287,25 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		if (!UserDefinedPropertiesBuffer.isNull())
 			RoomNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"OctreeEnabled", OctreeEnabled))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"OctreeEnabled", OctreeEnabled))
 			zeError("Can not find room property : \"OctreeEnabled\".");
 		else
 			RoomNode->AddProperty("GenerateOctree")->SetBool(OctreeEnabled);
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshExists", PhysicalMeshExists))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshExists", PhysicalMeshExists))
 			zeError("Can not find room property : \"PhysicalMeshExists\".");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshEnabled", PhysicalMeshEnabled))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshEnabled", PhysicalMeshEnabled))
 			zeError("Can not find room property : \"PhysicalMeshEnabled\".");
 
-		if(!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshUseSelf", PhysicalMeshUseSelf))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshUseSelf", PhysicalMeshUseSelf))
 			zeError("Can not find room property : \"PhysicalMeshUseSelf\".");
 
-		if(PhysicalMeshEnabled && !PhysicalMeshUseSelf)
-			if(!ZE3dsMaxUtils::GetProperty(CurrentObject, L"PhysicalMesh", PhysicalMeshMaxNode))
+		if (PhysicalMeshEnabled && !PhysicalMeshUseSelf)
+			if (!ZE3dsMaxUtils::GetProperty(CurrentObject, L"PhysicalMesh", PhysicalMeshMaxNode))
 				zeError("Can not find room property : \"PhysicalMesh\".");
 
-		if(PhysicalMeshExists)
+		if (PhysicalMeshExists)
 		{
 			if (PhysicalMeshUseSelf)
 			{
@@ -321,7 +323,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			else
 			{
 				PhysicalMeshNode = Scene->GetIGameNode(PhysicalMeshMaxNode);
-				if(PhysicalMeshNode == NULL)
+				if (PhysicalMeshNode == NULL)
 				{
 					zeWarning("No physical mesh found. Physical Mesh processing aborted.");
 					PhysicalMeshEnabled = false;
@@ -344,15 +346,15 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 
 		IGameMesh* Mesh = (IGameMesh*)CurrentObject;
 		
-		if(!Mesh->InitializeData())
+		if (!Mesh->InitializeData())
 			zeError("Can not initialize mesh data.");
 
-		if(!Mesh->InitializeBinormalData())
+		if (!Mesh->InitializeBinormalData())
 			zeError("Can not initialize mesh binormal data.");
 
 		Mesh->SetUseWeightedNormals();
 
-		if(Mesh->GetNumberOfFaces() == 0)
+		if (Mesh->GetNumberOfFaces() == 0)
 			zeError("Face count is : 0.");
 
 		ZEArray<ZEInteriorFilePolygon> Polygons;
@@ -390,27 +392,27 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 				ZEInt32 BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt32)I, (ZEInt32)N);
 
 				Point3 Temp;
-				if(!Mesh->GetVertex(Face->vert[N], Temp, true))
+				if (!Mesh->GetVertex(Face->vert[N], Temp, true))
 					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
 
 				ZEMatrix4x4::Transform(Vertex->Position, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 				
-				if(!Mesh->GetNormal(Face->norm[N], Temp, true))
+				if (!Mesh->GetNormal(Face->norm[N], Temp, true))
 					zeError("Can not get normal of face %d, normal index : %d.", I, N);
 
 				ZEMatrix4x4::Transform3x3(Vertex->Normal, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
 
-				if(!Mesh->GetTangent(BinormalTangentIndex, Temp))
+				if (!Mesh->GetTangent(BinormalTangentIndex, Temp))
 					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
 
 				ZEMatrix4x4::Transform3x3(Vertex->Tangent, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
 
-				if(!Mesh->GetBinormal(BinormalTangentIndex, Temp))
+				if (!Mesh->GetBinormal(BinormalTangentIndex, Temp))
 					zeError("Can not get binormal of face %d, binormal index : %d.", I, BinormalTangentIndex);
 
 				ZEMatrix4x4::Transform3x3(Vertex->Binormal, OffsetTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
-				if(!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
+				if (!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
 			}
 		}
@@ -451,7 +453,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		ZEInt32 OwnerIndex;
 		ZEInteriorHelperOwnerType OwnerType;
 
-		if(!ZE3dsMaxUtils::GetProperty(Helper, L"Owner", OwnerNode))
+		if (!ZE3dsMaxUtils::GetProperty(Helper, L"Owner", OwnerNode))
 			zeError("Can not find helper property: Owner");
 
 		IGameNode* OwnerGameNode = Scene->GetIGameNode(OwnerNode);
@@ -559,10 +561,10 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		ZEString MaterialName = NodeMaterial->GetMaterialName();
 
 		ZEResourceOption MaterialOption;
-		if(!ResourceConfigurationDialog->GetOption(MaterialName + ".ZEMaterial", MaterialOption))
+		if (!ResourceConfigurationDialog->GetOption(MaterialName + ".ZEMaterial", MaterialOption))
 			zeError("Can not find resource option. Resource identifier : %s", (MaterialName + ".ZEMaterial").ToCString());
 
-		if(!ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+		if (!ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 		{
 			ZEMLNode* MaterialNode = MaterialsNode->AddNode("Material");
 			MaterialNode->AddProperty("Name")->SetString(MaterialName);
@@ -606,7 +608,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
 					zeError("Diffuse texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+				if (!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
 					zeError("Diffuse texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
@@ -614,9 +616,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(DiffuseMap, ResourceRelativePath.ToCString() , ZE_EXFL_MAX_FILENAME_SIZE);
 
-					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+					if (ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
+						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -627,7 +629,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
 					zeError("Specular texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+				if (!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
 					zeError("Specular texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
@@ -635,9 +637,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(SpecularMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
-					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+					if (ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
+						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -648,7 +650,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
 					zeError("Emissive texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+				if (!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
 					zeError("Emissive texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
@@ -656,9 +658,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(EmissiveMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
-					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+					if (ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
+						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -669,7 +671,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
 					zeError("Opacity texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+				if (!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
 					zeError("Opacity texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
@@ -677,9 +679,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(OpacityMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
-					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+					if (ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
+						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -692,7 +694,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
 					zeError("Bump texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+				if (!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
 					zeError("Bump texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
@@ -700,9 +702,9 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(NormalMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
-					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+					if (ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
-						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
+						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -713,7 +715,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 				if (!ResourceConfigurationDialog->GetOption(ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName(), MaterialOption))
 					zeError("Environment texture export path not found in resource options. Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 
-				if(!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
+				if (!ZEDirectoryInfo(MaterialOption.ExportPath).IsDirectory())
 					zeError("Environment texture export path not valid . Resource identifier : %s", ZEFileInfo(ZEString(CurrentTexture->GetBitmapFileName())).GetFileName().ToCString());
 				else
 				{
@@ -721,10 +723,10 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 					ResourceRelativePath = ResourceConfigurationDialog->GetResourceRelativePath(MaterialFilePath, MaterialOption.Identifier);
 					strncpy(EnvironmentMap, ResourceRelativePath.ToCString(), ZE_EXFL_MAX_FILENAME_SIZE);
 
-					if(ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
+					if (ResourceConfigurationDialog->GetCopyState(MaterialOption.Identifier))
 					{
 						ZEFileInfo FileInfo(MaterialOption.PhysicalPath);
-						if(!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
+						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
 							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
@@ -949,10 +951,10 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 			bool IsFound = false;
 
 			for(ZESize J = 0; J < (ZESize)ResourceMaterials.Count(); J++)
-				if(ResourceMaterials[J] == CurrentMaterial)
+				if (ResourceMaterials[J] == CurrentMaterial)
 					IsFound = true;
 
-			if(!IsFound)
+			if (!IsFound)
 				ResourceMaterials.Append(1, &CurrentMaterial);
 		}
 	}

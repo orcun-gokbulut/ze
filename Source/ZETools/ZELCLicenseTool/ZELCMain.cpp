@@ -35,8 +35,8 @@
 #include "ZELCLicenseToolWindow.h"
 #include "ZEPlatform.h"
 
-#include <QtGui/QApplication>
-#include <QtCore/QFile>
+#include <QApplication>
+#include <QFile>
 
 #ifdef ZE_PLATFORM_WINDOWS
 #define  WIN32_LEAN_AND_MEAN
