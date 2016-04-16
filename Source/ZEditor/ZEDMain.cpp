@@ -40,7 +40,7 @@
 #include "ZEDSceneEditor/ZEDMainEditor.h"
 
 #include <windows.h>
-#include <QtGui/QApplication>
+#include <QApplication>
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {

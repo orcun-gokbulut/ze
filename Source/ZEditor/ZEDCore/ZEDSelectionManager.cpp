@@ -142,7 +142,6 @@ void ZEDSelectionManager::SelectObject(const ZERay& Ray)
 	Parameters.FilterFunction = ZERayCastFilterFunction::Create<ZEDSelectionManager, &ZEDSelectionManager::FilterSelection>(this);
 	Parameters.FilterFunctionParameter = Filter;
 	ZERayCastReport Report;
-
 	ZEDScene* Scene = ZEDCore::GetInstance()->GetEditorModule()->GetScene();
 
 	if (!Scene->RayCast(Report, Parameters))
@@ -160,7 +159,6 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 		return;
 
 	ZEArray<ZEDObjectWrapper*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetWrappers(Filter);
-	
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		if (!ViewVolume->CullTest(Wrappers[I]->GetObjectBoundingBox()))
@@ -168,7 +166,8 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 	}
 }
 
-void ZEDSelectionManager::SelectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
+/*
+void ZEDSelectionManager::SelectObject(const ZERNView& View, const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
 {
 	ZECamera* ActiveCamera = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera();
 
@@ -230,7 +229,7 @@ void ZEDSelectionManager::SelectObject(const ZEVector2& ScreenPoint1, const ZEVe
 	SelectionFrustum.Create(RightClipPlane, BottomClipPlane, LeftClipPlane, TopClipPlane, FarClipPlane, NearClipPlane);
 
 	SelectObject(&SelectionFrustum);
-}
+}*/
 
 void ZEDSelectionManager::SelectObject(const ZEString& Name)
 {
@@ -238,7 +237,6 @@ void ZEDSelectionManager::SelectObject(const ZEString& Name)
 		return;
 
 	ZEArray<ZEDObjectWrapper*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetWrappers(Filter);
-
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		if (Wrappers[I]->GetObjectName() == Name)
@@ -249,7 +247,6 @@ void ZEDSelectionManager::SelectObject(const ZEString& Name)
 void ZEDSelectionManager::SelectObject(ZESize Id)
 {
 	ZEArray<ZEDObjectWrapper*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetWrappers(Filter);
-
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		if (Wrappers[I]->GetObjectId() == Id)
@@ -305,7 +302,8 @@ void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
 	}
 }
 
-void ZEDSelectionManager::DeselectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
+/*
+void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
 {
 	ZECamera* ActiveCamera = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera();
 
@@ -364,6 +362,7 @@ void ZEDSelectionManager::DeselectObject(const ZEVector2& ScreenPoint1, const ZE
 
 	DeselectObject(&SelectionFrustum);
 }
+*/
 
 void ZEDSelectionManager::DeselectObject(const ZEString& Name)
 {

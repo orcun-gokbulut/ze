@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDModule.h
+ Zinek Engine - ZEDViewportInput.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,40 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#include "ZECore/ZEApplicationModule.h"
-
-class ZEDScene;
-class ZEDSceneWrapper;
-class ZEDObjectWrapper;
-class ZEDViewport;
-class ZEGrid;
-
-class ZEDModule : public ZEApplicationModule
-{
-	private:
-		ZEDViewport*				Viewport;
-		ZEDScene*					Scene;
-		ZEDSceneWrapper*			SceneWrapper;
-		ZEGrid*						Grid;
-
-	public:
-		void						SetViewPort(ZEDViewport* Viewport);
-		ZEDViewport*				GetViewPort();
-
-		void						SetScene(ZEDScene* Scene);
-		ZEDScene*					GetScene();
-		
-		ZEDObjectWrapper*			GetRootWrapper();
-
-		virtual void				Tick(float ElapsedTime);
-		virtual void				Render(float ElapsedTime);
-
-		virtual void				StartUp();
-		virtual void				ShutDown();
-
-									ZEDModule();
-		virtual						~ZEDModule();
-
-};
+#include "ZEDViewportInput.h"

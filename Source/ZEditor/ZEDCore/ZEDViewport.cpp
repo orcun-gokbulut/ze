@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewPort.cpp
+ Zinek Engine - ZEDViewport.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,18 +33,74 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDViewPort.h"
-#include "ZEDCore.h"
-#include "ZEDModule.h"
-#include "ZEDGizmo.h"
-#include "ZEDScene.h"
-#include "ZEDSelectionManager.h"
-#include "ZEDTransformationManager.h"
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZEMath/ZEAngle.h"
+#include "ZEDViewport.h"
+#include "ZECore\ZECore.h"
+#include "ZEGraphics\ZEGROutput.h"
+#include "ZEGraphics\ZEGRRenderTarget.h"
+#include "ZEMath\ZEAngle.h"
 
-void ZEDViewPort::MoveCamera(float ElapsedTime)
+
+void ZEDViewport::UpdateView()
+{
+	//if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW))
+	{
+		View.Position = Position;
+		View.Rotation = Rotation;
+		View.Direction = View.Rotation * ZEVector3::UnitZ;
+		View.U = View.Rotation * ZEVector3::UnitX;
+		View.V = View.Rotation * ZEVector3::UnitY;
+		View.N = View.Rotation * ZEVector3::UnitZ;
+
+
+		View.AspectRatio = (float)Window->GetWidth() / (float)Window->GetHeight();
+		View.VerticalFOV = GetVerticalFOV();
+		View.HorizontalFOV = View.AspectRatio * View.VerticalFOV;
+
+
+		ZEMatrix4x4::CreateViewTransform(View.ViewTransform, View.Position, View.Rotation);
+		ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
+		ZEMatrix4x4::Multiply(View.ViewProjectionTransform, View.ProjectionTransform, View.ViewTransform);
+		ZEMatrix4x4::Inverse(View.InvViewTransform, View.ViewTransform);
+		ZEMatrix4x4::Inverse(View.InvProjectionTransform, View.ProjectionTransform);
+		ZEMatrix4x4::Inverse(View.InvViewProjectionTransform, View.ViewProjectionTransform);
+
+		View.NearZ = 1.0f;
+		View.FarZ = 2000.0f;
+
+		View.ProjectionType = ZERN_PT_PERSPECTIVE;
+		View.Type = ZERN_VT_VIEWPORT;
+		View.Viewport = &Viewport;
+		View.ViewVolume = &ViewFrustum;
+
+		View.ShadowDistance = 100.0f;
+		View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
+
+		ViewFrustum.Create(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
+
+		//CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW);
+	}
+
+	//return View;
+}
+
+bool ZEDViewport::InitializeSelf()
+{
+	Window = ZEGRWindow::WrapHandle((void*)winId());
+
+	if (!Renderer.Initialize())
+		return false;
+
+	return true;
+}
+
+void ZEDViewport::DeinitializeSelf()
+{
+	Renderer.Deinitialize();
+	Window->Destroy();
+}
+
+/*
+void ZEDViewport::MoveCamera(float ElapsedTime)
 {	
 	ZEVector3 Position = Camera->GetPosition();
 	ZEQuaternion Rotation = Camera->GetRotation();
@@ -84,7 +140,7 @@ void ZEDViewPort::MoveCamera(float ElapsedTime)
 	}
 }
 
-void ZEDViewPort::RotateCamera(const ZEVector2& MousePosition)
+void ZEDViewport::RotateCamera(const ZEVector2& MousePosition)
 {
 	float XDiff = MousePosition.x - MouseStartPosition.x;
 	float YDiff = MousePosition.y - MouseStartPosition.y;
@@ -109,7 +165,7 @@ void ZEDViewPort::RotateCamera(const ZEVector2& MousePosition)
 	MouseStartPosition = MousePosition;
 }
 
-void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
+void ZEDViewport::mousePressEvent(QMouseEvent* MouseEvent)
 {
 	if (Scene == NULL)
 		return;
@@ -133,7 +189,7 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 		if (!Gizmo->GetVisible() || Gizmo->GetMode() == ZED_GM_NONE)
 			return;
 
-		Gizmo->SetSelectedAxis(Gizmo->PickAxis(Ray, TRay));
+		Gizmo->SetSelectedAxis(Gizmo->PickAxis(Camera->GetView(), Ray, TRay));
 
 		if (Gizmo->GetSelectedAxis() == ZED_GA_NONE)
 			return;
@@ -141,19 +197,19 @@ void ZEDViewPort::mousePressEvent(QMouseEvent* MouseEvent)
 		switch (Gizmo->GetMode())
 		{
 			case ZED_GM_MOVE:
-				Gizmo->StartMoveProjection(Ray);
+				Gizmo->StartMoveProjection(Camera->GetView(), Ray);
 				return;
 			case ZED_GM_ROTATE:
-				Gizmo->StartRotationProjection(Ray);
+				Gizmo->StartRotationProjection(Camera->GetView(), Ray);
 				return;
 			case ZED_GM_SCALE:
-				Gizmo->StartScaleProjection(Ray);
+				Gizmo->StartScaleProjection(Camera->GetView(), Ray);
 				return;
 		}
 	}
 }
 
-void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
+void ZEDViewport::mouseMoveEvent(QMouseEvent* MouseEvent)
 {	
 	if (Scene == NULL)
 		return;
@@ -194,7 +250,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 				if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
 					ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_TRANSLATE);
 
-				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Ray) - Gizmo->GetPosition());
+				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Camera->GetView(), Ray) - Gizmo->GetPosition());
 				ZEMatrix4x4::CreateTranslation(NewTransform, NewTranslation);
 				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
 				Gizmo->SetPosition(Gizmo->GetPosition() + NewTranslation);
@@ -204,7 +260,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 				if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
 					ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_ROTATE);
 
-				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Ray);
+				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Camera->GetView(), Ray);
 				ZEMatrix4x4::CreateRotation(NewTransform, NewOrientation);
 				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
 			}
@@ -213,7 +269,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 				if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
 					ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_SCALE);
 
-				ZEVector3 NewScale = Gizmo->ScaleProjection(Ray);
+				ZEVector3 NewScale = Gizmo->ScaleProjection(Camera->GetView(), Ray);
 				ZEMatrix4x4::CreateScale(NewTransform, NewScale);
 				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
 			}
@@ -236,8 +292,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	}
 	else
 	{
-		ZERay Ray;
-		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
+		ZERay Ray =	Scene->GetActiveCamera()->GetScreenRay(MouseEvent->x(), MouseEvent->y());
 		float TRay = FLT_MAX;
 
 		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
@@ -275,7 +330,7 @@ void ZEDViewPort::mouseMoveEvent(QMouseEvent* MouseEvent)
 	}
 }
 
-void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
+void ZEDViewport::mouseReleaseEvent(QMouseEvent* MouseEvent)
 {
 	if (Scene == NULL)
 		return;
@@ -284,8 +339,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 	{
 		ZEDTransformationManager* TransformationManager = ZEDTransformationManager::GetInstance();
 
-		ZERay Ray;
-		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
+		ZERay Ray = Scene->GetActiveCamera()->GetScreenRay(MouseEvent->x(), MouseEvent->y());
 
 		ZEDGizmo* Gizmo = TransformationManager->GetGizmo();
 
@@ -295,7 +349,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 
 			if (Gizmo->GetMode() == ZED_GM_MOVE)
 			{
-				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Ray) - Gizmo->GetPosition());
+				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Camera->GetView(), Ray) - Gizmo->GetPosition());
 				ZEMatrix4x4::CreateTranslation(NewTransform, NewTranslation);
 				TransformationManager->ApplyTransform(NewTransform);
 				TransformationManager->EndTransform();
@@ -303,7 +357,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 			}
 			else if (Gizmo->GetMode() == ZED_GM_ROTATE)
 			{
-				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Ray);
+				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Camera->GetView(), Ray);
 				ZEMatrix4x4::CreateRotation(NewTransform, NewOrientation);
 				TransformationManager->ApplyTransform(NewTransform);
 				TransformationManager->EndTransform();
@@ -311,7 +365,7 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 			}
 			else if (Gizmo->GetMode() == ZED_GM_SCALE)
 			{
-				ZEVector3 NewScale = Gizmo->ScaleProjection(Ray);
+				ZEVector3 NewScale = Gizmo->ScaleProjection(Camera->GetView(), Ray);
 				ZEMatrix4x4::CreateScale(NewTransform, NewScale);
 				TransformationManager->ApplyTransform(NewTransform);
 				TransformationManager->EndTransform();
@@ -345,123 +399,136 @@ void ZEDViewPort::mouseReleaseEvent(QMouseEvent* MouseEvent)
 	}
 }
 
-void ZEDViewPort::keyPressEvent(QKeyEvent* KeyEvent)
+void ZEDViewport::keyPressEvent(QKeyEvent* KeyEvent)
 {
 	if (!KeyEvent->isAutoRepeat())
 		PressedKeyboardKeys.insert(KeyEvent->key());
 }
 
-void ZEDViewPort::keyReleaseEvent(QKeyEvent* KeyEvent)
+void ZEDViewport::keyReleaseEvent(QKeyEvent* KeyEvent)
 {
 	if (!KeyEvent->isAutoRepeat())
 		PressedKeyboardKeys.remove(KeyEvent->key());
 }
 
-void ZEDViewPort::resizeEvent(QResizeEvent* ResizeEvent)
+void ZEDViewport::resizeEvent(QResizeEvent* ResizeEvent)
 {
 	QSize NewSize = ResizeEvent->size();
 	ZECore::GetInstance()->GetWindow()->SetWindowSize(NewSize.width(), NewSize.height());
 }
+*/
 
-void ZEDViewPort::dragEnterEvent(QDragEnterEvent* Event)
-{
-
-}
-
-void ZEDViewPort::dragMoveEvent(QDragMoveEvent* Event)
-{
-
-}
-
-void ZEDViewPort::dragLeaveEvent(QDragLeaveEvent* Event)
-{
-
-}
-
-void ZEDViewPort::dropEvent(QDropEvent* Event)
-{
-
-}
-
-void ZEDViewPort::focusInEvent(QFocusEvent* Event)
+void ZEDViewport::focusInEvent(QFocusEvent* Event)
 {
 	this->setMouseTracking(true);
 }
 
-void ZEDViewPort::focusOutEvent(QFocusEvent* Event)
+void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 {
 	this->setMouseTracking(false);
 }
 
-void ZEDViewPort::SetViewMode(ZEDViewMode Mode)
+const ZERNView& ZEDViewport::GetView()
+{
+	return View;
+}
+
+void ZEDViewport::SetViewMode(ZEDViewMode Mode)
 {
 	this->ViewMode = Mode;
 }
 
-ZEDViewMode ZEDViewPort::GetViewMode()
+ZEDViewMode ZEDViewport::GetViewMode()
 {
 	return ViewMode;
 }
 
-const ZEView& ZEDViewPort::GetView()
-{
-	return Camera->GetView();
-}
-
-void ZEDViewPort::SetScene(ZEDScene* Scene)
+void ZEDViewport::SetScene(ZEDScene* Scene)
 {
 	this->Scene = Scene;
 }
 
-ZEDScene* ZEDViewPort::GetScene()
+ZEDScene* ZEDViewport::GetScene()
 {
 	return Scene;
 }
 
-void ZEDViewPort::SetStepSize(ZEInt StepSize)
+void ZEDViewport::SetPosition(const ZEVector3& Position)
 {
-	this->StepSize = StepSize;
+	this->Position = Position;
 }
 
-ZEInt ZEDViewPort::GetStepSize()
+const ZEVector3& ZEDViewport::GetPosition()
 {
-	return StepSize;
+	return Position;
 }
 
-void ZEDViewPort::Tick(float Time)
+void ZEDViewport::SetRotation(const ZEQuaternion& Quaternion)
+{
+	Rotation = Quaternion;
+}
+
+const ZEQuaternion& ZEDViewport::GetRotation()
+{
+	return Rotation;
+}
+
+void ZEDViewport::SetVerticalFOV(float FOV)
+{
+	VerticalFOV = FOV;
+}
+
+float ZEDViewport::GetVerticalFOV()
+{
+	return VerticalFOV;
+}
+
+void ZEDViewport::Tick(float Time)
 {
 	if (!PressedKeyboardKeys.isEmpty())
 		MoveCamera(Time);
 }
 
-bool ZEDViewPort::Initialize()
+void ZEDViewport::Render()
 {
-	if (Scene == NULL)
-		return false;
+	if (isVisible())
+		return;
 
-	Camera = ZECamera::CreateInstance();
-	Camera->SetHorizontalFOV(ZE_PI / 3);
+	ZESize FrameID = ZECore::GetInstance()->GetFrameId();
+	ZEGROutput* Output = Window->GetOutput();
+	if (Output == NULL)
+		return;
 
-	//Add Wrapper Properly
-	Scene->SetActiveCamera(Camera);
-	Scene->AddEntity(Camera);
+	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	Viewport.SetX(0.0f);
+	Viewport.SetY(0.0f);
+	Viewport.SetWidth((float)RenderTarget->GetWidth());
+	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
-	return true;
+	UpdateView();
+
+	Renderer.SetOutputRenderTarget(RenderTarget);
+	Renderer.SetView(View);
+	Renderer.Render(0.0f);
 }
 
-bool ZEDViewPort::Deinitialize()
+void ZEDViewport::Present()
 {
-	return true;
+	if (isVisible())
+		return;
+
+	ZEGROutput* Output = Window->GetOutput();
+	if(Output == NULL)
+		return;
+
+	Output->Present();
 }
 
-ZEDViewPort::ZEDViewPort(QWidget* Parent) : QFrame(Parent)
+ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
 {
+	Window = NULL;
 	ViewMode = ZED_VM_FREE;
-	Camera = NULL;
-	MouseStartPosition = ZEVector2::Zero;
-	MouseCurrentPosition = ZEVector2::Zero;
-	Pitch = 0.0f;
-	Yaw = 0.0f;
-	Roll = 0.0f;
-	StepSize = 1;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	VerticalFOV = ZE_PI_3;
 }
