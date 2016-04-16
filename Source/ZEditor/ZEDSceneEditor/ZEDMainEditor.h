@@ -36,7 +36,7 @@
 #pragma once
 
 #include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDViewPort.h"
+#include "ZEDCore/ZEDViewport.h"
 
 #include <QMainWindow>
 #include <QTimer>
@@ -50,7 +50,7 @@ class ZEDMainEditor : public QMainWindow
 	private:
 		Ui::MainEditor*						ui;
 		ZEDCore*							Core;
-		ZEDViewPort*						MainViewPort;
+		ZEDViewport*						MainViewPort;
 		QTimer*								MainTimer;
 		ZEDMainBrowser*						Browser;
 

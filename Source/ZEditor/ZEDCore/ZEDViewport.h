@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewPort.h
+ Zinek Engine - ZEDViewport.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,7 +36,9 @@
 #pragma once
 
 #include "ZETypes.h"
+
 #include "ZERenderer/ZECamera.h"
+#include "ZEGraphics/ZEGRWindow.h"
 
 #include <QFrame>
 #include <QMouseEvent>
@@ -44,6 +46,7 @@
 #include <QDropEvent>
 #include <QFocusEvent>
 #include <QTimer>
+
 
 enum ZEDViewMode
 {
@@ -53,60 +56,66 @@ enum ZEDViewMode
 
 class ZEDScene;
 
-class ZEDViewPort : public QFrame
+class ZEDViewport : public QFrame, public ZEInitializable
 {
 	Q_OBJECT
 	private:
-		ZEDViewMode					ViewMode;
-		ZECamera*					Camera;
-		ZEDScene*					Scene;
+		ZEDViewMode						ViewMode;
+		ZERNView						View;
+		ZEViewFrustum					ViewFrustum;
+		ZEGRViewport					Viewport;
+		ZEDScene*						Scene;
 
-		QSet<ZEInt>					PressedKeyboardKeys;
-		ZEInt						StepSize;
+		QSet<ZEInt>						PressedKeyboardKeys;
+		ZEInt							StepSize;
 
-		ZEVector2					MouseStartPosition;
-		ZEVector2					MouseCurrentPosition;
+		ZEVector3						Position;
+		ZEQuaternion					Rotation;
+		float							VerticalFOV;
 
-		float						Pitch;
-		float						Yaw;
-		float						Roll;
+		ZEGRWindow*						Window;
+		ZERNRenderer					Renderer;
 
-		void						MoveCamera(float ElapsedTime);
-		void						RotateCamera(const ZEVector2& MousePosition);
+		void							UpdateView();
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+		void							MoveCamera(float ElapsedTime);
+		void							RotateCamera(const ZEVector2& MousePosition);
 
 	protected:
-		virtual void				mousePressEvent(QMouseEvent* MouseEvent);
-		virtual void				mouseMoveEvent(QMouseEvent* MouseEvent);
-		virtual void				mouseReleaseEvent(QMouseEvent* MouseEvent);		
-				 
-		virtual void				keyPressEvent(QKeyEvent* KeyEvent);
-		virtual void				keyReleaseEvent(QKeyEvent* KeyEvent);
-				 
-		virtual void				resizeEvent(QResizeEvent* ResizeEvent);
-				 
-		virtual void				dragEnterEvent(QDragEnterEvent* Event);
-		virtual void				dragMoveEvent(QDragMoveEvent* Event);
-		virtual void				dragLeaveEvent(QDragLeaveEvent* Event);
-		virtual void				dropEvent(QDropEvent* Event);
-				 
-		virtual void				focusInEvent(QFocusEvent* Event);
-		virtual void				focusOutEvent(QFocusEvent* Event);
+		/*virtual void					mousePressEvent(QMouseEvent* MouseEvent);
+		virtual void					mouseMoveEvent(QMouseEvent* MouseEvent);
+		virtual void					mouseReleaseEvent(QMouseEvent* MouseEvent);		 
+		virtual void					keyPressEvent(QKeyEvent* KeyEvent);
+		virtual void					keyReleaseEvent(QKeyEvent* KeyEvent);
+		virtual void					resizeEvent(QResizeEvent* ResizeEvent);*/
+		virtual void					focusInEvent(QFocusEvent* Event);
+		virtual void					focusOutEvent(QFocusEvent* Event);
 
 	public:
-		void						SetViewMode(ZEDViewMode Mode);
-		ZEDViewMode					GetViewMode();
-		//const ZEView&				GetView();
+		const ZERNView&					GetView();
 
-		void						SetScene(ZEDScene* Scene);
-		ZEDScene*					GetScene();
+		void							SetViewMode(ZEDViewMode Mode);
+		ZEDViewMode						GetViewMode();
 
-		void						SetStepSize(ZEInt StepSize);
-		ZEInt						GetStepSize();
+		void							SetPosition(const ZEVector3& Position);
+		const ZEVector3&				GetPosition();
 
-		void						Tick(float Time);
+		void							SetRotation(const ZEQuaternion& Quaternion);
+		const ZEQuaternion&				GetRotation();
 
-		bool						Initialize();
-		bool						Deinitialize();
+		void							SetVerticalFOV(float FOV);
+		float							GetVerticalFOV();
 
-									ZEDViewPort(QWidget* Parent = NULL);
+		void							SetScene(ZEDScene* Scene);
+		ZEDScene*						GetScene();
+
+		void							Tick(float Time);
+		
+		void							Render();
+		void							Present();
+
+										ZEDViewport(QWidget* Parent = NULL);
 };

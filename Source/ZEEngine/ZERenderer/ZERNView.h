@@ -56,7 +56,8 @@ ZE_ENUM(ZERNViewType)
 	ZERN_VT_NONE,
 	ZERN_VT_CAMERA,
 	ZERN_VT_SHADOW_CASTER,
-	ZERN_VT_PROBE
+	ZERN_VT_PROBE,
+	ZERN_VT_VIEWPORT
 };
 
 ZE_ENUM(ZERNProjectionType)
@@ -110,28 +111,28 @@ class ZERNView : public ZEObject
 
 struct ZERNViewConstantBuffer
 {
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;		
-	ZEMatrix4x4				ViewProjectionTransform;
-	ZEMatrix4x4				InvViewTransform;
-	ZEMatrix4x4				InvProjectionTransform;			
-	ZEMatrix4x4				InvViewProjectionTransform;
+	ZEMatrix4x4						ViewTransform;
+	ZEMatrix4x4						ProjectionTransform;		
+	ZEMatrix4x4						ViewProjectionTransform;
+	ZEMatrix4x4						InvViewTransform;
+	ZEMatrix4x4						InvProjectionTransform;			
+	ZEMatrix4x4						InvViewProjectionTransform;
 
-	ZEVector3				Position;
-	float					Width;
-	ZEQuaternion			RotationQuaternion;
-	ZEVector3				RotationEuler;
-	float					Height;
+	ZEVector3						Position;
+	float							Width;
+	ZEQuaternion					RotationQuaternion;
+	ZEVector3						RotationEuler;
+	float							Height;
 
-	ZEVector3				RightVector;
-	float					VerticalFOV;
-	ZEVector3				UpVector;
-	float					HorizontalFOV;
-	ZEVector3				FrontVector;
-	float					AspectRatio;
+	ZEVector3						RightVector;
+	float							VerticalFOV;
+	ZEVector3						UpVector;
+	float							HorizontalFOV;
+	ZEVector3						FrontVector;
+	float							AspectRatio;
 
-	float					ShadowDistance;
-	float					ShadowFadeDistance;
-	float					NearZ;
-	float					FarZ;
+	float							ShadowDistance;
+	float							ShadowFadeDistance;
+	float							NearZ;
+	float							FarZ;
 };

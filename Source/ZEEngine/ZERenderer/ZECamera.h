@@ -122,7 +122,7 @@ class ZECamera : public ZEEntity
 		const ZERNView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
 
-		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
+		ZERay							GetScreenRay(ZEInt ScreenX, ZEInt ScreenY);
 		ZEVector2						GetScreenPosition(const ZEVector3& WorldPosition);
 
 		static ZECamera*				CreateInstance();

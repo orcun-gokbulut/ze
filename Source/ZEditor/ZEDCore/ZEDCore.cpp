@@ -39,7 +39,7 @@
 #include "ZEDTransformationManager.h"
 #include "ZEDModule.h"
 #include "ZEDObjectWrapper.h"
-#include "ZEDViewPort.h"
+#include "ZEDViewport.h"
 #include "ZEDS/ZEString.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"

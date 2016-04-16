@@ -37,7 +37,7 @@
 
 #include "ZEDScene.h"
 #include "ZEDSceneWrapper.h"
-#include "ZEDViewPort.h"
+#include "ZEDViewport.h"
 #include "ZEDTransformationManager.h"
 #include "ZEDCore.h"
 #include "ZEDGizmo.h"
@@ -56,13 +56,13 @@ ZEDScene* ZEDModule::GetScene()
 	return Scene;
 }
 
-void ZEDModule::SetViewPort(ZEDViewPort* Viewport)
+void ZEDModule::SetViewPort(ZEDViewport* Viewport)
 {
 	//Multiple ViewPorts across different widgets will have a reference in here.
 	this->Viewport = Viewport;
 }
 
-ZEDViewPort* ZEDModule::GetViewPort()
+ZEDViewport* ZEDModule::GetViewPort()
 {
 	return Viewport;
 }

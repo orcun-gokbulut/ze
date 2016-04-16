@@ -36,7 +36,7 @@
 #include "ZEDMainEditor.h"
 #include "ZEDCore/ZEDCore.h"
 #include "ZEDCore/ZEDModule.h"
-#include "ZEDCore/ZEDViewPort.h"
+#include "ZEDCore/ZEDViewport.h"
 #include "ZEDCore/ZEDOperationManager.h"
 #include "ZEDCore/ZEDTransformationManager.h"
 #include "ZEDCore/ZEDGizmo.h"
@@ -227,7 +227,7 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	MainTimer->setInterval(0);
 
 	Core = ZEDCore::GetInstance();
-	MainViewPort = new ZEDViewPort(ui->CentralWidget);
+	MainViewPort = new ZEDViewport(ui->CentralWidget);
 	ui->ViewPort = MainViewPort;
 	ui->gridLayout->addWidget(ui->ViewPort, 0, 0, 1, 1);
 	

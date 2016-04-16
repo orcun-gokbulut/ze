@@ -463,8 +463,10 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 	return ViewFrustum;
 }
 
-void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
+ZERay ZECamera::GetScreenRay(ZEInt ScreenX, ZEInt ScreenY)
 {
+	ZERay Ray;
+
 	ZEVector3 V;
 	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();
 	V.x =  (((2.0f * ScreenX ) / (ZEInt)View.Viewport->GetWidth()) - 1) / ProjMatrix.M11;
@@ -479,6 +481,8 @@ void ZECamera::GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY)
 	Ray.p.z = InvViewMatrix.M34; 
 
 	ZEVector3::Normalize(Ray.v, Ray.v);
+	
+	return Ray;
 }
 
 ZEVector2 ZECamera::GetScreenPosition(const ZEVector3& WorldPosition)

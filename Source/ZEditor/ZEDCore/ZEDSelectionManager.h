@@ -35,14 +35,11 @@
 
 #pragma once
 
-#include "ZEFoundation/ZEDS/ZEArray.h"
-#include "ZEFoundation/ZEMath/ZERay.h"
-#include "ZEFoundation/ZEMath/ZEMatrix.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEMatrix.h"
 
-class ZEDObjectWrapper;
-class ZEObject;
-class ZEClass;
-class ZEViewVolume;
+#include "ZEDViewportInput.h"
 
 enum ZEDSelectionPivotMode
 {
@@ -51,10 +48,30 @@ enum ZEDSelectionPivotMode
 	ZED_SCM_SPACE_CENTER
 };
 
+enum ZEDSelectionShape
+{
+	ZED_SS_NONE,
+	ZED_SS_RAY,
+	ZED_SS_BOX,
+	ZED_SS_CIRCLE
+};
+
+enum ZEDSelectionMode
+{
+	ZE_SS_NODE,
+	ZE_SS_FULLY_INSIDE,
+	ZE_SS_PARTIALY_INSIDE
+};
+
+class ZEObject;
+class ZEClass;
+class ZEViewVolume;
+class ZEDObjectWrapper;
+class ZEDViewport;
+
 class ZEDSelectionManager
 {
 	friend class ZEDCore;
-
 	private:
 		ZEArray<ZEDObjectWrapper*>			Selection;
 		ZEDSelectionPivotMode				PivotMode;
@@ -63,24 +80,30 @@ class ZEDSelectionManager
 
 		void								CalculateSelectionPivot();
 		
+		void								ViewportFocusGainedEvent(ZEDViewport* Viewport);
+		void								ViewportFocusLostEvent(ZEDViewport* Viewport);
+		void								ViewportKeyboardEvent(ZEDViewport* Viewport, const ZEDViewportKeyboardEvent& KeyboardEvent);
+		void								ViewportMouseEvent(ZEDViewport* Viewport, const ZEDViewportMouseEvent& KeyboardEvent);
+
 											ZEDSelectionManager();
 
 	public:
 		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects();
 
+		void								SetSelectionMode();
+		void								SetSelectionShape();
+
 		void								SelectObject(ZEDObjectWrapper* Object);
-		void								SelectObject(const ZERay& Ray);
-		void								SelectObject(ZEViewVolume* ViewVolume);
-		void								SelectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2);
-		void								SelectObject(const ZEString& Name);
 		void								SelectObject(ZESize Id);
+		void								SelectObject(const ZEString& Name);
+		void								SelectObject(ZEViewVolume* ViewVolume);
+		void								SelectObject(const ZERay& Ray);
 
 		void								DeselectObject(ZEDObjectWrapper* Object);
+		void								DeselectObject(ZESize Id);
+		void								DeselectObject(const ZEString& Name);
 		void								DeselectObject(const ZERay& Ray);
 		void								DeselectObject(ZEViewVolume* ViewVolume);
-		void								DeselectObject(const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2);
-		void								DeselectObject(const ZEString& Name);
-		void								DeselectObject(ZESize Id);
 
 		void								ClearSelection();
 
