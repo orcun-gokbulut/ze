@@ -198,6 +198,7 @@ bool ZERNFixedMaterial::UpdateConstantBuffer() const
 
 	AmbientColor = ZEVector3::One; //CustB HACK
 	DiffuseColor = ZEVector3::One; //CustB HACK
+	EmissiveFactor = 5.0f;
 	
 	Constants.AmbientColor = (AmbientEnabled ? 1.0f : 0.0f) * AmbientFactor * AmbientColor;
 	Constants.DiffuseColor = (DiffuseEnabled ? 1.0f : 0.0f) * DiffuseFactor * DiffuseColor;
