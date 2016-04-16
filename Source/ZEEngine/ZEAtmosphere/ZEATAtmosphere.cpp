@@ -674,8 +674,13 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	ComputeAmbientColors(CosSunZenith, CosMoonZenith);
 
-	zeScene->SetAmbientColor(ZEVector3(0.1f) + TerrestrialSunAmbientColor * 10.0f + TerrestrialMoonAmbientColor * 1.0f);
+	ZEVector3 AmbientColor = ZEVector3(0.1f) + TerrestrialSunAmbientColor * 10.0f + TerrestrialMoonAmbientColor * 0.5f;
+	zeScene->SetAmbientColor(AmbientColor);
 	zeScene->SetAmbientFactor(1.0f);
+
+	float SunInscattering = 0.5f * (CosSunZenith * 0.5f + 0.5f);
+	float MoonInscattering = 0.1f * (CosMoonZenith * 0.5f + 0.5f);
+	Fog->SetColor(ZEVector3(SunInscattering + MoonInscattering + 0.4f));
 
 	bool SunVisible = CosSunZenith >= 0.0f;
 	bool MoonVisible = CosMoonZenith >= 0.0f;
@@ -717,18 +722,16 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	if (SunVisible)
 	{
-		float InscatteringSun = 0.5f * (CosSunZenith * 0.5f + 0.5f);
 		Cloud->SetLightDirection(-SunDirection);
 		Cloud->SetLightColor(TerrestrialSunColor * 10.0f);
-		Cloud->SetInscattering(InscatteringSun);
+		Cloud->SetInscattering(SunInscattering);
 		Stars->SetBrightness(0.0f);
 	}
 	else
 	{
-		float InscatteringMoon = 0.1f * (CosMoonZenith * 0.5f + 0.5f);
 		Cloud->SetLightDirection(-MoonDirection);
 		Cloud->SetLightColor(TerrestrialMoonColor * 1.0f);
-		Cloud->SetInscattering(InscatteringMoon);
+		Cloud->SetInscattering(MoonInscattering);
 		Stars->SetBrightness(1.1f);
 	}
 

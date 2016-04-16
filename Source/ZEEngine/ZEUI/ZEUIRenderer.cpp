@@ -209,6 +209,9 @@ void ZEUIRenderer::Clean()
 
 void ZEUIRenderer::Setup(ZERNRenderer* Renderer)
 {
+	if (Rectangles.GetCount() == 0)
+		return;
+
 	Command.Priority = ZE_INT_MAX;
 	Command.Order = ZE_FLOAT_MAX;
 	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEUIRenderer, Render, this);
@@ -221,6 +224,9 @@ void ZEUIRenderer::Setup(ZERNRenderer* Renderer)
 
 void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
+	if (Rectangles.GetCount() == 0)
+		return;
+
 	ZEGRContext* Context = RenderParameters->Context;
 	Context->SetRenderState(RenderStateData);
 	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
