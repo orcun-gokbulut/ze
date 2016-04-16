@@ -430,7 +430,7 @@ bool ZEModelBone::GetPhysicsEnabled() const
 
 void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource)
 {
-	Model = Model;
+	this->Model = Model;
 	this->BoneResource = BoneResource;
 	Position = BoneResource->Position;
 	Rotation = BoneResource->Rotation;

@@ -42,7 +42,7 @@
 
 #define TILE_DIMENSION		16
 #define TILE_SIZE			(TILE_DIMENSION * TILE_DIMENSION)
-#define MAX_LIGHT			255
+#define MAX_LIGHT			1024
 
 #define ZE_LT_NONE				0
 #define ZE_LT_POINT				1
