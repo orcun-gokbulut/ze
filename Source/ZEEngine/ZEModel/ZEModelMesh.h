@@ -44,7 +44,7 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZERenderer/ZERNCommand.h"
 
-struct ZERNCullParameters;
+class ZERNCullParameters;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")

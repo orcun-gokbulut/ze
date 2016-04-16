@@ -60,7 +60,7 @@ class ZELightPoint;
 class ZELightDirectional;
 class ZELightOmniProjective;
 
-#define MAX_LIGHT			255
+#define MAX_LIGHT			1024
 #define TILE_SIZE_IN_PIXELS	16
 
 class ZERNStageLighting : public ZERNStage

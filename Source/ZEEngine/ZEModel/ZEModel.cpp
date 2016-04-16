@@ -104,8 +104,8 @@ void ZEModel::LoadModelResource()
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].Deinitialize();
-	Bones.SetCount(0);
 
+	Bones.SetCount(0);
 	Skeleton.SetCount(0);
 
 	for (ZESize I = 0; I < Helpers.GetCount(); I++)
@@ -122,7 +122,6 @@ void ZEModel::LoadModelResource()
 	}
 
 	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
-
 	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
 	{
 		if (ModelResource->GetMeshes()[I].ParentMesh != -1)
@@ -132,7 +131,6 @@ void ZEModel::LoadModelResource()
 	}
 
 	Bones.SetCount(ModelResource->GetBones().GetCount());
-
 	for (ZESize I = 0; I < ModelResource->GetBones().GetCount(); I++)
 	{
 		if (ModelResource->GetBones()[I].ParentBone != -1)
