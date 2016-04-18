@@ -209,6 +209,8 @@ class ZEGRWindow : public ZEObject, public ZEInitializable
 		void							Maximize();
 		void							Restore();
 
+		void							WrapperResized(ZEUInt Width, ZEUInt Height);
+
 		void							Show();
 		virtual void					Destroy();
 

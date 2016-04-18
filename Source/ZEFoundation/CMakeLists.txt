@@ -96,10 +96,12 @@ ze_add_source(ZEVersion.cpp				Sources)
 ze_add_source(ZEVersion.h				Sources Headers)
 ze_add_source(ZEInitializable.cpp		Sources)
 ze_add_source(ZEInitializable.h			Sources Headers)
+ze_add_source(ZEEncryption.cpp			Sources)
+ze_add_source(ZEEncryption.h			Sources Headers)
 
 ze_add_library(TARGET ZEFoundation
 	COMBINE
-	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta
+	LIBS ZEDS ZEMath ZESerialization ZEStateMachine ZEFile ZEMacro ZESpatial ZESerialPort ZETest ZEThread ZESocket ZEML ZERegEx ZECompression ZEPointer ZEMeta libCryptopp
 	SOURCES ${Sources} 
 	HEADERS ${Headers})
 

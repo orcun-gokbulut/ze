@@ -52,5 +52,24 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 
 	Editor.show();
 	Application.connect(&Application, SIGNAL(lastWindowClosed()), &Editor, SLOT(actExit_onTriggered()));
-	return Application.exec();
+
+	if (!ZEDCore::GetInstance()->Initialize())
+		return EXIT_FAILURE;
+	
+	if (!Editor.Initialize())
+		return EXIT_FAILURE;
+
+	while(true)
+	{
+		/*if (Application.activeWindow() == NULL)
+			break;*/
+
+		Application.processEvents();
+		ZEDCore::GetInstance()->ProcessEngine();
+	}
+	
+	Editor.Deinitialize();
+	ZEDCore::GetInstance()->Deinitialize();
+
+	return EXIT_SUCCESS;
 }

@@ -45,6 +45,7 @@
 
 #include "ZEGame/ZEGrid.h"
 #include "ZEModel/ZEModel.h"
+#include "ZEDViewportManager.h"
 
 void ZEDModule::SetScene(ZEDScene* Scene)
 {
@@ -56,15 +57,9 @@ ZEDScene* ZEDModule::GetScene()
 	return Scene;
 }
 
-void ZEDModule::SetViewPort(ZEDViewport* Viewport)
+ZEDViewportManager* ZEDModule::GetViewportManager()
 {
-	//Multiple ViewPorts across different widgets will have a reference in here.
-	this->Viewport = Viewport;
-}
-
-ZEDViewport* ZEDModule::GetViewPort()
-{
-	return Viewport;
+	return ViewportManager;
 }
 
 ZEDObjectWrapper* ZEDModule::GetRootWrapper()
@@ -72,18 +67,15 @@ ZEDObjectWrapper* ZEDModule::GetRootWrapper()
 	return SceneWrapper;
 }
 
-void ZEDModule::Tick(float ElapsedTime)
+void ZEDModule::Process(float ElapsedTime)
 {
 	Scene->Tick(ElapsedTime);
-	Viewport->Tick(ElapsedTime);
 }
-/*
-void ZEDModule::Render(float ElapsedTime)
+
+void ZEDModule::PostProcess(float ElapsedTime)
 {
-	Scene->Render(ElapsedTime);
-	Scene->GetRenderer()->Render(ElapsedTime);
-	Scene->GetRenderer()->ClearLists();
-}*/
+	ViewportManager->Render();
+}
 
 void ZEDModule::StartUp()
 {
@@ -140,11 +132,11 @@ ZEDModule::ZEDModule()
 {
 	Scene = NULL;
 	SceneWrapper = NULL;
-	Viewport = NULL;
+	ViewportManager = new ZEDViewportManager();
 }
 
 ZEDModule::~ZEDModule()
 {
-
+	delete ViewportManager;
 }
 

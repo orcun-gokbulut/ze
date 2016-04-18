@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.h
+ Zinek Engine - ZEDViewportManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,40 +36,17 @@
 #pragma once
 
 #include "ZEDS/ZEArray.h"
-#include "ZEInitializable.h"
 
-class ZEDOperationManager;
-class ZEDSelectionManager;
-class ZEDTransformationManager;
-class ZEDModule;
-class ZEClass;
+class ZEDViewport;
 
-class ZEDCore : public ZEInitializable
+class ZEDViewportManager
 {
 	private:
-		ZEDOperationManager*			OperationManager;
-		ZEDSelectionManager*			SelectionManager;
-		ZEDTransformationManager*		TransformationManager;
-		ZEDModule*						EditorModule;
-		
-		ZEArray<ZEClass*>				WrapperTypes;
-
-		bool							InitializeSelf();
-		void							DeinitializeSelf();
-
-										ZEDCore();
-										~ZEDCore();
+		ZEArray<ZEDViewport*>		Viewports;
 
 	public:
-		ZEDOperationManager*			GetOperationManager();
-		ZEDSelectionManager*			GetSelectionManager();
-		ZEDTransformationManager*		GetTransformationManager();
-		ZEDModule*						GetEditorModule();
-		const ZEArray<ZEClass*>&		GetWrapperTypes();
+		void						RegisterViewport(ZEDViewport* Viewport);
+		void						UnregisterViewport(ZEDViewport* Viewport);
 
-		void							ProcessEngine();
-
-		void							Destroy();
-
-		static ZEDCore*					GetInstance();
+		void						Render();
 };

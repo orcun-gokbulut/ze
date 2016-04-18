@@ -50,6 +50,31 @@
 
 extern HINSTANCE ApplicationInstance;
 
+
+bool ZEDCore::InitializeSelf()
+{
+	zeCore->SetApplicationModule(EditorModule);
+
+	zeCore->GetOptions()->Load("options.ini");
+	zeCore->GetOptions()->ResetChanges();
+	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
+
+	if (!zeCore->StartUp())
+		return false;
+
+	zeCore->SetCoreState(ZE_CS_RUNNING);
+
+	if (!EditorModule->Initialize())
+		return false;
+
+	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
+}
+
+void ZEDCore::DeinitializeSelf()
+{
+	zeCore->ShutDown();
+}
+
 ZEDCore::ZEDCore()
 {
 	OperationManager = new ZEDOperationManager();
@@ -91,37 +116,16 @@ const ZEArray<ZEClass*>& ZEDCore::GetWrapperTypes()
 	return WrapperTypes;
 }
 
-void ZEDCore::InitializeEngine()
-{
-	zeCore->SetApplicationModule(EditorModule);
-
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
-
-	if (zeCore->StartUp())
-	{
-		zeCore->SetCoreState(ZE_CS_RUNNING);
-		EditorModule->Initialize();
-	}
-
-	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
-}
-
 void ZEDCore::ProcessEngine()
 {
 	ZECoreState State = zeCore->GetCoreState();
 
 	if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
-		DeinitializeEngine();
+		DeinitializeSelf();
 
 	zeCore->MainLoop();
 }
 
-void ZEDCore::DeinitializeEngine()
-{
-	zeCore->ShutDown();
-}
 
 void ZEDCore::Destroy()
 {

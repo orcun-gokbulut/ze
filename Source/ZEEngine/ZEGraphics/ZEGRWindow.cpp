@@ -383,6 +383,14 @@ ZEGRWindow::ZEGRWindow()
 
 ZEGRWindow::~ZEGRWindow()
 {
+
+}
+
+void ZEGRWindow::WrapperResized(ZEUInt Width, ZEUInt Height)
+{
+	this->Width = Width;
+	this->Height = Height;
+	Output->Resize(Width, Height);
 }
 
 ZEUInt ZEGRWindow::GetWindowCount()

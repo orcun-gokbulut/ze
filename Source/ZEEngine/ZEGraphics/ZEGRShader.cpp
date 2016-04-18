@@ -35,13 +35,14 @@
 
 #include "ZEGRShader.h"
 
+#include "ZEEncryption.h"
 #include "ZEFile/ZEFile.h"
-#include "ZEPointer/ZEPointer.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRShaderCompiler.h"
-#include "ZEProtect/ZELCEncryption.h"
 #include "ZEFile/ZEPathManager.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEPointer/ZEPointer.h"
+
+#include "ZEGRGraphicsModule.h"
+#include "ZEGRShaderCompiler.h"
 
 bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {

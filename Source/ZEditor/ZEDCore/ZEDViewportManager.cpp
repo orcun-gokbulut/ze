@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.h
+ Zinek Engine - ZEDViewportManager.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,43 +33,28 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDViewportManager.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEInitializable.h"
+#include "ZEDViewport.h"
 
-class ZEDOperationManager;
-class ZEDSelectionManager;
-class ZEDTransformationManager;
-class ZEDModule;
-class ZEClass;
-
-class ZEDCore : public ZEInitializable
+void ZEDViewportManager::RegisterViewport(ZEDViewport* Viewport)
 {
-	private:
-		ZEDOperationManager*			OperationManager;
-		ZEDSelectionManager*			SelectionManager;
-		ZEDTransformationManager*		TransformationManager;
-		ZEDModule*						EditorModule;
-		
-		ZEArray<ZEClass*>				WrapperTypes;
+	if (Viewports.Exists(Viewport))
+		return;
 
-		bool							InitializeSelf();
-		void							DeinitializeSelf();
+	Viewports.Add(Viewport);
+}
 
-										ZEDCore();
-										~ZEDCore();
+void ZEDViewportManager::UnregisterViewport(ZEDViewport* Viewport)
+{
+	Viewports.RemoveValue(Viewport);
+}
 
-	public:
-		ZEDOperationManager*			GetOperationManager();
-		ZEDSelectionManager*			GetSelectionManager();
-		ZEDTransformationManager*		GetTransformationManager();
-		ZEDModule*						GetEditorModule();
-		const ZEArray<ZEClass*>&		GetWrapperTypes();
+void ZEDViewportManager::Render()
+{
+	for(ZESize I = 0; I < Viewports.GetCount(); I++)
+		Viewports[I]->Render();
 
-		void							ProcessEngine();
-
-		void							Destroy();
-
-		static ZEDCore*					GetInstance();
-};
+	for(ZESize I = 0; I < Viewports.GetCount(); I++)
+		Viewports[I]->Present();
+}
