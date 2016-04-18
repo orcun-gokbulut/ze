@@ -34,11 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDViewport.h"
-#include "ZECore\ZECore.h"
+
+#include "ZEMath\ZEAngle.h"
 #include "ZEGraphics\ZEGROutput.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
-#include "ZEMath\ZEAngle.h"
+#include "ZERenderer\ZERNStageGBuffer.h"
+#include "ZERenderer\ZERNStageShadowing.h"
+#include "ZERenderer\ZERNStagePreProcess.h"
+#include "ZERenderer\ZERNStageLighting.h"
+#include "ZERenderer\ZERNStageParticleRendering.h"
+#include "ZERenderer\ZERNStagePostProcess.h"
+#include "ZERenderer\ZERNStageHDR.h"
+#include "ZERenderer\ZERNStageAntiAliasing.h"
+#include "ZERenderer\ZERNStage2D.h"
+#include "ZERenderer\ZERNStageOutput.h"
 
+#include "ZEDCore.h"
+#include "ZEDModule.h"
+#include "ZEDViewportManager.h"
+#include "ZECore\ZECore.h"
 
 void ZEDViewport::UpdateView()
 {
@@ -87,14 +101,58 @@ bool ZEDViewport::InitializeSelf()
 {
 	Window = ZEGRWindow::WrapHandle((void*)winId());
 
+	ZERNStageGBuffer* StageGBuffer = new ZERNStageGBuffer();
+	Renderer.AddStage(StageGBuffer);
+
+	ZERNStageShadowing* StageShadowing = new ZERNStageShadowing();
+	Renderer.AddStage(StageShadowing);
+	
+	ZERNStagePreProcess* StagePreProcess = new ZERNStagePreProcess();
+	Renderer.AddStage(StagePreProcess);
+
+	ZERNStageLighting* StageLighting = new ZERNStageLighting();
+	Renderer.AddStage(StageLighting);
+
+	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
+	Renderer.AddStage(StageParticleRendering);
+
+	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
+	Renderer.AddStage(StagePostProcess);
+
+	ZERNStageHDR* StageHDR = new ZERNStageHDR();
+	StageHDR->SetToneMapOperator(ZERN_HTMO_UNCHARTED);
+	StageHDR->SetKey(0.180000);
+	StageHDR->SetAutoKey(false);
+	StageHDR->SetWhiteLevel(1.000000);
+	StageHDR->SetBlurTextureSize(ZERN_HBTS_HALF);
+	StageHDR->SetBloomEnabled(true);
+	StageHDR->SetBloomFactor(2.000000);
+	StageHDR->SetBloomThreshold(1.000000);
+	StageHDR->SetLuminanceMin(0.100000);
+	StageHDR->SetLuminanceMax(10.000000);
+	StageHDR->SetSaturation(0.700000);
+	Renderer.AddStage(StageHDR);
+
+	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
+	Renderer.AddStage(StageAntiAliasing);
+
+	ZERNStage2D* Stage2D = new ZERNStage2D();
+	Renderer.AddStage(Stage2D);
+
+	ZERNStageOutput* StageOutput = new ZERNStageOutput();
+	Renderer.AddStage(StageOutput);
+
 	if (!Renderer.Initialize())
 		return false;
+
+	ZEDCore::GetInstance()->GetEditorModule()->GetViewportManager()->RegisterViewport(this);
 
 	return true;
 }
 
 void ZEDViewport::DeinitializeSelf()
 {
+	ZEDCore::GetInstance()->GetEditorModule()->GetViewportManager()->UnregisterViewport(this);
 	Renderer.Deinitialize();
 	Window->Destroy();
 }
@@ -409,14 +467,15 @@ void ZEDViewport::keyReleaseEvent(QKeyEvent* KeyEvent)
 {
 	if (!KeyEvent->isAutoRepeat())
 		PressedKeyboardKeys.remove(KeyEvent->key());
-}
+}*/
 
 void ZEDViewport::resizeEvent(QResizeEvent* ResizeEvent)
 {
 	QSize NewSize = ResizeEvent->size();
-	ZECore::GetInstance()->GetWindow()->SetWindowSize(NewSize.width(), NewSize.height());
+
+	if (Window != NULL)
+		Window->WrapperResized(NewSize.width(), NewSize.height());
 }
-*/
 
 void ZEDViewport::focusInEvent(QFocusEvent* Event)
 {
@@ -483,15 +542,9 @@ float ZEDViewport::GetVerticalFOV()
 	return VerticalFOV;
 }
 
-void ZEDViewport::Tick(float Time)
-{
-	if (!PressedKeyboardKeys.isEmpty())
-		MoveCamera(Time);
-}
-
 void ZEDViewport::Render()
 {
-	if (isVisible())
+	if (!isVisible())
 		return;
 
 	ZESize FrameID = ZECore::GetInstance()->GetFrameId();
@@ -514,7 +567,7 @@ void ZEDViewport::Render()
 
 void ZEDViewport::Present()
 {
-	if (isVisible())
+	if (!isVisible())
 		return;
 
 	ZEGROutput* Output = Window->GetOutput();

@@ -89,8 +89,8 @@ class ZEDViewport : public QFrame, public ZEInitializable
 		virtual void					mouseMoveEvent(QMouseEvent* MouseEvent);
 		virtual void					mouseReleaseEvent(QMouseEvent* MouseEvent);		 
 		virtual void					keyPressEvent(QKeyEvent* KeyEvent);
-		virtual void					keyReleaseEvent(QKeyEvent* KeyEvent);
-		virtual void					resizeEvent(QResizeEvent* ResizeEvent);*/
+		virtual void					keyReleaseEvent(QKeyEvent* KeyEvent);*/
+		virtual void					resizeEvent(QResizeEvent* ResizeEvent);
 		virtual void					focusInEvent(QFocusEvent* Event);
 		virtual void					focusOutEvent(QFocusEvent* Event);
 
@@ -112,8 +112,6 @@ class ZEDViewport : public QFrame, public ZEInitializable
 		void							SetScene(ZEDScene* Scene);
 		ZEDScene*						GetScene();
 
-		void							Tick(float Time);
-		
 		void							Render();
 		void							Present();
 

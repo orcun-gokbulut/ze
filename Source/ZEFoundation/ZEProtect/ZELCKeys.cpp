@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELCKeys.h"
-#include "ZELCEncryption.h"
 
+#include "ZEEncryption.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLFormatXMLV1.h"
 

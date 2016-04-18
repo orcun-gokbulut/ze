@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEInitializable.h"
+
 #include <QWidget>
 #include <QDockWidget>
 #include <QTreeWidget>
@@ -42,19 +44,19 @@
 namespace Ui { class MainBrowser; }
 class ZEDObjectWrapper;
 
-class ZEDMainBrowserWidget : public QWidget
+class ZEDMainBrowserWidget : public QWidget, public ZEInitializable
 {
 	Q_OBJECT
 	private:
 		Ui::MainBrowser*				Form;
 		ZEDObjectWrapper*				Scene;
 
+		bool							InitializeSelf();
+		bool							DeinitalizeSelf();
+
 	public:
 		void							LoadObject(QTreeWidgetItem* Item, ZEDObjectWrapper* Object);
 		void							LoadScene();
-
-		bool							Initialize();
-		bool							Deinitalize();
 
 										ZEDMainBrowserWidget(QWidget* Parent = 0);
 };

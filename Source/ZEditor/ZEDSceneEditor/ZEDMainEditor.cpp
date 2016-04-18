@@ -45,6 +45,9 @@
 
 bool ZEDMainEditor::InitializeSelf()
 {
+	if (!Core->Initialize())
+		return false;
+
 	MainViewPort->SetScene(Core->GetEditorModule()->GetScene());
 	MainViewPort->Initialize();
 
@@ -62,13 +65,18 @@ bool ZEDMainEditor::InitializeSelf()
 	connect(ui->actRedo, SIGNAL(triggered(bool)), this, SLOT(actRedo_onTriggered()));
 	connect(MainTimer, SIGNAL(timeout()), this, SLOT(MainTimer_onTimeout()));
 	MainTimer->start();
+	
+	if (!Browser->GetBrowserWidget()->Initialize())
+		return false;
 
 	return true;
 }
 
-bool ZEDMainEditor::DeinitializeSelf()
+void ZEDMainEditor::DeinitializeSelf()
 {
-	return true;
+	MainViewPort->Deinitialize();
+	Browser->GetBrowserWidget()->Deinitialize();
+	Core->Deinitialize();
 }
 
 void ZEDMainEditor::actNew_onTriggered()
@@ -98,23 +106,20 @@ void ZEDMainEditor::actSaveAs_onTriggered()
 
 void ZEDMainEditor::actExit_onTriggered()
 {
-	Deinitalize();
-
-	//Save
-
+	Deinitialize();
 	qApp->quit();
 }
 
 void ZEDMainEditor::actUndo_onTriggered()
 {
-	if (Core->GetEditorModule()->GetViewPort()->hasFocus())
-		ZEDCore::GetInstance()->GetOperationManager()->Undo();
+	/*if (Core->GetEditorModule()->GetViewPort()->hasFocus())
+		ZEDCore::GetInstance()->GetOperationManager()->Undo();*/
 }
 
 void ZEDMainEditor::actRedo_onTriggered()
 {
-	if (Core->GetEditorModule()->GetViewPort()->hasFocus())
-		ZEDCore::GetInstance()->GetOperationManager()->Redo();
+	/*if (Core->GetEditorModule()->GetViewPort()->hasFocus())
+		ZEDCore::GetInstance()->GetOperationManager()->Redo();*/
 }
 
 void ZEDMainEditor::actClone_onTriggered()
@@ -188,33 +193,6 @@ ZEDMainBrowser* ZEDMainEditor::GetBrowser()
 	return Browser;
 }
 
-bool ZEDMainEditor::Initialize()
-{
-	Core->InitializeEngine();
-
-	if (!InitializeSelf())
-		return false;
-
-	if (!Browser->GetBrowserWidget()->Initialize())
-		return false;
-
-	return true;
-}
-
-bool ZEDMainEditor::Deinitalize()
-{
-	if (!Browser->GetBrowserWidget()->Deinitalize())
-		return false;
-
-	if (!DeinitializeSelf())
-		return false;
-
-	if (Core != NULL)
-		Core->DeinitializeEngine();
-
-	return true;
-}
-
 ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWindow(Parent, Flags)
 {
 	ui = new Ui::MainEditor();
@@ -228,18 +206,17 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 
 	Core = ZEDCore::GetInstance();
 	MainViewPort = new ZEDViewport(ui->CentralWidget);
+	MainViewPort->show();
 	ui->ViewPort = MainViewPort;
 	ui->gridLayout->addWidget(ui->ViewPort, 0, 0, 1, 1);
 	
-	Core->GetEditorModule()->SetViewPort(MainViewPort);
+//	Core->GetEditorModule()->SetViewPort(MainViewPort);
 	
 	Browser = new ZEDMainBrowser(this);
 	addDockWidget(Qt::RightDockWidgetArea, Browser);
-
-	Initialize();
 }
 
 ZEDMainEditor::~ZEDMainEditor()
 {
-	Deinitalize();
+
 }

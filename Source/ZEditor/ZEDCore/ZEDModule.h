@@ -40,28 +40,27 @@
 class ZEDScene;
 class ZEDSceneWrapper;
 class ZEDObjectWrapper;
-class ZEDViewport;
+class ZEDViewportManager;
 class ZEGrid;
 
 class ZEDModule : public ZEApplicationModule
 {
 	private:
-		ZEDViewport*				Viewport;
 		ZEDScene*					Scene;
 		ZEDSceneWrapper*			SceneWrapper;
 		ZEGrid*						Grid;
+		ZEDViewportManager*			ViewportManager;
 
 	public:
-		void						SetViewPort(ZEDViewport* Viewport);
-		ZEDViewport*				GetViewPort();
+		ZEDViewportManager*			GetViewportManager();
 
 		void						SetScene(ZEDScene* Scene);
 		ZEDScene*					GetScene();
 		
 		ZEDObjectWrapper*			GetRootWrapper();
 
-		virtual void				Tick(float ElapsedTime);
-		virtual void				Render(float ElapsedTime);
+		virtual void				Process(float ElapsedTime);
+		virtual void				PostProcess(float ElapsedTime);
 
 		virtual void				StartUp();
 		virtual void				ShutDown();

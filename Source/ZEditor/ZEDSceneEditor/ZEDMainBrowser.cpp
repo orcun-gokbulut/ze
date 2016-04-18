@@ -69,19 +69,17 @@ void ZEDMainBrowserWidget::LoadScene()
 	LoadObject(TopLevelItem, Scene);
 }
 
-bool ZEDMainBrowserWidget::Initialize()
+bool ZEDMainBrowserWidget::InitializeSelf()
 {
 	Scene = ZEDCore::GetInstance()->GetEditorModule()->GetRootWrapper();
-
 	LoadScene();
-
+	
 	return true;
 }
 
-bool ZEDMainBrowserWidget::Deinitalize()
+bool ZEDMainBrowserWidget::DeinitalizeSelf()
 {
 	Scene = NULL;
-
 	return true;
 }
 

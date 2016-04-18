@@ -35,11 +35,12 @@
 
 #include "ZELCActivationCodeGenerator.h"
 
-#include "ZELCKeys.h"
-#include "ZELCActivationData.h"
-#include "ZELCEncryption.h"
+#include "ZEEncryption.h"
 #include "ZEDS\ZEFormat.h"
 #include "ZERegEx\ZERegEx.h"
+
+#include "ZELCKeys.h"
+#include "ZELCActivationData.h"
 #include "ZELCUtils.h"
 
 void ZELCActivationCodeGenerator::SetPreActivationKey(const void* Key, ZESize KeySize)

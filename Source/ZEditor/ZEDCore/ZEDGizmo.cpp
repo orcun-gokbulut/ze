@@ -34,9 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDGizmo.h"
-#include "ZEDCore.h"
-#include "ZEDModule.h"
-#include "ZEDScene.h"
+
 #include "ZETypes.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEPlane.h"
@@ -44,15 +42,15 @@
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZECore/ZEConsole.h"
+
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZERNStageID.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCuller.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
-#include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 
 void ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)

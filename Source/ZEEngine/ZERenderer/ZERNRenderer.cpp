@@ -124,8 +124,11 @@ void ZERNRenderer::UpdateConstantBuffers()
 	RendererConstants.ScreenTransform = ScreenTransform.ToMatrix3x3Shader();
 	RendererConstantBuffer->SetData(&RendererConstants);
 
-	SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();
-	SceneConstantBuffer->SetData(&SceneConstants);
+	if (Scene != NULL)
+	{
+		SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();
+		SceneConstantBuffer->SetData(&SceneConstants);
+	}
 }
 
 void ZERNRenderer::Cull()

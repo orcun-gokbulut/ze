@@ -220,7 +220,7 @@ static bool RegisterWindowClass(HINSTANCE Instance)
 	WindowClass.hIconSm			= NULL;
 
 	BOOL Result = RegisterClassEx(&WindowClass);
-	if(Result == 0)
+	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
 		return false;
@@ -704,7 +704,7 @@ bool ZEGRWindow::InitializeSelf()
 	WindowCount++;
 
 	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
-	if(Output == NULL)
+	if (Output == NULL)
 		return false;
 
 	return true;
@@ -723,18 +723,7 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	}
 
 	LONG_PTR Win32Style = GetWindowLongPtr(Handle, GWL_STYLE);
-	if (Win32Style == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return NULL;
-	}
-
 	LONG_PTR Win32StyleEx = GetWindowLongPtr(Handle, GWL_EXSTYLE);
-	if (Win32StyleEx == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return NULL;
-	}
 
 	RECT Rectangle = {0};
 	BOOL Result = GetClientRect(Handle, &Rectangle);
@@ -761,6 +750,13 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	Window->Bordered = (Win32Style & WS_BORDER) == WS_BORDER;
 	Window->ShowInTaskbar = (Win32StyleEx & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
 	Window->AlwaysOnTop = (Win32StyleEx & WS_EX_TOPMOST) == WS_EX_TOPMOST;
+
+	Window->Output = ZEGROutput::Create(Window, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+	if (Window->Output == NULL)
+	{
+		delete Window;
+		return NULL;
+	}
 
 	return Window;
 }
@@ -792,7 +788,7 @@ void ZEGRWindow::DeinitializeSelf()
 
 void ZEGRWindow::Show()
 {
-	if(!IsInitialized())
+	if (!IsInitialized())
 		return;
 
 	if (GetVisible())

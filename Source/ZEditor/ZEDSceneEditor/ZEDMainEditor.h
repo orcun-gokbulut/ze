@@ -44,7 +44,7 @@
 namespace Ui {class MainEditor;}
 class ZEDMainBrowser;
 
-class ZEDMainEditor : public QMainWindow
+class ZEDMainEditor : public QMainWindow, public ZEInitializable
 {
 	Q_OBJECT
 	private:
@@ -55,7 +55,7 @@ class ZEDMainEditor : public QMainWindow
 		ZEDMainBrowser*						Browser;
 
 		bool								InitializeSelf();
-		bool								DeinitializeSelf();
+		void								DeinitializeSelf();
 
 	private slots:
 		//File Menu Actions
@@ -97,9 +97,6 @@ class ZEDMainEditor : public QMainWindow
 		
 	public:
 		ZEDMainBrowser*						GetBrowser();
-
-		bool								Initialize();
-		bool								Deinitalize();
 
 											ZEDMainEditor(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
 											~ZEDMainEditor();
