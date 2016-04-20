@@ -736,9 +736,22 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	if (!Visible)
 		return false;
 
-	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+	ZEAABBox BoundingBox = GetWorldBoundingBox();
+
+	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(BoundingBox))
 		return false;
 
+	float ClosestBoundingBoxEdgeDistanceSquare = FLT_MAX;
+	float CurrentBoundingBoxEdgeDistanceSquare;
+
+	for (ZESize I = 0; I < 8; I++)
+	{
+		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, BoundingBox.GetVertex(I));
+
+		if (CurrentBoundingBoxEdgeDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
+			ClosestBoundingBoxEdgeDistanceSquare = CurrentBoundingBoxEdgeDistanceSquare;
+	}
+	
 	ZEInt32 CurrentLOD = 0;
 	float DrawOrder = 0.0f;
 	float LODDistanceSquare = 0.0f;
@@ -754,7 +767,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	{
 		LODDistanceSquare = LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance();
 
-		if (LODDistanceSquare < EntityDistanceSquare)
+		if (LODDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
 		{
 			if (CurrentDistanceSquare <= LODDistanceSquare)
 			{
@@ -764,7 +777,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		}
 	}
 
-	if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
+	if (ClosestBoundingBoxEdgeDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
 		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
