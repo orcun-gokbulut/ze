@@ -160,7 +160,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool									HeightMapEnabled;
 		ZERNHeightMapTechnique					HeightMapTechnique;
 		bool									EmissiveEnabled;
-		mutable float							EmissiveFactor; // GERİ ZEKALI BİTES HACK
+		float									EmissiveFactor;
 		ZEVector3								EmissiveColor; 
 		bool									EmissiveMapEnabled;
 		bool									SubSurfaceScatteringMapEnabled;
