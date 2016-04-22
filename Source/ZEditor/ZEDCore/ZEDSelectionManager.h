@@ -39,7 +39,7 @@
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMatrix.h"
 
-#include "ZEDViewportInput.h"
+#include "ZEDInputEvent.h"
 
 enum ZEDSelectionPivotMode
 {

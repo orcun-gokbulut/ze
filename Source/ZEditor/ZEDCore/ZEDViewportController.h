@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDModule.h
+ Zinek Engine - ZEDViewportController.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,29 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
-#include "ZECore/ZEApplicationModule.h"
-
 #include "ZEDInputEvent.h"
-#include "ZEDViewportController.h"
 
-class ZEDScene;
-class ZEDSceneWrapper;
-class ZEDObjectWrapper;
-class ZEDViewportManager;
-class ZEDViewportController;
-class ZEGrid;
-
-class ZEDModule : public ZEApplicationModule
+class ZEDViewportController
 {
 	private:
-		ZEDScene*					Scene;
-		ZEDSceneWrapper*			SceneWrapper;
-		ZEGrid*						Grid;
-		ZEDViewportManager*			ViewportManager;
-		ZEDViewportController		ViewportController;
-
+		bool						LockCamera;
+		float						StepSize;
+		float						MouseSensivity;
+		bool						Active;
+		float						Rx, Ry, Rz;
 	public:
-		ZEDViewportManager*			GetViewportManager();
+		void						SetLockCamera(bool Enabled);
+		bool						GetLockCamera();
 
-		void						SetScene(ZEDScene* Scene);
-		ZEDScene*					GetScene();
-		
-		ZEDObjectWrapper*			GetRootWrapper();
+		void						SetStepSize(float StepSize);
+		float						GetStepSize();
 
-		virtual void				Process(float ElapsedTime);
-		virtual void				PostProcess(float ElapsedTime);
+		void						SetMouseSensivity(float Sensivity);
+		float						GetMouseSensivity();
 
-		virtual void				StartUp();
-		virtual void				ShutDown();
+		virtual bool				KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event);
+		virtual bool				MouseEventHandler(const ZEDViewportMouseEvent& Event);
 
-		virtual void				KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event);
-		virtual void				MouseEventHandler(const ZEDViewportMouseEvent& Event);
-
-									ZEDModule();
-		virtual						~ZEDModule();
-
+									ZEDViewportController();
+									~ZEDViewportController();
 };

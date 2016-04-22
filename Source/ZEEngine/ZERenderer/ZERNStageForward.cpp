@@ -48,38 +48,12 @@ void ZERNStageForward::DeinitializeSelf()
 	ColorBuffer.Release();
 	ColorRenderTarget.Release();
 	DepthStencilBuffer.Release();
-	DepthOutput.Release();
 }
 
 bool ZERNStageForward::UpdateRenderTargets()
 {
-	ColorRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
-	if (ColorRenderTarget == NULL)
-	{
-		const ZEGRRenderTarget* OriginalRenderTarget = GetRenderer()->GetOutputRenderTarget();
-		if (OriginalRenderTarget == NULL)
-			return false;
-
-		ColorBuffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-		ColorRenderTarget = ColorBuffer->GetRenderTarget();
-	}
-	else
-	{
-		ColorBuffer.Release();
-	}
-
-	DepthOutput = GetPrevOutput(ZERN_SO_DEPTH);
-	if (DepthOutput == NULL)
-	{
-		if (DepthStencilBuffer == NULL || 
-			DepthStencilBuffer->GetWidth() != ColorRenderTarget->GetWidth() || 
-			DepthStencilBuffer->GetHeight() != ColorRenderTarget->GetHeight())
-			DepthStencilBuffer = ZEGRTexture2D::CreateInstance(ColorRenderTarget->GetWidth(), ColorRenderTarget->GetHeight(), 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
-	}
-	else
-	{
-		DepthStencilBuffer.Release();
-	}
+	BindOutput(ZERN_SO_COLOR, ZEGR_TF_R11G11B10_FLOAT, true, ColorBuffer, ColorRenderTarget);
+	BindDepthOutput(ZERN_SO_DEPTH, ZEGR_TF_D24_UNORM_S8_UINT, true, DepthBuffer, DepthStencilBuffer);
 
 	Viewport.SetWidth((float)ColorRenderTarget->GetWidth());
 	Viewport.SetHeight((float)ColorRenderTarget->GetHeight());
@@ -107,6 +81,14 @@ const ZEString& ZERNStageForward::GetName() const
 	return Name;
 }
 
+const ZEGRRenderTarget*	ZERNStageForward::GetProvidedInput(ZERNStageBuffer Input) const
+{
+	if (GetEnabled() && Input == ZERN_SO_COLOR)
+		return ColorBuffer->GetRenderTarget();
+	
+	return ZERNStage::GetProvidedInput(Input);
+}
+
 const ZEGRTexture2D* ZERNStageForward::GetOutput(ZERNStageBuffer Output) const
 {
 	if (GetEnabled())
@@ -118,12 +100,13 @@ const ZEGRTexture2D* ZERNStageForward::GetOutput(ZERNStageBuffer Output) const
 				return ColorBuffer;
 
 			case ZERN_SO_DEPTH:
-				return DepthStencilBuffer;
+				return DepthBuffer;
 		}
 	}
 
 	return ZERNStage::GetOutput(Output);
 }
+
 
 bool ZERNStageForward::Setup(ZEGRContext* Context)
 {
@@ -136,10 +119,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (ColorBuffer != NULL)
 		Context->ClearRenderTarget(ColorRenderTarget, ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
 
-	if (DepthOutput != NULL)
-		Context->ClearDepthStencilBuffer(DepthOutput->GetDepthStencilBuffer(), true, true, 1.0f, 0x00);
-
-	Context->SetRenderTargets(1, ColorRenderTarget.GetPointerToPointer(), DepthStencilBuffer->GetDepthStencilBuffer());
+	Context->SetRenderTargets(1, ColorRenderTarget.GetPointerToPointer(), DepthStencilBuffer);
 	Context->SetViewports(1, &Viewport);
 
 	return true;

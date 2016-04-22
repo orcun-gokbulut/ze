@@ -41,6 +41,7 @@
 
 #include <windows.h>
 #include <QApplication>
+#include "ZEMath/ZEAngle.h"
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {

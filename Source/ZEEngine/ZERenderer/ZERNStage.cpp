@@ -36,7 +36,12 @@
 #include "ZERNStage.h"
 
 #include "ZEDS/ZEList2.h"
+
+#include "ZERNRenderer.h"
 #include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Input) const
 {
@@ -47,7 +52,6 @@ const ZEGRTexture2D* ZERNStage::GetPrevOutput(ZERNStageBuffer Input) const
 	return PrevStage->GetOutput(Input);
 }
 
-
 const ZEGRRenderTarget* ZERNStage::GetNextProvidedInput(ZERNStageBuffer RenderTarget) const
 {
 	ZERNStage* NextStage = GetNextStage();
@@ -55,6 +59,62 @@ const ZEGRRenderTarget* ZERNStage::GetNextProvidedInput(ZERNStageBuffer RenderTa
 		return NULL;
 
 	return NextStage->GetProvidedInput(RenderTarget);
+}
+
+bool ZERNStage::BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRRenderTarget>& Target)
+{
+	if (BothWay)
+	{
+		ZEHolder<const ZEGRTexture2D> PrevOutput = GetPrevOutput(Output);
+		if (PrevOutput != NULL)
+		{
+			Buffer = PrevOutput;
+			Target = PrevOutput->GetRenderTarget(0);
+			return false;
+		}
+	}
+
+	ZEHolder<const ZEGRRenderTarget> ProvidedRenderTarget = GetProvidedInput(Output);
+	if (ProvidedRenderTarget != NULL)
+	{
+		Buffer.Release();
+		Target = ProvidedRenderTarget;
+		return false;
+	}
+
+	const ZEGRRenderTarget* OriginalRenderTarget = GetRenderer()->GetOutputRenderTarget();
+	if (Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
+		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
+	{
+		Buffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_RENDER_TARGET).GetPointer();
+		Target = ProvidedRenderTarget;
+	}
+
+	return true;
+}
+
+bool ZERNStage::BindDepthOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRDepthStencilBuffer>& Target)
+{
+	if (BothWay)
+	{
+		ZEHolder<const ZEGRTexture2D> PrevOutput = GetPrevOutput(Output);
+		if (PrevOutput != NULL)
+		{
+			Buffer = PrevOutput;
+			Target = PrevOutput->GetDepthStencilBuffer();
+			return false;
+		}
+	}
+
+	const ZEGRRenderTarget* OriginalRenderTarget = GetRenderer()->GetOutputRenderTarget();
+	if (Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
+		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
+	{
+		Buffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL).GetPointer();
+		Target = Buffer->GetDepthStencilBuffer(0);
+	}
+
+	return true;
 }
 
 ZERNRenderer* ZERNStage::GetRenderer() const

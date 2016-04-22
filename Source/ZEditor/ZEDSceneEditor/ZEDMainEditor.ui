@@ -182,6 +182,100 @@
           </widget>
          </item>
          <item>
+          <widget class="QLabel" name="lblCameraPosition_2">
+           <property name="text">
+            <string>Cam Rot: </string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblCameraRotationX">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string/>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::WinPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblCameraRotationY">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string/>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::WinPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="lineWidth">
+            <number>0</number>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="lblCameraRotationZ">
+           <property name="minimumSize">
+            <size>
+             <width>75</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>75</width>
+             <height>20</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string/>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::WinPanel</enum>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Sunken</enum>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+          </widget>
+         </item>
+         <item>
           <spacer name="horizontalSpacer">
            <property name="orientation">
             <enum>Qt::Horizontal</enum>
@@ -373,9 +467,6 @@
    <property name="text">
     <string>Rotate</string>
    </property>
-   <property name="shortcut">
-    <string>R</string>
-   </property>
   </action>
   <action name="actMove">
    <property name="checkable">
@@ -384,9 +475,6 @@
    <property name="text">
     <string>Move</string>
    </property>
-   <property name="shortcut">
-    <string>E</string>
-   </property>
   </action>
   <action name="actScale">
    <property name="checkable">
@@ -394,9 +482,6 @@
    </property>
    <property name="text">
     <string>Scale</string>
-   </property>
-   <property name="shortcut">
-    <string>T</string>
    </property>
   </action>
   <action name="actHelp">
@@ -448,9 +533,6 @@
    </property>
    <property name="text">
     <string>Select</string>
-   </property>
-   <property name="shortcut">
-    <string>Q</string>
    </property>
   </action>
   <action name="DeleteAction">
@@ -656,9 +738,7 @@
   </action>
  </widget>
  <layoutdefault spacing="6" margin="11"/>
- <resources>
-  <include location="MapEditor.qrc"/>
- </resources>
+ <resources/>
  <connections>
   <connection>
    <sender>actExit</sender>

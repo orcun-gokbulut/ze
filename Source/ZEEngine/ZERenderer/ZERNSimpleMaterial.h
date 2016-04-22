@@ -66,18 +66,18 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		struct
 		{
 			ZEVector4						MaterialColor;
-			bool 							TextureEnabled;
+			ZEBool32						TextureEnabled;
+			ZEBool32						VertexColorEnabled;
 			float							Reserved0;
-			bool 							VertexColorEnabled;
 			float							Reserved1;
 		} Constants;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZERNMap								TextureMap;
 
-		void								UpdateShaders();
-		void								UpdateRenderState();
-		void								UpdateConstantBuffer();
+		bool								UpdateShaders();
+		bool								UpdateRenderState();
+		bool								UpdateConstantBuffer();
 	
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();

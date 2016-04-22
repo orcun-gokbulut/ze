@@ -67,6 +67,8 @@ ze_add_source(ZEDViewportInput.cpp				Sources)
 ze_add_source(ZEDViewportInput.h				Sources)
 ze_add_source(ZEDViewportManager.cpp			Sources)
 ze_add_source(ZEDViewportManager.h				Sources)
+ze_add_source(ZEDViewportController.cpp			Sources)
+ze_add_source(ZEDViewportController.h			Sources)
 
 qt5_wrap_cpp (QtMocFiles ${QtMocs})
 

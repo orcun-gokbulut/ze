@@ -42,9 +42,24 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
+bool ZERNStagePostProcess::UpdateRenderTargets()
+{
+	BindOutput(ZERN_SO_COLOR, ZEGR_TF_R11G11B10_FLOAT, true, ColorBuffer, ColorRenderTarget);
+	return true;
+}
+
+bool ZERNStagePostProcess::Update()
+{
+	if (!UpdateRenderTargets())
+		return false;
+
+	return true;
+}
+
 void ZERNStagePostProcess::DeinitializeSelf()
 {
-	OutputTexture.Release();
+	ColorRenderTarget.Release();
+	ColorBuffer.Release();
 
 	ZERNStage::Deinitialize();
 }
@@ -68,11 +83,11 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
+	if (!Update())
+		return false;
+
 	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
 	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
-
-	OutputTexture = GetPrevOutput(ZERN_SO_COLOR);
-
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
 	return true;
@@ -86,7 +101,7 @@ void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
 {
 	if (GetEnabled() && (Input == ZERN_SO_COLOR))
-		return OutputTexture->GetRenderTarget();
+		return ColorRenderTarget;
 
 	return ZERNStage::GetProvidedInput(Input);
 }
@@ -94,7 +109,7 @@ const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer I
 const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) const
 {
 	if (GetEnabled() && Output == ZERN_SO_COLOR)
-		return OutputTexture;
+		return ColorBuffer;
 
 	return ZERNStage::GetOutput(Output);
 }

@@ -50,6 +50,12 @@ void ZEDViewportManager::UnregisterViewport(ZEDViewport* Viewport)
 	Viewports.RemoveValue(Viewport);
 }
 
+void ZEDViewportManager::Tick()
+{
+	for(ZESize I = 0; I < Viewports.GetCount(); I++)
+		Viewports[I]->Tick();
+}
+
 void ZEDViewportManager::Render()
 {
 	for(ZESize I = 0; I < Viewports.GetCount(); I++)

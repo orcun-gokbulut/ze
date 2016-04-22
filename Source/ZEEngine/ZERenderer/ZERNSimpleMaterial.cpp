@@ -53,10 +53,10 @@
 #define ZERN_SMDF_CONSTANT_BUFFER	2
 #define ZERN_SMDF_SHADERS			4
 
-void ZERNSimpleMaterial::UpdateShaders()
+bool ZERNSimpleMaterial::UpdateShaders()
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_RENDER_STATE))
-		return;
+		return true;
 
 	ZEGRShaderCompileOptions Options;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNSimpleMaterial.hlsl";
@@ -72,12 +72,14 @@ void ZERNSimpleMaterial::UpdateShaders()
 
 	DirtyFlags.UnraiseFlags(ZERN_SMDF_RENDER_STATE);
 	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
+
+	return true;
 }
 
-void ZERNSimpleMaterial::UpdateRenderState()
+bool ZERNSimpleMaterial::UpdateRenderState()
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_RENDER_STATE))
-		return;
+		return true;
 
 	ZEGRRenderState RenderState = ZERNStageForward::GetRenderState();
 	RenderState.SetPrimitiveType(PrimitiveType);
@@ -101,16 +103,23 @@ void ZERNSimpleMaterial::UpdateRenderState()
 	RenderStateData = RenderState.Compile();
 
 	DirtyFlags.UnraiseFlags(ZERN_SMDF_RENDER_STATE);
+
+	return true;
 }
 
-void ZERNSimpleMaterial::UpdateConstantBuffer()
+bool ZERNSimpleMaterial::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_CONSTANT_BUFFER))
-		return
-		
+		return true;
+	
+	if (ConstantBuffer == NULL)
+		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
+
+	return true;
 }
 
 bool ZERNSimpleMaterial::InitializeSelf()
@@ -254,7 +263,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	if(!Update())
+	if (!Update())
 		return false;
 
 	Context->SetRenderState(RenderStateData);

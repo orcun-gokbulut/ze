@@ -45,7 +45,11 @@ class ZERNStagePostProcess : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<const ZEGRTexture2D>		OutputTexture;
+		ZEHolder<const ZEGRTexture2D>		ColorBuffer;
+		ZEHolder<const ZEGRRenderTarget>	ColorRenderTarget;
+
+		bool								UpdateRenderTargets();
+		bool								Update();
 
 		virtual void						DeinitializeSelf();
 

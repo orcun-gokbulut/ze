@@ -289,12 +289,6 @@ void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* C
 
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
-	if (AxisEnabled)
-	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferAxisTransform);
-		Context->Draw(4, 0);
-	}
-
 	if (MinorGridEnabled)
 	{
 		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferMinorGridTransform);
@@ -305,6 +299,12 @@ void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* C
 	{
 		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferMajorGridTransform);
 		Context->Draw(MajorGridCount, MajorGridOffset);
+	}
+
+	if (AxisEnabled)
+	{
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferAxisTransform);
+		Context->Draw(4, 0);
 	}
 
 	Material->CleanupMaterial(Context, Parameters->Stage);
@@ -319,9 +319,10 @@ bool ZEGrid::InitializeSelf()
 	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
-	Material = ZERNFixedMaterial::CreateInstance();
-	Material->SetVertexColorEnabled(false);
-	Material->Initialize();
+	Material = ZERNSimpleMaterial::CreateInstance();
+	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	Material->SetVertexColorEnabled(true);
+	Material->Update();
 
 	RenderCommand.Entity = this;
 	RenderCommand.Priority = 0;
@@ -351,14 +352,14 @@ ZEGrid::ZEGrid()
 
 	MinorGridEnabled = true;
 	MinorGridUnitSize = ZEVector2(1.0f, 1.0f);
-	MinorGridColor = ZEVector3(0.4f, 0.4f, 0.4f);
+	MinorGridColor = ZEVector3(0.3f, 0.3f, 0.3f);
 
 	MajorGridEnabled = true;
 	MajorGridUnitSize = ZEVector2(5.0f, 5.0f);
-	MajorGridColor = ZEVector3(0.3f, 0.3f, 0.3f);
+	MajorGridColor = ZEVector3(0.5f, 0.5f, 0.5f);
 
 	AxisEnabled = true;
-	AxisColor = ZEVector3::Zero;
+	AxisColor = ZEVector3(0.7f, 0.7f, 0.7f);
 }
 
 ZEGrid* ZEGrid::CreateInstance()
