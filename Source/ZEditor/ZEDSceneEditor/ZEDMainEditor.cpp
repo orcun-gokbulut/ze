@@ -34,14 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDMainEditor.h"
+
+#include "ui_ZEDMainEditor.h"
+#include "ZEDMainBrowser.h"
 #include "ZEDCore/ZEDCore.h"
 #include "ZEDCore/ZEDModule.h"
 #include "ZEDCore/ZEDViewport.h"
 #include "ZEDCore/ZEDOperationManager.h"
 #include "ZEDCore/ZEDTransformationManager.h"
 #include "ZEDCore/ZEDGizmo.h"
-#include "ui_ZEDMainEditor.h"
-#include "ZEDMainBrowser.h"
+#include "ZEDCore/ZEDScene.h"
+#include "ZEMath/ZEAngle.h"
 
 bool ZEDMainEditor::InitializeSelf()
 {
@@ -186,6 +189,16 @@ void ZEDMainEditor::MainTimer_onTimeout()
 
 	ui->actUndo->setEnabled(Core->GetOperationManager()->CanUndo());
 	ui->actRedo->setEnabled(Core->GetOperationManager()->CanRedo());
+
+	ui->lblCameraPositionX->setText(QString::number(MainViewPort->GetPosition().x));
+	ui->lblCameraPositionY->setText(QString::number(MainViewPort->GetPosition().y));
+	ui->lblCameraPositionZ->setText(QString::number(MainViewPort->GetPosition().z));
+
+	float Rx, Ry, Rz;
+	ZEQuaternion::ConvertToEulerAngles(Rx, Ry, Rz, MainViewPort->GetRotation());
+	ui->lblCameraRotationX->setText(QString::number((ZEInt)ZEAngle::ToDegree(Rx)));
+	ui->lblCameraRotationY->setText(QString::number((ZEInt)ZEAngle::ToDegree(Ry)));
+	ui->lblCameraRotationZ->setText(QString::number((ZEInt)ZEAngle::ToDegree(Rz)));
 }
 
 ZEDMainBrowser* ZEDMainEditor::GetBrowser()

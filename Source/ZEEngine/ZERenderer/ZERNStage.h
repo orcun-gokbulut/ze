@@ -41,15 +41,15 @@
 #include "ZETypes.h"
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEGraphics/ZEGRFormat.h"
 
 class ZEString;
 class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRRenderState;
 class ZEGRRenderTarget;
-class ZERNCommand;
-class ZERNRenderer;
-class ZEString;
+class ZEGRDepthStencilBuffer;
 class ZERNRenderer;
 class ZERNCommand;
 
@@ -91,6 +91,10 @@ class ZERNStage : public ZEObject, public ZEInitializable
 	protected:
 		const ZEGRTexture2D*				GetPrevOutput(ZERNStageBuffer Input) const;
 		const ZEGRRenderTarget*				GetNextProvidedInput(ZERNStageBuffer RenderTarget) const;
+
+		bool								BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRRenderTarget>& Target);
+		bool								BindDepthOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRDepthStencilBuffer>& Target);
+
 
 	public:
 		virtual ZEInt						GetId() const = 0;

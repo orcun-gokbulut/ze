@@ -53,48 +53,98 @@
 #include "ZEDModule.h"
 #include "ZEDViewportManager.h"
 #include "ZECore\ZECore.h"
+#include "ZEDInputEvent.h"
+#include "ZERenderer\ZERNStageForward.h"
 
-void ZEDViewport::UpdateView()
+#define ZED_VDF_VIEW			0x01
+#define ZED_VDF_VIEW_PORT		0x02
+
+bool ZEDViewport::UpdateView()
 {
-	//if (CameraDirtyFlags.GetFlags(ZE_CDF_VIEW))
+	if (!DirtyFlags.GetFlags(ZED_VDF_VIEW))
+		return true;
+
+	View.Type = ZERN_VT_VIEWPORT;
+	View.Entity = NULL;
+
+	View.Position = Position;
+	View.Rotation = Rotation;
+	View.Direction = View.Rotation * ZEVector3::UnitZ;
+	View.U = View.Rotation * ZEVector3::UnitX;
+	View.V = View.Rotation * ZEVector3::UnitY;
+	View.N = View.Rotation * ZEVector3::UnitZ;
+
+	View.AspectRatio = (float)Window->GetWidth() / (float)Window->GetHeight();
+	View.VerticalFOV = GetVerticalFOV();
+	View.VerticalFOVTop = View.VerticalFOV / 2.0f;
+	View.VerticalFOVBottom = View.VerticalFOV / 2.0f;
+	View.HorizontalFOV = View.AspectRatio * View.VerticalFOV;
+	View.HorizontalFOVLeft = View.HorizontalFOV / 2.0f;
+	View.HorizontalFOVRight = View.HorizontalFOV / 2.0f;
+	View.ProjectionType = ZERN_PT_PERSPECTIVE;
+	View.NearZ = 1.0f;
+	View.FarZ = 2000.0f;
+
+	ZEMatrix4x4::CreateViewTransform(View.ViewTransform, View.Position, View.Rotation);
+	ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
+	ZEMatrix4x4::Multiply(View.ViewProjectionTransform, View.ProjectionTransform, View.ViewTransform);
+	ZEMatrix4x4::Inverse(View.InvViewTransform, View.ViewTransform);
+	ZEMatrix4x4::Inverse(View.InvProjectionTransform, View.ProjectionTransform);
+	ZEMatrix4x4::Multiply(View.InvViewProjectionTransform, View.InvViewTransform, View.InvProjectionTransform);
+
+	View.Viewport = &Viewport;
+
+	ViewFrustum.Create(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
+	View.ViewVolume = &ViewFrustum;
+
+	View.ShadowDistance = 100.0f;
+	View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
+
+	Renderer.SetView(View);
+
+	DirtyFlags.UnraiseFlags(ZED_VDF_VIEW);
+
+	return true;
+}
+
+bool ZEDViewport::UpdateRenderTarget()
+{
+	if (Window == NULL)
+		return false;
+
+	ZEGROutput* Output = Window->GetOutput();
+	if (Output == NULL)
+		return false;
+
+	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
+	Renderer.SetOutputRenderTarget(RenderTarget);
+
+	if (RenderTarget == NULL)
+		return false;
+
+	if (Viewport.GetWidth() == RenderTarget->GetWidth() &&
+		Viewport.GetHeight() == RenderTarget->GetHeight())
 	{
-		View.Position = Position;
-		View.Rotation = Rotation;
-		View.Direction = View.Rotation * ZEVector3::UnitZ;
-		View.U = View.Rotation * ZEVector3::UnitX;
-		View.V = View.Rotation * ZEVector3::UnitY;
-		View.N = View.Rotation * ZEVector3::UnitZ;
-
-
-		View.AspectRatio = (float)Window->GetWidth() / (float)Window->GetHeight();
-		View.VerticalFOV = GetVerticalFOV();
-		View.HorizontalFOV = View.AspectRatio * View.VerticalFOV;
-
-
-		ZEMatrix4x4::CreateViewTransform(View.ViewTransform, View.Position, View.Rotation);
-		ZEMatrix4x4::CreatePerspectiveProjection(View.ProjectionTransform, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
-		ZEMatrix4x4::Multiply(View.ViewProjectionTransform, View.ProjectionTransform, View.ViewTransform);
-		ZEMatrix4x4::Inverse(View.InvViewTransform, View.ViewTransform);
-		ZEMatrix4x4::Inverse(View.InvProjectionTransform, View.ProjectionTransform);
-		ZEMatrix4x4::Inverse(View.InvViewProjectionTransform, View.ViewProjectionTransform);
-
-		View.NearZ = 1.0f;
-		View.FarZ = 2000.0f;
-
-		View.ProjectionType = ZERN_PT_PERSPECTIVE;
-		View.Type = ZERN_VT_VIEWPORT;
-		View.Viewport = &Viewport;
-		View.ViewVolume = &ViewFrustum;
-
-		View.ShadowDistance = 100.0f;
-		View.ShadowFadeDistance = View.ShadowDistance * 0.1f;
-
-		ViewFrustum.Create(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
-
-		//CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW);
+		return true;
 	}
 
-	//return View;
+	Viewport.SetX(0.0f);
+	Viewport.SetY(0.0f);
+	Viewport.SetWidth((float)RenderTarget->GetWidth());
+	Viewport.SetHeight((float)RenderTarget->GetHeight());
+
+	DirtyFlags.RaiseFlags(ZED_VDF_VIEW);
+}
+
+bool ZEDViewport::Update()
+{
+	if (!UpdateRenderTarget())
+		return false;
+
+	if (!UpdateView())
+		return false;
+
+	return true;
 }
 
 bool ZEDViewport::InitializeSelf()
@@ -107,17 +157,17 @@ bool ZEDViewport::InitializeSelf()
 	ZERNStageShadowing* StageShadowing = new ZERNStageShadowing();
 	Renderer.AddStage(StageShadowing);
 	
-	ZERNStagePreProcess* StagePreProcess = new ZERNStagePreProcess();
-	Renderer.AddStage(StagePreProcess);
-
 	ZERNStageLighting* StageLighting = new ZERNStageLighting();
 	Renderer.AddStage(StageLighting);
 
-	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
-	Renderer.AddStage(StageParticleRendering);
+	ZERNStageForward* StageForward = new ZERNStageForward();
+	Renderer.AddStage(StageForward);
 
 	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
 	Renderer.AddStage(StagePostProcess);
+
+	/*ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
+	Renderer.AddStage(StageParticleRendering);*/
 
 	ZERNStageHDR* StageHDR = new ZERNStageHDR();
 	StageHDR->SetToneMapOperator(ZERN_HTMO_UNCHARTED);
@@ -133,11 +183,12 @@ bool ZEDViewport::InitializeSelf()
 	StageHDR->SetSaturation(0.700000);
 	Renderer.AddStage(StageHDR);
 
+	/*
 	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
 	Renderer.AddStage(StageAntiAliasing);
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
-	Renderer.AddStage(Stage2D);
+	Renderer.AddStage(Stage2D);*/
 
 	ZERNStageOutput* StageOutput = new ZERNStageOutput();
 	Renderer.AddStage(StageOutput);
@@ -152,9 +203,11 @@ bool ZEDViewport::InitializeSelf()
 
 void ZEDViewport::DeinitializeSelf()
 {
+	DirtyFlags.RaiseAll();
 	ZEDCore::GetInstance()->GetEditorModule()->GetViewportManager()->UnregisterViewport(this);
 	Renderer.Deinitialize();
 	Window->Destroy();
+	Window = NULL;
 }
 
 /*
@@ -469,22 +522,221 @@ void ZEDViewport::keyReleaseEvent(QKeyEvent* KeyEvent)
 		PressedKeyboardKeys.remove(KeyEvent->key());
 }*/
 
-void ZEDViewport::resizeEvent(QResizeEvent* ResizeEvent)
+ZEDViewportKeyboardEvent ZEDViewport::Convert(QKeyEvent* KeyEvent)
 {
-	QSize NewSize = ResizeEvent->size();
+	ZEDViewportKeyboardEvent Event;
+
+	return Event;
+}
+
+void ZEDViewport::mousePressEvent(QMouseEvent* Event)
+{
+	ZEDViewportMouseEvent MouseEvent;
+	MouseEvent.Viewport = this;
+	MouseEvent.PositionX = LastMousePositionX;
+	MouseEvent.PositionY = LastMousePositionY;
+	MouseEvent.DeltaX = 0.0f;
+	MouseEvent.DeltaY = 0.0f;
+	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
+	MouseEvent.Modifiers = Modifiers;
+
+	MouseEvent.Type = ZED_ET_BUTTON_PRESSING;
+	MouseEvents.Add(MouseEvent);
+
+	MouseEvent.Type = ZED_ET_BUTTON_PRESSED;
+	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
+
+	QFrame::mousePressEvent(Event);
+}
+
+void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
+{
+	ZEDViewportMouseEvent MouseEvent;
+	MouseEvent.Type = ZED_ET_MOUSE_MOVED;
+	MouseEvent.Viewport = this;
+	MouseEvent.PositionX = Event->pos().x();
+	MouseEvent.PositionY = Event->pos().y();
+
+	if (LastMousePositionX == -1)
+	{
+		MouseDeltaX = 0;
+		MouseDeltaY = 0;
+	}
+	else
+	{
+		MouseDeltaX =  MouseEvent.PositionX - LastMousePositionX;
+		MouseDeltaY =  MouseEvent.PositionY - LastMousePositionY;
+	}
+
+	MouseEvent.DeltaX = MouseDeltaX;
+	MouseEvent.DeltaY = MouseDeltaY;
+
+	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
+	MouseEvent.Modifiers = Modifiers;
+
+	LastMousePositionX = MouseEvent.PositionX;
+	LastMousePositionY = MouseEvent.PositionY;
+
+	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
+
+	QFrame::mouseMoveEvent(Event);
+}
+
+void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
+{
+	ZEDViewportMouseEvent MouseEvent;
+	MouseEvent.Type = ZED_ET_BUTTON_RELEASED;
+	MouseEvent.Viewport = this;
+	MouseEvent.PositionX = LastMousePositionX;
+	MouseEvent.PositionY = LastMousePositionY;
+	MouseEvent.DeltaX = MouseDeltaX;
+	MouseEvent.DeltaY = MouseDeltaY;
+	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
+	MouseEvent.Modifiers = Modifiers;
+
+	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
+	{
+		if (MouseEvents[I].Button == MouseEvent.Button)
+		{
+			MouseEvents.Remove(I);
+			break;
+		}
+	}
+
+	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
+
+	QFrame::mouseMoveEvent(Event);
+}
+
+void ZEDViewport::enterEvent(QEvent* Event)
+{
+	LastMousePositionX = -1;
+	LastMousePositionY = -1;
+
+	QFrame::enterEvent(Event);
+}
+
+void ZEDViewport::leaveEvent(QEvent* Event)
+{
+	LastMousePositionX = -1;
+	LastMousePositionY = -1;
+
+	QFrame::leaveEvent(Event);
+}
+
+void ZEDViewport::keyPressEvent(QKeyEvent* Event)
+{
+	if (Event->isAutoRepeat())
+		return;
+
+	if (Event->key() == Qt::Key_Shift)
+		Modifiers |= ZED_KKM_SHIFT;
+
+	if (Event->key() == Qt::Key_Control)
+		Modifiers |= ZED_KKM_CTRL;
+
+	if (Event->key() == Qt::Key_Alt)
+		Modifiers |= ZED_KKM_ALT;
+
+	if (Event->key() == Qt::Key_Meta)
+		Modifiers |= ZED_KKM_WINDOWS;
+
+	ZEDViewportKeyboardEvent KeyboardEvent;
+	KeyboardEvent.Viewport = this;
+	KeyboardEvent.Key = (ZEDInputKeyboardKey)Event->key();
+	KeyboardEvent.VirtualKey = Event->nativeVirtualKey();
+	KeyboardEvent.Text = Event->text().toUtf8().begin();
+	KeyboardEvent.Modifiers = Modifiers;
+
+	KeyboardEvent.Type = ZED_ET_BUTTON_PRESSING;
+	KeyboardEvents.Add(KeyboardEvent);
+
+	KeyboardEvent.Type = ZED_ET_BUTTON_PRESSED;
+	ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvent);
+
+	QFrame::keyPressEvent(Event);
+}
+
+void ZEDViewport::keyReleaseEvent(QKeyEvent* Event)
+{
+	if (Event->isAutoRepeat())
+		return;
+
+	ZEDViewportKeyboardEvent KeyboardEvent;
+	KeyboardEvent.Viewport = this;
+	KeyboardEvent.Type = ZED_ET_BUTTON_RELEASED;
+	KeyboardEvent.Key = (ZEDInputKeyboardKey)Event->key();
+	KeyboardEvent.VirtualKey = Event->nativeVirtualKey();
+	KeyboardEvent.Text = Event->text().toUtf8().begin();
+	KeyboardEvent.Modifiers = Modifiers;
+
+	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
+	{
+		if (KeyboardEvents[I].Key == KeyboardEvent.Key)
+		{
+			KeyboardEvents.Remove(I);
+			break;
+		}
+	}
+
+	ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvent);
+	
+	if (Event->key() == Qt::Key_Shift)
+		Modifiers &= ~ZED_KKM_SHIFT;
+
+	if (Event->key() == Qt::Key_Control)
+		Modifiers &= ~ZED_KKM_CTRL;
+
+	if (Event->key() == Qt::Key_Alt)
+		Modifiers &= ~ZED_KKM_ALT;
+
+	if (Event->key() == Qt::Key_Meta)
+		Modifiers &= ~ZED_KKM_WINDOWS;
+
+	QFrame::keyReleaseEvent(Event);
+}
+
+void ZEDViewport::resizeEvent(QResizeEvent* Event)
+{
+	QSize NewSize = Event->size();
 
 	if (Window != NULL)
 		Window->WrapperResized(NewSize.width(), NewSize.height());
+
+	QFrame::resizeEvent(Event);
 }
 
 void ZEDViewport::focusInEvent(QFocusEvent* Event)
 {
-	this->setMouseTracking(true);
+	setMouseTracking(true);
+	QFrame::focusInEvent(Event);
 }
 
 void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 {
-	this->setMouseTracking(false);
+	LastMousePositionX = -1;
+	LastMousePositionY = -1;
+	MouseDeltaX = 0;
+	MouseDeltaY = 0;
+	Modifiers = ZED_KKM_NONE;
+
+	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
+	{
+		KeyboardEvents[I].Type = ZED_ET_BUTTON_RELEASED;
+		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvents[I]);
+	}
+	KeyboardEvents.Clear();
+
+	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
+	{
+		MouseEvents[I].Type = ZED_ET_BUTTON_RELEASED;
+		ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvents[I]);
+	}
+
+	MouseEvents.Clear();
+
+	setMouseTracking(false);
+	QFrame::focusOutEvent(Event);
 }
 
 const ZERNView& ZEDViewport::GetView()
@@ -492,29 +744,36 @@ const ZERNView& ZEDViewport::GetView()
 	return View;
 }
 
-void ZEDViewport::SetViewMode(ZEDViewMode Mode)
-{
-	this->ViewMode = Mode;
-}
-
-ZEDViewMode ZEDViewport::GetViewMode()
-{
-	return ViewMode;
-}
-
-void ZEDViewport::SetScene(ZEDScene* Scene)
+void ZEDViewport::SetScene(ZEScene* Scene)
 {
 	this->Scene = Scene;
 }
 
-ZEDScene* ZEDViewport::GetScene()
+ZEScene* ZEDViewport::GetScene()
 {
 	return Scene;
+}
+
+void ZEDViewport::Tick()
+{
+	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
+		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvents[I]);
+
+	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
+	{
+		MouseEvents[I].DeltaX = MouseDeltaX;
+		MouseEvents[I].DeltaY = MouseDeltaY;
+		ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvents[I]);
+	}
+
+	MouseDeltaX = 0;
+	MouseDeltaY = 0;
 }
 
 void ZEDViewport::SetPosition(const ZEVector3& Position)
 {
 	this->Position = Position;
+	DirtyFlags.RaiseFlags(ZED_VDF_VIEW);
 }
 
 const ZEVector3& ZEDViewport::GetPosition()
@@ -525,6 +784,7 @@ const ZEVector3& ZEDViewport::GetPosition()
 void ZEDViewport::SetRotation(const ZEQuaternion& Quaternion)
 {
 	Rotation = Quaternion;
+	DirtyFlags.RaiseFlags(ZED_VDF_VIEW);
 }
 
 const ZEQuaternion& ZEDViewport::GetRotation()
@@ -535,6 +795,7 @@ const ZEQuaternion& ZEDViewport::GetRotation()
 void ZEDViewport::SetVerticalFOV(float FOV)
 {
 	VerticalFOV = FOV;
+	DirtyFlags.RaiseFlags(ZED_VDF_VIEW);
 }
 
 float ZEDViewport::GetVerticalFOV()
@@ -547,21 +808,21 @@ void ZEDViewport::Render()
 	if (!isVisible())
 		return;
 
-	ZESize FrameID = ZECore::GetInstance()->GetFrameId();
+	if (Window == NULL)
+		return;
+
 	ZEGROutput* Output = Window->GetOutput();
 	if (Output == NULL)
 		return;
 
 	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Viewport.SetWidth((float)RenderTarget->GetWidth());
-	Viewport.SetHeight((float)RenderTarget->GetHeight());
+	if (RenderTarget == NULL)
+		return;
 
-	UpdateView();
+	if (!Update())
+		return;
 
-	Renderer.SetOutputRenderTarget(RenderTarget);
-	Renderer.SetView(View);
+	Renderer.SetScene(Scene);
 	Renderer.Render(0.0f);
 }
 
@@ -579,9 +840,16 @@ void ZEDViewport::Present()
 
 ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
 {
+	DirtyFlags.RaiseAll();
 	Window = NULL;
-	ViewMode = ZED_VM_FREE;
 	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
+	Modifiers = ZED_KKM_NONE;
 	VerticalFOV = ZE_PI_3;
+	LastMousePositionX = -1;
+	LastMousePositionY = -1;
+	MouseDeltaX = 0;
+	MouseDeltaY = 0;
+	setMouseTracking(true);
+	setFocusPolicy(Qt::ClickFocus);
 }

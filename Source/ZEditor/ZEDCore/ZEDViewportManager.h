@@ -48,5 +48,6 @@ class ZEDViewportManager
 		void						RegisterViewport(ZEDViewport* Viewport);
 		void						UnregisterViewport(ZEDViewport* Viewport);
 
+		void						Tick();
 		void						Render();
 };

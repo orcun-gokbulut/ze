@@ -159,6 +159,9 @@ class ZEVector3
 		static const ZEVector3		UnitX;
 		static const ZEVector3		UnitY;
 		static const ZEVector3		UnitZ;
+		static const ZEVector3		NegUnitX;
+		static const ZEVector3		NegUnitY;
+		static const ZEVector3		NegUnitZ;
 		static const ZEVector3		MaxValue;
 		static const ZEVector3		MinValue;
 

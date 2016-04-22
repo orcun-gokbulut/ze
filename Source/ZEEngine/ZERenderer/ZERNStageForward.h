@@ -39,46 +39,49 @@
 
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRFormat.h"
 
 class ZEGRTexture2D;
+class ZEGRDepthStencilBuffer;
 
 class ZERNStageForward : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<ZEGRTexture2D>				ColorBuffer;
-		ZEHolder<const ZEGRRenderTarget>	ColorRenderTarget;
-		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
-		ZEHolder<const ZEGRTexture2D>		DepthOutput;
-		ZEGRViewport						Viewport;
+		ZEHolder<const ZEGRTexture2D>				ColorBuffer;
+		ZEHolder<const ZEGRRenderTarget>			ColorRenderTarget;
+		ZEHolder<const ZEGRTexture2D>				DepthBuffer;
+		ZEHolder<const ZEGRDepthStencilBuffer>		DepthStencilBuffer;
+		ZEGRViewport								Viewport;
 
-		virtual void						DeinitializeSelf();
+		virtual void								DeinitializeSelf();
 
-		bool								UpdateRenderTargets();
-		bool								Update();
+		bool										UpdateRenderTargets();
+		bool										Update();
 
 	public:
-		virtual ZEInt						GetId() const;
-		virtual const ZEString&				GetName() const;
+		virtual ZEInt								GetId() const;
+		virtual const ZEString&						GetName() const;
 
-		virtual bool						Setup(ZEGRContext* Context);
-		virtual void						CleanUp(ZEGRContext* Context);
+		virtual bool								Setup(ZEGRContext* Context);
+		virtual void								CleanUp(ZEGRContext* Context);
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual const ZEGRTexture2D*				GetOutput(ZERNStageBuffer Output) const;
+		virtual const ZEGRRenderTarget*				GetProvidedInput(ZERNStageBuffer Input) const;
 
-											ZERNStageForward();
+													ZERNStageForward();
 
-		static ZEGRRenderState				GetRenderState();
+		static ZEGRRenderState						GetRenderState();
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
 	ZE_OBJECT
 	public:
-		virtual ZEInt						GetId() const;
-		virtual const ZEString&				GetName() const;
+		virtual ZEInt								GetId() const;
+		virtual const ZEString&						GetName() const;
 
-											ZERNStageForwardTransparent();
+		ZERNStageForwardTransparent();
 
-		static ZEGRRenderState				GetRenderState();
+		static ZEGRRenderState						GetRenderState();
 };

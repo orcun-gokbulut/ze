@@ -45,8 +45,8 @@ cbuffer ZERNSimpleMaterial_Constants						: register(ZERN_SHADER_CONSTANT_MATERI
 {
 	float4			ZERNSimpleMaterial_Color;
 	bool			ZERNSimpleMaterial_EnableTexture;
-	float			ZERNSimpleMaterial_Reserved0;
 	bool			ZERNSimpleMaterial_EnableVertexColor;
+	float			ZERNSimpleMaterial_Reserved0;
 	float			ZERNSimpleMaterial_Reserved1;
 };
 
@@ -97,7 +97,6 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Texcoord = Input.Textcoord;
-	
 	Output.Color = ZERNSimpleMaterial_Color;
 	
 	if (ZERNSimpleMaterial_EnableVertexColor)

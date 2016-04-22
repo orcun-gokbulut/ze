@@ -46,6 +46,9 @@
 #include "ZEGame/ZEGrid.h"
 #include "ZEModel/ZEModel.h"
 #include "ZEDViewportManager.h"
+#include "ZEAtmosphere/ZEATAtmosphere.h"
+#include "ZERenderer/ZELightDirectional.h"
+#include "ZEAtmosphere/ZEATSkyBox.h"
 
 void ZEDModule::SetScene(ZEDScene* Scene)
 {
@@ -70,6 +73,7 @@ ZEDObjectWrapper* ZEDModule::GetRootWrapper()
 void ZEDModule::Process(float ElapsedTime)
 {
 	Scene->Tick(ElapsedTime);
+	ViewportManager->Tick();
 }
 
 void ZEDModule::PostProcess(float ElapsedTime)
@@ -102,9 +106,10 @@ void ZEDModule::StartUp()
 	SceneWrapper->AddChildWrapper(Trial1Wrapper);
 
 	ZEModel* Trial2 = ZEModel::CreateInstance();
-	Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
-	Trial2->SetUserDefinedBoundingBoxEnabled(true);
+	//Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
+	//Trial2->SetUserDefinedBoundingBoxEnabled(true);
 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
+	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	ZEDEntityWrapper* Trial2Wrapper = ZEDEntityWrapper::CreateInstance();
 	Trial2Wrapper->SetObject(Trial2);
 	SceneWrapper->AddChildWrapper(Trial2Wrapper);
@@ -116,6 +121,20 @@ void ZEDModule::StartUp()
 	GizmoWrapper->SetObject(Gizmo);
 	GizmoWrapper->SetObjectSelectable(false);
 	SceneWrapper->AddChildWrapper(GizmoWrapper);
+	
+	/*ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
+	ZEDEntityWrapper* AtmosphereWrapper = ZEDEntityWrapper::CreateInstance();
+	AtmosphereWrapper->SetObject(Atmosphere);
+	AtmosphereWrapper->SetObjectSelectable(false);
+	SceneWrapper->AddChildWrapper(AtmosphereWrapper);*/
+
+	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
+	SkyBox->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	ZEDEntityWrapper* SkyBoxWrapper = ZEDEntityWrapper::CreateInstance();
+	SkyBoxWrapper->SetObject(SkyBox);
+	SkyBoxWrapper->SetObjectSelectable(false);
+	SceneWrapper->AddChildWrapper(SkyBoxWrapper);
+
 }
 
 void ZEDModule::ShutDown()
@@ -126,6 +145,18 @@ void ZEDModule::ShutDown()
 		Scene->Destroy();
 		Scene = NULL;
 	}
+}
+
+void ZEDModule::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
+{
+	ViewportController.KeyboardEventHandler(Event);
+}
+
+void ZEDModule::MouseEventHandler(const ZEDViewportMouseEvent& Event)
+{
+	ViewportController.MouseEventHandler(Event);
+	/*zeLog("Type: %d, Button: %d, Modifiers: %d, PosX: %d, PosY: %d, DeltaX: %d, DeltaY: %d.", 
+		Event.Type, Event.Button, Event.Modifiers, Event.PositionX, Event.PositionY, Event.DeltaX, Event.DeltaY);*/
 }
 
 ZEDModule::ZEDModule()
