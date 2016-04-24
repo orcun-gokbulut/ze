@@ -34,26 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDSceneWrapper.h"
+
+#include "ZEGame/ZEEntity.h"
 #include "ZEDEntityWrapper.h"
 
-void ZEDSceneWrapper::SetObjectId(ZEInt Id)
+void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer, ZEDEntityWrapper* Wrapper)
 {
-
-}
-
-ZEInt ZEDSceneWrapper::GetObjectId()
-{
-	return 0;
-}
-
-void ZEDSceneWrapper::SetObjectName(const ZEString& Name)
-{
-
-}
-
-ZEString ZEDSceneWrapper::GetObjectName()
-{
-	return ZEString();
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{
+		Wrappers[I]->PreRender();
+	}
 }
 
 void ZEDSceneWrapper::SetObject(ZEObject* Object)
@@ -93,72 +83,6 @@ void ZEDSceneWrapper::SetObject(ZEObject* Object)
 		Temp->SetObject(Entities[I]);
 		ChildWrappers[I] = Temp;
 	}
-}
-
-void ZEDSceneWrapper::SetObjectEnabled(bool Value)
-{
-	if (Object == NULL)
-		return;
-
-	((ZEDScene*)Object)->SetEnabled(Value);
-}
-
-bool ZEDSceneWrapper::GetObjectEnabled()
-{
-	if (Object == NULL)
-		return false;
-
-	return ((ZEDScene*)Object)->GetEnabled();
-}
-
-void ZEDSceneWrapper::SetObjectVisibility(bool Value)
-{
-
-}
-
-bool ZEDSceneWrapper::GetObjectVisibility()
-{
-	return true;
-}
-
-ZEAABBox ZEDSceneWrapper::GetObjectBoundingBox()
-{
-	return ZEAABBox();
-}
-
-ZEMatrix4x4 ZEDSceneWrapper::GetObjectTransform()
-{
-	return ZEMatrix4x4::Identity;
-}
-
-void ZEDSceneWrapper::SetObjectPosition(const ZEVector3& NewPosition)
-{
-
-}
-
-ZEVector3 ZEDSceneWrapper::GetObjectPosition()
-{
-	return ZEVector3::Zero;
-}
-
-void ZEDSceneWrapper::SetObjectRotation(const ZEQuaternion& NewRotation)
-{
-
-}
-
-ZEQuaternion ZEDSceneWrapper::GetObjectRotation()
-{
-	return ZEQuaternion::Identity;
-}
-
-void ZEDSceneWrapper::SetObjectScale(const ZEVector3& NewScale)
-{
-
-}
-
-ZEVector3 ZEDSceneWrapper::GetObjectScale()
-{
-	return ZEVector3::One;
 }
 
 bool ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -220,5 +144,10 @@ void ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 
 	Scene->RemoveEntity((ZEEntity*)Wrapper->GetObject());
 	Scene->RemoveWrapper(Wrapper);
+}
+
+void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer)
+{
+	
 }
 

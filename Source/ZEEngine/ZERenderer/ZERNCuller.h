@@ -55,7 +55,7 @@ class ZESceneCuller
 		ZEScene*					Scene;
 		ZERNCullParameters			CullParameters;
 
-		void						CullEntity(ZEEntity* Entity);
+		void						PreRender(ZEEntity* Entity);
 
 	public:
 		void						SetScene(ZEScene* Scene);

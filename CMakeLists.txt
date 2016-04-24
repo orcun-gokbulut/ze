@@ -50,6 +50,7 @@ add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake/External" "${PROJECT_SOURCE_DIR}/CMake" "${CMAKE_MODULE_PATH}")
+set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
 
 include(ze)
 ze_init()

@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 
+#include "ZEDViewportInput.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGraphics/ZEGRWindow.h"
 
@@ -46,7 +47,6 @@
 #include <QDropEvent>
 #include <QFocusEvent>
 #include <QTimer>
-#include "ZEDInputEvent.h"
 
 class ZEScene;
 

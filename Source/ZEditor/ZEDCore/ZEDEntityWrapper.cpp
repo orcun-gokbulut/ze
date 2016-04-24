@@ -35,36 +35,31 @@
 
 #include "ZEDEntityWrapper.h"
 
-void ZEDEntityWrapper::DrawBoundingBox(const ZEVector4& Color)
-{
-	ZEAABBox BoundingBox = GetObjectBoundingBox();
+#include "ZEDS/ZEDelegate.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGame/ZEGizmo.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEGraphics/ZEGRContext.h"
 
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
-		ZEQuaternion::Identity, 
-		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
-
-	DrawCanvas.SetColor(Color);
-	DrawCanvas.SetTransfomation(WorldMatrix);
-	DrawCanvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
-}
-
-void ZEDEntityWrapper::SetObjectId(ZEInt Id)
+void ZEDEntityWrapper::SetId(ZEInt Id)
 {
 	static_cast<ZEEntity*>(Object)->SetEntityId(Id);
 }
 
-ZEInt ZEDEntityWrapper::GetObjectId()
+ZEInt ZEDEntityWrapper::GetId()
 {
 	return static_cast<ZEEntity*>(Object)->GetEntityId();
 }
 
-void ZEDEntityWrapper::SetObjectName(const ZEString& Name)
+void ZEDEntityWrapper::SetName(const ZEString& Name)
 {
 	static_cast<ZEEntity*>(Object)->SetName(Name);
 }
 
-ZEString ZEDEntityWrapper::GetObjectName()
+ZEString ZEDEntityWrapper::GetName()
 {
 	return static_cast<ZEEntity*>(Object)->GetName();
 }
@@ -101,27 +96,17 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 	}
 }
 
-void ZEDEntityWrapper::SetObjectEnabled(bool Value)
-{
-	static_cast<ZEEntity*>(GetObject())->SetEnabled(Value);
-}
-
-bool ZEDEntityWrapper::GetObjectEnabled()
-{
-	return static_cast<ZEEntity*>(GetObject())->GetEnabled();
-}
-
-void ZEDEntityWrapper::SetObjectVisibility(bool Value)
+void ZEDEntityWrapper::SetVisible(bool Value)
 {
 	static_cast<ZEEntity*>(GetObject())->SetVisible(Value);
 }
 
-bool ZEDEntityWrapper::GetObjectVisibility()
+bool ZEDEntityWrapper::GetVisible()
 {
 	return static_cast<ZEEntity*>(GetObject())->GetVisible();
 }
 
-ZEAABBox ZEDEntityWrapper::GetObjectBoundingBox()
+ZEAABBox ZEDEntityWrapper::GetLocalBoundingBox()
 {
 	if (GetObject() == NULL)
 		return ZEAABBox();
@@ -129,7 +114,7 @@ ZEAABBox ZEDEntityWrapper::GetObjectBoundingBox()
 	return static_cast<ZEEntity*>(GetObject())->GetWorldBoundingBox();
 }
 
-ZEMatrix4x4 ZEDEntityWrapper::GetObjectTransform()
+ZEMatrix4x4 ZEDEntityWrapper::GetWorldTransform()
 {
 	if (GetObject() == NULL)
 		return ZEMatrix4x4::Identity;
@@ -137,7 +122,7 @@ ZEMatrix4x4 ZEDEntityWrapper::GetObjectTransform()
 	return static_cast<ZEEntity*>(GetObject())->GetWorldTransform();
 }
 
-void ZEDEntityWrapper::SetObjectPosition(const ZEVector3& NewPosition)
+void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 {
 	if (GetObject() == NULL)
 		return;
@@ -145,7 +130,7 @@ void ZEDEntityWrapper::SetObjectPosition(const ZEVector3& NewPosition)
 	static_cast<ZEEntity*>(GetObject())->SetWorldPosition(NewPosition);
 }
 
-ZEVector3 ZEDEntityWrapper::GetObjectPosition()
+ZEVector3 ZEDEntityWrapper::GetPosition()
 {
 	if (GetObject() == NULL)
 		return ZEVector3::Zero;
@@ -153,7 +138,7 @@ ZEVector3 ZEDEntityWrapper::GetObjectPosition()
 	return static_cast<ZEEntity*>(GetObject())->GetWorldPosition();
 }
 
-void ZEDEntityWrapper::SetObjectRotation(const ZEQuaternion& NewRotation)
+void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 {
 	if (GetObject() == NULL)
 		return;
@@ -161,7 +146,7 @@ void ZEDEntityWrapper::SetObjectRotation(const ZEQuaternion& NewRotation)
 	static_cast<ZEEntity*>(GetObject())->SetWorldRotation(NewRotation);
 }
 
-ZEQuaternion ZEDEntityWrapper::GetObjectRotation()
+ZEQuaternion ZEDEntityWrapper::GetRotation()
 {
 	if (GetObject() == NULL)
 		return ZEQuaternion::Identity;
@@ -169,7 +154,7 @@ ZEQuaternion ZEDEntityWrapper::GetObjectRotation()
 	return static_cast<ZEEntity*>(GetObject())->GetWorldRotation();
 }
 
-void ZEDEntityWrapper::SetObjectScale(const ZEVector3& NewScale)
+void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 {
 	if (GetObject() == NULL)
 		return;
@@ -177,7 +162,7 @@ void ZEDEntityWrapper::SetObjectScale(const ZEVector3& NewScale)
 	static_cast<ZEEntity*>(GetObject())->SetWorldScale(NewScale);
 }
 
-ZEVector3 ZEDEntityWrapper::GetObjectScale()
+ZEVector3 ZEDEntityWrapper::GetScale()
 {
 	if (GetObject() == NULL)
 		return ZEVector3::One;
@@ -190,24 +175,62 @@ bool ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 	return static_cast<ZEEntity*>(GetObject())->ZEEntity::RayCast(Report, Parameters);
 }
 
-/*void ZEDEntityWrapper::Draw(ZEDrawParameters* Parameters)
+void ZEDEntityWrapper::PreRender(const ZERNCullParameters* Parameters)
 {
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	DrawCanvas.Clean();
+	ZEAABBox BoundingBox = GetLocalBoundingBox();
 
+	ZEMatrix4x4 WorldMatrix;
+	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
+		ZEQuaternion::Identity, 
+		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
+	
+	if (Material.IsNull())
+	{
+		Material = ZERNSimpleMaterial::CreateInstance();
+		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
+		Material->SetVertexColorEnabled(true);
+	}
+
+	if (ConstantBuffer.IsNull())
+	{
+		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+		ConstantBuffer->SetData(&WorldMatrix);
+	}
+
+	if (VertexBuffer.IsNull())
+	{
+		ZECanvas Canvas;
+		Canvas.SetColor(ZEVector4::One);
+		Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
+
+		VertexBuffer = ZEGRVertexBuffer::Create(Canvas.Vertices.GetCount(), sizeof(ZECanvasVertex));
+		void* Buffer;
+		VertexBuffer->Lock(&Buffer);
+		memcpy(Buffer, Canvas.Vertices.GetCArray(), Canvas.Vertices.GetCount() * sizeof(ZECanvasVertex));
+		VertexBuffer->Unlock();
+	}
+
+	Command.StageMask = Material->GetStageMask();
+	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDEntityWrapper, Render, this);
+
+}
+
+void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
 	if (GetObject() == NULL)
 		return;
 
-	DrawBoundingBox(ZEVector4(0.8f, 0.8f, 0.8f, 1.0f));
+	ZEGRContext* Context = Parameters->Context;
 
-	if (DrawCanvas.Vertices.GetCount() == 0)
+	if (!Material->SetupMaterial(Context, Parameters->Stage))
 		return;
 
-	RenderCommand.PrimitiveCount = DrawCanvas.Vertices.GetCount() / 2;
-	Parameters->Renderer->AddToRenderList(&RenderCommand);
+	Context->Draw(VertexBuffer->GetSize() / VertexBuffer->GetVertexSize(), 0);
 
-	ZEDObjectWrapper::Draw(Parameters);
-}*/
+	Material->CleanupMaterial(Context, Parameters->Stage);
+
+	ZEDObjectWrapper::Render(Parameters, Command);
+}
 
 void ZEDEntityWrapper::Tick(float ElapsedTime)
 {

@@ -38,7 +38,6 @@ cmake_minimum_required (VERSION 2.8)
 project (ZEditor)
 ze_set_project_folder("ZEditor")
 
-set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
 find_package(Qt5 COMPONENTS Widgets)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})

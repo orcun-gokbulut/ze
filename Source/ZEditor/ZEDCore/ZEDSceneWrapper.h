@@ -38,37 +38,29 @@
 #include "ZEDObjectWrapper.h"
 #include "ZEDScene.h"
 
+// ZEDSceneWrapper wraps scene
+// SetObject fires entity search
+// 
 class ZEDSceneWrapper : public ZEDObjectWrapper
 {
-	public:
-		virtual void							SetObjectId(ZEInt Id);
-		virtual ZEInt							GetObjectId();
+	private:
+		ZEArray<ZEDEntityWrapper>				Wrappers;
 
-		virtual void							SetObjectName(const ZEString& Name);
-		virtual ZEString						GetObjectName();
+		virtual void							PreRender(ZERNRenderer* Renderer, ZEDEntityWrapper* Wrapper);
+		void									UpdateWrappers();
+
+	public:
+		virtual void							SetId(ZEInt Id);
+		virtual ZEInt							GetId();
 
 		virtual void							SetObject(ZEObject* Object);
-
-		virtual void							SetObjectEnabled(bool Value);
-		virtual bool							GetObjectEnabled();
-
-		virtual void							SetObjectVisibility(bool Value);
-		virtual bool							GetObjectVisibility();
-
-		virtual ZEAABBox						GetObjectBoundingBox();
-		virtual ZEMatrix4x4						GetObjectTransform();
-		virtual void							SetObjectPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3						GetObjectPosition();
-		virtual void							SetObjectRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion					GetObjectRotation();
-		virtual void							SetObjectScale(const ZEVector3& NewScale);
-		virtual ZEVector3						GetObjectScale();
-
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
 		virtual void							AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void							RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
+
+		virtual void							PreRender(ZERNRenderer* Renderer);
 
 		static ZEDSceneWrapper*					CreateInstance();
 };

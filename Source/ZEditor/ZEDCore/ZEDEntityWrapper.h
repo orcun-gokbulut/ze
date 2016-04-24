@@ -36,41 +36,46 @@
 #pragma once
 
 #include "ZEDObjectWrapper.h"
-#include "ZEGame/ZEEntity.h"
+
+class ZEGRVertexBuffer;
+class ZEGRConstantBuffer;
+class ZERNSimpleMaterial;
 
 class ZEDEntityWrapper : public ZEDObjectWrapper
 {
 	//ZE_OBJECT
-	protected:
-		void							DrawBoundingBox(const ZEVector4& Color);
+	private:
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZERNSimpleMaterial>		Material;
+		ZERNCommand							Command;
 
 	public:
-		virtual void					SetObjectId(ZEInt Id);
-		virtual ZEInt					GetObjectId();
+		virtual void						SetObject(ZEObject* Object);
 
-		virtual void					SetObjectName(const ZEString& Name);
-		virtual ZEString				GetObjectName();
+		virtual void						SetId(ZEInt Id);
+		virtual ZEInt						GetId();
 
-		virtual void					SetObject(ZEObject* Object);
+		virtual void						SetName(const ZEString& Name);
+		virtual ZEString					GetName();
 
-		virtual void					SetObjectEnabled(bool Value);
-		virtual bool					GetObjectEnabled();
+		virtual ZEAABBox					GetLocalBoundingBox();
+		virtual ZEMatrix4x4					GetWorldTransform();
 
-		virtual void					SetObjectVisibility(bool Value);
-		virtual bool					GetObjectVisibility();
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3					GetPosition();
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion				GetRotation();
+		virtual void						SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3					GetScale();
 
-		virtual ZEAABBox				GetObjectBoundingBox();
-		virtual ZEMatrix4x4				GetObjectTransform();
-		virtual void					SetObjectPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3				GetObjectPosition();
-		virtual void					SetObjectRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion			GetObjectRotation();
-		virtual void					SetObjectScale(const ZEVector3& NewScale);
-		virtual ZEVector3				GetObjectScale();
+		virtual void						SetVisible(bool Value);
+		virtual bool						GetVisible();
 
-		virtual bool					RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-		//virtual void					Draw(ZEDrawParameters* Parameters);
-		virtual void					Tick(float ElapsedTime);
+		virtual void						PreRender(const ZERNCullParameters* Parameters);
+		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual void						Tick(float ElapsedTime);
+		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		static ZEDEntityWrapper*		CreateInstance();
+		static ZEDEntityWrapper*			CreateInstance();
 };

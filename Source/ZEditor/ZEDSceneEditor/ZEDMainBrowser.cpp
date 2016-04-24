@@ -44,7 +44,7 @@ void ZEDMainBrowserWidget::LoadObject(QTreeWidgetItem* Item, ZEDObjectWrapper* O
 	if (Item == NULL || Object == NULL)
 		return;
 
-	Item->setText(0, Object->GetObjectName().ToCString());
+	Item->setText(0, Object->GetName().ToCString());
 	Item->setText(1, Object->GetObject()->GetClass()->GetName());
 	Item->setData(0, Qt::UserRole, QVariant((qlonglong)Object));
 

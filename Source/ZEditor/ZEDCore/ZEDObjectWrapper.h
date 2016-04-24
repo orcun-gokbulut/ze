@@ -48,27 +48,23 @@
 #include <QWidget>
 #include <QMenu>
 
-struct ZEDrawParameters;
-class ZEMaterial;
+class ZERNCullParameters;
+class ZERNRenderParameters;
 
 /*ZE_ATTRIBUTE_0(ObjectClass)*/
 class ZEDObjectWrapper : public ZEObject
 {
 /*	ZE_OBJECT*/
 	protected:
+		ZEObject*							Object;
+		ZEDObjectWrapper*					Parent;
+
 		ZEString							Icon;
 		bool								Selectable;
-		QWidget*							CustomWidget;
-		QMenu*								PopupMenu;
+		bool								Selected;
+		bool								Locked;
 
-		ZEObject*							Object;
-
-		ZEDObjectWrapper*					ParentWrapper;
 		ZEArray<ZEDObjectWrapper*>			ChildWrappers;
-
-		ZECanvas							DrawCanvas;
-		//ZEMaterial*						Material;
-		//ZERenderCommand					RenderCommand;
 
 											ZEDObjectWrapper();
 		virtual								~ZEDObjectWrapper();
@@ -83,60 +79,61 @@ class ZEDObjectWrapper : public ZEObject
  	//	virtual void						OnParentObjectChanged();
  	//	virtual void						OnOpenContainer();
  	//	virtual void						OnCloseContainer();
+
  	//	virtual void						Save();
  	//	virtual void						Load();
 
 	public:
-		virtual void						SetObjectId(ZEInt Id) = 0;
-		virtual ZEInt						GetObjectId() = 0;
-
-		virtual void						SetObjectName(const ZEString& Name) = 0;
-		virtual ZEString					GetObjectName() = 0;
-
-		virtual void						SetObjectEnabled(bool Value) = 0;
-		virtual bool						GetObjectEnabled() = 0;
-
 		virtual void						SetObject(ZEObject* Object);
 		virtual ZEObject*					GetObject();
+		
+		virtual void						SetParent(ZEDObjectWrapper* Wrapper);
+		virtual ZEDObjectWrapper*			GetParent();
 
-		void								SetObjectIcon(const ZEString& Icon);
-		const ZEString&						GetObjectIcon();
+		virtual void						SetId(ZEInt Id);
+		virtual ZEInt						GetId();
 
-		void								SetCustomWidget(QWidget* Widget);
-		QWidget*							GetCustomWidget();
+		virtual void						SetName(const ZEString& Name);
+		virtual ZEString					GetName();
 
-		void								SetPopupMenu(QMenu* Menu);
-		QMenu*								GetPopupMenu();
+		void								SetIcon(const ZEString& Icon);
+		const ZEString&						GetIcon();
 
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters) = 0;
+		virtual ZEAABBox					GetLocalBoundingBox();
+		virtual ZEMatrix4x4					GetWorldTransform();
 
-		void								SetObjectSelectable(bool Value);
-		bool								GetObjectSelectable();
+		virtual void						SetPosition(const ZEVector3& NewPosition);
+		virtual ZEVector3					GetPosition();
 
-		virtual void						SetObjectVisibility(bool Value) = 0;
-		virtual bool						GetObjectVisibility() = 0;
+		virtual void						SetRotation(const ZEQuaternion& NewRotation);
+		virtual ZEQuaternion				GetRotation();
 
-		virtual ZEAABBox					GetObjectBoundingBox() = 0;
-		virtual ZEMatrix4x4					GetObjectTransform() = 0;
+		virtual void						SetScale(const ZEVector3& NewScale);
+		virtual ZEVector3					GetScale();
 
-		virtual void						SetObjectPosition(const ZEVector3& NewPosition) = 0;
-		virtual ZEVector3					GetObjectPosition() = 0;
+		virtual void						SetLocked(bool Value);
+		virtual bool						GetLocked();
 
-		virtual void						SetObjectRotation(const ZEQuaternion& NewRotation) = 0;
-		virtual ZEQuaternion				GetObjectRotation() = 0;
+		void								SetSelectable(bool Value);
+		bool								GetSelectable();
 
-		virtual void						SetObjectScale(const ZEVector3& NewScale) = 0;
-		virtual ZEVector3					GetObjectScale() = 0;
+		virtual void						SetSelected(bool Selected);
+		virtual bool						GetSelected();
 
-		virtual void						Draw(ZEDrawParameters* Parameters);
-		virtual void						Tick(float ElapsedTime);
-
-		virtual void						SetParentWrapper(ZEDObjectWrapper* Wrapper);
-		virtual ZEDObjectWrapper*			GetParentWrapper();
+		virtual void						SetVisible(bool Value);
+		virtual bool						GetVisible();
 
 		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
 		virtual void						AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void						RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
+		
+		virtual QWidget*					GetCustomWidget();
+		virtual QMenu*						GetPopupMenu();
+
+		virtual void						PreRender(const ZERNCullParameters* Parameters);
+		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual void						Tick(float ElapsedTime);
+		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters) = 0;
 
 		virtual void						Destroy();
 };

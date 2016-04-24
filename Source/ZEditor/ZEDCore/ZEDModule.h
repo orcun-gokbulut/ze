@@ -37,7 +37,7 @@
 
 #include "ZECore/ZEApplicationModule.h"
 
-#include "ZEDInputEvent.h"
+#include "ZEDViewportInput.h"
 #include "ZEDViewportController.h"
 
 class ZEDScene;

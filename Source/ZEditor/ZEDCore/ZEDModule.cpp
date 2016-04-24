@@ -95,7 +95,7 @@ void ZEDModule::StartUp()
 	Grid = ZEGrid::CreateInstance();
 	ZEDEntityWrapper* GridWrapper = ZEDEntityWrapper::CreateInstance();
 	GridWrapper->SetObject(Grid);
-	GridWrapper->SetObjectSelectable(false);
+	GridWrapper->SetSelectable(false);
 	SceneWrapper->AddChildWrapper(GridWrapper);
 
 	ZEModel* Trial = ZEModel::CreateInstance();
@@ -109,7 +109,7 @@ void ZEDModule::StartUp()
 	//Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
 	//Trial2->SetUserDefinedBoundingBoxEnabled(true);
 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
-	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+	//Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	ZEDEntityWrapper* Trial2Wrapper = ZEDEntityWrapper::CreateInstance();
 	Trial2Wrapper->SetObject(Trial2);
 	SceneWrapper->AddChildWrapper(Trial2Wrapper);
@@ -119,7 +119,7 @@ void ZEDModule::StartUp()
 	Gizmo->SetVisible(false);
 	ZEDEntityWrapper* GizmoWrapper = ZEDEntityWrapper::CreateInstance();
 	GizmoWrapper->SetObject(Gizmo);
-	GizmoWrapper->SetObjectSelectable(false);
+	GizmoWrapper->SetSelectable(false);
 	SceneWrapper->AddChildWrapper(GizmoWrapper);
 	
 	/*ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
@@ -132,7 +132,7 @@ void ZEDModule::StartUp()
 	SkyBox->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	ZEDEntityWrapper* SkyBoxWrapper = ZEDEntityWrapper::CreateInstance();
 	SkyBoxWrapper->SetObject(SkyBox);
-	SkyBoxWrapper->SetObjectSelectable(false);
+	SkyBoxWrapper->SetSelectable(false);
 	SceneWrapper->AddChildWrapper(SkyBoxWrapper);
 
 }
@@ -155,8 +155,6 @@ void ZEDModule::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
 void ZEDModule::MouseEventHandler(const ZEDViewportMouseEvent& Event)
 {
 	ViewportController.MouseEventHandler(Event);
-	/*zeLog("Type: %d, Button: %d, Modifiers: %d, PosX: %d, PosY: %d, DeltaX: %d, DeltaY: %d.", 
-		Event.Type, Event.Button, Event.Modifiers, Event.PositionX, Event.PositionY, Event.DeltaX, Event.DeltaY);*/
 }
 
 ZEDModule::ZEDModule()
