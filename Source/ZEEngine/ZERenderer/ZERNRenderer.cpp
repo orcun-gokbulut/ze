@@ -123,24 +123,6 @@ void ZERNRenderer::UpdateConstantBuffers()
 		0.0f, 0.0f, 1.0f);
 	RendererConstants.ScreenTransform = ScreenTransform.ToMatrix3x3Shader();
 	RendererConstantBuffer->SetData(&RendererConstants);
-
-	if (Scene != NULL)
-	{
-		SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();
-		SceneConstantBuffer->SetData(&SceneConstants);
-	}
-}
-
-void ZERNRenderer::Cull()
-{
-	ZERNCullParameters CullParameters;
-	CullParameters.Renderer = this;
-	CullParameters.View = &View;
-
-	ZESceneCuller Culler;
-	Culler.SetScene(Scene);
-	Culler.SetCullParameters(CullParameters);
-	Culler.Cull();
 }
 
 void ZERNRenderer::SortStageCommands()
@@ -159,7 +141,7 @@ void ZERNRenderer::RenderStages()
 	Parameters.FrameId = 0;
 	Parameters.ElapsedTime = RendererConstants.Elapsedtime;
 	Parameters.Time = 0;
-	Parameters.Scene = Scene;
+	//Parameters.Scene = Scene;
 	Parameters.Context = Context;
 	Parameters.View = &View;
 	Parameters.Renderer = this;
@@ -221,7 +203,6 @@ bool ZERNRenderer::InitializeSelf()
 
 	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
 	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
-	SceneConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SceneConstants));
 
 	return true;
 }
@@ -253,16 +234,6 @@ void ZERNRenderer::SetView(const ZERNView& View)
 const ZERNView& ZERNRenderer::GetView()
 {
 	return View;
-}
-
-void ZERNRenderer::SetScene(ZEScene* Scene)
-{
-	this->Scene = Scene;
-}
-
-ZEScene* ZERNRenderer::GetScene()
-{
-	return Scene;
 }
 
 void ZERNRenderer::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
@@ -385,24 +356,30 @@ bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 	return false;
 }
 
+void ZERNRenderer::PreRenderScene(ZEScene* Scene)
+{
+	ZERNCullParameters CullParameters;
+	CullParameters.Renderer = this;
+	CullParameters.View = &View;
+
+	ZESceneCuller Culler;
+	Culler.SetScene(Scene);
+	Culler.SetCullParameters(CullParameters);
+	Culler.Cull();
+}
+
 void ZERNRenderer::Render(float ElapsedTime)
 {
 	if (!IsInitialized())
 		return;
 
-	if (Scene != NULL)
-	{
-		Cull();
-		SortStageCommands();
-	}
-
+	SortStageCommands();
 	RenderStages();
 }
 
 ZERNRenderer::ZERNRenderer()
 {
 	Context = NULL;
-	Scene = NULL;
 	OutputRenderTarget = NULL;
 }
 

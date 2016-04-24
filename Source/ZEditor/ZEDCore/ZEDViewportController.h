@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDInputEvent.h"
+#include "ZEDViewportInput.h"
 
 class ZEDViewportController
 {

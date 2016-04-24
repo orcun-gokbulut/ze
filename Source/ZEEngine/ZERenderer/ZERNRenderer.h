@@ -55,7 +55,6 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 	ZE_OBJECT
 	private:
 		ZEGRContext*					Context;
-		ZEScene*						Scene;
 		ZERNView						View;
 		ZEGRRenderTarget*				OutputRenderTarget;
 		ZEHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
@@ -74,13 +73,6 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 			ZEMatrix3x3Shader			ScreenTransform;
 		} RendererConstants;
 
-		struct SceneConstants
-		{
-			ZEVector3					AmbientColor;
-			float						Reserved0;
-		} SceneConstants;
-
-		void							Cull();
 		void							SortStageCommands();
 		void							RenderStage(ZERNStage* Queue);
 		void							RenderStages();
@@ -97,9 +89,6 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void							SetView(const ZERNView& View);
 		const ZERNView&					GetView();
 
-		void							SetScene(ZEScene* Scene);
-		ZEScene*						GetScene();
-
 		void							SetOutputRenderTarget(ZEGRRenderTarget* Output);
 		ZEGRRenderTarget*				GetOutputRenderTarget();
 
@@ -109,6 +98,8 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void							AddStage(ZERNStage* Stage);
 		void							RemoveStage(ZERNStage* Stage);
 		void							CleanStages();
+
+		void							PreRenderScene(ZEScene* Scene);
 
 		void							AddCommand(ZERNCommand* Command);
 		void							RemoveCommand(ZERNCommand* Command);

@@ -83,17 +83,15 @@ bool ZEDViewportController::KeyboardEventHandler(const ZEDViewportKeyboardEvent&
 	float ElapsedTime = zeCore->GetElapsedTime();
 
 	float ModStepSize = StepSize;
-	
-	if (Event.Modifiers & ZED_KKM_SHIFT)
-		ModStepSize *= 2.0f;
+	if ((Event.Modifiers & ZED_KKM_SHIFT) != 0)
+		ModStepSize *= 5.0f;
 
-	if (Event.Modifiers & ZED_KKM_CTRL)
-		ModStepSize *= 0.5f;
+	if ((Event.Modifiers & ZED_KKM_CTRL) != 0)
+		ModStepSize *= 0.2f;
 
 
-	if (Event.Key == ZED_IKK_KEY_W || Event.Key == ZED_IKK_KEY_UP)
+	if (Event.Key == ZED_IKK_KEY_W)
 	{
-		if (Event.Text)
 		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3::UnitZ);
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
 		ZEVector3::Add(Position, Position, PositionChange);
@@ -118,7 +116,7 @@ bool ZEDViewportController::KeyboardEventHandler(const ZEDViewportKeyboardEvent&
 
 		return true;
 	}
-	if (Event.Key == ZED_IKK_KEY_D)
+	else if (Event.Key == ZED_IKK_KEY_D)
 	{
 		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3::UnitX);
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
@@ -176,7 +174,7 @@ bool ZEDViewportController::MouseEventHandler(const ZEDViewportMouseEvent& Event
 ZEDViewportController::ZEDViewportController()
 {
 	MouseSensivity = 1.0f;
-	StepSize = 2.0f;
+	StepSize = 10.0f;
 	LockCamera = false;
 	Active = false;
 	Rx = Ry = Rz = 0.0f;

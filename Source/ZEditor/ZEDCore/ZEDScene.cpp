@@ -43,9 +43,6 @@
 
 void ZEDScene::Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime)
 {
-	if (!Wrapper->GetObjectEnabled())
-		return;
-
 	Wrapper->Tick(ElapsedTime);
 
 	const ZEArray<ZEDObjectWrapper*>& SubEntities = Wrapper->GetChildWrappers();
@@ -123,6 +120,8 @@ void ZEDScene::Tick(float ElapsedTime)
 
 void ZEDScene::Render(float ElapsedTime)
 {
+	ZEDScene::Render(ElapsedTime);
+
 	/*if (GetActiveCamera() == NULL)
 		return;
 

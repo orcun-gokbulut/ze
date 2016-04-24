@@ -33,85 +33,172 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGame.h"
-#include "ZETypes.h"
 #include "ZEScene.h"
+
+#include "ZETypes.h"
 #include "ZEError.h"
-#include "ZEEntity.h"
 #include "ZEMath/ZERay.h"
 #include "ZEFile/ZEFile.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEML/ZEMLWriter.h"
+#include "ZEMeta/ZEProvider.h"
+
+#include "ZEGame.h"
+#include "ZEEntity.h"
+#include "ZEEntityProvider.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
-#include "ZEEntityProvider.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEMeta/ZEProvider.h"
-#include "ZEML/ZEMLReader.h"
-#include "ZEML/ZEMLWriter.h"
-#include <memory.h>
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 #include <memory.h>
+#include "ZERenderer/ZERNCuller.h"
 
+#define ZE_SDF_CONSTANT_BUFFER		0x01
 
-bool ZEScene::Initialize()
+void ZEScene::PreRenderEntity(ZEEntity* Entity, ZERNCullParameters* Parameters)
 {
-	if (Initialized)
-		return true;
-	
-	if (PhysicalWorld == NULL)
-		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
-
-	if (PhysicalWorld == NULL)
-	{
-		zeCriticalError("Can not create physical world.");
-		return false;
-	}
-
-	if (!PhysicalWorld->Initialize())
-	{
-		zeCriticalError("Can not create physical world.");
-		return false;
-	}
-
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-	{
-		Entities[I]->SetOwnerScene(this);
-		Entities[I]->Initialize();
-	}
-
-	Initialized = true;
-	return true;
-}
-
-void ZEScene::Deinitialize()
-{
-	if (!Initialized)
+	if (!Entity->GetVisible())
 		return;
 
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Deinitialize();
+	ZEUInt EntityDrawFlags = Entity->GetDrawFlags();
 
-	if (PhysicalWorld != NULL)
-		PhysicalWorld->Deinitialize();
-
-	Initialized = false;
-}
-
-void ZEScene::Destroy()
-{
-	Deinitialize();
-
-	ClearEntities();
-
-	if (PhysicalWorld != NULL)
+	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
 	{
-		PhysicalWorld->Destroy();
-		PhysicalWorld = NULL;
+		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && Parameters->View->ViewVolume != NULL)
+		{
+			if (!Parameters->View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
+				Entity->PreRender(Parameters);
+		}
+		else
+		{
+			Entity->PreRender(Parameters);
+		}
 	}
 
-	delete this;
+	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		PreRenderEntity(Components[I], Parameters);
+
+	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		PreRenderEntity(ChildEntities[I], Parameters);
+}
+
+
+void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
+{
+	if (!Entity->GetEnabled())
+		return;
+
+	Entity->Tick(ElapsedTime);
+
+	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
+	for (ZESize N = 0; N < Components.GetCount(); N++)
+		TickEntity(Components[N], ElapsedTime);
+
+
+	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
+	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
+		TickEntity(SubEntities[N], ElapsedTime);
+
+}
+
+void ZEScene::UpdateConstantBuffer()
+{
+	if (!SceneDirtyFlags.GetFlags(ZE_SDF_CONSTANT_BUFFER))
+		return;
+
+	ConstantBuffer->SetData(&Constants);
+
+	SceneDirtyFlags.UnraiseFlags(ZE_SDF_CONSTANT_BUFFER);
+}
+
+const ZEGRConstantBuffer* ZEScene::GetConstantBuffer()
+{
+	return ConstantBuffer;
+}
+
+ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
+{
+	return PhysicalWorld;
+}
+
+void ZEScene::SetActiveCamera(ZECamera* Camera)
+{
+	ActiveCamera = Camera;
+}
+
+ZECamera* ZEScene::GetActiveCamera()
+{
+	return ActiveCamera;
+}
+
+void ZEScene::SetActiveListener(ZEListener* Listener)
+{
+	ActiveListener = Listener;
+	zeSound->SetActiveListener(Listener);
+}
+
+ZEListener* ZEScene::GetActiveListener()
+{
+	return ActiveListener;
+}
+
+void ZEScene::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZEScene::GetEnabled() const
+{
+	return Enabled;
+}
+
+void ZEScene::SetAmbientFactor(float Factor)
+{
+	AmbientFactor = Factor;
+	SceneDirtyFlags.RaiseFlags(ZE_SDF_CONSTANT_BUFFER);
+}
+
+float ZEScene::GetAmbientFactor() const
+{
+	return AmbientFactor;
+}
+
+void ZEScene::SetAmbientColor(ZEVector3 Color)
+{
+	AmbientColor = Color;
+	SceneDirtyFlags.RaiseFlags(ZE_SDF_CONSTANT_BUFFER);
+}
+
+const ZEVector3& ZEScene::GetAmbientColor() const
+{
+	return AmbientColor;
+}
+
+const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
+{
+	return Entities;
+}
+
+ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
+{
+	ZEArray<ZEEntity*> ProperEntities;
+	ZEEntity* CurrentEntity = NULL;
+	ProperEntities.Clear();
+
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+	{
+		CurrentEntity = Entities[I];
+		if (Class->IsDerivedFrom(Class, CurrentEntity->GetClass()))
+			ProperEntities.Add(CurrentEntity);
+	}
+
+	return ProperEntities;
 }
 
 void ZEScene::AddEntity(ZEEntity* Entity)
@@ -148,79 +235,71 @@ void ZEScene::ClearEntities()
 	Entities.Clear();
 }
 
-void ZEScene::SetRenderer(ZERNRenderer* Renderer)
+bool ZEScene::Initialize()
 {
-	this->Renderer = Renderer;
-}
+	if (Initialized)
+		return true;
 
-ZERNRenderer* ZEScene::GetRenderer()
-{
-	return Renderer;
-}
+	if (PhysicalWorld == NULL)
+		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
 
-const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
-{
-	return Entities;
-}
+	if (PhysicalWorld == NULL)
+	{
+		zeCriticalError("Can not create physical world.");
+		return false;
+	}
 
-ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
-{
-	ZEArray<ZEEntity*> ProperEntities;
-	ZEEntity* CurrentEntity = NULL;
-	ProperEntities.Clear();
+	if (!PhysicalWorld->Initialize())
+	{
+		zeCriticalError("Can not create physical world.");
+		return false;
+	}
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
-		CurrentEntity = Entities[I];
-		if (Class->IsDerivedFrom(Class, CurrentEntity->GetClass()))
-			ProperEntities.Add(CurrentEntity);
+		Entities[I]->SetOwnerScene(this);
+		Entities[I]->Initialize();
 	}
 
-	return ProperEntities;
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+
+	SceneDirtyFlags.RaiseAll();
+
+	Initialized = true;
+	return true;
 }
 
-ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
+void ZEScene::Deinitialize()
 {
-	return PhysicalWorld;
-}
-
-void ZEScene::SetActiveCamera(ZECamera* Camera)
-{
-	ActiveCamera = Camera;
-}
-
-ZECamera* ZEScene::GetActiveCamera()
-{
-	return ActiveCamera;
-}
-
-void ZEScene::SetActiveListener(ZEListener* Listener)
-{
-	ActiveListener = Listener;
-	zeSound->SetActiveListener(Listener);
-}
-
-ZEListener* ZEScene::GetActiveListener()
-{
-	return ActiveListener;
-}
-
-void ZEScene::Tick(ZEEntity* Entity, float ElapsedTime)
-{
-	if (!Entity->GetEnabled())
+	if (!Initialized)
 		return;
-	
-	Entity->Tick(ElapsedTime);
-	
-	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
-	for (ZESize N = 0; N < Components.GetCount(); N++)
-		Tick(Components[N], ElapsedTime);
 
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Deinitialize();
 
-	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
-	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
-		Tick(SubEntities[N], ElapsedTime);
+	if (PhysicalWorld != NULL)
+		PhysicalWorld->Deinitialize();
 
+	ConstantBuffer.Release();
+
+	SceneDirtyFlags.RaiseAll();
+
+	Initialized = false;
+}
+
+void ZEScene::Destroy()
+{
+	Deinitialize();
+
+	ClearEntities();
+
+	if (PhysicalWorld != NULL)
+	{
+		PhysicalWorld->Destroy();
+		PhysicalWorld = NULL;
+	}
+
+	delete this;
 }
 
 void ZEScene::Tick(float ElapsedTime)
@@ -229,13 +308,17 @@ void ZEScene::Tick(float ElapsedTime)
 		return;
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Tick(Entities[I], ElapsedTime);
+		TickEntity(Entities[I], ElapsedTime);
 }
 
-void ZEScene::Render(float ElapsedTime)
+void ZEScene::PreRender(ZERNRenderer* Renderer)
 {
-	if (ActiveCamera == NULL)
-		return;
+	ZERNCullParameters CullParameters;
+	CullParameters.Renderer = Renderer;
+	CullParameters.View = &Renderer->GetView();
+
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+		PreRenderEntity(Entities[I], &CullParameters);
 }
 
 bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -384,28 +467,9 @@ bool ZEScene::Load(const ZEString& FileName)
 	return true;
 }
 
-void ZEScene::SetAmbientFactor(float Factor)
-{
-	AmbientFactor = Factor;
-}
-
-float ZEScene::GetAmbientFactor() const
-{
-	return AmbientFactor;
-}
-
-void ZEScene::SetAmbientColor(ZEVector3 Color)
-{
-	AmbientColor = Color;
-}
-
-const ZEVector3& ZEScene::GetAmbientColor() const
-{
-	return AmbientColor;
-}
-
 ZEScene::ZEScene()
 {
+	SceneDirtyFlags.RaiseAll();
 	Initialized = false;
 	LastEntityId = 0;
 	ActiveCamera = NULL;
@@ -427,14 +491,4 @@ ZEScene::~ZEScene()
 ZEScene* ZEScene::GetInstance()
 {
 	return zeGame->GetScene();
-}
-
-void ZEScene::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEScene::GetEnabled() const
-{
-	return Enabled;
 }

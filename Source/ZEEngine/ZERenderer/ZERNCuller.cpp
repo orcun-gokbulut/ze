@@ -43,34 +43,6 @@
 #include "ZEModel/ZEModel.h"
 #include "ZEApplications/ZETrainIG/ZETIPole.h"
 
-void ZESceneCuller::CullEntity(ZEEntity* Entity)
-{
-	if (!Entity->GetVisible())
-		return;
-
-	ZEUInt EntityDrawFlags = Entity->GetDrawFlags();
-
-	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
-	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && CullParameters.View->ViewVolume != NULL)
-		{
-			if (!CullParameters.View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
-				Entity->PreRender(&CullParameters);
-		}
-		else
-		{
-			Entity->PreRender(&CullParameters);
-		}
-	}
-
-	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		CullEntity(Components[I]);
-
-	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		CullEntity(ChildEntities[I]);
-}
 
 void ZESceneCuller::SetScene(ZEScene* Scene)
 {

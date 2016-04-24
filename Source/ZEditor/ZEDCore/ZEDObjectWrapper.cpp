@@ -42,68 +42,15 @@
 
 ZEDObjectWrapper::ZEDObjectWrapper()
 {
-	CustomWidget = NULL;
-	PopupMenu = NULL;
-	Selectable = true;
-
 	Object = NULL;
-	ParentWrapper = NULL;
-	/*
-	Material = ZESimpleMaterial::CreateInstance();
-
-	RenderCommand.SetZero();
-	RenderCommand.Material = Material;
-	RenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM;
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.VertexBuffer = &DrawCanvas;
-	RenderCommand.Priority = 10;*/
+	Parent = NULL;
+	Selectable = true;
+	Locked = true;
 }
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
 {
-	/*if (Material != NULL)
-	{
-		Material->Release();
-		Material->Destroy();
-		Material = NULL;
-	}*/
 
-	if (Object != NULL)
-	{
-		delete Object;
-		Object = NULL;
-	}
-}
-
-void ZEDObjectWrapper::SetCustomWidget(QWidget* Widget)
-{
-	CustomWidget = Widget;
-}
-
-QWidget* ZEDObjectWrapper::GetCustomWidget()
-{
-	return CustomWidget;
-}
-
-void ZEDObjectWrapper::SetPopupMenu(QMenu* Menu)
-{
-	PopupMenu = Menu;
-}
-
-QMenu* ZEDObjectWrapper::GetPopupMenu()
-{
-	return PopupMenu;
-}
-
-void ZEDObjectWrapper::SetObjectSelectable(bool Value)
-{
-	Selectable = Value;
-}
-
-bool ZEDObjectWrapper::GetObjectSelectable()
-{
-	return Selectable;
 }
 
 void ZEDObjectWrapper::SetObject(ZEObject* Object)
@@ -119,24 +66,136 @@ ZEObject* ZEDObjectWrapper::GetObject()
 	return Object;
 }
 
-void ZEDObjectWrapper::SetObjectIcon(const ZEString& Icon)
+
+void ZEDObjectWrapper::SetParent(ZEDObjectWrapper* Wrapper)
 {
-	this->Icon = Icon;
+	Parent = Wrapper;
 }
 
-const ZEString& ZEDObjectWrapper::GetObjectIcon()
+ZEDObjectWrapper* ZEDObjectWrapper::GetParent()
 {
-	return Icon;
+	return Parent;
 }
 
-void ZEDObjectWrapper::SetParentWrapper(ZEDObjectWrapper* Wrapper)
+void ZEDObjectWrapper::SetId(ZEInt Id)
 {
-	ParentWrapper = Wrapper;
+
 }
 
-ZEDObjectWrapper* ZEDObjectWrapper::GetParentWrapper()
+ZEInt ZEDObjectWrapper::GetId()
 {
-	return ParentWrapper;
+	return 0;
+}
+
+void ZEDObjectWrapper::SetName(const ZEString& Name)
+{
+
+}
+
+ZEString ZEDObjectWrapper::GetName()
+{
+	return ZEString::Empty;
+}
+
+void ZEDObjectWrapper::SetIcon(const ZEString& Icon)
+{
+
+}
+
+const ZEString& ZEDObjectWrapper::GetIcon()
+{
+	return ZEString::Empty;
+}
+
+ZEAABBox ZEDObjectWrapper::GetLocalBoundingBox()
+{
+	return ZEAABBox::Zero;
+}
+
+ZEMatrix4x4 ZEDObjectWrapper::GetWorldTransform()
+{
+	return ZEMatrix4x4::Identity;
+}
+
+void ZEDObjectWrapper::SetPosition(const ZEVector3& NewPosition)
+{
+
+}
+
+ZEVector3 ZEDObjectWrapper::GetPosition()
+{
+	return ZEVector3::Zero;
+}
+
+void ZEDObjectWrapper::SetRotation(const ZEQuaternion& NewRotation)
+{
+
+}
+
+ZEQuaternion ZEDObjectWrapper::GetRotation()
+{
+	return ZEQuaternion::Identity;
+}
+
+void ZEDObjectWrapper::SetScale(const ZEVector3& NewScale)
+{
+	
+}
+
+ZEVector3 ZEDObjectWrapper::GetScale()
+{
+	return ZEVector3::One;
+}
+
+
+void ZEDObjectWrapper::SetLocked(bool Value)
+{
+	Locked = Value;
+}
+
+bool ZEDObjectWrapper::GetLocked()
+{
+	return Locked;
+}
+
+void ZEDObjectWrapper::SetSelectable(bool Value)
+{
+	this->Selectable = Selectable;
+}
+
+bool ZEDObjectWrapper::GetSelectable()
+{
+	return Selectable;
+}
+
+void ZEDObjectWrapper::SetSelected(bool Selected)
+{
+	this->Selected = Selected;
+}
+
+bool ZEDObjectWrapper::GetSelected()
+{
+	return Selected;
+}
+
+void ZEDObjectWrapper::SetVisible(bool Value)
+{
+	
+}
+
+bool ZEDObjectWrapper::GetVisible()
+{
+	return true;
+}
+
+QWidget* ZEDObjectWrapper::GetCustomWidget()
+{
+	return NULL;
+}
+
+QMenu* ZEDObjectWrapper::GetPopupMenu()
+{
+	return NULL;
 }
 
 const ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetChildWrappers()
@@ -156,7 +215,7 @@ void ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper)
 		return;
 
 	ChildWrappers.Add(Wrapper);
-	Wrapper->SetParentWrapper(this);
+	Wrapper->SetParent(this);
 }
 
 void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
@@ -168,15 +227,17 @@ void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 		return;
 
 	ChildWrappers.RemoveValue(Wrapper);
-	Wrapper->SetParentWrapper(NULL);
+	Wrapper->SetParent(NULL);
 }
 
-void ZEDObjectWrapper::Draw(ZEDrawParameters* Parameters)
+void ZEDObjectWrapper::PreRender(const ZERNCullParameters* Parameters)
 {
-	//RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	//DrawCanvas.Clean();
 
-	//Icon
+}
+
+void ZEDObjectWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+
 }
 
 void ZEDObjectWrapper::Tick(float ElapsedTime)

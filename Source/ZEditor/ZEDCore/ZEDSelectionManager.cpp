@@ -57,23 +57,23 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 
 	if (PivotMode == ZED_SCM_ENTITY_PIVOT)
 	{
-		SelectionCenterPosition = Selection.GetFirstItem()->GetObjectPosition(); //GetPivotPosition
+		SelectionCenterPosition = Selection.GetFirstItem()->GetPosition(); //GetPivotPosition
 
 		if (TargetSpace == ZED_TS_LOCAL)
-			SelectionCenterRotation = Selection.GetFirstItem()->GetObjectRotation(); //GetPivotRotation
+			SelectionCenterRotation = Selection.GetFirstItem()->GetRotation(); //GetPivotRotation
 	}
 	else if (PivotMode == ZED_SCM_SELECTION_CENTER)
 	{
 		if (TargetSpace == ZED_TS_LOCAL)
 		{
-			SelectionCenterPosition = Selection.GetFirstItem()->GetObjectBoundingBox().GetCenter();
-			SelectionCenterRotation = Selection.GetFirstItem()->GetObjectRotation(); //GetPivotRotation ? BBox rotation?
+			SelectionCenterPosition = Selection.GetFirstItem()->GetLocalBoundingBox().GetCenter();
+			SelectionCenterRotation = Selection.GetFirstItem()->GetRotation(); //GetPivotRotation ? BBox rotation?
 		}
 		else if (TargetSpace == ZED_TS_WORLD)
 		{
 			for (ZESize I = 0; I < Selection.GetCount(); I++)
 			{
-				ObjectCenter = Selection[I]->GetObjectBoundingBox().GetCenter();
+				ObjectCenter = Selection[I]->GetLocalBoundingBox().GetCenter();
 				SelectionCenterPosition += ObjectCenter;
 			}
 
@@ -84,8 +84,8 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 	{
 		if (TargetSpace == ZED_TS_LOCAL)
 		{
-			SelectionCenterPosition = Selection.GetFirstItem()->GetObjectPosition(); //GetPivotPosition
-			SelectionCenterRotation = Selection.GetFirstItem()->GetObjectRotation(); //GetPivotRotation
+			SelectionCenterPosition = Selection.GetFirstItem()->GetPosition(); //GetPivotPosition
+			SelectionCenterRotation = Selection.GetFirstItem()->GetRotation(); //GetPivotRotation
 		}
 		else if (TargetSpace == ZED_TS_WORLD)
 		{
@@ -123,7 +123,7 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 	if (Object == NULL)
 		return;
 
-	if (!Object->GetObjectSelectable())
+	if (!Object->GetSelectable())
 		return;
 
 	if (Filter != NULL)
@@ -161,7 +161,7 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 	ZEArray<ZEDObjectWrapper*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetWrappers(Filter);
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		if (!ViewVolume->CullTest(Wrappers[I]->GetObjectBoundingBox()))
+		if (!ViewVolume->CullTest(Wrappers[I]->GetLocalBoundingBox()))
 			SelectObject(Wrappers[I]);
 	}
 }
@@ -239,7 +239,7 @@ void ZEDSelectionManager::SelectObject(const ZEString& Name)
 	ZEArray<ZEDObjectWrapper*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetWrappers(Filter);
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		if (Wrappers[I]->GetObjectName() == Name)
+		if (Wrappers[I]->GetName() == Name)
 			SelectObject(Wrappers[I]);
 	}
 }
@@ -249,7 +249,7 @@ void ZEDSelectionManager::SelectObject(ZESize Id)
 	ZEArray<ZEDObjectWrapper*> Wrappers = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetWrappers(Filter);
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		if (Wrappers[I]->GetObjectId() == Id)
+		if (Wrappers[I]->GetId() == Id)
 		{
 			SelectObject(Wrappers[I]);
 			return;
@@ -297,7 +297,7 @@ void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
 
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		if (!ViewVolume->CullTest(Wrappers[I]->GetObjectBoundingBox()))
+		if (!ViewVolume->CullTest(Wrappers[I]->GetLocalBoundingBox()))
 			DeselectObject(Wrappers[I]);
 	}
 }
@@ -373,7 +373,7 @@ void ZEDSelectionManager::DeselectObject(const ZEString& Name)
 
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		if (Wrappers[I]->GetObjectName() == Name)
+		if (Wrappers[I]->GetName() == Name)
 			DeselectObject(Wrappers[I]);
 	}
 }
@@ -384,7 +384,7 @@ void ZEDSelectionManager::DeselectObject(ZESize Id)
 
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		if (Wrappers[I]->GetObjectId() == Id)
+		if (Wrappers[I]->GetId() == Id)
 		{
 			DeselectObject(Wrappers[I]);
 			return;

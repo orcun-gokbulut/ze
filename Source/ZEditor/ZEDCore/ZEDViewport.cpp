@@ -36,6 +36,7 @@
 #include "ZEDViewport.h"
 
 #include "ZEMath\ZEAngle.h"
+#include "ZECore\ZECore.h"
 #include "ZEGraphics\ZEGROutput.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZERenderer\ZERNStageGBuffer.h"
@@ -48,13 +49,12 @@
 #include "ZERenderer\ZERNStageAntiAliasing.h"
 #include "ZERenderer\ZERNStage2D.h"
 #include "ZERenderer\ZERNStageOutput.h"
+#include "ZERenderer\ZERNStageForward.h"
 
 #include "ZEDCore.h"
 #include "ZEDModule.h"
 #include "ZEDViewportManager.h"
-#include "ZECore\ZECore.h"
-#include "ZEDInputEvent.h"
-#include "ZERenderer\ZERNStageForward.h"
+#include "ZEDViewportInput.h"
 
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
@@ -757,12 +757,16 @@ ZEScene* ZEDViewport::GetScene()
 void ZEDViewport::Tick()
 {
 	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
+	{
+		KeyboardEvents[I].Modifiers = Modifiers;
 		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvents[I]);
+	}
 
 	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
 	{
 		MouseEvents[I].DeltaX = MouseDeltaX;
 		MouseEvents[I].DeltaY = MouseDeltaY;
+		MouseEvents[I].Modifiers = Modifiers;
 		ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvents[I]);
 	}
 
@@ -822,7 +826,7 @@ void ZEDViewport::Render()
 	if (!Update())
 		return;
 
-	Renderer.SetScene(Scene);
+	Renderer.PreRenderScene(Scene);
 	Renderer.Render(0.0f);
 }
 
