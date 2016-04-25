@@ -68,7 +68,7 @@ class ZEParticleEffect;
 class ZEParticleModifier;
 class ZERNParticleMaterial;
 class ZERNRenderParameters;
-struct ZERNCullParameters;
+class ZERNPreRenderParameters;
 
 class ZEParticleEmitter : public ZEObject
 {
@@ -217,7 +217,7 @@ class ZEParticleEmitter : public ZEObject
 		void								SetMaterial(ZEHolder<ZERNParticleMaterial> Material);
 		ZEHolder<ZERNParticleMaterial>		GetMaterial() const;
 
-		bool								PreRender(const ZERNCullParameters* CullParameters);
+		bool								PreRender(const ZERNPreRenderParameters* Parameters);
 		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 		void								Tick(float ElapsedTime);
 

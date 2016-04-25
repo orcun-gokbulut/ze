@@ -55,6 +55,7 @@
 #include "ZEDModule.h"
 #include "ZEDViewportManager.h"
 #include "ZEDViewportInput.h"
+#include "ZEGame\ZEScene.h"
 
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
@@ -92,8 +93,6 @@ bool ZEDViewport::UpdateView()
 	ZEMatrix4x4::Inverse(View.InvProjectionTransform, View.ProjectionTransform);
 	ZEMatrix4x4::Multiply(View.InvViewProjectionTransform, View.InvViewTransform, View.InvProjectionTransform);
 
-	View.Viewport = &Viewport;
-
 	ViewFrustum.Create(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
 	View.ViewVolume = &ViewFrustum;
 
@@ -122,16 +121,16 @@ bool ZEDViewport::UpdateRenderTarget()
 	if (RenderTarget == NULL)
 		return false;
 
-	if (Viewport.GetWidth() == RenderTarget->GetWidth() &&
-		Viewport.GetHeight() == RenderTarget->GetHeight())
+	if (View.Viewport.GetWidth() == RenderTarget->GetWidth() &&
+		View.Viewport.GetHeight() == RenderTarget->GetHeight())
 	{
 		return true;
 	}
 
-	Viewport.SetX(0.0f);
-	Viewport.SetY(0.0f);
-	Viewport.SetWidth((float)RenderTarget->GetWidth());
-	Viewport.SetHeight((float)RenderTarget->GetHeight());
+	View.Viewport.SetX(0.0f);
+	View.Viewport.SetY(0.0f);
+	View.Viewport.SetWidth((float)RenderTarget->GetWidth());
+	View.Viewport.SetHeight((float)RenderTarget->GetHeight());
 
 	DirtyFlags.RaiseFlags(ZED_VDF_VIEW);
 }
@@ -826,7 +825,9 @@ void ZEDViewport::Render()
 	if (!Update())
 		return;
 
-	Renderer.PreRenderScene(Scene);
+	Renderer.SetView(View);
+	Renderer.SetMainScene(Scene);
+	Scene->PreRender(&Renderer);
 	Renderer.Render(0.0f);
 }
 

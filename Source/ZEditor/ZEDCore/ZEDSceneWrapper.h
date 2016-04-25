@@ -35,12 +35,9 @@
 
 #pragma once
 
-#include "ZEDObjectWrapper.h"
+#include "ZEDEntityWrapper.h"
 #include "ZEDScene.h"
 
-// ZEDSceneWrapper wraps scene
-// SetObject fires entity search
-// 
 class ZEDSceneWrapper : public ZEDObjectWrapper
 {
 	private:
@@ -50,9 +47,6 @@ class ZEDSceneWrapper : public ZEDObjectWrapper
 		void									UpdateWrappers();
 
 	public:
-		virtual void							SetId(ZEInt Id);
-		virtual ZEInt							GetId();
-
 		virtual void							SetObject(ZEObject* Object);
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

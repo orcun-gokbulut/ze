@@ -44,7 +44,7 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZERenderer/ZERNCommand.h"
 
-struct ZERNCullParameters;
+class ZERNPreRenderParameters;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
@@ -177,7 +177,7 @@ class ZEModelMesh : public ZEObject
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		bool								PreRender(const ZERNCullParameters* CullParameters);
+		bool								PreRender(const ZERNPreRenderParameters* Parameters);
 
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 

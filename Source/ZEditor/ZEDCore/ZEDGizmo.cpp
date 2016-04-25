@@ -49,7 +49,6 @@
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZERNStageID.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 
@@ -1109,12 +1108,12 @@ void ZEDGizmo::LocalTransformChanged()
 	ConstantBuffer->SetData(&GetWorldTransform());
 }
 
-bool ZEDGizmo::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEDGizmo::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return true;
 
-	CullParameters->Renderer->AddCommand(&RenderCommand);
+	Parameters->Renderer->AddCommand(&RenderCommand);
 	return true;
 }
 

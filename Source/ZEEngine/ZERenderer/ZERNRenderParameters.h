@@ -50,24 +50,36 @@ ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
 ZE_META_FORWARD_DECLARE(ZERNCommand, "ZERNCommand.h");
 ZE_META_FORWARD_DECLARE(ZERNView, "ZERNView.h");
 
-enum ZERNDrawType
+
+class ZERNPreRenderParameters : public ZEObject
 {
-	ZERN_DT_NORMAL,
-	ZERN_DT_SHADOW
+	ZE_OBJECT
+	public:
+		ZEUInt64					FrameId;
+		float						ElapsedTime;
+		float						Time;
+		ZERNRenderer*				Renderer;
+		const ZERNView*				View;
+
+		void						UpdateTime();
+
+									ZERNPreRenderParameters();
 };
 
 class ZERNRenderParameters : public ZEObject
 {
 	ZE_OBJECT
 	public:
-		ZESize						FrameId;
+		ZEUInt64					FrameId;
 		float						ElapsedTime;
 		float						Time;
-		ZEScene*					Scene;
 		ZEGRContext*				Context;
-		ZERNView*					View;
 		ZERNRenderer*				Renderer;
-		ZERNDrawType				Type;
-		ZERNStage*					Stage;
-		ZERNCommand*				Command;
+		const ZERNView*				View;
+		const ZERNStage*			Stage;
+		const ZERNCommand*			Command;
+
+		void						UpdateTime();
+
+									ZERNRenderParameters();
 };

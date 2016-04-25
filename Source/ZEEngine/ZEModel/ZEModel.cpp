@@ -480,9 +480,9 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 	ParentlessBoneJoint->Initialize();
 }
 
-bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEModel::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
@@ -494,7 +494,7 @@ bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
 	bool Result = false;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if (Meshes[I].PreRender(CullParameters))
+		if (Meshes[I].PreRender(Parameters))
 			Result = true;
 	}
 

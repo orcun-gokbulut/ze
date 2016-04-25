@@ -47,7 +47,6 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStagePostProcess.h"
 #include "ZERenderer/ZERNShaderSlots.h"
@@ -411,12 +410,12 @@ void ZEATCloud::Tick(float Time)
 	SetTranslation(Translation);
 }
 
-bool ZEATCloud::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	CullParameters->Renderer->AddCommand(&RenderCommand);
+	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }
@@ -432,7 +431,7 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	PlaneTransformConstantBuffer->SetData(&WorldMatrix);
 
 	ZEGRContext* Context = Parameters->Context;	
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();

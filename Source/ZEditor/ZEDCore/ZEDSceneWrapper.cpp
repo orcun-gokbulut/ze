@@ -40,10 +40,10 @@
 
 void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer, ZEDEntityWrapper* Wrapper)
 {
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	/*for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		Wrappers[I]->PreRender();
-	}
+		Wrappers[I].PreRender();
+	}*/
 }
 
 void ZEDSceneWrapper::SetObject(ZEObject* Object)

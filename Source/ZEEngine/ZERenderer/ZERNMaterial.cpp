@@ -48,7 +48,7 @@ ZERNMaterial::~ZERNMaterial()
 
 }
 
-bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if(Stage == NULL || !Stage->GetEnabled())
 		return false;
@@ -56,7 +56,7 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 	return true;
 }
 
-void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 
 }

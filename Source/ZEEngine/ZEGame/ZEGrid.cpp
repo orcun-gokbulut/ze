@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEMath/ZEMath.h"
+
 #include "ZEGrid.h"
 #include "ZEScene.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNFixedMaterial.h"
-#include "ZEMath/ZEMath.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNShaderSlots.h"
+#include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
@@ -233,7 +233,7 @@ const ZEVector3& ZEGrid::GetAxisColor()
 	return AxisColor;
 }
 
-bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
+bool ZEGrid::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	// Update Constants
 	ZEVector3 CameraPosition = Parameters->View->Position;

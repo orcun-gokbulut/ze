@@ -83,8 +83,8 @@ class ZEInterior : public ZEEntity
 		void									LoadInteriorResource();
 
 		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor* Door, const ZEViewVolume* OldViewVolume);
-		void									CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullParameters, ZEViewVolume* ViewVolume);
-		void									CullRooms(const ZERNCullParameters* CullParameters);
+		void									CullRoom(ZEInteriorDoor* Door, const ZERNPreRenderParameters* Parameters, ZEViewVolume* ViewVolume);
+		void									CullRooms(const ZERNPreRenderParameters* Parameters);
 
 		virtual	void							ParentTransformChanged();
 
@@ -115,7 +115,7 @@ class ZEInterior : public ZEEntity
 		void									SetCullMode(ZEInteriorCullMode Value);
 		ZEInteriorCullMode						GetCullMode() const;
 
-		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);

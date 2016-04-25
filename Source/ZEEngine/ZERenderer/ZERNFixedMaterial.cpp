@@ -1306,7 +1306,7 @@ bool ZERNFixedMaterial::GetClippingPlanesEnabled() const
 	return ClippingPlanesEnabled;
 }
 
-bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -1400,7 +1400,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) co
 	return true;
 }
 
-void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);

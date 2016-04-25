@@ -58,7 +58,6 @@ class ZEDViewport : public QFrame, public ZEInitializable
 
 		ZERNView							View;
 		ZEViewFrustum						ViewFrustum;
-		ZEGRViewport						Viewport;
 		ZEScene*							Scene;
 
 		ZEVector3							Position;

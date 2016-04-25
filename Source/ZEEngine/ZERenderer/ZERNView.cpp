@@ -34,6 +34,39 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZERNView.h"
-#include "ZECommon.h"
 
-ZE_SUPPRESS_LNK4221
+ZERNView::ZERNView()
+{
+	Type = ZERN_VT_NONE;
+	Entity = NULL;
+
+	ViewTransform = ZEMatrix4x4::Identity;
+	ProjectionTransform = ZEMatrix4x4::Identity;		
+	ViewProjectionTransform = ZEMatrix4x4::Identity;
+	InvViewTransform = ZEMatrix4x4::Identity;
+	InvProjectionTransform = ZEMatrix4x4::Identity;			
+	InvViewProjectionTransform = ZEMatrix4x4::Identity;
+	
+	ProjectionType = ZERN_PT_NONE;
+	VerticalFOV = 0.0f;
+	VerticalFOVTop = 0.0f;
+	VerticalFOVBottom = 0.0f;
+	HorizontalFOV = 0.0f;
+	HorizontalFOVRight = 0.0f;
+	HorizontalFOVLeft = 0.0f;
+	AspectRatio = 1.0f;
+	NearZ = 0.0f;
+	FarZ = 1000.0f;
+	ShadowDistance = 1000.0f;
+	ShadowFadeDistance = 100.0f;
+
+	
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Direction = ZEVector3::UnitZ;
+	U = ZEVector3::UnitX;
+	V = ZEVector3::UnitY;
+	N = ZEVector3::UnitZ;
+	
+	ViewVolume = NULL;
+}

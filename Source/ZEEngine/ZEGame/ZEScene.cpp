@@ -55,11 +55,11 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 
 #include <memory.h>
-#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
 #define ZE_SDF_CONSTANT_BUFFER		0x01
 
-void ZEScene::PreRenderEntity(ZEEntity* Entity, ZERNCullParameters* Parameters)
+void ZEScene::PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters)
 {
 	if (!Entity->GetVisible())
 		return;
@@ -119,6 +119,7 @@ void ZEScene::UpdateConstantBuffer()
 
 const ZEGRConstantBuffer* ZEScene::GetConstantBuffer()
 {
+	UpdateConstantBuffer();
 	return ConstantBuffer;
 }
 
@@ -161,6 +162,8 @@ bool ZEScene::GetEnabled() const
 void ZEScene::SetAmbientFactor(float Factor)
 {
 	AmbientFactor = Factor;
+
+	Constants.AmbientColor = AmbientColor * AmbientFactor;
 	SceneDirtyFlags.RaiseFlags(ZE_SDF_CONSTANT_BUFFER);
 }
 
@@ -172,6 +175,8 @@ float ZEScene::GetAmbientFactor() const
 void ZEScene::SetAmbientColor(ZEVector3 Color)
 {
 	AmbientColor = Color;
+
+	Constants.AmbientColor = AmbientColor * AmbientFactor;
 	SceneDirtyFlags.RaiseFlags(ZE_SDF_CONSTANT_BUFFER);
 }
 
@@ -313,12 +318,12 @@ void ZEScene::Tick(float ElapsedTime)
 
 void ZEScene::PreRender(ZERNRenderer* Renderer)
 {
-	ZERNCullParameters CullParameters;
-	CullParameters.Renderer = Renderer;
-	CullParameters.View = &Renderer->GetView();
+	ZERNPreRenderParameters Parameters;
+	Parameters.Renderer = Renderer;
+	Parameters.View = &Renderer->GetView();
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		PreRenderEntity(Entities[I], &CullParameters);
+		PreRenderEntity(Entities[I], &Parameters);
 }
 
 bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

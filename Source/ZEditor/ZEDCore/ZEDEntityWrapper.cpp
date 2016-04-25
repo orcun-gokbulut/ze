@@ -175,7 +175,7 @@ bool ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 	return static_cast<ZEEntity*>(GetObject())->ZEEntity::RayCast(Report, Parameters);
 }
 
-void ZEDEntityWrapper::PreRender(const ZERNCullParameters* Parameters)
+void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	ZEAABBox BoundingBox = GetLocalBoundingBox();
 

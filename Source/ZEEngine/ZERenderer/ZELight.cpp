@@ -36,9 +36,9 @@
 #include "ZELight.h"
 
 #include "ZERNRenderer.h"
-#include "ZERNCuller.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStageShadowmapGeneration.h"
+#include "ZEGame\ZEScene.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -256,15 +256,15 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
-bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
+bool ZELight::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
 	if (CastsShadows)
 		Command.StageMask |= ZERN_STAGE_SHADOWING;
 
-	CullParameters->Renderer->AddCommand(&Command);
+	Parameters->Renderer->AddCommand(&Command);
 
 	return true;
 }
@@ -272,7 +272,7 @@ bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	ShadowRenderer.SetContext(Parameters->Context);
-	ShadowRenderer.PreRenderScene(Parameters->Scene);
+	GetOwnerScene()->PreRender(&ShadowRenderer);
 	ShadowRenderer.Render(0.0f);
 }
 
@@ -280,15 +280,18 @@ ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution
 {
 	switch (ShadowResolution)
 	{
-	default:
-	case ZE_LSR_LOW:
-		return 256;
-	case ZE_LSR_MEDIUM:
-		return 512;
-	case ZE_LSR_HIGH:
-		return 1024;
-	case ZE_LSR_VERY_HIGH:
-		return 2048;
+		default:
+		case ZE_LSR_LOW:
+			return 256;
+
+		case ZE_LSR_MEDIUM:
+			return 512;
+
+		case ZE_LSR_HIGH:
+			return 1024;
+
+		case ZE_LSR_VERY_HIGH:
+			return 2048;
 	}
 }
 
@@ -296,14 +299,17 @@ ZEUInt ZELight::ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCo
 {
 	switch (ShadowSampleCount)
 	{
-	default:
-	case ZE_LSC_LOW:
-		return 4;
-	case ZE_LSC_MEDIUM:
-		return 8;
-	case ZE_LSC_HIGH:
-		return 16;
-	case ZE_LSC_VERY_HIGH:
-		return 16;
+		default:
+		case ZE_LSC_LOW:
+			return 4;
+
+		case ZE_LSC_MEDIUM:
+			return 8;
+
+		case ZE_LSC_HIGH:
+			return 16;
+
+		case ZE_LSC_VERY_HIGH:
+			return 16;
 	}
 }

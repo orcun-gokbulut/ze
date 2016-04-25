@@ -47,7 +47,6 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNStagePostProcess.h"
@@ -263,12 +262,12 @@ ZEATSkyBox::~ZEATSkyBox()
 
 }
 
-bool ZEATSkyBox::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATSkyBox::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	CullParameters->Renderer->AddCommand(&SkyRenderCommand);
+	Parameters->Renderer->AddCommand(&SkyRenderCommand);
 
 	return true;
 }
@@ -285,7 +284,7 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ConstantBufferTransform->SetData(&WorldMatrix);
 
 	ZEGRContext* Context = Parameters->Context;
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);

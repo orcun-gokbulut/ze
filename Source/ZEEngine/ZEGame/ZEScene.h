@@ -56,6 +56,7 @@ ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
 class ZEPhysicalWorld;
 class ZERNRenderer;
 class ZEGRConstantBuffer;
+class ZERNPreRenderParameters;
 
 #define zeScene ZEScene::GetInstance()
 
@@ -85,7 +86,7 @@ class ZEScene : public ZEObject
 
 		void									UpdateConstantBuffer();
 
-		void									PreRenderEntity(ZEEntity* Entity, ZERNCullParameters* CullParameters);
+		void									PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters);
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
 
 	public:

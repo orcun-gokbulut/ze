@@ -33,25 +33,26 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore/ZECore.h"
 #include "ZEInteriorRoom.h"
-#include "ZEInteriorResource.h"
-#include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZERenderer/ZELight.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEInterior/ZEInterior.h"
+
 #include "ZEMath/ZEViewVolume.h"
-#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
-#include "ZERenderer\ZERNCuller.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZEGraphics\ZEGRContext.h"
-#include "ZERenderer\ZERNShaderSlots.h"
-#include "ZERenderer\ZERNRenderParameters.h"
+
+#include "ZEInterior.h"
+#include "ZEInteriorResource.h"
+#include "ZECore/ZECore.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZERenderer/ZELight.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
+#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
 
 bool ZEInteriorRoom::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
 {
@@ -325,13 +326,13 @@ void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 	IsPersistentDraw = Enabled;
 }
 
-void ZEInteriorRoom::PreRender(const ZERNCullParameters* CullParameters)
+void ZEInteriorRoom::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	IsDrawn = true;
 	
 	ZESize RenderCommandCount = RenderCommands.GetCount();
 	for(ZESize I = 0; I < RenderCommandCount; I++)
-		CullParameters->Renderer->AddCommand(&RenderCommands[I]);
+		Parameters->Renderer->AddCommand(&RenderCommands[I]);
 }
 
 void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)

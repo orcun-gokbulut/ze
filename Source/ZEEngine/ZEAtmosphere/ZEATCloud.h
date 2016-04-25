@@ -128,7 +128,7 @@ class ZEATCloud : public ZEEntity
 		const ZEVector2&				GetTranslation() const;
 
 		virtual void					Tick(float Time);
-		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEATCloud*				CreateInstance();

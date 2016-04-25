@@ -34,23 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInterior.h"
-#include "ZEInteriorResource.h"
-#include "ZEInteriorRoom.h"
-#include "ZEInteriorDoor.h"
-#include "ZEInteriorHelper.h"
+
 #include "ZEError.h"
-#include "ZECore/ZEConsole.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEPhysics/ZEPhysicalMesh.h"
+
+#include "ZEInteriorResource.h"
+#include "ZEInteriorRoom.h"
+#include "ZEInteriorDoor.h"
+#include "ZEInteriorHelper.h"
+#include "ZECore/ZEConsole.h"
 #include "ZEGame/ZEEntityProvider.h"
-#include "ZERenderer\ZERNCuller.h"
-#include "ZERenderer\ZERNView.h"
-#include "ZEGraphics\ZEGRContext.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZERenderer\ZERNRenderParameters.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZERenderer/ZERNView.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
@@ -357,7 +358,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 	return false;
 }
 
-void ZEInterior::CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullParameters, ZEViewVolume* ViewVolume)
+void ZEInterior::CullRoom(ZEInteriorDoor* Door, const ZERNPreRenderParameters* Parameters, ZEViewVolume* ViewVolume)
 {
 	if(!Door->GetOpen())
 		return;
@@ -375,7 +376,7 @@ void ZEInterior::CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullPa
 		GenerateViewVolume(NewViewVolume, Door, ViewVolume);
 
 		DoorRooms[I]->CullPass = true;
-		DoorRooms[I]->PreRender(CullParameters);
+		DoorRooms[I]->PreRender(Parameters);
 
 		const ZEArray<ZEInteriorDoor*>& NextDoors = DoorRooms[I]->GetDoors();
 		ZESize NextDoorCount = NextDoors.GetCount();
@@ -384,27 +385,27 @@ void ZEInterior::CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullPa
 			if(NextDoors[J] == Door)
 				continue;
 
-			CullRoom(NextDoors[J], CullParameters, (ZEViewVolume*)&NewViewVolume);
+			CullRoom(NextDoors[J], Parameters, (ZEViewVolume*)&NewViewVolume);
 		}
 	}
 }
 
-void ZEInterior::CullRooms(const ZERNCullParameters* CullParameters)
+void ZEInterior::CullRooms(const ZERNPreRenderParameters* Parameters)
 {
 	ZESize RoomCount = Rooms.GetCount();
 
 	if (CullMode == ZE_ICM_NONE)
 	{
 		for (ZESize I = 0; I < RoomCount; I++)
-			Rooms[I]->PreRender(CullParameters);
+			Rooms[I]->PreRender(Parameters);
 	}
 	else
 	{
 		bool NoClip = true;
 
-		if (CullParameters->View->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
+		if (Parameters->View->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
 		{
-			ZEViewFrustum* Frustum = (ZEViewFrustum*)CullParameters->View->ViewVolume;
+			ZEViewFrustum* Frustum = (ZEViewFrustum*)Parameters->View->ViewVolume;
 			ZEVector3 FrustumPosition = Frustum->GetPosition();
 
 			for (ZESize I = 0; I < RoomCount; I++)
@@ -416,12 +417,12 @@ void ZEInterior::CullRooms(const ZERNCullParameters* CullParameters)
 				{
 					NoClip = false;
 					Rooms[I]->CullPass = true;
-					Rooms[I]->PreRender(CullParameters);
+					Rooms[I]->PreRender(Parameters);
 
 					const ZEArray<ZEInteriorDoor*>& Doors = Rooms[I]->GetDoors();
 					ZESize DoorCount = Doors.GetCount();
 					for(ZESize J = 0; J < DoorCount; J++)
-						CullRoom(Doors[J], CullParameters, Frustum);
+						CullRoom(Doors[J], Parameters, Frustum);
 				}
 			}
 		}
@@ -430,8 +431,8 @@ void ZEInterior::CullRooms(const ZERNCullParameters* CullParameters)
 		{
 			for (ZESize I = 0; I < RoomCount; I++)
 			{
-				if (!CullParameters->View->ViewVolume->CullTest(Rooms[I]->GetWorldBoundingBox()))
-					Rooms[I]->PreRender(CullParameters);
+				if (!Parameters->View->ViewVolume->CullTest(Rooms[I]->GetWorldBoundingBox()))
+					Rooms[I]->PreRender(Parameters);
 			}
 		}
 
@@ -440,7 +441,7 @@ void ZEInterior::CullRooms(const ZERNCullParameters* CullParameters)
 			if (Rooms[I]->IsPersistentDraw)
 			{
 				if (!Rooms[I]->IsDrawn)
-					Rooms[I]->PreRender(CullParameters);
+					Rooms[I]->PreRender(Parameters);
 			}
 		}
 	}
@@ -463,7 +464,7 @@ void ZEInterior::SetCullMode(ZEInteriorCullMode Value)
 	CullMode = Value;
 }
 
-bool ZEInterior::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEInterior::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!GetVisible())
 		return false;
@@ -475,7 +476,7 @@ bool ZEInterior::PreRender(const ZERNCullParameters* CullParameters)
 		Rooms[I]->IsDrawn = false;
 	}
 
-	CullRooms(CullParameters);
+	CullRooms(Parameters);
 
 	return true;
 }

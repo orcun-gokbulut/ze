@@ -142,7 +142,7 @@ class ZEDGizmo : public ZEEntity
 		void							StartScaleProjection(const ZERNView& View, const ZERay& InitialRay);
 		ZEVector3						ScaleProjection(const ZERNView& View, const ZERay& Ray);
 	
-		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 	
 		static ZEDGizmo*				CreateInstance();
