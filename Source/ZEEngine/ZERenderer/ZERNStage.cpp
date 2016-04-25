@@ -132,7 +132,7 @@ bool ZERNStage::GetEnabled() const
 	return Enabled;
 }
 
-const ZEList2<ZERNCommand>& ZERNStage::GetCommands()
+const ZEList2<ZERNCommand>& ZERNStage::GetCommands() const
 {
 	return Commands;
 }

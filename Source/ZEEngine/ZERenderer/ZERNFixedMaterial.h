@@ -357,8 +357,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		void									SetClippingPlanesEnabled(bool Enabled);
 		bool									GetClippingPlanesEnabled() const;
 
-		virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
-		virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
 		virtual bool							Update() const;
 

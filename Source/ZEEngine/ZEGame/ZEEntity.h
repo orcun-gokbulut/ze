@@ -54,7 +54,7 @@
 
 class ZEScene;
 class ZERNDrawParameters;
-class ZERNCullParameters;
+class ZERNPreRenderParameters;
 class ZERNRenderParameters;
 class ZERNCommand;
 class ZEMLWriterNode;
@@ -195,7 +195,7 @@ class ZEEntity : public ZEObject
 
 		virtual void							Tick(float Time);
 
-		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);

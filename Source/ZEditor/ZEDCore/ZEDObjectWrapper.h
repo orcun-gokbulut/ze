@@ -48,7 +48,7 @@
 #include <QWidget>
 #include <QMenu>
 
-class ZERNCullParameters;
+class ZERNPreRenderParameters;
 class ZERNRenderParameters;
 
 /*ZE_ATTRIBUTE_0(ObjectClass)*/
@@ -130,7 +130,7 @@ class ZEDObjectWrapper : public ZEObject
 		virtual QWidget*					GetCustomWidget();
 		virtual QMenu*						GetPopupMenu();
 
-		virtual void						PreRender(const ZERNCullParameters* Parameters);
+		virtual void						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void						Tick(float ElapsedTime);
 		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters) = 0;

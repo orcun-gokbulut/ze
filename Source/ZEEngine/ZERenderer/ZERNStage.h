@@ -107,7 +107,7 @@ class ZERNStage : public ZEObject, public ZEInitializable
 		void								SetEnabled(bool Enable);
 		bool								GetEnabled() const;
 
-		const ZEList2<ZERNCommand>&			GetCommands();
+		const ZEList2<ZERNCommand>&			GetCommands() const;
 
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;

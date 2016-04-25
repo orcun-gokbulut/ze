@@ -174,10 +174,10 @@ const ZEMatrix4x4& ZECamera::GetInvViewProjectionTransform()
 
 void ZECamera::SetViewport(const ZEGRViewport& Viewport)
 {
-	if (this->Viewport.GetWidth() == Viewport.GetWidth() && this->Viewport.GetHeight() == Viewport.GetHeight())
+	if (View.Viewport.GetWidth() == Viewport.GetWidth() && View.Viewport.GetHeight() == Viewport.GetHeight())
 		return;
 
-	this->Viewport = Viewport;
+	View.Viewport = Viewport;
 	if (AutoAspectRatio)
 		View.AspectRatio = Viewport.GetWidth() / Viewport.GetHeight();
 
@@ -186,7 +186,7 @@ void ZECamera::SetViewport(const ZEGRViewport& Viewport)
 
 const ZEGRViewport& ZECamera::GetViewport() const
 {
-	return Viewport;
+	return View.Viewport;
 }
 
 void ZECamera::SetNearZ(float NearZ)
@@ -274,7 +274,7 @@ void ZECamera::SetAspectRatio(float AspectRatio)
 float ZECamera::GetAspectRatio() const
 {
 	if (AutoAspectRatio)
-		View.AspectRatio = Viewport.GetWidth() / Viewport.GetHeight();
+		View.AspectRatio = View.Viewport.GetWidth() / View.Viewport.GetHeight();
 
 	return View.AspectRatio;
 }
@@ -407,7 +407,6 @@ const ZERNView& ZECamera::GetView()
 
 		View.ProjectionType = GetProjectionType();
 		View.Type = ZERN_VT_CAMERA;
-		View.Viewport = &GetViewport();
 		View.ViewVolume = &GetViewVolume();
 
 		View.ShadowDistance = GetShadowDistance();
@@ -469,8 +468,8 @@ ZERay ZECamera::GetScreenRay(ZEInt ScreenX, ZEInt ScreenY)
 
 	ZEVector3 V;
 	const ZEMatrix4x4& ProjMatrix = GetProjectionTransform();
-	V.x =  (((2.0f * ScreenX ) / (ZEInt)View.Viewport->GetWidth()) - 1) / ProjMatrix.M11;
-	V.y = -(((2.0f * ScreenY ) / (ZEInt)View.Viewport->GetHeight()) - 1) / ProjMatrix.M22;
+	V.x =  (((2.0f * ScreenX ) / (ZEInt)View.Viewport.GetWidth()) - 1) / ProjMatrix.M11;
+	V.y = -(((2.0f * ScreenY ) / (ZEInt)View.Viewport.GetHeight()) - 1) / ProjMatrix.M22;
 	V.z =  1.0f;
 
 	const ZEMatrix4x4& InvViewMatrix = GetInvViewTransform();
@@ -491,8 +490,8 @@ ZEVector2 ZECamera::GetScreenPosition(const ZEVector3& WorldPosition)
 	ZEMatrix4x4::Transform(ClipPosition, GetViewProjectionTransform(), ZEVector4(WorldPosition, 1.0f));
 	ClipPosition /= ClipPosition.w;
 	
-	float HalfWidth = View.Viewport->GetWidth() * 0.5f;
-	float HalfHeight = View.Viewport->GetHeight() * 0.5f;
+	float HalfWidth = View.Viewport.GetWidth() * 0.5f;
+	float HalfHeight = View.Viewport.GetHeight() * 0.5f;
 
 	return ZEVector2(ClipPosition.x * HalfWidth + HalfWidth, ClipPosition.y * -HalfHeight + HalfHeight);
 }
@@ -506,7 +505,6 @@ ZECamera::ZECamera()
 	View.FarZ = 1000.0f;
 	View.NearZ = 1.0f;
 	View.AspectRatio = 1.333333f;
-	View.Viewport = &Viewport;
 	View.ViewVolume = &ViewFrustum;
 	View.ProjectionType = ZERN_PT_PERSPECTIVE;
 	View.ShadowDistance = 100.0f;

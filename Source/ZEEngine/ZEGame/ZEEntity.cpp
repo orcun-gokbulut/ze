@@ -45,7 +45,6 @@
 #include "ZEMeta/ZEProvider.h"
 
 #include "ZEScene.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNView.h"
 
 #define ZE_EDF_LOCAL_TRANSFORM					0x0001
@@ -574,7 +573,7 @@ void ZEEntity::Tick(float Time)
 
 }
 
-bool ZEEntity::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEEntity::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!GetEnabled() || !GetVisible())
 		return false;

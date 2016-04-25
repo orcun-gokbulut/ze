@@ -47,7 +47,6 @@
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
@@ -237,12 +236,12 @@ const ZEVector3& ZEATSun::GetColor() const
 	return Constants.Color;
 }
 
-bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATSun::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	const ZERNView& View = *CullParameters->View;
+	const ZERNView& View = *Parameters->View;
 
 	ZEVector2 SunPositionScreen;
 	if (!CalculateSunPositionScreen(View, SunPositionScreen))
@@ -261,7 +260,7 @@ bool ZEATSun::PreRender(const ZERNCullParameters* CullParameters)
 		DirtyFlags.RaiseFlags(ZEAT_SDF_CONSTANT_BUFFERS);
 	}
 
-	CullParameters->Renderer->AddCommand(&Command);
+	Parameters->Renderer->AddCommand(&Command);
 
 	return true;
 }
@@ -272,7 +271,7 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);

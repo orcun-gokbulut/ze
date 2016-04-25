@@ -51,8 +51,8 @@ class ZERNMaterial;
 class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
 class ZEGRContext;
+class ZERNPreRenderParameters;
 struct ZEInteriorResourceRoom;
-struct ZERNCullParameters;
 struct ZEExtraRenderParameters;
 
 typedef ZEFlags ZEInteriorRoomDirtyFlags;
@@ -75,7 +75,7 @@ class ZEInteriorRoom
 		ZEArray<ZEInteriorDoor*>			Doors;
 		ZEPhysicalMesh*						PhysicalMesh;
 
-		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEArray<ZEExtraRenderParameters>	ExtraRenderParameters;
 
@@ -133,7 +133,7 @@ class ZEInteriorRoom
 		void								Deinitialize();
 
 		void								SetPersistentDraw(bool Enabled);
-		void								PreRender(const ZERNCullParameters* CullParameters);
+		void								PreRender(const ZERNPreRenderParameters* Parameters);
 		void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);

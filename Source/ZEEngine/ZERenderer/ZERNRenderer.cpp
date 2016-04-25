@@ -35,32 +35,42 @@
 
 #include "ZERNRenderer.h"
 
-#include "ZERNCuller.h"
 #include "ZERNStage.h"
 #include "ZERNCommand.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNRenderParameters.h"
-#include "ZEGame\ZEScene.h"
-#include "ZEGame\ZEEntity.h"
-#include "ZEGraphics\ZEGRShader.h"
-#include "ZEGraphics\ZEGRContext.h"
-#include "ZEGraphics\ZEGRViewport.h"
-#include "ZEGraphics\ZEGRTexture2D.h"
-#include "ZEGraphics\ZEGRRenderState.h"
-#include "ZEGraphics\ZEGRRenderTarget.h"
-#include "ZEGraphics\ZEGRGraphicsModule.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZEGraphics\ZEGRDepthStencilBuffer.h"
-#include "ZECore\ZECore.h"
+#include "ZECore/ZECore.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
 static ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
-	if (A->Priority < B->Priority)
+	if (A->SceneIndex < B->SceneIndex)
+	{
 		return -1;
-	else if (A->Priority > B->Priority)
+	}
+	else if (A->SceneIndex > B->SceneIndex)
+	{
 		return 1;
+	}
 	else
-		return (ZEInt)(A->Order - B->Order);
+	{
+		if (A->Priority < B->Priority)
+			return -1;
+		else if (A->Priority > B->Priority)
+			return 1;
+		else
+			return (ZEInt)(A->Order - B->Order);
+	}
 }
 
 void ZERNRenderer::UpdateConstantBuffers()
@@ -78,8 +88,8 @@ void ZERNRenderer::UpdateConstantBuffers()
 	Buffer->InvProjectionTransform = View.InvProjectionTransform;			
 	Buffer->InvViewProjectionTransform = View.InvViewProjectionTransform;
 
-	Buffer->Width = View.Viewport != NULL ? View.Viewport->GetWidth() : 0.0f;
-	Buffer->Height = View.Viewport != NULL ? View.Viewport->GetHeight() : 0.0f;
+	Buffer->Width = View.Viewport.GetWidth();
+	Buffer->Height = View.Viewport.GetHeight();
 	Buffer->VerticalFOV = View.VerticalFOV;
 	Buffer->HorizontalFOV = View.HorizontalFOV;
 	Buffer->AspectRatio = View.AspectRatio;
@@ -141,11 +151,9 @@ void ZERNRenderer::RenderStages()
 	Parameters.FrameId = 0;
 	Parameters.ElapsedTime = RendererConstants.Elapsedtime;
 	Parameters.Time = 0;
-	//Parameters.Scene = Scene;
 	Parameters.Context = Context;
 	Parameters.View = &View;
 	Parameters.Renderer = this;
-	Parameters.Type = ZERN_DT_NORMAL;
 
 	UpdateConstantBuffers();
 
@@ -156,7 +164,8 @@ void ZERNRenderer::RenderStages()
 
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, SceneConstantBuffer);
+	if (MainScene != NULL)
+		Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, MainScene->GetConstantBuffer());
 
 	if(OutputRenderTarget != NULL)
 	{
@@ -213,7 +222,6 @@ void ZERNRenderer::DeinitializeSelf()
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
-	SceneConstantBuffer.Release();
 }
 
 void ZERNRenderer::SetContext(ZEGRContext* Context)
@@ -235,6 +243,17 @@ const ZERNView& ZERNRenderer::GetView()
 {
 	return View;
 }
+
+void ZERNRenderer::SetMainScene(ZEScene* Scene)
+{
+	MainScene = Scene;
+}
+
+ZEScene* ZERNRenderer::GetMainScene()
+{
+	return MainScene;
+}
+
 
 void ZERNRenderer::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
 {
@@ -356,18 +375,6 @@ bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 	return false;
 }
 
-void ZERNRenderer::PreRenderScene(ZEScene* Scene)
-{
-	ZERNCullParameters CullParameters;
-	CullParameters.Renderer = this;
-	CullParameters.View = &View;
-
-	ZESceneCuller Culler;
-	Culler.SetScene(Scene);
-	Culler.SetCullParameters(CullParameters);
-	Culler.Cull();
-}
-
 void ZERNRenderer::Render(float ElapsedTime)
 {
 	if (!IsInitialized())
@@ -381,6 +388,7 @@ ZERNRenderer::ZERNRenderer()
 {
 	Context = NULL;
 	OutputRenderTarget = NULL;
+	MainScene = NULL;
 }
 
 ZERNRenderer::~ZERNRenderer()

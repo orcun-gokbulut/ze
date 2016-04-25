@@ -39,6 +39,13 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEViewVolume.h""
+
+#include "ZEATAstronomy.h"
+#include "ZEATSun.h"
+#include "ZEATMoon.h"
+#include "ZEATFog.h"
+#include "ZEATCloud.h"
+#include "ZEATSkyBox.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRSampler.h"
@@ -54,15 +61,8 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNStageGBuffer.h"
 #include "ZERenderer/ZELightDirectional.h"
-#include "ZEATAstronomy.h"
-#include "ZEATSun.h"
-#include "ZEATMoon.h"
-#include "ZEATFog.h"
-#include "ZEATCloud.h"
-#include "ZEATSkyBox.h"
 
 #define ZEAT_ADF_SHADERS			1
 #define ZEAT_ADF_RENDER_STATE		2
@@ -745,9 +745,9 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	ZEUInt SunsetMinute = (ZEUInt)(Sunset * 60.0) % 60;
 }
 
-bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
 	if (SunLight != NULL)
@@ -768,7 +768,7 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
 
-	CullParameters->Renderer->AddCommand(&Command);
+	Parameters->Renderer->AddCommand(&Command);
 
 	return true;
 }
@@ -779,7 +779,7 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	static bool Precomputed = false;
 	if(!Precomputed)

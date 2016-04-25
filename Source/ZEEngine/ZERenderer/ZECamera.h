@@ -55,12 +55,10 @@ typedef ZEFlags ZECameraSettingFlags;
 class ZECamera : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 		mutable ZERNView				View;
 
-		ZEGRViewport					Viewport;
 		ZEViewFrustum					ViewFrustum;
 		bool							AutoAspectRatio;
 

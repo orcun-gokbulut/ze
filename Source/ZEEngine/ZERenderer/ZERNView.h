@@ -45,10 +45,11 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPointer/ZEHolder.h"
 
-class ZEViewVolume;
+#include "ZEGraphics/ZEGRViewport.h"
+
 class ZEEntity;
-class ZEGROutput;
-class ZEGRConstantBuffer;
+class ZEViewVolume;
+
 ZE_META_FORWARD_DECLARE(ZEGRViewport, "ZEGRViewport.h");
 
 ZE_ENUM(ZERNViewType)
@@ -62,6 +63,7 @@ ZE_ENUM(ZERNViewType)
 
 ZE_ENUM(ZERNProjectionType)
 {
+	ZERN_PT_NONE,
 	ZERN_PT_PERSPECTIVE,
 	ZERN_PT_PERSPECTIVE_OFFCENTER,
 	ZERN_PT_ORTHOGONAL,
@@ -105,8 +107,10 @@ class ZERNView : public ZEObject
 		ZEVector3					U, V, N;
 
 		// Others
-		const ZEGRViewport*			Viewport;
+		ZEGRViewport				Viewport;
 		const ZEViewVolume*			ViewVolume;
+
+									ZERNView();
 };
 
 struct ZERNViewConstantBuffer

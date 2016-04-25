@@ -46,68 +46,71 @@
 
 ZE_META_FORWARD_DECLARE(ZEScene, "ZEGame/ZEScene.h");
 ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
+
 class ZERNCommand;
 class ZEGRContext;
 class ZEGRRenderTarget;
+class ZEGRConstantBuffer;
 
 class ZERNRenderer : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	private:
-		ZEGRContext*					Context;
-		ZERNView						View;
-		ZEGRRenderTarget*				OutputRenderTarget;
-		ZEHolder<ZEGRConstantBuffer>	ViewConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>	RendererConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>	SceneConstantBuffer;
-		ZEList2<ZERNStage>				Stages;
+		ZEGRContext*							Context;
+		ZERNView								View;
+		ZEGRRenderTarget*						OutputRenderTarget;
+		ZEHolder<ZEGRConstantBuffer>			ViewConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>			RendererConstantBuffer;
+		ZEList2<ZERNStage>						Stages;
+		ZEScene*								MainScene;
 
 		struct RendererConstants
 		{
-			float						Elapsedtime;
-			float						Time;
-			ZEUInt32					FrameId;
-			ZEUInt32					Reserved0;
-			ZEVector2					OutputSize;
-			ZEVector2					InvOutputSize;
-			ZEMatrix3x3Shader			ScreenTransform;
+			float								Elapsedtime;
+			float								Time;
+			ZEUInt32							FrameId;
+			ZEUInt32							Reserved0;
+			ZEVector2							OutputSize;
+			ZEVector2							InvOutputSize;
+			ZEMatrix3x3Shader					ScreenTransform;
 		} RendererConstants;
 
-		void							SortStageCommands();
-		void							RenderStage(ZERNStage* Queue);
-		void							RenderStages();
+		void									SortStageCommands();
+		void									RenderStage(ZERNStage* Queue);
+		void									RenderStages();
 
-		void							UpdateConstantBuffers();
+		void									UpdateConstantBuffers();
 
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
 
 	public:
-		void							SetContext(ZEGRContext* Context);
-		ZEGRContext*					GetContext();
+		void									SetContext(ZEGRContext* Context);
+		ZEGRContext*							GetContext();
 
-		void							SetView(const ZERNView& View);
-		const ZERNView&					GetView();
+		void									SetView(const ZERNView& View);
+		const ZERNView&							GetView();
 
-		void							SetOutputRenderTarget(ZEGRRenderTarget* Output);
-		ZEGRRenderTarget*				GetOutputRenderTarget();
+		void									SetMainScene(ZEScene* Scene);
+		ZEScene*								GetMainScene();
 
-		const ZEList2<ZERNStage>&		GetStages();
-		ZERNStage*						GetStage(ZERNStageID Id);
-		ZERNStage*						GetStage(ZEClass* Class);
-		void							AddStage(ZERNStage* Stage);
-		void							RemoveStage(ZERNStage* Stage);
-		void							CleanStages();
+		void									SetOutputRenderTarget(ZEGRRenderTarget* Output);
+		ZEGRRenderTarget*						GetOutputRenderTarget();
 
-		void							PreRenderScene(ZEScene* Scene);
+		const ZEList2<ZERNStage>&				GetStages();
+		ZERNStage*								GetStage(ZERNStageID Id);
+		ZERNStage*								GetStage(ZEClass* Class);
+		void									AddStage(ZERNStage* Stage);
+		void									RemoveStage(ZERNStage* Stage);
+		void									CleanStages();
 
-		void							AddCommand(ZERNCommand* Command);
-		void							RemoveCommand(ZERNCommand* Command);
-		void							CleanCommands();
-		bool							ContainsCommand(ZERNCommand* Command);
+		void									AddCommand(ZERNCommand* Command);
+		void									RemoveCommand(ZERNCommand* Command);
+		void									CleanCommands();
+		bool									ContainsCommand(ZERNCommand* Command);
 
-		void							Render(float ElapsedTime);
+		void									Render(float ElapsedTime);
 
-										ZERNRenderer();
-		virtual							~ZERNRenderer();
+												ZERNRenderer();
+		virtual									~ZERNRenderer();
 };

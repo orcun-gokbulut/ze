@@ -231,7 +231,6 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	View.NearZ = 0.1f;
 	View.FarZ = GetRange();
 
-	View.Viewport = NULL;
 	View.ViewVolume = &GetViewVolume();
 	View.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
 

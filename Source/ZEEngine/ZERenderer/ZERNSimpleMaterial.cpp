@@ -258,7 +258,7 @@ const ZERNMap& ZERNSimpleMaterial::GetTexture() const
 	return TextureMap;
 }
 
-bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -280,7 +280,7 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	return true;
 }
 
-void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
+void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
 {
 	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);

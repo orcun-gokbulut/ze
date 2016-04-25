@@ -42,13 +42,13 @@
 #include "ZEModel.h"
 #include "ZEModelMeshLOD.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNMaterial.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 #define ZEMD_MDF_LOCAL_TRANSFORM			0x0001
 #define ZEMD_MDF_INV_LOCAL_TRANSFORM		0x0002
@@ -731,19 +731,19 @@ bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& Poligon
 	return HaveIntersection;
 }
 
-bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!Visible)
 		return false;
 
-	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+	if (Parameters->View->ViewVolume != NULL && Parameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
 		return false;
 
 	ZEInt32 CurrentLOD = 0;
 	float DrawOrder = 0.0f;
 	float LODDistanceSquare = 0.0f;
 
-	float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	
+	float EntityDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldPosition());	
 	if (!DrawOrderIsUserDefined)
 		DrawOrder = EntityDistanceSquare;
 	else
@@ -774,7 +774,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	RenderCommand.Entity = Owner;
 	RenderCommand.ExtraParameters = MeshLOD;
 
-	CullParameters->Renderer->AddCommand(&RenderCommand);
+	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }

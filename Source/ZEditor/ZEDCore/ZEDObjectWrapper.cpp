@@ -230,7 +230,7 @@ void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 	Wrapper->SetParent(NULL);
 }
 
-void ZEDObjectWrapper::PreRender(const ZERNCullParameters* Parameters)
+void ZEDObjectWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 
 }

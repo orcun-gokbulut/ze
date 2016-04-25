@@ -38,6 +38,10 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
+
+#include "ZERNView.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNStageShadowmapGeneration.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
@@ -45,11 +49,6 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZERNCuller.h"
-#include "ZERNView.h"
-#include "ZERNRenderParameters.h"
-#include "ZERNStageShadowmapGeneration.h"
-#include "ZECamera.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -366,7 +365,6 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	View.U = GetWorldRight();
 	View.V = GetWorldUp();
 	View.N = GetWorldFront();
-	View.Viewport = NULL;
 
 	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{

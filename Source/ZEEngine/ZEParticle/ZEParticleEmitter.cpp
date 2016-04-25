@@ -35,17 +35,17 @@
 
 #include "ZEParticleEmitter.h"
 
+#include "ZERandom.h"
+#include "ZEMath/ZEAngle.h"
+
 #include "ZEParticleEffect.h"
 #include "ZEParticleModifier.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZERandom.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRStructuredBuffer.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNStageID.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
@@ -543,13 +543,13 @@ ZEParticleEmitter::~ZEParticleEmitter()
 
 }
 
-bool ZEParticleEmitter::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	RenderCommand.Entity = Owner;
 	RenderCommand.ExtraParameters = this;
 	RenderCommand.StageMask = Material->GetStageMask();
 
-	CullParameters->Renderer->AddCommand(&RenderCommand);
+	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }
@@ -560,7 +560,7 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 		return;
 
 	ZEGRContext* Context = RenderParameters->Context;
-	ZERNStage* Stage = RenderParameters->Stage;
+	const ZERNStage* Stage = RenderParameters->Stage;
 
 	if (!Material->SetupMaterial(Context, Stage))
 		return;

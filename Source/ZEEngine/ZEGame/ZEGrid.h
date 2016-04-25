@@ -112,7 +112,7 @@ class ZEGrid : public ZEEntity
 		void							SetAxisColor(const ZEVector3& Color);
 		const ZEVector3&				GetAxisColor();
 		
-		virtual	bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual	bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		
 		static ZEGrid*					CreateInstance();

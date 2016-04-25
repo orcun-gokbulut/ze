@@ -147,7 +147,7 @@ class ZELight : public ZEEntity
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
 		
-		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
