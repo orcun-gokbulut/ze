@@ -78,7 +78,7 @@ class ZERNStageHDR : public ZERNStage
 
 		ZEHolder<const ZEGRTexture2D>		InputTexture;
 		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
+		ZEHolder<const ZEGRTexture2D>		OutputTexture;
 
 		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexcoord;
 		ZEHolder<ZEGRShader>				CalculateLuminance_PixelShader;

@@ -46,6 +46,7 @@
 #include "ZEPointer/ZEHolder.h"
 
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZEMath/ZERay.h"
 
 class ZEEntity;
 class ZEViewVolume;
@@ -69,6 +70,34 @@ ZE_ENUM(ZERNProjectionType)
 	ZERN_PT_ORTHOGONAL,
 	ZERN_PT_ORTHOGONAL_OFFCENTER,
 	ZERN_PT_PARABOLOID
+};
+
+struct ZERNViewConstantBuffer
+{
+	ZEMatrix4x4						ViewTransform;
+	ZEMatrix4x4						ProjectionTransform;		
+	ZEMatrix4x4						ViewProjectionTransform;
+	ZEMatrix4x4						InvViewTransform;
+	ZEMatrix4x4						InvProjectionTransform;			
+	ZEMatrix4x4						InvViewProjectionTransform;
+
+	ZEVector3						Position;
+	float							Width;
+	ZEQuaternion					RotationQuaternion;
+	ZEVector3						RotationEuler;
+	float							Height;
+
+	ZEVector3						RightVector;
+	float							VerticalFOV;
+	ZEVector3						UpVector;
+	float							HorizontalFOV;
+	ZEVector3						FrontVector;
+	float							AspectRatio;
+
+	float							ShadowDistance;
+	float							ShadowFadeDistance;
+	float							NearZ;
+	float							FarZ;
 };
 
 class ZERNView : public ZEObject
@@ -113,30 +142,13 @@ class ZERNView : public ZEObject
 									ZERNView();
 };
 
-struct ZERNViewConstantBuffer
+class ZERNScreenUtilities
 {
-	ZEMatrix4x4						ViewTransform;
-	ZEMatrix4x4						ProjectionTransform;		
-	ZEMatrix4x4						ViewProjectionTransform;
-	ZEMatrix4x4						InvViewTransform;
-	ZEMatrix4x4						InvProjectionTransform;			
-	ZEMatrix4x4						InvViewProjectionTransform;
+	ZERay							ScreenToWorld(const ZERNView& View, const ZEVector2& ScreenCoords);
+	ZERay							ScreenToView(const ZERNView& View, const ZEVector2& ScreenCoords);
+	ZEVector2						ScreenToClip(const ZERNView& View, const ZEVector2& ScreenCoords);
 
-	ZEVector3						Position;
-	float							Width;
-	ZEQuaternion					RotationQuaternion;
-	ZEVector3						RotationEuler;
-	float							Height;
-
-	ZEVector3						RightVector;
-	float							VerticalFOV;
-	ZEVector3						UpVector;
-	float							HorizontalFOV;
-	ZEVector3						FrontVector;
-	float							AspectRatio;
-
-	float							ShadowDistance;
-	float							ShadowFadeDistance;
-	float							NearZ;
-	float							FarZ;
+	ZEVector2						WorldToScreen(const ZERNView& View, const ZEVector3& WorldCoords);
+	ZEVector2						ViewToScreen(const ZERNView& View, const ZEVector3& ViewCoords);
+	ZEVector2						ClipToScreen(const ZERNView& View, const ZEVector2& ClipCoords);
 };

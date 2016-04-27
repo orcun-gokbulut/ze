@@ -764,8 +764,8 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 		}
 	}
 
-	if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
-		return false;
+	/*if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
+		return false;*/
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
 	RenderCommand.Priority = 0;

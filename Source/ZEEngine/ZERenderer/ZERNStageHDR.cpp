@@ -171,27 +171,7 @@ bool ZERNStageHDR::UpdateInputOutput()
 	if (InputTexture == NULL)
 		return false;
 
-	ZEUInt Width = InputTexture->GetWidth();
-	ZEUInt Height = InputTexture->GetHeight();
-
-	if (Viewport.GetWidth() != Width || Viewport.GetHeight() != Height)
-		DirtyFlags.RaiseFlags(ZERN_HSDF_RESIZE);
-
-	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
-	if (OutputRenderTarget == NULL)
-	{
-		// No Provided Output - Create Own Buffer
-		if (OutputTexture == NULL || 
-			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-
-		OutputRenderTarget = OutputTexture->GetRenderTarget();
-	}
-	else
-	{
-		// Output is provided - Release own output texture and use provided one.
-		OutputTexture.Release();
-	}
+	BindOutput(ZERN_SO_COLOR, ZEGR_TF_R11G11B10_FLOAT, false, OutputTexture, OutputRenderTarget);
 
 	return true;
 }

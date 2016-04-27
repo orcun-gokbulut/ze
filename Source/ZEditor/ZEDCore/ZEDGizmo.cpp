@@ -52,7 +52,11 @@
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 
-void ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)
+#define ZED_GDF_GIZMO				0x01
+#define ZED_GDF_VERTEX_BUFFER		0x02
+#define ZED_GDF_CONSTANT_BUFFER		0x04
+
+bool ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)
 {
 	const ZEVector3& CameraPosition = View.Position;
 	const ZEQuaternion& CameraRotation = View.Rotation;
@@ -173,10 +177,10 @@ void ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)
 		GizmoTriangles.AddQuad(ZEVector3(0.0f, 0.0f, 0.0f), ZEVector3(0.0f, AxisLength_2, 0.0f), ZEVector3(0.0f, AxisLength_2, AxisLength_2), ZEVector3(0.0f, 0.0f, AxisLength_2));
 	}	
 
-	DirtyGizmoFlag = false;
+	return true;
 }
 
-void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
+bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 {
 	const ZEVector3& CameraPosition = View.Position;
 	const ZEQuaternion& CameraRotation = View.Rotation;
@@ -274,7 +278,7 @@ void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 
 		if (HoveredAxis == ZED_GA_X_AXIS || HoveredAxis == ZED_GA_XY_AXIS || HoveredAxis == ZED_GA_XZ_AXIS)
 		{
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 
@@ -288,7 +292,7 @@ void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 			if (Backface)
 				continue;
 
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 			Verts[0].Color = Verts[1].Color = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -310,7 +314,7 @@ void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 
 		if (HoveredAxis == ZED_GA_Y_AXIS || HoveredAxis == ZED_GA_XY_AXIS || HoveredAxis == ZED_GA_YZ_AXIS)
 		{
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 
@@ -324,7 +328,7 @@ void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 			if (Backface)
 				continue;
 
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 			Verts[0].Color = Verts[1].Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -347,7 +351,7 @@ void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 
 		if (HoveredAxis == ZED_GA_Z_AXIS || HoveredAxis == ZED_GA_XZ_AXIS || HoveredAxis == ZED_GA_YZ_AXIS)
 		{
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 
@@ -361,30 +365,21 @@ void ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 			if (Backface)
 				continue;
 
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 			Verts[0].Color = Verts[1].Color = ZEVector4(0.0f, 0.0f, 1.0f, 1.0f);
 		}
 	}
 
-	DirtyGizmoFlag = false;
+	return true;
 }
 
-void ZEDGizmo::UpdateScaleGizmo(const ZERNView& View)
+bool ZEDGizmo::UpdateScaleGizmo(const ZERNView& View)
 {
 	ZEVector3 CameraPosition = View.Position;
 	ZEQuaternion CameraRotation = View.Rotation;
 	ZEMatrix4x4 ProjectionTransform = View.ProjectionTransform;
-
-	/*ZEVector3 CameraPosition = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetWorldPosition();
-	ZEQuaternion CameraRotation = ZEDCore::GetInstance()->GetEditorModule()->GetScene()->GetActiveCamera()->GetWorldRotation();
-
-	static ZEVector3 OldCameraPosition = ZEVector3::Zero;
-	static ZEQuaternion OldCameraRotation = ZEQuaternion::Identity;
-
-	if (!DirtyGizmoFlag && CameraPosition == OldCameraPosition && CameraRotation == OldCameraRotation)
-		return;*/
 
 	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetPosition()) * ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
@@ -520,10 +515,10 @@ void ZEDGizmo::UpdateScaleGizmo(const ZERNView& View)
 		GizmoTriangles.AddTriangle(ZEVector3(AxisLength_2, 0.0f, 0.0f), ZEVector3(0.0f, AxisLength_2, 0.0f), ZEVector3(0.0f, 0.0f, AxisLength_2));
 	}
 
-	DirtyGizmoFlag = false;
+	return true;
 }
 
-void ZEDGizmo::UpdateHelperGizmo(const ZERNView& View)
+bool ZEDGizmo::UpdateHelperGizmo(const ZERNView& View)
 {
 	const ZEVector3& CameraPosition = View.Position;
 	const ZEQuaternion& CameraRotation = View.Rotation;
@@ -573,41 +568,87 @@ void ZEDGizmo::UpdateHelperGizmo(const ZERNView& View)
 	GizmoLines.AddLine(ZEVector3(-0.25f, 0.5f, 0.0f), ZEVector3(0.25f, 0.5f, 0.0f));
 	GizmoLines.AddLine(ZEVector3(0.25f, 0.5f, 0.0f), ZEVector3(-0.25f, -0.5f, 0.0f));
 	GizmoLines.AddLine(ZEVector3(-0.25f, -0.5f, 0.0f), ZEVector3(0.25f, -0.5f, 0.0f));
+
+	return true;
 }
 
-void ZEDGizmo::UpdateGizmo(const ZERNView& View)
+bool ZEDGizmo::UpdateGizmo(const ZERNView& View)
 {
+	/*if (!DirtyGizmoFlags.GetFlags(ZED_GDF_GIZMO))
+		return true;*/
+
 	switch(Mode)
 	{
 		case ZED_GM_MOVE:
-			UpdateMoveGizmo(View);
+			if (!UpdateMoveGizmo(View))
+				return false;
 			break;
 
 		case ZED_GM_ROTATE:
-			UpdateRotateGizmo(View);
+			if (!UpdateRotateGizmo(View))
+				return false;
 			break;
 
 		case ZED_GM_SCALE:
-			UpdateScaleGizmo(View);
+			if (!UpdateScaleGizmo(View))
+				return false;
 			break;
 
 		case ZED_GM_HELPER:
-			UpdateHelperGizmo(View);
+			if (!UpdateHelperGizmo(View))
+				return false;
 			break;
 	}
+
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_VERTEX_BUFFER);
+	DirtyGizmoFlags.UnraiseFlags(ZED_GDF_GIZMO);
+}
+	
+bool ZEDGizmo::UpdateVertexBuffer()
+{
+	if (!DirtyGizmoFlags.GetFlags(ZED_GDF_VERTEX_BUFFER))
+		return true;
 
 	ZESize VertexBufferSize = GizmoLines.GetBufferSize() + GizmoTriangles.GetBufferSize();
 	if (VertexBuffer.IsNull() ||
 		VertexBuffer->GetSize() < VertexBufferSize)
 	{
 		VertexBuffer = ZEGRVertexBuffer::Create(VertexBufferSize / sizeof(ZECanvasVertex), sizeof(ZECanvasVertex));
+		if (VertexBuffer.IsNull())
+			return false;
 	}
 
 	void* Buffer;
 	VertexBuffer->Lock(&Buffer);
-		memcpy(Buffer, GizmoLines.GetVertexBuffer(), GizmoLines.GetBufferSize());
-		memcpy((ZEBYTE*)Buffer + GizmoLines.GetBufferSize(), GizmoTriangles.GetVertexBuffer(), GizmoTriangles.GetBufferSize());
+		memcpy(Buffer, GizmoLines.GetBuffer(), GizmoLines.GetBufferSize());
+		memcpy((ZEBYTE*)Buffer + GizmoLines.GetBufferSize(), GizmoTriangles.GetBuffer(), GizmoTriangles.GetBufferSize());
 	VertexBuffer->Unlock();
+
+	DirtyGizmoFlags.UnraiseFlags(ZED_GDF_VERTEX_BUFFER);
+
+	return true;
+}
+
+bool ZEDGizmo::UpdateConstantBuffer()
+{
+	if (!DirtyGizmoFlags.GetFlags(ZED_GDF_CONSTANT_BUFFER))
+		return true;
+
+	ConstantBuffer->SetData(&GetWorldTransform());
+	DirtyGizmoFlags.UnraiseFlags(ZED_GDF_CONSTANT_BUFFER);
+
+	return true;
+}
+
+bool ZEDGizmo::Update()
+{
+	if (!UpdateConstantBuffer())
+		return false;
+
+	if (!UpdateVertexBuffer())
+		return false;
+
+	return true;
 }
 
 ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray)
@@ -1004,22 +1045,9 @@ ZEDGizmoAxis ZEDGizmo::PickScaleAxis(const ZERNView& View, const ZERay& Ray, flo
 	return PickedAxis;
 }
 
-void ZEDGizmo::SetPosition(const ZEVector3& NewPosition)
+ZEDrawFlags ZEDGizmo::GetDrawFlags() const
 {
-	OldPosition = GetPosition();
-
-	if (Mode == ZED_GM_ROTATE)
-		DirtyGizmoFlag = true;
-
-	ZEEntity::SetPosition(NewPosition);
-}
-
-void ZEDGizmo::SetRotation(const ZEQuaternion& NewRotation)
-{
-	if (Mode == ZED_GM_ROTATE)
-		DirtyGizmoFlag = true;
-
-	ZEEntity::SetRotation(NewRotation);
+	return ZE_DF_DRAW;
 }
 
 void ZEDGizmo::SetMode(ZEDGizmoMode Mode)
@@ -1028,7 +1056,8 @@ void ZEDGizmo::SetMode(ZEDGizmoMode Mode)
 		return;
 
 	this->Mode = Mode;
-	DirtyGizmoFlag = true;
+
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_GIZMO);
 }
 
 ZEDGizmoMode ZEDGizmo::GetMode()
@@ -1036,14 +1065,19 @@ ZEDGizmoMode ZEDGizmo::GetMode()
 	return Mode;
 }
 
-void ZEDGizmo::SetHoveredAxis(ZEDGizmoAxis GizmoAxis)
+void ZEDGizmo::SetVisible(bool Visibility)
 {
-	if (HoveredAxis == GizmoAxis)
+	ZEEntity::SetVisible(Visibility);
+}
+
+void ZEDGizmo::SetHoveredAxis(ZEDGizmoAxis Axis)
+{
+	if (HoveredAxis == Axis)
 		return;
 
-	HoveredAxis = GizmoAxis;
+	HoveredAxis = Axis;
 
-	DirtyGizmoFlag = true;
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_GIZMO);
 }
 
 ZEDGizmoAxis ZEDGizmo::GetHoveredAxis()
@@ -1051,14 +1085,14 @@ ZEDGizmoAxis ZEDGizmo::GetHoveredAxis()
 	return HoveredAxis;
 }
 
-void ZEDGizmo::SetSelectedAxis(ZEDGizmoAxis GizmoAxis)
+void ZEDGizmo::SetSelectedAxis(ZEDGizmoAxis Axis)
 {
-	if (SelectedAxis == GizmoAxis)
+	if (SelectedAxis == Axis)
 		return;
 
-	this->SelectedAxis = GizmoAxis;
+	SelectedAxis = Axis;
 
-	DirtyGizmoFlag = true;
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_GIZMO);
 }
 
 ZEDGizmoAxis ZEDGizmo::GetSelectedAxis()
@@ -1068,8 +1102,12 @@ ZEDGizmoAxis ZEDGizmo::GetSelectedAxis()
 
 void ZEDGizmo::SetAxisLength(float Size)
 {
+	if (AxisLength == Size)
+		return;
+
 	AxisLength = Size;
-	DirtyGizmoFlag = true;
+
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_GIZMO);
 }
 
 float ZEDGizmo::GetAxisLength()
@@ -1082,19 +1120,27 @@ bool ZEDGizmo::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
+	DirtyGizmoFlags.RaiseAll();
+
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
 	MaterialLines = ZERNSimpleMaterial::CreateInstance();
 	MaterialLines->SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	MaterialLines->SetDepthTestDisabled(true);
 
 	MaterialTriangles = ZERNSimpleMaterial::CreateInstance();
-	MaterialLines->SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+	MaterialTriangles->SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+	MaterialTriangles->SetDepthTestDisabled(true);
+
+	RenderCommand.StageMask = MaterialLines->GetStageMask();
 
 	return true;
 }
 
 bool ZEDGizmo::DeinitializeSelf()
 {	
+	GizmoLines.Clean();
+	GizmoTriangles.Clean();
 	VertexBuffer.Release();
 	ConstantBuffer.Release();
 	MaterialLines.Release();
@@ -1105,26 +1151,58 @@ bool ZEDGizmo::DeinitializeSelf()
 
 void ZEDGizmo::LocalTransformChanged()
 {
-	ConstantBuffer->SetData(&GetWorldTransform());
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_CONSTANT_BUFFER);
+	ZEEntity::LocalTransformChanged();
+}
+
+void ZEDGizmo::ParentTransformChanged()
+{
+	DirtyGizmoFlags.RaiseFlags(ZED_GDF_CONSTANT_BUFFER);
+	ZEEntity::ParentTransformChanged();
+
 }
 
 bool ZEDGizmo::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!ZEEntity::PreRender(Parameters))
 		return true;
+	
+	if (!UpdateGizmo(*Parameters->View))
+		return false;
 
+	if (!Update())
+		return false;
+	
 	Parameters->Renderer->AddCommand(&RenderCommand);
 	return true;
 }
 
 void ZEDGizmo::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
-	UpdateGizmo(*Parameters->View);
+	if (GizmoLines.GetBufferSize() == 0 && GizmoTriangles.GetBufferSize() == 0)
+		return;
 
 	ZEGRContext* Context = Parameters->Context;
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->Draw(0, GizmoLines.GetBufferSize() / sizeof(ZECanvasVertex));
-	Context->Draw(GizmoLines.GetBufferSize() / sizeof(ZECanvasVertex), GizmoTriangles.GetBufferSize() / sizeof(ZECanvasVertex));
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	
+	if (GizmoLines.GetBufferSize() != 0)
+	{
+		if (!MaterialLines->SetupMaterial(Context, Parameters->Stage))
+			return;
+
+		Context->Draw(GizmoLines.GetVertexCount(), 0);
+		MaterialLines->CleanupMaterial(Context, Parameters->Stage);
+	}
+
+	if (GizmoTriangles.GetBufferSize() != 0)
+	{
+		if (!MaterialTriangles->SetupMaterial(Context, Parameters->Stage))
+			return;
+
+		Context->Draw(GizmoTriangles.GetVertexCount(), GizmoLines.GetVertexCount());
+		MaterialTriangles->CleanupMaterial(Context, Parameters->Stage);
+	}
 }
 
 ZEDGizmoAxis ZEDGizmo::PickAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
@@ -1179,7 +1257,7 @@ ZEVector3 ZEDGizmo::ScaleProjection(const ZERNView& View, const ZERay& Ray)
 
 ZEDGizmo::ZEDGizmo()
 {
-	DirtyGizmoFlag = true;
+	DirtyGizmoFlags.RaiseAll();
 	HoveredAxis = ZED_GA_NONE;
 	SelectedAxis = ZED_GA_NONE;
 	Mode = ZED_GM_NONE;

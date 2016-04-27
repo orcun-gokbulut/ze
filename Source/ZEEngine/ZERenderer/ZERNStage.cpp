@@ -83,11 +83,12 @@ bool ZERNStage::BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothW
 	}
 
 	const ZEGRRenderTarget* OriginalRenderTarget = GetRenderer()->GetOutputRenderTarget();
-	if (Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
+	if (Buffer == NULL ||
+		Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
 		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
 	{
-		Buffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_RENDER_TARGET).GetPointer();
-		Target = ProvidedRenderTarget;
+		Buffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_RENDER_TARGET).GetPointer();
+		Target = Buffer->GetRenderTarget();
 	}
 
 	return true;

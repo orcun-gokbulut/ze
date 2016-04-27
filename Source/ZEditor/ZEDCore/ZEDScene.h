@@ -63,7 +63,7 @@ class ZEDScene : public ZEScene
 		virtual void						Deinitialize();
 											
 		virtual void						Tick(float ElapsedTime);
-		virtual void						Render(float ElapsedTime);
+		virtual void						PreRender(ZERNRenderer* Renderer);
 		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEDScene*					CreateInstance();

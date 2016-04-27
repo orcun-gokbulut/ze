@@ -116,9 +116,6 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (!Update())
 		return false;
 
-	if (ColorBuffer != NULL)
-		Context->ClearRenderTarget(ColorRenderTarget, ZEVector4(0.0f, 0.0f, 0.0f, 1.0f));
-
 	Context->SetRenderTargets(1, ColorRenderTarget.GetPointerToPointer(), DepthStencilBuffer);
 	Context->SetViewports(1, &Viewport);
 

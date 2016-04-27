@@ -37,6 +37,11 @@
 
 #include "ZEDViewport.h"
 
+const ZEArray<ZEDViewport*> ZEDViewportManager::GetViewports()
+{
+	return Viewports;
+}
+
 void ZEDViewportManager::RegisterViewport(ZEDViewport* Viewport)
 {
 	if (Viewports.Exists(Viewport))

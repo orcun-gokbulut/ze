@@ -78,6 +78,23 @@ void ZEDModule::Process(float ElapsedTime)
 
 void ZEDModule::PostProcess(float ElapsedTime)
 {
+	ZEArray<ZEDViewport*> Viewports = ViewportManager->GetViewports();
+	for (ZESize I = 0; I < Viewports.GetCount(); I++)
+	{
+		if (!Viewports[I]->PreRender())
+			continue;
+
+		ZERNRenderer* Renderer = Viewports[I]->GetRenderer();
+
+		Renderer->StartScene(Scene->GetConstantBuffer());
+		Scene->PreRender(Renderer);
+		Renderer->EndScene();
+
+		Renderer->StartScene(NULL);
+		SceneWrapper->PreRender(Renderer);
+		Renderer->EndScene();	
+	}
+
 	ViewportManager->Render();
 }
 
@@ -109,14 +126,24 @@ void ZEDModule::StartUp()
 	//Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
 	//Trial2->SetUserDefinedBoundingBoxEnabled(true);
 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
-	//Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	ZEDEntityWrapper* Trial2Wrapper = ZEDEntityWrapper::CreateInstance();
 	Trial2Wrapper->SetObject(Trial2);
 	SceneWrapper->AddChildWrapper(Trial2Wrapper);
 
+	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
+	ZEDEntityWrapper* Light1Wrapper = ZEDEntityWrapper::CreateInstance();
+	Light1->SetIntensity(1.0f);
+	Light1->SetColor(ZEVector3::One);
+	Light1Wrapper->SetObject(Light1);
+	SceneWrapper->AddChildWrapper(Light1Wrapper);
+
+	Scene->SetAmbientColor(ZEVector3::One);
+	Scene->SetAmbientFactor(0.2f);
+	
+
 	ZEDGizmo* Gizmo = ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo();
 	Gizmo->SetMode(ZED_GM_HELPER);
-	Gizmo->SetVisible(false);
 	ZEDEntityWrapper* GizmoWrapper = ZEDEntityWrapper::CreateInstance();
 	GizmoWrapper->SetObject(Gizmo);
 	GizmoWrapper->SetSelectable(false);

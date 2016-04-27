@@ -182,12 +182,12 @@ bool ZEDViewport::InitializeSelf()
 	StageHDR->SetSaturation(0.700000);
 	Renderer.AddStage(StageHDR);
 
-	/*
+	
 	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
 	Renderer.AddStage(StageAntiAliasing);
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
-	Renderer.AddStage(Stage2D);*/
+	Renderer.AddStage(Stage2D);
 
 	ZERNStageOutput* StageOutput = new ZERNStageOutput();
 	Renderer.AddStage(StageOutput);
@@ -738,6 +738,11 @@ void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 	QFrame::focusOutEvent(Event);
 }
 
+ZERNRenderer* ZEDViewport::GetRenderer()
+{
+	return &Renderer;
+}
+
 const ZERNView& ZEDViewport::GetView()
 {
 	return View;
@@ -806,29 +811,34 @@ float ZEDViewport::GetVerticalFOV()
 	return VerticalFOV;
 }
 
-void ZEDViewport::Render()
+bool ZEDViewport::PreRender()
 {
 	if (!isVisible())
-		return;
+		return false;
 
 	if (Window == NULL)
-		return;
+		return false;
 
 	ZEGROutput* Output = Window->GetOutput();
 	if (Output == NULL)
-		return;
+		return false;
 
 	ZEGRRenderTarget* RenderTarget = Output->GetRenderTarget();
 	if (RenderTarget == NULL)
-		return;
+		return false;
 
 	if (!Update())
-		return;
+		return false;
 
+	Renderer.SetOutputRenderTarget(RenderTarget);
 	Renderer.SetView(View);
-	Renderer.SetMainScene(Scene);
-	Scene->PreRender(&Renderer);
-	Renderer.Render(0.0f);
+
+	return true;
+}
+
+void ZEDViewport::Render()
+{
+	Renderer.Render();
 }
 
 void ZEDViewport::Present()

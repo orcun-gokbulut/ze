@@ -287,7 +287,7 @@ void ZEGizmo::UpdateRotateGizmo()
 		
 		if (HoveredAxis == ZE_GA_X_AXIS || HoveredAxis == ZE_GA_XY_AXIS || HoveredAxis == ZE_GA_XZ_AXIS)
 		{
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 
@@ -301,7 +301,7 @@ void ZEGizmo::UpdateRotateGizmo()
 			if (Backface)
 				continue;
 
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 			Verts[0].Color = Verts[1].Color = ZEVector4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -323,7 +323,7 @@ void ZEGizmo::UpdateRotateGizmo()
 		
 		if (HoveredAxis == ZE_GA_Y_AXIS || HoveredAxis == ZE_GA_XY_AXIS || HoveredAxis == ZE_GA_YZ_AXIS)
 		{
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 
@@ -337,7 +337,7 @@ void ZEGizmo::UpdateRotateGizmo()
 			if (Backface)
 				continue;
 
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 			Verts[0].Color = Verts[1].Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
@@ -360,7 +360,7 @@ void ZEGizmo::UpdateRotateGizmo()
 		
 		if (HoveredAxis == ZE_GA_Z_AXIS || HoveredAxis == ZE_GA_XZ_AXIS || HoveredAxis == ZE_GA_YZ_AXIS)
 		{
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 
@@ -374,7 +374,7 @@ void ZEGizmo::UpdateRotateGizmo()
 			if (Backface)
 				continue;
 
-			ZECanvasVertex* Verts = GizmoLines.Vertices.MassAdd(2);
+			ZECanvasVertex* Verts = GizmoLines.AddVertices(2);
 			Verts[0].Position = LineStart;
 			Verts[1].Position = LineEnd;
 			Verts[0].Color = Verts[1].Color = ZEVector4(0.0f, 0.0f, 1.0f, 1.0f);

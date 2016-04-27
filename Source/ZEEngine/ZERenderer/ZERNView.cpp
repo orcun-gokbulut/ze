@@ -70,3 +70,67 @@ ZERNView::ZERNView()
 	
 	ViewVolume = NULL;
 }
+
+
+ZERay ZERNScreenUtilities::ScreenToWorld(const ZERNView& View, const ZEVector2& ScreenCoords)
+{
+	ZEVector4 ClipCoords = ZEVector4(ScreenToClip(View, ScreenCoords), 0.0f, 1.0f);
+	ZEVector4 Vector;
+	ZEMatrix4x4::Transform(Vector, View.InvProjectionTransform, ClipCoords);
+
+	ZERay Ray;
+	Ray.p = View.Position;
+	Ray.v = Vector.ToVector3().Normalize();
+
+	return Ray;
+}
+
+ZERay ZERNScreenUtilities::ScreenToView(const ZERNView& View, const ZEVector2& ScreenCoords)
+{
+	ZEVector4 ClipCoords = ZEVector4(ScreenToClip(View, ScreenCoords), 0.0f, 1.0f);
+	ZEVector4 Vector;
+	ZEMatrix4x4::Transform(Vector, View.InvViewProjectionTransform, ClipCoords);
+
+	ZERay Ray;
+	Ray.p = View.Position;
+	Ray.v = Vector.ToVector3().Normalize();
+	
+	return Ray;
+}
+
+ZEVector2 ZERNScreenUtilities::ScreenToClip(const ZERNView& View, const ZEVector2& ScreenCoords)
+{
+	ZEVector2 ClipCoords;
+
+	ClipCoords.x = 2.0f * (ScreenCoords.x - View.Viewport.GetX()) / View.Viewport.GetWidth() - 1.0f;
+	ClipCoords.y = 1.0f - 2.0f * (ScreenCoords.y - View.Viewport.GetY()) / View.Viewport.GetHeight();
+
+	return ClipCoords;
+}
+
+ZEVector2 ZERNScreenUtilities::WorldToScreen(const ZERNView& View, const ZEVector3& WorldCoords)
+{
+	return ViewToScreen(View, View.ViewTransform * WorldCoords);
+}
+
+ZEVector2 ZERNScreenUtilities::ViewToScreen(const ZERNView& View, const ZEVector3& ViewCoords)
+{
+	ZEVector4 Output4;
+	ZEMatrix4x4::Transform(Output4, View.ViewProjectionTransform, ZEVector4(ViewCoords, 1.0f));
+	
+	ZEVector2 ClipCoords;
+	ClipCoords.x = Output4.x / Output4.w;
+	ClipCoords.y = Output4.y / Output4.w;
+
+	return ClipToScreen(View, ClipCoords);
+}
+
+ZEVector2 ZERNScreenUtilities::ClipToScreen(const ZERNView& View, const ZEVector2& ClipCoords)
+{
+	ZEVector2 ScreenCoords;
+
+	ScreenCoords.x = View.Viewport.GetX() + (ClipCoords.x + 1.0f) * (View.Viewport.GetWidth() / 2.0f);
+	ScreenCoords.y = View.Viewport.GetY() + (1.0f - ClipCoords.y) * (View.Viewport.GetHeight() / 2.0f);
+
+	return ScreenCoords;
+}

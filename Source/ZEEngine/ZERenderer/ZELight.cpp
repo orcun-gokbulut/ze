@@ -273,7 +273,7 @@ void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 {
 	ShadowRenderer.SetContext(Parameters->Context);
 	GetOwnerScene()->PreRender(&ShadowRenderer);
-	ShadowRenderer.Render(0.0f);
+	ShadowRenderer.Render();
 }
 
 ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution)
