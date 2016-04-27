@@ -70,12 +70,12 @@ class ZERNView;
 class ZEDGizmo : public ZEEntity
 {
 	private:
-		bool							DirtyGizmoFlag;
-		float							AxisLength;
+		ZEFlags							DirtyGizmoFlags;
 
 		ZEDGizmoMode					Mode;
 		ZEDGizmoAxis					HoveredAxis;
 		ZEDGizmoAxis					SelectedAxis;
+		float							AxisLength;
 
 		ZEVector3						MoveDifference;
 		ZEQuaternion					InitialRotation;
@@ -102,26 +102,33 @@ class ZEDGizmo : public ZEEntity
 		ZEQuaternion					RotationProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray);
 		ZEVector3						ScaleProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray);
 
-		void							UpdateMoveGizmo(const ZERNView& View);
-		void							UpdateRotateGizmo(const ZERNView& View);
-		void							UpdateScaleGizmo(const ZERNView& View);
-		void							UpdateHelperGizmo(const ZERNView& View);				 
-		void							UpdateGizmo(const ZERNView& View);		 
+		bool							UpdateMoveGizmo(const ZERNView& View);
+		bool							UpdateRotateGizmo(const ZERNView& View);
+		bool							UpdateScaleGizmo(const ZERNView& View);
+		bool							UpdateHelperGizmo(const ZERNView& View);				 
+		bool							UpdateGizmo(const ZERNView& View);
+
+		bool							UpdateConstantBuffer();
+		bool							UpdateVertexBuffer();
+		bool							UpdateMaterials();
+		bool							Update();
 
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
 		virtual void					LocalTransformChanged();
+		virtual void					ParentTransformChanged();
 
 										ZEDGizmo();
 
 	public:
-		virtual void					SetPosition(const ZEVector3& NewPosition);
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-	
+		ZEDrawFlags						GetDrawFlags() const;
+
 		void							SetMode(ZEDGizmoMode Mode);
 		ZEDGizmoMode					GetMode();
 	
+				virtual void							SetVisible(bool Visibility);
+
 		void							SetHoveredAxis(ZEDGizmoAxis HoveredAxis);
 		ZEDGizmoAxis					GetHoveredAxis();
 

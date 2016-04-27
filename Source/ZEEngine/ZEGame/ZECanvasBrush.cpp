@@ -63,10 +63,10 @@ ZECanvas* ZECanvasBrush::GetCanvas()
 
 void ZECanvasBrush::UpdateCanvas()
 {
-	if (OldVertexCount != Canvas.Vertices.GetCount())
+	if (OldVertexCount != Canvas.GetVertexCount())
 	{
-		OldVertexCount = Canvas.Vertices.GetCount();
-		VertexBuffer = VertexBuffer->Create(Canvas.GetBufferSize() / sizeof(ZECanvasVertex), sizeof(ZECanvasVertex));
+		OldVertexCount = Canvas.GetVertexCount();
+		VertexBuffer = VertexBuffer->Create(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
 		if (VertexBuffer != NULL)
 			zeCriticalError("Can not create Static Vertex Buffer.");
 	}
@@ -78,7 +78,7 @@ void ZECanvasBrush::UpdateCanvas()
 		return;
 	}
 
-	memcpy(Buffer, Canvas.GetVertexBuffer(), Canvas.GetBufferSize());
+	memcpy(Buffer, Canvas.GetBuffer(), Canvas.GetBufferSize());
 	VertexBuffer->Unlock();
 	
 	ZEAABBox BoundingBox;

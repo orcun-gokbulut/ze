@@ -282,7 +282,6 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* St
 
 void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
 	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
@@ -290,9 +289,14 @@ void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* 
 
 bool ZERNSimpleMaterial::Update()
 {
-	UpdateShaders();
-	UpdateRenderState();
-	UpdateConstantBuffer();
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderState())
+		return false;
+
+	if (!UpdateConstantBuffer())
+		return false;
 
 	return true;
 }

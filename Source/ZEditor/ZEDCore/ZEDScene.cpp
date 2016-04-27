@@ -40,6 +40,8 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEDTransformationManager.h"
 #include "ZEDGizmo.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 void ZEDScene::Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime)
 {
@@ -118,27 +120,24 @@ void ZEDScene::Tick(float ElapsedTime)
 		Tick(Wrappers[I], ElapsedTime);
 }
 
-void ZEDScene::Render(float ElapsedTime)
+void ZEDScene::PreRender(ZERNRenderer* Renderer)
 {
-	ZEDScene::Render(ElapsedTime);
+	ZEScene::PreRender(Renderer);
 
-	/*if (GetActiveCamera() == NULL)
-		return;
-
-	ZEScene::Render(ElapsedTime);
-
-	ZEDrawParameters* Parameters = GetRenderer()->GetDrawParameters();
+	ZERNPreRenderParameters Parameters;
+	Parameters.Renderer = Renderer;
+	Parameters.View = &Renderer->GetView();
 
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
-		Wrappers[I]->Draw(Parameters);
+		Wrappers[I]->PreRender(&Parameters);
 
 		const ZEArray<ZEDObjectWrapper*>& Children = Wrappers[I]->GetChildWrappers();
 		for (ZESize J = 0; J < Children.GetCount(); J++)
-			Children[J]->Draw(Parameters);
+			Children[J]->PreRender(&Parameters);
 	}
 
-	ZEDTransformationManager::GetInstance()->GetGizmo()->Draw(Parameters);*/
+	ZEDTransformationManager::GetInstance()->GetGizmo()->PreRender(&Parameters);
 }
 
 bool ZEDScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

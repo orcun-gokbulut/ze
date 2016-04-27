@@ -62,7 +62,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEHolder<ZEGRConstantBuffer>			ViewConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>			RendererConstantBuffer;
 		ZEList2<ZERNStage>						Stages;
-		ZEScene*								MainScene;
+		ZEArray<ZEHolder<const ZEGRConstantBuffer>> SceneConstants;
 
 		struct RendererConstants
 		{
@@ -91,9 +91,6 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void									SetView(const ZERNView& View);
 		const ZERNView&							GetView();
 
-		void									SetMainScene(ZEScene* Scene);
-		ZEScene*								GetMainScene();
-
 		void									SetOutputRenderTarget(ZEGRRenderTarget* Output);
 		ZEGRRenderTarget*						GetOutputRenderTarget();
 
@@ -104,12 +101,15 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		void									RemoveStage(ZERNStage* Stage);
 		void									CleanStages();
 
+		void									StartScene(const ZEGRConstantBuffer* ConstantBuffer);
+		void									EndScene();
+
 		void									AddCommand(ZERNCommand* Command);
 		void									RemoveCommand(ZERNCommand* Command);
 		void									CleanCommands();
 		bool									ContainsCommand(ZERNCommand* Command);
 
-		void									Render(float ElapsedTime);
+		void									Render();
 
 												ZERNRenderer();
 		virtual									~ZERNRenderer();

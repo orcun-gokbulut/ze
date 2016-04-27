@@ -114,6 +114,7 @@ class ZEDViewport : public QFrame, public ZEInitializable
 		ZEScene*							GetScene();
 
 		void								Tick();
+		bool								PreRender();
 		void								Render();
 		void								Present();
 

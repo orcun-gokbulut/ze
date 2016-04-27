@@ -41,7 +41,7 @@
 class ZEDSceneWrapper : public ZEDObjectWrapper
 {
 	private:
-		ZEArray<ZEDEntityWrapper>				Wrappers;
+		ZEArray<ZEDEntityWrapper*>				Wrappers;
 
 		virtual void							PreRender(ZERNRenderer* Renderer, ZEDEntityWrapper* Wrapper);
 		void									UpdateWrappers();

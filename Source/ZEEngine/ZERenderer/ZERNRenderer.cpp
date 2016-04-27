@@ -164,8 +164,6 @@ void ZERNRenderer::RenderStages()
 
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
-	if (MainScene != NULL)
-		Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, MainScene->GetConstantBuffer());
 
 	if(OutputRenderTarget != NULL)
 	{
@@ -184,8 +182,15 @@ void ZERNRenderer::RenderStages()
 			continue;
 
 		Parameters.Stage = Stage.GetPointer();
+		ZEInt LastSceneIndex = -1;
 		ze_for_each(Command, Stage->Commands)
 		{
+			if (Command->SceneIndex != LastSceneIndex)
+			{
+				Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, SceneConstants[Command->SceneIndex]);
+				LastSceneIndex = Command->SceneIndex;
+			}
+
 			Parameters.Command = Command.GetPointer();
 			Command->Execute(&Parameters);
 		}
@@ -243,17 +248,6 @@ const ZERNView& ZERNRenderer::GetView()
 {
 	return View;
 }
-
-void ZERNRenderer::SetMainScene(ZEScene* Scene)
-{
-	MainScene = Scene;
-}
-
-ZEScene* ZERNRenderer::GetMainScene()
-{
-	return MainScene;
-}
-
 
 void ZERNRenderer::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
 {
@@ -324,8 +318,20 @@ void ZERNRenderer::CleanStages()
 	}
 }
 
+void ZERNRenderer::StartScene(const ZEGRConstantBuffer* ConstantBuffer)
+{
+	SceneConstants.Add(ConstantBuffer);
+}
+
+void ZERNRenderer::EndScene()
+{
+
+}
+
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
+	Command->SceneIndex = SceneConstants.GetCount() - 1;
+
 	ze_for_each(Stage, Stages)
 	{
 		if ((Command->StageMask & Stage->GetId()) == 0)
@@ -357,6 +363,7 @@ void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
 
 void ZERNRenderer::CleanCommands()
 {
+	SceneConstants.Clear();
 	ze_for_each(Stage, Stages)
 		Stage->Commands.Clean();
 }
@@ -375,7 +382,7 @@ bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 	return false;
 }
 
-void ZERNRenderer::Render(float ElapsedTime)
+void ZERNRenderer::Render()
 {
 	if (!IsInitialized())
 		return;
@@ -388,7 +395,6 @@ ZERNRenderer::ZERNRenderer()
 {
 	Context = NULL;
 	OutputRenderTarget = NULL;
-	MainScene = NULL;
 }
 
 ZERNRenderer::~ZERNRenderer()

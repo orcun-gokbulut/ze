@@ -35,8 +35,10 @@
 
 #include "ZEDSceneWrapper.h"
 
-#include "ZEGame/ZEEntity.h"
 #include "ZEDEntityWrapper.h"
+#include "ZEGame/ZEEntity.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer, ZEDEntityWrapper* Wrapper)
 {
@@ -148,6 +150,11 @@ void ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 
 void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer)
 {
-	
+	ZERNPreRenderParameters Parameters;
+	Parameters.Renderer = Renderer;
+	Parameters.View = &Renderer->GetView();
+
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+		Wrappers[I]->PreRender(&Parameters);
 }
 

@@ -51,10 +51,9 @@
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
 
-/*ZE_ATTRIBUTE_0(ObjectClass)*/
 class ZEDObjectWrapper : public ZEObject
 {
-/*	ZE_OBJECT*/
+	//ZE_OBJECT
 	protected:
 		ZEObject*							Object;
 		ZEDObjectWrapper*					Parent;
@@ -68,20 +67,6 @@ class ZEDObjectWrapper : public ZEObject
 
 											ZEDObjectWrapper();
 		virtual								~ZEDObjectWrapper();
-
- 	//public slots:
- 	//	virtual void						OnSelected();
- 	//	virtual void						OnDeselected();
- 	//	virtual void						OnCreated();
- 	//	virtual void						OnDestroy();
- 	//	virtual void						OnTransformed();
- 	//	virtual void						OnChildObjectChanged();
- 	//	virtual void						OnParentObjectChanged();
- 	//	virtual void						OnOpenContainer();
- 	//	virtual void						OnCloseContainer();
-
- 	//	virtual void						Save();
- 	//	virtual void						Load();
 
 	public:
 		virtual void						SetObject(ZEObject* Object);
@@ -126,7 +111,7 @@ class ZEDObjectWrapper : public ZEObject
 		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
 		virtual void						AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void						RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
-		
+
 		virtual QWidget*					GetCustomWidget();
 		virtual QMenu*						GetPopupMenu();
 

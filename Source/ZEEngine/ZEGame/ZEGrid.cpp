@@ -64,7 +64,7 @@ void ZEGrid::GenerateGrid()
 	Canvas.AddLine(ZEVector3(0.0f, 0.0f, -0.5f), ZEVector3(0.0f, 0.0f, 0.5f));
 
 	// Minor Grid
-	MinorGridOffset = Canvas.Vertices.GetCount();
+	MinorGridOffset = Canvas.GetVertexCount();
 
 	ZEInt MinorGridLineCountX = (ZEInt)(GridSize.x / MinorGridUnitSize.x);
 	if (MinorGridLineCountX % 2 == 1)
@@ -81,11 +81,11 @@ void ZEGrid::GenerateGrid()
 	for (ZEInt Y = -MinorGridLineCountY; Y <= MinorGridLineCountY; Y++)
 		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y));
 
-	MinorGridCount = Canvas.Vertices.GetCount() - MinorGridOffset;
+	MinorGridCount = Canvas.GetVertexCount() - MinorGridOffset;
 
 	
 	// Major Grid
-	MajorGridOffset = Canvas.Vertices.GetCount();
+	MajorGridOffset = Canvas.GetVertexCount();
 
 	ZEInt MajorGridLineCountX = (ZEInt)(GridSize.x / MajorGridUnitSize.x);
 	if (MajorGridLineCountX % 2 == 1)
@@ -102,7 +102,7 @@ void ZEGrid::GenerateGrid()
 	for (ZEInt Y = -MajorGridLineCountY; Y <= MajorGridLineCountY; Y++)
 		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 
-	MajorGridCount = Canvas.Vertices.GetCount() - MajorGridOffset;
+	MajorGridCount = Canvas.GetVertexCount() - MajorGridOffset;
 
 	VertexBuffer = Canvas.CreateVertexBuffer();
 }

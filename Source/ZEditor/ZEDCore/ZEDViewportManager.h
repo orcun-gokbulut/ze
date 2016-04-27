@@ -36,18 +36,22 @@
 #pragma once
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEDelegate.h"
 
 class ZEDViewport;
+
+typedef ZEDelegate<void (void*)> ZEDPreRenderFunction;
 
 class ZEDViewportManager
 {
 	private:
-		ZEArray<ZEDViewport*>		Viewports;
+		ZEArray<ZEDViewport*>			Viewports;
 
 	public:
-		void						RegisterViewport(ZEDViewport* Viewport);
-		void						UnregisterViewport(ZEDViewport* Viewport);
+		const ZEArray<ZEDViewport*>		GetViewports();
+		void							RegisterViewport(ZEDViewport* Viewport);
+		void							UnregisterViewport(ZEDViewport* Viewport);
 
-		void						Tick();
-		void						Render();
+		void							Tick();
+		void							Render();
 };

@@ -45,10 +45,18 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 {
 	//ZE_OBJECT
 	private:
+		bool								Dirty;
 		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZERNSimpleMaterial>		Material;
 		ZERNCommand							Command;
+
+	protected:
+		ZECanvas							Canvas;
+
+		bool								Update();
+
+											ZEDEntityWrapper();
 
 	public:
 		virtual void						SetObject(ZEObject* Object);

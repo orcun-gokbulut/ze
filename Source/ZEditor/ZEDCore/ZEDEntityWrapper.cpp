@@ -40,9 +40,58 @@
 #include "ZEGame/ZEGizmo.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRContext.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRContext.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNShaderSlots.h"
+
+bool ZEDEntityWrapper::Update()
+{
+	if (!Dirty)
+		return true;
+
+	ZEAABBox BoundingBox = GetLocalBoundingBox();
+
+	ZEMatrix4x4 WorldMatrix;
+	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
+		ZEQuaternion::Identity, 
+		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
+
+	if (Material.IsNull())
+	{
+		Material = ZERNSimpleMaterial::CreateInstance();
+		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
+		Material->SetVertexColorEnabled(true);
+	}
+
+	if (ConstantBuffer.IsNull())
+		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+
+	ConstantBuffer->SetData(&WorldMatrix);
+
+	Canvas.Clean();
+	Canvas.SetColor(ZEVector4::One);
+	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
+
+	if (VertexBuffer.IsNull() ||
+		VertexBuffer->GetSize() < Canvas.GetBufferSize())
+		VertexBuffer = ZEGRVertexBuffer::Create(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
+
+	void* Buffer;
+	VertexBuffer->Lock(&Buffer);
+	memcpy(Buffer, Canvas.GetBuffer(), Canvas.GetVertexCount() * sizeof(ZECanvasVertex));
+	VertexBuffer->Unlock();
+
+	Dirty = false;
+
+	return true;
+}
+
+ZEDEntityWrapper::ZEDEntityWrapper()
+{
+	Dirty = true;
+}
 
 void ZEDEntityWrapper::SetId(ZEInt Id)
 {
@@ -128,6 +177,8 @@ void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 		return;
 
 	static_cast<ZEEntity*>(GetObject())->SetWorldPosition(NewPosition);
+
+	Dirty = true;
 }
 
 ZEVector3 ZEDEntityWrapper::GetPosition()
@@ -144,6 +195,8 @@ void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 		return;
 
 	static_cast<ZEEntity*>(GetObject())->SetWorldRotation(NewRotation);
+
+	Dirty = true;
 }
 
 ZEQuaternion ZEDEntityWrapper::GetRotation()
@@ -160,6 +213,8 @@ void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 		return;
 
 	static_cast<ZEEntity*>(GetObject())->SetWorldScale(NewScale);
+
+	Dirty = true;
 }
 
 ZEVector3 ZEDEntityWrapper::GetScale()
@@ -177,46 +232,18 @@ bool ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 
 void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	ZEAABBox BoundingBox = GetLocalBoundingBox();
-
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
-		ZEQuaternion::Identity, 
-		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
-	
-	if (Material.IsNull())
-	{
-		Material = ZERNSimpleMaterial::CreateInstance();
-		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
-		Material->SetVertexColorEnabled(true);
-	}
-
-	if (ConstantBuffer.IsNull())
-	{
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
-		ConstantBuffer->SetData(&WorldMatrix);
-	}
-
-	if (VertexBuffer.IsNull())
-	{
-		ZECanvas Canvas;
-		Canvas.SetColor(ZEVector4::One);
-		Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
-
-		VertexBuffer = ZEGRVertexBuffer::Create(Canvas.Vertices.GetCount(), sizeof(ZECanvasVertex));
-		void* Buffer;
-		VertexBuffer->Lock(&Buffer);
-		memcpy(Buffer, Canvas.Vertices.GetCArray(), Canvas.Vertices.GetCount() * sizeof(ZECanvasVertex));
-		VertexBuffer->Unlock();
-	}
+	if (!Update())
+		return;
 
 	Command.StageMask = Material->GetStageMask();
 	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDEntityWrapper, Render, this);
-
+	Parameters->Renderer->AddCommand(&Command);
 }
 
 void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
+	ZEDObjectWrapper::Render(Parameters, Command);
+
 	if (GetObject() == NULL)
 		return;
 
@@ -225,11 +252,11 @@ void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 	if (!Material->SetupMaterial(Context, Parameters->Stage))
 		return;
 
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
 	Context->Draw(VertexBuffer->GetSize() / VertexBuffer->GetVertexSize(), 0);
 
 	Material->CleanupMaterial(Context, Parameters->Stage);
-
-	ZEDObjectWrapper::Render(Parameters, Command);
 }
 
 void ZEDEntityWrapper::Tick(float ElapsedTime)
