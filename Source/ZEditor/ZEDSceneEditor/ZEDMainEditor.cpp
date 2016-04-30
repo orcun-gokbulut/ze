@@ -43,7 +43,6 @@
 #include "ZEDCore/ZEDOperationManager.h"
 #include "ZEDCore/ZEDTransformationManager.h"
 #include "ZEDCore/ZEDGizmo.h"
-#include "ZEDCore/ZEDScene.h"
 #include "ZEMath/ZEAngle.h"
 
 bool ZEDMainEditor::InitializeSelf()

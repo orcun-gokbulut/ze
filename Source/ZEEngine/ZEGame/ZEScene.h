@@ -86,9 +86,10 @@ class ZEScene : public ZEObject
 
 		void									UpdateConstantBuffer();
 
-		void									PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters);
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
-
+		void									PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters);
+		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		
 	public:
 		const ZEGRConstantBuffer*				GetConstantBuffer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
@@ -120,7 +121,7 @@ class ZEScene : public ZEObject
 
 		void									Tick(float ElapsedTime);
 		void									PreRender(ZERNRenderer* Renderer);
-		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		bool									Save(const ZEString& FileName);
 		bool									Load(const ZEString& FileName);

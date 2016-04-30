@@ -48,11 +48,12 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	ZEInt argc = 0;
 	char** argv = NULL;
 
+	bool StopMainLoop = false;
 	QApplication Application(argc, argv);
-	ZEDMainEditor Editor;
+	Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
 
+	ZEDMainEditor Editor;
 	Editor.show();
-	Application.connect(&Application, SIGNAL(lastWindowClosed()), &Editor, SLOT(actExit_onTriggered()));
 
 	if (!ZEDCore::GetInstance()->Initialize())
 		return EXIT_FAILURE;
@@ -60,11 +61,9 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	if (!Editor.Initialize())
 		return EXIT_FAILURE;
 
-	while(true)
+	
+	while (!StopMainLoop)
 	{
-		/*if (Application.activeWindow() == NULL)
-			break;*/
-
 		Application.processEvents();
 		ZEDCore::GetInstance()->ProcessEngine();
 	}

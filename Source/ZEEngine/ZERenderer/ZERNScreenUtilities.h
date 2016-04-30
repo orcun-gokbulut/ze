@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDScene.h
+ Zinek Engine - ZERNScreenUtilities.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,36 +35,19 @@
 
 #pragma once
 
-#include "ZEDObjectWrapper.h"
-#include "ZEGame/ZEScene.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZERay.h"
 
-class ZEObject;
+class ZERNView;
 
-class ZEDScene : public ZEScene
+class ZERNScreenUtilities
 {
-	friend class ZEDSceneWrapper;
-
-	private:
-		ZEArray<ZEDObjectWrapper*>			Wrappers;
-		void								Tick(ZEDObjectWrapper* Wrapper, float ElapsedTime);
-
-	protected:
-		void								AddWrapper(ZEDObjectWrapper* Wrapper);
-		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
-
-											ZEDScene() {};
-
 	public:
-		const ZEArray<ZEDObjectWrapper*>&	GetWrappers();
-		ZEArray<ZEDObjectWrapper*>			GetWrappers(ZEClass* Class);
-		ZEDObjectWrapper*					GetWrapper(ZEObject* Object);
-		
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-											
-		virtual void						Tick(float ElapsedTime);
-		virtual void						PreRender(ZERNRenderer* Renderer);
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-		
-		static ZEDScene*					CreateInstance();
+		static ZERay					ScreenToWorld(const ZERNView& View, const ZEVector2& ScreenCoords);
+		static ZERay					ScreenToView(const ZERNView& View, const ZEVector2& ScreenCoords);
+		static ZEVector2				ScreenToClip(const ZERNView& View, const ZEVector2& ScreenCoords);
+
+		static ZEVector2				WorldToScreen(const ZERNView& View, const ZEVector3& WorldCoords);
+		static ZEVector2				ViewToScreen(const ZERNView& View, const ZEVector3& ViewCoords);
+		static ZEVector2				ClipToScreen(const ZERNView& View, const ZEVector2& ClipCoords);
 };

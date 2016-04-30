@@ -35,27 +35,28 @@
 
 #include "ZEDModule.h"
 
-#include "ZEDScene.h"
-#include "ZEDSceneWrapper.h"
-#include "ZEDViewport.h"
-#include "ZEDTransformationManager.h"
 #include "ZEDCore.h"
+#include "ZEDSceneWrapper.h"
+#include "ZEDTransformationManager.h"
+#include "ZEDSelectionManager.h"
+#include "ZEDViewport.h"
 #include "ZEDGizmo.h"
 #include "ZEDEntityWrapper.h"
+#include "ZEDViewportManager.h"
 
 #include "ZEGame/ZEGrid.h"
+#include "ZEGame/ZEScene.h"
 #include "ZEModel/ZEModel.h"
-#include "ZEDViewportManager.h"
 #include "ZEAtmosphere/ZEATAtmosphere.h"
-#include "ZERenderer/ZELightDirectional.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
+#include "ZERenderer/ZELightDirectional.h"
 
-void ZEDModule::SetScene(ZEDScene* Scene)
+void ZEDModule::SetScene(ZEScene* Scene)
 {
 	this->Scene = Scene;
 }
 
-ZEDScene* ZEDModule::GetScene()
+ZEScene* ZEDModule::GetScene()
 {
 	return Scene;
 }
@@ -102,7 +103,7 @@ void ZEDModule::StartUp()
 {
 	if (Scene == NULL)
 	{
-		Scene = ZEDScene::CreateInstance();
+		Scene = new ZEScene();
 		Scene->Initialize();
 
 		SceneWrapper = ZEDSceneWrapper::CreateInstance();
@@ -149,11 +150,11 @@ void ZEDModule::StartUp()
 	GizmoWrapper->SetSelectable(false);
 	SceneWrapper->AddChildWrapper(GizmoWrapper);
 	
-	/*ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
+	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
 	ZEDEntityWrapper* AtmosphereWrapper = ZEDEntityWrapper::CreateInstance();
 	AtmosphereWrapper->SetObject(Atmosphere);
-	AtmosphereWrapper->SetObjectSelectable(false);
-	SceneWrapper->AddChildWrapper(AtmosphereWrapper);*/
+	AtmosphereWrapper->SetSelectable(false);
+	SceneWrapper->AddChildWrapper(AtmosphereWrapper);
 
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
 	SkyBox->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
@@ -176,12 +177,20 @@ void ZEDModule::ShutDown()
 
 void ZEDModule::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
 {
-	ViewportController.KeyboardEventHandler(Event);
+	if (ZEDCore::GetInstance()->GetSelectionManager()->KeyboardEventHandler(Event))
+		return;
+
+	if (ViewportController.KeyboardEventHandler(Event))
+		return;
 }
 
 void ZEDModule::MouseEventHandler(const ZEDViewportMouseEvent& Event)
 {
-	ViewportController.MouseEventHandler(Event);
+	if (ZEDCore::GetInstance()->GetSelectionManager()->MouseEventHandler(Event))
+		return;
+	
+	if (ViewportController.MouseEventHandler(Event))
+		return;
 }
 
 ZEDModule::ZEDModule()

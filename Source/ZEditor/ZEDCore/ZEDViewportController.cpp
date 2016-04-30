@@ -152,8 +152,8 @@ bool ZEDViewportController::MouseEventHandler(const ZEDViewportMouseEvent& Event
 	if (!Active)
 		return false;
 
-	Rx += Event.DeltaY * 0.01f * MouseSensivity;
-	Ry += Event.DeltaX * 0.01f * MouseSensivity;
+	Rx += Event.Delta.y * 0.01f * MouseSensivity;
+	Ry += Event.Delta.x * 0.01f * MouseSensivity;
 
 	if (Ry < -ZE_PI)
 		Ry = ZE_PI;

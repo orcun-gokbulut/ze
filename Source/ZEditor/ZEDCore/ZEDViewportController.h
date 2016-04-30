@@ -43,6 +43,7 @@ class ZEDViewportController
 		float						MouseSensivity;
 		bool						Active;
 		float						Rx, Ry, Rz;
+
 	public:
 		void						SetLockCamera(bool Enabled);
 		bool						GetLockCamera();

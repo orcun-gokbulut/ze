@@ -53,6 +53,7 @@
 #include "ZEMeta/ZEEnumerator.h"
 
 class ZEScene;
+class ZEDObjectWrapper;
 class ZERNDrawParameters;
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
@@ -82,15 +83,13 @@ ZE_ENUM(ZEEntityState)
 
 class ZEEntity : public ZEObject
 {
-	friend class ZEScene;
-	friend class ZESceneCuller;
-	friend class ZEDebugDrawer;
-
 	ZE_OBJECT
-
+	friend class ZEScene;
+	friend class ZEDEntityWrapper;
 	private: 
 		ZEEntity*								Owner;
 		ZEScene*								OwnerScene;
+		ZEDObjectWrapper*						Wrapper;
 
 		ZEString								Name;
 		ZEEntityState							State;
@@ -111,6 +110,8 @@ class ZEEntity : public ZEObject
 		
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
+
+		void									SetWrapper(ZEDObjectWrapper* Wrapper);
 
 	protected:
 		virtual bool							SetOwner(ZEEntity* Owner);
@@ -197,6 +198,7 @@ class ZEEntity : public ZEObject
 
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		ZEDObjectWrapper*						GetWrapper() const;
 };

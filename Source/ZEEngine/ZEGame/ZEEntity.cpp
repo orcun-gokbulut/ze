@@ -53,6 +53,17 @@
 #define ZE_EDF_INV_WORLD_TRANSFORM				0x0008
 #define ZE_EDF_WORLD_BOUNDING_BOX				0x0010
 
+
+void ZEEntity::SetWrapper(ZEDObjectWrapper* Wrapper)
+{
+	this->Wrapper = Wrapper;
+}
+
+ZEDObjectWrapper* ZEEntity::GetWrapper() const
+{
+	return Wrapper;
+}
+
 void ZEEntity::LocalTransformChanged()
 {
 	EntityDirtyFlags.RaiseFlags(
@@ -225,6 +236,7 @@ ZEEntity::ZEEntity()
 	Enabled = true;
 	Visible = true;
 	State = ZE_ES_NOT_INITIALIZED;
+	Wrapper = NULL;
 	LocalTransformChanged();
 }
 
@@ -590,37 +602,16 @@ void ZEEntity::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	
 }
 
-bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
-		return false;
+	ZERayCastHelper Helper;
+	Helper.SetReport(&Report);
+	Helper.SetObject(this);
+	Helper.SetSubObject(NULL);
+	Helper.SetWorldTransform(&GetWorldTransform());
+	Helper.SetInvWorldTransform(&GetInvWorldTransform());
 
-	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
-	LocalRay.v.NormalizeSelf();
-
-	float TMin;
-	if (!ZEAABBox::IntersectionTest(BoundingBox, LocalRay, TMin))
-		return false;
-
-	ZEVector3 IntersectionPoint;
-	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
-	float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, IntersectionPoint);
-	if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
-	{
-		Report.Position = IntersectionPoint;
-		Report.Distance = ZEMath::Sqrt(DistanceSquare);
-		Report.Entity = this;
-		Report.SubComponent = NULL;
-		Report.PoligonIndex = 0;
-		Report.Normal = ZEVector3::Zero;
-		Report.Binormal = ZEVector3::Zero;
-		
-		return true;
-	}
-
-	return false;
+	Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
 }
 
 

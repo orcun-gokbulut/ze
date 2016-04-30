@@ -77,13 +77,15 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						SetScale(const ZEVector3& NewScale);
 		virtual ZEVector3					GetScale();
 
+		virtual void						SetSelected(bool Selected);
+
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible();
 
 		virtual void						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void						Tick(float ElapsedTime);
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEDEntityWrapper*			CreateInstance();
 };

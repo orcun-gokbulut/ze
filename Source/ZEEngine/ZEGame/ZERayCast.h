@@ -38,57 +38,169 @@
 #define __ZE_RAY_CAST_H__
 
 #include "ZETypes.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZERay.h"
-#include "ZEDS/ZEDelegate.h"
 #include "ZEDS/ZEFlags.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEDelegate.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZETriangle.h"
+#include "ZEMath/ZEAABBox.h"
 
 class ZEObject;
-class ZEEntity;
-class ZERNMaterial;
 
-typedef ZEFlags ZERayCastReportExtras;
+typedef ZEFlags ZERayCastReportComponents;
 #define ZE_RCRE_ALL					0xFFFFFFFF
 #define ZE_RCRE_NONE				0x0
-#define ZE_RCRE_NORMAL				0x1
-#define ZE_RCRE_BINORMAL			0x2
-#define ZE_RCRE_POLIGON_INDEX		0x4
-#define ZE_RCRE_POLYGON_MATERIAL	0x8
+#define ZE_RCRE_MULTI_COLLISIONS	0x1
+#define ZE_RCRE_BOUNDING_BOX_ENTER	0x2
+#define ZE_RCRE_BOUNDING_BOX_EXIT	0x4
+#define ZE_RCRE_POLYGONS			0x8
+
+enum ZERayCastCollisionType
+{
+	ZE_RCCT_NONE = 0,
+	ZE_RCCT_BOUNDING_BOX,
+	ZE_RCCT_BOUNDING_BOX_ENTER = ZE_RCCT_BOUNDING_BOX,
+	ZE_RCCT_BOUNDING_BOX_EXIT,
+	ZE_RCCT_POLGON,
+};
+
+enum ZERayCastMatch
+{
+	ZE_RCM_NONE = 0,
+	ZE_RCM_FIRST,
+	ZE_RCM_NEAREST,
+	ZE_RCM_FURTHEST
+};
 
 typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;
 
-struct ZERayCastParameters
-{
-	ZERay						Ray;
-	ZERayCastReportExtras		Extras;
-	ZERayCastFilterFunction		FilterFunction;
-	void*						FilterFunctionParameter;
-	float						MinimumDistance;
-	float						MaximumDistance;
+class ZERNMaterial;
 
-								ZERayCastParameters();
+class ZERayCastParameters
+{
+	public:
+		ZERay								Ray;
+		ZERayCastReportComponents			Components;
+		ZERayCastMatch						Match;
+
+		ZEClass*							FilterClass;
+		ZEArray<ZEClass*>					FilterIncludedClasses;
+		ZEArray<ZEClass*>					FilterExludedClasses;
+
+		ZEArray<ZEObject*>					FilterIncludedObjects;
+		ZEArray<ZEObject*>					FilterExcludedObjects;
+
+		ZERayCastFilterFunction				FilterFunction;
+		void*								FilterFunctionParameter;
+
+		float								MinimumDistance;
+		float								MaximumDistance;
+
+		void*								ExtraParameters;
+
+		bool								Filter(ZEObject* Object) const;
+
+											ZERayCastParameters();
 };
 
-struct ZERayCastReport
+class ZERayCastCollision
 {
-	union
-	{
-		ZEEntity*				Entity;
-		ZEObject*				Object;
-	};
+	public:
+		ZERayCastCollisionType				Type;
 
-	void*						SubComponent;
-	ZESize						PoligonIndex;
+		ZEObject*							Object;
+		ZEObject*							SubObject;
 
-	ZEVector3					Position;
-	ZEVector3					Normal;
-	ZEVector3					Binormal;
-	
-	ZERNMaterial*				Material;
+		float								Distance;
+		ZEVector3							Position;
+		ZETriangle							Polygon;
 
-	float						Distance;
+		const void*							CustomValue;
 
-								ZERayCastReport();
+											ZERayCastCollision();
+};
+
+class ZERayCastReport
+{
+	private:
+		const ZERayCastParameters*			Parameters;
+		ZERayCastCollision					Collision;
+		ZEArray<ZERayCastCollision>			Collisions;
+		float								MinimumDistance;
+		float								MaximumDistance;
+
+	public:
+		bool								GetResult() const;
+		const ZERayCastCollision&			GetCollision() const;
+		const ZEArray<ZERayCastCollision>	GetCollisions() const;
+
+		float								GetMinimumDistance();
+		float								GetMaximumDistance();
+
+		void								SetParameters(const ZERayCastParameters* Parameters);
+		const ZERayCastParameters*			GetParameters() const;
+
+		void								AddCollision(const ZERayCastCollision& Collision);
+
+		bool								CheckDistance(float Distance) const;
+		bool								CheckDone() const;
+
+											ZERayCastReport();
+};
+
+
+class ZERayCastHelper
+{
+	private:
+		mutable bool						Dirty;
+		mutable ZERay						LocalRay;
+		const ZEMatrix4x4*					WorldTransform;
+		const ZEMatrix4x4*					InvWorldTransform;
+
+		ZEObject*							Object;
+		ZEObject*							SubObject;
+		ZERayCastReport*					Report;
+		const void*							CustomValue;
+
+		void								InitializeCollision(ZERayCastCollision& Collision, float RayT) const;
+
+		void								Update()  const;
+
+	public:
+		void								SetReport(ZERayCastReport* Parameters);
+		ZERayCastReport*					GetReport() const;
+
+		void								SetWorldTransform(const ZEMatrix4x4* WorldTransform);
+		const ZEMatrix4x4*					GetWorldTransform() const;
+
+		void								SetInvWorldTransform(const ZEMatrix4x4* InvWorldTransform);
+		const ZEMatrix4x4*					GetInvWorldTransform() const;
+
+		void								SetObject(ZEObject* Object);
+		ZEObject*							GetObject();
+
+		void								SetSubObject(ZEObject* Object);
+		ZEObject*							SetSubObject();
+
+		void								SetCustomValue(const void* Value);
+		const void*							GetCustomValue();
+
+		const ZERay&						GetLocalRay() const;
+
+		bool								TestBoundingBox(const ZEAABBox& WorldBoundingBox) const;
+
+		bool								RayCastPolygon(const ZEVector3& Vertex0, const ZEVector3& Vertex1, const ZEVector3& Vertex3) const;
+
+		bool								RayCastBoundingBox(const ZEAABBox& WorldBoundingBox) const;
+		bool								RayCastBoundingBox(const ZEAABBox& WorldBoundingBox, const ZEAABBox& LocalBoundingBox) const;
+
+		bool								RayCastMesh(const void* VertexBuffer, ZESize VertexCount, ZESize VertexStride) const;
+		bool								RayCastMesh(const void* PolygonBuffer, ZESize PolgonCount, ZESize PolygonStride, 
+														ZESize Vertex0Offset, ZESize Vertex1Offset, ZESize Vertex2Offset) const;
+
+											ZERayCastHelper();
 };
 
 #endif

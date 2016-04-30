@@ -52,26 +52,18 @@ class ZERay;
 class ZEViewVolume;
 class ZEViewFrustum;
 class ZEInteriorResource;
-class ZEInteriorRoom;
-class ZEInteriorDoor;
-class ZEInteriorHelper;
 
-struct ZEExtraRenderParameters
-{
-	ZEUInt VertexOffset;
-	ZEUInt VertexCount;
-	ZERNMaterial* Material;
-	ZEInteriorRoom* Room;
-};
+ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorHelper, "ZEInteriorHelper.h");
 
 class ZEInterior : public ZEEntity
 {
+	ZE_OBJECT
 	friend class ZEInteriorDoor;
 	friend class ZEInteriorHelper;
 	friend class ZEInteriorDebugDrawer;
-
-	ZE_OBJECT
-
 	private:
 		const ZEInteriorResource*				InteriorResource;
 
@@ -88,7 +80,6 @@ class ZEInterior : public ZEEntity
 
 		virtual	void							ParentTransformChanged();
 
-	protected:
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
 
@@ -118,7 +109,7 @@ class ZEInterior : public ZEEntity
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInterior*						CreateInstance();
 };

@@ -37,22 +37,25 @@
 #ifndef __ZE_INTERIOR_DOOR_H__
 #define __ZE_INTERIOR_DOOR_H__
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEMath/ZERectangle3D.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
 
-class ZEInterior;
-class ZEInteriorRoom;
+ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+
 struct ZEInteriorResourceDoor;
-class ZERNSimpleMaterial;
 class ZECanvas;
+class ZERNSimpleMaterial;
 class ZERNRenderer;
 class ZERNCommand;
 
-class ZEInteriorDoor
+class ZEInteriorDoor : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEInterior;
-
 	private:
 		ZEInterior*						Owner;
 		const ZEInteriorResourceDoor*	Resource;
@@ -72,8 +75,8 @@ class ZEInteriorDoor
 
 		struct
 		{
-			ZERNSimpleMaterial*				Material;
-			ZECanvas						BoxCanvas;
+			ZERNSimpleMaterial*			Material;
+			ZECanvas					BoxCanvas;
 			ZERNCommand					BoxRenderCommand;
 
 		} DebugDrawComponents;
@@ -86,7 +89,6 @@ class ZEInteriorDoor
 
 	public:
 		ZEInterior*						GetOwner();
-
 		const char*						GetName();
 
 		ZEInteriorRoom**				GetRooms();

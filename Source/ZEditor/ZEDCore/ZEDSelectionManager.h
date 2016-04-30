@@ -66,45 +66,32 @@ enum ZEDSelectionMode
 class ZEObject;
 class ZEClass;
 class ZEViewVolume;
+class ZEDModule;
 class ZEDObjectWrapper;
-class ZEDViewport;
 
 class ZEDSelectionManager
 {
 	friend class ZEDCore;
 	private:
+		ZEDModule*							Module;
 		ZEArray<ZEDObjectWrapper*>			Selection;
 		ZEDSelectionPivotMode				PivotMode;
 		ZEMatrix4x4							SelectionPivot;
 		ZEClass*							Filter;
+		
+		ZEVector2							SelectionStartPosition;
 
 		void								CalculateSelectionPivot();
 		
-		void								ViewportFocusGainedEvent(ZEDViewport* Viewport);
-		void								ViewportFocusLostEvent(ZEDViewport* Viewport);
-		void								ViewportKeyboardEvent(ZEDViewport* Viewport, const ZEDViewportKeyboardEvent& KeyboardEvent);
-		void								ViewportMouseEvent(ZEDViewport* Viewport, const ZEDViewportMouseEvent& KeyboardEvent);
-
 											ZEDSelectionManager();
 
 	public:
+		ZEDModule*							GetModule();
+
 		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects();
 
-		void								SetSelectionMode();
-		void								SetSelectionShape();
-
 		void								SelectObject(ZEDObjectWrapper* Object);
-		void								SelectObject(ZESize Id);
-		void								SelectObject(const ZEString& Name);
-		void								SelectObject(ZEViewVolume* ViewVolume);
-		void								SelectObject(const ZERay& Ray);
-
 		void								DeselectObject(ZEDObjectWrapper* Object);
-		void								DeselectObject(ZESize Id);
-		void								DeselectObject(const ZEString& Name);
-		void								DeselectObject(const ZERay& Ray);
-		void								DeselectObject(ZEViewVolume* ViewVolume);
-
 		void								ClearSelection();
 
 		void								SetSelectionFilter(ZEClass* Class);
@@ -115,6 +102,9 @@ class ZEDSelectionManager
 		ZEDSelectionPivotMode				GetSelectionPivotMode();
 		const ZEMatrix4x4&					GetSelectionPivot();
 		void								UpdateSelectionGizmo();
+
+		bool								KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event);
+		bool								MouseEventHandler(const ZEDViewportMouseEvent& Event);
 
 		void								Destroy();
 

@@ -67,10 +67,8 @@ class ZEDViewport : public QFrame, public ZEInitializable
 		ZEGRWindow*							Window;
 		ZERNRenderer						Renderer;
 
-		ZEInt								MouseDeltaX;
-		ZEInt								MouseDeltaY;
-		ZEInt								LastMousePositionX;
-		ZEInt								LastMousePositionY;
+		ZEVector2							MouseDelta;
+		ZEVector2							LastMousePosition;
 
 		ZEUInt								Modifiers;
 		ZEArray<ZEDViewportKeyboardEvent>	KeyboardEvents;

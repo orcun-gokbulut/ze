@@ -595,19 +595,21 @@ bool ZEModel::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	bool Result = false;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Result |= Meshes[I].RayCast(Report, Parameters);
+	{
+		Meshes[I].RayCast(Report, Parameters);
+		if (Report.CheckDone())
+			return;
+	}
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
-		Result |= Bones[I].RayCast(Report, Parameters);
-	
-	if (Result)
-		Report.Entity = this;
-
-	return Result;
+	{
+		Bones[I].RayCast(Report, Parameters);
+		if (Report.CheckDone())
+			return;
+	}
 }
 
 ZEModel* ZEModel::CreateInstance()

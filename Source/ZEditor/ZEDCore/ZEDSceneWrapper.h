@@ -36,25 +36,24 @@
 #pragma once
 
 #include "ZEDEntityWrapper.h"
-#include "ZEDScene.h"
 
 class ZEDSceneWrapper : public ZEDObjectWrapper
 {
 	private:
 		ZEArray<ZEDEntityWrapper*>				Wrappers;
 
-		virtual void							PreRender(ZERNRenderer* Renderer, ZEDEntityWrapper* Wrapper);
-		void									UpdateWrappers();
+		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
+		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 	public:
 		virtual void							SetObject(ZEObject* Object);
-		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
 		virtual void							AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void							RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
 
 		virtual void							PreRender(ZERNRenderer* Renderer);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEDSceneWrapper*					CreateInstance();
 };

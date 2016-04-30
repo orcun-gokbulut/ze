@@ -703,34 +703,6 @@ void ZEModelMesh::Deinitialize()
 	DirtyFlags.RaiseAll();
 }
 
-
-bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
-{
-	if (MeshResource->LODs.GetCount() == 0)
-		return false;
-
-	bool HaveIntersection = false;
-
-	const ZEArray<ZEVector3>& Vertices = MeshResource->Geometry;
-	for (ZESize I = 0; I < Vertices.GetCount(); I += 3)
-	{
-		ZETriangle Triangle(Vertices[I], Vertices[I + 1], Vertices[I + 2]);
-
-		float RayT;
-		if (ZETriangle::IntersectionTest(Triangle, Ray, RayT))
-		{
-			if (RayT < MinT)
-			{
-				MinT = RayT;
-				PoligonIndex = I / 3;
-				HaveIntersection = true;
-			}
-		}
-	}
-
-	return HaveIntersection;
-}
-
 bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!Visible)
@@ -739,7 +711,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (Parameters->View->ViewVolume != NULL && Parameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
 		return false;
 
-	ZEInt32 CurrentLOD = 0;
+	ZEInt CurrentLOD = 0;
 	float DrawOrder = 0.0f;
 	float LODDistanceSquare = 0.0f;
 
@@ -752,14 +724,14 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	float CurrentDistanceSquare = 0.0f;
 	for (ZESize I = 0; I < LODs.GetCount(); I++)
 	{
-		LODDistanceSquare = LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance();
+		LODDistanceSquare = (float)(LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance());
 
 		if (LODDistanceSquare < EntityDistanceSquare)
 		{
 			if (CurrentDistanceSquare <= LODDistanceSquare)
 			{
 				CurrentDistanceSquare = LODDistanceSquare;
-				CurrentLOD = I;
+				CurrentLOD = (ZEInt)I;
 			}
 		}
 	}
@@ -779,64 +751,19 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	return true;
 }
 
-bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	if (MeshResource == NULL || MeshResource->IsSkinned)
-		return false;
+	ZERayCastHelper Helper;
+	Helper.SetReport(&Report);
+	Helper.SetWorldTransform(&GetWorldTransform());
+	Helper.SetInvWorldTransform(&GetInvWorldTransform());
+	Helper.SetObject(Owner);
+	Helper.SetSubObject(this);
 
-	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
-	LocalRay.v.NormalizeSelf();
+	if (!Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetLocalBoundingBox()))
+		return;
 
-	float RayT;
-	if (!ZEAABBox::IntersectionTest(GetLocalBoundingBox(), LocalRay, RayT))
-		return false;
-
-	float MinT = ZE_FLOAT_MAX;
-	ZESize PoligonIndex;
-	if (RayCastPoligons(LocalRay, MinT, PoligonIndex))
-	{
-		ZEVector3 WorldPosition;
-		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
-
-		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, WorldPosition);
-		if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
-		{
-			Report.Distance = ZEMath::Sqrt(DistanceSquare);
-			Report.Position = WorldPosition;
-			Report.SubComponent = this;
-			Report.PoligonIndex = PoligonIndex;
-
- 			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
- 			{
- 				ZEVector3 V0 = MeshResource->Geometry[3 * Report.PoligonIndex];
- 				ZEVector3 V1 = MeshResource->Geometry[3 * Report.PoligonIndex + 1];
- 				ZEVector3 V2 = MeshResource->Geometry[3 * Report.PoligonIndex + 2];
- 
- 				ZEVector3 Binormal = ZEVector3(V0, V1);
- 				ZEVector3 Tangent = ZEVector3(V0, V2);
- 				ZEVector3 Normal;
- 				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
- 
- 				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
- 				{
- 					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
- 					Report.Normal.NormalizeSelf();
- 				}
- 
- 				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
- 				{
- 					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
- 					Report.Binormal.NormalizeSelf();
- 				}
- 			}
-
-			return true;
-		}
-	}
-
-	return false;
+	Helper.RayCastMesh(MeshResource->Geometry.GetConstCArray(), MeshResource->Geometry.GetCount(), sizeof(ZEVector3));
 }
 
 ZEModelMesh::ZEModelMesh()

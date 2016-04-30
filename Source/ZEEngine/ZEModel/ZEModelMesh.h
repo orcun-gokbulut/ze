@@ -95,8 +95,6 @@ class ZEModelMesh : public ZEObject
 		ZEArray<ZEPlane>					ClippingPlanes;
 		ZERNCommand							RenderCommand;
 		
-		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
-
 		void								UpdateConstantBuffer();
 
 		void								LocalTransformChanged();
@@ -179,7 +177,7 @@ class ZEModelMesh : public ZEObject
 
 		bool								PreRender(const ZERNPreRenderParameters* Parameters);
 
-		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();
 											~ZEModelMesh();

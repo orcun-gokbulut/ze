@@ -210,70 +210,6 @@ void ZEDViewport::DeinitializeSelf()
 }
 
 /*
-void ZEDViewport::MoveCamera(float ElapsedTime)
-{	
-	ZEVector3 Position = Camera->GetPosition();
-	ZEQuaternion Rotation = Camera->GetRotation();
-	ZEVector3 PositionChange;
-	ZEQuaternion RotationChange;
-
-	if (PressedKeyboardKeys.contains(Qt::Key_W))
-	{
-		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, 5));
-		ZEVector3::Scale(PositionChange, PositionChange, StepSize * ElapsedTime);
-		ZEVector3::Add(Position, Position, PositionChange);
-		Camera->SetPosition(Position);
-	}
-
-	if (PressedKeyboardKeys.contains(Qt::Key_S))
-	{
-		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(0, 0, -5));
-		ZEVector3::Scale(PositionChange, PositionChange, StepSize * ElapsedTime);
-		ZEVector3::Add(Position, Position, PositionChange);
-		Camera->SetPosition(Position);
-	}
-
-	if (PressedKeyboardKeys.contains(Qt::Key_A))
-	{
-		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(-5, 0, 0));
-		ZEVector3::Scale(PositionChange, PositionChange, StepSize * ElapsedTime);
-		ZEVector3::Add(Position, Position, PositionChange);
-		Camera->SetPosition(Position);
-	}
-
-	if (PressedKeyboardKeys.contains(Qt::Key_D))
-	{
-		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3(5, 0, 0));
-		ZEVector3::Scale(PositionChange, PositionChange, StepSize * ElapsedTime);
-		ZEVector3::Add(Position, Position, PositionChange);
-		Camera->SetPosition(Position);
-	}
-}
-
-void ZEDViewport::RotateCamera(const ZEVector2& MousePosition)
-{
-	float XDiff = MousePosition.x - MouseStartPosition.x;
-	float YDiff = MousePosition.y - MouseStartPosition.y;
-
-	Yaw = Yaw + 0.005f * XDiff;
-	Pitch = Pitch + 0.005f * YDiff;
-
-	if (Yaw < -ZE_PI)
-		Yaw = ZE_PI;
-	else if (Yaw > ZE_PI)
-		Yaw = -ZE_PI;
-
-	if (Pitch < -ZE_PI_2)
-		Pitch = -ZE_PI_2;
-	else if (Pitch > ZE_PI_2)
-		Pitch = ZE_PI_2;
-
-	ZEQuaternion Temp, Rotation;
-	ZEQuaternion::CreateFromEuler(Temp, Pitch, Yaw, Roll);
-	ZEQuaternion::Normalize(Rotation, Temp);
-	Camera->SetRotation(Rotation);
-	MouseStartPosition = MousePosition;
-}
 
 void ZEDViewport::mousePressEvent(QMouseEvent* MouseEvent)
 {
@@ -532,10 +468,8 @@ void ZEDViewport::mousePressEvent(QMouseEvent* Event)
 {
 	ZEDViewportMouseEvent MouseEvent;
 	MouseEvent.Viewport = this;
-	MouseEvent.PositionX = LastMousePositionX;
-	MouseEvent.PositionY = LastMousePositionY;
-	MouseEvent.DeltaX = 0.0f;
-	MouseEvent.DeltaY = 0.0f;
+	MouseEvent.Position = LastMousePosition;
+	MouseEvent.Delta = ZEVector2::Zero;
 	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
 	MouseEvent.Modifiers = Modifiers;
 
@@ -553,28 +487,23 @@ void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
 	ZEDViewportMouseEvent MouseEvent;
 	MouseEvent.Type = ZED_ET_MOUSE_MOVED;
 	MouseEvent.Viewport = this;
-	MouseEvent.PositionX = Event->pos().x();
-	MouseEvent.PositionY = Event->pos().y();
+	MouseEvent.Position.x = Event->pos().x();
+	MouseEvent.Position.y = Event->pos().y();
 
-	if (LastMousePositionX == -1)
+	if (LastMousePosition.x == -1)
 	{
-		MouseDeltaX = 0;
-		MouseDeltaY = 0;
+		MouseDelta = ZEVector2::Zero;
 	}
 	else
 	{
-		MouseDeltaX =  MouseEvent.PositionX - LastMousePositionX;
-		MouseDeltaY =  MouseEvent.PositionY - LastMousePositionY;
+		MouseDelta = MouseEvent.Position - LastMousePosition;
 	}
-
-	MouseEvent.DeltaX = MouseDeltaX;
-	MouseEvent.DeltaY = MouseDeltaY;
 
 	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
 	MouseEvent.Modifiers = Modifiers;
 
-	LastMousePositionX = MouseEvent.PositionX;
-	LastMousePositionY = MouseEvent.PositionY;
+	MouseEvent.Delta = MouseDelta;
+	LastMousePosition = MouseEvent.Position;
 
 	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
 
@@ -586,10 +515,8 @@ void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
 	ZEDViewportMouseEvent MouseEvent;
 	MouseEvent.Type = ZED_ET_BUTTON_RELEASED;
 	MouseEvent.Viewport = this;
-	MouseEvent.PositionX = LastMousePositionX;
-	MouseEvent.PositionY = LastMousePositionY;
-	MouseEvent.DeltaX = MouseDeltaX;
-	MouseEvent.DeltaY = MouseDeltaY;
+	MouseEvent.Position = LastMousePosition;
+	MouseEvent.Delta = MouseDelta;
 	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
 	MouseEvent.Modifiers = Modifiers;
 
@@ -609,17 +536,13 @@ void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
 
 void ZEDViewport::enterEvent(QEvent* Event)
 {
-	LastMousePositionX = -1;
-	LastMousePositionY = -1;
-
+	LastMousePosition = ZEVector2(-1.0f, -1.0f);
 	QFrame::enterEvent(Event);
 }
 
 void ZEDViewport::leaveEvent(QEvent* Event)
 {
-	LastMousePositionX = -1;
-	LastMousePositionY = -1;
-
+	LastMousePosition = ZEVector2(-1.0f, -1.0f);
 	QFrame::leaveEvent(Event);
 }
 
@@ -713,10 +636,8 @@ void ZEDViewport::focusInEvent(QFocusEvent* Event)
 
 void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 {
-	LastMousePositionX = -1;
-	LastMousePositionY = -1;
-	MouseDeltaX = 0;
-	MouseDeltaY = 0;
+	LastMousePosition = ZEVector2(-1.0f, -1.0f);
+	MouseDelta = ZEVector2::Zero;
 	Modifiers = ZED_KKM_NONE;
 
 	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
@@ -768,14 +689,12 @@ void ZEDViewport::Tick()
 
 	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
 	{
-		MouseEvents[I].DeltaX = MouseDeltaX;
-		MouseEvents[I].DeltaY = MouseDeltaY;
+		MouseEvents[I].Delta = MouseDelta;
 		MouseEvents[I].Modifiers = Modifiers;
 		ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvents[I]);
 	}
 
-	MouseDeltaX = 0;
-	MouseDeltaY = 0;
+	MouseDelta = ZEVector2::Zero;
 }
 
 void ZEDViewport::SetPosition(const ZEVector3& Position)
@@ -861,10 +780,8 @@ ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
 	Rotation = ZEQuaternion::Identity;
 	Modifiers = ZED_KKM_NONE;
 	VerticalFOV = ZE_PI_3;
-	LastMousePositionX = -1;
-	LastMousePositionY = -1;
-	MouseDeltaX = 0;
-	MouseDeltaY = 0;
+	LastMousePosition = ZEVector2(-1.0f, -1.0f);
+	MouseDelta = ZEVector2::Zero;
 	setMouseTracking(true);
 	setFocusPolicy(Qt::ClickFocus);
 }

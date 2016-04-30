@@ -50,6 +50,8 @@ ze_add_source(ZERNRenderParameters.cpp				Sources)
 ze_add_source(ZERNRenderParameters.h				Sources Headers ZEMC)
 ze_add_source(ZERNFilter.cpp						Sources)
 ze_add_source(ZERNFilter.h							Sources Headers)
+ze_add_source(ZERNScreenUtilities.h 				Sources Headers ZEMC)
+ze_add_source(ZERNScreenUtilities.cpp				Sources)
 
 ze_add_source(ZELight.cpp 							Sources)
 ze_add_source(ZELight.h 							Sources Headers ZEMC)
