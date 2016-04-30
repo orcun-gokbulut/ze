@@ -118,7 +118,7 @@ class ZEDObjectWrapper : public ZEObject
 		virtual void						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void						Tick(float ElapsedTime);
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters) = 0;
+		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		virtual void						Destroy();
 };

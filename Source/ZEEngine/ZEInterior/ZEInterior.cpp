@@ -487,17 +487,16 @@ void ZEInterior::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ExtraParameters->Room->Render(Parameters, Command);
 }
 
-bool ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	bool Result = false;
 	ZESize RoomCount = Rooms.GetCount();
 	for (ZESize I = 0; I < RoomCount; I++)
-		Result |= Rooms[I]->RayCast(Report, Parameters);
-	
-	if (Result)
-		Report.Entity = this;
+	{
+		if (!Parameters.Filter(Rooms[I]) || Report.CheckDone())
+			return;
 
-	return Result;
+		Rooms[I]->RayCast(Report, Parameters);
+	}
 }
 
 ZEInteriorCullMode ZEInterior::GetCullMode() const

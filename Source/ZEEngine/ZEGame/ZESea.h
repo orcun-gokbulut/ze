@@ -60,11 +60,10 @@ class ZESea : public ZEEntity
 		virtual					~ZESea();
 
 	public:
-		virtual void			Tick(float ElapsedTime);
-
-		virtual bool			RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
 		virtual ZEDrawFlags		GetDrawFlags() const;
+
+		virtual void			Tick(float ElapsedTime);
+		virtual void			RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZESea*			CreateInstance();
 };

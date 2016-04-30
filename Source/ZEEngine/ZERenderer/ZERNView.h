@@ -141,14 +141,3 @@ class ZERNView : public ZEObject
 
 									ZERNView();
 };
-
-class ZERNScreenUtilities
-{
-	ZERay							ScreenToWorld(const ZERNView& View, const ZEVector2& ScreenCoords);
-	ZERay							ScreenToView(const ZERNView& View, const ZEVector2& ScreenCoords);
-	ZEVector2						ScreenToClip(const ZERNView& View, const ZEVector2& ScreenCoords);
-
-	ZEVector2						WorldToScreen(const ZERNView& View, const ZEVector3& WorldCoords);
-	ZEVector2						ViewToScreen(const ZERNView& View, const ZEVector3& ViewCoords);
-	ZEVector2						ClipToScreen(const ZERNView& View, const ZEVector2& ClipCoords);
-};

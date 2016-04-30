@@ -162,7 +162,7 @@ class ZEModel : public ZEEntity
 
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);	
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEModel*						CreateInstance();
 };

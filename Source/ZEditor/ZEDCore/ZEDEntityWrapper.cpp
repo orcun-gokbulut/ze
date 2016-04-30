@@ -71,7 +71,11 @@ bool ZEDEntityWrapper::Update()
 	ConstantBuffer->SetData(&WorldMatrix);
 
 	Canvas.Clean();
-	Canvas.SetColor(ZEVector4::One);
+	if (GetSelected())
+		Canvas.SetColor(ZEVector4::One);
+	else
+		Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
+
 	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
 	if (VertexBuffer.IsNull() ||
@@ -120,6 +124,7 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 
 	ZEEntity* Entity = static_cast<ZEEntity*>(Object);
 
+	Entity->SetWrapper(this);
 	ZEDObjectWrapper::SetObject(Entity);
 
 	const ZEArray<ZEEntity*>& Children = Entity->GetChildEntities();
@@ -225,9 +230,18 @@ ZEVector3 ZEDEntityWrapper::GetScale()
 	return static_cast<ZEEntity*>(GetObject())->GetWorldScale();
 }
 
-bool ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEDEntityWrapper::SetSelected(bool Selected)
 {
-	return static_cast<ZEEntity*>(GetObject())->ZEEntity::RayCast(Report, Parameters);
+	if (GetSelected() == Selected)
+		return;
+
+	ZEDObjectWrapper::SetSelected(Selected);
+	Dirty = true;
+}
+
+void ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+	static_cast<ZEEntity*>(Object)->RayCast(Report, Parameters);
 }
 
 void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)

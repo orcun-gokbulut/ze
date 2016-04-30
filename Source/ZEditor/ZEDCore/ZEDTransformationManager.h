@@ -39,6 +39,8 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 
+#include "ZEDViewportInput.h"
+
 enum ZEDTransformType
 {
 	ZED_TT_NONE,
@@ -54,11 +56,13 @@ enum ZEDTransformSpace
 };
 
 class ZEDGizmo;
+class ZEDModule;
 
 class ZEDTransformationManager
 {
 	friend class ZEDCore;
 	private:
+		ZEDModule*							Module;
 		ZEDTransformType					TransformType;
 		ZEDTransformSpace					TransformSpace;
 		ZEMatrix4x4							Transform;
@@ -79,6 +83,9 @@ class ZEDTransformationManager
 		void								ResetTransform();
 		void								ApplyTransform(ZEMatrix4x4 Transform);
 		void								EndTransform();
+
+		virtual bool						KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event);
+		virtual bool						MouseEventHandler(const ZEDViewportMouseEvent& Event);
 
 		void								Destroy();
 

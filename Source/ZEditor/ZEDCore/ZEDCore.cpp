@@ -50,7 +50,6 @@
 
 extern HINSTANCE ApplicationInstance;
 
-
 bool ZEDCore::InitializeSelf()
 {
 	zeCore->SetApplicationModule(EditorModule);
@@ -68,6 +67,7 @@ bool ZEDCore::InitializeSelf()
 		return false;
 
 	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
+	SelectionManager->Module = EditorModule;
 }
 
 void ZEDCore::DeinitializeSelf()

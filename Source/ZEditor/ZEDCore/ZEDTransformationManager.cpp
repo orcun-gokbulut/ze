@@ -43,6 +43,7 @@
 
 ZEDTransformationManager::ZEDTransformationManager()
 {
+	Module = NULL;
 	Gizmo = ZEDGizmo::CreateInstance();
 	TransformType = ZED_TT_NONE;
 	TransformSpace = ZED_TS_WORLD;
@@ -220,6 +221,17 @@ void ZEDTransformationManager::EndTransform()
 
 	TransformType = ZED_TT_NONE;
 	Transform = ZEMatrix4x4::Identity;
+}
+
+bool ZEDTransformationManager::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
+{
+	return false;
+}
+
+bool ZEDTransformationManager::MouseEventHandler(const ZEDViewportMouseEvent& Event)
+{
+	if (ZEDSelectionManager::GetInstance()->GetSelectedObjects().GetCount() == 0)
+		return false;
 }
 
 void ZEDTransformationManager::Destroy()

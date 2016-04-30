@@ -59,6 +59,24 @@
 
 #define ZE_SDF_CONSTANT_BUFFER		0x01
 
+void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
+{
+	if (!Entity->GetEnabled())
+		return;
+
+	Entity->Tick(ElapsedTime);
+
+	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
+	for (ZESize N = 0; N < Components.GetCount(); N++)
+		TickEntity(Components[N], ElapsedTime);
+
+
+	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
+	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
+		TickEntity(SubEntities[N], ElapsedTime);
+
+}
+
 void ZEScene::PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters)
 {
 	if (!Entity->GetVisible())
@@ -88,23 +106,36 @@ void ZEScene::PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Paramet
 		PreRenderEntity(ChildEntities[I], Parameters);
 }
 
-
-void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
+void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	if (!Entity->GetEnabled())
+	Entity->RayCast(Report, Parameters);
+
+	if (Report.CheckDone())
 		return;
 
-	Entity->Tick(ElapsedTime);
+	const ZEArray<ZEEntity*> ChildEntities = Entity->GetChildEntities();
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	{
+		if (!Parameters.Filter(ChildEntities[I]))
+			continue;
 
-	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
-	for (ZESize N = 0; N < Components.GetCount(); N++)
-		TickEntity(Components[N], ElapsedTime);
+		RayCastEntity(ChildEntities[I], Report, Parameters);
 
+		if (Report.CheckDone())
+			return;
+	}
 
-	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
-	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
-		TickEntity(SubEntities[N], ElapsedTime);
+	const ZEArray<ZEEntity*> Components = Entity->GetComponents();
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+	{
+		if (!Parameters.Filter(Components[I]))
+			continue;
 
+		RayCastEntity(Components[I], Report, Parameters);
+
+		if (Report.CheckDone())
+			return;
+	}
 }
 
 void ZEScene::UpdateConstantBuffer()
@@ -326,24 +357,18 @@ void ZEScene::PreRender(ZERNRenderer* Renderer)
 		PreRenderEntity(Entities[I], &Parameters);
 }
 
-bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	bool Result = false;
-	if (!Parameters.FilterFunction.IsNull())
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
 	{
-		for (ZESize I = 0; I < Entities.GetCount(); I++)
-		{
-			if (Parameters.FilterFunction(Entities[I], Parameters.FilterFunctionParameter))
-				Result |= Entities[I]->RayCast(Report, Parameters);
-		}
-	}
-	else
-	{
-		for (ZESize I = 0; I < Entities.GetCount(); I++)
-			Result |= Entities[I]->RayCast(Report, Parameters);
-	}
+		if (!Parameters.Filter(Entities[I]))
+			continue;
 
-	return Result;
+		RayCastEntity(Entities[I], Report, Parameters);
+
+		if (Report.CheckDone())
+			break;
+	}
 }
 
 bool ZEScene::Save(const ZEString& FileName)

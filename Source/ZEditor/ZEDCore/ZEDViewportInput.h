@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDInputEvent.h
+ Zinek Engine - ZEDViewportInput.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,6 +37,7 @@
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
 
 enum ZEDInputMouseButton
 {
@@ -214,10 +215,8 @@ class ZEDViewportMouseEvent
 	public:
 		ZEDViewport*				Viewport;
 		ZEDInputEventType			Type;
-		ZEInt						DeltaX;
-		ZEInt						DeltaY;
-		ZEInt						PositionX;
-		ZEInt						PositionY;
+		ZEVector2					Delta;
+		ZEVector2					Position;
 		ZEUInt						Modifiers;
 		ZEDInputMouseButton			Button;
 };

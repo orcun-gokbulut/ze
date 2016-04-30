@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
 #include "ZEGame/ZERayCast.h"
@@ -42,9 +44,11 @@
 #include "ZERenderer/ZECanvas.h"
 #include "ZESpatial/ZEOctree.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZEInterior;
 class ZEInteriorDoor;
+class ZEInteriorRoom;
 class ZEPhysicalMesh;
 class ZERNRenderer;
 class ZERNMaterial;
@@ -53,7 +57,6 @@ class ZEGRConstantBuffer;
 class ZEGRContext;
 class ZERNPreRenderParameters;
 struct ZEInteriorResourceRoom;
-struct ZEExtraRenderParameters;
 
 typedef ZEFlags ZEInteriorRoomDirtyFlags;
 #define ZE_IRDF_NONE							0
@@ -63,11 +66,19 @@ typedef ZEFlags ZEInteriorRoomDirtyFlags;
 #define ZE_IRDF_WORLD_BOUNDING_BOX				8
 #define ZE_IRDF_ALL								0xFFFFFFFF
 
-class ZEInteriorRoom
+struct ZEExtraRenderParameters
 {
+	ZEUInt VertexOffset;
+	ZEUInt VertexCount;
+	ZERNMaterial* Material;
+	ZEInteriorRoom* Room;
+};
+
+class ZEInteriorRoom : public ZEObject
+{
+	ZE_OBJECT
 	friend class ZEInteriorDoor;
 	friend class ZEInterior;
-
 	private:
 		ZEInterior*							Owner;
 		const ZEInteriorResourceRoom*		Resource;
@@ -96,9 +107,8 @@ class ZEInteriorRoom
 		ZEQuaternion						Rotation;
 		ZEVector3							Scale;
 
-		bool								RayCastPoligons(const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
-		bool								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
-		bool								RayCastOctree(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
+		void								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, ZERayCastReport& Report, ZERayCastHelper& Helper);
+		void								RayCastOctree(const ZEOctree<ZESize>& Octree, ZERayCastReport& Report, ZERayCastHelper& Helper);
 
 		void								ParentTransformChanged();
 
@@ -136,7 +146,7 @@ class ZEInteriorRoom
 		void								PreRender(const ZERNPreRenderParameters* Parameters);
 		void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInteriorRoom*				CreateInstance();
 };

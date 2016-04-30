@@ -141,7 +141,7 @@ class ZEModelBone : public ZEObject
 		void								Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource);
 		void								Deinitialize();
 
-		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelBone();
 											~ZEModelBone();

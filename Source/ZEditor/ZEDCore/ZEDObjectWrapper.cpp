@@ -45,7 +45,8 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 	Object = NULL;
 	Parent = NULL;
 	Selectable = true;
-	Locked = true;
+	Selected = false;
+	Locked = false;
 }
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
@@ -241,6 +242,11 @@ void ZEDObjectWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 }
 
 void ZEDObjectWrapper::Tick(float ElapsedTime)
+{
+
+}
+
+void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 
 }

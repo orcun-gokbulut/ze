@@ -40,7 +40,7 @@
 #include "ZEDViewportInput.h"
 #include "ZEDViewportController.h"
 
-class ZEDScene;
+class ZEScene;
 class ZEDSceneWrapper;
 class ZEDObjectWrapper;
 class ZEDViewportManager;
@@ -50,7 +50,7 @@ class ZEGrid;
 class ZEDModule : public ZEApplicationModule
 {
 	private:
-		ZEDScene*					Scene;
+		ZEScene*					Scene;
 		ZEDSceneWrapper*			SceneWrapper;
 		ZEGrid*						Grid;
 		ZEDViewportManager*			ViewportManager;
@@ -59,8 +59,8 @@ class ZEDModule : public ZEApplicationModule
 	public:
 		ZEDViewportManager*			GetViewportManager();
 
-		void						SetScene(ZEDScene* Scene);
-		ZEDScene*					GetScene();
+		void						SetScene(ZEScene* Scene);
+		ZEScene*					GetScene();
 		
 		ZEDObjectWrapper*			GetRootWrapper();
 
