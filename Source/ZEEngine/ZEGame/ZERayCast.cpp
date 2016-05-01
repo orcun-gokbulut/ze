@@ -52,7 +52,7 @@ ZERayCastParameters::ZERayCastParameters()
 	Match = ZE_RCM_NEAREST;
 
 	FilterFunctionParameter = NULL;
-	Components = ZE_RCRE_NONE;
+	Components = ZE_RCRE_BOUNDING_BOX_ENTER;
 
 	FilterClass = NULL;
 	FilterFunctionParameter = NULL;
@@ -168,10 +168,36 @@ const ZERayCastParameters* ZERayCastReport::GetParameters() const
 	return Parameters;
 }
 
+void ZERayCastReport::SetModifierFunction(const ZERayCastModifierFunction& Function)
+{
+	ModifierFunction = Function;
+}
+
+const ZERayCastModifierFunction& ZERayCastReport::GetModifierFunction()
+{
+	return ModifierFunction;
+}
+
+void ZERayCastReport::SetModifierParameter(const void* Parameter)
+{
+	ModifierParameter = Parameter;
+}
+
+const void* ZERayCastReport::GetModifierParameter()
+{
+	return ModifierParameter;
+}
+
 void ZERayCastReport::AddCollision(const ZERayCastCollision& NewCollision)
 {
 	if (NewCollision.Type == ZE_RCCT_NONE)
 		return;
+
+	if (!ModifierFunction.IsNull())
+	{
+		if (!ModifierFunction(Collision, ModifierParameter))
+			return;
+	}
 
 	if (Collision.Type == ZE_RCCT_NONE)
 	{
@@ -444,7 +470,7 @@ bool ZERayCastHelper::RayCastPolygon(const ZEVector3& Vertex0, const ZEVector3& 
 
 bool ZERayCastHelper::RayCastMesh(const void* VertexBuffer, ZESize VertexCount, ZESize VertexStride) const
 {
-	return RayCastMesh(VertexBuffer, 3 * VertexStride, 0, VertexStride, 2 * VertexStride, VertexCount / 3);
+	return RayCastMesh(VertexBuffer, VertexCount / 3, 3 * VertexStride, 0, VertexStride, 2 * VertexStride);
 }
 
 bool ZERayCastHelper::RayCastMesh(const void* PolygonBuffer,  ZESize PolgonCount, ZESize PolygonStride, 

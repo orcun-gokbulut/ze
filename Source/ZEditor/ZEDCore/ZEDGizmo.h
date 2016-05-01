@@ -127,7 +127,7 @@ class ZEDGizmo : public ZEEntity
 		void							SetMode(ZEDGizmoMode Mode);
 		ZEDGizmoMode					GetMode();
 	
-				virtual void							SetVisible(bool Visibility);
+		virtual void					SetVisible(bool Visibility);
 
 		void							SetHoveredAxis(ZEDGizmoAxis HoveredAxis);
 		ZEDGizmoAxis					GetHoveredAxis();

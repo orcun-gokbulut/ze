@@ -180,6 +180,9 @@ void ZEDModule::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
 	if (ZEDCore::GetInstance()->GetSelectionManager()->KeyboardEventHandler(Event))
 		return;
 
+	if (ZEDCore::GetInstance()->GetTransformationManager()->KeyboardEventHandler(Event))
+		return;
+
 	if (ViewportController.KeyboardEventHandler(Event))
 		return;
 }
@@ -189,6 +192,9 @@ void ZEDModule::MouseEventHandler(const ZEDViewportMouseEvent& Event)
 	if (ZEDCore::GetInstance()->GetSelectionManager()->MouseEventHandler(Event))
 		return;
 	
+	if (ZEDCore::GetInstance()->GetTransformationManager()->MouseEventHandler(Event))
+		return;
+
 	if (ViewportController.MouseEventHandler(Event))
 		return;
 }

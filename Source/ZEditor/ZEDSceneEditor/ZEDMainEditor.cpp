@@ -65,11 +65,10 @@ bool ZEDMainEditor::InitializeSelf()
 	connect(ui->actScale, SIGNAL(triggered(bool)), this, SLOT(actScale_onTriggered()));
 	connect(ui->actUndo, SIGNAL(triggered(bool)), this, SLOT(actUndo_onTriggered()));
 	connect(ui->actRedo, SIGNAL(triggered(bool)), this, SLOT(actRedo_onTriggered()));
-	connect(MainTimer, SIGNAL(timeout()), this, SLOT(MainTimer_onTimeout()));
-	MainTimer->start();
+	//connect(MainTimer, SIGNAL(timeout()), this, SLOT(MainTimer_onTimeout()));
+	//MainTimer->start();
 	
-	if (!Browser->GetBrowserWidget()->Initialize())
-		return false;
+	Browser->GetBrowserWidget()->LoadScene();
 
 	return true;
 }
@@ -77,7 +76,6 @@ bool ZEDMainEditor::InitializeSelf()
 void ZEDMainEditor::DeinitializeSelf()
 {
 	MainViewPort->Deinitialize();
-	Browser->GetBrowserWidget()->Deinitialize();
 	Core->Deinitialize();
 }
 
@@ -108,7 +106,6 @@ void ZEDMainEditor::actSaveAs_onTriggered()
 
 void ZEDMainEditor::actExit_onTriggered()
 {
-	Deinitialize();
 	qApp->quit();
 }
 
@@ -213,8 +210,8 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 
-	MainTimer = new QTimer(this);
-	MainTimer->setInterval(0);
+	/*MainTimer = new QTimer(this);
+	MainTimer->setInterval(0);*/
 
 	Core = ZEDCore::GetInstance();
 	MainViewPort = new ZEDViewport(ui->CentralWidget);
@@ -226,9 +223,11 @@ ZEDMainEditor::ZEDMainEditor(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	
 	Browser = new ZEDMainBrowser(this);
 	addDockWidget(Qt::RightDockWidgetArea, Browser);
+
+	InitializeSelf();
 }
 
 ZEDMainEditor::~ZEDMainEditor()
 {
-
+	DeinitializeSelf();
 }

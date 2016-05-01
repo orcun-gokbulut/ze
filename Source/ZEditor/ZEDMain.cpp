@@ -50,25 +50,20 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 
 	bool StopMainLoop = false;
 	QApplication Application(argc, argv);
-	Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
+	//Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
 
 	ZEDMainEditor Editor;
 	Editor.show();
 
 	if (!ZEDCore::GetInstance()->Initialize())
 		return EXIT_FAILURE;
-	
-	if (!Editor.Initialize())
-		return EXIT_FAILURE;
 
-	
 	while (!StopMainLoop)
 	{
 		Application.processEvents();
 		ZEDCore::GetInstance()->ProcessEngine();
 	}
 	
-	Editor.Deinitialize();
 	ZEDCore::GetInstance()->Deinitialize();
 
 	return EXIT_SUCCESS;

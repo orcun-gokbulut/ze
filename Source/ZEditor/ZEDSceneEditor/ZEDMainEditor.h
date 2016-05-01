@@ -44,7 +44,7 @@
 namespace Ui {class MainEditor;}
 class ZEDMainBrowser;
 
-class ZEDMainEditor : public QMainWindow, public ZEInitializable
+class ZEDMainEditor : public QMainWindow
 {
 	Q_OBJECT
 	private:

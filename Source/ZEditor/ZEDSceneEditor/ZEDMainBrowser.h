@@ -44,7 +44,7 @@
 namespace Ui { class MainBrowser; }
 class ZEDObjectWrapper;
 
-class ZEDMainBrowserWidget : public QWidget, public ZEInitializable
+class ZEDMainBrowserWidget : public QWidget
 {
 	Q_OBJECT
 	private:

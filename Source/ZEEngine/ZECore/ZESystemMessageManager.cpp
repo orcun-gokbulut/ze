@@ -41,9 +41,19 @@
 #define WINDOWS_MEAN_AND_LEAN
 #include <Windows.h>
 
+void ZESystemMessageManager::SetEnabled(bool Enabled)
+{
+	this->Enabled = Enabled;
+}
+
+bool ZESystemMessageManager::GetEnabled()
+{
+	return false;
+}
+
 ZESystemMessageManager::ZESystemMessageManager()
 {
-
+	Enabled = true;
 }
 
 ZESystemMessageManager::~ZESystemMessageManager()
@@ -74,6 +84,9 @@ void ZESystemMessageManager::UnregisterMessageHandler(ZESystemMessageHandler* Ha
 
 void ZESystemMessageManager::ProcessMessages()
 {
+	if (!Enabled)
+		return;
+
 	MSG Msg;
 	ZeroMemory(&Msg, sizeof(Msg));
 

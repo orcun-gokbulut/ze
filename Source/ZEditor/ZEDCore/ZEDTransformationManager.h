@@ -68,9 +68,13 @@ class ZEDTransformationManager
 		ZEMatrix4x4							Transform;
 		ZEDGizmo*							Gizmo;
 
+		ZEVector2							MouseStartPosition;
+
 											ZEDTransformationManager();
 
 	public:
+		ZEDModule*							GetModule();
+
 		void								SetTransformType(ZEDTransformType Type);
 		ZEDTransformType					GetTransformType();
 

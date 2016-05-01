@@ -46,6 +46,12 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 
+bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void* Parameter)
+{
+	Collision.Object = this;
+	return true;
+}
+
 bool ZEDEntityWrapper::Update()
 {
 	if (!Dirty)
@@ -241,7 +247,9 @@ void ZEDEntityWrapper::SetSelected(bool Selected)
 
 void ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
+	Report.SetModifierFunction(ZEDelegateMethod(ZERayCastModifierFunction, ZEDEntityWrapper, RayCastModifier, this));
 	static_cast<ZEEntity*>(Object)->RayCast(Report, Parameters);
+	Report.SetModifierFunction(ZERayCastModifierFunction());
 }
 
 void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
