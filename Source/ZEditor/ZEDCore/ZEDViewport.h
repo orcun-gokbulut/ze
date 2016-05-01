@@ -50,7 +50,7 @@
 
 class ZEScene;
 
-class ZEDViewport : public QFrame, public ZEInitializable
+class ZEDViewport : public QFrame
 {
 	Q_OBJECT
 	private:
@@ -81,9 +81,6 @@ class ZEDViewport : public QFrame, public ZEInitializable
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 
-		ZEDViewportKeyboardEvent			Convert(QKeyEvent* KeyEvent);
-		ZEDViewportMouseEvent				Convert(QMouseEvent* MouseEvent);
-
 		virtual void						mousePressEvent(QMouseEvent* MouseEvent);
 		virtual void						mouseMoveEvent(QMouseEvent* MouseEvent);
 		virtual void						mouseReleaseEvent(QMouseEvent* MouseEvent);
@@ -110,6 +107,9 @@ class ZEDViewport : public QFrame, public ZEInitializable
 
 		void								SetScene(ZEScene* Scene);
 		ZEScene*							GetScene();
+
+		virtual bool						Initialize();
+		virtual void						Deinitialize();
 
 		void								Tick();
 		bool								PreRender();

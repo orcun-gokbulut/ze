@@ -74,9 +74,10 @@ enum ZERayCastMatch
 	ZE_RCM_FURTHEST
 };
 
-typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;
+class ZERayCastCollision;
 
-class ZERNMaterial;
+typedef ZEDelegate<bool (ZEObject*, void*)> ZERayCastFilterFunction;
+typedef ZEDelegate<bool (ZERayCastCollision&, const void*)> ZERayCastModifierFunction;
 
 class ZERayCastParameters
 {
@@ -131,6 +132,9 @@ class ZERayCastReport
 		float								MinimumDistance;
 		float								MaximumDistance;
 
+		const void*							ModifierParameter;
+		ZERayCastModifierFunction			ModifierFunction;
+
 	public:
 		bool								GetResult() const;
 		const ZERayCastCollision&			GetCollision() const;
@@ -142,7 +146,13 @@ class ZERayCastReport
 		void								SetParameters(const ZERayCastParameters* Parameters);
 		const ZERayCastParameters*			GetParameters() const;
 
-		void								AddCollision(const ZERayCastCollision& Collision);
+		void								SetModifierFunction(const ZERayCastModifierFunction& Function);
+		const ZERayCastModifierFunction&	GetModifierFunction();
+
+		void								SetModifierParameter(const void* Parameter);
+		const void*							GetModifierParameter();
+
+		virtual void						AddCollision(const ZERayCastCollision& Collision);
 
 		bool								CheckDistance(float Distance) const;
 		bool								CheckDone() const;

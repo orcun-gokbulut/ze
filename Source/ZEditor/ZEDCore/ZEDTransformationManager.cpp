@@ -40,6 +40,10 @@
 #include "ZEDObjectWrapper.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDOperationManager.h"
+#include "ZERenderer\ZERNScreenUtilities.h"
+#include "ZEDModule.h"
+#include "ZEDViewportInput.h"
+#include "ZEDViewport.h"
 
 ZEDTransformationManager::ZEDTransformationManager()
 {
@@ -48,6 +52,11 @@ ZEDTransformationManager::ZEDTransformationManager()
 	TransformType = ZED_TT_NONE;
 	TransformSpace = ZED_TS_WORLD;
 	Transform = ZEMatrix4x4::Identity;
+}
+
+ZEDModule* ZEDTransformationManager::GetModule()
+{
+	return Module;
 }
 
 void ZEDTransformationManager::SetTransformType(ZEDTransformType Type)
@@ -230,8 +239,91 @@ bool ZEDTransformationManager::KeyboardEventHandler(const ZEDViewportKeyboardEve
 
 bool ZEDTransformationManager::MouseEventHandler(const ZEDViewportMouseEvent& Event)
 {
+	if (!Gizmo->GetVisible() || Gizmo->GetMode() == ZED_GM_NONE)
+		return false;
+
 	if (ZEDSelectionManager::GetInstance()->GetSelectedObjects().GetCount() == 0)
 		return false;
+
+	const ZERNView& View = Event.Viewport->GetView();
+	ZERay Ray = ZERNScreenUtilities::ScreenToWorld(Event.Viewport->GetView(), Event.Position);
+	float TRay = FLT_MAX;
+
+	if (Event.Button == ZED_MB_NONE)
+	{
+		// Axis Highlight
+		ZEDGizmoAxis Axis = Gizmo->PickAxis(View, Ray, TRay);
+		Gizmo->SetHoveredAxis(Axis);
+		return false;
+	}
+	else if (Event.Button != ZED_MB_LEFT && Event.Type == ZED_ET_BUTTON_PRESSED)
+	{
+		// Transformation Start
+		ZEDGizmoAxis Axis = Gizmo->PickAxis(View, Ray, TRay);
+		Gizmo->SetSelectedAxis(Axis);
+
+		if (Gizmo->GetSelectedAxis() == ZED_GA_NONE)
+			return false;
+
+		switch (Gizmo->GetMode())
+		{
+			case ZED_GM_MOVE:
+				Gizmo->StartMoveProjection(View, Ray);
+				return true;
+
+			case ZED_GM_ROTATE:
+				Gizmo->StartRotationProjection(View, Ray);
+				return true;
+
+			case ZED_GM_SCALE:
+				Gizmo->StartScaleProjection(View, Ray);
+				return true;
+
+			default:
+				return false;
+		}
+	}
+	else if (Event.Type == ZED_ET_BUTTON_PRESSING)
+	{
+
+	}
+	else if (Event.Type == ZED_ET_BUTTON_RELEASED)
+	{
+		// End	
+		ZEMatrix4x4 NewTransform = ZEMatrix4x4::Identity;
+		if (Gizmo->GetMode() == ZED_GM_MOVE)
+		{
+			if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
+				ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_TRANSLATE);
+
+			ZEVector3 NewTranslation = (Gizmo->MoveProjection(View, Ray) - Gizmo->GetPosition());
+			ZEMatrix4x4::CreateTranslation(NewTransform, NewTranslation);
+			ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
+			Gizmo->SetPosition(Gizmo->GetPosition() + NewTranslation);
+			return true;
+		}
+		else if (Gizmo->GetMode() == ZED_GM_ROTATE)
+		{
+			if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
+				ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_ROTATE);
+
+			ZEQuaternion NewOrientation = Gizmo->RotationProjection(View, Ray);
+			ZEMatrix4x4::CreateRotation(NewTransform, NewOrientation);
+			ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
+			return true;
+		}
+		else if (Gizmo->GetMode() == ZED_GM_SCALE)
+		{
+			if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
+				ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_SCALE);
+
+			ZEVector3 NewScale = Gizmo->ScaleProjection(View, Ray);
+			ZEMatrix4x4::CreateScale(NewTransform, NewScale);
+			ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
+
+			return true;
+		}
+	}
 }
 
 void ZEDTransformationManager::Destroy()

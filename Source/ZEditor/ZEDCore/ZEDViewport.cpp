@@ -209,261 +209,6 @@ void ZEDViewport::DeinitializeSelf()
 	Window = NULL;
 }
 
-/*
-
-void ZEDViewport::mousePressEvent(QMouseEvent* MouseEvent)
-{
-	if (Scene == NULL)
-		return;
-
-	setFocus(Qt::MouseFocusReason);
-
-	if(MouseEvent->button() == Qt::LeftButton || MouseEvent->button() == Qt::RightButton)
-	{
-		this->MouseStartPosition.x = MouseEvent->x();
-		this->MouseStartPosition.y = MouseEvent->y();
-	}
-	
-	if (MouseEvent->button() == Qt::LeftButton && !(MouseEvent->buttons() & Qt::RightButton))
-	{
-		ZERay Ray;
-		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
-		float TRay = FLT_MAX;
-
-		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
-
-		if (!Gizmo->GetVisible() || Gizmo->GetMode() == ZED_GM_NONE)
-			return;
-
-		Gizmo->SetSelectedAxis(Gizmo->PickAxis(Camera->GetView(), Ray, TRay));
-
-		if (Gizmo->GetSelectedAxis() == ZED_GA_NONE)
-			return;
-
-		switch (Gizmo->GetMode())
-		{
-			case ZED_GM_MOVE:
-				Gizmo->StartMoveProjection(Camera->GetView(), Ray);
-				return;
-			case ZED_GM_ROTATE:
-				Gizmo->StartRotationProjection(Camera->GetView(), Ray);
-				return;
-			case ZED_GM_SCALE:
-				Gizmo->StartScaleProjection(Camera->GetView(), Ray);
-				return;
-		}
-	}
-}
-
-void ZEDViewport::mouseMoveEvent(QMouseEvent* MouseEvent)
-{	
-	if (Scene == NULL)
-		return;
-
-	if((MouseEvent->buttons() & Qt::RightButton))
-	{
-		if (MouseEvent->modifiers() & Qt::AltModifier)
-		{
-			ZEVector3 CameraDirection = Camera->GetFront();
-			ZEVector3::Scale(CameraDirection,CameraDirection, 0.1f * (MouseStartPosition.y - MouseEvent->y()));
-			Camera->SetPosition(Camera->GetPosition() + CameraDirection);
-			MouseStartPosition.x = MouseEvent->x();
-			MouseStartPosition.y = MouseEvent->y();
-		}
-		else if (MouseEvent->modifiers() == Qt::NoModifier)
-		{
-			MouseCurrentPosition.x = MouseEvent->x();
-			MouseCurrentPosition.y = MouseEvent->y();
-			RotateCamera(MouseCurrentPosition);	
-		}
-
-		return;
-	}
-
-	if(MouseEvent->buttons() & Qt::LeftButton)
-	{	
-		ZERay Ray;
-		Scene->GetActiveCamera()->GetScreenRay(Ray, MouseEvent->x(), MouseEvent->y());
-	
-		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
-
-		if (Gizmo->GetVisible() && Gizmo->GetSelectedAxis() != ZED_GA_NONE)
-		{
-			ZEMatrix4x4 NewTransform = ZEMatrix4x4::Identity;
-
-			if (Gizmo->GetMode() == ZED_GM_MOVE)
-			{
-				if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
-					ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_TRANSLATE);
-
-				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Camera->GetView(), Ray) - Gizmo->GetPosition());
-				ZEMatrix4x4::CreateTranslation(NewTransform, NewTranslation);
-				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
-				Gizmo->SetPosition(Gizmo->GetPosition() + NewTranslation);
-			}
-			else if (Gizmo->GetMode() == ZED_GM_ROTATE)
-			{
-				if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
-					ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_ROTATE);
-
-				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Camera->GetView(), Ray);
-				ZEMatrix4x4::CreateRotation(NewTransform, NewOrientation);
-				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
-			}
-			else if (Gizmo->GetMode() == ZED_GM_SCALE)
-			{
-				if (ZEDTransformationManager::GetInstance()->GetTransformType() == ZED_TT_NONE)
-					ZEDTransformationManager::GetInstance()->BeginTransform(ZED_TT_SCALE);
-
-				ZEVector3 NewScale = Gizmo->ScaleProjection(Camera->GetView(), Ray);
-				ZEMatrix4x4::CreateScale(NewTransform, NewScale);
-				ZEDTransformationManager::GetInstance()->ApplyTransform(NewTransform);
-			}
-		}
-		else
-		{
-			MouseCurrentPosition.x = MouseEvent->x();
-			MouseCurrentPosition.y = MouseEvent->y();
-
-			if (MouseEvent->modifiers() & Qt::ControlModifier)
-			{
-				//Make add to selection display preps
-			}
-			else if (MouseEvent->modifiers() & Qt::AltModifier)
-			{
-				//Make remove from selection display preps
-			}
-		}
-
-	}
-	else
-	{
-		ZERay Ray =	Scene->GetActiveCamera()->GetScreenRay(MouseEvent->x(), MouseEvent->y());
-		float TRay = FLT_MAX;
-
-		ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
-
-		if (Gizmo->GetMode() == ZED_GM_NONE)
-			return;
-
-		switch(Gizmo->PickAxis(Ray, TRay))
-		{
-			case ZED_GA_NONE:
-				Gizmo->SetHoveredAxis(ZED_GA_NONE);
-				break;
-			case ZED_GA_X_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_X_AXIS);
-				break;
-			case ZED_GA_Y_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_Y_AXIS);
-				break;
-			case ZED_GA_Z_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_Z_AXIS);
-				break;
-			case ZED_GA_XY_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_XY_AXIS);
-				break;
-			case ZED_GA_XZ_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_XZ_AXIS);
-				break;
-			case ZED_GA_YZ_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_YZ_AXIS);
-				break;
-			case ZED_GA_XYZ_AXIS:
-				Gizmo->SetHoveredAxis(ZED_GA_XYZ_AXIS);
-				break;
-		}	
-	}
-}
-
-void ZEDViewport::mouseReleaseEvent(QMouseEvent* MouseEvent)
-{
-	if (Scene == NULL)
-		return;
-
-	if (MouseEvent->button() == Qt::LeftButton)
-	{
-		ZEDTransformationManager* TransformationManager = ZEDTransformationManager::GetInstance();
-
-		ZERay Ray = Scene->GetActiveCamera()->GetScreenRay(MouseEvent->x(), MouseEvent->y());
-
-		ZEDGizmo* Gizmo = TransformationManager->GetGizmo();
-
-		if (Gizmo->GetVisible() && Gizmo->GetSelectedAxis() != ZED_GA_NONE)
-		{
-			ZEMatrix4x4 NewTransform = ZEMatrix4x4::Identity;
-
-			if (Gizmo->GetMode() == ZED_GM_MOVE)
-			{
-				ZEVector3 NewTranslation = (Gizmo->MoveProjection(Camera->GetView(), Ray) - Gizmo->GetPosition());
-				ZEMatrix4x4::CreateTranslation(NewTransform, NewTranslation);
-				TransformationManager->ApplyTransform(NewTransform);
-				TransformationManager->EndTransform();
-				//ParentEditor->UpdatePropertyWidgetValues();
-			}
-			else if (Gizmo->GetMode() == ZED_GM_ROTATE)
-			{
-				ZEQuaternion NewOrientation = Gizmo->RotationProjection(Camera->GetView(), Ray);
-				ZEMatrix4x4::CreateRotation(NewTransform, NewOrientation);
-				TransformationManager->ApplyTransform(NewTransform);
-				TransformationManager->EndTransform();
-				//ParentEditor->UpdatePropertyWidgetValues();
-			}
-			else if (Gizmo->GetMode() == ZED_GM_SCALE)
-			{
-				ZEVector3 NewScale = Gizmo->ScaleProjection(Camera->GetView(), Ray);
-				ZEMatrix4x4::CreateScale(NewTransform, NewScale);
-				TransformationManager->ApplyTransform(NewTransform);
-				TransformationManager->EndTransform();
-				//ParentEditor->UpdatePropertyWidgetValues();
-			}
-		}
-		else
-		{
-			MouseCurrentPosition.x = MouseEvent->x();
-			MouseCurrentPosition.y = MouseEvent->y();
-
-			if (MouseEvent->modifiers() & Qt::ControlModifier) //this should be equality but I'm not sure.
-			{
-				ZEDSelectionManager::GetInstance()->SelectObject(MouseStartPosition, MouseCurrentPosition);
-			}
-			else if (MouseEvent->modifiers() & Qt::AltModifier)
-			{
-				ZEDSelectionManager::GetInstance()->DeselectObject(MouseStartPosition, MouseCurrentPosition);
-			}
-			else
-			{
-				ZEDSelectionManager::GetInstance()->ClearSelection();
-				ZEDSelectionManager::GetInstance()->SelectObject(MouseStartPosition, MouseCurrentPosition);
-			}
-		}
-
-	}
-	else if (MouseEvent->button() == Qt::RightButton)
-	{
-		//Nothing to do?
-	}
-}
-
-void ZEDViewport::keyPressEvent(QKeyEvent* KeyEvent)
-{
-	if (!KeyEvent->isAutoRepeat())
-		PressedKeyboardKeys.insert(KeyEvent->key());
-}
-
-void ZEDViewport::keyReleaseEvent(QKeyEvent* KeyEvent)
-{
-	if (!KeyEvent->isAutoRepeat())
-		PressedKeyboardKeys.remove(KeyEvent->key());
-}*/
-
-ZEDViewportKeyboardEvent ZEDViewport::Convert(QKeyEvent* KeyEvent)
-{
-	ZEDViewportKeyboardEvent Event;
-
-	return Event;
-}
-
 void ZEDViewport::mousePressEvent(QMouseEvent* Event)
 {
 	ZEDViewportMouseEvent MouseEvent;
@@ -549,7 +294,10 @@ void ZEDViewport::leaveEvent(QEvent* Event)
 void ZEDViewport::keyPressEvent(QKeyEvent* Event)
 {
 	if (Event->isAutoRepeat())
+	{
+		QFrame::keyReleaseEvent(Event);
 		return;
+	}
 
 	if (Event->key() == Qt::Key_Shift)
 		Modifiers |= ZED_KKM_SHIFT;
@@ -582,7 +330,10 @@ void ZEDViewport::keyPressEvent(QKeyEvent* Event)
 void ZEDViewport::keyReleaseEvent(QKeyEvent* Event)
 {
 	if (Event->isAutoRepeat())
+	{
+		QFrame::keyReleaseEvent(Event);
 		return;
+	}
 
 	ZEDViewportKeyboardEvent KeyboardEvent;
 	KeyboardEvent.Viewport = this;
@@ -677,6 +428,15 @@ void ZEDViewport::SetScene(ZEScene* Scene)
 ZEScene* ZEDViewport::GetScene()
 {
 	return Scene;
+}
+
+bool ZEDViewport::Initialize()
+{
+	return InitializeSelf();
+}
+void ZEDViewport::Deinitialize()
+{
+	DeinitializeSelf();
 }
 
 void ZEDViewport::Tick()
@@ -782,6 +542,6 @@ ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
 	VerticalFOV = ZE_PI_3;
 	LastMousePosition = ZEVector2(-1.0f, -1.0f);
 	MouseDelta = ZEVector2::Zero;
-	setMouseTracking(true);
-	setFocusPolicy(Qt::ClickFocus);
+	//setMouseTracking(true);
+	//setFocusPolicy(Qt::StrongFocus);
 }

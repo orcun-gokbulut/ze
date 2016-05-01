@@ -69,20 +69,6 @@ void ZEDMainBrowserWidget::LoadScene()
 	LoadObject(TopLevelItem, Scene);
 }
 
-bool ZEDMainBrowserWidget::InitializeSelf()
-{
-	Scene = ZEDCore::GetInstance()->GetEditorModule()->GetRootWrapper();
-	LoadScene();
-	
-	return true;
-}
-
-bool ZEDMainBrowserWidget::DeinitalizeSelf()
-{
-	Scene = NULL;
-	return true;
-}
-
 ZEDMainBrowserWidget::ZEDMainBrowserWidget(QWidget* Parent) : QWidget(Parent)
 {
 	Form = new Ui::MainBrowser();

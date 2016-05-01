@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEDEntityWrapper.h"
+#include "ZEGame/ZERayCast.h"
 
 class ZEDSceneWrapper : public ZEDObjectWrapper
 {

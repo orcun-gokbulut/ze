@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDCore.h"
+
 #include "ZEDOperationManager.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDTransformationManager.h"
@@ -44,7 +45,9 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZECore/ZEOptionManager.h"
+#include "ZECore/ZESystemMessageManager.h"
 #include "ZEMeta/ZEProvider.h"
+
 #include <windows.h>
 #include <QtCore/QObject>
 
@@ -56,6 +59,7 @@ bool ZEDCore::InitializeSelf()
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
+	zeCore->GetSystemMessageManager()->SetEnabled(false);
 	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
 
 	if (!zeCore->StartUp())

@@ -51,9 +51,12 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		ZEHolder<ZERNSimpleMaterial>		Material;
 		ZERNCommand							Command;
 
+		bool								AlterRaycast(ZERayCastCollision& Collision);
+
 	protected:
 		ZECanvas							Canvas;
 
+		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
 		bool								Update();
 
 											ZEDEntityWrapper();
