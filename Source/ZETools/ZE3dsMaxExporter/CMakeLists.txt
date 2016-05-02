@@ -118,11 +118,13 @@ qt5_wrap_cpp(QtMocFiles ${QtMocs})
 
 source_group("Generated" FILES ${QtResourceFiles} ${QtMocFiles} ${QtUIFiles})
 
-ze_add_library(TARGET ZE3dsMaxExporter 
+ze_add_library(TARGET ZE3dsMaxPlugin
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	ZEFC ${ZEFC}
-	LIBS ZEFoundation lib3dsMax2015)
+	LIBS ZEFoundation lib3dsMax2015
+	DLL)
 
-qt5_use_modules(ZE3dsMaxExporter Widgets)
+qt5_use_modules(ZE3dsMaxPlugin Widgets)
 
-set_property(TARGET ZE3dsMaxExporter APPEND PROPERTY COMPILE_FLAGS "/GR")
+set_property(TARGET ZE3dsMaxPlugin APPEND PROPERTY COMPILE_FLAGS "/GR")
+set_property(TARGET ZE3dsMaxPlugin PROPERTY SUFFIX ".gup")

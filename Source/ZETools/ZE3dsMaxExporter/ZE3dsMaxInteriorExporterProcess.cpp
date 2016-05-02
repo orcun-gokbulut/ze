@@ -122,17 +122,17 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		IGameNode* CurrentNode = Doors[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
-		zeLog("Processing Door \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Doors.Count());
+		zeLog("Processing Door \"%s\" (%Iu/%d)", ZEString(CurrentNode->GetName()).ToCString(), I + 1, Doors.Count());
 		
 		DoorNode->AddProperty("Name")->SetString(ZEString(CurrentNode->GetName()));
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, L"IsOpen", *DoorNode->AddProperty("IsOpen")))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_BOOL_PROP, ZEString("IsOpen"), *DoorNode->AddProperty("IsOpen")))
 			zeError("Can not find door property : \"IsOpen\".");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, L"Width", *DoorNode->AddProperty("Width")))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, ZEString("Width"), *DoorNode->AddProperty("Width")))
 			zeError("Can not find door property : \"Width\".");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, L"Length", *DoorNode->AddProperty("Length")))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_FLOAT_PROP, ZEString("Length"), *DoorNode->AddProperty("Length")))
 			zeError("Can not find door property : \"Length\".");
 
 		ZEMatrix4x4 ObjectTM;
@@ -150,21 +150,21 @@ bool ZE3dsMaxInteriorExporter::ProcessDoors()
 		ZEMatrix4x4 OffsetTransform = WorldTM.Inverse() * ObjectTM;
 
 		if (!OffsetTransform.Equals(ZEMatrix4x4::Identity, 0.0000001f))
-			zeWarning("Pivot transformations are omitted for ZEInteriorDoor. The pivot for ZEInteriorDoor: %s is returned to it's Identity state.", CurrentNode->GetName());
+			zeWarning("Pivot transformations are omitted for ZEInteriorDoor. The pivot for ZEInteriorDoor: %s is returned to it's Identity state.", ZEString(CurrentNode->GetName()).ToCString());
 
 		DoorNode->AddProperty("Position")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Translation()));
 		DoorNode->AddProperty("Rotation")->SetQuaternion(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Rotation()));
 		DoorNode->AddProperty("Scale")->SetVector3(ZE3dsMaxUtils::MaxtoZE(CurrentNode->GetObjectTM().Scaling()));
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomA", RoomANode))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZEString("RoomA"), RoomANode))
 			zeError("Can not find door property: RoomA");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, L"RoomB", RoomBNode))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZEString("RoomB"), RoomBNode))
 			zeError("Can not find door property: RoomB");
 
 		if (RoomANode == NULL || RoomBNode == NULL || RoomANode == RoomBNode)
 		{
-			zeWarning("Interior door \"%s\" has wrong parameters.", CurrentNode->GetName());
+			zeWarning("Interior door \"%s\" has wrong parameters.", ZEString(CurrentNode->GetName()).ToCString());
 			return false;
 		}
 
@@ -269,7 +269,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 
 		IGameNode* CurrentNode = Rooms[I];
 		ZEProgressDialog::GetInstance()->OpenTask(CurrentNode->GetName());
-		zeLog("Processing Room \"%s\" (%Iu/%d)", CurrentNode->GetName(), I + 1, Rooms.Count());
+		zeLog("Processing Room \"%s\" (%Iu/%d)", ZEString(CurrentNode->GetName()).ToCString(), I + 1, Rooms.Count());
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
 		bool PhysicalMeshExists, PhysicalMeshEnabled, PhysicalMeshUseSelf, OctreeEnabled;
 		INode* PhysicalMeshMaxNode;
@@ -287,22 +287,22 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 		if (!UserDefinedPropertiesBuffer.isNull())
 			RoomNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"OctreeEnabled", OctreeEnabled))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, ZEString("OctreeEnabled"), OctreeEnabled))
 			zeError("Can not find room property : \"OctreeEnabled\".");
 		else
 			RoomNode->AddProperty("GenerateOctree")->SetBool(OctreeEnabled);
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshExists", PhysicalMeshExists))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, ZEString("PhysicalMeshExists"), PhysicalMeshExists))
 			zeError("Can not find room property : \"PhysicalMeshExists\".");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshEnabled", PhysicalMeshEnabled))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, ZEString("PhysicalMeshEnabled"), PhysicalMeshEnabled))
 			zeError("Can not find room property : \"PhysicalMeshEnabled\".");
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, L"PhysicalMeshUseSelf", PhysicalMeshUseSelf))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_INT_PROP, ZEString("PhysicalMeshUseSelf"), PhysicalMeshUseSelf))
 			zeError("Can not find room property : \"PhysicalMeshUseSelf\".");
 
 		if (PhysicalMeshEnabled && !PhysicalMeshUseSelf)
-			if (!ZE3dsMaxUtils::GetProperty(CurrentObject, L"PhysicalMesh", PhysicalMeshMaxNode))
+			if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZEString("PhysicalMesh"), PhysicalMeshMaxNode))
 				zeError("Can not find room property : \"PhysicalMesh\".");
 
 		if (PhysicalMeshExists)
@@ -380,7 +380,7 @@ bool ZE3dsMaxInteriorExporter::ProcessRooms()
 			Face = Mesh->GetFace((ZEInt32)I);
 			if (Mesh->GetMaterialFromFace((ZEInt32)I) == NULL)
 			{
-				zeError("Face %d of room \"%s\" does not have valid material.", I, CurrentNode->GetName());
+				zeError("Face %d of room \"%s\" does not have valid material.", I, ZEString(CurrentNode->GetName()).ToCString());
 				return false;
 			}
 
@@ -445,7 +445,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		IGameObject* Helper = Node->GetIGameObject();
 
 		ZEProgressDialog::GetInstance()->OpenTask(Node->GetName());
-		zeLog("Processing helper \"%s\".", Node->GetName());
+		zeLog("Processing helper \"%s\".", ZEString(Node->GetName()).ToCString());
 
 		HelperNode->AddProperty("Name")->SetString(ZEString(Node->GetName()));
 
@@ -453,39 +453,39 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		ZEInt32 OwnerIndex;
 		ZEInteriorHelperOwnerType OwnerType;
 
-		if (!ZE3dsMaxUtils::GetProperty(Helper, L"Owner", OwnerNode))
+		if (!ZE3dsMaxUtils::GetProperty(Helper, ZEString("Owner"), OwnerNode))
 			zeError("Can not find helper property: Owner");
 
 		IGameNode* OwnerGameNode = Scene->GetIGameNode(OwnerNode);
 
 		if (OwnerNode == NULL)
 		{
-			zeWarning("Helper \"%s\" has no immediate owner parameter. Interior will be set as owner.", Node->GetName());
+			zeWarning("Helper \"%s\" has no immediate owner parameter. Interior will be set as owner.", ZEString(Node->GetName()).ToCString());
 
 			OwnerIndex = -1;
 			OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_INTERIOR;
 		}
 		else
 		{
-			const MCHAR* Type;
+			ZEString Type;
 
-			ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, L"ZEType", Type);
+			ZE3dsMaxUtils::GetProperty(OwnerGameNode->GetIGameObject(), ZE_STRING_PROP, ZEString("ZEType"), Type);
 
-			if (wcscmp(Type, L"Room") == 0)
+			if (Type.Equals("Room"))
 			{
 				OwnerIndex = ZE3dsMaxInteriorExporter::FindRoomIndex(OwnerGameNode);
 				OwnerType = ZEInteriorHelperOwnerType::ZE_IHOT_ROOM;
 			}
 			else
 			{
-				zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+				zeError("Helper \"%s\" has invalid owner parameter.", ZEString(Node->GetName()).ToCString());
 				return false;
 			}
 		}
 
 		if (OwnerIndex < 0 && OwnerType != ZE_IHOT_INTERIOR)
 		{
-			zeError("Helper \"%s\" has invalid owner parameter.", Node->GetName());
+			zeError("Helper \"%s\" has invalid owner parameter.", ZEString(Node->GetName()).ToCString());
 			return false;
 		}
 
@@ -525,7 +525,7 @@ bool ZE3dsMaxInteriorExporter::ProcessHelpers()
 		if (!UserDefinedPropertiesBuffer.isNull())
 			HelperNode->AddProperty("UserDefinedProperties")->SetString(ZEString(UserDefinedPropertiesBuffer.data()));
 
-		zeLog("Helper \"%s\" is processed.", Node->GetName());
+		zeLog("Helper \"%s\" is processed.", ZEString(Node->GetName()).ToCString());
 		ZEProgressDialog::GetInstance()->CloseTask();
 	}
 
@@ -588,7 +588,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 		zeLog("Opening material file...");
 		if (!MaterialFile.Open(MaterialOption.ExportPath + "\\" + MaterialName + ".ZEMaterial", ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
 		{
-			zeError("Material process failed. Unable to open file for material: \"%s\"", MaterialName);
+			zeError("Material process failed. Unable to open file for material: \"%s\"", MaterialName.ToCString());
 			return false;
 		}
 		zeLog("Material file successfully opened.");
@@ -621,7 +621,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
-							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
+							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier.ToCString());
 					}
 				}
 				break;
@@ -642,7 +642,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
-							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
+							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier.ToCString());
 					}
 				}
 				break;
@@ -663,7 +663,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
-							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
+							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier.ToCString());
 					}
 				}
 				break;
@@ -684,7 +684,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
-							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
+							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier.ToCString());
 					}
 				}
 				break;
@@ -707,7 +707,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
-							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
+							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier.ToCString());
 					}
 				}
 				break;
@@ -729,7 +729,7 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 						if (!ZEFileInfo(MaterialOption.PhysicalPath).Copy(MaterialOption.ExportPath + "//" + MaterialOption.Identifier))
 							zeError("Can not copy resource, resource identifier : %s", MaterialOption.Identifier.ToCString());
 						else
-							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier);
+							zeLog("Resource copied successfully, resource identifier : %s", MaterialOption.Identifier.ToCString());
 					}
 				}
 				break; 
@@ -752,11 +752,11 @@ bool ZE3dsMaxInteriorExporter::ProcessMaterials(const char* FileName)
 
 		MaterialConfigNode.WriteString("Name", "Default");
 		bool TempBooleanValue = false;
-		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, L"wire", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, ZEString("wire"), TempBooleanValue);
 		MaterialConfigNode.WriteBool("Wireframe", TempBooleanValue);
 
 		TempBooleanValue = false;
-		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, L"twoSided", TempBooleanValue);
+		ZE3dsMaxUtils::GetProperty(NodeMaterial, ZE_INT_PROP, ZEString("twoSided"), TempBooleanValue);
 		MaterialConfigNode.WriteBool("TwoSided", TempBooleanValue);
 
 		MaterialConfigNode.WriteBool("LightningEnabled", true); // Lightning Enabled is forced true;
@@ -849,31 +849,31 @@ bool ZE3dsMaxInteriorExporter::ProcessScene()
 
 	IGameNode* CurrentNode = NULL;
 	IGameObject* CurrentObject = NULL;
-	const MCHAR* NodeZEType = NULL;
+	ZEString NodeZEType;
 
 	for (ZESize I = 0; I < (ZESize)MeshNodes.Count(); I++)
 	{
 		CurrentNode = MeshNodes[I];
 		CurrentObject = CurrentNode->GetIGameObject();
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, L"ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, ZEString("ZEType"), NodeZEType))
 			continue;
 
-		if (wcscmp(NodeZEType, L"Room") == 0)
+		if (NodeZEType.Equals("Room"))
 		{
 			RoomNodeCount++;
 			Rooms.Append(1, &CurrentNode);
 		}
-		else if (wcscmp(NodeZEType, L"Door") == 0)
+		else if (NodeZEType.Equals("Door"))
 		{
 			DoorNodeCount++;
 			Doors.Append(1, &CurrentNode);
 		}
-		else if (wcscmp(NodeZEType, L"ZEInteriorFileBrush") == 0)
+		else if (NodeZEType.Equals("ZEInteriorFileBrush"))
 		{
 			EntityNodeCount++;
 		}
-		else if (wcscmp(NodeZEType, L"ZEInteriorFileEntity") == 0)
+		else if (NodeZEType.Equals("ZEInteriorFileEntity"))
 		{
 			//Why is is empty...
 		}
@@ -888,10 +888,10 @@ bool ZE3dsMaxInteriorExporter::ProcessScene()
 		CurrentNode = HelperNodes[I];
 		CurrentObject = CurrentNode->GetIGameObject();
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, L"ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, ZEString("ZEType"), NodeZEType))
 			continue;
 
-		if (wcscmp(NodeZEType, L"Helper") == 0)
+		if (NodeZEType.Equals("Helper"))
 		{
 			HelperNodeCount++;
 			Helpers.Append(1, &CurrentNode);
@@ -917,12 +917,12 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 	{
 		IGameNode* CurrentNode = Nodes[I];
 		IGameObject* CurrentObject = CurrentNode->GetIGameObject();
-		const MCHAR* NodeZEType = NULL;
+		ZEString NodeZEType;
 
-		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, L"ZEType", NodeZEType))
+		if (!ZE3dsMaxUtils::GetProperty(CurrentObject, ZE_STRING_PROP, ZEString("ZEType"), NodeZEType))
 			continue;
 
-		if (wcscmp(NodeZEType, L"Room") == 0)
+		if (NodeZEType.Equals("Room"))
 		{
 			RoomNodeCount++;
 			ResourceRooms.Append(1, &CurrentNode);
@@ -946,7 +946,7 @@ void ZE3dsMaxInteriorExporter::CollectResources()
 			IGameMaterial* CurrentMaterial = Mesh->GetMaterialFromFace((ZEInt32)I);
 
 			if (CurrentMaterial == NULL)
-				zeError("Face %d of room \"%s\" does not have valid material. Can not collect resource.", I, CurrentNode->GetName());
+				zeError("Face %d of room \"%s\" does not have valid material. Can not collect resource.", I, ZEString(CurrentNode->GetName()).ToCString());
 
 			bool IsFound = false;
 

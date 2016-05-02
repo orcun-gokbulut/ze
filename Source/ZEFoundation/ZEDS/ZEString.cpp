@@ -2337,6 +2337,11 @@ ZEString::operator const char*() const
 	return GetValue();
 }
 
+ZEString::operator const wchar_t*() const
+{
+	return ToWCString();
+}
+
 ZEString::ZEString()
 {
 	Buffer = NULL;

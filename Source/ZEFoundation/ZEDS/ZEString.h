@@ -304,6 +304,7 @@ class ZEString
 
 									operator std::string() const;
 									operator const char*() const;
+									operator const wchar_t*() const;
 
 									ZEString();
 

@@ -43,6 +43,7 @@
 #include "ZEML/ZEMLProperty.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEFile/ZEFileCommon.h"
+#include <QFile>
 
 void ZEResourceConfiguratorWidget::TreeItemClicked(QTreeWidgetItem* Item, int Column)
 {
@@ -67,6 +68,11 @@ ZEResourceConfiguratorWidget::ZEResourceConfiguratorWidget(QWidget* Parent) : QD
 
 	Form = new Ui::ZEResourceConfiguratorUI();
 	Form->setupUi(this);
+
+	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
+	File.open(QFile::ReadOnly);
+	QString StyleSheet = QLatin1String(File.readAll());
+	setStyleSheet(StyleSheet);
 
 	OptionWidget = new ZEResourceOptionWidget(Form->OptionsParentWidget);
 	Form->OptionsParentWidgetLayout->addWidget(OptionWidget);

@@ -94,37 +94,37 @@ ZEInt ZE3dsMaxModelExporter::ExtCount()
 
 const TCHAR *ZE3dsMaxModelExporter::Ext(ZEInt n)
 {		
-	return L"zeModel";
+	return ZEString("zeModel");
 }
 
 const TCHAR *ZE3dsMaxModelExporter::LongDesc()
 {
-	return L"Zinek Engine Model File";
+	return ZEString("Zinek Engine Model File");
 }
 	
 const TCHAR *ZE3dsMaxModelExporter::ShortDesc() 
 {			
-	return L"Zinek Engine Model";
+	return ZEString("Zinek Engine Model");
 }
 
 const TCHAR *ZE3dsMaxModelExporter::AuthorName()
 {			
-	return L"Zinek Engine Staff";
+	return ZEString("Zinek Engine Staff");
 }
 
 const TCHAR *ZE3dsMaxModelExporter::CopyrightMessage() 
 {	
-	return L"Copyright (c) 2008, Zinek Engine Staff";
+	return ZEString("Copyright (c) 2008, Zinek Engine Staff");
 }
 
 const TCHAR *ZE3dsMaxModelExporter::OtherMessage1() 
 {		
-	return L"";
+	return ZEString();
 }
 
 const TCHAR *ZE3dsMaxModelExporter::OtherMessage2() 
 {		
-	return L"";
+	return ZEString();
 }
 
 ZEUInt ZE3dsMaxModelExporter::Version()
@@ -278,15 +278,15 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	ProgressDialog->Start();
 	ProgressDialog->OpenTask("Model Exporter", true);
 
-	zeLog("Exporting model to file \"%s\".", name);
+	zeLog("Exporting model to file \"%s\".", ZEString(name).ToCString());
 
 	Tab<IGameNode*> Meshes = Scene->GetIGameNodeByType(IGameObject::IGAME_MESH);
-	const MCHAR* Type;
+	ZEString Type;
 
 	for (ZESize I = 0; I < (ZESize)Meshes.Count(); I++)
 	{
-		Type = NULL;
-		if (ZE3dsMaxUtils::GetProperty(Meshes[I]->GetIGameObject(), ZE_STRING_PROP, L"ZEType", Type) && wcscmp(Type, L"BoundingBox") == 0)
+		Type.Clear();
+		if (ZE3dsMaxUtils::GetProperty(Meshes[I]->GetIGameObject(), ZE_STRING_PROP, ZEString("ZEType"), Type) && Type.Equals("BoundingBox"))
 		{
 			IGameMesh* BoundingBoxMesh = (IGameMesh*)Meshes[I]->GetIGameObject();
 
@@ -346,7 +346,7 @@ ZEInt ZE3dsMaxModelExporter::DoExport(const TCHAR* name, ExpInterface* ei,Interf
 	}
 	ProgressDialog->CloseTask();
 
-	ProgressDialog->OpenTask("Writing File");
+	ProgressDialog->OpenTask("Write Process");
 	zeLog("Writing ZEModel to file...");
 	if (!WriteToFile(ZEString(name)))
 	{
@@ -398,6 +398,8 @@ bool ZE3dsMaxModelExporter::WriteToFile(const char* FilePath)
 	ModelRoot.Write(&File);
 
 	File.Close();
+
+	zeLog("Writing model to file completed successfully.");
 
 	return true;
 }

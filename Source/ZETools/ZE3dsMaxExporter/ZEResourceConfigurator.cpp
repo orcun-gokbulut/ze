@@ -157,7 +157,28 @@ ZEString ZEResourceConfigurator::GetResourceRelativePath(ZEString& RelativeTo, c
 
 	ZEPathInfo Path(Option->ExportPath + "\\" + Option->Identifier);
 
-	return Path.GetRelativeTo(RelativeTo);
+	ZEPathInfo RelativePathInfo(RelativeTo);
+	
+	if (RelativePathInfo.IsFile())
+		RelativePathInfo.SetPath(RelativePathInfo.GetParentDirectory());
+
+	if (Path.IsParent(RelativePathInfo.GetPath()))
+		return Path.GetRelativeTo(RelativePathInfo.GetPath());
+
+	ZEPathInfo ParentPathInfo(RelativePathInfo.GetPath());
+	ZEString Result;
+
+	while (Path.IsParent(ParentPathInfo.GetPath()) == false)
+	{
+		ParentPathInfo.SetPath(ParentPathInfo.GetParentDirectory());
+		Result.Append("../");
+
+		if (!ParentPathInfo.IsExists())
+			return ZEString();
+	}
+
+	Result.Append(Path.GetRelativeTo(ParentPathInfo.GetPath()));
+	return Result;
 }
 
 ZEString ZEResourceConfigurator::GetResourceRelativePath(ZEString& RelativeTo, const ZEResourceOption& Option)

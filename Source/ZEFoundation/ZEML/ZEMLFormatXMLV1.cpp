@@ -1104,7 +1104,7 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 		case ZEML_ET_DATA:
 		{
 			ZEString Output = ZEFormat::Format("<Data Name=\"{0}\" Size=\"{1}\">", Element.Name, Element.Size);
-			if (File->Write(Output, Output.GetLength(), 1) != 1)
+			if (File->Write(Output.ToCString(), Output.GetLength(), 1) != 1)
 				return false;
 
 			ZESize Base64Size = ZEBase64::EncodeSize(Element.Size);

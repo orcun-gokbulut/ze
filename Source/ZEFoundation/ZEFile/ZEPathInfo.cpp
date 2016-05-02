@@ -176,6 +176,34 @@ bool ZEPathInfo::IsInsidePackage() const
 	return false;
 }
 
+bool ZEPathInfo::IsParent(const char* ParentPath) const
+{
+	ZEPathTokenizer PathTokens;
+	PathTokens.Tokenize(GetRealPath().Path);
+	if (!Normalize(PathTokens))
+		return false;
+
+	ZEPathTokenizer ParentPathTokens;
+	ZEPathInfo ParentPathInfo(ParentPath);
+	ParentPathTokens.Tokenize(ParentPathInfo.GetRealPath().Path);
+	if (!Normalize(ParentPathTokens))
+		return false;
+	
+	if (PathTokens.GetTokenCount() < ParentPathTokens.GetTokenCount())
+		return false;
+
+	for (ZESize I = 0; I < ParentPathTokens.GetTokenCount(); I++)
+	{
+		const char* ParentToken = ParentPathTokens.GetToken(I);
+		const char* PathToken = PathTokens.GetToken(I);
+
+		if (strcmp(ParentToken, PathToken) != 0)
+			return false;
+	}
+
+	return true;
+}
+
 ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 {
 	ZEPathTokenizer PathTokens;
@@ -188,7 +216,6 @@ ZEString ZEPathInfo::GetRelativeTo(const char* ParentPath) const
 	if (!Normalize(ParentPathTokens))
 		return "";
 
-	ZESize Index = 0;
 	for (ZESize I = 0; I < ParentPathTokens.GetTokenCount(); I++)
 	{
 		const char* ParentToken = ParentPathTokens.GetToken(I);

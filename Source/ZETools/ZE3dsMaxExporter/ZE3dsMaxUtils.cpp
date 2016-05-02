@@ -67,7 +67,7 @@ Quat ZE3dsMaxUtils::ZEtoMax(const ZEQuaternion& Quaternion)
 	return Quat(Quaternion.x, Quaternion.y, Quaternion.z, Quaternion.w);
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const MCHAR* Property, INode*& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const ZEString& Property, INode*& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -85,12 +85,12 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const MCHAR* Property, IN
 	else
 	{
 		Value = NULL;
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property.ToCString());
 		return false;
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const MCHAR* Property, IGameScene* Scene, IGameNode*& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const ZEString& Property, IGameScene* Scene, IGameNode*& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -114,12 +114,12 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, const MCHAR* Property, IG
 	}
 	else
 	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property.ToCString());
 		return false;
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, bool& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, bool& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -140,24 +140,24 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 			}
 			else
 			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
+				zeWarning("Can not read property value. (Property Name : \"%s\")", Property.ToCString());
 				return false;
 			}
 		}
 		else
 		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
+			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property.ToCString(), Prop->GetType(), Type);
 			return false;
 		}
 	}
 	else
 	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property.ToCString());
 		return false;
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, const MCHAR*& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, ZEString& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -171,17 +171,22 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 
 		if (Prop->GetType() == Type)
 		{
-			if (Prop->GetPropertyValue(Value))
+			const MCHAR* TempValue;
+
+			if (Prop->GetPropertyValue(TempValue))
+			{
+				Value.SetValue(TempValue);
 				return true;
+			}
 			else
 			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
+				zeWarning("Can not read property value. (Property Name : \"%s\")", Property.ToCString());
 				return false;
 			}
 		}	
 		else
 		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
+			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property.ToCString(), Prop->GetType(), Type);
 			return false;
 		}
 	}
@@ -189,7 +194,7 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 	return false;
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEInt& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, ZEInt& Value)
 { 
 	if (Object == NULL)
 		return false;
@@ -206,24 +211,24 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 				return true;
 			else
 			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
+				zeWarning("Can not read property value. (Property Name : \"%s\")", Property.ToCString());
 				return false;
 			}
 		}
 		else
 		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
+			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property.ToCString(), Prop->GetType(), Type);
 			return false;
 		}
 	}
 	else
 	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property.ToCString());
 		return false;
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEUInt& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, ZEUInt& Value)
 {
 	ZEInt Temp;
 	if (Object == NULL)
@@ -248,25 +253,25 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 			}
 			else
 			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
+				zeWarning("Can not read property value. (Property Name : \"%s\")", Property.ToCString());
 				return false;
 			}
 		}
 		else
 		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
+			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property.ToCString(), Prop->GetType(), Type);
 			return false;
 		}
 	}
 	else
 	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property.ToCString());
 		return false;
 	}
 
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, float& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, float& Value)
 {
 	if (Object == NULL)
 		return false;
@@ -283,24 +288,24 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MC
 				return true;
 			else
 			{
-				zeWarning("Can not read property value. (Property Name : \"%s\")", Property);
+				zeWarning("Can not read property value. (Property Name : \"%s\")", Property.ToCString());
 				return false;
 			}
 		}
 		else
 		{
-			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property, Prop->GetType(), Type);
+			zeWarning("Wrong property type. (Property Name : \"%s\", Expected Type : %d, Type : %d)", Property.ToCString(), Prop->GetType(), Type);
 			return false;
 		}
 	}
 	else
 	{
-		zeWarning("Can not find property. (Property Name : \"%s\")", Property);
+		zeWarning("Can not find property. (Property Name : \"%s\")", Property.ToCString());
 		return false;
 	}
 }
 
-bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const MCHAR* Property, ZEMLProperty& Value)
+bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, ZEMLProperty& Value)
 {
 	if (Object == NULL)
 		return false;

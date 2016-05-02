@@ -93,37 +93,37 @@ ZEInt ZE3dsMaxInteriorExporter::ExtCount()
 
 const TCHAR *ZE3dsMaxInteriorExporter::Ext(ZEInt n)
 {		
-	return L"zeInterior";
+	return ZEString("zeInterior");
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::LongDesc()
 {
-	return L"Zinek Engine Interior File";
+	return ZEString("Zinek Engine Interior File");
 }
 	
 const TCHAR *ZE3dsMaxInteriorExporter::ShortDesc() 
 {			
-	return L"Zinek Engine Interior";
+	return ZEString("Zinek Engine Interior");
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::AuthorName()
 {			
-	return L"Zinek Code House and Game Studio";
+	return ZEString("Zinek Code House and Game Studio");
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::CopyrightMessage() 
 {	
-	return L"Copyright (c) 2008-2011, Zinek Code House and Game Studio";
+	return ZEString("Copyright (c) 2008-2011, Zinek Code House and Game Studio");
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::OtherMessage1() 
 {		
-	return L"";
+	return ZEString();
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::OtherMessage2() 
 {		
-	return L"";
+	return ZEString();
 }
 
 ZEUInt ZE3dsMaxInteriorExporter::Version()
@@ -326,17 +326,18 @@ ZEInt ZE3dsMaxInteriorExporter::DoExport(const TCHAR* name, ExpInterface* ei,Int
 	InteriorNode.AddProperty("HelperCount")->SetUInt32((ZEUInt32)Helpers.Count());
 	InteriorNode.AddProperty("MaterialCount")->SetUInt32((ZEUInt32)Materials.Count());
 
-	ProgressDialog->OpenTask("Writing File");
+	ProgressDialog->OpenTask("Write Process");
 	zeLog("Writing ZEInterior to file...");
 	ZEFile ExportFile;
 	if (ExportFile.Open(name, ZE_FOM_READ_WRITE, ZE_FCM_OVERWRITE))
 	{
 		InteriorRoot.Write(&ExportFile);
 		ExportFile.Close();
+		zeLog("Writing interior to file is completed successfully.");
 	}
 	ProgressDialog->CloseTask();
 
-	zeLog("Export process completed succesfully.");
+	zeLog("Export process completed successfully.");
 	ProgressDialog->End();
 
 	return true;
