@@ -49,103 +49,117 @@ DWORD ZE3dsMaxUI::Start()
 	// Define Actions
 	// Menus
 
+	IMenuManager* MenuManager = GetCOREInterface()->GetMenuManager();
+	ZEString ZinekEngineName("Zinek Engine");
+
 	ActionTable* ZinekActionTable = GetCOREInterface()->GetActionManager()->FindTable(ZE3dsMax_Action_Table_ID.PartA());
 
 	int kZinekEngineMenuBar = ZE3dsMax_Menu_Context_ID.PartA();
 
-	if (GetCOREInterface()->GetMenuManager()->RegisterMenuBarContext(kZinekEngineMenuBar, L"Zinek Engine"))
-	{
-		IMenu* ZinekMenu = GetCOREInterface()->GetMenuManager()->FindMenu(L"Zinek Engine");
+	bool IsMenuDefined = !(MenuManager->RegisterMenuBarContext(kZinekEngineMenuBar, ZinekEngineName));
+	
+	IMenu* ZinekMenu = MenuManager->FindMenu(ZinekEngineName);
 
+	if (!IsMenuDefined || ZinekMenu == NULL)
+	{
 		if (ZinekMenu != NULL)
 		{
-			GetCOREInterface()->GetMenuManager()->UnRegisterMenu(ZinekMenu);
+			bool Result = MenuManager->UnRegisterMenu(ZinekMenu);
 			ZinekMenu=NULL;
 		}
 
 		if (ZinekMenu == NULL)
 		{
 			ZinekMenu = GetIMenu();
-			ZinekMenu->SetTitle(L"Zinek Engine");
-			GetCOREInterface()->GetMenuManager()->RegisterMenu(ZinekMenu, 0);
+			ZinekMenu->SetTitle(ZinekEngineName);
+			MenuManager->RegisterMenu(ZinekMenu);
 
 			IMenu* ModelSubMenu = GetIMenu();
-			ModelSubMenu->SetTitle(L"ZEModel Attributes");
+			ModelSubMenu->SetTitle(ZEString("ZEModel Attributes"));
 
 			IMenu* InteriorSubMenu = GetIMenu();
-			InteriorSubMenu->SetTitle(L"ZEInterior Attributes");
+			InteriorSubMenu->SetTitle(ZEString("ZEInterior Attributes"));
 
 			IMenu* HelperSubMenu = GetIMenu();
-			HelperSubMenu->SetTitle(L"ZEHelper Attributes");
+			HelperSubMenu->SetTitle(ZEString("ZEHelper Attributes"));
 
-			if (GetCOREInterface()->GetMenuManager()->RegisterMenu(ModelSubMenu, 0))
+			for (ZESize I = 0; I < 4; I++)
 			{
-				for (ZESize I = 0; I < 4; I++)
+				IMenuItem* ModelSubMenuSubItem = GetIMenuItem();
+				ActionItem* ModelMenuAction = ZinekActionTable->GetActionByIndex(I);
+
+				if (ModelMenuAction != NULL)
 				{
-					IMenuItem* ModelSubMenuSubItem = GetIMenuItem();
-					ActionItem* ModelMenuAction = ZinekActionTable->GetActionByIndex(I);
-
-					if (ModelMenuAction != NULL)
-					{
-						ModelSubMenuSubItem->SetActionItem(ModelMenuAction);
-						ModelSubMenu->AddItem(ModelSubMenuSubItem);
-					}
+					ModelSubMenuSubItem->SetActionItem(ModelMenuAction);
+					ModelSubMenu->AddItem(ModelSubMenuSubItem);
 				}
-
-				IMenuItem* ModelSubMenuItem =  GetIMenuItem();
-				ModelSubMenuItem->SetSubMenu(ModelSubMenu);
-				ZinekMenu->AddItem(ModelSubMenuItem);
 			}
 
-			if (GetCOREInterface()->GetMenuManager()->RegisterMenu(InteriorSubMenu, 0))
+			IMenuItem* ModelSubMenuItem =  GetIMenuItem();
+			ModelSubMenuItem->SetSubMenu(ModelSubMenu);
+			ZinekMenu->AddItem(ModelSubMenuItem);
+
+			for (ZESize I = 4; I < 6; I++)
 			{
-				for (ZESize I = 4; I < 6; I++)
+				IMenuItem* InteriorSubMenuSubItem = GetIMenuItem();
+				ActionItem* InteriorMenuAction = ZinekActionTable->GetActionByIndex(I);
+
+				if (InteriorMenuAction != NULL)
 				{
-					IMenuItem* InteriorSubMenuSubItem = GetIMenuItem();
-					ActionItem* InteriorMenuAction = ZinekActionTable->GetActionByIndex(I);
-
-					if (InteriorMenuAction != NULL)
-					{
-						InteriorSubMenuSubItem->SetActionItem(InteriorMenuAction);
-						InteriorSubMenu->AddItem(InteriorSubMenuSubItem);
-					}
+					InteriorSubMenuSubItem->SetActionItem(InteriorMenuAction);
+					InteriorSubMenu->AddItem(InteriorSubMenuSubItem);
 				}
-
-				IMenuItem* InteriorSubMenuItem =  GetIMenuItem();
-				InteriorSubMenuItem->SetSubMenu(InteriorSubMenu);
-				ZinekMenu->AddItem(InteriorSubMenuItem);
 			}
 
-			if (GetCOREInterface()->GetMenuManager()->RegisterMenu(HelperSubMenu, 0))
-			{
-				IMenuItem* HelperSubMenuSubItem = GetIMenuItem();
-				HelperSubMenuSubItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsHelperAttributesAdd_Action_ID.PartA()));
-				HelperSubMenu->AddItem(HelperSubMenuSubItem);
+			IMenuItem* InteriorSubMenuItem =  GetIMenuItem();
+			InteriorSubMenuItem->SetSubMenu(InteriorSubMenu);
+			ZinekMenu->AddItem(InteriorSubMenuItem);
 
-				IMenuItem* HelperSubMenuItem =  GetIMenuItem();
-				HelperSubMenuItem->SetSubMenu(HelperSubMenu);
-				ZinekMenu->AddItem(HelperSubMenuItem);
-			}
+			IMenuItem* HelperSubMenuSubItem = GetIMenuItem();
+			HelperSubMenuSubItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsHelperAttributesAdd_Action_ID.PartA()));
+			HelperSubMenu->AddItem(HelperSubMenuSubItem);
+
+			IMenuItem* HelperSubMenuItem =  GetIMenuItem();
+			HelperSubMenuItem->SetSubMenu(HelperSubMenu);
+			ZinekMenu->AddItem(HelperSubMenuItem);
+
+			IMenuItem* SeparatorItem = GetIMenuItem();
+			SeparatorItem->ActAsSeparator();
+			ZinekMenu->AddItem(SeparatorItem);
 
 			IMenuItem* RemoveItem = GetIMenuItem();
 			RemoveItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsRemoveAttributes_Action_ID.PartA()));
 			ZinekMenu->AddItem(RemoveItem);
 		}
 
-		IMenuBarContext* ZinekMenuContext = (IMenuBarContext*) GetCOREInterface()->GetMenuManager()->GetContext(kZinekEngineMenuBar);
+		IMenuBarContext* ZinekMenuContext = (IMenuBarContext*)MenuManager->GetContext(kZinekEngineMenuBar);
 		ZinekMenuContext->SetMenu(ZinekMenu);
-		ZinekMenuContext->CreateWindowsMenu();
+		
+		IMenuItem* ZinekSubMenuItem =  GetIMenuItem();
+		ZinekSubMenuItem->SetSubMenu(ZinekMenu);
+		MenuManager->GetMainMenuBar()->AddItem(ZinekSubMenuItem, (MenuManager->GetMainMenuBar()->NumItems() - 1));
+		MenuManager->UpdateMenuBar();
+
+// 		IQuadMenu* TranformMenu = MenuManager->FindQuadMenu(L"transform");
+// 		TranformMenu->AddMenu(ZinekMenu);
 	}
 
 	ZE3dsMaxScriptCommonUtilities_ms CommonUtilitiesScript;
-	ExecuteMAXScriptScript(ZEString((const char*)CommonUtilitiesScript.GetData()).ToWCString());
+	ExecuteMAXScriptScript(ZEString((const char*)CommonUtilitiesScript.GetData()));
 
 	return GUPRESULT_KEEP;
 }
 
 void ZE3dsMaxUI::Stop()
 {
-	
+	IMenuManager* MenuManager = GetCOREInterface()->GetMenuManager();
+	IMenu* ZinekMenu = MenuManager->FindMenu(ZEString("Zinek Engine"));
+
+	if (ZinekMenu != NULL)
+	{
+		bool Result = MenuManager->UnRegisterMenu(ZinekMenu);
+		MenuManager->UpdateMenuBar();
+	}
 }
 
 void ZE3dsMaxUI::DeleteThis()
@@ -171,27 +185,27 @@ int ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetId()
 BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::ExecuteAction()
 {
  	ZE3dsMaxScriptHelper_ms HelperScript;
- 	return ExecuteMAXScriptScript(ZEString((const char*)HelperScript.GetData()).ToWCString());
+ 	return ExecuteMAXScriptScript(ZEString((const char*)HelperScript.GetData()));
 }
 
 void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = L"Add ZEHelper Attributes";
+	buttonText = ZEString("Add ZEHelper Attributes");
 }
 
 void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = L"Add ZEHelper Attributes";
+	menuText = ZEString("Add ZEHelper Attributes");
 }
 
 void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = L"Add ZEHelper Attributes";
+	descText = ZEString("Add ZEHelper Attributes");
 }
 
 void ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetCategoryText(MSTR& catText)
 {
-	catText = L"Zinek Engine";
+	catText = ZEString("Zinek Engine");
 }
 
 BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::IsChecked()
@@ -212,7 +226,7 @@ BOOL ZE3dsMaxCommonUtilsActionAddHelperAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxCommonUtilsActionAddHelperAttributes::GetIcon()
 {
 	if (HelperActionIcon == NULL)
-		HelperActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 7);
+		HelperActionIcon = new MaxBmpFileIcon(ZEString("ZEToolbarIcons"), 7);
 
 	return HelperActionIcon;
 }
@@ -236,27 +250,27 @@ int ZE3dsMaxCommonUtilsRemoveAttributes::GetId()
 BOOL ZE3dsMaxCommonUtilsRemoveAttributes::ExecuteAction()
 {
 	ZE3dsMaxScriptRemove_ms RemoveScript;
-	return ExecuteMAXScriptScript(ZEString((const char*)RemoveScript.GetData()).ToWCString());
+	return ExecuteMAXScriptScript(ZEString((const char*)RemoveScript.GetData()));
 }
 
 void ZE3dsMaxCommonUtilsRemoveAttributes::GetButtonText(MSTR& buttonText)
 {
-	buttonText = L"Remove Zinek Engine Attributes";
+	buttonText = ZEString("Remove Zinek Engine Attributes");
 }
 
 void ZE3dsMaxCommonUtilsRemoveAttributes::GetMenuText(MSTR& menuText)
 {
-	menuText = L"Remove Zinek Engine Attributes";
+	menuText = ZEString("Remove Zinek Engine Attributes");
 }
 
 void ZE3dsMaxCommonUtilsRemoveAttributes::GetDescriptionText(MSTR& descText)
 {
-	descText = L"Remove Zinek Engine Attributes";
+	descText = ZEString("Remove Zinek Engine Attributes");
 }
 
 void ZE3dsMaxCommonUtilsRemoveAttributes::GetCategoryText(MSTR& catText)
 {
-	catText = L"Zinek Engine";
+	catText = ZEString("Zinek Engine");
 }
 
 BOOL ZE3dsMaxCommonUtilsRemoveAttributes::IsChecked()
@@ -277,7 +291,7 @@ BOOL ZE3dsMaxCommonUtilsRemoveAttributes::IsEnabled()
 MaxIcon* ZE3dsMaxCommonUtilsRemoveAttributes::GetIcon()
 {
 	if (RemoveActionIcon == NULL)
-		RemoveActionIcon = new MaxBmpFileIcon(L"ZEToolbarIcons", 6);
+		RemoveActionIcon = new MaxBmpFileIcon(ZEString("ZEToolbarIcons"), 6);
 
 	return RemoveActionIcon;
 }

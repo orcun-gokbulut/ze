@@ -50,7 +50,7 @@ void* ZE3dsMaxInteriorExporterDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxInteriorExporterDescription::ClassName()
 { 
-	return L"ZE3dsMaxInteriorExporter"; 
+	return ZEString("ZE3dsMaxInteriorExporter"); 
 }
 
 SClass_ID ZE3dsMaxInteriorExporterDescription::SuperClassID()
@@ -65,12 +65,12 @@ Class_ID ZE3dsMaxInteriorExporterDescription::ClassID()
 
 const TCHAR* ZE3dsMaxInteriorExporterDescription::Category()
 {
-	return L"Exporter"; 
+	return ZEString("Exporter"); 
 }
 
 const TCHAR* ZE3dsMaxInteriorExporterDescription::InternalName()
 { 
-	return L"ZEInterior Exporter"; 
+	return ZEString("ZEInterior Exporter"); 
 }
 
 HINSTANCE ZE3dsMaxInteriorExporterDescription::HInstance()

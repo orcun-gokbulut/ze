@@ -40,6 +40,7 @@
 #include "ZEProgresDialogSignalHandler.h"
 #include "ZEProgressDialogTreeWidget.h"
 #include "ZEFile\ZEFile.h"
+#include <QFile>
 
 void LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
@@ -66,6 +67,11 @@ ZEProgressDialog::ZEProgressDialog()
 	Form = new Ui::ZEProgressDialogUI();
 	Form->setupUi(Dialog);
 	
+// 	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
+// 	File.open(QFile::ReadOnly);
+// 	QString StyleSheet = QLatin1String(File.readAll());
+// 	Dialog->setStyleSheet(StyleSheet);
+
 	Canceled = false;
 	IsWaitForClose = true;
 	TasksTreeWidget = new ZEProgressDialogTreeWidget(Form->tabTasks);

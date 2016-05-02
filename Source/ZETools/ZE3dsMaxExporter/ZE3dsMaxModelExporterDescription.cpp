@@ -51,7 +51,7 @@ void* ZE3dsMaxModelExporterDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxModelExporterDescription::ClassName()
 { 
-	return L"ZE3dsMaxModelExporter"; 
+	return ZEString("ZE3dsMaxModelExporter"); 
 }
 
 SClass_ID ZE3dsMaxModelExporterDescription::SuperClassID()
@@ -66,12 +66,12 @@ Class_ID ZE3dsMaxModelExporterDescription::ClassID()
 
 const TCHAR* ZE3dsMaxModelExporterDescription::Category()
 {
-	return L"Exporter"; 
+	return ZEString("Exporter"); 
 }
 
 const TCHAR* ZE3dsMaxModelExporterDescription::InternalName()
 { 
-	return L"ZEModel Exporter"; 
+	return ZEString("ZEModel Exporter"); 
 }
 
 int ZE3dsMaxModelExporterDescription::NumActionTables()

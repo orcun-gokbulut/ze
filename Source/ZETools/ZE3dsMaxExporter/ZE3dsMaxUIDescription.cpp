@@ -37,6 +37,7 @@
 #include "ZE3dsMaxUI.h"
 #include "ZE3dsMaxInteriorActions.h"
 #include "ZE3dsMaxModelActions.h"
+#include "ZEDS/ZEString.h"
 
 #define ZE_3DS_MAX_UI_CLASS_ID Class_ID(0x9b240b2, 0x2c757d96)
 
@@ -52,7 +53,7 @@ void* ZE3dsMaxUIDescription::Create(BOOL Loading)
 
 const TCHAR* ZE3dsMaxUIDescription::ClassName()
 { 
-	return L"ZE3dsMaxUI"; 
+	return ZEString("ZE3dsMaxUI"); 
 }
 
 SClass_ID ZE3dsMaxUIDescription::SuperClassID()
@@ -67,12 +68,12 @@ Class_ID ZE3dsMaxUIDescription::ClassID()
 
 const TCHAR* ZE3dsMaxUIDescription::Category()
 {
-	return L"Zinek"; 
+	return ZEString("Zinek");
 }
 
 const TCHAR* ZE3dsMaxUIDescription::InternalName()
 { 
-	return L"Zinek Engine UI"; 
+	return ZEString("Zinek Engine UI");
 }
 
 HINSTANCE ZE3dsMaxUIDescription::HInstance()

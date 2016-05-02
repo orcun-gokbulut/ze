@@ -73,7 +73,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, ULONG fdwReason, LPVOID lpvReserved)
 
 __declspec( dllexport ) const TCHAR* LibDescription()
 {
-	return L"Zinek Engine 3ds Max Plugin";
+	return ZEString("Zinek Engine 3ds Max Plugin");
 }
 
 __declspec( dllexport ) ZEInt LibNumberClasses()
