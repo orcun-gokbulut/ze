@@ -52,18 +52,15 @@ Texture3D<float3>	ZERNPrecomputingLightScattering_PreviousInScatteringBuffer		: 
 Texture3D<float3>	ZERNPrecomputingLightScattering_HighOrderScatteringBuffer		: register(t1);
 Texture2D<float3>	ZERNPrecomputingLightScattering_RandomVectorsTexture			: register(t2);
 
-Texture2D<float2>	ZERNPrecomputingLightScattering_DensityBuffer					: register(t5);
-Texture2D<float3>	ZERNPrecomputingLightScattering_SkyAmbientBuffer				: register(t6);
-
 void ZERNPrecomputingLightScattering_MultiplyWithPhases(in float3 SunDirection, in float3 ViewDirection, inout float3 RayleighInScattering, inout float3 MieInScattering)
 {
 	float CosAngle = dot(SunDirection, ViewDirection);
 
 	float3 PhaseRayleigh =  (3.0f / (16.0f * ZERNMath_PI)) * (1.0f + CosAngle * CosAngle);
 	
-	float G = 0.7f;
+	float G = 0.6f;
 	float GG = G * G;
-	float3 PhaseMie = (3.0f / (8.0f * ZERNMath_PI)) * ((1.0f - GG) * (1.0f + CosAngle * CosAngle)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosAngle), 1.5f));
+	float3 PhaseMie = (3.0f / (4.0f * ZERNMath_PI)) * ((1.0f - GG) * (1.0f + CosAngle * CosAngle)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosAngle), 1.5f));
 	//float3 PhaseMie = (1.0f / (6.0f * PI)) * (1.0f - GG) / pow(abs(1.0f + GG - 2.0f * G * CosAngle), 1.5f);
 	
 	RayleighInScattering *= PhaseRayleigh;

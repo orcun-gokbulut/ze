@@ -47,7 +47,7 @@
 #define LUT_DIMENSIONS			float4(32.0f, 128.0f, 64.0f, 16.0f)
 
 static const float3 ZERNLightScatteringCommon_RayleighScatteringFactor	= float3(5.8e-6, 13.5e-6, 33.1e-6);
-static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= float3(2.0e-5, 2.0e-5, 2.0e-5);
+static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= (float3)2.0e-5;
 
 SamplerState		ZERNLightScatteringCommon_SamplerLinearClamp	: register(s0);
 

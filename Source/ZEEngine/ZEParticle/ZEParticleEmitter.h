@@ -130,6 +130,9 @@ class ZEParticleEmitter : public ZEObject
 
 		bool								Continuity;
 
+		bool								Initialize();
+		void								Deinitialize();
+
 		void 								InitializeParticlePool();
 		void								GenerateParticle(ZEParticle &Particle);
 

@@ -38,7 +38,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEMath/ZEMath.h"
 
-bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
+bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -46,7 +46,8 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
-	SetIsRenderTarget(RenderTarget);
+	SetResourceUsage(Usage);
+	SetResourceBindFlags(BindFlags);
 
 	SetSize(Depth * CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture3D, Texture);
@@ -97,7 +98,7 @@ ZEGRTexture3D::ZEGRTexture3D()
 	Depth = 0;
 }
 
-ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
+ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {
 	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
 	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
@@ -109,7 +110,7 @@ ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUIn
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, RenderTarget, UAV))
+	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, Usage, BindFlags))
 	{
 		Texture->Destroy();
 		return NULL;

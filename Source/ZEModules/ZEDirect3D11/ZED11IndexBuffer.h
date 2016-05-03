@@ -54,6 +54,7 @@ class ZED11IndexBuffer : public ZEGRIndexBuffer, public ZED11ComponentBase
 		virtual void			Deinitialize();
 
 								ZED11IndexBuffer();
+		virtual					~ZED11IndexBuffer();
 
 	public:
 		ID3D11Buffer*			GetBuffer() const;

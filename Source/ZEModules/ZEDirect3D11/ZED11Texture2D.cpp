@@ -97,147 +97,6 @@ static DXGI_FORMAT ConvertToShaderResourceViewFormat(ZEGRFormat Format)
 	}
 }
 
-ID3D11Resource* ZED11Texture2D::GetResource() const
-{
-	ID3D11Resource* Resource = NULL;
-
-	if (Texture2D != NULL)
-		Texture2D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
-
-	return Resource;
-}
-
-ID3D11Texture2D* ZED11Texture2D::GetTexture() const
-{
-	return Texture2D;
-}
-
-ID3D11ShaderResourceView* ZED11Texture2D::GetShaderResourceView() const
-{
-	return ShaderResourceView;
-}
-
-ID3D11UnorderedAccessView* ZED11Texture2D::GetUnorderedAccessView() const
-{
-	return UnorderedAccessView;
-}
-
-ZEHolder<const ZEGRRenderTarget> ZED11Texture2D::GetRenderTarget(ZEUInt Level) const
-{
-	zeDebugCheck(!GetIsRenderTarget(), "Texture is not created with render target flag");
-	zeDebugCheck(Level >= GetLevelCount(), "Texture dont have specified Mipmap level");
-	zeDebugCheck(GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE, "Texture cannot be bound as input or output");
-
-	if (RenderTargets[Level] == NULL)
-	{
-		D3D11_TEXTURE2D_DESC TextureDesc;
-		Texture2D->GetDesc(&TextureDesc);
-		if((TextureDesc.BindFlags & D3D11_BIND_RENDER_TARGET) != D3D11_BIND_RENDER_TARGET)
-			return NULL;
-
-		D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc = {};
-		RenderTargetDesc.Format = ZED11ComponentBase::ConvertFormat(GetFormat());
-		if((TextureDesc.SampleDesc.Count > 1) )
-		{
-			RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
-		}
-		else
-		{
-			RenderTargetDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
-			RenderTargetDesc.Texture2D.MipSlice = Level;
-		}
-
-		ID3D11RenderTargetView* RenderTargetView = NULL;
-		HRESULT Result = GetDevice()->CreateRenderTargetView(Texture2D, &RenderTargetDesc, &RenderTargetView);
-		if(FAILED(Result))
-		{
-			zeError("Texture 2D render target creation failed. ErrorCode: %d.", Result);
-			return NULL;
-		}
-
-		RenderTargets[Level] = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
-	}
-
-	return RenderTargets[Level];
-}
-
-ZEHolder<const ZEGRDepthStencilBuffer> ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnly, ZEUInt ArrayIndex) const
-{
-	zeDebugCheck(GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE, "Texture cannot be bound as input or output");
-
-	UINT Flags = 0;
-	ZEUInt BufferIndex = 0;
-
-	if (!ReadOnly)
-	{
-		if (DepthStencilBuffers[ArrayIndex][0] != NULL)
-			return DepthStencilBuffers[ArrayIndex][0];
-	}
-	else
-	{
-		if (DepthStencilBuffers[ArrayIndex][1] != NULL)
-			return DepthStencilBuffers[ArrayIndex][1];
-
-		BufferIndex = 1;
-		Flags = D3D11_DSV_READ_ONLY_DEPTH  | D3D11_DSV_READ_ONLY_STENCIL;
-	}
-
-	D3D11_TEXTURE2D_DESC TextureDesc;
-	Texture2D->GetDesc(&TextureDesc);
-	if ((TextureDesc.BindFlags & D3D11_BIND_DEPTH_STENCIL) != D3D11_BIND_DEPTH_STENCIL)
-		return NULL;
-
-	D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
-	DepthStencilViewDesc.Format = ConvertToDepthStencilViewFormat(GetFormat());
-	DepthStencilViewDesc.Flags = Flags;
-
-	if (TextureDesc.ArraySize > 1)
-	{
-		if (TextureDesc.SampleDesc.Count > 1)
-		{
-			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
-			DepthStencilViewDesc.Texture2DMSArray.ArraySize = 1;
-			DepthStencilViewDesc.Texture2DMSArray.FirstArraySlice = ArrayIndex;
-		}
-		else
-		{	
-			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
-			DepthStencilViewDesc.Texture2DArray.ArraySize = 1;
-			DepthStencilViewDesc.Texture2DArray.FirstArraySlice = ArrayIndex;
-			DepthStencilViewDesc.Texture2DArray.MipSlice = 0;
-		}
-	}
-	else
-	{
-		if(TextureDesc.SampleDesc.Count > 1)
-		{
-			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
-		}
-		else
-		{
-			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
-			DepthStencilViewDesc.Texture2D.MipSlice = 0;
-		}
-	}
-
-	ID3D11DepthStencilView* DepthStencilView = NULL;
-	HRESULT Result = GetDevice()->CreateDepthStencilView(Texture2D, &DepthStencilViewDesc, &DepthStencilView);
-	if(FAILED(Result))
-	{
-		zeError("Texture 2D depth stencil creation failed. ErrorCode: %d.", Result);
-		return NULL;
-	}
-
-	DepthStencilBuffers[ArrayIndex][BufferIndex] = new ZED11DepthStencilBuffer(Width, Height, GetFormat(), DepthStencilView);
-	
-	return DepthStencilBuffers[ArrayIndex][BufferIndex];
-}
-
-void ZED11Texture2D::GenerateMipMaps()
-{
-	GetMainContext()->GenerateMips(ShaderResourceView);
-}
-
 bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount)
 {
 	bool DepthStencil = BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL);
@@ -245,9 +104,7 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, 
 	bool RenderTarget = BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET);
 	bool ShaderResource = BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE);
 
-	DXGI_FORMAT TextureFormat = (Format == ZEGR_TF_R8G8B8A8_UNORM) ? DXGI_FORMAT_B8G8R8A8_UNORM : ConvertFormat(Format);	//format of .tga
-	TextureFormat = (RenderTarget || UnorderedAccess) ?  ConvertFormat(Format) : TextureFormat;
-	TextureFormat = DepthStencil ? ConvertDepthStencilFormat(Format) : TextureFormat;
+	DXGI_FORMAT TextureFormat = DepthStencil ? ConvertDepthStencilFormat(Format) : ConvertFormat(Format);
 
 	D3D11_TEXTURE2D_DESC TextureDesc = {};
 	TextureDesc.Width = Width;
@@ -336,16 +193,179 @@ void ZED11Texture2D::Deinitialize()
 	ZEGR_RELEASE(ShaderResourceView);
 	ZEGR_RELEASE(UnorderedAccessView);
 
-	for(ZEUInt I = 0; I < 15; I++)
-		RenderTargets[I].Release();
+	ZEGRTexture2D::Deinitialize();
+}
 
-	for(ZEUInt I = 0; I < 8; I++)
+ID3D11Resource* ZED11Texture2D::GetResource() const
+{
+	ID3D11Resource* Resource = NULL;
+
+	if (Texture2D != NULL)
+		Texture2D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
+
+	return Resource;
+}
+
+ID3D11Texture2D* ZED11Texture2D::GetTexture() const
+{
+	return Texture2D;
+}
+
+ID3D11ShaderResourceView* ZED11Texture2D::GetShaderResourceView() const
+{
+	return ShaderResourceView;
+}
+
+ID3D11UnorderedAccessView* ZED11Texture2D::GetUnorderedAccessView() const
+{
+	return UnorderedAccessView;
+}
+
+ZED11Texture2D::ZED11Texture2D()
+{
+	Texture2D = NULL;
+	ShaderResourceView = NULL;
+	UnorderedAccessView = NULL;
+}
+
+ZED11Texture2D::~ZED11Texture2D()
+{
+	Deinitialize();
+}
+
+const ZEGRRenderTarget* ZED11Texture2D::GetRenderTarget(ZEUInt Level, ZEUInt ArrayIndex) const
+{
+	zeDebugCheck(Level >= GetLevelCount(), "Texture dont have specified Mipmap level");
+	zeDebugCheck(!GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET), "Texture had not been created with render target bind flag");
+	
+	ZEUInt Index = ArrayIndex * GetLevelCount() + Level;
+
+	if (RenderTargets.GetCount() > Index)
+		return RenderTargets[Index];
+
+	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetViewDesc = {};
+	RenderTargetViewDesc.Format = ZED11ComponentBase::ConvertFormat(GetFormat());
+
+	if (ArrayCount > 1)
 	{
-		DepthStencilBuffers[I][0].Release();
-		DepthStencilBuffers[I][1].Release();
+		if (SampleCount > 1)
+		{
+			RenderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMSARRAY;
+			RenderTargetViewDesc.Texture2DMSArray.ArraySize = 1;
+			RenderTargetViewDesc.Texture2DMSArray.FirstArraySlice = ArrayIndex;
+		}
+		else
+		{	
+			RenderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DARRAY;
+			RenderTargetViewDesc.Texture2DArray.ArraySize = 1;
+			RenderTargetViewDesc.Texture2DArray.FirstArraySlice = ArrayIndex;
+			RenderTargetViewDesc.Texture2DArray.MipSlice = Level;
+		}
+	}
+	else
+	{
+		if (SampleCount > 1)
+		{
+			RenderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2DMS;
+		}
+		else
+		{
+			RenderTargetViewDesc.ViewDimension = D3D11_RTV_DIMENSION_TEXTURE2D;
+			RenderTargetViewDesc.Texture2D.MipSlice = Level;
+		}
 	}
 
-	ZEGRTexture2D::Deinitialize();
+	ID3D11RenderTargetView* RenderTargetView = NULL;
+	HRESULT Result = GetDevice()->CreateRenderTargetView(Texture2D, &RenderTargetViewDesc, &RenderTargetView);
+	if (FAILED(Result))
+	{
+		zeError("Texture 2D render target creation failed. ErrorCode: %d.", Result);
+		return NULL;
+	}
+
+	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
+	RenderTarget->SetOwner(this);
+
+	RenderTargets.Add(RenderTarget);
+
+	return RenderTarget;
+}
+
+const ZEGRDepthStencilBuffer* ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnly, ZEUInt ArrayIndex) const
+{
+	zeDebugCheck(ArrayIndex >= ArrayCount, "Array index is out of range");
+	zeDebugCheck(!GetResourceBindFlags().GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Texture had not been created with depth-stencil bind flag");
+
+	UINT Flags = 0;
+
+	ZEUInt Index = ArrayIndex * 2;
+	if (!ReadOnly)
+	{
+		if (DepthStencilBuffers[Index] != NULL)
+			return DepthStencilBuffers[Index];
+	}
+	else
+	{
+		Index++;
+		if (DepthStencilBuffers[Index] != NULL)
+			return DepthStencilBuffers[Index];
+
+		Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+	}
+
+	D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
+	DepthStencilViewDesc.Format = ConvertToDepthStencilViewFormat(GetFormat());
+	DepthStencilViewDesc.Flags = Flags;
+
+	if (ArrayCount > 1)
+	{
+		if (SampleCount > 1)
+		{
+			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMSARRAY;
+			DepthStencilViewDesc.Texture2DMSArray.ArraySize = 1;
+			DepthStencilViewDesc.Texture2DMSArray.FirstArraySlice = ArrayIndex;
+		}
+		else
+		{	
+			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DARRAY;
+			DepthStencilViewDesc.Texture2DArray.ArraySize = 1;
+			DepthStencilViewDesc.Texture2DArray.FirstArraySlice = ArrayIndex;
+			DepthStencilViewDesc.Texture2DArray.MipSlice = 0;
+		}
+	}
+	else
+	{
+		if(SampleCount > 1)
+		{
+			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2DMS;
+		}
+		else
+		{
+			DepthStencilViewDesc.ViewDimension = D3D11_DSV_DIMENSION_TEXTURE2D;
+			DepthStencilViewDesc.Texture2D.MipSlice = 0;
+		}
+	}
+
+	ID3D11DepthStencilView* DepthStencilView = NULL;
+	HRESULT Result = GetDevice()->CreateDepthStencilView(Texture2D, &DepthStencilViewDesc, &DepthStencilView);
+	if(FAILED(Result))
+	{
+		zeError("Texture 2D depth stencil creation failed. ErrorCode: %d.", Result);
+		return NULL;
+	}
+
+	ZED11DepthStencilBuffer* DepthStencilBuffer = new ZED11DepthStencilBuffer(Width, Height, GetFormat(), DepthStencilView);
+	DepthStencilBuffer->SetOwner(this);
+	DepthStencilBuffer->SetReadOnly(ReadOnly);
+
+	DepthStencilBuffers[Index] = DepthStencilBuffer;
+
+	return DepthStencilBuffer;
+}
+
+void ZED11Texture2D::GenerateMipMaps()
+{
+	GetMainContext()->GenerateMips(ShaderResourceView);
 }
 
 bool ZED11Texture2D::UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch) 
@@ -406,16 +426,4 @@ void ZED11Texture2D::Unlock()
 	zeDebugCheck(Texture2D == NULL, "Texture is not initailized.");
 
 	GetMainContext()->Unmap(Texture2D, 0);
-}
-
-ZED11Texture2D::ZED11Texture2D()
-{
-	Texture2D = NULL;
-	ShaderResourceView = NULL;
-	UnorderedAccessView = NULL;
-}
-
-ZED11Texture2D::~ZED11Texture2D()
-{
-
 }

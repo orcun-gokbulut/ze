@@ -119,7 +119,7 @@ bool ZERNStageDebug::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZERN_SDDF_RENDER_STATES))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStageDebug::GetRenderState();
+	ZEGRRenderState RenderState;
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
 
@@ -198,13 +198,7 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 	if (BoundingBoxVertexBuffer == NULL || 
 		BoundingBoxVertexBuffer->GetVertexCount() != VertexCount)
 	{
-		BoundingBoxVertexBuffer.Release();
-		BoundingBoxVertexBuffer = ZEGRVertexBuffer::Create(VertexCount, sizeof(ZEVector3));
-		
-		void* Data;
-		BoundingBoxVertexBuffer->Lock(&Data);
-		memcpy(Data, &Vertices[0], sizeof(ZEVector3) * VertexCount);
-		BoundingBoxVertexBuffer->Unlock();
+		BoundingBoxVertexBuffer = ZEGRVertexBuffer::Create(VertexCount, sizeof(ZEVector3), ZEGR_RU_GPU_READ_ONLY, &Vertices[0]);
 	}
 
 	return true;
@@ -228,6 +222,7 @@ void ZERNStageDebug::DeinitializeSelf()
 	BoundingBoxVertexShader.Release();
 	BoundingBoxGeometryShader.Release();
 	BoundingBoxRenderStateData.Release();
+
 	BoundingBoxVertexBuffer.Release();
 
 	DepthMap.Release();
@@ -327,10 +322,8 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 	}
 
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = DepthMap->GetDepthStencilBuffer();
-
 	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 0.0f, 0x00);
-
-	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_GEOMETRY, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
@@ -342,7 +335,6 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 			Context->SetVertexBuffers(0, 1, BoundingBoxVertexBuffer.GetPointerToPointer());
 			Context->Draw(BoundingBoxVertexBuffer->GetVertexCount(), 0);
 
-			Context->SetVertexBuffers(0, 0, NULL);
 			CleanUp(Context);
 		}
 
@@ -358,9 +350,6 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 
 void ZERNStageDebug::CleanUp(ZEGRContext* Context)
 {
-	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 

@@ -50,7 +50,6 @@ class ZEGRShader : public ZEReferenceCounted
 		virtual void				Deinitialize();
 
 									ZEGRShader();
-		virtual						~ZEGRShader();
 
 	public:
 		virtual ZEGRShaderType		GetShaderType() const;

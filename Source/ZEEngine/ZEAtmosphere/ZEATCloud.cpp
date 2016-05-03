@@ -435,24 +435,18 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer();
+	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
-	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, PlaneTransformConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, PlaneTransformConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_ALL, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(PlaneRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, CloudTexture->GetTexture());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearWrap.GetPointerToPointer());
+	ZEGRTexture* Texture = CloudTexture->GetTexture();
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
 
 	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, 8, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetVertexBuffers(0, 0, NULL);
 }
 
 ZEATCloud* ZEATCloud::CreateInstance()

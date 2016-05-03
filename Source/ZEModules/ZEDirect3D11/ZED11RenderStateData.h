@@ -43,20 +43,21 @@
 
 #include <d3d11.h>
 
+class ZED11Shader;
+
 class ZED11RenderStateData : public ZEGRRenderStateData, public ZED11ComponentBase
 {
 	friend class ZED11Module;
 	friend class ZED11Context;
 	friend class ZED11StatePool;
 	private:
-		ZEHolder<const ZED11VertexLayout>		VertexLayout;
+		ZEHolder<const ZED11Shader>				Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEHolder<const ZED11BlendState>			BlendState;
 		ZEHolder<const ZED11RasterizerState>	RasterizerState;
 		ZEHolder<const ZED11DepthStencilState>	DepthStencilState;
-		ZEHolder<const ZED11BlendState>			BlendState;
+		ZEHolder<const ZED11VertexLayout>		VertexLayout;
 
 		D3D11_PRIMITIVE_TOPOLOGY				PrimitiveTopology;
-
-		ZEHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
 
 		virtual bool							Initialize(const ZEGRRenderState& RenderState);
 };
@@ -65,7 +66,7 @@ class ZED11ComputeRenderStateData : public ZEGRComputeRenderStateData, public ZE
 {
 	friend class ZED11Context;
 	private:
-		ZEHolder<const ZEGRShader>				ComputeShader;
+		ZEHolder<const ZED11Shader>				ComputeShader;
 
 		virtual bool							Initialize(const ZEGRComputeRenderState& RenderState);
 };

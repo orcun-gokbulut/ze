@@ -100,9 +100,8 @@ const ZEVector3& ZEMoon::GetGetDirection() const
 	return Direction;
 }
 
-void ZEMoon::SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
+void ZEMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
-	// Load the texture
 	if (Texture != NULL)
 	{
 		Texture->Release();
@@ -113,9 +112,9 @@ void ZEMoon::SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt 
 
 }
 
-const ZEString ZEMoon::GetTexture() const
+const ZEString& ZEMoon::GetTextureFile() const
 {
-	return (Texture == NULL) ? "" : Texture->GetFileName();
+	return (Texture == NULL) ? ZEString::Empty : Texture->GetFileName();
 }
 
 bool ZEMoon::InitializeSelf()

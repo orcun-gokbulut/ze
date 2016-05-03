@@ -39,12 +39,13 @@
 #include "ZEError.h"
 #include "ZEMath/ZEMath.h"
 
-bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {
 	this->Length = Length;
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
-	SetIsRenderTarget(RenderTarget);
+	SetResourceUsage(Usage);
+	SetResourceBindFlags(BindFlags);
 
 	SetSize(CalculateSize(Length, Length, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, TextureCube, Texture);
@@ -84,11 +85,7 @@ ZEGRTextureCube::ZEGRTextureCube()
 	Length = 0;
 }
 
-ZEGRTextureCube::~ZEGRTextureCube()
-{
-}
-
-ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {	
 	zeCheckError(Length == 0, NULL, "Width cannot be 0.");
 	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
@@ -98,7 +95,7 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt 
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Length, LevelCount, Format, RenderTarget))
+	if (!Texture->Initialize(Length, LevelCount, Format, Usage, BindFlags))
 	{
 		Texture->Destroy();
 		return NULL;

@@ -120,7 +120,6 @@ class ZEGRWindow : public ZEObject, public ZEInitializable
 		virtual void					DeinitializeSelf();
 
 										ZEGRWindow();
-		virtual							~ZEGRWindow();
 
 	public:
 		ZEUInt							GetId() const;

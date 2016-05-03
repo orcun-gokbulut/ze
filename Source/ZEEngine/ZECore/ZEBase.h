@@ -46,7 +46,7 @@ enum ZEInitializationState
 class ZEBase
 {
 	private:
-		ZEInitializationState			InitializationState;
+		ZEInitializationState	InitializationState;
 
 	protected:
 		virtual bool			InitializeSelf();

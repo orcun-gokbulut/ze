@@ -268,7 +268,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	
 	// Create TextureCubeResource 
 	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::CreateInstance(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat(), false);
+	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::CreateInstance(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat());
 	if (Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());

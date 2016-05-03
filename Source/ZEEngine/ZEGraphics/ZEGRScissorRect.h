@@ -39,7 +39,7 @@
 
 class ZEGRScissorRect
 {
-	private:
+	public:
 		struct ZEScissorRectangleData
 		{
 			ZEInt				Bottom;

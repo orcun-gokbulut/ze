@@ -73,7 +73,6 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer(true));
-	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &Viewport);
 
 	return true;
@@ -81,8 +80,6 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 
 void ZERNStageParticleRendering::CleanUp(ZEGRContext* Context)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 

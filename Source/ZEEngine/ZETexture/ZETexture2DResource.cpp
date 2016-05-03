@@ -33,22 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETexture2DResource.h"
+
+#include "ZECore/ZEConsole.h"
+#include "ZECore/ZEResourceManager.h"
 #include "ZEError.h"
+#include "ZEFile/ZEFile.h"
+#include "ZEFile/ZEFileCache.h"
+#include "ZETextureData.h"
+#include "ZETextureLoader.h"
+#include "ZETextureQualityManager.h"
+#include "ZETextureCacheDataIdentifier.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
-#include "ZETextureData.h"
-#include "ZEFile/ZEFile.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEFile/ZEFileCache.h"
-#include "ZETexture2DResource.h"
-#include "ZETextureQualityManager.h"
-#include "ZECore/ZEResourceManager.h"
-#include "ZETextureLoader.h"
-#include "ZETextureCacheDataIdentifier.h"
 
-#include <sys/stat.h>
-#include <stdio.h>
-#include <string.h>
 #include "ZEPointer/ZEPointer.h"
 
 static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
@@ -69,7 +67,7 @@ static void CopyToTexture2D(ZEGRTexture2D* Output, ZETextureData* TextureData)
 		Output->UpdateSubResource(0, Level, NULL, SrcBuffer, SrcRowPitch);
 	}
 
-	delete [] SrcBuffer;
+	delete[] SrcBuffer;
 }
 
 const char* ZETexture2DResource::GetResourceType() const

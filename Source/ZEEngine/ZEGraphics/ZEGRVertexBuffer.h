@@ -35,30 +35,30 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZEGRResource.h"
+
+#include "ZETypes.h"
 
 class ZEGRVertexBuffer : public ZEGRResource
 {
 	private:
 		ZESize								VertexCount;
-		ZESize								VertexSize;
+		ZEUInt								VertexStride;
 
 	protected:
-		virtual bool						Initialize(ZEUInt VertexCount, ZESize VertexSize);
+		virtual bool						Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data);
 		virtual void						Deinitialize();
 
 											ZEGRVertexBuffer();
-		virtual								~ZEGRVertexBuffer();
 
 	public:
 		virtual ZEGRResourceType			GetResourceType() const;
 
-		ZESize								GetVertexSize() const;
 		ZESize								GetVertexCount() const;
+		ZEUInt								GetVertexStride() const;
 
-		virtual void						Unlock() = 0;
 		virtual bool						Lock(void** Data) = 0;
+		virtual void						Unlock() = 0;
 		
-		static ZEHolder<ZEGRVertexBuffer>	Create(ZEUInt VertexCount, ZESize VertexSize);
+		static ZEHolder<ZEGRVertexBuffer>	Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, void* Data = NULL);
 };

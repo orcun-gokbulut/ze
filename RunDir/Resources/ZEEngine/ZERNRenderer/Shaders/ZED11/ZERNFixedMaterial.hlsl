@@ -209,7 +209,6 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 	
 	#ifdef ZERN_FM_SKIN_TRANSFORM
 		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
-		float4x4 ModelSkinTransform = mul(SkinTransform, ZERNFixedMaterial_PreSkinTransform);
 		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
 		Input.Normal = mul(SkinTransform, float4(Input.Normal, 0.0f)).xyz;
 		Input.Tangent = mul(SkinTransform, float4(Input.Tangent, 0.0f)).xyz;
@@ -354,6 +353,11 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 
 ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput ZERNFixedMaterial_ShadowMapGenerationStage_VertexShader_Main(ZERNFixedMaterial_ShadowMapGenerationStage_VSInput Input)
 {
+	#ifdef ZERN_FM_SKIN_TRANSFORM
+		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
+		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
+	#endif
+	
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
 	
 	ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput Output;

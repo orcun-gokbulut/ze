@@ -47,26 +47,26 @@ class ZETexture2DResource;
 class ZELensFlareArtifact
 {
 	private:
-		ZERNCommand Command;
-		ZERNFixedMaterial* Material;
-		ZETexture2DResource* Texture;
+		ZERNCommand							Command;
+		ZERNFixedMaterial*					Material;
+		ZETexture2DResource*				Texture;
 
-		float Size;
-		float Position;
-		float Opacity;
+		float								Size;
+		float								Position;
+		float								Opacity;
 
 	public:
-		void SetSize(float Size);
-		float GetSize();
+		void								SetSize(float Size);
+		float								GetSize();
 
-		void SetPosition(float Position);
-		float GetPosition();
+		void								SetPosition(float Position);
+		float								GetPosition();
 
-		void SetOpacity(float Opacity);
-		float GetOpacity();
+		void								SetOpacity(float Opacity);
+		float								GetOpacity();
 
-		void SetTexture(const char* FileName);
-		const char* GetTexture();
+		void								SetTextureFile(const ZEString& FileName);
+		const ZEString&						GetTextureFile();
 };
 
 class ZELensFlare : public ZEEntity
@@ -96,5 +96,4 @@ class ZELensFlare : public ZEEntity
 		virtual void						Tick(float Time);
 
 		static ZELensFlare*					CreateInstance();
-
 };

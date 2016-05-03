@@ -86,7 +86,7 @@ void ZED11Output::UpdateRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat For
 
 	ID3D11RenderTargetView* RenderTargetView;
 	ID3D11Texture2D* BackBuffer;
-	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), (void**)&BackBuffer);
+	Result = SwapChain->GetBuffer(0, __uuidof(ID3D11Texture2D), reinterpret_cast<void**>(&BackBuffer));
 	if(FAILED(Result))
 	{
 		zeCriticalError("Cannot get swapchain buffers. Error: %d.", Result);
@@ -202,6 +202,11 @@ ZED11Output::ZED11Output()
 	RestrictedToMonitor = false;
 }
 
+ZED11Output::~ZED11Output()
+{
+	Deinitialize();
+}
+
 void* ZED11Output::GetHandle() const
 {
 	return Handle;
@@ -225,7 +230,7 @@ void ZED11Output::SetMonitor(ZEGRMonitor* Monitor, bool RestrictToMonitor)
 
 ZEGRMonitor* ZED11Output::GetMonitor() const
 {
-	if(RestrictedToMonitor)
+	if (RestrictedToMonitor)
 		return Monitor;
 
 	IDXGIOutput* CurrentOutputMonitor;
@@ -234,25 +239,25 @@ ZEGRMonitor* ZED11Output::GetMonitor() const
 	DXGI_OUTPUT_DESC CurrentOutputDescription;
 	CurrentOutputMonitor->GetDesc(&CurrentOutputDescription);
 
-	if(Monitor == NULL)
+	if (Monitor == NULL)
 	{
 		ZEGRAdapter* CurrentAdapter = ZEGRGraphicsModule::GetInstance()->GetCurrentAdapter();
 
 		const ZEArray<ZEGRMonitor*>& Monitors = CurrentAdapter->GetMonitors();
-		for(ZEUInt I = 0; I < Monitors.GetCount(); I++)
+		for (ZEUInt I = 0; I < Monitors.GetCount(); I++)
 		{
-			if(Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
+			if (Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
 				Monitor = Monitors[I];
 		}
 	}
 	else
 	{
-		if(Monitor->GetHandle() != CurrentOutputDescription.Monitor)
+		if (Monitor->GetHandle() != CurrentOutputDescription.Monitor)
 		{
 			const ZEArray<ZEGRMonitor*>& Monitors = Monitor->GetAdapter()->GetMonitors();
-			for(ZEUInt I = 0; I < Monitors.GetCount(); I++)
+			for (ZEUInt I = 0; I < Monitors.GetCount(); I++)
 			{
-				if(Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
+				if (Monitors[I]->GetHandle() == CurrentOutputDescription.Monitor)
 					Monitor = Monitors[I];
 			}
 		}

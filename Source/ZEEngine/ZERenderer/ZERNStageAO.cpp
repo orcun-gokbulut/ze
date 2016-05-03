@@ -239,19 +239,18 @@ void ZERNStageAO::GenerateOcclusionMap(ZEGRContext* Context)
 
 	Context->SetRenderState(SSAORenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, SSAOConstantBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointWrap);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, RandomVectorsTexture);
-	Context->SetVertexBuffers(0, 0, NULL);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, SSAOConstantBuffer.GetPointerToPointer());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerPointWrap.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<ZEGRTexture**>(&RandomVectorsTexture));
 
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, NULL);
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, NULL);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, NULL);
 }
 
 void ZERNStageAO::ApplyBlur(ZEGRContext* Context)
@@ -263,48 +262,47 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context)
 	Viewport.SetHeight((float)(OcclusionRenderTarget->GetHeight()));
 
 	Context->SetRenderState(FilterRenderStateData);
-	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &Viewport);
 
 	Context->SetRenderTargets(1, &BlurRenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
+	Context->SetTextures(ZEGR_ST_PIXEL, 6, 1, reinterpret_cast<ZEGRTexture**>(&OcclusionMap));
 
 	SetFilterKernelValues(&HorizontalValues[0], HorizontalValues.GetCount());
 	FilterConstantBuffer->SetData(&FilterConstants);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, FilterConstantBuffer.GetPointerToPointer());
 
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(1, &OcclusionRenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, BlurTexture);
+	Context->SetTextures(ZEGR_ST_PIXEL, 6, 1, reinterpret_cast<ZEGRTexture**>(&BlurTexture));
 
 	SetFilterKernelValues(&VerticalValues[0], VerticalValues.GetCount());
 	FilterConstantBuffer->SetData(&FilterConstants);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, FilterConstantBuffer.GetPointerToPointer());
 
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(1, &BlurRenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, OcclusionMap);
+	Context->SetTextures(ZEGR_ST_PIXEL, 6, 1, reinterpret_cast<ZEGRTexture**>(&OcclusionMap));
 
 	SetFilterKernelValues(&HorizontalValues[0], HorizontalValues.GetCount());
 	FilterConstantBuffer->SetData(&FilterConstants);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, FilterConstantBuffer.GetPointerToPointer());
 
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(1, &OcclusionRenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, BlurTexture);
+	Context->SetTextures(ZEGR_ST_PIXEL, 6, 1, reinterpret_cast<ZEGRTexture**>(&BlurTexture));
 
 	SetFilterKernelValues(&VerticalValues[0], VerticalValues.GetCount());
 	FilterConstantBuffer->SetData(&FilterConstants);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, FilterConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, FilterConstantBuffer.GetPointerToPointer());
 
 	Context->Draw(3, 0);
 
 	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 6, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, NULL);
+	Context->SetTextures(ZEGR_ST_PIXEL, 6, 1, NULL);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, NULL);
 }
 
 bool ZERNStageAO::InitializeSelf()
@@ -495,9 +493,9 @@ bool ZERNStageAO::Setup(ZEGRContext* Context)
 	if (!Update())
 		return false;
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, SamplerPointClamp);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, InputDepth);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, InputNormal);
+	Context->SetSamplers(ZEGR_ST_PIXEL, 1, 1, SamplerPointClamp.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 3, 1, reinterpret_cast<const ZEGRTexture**>(&InputNormal));
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&InputDepth));
 
 	GenerateOcclusionMap(Context);
 	ApplyBlur(Context);
@@ -506,11 +504,7 @@ bool ZERNStageAO::Setup(ZEGRContext* Context)
 }
 
 void ZERNStageAO::CleanUp(ZEGRContext* Context)
-{
-	Context->SetSampler(ZEGR_ST_PIXEL, 1, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	
+{	
 	ZERNStage::CleanUp(Context);
 }
 

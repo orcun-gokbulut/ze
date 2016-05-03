@@ -51,20 +51,20 @@ class ZERNMap : public ZEObject
 	ZE_OBJECT
 	private:
 		ZETextureResource*				Resource;
-		ZEHolder<const ZEGRTexture>		Texture;
-		ZEHolder<const ZEGRSampler>		Sampler;
+		const ZEGRTexture*				Texture;
+		const ZEGRSampler*				Sampler;
 
 		void							Clean();
 
 	public:
-		void							SetSampler(ZEHolder<const ZEGRSampler> Sampler);
-		ZEHolder<const ZEGRSampler>		GetSampler() const;
+		void							SetSampler(const ZEGRSampler* Sampler);
+		const ZEGRSampler*				GetSampler() const;
 
 		void							SetTexture(const ZEGRTexture* Texture);
-		ZEHolder<const ZEGRTexture>		GetTexture() const;
+		const ZEGRTexture*				GetTexture() const;
 
 		void							SetTextureResource(ZETextureResource* Resource);
-		ZETextureResource*				GetTextureResource() const;
+		const ZETextureResource*		GetTextureResource() const;
 
 		const ZEString&					GetTextureFile() const;
 
@@ -78,7 +78,7 @@ class ZERNMap : public ZEObject
 		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name);
 
 										ZERNMap();
-										ZERNMap(const char* FileName, ZEGRTextureType Type = ZEGR_TT_2D, ZEGRSampler* Sampler = NULL);
+										ZERNMap(const ZEString& FileName, ZEGRTextureType Type = ZEGR_TT_2D, ZEGRSampler* Sampler = NULL);
 										ZERNMap(ZEGRTexture* Texture, ZEGRSampler* Sampler = NULL);
 										ZERNMap(ZETextureResource* Resource, ZEGRSampler* Sampler = NULL);
 										~ZERNMap();

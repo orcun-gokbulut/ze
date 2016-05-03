@@ -62,11 +62,17 @@ bool ZERNStageGBuffer::UpdateRenderTargets()
 	Viewport.SetWidth((float)Width);
 	Viewport.SetHeight((float)Height);
 
-	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
+	GBuffer0.Release();
+	GBuffer1.Release();
+	GBuffer2.Release();
+	GBuffer3.Release();
+	DepthStencilBuffer.Release();
+
 	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
 	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
 
 	RenderTargets[0] = GBuffer0->GetRenderTarget();
 	RenderTargets[1] = GBuffer1->GetRenderTarget();
@@ -86,11 +92,11 @@ bool ZERNStageGBuffer::Update()
 
 void ZERNStageGBuffer::DeinitializeSelf()
 {
-	DepthStencilBuffer.Release();
 	GBuffer0.Release();
 	GBuffer1.Release();
 	GBuffer2.Release();
 	GBuffer3.Release();
+	DepthStencilBuffer.Release();
 
 	ZERNStage::DeinitializeSelf();
 }
@@ -106,27 +112,27 @@ const ZEString& ZERNStageGBuffer::GetName() const
 	return Name;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetDiffuseColorMap() const
-{
-	return GBuffer2;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetSpecularColorMap() const
-{
-	return GBuffer3;
-}
-
-ZEGRTexture2D* ZERNStageGBuffer::GetNormalMap() const
-{
-	return GBuffer1;
-}
-
 ZEGRTexture2D* ZERNStageGBuffer::GetAccumulationMap() const
 {
 	return GBuffer0;
 }
 
-ZEGRTexture2D* ZERNStageGBuffer::GetDepthMap() const
+ZEGRTexture2D* ZERNStageGBuffer::GetEmissiveGlossMap() const
+{
+	return GBuffer1;
+}
+
+ZEGRTexture2D* ZERNStageGBuffer::GetDiffuseSubSurfaceMap() const
+{
+	return GBuffer2;
+}
+
+ZEGRTexture2D* ZERNStageGBuffer::GetNormalSpecularMap() const
+{
+	return GBuffer3;
+}
+
+ZEGRTexture2D* ZERNStageGBuffer::GetDepthStencilMap() const
 {
 	return DepthStencilBuffer;
 }
@@ -141,17 +147,17 @@ const ZEGRTexture2D* ZERNStageGBuffer::GetOutput(ZERNStageBuffer Output) const
 			case ZERN_SO_ACCUMULATION:
 				return GetAccumulationMap();
 
-			case ZERN_SO_DEPTH:
-				return GetDepthMap();
-
-			case ZERN_SO_NORMAL:
-				return GetNormalMap();	
+			case ZERN_SO_GBUFFER_EMISSIVE:
+				return GetEmissiveGlossMap();
 
 			case ZERN_SO_GBUFFER_DIFFUSE:
-				return GetDiffuseColorMap();
+				return GetDiffuseSubSurfaceMap();
 
-			case ZERN_SO_GBUFFER_SPECULAR:
-				return GetSpecularColorMap();
+			case ZERN_SO_NORMAL:
+				return GetNormalSpecularMap();	
+
+			case ZERN_SO_DEPTH:
+				return GetDepthStencilMap();
 		}
 	}
 
@@ -170,18 +176,17 @@ bool ZERNStageGBuffer::Setup(ZEGRContext* Context)
 	Context->ClearRenderTarget(GBuffer1->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer2->GetRenderTarget(), ZEVector4::Zero);
 	Context->ClearRenderTarget(GBuffer3->GetRenderTarget(), ZEVector4::Zero);
-	Context->ClearDepthStencilBuffer(DepthStencilBuffer->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
+	const ZEGRDepthStencilBuffer* DepthStencil = DepthStencilBuffer->GetDepthStencilBuffer();
+	Context->ClearDepthStencilBuffer(DepthStencil, true, true, 0.0f, 0x00);
 
 	Context->SetViewports(1, &Viewport);
-	Context->SetRenderTargets(4, RenderTargets, DepthStencilBuffer->GetDepthStencilBuffer());
+	Context->SetRenderTargets(4, RenderTargets, DepthStencil);
 
 	return true;
 }
 
 void ZERNStageGBuffer::CleanUp(ZEGRContext* Context)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 

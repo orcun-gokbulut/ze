@@ -34,7 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11RenderTarget.h"
+
 #include "ZEGraphics\ZEGRDefinitions.h"
+#include "ZEGraphics\ZEGRContext.h"
+#include "ZEGraphics\ZEGRTexture.h"
+#include "ZED11Module.h"
 
 ID3D11RenderTargetView* ZED11RenderTarget::GetView() const
 {

@@ -60,7 +60,7 @@ class ZELightDirectional : public ZELight
 			ZECascade						Cascades[4];
 			ZEUInt							CascadeCount;
 			ZEVector3						Reserved;
-		}CascadeConstants;
+		} CascadeConstants;
 
 		ZEHolder<ZEGRConstantBuffer>		CascadeConstantBuffer;
 		ZEHolder<ZEGRTexture2D>				CascadeShadowMaps;

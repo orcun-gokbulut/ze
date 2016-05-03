@@ -100,7 +100,7 @@ ZED11StructuredBuffer::ZED11StructuredBuffer()
 
 ZED11StructuredBuffer::~ZED11StructuredBuffer()
 {
-
+	Deinitialize();
 }
 
 ID3D11Buffer* ZED11StructuredBuffer::GetBuffer() const
@@ -140,6 +140,8 @@ bool ZED11StructuredBuffer::Lock(void** Buffer)
 	}
 
 	*Buffer = Map.pData;
+
+	memset(*Buffer, 0, GetSize());
 
 	return true;
 }

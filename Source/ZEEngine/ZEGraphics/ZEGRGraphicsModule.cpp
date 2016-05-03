@@ -150,8 +150,3 @@ ZEGRGraphicsModule::ZEGRGraphicsModule()
 {
 	TextureQuality = ZE_TQ_HIGH;
 }
-
-ZEGRGraphicsModule::~ZEGRGraphicsModule()
-{
-
-}

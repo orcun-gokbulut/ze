@@ -40,12 +40,29 @@
 #include "ZETypes.h"
 #include "ZEGRFormat.h"
 
+class ZEGRTexture;
+
 class ZEGRDepthStencilBuffer : public ZEGRResource
 {
+	friend class ZEGRContext;
+	private:
+		const ZEGRTexture*				Owner;
+		bool							ReadOnly;
+		bool							Bound;
+
 	protected:
 		ZEUInt							Width;
 		ZEUInt							Height;
 		ZEGRFormat						Format;
+
+		void							SetOwner(const ZEGRTexture* OwnerTexture);
+		const ZEGRTexture*				GetOwner() const;
+
+		void							SetReadOnly(bool ReadOnly);
+		bool							GetReadOnly() const;
+
+		void							SetBound(bool Bound);
+		bool							GetBound() const;
 
 										ZEGRDepthStencilBuffer();
 										ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);

@@ -39,8 +39,6 @@
 #include "ZED11ComponentBase.h"
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEPointer/ZEHolder.h"
 
 class ZEGRRenderTarget;
 
@@ -50,23 +48,22 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 	friend class ZED11Context;
 
 	private:
-		ID3D11Texture3D*							Texture3D;
-		ID3D11ShaderResourceView*					ResourceView;
-		ID3D11UnorderedAccessView*					UnorderedAccessView;
-		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>	RenderTargets;
+		ID3D11Texture3D*				Texture3D;
+		ID3D11ShaderResourceView*		ResourceView;
+		ID3D11UnorderedAccessView*		UnorderedAccessView;
 
-		virtual bool								Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV);
-		virtual void								Deinitialize();
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags);
+		virtual void					Deinitialize();
 
-													ZED11Texture3D();
-		virtual										~ZED11Texture3D();
+		ID3D11Texture3D*				GetTexture() const;
+		ID3D11ShaderResourceView*		GetShaderResourceView() const;
+		ID3D11UnorderedAccessView*		GetUnorderedAccessView() const;
+
+										ZED11Texture3D();
+		virtual							~ZED11Texture3D();
 
 	public:
-		ID3D11Texture3D*							GetTexture() const;
-		ID3D11ShaderResourceView*					GetResourceView() const;
-		ID3D11UnorderedAccessView*					GetUnorderedAccessView() const;
+		virtual bool					UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch);
 
-		virtual bool								UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch);
-
-		virtual ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel) const;
+		virtual const ZEGRRenderTarget*	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel) const;
 };

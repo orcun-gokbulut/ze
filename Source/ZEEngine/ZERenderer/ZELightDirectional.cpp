@@ -48,7 +48,7 @@
 #include "ZERNCuller.h"
 #include "ZERNView.h"
 #include "ZERNRenderParameters.h"
-#include "ZERNStageShadowmapGeneration.h"
+#include "ZERNStage.h"
 #include "ZECamera.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
@@ -303,8 +303,8 @@ void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Conte
 	
 	CascadeConstantBuffer->SetData(&CascadeConstants);
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, CascadeConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 9, CascadeConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, CascadeConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_COMPUTE, 9, 1, CascadeConstantBuffer.GetPointerToPointer());
 }
 
 ZELightType ZELightDirectional::GetLightType() const
@@ -354,6 +354,9 @@ const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index) cons
 
 void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
+	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
+		return;
+
 	UpdateCascadeShadowMaps();
 	UpdateCascadeTransforms(*Parameters->View);
 
@@ -368,6 +371,9 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	View.N = GetWorldFront();
 	View.Viewport = NULL;
 
+	ShadowRenderer.SetContext(Parameters->Context);
+	ShadowRenderer.SetScene(Parameters->Scene);
+
 	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
 		View.ViewVolume = &GetViewVolume(CascadeIndex);
@@ -380,10 +386,8 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
-		ZELight::Render(Parameters, Command);
+		ShadowRenderer.Render(0.0f);
 	}
-
-	Context->SetRenderTargets(0, NULL, NULL);
 }
 
 ZELightDirectional* ZELightDirectional::CreateInstance()

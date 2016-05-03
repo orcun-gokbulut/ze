@@ -38,6 +38,9 @@
 #include "ZEGame/ZEScene.h"
 #include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZERNCommand.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNStage.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2

@@ -39,11 +39,13 @@
 #include "ZERNCuller.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStageShadowmapGeneration.h"
+#include "ZEMath\ZEViewFrustum.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
+#define ZE_LDF_BOUNDING_BOX				16
 
 float ZELight::AttenuationFunction(float RootToTry)
 {
@@ -70,6 +72,32 @@ bool ZELight::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
+void ZELight::CalculateBoundingBox() const
+{
+	ZEAABBox AABB;
+
+	const ZEViewVolume& ViewVolume = GetViewVolume();
+	if (ViewVolume.GetViewVolumeType() == ZE_VVT_FRUSTUM)
+	{
+		const ZEViewFrustum& ViewFrustum = static_cast<const ZEViewFrustum&>(ViewVolume);
+		for (ZEUInt I = 0; I < 8; I++)
+		{
+			ZEVector3 VertexLocal = GetInvWorldTransform() * ViewFrustum.GetVertex((ZEViewFrustumVertex)I);
+
+			ZEVector3::Min(AABB.Min, AABB.Min, VertexLocal);
+			ZEVector3::Max(AABB.Max, AABB.Max, VertexLocal);
+		}
+	}
+	else if (ViewVolume.GetViewVolumeType() == ZE_VVT_SPHERE)
+	{
+		ZEVector3 Extent(Range, Range, Range);
+		AABB.Min = -Extent;
+		AABB.Max = Extent;
+	}
+	
+	const_cast<ZELight*>(this)->SetBoundingBox(AABB);
+}
+
 void ZELight::LocalTransformChanged()
 {
 	ZEEntity::LocalTransformChanged();
@@ -80,6 +108,12 @@ void ZELight::ParentTransformChanged()
 {
 	ZEEntity::ParentTransformChanged();
 	DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
+}
+
+void ZELight::BoundingBoxChanged()
+{
+	ZEEntity::BoundingBoxChanged();
+	DirtyFlags.RaiseFlags(ZE_LDF_BOUNDING_BOX);
 }
 
 ZELight::ZELight()
@@ -129,9 +163,6 @@ void ZELight::SetRange(float NewValue)
 		return;
 
 	Range = NewValue;
-
-	ZEVector3 Extent(Range, Range, Range);
-	SetBoundingBox(ZEAABBox(-Extent, Extent));
 
 	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
@@ -256,6 +287,17 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
+const ZEAABBox& ZELight::GetBoundingBox() const
+{
+	if (DirtyFlags.GetFlags(ZE_LDF_BOUNDING_BOX))
+	{
+		CalculateBoundingBox();
+		DirtyFlags.UnraiseFlags(ZE_LDF_BOUNDING_BOX);
+	}
+
+	return ZEEntity::GetBoundingBox();
+}
+
 bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 {
 	if (!ZEEntity::PreRender(CullParameters))
@@ -267,13 +309,6 @@ bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 	CullParameters->Renderer->AddCommand(&Command);
 
 	return true;
-}
-
-void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
-{
-	ShadowRenderer.SetContext(Parameters->Context);
-	ShadowRenderer.SetScene(Parameters->Scene);
-	ShadowRenderer.Render(0.0f);
 }
 
 ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution)

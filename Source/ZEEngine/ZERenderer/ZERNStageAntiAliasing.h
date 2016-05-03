@@ -59,14 +59,6 @@ class ZERNStageAntiAliasing  : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>		InputTexture;
-		ZEHolder<const ZEGRTexture2D>		DepthTexture;
-		ZEHolder<const ZEGRTexture2D>		NormalTexture;
-		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
-
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
-
 		ZEHolder<ZEGRShader>				EdgeDetectionVertexShader;
 		ZEHolder<ZEGRShader>				EdgeDetectionPixelShader;
 		ZEHolder<ZEGRShader>				BlendingWeightCalculationVertexShader;
@@ -78,10 +70,11 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>		BlendingWeightCalculationPassRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		NeighborhoodBlendingPassRenderStateData;
 
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
 		ZEHolder<ZEGRTexture2D>				EdgeTexture;
 		ZEHolder<ZEGRTexture2D>				BlendTexture;
-		ZEHolder<const ZEGRRenderTarget>	EdgeRenderTarget;
-		ZEHolder<const ZEGRRenderTarget>	BlendRenderTarget;
 		ZEHolder<ZEGRTexture2D>				AreaTexture;
 		ZEHolder<ZEGRTexture2D>				SearchTexture;
 
@@ -95,6 +88,13 @@ class ZERNStageAntiAliasing  : public ZERNStage
 			ZEVector2						OutputSize;
 			ZEVector2						Reserved0;
 		} Constants;
+
+		const ZEGRTexture2D*				InputTexture;
+		const ZEGRTexture2D*				DepthTexture;
+		const ZEGRTexture2D*				NormalTexture;
+		const ZEGRRenderTarget*				OutputRenderTarget;
+		const ZEGRRenderTarget*				EdgeRenderTarget;
+		const ZEGRRenderTarget*				BlendRenderTarget;
 
 		bool								UpdateInputOutput();
 		bool								UpdateConstantBuffers();

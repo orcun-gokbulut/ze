@@ -37,25 +37,27 @@
 
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZED11ComponentBase.h"
+
 #include "ZETypes.h"
 
-struct  ID3D11Buffer;
+struct ID3D11Buffer;
 
 class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 {
 	friend class ZED11Module;
-
+	friend class ZED11Context;
 	private:		
 		ID3D11Buffer*				Buffer;
 
-		virtual bool				Initialize(ZEUInt VertexCount, ZESize VertexSize);
+		virtual bool				Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data);
 		virtual void				Deinitialize();
-	
-									ZED11VertexBuffer();
 
-	public:
 		ID3D11Buffer*				GetBuffer() const;
 
+									ZED11VertexBuffer();
+		virtual						~ZED11VertexBuffer();
+
+	public:
 		virtual bool				Lock(void** Data);
 		virtual void				Unlock();
 };

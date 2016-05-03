@@ -216,11 +216,11 @@ const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
 	return Constants.MaterialColor;
 }
 
-void ZERNSimpleMaterial::SetTexture(const ZERNMap& Sampler)
+void ZERNSimpleMaterial::SetTexture(const ZERNMap& Map)
 {
-	TextureMap = Sampler;
+	TextureMap = Map;
 	
-	bool TextureEnabled = (Sampler.GetTexture() != NULL);
+	bool TextureEnabled = (Map.GetTexture() != NULL);
 	if (Constants.TextureEnabled == TextureEnabled)
 		return;
 	
@@ -238,29 +238,28 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	if(!Update())
+	if (!Update())
 		return false;
 
 	Context->SetRenderState(RenderStateData);
 
 	if (Constants.TextureEnabled)
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureMap.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureMap.GetSampler().GetPointer());
+		const ZEGRTexture* Texture = TextureMap.GetTexture();
+		const ZEGRSampler* Sampler = TextureMap.GetSampler();
+		Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, &Texture);
+		Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, &Sampler);
 	}
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
 
 	return true;
 }
 
 void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
+	return ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
 bool ZERNSimpleMaterial::Update()

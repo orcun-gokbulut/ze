@@ -267,7 +267,7 @@ static DXGI_FORMAT Convert(ZEGRVertexElementType ElementType)
 			return DXGI_FORMAT_R32G32B32_UINT;
 
 		case ZEGR_VET_UINT4:
-			return DXGI_FORMAT_R8G8B8A8_UINT;
+			return DXGI_FORMAT_R32G32B32A32_UINT;
 
 		case ZEGR_VET_FLOAT:
 			return DXGI_FORMAT_R32_FLOAT;
@@ -280,6 +280,9 @@ static DXGI_FORMAT Convert(ZEGRVertexElementType ElementType)
 
 		case ZEGR_VET_FLOAT4:
 			return DXGI_FORMAT_R32G32B32A32_FLOAT;
+
+		case ZEGR_VET_UINT8_4:
+			return DXGI_FORMAT_R8G8B8A8_UINT;
 	};
 }
 
@@ -437,7 +440,7 @@ ID3D11DepthStencilState* ZED11StatePool::CreateDepthStencilState(const ZEGRDepth
 	return NativeState;
 }
 
-ID3D11InputLayout* ZED11StatePool::CreateVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* Shader) const
+ID3D11InputLayout* ZED11StatePool::CreateVertexLayout(const ZEGRVertexLayout& VertexLayout, const ZEGRShader* Shader) const
 {
 	if (Shader == NULL || Shader->GetShaderType() != ZEGR_ST_VERTEX)
 	{
@@ -509,7 +512,7 @@ ID3D11InputLayout* ZED11StatePool::CreateVertexLayout(const ZEGRVertexLayout& Ve
 		ElementDesc[I].InputSlotClass = Convert(Elements[I].Usage);
 	}
 
-	ZED11Shader* D11Shader = static_cast<ZED11Shader*>(Shader);
+	const ZED11Shader* D11Shader = static_cast<const ZED11Shader*>(Shader);
 	ID3D11InputLayout* NativeState = NULL;
 	HRESULT Result = GetDevice()->CreateInputLayout(
 		ElementDesc, ElementCount, 
@@ -610,7 +613,7 @@ ZEHolder<const ZED11DepthStencilState> ZED11StatePool::GetDepthStencilState(cons
 	return Entry;
 }
 
-ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader) const
+ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVertexLayout& VertexLayout, const ZEGRShader* VertexShader) const
 {
 	zeCheckCriticalError(VertexShader == NULL, NULL, "Vertex shader cannot be NULL");
 	zeCheckCriticalError(VertexShader->GetShaderType() != ZEGR_ST_VERTEX, NULL, "Wrong shader type.");
@@ -618,7 +621,6 @@ ZEHolder<const ZED11VertexLayout> ZED11StatePool::GetVertexLayout(const ZEGRVert
 	ZED11VertexLayout* Entry = NULL;
 	if(VertexLayout.GetElementCount() > 0)
 	{
-
 		Entry = static_cast<ZED11VertexLayout*>(FindPoolEntry(VertexLayoutPool, VertexLayout));
 		if (Entry == NULL)
 		{

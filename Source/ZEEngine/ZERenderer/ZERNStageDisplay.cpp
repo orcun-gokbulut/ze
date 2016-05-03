@@ -42,14 +42,18 @@
 #include "ZERNShaderSlots.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
 
-#define ZERN_SMIDF_SAMPLER	0x01
-#define ZERN_SMIDF_CONSTANT_BUFFER	0x02
+#define ZERN_SDDF_SAMPLER			0x01
+#define ZERN_SDDF_CONSTANT_BUFFER	0x02
 
 void ZERNStageDisplay::DeinitializeSelf()
 {
+	DirtyFlags.RaiseAll();
+
 	ConstantBuffer.Release();
 	Sampler.Release();
-	DirtyFlags.RaiseAll();
+
+	InputTexture = NULL;
+	OutputRenderTarget = NULL;
 }
 
 bool ZERNStageDisplay::UpdateInputOutput()
@@ -64,7 +68,7 @@ bool ZERNStageDisplay::UpdateInputOutput()
 		else if (InputTexture != NewTexture)
 		{
 			InputTexture = NewTexture;
-			DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+			DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 		}
 	}
 
@@ -83,7 +87,7 @@ bool ZERNStageDisplay::UpdateInputOutput()
 			Viewport.SetWidth(OutputSizeMod.x);
 			Viewport.SetHeight(OutputSizeMod.y);
 
-			DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+			DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 		}
 	}
 
@@ -92,7 +96,7 @@ bool ZERNStageDisplay::UpdateInputOutput()
 
 bool ZERNStageDisplay::UpdateConstantBuffer()
 {
-	if (!DirtyFlags.GetFlags(ZERN_SMIDF_CONSTANT_BUFFER))
+	if (!DirtyFlags.GetFlags(ZERN_SDDF_CONSTANT_BUFFER))
 		return true;
 
 	if (ConstantBuffer.IsNull())
@@ -101,7 +105,7 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 	if (ConstantBuffer.IsNull())
 		return false;
 
-	if (InputTexture.IsNull())
+	if (InputTexture == NULL)
 		return false;
 
 	ZEVector2 InputSizeMod;
@@ -152,7 +156,6 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 
 	ZEMatrix3x3 InputTransform = InputOffsetTransform * InputZoomTransform * InputFlipTransform;
 
-
 	// Output Transform
 	ZERNStageDisplayScaleMode ModScaleMode = ScaleMode;
 	if (ScaleMode == ZERN_SDSM_FIT_AUTO)
@@ -195,14 +198,14 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 	memcpy(Buffer, &Constants, sizeof(Constants));
 	ConstantBuffer->Unlock();
 
-	DirtyFlags.UnraiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.UnraiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 
 	return true;
 }
 
 bool ZERNStageDisplay::UpdateSampler()
 {
-	if (!DirtyFlags.GetFlags(ZERN_SMIDF_SAMPLER))
+	if (!DirtyFlags.GetFlags(ZERN_SDDF_SAMPLER))
 		return true;
 
 	ZEGRSamplerDescription SamplerDescription;
@@ -215,6 +218,8 @@ bool ZERNStageDisplay::UpdateSampler()
 
 	Sampler = ZEGRSampler::GetSampler(SamplerDescription);
 
+	DirtyFlags.UnraiseFlags(ZERN_SDDF_SAMPLER);
+
 	return true;
 }
 
@@ -226,10 +231,10 @@ bool ZERNStageDisplay::Update()
 	if (!UpdateInputOutput())
 		return false;
 
-	if (!UpdateSampler())
+	if (!UpdateConstantBuffer())
 		return false;
 
-	if (!UpdateConstantBuffer())
+	if (!UpdateSampler())
 		return false;
 
 	return true;
@@ -238,12 +243,11 @@ bool ZERNStageDisplay::Update()
 bool ZERNStageDisplay::Draw(ZEGRContext* Context)
 {
 	Context->SetViewports(1, &Viewport);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_STAGE, ConstantBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
-	Context->Draw(3, 0);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_STAGE, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_STAGE, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
+	Context->Draw(3, 0);
 
 	return true;
 }
@@ -295,7 +299,7 @@ void ZERNStageDisplay::SetInputOffset(const ZEVector2& Offset)
 
 	InputOffset = Offset;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 const ZEVector2& ZERNStageDisplay::GetInputOffset() const
@@ -310,7 +314,7 @@ void ZERNStageDisplay::SetInputSize(const ZEVector2& Size)
 
 	InputSize = Size;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 const ZEVector2& ZERNStageDisplay::GetInputSize() const
@@ -325,7 +329,7 @@ void ZERNStageDisplay::SetOutputOffset(const ZEVector2& Offset)
 
 	OutputOffset = Offset;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 const ZEVector2& ZERNStageDisplay::GetOutputOffset() const
@@ -340,7 +344,7 @@ void ZERNStageDisplay::SetOutputSize(const ZEVector2& Size)
 
 	OutputSize = Size;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 const ZEVector2& ZERNStageDisplay::GetOutputSize() const
@@ -355,7 +359,7 @@ void ZERNStageDisplay::SetScaleMode(ZERNStageDisplayScaleMode Mode)
 
 	ScaleMode = Mode;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 ZERNStageDisplayScaleMode ZERNStageDisplay::GetScaleMode() const
@@ -370,7 +374,7 @@ void ZERNStageDisplay::SetZoom(const ZEVector2& Zoom)
 
 	this->Zoom = Zoom;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 const ZEVector2& ZERNStageDisplay::GetZoom() const
@@ -385,7 +389,7 @@ void ZERNStageDisplay::SetRotate(float Rotation)
 
 	this->Rotation = Rotation;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 float ZERNStageDisplay::GetRotation()const
@@ -400,7 +404,7 @@ void ZERNStageDisplay::SetFlipMode(ZERNStageDisplayFlipMode Mode)
 
 	FlipMode = Mode;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 }
 
 ZERNStageDisplayFlipMode ZERNStageDisplay::GetFlipMode() const
@@ -415,7 +419,7 @@ void ZERNStageDisplay::SetFilter(ZEGRTextureFilter Filter)
 
 	this->Filter = Filter;
 
-	DirtyFlags.RaiseFlags(ZERN_SMIDF_SAMPLER);
+	DirtyFlags.RaiseFlags(ZERN_SDDF_SAMPLER);
 }
 
 ZEGRTextureFilter ZERNStageDisplay::GetFilter() const
@@ -446,7 +450,7 @@ bool ZERNStageDisplay::Setup(ZEGRContext* Context, const ZEGRViewport& Multiplex
 		Viewport.GetHeight() != MultiplexerViewport.GetHeight())
 	{
 		Viewport = MultiplexerViewport;
-		DirtyFlags.RaiseFlags(ZERN_SMIDF_CONSTANT_BUFFER);
+		DirtyFlags.RaiseFlags(ZERN_SDDF_CONSTANT_BUFFER);
 		UpdateConstantBuffer();
 	}
 	
@@ -469,4 +473,9 @@ ZERNStageDisplay::ZERNStageDisplay() : StageLink(this)
 	Zoom = ZEVector2::One;
 	Rotation = 0.0f;
 	Filter = ZEGR_TFM_LINEAR;
+
+	memset(&Constants, 0, sizeof(Constants));
+
+	InputTexture = NULL;
+	OutputRenderTarget = NULL;
 }

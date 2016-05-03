@@ -76,8 +76,8 @@ class ZEModel : public ZEEntity
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
 		ZEVector3							ParentlessBoneBodyPosition;
 
-		mutable bool						DirtyConstantBufferSkin;
-		mutable ZEHolder<ZEGRConstantBuffer> ConstantBufferBoneTransforms;
+		bool								DirtyConstantBufferSkin;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBufferBoneTransforms;
 
 		ZEUInt								ActiveLOD;
 		bool								Visibility;

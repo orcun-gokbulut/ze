@@ -73,11 +73,6 @@ ZEGRConstantBuffer::ZEGRConstantBuffer()
 
 }
 
-ZEGRConstantBuffer::~ZEGRConstantBuffer()
-{
-	Deinitialize();
-}
-
 ZEHolder<ZEGRConstantBuffer> ZEGRConstantBuffer::Create(ZESize BufferSize)
 {
 	ZEHolder<ZEGRConstantBuffer> ConstantBuffer = ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
