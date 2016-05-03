@@ -244,18 +244,13 @@ void ZERNFilter::Process(ZEGRContext* Context)
 	if(!Update())
 		return;
 
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerPointClamp.GetPointer());
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, Input);
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerPointClamp.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&Input));
 	Context->SetRenderTargets(1, &Output, NULL);
-	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
 
 	Context->Draw(3, 0);
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 ZERNFilter::ZERNFilter()

@@ -36,15 +36,17 @@
 #include "ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-bool ZEGRVertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
+bool ZEGRVertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data)
 {
 	zeCheckError(VertexCount == 0, false, "Vertex count cannot be zero.");
-	zeCheckError(VertexSize == 0, false, "Vertex size cannot be zoro.");
+	zeCheckError(VertexStride == 0, false, "Vertex stride cannot be zoro.");
 
 	this->VertexCount = VertexCount;
-	this->VertexSize = VertexSize;
+	this->VertexStride = VertexStride;
 
-	SetSize(VertexCount * VertexSize);
+	SetResourceUsage(Usage);
+	SetResourceBindFlags(ZEGR_RBF_VERTEX_BUFFER);
+	SetSize(VertexCount * VertexStride);
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, VertexBuffer, Geometry);
 
 	return true;
@@ -58,13 +60,8 @@ void ZEGRVertexBuffer::Deinitialize()
 
 ZEGRVertexBuffer::ZEGRVertexBuffer()
 {
-	VertexSize = 0;
 	VertexCount = 0;
-}
-
-ZEGRVertexBuffer::~ZEGRVertexBuffer()
-{
-	Deinitialize();
+	VertexStride = 0;
 }
 
 ZEGRResourceType ZEGRVertexBuffer::GetResourceType() const
@@ -72,23 +69,23 @@ ZEGRResourceType ZEGRVertexBuffer::GetResourceType() const
 	return ZEGR_RT_VERTEX_BUFFER;
 }
 
-ZESize ZEGRVertexBuffer::GetVertexSize() const
-{
-	return VertexSize;
-}
-
 ZESize ZEGRVertexBuffer::GetVertexCount() const
 {
 	return VertexCount;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::Create(ZEUInt VertexCount, ZESize VertexSize)
+ZEUInt ZEGRVertexBuffer::GetVertexStride() const
+{
+	return VertexStride;
+}
+
+ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data)
 {
 	ZEHolder<ZEGRVertexBuffer> VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
 	if (VertexBuffer == NULL)
 		return NULL;
 
-	if (!VertexBuffer->Initialize(VertexCount, VertexSize))
+	if (!VertexBuffer->Initialize(VertexCount, VertexStride, Usage, Data))
 		return NULL;
 
 	return VertexBuffer;

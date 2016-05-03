@@ -169,9 +169,8 @@ void ZERNRenderer::RenderStages()
 	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_VIEW, &PrevViewConstantBuffer);
 	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, &PrevRendererConstantBuffer);
 
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, ViewConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, RendererConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, SceneConstantBuffer);
+	ZEGRConstantBuffer* ConstantBuffers[] = {RendererConstantBuffer, SceneConstantBuffer, ViewConstantBuffer};
+	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, ConstantBuffers);
 
 	if(OutputRenderTarget != NULL)
 	{
@@ -201,8 +200,8 @@ void ZERNRenderer::RenderStages()
 
 	CleanCommands();
 
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_VIEW, PrevViewConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, PrevRendererConstantBuffer);
+	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, SceneConstantBuffer, PrevViewConstantBuffer};
+	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
 }
 
 bool ZERNRenderer::InitializeSelf()

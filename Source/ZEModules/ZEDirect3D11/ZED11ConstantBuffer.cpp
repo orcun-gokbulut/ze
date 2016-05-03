@@ -63,14 +63,13 @@ bool ZED11ConstantBuffer::Initialize(ZESize BufferSize)
 		return false;
 	}
 
-	SetSize(BufferSize);
-
-	return true;
+	return ZEGRConstantBuffer::Initialize(BufferSize);
 }
 
 void ZED11ConstantBuffer::Deinitialize()
 {
 	ZEGR_RELEASE(Buffer);
+
 	ZEGRConstantBuffer::Deinitialize();
 }
 
@@ -86,6 +85,8 @@ bool ZED11ConstantBuffer::Lock(void** Buffer)
 
 	*Buffer = Map.pData;
 
+	memset(*Buffer, 0, GetSize());
+
 	return true;
 }
 void ZED11ConstantBuffer::Unlock()
@@ -96,4 +97,9 @@ void ZED11ConstantBuffer::Unlock()
 ZED11ConstantBuffer::ZED11ConstantBuffer()
 {
 	Buffer = NULL;
+}
+
+ZED11ConstantBuffer::~ZED11ConstantBuffer()
+{
+	Deinitialize();
 }

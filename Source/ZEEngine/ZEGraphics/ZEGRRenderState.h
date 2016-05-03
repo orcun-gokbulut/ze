@@ -69,17 +69,29 @@ class ZEGRRenderState
 	friend class ZEGRContext;
 
 	private:
-		ZEGRPrimitiveType						PrimitiveType;
-		ZEGRVertexLayout						VertexLayout;
-		ZEHolder<ZEGRShader>					Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEHolder<const ZEGRShader>				Shaders[ZEGR_SHADER_TYPE_COUNT];
+		ZEGRBlendState							BlendState;
 		ZEGRRasterizerState						RasterizerState;
 		ZEGRDepthStencilState					DepthStencilState;
-		ZEGRFormat								DepthStencilFormat;
+		ZEGRVertexLayout						VertexLayout;
+		ZEGRPrimitiveType						PrimitiveType;
 		ZEGRFormat								RenderTargetFormats[ZEGR_MAX_RENDER_TARGET_SLOT];
-		ZEGRBlendState							BlendState;
+		ZEGRFormat								DepthStencilFormat;
 
 	public:
 		static ZEGRRenderState					Default;
+
+		void									SetShader(ZEGRShaderType Type, const ZEGRShader* Shader);
+		const ZEGRShader*						GetShader(ZEGRShaderType Type) const;
+
+		void									SetBlendState(const ZEGRBlendState& State);
+		const ZEGRBlendState&					GetBlendState() const;
+
+		void									SetRasterizerState(const ZEGRRasterizerState& State);
+		const ZEGRRasterizerState&				GetRasterizerState() const;
+
+		void									SetDepthStencilState(const ZEGRDepthStencilState& State);
+		const ZEGRDepthStencilState&			GetDepthStencilState() const;
 
 		void									SetVertexLayout(const ZEGRVertexLayout& Layout);
 		const ZEGRVertexLayout&					GetVertexLayout() const;
@@ -87,23 +99,11 @@ class ZEGRRenderState
 		void									SetPrimitiveType(ZEGRPrimitiveType Type);
 		ZEGRPrimitiveType						GetPrimitiveType() const;
 
-		void									SetShader(ZEGRShaderType Type, ZEGRShader* Shader);
-		ZEHolder<ZEGRShader>					GetShader(ZEGRShaderType Type) const;
-
 		void									SetRenderTargetFormat(ZEUInt Index, ZEGRFormat Format);
 		ZEGRFormat								GetRenderTargetFormat(ZEUInt Index) const;
 
 		void									SetDepthStencilFormat(ZEGRFormat Format);
 		ZEGRFormat								GetDepthStencilFormat() const;
-
-		void									SetRasterizerState(const ZEGRRasterizerState& State);
-		const ZEGRRasterizerState&				GetRasterizerState() const;
-
-		void									SetBlendState(const ZEGRBlendState& State);
-		const ZEGRBlendState&					GetBlendState() const;
-
-		void									SetDepthStencilState(const ZEGRDepthStencilState& State);
-		const ZEGRDepthStencilState&			GetDepthStencilState() const;
 		
 		void									SetToDefault();
 
@@ -122,6 +122,9 @@ class ZEGRComputeRenderStateData : public ZEReferenceCounted
 
 	protected:
 		virtual bool							Initialize(const ZEGRComputeRenderState& RenderState) = 0;
+
+	public:
+		static ZEGRComputeRenderStateData*		Create(const ZEGRComputeRenderState& RenderState);
 };
 
 class ZEGRComputeRenderState
@@ -134,5 +137,4 @@ class ZEGRComputeRenderState
 		const ZEGRShader*						GetComputeShader() const;
 
 		ZEGRComputeRenderStateData*				Compile();
-
 };

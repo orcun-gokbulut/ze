@@ -76,8 +76,6 @@ class ZERNStageHDR : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>		InputTexture;
-		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
 
 		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexcoord;
@@ -131,6 +129,9 @@ class ZERNStageHDR : public ZERNStage
 			float							Reserved1;
 			float							Reserved2;
 		} Constants;
+
+		const ZEGRTexture2D*				InputTexture;
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		bool								UpdateInputOutput();
 		bool								UpdateTextures();

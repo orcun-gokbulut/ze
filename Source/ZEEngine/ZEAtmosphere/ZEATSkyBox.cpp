@@ -62,37 +62,7 @@ ZEDrawFlags ZEATSkyBox::GetDrawFlags() const
 	return ZE_DF_DRAW;
 }
 
-void ZEATSkyBox::SetBrightness(float Brightness)
-{
-	if (this->Brightness == Brightness)
-		return;
-
-	this->Brightness = Brightness;
-
-	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
-}
-
-float ZEATSkyBox::GetBrightness() const
-{
-	return Brightness;
-}
-
-void ZEATSkyBox::SetColor(const ZEVector3& Color)
-{
-	if (Constants.Color == Color)
-		return;
-
-	Constants.Color = Color;
-
-	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
-}
-
-const ZEVector3& ZEATSkyBox::GetColor() const
-{
-	return Constants.Color;
-}
-
-void ZEATSkyBox::SetTexture(const ZEString& FileName)
+void ZEATSkyBox::SetTextureFile(const ZEString& FileName)
 {
 	if (SkyTexture != NULL)
 	{
@@ -111,12 +81,42 @@ void ZEATSkyBox::SetTexture(const ZEString& FileName)
 	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
 }
 
-const ZEString& ZEATSkyBox::GetTexture() const
+const ZEString& ZEATSkyBox::GetTextureFile() const
 {
 	if (SkyTexture == NULL)
 		return ZEString::Empty;
-	
+
 	return SkyTexture->GetFileName();
+}
+
+void ZEATSkyBox::SetBrightness(float Brightness)
+{
+	if (this->Brightness == Brightness)
+		return;
+
+	this->Brightness = Brightness;
+
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
+}
+
+float ZEATSkyBox::GetBrightness() const
+{
+	return Brightness;
+}
+
+void ZEATSkyBox::SetColor(const ZEVector3& Color)
+{
+	if (this->Color == Color)
+		return;
+
+	this->Color = Color;
+
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
+}
+
+const ZEVector3& ZEATSkyBox::GetColor() const
+{
+	return Constants.Color;
 }
 
 bool ZEATSkyBox::InitializeSelf()
@@ -221,7 +221,7 @@ bool ZEATSkyBox::UpdateConstantBuffers()
 	if (!DirtyFlags.GetFlags(ZEAT_SBDF_CONSTANT_BUFFER))
 		return true;
 
-	Constants.Color *= Brightness;
+	Constants.Color = Color * Brightness;
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
@@ -290,22 +290,16 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferTransform);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferTransform.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearWrap);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture->GetTexture());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearWrap.GetPointerToPointer());
+	ZEGRTexture* Texture = SkyTexture->GetTexture();
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	Context->Draw(VertexBuffer->GetVertexCount(), 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetVertexBuffers(0, 0, NULL);
 }
 
 ZEATSkyBox* ZEATSkyBox::CreateInstance()

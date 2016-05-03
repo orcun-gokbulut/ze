@@ -56,23 +56,23 @@ class ZEGRDepthStencilState : public ZEGRState
 	private:
 		struct ZEDepthStencilStateData
 		{
-			bool						DepthTestEnable : 1;
-			bool						DepthWriteEnable : 1;
-			ZEGRComparisonFunction		DepthFunction : 5;
+			bool						DepthTestEnable;
+			bool						DepthWriteEnable;
+			ZEGRComparisonFunction		DepthFunction;
 
-			bool						StencilTestEnable : 1;
-			ZEUInt8						StencilWriteMask : 8;
-			ZEUInt8						StencilReadMask : 8;
+			bool						StencilTestEnable;
+			ZEUInt8						StencilWriteMask;
+			ZEUInt8						StencilReadMask;
 
-			ZEGRComparisonFunction		FrontStencilFunction : 5;
-			ZEGRStencilOperation		FrontStencilPassOperation : 5;
-			ZEGRStencilOperation		FrontStencilFailOperation : 5;
-			ZEGRStencilOperation		FrontStencilDepthFailOperation : 5;
+			ZEGRComparisonFunction		FrontStencilFunction;
+			ZEGRStencilOperation		FrontStencilPassOperation;
+			ZEGRStencilOperation		FrontStencilFailOperation;
+			ZEGRStencilOperation		FrontStencilDepthFailOperation;
 
-			ZEGRComparisonFunction		BackStencilFunction : 5;
-			ZEGRStencilOperation		BackStencilPassOperation : 5;
-			ZEGRStencilOperation		BackStencilFailOperation : 5;
-			ZEGRStencilOperation		BackStencilDepthFailOperation : 5;
+			ZEGRComparisonFunction		BackStencilFunction;
+			ZEGRStencilOperation		BackStencilPassOperation;
+			ZEGRStencilOperation		BackStencilFailOperation;
+			ZEGRStencilOperation		BackStencilDepthFailOperation;
 		} StateData;
 	
 	public:

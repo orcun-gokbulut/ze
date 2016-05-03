@@ -47,7 +47,6 @@ class ZEGRStructuredBuffer : public ZEGRResource
 		virtual void							Deinitialize();
 
 												ZEGRStructuredBuffer();
-		virtual									~ZEGRStructuredBuffer();
 
 	public:
 		ZEGRResourceType						GetResourceType() const;

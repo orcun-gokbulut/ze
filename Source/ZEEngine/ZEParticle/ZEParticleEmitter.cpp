@@ -132,6 +132,27 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 	//zeLog("APC : %u", AliveParticleCount);
 }
 
+bool ZEParticleEmitter::Initialize()
+{
+	InstanceBuffer = ZEGRConstantBuffer::Create(sizeof(InstanceAttributes) * 1000);
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+
+	return true;
+}
+
+void ZEParticleEmitter::Deinitialize()
+{
+	Owner = NULL;
+	ParticlePool.Clear();
+	SortArray.Clear();
+	Modifiers.Clear();
+	
+	Material.Release();
+
+	InstanceBuffer.Release();
+	ConstantBuffer.Release();
+}
+
 void ZEParticleEmitter::InitializeParticlePool()
 {
 	ParticlePool.SetCount((ZESize)MaxParticleCount);
@@ -435,9 +456,6 @@ float ZEParticleEmitter::GetMaxLife() const
 void ZEParticleEmitter::SetMaxParticleCount(ZEUInt MaxParticleCount)
 {
 	this->MaxParticleCount = MaxParticleCount;
-	
-	InstanceBuffer = ZEGRConstantBuffer::Create(sizeof(InstanceAttributes) * MaxParticleCount);
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
 	ZESize OldSize = ParticlePool.GetCount();
 
@@ -531,8 +549,6 @@ ZEParticleEmitter::ZEParticleEmitter()
 	SphereRadius = 1.0f;
 	TorusSize = ZEVector2::One;
 	PlaneSize = ZEVector2::One;
-
-	Material = NULL;
 	
 	BillboardType = ZE_PBT_SCREEN_ALIGNED;
 	AxisOrientation = -ZEVector3::UnitZ;
@@ -585,15 +601,13 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 	}
 	InstanceBuffer->Unlock();
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, InstanceBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, Stage->GetOutput(ZERN_SO_DEPTH));
+	const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);
+
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, InstanceBuffer.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, &DepthMap);
 
 	Context->DrawInstanced(4, 0, ParticleCount, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 
 	Material->CleanupMaterial(Context, Stage);
 }

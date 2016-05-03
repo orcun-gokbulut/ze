@@ -81,6 +81,7 @@ bool ZED11IndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Forma
 void ZED11IndexBuffer::Deinitialize()
 {
 	ZEGR_RELEASE(Buffer);
+
 	ZEGRIndexBuffer::Deinitialize();
 }
 
@@ -98,10 +99,17 @@ bool ZED11IndexBuffer::Lock(void** Data)
 	
 	*Data = Map.pData;
 
+	memset(*Data, 0, GetSize());
+
 	return true;
 }
 
 void ZED11IndexBuffer::Unlock()
 {
 	GetMainContext()->Unmap(Buffer, 0);
+}
+
+ZED11IndexBuffer::~ZED11IndexBuffer()
+{
+	Deinitialize();
 }

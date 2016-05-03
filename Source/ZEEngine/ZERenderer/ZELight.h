@@ -102,8 +102,11 @@ class ZELight : public ZEEntity
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
+		void							CalculateBoundingBox() const;
+
 		virtual void					LocalTransformChanged();
 		virtual void					ParentTransformChanged();
+		virtual void					BoundingBoxChanged();
 
 										ZELight();
 		virtual							~ZELight();
@@ -142,13 +145,14 @@ class ZELight : public ZEEntity
 		void							SetAttenuation(float DistanceSquare, float Distance, float Constant);
 		const ZEVector3&				GetAttenuation() const;
 
+		virtual const ZEAABBox&			GetBoundingBox() const;
+
 		virtual ZEGRTexture*			GetShadowMap(ZESize Index = 0) const = 0;
 		virtual const ZEViewVolume&		GetViewVolume(ZESize Index = 0) const = 0;
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
 		
 		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
-		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
 		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);

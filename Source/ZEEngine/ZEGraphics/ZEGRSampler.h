@@ -78,7 +78,7 @@ struct ZEGRSamplerDescription
 											ZEGRSamplerDescription();
 };
 
-class ZEGRSampler : public ZEInitializable, public ZEReferenceCounted
+class ZEGRSampler : public ZEReferenceCounted
 {
 	private:
 		static ZEList2<ZEGRSampler>			SamplerCache;
@@ -87,6 +87,9 @@ class ZEGRSampler : public ZEInitializable, public ZEReferenceCounted
 
 	protected:
 		ZEGRSamplerDescription				Description;
+
+		virtual bool						Initialize() = 0;
+		virtual void						Deinitialize() = 0;
 
 											ZEGRSampler();
 		virtual								~ZEGRSampler();

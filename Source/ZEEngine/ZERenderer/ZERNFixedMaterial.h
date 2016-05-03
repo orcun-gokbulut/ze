@@ -196,8 +196,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		const ZEString&							GetFileName() const;
 
-		void									SetSampler(ZEHolder<ZEGRSampler> Sampler);
-		ZEHolder<ZEGRSampler>					GetSampler() const;
+		void									SetSampler(const ZEHolder<ZEGRSampler>& Sampler);
+		const ZEHolder<ZEGRSampler>&			GetSampler() const;
 
 		void									SetShadowCaster(bool ShadowCaster);
 		bool									GetShadowCaster() const;
@@ -338,10 +338,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									GetDetailBaseMapAttenuationStart() const;
 		void									SetDetailBaseMapAttenuationFactor(float Factor);
 		float									GetDetailBaseMapAttenuationFactor() const;
-		void									SetDetailBaseMap(const ZERNMap& Map);
-		const ZERNMap&							GetDetailBaseMap() const;
+		void									SetDetailBaseMapFile(const ZEString& Filename);
+		const ZEString&							GetDetailBaseMapFile() const;
 
-		void									SetDetailNormalMapEnabled(bool Enabled); 
+		void									SetDetailNormalMapEnabled(bool Enabled);
 		bool									GetDetailNormalMapEnabled() const;
 		void									SetDetailNormalMapFactor(float Factor);
 		float									GetDetailNormalMapFactor() const;
@@ -351,8 +351,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									GetDetailNormalMapAttenuationStart() const;
 		void									SetDetailNormalMapAttenuationFactor(float Factor);
 		float									GetDetailNormalMapAttenuationFactor() const;
-		void									SetDetailNormalMap(const ZERNMap& Map);
-		const ZERNMap&							GetDetailNormalMap() const;
+		void									SetDetailNormalMapFile(const ZEString& Map);
+		const ZEString&							GetDetailNormalMapFile() const;
 
 		void									SetClippingPlanesEnabled(bool Enabled);
 		bool									GetClippingPlanesEnabled() const;

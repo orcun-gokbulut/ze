@@ -46,8 +46,6 @@ class ZERNStageShadowmapGeneration : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-											ZERNStageShadowmapGeneration();
-
 		static ZEGRRenderState				GetRenderState();
 
 };

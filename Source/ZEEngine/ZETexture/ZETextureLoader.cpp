@@ -147,17 +147,28 @@ bool ZETextureLoader::LoadFromImageFile(ZEFile* File, ZETextureData* TextureData
 	ZEUInt RowSize		= Width * PixelSize;
 	ZEUInt RowCount		= Height;
 
-	TextureData->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8_UNORM, 1, 1, Width, Height);
+	FREE_IMAGE_TYPE Type = FreeImage_GetImageType(Bitmap32);
+
+	TextureData->Create(ZEGR_TT_2D, ZEGR_TF_R8G8B8A8_UNORM_SRGB, 1, 1, Width, Height);
 	BYTE* TargetData = (BYTE*)TextureData->GetSurfaces().GetItem(0).GetLevels().GetItem(0).GetData();
 
-	FreeImage_ConvertToRawBits(TargetData, Bitmap32, RowSize, BPP, 0x00FF0000, 0x0000FF00, 0x000000FF, TRUE);
+	FreeImage_FlipVertical(Bitmap32);
+	BYTE* SourceData = FreeImage_GetBits(Bitmap32);
+	ZESize Size = RowSize * RowCount;
+	for (ZESize I = 0; I < Size; I += 4)
+	{
+		TargetData[I] = SourceData[I + FI_RGBA_RED];
+		TargetData[I + 1] = SourceData[I + FI_RGBA_GREEN];
+		TargetData[I + 2] = SourceData[I + FI_RGBA_BLUE];
+		TargetData[I + 3] = SourceData[I + FI_RGBA_ALPHA];
+	}
 
 	zeLog("Image file loaded successfully: \"%s\".", File->GetPath().GetValue());
 
 	FreeImage_Unload(Bitmap32);
 	Bitmap32 = Bitmap = NULL;
-	return true;
 
+	return true;
 }
 
 // Saves level 0 of surface 0 to specified file in ".TGA" format

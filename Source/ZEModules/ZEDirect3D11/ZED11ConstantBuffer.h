@@ -52,6 +52,7 @@ class ZED11ConstantBuffer : public ZEGRConstantBuffer, public ZED11ComponentBase
 		virtual void			Deinitialize();
 
 								ZED11ConstantBuffer();
+		virtual					~ZED11ConstantBuffer();
 
 	public:
 		ID3D11Buffer*			GetBuffer() const;

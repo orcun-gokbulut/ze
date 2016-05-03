@@ -36,29 +36,22 @@
 #ifndef __ZERN_GBUFFER_H__
 #define __ZERN_GBUFFER_H__
 
-#include "ZERNView.hlsl"
-
-
-// SHADER RESOURCES
-///////////////////////////////////////////////////////////////////////////////
-#define ZERN_LM_BLINN_PONG 0
-
 
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
-Texture2D<float>	ZERNGBuffer_DepthBuffer	: register(t0);
-Texture2D<float3>	ZERNGBuffer_Buffer0		: register(t1);
-Texture2D<float4>	ZERNGBuffer_Buffer1		: register(t2);
-Texture2D<float4>	ZERNGBuffer_Buffer2		: register(t3);
-Texture2D<float4>	ZERNGBuffer_Buffer3		: register(t4);
+Texture2D<float3>	ZERNGBuffer_Buffer0		: register(t0);
+Texture2D<float4>	ZERNGBuffer_Buffer1		: register(t1);
+Texture2D<float4>	ZERNGBuffer_Buffer2		: register(t2);
+Texture2D<float4>	ZERNGBuffer_Buffer3		: register(t3);
+Texture2D<float>	ZERNGBuffer_DepthBuffer	: register(t4);
 
 struct ZERNGBuffer
 {
 	float4			Buffer0					: SV_Target0; // xyz:AccumulationBuffer
-	float4			Buffer1					: SV_Target1; // xyz:Normal, w:SpecularColor
-	float4			Buffer2					: SV_Target2; // xyz:DiffuseColor, w:Subsurface Scattering
-	float4			Buffer3					: SV_Target3; // xyz:Emissive, w:SpecularPower
+	float4			Buffer1					: SV_Target1; // xyz:Emissive, w:SpecularPower
+	float4			Buffer2					: SV_Target2; // xyz:DiffuseColor, w:Subsurface Scattering 
+	float4			Buffer3					: SV_Target3; // xyz:Normal, w:SpecularColor
 };
 
 
@@ -110,40 +103,40 @@ float3 ZERNGBuffer_GetAccumulationColor(SamplerState Sampler, float2 TexCoord)
 	return ZERNGBuffer_Buffer0.SampleLevel(Sampler, TexCoord, 0);
 }
 
-// NORMAL
+// EMISSIVE COLOR
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetViewNormal(inout ZERNGBuffer GBuffer, float3 Normal /*Must be Normalized*/)
+void ZERNGBuffer_SetEmissiveColor(inout ZERNGBuffer GBuffer, float3 EmissiveColor)
 {
-	GBuffer.Buffer1.xyz = Normal * 0.5f + 0.5f;
+	GBuffer.Buffer1.xyz = EmissiveColor;
 }
 
-float3 ZERNGBuffer_GetViewNormal(float2 ScreenPos)
+float3 ZERNGBuffer_GetEmissiveColor(float2 ScreenPos)
 {
-	return normalize(ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).xyz * 2.0f - 1.0f);
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
 }
 
-float3 ZERNGBuffer_GetViewNormal(SamplerState Sampler, float2 TexCoord)
+float3 ZERNGBuffer_GetEmissiveColor(SamplerState Sampler, float2 TexCoord)
 {
-	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).xyz * 2.0f - 1.0f;
+	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).xyz;
 }
 
-// SPECULAR COLOR
+// SPECULAR POWER
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float3 SpecularColor)
+void ZERNGBuffer_SetSpecularPower(inout ZERNGBuffer GBuffer, float SpecularPower)
 {
-	GBuffer.Buffer1.w = SpecularColor.x;
+	GBuffer.Buffer1.w = SpecularPower;
 }
 
-float3 ZERNGBuffer_GetSpecularColor(float2 ScreenPos)
+float ZERNGBuffer_GetSpecularPower(float2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).www;
+	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).w * 64.0f;
 }
 
-float3 ZERNGBuffer_GetSpecularColor(SamplerState Sampler, float2 TexCoord)
+float ZERNGBuffer_GetSpecularPower(SamplerState Sampler, float2 TexCoord)
 {
-	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).www;
+	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).w * 64.0f;
 }
 
 // DIFFUSE COLOR
@@ -182,40 +175,40 @@ float ZERNGBuffer_GetSubsurfaceScattering(SamplerState Sampler, float2 TexCoord)
 	return ZERNGBuffer_Buffer2.SampleLevel(Sampler, TexCoord, 0).w;
 }
 
-// EMISSIVE COLOR
+// NORMAL
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetEmissiveColor(inout ZERNGBuffer GBuffer, float3 EmissiveColor)
+void ZERNGBuffer_SetViewNormal(inout ZERNGBuffer GBuffer, float3 Normal /*Must be Normalized*/)
 {
-	GBuffer.Buffer3.xyz = EmissiveColor;
+	GBuffer.Buffer3.xyz = Normal * 0.5f + 0.5f;
 }
 
-float3 ZERNGBuffer_GetEmissiveColor(float2 ScreenPos)
+float3 ZERNGBuffer_GetViewNormal(float2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).xyz;
+	return normalize(ZERNGBuffer_Buffer3.Load(int3(ScreenPos, 0)).xyz * 2.0f - 1.0f);
 }
 
-float3 ZERNGBuffer_GetEmissiveColor(SamplerState Sampler, float2 TexCoord)
+float3 ZERNGBuffer_GetViewNormal(SamplerState Sampler, float2 TexCoord)
 {
-	return ZERNGBuffer_Buffer3.SampleLevel(Sampler, TexCoord, 0).xyz;
+	return normalize(ZERNGBuffer_Buffer3.SampleLevel(Sampler, TexCoord, 0)).xyz * 2.0f - 1.0f;
 }
 
-// SPECULAR POWER
+// SPECULAR COLOR
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetSpecularPower(inout ZERNGBuffer GBuffer, float SpecularPower)
+void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float3 SpecularColor)
 {
-	GBuffer.Buffer3.w = SpecularPower;
+	GBuffer.Buffer3.w = SpecularColor.x;
 }
 
-float ZERNGBuffer_GetSpecularPower(float2 ScreenPos)
+float3 ZERNGBuffer_GetSpecularColor(float2 ScreenPos)
 {
-	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).w * 64.0f;
+	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).www;
 }
 
-float ZERNGBuffer_GetSpecularPower(SamplerState Sampler, float2 TexCoord)
+float3 ZERNGBuffer_GetSpecularColor(SamplerState Sampler, float2 TexCoord)
 {
-	return ZERNGBuffer_Buffer3.SampleLevel(Sampler, TexCoord, 0).w * 64.0f;
+	return ZERNGBuffer_Buffer3.SampleLevel(Sampler, TexCoord, 0).www;
 }
 
 #endif

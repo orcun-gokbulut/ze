@@ -96,7 +96,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		void								SetMaterialColor(const ZEVector4& Color);
 		const ZEVector4&					GetMaterialColor() const;
 
-		void								SetTexture(const ZERNMap& Sampler);
+		void								SetTexture(const ZERNMap& Map);
 		const ZERNMap&						GetTexture() const;
 	
 		void								SetVertexColorEnabled(bool Enable);

@@ -41,13 +41,17 @@
 struct ZERNDebug_VertexShader_Input
 {
 	float3		Position	: POSITION0;
-	float3		Normal		: NORMAL0;	
+	float3		Normal		: NORMAL0;
+	float3		Tangent		: TANGENT0;
+	float3		Binormal	: BINORMAL0;
 };
 
 struct ZERNDebug_GeometryShader_Input
 {
 	float3		Position	: POSITION0;
 	float3		Normal		: NORMAL0;
+	float3		Tangent		: TANGENT0;
+	float3		Binormal	: BINORMAL0;
 };
 
 struct ZERNDebug_PixelShader_Input
@@ -69,17 +73,25 @@ cbuffer ZERNDebug_Constants					: register(b8)
 	bool		ZERNDebug_CullBackface;
 };
 
+static const float3 ZERNDebug_ColorWireframe	= float3(0.0f, 0.0f, 1.0f);
+static const float3 ZERNDebug_ColorNormal		= float3(1.0f, 1.0f, 1.0f);
+static const float3 ZERNDebug_ColorTangent		= float3(1.0f, 0.0f, 0.0f);
+static const float3 ZERNDebug_ColorBinormal		= float3(0.0f, 1.0f, 0.0f);
+static const float3 ZERNDebug_ColorBoundingBox	= float3(1.0f, 1.0f, 0.0f);
+
 ZERNDebug_GeometryShader_Input ZERNDebug_VertexShader_Main(ZERNDebug_VertexShader_Input Input)
 {
 	ZERNDebug_GeometryShader_Input Output;
 	
 	Output.Position = mul(ZERNDebug_WorldTransform, float4(Input.Position, 1.0f)).xyz;
 	Output.Normal = mul(ZERNDebug_WorldTransform, float4(Input.Normal, 0.0f)).xyz;
+	Output.Tangent = mul(ZERNDebug_WorldTransform, float4(Input.Tangent, 0.0f)).xyz;
+	Output.Binormal = mul(ZERNDebug_WorldTransform, float4(Input.Binormal, 0.0f)).xyz;
 	
 	return Output;
 }
 
-[maxvertexcount(9)]
+[maxvertexcount(22)]
 void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input[3], inout LineStream<ZERNDebug_PixelShader_Input> OutputStream)
 {
 	if (ZERNDebug_CullBackface)
@@ -94,43 +106,9 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 	
 	ZERNDebug_PixelShader_Input Output;
 	
-	if (ZERNDebug_ShowNormalVectors)
-	{
-		Output.Color = float3(0.0f, 1.0f, 0.0f);
-		
-		float LineLength = 0.2f;
-		
-		float3 LineStartWorld = Input[0].Position;
-		float3 LineEndWorld = LineStartWorld + normalize(Input[0].Normal) * LineLength;
-		
-		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
-		OutputStream.Append(Output);
-		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
-		OutputStream.Append(Output);
-		OutputStream.RestartStrip();
-		
-		LineStartWorld = Input[1].Position;
-		LineEndWorld = LineStartWorld + normalize(Input[1].Normal) * LineLength;
-		
-		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
-		OutputStream.Append(Output);
-		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
-		OutputStream.Append(Output);
-		OutputStream.RestartStrip();
-		
-		LineStartWorld = Input[2].Position;
-		LineEndWorld = LineStartWorld + normalize(Input[2].Normal) * LineLength;
-		
-		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
-		OutputStream.Append(Output);
-		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
-		OutputStream.Append(Output);
-		OutputStream.RestartStrip();
-	}
-	
 	if (ZERNDebug_ShowWireframe)
 	{
-		Output.Color = float3(0.0f, 0.0f, 1.0f);
+		Output.Color = ZERNDebug_ColorWireframe;
 		
 		Output.Position = ZERNTransformations_WorldToProjection(float4(Input[0].Position, 1.0f));
 		OutputStream.Append(Output);
@@ -141,6 +119,102 @@ void ZERNDebug_GeometryShader_Main(triangle ZERNDebug_GeometryShader_Input Input
 		Output.Position = ZERNTransformations_WorldToProjection(float4(Input[2].Position, 1.0f));
 		OutputStream.Append(Output);
 		
+		Output.Position = ZERNTransformations_WorldToProjection(float4(Input[0].Position, 1.0f));
+		OutputStream.Append(Output);
+		
+		OutputStream.RestartStrip();
+	}
+	
+	if (ZERNDebug_ShowNormalVectors)
+	{
+		float LineLength = 0.2f;
+		
+		float3 LineStartWorld = Input[0].Position;
+		float3 LineEndWorld = LineStartWorld + normalize(Input[0].Normal) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorNormal;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();
+		
+		LineEndWorld = LineStartWorld + normalize(Input[0].Tangent) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorTangent;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();
+		
+		LineEndWorld = LineStartWorld + normalize(Input[0].Binormal) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorBinormal;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();	
+		
+		
+		
+		LineStartWorld = Input[1].Position;
+		LineEndWorld = LineStartWorld + normalize(Input[1].Normal) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorNormal;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();
+		
+		LineEndWorld = LineStartWorld + normalize(Input[1].Tangent) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorTangent;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();
+		
+		LineEndWorld = LineStartWorld + normalize(Input[1].Binormal) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorBinormal;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();	
+		
+		
+		
+		LineStartWorld = Input[2].Position;
+		LineEndWorld = LineStartWorld + normalize(Input[2].Normal) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorNormal;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();
+		
+		LineEndWorld = LineStartWorld + normalize(Input[2].Tangent) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorTangent;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
+		OutputStream.RestartStrip();
+		
+		LineEndWorld = LineStartWorld + normalize(Input[2].Binormal) * LineLength;
+		
+		Output.Color = ZERNDebug_ColorBinormal;
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineStartWorld, 1.0f));
+		OutputStream.Append(Output);
+		Output.Position = ZERNTransformations_WorldToProjection(float4(LineEndWorld, 1.0f));
+		OutputStream.Append(Output);
 		OutputStream.RestartStrip();
 	}
 }
@@ -155,7 +229,7 @@ void ZERNDebug_BoundingBox_GeometryShader_Main(line float3 MinMax[2] : POSITION0
 {
 	ZERNDebug_PixelShader_Input Output;
 	
-	Output.Color = float3(1.0f, 0.0f, 0.0f);
+	Output.Color = ZERNDebug_ColorBoundingBox;
 	
 	float3 Min = MinMax[0];
 	float3 Max = MinMax[1];

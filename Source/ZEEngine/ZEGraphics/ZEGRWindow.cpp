@@ -381,10 +381,6 @@ ZEGRWindow::ZEGRWindow()
 	VSynchEnabled = false;
 }
 
-ZEGRWindow::~ZEGRWindow()
-{
-}
-
 ZEUInt ZEGRWindow::GetWindowCount()
 {
 	return WindowCount;

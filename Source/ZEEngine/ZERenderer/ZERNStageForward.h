@@ -47,10 +47,11 @@ class ZERNStageForward : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEHolder<ZEGRTexture2D>				ColorBuffer;
-		ZEHolder<const ZEGRRenderTarget>	ColorRenderTarget;
 		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
-		ZEHolder<const ZEGRTexture2D>		DepthOutput;
 		ZEGRViewport						Viewport;
+
+		const ZEGRRenderTarget*				ColorRenderTarget;
+		const ZEGRTexture2D*				DepthOutput;
 
 		virtual void						DeinitializeSelf();
 

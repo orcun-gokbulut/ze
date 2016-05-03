@@ -69,13 +69,19 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 	if (NormalTexture == NULL)
 		return false;
 
-
-	ZEHolder<const ZEGRRenderTarget> NewOutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
+	const ZEGRRenderTarget* NewOutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (NewOutputRenderTarget == NULL)
 	{
+		ZEUInt Width = InputTexture->GetWidth();
+		ZEUInt Height = InputTexture->GetHeight();
+
 		// No Provided Output - Create Own Buffer
-		if (OutputTexture == NULL || OutputTexture->GetWidth() != InputTexture->GetWidth() || OutputTexture->GetHeight() != InputTexture->GetHeight())
-			OutputTexture = ZEGRTexture2D::CreateInstance(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+		if (OutputTexture == NULL || 
+			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
+		{
+			OutputTexture.Release();
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+		}
 
 		NewOutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -90,6 +96,7 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 		Viewport.SetWidth(OutputRenderTarget->GetWidth());
 		Viewport.SetHeight(OutputRenderTarget->GetHeight());
 		Constants.OutputSize = ZEVector2(Viewport.GetWidth(), Viewport.GetHeight());
+
 		DirtyFlags.RaiseFlags(ZERN_AADF_CONSTANT_BUFFER);
 	}
 
@@ -204,16 +211,14 @@ bool ZERNStageAntiAliasing::UpdateTextures()
 	if (!DirtyFlags.GetFlags(ZERN_AADF_TEXTURE))
 		return true;
 
-	if (EdgeTexture == NULL ||
-		EdgeTexture->GetWidth() != OutputRenderTarget->GetWidth() ||
-		EdgeTexture->GetHeight() != OutputRenderTarget->GetHeight())
-	{
-		EdgeTexture = ZEGRTexture2D::CreateInstance(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-		EdgeRenderTarget = EdgeTexture->GetRenderTarget();
+	ZEUInt Width = OutputRenderTarget->GetWidth();
+	ZEUInt Height = OutputRenderTarget->GetHeight();
 
-		BlendTexture = ZEGRTexture2D::CreateInstance(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-		BlendRenderTarget = BlendTexture->GetRenderTarget();
-	}
+	EdgeTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	EdgeRenderTarget = EdgeTexture->GetRenderTarget();
+
+	BlendTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	BlendRenderTarget = BlendTexture->GetRenderTarget();
 
 	DirtyFlags.UnraiseFlags(ZERN_AADF_TEXTURE);
 
@@ -250,39 +255,29 @@ void ZERNStageAntiAliasing::ClearTextures(ZEGRContext* Context)
 void ZERNStageAntiAliasing::DoEdgeDetection(ZEGRContext* Context)
 {
 	Context->SetRenderState(EdgeDetectionPassRenderStateData);
-	Context->SetRenderTargets(1, EdgeRenderTarget.GetPointerToPointer(), DepthTexture->GetDepthStencilBuffer());
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, InputTexture);
+	Context->SetRenderTargets(1, &EdgeRenderTarget, DepthTexture->GetDepthStencilBuffer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
 
 	Context->Draw(3, 0);
-
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 void ZERNStageAntiAliasing::DoBlendingWeightCalculation(ZEGRContext* Context)
 {
 	Context->SetRenderState(BlendingWeightCalculationPassRenderStateData);
-	Context->SetRenderTargets(1, BlendRenderTarget.GetPointerToPointer(), DepthTexture->GetDepthStencilBuffer());
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, EdgeTexture);
+	Context->SetRenderTargets(1, &BlendRenderTarget, DepthTexture->GetDepthStencilBuffer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 1, 1, reinterpret_cast<ZEGRTexture**>(&EdgeTexture));
 
 	Context->Draw(3, 0);
-
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 1, NULL);
 }
 
 void ZERNStageAntiAliasing::DoNeighborhoodBlending(ZEGRContext* Context)
 {
 	Context->SetRenderState(NeighborhoodBlendingPassRenderStateData);
-	Context->SetRenderTargets(1, OutputRenderTarget.GetPointerToPointer(), NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, InputTexture);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, BlendTexture);
+	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
+	Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+	Context->SetTextures(ZEGR_ST_PIXEL, 2, 1, reinterpret_cast<ZEGRTexture**>(&BlendTexture));
 
 	Context->Draw(3, 0);
-
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
 }
 
 bool ZERNStageAntiAliasing::InitializeSelf()
@@ -316,19 +311,6 @@ void ZERNStageAntiAliasing::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
-	InputTexture.Release();
-	OutputTexture.Release();
-	OutputRenderTarget.Release();
-	DepthTexture.Release();
-	NormalTexture.Release();
-
-	EdgeRenderTarget.Release();
-	EdgeTexture.Release();
-	EdgeRenderTarget.Release();
-	BlendTexture.Release();
-
-	ConstantBuffer.Release();
-
 	EdgeDetectionVertexShader.Release();
 	EdgeDetectionPixelShader.Release();
 	
@@ -341,6 +323,14 @@ void ZERNStageAntiAliasing::DeinitializeSelf()
 	EdgeDetectionPassRenderStateData.Release();
 	BlendingWeightCalculationPassRenderStateData.Release();
 	NeighborhoodBlendingPassRenderStateData.Release();
+
+	ConstantBuffer.Release();
+
+	OutputTexture.Release();
+	EdgeTexture.Release();
+	BlendTexture.Release();
+	AreaTexture.Release();
+	SearchTexture.Release();
 
 	SamplerLinear.Release();
 	SamplerPoint.Release();
@@ -380,17 +370,25 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
+	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
+	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
+
+	if (EdgeTexture == NULL ||
+		EdgeTexture->GetWidth() != Width ||
+		EdgeTexture->GetHeight() != Height)
+	{
+		DirtyFlags.RaiseFlags(ZERN_AADF_TEXTURE);
+	}
+
 	if (!Update())
 		return false;
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_POST_PROCESSOR, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_POST_PROCESSOR, ConstantBuffer);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinear);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_POST_PROCESSOR, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_POST_PROCESSOR, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinear.GetPointerToPointer());
 	Context->SetStencilRef(1);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, AreaTexture);
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, SearchTexture);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NormalTexture);
-	Context->SetVertexBuffers(0, 0, NULL);
+	const ZEGRTexture* Textures[] = {AreaTexture, SearchTexture, NormalTexture};
+	Context->SetTextures(ZEGR_ST_PIXEL, 3, 3, Textures);
 	Context->SetViewports(1, &Viewport);
 
 	ClearTextures(Context);
@@ -403,12 +401,6 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 
 void ZERNStageAntiAliasing::CleanUp(ZEGRContext* Context)
 {
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_POST_PROCESSOR, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_POST_PROCESSOR, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 

@@ -76,11 +76,6 @@ ZEGRStructuredBuffer::ZEGRStructuredBuffer()
 
 }
 
-ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
-{
-	Deinitialize();
-}
-
 ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)
 {
 	ZEHolder<ZEGRStructuredBuffer> StructuredBuffer = ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();

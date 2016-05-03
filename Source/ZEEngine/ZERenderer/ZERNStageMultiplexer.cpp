@@ -55,11 +55,16 @@ bool ZERNStageMultiplexer::UpdateInputOutputs()
 		if (RenderTarget == NULL)
 			return false;
 
+		ZEUInt Width = RenderTarget->GetWidth();
+		ZEUInt Height = RenderTarget->GetHeight();
+
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
-			OutputTexture->GetWidth() != RenderTarget->GetWidth() || 
-			OutputTexture->GetHeight() !=  RenderTarget->GetHeight())
-			OutputTexture = ZEGRTexture2D::CreateInstance(RenderTarget->GetWidth(), RenderTarget->GetHeight(), 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() !=  Height)
+		{
+			OutputTexture.Release();
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+		}
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -297,12 +302,13 @@ bool ZERNStageMultiplexer::InitializeSelf()
 
 void ZERNStageMultiplexer::DeinitializeSelf()
 {
+	OutputTexture.Release();
+	RenderStateData.Release();
+
 	ze_for_each(Display, Displays)
 		Display->Deinitialize();
 
-	OutputRenderTarget.Release();
-	OutputTexture.Release();
-	RenderStateData.Release();
+	OutputRenderTarget = NULL;
 
 	ZERNStage::Deinitialize();
 }
@@ -338,6 +344,7 @@ void ZERNStageMultiplexer::AddInput(ZERNStageDisplay* Input)
 	zeCheckError(Input->Owner != NULL, ZE_VOID, "Multiplexer input is already registered with a stage.");
 	
 	Displays.AddEnd(&Input->StageLink);
+
 	Input->Owner = this;
 	if (IsInitialized())
 		Input->Initialize();
@@ -349,6 +356,7 @@ void ZERNStageMultiplexer::RemoveInput(ZERNStageDisplay* Input)
 
 	Input->Deinitialize();
 	Input->Owner = NULL;
+
 	Displays.Remove(&Input->StageLink);
 }
 
@@ -380,7 +388,7 @@ bool ZERNStageMultiplexer::Setup(ZEGRContext* Context)
 		return false;
 
 	Context->SetRenderState(RenderStateData);
-	Context->SetRenderTargets(1, OutputRenderTarget.GetPointerToPointer(), NULL);
+	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 
 	switch (Mode)
 	{
@@ -413,15 +421,13 @@ bool ZERNStageMultiplexer::Setup(ZEGRContext* Context)
 
 void ZERNStageMultiplexer::CleanUp(ZEGRContext* Context)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 
 ZERNStageMultiplexer::ZERNStageMultiplexer()
 {
 	Mode = ZERN_SMM_SINGLE;
+	OutputRenderTarget = NULL;
 }
 
 ZERNStageMultiplexer::~ZERNStageMultiplexer()
@@ -433,4 +439,3 @@ ZERNStageMultiplexer::~ZERNStageMultiplexer()
 		delete Input;
 	}
 }
-

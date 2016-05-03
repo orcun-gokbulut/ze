@@ -66,6 +66,7 @@ class ZEATSkyBox : public ZEEntity
 		ZETextureCubeResource*				SkyTexture;
 
 		float								Brightness;
+		ZEVector3							Color;
 
 		struct  
 		{
@@ -87,8 +88,8 @@ class ZEATSkyBox : public ZEEntity
 	public:
 		virtual ZEDrawFlags					GetDrawFlags() const;
 
-		void								SetTexture(const ZEString& FileName);
-		const ZEString&						GetTexture() const;
+		void								SetTextureFile(const ZEString& FileName);
+		const ZEString&						GetTextureFile() const;
 	
 		void								SetBrightness(float Brightness);
 		float								GetBrightness() const;

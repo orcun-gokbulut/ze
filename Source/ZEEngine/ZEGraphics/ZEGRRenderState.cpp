@@ -47,6 +47,48 @@ ZEGRRenderStateData* ZEGRRenderStateData::Create(const ZEGRRenderState& RenderSt
 	return RenderStateData;
 }
 
+void ZEGRRenderState::SetShader(ZEGRShaderType Type, const ZEGRShader* Shader)
+{
+	zeCheckError(Type > ZEGR_SHADER_TYPE_COUNT, ZE_VOID, "Unknown shader type.");
+	Shaders[Type] = Shader;
+}
+
+const ZEGRShader* ZEGRRenderState::GetShader(ZEGRShaderType Type) const
+{
+	zeCheckError(Type > ZEGR_SHADER_TYPE_COUNT, NULL, "Unknown shader type.");
+	return Shaders[Type];
+}
+
+void ZEGRRenderState::SetBlendState(const ZEGRBlendState& State)
+{
+	BlendState = State;
+}
+
+const ZEGRBlendState& ZEGRRenderState::GetBlendState() const
+{
+	return BlendState;
+}
+
+void ZEGRRenderState::SetRasterizerState(const ZEGRRasterizerState& State)
+{
+	RasterizerState = State;
+}
+
+const ZEGRRasterizerState& ZEGRRenderState::GetRasterizerState() const
+{
+	return RasterizerState;
+}
+
+void ZEGRRenderState::SetDepthStencilState(const ZEGRDepthStencilState& State)
+{
+	DepthStencilState = State;
+}
+
+const ZEGRDepthStencilState& ZEGRRenderState::GetDepthStencilState() const
+{
+	return DepthStencilState;
+}
+
 void ZEGRRenderState::SetVertexLayout(const ZEGRVertexLayout& Layout)
 {
 	VertexLayout = Layout;
@@ -57,16 +99,14 @@ const ZEGRVertexLayout& ZEGRRenderState::GetVertexLayout() const
 	return VertexLayout;
 }
 
-void ZEGRRenderState::SetShader(ZEGRShaderType Type, ZEGRShader* Shader)
+void ZEGRRenderState::SetPrimitiveType(ZEGRPrimitiveType Type)
 {
-	zeCheckError(Type >= ZEGR_SHADER_TYPE_COUNT, ZE_VOID, "Unknown shader type.");
-	Shaders[Type] = Shader;
+	PrimitiveType = Type;
 }
 
-ZEHolder<ZEGRShader> ZEGRRenderState::GetShader(ZEGRShaderType Type) const
+ZEGRPrimitiveType ZEGRRenderState::GetPrimitiveType() const
 {
-	zeCheckError(Type >= ZEGR_SHADER_TYPE_COUNT, NULL, "Unknown shader type.");
-	return Shaders[Type];
+	return PrimitiveType;
 }
 
 void ZEGRRenderState::SetRenderTargetFormat(ZEUInt Index, ZEGRFormat Format)
@@ -81,26 +121,6 @@ ZEGRFormat ZEGRRenderState::GetRenderTargetFormat(ZEUInt Index) const
 	return RenderTargetFormats[Index];
 }
 
-void ZEGRRenderState::SetRasterizerState(const ZEGRRasterizerState& State)
-{
-	RasterizerState = State;
-}
-
-const ZEGRRasterizerState& ZEGRRenderState::GetRasterizerState() const
-{
-	return RasterizerState;
-}
-
-void ZEGRRenderState::SetBlendState(const ZEGRBlendState& State)
-{
-	BlendState = State;
-}
-
-const ZEGRBlendState& ZEGRRenderState::GetBlendState() const
-{
-	return BlendState;
-}
-
 void ZEGRRenderState::SetDepthStencilFormat(ZEGRFormat Format)
 {
 	DepthStencilFormat = Format;
@@ -111,37 +131,15 @@ ZEGRFormat ZEGRRenderState::GetDepthStencilFormat() const
 	return DepthStencilFormat;
 }
 
-void ZEGRRenderState::SetDepthStencilState(const ZEGRDepthStencilState& State)
-{
-	DepthStencilState = State;
-}
-
-const ZEGRDepthStencilState& ZEGRRenderState::GetDepthStencilState() const
-{
-	return DepthStencilState;
-}
-
-void ZEGRRenderState::SetPrimitiveType(ZEGRPrimitiveType Type)
-{
-	PrimitiveType = Type;
-}
-
-ZEGRPrimitiveType ZEGRRenderState::GetPrimitiveType() const
-{
-	return PrimitiveType;
-}
-
 void ZEGRRenderState::SetToDefault()
 {
-	VertexLayout.SetToDefault();
-	DepthStencilFormat = ZEGR_TF_NONE;
-	memset(RenderTargetFormats, ZEGR_TF_NONE, sizeof(ZEGRFormat) * ZEGR_MAX_RENDER_TARGET_SLOT);
-
 	BlendState.SetToDefault();
 	RasterizerState.SetToDefault();
 	DepthStencilState.SetToDefault();
-
+	VertexLayout.SetToDefault();
 	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
+	memset(RenderTargetFormats, ZEGR_TF_NONE, sizeof(ZEGRFormat) * ZEGR_MAX_RENDER_TARGET_SLOT);
+	DepthStencilFormat = ZEGR_TF_NONE;
 }
 
 ZEGRRenderStateData* ZEGRRenderState::Compile()
@@ -183,8 +181,14 @@ ZEGRRenderState::ZEGRRenderState(const ZEGRRenderState& RenderState)
 
 ZEGRRenderState::~ZEGRRenderState()
 {
-	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
-		Shaders[I].Release();
+
+}
+
+ZEGRComputeRenderStateData* ZEGRComputeRenderStateData::Create(const ZEGRComputeRenderState& RenderState)
+{
+	ZEGRComputeRenderStateData* RenderStateData = ZEGRGraphicsModule::GetInstance()->CreateComputeRenderStateData();
+	RenderStateData->Initialize(RenderState);
+	return RenderStateData;
 }
 
 void ZEGRComputeRenderState::SetComputeShader(ZEGRShader* ComputeShader)

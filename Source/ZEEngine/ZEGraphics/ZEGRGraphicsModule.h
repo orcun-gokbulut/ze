@@ -72,7 +72,6 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual bool							DeinitializeSelf();
 
 												ZEGRGraphicsModule();
-		virtual									~ZEGRGraphicsModule();
 
 	public:
 		// NOTE: These methods should be here ?

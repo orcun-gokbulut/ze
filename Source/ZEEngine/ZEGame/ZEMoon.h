@@ -79,8 +79,8 @@ class ZEMoon : public ZEEntity
 		virtual void				SetDirection(const ZEVector3& NewDirection);
 		const ZEVector3&			GetGetDirection() const;
 
-		virtual void				SetTexture(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
-		const ZEString				GetTexture() const;
+		virtual void				SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		const ZEString&				GetTextureFile() const;
 
 		virtual void				Tick(float ElapsedTime);
 

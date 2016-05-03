@@ -40,12 +40,20 @@ struct ZERNShading_Light
 {
 	float3						PositionView;
 	float						Range;
+	
 	float3						Color;
 	float						Reserved0;
+	
 	float3  					Attenuation;
 	bool						CastShadow;
+	
 	float3						DirectionView;
 	int							Type;
+	
+	uint						ShadowSampleCount;
+	float						ShadowSampleLength;
+	float						ShadowDepthBias;
+	float						Reserved1;
 };
 
 struct ZERNShading_Surface

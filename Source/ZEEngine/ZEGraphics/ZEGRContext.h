@@ -35,66 +35,90 @@
 
 #pragma once
 
-#include "ZEGRBlendState.h"
-#include "ZEGRVertexLayout.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRRasterizerState.h"
-#include "ZEGRDepthStencilState.h"
 #include "ZEGRRenderState.h"
+#include "ZEGRViewport.h"
+#include "ZEGRScissorRect.h"
 
-class ZEGRVertexLayout;
 class ZEGRVertexBuffer;
 class ZEGRIndexBuffer;
 class ZEGRShader;
 class ZEGRConstantBuffer;
-class ZEGRTexture;
-class ZEGRSamplerState;
 class ZEGRStructuredBuffer;
+class ZEGRResource;
 class ZEGRSampler;
-class ZEGRViewport;
-class ZEGRScissorRect;
+class ZEGRTexture;
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
 
 class ZEGRContext
 {
 	protected:
-								ZEGRContext();
-		virtual					~ZEGRContext();
+		const ZEGRResource*				VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
+		const ZEGRResource*				IndexBuffer;
+		const ZEGRResource*				ConstantBuffers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_CONSTANT_BUFFER_SLOT];
+		const ZEGRSampler*				Samplers[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_SAMPLER_SLOT];
+		const ZEGRResource*				ShaderResources[ZEGR_SHADER_TYPE_COUNT][ZEGR_MAX_TEXTURE_SLOT];
+		const ZEGRResource*				UnorderedAccesses[ZEGR_MAX_RWTEXTURE_SLOT];
+
+		const ZEGRRenderTarget*			RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
+		const ZEGRDepthStencilBuffer*	DepthStencilBuffer;
+
+		ZEGRViewport					Viewports[ZEGR_MAX_VIEWPORT_SLOT];
+		ZEGRScissorRect					ScissorRects[ZEGR_MAX_SCISSOR_SLOT];
+
+		bool							CheckVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers);
+		bool							CheckIndexBuffer(const ZEGRIndexBuffer* Buffer);
+		bool							CheckConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers);
+		bool							CheckSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers);
+		bool							CheckShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRResource*const* Resources);
+		bool							CheckUnorderedAccesses(ZEUInt Index, ZEUInt Count, const ZEGRResource*const* Resources);
+		bool							CheckRenderTargetsAndDepthStencilBuffer(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		bool							CheckViewports(ZEUInt Count, const ZEGRViewport* Viewports);
+		bool							CheckScissorRects(ZEUInt Count, const ZEGRScissorRect* ScissorRects);
+
+										ZEGRContext();
+		virtual							~ZEGRContext();
 
 	public:
-		virtual void			SetRenderState(const ZEGRRenderStateData* State) = 0;
-		virtual void			SetComputeRenderState(const ZEGRComputeRenderStateData* State) = 0;
+		virtual void					SetRenderState(const ZEGRRenderStateData* State) = 0;
+		virtual void					SetComputeRenderState(const ZEGRComputeRenderStateData* State) = 0;
 
-		virtual void			SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers) = 0;
-		virtual void			SetIndexBuffer(const ZEGRIndexBuffer* Buffer) = 0;
+		virtual void					SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers) = 0;
+		virtual void					SetIndexBuffer(const ZEGRIndexBuffer* Buffer) = 0;
+		virtual void					SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers) = 0;
+		virtual void					GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer);
 
-		virtual void			SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer) = 0;
-		virtual void			SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRConstantBuffer* Buffer) = 0;
-		virtual void			GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer) = 0;
-		virtual void			SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture) = 0;
-		virtual void			GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture) = 0;
-		virtual void			SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler) = 0;
+		virtual void					SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffer) = 0;
+		virtual void					SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures) = 0;
+		virtual void					GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture);
+
+		virtual void					SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers) = 0;
 		
-		virtual void			SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer) = 0;
-		virtual void			GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer** DepthStencilBuffer) = 0;
+		virtual void					SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer) = 0;
+		virtual void					GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets);
+		virtual void					GetDepthStencilBuffer(ZEGRDepthStencilBuffer** DepthStencilBuffer);
 
-		virtual void			SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts) = 0;
-		virtual void			SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects) = 0;
+		virtual void					SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects) = 0;
+		virtual void					SetViewports(ZEUInt Count, const ZEGRViewport* ViewPorts) = 0;
 
-		virtual void			SetStencilRef(ZEUInt Reference) = 0;
-		virtual void			SetBlendFactors(ZEVector4& Factors) = 0;
-		virtual void			SetBlendMask(ZEUInt Mask) = 0;
+		virtual void					SetStencilRef(ZEUInt Reference) = 0;
+		virtual void					SetBlendFactors(const ZEVector4& Factors) = 0;
+		virtual void					SetBlendMask(ZEUInt Mask) = 0;
 
-		virtual void			SetRWTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture) = 0;
-		virtual void			SetRWStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer) = 0;
+		virtual void					SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers) = 0;
+		virtual void					SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures) = 0;
 
-		virtual	void			CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource) = 0;
+		virtual	void					CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource) = 0;
 
-		virtual void			Draw(ZEUInt VertexCount, ZEUInt VertexOffset) = 0;
-		virtual void			DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
+		virtual void					ClearShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count);
+		virtual void					ClearUnorderedAccesses(ZEUInt Index, ZEUInt Count);
+
+		virtual void					Draw(ZEUInt VertexCount, ZEUInt VertexOffset) = 0;
+		virtual void					DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
 		
-		virtual void			Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ) = 0;
+		virtual void					Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ) = 0;
 
-		virtual void			ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
-		virtual void			ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
-		virtual void			ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor) = 0;
+		virtual void					ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
+		virtual void					ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
+		virtual void					ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor) = 0;
 };

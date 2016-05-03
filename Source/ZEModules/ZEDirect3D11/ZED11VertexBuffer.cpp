@@ -33,8 +33,9 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
 #include "ZED11VertexBuffer.h"
+
+#include "ZEError.h"
 #include "ZED11Module.h"
 
 ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
@@ -42,36 +43,68 @@ ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
 	return Buffer;
 }
 
-bool ZED11VertexBuffer::Initialize(ZEUInt VertexCount, ZESize VertexSize)
+bool ZED11VertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data)
 {
 	zeDebugCheck(Buffer != NULL, "Vertex buffer is already initialized.");
-	zeDebugCheck(VertexSize == 0, "Zero vertex size.");
 	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
+	zeDebugCheck(VertexStride == 0, "Zero vertex stride.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static vertex buffer");
 
-	ZESize Size = VertexSize * (ZESize)VertexCount;
+	ZESize Size = VertexCount * VertexStride;
 	zeDebugCheck(Size > 134217728, "Buffer too large.");
 
-	D3D11_BUFFER_DESC BufferDesc;
-	memset(&BufferDesc, 0, sizeof(D3D11_BUFFER_DESC));
-	BufferDesc.MiscFlags = 0;
-	BufferDesc.Usage = D3D11_USAGE_DYNAMIC;
+	D3D11_BUFFER_DESC BufferDesc = {};
+	BufferDesc.ByteWidth = VertexCount * VertexStride;
+	BufferDesc.Usage = ConvertUsage(Usage);
 	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	BufferDesc.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-	BufferDesc.ByteWidth = VertexCount * (UINT)VertexSize;
-	BufferDesc.StructureByteStride = (UINT)VertexSize;
+	BufferDesc.CPUAccessFlags = (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
+	BufferDesc.StructureByteStride = VertexStride;
+	BufferDesc.MiscFlags = 0;
 
-	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
+	HRESULT Result;
+	if (BufferDesc.Usage == D3D11_USAGE_IMMUTABLE)
+	{
+		D3D11_SUBRESOURCE_DATA SubresourceData = {};
+		SubresourceData.pSysMem = Data;
+		SubresourceData.SysMemPitch = Size;
+
+		Result = GetDevice()->CreateBuffer(&BufferDesc, &SubresourceData, &Buffer);
+	}
+	else if (BufferDesc.Usage == D3D11_USAGE_DYNAMIC)
+	{
+		Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
+	}
+
 	if (FAILED(Result))
 	{
-		zeError("Can not create dynamic vertex buffer.");
+		zeError("Can not create vertex buffer.");
 		return false;
 	}
 
-	return ZEGRVertexBuffer::Initialize(VertexCount, VertexSize);
+	return ZEGRVertexBuffer::Initialize(VertexCount, VertexStride, Usage, Data);
+}
+
+void ZED11VertexBuffer::Deinitialize()
+{
+	ZEGR_RELEASE(Buffer);
+
+	ZEGRVertexBuffer::Deinitialize();
+}
+
+ZED11VertexBuffer::ZED11VertexBuffer()
+{
+	Buffer = NULL;
+}
+
+ZED11VertexBuffer::~ZED11VertexBuffer()
+{
+	Deinitialize();
 }
 
 bool ZED11VertexBuffer::Lock(void** Data)
 {
+	zeDebugCheck(GetResourceUsage() != ZEGR_RU_GPU_READ_CPU_WRITE, "Vertex buffer is not dynamic");
+
 	D3D11_MAPPED_SUBRESOURCE Map;
 	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Map);
 	if (FAILED(Result))
@@ -79,20 +112,14 @@ bool ZED11VertexBuffer::Lock(void** Data)
 
 	*Data = Map.pData;
 
+	memset(*Data, 0, GetSize());
+
 	return true;
 }
 
 void ZED11VertexBuffer::Unlock()
 {
+	zeDebugCheck(GetResourceUsage() != ZEGR_RU_GPU_READ_CPU_WRITE, "Vertex buffer is not dynamic");
+
 	GetMainContext()->Unmap(Buffer, 0);
-}
-
-void ZED11VertexBuffer::Deinitialize()
-{
-	ZEGR_RELEASE(Buffer);
-}
-
-ZED11VertexBuffer::ZED11VertexBuffer()
-{
-	Buffer = NULL;
 }

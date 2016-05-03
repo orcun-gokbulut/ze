@@ -34,14 +34,43 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRRenderTarget.h"
+
 #include "ZEError.h"
+#include "ZEGRGraphicsModule.h"
+#include "ZEGRTexture.h"
+#include "ZEGRContext.h"
+
+void ZEGRRenderTarget::SetOwner(const ZEGRTexture* OwnerTexture)
+{
+	this->Owner = OwnerTexture;
+}
+
+const ZEGRTexture* ZEGRRenderTarget::GetOwner() const
+{
+	return Owner;
+}
+
+void ZEGRRenderTarget::SetBound(bool Bound)
+{
+	this->Bound = Bound;
+}
+
+bool ZEGRRenderTarget::GetBound() const
+{
+	return Bound;
+}
 
 ZEGRRenderTarget::ZEGRRenderTarget()
 {
+	Owner = NULL;
+	Bound = false;
 }
 
 ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
+	Owner = NULL;
+	Bound = false;
+
 	this->Width = Width;
 	this->Height = Height;
 	this->Format = Format;
@@ -49,6 +78,16 @@ ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Forma
 
 ZEGRRenderTarget::~ZEGRRenderTarget()
 {
+	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
+	if (Context != NULL && Bound)
+	{
+		ZEGRDepthStencilBuffer* CurrentDepthStencilBuffer;
+		Context->GetDepthStencilBuffer(&CurrentDepthStencilBuffer);
+
+		Context->SetRenderTargets(0, NULL, CurrentDepthStencilBuffer);
+	}
+
+	Owner = NULL;
 }
 
 ZEGRResourceType ZEGRRenderTarget::GetResourceType() const

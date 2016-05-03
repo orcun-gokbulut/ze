@@ -51,11 +51,17 @@ bool ZEParticleEffect::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Initialize();
+
 	return true;
 }
 
 bool ZEParticleEffect::DeinitializeSelf()
 {
+	for (ZESize I = 0; I < Emitters.GetCount(); I++)
+		Emitters[I]->Deinitialize();
+
 	return ZEEntity::DeinitializeSelf();
 }
 

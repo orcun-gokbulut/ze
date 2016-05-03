@@ -46,9 +46,10 @@
 void ZERNStageForward::DeinitializeSelf()
 {
 	ColorBuffer.Release();
-	ColorRenderTarget.Release();
 	DepthStencilBuffer.Release();
-	DepthOutput.Release();
+
+	ColorRenderTarget = NULL;
+	DepthOutput = NULL;
 }
 
 bool ZERNStageForward::UpdateRenderTargets()
@@ -139,7 +140,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (DepthOutput != NULL)
 		Context->ClearDepthStencilBuffer(DepthOutput->GetDepthStencilBuffer(), true, true, 1.0f, 0x00);
 
-	Context->SetRenderTargets(1, ColorRenderTarget.GetPointerToPointer(), DepthStencilBuffer->GetDepthStencilBuffer());
+	Context->SetRenderTargets(1, &ColorRenderTarget, DepthStencilBuffer->GetDepthStencilBuffer());
 	Context->SetViewports(1, &Viewport);
 
 	return true;
@@ -154,7 +155,8 @@ void ZERNStageForward::CleanUp(ZEGRContext* Context)
 
 ZERNStageForward::ZERNStageForward()
 {
-
+	ColorRenderTarget = NULL;
+	DepthOutput = NULL;
 }
 
 ZEGRRenderState ZERNStageForward::GetRenderState()

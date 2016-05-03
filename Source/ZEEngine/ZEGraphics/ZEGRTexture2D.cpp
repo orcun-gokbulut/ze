@@ -84,7 +84,6 @@ bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 	SetResourceUsage(Usage);
 	SetResourceBindFlags(BindFlags);
 	SetLevelCount(LevelCount);
-	SetIsRenderTarget(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET));
 
 	SetSize(CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);

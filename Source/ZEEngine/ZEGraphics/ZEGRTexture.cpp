@@ -35,8 +35,10 @@
 
 #include "ZEGRTexture.h"
 
+#include "ZEMath/ZEMath.h"
 #include "ZEGRGraphicsModule.h"
-#include "ZEMath\ZEMath.h"
+#include "ZEGRTexture.h"
+#include "ZEGRContext.h"
 
 void ZEGRTexture::SetFormat(ZEGRFormat Format)
 {
@@ -48,9 +50,28 @@ void ZEGRTexture::SetLevelCount(ZEUInt LevelCount)
 	this->LevelCount = LevelCount;
 }
 
-void ZEGRTexture::SetIsRenderTarget(bool RenderTarget)
+void ZEGRTexture::SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource, bool BoundAsUnorderedAccess)
 {
-	this->IsRenderTarget = RenderTarget;
+	zeDebugCheck(BoundAsShaderResource && BoundAsUnorderedAccess, "A texture cannot be bound as both shader resource and unordered access");
+
+	BoundStages[Shader].BoundAsShaderResource = BoundAsShaderResource;
+	BoundStages[Shader].BoundAsUnorderedAccess = BoundAsUnorderedAccess;
+	BoundStages[Shader].Slot = Slot;
+}
+
+const ZEArray<ZEGRTexture::BoundStage>& ZEGRTexture::GetBoundStages() const
+{
+	return BoundStages;
+}
+
+const ZEArray<ZEHolder<ZEGRRenderTarget>>& ZEGRTexture::GetRenderTargets() const
+{
+	return RenderTargets;
+}
+
+const ZEArray<ZEHolder<ZEGRDepthStencilBuffer>>& ZEGRTexture::GetDepthStencilBuffers() const
+{
+	return DepthStencilBuffers;
 }
 
 ZESize ZEGRTexture::CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format)
@@ -97,7 +118,34 @@ ZEGRTexture::ZEGRTexture()
 {
 	Format = ZEGR_TF_NONE;
 	LevelCount = 0;
-	IsRenderTarget = false;
+
+	BoundStages.SetCount(ZEGR_SHADER_TYPE_COUNT);
+	BoundStage Stage;
+	Stage.BoundAsShaderResource = false;
+	Stage.BoundAsUnorderedAccess = false;
+	Stage.Slot = -1;
+	BoundStages.Fill(Stage);
+
+	DepthStencilBuffers.SetCount(8);
+}
+
+ZEGRTexture::~ZEGRTexture()
+{
+	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
+	if (Context != NULL)
+	{
+		ze_for_each(Stage, BoundStages)
+		{
+			if (Stage->BoundAsShaderResource)
+				Context->ClearShaderResources((ZEGRShaderType)Stage.GetIndex(), Stage->Slot, 1);
+
+			else if (Stage->BoundAsUnorderedAccess)
+				Context->ClearUnorderedAccesses(Stage->Slot, 1);
+		}
+	}
+
+	RenderTargets.Clear();
+	DepthStencilBuffers.Clear();
 }
 
 ZEGRFormat ZEGRTexture::GetFormat() const
@@ -108,9 +156,4 @@ ZEGRFormat ZEGRTexture::GetFormat() const
 ZEUInt ZEGRTexture::GetLevelCount() const
 {
 	return LevelCount;
-}
-
-bool ZEGRTexture::GetIsRenderTarget() const
-{
-	return IsRenderTarget;
 }

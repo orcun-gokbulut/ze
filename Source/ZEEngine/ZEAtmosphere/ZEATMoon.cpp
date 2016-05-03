@@ -292,23 +292,17 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, PhaseTexture.GetTexture());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, ZEGRSampler::GetDefaultSampler().GetPointerToPointer());
+	const ZEGRTexture* Texture = PhaseTexture.GetTexture();
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 	
 	Context->Draw(4, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
 }
 
 ZEATMoon* ZEATMoon::CreateInstance()

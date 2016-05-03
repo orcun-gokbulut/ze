@@ -66,6 +66,7 @@ class ZED11Output : public ZEGROutput, ZED11ComponentBase
 		virtual	void						Deinitialize();
 
 											ZED11Output();
+		virtual								~ZED11Output();
 
 	public:
 		virtual void*						GetHandle() const;

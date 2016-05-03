@@ -48,11 +48,6 @@ const ZEString& ZERNStageShadowmapGeneration::GetName() const
 	return Name;
 }
 
-ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
-{
-
-}
-
 ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
 {
 	static ZEGRRenderState RenderState;

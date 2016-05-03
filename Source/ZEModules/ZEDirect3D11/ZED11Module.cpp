@@ -68,13 +68,13 @@
 
 ZE_MODULE_DESCRIPTION(ZED11Module, ZEGRGraphicsModule, NULL)
 
-static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device1* Device)
+static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device* Device)
 {
-	IDXGIDevice1* DXGIDevice;
-	HRESULT Result = Device->QueryInterface(__uuidof(IDXGIDevice1), (void**)&DXGIDevice);
+	IDXGIDevice* DXGIDevice;
+	HRESULT Result = Device->QueryInterface(__uuidof(IDXGIDevice), (void**)&DXGIDevice);
 	if(FAILED(Result))
 	{
-		zeCriticalError("Cannot query IDXGIDevice1. Error: %d", Result);
+		zeCriticalError("Cannot query IDXGIDevice. Error: %d", Result);
 		DXGIDevice->Release();
 		return NULL;
 	}
@@ -113,19 +113,6 @@ bool ZED11Module::InitializeSelf()
 	#else
 		ZEGRTracer::GetInstance()->SetEnabled(false);
 	#endif
-
-	D3D_FEATURE_LEVEL FeatureLevelArr[] = 
-	{
-		D3D_FEATURE_LEVEL_11_1,
-		D3D_FEATURE_LEVEL_11_0	
-	};
-
-	UINT DeviceFlags = 0;
-	//#ifdef ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
-		DeviceFlags |= D3D11_CREATE_DEVICE_DEBUG;
-	/*#else
-		DeviceFlags |= D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
-	#endif*/
 	
 	IDXGIFactory2* Factory;
 	HRESULT Result = CreateDXGIFactory1(__uuidof(IDXGIFactory2), (void**)&Factory);
@@ -134,6 +121,11 @@ bool ZED11Module::InitializeSelf()
 		zeCriticalError("Cannot create factory. Error: %d", Result);
 		return false;
 	}
+
+	D3D_FEATURE_LEVEL FeatureLevelArr[] = 
+	{
+		D3D_FEATURE_LEVEL_11_0	
+	};
 
 	IDXGIAdapter1* Adapter;
 	UINT AdapterIndex = 0;
@@ -156,7 +148,7 @@ bool ZED11Module::InitializeSelf()
 
 	Factory->Release();
 
-	if(!AdapterFound)
+	if (!AdapterFound)
 	{
 		zeCriticalError("There is no hardware that supports Directx 11.");
 		Adapter->Release();
@@ -165,37 +157,28 @@ bool ZED11Module::InitializeSelf()
 
 	CurrentAdapter = new ZED11Adapter(Adapter);
 
-	ID3D11Device* DeviceTemp;
-	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, 0, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &DeviceTemp, NULL, NULL);
-	if(FAILED(Result))
+	UINT DeviceFlags = 0;
+#ifdef _DEBUG
+	DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+#else
+	DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
+#endif
+
+	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, DeviceFlags, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &Device, NULL, NULL);
+	if (FAILED(Result))
 	{
 		zeCriticalError("Cannot create device. Error: %d", Result);
 		return false;
 	}
 
-	Result = DeviceTemp->QueryInterface(__uuidof(ID3D11Device1), (void**)&Device);
-	DeviceTemp->Release();
-	if(FAILED(Result))
-	{
-		zeCriticalError("Cannot query ID3D11Device1. Error: %d", Result);
-		return false;
-	}
-
-	ID3D11DeviceContext1* NativeContext;
-	Device->GetImmediateContext1(&NativeContext);
-	Context.Initialize(NativeContext);
+	ID3D11DeviceContext* NativeContext;
+	Device->GetImmediateContext(&NativeContext);
 
 	ZED11ComponentBase::Module = this;
 	ZED11ComponentBase::Device = Device;
-	ZED11ComponentBase::Context = Context.Context;
+	ZED11ComponentBase::Context = NativeContext;
 
-	// Read options
-	/*TextureQuality = (ZETextureQuality)ZEOptionManager::GetInstance()->GetOption("Graphics", "TextureQuality")->GetValue().GetInt32();
-	ZEUInt Anisotropy = (ZEUInt)ZEOptionManager::GetInstance()->GetOption("Graphics", "AnisotropicFilter")->GetValue().GetInt32();
-	ZEInt Width = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenWidth")->GetValue().GetInt32();
-	ZEInt Height = ZEOptionManager::GetInstance()->GetOption("Graphics", "ScreenHeight")->GetValue().GetInt32();
-	bool FullScreen = ZEOptionManager::GetInstance()->GetOption("Graphics", "FullScreen")->GetValue().GetBoolean();
-	bool VerticalSync = ZEOptionManager::GetInstance()->GetOption("Graphics", "VerticalSync")->GetValue().GetBoolean();*/
+	Context.Initialize(NativeContext);
 
 	return true;
 }
@@ -266,7 +249,7 @@ ZEGROutput* ZED11Module::CreateOutput()
 ZEGRContext* ZED11Module::CreateContext()
 {
 	ZED11Context* Context = new ZED11Context();
-	if (FAILED(Device->CreateDeferredContext1(0, &Context->Context)))
+	if (FAILED(Device->CreateDeferredContext(0, &Context->Context)))
 	{
 		zeError("Cannot create deffered device context.");
 		return NULL;
@@ -332,9 +315,5 @@ ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
 
 ZED11Module::ZED11Module()
 {
-}
-
-ZED11Module::~ZED11Module()
-{
-	Deinitialize();
+	Device = NULL;
 }

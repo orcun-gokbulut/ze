@@ -47,7 +47,7 @@ class ZERNStageOutputTexture : public ZERNStage
 		bool								Dirty;
 
 		ZEHolder<ZEGRTexture2D>				Texture;
-		ZEHolder<const ZEGRRenderTarget>	RenderTarget;
+		const ZEGRRenderTarget*				RenderTarget;
 
 		ZERNStageBuffer						TargetBuffer;
 		ZEUInt								Width;
