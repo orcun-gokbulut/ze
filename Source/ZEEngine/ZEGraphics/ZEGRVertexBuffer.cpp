@@ -36,11 +36,8 @@
 #include "ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-bool ZEGRVertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data)
+bool ZEGRVertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data)
 {
-	zeCheckError(VertexCount == 0, false, "Vertex count cannot be zero.");
-	zeCheckError(VertexStride == 0, false, "Vertex stride cannot be zoro.");
-
 	this->VertexCount = VertexCount;
 	this->VertexStride = VertexStride;
 
@@ -79,8 +76,12 @@ ZEUInt ZEGRVertexBuffer::GetVertexStride() const
 	return VertexStride;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data)
+ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data)
 {
+	zeDebugCheck(VertexCount == 0, "Vertex count cannot be zero.");
+	zeDebugCheck(VertexStride == 0, "Vertex stride cannot be zero.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static vertex buffer");
+
 	ZEHolder<ZEGRVertexBuffer> VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
 	if (VertexBuffer == NULL)
 		return NULL;

@@ -153,20 +153,17 @@ float3 ZERNDeferredShading_PointLighting(ZERNShading_Light PointLight, ZERNShadi
 	
 	float3 ResultColor = 0.0f;
 	
-	if (LightDistance < PointLight.Range)
-	{
-		PointLight.DirectionView = LightVectorView / LightDistance;
-		
-		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
-		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
-		
-		float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation, float3(1.0f, LightDistance, LightDistance * LightDistance));
-		float NdotL = dot(Surface.NormalView, PointLight.DirectionView);
-		NdotL = (Surface.SubsurfaceScattering != 0.0f) ? abs(NdotL) : max(0.0f, NdotL);
-		float3 LightColor = PointLight.Color * DistanceAttenuation * NdotL;
-		
-		ResultColor = (ResultDiffuse + ResultSpecular) * LightColor;
-	}
+	PointLight.DirectionView = LightVectorView / LightDistance;
+	
+	float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(PointLight, Surface);
+	float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(PointLight, Surface);
+	
+	float DistanceAttenuation = 1.0f / dot(PointLight.Attenuation.zyx, float3(1.0f, LightDistance, LightDistance * LightDistance));
+	float NdotL = dot(Surface.NormalView, PointLight.DirectionView);
+	NdotL = (Surface.SubsurfaceScattering != 0.0f) ? abs(NdotL) : max(0.0f, NdotL);
+	float3 LightColor = PointLight.Color * DistanceAttenuation * NdotL;
+	
+	ResultColor = (ResultDiffuse + ResultSpecular) * LightColor;
 	
 	return ResultColor;
 }
@@ -227,7 +224,6 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 		
 		float Visibility = 1.0f;
 		
-		[branch]
 		if(ProjectiveLight.CastShadow)
 		{
 			if(Surface.PositionView.z < ZERNView_ShadowDistance)
@@ -262,7 +258,7 @@ float3 ZERNDeferredShading_ProjectiveLighting(ZERNShading_Light ProjectiveLight,
 		float3 ResultDiffuse = ZERNShading_Diffuse_Lambert(ProjectiveLight, Surface);
 		float3 ResultSpecular = ZERNShading_Specular_BlinnPhong(ProjectiveLight, Surface);
 		
-		float DistanceAttenuation = 1.0f / dot(ProjectiveLight.Attenuation, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
+		float DistanceAttenuation = 1.0f / dot(ProjectiveLight.Attenuation.zyx, float3(1.0f, LightDistanceView, LightDistanceView * LightDistanceView));
 		float NdotL = dot(Surface.NormalView, ProjectiveLight.DirectionView);
 		NdotL = (Surface.SubsurfaceScattering != 0.0f) ? abs(NdotL) : max(0.0f, NdotL);
 		float3 LightColor = ProjectiveLight.Color * DistanceAttenuation * NdotL;

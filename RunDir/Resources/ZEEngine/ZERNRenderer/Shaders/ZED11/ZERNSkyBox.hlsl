@@ -36,7 +36,6 @@
 #ifndef __ZERN_SKY_BOX_H__
 #define __ZERN_SKY_BOX_H__
 
-#include "ZERNGBuffer.hlsl"
 #include "ZERNTransformations.hlsl"
 
 cbuffer ZERNSkyBox_Constants						: register(b8)
@@ -55,8 +54,8 @@ TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
 
 struct ZERNSkyBox_PixelShader_Input
 {
-	float4			Position		: SV_Position;
-	float3			CubeTexcoord	: TEXCOORD0;
+	float4			Position						: SV_Position;
+	float3			CubeTexcoord					: TEXCOORD0;
 };
 
 ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
@@ -66,7 +65,6 @@ ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSI
 	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Position, 1.0f));
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Position.z = 0.0f;
-	Output.Position.w = 1.0f;
 	Output.CubeTexcoord = Position;
 	
 	return Output;

@@ -36,6 +36,7 @@
 #include "ZED11VertexBuffer.h"
 
 #include "ZEError.h"
+#include "ZEPointer\ZEPointer.h"
 #include "ZED11Module.h"
 
 ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
@@ -43,12 +44,9 @@ ID3D11Buffer* ZED11VertexBuffer::GetBuffer() const
 	return Buffer;
 }
 
-bool ZED11VertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data)
+bool ZED11VertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data)
 {
 	zeDebugCheck(Buffer != NULL, "Vertex buffer is already initialized.");
-	zeDebugCheck(VertexCount == 0, "Zero vertex count.");
-	zeDebugCheck(VertexStride == 0, "Zero vertex stride.");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static vertex buffer");
 
 	ZESize Size = VertexCount * VertexStride;
 	zeDebugCheck(Size > 134217728, "Buffer too large.");
@@ -57,24 +55,19 @@ bool ZED11VertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGR
 	BufferDesc.ByteWidth = VertexCount * VertexStride;
 	BufferDesc.Usage = ConvertUsage(Usage);
 	BufferDesc.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-	BufferDesc.CPUAccessFlags = (Usage == ZEGR_RU_GPU_READ_CPU_WRITE) ? D3D11_CPU_ACCESS_WRITE : 0;
+	BufferDesc.CPUAccessFlags = ConvertUsageToCpuAccessFlags(Usage);
 	BufferDesc.StructureByteStride = VertexStride;
 	BufferDesc.MiscFlags = 0;
 
-	HRESULT Result;
-	if (BufferDesc.Usage == D3D11_USAGE_IMMUTABLE)
+	ZEPointer<D3D11_SUBRESOURCE_DATA> SubresourceData;
+	if (Data != NULL)
 	{
-		D3D11_SUBRESOURCE_DATA SubresourceData = {};
-		SubresourceData.pSysMem = Data;
-		SubresourceData.SysMemPitch = Size;
-
-		Result = GetDevice()->CreateBuffer(&BufferDesc, &SubresourceData, &Buffer);
-	}
-	else if (BufferDesc.Usage == D3D11_USAGE_DYNAMIC)
-	{
-		Result = GetDevice()->CreateBuffer(&BufferDesc, NULL, &Buffer);
+		SubresourceData = new D3D11_SUBRESOURCE_DATA();
+		SubresourceData->pSysMem = Data;
+		SubresourceData->SysMemPitch = Size;
 	}
 
+	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, SubresourceData, &Buffer);
 	if (FAILED(Result))
 	{
 		zeError("Can not create vertex buffer.");

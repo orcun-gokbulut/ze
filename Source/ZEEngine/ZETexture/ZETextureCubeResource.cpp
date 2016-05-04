@@ -34,47 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEError.h"
-#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZECore/ZEConsole.h"
+#include "ZECore/ZEResourceManager.h"
+#include "ZEFile/ZEFileCache.h"
+#include "ZEPointer/ZEPointer.h"
 #include "ZETextureData.h"
 #include "ZETextureLoader.h"
-#include "ZECore/ZEConsole.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEFile/ZEFileCache.h"
 #include "ZETextureCubeResource.h"
 #include "ZETextureQualityManager.h"
-#include "ZECore/ZEResourceManager.h"
 #include "ZETextureCacheDataIdentifier.h"
-
-
-static void CopyToTextureCube(ZEGRTextureCube* Output, ZETextureData* TextureData)
-{
-	ZEUInt LevelCount = TextureData->GetLevelCount();
-	ZEUInt SurfaceCount = TextureData->GetSurfaceCount();
-
-	ZEUInt Length = Output->GetLength();
-
-	// Copy texture data into ZETextureCube
-	void* SrcBuffer = new unsigned char[Length * Length * 4];
-	ZESize SrcRowPitch = Length * 4;
-
-	for (ZESize Surface = 0; Surface < 6; Surface++)
-	{
-		for (ZESize Level = 0; Level < (ZESize)LevelCount; Level++)
-		{
-			TextureData->GetSurfaces().GetItem(Surface).GetLevels().GetItem(Level).CopyTo(SrcBuffer, SrcRowPitch);
-			Output->UpdateSubResource((ZEGRTextureCubeFace)Surface, (ZEUInt)Level, SrcBuffer, SrcRowPitch);
-		}
-	}
-
-	delete [] SrcBuffer;
-}
-
-static void CopyCubeFaceTo(void* Destination, ZESize DestPitch, void* SourceBuffer, ZESize SourcePitch, ZEUInt EdgeLenght, ZEUInt OffsetX, ZEUInt OffsetY)
-{
-	for (ZESize I = 0; I < (ZESize)EdgeLenght; I++)
-		memcpy((unsigned char*)Destination + (I * DestPitch), (unsigned char*)SourceBuffer + SourcePitch * ((ZESize)OffsetY + I) + (ZESize)OffsetX * 4, (ZESize)EdgeLenght * 4);
-
-}
+#include "ZEGraphics/ZEGRTextureCube.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 void ZETextureCubeResource::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {
@@ -146,15 +116,13 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(const ZEString& FileN
 
 ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
 {
-	if(UserOptions == NULL)
+	if (UserOptions == NULL)
 		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
-
-	ZEFileCache			FileCache;
-	ZETextureOptions	FinalOptions;
-	ZETextureData	TempTextureData;
-	ZETextureData	ProcessedTextureData;
-	ZEString			CachePath = "#S:/Caches/TextureCache.ZECache";
+	ZETextureData TextureDataCube;
+	ZETextureOptions FinalOptions;
+	ZEFileCache FileCache;
+	ZEString CachePath = "#S:/Caches/TextureCache.ZECache";
 
 	bool CacheIt			= true;
 	bool Process			= true;
@@ -163,10 +131,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 	bool Processed			= false;
 	bool IdentifierExists	= false;
 
-	// Decide final texture options
 	ZETextureQualityManager::GetFinalTextureOptions(&FinalOptions, ResourceFile, UserOptions, 3, 2, ZEGR_TT_CUBE);
-	
-	// Create identifier
 	ZETextureCacheDataIdentifier Identifier(ResourceFile->GetPath(), FinalOptions);
 
 	if(UserOptions->FileCaching != ZE_TFC_DISABLED)
@@ -184,9 +149,8 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		IdentifierExists	= false;
 	}
 
-	if (CheckCache && CacheOpen && IdentifierExists)
+	if(CheckCache && CacheOpen && IdentifierExists)
 	{
-		// If found in cache load from cache directly
 		zeLog("Loading from file cache: \"%s\".", ResourceFile->GetPath().GetValue());
 
 		ZEPartialFile PartialResourceFile;
@@ -196,12 +160,10 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 			return NULL;
 		}
 
-		// Load into TextureData
-		if (!ZETextureLoader::Read(&PartialResourceFile, &ProcessedTextureData))
+		if (!ZETextureLoader::Read(&PartialResourceFile, &TextureDataCube))
 		{
 			zeDebugCheck(true, "Cannot read texture from cache. File: \"%s\".", ResourceFile->GetPath().GetValue());
-			TempTextureData.Destroy();
-			ProcessedTextureData.Destroy();
+			TextureDataCube.Destroy();
 			return NULL;
 		}
 
@@ -210,54 +172,36 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		Process = CacheIt = false;
 
 	}
-	else // If cache is not used then try to load from ZEPack / ZETextureFile / Image file
+	else
 	{
-		// Load into TextureData
-		if (!ZETextureLoader::LoadFromFile(ResourceFile, &ProcessedTextureData))
+		ZETextureData TextureData;
+		if (!ZETextureLoader::LoadFromFile(ResourceFile, &TextureData))
 		{
 			zeDebugCheck(true, "Cannot load image from file: \"%s\".", ResourceFile->GetPath().GetValue());
-			TempTextureData.Destroy();
+			TextureData.Destroy();
 			return NULL;
 		}
+
+		ZETextureData::ConvertToCubeTextureData(&TextureDataCube, &TextureData);
+		TextureData.Destroy();
 	}
 
-	// If not loaded properly
-	if (ProcessedTextureData.IsEmpty())
+	if (TextureDataCube.IsEmpty())
 	{
 		zeError("Cannot load: \"%s\".", ResourceFile->GetPath().GetValue());
-		TempTextureData.Destroy();
+		TextureDataCube.Destroy();
 		return NULL;
 	}
 
-	// Process the data
-	if(Process)
-	{
-		zeLog("Processing texture \"%s\".", ResourceFile->GetPath().GetValue());
-	
-		// Convert to 6 surface texture data and clean ProcessedTextureData
-		ZETextureData::ConvertToCubeTextureData(&TempTextureData, &ProcessedTextureData);
-		ProcessedTextureData.Destroy();
-
-		Processed = ZETextureQualityManager::Process(&ProcessedTextureData, &TempTextureData, &FinalOptions);
-		if (!Processed)
-		{
-			zeCriticalError("Cannot process texture: \"%s\".", ResourceFile->GetPath().GetValue());
-			ProcessedTextureData.Destroy();
-			TempTextureData.Destroy();
-			return NULL;
-		}
-	}
-
-	// Save to cache
 	if(CacheIt && CacheOpen && !IdentifierExists)
 	{
 		ZEPartialFile PartialResourceFile;
-		if (!FileCache.Allocate(&PartialResourceFile, &Identifier, ProcessedTextureData.GetSizeOnDisk()))
+		if (!FileCache.Allocate(&PartialResourceFile, &Identifier, TextureDataCube.GetSizeOnDisk()))
 		{
 			zeDebugCheck(true, "Cache allocation failed for file: \"%s\".", ResourceFile->GetPath().GetValue());
 		}
 
-		if (!ZETextureLoader::Write((ZEFile*)&PartialResourceFile, &ProcessedTextureData))
+		if (!ZETextureLoader::Write((ZEFile*)&PartialResourceFile, &TextureDataCube))
 		{
 			zeDebugCheck(true, "Cannot cache the texture: \"%s\".", ResourceFile->GetPath().GetValue());
 		}
@@ -265,36 +209,50 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 		PartialResourceFile.Close();
 		FileCache.Close();
 	}
-	
+
+	ZEUInt Length = TextureDataCube.GetWidth();
+	ZEUInt PixelSize = ZEGRFormatDefinition::GetDefinition(TextureDataCube.GetPixelFormat())->BlockSize;
+
+	ZEBYTE* Data = new ZEBYTE[Length * Length * PixelSize * 6];
+	ZESize RowPitch = Length * PixelSize;
+	ZESize SlicePitch = RowPitch * Length;
+
+	for (ZESize Surface = 0; Surface < 6; Surface++)
+		TextureDataCube.GetSurfaces()[Surface].GetLevels()[0].CopyTo(Data + Surface * SlicePitch, RowPitch);
+
 	// Create TextureCubeResource 
-	ZETextureCubeResource* TextureResource = new ZETextureCubeResource();
-	ZEGRTextureCube* Texture = TextureResource->Texture = ZEGRTextureCube::CreateInstance(ProcessedTextureData.GetWidth(), ProcessedTextureData.GetLevelCount(), ProcessedTextureData.GetPixelFormat());
-	if (Texture == NULL)
+	ZEPointer<ZETextureCubeResource, ZEDeletorRelease<ZETextureCubeResource>> TextureResource = new ZETextureCubeResource();
+	TextureResource->Texture = ZEGRTextureCube::CreateInstance(
+															TextureDataCube.GetWidth(), 
+															TextureDataCube.GetLevelCount(), 
+															TextureDataCube.GetPixelFormat(), 
+															ZEGR_RU_GPU_READ_ONLY, 
+															ZEGR_RBF_SHADER_RESOURCE, 
+															Data);
+
+	if (TextureResource->Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());
-		ProcessedTextureData.Destroy();
-		TempTextureData.Destroy();
-		delete TextureResource;
+		TextureDataCube.Destroy();
+		delete[] Data;
 		return NULL;
 	}
+
+	delete[] Data;
 
 	TextureResource->SetFileName(ResourceFile->GetPath().GetValue());
 	TextureResource->Cached = false;
 	TextureResource->Shared = false;
-
-	CopyToTextureCube(Texture, &ProcessedTextureData);
 	
-	ProcessedTextureData.Destroy();
-	TempTextureData.Destroy();
+	TextureDataCube.Destroy();
 
-	return TextureResource;
+	return TextureResource.Transfer();
 }
 
 const char* ZETextureCubeResource::GetResourceType() const
 {
 	return "Cube Texture Resource";
 }
-
 
 ZEGRTextureType ZETextureCubeResource::GetTextureType() const
 {

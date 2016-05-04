@@ -106,6 +106,8 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 
 		virtual void									Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ);
 
+		virtual void									GenerateMipMaps(const ZEGRTexture* Texture);
+
 		virtual void									ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor);
 		virtual void									ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue);
 		virtual void									ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor);

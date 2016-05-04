@@ -214,10 +214,10 @@ D3D11_USAGE ZED11ComponentBase::ConvertUsage(ZEGRResourceUsage Usage)
 {
 	switch (Usage)
 	{
-		default:
 		case ZEGR_RU_GPU_READ_ONLY:
 			return D3D11_USAGE_IMMUTABLE;
-
+			
+		default:
 		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
 			return D3D11_USAGE_DEFAULT;
 
@@ -234,7 +234,7 @@ UINT ZED11ComponentBase::ConvertBindFlags(ZEFlags BindFlags)
 	if (BindFlags == ZEGR_RBF_NONE)
 		return 0;
 
-	UINT Flags = D3D11_BIND_SHADER_RESOURCE;
+	UINT Flags = 0;
 
 	if (BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE))
 		Flags |= D3D11_BIND_SHADER_RESOURCE;
@@ -249,4 +249,20 @@ UINT ZED11ComponentBase::ConvertBindFlags(ZEFlags BindFlags)
 		Flags |= D3D11_BIND_UNORDERED_ACCESS;
 
 	return Flags;
+}
+
+UINT ZED11ComponentBase::ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage)
+{
+	switch (Usage)
+	{
+		case ZEGR_RU_GPU_READ_ONLY:
+		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
+			return 0;
+
+		case ZEGR_RU_GPU_READ_CPU_WRITE:
+			return D3D11_CPU_ACCESS_WRITE;
+
+		case ZEGR_RU_CPU_READ_WRITE:
+			return D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+	}
 }

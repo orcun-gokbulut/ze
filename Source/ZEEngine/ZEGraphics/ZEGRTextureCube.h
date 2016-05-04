@@ -57,7 +57,7 @@ class ZEGRTextureCube : public ZEGRTexture
 		ZEUInt										Length;
 
 	protected:
-		virtual	bool								Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags) = 0;
+		virtual	bool								Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data) = 0;
 		virtual void								Deinitialize();
 
 													ZEGRTextureCube();
@@ -69,9 +69,15 @@ class ZEGRTextureCube : public ZEGRTexture
 		ZEUInt										GetLength() const;
 		float										GetPixelSize() const;
 
-		virtual bool								UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
+		virtual void								UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
 		
 		virtual const ZEGRRenderTarget*				GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) const = 0;
 
-		static ZEHolder<ZEGRTextureCube>			CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_RENDER_TARGET);
+		static ZEHolder<ZEGRTextureCube>			CreateInstance(
+																	ZEUInt Length, 
+																	ZEUInt LevelCount, 
+																	ZEGRFormat Format, 
+																	ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
+																	ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+																	const void* Data = NULL);
 };
