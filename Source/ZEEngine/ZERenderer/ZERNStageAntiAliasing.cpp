@@ -80,7 +80,7 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 		{
 			OutputTexture.Release();
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT);
 		}
 
 		NewOutputRenderTarget = OutputTexture->GetRenderTarget();
@@ -214,10 +214,10 @@ bool ZERNStageAntiAliasing::UpdateTextures()
 	ZEUInt Width = OutputRenderTarget->GetWidth();
 	ZEUInt Height = OutputRenderTarget->GetHeight();
 
-	EdgeTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	EdgeTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 	EdgeRenderTarget = EdgeTexture->GetRenderTarget();
 
-	BlendTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	BlendTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 	BlendRenderTarget = BlendTexture->GetRenderTarget();
 
 	DirtyFlags.UnraiseFlags(ZERN_AADF_TEXTURE);

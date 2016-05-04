@@ -54,7 +54,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		ID3D11ShaderResourceView*				ShaderResourceView;
 		ID3D11UnorderedAccessView*				UnorderedAccessView;
 
-		virtual bool							Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount);
+		virtual bool							Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data);
 		virtual void							Deinitialize();
 
 		ID3D11Resource*							GetResource() const;
@@ -69,8 +69,7 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 		virtual const ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level = 0, ZEUInt ArrayIndex = 0) const;
 		virtual const ZEGRDepthStencilBuffer*	GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const;
 
-		virtual void							GenerateMipMaps();
-		virtual bool							UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch);
-		virtual bool							Lock(void** Buffer, ZESize* RowPitch);
+		virtual void							UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch);
+		virtual bool							Lock(void** Buffer, ZESize* RowPitch = NULL, ZESize* SlicePitch = NULL, ZEUInt ArrayIndex = 0, ZEUInt Level = 0);
 		virtual void							Unlock();
 };

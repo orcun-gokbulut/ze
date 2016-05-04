@@ -81,7 +81,8 @@ static ZEVector2 CalculateDensity(const ZEVector3& Position)
 
 void ZEATAtmosphere::CreateRandomVectors()
 {
-	ZEVector4 SphereSamples[128];
+	ZEArray<ZEVector4> SphereSamples;
+	SphereSamples.SetCount(128);
 	for (ZEUInt I = 0; I < 128; I++)
 	{
 		float Z = ZERandom::GetFloatPositive() * 2.0f - 1.0f;
@@ -94,9 +95,7 @@ void ZEATAtmosphere::CreateRandomVectors()
 		SphereSamples[I].w = 0.0f;
 	}
 
-	RandomVectorsTexture.Release();
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
-	RandomVectorsTexture->UpdateSubResource(0, 0, NULL, &SphereSamples[0], 128 * sizeof(ZEVector4));
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 1, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, SphereSamples.GetConstCArray());
 }
 
 bool ZEATAtmosphere::UpdateShaders()
@@ -376,7 +375,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	Context->CopyResource(AmbientBuffer, PrecomputedSkyAmbientBuffer);
 
 	float* Data;
-	AmbientBuffer->Lock(reinterpret_cast<void**>(&Data), NULL);
+	AmbientBuffer->Lock(reinterpret_cast<void**>(&Data));
 		memcpy(&SkyAmbient, Data, sizeof(ZEVector4) * 1024);
 	AmbientBuffer->Unlock();
 
@@ -395,7 +394,6 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	PrecomputeSkyAmbientRenderStateData.Release();
 
 	RandomVectorsTexture.Release();
-	PrecomputedSkyAmbientBuffer.Release();
 }
 
 void ZEATAtmosphere::ComputeTerrestrialColors(const ZEVector3& SunDirection, const ZEVector3& MoonDirection)
@@ -732,7 +730,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		Cloud->SetLightDirection(-MoonDirection);
 		Cloud->SetLightColor(TerrestrialMoonColor * 1.0f);
 		Cloud->SetInscattering(MoonInscattering);
-		Stars->SetBrightness(0.1f);
+		Stars->SetBrightness(0.5f);
 		Fog->SetColor(ZEVector3(MoonInscattering));
 	}
 

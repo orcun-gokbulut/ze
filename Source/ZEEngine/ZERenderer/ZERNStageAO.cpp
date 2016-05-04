@@ -73,19 +73,18 @@ static ZEUInt ConvertSampleCount(ZERNSSAOSampleCount SampleCount)
 
 void ZERNStageAO::CreateRandomVectors()
 {
-	const ZEUInt Size = 128 * 128 * 4;
-	ZEUInt8 Vectors[Size];
+	ZEUInt Size = 128 * 128 * 4;
+	ZEArray<ZEUInt8> RandomVectors;
+	RandomVectors.SetCount(Size);
 	for(ZEUInt I = 0; I < Size; I += 4)
 	{
-		Vectors[I]		= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
-		Vectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
-		Vectors[I + 2]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
-		Vectors[I + 3]	= 0;
+		RandomVectors[I]		= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+		RandomVectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+		RandomVectors[I + 2]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+		RandomVectors[I + 3]	= 0;
 	}
 
-	RandomVectorsTexture.Release();
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
-	RandomVectorsTexture->UpdateSubResource(0, 0, NULL, &Vectors[0], 128 * 4);
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageAO::CreateSphereSamples()
@@ -202,8 +201,8 @@ bool ZERNStageAO::UpdateTextures()
 	ZEUInt TextureWidth = static_cast<ZEUInt>(Width / Constants.DownScale);
 	ZEUInt TextureHeight = static_cast<ZEUInt>(Height / Constants.DownScale);
 
-	OcclusionMap = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, ZEGR_TF_R16G16B16A16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-	BlurTexture = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, ZEGR_TF_R16G16B16A16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+	OcclusionMap = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, ZEGR_TF_R16G16B16A16_FLOAT);
+	BlurTexture = ZEGRTexture2D::CreateInstance(TextureWidth, TextureHeight, 1, ZEGR_TF_R16G16B16A16_FLOAT);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_TEXTURE);
 

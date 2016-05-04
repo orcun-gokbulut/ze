@@ -49,7 +49,7 @@ class ZED11VertexBuffer : public ZEGRVertexBuffer, public ZED11ComponentBase
 	private:		
 		ID3D11Buffer*				Buffer;
 
-		virtual bool				Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data);
+		virtual bool				Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data);
 		virtual void				Deinitialize();
 
 		ID3D11Buffer*				GetBuffer() const;

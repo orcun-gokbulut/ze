@@ -819,6 +819,32 @@ void ZED11Context::Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt Group
 	GetMainContext()->Dispatch(GroupCountX, GroupCountY, GroupCountZ);
 }
 
+void ZED11Context::GenerateMipMaps(const ZEGRTexture* Texture)
+{
+	ID3D11ShaderResourceView* NativeShaderResource = NULL;
+
+	switch (Texture->GetTextureType())
+	{
+		case ZEGR_TT_2D:
+			NativeShaderResource = static_cast<const ZED11Texture2D*>(Texture)->GetShaderResourceView();
+			break;
+
+		case ZEGR_TT_3D:
+			NativeShaderResource = static_cast<const ZED11Texture3D*>(Texture)->GetShaderResourceView();
+			break;
+
+		case ZEGR_TT_CUBE:
+			NativeShaderResource = static_cast<const ZED11TextureCube*>(Texture)->GetShaderResourceView();
+			break;
+
+		default:
+			break;
+	}
+
+	if (NativeShaderResource != NULL)
+		GetMainContext()->GenerateMips(NativeShaderResource);
+}
+
 void ZED11Context::ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
 	GetMainContext()->ClearRenderTargetView(static_cast<const ZED11RenderTarget*>(RenderTarget)->GetView(), ClearColor.M);

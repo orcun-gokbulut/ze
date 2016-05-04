@@ -49,10 +49,10 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 
 	private:
 		ID3D11Texture3D*				Texture3D;
-		ID3D11ShaderResourceView*		ResourceView;
+		ID3D11ShaderResourceView*		ShaderResourceView;
 		ID3D11UnorderedAccessView*		UnorderedAccessView;
 
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags);
+		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data);
 		virtual void					Deinitialize();
 
 		ID3D11Texture3D*				GetTexture() const;
@@ -63,7 +63,7 @@ class ZED11Texture3D : public ZEGRTexture3D, public ZED11ComponentBase
 		virtual							~ZED11Texture3D();
 
 	public:
-		virtual bool					UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch);
+		virtual void					UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch);
 
 		virtual const ZEGRRenderTarget*	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel) const;
 };

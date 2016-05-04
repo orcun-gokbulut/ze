@@ -118,6 +118,8 @@ class ZEGRContext
 		
 		virtual void					Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ) = 0;
 
+		virtual void					GenerateMipMaps(const ZEGRTexture* Texture) = 0;
+
 		virtual void					ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor) = 0;
 		virtual void					ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue) = 0;
 		virtual void					ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor) = 0;

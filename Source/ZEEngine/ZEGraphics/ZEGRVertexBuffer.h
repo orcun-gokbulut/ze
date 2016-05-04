@@ -46,7 +46,7 @@ class ZEGRVertexBuffer : public ZEGRResource
 		ZEUInt								VertexStride;
 
 	protected:
-		virtual bool						Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, void* Data);
+		virtual bool						Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data);
 		virtual void						Deinitialize();
 
 											ZEGRVertexBuffer();
@@ -60,5 +60,5 @@ class ZEGRVertexBuffer : public ZEGRResource
 		virtual bool						Lock(void** Data) = 0;
 		virtual void						Unlock() = 0;
 		
-		static ZEHolder<ZEGRVertexBuffer>	Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, void* Data = NULL);
+		static ZEHolder<ZEGRVertexBuffer>	Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, const void* Data = NULL);
 };

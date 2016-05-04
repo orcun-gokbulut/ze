@@ -70,16 +70,16 @@
 
 void ZERNStageLighting::CreateRandomVectors()
 {
-	const ZEUInt Size = 128 * 128 * 2;
-	ZEUInt8 Vectors[Size];
+	ZEUInt Size = 128 * 128 * 2;
+	ZEArray<ZEUInt8> RandomVectors;
+	RandomVectors.SetCount(Size);
 	for(ZEUInt I = 0; I < Size; I += 2)
 	{
-		Vectors[I]		= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
-		Vectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+		RandomVectors[I]		= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
+		RandomVectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
 	}
 
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE);
-	RandomVectorsTexture->UpdateSubResource(0, 0, NULL, &Vectors[0], 128 * 2);
+	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageLighting::CreateLightGeometries()
@@ -529,7 +529,7 @@ bool ZERNStageLighting::InitializeSelf()
 	TiledDeferredCullableLightStructuredBuffer = ZEGRStructuredBuffer::Create(MAX_CULLABLE_LIGHT, sizeof(TiledDeferredCullableLightStruct));
 	TiledDeferredConstantBuffer = ZEGRConstantBuffer::Create(sizeof(TiledDeferredConstants));
 
-	MultipleShadowMaps = ZEGRTexture2D::CreateInstance(1024, 1024, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL, 10);
+	MultipleShadowMaps = ZEGRTexture2D::CreateInstance(1024, 1024, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 10);
 
 	return Update();
 }
@@ -636,8 +636,7 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	if (OutputTexture == NULL || 
 		OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 	{
-		OutputTexture.Release();
-		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
+		OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
 	
 		Viewport.SetWidth((float)Width);
 		Viewport.SetHeight((float)Height);

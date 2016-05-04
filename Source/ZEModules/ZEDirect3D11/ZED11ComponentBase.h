@@ -59,4 +59,5 @@ class ZED11ComponentBase
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 		static D3D11_USAGE				ConvertUsage(ZEGRResourceUsage Usage);
 		static UINT						ConvertBindFlags(ZEFlags BindFlags);
+		static UINT						ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage);
 };

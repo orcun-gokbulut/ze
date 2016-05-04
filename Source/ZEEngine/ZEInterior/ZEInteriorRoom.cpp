@@ -304,19 +304,19 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
 
-	ZESize PolygonCount = Resource->Polygons.GetCount();
-
-	VertexBuffer = ZEGRVertexBuffer::Create(PolygonCount * 3, sizeof(ZEInteriorVertex));
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	
+	ZESize PolygonCount = Resource->Polygons.GetCount();
 
 	ZEArray<bool> Processed;
 	Processed.SetCount(PolygonCount);
 	Processed.Fill(false);
 
+	ZEArray<ZEInteriorVertex> Vertices;
+	Vertices.SetCount(PolygonCount * 3);
+
 	ZESize CurrentVertexIndex = 0;
 	ZESize StartVertexIndex = 0;
-	ZEInteriorVertex* Buffer;
-	VertexBuffer->Lock(reinterpret_cast<void**>(&Buffer));
 	for (ZESize N = 0; N < PolygonCount; N++)
 	{
 		StartVertexIndex = CurrentVertexIndex;
@@ -330,7 +330,8 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 				if (Resource->Polygons[I].Material != Material)
 					continue;
 
-				memcpy(Buffer + CurrentVertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
+				memcpy(&Vertices[CurrentVertexIndex], Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
+
 				CurrentVertexIndex += 3;
 				Processed[I] = true;
 			}
@@ -344,7 +345,8 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 			ExtraRenderParameters.AddByRef(ExtraParameters);
 		}
 	}
-	VertexBuffer->Unlock();
+
+	VertexBuffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZEInteriorVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
 
 	ZESize ExtraParameterCount = ExtraRenderParameters.GetCount();
 	RenderCommands.SetCount(ExtraParameterCount);

@@ -61,7 +61,7 @@ bool ZERNStageForward::UpdateRenderTargets()
 		if (OriginalRenderTarget == NULL)
 			return false;
 
-		ColorBuffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
+		ColorBuffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, ZEGR_TF_R11G11B10_FLOAT);
 		ColorRenderTarget = ColorBuffer->GetRenderTarget();
 	}
 	else

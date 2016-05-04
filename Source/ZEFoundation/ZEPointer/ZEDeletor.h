@@ -88,4 +88,3 @@ void ZEDeletorDestroy<Type>::Delete(Type* Pointer)
 {
 	Pointer->Destroy();
 }
-
