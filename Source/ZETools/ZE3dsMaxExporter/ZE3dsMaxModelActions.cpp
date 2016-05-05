@@ -49,8 +49,7 @@ int ZE3dsMaxModelActionAddMeshAttributes::GetId()
 BOOL ZE3dsMaxModelActionAddMeshAttributes::ExecuteAction()
 {
 	ZE3dsMaxModelScriptMesh_ms MeshScript;
-	bool Result = ExecuteMAXScriptScript(ZEString((const char*)MeshScript.GetData()));
-	return Result;
+	return ExecuteMAXScriptScript(ZEString((const char*)MeshScript.GetData()));
 }
 
 void ZE3dsMaxModelActionAddMeshAttributes::GetButtonText(MSTR& buttonText)
@@ -115,8 +114,7 @@ int ZE3dsMaxModelActionAddBoneAttributes::GetId()
 BOOL ZE3dsMaxModelActionAddBoneAttributes::ExecuteAction()
 {
 	ZE3dsMaxModelScriptBone_ms BoneScript;
-	bool Result = ExecuteMAXScriptScript(ZEString((const char*)BoneScript.GetData()));
-	return Result;
+	return ExecuteMAXScriptScript(ZEString((const char*)BoneScript.GetData()));
 }
 
 void ZE3dsMaxModelActionAddBoneAttributes::GetButtonText(MSTR& buttonText)

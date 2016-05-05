@@ -39,6 +39,7 @@
 #include "ZE3dsMaxScriptCommonUtilities.ms.h"
 #include "ZE3dsMaxScriptHelper.ms.h"
 #include "ZE3dsMaxScriptRemove.ms.h"
+#include "ZE3dsMaxScriptMeshBatcher.ms.h"
 #include "ZEDS/ZEString.h"
 #include <imenus.h>
 #include <imenuman.h>
@@ -58,94 +59,93 @@ DWORD ZE3dsMaxUI::Start()
 
 	bool IsMenuDefined = !(MenuManager->RegisterMenuBarContext(kZinekEngineMenuBar, ZinekEngineName));
 	
+	//RegisterContext does not go false if the menu is deleted.
+	
 	IMenu* ZinekMenu = MenuManager->FindMenu(ZinekEngineName);
 
-	if (!IsMenuDefined || ZinekMenu == NULL)
+	if (ZinekMenu != NULL)
 	{
-		if (ZinekMenu != NULL)
-		{
-			bool Result = MenuManager->UnRegisterMenu(ZinekMenu);
-			ZinekMenu=NULL;
-		}
-
-		if (ZinekMenu == NULL)
-		{
-			ZinekMenu = GetIMenu();
-			ZinekMenu->SetTitle(ZinekEngineName);
-			MenuManager->RegisterMenu(ZinekMenu);
-
-			IMenu* ModelSubMenu = GetIMenu();
-			ModelSubMenu->SetTitle(ZEString("ZEModel Attributes"));
-
-			IMenu* InteriorSubMenu = GetIMenu();
-			InteriorSubMenu->SetTitle(ZEString("ZEInterior Attributes"));
-
-			IMenu* HelperSubMenu = GetIMenu();
-			HelperSubMenu->SetTitle(ZEString("ZEHelper Attributes"));
-
-			for (ZESize I = 0; I < 4; I++)
-			{
-				IMenuItem* ModelSubMenuSubItem = GetIMenuItem();
-				ActionItem* ModelMenuAction = ZinekActionTable->GetActionByIndex(I);
-
-				if (ModelMenuAction != NULL)
-				{
-					ModelSubMenuSubItem->SetActionItem(ModelMenuAction);
-					ModelSubMenu->AddItem(ModelSubMenuSubItem);
-				}
-			}
-
-			IMenuItem* ModelSubMenuItem =  GetIMenuItem();
-			ModelSubMenuItem->SetSubMenu(ModelSubMenu);
-			ZinekMenu->AddItem(ModelSubMenuItem);
-
-			for (ZESize I = 4; I < 6; I++)
-			{
-				IMenuItem* InteriorSubMenuSubItem = GetIMenuItem();
-				ActionItem* InteriorMenuAction = ZinekActionTable->GetActionByIndex(I);
-
-				if (InteriorMenuAction != NULL)
-				{
-					InteriorSubMenuSubItem->SetActionItem(InteriorMenuAction);
-					InteriorSubMenu->AddItem(InteriorSubMenuSubItem);
-				}
-			}
-
-			IMenuItem* InteriorSubMenuItem =  GetIMenuItem();
-			InteriorSubMenuItem->SetSubMenu(InteriorSubMenu);
-			ZinekMenu->AddItem(InteriorSubMenuItem);
-
-			IMenuItem* HelperSubMenuSubItem = GetIMenuItem();
-			HelperSubMenuSubItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsHelperAttributesAdd_Action_ID.PartA()));
-			HelperSubMenu->AddItem(HelperSubMenuSubItem);
-
-			IMenuItem* HelperSubMenuItem =  GetIMenuItem();
-			HelperSubMenuItem->SetSubMenu(HelperSubMenu);
-			ZinekMenu->AddItem(HelperSubMenuItem);
-
-			IMenuItem* SeparatorItem = GetIMenuItem();
-			SeparatorItem->ActAsSeparator();
-			ZinekMenu->AddItem(SeparatorItem);
-
-			IMenuItem* RemoveItem = GetIMenuItem();
-			RemoveItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsRemoveAttributes_Action_ID.PartA()));
-			ZinekMenu->AddItem(RemoveItem);
-		}
-
-		IMenuBarContext* ZinekMenuContext = (IMenuBarContext*)MenuManager->GetContext(kZinekEngineMenuBar);
-		ZinekMenuContext->SetMenu(ZinekMenu);
-		
-		IMenuItem* ZinekSubMenuItem =  GetIMenuItem();
-		ZinekSubMenuItem->SetSubMenu(ZinekMenu);
-		MenuManager->GetMainMenuBar()->AddItem(ZinekSubMenuItem, (MenuManager->GetMainMenuBar()->NumItems() - 1));
-		MenuManager->UpdateMenuBar();
-
-// 		IQuadMenu* TranformMenu = MenuManager->FindQuadMenu(L"transform");
-// 		TranformMenu->AddMenu(ZinekMenu);
+		MenuManager->UnRegisterMenu(ZinekMenu);
+		ZinekMenu = NULL;
 	}
+
+	ZinekMenu = GetIMenu();
+	ZinekMenu->SetTitle(ZinekEngineName);
+	MenuManager->RegisterMenu(ZinekMenu);
+
+	IMenu* ModelSubMenu = GetIMenu();
+	ModelSubMenu->SetTitle(ZEString("ZEModel Attributes"));
+
+	IMenu* InteriorSubMenu = GetIMenu();
+	InteriorSubMenu->SetTitle(ZEString("ZEInterior Attributes"));
+
+	IMenu* HelperSubMenu = GetIMenu();
+	HelperSubMenu->SetTitle(ZEString("ZEHelper Attributes"));
+
+	for (ZESize I = 0; I < 4; I++)
+	{
+		IMenuItem* ModelSubMenuSubItem = GetIMenuItem();
+		ActionItem* ModelMenuAction = ZinekActionTable->GetActionByIndex(I);
+
+		if (ModelMenuAction != NULL)
+		{
+			ModelSubMenuSubItem->SetActionItem(ModelMenuAction);
+			ModelSubMenu->AddItem(ModelSubMenuSubItem);
+		}
+	}
+
+	IMenuItem* ModelSubMenuItem =  GetIMenuItem();
+	ModelSubMenuItem->SetSubMenu(ModelSubMenu);
+	ZinekMenu->AddItem(ModelSubMenuItem);
+
+	for (ZESize I = 4; I < 6; I++)
+	{
+		IMenuItem* InteriorSubMenuSubItem = GetIMenuItem();
+		ActionItem* InteriorMenuAction = ZinekActionTable->GetActionByIndex(I);
+
+		if (InteriorMenuAction != NULL)
+		{
+			InteriorSubMenuSubItem->SetActionItem(InteriorMenuAction);
+			InteriorSubMenu->AddItem(InteriorSubMenuSubItem);
+		}
+	}
+
+	IMenuItem* InteriorSubMenuItem =  GetIMenuItem();
+	InteriorSubMenuItem->SetSubMenu(InteriorSubMenu);
+	ZinekMenu->AddItem(InteriorSubMenuItem);
+
+	IMenuItem* HelperSubMenuSubItem = GetIMenuItem();
+	HelperSubMenuSubItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsHelperAttributesAdd_Action_ID.PartA()));
+	HelperSubMenu->AddItem(HelperSubMenuSubItem);
+
+	IMenuItem* HelperSubMenuItem =  GetIMenuItem();
+	HelperSubMenuItem->SetSubMenu(HelperSubMenu);
+	ZinekMenu->AddItem(HelperSubMenuItem);
+
+	IMenuItem* SeparatorItem = GetIMenuItem();
+	SeparatorItem->ActAsSeparator();
+	ZinekMenu->AddItem(SeparatorItem);
+
+	IMenuItem* RemoveItem = GetIMenuItem();
+	RemoveItem->SetActionItem(ZinekActionTable->GetAction(ZECommonUtilsRemoveAttributes_Action_ID.PartA()));
+	ZinekMenu->AddItem(RemoveItem);
+
+	IMenuBarContext* ZinekMenuContext = (IMenuBarContext*)MenuManager->GetContext(kZinekEngineMenuBar);
+	ZinekMenuContext->SetMenu(ZinekMenu);
+
+	IMenuItem* ZinekSubMenuItem =  GetIMenuItem();
+	ZinekSubMenuItem->SetSubMenu(ZinekMenu);
+	MenuManager->GetMainMenuBar()->AddItem(ZinekSubMenuItem, (MenuManager->GetMainMenuBar()->NumItems() - 1));
+	MenuManager->UpdateMenuBar();
+
+	// 		IQuadMenu* TranformMenu = MenuManager->FindQuadMenu(L"transform");
+	// 		TranformMenu->AddMenu(ZinekMenu);
 
 	ZE3dsMaxScriptCommonUtilities_ms CommonUtilitiesScript;
 	ExecuteMAXScriptScript(ZEString((const char*)CommonUtilitiesScript.GetData()));
+
+	ZE3dsMaxScriptMeshBatcher_ms MeshBatcherScript;
+	ExecuteMAXScriptScript(ZEString((const char*)MeshBatcherScript.GetData()));
 
 	return GUPRESULT_KEEP;
 }
