@@ -83,6 +83,7 @@ ze_add_source(ZE3dsMaxModelScriptMesh.ms					Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptBone.ms					Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptPhysicalBody.ms			Sources ZEFC)
 ze_add_source(ZE3dsMaxModelScriptBoundingBox.ms				Sources ZEFC)
+ze_add_source(ZE3dsMaxScriptMeshBatcher.ms					Sources ZEFC)
 ze_add_source(ZEToolbarIcons_16a.bmp						Sources ZEFC)
 ze_add_source(ZEToolbarIcons_16i.bmp						Sources ZEFC)
 ze_add_source(ZEToolbarIcons_24a.bmp						Sources ZEFC)
@@ -121,7 +122,7 @@ source_group("Generated" FILES ${QtResourceFiles} ${QtMocFiles} ${QtUIFiles})
 ze_add_library(TARGET ZE3dsMaxPlugin
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
 	ZEFC ${ZEFC}
-	LIBS ZEFoundation lib3dsMax2015
+	LIBS ZEFoundation lib3dsMax2014
 	DLL)
 
 qt5_use_modules(ZE3dsMaxPlugin Widgets)
