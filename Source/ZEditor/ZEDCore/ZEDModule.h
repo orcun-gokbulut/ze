@@ -37,14 +37,14 @@
 
 #include "ZECore/ZEApplicationModule.h"
 
-#include "ZEDViewportInput.h"
-#include "ZEDViewportController.h"
-
 class ZEScene;
 class ZEDSceneWrapper;
 class ZEDObjectWrapper;
+class ZEDSelectionEvent;
 class ZEDViewportManager;
 class ZEDViewportController;
+class ZEDViewportKeyboardEvent;
+class ZEDViewportMouseEvent;
 class ZEGrid;
 
 class ZEDModule : public ZEApplicationModule
@@ -54,7 +54,7 @@ class ZEDModule : public ZEApplicationModule
 		ZEDSceneWrapper*			SceneWrapper;
 		ZEGrid*						Grid;
 		ZEDViewportManager*			ViewportManager;
-		ZEDViewportController		ViewportController;
+		ZEDViewportController*		ViewportController;
 
 	public:
 		ZEDViewportManager*			GetViewportManager();
@@ -70,8 +70,9 @@ class ZEDModule : public ZEApplicationModule
 		virtual void				StartUp();
 		virtual void				ShutDown();
 
-		virtual void				KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event);
-		virtual void				MouseEventHandler(const ZEDViewportMouseEvent& Event);
+		virtual void				SelectionEvent(const ZEDSelectionEvent& Event);
+		virtual void				KeyboardEvent(const ZEDViewportKeyboardEvent& Event);
+		virtual void				MouseEvent(const ZEDViewportMouseEvent& Event);
 
 									ZEDModule();
 		virtual						~ZEDModule();

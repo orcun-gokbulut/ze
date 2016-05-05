@@ -84,7 +84,7 @@ const ZEString& ZERNStageForward::GetName() const
 const ZEGRRenderTarget*	ZERNStageForward::GetProvidedInput(ZERNStageBuffer Input) const
 {
 	if (GetEnabled() && Input == ZERN_SO_COLOR)
-		return ColorBuffer->GetRenderTarget();
+		return ColorRenderTarget;
 	
 	return ZERNStage::GetProvidedInput(Input);
 }
@@ -165,6 +165,27 @@ ZERNStageForwardTransparent::ZERNStageForwardTransparent()
 }
 
 ZEGRRenderState ZERNStageForwardTransparent::GetRenderState()
+{
+	return ZERNStageForward::GetRenderState();
+}
+
+
+ZEInt ZERNStageForwardPostHDR::GetId() const
+{
+	return ZERN_STAGE_FORWARD_POST;
+}
+
+const ZEString& ZERNStageForwardPostHDR::GetName() const
+{
+	static ZEString Name = "ForwardPostHDR";
+	return Name;
+}
+
+ZERNStageForwardPostHDR::ZERNStageForwardPostHDR()
+{
+}
+
+ZEGRRenderState ZERNStageForwardPostHDR::GetRenderState()
 {
 	return ZERNStageForward::GetRenderState();
 }

@@ -35,7 +35,7 @@
 
 #include "ZEDOperation.h"
 
-void ZEDOperation::SetText(const char* Text)
+void ZEDOperation::SetText(const ZEString& Text)
 {
 	this->Text = Text;
 }

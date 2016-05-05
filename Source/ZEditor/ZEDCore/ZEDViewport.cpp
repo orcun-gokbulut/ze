@@ -60,6 +60,23 @@
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
 
+
+ZEDViewportChangedEvent::ZEDViewportChangedEvent()
+{
+	View = NULL;
+	OldView = NULL;
+}
+
+const ZERNView& ZEDViewportChangedEvent::GetView() const
+{
+	return *View;
+}
+
+const ZERNView& ZEDViewportChangedEvent::GetOldView() const
+{
+	return *OldView;
+}
+
 bool ZEDViewport::UpdateView()
 {
 	if (!DirtyFlags.GetFlags(ZED_VDF_VIEW))
@@ -91,7 +108,7 @@ bool ZEDViewport::UpdateView()
 	ZEMatrix4x4::Multiply(View.ViewProjectionTransform, View.ProjectionTransform, View.ViewTransform);
 	ZEMatrix4x4::Inverse(View.InvViewTransform, View.ViewTransform);
 	ZEMatrix4x4::Inverse(View.InvProjectionTransform, View.ProjectionTransform);
-	ZEMatrix4x4::Multiply(View.InvViewProjectionTransform, View.InvViewTransform, View.InvProjectionTransform);
+	ZEMatrix4x4::Inverse(View.InvViewProjectionTransform, View.ViewProjectionTransform);
 
 	ViewFrustum.Create(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
 	View.ViewVolume = &ViewFrustum;
@@ -162,8 +179,8 @@ bool ZEDViewport::InitializeSelf()
 	ZERNStageForward* StageForward = new ZERNStageForward();
 	Renderer.AddStage(StageForward);
 
-	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
-	Renderer.AddStage(StagePostProcess);
+	/*ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
+	Renderer.AddStage(StagePostProcess);*/
 
 	/*ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
 	Renderer.AddStage(StageParticleRendering);*/
@@ -185,6 +202,9 @@ bool ZEDViewport::InitializeSelf()
 	
 	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
 	Renderer.AddStage(StageAntiAliasing);
+
+	ZERNStageForwardPostHDR* StagePostHDRForward = new ZERNStageForwardPostHDR();
+	Renderer.AddStage(StagePostHDRForward);
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);
@@ -222,7 +242,7 @@ void ZEDViewport::mousePressEvent(QMouseEvent* Event)
 	MouseEvents.Add(MouseEvent);
 
 	MouseEvent.Type = ZED_ET_BUTTON_PRESSED;
-	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
+	ZEDCore::GetInstance()->GetEditorModule()->MouseEvent(MouseEvent);
 
 	QFrame::mousePressEvent(Event);
 }
@@ -250,7 +270,7 @@ void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
 	MouseEvent.Delta = MouseDelta;
 	LastMousePosition = MouseEvent.Position;
 
-	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
+	ZEDCore::GetInstance()->GetEditorModule()->MouseEvent(MouseEvent);
 
 	QFrame::mouseMoveEvent(Event);
 }
@@ -274,7 +294,7 @@ void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
 		}
 	}
 
-	ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvent);
+	ZEDCore::GetInstance()->GetEditorModule()->MouseEvent(MouseEvent);
 
 	QFrame::mouseMoveEvent(Event);
 }
@@ -322,7 +342,7 @@ void ZEDViewport::keyPressEvent(QKeyEvent* Event)
 	KeyboardEvents.Add(KeyboardEvent);
 
 	KeyboardEvent.Type = ZED_ET_BUTTON_PRESSED;
-	ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvent);
+	ZEDCore::GetInstance()->GetEditorModule()->KeyboardEvent(KeyboardEvent);
 
 	QFrame::keyPressEvent(Event);
 }
@@ -352,7 +372,7 @@ void ZEDViewport::keyReleaseEvent(QKeyEvent* Event)
 		}
 	}
 
-	ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvent);
+	ZEDCore::GetInstance()->GetEditorModule()->KeyboardEvent(KeyboardEvent);
 	
 	if (Event->key() == Qt::Key_Shift)
 		Modifiers &= ~ZED_KKM_SHIFT;
@@ -394,14 +414,14 @@ void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
 	{
 		KeyboardEvents[I].Type = ZED_ET_BUTTON_RELEASED;
-		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvents[I]);
+		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEvent(KeyboardEvents[I]);
 	}
 	KeyboardEvents.Clear();
 
 	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
 	{
 		MouseEvents[I].Type = ZED_ET_BUTTON_RELEASED;
-		ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvents[I]);
+		ZEDCore::GetInstance()->GetEditorModule()->MouseEvent(MouseEvents[I]);
 	}
 
 	MouseEvents.Clear();
@@ -444,14 +464,14 @@ void ZEDViewport::Tick()
 	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
 	{
 		KeyboardEvents[I].Modifiers = Modifiers;
-		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEventHandler(KeyboardEvents[I]);
+		ZEDCore::GetInstance()->GetEditorModule()->KeyboardEvent(KeyboardEvents[I]);
 	}
 
 	for (ZESize I = 0; I < MouseEvents.GetCount(); I++)
 	{
 		MouseEvents[I].Delta = MouseDelta;
 		MouseEvents[I].Modifiers = Modifiers;
-		ZEDCore::GetInstance()->GetEditorModule()->MouseEventHandler(MouseEvents[I]);
+		ZEDCore::GetInstance()->GetEditorModule()->MouseEvent(MouseEvents[I]);
 	}
 
 	MouseDelta = ZEVector2::Zero;
@@ -542,6 +562,6 @@ ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
 	VerticalFOV = ZE_PI_3;
 	LastMousePosition = ZEVector2(-1.0f, -1.0f);
 	MouseDelta = ZEVector2::Zero;
-	//setMouseTracking(true);
-	//setFocusPolicy(Qt::StrongFocus);
+	setMouseTracking(true);
+	setFocusPolicy(Qt::StrongFocus);
 }

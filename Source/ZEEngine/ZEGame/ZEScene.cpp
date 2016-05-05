@@ -353,8 +353,12 @@ void ZEScene::PreRender(ZERNRenderer* Renderer)
 	Parameters.Renderer = Renderer;
 	Parameters.View = &Renderer->GetView();
 
+	Renderer->StartScene(GetConstantBuffer());
+	
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		PreRenderEntity(Entities[I], &Parameters);
+
+	Renderer->EndScene();
 }
 
 void ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

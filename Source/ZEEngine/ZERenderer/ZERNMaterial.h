@@ -41,6 +41,7 @@
 
 class ZEGRContext;
 class ZERNStage;
+class ZERNCommand;
 
 class ZERNMaterial : public ZEObject, public ZEReferenceCounted, public ZEInitializable
 {
@@ -52,6 +53,7 @@ class ZERNMaterial : public ZEObject, public ZEReferenceCounted, public ZEInitia
 	public:
 		virtual ZEUInt					GetStageMask() const = 0;
 
+		virtual bool					PreRender(ZERNCommand& Command);
 		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 

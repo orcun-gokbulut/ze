@@ -89,6 +89,7 @@ bool ZERNSimpleMaterial::UpdateRenderState()
 	{
 		ZEGRDepthStencilState DepthStencilState = RenderState.GetDepthStencilState();
 		DepthStencilState.SetDepthTestEnable(false);
+		DepthStencilState.SetStencilTestEnable(false);
 		RenderState.SetDepthStencilState(DepthStencilState);
 	}
 
@@ -143,6 +144,7 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 {
 	Wireframe = false;
 	TwoSided = false;
+	StageMask = ZERN_STAGE_FORWARD;
 	DepthTestDisabled = false;
 	Constants.VertexColorEnabled = true;
 	Constants.TextureEnabled = false;
@@ -152,9 +154,14 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	DirtyFlags.RaiseAll();
 }
 
+void ZERNSimpleMaterial::SetStageMask(ZERNStageMask Mask)
+{
+	StageMask = Mask;
+}
+
 ZERNStageMask ZERNSimpleMaterial::GetStageMask() const
 {
-	return ZERN_STAGE_FORWARD;
+	return StageMask;
 }
 
 void ZERNSimpleMaterial::SetTwoSided(bool Enable)

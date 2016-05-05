@@ -77,12 +77,10 @@ class ZEDGizmo : public ZEEntity
 		ZEDGizmoAxis					SelectedAxis;
 		float							AxisLength;
 
-		ZEVector3						MoveDifference;
+		ZEVector3						PickOffset;
+		ZEVector3						InitialPosition;
 		ZEQuaternion					InitialRotation;
 		ZEVector3						InitialScale;
-
-		ZEVector3						OldPosition;
-		ZEVector2						StartScreenPosition;
 
 		ZECanvas						GizmoLines;
 		ZECanvas						GizmoTriangles;
@@ -99,14 +97,12 @@ class ZEDGizmo : public ZEEntity
 		ZEDGizmoAxis					PickScaleAxis(const ZERNView& View, const ZERay& Ray, float& TRay);
 
 		ZEVector3						MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray);
-		ZEQuaternion					RotationProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray);
-		ZEVector3						ScaleProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray);
 
-		bool							UpdateMoveGizmo(const ZERNView& View);
-		bool							UpdateRotateGizmo(const ZERNView& View);
-		bool							UpdateScaleGizmo(const ZERNView& View);
-		bool							UpdateHelperGizmo(const ZERNView& View);				 
-		bool							UpdateGizmo(const ZERNView& View);
+		bool							DrawMoveGizmo(const ZERNView& View);
+		bool							DrawRotateGizmo(const ZERNView& View);
+		bool							DrawScaleGizmo(const ZERNView& View);
+		bool							DrawHelperGizmo(const ZERNView& View);				 
+		bool							DrawGizmo(const ZERNView& View);
 
 		bool							UpdateConstantBuffer();
 		bool							UpdateVertexBuffer();
@@ -143,11 +139,11 @@ class ZEDGizmo : public ZEEntity
 		void							StartMoveProjection(const ZERNView& View, const ZERay& InitialRay);
 		ZEVector3						MoveProjection(const ZERNView& View, const ZERay& Ray);
 	
-		void							StartRotationProjection(const ZERNView& View, const ZERay& InitialRay);
-		ZEQuaternion					RotationProjection(const ZERNView& View, const ZERay& Ray);
+		void							StartRotationProjection(const ZEQuaternion& InitialRotation = ZEQuaternion::Identity);
+		ZEQuaternion					RotationProjection(const ZERNView& View, float RotateAmount);
 	
-		void							StartScaleProjection(const ZERNView& View, const ZERay& InitialRay);
-		ZEVector3						ScaleProjection(const ZERNView& View, const ZERay& Ray);
+		void							StartScaleProjection(const ZEVector3& InitialScale = ZEVector3::One);
+		ZEVector3						ScaleProjection(float ScaleAmount);
 	
 		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

@@ -63,7 +63,7 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<const ZEGRTexture2D>		DepthTexture;
 		ZEHolder<const ZEGRTexture2D>		NormalTexture;
 		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
+		ZEHolder<const ZEGRTexture2D>		OutputTexture;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 

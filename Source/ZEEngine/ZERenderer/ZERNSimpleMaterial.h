@@ -57,6 +57,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool								TwoSided;
 		bool								Wireframe;
 		bool								DepthTestDisabled;
+		ZERNStageMask						StageMask;
 		ZEGRPrimitiveType					PrimitiveType;
 
 		ZEHolder<ZEGRShader>				VertexShader;
@@ -85,6 +86,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 											ZERNSimpleMaterial();
 
 	public:
+		void								SetStageMask(ZERNStageMask Mask);
 		virtual ZERNStageMask				GetStageMask() const;
 
 		void								SetTwoSided(bool Enable);
@@ -92,7 +94,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		void								SetWireframe(bool Enable);
 		bool								GetWireframe() const;
-
+		
 		void								SetPrimitiveType(ZEGRPrimitiveType Type);
 		ZEGRPrimitiveType					SetPrimitiveType() const;
 

@@ -42,11 +42,11 @@ ZERay ZERNScreenUtilities::ScreenToWorld(const ZERNView& View, const ZEVector2& 
 {
 	ZEVector4 ClipCoords = ZEVector4(ScreenToClip(View, ScreenCoords), 0.0f, 1.0f);
 	ZEVector4 Vector;
-	ZEMatrix4x4::Transform(Vector, View.InvViewProjectionTransform, ClipCoords);
+	ZEMatrix4x4::Transform(Vector, View.InvProjectionTransform, ClipCoords);
 
 	ZERay Ray;
 	Ray.p = View.Position;
-	Ray.v = Vector.ToVector3().Normalize();
+	Ray.v = (Vector.x * View.U + Vector.y * View.V + View.N).Normalize();
 
 	return Ray;
 }
@@ -56,10 +56,10 @@ ZERay ZERNScreenUtilities::ScreenToView(const ZERNView& View, const ZEVector2& S
 	ZEVector4 ClipCoords = ZEVector4(ScreenToClip(View, ScreenCoords), 0.0f, 1.0f);
 	ZEVector4 Vector;
 	ZEMatrix4x4::Transform(Vector, View.InvProjectionTransform, ClipCoords);
-
+	
 	ZERay Ray;
 	Ray.p = View.Position;
-	Ray.v = Vector.ToVector3().Normalize();
+	Ray.v = Vector.Normalize().ToVector3();
 	
 	return Ray;
 }

@@ -69,24 +69,9 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 	if (NormalTexture == NULL)
 		return false;
 
-
-	ZEHolder<const ZEGRRenderTarget> NewOutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
-	if (NewOutputRenderTarget == NULL)
+	BindOutput(ZERN_SO_COLOR, ZEGR_TF_R11G11B10_FLOAT, false, OutputTexture, OutputRenderTarget);
+	if (OutputRenderTarget->GetWidth() != Viewport.GetWidth() || OutputRenderTarget->GetHeight() != Viewport.GetHeight())
 	{
-		// No Provided Output - Create Own Buffer
-		if (OutputTexture == NULL || OutputTexture->GetWidth() != InputTexture->GetWidth() || OutputTexture->GetHeight() != InputTexture->GetHeight())
-			OutputTexture = ZEGRTexture2D::CreateInstance(InputTexture->GetWidth(), InputTexture->GetHeight(), 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE);
-
-		NewOutputRenderTarget = OutputTexture->GetRenderTarget();
-	}
-	else
-	{
-		OutputTexture.Release();
-	}
-
-	if (NewOutputRenderTarget != OutputRenderTarget)
-	{
-		OutputRenderTarget = NewOutputRenderTarget;
 		Viewport.SetWidth(OutputRenderTarget->GetWidth());
 		Viewport.SetHeight(OutputRenderTarget->GetHeight());
 		Constants.OutputSize = ZEVector2(Viewport.GetWidth(), Viewport.GetHeight());

@@ -74,7 +74,7 @@ bool ZERNStage::BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothW
 		}
 	}
 
-	ZEHolder<const ZEGRRenderTarget> ProvidedRenderTarget = GetProvidedInput(Output);
+	ZEHolder<const ZEGRRenderTarget> ProvidedRenderTarget = GetNextProvidedInput(Output);
 	if (ProvidedRenderTarget != NULL)
 	{
 		Buffer.Release();

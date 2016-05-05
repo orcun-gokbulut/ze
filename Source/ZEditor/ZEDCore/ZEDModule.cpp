@@ -40,9 +40,10 @@
 #include "ZEDTransformationManager.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDViewport.h"
+#include "ZEDViewportManager.h"
+#include "ZEDViewportInput.h"
 #include "ZEDGizmo.h"
 #include "ZEDEntityWrapper.h"
-#include "ZEDViewportManager.h"
 
 #include "ZEGame/ZEGrid.h"
 #include "ZEGame/ZEScene.h"
@@ -50,6 +51,8 @@
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
+#include "ZEDViewportController.h"
+
 
 void ZEDModule::SetScene(ZEScene* Scene)
 {
@@ -87,13 +90,9 @@ void ZEDModule::PostProcess(float ElapsedTime)
 
 		ZERNRenderer* Renderer = Viewports[I]->GetRenderer();
 
-		Renderer->StartScene(Scene->GetConstantBuffer());
 		Scene->PreRender(Renderer);
-		Renderer->EndScene();
-
-		Renderer->StartScene(NULL);
 		SceneWrapper->PreRender(Renderer);
-		Renderer->EndScene();	
+		ZEDCore::GetInstance()->GetTransformationManager()->PreRender(Renderer);
 	}
 
 	ViewportManager->Render();
@@ -109,6 +108,8 @@ void ZEDModule::StartUp()
 		SceneWrapper = ZEDSceneWrapper::CreateInstance();
 		SceneWrapper->SetObject(Scene);
 	}
+
+	ViewportController = new ZEDViewportController();
 
 	Grid = ZEGrid::CreateInstance();
 	ZEDEntityWrapper* GridWrapper = ZEDEntityWrapper::CreateInstance();
@@ -142,19 +143,11 @@ void ZEDModule::StartUp()
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
 	
-
-	ZEDGizmo* Gizmo = ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo();
-	Gizmo->SetMode(ZED_GM_HELPER);
-	ZEDEntityWrapper* GizmoWrapper = ZEDEntityWrapper::CreateInstance();
-	GizmoWrapper->SetObject(Gizmo);
-	GizmoWrapper->SetSelectable(false);
-	SceneWrapper->AddChildWrapper(GizmoWrapper);
-	
-	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
+	/*ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
 	ZEDEntityWrapper* AtmosphereWrapper = ZEDEntityWrapper::CreateInstance();
 	AtmosphereWrapper->SetObject(Atmosphere);
 	AtmosphereWrapper->SetSelectable(false);
-	SceneWrapper->AddChildWrapper(AtmosphereWrapper);
+	SceneWrapper->AddChildWrapper(AtmosphereWrapper);*/
 
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
 	SkyBox->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
@@ -175,27 +168,32 @@ void ZEDModule::ShutDown()
 	}
 }
 
-void ZEDModule::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
+void ZEDModule::SelectionEvent(const ZEDSelectionEvent& Event)
 {
-	if (ZEDCore::GetInstance()->GetSelectionManager()->KeyboardEventHandler(Event))
+	ZEDCore::GetInstance()->GetTransformationManager()->SelectionEvent(Event);
+}
+
+void ZEDModule::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
+{
+	if (ZEDCore::GetInstance()->GetTransformationManager()->ViewportKeyboardEvent(Event))
 		return;
 
-	if (ZEDCore::GetInstance()->GetTransformationManager()->KeyboardEventHandler(Event))
+	if (ZEDCore::GetInstance()->GetSelectionManager()->KeyboardEvent(Event))
 		return;
 
-	if (ViewportController.KeyboardEventHandler(Event))
+	if (ViewportController->KeyboardEvent(Event))
 		return;
 }
 
-void ZEDModule::MouseEventHandler(const ZEDViewportMouseEvent& Event)
+void ZEDModule::MouseEvent(const ZEDViewportMouseEvent& Event)
 {
-	if (ZEDCore::GetInstance()->GetSelectionManager()->MouseEventHandler(Event))
-		return;
-	
-	if (ZEDCore::GetInstance()->GetTransformationManager()->MouseEventHandler(Event))
+	if (ZEDCore::GetInstance()->GetTransformationManager()->ViewportMouseEvent(Event))
 		return;
 
-	if (ViewportController.MouseEventHandler(Event))
+	if (ZEDCore::GetInstance()->GetSelectionManager()->MouseEvent(Event))
+		return;
+	
+	if (ViewportController->MouseEvent(Event))
 		return;
 }
 

@@ -37,26 +37,35 @@
 
 #include "ZEDOperation.h"
 #include "ZEDTransformationManager.h"
-#include "ZEDSelectionManager.h"
 #include "ZEDS/ZEArray.h"
 
 class ZEDObjectWrapper;
 
+struct ZEDTransformOperationTransforms
+{
+	ZEDObjectWrapper*							Object;
+
+	ZEVector3									Position;
+	ZEQuaternion								Rotation;
+	ZEVector3									Scale;
+
+	ZEVector3									OldPosition;
+	ZEQuaternion								OldRotation;
+	ZEVector3									OldScale;
+
+};
+
 class ZEDTransformationOperation : public ZEDOperation
 {
 	private:
-		ZEDTransformType				Type;
-		ZEMatrix4x4						Transform;
-		ZEDSelectionPivotMode			PivotMode;
-		ZEMatrix4x4						Pivot;
-		ZEArray<ZEDObjectWrapper*>		Wrappers;
+		ZEArray<ZEDTransformOperationTransforms>	Transforms;
 
 	protected:		
-		virtual bool					Apply();
-		virtual bool					Revert();
+		virtual bool							Apply();
+		virtual bool							Revert();
 
 	public:
-		virtual void					Destroy();
+		virtual void							Destroy();
 
-										ZEDTransformationOperation(ZEDTransformType Type, ZEDSelectionPivotMode PivotMode, ZEMatrix4x4 Transform, const ZEArray<ZEDObjectWrapper*>& Wrappers);
+												ZEDTransformationOperation(ZEDTransformType Type, const ZEArray<ZEDTransformationState>& State);
 };

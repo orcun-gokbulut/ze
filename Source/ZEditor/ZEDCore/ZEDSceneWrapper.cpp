@@ -185,6 +185,8 @@ void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer)
 	Parameters.Renderer = Renderer;
 	Parameters.View = &Renderer->GetView();
 
+	Renderer->StartScene(NULL);
+
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		Wrappers[I]->PreRender(&Parameters);
@@ -193,4 +195,6 @@ void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer)
 		for (ZESize J = 0; J < Children.GetCount(); J++)
 			Children[J]->PreRender(&Parameters);
 	}
+
+	Renderer->EndScene();
 }
