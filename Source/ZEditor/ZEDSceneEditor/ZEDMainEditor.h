@@ -54,6 +54,8 @@ class ZEDMainEditor : public QMainWindow
 		QTimer*								MainTimer;
 		ZEDMainBrowser*						Browser;
 
+		void								closeEvent(QCloseEvent* Event);
+
 		bool								InitializeSelf();
 		void								DeinitializeSelf();
 

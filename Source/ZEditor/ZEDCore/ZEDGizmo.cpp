@@ -56,13 +56,9 @@
 #define ZED_GDF_VERTEX_BUFFER		0x02
 #define ZED_GDF_CONSTANT_BUFFER		0x04
 
-bool ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)
+bool ZEDGizmo::DrawMoveGizmo(const ZERNView& View)
 {
-	const ZEVector3& CameraPosition = View.Position;
-	const ZEQuaternion& CameraRotation = View.Rotation;
-	const ZEMatrix4x4& ProjectionTransform = View.ProjectionTransform;
-
-	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetPosition()) * ProjectionTransform.M11;
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, GetWorldPosition()) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
 	float AxisLength_10 = AxisLength * 0.1f;
 	float AxisLength_5 = AxisLength * 0.2f;
@@ -103,7 +99,7 @@ bool ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)
 
 	GizmoLines.PushTransformation();
 
-	GizmoLines.SetRotation(CameraRotation * GetRotation().Conjugate());
+	GizmoLines.SetRotation(View.Rotation * GetRotation().Conjugate());
 
 	// X Letter
 	GizmoLines.SetColor(XAxisColor);
@@ -180,18 +176,14 @@ bool ZEDGizmo::UpdateMoveGizmo(const ZERNView& View)
 	return true;
 }
 
-bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
+bool ZEDGizmo::DrawRotateGizmo(const ZERNView& View)
 {
-	const ZEVector3& CameraPosition = View.Position;
-	const ZEQuaternion& CameraRotation = View.Rotation;
-	const ZEMatrix4x4& ProjectionTransform = View.ProjectionTransform;
+	const ZEVector3& Position = GetWorldPosition();
 
-	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetPosition()) * ProjectionTransform.M11;
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
 	float AxisLength_10 = AxisLength * 0.1f;
 	float AxisLength_4 = AxisLength * 0.25f;
-
-	const ZEVector3& Position = GetPosition();
 
 	GizmoLines.Clean();
 	GizmoTriangles.Clean();
@@ -199,13 +191,13 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 	const ZEMatrix4x4& Transformation = GetWorldTransform();
 	const ZEQuaternion& Rotation = GetRotation();
 
-	ZEVector3 CameraDirection;
-	ZEQuaternion::VectorProduct(CameraDirection, CameraRotation, ZEVector3::UnitZ);
-	ZEVector3::Scale(CameraDirection, CameraDirection, -1.0f);
+	ZEVector3 ViewDirection;
+	ZEQuaternion::VectorProduct(ViewDirection, View.Rotation, ZEVector3::UnitZ);
+	ZEVector3::Scale(ViewDirection, ViewDirection, -1.0f);
 
 	// General Circle 
-	GizmoLines.SetRotation(CameraRotation * ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
-	GizmoLines.SetTranslation(GetPosition());
+	GizmoLines.SetRotation(View.Rotation * ZEQuaternion(ZE_PI_2, ZEVector3(1.0f, 0.0f, 0.0f)));
+	GizmoLines.SetTranslation(Position);
 	GizmoLines.SetColor(ZEVector4(0.2f ,0.2f, 0.2f, 1.0f));
 	GizmoLines.AddCircle(AxisLength, 32);
 	GizmoLines.SetColor(ZEVector4(0.3f, 0.3f, 0.3f, 1.0f));
@@ -264,7 +256,7 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 	// X Axis
 	ZEVector3 AxisUp;
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitX);
-	bool FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
+	bool FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, ViewDirection)) > 0.98);
 
 	ZEVector3 LineStart, LineEnd;
 	for (ZESize X = 0; X < 64; X++)
@@ -273,8 +265,8 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(0.0f, AxisLength * ZEAngle::Sin((X + 1) * HAngle), AxisLength * ZEAngle::Cos((X + 1) * HAngle)));
 
 		bool Backface = (!FullDraw && 
-			ZEVector3::DotProduct((LineStart - Position).Normalize(), CameraDirection) < -0.01f &&
-			ZEVector3::DotProduct((LineEnd - Position).Normalize(), CameraDirection) < -0.01f);
+			ZEVector3::DotProduct((LineStart - Position).Normalize(), ViewDirection) < -0.01f &&
+			ZEVector3::DotProduct((LineEnd - Position).Normalize(), ViewDirection) < -0.01f);
 
 		if (HoveredAxis == ZED_GA_X_AXIS || HoveredAxis == ZED_GA_XY_AXIS || HoveredAxis == ZED_GA_XZ_AXIS)
 		{
@@ -301,7 +293,7 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 
 	// Y Axis
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitY);
-	FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
+	FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, ViewDirection)) > 0.98);
 
 	for (ZESize X = 0; X < 64; X++)
 	{
@@ -309,8 +301,8 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLength * ZEAngle::Sin((X + 1) * HAngle), 0.0f, AxisLength * ZEAngle::Cos((X + 1) * HAngle)));
 
 		bool Backface = (!FullDraw && 
-			ZEVector3::DotProduct((LineStart - Position).Normalize(), CameraDirection) < -0.01f &&
-			ZEVector3::DotProduct((LineEnd - Position).Normalize(), CameraDirection) < -0.01f);
+			ZEVector3::DotProduct((LineStart - Position).Normalize(), ViewDirection) < -0.01f &&
+			ZEVector3::DotProduct((LineEnd - Position).Normalize(), ViewDirection) < -0.01f);
 
 		if (HoveredAxis == ZED_GA_Y_AXIS || HoveredAxis == ZED_GA_XY_AXIS || HoveredAxis == ZED_GA_YZ_AXIS)
 		{
@@ -338,7 +330,7 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 
 	// Z Axis
 	ZEQuaternion::VectorProduct(AxisUp, Rotation, ZEVector3::UnitZ);
-	FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, CameraDirection)) > 0.98);
+	FullDraw =  (ZEMath::Abs(ZEVector3::DotProduct(AxisUp, ViewDirection)) > 0.98);
 
 	for (ZESize X = 0; X < 64; X++)
 	{
@@ -346,8 +338,8 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 		ZEMatrix4x4::Transform(LineEnd, Transformation, ZEVector3(AxisLength * ZEAngle::Sin((X + 1) * HAngle), AxisLength * ZEAngle::Cos((X + 1) * HAngle), 0.0f));
 
 		bool Backface = (!FullDraw && 
-			ZEVector3::DotProduct((LineStart - Position).Normalize(), CameraDirection) < -0.01f &&
-			ZEVector3::DotProduct((LineEnd - Position).Normalize(), CameraDirection) < -0.01f);
+			ZEVector3::DotProduct((LineStart - Position).Normalize(), ViewDirection) < -0.01f &&
+			ZEVector3::DotProduct((LineEnd - Position).Normalize(), ViewDirection) < -0.01f);
 
 		if (HoveredAxis == ZED_GA_Z_AXIS || HoveredAxis == ZED_GA_XZ_AXIS || HoveredAxis == ZED_GA_YZ_AXIS)
 		{
@@ -375,13 +367,9 @@ bool ZEDGizmo::UpdateRotateGizmo(const ZERNView& View)
 	return true;
 }
 
-bool ZEDGizmo::UpdateScaleGizmo(const ZERNView& View)
+bool ZEDGizmo::DrawScaleGizmo(const ZERNView& View)
 {
-	ZEVector3 CameraPosition = View.Position;
-	ZEQuaternion CameraRotation = View.Rotation;
-	ZEMatrix4x4 ProjectionTransform = View.ProjectionTransform;
-
-	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetPosition()) * ProjectionTransform.M11;
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, GetWorldPosition()) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
 	float AxisLength_10 = AxisLength * 0.1f;
 	float AxisLength_5 = AxisLength * 0.2f;
@@ -423,7 +411,7 @@ bool ZEDGizmo::UpdateScaleGizmo(const ZERNView& View)
 
 	GizmoLines.PushTransformation();
 
-	GizmoLines.SetRotation(CameraRotation * GetRotation().Conjugate());
+	GizmoLines.SetRotation(View.Rotation * GetRotation().Conjugate());
 
 	// X Letter
 	GizmoLines.SetColor(XAxisColor);
@@ -518,13 +506,13 @@ bool ZEDGizmo::UpdateScaleGizmo(const ZERNView& View)
 	return true;
 }
 
-bool ZEDGizmo::UpdateHelperGizmo(const ZERNView& View)
+bool ZEDGizmo::DrawHelperGizmo(const ZERNView& View)
 {
 	const ZEVector3& CameraPosition = View.Position;
 	const ZEQuaternion& CameraRotation = View.Rotation;
 	const ZEMatrix4x4& ProjectionTransform = View.ProjectionTransform;
 
-	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetPosition()) * ProjectionTransform.M11;
+	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetWorldPosition()) * ProjectionTransform.M11;
 	float AxisLength_5 = AxisLength * 0.2f;
 	float AxisLength_10 = AxisLength * 0.1f;
 
@@ -572,7 +560,7 @@ bool ZEDGizmo::UpdateHelperGizmo(const ZERNView& View)
 	return true;
 }
 
-bool ZEDGizmo::UpdateGizmo(const ZERNView& View)
+bool ZEDGizmo::DrawGizmo(const ZERNView& View)
 {
 	/*if (!DirtyGizmoFlags.GetFlags(ZED_GDF_GIZMO))
 		return true;*/
@@ -580,22 +568,22 @@ bool ZEDGizmo::UpdateGizmo(const ZERNView& View)
 	switch(Mode)
 	{
 		case ZED_GM_MOVE:
-			if (!UpdateMoveGizmo(View))
+			if (!DrawMoveGizmo(View))
 				return false;
 			break;
 
 		case ZED_GM_ROTATE:
-			if (!UpdateRotateGizmo(View))
+			if (!DrawRotateGizmo(View))
 				return false;
 			break;
 
 		case ZED_GM_SCALE:
-			if (!UpdateScaleGizmo(View))
+			if (!DrawScaleGizmo(View))
 				return false;
 			break;
 
 		case ZED_GM_HELPER:
-			if (!UpdateHelperGizmo(View))
+			if (!DrawHelperGizmo(View))
 				return false;
 			break;
 	}
@@ -610,6 +598,9 @@ bool ZEDGizmo::UpdateVertexBuffer()
 		return true;
 
 	ZESize VertexBufferSize = GizmoLines.GetBufferSize() + GizmoTriangles.GetBufferSize();
+	if (VertexBufferSize == 0)
+		return false;
+
 	if (VertexBuffer.IsNull() ||
 		VertexBuffer->GetSize() < VertexBufferSize)
 	{
@@ -634,7 +625,14 @@ bool ZEDGizmo::UpdateConstantBuffer()
 	if (!DirtyGizmoFlags.GetFlags(ZED_GDF_CONSTANT_BUFFER))
 		return true;
 
-	ConstantBuffer->SetData(&GetWorldTransform());
+	if (ConstantBuffer.IsNull())
+		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+
+	if (GetMode() == ZED_GM_ROTATE)
+		ConstantBuffer->SetData(&ZEMatrix4x4::Identity);
+	else
+		ConstantBuffer->SetData(&GetWorldTransform());
+
 	DirtyGizmoFlags.UnraiseFlags(ZED_GDF_CONSTANT_BUFFER);
 
 	return true;
@@ -653,7 +651,7 @@ bool ZEDGizmo::Update()
 
 ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray)
 {
-	const ZEVector3& Position = GetPosition();
+	const ZEVector3& Position = GetWorldPosition();
 
 	ZEVector3 Right, Up, Front;
 	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetRotation());
@@ -672,7 +670,7 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 			if (ZERay::MinimumDistance(Ray, AxisLine, TRay, TLine) < 10.0f)
 				return AxisLine.GetPointOn(TLine);
 			else
-				return GetPosition();
+				return GetWorldPosition();
 		}
 
 		case ZED_GA_Y_AXIS:
@@ -685,7 +683,7 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 			if (ZERay::MinimumDistance(Ray, AxisLine, TRay, TLine) < 10.0f)
 				return AxisLine.GetPointOn(TLine);
 			else
-				return GetPosition();
+				return GetWorldPosition();
 		}
 
 		case ZED_GA_Z_AXIS:
@@ -698,7 +696,7 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 			if (ZERay::MinimumDistance(Ray, AxisLine, TRay, TLine) < 10.0f)
 				return AxisLine.GetPointOn(TLine);
 			else
-				return GetPosition();
+				return GetWorldPosition();
 		}
 
 		case ZED_GA_XY_AXIS:
@@ -708,7 +706,7 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 			if (ZEPlane::IntersectionTest(AxisPlane, Ray, TRay))
 				return Ray.GetPointOn(TRay);
 			else
-				return GetPosition();
+				return GetWorldPosition();
 		}
 
 		case ZED_GA_XZ_AXIS:
@@ -718,7 +716,7 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 			if (ZEPlane::IntersectionTest(AxisPlane, Ray, TRay))
 				return Ray.GetPointOn(TRay);
 			else
-				return GetPosition();
+				return GetWorldPosition();
 		}
 
 		case ZED_GA_YZ_AXIS:
@@ -728,147 +726,146 @@ ZEVector3 ZEDGizmo::MoveProjectionInternal(const ZERNView& View, ZEDGizmoAxis Ax
 			if (ZEPlane::IntersectionTest(AxisPlane, Ray, TRay))
 				return Ray.GetPointOn(TRay);
 			else
-				return GetPosition();
+				return GetWorldPosition();
 		}
 
 		default:
-			return GetPosition();
+			return GetWorldPosition();
 	}
-}
-
-ZEQuaternion ZEDGizmo::RotationProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray)
-{
-	ZEVector2 Replacement;
-	float Displacement = Replacement.Length();
-
-	ZEVector3 RotationAxis;
-	switch (Axis)
-	{
-		default:
-		case ZED_GA_XY_AXIS:
-		case ZED_GA_XZ_AXIS:
-		case ZED_GA_YZ_AXIS:
-		case ZED_GA_XYZ_AXIS:
-		case ZED_GA_NONE:
-			return ZEQuaternion::Identity;
-			break;
-
-		case ZED_GA_X_AXIS:
-			RotationAxis = ZEVector3::UnitX;
-			break;
-
-		case ZED_GA_Y_AXIS:
-			RotationAxis = ZEVector3::UnitY;
-			break;
-
-		case ZED_GA_Z_AXIS:
-			RotationAxis = ZEVector3::UnitZ;
-			break;
-
-		case ZED_GA_SCREEN_AXIS:
-			RotationAxis = View.Rotation * ZEVector3::UnitZ;
-			break;
-	}
-
-	ZEQuaternion Output;
-	ZEQuaternion::CreateFromAngleAxis(Output, Displacement, RotationAxis);
-	return Output;
-}
-
-ZEVector3 ZEDGizmo::ScaleProjectionInternal(const ZERNView& View, ZEDGizmoAxis Axis, const ZERay& Ray)
-{
-	return MoveProjectionInternal(View, Axis, Ray);
 }
 
 ZEDGizmoAxis ZEDGizmo::PickMoveAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
 {
-	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, GetPosition()) * View.ProjectionTransform.M11;
+	const ZEVector3& Position = GetWorldPosition();
+
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
 	float AxisTreshold = AxisLength * 0.1f;
 
 	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
-
-	const ZEVector3& Position = GetPosition();
-
 	ZEVector3 Right, Up, Front;
-	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetRotation());
+	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetWorldRotation());
 	ZEVector3::CrossProduct(Right, Up, Front);
 	ZEVector3::Normalize(Right, Right);
 
 	float NewTRay, TLineSegment;
 
 	// Check Planes
-	ZEPlane AxisXY(Front, Position), AxisXZ(Up, Position), AxisYZ(Right, Position);
-	if (ZEPlane::IntersectionTest(AxisXY, Ray, NewTRay))
+	ZEPlane AxisXY(Front, Position);
+	if (ZEPlane::IntersectionTest(AxisXY, Ray, NewTRay) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
+		ZEVector3 TestPos(AxisXY.p, Ray.GetPointOn(NewTRay));
+		float ProjU  = ZEVector3::DotProduct(TestPos, Right);
+		float ProjV = ZEVector3::DotProduct(TestPos, Up);
+		if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
 		{
-			ZEVector3 TestPos (AxisXY.p, Ray.GetPointOn(NewTRay));
-			float ProjU  = ZEVector3::DotProduct(TestPos, Right);
-			float ProjV = ZEVector3::DotProduct(TestPos, Up);
-			if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
-			{
-				TRay = NewTRay;
-				PickedAxis = ZED_GA_XY_AXIS;
-			}
+			TRay = NewTRay;
+			PickedAxis = ZED_GA_XY_AXIS;
 		}
 	}
 
-	if (ZEPlane::IntersectionTest(AxisXZ, Ray, NewTRay))
+	ZEPlane AxisXZ(Up, Position);
+	if (ZEPlane::IntersectionTest(AxisXZ, Ray, NewTRay) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
+		ZEVector3 TestPos(AxisXZ.p, Ray.GetPointOn(NewTRay));
+		float ProjU  = ZEVector3::DotProduct(TestPos, Right);
+		float ProjV = ZEVector3::DotProduct(TestPos, Front);
+		if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
 		{
-			ZEVector3 TestPos (AxisXZ.p, Ray.GetPointOn(NewTRay));
-			float ProjU  = ZEVector3::DotProduct(TestPos, Right);
-			float ProjV = ZEVector3::DotProduct(TestPos, Front);
-			if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
-			{
-				TRay = NewTRay;
-				PickedAxis = ZED_GA_XZ_AXIS;
-			}
+			TRay = NewTRay;
+			PickedAxis = ZED_GA_XZ_AXIS;
 		}
 	}
 
-	if (ZEPlane::IntersectionTest(AxisYZ, Ray, NewTRay))
+	ZEPlane AxisYZ(Right, Position);
+	if (ZEPlane::IntersectionTest(AxisYZ, Ray, NewTRay) && (NewTRay < TRay))
 	{		
-		if (NewTRay < TRay)
+		ZEVector3 TestPos(AxisYZ.p, Ray.GetPointOn(NewTRay));
+		float ProjU  = ZEVector3::DotProduct(TestPos, Up);
+		float ProjV = ZEVector3::DotProduct(TestPos, Front);
+		if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
 		{
-			ZEVector3 TestPos (AxisYZ.p, Ray.GetPointOn(NewTRay));
-			float ProjU  = ZEVector3::DotProduct(TestPos, Up);
-			float ProjV = ZEVector3::DotProduct(TestPos, Front);
-			if (ProjU > 0.0f && ProjU < AxisLength_2 && ProjV > 0.0f && ProjV < AxisLength_2)
-			{
-				TRay = NewTRay;
-				PickedAxis = ZED_GA_YZ_AXIS;
-			}
+			TRay = NewTRay;
+			PickedAxis = ZED_GA_YZ_AXIS;
 		}
 	}
 
 	// Check Line Segments
-	ZELineSegment XAxis(Position, Position + Right * AxisLength);
-	if (ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay) < AxisTreshold)
+	ZELineSegment XAxis(Position, Position +  1.5f * Right * AxisLength);
+	if ((ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
+		TRay = NewTRay;
+		PickedAxis = ZED_GA_X_AXIS;
+	}
+
+	ZELineSegment YAxis(Position, Position +  1.5f * Up * AxisLength);
+	if ((ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay)) < AxisTreshold && (NewTRay < TRay))
+	{
+		TRay = NewTRay;
+		PickedAxis = ZED_GA_Y_AXIS;
+	}
+
+	ZELineSegment ZAxis(Position, Position +  1.5f * Front * AxisLength);
+	if ((ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
+	{
+		TRay = NewTRay;
+		PickedAxis = ZED_GA_Z_AXIS;
+	}
+	
+	return PickedAxis;
+}
+
+ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
+{
+	const ZEVector3& Position = GetWorldPosition();
+
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
+	float AxisTreshold = AxisLength * 0.1f;
+
+	ZEVector3 Right, Up, Front;
+	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetWorldRotation());
+	ZEVector3::CrossProduct(Right, Up, Front);
+	ZEVector3::Normalize(Right, Right);
+
+	float NewTRay;
+	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
+
+	// X Axis
+	ZEPlane AxisXPlane(Right, Position);
+	if (ZEPlane::IntersectionTest(AxisXPlane, Ray, NewTRay) && (NewTRay < TRay))
+	{
+		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
+		float Distance = ZEVector3::Distance(IntersectionPoint, Position);
+		if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
+			ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.0f)
 		{
 			TRay = NewTRay;
 			PickedAxis = ZED_GA_X_AXIS;
 		}
 	}
-
-	ZELineSegment YAxis(GetPosition(), Position + Up * AxisLength);
-	if (ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay) < AxisTreshold)
+	
+	ZEPlane AxisYPlane(Up, Position);
+	if (ZEPlane::IntersectionTest(AxisYPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
+		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
+		float Distance = ZEVector3::Distance(IntersectionPoint, Position);
+
+		if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
+			ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.0f)
 		{
 			TRay = NewTRay;
 			PickedAxis = ZED_GA_Y_AXIS;
 		}
 	}
-
-	ZELineSegment ZAxis(GetPosition(), Position + Front * AxisLength);
-	if (ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay) < AxisTreshold)
+	
+	ZEPlane AxisZPlane(Front, Position);
+	if (ZEPlane::IntersectionTest(AxisZPlane, Ray, NewTRay) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
+		ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
+		float Distance = ZEVector3::Distance(IntersectionPoint, Position);
+
+		if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold) /* &&
+			ZEVector3::DotProduct(IntersectionPoint.Normalize(), View.Direction) < 0.0f)*/
 		{
 			TRay = NewTRay;
 			PickedAxis = ZED_GA_Z_AXIS;
@@ -878,89 +875,15 @@ ZEDGizmoAxis ZEDGizmo::PickMoveAxis(const ZERNView& View, const ZERay& Ray, floa
 	return PickedAxis;
 }
 
-ZEDGizmoAxis ZEDGizmo::PickRotateAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
-{
-	ZEVector3 CameraPosition = View.Position;
-	ZEVector3 CameraDirection = View.Rotation * ZEVector3::UnitZ;
-
-	float AxisLength = this->AxisLength * ZEVector3::Distance(CameraPosition, GetPosition()) * View.ProjectionTransform.M11;
-	float AxisTreshold = AxisLength * 0.1f;
-
-	const ZEVector3& Position = GetPosition();
-
-	ZEVector3 Right, Up, Front;
-	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetRotation());
-	ZEVector3::CrossProduct(Right, Up, Front);
-	ZEVector3::Normalize(Right, Right);
-
-	float NewTRay;
-	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
-
-	// X Axis
-	ZEPlane AxisXPlane(Right, Position), AxisYPlane(Up, Position), AxisZPlane(Front, Position);
-
-	if (ZEPlane::IntersectionTest(AxisXPlane, Ray, NewTRay))
-	{
-		if (NewTRay < TRay)
-		{
-			ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-
-			float Distance = ZEVector3::Distance(IntersectionPoint, Position);
-
-			if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
-				ZEVector3::DotProduct(IntersectionPoint.Normalize(), CameraDirection) < 0.0f)
-			{
-				TRay = NewTRay;
-				PickedAxis = ZED_GA_X_AXIS;
-			}
-		}
-	}
-	
-	if (ZEPlane::IntersectionTest(AxisYPlane, Ray, NewTRay))
-	{
-		if (NewTRay < TRay)
-		{
-			ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-			float Distance = ZEVector3::Distance(IntersectionPoint, Position);
-
-			if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
-				ZEVector3::DotProduct(IntersectionPoint.Normalize(), CameraDirection) < 0.0f)
-			{
-				TRay = NewTRay;
-				PickedAxis = ZED_GA_Y_AXIS;
-			}
-		}
-	}
-	
-	if (ZEPlane::IntersectionTest(AxisZPlane, Ray, NewTRay))
-	{
-		if (NewTRay < TRay)
-		{
-			ZEVector3 IntersectionPoint = Ray.GetPointOn(NewTRay);
-			float Distance = ZEVector3::Distance(IntersectionPoint, Position);
-
-			if (ZEMath::Abs(Distance - AxisLength) < AxisTreshold &&
-				ZEVector3::DotProduct(IntersectionPoint.Normalize(), CameraDirection) < 0.0f)
-			{
-				TRay = NewTRay;
-				PickedAxis = ZED_GA_Z_AXIS;
-			}
-		}
-	}
-	
-	return PickedAxis;
-}
-
 ZEDGizmoAxis ZEDGizmo::PickScaleAxis(const ZERNView& View, const ZERay& Ray, float& TRay)
 {
-	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, GetPosition()) * View.ProjectionTransform.M11;
+	const ZEVector3& Position = GetWorldPosition();
+
+	float AxisLength = this->AxisLength * ZEVector3::Distance(View.Position, Position) * View.ProjectionTransform.M11;
 	float AxisLength_2 = AxisLength * 0.5f;
 	float AxisTreshold = AxisLength * 0.1f;
 
 	ZEDGizmoAxis PickedAxis = ZED_GA_NONE;
-
-	const ZEVector3& Position = GetPosition();
-
 	ZEVector3 Right, Up, Front;
 	ZEQuaternion::ConvertToLookAndUp(Front, Up, GetRotation());
 	ZEVector3::CrossProduct(Right, Up, Front);
@@ -971,75 +894,57 @@ ZEDGizmoAxis ZEDGizmo::PickScaleAxis(const ZERNView& View, const ZERay& Ray, flo
 	// Check Planes
 	ZETriangle InnerAxisXY(GetWorldTransform() * ZEVector3::Zero, GetWorldTransform() * ZEVector3(AxisLength_2, 0.0f, 0.0f), GetWorldTransform() * ZEVector3(0.0f, AxisLength_2, 0.0f));
 	ZETriangle OuterAxisXY(GetWorldTransform() * ZEVector3::Zero, GetWorldTransform() * ZEVector3(AxisLength * 0.7f, 0.0f, 0.0f), GetWorldTransform() * ZEVector3(0.0f, AxisLength * 0.7f, 0.0f));
-	if (ZETriangle::IntersectionTest(OuterAxisXY, Ray, NewTRay))
+	if (ZETriangle::IntersectionTest(OuterAxisXY, Ray, NewTRay) && (NewTRay < TRay))
 	{	
-		if (NewTRay < TRay)
-		{
-			TRay = NewTRay;
-			if (ZETriangle::IntersectionTest(InnerAxisXY, Ray, NewTRay))
-				PickedAxis = ZED_GA_XYZ_AXIS;
-			else
-				PickedAxis = ZED_GA_XY_AXIS;
-		}
+		TRay = NewTRay;
+		if (ZETriangle::IntersectionTest(InnerAxisXY, Ray, NewTRay))
+			PickedAxis = ZED_GA_XYZ_AXIS;
+		else
+			PickedAxis = ZED_GA_XY_AXIS;
 	}
 
 	ZETriangle InnerAxisXZ(GetWorldTransform() * ZEVector3::Zero, GetWorldTransform() * ZEVector3(AxisLength_2, 0.0f, 0.0f), GetWorldTransform() * ZEVector3(0.0f, 0.0f, AxisLength_2));
 	ZETriangle OuterAxisXZ(GetWorldTransform() * ZEVector3::Zero, GetWorldTransform() * ZEVector3(AxisLength * 0.7f, 0.0f, 0.0f), GetWorldTransform() * ZEVector3(0.0f, 0.0f, AxisLength * 0.7f));
-	if (ZETriangle::IntersectionTest(OuterAxisXZ, Ray, NewTRay))
+	if (ZETriangle::IntersectionTest(OuterAxisXZ, Ray, NewTRay) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
-		{
-			TRay = NewTRay;
-			if (ZETriangle::IntersectionTest(InnerAxisXZ, Ray, NewTRay))
-				PickedAxis = ZED_GA_XYZ_AXIS;
-			else
-				PickedAxis = ZED_GA_XZ_AXIS;
-		}
+		TRay = NewTRay;
+		if (ZETriangle::IntersectionTest(InnerAxisXZ, Ray, NewTRay))
+			PickedAxis = ZED_GA_XYZ_AXIS;
+		else
+			PickedAxis = ZED_GA_XZ_AXIS;
 	}
 
 	ZETriangle InnerAxisYZ(GetWorldTransform() * ZEVector3::Zero, GetWorldTransform() * ZEVector3(0.0f, AxisLength_2, 0.0f), GetWorldTransform() * ZEVector3(0.0f, 0.0f, AxisLength_2));
 	ZETriangle OuterAxisYZ(GetWorldTransform() * ZEVector3::Zero, GetWorldTransform() * ZEVector3(0.0f, AxisLength * 0.7f, 0.0f), GetWorldTransform() * ZEVector3(0.0f, 0.0f, AxisLength * 0.7f));
-	if (ZETriangle::IntersectionTest(OuterAxisYZ, Ray, NewTRay))
+	if (ZETriangle::IntersectionTest(OuterAxisYZ, Ray, NewTRay) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
-		{
-			TRay = NewTRay;
-			if (ZETriangle::IntersectionTest(InnerAxisYZ, Ray, NewTRay))
-				PickedAxis = ZED_GA_XYZ_AXIS;
-			else
-				PickedAxis = ZED_GA_YZ_AXIS;
-		}
+		TRay = NewTRay;
+		if (ZETriangle::IntersectionTest(InnerAxisYZ, Ray, NewTRay))
+			PickedAxis = ZED_GA_XYZ_AXIS;
+		else
+			PickedAxis = ZED_GA_YZ_AXIS;
 	}
 
 	// Check Line Segments
 	ZELineSegment XAxis(Position, Position + Right * AxisLength);
-	if (ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay) < AxisTreshold)
+	if ((ZELineSegment::MinimumDistance(XAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
-		{
-			TRay = NewTRay;
-			PickedAxis = ZED_GA_X_AXIS;
-		}
+		TRay = NewTRay;
+		PickedAxis = ZED_GA_X_AXIS;
 	}
 
-	ZELineSegment YAxis(GetPosition(), Position + Up * AxisLength);
-	if (ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay) < AxisTreshold)
+	ZELineSegment YAxis(Position, Position + Up * AxisLength);
+	if ((ZELineSegment::MinimumDistance(YAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
-		{
-			TRay = NewTRay;
-			PickedAxis = ZED_GA_Y_AXIS;
-		}
+		TRay = NewTRay;
+		PickedAxis = ZED_GA_Y_AXIS;
 	}
 
-	ZELineSegment ZAxis(GetPosition(), Position + Front * AxisLength);
-	if (ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay) < AxisTreshold)
+	ZELineSegment ZAxis(Position, Position + Front * AxisLength);
+	if ((ZELineSegment::MinimumDistance(ZAxis, Ray, TLineSegment, NewTRay) < AxisTreshold) && (NewTRay < TRay))
 	{
-		if (NewTRay < TRay)
-		{
-			TRay = NewTRay;
-			PickedAxis = ZED_GA_Z_AXIS;
-		}
+		TRay = NewTRay;
+		PickedAxis = ZED_GA_Z_AXIS;
 	}
 	
 	return PickedAxis;
@@ -1126,11 +1031,15 @@ bool ZEDGizmo::InitializeSelf()
 
 	MaterialLines = ZERNSimpleMaterial::CreateInstance();
 	MaterialLines->SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	MaterialLines->SetTwoSided(true);
 	MaterialLines->SetDepthTestDisabled(true);
+	MaterialLines->SetStageMask(ZERN_STAGE_FORWARD_POST);
 
 	MaterialTriangles = ZERNSimpleMaterial::CreateInstance();
 	MaterialTriangles->SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+	MaterialTriangles->SetTwoSided(true);
 	MaterialTriangles->SetDepthTestDisabled(true);
+	MaterialTriangles->SetStageMask(ZERN_STAGE_FORWARD_POST);
 
 	RenderCommand.StageMask = MaterialLines->GetStageMask();
 
@@ -1167,12 +1076,15 @@ bool ZEDGizmo::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return true;
 	
-	if (!UpdateGizmo(*Parameters->View))
+	if (!DrawGizmo(*Parameters->View))
 		return false;
 
 	if (!Update())
 		return false;
 	
+	if (!MaterialLines->PreRender(RenderCommand))
+		return false;
+
 	Parameters->Renderer->AddCommand(&RenderCommand);
 	return true;
 }
@@ -1226,33 +1138,102 @@ ZEDGizmoAxis ZEDGizmo::PickAxis(const ZERNView& View, const ZERay& Ray, float& T
 void ZEDGizmo::StartMoveProjection(const ZERNView& View, const ZERay& InitialRay)
 {
 	ZEVector3 PickPosition = MoveProjectionInternal(View, SelectedAxis, InitialRay);
-	MoveDifference = PickPosition - GetPosition();
+	PickOffset = PickPosition - GetWorldPosition();
+	InitialPosition = GetWorldPosition();
 }
 
 ZEVector3 ZEDGizmo::MoveProjection(const ZERNView& View, const ZERay& Ray)
 {
-	return MoveProjectionInternal(View, SelectedAxis, Ray) - MoveDifference;
+	ZEVector3 Translation = MoveProjectionInternal(View, SelectedAxis, Ray) - PickOffset;
+	SetPosition(Translation);
+	return Translation - InitialPosition;
 }
 
-void ZEDGizmo::StartRotationProjection(const ZERNView& View, const ZERay& InitialRay)
+void ZEDGizmo::StartRotationProjection(const ZEQuaternion& InitialRotation)
 {
-	InitialRotation = RotationProjectionInternal(View, SelectedAxis, InitialRay);
+	this->InitialRotation = InitialRotation;
 }
 
-ZEQuaternion ZEDGizmo::RotationProjection(const ZERNView& View, const ZERay& Ray)
+ZEQuaternion ZEDGizmo::RotationProjection(const ZERNView& View, float RotationAmount)
 {
-	return RotationProjectionInternal(View, SelectedAxis, Ray);
+	ZEVector3 RotationAxis;
+	switch (SelectedAxis)
+	{
+		default:
+		case ZED_GA_XY_AXIS:
+		case ZED_GA_XZ_AXIS:
+		case ZED_GA_YZ_AXIS:
+		case ZED_GA_XYZ_AXIS:
+		case ZED_GA_NONE:
+			return ZEQuaternion::Identity;
+			break;
+
+		case ZED_GA_X_AXIS:
+			RotationAxis = ZEVector3::UnitX;
+			break;
+
+		case ZED_GA_Y_AXIS:
+			RotationAxis = ZEVector3::UnitY;
+			break;
+
+		case ZED_GA_Z_AXIS:
+			RotationAxis = ZEVector3::UnitZ;
+			break;
+
+		case ZED_GA_SCREEN_AXIS:
+			RotationAxis = View.Rotation * ZEVector3::UnitZ;
+			break;
+	}
+
+	ZEQuaternion Output;
+	ZEQuaternion::CreateFromAngleAxis(Output, RotationAmount, RotationAxis);
+
+	return Output;
 }
 
-void ZEDGizmo::StartScaleProjection(const ZERNView& View, const ZERay& InitialRay)
+void ZEDGizmo::StartScaleProjection(const ZEVector3& InitialScale)
 {
-	ZEVector3 PickPosition = ScaleProjectionInternal(View, SelectedAxis, InitialRay);
-	MoveDifference = PickPosition - GetPosition();
+	this->InitialScale = InitialScale;
 }
 
-ZEVector3 ZEDGizmo::ScaleProjection(const ZERNView& View, const ZERay& Ray)
+ZEVector3 ZEDGizmo::ScaleProjection(float ScaleAmount)
 {
-	return (ScaleProjectionInternal(View, SelectedAxis, Ray) - MoveDifference);
+	ZEVector3 Scale;
+	switch (SelectedAxis)
+	{
+		default:
+		case ZED_GA_NONE:
+			return ZEVector3::One;
+
+		case ZED_GA_X_AXIS:
+			return ZEVector3(1.0f + ScaleAmount, 1.0f, 1.0f);
+
+		case ZED_GA_Y_AXIS:
+			return ZEVector3(1.0f, 1.0f + ScaleAmount, 1.0f);
+			break;
+
+		case ZED_GA_Z_AXIS:
+			return ZEVector3(1.0f, 1.0f, 1.0f + ScaleAmount);
+			break;
+
+		case ZED_GA_XY_AXIS:
+			return ZEVector3(1.0f + ScaleAmount, 1.0f + ScaleAmount, 1.0f);
+			break;
+
+		case ZED_GA_XZ_AXIS:
+			return ZEVector3(1.0f + ScaleAmount, 1.0f, 1.0f + ScaleAmount);
+			break;
+
+		case ZED_GA_YZ_AXIS:
+			return ZEVector3(1.0f, 1.0f + ScaleAmount, 1.0f + ScaleAmount);
+			break;
+
+		case ZED_GA_XYZ_AXIS:
+			return ZEVector3(1.0f + ScaleAmount, 1.0f + ScaleAmount, 1.0f + ScaleAmount);
+			break;
+	}
+
+	return Scale;
 }
 
 ZEDGizmo::ZEDGizmo()
@@ -1263,11 +1244,9 @@ ZEDGizmo::ZEDGizmo()
 	Mode = ZED_GM_NONE;
 	AxisLength = 0.1f;
 
-	MoveDifference = ZEVector3::Zero;
+	PickOffset = ZEVector3::Zero;
 	InitialRotation = ZEQuaternion::Identity;
 	InitialScale = ZEVector3::One;
-	OldPosition = ZEVector3::Zero;
-	StartScreenPosition = ZEVector2::Zero;
 
 	RenderCommand.Entity = this;
 	RenderCommand.StageMask = ZERN_STAGE_2D;

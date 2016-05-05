@@ -212,22 +212,45 @@ class ZEDViewport;
 
 class ZEDViewportMouseEvent
 {
-	public:
+	friend class ZEDViewport;
+	private:
 		ZEDViewport*				Viewport;
 		ZEDInputEventType			Type;
 		ZEVector2					Delta;
 		ZEVector2					Position;
 		ZEUInt						Modifiers;
 		ZEDInputMouseButton			Button;
+
+	public:
+		ZEDViewport*				GetViewport() const;
+		ZEDInputEventType			GetType() const;
+		const ZEVector2&			GetDelta() const;
+		const ZEVector2&			GetPosition() const;
+		ZEUInt						GetModifiers() const;
+		ZEDInputMouseButton			GetButton() const;
+
+									ZEDViewportMouseEvent();
 };
 
 class ZEDViewportKeyboardEvent
 {
-	public:
+	friend class ZEDViewport;
+	private:
 		ZEDViewport*				Viewport;
 		ZEDInputEventType			Type;
 		ZEDInputKeyboardKey			Key;
 		ZEUInt						Modifiers;
 		ZEUInt						VirtualKey;
 		ZEString					Text;
+
+	public:
+		ZEDViewport*				GetViewport() const;
+		ZEDInputEventType			GetType() const;
+		ZEDInputKeyboardKey			GetKey() const;
+		ZEUInt						GetModifiers() const;
+		ZEUInt						GetVirtualKey() const;
+		const ZEString&				GetText() const;
+
+
+									ZEDViewportKeyboardEvent();
 };

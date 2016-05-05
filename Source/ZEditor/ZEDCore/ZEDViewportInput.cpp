@@ -34,3 +34,82 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDViewportInput.h"
+
+ZEDViewportMouseEvent::ZEDViewportMouseEvent()
+{
+	Viewport = NULL;
+	Type = ZED_ET_NONE;
+	Delta = ZEVector2::Zero;
+	Position = ZEVector2::Zero;
+	Modifiers = ZED_KKM_NONE;
+	Button = ZED_MB_NONE;
+}
+
+ZEDViewport* ZEDViewportMouseEvent::GetViewport() const
+{
+	return Viewport;
+}
+
+ZEDInputEventType ZEDViewportMouseEvent::GetType() const
+{
+	return Type;
+}
+
+const ZEVector2& ZEDViewportMouseEvent::GetDelta() const
+{
+	return Delta;
+}
+
+const ZEVector2& ZEDViewportMouseEvent::GetPosition() const
+{
+	return Position;
+}
+
+ZEUInt ZEDViewportMouseEvent::GetModifiers() const
+{
+	return Modifiers;
+}
+
+ZEDInputMouseButton ZEDViewportMouseEvent::GetButton() const
+{
+	return Button;
+}
+
+ZEDViewportKeyboardEvent::ZEDViewportKeyboardEvent()
+{
+	Viewport = NULL;
+	Type = ZED_ET_NONE;
+	Key = ZED_IKK_KEY_ESCAPE;
+	Modifiers = ZED_KKM_NONE;
+	VirtualKey = 0;
+}
+
+ZEDViewport* ZEDViewportKeyboardEvent::GetViewport() const
+{
+	return Viewport;
+}
+
+ZEDInputEventType ZEDViewportKeyboardEvent::GetType() const
+{
+	return Type;
+}
+
+ZEDInputKeyboardKey ZEDViewportKeyboardEvent::GetKey() const
+{
+	return Key;
+}
+
+ZEUInt ZEDViewportKeyboardEvent::GetModifiers() const
+{
+	return Modifiers;
+}
+
+ZEUInt ZEDViewportKeyboardEvent::GetVirtualKey() const
+{
+	return VirtualKey;
+}
+
+const ZEString& ZEDViewportKeyboardEvent::GetText() const
+{
+	return Text;
+}

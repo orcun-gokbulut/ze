@@ -54,8 +54,8 @@ class ZEDViewportController
 		void						SetMouseSensivity(float Sensivity);
 		float						GetMouseSensivity();
 
-		virtual bool				KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event);
-		virtual bool				MouseEventHandler(const ZEDViewportMouseEvent& Event);
+		virtual bool				KeyboardEvent(const ZEDViewportKeyboardEvent& Event);
+		virtual bool				MouseEvent(const ZEDViewportMouseEvent& Event);
 
 									ZEDViewportController();
 									~ZEDViewportController();

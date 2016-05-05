@@ -81,7 +81,20 @@ class ZERNStageForwardTransparent : public ZERNStageForward
 		virtual ZEInt								GetId() const;
 		virtual const ZEString&						GetName() const;
 
-		ZERNStageForwardTransparent();
+													ZERNStageForwardTransparent();
+
+		static ZEGRRenderState						GetRenderState();
+};
+
+
+class ZERNStageForwardPostHDR : public ZERNStageForward
+{
+	ZE_OBJECT
+	public:
+		virtual ZEInt								GetId() const;
+		virtual const ZEString&						GetName() const;
+
+													ZERNStageForwardPostHDR();
 
 		static ZEGRRenderState						GetRenderState();
 };

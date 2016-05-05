@@ -54,7 +54,7 @@ class ZEDOperation
 		bool						RevertEnabled;
 
 	protected:
-		void						SetText(const char* Text);
+		void						SetText(const ZEString& Text);
 		
 		virtual bool				Apply() = 0;
 		virtual bool				Revert() = 0;

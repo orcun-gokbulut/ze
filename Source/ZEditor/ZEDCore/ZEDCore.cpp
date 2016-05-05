@@ -67,6 +67,7 @@ bool ZEDCore::InitializeSelf()
 
 	zeCore->SetCoreState(ZE_CS_RUNNING);
 
+	TransformationManager->Initialize();
 	if (!EditorModule->Initialize())
 		return false;
 
@@ -76,6 +77,7 @@ bool ZEDCore::InitializeSelf()
 
 void ZEDCore::DeinitializeSelf()
 {
+	TransformationManager->Deinitialize();
 	zeCore->ShutDown();
 }
 

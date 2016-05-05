@@ -50,6 +50,20 @@
 
 class ZEScene;
 
+class ZEDViewportChangedEvent
+{
+	friend ZEDViewport;
+	private:
+		ZERNView*							View;
+		ZERNView*							OldView;
+
+											ZEDViewportChangedEvent();
+
+	public:
+		const ZERNView&						GetView() const;
+		const ZERNView&						GetOldView() const;
+};
+
 class ZEDViewport : public QFrame
 {
 	Q_OBJECT

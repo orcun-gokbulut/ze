@@ -46,6 +46,40 @@
 #include "ZEDTransformationManager.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
 
+ZEDSelectionEvent::ZEDSelectionEvent()
+{
+	Type = ZED_SET_NONE;
+	Selection = NULL;
+	OldSelection = NULL;
+	SelectedObjects = NULL;
+	UnselectedObjects = NULL;
+}
+
+ZEDSelectionEventType ZEDSelectionEvent::GetType() const
+{
+	return Type;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetSelection() const
+{
+	return *Selection;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetOldSelection() const
+{
+	return *OldSelection;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetSelectedObjects() const
+{
+	return *SelectedObjects;
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() const
+{
+	return *UnselectedObjects;
+}
+
 void ZEDSelectionManager::CalculateSelectionPivot()
 {
 	if (Selection.GetCount() == 0)
@@ -100,18 +134,17 @@ void ZEDSelectionManager::CalculateSelectionPivot()
 
 void ZEDSelectionManager::UpdateSelectionGizmo()
 {
-	const ZEMatrix4x4& Pivot = GetSelectionPivot();
+/*	const ZEMatrix4x4& Pivot = GetSelectionPivot();
 	ZEDTransformSpace Space = ZEDTransformationManager::GetInstance()->GetTransformSpace();
 	ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
 
 	Gizmo->SetVisible(Selection.GetCount());
-
 	Gizmo->SetPosition(Pivot.GetTranslation());
 
 	if (Space == ZED_TS_LOCAL && (Gizmo->GetMode() == ZED_GM_MOVE || Gizmo->GetMode() == ZED_GM_HELPER))
 	{
 		Gizmo->SetRotation(Pivot.GetRotation());
-	}
+	}*/
 }
 
 ZEDModule* ZEDSelectionManager::GetModule()
@@ -138,10 +171,56 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 			return;
 	}
 
+	if (Selection.Exists(Object))
+		return;
+
+	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelectedObjects();
+
 	Object->SetSelected(true);
 	Selection.Add(Object);
 
-	//UpdateSelectionGizmo();
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+	SelectedObjects.Add(Object);
+
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_SELECTED;
+	Event.Selection = &Selection;
+	Event.OldSelection = &OldSelection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &UnselectedObjects;
+
+	GetModule()->SelectionEvent(Event);
+}
+
+void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Objects)
+{
+	ZEArray<ZEDObjectWrapper*> OldSelection = Selection;
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+
+	for (ZESize I = 0; I < Objects.GetCount(); I++)
+	{
+		if (Objects[I] == NULL)
+			continue;
+
+		if (Selection.Exists(Objects[I]))
+			continue;;
+
+		Objects[I]->SetSelected(true);
+		SelectedObjects.Add(Objects[I]);
+		Selection.Add(Objects[I]);
+	}
+
+
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_SELECTED;
+	Event.Selection = &Selection;
+	Event.OldSelection = &OldSelection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &UnselectedObjects;
+
+	GetModule()->SelectionEvent(Event);
 }
 
 /*
@@ -268,18 +347,76 @@ void ZEDSelectionManager::SelectObject(ZESize Id)
 
 void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 {
-	if (Object == NULL)
-		return;
-
 	if (!Selection.Exists(Object))
 		return;
 
 	Object->SetSelected(false);
 	Selection.RemoveValue(Object);
 
-	//UpdateSelectionGizmo();
+	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelectedObjects();
+
+	Object->SetSelected(true);
+	Selection.Add(Object);
+
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+	UnselectedObjects.Add(Object);
+
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_DESELECTED;
+	Event.Selection = &Selection;
+	Event.OldSelection = &OldSelection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &UnselectedObjects;
+
+	GetModule()->SelectionEvent(Event);
 }
 
+void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Objects)
+{
+	ZEArray<ZEDObjectWrapper*> OldSelection = Selection;
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+
+	for (ZESize I = 0; I < Objects.GetCount(); I++)
+	{
+		if (!Selection.Exists(Objects[I]))
+			continue;
+
+		Objects[I]->SetSelected(false);
+		UnselectedObjects.Add(Objects[I]);
+		Selection.Remove(I);
+	}
+
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_DESELECTED;
+	Event.Selection = &Selection;
+	Event.OldSelection = &OldSelection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &UnselectedObjects;
+
+	GetModule()->SelectionEvent(Event);
+}
+
+void ZEDSelectionManager::ClearSelection()
+{
+	ZEArray<ZEDObjectWrapper*> OldSelection = Selection;
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+
+	for (ZESize I = 0; I < Selection.GetCount(); I++)
+		Selection[I]->SetSelected(false);
+
+	Selection.Clear();
+
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_DESELECTED;
+	Event.Selection = &Selection;
+	Event.OldSelection = &OldSelection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &OldSelection;
+
+	GetModule()->SelectionEvent(Event);
+}
 /*
 void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
 {
@@ -374,16 +511,6 @@ void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& 
 }
 */
 
-void ZEDSelectionManager::ClearSelection()
-{
-	for (ZESize I = 0; I < Selection.GetCount(); I++)
-		Selection[I]->SetSelected(false);
-
-	Selection.Clear();
-	SelectionPivot = ZEMatrix4x4::Zero;
-	UpdateSelectionGizmo();
-}
-
 void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)
 {
 	Filter = Class;
@@ -418,24 +545,23 @@ const ZEMatrix4x4& ZEDSelectionManager::GetSelectionPivot()
 	return SelectionPivot;
 }
 
-
-bool ZEDSelectionManager::KeyboardEventHandler(const ZEDViewportKeyboardEvent& Event)
+bool ZEDSelectionManager::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
 {
 	return false;
 }
 
-bool ZEDSelectionManager::MouseEventHandler(const ZEDViewportMouseEvent& Event)
+bool ZEDSelectionManager::MouseEvent(const ZEDViewportMouseEvent& Event)
 {
-	if (Event.Button != ZED_MB_LEFT)
+	if (Event.GetButton() != ZED_MB_LEFT)
 		return false;
 
-	if (Event.Type == ZED_ET_BUTTON_PRESSED)
+	if (Event.GetType() == ZED_ET_BUTTON_PRESSED)
 	{
-		SelectionStartPosition = Event.Position;
+		SelectionStartPosition = Event.GetPosition();
 
 		// Single Selection	
 		ZERayCastParameters Parameters;
-		Parameters.Ray = ZERNScreenUtilities::ScreenToWorld(Event.Viewport->GetView(), Event.Position);
+		Parameters.Ray = ZERNScreenUtilities::ScreenToWorld(Event.GetViewport()->GetView(), Event.GetPosition());
 
 		ZERayCastReport Report;
 		Report.SetParameters(&Parameters);
@@ -443,11 +569,11 @@ bool ZEDSelectionManager::MouseEventHandler(const ZEDViewportMouseEvent& Event)
 		GetModule()->GetRootWrapper()->RayCast(Report, Parameters);	
 		if (Report.GetResult())
 		{
-			if ((Event.Modifiers & ZED_KKM_CTRL) != 0 || (Event.Modifiers & ZED_KKM_SHIFT) != 0)
+			if ((Event.GetModifiers() & ZED_KKM_CTRL) != 0 || (Event.GetModifiers() & ZED_KKM_SHIFT) != 0)
 			{
 				SelectObject(static_cast<ZEEntity*>(Report.GetCollision().Object)->GetWrapper());
 			}
-			else if (Event.Modifiers & ZED_KKM_ALT)
+			else if (Event.GetModifiers() & ZED_KKM_ALT)
 			{
 				DeselectObject(static_cast<ZEEntity*>(Report.GetCollision().Object)->GetWrapper());
 			}
@@ -462,15 +588,17 @@ bool ZEDSelectionManager::MouseEventHandler(const ZEDViewportMouseEvent& Event)
 			ClearSelection();
 		}
 
+		return true;
 	}
-	else if (Event.Type == ZED_ET_BUTTON_PRESSED)
+	else if (Event.GetType() == ZED_ET_BUTTON_PRESSED)
 	{
-		if (SelectionStartPosition - Event.Position == ZEVector2::Zero)
+		if (SelectionStartPosition - Event.GetPosition() == ZEVector2::Zero)
 		{
 		}
 	}
 
-	return true;
+
+	return false;
 }
 
 void ZEDSelectionManager::Destroy()

@@ -45,6 +45,11 @@
 #include "ZEDCore/ZEDGizmo.h"
 #include "ZEMath/ZEAngle.h"
 
+void ZEDMainEditor::closeEvent(QCloseEvent* Event)
+{
+	actExit_onTriggered();
+}
+
 bool ZEDMainEditor::InitializeSelf()
 {
 	if (!Core->Initialize())
@@ -65,6 +70,7 @@ bool ZEDMainEditor::InitializeSelf()
 	connect(ui->actScale, SIGNAL(triggered(bool)), this, SLOT(actScale_onTriggered()));
 	connect(ui->actUndo, SIGNAL(triggered(bool)), this, SLOT(actUndo_onTriggered()));
 	connect(ui->actRedo, SIGNAL(triggered(bool)), this, SLOT(actRedo_onTriggered()));
+
 	//connect(MainTimer, SIGNAL(timeout()), this, SLOT(MainTimer_onTimeout()));
 	//MainTimer->start();
 	
@@ -106,7 +112,7 @@ void ZEDMainEditor::actSaveAs_onTriggered()
 
 void ZEDMainEditor::actExit_onTriggered()
 {
-	qApp->quit();
+	exit(0);
 }
 
 void ZEDMainEditor::actUndo_onTriggered()
@@ -140,7 +146,7 @@ void ZEDMainEditor::actSelect_onTriggered()
 	if(!ui->actSelect->isChecked())
 		ui->actSelect->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_HELPER);
+	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_NONE);
 }
 
 void ZEDMainEditor::actMove_onTriggered()
@@ -152,7 +158,7 @@ void ZEDMainEditor::actMove_onTriggered()
 	if(!ui->actMove->isChecked())
 		ui->actMove->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_MOVE);
+	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_TRANSLATE);
 }
 
 void ZEDMainEditor::actRotate_onTriggered()
@@ -164,7 +170,7 @@ void ZEDMainEditor::actRotate_onTriggered()
 	if(!ui->actRotate->isChecked())
 		ui->actRotate->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_ROTATE);
+	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_ROTATE);
 }
 
 void ZEDMainEditor::actScale_onTriggered()
@@ -176,7 +182,7 @@ void ZEDMainEditor::actScale_onTriggered()
 	if(!ui->actScale->isChecked())
 		ui->actScale->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->GetGizmo()->SetMode(ZED_GM_SCALE);
+	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_SCALE);
 }
 
 void ZEDMainEditor::MainTimer_onTimeout()

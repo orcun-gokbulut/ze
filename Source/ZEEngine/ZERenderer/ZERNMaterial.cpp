@@ -36,6 +36,7 @@
 #include "ZERNMaterial.h"
 
 #include "ZERNStage.h"
+#include "ZERNCommand.h"
 #include "ZEGraphics/ZEGRContext.h"
 
 ZERNMaterial::ZERNMaterial()
@@ -46,6 +47,12 @@ ZERNMaterial::ZERNMaterial()
 ZERNMaterial::~ZERNMaterial()
 {
 
+}
+
+bool ZERNMaterial::PreRender(ZERNCommand& Command)
+{
+	Command.StageMask = GetStageMask();
+	return true;
 }
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
