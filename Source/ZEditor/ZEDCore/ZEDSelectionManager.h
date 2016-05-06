@@ -41,26 +41,19 @@
 
 #include "ZEDViewportInput.h"
 
-enum ZEDSelectionPivotMode
-{
-	ZED_SCM_ENTITY_PIVOT,
-	ZED_SCM_SELECTION_CENTER,
-	ZED_SCM_SPACE_CENTER
-};
-
 enum ZEDSelectionShape
 {
 	ZED_SS_NONE,
-	ZED_SS_RAY,
-	ZED_SS_BOX,
-	ZED_SS_CIRCLE
+	ZED_SS_RECTANGLE,
+	ZED_SS_CIRCLE,
+	ZED_SS_BRUSH
 };
 
 enum ZEDSelectionMode
 {
-	ZE_SS_NODE,
-	ZE_SS_FULLY_INSIDE,
-	ZE_SS_PARTIALY_INSIDE
+	ZE_SM_NONE,
+	ZE_SM_FULLY_INSIDE,
+	ZE_SM_PARTIALY_INSIDE
 };
 
 class ZEObject;
@@ -102,35 +95,34 @@ class ZEDSelectionManager
 	private:
 		ZEDModule*							Module;
 		ZEArray<ZEDObjectWrapper*>			Selection;
-		ZEDSelectionPivotMode				PivotMode;
-		ZEMatrix4x4							SelectionPivot;
+		ZEDSelectionMode					SelectionMode;
+		ZEDSelectionShape					SelectionShape;
 		ZEClass*							Filter;
-		
 		ZEVector2							SelectionStartPosition;
 
-		void								CalculateSelectionPivot();
-		
+		bool								FilterSelection(ZEObject* Object, void* Class);
+
 											ZEDSelectionManager();
+											~ZEDSelectionManager();
 
 	public:
 		ZEDModule*							GetModule();
 
-		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects();
+		void								SetSelectionMode(ZEDSelectionMode Mode);
+		ZEDSelectionMode					GetSelectionMode();
 
+		void								SetSelectionShape(ZEDSelectionShape Shape);
+		ZEDSelectionShape					GetSelectionShape();
+
+		void								SetSelectionFilter(ZEClass* Class);
+		ZEClass*							GetSelectionFilter();
+		
+		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects();
 		void								SelectObject(ZEDObjectWrapper* Object);
 		void								SelectObjects(const ZEArray<ZEDObjectWrapper*>& Objects);
 		void								DeselectObject(ZEDObjectWrapper* Object);
 		void								DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Object);
 		void								ClearSelection();
-
-		void								SetSelectionFilter(ZEClass* Class);
-		ZEClass*							GetSelectionFilter();
-		bool								FilterSelection(ZEObject* Object, void* Class);
-
-		void								SetSelectionPivotMode(ZEDSelectionPivotMode Mode);
-		ZEDSelectionPivotMode				GetSelectionPivotMode();
-		const ZEMatrix4x4&					GetSelectionPivot();
-		void								UpdateSelectionGizmo();
 
 		bool								KeyboardEvent(const ZEDViewportKeyboardEvent& Event);
 		bool								MouseEvent(const ZEDViewportMouseEvent& Event);

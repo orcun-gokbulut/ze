@@ -43,7 +43,7 @@
 
 
 // ZERayCastParameters
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 ZERayCastParameters::ZERayCastParameters()
 {
@@ -104,7 +104,7 @@ bool ZERayCastParameters::Filter(ZEObject* Object) const
 
 
 // ZERayCastCollision
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 ZERayCastCollision::ZERayCastCollision()
 {
@@ -124,13 +124,14 @@ ZERayCastCollision::ZERayCastCollision()
 
 
 // ZERayCastReport
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 ZERayCastReport::ZERayCastReport()
 {
 	Parameters = NULL;
 	MinimumDistance = ZE_FLOAT_MAX;
 	MaximumDistance = ZE_FLOAT_MIN;
+	ModifierParameter = NULL;
 }
 
 bool ZERayCastReport::GetResult() const
@@ -193,27 +194,28 @@ void ZERayCastReport::AddCollision(const ZERayCastCollision& NewCollision)
 	if (NewCollision.Type == ZE_RCCT_NONE)
 		return;
 
-	if (!ModifierFunction.IsNull())
-	{
-		if (!ModifierFunction(Collision, ModifierParameter))
-			return;
-	}
-
 	if (Collision.Type == ZE_RCCT_NONE)
 	{
 		Collision = NewCollision;
+		ModifierFunction.CheckAndCall(Collision, ModifierParameter);
 		MinimumDistance = Collision.Distance;
 		MaximumDistance = Collision.Distance;
 	}
 	else if (Parameters->Match == ZE_RCM_NEAREST)
 	{
 		if (NewCollision.Distance < MinimumDistance)
+		{
 			Collision = NewCollision;
+			ModifierFunction.CheckAndCall(Collision, ModifierParameter);
+		}
 	}
 	else if (Parameters->Match == ZE_RCM_FURTHEST)
 	{
 		if (Collision.Distance > MaximumDistance)
+		{
 			Collision = NewCollision;
+			ModifierFunction.CheckAndCall(Collision, ModifierParameter);
+		}
 	}
 
 	if (Collision.Distance < MinimumDistance)
@@ -231,6 +233,7 @@ void ZERayCastReport::AddCollision(const ZERayCastCollision& NewCollision)
 				if (NewCollision.Distance < Collisions[I].Distance)
 				{
 					Collisions.Insert(I, NewCollision);
+					ModifierFunction.CheckAndCall(Collisions[I], ModifierParameter);
 					return;
 				}
 			}
@@ -242,12 +245,14 @@ void ZERayCastReport::AddCollision(const ZERayCastCollision& NewCollision)
 				if (NewCollision.Distance > Collisions[I].Distance)
 				{
 					Collisions.Insert(I, NewCollision);
+					ModifierFunction.CheckAndCall(Collisions[I], ModifierParameter);
 					return;
 				}
 			}
 		}
 
 		Collisions.Add(NewCollision);
+		ModifierFunction.CheckAndCall(Collisions.GetLastItem(), ModifierParameter);
 	}
 }
 
@@ -280,7 +285,7 @@ bool ZERayCastReport::CheckDone() const
 
 
 // ZERayCastHelper
-//////////////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////////////////////
 
 void ZERayCastHelper::InitializeCollision(ZERayCastCollision& Collision, float RayT) const
 {

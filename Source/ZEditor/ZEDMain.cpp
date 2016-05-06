@@ -37,7 +37,7 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include "ZETypes.h"
-#include "ZEDSceneEditor/ZEDMainEditor.h"
+#include "ZEDSceneEditor/ZEDMainWindow.h"
 
 #include <windows.h>
 #include <QApplication>
@@ -52,7 +52,7 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	QApplication Application(argc, argv);
 	//Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
 
-	ZEDMainEditor Editor;
+	ZEDMainWindow Editor;
 	Editor.show();
 
 	if (!ZEDCore::GetInstance()->Initialize())

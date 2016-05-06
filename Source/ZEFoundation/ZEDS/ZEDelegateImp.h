@@ -132,6 +132,14 @@ class ZEDelegate<TReturn (ZE_TEMPLATE_ARGUMENTS)>
 			return IsNull();
 		}
 
+		void CheckAndCall(ZE_ARGUMENT_DEFINITIONS) const
+		{
+			if (IsNull())
+				return;
+
+			(*(TReturn (*)(void* ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENTS))Wrapper)(Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENTS);
+		}
+
 		TReturn Call(ZE_ARGUMENT_DEFINITIONS) const
 		{
 			return (*(TReturn (*)(void* ZE_ARGUMENT_SEPERATOR ZE_TEMPLATE_ARGUMENTS))Wrapper)(Object ZE_ARGUMENT_SEPERATOR ZE_ARGUMENTS);

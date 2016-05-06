@@ -48,6 +48,10 @@
 #include "ZERenderer\ZERNScreenUtilities.h"
 #include "ZERenderer\ZERNRenderParameters.h"
 
+
+// ZEDTransformationState
+//////////////////////////////////////////////////////////////////////////////////////
+
 ZEDTransformationState::ZEDTransformationState()
 {
 	Wrapper = NULL;
@@ -66,6 +70,10 @@ ZEDTransformationState::~ZEDTransformationState()
 		Gizmo = NULL;
 	}
 }
+
+
+// ZEDTransformationManager
+//////////////////////////////////////////////////////////////////////////////////////
 
 void ZEDTransformationManager::UpdateGizmos()
 {
@@ -205,6 +213,125 @@ void ZEDTransformationManager::DeinitializeSelf()
 	ZEInitializable::DeinitializeSelf();
 }
 
+
+void ZEDTransformationManager::StartTransform(ZEDGizmo* TransformGizmo)
+{
+	TransformActive = true;
+	this->TransformGizmo = TransformGizmo;
+}
+
+void ZEDTransformationManager::ResetTransform()
+{
+	if (!TransformActive)
+		return;
+
+	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	{
+		ZEDTransformationState& TransformState = TransformStates[I];
+		switch (TransformType)
+		{
+		case ZED_TT_TRANSLATE:
+			TransformState.Wrapper->SetPosition(TransformState.OriginalPosition);
+			break;
+
+		case ZED_TT_ROTATE:
+			TransformState.Wrapper->SetRotation(TransformState.OriginalRotation);
+			break;
+
+		case ZED_TT_SCALE:
+			TransformState.Wrapper->SetScale(TransformState.OriginalScale);
+			break;
+		}
+	}
+
+	TransformGizmo = NULL;
+	TransformActive = false;
+}
+
+void ZEDTransformationManager::ApplyTranslation(const ZEVector3& Translation)
+{
+	if (!TransformActive)
+		return;
+
+	if (TransformType != ZED_TT_TRANSLATE)
+		return;
+
+	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	{
+		ZEDTransformationState& TransformState = TransformStates[I];
+		TransformState.Wrapper->SetPosition(TransformState.OriginalPosition + Translation);
+	}
+
+	UpdateGizmos();
+}
+
+void ZEDTransformationManager::ApplyRotation(const ZEQuaternion& Rotation)
+{
+	if (!TransformActive)
+		return;
+
+	if (TransformType != ZED_TT_ROTATE)
+		return;
+
+	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	{
+		ZEDTransformationState& TransformState = TransformStates[I];
+
+		ZEVector3 Position;
+		ZEQuaternion::VectorProduct(Position, Rotation, TransformState.OriginalPosition - TransformState.Pivot);
+		Position += TransformState.Pivot;
+		TransformState.Wrapper->SetPosition(Position);
+
+		TransformState.Wrapper->SetRotation(Rotation * TransformState.OriginalRotation);
+	}
+}
+
+void ZEDTransformationManager::ApplyScale(const ZEVector3& Scale)
+{
+	if (!TransformActive)
+		return;
+
+	if (TransformType != ZED_TT_SCALE)
+		return;
+
+	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	{
+		ZEDTransformationState& TransformState = TransformStates[I];
+
+		ZEVector3 Position;
+		ZEVector3::Multiply(Position, Scale, TransformState.OriginalPosition - TransformState.Pivot);
+		Position += TransformState.Pivot;
+		TransformState.Wrapper->SetPosition(Position);
+
+		TransformState.Wrapper->SetScale(Scale * TransformState.OriginalScale);
+	}
+}
+
+void ZEDTransformationManager::EndTransform()
+{
+	if (!TransformActive)
+		return;
+
+	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
+	ZEMatrix4x4 Transform;
+
+	ZEDTransformationOperation* Operation = new ZEDTransformationOperation(TransformType, TransformStates);
+	Operation->SetApplyEnabled(false);
+	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	Operation->SetApplyEnabled(true);
+
+	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	{
+		ZEDTransformationState& TransformState = TransformStates[I];
+		TransformState.OriginalPosition = TransformState.Wrapper->GetPosition();
+		TransformState.OriginalRotation = TransformState.Wrapper->GetRotation();
+		TransformState.OriginalScale = TransformState.Wrapper->GetScale();
+	}
+
+	TransformGizmo = NULL;
+	TransformActive = false;
+}
+
 ZEDTransformationManager::ZEDTransformationManager()
 {
 	Module = NULL;
@@ -265,121 +392,34 @@ ZEDTransformPivot ZEDTransformationManager::GetTransformPivot()
 	return TransformPivot;
 }
 
-void ZEDTransformationManager::StartTransform(ZEDGizmo* TransformGizmo)
+void ZEDTransformationManager::SetX(float Value)
 {
-	TransformActive = true;
-	this->TransformGizmo = TransformGizmo;
+
 }
 
-void ZEDTransformationManager::ResetTransform()
+float ZEDTransformationManager::GetX()
 {
-	if (!TransformActive)
-		return;
-
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-	{
-		ZEDTransformationState& TransformState = TransformStates[I];
-		switch (TransformType)
-		{
-			case ZED_TT_TRANSLATE:
-				TransformState.Wrapper->SetPosition(TransformState.OriginalPosition);
-				break;
-
-			case ZED_TT_ROTATE:
-				TransformState.Wrapper->SetRotation(TransformState.OriginalRotation);
-				break;
-
-			case ZED_TT_SCALE:
-				TransformState.Wrapper->SetScale(TransformState.OriginalScale);
-				break;
-		}
-	}
-
-	TransformGizmo = NULL;
-	TransformActive = false;
+	return 0.0f;
 }
 
-void ZEDTransformationManager::ApplyTranslation(const ZEVector3& Translation)
+void ZEDTransformationManager::SetY(float Value)
 {
-	if (!TransformActive)
-		return;
 
-	if (TransformType != ZED_TT_TRANSLATE)
-		return;
-
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-	{
-		ZEDTransformationState& TransformState = TransformStates[I];
-		TransformState.Wrapper->SetPosition(TransformState.OriginalPosition + Translation);
-	}
 }
 
-void ZEDTransformationManager::ApplyRotation(const ZEQuaternion& Rotation)
+float ZEDTransformationManager::GetY()
 {
-	if (!TransformActive)
-		return;
-	
-	if (TransformType != ZED_TT_ROTATE)
-		return;
-
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-	{
-		ZEDTransformationState& TransformState = TransformStates[I];
-		ZEVector3 Position;
-		ZEQuaternion::VectorProduct(Position, Rotation, TransformState.OriginalPosition - TransformState.Pivot);
-		Position += TransformState.Pivot;
-		TransformState.Wrapper->SetPosition(Position);
-		TransformState.Wrapper->SetRotation(Rotation * TransformState.OriginalRotation);
-	}
+	return 0.0f;
 }
 
-void ZEDTransformationManager::ApplyScale(const ZEVector3& Scale)
+void ZEDTransformationManager::SetZ(float Value)
 {
-	if (!TransformActive)
-		return;
 
-	if (TransformType != ZED_TT_SCALE)
-		return;
-
-	if (!TransformActive)
-		return;
-
-	if (TransformType != ZED_TT_ROTATE)
-		return;
-
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-	{
-		ZEDTransformationState& TransformState = TransformStates[I];
-		ZEVector3 Position;
-		Position = Scale * (TransformState.OriginalPosition - TransformState.Pivot) + TransformState.Pivot;
-		TransformState.Wrapper->SetPosition(Position);
-		TransformState.Wrapper->SetScale(Scale);
-	}
 }
 
-void ZEDTransformationManager::EndTransform()
+float ZEDTransformationManager::GetZ()
 {
-	if (!TransformActive)
-		return;
-
-	ZEDSelectionManager* SelectionManager = ZEDSelectionManager::GetInstance();
-	ZEMatrix4x4 Transform;
-	
-	ZEDTransformationOperation* Operation = new ZEDTransformationOperation(TransformType, TransformStates);
-	Operation->SetApplyEnabled(false);
-	ZEDOperationManager::GetInstance()->DoOperation(Operation);
-	Operation->SetApplyEnabled(true);
-
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-	{
-		ZEDTransformationState& TransformState = TransformStates[I];
-		TransformState.OriginalPosition = TransformState.Wrapper->GetPosition();
-		TransformState.OriginalRotation = TransformState.Wrapper->GetRotation();
-		TransformState.OriginalScale = TransformState.Wrapper->GetScale();
-	}
-
-	TransformGizmo = NULL;
-	TransformActive = false;
+	return 0.0f;
 }
 
 void ZEDTransformationManager::SelectionEvent(const ZEDSelectionEvent& Event)
@@ -490,7 +530,8 @@ bool ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent& E
 		}
 		else if (GetTransformType() == ZED_TT_ROTATE)
 		{
-			float MouseDisplacement = MouseStartPosition.x - Event.GetPosition().x;
+
+			float MouseDisplacement = (MouseStartPosition - Event.GetPosition()).x;
 
 			ZEQuaternion NewOrientation = TransformGizmo->RotationProjection(View, MouseDisplacement * 0.01f);
 			ApplyRotation(NewOrientation);
@@ -499,7 +540,7 @@ bool ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent& E
 		}
 		else if (GetTransformType() == ZED_TT_SCALE)
 		{
-			float MouseDisplacement = MouseStartPosition.x - Event.GetPosition().x;
+			float MouseDisplacement = (MouseStartPosition - Event.GetPosition()).x;
 
 			ZEVector3 NewScale = TransformGizmo->ScaleProjection(MouseDisplacement * 0.001f);
 			ApplyScale(NewScale);

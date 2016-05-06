@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMainEditor.h
+ Zinek Engine - ZEDTransformationManagerToolbar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,73 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include <QToolBar>
 
-#include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDViewport.h"
+class ZEDTransformationManager;
+class Ui_ZEDTransformManagerToolbar;
 
-#include <QMainWindow>
-#include <QTimer>
-
-namespace Ui {class MainEditor;}
-class ZEDMainBrowser;
-
-class ZEDMainEditor : public QMainWindow
+class ZEDTransformationManagerToolbar : public QToolBar
 {
 	Q_OBJECT
 	private:
-		Ui::MainEditor*						ui;
-		ZEDCore*							Core;
-		ZEDViewport*						MainViewPort;
-		QTimer*								MainTimer;
-		ZEDMainBrowser*						Browser;
+		Ui_ZEDTransformManagerToolbar*		Form;
+		ZEDTransformationManager*			TransformationManager;
 
-		void								closeEvent(QCloseEvent* Event);
-
-		bool								InitializeSelf();
-		void								DeinitializeSelf();
+		void								UpdateUI();
 
 	private slots:
-		//File Menu Actions
-		void								actNew_onTriggered();
-		void								actOpen_onTriggered();
-		void								actClose_onTriggered();
-		void								actSave_onTriggered();
-		void								actSaveAs_onTriggered();
-		void								actExit_onTriggered();
-		//Edit Menu Actions
- 		void								actUndo_onTriggered();
- 		void								actRedo_onTriggered();
- 		void								actClone_onTriggered();
- 		void								actDelete_onTriggered();
-		//Operations Menu Actions
- 		void								actSelect_onTriggered();
- 		void								actMove_onTriggered();
- 		void								actRotate_onTriggered();
- 		void								actScale_onTriggered();
-// 		void								actHide_onTriggered();
-// 		void								actUnhide_onTriggered();
-// 		void								actFreeze_onTriggered();
-// 		void								actUnfreeze_onTriggered();
-// 		void								actGoToEntity_onTriggered();
+		void								btnSelect_clicked();
+		void								btnMove_clicked();
+		void								btnRotate_clicked();
+		void								btnScale_clicked();
+		void								cmbSpace_currentIndexChanged(const QString & text);
+		void								cmbPivot_currentIndexChanged(const QString & text);
+		void								txtX_valueChanged(double d);
+		void								txtY_valueChanged(double d);
+		void								txtZ_valueChanged(double d);
 
-		void								MainTimer_onTimeout();
-
-// 		virtual void						OnSelected();
-// 		virtual void						OnDeselected();
-// 		virtual void						OnCreated();
-// 		virtual void						OnDestroy();
-// 		virtual void						OnTransformed();
-// 		virtual void						OnChildObjectChanged();
-// 		virtual void						OnParentObjectChanged();
-// 		virtual void						OnOpenContainer();
-// 		virtual void						OnCloseContainer();
-// 		virtual void						Save();
-// 		virtual void						Load();
-		
 	public:
-		ZEDMainBrowser*						GetBrowser();
+		void								SetTransformManager(ZEDTransformationManager* Manager);
+		ZEDTransformationManager*			GetTransformManager();
 
-											ZEDMainEditor(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
-											~ZEDMainEditor();
+											ZEDTransformationManagerToolbar(QWidget* Parent = NULL);
+											~ZEDTransformationManagerToolbar();
 };

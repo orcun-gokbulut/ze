@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportInput.cpp
+ Zinek Engine - ZEDSelectionManagerToolbar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,91 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDViewportInput.h"
+#include <QToolBar>
 
+class ZEDSelectionManager;
+class Ui_ZEDSelectionManagerToolbar;
 
-// ZEDInputMouseButton
-//////////////////////////////////////////////////////////////////////////////////////
-
-ZEDViewportMouseEvent::ZEDViewportMouseEvent()
+class ZEDSelectionManagerToolbar : public QToolBar
 {
-	Viewport = NULL;
-	Type = ZED_ET_NONE;
-	Delta = ZEVector2::Zero;
-	Position = ZEVector2::Zero;
-	Modifiers = ZED_KKM_NONE;
-	Button = ZED_MB_NONE;
-}
+	Q_OBJECT
+	private:
+		Ui_ZEDSelectionManagerToolbar*		Form;
+		ZEDSelectionManager*				SelectionManager;
 
-ZEDViewport* ZEDViewportMouseEvent::GetViewport() const
-{
-	return Viewport;
-}
+		void								UpdateUI();
 
-ZEDInputEventType ZEDViewportMouseEvent::GetType() const
-{
-	return Type;
-}
+	private slots:
+		void								btnSelectionList_clicked();
+		void								cmbShape_currentIndexChanged(const QString & text);
+		void								cmbMode_currentIndexChanged(const QString & text);
+		void								btnFreeze_clicked();
+		void								btnUnfreezeAll_clicked();
 
-const ZEVector2& ZEDViewportMouseEvent::GetDelta() const
-{
-	return Delta;
-}
+	public:
+		void								SetSelectionManager(ZEDSelectionManager* Manager);
+		ZEDSelectionManager*				GetSelectionManager();
 
-const ZEVector2& ZEDViewportMouseEvent::GetPosition() const
-{
-	return Position;
-}
-
-ZEUInt ZEDViewportMouseEvent::GetModifiers() const
-{
-	return Modifiers;
-}
-
-ZEDInputMouseButton ZEDViewportMouseEvent::GetButton() const
-{
-	return Button;
-}
-
-
-// ZEDViewportKeyboardEvent
-//////////////////////////////////////////////////////////////////////////////////////
-
-ZEDViewportKeyboardEvent::ZEDViewportKeyboardEvent()
-{
-	Viewport = NULL;
-	Type = ZED_ET_NONE;
-	Key = ZED_IKK_KEY_ESCAPE;
-	Modifiers = ZED_KKM_NONE;
-	VirtualKey = 0;
-}
-
-ZEDViewport* ZEDViewportKeyboardEvent::GetViewport() const
-{
-	return Viewport;
-}
-
-ZEDInputEventType ZEDViewportKeyboardEvent::GetType() const
-{
-	return Type;
-}
-
-ZEDInputKeyboardKey ZEDViewportKeyboardEvent::GetKey() const
-{
-	return Key;
-}
-
-ZEUInt ZEDViewportKeyboardEvent::GetModifiers() const
-{
-	return Modifiers;
-}
-
-ZEUInt ZEDViewportKeyboardEvent::GetVirtualKey() const
-{
-	return VirtualKey;
-}
-
-const ZEString& ZEDViewportKeyboardEvent::GetText() const
-{
-	return Text;
-}
+											ZEDSelectionManagerToolbar(QWidget* Parent = NULL);
+											~ZEDSelectionManagerToolbar();
+};

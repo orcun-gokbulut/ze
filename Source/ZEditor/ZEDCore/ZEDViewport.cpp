@@ -233,7 +233,8 @@ void ZEDViewport::mousePressEvent(QMouseEvent* Event)
 {
 	ZEDViewportMouseEvent MouseEvent;
 	MouseEvent.Viewport = this;
-	MouseEvent.Position = LastMousePosition;
+	MouseEvent.Position.x = Event->pos().x();// = LastMousePosition;
+	MouseEvent.Position.y = Event->pos().y();
 	MouseEvent.Delta = ZEVector2::Zero;
 	MouseEvent.Button = (ZEDInputMouseButton)Event->button();
 	MouseEvent.Modifiers = Modifiers;
@@ -401,7 +402,6 @@ void ZEDViewport::resizeEvent(QResizeEvent* Event)
 
 void ZEDViewport::focusInEvent(QFocusEvent* Event)
 {
-	setMouseTracking(true);
 	QFrame::focusInEvent(Event);
 }
 
@@ -426,7 +426,6 @@ void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 
 	MouseEvents.Clear();
 
-	setMouseTracking(false);
 	QFrame::focusOutEvent(Event);
 }
 

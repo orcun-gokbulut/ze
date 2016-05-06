@@ -1,0 +1,317 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZEDTransformManagerToolbar</class>
+ <widget class="QWidget" name="ZEDTransformManagerToolbar">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>867</width>
+    <height>37</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Transformation</string>
+  </property>
+  <widget class="QPushButton" name="btnSelect">
+   <property name="geometry">
+    <rect>
+     <x>9</x>
+     <y>9</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnMove">
+   <property name="geometry">
+    <rect>
+     <x>90</x>
+     <y>9</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Move</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnRotate">
+   <property name="geometry">
+    <rect>
+     <x>171</x>
+     <y>9</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Rotate</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="btnScale">
+   <property name="geometry">
+    <rect>
+     <x>252</x>
+     <y>9</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>Scale</string>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="autoExclusive">
+    <bool>true</bool>
+   </property>
+  </widget>
+  <widget class="QComboBox" name="cmbSpace">
+   <property name="geometry">
+    <rect>
+     <x>333</x>
+     <y>10</y>
+     <width>90</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <item>
+    <property name="text">
+     <string>World Space</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Local Space</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Parent Space</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>View Space</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QComboBox" name="cmbPivot">
+   <property name="geometry">
+    <rect>
+     <x>429</x>
+     <y>10</y>
+     <width>85</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <item>
+    <property name="text">
+     <string>Object Pivot</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Focused Object Pivot</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>First Object Pivot</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Last Object Pivot</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>Center Pivot</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>World Pivot</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QLabel" name="label">
+   <property name="geometry">
+    <rect>
+     <x>520</x>
+     <y>9</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>x:</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="txtX">
+   <property name="geometry">
+    <rect>
+     <x>536</x>
+     <y>10</y>
+     <width>93</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>-10000000.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>10000000.990000000223517</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_2">
+   <property name="geometry">
+    <rect>
+     <x>635</x>
+     <y>9</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>y:</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="txtY">
+   <property name="geometry">
+    <rect>
+     <x>651</x>
+     <y>10</y>
+     <width>93</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>-10000000.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>10000000.000000000000000</double>
+   </property>
+  </widget>
+  <widget class="QLabel" name="label_3">
+   <property name="geometry">
+    <rect>
+     <x>750</x>
+     <y>9</y>
+     <width>16</width>
+     <height>16</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="text">
+    <string>z:</string>
+   </property>
+  </widget>
+  <widget class="QDoubleSpinBox" name="txtZ">
+   <property name="geometry">
+    <rect>
+     <x>765</x>
+     <y>10</y>
+     <width>93</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="minimum">
+    <double>-10000000.000000000000000</double>
+   </property>
+   <property name="maximum">
+    <double>10000000.000000000000000</double>
+   </property>
+  </widget>
+ </widget>
+ <tabstops>
+  <tabstop>btnSelect</tabstop>
+  <tabstop>btnMove</tabstop>
+  <tabstop>btnRotate</tabstop>
+  <tabstop>btnScale</tabstop>
+  <tabstop>cmbSpace</tabstop>
+  <tabstop>cmbPivot</tabstop>
+  <tabstop>txtX</tabstop>
+  <tabstop>txtY</tabstop>
+  <tabstop>txtZ</tabstop>
+ </tabstops>
+ <resources/>
+ <connections/>
+</ui>
