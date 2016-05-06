@@ -1210,30 +1210,50 @@ ZEVector3 ZEDGizmo::ScaleProjection(float ScaleAmount)
 
 		case ZED_GA_Y_AXIS:
 			return ZEVector3(1.0f, 1.0f + ScaleAmount, 1.0f);
-			break;
 
 		case ZED_GA_Z_AXIS:
 			return ZEVector3(1.0f, 1.0f, 1.0f + ScaleAmount);
-			break;
 
 		case ZED_GA_XY_AXIS:
 			return ZEVector3(1.0f + ScaleAmount, 1.0f + ScaleAmount, 1.0f);
-			break;
 
 		case ZED_GA_XZ_AXIS:
 			return ZEVector3(1.0f + ScaleAmount, 1.0f, 1.0f + ScaleAmount);
-			break;
 
 		case ZED_GA_YZ_AXIS:
 			return ZEVector3(1.0f, 1.0f + ScaleAmount, 1.0f + ScaleAmount);
-			break;
 
 		case ZED_GA_XYZ_AXIS:
 			return ZEVector3(1.0f + ScaleAmount, 1.0f + ScaleAmount, 1.0f + ScaleAmount);
-			break;
 	}
 
-	return Scale;
+	/*switch (SelectedAxis)
+	{
+		default:
+		case ZED_GA_NONE:
+			return InitialScale;
+
+		case ZED_GA_X_AXIS:
+			return InitialScale + ZEVector3(ScaleAmount, 0.0f, 0.0f);
+
+		case ZED_GA_Y_AXIS:
+			return InitialScale + ZEVector3(0.0f, ScaleAmount, 0.0f);
+
+		case ZED_GA_Z_AXIS:
+			return InitialScale + ZEVector3(0.0f, 0.0f, ScaleAmount);
+
+		case ZED_GA_XY_AXIS:
+			return InitialScale + ZEVector3(ScaleAmount, ScaleAmount, 0.0f);
+
+		case ZED_GA_XZ_AXIS:
+			return InitialScale + ZEVector3(ScaleAmount, 0.0f, ScaleAmount);
+
+		case ZED_GA_YZ_AXIS:
+			return InitialScale + ZEVector3(0.0f, ScaleAmount, ScaleAmount);
+
+		case ZED_GA_XYZ_AXIS:
+			return InitialScale + ZEVector3(ScaleAmount, ScaleAmount,ScaleAmount);
+	}*/
 }
 
 ZEDGizmo::ZEDGizmo()

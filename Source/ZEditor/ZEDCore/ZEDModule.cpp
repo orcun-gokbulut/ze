@@ -118,8 +118,7 @@ void ZEDModule::StartUp()
 	SceneWrapper->AddChildWrapper(GridWrapper);
 
 	ZEModel* Trial = ZEModel::CreateInstance();
-	Trial->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
-	Trial->SetUserDefinedBoundingBoxEnabled(true);
+	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	ZEDEntityWrapper* Trial1Wrapper = ZEDEntityWrapper::CreateInstance();
 	Trial1Wrapper->SetObject(Trial);
 	SceneWrapper->AddChildWrapper(Trial1Wrapper);

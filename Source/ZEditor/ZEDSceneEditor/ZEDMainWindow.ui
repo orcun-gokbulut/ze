@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainEditor</class>
- <widget class="QMainWindow" name="MainEditor">
+ <class>ZEDMainWindow</class>
+ <widget class="QMainWindow" name="ZEDMainWindow">
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -743,7 +743,7 @@
   <connection>
    <sender>actExit</sender>
    <signal>triggered(bool)</signal>
-   <receiver>MainEditor</receiver>
+   <receiver>ZEDMainWindow</receiver>
    <slot>close()</slot>
    <hints>
     <hint type="sourcelabel">

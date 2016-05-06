@@ -46,6 +46,10 @@
 #include "ZEDTransformationManager.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
 
+
+// ZEDSelectionEvent
+//////////////////////////////////////////////////////////////////////////////////////
+
 ZEDSelectionEvent::ZEDSelectionEvent()
 {
 	Type = ZED_SET_NONE;
@@ -80,76 +84,61 @@ const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() cons
 	return *UnselectedObjects;
 }
 
-void ZEDSelectionManager::CalculateSelectionPivot()
+
+// ZEDSelectionManager
+//////////////////////////////////////////////////////////////////////////////////////
+
+
+ZEDSelectionManager::ZEDSelectionManager()
 {
-	if (Selection.GetCount() == 0)
-		return;
-
-	ZEVector3 ObjectCenter;
-	ZEVector3 SelectionCenterPosition = ZEVector3::Zero;
-	ZEQuaternion SelectionCenterRotation = ZEQuaternion::Identity;
-	ZEDTransformSpace TargetSpace = ZEDTransformationManager::GetInstance()->GetTransformSpace();
-
-	if (PivotMode == ZED_SCM_ENTITY_PIVOT)
-	{
-		SelectionCenterPosition = Selection.GetFirstItem()->GetPosition(); //GetPivotPosition
-
-		if (TargetSpace == ZED_TS_LOCAL)
-			SelectionCenterRotation = Selection.GetFirstItem()->GetRotation(); //GetPivotRotation
-	}
-	else if (PivotMode == ZED_SCM_SELECTION_CENTER)
-	{
-		if (TargetSpace == ZED_TS_LOCAL)
-		{
-			SelectionCenterPosition = Selection.GetFirstItem()->GetLocalBoundingBox().GetCenter();
-			SelectionCenterRotation = Selection.GetFirstItem()->GetRotation(); //GetPivotRotation ? BBox rotation?
-		}
-		else if (TargetSpace == ZED_TS_WORLD)
-		{
-			for (ZESize I = 0; I < Selection.GetCount(); I++)
-			{
-				ObjectCenter = Selection[I]->GetLocalBoundingBox().GetCenter();
-				SelectionCenterPosition += ObjectCenter;
-			}
-
-			SelectionCenterPosition /= Selection.GetCount();
-		}
-	}
-	else if (PivotMode == ZED_SCM_SPACE_CENTER)
-	{
-		if (TargetSpace == ZED_TS_LOCAL)
-		{
-			SelectionCenterPosition = Selection.GetFirstItem()->GetPosition(); //GetPivotPosition
-			SelectionCenterRotation = Selection.GetFirstItem()->GetRotation(); //GetPivotRotation
-		}
-		else if (TargetSpace == ZED_TS_WORLD)
-		{
-			SelectionCenterPosition = ZEVector3::Zero;
-			SelectionCenterRotation = ZEQuaternion::Identity;
-		}
-	}
-
-	ZEMatrix4x4::CreateOrientation(SelectionPivot, SelectionCenterPosition, SelectionCenterRotation, ZEVector3::One);
+	Module = NULL;
+	Filter = ZEDObjectWrapper::Class();
+	
 }
 
-void ZEDSelectionManager::UpdateSelectionGizmo()
+ZEDSelectionManager::~ZEDSelectionManager()
 {
-/*	const ZEMatrix4x4& Pivot = GetSelectionPivot();
-	ZEDTransformSpace Space = ZEDTransformationManager::GetInstance()->GetTransformSpace();
-	ZEDGizmo* Gizmo = ZEDTransformationManager::GetInstance()->GetGizmo();
 
-	Gizmo->SetVisible(Selection.GetCount());
-	Gizmo->SetPosition(Pivot.GetTranslation());
+}
 
-	if (Space == ZED_TS_LOCAL && (Gizmo->GetMode() == ZED_GM_MOVE || Gizmo->GetMode() == ZED_GM_HELPER))
-	{
-		Gizmo->SetRotation(Pivot.GetRotation());
-	}*/
+bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
+{
+	return ZEClass::IsDerivedFrom((ZEClass*)Class, Object->GetClass());
 }
 
 ZEDModule* ZEDSelectionManager::GetModule()
 {
 	return Module;
+}
+
+void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)
+{
+	SelectionMode = Mode;
+}
+
+ZEDSelectionMode ZEDSelectionManager::GetSelectionMode()
+{
+	return SelectionMode;
+}
+
+void ZEDSelectionManager::SetSelectionShape(ZEDSelectionShape Shape)
+{
+	SelectionShape = Shape;
+}
+
+ZEDSelectionShape ZEDSelectionManager::GetSelectionShape()
+{
+	return SelectionShape;
+}
+
+void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)
+{
+	Filter = Class;
+}
+
+ZEClass* ZEDSelectionManager::GetSelectionFilter()
+{
+	return Filter;
 }
 
 const ZEArray<ZEDObjectWrapper*>& ZEDSelectionManager::GetSelectedObjects()
@@ -350,13 +339,10 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 	if (!Selection.Exists(Object))
 		return;
 
-	Object->SetSelected(false);
-	Selection.RemoveValue(Object);
-
 	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelectedObjects();
 
-	Object->SetSelected(true);
-	Selection.Add(Object);
+	Object->SetSelected(false);
+	Selection.RemoveValue(Object);
 
 	ZEArray<ZEDObjectWrapper*> SelectedObjects;
 	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
@@ -511,42 +497,14 @@ void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& 
 }
 */
 
-void ZEDSelectionManager::SetSelectionFilter(ZEClass* Class)
-{
-	Filter = Class;
-}
-
-ZEClass* ZEDSelectionManager::GetSelectionFilter()
-{
-	return Filter;
-}
-
-bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
-{
-	return ZEClass::IsDerivedFrom((ZEClass*)Class, Object->GetClass());
-}
-
-void ZEDSelectionManager::SetSelectionPivotMode(ZEDSelectionPivotMode Mode)
-{
-	PivotMode = Mode;
-
-	CalculateSelectionPivot();
-}
-
-ZEDSelectionPivotMode ZEDSelectionManager::GetSelectionPivotMode()
-{
-	return PivotMode;
-}
-
-const ZEMatrix4x4& ZEDSelectionManager::GetSelectionPivot()
-{
-	CalculateSelectionPivot();
-
-	return SelectionPivot;
-}
-
 bool ZEDSelectionManager::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
 {
+	if (Event.GetKey() == ZED_IKK_KEY_ESCAPE && Event.GetType() == ZED_ET_BUTTON_PRESSED)
+	{
+		ClearSelection();
+		return false;
+	}
+
 	return false;
 }
 
@@ -569,18 +527,22 @@ bool ZEDSelectionManager::MouseEvent(const ZEDViewportMouseEvent& Event)
 		GetModule()->GetRootWrapper()->RayCast(Report, Parameters);	
 		if (Report.GetResult())
 		{
+			ZEDObjectWrapper* Wrapper = static_cast<ZEDObjectWrapper*>(Report.GetCollision().Object);
 			if ((Event.GetModifiers() & ZED_KKM_CTRL) != 0 || (Event.GetModifiers() & ZED_KKM_SHIFT) != 0)
 			{
-				SelectObject(static_cast<ZEEntity*>(Report.GetCollision().Object)->GetWrapper());
+				SelectObject(Wrapper);
 			}
 			else if (Event.GetModifiers() & ZED_KKM_ALT)
 			{
-				DeselectObject(static_cast<ZEEntity*>(Report.GetCollision().Object)->GetWrapper());
+				DeselectObject(Wrapper);
 			}
 			else
 			{
+				if (Selection.Exists(Wrapper))
+					return false;
+
 				ClearSelection();
-				SelectObject(static_cast<ZEEntity*>(Report.GetCollision().Object)->GetWrapper());
+				SelectObject(Wrapper);
 			}
 		}
 		else
@@ -606,16 +568,7 @@ void ZEDSelectionManager::Destroy()
 	delete this;
 }
 
-
 ZEDSelectionManager* ZEDSelectionManager::GetInstance()
 {
 	return ZEDCore::GetInstance()->GetSelectionManager();
-}
-
-ZEDSelectionManager::ZEDSelectionManager()
-{
-	Module = NULL;
-	Filter = ZEDObjectWrapper::Class();
-	PivotMode = ZED_SCM_SELECTION_CENTER;
-	SelectionPivot = ZEMatrix4x4::Zero;
 }

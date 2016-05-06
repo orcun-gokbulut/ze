@@ -60,6 +60,7 @@ enum ZEDTransformSpace
 enum ZEDTransformPivot
 {
 	ZED_TP_OBJECT,
+	ZED_TP_FOCUSED_OBJECT,
 	ZED_TP_FIRST_OBJECT,
 	ZED_TP_LAST_OBJECT,
 	ZED_TP_CENTER,
@@ -101,7 +102,6 @@ class ZEDTransformationManager : public ZEInitializable
 		bool								TransformActive;
 		ZEArray<ZEDTransformationState>		TransformStates;
 
-
 		ZEVector2							MouseStartPosition;
 
 		void								UpdateGizmos();
@@ -131,6 +131,15 @@ class ZEDTransformationManager : public ZEInitializable
 		void								SetTransformPivot(ZEDTransformPivot Pivot);
 		ZEDTransformPivot					GetTransformPivot();
 
+		void								SetX(float Value);
+		float								GetX();
+
+		void								SetY(float Value);
+		float								GetY();
+
+		void								SetZ(float Value);
+		float								GetZ();
+
 		// Events
 		virtual void						SelectionEvent(const ZEDSelectionEvent& Event);
 		virtual void						ViewportChangedEvent(const ZEDViewportChangedEvent& Event);
@@ -138,6 +147,7 @@ class ZEDTransformationManager : public ZEInitializable
 		virtual bool						ViewportMouseEvent(const ZEDViewportMouseEvent& Event);
 		virtual void						PreRender(ZERNRenderer* Renderer);
 
+		
 		void								Destroy();
 
 		static ZEDTransformationManager*	GetInstance();
