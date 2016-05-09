@@ -53,7 +53,7 @@ struct ZERNShading_Light
 	uint						ShadowSampleCount;
 	float						ShadowSampleLength;
 	float						ShadowDepthBias;
-	float						Reserved1;
+	float						ShadowNormalBias;
 };
 
 struct ZERNShading_Surface

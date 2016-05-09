@@ -63,6 +63,12 @@ struct ZERNDebug_PixelShader_Input
 cbuffer ZERNDebug_Constant_Draw_Transform	: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
 	float4x4	ZERNDebug_WorldTransform;
+	float4x4	ZERNDebug_WorldTransformInverseTranspose;
+	float4x4	ZERNDebug_PreSkinTransform;
+	float4		ZERNDebug_ClippingPlane0;
+	float4		ZERNDebug_ClippingPlane1;
+	float4		ZERNDebug_ClippingPlane2;
+	float4		ZERNDebug_ClippingPlane3;
 };
 
 cbuffer ZERNDebug_Constants					: register(b8)
@@ -84,7 +90,7 @@ ZERNDebug_GeometryShader_Input ZERNDebug_VertexShader_Main(ZERNDebug_VertexShade
 	ZERNDebug_GeometryShader_Input Output;
 	
 	Output.Position = mul(ZERNDebug_WorldTransform, float4(Input.Position, 1.0f)).xyz;
-	Output.Normal = mul(ZERNDebug_WorldTransform, float4(Input.Normal, 0.0f)).xyz;
+	Output.Normal = mul(ZERNDebug_WorldTransformInverseTranspose, float4(Input.Normal, 0.0f)).xyz;
 	Output.Tangent = mul(ZERNDebug_WorldTransform, float4(Input.Tangent, 0.0f)).xyz;
 	Output.Binormal = mul(ZERNDebug_WorldTransform, float4(Input.Binormal, 0.0f)).xyz;
 	

@@ -59,12 +59,28 @@
 #define ZE_IRDF_WORLD_BOUNDING_BOX				8
 #define ZE_IRDF_CONSTANT_BUFFER					16
 
+struct ZEInteriorTransformConstants
+{
+	ZEMatrix4x4	WorldTransform;
+	ZEMatrix4x4	WorldTransformInverseTranspose;
+	ZEMatrix4x4	PreSkinTransform;
+	ZEVector4	ClippingPlane0;
+	ZEVector4	ClippingPlane1;
+	ZEVector4	ClippingPlane2;
+	ZEVector4	ClippingPlane3;
+};
+
 void ZEInteriorRoom::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZE_IRDF_CONSTANT_BUFFER))
 		return;
 
-	ConstantBuffer->SetData(&GetWorldTransform());
+	ZEInteriorTransformConstants Constants;
+
+	Constants.WorldTransform = GetWorldTransform();
+	Constants.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
+
+	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZE_IRDF_CONSTANT_BUFFER);
 }
@@ -304,7 +320,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEInteriorTransformConstants));
 	
 	ZESize PolygonCount = Resource->Polygons.GetCount();
 

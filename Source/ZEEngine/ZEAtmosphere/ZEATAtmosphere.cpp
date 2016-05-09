@@ -685,6 +685,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 		SunLight->SetWorldRotation(SunRotation);
 		SunLight->SetVisible(SunVisible);
+		SunLight->SetCastsShadow(SunVisible);
 		SunLight->SetTerrestrialColor(TerrestrialSunColor);
 	}
 
@@ -695,7 +696,6 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 		MoonLight->SetWorldRotation(MoonRotation);
 		MoonLight->SetVisible(MoonVisible);
-		MoonLight->SetCastsShadow(!SunVisible);
 		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
 	}
 
@@ -715,7 +715,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	if (SunVisible)
 	{
-		float SunInscattering = 0.5f * (CosSunZenith * 0.5f + 0.5f);
+		float SunInscattering = 1.0f * (CosSunZenith * 0.5f + 0.5f);
 		
 		Cloud->SetLightDirection(-SunDirection);
 		Cloud->SetLightColor(TerrestrialSunColor * 10.0f);
@@ -725,7 +725,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	}
 	else
 	{
-		float MoonInscattering = 0.1f * (CosMoonZenith * 0.5f + 0.5f);
+		float MoonInscattering = 0.2f * (CosMoonZenith * 0.5f + 0.5f);
 
 		Cloud->SetLightDirection(-MoonDirection);
 		Cloud->SetLightColor(TerrestrialMoonColor * 1.0f);

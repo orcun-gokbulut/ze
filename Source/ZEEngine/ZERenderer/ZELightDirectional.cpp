@@ -163,15 +163,16 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 			Cascade.Band = ZEVector4(Cascade.Borders.x - View.ShadowFadeDistance, Cascade.Borders.x + View.ShadowFadeDistance, Cascade.Borders.w - View.ShadowFadeDistance, Cascade.Borders.w);
 		}
 
-		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
+		Cascade.ViewTransform = GetViewTransform();
+		Cascade.ProjectionTransform = Cascade.ProjectionTransform;
 
 		ZEMatrix4x4 InvLightViewTransform;
 		ZEMatrix4x4::Transpose(InvLightViewTransform, GetViewTransform());
 
-		ZEVector4 CascadePositionWorld;
-		ZEMatrix4x4::Transform(CascadePositionWorld, InvLightViewTransform, ZEVector4(CascadeFrustumAABBLight.GetCenter(), 1.0f));
+		ZEVector3 CascadePositionWorld;
+		ZEMatrix4x4::Transform3x3(CascadePositionWorld, InvLightViewTransform, CascadeFrustumAABBLight.GetCenter());
 
-		CascadeVolumes[CascadeIndex].Create(CascadePositionWorld.ToVector3(), GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
+		CascadeVolumes[CascadeIndex].Create(CascadePositionWorld, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
 	}
 }
 
@@ -207,6 +208,7 @@ bool ZELightDirectional::DeinitializeSelf()
 
 ZELightDirectional::ZELightDirectional()
 {
+	memset(&CascadeConstants, 0, sizeof(CascadeConstants));
 	CascadeDistanceFactor = 0.5f;
 	CascadeConstants.CascadeCount = 3;
 	CascadeVolumes.Resize(3);
@@ -254,6 +256,26 @@ float ZELightDirectional::GetCascadeDistanceFactor() const
 	return CascadeDistanceFactor;
 }
 
+void ZELightDirectional::SetCascadeDepthBias(ZEUInt CascadeIndex, float CascadeDepthBias)
+{
+	CascadeConstants.Cascades[CascadeIndex].DepthBias = CascadeDepthBias;
+}
+
+float ZELightDirectional::GetCascadeDepthBias(ZEUInt CascadeIndex) const
+{
+	return CascadeConstants.Cascades[CascadeIndex].DepthBias;
+}
+
+void ZELightDirectional::SetCascadeNormalBias(ZEUInt CascadeIndex, float CascadeNormalBias)
+{
+	CascadeConstants.Cascades[CascadeIndex].NormalBias = CascadeNormalBias;
+}
+
+float ZELightDirectional::GetCascadeNormalBias(ZEUInt CascadeIndex) const
+{
+	return CascadeConstants.Cascades[CascadeIndex].NormalBias;
+}
+
 void ZELightDirectional::SetUseSunLight(bool UseSunLight)
 {
 	this->UseSunLight = UseSunLight;
@@ -296,7 +318,8 @@ void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Conte
 	for (ZEUInt I = 0; I < CascadeConstants.CascadeCount; I++)
 	{
 		ZECascade& Cascade = CascadeConstants.Cascades[I];
-		Cascade.ProjectionTransform = TextureTransform * Cascade.ProjectionTransform * Renderer->GetView().InvViewTransform;
+		Cascade.ViewTransform = Cascade.ViewTransform * Renderer->GetView().InvViewTransform;
+		Cascade.ProjectionTransform = TextureTransform * Cascade.ProjectionTransform;
 	}
 	
 	CascadeConstantBuffer->SetData(&CascadeConstants);
@@ -375,7 +398,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
 	{
 		View.ViewVolume = &GetViewVolume(CascadeIndex);
-		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
+		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex) * GetViewTransform();
 
 		ShadowRenderer.SetView(View);
 

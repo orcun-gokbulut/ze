@@ -291,6 +291,7 @@ bool ZERNStageLighting::SetupDeferred(ZEGRContext* Context)
 			DestLight.ShadowSampleCount = ZELight::ConvertShadowSampleCount(DirectionalLight->GetShadowSampleCount());
 			DestLight.ShadowSampleLength = DirectionalLight->GetShadowSampleLength();
 			DestLight.ShadowDepthBias = DirectionalLight->GetShadowDepthBias();
+			DestLight.ShadowNormalBias = DirectionalLight->GetShadowNormalBias();
 
 			if (DirectionalLight->GetUseSunLight() || DirectionalLight->GetUseMoonLight())
 				DestLight.Color = DirectionalLight->GetTerrestrialColor() * DirectionalLight->GetIntensity();

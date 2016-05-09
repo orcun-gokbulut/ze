@@ -86,6 +86,7 @@ class ZELight : public ZEEntity
 		ZELightShadowSampleCount		ShadowSampleCount;
 		float							ShadowSampleLength;
 		float							ShadowDepthBias;
+		float							ShadowNormalBias;
 
 		float							Range;
 		float							Intensity;
@@ -137,6 +138,9 @@ class ZELight : public ZEEntity
 
 		void							SetShadowDepthBias(float ShadowDepthBias);
 		float							GetShadowDepthBias() const;
+
+		void							SetShadowNormalBias(float ShadowNormalBias);
+		float							GetShadowNormalBias() const;
 
 		void							SetColor(const ZEVector3& NewColor);
 		const ZEVector3&				GetColor() const;

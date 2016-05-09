@@ -60,9 +60,8 @@ ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
 		ZEGRRasterizerState RasterizerState;
 		RasterizerState.SetDepthBias(0.0f);
 		RasterizerState.SetDepthBiasClamp(0.0f);
-		RasterizerState.SetSlopeScaledDepthBias(1.0f);
+		RasterizerState.SetSlopeScaledDepthBias(0.0f);
 		RasterizerState.SetDepthClipEnable(true);
-		RasterizerState.SetCullMode(ZEGR_CMD_NONE);
 
 		RenderState.SetRasterizerState(RasterizerState);
 
