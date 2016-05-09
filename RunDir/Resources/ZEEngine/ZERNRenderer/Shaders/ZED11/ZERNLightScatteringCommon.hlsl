@@ -47,7 +47,8 @@
 #define LUT_DIMENSIONS			float4(32.0f, 128.0f, 64.0f, 16.0f)
 
 static const float3 ZERNLightScatteringCommon_RayleighScatteringFactor	= float3(5.8e-6, 13.5e-6, 33.1e-6);
-static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= (float3)2.0e-5;
+static const float3 ZERNLightScatteringCommon_MieScatteringFactor		= (float3)2.0e-5 / 0.9f;
+static const float3 ZERNLightScatteringCommon_OzoneAbsorptionFactor		= float3(2.483825e-25f, 1.799535e-25f, 1.360172e-26f) * 2.69e+25f * 6.e-7f;
 
 SamplerState		ZERNLightScatteringCommon_SamplerLinearClamp	: register(s0);
 
@@ -158,7 +159,7 @@ float3 ZERNLightScatteringCommon_CalculateExtinction(float3 Start, float3 End)
 {
 	float2 Density = ZERNLightScatteringCommon_IntegrateDensity(Start, End);
 	
-	return ZERNLightScatteringCommon_RayleighScatteringFactor * Density.x + ZERNLightScatteringCommon_MieScatteringFactor * Density.y;
+	return ZERNLightScatteringCommon_RayleighScatteringFactor * Density.x + ZERNLightScatteringCommon_MieScatteringFactor * Density.y;// + ZERNLightScatteringCommon_OzoneAbsorptionFactor * Density.x;
 }
 
 float3 ZERNLightScatteringCommon_LookupPrecomputedScattering(Texture3D<float3> ScatteringBuffer, float3 Position, float3 ViewDirection, float3 LightDirection, float3 EarthCenter, inout float PrevTexCoordY)

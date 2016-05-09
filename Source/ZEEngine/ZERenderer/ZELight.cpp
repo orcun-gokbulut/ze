@@ -125,6 +125,7 @@ ZELight::ZELight()
 	ShadowSampleCount = ZE_LSC_MEDIUM;
 	ShadowSampleLength = 1.0f;
 	ShadowDepthBias = 0.005f;
+	ShadowNormalBias = 0.1f;
 
 	Range = 100.0f;
 	Intensity = 1.0f;
@@ -225,6 +226,16 @@ void ZELight::SetShadowDepthBias(float ShadowDepthBias)
 float ZELight::GetShadowDepthBias() const
 {
 	return ShadowDepthBias;
+}
+
+void ZELight::SetShadowNormalBias(float ShadowNormalBias)
+{
+	this->ShadowNormalBias = ShadowNormalBias;
+}
+
+float ZELight::GetShadowNormalBias() const
+{
+	return ShadowNormalBias;
 }
 
 void ZELight::SetColor(const ZEVector3& NewColor)

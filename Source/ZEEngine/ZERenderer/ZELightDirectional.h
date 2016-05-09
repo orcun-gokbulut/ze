@@ -50,9 +50,13 @@ class ZELightDirectional : public ZELight
 	private:
 		struct ZECascade
 		{
+			ZEMatrix4x4						ViewTransform;
 			ZEMatrix4x4						ProjectionTransform;
 			ZEVector4						Borders;
 			ZEVector4						Band;
+			float							DepthBias;
+			float							NormalBias;
+			ZEVector2						Reserved;
 		};
 
 		struct ZECascadeConstants
@@ -91,6 +95,12 @@ class ZELightDirectional : public ZELight
 
 		void								SetCascadeDistanceFactor(float CascadeDistanceFactor);
 		float								GetCascadeDistanceFactor() const;
+
+		void								SetCascadeDepthBias(ZEUInt CascadeIndex, float CascadeDepthBias);
+		float								GetCascadeDepthBias(ZEUInt CascadeIndex) const;
+
+		void								SetCascadeNormalBias(ZEUInt CascadeIndex, float CascadeNormalBias);
+		float								GetCascadeNormalBias(ZEUInt CascadeIndex) const;
 
 		void								SetUseSunLight(bool UseSunLight);
 		bool								GetUseSunLight() const;

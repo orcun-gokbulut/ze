@@ -84,6 +84,7 @@ cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 cbuffer ZERNFixedMaterial_Constant_Draw_Transform : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
 	float4x4		ZERNFixedMaterial_WorldTransform;
+	float4x4		ZERNFixedMaterial_WorldTransformInverseTranspose;
 	float4x4		ZERNFixedMaterial_PreSkinTransform;
 	float4			ZERNFixedMaterial_ClippingPlane0;
 	float4			ZERNFixedMaterial_ClippingPlane1;
@@ -216,14 +217,14 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 	#endif
 
 	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
-	float4 NormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Normal, 0.0f));
-	float4 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Tangent, 0.0f));
-	float4 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Binormal, 0.0f));
+	float3 NormalWorld = mul(ZERNFixedMaterial_WorldTransformInverseTranspose, float4(Input.Normal, 0.0f)).xyz;
+	float3 TangentWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Tangent, 0.0f)).xyz;
+	float3 BinormalWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Binormal, 0.0f)).xyz;
 	
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	Output.Normal = ZERNTransformations_WorldToView(NormalWorld);
-	Output.Tangent = ZERNTransformations_WorldToView(TangentWorld);
-	Output.Binormal = ZERNTransformations_WorldToView(BinormalWorld); //cross(Output.Tangent, Output.Normal);
+	Output.Normal = ZERNTransformations_WorldToView(float4(NormalWorld, 0.0f));
+	Output.Tangent = ZERNTransformations_WorldToView(float4(TangentWorld, 0.0f));
+	Output.Binormal = ZERNTransformations_WorldToView(float4(BinormalWorld, 0.0f)); //cross(Output.Tangent, Output.Normal);
 	Output.Texcoord = Input.Texcoord;
 	Output.ViewDistance = length(PositionWorld.xyz - ZERNView_Position);
 
@@ -265,21 +266,21 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	#endif
 	
 	float3 Normal = normalize(Input.Normal);
+	float3 Tangent = normalize(Input.Tangent);
+	float3 Binormal = normalize(Input.Binormal);
 	#ifdef ZERN_FM_NORMAL_MAP
 		float3 NormalSample = ZERNFixedMaterial_NormalMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).xyz * 2.0f - 1.0f;
-		float3 Tangent = normalize(Input.Tangent);
-		float3 Binormal = normalize(Input.Binormal);
 		Normal = normalize(NormalSample.x * Tangent + NormalSample.y * Binormal + NormalSample.z * Normal);
 	#endif
 
 	#ifdef ZERN_FM_DETAIL_NORMAL_MAP
 		float3 DetailNormalSample = ZERNFixedMaterial_DetailNormalMap.Sample(ZERNFixedMaterial_DetailNormalSampler, Input.Texcoord * ZERNFixedMaterial_DetailNormalMapTiling) * 2.0f - 1.0f;
-		float3 DetailNormal = normalize(DetailNormalSample.x * Input.Tangent + DetailNormalSample.y * Input.Binormal + DetailNormalSample.z * Input.Normal);
+		float3 DetailNormal = normalize(DetailNormalSample.x * Tangent + DetailNormalSample.y * Binormal + DetailNormalSample.z * Normal);
 		DetailNormal = normalize(Normal + DetailNormal);	
 	
 		float DetailNormalPixelDistance = Input.ViewDistance - ZERNFixedMaterial_DetailNormalMapAttenuationStart;
 		float DetailNormalAttenuation = saturate(1.0f /  (1.0f + DetailNormalPixelDistance * ZERNFixedMaterial_DetailNormalMapAttenuationFactor));
-
+    
 		Normal = normalize(lerp(Normal, DetailNormal, DetailNormalAttenuation));
 	#endif
 
@@ -293,7 +294,7 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 		
 		float DetailBasePixelDistance = Input.ViewDistance - ZERNFixedMaterial_DetailBaseMapAttenuationStart;
 		float DetailBaseAttenuation = saturate(1.0f /  (1.0f + DetailBasePixelDistance * ZERNFixedMaterial_DetailBaseMapAttenuationFactor));
-
+    
 		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailBaseAttenuation);
 	#endif
 

@@ -112,7 +112,7 @@ class ZERNStageLighting : public ZERNStage
 			ZEUInt								ShadowSampleCount;
 			float								ShadowSampleLength;
 			float								ShadowDepthBias;
-			float								Reserved;
+			float								ShadowNormalBias;
 		};
 
 		struct DeferredLightConstantsStruct

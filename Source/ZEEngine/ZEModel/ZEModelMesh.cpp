@@ -62,12 +62,13 @@
 
 struct ZEModelMeshConstants
 {
-	ZEMatrix4x4						WorldTransform;
-	ZEMatrix4x4						PreSkinTransform;
-	ZEVector4						ClippingPlane0;
-	ZEVector4						ClippingPlane1;
-	ZEVector4						ClippingPlane2;
-	ZEVector4						ClippingPlane3;
+	ZEMatrix4x4	WorldTransform;
+	ZEMatrix4x4	WorldTransformInverseTranspose;
+	ZEMatrix4x4	PreSkinTransform;
+	ZEVector4	ClippingPlane0;
+	ZEVector4	ClippingPlane1;
+	ZEVector4	ClippingPlane2;
+	ZEVector4	ClippingPlane3;
 };
 
 void ZEModelMesh::UpdateConstantBuffer()
@@ -78,6 +79,7 @@ void ZEModelMesh::UpdateConstantBuffer()
 	ZEModelMeshConstants Constants;
 
 	Constants.WorldTransform = GetWorldTransform();
+	Constants.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
 	Constants.PreSkinTransform = GetModelTransform();
 
 	if (ClippingPlanes.GetCount() > 0)

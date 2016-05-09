@@ -170,10 +170,10 @@ bool ZERNStageDebug::Update()
 	return true;
 }
 
-#include "ZEModel/ZEModel.h"
-#include "ZEModel/ZEModelMesh.h"
-#include "ZEModel/ZEModelMeshLOD.h"
-#include "ZEDS/ZEArray.h"
+//#include "ZEModel/ZEModel.h"
+//#include "ZEModel/ZEModelMesh.h"
+//#include "ZEModel/ZEModelMeshLOD.h"
+//#include "ZEDS/ZEArray.h"
 
 bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 {

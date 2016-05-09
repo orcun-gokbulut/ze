@@ -52,7 +52,7 @@ enum ZEUITextAlignment
 struct ZEUITextCharacter
 {
 	char				CChar;
-	ZEUIFontCharacter		FontCharacter;
+	ZEUIFontCharacter	FontCharacter;
 	ZEUIRectangle		RenderableCharacter;
 	ZEInt32				Line;
 	bool				IsSelected;
@@ -67,7 +67,7 @@ class ZEUILabel : public ZEUIFrameControl
 		ZEArray<ZEUITextCharacter>			Characters;
 		ZEArray<ZEInt32>					LineTextWidths;
 
-		ZEUIFont*						FontResource;
+		ZEUIFont*							FontResource;
 		ZEVector4							FontColor;
 
 		ZERectangle							TextRenderingArea;
@@ -86,13 +86,13 @@ class ZEUILabel : public ZEUIFrameControl
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
 		void								SetFontResource(ZEUIFont* Resource);
-		ZEUIFont*						GetFontResource();
+		ZEUIFont*							GetFontResource();
 
 		void								SetFontColor(const ZEVector4& Color);
 		const ZEVector4&					GetFontColor() const;
 
 		void								SetText(ZEString NewText);
-		const ZEString&						GetText();
+		const ZEString&						GetText() const;
 
 		void								SetTextAlignment(ZEUITextAlignment Alignment);
 		ZEUITextAlignment					GetTextAlignment() const;
