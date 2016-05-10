@@ -41,6 +41,7 @@ class Ui_ZEDTransformManagerToolbar;
 class ZEDTransformationManagerToolbar : public QToolBar
 {
 	Q_OBJECT
+	friend class ZEDTransformationManager;
 	private:
 		Ui_ZEDTransformManagerToolbar*		Form;
 		ZEDTransformationManager*			TransformationManager;

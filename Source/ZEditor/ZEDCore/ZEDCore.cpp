@@ -73,6 +73,8 @@ bool ZEDCore::InitializeSelf()
 
 	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
 	SelectionManager->Module = EditorModule;
+
+	return true;
 }
 
 void ZEDCore::DeinitializeSelf()

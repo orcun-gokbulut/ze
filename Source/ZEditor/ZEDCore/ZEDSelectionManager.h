@@ -66,7 +66,9 @@ enum ZEDSelectionEventType
 {
 	ZED_SET_NONE,
 	ZED_SET_SELECTED,
-	ZED_SET_DESELECTED
+	ZED_SET_DESELECTED,
+	ZED_SET_FOCUS_CHANGED,
+	ZED_SET_MANAGER_STATE_CHANGED
 };
 
 class ZEDSelectionEvent
@@ -74,19 +76,25 @@ class ZEDSelectionEvent
 	friend class ZEDSelectionManager;
 	private:
 		ZEDSelectionEventType				Type;
+		ZEDSelectionManager*				Manager;
 		ZEArray<ZEDObjectWrapper*>*			Selection;
 		ZEArray<ZEDObjectWrapper*>*			OldSelection;
 		ZEArray<ZEDObjectWrapper*>*			SelectedObjects;
 		ZEArray<ZEDObjectWrapper*>*			UnselectedObjects;
+		ZEDObjectWrapper*					Focus;
+		ZEDObjectWrapper*					OldFocus;
 
 											ZEDSelectionEvent();
 
 	public:
 		ZEDSelectionEventType				GetType() const;
+		ZEDSelectionManager*				GetManager() const;
 		const ZEArray<ZEDObjectWrapper*>&	GetSelection() const;
 		const ZEArray<ZEDObjectWrapper*>&	GetOldSelection() const;
 		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects() const;
 		const ZEArray<ZEDObjectWrapper*>&	GetUnselectedObjects() const;
+		ZEDObjectWrapper*					GetFocus();
+		ZEDObjectWrapper*					GetOldFocus();
 };
 
 class ZEDSelectionManager
@@ -95,6 +103,7 @@ class ZEDSelectionManager
 	private:
 		ZEDModule*							Module;
 		ZEArray<ZEDObjectWrapper*>			Selection;
+		ZEDObjectWrapper*					FocusedObject;
 		ZEDSelectionMode					SelectionMode;
 		ZEDSelectionShape					SelectionShape;
 		ZEClass*							Filter;
@@ -123,6 +132,9 @@ class ZEDSelectionManager
 		void								DeselectObject(ZEDObjectWrapper* Object);
 		void								DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Object);
 		void								ClearSelection();
+
+		void								FocusObject(ZEDObjectWrapper* Object);
+		void								ClearFocus();
 
 		bool								KeyboardEvent(const ZEDViewportKeyboardEvent& Event);
 		bool								MouseEvent(const ZEDViewportMouseEvent& Event);

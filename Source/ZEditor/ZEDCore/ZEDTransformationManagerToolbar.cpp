@@ -61,7 +61,6 @@ void ZEDTransformationManagerToolbar::UpdateUI()
 	Form->btnRotate->setChecked(TransformType == ZED_TT_ROTATE);
 	Form->btnScale->setChecked(TransformType == ZED_TT_SCALE);
 	
-
 	switch (TransformationManager->GetTransformSpace())
 	{
 		default:
@@ -94,14 +93,6 @@ void ZEDTransformationManagerToolbar::UpdateUI()
 			Form->cmbPivot->setCurrentText("Focused Object Pivot");
 			break;
 
-		case ZED_TP_FIRST_OBJECT:
-			Form->cmbPivot->setCurrentText("First Object Pivot");
-			break;
-
-		case ZED_TP_LAST_OBJECT:
-			Form->cmbPivot->setCurrentText("Last Object Pivot");
-			break;
-
 		case ZED_TP_CENTER:
 			Form->cmbPivot->setCurrentText("Center Pivot");
 			break;
@@ -111,9 +102,18 @@ void ZEDTransformationManagerToolbar::UpdateUI()
 			break;
 	}
 
-	Form->txtX->setValue(TransformationManager->GetX());
-	Form->txtY->setValue(TransformationManager->GetY());
-	Form->txtZ->setValue(TransformationManager->GetZ());
+	bool Result = true;
+	bool Valid = false;
+	Form->txtX->setValue(TransformationManager->GetX(Valid));
+	Result &= Valid;
+	Form->txtY->setValue(TransformationManager->GetY(Valid));
+	Result &= Valid;
+	Form->txtZ->setValue(TransformationManager->GetZ(Valid));
+	Result &= Valid;
+
+	Form->txtX->setEnabled(Result);
+	Form->txtY->setEnabled(Result);
+	Form->txtZ->setEnabled(Result);
 
 	Form->btnSelect->blockSignals(false);
 	Form->btnMove->blockSignals(false);
@@ -169,10 +169,6 @@ void ZEDTransformationManagerToolbar::cmbPivot_currentIndexChanged(const QString
 		TransformationManager->SetTransformPivot(ZED_TP_OBJECT);
 	else if (text == "Focused Object Pivot")
 		TransformationManager->SetTransformPivot(ZED_TP_FOCUSED_OBJECT);
-	else if (text == "First Object Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_FIRST_OBJECT);
-	else if (text == "Last Object Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_LAST_OBJECT);
 	else if (text == "Center Pivot")
 		TransformationManager->SetTransformPivot(ZED_TP_CENTER);
 	else if (text == "World Pivot")

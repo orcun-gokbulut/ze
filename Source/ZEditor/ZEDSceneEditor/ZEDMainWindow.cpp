@@ -224,6 +224,7 @@ ZEDMainWindow::ZEDMainWindow(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	
 	TransformManagerToolbar = new ZEDTransformationManagerToolbar();
 	TransformManagerToolbar->SetTransformManager(ZEDCore::GetInstance()->GetTransformationManager());
+	ZEDCore::GetInstance()->GetTransformationManager()->Toolbar = TransformManagerToolbar;
 	TransformManagerToolbar->show();
 
 	SelectionManagerToolbar = new ZEDSelectionManagerToolbar();
