@@ -342,6 +342,10 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressW = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.MinFilter = ZEGR_TFM_ANISOTROPIC;
+	SamplerLinearWrapDescription.MipFilter = ZEGR_TFM_ANISOTROPIC;
+	SamplerLinearWrapDescription.MagFilter = ZEGR_TFM_ANISOTROPIC;
+	SamplerLinearWrapDescription.MaxAnisotropy = 4;
 	Sampler = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
 }
 
