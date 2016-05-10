@@ -61,6 +61,7 @@ class ZEDObjectWrapper : public ZEObject
 		ZEString							Icon;
 		bool								Selectable;
 		bool								Selected;
+		bool								Focused;
 		bool								Locked;
 
 		ZEArray<ZEDObjectWrapper*>			ChildWrappers;
@@ -104,6 +105,9 @@ class ZEDObjectWrapper : public ZEObject
 
 		virtual void						SetSelected(bool Selected);
 		virtual bool						GetSelected();
+
+		virtual void						SetFocused(bool Focused);
+		virtual bool						GetFocused();
 
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible();

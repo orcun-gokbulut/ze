@@ -57,6 +57,8 @@ ZEDSelectionEvent::ZEDSelectionEvent()
 	OldSelection = NULL;
 	SelectedObjects = NULL;
 	UnselectedObjects = NULL;
+	Focus = NULL;
+	OldFocus = NULL;
 }
 
 ZEDSelectionEventType ZEDSelectionEvent::GetType() const
@@ -84,6 +86,15 @@ const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() cons
 	return *UnselectedObjects;
 }
 
+ZEDObjectWrapper* ZEDSelectionEvent::GetFocus()
+{
+	return Focus;
+}
+
+ZEDObjectWrapper* ZEDSelectionEvent::GetOldFocus()
+{
+	return OldFocus;
+}
 
 // ZEDSelectionManager
 //////////////////////////////////////////////////////////////////////////////////////
@@ -92,6 +103,7 @@ const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() cons
 ZEDSelectionManager::ZEDSelectionManager()
 {
 	Module = NULL;
+	FocusedObject = NULL;
 	Filter = ZEDObjectWrapper::Class();
 	
 }
@@ -174,6 +186,7 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 
 	ZEDSelectionEvent Event;
 	Event.Type = ZED_SET_SELECTED;
+	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
@@ -204,6 +217,7 @@ void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Object
 
 	ZEDSelectionEvent Event;
 	Event.Type = ZED_SET_SELECTED;
+	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
@@ -212,22 +226,7 @@ void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Object
 	GetModule()->SelectionEvent(Event);
 }
 
-/*
-void ZEDSelectionManager::SelectObject(const ZERay& Ray)
-{
-	ZERayCastParameters Parameters;
-	Parameters.Ray = Ray;
-	Parameters.FilterFunction = ZERayCastFilterFunction::Create<ZEDSelectionManager, &ZEDSelectionManager::FilterSelection>(this);
-	Parameters.FilterFunctionParameter = Filter;
-	ZERayCastReport Report;
-	ZEScene* Scene = ZEDCore::GetInstance()->GetEditorModule()->GetScene();
-	if (!Scene->RayCast(Report, Parameters))
-		return;
-
-	SelectObject(Scene->GetWrapper(Report.Object));
-}
-
-void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
+/*void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 {
 	if (ViewVolume == NULL)
 		return;
@@ -242,7 +241,6 @@ void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
 			SelectObject(Wrappers[I]);
 	}
 }
-
 
 void ZEDSelectionManager::SelectObject(const ZERNView& View, const ZEVector2& ScreenPoint1, const ZEVector2& ScreenPoint2)
 {
@@ -306,32 +304,6 @@ void ZEDSelectionManager::SelectObject(const ZERNView& View, const ZEVector2& Sc
 	SelectionFrustum.Create(RightClipPlane, BottomClipPlane, LeftClipPlane, TopClipPlane, FarClipPlane, NearClipPlane);
 
 	SelectObject(&SelectionFrustum);
-}
-
-void ZEDSelectionManager::SelectObject(const ZEString& Name)
-{
-	if (Name.IsEmpty())
-		return;
-
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetModule()->GetRootWrapper()->GetChildWrappers();
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		if (Wrappers[I]->GetName() == Name)
-			SelectObject(Wrappers[I]);
-	}
-}
-
-void ZEDSelectionManager::SelectObject(ZESize Id)
-{
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetModule()->GetRootWrapper()->GetChildWrappers();
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		if (Wrappers[I]->GetId() == Id)
-		{
-			SelectObject(Wrappers[I]);
-			return;
-		}
-	}
 }*/
 
 void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
@@ -340,6 +312,12 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 		return;
 
 	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelectedObjects();
+
+	if (FocusedObject == Object)
+	{
+		FocusedObject->SetFocused(false);
+		FocusedObject = NULL;
+	}
 
 	Object->SetSelected(false);
 	Selection.RemoveValue(Object);
@@ -350,6 +328,7 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 
 	ZEDSelectionEvent Event;
 	Event.Type = ZED_SET_DESELECTED;
+	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
@@ -374,10 +353,72 @@ void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 		Selection.Remove(I);
 	}
 
+	for (ZESize I = 0; I < UnselectedObjects.GetCount(); I++)
+	{
+		if (FocusedObject != UnselectedObjects[I])
+			continue;
+
+		FocusedObject->SetFocused(false);
+		FocusedObject = NULL;
+	}
+
 	ZEDSelectionEvent Event;
 	Event.Type = ZED_SET_DESELECTED;
+	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &UnselectedObjects;
+	Event.OldFocus = FocusedObject;
+
+	GetModule()->SelectionEvent(Event);
+}
+
+void ZEDSelectionManager::FocusObject(ZEDObjectWrapper* Object)
+{
+	if (Object == NULL)
+		return;
+
+	if (FocusedObject == Object)
+		return;
+
+	if (!Selection.Exists(Object))
+		return;
+
+	ClearFocus();
+	
+	Object->SetFocused(true);
+	FocusedObject = Object;
+
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+	SelectedObjects.Add(Object);
+
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_FOCUS_CHANGED;
+	Event.Focus = FocusedObject;
+	Event.Selection = &Selection;
+	Event.OldSelection = &Selection;
+	Event.SelectedObjects = &SelectedObjects;
+	Event.UnselectedObjects = &UnselectedObjects;
+
+	GetModule()->SelectionEvent(Event);
+}
+
+void ZEDSelectionManager::ClearFocus()
+{
+	if (FocusedObject == NULL)
+		return;
+
+	FocusedObject->SetFocused(false);
+	FocusedObject = NULL;
+
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+	ZEDSelectionEvent Event;
+	Event.Type = ZED_SET_FOCUS_CHANGED;
+	Event.Selection = &Selection;
+	Event.OldSelection = &Selection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
 
@@ -386,6 +427,8 @@ void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 
 void ZEDSelectionManager::ClearSelection()
 {
+	ClearFocus();
+
 	ZEArray<ZEDObjectWrapper*> OldSelection = Selection;
 	ZEArray<ZEDObjectWrapper*> SelectedObjects;
 
@@ -400,26 +443,13 @@ void ZEDSelectionManager::ClearSelection()
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &OldSelection;
+	Event.OldFocus = FocusedObject;
+	Event.Focus = NULL;
 
 	GetModule()->SelectionEvent(Event);
 }
-/*
-void ZEDSelectionManager::DeselectObject(const ZERay& Ray)
-{
-	ZERayCastParameters Parameters;
-	Parameters.Ray = Ray;
-	Parameters.FilterFunction = ZERayCastFilterFunction::Create<ZEDSelectionManager, &ZEDSelectionManager::FilterSelection>(this);
-	Parameters.FilterFunctionParameter = Filter;
-	ZERayCastReport Report;
 
-	ZEDSceneWrapper* SceneWrapper = static_cast<ZEDSceneWrapper*>(GetModule()->GetRootWrapper());
-	if (!SceneWrapper->RayCast(Report, Parameters))
-		return;
-
-	DeselectObject(Report.Object);
-}
-
-void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
+/*void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
 {
 	if (ViewVolume == NULL)
 		return;
@@ -494,8 +524,7 @@ void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& 
 	SelectionFrustum.Create(RightClipPlane, BottomClipPlane, LeftClipPlane, TopClipPlane, FarClipPlane, NearClipPlane);
 
 	DeselectObject(&SelectionFrustum);
-}
-*/
+}*/
 
 bool ZEDSelectionManager::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
 {
@@ -539,10 +568,14 @@ bool ZEDSelectionManager::MouseEvent(const ZEDViewportMouseEvent& Event)
 			else
 			{
 				if (Selection.Exists(Wrapper))
-					return false;
-
-				ClearSelection();
-				SelectObject(Wrapper);
+				{
+					FocusObject(Wrapper);
+				}
+				else
+				{
+					ClearSelection();
+					SelectObject(Wrapper);
+				}
 			}
 		}
 		else

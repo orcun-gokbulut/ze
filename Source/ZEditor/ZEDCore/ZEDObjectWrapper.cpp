@@ -47,6 +47,7 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 	Selectable = true;
 	Selected = false;
 	Locked = false;
+	Focused = false;
 }
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
@@ -172,12 +173,26 @@ bool ZEDObjectWrapper::GetSelectable()
 void ZEDObjectWrapper::SetSelected(bool Selected)
 {
 	this->Selected = Selected;
+
+	if (!Selected)
+		Focused = false;
 }
 
 bool ZEDObjectWrapper::GetSelected()
 {
 	return Selected;
 }
+
+void ZEDObjectWrapper::SetFocused(bool Focused)
+{
+	this->Focused = Focused;
+}
+
+bool ZEDObjectWrapper::GetFocused()
+{
+	return Focused;
+}
+
 
 void ZEDObjectWrapper::SetVisible(bool Value)
 {

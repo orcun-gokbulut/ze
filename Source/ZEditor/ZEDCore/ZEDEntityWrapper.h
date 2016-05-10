@@ -81,6 +81,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual ZEVector3					GetScale();
 
 		virtual void						SetSelected(bool Selected);
+		virtual void						SetFocused(bool Focused);
 
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible();

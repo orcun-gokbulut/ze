@@ -69,6 +69,7 @@ bool ZEDEntityWrapper::Update()
 		Material = ZERNSimpleMaterial::CreateInstance();
 		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 		Material->SetVertexColorEnabled(true);
+		Material->SetStageMask(ZERN_STAGE_FORWARD_POST);
 	}
 
 	if (ConstantBuffer.IsNull())
@@ -78,9 +79,16 @@ bool ZEDEntityWrapper::Update()
 
 	Canvas.Clean();
 	if (GetSelected())
-		Canvas.SetColor(ZEVector4::One);
+	{
+		if (GetFocused())
+			Canvas.SetColor(ZEVector4(1.0f, 1.0f, 0.0f, 1.0f));
+		else
+			Canvas.SetColor(ZEVector4::One);
+	}
 	else
+	{
 		Canvas.SetColor(ZEVector4(0.5, 0.5, 0.5, 1.0f));
+	}
 
 	Canvas.AddWireframeBox(1.0f, 1.0f, 1.0f);
 
@@ -242,6 +250,15 @@ void ZEDEntityWrapper::SetSelected(bool Selected)
 		return;
 
 	ZEDObjectWrapper::SetSelected(Selected);
+	Dirty = true;
+}
+
+void ZEDEntityWrapper::SetFocused(bool Focused)
+{
+	if (GetFocused() == Focused)
+		return;
+
+	ZEDObjectWrapper::SetFocused(Focused);
 	Dirty = true;
 }
 

@@ -176,16 +176,6 @@
    </item>
    <item>
     <property name="text">
-     <string>First Object Pivot</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>Last Object Pivot</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
      <string>Center Pivot</string>
     </property>
    </item>

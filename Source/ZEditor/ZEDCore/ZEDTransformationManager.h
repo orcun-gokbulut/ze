@@ -61,10 +61,17 @@ enum ZEDTransformPivot
 {
 	ZED_TP_OBJECT,
 	ZED_TP_FOCUSED_OBJECT,
-	ZED_TP_FIRST_OBJECT,
-	ZED_TP_LAST_OBJECT,
 	ZED_TP_CENTER,
 	ZED_TP_WORLD
+};
+
+
+enum ZEDTransformEventType
+{
+	ZED_TET_TRANSFORM_STARTED,
+	ZED_TET_TRANSFORMING,
+	ZED_TET_TRANSFORM_ENDED,
+	ZED_TET_MANAGER_STATE_CHANGED,
 };
 
 class ZEDModule;
@@ -75,80 +82,109 @@ class ZEDViewportKeyboardEvent;
 class ZEDViewportMouseEvent;
 class ZEDViewportChangedEvent;
 class ZERNRenderer;
+class ZEDTransformationManagerToolbar;
+class ZEDTransformationManager;
+
+class ZEDTransformEvent
+{
+	private:
+		ZEDTransformationManager*				Manager;
+		ZEDTransformEventType					Type;
+
+	public:
+		ZEDTransformEventType					GetType();
+		ZEDTransformationManager*				GetManager();
+};
 
 class ZEDTransformationState
 {
 	public:
-		ZEDObjectWrapper*					Wrapper;
-		ZEVector3							Pivot;
-		ZEVector3							OriginalPosition;
-		ZEQuaternion						OriginalRotation;
-		ZEVector3							OriginalScale;
-		ZEDGizmo*							Gizmo;
+		ZEDObjectWrapper*						Wrapper;
+		ZEVector3								Pivot;
+		ZEVector3								OriginalPosition;
+		ZEQuaternion							OriginalRotation;
+		ZEVector3								OriginalScale;
+		ZEDGizmo*								Gizmo;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
 
-											ZEDTransformationState();
-											~ZEDTransformationState();
+												ZEDTransformationState();
+												~ZEDTransformationState();
 };
 
 class ZEDTransformationManager : public ZEInitializable
 {
 	friend class ZEDCore;
 	private:
-		ZEDModule*							Module;
-		ZEDTransformType					TransformType;
-		ZEDTransformSpace					TransformSpace;
-		ZEDTransformPivot					TransformPivot;
-		ZEDGizmo*							TransformGizmo;
-		bool								TransformActive;
-		ZEArray<ZEDTransformationState>		TransformStates;
+		ZEDModule*								Module;
+		ZEDTransformType						TransformType;
+		ZEDTransformSpace						TransformSpace;
+		ZEDTransformPivot						TransformPivot;
+		ZEDGizmo*								TransformGizmo;
+		bool									TransformActive;
+		ZEArray<ZEDTransformationState>			TransformStates;
+		ZEDTransformationState*					TransformFocused;
 
-		ZEVector2							MouseStartPosition;
+		ZEVector3								PivotPosition;
+		ZEVector3								PivotRotation;
+		ZEVector3								PivotScale;
 
-		void								UpdateGizmos();
-		void								UpdateTransformStates();
+		ZEVector2								MouseStartPosition;
 
-		bool								InitializeSelf();
-		void								DeinitializeSelf();
+		void									UpdateGizmo(ZEDGizmo* Gizmo, const ZEVector3& WorldPosition, const ZEQuaternion& WorldRotation);
+		void									UpdateGizmos();
+		void									UpdateToolbar();
+		void									UpdateTransformStates();
 
-		void								StartTransform(ZEDGizmo* TransformGizmo);
-		void								ResetTransform();
-		void								ApplyTranslation(const ZEVector3& Translation);
-		void								ApplyRotation(const ZEQuaternion& Rotation);
-		void								ApplyScale(const ZEVector3& Scale);
-		void								EndTransform();
+		bool									InitializeSelf();
+		void									DeinitializeSelf();
 
-											ZEDTransformationManager();
+		void									StartTransform(ZEDGizmo* TransformGizmo);
+		void									EndTransform();
+		void									ResetTransform();
+
+		void									ApplyTranslation(const ZEVector3& Translation);
+		void									ApplyRotation(const ZEQuaternion& Rotation);
+		void									ApplyScale(const ZEVector3& Scale);
+
+		ZEVector3								GetPosition(bool& Valid);
+		ZEVector3								GetRotation(bool& Valid);
+		ZEVector3								GetScale(bool& Valid);
+
+												ZEDTransformationManager();
 
 	public:
-		ZEDModule*							GetModule();
+		ZEDTransformationManagerToolbar*		Toolbar;
 
-		void								SetTransformType(ZEDTransformType Type);
-		ZEDTransformType					GetTransformType();
+		ZEDModule*								GetModule();
 
-		void								SetTransformSpace(ZEDTransformSpace Space);
-		ZEDTransformSpace					GetTransformSpace();
+		void									SetTransformType(ZEDTransformType Type);
+		ZEDTransformType						GetTransformType();
 
-		void								SetTransformPivot(ZEDTransformPivot Pivot);
-		ZEDTransformPivot					GetTransformPivot();
+		void									SetTransformSpace(ZEDTransformSpace Space);
+		ZEDTransformSpace						GetTransformSpace();
 
-		void								SetX(float Value);
-		float								GetX();
+		void									SetTransformPivot(ZEDTransformPivot Pivot);
+		ZEDTransformPivot						GetTransformPivot();
 
-		void								SetY(float Value);
-		float								GetY();
+		void									SetX(float Value);
+		float									GetX(bool& Valid);
 
-		void								SetZ(float Value);
-		float								GetZ();
+		void									SetY(float Value);
+		float									GetY(bool& Valid);
+
+		void									SetZ(float Value);
+		float									GetZ(bool& Valid);
 
 		// Events
-		virtual void						SelectionEvent(const ZEDSelectionEvent& Event);
-		virtual void						ViewportChangedEvent(const ZEDViewportChangedEvent& Event);
-		virtual bool						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent& Event);
-		virtual bool						ViewportMouseEvent(const ZEDViewportMouseEvent& Event);
-		virtual void						PreRender(ZERNRenderer* Renderer);
+		virtual void							SelectionEvent(const ZEDSelectionEvent& Event);
+		virtual void							ViewportChangedEvent(const ZEDViewportChangedEvent& Event);
+		virtual bool							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent& Event);
+		virtual bool							ViewportMouseEvent(const ZEDViewportMouseEvent& Event);
+		virtual void							PreRender(ZERNRenderer* Renderer);
 
 		
-		void								Destroy();
+		void									Destroy();
 
-		static ZEDTransformationManager*	GetInstance();
+		static ZEDTransformationManager*		GetInstance();
 };
