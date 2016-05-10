@@ -671,7 +671,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	ComputeAmbientColors(CosSunZenith, CosMoonZenith);
 
-	ZEVector3 AmbientColor = ZEVector3(0.1f) + TerrestrialSunAmbientColor * 10.0f + TerrestrialMoonAmbientColor * 0.5f;
+	ZEVector3 AmbientColor = ZEVector3(0.1f) + TerrestrialSunAmbientColor * 20.0f + TerrestrialMoonAmbientColor * 0.5f;
 	zeScene->SetAmbientColor(AmbientColor);
 	zeScene->SetAmbientFactor(1.0f);
 
