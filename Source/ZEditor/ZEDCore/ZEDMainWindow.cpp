@@ -37,16 +37,16 @@
 
 #include "ui_ZEDMainWindow.h"
 
-#include "ZEDMainBrowser.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEDCore/ZEDCore.h"
 #include "ZEDCore/ZEDModule.h"
 #include "ZEDCore/ZEDViewport.h"
 #include "ZEDCore/ZEDOperationManager.h"
 #include "ZEDCore/ZEDTransformationManager.h"
 #include "ZEDCore/ZEDGizmo.h"
-#include "ZEMath/ZEAngle.h"
 #include "ZEDCore/ZEDTransformationManagerToolbar.h"
 #include "ZEDCore/ZEDSelectionManagerToolbar.h"
+#include "ZEDCore/ZEDObjectBrowser.h"
 
 void ZEDMainWindow::closeEvent(QCloseEvent* Event)
 {
@@ -55,12 +55,6 @@ void ZEDMainWindow::closeEvent(QCloseEvent* Event)
 
 bool ZEDMainWindow::InitializeSelf()
 {
-	if (!Core->Initialize())
-		return false;
-
-	MainViewPort->SetScene(Core->GetEditorModule()->GetScene());
-	MainViewPort->Initialize();
-
 	connect(Form->actNew, SIGNAL(triggered(bool)), this, SLOT(actNew_onTriggered()));
 	connect(Form->actOpen, SIGNAL(triggered(bool)), this, SLOT(actOpen_onTriggered()));
 	connect(Form->actClose, SIGNAL(triggered(bool)), this, SLOT(actClose_onTriggered()));
@@ -74,15 +68,12 @@ bool ZEDMainWindow::InitializeSelf()
 	connect(Form->actUndo, SIGNAL(triggered(bool)), this, SLOT(actUndo_onTriggered()));
 	connect(Form->actRedo, SIGNAL(triggered(bool)), this, SLOT(actRedo_onTriggered()));
 
-	Browser->GetBrowserWidget()->LoadScene();
-
 	return true;
 }
 
 void ZEDMainWindow::DeinitializeSelf()
 {
-	MainViewPort->Deinitialize();
-	Core->Deinitialize();
+
 }
 
 void ZEDMainWindow::actNew_onTriggered()
@@ -117,12 +108,12 @@ void ZEDMainWindow::actExit_onTriggered()
 
 void ZEDMainWindow::actUndo_onTriggered()
 {
-	ZEDCore::GetInstance()->GetOperationManager()->Undo();
+	GetModule()->GetOperationManager()->Undo();
 }
 
 void ZEDMainWindow::actRedo_onTriggered()
 {
-	ZEDCore::GetInstance()->GetOperationManager()->Redo();
+	GetModule()->GetOperationManager()->Redo();
 }
 
 void ZEDMainWindow::actClone_onTriggered()
@@ -144,7 +135,7 @@ void ZEDMainWindow::actSelect_onTriggered()
 	if(!Form->actSelect->isChecked())
 		Form->actSelect->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_NONE);
+	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_NONE);
 }
 
 void ZEDMainWindow::actMove_onTriggered()
@@ -156,7 +147,7 @@ void ZEDMainWindow::actMove_onTriggered()
 	if(!Form->actMove->isChecked())
 		Form->actMove->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_TRANSLATE);
+	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_TRANSLATE);
 }
 
 void ZEDMainWindow::actRotate_onTriggered()
@@ -168,7 +159,7 @@ void ZEDMainWindow::actRotate_onTriggered()
 	if(!Form->actRotate->isChecked())
 		Form->actRotate->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_ROTATE);
+	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_ROTATE);
 }
 
 void ZEDMainWindow::actScale_onTriggered()
@@ -180,30 +171,26 @@ void ZEDMainWindow::actScale_onTriggered()
 	if(!Form->actScale->isChecked())
 		Form->actScale->setChecked(true);
 
-	ZEDCore::GetInstance()->GetTransformationManager()->SetTransformType(ZED_TT_SCALE);
+	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_SCALE);
 }
 
 void ZEDMainWindow::MainTimer_onTimeout()
 {
-	Core->ProcessEngine();
+	ZEDCore::GetInstance()->ProcessEngine();
 
-	Form->actUndo->setEnabled(Core->GetOperationManager()->CanUndo());
-	Form->actRedo->setEnabled(Core->GetOperationManager()->CanRedo());
-
-	Form->lblCameraPositionX->setText(QString::number(MainViewPort->GetPosition().x));
-	Form->lblCameraPositionY->setText(QString::number(MainViewPort->GetPosition().y));
-	Form->lblCameraPositionZ->setText(QString::number(MainViewPort->GetPosition().z));
-
-	float Rx, Ry, Rz;
-	ZEQuaternion::ConvertToEulerAngles(Rx, Ry, Rz, MainViewPort->GetRotation());
-	Form->lblCameraRotationX->setText(QString::number((ZEInt)ZEAngle::ToDegree(Rx)));
-	Form->lblCameraRotationY->setText(QString::number((ZEInt)ZEAngle::ToDegree(Ry)));
-	Form->lblCameraRotationZ->setText(QString::number((ZEInt)ZEAngle::ToDegree(Rz)));
+	Form->actUndo->setEnabled(GetModule()->GetOperationManager()->CanUndo());
+	Form->actRedo->setEnabled(GetModule()->GetOperationManager()->CanRedo());
 }
 
-ZEDMainBrowser* ZEDMainWindow::GetBrowser()
+void ZEDMainWindow::SetViewport(ZEDViewport* Viewport)
 {
-	return Browser;
+	this->Viewport = Viewport;
+	setCentralWidget(Viewport);
+}
+
+ZEDViewport* ZEDMainWindow::GetViewport()
+{
+	return Viewport;
 }
 
 ZEDMainWindow::ZEDMainWindow(QWidget* Parent, Qt::WindowFlags Flags) : QMainWindow(Parent, Flags)
@@ -215,29 +202,9 @@ ZEDMainWindow::ZEDMainWindow(QWidget* Parent, Qt::WindowFlags Flags) : QMainWind
 	
 	setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-		
-	Core = ZEDCore::GetInstance();
-	MainViewPort = new ZEDViewport(Form->CentralWidget);
-	MainViewPort->show();
-	Form->ViewPort = MainViewPort;
-	Form->gridLayout->addWidget(Form->ViewPort, 0, 0, 1, 1);
-	
-	TransformManagerToolbar = new ZEDTransformationManagerToolbar();
-	TransformManagerToolbar->SetTransformManager(ZEDCore::GetInstance()->GetTransformationManager());
-	ZEDCore::GetInstance()->GetTransformationManager()->Toolbar = TransformManagerToolbar;
-	TransformManagerToolbar->show();
-
-	SelectionManagerToolbar = new ZEDSelectionManagerToolbar();
-	SelectionManagerToolbar->SetSelectionManager(ZEDCore::GetInstance()->GetSelectionManager());
-	SelectionManagerToolbar->show();
-
-	Browser = new ZEDMainBrowser(this);
-	addDockWidget(Qt::RightDockWidgetArea, Browser);
-
-	InitializeSelf();
 }
 
 ZEDMainWindow::~ZEDMainWindow()
 {
-	DeinitializeSelf();
+
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelectionManagerToolbar.h
+ Zinek Engine - ZEDEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,32 +35,31 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include "ZEMeta/ZEObject.h"
 
-class ZEDSelectionManager;
-class Ui_ZEDSelectionManagerToolbar;
-
-class ZEDSelectionManagerToolbar : public QToolBar, public ZEDComponent
+class ZEDEvent : public ZEObject
 {
-	Q_OBJECT
+	ZE_OBJECT
 	private:
-		Ui_ZEDSelectionManagerToolbar*		Form;
-		ZEDSelectionManager*				SelectionManager;
+		mutable bool			Acquired;
 
-		void								UpdateUI();
-
-	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+	protected:
+								ZEDEvent();
 
 	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
+		bool					IsAcquired() const;
+		void					Acquire() const;
+		void					Unacuqire() const;
 
-											ZEDSelectionManagerToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionManagerToolbar();
+};
+
+class ZEDTickEvent : public ZEDEvent
+{ 
+	ZE_OBJECT
+	public:
+		float					ElapsedTime;
+
+	public:
+		void					SetElapsedTime(float ElapsedTime);
+		float					GetElapsedTime();
 };

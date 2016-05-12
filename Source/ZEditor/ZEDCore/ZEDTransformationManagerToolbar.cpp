@@ -126,6 +126,11 @@ void ZEDTransformationManagerToolbar::UpdateUI()
 	Form->txtZ->blockSignals(false);
 }
 
+void ZEDTransformationManagerToolbar::TransformationEvent(const ZEDTransformationEvent* Event)
+{
+
+}
+
 void ZEDTransformationManagerToolbar::btnSelect_clicked()
 {
 	TransformationManager->SetTransformType(ZED_TT_NONE);

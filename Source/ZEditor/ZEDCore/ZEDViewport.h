@@ -35,9 +35,10 @@
 
 #pragma once
 
-#include "ZETypes.h"
+#include "ZEDComponent.h"
 
-#include "ZEDViewportInput.h"
+#include "ZETypes.h"
+#include "ZEDViewportEvent.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZEGraphics/ZEGRWindow.h"
 
@@ -48,31 +49,20 @@
 #include <QFocusEvent>
 #include <QTimer>
 
-class ZEScene;
 
-class ZEDViewportChangedEvent
-{
-	friend ZEDViewport;
-	private:
-		ZERNView*							View;
-		ZERNView*							OldView;
+class ZEDViewportManager;
 
-											ZEDViewportChangedEvent();
-
-	public:
-		const ZERNView&						GetView() const;
-		const ZERNView&						GetOldView() const;
-};
-
-class ZEDViewport : public QFrame
+class ZEDViewport : public QFrame, public ZEDComponent
 {
 	Q_OBJECT
+	friend ZEDViewportManager;
 	private:
 		ZEFlags								DirtyFlags;
 
+		ZEDViewportManager*					ViewportManager;
+
 		ZERNView							View;
 		ZEViewFrustum						ViewFrustum;
-		ZEScene*							Scene;
 
 		ZEVector3							Position;
 		ZEQuaternion						Rotation;
@@ -95,6 +85,8 @@ class ZEDViewport : public QFrame
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 
+		virtual void						TickEvent(const ZEDTickEvent* Tick);
+
 		virtual void						mousePressEvent(QMouseEvent* MouseEvent);
 		virtual void						mouseMoveEvent(QMouseEvent* MouseEvent);
 		virtual void						mouseReleaseEvent(QMouseEvent* MouseEvent);
@@ -107,6 +99,7 @@ class ZEDViewport : public QFrame
 		virtual void						focusOutEvent(QFocusEvent* Event);
 
 	public:
+		ZEDViewportManager*					GetViewportManager();
 		ZERNRenderer*						GetRenderer();
 		const ZERNView&						GetView();
 
@@ -119,13 +112,6 @@ class ZEDViewport : public QFrame
 		void								SetVerticalFOV(float FOV);
 		float								GetVerticalFOV();
 
-		void								SetScene(ZEScene* Scene);
-		ZEScene*							GetScene();
-
-		virtual bool						Initialize();
-		virtual void						Deinitialize();
-
-		void								Tick();
 		bool								PreRender();
 		void								Render();
 		void								Present();

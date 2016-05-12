@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "ZEInitializable.h"
+#include "ZEDComponent.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
@@ -112,11 +113,10 @@ class ZEDTransformationState
 												~ZEDTransformationState();
 };
 
-class ZEDTransformationManager : public ZEInitializable
+class ZEDTransformationManager : public ZEDComponent
 {
 	friend class ZEDCore;
 	private:
-		ZEDModule*								Module;
 		ZEDTransformType						TransformType;
 		ZEDTransformSpace						TransformSpace;
 		ZEDTransformPivot						TransformPivot;
@@ -151,13 +151,16 @@ class ZEDTransformationManager : public ZEInitializable
 		ZEVector3								GetRotation(bool& Valid);
 		ZEVector3								GetScale(bool& Valid);
 
+		virtual void							SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual void							ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
+		virtual void							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
+		virtual void							ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+		virtual void							ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
+
 												ZEDTransformationManager();
+		virtual									~ZEDTransformationManager();
 
 	public:
-		ZEDTransformationManagerToolbar*		Toolbar;
-
-		ZEDModule*								GetModule();
-
 		void									SetTransformType(ZEDTransformType Type);
 		ZEDTransformType						GetTransformType();
 
@@ -176,15 +179,5 @@ class ZEDTransformationManager : public ZEInitializable
 		void									SetZ(float Value);
 		float									GetZ(bool& Valid);
 
-		// Events
-		virtual void							SelectionEvent(const ZEDSelectionEvent& Event);
-		virtual void							ViewportChangedEvent(const ZEDViewportChangedEvent& Event);
-		virtual bool							ViewportKeyboardEvent(const ZEDViewportKeyboardEvent& Event);
-		virtual bool							ViewportMouseEvent(const ZEDViewportMouseEvent& Event);
-		virtual void							PreRender(ZERNRenderer* Renderer);
-
-		
-		void									Destroy();
-
-		static ZEDTransformationManager*		GetInstance();
+		static ZEDTransformationManager*		CreateInstance();
 };

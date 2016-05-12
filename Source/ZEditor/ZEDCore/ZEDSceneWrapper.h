@@ -48,12 +48,13 @@ class ZEDSceneWrapper : public ZEDObjectWrapper
 
 	public:
 		virtual void							SetObject(ZEObject* Object);
+		virtual ZEString						GetName();
 
 		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
 		virtual void							AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void							RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
 
-		virtual void							PreRender(ZERNRenderer* Renderer);
+		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEDSceneWrapper*					CreateInstance();

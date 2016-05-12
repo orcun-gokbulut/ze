@@ -112,6 +112,11 @@ void ZEDSceneWrapper::SetObject(ZEObject* Object)
 	}
 }
 
+ZEString ZEDSceneWrapper::GetName()
+{
+	return "Scene";
+}
+
 void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
@@ -179,22 +184,13 @@ void ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 	Wrappers.RemoveValue(static_cast<ZEDEntityWrapper*>(Wrapper));
 }
 
-void ZEDSceneWrapper::PreRender(ZERNRenderer* Renderer)
+void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	ZERNPreRenderParameters Parameters;
-	Parameters.Renderer = Renderer;
-	Parameters.View = &Renderer->GetView();
+	static_cast<ZEScene*>(GetObject())->PreRender(Parameters);
 
-	Renderer->StartScene(NULL);
-
+	Parameters->Renderer->StartScene(NULL);
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		Wrappers[I]->PreRender(&Parameters);
+		PreRenderEntity(Wrappers[I], Parameters);
 
-		const ZEArray<ZEDObjectWrapper*>& Children = Wrappers[I]->GetChildWrappers();
-		for (ZESize J = 0; J < Children.GetCount(); J++)
-			Children[J]->PreRender(&Parameters);
-	}
-
-	Renderer->EndScene();
+	Parameters->Renderer->EndScene();
 }

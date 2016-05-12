@@ -36,6 +36,18 @@
 #include "ZEDViewportManager.h"
 
 #include "ZEDViewport.h"
+#include "ZEDModule.h"
+#include "ZEError.h"
+
+ZEDViewportManager::ZEDViewportManager()
+{
+
+}
+
+ZEDViewportManager::~ZEDViewportManager()
+{
+
+}
 
 const ZEArray<ZEDViewport*> ZEDViewportManager::GetViewports()
 {
@@ -44,21 +56,25 @@ const ZEArray<ZEDViewport*> ZEDViewportManager::GetViewports()
 
 void ZEDViewportManager::RegisterViewport(ZEDViewport* Viewport)
 {
+	zeCheckError(Viewport->ViewportManager != NULL, ZE_VOID, "Viewport is already registered to manager.");
+
 	if (Viewports.Exists(Viewport))
 		return;
 
+	Viewport->ViewportManager = this;
 	Viewports.Add(Viewport);
+
+	GetModule()->AddComponent(Viewport);
 }
 
 void ZEDViewportManager::UnregisterViewport(ZEDViewport* Viewport)
 {
-	Viewports.RemoveValue(Viewport);
-}
+	zeCheckError(Viewport->ViewportManager != this, ZE_VOID, "Viewport doesn't belong to this manager.");
 
-void ZEDViewportManager::Tick()
-{
-	for(ZESize I = 0; I < Viewports.GetCount(); I++)
-		Viewports[I]->Tick();
+	Viewport->ViewportManager = NULL;
+	Viewports.RemoveValue(Viewport);
+
+	GetModule()->RemoveComponent(Viewport);
 }
 
 void ZEDViewportManager::Render()
@@ -68,4 +84,9 @@ void ZEDViewportManager::Render()
 
 	for(ZESize I = 0; I < Viewports.GetCount(); I++)
 		Viewports[I]->Present();
+}
+
+ZEDViewportManager* ZEDViewportManager::CreateInstance()
+{
+	return new ZEDViewportManager();
 }

@@ -35,6 +35,7 @@
 
 #include "ZEDTransformationManager.h"
 
+#include "ZEMath\ZEAngle.h"
 #include "ZEDCore.h"
 #include "ZEDModule.h"
 #include "ZEDGizmo.h"
@@ -43,13 +44,9 @@
 #include "ZEDOperationManager.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDViewport.h"
-#include "ZEDViewportInput.h"
-
+#include "ZEDViewportEvent.h"
 #include "ZERenderer\ZERNScreenUtilities.h"
 #include "ZERenderer\ZERNRenderParameters.h"
-#include "ZEMath\ZEAngle.h"
-#include "ZEDTransformationManagerToolbar.h"
-#include "ui_ZEDTransformationManagerToolbar.h"
 
 
 // ZEDTransformationState
@@ -164,15 +161,12 @@ void ZEDTransformationManager::UpdateGizmos()
 
 void ZEDTransformationManager::UpdateToolbar()
 {
-	if (Toolbar == NULL)
-		return;
 
-	Toolbar->UpdateUI();
 }
 
 void ZEDTransformationManager::UpdateTransformStates()
 {
-	const ZEArray<ZEDObjectWrapper*>& Selection = ZEDCore::GetInstance()->GetSelectionManager()->GetSelectedObjects();
+	const ZEArray<ZEDObjectWrapper*>& Selection = GetModule()->GetSelectionManager()->GetSelectedObjects();
 
 	TransformStates.Clear();
 	TransformFocused = NULL;
@@ -270,7 +264,7 @@ void ZEDTransformationManager::EndTransform()
 
 	ZEDTransformationOperation* Operation = new ZEDTransformationOperation(TransformType, TransformStates);
 	Operation->SetApplyEnabled(false);
-	ZEDOperationManager::GetInstance()->DoOperation(Operation);
+	GetModule()->GetOperationManager()->DoOperation(Operation);
 	Operation->SetApplyEnabled(true);
 
 	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
@@ -479,9 +473,156 @@ ZEVector3 ZEDTransformationManager::GetScale(bool& Valid)
 	return ZEVector3::Zero;
 }
 
+
+void ZEDTransformationManager::SelectionEvent(const ZEDSelectionEvent* Event)
+{
+	ResetTransform();
+	UpdateTransformStates();
+}
+
+void ZEDTransformationManager::ViewportChangedEvent(const ZEDViewportChangedEvent* Event)
+{
+
+}
+
+void ZEDTransformationManager::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
+{
+	if (TransformActive && Event->GetKey() == ZED_VKK_ESCAPE)
+	{
+		ResetTransform();
+		Event->Acquire();
+	}
+}
+
+void ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
+{
+	if (GetTransformType() == ZED_TT_NONE)
+		return;
+
+	if (TransformStates.GetCount() == 0)
+		return;
+
+	const ZERNView& View = Event->GetViewport()->GetView();
+	ZERay Ray = ZERNScreenUtilities::ScreenToWorld(Event->GetViewport()->GetView(), Event->GetPosition());
+
+	ZEDGizmoAxis GizmoAxis = ZED_GA_NONE;
+	ZEDTransformationState* TransformState = NULL;
+
+	if (!TransformActive)
+	{
+		float GizmoAxisRayT = FLT_MAX;	
+		for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+		{
+			if (TransformStates[I].Gizmo == NULL)
+				continue;
+
+			ZEDGizmoAxis Axis = TransformStates[I].Gizmo->PickAxis(View, Ray, GizmoAxisRayT);
+			if (Axis != ZED_GA_NONE)
+			{
+				TransformState = &TransformStates[I];
+				GizmoAxis = Axis;
+			}
+			else
+			{
+				TransformStates[I].Gizmo->SetHoveredAxis(ZED_GA_NONE);
+			}
+		}
+
+		if (TransformState != NULL)
+			TransformState->Gizmo->SetHoveredAxis(GizmoAxis);
+	}
+
+	if (Event->GetButton() == ZED_VMB_LEFT && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
+	{
+		MouseStartPosition = Event->GetPosition();
+
+		if (TransformState == NULL)
+			return;
+
+		TransformState->Gizmo->SetSelectedAxis(GizmoAxis);
+		switch (GetTransformType())
+		{
+			case ZED_TT_TRANSLATE:
+				StartTransform(TransformState->Gizmo);
+				
+				TransformGizmo->SetHoveredAxis(TransformState->Gizmo->GetSelectedAxis());
+				TransformGizmo->StartMoveProjection(View, Ray);
+				
+				Event->Acquire();
+
+			case ZED_TT_ROTATE:
+				StartTransform(TransformState->Gizmo);
+				
+				TransformGizmo->SetHoveredAxis(TransformState->Gizmo->GetSelectedAxis());
+				TransformGizmo->StartRotationProjection();
+				
+				Event->Acquire();
+
+			case ZED_TT_SCALE:
+				StartTransform(TransformState->Gizmo);
+				
+				TransformGizmo->SetHoveredAxis(TransformState->Gizmo->GetSelectedAxis());
+				TransformGizmo->StartScaleProjection();
+				
+				Event->Acquire();
+
+			default:
+				return;
+		}
+	}
+	else if (Event->GetType() == ZED_VIET_MOUSE_MOVED)
+	{
+		if (!TransformActive)
+			return;
+
+		if (GetTransformType() == ZED_TT_TRANSLATE)
+		{
+			ZEVector3 TranslationDiff = TransformGizmo->MoveProjection(View, Ray);
+			ApplyTranslation(TranslationDiff);
+
+			Event->Acquire();
+		}
+		else if (GetTransformType() == ZED_TT_ROTATE)
+		{
+			float MouseDisplacement = (MouseStartPosition - Event->GetPosition()).x;
+
+			ZEQuaternion RotationDiff = TransformGizmo->RotationProjection(View, MouseDisplacement * 0.01f);
+			ApplyRotation(RotationDiff);
+
+			Event->Acquire();
+		}
+		else if (GetTransformType() == ZED_TT_SCALE)
+		{
+			float MouseDisplacement = (MouseStartPosition - Event->GetPosition()).x;
+
+			ZEVector3 ScaleDiff = TransformGizmo->ScaleProjection(MouseDisplacement * 0.001f);
+			ApplyScale(ScaleDiff);
+
+			Event->Acquire();
+		}
+	}
+	else if (Event->GetButton() == ZED_VMB_LEFT && Event->GetType() == ZED_VIET_BUTTON_RELEASED)
+	{
+		EndTransform();
+	}
+}
+
+void ZEDTransformationManager::ViewportRenderEvent(const ZEDViewportRenderEvent* Event)
+{
+	const ZERNPreRenderParameters& PreRenderParameters = Event->GetPreRenderParameters();
+	PreRenderParameters.Renderer->StartScene(NULL);
+	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	{
+		if (TransformStates[I].Gizmo == NULL)
+			continue;
+
+		TransformStates[I].Gizmo->PreRender(&PreRenderParameters);
+	}
+	PreRenderParameters.Renderer->EndScene();
+}
+
 ZEDTransformationManager::ZEDTransformationManager()
 {
-	Module = NULL;
 	TransformType = ZED_TT_NONE;
 	TransformSpace = ZED_TS_WORLD;
 	TransformPivot = ZED_TP_OBJECT;
@@ -489,9 +630,9 @@ ZEDTransformationManager::ZEDTransformationManager()
 	TransformGizmo = NULL;
 }
 
-ZEDModule* ZEDTransformationManager::GetModule()
+ZEDTransformationManager::~ZEDTransformationManager()
 {
-	return Module;
+
 }
 
 void ZEDTransformationManager::SetTransformType(ZEDTransformType Type)
@@ -698,161 +839,7 @@ float ZEDTransformationManager::GetZ(bool& Valid)
 	}
 }
 
-void ZEDTransformationManager::SelectionEvent(const ZEDSelectionEvent& Event)
+ZEDTransformationManager* ZEDTransformationManager::CreateInstance()
 {
-	ResetTransform();
-	UpdateTransformStates();
-}
-
-void ZEDTransformationManager::ViewportChangedEvent(const ZEDViewportChangedEvent& Event)
-{
-
-}
-
-bool ZEDTransformationManager::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent& Event)
-{
-	if (TransformActive && Event.GetKey() == ZED_IKK_KEY_ESCAPE)
-	{
-		ResetTransform();
-		return true;
-	}
-
-	return false;
-}
-
-bool ZEDTransformationManager::ViewportMouseEvent(const ZEDViewportMouseEvent& Event)
-{
-	if (GetTransformType() == ZED_TT_NONE)
-		return false;
-
-	if (TransformStates.GetCount() == 0)
-		return false;
-
-	const ZERNView& View = Event.GetViewport()->GetView();
-	ZERay Ray = ZERNScreenUtilities::ScreenToWorld(Event.GetViewport()->GetView(), Event.GetPosition());
-
-	ZEDGizmoAxis GizmoAxis = ZED_GA_NONE;
-	ZEDTransformationState* TransformState = NULL;
-
-	if (!TransformActive)
-	{
-		float GizmoAxisRayT = FLT_MAX;	
-		for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-		{
-			if (TransformStates[I].Gizmo == NULL)
-				continue;
-
-			ZEDGizmoAxis Axis = TransformStates[I].Gizmo->PickAxis(View, Ray, GizmoAxisRayT);
-			if (Axis != ZED_GA_NONE)
-			{
-				TransformState = &TransformStates[I];
-				GizmoAxis = Axis;
-			}
-			else
-			{
-				TransformStates[I].Gizmo->SetHoveredAxis(ZED_GA_NONE);
-			}
-		}
-
-		if (TransformState != NULL)
-			TransformState->Gizmo->SetHoveredAxis(GizmoAxis);
-	}
-
-	if (Event.GetButton() == ZED_MB_LEFT && Event.GetType() == ZED_ET_BUTTON_PRESSED)
-	{
-		MouseStartPosition = Event.GetPosition();
-
-		if (TransformState == NULL)
-			return false;
-
-		TransformState->Gizmo->SetSelectedAxis(GizmoAxis);
-		switch (GetTransformType())
-		{
-			case ZED_TT_TRANSLATE:
-				StartTransform(TransformState->Gizmo);
-				TransformGizmo->SetHoveredAxis(TransformState->Gizmo->GetSelectedAxis());
-				TransformGizmo->StartMoveProjection(View, Ray);
-				return true;
-
-			case ZED_TT_ROTATE:
-				StartTransform(TransformState->Gizmo);
-				TransformGizmo->SetHoveredAxis(TransformState->Gizmo->GetSelectedAxis());
-				TransformGizmo->StartRotationProjection();
-				return true;
-
-			case ZED_TT_SCALE:
-				StartTransform(TransformState->Gizmo);
-				TransformGizmo->SetHoveredAxis(TransformState->Gizmo->GetSelectedAxis());
-				TransformGizmo->StartScaleProjection();
-				return true;
-
-			default:
-				return false;
-		}
-	}
-	else if (Event.GetType() == ZED_ET_MOUSE_MOVED)
-	{
-		if (!TransformActive)
-			return false;
-
-		if (GetTransformType() == ZED_TT_TRANSLATE)
-		{
-			ZEVector3 TranslationDiff = TransformGizmo->MoveProjection(View, Ray);
-			ApplyTranslation(TranslationDiff);
-			
-			return true;
-		}
-		else if (GetTransformType() == ZED_TT_ROTATE)
-		{
-
-			float MouseDisplacement = (MouseStartPosition - Event.GetPosition()).x;
-
-			ZEQuaternion RotationDiff = TransformGizmo->RotationProjection(View, MouseDisplacement * 0.01f);
-			ApplyRotation(RotationDiff);
-			
-			return true;
-		}
-		else if (GetTransformType() == ZED_TT_SCALE)
-		{
-			float MouseDisplacement = (MouseStartPosition - Event.GetPosition()).x;
-
-			ZEVector3 ScaleDiff = TransformGizmo->ScaleProjection(MouseDisplacement * 0.001f);
-			ApplyScale(ScaleDiff);
-
-			return true;
-		}
-	}
-	else if (Event.GetButton() == ZED_MB_LEFT && Event.GetType() == ZED_ET_BUTTON_RELEASED)
-	{
-		EndTransform();
-	}
-
-	return false;
-}
-
-void ZEDTransformationManager::PreRender(ZERNRenderer* Renderer)
-{
-	ZERNPreRenderParameters Parameters;
-	Parameters.Renderer = Renderer;
-	Parameters.View = &Renderer->GetView();
-
-	Renderer->StartScene(NULL);
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
-	{
-		if (TransformStates[I].Gizmo == NULL)
-			continue;
-
-		TransformStates[I].Gizmo->PreRender(&Parameters);
-	}
-	Renderer->EndScene();
-}
-
-void ZEDTransformationManager::Destroy()
-{
-	delete this;
-}
-
-ZEDTransformationManager* ZEDTransformationManager::GetInstance()
-{
-	return ZEDCore::GetInstance()->GetTransformationManager();
+	return new ZEDTransformationManager();
 }

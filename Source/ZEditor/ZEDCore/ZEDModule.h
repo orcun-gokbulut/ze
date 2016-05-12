@@ -37,44 +37,52 @@
 
 #include "ZECore/ZEApplicationModule.h"
 
-class ZEScene;
-class ZEDSceneWrapper;
+#include "ZEDOperationManager.h"
+#include "ZEDViewportManager.h"
+
+class ZEDComponent;
+class ZEDEvent;
 class ZEDObjectWrapper;
-class ZEDSelectionEvent;
+class ZEDSelectionManager;
+class ZEDTransformationManager;
+class ZEDOperationManager;
 class ZEDViewportManager;
-class ZEDViewportController;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEGrid;
+class ZEDObjectWrapper;
+
 
 class ZEDModule : public ZEApplicationModule
 {
+	friend ZEDComponent;
 	private:
-		ZEScene*					Scene;
-		ZEDSceneWrapper*			SceneWrapper;
-		ZEGrid*						Grid;
-		ZEDViewportManager*			ViewportManager;
-		ZEDViewportController*		ViewportController;
+		ZEArray<ZEDComponent*>				Components;
+		ZEDOperationManager*				OperationManager;
+		ZEDSelectionManager*				SelectionManager;
+		ZEDTransformationManager*			TransformManager;
+		ZEDViewportManager*					ViewportManager;
+		ZEDObjectWrapper*					RootWrapper;
+
+		void								DistributeEvent(const ZEDEvent* Event);
+
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 	public:
-		ZEDViewportManager*			GetViewportManager();
+		ZEDOperationManager*				GetOperationManager();
+		ZEDSelectionManager*				GetSelectionManager();
+		ZEDTransformationManager*			GetTransformManager();
+		ZEDViewportManager*					GetViewportManager();
+		ZEDObjectWrapper*					GetRootWrapper();
 
-		void						SetScene(ZEScene* Scene);
-		ZEScene*					GetScene();
-		
-		ZEDObjectWrapper*			GetRootWrapper();
+		virtual void						AddComponent(ZEDComponent* Component);
+		virtual void						RemoveComponent(ZEDComponent* Component);
 
-		virtual void				Process(float ElapsedTime);
-		virtual void				PostProcess(float ElapsedTime);
+		virtual void						Process(float ElapsedTime);
+		virtual void						PostProcess(float ElapsedTime);
 
-		virtual void				StartUp();
-		virtual void				ShutDown();
+		virtual void						StartUp();
+		virtual void						ShutDown();
 
-		virtual void				SelectionEvent(const ZEDSelectionEvent& Event);
-		virtual void				KeyboardEvent(const ZEDViewportKeyboardEvent& Event);
-		virtual void				MouseEvent(const ZEDViewportMouseEvent& Event);
-
-									ZEDModule();
-		virtual						~ZEDModule();
+											ZEDModule();
+		virtual								~ZEDModule();
 
 };
