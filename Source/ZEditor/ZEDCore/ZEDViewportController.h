@@ -33,9 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDViewportInput.h"
+#pragma once
 
-class ZEDViewportController
+#include "ZEDComponent.h"
+#include "ZEDViewportEvent.h"
+
+class ZEDViewportController : public ZEDComponent
 {
 	private:
 		bool						LockCamera;
@@ -54,8 +57,8 @@ class ZEDViewportController
 		void						SetMouseSensivity(float Sensivity);
 		float						GetMouseSensivity();
 
-		virtual bool				KeyboardEvent(const ZEDViewportKeyboardEvent& Event);
-		virtual bool				MouseEvent(const ZEDViewportMouseEvent& Event);
+		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
+		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
 
 									ZEDViewportController();
 									~ZEDViewportController();

@@ -114,7 +114,7 @@ bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 
 	if (CanRedo())
 	{
-		for (ZESSize I = StackIndex + 1; I < Stack.GetCount(); I++)
+		for (ZESSize I = StackIndex + 1; I < (ZESSize)Stack.GetCount(); I++)
 		{
 			Stack[I]->Destroy();
 			Stack.Remove(I);
@@ -144,12 +144,7 @@ void ZEDOperationManager::Clear()
 	StackIndex = -1;
 }
 
-void ZEDOperationManager::Destroy()
+ZEDOperationManager* ZEDOperationManager::CreateInstance()
 {
-	delete this;
-}
-
-ZEDOperationManager* ZEDOperationManager::GetInstance()
-{
-	return ZEDCore::GetInstance()->GetOperationManager();
+	return new ZEDOperationManager();
 }

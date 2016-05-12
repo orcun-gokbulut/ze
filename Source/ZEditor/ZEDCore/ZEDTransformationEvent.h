@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMainBrowser.h
+ Zinek Engine - ZEDTransformationEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,40 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-
-#include "ZEInitializable.h"
-
-#include <QWidget>
-#include <QDockWidget>
-#include <QTreeWidget>
-
-namespace Ui { class MainBrowser; }
-class ZEDObjectWrapper;
-
-class ZEDMainBrowserWidget : public QWidget
-{
-	Q_OBJECT
-	private:
-		Ui::MainBrowser*				Form;
-		ZEDObjectWrapper*				Scene;
-
-		bool							InitializeSelf();
-		bool							DeinitalizeSelf();
-
-	public:
-		void							LoadObject(QTreeWidgetItem* Item, ZEDObjectWrapper* Object);
-		void							LoadScene();
-
-										ZEDMainBrowserWidget(QWidget* Parent = 0);
-};
-
-class ZEDMainBrowser : public QDockWidget
-{
-	private:
-		ZEDMainBrowserWidget*			Browser;
-		
-	public:
-		ZEDMainBrowserWidget*			GetBrowserWidget();
-
-										ZEDMainBrowser(QWidget* Parent = 0);
-};

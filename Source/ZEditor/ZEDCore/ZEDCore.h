@@ -47,12 +47,9 @@ class ZEClass;
 class ZEDCore : public ZEInitializable
 {
 	private:
-		ZEDOperationManager*				OperationManager;
-		ZEDSelectionManager*				SelectionManager;
-		ZEDTransformationManager*			TransformationManager;
-		ZEDModule*							EditorModule;
-		
-		ZEArray<ZEClass*>					WrapperTypes;
+		ZEDModule*							Module;
+
+		void								LoadClasses();
 
 		bool								InitializeSelf();
 		void								DeinitializeSelf();
@@ -61,15 +58,12 @@ class ZEDCore : public ZEInitializable
 											~ZEDCore();
 
 	public:
-		ZEDOperationManager*				GetOperationManager();
-		ZEDSelectionManager*				GetSelectionManager();
-		ZEDTransformationManager*			GetTransformationManager();
-		ZEDModule*							GetEditorModule();
-		const ZEArray<ZEClass*>&			GetWrapperTypes();
+		void								SetModule(ZEDModule* Module);
+		ZEDModule*							GetModule();
 
 		void								ProcessEngine();
-
 		void								Destroy();
 
 		static ZEDCore*						GetInstance();
 };
+

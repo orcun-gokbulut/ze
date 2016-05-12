@@ -43,12 +43,13 @@ find_package(Qt5 COMPONENTS Widgets)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(ZEDCore)
-add_subdirectory(ZEDSceneEditor)
 
 ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine ZEDCore ZEDSceneEditor)
+	LIBS ZEEngine ZEDCore)
 
 qt5_use_modules(ZEditor Widgets)
+
+ze_meta_register(LIBS ZEDCore)

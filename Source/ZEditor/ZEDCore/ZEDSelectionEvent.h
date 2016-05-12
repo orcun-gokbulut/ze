@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelectionManagerToolbar.h
+ Zinek Engine - ZEDSelectionEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,32 +35,45 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include "ZEDEvent.h"
 
-class ZEDSelectionManager;
-class Ui_ZEDSelectionManagerToolbar;
+#include "ZEDS\ZEArray.h"
+#include "ZEDSelectionManager.h"
 
-class ZEDSelectionManagerToolbar : public QToolBar, public ZEDComponent
+class ZEDObjectWrapper;
+
+enum ZEDSelectionEventType
 {
-	Q_OBJECT
+	ZED_SET_NONE,
+	ZED_SET_SELECTED,
+	ZED_SET_DESELECTED,
+	ZED_SET_FOCUS_CHANGED,
+	ZED_SET_MANAGER_STATE_CHANGED
+};
+
+class ZEDSelectionEvent : public ZEDEvent
+{
+	ZE_OBJECT
+	friend class ZEDSelectionManager;
 	private:
-		Ui_ZEDSelectionManagerToolbar*		Form;
-		ZEDSelectionManager*				SelectionManager;
+		ZEDSelectionEventType				Type;
+		ZEDSelectionManager*				Manager;
+		ZEArray<ZEDObjectWrapper*>*			Selection;
+		ZEArray<ZEDObjectWrapper*>*			OldSelection;
+		ZEArray<ZEDObjectWrapper*>*			SelectedObjects;
+		ZEArray<ZEDObjectWrapper*>*			UnselectedObjects;
+		ZEDObjectWrapper*					Focus;
+		ZEDObjectWrapper*					OldFocus;
 
-		void								UpdateUI();
-
-	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+											ZEDSelectionEvent();
 
 	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
-
-											ZEDSelectionManagerToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionManagerToolbar();
+		ZEDSelectionEventType				GetType() const;
+		ZEDSelectionManager*				GetManager() const;
+		const ZEArray<ZEDObjectWrapper*>&	GetSelection() const;
+		const ZEArray<ZEDObjectWrapper*>&	GetOldSelection() const;
+		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects() const;
+		const ZEArray<ZEDObjectWrapper*>&	GetUnselectedObjects() const;
+		ZEDObjectWrapper*					GetFocus();
+		ZEDObjectWrapper*					GetOldFocus();
 };

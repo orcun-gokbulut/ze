@@ -272,7 +272,12 @@ bool ZELight::PreRender(const ZERNPreRenderParameters* Parameters)
 void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	ShadowRenderer.SetContext(Parameters->Context);
-	GetOwnerScene()->PreRender(&ShadowRenderer);
+
+	ZERNPreRenderParameters ShadowPreRenderParameters;
+	ShadowPreRenderParameters.Renderer = &ShadowRenderer;
+	ShadowPreRenderParameters.View = &ShadowRenderer.GetView();
+
+	GetOwnerScene()->PreRender(&ShadowPreRenderParameters);
 	ShadowRenderer.Render();
 }
 

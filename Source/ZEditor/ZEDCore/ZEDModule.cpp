@@ -41,7 +41,7 @@
 #include "ZEDSelectionManager.h"
 #include "ZEDViewport.h"
 #include "ZEDViewportManager.h"
-#include "ZEDViewportInput.h"
+#include "ZEDViewportEvent.h"
 #include "ZEDGizmo.h"
 #include "ZEDEntityWrapper.h"
 
@@ -52,16 +52,58 @@
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZEDViewportController.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEDTransformationManagerToolbar.h"
+#include "ZEDSelectionManagerToolbar.h"
+#include "ZEDObjectBrowser.h"
+#include "ZEDMainWindow.h"
 
-
-void ZEDModule::SetScene(ZEScene* Scene)
+void ZEDModule::DistributeEvent(const ZEDEvent* Event)
 {
-	this->Scene = Scene;
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+	{
+		if (Event->IsAcquired())
+			break;
+
+		Components[I]->EventReceived(Event);
+	}
 }
 
-ZEScene* ZEDModule::GetScene()
+bool ZEDModule::InitializeSelf()
 {
-	return Scene;
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+	{
+		if (!Components[I]->Initialize())
+		{
+			zeError("Cannot initialize component.");
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool ZEDModule::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->Deinitialize();
+
+	return true;
+}
+
+ZEDOperationManager* ZEDModule::GetOperationManager()
+{
+	return OperationManager;
+}
+
+ZEDSelectionManager* ZEDModule::GetSelectionManager()
+{
+	return SelectionManager;
+}
+
+ZEDTransformationManager* ZEDModule::GetTransformManager()
+{
+	return TransformManager;
 }
 
 ZEDViewportManager* ZEDModule::GetViewportManager()
@@ -71,13 +113,35 @@ ZEDViewportManager* ZEDModule::GetViewportManager()
 
 ZEDObjectWrapper* ZEDModule::GetRootWrapper()
 {
-	return SceneWrapper;
+	return RootWrapper;
+}
+
+void ZEDModule::AddComponent(ZEDComponent* Component)
+{
+	zeCheckError(Component->Module != NULL, ZE_VOID, "Component is already registered to a module.");
+
+	Components.Add(Component);
+	
+	if (IsInitialized())
+		Component->Initialize();
+
+	Component->Module = this;
+}
+
+void ZEDModule::RemoveComponent(ZEDComponent* Component)
+{
+	zeCheckError(Component->Module != this, ZE_VOID, "Component doesn't belong to this module.");
+
+	Component->Deinitialize();
+	Components.RemoveValue(Component);
+	Component->Module = NULL;
 }
 
 void ZEDModule::Process(float ElapsedTime)
 {
-	Scene->Tick(ElapsedTime);
-	ViewportManager->Tick();
+	ZEDTickEvent Event;
+	Event.SetElapsedTime(ElapsedTime);
+	DistributeEvent(&Event);
 }
 
 void ZEDModule::PostProcess(float ElapsedTime)
@@ -89,10 +153,10 @@ void ZEDModule::PostProcess(float ElapsedTime)
 			continue;
 
 		ZERNRenderer* Renderer = Viewports[I]->GetRenderer();
-
-		Scene->PreRender(Renderer);
-		SceneWrapper->PreRender(Renderer);
-		ZEDCore::GetInstance()->GetTransformationManager()->PreRender(Renderer);
+		ZERNPreRenderParameters PreRenderParameters;
+		PreRenderParameters.Renderer = Viewports[I]->GetRenderer();
+		PreRenderParameters.View = &Viewports[I]->GetView();
+		RootWrapper->PreRender(&PreRenderParameters);
 	}
 
 	ViewportManager->Render();
@@ -100,28 +164,49 @@ void ZEDModule::PostProcess(float ElapsedTime)
 
 void ZEDModule::StartUp()
 {
-	if (Scene == NULL)
-	{
-		Scene = new ZEScene();
-		Scene->Initialize();
+	ZEDMainWindow* MainWindow = new ZEDMainWindow();
+	AddComponent(MainWindow);
+	MainWindow->show();
 
-		SceneWrapper = ZEDSceneWrapper::CreateInstance();
-		SceneWrapper->SetObject(Scene);
-	}
+	ZEDTransformationManagerToolbar* TransformManagerToolbar = new ZEDTransformationManagerToolbar();
+	TransformManagerToolbar->SetTransformManager(TransformManager);
+	AddComponent(TransformManagerToolbar);
+	TransformManagerToolbar->show();
 
-	ViewportController = new ZEDViewportController();
+	ZEDSelectionManagerToolbar* SelectionManagerToolbar = new ZEDSelectionManagerToolbar();
+	AddComponent(SelectionManagerToolbar);
+	SelectionManagerToolbar->SetSelectionManager(GetSelectionManager());
+	SelectionManagerToolbar->show();
 
-	Grid = ZEGrid::CreateInstance();
+	ZEDViewportController* Controller = new ZEDViewportController();
+	AddComponent(Controller);
+
+
+	ZEDObjectBrowser* Browser = new ZEDObjectBrowser();
+	AddComponent(Browser);
+	Browser->show();
+
+	ZEDViewport* Viewport = new ZEDViewport();
+	GetViewportManager()->RegisterViewport(Viewport);
+	MainWindow->SetViewport(Viewport);
+
+	ZEScene* Scene = new ZEScene();
+	Scene->Initialize();
+
+	RootWrapper = ZEDSceneWrapper::CreateInstance();
+	RootWrapper->SetObject(Scene);
+
+	ZEGrid* Grid = ZEGrid::CreateInstance();
 	ZEDEntityWrapper* GridWrapper = ZEDEntityWrapper::CreateInstance();
 	GridWrapper->SetObject(Grid);
 	GridWrapper->SetSelectable(false);
-	SceneWrapper->AddChildWrapper(GridWrapper);
+	RootWrapper->AddChildWrapper(GridWrapper);
 
 	ZEModel* Trial = ZEModel::CreateInstance();
 	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	ZEDEntityWrapper* Trial1Wrapper = ZEDEntityWrapper::CreateInstance();
 	Trial1Wrapper->SetObject(Trial);
-	SceneWrapper->AddChildWrapper(Trial1Wrapper);
+	RootWrapper->AddChildWrapper(Trial1Wrapper);
 
 	ZEModel* Trial2 = ZEModel::CreateInstance();
 	//Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
@@ -130,14 +215,14 @@ void ZEDModule::StartUp()
 	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	ZEDEntityWrapper* Trial2Wrapper = ZEDEntityWrapper::CreateInstance();
 	Trial2Wrapper->SetObject(Trial2);
-	SceneWrapper->AddChildWrapper(Trial2Wrapper);
+	RootWrapper->AddChildWrapper(Trial2Wrapper);
 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
 	ZEDEntityWrapper* Light1Wrapper = ZEDEntityWrapper::CreateInstance();
 	Light1->SetIntensity(1.0f);
 	Light1->SetColor(ZEVector3::One);
 	Light1Wrapper->SetObject(Light1);
-	SceneWrapper->AddChildWrapper(Light1Wrapper);
+	RootWrapper->AddChildWrapper(Light1Wrapper);
 
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
@@ -153,58 +238,36 @@ void ZEDModule::StartUp()
 	ZEDEntityWrapper* SkyBoxWrapper = ZEDEntityWrapper::CreateInstance();
 	SkyBoxWrapper->SetObject(SkyBox);
 	SkyBoxWrapper->SetSelectable(false);
-	SceneWrapper->AddChildWrapper(SkyBoxWrapper);
+	RootWrapper->AddChildWrapper(SkyBoxWrapper);
 
 }
 
 void ZEDModule::ShutDown()
 {
-	if (Scene != NULL)
-	{
-		Scene->Deinitialize();
-		Scene->Destroy();
-		Scene = NULL;
-	}
-}
 
-void ZEDModule::SelectionEvent(const ZEDSelectionEvent& Event)
-{
-	ZEDCore::GetInstance()->GetTransformationManager()->SelectionEvent(Event);
-}
-
-void ZEDModule::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
-{
-	if (ZEDCore::GetInstance()->GetTransformationManager()->ViewportKeyboardEvent(Event))
-		return;
-
-	if (ZEDCore::GetInstance()->GetSelectionManager()->KeyboardEvent(Event))
-		return;
-
-	if (ViewportController->KeyboardEvent(Event))
-		return;
-}
-
-void ZEDModule::MouseEvent(const ZEDViewportMouseEvent& Event)
-{
-	if (ZEDCore::GetInstance()->GetTransformationManager()->ViewportMouseEvent(Event))
-		return;
-
-	if (ZEDCore::GetInstance()->GetSelectionManager()->MouseEvent(Event))
-		return;
-	
-	if (ViewportController->MouseEvent(Event))
-		return;
 }
 
 ZEDModule::ZEDModule()
 {
-	Scene = NULL;
-	SceneWrapper = NULL;
-	ViewportManager = new ZEDViewportManager();
+	RootWrapper = NULL;
+
+	OperationManager = ZEDOperationManager::CreateInstance();
+	AddComponent(OperationManager);
+
+	TransformManager = ZEDTransformationManager::CreateInstance();
+	AddComponent(TransformManager);
+
+	SelectionManager = ZEDSelectionManager::CreateInstance();
+	AddComponent(SelectionManager);
+
+	ViewportManager = ZEDViewportManager::CreateInstance();
+	AddComponent(ViewportManager);
 }
 
 ZEDModule::~ZEDModule()
 {
-	delete ViewportManager;
-}
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->Destroy();
 
+	Components.Clear();
+}

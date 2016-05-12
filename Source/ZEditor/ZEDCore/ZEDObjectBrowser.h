@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAddToSceneOperation.h
+ Zinek Engine - ZEDObjectBrowser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,23 +35,35 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDOperation.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEDComponent.h"
+#include <QTreeWidget>
 
 class ZEDObjectWrapper;
+class ZEDSelectionManager;
 
-class ZEDAddToSceneOperation : public ZEDOperation
+class ZEDObjectBrowser : public QTreeWidget, public ZEDComponent
 {
+	Q_OBJECT
 	private:
-		ZEDObjectWrapper* Parent;
-		ZEDObjectWrapper* Object;
+		ZEDObjectWrapper*				RootWrapper;
 
-	protected:		
-		virtual bool Apply();
-		virtual bool Revert();
+		QTreeWidgetItem*				FindTreeItem(QTreeWidgetItem* Parent, ZEDObjectWrapper* Wrapper);
+
+	private slots:
+		void							OnSelectionChanged();
+
+	protected:
+		virtual void					UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper);
 
 	public:
-		virtual void Destroy();
+		void							SetRootWrapper(ZEDObjectWrapper* Wrapper);
+		ZEDObjectWrapper*				GetRootWrapper();
 
-		ZEDAddToSceneOperation(ZEDObjectWrapper* Parent, ZEDObjectWrapper* Object);
+		QTreeWidgetItem*				FindTreeItem(ZEDObjectWrapper* Wrapper);
+
+		void							UpdateWrapper(ZEDObjectWrapper* Wrapper);
+		void							UpdateWrapper(QTreeWidgetItem* TreeItem);
+		void							Update();
+
+										ZEDObjectBrowser(QWidget* Parent = 0);
 };

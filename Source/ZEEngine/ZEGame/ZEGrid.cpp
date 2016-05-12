@@ -322,6 +322,7 @@ bool ZEGrid::InitializeSelf()
 	Material = ZERNSimpleMaterial::CreateInstance();
 	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	Material->SetVertexColorEnabled(true);
+	Material->SetStageMask(ZERN_STAGE_FORWARD_POST);
 	Material->Update();
 
 	RenderCommand.Entity = this;

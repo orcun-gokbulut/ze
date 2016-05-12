@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDTransformationOperation.h"
-#include "ZEDObjectWrapper.h"
 
+#include "ZEDObjectWrapper.h"
 
 bool ZEDTransformationOperation::Apply()
 {

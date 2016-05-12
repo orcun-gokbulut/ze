@@ -33,20 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+
+#include "ZEDComponent.h"
 #include <QToolBar>
 
 class ZEDTransformationManager;
 class Ui_ZEDTransformManagerToolbar;
 
-class ZEDTransformationManagerToolbar : public QToolBar
+class ZEDTransformationManagerToolbar : public QToolBar, public ZEDComponent
 {
 	Q_OBJECT
-	friend class ZEDTransformationManager;
 	private:
 		Ui_ZEDTransformManagerToolbar*		Form;
 		ZEDTransformationManager*			TransformationManager;
 
 		void								UpdateUI();
+		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
 
 	private slots:
 		void								btnSelect_clicked();

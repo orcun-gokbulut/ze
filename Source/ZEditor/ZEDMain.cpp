@@ -35,13 +35,15 @@
 
 #pragma once
 
-#define WIN32_LEAN_AND_MEAN
 #include "ZETypes.h"
-#include "ZEDSceneEditor/ZEDMainWindow.h"
-
-#include <windows.h>
-#include <QApplication>
 #include "ZEMath/ZEAngle.h"
+#include "ZEDCore/ZEDCore.h"
+#include "ZEDCore/ZEDModule.h"
+
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+
+#include <QApplication>
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
@@ -52,9 +54,7 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	QApplication Application(argc, argv);
 	//Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
 
-	ZEDMainWindow Editor;
-	Editor.show();
-
+	ZEDCore::GetInstance()->SetModule(new ZEDModule());
 	if (!ZEDCore::GetInstance()->Initialize())
 		return EXIT_FAILURE;
 

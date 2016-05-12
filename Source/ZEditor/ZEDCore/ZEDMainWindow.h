@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAddToSceneOperation.cpp
+ Zinek Engine - ZEDMainWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,71 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDAddToSceneOperation.h"
-#include "ZEDCore/ZEDObjectWrapper.h"
+#pragma once
 
-bool ZEDAddToSceneOperation::Apply()
+#include "ZEDCore/ZEDComponent.h"
+#include <QMainWindow>
+
+#include "ZEDCore/ZEDCore.h"
+#include "ZEDCore/ZEDViewport.h"
+
+class ZEDViewport;
+class Ui_ZEDMainWindow;
+
+class ZEDMainWindow : public QMainWindow, public ZEDComponent
 {
-	if (Parent == NULL || Object == NULL)
-		return false;
+	Q_OBJECT
+	private:
+		Ui_ZEDMainWindow*					Form;
+		ZEDViewport*						Viewport;
 
-	Parent->AddChildWrapper(Object);
-}
+		void								closeEvent(QCloseEvent* Event);
 
-bool ZEDAddToSceneOperation::Revert()
-{
-	if (Parent == NULL || Object == NULL)
-		return false;
+		bool								InitializeSelf();
+		void								DeinitializeSelf();
 
-	Parent->RemoveChildWrapper(Object);
-}
+	private slots:
+		//File Menu Actions
+		void								actNew_onTriggered();
+		void								actOpen_onTriggered();
+		void								actClose_onTriggered();
+		void								actSave_onTriggered();
+		void								actSaveAs_onTriggered();
+		void								actExit_onTriggered();
+		//Edit Menu Actions
+ 		void								actUndo_onTriggered();
+ 		void								actRedo_onTriggered();
+ 		void								actClone_onTriggered();
+ 		void								actDelete_onTriggered();
+		//Operations Menu Actions
+ 		void								actSelect_onTriggered();
+ 		void								actMove_onTriggered();
+ 		void								actRotate_onTriggered();
+ 		void								actScale_onTriggered();
+// 		void								actHide_onTriggered();
+// 		void								actUnhide_onTriggered();
+// 		void								actFreeze_onTriggered();
+// 		void								actUnfreeze_onTriggered();
+// 		void								actGoToEntity_onTriggered();
 
-void ZEDAddToSceneOperation::Destroy()
-{
-	if (ZED_OS_NOT_DONE)
-		Object->Destroy();
-}
+		void								MainTimer_onTimeout();
 
-ZEDAddToSceneOperation::ZEDAddToSceneOperation(ZEDObjectWrapper* Parent, ZEDObjectWrapper* Object)
-{
-	SetText("Add To Scene");
-	this->Parent = Parent;
-	this->Object = Object;
-}
+// 		virtual void						OnSelected();
+// 		virtual void						OnDeselected();
+// 		virtual void						OnCreated();
+// 		virtual void						OnDestroy();
+// 		virtual void						OnTransformed();
+// 		virtual void						OnChildObjectChanged();
+// 		virtual void						OnParentObjectChanged();
+// 		virtual void						OnOpenContainer();
+// 		virtual void						OnCloseContainer();
+// 		virtual void						Save();
+// 		virtual void						Load();
+		
+	public:
+		void								SetViewport(ZEDViewport* Viewport);
+		ZEDViewport*						GetViewport();
+
+											ZEDMainWindow(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
+											~ZEDMainWindow();
+};

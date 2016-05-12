@@ -577,6 +577,9 @@ bool ZECore::StartUp(void* WindowHandle)
 	if (Application != NULL)
 		Application->StartUp();
 
+	if (Application != NULL)
+		Application->Initialize();
+
 	return true;
 }
 

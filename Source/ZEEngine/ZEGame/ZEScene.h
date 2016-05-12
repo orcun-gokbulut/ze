@@ -87,7 +87,7 @@ class ZEScene : public ZEObject
 		void									UpdateConstantBuffer();
 
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
-		void									PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters);
+		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 	public:
@@ -120,7 +120,7 @@ class ZEScene : public ZEObject
 		void									Destroy();
 
 		void									Tick(float ElapsedTime);
-		void									PreRender(ZERNRenderer* Renderer);
+		void									PreRender(const ZERNPreRenderParameters* Parameters);
 		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		bool									Save(const ZEString& FileName);

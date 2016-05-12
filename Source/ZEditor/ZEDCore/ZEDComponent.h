@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelectionManagerToolbar.h
+ Zinek Engine - ZEDComponent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,32 +35,43 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include "ZEInitializable.h"
+#include "ZEDEvent.h"
 
-class ZEDSelectionManager;
-class Ui_ZEDSelectionManagerToolbar;
+class ZEDModule;
+class ZEDEvent;
+class ZEDSelectionEvent;
+class ZEDTransformationEvent;
+class ZEDViewportKeyboardEvent;
+class ZEDViewportMouseEvent;
+class ZEDViewportChangedEvent;
+class ZEDViewportRenderEvent;
 
-class ZEDSelectionManagerToolbar : public QToolBar, public ZEDComponent
+class ZEDComponent : public ZEInitializable
 {
-	Q_OBJECT
+	friend class ZEDModule;
 	private:
-		Ui_ZEDSelectionManagerToolbar*		Form;
-		ZEDSelectionManager*				SelectionManager;
+		ZEDModule*						Module;
 
-		void								UpdateUI();
+	protected:
+		virtual void					EventReceived(const ZEDEvent* Event);
+	
+		virtual void					ObjectModifiedEvent(const ZEDEvent* Event);
+		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
+		virtual	void					TickEvent(const ZEDTickEvent* Event);
+		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
+		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
+		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
 
-	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+		void							RaiseEvent(const ZEDEvent* Event);
+	
+										ZEDComponent();
+		virtual							~ZEDComponent();
 
 	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
+		ZEDModule*						GetModule();
 
-											ZEDSelectionManagerToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionManagerToolbar();
+		virtual void					Destroy();
 };

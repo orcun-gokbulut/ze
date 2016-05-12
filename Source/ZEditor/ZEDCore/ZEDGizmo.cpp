@@ -590,6 +590,8 @@ bool ZEDGizmo::DrawGizmo(const ZERNView& View)
 
 	DirtyGizmoFlags.RaiseFlags(ZED_GDF_VERTEX_BUFFER);
 	DirtyGizmoFlags.UnraiseFlags(ZED_GDF_GIZMO);
+
+	return true;
 }
 	
 bool ZEDGizmo::UpdateVertexBuffer()

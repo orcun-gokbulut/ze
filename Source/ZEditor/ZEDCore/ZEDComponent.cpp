@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelectionManagerToolbar.h
+ Zinek Engine - ZEDComponent.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,92 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-
 #include "ZEDComponent.h"
-#include <QToolBar>
 
-class ZEDSelectionManager;
-class Ui_ZEDSelectionManagerToolbar;
+#include "ZEDSelectionEvent.h"
+#include "ZEDViewportEvent.h"
+#include "ZEDModule.h"
 
-class ZEDSelectionManagerToolbar : public QToolBar, public ZEDComponent
+void ZEDComponent::EventReceived(const ZEDEvent* Event)
 {
-	Q_OBJECT
-	private:
-		Ui_ZEDSelectionManagerToolbar*		Form;
-		ZEDSelectionManager*				SelectionManager;
+	if(ZEClass::IsDerivedFrom(ZEDTickEvent::Class(), Event->GetClass()))
+		TickEvent(static_cast<const ZEDTickEvent*>(Event));
+	else if (ZEClass::IsDerivedFrom(ZEDSelectionEvent::Class(), Event->GetClass()))
+		SelectionEvent(static_cast<const ZEDSelectionEvent*>(Event));
+	else if(ZEClass::IsDerivedFrom(ZEDViewportKeyboardEvent::Class(), Event->GetClass()))
+		ViewportKeyboardEvent(static_cast<const ZEDViewportKeyboardEvent*>(Event));
+	else if(ZEClass::IsDerivedFrom(ZEDViewportMouseEvent::Class(), Event->GetClass()))
+		ViewportMouseEvent(static_cast<const ZEDViewportMouseEvent*>(Event));
+	else if(ZEClass::IsDerivedFrom(ZEDViewportChangedEvent::Class(), Event->GetClass()))
+		ViewportChangedEvent(static_cast<const ZEDViewportChangedEvent*>(Event));
+	else if(ZEClass::IsDerivedFrom(ZEDViewportRenderEvent::Class(), Event->GetClass()))
+		ViewportRenderEvent(static_cast<const ZEDViewportRenderEvent*>(Event));
+}
 
-		void								UpdateUI();
+void ZEDComponent::ObjectModifiedEvent(const ZEDEvent* Event)
+{
 
-	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+}
 
-	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
+void ZEDComponent::SelectionEvent(const ZEDSelectionEvent* Event)
+{
 
-											ZEDSelectionManagerToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionManagerToolbar();
-};
+}
+
+void ZEDComponent::TransformationEvent(const ZEDTransformationEvent* Event)
+{
+
+}
+
+void ZEDComponent::TickEvent(const ZEDTickEvent* Event)
+{
+
+}
+
+void ZEDComponent::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
+{
+
+}
+
+void ZEDComponent::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
+{
+
+}
+
+void ZEDComponent::ViewportChangedEvent(const ZEDViewportChangedEvent* Event)
+{
+
+}
+
+void ZEDComponent::ViewportRenderEvent(const ZEDViewportRenderEvent* Event)
+{
+
+}
+
+void ZEDComponent::RaiseEvent(const ZEDEvent* Event)
+{
+	if (Module == NULL)
+		return;
+
+	Module->DistributeEvent(Event);
+}
+
+ZEDComponent::ZEDComponent()
+{
+	Module = NULL;
+}
+
+ZEDComponent::~ZEDComponent()
+{
+	
+}
+
+ZEDModule* ZEDComponent::GetModule()
+{
+	return Module;
+}
+
+void ZEDComponent::Destroy()
+{
+	delete this;
+}

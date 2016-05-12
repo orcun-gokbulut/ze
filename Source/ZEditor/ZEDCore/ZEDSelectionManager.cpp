@@ -36,76 +36,21 @@
 #include "ZEDSelectionManager.h"
 
 #include "ZEMath/ZEViewVolume.h"
-
 #include "ZEDCore.h"
 #include "ZEDModule.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDGizmo.h"
 #include "ZEDViewPort.h"
-#include "ZEDViewportInput.h"
+#include "ZEDViewportEvent.h"
 #include "ZEDTransformationManager.h"
+#include "ZEDSelectionEvent.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
-
-
-// ZEDSelectionEvent
-//////////////////////////////////////////////////////////////////////////////////////
-
-ZEDSelectionEvent::ZEDSelectionEvent()
-{
-	Type = ZED_SET_NONE;
-	Selection = NULL;
-	OldSelection = NULL;
-	SelectedObjects = NULL;
-	UnselectedObjects = NULL;
-	Focus = NULL;
-	OldFocus = NULL;
-}
-
-ZEDSelectionEventType ZEDSelectionEvent::GetType() const
-{
-	return Type;
-}
-
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetSelection() const
-{
-	return *Selection;
-}
-
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetOldSelection() const
-{
-	return *OldSelection;
-}
-
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetSelectedObjects() const
-{
-	return *SelectedObjects;
-}
-
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() const
-{
-	return *UnselectedObjects;
-}
-
-ZEDObjectWrapper* ZEDSelectionEvent::GetFocus()
-{
-	return Focus;
-}
-
-ZEDObjectWrapper* ZEDSelectionEvent::GetOldFocus()
-{
-	return OldFocus;
-}
-
-// ZEDSelectionManager
-//////////////////////////////////////////////////////////////////////////////////////
 
 
 ZEDSelectionManager::ZEDSelectionManager()
 {
-	Module = NULL;
 	FocusedObject = NULL;
 	Filter = ZEDObjectWrapper::Class();
-	
 }
 
 ZEDSelectionManager::~ZEDSelectionManager()
@@ -116,11 +61,6 @@ ZEDSelectionManager::~ZEDSelectionManager()
 bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
 {
 	return ZEClass::IsDerivedFrom((ZEClass*)Class, Object->GetClass());
-}
-
-ZEDModule* ZEDSelectionManager::GetModule()
-{
-	return Module;
 }
 
 void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)
@@ -192,7 +132,7 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Objects)
@@ -223,7 +163,7 @@ void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Object
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 /*void ZEDSelectionManager::SelectObject(ZEViewVolume* ViewVolume)
@@ -334,7 +274,7 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Objects)
@@ -371,7 +311,7 @@ void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 	Event.UnselectedObjects = &UnselectedObjects;
 	Event.OldFocus = FocusedObject;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 void ZEDSelectionManager::FocusObject(ZEDObjectWrapper* Object)
@@ -402,7 +342,7 @@ void ZEDSelectionManager::FocusObject(ZEDObjectWrapper* Object)
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 void ZEDSelectionManager::ClearFocus()
@@ -422,7 +362,7 @@ void ZEDSelectionManager::ClearFocus()
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 void ZEDSelectionManager::ClearSelection()
@@ -446,7 +386,7 @@ void ZEDSelectionManager::ClearSelection()
 	Event.OldFocus = FocusedObject;
 	Event.Focus = NULL;
 
-	GetModule()->SelectionEvent(Event);
+	RaiseEvent(&Event);
 }
 
 /*void ZEDSelectionManager::DeselectObject(ZEViewVolume* ViewVolume)
@@ -526,29 +466,27 @@ void ZEDSelectionManager::DeselectObject(const ZERNView& View, const ZEVector2& 
 	DeselectObject(&SelectionFrustum);
 }*/
 
-bool ZEDSelectionManager::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
+void ZEDSelectionManager::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
 {
-	if (Event.GetKey() == ZED_IKK_KEY_ESCAPE && Event.GetType() == ZED_ET_BUTTON_PRESSED)
+	if (Event->GetKey() == ZED_VKK_ESCAPE && Event->GetType() == ZED_VIET_BUTTON_PRESSED)
 	{
 		ClearSelection();
-		return false;
+		Event->Acquire();
 	}
-
-	return false;
 }
 
-bool ZEDSelectionManager::MouseEvent(const ZEDViewportMouseEvent& Event)
+void ZEDSelectionManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
 {
-	if (Event.GetButton() != ZED_MB_LEFT)
-		return false;
+	if (Event->GetButton() != ZED_VMB_LEFT)
+		return;
 
-	if (Event.GetType() == ZED_ET_BUTTON_PRESSED)
+	if (Event->GetType() == ZED_VIET_BUTTON_PRESSED)
 	{
-		SelectionStartPosition = Event.GetPosition();
+		SelectionStartPosition = Event->GetPosition();
 
 		// Single Selection	
 		ZERayCastParameters Parameters;
-		Parameters.Ray = ZERNScreenUtilities::ScreenToWorld(Event.GetViewport()->GetView(), Event.GetPosition());
+		Parameters.Ray = ZERNScreenUtilities::ScreenToWorld(Event->GetViewport()->GetView(), Event->GetPosition());
 
 		ZERayCastReport Report;
 		Report.SetParameters(&Parameters);
@@ -557,11 +495,11 @@ bool ZEDSelectionManager::MouseEvent(const ZEDViewportMouseEvent& Event)
 		if (Report.GetResult())
 		{
 			ZEDObjectWrapper* Wrapper = static_cast<ZEDObjectWrapper*>(Report.GetCollision().Object);
-			if ((Event.GetModifiers() & ZED_KKM_CTRL) != 0 || (Event.GetModifiers() & ZED_KKM_SHIFT) != 0)
+			if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0 || (Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
 			{
 				SelectObject(Wrapper);
 			}
-			else if (Event.GetModifiers() & ZED_KKM_ALT)
+			else if (Event->GetModifiers() & ZED_VKM_ALT)
 			{
 				DeselectObject(Wrapper);
 			}
@@ -583,25 +521,17 @@ bool ZEDSelectionManager::MouseEvent(const ZEDViewportMouseEvent& Event)
 			ClearSelection();
 		}
 
-		return true;
+		Event->Acquire();
 	}
-	else if (Event.GetType() == ZED_ET_BUTTON_PRESSED)
+	else if (Event->GetType() == ZED_VIET_BUTTON_PRESSED)
 	{
-		if (SelectionStartPosition - Event.GetPosition() == ZEVector2::Zero)
+		if (SelectionStartPosition - Event->GetPosition() == ZEVector2::Zero)
 		{
 		}
 	}
-
-
-	return false;
 }
 
-void ZEDSelectionManager::Destroy()
+ZEDSelectionManager* ZEDSelectionManager::CreateInstance()
 {
-	delete this;
-}
-
-ZEDSelectionManager* ZEDSelectionManager::GetInstance()
-{
-	return ZEDCore::GetInstance()->GetSelectionManager();
+	return new ZEDSelectionManager();
 }

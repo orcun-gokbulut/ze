@@ -34,6 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDViewportController.h"
+
 #include "ZEMath\ZEVector.h"
 #include "ZEMath\ZEQuaternion.h"
 #include "ZEDViewPort.h"
@@ -70,90 +71,89 @@ float ZEDViewportController::GetMouseSensivity()
 	return MouseSensivity;
 }
 
-bool ZEDViewportController::KeyboardEvent(const ZEDViewportKeyboardEvent& Event)
+void ZEDViewportController::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
 {
-	if (Event.GetType() != ZED_ET_BUTTON_PRESSING)
-		return false;
+	if (Event->GetType() != ZED_VIET_BUTTON_PRESSING)
+		return;
 
-	ZEVector3 Position = Event.GetViewport()->GetPosition();
-	ZEQuaternion Rotation = Event.GetViewport()->GetRotation();
+	ZEVector3 Position = Event->GetViewport()->GetPosition();
+	ZEQuaternion Rotation = Event->GetViewport()->GetRotation();
 	ZEVector3 PositionChange;
 	ZEQuaternion RotationChange;
 
 	float ElapsedTime = zeCore->GetElapsedTime();
 
 	float ModStepSize = StepSize;
-	if ((Event.GetModifiers() & ZED_KKM_SHIFT) != 0)
+	if ((Event->GetModifiers() & ZED_VKM_SHIFT) != 0)
 		ModStepSize *= 5.0f;
 
-	if ((Event.GetModifiers() & ZED_KKM_CTRL) != 0)
+	if ((Event->GetModifiers() & ZED_VKM_CTRL) != 0)
 		ModStepSize *= 0.2f;
 
 
-	if (Event.GetKey() == ZED_IKK_KEY_W)
+	if (Event->GetKey() == ZED_VKK_W)
 	{
 		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3::UnitZ);
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
 		ZEVector3::Add(Position, Position, PositionChange);
-		Event.GetViewport()->SetPosition(Position);
-		return true;
+		Event->GetViewport()->SetPosition(Position);
+		
+		Event->Acquire();
 	}
-	else if (Event.GetKey() == ZED_IKK_KEY_S)
+	else if (Event->GetKey() == ZED_VKK_S)
 	{
 		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3::NegUnitZ);
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
 		ZEVector3::Add(Position, Position, PositionChange);
-		Event.GetViewport()->SetPosition(Position);
+		Event->GetViewport()->SetPosition(Position);
 
-		return true;
+		Event->Acquire();
 	}
-	else if (Event.GetKey() == ZED_IKK_KEY_A)
+	else if (Event->GetKey() == ZED_VKK_A)
 	{
 		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3::NegUnitX);
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
 		ZEVector3::Add(Position, Position, PositionChange);
-		Event.GetViewport()->SetPosition(Position);
+		Event->GetViewport()->SetPosition(Position);
 
-		return true;
+		Event->Acquire();
 	}
-	else if (Event.GetKey() == ZED_IKK_KEY_D)
+	else if (Event->GetKey() == ZED_VKK_D)
 	{
 		ZEQuaternion::VectorProduct(PositionChange, Rotation, ZEVector3::UnitX);
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
 		ZEVector3::Add(Position, Position, PositionChange);
-		Event.GetViewport()->SetPosition(Position);
+		Event->GetViewport()->SetPosition(Position);
 
-		return true;
+		Event->Acquire();
 	}
-
-	return false;
 }
 
-bool ZEDViewportController::MouseEvent(const ZEDViewportMouseEvent& Event)
+void ZEDViewportController::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
 {
-	if (Event.GetButton() == ZED_MB_MIDDLE || (Event.GetButton() == ZED_MB_LEFT && Event.GetModifiers() == ZED_KKM_ALT))
+	if (Event->GetButton() == ZED_VMB_MIDDLE || (Event->GetButton() == ZED_VMB_LEFT && Event->GetModifiers() == ZED_VKM_ALT))
 	{
-		if (Event.GetType() == ZED_ET_BUTTON_PRESSED)
+		if (Event->GetType() == ZED_VIET_BUTTON_PRESSED)
 		{
 			Active = true;
-			ZEQuaternion::ConvertToEulerAngles(Rx, Ry, Rz, Event.GetViewport()->GetRotation());
-			return true;
+			ZEQuaternion::ConvertToEulerAngles(Rx, Ry, Rz, Event->GetViewport()->GetRotation());
+			Event->Acquire();
 		}
-		else if (Event.GetType() == ZED_ET_BUTTON_RELEASED)
+		else if (Event->GetType() == ZED_VIET_BUTTON_RELEASED)
 		{
 			Active = false;
-			return true;
+			Event->Acquire();
 		}
 	}
 
-	if (Event.GetType() != ZED_ET_MOUSE_MOVED)
-		return false;
+	if (Event->GetType() != ZED_VIET_MOUSE_MOVED)
+		return;
 
 	if (!Active)
-		return false;
+		return;
 
-	Rx += Event.GetDelta().y * 0.01f * MouseSensivity;
-	Ry += Event.GetDelta().x * 0.01f * MouseSensivity;
+	Rx += Event->GetDelta().y * 0.01f * MouseSensivity;
+	Ry += Event->GetDelta().x * 0.01f * MouseSensivity;
 
 	if (Ry < -ZE_PI)
 		Ry = ZE_PI;
@@ -168,9 +168,9 @@ bool ZEDViewportController::MouseEvent(const ZEDViewportMouseEvent& Event)
 	ZEQuaternion NewRotation;
 	ZEQuaternion::CreateFromEuler(NewRotation, Rx, Ry, Rz);
 
-	Event.GetViewport()->SetRotation(NewRotation);
+	Event->GetViewport()->SetRotation(NewRotation);
 
-	return true;
+	Event->Acquire();
 }
 
 ZEDViewportController::ZEDViewportController()

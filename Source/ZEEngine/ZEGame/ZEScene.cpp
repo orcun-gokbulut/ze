@@ -77,7 +77,7 @@ void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 
 }
 
-void ZEScene::PreRenderEntity(ZEEntity* Entity, ZERNPreRenderParameters* Parameters)
+void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
 	if (!Entity->GetVisible())
 		return;
@@ -347,18 +347,14 @@ void ZEScene::Tick(float ElapsedTime)
 		TickEntity(Entities[I], ElapsedTime);
 }
 
-void ZEScene::PreRender(ZERNRenderer* Renderer)
+void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	ZERNPreRenderParameters Parameters;
-	Parameters.Renderer = Renderer;
-	Parameters.View = &Renderer->GetView();
+	Parameters->Renderer->StartScene(GetConstantBuffer());
 
-	Renderer->StartScene(GetConstantBuffer());
-	
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		PreRenderEntity(Entities[I], &Parameters);
+		PreRenderEntity(Entities[I], Parameters);
 
-	Renderer->EndScene();
+	Parameters->Renderer->EndScene();
 }
 
 void ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

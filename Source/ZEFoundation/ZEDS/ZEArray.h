@@ -39,10 +39,13 @@
 
 #include "ZETypes.h"
 #include "ZEAllocator.h"
-#include "ZEError.h"
 #include "ZEArrayIterator.h"
+#include "ZEError.h"
 
 #include <stdlib.h>
+
+#define ZE_ARRAY_FRIEND template<typename _Type, typename _Allocator> friend class ZEArray; template<typename _Type> friend class ZEAllocatorBase;
+#define ZE_ARRAY_FRIEND_SPECIFIC(Allocator) template<typename _Type, typename _Allocator> friend class ZEArray; template<typename _Type> friend class Allocator;
 
 template<typename ZEType, typename Allocator_= ZEAllocatorBase<ZEType> >
 class ZEArray

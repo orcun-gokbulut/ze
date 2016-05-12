@@ -35,13 +35,13 @@
 
 #pragma once
 
+#include "ZEDComponent.h"
+
 #include "ZEDOperation.h"
 #include "ZEDS\ZEArray.h"
 
-class ZEDOperationManager
+class ZEDOperationManager : public ZEDComponent
 {
-	friend class ZEDCore;
-
 	private:
 		ZEArray<ZEDOperation*>			Stack;
 		ZESSize							StackIndex;
@@ -62,7 +62,5 @@ class ZEDOperationManager
 
 		bool							DoOperation(ZEDOperation* Operation);
 
-		void							Destroy();
-
-		static ZEDOperationManager*		GetInstance();
+		static ZEDOperationManager*		CreateInstance();
 };

@@ -35,27 +35,39 @@
 
 #include "ZEDCore.h"
 
-#include "ZEDOperationManager.h"
-#include "ZEDSelectionManager.h"
-#include "ZEDTransformationManager.h"
-#include "ZEDModule.h"
-#include "ZEDObjectWrapper.h"
-#include "ZEDViewport.h"
-#include "ZEDS/ZEString.h"
-#include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
-#include "ZECore/ZEOptionManager.h"
-#include "ZECore/ZESystemMessageManager.h"
 #include "ZEMeta/ZEProvider.h"
+#include "ZEDModule.h"
+#include "ZECore/ZECore.h"
+#include "ZECore/ZESystemMessageManager.h"
+#include "ZECore/ZEOptionManager.h"
 
 #include <windows.h>
 #include <QtCore/QObject>
 
+#undef RegisterClass
+
 extern HINSTANCE ApplicationInstance;
+
+void ZEDCore::LoadClasses()
+{
+	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration();
+	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
+	#include "../ZEMetaRegister.h"
+	#undef ZE_META_REGISTER_ENUM
+	#undef ZE_META_REGISTER_CLASS
+
+	#define ZE_META_REGISTER_ENUM(Name) ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
+	#define ZE_META_REGISTER_CLASS(Name) ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
+	#include "../ZEMetaRegister.h"
+	#undef ZE_META_REGISTER_ENUM
+	#undef ZE_META_REGISTER_CLASS
+}
 
 bool ZEDCore::InitializeSelf()
 {
-	zeCore->SetApplicationModule(EditorModule);
+	zeCheckError(Module == NULL, false, "Module is not available.");
+
+	zeCore->SetApplicationModule(Module);
 
 	zeCore->GetOptions()->Load("options.ini");
 	zeCore->GetOptions()->ResetChanges();
@@ -63,65 +75,42 @@ bool ZEDCore::InitializeSelf()
 	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
 
 	if (!zeCore->StartUp())
+	{
+		zeError("Cannot start up core.");
 		return false;
+	}
 
 	zeCore->SetCoreState(ZE_CS_RUNNING);
-
-	TransformationManager->Initialize();
-	if (!EditorModule->Initialize())
-		return false;
-
-	WrapperTypes = ZEProvider::GetInstance()->GetClass(ZEDObjectWrapper::Class());
-	SelectionManager->Module = EditorModule;
 
 	return true;
 }
 
 void ZEDCore::DeinitializeSelf()
 {
-	TransformationManager->Deinitialize();
 	zeCore->ShutDown();
 }
 
 ZEDCore::ZEDCore()
 {
-	OperationManager = new ZEDOperationManager();
-	SelectionManager = new ZEDSelectionManager();
-	TransformationManager = new ZEDTransformationManager();
-	EditorModule = new ZEDModule();
+	LoadClasses();
 }
 
 ZEDCore::~ZEDCore()
 {
-	delete OperationManager;
-	delete SelectionManager;
-	delete TransformationManager;
-	delete EditorModule;
+
 }
 
-ZEDOperationManager* ZEDCore::GetOperationManager()
+void ZEDCore::SetModule(ZEDModule* Module)
 {
-	return OperationManager;
+	if (IsInitialized())
+		return;
+
+	this->Module = Module;
 }
 
-ZEDSelectionManager* ZEDCore::GetSelectionManager()
+ZEDModule* ZEDCore::GetModule()
 {
-	return SelectionManager;
-}
-
-ZEDTransformationManager* ZEDCore::GetTransformationManager()
-{
-	return TransformationManager;
-}
-
-ZEDModule* ZEDCore::GetEditorModule()
-{
-	return EditorModule;
-}
-
-const ZEArray<ZEClass*>& ZEDCore::GetWrapperTypes()
-{
-	return WrapperTypes;
+	return Module;
 }
 
 void ZEDCore::ProcessEngine()

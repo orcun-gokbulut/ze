@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDMainBrowser.cpp
+ Zinek Engine - ZEDTransformationEvent.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,4 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDMainBrowser.h"
-#include "ui_ZEDMainBrowser.h"
-#include "ZEDCore/ZEDObjectWrapper.h"
-#include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDModule.h"
-
-void ZEDMainBrowserWidget::LoadObject(QTreeWidgetItem* Item, ZEDObjectWrapper* Object)
-{
-	if (Item == NULL || Object == NULL)
-		return;
-
-	Item->setText(0, Object->GetName().ToCString());
-	Item->setText(1, Object->GetObject()->GetClass()->GetName());
-	Item->setData(0, Qt::UserRole, QVariant((qlonglong)Object));
-
-	const ZEArray<ZEDObjectWrapper*>& ChildObjects = Object->GetChildWrappers();
-
-	for (ZESize I = 0; I < ChildObjects.GetCount(); I++)
-	{
-		QTreeWidgetItem* SubItem = new QTreeWidgetItem(Item);
-		LoadObject(SubItem, ChildObjects[I]);
-	}
-}
-
-void ZEDMainBrowserWidget::LoadScene()
-{
-	Form->treeBrowser->clear();
-
-	if (Scene == NULL)
-		return;
-
-	QTreeWidgetItem* TopLevelItem = new QTreeWidgetItem();
-	Form->treeBrowser->addTopLevelItem(TopLevelItem);
-	LoadObject(TopLevelItem, Scene);
-}
-
-ZEDMainBrowserWidget::ZEDMainBrowserWidget(QWidget* Parent) : QWidget(Parent)
-{
-	Form = new Ui::MainBrowser();
-	Form->setupUi(this);
-
-	Scene = NULL;
-}
-
-//ZEDMainBrowser Dock Widget
-
-ZEDMainBrowserWidget* ZEDMainBrowser::GetBrowserWidget()
-{
-	return Browser;
-}
-
-ZEDMainBrowser::ZEDMainBrowser(QWidget* Parent) : QDockWidget("Main Browser", Parent)
-{
-	Browser = new ZEDMainBrowserWidget(this);
-	setWidget(Browser);
-	setAllowedAreas(Qt::LeftDockWidgetArea | Qt::RightDockWidgetArea);
-}
+#include "ZEDTransformationEvent.h"
