@@ -22,6 +22,11 @@
    <Node Name="Configuration"/>
   </Node>
   <Node Name="Module">
+   <Property Name="Name" Type="String">Integrity</Property>
+   <Property Name="Enabled" Type="Bool">true</Property>
+   <Node Name="Configuration"/>
+  </Node>
+  <Node Name="Module">
    <Property Name="Name" Type="String">Update</Property>
    <Property Name="Enabled" Type="Bool">false</Property>
    <Node Name="Configuration"/>

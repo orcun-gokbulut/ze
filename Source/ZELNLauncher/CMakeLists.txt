@@ -35,9 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+find_package(OpenMP REQUIRED)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 ze_add_source(ZELNMain.cpp						Sources)
 ze_add_source(ZELNModule.cpp					Sources)
-ze_add_source(ZELNModule.h						Sources)
+ze_add_source(ZELNModule.h						Sources Headers)
 ze_add_source(ZELNLauncher.cpp					Sources)
 ze_add_source(ZELNLauncher.h					Sources)
 ze_add_source(ZELNLauncherWindow.cpp			Sources)
@@ -62,6 +68,16 @@ ze_add_source(ZELNLicenseManagerDialog.ui		Source QtUIs)
 ze_add_source(ZELNLicenseEditorDialog.cpp		Sources)
 ze_add_source(ZELNLicenseEditorDialog.h			Sources QtMocs)
 ze_add_source(ZELNLicenseEditorDialog.ui		Source QtUIs)
+
+ze_add_source(ZELNIntegrityModule.cpp			Sources)
+ze_add_source(ZELNIntegrityModule.h				Sources QtMocs)
+ze_add_source(ZELNIntegrityWidget.ui			Sources QtUIs)
+ze_add_source(ZEITIntegrityChecker.cpp			Sources)
+ze_add_source(ZEITIntegrityChecker.h			Sources Headers)
+ze_add_source(ZEITIntegrityGenerator.cpp		Sources)
+ze_add_source(ZEITIntegrityGenerator.h			Sources Headers)
+ze_add_source(ZEITIntegrityRecord.cpp			Sources)
+ze_add_source(ZEITIntegrityRecord.h				Sources Headers)
 
 ze_add_source(ZELNUpdateModule.cpp				Sources)
 ze_add_source(ZELNUpdateModule.h				Sources)
@@ -88,7 +104,7 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect Qt5::WinMain
+	LIBS ZEFoundation ZEProtect libCryptopp Qt5::WinMain
 	DESCRIPTION "Zinek Launcher")
 
 qt5_use_modules(ZELNLauncher Core Widgets)

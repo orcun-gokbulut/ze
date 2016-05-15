@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNModule.cpp
+ Zinek Engine - ZELNIntegrityModule.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#pragma once
+
 #include "ZELNModule.h"
-#include "ZELNUpdateModule.h"
-#include "ZELNLicenseModule.h"
-#include "ZELNLogModule.h"
-#include "ZELNContactModule.h"
-#include "ZELNIntegrityModule.h"
 
-static ZELNModuleDescription* Modules[] =
+#include "ZEITIntegrityChecker.h"
+
+#include <QObject>
+
+class QWidget;
+class Ui_ZELNIntegrityWidget;
+
+class ZELNIntegrityModule : public QObject, public ZELNModule
 {
-	ZELNLogModule::Description(),
-	ZELNLicenseModule::Description(),
-	ZELNUpdateModule::Description(),
-	ZELNContactModule::Description(),
-	ZELNIntegrityModule::Description()
+	Q_OBJECT
+	ZELN_MODULE
+	friend class ZELNLauncher;
+	private:
+		QWidget*						Widget;
+		Ui_ZELNIntegrityWidget*			Form;
+		bool							State;
+		ZEITIntegrityCheker				Checker;
+
+		void							UpdateRecord(ZESize Index);
+		void							Update();
+
+		virtual bool					InitializeSelf();
+
+	private slots:
+		void							btnCheckIntegrity_clicked();
+
+	public:
+		virtual QWidget*				GetWidget();
+
+		void							CheckIntegrity();
+		void							CancelCheckIntegrity();
 };
-
-bool ZELNModule::OnPreLaunch()
-{
-	return true;
-}
-
-void ZELNModule::OnPostLaunch()
-{
-
-}
-
-void ZELNModule::OnTerminate()
-{
-	
-}
-
-void ZELNModule::OnUpdate()
-{
-
-}
-
-QWidget* ZELNModule::GetWidget()
-{
-	return NULL;
-}
-
-bool ZELNModule::GetAllowLaunch()
-{
-	return true;
-}
-
-ZEArray<ZEString> ZELNModule::GetLaunchParameters()
-{
-	return ZEArray<ZEString>();
-}
-
-void ZELNModule::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
-{
-
-}
-
-ZESize ZELNModule::GetModuleCount()
-{
-	return sizeof(Modules) / sizeof(ZELNModuleDescription*);
-}
-
-ZELNModuleDescription** ZELNModule::GetModules()
-{
-	return Modules;
-}
-
-ZELNModuleDescription* ZELNModule::GetModule(const char* Name)
-{
-	for (ZESize I = 0; I < GetModuleCount(); I++)
-	{
-		ZELNModuleDescription* ModuleDescription = GetModules()[I];
-		if (strcmp(Name, ModuleDescription->GetName()) == 0)
-			return ModuleDescription;
-	}
-
-	return NULL;
-}

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNModule.cpp
+ Zinek Engine - ZEITIntegrityGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNModule.h"
-#include "ZELNUpdateModule.h"
-#include "ZELNLicenseModule.h"
-#include "ZELNLogModule.h"
-#include "ZELNContactModule.h"
-#include "ZELNIntegrityModule.h"
+#pragma once
 
-static ZELNModuleDescription* Modules[] =
+#include "ZEDS/ZEArray.h"
+#include "ZEITIntegrityRecord.h"
+#include "ZEThread/ZELock.h"
+
+class ZEITIntegrityGenerator
 {
-	ZELNLogModule::Description(),
-	ZELNLicenseModule::Description(),
-	ZELNUpdateModule::Description(),
-	ZELNContactModule::Description(),
-	ZELNIntegrityModule::Description()
+	private:
+		ZELock								Lock;
+		ZEArray<ZEITIntegrityRecord>		Records;
+		ZEString							IntegrityFile;
+
+	public:
+		const ZEArray<ZEITIntegrityRecord>	GetRecords() const;
+		void								AddRecord(const ZEITIntegrityRecord& Record);
+		void								RemoveRecord(const ZEITIntegrityRecord& Record);
+
+		void								ScanDirectory(const ZEString& Path, bool Recursive);
+
+		void								SetIntegrityFileName(const ZEString& FileName);
+		const ZEString&						GetIntegrityFileName() const;
+
+		bool								Load();
+		bool								Save();
+
+
 };
-
-bool ZELNModule::OnPreLaunch()
-{
-	return true;
-}
-
-void ZELNModule::OnPostLaunch()
-{
-
-}
-
-void ZELNModule::OnTerminate()
-{
-	
-}
-
-void ZELNModule::OnUpdate()
-{
-
-}
-
-QWidget* ZELNModule::GetWidget()
-{
-	return NULL;
-}
-
-bool ZELNModule::GetAllowLaunch()
-{
-	return true;
-}
-
-ZEArray<ZEString> ZELNModule::GetLaunchParameters()
-{
-	return ZEArray<ZEString>();
-}
-
-void ZELNModule::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
-{
-
-}
-
-ZESize ZELNModule::GetModuleCount()
-{
-	return sizeof(Modules) / sizeof(ZELNModuleDescription*);
-}
-
-ZELNModuleDescription** ZELNModule::GetModules()
-{
-	return Modules;
-}
-
-ZELNModuleDescription* ZELNModule::GetModule(const char* Name)
-{
-	for (ZESize I = 0; I < GetModuleCount(); I++)
-	{
-		ZELNModuleDescription* ModuleDescription = GetModules()[I];
-		if (strcmp(Name, ModuleDescription->GetName()) == 0)
-			return ModuleDescription;
-	}
-
-	return NULL;
-}
