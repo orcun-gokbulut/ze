@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNModule.cpp
+ Zinek Engine - ZEITIntegrityChecker.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,45 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNModule.h"
-#include "ZELNUpdateModule.h"
-#include "ZELNLicenseModule.h"
-#include "ZELNLogModule.h"
-#include "ZELNContactModule.h"
-#include "ZELNIntegrityModule.h"
+#pragma once
 
-static ZELNModuleDescription* Modules[] =
+#include "ZEDS/ZEArray.h"
+#include "ZEITIntegrityRecord.h"
+
+enum ZEITIntegrityCheckerResult
 {
-	ZELNLogModule::Description(),
-	ZELNLicenseModule::Description(),
-	ZELNUpdateModule::Description(),
-	ZELNContactModule::Description(),
-	ZELNIntegrityModule::Description()
+	ZEIT_ICR_NONE,
+	ZEIT_ICR_SUCESS,
+	ZEIT_ICR_PARTIAL_SUCESS,
+	ZEIT_ICR_FAILED
 };
 
-bool ZELNModule::OnPreLaunch()
+class ZEITIntegrityCheker
 {
-	return true;
-}
+	private:
+		ZEArray<ZEITIntegrityRecord>			Records;
+		ZESize									LastIndex;
+		ZEString								IntegrityFile;
+		ZEITIntegrityCheckerResult				Result;
+		bool									StopOnFirstFailure;
 
-void ZELNModule::OnPostLaunch()
-{
+	public:
+		const ZEArray<ZEITIntegrityRecord>&		GetRecords() const;
 
-}
+		void									SetIntegrityFile(const ZEString& FileName);
+		const ZEString&							GetIntegrityFile() const;
 
-void ZELNModule::OnTerminate()
-{
-	
-}
+		void									GetStopOnFirstFailure(bool Enabled);
+		bool									GetStopOnFirstFailure() const;
 
-void ZELNModule::OnUpdate()
-{
+		ZEITIntegrityCheckerResult				GetResult() const;
 
-}
+		void									CheckStart();
+		ZESSize									CheckProgress();
+		
 
-QWidget* ZELNModule::GetWidget()
-{
-	return NULL;
-}
+		bool									Load();
+		bool									Save();
 
-bool ZELNModule::GetAllowLaunch()
-{
-	return true;
-}
-
-ZEArray<ZEString> ZELNModule::GetLaunchParameters()
-{
-	return ZEArray<ZEString>();
-}
-
-void ZELNModule::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
-{
-
-}
-
-ZESize ZELNModule::GetModuleCount()
-{
-	return sizeof(Modules) / sizeof(ZELNModuleDescription*);
-}
-
-ZELNModuleDescription** ZELNModule::GetModules()
-{
-	return Modules;
-}
-
-ZELNModuleDescription* ZELNModule::GetModule(const char* Name)
-{
-	for (ZESize I = 0; I < GetModuleCount(); I++)
-	{
-		ZELNModuleDescription* ModuleDescription = GetModules()[I];
-		if (strcmp(Name, ModuleDescription->GetName()) == 0)
-			return ModuleDescription;
-	}
-
-	return NULL;
-}
+												ZEITIntegrityCheker();
+};

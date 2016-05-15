@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNModule.cpp
+ Zinek Engine - ZEITIntegrityRecord.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,80 +33,61 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNModule.h"
-#include "ZELNUpdateModule.h"
-#include "ZELNLicenseModule.h"
-#include "ZELNLogModule.h"
-#include "ZELNContactModule.h"
-#include "ZELNIntegrityModule.h"
+#pragma once
 
-static ZELNModuleDescription* Modules[] =
+#include "ZEDS/ZEString.h"
+
+class ZEFile;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
+
+enum ZEITIntegrityRecordType
 {
-	ZELNLogModule::Description(),
-	ZELNLicenseModule::Description(),
-	ZELNUpdateModule::Description(),
-	ZELNContactModule::Description(),
-	ZELNIntegrityModule::Description()
+	ZEIT_RT_NONE,
+	ZEIT_RT_FILE,
+	ZEIT_RT_DIRECTORY
 };
 
-bool ZELNModule::OnPreLaunch()
+enum ZEITIntegrityResult
 {
-	return true;
-}
+	ZETI_CR_NOT_CHECKED,
+	ZEIT_CR_SUCCESS,
+	ZEIT_CR_MISSING,
+	ZEIT_CR_CHECKSUM_FAILED
+};
 
-void ZELNModule::OnPostLaunch()
+class ZEITIntegrityRecord
 {
-
-}
-
-void ZELNModule::OnTerminate()
-{
+	private:
+		ZEString							Path;
+		ZEITIntegrityRecordType				Type;
+		bool								Required;
+		ZEString							Checksum;
+		ZEITIntegrityResult					Result;
 	
-}
+		ZEString							CalculateChecksum(ZEFile* File);
 
-void ZELNModule::OnUpdate()
-{
+	public:
+		void								SetPath(const ZEString& Path);
+		const ZEString&						GetPath() const;
 
-}
+		void								SetType(ZEITIntegrityRecordType Type);
+		ZEITIntegrityRecordType				GetType() const;
 
-QWidget* ZELNModule::GetWidget()
-{
-	return NULL;
-}
+		void								SetRequired(bool Required);
+		bool								GetRequired() const;
 
-bool ZELNModule::GetAllowLaunch()
-{
-	return true;
-}
+		void								SetChecksum(const ZEString& CheckSum);
+		const ZEString&						GetChecksum() const;
 
-ZEArray<ZEString> ZELNModule::GetLaunchParameters()
-{
-	return ZEArray<ZEString>();
-}
+		ZEITIntegrityResult					GetResult() const;
 
-void ZELNModule::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
-{
+		bool								Check();
+		bool								Generate();
+		void								Reset();
 
-}
+		bool								Load(ZEMLReaderNode* RecordNode);
+		bool								Save(ZEMLWriterNode* RecordsNode);
 
-ZESize ZELNModule::GetModuleCount()
-{
-	return sizeof(Modules) / sizeof(ZELNModuleDescription*);
-}
-
-ZELNModuleDescription** ZELNModule::GetModules()
-{
-	return Modules;
-}
-
-ZELNModuleDescription* ZELNModule::GetModule(const char* Name)
-{
-	for (ZESize I = 0; I < GetModuleCount(); I++)
-	{
-		ZELNModuleDescription* ModuleDescription = GetModules()[I];
-		if (strcmp(Name, ModuleDescription->GetName()) == 0)
-			return ModuleDescription;
-	}
-
-	return NULL;
-}
+											ZEITIntegrityRecord();
+};
