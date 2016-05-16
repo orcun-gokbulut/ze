@@ -109,6 +109,8 @@ void ZELNIntegrityModule::Worker_Done(bool Canceled)
 	}
 	else
 	{
+		Form->prgProgress->setEnabled(false);
+		Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 		Form->lblStatus->setText(QString("Canceled (%1)").arg(StatusText));
 	}
 
@@ -257,7 +259,7 @@ ZELNIntegrityModule::ZELNIntegrityModule()
 	Form->tblRecords->setHorizontalHeaderItem(1, PathHeader);
 
 	Form->tblRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
-	Form->tblRecords->verticalHeader().setVisible(false);
+	Form->tblRecords->verticalHeader()->setVisible(false);
 
 	QHeaderView* verticalHeader = Form->tblRecords->verticalHeader();
 	verticalHeader->sectionResizeMode(QHeaderView::Fixed);
@@ -279,8 +281,10 @@ void ZELNIntegrityModule::btnCheckIntegrity_clicked()
 	{
 		State = true;
 
+		Form->prgProgress->setEnabled(true);
 		Form->prgProgress->setValue(0);
 		Form->prgProgress->setMaximum(Checker.GetRecords().GetCount());
+		Form->prgProgress->setStyleSheet("");
 		Form->lblStatus->setText("Checking...");
 		Form->btnCheckIntegrity->setText("Cancel");
 

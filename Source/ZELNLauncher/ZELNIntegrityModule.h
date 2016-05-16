@@ -37,7 +37,7 @@
 
 #include "ZELNModule.h"
 
-#include "ZEITIntegrityChecker.h"
+#include "ZEITIntegrity/ZEITIntegrityChecker.h"
 
 #include <QObject>
 #include <QThread>
