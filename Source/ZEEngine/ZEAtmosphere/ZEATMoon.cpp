@@ -163,7 +163,7 @@ bool ZEATMoon::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 bool ZEATMoon::DeinitializeSelf()

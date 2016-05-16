@@ -235,7 +235,7 @@ bool ZEATCloud::InitializeSelf()
 	SamplerDescriptionLinearWrap.AddressV = ZEGR_TAM_WRAP;
 	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerDescriptionLinearWrap);
 
-	return true;
+	return Update();
 }
 
 bool ZEATCloud::DeinitializeSelf()

@@ -162,7 +162,7 @@ bool ZEATSun::InitializeSelf()
 	
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 bool ZEATSun::DeinitializeSelf()

@@ -39,9 +39,8 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEPointer/ZESharedPointer.h"
-#include "ZERNFilter.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZERNFilter.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -49,7 +48,6 @@ class ZEGRTexture2D;
 class ZEGRConstantBuffer;
 class ZEGRContext;
 class ZEGRRenderStateData;
-class ZEGRRenderState;
 class ZERNRenderer;
 class ZEGRRenderTarget;
 

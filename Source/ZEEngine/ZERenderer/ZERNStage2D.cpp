@@ -86,9 +86,6 @@ bool ZERNStage2D::Setup(ZEGRContext* Context)
 
 void ZERNStage2D::CleanUp(ZEGRContext* Context)
 {
-	Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 

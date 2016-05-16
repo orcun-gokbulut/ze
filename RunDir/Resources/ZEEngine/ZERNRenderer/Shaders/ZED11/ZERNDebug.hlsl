@@ -44,6 +44,7 @@ struct ZERNDebug_VertexShader_Input
 	float3		Normal		: NORMAL0;
 	float3		Tangent		: TANGENT0;
 	float3		Binormal	: BINORMAL0;
+	float2		Texcoord	: TEXCOORD0;
 };
 
 struct ZERNDebug_GeometryShader_Input

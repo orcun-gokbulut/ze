@@ -66,22 +66,26 @@ class ZERNStageLighting : public ZERNStage
 	private:
 		ZEFlags									DirtyFlags;
 		ZEGRViewport							Viewport;
-		ZEHolder<ZEGRTexture2D>					OutputTexture;
 
 		ZEHolder<ZEGRShader>					ScreenCoverVertexShader;
 		ZEHolder<ZEGRShader>					DeferredVertexShader;
 		ZEHolder<ZEGRShader>					DeferredPixelShader;
+		ZEHolder<ZEGRShader>					DeferredPixelShaderPerSample;
 		ZEHolder<ZEGRShader>					TiledDeferredComputeShader;
-		ZEHolder<ZEGRShader>					AccumulateAmbientEmissivePixelShader;
+		ZEHolder<ZEGRShader>					AccumulateEmissivePixelShader;
+		ZEHolder<ZEGRShader>					EdgeDetectionPixelShader;
 
 		ZEHolder<ZEGRRenderStateData>			DeferredRenderState;
+		ZEHolder<ZEGRRenderStateData>			DeferredRenderStatePerSample;
 		ZEHolder<ZEGRComputeRenderStateData>	TiledDeferredComputeRenderState;
-		ZEHolder<ZEGRRenderStateData>			AccumulateAmbientEmissiveRenderState;
+		ZEHolder<ZEGRRenderStateData>			AccumulateEmissiveRenderState;
+		ZEHolder<ZEGRRenderStateData>			EdgeDetectionRenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			DeferredLightConstantBuffer;
 		ZEHolder<ZEGRVertexBuffer>				DeferredLightVertexBuffer;
 		ZEHolder<ZEGRStructuredBuffer>			TiledDeferredCullableLightStructuredBuffer;
 		ZEHolder<ZEGRConstantBuffer>			TiledDeferredConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>			CascadeConstantBuffer;
 
 		ZEHolder<ZEGRSampler>					SamplerLinearBorder;
 		ZEHolder<ZEGRSampler>					SamplerComparisonLinearPointClamp;
@@ -92,6 +96,9 @@ class ZERNStageLighting : public ZERNStage
 
 		ZEList2<ZELight>						DeferredLightList;
 		ZEList2<ZELight>						TiledDeferredLightList;
+
+		const ZEGRTexture2D*					AccumulationTexture;
+		const ZEGRTexture2D*					DepthTexture;
 
 		bool									ShowCascades;
 
@@ -114,6 +121,22 @@ class ZERNStageLighting : public ZERNStage
 			float								ShadowDepthBias;
 			float								ShadowNormalBias;
 		};
+
+		struct CascadeStruct
+		{
+			ZEMatrix4x4							ViewTransform;
+			ZEMatrix4x4							ProjectionTransform;
+			float								DepthBias;
+			float								NormalBias;
+			ZEVector2							Reserved;
+		};
+
+		struct DeferredLightCascadeConstansStruct
+		{
+			CascadeStruct						Cascades[4];
+			ZEUInt								CascadeCount;
+			ZEVector3							Reserved;
+		} CascadeConstants;
 
 		struct DeferredLightConstantsStruct
 		{
@@ -145,6 +168,7 @@ class ZERNStageLighting : public ZERNStage
 
 		bool									UpdateRenderState();
 		bool									UpdateShaders();
+		bool									UpdateInputOutputs();
 		bool									Update();
 
 		bool									SetupDeferred(ZEGRContext* Context);

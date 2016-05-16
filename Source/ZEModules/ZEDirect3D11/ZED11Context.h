@@ -100,6 +100,7 @@ class ZED11Context : public ZEGRContext, public ZED11ComponentBase
 		virtual void									SetBlendMask(ZEUInt Mask);
 
 		virtual void									CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource);
+		virtual void									ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSubresource, ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format);
 
 		virtual void									Draw(ZEUInt VertexCount, ZEUInt VertexOffset);
 		virtual void									DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset);

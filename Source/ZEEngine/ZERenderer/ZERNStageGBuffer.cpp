@@ -43,6 +43,7 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 bool ZERNStageGBuffer::UpdateRenderTargets()
 {
@@ -62,11 +63,11 @@ bool ZERNStageGBuffer::UpdateRenderTargets()
 	Viewport.SetWidth((float)Width);
 	Viewport.SetHeight((float)Height);
 
-	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT);
-	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
-	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
-	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
-	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL);
+	GBuffer0 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+	GBuffer1 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+	GBuffer2 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+	GBuffer3 = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
+	DepthStencilBuffer	= ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 1, ZEGRGraphicsModule::SAMPLE_COUNT);
 
 	RenderTargets[0] = GBuffer0->GetRenderTarget();
 	RenderTargets[1] = GBuffer1->GetRenderTarget();
@@ -82,6 +83,14 @@ bool ZERNStageGBuffer::Update()
 		return false;
 
 	return true;
+}
+
+bool ZERNStageGBuffer::InitializeSelf()
+{
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	return Update();
 }
 
 void ZERNStageGBuffer::DeinitializeSelf()

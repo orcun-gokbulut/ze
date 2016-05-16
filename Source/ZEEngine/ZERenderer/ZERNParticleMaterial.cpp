@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
-
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERNStageParticleRendering.h"
 #include "ZERNShaderSlots.h"
 
@@ -80,7 +80,7 @@ bool ZERNParticleMaterial::UpdateShaders() const
 	ZEGRShaderCompileOptions Options;
 
 	UpdateShaderDefinitions(Options);
-
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNParticleMaterial.hlsl";
 	Options.Model = ZEGR_SM_5_0;
 
@@ -650,37 +650,9 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 	if (!Update())
 		return false;
 
-	bool TextureSampler = false;
-	if (DiffuseMapEnabled && DiffuseMap.IsAvailable())
-	{
-		const ZEGRTexture* Texture = DiffuseMap.GetTexture();
-		Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
-		TextureSampler = true;
-	}
-
-	if (EmissiveMapEnabled && EmissiveMap.IsAvailable())
-	{
-		const ZEGRTexture* Texture = EmissiveMap.GetTexture();
-		Context->SetTextures(ZEGR_ST_PIXEL, 6, 1, &Texture);
-		TextureSampler = true;
-	}
-
-	if (NormalMapEnabled && NormalMap.IsAvailable())
-	{
-		const ZEGRTexture* Texture = NormalMap.GetTexture();
-		Context->SetTextures(ZEGR_ST_PIXEL, 7, 1, &Texture);
-		TextureSampler = true;
-	}
-
-	if (OpacityMapEnabled && OpacityMap.IsAvailable())
-	{
-		const ZEGRTexture* Texture = OpacityMap.GetTexture();
-		Context->SetTextures(ZEGR_ST_PIXEL, 8, 1, &Texture);
-		TextureSampler = true;
-	}
-
-	if (TextureSampler)
-		Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
+	const ZEGRTexture* Textures[] = {DiffuseMap.GetTexture(), EmissiveMap.GetTexture(), NormalMap.GetTexture(), OpacityMap.GetTexture()};
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 4, Textures);
 
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(StageParticleRendering_RenderState);
@@ -690,10 +662,6 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage)
 
 void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 {
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 4, NULL);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, NULL);
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, 1, NULL);
-
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 

@@ -107,6 +107,7 @@ bool ZEATAtmosphere::UpdateShaders()
 
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFastLightScattering.hlsl";
 	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNFastLightScattering_PixelShader_Main";
@@ -671,15 +672,13 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	ComputeAmbientColors(CosSunZenith, CosMoonZenith);
 
-	ZEVector3 AmbientColor = ZEVector3(0.1f) + TerrestrialSunAmbientColor * 20.0f + TerrestrialMoonAmbientColor * 0.5f;
-	zeScene->SetAmbientColor(AmbientColor);
-	zeScene->SetAmbientFactor(1.0f);
-
 	bool SunVisible = CosSunZenith >= 0.0f;
 	bool MoonVisible = CosMoonZenith >= 0.0f;
 
 	if (SunLight != NULL)
 	{
+		TerrestrialSunAmbientColor *= SunLight->GetIntensity();
+
 		ZEQuaternion SunRotation;
 		ZEQuaternion::CreateFromDirection(SunRotation, -SunDirection);
 
@@ -691,6 +690,8 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	if (MoonLight != NULL)
 	{
+		TerrestrialMoonAmbientColor *= MoonLight->GetIntensity();
+
 		ZEQuaternion MoonRotation;
 		ZEQuaternion::CreateFromDirection(MoonRotation, -MoonDirection);
 
@@ -698,6 +699,10 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		MoonLight->SetVisible(MoonVisible);
 		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
 	}
+
+	ZEVector3 AmbientColor = ZEVector3(0.02f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
+	zeScene->SetAmbientColor(AmbientColor);
+	zeScene->SetAmbientFactor(1.0f);
 
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 
@@ -763,7 +768,7 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 
 	if (MoonLight != NULL)
 	{
-		Constants.MoonColor = MoonLight->GetColor() * MoonLight->GetIntensity() * 5.0f;
+		Constants.MoonColor = MoonLight->GetColor() * MoonLight->GetIntensity();
 		Constants.MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.MoonDirection.NormalizeSelf();
 
@@ -790,7 +795,7 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	Context->SetRenderState(SkyRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture)); 
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, UseMultipleScattering ? reinterpret_cast<ZEGRTexture**>(&PrecomputedMultipleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 

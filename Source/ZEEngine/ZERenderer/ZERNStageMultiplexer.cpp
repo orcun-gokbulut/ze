@@ -35,8 +35,6 @@
 
 #include "ZERNStageMultiplexer.h"
 
-#include "ZERNRenderer.h"
-#include "ZERNStageID.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
@@ -44,6 +42,9 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZERNRenderer.h"
+#include "ZERNStageID.h"
 #include "ZERNStageDisplay.h"
 
 bool ZERNStageMultiplexer::UpdateInputOutputs()
@@ -61,10 +62,7 @@ bool ZERNStageMultiplexer::UpdateInputOutputs()
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() !=  Height)
-		{
-			OutputTexture.Release();
 			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
-		}
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -275,6 +273,7 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	ZEGRShaderCompileOptions Options;
 	Options.Model = ZEGR_SM_5_0;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNStageMultiplexer.hlsl";
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
@@ -297,7 +296,7 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	ze_for_each(Display, Displays)
 		Display->Initialize();
 
-	return true;
+	return UpdateInputOutputs();
 }
 
 void ZERNStageMultiplexer::DeinitializeSelf()

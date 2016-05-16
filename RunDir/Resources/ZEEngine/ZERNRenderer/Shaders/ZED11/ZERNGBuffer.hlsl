@@ -36,22 +36,33 @@
 #ifndef __ZERN_GBUFFER_H__
 #define __ZERN_GBUFFER_H__
 
-
 // SHADER RESOURCES
 ///////////////////////////////////////////////////////////////////////////////
 
-Texture2D<float3>	ZERNGBuffer_Buffer0		: register(t0);
-Texture2D<float4>	ZERNGBuffer_Buffer1		: register(t1);
-Texture2D<float4>	ZERNGBuffer_Buffer2		: register(t2);
-Texture2D<float4>	ZERNGBuffer_Buffer3		: register(t3);
-Texture2D<float>	ZERNGBuffer_DepthBuffer	: register(t4);
+#if SAMPLE_COUNT > 1
+	#define MSAA_ENABLED
+#endif
+
+#ifdef MSAA_ENABLED
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer0		: register(t0);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer1		: register(t1);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer2		: register(t2);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_Buffer3		: register(t3);
+	Texture2DMS<float4, SAMPLE_COUNT>	ZERNGBuffer_DepthBuffer	: register(t4);
+#else
+	Texture2D<float3>					ZERNGBuffer_Buffer0		: register(t0);
+	Texture2D<float4>					ZERNGBuffer_Buffer1		: register(t1);
+	Texture2D<float4>					ZERNGBuffer_Buffer2		: register(t2);
+	Texture2D<float4>					ZERNGBuffer_Buffer3		: register(t3);
+	Texture2D<float>					ZERNGBuffer_DepthBuffer	: register(t4);
+#endif
 
 struct ZERNGBuffer
 {
-	float4			Buffer0					: SV_Target0; // xyz:AccumulationBuffer
-	float4			Buffer1					: SV_Target1; // xyz:Emissive, w:SpecularPower
-	float4			Buffer2					: SV_Target2; // xyz:DiffuseColor, w:Subsurface Scattering 
-	float4			Buffer3					: SV_Target3; // xyz:Normal, w:SpecularColor
+	float4								Buffer0					: SV_Target0; // xyz:AccumulationBuffer
+	float4								Buffer1					: SV_Target1; // xyz:Emissive, w:SpecularPower
+	float4								Buffer2					: SV_Target2; // xyz:DiffuseColor, w:Subsurface Scattering 
+	float4								Buffer3					: SV_Target3; // xyz:Normal, w:SpecularColor
 };
 
 
@@ -61,7 +72,13 @@ struct ZERNGBuffer
 float2 ZERNGBuffer_GetDimensions()
 {
 	float2 Dimensions;
-	ZERNGBuffer_DepthBuffer.GetDimensions(Dimensions.x, Dimensions.y);
+	
+	#ifdef MSAA_ENABLED
+		float SampleCount;
+		ZERNGBuffer_DepthBuffer.GetDimensions(Dimensions.x, Dimensions.y, SampleCount);
+	#else
+		ZERNGBuffer_DepthBuffer.GetDimensions(Dimensions.x, Dimensions.y);
+	#endif
 	
 	return Dimensions;
 }
@@ -69,20 +86,13 @@ float2 ZERNGBuffer_GetDimensions()
 // DEPTH
 ///////////////////////////////////////////////////////////////////////////////
 
-void ZERNGBuffer_SetDepth(inout ZERNGBuffer GBuffer, float Depth)
+float ZERNGBuffer_GetDepth(float2 ScreenPos, float SampleIndex = 0)
 {
-	// EMPTY BUT MUST BE CALLED BY GBUFFER STAGE SHADERS
-	// FOR FUTURE POSSIBLE USAGES
-}
-
-float ZERNGBuffer_GetDepth(float2 ScreenPos)
-{
-	return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos, 0)).x;
-}
-
-float ZERNGBuffer_GetDepth(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_DepthBuffer.SampleLevel(Sampler, TexCoord, 0);
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_DepthBuffer.Load(ScreenPos, SampleIndex).x;
+	#else
+		return ZERNGBuffer_DepthBuffer.Load(int3(ScreenPos, 0)).x;
+	#endif
 }
 
 // ACCUMULATION
@@ -93,14 +103,13 @@ void ZERNGBuffer_SetAccumulationColor(inout ZERNGBuffer GBuffer, float3 Color)
 	GBuffer.Buffer0.xyz = Color;
 }
 
-float3 ZERNGBuffer_GetAccumulationColor(float2 ScreenPos)
+float3 ZERNGBuffer_GetAccumulationColor(float2 ScreenPos, float SampleIndex = 0)
 {
-	return ZERNGBuffer_Buffer0.Load(int3(ScreenPos.xy, 0));
-}
-
-float3 ZERNGBuffer_GetAccumulationColor(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_Buffer0.SampleLevel(Sampler, TexCoord, 0);
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_Buffer0.Load(ScreenPos, SampleIndex).xyz;
+	#else
+		return ZERNGBuffer_Buffer0.Load(int3(ScreenPos, 0)).xyz;
+	#endif
 }
 
 // EMISSIVE COLOR
@@ -111,14 +120,13 @@ void ZERNGBuffer_SetEmissiveColor(inout ZERNGBuffer GBuffer, float3 EmissiveColo
 	GBuffer.Buffer1.xyz = EmissiveColor;
 }
 
-float3 ZERNGBuffer_GetEmissiveColor(float2 ScreenPos)
+float3 ZERNGBuffer_GetEmissiveColor(float2 ScreenPos, float SampleIndex = 0)
 {
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).xyz;
-}
-
-float3 ZERNGBuffer_GetEmissiveColor(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).xyz;
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_Buffer1.Load(ScreenPos, SampleIndex).xyz;
+	#else
+		return ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).xyz;
+	#endif
 }
 
 // SPECULAR POWER
@@ -129,14 +137,13 @@ void ZERNGBuffer_SetSpecularPower(inout ZERNGBuffer GBuffer, float SpecularPower
 	GBuffer.Buffer1.w = SpecularPower;
 }
 
-float ZERNGBuffer_GetSpecularPower(float2 ScreenPos)
+float ZERNGBuffer_GetSpecularPower(float2 ScreenPos, float SampleIndex = 0)
 {
-	return ZERNGBuffer_Buffer1.Load(int3(ScreenPos.xy, 0)).w * 64.0f;
-}
-
-float ZERNGBuffer_GetSpecularPower(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_Buffer1.SampleLevel(Sampler, TexCoord, 0).w * 64.0f;
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_Buffer1.Load(ScreenPos, SampleIndex).w * 64.0f;
+	#else
+		return ZERNGBuffer_Buffer1.Load(int3(ScreenPos, 0)).w * 64.0f;
+	#endif
 }
 
 // DIFFUSE COLOR
@@ -147,14 +154,13 @@ void ZERNGBuffer_SetDiffuseColor(inout ZERNGBuffer GBuffer, float3 DiffuseColor)
 	GBuffer.Buffer2.xyz = DiffuseColor;
 }
 
-float3 ZERNGBuffer_GetDiffuseColor(float2 ScreenPos)
+float3 ZERNGBuffer_GetDiffuseColor(float2 ScreenPos, float SampleIndex = 0)
 {
-	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).xyz;
-}
-
-float3 ZERNGBuffer_GetDiffuseColor(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_Buffer2.SampleLevel(Sampler, TexCoord, 0).xyz;
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_Buffer2.Load(ScreenPos, SampleIndex).xyz;
+	#else
+		return ZERNGBuffer_Buffer2.Load(int3(ScreenPos, 0)).xyz;
+	#endif
 }
 
 // SUB SURFACE SCATTERING
@@ -165,14 +171,13 @@ void ZERNGBuffer_SetSubsurfaceScattering(inout ZERNGBuffer GBuffer, float Subsur
 	GBuffer.Buffer2.w = SubsurfaceScattering;
 }
 
-float ZERNGBuffer_GetSubsurfaceScattering(float2 ScreenPos)
+float ZERNGBuffer_GetSubsurfaceScattering(float2 ScreenPos, float SampleIndex = 0)
 {
-	return ZERNGBuffer_Buffer2.Load(int3(ScreenPos.xy, 0)).w;
-}
-
-float ZERNGBuffer_GetSubsurfaceScattering(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_Buffer2.SampleLevel(Sampler, TexCoord, 0).w;
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_Buffer2.Load(ScreenPos, SampleIndex).w;
+	#else
+		return ZERNGBuffer_Buffer2.Load(int3(ScreenPos, 0)).w;
+	#endif
 }
 
 // NORMAL
@@ -183,14 +188,13 @@ void ZERNGBuffer_SetViewNormal(inout ZERNGBuffer GBuffer, float3 Normal /*Must b
 	GBuffer.Buffer3.xyz = Normal * 0.5f + 0.5f;
 }
 
-float3 ZERNGBuffer_GetViewNormal(float2 ScreenPos)
+float3 ZERNGBuffer_GetViewNormal(float2 ScreenPos, float SampleIndex = 0)
 {
-	return normalize(ZERNGBuffer_Buffer3.Load(int3(ScreenPos, 0)).xyz * 2.0f - 1.0f);
-}
-
-float3 ZERNGBuffer_GetViewNormal(SamplerState Sampler, float2 TexCoord)
-{
-	return normalize(ZERNGBuffer_Buffer3.SampleLevel(Sampler, TexCoord, 0)).xyz * 2.0f - 1.0f;
+	#ifdef MSAA_ENABLED
+		return normalize(ZERNGBuffer_Buffer3.Load(ScreenPos, SampleIndex).xyz * 2.0f - 1.0f);
+	#else
+		return normalize(ZERNGBuffer_Buffer3.Load(int3(ScreenPos, 0)).xyz * 2.0f - 1.0f);
+	#endif
 }
 
 // SPECULAR COLOR
@@ -201,14 +205,13 @@ void ZERNGBuffer_SetSpecularColor(inout ZERNGBuffer GBuffer, float3 SpecularColo
 	GBuffer.Buffer3.w = SpecularColor.x;
 }
 
-float3 ZERNGBuffer_GetSpecularColor(float2 ScreenPos)
+float3 ZERNGBuffer_GetSpecularColor(float2 ScreenPos, float SampleIndex = 0)
 {
-	return ZERNGBuffer_Buffer3.Load(int3(ScreenPos.xy, 0)).www;
-}
-
-float3 ZERNGBuffer_GetSpecularColor(SamplerState Sampler, float2 TexCoord)
-{
-	return ZERNGBuffer_Buffer3.SampleLevel(Sampler, TexCoord, 0).www;
+	#ifdef MSAA_ENABLED
+		return ZERNGBuffer_Buffer3.Load(ScreenPos, SampleIndex).www;
+	#else
+		return ZERNGBuffer_Buffer3.Load(int3(ScreenPos, 0)).www;
+	#endif
 }
 
 #endif

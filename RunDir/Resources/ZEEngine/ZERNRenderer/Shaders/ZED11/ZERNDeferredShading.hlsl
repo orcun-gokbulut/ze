@@ -53,8 +53,6 @@ struct ZERNDeferredShading_Cascade
 {
 	float4x4						ViewTransform;
 	float4x4						ProjectionTransform;
-	float4							Borders;
-	float4							Band;
 	float							DepthBias;
 	float							NormalBias;
 	float2							Reserved;
@@ -320,12 +318,45 @@ float3 ZERNDeferredShading_PixelShader_LightingStage(float4 PositionViewport : S
 	return ZERNDeferredShading_Lighting(Surface);
 }
 
-float3 ZERNDeferredShading_Accumulate_AmbientEmissive_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+float3 ZERNDeferredShading_PixelShader_PerSample_LightingStage(float4 PositionViewport : SV_Position, uint SampleIndex : SV_SampleIndex) : SV_Target0
 {
-	float3 Emissive = ZERNGBuffer_GetEmissiveColor(PositionViewport.xy);
-	float3 Ambient = ZERNGBuffer_GetAccumulationColor(PositionViewport.xy);
+	ZERNShading_Surface Surface;
+	Surface.PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy, SampleIndex));
+	Surface.NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, SampleIndex);
+	Surface.Diffuse = ZERNGBuffer_GetDiffuseColor(PositionViewport.xy, SampleIndex);
+	Surface.SubsurfaceScattering = ZERNGBuffer_GetSubsurfaceScattering(PositionViewport.xy, SampleIndex);
+	Surface.Specular = ZERNGBuffer_GetSpecularColor(PositionViewport.xy, SampleIndex);
+	Surface.SpecularPower = ZERNGBuffer_GetSpecularPower(PositionViewport.xy, SampleIndex);
 	
-	return Emissive + Ambient;
+	return ZERNDeferredShading_Lighting(Surface);
+}
+
+float3 ZERNDeferredShading_Accumulate_Emissive_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	return ZERNGBuffer_GetEmissiveColor(PositionViewport.xy);
+}
+
+void ZERNDeferredShading_EdgeDetection_PixelShader_Main(float4 PositionViewport : SV_Position)
+{
+	ZERNShading_Surface Surfaces[SAMPLE_COUNT];
+	[unroll]
+    for (uint I = 0; I < SAMPLE_COUNT; I++)
+	{
+		Surfaces[I].PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy, I));
+		Surfaces[I].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, I);
+	}
+	
+	bool EdgePixel = false;
+	[unroll]
+	for (uint J = 1; J < SAMPLE_COUNT; J++)
+	{
+		if (abs(Surfaces[J].PositionView.z - Surfaces[0].PositionView.z) > 0.1f ||
+			dot(Surfaces[J].NormalView, Surfaces[0].NormalView) < 0.99f)
+			EdgePixel = true;	
+	}
+	
+	if (!EdgePixel)
+		discard;
 }
 
 #endif

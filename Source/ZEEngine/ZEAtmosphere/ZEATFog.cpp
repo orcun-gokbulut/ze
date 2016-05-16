@@ -41,6 +41,7 @@
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCuller.h"
@@ -58,6 +59,7 @@ bool ZEATFog::UpdateShaders()
 	ZEGRShaderCompileOptions Options;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFog.hlsl";
 	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_Position";
@@ -139,7 +141,7 @@ bool ZEATFog::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 bool ZEATFog::DeinitializeSelf()

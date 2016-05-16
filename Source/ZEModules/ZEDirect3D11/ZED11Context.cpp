@@ -643,7 +643,7 @@ void ZED11Context::SetStencilRef(ZEUInt Reference)
 		return;
 
 	StencilRef = Reference;
-	DirtyFlags.RaiseBit(ZEGR_CDF_DEPTHSTENCIL_STATE);
+	DirtyFlags.RaiseFlags(ZEGR_CDF_DEPTHSTENCIL_STATE);
 }
 
 void ZED11Context::SetBlendFactors(const ZEVector4& Factors)
@@ -652,7 +652,7 @@ void ZED11Context::SetBlendFactors(const ZEVector4& Factors)
 		return;
 
 	BlendFactors = Factors;
-	DirtyFlags.RaiseBit(ZEGR_CDF_BLEND_STATE);
+	DirtyFlags.RaiseFlags(ZEGR_CDF_BLEND_STATE);
 }
 
 void ZED11Context::SetBlendMask(ZEUInt Mask)
@@ -661,7 +661,7 @@ void ZED11Context::SetBlendMask(ZEUInt Mask)
 		return;
 
 	BlendMask = Mask;
-	DirtyFlags.RaiseBit(ZEGR_CDF_BLEND_STATE);
+	DirtyFlags.RaiseFlags(ZEGR_CDF_BLEND_STATE);
 }
 
 void ZED11Context::SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers)
@@ -800,6 +800,44 @@ void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcRes
 	}
 
 	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
+}
+
+void ZED11Context::ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSubresource, ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format)
+{
+	zeDebugCheck(DestResource == NULL || SrcResource == NULL, "Source or destination resource cannot be NULL");
+
+	ID3D11Resource* DestNativeResource = NULL;
+	ID3D11Resource* SrcNativeResource = NULL;
+
+	switch (DestResource->GetResourceType())
+	{
+		case ZEGR_RT_TEXTURE:
+			{
+				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(DestResource);
+				if (Texture->GetTextureType() == ZEGR_TT_2D)
+					DestNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+			}
+			break;
+
+		default:
+			return;
+	}
+
+	switch (SrcResource->GetResourceType())
+	{
+		case ZEGR_RT_TEXTURE:
+			{
+				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(SrcResource);
+				if (Texture->GetTextureType() == ZEGR_TT_2D)
+					SrcNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+			}
+			break;
+
+		default:
+			return;
+	}
+
+	GetMainContext()->ResolveSubresource(DestNativeResource, DestSubresource, SrcNativeResource, SrcSubresource, ConvertFormat(Format));
 }
 
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)

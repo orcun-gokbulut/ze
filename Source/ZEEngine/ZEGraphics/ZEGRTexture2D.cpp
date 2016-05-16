@@ -119,7 +119,7 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Heigh
 	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
 	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
 	zeDebugCheck(ArrayCount > ZEGR_MAX_TEXTURE2D_ARRAY_LENGTH, "Array count is too much");
-	zeDebugCheck(SampleCount > ZEGR_MAX_MULTISAMPLE_COUNT, "Sample count is too much");
+	zeDebugCheck(SampleCount > ZEGR_MAX_SAMPLE_COUNT, "Sample count is too much");
 
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)

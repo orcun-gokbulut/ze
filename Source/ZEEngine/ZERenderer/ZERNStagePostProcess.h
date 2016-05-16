@@ -45,16 +45,19 @@ class ZERNStagePostProcess : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<const ZEGRTexture2D>		OutputTexture;
+		const ZEGRTexture2D*				AccumulationTexture;
 
+		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
+
+		bool								UpdateInputOutputs();
 
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
+		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 
 		virtual bool						Setup(ZEGRContext* Context);
 		virtual void						CleanUp(ZEGRContext* Context);
