@@ -24,7 +24,9 @@
   <Node Name="Module">
    <Property Name="Name" Type="String">Integrity</Property>
    <Property Name="Enabled" Type="Bool">true</Property>
-   <Node Name="Configuration"/>
+   <Node Name="Configuration">
+    <Property Name="IntegrityFile" Type="String">#R:/ZETrainSimulator/ZETrainSimulator.ZEIntegrity</Property>
+   </Node>
   </Node>
   <Node Name="Module">
    <Property Name="Name" Type="String">Update</Property>

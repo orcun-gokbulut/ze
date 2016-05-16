@@ -77,7 +77,7 @@ void ZEITIntegrityGenerator::ScanDirectory(const ZEString& Path, bool Recursive)
 	int Count = omp_get_max_threads();
 	omp_set_num_threads(Count);
 
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic)
 	for (ZESSize I = 0; I < Files.GetCount(); I++) 
 	{
 		ZEITIntegrityRecord Record;

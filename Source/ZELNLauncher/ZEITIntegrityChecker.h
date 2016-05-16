@@ -38,22 +38,12 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEITIntegrityRecord.h"
 
-enum ZEITIntegrityCheckerResult
-{
-	ZEIT_ICR_NONE,
-	ZEIT_ICR_SUCESS,
-	ZEIT_ICR_PARTIAL_SUCESS,
-	ZEIT_ICR_FAILED
-};
-
 class ZEITIntegrityCheker
 {
 	private:
 		ZEArray<ZEITIntegrityRecord>			Records;
-		ZESize									LastIndex;
 		ZEString								IntegrityFile;
-		ZEITIntegrityCheckerResult				Result;
-		bool									StopOnFirstFailure;
+		ZEITIntegrityResult						Result;
 
 	public:
 		const ZEArray<ZEITIntegrityRecord>&		GetRecords() const;
@@ -61,15 +51,11 @@ class ZEITIntegrityCheker
 		void									SetIntegrityFile(const ZEString& FileName);
 		const ZEString&							GetIntegrityFile() const;
 
-		void									GetStopOnFirstFailure(bool Enabled);
-		bool									GetStopOnFirstFailure() const;
-
-		ZEITIntegrityCheckerResult				GetResult() const;
+		ZEITIntegrityResult						GetResult() const;
 
 		void									CheckStart();
-		ZESSize									CheckProgress();
+		bool									CheckProgress(ZESize Index);
 		
-
 		bool									Load();
 		bool									Save();
 

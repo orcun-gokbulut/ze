@@ -50,10 +50,18 @@ enum ZEITIntegrityRecordType
 
 enum ZEITIntegrityResult
 {
-	ZETI_CR_NOT_CHECKED,
-	ZEIT_CR_SUCCESS,
-	ZEIT_CR_MISSING,
-	ZEIT_CR_CHECKSUM_FAILED
+	ZEIT_IR_NOT_CHECKED,
+	ZEIT_IR_SUCCESS,
+	ZEIT_IR_WARNING,
+	ZEIT_IR_ERROR
+};
+
+enum ZEITIntegrityProblem
+{
+	ZEIT_IP_NONE,
+	ZEIT_IP_MISSING,
+	ZEIT_IP_FILE_SIZE,
+	ZEIT_IP_CHECKSUM
 };
 
 class ZEITIntegrityRecord
@@ -62,8 +70,10 @@ class ZEITIntegrityRecord
 		ZEString							Path;
 		ZEITIntegrityRecordType				Type;
 		bool								Required;
+		ZEUInt64							FileSize;
 		ZEString							Checksum;
 		ZEITIntegrityResult					Result;
+		ZEITIntegrityProblem				Problem;
 	
 		ZEString							CalculateChecksum(ZEFile* File);
 
@@ -77,10 +87,14 @@ class ZEITIntegrityRecord
 		void								SetRequired(bool Required);
 		bool								GetRequired() const;
 
+		void								SetFileSize(ZEUInt64 Size);
+		ZEUInt64							GetFileSize() const;
+
 		void								SetChecksum(const ZEString& CheckSum);
 		const ZEString&						GetChecksum() const;
 
 		ZEITIntegrityResult					GetResult() const;
+		ZEITIntegrityProblem				GetProblem() const;
 
 		bool								Check();
 		bool								Generate();
