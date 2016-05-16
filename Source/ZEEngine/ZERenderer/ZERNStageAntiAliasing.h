@@ -78,8 +78,7 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				AreaTexture;
 		ZEHolder<ZEGRTexture2D>				SearchTexture;
 
-		ZEHolder<ZEGRSampler>				SamplerLinear;
-		ZEHolder<ZEGRSampler>				SamplerPoint;
+		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
 
 		ZEGRViewport						Viewport;
 
@@ -115,8 +114,7 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-
-		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Output) const;
+		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 
 		virtual bool						Setup(ZEGRContext* Context);

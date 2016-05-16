@@ -335,7 +335,7 @@ bool ZERNStageAO::InitializeSelf()
 	SamplerPointClampDescription.BorderColor = ZEVector4::Zero;
 	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerPointClampDescription);
 
-	return true;
+	return Update();
 }
 
 void ZERNStageAO::DeinitializeSelf()

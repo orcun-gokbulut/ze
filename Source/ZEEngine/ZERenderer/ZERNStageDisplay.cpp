@@ -35,12 +35,12 @@
 
 #include "ZERNStageDisplay.h"
 
-#include "ZERNStageMultiplexer.h"
 #include "ZEGraphics\ZEGRConstantBuffer.h"
 #include "ZEGraphics\ZEGRTexture2D.h"
 #include "ZEGraphics\ZEGRContext.h"
-#include "ZERNShaderSlots.h"
 #include "ZEGraphics\ZEGRRenderTarget.h"
+#include "ZERNShaderSlots.h"
+#include "ZERNStageMultiplexer.h"
 
 #define ZERN_SDDF_SAMPLER			0x01
 #define ZERN_SDDF_CONSTANT_BUFFER	0x02
@@ -152,7 +152,7 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 	ZEMatrix3x3::CreateScale2D(InputZoomTransform, ZEVector2(1.0f, 1.0f) / Zoom);
 	
 	ZEMatrix3x3 InputOffsetTransform;
-	ZEMatrix3x3::CreateTranslation2D(InputOffsetTransform, -InputOffset);
+	ZEMatrix3x3::CreateTranslation2D(InputOffsetTransform, InputOffset);
 
 	ZEMatrix3x3 InputTransform = InputOffsetTransform * InputZoomTransform * InputFlipTransform;
 

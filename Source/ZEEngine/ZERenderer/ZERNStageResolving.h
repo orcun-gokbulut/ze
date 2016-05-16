@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageGBuffer.h
+ Zinek Engine - ZERNStageResolving.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,47 +37,78 @@
 
 #include "ZERNStage.h"
 
-#include "ZEDS/ZEFlags.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
+class ZEGRShader;
+class ZEGRSampler;
 class ZEGRTexture2D;
+class ZEGRConstantBuffer;
+class ZEGRContext;
+class ZEGRRenderStateData;
+class ZERNRenderer;
 class ZEGRRenderTarget;
 
-class ZERNStageGBuffer : public ZERNStage
+enum ZERNResolveFilterType
+{
+	ZERN_FILTER_NONE	= 0,
+	ZERN_FILTER_BOX
+};
+
+class ZERNStageResolving : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<ZEGRTexture2D>				GBuffer0;
-		ZEHolder<ZEGRTexture2D>				GBuffer1;
-		ZEHolder<ZEGRTexture2D>				GBuffer2;
-		ZEHolder<ZEGRTexture2D>				GBuffer3;
-		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
-		const ZEGRRenderTarget*				RenderTargets[4];
-		ZEGRViewport						Viewport;
+		ZEFlags							DirtyFlags;
 
-		bool								UpdateRenderTargets();
-		bool								Update();
+		ZEHolder<ZEGRRenderStateData>	ResolveGBuffersRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	ResolveAllGBuffersRenderStateData;
+		ZEHolder<ZEGRRenderStateData>	ResolveCustomRenderStateData;
 
-		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+
+		ZEHolder<ZEGRTexture2D>			ResolvedInputTexture;
+		ZEHolder<ZEGRTexture2D>			ResolvedNormalTexture;
+		ZEHolder<ZEGRTexture2D>			ResolvedDepthTexture;
+		ZEHolder<ZEGRTexture2D>			ResolvedGbufferEmissive;
+		ZEHolder<ZEGRTexture2D>			ResolvedGbufferDiffuse;
+
+		const ZEGRTexture2D*			InputTexture;
+		const ZEGRTexture2D*			NormalTexture;
+		const ZEGRTexture2D*			DepthTexture;
+		const ZEGRTexture2D*			EmissiveTexture;
+		const ZEGRTexture2D*			DiffuseTexture;
+
+		bool							ResolveAllGbuffers;
+
+		struct
+		{
+			ZERNResolveFilterType		FilterType;
+			float						Reserved0[3];
+		} Constants;
+
+		virtual bool					InitializeSelf();						
+		virtual void					DeinitializeSelf();
+
+		bool							UpdateRenderStates();
+		bool							UpdateConstantBuffers();
+		bool							UpdateInputOutputs();
+		bool							Update();
 
 	public:
-		virtual ZEInt						GetId() const;
-		virtual const ZEString&				GetName() const;
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
 
-		ZEGRTexture2D*						GetAccumulationMap() const;
-		ZEGRTexture2D*						GetEmissiveGlossMap() const;
-		ZEGRTexture2D*						GetDiffuseSubSurfaceMap() const;
-		ZEGRTexture2D*						GetNormalSpecularMap() const;
-		ZEGRTexture2D*						GetDepthStencilMap() const;
+		void							SetCustomResolveFilter(ZERNResolveFilterType FilterType);
+		ZERNResolveFilterType			GetCustomResolveFilter() const;
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		void							SetResolveAllGbuffers(bool ResolveAllGbuffers);
+		bool							GetResolveAllGbuffers() const;
 
-		virtual bool						Setup(ZEGRContext* Context);
-		virtual void						CleanUp(ZEGRContext* Context);
+		virtual bool					Setup(ZEGRContext* Context);
+		virtual void					CleanUp(ZEGRContext* Context);
 
-											ZERNStageGBuffer();
+		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
 
-		static ZEGRRenderState				GetRenderState();
+										ZERNStageResolving();
 };

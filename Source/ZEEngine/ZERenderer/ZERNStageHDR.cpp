@@ -50,6 +50,7 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRShaderCompiler.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 
 #define ZERN_HSDF_CONSTANT_BUFFER	1
 #define ZERN_HSDF_SHADERS			2
@@ -80,7 +81,7 @@ bool ZERNStageHDR::UpdateRenderStates()
 	ZEGRRenderState RenderState;
 
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
+	RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShaderPositionTexcoord);
 
 	ZEGRDepthStencilState DepthStencilStateNoTestWrite;
@@ -127,10 +128,12 @@ bool ZERNStageHDR::UpdateShaders()
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
 	ScreenCoverVertexShaderPositionTexcoord = ZEGRShader::Compile(Options);
 
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNHDR_Luminance_Calculate_PixelShader";
 	CalculateLuminance_PixelShader = ZEGRShader::Compile(Options);
 
+	Options.Definitions.Clear();
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNHDR_Luminance_CalculateAdapted_PixelShader";
 	CalculateAdaptedLuminance_PixelShader = ZEGRShader::Compile(Options);
@@ -139,6 +142,7 @@ bool ZERNStageHDR::UpdateShaders()
 	Options.EntryPoint = "ZERNHDR_Luminance_DownScale_PixelShader";
 	DownSampling_PixelShader = ZEGRShader::Compile(Options);
 
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNHDR_Bright_Calculate_PixelShader";
 	CalculateBrightness_PixelShader = ZEGRShader::Compile(Options);
@@ -183,10 +187,7 @@ bool ZERNStageHDR::UpdateInputOutput()
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-		{
-			OutputTexture.Release();
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R11G11B10_FLOAT);
-		}
+			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -385,14 +386,13 @@ bool ZERNStageHDR::InitializeSelf()
 {
 	if (!ZERNStage::InitializeSelf())
 		return false;
-
-	DirtyFlags.RaiseAll();
 	
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	Filter.Initialize();
 	ZERNFilter::GenerateGaussianKernel(HorizontalValues, 11, 2.0f);
 	ZERNFilter::GenerateGaussianKernel(VerticalValues, 11, 2.0f, false);
-	SamplerLinearClamp = ZEGRSampler::GetSampler(ZEGRSamplerDescription());
+
+	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
 	ZEGRSamplerDescription SamplerDescriptionLinearBorder;
 	SamplerDescriptionLinearBorder.AddressU = ZEGR_TAM_BORDER;
@@ -400,7 +400,7 @@ bool ZERNStageHDR::InitializeSelf()
 	SamplerDescriptionLinearBorder.BorderColor = ZEVector4::Zero;
 	SamplerLinearBorder = ZEGRSampler::GetSampler(SamplerDescriptionLinearBorder);
 
-	return true;
+	return Update();
 }
 
 void ZERNStageHDR::DeinitializeSelf()
@@ -674,8 +674,8 @@ ZERNStageHDR::ZERNStageHDR()
 	Constants.Key = 0.18f;
 	Constants.WhiteLevel = 1.0f;
 	Constants.ToneMapOperator = ZERN_HTMO_UNCHARTED;
-	Constants.BloomFactor = 5.0f;
-	Constants.BloomThreshold = 1.0f;
+	Constants.BloomFactor = 1.0f;
+	Constants.BloomThreshold = 2.0f;
 	Constants.LuminanceMin = 0.1f;
 	Constants.LuminanceMax = 10.0f;
 	Constants.Saturation = 0.7f;

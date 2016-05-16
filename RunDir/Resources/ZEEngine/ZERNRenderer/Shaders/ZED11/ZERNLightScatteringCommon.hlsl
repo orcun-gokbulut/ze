@@ -159,7 +159,7 @@ float3 ZERNLightScatteringCommon_CalculateExtinction(float3 Start, float3 End)
 {
 	float2 Density = ZERNLightScatteringCommon_IntegrateDensity(Start, End);
 	
-	return ZERNLightScatteringCommon_RayleighScatteringFactor * Density.x + ZERNLightScatteringCommon_MieScatteringFactor * Density.y;// + ZERNLightScatteringCommon_OzoneAbsorptionFactor * Density.x;
+	return ZERNLightScatteringCommon_RayleighScatteringFactor * Density.x + ZERNLightScatteringCommon_MieScatteringFactor * Density.y + ZERNLightScatteringCommon_OzoneAbsorptionFactor * Density.x;
 }
 
 float3 ZERNLightScatteringCommon_LookupPrecomputedScattering(Texture3D<float3> ScatteringBuffer, float3 Position, float3 ViewDirection, float3 LightDirection, float3 EarthCenter, inout float PrevTexCoordY)

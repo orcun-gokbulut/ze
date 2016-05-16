@@ -101,12 +101,12 @@ bool ZERNStageDebug::UpdateShaders()
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNDebug_BoundingBox_VertexShader_Main";
 	BoundingBoxVertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(VertexShader == NULL, false, "Cannot set vertex shader.");
-
+	zeCheckError(BoundingBoxVertexShader == NULL, false, "Cannot set vertex shader.");
+	
 	Options.Type = ZEGR_ST_GEOMETRY;
 	Options.EntryPoint = "ZERNDebug_BoundingBox_GeometryShader_Main";
 	BoundingBoxGeometryShader = ZEGRShader::Compile(Options);
-	zeCheckError(GeometryShader == NULL, false, "Cannot set geometry shader.");
+	zeCheckError(BoundingBoxGeometryShader == NULL, false, "Cannot set geometry shader.");
 
 	DirtyFlags.UnraiseFlags(ZERN_SDDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_SDDF_RENDER_STATES);
@@ -122,20 +122,20 @@ bool ZERNStageDebug::UpdateRenderStates()
 	ZEGRRenderState RenderState;
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
-
+	
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_GEOMETRY, GeometryShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
-
+	
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set debug render state.");
-
+	
 	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	RenderState.SetVertexLayout(GetPositionVertexLayout());
-
+	
 	RenderState.SetShader(ZEGR_ST_VERTEX, BoundingBoxVertexShader);
 	RenderState.SetShader(ZEGR_ST_GEOMETRY, BoundingBoxGeometryShader);
-
+	
 	BoundingBoxRenderStateData = RenderState.Compile();
 	zeCheckError(BoundingBoxRenderStateData == NULL, false, "Cannot set debug render state.");
 
@@ -206,9 +206,12 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 
 bool ZERNStageDebug::InitializeSelf()
 {
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 void ZERNStageDebug::DeinitializeSelf()
@@ -226,6 +229,8 @@ void ZERNStageDebug::DeinitializeSelf()
 	BoundingBoxVertexBuffer.Release();
 
 	DepthMap.Release();
+
+	ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageDebug::GetId() const
@@ -235,7 +240,7 @@ ZEInt ZERNStageDebug::GetId() const
 
 const ZEString& ZERNStageDebug::GetName() const
 {
-	static const ZEString Name = "Debug";
+	static const ZEString Name = "Stage Debug";
 	return Name;
 }
 

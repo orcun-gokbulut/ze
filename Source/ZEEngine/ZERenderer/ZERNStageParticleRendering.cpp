@@ -43,6 +43,35 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
 
+bool ZERNStageParticleRendering::InitializeSelf()
+{
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	return UpdateInputOutputs();
+}
+
+void ZERNStageParticleRendering::DeinitializeSelf()
+{
+	AccumulationTexture = NULL;
+	DepthTexture = NULL;
+
+	ZERNStage::DeinitializeSelf();
+}
+
+bool ZERNStageParticleRendering::UpdateInputOutputs()
+{
+	AccumulationTexture = GetPrevOutput(ZERN_SO_ACCUMULATION);
+	if (AccumulationTexture == NULL)
+		return false;
+
+	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthTexture == NULL)
+		return false;
+
+	return true;
+}
+
 ZEInt ZERNStageParticleRendering::GetId() const
 {
 	return ZERN_STAGE_PARTICLE_RENDERING;
@@ -59,20 +88,15 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	const ZEGRTexture2D* ColorMap = GetPrevOutput(ZERN_SO_COLOR);
-	if (ColorMap == NULL)
+	if (!UpdateInputOutputs())
 		return false;
 
-	const ZEGRTexture2D* DepthMap = GetPrevOutput(ZERN_SO_DEPTH);
-	if (DepthMap == NULL)
-		return false;
-
-	const ZEGRRenderTarget* RenderTarget = ColorMap->GetRenderTarget();
+	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 	
 	Viewport.SetWidth((float)RenderTarget->GetWidth());
 	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
-	Context->SetRenderTargets(1, &RenderTarget, DepthMap->GetDepthStencilBuffer(true));
+	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetViewports(1, &Viewport);
 
 	return true;
@@ -83,9 +107,18 @@ void ZERNStageParticleRendering::CleanUp(ZEGRContext* Context)
 	ZERNStage::CleanUp(Context);
 }
 
+const ZEGRTexture2D* ZERNStageParticleRendering::GetOutput(ZERNStageBuffer Output) const
+{
+	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION))
+		return AccumulationTexture;
+
+	return ZERNStage::GetOutput(Output);
+}
+
 ZERNStageParticleRendering::ZERNStageParticleRendering()
 {
-
+	AccumulationTexture = NULL;
+	DepthTexture = NULL;
 }
 
 ZEGRRenderState ZERNStageParticleRendering::GetRenderState()
@@ -106,10 +139,6 @@ ZEGRRenderState ZERNStageParticleRendering::GetRenderState()
 		BlendRenderTargetAlphaBlended.SetBlendEnable(true);
 		BlendStateAlphaBlended.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlended);
 		RenderState.SetBlendState(BlendStateAlphaBlended);
-		
-		ZEGRRasterizerState RasterizerStateWireframe;
-		RasterizerStateWireframe.SetFillMode(ZEGR_FM_WIREFRAME);
-		//RenderState.SetRasterizerState(RasterizerStateWireframe);
 
 		RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
 	}

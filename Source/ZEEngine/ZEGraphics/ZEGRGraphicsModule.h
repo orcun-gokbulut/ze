@@ -104,5 +104,7 @@ class ZEGRGraphicsModule : public ZEModule
 		virtual ZEGRRenderStateData*			CreateRenderStateData() = 0;
 		virtual ZEGRComputeRenderStateData*		CreateComputeRenderStateData() = 0;
 
+		static ZEUInt							SAMPLE_COUNT;
+
 		static ZEGRGraphicsModule*				GetInstance();
 };

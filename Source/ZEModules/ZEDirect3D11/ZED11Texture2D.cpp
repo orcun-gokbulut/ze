@@ -333,7 +333,7 @@ const ZEGRDepthStencilBuffer* ZED11Texture2D::GetDepthStencilBuffer(bool ReadOnl
 		if (DepthStencilBuffers[Index] != NULL)
 			return DepthStencilBuffers[Index];
 
-		Flags = D3D11_DSV_READ_ONLY_DEPTH | D3D11_DSV_READ_ONLY_STENCIL;
+		Flags = D3D11_DSV_READ_ONLY_DEPTH;
 	}
 
 	D3D11_DEPTH_STENCIL_VIEW_DESC DepthStencilViewDesc;
@@ -411,7 +411,7 @@ void ZED11Texture2D::UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, 
 bool ZED11Texture2D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt ArrayIndex, ZEUInt Level)
 {
 	zeDebugCheck(Texture2D == NULL, "Texture is not initialized.");
-	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_CPU_WRITE && (GetLevelCount() > 1 || GetArrayCount() > 1), "Texture having subresource cannot be mapped");
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_CPU_WRITE && (GetLevelCount() > 1 || GetArrayCount() > 1), "Dynamic texture having subresource cannot be mapped");
 	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_ONLY || GetResourceUsage() == ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, "Texture had not been created for mapping");
 
 	D3D11_MAP MapType;

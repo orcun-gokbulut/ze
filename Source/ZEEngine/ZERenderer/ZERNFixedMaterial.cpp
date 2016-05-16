@@ -123,6 +123,8 @@ bool ZERNFixedMaterial::UpdateShaders() const
 
 	UpdateShaderDefinitions(Options);
 
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFixedMaterial.hlsl";
 	Options.Model = ZEGR_SM_5_0;
 

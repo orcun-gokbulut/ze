@@ -42,11 +42,28 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
+bool ZERNStagePostProcess::InitializeSelf()
+{
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	return UpdateInputOutputs();
+}
+
 void ZERNStagePostProcess::DeinitializeSelf()
 {
-	OutputTexture.Release();
+	AccumulationTexture = NULL;
 
 	ZERNStage::Deinitialize();
+}
+
+bool ZERNStagePostProcess::UpdateInputOutputs()
+{
+	AccumulationTexture = GetPrevOutput(ZERN_SO_ACCUMULATION);
+	if (AccumulationTexture == NULL)
+		return false;
+
+	return true;
 }
 
 ZEInt ZERNStagePostProcess::GetId() const
@@ -65,15 +82,13 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
+	if (!UpdateInputOutputs())
+		return false;
+
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
-
-	OutputTexture = GetPrevOutput(ZERN_SO_COLOR);
-
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 
 	return true;
 }
@@ -83,25 +98,25 @@ void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 	ZERNStage::CleanUp(Context);
 }
 
-const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
+const ZEGRRenderTarget* ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
 {
-	if (GetEnabled() && (Input == ZERN_SO_COLOR))
-		return OutputTexture->GetRenderTarget();
+	if (GetEnabled() && (Input == ZERN_SO_COLOR || Input == ZERN_SO_ACCUMULATION))
+		return AccumulationTexture->GetRenderTarget();
 
 	return ZERNStage::GetProvidedInput(Input);
 }
 
 const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) const
 {
-	if (GetEnabled() && Output == ZERN_SO_COLOR)
-		return OutputTexture;
+	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION))
+		return AccumulationTexture;
 
 	return ZERNStage::GetOutput(Output);
 }
 
 ZERNStagePostProcess::ZERNStagePostProcess()
 {
-
+	AccumulationTexture = NULL;
 }
 
 ZEGRRenderState ZERNStagePostProcess::GetRenderState()
