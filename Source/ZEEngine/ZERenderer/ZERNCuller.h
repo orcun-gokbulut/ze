@@ -42,9 +42,16 @@ class ZEEntity;
 class ZERNRenderer;
 class ZERNView;
 
+enum ZERNRenderType
+{
+	ZERN_RT_NORMAL,
+	ZERN_RT_SHADOW_MAP,
+	ZERN_RT_ENVIRONMENT_MAP
+};
 class ZERNCullParameters
 {
 	public:
+		ZERNRenderType				Type;
 		ZERNRenderer*				Renderer;
 		ZERNView*					View;
 };

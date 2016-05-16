@@ -226,7 +226,7 @@ class ZEUIManager : public ZEObject
 
 		static const ZEVector4&		GetDefaultBackgroundColor();
 		static const ZEVector4&		GetDefaultForegroundColor();
-		static ZEUIFont*		GetDefaultFontResource();
+		static ZEUIFont*			GetDefaultFontResource();
 };
 
 #endif

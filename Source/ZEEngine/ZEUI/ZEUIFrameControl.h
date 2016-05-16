@@ -46,11 +46,11 @@ class ZEUIFrameControl : public ZEUIControl
 		ZEUIRectangle				Frame;
 
 	public:
+		virtual void				SetPosition(const ZEVector2& Position);
 		virtual	void				SetSize(const ZEVector2& Size);
 		virtual void				SetWidth(float Width);
 		virtual void				SetHeight(float Height);
-
-		virtual void				SetPosition(const ZEVector2& Position);
+		virtual void				SetTexture(const ZEGRTexture2D* Texture);
 
 		virtual void				Draw(ZEUIRenderer* Renderer);
 
