@@ -95,6 +95,15 @@ bool ZEITIntegrityRecord::GetRequired() const
 	return Required;
 }
 
+void ZEITIntegrityRecord::SetFileSize(ZESize Size)
+{
+	FileSize = Size;
+}
+
+ZESize ZEITIntegrityRecord::GetFileSize() const
+{
+	return FileSize;
+}
 
 void ZEITIntegrityRecord::SetChecksum(const ZEString& CheckSum)
 {
@@ -111,31 +120,71 @@ ZEITIntegrityResult ZEITIntegrityRecord::GetResult() const
 	return Result;
 }
 
+ZEITIntegrityProblem ZEITIntegrityRecord::GetProblem() const
+{
+	return Problem;
+}
+
 bool ZEITIntegrityRecord::Check()
 {
 	ZEFile File;
 	if (!File.Open(Path, ZE_FOM_READ, ZE_FCM_NONE))
 	{
-		Result = ZEIT_CR_MISSING;
+		Problem = ZEIT_IP_MISSING;
+
 		if (GetRequired())
-			return true;
-		else
+		{
+			Result = ZEIT_IR_ERROR;
 			return false;
-	}
-	
-	ZEString CheckSumFile = CalculateChecksum(&File);
-	if (!CheckSumFile.EqualsIncase(GetChecksum()))
-	{
-		File.Close();
-		Result = ZEIT_CR_CHECKSUM_FAILED;
-		if (GetRequired())
-			return false;
+		}
 		else
+		{
+			Result = ZEIT_IR_WARNING;
 			return true;
+		}
 	}
 
-	Result = ZEIT_CR_SUCCESS;
+	if (File.GetSize() != FileSize)
+	{
+		File.Close();
+
+		Problem = ZEIT_IP_FILE_SIZE;
+
+		if (GetRequired())
+		{
+			Result = ZEIT_IR_ERROR;
+			return false;
+		}
+		else
+		{
+			Result = ZEIT_IR_WARNING;
+			return true;
+		}
+	}
+
+	ZEString CheckSumFile = CalculateChecksum(&File);
 	File.Close();
+
+	if (!CheckSumFile.EqualsIncase(GetChecksum()))
+	{
+		Problem = ZEIT_IP_CHECKSUM;
+
+		if (GetRequired())
+		{
+			Result = ZEIT_IR_ERROR;
+			return false;
+		}
+		else
+		{
+			Result = ZEIT_IR_WARNING;
+			return true;
+		}
+	}
+
+	Result = ZEIT_IR_SUCCESS;
+	Problem = ZEIT_IP_NONE;
+	
+	return true;
 }
 
 bool ZEITIntegrityRecord::Generate()
@@ -147,6 +196,7 @@ bool ZEITIntegrityRecord::Generate()
 	if (!File.Open(Path, ZE_FOM_READ, ZE_FCM_NONE))
 			return false;
 
+	FileSize = File.GetSize();
 	Checksum = CalculateChecksum(&File);
 
 	File.Close();
@@ -155,6 +205,7 @@ bool ZEITIntegrityRecord::Generate()
 void ZEITIntegrityRecord::Reset()
 {
 	Type = ZEIT_RT_NONE;
+	Problem = ZEIT_IP_NONE;
 }
 
 bool ZEITIntegrityRecord::Load(ZEMLReaderNode* RecordNode)
@@ -162,6 +213,7 @@ bool ZEITIntegrityRecord::Load(ZEMLReaderNode* RecordNode)
 	SetPath(RecordNode->ReadString("Path"));
 	SetType((ZEITIntegrityRecordType)RecordNode->ReadUInt8("Type"));
 	SetRequired(RecordNode->ReadBoolean("Required"));
+	SetFileSize(RecordNode->ReadUInt64("FileSize"));
 	SetChecksum(RecordNode->ReadString("Checksum"));
 	Reset();
 
@@ -177,6 +229,7 @@ bool ZEITIntegrityRecord::Save(ZEMLWriterNode* RecordsNode)
 	RecordNode.WriteString("Path", GetPath());
 	RecordNode.WriteUInt8("Type", GetType());
 	RecordNode.WriteBool("Required", GetRequired());
+	RecordNode.WriteUInt64("FileSize", GetFileSize());
 	RecordNode.WriteString("Checksum", GetChecksum());
 
 	RecordNode.CloseNode();
@@ -187,6 +240,8 @@ bool ZEITIntegrityRecord::Save(ZEMLWriterNode* RecordsNode)
 ZEITIntegrityRecord::ZEITIntegrityRecord()
 {
 	Type = ZEIT_RT_NONE;
-	Required = false;
-	Result = ZETI_CR_NOT_CHECKED;
+	Required = true;
+	FileSize = 0;
+	Result = ZEIT_IR_NOT_CHECKED;
+	Problem = ZEIT_IP_NONE;
 }

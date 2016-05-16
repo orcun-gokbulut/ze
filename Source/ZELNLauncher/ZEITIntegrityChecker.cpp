@@ -38,9 +38,7 @@
 
 ZEITIntegrityCheker::ZEITIntegrityCheker()
 {
-	LastIndex = 0;
-	Result = ZEIT_ICR_NONE;
-	StopOnFirstFailure = true;
+	Result = ZEIT_IR_NOT_CHECKED;
 }
 
 const ZEArray<ZEITIntegrityRecord>& ZEITIntegrityCheker::GetRecords() const
@@ -58,57 +56,29 @@ const ZEString& ZEITIntegrityCheker::GetIntegrityFile() const
 	return IntegrityFile;
 }
 
-void ZEITIntegrityCheker::GetStopOnFirstFailure(bool Enabled)
-{
-	StopOnFirstFailure = true;
-}
-
-bool ZEITIntegrityCheker::GetStopOnFirstFailure() const
-{
-	return StopOnFirstFailure;
-}
-
-ZEITIntegrityCheckerResult ZEITIntegrityCheker::GetResult() const
+ZEITIntegrityResult ZEITIntegrityCheker::GetResult() const
 {
 	return Result;
 }
 
 void ZEITIntegrityCheker::CheckStart()
 {
-	Result = ZEIT_ICR_NONE;
-	LastIndex = 0;
+	Result = ZEIT_IR_NOT_CHECKED;
 	for (ZESize I = 0; I < Records.GetCount(); I++)
 		Records[I].Reset();
 }
 
-ZESSize ZEITIntegrityCheker::CheckProgress()
+bool ZEITIntegrityCheker::CheckProgress(ZESize Index)
 {
-	if (LastIndex >= Records.GetCount() || LastIndex == -1)
-		return -1;
+	if (Index >= Records.GetCount())
+		return false;
 
-	bool CheckResult = Records[LastIndex].Check();
-	LastIndex++;
+	bool CheckResult = Records[Index].Check();
 	
-	if (CheckResult)
-	{
-		if (Records[LastIndex].GetResult() == ZEIT_ICR_SUCESS)
-		{
-			if (Result == ZEIT_ICR_NONE)
-				Result = ZEIT_ICR_SUCESS;
-		}
-		else
-		{
-			if (Result != ZEIT_ICR_FAILED)
-				Result = ZEIT_ICR_PARTIAL_SUCESS;
-		}
+	if (Records[Index].GetResult() > Result)
+		Result = Records[Index].GetResult();
 
-		return LastIndex;
-	}
-	else
-	{
-		Result = ZEIT_ICR_FAILED;
-		return -1;
-	}
+	return CheckResult;
 }
 
 bool ZEITIntegrityCheker::Load()

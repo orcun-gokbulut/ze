@@ -40,9 +40,30 @@
 #include "ZEITIntegrityChecker.h"
 
 #include <QObject>
+#include <QThread>
 
 class QWidget;
 class Ui_ZELNIntegrityWidget;
+
+class ZELNIntegrityWorker : public QThread
+{
+	Q_OBJECT
+	friend class ZELNIntegrityModule;
+	private:
+		ZEITIntegrityCheker*			Checker;
+		bool							IsCanceled;
+
+		void							run();
+
+										ZELNIntegrityWorker();
+
+	signals:
+		void							RecordUpdated(unsigned int RecordIndex);
+		void							Done(bool Canceled);
+
+	public slots:
+		void							Cancel();
+};
 
 class ZELNIntegrityModule : public QObject, public ZELNModule
 {
@@ -54,18 +75,29 @@ class ZELNIntegrityModule : public QObject, public ZELNModule
 		Ui_ZELNIntegrityWidget*			Form;
 		bool							State;
 		ZEITIntegrityCheker				Checker;
+		ZELNIntegrityWorker	 			Worker;
 
-		void							UpdateRecord(ZESize Index);
+		void							UpdateRecord(ZESize RecordIndex);
 		void							Update();
 
 		virtual bool					InitializeSelf();
 
+										ZELNIntegrityModule();
+
 	private slots:
+		void							Worker_RecordUpdated(unsigned int RecordIndex);
+		void							Worker_Done(bool Canceled);
+
 		void							btnCheckIntegrity_clicked();
+		void							chkFilter_toggled(bool);
+		void							btnSave_clicked();
 
 	public:
 		virtual QWidget*				GetWidget();
 
 		void							CheckIntegrity();
 		void							CancelCheckIntegrity();
+
+		virtual void					LoadConfiguration(const ZEMLReaderNode& ConfigurationNode);
+
 };
