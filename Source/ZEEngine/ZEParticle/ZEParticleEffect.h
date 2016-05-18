@@ -64,9 +64,9 @@ class ZEParticleEffect : public ZEEntity
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
 
+		virtual void						Tick(float TimeElapsed);
 		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
 		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
-		virtual void						Tick(float TimeElapsed);
 
 		static ZEParticleEffect*			CreateInstance();
 
