@@ -48,6 +48,7 @@ enum ZERNRenderType
 	ZERN_RT_SHADOW_MAP,
 	ZERN_RT_ENVIRONMENT_MAP
 };
+
 class ZERNCullParameters
 {
 	public:

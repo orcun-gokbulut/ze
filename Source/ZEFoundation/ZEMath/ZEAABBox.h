@@ -80,6 +80,7 @@ class ZEAABBox
 		static void					Combine(ZEAABBox& Output, const ZEAABBox& A, const ZEAABBox& B);
 
 		static const ZEAABBox		Zero;
+		static const ZEAABBox		Maximum;
 
 									ZEAABBox();
 									ZEAABBox(const ZEVector3& Min, const ZEVector3& Max);

@@ -93,12 +93,19 @@ void ZEParticleEffect::Tick(float TimeElapsed)
 
 void ZEParticleEffect::AddEmitter(ZEParticleEmitter* Emitter)
 {
-	Emitter->SetOwner(this);
+	zeCheckError(Emitter == NULL, ZE_VOID, "Emitter is NULL.");
+	zeCheckError(Emitter->Effect != NULL, ZE_VOID, "Emitter is already registered to a Particle Effect.");
+
+	Emitter->Effect = this;
 	Emitters.Add(Emitter);
 }
 
 void ZEParticleEffect::RemoveEmitter(ZEParticleEmitter* Emitter)
 {
+	zeCheckError(Emitter == NULL, ZE_VOID, "Emitter is NULL.");
+	zeCheckError(Emitter->Effect != this, ZE_VOID, "Emitter is not registered to this Particle Effect.");
+
+	Emitter->Effect = NULL;
 	Emitters.RemoveValue(Emitter);
 }
 
@@ -110,7 +117,7 @@ const ZEArray<ZEParticleEmitter*>& ZEParticleEffect::GetEmitters()
 void ZEParticleEffect::ResetEmitters()
 {
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-		Emitters[I]->Reset();
+		Emitters[I]->ResetPool();
 }
 
 ZEParticleEffect::ZEParticleEffect()

@@ -49,6 +49,7 @@
 #define		Z_AXIS		(ZEUInt)0x04
 
 const ZEAABBox ZEAABBox::Zero = ZEAABBox(ZEVector3::Zero, ZEVector3::Zero);
+const ZEAABBox ZEAABBox::Maximum = ZEAABBox(ZEVector3(ZE_FLOAT_MIN, ZE_FLOAT_MIN, ZE_FLOAT_MIN), ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX));
 
 ZEVector3 ZEAABBox::GetCenter() const
 {
