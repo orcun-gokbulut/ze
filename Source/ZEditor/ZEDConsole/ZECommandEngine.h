@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECommandEngine.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,27 +30,49 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-project (ZEditor)
-ze_set_project_folder("ZEditor")
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEValue.h"
+#include "ZEDS/ZEArray.h"
 
-find_package(Qt5 COMPONENTS Widgets)
+class ZECommandVariable
+{
+	public:
+		ZEString								Name;
+		ZEValue									Value;
+};
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+class ZECommandGlobalObject
+{
+	public:
+		ZEString								Name;
+		ZEObject*								Object;
+		const ZEObject*							ObjectConst;
+};
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
+class ZEDCommandEngine
+{
+	private:
+		ZEArray<ZECommandVariable>				Variables;
+		ZEArray<ZECommandGlobalObject>			GlobalObjects;
 
-ze_add_source(ZEDMain.cpp		Sources)
+	public:
+		const ZEArray<ZECommandVariable>&		GetVariables();
+		void									SetVariable(const ZEString& Name, const ZEValue& Value);
+		void									UnsetVariable(const ZEString& Name);
 
-ze_add_executable(TARGET ZEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDCore)
+		const ZEArray<ZECommandGlobalObject>&	GetGlobalObjects();
+		ZECommandGlobalObject*					GetGlobalObject(const ZEString& Name);
+		void									RegisterGlobalObject(const ZEString& Name, ZEObject* Object);
+		void									RegisterGlobalObject(const ZEString& Name, const ZEObject* Object);
+		void									UnregisterGlobalObject(const ZEString& Name);
 
-qt5_use_modules(ZEditor Widgets)
+		ZEString								Execute(const ZEString& Input);
 
-ze_meta_register(LIBS ZEDCore)
+												ZEDCommandEngine();
+												~ZEDCommandEngine();
+};

@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECommandLexer.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,27 +30,39 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-project (ZEditor)
-ze_set_project_folder("ZEditor")
+#include "ZEDS\ZEValue.h"
+#include "ZEDS\ZEString.h"
 
-find_package(Qt5 COMPONENTS Widgets)
+typedef unsigned int ZECommandTokenType;
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+class ZECommandToken
+{
+	public:
+		ZECommandTokenType			Type;
+		ZEValue						Value;
+		ZESize						Offset;
+		ZESize						Line;
+		ZESize						Column;	
+};
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
+class ZECommandLexer
+{
+	private:
+		char*						Buffer;
+		char*						Cursor;
+		char*						BlockStart;
+		char*						Marker;
 
-ze_add_source(ZEDMain.cpp		Sources)
+	public:
+		void						SetInput(const ZEString& String);
+		const ZEString&				GetInput();
 
-ze_add_executable(TARGET ZEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDCore)
+		ZECommandToken				Scan();
 
-qt5_use_modules(ZEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore)
+									ZECommandLexer();
+};
