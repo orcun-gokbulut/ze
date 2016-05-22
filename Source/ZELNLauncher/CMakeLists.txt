@@ -53,8 +53,6 @@ ze_add_source(ZELNLauncher.qrc					Sources QtResources)
 
 ze_add_source(ZELNLogModule.cpp					Sources)
 ze_add_source(ZELNLogModule.h					Sources)
-ze_add_source(ZELNLogWidget.cpp					Sources)
-ze_add_source(ZELNLogWidget.h					Sources QtMocs)
 ze_add_source(ZELNLogWidget.ui					Sources QtUIs)
 
 ze_add_source(ZELNLicenseModule.cpp				Sources)
@@ -81,8 +79,6 @@ ze_add_source(ZELNUpdateWidget.ui				Sources QtUIs)
 
 ze_add_source(ZELNContactModule.cpp				Sources)
 ze_add_source(ZELNContactModule.h				Sources)
-ze_add_source(ZELNContactWidget.cpp				Sources)
-ze_add_source(ZELNContactWidget.h				Sources QtMocs)
 ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
 
 ze_add_source(../ZEEngine/ZECore/ZEWindowResources.rc 	Sources)
