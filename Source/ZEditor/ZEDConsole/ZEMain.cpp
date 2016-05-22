@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,27 +30,31 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+#pragma once
 
-project (ZEditor)
-ze_set_project_folder("ZEditor")
+#include "ZETypes.h"
+#include "ZECore/ZECore.h"
+#include "ZEDConsoleWidget.h"
 
-find_package(Qt5 COMPONENTS Widgets)
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
+#include <QApplication>
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
+ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
+{
+	ZEInt argc = 0;
+	char** argv = NULL;
 
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
+	bool StopMainLoop = false;
+	QApplication Application(argc, argv);
+	
+	zeCore->LoadClasses();
 
-ze_add_source(ZEDMain.cpp		Sources)
+	ZEDConsoleWidget Widget;
+	Widget.show();
 
-ze_add_executable(TARGET ZEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDCore)
-
-qt5_use_modules(ZEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore)
+	return Application.exec();
+}

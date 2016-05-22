@@ -1,6 +1,6 @@
-#ZE_SOURCE_PROCESSOR_START(License, 1.0)
-#[[*****************************************************************************
- Zinek Engine - CMakeLists.txt
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZECommandParser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,27 +30,11 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*****************************************************************************]]
-#ZE_SOURCE_PROCESSOR_END()
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
-
-project (ZEditor)
-ze_set_project_folder("ZEditor")
-
-find_package(Qt5 COMPONENTS Widgets)
-
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-
-add_subdirectory(ZEDCore)
-add_subdirectory(ZEDConsole)
-
-ze_add_source(ZEDMain.cpp		Sources)
-
-ze_add_executable(TARGET ZEditor 
-	SOURCES ${Sources}
-	LIBS ZEEngine ZEDCore)
-
-qt5_use_modules(ZEditor Widgets)
-
-ze_meta_register(LIBS ZEDCore)
+#define TOKEN_ADD                              1
+#define TOKEN_SUB                              2
+#define TOKEN_MUL                              3
+#define TOKEN_DIV                              4
+#define TOKEN_INT                              5
