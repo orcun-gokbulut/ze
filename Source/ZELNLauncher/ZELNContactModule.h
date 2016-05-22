@@ -45,11 +45,12 @@ class ZELNContactModule  : public ZELNModule
 	ZELN_MODULE
 	friend class ZELNLauncher;
 	private:
-		ZELNContactWidget*			Widget;
+		QWidget*					Widget;
+		Ui_ZELNContactWidget*		Form;
 
 		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
 
 	public:
 		virtual QWidget*			GetWidget();
-		Ui_ZELNContactWidget*		GetForm();
 };

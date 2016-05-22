@@ -37,21 +37,22 @@
 
 #include "ZELNModule.h"
 
-class ZELNLogWidget;
-class Ui_ZELNLogWidget;
 enum ZELogType;
+class Ui_ZELNLogWidget;
 
 class ZELNLogModule  : public ZELNModule
 {
 	ZELN_MODULE
 	friend class ZELNLauncher;
 	private:
-		ZELNLogWidget*				Widget;
+		QWidget*					Widget;
+		Ui_ZELNLogWidget*			Form;
 
 		static void					LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
+		
 		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
 
 	public:
 		virtual QWidget*			GetWidget();
-		Ui_ZELNLogWidget*			GetForm();
 };
