@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationEvent.cpp
+ Zinek Engine - ZEDPropertyOperation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationEvent.h"
+#pragma once
 
-ZEDTransformationEvent::ZEDTransformationEvent()
-{
-	Type = ZED_TET_NONE;
-	Manager = NULL;
-	TransformationStates = NULL;
-}
+#include "ZEDOperation.h"
 
-ZEDTransformationEventType ZEDTransformationEvent::GetType() const
-{
-	return Type;
-}
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
 
-ZEDTransformationManager* ZEDTransformationEvent::GetManager() const
-{
-	return Manager;
-}
+struct ZEProperty;
+class ZEDObjectWrapper;
 
-const ZEArray<ZEDTransformationState>& ZEDTransformationEvent::GetTransformationStates() const
+struct ZEDPropertyOperationItem
 {
-	return *TransformationStates;
-}
+	ZEDObjectWrapper*							Wrapper;
+	ZEVariant									OldValue;
+};
+
+class ZEDPropertyOperation : public ZEDOperation
+{
+	private:
+		ZEArray<ZEDPropertyOperationItem>		Items;
+		ZEDObjectWrapper*						Wrappers;
+		const ZEProperty*						Property;
+		ZEVariant								Value;
+
+		virtual bool							Apply();
+		virtual bool							Revert();
+
+												ZEDPropertyOperation();
+
+	public:
+		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEVariant& Value);
+};

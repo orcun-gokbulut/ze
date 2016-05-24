@@ -96,7 +96,7 @@ class ZEVariant
 		static void						DeleterTemplate(void* Instance);
 
 		template<typename ZEReturnType>
-		ZEReturnType					ConvertIntegerValue() const;
+		ZEReturnType					ConvertValue() const;
 		template <typename ZEReturnType, ZETypeType Type>
 		ZEReturnType&					ConvertRef() const;
 		template <typename ZEReturnType, ZETypeType Type>

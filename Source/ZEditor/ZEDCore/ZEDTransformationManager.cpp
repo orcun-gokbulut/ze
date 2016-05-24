@@ -39,10 +39,10 @@
 #include "ZEDCore.h"
 #include "ZEDModule.h"
 #include "ZEDGizmo.h"
-#include "ZEDTransformationOperation.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDOperationManager.h"
 #include "ZEDSelectionManager.h"
+#include "ZEDTransformationOperation.h"
 #include "ZEDViewport.h"
 #include "ZEDViewportEvent.h"
 #include "ZERenderer\ZERNScreenUtilities.h"
@@ -262,7 +262,7 @@ void ZEDTransformationManager::EndTransform()
 	if (!TransformActive)
 		return;
 
-	ZEDTransformationOperation* Operation = new ZEDTransformationOperation(TransformType, TransformStates);
+	ZEDTransformationOperation* Operation = ZEDTransformationOperation::Create(TransformType, TransformStates);
 	Operation->SetApplyEnabled(false);
 	GetModule()->GetOperationManager()->DoOperation(Operation);
 	Operation->SetApplyEnabled(true);

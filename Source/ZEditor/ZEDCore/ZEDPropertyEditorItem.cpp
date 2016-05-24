@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelectionManagerToolbar.h
+ Zinek Engine - ZEDPropertyEditorItem.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,34 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDPropertyEditorItem.h"
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include "ZEDPropertyEditor.h"
 
-class ZEDSelectionManager;
-class Ui_ZEDSelectionManagerToolbar;
-
-class ZEDSelectionManagerToolbar : public QToolBar, public ZEDComponent
+void ZEDPropertyEditorItem::PropertyChanged(const ZEVariant& NewValue)
 {
-	Q_OBJECT
-	private:
-		Ui_ZEDSelectionManagerToolbar*		Form;
-		ZEDSelectionManager*				SelectionManager;
+	GetPropertyEditor()->PropertyChanged(Property, NewValue);
+}
 
-		void								UpdateUI();
+bool ZEDPropertyEditorItem::InitializeSelf()
+{
+	if (Property == NULL)
+	{
+		setText(0, "Error");
+		return false;
+	}
 
-	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+	setText(0, Property->Name);	
+	this->Property = Property;
 
-	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
+	return true;
+}
 
-											ZEDSelectionManagerToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionManagerToolbar();
-};
+ZEDPropertyEditor* ZEDPropertyEditorItem::GetPropertyEditor() const
+{
+	return static_cast<ZEDPropertyEditor*>(treeWidget());
+}
+
+void ZEDPropertyEditorItem::SetProperty(const ZEProperty* Property)
+{
+	if (this->Property == Property)
+		return;
+
+	this->Property = Property;
+
+	if (IsInitialized())
+	{
+		Deinitialize();
+		Initialize();
+	}
+}
+
+const ZEProperty* ZEDPropertyEditorItem::GetProperty() const
+{
+	return Property;
+}
+
+void ZEDPropertyEditorItem::Update()
+{
+
+}
+
+ZEDPropertyEditorItem::ZEDPropertyEditorItem()
+{
+	Property = NULL;
+}

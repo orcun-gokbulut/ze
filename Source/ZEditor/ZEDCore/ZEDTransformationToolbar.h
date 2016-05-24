@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationEvent.cpp
+ Zinek Engine - ZEDTransformationToolbar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,39 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationEvent.h"
+#pragma once
 
-ZEDTransformationEvent::ZEDTransformationEvent()
-{
-	Type = ZED_TET_NONE;
-	Manager = NULL;
-	TransformationStates = NULL;
-}
+#include "ZEDComponent.h"
+#include <QToolBar>
 
-ZEDTransformationEventType ZEDTransformationEvent::GetType() const
-{
-	return Type;
-}
+class ZEDTransformationManager;
+class Ui_ZEDTransformationToolbar;
 
-ZEDTransformationManager* ZEDTransformationEvent::GetManager() const
+class ZEDTransformationToolbar : public QToolBar, public ZEDComponent
 {
-	return Manager;
-}
+	Q_OBJECT
+	private:
+		Ui_ZEDTransformationToolbar*		Form;
+		ZEDTransformationManager*			TransformationManager;
 
-const ZEArray<ZEDTransformationState>& ZEDTransformationEvent::GetTransformationStates() const
-{
-	return *TransformationStates;
-}
+		void								UpdateUI();
+		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
+
+	private slots:
+		void								btnSelect_clicked();
+		void								btnMove_clicked();
+		void								btnRotate_clicked();
+		void								btnScale_clicked();
+		void								cmbSpace_currentIndexChanged(const QString & text);
+		void								cmbPivot_currentIndexChanged(const QString & text);
+		void								txtX_valueChanged(double d);
+		void								txtY_valueChanged(double d);
+		void								txtZ_valueChanged(double d);
+
+	public:
+		void								SetTransformManager(ZEDTransformationManager* Manager);
+		ZEDTransformationManager*			GetTransformManager();
+
+											ZEDTransformationToolbar(QWidget* Parent = NULL);
+											~ZEDTransformationToolbar();
+};

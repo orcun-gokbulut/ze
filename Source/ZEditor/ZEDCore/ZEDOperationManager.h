@@ -37,8 +37,8 @@
 
 #include "ZEDComponent.h"
 
-#include "ZEDOperation.h"
 #include "ZEDS\ZEArray.h"
+#include "ZEDOperation.h"
 
 class ZEDOperationManager : public ZEDComponent
 {

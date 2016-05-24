@@ -42,6 +42,17 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 
+class ZEDModule;
+class ZEDObjectWrapper;
+class ZEDGizmo;
+class ZEDSelectionEvent;
+class ZEDViewportKeyboardEvent;
+class ZEDViewportMouseEvent;
+class ZEDViewportChangedEvent;
+class ZERNRenderer;
+class ZEDTransformationToolbar;
+class ZEDTransformationManager;
+
 enum ZEDTransformType
 {
 	ZED_TT_NONE,
@@ -64,37 +75,6 @@ enum ZEDTransformPivot
 	ZED_TP_FOCUSED_OBJECT,
 	ZED_TP_CENTER,
 	ZED_TP_WORLD
-};
-
-
-enum ZEDTransformEventType
-{
-	ZED_TET_TRANSFORM_STARTED,
-	ZED_TET_TRANSFORMING,
-	ZED_TET_TRANSFORM_ENDED,
-	ZED_TET_MANAGER_STATE_CHANGED,
-};
-
-class ZEDModule;
-class ZEDObjectWrapper;
-class ZEDGizmo;
-class ZEDSelectionEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZERNRenderer;
-class ZEDTransformationManagerToolbar;
-class ZEDTransformationManager;
-
-class ZEDTransformEvent
-{
-	private:
-		ZEDTransformationManager*				Manager;
-		ZEDTransformEventType					Type;
-
-	public:
-		ZEDTransformEventType					GetType();
-		ZEDTransformationManager*				GetManager();
 };
 
 class ZEDTransformationState

@@ -125,12 +125,15 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 	SelectedObjects.Add(Object);
 
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_SELECTED;
-	Event.Focus = FocusedObject;
+	Event.FocusedObject = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
+	Event.FocusedObject = FocusedObject;
+	Event.OldFocusedObject = NULL;
 
 	RaiseEvent(&Event);
 }
@@ -156,12 +159,14 @@ void ZEDSelectionManager::SelectObjects(const ZEArray<ZEDObjectWrapper*>& Object
 
 
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_SELECTED;
-	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
+	Event.FocusedObject = FocusedObject;
+	Event.OldFocusedObject = NULL;
 
 	RaiseEvent(&Event);
 }
@@ -267,8 +272,9 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 	UnselectedObjects.Add(Object);
 
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_DESELECTED;
-	Event.Focus = FocusedObject;
+	Event.FocusedObject = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
@@ -303,13 +309,14 @@ void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 	}
 
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_DESELECTED;
-	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
-	Event.OldFocus = FocusedObject;
+	Event.FocusedObject = FocusedObject;
+	Event.OldFocusedObject = FocusedObject;
 
 	RaiseEvent(&Event);
 }
@@ -332,15 +339,16 @@ void ZEDSelectionManager::FocusObject(ZEDObjectWrapper* Object)
 
 	ZEArray<ZEDObjectWrapper*> SelectedObjects;
 	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
-	SelectedObjects.Add(Object);
 
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_FOCUS_CHANGED;
-	Event.Focus = FocusedObject;
 	Event.Selection = &Selection;
 	Event.OldSelection = &Selection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
+	Event.FocusedObject = FocusedObject;
+	Event.OldFocusedObject = NULL;
 
 	RaiseEvent(&Event);
 }
@@ -350,17 +358,23 @@ void ZEDSelectionManager::ClearFocus()
 	if (FocusedObject == NULL)
 		return;
 
+	ZEDObjectWrapper* OldFocusedObject = FocusedObject;
+
 	FocusedObject->SetFocused(false);
 	FocusedObject = NULL;
 
 	ZEArray<ZEDObjectWrapper*> SelectedObjects;
 	ZEArray<ZEDObjectWrapper*> UnselectedObjects;
+
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_FOCUS_CHANGED;
 	Event.Selection = &Selection;
 	Event.OldSelection = &Selection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &UnselectedObjects;
+	Event.FocusedObject = NULL;
+	Event.OldFocusedObject = OldFocusedObject;
 
 	RaiseEvent(&Event);
 }
@@ -378,13 +392,14 @@ void ZEDSelectionManager::ClearSelection()
 	Selection.Clear();
 
 	ZEDSelectionEvent Event;
+	Event.Manager = this;
 	Event.Type = ZED_SET_DESELECTED;
 	Event.Selection = &Selection;
 	Event.OldSelection = &OldSelection;
 	Event.SelectedObjects = &SelectedObjects;
 	Event.UnselectedObjects = &OldSelection;
-	Event.OldFocus = FocusedObject;
-	Event.Focus = NULL;
+	Event.OldFocusedObject = FocusedObject;
+	Event.FocusedObject = NULL;
 
 	RaiseEvent(&Event);
 }

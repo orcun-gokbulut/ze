@@ -42,8 +42,8 @@ ZEDSelectionEvent::ZEDSelectionEvent()
 	OldSelection = NULL;
 	SelectedObjects = NULL;
 	UnselectedObjects = NULL;
-	Focus = NULL;
-	OldFocus = NULL;
+	FocusedObject = NULL;
+	OldFocusedObject = NULL;
 }
 
 ZEDSelectionEventType ZEDSelectionEvent::GetType() const
@@ -71,12 +71,12 @@ const ZEArray<ZEDObjectWrapper*>& ZEDSelectionEvent::GetUnselectedObjects() cons
 	return *UnselectedObjects;
 }
 
-ZEDObjectWrapper* ZEDSelectionEvent::GetFocus()
+ZEDObjectWrapper* ZEDSelectionEvent::GetFocusedObject()
 {
-	return Focus;
+	return FocusedObject;
 }
 
-ZEDObjectWrapper* ZEDSelectionEvent::GetOldFocus()
+ZEDObjectWrapper* ZEDSelectionEvent::GetOldFocusedObject()
 {
-	return OldFocus;
+	return OldFocusedObject;
 }

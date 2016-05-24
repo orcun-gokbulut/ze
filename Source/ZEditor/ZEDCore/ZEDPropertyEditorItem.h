@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationManagerToolbar.h
+ Zinek Engine - ZEDPropertyEditorItem.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,37 +35,31 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include <QTreeWidget>
 
-class ZEDTransformationManager;
-class Ui_ZEDTransformManagerToolbar;
+#include "ZEDS/ZEVariant.h"
+#include "ZEInitializable.h"
 
-class ZEDTransformationManagerToolbar : public QToolBar, public ZEDComponent
+struct ZEProperty;
+class ZEDPropertyEditor;
+
+class ZEDPropertyEditorItem : public QTreeWidgetItem, public ZEInitializable
 {
-	Q_OBJECT
 	private:
-		Ui_ZEDTransformManagerToolbar*		Form;
-		ZEDTransformationManager*			TransformationManager;
+		const ZEProperty*			Property;
+	
+	protected:
+		void						PropertyChanged(const ZEVariant& NewValue);
 
-		void								UpdateUI();
-		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
-
-	private slots:
-		void								btnSelect_clicked();
-		void								btnMove_clicked();
-		void								btnRotate_clicked();
-		void								btnScale_clicked();
-		void								cmbSpace_currentIndexChanged(const QString & text);
-		void								cmbPivot_currentIndexChanged(const QString & text);
-		void								txtX_valueChanged(double d);
-		void								txtY_valueChanged(double d);
-		void								txtZ_valueChanged(double d);
+		virtual bool				InitializeSelf();
 
 	public:
-		void								SetTransformManager(ZEDTransformationManager* Manager);
-		ZEDTransformationManager*			GetTransformManager();
+		ZEDPropertyEditor*			GetPropertyEditor() const;
+		
+		void						SetProperty(const ZEProperty* Property);
+		const ZEProperty*			GetProperty() const;
 
-											ZEDTransformationManagerToolbar(QWidget* Parent = NULL);
-											~ZEDTransformationManagerToolbar();
+		virtual void				Update();
+
+									ZEDPropertyEditorItem();
 };

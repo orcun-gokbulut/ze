@@ -36,36 +36,35 @@
 #pragma once
 
 #include "ZEDOperation.h"
-#include "ZEDTransformationManager.h"
+
 #include "ZEDS/ZEArray.h"
+#include "ZEDTransformationManager.h"
 
 class ZEDObjectWrapper;
 
-struct ZEDTransformOperationTransforms
+class ZEDTransformItem
 {
-	ZEDObjectWrapper*							Object;
+	public:
+		ZEDObjectWrapper*						Wrapper;
 
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
+		ZEVector3								Scale;
 
-	ZEVector3									OldPosition;
-	ZEQuaternion								OldRotation;
-	ZEVector3									OldScale;
-
+		ZEVector3								OldPosition;
+		ZEQuaternion							OldRotation;
+		ZEVector3								OldScale;
 };
 
 class ZEDTransformationOperation : public ZEDOperation
 {
 	private:
-		ZEArray<ZEDTransformOperationTransforms>	Transforms;
+		ZEArray<ZEDTransformItem> Transforms;
 
-	protected:		
 		virtual bool							Apply();
 		virtual bool							Revert();
 
+												ZEDTransformationOperation();										
 	public:
-		virtual void							Destroy();
-
-												ZEDTransformationOperation(ZEDTransformType Type, const ZEArray<ZEDTransformationState>& State);
+		static ZEDTransformationOperation*		Create(ZEDTransformType Type, const ZEArray<ZEDTransformationState>& State);
 };
