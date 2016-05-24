@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationEvent.cpp
+ Zinek Engine - ZEDPropertyEditorItemInteger.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationEvent.h"
+#pragma once
 
-ZEDTransformationEvent::ZEDTransformationEvent()
-{
-	Type = ZED_TET_NONE;
-	Manager = NULL;
-	TransformationStates = NULL;
-}
+#include "ZEDPropertyEditorItem.h"
 
-ZEDTransformationEventType ZEDTransformationEvent::GetType() const
-{
-	return Type;
-}
+class QSpinBox;
 
-ZEDTransformationManager* ZEDTransformationEvent::GetManager() const
+class ZEDPropertyEditorItemInteger : public QObject, public ZEDPropertyEditorItem
 {
-	return Manager;
-}
+	Q_OBJECT
+	private:
+		QSpinBox*					SpinBox;
 
-const ZEArray<ZEDTransformationState>& ZEDTransformationEvent::GetTransformationStates() const
-{
-	return *TransformationStates;
-}
+		virtual bool				InitializeSelf();
+
+	private slots:
+		void						SpinBox_valueChanged(int);
+
+	public:
+		virtual void				Update();
+
+									ZEDPropertyEditorItemInteger();
+};

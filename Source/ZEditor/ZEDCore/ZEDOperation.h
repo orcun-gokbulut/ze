@@ -59,6 +59,9 @@ class ZEDOperation
 		virtual bool				Apply() = 0;
 		virtual bool				Revert() = 0;
 
+									ZEDOperation();
+		virtual						~ZEDOperation();
+
 	public:
 		const ZEString&				GetText() const;
 		ZEDOperationStatus			GetStatus() const;
@@ -73,7 +76,4 @@ class ZEDOperation
 		bool						Undo();
 
 		virtual void				Destroy();
-
-									ZEDOperation();
-		virtual						~ZEDOperation();
 };

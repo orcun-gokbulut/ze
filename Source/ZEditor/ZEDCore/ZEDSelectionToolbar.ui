@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZEDSelectionManagerToolbar</class>
- <widget class="QWidget" name="ZEDSelectionManagerToolbar">
+ <class>ZEDSelectionToolbar</class>
+ <widget class="QWidget" name="ZEDSelectionToolbar">
   <property name="geometry">
    <rect>
     <x>0</x>

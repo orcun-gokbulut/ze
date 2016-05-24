@@ -34,3 +34,38 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+
+#include "ZEDEvent.h"
+
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEDTransformationManager.h"
+
+class ZEDObjectWrapper;
+class ZEDTransformationManager;
+
+enum ZEDTransformationEventType
+{
+	ZED_TET_NONE,
+	ZED_TET_TRANSFORMATION_STARTED,
+	ZED_TET_TRANSFORMING,
+	ZED_TET_TRANSFORMATION_ENDED,
+	ZED_TET_MANAGER_STATE_CHANGED,
+};
+
+class ZEDTransformationEvent : public ZEDEvent
+{
+	ZE_OBJECT
+	private:
+		ZEDTransformationManager*				Manager;
+		ZEDTransformationEventType				Type;
+		ZEArray<ZEDTransformationState>*		TransformationStates;
+
+												ZEDTransformationEvent();
+
+	public:
+		ZEDTransformationEventType				GetType() const;
+		ZEDTransformationManager*				GetManager() const;
+		const ZEArray<ZEDTransformationState>&	GetTransformationStates() const;
+};

@@ -157,6 +157,8 @@ void ZEDObjectBrowser::Update()
 
 ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QTreeWidget(Parent)
 {
+	setWindowTitle("Object Browser");
+
 	RootWrapper = NULL;
 
 	QTreeWidgetItem* Item = new QTreeWidgetItem();

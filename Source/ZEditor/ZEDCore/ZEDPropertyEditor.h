@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationEvent.cpp
+ Zinek Engine - ZEDPropertyEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,26 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationEvent.h"
+#pragma once
 
-ZEDTransformationEvent::ZEDTransformationEvent()
-{
-	Type = ZED_TET_NONE;
-	Manager = NULL;
-	TransformationStates = NULL;
-}
+#include "ZEDComponent.h"
 
-ZEDTransformationEventType ZEDTransformationEvent::GetType() const
-{
-	return Type;
-}
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEValue.h"
 
-ZEDTransformationManager* ZEDTransformationEvent::GetManager() const
-{
-	return Manager;
-}
+#include <QTreeWidget>
 
-const ZEArray<ZEDTransformationState>& ZEDTransformationEvent::GetTransformationStates() const
+class ZEDObjectWrapper;
+
+class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
 {
-	return *TransformationStates;
-}
+	friend class ZEDPropertyEditorItem;
+	private:
+		ZEClass*							BaseClass;
+		ZEArray<ZEDObjectWrapper*>			Wrappers;
+
+		void								Populate();
+
+		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+
+	protected:
+		virtual void						PropertyChanged(const ZEProperty* Property, const ZEVariant& Value);
+
+	public:
+		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;
+		void								AddWrapper(ZEDObjectWrapper* Wrapper);
+		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
+
+		void								Update();
+
+											ZEDPropertyEditor(QWidget* Parent = 0);
+};

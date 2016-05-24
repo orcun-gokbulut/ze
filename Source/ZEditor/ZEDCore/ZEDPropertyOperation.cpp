@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationOperation.cpp
+ Zinek Engine - ZEDPropertyOperation.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,63 +33,59 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationOperation.h"
+#include "ZEDPropertyOperation.h"
 
 #include "ZEDObjectWrapper.h"
+#include "ZEMeta\ZEClass.h"
 
-bool ZEDTransformationOperation::Apply()
+bool ZEDPropertyOperation::Apply()
 {
-	for (ZESize I = 0; I < Transforms.GetCount(); I++)
+	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		ZEDTransformItem& TransformState = Transforms[I];
-		TransformState.Wrapper->SetPosition(TransformState.Position);
-		TransformState.Wrapper->SetRotation(TransformState.Rotation);
-		TransformState.Wrapper->SetScale(TransformState.Scale);
+		ZEObject* Object = Items[I].Wrapper->GetObject();
+		ZEClass* Class = Object->GetClass();
+
+		Class->SetProperty(Object, Property->ID, Value);
 	}
 
 	return true;
 }
 
-bool ZEDTransformationOperation::Revert()
+bool ZEDPropertyOperation::Revert()
 {
-	for (ZESize I = 0; I < Transforms.GetCount(); I++)
+	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		ZEDTransformItem& TransformState = Transforms[I];
-		TransformState.Wrapper->SetPosition(TransformState.OldPosition);
-		TransformState.Wrapper->SetRotation(TransformState.OldRotation);
-		TransformState.Wrapper->SetScale(TransformState.OldScale);
+		ZEObject* Object = Items[I].Wrapper->GetObject();
+		ZEClass* Class = Object->GetClass();
+
+		Class->SetProperty(Object, Property->ID, Items[I].OldValue);
 	}
 
 	return true;
 }
 
-ZEDTransformationOperation::ZEDTransformationOperation()
+ZEDPropertyOperation::ZEDPropertyOperation()
 {
-
+	Property = NULL;
 }
 
-ZEDTransformationOperation* ZEDTransformationOperation::Create(ZEDTransformType Type, const ZEArray<ZEDTransformationState>& TransformStates)
+ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& ObjectWrappers, const ZEProperty* Property, const ZEVariant& Value)
 {
-	ZEDTransformationOperation* Operation = new ZEDTransformationOperation();
+	ZEDPropertyOperation* Operation = new ZEDPropertyOperation();
+	Operation->Property = Property;
+	Operation->Value = Value;
 
-	Operation->Transforms.SetCount(TransformStates.GetCount());
-	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
+	Operation->Items.SetCount(ObjectWrappers.GetCount());
+	for (ZESize I = 0; I < Operation->Items.GetCount(); I++)
 	{
-		Operation->Transforms[I].Wrapper = TransformStates[I].Wrapper;
-		Operation->Transforms[I].Position = TransformStates[I].Wrapper->GetPosition();
-		Operation->Transforms[I].Rotation = TransformStates[I].Wrapper->GetRotation();
-		Operation->Transforms[I].Scale = TransformStates[I].Wrapper->GetScale();
-		Operation->Transforms[I].OldPosition = TransformStates[I].OriginalPosition;
-		Operation->Transforms[I].OldRotation = TransformStates[I].OriginalRotation;
-		Operation->Transforms[I].OldScale = TransformStates[I].OriginalScale;
+		Operation->Items[I].Wrapper = ObjectWrappers[I];
+	
+		ZEObject* Object = ObjectWrappers[I]->GetObject();
+		ZEClass* Class = Object->GetClass();
+		Class->GetProperty(Object, Operation->Property->ID, Operation->Items[I].OldValue);
 	}
 
-	if (Type == ZED_TT_TRANSLATE)
-		Operation->SetText("Change Position");
-	else if (Type == ZED_TT_ROTATE)
-		Operation->SetText("Change Rotation");
-	else if (Type == ZED_TT_SCALE)
-		Operation->SetText("Change Scale");
+	Operation->SetText("Property Changed");
 
 	return Operation;
 }

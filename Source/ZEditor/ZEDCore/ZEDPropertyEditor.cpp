@@ -1,0 +1,193 @@
+//ZE_SOURCE_PROCESSOR_START(License, 1.0)
+/*******************************************************************************
+ Zinek Engine - ZEDPropertyEditor.cpp
+ ------------------------------------------------------------------------------
+ Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
+
+ This file is part of the Zinek Engine  Software. Zinek Engine Software and the
+ accompanying  materials are  made available  under the  terms of Zinek  Engine
+ Commercial License or the GNU General Public License Version 3.
+
+                      ZINEK ENGINE COMMERCIAL LICENSE
+ Licensees  holding  valid  Zinek Engine Commercial  License(s) may  use  Zinek
+ Engine  Software in  accordance  with   the  commercial  license  agreement(s)
+ (which can only be  issued  by  copyright  owner "Yiğit  Orçun  GÖKBULUT") and
+ provided with the Software  or, alternatively,  in  accordance with the  terms
+ contained  in  a  written  agreement  between  you  and  copyright  owner. For
+ licensing  terms  and conditions  please  contact  with  copyright owner.
+
+                    GNU GENERAL PUBLIC LICENSE VERSION 3
+ This program is free software: you can  redistribute it and/or modify it under
+ the terms of the GNU General Public  License as published by the Free Software
+ Foundation, either  version 3 of  the License, or  (at your option)  any later
+ version. This program is  distributed in the hope that  it will be useful, but
+ WITHOUT ANY WARRANTY; without even the  implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE. See  the GNU General Public License for more
+ details. You  should have received  a copy of the  GNU General  Public License
+ along with this program. If not, see <https://www.gnu.org/licenses/>.
+
+ Copyright Owner Information:
+  Name: Yiğit Orçun GÖKBULUT
+  Contact: orcun.gokbulut@gmail.com
+  Github: https://www.github.com/orcun-gokbulut/ZE
+*******************************************************************************/
+//ZE_SOURCE_PROCESSOR_END()
+
+#include "ZEDPropertyEditor.h"
+
+#include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEClass.h"
+#include "ZEDModule.h"
+#include "ZEDObjectWrapper.h"
+#include "ZEDSelectionEvent.h"
+#include "ZEDPropertyOperation.h"
+#include "ZEDOperationManager.h"
+#include "ZEDPropertyEditorItemInteger.h"
+#include "ZEDPropertyEditorItemFloat.h"
+
+#include <QHeaderView>
+
+void ZEDPropertyEditor::Populate()
+{
+	clear();
+
+	if (Wrappers.GetCount() == 0)
+		return;
+
+	// Find Common Ancestor
+	ZEClass* BaseClass = NULL;
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{
+		ZEClass* CurrentClass = Wrappers[I]->GetObject()->GetClass();
+		if (BaseClass == NULL)
+		{
+			BaseClass = CurrentClass;
+			continue;
+		}
+
+		while (!ZEClass::IsDerivedFrom(BaseClass, CurrentClass))
+			BaseClass = BaseClass->GetParentClass();
+	}
+	
+	if (BaseClass == NULL)
+		return;
+
+	const ZEProperty* Properties = BaseClass->GetProperties();
+	for (ZESize I = 0; I < BaseClass->GetPropertyCount(); I++)
+	{
+		if (Properties[I].Access == ZEMT_PA_NONE)
+			continue;
+
+		if (Properties[I].Type.ContainerType != ZE_CT_NONE)
+			continue;
+
+		switch (Properties[I].Type.Type)
+		{
+			case ZE_TT_UNDEFINED:
+			case ZE_TT_VOID:
+				continue;
+
+			case ZE_TT_INTEGER_8:
+			case ZE_TT_INTEGER_16:
+			case ZE_TT_INTEGER_32:
+			case ZE_TT_INTEGER_64:
+			case ZE_TT_UNSIGNED_INTEGER_8:
+			case ZE_TT_UNSIGNED_INTEGER_16:
+			case ZE_TT_UNSIGNED_INTEGER_32:
+			case ZE_TT_UNSIGNED_INTEGER_64:
+			{
+				ZEDPropertyEditorItemInteger* IntegerItem = new ZEDPropertyEditorItemInteger();
+				IntegerItem->SetProperty(&Properties[I]);
+				addTopLevelItem(IntegerItem);
+				IntegerItem->Initialize();
+				break;
+			}
+
+			case ZE_TT_DOUBLE:
+			case ZE_TT_FLOAT:
+			{
+				ZEDPropertyEditorItemFloat* FloatItem = new ZEDPropertyEditorItemFloat();
+				FloatItem->SetProperty(&Properties[I]);
+				addTopLevelItem(FloatItem);
+				FloatItem->Initialize();
+				break;
+			}
+
+			case ZE_TT_BOOLEAN:
+			case ZE_TT_STRING:
+			case ZE_TT_QUATERNION:
+			case ZE_TT_VECTOR2:
+			case ZE_TT_VECTOR2D:
+			case ZE_TT_VECTOR3:
+			case ZE_TT_VECTOR3D:
+			case ZE_TT_VECTOR4:
+			case ZE_TT_VECTOR4D:
+			case ZE_TT_MATRIX3X3:
+			case ZE_TT_MATRIX3X3D:
+			case ZE_TT_MATRIX4X4:
+			case ZE_TT_MATRIX4X4D:
+			case ZE_TT_OBJECT:
+			case ZE_TT_OBJECT_PTR:
+			case ZE_TT_ENUMERATOR:
+			case ZE_TT_CLASS:
+				continue;
+		}
+	}
+}
+
+void ZEDPropertyEditor::SelectionEvent(const ZEDSelectionEvent* Event)
+{
+	for (ZESize I = 0; I < Event->GetUnselectedObjects().GetCount(); I++)
+		Wrappers.RemoveValue(Event->GetUnselectedObjects()[I]);
+
+	for (ZESize I = 0; I < Event->GetSelectedObjects().GetCount(); I++)
+		Wrappers.Add(Event->GetSelectedObjects()[I]);
+
+	Populate();
+}
+
+void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEVariant& Value)
+{
+	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Value);
+	GetModule()->GetOperationManager()->DoOperation(Operation);
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetWrappers() const
+{
+	return Wrappers;
+}
+
+void ZEDPropertyEditor::AddWrapper(ZEDObjectWrapper* Wrapper)
+{
+	zeCheckError(Wrappers.Exists(Wrapper), ZE_VOID, "Object wrapper is already added to list.");
+
+	Wrappers.Add(Wrapper);
+}
+
+void ZEDPropertyEditor::RemoveWrapper(ZEDObjectWrapper* Wrapper)
+{
+	Wrappers.RemoveValue(Wrapper);
+}
+
+void ZEDPropertyEditor::Update()
+{
+	int ItemCount = topLevelItemCount();
+	for (int I = 0; I < ItemCount; I++)
+		static_cast<ZEDPropertyEditorItem*>(topLevelItem(I))->Update();
+}
+
+ZEDPropertyEditor::ZEDPropertyEditor(QWidget* Parent) : QTreeWidget(Parent)
+{
+	setWindowTitle("Property Editor");
+
+	setColumnCount(2);
+
+	QTreeWidgetItem* Item = new QTreeWidgetItem();
+	Item->setText(0, "Name");
+	Item->setTextAlignment(0, Qt::AlignLeft | Qt::AlignVCenter);
+	Item->setText(1, "Value");
+	Item->setTextAlignment(1, Qt::AlignLeft | Qt::AlignVCenter);
+	setHeaderItem(Item);
+
+	header()->setStretchLastSection(true);
+}

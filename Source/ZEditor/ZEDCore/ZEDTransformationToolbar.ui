@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>ZEDTransformManagerToolbar</class>
- <widget class="QWidget" name="ZEDTransformManagerToolbar">
+ <class>ZEDTransformationToolbar</class>
+ <widget class="QWidget" name="ZEDTransformationToolbar">
   <property name="geometry">
    <rect>
     <x>0</x>

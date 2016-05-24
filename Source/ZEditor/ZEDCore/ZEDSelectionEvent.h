@@ -62,8 +62,8 @@ class ZEDSelectionEvent : public ZEDEvent
 		ZEArray<ZEDObjectWrapper*>*			OldSelection;
 		ZEArray<ZEDObjectWrapper*>*			SelectedObjects;
 		ZEArray<ZEDObjectWrapper*>*			UnselectedObjects;
-		ZEDObjectWrapper*					Focus;
-		ZEDObjectWrapper*					OldFocus;
+		ZEDObjectWrapper*					FocusedObject;
+		ZEDObjectWrapper*					OldFocusedObject;
 
 											ZEDSelectionEvent();
 
@@ -74,6 +74,6 @@ class ZEDSelectionEvent : public ZEDEvent
 		const ZEArray<ZEDObjectWrapper*>&	GetOldSelection() const;
 		const ZEArray<ZEDObjectWrapper*>&	GetSelectedObjects() const;
 		const ZEArray<ZEDObjectWrapper*>&	GetUnselectedObjects() const;
-		ZEDObjectWrapper*					GetFocus();
-		ZEDObjectWrapper*					GetOldFocus();
+		ZEDObjectWrapper*					GetFocusedObject();
+		ZEDObjectWrapper*					GetOldFocusedObject();
 };

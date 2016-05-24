@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationManagerToolbar.cpp
+ Zinek Engine - ZEDTransformationToolbar.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,12 +33,12 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDTransformationManagerToolbar.h"
+#include "ZEDTransformationToolbar.h"
 
-#include "ui_ZEDTransformationManagerToolbar.h"
+#include "Ui_ZEDTransformationToolbar.h"
 #include "ZEDTransformationManager.h"
 
-void ZEDTransformationManagerToolbar::UpdateUI()
+void ZEDTransformationToolbar::UpdateUI()
 {
 	setEnabled(TransformationManager != NULL);
 
@@ -126,32 +126,32 @@ void ZEDTransformationManagerToolbar::UpdateUI()
 	Form->txtZ->blockSignals(false);
 }
 
-void ZEDTransformationManagerToolbar::TransformationEvent(const ZEDTransformationEvent* Event)
+void ZEDTransformationToolbar::TransformationEvent(const ZEDTransformationEvent* Event)
 {
 
 }
 
-void ZEDTransformationManagerToolbar::btnSelect_clicked()
+void ZEDTransformationToolbar::btnSelect_clicked()
 {
 	TransformationManager->SetTransformType(ZED_TT_NONE);
 }
 
-void ZEDTransformationManagerToolbar::btnMove_clicked()
+void ZEDTransformationToolbar::btnMove_clicked()
 {
 	TransformationManager->SetTransformType(ZED_TT_TRANSLATE);
 }
 
-void ZEDTransformationManagerToolbar::btnRotate_clicked()
+void ZEDTransformationToolbar::btnRotate_clicked()
 {
 	TransformationManager->SetTransformType(ZED_TT_ROTATE);
 }
 
-void ZEDTransformationManagerToolbar::btnScale_clicked()
+void ZEDTransformationToolbar::btnScale_clicked()
 {
 	TransformationManager->SetTransformType(ZED_TT_SCALE);
 }
 
-void ZEDTransformationManagerToolbar::cmbSpace_currentIndexChanged(const QString & text)
+void ZEDTransformationToolbar::cmbSpace_currentIndexChanged(const QString & text)
 {
 	if (text == "World Space")
 		TransformationManager->SetTransformSpace(ZED_TS_WORLD);
@@ -167,7 +167,7 @@ void ZEDTransformationManagerToolbar::cmbSpace_currentIndexChanged(const QString
 		TransformationManager->SetTransformSpace(ZED_TS_WORLD);
 }
 
-void ZEDTransformationManagerToolbar::cmbPivot_currentIndexChanged(const QString & text)
+void ZEDTransformationToolbar::cmbPivot_currentIndexChanged(const QString & text)
 {
 
 	if (text == "Object Pivot")
@@ -182,22 +182,22 @@ void ZEDTransformationManagerToolbar::cmbPivot_currentIndexChanged(const QString
 		TransformationManager->SetTransformPivot(ZED_TP_OBJECT);
 }
 
-void ZEDTransformationManagerToolbar::txtX_valueChanged(double d)
+void ZEDTransformationToolbar::txtX_valueChanged(double d)
 {
 	TransformationManager->SetX(d);
 }
 
-void ZEDTransformationManagerToolbar::txtY_valueChanged(double d)
+void ZEDTransformationToolbar::txtY_valueChanged(double d)
 {
 	TransformationManager->SetY(d);
 }
 
-void ZEDTransformationManagerToolbar::txtZ_valueChanged(double d)
+void ZEDTransformationToolbar::txtZ_valueChanged(double d)
 {
 	TransformationManager->SetZ(d);
 }
 
-void ZEDTransformationManagerToolbar::SetTransformManager(ZEDTransformationManager* Manager)
+void ZEDTransformationToolbar::SetTransformManager(ZEDTransformationManager* Manager)
 {
 	if (TransformationManager == Manager)
 		return;
@@ -207,14 +207,14 @@ void ZEDTransformationManagerToolbar::SetTransformManager(ZEDTransformationManag
 	UpdateUI();
 }
 
-ZEDTransformationManager* ZEDTransformationManagerToolbar::GetTransformManager()
+ZEDTransformationManager* ZEDTransformationToolbar::GetTransformManager()
 {
 	return TransformationManager;
 }
 
-ZEDTransformationManagerToolbar::ZEDTransformationManagerToolbar(QWidget* Parent) : QToolBar(Parent)
+ZEDTransformationToolbar::ZEDTransformationToolbar(QWidget* Parent) : QToolBar(Parent)
 {
-	Form = new Ui_ZEDTransformManagerToolbar();
+	Form = new Ui_ZEDTransformationToolbar();
 	Form->setupUi(this);
 
 	TransformationManager = NULL;
@@ -230,7 +230,7 @@ ZEDTransformationManagerToolbar::ZEDTransformationManagerToolbar(QWidget* Parent
 	connect(Form->txtZ, SIGNAL(valueChanged(double)), this, SLOT(txtZ_valueChanged(double)));
 }
 
-ZEDTransformationManagerToolbar::~ZEDTransformationManagerToolbar()
+ZEDTransformationToolbar::~ZEDTransformationToolbar()
 {
 	delete Form;
 }

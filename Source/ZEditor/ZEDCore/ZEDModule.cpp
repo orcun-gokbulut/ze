@@ -37,13 +37,16 @@
 
 #include "ZEDCore.h"
 #include "ZEDSceneWrapper.h"
-#include "ZEDTransformationManager.h"
 #include "ZEDSelectionManager.h"
 #include "ZEDViewport.h"
 #include "ZEDViewportManager.h"
 #include "ZEDViewportEvent.h"
 #include "ZEDGizmo.h"
 #include "ZEDEntityWrapper.h"
+#include "ZEDObjectBrowser.h"
+#include "ZEDMainWindow.h"
+#include "ZEDViewportController.h"
+
 
 #include "ZEGame/ZEGrid.h"
 #include "ZEGame/ZEScene.h"
@@ -51,12 +54,12 @@
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
-#include "ZEDViewportController.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEDTransformationManagerToolbar.h"
-#include "ZEDSelectionManagerToolbar.h"
-#include "ZEDObjectBrowser.h"
-#include "ZEDMainWindow.h"
+
+#include "ZEDPropertyEditor.h"
+#include "ZEDSelectionToolbar.h"
+#include "ZEDTransformationToolbar.h"
+#include "ZEDTransformationManager.h"
 
 void ZEDModule::DistributeEvent(const ZEDEvent* Event)
 {
@@ -168,23 +171,26 @@ void ZEDModule::StartUp()
 	AddComponent(MainWindow);
 	MainWindow->show();
 
-	ZEDTransformationManagerToolbar* TransformManagerToolbar = new ZEDTransformationManagerToolbar();
+	ZEDTransformationToolbar* TransformManagerToolbar = new ZEDTransformationToolbar();
 	TransformManagerToolbar->SetTransformManager(TransformManager);
 	AddComponent(TransformManagerToolbar);
 	TransformManagerToolbar->show();
 
-	ZEDSelectionManagerToolbar* SelectionManagerToolbar = new ZEDSelectionManagerToolbar();
-	AddComponent(SelectionManagerToolbar);
-	SelectionManagerToolbar->SetSelectionManager(GetSelectionManager());
-	SelectionManagerToolbar->show();
+	ZEDSelectionToolbar* SelectionToolbar = new ZEDSelectionToolbar();
+	AddComponent(SelectionToolbar);
+	SelectionToolbar->SetSelectionManager(GetSelectionManager());
+	SelectionToolbar->show();
 
 	ZEDViewportController* Controller = new ZEDViewportController();
 	AddComponent(Controller);
 
-
 	ZEDObjectBrowser* Browser = new ZEDObjectBrowser();
 	AddComponent(Browser);
 	Browser->show();
+
+	ZEDPropertyEditor* Property = new ZEDPropertyEditor();
+	AddComponent(Property);
+	Property->show();
 
 	ZEDViewport* Viewport = new ZEDViewport();
 	GetViewportManager()->RegisterViewport(Viewport);
