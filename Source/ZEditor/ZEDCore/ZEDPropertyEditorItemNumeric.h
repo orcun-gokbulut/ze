@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDPropertyEditor.h
+ Zinek Engine - ZEDPropertyEditorItemNumeric.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,36 +35,28 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
+#include "ZEDPropertyEditorItem.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEValue.h"
+class QLineEdit;
 
-#include <QTreeWidget>
-
-class ZEDObjectWrapper;
-
-class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
+class ZEDPropertyEditorItemNumeric : public QObject, public ZEDPropertyEditorItem
 {
-	friend class ZEDPropertyEditorItem;
+	Q_OBJECT
 	private:
-		ZEClass*							BaseClass;
-		ZEArray<ZEDObjectWrapper*>			Wrappers;
+		QLineEdit*					TextEdit;
+		bool						Error;
+		ZEVariant					Value;
 
-		void								Populate();
+		virtual bool				InitializeSelf();
 
-		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual bool				eventFilter(QObject* Object, QEvent* Event);
 
-	protected:
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEVariant& Value);
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
+	private slots:
+		void						TextEdit_textChanged(const QString&);
+		void						TextEdit_editingFinished();
 
 	public:
-		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;
-		void								AddWrapper(ZEDObjectWrapper* Wrapper);
-		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
+		virtual void				Update();
 
-		void								Update();
-
-											ZEDPropertyEditor(QWidget* Parent = 0);
+									ZEDPropertyEditorItemNumeric();
 };

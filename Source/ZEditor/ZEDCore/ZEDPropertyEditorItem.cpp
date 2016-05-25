@@ -37,9 +37,14 @@
 
 #include "ZEDPropertyEditor.h"
 
-void ZEDPropertyEditorItem::PropertyChanged(const ZEVariant& NewValue)
+void ZEDPropertyEditorItem::Changed(const ZEVariant& NewValue)
 {
 	GetPropertyEditor()->PropertyChanged(Property, NewValue);
+}
+
+void ZEDPropertyEditorItem::Changed(const ZEArray<ZEVariant>& NewValues)
+{
+	GetPropertyEditor()->PropertyChanged(Property, NewValues);
 }
 
 bool ZEDPropertyEditorItem::InitializeSelf()

@@ -46,6 +46,7 @@ class ZEDObjectWrapper;
 struct ZEDPropertyOperationItem
 {
 	ZEDObjectWrapper*							Wrapper;
+	ZEVariant									NewValue;
 	ZEVariant									OldValue;
 };
 
@@ -55,7 +56,6 @@ class ZEDPropertyOperation : public ZEDOperation
 		ZEArray<ZEDPropertyOperationItem>		Items;
 		ZEDObjectWrapper*						Wrappers;
 		const ZEProperty*						Property;
-		ZEVariant								Value;
 
 		virtual bool							Apply();
 		virtual bool							Revert();
@@ -64,4 +64,5 @@ class ZEDPropertyOperation : public ZEDOperation
 
 	public:
 		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEVariant& Value);
+		static ZEDPropertyOperation*			Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
 };

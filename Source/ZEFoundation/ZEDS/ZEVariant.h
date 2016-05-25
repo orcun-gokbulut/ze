@@ -233,6 +233,8 @@ class ZEVariant
 
 		// Getters
 		////////////////////////////////////////////////
+		bool							IsUndefined() const;
+
 		ZEInt8							GetInt8() const;
 		ZEInt8&							GetInt8Ref() const;
 		const ZEInt8&					GetInt8ConstRef() const;

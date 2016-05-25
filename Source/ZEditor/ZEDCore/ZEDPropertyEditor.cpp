@@ -42,10 +42,33 @@
 #include "ZEDSelectionEvent.h"
 #include "ZEDPropertyOperation.h"
 #include "ZEDOperationManager.h"
-#include "ZEDPropertyEditorItemInteger.h"
-#include "ZEDPropertyEditorItemFloat.h"
+#include "ZEDPropertyEditorItemNumeric.h"
+#include "ZEDPropertyEditorItemBoolean.h"
+#include "ZEDPropertyEditorItemString.h"
+#include "ZEDPropertyEditorItemEnumurator.h"
+#include "ZEDPropertyEditorItemVector.h"
 
 #include <QHeaderView>
+#include "QStyledItemDelegate"
+#include "QPainter"
+
+class ZEDPropertyEditorGridDelegate : public QStyledItemDelegate
+{
+	public:
+		explicit ZEDPropertyEditorGridDelegate(QObject * parent = 0) : QStyledItemDelegate(parent) { }
+
+		void paint(QPainter* painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
+		{		
+			QStyledItemDelegate::paint(painter, option, index);
+
+			QPalette Palatte;
+			painter->save();
+			painter->setPen(QColor(76, 70, 70));
+			painter->drawRect(option.rect);
+			painter->restore();
+
+		}
+};
 
 void ZEDPropertyEditor::Populate()
 {
@@ -56,6 +79,7 @@ void ZEDPropertyEditor::Populate()
 
 	// Find Common Ancestor
 	ZEClass* BaseClass = NULL;
+	
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		ZEClass* CurrentClass = Wrappers[I]->GetObject()->GetClass();
@@ -72,10 +96,33 @@ void ZEDPropertyEditor::Populate()
 	if (BaseClass == NULL)
 		return;
 
+	ZEClass* CurrentClass = NULL;
+	QTreeWidgetItem* CurrentClassItem = NULL;
 	const ZEProperty* Properties = BaseClass->GetProperties();
 	for (ZESize I = 0; I < BaseClass->GetPropertyCount(); I++)
 	{
-		if (Properties[I].Access == ZEMT_PA_NONE)
+		if (Properties[I].MemberOf != CurrentClass)
+		{
+			CurrentClass = Properties[I].MemberOf;
+
+			CurrentClassItem = new QTreeWidgetItem();
+			CurrentClassItem->setText(0, CurrentClass->GetName());
+
+			QFont Font = CurrentClassItem->font(0);
+			Font.setBold(true);	
+			CurrentClassItem->setFont(0, Font);
+
+			QPalette Palette;
+			CurrentClassItem->setBackgroundColor(0, QColor(76, 70, 70));
+			CurrentClassItem->setBackgroundColor(1, QColor(76, 70, 70));
+			CurrentClassItem->setTextColor(0, QColor(255, 255, 255));
+			CurrentClassItem->setTextColor(1, QColor(255, 255, 255));
+
+			addTopLevelItem(CurrentClassItem);
+			CurrentClassItem->setExpanded(true);	
+		}
+
+		if (Properties[I].Access == ZEMT_PA_NONE || Properties[I].Access == ZEMT_PA_WRITE)
 			continue;
 
 		if (Properties[I].Type.ContainerType != ZE_CT_NONE)
@@ -95,26 +142,47 @@ void ZEDPropertyEditor::Populate()
 			case ZE_TT_UNSIGNED_INTEGER_16:
 			case ZE_TT_UNSIGNED_INTEGER_32:
 			case ZE_TT_UNSIGNED_INTEGER_64:
-			{
-				ZEDPropertyEditorItemInteger* IntegerItem = new ZEDPropertyEditorItemInteger();
-				IntegerItem->SetProperty(&Properties[I]);
-				addTopLevelItem(IntegerItem);
-				IntegerItem->Initialize();
-				break;
-			}
-
 			case ZE_TT_DOUBLE:
 			case ZE_TT_FLOAT:
 			{
-				ZEDPropertyEditorItemFloat* FloatItem = new ZEDPropertyEditorItemFloat();
-				FloatItem->SetProperty(&Properties[I]);
-				addTopLevelItem(FloatItem);
-				FloatItem->Initialize();
+				ZEDPropertyEditorItemNumeric* NumericItem = new ZEDPropertyEditorItemNumeric();
+				NumericItem->SetProperty(&Properties[I]);
+				CurrentClassItem->addChild(NumericItem);
+				NumericItem->Initialize();
+				NumericItem->Update();
 				break;
 			}
 
 			case ZE_TT_BOOLEAN:
+			{
+				ZEDPropertyEditorItemBoolean* BooleanItem = new ZEDPropertyEditorItemBoolean();
+				BooleanItem->SetProperty(&Properties[I]);
+				CurrentClassItem->addChild(BooleanItem);
+				BooleanItem->Initialize();
+				BooleanItem->Update();
+				break;
+			}
+
 			case ZE_TT_STRING:
+			{
+				ZEDPropertyEditorItemString* StringItem = new ZEDPropertyEditorItemString();
+				StringItem->SetProperty(&Properties[I]);
+				CurrentClassItem->addChild(StringItem);
+				StringItem->Initialize();
+				StringItem->Update();
+				break;
+			}
+
+			case ZE_TT_ENUMERATOR:
+			{
+				ZEDPropertyEditorItemEnumurator* EnumuratorItem = new ZEDPropertyEditorItemEnumurator();
+				EnumuratorItem->SetProperty(&Properties[I]);
+				CurrentClassItem->addChild(EnumuratorItem);
+				EnumuratorItem->Initialize();
+				EnumuratorItem->Update();
+				break;
+			}
+
 			case ZE_TT_QUATERNION:
 			case ZE_TT_VECTOR2:
 			case ZE_TT_VECTOR2D:
@@ -126,22 +194,63 @@ void ZEDPropertyEditor::Populate()
 			case ZE_TT_MATRIX3X3D:
 			case ZE_TT_MATRIX4X4:
 			case ZE_TT_MATRIX4X4D:
+			{
+				ZEDPropertyEditorItemVector* VectorItem = new ZEDPropertyEditorItemVector();
+				VectorItem->SetProperty(&Properties[I]);
+				CurrentClassItem->addChild(VectorItem);
+				VectorItem->Initialize();
+				VectorItem->Update();
+				break;
+			}
+
 			case ZE_TT_OBJECT:
 			case ZE_TT_OBJECT_PTR:
-			case ZE_TT_ENUMERATOR:
-			case ZE_TT_CLASS:
 				continue;
+
+			case ZE_TT_CLASS:
+			{
+				QTreeWidgetItem* Item = new QTreeWidgetItem();
+				Item->setText(0, Properties[I].Name);
+				CurrentClassItem->addChild(Item);
+
+				ZEVariant PropertyValue;
+				for (ZESize N = 0; N < Wrappers.GetCount(); N++)
+				{
+					ZEVariant Current;
+					if (!Wrappers[N]->GetObject()->GetClass()->GetProperty(Wrappers[N]->GetObject(), Properties[I].Name, Current))
+					{
+						Item->setText(1, "ERROR");
+						break;
+					}
+
+					if (PropertyValue.IsUndefined())
+					{
+						PropertyValue = Current;
+						Item->setText(1, Current.GetClass()->GetName());
+					} 
+					else if (PropertyValue.GetClass() != Current.GetClass())
+					{
+						Item->setText(1, "Multiple Object Class");
+						break;
+					}
+				}
+		
+				continue;
+			}
 		}
 	}
 }
 
 void ZEDPropertyEditor::SelectionEvent(const ZEDSelectionEvent* Event)
 {
-	for (ZESize I = 0; I < Event->GetUnselectedObjects().GetCount(); I++)
-		Wrappers.RemoveValue(Event->GetUnselectedObjects()[I]);
+	if (Event->GetType() == ZED_SET_SELECTED || Event->GetType() == ZED_SET_DESELECTED)
+	{
+		for (ZESize I = 0; I < Event->GetUnselectedObjects().GetCount(); I++)
+			Wrappers.RemoveValue(Event->GetUnselectedObjects()[I]);
 
-	for (ZESize I = 0; I < Event->GetSelectedObjects().GetCount(); I++)
-		Wrappers.Add(Event->GetSelectedObjects()[I]);
+		for (ZESize I = 0; I < Event->GetSelectedObjects().GetCount(); I++)
+			Wrappers.Add(Event->GetSelectedObjects()[I]);
+	}
 
 	Populate();
 }
@@ -149,6 +258,12 @@ void ZEDPropertyEditor::SelectionEvent(const ZEDSelectionEvent* Event)
 void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Value);
+	GetModule()->GetOperationManager()->DoOperation(Operation);
+}
+
+void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values)
+{
+	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Values);
 	GetModule()->GetOperationManager()->DoOperation(Operation);
 }
 
@@ -181,6 +296,12 @@ ZEDPropertyEditor::ZEDPropertyEditor(QWidget* Parent) : QTreeWidget(Parent)
 	setWindowTitle("Property Editor");
 
 	setColumnCount(2);
+
+	setAlternatingRowColors(true);
+	setRootIsDecorated(false);
+	setSelectionMode(QAbstractItemView::NoSelection);
+	setSelectionBehavior(QAbstractItemView::SelectRows);
+	//setItemDelegate(new ZEDPropertyEditorGridDelegate(this));
 
 	QTreeWidgetItem* Item = new QTreeWidgetItem();
 	Item->setText(0, "Name");
