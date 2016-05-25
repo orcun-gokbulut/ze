@@ -202,9 +202,6 @@ bool ZERNFixedMaterial::UpdateConstantBuffer() const
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_CONSTANT_BUFFER))
 		return true;
-
-	AmbientColor = ZEVector3::One; //CustB HACK
-	DiffuseColor = ZEVector3::One; //CustB HACK
 	
 	Constants.AmbientColor = (AmbientEnabled ? 1.0f : 0.0f) * AmbientFactor * AmbientColor;
 	Constants.DiffuseColor = (DiffuseEnabled ? 1.0f : 0.0f) * DiffuseFactor * DiffuseColor;

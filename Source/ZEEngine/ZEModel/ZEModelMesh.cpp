@@ -816,7 +816,7 @@ bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
 
 		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, WorldPosition);
-		if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
+		if (Parameters.MinimumDistance * Parameters.MinimumDistance < DistanceSquare && DistanceSquare <= Parameters.MaximumDistance * Parameters.MaximumDistance)
 		{
 			Report.Distance = ZEMath::Sqrt(DistanceSquare);
 			Report.Position = WorldPosition;

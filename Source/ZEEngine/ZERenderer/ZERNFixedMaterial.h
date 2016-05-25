@@ -147,10 +147,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool									BaseMapEnabled;
 		bool									AmbientEnabled;
 		float									AmbientFactor;
-		mutable ZEVector3						AmbientColor; // GERİ ZEKALI BİTES HACK
+		ZEVector3								AmbientColor;
 		bool									DiffuseEnabled;
 		float									DiffuseFactor;
-		mutable ZEVector3						DiffuseColor; // GERİ ZEKALI BİTES HACK
+		ZEVector3								DiffuseColor;
 		bool									SpecularEnabled;
 		bool									SpecularMapEnabled;
 		bool									SpecularGlossMapEnabled;
