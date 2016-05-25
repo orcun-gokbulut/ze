@@ -54,7 +54,7 @@ void ZERNStagePostProcess::DeinitializeSelf()
 {
 	AccumulationTexture = NULL;
 
-	ZERNStage::Deinitialize();
+	ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStagePostProcess::UpdateInputOutputs()
