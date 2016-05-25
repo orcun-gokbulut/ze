@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDPropertyEditor.h
+ Zinek Engine - ZEDPropertyEditorItemVector.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,36 +35,36 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
+#include "ZEDPropertyEditorItem.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEValue.h"
+class QLineEdit;
 
-#include <QTreeWidget>
-
-class ZEDObjectWrapper;
-
-class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
+class ZEDPropertyEditorItemVector : public QObject, public ZEDPropertyEditorItem
 {
-	friend class ZEDPropertyEditorItem;
+	Q_OBJECT
 	private:
-		ZEClass*							BaseClass;
-		ZEArray<ZEDObjectWrapper*>			Wrappers;
+		const char*					Labels[16];
+		QLineEdit*					TextEdits[16];
 
-		void								Populate();
+		bool						Detail;
+		ZESize						RowCount;
+		ZESize						ColumnCount;
 
-		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+		void						SetMemeberValue(ZEVariant& Variant, ZESize MemberIndex, double MemberValue);
+		double						GetMemeberValue(const ZEVariant& Variant, ZESize Index);
 
-	protected:
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEVariant& Value);
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
+		ZESSize						FindIndex(QLineEdit* TextEdit);
+
+		virtual bool				eventFilter(QObject* Object, QEvent* Event);
+
+		virtual bool				InitializeSelf();
+
+	private slots:
+		void						TextEdit_textChanged(const QString&);
+		void						TextEdit_editingFinished();
 
 	public:
-		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;
-		void								AddWrapper(ZEDObjectWrapper* Wrapper);
-		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
+		virtual void				Update();
 
-		void								Update();
-
-											ZEDPropertyEditor(QWidget* Parent = 0);
+									ZEDPropertyEditorItemVector();
 };

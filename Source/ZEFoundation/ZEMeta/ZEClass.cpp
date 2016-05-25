@@ -87,7 +87,7 @@ ZEClass* ZEClass::GetParentClass()
 
 const char* ZEClass::GetName()
 {
-	return "";
+	return "ZEObject";
 }
 
 ZEGUID ZEClass::GetGUID()

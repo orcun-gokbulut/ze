@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDPropertyEditorItemFloat.cpp
+ Zinek Engine - ZEDPropertyEditorItemBoolean.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,15 +35,16 @@
 
 #pragma once
 
-#include "ZEDPropertyEditorItemFloat.h"
+#include "ZEDPropertyEditorItemBoolean.h"
 
 #include "ZEMeta/ZEProperty.h"
 #include "ZEDPropertyEditor.h"
 #include "ZEDObjectWrapper.h"
 
-#include <QDoubleSpinBox>
+#include <QComboBox>
+#include <QLineEdit>
 
-bool ZEDPropertyEditorItemFloat::InitializeSelf()
+bool ZEDPropertyEditorItemBoolean::InitializeSelf()
 {
 	if (!ZEDPropertyEditorItem::InitializeSelf())
 	{
@@ -52,56 +53,46 @@ bool ZEDPropertyEditorItemFloat::InitializeSelf()
 	}
 
 	const ZEProperty* Property = GetProperty();
-
-	if (Property->Type.Type != ZE_TT_FLOAT&&
-		Property->Type.Type != ZE_TT_DOUBLE)
+	if (Property->Type.Type != ZE_TT_BOOLEAN)
 	{
 		setText(1, "Type Error");
 		return false;
 	}
 
-	if (Property->Access == ZEMT_PA_WRITE)
+	ComboBox = new QComboBox();
+	ComboBox->setEditable(true);
+	ComboBox->lineEdit()->setReadOnly(true);
+	ComboBox->setFrame(false);
+	ComboBox->setStyleSheet("QComboBox { background-color: rgba(0, 0, 0, 0); }");
+	ComboBox->setEnabled(Property->Access == ZEMT_PA_READ);
+
+	if (Property->Access == ZEMT_PA_READ_WRITE)
 	{
-		setText(1, "Write Only");
-		return false;
+		ComboBox->addItem("True");
+		ComboBox->addItem("False");
 	}
+	treeWidget()->setItemWidget(this, 1, ComboBox);
 
-	SpinBox = new QDoubleSpinBox();
-	treeWidget()->setItemWidget(this, 1, SpinBox);
-	
-	Update();
-
-	SpinBox->setReadOnly(Property->Access == ZEMT_PA_READ);
-	this->connect(SpinBox, SIGNAL(valueChanged(double)), this, SLOT(SpinBox_valueChanged(double)));
+	connect(ComboBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(ComboBox_currentTextChanged(const QString&)));
 
 	return true;
 }
 
-void ZEDPropertyEditorItemFloat::SpinBox_valueChanged(float)
+void ZEDPropertyEditorItemBoolean::ComboBox_currentTextChanged(const QString& Text)
 {
 	ZEVariant Value;
-	switch(GetProperty()->Type.Type)
-	{
-		default:
-		case ZE_TT_FLOAT:
-			Value.SetFloat(SpinBox->value());
-			break;
+	Value.SetBool(Text == "True");
 
-		case ZE_TT_DOUBLE:
-			Value.SetDouble(SpinBox->value());
-			break;
-	}
-
-	PropertyChanged(Value);
+	Changed(Value);
 	Update();
 }
 
-void ZEDPropertyEditorItemFloat::Update()
+void ZEDPropertyEditorItemBoolean::Update()
 {
-	if (GetProperty() == NULL ||GetPropertyEditor() == NULL)
+	if (!IsInitialized())
 		return;
 
-	QSignalBlocker Blocker(SpinBox);
+	QSignalBlocker Blocker(ComboBox);
 
 	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetWrappers());
 	bool MultipleValue = false;
@@ -114,47 +105,31 @@ void ZEDPropertyEditorItemFloat::Update()
 		ZEVariant CurrentValue;
 		if (!Class->GetProperty(Object, GetProperty()->ID, CurrentValue))
 		{
-			SpinBox->setValue(0.0f);
-			SpinBox->setSpecialValueText("Error");
+			ComboBox->setCurrentText("Value Error");
+			ComboBox->setEnabled(false);
 			return;
 		}
 
-		if (Value.GetType().Type == ZE_TT_UNDEFINED)
+		if (Value.IsUndefined())
 		{
 			Value = CurrentValue;
 		}
-		else if (CurrentValue.GetDouble() != Value.GetDouble())
+		else if (CurrentValue.GetBool() != Value.GetBool())
 		{
-			MultipleValue = true;
+			Value.SetUndefined();
 			break;
 		}
 	}
 
-	if (MultipleValue)
-	{
-		SpinBox->setSpecialValueText("");
-	}
+	ComboBox->setEnabled(true);
+
+	if (Value.IsUndefined())
+		ComboBox->setCurrentText("");
 	else
-	{
-		switch (GetProperty()->Type.Type)
-		{
-			case ZE_TT_FLOAT:
-				SpinBox->setValue(Value.GetFloat());
-				break;
-
-			case ZE_TT_DOUBLE:
-				SpinBox->setValue(Value.GetDouble());
-				break;
-
-			default:
-				SpinBox->setValue(0);
-				SpinBox->setSpecialValueText("Error");
-				break;
-		}
-	}
+		ComboBox->setCurrentText(Value.GetBool() ? "True" : "False");
 }
 
-ZEDPropertyEditorItemFloat::ZEDPropertyEditorItemFloat()
+ZEDPropertyEditorItemBoolean::ZEDPropertyEditorItemBoolean()
 {
-
+	ComboBox = NULL;
 }

@@ -49,7 +49,8 @@ class ZEDPropertyEditorItem : public QTreeWidgetItem, public ZEInitializable
 		const ZEProperty*			Property;
 	
 	protected:
-		void						PropertyChanged(const ZEVariant& NewValue);
+		void						Changed(const ZEVariant& NewValue);
+		void						Changed(const ZEArray<ZEVariant>& NewValues);
 
 		virtual bool				InitializeSelf();
 

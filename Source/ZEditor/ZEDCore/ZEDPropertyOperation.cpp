@@ -45,7 +45,7 @@ bool ZEDPropertyOperation::Apply()
 		ZEObject* Object = Items[I].Wrapper->GetObject();
 		ZEClass* Class = Object->GetClass();
 
-		Class->SetProperty(Object, Property->ID, Value);
+		Class->SetProperty(Object, Property->ID, Items[I].NewValue);
 	}
 
 	return true;
@@ -69,18 +69,41 @@ ZEDPropertyOperation::ZEDPropertyOperation()
 	Property = NULL;
 }
 
-ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& ObjectWrappers, const ZEProperty* Property, const ZEVariant& Value)
+ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = new ZEDPropertyOperation();
 	Operation->Property = Property;
-	Operation->Value = Value;
 
-	Operation->Items.SetCount(ObjectWrappers.GetCount());
+
+	Operation->Items.SetCount(Wrappers.GetCount());
 	for (ZESize I = 0; I < Operation->Items.GetCount(); I++)
 	{
-		Operation->Items[I].Wrapper = ObjectWrappers[I];
-	
-		ZEObject* Object = ObjectWrappers[I]->GetObject();
+		Operation->Items[I].Wrapper = Wrappers[I];
+		Operation->Items[I].NewValue = Value;
+
+		ZEObject* Object = Wrappers[I]->GetObject();
+		ZEClass* Class = Object->GetClass();
+		Class->GetProperty(Object, Operation->Property->ID, Operation->Items[I].OldValue);
+	}
+
+	Operation->SetText("Property Changed");
+
+	return Operation;
+}
+
+ZEDPropertyOperation* ZEDPropertyOperation::Create(const ZEArray<ZEDObjectWrapper*>& Wrappers, const ZEProperty* Property, const ZEArray<ZEVariant>& Values)
+{
+	ZEDPropertyOperation* Operation = new ZEDPropertyOperation();
+	Operation->Property = Property;
+
+
+	Operation->Items.SetCount(Wrappers.GetCount());
+	for (ZESize I = 0; I < Operation->Items.GetCount(); I++)
+	{
+		Operation->Items[I].Wrapper = Wrappers[I];
+		Operation->Items[I].NewValue = Values[I];
+
+		ZEObject* Object = Wrappers[I]->GetObject();
 		ZEClass* Class = Object->GetClass();
 		Class->GetProperty(Object, Operation->Property->ID, Operation->Items[I].OldValue);
 	}

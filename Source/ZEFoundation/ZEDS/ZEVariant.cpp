@@ -1081,6 +1081,12 @@ void ZEVariant::SetValue(const ZEValue& Value)
 			break;
 	}
 }
+
+bool ZEVariant::IsUndefined() const
+{
+	return (GetType().Type == ZE_TT_UNDEFINED);
+}
+
 ZEInt8 ZEVariant::GetInt8() const
 {
 	return ConvertValue<ZEInt8>();

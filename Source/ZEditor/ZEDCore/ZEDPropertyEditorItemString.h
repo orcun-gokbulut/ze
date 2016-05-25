@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDPropertyEditorItemFloat.h
+ Zinek Engine - ZEDPropertyEditorItemString.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,21 +37,26 @@
 
 #include "ZEDPropertyEditorItem.h"
 
-class QDoubleSpinBox;
+class QPlainTextEdit;
+class QToolButton;
 
-class ZEDPropertyEditorItemFloat : public QObject, public ZEDPropertyEditorItem
+class ZEDPropertyEditorItemString : public QObject, public ZEDPropertyEditorItem
 {
 	Q_OBJECT
 	private:
-		QDoubleSpinBox*				SpinBox;
+		QLineEdit*					TextEdit;
+		QToolButton*				DetailButton;
 
 		virtual bool				InitializeSelf();
 
+		virtual bool				eventFilter(QObject* Object, QEvent* Event);
+
 	private slots:
-		void						SpinBox_valueChanged(float);
+		void						TextEdit_editingFinished();
+		void						DetailButton_clicked();
 
 	public:
 		virtual void				Update();
 
-									ZEDPropertyEditorItemFloat();
+									ZEDPropertyEditorItemString();
 };
