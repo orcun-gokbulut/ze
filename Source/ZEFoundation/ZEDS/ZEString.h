@@ -300,7 +300,9 @@ class ZEString
 											ZEString();
 
 											ZEString(const char* String);
+											ZEString(const char* Start, const char* End);
 											ZEString(const wchar_t* String);
+											ZEString(const void* Buffer, ZESize Length);
 											ZEString(const ZEString& String);
 											ZEString(const std::string& String);
 											ZEString(const std::wstring& String);
