@@ -36,7 +36,8 @@
 #pragma once
 
 #include <QtWidgets/QWidget>
-#include "ZECommandEngine.h"
+
+#include "ZEMTInterpreter.h"
 
 class Ui_ZEDConsoleWidget;
 
@@ -45,7 +46,7 @@ class ZEDConsoleWidget: public QWidget
 	Q_OBJECT
 	private:
 		Ui_ZEDConsoleWidget*			Form;
-		ZEDCommandEngine				Engine;
+		ZEMTInterpreter					Engine;
 
 		void							Execute();
 

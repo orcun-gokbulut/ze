@@ -38,14 +38,14 @@ cmake_minimum_required(VERSION 2.8)
 ze_add_source(ZEDConsoleWidget.cpp						Sources)
 ze_add_source(ZEDConsoleWidget.h						Sources Headers QtMocs)
 ze_add_source(ZEDConsoleWidget.ui						Sources QtUI)
-ze_add_source(ZECommandEngine.cpp						Sources)
-ze_add_source(ZECommandEngine.h							Sources Headers)
-ze_add_source(ZECommandParser.cpp						Sources)
-ze_add_source(ZECommandParser.h							Sources Headers)
-ze_add_source(ZECommandParser.y							Sources)
-ze_add_source(ZECommandLexer.cpp						Sources)
-ze_add_source(ZECommandLexer.h							Sources)
-ze_add_source(ZECommandLexer.l							Sources Headers)
+ze_add_source(ZEMTInterpreter.cpp						Sources)
+ze_add_source(ZEMTInterpreter.h							Sources Headers)
+ze_add_source(ZEMTInterpreterParser.cpp					Sources)
+ze_add_source(ZEMTInterpreterParser.h					Sources)
+ze_add_source(ZEMTInterpreterParser.y					Sources)
+ze_add_source(ZEMTInterpreterLexer.cpp					Sources)
+ze_add_source(ZEMTInterpreterLexer.h					Sources)
+ze_add_source(ZEMTInterpreterLexer.l					Sources)
 ze_add_source(ZEMain.cpp								Sources)
 
 qt5_wrap_cpp (QtMocFiles ${QtMocs})
@@ -56,29 +56,29 @@ qt5_wrap_ui (QtUiFiles ${QtUI})
 #######################################################
 
 add_custom_command(
-	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ZECommandLexer.l.cpp"
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp"
 	COMMAND "${CMAKE_SOURCE_DIR}/Tool/re2c.exe" 
-	ARGS "-o" "${CMAKE_CURRENT_BINARY_DIR}/ZECommandLexer.l.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/ZECommandLexer.l"
-	MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/ZECommandLexer.l"
+	ARGS "-o" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp" "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterLexer.l"
+	MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterLexer.l"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 
-ze_add_source("${CMAKE_CURRENT_BINARY_DIR}/ZECommandLexer.l.cpp" Sources)
+ze_add_source("${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp" Sources)
 
 
 # LEMON
 #######################################################
 
 add_custom_command(
-	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.tmp" "${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.c" "${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.h"
+	OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.tmp" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.c" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h"
 	COMMAND "${CMAKE_COMMAND}"
-		ARGS "-E" "copy_if_different" "${CMAKE_CURRENT_SOURCE_DIR}/ZECommandParser.y" "${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.tmp"
+		ARGS "-E" "copy_if_different" "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterParser.y" "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.tmp"
 	COMMAND "${CMAKE_SOURCE_DIR}/Tool/lemon.exe" 
-		ARGS "${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.tmp"
-	MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/ZECommandParser.y"
+		ARGS "${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.tmp"
+	MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/ZEMTInterpreterParser.y"
 	WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}")
 	
-ze_add_source("${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.c" Sources)
-ze_add_source("${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.h" Sources)
+ze_add_source("${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.c" Sources)
+ze_add_source("${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h" Sources)
 	
 ze_add_executable(TARGET ZEDConsole 
 	ZEMC ${ZEMC}
@@ -88,8 +88,8 @@ ze_add_executable(TARGET ZEDConsole
 source_group("Generated" FILES 
 	${QtMocFiles} 
 	${QtUiFiles}
-	"${CMAKE_CURRENT_BINARY_DIR}/ZECommandLexer.l.cpp"
-	"${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.c"
-	"${CMAKE_CURRENT_BINARY_DIR}/ZECommandParser.y.h")
+	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp"
+	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.c"
+	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h")
 
 qt5_use_modules(ZEDConsole Widgets)

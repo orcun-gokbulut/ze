@@ -2474,6 +2474,16 @@ ZEString::ZEString(bool Value)
 	SetValue(Value);
 }
 
+ZEString::ZEString(const char* Start, const char* End)
+{
+	SetValue(Buffer, End - Start);
+}
+
+ZEString::ZEString(const void* Buffer, ZESize Length)
+{
+	SetValue(Buffer, Length);
+}
+
 ZEString::~ZEString()
 {
 	Clear();
