@@ -125,7 +125,8 @@ void ZEModelAnimationTrack::SetCurrentFrame(float Frame)
 	else
 		CurrentFrame = Frame;
 
-	UpdateMeshesAndBones();
+	if (Owner != NULL)
+		UpdateMeshesAndBones();
 }
 
 void ZEModelAnimationTrack::SetCurrentFrameByTime(float Seconds)
