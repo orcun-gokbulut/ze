@@ -93,7 +93,7 @@ ZEInt ZE3dsMaxInteriorExporter::ExtCount()
 
 const TCHAR *ZE3dsMaxInteriorExporter::Ext(ZEInt n)
 {		
-	return ZEString("zeInterior");
+	return ZEString("ZEInterior");
 }
 
 const TCHAR *ZE3dsMaxInteriorExporter::LongDesc()
