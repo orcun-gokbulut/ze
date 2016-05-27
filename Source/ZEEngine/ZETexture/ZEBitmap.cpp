@@ -40,6 +40,7 @@
 #include "ZEMath/ZEMath.h"
 
 #include <FreeImage.h>
+#include "ZEFile/ZEPathInfo.h"
 
 ZEPixelColor ZEPixelColor::Lerp(const ZEPixelColor& A, const ZEPixelColor& B, float T)
 {
@@ -372,9 +373,15 @@ void ZEBitmap::Clear()
 
 bool ZEBitmap::Load(const char* FileName)
 {
-	FREE_IMAGE_FORMAT fif = FreeImage_GetFileType(FileName, 0);
+	ZERealPath RealPath = ZEPathInfo(FileName).GetRealPath();
+	if ((RealPath.Access | ZE_PA_READ) == 0)
+	{
+		zeError("Can not open bitmap file.");
+		return false;
+	}
 
-	FIBITMAP* FIBitmap = FreeImage_Load(fif, FileName, 0);
+	FREE_IMAGE_FORMAT FIFormat = FreeImage_GetFileType(RealPath.Path, 0);
+	FIBITMAP* FIBitmap = FreeImage_Load(FIFormat, RealPath.Path, 0);
 
 	if (FIBitmap == NULL)
 	{

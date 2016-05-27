@@ -233,6 +233,14 @@ ZEEntity::~ZEEntity()
 {
 	Deinitialize();
 
+	if (Owner != NULL)
+	{
+		if (Owner->GetComponents().Exists(this))
+			Owner->RemoveComponent(this);
+		else if (Owner->GetChildEntities().Exists(this))
+			Owner->RemoveChildEntity(this);
+	}
+
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Destroy();
 
