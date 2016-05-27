@@ -94,7 +94,7 @@ ZEInt ZE3dsMaxModelExporter::ExtCount()
 
 const TCHAR *ZE3dsMaxModelExporter::Ext(ZEInt n)
 {		
-	return ZEString("zeModel");
+	return ZEString("ZEModel");
 }
 
 const TCHAR *ZE3dsMaxModelExporter::LongDesc()

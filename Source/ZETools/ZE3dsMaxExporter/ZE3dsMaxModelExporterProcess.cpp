@@ -977,7 +977,15 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LO
 		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Rotation()), 
 		ZE3dsMaxUtils::MaxtoZE(Node->GetWorldTM().Scaling()));
 
-	ZEMatrix4x4 WorldTransform = WorldTM.Inverse() * ObjectTM;
+	ZEMatrix4x4 InvWorldTM = WorldTM.Inverse();
+
+	// BIG INFO
+	// Transform Order: WorldParentNodeTM -> LocalNodeTM -> PivotTM -> Vertex
+	// Zinek cannot represent pivots. Therefore pivots must be eliminated. Pivot transform must be applied to vertices.
+	// Vertex Transform does this. It applies ObjectTransform to vertices to assimilate Pivot into Node Transform.
+
+	ZEMatrix4x4 VertexTransform = InvWorldTM * ObjectTM;
+	ZEMatrix4x4 TangentTransform = InvWorldTM;
 
 	bool GotError = false;
 	bool BoneCountWarning = false; 
@@ -997,24 +1005,25 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LO
 				if (!Mesh->GetVertex(Face->vert[N], Temp, true))
 					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
 
-				Vertex->Position = WorldTransform * ZE3dsMaxUtils::MaxtoZE(Temp);
+				Vertex->Position = VertexTransform * ZE3dsMaxUtils::MaxtoZE(Temp);
 
 				if (!Mesh->GetNormal(Face->norm[N], Temp, true))
 					zeError("Can not get normal of face %d, normal index : %d.", I, N);
 				
-				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, VertexTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
 				ZEInt32 BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt32)I, (ZEInt32)N);
 
 				if (!Mesh->GetTangent(BinormalTangentIndex, Temp))
 					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
 
-				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, TangentTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
 
 				if (!Mesh->GetBinormal(BinormalTangentIndex, Temp))
 					zeError("Can not get binormal of face %d, binormal index : %d.", I, BinormalTangentIndex);
 
-				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEVector3 InverseBinormal = -(ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, TangentTransform, InverseBinormal);
 
 				if (!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
@@ -1033,24 +1042,24 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LO
 				if (!Mesh->GetVertex(Face->vert[N], Temp, true))
 					zeError("Can not get vertex of face %d, vertex index : %d.", I, N);
 
-				Vertex->Position = WorldTransform * ZE3dsMaxUtils::MaxtoZE(Temp);
+				Vertex->Position = VertexTransform * ZE3dsMaxUtils::MaxtoZE(Temp);
 
 				if (!Mesh->GetNormal(Face->norm[N], Temp, true))
 					zeError("Can not get normal of face %d, normal index : %d.", I, N);
 
-				ZEMatrix4x4::Transform3x3(Vertex->Normal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEMatrix4x4::Transform3x3(Vertex->Normal, VertexTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
 				ZEInt32 BinormalTangentIndex = Mesh->GetFaceVertexTangentBinormal((ZEInt32)I, (ZEInt32)N);
 
 				if (!Mesh->GetTangent(BinormalTangentIndex, Temp))
 					zeError("Can not get tangent of face %d, tangent index : %d.", I, BinormalTangentIndex);
 
-				ZEMatrix4x4::Transform3x3(Vertex->Tangent, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
+				ZEMatrix4x4::Transform3x3(Vertex->Tangent, TangentTransform, ZE3dsMaxUtils::MaxtoZE(Temp.Normalize()));
 
 				if (!Mesh->GetBinormal(BinormalTangentIndex, Temp))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
 
-				ZEMatrix4x4::Transform3x3(Vertex->Binormal, WorldTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, TangentTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
 
 				if (!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
