@@ -57,14 +57,6 @@ ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
 	{
 		Initialized = true;
 
-		ZEGRRasterizerState RasterizerState;
-		RasterizerState.SetDepthBias(0.0f);
-		RasterizerState.SetDepthBiasClamp(0.0f);
-		RasterizerState.SetSlopeScaledDepthBias(0.0f);
-		RasterizerState.SetDepthClipEnable(true);
-
-		RenderState.SetRasterizerState(RasterizerState);
-
 		RenderState.SetDepthStencilFormat(ZEGR_TF_D32_FLOAT);
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
 	}

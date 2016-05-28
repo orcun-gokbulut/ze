@@ -40,6 +40,7 @@
 #include "ZERNSkin.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNScene.hlsl"
+#include "ZERNShading.hlsl"
 
 // SHADER RESOURCES (CONSTANT BUFFERS)
 ///////////////////////////////////////////////////////////////////////////////
@@ -81,7 +82,7 @@ cbuffer ZERNFixedMaterial_Constants : register(ZERN_SHADER_CONSTANT_MATERIAL)
 	float			ZERNFixedMaterial_DetailNormalMapAttenuationFactor;
 };
 
-cbuffer ZERNFixedMaterial_Constant_Draw_Transform : register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
+cbuffer ZERNFixedMaterial_Constant_Draw_Transform	: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
 {
 	float4x4		ZERNFixedMaterial_WorldTransform;
 	float4x4		ZERNFixedMaterial_WorldTransformInverseTranspose;
@@ -112,17 +113,11 @@ SamplerState		ZERNFixedMaterial_EnvironmentMapSampler		: register(s1);
 SamplerState		ZERNFixedMaterial_DetailBaseSampler			: register(s2);
 SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 
-// COMMON FUNCTIONS
-///////////////////////////////////////////////////////////////////////////////
-
-float ZERNFixelMaterial_CalculateDetailAttenuation()
-{
-}
 
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
-struct ZERNFixedMaterial_GBufferStage_VSInput
+struct ZERNFixedMaterial_VSInput
 {
 	float3 Position			: POSITION0;
 	float3 Normal			: NORMAL0;
@@ -140,7 +135,7 @@ struct ZERNFixedMaterial_GBufferStage_VSInput
 	#endif
 };
 
-struct ZERNFixedMaterial_GBufferStage_VSOutput 
+struct ZERNFixedMaterial_VSOutput 
 {
 	float4 Position			: SV_Position;
 	float3 Normal			: TEXCOORD0;
@@ -149,8 +144,12 @@ struct ZERNFixedMaterial_GBufferStage_VSOutput
 	float2 Texcoord			: TEXCOORD3;
 	float ViewDistance		: TEXCOORD4;
 	
+	#ifdef ZERN_FM_FORWARD
+		float3 PositionView	: TEXCOORD5;
+	#endif
+	
 	#ifdef ZERN_FM_VERTEX_COLOR
-		float4 Color		: TEXCOORD5;
+		float4 Color		: TEXCOORD6;
 	#endif
 	
 	#ifdef ZERN_FM_CLIPPING_PLANES
@@ -158,7 +157,7 @@ struct ZERNFixedMaterial_GBufferStage_VSOutput
 	#endif
 };
 
-struct ZERNFixedMaterial_GBufferStage_PSInput
+struct ZERNFixedMaterial_PSInput
 {
 	float4 Position			: SV_Position;
 	float3 Normal			: TEXCOORD0;
@@ -167,8 +166,21 @@ struct ZERNFixedMaterial_GBufferStage_PSInput
 	float2 Texcoord			: TEXCOORD3;
 	float ViewDistance		: TEXCOORD4;
 	
+	#ifdef ZERN_FM_FORWARD
+		float3 PositionView	: TEXCOORD5;
+	#endif
+	
 	#ifdef ZERN_FM_VERTEX_COLOR
-		float4 Color		: TEXCOORD5;
+		float4 Color		: TEXCOORD6;
+	#endif
+};
+
+struct ZERNFixedMaterial_PSOutput
+{
+	#ifdef ZERN_FM_DEFERRED
+		ZERNGBuffer GBuffer;
+	#elif defined ZERN_FM_FORWARD
+		float4 Color : SV_Target0;
 	#endif
 };
 
@@ -190,6 +202,7 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_VSOutput
 {
 	float4 Position			: SV_Position;
 	float2 Texcoord         : TEXCOORD0;
+	
 	#ifdef ZERN_FM_CLIPPING_PLANES
 		float4 ClipDistance	: SV_ClipDistance;
 	#endif
@@ -201,12 +214,21 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_PSInput
 	float2 Texcoord         : TEXCOORD0;
 };
 
-// GBUFFER STAGE - VERTEX SHADER
-///////////////////////////////////////////////////////////////////////////////
-
-ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexShader(ZERNFixedMaterial_GBufferStage_VSInput Input)
+float4 ZERNFixedMaterial_VertexShader_StageRenderDepth(ZERNFixedMaterial_VSInput Input) : SV_Position
 {
-	ZERNFixedMaterial_GBufferStage_VSOutput Output = (ZERNFixedMaterial_GBufferStage_VSOutput)0;
+	#ifdef ZERN_FM_SKIN_TRANSFORM
+		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
+		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
+	#endif
+	
+	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
+	
+	return ZERNTransformations_WorldToProjection(PositionWorld);
+}
+
+ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSInput Input)
+{
+	ZERNFixedMaterial_VSOutput Output = (ZERNFixedMaterial_VSOutput)0;
 	
 	#ifdef ZERN_FM_SKIN_TRANSFORM
 		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
@@ -224,10 +246,14 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
 	Output.Normal = ZERNTransformations_WorldToView(float4(NormalWorld, 0.0f));
 	Output.Tangent = ZERNTransformations_WorldToView(float4(TangentWorld, 0.0f));
-	Output.Binormal = ZERNTransformations_WorldToView(float4(BinormalWorld, 0.0f)); //cross(Output.Tangent, Output.Normal);
+	Output.Binormal = ZERNTransformations_WorldToView(float4(BinormalWorld, 0.0f));
 	Output.Texcoord = Input.Texcoord;
 	Output.ViewDistance = length(PositionWorld.xyz - ZERNView_Position);
 
+	#ifdef ZERN_FM_FORWARD
+		Output.PositionView = ZERNTransformations_WorldToView(PositionWorld);
+	#endif
+	
 	#ifdef ZERN_FM_VERTEX_COLOR
 		Output.Color = Input.Color;
 	#endif
@@ -238,31 +264,22 @@ ZERNFixedMaterial_GBufferStage_VSOutput ZERNFixedMaterial_GBufferStage_VertexSha
 		Output.ClipDistance.z = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane2);
 		Output.ClipDistance.w = dot(PositionWorld, ZERNFixedMaterial_ClippingPlane3);
 	#endif
-		
+	
 	return Output;
 }
 
-
-// GBUFFER STAGE - PIXEL SHADER
-///////////////////////////////////////////////////////////////////////////////
-
-ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBufferStage_PSInput Input)
-{
-	ZERNGBuffer GBuffer = (ZERNGBuffer)0;
+ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
+{	
+	float Alpha = ZERNFixedMaterial_Opacity;
+	#ifdef ZERN_FM_OPACITY_MAP
+		Alpha = ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
+	#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
+		Alpha = ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
+	#endif
 	
 	#ifdef ZERN_FM_ALPHA_CULL
-		float Alpha = ZERNFixedMaterial_Opacity;
-		#ifdef ZERN_FM_OPACITY_MAP
-			Alpha = ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
-		#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
-			Alpha = ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
-		#endif
-		
 		if (Alpha <= ZERNFixedMaterial_AlphaCullLimit)
-		{
 			discard;
-			return GBuffer;
-		}
 	#endif
 	
 	float3 Normal = normalize(Input.Normal);
@@ -298,7 +315,6 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailBaseAttenuation);
 	#endif
 
-
 	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? ZERNScene_AmbientColor : ZERNFixedMaterial_AmbientColor);
 	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
 	float3 SpecularColor = ZERNFixedMaterial_SpecularColor;
@@ -314,12 +330,12 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 	#endif
 
 	#if defined(ZERN_FM_SPECULAR_GLOSS_MAP)
-		SpecularPower *= ZERNFixedMaterial_SpecularGlossMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r;
+		SpecularPower = ZERNFixedMaterial_SpecularGlossMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r;
 	#endif
 
 	float SubsurfaceScattering = ZERNFixedMaterial_SubSurfaceScatteringFactor;
 	#if defined(ZERN_FM_SUBSURFACE_SCATTERING_MAP)
-		SubSurfaceScattering = ZERNFixedMaterial_SubsurfaceScatteringMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r);
+		SubsurfaceScattering = ZERNFixedMaterial_SubsurfaceScatteringMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r;
 	#endif
 	
 	float3 ReflectionRefractionColor = float3(0.0f, 0.0f, 0.0f);
@@ -333,20 +349,66 @@ ZERNGBuffer ZERNFixedMaterial_GBufferStage_PixelShader(ZERNFixedMaterial_GBuffer
 		ReflectionRefractionColor += ZERNFixedMaterial_RefractionColor * ZERNFixedMaterial_EnvironmentMap.Sample(ZERNFixedMaterial_EnvironmentMapSampler, normalize(Input.RefractionVector)).rgb;
 	#endif
 		
-	#ifdef ZE_FM_VERTEX_COLOR
-		AmbientColor *= Input.Color;
-		DiffuseColor *= Input.Color;
+	#ifdef ZERN_FM_VERTEX_COLOR
+		AmbientColor *= Input.Color.rgb;
+		DiffuseColor *= Input.Color.rgb;
 	#endif
 	
-	ZERNGBuffer_SetAccumulationColor(GBuffer, AmbientColor);
-	ZERNGBuffer_SetViewNormal(GBuffer, Normal);
-	ZERNGBuffer_SetSpecularColor(GBuffer, SpecularColor);
-	ZERNGBuffer_SetDiffuseColor(GBuffer, DiffuseColor);
-	ZERNGBuffer_SetSubsurfaceScattering(GBuffer, SubsurfaceScattering);
-	ZERNGBuffer_SetEmissiveColor(GBuffer, EmissiveColor);
-	ZERNGBuffer_SetSpecularPower(GBuffer, SpecularPower);
+	ZERNShading_Surface Surface;
+	#ifdef ZERN_FM_FORWARD
+		Surface.PositionView = Input.PositionView;
+	#endif
+	Surface.NormalView = Normal;
+	Surface.Diffuse = DiffuseColor;
+	Surface.SubsurfaceScattering = SubsurfaceScattering;
+	Surface.Specular = SpecularColor;
+	Surface.SpecularPower = SpecularPower;
+	Surface.Ambient = AmbientColor;
+	Surface.Opacity = Alpha;
+	Surface.Emissive = EmissiveColor;
+	
+	return Surface;
+}
 
-	return GBuffer;
+ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInput Input)
+{	
+	ZERNFixedMaterial_PSOutput Output;
+	
+	ZERNShading_Surface Surface = GetSurfaceDataFromResources(Input);
+	
+	#ifdef ZERN_FM_DEFERRED
+		ZERNGBuffer GBuffer = (ZERNGBuffer)0;
+		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient);
+		ZERNGBuffer_SetViewNormal(GBuffer, Surface.NormalView);
+		ZERNGBuffer_SetSpecularColor(GBuffer, Surface.Specular);
+		ZERNGBuffer_SetDiffuseColor(GBuffer, Surface.Diffuse);
+		ZERNGBuffer_SetSubsurfaceScattering(GBuffer, Surface.SubsurfaceScattering);
+		ZERNGBuffer_SetEmissiveColor(GBuffer, Surface.Emissive);
+		ZERNGBuffer_SetSpecularPower(GBuffer, Surface.SpecularPower);
+		
+		Output.GBuffer = GBuffer;
+	#elif defined ZERN_FM_FORWARD
+		float3 ResultColor = 0.0f;
+		
+		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
+			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
+		
+		uint2 TileId = (Input.Position.xy - 0.5f) / TILE_DIMENSION;
+		uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
+		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
+		
+		uint TilePointLightCount = ZERNShading_TileLightIndices[TileStartOffset];
+		for (uint J = 0; J < TilePointLightCount; J++)
+			ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[ZERNShading_TileLightIndices[TileStartOffset + 1 + J]], Surface);
+		
+		uint TileTotalLightCount = ZERNShading_TileLightIndices[TileStartOffset + 1 + TilePointLightCount];
+		for (uint K = TilePointLightCount; K < TileTotalLightCount; K++)
+			ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[ZERNShading_TileLightIndices[TileStartOffset + 2 + K]], Surface);
+		
+		Output.Color = float4(ResultColor + Surface.Ambient + Surface.Emissive, Surface.Opacity);
+	#endif
+	
+	return Output;
 }
 
 // SHADOW MAP GENERATION STAGE - VERTEX SHADER

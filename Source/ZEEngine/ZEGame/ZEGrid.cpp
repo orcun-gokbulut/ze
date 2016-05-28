@@ -38,7 +38,7 @@
 #include "ZEMath/ZEMath.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNFixedMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
@@ -283,7 +283,8 @@ void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* C
 {
 	ZEGRContext* Context = Parameters->Context;
 	ZERNStage* Stage = Parameters->Stage;
-	Material->SetupMaterial(Context, Stage);
+	if (!Material->SetupMaterial(Context, Stage))
+		return;
 
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
@@ -317,8 +318,11 @@ bool ZEGrid::InitializeSelf()
 	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
-	Material = ZERNFixedMaterial::CreateInstance();
-	Material->SetVertexColorEnabled(false);
+	Material = ZERNSimpleMaterial::CreateInstance();
+	Material->SetTwoSided(true);
+	Material->SetVertexColorEnabled(true);
+	Material->SetTransparent(true);
+	Material->SetOpacity(0.1f);
 	Material->Initialize();
 
 	RenderCommand.Entity = this;
@@ -334,11 +338,13 @@ bool ZEGrid::InitializeSelf()
 
 bool ZEGrid::DeinitializeSelf()
 {
-	Material.Release();
 	VertexBuffer.Release();
+
 	ConstantBufferAxisTransform.Release();
 	ConstantBufferMinorGridTransform.Release();
 	ConstantBufferMajorGridTransform.Release();
+
+	Material.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }

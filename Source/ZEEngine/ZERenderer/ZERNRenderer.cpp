@@ -51,6 +51,7 @@
 #include "ZEGraphics\ZEGRGraphicsModule.h"
 #include "ZEGraphics\ZEGRConstantBuffer.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics\ZEGRSampler.h"
 #include "ZECore\ZECore.h"
 
 static ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
@@ -61,6 +62,52 @@ static ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 		return 1;
 	else
 		return (ZEInt)(A->Order - B->Order);
+}
+
+void ZERNRenderer::CreatePredefinedSamplers()
+{
+	ZEHolder<ZEGRSampler> SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
+
+	ZEGRSamplerDescription SamplerLinearWrapDescription;
+	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerLinearWrapDescription.AddressW = ZEGR_TAM_WRAP;
+	ZEHolder<ZEGRSampler> SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
+
+	ZEGRSamplerDescription SamplerLinearBorderZeroDescription;
+	SamplerLinearBorderZeroDescription.AddressU = ZEGR_TAM_BORDER;
+	SamplerLinearBorderZeroDescription.AddressV = ZEGR_TAM_BORDER;
+	SamplerLinearBorderZeroDescription.AddressW = ZEGR_TAM_BORDER;
+	SamplerLinearBorderZeroDescription.BorderColor = ZEVector4::Zero;
+	ZEHolder<ZEGRSampler> SamplerLinearBorderZero = ZEGRSampler::GetSampler(SamplerLinearBorderZeroDescription);
+
+	ZEGRSamplerDescription SamplerPointClampDescription;
+	SamplerPointClampDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointClampDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointClampDescription.MipFilter = ZEGR_TFM_POINT;
+	ZEHolder<ZEGRSampler> SamplerPointClamp = ZEGRSampler::GetSampler(SamplerPointClampDescription);
+
+	ZEGRSamplerDescription SamplerPointWrapDescription;
+	SamplerPointWrapDescription.MinFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.MagFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerPointWrapDescription.AddressU = ZEGR_TAM_WRAP;
+	SamplerPointWrapDescription.AddressV = ZEGR_TAM_WRAP;
+	SamplerPointWrapDescription.AddressW = ZEGR_TAM_WRAP;
+	ZEHolder<ZEGRSampler> SamplerPointWrap = ZEGRSampler::GetSampler(SamplerPointWrapDescription);
+
+	ZEGRSamplerDescription SamplerComparisonLinearPointClampDescription;
+	SamplerComparisonLinearPointClampDescription.MinFilter = ZEGR_TFM_LINEAR;
+	SamplerComparisonLinearPointClampDescription.MagFilter = ZEGR_TFM_LINEAR;
+	SamplerComparisonLinearPointClampDescription.MipFilter = ZEGR_TFM_POINT;
+	SamplerComparisonLinearPointClampDescription.AddressU = ZEGR_TAM_CLAMP;
+	SamplerComparisonLinearPointClampDescription.AddressV = ZEGR_TAM_CLAMP;
+	SamplerComparisonLinearPointClampDescription.AddressW = ZEGR_TAM_CLAMP;
+	SamplerComparisonLinearPointClampDescription.ComparisonFunction = ZEGR_CF_GREATER;
+	ZEHolder<ZEGRSampler> SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerComparisonLinearPointClampDescription);
+
+	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
+	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
 }
 
 void ZERNRenderer::UpdateConstantBuffers()
@@ -142,9 +189,8 @@ void ZERNRenderer::Cull()
 
 void ZERNRenderer::SortStageCommands()
 {
-	ZESize Count = Stages.GetCount();
-	for (ZESize I = 0; I < Count; I++)
-		Stages[I]->Commands.Sort<CompareCommands>();
+	ze_for_each(Stage, Stages)
+		Stage->Commands.Sort<CompareCommands>();
 }
 
 void ZERNRenderer::RenderStages()
@@ -218,6 +264,8 @@ bool ZERNRenderer::InitializeSelf()
 	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
 	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
 	SceneConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SceneConstants));
+
+	CreatePredefinedSamplers();
 
 	return true;
 }

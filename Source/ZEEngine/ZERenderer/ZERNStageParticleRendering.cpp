@@ -91,6 +91,9 @@ bool ZERNStageParticleRendering::Setup(ZEGRContext* Context)
 	if (!UpdateInputOutputs())
 		return false;
 
+	if (GetCommands().GetCount() == 0)
+		return false;
+
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 	
 	Viewport.SetWidth((float)RenderTarget->GetWidth());

@@ -40,7 +40,7 @@
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
 
-cbuffer ZERNFog_Constants	: register(b8)
+cbuffer ZERNFog_Constants	: register(b9)
 {
 	float	ZERNFog_Density;
 	float	ZERNFog_StartDistance;

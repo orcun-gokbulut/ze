@@ -101,9 +101,6 @@ class ZERNStageHDR : public ZERNStage
 		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceMips;
 		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
 		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
-		
-		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
-		ZEHolder<ZEGRSampler>				SamplerLinearBorder;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 

@@ -80,15 +80,17 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 			float						Reserved0;
 		} SceneConstants;
 
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+		
+		void							CreatePredefinedSamplers();
+
+		void							UpdateConstantBuffers();
+
 		void							Cull();
 		void							SortStageCommands();
 		void							RenderStage(ZERNStage* Queue);
 		void							RenderStages();
-
-		void							UpdateConstantBuffers();
-
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
 
 	public:
 		void							SetContext(ZEGRContext* Context);

@@ -38,6 +38,7 @@
 
 #include "ZERNRenderer.hlsl"
 #include "ZERNScreenCover.hlsl"
+#include "ZERNSamplers.hlsl"
 
 #if SAMPLE_COUNT > 1
 	#define MSAA
@@ -72,12 +73,6 @@ cbuffer ZERNHDR_Constants								: register(b8)
 };
 
 static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.072169f);
-
-// SAMPLERS
-///////////////////////////////////////////////////////////////////////////////
-
-SamplerState							ZERNHDR_SamplerLinearClamp			: register(s0);
-SamplerState							ZERNHDR_SamplerLinearBorder			: register(s1);
 
 // TEXTURES
 ///////////////////////////////////////////////////////////////////////////////
@@ -238,9 +233,9 @@ float ZERNHDR_Luminance_Calculate_PixelShader(float4 PositionViewport : SV_Posit
 	
 	return dot(Luminance, float4(1.0f, 1.0f, 1.0f, 1.0f)) / 4.0f;
 #else
-	float4 ColorReds = ZERNHDR_InputTexture.GatherRed(ZERNHDR_SamplerLinearClamp, TexCoord);
-	float4 ColorGreens = ZERNHDR_InputTexture.GatherGreen(ZERNHDR_SamplerLinearClamp, TexCoord);
-	float4 ColorBlues = ZERNHDR_InputTexture.GatherBlue(ZERNHDR_SamplerLinearClamp, TexCoord);
+	float4 ColorReds = ZERNHDR_InputTexture.GatherRed(ZERNSampler_LinearClamp, TexCoord);
+	float4 ColorGreens = ZERNHDR_InputTexture.GatherGreen(ZERNSampler_LinearClamp, TexCoord);
+	float4 ColorBlues = ZERNHDR_InputTexture.GatherBlue(ZERNSampler_LinearClamp, TexCoord);
 	float Luminance = 0.0f;
 	for (uint J = 0; J < 4; J++)
 	{
@@ -259,7 +254,7 @@ float ZERNHDR_Luminance_Calculate_PixelShader(float4 PositionViewport : SV_Posit
 float ZERNHDR_Luminance_DownScale_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
 	#ifndef MSAA
-		return ZERNHDR_InputTexture.Sample(ZERNHDR_SamplerLinearClamp, TexCoord).r;
+		return ZERNHDR_InputTexture.Sample(ZERNSampler_LinearClamp, TexCoord).r;
 	#endif
 }
 
@@ -312,9 +307,9 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 PositionViewport : SV_Positio
 	
 	return (ResultColors[0] + ResultColors[1] + ResultColors[2] + ResultColors[3]) / 4.0f;
 #else
-	float4 ColorReds = ZERNHDR_InputTexture.GatherRed(ZERNHDR_SamplerLinearClamp, TexCoord);
-	float4 ColorGreens = ZERNHDR_InputTexture.GatherGreen(ZERNHDR_SamplerLinearClamp, TexCoord);
-	float4 ColorBlues = ZERNHDR_InputTexture.GatherBlue(ZERNHDR_SamplerLinearClamp, TexCoord);
+	float4 ColorReds = ZERNHDR_InputTexture.GatherRed(ZERNSampler_LinearClamp, TexCoord);
+	float4 ColorGreens = ZERNHDR_InputTexture.GatherGreen(ZERNSampler_LinearClamp, TexCoord);
+	float4 ColorBlues = ZERNHDR_InputTexture.GatherBlue(ZERNSampler_LinearClamp, TexCoord);
 	float3 ResultColor = 0.0f;
 	for (uint J = 0; J < 4; J++)
 	{
@@ -344,7 +339,7 @@ float3 ZERNHDR_ToneMapping_PixelShader(float4 PositionViewport : SV_Position, fl
 	float3 PixelColor = ZERNHDR_InputTexture.Load(int3(PositionViewport.xy, 0));
 #endif
 	if (ZERNHDR_BloomEnabled)
-		PixelColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNHDR_SamplerLinearBorder, TexCoord).rgb;
+		PixelColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNSampler_LinearBorderZero, TexCoord).rgb;
 
 	ResultColor += ZERNHDR_ToneMap(PixelColor);
 #ifdef MSAA

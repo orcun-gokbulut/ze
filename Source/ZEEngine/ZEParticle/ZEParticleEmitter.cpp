@@ -623,7 +623,7 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, InstanceBuffer.GetPointerToPointer());
-	Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, &DepthMap);
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthMap);
 
 	Context->DrawInstanced(4, 0, ParticleCount, 0);
 

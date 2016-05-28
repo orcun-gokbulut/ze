@@ -162,7 +162,7 @@ bool ZERNStageResolving::UpdateInputOutputs()
 		ResolvedInputTexture.Release();
 	}
 
-	if (ResolveAllGbuffers && EmissiveTexture->GetSampleCount() > 1)
+	if (ResolveAllGbuffers)
 	{
 		EmissiveTexture = GetPrevOutput(ZERN_SO_GBUFFER_EMISSIVE);
 		if (EmissiveTexture == NULL)
@@ -172,14 +172,17 @@ bool ZERNStageResolving::UpdateInputOutputs()
 		if (DiffuseTexture == NULL)
 			return false;
 
-		ZEUInt Width = EmissiveTexture->GetWidth();
-		ZEUInt Height = EmissiveTexture->GetHeight();
-
-		if (ResolvedGbufferEmissive == NULL || 
-			ResolvedGbufferEmissive->GetWidth() != Width || ResolvedGbufferEmissive->GetHeight() != Height)
+		if (EmissiveTexture->GetSampleCount() > 1)
 		{
-			ResolvedGbufferEmissive = ZEGRTexture2D::CreateInstance(Width, Height, 1, EmissiveTexture->GetFormat());
-			ResolvedGbufferDiffuse = ZEGRTexture2D::CreateInstance(Width, Height, 1, DiffuseTexture->GetFormat());
+			ZEUInt Width = EmissiveTexture->GetWidth();
+			ZEUInt Height = EmissiveTexture->GetHeight();
+
+			if (ResolvedGbufferEmissive == NULL || 
+				ResolvedGbufferEmissive->GetWidth() != Width || ResolvedGbufferEmissive->GetHeight() != Height)
+			{
+				ResolvedGbufferEmissive = ZEGRTexture2D::CreateInstance(Width, Height, 1, EmissiveTexture->GetFormat());
+				ResolvedGbufferDiffuse = ZEGRTexture2D::CreateInstance(Width, Height, 1, DiffuseTexture->GetFormat());
+			}
 		}
 	}
 
@@ -191,11 +194,11 @@ bool ZERNStageResolving::UpdateInputOutputs()
 	if (DepthTexture == NULL)
 		return false;
 
-	ZEUInt Width = DepthTexture->GetWidth();
-	ZEUInt Height = DepthTexture->GetHeight();
-
 	if (DepthTexture->GetSampleCount() > 1)
 	{
+		ZEUInt Width = DepthTexture->GetWidth();
+		ZEUInt Height = DepthTexture->GetHeight();
+
 		if (ResolvedDepthTexture == NULL || 
 			ResolvedDepthTexture->GetWidth() != Width || ResolvedDepthTexture->GetHeight() != Height)
 		{

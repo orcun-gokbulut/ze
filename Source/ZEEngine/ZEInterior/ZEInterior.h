@@ -58,10 +58,10 @@ class ZEInteriorHelper;
 
 struct ZEExtraRenderParameters
 {
-	ZEUInt VertexOffset;
-	ZEUInt VertexCount;
-	ZERNMaterial* Material;
-	ZEInteriorRoom* Room;
+	ZEUInt			VertexOffset;
+	ZEUInt			VertexCount;
+	ZERNMaterial*	Material;
+	ZEInteriorRoom*	Room;
 };
 
 class ZEInterior : public ZEEntity

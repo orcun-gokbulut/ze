@@ -230,11 +230,6 @@ bool ZEATCloud::InitializeSelf()
 	PlaneTransformConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	ZEGRSamplerDescription SamplerDescriptionLinearWrap;
-	SamplerDescriptionLinearWrap.AddressU = ZEGR_TAM_WRAP;
-	SamplerDescriptionLinearWrap.AddressV = ZEGR_TAM_WRAP;
-	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerDescriptionLinearWrap);
-
 	return Update();
 }
 
@@ -249,7 +244,6 @@ bool ZEATCloud::DeinitializeSelf()
 	PlaneTransformConstantBuffer.Release();
 	
 	ConstantBuffer.Release();
-	SamplerLinearWrap.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }
@@ -438,10 +432,9 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
 	Context->SetConstantBuffers(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, PlaneTransformConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_ALL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_ALL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(PlaneRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearWrap.GetPointerToPointer());
 	ZEGRTexture* Texture = CloudTexture->GetTexture();
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());

@@ -111,7 +111,7 @@ ZEInt ZERNStageGBuffer::GetId() const
 
 const ZEString& ZERNStageGBuffer::GetName() const
 {
-	static const ZEString Name = "GBuffer";
+	static const ZEString Name = "Stage GBuffer";
 	return Name;
 }
 

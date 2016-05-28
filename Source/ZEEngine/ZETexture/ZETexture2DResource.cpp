@@ -81,7 +81,7 @@ ZETexture2DResource::~ZETexture2DResource()
 
 }
 
-ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
+ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions, bool sRGB)
 {	
 	ZETexture2DResource* NewResource = (ZETexture2DResource*)zeResources->GetResource(FileName.GetValue());
 	if(NewResource == NULL)
@@ -89,7 +89,7 @@ ZETexture2DResource* ZETexture2DResource::LoadSharedResource(const ZEString& Fil
 		if(UserOptions == NULL)
 			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
-		NewResource = LoadResource(FileName, UserOptions);
+		NewResource = LoadResource(FileName, UserOptions, sRGB);
 		if(NewResource != NULL)
 		{
 			NewResource->Shared = true;
@@ -128,7 +128,7 @@ void ZETexture2DResource::CacheResource(const ZEString& FileName, const ZETextur
 	}
 }
 
-ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
+ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions, bool sRGB)
 {
 	ZETexture2DResource* TextureResource;
 	bool Result;
@@ -139,7 +139,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 		if(UserOptions == NULL)
 			UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
 
-		TextureResource = LoadResource(&File, UserOptions);
+		TextureResource = LoadResource(&File, UserOptions, sRGB);
 		File.Close();
 
 		return TextureResource;
@@ -151,7 +151,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(const ZEString& FileName,
 	}
 }
 
-ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions)
+ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions, bool sRGB)
 {
 	if (UserOptions == NULL)
 		UserOptions = ZEGRGraphicsModule::GetInstance()->GetTextureOptions();
@@ -243,8 +243,10 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 		FileCache.Close();
 	}
 
+	ZEGRFormat Format = sRGB ? ZEGR_TF_R8G8B8A8_UNORM_SRGB : ZEGR_TF_R8G8B8A8_UNORM;
+
 	ZEPointer<ZETexture2DResource, ZEDeletorRelease<ZETexture2DResource>> TextureResource = new ZETexture2DResource();	
-	TextureResource->Texture = ZEGRTexture2D::CreateInstance(TextureData.GetWidth(), TextureData.GetHeight(), FinalOptions.MaximumMipmapLevel, TextureData.GetPixelFormat());
+	TextureResource->Texture = ZEGRTexture2D::CreateInstance(TextureData.GetWidth(), TextureData.GetHeight(), FinalOptions.MaximumMipmapLevel, Format);
 	if (TextureResource->Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());

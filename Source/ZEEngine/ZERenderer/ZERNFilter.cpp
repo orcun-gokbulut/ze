@@ -62,20 +62,13 @@ bool ZERNFilter::InitializeSelf()
 {
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(FilterConstants));
 
-	DirtyFlags.RaiseAll();
-
-	ZEGRSamplerDescription SamplerDescriptionPointClamp;
-	SamplerDescriptionPointClamp.MinFilter = ZEGR_TFM_POINT;
-	SamplerDescriptionPointClamp.MagFilter = ZEGR_TFM_POINT;
-	SamplerDescriptionPointClamp.MipFilter = ZEGR_TFM_POINT;
-
-	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerDescriptionPointClamp);
-
 	return Update();
 }
 
 void ZERNFilter::DeinitializeSelf()
 {
+	DirtyFlags.RaiseAll();
+
 	VertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
@@ -224,13 +217,13 @@ bool ZERNFilter::UpdateRenderState()
 
 bool ZERNFilter::Update()
 {
-	if(!UpdateShaders())
+	if (!UpdateShaders())
 		return false;
 
-	if(!UpdateRenderState())
+	if (!UpdateRenderState())
 		return false;
 
-	if(!UpdateConstantBuffer())
+	if (!UpdateConstantBuffer())
 		return false;
 
 	return true;
@@ -244,7 +237,6 @@ void ZERNFilter::Process(ZEGRContext* Context)
 	if(!Update())
 		return;
 
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerPointClamp.GetPointerToPointer());
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&Input));
 	Context->SetRenderTargets(1, &Output, NULL);
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
@@ -255,6 +247,8 @@ void ZERNFilter::Process(ZEGRContext* Context)
 
 ZERNFilter::ZERNFilter()
 {
+	DirtyFlags.RaiseAll();
+
 	Input = NULL;
 	Output = NULL;
 

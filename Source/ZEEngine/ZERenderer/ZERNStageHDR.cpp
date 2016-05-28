@@ -270,7 +270,6 @@ void ZERNStageHDR::CalculateLuminance(ZEGRContext* Context, const ZEGRTexture2D*
 
 	Context->SetRenderState(CalculateLuminance_RenderState);
 	Context->SetRenderTargets(1, &Output, NULL);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&Input));
 	Context->SetViewports(1, &Viewport);
 
@@ -284,7 +283,6 @@ void ZERNStageHDR::DownSample(ZEGRContext* Context, const ZEGRTexture2D* Input, 
 
 	Context->SetRenderState(DownSampling_RenderState);
 	Context->SetRenderTargets(1, &Output, NULL);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&Input));
 	Context->SetViewports(1, &Viewport);
 
@@ -324,7 +322,6 @@ void ZERNStageHDR::CalculateBrightness(ZEGRContext* Context, const ZEGRTexture2D
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(CalculateBrightness_RenderState);
 	Context->SetRenderTargets(1, &Output, NULL);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&Input));
 	Context->SetTextures(ZEGR_ST_PIXEL, 7, 1, reinterpret_cast<ZEGRTexture**>(&CurrentAdaptedLuminance));
 	Context->SetViewports(1, &Viewport);
@@ -373,8 +370,6 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* Input,
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(ToneMapping_RenderState);
 	Context->SetRenderTargets(1, &Output, NULL);
-	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearBorder};
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 2, Samplers);
 	const ZEGRTexture* Textures[] = {Input, BlurTextureFinal, CurrentAdaptedLuminance};
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 3, Textures);
 	Context->SetViewports(1, &Viewport);
@@ -391,14 +386,6 @@ bool ZERNStageHDR::InitializeSelf()
 	Filter.Initialize();
 	ZERNFilter::GenerateGaussianKernel(HorizontalValues, 11, 2.0f);
 	ZERNFilter::GenerateGaussianKernel(VerticalValues, 11, 2.0f, false);
-
-	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
-
-	ZEGRSamplerDescription SamplerDescriptionLinearBorder;
-	SamplerDescriptionLinearBorder.AddressU = ZEGR_TAM_BORDER;
-	SamplerDescriptionLinearBorder.AddressV = ZEGR_TAM_BORDER;
-	SamplerDescriptionLinearBorder.BorderColor = ZEVector4::Zero;
-	SamplerLinearBorder = ZEGRSampler::GetSampler(SamplerDescriptionLinearBorder);
 
 	return Update();
 }
@@ -435,8 +422,6 @@ void ZERNStageHDR::DeinitializeSelf()
 	LuminanceMips.Clear();
 	CurrentAdaptedLuminance.Release();
 	PreviousAdaptedLuminance.Release();
-
-	SamplerLinearClamp.Release();
 
 	ConstantBuffer.Release();
 

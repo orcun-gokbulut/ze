@@ -71,7 +71,7 @@ ze_add_source(ZERNShaderSlots.h 					Sources Headers)
 ze_add_source(ZERNMaterial.cpp 						Sources)
 ze_add_source(ZERNMaterial.h 						Sources Headers ZEMC)
 ze_add_source(ZERNSimpleMaterial.cpp 				Sources)
-ze_add_source(ZERNSimpleMaterial.h 					Sources Headers)
+ze_add_source(ZERNSimpleMaterial.h 					Sources Headers ZEMC)
 ze_add_source(ZERNFixedMaterial.cpp 				Sources)
 ze_add_source(ZERNFixedMaterial.h 					Sources Headers ZEMC)
 ze_add_source(ZERNParticleMaterial.cpp 				Sources)
@@ -119,6 +119,8 @@ ze_add_source(ZERNStage2D.h 						Sources Headers ZEMC)
 ze_add_source(ZERNStage2D.cpp						Sources)
 ze_add_source(ZERNStageResolving.h 					Sources Headers ZEMC)
 ze_add_source(ZERNStageResolving.cpp				Sources)
+ze_add_source(ZERNStageRenderDepth.h 				Sources Headers ZEMC)
+ze_add_source(ZERNStageRenderDepth.cpp				Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}

@@ -38,6 +38,21 @@
 #include "ZEPointer\ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
+#include "ZEGRContext.h"
+
+void ZEGRStructuredBuffer::SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource, bool BoundAsUnorderedAccess)
+{
+	zeDebugCheck(BoundAsShaderResource && BoundAsUnorderedAccess, "A structured buffer cannot be bound as both shader resource and unordered access");
+
+	BoundStages[Shader].BoundAsShaderResource = BoundAsShaderResource;
+	BoundStages[Shader].BoundAsUnorderedAccess = BoundAsUnorderedAccess;
+	BoundStages[Shader].Slot = Slot;
+}
+
+const ZEArray<ZEGRStructuredBuffer::BoundStage>& ZEGRStructuredBuffer::GetBoundStages() const
+{
+	return BoundStages;
+}
 
 ZEGRResourceType ZEGRStructuredBuffer::GetResourceType() const
 {
@@ -73,7 +88,28 @@ void ZEGRStructuredBuffer::SetData(void* Data)
 
 ZEGRStructuredBuffer::ZEGRStructuredBuffer()
 {
+	BoundStages.SetCount(ZEGR_SHADER_TYPE_COUNT);
+	BoundStage Stage;
+	Stage.BoundAsShaderResource = false;
+	Stage.BoundAsUnorderedAccess = false;
+	Stage.Slot = -1;
+	BoundStages.Fill(Stage);
+}
 
+ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
+{
+	ZEGRContext* Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
+	if (Context != NULL)
+	{
+		ze_for_each(Stage, BoundStages)
+		{
+			if (Stage->BoundAsShaderResource)
+				Context->ClearShaderResources((ZEGRShaderType)Stage.GetIndex(), Stage->Slot, 1);
+
+			else if (Stage->BoundAsUnorderedAccess)
+				Context->ClearUnorderedAccesses(Stage->Slot, 1);
+		}
+	}
 }
 
 ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)

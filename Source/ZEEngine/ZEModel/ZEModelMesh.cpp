@@ -784,7 +784,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
 	RenderCommand.Priority = 0;
-	RenderCommand.Order = DrawOrder;
+	RenderCommand.Order = (MeshLOD->GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -DrawOrder : DrawOrder;
 	RenderCommand.StageMask = MeshLOD->GetMaterial()->GetStageMask();
 	RenderCommand.Entity = Owner;
 	RenderCommand.ExtraParameters = MeshLOD;

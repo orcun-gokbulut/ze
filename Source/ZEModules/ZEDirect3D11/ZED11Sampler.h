@@ -42,7 +42,7 @@ class ZED11Sampler : public ZEGRSampler, public ZED11ComponentBase
 {
 	friend class ZED11Context;
 	friend class ZED11Module;
-	private:
+	protected:
 		ID3D11SamplerState*			NativeSampler;
 
 		virtual bool				Initialize();
