@@ -97,7 +97,7 @@ ze_add_executable(TARGET ZELNLauncher
 	LIBS ZEFoundation ZEProtect ZEITIntegrity libCryptopp Qt5::WinMain
 	DESCRIPTION "Zinek Launcher")
 
-qt5_use_modules(ZELNLauncher Core Widgets)
+qt5_use_modules(ZELNLauncher Widgets)
 
 add_custom_command(TARGET ZELNLauncher POST_BUILD
 	# DEBUG

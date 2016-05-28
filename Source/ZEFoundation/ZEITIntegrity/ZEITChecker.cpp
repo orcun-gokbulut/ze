@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEITIntegrityChecker.h
+ Zinek Engine - ZEITChecker.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,79 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEITChecker.h"
+#include "ZEML\ZEMLReader.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEITIntegrityRecord.h"
-
-class ZEITIntegrityCheker
+ZEITChecker::ZEITChecker()
 {
-	private:
-		ZEArray<ZEITIntegrityRecord>			Records;
-		ZEString								IntegrityFile;
-		ZEITIntegrityResult						Result;
+	Result = ZEIT_CR_NOT_CHECKED;
+}
 
-	public:
-		const ZEArray<ZEITIntegrityRecord>&		GetRecords() const;
+const ZEArray<ZEITRecord>& ZEITChecker::GetRecords() const
+{
+	return Records;
+}
 
-		void									SetIntegrityFile(const ZEString& FileName);
-		const ZEString&							GetIntegrityFile() const;
+void ZEITChecker::SetIntegrityFile(const ZEString& FileName)
+{
+	IntegrityFile = FileName;
+}
 
-		ZEITIntegrityResult						GetResult() const;
+const ZEString& ZEITChecker::GetIntegrityFile() const
+{
+	return IntegrityFile;
+}
 
-		void									CheckStart();
-		bool									CheckProgress(ZESize Index);
-		
-		bool									Load();
-		bool									Save();
+ZEITCheckResult ZEITChecker::GetResult() const
+{
+	return Result;
+}
 
-												ZEITIntegrityCheker();
-};
+void ZEITChecker::CheckStart()
+{
+	Result = ZEIT_CR_NOT_CHECKED;
+	for (ZESize I = 0; I < Records.GetCount(); I++)
+		Records[I].Reset();
+}
+
+bool ZEITChecker::CheckProgress(ZESize Index)
+{
+	if (Index >= Records.GetCount())
+		return false;
+
+	bool CheckResult = Records[Index].Check();
+	
+	if (Records[Index].GetResult() > Result)
+		Result = Records[Index].GetResult();
+
+	return CheckResult;
+}
+
+bool ZEITChecker::Load()
+{
+	ZEMLReader Reader;
+	if (!Reader.Open(IntegrityFile))
+	{
+		zeError("Cannot read Integrity file. File Name: \"%s\".", IntegrityFile.ToCString());
+		return false;
+	}
+
+	ZEMLReaderNode RootNode = Reader.GetRootNode();
+	if (RootNode.GetName() != "ZEIntegrity")
+	{
+		zeError("Unknown Integrity file format. File Name: \"%s\".", IntegrityFile.ToCString());
+		return false;
+	}
+
+	ZEMLReaderNode RecordsNode = RootNode.GetNode("Records");
+
+	ZESize RecordCount = RecordsNode.GetNodeCount("Record");
+	Records.SetCount(RecordCount);
+	for (ZESize I = 0; I < RecordCount; I++)
+	{
+		ZEMLReaderNode RecordNode = RecordsNode.GetNode("Record", I);
+		Records[I].Load(&RecordNode);
+	}
+
+	return true;
+}

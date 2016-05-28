@@ -50,7 +50,7 @@ void ZELNIntegrityWorker::run()
 {
 	IsCanceled = false;
 	Checker->CheckStart();
-	const ZEArray<ZEITIntegrityRecord>& Records = Checker->GetRecords();
+	const ZEArray<ZEITRecord>& Records = Checker->GetRecords();
 	for (ZESize I = 0; I < Records.GetCount(); I++)
 	{
 		if (IsCanceled)
@@ -84,19 +84,19 @@ void ZELNIntegrityModule::Worker_Done(bool Canceled)
 	switch(Checker.GetResult())
 	{
 		default:
-		case ZEIT_IR_NOT_CHECKED:
+		case ZEIT_CR_NOT_CHECKED:
 			StatusText = "Unknown";
 			break;
 
-		case ZEIT_IR_WARNING:
+		case ZEIT_CR_WARNING:
 			StatusText = "Warning";
 			break;
 
-		case ZEIT_IR_ERROR:
+		case ZEIT_CR_ERROR:
 			StatusText = "Error";
 			break;
 
-		case ZEIT_IR_SUCCESS:
+		case ZEIT_CR_SUCCESS:
 			StatusText = "OK";
 			break;
 	}
@@ -120,7 +120,7 @@ void ZELNIntegrityModule::Worker_Done(bool Canceled)
 
 void ZELNIntegrityModule::Worker_RecordUpdated(unsigned int RecordIndex)
 {
-	const ZEArray<ZEITIntegrityRecord>& Records = Checker.GetRecords();
+	const ZEArray<ZEITRecord>& Records = Checker.GetRecords();
 	Form->lblPath->setText(Records[RecordIndex].GetPath().ToCString());
 	Form->prgProgress->setValue(RecordIndex - 1);
 
@@ -130,19 +130,19 @@ void ZELNIntegrityModule::Worker_RecordUpdated(unsigned int RecordIndex)
 	switch(Checker.GetResult())
 	{
 		default:
-		case ZEIT_IR_NOT_CHECKED:
+		case ZEIT_CR_NOT_CHECKED:
 			StatusText = "Unknown";
 			break;
 
-		case ZEIT_IR_WARNING:
+		case ZEIT_CR_WARNING:
 			StatusText = "Warning";
 			break;
 
-		case ZEIT_IR_ERROR:
+		case ZEIT_CR_ERROR:
 			StatusText = "Error";
 			break;
 
-		case ZEIT_IR_SUCCESS:
+		case ZEIT_CR_SUCCESS:
 			StatusText = "OK";
 			break;
 	}
@@ -152,7 +152,7 @@ void ZELNIntegrityModule::Worker_RecordUpdated(unsigned int RecordIndex)
 
 void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 {
-	const ZEITIntegrityRecord& Record = Checker.GetRecords()[Index];
+	const ZEITRecord& Record = Checker.GetRecords()[Index];
 
 	if (Form->tblRecords->item(Index, 0) == NULL)
 	{
@@ -170,23 +170,23 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 	switch (Record.GetResult())
 	{
 		default:
-		case ZEIT_IR_NOT_CHECKED:
+		case ZEIT_CR_NOT_CHECKED:
 			Form->tblRecords->item(Index, 0)->setText("Not Checked");
 			Form->tblRecords->item(Index, 0)->setBackground(Qt::lightGray);
 			Form->tblRecords->item(Index, 0)->setTextColor(Qt::black);
 			break;
 
-		case ZEIT_IR_WARNING:
+		case ZEIT_CR_WARNING:
 			Form->tblRecords->item(Index, 0)->setBackground(Qt::yellow);
 			Form->tblRecords->item(Index, 0)->setTextColor(Qt::black);
 			break;
 
-		case ZEIT_IR_ERROR:
+		case ZEIT_CR_ERROR:
 			Form->tblRecords->item(Index, 0)->setBackgroundColor(Qt::red);
 			Form->tblRecords->item(Index, 0)->setTextColor(Qt::white);
 			break;
 
-		case ZEIT_IR_SUCCESS:
+		case ZEIT_CR_SUCCESS:
 			Form->tblRecords->item(Index, 0)->setBackgroundColor(Qt::darkGreen);
 			Form->tblRecords->item(Index, 0)->setTextColor(Qt::white);
 			break;
@@ -195,22 +195,22 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 	switch (Record.GetProblem())
 	{
 		default:
-		case ZEIT_IP_NONE:
-			if (Record.GetResult() == ZEIT_IR_NOT_CHECKED)
+		case ZEIT_CP_NONE:
+			if (Record.GetResult() == ZEIT_CR_NOT_CHECKED)
 				Form->tblRecords->item(Index, 0)->setText("Not Checked");
 			else
 				Form->tblRecords->item(Index, 0)->setText("OK");
 			break;
 
-		case ZEIT_IP_MISSING:
+		case ZEIT_CP_MISSING:
 			Form->tblRecords->item(Index, 0)->setText("Missing");
 			break;
 
-		case ZEIT_IP_FILE_SIZE:
+		case ZEIT_CP_FILE_SIZE:
 			Form->tblRecords->item(Index, 0)->setText("Size Mismatch");
 			break;
 
-		case ZEIT_IP_CHECKSUM:
+		case ZEIT_CP_CHECKSUM:
 			Form->tblRecords->item(Index, 0)->setText("Checksum Failed");
 			break;
 	}
@@ -298,7 +298,7 @@ void ZELNIntegrityModule::btnCheckIntegrity_clicked()
 
 void ZELNIntegrityModule::chkFilter_toggled(bool)
 {
-	const ZEArray<ZEITIntegrityRecord>& Records = Checker.GetRecords();
+	const ZEArray<ZEITRecord>& Records = Checker.GetRecords();
 	if (Form->chkFilterAll->isChecked())
 	{
 		for (ZESize I = 0; I < Records.GetCount(); I++)
@@ -308,7 +308,7 @@ void ZELNIntegrityModule::chkFilter_toggled(bool)
 	{
 		for (ZESize I = 0; I < Records.GetCount(); I++)
 		{
-			bool Hide = (Records[I].GetResult() == ZEIT_IR_SUCCESS || Records[I].GetResult() == ZEIT_IR_NOT_CHECKED);
+			bool Hide = (Records[I].GetResult() == ZEIT_CR_SUCCESS || Records[I].GetResult() == ZEIT_CR_NOT_CHECKED);
 			Form->tblRecords->setRowHidden(I, Hide);
 		}
 	}
@@ -327,26 +327,26 @@ void ZELNIntegrityModule::btnSave_clicked()
 		return;
 	}
 
-	const ZEArray<ZEITIntegrityRecord>& Records = Checker.GetRecords();
+	const ZEArray<ZEITRecord>& Records = Checker.GetRecords();
 	for(ZESize I = 0; I < Records.GetCount(); I++)
 	{
 		const char* ResultText;
 		switch(Records[I].GetResult())
 		{
 			default:
-			case ZEIT_IR_NOT_CHECKED:
+			case ZEIT_CR_NOT_CHECKED:
 				ResultText = "Unknown";
 				break;
 
-			case ZEIT_IR_WARNING:
+			case ZEIT_CR_WARNING:
 				ResultText = "Warning";
 				break;
 
-			case ZEIT_IR_ERROR:
+			case ZEIT_CR_ERROR:
 				ResultText = "Error";
 				break;
 
-			case ZEIT_IR_SUCCESS:
+			case ZEIT_CR_SUCCESS:
 				ResultText = "Success";
 				break;
 		}
@@ -355,19 +355,19 @@ void ZELNIntegrityModule::btnSave_clicked()
 		switch (Records[I].GetProblem())
 		{
 			default:
-			case ZEIT_IP_NONE:
+			case ZEIT_CP_NONE:
 				ProblemText = "No Problem";
 				break;
 
-			case ZEIT_IP_MISSING:
+			case ZEIT_CP_MISSING:
 				ProblemText = "Missing";
 				break;
 
-			case ZEIT_IP_FILE_SIZE:
+			case ZEIT_CP_FILE_SIZE:
 				ProblemText = "Size Mismatch";
 				break;
 
-			case ZEIT_IP_CHECKSUM:
+			case ZEIT_CP_CHECKSUM:
 				ProblemText = "Checksum Failed";
 				break;
 		}
