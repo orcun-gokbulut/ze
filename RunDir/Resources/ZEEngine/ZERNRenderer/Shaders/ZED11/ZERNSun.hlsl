@@ -36,7 +36,7 @@
 #ifndef __ZERN_SUN_H__
 #define __ZERN_SUN_H__
 
-cbuffer ZERNSun_Constants				: register(b8)
+cbuffer ZERNSun_Constants				: register(b9)
 {
 	float2	ZERNSun_PositionScreen;
 	float2	ZERNSun_SizeScreen;

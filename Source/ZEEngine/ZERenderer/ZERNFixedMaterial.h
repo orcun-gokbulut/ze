@@ -38,8 +38,6 @@
 #include "ZERNMaterial.h"
 
 #include "ZEDS/ZEString.h"
-#include "ZEDefinitions.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERNMap.h"
@@ -74,15 +72,19 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZEString								Name;
 		ZEString								FileName;
 
+		mutable ZEUInt							StageMask;
 		mutable ZEFlags							DirtyFlags;
 		 
-		mutable ZEHolder<ZEGRShader>			StageGBuffer_VertexShader;
-		mutable ZEHolder<ZEGRShader>			StageGBuffer_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_RenderState;
+		mutable ZEHolder<ZEGRShader>			StageGBuffer_Forward_VertexShader;
+		mutable ZEHolder<ZEGRShader>			StageGBuffer_Forward_PixelShader;
+		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_Forward_RenderState;
 		 
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_VertexShader;
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
+
+		mutable ZEHolder<ZEGRShader>			StageRenderDepth_VertexShader;
+		mutable ZEHolder<ZEGRRenderStateData>	StageRenderDepth_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
@@ -180,6 +182,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool									UpdateShaders() const;
 		bool									UpdateConstantBuffer() const;
 		bool									UpdateRenderState() const;
+		bool									UpdateStageMask() const;
 
 		void									Load(const ZEMLReaderNode& MaterialNode);
 

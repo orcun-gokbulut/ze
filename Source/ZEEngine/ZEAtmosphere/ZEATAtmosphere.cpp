@@ -280,7 +280,6 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	MultipleScatteringRenderTargets.Resize(1024);	//64 * 16
 
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, PrecomputeConstantBuffer.GetPointerToPointer());
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
 	Context->SetTextures(ZEGR_ST_PIXEL, 2, 1, reinterpret_cast<ZEGRTexture**>(&RandomVectorsTexture));
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
 
@@ -475,8 +474,6 @@ bool ZEATAtmosphere::InitializeSelf()
 	PrecomputedSingleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);
 
-	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
-
 	Sun = ZEATSun::CreateInstance();
 	zeScene->AddEntity(Sun);
 
@@ -523,8 +520,6 @@ bool ZEATAtmosphere::DeinitializeSelf()
 
 	PrecomputedSingleScatteringBuffer.Release();
 	PrecomputedMultipleScatteringBuffer.Release();
-
-	SamplerLinearClamp.Release();
 
 	SunLight = NULL;
 	MoonLight = NULL;
@@ -791,10 +786,9 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, SkyConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, SkyConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(SkyRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
 	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, UseMultipleScattering ? reinterpret_cast<ZEGRTexture**>(&PrecomputedMultipleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));

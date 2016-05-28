@@ -70,12 +70,12 @@ class ZERNMap : public ZEObject
 
 		bool							IsAvailable() const;
 
-		void							Load2D(const ZEString& FileName);
+		void							Load2D(const ZEString& FileName, bool sRGB = true);
 		void							Load3D(const ZEString& FileName, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount);
 		void							LoadCube(const ZEString& FileName);
 
 		void							Write(ZEMLWriterNode& ParentNode, const ZEString& Name);
-		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name);
+		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name, bool sRGB = true);
 
 										ZERNMap();
 										ZERNMap(const ZEString& FileName, ZEGRTextureType Type = ZEGR_TT_2D, ZEGRSampler* Sampler = NULL);

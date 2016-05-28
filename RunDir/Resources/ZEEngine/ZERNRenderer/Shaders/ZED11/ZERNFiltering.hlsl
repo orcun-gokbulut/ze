@@ -37,6 +37,7 @@
 #define __ZERN_FILTERING_H__
 
 #include "ZERNScreenCover.hlsl"
+#include "ZERNSamplers.hlsl"
 
 cbuffer ZERNFiltering_Constants					: register(b8)
 {
@@ -45,7 +46,6 @@ cbuffer ZERNFiltering_Constants					: register(b8)
 	float4		ZERNFiltering_KernelValues[64];
 };
 
-SamplerState	ZERNFiltering_SamplerPointClamp	: register(s0);
 Texture2D		ZERNFiltering_InputTexture		: register(t5);
 
 float4 ZERNFiltering_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
@@ -58,7 +58,7 @@ float4 ZERNFiltering_PixelShader(float4 PositionViewport : SV_Position) : SV_Tar
 	
 	for(int I = 0; I < ZERNFiltering_KernelSize; ++I)
 	{
-		float4 SampleColor = ZERNFiltering_InputTexture.Sample(ZERNFiltering_SamplerPointClamp, TexCoord + ZERNFiltering_KernelValues[I].xy * TexelOffset);
+		float4 SampleColor = ZERNFiltering_InputTexture.Sample(ZERNSampler_PointClamp, TexCoord + ZERNFiltering_KernelValues[I].xy * TexelOffset);
 		ResultColor += SampleColor * ZERNFiltering_KernelValues[I].w;
 	}
 	

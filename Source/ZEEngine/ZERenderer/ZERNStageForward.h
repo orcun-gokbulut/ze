@@ -37,49 +37,63 @@
 
 #include "ZERNStage.h"
 
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
+class ZEGRShader;
 class ZEGRTexture2D;
+class ZEGRStructuredBuffer;
+class ZEGRComputeRenderStateData;
 
 class ZERNStageForward : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<ZEGRTexture2D>				ColorBuffer;
-		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
-		ZEGRViewport						Viewport;
+		ZEFlags									DirtyFlags;
+		ZEGRViewport							Viewport;
 
-		const ZEGRRenderTarget*				ColorRenderTarget;
-		const ZEGRTexture2D*				DepthOutput;
+		ZEHolder<ZEGRShader>					TiledForwardComputeShader;
+		ZEHolder<ZEGRComputeRenderStateData>	TiledForwardComputeRenderState;
 
-		virtual void						DeinitializeSelf();
+		ZEHolder<ZEGRStructuredBuffer>			TileLightStructuredBuffer;
+		
+		ZEHolder<ZEGRTexture2D>					ColorBuffer;
+		ZEHolder<ZEGRTexture2D>					DepthStencilBuffer;
 
-		bool								UpdateRenderTargets();
-		bool								Update();
+		const ZEGRTexture2D*					ColorTexture;
+		const ZEGRTexture2D*					DepthTexture;
+
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
+
+		bool									UpdateShaders();
+		bool									UpdateRenderStates();
+		bool									UpdateInputOutputs();
+		bool									Update();
 
 	public:
-		virtual ZEInt						GetId() const;
-		virtual const ZEString&				GetName() const;
+		virtual ZEInt							GetId() const;
+		virtual const ZEString&					GetName() const;
 
-		virtual bool						Setup(ZEGRContext* Context);
-		virtual void						CleanUp(ZEGRContext* Context);
+		virtual bool							Setup(ZEGRContext* Context);
+		virtual void							CleanUp(ZEGRContext* Context);
 
-		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
+		virtual const ZEGRTexture2D*			GetOutput(ZERNStageBuffer Output) const;
 
-											ZERNStageForward();
+												ZERNStageForward();
 
-		static ZEGRRenderState				GetRenderState();
+		static ZEGRRenderState					GetRenderState();
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
 	ZE_OBJECT
 	public:
-		virtual ZEInt						GetId() const;
-		virtual const ZEString&				GetName() const;
+		virtual ZEInt							GetId() const;
+		virtual const ZEString&					GetName() const;
 
-											ZERNStageForwardTransparent();
-
-		static ZEGRRenderState				GetRenderState();
+		static ZEGRRenderState					GetRenderState();
 };

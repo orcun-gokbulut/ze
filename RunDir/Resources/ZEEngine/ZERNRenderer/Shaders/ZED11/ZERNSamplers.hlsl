@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNSkyBox.hlsl
+ Zinek Engine - ZERNSamplers.hlsl
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,14 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_SKY_BOX_H__
-#define __ZERN_SKY_BOX_H__
+#ifndef __ZERN_SAMPLERS_H__
+#define __ZERN_SAMPLERS_H__
 
-#include "ZERNTransformations.hlsl"
-#include "ZERNSamplers.hlsl"
-
-cbuffer ZERNSkyBox_Constants						: register(b9)
-{
-	float3			ZERNSkyBox_Color;
-	float			ZERNSkyBox_Reserved;	
-};
-
-cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
-{
-	float4x4		ZERNSkyBox_WorldTransform;
-};
-
-TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
-
-struct ZERNSkyBox_PixelShader_Input
-{
-	float4			Position						: SV_Position;
-	float3			CubeTexcoord					: TEXCOORD0;
-};
-
-ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
-{
-	ZERNSkyBox_PixelShader_Input Output;
-
-	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Position, 1.0f));
-	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	Output.Position.z = 0.0f;
-	Output.CubeTexcoord = Position;
-	
-	return Output;
-}
-
-float3 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Target0
-{
-	return ZERNSkyBox_Color * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSampler_LinearWrap, Input.CubeTexcoord, 0.0f);
-}
+SamplerState			ZERNSampler_LinearClamp					: register(s10);
+SamplerState			ZERNSampler_LinearWrap					: register(s11);
+SamplerState			ZERNSampler_LinearBorderZero			: register(s12);
+SamplerState			ZERNSampler_PointClamp					: register(s13);
+SamplerState			ZERNSampler_PointWrap					: register(s14);
+SamplerComparisonState	ZERNSampler_ComparisonLinearPointClamp	: register(s15);
 
 #endif

@@ -277,8 +277,8 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));

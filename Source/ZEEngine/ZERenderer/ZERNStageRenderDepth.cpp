@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNSkyBox.hlsl
+ Zinek Engine - ZERNStageRenderDepth.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,46 +33,88 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZERN_SKY_BOX_H__
-#define __ZERN_SKY_BOX_H__
+#include "ZERNStageRenderDepth.h"
 
-#include "ZERNTransformations.hlsl"
-#include "ZERNSamplers.hlsl"
+#include "ZERNStageID.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-cbuffer ZERNSkyBox_Constants						: register(b9)
+bool ZERNStageRenderDepth::InitializeSelf()
 {
-	float3			ZERNSkyBox_Color;
-	float			ZERNSkyBox_Reserved;	
-};
+	if (!ZERNStage::InitializeSelf())
+		return false;
 
-cbuffer ZERNSkyBox_Constants_Transform				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
-{
-	float4x4		ZERNSkyBox_WorldTransform;
-};
-
-TextureCube<float3>	ZERNSkyBox_SkyTexture			: register(t5);
-
-struct ZERNSkyBox_PixelShader_Input
-{
-	float4			Position						: SV_Position;
-	float3			CubeTexcoord					: TEXCOORD0;
-};
-
-ZERNSkyBox_PixelShader_Input ZERNSkyBox_VertexShader_Main(float3 Position : POSITION0)
-{
-	ZERNSkyBox_PixelShader_Input Output;
-
-	float4 PositionWorld = mul(ZERNSkyBox_WorldTransform, float4(Position, 1.0f));
-	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	Output.Position.z = 0.0f;
-	Output.CubeTexcoord = Position;
-	
-	return Output;
+	return UpdateInputOutputs();
 }
 
-float3 ZERNSkyBox_PixelShader_Main(ZERNSkyBox_PixelShader_Input Input) : SV_Target0
+void ZERNStageRenderDepth::DeinitializeSelf()
 {
-	return ZERNSkyBox_Color * ZERNSkyBox_SkyTexture.SampleLevel(ZERNSampler_LinearWrap, Input.CubeTexcoord, 0.0f);
+	DepthBuffer = NULL;
+
+	ZERNStage::DeinitializeSelf();
 }
 
-#endif
+bool ZERNStageRenderDepth::UpdateInputOutputs()
+{
+	DepthBuffer = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthBuffer == NULL)
+		return false;
+
+	return true;
+}
+
+ZEInt ZERNStageRenderDepth::GetId() const
+{
+	return ZERN_STAGE_RENDER_DEPTH;
+}
+
+const ZEString& ZERNStageRenderDepth::GetName() const
+{
+	static const ZEString Name = "Stage render depth";
+	return Name;
+}
+
+bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
+{
+	if (!ZERNStage::Setup(Context))
+		return false;
+
+	if (!UpdateInputOutputs())
+		return false;
+
+	if (GetCommands().GetCount() == 0)
+		return false;
+
+	Context->SetRenderTargets(0, NULL, DepthBuffer->GetDepthStencilBuffer());
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthBuffer->GetWidth(), (float)DepthBuffer->GetHeight()));
+
+	return true;
+}
+
+void ZERNStageRenderDepth::CleanUp(ZEGRContext* Context)
+{
+	ZERNStage::CleanUp(Context);
+}
+
+ZERNStageRenderDepth::ZERNStageRenderDepth()
+{
+	DepthBuffer = NULL;
+}
+
+ZEGRRenderState ZERNStageRenderDepth::GetRenderState()
+{
+	static ZEGRRenderState RenderState;
+	static bool Initialized = false;
+
+	if(!Initialized)
+	{
+		Initialized = true;
+
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
+	}
+
+	return RenderState;
+}

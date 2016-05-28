@@ -292,10 +292,9 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, ZEGRSampler::GetDefaultSampler().GetPointerToPointer());
 	const ZEGRTexture* Texture = PhaseTexture.GetTexture();
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 

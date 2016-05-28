@@ -54,6 +54,8 @@ class ZELightDirectional : public ZELight
 			ZEMatrix4x4						ProjectionTransform;
 			ZEViewCuboid					ViewVolume;
 			ZEVector4						Borders;
+			ZEUInt							SampleCount;
+			float							SampleLength;
 			float							DepthBias;
 			float							NormalBias;
 

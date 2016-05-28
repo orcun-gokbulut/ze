@@ -35,11 +35,12 @@
 
 #include "ZELight.h"
 
+#include "ZEMath\ZEViewFrustum.h"
 #include "ZERNRenderer.h"
 #include "ZERNCuller.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStageShadowmapGeneration.h"
-#include "ZEMath\ZEViewFrustum.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
@@ -61,6 +62,8 @@ bool ZELight::InitializeSelf()
 		return false;
 
 	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
+
+	ShadowRenderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
 
 	return ShadowRenderer.Initialize();
 }

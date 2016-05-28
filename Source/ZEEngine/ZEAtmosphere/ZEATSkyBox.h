@@ -61,8 +61,6 @@ class ZEATSkyBox : public ZEEntity
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBufferTransform;
 
-		ZEHolder<ZEGRSampler>				SamplerLinearWrap;
-
 		ZETextureCubeResource*				SkyTexture;
 
 		float								Brightness;

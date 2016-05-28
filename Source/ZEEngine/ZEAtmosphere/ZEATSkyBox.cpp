@@ -131,11 +131,6 @@ bool ZEATSkyBox::InitializeSelf()
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 	ConstantBufferTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
-	ZEGRSamplerDescription SamplerDescriptionLinearWrap;
-	SamplerDescriptionLinearWrap.AddressU = ZEGR_TAM_WRAP;
-	SamplerDescriptionLinearWrap.AddressV = ZEGR_TAM_WRAP;
-	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerDescriptionLinearWrap);
-
 	return Update();
 }
 
@@ -149,7 +144,6 @@ bool ZEATSkyBox::DeinitializeSelf()
 	VertexBuffer.Release();
 	ConstantBuffer.Release();
 	ConstantBufferTransform.Release();
-	SamplerLinearWrap.Release();
 
 	if (SkyTexture != NULL)
 	{
@@ -291,10 +285,9 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
 
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferTransform.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearWrap.GetPointerToPointer());
 	ZEGRTexture* Texture = SkyTexture->GetTexture();
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());

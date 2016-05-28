@@ -59,6 +59,8 @@
 
 ZELightDirectional::ZECascade::ZECascade()
 {
+	SampleCount = 16;
+	SampleLength = 1.0f;
 	DepthBias = 0.0005f;
 	NormalBias = 0.1f;
 }

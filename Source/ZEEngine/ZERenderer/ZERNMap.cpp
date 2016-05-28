@@ -105,9 +105,9 @@ const ZETextureResource* ZERNMap::GetTextureResource() const
 	return Resource;
 }
 
-void ZERNMap::Load2D(const ZEString& FileName)
+void ZERNMap::Load2D(const ZEString& FileName, bool sRGB)
 {
-	SetTextureResource(ZETexture2DResource::LoadSharedResource(FileName));
+	SetTextureResource(ZETexture2DResource::LoadSharedResource(FileName, NULL, sRGB));
 }
 
 void ZERNMap::Load3D(const ZEString& FileName, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount)
@@ -157,7 +157,7 @@ void ZERNMap::Write(ZEMLWriterNode& ParentNode, const ZEString& Name)
 	ParentNode.CloseNode();
 }
 
-void ZERNMap::Read(ZEMLReaderNode& ParentNode, const ZEString& Name)
+void ZERNMap::Read(ZEMLReaderNode& ParentNode, const ZEString& Name, bool sRGB)
 {
 	Clean();
 
@@ -190,7 +190,7 @@ void ZERNMap::Read(ZEMLReaderNode& ParentNode, const ZEString& Name)
 
 	if (!Filename.IsEmpty())
 	{
-		Load2D(ZEPathInfo::CombineRelativePath(ParentNode.GetFile()->GetPath(), Filename));
+		Load2D(ZEPathInfo::CombineRelativePath(ParentNode.GetFile()->GetPath(), Filename), sRGB);
 		SetSampler(ZEGRSampler::GetSampler(SamplerDescription));
 	}
 }
