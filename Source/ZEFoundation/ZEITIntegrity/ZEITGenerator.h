@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNIntegrityModule.h
+ Zinek Engine - ZEITGenerator.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,69 +35,72 @@
 
 #pragma once
 
-#include "ZELNModule.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEITRecord.h"
+#include "ZEThread/ZELock.h"
 
-#include "ZEITIntegrity/ZEITChecker.h"
-
-#include <QObject>
-#include <QThread>
-
-class QWidget;
-class Ui_ZELNIntegrityWidget;
-
-class ZELNIntegrityWorker : public QThread
+class ZEITScannerEntry
 {
-	Q_OBJECT
-	friend class ZELNIntegrityModule;
 	private:
-		ZEITChecker*					Checker;
-		bool							IsCanceled;
-
-		void							run();
-
-										ZELNIntegrityWorker();
-
-	signals:
-		void							RecordUpdated(unsigned int RecordIndex);
-		void							Done(bool Canceled);
-
-	public slots:
-		void							Cancel();
-};
-
-class ZELNIntegrityModule : public QObject, public ZELNModule
-{
-	Q_OBJECT
-	ZELN_MODULE
-	friend class ZELNLauncher;
-	private:
-		QWidget*						Widget;
-		Ui_ZELNIntegrityWidget*			Form;
-		bool							State;
-		ZEITChecker						Checker;
-		ZELNIntegrityWorker	 			Worker;
-
-		void							UpdateRecord(ZESize RecordIndex);
-		void							Update();
-
-		virtual bool					InitializeSelf();
-
-										ZELNIntegrityModule();
-
-	private slots:
-		void							Worker_RecordUpdated(unsigned int RecordIndex);
-		void							Worker_Done(bool Canceled);
-
-		void							btnCheckIntegrity_clicked();
-		void							chkFilter_toggled(bool);
-		void							btnSave_clicked();
+		ZEString							Path;
+		bool								Enabled;
+		bool								Recursive;
 
 	public:
-		virtual QWidget*				GetWidget();
+		void								SetPath(const ZEString& Path);
+		const ZEString&						GetPath() const;
 
-		void							CheckIntegrity();
-		void							CancelCheckIntegrity();
+		void								SetEnabled(bool Enabled);
+		bool								GetEnabled() const;
 
-		virtual void					LoadConfiguration(const ZEMLReaderNode& ConfigurationNode);
+		void								SetRecursive(bool Recursive);
+		bool								GetRecursive() const;
 
+											ZEITScannerEntry();
+};
+
+class ZEITGenerator
+{
+	private:
+		ZELock								Lock;
+		ZEArray<ZEITRecord>					Records;
+		ZEArray<ZEITScannerEntry>			Includes;
+		ZEArray<ZEITScannerEntry>			Excludes;
+		bool								DiscardDisabled;
+
+		bool								CheckExcluded(const ZEString& Path) const;
+		void								ScanDirectory(const ZEString& Path, bool Recursive);
+
+	public:
+		const ZEArray<ZEITRecord>&			GetRecords() const;
+		ZEITRecord&							GetRecord(ZESize Index);
+		const ZEITRecord&					GetRecord(ZESize Index) const;
+		void								AddRecord(const ZEITRecord& Entry);
+		void								RemoveRecord(ZESize Index);
+
+		const ZEArray<ZEITScannerEntry>&	GetIncludes() const;
+		ZEITScannerEntry&					GetInclude(ZESize Index);
+		const ZEITScannerEntry&				GetInclude(ZESize Index) const;
+		void								AddInclude(const ZEITScannerEntry& Entry);
+		void								RemoveInclude(ZESize Index);
+
+		const ZEArray<ZEITScannerEntry>&	GetExcludes() const;
+		ZEITScannerEntry&					GetExclude(ZESize Index);
+		const ZEITScannerEntry&				GetExclude(ZESize Index) const;
+		void								AddExclude(const ZEITScannerEntry& Entry);
+		void								RemoveExclude(ZESize Index);
+
+		void								SetDiscardDisabled(bool Discard);
+		bool								GetDiscardDisabled() const;
+
+		void								Scan();
+		void								Generate();
+
+		bool								LoadGeneratorFile(const ZEString& FileName);
+		bool								SaveGeneratorFile(const ZEString& FileName) const;
+
+		bool								LoadIntegrityFile(const ZEString& FileName);
+		bool								SaveIntegrityFile(const ZEString& FileName) const;
+
+											ZEITGenerator();
 };

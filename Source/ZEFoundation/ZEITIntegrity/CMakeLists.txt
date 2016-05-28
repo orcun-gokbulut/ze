@@ -41,12 +41,12 @@ if (OPENMP_FOUND)
     set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
 endif()
 
-ze_add_source(ZEITIntegrityChecker.cpp			Sources)
-ze_add_source(ZEITIntegrityChecker.h			Sources Headers)
-ze_add_source(ZEITIntegrityGenerator.cpp		Sources)
-ze_add_source(ZEITIntegrityGenerator.h			Sources Headers)
-ze_add_source(ZEITIntegrityRecord.cpp			Sources)
-ze_add_source(ZEITIntegrityRecord.h				Sources Headers)
+ze_add_source(ZEITChecker.cpp				Sources)
+ze_add_source(ZEITChecker.h					Sources Headers)
+ze_add_source(ZEITGenerator.cpp				Sources)
+ze_add_source(ZEITGenerator.h				Sources Headers)
+ze_add_source(ZEITRecord.cpp				Sources)
+ze_add_source(ZEITRecord.h					Sources Headers)
 
 ze_add_library(TARGET ZEITIntegrity 
 	SOURCES ${Sources}

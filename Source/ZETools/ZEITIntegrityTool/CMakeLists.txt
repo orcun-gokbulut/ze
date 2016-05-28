@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZELCMain.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,57 +30,28 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
-#include "ZELCLicenseToolWindow.h"
-#include "ZEPlatform.h"
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include <QtGui/QApplication>
-#include <QtCore/QFile>
+cmake_minimum_required (VERSION 2.8)
 
-#ifdef ZE_PLATFORM_WINDOWS
-#define  WIN32_LEAN_AND_MEAN
-#include <windows.h>
-#include <combaseapi.h>
+find_package(Qt5Core)
+find_package(Qt5Widgets)
 
-int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
-{
-	int argc = 1;
-	char* argv[] =
-	{
-		"ZELCLicenseTool.exe"
-	};
+ze_add_source(ZEITMain.cpp							Sources)
+ze_add_source(ZEITIntegrityToolWindow.cpp			Sources)
+ze_add_source(ZEITIntegrityToolWindow.h				Sources QtMocs)
+ze_add_source(ZEITIntegrityToolWindow.ui			Sources QtUIs)
+ze_add_source(../CommonResources/ZEZinekIcon.qrc	Sources QtResources)
 
+qt5_wrap_ui(QtUIOutputs ${QtUIs})
+qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
+qt5_add_resources(QtResourceOutputs ${QtResources})
 
-	QApplication Application(argc, argv);
-	HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
-
-	QFile File(":/Zinek/ZEThemeDark/ZEThemeDark.qss");
-	File.open(QFile::ReadOnly);
-	QString StyleSheet = QLatin1String(File.readAll());
-	qApp->setStyleSheet(StyleSheet);
-
-	ZELCLicenseToolWindow Window;
-	Window.show();
-
-	return Application.exec();
-}
-#else
-int Main(int argc, char** argv)
-{
-	ZEPathManager::GetInstance()->SetAccessControl(false);
+ze_add_executable(TARGET ZEITIntegrityTool
+	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
+	LIBS ZEFoundation ZEITIntegrity)
 	
-	QApplication Application(argc, argv);
+qt5_use_modules(ZEITIntegrityTool Widgets)
 
-
-	QFile File(":/qdarkstyle/style.qss");
-	File.open(QFile::ReadOnly);
-	QString StyleSheet = QLatin1String(File.readAll());
-	qApp->setStyleSheet(StyleSheet);
-
-	ZELCLicenseToolWindow Window;
-	Window.show();
-
-	return Application.exec();
-}
-#endif
+source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

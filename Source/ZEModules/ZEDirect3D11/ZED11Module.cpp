@@ -159,7 +159,7 @@ bool ZED11Module::InitializeSelf()
 
 	UINT DeviceFlags = 0;
 #ifdef _DEBUG
-	DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+//	DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
 #else
 	DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
 #endif

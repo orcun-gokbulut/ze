@@ -40,8 +40,15 @@
 
 #include <QtWidgets/QApplication>
 
+#include "ZEITIntegrity/ZEITGenerator.h"
+
 int main(int argc, char** argv)
 {
+	/*ZEITIntegrityGenerator Generator;
+	Generator.SetIntegrityFileName("#s:/Files.ZEIntegrity");
+	Generator.ScanDirectory("#E:/", true);
+	Generator.Save();*/
+
 	ZEPathManager::GetInstance()->SetAccessControl(false);
 
 	QApplication Application(argc, argv);

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELCMain.cpp
+ Zinek Engine - ZEITMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -32,11 +32,12 @@
   Github: https://www.github.com/orcun-gokbulut/ZE
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
-#include "ZELCLicenseToolWindow.h"
 #include "ZEPlatform.h"
+#include "ZEFile/ZEPathManager.h"
+#include "ZEITIntegrityToolWindow.h"
 
-#include <QtGui/QApplication>
-#include <QtCore/QFile>
+#include <QApplication>
+#include <QFile>
 
 #ifdef ZE_PLATFORM_WINDOWS
 #define  WIN32_LEAN_AND_MEAN
@@ -51,16 +52,15 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 		"ZELCLicenseTool.exe"
 	};
 
-
 	QApplication Application(argc, argv);
 	HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
 
-	QFile File(":/Zinek/ZEThemeDark/ZEThemeDark.qss");
+	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
 	File.open(QFile::ReadOnly);
 	QString StyleSheet = QLatin1String(File.readAll());
 	qApp->setStyleSheet(StyleSheet);
 
-	ZELCLicenseToolWindow Window;
+	ZEITIntegrityToolWindow Window;
 	Window.show();
 
 	return Application.exec();
@@ -73,12 +73,12 @@ int Main(int argc, char** argv)
 	QApplication Application(argc, argv);
 
 
-	QFile File(":/qdarkstyle/style.qss");
+	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
 	File.open(QFile::ReadOnly);
 	QString StyleSheet = QLatin1String(File.readAll());
 	qApp->setStyleSheet(StyleSheet);
 
-	ZELCLicenseToolWindow Window;
+	ZEITIntegrityToolWindow Window;
 	Window.show();
 
 	return Application.exec();

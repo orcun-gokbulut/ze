@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEITIntegrityGenerator.h
+ Zinek Engine - ZEITRecord.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,29 +35,78 @@
 
 #pragma once
 
-#include "ZEDS/ZEArray.h"
-#include "ZEITIntegrityRecord.h"
-#include "ZEThread/ZELock.h"
+#include "ZEDS/ZEString.h"
 
-class ZEITIntegrityGenerator
+class ZEFile;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
+
+enum ZEITRecordType
+{
+	ZEIT_RT_NONE,
+	ZEIT_RT_FILE,
+	ZEIT_RT_DIRECTORY
+};
+
+enum ZEITCheckResult
+{
+	ZEIT_CR_NOT_CHECKED,
+	ZEIT_CR_SUCCESS,
+	ZEIT_CR_WARNING,
+	ZEIT_CR_ERROR
+};
+
+enum ZEITCheckProblem
+{
+	ZEIT_CP_NONE,
+	ZEIT_CP_MISSING,
+	ZEIT_CP_FILE_SIZE,
+	ZEIT_CP_CHECKSUM
+};
+
+class ZEITRecord
 {
 	private:
-		ZELock								Lock;
-		ZEArray<ZEITIntegrityRecord>		Records;
-		ZEString							IntegrityFile;
+		ZEString						Path;
+		ZEITRecordType					Type;
+		bool							Enabled;
+		bool							Required;
+		ZEUInt64						FileSize;
+		ZEString						Checksum;
+		ZEITCheckResult					Result;
+		ZEITCheckProblem				Problem;
+	
+		ZEString						CalculateChecksum(ZEFile* File);
 
 	public:
-		const ZEArray<ZEITIntegrityRecord>	GetRecords() const;
-		void								AddRecord(const ZEITIntegrityRecord& Record);
-		void								RemoveRecord(const ZEITIntegrityRecord& Record);
+		void							SetPath(const ZEString& Path);
+		const ZEString&					GetPath() const;
 
-		void								ScanDirectory(const ZEString& Path, bool Recursive);
+		void							SetType(ZEITRecordType Type);
+		ZEITRecordType					GetType() const;
 
-		void								SetIntegrityFileName(const ZEString& FileName);
-		const ZEString&						GetIntegrityFileName() const;
+		void							SetEnabled(bool Enabled);
+		bool							GetEnabled() const;
 
-		bool								Load();
-		bool								Save();
+		void							SetRequired(bool Required);
+		bool							GetRequired() const;
 
+		void							SetFileSize(ZEUInt64 Size);
+		ZEUInt64						GetFileSize() const;
 
+		void							SetChecksum(const ZEString& CheckSum);
+		const ZEString&					GetChecksum() const;
+
+		ZEITCheckResult					GetResult() const;
+		ZEITCheckProblem				GetProblem() const;
+
+		bool							Check();
+		bool							CheckExists();
+		bool							Generate();
+		void							Reset();
+
+		bool							Load(ZEMLReaderNode* RecordNode);
+		bool							Save(ZEMLWriterNode* RecordsNode) const;
+
+										ZEITRecord();
 };

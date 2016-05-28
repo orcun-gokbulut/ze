@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEITIntegrityRecord.h
+ Zinek Engine - ZEITIntegrityToolWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,73 +35,51 @@
 
 #pragma once
 
-#include "ZEDS/ZEString.h"
+#include "ZEITIntegrity/ZEITGenerator.h"
 
-class ZEFile;
-class ZEMLReaderNode;
-class ZEMLWriterNode;
+#include <QDialog>
 
-enum ZEITIntegrityRecordType
+class Ui_ZEITIntegrityToolWindow;
+class QListWidgetItem;
+
+class ZEITIntegrityToolWindow : public QDialog
 {
-	ZEIT_RT_NONE,
-	ZEIT_RT_FILE,
-	ZEIT_RT_DIRECTORY
-};
-
-enum ZEITIntegrityResult
-{
-	ZEIT_IR_NOT_CHECKED,
-	ZEIT_IR_SUCCESS,
-	ZEIT_IR_WARNING,
-	ZEIT_IR_ERROR
-};
-
-enum ZEITIntegrityProblem
-{
-	ZEIT_IP_NONE,
-	ZEIT_IP_MISSING,
-	ZEIT_IP_FILE_SIZE,
-	ZEIT_IP_CHECKSUM
-};
-
-class ZEITIntegrityRecord
-{
+	Q_OBJECT
+	friend class ZELNContactModule;
 	private:
-		ZEString							Path;
-		ZEITIntegrityRecordType				Type;
-		bool								Required;
-		ZEUInt64							FileSize;
-		ZEString							Checksum;
-		ZEITIntegrityResult					Result;
-		ZEITIntegrityProblem				Problem;
-	
-		ZEString							CalculateChecksum(ZEFile* File);
+		Ui_ZEITIntegrityToolWindow*		Form;
+
+		ZEITGenerator					Generator;
+
+		void							UpdateRecord(ZESize Index);
+		void							UpdateLists();
+		void							UpdateUI();
+
+	private slots:
+		void							lstIncludes_itemSelectionChanged();
+		void							lstIncludes_itemChanged(QListWidgetItem* Item);
+		void							btnIncludeAdd_clicked();
+		void							btnIncludeRemove_clicked();
+
+		void							lstExcludes_itemSelectionChanged();
+		void							lstExcludes_itemChanged(QListWidgetItem* Item);
+		void							btnExcludeAdd_clicked();
+		void							btnExcludeRemove_clicked();
+
+		void							btnGeneratorLoad_clicked();
+		void							btnGeneratorSave_clicked();
+		void							btnScan_clicked();
+
+		void							tblRecords_itemSelectionChanged();
+		void							btnRecordAdd_clicked();
+		void							btnRecordRemove_clicked();
+		void							btnRecordExclude_clicked();
+		void							btnRecordUpdate_clicked();
+		void							btnRecordUpdateAll_clicked();
+
+		void							btnIntegritySave_clicked();
 
 	public:
-		void								SetPath(const ZEString& Path);
-		const ZEString&						GetPath() const;
-
-		void								SetType(ZEITIntegrityRecordType Type);
-		ZEITIntegrityRecordType				GetType() const;
-
-		void								SetRequired(bool Required);
-		bool								GetRequired() const;
-
-		void								SetFileSize(ZEUInt64 Size);
-		ZEUInt64							GetFileSize() const;
-
-		void								SetChecksum(const ZEString& CheckSum);
-		const ZEString&						GetChecksum() const;
-
-		ZEITIntegrityResult					GetResult() const;
-		ZEITIntegrityProblem				GetProblem() const;
-
-		bool								Check();
-		bool								Generate();
-		void								Reset();
-
-		bool								Load(ZEMLReaderNode* RecordNode);
-		bool								Save(ZEMLWriterNode* RecordsNode);
-
-											ZEITIntegrityRecord();
+										ZEITIntegrityToolWindow();
+										~ZEITIntegrityToolWindow();
 };
