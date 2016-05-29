@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZECommandParser.h
+ Zinek Engine - ZEMTInterpreterParser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,8 +33,16 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define TOKEN_ADD                              1
-#define TOKEN_SUB                              2
-#define TOKEN_MUL                              3
-#define TOKEN_DIV                              4
-#define TOKEN_INT                              5
+#include "ZEMTInterpreterLexer.h"
+
+class ZEMTInterpreterParser
+{
+	public:
+		void*					ParserState;
+
+	public:
+		void					Initialize();
+		void					Deinitialize();
+
+		void					Parse(ZEMTInterpreterToken& Token, ZEString* Output);
+};

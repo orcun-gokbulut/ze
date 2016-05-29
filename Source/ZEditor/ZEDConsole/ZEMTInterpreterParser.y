@@ -1,86 +1,94 @@
+%name ZEMTInterpreterParserParse
+
 %token_prefix ZEMT_IT_
+%extra_argument {ZEString* Output}
 
 %left ADD SUB.
 %left MUL DIV.
 
-%token_type 
-{ 
-	YYSTYPE 
-}
-
-%extra_argument 
-{ 
-	ParserState *state 
-}
+%token_type {ZEMTInterpreterToken*}
 
 %include 
 {
-	#include <stdio.h>
+	#include "ZEMTInterpreterLexer.h"
+	#include "ZEDS/ZEFormat.h"
+	#include <assert.h>
 }
 
 %syntax_error 
 {
-    fprintf(stderr, "Syntax error\n");
+    *Output += "Error: Syntax error.\n";
 }
 
 %parse_failure 
 {
-    fprintf(stderr,"Giving up.  Parser is hopelessly lost...\n");
+    *Output += "Error: Giving up.  Parser is hopelessly lost...\n";
 }
 
 %start_symbol program
 
 program ::= statements.
 {
-	prinf("Wow much program.");
+	*Output += "WOW much program.\n";
 }
 
 statements ::= .
 {
-	printf("wow empty statements.");
+	*Output += "WOW empty statements.\n";
 }
 
 statements ::= statement.
 {
-	printf("wow single statement statements.");
+	*Output += "WOW single statement statements.\n";
 }
 
 statements ::= statement statement.
 {
-	printf("wow recursive statmenets.");
+	*Output += "WOW recursive statmenets.\n";
 }
 
 statement ::= expression SEMI_COLON.
 {
-	printf("wow expressions");
+	*Output += "WOW End of Statement.\n";
 }
 
-statement ::= IDENTIFIER ASSIGNMENT expression SEMI_COLON.
+statement ::= IDENTIFIER OPERATOR_ASSIGNMENT expression END_OF_STATEMENT.
 {
-	printf("wow assignement");
+	*Output += "WOW assignement.\n";
+}
+
+expression(A) ::= expression(B) OPERATOR_REFERENCE IDENTIFIER(C).
+{
+	A = new ZEMTInterpreterToken();
+	A->Text = ZEFormat::Format("{0}.{1}", B->Text, C->Text);
+	*Output += ZEFormat::Format("WOW Reference. a:\"{0}\", b:\"{1}\".\n", B->Text, C->Text);
 }
 
 expression ::= INTEGER.
 {
-	printf("wow integer");
+	*Output += "WOW integer.\n";
+}
+
+expression ::= IDENTIFIER.
+{
+	*Output += "WOW Identifier.\n";
 }
 
 expression ::= FLOAT.
 {
-	printf("wow integer");
+	*Output += "WOW integer.\n";
 }
-
 
 expression ::= DOUBLE.
 {
-	printf("wow integer");
+	*Output += "WOW integer.\n";
 }
 
-/*
+
 // Expression
 /////////////////////////////////////////////////////////////////////////////////
 
-expression ::= IDENTIFIER.
+/*expression ::= IDENTIFIER.
 
 expression(A) ::= PARENTHESES_LEFT expression(B) PARENTHESES_RIGHT. 
 {

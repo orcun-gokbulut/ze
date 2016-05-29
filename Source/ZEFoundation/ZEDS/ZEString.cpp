@@ -2344,143 +2344,130 @@ ZEString::operator const wchar_t*() const
 
 ZEString::ZEString()
 {
+	BufferChanged = true;
 	Buffer = NULL;
 	WBuffer = NULL;
 }
 
 ZEString::ZEString(const char* String)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(String);
 }
 
 ZEString::ZEString(const wchar_t* String)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(String);
 }
 
 ZEString::ZEString(const ZEString& String)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	CopyFrom(String);
 }
 
 ZEString::ZEString(const std::string& String)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(String.c_str());
 }
 
 ZEString::ZEString(const std::wstring& String)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(String.c_str());
 }
 
 ZEString::ZEString(wchar_t Character)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Character);
 }
 
 ZEString::ZEString(const ZECharacter& Character)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Character);
 }
 
 ZEString::ZEString(ZEInt8 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEInt16 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEInt32 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEInt64 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEUInt8 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEUInt16 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEUInt32 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(ZEUInt64 Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(float Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(double Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(bool Value)
 {
-	Buffer = NULL;
-	WBuffer = NULL;
+	new(this) ZEString();
 	SetValue(Value);
 }
 
 ZEString::ZEString(const char* Start, const char* End)
 {
-	SetValue(Buffer, End - Start);
+	new(this) ZEString();
+	SetValue(Start, End - Start);
 }
 
 ZEString::ZEString(const void* Buffer, ZESize Length)
 {
+	BufferChanged = false;
+	Buffer = NULL;
+	WBuffer = NULL;
 	SetValue(Buffer, Length);
 }
 

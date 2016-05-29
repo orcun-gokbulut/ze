@@ -33,4 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#
 #include "ZEMTInterpreterParser.h"
+#include "ZEMTInterpreterParser.y.cpp"
+
+#include <memory.h>
+
+void ZEMTInterpreterParser::Initialize()
+{
+	ParserState = ZEMTInterpreterParserParseAlloc(malloc);
+}
+
+void ZEMTInterpreterParser::Deinitialize()
+{
+	ZEMTInterpreterParserParseFree(ParserState, free);
+}
+
+void ZEMTInterpreterParser::Parse(ZEMTInterpreterToken& Token, ZEString* Output)
+{
+	ZEMTInterpreterParserParse(ParserState, Token.Type, &Token, Output);
+}

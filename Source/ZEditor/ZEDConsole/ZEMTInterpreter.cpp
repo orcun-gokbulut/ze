@@ -36,6 +36,8 @@
 #include "ZEMTInterpreter.h"
 
 #include "ZERegEx/ZERegEx.h"
+#include "ZEMTInterpreterLexer.h"
+#include "ZEMTInterpreterParser.h"
 
 const ZEArray<ZEMTInterpreterVariable>& ZEMTInterpreter::GetVariables()
 {
@@ -158,7 +160,23 @@ void ZEMTInterpreter::UnregisterGlobalObject(const ZEString& Name)
 
 ZEString ZEMTInterpreter::Execute(const ZEString& Input)
 {
-	return "Büllük";
+	ZEString Output;
+
+	ZEMTInterpreterLexer Lexer;
+	Lexer.SetInput(Input);
+
+	ZEMTInterpreterParser Parser;
+	Parser.Initialize();
+
+	while (true)
+	{
+		ZEMTInterpreterToken* Token = new ZEMTInterpreterToken();
+		if (!Lexer.Scan(*Token, Output))
+			break;
+		Parser.Parse(*Token, &Output);
+	}
+
+	return Output;
 }
 
 ZEMTInterpreter::ZEMTInterpreter()
