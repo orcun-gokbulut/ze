@@ -57,10 +57,11 @@ class ZEMTInterpreterLexer
 	private:
 		ZEString					Input;
 
-		const char*					TokenStart;
+		const char*					TokenMarker;
 		const char*					Cursor;
-		const char*					Marker;
 		const char*					Limit;
+		const char*					Marker;
+		const char*					CtxMarker;
 
 		const char*					LineStart;
 		ZESize						Line;
@@ -72,7 +73,7 @@ class ZEMTInterpreterLexer
 		void						SetInput(const ZEString& Input);
 		const ZEString&				GetInput();
 
-		bool						Scan(ZEMTInterpreterToken& Token);
+		bool						Scan(ZEMTInterpreterToken& Token, ZEString& Output);
 
 									ZEMTInterpreterLexer();
 };

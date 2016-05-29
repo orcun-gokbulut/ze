@@ -35,10 +35,12 @@
 
 #include "ZEMTInterpreterLexer.h"
 
+#include "ZEMTInterpreterLexer.l.cpp"
+
 void ZEMTInterpreterLexer::InitializeToken(ZEMTInterpreterToken& Token)
 {
 	Token.Type = ZEMT_IT_NONE;
-	Token.Text = ZEString(Marker, Cursor);
+	Token.Text = ZEString(TokenMarker, Cursor);
 	Token.Line = Line;
 	Token.Column = Column;
 }
@@ -46,6 +48,9 @@ void ZEMTInterpreterLexer::InitializeToken(ZEMTInterpreterToken& Token)
 void ZEMTInterpreterLexer::SetInput(const ZEString& Input)
 {
 	this->Input = Input;
+	Cursor = Input.GetValue();
+	LineStart = Cursor;
+	Limit = Input.GetValue() + Input.GetBufferSize();
 }
 
 const ZEString& ZEMTInterpreterLexer::GetInput()
@@ -55,10 +60,11 @@ const ZEString& ZEMTInterpreterLexer::GetInput()
 
 ZEMTInterpreterLexer::ZEMTInterpreterLexer()
 {
-	TokenStart = NULL;
+	TokenMarker = NULL;
 	Cursor = NULL;
-	Marker = NULL;
 	Limit = NULL;
+	Marker = NULL;
+	CtxMarker = NULL;
 
 	LineStart = NULL;
 	Line = 0;

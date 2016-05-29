@@ -52,10 +52,11 @@ void ZEDConsoleWidget::Execute()
 		return;
 
 	Form->txtOutput->setPlainText(Form->txtOutput->toPlainText() + Form->txtCommand->text() + "\n");
-	Form->txtCommand->setText("");
 
 	ZEString Output = Engine.Execute(Form->txtCommand->text().toUtf8().cbegin());
 	Form->txtOutput->setPlainText(Form->txtOutput->toPlainText() + Output + "\n");
+
+	Form->txtCommand->setText("");
 }
 
 bool ZEDConsoleWidget::eventFilter(QObject* Object, QEvent* Event)

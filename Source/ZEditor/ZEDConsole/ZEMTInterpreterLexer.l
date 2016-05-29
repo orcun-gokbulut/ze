@@ -1,65 +1,21 @@
 #include "ZEMTInterpreterLexer.h"
 
+#include "ZEError.h"
+#include "ZEDS/ZEFormat.h"
 #include "ZEMTInterpreterParser.y.h"
 
-bool fill(int n) 
-{
- 
-    // is eof?
-    if (ifs->eof()) 
-	{
-        if ((m_limit-m_cursor) <= 0) 
-		{
-            return false;
-        }
-    }
- 
-    int restSize = m_limit-m_token;
-    if (restSize+n >= m_buffer_size) {
-        // extend buffer
-        m_buffer_size *= 2;
-        char* newBuffer = new char[m_buffer_size];
-        for (int i=0; i<restSize; ++i) { // memcpy
-            *(newBuffer+i) = *(m_token+i);
-        }
-        m_cursor = newBuffer + (m_cursor-m_token);
-        m_token = newBuffer;
-        m_limit = newBuffer + restSize;
- 
-        delete [] m_buffer;
-        m_buffer = newBuffer;
-    } else {
-        // move remained data to head.
-        for (int i=0; i<restSize; ++i) { //memmove( m_buffer, m_token, (restSize)*sizeof(char) );
-            *(m_buffer+i) = *(m_token+i);
-        }
-        m_cursor = m_buffer + (m_cursor-m_token);
-        m_token = m_buffer;
-        m_limit = m_buffer+restSize;
-    }
- 
-    // fill to buffer
-    int read_size = m_buffer_size - restSize;
-    ifs->read( m_limit, read_size );
-    m_limit += ifs->gcount();
- 
-    return true;
-}
-
-bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token)
+bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 {
 	std:
-    TokenStart = Cursor;
+	TokenMarker = Cursor;
  
 	/*!re2c
 		re2c:define:YYCTYPE = "char";
 		re2c:define:YYCURSOR = Cursor;
-		re2c:define:YYMARKER = Marker;
 		re2c:define:YYLIMIT = Limit;
-		re2c:define:YYFILL:naked = 1;
-		re2c:define:YYFILL@len = #;
-		re2c:define:YYFILL = "if (!fill(#)) { return 0; }";
-		re2c:yyfill:enable = 1;
+		re2c:define:YYMARKER = Marker;
+		re2c:define:YYCTXMARKER = CtxMarker;
+		re2c:yyfill:enable = 0;
 		re2c:indent:top = 2;
 		re2c:indent:string="    ";
 
@@ -111,17 +67,31 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token)
 			return true;
 		}
 
+		'='
+		{
+			InitializeToken(Token);
+			Token.Type = ZEMT_IT_OPERATOR_ASSIGNMENT;
+			return true;
+		}
+
+		'.'
+		{
+			InitializeToken(Token);
+			Token.Type = ZEMT_IT_OPERATOR_REFERENCE;
+			return true;
+		}
+
 		';'
 		{
 			InitializeToken(Token);
-			Token.Type =ZEMT_IT_SEMI_COLON;
+			Token.Type = ZEMT_IT_END_OF_STATEMENT;
 			return true;
 		}
 
 		[\n]
 		{
 			Line++;
-			LineStart = TokenStart;
+			LineStart = Marker;
 			goto std;
 		}
 
@@ -132,8 +102,10 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token)
 
 		[^]
 		{
-			printf("Unexpected character: '%c(%d)'\n", *TokenStart, *TokenStart);
+			Output += ZEFormat::Format("Unexpected character: '{0:c}'. (Line: {1}, Column: {2})\n", *TokenMarker, Line, Cursor - LineStart);
 			return false;
 		}
 	*/
+
+	return false;
 }
