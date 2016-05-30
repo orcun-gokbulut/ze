@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLEditorWindow.h
+ Zinek Engine - ZEITGeneratorWorker.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,86 +34,41 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
 
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
+#include <QThread>
 
-#include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLRoot.h"
+class ZEITGenerator;
 
-class Ui_ZEMLEditorWindow;
-class QLabel;
+enum ZEITGeneratorWorkerState
+{
+	ZEIT_GWS_NONE,
+	ZEIT_GWS_RUNNING,
+	ZEIT_GWS_CANCELED,
+	ZEIT_GWS_DONE
+};
 
-class ZEMLEditorWindow : public QMainWindow
+class ZEITGeneratorWorker : public QThread
 {
 	Q_OBJECT
 	private:
-		static ZEMLEditorWindow*		Instance;
-		Ui_ZEMLEditorWindow*			Form;
-		ZEMLFormatDescription*			Format;
-		QLabel*							StatusBarLabel;
-		ZEString						FileName;
-		ZEMLRoot						Root;
-		ZEMLNode*						RootNode;
+		ZEITGenerator*					Generator;
+		bool							IsCanceled;
+		ZEITGeneratorWorkerState		State;
 
-		ZEMLNode*						ClipBoard;
+		void							run();
 
-		void							LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void							LoadTree();
-		
-		void							RegisterRecentFile(const ZEString& FileName);
-		void							LoadRecentFiles();
+	signals:
+		void							RecordUpdated(unsigned int RecordIndex);
+		void							StateChanged();
 
-		void							OpenFile(const ZEString& FileName);
-		void							SaveFile(const ZEString& FileName);
-
-		void							ConfigureUI();
-
-	private slots:
-		void							NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void							ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void							DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
-		
-		void							Select();
-		void							Deselect();
-
-		void							New();
-		void							Open();
-		void							OpenRecentFile();
-		void							Save();
-		void							SaveAs();
-		void							Close();
-		void							Quit();
-
-		void							Undo();
-		void							Redo();
-		void							Cut();
-		void							Copy();
-		void							Paste();
-
-		void							EditMode();
-
-		void							AddNewNode();
-		void							AddNewProperty();
-		void							AddNewData();
-		void							Delete();
-
-		void							UserGuide();
-		void							BugReport();
-		void							Website();
-		void							About();
+	public slots:
+		void							Cancel();
 
 	public:
-		Ui_ZEMLEditorWindow*			GetForm();
-		bool							GetEditMode();
-		void							Update();
+		ZEITGeneratorWorkerState		GetState();
 
-										ZEMLEditorWindow();
-										~ZEMLEditorWindow();
+		void							SetGenerator(ZEITGenerator* Generator);
+		ZEITGenerator*					GetGenerator();
 
-		static ZEMLEditorWindow*		GetInstance();
+										ZEITGeneratorWorker();
 };
-
-#endif

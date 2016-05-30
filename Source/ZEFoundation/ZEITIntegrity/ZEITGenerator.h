@@ -77,6 +77,7 @@ class ZEITGenerator
 		const ZEITRecord&					GetRecord(ZESize Index) const;
 		void								AddRecord(const ZEITRecord& Entry);
 		void								RemoveRecord(ZESize Index);
+		void								ClearRecords();
 
 		const ZEArray<ZEITScannerEntry>&	GetIncludes() const;
 		ZEITScannerEntry&					GetInclude(ZESize Index);
@@ -94,7 +95,11 @@ class ZEITGenerator
 		bool								GetDiscardDisabled() const;
 
 		void								Scan();
-		void								Generate();
+
+		void								GenerateStart();
+		bool								Generate(ZESize Index);
+
+		void								Clear();
 
 		bool								LoadGeneratorFile(const ZEString& FileName);
 		bool								SaveGeneratorFile(const ZEString& FileName) const;

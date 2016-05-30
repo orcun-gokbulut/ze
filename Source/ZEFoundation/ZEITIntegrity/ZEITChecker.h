@@ -54,7 +54,7 @@ class ZEITChecker
 		ZEITCheckResult						GetResult() const;
 
 		void								CheckStart();
-		bool								CheckProgress(ZESize Index);
+		bool								Check(ZESize Index);
 
 		bool								Load();
 		bool								Save();

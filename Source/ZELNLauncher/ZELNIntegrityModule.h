@@ -43,27 +43,8 @@
 #include <QThread>
 
 class QWidget;
+class ZELNIntegrityWorker;
 class Ui_ZELNIntegrityWidget;
-
-class ZELNIntegrityWorker : public QThread
-{
-	Q_OBJECT
-	friend class ZELNIntegrityModule;
-	private:
-		ZEITChecker*					Checker;
-		bool							IsCanceled;
-
-		void							run();
-
-										ZELNIntegrityWorker();
-
-	signals:
-		void							RecordUpdated(unsigned int RecordIndex);
-		void							Done(bool Canceled);
-
-	public slots:
-		void							Cancel();
-};
 
 class ZELNIntegrityModule : public QObject, public ZELNModule
 {
@@ -73,9 +54,9 @@ class ZELNIntegrityModule : public QObject, public ZELNModule
 	private:
 		QWidget*						Widget;
 		Ui_ZELNIntegrityWidget*			Form;
-		bool							State;
+
 		ZEITChecker						Checker;
-		ZELNIntegrityWorker	 			Worker;
+		ZELNIntegrityWorker* 			CheckerWorker;
 
 		void							UpdateRecord(ZESize RecordIndex);
 		void							Update();
@@ -85,8 +66,8 @@ class ZELNIntegrityModule : public QObject, public ZELNModule
 										ZELNIntegrityModule();
 
 	private slots:
-		void							Worker_RecordUpdated(unsigned int RecordIndex);
-		void							Worker_Done(bool Canceled);
+		void							CheckerWorker_RecordUpdated(unsigned int RecordIndex);
+		void							CheckerWorker_StateChanged();
 
 		void							btnCheckIntegrity_clicked();
 		void							chkFilter_toggled(bool);

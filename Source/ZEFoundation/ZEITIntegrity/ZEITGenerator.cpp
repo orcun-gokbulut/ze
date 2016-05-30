@@ -34,13 +34,12 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEITGenerator.h"
-#include "ZEML\ZEMLReader.h"
+
+#include "ZEDS\ZEFormat.h"
 #include "ZEFile\ZEDirectoryInfo.h"
 #include "ZEML\ZEMLWriter.h"
-#include "ZEDS\ZEFormat.h"
 #include "ZEML\ZEMLFormat.h"
-#include <omp.h>
-#include "ZEFile\ZEPathInfo.h"
+#include "ZEML\ZEMLReader.h"
 
 
 // ZEITScannerEntry
@@ -137,30 +136,35 @@ int WildcardCompare(const char *wild, const char *string)
 
 bool ZEITGenerator::CheckExcluded(const ZEString& Path) const
 {
+	bool Result = WildcardCompare("*.pdb", "#E:/ZEDSHShaderEditorDLL.pdb");
+
 	for (ZESize I = 0; I < Excludes.GetCount(); I++)
 	{
-		if (WildcardCompare(Excludes[I].GetPath(), Path))
-			return false;
+		if (WildcardCompare(Excludes[I].GetPath(), Path))/* || 
+			strncmp(Excludes[I].GetPath(), Path, strlen(Excludes[I].GetPath())))*/
+		{
+			return true;
+		}
 	}
 
-	return true;
+	return false;
 }
 
 void ZEITGenerator::ScanDirectory(const ZEString& Path, bool Recursive)
 {
-	zeLog("Scanning Directory: %s", Path.ToCString());
-
 	ZEDirectoryInfo Info(Path);
 	ZEArray<ZEString> Files = Info.GetFiles();
 
-	int Count = omp_get_max_threads();
-	omp_set_num_threads(Count);
-
-	#pragma omp parallel for schedule(dynamic)
+	if (CheckExcluded(Path))
+		return;
+	
 	for (ZESSize I = 0; I < Files.GetCount(); I++) 
 	{
 		ZEPathInfo Info(ZEFormat::Format("{0}/{1}", Path, Files[I]));
 		ZEString NormalizedPath = Info.Normalize();
+
+		if (CheckExcluded(NormalizedPath))
+			continue;
 
 		bool Found = false;
 		for (ZESize I = 0; I < Records.GetCount(); I++)
@@ -170,13 +174,16 @@ void ZEITGenerator::ScanDirectory(const ZEString& Path, bool Recursive)
 				Found = false;
 				break;
 			}
+			
 		}
+		
+		if (Found)
+			continue;
 
 		ZEITRecord Record;
 		Record.SetPath(NormalizedPath);
 		Record.SetRequired(true);
 		Record.SetType(ZEIT_RT_FILE);
-		zeLog("Generating Record: %s, Thread ID: %d", Record.GetPath().ToCString(), omp_get_thread_num());
 		AddRecord(Record);
 	}
 
@@ -215,6 +222,11 @@ void ZEITGenerator::RemoveRecord(ZESize Index)
 	Lock.Lock();
 	Records.Remove(Index);
 	Lock.Unlock();
+}
+
+void ZEITGenerator::ClearRecords()
+{
+	Records.Clear();
 }
 
 const ZEArray<ZEITScannerEntry>& ZEITGenerator::GetIncludes() const
@@ -291,15 +303,29 @@ void ZEITGenerator::Scan()
 	}
 }
 
-void ZEITGenerator::Generate()
+void ZEITGenerator::GenerateStart()
 {
-	for (ZESize I = 0; I < Records.GetCount(); I++)
-	{
-		if (!Records[I].GetEnabled())
-			continue;
 
-		Records[I].Generate();
-	}
+}
+
+bool ZEITGenerator::Generate(ZESize Index)
+{
+	if (Index >= Records.GetCount())
+		return false;
+
+	if (!Records[Index].GetEnabled())
+		return true;
+
+	Records[Index].Generate();
+
+	return true;
+}
+
+void ZEITGenerator::Clear()
+{
+	Includes.Clear();
+	Excludes.Clear();
+	Records.Clear();
 }
 
 bool ZEITGenerator::LoadGeneratorFile(const ZEString& FileName)
@@ -394,9 +420,9 @@ bool ZEITGenerator::SaveGeneratorFile(const ZEString& FileName) const
 	{
 		ZEMLWriterNode ExcludeNode;
 		ExcludesNode.OpenNode("Exclude", ExcludeNode);
-		ExcludeNode.WriteString("Path", Includes[I].GetPath());
-		ExcludeNode.WriteBool("Enabled", Includes[I].GetEnabled());
-		ExcludeNode.WriteBool("Recursive", Includes[I].GetRecursive());
+		ExcludeNode.WriteString("Path", Excludes[I].GetPath());
+		ExcludeNode.WriteBool("Enabled", Excludes[I].GetEnabled());
+		ExcludeNode.WriteBool("Recursive", Excludes[I].GetRecursive());
 		ExcludeNode.CloseNode();
 	}
 	ExcludesNode.CloseNode();
@@ -456,7 +482,7 @@ bool ZEITGenerator::SaveIntegrityFile(const ZEString& FileName) const
 	}
 
 	ZEMLWriterNode RootNode;
-	Writer.OpenRootNode("ZEIntegrity", RootNode);
+	Writer.OpenRootNode("ZEITIntegrity", RootNode);
 
 	ZEMLWriterNode RecordsNode;
 	RootNode.OpenNode("Records", RecordsNode);

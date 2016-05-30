@@ -68,7 +68,7 @@ void ZEITChecker::CheckStart()
 		Records[I].Reset();
 }
 
-bool ZEITChecker::CheckProgress(ZESize Index)
+bool ZEITChecker::Check(ZESize Index)
 {
 	if (Index >= Records.GetCount())
 		return false;
@@ -91,7 +91,7 @@ bool ZEITChecker::Load()
 	}
 
 	ZEMLReaderNode RootNode = Reader.GetRootNode();
-	if (RootNode.GetName() != "ZEIntegrity")
+	if (RootNode.GetName() != "ZEITIntegrity")
 	{
 		zeError("Unknown Integrity file format. File Name: \"%s\".", IntegrityFile.ToCString());
 		return false;

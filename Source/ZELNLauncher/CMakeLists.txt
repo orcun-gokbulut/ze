@@ -69,6 +69,8 @@ ze_add_source(ZELNLicenseEditorDialog.ui		Source QtUIs)
 
 ze_add_source(ZELNIntegrityModule.cpp			Sources)
 ze_add_source(ZELNIntegrityModule.h				Sources QtMocs)
+ze_add_source(ZELNIntegrityWorker.cpp			Sources)
+ze_add_source(ZELNIntegrityWorker.h				Sources QtMocs)
 ze_add_source(ZELNIntegrityWidget.ui			Sources QtUIs)
 
 ze_add_source(ZELNUpdateModule.cpp				Sources)
