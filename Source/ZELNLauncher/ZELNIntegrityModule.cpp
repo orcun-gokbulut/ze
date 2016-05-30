@@ -43,43 +43,15 @@
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <md5.h>
+#include "ZELNIntegrityWorker.h"
 
 ZELN_MODULE_DECRIPTION(ZELNIntegrityModule, "Integrity");
 
-void ZELNIntegrityWorker::run()
+void ZELNIntegrityModule::CheckerWorker_StateChanged()
 {
-	IsCanceled = false;
-	Checker->CheckStart();
-	const ZEArray<ZEITRecord>& Records = Checker->GetRecords();
-	for (ZESize I = 0; I < Records.GetCount(); I++)
-	{
-		if (IsCanceled)
-		{
-			emit Done(true);
-			return;
-		}
+	if (CheckerWorker->GetState() != ZELN_IWS_DONE && CheckerWorker->GetState() != ZELN_IWS_CANCELED)
+		return;
 
-		emit RecordUpdated(I);
-		Checker->CheckProgress(I);
-		emit RecordUpdated(I);
-	}
-
-	emit Done(false);
-}
-
-void ZELNIntegrityWorker::Cancel()
-{
-	IsCanceled = true;
-}
-
-ZELNIntegrityWorker::ZELNIntegrityWorker()
-{
-	Checker = NULL;
-	IsCanceled = false;
-}
-
-void ZELNIntegrityModule::Worker_Done(bool Canceled)
-{
 	const char* StatusText;
 	switch(Checker.GetResult())
 	{
@@ -89,36 +61,39 @@ void ZELNIntegrityModule::Worker_Done(bool Canceled)
 			break;
 
 		case ZEIT_CR_WARNING:
-			StatusText = "Warning";
+			StatusText = "<font color=\"#D24726\">Warning</font>";
 			break;
 
 		case ZEIT_CR_ERROR:
-			StatusText = "Error";
+			StatusText = "<font color=\"Red\">Failed !</font>";
 			break;
 
 		case ZEIT_CR_SUCCESS:
-			StatusText = "OK";
+			StatusText = "<font color=\"#008A00\">Success</font>";
 			break;
 	}
 
-	if (!Canceled)
+	if (CheckerWorker->GetState() != ZELN_IWS_CANCELED)
 	{
-		Form->prgProgress->setValue(Checker.GetRecords().GetCount());
-		Form->lblPath->setText("");
+		if (Checker.GetResult() != ZEIT_CR_ERROR)
+		{
+			Form->prgProgress->setValue(Checker.GetRecords().GetCount());
+			Form->lblPath->setText("");
+		}
+
 		Form->lblStatus->setText(StatusText);
 	}
 	else
 	{
 		Form->prgProgress->setEnabled(false);
-		Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 		Form->lblStatus->setText(QString("Canceled (%1)").arg(StatusText));
 	}
 
+	Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 	Form->btnCheckIntegrity->setText("Check Integrity");
-	State = false;
 }
 
-void ZELNIntegrityModule::Worker_RecordUpdated(unsigned int RecordIndex)
+void ZELNIntegrityModule::CheckerWorker_RecordUpdated(unsigned int RecordIndex)
 {
 	const ZEArray<ZEITRecord>& Records = Checker.GetRecords();
 	Form->lblPath->setText(Records[RecordIndex].GetPath().ToCString());
@@ -135,15 +110,15 @@ void ZELNIntegrityModule::Worker_RecordUpdated(unsigned int RecordIndex)
 			break;
 
 		case ZEIT_CR_WARNING:
-			StatusText = "Warning";
+			StatusText = "<font color=\"#D24726\">Warning</font>";
 			break;
 
 		case ZEIT_CR_ERROR:
-			StatusText = "Error";
+			StatusText = "<font color=\"Red\">Error</font>";
 			break;
 
 		case ZEIT_CR_SUCCESS:
-			StatusText = "OK";
+			StatusText = "<font color=\"#008A00\">OK</font>";
 			break;
 	}
 
@@ -187,7 +162,7 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 			break;
 
 		case ZEIT_CR_SUCCESS:
-			Form->tblRecords->item(Index, 0)->setBackgroundColor(Qt::darkGreen);
+			Form->tblRecords->item(Index, 0)->setBackgroundColor(0x008A00);
 			Form->tblRecords->item(Index, 0)->setTextColor(Qt::white);
 			break;
 	}
@@ -241,7 +216,6 @@ bool ZELNIntegrityModule::InitializeSelf()
 
 ZELNIntegrityModule::ZELNIntegrityModule()
 {
-	State = false;
 	Widget = new QWidget();
 	Form = new Ui_ZELNIntegrityWidget();
 	Form->setupUi(Widget);
@@ -265,22 +239,21 @@ ZELNIntegrityModule::ZELNIntegrityModule()
 	verticalHeader->sectionResizeMode(QHeaderView::Fixed);
 	verticalHeader->setDefaultSectionSize(24);
 
-	Worker.Checker = &Checker;
+	CheckerWorker = new ZELNIntegrityWorker();
+	CheckerWorker->SetChecker(&Checker);
 
 	connect(Form->btnCheckIntegrity, SIGNAL(clicked()), this, SLOT(btnCheckIntegrity_clicked()));
-	connect(Form->chkFilterAll, SIGNAL(toggled(bool)), this, SLOT(chkFilter_toggled(bool)));
-	connect(Form->chkFilterFailed, SIGNAL(toggled(bool)), this, SLOT(chkFilter_toggled(bool)));
-	connect(Form->btnSave, SIGNAL(clicked()), this, SLOT(btnSave_clicked()));
-	connect(&Worker, SIGNAL(RecordUpdated(unsigned int)), this, SLOT(Worker_RecordUpdated(unsigned int)));
-	connect(&Worker, SIGNAL(Done(bool)), this, SLOT(Worker_Done(bool)));
+	connect(Form->chkFilterAll,		SIGNAL(toggled(bool)), this, SLOT(chkFilter_toggled(bool)));
+	connect(Form->chkFilterFailed,	SIGNAL(toggled(bool)), this, SLOT(chkFilter_toggled(bool)));
+	connect(Form->btnSave,			SIGNAL(clicked()), this, SLOT(btnSave_clicked()));
+	connect(CheckerWorker,			SIGNAL(RecordUpdated(unsigned int)), this, SLOT(CheckerWorker_RecordUpdated(unsigned int)));
+	connect(CheckerWorker,			SIGNAL(StateChanged()), this, SLOT(CheckerWorker_StateChanged()));
 }
 
 void ZELNIntegrityModule::btnCheckIntegrity_clicked()
 {
-	if (!State)
+	if (CheckerWorker->GetState() != ZELN_IWS_RUNNING)
 	{
-		State = true;
-
 		Form->prgProgress->setEnabled(true);
 		Form->prgProgress->setValue(0);
 		Form->prgProgress->setMaximum(Checker.GetRecords().GetCount());
@@ -288,11 +261,11 @@ void ZELNIntegrityModule::btnCheckIntegrity_clicked()
 		Form->lblStatus->setText("Checking...");
 		Form->btnCheckIntegrity->setText("Cancel");
 
-		Worker.start();
+		CheckerWorker->start();
 	}
 	else
 	{
-		Worker.Cancel();
+		CheckerWorker->Cancel();
 	}
 }
 

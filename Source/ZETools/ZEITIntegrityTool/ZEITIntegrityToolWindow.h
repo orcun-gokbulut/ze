@@ -37,12 +37,14 @@
 
 #include "ZEITIntegrity/ZEITGenerator.h"
 
-#include <QDialog>
+#include <QMainWindow>
 
-class Ui_ZEITIntegrityToolWindow;
 class QListWidgetItem;
+class QTableWidgetItem;
+class ZEITGeneratorWorker;
+class Ui_ZEITIntegrityToolWindow;
 
-class ZEITIntegrityToolWindow : public QDialog
+class ZEITIntegrityToolWindow : public QMainWindow
 {
 	Q_OBJECT
 	friend class ZELNContactModule;
@@ -50,12 +52,35 @@ class ZEITIntegrityToolWindow : public QDialog
 		Ui_ZEITIntegrityToolWindow*		Form;
 
 		ZEITGenerator					Generator;
+		ZEITGeneratorWorker*			GeneratorWorker;
+
+		QString							ToolFileName;
+		QString							IntegrityFileName;
 
 		void							UpdateRecord(ZESize Index);
 		void							UpdateLists();
 		void							UpdateUI();
 
+		void							LoadRecentFiles();
+		void							RegisterRecentFile(const QString& FileName);
+
 	private slots:
+		void							GeneratorWorker_RecordUpdated(unsigned int RecordIndex);
+		void							GeneratorWorker_StateChanged();
+
+		void							actNew_triggered();
+		void							actOpen_triggered();
+		void							mnuRecentFiles_triggered();
+		void							actSave_triggered();
+		void							actSaveAs_triggered();
+		void							actQuit_triggered();
+
+		void							actIntegritySave_triggered();
+		void							actIntegritySaveAs_triggered();
+
+		void							btnScan_clicked();
+		void							btnGenerate_clicked();
+
 		void							lstIncludes_itemSelectionChanged();
 		void							lstIncludes_itemChanged(QListWidgetItem* Item);
 		void							btnIncludeAdd_clicked();
@@ -65,19 +90,14 @@ class ZEITIntegrityToolWindow : public QDialog
 		void							lstExcludes_itemChanged(QListWidgetItem* Item);
 		void							btnExcludeAdd_clicked();
 		void							btnExcludeRemove_clicked();
-
-		void							btnGeneratorLoad_clicked();
-		void							btnGeneratorSave_clicked();
-		void							btnScan_clicked();
-
+		
 		void							tblRecords_itemSelectionChanged();
+		void							tblRecords_itemChanged(QTableWidgetItem* Item);
 		void							btnRecordAdd_clicked();
 		void							btnRecordRemove_clicked();
 		void							btnRecordExclude_clicked();
 		void							btnRecordUpdate_clicked();
-		void							btnRecordUpdateAll_clicked();
-
-		void							btnIntegritySave_clicked();
+		void							btnRecordClear_clicked();
 
 	public:
 										ZEITIntegrityToolWindow();

@@ -230,12 +230,19 @@ bool ZEITRecord::Generate()
 
 	ZEFile File;
 	if (!File.Open(Path, ZE_FOM_READ, ZE_FCM_NONE))
-			return false;
+	{
+		Result = ZEIT_CR_ERROR;
+		Problem = ZEIT_CP_MISSING;
+		return false;
+	}
 
 	FileSize = File.GetSize();
 	Checksum = CalculateChecksum(&File);
 
 	File.Close();
+
+	Result = ZEIT_CR_SUCCESS;
+	Problem = ZEIT_CP_NONE;
 }
 
 void ZEITRecord::Reset()

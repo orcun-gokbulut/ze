@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMLEditorWindow.h
+ Zinek Engine - ZEITGeneratorWorker.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,87 +33,64 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZEML_EDITOR_WINDOW_H__
-#define __ZEML_EDITOR_WINDOW_H__
+#include "ZEITGeneratorWorker.h"
 
-#include <QtGui/QMainWindow>
-#include "QtGui/qtreewidget.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEITIntegrity/ZEITGenerator.h"
 
-#include "ZEDS/ZEString.h"
-#include "ZEML/ZEMLRoot.h"
+#include <QThread>
 
-class Ui_ZEMLEditorWindow;
-class QLabel;
-
-class ZEMLEditorWindow : public QMainWindow
+void ZEITGeneratorWorker::run()
 {
-	Q_OBJECT
-	private:
-		static ZEMLEditorWindow*		Instance;
-		Ui_ZEMLEditorWindow*			Form;
-		ZEMLFormatDescription*			Format;
-		QLabel*							StatusBarLabel;
-		ZEString						FileName;
-		ZEMLRoot						Root;
-		ZEMLNode*						RootNode;
+	State = ZEIT_GWS_RUNNING;
+	emit StateChanged();
 
-		ZEMLNode*						ClipBoard;
+	Generator->GenerateStart();
+	const ZEArray<ZEITRecord>& Records = Generator->GetRecords();
+	bool Result = true;
+	ZESize Index = 0;
+	while (true)
+	{
+		if (State != ZEIT_GWS_RUNNING)
+		{
+			emit StateChanged();
+			return;
+		}
 
-		void							LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void							LoadTree();
-		
-		void							RegisterRecentFile(const ZEString& FileName);
-		void							LoadRecentFiles();
+		emit RecordUpdated(Index);
+		if (!Generator->Generate(Index))
+			break;
+		emit RecordUpdated(Index);
 
-		void							OpenFile(const ZEString& FileName);
-		void							SaveFile(const ZEString& FileName);
+		Index++;
+	}
 
-		void							ConfigureUI();
+	State = ZEIT_GWS_DONE;
+	emit StateChanged();
+}
 
-	private slots:
-		void							NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void							ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void							DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
-		
-		void							Select();
-		void							Deselect();
+void ZEITGeneratorWorker::Cancel()
+{
+	State = ZEIT_GWS_CANCELED;
+}
 
-		void							New();
-		void							Open();
-		void							OpenRecentFile();
-		void							Save();
-		void							SaveAs();
-		void							Close();
-		void							Quit();
+ZEITGeneratorWorkerState ZEITGeneratorWorker::GetState()
+{
+	return State;
+}
 
-		void							Undo();
-		void							Redo();
-		void							Cut();
-		void							Copy();
-		void							Paste();
+void ZEITGeneratorWorker::SetGenerator(ZEITGenerator* Generator)
+{
+	this->Generator = Generator;
+}
 
-		void							EditMode();
+ZEITGenerator* ZEITGeneratorWorker::GetGenerator()
+{
+	return Generator;
+}
 
-		void							AddNewNode();
-		void							AddNewProperty();
-		void							AddNewData();
-		void							Delete();
-
-		void							UserGuide();
-		void							BugReport();
-		void							Website();
-		void							About();
-
-	public:
-		Ui_ZEMLEditorWindow*			GetForm();
-		bool							GetEditMode();
-		void							Update();
-
-										ZEMLEditorWindow();
-										~ZEMLEditorWindow();
-
-		static ZEMLEditorWindow*		GetInstance();
-};
-
-#endif
+ZEITGeneratorWorker::ZEITGeneratorWorker()
+{
+	Generator = NULL;
+	State = ZEIT_GWS_NONE;
+}

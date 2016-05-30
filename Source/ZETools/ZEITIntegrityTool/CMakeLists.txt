@@ -39,6 +39,8 @@ find_package(Qt5Core)
 find_package(Qt5Widgets)
 
 ze_add_source(ZEITMain.cpp							Sources)
+ze_add_source(ZEITGeneratorWorker.cpp				Sources)
+ze_add_source(ZEITGeneratorWorker.h					Sources QtMocs)
 ze_add_source(ZEITIntegrityToolWindow.cpp			Sources)
 ze_add_source(ZEITIntegrityToolWindow.h				Sources QtMocs)
 ze_add_source(ZEITIntegrityToolWindow.ui			Sources QtUIs)
