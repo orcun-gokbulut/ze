@@ -34,16 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELNIntegrityModule.h"
-#include "ui_ZELNIntegrityWidget.h"
 
 #include "ZEError.h"
 #include "ZEML/ZEMLReader.h"
+#include "ZELNIntegrityWorker.h"
+#include "ui_ZELNIntegrityWidget.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDialogButtonBox>
 #include <md5.h>
-#include "ZELNIntegrityWorker.h"
+
 
 ZELN_MODULE_DECRIPTION(ZELNIntegrityModule, "Integrity");
 
@@ -254,6 +255,12 @@ void ZELNIntegrityModule::btnCheckIntegrity_clicked()
 {
 	if (CheckerWorker->GetState() != ZELN_IWS_RUNNING)
 	{
+		Checker.CheckStart();
+		for (ZESize I = 0; I < Checker.GetRecords().GetCount(); I++)
+			UpdateRecord(I);
+
+		chkFilter_toggled(true);
+
 		Form->prgProgress->setEnabled(true);
 		Form->prgProgress->setValue(0);
 		Form->prgProgress->setMaximum(Checker.GetRecords().GetCount());

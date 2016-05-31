@@ -140,8 +140,11 @@ bool ZEITGenerator::CheckExcluded(const ZEString& Path) const
 
 	for (ZESize I = 0; I < Excludes.GetCount(); I++)
 	{
-		if (WildcardCompare(Excludes[I].GetPath(), Path))/* || 
-			strncmp(Excludes[I].GetPath(), Path, strlen(Excludes[I].GetPath())))*/
+		if (!Excludes[I].GetEnabled())
+			continue;
+
+		if (WildcardCompare(Excludes[I].GetPath(), Path) || 
+			strncmp(Excludes[I].GetPath(), Path, strlen(Excludes[I].GetPath())) == 0)
 		{
 			return true;
 		}
@@ -171,7 +174,7 @@ void ZEITGenerator::ScanDirectory(const ZEString& Path, bool Recursive)
 		{
 			if (Records[I].GetPath() == NormalizedPath)
 			{
-				Found = false;
+				Found = true;
 				break;
 			}
 			
@@ -279,6 +282,16 @@ void ZEITGenerator::RemoveExclude(ZESize Index)
 	Excludes.Remove(Index);
 }
 
+void ZEITGenerator::SetIntegrityFileName(const ZEString& FileName)
+{
+	IntegrityFileName = FileName;
+}
+
+const ZEString& ZEITGenerator::GetIntegrityFileName() const
+{
+	return IntegrityFileName;
+}
+
 void ZEITGenerator::SetDiscardDisabled(bool Discard)
 {
 	DiscardDisabled = Discard;
@@ -291,9 +304,6 @@ bool ZEITGenerator::GetDiscardDisabled() const
 
 void ZEITGenerator::Scan()
 {
-	for (ZESize I = 0; I < Records.GetCount(); I++)
-		Records[I].CheckExists();
-
 	for (ZESize I = 0; I < Includes.GetCount(); I++)
 	{
 		if (!Includes[I].GetEnabled())
@@ -316,7 +326,8 @@ bool ZEITGenerator::Generate(ZESize Index)
 	if (!Records[Index].GetEnabled())
 		return true;
 
-	Records[Index].Generate();
+	if (!Records[Index].Generate())
+		return false;
 
 	return true;
 }
@@ -344,6 +355,8 @@ bool ZEITGenerator::LoadGeneratorFile(const ZEString& FileName)
 		return false;
 	}
 
+	IntegrityFileName = RootNode.ReadString("IntegrityFileName");
+	
 	ZEMLReaderNode ScannerNode = RootNode.GetNode("Scanner");
 	if (ScannerNode.IsValid())
 	{
@@ -395,6 +408,7 @@ bool ZEITGenerator::SaveGeneratorFile(const ZEString& FileName) const
 
 	ZEMLWriterNode RootNode;
 	Writer.OpenRootNode("ZEITIntegrityGenerator", RootNode);
+	RootNode.WriteString("IntegrityFileName", IntegrityFileName);
 
 	ZEMLWriterNode ScannerNode;
 	RootNode.OpenNode("Scanner", ScannerNode);
@@ -442,42 +456,13 @@ bool ZEITGenerator::SaveGeneratorFile(const ZEString& FileName) const
 	return true;
 }
 
-bool ZEITGenerator::LoadIntegrityFile(const ZEString& FileName)
-{
-	ZEMLReader Reader;
-	if (!Reader.Open(FileName))
-	{
-		zeError("Cannot read Integrity file. File Name: \"%s\".", FileName.ToCString());
-		return false;
-	}
-
-	ZEMLReaderNode RootNode = Reader.GetRootNode();
-	if (RootNode.GetName() != "ZEITIntegrity")
-	{
-		zeError("Unknown Integrity file format. File Name: \"%s\".", FileName.ToCString());
-		return false;
-	}
-
-	ZEMLReaderNode RecordsNode = RootNode.GetNode("Records");
-
-	ZESize RecordCount = RecordsNode.GetNodeCount("Record");
-	Records.SetCount(RecordCount);
-	for (ZESize I = 0; I < RecordCount; I++)
-	{
-		ZEMLReaderNode RecordNode = RootNode.GetNode("Record", I);
-		Records[I].Load(&RecordNode);
-	}
-
-	return true;
-}
-
-bool ZEITGenerator::SaveIntegrityFile(const ZEString& FileName) const
+bool ZEITGenerator::GenerateIntegrityFile() const
 {
 	ZEMLWriter Writer;
 	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
-	if (!Writer.Open(FileName))
+	if (!Writer.Open(IntegrityFileName))
 	{
-		zeError("Cannot write Integrity file. File Name: \"%s\".", FileName.ToCString());
+		zeError("Cannot write Integrity file. File Name: \"%s\".", IntegrityFileName.ToCString());
 		return false;
 	}
 

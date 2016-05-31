@@ -20,6 +20,27 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_8">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_3">
+      <item>
+       <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Integrity File</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLineEdit" name="txtIntegrityFile"/>
+      </item>
+      <item>
+       <widget class="QPushButton" name="btnBrowse">
+        <property name="text">
+         <string>Browse</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QSplitter" name="splitter">
       <property name="orientation">
        <enum>Qt::Vertical</enum>
@@ -355,15 +376,7 @@
     <addaction name="separator"/>
     <addaction name="actQuit"/>
    </widget>
-   <widget class="QMenu" name="menuIntegrity">
-    <property name="title">
-     <string>Integrity File</string>
-    </property>
-    <addaction name="actIntegritySave"/>
-    <addaction name="actIntegritySaveAs"/>
-   </widget>
    <addaction name="menuGenerator_File"/>
-   <addaction name="menuIntegrity"/>
   </widget>
   <widget class="QStatusBar" name="stbStatusBar"/>
   <action name="actIntegritySave">

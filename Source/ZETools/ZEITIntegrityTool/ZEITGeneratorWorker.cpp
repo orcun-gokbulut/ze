@@ -46,10 +46,9 @@ void ZEITGeneratorWorker::run()
 	emit StateChanged();
 
 	Generator->GenerateStart();
+
 	const ZEArray<ZEITRecord>& Records = Generator->GetRecords();
-	bool Result = true;
-	ZESize Index = 0;
-	while (true)
+	for (ZESize Index = 0; Index < Records.GetCount(); Index++)
 	{
 		if (State != ZEIT_GWS_RUNNING)
 		{
@@ -59,10 +58,12 @@ void ZEITGeneratorWorker::run()
 
 		emit RecordUpdated(Index);
 		if (!Generator->Generate(Index))
-			break;
+		{
+			State = ZEIT_GWS_ERROR;
+			emit StateChanged();
+			return;
+		}
 		emit RecordUpdated(Index);
-
-		Index++;
 	}
 
 	State = ZEIT_GWS_DONE;

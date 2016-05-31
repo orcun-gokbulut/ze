@@ -53,13 +53,14 @@ class ZEITIntegrityToolWindow : public QMainWindow
 
 		ZEITGenerator					Generator;
 		ZEITGeneratorWorker*			GeneratorWorker;
-
-		QString							ToolFileName;
-		QString							IntegrityFileName;
+		QString							GeneratorFileName;
 
 		void							UpdateRecord(ZESize Index);
 		void							UpdateLists();
 		void							UpdateUI();
+
+		bool							Open(const QString& FileName);
+		bool							Save(const QString& FileName);
 
 		void							LoadRecentFiles();
 		void							RegisterRecentFile(const QString& FileName);
@@ -75,9 +76,8 @@ class ZEITIntegrityToolWindow : public QMainWindow
 		void							actSaveAs_triggered();
 		void							actQuit_triggered();
 
-		void							actIntegritySave_triggered();
-		void							actIntegritySaveAs_triggered();
-
+		void							txtIntegrityFile_textEdited(const QString&);
+		void							btnBrowse_clicked();
 		void							btnScan_clicked();
 		void							btnGenerate_clicked();
 
