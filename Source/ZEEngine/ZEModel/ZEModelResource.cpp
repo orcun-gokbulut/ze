@@ -396,7 +396,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 				{
 					Mesh->Geometry.SetCount(LOD->VertexCount);
 					for (ZESize N = 0; N < LOD->VertexCount; N++)
-						Mesh->Geometry[N] = ((ZEModelVertex*)Buffer)[N].Position;
+						Mesh->Geometry[N] = (reinterpret_cast<ZEModelVertex*>(Buffer))[N].Position;
 				}
 
 				delete[] Buffer;
