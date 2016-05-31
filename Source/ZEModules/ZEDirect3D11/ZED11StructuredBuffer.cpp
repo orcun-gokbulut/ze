@@ -42,7 +42,7 @@ bool ZED11StructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, 
 {	
 	ZESize BufferSize = ElementCount * ElementSize;
 	zeDebugCheck(BufferSize == 0, "Cannot create zero sized buffer.");
-	zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
+	//zeDebugCheck((BufferSize % 16) != 0, "Buffer size must be multiple of 16.");
 
 	D3D11_BUFFER_DESC Desc;
 	Desc.ByteWidth = (UINT)BufferSize;

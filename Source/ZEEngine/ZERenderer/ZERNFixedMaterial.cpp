@@ -194,7 +194,7 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 	RenderState.SetShader(ZEGR_ST_PIXEL, StageGBuffer_Forward_PixelShader);
 
 	StageGBuffer_Forward_RenderState = RenderState.Compile();
-	zeCheckError(StageGBuffer_Forward_RenderState == NULL, false, "Cannot set gbuffer render state.");
+	zeCheckError(StageGBuffer_Forward_RenderState == NULL, false, "Cannot set gbuffer/forward render state.");
 
 	RenderState = ZERNStageShadowmapGeneration::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
@@ -243,7 +243,7 @@ bool ZERNFixedMaterial::UpdateStageMask() const
 		return true;
 
 	StageMask = ZERN_STAGE_DEBUG;
-	StageMask |= /*(OpacityMapEnabled || TransparencyEnabled) ? (ZERN_STAGE_RENDER_DEPTH | ZERN_STAGE_FORWARD_TRANSPARENT) :*/ ZERN_STAGE_GBUFFER;
+	StageMask |= (OpacityMapEnabled || TransparencyEnabled) ? (ZERN_STAGE_RENDER_DEPTH | ZERN_STAGE_FORWARD_TRANSPARENT) : ZERN_STAGE_GBUFFER;
 	StageMask |= ShadowCaster ? ZERN_STAGE_SHADOW_MAP_GENERATION : 0;
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_STAGE_MASK);
