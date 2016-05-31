@@ -46,26 +46,20 @@ void ZELNIntegrityWorker::run()
 	emit StateChanged();
 
 	Checker->CheckStart();
-
-	if (Checker->GetRecords().GetCount() != 0)
+	for (ZESize Index = 0; Index < Checker->GetRecords().GetCount(); Index++)
 	{
-		bool Result = true;
-		ZESize Index = 0;
-		while (true)
+		if (State != ZELN_IWS_RUNNING)
 		{
-			if (State != ZELN_IWS_RUNNING)
-			{
-				emit StateChanged();
-				return;
-			}
-
-			emit RecordUpdated(Index);
-			if (!Checker->Check(Index))
-				break;
-			emit RecordUpdated(Index);
-
-			Index++;
+			emit StateChanged();
+			return;
 		}
+
+		emit RecordUpdated(Index);
+		bool Result = Checker->Check(Index);
+		emit RecordUpdated(Index);
+
+		if (!Result)
+			break;
 	}
 
 	State = ZELN_IWS_DONE;

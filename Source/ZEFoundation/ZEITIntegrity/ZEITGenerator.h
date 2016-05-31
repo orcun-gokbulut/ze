@@ -67,6 +67,7 @@ class ZEITGenerator
 		ZEArray<ZEITScannerEntry>			Includes;
 		ZEArray<ZEITScannerEntry>			Excludes;
 		bool								DiscardDisabled;
+		ZEString							IntegrityFileName;
 
 		bool								CheckExcluded(const ZEString& Path) const;
 		void								ScanDirectory(const ZEString& Path, bool Recursive);
@@ -91,6 +92,9 @@ class ZEITGenerator
 		void								AddExclude(const ZEITScannerEntry& Entry);
 		void								RemoveExclude(ZESize Index);
 
+		void								SetIntegrityFileName(const ZEString& FileName);
+		const ZEString&						GetIntegrityFileName() const;
+
 		void								SetDiscardDisabled(bool Discard);
 		bool								GetDiscardDisabled() const;
 
@@ -98,14 +102,12 @@ class ZEITGenerator
 
 		void								GenerateStart();
 		bool								Generate(ZESize Index);
+		bool								GenerateIntegrityFile() const;
 
 		void								Clear();
 
 		bool								LoadGeneratorFile(const ZEString& FileName);
 		bool								SaveGeneratorFile(const ZEString& FileName) const;
-
-		bool								LoadIntegrityFile(const ZEString& FileName);
-		bool								SaveIntegrityFile(const ZEString& FileName) const;
 
 											ZEITGenerator();
 };

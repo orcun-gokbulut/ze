@@ -243,11 +243,13 @@ bool ZEITRecord::Generate()
 
 	Result = ZEIT_CR_SUCCESS;
 	Problem = ZEIT_CP_NONE;
+
+	return true;
 }
 
 void ZEITRecord::Reset()
 {
-	Type = ZEIT_RT_NONE;
+	Result = ZEIT_CR_NOT_CHECKED;
 	Problem = ZEIT_CP_NONE;
 }
 

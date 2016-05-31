@@ -159,7 +159,6 @@ void ZEITIntegrityToolWindow::UpdateLists()
 
 	Form->tblRecords->blockSignals(true);
 	const ZEArray<ZEITRecord>& Records = Generator.GetRecords();
-	Form->tblRecords->clearContents();
 	Form->tblRecords->setRowCount(Records.GetCount());
 	for (ZESize I = 0; I < Records.GetCount(); I++)
 		UpdateRecord(I);
@@ -174,8 +173,9 @@ void ZEITIntegrityToolWindow::UpdateUI()
 	Form->btnIncludeRemove->setEnabled(!GeneratorWorkerRunning && Form->lstIncludes->selectedItems().count() != 0);
 	Form->btnExcludeAdd->setEnabled(!GeneratorWorkerRunning);
 	Form->btnExcludeRemove->setEnabled(!GeneratorWorkerRunning && Form->lstExludes->selectedItems().count() != 0);
+	Form->txtIntegrityFile->setEnabled(!GeneratorWorkerRunning);
+	Form->btnBrowse->setEnabled(!GeneratorWorkerRunning);
 	Form->btnScan->setEnabled(!GeneratorWorkerRunning);
-	
 	Form->btnRecordAdd->setEnabled(!GeneratorWorkerRunning);
 	Form->btnRecordRemove->setEnabled(!GeneratorWorkerRunning && Form->tblRecords->selectedItems().count() != 0);
 	Form->btnRecordExclude->setEnabled(!GeneratorWorkerRunning && Form->tblRecords->selectedItems().count() != 0);
@@ -188,7 +188,7 @@ void ZEITIntegrityToolWindow::UpdateUI()
 	Form->actQuit->setEnabled(!GeneratorWorkerRunning);
 	Form->actIntegritySave->setEnabled(!GeneratorWorkerRunning);
 	Form->actIntegritySaveAs->setEnabled(!GeneratorWorkerRunning);
-
+	
 	if (GeneratorWorkerRunning)
 		Form->btnGenerate->setText("Cancel");
 	else
@@ -211,6 +211,49 @@ void ZEITIntegrityToolWindow::RegisterRecentFile(const QString& FileName)
 	Settings.setValue("RecentFiles", RecentFiles);
 
 	LoadRecentFiles();
+}
+
+bool ZEITIntegrityToolWindow::Open(const QString& FileName)
+{
+	Form->stbStatusBar->showMessage(QString("Opening Integrity Generator file \"%1\".").arg(FileName));
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+	if (!Generator.LoadGeneratorFile(FileName.toUtf8().begin()))
+	{
+		QMessageBox::critical(this, "Open Integrity Generator File", "Cannot load file.", QMessageBox::Ok, QMessageBox::NoButton);
+		Form->stbStatusBar->showMessage(QString("Opening Integrity Generator file \"%1\" failed.").arg(Generator.GetIntegrityFileName().ToCString()), 5000);
+		return false;
+	}
+	ZEPathManager::GetInstance()->SetAccessControl(true);
+	Form->stbStatusBar->showMessage(QString("Integrity Generator file \"%1\" opened.").arg(FileName), 5000);
+
+	Form->txtIntegrityFile->setText(Generator.GetIntegrityFileName().ToCString());
+	GeneratorFileName = FileName;
+
+	RegisterRecentFile(FileName);
+
+	UpdateLists();
+	UpdateUI();
+
+	return true;
+}
+
+bool ZEITIntegrityToolWindow::Save(const QString& FileName)
+{
+	Form->stbStatusBar->showMessage(QString("Saving Integrity Generator file \"%1\".").arg(FileName));
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+	if (!Generator.SaveGeneratorFile(FileName.toUtf8().begin()))
+	{
+		QMessageBox::critical(this, "Save Integrity Generator File", "Cannot save file.", QMessageBox::Ok, QMessageBox::NoButton);
+		Form->stbStatusBar->showMessage(QString("Saving Integrity Generator file \"%1\" failed.").arg(FileName), 5000);
+		return false;
+	}
+	ZEPathManager::GetInstance()->SetAccessControl(true);
+	Form->stbStatusBar->showMessage(QString("Integrity Generator file \"%1\" saved.").arg(FileName), 5000);
+
+	GeneratorFileName = FileName;
+	RegisterRecentFile(FileName);
+
+	return true;
 }
 
 void ZEITIntegrityToolWindow::LoadRecentFiles()
@@ -243,7 +286,8 @@ void ZEITIntegrityToolWindow::btnScan_clicked()
 	Form->stbStatusBar->showMessage("Scanning...");
 	Generator.Scan();
 	UpdateLists();
-	Form->stbStatusBar->showMessage("Scanning done.", 5);
+	UpdateUI();
+	Form->stbStatusBar->showMessage("Scanning done.", 5000);
 }
 
 void ZEITIntegrityToolWindow::btnGenerate_clicked()
@@ -253,40 +297,63 @@ void ZEITIntegrityToolWindow::btnGenerate_clicked()
 		Form->prgGenerate->setEnabled(true);
 		Form->prgGenerate->setValue(0);
 		Form->prgGenerate->setMaximum(Generator.GetRecords().GetCount());
-
+		Form->stbStatusBar->showMessage("Generating...");
 		GeneratorWorker->start();
 	}
 	else
 	{
+		Form->stbStatusBar->showMessage("Generate canceled.");
 		GeneratorWorker->Cancel();
 	}
 }
 
 void ZEITIntegrityToolWindow::GeneratorWorker_RecordUpdated(unsigned int RecordIndex)
 {
-	if (RecordIndex < Generator.GetRecords().GetCount())
-	{
-		Form->lblGenerateFile->setText(Generator.GetRecord(RecordIndex).GetPath().ToCString());
-		UpdateRecord(RecordIndex);
-		Form->prgGenerate->setValue(RecordIndex - 1);
-	}
-	else
-	{
-		Form->prgGenerate->setValue(RecordIndex);
-		Form->lblGenerateFile->setText("");
-	}
+	Form->lblGenerateFile->setText(Generator.GetRecord(RecordIndex).GetPath().ToCString());
+	UpdateRecord(RecordIndex);
+	Form->prgGenerate->setValue(RecordIndex);
 }
 
 void ZEITIntegrityToolWindow::GeneratorWorker_StateChanged()
 {
+	if (GeneratorWorker->GetState() == ZEIT_GWS_DONE)
+	{
+		Form->prgGenerate->setValue(Form->prgGenerate->maximum());
+		Form->lblGenerateFile->setText("");
+		Form->stbStatusBar->showMessage("Generate done.", 5000);
+
+		QString IntegrityFileName = Form->txtIntegrityFile->text();
+		Form->stbStatusBar->showMessage(QString("Saving Integrity file \"%1\".").arg(Generator.GetIntegrityFileName().ToCString()));
+		ZEPathManager::GetInstance()->SetAccessControl(false);
+		if (!Generator.GenerateIntegrityFile())
+		{
+			QMessageBox::critical(this, "Save Integrity File", "Cannot save file.", QMessageBox::Ok, QMessageBox::NoButton);
+			Form->stbStatusBar->showMessage(QString("Saving Integrity file \"%1\" failed.").arg(Generator.GetIntegrityFileName().ToCString()), 5000);
+			return;
+		}
+		Form->txtIntegrityFile->setText(Generator.GetIntegrityFileName().ToCString());
+		Form->stbStatusBar->showMessage(QString("Integrity file \"%1\" saved.").arg(Generator.GetIntegrityFileName().ToCString()), 5000);
+	}
+	else if (GeneratorWorker->GetState() == ZEIT_GWS_ERROR)
+	{
+		static bool Fence = false;
+		if (Fence)
+			return;
+		Fence = true;
+		QMessageBox::critical(this, "Save Integrity File", "There are problems in Integrity file. Please correct them.", QMessageBox::Ok, QMessageBox::NoButton);
+		Form->stbStatusBar->showMessage("Generation failed.", 5000);
+		Fence = false;
+	}
+
 	UpdateUI();
 }
 
 void ZEITIntegrityToolWindow::actNew_triggered()
 {
-	ToolFileName = "";
-	IntegrityFileName = "";
+	GeneratorFileName = "";
+	Generator.SetIntegrityFileName("");
 	Generator.Clear();
+	Form->txtIntegrityFile->clear();
 	Form->lstIncludes->clear();
 	Form->lstExludes->clear();
 	Form->tblRecords->clearContents();
@@ -295,85 +362,37 @@ void ZEITIntegrityToolWindow::actNew_triggered()
 
 void ZEITIntegrityToolWindow::actOpen_triggered()
 {
-	QString FileName = QFileDialog::getOpenFileName(this, "Open Integrity Generator File", QString(), "Integrity Generator (*.ZEITGenerator);;All files (*.*)");
+	QString FileName = QFileDialog::getOpenFileName(this, "Open Integrity Generator File", QString(), "Integrity Generator files (*.ZEITGenerator);;All files (*.*)");
 	if (FileName.isEmpty())
 		return;
 
-	Form->stbStatusBar->showMessage(QString("Opening Generator file \"%1\".").arg(FileName));
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	if (!Generator.LoadGeneratorFile(FileName.toUtf8().begin()))
-	{
-		QMessageBox::critical(this, "Open Integrity Generator File", "Cannot load file.", QMessageBox::Ok, QMessageBox::NoButton);
-		return;
-	}
-	ZEPathManager::GetInstance()->SetAccessControl(true);
-	Form->stbStatusBar->showMessage(QString("Generator file \"%1\" opened.").arg(FileName), 5);
-
-	ToolFileName = FileName;
-	RegisterRecentFile(FileName);
-
-	UpdateLists();
-	UpdateUI();
+	Open(FileName);
 }
 
 void ZEITIntegrityToolWindow::mnuRecentFiles_triggered()
 {
 	QString FileName = ((QAction*)sender())->text().toUtf8().constData();
-
-	Form->stbStatusBar->showMessage(QString("Opening Generator file \"%1\".").arg(FileName));
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	if (!Generator.LoadGeneratorFile(FileName.toUtf8().begin()))
-	{
-		QMessageBox::critical(this, "Open Integrity Generator File", "Cannot load file.", QMessageBox::Ok, QMessageBox::NoButton);
-		return;
-	}
-	ZEPathManager::GetInstance()->SetAccessControl(true);
-	Form->stbStatusBar->showMessage(QString("Generator file \"%1\" opened.").arg(FileName), 5);
-
-
-	ToolFileName = FileName;
-
-	UpdateLists();
-	UpdateUI();
+	Open(FileName);
 }
 
 void ZEITIntegrityToolWindow::actSave_triggered()
 {
-	if (ToolFileName.isEmpty())
+	if (GeneratorFileName.isEmpty())
 	{
 		actSaveAs_triggered();
 		return;
 	}
 
-	Form->stbStatusBar->showMessage(QString("Saving Generator file \"%1\".").arg(ToolFileName));
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	if (!Generator.SaveGeneratorFile(ToolFileName.toUtf8().begin()))
-	{
-		QMessageBox::critical(this, "Save Integrity Generator File", "Cannot save file.", QMessageBox::Ok, QMessageBox::NoButton);
-		return;
-	}
-	ZEPathManager::GetInstance()->SetAccessControl(true);
-	Form->stbStatusBar->showMessage(QString("Generator file \"%1\" saved.").arg(ToolFileName), 5);
+	Save(GeneratorFileName);
 }
 
 void ZEITIntegrityToolWindow::actSaveAs_triggered()
 {
-	QString FileName = QFileDialog::getSaveFileName(this, "Save Integrity Generator File", QString(), "Integrity Generator (*.ZEITGenerator);;All files (*.*)");
+	QString FileName = QFileDialog::getSaveFileName(this, "Save Integrity Generator File", QString(), "Integrity Generator files (*.ZEITGenerator);;All files (*.*)");
 	if (FileName.isEmpty())
 		return;
 
-	Form->stbStatusBar->showMessage(QString("Saving Generator file \"%1\".").arg(FileName));
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	if (!Generator.SaveGeneratorFile(FileName.toUtf8().begin()))
-	{
-		QMessageBox::critical(this, "Save Integrity Generator File", "Cannot save file.", QMessageBox::Ok, QMessageBox::NoButton);
-		return;
-	}
-	ZEPathManager::GetInstance()->SetAccessControl(true);
-	Form->stbStatusBar->showMessage(QString("Generator file \"%1\" saved.").arg(FileName), 5);
-
-	ToolFileName = FileName;
-	RegisterRecentFile(FileName);
+	Save(FileName);
 }
 
 void ZEITIntegrityToolWindow::actQuit_triggered()
@@ -383,41 +402,19 @@ void ZEITIntegrityToolWindow::actQuit_triggered()
 		qApp->exit(EXIT_SUCCESS);
 }
 
-void ZEITIntegrityToolWindow::actIntegritySave_triggered()
+void ZEITIntegrityToolWindow::txtIntegrityFile_textEdited(const QString&)
 {
-	if (IntegrityFileName.isEmpty())
-	{
-		actIntegritySaveAs_triggered();
-		return;
-	}
-
-	Form->stbStatusBar->showMessage(QString("Saving Integrity file \"%1\".").arg(IntegrityFileName));
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	if (!Generator.SaveIntegrityFile(IntegrityFileName.toUtf8().begin()))
-	{
-		QMessageBox::critical(this, "Save Integrity File", "Cannot save file.", QMessageBox::Ok, QMessageBox::NoButton);
-		return;
-	}
-	Form->stbStatusBar->showMessage(QString("Integrity file \"%1\" saved.").arg(IntegrityFileName), 5);
+	Generator.SetIntegrityFileName(Form->txtIntegrityFile->text().toUtf8().begin());
 }
 
-void ZEITIntegrityToolWindow::actIntegritySaveAs_triggered()
+void ZEITIntegrityToolWindow::btnBrowse_clicked()
 {
-	QString FileName = QFileDialog::getSaveFileName(this, "Save Integrity File", QString(), "Integrity Generator (*.ZEITIntegrity);;All files (*.*)");
+	QString FileName = QFileDialog::getSaveFileName(this, "Save Integrity File", QString(), "Integrity Generator files (*.ZEITIntegrity);;All files (*.*)");
 	if (FileName.isEmpty())
 		return;
 
-	Form->stbStatusBar->showMessage(QString("Saving Integrity file \"%1\".").arg(FileName));
-	ZEPathManager::GetInstance()->SetAccessControl(false);
-	if (!Generator.SaveIntegrityFile(FileName.toUtf8().begin()))
-	{
-		QMessageBox::critical(this, "Save Integrity Generator File", "Cannot save file.", QMessageBox::Ok, QMessageBox::NoButton);
-		return;
-	}
-	ZEPathManager::GetInstance()->SetAccessControl(true);
-	Form->stbStatusBar->showMessage(QString("Integrity file \"%1\" saved.").arg(FileName), 5);
-
-	IntegrityFileName = FileName;
+	Form->txtIntegrityFile->setText(FileName);
+	Generator.SetIntegrityFileName(FileName.toUtf8().begin());
 }
 
 void ZEITIntegrityToolWindow::lstIncludes_itemSelectionChanged()
@@ -557,7 +554,7 @@ void ZEITIntegrityToolWindow::btnRecordRemove_clicked()
 	QModelIndexList List = Form->tblRecords->selectionModel()->selectedRows();
 	for (int I = List.count() - 1; I >= 0; I--)
 	{
-		Generator.RemoveRecord(I);
+		Generator.RemoveRecord(List[I].row());
 		Form->tblRecords->removeRow(List[I].row());
 	}
 
@@ -583,7 +580,7 @@ void ZEITIntegrityToolWindow::btnRecordExclude_clicked()
 		Item->setText(Entry.GetPath().ToCString());
 		Form->lstExludes->addItem(Item);
 
-		Generator.RemoveRecord(I);
+		Generator.RemoveRecord(List[I].row());
 		Form->tblRecords->removeRow(List[I].row());
 	}
 
@@ -671,9 +668,9 @@ ZEITIntegrityToolWindow::ZEITIntegrityToolWindow()
 	connect(Form->actSave,				SIGNAL(triggered()), this, SLOT(actSave_triggered()));
 	connect(Form->actSaveAs,			SIGNAL(triggered()), this, SLOT(actSaveAs_triggered()));
 	connect(Form->actQuit,				SIGNAL(triggered()), this, SLOT(actQuit_triggered()));
-	connect(Form->actIntegritySave,		SIGNAL(triggered()), this, SLOT(actIntegritySave_triggered()));
-	connect(Form->actIntegritySaveAs,	SIGNAL(triggered()), this, SLOT(actIntegritySaveAs_triggered()));
-	
+
+	connect(Form->btnBrowse,			SIGNAL(clicked()), this, SLOT(btnBrowse_clicked()));
+	connect(Form->txtIntegrityFile,		SIGNAL(textEdited(const QString&)), this, SLOT(txtIntegrityFile_textEdited(const QString&)));
 	connect(Form->btnScan,				SIGNAL(clicked()), this, SLOT(btnScan_clicked()));
 	connect(Form->btnGenerate,			SIGNAL(clicked()), this, SLOT(btnGenerate_clicked()));
 	connect(GeneratorWorker,			SIGNAL(RecordUpdated(unsigned int)), this, SLOT(GeneratorWorker_RecordUpdated(unsigned int)));
