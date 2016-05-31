@@ -525,12 +525,12 @@ void ZEModelMesh::SetCustomDrawOrderEnabled(bool Enabled)
 	DrawOrderIsUserDefined = Enabled;
 }
 
-void ZEModelMesh::SetCustomDrawOrder(ZEUInt8 DrawOrder)
+void ZEModelMesh::SetCustomDrawOrder(ZEInt DrawOrder)
 {
 	UserDefinedDrawOrder = DrawOrder;
 }
 
-ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
+ZEInt ZEModelMesh::GetCustomDrawOrder()
 {
 	return UserDefinedDrawOrder;
 }
@@ -758,11 +758,11 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 	float DrawOrder = 0.0f;
 	float LODDistanceSquare = 0.0f;
 
-	float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	
-	if (!DrawOrderIsUserDefined)
-		DrawOrder = EntityDistanceSquare;
-	else
-		DrawOrder = EntityDistanceSquare * (UserDefinedDrawOrder + 1);
+	//float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	
+	//if (!DrawOrderIsUserDefined)
+		DrawOrder = ClosestBoundingBoxEdgeDistanceSquare;
+	//else
+	//	DrawOrder = ClosestBoundingBoxEdgeDistanceSquare * (UserDefinedDrawOrder + 1);
  	
 	float CurrentDistanceSquare = 0.0f;
 	for (ZESize I = 0; I < LODs.GetCount(); I++)
@@ -783,7 +783,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
-	RenderCommand.Priority = 0;
+	RenderCommand.Priority = DrawOrderIsUserDefined ? UserDefinedDrawOrder : 255;
 	RenderCommand.Order = (MeshLOD->GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -DrawOrder : DrawOrder;
 	RenderCommand.StageMask = MeshLOD->GetMaterial()->GetStageMask();
 	RenderCommand.Entity = Owner;
