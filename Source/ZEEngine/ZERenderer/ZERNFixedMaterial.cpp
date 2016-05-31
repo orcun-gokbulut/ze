@@ -1611,7 +1611,7 @@ void ZERNFixedMaterial::Load(const ZEMLReaderNode& MaterialNode)
 		SetSkinningEnabled(ConfigurationNode.ReadBoolean("SkinningEnabled", false));
 		SetVertexColorEnabled(ConfigurationNode.ReadBoolean("VertexColorEnabled", false));
 
-		SetTransparencyEnabled(ConfigurationNode.ReadBoolean("TransparencyEnabled", false));
+		SetTransparencyEnabled(ConfigurationNode.ReadBoolean("TransparencyEnabled", ConfigurationNode.ReadBoolean("Transparant")));
 		SetTransparencyMode((ZERNTransparencyMode)ConfigurationNode.ReadInt32("TransparencyMode", ZERN_TM_NONE));
 
 		SetAlphaCullEnabled(ConfigurationNode.ReadBoolean("AlphaCullEnabled", false));
