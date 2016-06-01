@@ -78,7 +78,7 @@ class ZELight : public ZEEntity
 		ZEVector3						Color;
 		ZEVector3						Attenuation;
 
-		virtual void					OnTransformChanged();
+		virtual void					ParentTransformChanged();
 
 	public:
 		void							SetRange(float NewValue);

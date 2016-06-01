@@ -39,19 +39,19 @@
 #include "ZEGame/ZEGame.h"
 #include "ZEMath/ZEMath.h"
 
-void ZESectorSelector::OnTransformChanged()
+void ZESectorSelector::UpdateSectors()
 {
 	if (!IsInitialized())
-		return ZEGeographicEntity::OnTransformChanged();
+		return;
 
 	if (IsProcessing)
-		return ZEGeographicEntity::OnTransformChanged();
+		return;
 
 	ZESector* TargetSector = DetermineSector(this);
 	ZESector* OwnerSector = (ZESector*)GetOwner();
 
 	if (TargetSector == NULL)
-		return ZEGeographicEntity::OnTransformChanged();
+		return;
 
 	if (TargetSector != OwnerSector)
 	{
@@ -76,8 +76,18 @@ void ZESectorSelector::OnTransformChanged()
 		SetGeographicScale(CurrentGeographicScale);
 		IsProcessing = false;
 	}
+}
 
-	ZEGeographicEntity::OnTransformChanged();
+void ZESectorSelector::LocalTransformChanged()
+{
+	ZEEntity::LocalTransformChanged();
+	UpdateSectors();
+}
+
+void ZESectorSelector::ParentTransformChanged()
+{
+	ZEEntity::ParentTransformChanged();
+	UpdateSectors();
 }
 
 bool ZESectorSelector::SetOwner(ZEEntity* Owner)

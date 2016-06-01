@@ -83,11 +83,9 @@ void ZEModelMeshLOD::Draw(ZEDrawParameters* DrawParameters, float DrawOrder)
 	{
 		RenderCommand.BoneTransforms.SetCount(LODResource->AffectingBoneIds.GetCount());
 		for (ZESize I = 0; I < LODResource->AffectingBoneIds.GetCount(); I++)
-		{
-			ZEMatrix4x4::Multiply(RenderCommand.BoneTransforms[I], Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform(), this->OwnerMesh->GetLocalTransform());
-		}
+			RenderCommand.BoneTransforms[I] = Owner->GetBones()[(ZESize)LODResource->AffectingBoneIds[I]].GetVertexTransform();
 
-		RenderCommand.WorldMatrix = Owner->GetWorldTransform();
+		RenderCommand.WorldMatrix = OwnerMesh->GetWorldTransform();
 	}
 	else if(OwnerMesh->GetPhysicalCloth() != NULL)
 	{

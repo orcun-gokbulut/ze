@@ -526,15 +526,15 @@ void ZEInterior::CullRooms(ZEDrawParameters* DrawParameters)
 	}
 }
 
-void ZEInterior::OnTransformChanged()
+void ZEInterior::ParentTransformChanged()
 {
+	ZEEntity::ParentTransformChanged();
+
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
-		Rooms[I]->OnTransformChanged();
+		Rooms[I]->ParentTransformChanged();
 
 	for (ZESize I = 0; I < Doors.GetCount(); I++)
 		Doors[I]->TransformChanged = true;
-
-	ZEEntity::OnTransformChanged();
 }
 
 void ZEInterior::SetCullMode(ZEInteriorCullMode Value)
