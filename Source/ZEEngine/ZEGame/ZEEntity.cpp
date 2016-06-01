@@ -43,20 +43,49 @@
 #include "ZEError.h"
 #include "ZEScene.h"
 #include "ZEEntityProvider.h"
-
-#include <string.h>
 #include "ZEMeta/ZEProvider.h"
 
+#include <string.h>
 
-void ZEEntity::OnTransformChanged()
+// Entity Dirty Flags
+typedef ZEFlags ZEEntityDirtyFlags;
+#define ZE_EDF_NONE								0x0000
+#define ZE_EDF_LOCAL_TRANSFORM					0x0001
+#define ZE_EDF_INV_LOCAL_TRANSFORM				0x0002
+#define ZE_EDF_WORLD_TRANSFORM					0x0004
+#define ZE_EDF_INV_WORLD_TRANSFORM				0x0008
+#define ZE_EDF_WORLD_BOUNDING_BOX				0x0010
+
+void ZEEntity::LocalTransformChanged()
 {
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL & ~ZE_EDF_LOCAL_TRANSFORM);
+	EntityDirtyFlags.RaiseFlags(
+		ZE_EDF_LOCAL_TRANSFORM | ZE_EDF_INV_LOCAL_TRANSFORM	|
+		ZE_EDF_WORLD_TRANSFORM | ZE_EDF_INV_WORLD_TRANSFORM	|
+		ZE_EDF_WORLD_BOUNDING_BOX);
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->OnTransformChanged();
+		Components[I]->ParentTransformChanged();
 
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->OnTransformChanged();
+		ChildEntities[I]->ParentTransformChanged();
+}
+
+void ZEEntity::ParentTransformChanged()
+{
+	EntityDirtyFlags.RaiseFlags(
+		ZE_EDF_WORLD_TRANSFORM | ZE_EDF_INV_WORLD_TRANSFORM	|
+		ZE_EDF_WORLD_BOUNDING_BOX);
+
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->ParentTransformChanged();
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		ChildEntities[I]->ParentTransformChanged();
+}
+
+void ZEEntity::BoundingBoxChanged()
+{
+	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 }
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
@@ -127,7 +156,6 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 		return false;
 
 	Entity->SetOwnerScene(this->OwnerScene);
-
 	ChildEntities.Add(Entity);
 
 	if (State == ZE_ES_INITIALIZED)
@@ -153,17 +181,10 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 	Entity->SetOwnerScene(NULL);
 }
 
-void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
-{
-	this->BoundingBox = BoundingBox;
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
-}
-
 bool ZEEntity::SetOwner(ZEEntity* Owner)
 {
 	this->Owner = Owner;
-	OnTransformChanged();
-
+	ParentTransformChanged();
 	return true;
 }
 
@@ -182,10 +203,10 @@ void ZEEntity::SetOwnerScene(ZEScene* Scene)
 		ChildEntities[I]->SetOwnerScene(Scene);
 }
 
-void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox) const
+void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
 	this->BoundingBox = BoundingBox;
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+	BoundingBoxChanged();
 }
 
 bool ZEEntity::InitializeSelf()
@@ -203,14 +224,15 @@ bool ZEEntity::DeinitializeSelf()
 ZEEntity::ZEEntity()
 {
 	Owner = NULL;
+	Name.Clear();
 	OwnerScene = NULL;
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_ALL);
 	Position = ZEVector3(0.0f, 0.0f, 0.0f);
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
 	State = ZE_ES_NOT_INITIALIZED;
+	LocalTransformChanged();
 }
 
 ZEEntity::~ZEEntity()
@@ -222,11 +244,6 @@ ZEEntity::~ZEEntity()
 
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 		ChildEntities[I]->Destroy();
-}
-
-ZEEntityDirtyFlags ZEEntity::GetDirtyFlags() const
-{
-	return EntityDirtyFlags;
 }
 
 ZEDrawFlags ZEEntity::GetDrawFlags() const
@@ -363,9 +380,7 @@ bool ZEEntity::GetEnabled() const
 void ZEEntity::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
-
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
-	OnTransformChanged();
+	LocalTransformChanged();
 }
 
 const ZEVector3& ZEEntity::GetPosition() const
@@ -382,7 +397,9 @@ void ZEEntity::SetWorldPosition(const ZEVector3& NewPosition)
 		SetPosition(Result);
 	}
 	else
+	{
 		SetPosition(NewPosition);
+	}
 }
 
 const ZEVector3 ZEEntity::GetWorldPosition() const
@@ -400,9 +417,7 @@ const ZEVector3 ZEEntity::GetWorldPosition() const
 void ZEEntity::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
-
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
-	OnTransformChanged();
+	LocalTransformChanged();
 }
 
 const ZEQuaternion& ZEEntity::GetRotation() const
@@ -420,7 +435,9 @@ void ZEEntity::SetWorldRotation(const ZEQuaternion& NewRotation)
 		SetRotation(Result);
 	}
 	else
+	{
 		SetRotation(NewRotation);
+	}
 }
 
 const ZEQuaternion ZEEntity::GetWorldRotation() const
@@ -439,9 +456,7 @@ const ZEQuaternion ZEEntity::GetWorldRotation() const
 void ZEEntity::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
-
-	EntityDirtyFlags.RaiseFlags(ZE_EDF_LOCAL_TRANSFORM);
-	OnTransformChanged();
+	LocalTransformChanged();
 }
 
 const ZEVector3& ZEEntity::GetScale() const
@@ -458,7 +473,9 @@ void ZEEntity::SetWorldScale(const ZEVector3& NewScale)
 		SetScale(Temp);
 	}
 	else
+	{
 		SetScale(NewScale);
+	}
 }
 
 const ZEVector3 ZEEntity::GetWorldScale() const

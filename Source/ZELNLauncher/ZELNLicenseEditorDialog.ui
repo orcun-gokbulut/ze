@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>514</width>
-    <height>340</height>
+    <width>446</width>
+    <height>379</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -81,19 +81,6 @@
         </property>
        </widget>
       </item>
-      <item row="5" column="0">
-       <widget class="QLabel" name="txtAp">
-        <property name="minimumSize">
-         <size>
-          <width>125</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Activation Code</string>
-        </property>
-       </widget>
-      </item>
       <item row="5" column="1">
        <widget class="QPlainTextEdit" name="txtActivationCode"/>
       </item>
@@ -132,6 +119,50 @@
        <widget class="QCheckBox" name="chkEnabled">
         <property name="text">
          <string/>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_8">
+        <item>
+         <spacer name="horizontalSpacer_7">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnPasteActivationCode">
+          <property name="text">
+           <string>Paste</string>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnOpenActivationCode">
+          <property name="text">
+           <string>Open</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="4" column="0">
+       <widget class="QLabel" name="txtAp">
+        <property name="minimumSize">
+         <size>
+          <width>125</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Activation Code</string>
         </property>
        </widget>
       </item>
@@ -185,10 +216,15 @@
   </layout>
  </widget>
  <tabstops>
+  <tabstop>txtGUID</tabstop>
   <tabstop>txtLicensee</tabstop>
   <tabstop>txtSerialKey</tabstop>
   <tabstop>txtApplicationName</tabstop>
+  <tabstop>btnPasteActivationCode</tabstop>
+  <tabstop>btnOpenActivationCode</tabstop>
   <tabstop>txtActivationCode</tabstop>
+  <tabstop>btnGeneratePreActivationCode</tabstop>
+  <tabstop>chkEnabled</tabstop>
   <tabstop>btnSave</tabstop>
   <tabstop>btnClose</tabstop>
  </tabstops>

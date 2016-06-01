@@ -107,7 +107,7 @@ class ZEInteriorRoom
 		bool								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
 		bool								RayCastOctree(const ZEOctree<ZESize>& Octree, const ZERay& LocalRay, float& MinT, ZESize& PoligonIndex);
 
-		void								OnTransformChanged();
+		void								ParentTransformChanged();
 
 											ZEInteriorRoom();
 											~ZEInteriorRoom();

@@ -39,9 +39,14 @@
 #include "ZELNLauncher.h"
 #include "ZELNLicenseModule.h"
 #include "ZELNLicenseManagerDialog.h"
-#include "ZEProtect\ZELCLicenseManager.h"
+#include "ZEProtect/ZELCLicenseManager.h"
 
-#include <QtWidgets\QMessageBox>
+#include <QtCore/QTextStream>
+#include <QtCore/QMimeData>
+#include <QtGui/QClipboard>
+#include <QtWidgets/QFileDialog>
+#include <QtWidgets/QDialogButtonBox>
+#include <QtWidgets/QMessageBox>
 
 void ZELNLicenseWidget::UpdateWidget()
 {
@@ -144,6 +149,67 @@ void ZELNLicenseWidget::btnLicenseManager_clicked()
 	Module->LoadLicense();
 }
 
+void ZELNLicenseWidget::btnCopyPreActivationCode_clicked()
+{
+	QClipboard* Clipboard = QApplication::clipboard();
+	Clipboard->setText(Form->txtPreActivationCode->toPlainText());
+}
+
+void ZELNLicenseWidget::btnSavePreActivationCode_clicked()
+{
+	QString FileName = QFileDialog::getSaveFileName(this, "Open Pre-Activation File", QString(), "Text files (*.txt);;All files (*.*)");
+	if (FileName.isEmpty())
+		return;
+	
+	if (QFile::exists(FileName))
+	{
+		int Result = QMessageBox::question(this, "Save Pre-Activation Code", "Are you sure you want to overwrite this file ?", QDialogButtonBox::Yes, QDialogButtonBox::No);
+		if (Result == QDialogButtonBox::No || Result == -1)
+			return;
+	}
+
+	QFile File(FileName);
+	bool Result = File.open(QIODevice::WriteOnly | QIODevice::Text);
+	if (!Result)
+	{
+		QMessageBox::critical(this, "Save Pre-Activation Code", "Cannot open file.", QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
+		return;
+	}
+
+	QTextStream Stream(&File);
+	Stream << Form->txtPreActivationCode->toPlainText();
+
+	File.close();
+}
+
+void ZELNLicenseWidget::btnPasteActivationCode_clicked()
+{
+	QClipboard* Clipboard = QApplication::clipboard();
+	if (!Clipboard->mimeData()->hasText())
+		return;
+
+	Form->txtActivationCode->setPlainText(Clipboard->text());
+}
+
+void ZELNLicenseWidget::btnOpenActivationCode_clicked()
+{
+	QString FileName = QFileDialog::getOpenFileName(this, "Open Activation Code File", QString(), "Text files (*.txt);;All files (*.*)");
+	if (FileName.isEmpty())
+		return;
+
+	QFile File(FileName);
+	bool Result = File.open(QIODevice::ReadOnly | QIODevice::Text);
+	if (!Result)
+	{
+		QMessageBox::critical(this, "Open Activation Code File", "Cannot read file.", QDialogButtonBox::Ok, QDialogButtonBox::NoButton);
+		return;
+	}
+
+	Form->txtActivationCode->setPlainText(File.readAll());
+
+	File.close();
+}
+
 void ZELNLicenseWidget::SetLicense(const ZELCLicense& License)
 {
 	this->License = License;
@@ -164,6 +230,10 @@ ZELNLicenseWidget::ZELNLicenseWidget(QWidget* Parent) : QWidget(Parent)
 	connect(Form->btnEnter, SIGNAL(clicked()), this, SLOT(btnEnter_clicked()));
 	connect(Form->btnActivate, SIGNAL(clicked()), this, SLOT(btnActivate_clicked()));
 	connect(Form->btnLicenseManager, SIGNAL(clicked()), this, SLOT(btnLicenseManager_clicked()));
+	connect(Form->btnCopyPreActivationCode, SIGNAL(clicked()), this, SLOT(btnCopyPreActivationCode_clicked()));
+	connect(Form->btnSavePreActivationCode, SIGNAL(clicked()), this, SLOT(btnSavePreActivationCode_clicked()));
+	connect(Form->btnPasteActivationCode, SIGNAL(clicked()), this, SLOT(btnPasteActivationCode_clicked()));
+	connect(Form->btnOpenActivationCode, SIGNAL(clicked()), this, SLOT(btnOpenActivationCode_clicked()));
 }
 
 ZELNLicenseWidget::~ZELNLicenseWidget()

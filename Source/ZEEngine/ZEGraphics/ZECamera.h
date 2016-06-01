@@ -100,12 +100,20 @@ class ZECamera : public ZEEntity
 		ZEViewFrustum					ViewFrustum;
 		ZEView							View;
 
-										ZECamera();
-
-		virtual void					OnTransformChanged();
+	protected:
+		void							ProjectionTransformChanged();
+		virtual void					LocalTransformChanged();
+		virtual void					ParentTransformChanged();
 		virtual void					UpdateAutoParameters();
 
+										ZECamera();
+
 	public:
+		const ZEMatrix4x4&				GetViewTransform();
+		const ZEMatrix4x4&				GetProjectionTransform();
+		const ZEMatrix4x4&				GetViewProjectionTransform();
+		const ZEView&					GetView();
+		const ZEViewVolume&				GetViewVolume();
 
 		void							SetAutoZ(bool Enabled);
 		bool							GetAutoZ();
@@ -133,16 +141,6 @@ class ZECamera : public ZEEntity
 
 		void							SetShadowFadeDistance(float Value);
 		float							GetShadowFadeDistance() const;
-
-		const ZEMatrix4x4&				GetViewTransform();
-		const ZEMatrix4x4&				GetProjectionTransform();
-		const ZEMatrix4x4&				GetViewProjectionTransform();
-
-		virtual void					SetPosition(const ZEVector3& NewPosition);	
-		virtual void					SetRotation(const ZEQuaternion& NewRotation);
-
-		const ZEView&					GetView();
-		const ZEViewVolume&				GetViewVolume();
 
 		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
 		//ZEVector2						GetScreenPosition(ZEVector3& WorldPosition);

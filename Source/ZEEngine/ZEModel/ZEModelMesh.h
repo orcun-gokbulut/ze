@@ -62,14 +62,14 @@ class ZEModelMesh : public ZEObject
 		ZEModelMesh*						ParentMesh;
 		ZEArray<ZEModelMesh*>				ChildMeshes;
 
-		mutable ZEAABBox					LocalBoundingBox;
-		mutable ZEAABBox					ModelBoundingBox;
-		mutable ZEAABBox					WorldBoundingBox;
-
 		ZEVector3							Position;
 		ZEVector3							Scale;
 		ZEQuaternion						Rotation;
 
+		mutable ZEFlags						DirtyFlags;
+		mutable ZEAABBox					LocalBoundingBox;
+		mutable ZEAABBox					ModelBoundingBox;
+		mutable ZEAABBox					WorldBoundingBox;
 		mutable ZEMatrix4x4					LocalTransform;
 		mutable ZEMatrix4x4					ModelTransform;
 		mutable ZEMatrix4x4					WorldTransform;
@@ -93,19 +93,21 @@ class ZEModelMesh : public ZEObject
 		ZEArray<ZEPlane>					ClippingPlanes;
 
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
-		void								OnTransformChanged();
+
+		void								LocalTransformChanged();
+		void								ParentTransformChanged();
 
 	public:
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();
+
 		ZEPhysicalRigidBody*				GetPhysicalBody();
 		ZEPhysicalCloth*					GetPhysicalCloth();
 
 		const ZEAABBox&						GetLocalBoundingBox() const;
 		const ZEAABBox&						GetModelBoundingBox() const;
 		const ZEAABBox&						GetWorldBoundingBox() const;
-
 		const ZEMatrix4x4&					GetLocalTransform() const;
 		const ZEMatrix4x4&					GetModelTransform() const;
 		const ZEMatrix4x4&					GetWorldTransform() const;

@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>472</width>
-    <height>381</height>
+    <height>538</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -51,9 +51,9 @@
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>-270</y>
+        <y>-137</y>
         <width>455</width>
-        <height>651</height>
+        <height>675</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -275,11 +275,42 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>Pre Activation Code</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_5">
+            <item>
+             <widget class="QLabel" name="label_3">
+              <property name="text">
+               <string>Pre Activation Code</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_4">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnCopyPreActivationCode">
+              <property name="text">
+               <string>Copy</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnSavePreActivationCode">
+              <property name="text">
+               <string>Save</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QPlainTextEdit" name="txtPreActivationCode">
@@ -289,11 +320,42 @@
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="label_7">
-            <property name="text">
-             <string>Activation Code</string>
-            </property>
-           </widget>
+           <layout class="QHBoxLayout" name="horizontalLayout_6">
+            <item>
+             <widget class="QLabel" name="label_7">
+              <property name="text">
+               <string>Activation Code</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer_5">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnPasteActivationCode">
+              <property name="text">
+               <string>Paste</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QPushButton" name="btnOpenActivationCode">
+              <property name="text">
+               <string>Open</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
           </item>
           <item>
            <widget class="QPlainTextEdit" name="txtActivationCode"/>
@@ -344,6 +406,21 @@
    </item>
   </layout>
  </widget>
+ <tabstops>
+  <tabstop>scrollArea</tabstop>
+  <tabstop>btnLicenseManager</tabstop>
+  <tabstop>txtLicensee</tabstop>
+  <tabstop>txtSerialKey</tabstop>
+  <tabstop>btnEnter</tabstop>
+  <tabstop>txtSerialKeyActivation</tabstop>
+  <tabstop>btnCopyPreActivationCode</tabstop>
+  <tabstop>btnSavePreActivationCode</tabstop>
+  <tabstop>txtPreActivationCode</tabstop>
+  <tabstop>btnPasteActivationCode</tabstop>
+  <tabstop>btnOpenActivationCode</tabstop>
+  <tabstop>txtActivationCode</tabstop>
+  <tabstop>btnActivate</tabstop>
+ </tabstops>
  <resources>
   <include location="ZELNLauncher.qrc"/>
  </resources>
