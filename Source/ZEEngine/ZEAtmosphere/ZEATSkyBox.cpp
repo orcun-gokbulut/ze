@@ -50,7 +50,7 @@
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
-#include "ZERenderer/ZERNStagePostProcess.h"
+#include "ZERenderer/ZERNStageAtmosphere.h"
 #include "ZETexture/ZETextureCubeResource.h"
 
 #define	ZEAT_SBDF_SHADERS			1
@@ -184,15 +184,9 @@ bool ZEATSkyBox::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZEAT_SBDF_RENDER_STATE))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
-
-	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
-	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
-	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
-
-	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
 	ZEGRRasterizerState RasterizerStateFrontCCW;
 	RasterizerStateFrontCCW.SetFrontIsCounterClockwise(true);
@@ -243,7 +237,7 @@ ZEATSkyBox::ZEATSkyBox()
 
 	SkyRenderCommand.Entity = this;
 	SkyRenderCommand.Priority = 1;
-	SkyRenderCommand.StageMask = ZERN_STAGE_POST_EFFECT;
+	SkyRenderCommand.StageMask = ZERN_STAGE_ATMOSPHERE;
 
 	SkyTexture = NULL;
 
@@ -281,13 +275,9 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ZEGRContext* Context = Parameters->Context;
 	ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
-
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferTransform.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	ZEGRTexture* Texture = SkyTexture->GetTexture();
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());

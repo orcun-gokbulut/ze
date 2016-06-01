@@ -314,7 +314,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
     
 		BaseColor = lerp(BaseColor, DetailBaseColor * BaseColor, DetailBaseAttenuation);
 	#endif
-
+	
 	float3 AmbientColor = BaseColor * (ZERNFixedMaterial_SceneAmbientEnabled ? ZERNScene_AmbientColor : ZERNFixedMaterial_AmbientColor);
 	float3 DiffuseColor = BaseColor * ZERNFixedMaterial_DiffuseColor;
 	float3 SpecularColor = ZERNFixedMaterial_SpecularColor;
@@ -330,7 +330,7 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	#endif
 
 	#if defined(ZERN_FM_SPECULAR_GLOSS_MAP)
-		SpecularPower = ZERNFixedMaterial_SpecularGlossMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r;
+		SpecularPower *= ZERNFixedMaterial_SpecularGlossMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).r;
 	#endif
 
 	float SubsurfaceScattering = ZERNFixedMaterial_SubSurfaceScatteringFactor;

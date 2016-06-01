@@ -53,6 +53,7 @@ bool ZERNStagePostProcess::InitializeSelf()
 void ZERNStagePostProcess::DeinitializeSelf()
 {
 	AccumulationTexture = NULL;
+	DepthTexture = NULL;
 
 	ZERNStage::DeinitializeSelf();
 }
@@ -61,6 +62,10 @@ bool ZERNStagePostProcess::UpdateInputOutputs()
 {
 	AccumulationTexture = GetPrevOutput(ZERN_SO_ACCUMULATION);
 	if (AccumulationTexture == NULL)
+		return false;
+
+	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthTexture == NULL)
 		return false;
 
 	return true;
@@ -73,7 +78,7 @@ ZEInt ZERNStagePostProcess::GetId() const
 
 const ZEString& ZERNStagePostProcess::GetName() const
 {
-	static const ZEString Name = "Post Process Stage";
+	static const ZEString Name = "Stage post process";
 	return Name;
 }
 
@@ -88,6 +93,7 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 
 	return true;
@@ -117,6 +123,7 @@ const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) con
 ZERNStagePostProcess::ZERNStagePostProcess()
 {
 	AccumulationTexture = NULL;
+	DepthTexture = NULL;
 }
 
 ZEGRRenderState ZERNStagePostProcess::GetRenderState()
@@ -124,15 +131,15 @@ ZEGRRenderState ZERNStagePostProcess::GetRenderState()
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
 
-	if(!Initialized)
+	if (!Initialized)
 	{
 		Initialized = true;
 
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthTestEnable(false);
-		DepthStencilState.SetDepthWriteEnable(false);
+		ZEGRDepthStencilState DepthStencilStateNoTestWrite;
+		DepthStencilStateNoTestWrite.SetDepthTestEnable(false);
+		DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
 
-		RenderState.SetDepthStencilState(DepthStencilState);
+		RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 
 		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);

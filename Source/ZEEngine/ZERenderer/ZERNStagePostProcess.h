@@ -46,6 +46,7 @@ class ZERNStagePostProcess : public ZERNStage
 	ZE_OBJECT
 	private:
 		const ZEGRTexture2D*				AccumulationTexture;
+		const ZEGRTexture2D*				DepthTexture;
 
 		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();

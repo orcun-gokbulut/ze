@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStageRenderDepth.h
+ Zinek Engine - ZERNStageAtmosphere.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -39,10 +39,11 @@
 
 class ZEGRTexture2D;
 
-class ZERNStageRenderDepth : public ZERNStage
+class ZERNStageAtmosphere : public ZERNStage
 {
 	ZE_OBJECT
 	private:
+		const ZEGRTexture2D*			AccumulationTexture;
 		const ZEGRTexture2D*			DepthTexture;
 
 		virtual bool					InitializeSelf();						
@@ -59,7 +60,7 @@ class ZERNStageRenderDepth : public ZERNStage
 		virtual bool					Setup(ZEGRContext* Context);
 		virtual void					CleanUp(ZEGRContext* Context);
 
-										ZERNStageRenderDepth();
+										ZERNStageAtmosphere();
 
 		static ZEGRRenderState			GetRenderState();
 };

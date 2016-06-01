@@ -693,4 +693,5 @@ ZERNStageLighting::ZERNStageLighting()
 	UseTiledDeferred = false;
 
 	memset(&Constants, 0, sizeof(Constants));
+	memset(&DirectionalLightShadowMaps, NULL, sizeof(ZEGRTexture*) * 2);
 }

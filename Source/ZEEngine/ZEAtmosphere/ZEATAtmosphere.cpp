@@ -56,7 +56,7 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCuller.h"
-#include "ZERenderer/ZERNStageGBuffer.h"
+#include "ZERenderer/ZERNStageAtmosphere.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZEATAstronomy.h"
 #include "ZEATSun.h"
@@ -155,27 +155,20 @@ bool ZEATAtmosphere::UpdateRenderState()
 	if (!DirtyFlags.GetFlags(ZEAT_ADF_RENDER_STATE))
 		return true;
 
-	ZEGRRenderState RenderState;
-
+	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
 
-	ZEGRDepthStencilState DepthStencilStateNoTestWrite;
-	DepthStencilStateNoTestWrite.SetDepthTestEnable(true);
-	DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
+	ZEGRBlendState BlendState;
+	BlendState.SetBlendEnable(true);
+	ZEGRBlendRenderTarget RenderTarge0_BlendAdditive = BlendState.GetRenderTarget(0);
+	RenderTarge0_BlendAdditive.SetSource(ZEGRBlend::ZEGR_BO_ONE);
+	RenderTarge0_BlendAdditive.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
+	RenderTarge0_BlendAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	RenderTarge0_BlendAdditive.SetBlendEnable(true);
+	BlendState.SetRenderTargetBlend(0, RenderTarge0_BlendAdditive);
 
-	RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
-
-	ZEGRBlendState BlendStateAlphaBlending;
-	BlendStateAlphaBlending.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlending = BlendStateAlphaBlending.GetRenderTarget(0);
-	BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_ONE);
-	BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
-	BlendRenderTargetAlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
-	BlendRenderTargetAlphaBlending.SetBlendEnable(true);
-	BlendStateAlphaBlending.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlending);
-
-	RenderState.SetBlendState(BlendStateAlphaBlending);
+	RenderState.SetBlendState(BlendState);
 
 	RenderState.SetShader(ZEGR_ST_PIXEL, SkyPixelShader);
 
@@ -552,7 +545,7 @@ ZEATAtmosphere::ZEATAtmosphere()
 	DirtyFlags.RaiseAll();
 
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.StageMask = ZERN_STAGE_ATMOSPHERE;
 	Command.Priority = 3;
 
 	TerrestrialSunColor = ZEVector3::Zero;
@@ -679,7 +672,6 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 		SunLight->SetWorldRotation(SunRotation);
 		SunLight->SetVisible(SunVisible);
-		SunLight->SetCastsShadow(SunVisible);
 		SunLight->SetTerrestrialColor(TerrestrialSunColor);
 	}
 
@@ -783,15 +775,12 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	ZEGRContext* Context = Parameters->Context;
 	ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
+	//const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
 
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, SkyConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(SkyRenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	//Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, UseMultipleScattering ? reinterpret_cast<ZEGRTexture**>(&PrecomputedMultipleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
 
 	Context->Draw(3, 0);
 }

@@ -49,7 +49,7 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZERenderer/ZERNStagePostProcess.h"
+#include "ZERenderer/ZERNStageAtmosphere.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNFilter.h"
 #include "ZETexture/ZETexture2DResource.h"
@@ -156,7 +156,7 @@ bool ZEATCloud::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZE_CDF_RENDER_STATES))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_16_CONTROL_POINT_PATCHLIST);
 	RenderState.SetVertexLayout(GetPositionTexcoordVertexLayout());
 
@@ -165,21 +165,16 @@ bool ZEATCloud::UpdateRenderStates()
 
 	RenderState.SetRasterizerState(RasterizerStateFrontCCW);
 
-	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
-	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
-	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
-	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
+	ZEGRBlendState BlendState;
+	BlendState.SetBlendEnable(true);
+	ZEGRBlendRenderTarget RenderTarget0_AlphaBlending = BlendState.GetRenderTarget(0);
+	RenderTarget0_AlphaBlending.SetBlendEnable(true);
+	RenderTarget0_AlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
+	RenderTarget0_AlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
+	RenderTarget0_AlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	BlendState.SetRenderTargetBlend(0, RenderTarget0_AlphaBlending);
 
-	ZEGRBlendState BlendStateAlphaBlending;
-	BlendStateAlphaBlending.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTargetAlphaBlending = BlendStateAlphaBlending.GetRenderTarget(0);
-	BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
-	BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
-	BlendRenderTargetAlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
-	BlendRenderTargetAlphaBlending.SetBlendEnable(true);
-	BlendStateAlphaBlending.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlending);
-
-	RenderState.SetBlendState(BlendStateAlphaBlending);
+	RenderState.SetBlendState(BlendState);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, PlaneVertexShader);
 	RenderState.SetShader(ZEGR_ST_HULL, PlaneHullShader);
@@ -254,13 +249,13 @@ ZEATCloud::ZEATCloud()
 
 	RenderCommand.Entity = this;
 	RenderCommand.Priority = 4;
-	RenderCommand.StageMask = ZERN_STAGE_POST_EFFECT;
+	RenderCommand.StageMask = ZERN_STAGE_ATMOSPHERE;
 
 	CloudTexture = NULL;
 
 	Constants.PlaneSubdivision = 10.0f;
-	Constants.CloudCoverage = 0.5f;
-	Constants.CloudDensity = 1.0f;
+	Constants.CloudCoverage = 0.0f;
+	Constants.CloudDensity = 0.0f;
 	Constants.LightColor = ZEVector3::One;
 	Constants.Inscattering = 0.05f;
 	Constants.LightDirection = ZEVector3::One;
@@ -428,13 +423,9 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	ZEGRContext* Context = Parameters->Context;	
 	ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
-
 	Context->SetConstantBuffers(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, PlaneTransformConstantBuffer.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_ALL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(PlaneRenderStateData);
-	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	ZEGRTexture* Texture = CloudTexture->GetTexture();
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
