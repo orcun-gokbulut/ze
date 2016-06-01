@@ -206,6 +206,8 @@ bool ZERNStageResolving::UpdateInputOutputs()
 			ResolvedDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
 		}
 	}
+	
+	return true;
 }
 
 bool ZERNStageResolving::Update()

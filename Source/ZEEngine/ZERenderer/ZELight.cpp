@@ -137,8 +137,6 @@ ZELight::ZELight()
 
 	ViewTransform = ZEMatrix4x4::Identity;
 	ProjectionTransform = ZEMatrix4x4::Identity;
-
-	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
 }
 
 ZELight::~ZELight()
@@ -317,6 +315,7 @@ bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
 	if (!ZEEntity::PreRender(CullParameters))
 		return false;
 
+	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
 	if (CastsShadows)
 		Command.StageMask |= ZERN_STAGE_SHADOWING;
 

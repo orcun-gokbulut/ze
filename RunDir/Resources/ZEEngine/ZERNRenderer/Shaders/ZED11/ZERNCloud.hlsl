@@ -202,13 +202,17 @@ float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input)
 	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
 	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNSampler_LinearWrap, ZERNCloud_PlaneSubdivision * TexCoord, 0.0f);
 	
-	float4 CloudCoverage = max(0.0f, ZERNCloud_CloudCoverage - float4(1.0f, 0.75f, 0.25f, 1.0f));
-	float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
-
-	float MieDensity = exp(-CloudDensity * CloudDensity);
-	float3 ResultColor = ZERNCloud_LightColor * PhaseMie * MieDensity + ZERNCloud_Inscattering;
+	//float4 CloudCoverage = max(0.0f, ZERNCloud_CloudCoverage - float4(0.25f, 0.50f, 0.75f, 0.75f));
+	//float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
+	//float4 CloudPathLengthPerLayer = max(0.0f, CloudSample - (1.0f - ZERNCloud_CloudCoverage));
+	//float CloudCoverage = dot(ZERNCloud_CloudCoverage, float4(0.25f, 0.50f, 0.75f, 0.75f));
+	float CloudPathLength = dot(CloudSample + ZERNCloud_CloudCoverage, float4(0.25f, 0.50f, 0.75f, 0.75f));
 	
-	return float4(ResultColor, (CloudDensity / (CloudDensity + 1.0f)));
+	float Exponent = ZERNCloud_CloudDensity * CloudPathLength;
+	float Transmittance = exp(-Exponent * Exponent);
+	float3 ResultColor = ZERNCloud_LightColor * PhaseMie * Transmittance + ZERNCloud_Inscattering;
+	
+	return float4(ResultColor, max(1.0f - Transmittance, 0.0f));
 }
 
 #endif

@@ -241,12 +241,12 @@ void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);
+	//const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);
 
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthMap);
+	//Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthMap);
 	
 	Context->Draw(3, 0);
 }

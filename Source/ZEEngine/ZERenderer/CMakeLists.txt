@@ -121,6 +121,8 @@ ze_add_source(ZERNStageResolving.h 					Sources Headers ZEMC)
 ze_add_source(ZERNStageResolving.cpp				Sources)
 ze_add_source(ZERNStageRenderDepth.h 				Sources Headers ZEMC)
 ze_add_source(ZERNStageRenderDepth.cpp				Sources)
+ze_add_source(ZERNStageAtmosphere.h 				Sources Headers ZEMC)
+ze_add_source(ZERNStageAtmosphere.cpp				Sources)
 
 ze_add_library(TARGET ZERenderer 
 	SOURCES ${Sources}
