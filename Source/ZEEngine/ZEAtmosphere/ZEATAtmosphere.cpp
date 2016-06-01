@@ -687,7 +687,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
 	}
 
-	ZEVector3 AmbientColor = ZEVector3(0.02f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
+	ZEVector3 AmbientColor = ZEVector3(0.005f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
 	zeScene->SetAmbientColor(AmbientColor);
 	zeScene->SetAmbientFactor(1.0f);
 
@@ -698,12 +698,14 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	Sun->SetColor(TerrestrialSunColor * 50.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
+	Sun->SetVisible(SunVisible);
 
 	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
 	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
 	Moon->SetColor(TerrestrialMoonColor * 5.0f);
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
+	Moon->SetVisible(!SunVisible);
 
 	if (SunVisible)
 	{
@@ -746,7 +748,11 @@ bool ZEATAtmosphere::PreRender(const ZERNCullParameters* CullParameters)
 
 	if (SunLight != NULL)
 	{
-		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * 5.0f;
+		ZEVector3 SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
+		float CosSunZenith = ZEVector3::DotProduct(ZEVector3::UnitY, SunDirection);
+		float SunIntensity = (CosSunZenith > -0.2f) ? 5.0f : 0.5f;
+
+		Constants.SunColor = SunLight->GetColor() * SunLight->GetIntensity() * SunIntensity;
 		Constants.SunDirection = SunLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.SunDirection.NormalizeSelf();
 
@@ -775,11 +781,11 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 	ZEGRContext* Context = Parameters->Context;
 	ZERNStage* Stage = Parameters->Stage;
 
-	//const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
+	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
 
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, SkyConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(SkyRenderStateData);
-	//Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, UseMultipleScattering ? reinterpret_cast<ZEGRTexture**>(&PrecomputedMultipleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
 
 	Context->Draw(3, 0);
