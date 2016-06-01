@@ -1059,7 +1059,8 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LO
 				if (!Mesh->GetBinormal(BinormalTangentIndex, Temp))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
 
-				ZEMatrix4x4::Transform3x3(Vertex->Binormal, TangentTransform, ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEVector3 InverseBinormal = -(ZE3dsMaxUtils::MaxtoZE(Temp));
+				ZEMatrix4x4::Transform3x3(Vertex->Binormal, TangentTransform, InverseBinormal);
 
 				if (!Mesh->GetTexVertex(Face->texCoord[N], *(Point2*)&Vertex->Texcoord))
 					zeError("Can not get texture coordinate of face %d vertex %d.", I, N, BinormalTangentIndex);
