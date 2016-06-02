@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_READER_H__
-#define __ZEML_READER_H__
 
 #include "ZEMLElement.h"
 #include "ZEMLFormat.h"
@@ -47,111 +45,112 @@
 #include "ZEFile/ZEFile.h"
 #include "ZEPointer/ZEPointer.h"
 
-
-struct ZEMLReaderProperty
+class ZEMLReaderProperty
 {
-	ZEMLElementType	ElementType;
-	ZEString		Name;
-	ZEMLValueType	ValueType;
-	ZEValue			Value;
-	ZEUInt64		DataSize;
-	ZEUInt64		DataOffset;
+	public:
+		ZEMLElementType					ElementType;
+		ZEString						Name;
+		ZEMLValueType					ValueType;
+		ZEValue							Value;
+		ZEUInt64						DataSize;
+		ZEUInt64						DataOffset;
 
-					ZEMLReaderProperty();
+										ZEMLReaderProperty();
 };
 
-struct ZEMLReaderSubNode
+class ZEMLReaderSubNode
 {
-	ZEString		Name;
-	ZEUInt64		Offset;
-	ZEUInt64		Size;
+	public:
+		ZEString						Name;
+		ZEUInt64						Offset;
+		ZEUInt64						Size;
 	
-					ZEMLReaderSubNode();
+										ZEMLReaderSubNode();
 };
 
 class ZEMLReaderNode
 {
 	friend class ZEMLReader;
 	private:
-		ZEFile*						File;
-		ZEMLFormat*					Format;
-		ZEMLFormatElement			Node;
+		ZEFile*							File;
+		ZEMLFormat*						Format;
+		ZEMLFormatElement				Node;
+		ZEString						Path;
 
-		ZEArray<ZEMLFormatElement>	Elements;
-		ZESize						NodeCount;
+		ZEArray<ZEMLFormatElement>		Elements;
+		ZESize							NodeCount;
 
-		const ZEMLFormatElement*	FindElement(const char* Name, ZEMLElementType Type, ZESize Index = 0) const;
-		bool						Load();
+		const ZEMLFormatElement*		FindElement(const char* Name, ZEMLElementType Type, ZESize Index = 0) const;
+		bool							Load();
 		 
 	public:
-		const ZEString&						GetName() const;
-		const ZEArray<ZEMLFormatElement>&	GetElements() const;
+		const ZEFile*					GetFile() const;
+		const ZEString&					GetName() const;
+		const ZEString&					GetPath() const;
 
-		ZESize						GetNodeCount() const;
-		ZESize						GetNodeCount(const char* Name) const;
+		const ZEArray<ZEMLFormatElement>& GetElements() const;
 
-		ZEMLReaderNode				GetNode(const char* Name, ZESize Index = 0) const;
-		ZEMLReaderNode				GetNode(ZESize Index) const;
+		ZESize							GetNodeCount() const;
+		ZESize							GetNodeCount(const char* Name) const;
 
-		bool						IsValid() const;
-		bool						IsPropertyExists(const char* Name) const;
-		bool						IsSubNodeExists(const char* Name) const;
+		ZEMLReaderNode					GetNode(const char* Name, ZESize Index = 0) const;
+		ZEMLReaderNode					GetNode(ZESize Index) const;
 
-		ZEValue						ReadValue(const char* Name) const;
-		ZEInt8						ReadInt8(const char* Name, ZEInt8 Default = 0) const;
-		ZEInt16						ReadInt16(const char* Name, ZEInt16 Default = 0) const;
-		ZEInt32						ReadInt32(const char* Name, ZEInt32 Default = 0) const;
-		ZEInt64						ReadInt64(const char* Name, ZEInt64 Default = 0) const;
-		ZEUInt8						ReadUInt8(const char* Name, ZEUInt8 Default = 0) const;
-		ZEUInt16					ReadUInt16(const char* Name, ZEUInt16 Default = 0) const;
-		ZEUInt32					ReadUInt32(const char* Name, ZEUInt32 Default = 0) const;
-		ZEUInt64					ReadUInt64(const char* Name, ZEUInt64 Default = 0) const;
-		float						ReadFloat(const char* Name, float Default = 0.0f) const;
-		double						ReadDouble(const char* Name, double Default = 0.0) const;
-		bool						ReadBoolean(const char* Name, bool Default = false) const;
-		ZEVector2					ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero) const;
-		ZEVector2d					ReadVector2d(const char* Name, const ZEVector2d& Default = ZEVector2d::Zero) const;
-		ZEVector3					ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero) const;
-		ZEVector3d					ReadVector3d(const char* Name, const ZEVector3d& Default = ZEVector3d::Zero) const;
-		ZEVector4					ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero) const;
-		ZEVector4d					ReadVector4d(const char* Name, const ZEVector4d& Default = ZEVector4d::Zero) const;
-		ZEQuaternion				ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero) const;
-		ZEMatrix3x3					ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero) const;
-		ZEMatrix3x3d				ReadMatrix3x3d(const char* Name, const ZEMatrix3x3d& Default = ZEMatrix3x3d::Zero) const;
-		ZEMatrix4x4					ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero) const;
-		ZEMatrix4x4d				ReadMatrix4x4d(const char* Name, const ZEMatrix4x4d& Default = ZEMatrix4x4d::Zero) const;
-		ZEString					ReadString(const char* Name, const ZEString& Default = "") const;
+		bool							IsValid() const;
+		bool							IsPropertyExists(const char* Name) const;
+		bool							IsSubNodeExists(const char* Name) const;
 
-		ZESize						ReadDataSize(const char* Name) const;
-		bool						ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0) const;
-		bool						ReadDataItems(const char* Name, void* Buffer, ZESize ItemSize, ZESize ItemCount, ZESize Offset = 0) const;
+		ZEValue							ReadValue(const char* Name) const;
+		ZEInt8							ReadInt8(const char* Name, ZEInt8 Default = 0) const;
+		ZEInt16							ReadInt16(const char* Name, ZEInt16 Default = 0) const;
+		ZEInt32							ReadInt32(const char* Name, ZEInt32 Default = 0) const;
+		ZEInt64							ReadInt64(const char* Name, ZEInt64 Default = 0) const;
+		ZEUInt8							ReadUInt8(const char* Name, ZEUInt8 Default = 0) const;
+		ZEUInt16						ReadUInt16(const char* Name, ZEUInt16 Default = 0) const;
+		ZEUInt32						ReadUInt32(const char* Name, ZEUInt32 Default = 0) const;
+		ZEUInt64						ReadUInt64(const char* Name, ZEUInt64 Default = 0) const;
+		float							ReadFloat(const char* Name, float Default = 0.0f) const;
+		double							ReadDouble(const char* Name, double Default = 0.0) const;
+		bool							ReadBoolean(const char* Name, bool Default = false) const;
+		ZEVector2						ReadVector2(const char* Name, const ZEVector2& Default = ZEVector2::Zero) const;
+		ZEVector2d						ReadVector2d(const char* Name, const ZEVector2d& Default = ZEVector2d::Zero) const;
+		ZEVector3						ReadVector3(const char* Name, const ZEVector3& Default = ZEVector3::Zero) const;
+		ZEVector3d						ReadVector3d(const char* Name, const ZEVector3d& Default = ZEVector3d::Zero) const;
+		ZEVector4						ReadVector4(const char* Name, const ZEVector4& Default = ZEVector4::Zero) const;
+		ZEVector4d						ReadVector4d(const char* Name, const ZEVector4d& Default = ZEVector4d::Zero) const;
+		ZEQuaternion					ReadQuaternion(const char* Name, const ZEQuaternion& Default = ZEQuaternion::Zero) const;
+		ZEMatrix3x3						ReadMatrix3x3(const char* Name, const ZEMatrix3x3& Default = ZEMatrix3x3::Zero) const;
+		ZEMatrix3x3d					ReadMatrix3x3d(const char* Name, const ZEMatrix3x3d& Default = ZEMatrix3x3d::Zero) const;
+		ZEMatrix4x4						ReadMatrix4x4(const char* Name, const ZEMatrix4x4& Default = ZEMatrix4x4::Zero) const;
+		ZEMatrix4x4d					ReadMatrix4x4d(const char* Name, const ZEMatrix4x4d& Default = ZEMatrix4x4d::Zero) const;
+		ZEString						ReadString(const char* Name, const ZEString& Default = "") const;
 
-		const ZEFile*				GetFile() const;
+		ZESize							ReadDataSize(const char* Name) const;
+		bool							ReadData(const char* Name, void* Buffer, ZESize BufferSize, ZESize Offset = 0) const;
+		bool							ReadDataItems(const char* Name, void* Buffer, ZESize ItemSize, ZESize ItemCount, ZESize Offset = 0) const;
 
-									ZEMLReaderNode();
+										ZEMLReaderNode();
 };
 
 class ZEMLReader
 {
 	private:
-		ZEFile						OwnedFile;
-		ZEFile*						File;
-		ZEPointer<ZEMLFormat>		Format;
-		ZEMLReaderNode				RootNode;
+		ZEFile							OwnedFile;
+		ZEFile*							File;
+		ZEPointer<ZEMLFormat>			Format;
+		ZEMLReaderNode					RootNode;
 
-		bool						Load();
+		bool							Load();
 
 	public:
-		ZEMLReaderNode				GetRootNode();
+		ZEMLReaderNode					GetRootNode();
 
-		ZEMLFormat*					GetFormat();
+		ZEMLFormat*						GetFormat();
 
-		bool						Open(const char* FileName);
-		bool						Open(ZEFile* File);
-		void						Close();
+		bool							Open(const char* FileName);
+		bool							Open(ZEFile* File);
+		void							Close();
 
-									ZEMLReader();
-									~ZEMLReader();
+										ZEMLReader();
+										~ZEMLReader();
 };
-
-#endif

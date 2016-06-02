@@ -60,12 +60,12 @@ void ZEUICursorControl::Draw(ZEUIRenderer* Renderer)
 
 	ZEUIControl::Draw(Renderer);
 	Cursor.ZOrder = GetZOrder();
-	Renderer->AddRectangle(Cursor);
+	Renderer->AddRectangle(&Cursor);
 }
 
 void ZEUICursorControl::Tick(float ElapsedTime)
 {
-	InputMap.Update();
+	/*InputMap.Update();
 
 	ZESize InputActionCount = InputMap.GetActionCount();
 	const ZEInputAction* InputActions = InputMap.GetActions();
@@ -150,7 +150,7 @@ void ZEUICursorControl::Tick(float ElapsedTime)
 	else if (GetPosition().y < 0)
 	{
 		SetPosition(ZEVector2(GetPosition().x, 0));
-	}
+	}*/
 }
 
 ZEUIMouseKey ZEUICursorControl::GetCurrentButton()
@@ -162,16 +162,6 @@ void ZEUICursorControl::SetZOrder(ZEInt32 Z)
 {
 	ZEUIControl::SetZOrder(Z);
 	Cursor.ZOrder = Z;
-}
-
-ZEMaterial* ZEUICursorControl::GetMaterial() const
-{
-	return CursorMaterial;
-}
-
-void ZEUICursorControl::SetMaterial(ZEMaterial* Material)
-{
-	Cursor.Material = (ZEUIMaterial*)Material;
 }
 
 ZEUICursorControl::ZEUICursorControl()
@@ -188,7 +178,7 @@ ZEUICursorControl::ZEUICursorControl()
 	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON1, ZE_IS_RELEASED, ACTIONID_RIGHT_RELEASE);
 	InputMap.AddButtonAction("Mouse", ZE_IMB_BUTTON2, ZE_IS_RELEASED, ACTIONID_MIDDLE_RELEASE);
 
-	SetHeight(24);
+	/*SetHeight(24);
 	SetWidth(24);	
 
 	ZEInt32 Width, Height;
@@ -202,14 +192,14 @@ ZEUICursorControl::ZEUICursorControl()
 	Cursor.Texcoords.RightDown = ZEVector2::One;
 
 	CursorMaterial = ZEUIMaterial::CreateInstance();
-	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("#R:/ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture());
+	CursorMaterial->SetTexture(ZETexture2DResource::LoadResource("#R:/ZEEngine/ZEGUI/Textures/Cursor.png")->GetTexture2D());
 	Cursor.Material = CursorMaterial;
 	Cursor.Color = GetBackgroundColor();
 
 	SetEnabled(true);
 	SetFocusable(false);
 
-	CurentButton = ZE_UI_MOUSE_BUTTON_NONE;
+	CurentButton = ZE_UI_MOUSE_BUTTON_NONE;*/
 	
 }
 

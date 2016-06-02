@@ -37,13 +37,14 @@
 #ifndef	__ZE_MODEL_BONE_H__
 #define __ZE_MODEL_BONE_H__
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
-#include "ZEDS/ZEFlags.h"
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")

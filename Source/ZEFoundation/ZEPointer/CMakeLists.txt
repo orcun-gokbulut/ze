@@ -35,6 +35,8 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEDeletor.cpp				Sources)
+ze_add_source(ZEDeletor.h				Sources Headers)
 ze_add_source(ZEPointer.cpp				Sources)
 ze_add_source(ZEPointer.h				Sources Headers)
 ze_add_source(ZEPointerTests.cpp		Tests)
@@ -46,6 +48,10 @@ ze_add_source(ZEWeakPointer.h			Sources Headers)
 ze_add_source(ZEWeakPointerTests.cpp	Tests)
 ze_add_source(ZEPointerTestClass.h		Tests)
 ze_add_source(ZEPointerTestClass.cpp	Tests)
+ze_add_source(ZEReferenceCounted.cpp	Sources)
+ze_add_source(ZEReferenceCounted.h		Sources Headers)
+ze_add_source(ZEHolder.cpp				Sources)
+ze_add_source(ZEHolder.h				Sources Headers)
 
 ze_add_library(TARGET ZEPointer 
 	SOURCES ${Sources} 

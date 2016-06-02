@@ -34,27 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_MESH_H__
-#define __ZE_MODEL_MESH_H__
+
+#include "ZEMeta/ZEObject.h"
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
 #include "ZEModelMeshLOD.h"
-#include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
 #include "ZEModelResource.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEGame/ZERayCast.h"
+#include "ZERenderer/ZERNCommand.h"
 
+class ZERNCullParameters;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 
 class ZEModelMesh : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEModel;
 	friend class ZEModelMeshLOD;
-	ZE_OBJECT
+
 	private:
 		ZEModel*							Owner;
 
@@ -75,6 +75,8 @@ class ZEModelMesh : public ZEObject
 		mutable ZEMatrix4x4					WorldTransform;
 		mutable ZEMatrix4x4					InvWorldTransform;
 
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+
 		bool								PhysicsEnabled;
 		ZEPhysicalRigidBody*				PhysicalBody;
 		ZEPhysicalCloth*					PhysicalCloth;
@@ -83,7 +85,7 @@ class ZEModelMesh : public ZEObject
 		ZEUInt								ActiveLOD;
 
 		bool								DrawOrderIsUserDefined;
-		ZEUInt8								UserDefinedDrawOrder;
+		ZEInt								UserDefinedDrawOrder;
 
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
@@ -91,8 +93,11 @@ class ZEModelMesh : public ZEObject
 		ZEArray<ZEModelMeshLOD>				LODs;
 
 		ZEArray<ZEPlane>					ClippingPlanes;
-
+		ZERNCommand							RenderCommand;
+		
 		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
+
+		void								UpdateConstantBuffer();
 
 		void								LocalTransformChanged();
 		void								ParentTransformChanged();
@@ -166,16 +171,16 @@ class ZEModelMesh : public ZEObject
 		const ZEPlane&						GetClippingPlane(ZESize Index);
 
 		void								SetCustomDrawOrderEnabled(bool Enabled);
-		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);
-		ZEUInt8								GetCustomDrawOrder();
+		void								SetCustomDrawOrder(ZEInt DrawOrder);
+		ZEInt								GetCustomDrawOrder();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		void								Draw(ZEDrawParameters* DrawParameters);
+		bool								PreRender(const ZERNCullParameters* CullParameters);
+
 		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();
 											~ZEModelMesh();
 };
-#endif

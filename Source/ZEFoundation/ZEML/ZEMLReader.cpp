@@ -37,6 +37,7 @@
 #include "ZEEndian.h"
 #include "ZEPointer\ZEPointer.h"
 #include "ZEDS\ZEHashGenerator.h"
+#include "ZEDS\ZEFormat.h"
 
 #define ZEML_ITEM_FILE_IDENTIFIER	'Z'
 #define ZEML_MAX_NAME_SIZE			256
@@ -83,9 +84,19 @@ bool ZEMLReaderNode::Load()
 	return true;
 };
 
+const ZEFile* ZEMLReaderNode::GetFile() const
+{
+	return File;
+}
+
 const ZEString& ZEMLReaderNode::GetName() const
 {
 	return Node.Name;
+}
+
+const ZEString& ZEMLReaderNode::GetPath() const
+{
+	return Path;
 }
 
 const ZEArray<ZEMLFormatElement>& ZEMLReaderNode::GetElements() const
@@ -138,6 +149,7 @@ ZEMLReaderNode ZEMLReaderNode::GetNode(ZESize Index) const
 	Node.File = File;
 	Node.Format = Format;
 	Node.Node = Elements[Index];
+	Node.Path = ZEFormat::Format("{0}/{1}", Path, Elements[Index].Name);
 
 	if (!Node.Load())
 	{
@@ -435,11 +447,6 @@ bool ZEMLReaderNode::ReadDataItems(const char* Name, void* Buffer, ZESize Elemen
 	return ReadData(Name, Buffer, ElementCount * ElementSize, Offset);
 }
 
-const ZEFile* ZEMLReaderNode::GetFile() const
-{
-	return File;
-}
-
 ZEMLReaderNode::ZEMLReaderNode()
 {
 	NodeCount = 0;
@@ -472,17 +479,26 @@ bool ZEMLReader::Load()
 	RootNode.Format = Format;
 
 	if (!Format->ReadHeader(File))
+	{
+		zeError("Cannot reade header.. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
+	}
 
 	if (!Format->ReadElement(File, RootNode.Node))
+	{
+		zeError("Cannot read element: \"%s\".", File->GetPath().ToCString());
 		return false;
+	}
+
+	RootNode.Path = RootNode.Node.Name;
 
 	if (RootNode.Node.ElementType != ZEML_ET_NODE)
+	{
+		zeError("Corrupted ZEML file first element is not node. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
+	}
 
 	return RootNode.Load();
-
-	return false;
 }
 
 ZEMLReaderNode ZEMLReader::GetRootNode()

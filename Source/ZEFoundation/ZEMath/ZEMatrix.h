@@ -55,6 +55,26 @@ enum ZERotationOrder
 	ZE_RO_ZYX
 };
 
+// ZEMatrix3x3Shader - ShaderStorage
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+class ZEMatrix3x3Shader
+{
+	public:
+		union
+		{
+			struct
+			{
+				float	M11, M21, M31, Unused0,
+						M12, M22, M32, Unused1,
+						M13, M23, M33, Unused2;
+			};
+
+			float M[4][3];
+			float MA[12];
+		};
+};
+
+
 // ZEMatrix3x3
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix3x3
@@ -130,6 +150,8 @@ class ZEMatrix3x3
 		ZEVector2						Get2DScale();
 		static void						Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZEVector2& Scale, const ZEMatrix3x3& Matrix);
 
+		ZEMatrix3x3Shader				ToMatrix3x3Shader();
+
 		ZEMatrix3x3						operator+(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator-(const ZEMatrix3x3 &RightOperand) const;
 		ZEMatrix3x3						operator*(const ZEMatrix3x3 &RightOperand) const;
@@ -182,10 +204,11 @@ class ZEMatrix4x4
 		static const ZEMatrix4x4		Zero;
 		static const ZEMatrix4x4		Identity;
 
-		static void						Create(ZEMatrix4x4& Matrix, float M11, float M12, float M13, float M14,
-											   float M21, float M22, float M23, float M24,
-											   float M31, float M32, float M33, float M34,
-											   float M41, float M42, float M43, float M44);
+		static void						Create(ZEMatrix4x4& Matrix, 
+											float M11, float M12, float M13, float M14,
+											float M21, float M22, float M23, float M24,
+											float M31, float M32, float M33, float M34,
+											float M41, float M42, float M43, float M44);
 		static void						Create(ZEMatrix4x4& Matrix, float* M);
 		static void						CreateRotationX(ZEMatrix4x4& Matrix, float Pitch);
 		static void						CreateRotationY(ZEMatrix4x4& Matrix, float Yawn);
@@ -205,6 +228,7 @@ class ZEMatrix4x4
 		static void						CreateLookAtTransform(ZEMatrix4x4& Matrix, const ZEVector3& Position, const ZEVector3& Target, const ZEVector3& Up);
 		static void						CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width, float Height, float NearZ, float FarZ);
 		static void						CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ);
+		static void						CreatePerspectiveProjectionOffCenter(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
 		static void						CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ);
 		static void						CreateScreenTransform(ZEMatrix4x4& Matrix, float ScreenWidth, float ScreenHeight);
 

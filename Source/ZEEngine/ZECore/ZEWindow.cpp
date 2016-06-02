@@ -33,15 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
-#include "ZECore.h"
-#include "ZEError.h"
 #include "ZEWindow.h"
-#include "ZEConsole.h"
-#include "ZEInput/ZEInputModule.h"
-#include "ZESystemMessageManager.h"
-#include "ZESystemMessageHandler.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+
+#include "ZEGraphics\ZEGRAdapter.h"
+#include "ZEGraphics\ZEGROutput.h"
+#include "ZEError.h"
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
@@ -49,142 +45,73 @@
 #include <stdio.h>
 #include "ZEWindowResources.h"
 
-#define ZEWINDOW_WINDOWNAME		"Zinek Engine"
-#define ZEWINDOW_CLASSNAME		"ZINEKENGINE"
-
-char*  Parameters;
-
-ZEWindow* Window = NULL;
-bool WindowInitialization;
-
-
-static void PaintBlack(HWND hwnd)
-{
-	PAINTSTRUCT ps;
-	RECT rc;
-	HDC hdc = BeginPaint(hwnd, &ps);
-	GetClientRect(hwnd, &rc);
-	HBRUSH hBrush = CreateSolidBrush(RGB(0,0,0));
-	FillRect(hdc, &rc, hBrush);
-	EndPaint(hwnd, &ps);
-	DeleteObject(hBrush);
-}
 
 static void ManageCursorVisibility(HWND hWnd, LPARAM lParam)
 {
-	WORD Handle = LOWORD(lParam);
+	ZEWindow* Window = (ZEWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
 	static bool CursorHidden = false;
-	if (Handle == HTCLIENT && !CursorHidden && !Window->GetMouseCursorVisibility() && GetFocus() == hWnd)
+	if (LOWORD(lParam) == HTCLIENT && !Window->GetHideCursor() && GetFocus() == hWnd)
 	{
-		CursorHidden = true;
 		ShowCursor(false);
 	}
-	else if (Handle != HTCLIENT && CursorHidden) 
+	else if (LOWORD(lParam) != HTCLIENT || Window->GetHideCursor() || GetFocus() != hWnd) 
 	{
-		CursorHidden = false;
 		ShowCursor(true);
 	}
 }
 
-static void LockMousePosition(HWND hWnd)
+static void ManageCursorLock(HWND hWnd)
 {
-	if (!Window->GetMouseCursorLockEnabled())
-		return;
-
-	RECT Rect;
-	GetClientRect(hWnd, &Rect);
-
-	RECT ScreenRect;
-	POINT Point;
-	Point.x = Rect.left; Point.y = Rect.top;
-	ClientToScreen(hWnd, &Point);
-	ScreenRect.left = Point.x; ScreenRect.top = Point.y;
-	Point.x = Rect.right; Point.y = Rect.bottom;
-	ClientToScreen(hWnd, &Point);
-	ScreenRect.right = Point.x; ScreenRect.bottom = Point.y;
-
-	ClipCursor(&ScreenRect);
-}
-
-static void UnlockMousePosition(HWND hWnd)
-{
-	ClipCursor(NULL);
-}
-
-LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
-{
-	switch (msg)
+	ZEWindow* Window = (ZEWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	if (Window->GetLockCursor())
 	{
-		case WM_CREATE:
-			break;
+		RECT Rect;
+		GetClientRect(hWnd, &Rect);
 
-		case WM_SIZE:
-			if (!WindowInitialization)
-				Window->WindowResized(LOWORD(lParam), HIWORD(lParam));
-			break;
+		RECT ScreenRect;
+		POINT Point;
+		Point.x = Rect.left; Point.y = Rect.top;
+		ClientToScreen(hWnd, &Point);
+		ScreenRect.left = Point.x; ScreenRect.top = Point.y;
+		Point.x = Rect.right; Point.y = Rect.bottom;
+		ClientToScreen(hWnd, &Point);
+		ScreenRect.right = Point.x; ScreenRect.bottom = Point.y;
+		ClipCursor(&ScreenRect);
+	}
+	else
+	{
+		ClipCursor(NULL);
+	}
+}
 
-		case WM_PAINT:
-			if (ZECore::GetInstance()->GetGraphicsModule() != NULL)
-				ValidateRect(hWnd, NULL);
-			else
-				PaintBlack(hWnd);
-			break;
+static DWORD GetWindowStyle(ZEWindow* Window)
+{
+	DWORD Style = 0;
+	if (Window->GetFullscreen())
+	{
+		Style = WS_POPUP | WS_EX_TOPMOST | WS_VISIBLE | WS_MAXIMIZE;
+	}
+	else
+	{
+		if (Window->GetBorderlessMode())
+		{
+			Style = WS_POPUP;
+		}
+		else 
+		{
+			Style |= WS_OVERLAPPED | WS_CAPTION | WS_BORDER | WS_SYSMENU | WS_MINIMIZEBOX;
+			if (Window->GetResizable())
+				Style |= WS_SIZEBOX | WS_MAXIMIZEBOX;
+		}
 
-		case WM_SETCURSOR:
-			ManageCursorVisibility(hWnd, lParam);
-			break;
-
-		/*case WM_ACTIVATEAPP:
-			if (wParam == TRUE)
-			{
-				Window->WindowGainedFocus();
-				LockMousePosition(hWnd);
-			}
-			else
-			{
-				Window->WindowLostFocus();
-				UnlockMousePosition(hWnd);
-			}
-			break;*/
-		
-		case WM_LBUTTONDOWN:
-		case WM_RBUTTONDOWN:
-		case WM_MBUTTONDOWN:
-			LockMousePosition(hWnd);
-			break;
-
-		case WM_ACTIVATE:
-			if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
-			{
-				Window->WindowGainedFocus();
-				LockMousePosition(hWnd);
-			}
-			else if (wParam == WA_INACTIVE)
-			{
-				Window->WindowLostFocus();
-				UnlockMousePosition(hWnd);
-			}
-			break;
-
-		case WM_CLOSE:
-			if (MessageBox(hWnd, "Do you really want to exit Zinek Engine ?", "Zinek Engine", MB_ICONQUESTION | MB_YESNO) == IDYES)
-			{
-				Window->WindowDestroyed();
-			}
-			break;
-
-		case WM_DESTROY:
-			Window->WindowDestroyed();
-			break;
-
-		default:
-			return DefWindowProc(hWnd, msg, wParam, lParam);
+		if (Window->GetVisible())
+			Style |= WS_VISIBLE;
 	}
 
-	return true;
+	return Style;
 }
 
-void ShowWindowError()
+static void ShowWindowError()
 {
     LPVOID lpMsgBuf;
     DWORD dw = GetLastError(); 
@@ -202,294 +129,475 @@ void ShowWindowError()
     LocalFree(lpMsgBuf);
 }
 
-void ZEWindow::WindowGainedFocus()
+class ZEWindowCallback
 {
-	zeLog("Main window gained focus.");
-	if (ZEInputModule::GetInstance() != NULL)
-		ZEInputModule::GetInstance()->Acquire();
-}
+	public:
+		static LRESULT CALLBACK Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+};
 
-void ZEWindow::WindowLostFocus()
+LRESULT CALLBACK ZEWindowCallback::Callback(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
-	zeLog("Window lost focus.");
-	if (ZEInputModule::GetInstance() != NULL)
-		ZEInputModule::GetInstance()->UnAcquire();
-}
-
-void ZEWindow::WindowDestroyed()
-{
-	exit(EXIT_SUCCESS);
-	zeCore->ShutDown();
-}
-
-bool ZEWindow::CreateMainWindow(const char* WindowTitle)
-{
-	DWORD Style;
-	switch(WindowType)
+	ZEWindow* Window = (ZEWindow*)GetWindowLongPtr(hWnd, GWLP_USERDATA);
+	switch (msg)
 	{
-		case ZE_WT_DEFAULT:
-		case ZE_WT_FIXEDSIZE:
-			Style = WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MINIMIZE;
+		case WM_CREATE:
+		{
+			LPCREATESTRUCT CreateStruct = (LPCREATESTRUCT)lParam;
+			SetWindowLongPtr(hWnd, GWLP_USERDATA, (LONG_PTR)CreateStruct->lpCreateParams);
 			break;
-		case ZE_WT_RESIZABLE:
-			Style = WS_SIZEBOX | WS_OVERLAPPED | WS_SYSMENU | WS_CAPTION | WS_MINIMIZE;
+		}
+
+		case WM_SIZE:
+			Window->Width = (ZEUInt)LOWORD(lParam);
+			Window->Height = (ZEUInt)HIWORD(lParam);
+			if (Window->Output != NULL)
+				Window->Output->Resize(Window->Width, Window->Height);
 			break;
-		case ZE_WT_FULLSCREEN:
-			Style = WS_EX_TOPMOST | WS_POPUP;
+
+		case WM_PAINT:
+			if (Window->GetOutput() != NULL)
+			{
+				ValidateRect(hWnd, NULL);
+			}
+			else
+			{
+				PAINTSTRUCT ps;
+				RECT rc;
+				HDC hdc = BeginPaint(hWnd, &ps);
+				GetClientRect(hWnd, &rc);
+				HBRUSH hBrush = (HBRUSH)GetStockObject(GRAY_BRUSH);
+				FillRect(hdc, &rc, hBrush);
+				EndPaint(hWnd, &ps);
+			}
 			break;
-		case ZE_WT_COMPONENT:
-			zeError("Wrong Window Type you can not create window with component type. Component windows are provided from the out size of Zinek Engine. Use SetComponentWindow function.");
+
+		case WM_SETCURSOR:
+		{
+			WORD Area = LOWORD(lParam);
+			LRESULT Result =  DefWindowProc(hWnd, msg, wParam, lParam);
+			if (Window->GetHideCursor() && LOWORD(lParam) == HTCLIENT && GetActiveWindow() == hWnd)
+				SetCursor(NULL);
+			return Result;
+		}
+
+		case WM_MOVE:
+			Window->Left = (ZEInt)(short)LOWORD(lParam);
+			Window->Top = (ZEInt)(short)HIWORD(lParam);
+			break;
+
+		case WM_MOVING:
+			Window->Left = (ZEInt)(short)LOWORD(lParam);
+			Window->Top = (ZEInt)(short)HIWORD(lParam);
+			break;
+
+		case WM_LBUTTONDOWN:
+		case WM_RBUTTONDOWN:
+		case WM_MBUTTONDOWN:
+			ManageCursorLock(hWnd);
+			break;
+
+		case WM_ACTIVATE:
+			if (wParam == WA_ACTIVE || wParam == WA_CLICKACTIVE)
+				ManageCursorLock(hWnd);
+			else if (wParam == WA_INACTIVE)
+				ClipCursor(NULL);
+			break;
+
+		case WM_SHOWWINDOW:
+			if (wParam == TRUE)
+				ManageCursorLock(hWnd);
+			else
+				ClipCursor(NULL);
+			break;
+
+		case WM_CLOSE:
+			ClipCursor(NULL);
+			DestroyWindow(hWnd);
+			break;
+
+		case WM_DESTROY:
+			PostQuitMessage(0);
+			break;
+
+		default:
+			return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+
+	return 0;
+}
+
+ZEWindow::ZEWindow()
+{
+	Handle = NULL;
+	Output = NULL;
+
+	Title = "Zinek Engine";
+	Left = 0;
+	Top = 0;
+	Width = 640;
+	Height = 480;
+
+	Visible = true;
+	BorderlessMode = false;
+	Resizable = true;
+	Fullscreen = false;
+
+	HideCursor = false;
+	LockCursor = false;
+}
+
+ZEWindow::~ZEWindow()
+{
+
+}
+
+void ZEWindow::ChangeWidowGeometry()
+{
+	if (Handle == NULL || Fullscreen)
+		return;
+
+	RECT ClientRectangle, WindowRectangle;
+	POINT Difference;
+	GetClientRect((HWND)Handle, &ClientRectangle);
+	GetWindowRect((HWND)Handle, &WindowRectangle);
+	Difference.x = (WindowRectangle.right - WindowRectangle.left) - ClientRectangle.right;
+	Difference.y = (WindowRectangle.bottom - WindowRectangle.top) - ClientRectangle.bottom;
+	MoveWindow((HWND)Handle, WindowRectangle.left, WindowRectangle.top, Width + Difference.x, Height + Difference.y, TRUE);
+}
+
+void ZEWindow::ChangeWindowConfiguration()
+{
+	if (Handle == NULL)
+		return;
+
+	SetWindowLong((HWND)Handle, GWL_STYLE, GetWindowStyle(this));
+
+	if (Output == NULL)
+		return;
+
+	if (Fullscreen)
+	{
+		//MoveWindow((HWND)Handle, 0, 0, MonitorMode->GetWidth(), MonitorMode->GetHeight(), FALSE);
+		//Output->SetMonitorMode(MonitorMode);
+		Output->SetFullscreen(true);
+	}
+	else if (!Fullscreen && Output->GetFullscreen())
+	{
+		Output->SetFullscreen(false);
+	}
+}
+
+bool ZEWindow::CreateWindow_()
+{
+	static bool ClassCreated = false;
+	if (!ClassCreated)
+	{
+		WNDCLASSEX wc;
+		wc.cbSize			= sizeof(WNDCLASSEX);
+		wc.style			= CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
+		wc.lpfnWndProc		= ZEWindowCallback::Callback;
+		wc.cbClsExtra		= 0;
+		wc.cbWndExtra		= 0;
+		wc.hInstance		= (HINSTANCE)GetModuleHandle(NULL);
+		wc.hIcon			= NULL;
+		wc.hCursor			= LoadCursor(NULL, IDC_ARROW);
+		wc.hbrBackground	= NULL;
+		wc.lpszMenuName		= NULL;
+		wc.lpszClassName	= "ZEWindow";
+		wc.hIconSm			= NULL;
+
+		if(RegisterClassEx(&wc) == 0)
+		{
+			zeError("Could not register windows class.");
+			ShowWindowError();
 			return false;
+		}
+
+		ClassCreated = true;
 	}
 
-	WNDCLASSEX wc;
-	wc.cbSize			= sizeof(WNDCLASSEX);
-	wc.style			= CS_DBLCLKS | CS_OWNDC | CS_HREDRAW | CS_VREDRAW;
-	wc.lpfnWndProc		= Callback;
-    wc.cbClsExtra		= 0;
-    wc.cbWndExtra		= 0;
-	wc.hInstance		= (HINSTANCE)zeCore->GetApplicationInstance();
-    wc.hIcon			= LoadIcon((HINSTANCE)zeCore->GetApplicationInstance(), MAKEINTRESOURCE(IDI_ICON1));
-    wc.hCursor			= NULL;
-    wc.hbrBackground	= NULL;
-    wc.lpszMenuName		= NULL;
-    wc.lpszClassName	= "ZINEK ENGINE WINDOW";
-    wc.hIconSm			= NULL;
-
-	if(RegisterClassEx(&wc) == 0)
-	{
-		ShowWindowError();
-		zeError("Could not register windows class.");
-		ShowWindowError();
-		return false;
-	}
-
-	WindowHandle = CreateWindowEx(WS_EX_APPWINDOW, 
-        "ZINEK ENGINE WINDOW", 
-        WindowTitle, 
-		Style, 
+	Handle = CreateWindowEx(WS_EX_APPWINDOW, 
+        "ZEWindow", 
+        Title.ToCString(), 
+		GetWindowStyle(this), 
         CW_USEDEFAULT,
-		0, 
-		WindowWidth,
-        WindowHeight, 
+		CW_USEDEFAULT, 
+		Width,
+        Height, 
         NULL, 
         NULL, 
-		(HINSTANCE)zeCore->GetApplicationInstance(), 
-        NULL);
-	
-	if (!WindowHandle)
+		(HINSTANCE)GetModuleHandle(NULL), 
+        this);
+
+	if (!Handle)
 	{
 		ShowWindowError();
 		zeError("Can not create window.");
 		return false;
 	}
-	
-	if (WindowType != ZE_WT_FULLSCREEN)
-		SetWindowSize(WindowWidth, WindowHeight);
 
-	ShowWindow();
+	RECT Rect;
+	GetWindowRect((HWND)Handle, &Rect);
+	Left = Rect.left;
+	Top = Rect.top;
+	
+	ChangeWidowGeometry();
+	SetVisible(GetVisible());
+	
+	if (Visible)
+	{
+		ShowWindow((HWND)Handle, SW_SHOW);
+		UpdateWindow((HWND)Handle);
+	}
 
 	return true;
 }
 
-bool ZEWindow::DestroyMainWindow()
+bool ZEWindow::DestroyWindow()
 {
-	if (DestroyWindow((HWND)WindowHandle) == 0)
+	if(!IsWindow((HWND)Handle))
+		return false;
+
+	if (::DestroyWindow((HWND)Handle) == 0)
 	{
-		zeError("Can not destroy window.");
 		ShowWindowError();
+		zeError("Can not destroy window.");
 		return false;
 	}
 	 
 	return true;
 }
 
-void ZEWindow::SetWindowType(ZEWindowType WindowType)
+bool ZEWindow::InitializeSelf()
 {
-	this->WindowType = WindowType;
+	if (!CreateWindow_())
+		return false;
+
+	//Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM);
 }
 
-ZEWindowType ZEWindow::GetWindowType()
+void ZEWindow::DeinitializeSelf()
 {
-	return WindowType;
-}
-
-bool ZEWindow::SetComponentWindowHandle(void* Handle)
-{
-	WindowHandle = Handle;
-	RECT Rect;
-	GetWindowRect((HWND)WindowHandle, &Rect);
-	WindowWidth = Rect.right - Rect.left;
-	WindowHeight = Rect.bottom - Rect.top;
-	if (zeGraphics != NULL)
-		zeGraphics->SetScreenSize(WindowWidth, WindowHeight);
-
-	WindowType = ZE_WT_COMPONENT;
-	return true;
-}
-
-void ZEWindow::WindowResized(ZEInt Width, ZEInt Height)
-{
-
-/*	if (WindowHandle != NULL && WindowType != ZE_WT_COMPONENT)
-	{
-		RECT ClientRectangle, WindowRectangle;
-		POINT Difference;
-		GetClientRect((HWND)WindowHandle, &ClientRectangle);
-		GetWindowRect((HWND)WindowHandle, &WindowRectangle);
-		Difference.x = (WindowRectangle.right - WindowRectangle.left) - ClientRectangle.right;
-		Difference.y = (WindowRectangle.bottom - WindowRectangle.top) - ClientRectangle.bottom;
-	}*/
-
-	if (zeGraphics != NULL)
-		zeGraphics->SetScreenSize(Width, Height);
-
-	WindowWidth = Width;
-	WindowHeight = Height;
-}
-
-void ZEWindow::SetWindowPosition(ZEInt Left, ZEInt Top)
-{
-	if (WindowType == ZE_WT_COMPONENT || WindowType == ZE_WT_FULLSCREEN)
-		return;
-	WindowPositionLeft = Left;
-	WindowPositionTop = Top;
-	if (WindowHandle != NULL)
-	{
-		RECT Rect;
-		GetWindowRect((HWND)WindowHandle, &Rect);
-		MoveWindow((HWND)WindowHandle, Left, Top, Rect.right - Rect.left, Rect.bottom - Rect.top, FALSE);
-	}
-}
-
-void ZEWindow::GetWindowPosition(ZEInt& Left, ZEInt& Top)
-{
-	RECT Rect;
-	GetWindowRect((HWND)WindowHandle, &Rect);
-	Left = Rect.left;
-	Top = Rect.top;
-}
-
-void ZEWindow::SetWindowSize(ZEInt Width, ZEInt Height)
-{
-	if (WindowType != ZE_WT_COMPONENT)
-	{
-		RECT ClientRectangle, WindowRectangle;
-		POINT Difference;
-		if (WindowHandle != NULL)
-		{
-			GetClientRect((HWND)WindowHandle, &ClientRectangle);
-			GetWindowRect((HWND)WindowHandle, &WindowRectangle);
-			Difference.x = (WindowRectangle.right - WindowRectangle.left) - ClientRectangle.right;
-			Difference.y = (WindowRectangle.bottom - WindowRectangle.top) - ClientRectangle.bottom;
-			MoveWindow((HWND)WindowHandle, WindowRectangle.left, WindowRectangle.top, Width + Difference.x, Height + Difference.y, TRUE);
-		}
-	}
-	WindowResized(Width, Height);
-}
-
-void ZEWindow::GetWindowSize(ZEInt& Width, ZEInt& Height)
-{
-	RECT Rect;
-	GetClientRect((HWND)WindowHandle, &Rect);
-	Width = Rect.right - Rect.left;
-	Height = Rect.bottom - Rect.top;
+	Output = NULL;
+	DestroyWindow();
 }
 
 void* ZEWindow::GetHandle()
 {
-	return WindowHandle;
+	return Handle;
 }
 
-ZEVector2 ZEWindow::GetAbsoluteCursorPosition()
+ZEGROutput* ZEWindow::GetOutput()
+{
+	return Output;
+}
+
+void ZEWindow::SetTitle(const ZEString& Title)
+{
+	if (this->Title == Title)
+		return;
+
+	this->Title = Title;
+
+	if (Handle == NULL)
+		return;
+
+	SetWindowText((HWND)Handle, Title.ToCString());
+}
+
+const ZEString& ZEWindow::GetTitle()
+{
+	return Title;
+}
+
+void ZEWindow::SetLeft(ZEInt Left)
+{
+	if (this->Left == Left)
+		return;
+
+	this->Left = Left;
+
+	if (Handle == NULL || Fullscreen)
+		return;
+
+	RECT Rect;
+	GetWindowRect((HWND)Handle, &Rect);
+	MoveWindow((HWND)Handle, Left, Top, Rect.right - Rect.left, Rect.bottom - Rect.top, FALSE);
+}
+
+void ZEWindow::SetTop(ZEInt Top)
+{
+	if (this->Top == Top)
+		return;
+
+	this->Top = Top;
+
+	if (Handle == NULL || Fullscreen)
+		return;
+
+	RECT Rect;
+	GetWindowRect((HWND)Handle, &Rect);
+	MoveWindow((HWND)Handle, Left, Top, Rect.right - Rect.left, Rect.bottom - Rect.top, FALSE);
+}
+
+void ZEWindow::SetWidth(ZEUInt Width)
+{
+	if (this->Height == Height)
+		return;
+
+	this->Height = Height;
+
+	ChangeWidowGeometry();
+}
+
+ZEUInt ZEWindow::GetWidth()
+{
+	return Width;
+}
+
+void ZEWindow::SetHeight(ZEUInt Height)
+{
+	if (this->Height == Height)
+		return;
+
+	this->Height = Height;
+
+	if (Handle == NULL || Fullscreen)
+		return;
+
+	ChangeWidowGeometry();
+}
+
+ZEUInt ZEWindow::GetHeigth()
+{
+	return Height;
+}
+
+void ZEWindow::SetVisible(bool Visible)
+{
+	if (this->Visible == Visible)
+		return;
+
+	this->Visible = Visible;
+
+	if (Handle == NULL || Fullscreen)
+		return;
+
+	::ShowWindow((HWND)Handle, Visible ? SW_SHOWNORMAL : SW_HIDE);
+	UpdateWindow((HWND)Handle);
+}
+
+bool ZEWindow::GetVisible()
+{
+	return Visible;
+}
+
+void ZEWindow::SetResizable(bool Enabled)
+{
+	if (Resizable == Enabled)
+		return;
+
+	Resizable = Enabled;
+	ChangeWindowConfiguration();
+}
+
+bool ZEWindow::GetResizable()
+{
+	return Resizable;
+}
+
+void ZEWindow::SetBorderlessMode(bool Enabled)
+{
+	if (BorderlessMode == Enabled)
+		return;
+
+	BorderlessMode = Enabled;
+	ChangeWindowConfiguration();
+}
+
+bool ZEWindow::GetBorderlessMode()
+{
+	return BorderlessMode;
+}
+
+void ZEWindow::SetFullScreen(bool Enabled)
+{
+	if (Fullscreen == Enabled)
+		return;
+
+	Fullscreen = Enabled;
+
+	ChangeWindowConfiguration();
+}
+
+bool ZEWindow::GetFullscreen()
+{
+	return Fullscreen;
+}
+
+ZEVector2 ZEWindow::GetCursorPosition()
 {
 	POINT CursorPosition;
 	GetCursorPos(&CursorPosition);
-
-	return ZEVector2((float)CursorPosition.x, (float)CursorPosition.y);
+	
+	return ZEVector2((float)(CursorPosition.x - Left), (float)(CursorPosition.y - Top));
 }
 
-ZEVector2 ZEWindow::GetRelativeCursorPosition()
+void ZEWindow::Minimize()
 {
-	POINT CursorPosition;
-	GetCursorPos(&CursorPosition);
+	if (!Visible)
+		return;
 
-	ZEInt LeftPosition;
-	ZEInt TopPosition;
-
-	GetWindowPosition(LeftPosition, TopPosition);
-
-	return ZEVector2(((float)CursorPosition.x) - LeftPosition, ((float)CursorPosition.y) - TopPosition);
+	ShowWindow((HWND)Handle, SW_MINIMIZE);
 }
 
-void ZEWindow::SetMouseCursorVisibility(bool Visibility)
+void ZEWindow::Restore()
 {
-	MouseCursorVisibility = Visibility;
+	if (!Visible)
+		return;
+
+	ShowWindow((HWND)Handle, SW_NORMAL);
 }
 
-bool ZEWindow::GetMouseCursorVisibility()
+void ZEWindow::Maximize()
 {
-	return MouseCursorVisibility;
+	if (!Visible)
+		return;
+
+	if (Fullscreen)
+		ShowWindow((HWND)Handle, SW_MAXIMIZE);
+	else if (Resizable)
+		ShowWindow((HWND)Handle, SW_MAXIMIZE);
+	else
+		ShowWindow((HWND)Handle, SW_NORMAL);
 }
 
-void ZEWindow::SetMouseCursorLockEnabled(bool Enabled)
+void ZEWindow::SetHideCursor(bool Visibility)
 {
-	MouseCursorLockEnabled = Enabled;
+	HideCursor = Visibility;
 }
 
-bool ZEWindow::GetMouseCursorLockEnabled()
+bool ZEWindow::GetHideCursor()
 {
-	return MouseCursorLockEnabled;
+	return HideCursor;
 }
 
-void ZEWindow::ShowWindow()
+void ZEWindow::SetLockCursor(bool Enabled)
 {
-	::ShowWindow((HWND)WindowHandle, SW_SHOWNORMAL);
-	UpdateWindow((HWND)WindowHandle);
+	LockCursor = Enabled;
 }
 
-void ZEWindow::HideWindow()
+bool ZEWindow::GetLockCursor()
 {
-	::ShowWindow((HWND)WindowHandle, SW_HIDE);
-	UpdateWindow((HWND)WindowHandle);
+	return LockCursor;
 }
 
-bool ZEWindow::Initialize()
+void ZEWindow::Destroy()
 {
-	WindowInitialization = true;
-	if (WindowType != ZE_WT_COMPONENT)
-		if (!CreateMainWindow("Zinek Engine"))
-			return false;
-
-	WindowInitialization = false;
-	return true;
+	delete this;
 }
 
-void ZEWindow::Deinitialize()
+ZEWindow* ZEWindow::CreateInstance()
 {
-	DestroyMainWindow();
-	Window = NULL;
-}
-
-ZEWindow* ZEWindow::GetInstance()
-{
-	return ZECore::GetInstance()->GetWindow();
-}
-
-ZEWindow::ZEWindow()
-{
-	MouseCursorVisibility = false;
-	MouseCursorLockEnabled = true;
-	WindowType = ZE_WT_DEFAULT;
-	WindowPositionLeft = CW_USEDEFAULT;
-	WindowPositionTop = 0;
-	WindowWidth = CW_USEDEFAULT;
-	WindowHeight = 0;
-	WindowHandle = NULL;
-	Window = this;
-}
-
-ZEWindow::~ZEWindow()
-{
-	Window = NULL;
+	return new ZEWindow();
 }

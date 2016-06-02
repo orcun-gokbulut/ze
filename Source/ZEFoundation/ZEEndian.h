@@ -54,7 +54,7 @@ enum ZEEndianness
 class ZEEndian
 {
 	public:
-		static ZE_FORCE_INLINE ZEEndianness GetEndianness()
+		static ZE_INLINE ZEEndianness GetEndianness()
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZE_ET_LITTLE;
@@ -65,7 +65,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt8 Little(ZEUInt8 Value)
+		static ZE_INLINE ZEUInt8 Little(ZEUInt8 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -76,18 +76,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt16 Little(ZEUInt16 Value)
-		{
-			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-				return Value;
-			#endif
-
-			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
-				return ZESwap::Swap(Value);
-			#endif
-		}
-
-		static ZE_FORCE_INLINE ZEUInt32 Little(ZEUInt32 Value)
+		static ZE_INLINE ZEUInt16 Little(ZEUInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -98,7 +87,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt64 Little(ZEUInt64 Value)
+		static ZE_INLINE ZEUInt32 Little(ZEUInt32 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -109,7 +98,18 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt8 Little(ZEInt8 Value)
+		static ZE_INLINE ZEUInt64 Little(ZEUInt64 Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return Value;
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return ZESwap::Swap(Value);
+			#endif
+		}
+
+		static ZE_INLINE ZEInt8 Little(ZEInt8 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -120,7 +120,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt16 Little(ZEInt16 Value)
+		static ZE_INLINE ZEInt16 Little(ZEInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -131,7 +131,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt32 Little(ZEInt32 Value)
+		static ZE_INLINE ZEInt32 Little(ZEInt32 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -142,7 +142,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt64 Little(ZEInt64 Value)
+		static ZE_INLINE ZEInt64 Little(ZEInt64 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -153,7 +153,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE float Little(float Value)
+		static ZE_INLINE float Little(float Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -166,7 +166,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE double Little(double Value)
+		static ZE_INLINE double Little(double Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -179,7 +179,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt8 Big(ZEUInt8 Value)
+		static ZE_INLINE ZEUInt8 Big(ZEUInt8 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -190,18 +190,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt16 Big(ZEUInt16 Value)
-		{
-			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
-				return ZESwap::Swap(Value);
-			#endif
-
-			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
-				return Value;
-			#endif
-		}
-
-		static ZE_FORCE_INLINE ZEUInt32 Big(ZEUInt32 Value)
+		static ZE_INLINE ZEUInt16 Big(ZEUInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZESwap::Swap(Value);
@@ -212,7 +201,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt64 Big(ZEUInt64 Value)
+		static ZE_INLINE ZEUInt32 Big(ZEUInt32 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZESwap::Swap(Value);
@@ -223,7 +212,18 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt8 Big(ZEInt8 Value)
+		static ZE_INLINE ZEUInt64 Big(ZEUInt64 Value)
+		{
+			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
+				return ZESwap::Swap(Value);
+			#endif
+
+			#ifdef ZE_PLATFORM_ENDIANNESS_BIG
+				return Value;
+			#endif
+		}
+
+		static ZE_INLINE ZEInt8 Big(ZEInt8 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return Value;
@@ -234,7 +234,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt16 Big(ZEInt16 Value)
+		static ZE_INLINE ZEInt16 Big(ZEInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZESwap::Swap((ZEUInt16)Value);
@@ -245,7 +245,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt32 Big(ZEInt32 Value)
+		static ZE_INLINE ZEInt32 Big(ZEInt32 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZESwap::Swap((ZEUInt32)Value);
@@ -256,7 +256,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEInt64 Big(ZEInt64 Value)
+		static ZE_INLINE ZEInt64 Big(ZEInt64 Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				return ZESwap::Swap((ZEUInt64)Value);
@@ -267,7 +267,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE float Big(float Value)
+		static ZE_INLINE float Big(float Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				ZEUInt32 Temp = *(ZEUInt32*)&Value;
@@ -280,7 +280,7 @@ class ZEEndian
 			#endif
 		}
 
-		static ZE_FORCE_INLINE double Big(double Value)
+		static ZE_INLINE double Big(double Value)
 		{
 			#ifdef ZE_PLATFORM_ENDIANNESS_LITTLE
 				ZEUInt64 Temp = *(ZEUInt64*)&Value;
@@ -294,7 +294,7 @@ class ZEEndian
 		}
 
 		template<typename ZEType>
-		static ZE_FORCE_INLINE ZEType Uni(ZEType Value, ZEEndianness Endianness)
+		static ZE_INLINE ZEType Uni(ZEType Value, ZEEndianness Endianness)
 		{
 			if (Endianness == ZE_ET_BIG)
 				return ZEEndian::Big(Value);

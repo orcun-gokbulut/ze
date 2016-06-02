@@ -100,57 +100,6 @@ bool ZEALModule::InitializeSelf()
 	if (!ZESoundModule::InitializeSelf())
 		return false;
 	
-	zeLog("Enumurating Sound Devices.");
-	const ALCchar* DeviceNames = alcGetString(NULL, ALC_DEFAULT_DEVICE_SPECIFIER);
-	if (DeviceNames == NULL)
-	{
-		zeError("Can not enumurate devices.");
-		return false;
-	}
-
-	ZESize I = 0, Start = 0;
-	while (true)
-	{
-		if (DeviceNames[I] == '\0')
-		{
-			ZESoundDevice* Device = DeviceList.Add();
-			Device->DeviceId = DeviceList.GetCount();
-			strncpy(Device->DeviceName, (char*)&DeviceNames[Start], ZE_MAX_DEVICE_NAME_SIZE);
-			Device->DriverName[0] = '\0';
-
-			zeLog("Found sound device; "
-					"Index : %d, "
-					"Device Name: \"%s\", "
-					"Device Driver: \"%s\".",
-					Device->DeviceId,
-					Device->DeviceName,
-					Device->DriverName);
-
-			if (DeviceNames[I] == '\0' && DeviceNames[I + 1] == '\0')
-				break;
-		}
-		I++;
-	}
-
-	ZESize DeviceId = (ZESize)SoundOptions.GetOption("DeviceId")->GetValue().GetInt32();
-
-	ALchar* DeviceName = NULL;
-	if (DeviceId > DeviceList.GetCount())
-	{
-		zeWarning("Wrong device id. Using sound default device.");
-	}
-	else
-	{
-		if (DeviceId == 0)
-		{
-			zeLog("Using default sound device");
-		}
-		else
-		{
-			DeviceName = (ALchar*)(const char*)DeviceList[DeviceId].DeviceName;
-			zeLog("Using \"%s\" sound device.", DeviceName);
-		}
-	}
 
 	zeLog("Opening device.");
 	Device = alcOpenDevice(NULL); // select the "preferred device"

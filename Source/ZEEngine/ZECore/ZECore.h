@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_CORE_H__
-#define __ZE_CORE_H__
 
 #include "ZEAPI.h"
 #include "ZETypes.h"
@@ -70,7 +68,7 @@ class ZEResourceManager;
 class ZECommandManager;
 class ZEConsole;
 class ZEWindow;
-class ZEGraphicsModule;
+class ZEGRGraphicsModule;
 class ZESoundModule;
 class ZEInputModule;
 class ZEPhysicsModule;
@@ -100,6 +98,7 @@ class ZECore
 
 		ZERealTimeClock*				RealTimeClock;
 		ZEProfiler*						Profiler;
+		float							ElapsedTime;
 
 		ZECrashHandler*					CrashHandler;
 		ZEModuleManager*				ModuleManager;
@@ -112,9 +111,8 @@ class ZECore
 		ZECommandManager*				CommandManager;
 		ZETimerManager*					TimerManager;
 		ZEConsole*						Console;
-		ZEWindow*						Window;
 		
-		ZEGraphicsModule*				GraphicsModule;
+		ZEGRGraphicsModule*				GraphicsModule;
 		ZESoundModule*					SoundModule;
 		ZEInputModule*					InputModule;
 		ZEPhysicsModule*				PhysicsModule;
@@ -140,7 +138,6 @@ class ZECore
 		ZEResourceManager*				GetResourceManager();
 		ZECommandManager*				GetCommands();
 		ZEConsole*						GetConsole();
-		ZEWindow*						GetWindow();
 		ZEModuleManager*				GetModuleManager();
 		ZEExtensionManager*				GetExtensionManager();
 		ZEPluginManager*				GetPluginManager();
@@ -154,7 +151,7 @@ class ZECore
 		const char*						GetResourceDirectory();
 
 		bool							SetGraphicsModule(ZEModule* Module);
-		ZEGraphicsModule*				GetGraphicsModule();
+		ZEGRGraphicsModule*				GetGraphicsModule();
 
 		bool							SetSoundModule(ZEModule* Module);
 		ZESoundModule*					GetSoundModule();
@@ -174,8 +171,9 @@ class ZECore
 		void							SetApplicationModule(ZEApplicationModule* Module);
 		ZEApplicationModule*			GetApplicationModule();
 
-		float							GetRuningTime();
 		ZESize							GetFrameId();
+		float							GetElapsedTime();
+		float							GetRuningTime();
 		
 		void							SetDebugMode(bool Enabled);
 		bool							GetDebugMode();
@@ -203,4 +201,3 @@ class ZECore
 
 		ZEAPI static ZECore*			GetInstance();
 };
-#endif

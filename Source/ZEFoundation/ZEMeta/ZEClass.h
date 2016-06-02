@@ -88,6 +88,8 @@ class ZEEventHandlerBase;
 class ZEVariant;
 class ZEReference;
 class ZEScriptObject;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
 typedef ZEUInt ZEClassFlags;
 #define ZE_CF_NONE						0
@@ -127,6 +129,8 @@ class ZEClass
 
 		virtual const ZEProperty*		GetProperties();
 		virtual ZESize					GetPropertyCount();
+		const ZEProperty*				GetPropertyDescription(ZESize PropertyId);
+		const ZEProperty*				GetPropertyDescription(const ZEString& PropertyName);
 
 		virtual const ZEMethod*			GetMethods();
 		virtual ZESize					GetMethodCount();
@@ -234,6 +238,13 @@ class ZEClass
 		// Scripting
 		virtual ZEObject*				CreateScriptInstance();
 		virtual ZESize					GetSizeOfScriptObject();
+
+		// Serialization & Unserialization
+		bool							Serialize(ZEObject* Object, ZEMLWriterNode& ObjectNode);
+		bool							SerializeProperties(ZEObject* Object, ZEMLWriterNode& PropertiesNode);
+		
+		bool							Unserialize(ZEObject* Object, const ZEMLReaderNode& ObjectNode);
+		bool							UnserializeProperties(ZEObject* Object, const ZEMLReaderNode& PropertiesNode);
 
 		static bool						IsDerivedFrom(ZEClass* Parent, ZEClass* Target);
 		template<typename ZECastedObjectType>

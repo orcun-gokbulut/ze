@@ -34,57 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_VERTICAL_SLIDER_CONTROL__
-#define __ZE_UI_VERTICAL_SLIDER_CONTROL__
 
 #include "ZEUIControl.h"
-
-ZE_META_FORWARD_DECLARE(ZEUIMaterial, "ZEGraphics/ZEUIMaterial.h")
 
 class ZEUIVerticalSliderControl : public ZEUIControl
 {
 	ZE_OBJECT
-
 	private:
+		ZEUIRectangle				SliderButton;
+		ZEUIRectangle				SliderLine;
 
-		ZEUIRectangle	SliderButton;
-		ZEUIRectangle	SliderLine;
+		float						Value;
+		float						Stepsize;
+		float						MaximumValue;
+		float						MinimumValue;
 
-		float			Value;
-		float			Stepsize;
-		float			MaximumValue;
-		float			MinimumValue;
-
-		ZEUIMaterial*	SliderButtonMaterial;
-		ZEUIMaterial*	SliderLineMaterial;
-
-		bool			IsButtonPressed;
+		bool						IsButtonPressed;
 
 	protected:
-
-		virtual void	MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		virtual	void	MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
-		virtual void	MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
+		virtual void				MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual	void				MouseButtonReleased(ZEUIMouseKey Button, const ZEVector2& MousePosition);
+		virtual void				MouseMoveEvent(ZEUIMouseKey Button, const ZEVector2& MoveAmount);
 
 	public:
+		void						SetValue(float NewValue);
+		float						GetValue() const;
+		void						SetStepsize(float StepSize);
+		float						GetStepsize() const;
+		void						SetMaximumValue(float MaxValue);
+		float						GetMaximumValue() const;
+		void						SetMinimumValue(float MinValue);
+		float						GetMinimumValue() const;
 
-		virtual void	Draw(ZEUIRenderer* Renderer);
+		virtual void				SetWidth(float Width);
+		virtual	void				SetHeight(float Height);
 
-		void			SetValue(float NewValue);
-		float			GetValue() const;
-		void			SetStepsize(float StepSize);
-		float			GetStepsize() const;
-		void			SetMaximumValue(float MaxValue);
-		float			GetMaximumValue() const;
-		void			SetMinimumValue(float MinValue);
-		float			GetMinimumValue() const;
+		virtual void				SetPosition(const ZEVector2& Position);
 
-		virtual void	SetWidth(float Width);
-		virtual	void	SetHeight(float Height);
+		virtual void				Draw(ZEUIRenderer* Renderer);
 
-		virtual void	SetPosition(const ZEVector2& Position);
-
-						ZEUIVerticalSliderControl();
+									ZEUIVerticalSliderControl();
 };
-
-#endif

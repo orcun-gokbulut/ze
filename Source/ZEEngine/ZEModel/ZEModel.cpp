@@ -35,16 +35,10 @@
 
 #include "ZEModel.h"
 
-#include "ZEError.h"
-#include "ZEMath/ZEViewVolume.h"
-
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGame/ZEEntity.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZEGraphics/ZEGRResource.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 void ZEModel::CalculateBoundingBox() const
 {
@@ -94,17 +88,11 @@ void ZEModel::CalculateBoundingBox() const
 	}
 
 	const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox);
-	DirtyBoundingBox = false;
 }
 
 ZEDrawFlags ZEModel::GetDrawFlags() const
 {
-	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECIVER;
-}
-
-const ZEModelStatistics& ZEModel::GetStatistics() const
-{
-	return Statistics;
+	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER;
 }
 
 void ZEModel::LoadModelResource()
@@ -115,8 +103,8 @@ void ZEModel::LoadModelResource()
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].Deinitialize();
-	Bones.SetCount(0);
 
+	Bones.SetCount(0);
 	Skeleton.SetCount(0);
 
 	for (ZESize I = 0; I < Helpers.GetCount(); I++)
@@ -133,7 +121,6 @@ void ZEModel::LoadModelResource()
 	}
 
 	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
-
 	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
 	{
 		if (ModelResource->GetMeshes()[I].ParentMesh != -1)
@@ -142,13 +129,7 @@ void ZEModel::LoadModelResource()
 		}
 	}
 
-	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
-	{
-		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
-	}
-
 	Bones.SetCount(ModelResource->GetBones().GetCount());
-
 	for (ZESize I = 0; I < ModelResource->GetBones().GetCount(); I++)
 	{
 		if (ModelResource->GetBones()[I].ParentBone != -1)
@@ -164,6 +145,11 @@ void ZEModel::LoadModelResource()
 		{
 			Skeleton.Add(&Bones[I]);
 		}
+	}
+
+	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
+	{
+		Meshes[I].Initialize(this, &ModelResource->GetMeshes()[I]);
 	}
 
 	if(Skeleton.GetCount() > 1)
@@ -203,6 +189,27 @@ void ZEModel::LoadModelResource()
 	{
 		Helpers[I].Initialize(this, &ModelResource->GetHelpers()[I]);
 	}
+
+	DirtyConstantBufferSkin = true;
+	DirtyBoundingBox = true;
+}
+
+
+void ZEModel::UpdateConstantBufferBoneTransforms()
+{
+	if (!DirtyConstantBufferSkin)
+		return;
+
+	void* Buffer;
+	ConstantBufferBoneTransforms->Lock(&Buffer);
+
+		ZESize BoneCount = Bones.GetCount();
+		for (ZESize I = 0; I < BoneCount; I++)
+			static_cast<ZEMatrix4x4*>(Buffer)[I] = Bones[I].GetVertexTransform();
+
+	ConstantBufferBoneTransforms->Unlock();
+
+	DirtyConstantBufferSkin = false;
 }
 
 void ZEModel::ChildBoundingBoxChanged()
@@ -431,9 +438,6 @@ const ZEAABBox& ZEModel::GetBoundingBox() const
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (BoundingBoxIsUserDefined)
-		return ZEEntity::GetWorldBoundingBox();
-
 	if (DirtyBoundingBox && !BoundingBoxIsUserDefined)
 	{
 		CalculateBoundingBox();
@@ -467,17 +471,10 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 	ParentlessBoneJoint->Initialize();
 }
 
-void ZEModel::Draw(ZEDrawParameters* DrawParameters)
+bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
 {
-	if(!GetVisible())
-		return;
-
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		memset(&Statistics, 0, sizeof(ZEModelStatistics));
-
-		Statistics.TotalMeshCount = Meshes.GetCount();
-	}
+	if (!ZEEntity::PreRender(CullParameters))
+		return false;
 
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
 	{
@@ -485,53 +482,25 @@ void ZEModel::Draw(ZEDrawParameters* DrawParameters)
 			AnimationTracks[I].UpdateAnimation();
 	}
 
-	ZEUInt32 EntityDrawFlags = GetDrawFlags();
-
+	bool Result = false;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && !Meshes[I].LODs[0].IsSkinned())
-		{
-			if (DrawParameters->ViewVolume->CullTest(Meshes[I].GetWorldBoundingBox()))
-			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.CulledMeshCount++;
-
-				continue;
-			}
-			else
-			{
-				if (DrawParameters->Pass == ZE_RP_COLOR)
-					Statistics.DrawnMeshCount++;
-
-				Meshes[I].Draw(DrawParameters);
-			}
-		}
-		else
-		{
-			if (DrawParameters->Pass == ZE_RP_COLOR)
-				Statistics.DrawnMeshCount++;
-
-			Meshes[I].Draw(DrawParameters);
-		}
+		if (Meshes[I].PreRender(CullParameters))
+			Result = true;
 	}
 
-	if (DrawParameters->Pass == ZE_RP_COLOR)
-	{
-		DrawParameters->Statistics.ModelStatistics.TotalMeshCount += Statistics.TotalMeshCount;
-		DrawParameters->Statistics.ModelStatistics.CulledMeshCount += Statistics.CulledMeshCount;
-		DrawParameters->Statistics.ModelStatistics.DrawnMeshCount += Statistics.DrawnMeshCount;
-	}
+	return Result;
+}
 
-// 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-// 		Meshes[I].Draw(DrawParameters);
-	
-// 	if (DrawParameters->Renderer->GetRendererType() == ZE_RT_FRAME)
-// 		DebugDraw(DrawParameters->Renderer);
+void ZEModel::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
+{
+	ZEModelMeshLOD* MeshLOD = (ZEModelMeshLOD*)Command->ExtraParameters;
+	MeshLOD->Render(RenderParameters, Command);
 }
 
 void ZEModel::Tick(float ElapsedTime)
 {
-	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+	for (ZESize I = 0; I < AnimationTracks.GetCount(); I++)
 	{
 		AnimationTracks[I].Tick(ElapsedTime);
 
@@ -539,9 +508,8 @@ void ZEModel::Tick(float ElapsedTime)
 			AnimationTracks[I].UpdateAnimation();
 	}
 
-	for(ZESize I = 0; I < IKChains.GetCount(); I++)
+	for (ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
-	
 }
 
 void ZEModel::TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation)
@@ -595,14 +563,12 @@ ZEModel::ZEModel()
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
 	DirtyBoundingBox = true;
-
-	memset(&Statistics, 0, sizeof(ZEModelStatistics));
+	DirtyConstantBufferSkin = true;
 }
 
 ZEModel::~ZEModel()
 {
-	if (ModelResource != NULL)
-		((ZEModelResource*)ModelResource)->Release();
+	Deinitialize();
 }
 
 bool ZEModel::InitializeSelf()
@@ -612,11 +578,26 @@ bool ZEModel::InitializeSelf()
 
 	LoadModelResource();
 
+	ConstantBufferBoneTransforms = ZEGRConstantBuffer::Create(150 * sizeof(ZEMatrix4x4));
+
 	return true;
 }
 
 bool ZEModel::DeinitializeSelf()
 {
+	if (ModelResource != NULL)
+		const_cast<ZEModelResource*>(ModelResource)->Release();
+
+	Skeleton.Clear();
+	LODRenderCommands.Clear();
+	Meshes.Clear();
+	Bones.Clear();
+	Helpers.Clear();
+
+	ConstantBufferBoneTransforms.Release();
+
+	AnimationTracks.Clear();
+
 	return ZEEntity::DeinitializeSelf();
 }
 
@@ -639,3 +620,4 @@ ZEModel* ZEModel::CreateInstance()
 {
 	return new ZEModel();
 }
+

@@ -38,14 +38,14 @@
 #include "ZECore/ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEGraphics/ZEGraphicsModule.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGame.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZERay.h"
 #include "ZESound/ZEListener.h"
 #include "ZEEntityProvider.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZELightProjective.h"
 #include "ZEMath/ZEMath.h"
 
 #define ACTIONID_FORWARD			0
@@ -291,10 +291,10 @@ ZEPlayer::ZEPlayer()
 	Camera = ZECamera::CreateInstance();
 	Camera->SetPosition(ZEVector3(0.0f, 0.0f, 0.0f));
 	Camera->SetRotation(ZEQuaternion::Identity);
-	Camera->SetNearZ(zeGraphics->GetNearZ());
-	Camera->SetFarZ(zeGraphics->GetFarZ());
+	Camera->SetNearZ(1);
+	Camera->SetFarZ(10000);
 	Camera->SetHorizontalFOV(FOV);
-	Camera->SetAspectRatio(zeGraphics->GetAspectRatio());
+	Camera->SetAutoAspectRatio(true);
 	AddComponent(Camera);
 
 	Listener = ZEListener::CreateInstance();

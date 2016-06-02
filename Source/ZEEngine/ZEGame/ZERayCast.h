@@ -44,7 +44,7 @@
 #include "ZEDS/ZEFlags.h"
 
 class ZEEntity;
-class ZEMaterial;
+class ZERNMaterial;
 
 typedef ZEFlags ZERayCastReportExtras;
 #define ZE_RCRE_ALL					0xFFFFFFFF
@@ -78,7 +78,7 @@ struct ZERayCastReport
 	ZEVector3					Normal;
 	ZEVector3					Binormal;
 	
-	ZEMaterial*					Material;
+	ZERNMaterial*					Material;
 
 	float						Distance;
 

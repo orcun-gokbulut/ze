@@ -45,7 +45,7 @@ void ZEInitializable::DeinitializeSelf()
 
 }
 
-bool ZEInitializable::IsInitialized()
+bool ZEInitializable::IsInitialized() const
 {
 	return Initialized;
 }

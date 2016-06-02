@@ -45,6 +45,8 @@
 	#include <intrin.h>
 #endif
 
+ZE_COPY_NO_ACTION_IMP(ZELock)
+
 static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 {
 	#ifdef ZE_PLATFORM_COMPILER_MSVC
@@ -89,18 +91,8 @@ void ZELock::Unlock()
 	CurrentNumber++;
 }
 
-ZELock ZELock::operator=(const ZELock& Lock)
-{
-	return ZELock();
-}
 
 ZELock::ZELock()
-{
-	CurrentNumber = 1;
-	NextNumber = 0;
-}
-
-ZELock::ZELock(const ZELock& Lock)
 {
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_create(this, "ZELock", "", 0);

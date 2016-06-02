@@ -59,7 +59,7 @@ class ZESteeringPlayerFree : public ZESteering
 };
 
 class ZEListener;
-class ZEProjectiveLight;
+class ZELightProjective;
 class ZECamera;
 class ZEModelIKChain;
 

@@ -36,11 +36,6 @@
 
 #include <memory.h>
 
-ZEFileTime::ZEFileTime()
-{
-	memset(this, 0, sizeof(ZEFileTime));
-}
-
 ZERealPath::ZERealPath()
 {
 	Access = ZE_PA_NO_ACCESS;

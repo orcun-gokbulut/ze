@@ -34,14 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_INTERIOR_H__
-#define __ZE_INTERIOR_H__
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLNode.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGame/ZEDrawStatistics.h"
 #include "ZEGame/ZERayCast.h"
 
 ZE_ENUM(ZEInteriorCullMode)
@@ -52,15 +49,20 @@ ZE_ENUM(ZEInteriorCullMode)
 };
 
 class ZERay;
-class ZEVector3;
 class ZEViewVolume;
 class ZEViewFrustum;
 class ZEInteriorResource;
 class ZEInteriorRoom;
 class ZEInteriorDoor;
 class ZEInteriorHelper;
-struct ZEDrawParameters;
-struct ZEInteriorCullStatistics;
+
+struct ZEExtraRenderParameters
+{
+	ZEUInt			VertexOffset;
+	ZEUInt			VertexCount;
+	ZERNMaterial*	Material;
+	ZEInteriorRoom*	Room;
+};
 
 class ZEInterior : public ZEEntity
 {
@@ -76,15 +78,13 @@ class ZEInterior : public ZEEntity
 		ZEArray<ZEInteriorRoom*>				Rooms;
 		ZEArray<ZEInteriorDoor*>				Doors;
 		ZEArray<ZEInteriorHelper*>				Helpers;
-
 		ZEInteriorCullMode						CullMode;
-		ZEInteriorStatistics					Statistics;
 
 		void									LoadInteriorResource();
 
 		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor* Door, const ZEViewVolume* OldViewVolume);
-		void									CullRoom(ZEInteriorDoor* Door, ZEDrawParameters* DrawParameters, ZEViewVolume* ViewVolume);
-		void									CullRooms(ZEDrawParameters* DrawParameters);
+		void									CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullParameters, ZEViewVolume* ViewVolume);
+		void									CullRooms(const ZERNCullParameters* CullParameters);
 
 		virtual	void							ParentTransformChanged();
 
@@ -104,25 +104,21 @@ class ZEInterior : public ZEEntity
 		ZEInteriorDoor*							GetDoor(const ZEString& Name);
 		ZEInteriorHelper*						GetHelper(const ZEString& Name);
 
-		const ZEInteriorStatistics&				GetStatistics() const;
-
 		virtual ZEDrawFlags						GetDrawFlags() const;
-
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
 
 		virtual void							SetInteriorFile(const ZEString& InteriorFile);
 		virtual const ZEString&					GetInteriorFile() const;
 
 		void									SetInteriorResource(const ZEInteriorResource* InteriorResource);	
-		const ZEInteriorResource*				GetInteriorResource();
+		const ZEInteriorResource*				GetInteriorResource() const;
 
 		void									SetCullMode(ZEInteriorCullMode Value);
 		ZEInteriorCullMode						GetCullMode() const;
 
+		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
 		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInterior*						CreateInstance();
-
 };
-
-#endif

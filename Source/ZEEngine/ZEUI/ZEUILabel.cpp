@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUILabel.h"
-#include "ZEFontResource.h"
-#include "ZEGraphics/ZETexture2D.h"
+#include "ZEUIFont.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
 
 void ZEUILabel::UpdateCharacters()
 {
 	ZEInt64 KerningDistance = 0;
-	ZEFontCharacter Character;
+	ZEUIFontCharacter Character;
 	ZEUIRectangle Output;
 
 	char AddedCharacter = Text.Right(1).GetValue()[0];
@@ -78,12 +78,11 @@ void ZEUILabel::UpdateCharacters()
 	TextCharacter.CChar = AddedCharacter;
 	TextCharacter.FontCharacter = Character;
 	TextCharacter.IsSelected = false;
-	TextCharacter.RenderableCharacter.Material = FontMaterial;
 	TextCharacter.RenderableCharacter.ZOrder = GetZOrder() + 1;
 	TextCharacter.RenderableCharacter.Texcoords = Character.CoordinateRectangle;
 	TextCharacter.RenderableCharacter.Color = FontColor;
 	TextCharacter.RenderableCharacter.Positions = Output.Positions;
-	((ZEUIMaterial*)TextCharacter.RenderableCharacter.Material)->SetTexture(Character.Texture);
+	TextCharacter.RenderableCharacter.Texture = Character.Texture;
 	TextCharacter.Line = 0;
 
 	if (IsWordWrapping)
@@ -141,8 +140,7 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 	ZERectangle TempRenderRect = TextRenderingArea;
 	ZEVector2 CharacterPosIncrement, LineStartPosition, ScreenPos = GetScreenPosition();
 	TempRenderRect.SetPosition(ScreenPos);
-	ZERectangle ResultRenderRect;
-	ZERectangle::IntersectionTest(GetVisibleRectangle(), TempRenderRect, ResultRenderRect);
+	ZERectangle::IntersectionTest(GetVisibleRectangle(), TextRenderingArea, TempRenderRect);
 	ZEInt32 TempTextZOrder = GetZOrder() + 1;
 
 	LineStartPosition = CalculateLineStartPoint(0);
@@ -162,9 +160,11 @@ void ZEUILabel::Draw(ZEUIRenderer* Renderer)
 		TempCharacter.ZOrder = TempTextZOrder;
 
 		ZERectangle Intersection;
-		if(ZERectangle::IntersectionTest(ResultRenderRect, GetVisibleRectangle(), Intersection))
+		if(ZERectangle::IntersectionTest(TempRenderRect, GetVisibleRectangle(), Intersection))
+		{
 			if(!ZEUIRectangle::Clip(OutputCharacter, TempCharacter, Intersection))
-				Renderer->AddRectangle(OutputCharacter);
+				Renderer->AddRectangle(&OutputCharacter);
+		}
 	}
 }
 
@@ -180,7 +180,6 @@ ZEUILabel::ZEUILabel()
 	Text.Clear();
 	SetFocusable(false);
 	SetMoveable(false);
-	FontMaterial = ZEUIMaterial::CreateInstance();
 	CurrentLine = 0;
 	SetWordWrapping(false);
 	SetSize(ZEVector2::One * 100);
@@ -191,14 +190,6 @@ ZEUILabel::ZEUILabel()
 
 ZEUILabel::~ZEUILabel()
 {
-	if(FontMaterial != NULL)
-	{
-		FontMaterial->Destroy();
-		FontMaterial = NULL;
-	}
-
-	Characters.Clear();
-	Text.Clear();
 }
 
 void ZEUILabel::SetFontColor(const ZEVector4& Color)
@@ -233,7 +224,7 @@ void ZEUILabel::SetText(ZEString NewText)
 	}
 }
 
-const ZEString& ZEUILabel::GetText()
+const ZEString& ZEUILabel::GetText() const
 {
 	return Text;
 }
@@ -307,13 +298,13 @@ void ZEUILabel::SetHeight(float Height)
 	UpdateTextRenderingArea();
 }
 
-void ZEUILabel::SetFontResource(ZEFontResource* Resource)
+void ZEUILabel::SetFontResource(ZEUIFont* Resource)
 {
 	FontResource = Resource;
 	SetText(Text);
 }
 
-ZEFontResource* ZEUILabel::GetFontResource()
+ZEUIFont* ZEUILabel::GetFontResource()
 {
 	return FontResource;
 }

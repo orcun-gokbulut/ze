@@ -230,33 +230,28 @@ class ZEArray
 			Allocator.Reallocate(&Items, Count); 
 
 			ZEDebugCheckMemory();
-			
-			return &Items[Count - 1];		
+
+			return &Items[Count - 1];
 		}
 
-		inline ZEType* AddByRef(const ZEType& NewItem)
+		inline void AddByRef(const ZEType& NewItem)
 		{
 			Count++;
 			Allocator.Reallocate(&Items, Count);
 			Items[Count - 1] = NewItem;
 
 			ZEDebugCheckMemory();
-
-			return &Items[Count - 1];
 		}
 
-		inline ZEType* Add(ZEType NewItem)
+		inline void Add(ZEType NewItem)
 		{
 			Count++;
 			Allocator.Reallocate(&Items, Count);
 			Items[Count - 1] = NewItem;
-
 			ZEDebugCheckMemory();
-
-			return &Items[Count - 1];
 		}
 
-		inline ZEType* AddOrderedInc(ZEType NewItem)
+		inline void AddOrderedInc(ZEType NewItem)
 		{
 			if (Count == 0)
 				return Add(NewItem);
@@ -265,11 +260,11 @@ class ZEArray
 			while(Index < Count && Items[Index] < NewItem)
 				Index++;
 
-			return Insert(Index + 1, NewItem);
+			Insert(Index + 1, NewItem);
 		}
 
 		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
-		inline ZEType* AddOrderedInc(ZEType NewItem)
+		inline void AddOrderedInc(ZEType NewItem)
 		{
 			if (Count == 0)
 				return Add(NewItem);
@@ -278,10 +273,10 @@ class ZEArray
 			while(Index < Count && CompareFunction(&Items[Index], &NewItem) == -1)
 				Index++;
 
-			return Insert(Index + 1, NewItem);
+			Insert(Index + 1, NewItem);
 		}
 
-		inline ZEType* AddOrderedDec(ZEType Type)
+		inline void AddOrderedDec(ZEType Type)
 		{
 			if (Count == 0)
 			return Add(NewItem);
@@ -290,11 +285,11 @@ class ZEArray
 			while(Index < Count && Items[Index] > NewItem)
 				Index++;
 
-			return Insert(Index + 1, NewItem);
+			Insert(Index + 1, NewItem);
 		}
 
 		template<ZEInt CompareFunction(const ZEType*, const ZEType*)>
-		inline ZEType* AddOrderedDec(ZEType NewItem)
+		inline void AddOrderedDec(ZEType NewItem)
 		{
 			if (Count == 0)
 				return Add(NewItem);
@@ -303,7 +298,7 @@ class ZEArray
 			while(Index < Count && CompareFunction(&Items[Index], &NewItem) == 1)
 				Index++;
 
-			return Insert(Index + 1, NewItem);
+			Insert(Index + 1, NewItem);
 		}
 
 		inline bool Exists(ZEType Value) const
@@ -315,7 +310,7 @@ class ZEArray
 			return false;
 		}
 
-		inline ZEType* Insert(ZESize Index)
+		inline void Insert(ZESize Index)
 		{
 			zeDebugCheck(Index > Count, "Index is out of range.");
 			ZEType* TempPointer = this->Items;
@@ -334,19 +329,15 @@ class ZEArray
 			}
 
 			ZEDebugCheckMemory();
-
-			return &Items[Index];
 		}
 
-		inline ZEType* Insert(ZESize Index, ZEType NewItem)
+		inline void Insert(ZESize Index, ZEType NewItem)
 		{
 			
 			Insert(Index);
 			Items[Index] = NewItem;
 
 			ZEDebugCheckMemory();
-
-			return &Items[Index];
 		}
 
 		inline void Remove(ZESize Index)

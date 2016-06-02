@@ -33,22 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDebugDrawer.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
-#include "ZEGraphics/ZERenderer.h"
+/*#include "ZEDebugDrawer.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEOBBox.h"
-#include "ZEDrawParameters.h"
-#include "ZEGraphics/ZELight.h"
+#include "ZERenderer/ZELight.h"
 #include "ZEUI/ZEUIDebugDrawTag.h"
 #include "ZEGame.h"
 #include "ZEScene.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZERandom.h"
 #include "ZEMath/ZERectangle3D.h"
 
@@ -189,7 +188,7 @@ ZEUInt ZEDebugDrawer::GetDebugDrawElements() const
 	return DebugDrawElements.Value;
 }
 
-void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
+void ZEDebugDrawer::Draw(ZERNDrawParameters* DrawParameters)
 {
 	DrawCanvas.Clean();
 
@@ -230,7 +229,7 @@ void ZEDebugDrawer::Draw(ZEDrawParameters* DrawParameters)
 		return;
 
 	RenderCommand.PrimitiveCount = DrawCanvas.Vertices.GetCount() / 2;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
+	DrawParameters->Renderer->AddCommand(&RenderCommand);
 }
 
 bool ZEDebugDrawer::InitializeSelf()
@@ -239,7 +238,7 @@ bool ZEDebugDrawer::InitializeSelf()
 		return false;
 
 	if (Material == NULL)
-		Material = ZESimpleMaterial::CreateInstance();
+		Material = ZERNSimpleMaterial::CreateInstance();
 
 	RenderCommand.SetZero();
 	RenderCommand.Material = Material;
@@ -299,7 +298,4 @@ ZEDebugDrawer::~ZEDebugDrawer()
 ZEDebugDrawer* ZEDebugDrawer::CreateInstance()
 {
 	return new ZEDebugDrawer(); 
-}
-
-
-
+}*/

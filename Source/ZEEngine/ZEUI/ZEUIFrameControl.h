@@ -34,41 +34,25 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_FRAME_CONTROL__
-#define __ZE_UI_FRAME_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
-#include "ZEGraphics/ZEUIMaterial.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUIRectangle.h"
+
 
 class ZEUIFrameControl : public ZEUIControl
 {
-	friend class ZEUIBorderedFrameControl;
-	friend class ZEUIVerticalScrollbar;
-	friend class ZEUIHorizontalScrollbar;
-	friend class ZEUIScrollArea;
-
 	ZE_OBJECT
-
-	protected:
-
-		ZEUIRectangle		Frame;
-		ZEUIMaterial*		FrameMaterial;
+	public:
+		ZEUIRectangle				Frame;
 
 	public:
+		virtual void				SetPosition(const ZEVector2& Position);
+		virtual	void				SetSize(const ZEVector2& Size);
+		virtual void				SetWidth(float Width);
+		virtual void				SetHeight(float Height);
+		virtual void				SetTexture(const ZEGRTexture2D* Texture);
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
+		virtual void				Draw(ZEUIRenderer* Renderer);
 
-		virtual	void		SetSize(const ZEVector2& Size);
-		virtual void		SetWidth(float Width);
-		virtual void		SetHeight(float Height);
-
-		virtual ZEMaterial*	GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
-
-		virtual void		SetPosition(const ZEVector2& Position);
-
-							ZEUIFrameControl();
+									ZEUIFrameControl();
 };
-
-#endif

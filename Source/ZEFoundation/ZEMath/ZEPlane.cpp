@@ -34,11 +34,32 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPlane.h"
+
 #include "ZEMath.h"
+#include "ZERay.h"
 #include "ZELine.h"
 #include "ZELineSegment.h"
-#include "ZERay.h"
-#include "ZEMath/ZEMath.h"
+
+ZEVector4 ZEPlane::ToABCD() const
+{
+	ZEVector4 Vector;
+	Vector.x = n.x;
+	Vector.y = n.y;
+	Vector.z = n.z;
+	Vector.w = -(Vector.x * p.x + Vector.y * p.y + Vector.z * p.z);
+
+	return Vector;
+}
+
+ZEPlane::ZEPlane(const ZEVector3& n, const ZEVector3& p)
+{
+	Create(*this, n, p);
+}
+
+ZEPlane::ZEPlane()
+{
+
+}
 
 bool ZEPlane::IntersectionTest(const ZEPlane& Plane, const ZELine& Line, float &t)
 {	
@@ -139,14 +160,6 @@ float ZEPlane::Distance(const ZEPlane& Plane, const ZEVector3& Point)
 	return  ZEMath::Abs(ZEVector3::DotProduct(Point - Plane.p, Plane.n));
 }
 
-void ZEPlane::ToABCD(const ZEPlane& Plane, float& A, float& B, float& C, float &D)
-{
-	A = Plane.n.x;
-	B = Plane.n.y;
-	C = Plane.n.z;
-	D = -(A * Plane.p.x + B * Plane.p.y + C * Plane.p.z);
-}
-
 inline void ZEPlane::Create(ZEPlane& Plane, const ZEVector3& n, const ZEVector3& p)
 {
 	Plane.n = n;
@@ -163,12 +176,3 @@ void ZEPlane::Create(ZEPlane& Plane, const ZEVector3 &P1, const ZEVector3 &P2, c
 	Plane.p = P3;
 }
 
-ZEPlane::ZEPlane(const ZEVector3& n, const ZEVector3& p)
-{
-	Create(*this, n, p);
-}
-
-ZEPlane::ZEPlane()
-{
-
-}

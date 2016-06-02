@@ -213,6 +213,9 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 			if (Output.Class == NULL)
 				return false;
 
+			if (Output.Class->IsBuiltInClass)
+				return false;
+
 			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)
 				return false;
 		}

@@ -34,14 +34,9 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_H__
-#define __ZE_MODEL_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
-#include "ZEGraphics/ZECanvas.h"
+
 #include "ZEModelResource.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
@@ -49,17 +44,12 @@
 #include "ZEModelAnimation.h"
 #include "ZEModelAnimationTrack.h"
 #include "ZEModelIKChain.h"
-#include "ZEGame/ZEDrawStatistics.h"
 
-class ZEQuaternion;
-class ZEMatrix4x4;
-class ZEFixedMaterial;
-class ZESimpleMaterial;
+#include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
-
-struct ZEDrawParameters;
 
 class ZEModel : public ZEEntity
 {	
@@ -70,15 +60,14 @@ class ZEModel : public ZEEntity
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	friend class ZEModelDebugDrawer;
+	friend class ZEModelMeshLOD;
 
 	private:
 		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
-		ZEArray<ZERenderCommand>			LODRenderCommands;
+		ZEArray<ZERNCommand>				LODRenderCommands;
 		
-		ZEModelStatistics					Statistics;
-
 		ZEArray<ZEModelMesh>				Meshes;
 		ZEArray<ZEModelBone>				Bones;
 		ZEArray<ZEModelHelper>				Helpers;
@@ -86,6 +75,9 @@ class ZEModel : public ZEEntity
 		ZEPhysicalRigidBody*				ParentlessBoneBody;
 		ZEPhysicalBoxShape*					ParentlessBoneShape;
 		ZEVector3							ParentlessBoneBodyPosition;
+
+		bool								DirtyConstantBufferSkin;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBufferBoneTransforms;
 
 		ZEUInt								ActiveLOD;
 		bool								Visibility;
@@ -100,10 +92,14 @@ class ZEModel : public ZEEntity
 		mutable bool						DirtyBoundingBox;
 		bool								BoundingBoxIsUserDefined;
 
+		ZERNCommand							RenderCommand;
+
 		void								CalculateBoundingBox() const;
 		void								UpdateTransforms();
 	
 		void								LoadModelResource();
+
+		virtual void						UpdateConstantBufferBoneTransforms();
 
 		virtual void						ChildBoundingBoxChanged();
 		virtual void						LocalTransformChanged();
@@ -119,9 +115,7 @@ class ZEModel : public ZEEntity
 	public:
 		ZEArray<ZEModelIKChain>				IKChains;
 
-		virtual	ZEDrawFlags					GetDrawFlags() const;
-		virtual const ZEModelStatistics&	GetStatistics() const;
-
+		virtual ZEDrawFlags					GetDrawFlags() const;
 		void								SetUserDefinedBoundingBoxEnabled(bool Value);
 		virtual const ZEAABBox&				GetBoundingBox() const;
 		virtual const ZEAABBox&				GetWorldBoundingBox() const;
@@ -162,14 +156,13 @@ class ZEModel : public ZEEntity
 		bool								GetPhysicsEnabled();
 
 		void								Tick(float ElapsedTime);
-		void								Draw(ZEDrawParameters* DrawParameters);
-		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);
 		
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
+		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);	
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
+		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEModel*						CreateInstance();
 };
-
-#endif

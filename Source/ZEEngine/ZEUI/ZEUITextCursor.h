@@ -34,46 +34,42 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_TEXT_CURSOR__
-#define __ZE_UI_TEXT_CURSOR__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEUIRectangle.h"
 #include "ZECore/ZETimer.h"
 
-ZE_META_FORWARD_DECLARE(ZEMaterial, "ZEGraphics/ZEMaterial.h")
+ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZEGraphics/ZEMaterial.h")
 
 class ZEUITextCursor : public ZEUIRectangle, public ZEObject
 {
 	ZE_OBJECT
-
 	private:
-		ZETimer*			Timer;
-		float				BlinkTime;
-		bool				IsVisible;
+		ZETimer*					Timer;
+		float						BlinkTime;
+		bool						IsVisible;
 
-		ZEInt32				Width;
-		ZEInt32				Height;
+		ZEInt32						Width;
+		ZEInt32						Height;
 
-		void				Blink(float Time);
-		void				Update();
+		void						Blink(float Time);
+		void						Update();
 
 	public:
-		void				SetBlinkTime(float Time);
-		float				GetBlinkTime();
+		void						SetBlinkTime(float Time);
+		float						GetBlinkTime();
 
-		bool				GetVisible() const;
+		bool						GetVisible() const;
 
-		void				SetHeight(ZEInt32 Height);
-		void				SetWidth(ZEInt32 Width);
-		void				SetSize(const ZEVector2& Size);
+		void						SetHeight(ZEInt32 Height);
+		void						SetWidth(ZEInt32 Width);
+		void						SetSize(const ZEVector2& Size);
 
-		void				SetPostion(const ZEVector2& Position);
-		const ZEVector2&	GetPosition() const;
+		void						SetPostion(const ZEVector2& Position);
+		const ZEVector2&			GetPosition() const;
 
-		const ZEMaterial*	GetMaterial() const;
+		const ZERNMaterial*			GetMaterial() const;
 
-							ZEUITextCursor();
-							~ZEUITextCursor();
+									ZEUITextCursor();
+									~ZEUITextCursor();
 };
-
-#endif

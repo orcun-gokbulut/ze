@@ -53,14 +53,13 @@ class ZEAllocatorBase
 	public:	
 		inline static void ObjectCopy(Type* Destination, const Type* Source, ZESize Count)
 		{
-			if (Count == 0)
-				return;
-
-			Count--;
-			do
+			const Type* SourceEnd = Source + Count;
+			while(Source != SourceEnd)
 			{
-				Destination[Count] = Source[Count];
-			} while (Count--);
+				*Destination = *Source;
+				Destination++;
+				Source++;
+			} 
 		}
 
 		inline ZESize GetSize() const
@@ -70,59 +69,52 @@ class ZEAllocatorBase
 
 		inline void Deallocate(Type** Pointer)
 		{
-			if (*Pointer != NULL)
-			{
-				Size = 0;
-				delete[] *Pointer;
-				*Pointer = NULL;
-			}
+			if (*Pointer == NULL)
+				return;
+
+			Size = 0;
+			delete[] *Pointer;
+			*Pointer = NULL;
 		}
 	
 		inline bool Allocate(Type** Pointer, ZESize NewSize)
 		{
-			if (NewSize != 0)
+			if (Size == NewSize)
+				return false;
+
+			if (NewSize == 0)
 			{
-				if (Size != NewSize)
-				{
-					Size = NewSize;
-					*Pointer = new Type[NewSize];
-					return true;
-				}
-				else
-					return false;
-			}
-			else
-			{
-				Size = 0;
-				if (*Pointer != NULL)
-				{
-					delete[] *Pointer;
-					*Pointer = NULL;
-				}
+				Deallocate(Pointer);
 				return false;
 			}
 
+			Size = NewSize;
+			*Pointer = new Type[NewSize];
+
+			return true;
 		}
 
 		inline void Reallocate(Type** Pointer, ZESize NewSize)
 		{
-			if (NewSize != 0)
+			if (Size == NewSize)
+				return;
+
+			if (NewSize == 0)
 			{
-				if (Size != NewSize)
-				{
-					ZESize OldSize = Size;
-					Type* NewPointer = new Type[NewSize];
-					if (*Pointer != NULL)
-					{
-						ObjectCopy(NewPointer, *Pointer, (OldSize > NewSize ? NewSize : OldSize));
-						delete[] *Pointer;
-					}
-					Size = NewSize;
-					*Pointer = NewPointer;
-				}
-			}
-			else
 				Deallocate(Pointer);
+				return;
+			}
+			
+			ZESize OldSize = Size;
+			Type* NewPointer = new Type[NewSize];
+			if (*Pointer != NULL)
+			{
+				ObjectCopy(NewPointer, *Pointer, (OldSize > NewSize ? NewSize : OldSize));
+				delete[] *Pointer;
+			}
+
+			Size = NewSize;
+			*Pointer = NewPointer;
 		}
 		
 		ZEAllocatorBase()

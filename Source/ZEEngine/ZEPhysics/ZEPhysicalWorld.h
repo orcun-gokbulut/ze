@@ -46,7 +46,7 @@ class ZEPhysicsCollision;
 class ZEPhysicsTrigger;
 class ZEPhysicalObject;
 class ZEPhysicalShape;
-class ZERenderer;
+class ZERNRenderer;
 
 struct ZERayCastResultDetails
 {
@@ -90,8 +90,6 @@ class ZEPhysicalWorld
 		virtual void					Update() = 0;
 		
 		virtual void					Destroy();
-
-		virtual void					Draw(ZERenderer* Renderer) = 0;
 
 		virtual ZEPhysicalShape*		RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& ResultDetails) = 0;
 

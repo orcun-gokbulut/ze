@@ -35,9 +35,6 @@
 
 #pragma once
 
-#ifndef __ZE_PARTICLE_SYSTEM_H__
-#define __ZE_PARTICLE_SYSTEM_H__
-
 #include "ZEMeta/ZEObject.h"
 
 #include "ZEMath/ZEQuaternion.h"
@@ -48,7 +45,9 @@
 class ZEParticleRenderer;
 class ZEParticleOperator;
 class ZEParticleGenerator;
-struct ZEDrawParameters;
+class ZERNRenderParameters;
+class ZERNCommand;
+struct ZERNCullParameters;
 
 // struct ZENewParticle
 // {
@@ -70,7 +69,6 @@ class ZEParticleSystem : public ZEObject
 	friend class ZEParticleEffect;
 
 	private:
-
 		ZEParticleEffect*						Owner;
 
 		ZEArray<ZEParticle>						ParticlePool;
@@ -82,7 +80,6 @@ class ZEParticleSystem : public ZEObject
 		ZEUInt									MaximumParticleCount;
 
 	public:
-
 		void									SetRenderer(ZEParticleRenderer* Renderer);
 		const ZEParticleRenderer*				GetRenderer() const;
 
@@ -101,11 +98,10 @@ class ZEParticleSystem : public ZEObject
 
 		const ZEParticleEffect*					GetOwner() const;
 
-		virtual void							Draw(ZEDrawParameters* DrawParameters);
-		virtual void							Tick(float ElapsedTime);
+		bool									PreRender(const ZERNCullParameters* CullParameters);
+		void									Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		void									Tick(float ElapsedTime);
 
 												ZEParticleSystem();
-												~ZEParticleSystem();
+		virtual									~ZEParticleSystem();
 };
-
-#endif

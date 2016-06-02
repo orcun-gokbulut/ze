@@ -68,12 +68,11 @@ enum ZESpeakerLayout
 
 enum ZESoundSourceType;
 
-#define ZE_MAX_DEVICE_NAME_SIZE 128
 struct ZESoundDevice
 {
 	ZESize			DeviceId;
-	char			DeviceName[ZE_MAX_DEVICE_NAME_SIZE];
-	char			DriverName[ZE_MAX_DEVICE_NAME_SIZE];
+	ZEString		DeviceName;
+	ZEString		DriverName;
 };
 
 
@@ -81,7 +80,7 @@ class ZESoundModule : public ZEModule
 {
 	ZE_MODULE(ZESoundModule)
 
-	protected:
+	public:
 		static ZEOptionSection					SoundOptions;
 
 	public:

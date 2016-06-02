@@ -34,43 +34,53 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_BILLBOARD_RENDERER_H__
-#define __ZE_PARTICLE_BILLBOARD_RENDERER_H__
 
-#include "ZEParticleEmitter.h"
 #include "ZEParticleRenderer.h"
-#include "ZEGraphics\ZERenderCommand.h"
 
-class ZESimpleVertex;
-struct ZEDrawParameters;
-class ZEStaticVertexBuffer;
+#include "ZERenderer/ZERNCommand.h"
+#include "ZEPointer/ZEHolder.h"
+
+class ZEGRVertexBuffer;
+class ZERNRenderParameters;
+class ZEGRShader;
+class ZEGRRenderStateData;
+class ZEGRStructuredBuffer;
+struct ZERNCullParameters;
 
 class ZEParticleBillboardRenderer : public ZEParticleRenderer
 {
 	private:
-
-		ZEParticleBillboardType				BillboardType;
-
-		ZEStaticVertexBuffer*				VertexBuffer;
-		ZERenderCommand						RenderCommand;
+		ZERNCommand							RenderCommand;
 		ZEVector3							AxisOfOrientation;
 
-		void								UpdateVertexBuffer(ZEDrawParameters* DrawParameters);
-		void								DrawParticle(ZESimpleVertex* Buffer, const ZEParticle* Particle, const ZEVector3& Right, const ZEVector3& Up);
+		struct InstanceAttributes
+		{
+			ZEVector3	Position;
+			float		Size;
+		};
+		ZEHolder<ZEGRStructuredBuffer>		InstanceBuffer;
+
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				HullShader;
+		ZEHolder<ZEGRShader>				DomainShader;
+		ZEHolder<ZEGRShader>				PixelShader;
+
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
+
+		void								CreateShaders();
+		void								CreateRenderState();
+
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
 											ZEParticleBillboardRenderer();
 
 	public:
-
-		virtual void						Draw(ZEDrawParameters* DrawParameters);
+		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
 		void								SetAxixOfOrientation(const ZEVector3& AxisOfOrientation);
 		const ZEVector3&					GetAxisOfOrientation() const;
 
-		void								SetBillboardType(ZEParticleBillboardType Type);
-		ZEParticleBillboardType				GetBillboardType() const;
-
 		static ZEParticleBillboardRenderer*	CreateInstance();
 };
-
-#endif

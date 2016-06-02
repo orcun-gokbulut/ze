@@ -45,9 +45,9 @@ private:
 	ZEVector4					RoomColor;
 	ZEVector4					DoorColor;
 
-	ZEMaterial*					InteriorMaterial;
+	ZERNMaterial*					InteriorMaterial;
 	ZECanvas					InteriorDrawCanvas;
-	ZERenderCommand				InteriorRenderCommand;
+	ZERNCommand				InteriorRenderCommand;
 
 protected:
 	virtual void				DebugDrawEntity();

@@ -34,14 +34,14 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROVIDER_H__
-#define __ZE_PROVIDER_H__
 
 #include "ZEDS/ZEArray.h"
 #undef RegisterClass
 
 class ZEClass;
+class ZEObject;
 class ZEEnumerator;
+class ZEMLReaderNode;
 
 class ZEProvider
 {
@@ -67,7 +67,9 @@ class ZEProvider
 
 		ZEEnumerator*					GetEnumerator(const char* EnumeratorName);
 
+		ZEObject*						CreateInstance(const char* ClassName);
+		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName);
+		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& Node);
+
 		static ZEProvider*				GetInstance();
 };
-
-#endif

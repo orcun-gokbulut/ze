@@ -38,8 +38,9 @@
 #define __ZE_GIZMO_H__
 
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZEPointer/ZEHolder.h"
 
 enum ZEGizmoMode
 {
@@ -63,13 +64,12 @@ enum ZEGizmoAxis
 	ZE_GA_SCREEN_AXIS
 };
 
-ZE_META_FORWARD_DECLARE(ZESimpleMaterial, "ZEGraphics/ZESimpleMaterial.h")
-ZE_META_FORWARD_DECLARE(ZERenderer, "ZEGraphics/ZERenderer.h")
+ZE_META_FORWARD_DECLARE(ZERNSimpleMaterial, "ZERNRenderer/ZESimpleMaterial.h")
+ZE_META_FORWARD_DECLARE(ZERNRenderer, "ZERNRenderer/ZERenderer.h")
 
 class ZEGizmo : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
 		ZECanvas						GizmoLines;
 		ZECanvas						GizmoTriangles;
@@ -77,9 +77,9 @@ class ZEGizmo : public ZEEntity
 
 		float							AxisLenght;
 
-		static ZESimpleMaterial*		GizmoMaterial;
+		static ZEHolder<ZERNSimpleMaterial>	GizmoMaterial;
 
-		ZERenderCommand					RenderCommand;
+		ZERNCommand						RenderCommand;
 
 		ZEGizmoMode						Mode;
 		ZEGizmoAxis						HoveredAxis;
@@ -141,8 +141,6 @@ class ZEGizmo : public ZEEntity
 
 		void							StartScaleProjection(ZEGizmoAxis Axis, const ZERay& InitialRay);
 		ZEVector3						ScaleProjection(const ZERay& Ray);
-
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
 
 		static ZEGizmo*					CreateInstance();
 };

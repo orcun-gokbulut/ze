@@ -41,7 +41,7 @@
 #include "ZEInput/ZEInputModule.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEGraphics/ZEProjectiveLight.h"
+#include "ZERenderer/ZELightProjective.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 #define ACTIONID_FORWARD		0

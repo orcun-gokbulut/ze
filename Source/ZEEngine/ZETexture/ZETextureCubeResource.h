@@ -34,19 +34,18 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_CUBE_RESOURCE_H__
-#define __ZE_TEXTURE_CUBE_RESOURCE_H__
 
 #include "ZETextureResource.h"
 
-ZE_META_FORWARD_DECLARE(ZETextureCube, "ZEGraphics/ZETextureCube.h")
+#include "ZEPointer/ZEHolder.h"
+
+ZE_META_FORWARD_DECLARE(ZEGRTextureCube, "ZEGraphics/ZETextureCube.h")
 
 class ZETextureCubeResource : public ZETextureResource
 {
 	ZE_OBJECT
-
 	private:
-		ZETextureCube*						Texture;
+		ZEHolder<ZEGRTextureCube>			Texture;
 
 	protected:
 		 									ZETextureCubeResource();
@@ -54,14 +53,14 @@ class ZETextureCubeResource : public ZETextureResource
 
 	public:
 		virtual const char*					GetResourceType() const;
-		virtual ZETextureType				GetTextureType() const;
+		virtual ZEGRTextureType				GetTextureType() const;
 
-		const ZETextureCube*				GetTexture() const;
+		ZEGRTexture*						GetTexture() const;
+		ZEGRTextureCube*					GetTextureCube() const;
 
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
+
 		static ZETextureCubeResource*		LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETextureCubeResource*		LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 		static ZETextureCubeResource*		LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
 };
-
-#endif

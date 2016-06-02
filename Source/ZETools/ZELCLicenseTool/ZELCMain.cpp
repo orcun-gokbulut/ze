@@ -55,7 +55,7 @@ int CALLBACK WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLi
 	QApplication Application(argc, argv);
 	HRESULT hRes = CoInitializeSecurity(NULL, -1, NULL, NULL, RPC_C_AUTHN_LEVEL_CONNECT, RPC_C_IMP_LEVEL_DELEGATE, NULL, EOAC_NONE, 0);
 
-	QFile File(":/Themes/DarkTheme/StyleSheet.qss");
+	QFile File(":/Zinek/ZEThemeDark/ZEThemeDark.qss");
 	File.open(QFile::ReadOnly);
 	QString StyleSheet = QLatin1String(File.readAll());
 	qApp->setStyleSheet(StyleSheet);

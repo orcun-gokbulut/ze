@@ -43,40 +43,38 @@ class ZESector : public ZEGeographicEntity
 	ZE_OBJECT;
 
 	protected:
-		ZEGUID GUID;
-		ZEString SectorFile;
+		ZEGUID						GUID;
+		ZEString					SectorFile;
 
-		ZEArray<ZEGUID> AdjacentSectorIds;
-		ZEInt8 AdjacencyDepth;
+		ZEArray<ZEGUID>				AdjacentSectorIds;
+		ZEInt8						AdjacencyDepth;
 
-		virtual bool SaveSector(ZEMLWriterNode* Serializer);
-		virtual bool RestoreSector(ZEMLReaderNode* Unserializer);
+		virtual bool				SaveSector(ZEMLWriterNode* Serializer);
+		virtual bool				RestoreSector(ZEMLReaderNode* Unserializer);
 
-		virtual bool SetOwner(ZEEntity* Owner);
-		virtual bool InitializeSelf();
+		virtual bool				InitializeSelf();
 
-		ZESector();
+									ZESector();
 
 	public:
-		void SetGUID(const ZEGUID& GUID);
-		const ZEGUID& GetGUID();
+		void						SetGUID(const ZEGUID& GUID);
+		const ZEGUID&				GetGUID() const;
 
-		void SetSectorFile(const ZEString& FileName);
-		const ZEString& GetSectorFile() const;
+		void						SetSectorFile(const ZEString& FileName);
+		const ZEString&				GetSectorFile() const;
 
-		bool CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
-		const ZEArray<ZEGUID>& GetAdjacentSectorIds() const;
-		bool AddAdjacentSector(ZESector* Sector);
-		bool RemoveAdjacentSector(ZESector* Sector);
-		static ZESector* FindSector(const ZEGUID& Id);
+		bool						CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
+		const ZEArray<ZEGUID>&		GetAdjacentSectorIds() const;
+		bool						AddAdjacentSector(ZESector* Sector);
+		bool						RemoveAdjacentSector(ZESector* Sector);
+		
+		void						SetAdjacencyDepth(ZEInt8 Value);
+		ZEInt8						GetAdjacencyDepth() const;
 
-		void SetAdjacencyDepth(ZEInt8 Value);
-		ZEInt8 GetAdjacencyDepth() const;
+		virtual bool				Save(ZEMLWriterNode* Serializer);
+		virtual bool				Restore(ZEMLReaderNode* Unserializer);
 
-		virtual bool Save(ZEMLWriterNode* Serializer);
-		virtual bool Restore(ZEMLReaderNode* Unserializer);
+		virtual void				Destroy();
 
-		virtual void Destroy();
-
-		static ZESector* CreateInstance();
+		static ZESector*			CreateInstance();
 };

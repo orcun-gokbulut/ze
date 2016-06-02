@@ -37,37 +37,28 @@
 #ifndef __ZE_UI_CURSOR_CONTROL__
 #define __ZE_UI_CURSOR_CONTROL__
 
-#include "zeui/ZEUIControl.h"
-#include "zeui/ZEUIRectangle.h"
+#include "ZEUI/ZEUIControl.h"
+#include "ZEUI/ZEUIRectangle.h"
 #include "ZEInput/ZEInputMap.h"
-#include "ZEGraphics/ZEUIMaterial.h"
 
 class ZEUICursorControl : public ZEUIControl
 {
 	ZE_OBJECT
-
 	private:
-
-		ZEUIMaterial*		CursorMaterial;
-		ZEUIRectangle		Cursor;
-		ZEInputMap			InputMap;
-
-		ZEUIMouseKey		CurentButton;
+		ZEUIRectangle				Cursor;
+		ZEInputMap					InputMap;
+		ZEUIMouseKey				CurentButton;
 
 	public:
+		virtual void				Draw(ZEUIRenderer* Renderer);
+		virtual void				Tick(float ElapsedTime);
 
-		virtual void		Draw(ZEUIRenderer* Renderer);
-		virtual void		Tick(float ElapsedTime);
+		ZEUIMouseKey				GetCurrentButton();
 
-		virtual ZEMaterial* GetMaterial() const;
-		virtual void		SetMaterial(ZEMaterial* Material);
+		virtual void				SetZOrder(ZEInt32 Z);
 
-		ZEUIMouseKey		GetCurrentButton();
-
-		virtual void		SetZOrder(ZEInt32 Z);
-
-							ZEUICursorControl();
-							~ZEUICursorControl();
+									ZEUICursorControl();
+									~ZEUICursorControl();
 };
 
 #endif

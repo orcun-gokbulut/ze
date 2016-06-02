@@ -67,8 +67,12 @@ ZEExtensionDescription* ZEModuleManager::GetModuleDescription(ZEExtensionDescrip
 {
 	if (BaseModuleDescription->GetParent() != ZEModule::Description())
 		return NULL;
+	
+	ZEOption* Option = ModuleManagerOptions.GetOption(BaseModuleDescription->GetName());
+	if (Option == NULL)
+		return NULL;
 
-	return GetModuleDescription(ZEString(ModuleManagerOptions.GetOption(BaseModuleDescription->GetName())->GetValue().GetString()));
+	return GetModuleDescription(Option->GetValue().GetString());
 }
 
 ZEModule* ZEModuleManager::CreateModuleInstance(ZESize Index)
@@ -171,7 +175,7 @@ void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 }
 
 #include "ZEInput/ZEInputModule.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9Module.h"
+#include "ZEModules/ZEDirect3D11/ZED11Module.h"
 #include "ZEModules/ZEDirectSound/ZEDSModule.h"
 #include "ZEModules/ZEDirectInput/ZEDirectInputModule.h"
 //#include "ZEModules/ZEVirtualInput/ZEVirtualInputModule.h"
@@ -180,14 +184,14 @@ void ZEModuleManager::UnregisterModule(ZEExtensionDescription* ModuleDesc)
 
 ZEModuleManager::ZEModuleManager()
 {
-	RegisterModule(ZED3D9Module::Description());
+	RegisterModule(ZED11Module::Description());
 	RegisterModule(ZEDSModule::Description());
 	RegisterModule(ZEALModule::Description());
 	RegisterModule(ZEPhysXModule::Description());
 	RegisterModule(ZEInputModule::Description());
 
 	ModuleManagerOptions.SetName("ModuleManager");
-	ModuleManagerOptions.AddOption(new ZEOption("ZEGraphicsModule", "ZED3D9Module", ZE_OA_NORMAL));
+	ModuleManagerOptions.AddOption(new ZEOption("ZEGRGraphicsModule", "ZED11Module", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
 	ModuleManagerOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));

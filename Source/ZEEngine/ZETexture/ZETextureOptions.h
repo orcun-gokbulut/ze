@@ -34,9 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_TEXTURE_OPTIONS_H__
-#define __ZE_TEXTURE_OPTIONS_H__
-
 
 #include "ZETypes.h"
 
@@ -106,8 +103,5 @@ struct ZETextureOptions
 	ZETextureFileCaching			FileCaching;
 	ZETextureMipMapping				MipMapping;
 	ZEUInt32						MaximumMipmapLevel;
-
+	bool							sRGB;
 };
-
-
-#endif

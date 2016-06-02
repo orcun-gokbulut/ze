@@ -34,24 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_COMPONENT__
-#define __ZE_UI_COMPONENT__
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEUIRectangle.h"
 #include "ZEUIEvents.h"
 
-ZE_META_FORWARD_DECLARE(ZEUIRenderer, "ZEUIRenderer.h")
+class ZEUIRenderer;
 
 class ZEUIControl : public ZEObject
 {
-	friend class ZEUIManager;
-
 	ZE_OBJECT
-
+	friend class ZEUIManager;
 	private:
 		ZEString						Name;
 		ZEString						ToolTip;
@@ -80,23 +77,22 @@ class ZEUIControl : public ZEObject
 		ZEVector2						MaximumSize;
 		ZEVector2						MinimumSize;
 
-		ZEUIEventMouseClicked			MouseClickedEvent;			//Done
+		ZEUIEventMouseClicked			MouseClickedEvent;
 		ZEUIEventMouseDoubleClicked		MouseDoubleClickedEvent;
-		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;	//Done
-		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;	//Done
-		ZEUIEventMouseHovered			MouseHoveredEvent;			//Done
-		ZEUIEventMouseEntered			MouseEnteredEvent;			//Done
-		ZEUIEventMouseLeft				MouseLeftEvent;				//Done
-		ZEUIEventMouseMoved				MouseMovedEvent;			//Done
-		ZEUIEventKeyPressed				KeyPressedEvent;			//Done
-		ZEUIEventKeyReleased			KeyReleasedEvent;			//Done
-		ZEUIEventFocusGained			FocusGainedEvent;			//Done
-		ZEUIEventFocusLost				FocusLostEvent;				//Done
+		ZEUIEventMouseButtonPressed		MouseButtonPressedEvent;
+		ZEUIEventMouseButtonReleased	MouseButtonReleasedEvent;
+		ZEUIEventMouseHovered			MouseHoveredEvent;
+		ZEUIEventMouseEntered			MouseEnteredEvent;
+		ZEUIEventMouseLeft				MouseLeftEvent;
+		ZEUIEventMouseMoved				MouseMovedEvent;
+		ZEUIEventKeyPressed				KeyPressedEvent;
+		ZEUIEventKeyReleased			KeyReleasedEvent;
+		ZEUIEventFocusGained			FocusGainedEvent;
+		ZEUIEventFocusLost				FocusLostEvent;
+
+		void							SetParent(ZEUIControl* Parent);
 
 	protected:
-
-		void							SetParent(ZEUIControl *ParentName);
-
 		void							SetHovered(bool Hovered);
 		void							SetFocused(bool Focused);
 		void							SetPressed(bool Pressed);							
@@ -200,5 +196,3 @@ class ZEUIControl : public ZEObject
 										ZEUIControl();
 										~ZEUIControl();
 };
-
-#endif

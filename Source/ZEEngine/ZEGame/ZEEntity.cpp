@@ -35,21 +35,19 @@
 
 #include "ZEEntity.h"
 
+#include "ZEError.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEViewVolume.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
-#include "ZEError.h"
-#include "ZEScene.h"
-#include "ZEEntityProvider.h"
 #include "ZEMeta/ZEProvider.h"
 
-#include <string.h>
+#include "ZEScene.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNView.h"
 
-// Entity Dirty Flags
-typedef ZEFlags ZEEntityDirtyFlags;
-#define ZE_EDF_NONE								0x0000
 #define ZE_EDF_LOCAL_TRANSFORM					0x0001
 #define ZE_EDF_INV_LOCAL_TRANSFORM				0x0002
 #define ZE_EDF_WORLD_TRANSFORM					0x0004
@@ -169,11 +167,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 
 void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 {
-	if (Entity->Owner != this)
-	{
-		zeError("Can not remove non-child entity.");
-		return;
-	}
+	zeCheckError(Entity->Owner != this, ZE_VOID, "Can not remove non-child entity.");
 
 	ChildEntities.RemoveValue(Entity);
 
@@ -238,6 +232,17 @@ ZEEntity::ZEEntity()
 ZEEntity::~ZEEntity()
 {
 	Deinitialize();
+
+	if (OwnerScene != NULL)
+		OwnerScene->RemoveEntity(this);
+
+	if (Owner != NULL)
+	{
+		if (Owner->GetComponents().Exists(this))
+			Owner->RemoveComponent(this);
+		else if (Owner->GetChildEntities().Exists(this))
+			Owner->RemoveChildEntity(this);
+	}
 
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Destroy();
@@ -580,9 +585,21 @@ void ZEEntity::Tick(float Time)
 
 }
 
-void ZEEntity::Draw(ZEDrawParameters* DrawParameters)
+bool ZEEntity::PreRender(const ZERNCullParameters* CullParameters)
 {
+	if (!GetEnabled() || !GetVisible())
+		return false;
 
+	ZEDrawFlags Flags = GetDrawFlags();
+	if (!Flags.GetFlags(ZE_DF_DRAW))
+		return false;
+
+	return true;
+}
+
+void ZEEntity::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	
 }
 
 bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

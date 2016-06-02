@@ -35,45 +35,51 @@
 
 #include "ZELNLogModule.h"
 
-#include "ZELNLogWidget.h"
 #include "ui_ZELNLogWidget.h"
+
 #include "ZELog.h"
 
 ZELN_MODULE_DECRIPTION(ZELNLogModule, "Log");
 
-void ZELNLogModule::LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters)
+void ZELNLogModule::LogCallback(const char* ModuleName, ZELogType Type, const char* LogText, void* ExtraParameters)
 {
-	ZELNLogModule* Widget = (ZELNLogModule*)ExtraParameters;
-
+	ZELNLogModule* Module = static_cast<ZELNLogModule*>(ExtraParameters);
 	const char* TypeString = ZELog::UtilityGetLogTypeString(Type);
-
-	Widget->GetForm()->txtConsole->appendHtml(
+	Module->Form->txtConsole->appendHtml(
 		QString("[%1] <b>%2</b>: %3")
-		.arg(Module)
+		.arg(ModuleName)
 		.arg(TypeString)
 		.arg(LogText));
 }
-
 
 bool ZELNLogModule::InitializeSelf()
 {
 	if (!ZEInitializable::InitializeSelf())
 		return false;
 
-	Widget = new ZELNLogWidget();
-	
+	Widget = new QWidget();
+	Form = new Ui_ZELNLogWidget();
+	Form->setupUi(Widget);
+
 	ZELog::GetInstance()->SetCallbackParameter(this);
 	ZELog::GetInstance()->SetCallback(&LogCallback);
 	
 	return true;
 }
 
+void ZELNLogModule::DeinitializeSelf()
+{
+	ZELog::GetInstance()->SetCallbackParameter(NULL);
+	ZELog::GetInstance()->SetCallback(NULL);
+
+	delete Widget;
+	Widget = NULL;
+
+	delete Form;
+	Form = NULL;
+}
+
 QWidget* ZELNLogModule::GetWidget()
 {
 	return Widget;
-}
-
-Ui_ZELNLogWidget* ZELNLogModule::GetForm()
-{
-	return Widget->Form;
 }

@@ -72,12 +72,11 @@ class ZEAngle
 		static float		ArcSin(float Value);
 		static float		ArcCos(float Value);
 		static float		ArcTan(float Value);
-		static float		ArcTan2(float x, float y);
+		static float		ArcTan2(float Y, float X);
 
 		static float		ToRadian(float Angle);
 		static float		ToDegree(float Angle);
 		static ZEVector2	ToVector(float Angle);
-
 };
 
 #endif

@@ -33,50 +33,57 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZECore/ZECore.h"
 #include "ZEInteriorRoom.h"
-#include "ZEInteriorResource.h"
-#include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEInterior/ZEInterior.h"
-#include "ZEMath/ZEViewVolume.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+
+#include "ZECore/ZECore.h"
 #include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEViewVolume.h"
+#include "ZEInterior.h"
+#include "ZEInteriorResource.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRRenderState.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEPhysics/ZEPhysicalMesh.h"
+#include "ZEPhysics/ZEPhysicalWorld.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNMaterial.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
-void ZEInteriorRoom::DebugDraw(ZERenderer* Renderer)
+#define ZE_IRDF_TRANSFORM						1
+#define ZE_IRDF_WORLD_TRANSFORM					2
+#define ZE_IRDF_INV_WORLD_TRANSFORM				4
+#define ZE_IRDF_WORLD_BOUNDING_BOX				8
+#define ZE_IRDF_CONSTANT_BUFFER					16
+
+struct ZEInteriorTransformConstants
 {
-	if (DebugDrawComponents.Material == NULL)
-	{
-		DebugDrawComponents.Material = ZESimpleMaterial::CreateInstance();
+	ZEMatrix4x4	WorldTransform;
+	ZEMatrix4x4	WorldTransformInverseTranspose;
+	ZEMatrix4x4	PreSkinTransform;
+	ZEVector4	ClippingPlane0;
+	ZEVector4	ClippingPlane1;
+	ZEVector4	ClippingPlane2;
+	ZEVector4	ClippingPlane3;
+};
 
-		DebugDrawComponents.BoxRenderCommand.SetZero();
-		DebugDrawComponents.BoxRenderCommand.Material = DebugDrawComponents.Material;
-		DebugDrawComponents.BoxRenderCommand.Flags = ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_NO_Z_WRITE;
-		DebugDrawComponents.BoxRenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-		DebugDrawComponents.BoxRenderCommand.VertexBuffer = &DebugDrawComponents.BoxCanvas;
-		DebugDrawComponents.BoxRenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	}
+void ZEInteriorRoom::UpdateConstantBuffer()
+{
+	if (!DirtyFlags.GetFlags(ZE_IRDF_CONSTANT_BUFFER))
+		return;
 
-	DebugDrawComponents.BoxCanvas.Clean();
-	DebugDrawComponents.BoxCanvas.SetColor(ZEVector4(0.7f, 0.5f, 0.0f, 1.0f));
+	ZEInteriorTransformConstants Constants;
 
-	ZEAABBox BoundingBox = GetBoundingBox();
-	DebugDrawComponents.BoxCanvas.SetRotation(ZEQuaternion::Identity);
-	DebugDrawComponents.BoxCanvas.SetTranslation(ZEVector3::Zero);
-	DebugDrawComponents.BoxCanvas.AddWireframeBox((BoundingBox.Max.x - BoundingBox.Min.x), (BoundingBox.Max.y - BoundingBox.Min.y), (BoundingBox.Max.z - BoundingBox.Min.z));
-	ZEMatrix4x4 LocalMatrix;
-	ZEMatrix4x4::CreateOrientation(LocalMatrix, Position, Rotation, Scale);
-	DebugDrawComponents.BoxRenderCommand.WorldMatrix = Owner->GetWorldTransform() * LocalMatrix;
-	DebugDrawComponents.BoxRenderCommand.PrimitiveCount = DebugDrawComponents.BoxCanvas.Vertices.GetCount() / 2;
-	DebugDrawComponents.BoxRenderCommand.Priority = 4;
-	Renderer->AddToRenderList(&DebugDrawComponents.BoxRenderCommand);
+	Constants.WorldTransform = GetWorldTransform();
+	Constants.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
+
+	ConstantBuffer->SetData(&Constants);
+
+	DirtyFlags.UnraiseFlags(ZE_IRDF_CONSTANT_BUFFER);
 }
-
 
 bool ZEInteriorRoom::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
 {
@@ -145,77 +152,9 @@ bool ZEInteriorRoom::RayCastOctree(const ZEOctree<ZESize>& Octree, const ZERay& 
 	return HaveIntersection;
 }
 
-bool ZEInteriorRoom::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
-{
-	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
-		return false;
-
-	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
-	LocalRay.v.NormalizeSelf();
-
-	float RayT;
-	if (!ZEAABBox::IntersectionTest(GetBoundingBox(), LocalRay, RayT))
-		return false;
-
-	bool Result = false;
-	float MinT = ZE_FLOAT_MAX;
-	ZESize PoligonIndex;
-
-	if (Resource->HasOctree)
-		Result = RayCastOctree(Resource->Octree, LocalRay, MinT, PoligonIndex);
-	else
-		Result = RayCastPoligons(LocalRay, MinT, PoligonIndex);
-
-	if (Result)
-	{
-		ZEVector3 WorldPosition;
-		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
-		
-		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, WorldPosition);
-		if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
-		{
-			Report.Distance = ZEMath::Sqrt(DistanceSquare);
-			Report.Position = WorldPosition;
-			Report.SubComponent = this;
-			Report.PoligonIndex = PoligonIndex;
-
-			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
-			{
-				ZEVector3 V0 = Resource->Polygons[Report.PoligonIndex].Vertices[0].Position;
-				ZEVector3 V1 = Resource->Polygons[Report.PoligonIndex].Vertices[1].Position;
-				ZEVector3 V2 = Resource->Polygons[Report.PoligonIndex].Vertices[2].Position;
-
-				ZEVector3 Binormal = ZEVector3(V0, V1);
-				ZEVector3 Tangent = ZEVector3(V0, V2);
-				ZEVector3 Normal;
-				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
-
-				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
-				{
-					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
-					Report.Normal.NormalizeSelf();
-				}
-
-				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
-				{
-					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
-					Report.Binormal.NormalizeSelf();
-				}
-			}
-			
-			return true;
-		}
-	}
-
-	return false;
-}
-
-
 void ZEInteriorRoom::ParentTransformChanged()
 {
-	DirtyFlags.RaiseFlags(ZE_IRDF_ALL);
+	DirtyFlags.RaiseAll();
 
 	if (PhysicalMesh != NULL)
 	{
@@ -225,22 +164,54 @@ void ZEInteriorRoom::ParentTransformChanged()
 	}
 }
 
+ZEInteriorRoom::ZEInteriorRoom()
+{
+	Owner = NULL;
+	Resource = NULL;
+	PhysicalMesh = NULL;
+
+	CullPass = false;
+	IsDrawn = false;
+	IsPersistentDraw = false;
+
+	DirtyFlags.RaiseAll();
+
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+}
+
+ZEInteriorRoom::~ZEInteriorRoom()
+{
+	Deinitialize();
+}
+
 ZEInterior* ZEInteriorRoom::GetOwner()
 {
 	return Owner;
 }
 
-const char* ZEInteriorRoom::GetName()
+const ZEString& ZEInteriorRoom::GetName()
 {
 	if (Resource != NULL)
 		return Resource->Name;
 	else
-		return "";
+		return ZEString::Empty;
 }
 
 const ZEArray<ZEInteriorDoor*>& ZEInteriorRoom::GetDoors()
 {
 	return Doors;
+}
+
+ZEPhysicalMesh* ZEInteriorRoom::GetPhysicalMesh()
+{
+	return PhysicalMesh;
+}
+
+size_t ZEInteriorRoom::GetPolygonCount()
+{
+	return Resource->Polygons.GetCount();
 }
 
 const ZEAABBox& ZEInteriorRoom::GetBoundingBox() const
@@ -296,7 +267,7 @@ const ZEMatrix4x4& ZEInteriorRoom::GetInvWorldTransform() const
 void ZEInteriorRoom::SetPosition(const ZEVector3& NewPosition)
 {
 	Position = NewPosition;
-	DirtyFlags.RaiseFlags(ZE_IRDF_ALL);
+	DirtyFlags.RaiseAll();
 
 	if (PhysicalMesh != NULL)
 		PhysicalMesh->SetPosition(Owner->GetWorldPosition() + Position);
@@ -310,7 +281,7 @@ const ZEVector3& ZEInteriorRoom::GetPosition() const
 void ZEInteriorRoom::SetRotation(const ZEQuaternion& NewRotation)
 {
 	Rotation = NewRotation;
-	DirtyFlags.RaiseFlags(ZE_IRDF_ALL);
+	DirtyFlags.RaiseAll();
 
 	if (PhysicalMesh != NULL)
 		PhysicalMesh->SetRotation(Owner->GetWorldRotation() * Rotation);
@@ -324,7 +295,7 @@ const ZEQuaternion& ZEInteriorRoom::GetRotation() const
 void ZEInteriorRoom::SetScale(const ZEVector3& NewScale)
 {
 	Scale = NewScale;
-	DirtyFlags.RaiseFlags(ZE_IRDF_ALL);
+	DirtyFlags.RaiseAll();
 
 	if (PhysicalMesh != NULL)
 		PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
@@ -335,40 +306,13 @@ const ZEVector3& ZEInteriorRoom::GetScale() const
 	return Scale;
 }
 
-ZEPhysicalMesh* ZEInteriorRoom::GetPhysicalMesh()
-{
-	return PhysicalMesh;
-}
-
-size_t ZEInteriorRoom::GetPolygonCount()
-{
-	return Resource->Polygons.GetCount();
-}
-
 void ZEInteriorRoom::SetPersistentDraw(bool Enabled)
 {
 	IsPersistentDraw = Enabled;
 }
 
-void ZEInteriorRoom::Draw(ZEDrawParameters* DrawParameters)
-{
-	IsDrawn = true;
-
-	for(ZESize I = 0; I < RenderCommands.GetCount(); I++)
-	{
-		ZEMatrix4x4 LocalTransform;
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-		RenderCommands[I].WorldMatrix = Owner->GetWorldTransform() * LocalTransform;
-		RenderCommands[I].Lights.Clear();
-		RenderCommands[I].Lights.MassAdd(DrawParameters->Lights.GetConstCArray(), DrawParameters->Lights.GetCount());
-
-		DrawParameters->Renderer->AddToRenderList(&RenderCommands[I]);
-	}
-}
-
 bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource)
 {	
-
 	this->Owner = Owner;
 	this->Resource = Resource;
 	this->BoundingBox = Resource->BoundingBox;
@@ -376,57 +320,59 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
 
-	ZEMatrix4x4 LocalTransform;
-	ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation, Scale);
-	ZEMatrix4x4 WorldTransform = Owner->GetWorldTransform() * LocalTransform;
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEInteriorTransformConstants));
 	
+	ZESize PolygonCount = Resource->Polygons.GetCount();
 
-	// Initialize Render Components
-	if (VertexBuffer == NULL)
+	ZEArray<bool> Processed;
+	Processed.SetCount(PolygonCount);
+	Processed.Fill(false);
+
+	ZEArray<ZEInteriorVertex> Vertices;
+	Vertices.SetCount(PolygonCount * 3);
+
+	ZESize CurrentVertexIndex = 0;
+	ZESize StartVertexIndex = 0;
+	for (ZESize N = 0; N < PolygonCount; N++)
 	{
-		RenderCommands.Clear();
-		VertexBuffer = ZEStaticVertexBuffer::CreateInstance();
-		if (!VertexBuffer->Create(Resource->Polygons.GetCount() * 3 * sizeof(ZEInteriorVertex)))
-			return false;
+		StartVertexIndex = CurrentVertexIndex;
 
-		ZEArray<bool> Processed;
-		Processed.SetCount(Resource->Polygons.GetCount());
-		Processed.Fill(false);
-
-		ZESize VertexIndex = 0;
-		ZEInteriorVertex* Buffer = (ZEInteriorVertex*)VertexBuffer->Lock();	
-		for (ZESize N = 0; N < Resource->Polygons.GetCount(); N++)
+		if (!Processed[N])
 		{
-			if (!Processed[N])
+			ZERNMaterial* Material = Resource->Polygons[N].Material;
+
+			for (ZESize I = N; I < PolygonCount; I++)
 			{
-				ZEMaterial* Material = Resource->Polygons[N].Material;
-				ZERenderCommand* RenderCommand = RenderCommands.Add();
+				if (Resource->Polygons[I].Material != Material)
+					continue;
 
-				RenderCommand->SetZero();
-				RenderCommand->Priority = 2;
-				RenderCommand->Order = 1;
-				RenderCommand->Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-				RenderCommand->Material = Material;
-				RenderCommand->PrimitiveType = ZE_ROPT_TRIANGLE;
-				RenderCommand->VertexBufferOffset = VertexIndex;
-				RenderCommand->VertexBuffer = VertexBuffer;
-				RenderCommand->VertexDeclaration = ZEInteriorVertex::GetVertexDeclaration();
-				RenderCommand->WorldMatrix = WorldTransform;
+				memcpy(&Vertices[CurrentVertexIndex], Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
 
-				RenderCommand->PrimitiveCount = 0;
-				for (ZESize I = N; I < Resource->Polygons.GetCount(); I++)
-				{
-					if (Resource->Polygons[I].Material != Material)
-						continue;
-
-					memcpy(Buffer + VertexIndex, Resource->Polygons[I].Vertices, sizeof(ZEInteriorVertex) * 3);
-					VertexIndex += 3;
-					RenderCommand->PrimitiveCount++;
-					Processed[I] = true;
-				}
+				CurrentVertexIndex += 3;
+				Processed[I] = true;
 			}
+
+			ZEExtraRenderParameters ExtraParameters;
+			ExtraParameters.Material = Material;
+			ExtraParameters.Room = this;
+			ExtraParameters.VertexOffset = StartVertexIndex;
+			ExtraParameters.VertexCount = CurrentVertexIndex - StartVertexIndex;
+
+			ExtraRenderParameters.AddByRef(ExtraParameters);
 		}
-		VertexBuffer->Unlock();
+	}
+
+	VertexBuffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZEInteriorVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
+
+	ZESize ExtraParameterCount = ExtraRenderParameters.GetCount();
+	RenderCommands.SetCount(ExtraParameterCount);
+	for (ZESize I = 0; I < ExtraParameterCount; I++)
+	{
+		RenderCommands[I].Entity = Owner;
+		RenderCommands[I].Order = 0;
+		RenderCommands[I].Priority = 0;
+		RenderCommands[I].StageMask = ExtraRenderParameters[I].Material->GetStageMask();
+		RenderCommands[I].ExtraParameters = &ExtraRenderParameters[I];
 	}
 
 	if (Resource->HasPhysicalMesh)
@@ -467,47 +413,117 @@ void ZEInteriorRoom::Deinitialize()
 {
 	Owner = NULL;
 	Resource = NULL;
-	RenderCommands.Clear();
-	if (VertexBuffer != NULL)
-	{
-		VertexBuffer->Destroy();
-		VertexBuffer = NULL;
-	}
-
 	if (PhysicalMesh != NULL)
 	{
 		PhysicalMesh->Destroy();
 		PhysicalMesh = NULL;
 	}
 
-	if (DebugDrawComponents.Material != NULL)
-	{
-		DebugDrawComponents.Material->Release();
-		DebugDrawComponents.Material = NULL;
-	}
+	Doors.Clear();
+	RenderCommands.Clear();
+	ExtraRenderParameters.Clear();
+
+	VertexBuffer.Release();
+	ConstantBuffer.Release();
+
+	DirtyFlags.RaiseAll();
 }
 
-ZEInteriorRoom::ZEInteriorRoom()
+void ZEInteriorRoom::PreRender(const ZERNCullParameters* CullParameters)
 {
-	Owner = NULL;
-	Resource = NULL;
-	PhysicalMesh = NULL;
-	VertexBuffer = NULL;
-	DebugDrawComponents.Material = NULL;
+	IsDrawn = true;
+	
+	ZESize RenderCommandCount = RenderCommands.GetCount();
+	for(ZESize I = 0; I < RenderCommandCount; I++)
+		CullParameters->Renderer->AddCommand(&RenderCommands[I]);
+}
 
-	CullPass = false;
+void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	ZEGRContext* Context = Parameters->Context;
+	ZERNStage* Stage = Parameters->Stage;
+
+	ZEExtraRenderParameters* ExtraParameters = static_cast<ZEExtraRenderParameters*>(Command->ExtraParameters);
+	if (!ExtraParameters->Material->SetupMaterial(Context, Stage))
+		return;
+
+	UpdateConstantBuffer();
+
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+
+	Context->Draw(ExtraParameters->VertexCount, ExtraParameters->VertexOffset);
+
+	ExtraParameters->Material->CleanupMaterial(Context, Stage);
+
 	IsDrawn = false;
-	IsPersistentDraw = false;
-
-	DirtyFlags.RaiseFlags(ZE_IRDF_ALL);
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
 }
 
-ZEInteriorRoom::~ZEInteriorRoom()
+bool ZEInteriorRoom::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	Deinitialize();
+	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
+		return false;
+
+	ZERay LocalRay;
+	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
+	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
+	LocalRay.v.NormalizeSelf();
+
+	float RayT;
+	if (!ZEAABBox::IntersectionTest(GetBoundingBox(), LocalRay, RayT))
+		return false;
+
+	bool Result = false;
+	float MinT = ZE_FLOAT_MAX;
+	ZESize PoligonIndex;
+
+	if (Resource->HasOctree)
+		Result = RayCastOctree(Resource->Octree, LocalRay, MinT, PoligonIndex);
+	else
+		Result = RayCastPoligons(LocalRay, MinT, PoligonIndex);
+
+	if (Result)
+	{
+		ZEVector3 WorldPosition;
+		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
+
+		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, WorldPosition);
+		if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
+		{
+			Report.Distance = ZEMath::Sqrt(DistanceSquare);
+			Report.Position = WorldPosition;
+			Report.SubComponent = this;
+			Report.PoligonIndex = PoligonIndex;
+
+			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+			{
+				ZEVector3 V0 = Resource->Polygons[Report.PoligonIndex].Vertices[0].Position;
+				ZEVector3 V1 = Resource->Polygons[Report.PoligonIndex].Vertices[1].Position;
+				ZEVector3 V2 = Resource->Polygons[Report.PoligonIndex].Vertices[2].Position;
+
+				ZEVector3 Binormal = ZEVector3(V0, V1);
+				ZEVector3 Tangent = ZEVector3(V0, V2);
+				ZEVector3 Normal;
+				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
+					Report.Normal.NormalizeSelf();
+				}
+
+				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
+				{
+					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
+					Report.Binormal.NormalizeSelf();
+				}
+			}
+
+			return true;
+		}
+	}
+
+	return false;
 }
 
 ZEInteriorRoom* ZEInteriorRoom::CreateInstance()

@@ -34,16 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_H__
-#define __ZE_PARTICLE_H__
 
-#include "ZEMath/ZEVector.h"
-#include "ZERandom.h"
 #include "ZEMeta/ZEObject.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
+#include "ZERandom.h"
+#include "ZEMath/ZEVector.h"
 
-enum ZEParticleState
+ZE_ENUM(ZEParticleState)
 {
 	ZE_PAS_NEW,
 	ZE_PAS_ALIVE,
@@ -54,28 +51,26 @@ class ZEParticle : public ZEObject
 {
 	ZE_OBJECT
 	public:
+		ZEParticleState				State;
+		ZEVector3					Position;
+		ZEVector2					Size2D;
+		float						TotalLife;
+		float						Life;
+		ZEVector4					InitialColor;
+		ZEVector4					Color;
 
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		InitialColor;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		ZEVector2					MinTexCoord;
+		ZEVector2					MaxTexCoord;
 
-		ZEVector2		MinTexCoord;
-		ZEVector2		MaxTexCoord;
+		ZEVector3					InitialVelocity;
+		ZEVector3					Velocity;
+		ZEVector3					Acceleration;
 
-		ZEVector3		InitialVelocity;
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		float						Rotation;
+		float						AngularVelocity;
+		float						AngularAcceleration;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+		ZEVector2					Cos_NegSin;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+									ZEParticle();
 };
-
-#endif

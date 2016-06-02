@@ -41,21 +41,17 @@
 #include "ZEMath/ZERay.h"
 #include "ZEFile/ZEFile.h"
 #include "ZECore/ZECore.h"
-#include "ZESceneCuller.h"
-#include "ZEDrawParameters.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEEntityProvider.h"
-#include "ZEGraphics/ZELight.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZELight.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEGraphics/ZEFrameRenderer.h"
-#include "ZEGraphics/ZEShadowRenderer.h"
-#include "ZEInterior/ZEInterior.h"
-#include "ZEInterior/ZEInteriorResource.h"
 #include "ZEMeta/ZEProvider.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
+#include <memory.h>
+
 #include <memory.h>
 
 
@@ -63,37 +59,7 @@ bool ZEScene::Initialize()
 {
 	if (Initialized)
 		return true;
-
-	if (Renderer == NULL)
-		Renderer = ZEFrameRenderer::CreateInstance();
-
-	if (Renderer == NULL)
-	{
-		zeCriticalError("Can not create renderer.");
-		return false;
-	}
-
-	if (!Renderer->Initialize())
-	{
-		zeCriticalError("Can not initialize renderer.");
-		return false;
-	}
-
-	if (ShadowRenderer == NULL)
-		ShadowRenderer = ZEShadowRenderer::CreateInstance();
-
-	if (ShadowRenderer == NULL)
-	{
-		zeCriticalError("Can not create shadow renderer.");
-		return false;
-	}
 	
-	if (!ShadowRenderer->Initialize())
-	{
-		zeCriticalError("Can not initialize shadow renderer.");
-		return false;
-	}
-
 	if (PhysicalWorld == NULL)
 		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
 
@@ -130,14 +96,7 @@ void ZEScene::Deinitialize()
 	if (PhysicalWorld != NULL)
 		PhysicalWorld->Deinitialize();
 
-	if (Renderer != NULL)
-		Renderer->Deinitialize();
-
-	if (ShadowRenderer != NULL)
-		ShadowRenderer->Deinitialize();
-
 	Initialized = false;
-	
 }
 
 void ZEScene::Destroy()
@@ -152,28 +111,12 @@ void ZEScene::Destroy()
 		PhysicalWorld = NULL;
 	}
 
-	if (Renderer != NULL)
-	{
-		Renderer->Destroy();
-		Renderer = NULL;
-	}
-
-	if (ShadowRenderer != NULL)
-	{
-		ShadowRenderer->Destroy();
-		ShadowRenderer = NULL;
-	}
-
 	delete this;
 }
 
 void ZEScene::AddEntity(ZEEntity* Entity)
 {
-	if (Entities.Exists(Entity))
-	{
-		zeError("Can not add an already native entity.");
-		return;
-	}
+	zeCheckError(Entity->GetOwnerScene() != NULL, ZE_VOID, "Entity is already added to a scene.");
 
 	Entity->SetEntityId(LastEntityId++);
 	Entities.Add(Entity);
@@ -187,15 +130,14 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
-	if (!Entities.Exists(Entity))
-	{
-		zeError("Can not remove a foreign entity.");
-		return;
-	}
+	zeCheckError(Entity->GetOwnerScene() != this, ZE_VOID, "Entity does not belong to this scene.");
+
+	if (Entity->GetOwner() != NULL)
+		Entity->GetOwner()->RemoveChildEntity(Entity);
+	else
+		Entities.RemoveValue(Entity);
 
 	Entity->SetOwnerScene(NULL);
-
-	Entities.RemoveValue(Entity);
 }
 
 void ZEScene::ClearEntities()
@@ -204,6 +146,16 @@ void ZEScene::ClearEntities()
 		Entities[I]->Destroy();
 
 	Entities.Clear();
+}
+
+void ZEScene::SetRenderer(ZERNRenderer* Renderer)
+{
+	this->Renderer = Renderer;
+}
+
+ZERNRenderer* ZEScene::GetRenderer()
+{
+	return Renderer;
 }
 
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
@@ -227,16 +179,6 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 	return ProperEntities;
 }
 
-ZERenderer* ZEScene::GetRenderer()
-{
-	return Renderer;
-}
-
-ZERenderer*	ZEScene::GetShadowRenderer()
-{
-	return ShadowRenderer;
-}
-
 ZEPhysicalWorld* ZEScene::GetPhysicalWorld()
 {
 	return PhysicalWorld;
@@ -256,16 +198,6 @@ void ZEScene::SetActiveListener(ZEListener* Listener)
 {
 	ActiveListener = Listener;
 	zeSound->SetActiveListener(Listener);
-}
-
-ZESceneCuller& ZEScene::GetSceneCuller()
-{
-	return Culler;
-}
-
-const ZESceneStatistics& ZEScene::GetStatistics() const
-{
-	return Culler.GetStatistics();
 }
 
 ZEListener* ZEScene::GetActiveListener()
@@ -304,24 +236,6 @@ void ZEScene::Render(float ElapsedTime)
 {
 	if (ActiveCamera == NULL)
 		return;
-
-	Renderer->SetCamera(ActiveCamera);
-	
-	FrameDrawParameters.ElapsedTime = ElapsedTime;
-	FrameDrawParameters.FrameId = zeCore->GetFrameId();
-	FrameDrawParameters.Pass = ZE_RP_COLOR;
-	FrameDrawParameters.Renderer = Renderer;
-	FrameDrawParameters.ViewVolume = (ZEViewVolume*)&ActiveCamera->GetViewVolume();
-	FrameDrawParameters.View = (ZEView*)&ActiveCamera->GetView();
-	FrameDrawParameters.Lights.Clear();
-
-	memset(&FrameDrawParameters.Statistics, 0, sizeof(ZEDrawStatistics));
-
-	FrameDrawParameters.Renderer->SetDrawParameters(&FrameDrawParameters);
-
-	Culler.CullScene(this, &FrameDrawParameters);
-
-	//Fill Draw Parameters Statistics ZESceneStats section
 }
 
 bool ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -494,9 +408,6 @@ ZEScene::ZEScene()
 {
 	Initialized = false;
 	LastEntityId = 0;
-	PostProcessor = NULL;
-	ShadowRenderer = NULL;
-	Renderer = NULL;
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
 	PhysicalWorld = NULL;

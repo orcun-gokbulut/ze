@@ -34,13 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TIME_STAMP_H__
-#define __ZE_TIME_STAMP_H__
 
 #include "ZETypes.h"
 #include <time.h>
 
-#define ZE_ILVALID_TIME ((ZEInt64)-1)
+#define ZE_INVALID_TIME ((ZEInt64)-1)
 class ZETimeStamp
 {
 	public:
@@ -126,5 +124,3 @@ class ZETimeStamp
 
 		static ZETimeStamp		Now();
 };
-
-#endif

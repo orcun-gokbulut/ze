@@ -50,70 +50,70 @@ class ZEMLEditorWindow : public QMainWindow
 {
 	Q_OBJECT
 	private:
-		static ZEMLEditorWindow* Instance;
-		Ui_ZEMLEditorWindow*	Form;
-		ZEMLFormatDescription*	Format;
-		QLabel*					StatusBarLabel;
-		ZEString				FileName;
-		ZEMLRoot				Root;
-		ZEMLNode*				RootNode;
+		static ZEMLEditorWindow*		Instance;
+		Ui_ZEMLEditorWindow*			Form;
+		ZEMLFormatDescription*			Format;
+		QLabel*							StatusBarLabel;
+		ZEString						FileName;
+		ZEMLRoot						Root;
+		ZEMLNode*						RootNode;
 
-		ZEMLNode*				ClipBoard;
+		ZEMLNode*						ClipBoard;
 
-		void					LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
-		void					LoadTree();
+		void							LoadNode(QTreeWidgetItem* Item, ZEMLNode* Node);
+		void							LoadTree();
 		
-		void					RegisterRecentFile(const ZEString& FileName);
-		void					LoadRecentFiles();
+		void							RegisterRecentFile(const ZEString& FileName);
+		void							LoadRecentFiles();
 
-		void					OpenFile(const ZEString& FileName);
-		void					SaveFile(const ZEString& FileName);
+		void							OpenFile(const ZEString& FileName);
+		void							SaveFile(const ZEString& FileName);
 
-		void					ConfigureUI();
+		void							ConfigureUI();
 
 	private slots:
-		void					NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
-		void					ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
-		//void					DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
+		void							NameChanged(ZEMLElement* Element, const ZEString& NewName, const ZEString& OldName);
+		void							ValueChanged(ZEMLProperty* Property, const ZEValue& NewValue, const ZEValue& OldValue);
+		//void							DataChange(ZEMLData* Data, void* NewData, ZESize NewDataSize, void* OldData, ZESize OldDataSize);
 		
-		void					Select();
-		void					Deselect();
+		void							Select();
+		void							Deselect();
 
-		void					New();
-		void					Open();
-		void					OpenRecentFile();
-		void					Save();
-		void					SaveAs();
-		void					Close();
-		void					Quit();
+		void							New();
+		void							Open();
+		void							OpenRecentFile();
+		void							Save();
+		void							SaveAs();
+		void							Close();
+		void							Quit();
 
-		void					Undo();
-		void					Redo();
-		void					Cut();
-		void					Copy();
-		void					Paste();
+		void							Undo();
+		void							Redo();
+		void							Cut();
+		void							Copy();
+		void							Paste();
 
-		void					EditMode();
+		void							EditMode();
 
-		void					AddNewNode();
-		void					AddNewProperty();
-		void					AddNewData();
-		void					Delete();
+		void							AddNewNode();
+		void							AddNewProperty();
+		void							AddNewData();
+		void							Delete();
 
-		void					UserGuide();
-		void					BugReport();
-		void					Website();
-		void					About();
+		void							UserGuide();
+		void							BugReport();
+		void							Website();
+		void							About();
 
 	public:
-		Ui_ZEMLEditorWindow*	GetForm();
-		bool					GetEditMode();
-		void					Update();
+		Ui_ZEMLEditorWindow*			GetForm();
+		bool							GetEditMode();
+		void							Update();
 
-								ZEMLEditorWindow();
-								~ZEMLEditorWindow();
+										ZEMLEditorWindow();
+										~ZEMLEditorWindow();
 
-		static ZEMLEditorWindow* GetInstance();
+		static ZEMLEditorWindow*		GetInstance();
 };
 
 #endif

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_SHARED_POINTER_H__
-#define __ZE_SHARED_POINTER_H__
 
 #include "ZETypes.h"
 #include "ZEError.h"
@@ -52,12 +50,12 @@ class ZESharedPointer
 	template<typename TypeFriend> friend class ZEWeakPointer;
 	private:
 		Type* Pointer;
-		ZEReferenceCount* ReferanceCount;
+		ZEReferenceCount* ReferenceCount;
 
 	public:
 		bool IsNull()
 		{
-			return (ReferanceCount == NULL || Pointer == NULL);
+			return (ReferenceCount == NULL || Pointer == NULL);
 		}
 
 		void Create(Type* RawPointer)
@@ -68,9 +66,9 @@ class ZESharedPointer
 			Release();
 
 			Pointer = RawPointer;
-			ReferanceCount = new ZEReferenceCount;
-			ReferanceCount->Weak = 0;
-			ReferanceCount->Strong = 1;
+			ReferenceCount = new ZEReferenceCount;
+			ReferenceCount->Weak = 0;
+			ReferenceCount->Strong = 1;
 		}
 
 		void Copy(const ZESharedPointer<Type>& OtherPointer)
@@ -83,15 +81,15 @@ class ZESharedPointer
 			if (OtherPointer.Pointer != NULL)
 			{
 				Pointer = OtherPointer.Pointer;
-				ReferanceCount = OtherPointer.ReferanceCount;
-				ReferanceCount->Strong++;			
+				ReferenceCount = OtherPointer.ReferenceCount;
+				ReferenceCount->Strong++;			
 			}
 		}
 
 		ZESize GetReferenceCount()
 		{
-			if (ReferanceCount != NULL)
-				return ReferanceCount->Strong;
+			if (ReferenceCount != NULL)
+				return ReferenceCount->Strong;
 
 			return 0;
 		}
@@ -99,8 +97,8 @@ class ZESharedPointer
 
 		ZESize GetWeakReferenceCount()
 		{
-			if (ReferanceCount != NULL)
-				return ReferanceCount->Weak;
+			if (ReferenceCount != NULL)
+				return ReferenceCount->Weak;
 
 			return 0;
 		}
@@ -112,18 +110,18 @@ class ZESharedPointer
 
 		void Release()
 		{
-			if (ReferanceCount == NULL)
+			if (ReferenceCount == NULL)
 				return;
 
-			ReferanceCount->Strong--;
-			if (ReferanceCount->Strong == 0)
+			ReferenceCount->Strong--;
+			if (ReferenceCount->Strong == 0)
 			{
 				delete Pointer;
 				Pointer = NULL;
-				if (ReferanceCount->Weak == 0)
+				if (ReferenceCount->Weak == 0)
 				{
-					delete ReferanceCount;
-					ReferanceCount = NULL;
+					delete ReferenceCount;
+					ReferenceCount = NULL;
 				}
 			}
 		}
@@ -146,7 +144,7 @@ class ZESharedPointer
 			return *this;
 		}
 
-		ZESharedPointer<Type>& operator=(ZESharedPointer<Type>& OtherPointer)
+		ZESharedPointer<Type>& operator=(const ZESharedPointer<Type>& OtherPointer)
 		{
 			Copy(OtherPointer);
 			return *this;
@@ -155,20 +153,20 @@ class ZESharedPointer
 		ZESharedPointer()
 		{
 			Pointer = NULL;
-			ReferanceCount = NULL;
+			ReferenceCount = NULL;
 		}
 
-		explicit ZESharedPointer(Type* RawPointer)
+		ZESharedPointer(Type* RawPointer)
 		{
 			Pointer = NULL;
-			ReferanceCount = NULL;
+			ReferenceCount = NULL;
 			Create(RawPointer);
 		}
 
 		ZESharedPointer(const ZESharedPointer<Type>& OtherPointer)
 		{
 			Pointer = NULL;
-			ReferanceCount = NULL;
+			ReferenceCount = NULL;
 			Copy(OtherPointer);
 		}
 
@@ -180,14 +178,12 @@ class ZESharedPointer
 		static void Swap(const ZESharedPointer<Type>& A, const ZESharedPointer<Type>& B)
 		{
 			Type* TempP = A.Pointer;
-			ZESize TempRC = A.ReferanceCount;
+			ZESize TempRC = A.ReferenceCount;
 
 			A.Pointer = B.Pointer;
-			A.ReferanceCount = B.ReferanceCount;
+			A.ReferenceCount = B.ReferenceCount;
 
 			B.Pointer = TempP;
-			B.ReferanceCount = TempRC;
+			B.ReferenceCount = TempRC;
 		}
 };
-
-#endif

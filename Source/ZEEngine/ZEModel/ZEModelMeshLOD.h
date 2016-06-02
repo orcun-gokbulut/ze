@@ -34,17 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_MESH_LOD_H__
-#define __ZE_MODEL_MESH_LOD_H__
 
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZERenderer/ZERNCommand.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMatrix.h"
 
-struct ZEDrawParameters;
 class ZEModel;
-class ZEMaterial;
 class ZEModelMesh;
 class ZEModelResourceMeshLOD;
-class ZERenderer;
+class ZEGRVertexBuffer;
+class ZEGRIndexBuffer;
+class ZERNMaterial;
+class ZERNRenderer;
+class ZERNRenderParameters;
+class ZEGRConstantBuffer;
 
 class ZEModelMeshLOD
 {
@@ -54,31 +58,32 @@ class ZEModelMeshLOD
 		ZEInt32								DrawStartDistance;
 		ZEInt32								DrawEndDistance;
 		const ZEModelResourceMeshLOD*		LODResource;
-		ZEVertexBuffer*						VertexBuffer;
-		ZERenderCommand						RenderCommand;
-		const ZEMaterial*					Material;
-		bool								Skinned;
-
-	public:
-		void								ResetMaterial();
-		void								SetMaterial(const ZEMaterial* Material);
-		const ZEMaterial*					GetMaterial();
-
-		const ZEModelResourceMeshLOD*		GetLODResource();
-
-		ZEInt32								GetDrawStartDistance();
-		ZEInt32								GetDrawEndDistance();
-
-		bool								IsSkinned();
-
-		void								Draw(ZEDrawParameters* DrawParameters, float DrawOrder);
-
-		bool								UpdateVertexBuffer(ZEArray<ZEVector3> Vertices, ZEArray<ZEUInt32> Indices);
 		
+		ZEHolder<ZEGRIndexBuffer>			IndexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>			VertexBufferNormals;
+		ZEHolder<ZEGRVertexBuffer>			VertexBufferSkin;
+
+		ZEHolder<const ZERNMaterial>		Material;
+		bool								Skinned;
+	public:
+		bool								IsSkinned() const;
+
+		void								SetMaterial(ZEHolder<const ZERNMaterial> Material);
+		ZEHolder<const ZERNMaterial>		GetMaterial() const;
+
+		const ZEModelResourceMeshLOD*		GetLODResource() const;
+
+		ZEInt32								GetDrawStartDistance() const;
+		ZEInt32								GetDrawEndDistance() const;
+
 		void								Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource);
 		void								Deinitialize();
+
+		void								ResetMaterial();
+
+		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
 											ZEModelMeshLOD();
 											~ZEModelMeshLOD();
 };
-#endif
