@@ -13,6 +13,10 @@
   <property name="windowTitle">
    <string>Zinek Engine Crack</string>
   </property>
+  <property name="windowIcon">
+   <iconset resource="../CommonResources/ZEZinekIcon.qrc">
+    <normaloff>:/Zinek/ZEZinekIcon.ico</normaloff>:/Zinek/ZEZinekIcon.ico</iconset>
+  </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
     <widget class="QGraphicsView" name="graphicsView"/>
@@ -316,6 +320,8 @@
   <tabstop>btnGenerateActivationCode</tabstop>
   <tabstop>txtActivationCode</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../CommonResources/ZEZinekIcon.qrc"/>
+ </resources>
  <connections/>
 </ui>

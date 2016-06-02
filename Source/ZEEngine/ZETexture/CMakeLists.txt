@@ -139,7 +139,7 @@ ze_add_library(TARGET ZETexture
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
-	LIBS ZEFoundation libFreeImage libATICompress ZEDirect3D9)
+	LIBS ZEFoundation libFreeImage libATICompress)
 
 ze_add_test(TARGET ZETextureTests 
 	SOURCES ${Tests}

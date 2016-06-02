@@ -185,6 +185,9 @@ class ZEString
 		bool						Equals(const ZEString& String) const;
 		bool						Equals(const char* String) const;
 
+		bool						EqualsIncase(const ZEString& String) const;
+		bool						EqualsIncase(const char* String) const;
+
 		void						CopyTo(ZEString& String) const;
 		void						CopyFrom(const ZEString& String);
 

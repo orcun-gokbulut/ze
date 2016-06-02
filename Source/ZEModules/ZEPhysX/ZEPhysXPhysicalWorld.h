@@ -37,39 +37,22 @@
 #ifndef	__ZE_PHYSX_PHYSICAL_WORLD_H__
 #define __ZE_PHYSX_PHYSICAL_WORLD_H__
 
-#include <NxScene.h>
-#include <NxSceneDesc.h>
-#include <NxMaterial.h>
-
 #include "ZEPhysics/ZEPhysicalWorld.h"
 #include "ZEPhysXComponentBase.h"
 #include "ZEPhysXCollisionManager.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
-#include "ZEGraphics/ZEVertexBuffer.h"
-#include "ZEGraphics/ZEVertexTypes.h"
-#include "ZEGraphics/ZERenderCommand.h"
 
-class ZEMaterial;
+#include <NxScene.h>
+#include <NxSceneDesc.h>
+#include <NxMaterial.h>
+
 class ZEPhysicalObject;
 class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 {
 	friend class ZEPhysXModule;
 	private:
 		ZEPhysXCollisionManager						CollisionManager;
-
-		struct 
-		{
-			ZEMaterial* Material;
-			ZEArrayVertexBuffer<ZEColoredVertex>	PointsVertexBuffer;
-			ZEArrayVertexBuffer<ZEColoredVertex>	LinesVertexBuffer;
-			ZEArrayVertexBuffer<ZEColoredVertex>	TrianglesVertexBuffer;
-
-			ZERenderCommand							PointsRenderCommand;
-			ZERenderCommand							LinesRenderCommand;
-			ZERenderCommand							TrianglesRenderCommand;
-
-		} DebugDraw;
 
 		bool										Enabled;
 		bool										Visualize;
@@ -104,8 +87,6 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 
 		virtual bool								Initialize();
 		virtual void								Deinitialize();
-
-		virtual void								Draw(ZERenderer* Renderer);
 
 		virtual void								Destroy();
 

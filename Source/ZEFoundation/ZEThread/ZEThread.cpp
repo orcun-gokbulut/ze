@@ -34,7 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEThread.h"
+
 #include "ZEError.h"
+
+ZE_COPY_NO_ACTION_IMP(ZEThread)
 
 bool ZEThread::ControlPoint()
 {

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_RESOURCE_H__
-#define __ZE_MODEL_RESOURCE_H__
 
 #include "ZETypes.h"
 #include "ZECore/ZEResource.h"
@@ -44,20 +42,23 @@
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGraphics/ZEVertexTypes.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEPhysics/ZEPhysicalJoint.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
-
-class ZEStaticVertexBuffer;
-class ZETexture2D;
-class ZETexture2DResource;
-class ZEMaterial;
-class ZEPhysicalJoint;
-class ZEMLReaderNode;
+#include "ZEGraphics/ZEGRVertexLayout.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEDS/ZEString.h"
 
 #define ZE_MDLF_MAX_NAME_SIZE					128
 #define ZE_MDLF_MAX_FILENAME_SIZE				256
+
+class ZEGRIndexBuffer;
+class ZEGRVertexBuffer;
+class ZEGRTexture2D;
+class ZETexture2DResource;
+class ZERNMaterial;
+class ZEPhysicalJoint;
+class ZEMLReaderNode;
 
 enum ZEModelResourcePhysicalShapeType
 {
@@ -83,6 +84,37 @@ enum ZEModelResourceHelperOwnerType
 	ZE_MRHOT_BONE			= 2
 };
 
+struct ZEModelVertex
+{
+	private:
+		static ZEGRVertexLayout			VertexLayout;
+
+	public:
+		ZEVector3						Position;
+		ZEVector3						Normal;
+		ZEVector3						Tangent;
+		ZEVector3						Binormal;
+		ZEVector2						Texcoord;
+
+		static ZEGRVertexLayout*		GetVertexLayout();
+};
+
+struct ZESkinnedModelVertex
+{
+	private:
+		static ZEGRVertexLayout			VertexLayout;
+
+	public:
+		ZEVector3						Position;
+		ZEVector3						Normal;
+		ZEVector3						Tangent;
+		ZEVector3						Binormal;
+		ZEVector2						Texcoord;
+		ZEUInt8							BoneIndices[4];
+		float							BoneWeights[4];
+
+		static ZEGRVertexLayout*		GetVertexLayout();
+};
 
 struct ZEModelResourcePhysicalPolygon
 {
@@ -256,35 +288,31 @@ struct ZEModelResourceAnimationFrame
 
 struct ZEModelResourceAnimation
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEString									Name;
 	ZEArray<ZEModelResourceAnimationFrame>		Frames;
 };
 
 
 class ZEModelResourceMeshLOD
 {
-	private:
-		ZEStaticVertexBuffer*					SharedVertexBuffer;
-
 	public:
+		ZEHolder<ZEGRVertexBuffer>				VertexBuffer;
+		ZEHolder<ZEGRVertexBuffer>				VertexBufferNormals;
+		ZEHolder<ZEGRVertexBuffer>				VertexBufferSkin;
+		ZEHolder<ZEGRIndexBuffer>				IndexBuffer;
+		
+		ZEUInt32								TriangleCount;
+		ZEUInt32								VertexCount;
+
 		ZEInt32									LODLevel;
 		ZEInt32									LODStartDistance;
 		ZEInt32									LODEndDistance;
 		ZEInt32									MaterialId;
-		ZEArray<ZEModelVertex>					Vertices;
-		ZEArray<ZESkinnedModelVertex>			SkinnedVertices;
-		ZEArray<ZEUInt32>						AffectingBoneIds;
-
-		ZEStaticVertexBuffer*					GetSharedVertexBuffer() const;
-		ZEStaticVertexBuffer*					CreatePrivateVertexBuffer() const;
-
-												ZEModelResourceMeshLOD();
-												~ZEModelResourceMeshLOD();
 };
 
 struct ZEModelResourceMesh
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE]; 
+	ZEString									Name; 
 	ZEAABBox									BoundingBox;
 	ZEInt32										ParentMesh;
 	ZEVector3									Position;
@@ -295,11 +323,12 @@ struct ZEModelResourceMesh
 	ZEArray<ZEModelResourceMeshLOD>				LODs;
 	ZEModelResourcePhysicalBody					PhysicalBody;
 	ZEString									UserDefinedProperties;
+	ZEArray<ZEVector3>							Geometry;
 };
 
 struct ZEModelResourceBone
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEString									Name;
 	ZEAABBox									BoundingBox;
 	ZEInt32										ParentBone;
 	ZEVector3									Position;
@@ -315,7 +344,7 @@ struct ZEModelResourceBone
 
 struct ZEModelResourceHelper
 {
-	char										Name[ZE_MDLF_MAX_NAME_SIZE];
+	ZEString									Name;
 	ZEModelResourceHelperOwnerType				OwnerType;
 	ZEInt32										OwnerId;
 	ZEModelResourceMesh*						OwnerMesh;
@@ -336,7 +365,7 @@ class ZEModelResource : public ZEResource
 		ZEArray<ZEModelResourceHelper>				Helpers;
 		ZEArray<ZEModelResourceAnimation>			Animations;
 		ZESmartArray<ZETexture2DResource*>			TextureResources;
-		ZEArray<ZEMaterial*>						Materials;
+		ZEArray<ZEHolder<ZERNMaterial>>				Materials;
 
 		bool										BoundingBoxIsUserDefined;
 		ZEAABBox									UserDefinedBoundingBox;
@@ -350,8 +379,8 @@ class ZEModelResource : public ZEResource
 		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLReaderNode* PhysicalBodyNode);
 		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLReaderNode* PhysicalJointNode);
 
-		const ZETexture2D*							ManageModelMaterialTextures(const ZEString& FileName);
-		bool  										ReadModelFromFile(ZEFile* ResourceFile);
+		const ZEGRTexture2D*						ManageModelMaterialTextures(const ZEString& FileName);
+		bool  										ReadModelFromFileV0(ZEFile* ResourceFile);
 
 		virtual										~ZEModelResource();
 
@@ -361,7 +390,7 @@ class ZEModelResource : public ZEResource
 		bool										GetUserDefinedBoundingBoxEnabled() const;
 		const ZEAABBox&								GetUserDefinedBoundingBox() const;
 		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
-		const ZEArray<ZEMaterial*>&					GetMaterials() const;
+		const ZEArray<ZEHolder<ZERNMaterial>>&		GetMaterials() const;
 		const ZEArray<ZEModelResourceBone>&			GetBones() const;
 		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
 		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;
@@ -371,5 +400,3 @@ class ZEModelResource : public ZEResource
 		static ZEModelResource*						LoadSharedResource(const ZEString& FileName);
 		static void									CacheResource(const ZEString& FileName);
 };
-
-#endif

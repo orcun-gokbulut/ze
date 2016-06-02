@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_PHYSICS_OPERATOR_H__
-#define __ZE_PARTICLE_PHYSICS_OPERATOR_H__
 
 #include "ZEParticleOperator.h"
 
@@ -76,5 +74,3 @@ class ZEParticlePhysicsOperator : public ZEParticleOperator
 												ZEParticlePhysicsOperator();
 												~ZEParticlePhysicsOperator();
 };
-
-#endif

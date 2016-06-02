@@ -42,7 +42,7 @@
 #include "ZETextureFileJPEGHuffmanDecoder.h"
 #include "ZETextureFileJPEGDequantizator.h"
 #include "ZETextureFileJPEGIDCTProcessor.h"
-#include "ZEGraphics\ZETexture.h"
+#include "ZEGraphics\ZEGRTexture.h"
 #include "ZETextureFileJPEGMainController.h"
 
 

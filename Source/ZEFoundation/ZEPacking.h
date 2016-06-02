@@ -44,6 +44,7 @@
 #elif defined(ZE_PLATFORM_COMPILER_MSVC)
 	#define ZEPackStruct(Declaration) __pragma(pack(push, 1)) Declaration __pragma(pack(pop))
 	#define ZEPackStruct4(Declaration) __pragma(pack(push, 4)) Declaration __pragma(pack(pop))
+	#define ZEPackStruct16(Declaration) __pragma(pack(push, 16)) Declaration __pragma(pack(pop))
 #elif defined(ZE_PLATFORM_COMPILER_GCC)
 	#define ZEPackStruct(Declaration) Declaration __attribute__((__packed__))
 	#define ZEPackStruct4(Declaration) Declaration

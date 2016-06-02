@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_APPLICATION_MODULE_H__
-#define __ZE_APPLICATION_MODULE_H__
 
 #include "ZECore/ZEModule.h"
 #include "ZEDS/ZEString.h"
@@ -52,7 +50,7 @@ class ZEApplicationModule : public ZEModule
 
 		virtual void		PreProcess();
 		virtual void		Process(float ElapsedTime);
-		virtual void		PostProcess();
+		virtual void		PostProcess(float ElapsedTime);
 		
 		virtual void		StartUp();
 		virtual void		ShutDown();
@@ -66,5 +64,3 @@ class ZEApplicationModule : public ZEModule
 							ZEApplicationModule();
 		virtual				~ZEApplicationModule();
 };
-
-#endif

@@ -738,6 +738,11 @@ float& ZEVector3::operator[](ZESize Index)
 	return M[Index];
 }
 
+ZEVector3::ZEVector3(float Value)
+{
+	Create(*this, Value, Value, Value);
+}
+
 ZEVector3::ZEVector3(float x, float y, float z)
 {
 	Create(*this, x, y, z);

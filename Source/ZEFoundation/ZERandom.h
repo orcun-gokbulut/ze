@@ -43,7 +43,8 @@ class ZERandom
 	public:
 		static float		GetFloat();
 		static float		GetFloatPositive();
-		
+		static float		GetFloatRange(float Min, float Max);
+
 		static ZEInt		GetInt();
 		static ZEInt8		GetInt8();
 		static ZEInt16		GetInt16();
@@ -59,6 +60,7 @@ class ZERandom
 		static bool			GetBool();
 
 		static void			Reset();
+		static void			SetSeed(ZEUInt Seed);
 };
 
 #endif

@@ -1206,6 +1206,22 @@ bool ZEString::Equals(const char* String) const
 	return strcmp(GetValue(), String) == 0;
 }
 
+bool ZEString::EqualsIncase(const ZEString& String) const
+{
+	return EqualsIncase(String.Buffer);
+}
+
+bool ZEString::EqualsIncase(const char* String) const
+{
+	if (this->Buffer == String) // NULL Check
+		return true;
+
+	if (String == NULL)
+		return false;
+
+	return stricmp(GetValue(), String) == 0;
+}
+
 void ZEString::CopyTo(ZEString& String) const
 {
 	String.CopyFrom(*this);

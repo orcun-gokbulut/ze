@@ -34,24 +34,29 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIRectangle.h"
-#include "ZEGraphics/ZEVertexTypes.h"
+#include "ZEUIRenderer.h"
 
-void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Buffer) const
+void ZEUIRectangle::ConvertToVertices(ZEUIVertex* Output) const
 {
-	Buffer[0].Position = Positions.LeftUp;
-	Buffer[0].Texcoord = Texcoords.LeftUp;
-	Buffer[0].Color = Color;
-	Buffer[1].Position = ZEVector2(Positions.RightDown.x, Positions.LeftUp.y);
-	Buffer[1].Texcoord = ZEVector2(Texcoords.RightDown.x, Texcoords.LeftUp.y);
-	Buffer[1].Color = Color;
-	Buffer[2].Position = Positions.RightDown;
-	Buffer[2].Texcoord = Texcoords.RightDown;
-	Buffer[2].Color = Color;
-	Buffer[3] = Buffer[2];
-	Buffer[4].Position = ZEVector2(Positions.LeftUp.x, Positions.RightDown.y);
-	Buffer[4].Texcoord = ZEVector2(Texcoords.LeftUp.x, Texcoords.RightDown.y);
-	Buffer[4].Color = Color;
-	Buffer[5] = Buffer[0];
+	Output[0].Position = Positions.LeftUp;
+	Output[0].Texcoord = Texcoords.LeftUp;
+	Output[0].Color = Color;
+	Output[1].Position = ZEVector2(Positions.RightDown.x, Positions.LeftUp.y);
+	Output[1].Texcoord = ZEVector2(Texcoords.RightDown.x, Texcoords.LeftUp.y);
+	Output[1].Color = Color;
+	Output[2].Position = Positions.RightDown;
+	Output[2].Texcoord = Texcoords.RightDown;
+	Output[2].Color = Color;
+	Output[3] = Output[2];
+	Output[4].Position = ZEVector2(Positions.LeftUp.x, Positions.RightDown.y);
+	Output[4].Texcoord = ZEVector2(Texcoords.LeftUp.x, Texcoords.RightDown.y);
+	Output[4].Color = Color;
+	Output[5] = Output[0];
+}
+
+ZEUIRectangle::ZEUIRectangle() : RendererLink(this)
+{
+
 }
 
 bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, const ZERectangle& ClipRectangle)
@@ -114,9 +119,9 @@ bool ZEUIRectangle::Clip(ZEUIRectangle& Output, const ZEUIRectangle& Rectangle, 
 			Output.Texcoords.RightDown.y = Rectangle.Texcoords.RightDown.y;
 		}
 
-		Output.Material = Rectangle.Material;
-		Output.Color	= Rectangle.Color;
-		Output.ZOrder	= Rectangle.ZOrder;
+		Output.Texture = Rectangle.Texture;
+		Output.Color = Rectangle.Color;
+		Output.ZOrder = Rectangle.ZOrder;
 		
 		return false;
 	}

@@ -42,7 +42,7 @@
 #include "ZEUIRenderer.h"
 #include "ZEUIEvents.h"
 #include "ZEInput/ZEInputMap.h"
-#include "ZEFontResource.h"
+#include "ZEUIFont.h"
 
 enum ZEUIInputKey
 {
@@ -217,7 +217,7 @@ class ZEUIManager : public ZEObject
 		void						Deinitialize();
 		
 		void						ProcessEvents();
-		void						Render(ZERenderer* Render);
+		void						Render(ZERNRenderer* Render);
 		void						Tick(float ElapsedTime);
 
 		void						Destroy();
@@ -226,7 +226,7 @@ class ZEUIManager : public ZEObject
 
 		static const ZEVector4&		GetDefaultBackgroundColor();
 		static const ZEVector4&		GetDefaultForegroundColor();
-		static ZEFontResource*		GetDefaultFontResource();
+		static ZEUIFont*			GetDefaultFontResource();
 };
 
 #endif

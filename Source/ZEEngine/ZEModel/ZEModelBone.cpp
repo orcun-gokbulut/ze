@@ -38,8 +38,8 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEScene.h"
 
-#define ZEMD_BDF_LOCAL_TRANSFORM					0x0001
-#define ZEMD_BDF_INV_LOCAL_TRANSFORM				0x0002
+#define ZEMD_BDF_LOCAL_TRANSFORM			0x0001
+#define ZEMD_BDF_INV_LOCAL_TRANSFORM		0x0002
 #define ZEMD_BDF_MODEL_TRANSFORM			0x0004
 #define ZEMD_BDF_INV_MODEL_TRANSFORM		0x0008
 #define ZEMD_BDF_WORLD_TRANSFORM			0x0010
@@ -66,7 +66,10 @@ void ZEModelBone::LocalTransformChanged()
 		ChildBones[I]->ParentTransformChanged();
 
 	if (Model != NULL)
+	{
 		Model->ChildBoundingBoxChanged();
+		Model->DirtyConstantBufferSkin = true;
+	}
 }
 
 void ZEModelBone::ParentTransformChanged()
@@ -427,7 +430,7 @@ bool ZEModelBone::GetPhysicsEnabled() const
 
 void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource)
 {
-	Model = Model;
+	this->Model = Model;
 	this->BoneResource = BoneResource;
 	Position = BoneResource->Position;
 	Rotation = BoneResource->Rotation;
@@ -694,14 +697,16 @@ bool ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	ZEVector3 IntersectionPoint;
 	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
 	float DistanceSquare = IntersectionPoint.LengthSquare();
-	if (Report.Distance * Report.Distance > DistanceSquare && Report.Distance * Report.Distance < Parameters.MaximumDistance)
-	{
-		Report.Distance = ZEMath::Sqrt(DistanceSquare);
-		Report.SubComponent = NULL;
-		Report.PoligonIndex = 0;
-		Report.Normal = Report.Binormal = ZEVector3::Zero;
-		ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
-	}
+	if (Report.Distance * Report.Distance < DistanceSquare || Report.Distance * Report.Distance > Parameters.MaximumDistance)
+		return false;
+	
+	Report.Distance = ZEMath::Sqrt(DistanceSquare);
+	Report.SubComponent = NULL;
+	Report.PoligonIndex = 0;
+	Report.Normal = Report.Binormal = ZEVector3::Zero;
+	ZEMatrix4x4::Transform(Report.Position, WorldTransform, IntersectionPoint);
+
+	return true;
 
 	return true;
 }

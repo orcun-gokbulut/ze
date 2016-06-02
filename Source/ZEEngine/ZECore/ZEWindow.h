@@ -34,71 +34,94 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_WINDOW_H__
-#define __ZE_WINDOW_H__
 
-#define zeWindow ZEWindow::GetInstance()
+#include "ZEInitializable.h"
+#include "ZETypes.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEPointer/ZEHolder.h"
 
-enum ZEWindowType
+class ZEGROutput;
+
+class ZEWindow : public ZEInitializable
 {
-	ZE_WT_DEFAULT			= 0,
-	ZE_WT_FIXEDSIZE			= 1,
-	ZE_WT_RESIZABLE			= 2,
-	ZE_WT_COMPONENT			= 3,
-	ZE_WT_FULLSCREEN		= 4,
-};
+	friend class ZEWindowCallback;
+	private:
+		void*					Handle;
+		ZEHolder<ZEGROutput>	Output;
 
-class ZEWindow
-{
-	protected:
-		void*					WindowHandle;
-		ZEInt					WindowPositionLeft, WindowPositionTop;
-		ZEInt					WindowWidth, WindowHeight;
-		ZEWindowType			WindowType;
+		ZEString				Title;
+		ZEInt					Left;
+		ZEUInt					Top;
+		ZEUInt					Width;
+		ZEUInt					Height;
+		void*					Instance;
 		
-		bool					MouseCursorVisibility;
-		bool					MouseCursorLockEnabled;
+		bool					Visible;
+		bool					BorderlessMode;
+		bool					Resizable;
+		bool					Fullscreen;
+		
+		bool					HideCursor;
+		bool					LockCursor;
 
-		bool					CreateMainWindow(const char* WindowTitle);
-		bool					DestroyMainWindow();
+		bool					CreateWindow_();
+		bool					DestroyWindow();
 
-	public:
-		void					WindowGainedFocus();
-		void					WindowLostFocus();
-		void					WindowDestroyed();
-		void					WindowResized(ZEInt Width, ZEInt Height);
+		void					ChangeWindowConfiguration();
+		void					ChangeWidowGeometry();
 
-		void					SetWindowType(ZEWindowType WindowType);
-		ZEWindowType			GetWindowType();
+		virtual bool			InitializeSelf();
+		virtual void			DeinitializeSelf();
 
-		bool					SetComponentWindowHandle(void* Handle);
-
-		void					SetWindowPosition(ZEInt Left, ZEInt Top);
-		void					GetWindowPosition(ZEInt& Left, ZEInt& Top);
-
-		void					SetWindowSize(ZEInt Width, ZEInt Height);
-		void					GetWindowSize(ZEInt& Width, ZEInt& Height);
-
-		void					SetMouseCursorVisibility(bool Visibility);
-		bool					GetMouseCursorVisibility();
-
-		void					SetMouseCursorLockEnabled(bool Enabled);
-		bool					GetMouseCursorLockEnabled();
-
-		void					ShowWindow();
-		void					HideWindow();
-
-		void*					GetHandle();
-
-		ZEVector2				GetAbsoluteCursorPosition();
-		ZEVector2				GetRelativeCursorPosition();
-
-		bool					Initialize();
-		void					Deinitialize();
-
-		static ZEWindow*		GetInstance();
-							
 								ZEWindow();
 								~ZEWindow();
+
+	public:
+		void*					GetHandle();
+		ZEGROutput*				GetOutput();
+
+		void					SetTitle(const ZEString& Title);
+		const ZEString&			GetTitle();
+
+		void					SetLeft(ZEInt Left);
+		ZEInt					GetLeft();
+
+		void					SetTop(ZEInt Top);
+		ZEInt					GetTop();
+
+		void					SetWidth(ZEUInt Width);
+		ZEUInt					GetWidth();
+
+		void					SetHeight(ZEUInt Height);
+		ZEUInt					GetHeigth();
+
+		void					SetVisible(bool Visible);
+		bool					GetVisible();
+
+		void					SetResizable(bool True);
+		bool					GetResizable();
+
+		void					SetBorderlessMode(bool Enabled);
+		bool					GetBorderlessMode();
+
+		void					SetFullScreen(bool Enabled);
+		bool					GetFullscreen();
+
+		void					SetHideCursor(bool Visibility);
+		bool					GetHideCursor();
+
+		void					SetLockCursor(bool Enabled);
+		bool					GetLockCursor();
+
+		ZEVector2				GetCursorPosition();
+
+		void					Minimize();
+		void					Restore();
+		void					Maximize();
+
+		void					Destroy();
+
+		static ZEWindow*		CreateInstance();
+
 };
-#endif

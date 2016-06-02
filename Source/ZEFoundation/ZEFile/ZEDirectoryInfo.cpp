@@ -175,8 +175,3 @@ ZEDirectoryInfo::ZEDirectoryInfo(const char* Path)
 {
 	SetPath(Path);
 }
-
-ZEDirectoryInfo::ZEDirectoryInfo(const char* ParentPath, const char* RelativePath)
-{
-	SetRelativePath(ParentPath, RelativePath);
-}

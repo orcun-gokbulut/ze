@@ -58,7 +58,6 @@ void ZEResource::AddReferance() const
 		ReferenceCount++;
 }
 
-
 ZESize ZEResource::GetReferanceCount() const
 {
 	if (Shared)

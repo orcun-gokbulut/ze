@@ -419,6 +419,28 @@ void ZEMatrix3x3::Get2DDecomposition(ZEVector2& Translation, float& Rotation, ZE
 	Rotation = ZEAngle::ArcTan2(Matrix.M12, Matrix.M22);
 }
 
+
+ZEMatrix3x3Shader ZEMatrix3x3::ToMatrix3x3Shader()
+{
+	ZEMatrix3x3Shader Matrix;
+	Matrix.M11 = M11;
+	Matrix.M21 = M21;
+	Matrix.M31 = M31;
+	Matrix.Unused0 = 0.0f;
+
+	Matrix.M12 = M12;
+	Matrix.M22 = M22;
+	Matrix.M32 = M32;
+	Matrix.Unused1 = 0.0f;
+
+	Matrix.M13 = M13;
+	Matrix.M23 = M23;
+	Matrix.M33 = M33;
+	Matrix.Unused2 = 0.0f;
+
+	return Matrix;
+}
+
 ZEMatrix3x3 ZEMatrix3x3::operator+(const ZEMatrix3x3 &RightOperand) const 
 {
 	ZEMatrix3x3 Temp;
@@ -916,22 +938,48 @@ void ZEMatrix4x4::CreateOrthographicProjection(ZEMatrix4x4& Matrix, float Width,
 
 void ZEMatrix4x4::CreatePerspectiveProjection(ZEMatrix4x4& Matrix, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
+	float Temp = FarZ;
+	FarZ = NearZ;
+	NearZ = Temp;
+
 	float Ys = 1.0f / ZEAngle::Tan(FOV * 0.5f);
 	float Xs = Ys / AspectRatio;
+	float Range = FarZ - NearZ;
 
 	Create(Matrix, 
 		Xs, 0.0f, 0.0f, 0.0f,
 		0.0f, Ys, 0.0f, 0.0f,
-		0.0f, 0.0f, FarZ / (FarZ - NearZ), -NearZ * FarZ / (FarZ - NearZ),
+		0.0f, 0.0f, FarZ / Range, -FarZ * NearZ / Range,
+		0.0f, 0.0f, 1.0f, 0.0f);
+}
+
+void ZEMatrix4x4::CreatePerspectiveProjectionOffCenter(ZEMatrix4x4& Matrix, float Left, float Right, float Bottom, float Top, float NearZ, float FarZ)
+{
+	float OriginalNearZ = NearZ;
+	float Temp = FarZ;
+	FarZ = NearZ;
+	NearZ = Temp;
+
+	float Width = Right - Left;
+	float Height = Top - Bottom;
+	float Range = FarZ - NearZ;
+	float OffsetX = (Left + Right) / -Width;
+	float OffsetY = (Bottom + Top) / -Height;
+	float OffsetZ = FarZ * NearZ / -Range;
+
+	Create(Matrix,
+		2.0f * OriginalNearZ / Width, 0.0f, OffsetX, 0.0f,
+		0.0f, 2.0f * OriginalNearZ / Height, OffsetY, 0.0f,
+		0.0f, 0.0f, FarZ / Range, OffsetZ,
 		0.0f, 0.0f, 1.0f, 0.0f);
 }
 
 void ZEMatrix4x4::CreateViewPortTransform(ZEMatrix4x4& Matrix, float Left, float Right, float Top, float Bottom, float NearZ, float FarZ)
 {
 	Create(Matrix,
-			2.0f/(Right - Left), 0.0f, 0.0f, (Left + Right)/(Left - Right), 
-			0.0f, 2.0f/(Top - Bottom), 0.0f, (Top + Bottom)/(Bottom - Top), 
-			0.0f, 0.0f, 1.0f/(FarZ - NearZ), NearZ/(NearZ - FarZ), 
+			2.0f / (Right - Left), 0.0f, 0.0f, (Left + Right) / (Left - Right), 
+			0.0f, 2.0f / (Top - Bottom), 0.0f, (Top + Bottom) / (Bottom - Top), 
+			0.0f, 0.0f, 1.0f / (FarZ - NearZ), NearZ / (NearZ - FarZ), 
 			0.0f, 0.0f, 0.0f, 1.0f);
 }
 

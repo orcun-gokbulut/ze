@@ -37,6 +37,8 @@
 
 #include "ZEClass.h"
 #include "ZEEnumerator.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEObject.h"
 
 bool ZEProvider::RegisterClass(ZEClass* Class)
 {
@@ -118,6 +120,53 @@ ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
 	}
 
 	return NULL;
+}
+
+ZEObject* ZEProvider::CreateInstance(const char* ClassName)
+{
+	ZEClass* Class = GetClass(ClassName);
+	if (Class == NULL)
+	{
+		zeError("Cannot create object instace because class is not available. Class Name: \"%s\".", ClassName);
+		return NULL;
+	}
+
+	return Class->CreateInstance();
+}
+
+ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName)
+{
+	ZEClass* Class = GetClass(ClassName);
+	if (Class == NULL)
+	{
+		zeError("Cannot create object instace because base class is not available. Class Name: \"%s\".", ClassName);
+		return NULL;
+	}
+
+	if (!ZEClass::IsDerivedFrom(BaseClass, Class))
+	{
+		zeError("Cannot create object instace because class is not derived from base class. Base Class Name: \"%s\", Class Name: \"%s\".", 
+			BaseClass->GetName(), 
+			ClassName);
+		return NULL;
+	}
+
+	return Class->CreateInstance();
+}
+
+ZEObject* ZEProvider::CreateDerivedInstance(ZEClass* BaseClass, ZEMLReaderNode& ObjectNode)
+{
+	ZEObject* Object = CreateDerivedInstance(BaseClass, ObjectNode.ReadString("Class"));
+	if (Object == NULL)
+		return NULL;
+
+	if (!Object->GetClass()->Unserialize(Object, ObjectNode))
+	{
+		zeError("Failed to unserialize class.");
+		return false;
+	}
+
+	return Object;
 }
 
 ZEProvider* ZEProvider::GetInstance()

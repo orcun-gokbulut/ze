@@ -34,10 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticleSystem.h"
-#include "ZEGame\ZEDrawParameters.h"
+
 #include "ZEParticleRenderer.h"
 #include "ZEParticleOperator.h"
 #include "ZEParticleGenerator.h"
+#include "ZERenderer\ZERNRenderParameters.h"
+#include "ZERenderer\ZERNCommand.h"
+#include "ZERenderer\ZERNCuller.h"
 
 void ZEParticleSystem::SetRenderer(ZEParticleRenderer* Renderer)
 {
@@ -118,14 +121,10 @@ void ZEParticleSystem::SetMaximumParticleCount(ZEUInt ParticleCount)
 	ParticlePool.Resize((ZESize)MaximumParticleCount);
 
 	for (ZESize I = 0; I < Operators.GetCount(); I++)
-	{
 		Operators[I]->ResizeCustomDataPool((ZESize)MaximumParticleCount); 
-	}
 
 	if(Renderer != NULL)
-	{
 		Renderer->SetParticleCount(MaximumParticleCount);
-	}
 }
 
 ZEUInt ZEParticleSystem::GetMaximumParticleCount() const
@@ -138,12 +137,20 @@ const ZEParticleEffect* ZEParticleSystem::GetOwner() const
 	return Owner;
 }
 
-void ZEParticleSystem::Draw(ZEDrawParameters* DrawParameters)
+bool ZEParticleSystem::PreRender(const ZERNCullParameters* CullParameters)
+{
+	if(Renderer == NULL)
+		return false;
+
+	return Renderer->PreRender(CullParameters);
+}
+
+void ZEParticleSystem::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
 	if(Renderer == NULL)
 		return;
 
-	Renderer->Draw(DrawParameters);
+	Renderer->Render(RenderParameters, Command);
 }
 
 void ZEParticleSystem::Tick(float ElapsedTime)
@@ -151,31 +158,24 @@ void ZEParticleSystem::Tick(float ElapsedTime)
 	for (ZESize I = 0; I < (ZESize)MaximumParticleCount; I++)
 	{
 		if(ParticlePool[I].State == ZE_PAS_NEW)
-		{
 			ParticlePool[I].State = ZE_PAS_ALIVE;
-		}
 	}
 
 	for (ZESize I = 0; I < Generators.GetCount(); I++)
-	{
 		Generators[I]->Tick(ElapsedTime, ParticlePool);
-	}
 
 	for (ZESize I = 0; I < Operators.GetCount(); I++)
-	{
 		Operators[I]->Tick(ElapsedTime, ParticlePool);
-	}
 }
 
 ZEParticleSystem::ZEParticleSystem()
 {
 	Renderer = NULL;
+	Owner = NULL;
 	ParticlePool.Clear();
 	Operators.Clear();
-	Owner = NULL;
 }
 
 ZEParticleSystem::~ZEParticleSystem()
 {
-
 }

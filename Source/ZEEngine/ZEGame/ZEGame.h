@@ -51,6 +51,7 @@ enum ZEGameType
 };
 
 class ZEGame;
+class ZEUIManager;
 
 ZE_META_FORWARD_DECLARE(ZEUIManager, "ZEUI/ZEUIManager.h")
 

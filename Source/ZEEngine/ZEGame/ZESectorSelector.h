@@ -37,27 +37,10 @@
 
 #include "ZEGame/ZEGeographicEntity.h"
 
-class ZESector;
-
 class ZESectorSelector : public ZEGeographicEntity
 {
 	ZE_OBJECT;
 
-	private:
-		bool IsProcessing;
-		void UpdateSectors();
-	protected:
-		virtual void ParentTransformChanged();
-		virtual void LocalTransformChanged();
-		virtual bool SetOwner(ZEEntity* Owner);
-
-		ZESectorSelector();
-
 	public:
-		ZESector* DetermineSector(ZEGeographicEntity* Entity);
-
-		void SetReferenceSector(ZESector* Sector);
-		ZESector* GetReferenceSector();
-
 		static ZESectorSelector* CreateInstance();
 };

@@ -59,7 +59,6 @@ class ZEFileInfo : public ZEPathInfo
 
 								ZEFileInfo();
 								ZEFileInfo(const char* Path);
-								ZEFileInfo(const char* ParentPath, const char* RelativePath);
 };
 
 #endif

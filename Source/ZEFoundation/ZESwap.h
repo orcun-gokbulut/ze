@@ -47,7 +47,7 @@
 class ZESwap
 {
 	public:
-		static ZE_FORCE_INLINE ZEUInt16 Swap(ZEUInt16 Value)
+		static ZE_INLINE ZEUInt16 Swap(ZEUInt16 Value)
 		{
 			#ifdef ZE_PLATFORM_COMPILER_MSVC
 				return _byteswap_ushort(Value);
@@ -58,7 +58,7 @@ class ZESwap
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt32 Swap(const ZEUInt32 Value)
+		static ZE_INLINE ZEUInt32 Swap(const ZEUInt32 Value)
 		{
 			#ifdef ZE_PLATFORM_COMPILER_MSVC
 				return _byteswap_ulong(Value);
@@ -69,7 +69,7 @@ class ZESwap
 			#endif
 		}
 	
-		static ZE_FORCE_INLINE ZEUInt64 Swap(ZEUInt64 Value)
+		static ZE_INLINE ZEUInt64 Swap(ZEUInt64 Value)
 		{
 			#ifdef ZE_PLATFORM_COMPILER_MSVC
 				return _byteswap_uint64(Value);
@@ -80,17 +80,17 @@ class ZESwap
 			#endif
 		}
 
-		static ZE_FORCE_INLINE ZEUInt16 Swap(ZEInt16 Value)
+		static ZE_INLINE ZEUInt16 Swap(ZEInt16 Value)
 		{
 			return Swap((ZEUInt16)Value);
 		}
 
-		static ZE_FORCE_INLINE ZEUInt32 Swap(const ZEInt32 Value)
+		static ZE_INLINE ZEUInt32 Swap(const ZEInt32 Value)
 		{
 			return Swap((ZEUInt32)Value);
 		}
 	
-		static ZE_FORCE_INLINE ZEUInt64 Swap(ZEInt64 Value)
+		static ZE_INLINE ZEUInt64 Swap(ZEInt64 Value)
 		{
 			return Swap((ZEUInt64)Value);
 		}

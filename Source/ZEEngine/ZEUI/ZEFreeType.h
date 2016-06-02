@@ -34,12 +34,3 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#include "ft2build.h"
-#include "freetype\freetype.h"
-#include "freetype\ftglyph.h"
-
-struct ZEFreeType
-{
-	FT_Library	Library;
-	FT_Face		Face;
-};

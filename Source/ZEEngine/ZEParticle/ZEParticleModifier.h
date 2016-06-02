@@ -34,36 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PARTICLE_CONTROLLER_H__
-#define __ZE_PARTICLE_CONTROLLER_H__
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEDS/ZEString.h"
-#include "ZEDS/ZEArray.h"
-#include "ZETexture/ZETexture2DResource.h"
 #include "ZEParticle.h"
 
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZETexture/ZETexture2DResource.h"
+
 class ZEParticleEmitter;
+class ZEParticleEffect;
 
-class ZEParticleModifier
+class ZEParticleModifier : public ZEObject
 {
+	ZE_OBJECT
+	friend class ZEParticleEmitter;
 	private:
-
 		ZEString							Name;
-		ZEParticleEmitter*					Owner;
+		ZEParticleEmitter*					Emitter;
+		bool								Enabled;
 
 	protected: 
-
-		ZEArray<ZEParticle>&				GetOwnerParticlePool();
+		ZEArray<ZEParticle>&				GetPool();
 
 	public:
+		ZEParticleEffect*					GetEffect();
+		ZEParticleEmitter*					GetEmitter();
 
 		void								SetName(const ZEString& Name);
-		const ZEString&						GetName();
+		const ZEString&						GetName() const;
 
-		void								SetOwner(ZEParticleEmitter* Owner);
-		ZEParticleEmitter*					GetOwner();
-		
+		void								SetEnabled(bool Enabled);
+		bool								GetEnabled();
+
+		virtual void						PoolSizeChanged(ZESize NewSize);
 		virtual void						Tick(float ElapsedTime) = 0;
 
 											ZEParticleModifier();
@@ -72,205 +76,213 @@ class ZEParticleModifier
 
 class ZEParticlePhysicsModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
+		bool								IsRadialMovement;
+		float								MaxRadialSpeed;
+		float								MinRadialSpeed;
 
-		bool							IsRadialMovement;
-		float							MaxRadialSpeed;
-		float							MinRadialSpeed;
-
-		ZEVector3						MinAcceleration;
-		ZEVector3						MaxAcceleration;
-		ZEVector3						MinVelocity;
-		ZEVector3						MaxVelocity;
+		ZEVector3							MinAcceleration;
+		ZEVector3							MaxAcceleration;
+		ZEVector3							MinVelocity;
+		ZEVector3							MaxVelocity;
 
 	public:
+		void								SetRadialMovement(bool Enabled);
+		void								SetRadialSpeed(float Max, float Min);
 
-		void							SetRadialMovement(bool Enabled);
-		void							SetRadialSpeed(float Max, float Min);
+		void								SetMinAcceleration(const ZEVector3& Acceleration);
+		const ZEVector3&					GetMinAcceleration() const;
+		void								SetMaxAcceleration(const ZEVector3& Acceleration);
+		const ZEVector3&					GetMaxAcceleration() const;
 
-		void							SetMinAcceleration(const ZEVector3& Acceleration);
-		const ZEVector3&				GetMinAcceleration() const;
-		void							SetMaxAcceleration(const ZEVector3& Acceleration);
-		const ZEVector3&				GetMaxAcceleration() const;
+		void								SetMinVelocity(const ZEVector3& Velocity);
+		const ZEVector3&					GetMinVelocity() const;
+		void								SetMaxVelocity(const ZEVector3& Velocity);
+		const ZEVector3&					GetMaxVelocity() const;
 
-		void							SetMinVelocity(const ZEVector3& Velocity);
-		const ZEVector3&				GetMinVelocity() const;
-		void							SetMaxVelocity(const ZEVector3& Velocity);
-		const ZEVector3&				GetMaxVelocity() const;
+		virtual void						Tick(float ElapsedTime);
 
-		virtual void					Tick(float ElapsedTime);
-
-										ZEParticlePhysicsModifier();
-										~ZEParticlePhysicsModifier();
+											ZEParticlePhysicsModifier();
+											~ZEParticlePhysicsModifier();
 };
 
 class ZEParticleRotationModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
+		float								MaxRotation;
+		float								MinRotation;
 
-		float							MaxRotation;
-		float							MinRotation;
-
-		float							MinAngularAcceleration;
-		float							MaxAngularAcceleration;
-		float							MinAngularVelocity;
-		float							MaxAngularVelocity;
+		float								MinAngularAcceleration;
+		float								MaxAngularAcceleration;
+		float								MinAngularVelocity;
+		float								MaxAngularVelocity;
 
 	public:
+		void								SetMaxRotation(float MaxRotation);
+		float								GetMaxRotation() const;
+		void								SetMinRotation(float MinRotation);
+		float								GetMinRotation() const;
 
-		void							SetMaxRotation(float MaxRotation);
-		float							GetMaxRotation() const;
-		void							SetMinRotation(float MinRotation);
-		float							GetMinRotation() const;
+		void 								SetMinAngularAcceleration(float AngularAcceleration);
+		float			 					GetMinAngularAcceleration() const;
+		void 								SetMaxAngularAcceleration(float AngularAcceleration);
+		float 								GetMaxAngularAcceleration() const;
 
-		void 							SetMinAngularAcceleration(float AngularAcceleration);
-		float			 				GetMinAngularAcceleration() const;
-		void 							SetMaxAngularAcceleration(float AngularAcceleration);
-		float 							GetMaxAngularAcceleration() const;
+		void 								SetMinAngularVelocity(float AngularVelocity);
+		float								GetMinAngularVelocity() const;
+		void 								SetMaxAngularVelocity(float AngularVelocity);
+		float								GetMaxAngularVelocity() const;
 
-		void 							SetMinAngularVelocity(float AngularVelocity);
-		float							GetMinAngularVelocity() const;
-		void 							SetMaxAngularVelocity(float AngularVelocity);
-		float							GetMaxAngularVelocity() const;
+		virtual	void						Tick(float ElapsedTime);
 
-		virtual	void					Tick(float ElapsedTime);
-
-										ZEParticleRotationModifier();
-										~ZEParticleRotationModifier();
+											ZEParticleRotationModifier();
+											~ZEParticleRotationModifier();
 };
 
 class ZEParticleGrowModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
-
-		float	GrowFactor;
+		float								GrowFactor;
 
 	public:
+		void								SetGrowFactor(float Factor);
+		float								GetGrowFactor() const;
 
-		void			SetGrowFactor(float Factor);
-		float			GetGrowFactor() const;
+		virtual	void						Tick(float ElapsedTime);
 
-		virtual	void	Tick(float ElapsedTime);
-
-						ZEParticleGrowModifier();
-						~ZEParticleGrowModifier();
+											ZEParticleGrowModifier();
+											~ZEParticleGrowModifier();
 };
 
 class ZEParticleColorOverLifeModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
-
-		ZEVector4			ToColor;
+		ZEVector4							ToColor;
 
 	public:
+		void								SetToColor(const ZEVector4& Factor);
+		const ZEVector4&					GetToColor() const;
 
-		void				SetToColor(const ZEVector4& Factor);
-		const ZEVector4&	GetToColor() const;
+		virtual	void						Tick(float ElapsedTime);
 
-		virtual	void		Tick(float ElapsedTime);
-
-							ZEParticleColorOverLifeModifier();
-							~ZEParticleColorOverLifeModifier();
+											ZEParticleColorOverLifeModifier();
+											~ZEParticleColorOverLifeModifier();
 };
 
 class ZEParticleVelocityOverLifeModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
-
-		ZEVector3			ToVelocity;
+		ZEVector3							ToVelocity;
 
 	public:
+		void								SetToVelocity(const ZEVector3& Factor);
+		const ZEVector3&					GetToVelocity() const;
 
-		void				SetToVelocity(const ZEVector3& Factor);
-		const ZEVector3&	GetToVelocity() const;
+		virtual	void						Tick(float ElapsedTime);
 
-		virtual	void		Tick(float ElapsedTime);
-
-							ZEParticleVelocityOverLifeModifier();
-							~ZEParticleVelocityOverLifeModifier();
+											ZEParticleVelocityOverLifeModifier();
+											~ZEParticleVelocityOverLifeModifier();
 };
 
 class ZEParticleDiffuseMapChangerModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
-
-		ZEUInt							CurrentTextureIndex;
-		float							TotalTime;
+		ZEUInt								CurrentTextureIndex;
+		float								TotalTime;
 	
-		ZEArray<ZETexture2DResource*>	Textures;
-		float							Interval;
+		ZEArray<ZETexture2DResource*>		Textures;
+		float								Interval;
 
 	public:
-	
-		void							SetInterval(float NewInterval);
-		float							GetInterval();
+		void								SetInterval(float NewInterval);
+		float								GetInterval() const;
 
-		void							AddTextureResource(ZETexture2DResource* Resource);
+		void								AddTextureResource(ZETexture2DResource* Resource);
 
-		virtual	void					Tick(float ElapsedTime);
+		virtual	void						Tick(float ElapsedTime);
 	
-										ZEParticleDiffuseMapChangerModifier();
-										~ZEParticleDiffuseMapChangerModifier();
+											ZEParticleDiffuseMapChangerModifier();
+											~ZEParticleDiffuseMapChangerModifier();
 };
 
 class ZEParticleDisplacementModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
-	
-		ZEVector3						Displacement;
+		ZEVector3							Displacement;
 	
 	public:
+		void								SetDisplacement(ZEVector3 NewDisplacement);
+		ZEVector3							GetDisplacement();
 	
-
-		void							SetDisplacement(ZEVector3 NewDisplacement);
-		ZEVector3						GetDisplacement();
+		virtual	void						Tick(float ElapsedTime);
 	
-		virtual	void					Tick(float ElapsedTime);
-	
-										ZEParticleDisplacementModifier();
-										~ZEParticleDisplacementModifier();
+											ZEParticleDisplacementModifier();
+											~ZEParticleDisplacementModifier();
 };
 
 class ZEParticleRandomAccelerationModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
-	
-		float							MaxStrength;
+		float								MaxStrength;
 	
 	public:
+		void								SetMaxStrength(float NewStrength = 1000.0f);
+		float								GetMaxStrength() const;
 	
+		virtual	void						Tick(float ElapsedTime);
 	
-		void							SetMaxStrength(float NewStrength = 1000.0f);
-		float							GetMaxStrength() const;
-	
-		virtual	void					Tick(float ElapsedTime);
-	
-										ZEParticleRandomAccelerationModifier();
-										~ZEParticleRandomAccelerationModifier();
+											ZEParticleRandomAccelerationModifier();
+											~ZEParticleRandomAccelerationModifier();
 };
 
 class ZEParticleUVModifier : public ZEParticleModifier
 {
+	ZE_OBJECT
 	private:
+		bool								DoOnce;
+		ZEVector2							UVFrameSize;
+		ZEInt								CurrentUVFrame;
 
-		bool							DoOnce;
-		ZEVector2						UVFrameSize;
-		ZEInt							CurrentUVFrame;
-
-		ZEVector2						TextureSize;
-		ZEInt							RowCount;
-		ZEInt							ColumnCount;
+		ZEVector2							TextureSize;
+		ZEInt								RowCount;
+		ZEInt								ColumnCount;
 
 	public:
+		void								SetTextureSize(ZEVector2 TextureSize);
+		const ZEVector2&					GetTextureSize() const;
 
-		void							SetTextureSize(ZEVector2 TextureSize);
-		void							SetRowCount(ZEInt RowCount);
-		void							SetColumnCount(ZEInt ColumnCount);
+		void								SetRowCount(ZEInt RowCount);
+		ZEInt								GetRowCount() const;
 
-		virtual void					Tick(float ElapsedTime);
+		void								SetColumnCount(ZEInt ColumnCount);
+		ZEInt								GetColumnCount() const;
 
-										ZEParticleUVModifier();
-										~ZEParticleUVModifier();
+		virtual void						Tick(float ElapsedTime);
+
+											ZEParticleUVModifier();
+											~ZEParticleUVModifier();
 };
 
-#endif
+class ZEParticleConfineModifier : public ZEParticleModifier
+{
+	ZE_OBJECT
+	private:
+		ZEAABBox							BoundingBox;
+
+	public:
+		void								SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox						GetBoundingBox() const;
+
+		virtual void						Tick(float ElapsedTime);
+
+											ZEParticleConfineModifier();
+											~ZEParticleConfineModifier();
+};

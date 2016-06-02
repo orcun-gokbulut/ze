@@ -38,27 +38,32 @@
 
 ZEUInt ZETimeStamp::GetHour() const
 {
-	return (Value / (1000LL * 1000LL * 60LL * 60LL)) % 24LL;
+	tm Temp = ToTM();
+	return Temp.tm_hour;
 }
 
 ZEUInt ZETimeStamp::GetMinute() const
 {
-	return (Value / (1000LL * 1000LL * 60LL)) % 60LL;
+	tm Temp = ToTM();
+	return Temp.tm_min;
 }
 
 ZEUInt ZETimeStamp::GetSecond() const
 {
-	return (Value / (1000LL * 1000LL)) % 60LL;
+	tm Temp = ToTM();
+	return Temp.tm_sec;
 }
 
 ZEUInt ZETimeStamp::GetMillisecond() const
 {
-	return (Value / 1000LL) % 1000LL;
+	tm Temp = ToTM();
+	return Temp.tm_sec / 1000LL;
 }
 
 ZEUInt ZETimeStamp::GetMicrosecond() const
 {
-	return Value % 1000LL;
+	tm Temp = ToTM();
+	return Temp.tm_sec / (1000LL * 1000LL);
 }
 
 bool ZETimeStamp::GetAM() const
@@ -357,6 +362,7 @@ void ZETimeStamp::Clear()
 
 ZETimeStamp::ZETimeStamp()
 {
+	Value = 0;
 }
 
 ZETimeStamp::ZETimeStamp(ZEInt64 Value)

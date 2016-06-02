@@ -46,9 +46,9 @@ class ZEModelDebugDrawer : public ZEDebugDrawer
 		ZEVector4					BonePositionColor;
 		ZEVector4					BonePathColor;
 
-		ZEMaterial*					ModelMaterial;
+		ZERNMaterial*					ModelMaterial;
 		ZECanvas					ModelDrawCanvas;
-		ZERenderCommand				ModelRenderCommand;
+		ZERNCommand				ModelRenderCommand;
 
 	protected:
 		virtual void				DebugDrawEntity();
@@ -69,7 +69,7 @@ class ZEModelDebugDrawer : public ZEDebugDrawer
 		void						SetBonePathColor(ZEVector4 Color);
 		ZEVector4					GetBonePathColor() const;
 
-		virtual void				Draw(ZEDrawParameters* DrawParameters);
+		virtual void				Draw(ZERNDrawParameters* DrawParameters);
 
 		static ZEModelDebugDrawer*	CreateInstance();
 

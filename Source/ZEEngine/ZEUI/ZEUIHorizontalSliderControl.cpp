@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIHorizontalSliderControl.h"
-#include "ZEGraphics\ZEUIMaterial.h"
 
 void ZEUIHorizontalSliderControl::MouseButtonPressed(ZEUIMouseKey Button, const ZEVector2& MousePosition)
 {
@@ -76,10 +75,10 @@ void ZEUIHorizontalSliderControl::Draw(ZEUIRenderer* Renderer)
 	TempRect.RightDown.x += SliderButton.Positions.GetWidth() / 2;
 
 	if(!ZEUIRectangle::Clip(LineOutput, SliderLine, TempRect))
-		Renderer->AddRectangle(LineOutput);
+		Renderer->AddRectangle(&LineOutput);
 
 	if(!ZEUIRectangle::Clip(ButtonOutput, SliderButton, TempRect))
-		Renderer->AddRectangle(ButtonOutput);
+		Renderer->AddRectangle(&ButtonOutput);
 
 	ZEUIControl::Draw(Renderer);
 }
@@ -152,21 +151,16 @@ void ZEUIHorizontalSliderControl::SetPosition(const ZEVector2& Position)
 
 ZEUIHorizontalSliderControl::ZEUIHorizontalSliderControl()
 {
-	SliderButtonMaterial = ZEUIMaterial::CreateInstance();
-	SliderLineMaterial = ZEUIMaterial::CreateInstance();
-
 	SliderButton.Positions.SetPosition(ZEVector2::Zero);
 	SliderButton.Positions.SetWidth(10);
 	SliderButton.Positions.SetHeight(30);
 	SliderButton.Positions.SetPosition(ZEVector2(0 - (SliderButton.Positions.GetWidth() / 2) , 0));
 	SliderButton.Color = ZEUIManager::GetDefaultForegroundColor();
-	SliderButton.Material = SliderButtonMaterial;
 
 	SliderLine.Positions.SetPosition(ZEVector2::Zero);
 	SliderLine.Positions.SetWidth(100);
 	SliderLine.Positions.SetHeight(10);
 	SliderLine.Color = ZEUIManager::GetDefaultBackgroundColor();
-	SliderLine.Material = SliderLineMaterial;
 
 	SetMaximumValue(100);
 	SetMinimumValue(0);

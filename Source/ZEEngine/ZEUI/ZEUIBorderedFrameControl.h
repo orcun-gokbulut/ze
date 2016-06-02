@@ -34,12 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_UI_BORDERED_FRAME_CONTROL__
-#define __ZE_UI_BORDERED_FRAME_CONTROL__
 
 #include "ZEUIControl.h"
 #include "ZEUIFrameControl.h"
-#include "ZEFontResource.h"
+#include "ZEUIFont.h"
 
 #define	ZEUI_BFC_EL_MAINAREA		1
 #define	ZEUI_BFC_EL_LEFTUPCORNER	2
@@ -54,46 +52,46 @@
 
 struct ZEUIControlStyle
 {
-	bool			BorderVisibility;
-	ZEInt32				BorderWidth;
-	ZEInt32				ElementVisibilities;
-	bool			TileTextures;
+	bool							BorderVisibility;
+	ZEInt32							BorderWidth;
+	ZEInt32							ElementVisibilities;
+	bool							TileTextures;
 
-	ZEVector4		BoderEdgeColor;
-	ZEVector4		BorderCornerColor;
-	ZEVector4		BackGroundColor;
-	ZEVector4		ForeGroundColor;
-	ZEVector4		HoveredColor;
-	ZEVector4		PressedColor;
-	ZEVector4		DisabledColor;
+	ZEVector4						BoderEdgeColor;
+	ZEVector4						BorderCornerColor;
+	ZEVector4						BackGroundColor;
+	ZEVector4						ForeGroundColor;
+	ZEVector4						HoveredColor;
+	ZEVector4						PressedColor;
+	ZEVector4						DisabledColor;
 
-	ZEVector2		BorderTopLeftCornerUVLeftUp;
-	ZEVector2		BorderTopLeftCornerUVRightDown;
-	ZEVector2		BorderLeftDownCornerUVLeftUp;
-	ZEVector2		BorderLeftDownCornerUVRightDown;
-	ZEVector2		BorderRightUpCornerUVLeftUp;
-	ZEVector2		BorderRightUpCornerUVRightDown;
-	ZEVector2		BorderRightDownCornerUVLeftUp;
-	ZEVector2		BorderRightDownCornerUVRightDown;
-	ZEVector2		BorderTopEdgeUVLeftUp;
-	ZEVector2		BorderTopEdgeUVRightDown;
-	ZEVector2		BorderBottomEdgeUVLeftUp;
-	ZEVector2		BorderBottomEdgeUVRightDown;
-	ZEVector2		BorderLeftEdgeUVLeftUp;
-	ZEVector2		BorderLeftEdgeUVRightDown;
-	ZEVector2		BorderRightEdgeUVLeftUp;
-	ZEVector2		BorderRightEdgeUVRightDown;
-	ZEVector2		MainAreaUVLeftUp;
-	ZEVector2		MainAreaUVRightDown;
+	ZEVector2						BorderTopLeftCornerUVLeftUp;
+	ZEVector2						BorderTopLeftCornerUVRightDown;
+	ZEVector2						BorderLeftDownCornerUVLeftUp;
+	ZEVector2						BorderLeftDownCornerUVRightDown;
+	ZEVector2						BorderRightUpCornerUVLeftUp;
+	ZEVector2						BorderRightUpCornerUVRightDown;
+	ZEVector2						BorderRightDownCornerUVLeftUp;
+	ZEVector2						BorderRightDownCornerUVRightDown;
+	ZEVector2						BorderTopEdgeUVLeftUp;
+	ZEVector2						BorderTopEdgeUVRightDown;
+	ZEVector2						BorderBottomEdgeUVLeftUp;
+	ZEVector2						BorderBottomEdgeUVRightDown;
+	ZEVector2						BorderLeftEdgeUVLeftUp;
+	ZEVector2						BorderLeftEdgeUVRightDown;
+	ZEVector2						BorderRightEdgeUVLeftUp;
+	ZEVector2						BorderRightEdgeUVRightDown;
+	ZEVector2						MainAreaUVLeftUp;
+	ZEVector2						MainAreaUVRightDown;
 
-	ZETexture2D*	BackgroundTexture;
-	ZETexture2D*	BorderCornerTexture;
-	ZETexture2D*	BorderEdgeTexture;
-	ZETexture2D*	HoveredTexture;
-	ZETexture2D*	PressedTexture;
-	ZETexture2D*	DisabledTexture;
+	ZEGRTexture2D*					BackgroundTexture;
+	ZEGRTexture2D*					BorderCornerTexture;
+	ZEGRTexture2D*					BorderEdgeTexture;
+	ZEGRTexture2D*					HoveredTexture;
+	ZEGRTexture2D*					PressedTexture;
+	ZEGRTexture2D*					DisabledTexture;
 
-	ZEFontResource*	Font;
+	ZEUIFont*					Font;
 
 	ZEUIControlStyle()
 	{
@@ -146,34 +144,29 @@ class ZEUIBorderedFrameControl : public ZEUIControl
 
 	protected:
 
-		ZEUIFrameControl	MainArea;
-		ZEUIFrameControl	LeftUpCornerArea;
-		ZEUIFrameControl	LeftDownCornerArea;
-		ZEUIFrameControl	RightUpCornerArea;
-		ZEUIFrameControl	RightDownCornerArea;
-		ZEUIFrameControl	TopEdgeArea;
-		ZEUIFrameControl	LeftEdgeArea;
-		ZEUIFrameControl	RightEdgeArea;
-		ZEUIFrameControl	BottomEdgeArea;
+		ZEUIFrameControl			MainArea;
+		ZEUIFrameControl			LeftUpCornerArea;
+		ZEUIFrameControl			LeftDownCornerArea;
+		ZEUIFrameControl			RightUpCornerArea;
+		ZEUIFrameControl			RightDownCornerArea;
+		ZEUIFrameControl			TopEdgeArea;
+		ZEUIFrameControl			LeftEdgeArea;
+		ZEUIFrameControl			RightEdgeArea;
+		ZEUIFrameControl			BottomEdgeArea;
 
 	public:
 
-		virtual void		SetHeight(float Height);
-		virtual void		SetWidth(float Width);
+		virtual void				SetHeight(float Height);
+		virtual void				SetWidth(float Width);
 
-		virtual void		AddChildControl(ZEUIControl* Control);
+		virtual void				AddChildControl(ZEUIControl* Control);
 
-		void				SetElementVisibilities(ZEInt32 Elements, bool Visibility);
-		ZEInt32					GetVisibleElements();
+		void						SetElementVisibilities(ZEInt32 Elements, bool Visibility);
+		ZEInt32						GetVisibleElements();
 
-		void				SetBorderThickness(float Thickness);
+		void						SetBorderThickness(float Thickness);
 
-		virtual void		SetMaterial(ZEMaterial* Material);
-		virtual ZEMaterial*	GetMaterial() const;
-
-							ZEUIBorderedFrameControl();
+									ZEUIBorderedFrameControl();
 
 
 };
-
-#endif

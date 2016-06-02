@@ -33,11 +33,11 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MUTEX_H__
-#define __ZE_MUTEX_H__
+#pragma once
 
-#include "ZEDS/ZEString.h"
+#include "ZECommon.h"
 #include "ZEPlatform.h"
+#include "ZEDS/ZEString.h"
 
 #ifdef ZE_PLATFORM_UNIX
 #include <pthread.h>
@@ -45,6 +45,7 @@
 
 class ZEMutex
 {
+	ZE_COPY_NO_ACTION(ZEMutex)
 	private:
         bool                Locked;
         #ifdef ZE_PLATFORM_WINDOWS
@@ -59,17 +60,11 @@ class ZEMutex
         bool				TryToLock();
         void                Lock();
         bool				Lock(ZEUInt Milliseconds);
-
-        void                Wait();
-        bool				Wait(ZEUInt Milliseconds);
-
         void				Unlock();
 
-        ZEMutex         	operator=(const ZEMutex& Lock);
+		void                Wait();
+		bool				Wait(ZEUInt Milliseconds);
 
                             ZEMutex();
-                            ZEMutex(const ZEMutex& Lock);
                             ~ZEMutex();
 };
-
-#endif

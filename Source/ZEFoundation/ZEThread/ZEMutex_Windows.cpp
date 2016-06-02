@@ -59,7 +59,6 @@ bool ZEMutex::Lock(ZEUInt Milliseconds)
 	}
 
 	Locked = true;
-
 	return true;
 }
 
@@ -91,15 +90,6 @@ ZEMutex::ZEMutex()
 	Handle = CreateMutex(NULL, false, NULL);
 	if (Handle == NULL)
 		zeCriticalError("Can not create system lock.");
-
-	Locked = false;
-}
-
-ZEMutex::ZEMutex(const ZEMutex& Lock)
-{
-	Handle = CreateMutex(NULL, false, NULL);
-	if (Handle == NULL)
-		zeCriticalError("Can not create mutex.");
 
 	Locked = false;
 }

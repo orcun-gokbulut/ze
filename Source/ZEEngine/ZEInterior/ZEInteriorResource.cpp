@@ -41,36 +41,44 @@
 #include "ZECore/ZEResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZEGraphics/ZEFixedMaterial.h"
+#include "ZERenderer/ZERNFixedMaterial.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEFoundation/ZEPacking.h"
+#include "ZEGraphics/ZEGRVertexLayout.h"
 
 #include <string.h>
 
-// Reading
-#define ZE_SHADER_SKINTRANSFORM				1
-#define ZE_SHADER_BASE_MAP					2
-#define ZE_SHADER_NORMAL_MAP				4
-#define ZE_SHADER_SPECULAR_MAP				8
-#define ZE_SHADER_EMMISIVE_MAP				16
-#define ZE_SHADER_OPACITY_MAP				32
-#define ZE_SHADER_DETAIL_BASE_MAP			64
-#define ZE_SHADER_DETAIL_NORMAL_MAP			128
-#define ZE_SHADER_REFLECTION				256
-#define ZE_SHADER_REFRACTION				512
-#define ZE_SHADER_LIGHT_MAP					1024
-#define ZE_SHADER_DISTORTION_MAP			2048
+ZEGRVertexLayout ZEInteriorVertex::VertexLayout;
+ZEGRVertexLayout* ZEInteriorVertex::GetVertexLayout()
+{
 
-const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
+	if (VertexLayout.GetElementCount() == 0)
+	{
+		ZEGRVertexElement ElementArray[] = 
+		{
+			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0}
+		};
+
+		VertexLayout.SetElements(ElementArray, 5);
+	}
+
+	return &VertexLayout;
+}
+
+const ZEGRTexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZEString& FileName)
 {
 	if (FileName == "")
 		return NULL;
 
 	for (ZESize I = 0; I < TextureResources.GetCount(); I++)
 		if (TextureResources[I]->GetFileName() == FileName)
-			return TextureResources[I]->GetTexture();
+			return TextureResources[I]->GetTexture2D();
 
 	ZETexture2DResource* NewTextureResource = ZETexture2DResource::LoadSharedResource(ZEFileInfo(this->GetFileName()).GetParentDirectory() + "\\" + FileName);
 	if (NewTextureResource == NULL)
@@ -79,7 +87,7 @@ const ZETexture2D* ZEInteriorResource::ManageInteriorMaterialTextures(const ZESt
 		return NULL;
 	}
 	TextureResources.Add(NewTextureResource);
-	return NewTextureResource->GetTexture();
+	return NewTextureResource->GetTexture2D();
 }
 
 bool ZEInteriorResource::ReadInteriorFromFile(ZEFile* ResourceFile)
@@ -391,7 +399,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 		return false;
 
 	for(ZESize I = 0; I < Materials.GetCount(); I++)
-		Materials[I] = ZEFixedMaterial::CreateInstance();
+		Materials[I] = ZERNFixedMaterial::CreateInstance();
 
 	ZESize SubNodeCount = MaterialsNode->GetNodeCount("Material");
 
@@ -404,8 +412,9 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 
 		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
 
-		ZEFixedMaterial* CurrentMaterial = (ZEFixedMaterial*)Materials[I];
+		ZERNFixedMaterial* CurrentMaterial = static_cast<ZERNFixedMaterial*>(Materials[I].GetPointer());
 		CurrentMaterial->ReadFromFile(MaterialPath);
+		CurrentMaterial->Initialize();
 	}
 
 	return true;
@@ -421,7 +430,7 @@ const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures() const
 	return TextureResources;
 }
 
-const ZEArray<ZEMaterial*>& ZEInteriorResource::GetMaterials() const
+const ZEArray<ZEHolder<ZERNMaterial>>& ZEInteriorResource::GetMaterials() const
 {
 	return Materials;
 }
@@ -446,21 +455,19 @@ ZEInteriorResource* ZEInteriorResource::LoadSharedResource(const ZEString& FileN
 	ZEInteriorResource* Resource = (ZEInteriorResource*)zeResources->GetResource(FileName);
 	if (Resource != NULL)
 		return Resource;
-	else
+
+	// If there is no shared instance of ZEInterior file create and load new instance
+	Resource = LoadResource(FileName);
+	if (Resource != NULL)
 	{
-		// If there is no shared instance of ZEInterior file create and load new instance
-		Resource = LoadResource(FileName);
-		if (Resource != NULL)
-		{
-			// Flag as shared and add it to ZEResourceManager and return a instance
-			Resource->Cached = false;
-			Resource->ReferenceCount = 1;
-			zeResources->AddResource(Resource);
-			return Resource;
-		}
-		else
-			return NULL;
+		// Flag as shared and add it to ZEResourceManager and return a instance
+		Resource->Cached = false;
+		Resource->ReferenceCount = 1;
+		zeResources->AddResource(Resource);
+		return Resource;
 	}
+
+	return NULL;
 }
 
 void ZEInteriorResource::CacheResource(const ZEString& FileName)

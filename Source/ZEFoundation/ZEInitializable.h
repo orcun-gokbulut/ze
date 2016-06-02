@@ -45,7 +45,7 @@ class ZEInitializable
 		virtual void	DeinitializeSelf();
 
 	public:
-		bool			IsInitialized();
+		bool			IsInitialized() const;
 		bool			Initialize();
 		void			Deinitialize();
 		bool			Reinitialize();

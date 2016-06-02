@@ -88,8 +88,8 @@ class ZEModelAnimationTrack : public ZEObject
 		void							SetAnimation(const ZEModelAnimation* Animation);
 		const ZEModelAnimation*			GetAnimation();
 
-		void							SetAnimationByName(const char* Name);
-		const char*						GetAnimationName();
+		void							SetAnimationByName(const ZEString& Name);
+		const ZEString&					GetAnimationName();
 
 		void							SetState(ZEModelAnimationState State);
 		ZEModelAnimationState			GetState();

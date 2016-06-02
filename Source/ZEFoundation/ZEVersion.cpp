@@ -41,12 +41,12 @@
 
 ZEString ZEVersion::GetShortString() 
 {
-	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04}-{3}", Major, Minor, Internal, Revision, Branch);
+	return ZEFormat::Format("{0}.{1}.{2}-Rev:{3}", Major, Minor, Internal, Revision);
 }
 
 ZEString ZEVersion::GetLongString()	
 {
-	return ZEFormat::Format("{0:d:02}.{1:d:02}.{2:d:02}:{3:d04}-{4} ({5}-{6})", Major, Minor, Internal, Revision, Branch, Platform, Architecture);
+	return ZEFormat::Format("{0}.{1}.{2}-Rev:{3} (Branch:{4}, Platform:{5}-{6})", Major, Minor, Internal, Revision, Branch, Platform, Architecture);
 }
 
 ZEVersion ZEVersion::GetZinekVersion()

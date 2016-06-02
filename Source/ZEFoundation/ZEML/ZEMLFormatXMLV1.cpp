@@ -44,6 +44,7 @@
 #include "ZEError.h"
 
 #include <tinyxml.h>
+#include "ZEFile\ZEFileInfo.h"
 
 #define FormatError(Text) zeError(Text##" File Name: \"%s\", Element: \"%s\".", File->GetPath().ToCString(), CurrentNode->Attribute("Name") != NULL ? CurrentNode->Attribute("Name") : "Unknown")
 
@@ -99,15 +100,15 @@ bool ZEMLFormatXMLV1Description::Determine(ZEFile* File)
 
 	if (Match.SubMatches[0].String.ToInt32() != 1)
 	{
-		zeWarning("Unknown XML based ZEML format version detected. File Name: \"%s\"", File->GetPath());
+		zeWarning("Unknown XML based ZEML format version detected. File Name: \"%s\"", File->GetPath().ToCString());
 		return false;
 	}
 
 	if (Match.SubMatches[1].String.ToInt32() != 0)
-		zeWarning("Unknown XML based ZEML format minor version is detected. Can cause problems. File Name: \"%s\"", File->GetPath());
+		zeWarning("Unknown XML based ZEML format minor version is detected. Can cause problems. File Name: \"%s\"", File->GetPath().ToCString());
 
 	if (File->GetSize() >= 64 * 1024)
-		zeWarning("Loading XML based ZEML format which is slow and has high memory allocation. Please convert it to a faster binary ZEML format. File Name: \"%s\"", File->GetPath());
+		zeWarning("Loading XML based ZEML format which is slow and has high memory allocation. Please convert it to a faster binary ZEML format. File Name: \"%s\"", File->GetPath().ToCString());
 
 	return true;
 }
@@ -183,6 +184,96 @@ bool ZEMLFormatXMLV1::ReadVectors(ZEFile* File, float* Output, const char** Memb
 	return true;
 }
 
+bool ZEMLFormatXMLV1::Include(ZEFile* File, TiXmlElement* Node)
+{
+	const char* Source = Node->Attribute("Source");
+	if (Source == NULL)
+	{
+		FormatError("ZEML Include element does not have Source attribute.");
+		return false;
+	}
+
+	bool DiscardRoot = false;
+	const char* DiscardRootAttribute = Node->Attribute("DiscardRoot");
+	if (DiscardRootAttribute != NULL && strcmp(DiscardRootAttribute, "true") == 0)
+		DiscardRoot = true;
+
+
+	ZEFile IncludeFile;
+	if (!IncludeFile.Open(ZEFileInfo::CombineRelativePath(File->GetPath(), Source), ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot open ZEML Include file source. Source: \"%s\".", Source);
+		return false;
+	}
+
+	ZESize FileSize = IncludeFile.GetSize();
+	ZEArray<char> Buffer;
+	Buffer.SetCount(FileSize + 1);
+	if (IncludeFile.Read(Buffer.GetCArray(), FileSize, 1) != 1)
+	{
+		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", IncludeFile.GetPath().ToCString());
+		IncludeFile.Close();
+		return false;
+	}
+
+	IncludeFile.Close();
+
+	Buffer[FileSize] = '\0';
+	ZEPointer<TiXmlDocument> IncludeDocument = new TiXmlDocument();
+	IncludeDocument->Parse(Buffer.GetConstCArray(), 0, TIXML_ENCODING_UTF8);
+	if (IncludeDocument->Error())
+	{
+		zeError("Cannot parse XML in ZEML file. Corrupted ZEML file. File Name: \"%s\". Error Description: %s", IncludeFile.GetPath().ToCString(), IncludeDocument->ErrorDesc());
+		return false;
+	}
+
+	if (strcmp(IncludeDocument->RootElement()->Value(), "Node") != 0)
+	{
+		zeError("XML based ZEML file must have <Node> tag as root element. File Name: \"%s\".", IncludeFile.GetPath().ToCString());
+		return false;
+	}
+
+	if (DiscardRoot)
+	{
+		TiXmlNode* IncludeNode = IncludeDocument->RootElement()->FirstChild();
+		while (IncludeNode != NULL)
+		{
+			Node->Parent()->InsertBeforeChild(Node, *IncludeNode->Clone());
+			IncludeNode = IncludeNode->NextSibling();
+		}
+	}
+	else
+	{
+		Node->Parent()->InsertBeforeChild(Node, *IncludeDocument->RootElement()->Clone());
+	}
+	IncludeDocument.Release();
+
+	return true;
+}
+
+bool ZEMLFormatXMLV1::ParseIncludes(ZEFile* File, TiXmlElement* Node)
+{
+	TiXmlNode* IncludeNode = Node->FirstChild();
+	while (IncludeNode != NULL)
+	{
+		if (IncludeNode->Type() != TiXmlNode::TINYXML_ELEMENT ||
+			strcmp(IncludeNode->Value(), "Include") != 0)
+		{
+			IncludeNode = IncludeNode->NextSibling();
+			continue;
+		}
+
+		if (!Include(File, IncludeNode->ToElement()))
+			return false;
+
+		TiXmlNode* NextNode = IncludeNode->NextSibling();
+		IncludeNode->Parent()->RemoveChild(IncludeNode);
+		IncludeNode = NextNode;
+	}
+
+	return true;
+}
+
 bool ZEMLFormatXMLV1::ReadDoubleVectors(ZEFile* File, double* Output, const char** Members, ZESize MemberCount)
 {
 	bool ReadedMembers[32];
@@ -235,8 +326,9 @@ bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 	File->Seek(0, ZE_SF_BEGINING);
 
 	ZESize FileSize = File->GetSize();
-	ZEPointer<char> Buffer = new char[FileSize + 1];
-	if (File->Read(Buffer, FileSize, 1) != 1)
+	ZEArray<char> Buffer;
+	Buffer.SetCount(FileSize + 1);
+	if (File->Read(Buffer.GetCArray(), FileSize, 1) != 1)
 	{
 		zeError("Cannot load ZEML file. Corrupted ZEML file. File Name: \"%s\".", File->GetPath().ToCString());
 		return false;
@@ -244,7 +336,7 @@ bool ZEMLFormatXMLV1::ReadHeader(ZEFile* File)
 
 	Buffer[FileSize] = '\0';
 	Document = new TiXmlDocument();
-	Document->Parse(Buffer, 0, TIXML_ENCODING_UTF8);
+	Document->Parse(Buffer.GetConstCArray(), 0, TIXML_ENCODING_UTF8);
 	if (Document->Error())
 	{
 		zeError("Cannot parse XML in ZEML file. Corrupted ZEML file. File Name: \"%s\". Error Description: %s", File->GetPath().ToCString(), Document->ErrorDesc());
@@ -308,6 +400,9 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		Element.NameHash = Element.Name.Hash();
 		Element.Count = 0;
 		Element.Offset = (ZEUInt64)CurrentNode;
+
+		if (!ParseIncludes(File, CurrentNode))
+			return false;
 
 		TiXmlNode* Node = CurrentNode->FirstChild();
 		while(Node != NULL)

@@ -41,16 +41,15 @@
 #include "ZEMath/ZEPlane.h"
 #include "ZECore/ZEConsole.h"
 #include "ZEMath/ZETriangle.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZECamera.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZECamera.h"
 #include "ZEMath/ZELineSegment.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEMath/ZEMath.h"
 
-ZESimpleMaterial* ZEGizmo::GizmoMaterial = NULL;
+ZEHolder<ZERNSimpleMaterial> ZEGizmo::GizmoMaterial;
 
 void ZEGizmo::UpdateMoveGizmo()
 {
@@ -1047,42 +1046,13 @@ bool ZEGizmo::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	GizmoMaterial = ZESimpleMaterial::CreateInstance();
-
-	RenderCommand.SetZero();
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.Material = GizmoMaterial;
-	
 	return true;
 }
 
 bool ZEGizmo::DeinitializeSelf()
 {	
-	if (GizmoMaterial != NULL)
-	{
-		GizmoMaterial->Release();
-		GizmoMaterial = NULL;
-	}
-
+	GizmoMaterial = NULL;
 	return ZEEntity::DeinitializeSelf();
-}
-
-void ZEGizmo::Draw(ZEDrawParameters* DrawParameters)
-{
-	UpdateGizmo();
-
-	RenderCommand.Priority = 4;
-	RenderCommand.WorldMatrix = GetWorldTransform();
-	RenderCommand.Flags = (Mode == ZE_GM_ROTATE ? ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM : ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM);
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	RenderCommand.PrimitiveCount = GizmoLines.Vertices.GetCount() / 2;
-	RenderCommand.VertexBuffer = &GizmoLines;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
-
-	RenderCommand.PrimitiveType = ZE_ROPT_TRIANGLE;
-	RenderCommand.PrimitiveCount = GizmoTriangles.Vertices.GetCount() / 3;
-	RenderCommand.VertexBuffer = &GizmoTriangles;
-	DrawParameters->Renderer->AddToRenderList(&RenderCommand);
 }
 
 ZEGizmoAxis ZEGizmo::PickAxis(const ZERay& Ray, float& TRay)

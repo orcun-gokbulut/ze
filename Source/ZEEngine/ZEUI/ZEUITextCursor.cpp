@@ -34,7 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUITextCursor.h"
-#include "ZEGraphics/ZEUIMaterial.h"
 
 ZEUITextCursor::ZEUITextCursor()
 {
@@ -53,7 +52,6 @@ ZEUITextCursor::ZEUITextCursor()
 	SetWidth(Width);
 	SetHeight(Height);
 
-	Material = ZEUIMaterial::CreateInstance();
 	Color = ZEVector4(0.0f, 1.0f, 0.0f, 1.0f);
 }
 
@@ -62,7 +60,6 @@ ZEUITextCursor::~ZEUITextCursor()
 	Timer->Stop();
 	Timer->Destroy();
 	Timer = NULL;
-	((ZEUIMaterial*)Material)->Destroy();
 }
 
 void ZEUITextCursor::Blink(float Time)
@@ -121,9 +118,4 @@ void ZEUITextCursor::SetPostion(const ZEVector2& Position)
 const ZEVector2& ZEUITextCursor::GetPosition() const
 {
 	return Positions.LeftUp;
-}
-
-const ZEMaterial* ZEUITextCursor::GetMaterial() const
-{
-	return Material;
 }

@@ -44,14 +44,27 @@
 #endif
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
-	#define ZE_FORCE_INLINE __forceinline
+	#define ZE_INLINE __forceinline
 #elif defined(ZE_PLATFORM_COMPILER_GCC)
-	#define ZE_FORCE_INLINE inline
+	#define ZE_INLINE inline
 #else
-	#define ZE_FORCE_INLINE inline
+	#define ZE_INLINE inline
 #endif
+
+#define ZE_FINAL final
+#define ZE_OVERRIDE override
 
 #define ZE_DISALLOW_COPY(ClassName) \
 	private: \
 		ClassName(const ClassName&); \
 		ClassName& operator=(const ClassName&);
+
+#define ZE_COPY_NO_ACTION(ClassName) \
+	public: \
+		ClassName(const ClassName&); \
+		ClassName& operator=(const ClassName&); \
+	private:
+
+#define ZE_COPY_NO_ACTION_IMP(ClassName) \
+	ClassName::ClassName(const ClassName&) {new (this) ClassName();} \
+	ClassName& ClassName::operator=(const ClassName&) {return *this;}

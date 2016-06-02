@@ -34,78 +34,89 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_GRID_H__
-#define __ZE_GRID_H__
 
-#include "ZECanvasBrush.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGraphics/ZERenderCommand.h"
 
-class ZEListener;
-class ZEScene;
-class ZESimpleMaterial;
+#include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZERNCommand.h"
+
+class ZEGRVertexBuffer;
+class ZEGRConstantBuffer;
+class ZERNSimpleMaterial;
 
 class ZEGrid : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
-		ZECanvas					MinorGrid;
-		ZECanvas					MajorGrid;
-		ZECanvas					AxisX;
-		ZECanvas					AxisZ;
+		ZERNCommand						RenderCommand;
 
-		ZESimpleMaterial*			Material;
-		ZERenderCommand				RenderCommand;
+		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
+		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
+		ZEHolder<ZERNSimpleMaterial>	Material;
 
-		ZEVector2					GridSize;
-		bool						FollowerGrid;
+		ZESize							MinorGridOffset;
+		ZESize							MinorGridCount;
 
-		bool						MinorGridEnabled;
-		ZEVector2					MinorGridUnitSize;
-		ZEVector3					MinorGridColor;
+		ZESize							MajorGridOffset;
+		ZESize							MajorGridCount;
 
-		bool						MajorGridEnabled;
-		ZEVector2					MajorGridUnitSize;
-		ZEVector3					MajorGridColor;
+		ZEVector2						GridSize;
+		bool							FollowerGrid;
 
-		bool						AxisEnabled;
-		ZEVector3					AxisColor;
+		bool							MinorGridEnabled;
+		ZEVector2						MinorGridUnitSize;
+		ZEVector3						MinorGridColor;
 
-		void						GenerateGrid();
+		bool							MajorGridEnabled;
+		ZEVector2						MajorGridUnitSize;
+		ZEVector3						MajorGridColor;
 
-		virtual bool				InitializeSelf();
-		virtual bool				DeinitializeSelf();
+		bool							AxisEnabled;
+		ZEVector3						AxisColor;
 
-									ZEGrid();
+		struct
+		{
+			ZEMatrix4x4					AxisTransform;
+			ZEMatrix4x4					MinorGridTransform;
+			ZEMatrix4x4					MajorGridTransform;
+		} Constants;
+
+		void							GenerateGrid();
+
+		virtual bool					InitializeSelf();
+		virtual bool					DeinitializeSelf();
+
+										ZEGrid();
 
 	public:
-		ZEDrawFlags					GetDrawFlags() const;
+		ZEDrawFlags						GetDrawFlags() const;
 
-		void						SetGridSize(const ZEVector2& Size);
-		const ZEVector2&			GetGridSize();
+		void							SetGridSize(const ZEVector2& Size);
+		const ZEVector2&				GetGridSize();
 
-		void						SetMinorGridEnabled(bool Enable);
-		bool						GetMinorGridEnabled();
-		void						SetMinorGridUnitSize(const ZEVector2& Size);
-		const ZEVector2&			GetMinorGridUnitSize();
-		void						SetMinorGridColor(const ZEVector3& Color);
-		const ZEVector3&			GetMinorGridColor();
+		void							SetMinorGridEnabled(bool Enable);
+		bool							GetMinorGridEnabled();
+		void							SetMinorGridUnitSize(const ZEVector2& Size);
+		const ZEVector2&				GetMinorGridUnitSize();
+		void							SetMinorGridColor(const ZEVector3& Color);
+		const ZEVector3&				GetMinorGridColor();
 
-		void						SetMajorGridEnabled(bool Enabled);
-		bool						GetMajorGridEnabled();
-		void						SetMajorGridUnitSize(const ZEVector2& Size);
-		const ZEVector2&			GetMajorGridUnitSize();
-		void						SetMajorGridColor(const ZEVector3& Color);
-		const ZEVector3&			GetMajorGridColor();
+		void							SetMajorGridEnabled(bool Enabled);
+		bool							GetMajorGridEnabled();
+		void							SetMajorGridUnitSize(const ZEVector2& Size);
+		const ZEVector2&				GetMajorGridUnitSize();
+		void							SetMajorGridColor(const ZEVector3& Color);
+		const ZEVector3&				GetMajorGridColor();
 
-		void						SetAxisEnabled(bool Enabled);
-		bool						GetAxisEnabled();
-		void						SetAxisColor(const ZEVector3& Color);
-		const ZEVector3&			GetAxisColor();
-
-		virtual void				Draw(ZEDrawParameters* Parameters);
-
-		static ZEGrid*				CreateInstance();
+		void							SetAxisEnabled(bool Enabled);
+		bool							GetAxisEnabled();
+		void							SetAxisColor(const ZEVector3& Color);
+		const ZEVector3&				GetAxisColor();
+		
+		virtual	bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		
+		static ZEGrid*					CreateInstance();
 };
-#endif

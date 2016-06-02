@@ -34,26 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CANVASBRUSH_H__
-#define __ZE_CANVASBRUSH_H__
 
 #include "ZETypes.h"
 #include "ZEEntity.h"
-#include "ZEGraphics/ZECanvas.h"
-#include "ZEGraphics/ZERenderCommand.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZERenderer;
-class ZEMaterial;
+class ZERNMaterial;
+class ZEGRVertexBuffer;
+class ZEGRRenderStateData;
 
 class ZECanvasBrush : public ZEEntity
 {
 	ZE_OBJECT
 	
 	private:
-		ZERenderCommand					RenderCommand;
-		ZEStaticVertexBuffer*			VertexBuffer;
+		ZERNCommand						RenderCommand;
 		ZESize							OldVertexCount;
-	
+		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRVertexBuffer>	VertexBuffer;
+		ZEHolder<ZERNMaterial>		Material;
+		ZECanvas						Canvas;
+
+		void							UpdateRenderState();
+
 	protected:
 		virtual bool					DeinitializeSelf();
 
@@ -61,17 +66,15 @@ class ZECanvasBrush : public ZEEntity
 		virtual							~ZECanvasBrush();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
+		void							SetMaterial(ZERNMaterial* Material);
+		ZERNMaterial*					GetMaterial() const;
 
-		ZEROPrimitiveType				PrimitiveType;
-		ZEMaterial*						Material;
-		ZECanvas						Canvas;
+		ZECanvas*						GetCanvas();
 
 		void							UpdateCanvas();
 
-		virtual void					Draw(ZEDrawParameters* DrawParameters);
+		virtual ZEDrawFlags				GetDrawFlags() const;
 		virtual void					Tick(float ElapsedTime);
 
 		static ZECanvasBrush*			CreateInstance();
 };
-#endif

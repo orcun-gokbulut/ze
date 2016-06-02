@@ -34,13 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGrid.h"
-#include "ZEScene.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEGraphics/ZERenderer.h"
-#include "ZEGame/ZEDrawParameters.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZEGraphics/ZESimpleMaterial.h"
+
 #include "ZEMath/ZEMath.h"
+#include "ZERenderer/ZECamera.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
+#include "ZERenderer/ZERNCuller.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 ZEDrawFlags ZEGrid::GetDrawFlags() const
 {
@@ -49,62 +52,67 @@ ZEDrawFlags ZEGrid::GetDrawFlags() const
 
 void ZEGrid::GenerateGrid()
 {
-	AxisX.Clean();
-	AxisX.SetColor(ZEVector4(AxisColor, 1.0f));
-	AxisX.AddLine(ZEVector3(-0.5f, 0.0f, 0.0f), ZEVector3(0.5f, 0.0f, 0.0f));
-	
-	AxisZ.Clean();
-	AxisZ.SetColor(ZEVector4(AxisColor, 1.0f));
-	AxisZ.AddLine(ZEVector3(0.0f, 0.0f, -0.5f), ZEVector3(0.0f, 0.0f, 0.5f));
+	if (GetState() == ZE_ES_NOT_INITIALIZED || GetState() == ZE_ES_DEINITIALIZING)
+		return;
 
+	ZECanvas Canvas;
 
-	MinorGrid.Clean();
+	// Axis
+	Canvas.SetColor(ZEVector4(AxisColor, 1.0f));
+	Canvas.AddLine(ZEVector3(-0.5f, 0.0f, 0.0f), ZEVector3(0.5f, 0.0f, 0.0f));
+	Canvas.AddLine(ZEVector3(0.0f, 0.0f, -0.5f), ZEVector3(0.0f, 0.0f, 0.5f));
 
-	MinorGrid.SetColor(ZEVector4(MinorGridColor, 1.0f));
+	// Minor Grid
+	MinorGridOffset = Canvas.Vertices.GetCount();
 
 	ZEInt MinorGridLineCountX = (ZEInt)(GridSize.x / MinorGridUnitSize.x);
 	if (MinorGridLineCountX % 2 == 1)
 		MinorGridLineCountX--;
 	MinorGridLineCountX /= 2;
-
 	ZEInt MinorGridLineCountY = (ZEInt)(GridSize.y / MinorGridUnitSize.y);
 	if (MinorGridLineCountY % 2 == 1)
 		MinorGridLineCountY--;
 	MinorGridLineCountY /= 2;
 
-
+	Canvas.SetColor(ZEVector4(MinorGridColor, 1.0f));
 	for (ZEInt X = -MinorGridLineCountX; X <= MinorGridLineCountX; X++)
-		MinorGrid.AddLine(ZEVector3(X * MinorGridUnitSize.x, 0.0f, -GridSize.y * 0.5f), ZEVector3(X * MinorGridUnitSize.x, 0.0f, GridSize.y * 0.5f));
-
+		Canvas.AddLine(ZEVector3(X * MinorGridUnitSize.x, 0.0f, -GridSize.x * 0.5f), ZEVector3(X * MinorGridUnitSize.x, 0.0f, GridSize.x * 0.5f));
 	for (ZEInt Y = -MinorGridLineCountY; Y <= MinorGridLineCountY; Y++)
-		MinorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MinorGridUnitSize.y));
+		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MinorGridUnitSize.y));
 
+	MinorGridCount = Canvas.Vertices.GetCount() - MinorGridOffset;
 
-	MajorGrid.Clean();
-
-	MajorGrid.SetColor(ZEVector4(MajorGridColor, 1.0f));
+	
+	// Major Grid
+	MajorGridOffset = Canvas.Vertices.GetCount();
 
 	ZEInt MajorGridLineCountX = (ZEInt)(GridSize.x / MajorGridUnitSize.x);
 	if (MajorGridLineCountX % 2 == 1)
 		MajorGridLineCountX--;
 	MajorGridLineCountX /= 2;
-
 	ZEInt MajorGridLineCountY = (ZEInt)(GridSize.y / MajorGridUnitSize.y);
 	if (MajorGridLineCountY % 2 == 1)
 		MajorGridLineCountY--;
 	MajorGridLineCountY /= 2;
 
-
+	Canvas.SetColor(ZEVector4(MajorGridColor, 1.0f));
 	for (ZEInt X = -MajorGridLineCountX; X <= MajorGridLineCountX; X++)
-		MajorGrid.AddLine(ZEVector3(X * MajorGridUnitSize.x, 0.0f, -GridSize.y * 0.5f), ZEVector3(X * MajorGridUnitSize.x, 0.0f, GridSize.y * 0.5f));
-
+		Canvas.AddLine(ZEVector3(X * MajorGridUnitSize.x, 0.0f, -GridSize.x * 0.5f), ZEVector3(X * MajorGridUnitSize.x, 0.0f, GridSize.x * 0.5f));
 	for (ZEInt Y = -MajorGridLineCountY; Y <= MajorGridLineCountY; Y++)
-		MajorGrid.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.x * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
+		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
+
+	MajorGridCount = Canvas.Vertices.GetCount() - MajorGridOffset;
+
+	VertexBuffer = Canvas.CreateVertexBuffer();
 }
 
 void ZEGrid::SetGridSize(const ZEVector2& Size)
 {
+	if (GridSize == Size)
+		return;
+
 	GridSize = Size;
+	GenerateGrid();
 }
 
 const ZEVector2& ZEGrid::GetGridSize()
@@ -114,7 +122,11 @@ const ZEVector2& ZEGrid::GetGridSize()
 
 void ZEGrid::SetMinorGridEnabled(bool Enable)
 {
+	if (MinorGridEnabled == Enable)
+		return;
+
 	MinorGridEnabled = Enable;
+	GenerateGrid();
 }
 
 bool ZEGrid::GetMinorGridEnabled()
@@ -124,7 +136,11 @@ bool ZEGrid::GetMinorGridEnabled()
 
 void ZEGrid::SetMinorGridUnitSize(const ZEVector2& Size)
 {
+	if (MinorGridUnitSize == Size)
+		return;
+
 	MinorGridUnitSize = Size;
+	GenerateGrid();
 }
 
 const ZEVector2& ZEGrid::GetMinorGridUnitSize()
@@ -134,7 +150,11 @@ const ZEVector2& ZEGrid::GetMinorGridUnitSize()
 
 void ZEGrid::SetMinorGridColor(const ZEVector3& Color)
 {
+	if (MinorGridColor == Color)
+		return;
+
 	MinorGridColor = Color;
+	GenerateGrid();
 }
 
 const ZEVector3& ZEGrid::GetMinorGridColor()
@@ -144,7 +164,11 @@ const ZEVector3& ZEGrid::GetMinorGridColor()
 
 void ZEGrid::SetMajorGridEnabled(bool Enabled)
 {
+	if (MajorGridEnabled == Enabled)
+		return;
+
 	MajorGridEnabled = Enabled;
+	GenerateGrid();
 }
 
 bool ZEGrid::GetMajorGridEnabled()
@@ -154,7 +178,11 @@ bool ZEGrid::GetMajorGridEnabled()
 
 void ZEGrid::SetMajorGridUnitSize(const ZEVector2& Size)
 {
+	if (MajorGridUnitSize == Size)
+		return;
+
 	MajorGridUnitSize = Size;
+	GenerateGrid();
 }
 
 const ZEVector2& ZEGrid::GetMajorGridUnitSize()
@@ -164,7 +192,11 @@ const ZEVector2& ZEGrid::GetMajorGridUnitSize()
 
 void ZEGrid::SetMajorGridColor(const ZEVector3& Color)
 {
+	if (MajorGridColor == Color)
+		return;
+
 	MajorGridColor = Color;
+	GenerateGrid();
 }
 
 const ZEVector3& ZEGrid::GetMajorGridColor()
@@ -174,7 +206,11 @@ const ZEVector3& ZEGrid::GetMajorGridColor()
 
 void ZEGrid::SetAxisEnabled(bool Enabled)
 {
+	if (AxisEnabled == Enabled)
+		return;
+
 	AxisEnabled = Enabled;
+	GenerateGrid();
 }
 
 bool ZEGrid::GetAxisEnabled()
@@ -182,10 +218,13 @@ bool ZEGrid::GetAxisEnabled()
 	return AxisEnabled;
 }
 
-
 void ZEGrid::SetAxisColor(const ZEVector3& Color)
 {
+	if (AxisColor == Color)
+		return;
+
 	this->AxisColor = Color;
+	GenerateGrid();
 }
 
 const ZEVector3& ZEGrid::GetAxisColor()
@@ -193,60 +232,81 @@ const ZEVector3& ZEGrid::GetAxisColor()
 	return AxisColor;
 }
 
-void ZEGrid::Draw(ZEDrawParameters* Parameters)
+bool ZEGrid::PreRender(const ZERNCullParameters* Parameters)
 {
-	ZEVector3 CameraPosition = Parameters->View->Camera->GetWorldPosition();
-	
+	ZEVector3 CameraPosition = Parameters->View->Position;
+
+	if (AxisEnabled)
+	{
+		ZEVector3 AxisGridPosition(
+			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
+			0.0f,
+			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
+		if ((AxisGridPosition.x > -GridSize.x * 0.5f && AxisGridPosition.x < GridSize.x * 0.5f) &&
+			(AxisGridPosition.z > -GridSize.y * 0.5f && AxisGridPosition.z < GridSize.y * 0.5f))
+		{
+			ZEMatrix4x4::CreateOrientation(Constants.AxisTransform, AxisGridPosition, GetRotation(), ZEVector3(GridSize.x, 1.0f, GridSize.y));
+		}
+
+		ConstantBufferAxisTransform->SetData(&Constants.AxisTransform);
+	}
+
 	if (MinorGridEnabled)
 	{
-		RenderCommand.Order = 0.0f;
 		ZEVector3 MinorGridPosition(
 			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
 			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
+		ZEMatrix4x4::CreateOrientation(Constants.MinorGridTransform, MinorGridPosition, GetRotation(), ZEVector3::One);
 
-		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MinorGridPosition, GetRotation(), ZEVector3::One);
-		RenderCommand.VertexBuffer = &MinorGrid;
-		RenderCommand.PrimitiveCount = MinorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddToRenderList(&RenderCommand);
+		ConstantBufferMinorGridTransform->SetData(&Constants.MinorGridTransform);
 	}
 
 	if (MajorGridEnabled)
 	{
-		RenderCommand.Order = 1.0f;
 		ZEVector3 MajorGridPosition(
 			CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x),
 			0.0f,
 			CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
 
-		ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, MajorGridPosition, GetRotation(), ZEVector3::One);
-		RenderCommand.VertexBuffer = &MajorGrid;
-		RenderCommand.PrimitiveCount = MajorGrid.Vertices.GetCount() / 2;
-		Parameters->Renderer->AddToRenderList(&RenderCommand);
+		ZEMatrix4x4::CreateOrientation(Constants.MajorGridTransform, MajorGridPosition, GetRotation(), ZEVector3::One);
+
+		ConstantBufferMajorGridTransform->SetData(&Constants.MajorGridTransform);
 	}
+	
+	Parameters->Renderer->AddCommand(&RenderCommand);
+
+	return true;
+}
+
+void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
+{
+	ZEGRContext* Context = Parameters->Context;
+	ZERNStage* Stage = Parameters->Stage;
+	if (!Material->SetupMaterial(Context, Stage))
+		return;
+
+	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	if (AxisEnabled)
 	{
-		RenderCommand.Order = 2.0f;
-		ZEVector3 AxisXGridPosition(CameraPosition.x - ZEMath::Mod(CameraPosition.x, MajorGridUnitSize.x), 0.0f, 0.0f);
-		ZEVector3 AxisYGridPosition(0.0f, 0.0f, CameraPosition.z - ZEMath::Mod(CameraPosition.z, MajorGridUnitSize.y));
-
-		RenderCommand.PrimitiveCount = 1;
-
-		if (AxisYGridPosition.z > -GridSize.y * 0.5f && AxisYGridPosition.z < GridSize.y * 0.5f)
-		{
-			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisXGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
-			RenderCommand.VertexBuffer = &AxisX;
-			Parameters->Renderer->AddToRenderList(&RenderCommand);
-		}
-
-		if (AxisXGridPosition.x > -GridSize.x * 0.5f && AxisXGridPosition.x < GridSize.x * 0.5f)
-		{
-			ZEMatrix4x4::CreateOrientation(RenderCommand.WorldMatrix, AxisYGridPosition, GetRotation(), ZEVector3(GridSize.x, 0.0f, GridSize.y));
-			RenderCommand.VertexBuffer = &AxisZ;
-			Parameters->Renderer->AddToRenderList(&RenderCommand);
-		}
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferAxisTransform.GetPointerToPointer());
+		Context->Draw(4, 0);
 	}
+
+	if (MinorGridEnabled)
+	{
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferMinorGridTransform.GetPointerToPointer());
+		Context->Draw(MinorGridCount, MinorGridOffset);
+	}
+
+	if (MajorGridEnabled)
+	{
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferMajorGridTransform.GetPointerToPointer());
+		Context->Draw(MajorGridCount, MajorGridOffset);
+	}
+
+	Material->CleanupMaterial(Context, Stage);
 }
 
 bool ZEGrid::InitializeSelf()
@@ -254,40 +314,43 @@ bool ZEGrid::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
+	ConstantBufferAxisTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+
+	Material = ZERNSimpleMaterial::CreateInstance();
+	Material->SetTwoSided(true);
+	Material->SetVertexColorEnabled(true);
+	Material->SetTransparent(true);
+	Material->SetOpacity(0.1f);
+	Material->Initialize();
+
+	RenderCommand.Entity = this;
+	RenderCommand.Priority = 0;
+	RenderCommand.Order = 0;
+	RenderCommand.ExtraParameters = NULL;
+	RenderCommand.StageMask = Material->GetStageMask();
+
 	GenerateGrid();
 	
-	if (Material == NULL)
-		Material = ZESimpleMaterial::CreateInstance();
-
-	RenderCommand.SetZero();
-	RenderCommand.VertexDeclaration = ZECanvasVertex::GetVertexDeclaration();
-	RenderCommand.PrimitiveType = ZE_ROPT_LINE;
-	RenderCommand.Flags = ZE_ROF_ENABLE_WORLD_TRANSFORM | ZE_ROF_ENABLE_VIEW_PROJECTION_TRANSFORM | ZE_ROF_ENABLE_Z_CULLING;
-	RenderCommand.Material = Material;
-
 	return true;
 }
 
 bool ZEGrid::DeinitializeSelf()
 {
-	MinorGrid.Clean();
-	MajorGrid.Clean();
-	AxisX.Clean();
-	AxisZ.Clean();
+	VertexBuffer.Release();
 
-	if (Material != NULL)
-	{
-		Material->Release();
-		Material = NULL;
-	}
+	ConstantBufferAxisTransform.Release();
+	ConstantBufferMinorGridTransform.Release();
+	ConstantBufferMajorGridTransform.Release();
+
+	Material.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }
 
 ZEGrid::ZEGrid()
 {
-	Material = NULL;
-
 	GridSize = ZEVector2(100.0f, 100.0f);
 
 	MinorGridEnabled = true;

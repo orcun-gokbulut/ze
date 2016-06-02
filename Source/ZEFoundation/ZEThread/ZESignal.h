@@ -45,25 +45,25 @@
 
 class ZESignal
 {
-	ZE_DISALLOW_COPY(ZESignal)
+	ZE_COPY_NO_ACTION(ZESignal)
 	private:
         #ifdef ZE_PLATFORM_WINDOWS
-            void*           Handle;
+            mutable void* Handle;
         #elif defined(ZE_PLATFORM_UNIX)
             pthread_cond_t  Cond;
         #endif
 
-		bool				InitialState;
-		ZELock				InitializeLock;
-		void				Initialize();
+		bool InitialState;
+		mutable ZELock InitializeLock;
+		void Initialize() const;
 
 	public:
-        void                Signal();
-		void				Reset();
+        void Signal();
+		void Reset();
 
-        void                Wait();
-        bool				Wait(ZEUInt Milliseconds);
+        void Wait() const;
+        bool Wait(ZEUInt Milliseconds) const;
 
-                            ZESignal();
-                            ~ZESignal();
+		ZESignal();
+		~ZESignal();
 };

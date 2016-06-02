@@ -35,9 +35,15 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+find_package(OpenMP REQUIRED)
+if (OPENMP_FOUND)
+    set (CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set (CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+endif()
+
 ze_add_source(ZELNMain.cpp						Sources)
 ze_add_source(ZELNModule.cpp					Sources)
-ze_add_source(ZELNModule.h						Sources)
+ze_add_source(ZELNModule.h						Sources Headers)
 ze_add_source(ZELNLauncher.cpp					Sources)
 ze_add_source(ZELNLauncher.h					Sources)
 ze_add_source(ZELNLauncherWindow.cpp			Sources)
@@ -47,8 +53,6 @@ ze_add_source(ZELNLauncher.qrc					Sources QtResources)
 
 ze_add_source(ZELNLogModule.cpp					Sources)
 ze_add_source(ZELNLogModule.h					Sources)
-ze_add_source(ZELNLogWidget.cpp					Sources)
-ze_add_source(ZELNLogWidget.h					Sources QtMocs)
 ze_add_source(ZELNLogWidget.ui					Sources QtUIs)
 
 ze_add_source(ZELNLicenseModule.cpp				Sources)
@@ -63,6 +67,12 @@ ze_add_source(ZELNLicenseEditorDialog.cpp		Sources)
 ze_add_source(ZELNLicenseEditorDialog.h			Sources QtMocs)
 ze_add_source(ZELNLicenseEditorDialog.ui		Source QtUIs)
 
+ze_add_source(ZELNIntegrityModule.cpp			Sources)
+ze_add_source(ZELNIntegrityModule.h				Sources QtMocs)
+ze_add_source(ZELNIntegrityWorker.cpp			Sources)
+ze_add_source(ZELNIntegrityWorker.h				Sources QtMocs)
+ze_add_source(ZELNIntegrityWidget.ui			Sources QtUIs)
+
 ze_add_source(ZELNUpdateModule.cpp				Sources)
 ze_add_source(ZELNUpdateModule.h				Sources)
 ze_add_source(ZELNUpdateWidget.cpp				Sources)
@@ -71,8 +81,6 @@ ze_add_source(ZELNUpdateWidget.ui				Sources QtUIs)
 
 ze_add_source(ZELNContactModule.cpp				Sources)
 ze_add_source(ZELNContactModule.h				Sources)
-ze_add_source(ZELNContactWidget.cpp				Sources)
-ze_add_source(ZELNContactWidget.h				Sources QtMocs)
 ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
 
 ze_add_source(../ZEEngine/ZECore/ZEWindowResources.rc 	Sources)
@@ -88,10 +96,10 @@ qt5_add_resources(QtResourceOutputs ${QtResources})
 
 ze_add_executable(TARGET ZELNLauncher 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation ZEProtect Qt5::WinMain
+	LIBS ZEFoundation ZEProtect ZEITIntegrity libCryptopp Qt5::WinMain
 	DESCRIPTION "Zinek Launcher")
 
-qt5_use_modules(ZELNLauncher Core Widgets)
+qt5_use_modules(ZELNLauncher Widgets)
 
 add_custom_command(TARGET ZELNLauncher POST_BUILD
 	# DEBUG
