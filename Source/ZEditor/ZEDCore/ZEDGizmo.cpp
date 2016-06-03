@@ -1027,8 +1027,6 @@ bool ZEDGizmo::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	DirtyGizmoFlags.RaiseAll();
-
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
 	MaterialLines = ZERNSimpleMaterial::CreateInstance();
@@ -1054,6 +1052,7 @@ bool ZEDGizmo::DeinitializeSelf()
 	ConstantBuffer.Release();
 	MaterialLines.Release();
 	MaterialTriangles.Release();
+	DirtyGizmoFlags.RaiseAll();
 
 	return ZEEntity::DeinitializeSelf();
 }
@@ -1085,9 +1084,6 @@ bool ZEDGizmo::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Update())
 		return false;
 	
-	if (!MaterialLines->PreRender(RenderCommand))
-		return false;
-
 	Parameters->Renderer->AddCommand(&RenderCommand);
 	return true;
 }
@@ -1234,6 +1230,7 @@ ZEVector3 ZEDGizmo::ScaleProjection(float ScaleAmount)
 ZEDGizmo::ZEDGizmo()
 {
 	DirtyGizmoFlags.RaiseAll();
+
 	HoveredAxis = ZED_GA_NONE;
 	SelectedAxis = ZED_GA_NONE;
 	Mode = ZED_GM_NONE;
@@ -1244,7 +1241,6 @@ ZEDGizmo::ZEDGizmo()
 	InitialScale = ZEVector3::One;
 
 	RenderCommand.Entity = this;
-	RenderCommand.StageMask = ZERN_STAGE_2D;
 }
 
 ZEDGizmo* ZEDGizmo::CreateInstance()

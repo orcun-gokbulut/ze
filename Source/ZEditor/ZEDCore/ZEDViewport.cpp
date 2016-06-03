@@ -214,11 +214,11 @@ bool ZEDViewport::InitializeSelf()
 	ZERNStageResolving* StageResolving = new ZERNStageResolving();
 	Renderer.AddStage(StageResolving);
 
+	ZERNStageForwardPostHDR* StagePostHDRForward = new ZERNStageForwardPostHDR();
+	Renderer.AddStage(StagePostHDRForward);
+
 	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
 	Renderer.AddStage(StageAntiAliasing);
-
-	/*ZERNStageForwardPostHDR* StagePostHDRForward = new ZERNStageForwardPostHDR();
-	Renderer.AddStage(StagePostHDRForward);*/
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);

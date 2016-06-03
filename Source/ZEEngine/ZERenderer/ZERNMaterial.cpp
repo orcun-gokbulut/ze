@@ -70,5 +70,11 @@ void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
 
 bool ZERNMaterial::Update() const
 {
+	if (!IsInitialized())
+	{
+		if (!const_cast<ZERNMaterial*>(this)->Initialize())
+			return false;
+	}
+
 	return true;
 }

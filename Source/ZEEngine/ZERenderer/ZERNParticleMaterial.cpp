@@ -667,7 +667,7 @@ void ZERNParticleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage
 
 bool ZERNParticleMaterial::Update() const
 {
-	if (!IsInitialized())
+	if (!ZERNMaterial::Update())
 		return false;
 
 	if (!UpdateShaders())
