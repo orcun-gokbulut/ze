@@ -48,8 +48,3 @@ const ZEString& ZERNStageShadowing::GetName() const
 	static const ZEString Name = "Shadowing";
 	return Name;
 }
-
-ZERNStageShadowing::ZERNStageShadowing()
-{
-
-}

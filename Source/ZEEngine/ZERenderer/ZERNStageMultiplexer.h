@@ -38,11 +38,11 @@
 #include "ZERNStage.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDefinitions.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZEMath/ZEMatrix.h"
 
 ZE_ENUM(ZERNStageMultiplexerMode)
 {
@@ -64,12 +64,13 @@ class ZERNStageMultiplexer : public ZERNStage
 	ZE_OBJECT
 	friend class ZERNStageDisplay;
 	private:
-		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
 		ZEHolder<ZEGRTexture2D>				OutputTexture;
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 		ZERNStageMultiplexerMode			Mode;
 
 		ZEList2<ZERNStageDisplay>			Displays;
+
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		bool								UpdateInputOutputs();
 
@@ -100,5 +101,5 @@ class ZERNStageMultiplexer : public ZERNStage
 		virtual void						CleanUp(ZEGRContext* Context);
 
 											ZERNStageMultiplexer();
-											~ZERNStageMultiplexer();
+		virtual								~ZERNStageMultiplexer();
 };

@@ -458,7 +458,7 @@ bool ZERayCastHelper::RayCastPolygon(const ZEVector3& Vertex0, const ZEVector3& 
 	if (!ZETriangle::IntersectionTest(Triangle, LocalRay, RayT))
 		return false;
 
-	if (Report->CheckDistance(RayT))
+	if (!Report->CheckDistance(RayT))
 		return false;
 
 	ZERayCastCollision Collision;
@@ -493,7 +493,7 @@ bool ZERayCastHelper::RayCastMesh(const void* PolygonBuffer,  ZESize PolgonCount
 	{
 		ZEVector3* Vertex0 = (ZEVector3*)(PolgonPointer + Vertex0Offset);
 		ZEVector3* Vertex1 = (ZEVector3*)(PolgonPointer + Vertex1Offset);
-		ZEVector3* Vertex2 = (ZEVector3*)(PolgonPointer + Vertex1Offset);
+		ZEVector3* Vertex2 = (ZEVector3*)(PolgonPointer + Vertex2Offset);
 		PolgonPointer += PolygonStride;
 
 		Result |= RayCastPolygon(*Vertex0, *Vertex1, *Vertex2);

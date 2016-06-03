@@ -34,27 +34,123 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11TextureCube.h"
+
+#include "ZEError.h"
+#include "ZEPointer\ZEPointer.h"
 #include "ZED11Module.h"
 #include "ZED11RenderTarget.h"
 #include "ZED11Texture2D.h"
 
-#include "ZEError.h"
+bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
+{
+	zeDebugCheck(Texture != NULL, "Texture already created.");
+
+	D3D11_TEXTURE2D_DESC TextureDesc;
+	TextureDesc.MiscFlags = D3D11_RESOURCE_MISC_TEXTURECUBE;
+	TextureDesc.ArraySize = 6;
+	TextureDesc.Width = Length;
+	TextureDesc.Height = Length;
+	TextureDesc.MipLevels = LevelCount;
+	TextureDesc.Format = ConvertFormat(Format);
+	TextureDesc.Usage = ConvertUsage(Usage);
+	TextureDesc.BindFlags = ConvertBindFlags(BindFlags);
+	TextureDesc.CPUAccessFlags = ConvertUsageToCpuAccessFlags(Usage);
+	TextureDesc.SampleDesc.Count = 1;
+	TextureDesc.SampleDesc.Quality = 0;
+
+	ZEPointer<D3D11_SUBRESOURCE_DATA, ZEDeletorArray<D3D11_SUBRESOURCE_DATA>> SubresourceData;
+	if (Data != NULL)
+	{
+		SubresourceData = new D3D11_SUBRESOURCE_DATA[6];
+		ZEUInt PixelSize = ZEGRFormatDefinition::GetDefinition(Format)->BlockSize;
+		ZESize Offset = 0;
+		for (ZEUInt I = 0; I < 6; I++)
+		{
+			ZESize RowPitch = Length * PixelSize;
+			ZESize SlicePitch = RowPitch * Length;
+
+			SubresourceData[I].pSysMem = static_cast<const ZEBYTE*>(Data) + Offset;
+			SubresourceData[I].SysMemPitch = RowPitch;
+			SubresourceData[I].SysMemSlicePitch = SlicePitch;
+
+			Offset += SlicePitch;
+		}
+	}
+
+	HRESULT Result = GetDevice()->CreateTexture2D(&TextureDesc, SubresourceData, &Texture);
+	if (FAILED(Result))
+	{
+		zeError("Texture cube creation failed. ErrorCode: %d.", Result);
+		return false;
+	}
+
+	if (BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE))
+	{
+		D3D11_SHADER_RESOURCE_VIEW_DESC ResourceDesc;
+		ResourceDesc.Format = TextureDesc.Format;
+		ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
+		ResourceDesc.TextureCube.MostDetailedMip = 0;
+		ResourceDesc.TextureCube.MipLevels = LevelCount;
+
+		Result = GetDevice()->CreateShaderResourceView(Texture, &ResourceDesc, &ShaderResourceView);
+		if(FAILED(Result))
+		{
+			zeError("Texture cube shader resource view creation failed. ErrorCode: %d.", Result);
+			return false;
+		}
+	}
+
+	return ZEGRTextureCube::Initialize(Length, LevelCount, Format, Usage, BindFlags, Data);
+}
+
+void ZED11TextureCube::Deinitialize()
+{
+	ZEGR_RELEASE(Texture);
+	ZEGR_RELEASE(ShaderResourceView);
+
+	ZEGRTextureCube::Deinitialize();
+}
 
 ID3D11Texture2D* ZED11TextureCube::GetTexture() const
 {
 	return Texture;
 }
 
-ID3D11ShaderResourceView* ZED11TextureCube::GetResourceView() const
+ID3D11ShaderResourceView* ZED11TextureCube::GetShaderResourceView() const
 {
-	return ResourceView;
+	return ShaderResourceView;
 }
 
-ZEHolder<const ZEGRRenderTarget> ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const
+ZED11TextureCube::ZED11TextureCube()
 {
-	zeDebugCheck(Texture == NULL, "Empty texture.");
-	zeCheckError(!GetIsRenderTarget(), NULL, "Texture not created with render target flag");
+	Texture = NULL;
+	ShaderResourceView = NULL;
+}
+
+ZED11TextureCube::~ZED11TextureCube()
+{
+	Deinitialize();
+}
+
+void ZED11TextureCube::UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch)
+{
+	zeDebugCheck(DestFace >= 6, "There is no such a cube texture face.");
+	zeDebugCheck(DestLevel >= GetLevelCount(), "There is no such a texture level.");
+
+	GetMainContext()->UpdateSubresource(Texture, DestFace * GetLevelCount() + DestLevel, NULL, SrcData, SrcRowPitch, 0);
+}
+
+const ZEGRRenderTarget* ZED11TextureCube::GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const
+{
+	zeDebugCheck(Texture == NULL, "Texture is not initialized.");
+	zeCheckError(Face >= 6, NULL, "There is no such a cube texture face.");
 	zeCheckError(Level >= GetLevelCount(), NULL, "Texture dont have specified Mipmap level");
+	zeDebugCheck(!GetResourceBindFlags().GetFlags(ZEGR_RBF_RENDER_TARGET), "Texture had not been created with render target bind flag");
+
+	ZEUInt Index = Face * GetLevelCount() + Level;
+
+	if (RenderTargets.GetCount() > Index)
+		return RenderTargets[Index];
 
 	// Create render target view
 	D3D11_RENDER_TARGET_VIEW_DESC RenderTargetDesc;
@@ -63,98 +159,19 @@ ZEHolder<const ZEGRRenderTarget> ZED11TextureCube::GetRenderTarget(ZEGRTextureCu
 	RenderTargetDesc.Texture2DArray.MipSlice = Level;
 	RenderTargetDesc.Texture2DArray.FirstArraySlice = Face;
 	RenderTargetDesc.Texture2DArray.ArraySize = 6;
-		
+
 	ID3D11RenderTargetView* RenderTargetView = NULL;
 	HRESULT Result = GetDevice()->CreateRenderTargetView(Texture, &RenderTargetDesc, &RenderTargetView);
 	if(FAILED(Result))
 	{
-		zeError("D3D10 texture cube render target creation failed. ErrorCode: %d.", Result);
+		zeError("Texture cube render target creation failed. ErrorCode: %d.", Result);
 		return NULL;
 	}
 
-	ZEHolder<ZEGRRenderTarget> RenderTarget = new ZED11RenderTarget(GetLength() >> Level, GetLength() >> Level, GetFormat(), RenderTargetView);
+	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(GetLength() >> Level, GetLength() >> Level, GetFormat(), RenderTargetView);
+	RenderTarget->SetOwner(this);
 
-	#ifdef ZE_GRAPHIC_LOG_ENABLE
-	zeLog("Render target view created. TextureCube: %p, MipLevel: %u, Width: %u, Height: %u, Depth: %u", 
-			this, Level, RenderTarget->Width, RenderTarget->Height, RenderTarget->Depth);
-	#endif
+	RenderTargets.Add(RenderTarget);
 
 	return RenderTarget;
-}
-
-bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
-{
-	zeDebugCheck(Texture != NULL, "Texture already created.");
-	zeCheckError(ZED11Texture2D::ConvertFormat(Format) == DXGI_FORMAT_UNKNOWN, false, "Unknown pixel format.");
-
-	D3D11_USAGE Usage = D3D11_USAGE_DEFAULT;
-
-	UINT CPUAccess = 0;
-	
-	UINT BindFlags = 0;
-	BindFlags |= D3D11_BIND_SHADER_RESOURCE;
-	BindFlags |= RenderTarget ? D3D11_BIND_RENDER_TARGET : 0;
-	
-	UINT MiscFlags = 0;
-	MiscFlags |= D3D11_RESOURCE_MISC_TEXTURECUBE;
-
-	D3D11_TEXTURE2D_DESC TextureDesc;
-	TextureDesc.MiscFlags = MiscFlags;
-	TextureDesc.ArraySize = 6;
-	TextureDesc.Width = Length;
-	TextureDesc.Height = Length;
-	TextureDesc.MipLevels = LevelCount;
-	TextureDesc.Usage = Usage;
-	TextureDesc.BindFlags = BindFlags;
-	TextureDesc.CPUAccessFlags = CPUAccess;
-	TextureDesc.SampleDesc.Count = 1;
-	TextureDesc.SampleDesc.Quality = 0;
-	TextureDesc.Format = DXGI_FORMAT_B8G8R8A8_UNORM;	//ZED11Texture2D::ConvertFormat(Format);
-
-	HRESULT Result = GetDevice()->CreateTexture2D(&TextureDesc, NULL, &Texture);
-	if (FAILED(Result))
-	{
-		zeError("Texture cube creation failed. ErrorCode: %d.", Result);
-		return false;
-	}
-
-	// Create shader resource view
-	D3D11_SHADER_RESOURCE_VIEW_DESC ResourceDesc;
-	ResourceDesc.Format = TextureDesc.Format;
-	ResourceDesc.ViewDimension = D3D11_SRV_DIMENSION_TEXTURECUBE;
-	ResourceDesc.TextureCube.MostDetailedMip = 0;
-	ResourceDesc.TextureCube.MipLevels = LevelCount;
-	
-	Result = GetDevice()->CreateShaderResourceView(Texture, &ResourceDesc, &ResourceView);
-	if(FAILED(Result))
-	{
-		zeError("Texture cube shader resource view creation failed. ErrorCode: %d.", Result);
-		return false;
-	}
-
-	return ZEGRTextureCube::Initialize(Length, LevelCount, Format, RenderTarget);
-}
-
-void ZED11TextureCube::Deinitialize()
-{
-	ZEGR_RELEASE(ResourceView);
-	ZEGR_RELEASE(Texture);
-
-	ZEGRTextureCube::Deinitialize();
-}
-
-bool ZED11TextureCube::UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch)
-{
-	zeCheckError(DestFace >= 6, false, "There is no such a cube texture face.");
-	zeCheckError(DestLevel >= GetLevelCount(), false, "There is no such a texture level.");
-
-	GetMainContext()->UpdateSubresource(Texture, DestFace * GetLevelCount() + DestLevel, NULL, SrcData, SrcRowPitch, 0);
-
-	return true;
-}
-
-ZED11TextureCube::ZED11TextureCube()
-{
-	Texture = NULL;
-	ResourceView = NULL;
 }

@@ -69,8 +69,6 @@ class ZEATCloud : public ZEEntity
 
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZEHolder<ZEGRSampler>			SamplerLinearWrap;
-
 		ZETexture2DResource*			CloudTexture;
 
 		struct  

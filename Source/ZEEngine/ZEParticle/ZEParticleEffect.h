@@ -41,6 +41,8 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEParticleEmitter.h"
 
+class ZERNPreRenderParameters;
+
 class ZEParticleEffect : public ZEEntity
 {
 	friend class ZEParticleEmitter;
@@ -64,9 +66,8 @@ class ZEParticleEffect : public ZEEntity
 		void								AddEmitter(ZEParticleEmitter* Emitter);
 		void								RemoveEmitter(ZEParticleEmitter* Emitter);
 
-		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 		virtual void						Tick(float TimeElapsed);
+		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 
 		static ZEParticleEffect*			CreateInstance();
 

@@ -53,16 +53,12 @@ bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary,
 
 void ZEGRShader::Deinitialize()
 {
+
 }
 
 ZEGRShader::ZEGRShader()
 {
 	ShaderType = ZEGR_ST_NONE;
-}
-
-ZEGRShader::~ZEGRShader()
-{
-	Deinitialize();
 }
 
 ZEGRShaderType ZEGRShader::GetShaderType() const

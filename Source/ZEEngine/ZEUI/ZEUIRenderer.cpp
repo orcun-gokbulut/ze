@@ -159,12 +159,10 @@ bool ZEUIRenderer::InitializeSelf()
 	zeCheckError(RenderState.GetShader(ZEGR_ST_PIXEL) == NULL, false, "Cannot compile pixel shader.");
 
 	RenderStateData = RenderState.Compile();
-	zeCheckError(RenderState.Compile() == NULL, false, "Cannot compile render state.");
+	zeCheckError(RenderStateData == NULL, false, "Cannot compile render state.");
 
 	// Sampler
 	ZEGRSamplerDescription SamplerDescription;
-	SamplerDescription.MinFilter = ZEGR_TFM_LINEAR;
-	SamplerDescription.MagFilter = ZEGR_TFM_LINEAR;
 	SamplerDescription.AddressU = ZEGR_TAM_BORDER;
 	SamplerDescription.AddressV = ZEGR_TAM_BORDER;
 	SamplerDescription.BorderColor = ZEVector4::Zero;
@@ -208,6 +206,9 @@ void ZEUIRenderer::Clean()
 
 void ZEUIRenderer::Setup(ZERNRenderer* Renderer)
 {
+	if (Rectangles.GetCount() == 0)
+		return;
+
 	Command.Priority = ZE_INT_MAX;
 	Command.Order = ZE_FLOAT_MAX;
 	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEUIRenderer, Render, this);
@@ -220,24 +221,24 @@ void ZEUIRenderer::Setup(ZERNRenderer* Renderer)
 
 void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
+	if (Rectangles.GetCount() == 0)
+		return;
+
 	ZEGRContext* Context = RenderParameters->Context;
 	Context->SetRenderState(RenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
+	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	ze_for_each(Batch, Batches)
 	{
 		if (Batch->Texture != NULL)
-			Context->SetTexture(ZEGR_ST_PIXEL, 0, Batch->Texture.Cast<const ZEGRTexture>());
+			Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, reinterpret_cast<ZEGRTexture**>(&Batch->Texture));
 		else
-			Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
+			Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, NULL);
 
 		Context->Draw(Batch->Count, Batch->Offset);
 	}
 
-	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, 0);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 void ZEUIRenderer::Destroy()

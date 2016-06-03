@@ -94,11 +94,6 @@ ZEGRIndexBuffer::ZEGRIndexBuffer()
 	Format = ZEGR_IBF_NONE;
 }
 
-ZEGRIndexBuffer::~ZEGRIndexBuffer()
-{
-	Deinitialize();
-}
-
 ZEHolder<ZEGRIndexBuffer> ZEGRIndexBuffer::Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
 {
 	ZEHolder<ZEGRIndexBuffer> IndexBuffer = ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();

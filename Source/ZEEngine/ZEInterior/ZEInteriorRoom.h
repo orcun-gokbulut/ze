@@ -35,43 +35,33 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
-#include "ZEGame/ZERayCast.h"
-#include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZECanvas.h"
-#include "ZESpatial/ZEOctree.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZESpatial/ZEOctree.h"
+#include "ZEGame/ZERayCast.h"
+#include "ZERenderer/ZECanvas.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZEInterior;
-class ZEInteriorDoor;
-class ZEInteriorRoom;
+ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
+
+struct ZEInteriorResourceRoom;
 class ZEPhysicalMesh;
-class ZERNRenderer;
-class ZERNMaterial;
 class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
-class ZEGRContext;
+class ZERNMaterial;
 class ZERNPreRenderParameters;
-struct ZEInteriorResourceRoom;
+class ZERNRenderParameters;
 
 typedef ZEFlags ZEInteriorRoomDirtyFlags;
-#define ZE_IRDF_NONE							0
-#define ZE_IRDF_TRANSFORM						1
-#define ZE_IRDF_WORLD_TRANSFORM					2
-#define ZE_IRDF_INV_WORLD_TRANSFORM				4
-#define ZE_IRDF_WORLD_BOUNDING_BOX				8
-#define ZE_IRDF_ALL								0xFFFFFFFF
 
-struct ZEExtraRenderParameters
+struct ZEInteriorRoomDraw
 {
-	ZEUInt VertexOffset;
-	ZEUInt VertexCount;
-	ZERNMaterial* Material;
-	ZEInteriorRoom* Room;
+	ZEUInt										VertexOffset;
+	ZEUInt										VertexCount;
+	ZEHolder<ZERNMaterial>						Material;
+	ZERNCommand									RenderCommand;
 };
 
 class ZEInteriorRoom : public ZEObject
@@ -80,73 +70,75 @@ class ZEInteriorRoom : public ZEObject
 	friend class ZEInteriorDoor;
 	friend class ZEInterior;
 	private:
-		ZEInterior*							Owner;
-		const ZEInteriorResourceRoom*		Resource;
-		ZEArray<ZERNCommand>				RenderCommands;
-		ZEArray<ZEInteriorDoor*>			Doors;
-		ZEPhysicalMesh*						PhysicalMesh;
+		ZEInterior*								Owner;
+		const ZEInteriorResourceRoom*			Resource;
+		ZEPhysicalMesh*							PhysicalMesh;
+		ZEArray<ZEInteriorDoor*>				Doors;
+		ZESmartArray<ZEInteriorRoomDraw>		Draws;
 
-		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
-		ZEArray<ZEExtraRenderParameters>	ExtraRenderParameters;
+		ZEHolder<ZEGRVertexBuffer>				VertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 
-		bool								CullPass;
-		bool								IsDrawn;
-		bool								IsPersistentDraw;
+		bool									CullPass;
+		bool									IsDrawn;
+		bool									IsPersistentDraw;
 
-		mutable ZEInteriorRoomDirtyFlags	DirtyFlags;
+		mutable ZEInteriorRoomDirtyFlags		DirtyFlags;
 
-		ZEAABBox							BoundingBox;
-		mutable ZEAABBox					WorldBoundingBox;
+		ZEAABBox								BoundingBox;
+		mutable ZEAABBox						WorldBoundingBox;
 		
-		mutable ZEMatrix4x4					LocalTransform;
-		mutable ZEMatrix4x4					WorldTransform;
-		mutable ZEMatrix4x4					InvWorldTransform;
+		mutable ZEMatrix4x4						LocalTransform;
+		mutable ZEMatrix4x4						WorldTransform;
+		mutable ZEMatrix4x4						InvWorldTransform;
 
-		ZEVector3							Position;
-		ZEQuaternion						Rotation;
-		ZEVector3							Scale;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
+		ZEVector3								Scale;
 
-		void								RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, ZERayCastReport& Report, ZERayCastHelper& Helper);
-		void								RayCastOctree(const ZEOctree<ZESize>& Octree, ZERayCastReport& Report, ZERayCastHelper& Helper);
+		void									UpdateConstantBuffer();
 
-		void								ParentTransformChanged();
+		void									RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, ZERayCastReport& Report, ZERayCastHelper& Helper);
+		void									RayCastOctree(const ZEOctree<ZESize>& Octree, ZERayCastReport& Report, ZERayCastHelper& Helper);
 
-											ZEInteriorRoom();
-											~ZEInteriorRoom();
+		void									ParentTransformChanged();
+
+												ZEInteriorRoom();
+												~ZEInteriorRoom();
 
 	public:
-		ZEInterior*							GetOwner();
-		const char*							GetName();
+		ZEInterior*								GetOwner();
+		const ZEString&							GetName();
 
-		const ZEArray<ZEInteriorDoor*>&		GetDoors();
-		ZEPhysicalMesh*						GetPhysicalMesh();
-		ZESize								GetPolygonCount();
+		const ZEArray<ZEInteriorDoor*>&			GetDoors();
+		ZEPhysicalMesh*							GetPhysicalMesh();
+		ZESize									GetPolygonCount();
 
-		const ZEAABBox&						GetBoundingBox() const;
-		const ZEAABBox&						GetWorldBoundingBox() const;
+		const ZEAABBox&							GetBoundingBox() const;
+		const ZEAABBox&							GetWorldBoundingBox() const;
 
-		const ZEMatrix4x4&					GetTransform() const;
-		const ZEMatrix4x4&					GetWorldTransform() const;
-		const ZEMatrix4x4&					GetInvWorldTransform() const;
+		const ZEMatrix4x4&						GetTransform() const;
+		const ZEMatrix4x4&						GetWorldTransform() const;
+		const ZEMatrix4x4&						GetInvWorldTransform() const;
 
-		void								SetPosition(const ZEVector3& NewPosition);
-		const ZEVector3&					GetPosition() const;
+		void									SetPosition(const ZEVector3& NewPosition);
+		const ZEVector3&						GetPosition() const;
 
-		void								SetRotation(const ZEQuaternion& NewRotation);
-		const ZEQuaternion&					GetRotation() const;
+		void									SetRotation(const ZEQuaternion& NewRotation);
+		const ZEQuaternion&						GetRotation() const;
 
-		void								SetScale(const ZEVector3& NewScale);
-		const ZEVector3&					GetScale() const;
+		void									SetScale(const ZEVector3& NewScale);
+		const ZEVector3&						GetScale() const;
 
-		bool								Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource);
-		void								Deinitialize();
+		void									SetPersistentDraw(bool Enabled);
 
-		void								SetPersistentDraw(bool Enabled);
-		void								PreRender(const ZERNPreRenderParameters* Parameters);
-		void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		bool									Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resource);
+		void									Deinitialize();
 
-		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void									PreRender(const ZERNPreRenderParameters* Parameters);
+		void									Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		static ZEInteriorRoom*				CreateInstance();
+		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		static ZEInteriorRoom*					CreateInstance();
 };

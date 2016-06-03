@@ -42,26 +42,33 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
-bool ZERNStagePostProcess::UpdateRenderTargets()
+bool ZERNStagePostProcess::InitializeSelf()
 {
-	BindOutput(ZERN_SO_COLOR, ZEGR_TF_R11G11B10_FLOAT, true, ColorBuffer, ColorRenderTarget);
-	return true;
-}
-
-bool ZERNStagePostProcess::Update()
-{
-	if (!UpdateRenderTargets())
+	if (!ZERNStage::InitializeSelf())
 		return false;
 
-	return true;
+	return UpdateInputOutputs();
 }
 
 void ZERNStagePostProcess::DeinitializeSelf()
 {
-	ColorRenderTarget.Release();
-	ColorBuffer.Release();
+	AccumulationTexture = NULL;
+	DepthTexture = NULL;
 
-	ZERNStage::Deinitialize();
+	ZERNStage::DeinitializeSelf();
+}
+
+bool ZERNStagePostProcess::UpdateInputOutputs()
+{
+	AccumulationTexture = GetPrevOutput(ZERN_SO_ACCUMULATION);
+	if (AccumulationTexture == NULL)
+		return false;
+
+	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthTexture == NULL)
+		return false;
+
+	return true;
 }
 
 ZEInt ZERNStagePostProcess::GetId() const
@@ -71,7 +78,7 @@ ZEInt ZERNStagePostProcess::GetId() const
 
 const ZEString& ZERNStagePostProcess::GetName() const
 {
-	static const ZEString Name = "Post Process Stage";
+	static const ZEString Name = "Stage post process";
 	return Name;
 }
 
@@ -80,15 +87,14 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
+	if (!UpdateInputOutputs())
+		return false;
+
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	if (!Update())
-		return false;
-
-	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 
 	return true;
 }
@@ -98,25 +104,26 @@ void ZERNStagePostProcess::CleanUp(ZEGRContext* Context)
 	ZERNStage::CleanUp(Context);
 }
 
-const ZEGRRenderTarget*	ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
+const ZEGRRenderTarget* ZERNStagePostProcess::GetProvidedInput(ZERNStageBuffer Input) const
 {
-	if (GetEnabled() && (Input == ZERN_SO_COLOR))
-		return ColorRenderTarget;
+	if (GetEnabled() && (Input == ZERN_SO_COLOR || Input == ZERN_SO_ACCUMULATION))
+		return AccumulationTexture->GetRenderTarget();
 
 	return ZERNStage::GetProvidedInput(Input);
 }
 
 const ZEGRTexture2D* ZERNStagePostProcess::GetOutput(ZERNStageBuffer Output) const
 {
-	if (GetEnabled() && Output == ZERN_SO_COLOR)
-		return ColorBuffer;
+	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION))
+		return AccumulationTexture;
 
 	return ZERNStage::GetOutput(Output);
 }
 
 ZERNStagePostProcess::ZERNStagePostProcess()
 {
-
+	AccumulationTexture = NULL;
+	DepthTexture = NULL;
 }
 
 ZEGRRenderState ZERNStagePostProcess::GetRenderState()
@@ -124,15 +131,15 @@ ZEGRRenderState ZERNStagePostProcess::GetRenderState()
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
 
-	if(!Initialized)
+	if (!Initialized)
 	{
 		Initialized = true;
 
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthTestEnable(false);
-		DepthStencilState.SetDepthWriteEnable(false);
+		ZEGRDepthStencilState DepthStencilStateNoTestWrite;
+		DepthStencilStateNoTestWrite.SetDepthTestEnable(false);
+		DepthStencilStateNoTestWrite.SetDepthWriteEnable(false);
 
-		RenderState.SetDepthStencilState(DepthStencilState);
+		RenderState.SetDepthStencilState(DepthStencilStateNoTestWrite);
 
 		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);

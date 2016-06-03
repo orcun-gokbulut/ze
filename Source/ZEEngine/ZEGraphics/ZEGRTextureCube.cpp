@@ -39,12 +39,13 @@
 #include "ZEError.h"
 #include "ZEMath/ZEMath.h"
 
-bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
 {
 	this->Length = Length;
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
-	SetIsRenderTarget(RenderTarget);
+	SetResourceUsage(Usage);
+	SetResourceBindFlags(BindFlags);
 
 	SetSize(CalculateSize(Length, Length, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, TextureCube, Texture);
@@ -84,21 +85,23 @@ ZEGRTextureCube::ZEGRTextureCube()
 	Length = 0;
 }
 
-ZEGRTextureCube::~ZEGRTextureCube()
-{
-}
-
-ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget)
+ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
 {	
-	zeCheckError(Length == 0, NULL, "Width cannot be 0.");
-	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
-	zeCheckError(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), NULL, "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Length == 0, "length cannot be 0.");
+	zeDebugCheck(Length > ZEGR_MAX_TEXTURECUBE_DIMENSION, "length is too big.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), NULL, "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
+	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
 
 	ZEGRTextureCube* Texture = ZEGRGraphicsModule::GetInstance()->CreateTextureCube();
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Length, LevelCount, Format, RenderTarget))
+	if (!Texture->Initialize(Length, LevelCount, Format, Usage, BindFlags, Data))
 	{
 		Texture->Destroy();
 		return NULL;

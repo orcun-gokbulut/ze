@@ -56,7 +56,7 @@ struct ZERNParticleMaterial_VertexShader_Output
 	float4										Color										: COLOR0;
 	float										DepthView									: TEXCOORD1;
 };                                                                      					
-			
+
 struct ZERNParticleMaterial_PixelShader_Input                           					
 {                                                                       					
 	float4										PositionViewport							: SV_Position;
@@ -123,14 +123,14 @@ ZERNParticleMaterial_VertexShader_Output ZERNParticleMaterial_VertexShader_Main(
 
 float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_Input Input) : SV_Target0
 {
-	float Alpha = 1.0f;
+	float Alpha = ZERNParticleMaterial_Opacity;
+	#ifdef ZERN_PM_OPACITY_MAP
+		Alpha = ZERNParticleMaterial_OpacityMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord);
+	#elif defined ZERN_PM_DIFFUSE_MAP
+		Alpha = ZERNParticleMaterial_DiffuseMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord).w;
+	#endif
+	
 	#ifdef ZERN_PM_ALPHA_CULL
-			Alpha = ZERNParticleMaterial_Opacity;
-		#ifdef ZERN_PM_OPACITY_MAP
-			Alpha = ZERNParticleMaterial_OpacityMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord);
-		#elif defined ZERN_PM_DIFFUSE_MAP
-			Alpha = ZERNParticleMaterial_DiffuseMap.Sample(ZERNParticleMaterial_Sampler, Input.Texcoord).w;
-		#endif
 		clip(Alpha - ZERNParticleMaterial_AlphaCullLimit);
 	#endif
 	
@@ -148,8 +148,8 @@ float4 ZERNParticleMaterial_PixelShader_Main(ZERNParticleMaterial_PixelShader_In
 	#endif
 	
 	#ifdef ZERN_PM_VERTEX_COLOR
-		DiffuseColor *= Input.Color;
-		AmbientColor *= Input.Color;
+		DiffuseColor *= Input.Color.rgb;
+		AmbientColor *= Input.Color.rgb;
 	#endif
 	
 	if (ZERNParticleMaterial_SoftParticle)

@@ -52,9 +52,6 @@ Texture3D<float3>	ZERNPrecomputingLightScattering_PreviousInScatteringBuffer		: 
 Texture3D<float3>	ZERNPrecomputingLightScattering_HighOrderScatteringBuffer		: register(t1);
 Texture2D<float3>	ZERNPrecomputingLightScattering_RandomVectorsTexture			: register(t2);
 
-Texture2D<float2>	ZERNPrecomputingLightScattering_DensityBuffer					: register(t5);
-Texture2D<float3>	ZERNPrecomputingLightScattering_SkyAmbientBuffer				: register(t6);
-
 void ZERNPrecomputingLightScattering_MultiplyWithPhases(in float3 SunDirection, in float3 ViewDirection, inout float3 RayleighInScattering, inout float3 MieInScattering)
 {
 	float CosAngle = dot(SunDirection, ViewDirection);

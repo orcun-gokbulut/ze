@@ -49,14 +49,17 @@ bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary
 
 		case ZEGR_ST_DOMAIN:
 			Result = GetDevice()->CreateDomainShader(ShaderBinary, Size, NULL, &DomainShader);
+			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_HULL:
 			Result = GetDevice()->CreateHullShader(ShaderBinary, Size, NULL, &HullShader);
+			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_GEOMETRY:
 			Result = GetDevice()->CreateGeometryShader(ShaderBinary, Size, NULL, &GeometryShader);
+			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		case ZEGR_ST_PIXEL:
@@ -66,6 +69,7 @@ bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary
 
 		case ZEGR_ST_COMPUTE:
 			Result = GetDevice()->CreateComputeShader(ShaderBinary, Size, NULL, &ComputeShader);
+			ByteCode.MassAdd((ZEBYTE*)ShaderBinary, Size);
 			break;
 
 		default:
@@ -80,32 +84,7 @@ bool ZED11Shader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary
 
 void ZED11Shader::Deinitialize()
 {
-	switch (GetShaderType())
-	{
-		case ZEGR_ST_VERTEX:
-			ZEGR_RELEASE(ComputeShader);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			ZEGR_RELEASE(DomainShader);
-			break;
-
-		case ZEGR_ST_HULL:
-			ZEGR_RELEASE(HullShader);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			ZEGR_RELEASE(GeometryShader);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			ZEGR_RELEASE(PixelShader);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			ZEGR_RELEASE(ComputeShader);
-			break;
-	}
+	ZEGR_RELEASE(VertexShader);
 
 	ZEGRShader::Deinitialize();
 }
@@ -148,4 +127,9 @@ ID3D11PixelShader* ZED11Shader::GetPixelShader() const
 ID3D11ComputeShader* ZED11Shader::GetComputeShader() const
 {
 	return ComputeShader;
+}
+
+ZED11Shader::~ZED11Shader()
+{
+	Deinitialize();
 }

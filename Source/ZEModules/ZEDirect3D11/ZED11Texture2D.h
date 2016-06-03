@@ -50,29 +50,26 @@ class ZED11Texture2D : public ZEGRTexture2D, public ZED11ComponentBase
 	friend class ZED11Context;
 
 	private:
-		ID3D11Texture2D*										Texture2D;
-		ID3D11ShaderResourceView*								ShaderResourceView;
-		ID3D11UnorderedAccessView*								UnorderedAccessView;
-		mutable ZEHolder<ZEGRRenderTarget>						RenderTargets[15];			//maximum mip count is 15 in directx 11
-		mutable ZEHolder<ZEGRDepthStencilBuffer>				DepthStencilBuffers[4][2];
+		ID3D11Texture2D*						Texture2D;
+		ID3D11ShaderResourceView*				ShaderResourceView;
+		ID3D11UnorderedAccessView*				UnorderedAccessView;
 
-		virtual bool											Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount);
-		virtual void											Deinitialize();
+		virtual bool							Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data);
+		virtual void							Deinitialize();
 
-		ID3D11Resource*											GetResource() const;
-		ID3D11Texture2D*										GetTexture() const;
-		ID3D11ShaderResourceView*								GetShaderResourceView() const;
-		ID3D11UnorderedAccessView*								GetUnorderedAccessView() const;
+		ID3D11Resource*							GetResource() const;
+		ID3D11Texture2D*						GetTexture() const;
+		ID3D11ShaderResourceView*				GetShaderResourceView() const;
+		ID3D11UnorderedAccessView*				GetUnorderedAccessView() const;
 
-																ZED11Texture2D();
-		virtual													~ZED11Texture2D();
+												ZED11Texture2D();
+		virtual									~ZED11Texture2D();
 
 	public:
-		virtual ZEHolder<const ZEGRRenderTarget>				GetRenderTarget(ZEUInt Level) const;
-		virtual ZEHolder<const ZEGRDepthStencilBuffer>			GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const;
+		virtual const ZEGRRenderTarget*			GetRenderTarget(ZEUInt Level = 0, ZEUInt ArrayIndex = 0) const;
+		virtual const ZEGRDepthStencilBuffer*	GetDepthStencilBuffer(bool ReadOnly = false, ZEUInt ArrayIndex = 0) const;
 
-		virtual void											GenerateMipMaps();
-		virtual bool											UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch);
-		virtual bool											Lock(void** Buffer, ZESize* RowPitch);
-		virtual void											Unlock();
+		virtual void							UpdateSubResource(ZEUInt DestArrayIndex, ZEUInt DestLevel, ZERect* DestRect, const void* SrcData, ZESize SrcRowPitch);
+		virtual bool							Lock(void** Buffer, ZESize* RowPitch = NULL, ZESize* SlicePitch = NULL, ZEUInt ArrayIndex = 0, ZEUInt Level = 0);
+		virtual void							Unlock();
 };

@@ -37,64 +37,71 @@
 
 #include "ZERNStage.h"
 
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEMatrix.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEGraphics/ZEGRViewport.h"
-#include "ZEGraphics/ZEGRFormat.h"
 
+class ZEGRShader;
 class ZEGRTexture2D;
-class ZEGRDepthStencilBuffer;
+class ZEGRStructuredBuffer;
+class ZEGRComputeRenderStateData;
 
 class ZERNStageForward : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<const ZEGRTexture2D>				ColorBuffer;
-		ZEHolder<const ZEGRRenderTarget>			ColorRenderTarget;
-		ZEHolder<const ZEGRTexture2D>				DepthBuffer;
-		ZEHolder<const ZEGRDepthStencilBuffer>		DepthStencilBuffer;
-		ZEGRViewport								Viewport;
+		ZEFlags									DirtyFlags;
+		ZEGRViewport							Viewport;
 
-		virtual void								DeinitializeSelf();
+		ZEHolder<ZEGRShader>					TiledForwardComputeShader;
+		ZEHolder<ZEGRComputeRenderStateData>	TiledForwardComputeRenderState;
 
-		bool										UpdateRenderTargets();
-		bool										Update();
+		ZEHolder<ZEGRStructuredBuffer>			TileLightStructuredBuffer;
+		
+		ZEHolder<ZEGRTexture2D>					ColorBuffer;
+		ZEHolder<ZEGRTexture2D>					DepthStencilBuffer;
+
+		const ZEGRTexture2D*					ColorTexture;
+		const ZEGRTexture2D*					DepthTexture;
+
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
+
+		bool									UpdateShaders();
+		bool									UpdateRenderStates();
+		bool									UpdateInputOutputs();
+		bool									Update();
 
 	public:
-		virtual ZEInt								GetId() const;
-		virtual const ZEString&						GetName() const;
+		virtual ZEInt							GetId() const;
+		virtual const ZEString&					GetName() const;
 
-		virtual bool								Setup(ZEGRContext* Context);
-		virtual void								CleanUp(ZEGRContext* Context);
+		virtual bool							Setup(ZEGRContext* Context);
+		virtual void							CleanUp(ZEGRContext* Context);
 
-		virtual const ZEGRTexture2D*				GetOutput(ZERNStageBuffer Output) const;
-		virtual const ZEGRRenderTarget*				GetProvidedInput(ZERNStageBuffer Input) const;
+		virtual const ZEGRTexture2D*			GetOutput(ZERNStageBuffer Output) const;
 
-													ZERNStageForward();
+												ZERNStageForward();
 
-		static ZEGRRenderState						GetRenderState();
+		static ZEGRRenderState					GetRenderState();
 };
 
 class ZERNStageForwardTransparent : public ZERNStageForward
 {
 	ZE_OBJECT
 	public:
-		virtual ZEInt								GetId() const;
-		virtual const ZEString&						GetName() const;
+		virtual ZEInt							GetId() const;
+		virtual const ZEString&					GetName() const;
 
-													ZERNStageForwardTransparent();
-
-		static ZEGRRenderState						GetRenderState();
+		static ZEGRRenderState					GetRenderState();
 };
-
 
 class ZERNStageForwardPostHDR : public ZERNStageForward
 {
 	ZE_OBJECT
 	public:
-		virtual ZEInt								GetId() const;
-		virtual const ZEString&						GetName() const;
-
-													ZERNStageForwardPostHDR();
-
-		static ZEGRRenderState						GetRenderState();
+		virtual ZEInt							GetId() const;
+		virtual const ZEString&					GetName() const;
 };

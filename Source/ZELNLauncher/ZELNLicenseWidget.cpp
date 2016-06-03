@@ -157,7 +157,7 @@ void ZELNLicenseWidget::btnCopyPreActivationCode_clicked()
 
 void ZELNLicenseWidget::btnSavePreActivationCode_clicked()
 {
-	QString FileName = QFileDialog::getSaveFileName(this, "Open Pre-Activation File", QString(), "Text files (*.txt);;All files (*.*)");
+	QString FileName = QFileDialog::getSaveFileName(this, "Save Pre-Activation File", QString(), "Text files (*.txt);;All files (*.*)");
 	if (FileName.isEmpty())
 		return;
 	

@@ -101,12 +101,12 @@ bool ZERNStageDebug::UpdateShaders()
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNDebug_BoundingBox_VertexShader_Main";
 	BoundingBoxVertexShader = ZEGRShader::Compile(Options);
-	zeCheckError(VertexShader == NULL, false, "Cannot set vertex shader.");
-
+	zeCheckError(BoundingBoxVertexShader == NULL, false, "Cannot set vertex shader.");
+	
 	Options.Type = ZEGR_ST_GEOMETRY;
 	Options.EntryPoint = "ZERNDebug_BoundingBox_GeometryShader_Main";
 	BoundingBoxGeometryShader = ZEGRShader::Compile(Options);
-	zeCheckError(GeometryShader == NULL, false, "Cannot set geometry shader.");
+	zeCheckError(BoundingBoxGeometryShader == NULL, false, "Cannot set geometry shader.");
 
 	DirtyFlags.UnraiseFlags(ZERN_SDDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_SDDF_RENDER_STATES);
@@ -119,23 +119,23 @@ bool ZERNStageDebug::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZERN_SDDF_RENDER_STATES))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStageDebug::GetRenderState();
+	ZEGRRenderState RenderState;
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
-
+	
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_GEOMETRY, GeometryShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
-
+	
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set debug render state.");
-
+	
 	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	RenderState.SetVertexLayout(GetPositionVertexLayout());
-
+	
 	RenderState.SetShader(ZEGR_ST_VERTEX, BoundingBoxVertexShader);
 	RenderState.SetShader(ZEGR_ST_GEOMETRY, BoundingBoxGeometryShader);
-
+	
 	BoundingBoxRenderStateData = RenderState.Compile();
 	zeCheckError(BoundingBoxRenderStateData == NULL, false, "Cannot set debug render state.");
 
@@ -170,10 +170,10 @@ bool ZERNStageDebug::Update()
 	return true;
 }
 
-#include "ZEModel/ZEModel.h"
-#include "ZEModel/ZEModelMesh.h"
-#include "ZEModel/ZEModelMeshLOD.h"
-#include "ZEDS/ZEArray.h"
+//#include "ZEModel/ZEModel.h"
+//#include "ZEModel/ZEModelMesh.h"
+//#include "ZEModel/ZEModelMeshLOD.h"
+//#include "ZEDS/ZEArray.h"
 
 bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 {
@@ -198,13 +198,7 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 	if (BoundingBoxVertexBuffer == NULL || 
 		BoundingBoxVertexBuffer->GetVertexCount() != VertexCount)
 	{
-		BoundingBoxVertexBuffer.Release();
-		BoundingBoxVertexBuffer = ZEGRVertexBuffer::Create(VertexCount, sizeof(ZEVector3));
-		
-		void* Data;
-		BoundingBoxVertexBuffer->Lock(&Data);
-		memcpy(Data, &Vertices[0], sizeof(ZEVector3) * VertexCount);
-		BoundingBoxVertexBuffer->Unlock();
+		BoundingBoxVertexBuffer = ZEGRVertexBuffer::Create(VertexCount, sizeof(ZEVector3), ZEGR_RU_GPU_READ_ONLY, &Vertices[0]);
 	}
 
 	return true;
@@ -212,9 +206,12 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 
 bool ZERNStageDebug::InitializeSelf()
 {
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 void ZERNStageDebug::DeinitializeSelf()
@@ -228,9 +225,12 @@ void ZERNStageDebug::DeinitializeSelf()
 	BoundingBoxVertexShader.Release();
 	BoundingBoxGeometryShader.Release();
 	BoundingBoxRenderStateData.Release();
+
 	BoundingBoxVertexBuffer.Release();
 
 	DepthMap.Release();
+
+	ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageDebug::GetId() const
@@ -240,7 +240,7 @@ ZEInt ZERNStageDebug::GetId() const
 
 const ZEString& ZERNStageDebug::GetName() const
 {
-	static const ZEString Name = "Debug";
+	static const ZEString Name = "Stage Debug";
 	return Name;
 }
 
@@ -322,15 +322,12 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 	if (DepthMap == NULL || 
 		DepthMap->GetWidth() != Width || DepthMap->GetHeight() != Height)
 	{
-		DepthMap.Release();
 		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
 	}
 
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = DepthMap->GetDepthStencilBuffer();
-
 	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 0.0f, 0x00);
-
-	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_GEOMETRY, 8, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
@@ -342,7 +339,6 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 			Context->SetVertexBuffers(0, 1, BoundingBoxVertexBuffer.GetPointerToPointer());
 			Context->Draw(BoundingBoxVertexBuffer->GetVertexCount(), 0);
 
-			Context->SetVertexBuffers(0, 0, NULL);
 			CleanUp(Context);
 		}
 
@@ -358,9 +354,6 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 
 void ZERNStageDebug::CleanUp(ZEGRContext* Context)
 {
-	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 

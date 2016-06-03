@@ -35,20 +35,22 @@
 
 #include "ZELight.h"
 
+#include "ZEMath\ZEViewFrustum.h"
 #include "ZERNRenderer.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStageShadowmapGeneration.h"
-#include "ZEGame\ZEScene.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
+#define ZE_LDF_BOUNDING_BOX				16
 
 float ZELight::AttenuationFunction(float RootToTry)
 {
 	float Result = 0.0f;
-	Result = Intensity / (Attenuation.x + (Attenuation.y * RootToTry) + (Attenuation.z * RootToTry * RootToTry));
+	Result = Intensity / (Attenuation.z + (Attenuation.y * RootToTry) + (Attenuation.x * RootToTry * RootToTry));
 
 	return Result;
 }
@@ -60,6 +62,8 @@ bool ZELight::InitializeSelf()
 
 	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
 
+	ShadowRenderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
+
 	return ShadowRenderer.Initialize();
 }
 
@@ -68,6 +72,32 @@ bool ZELight::DeinitializeSelf()
 	ShadowRenderer.Deinitialize();
 
 	return ZEEntity::DeinitializeSelf();
+}
+
+void ZELight::CalculateBoundingBox() const
+{
+	ZEAABBox AABB;
+
+	const ZEViewVolume& ViewVolume = GetViewVolume();
+	if (ViewVolume.GetViewVolumeType() == ZE_VVT_FRUSTUM)
+	{
+		const ZEViewFrustum& ViewFrustum = static_cast<const ZEViewFrustum&>(ViewVolume);
+		for (ZEUInt I = 0; I < 8; I++)
+		{
+			ZEVector3 VertexLocal = GetInvWorldTransform() * ViewFrustum.GetVertex((ZEViewFrustumVertex)I);
+
+			ZEVector3::Min(AABB.Min, AABB.Min, VertexLocal);
+			ZEVector3::Max(AABB.Max, AABB.Max, VertexLocal);
+		}
+	}
+	else if (ViewVolume.GetViewVolumeType() == ZE_VVT_SPHERE)
+	{
+		ZEVector3 Extent(Range, Range, Range);
+		AABB.Min = -Extent;
+		AABB.Max = Extent;
+	}
+	
+	const_cast<ZELight*>(this)->SetBoundingBox(AABB);
 }
 
 void ZELight::LocalTransformChanged()
@@ -82,6 +112,12 @@ void ZELight::ParentTransformChanged()
 	DirtyFlags.RaiseFlags(ZE_LDF_VIEW_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
 
+void ZELight::BoundingBoxChanged()
+{
+	ZEEntity::BoundingBoxChanged();
+	DirtyFlags.RaiseFlags(ZE_LDF_BOUNDING_BOX);
+}
+
 ZELight::ZELight()
 {
 	DirtyFlags.RaiseAll();
@@ -91,6 +127,7 @@ ZELight::ZELight()
 	ShadowSampleCount = ZE_LSC_MEDIUM;
 	ShadowSampleLength = 1.0f;
 	ShadowDepthBias = 0.005f;
+	ShadowNormalBias = 0.1f;
 
 	Range = 100.0f;
 	Intensity = 1.0f;
@@ -99,8 +136,6 @@ ZELight::ZELight()
 
 	ViewTransform = ZEMatrix4x4::Identity;
 	ProjectionTransform = ZEMatrix4x4::Identity;
-
-	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
 }
 
 ZELight::~ZELight()
@@ -129,9 +164,6 @@ void ZELight::SetRange(float NewValue)
 		return;
 
 	Range = NewValue;
-
-	ZEVector3 Extent(Range, Range, Range);
-	SetBoundingBox(ZEAABBox(-Extent, Extent));
 
 	DirtyFlags.RaiseFlags(ZE_LDF_PROJECTION_TRANSFORM | ZE_LDF_VIEW_VOLUME);
 }
@@ -196,6 +228,16 @@ float ZELight::GetShadowDepthBias() const
 	return ShadowDepthBias;
 }
 
+void ZELight::SetShadowNormalBias(float ShadowNormalBias)
+{
+	this->ShadowNormalBias = ShadowNormalBias;
+}
+
+float ZELight::GetShadowNormalBias() const
+{
+	return ShadowNormalBias;
+}
+
 void ZELight::SetColor(const ZEVector3& NewColor)
 {
 	Color = NewColor;
@@ -213,9 +255,9 @@ void ZELight::SetAttenuation(const ZEVector3& Attenuation)
 
 void ZELight::SetAttenuation(float DistanceSquare, float Distance, float Constant)
 {
-	Attenuation.x = Constant;
+	Attenuation.x = DistanceSquare;
 	Attenuation.y = Distance;
-	Attenuation.z = DistanceSquare;
+	Attenuation.z = Constant;
 
 	if(GetLightType() != ZE_LT_DIRECTIONAL)
 	{
@@ -256,11 +298,23 @@ const ZEVector3& ZELight::GetAttenuation() const
 	return Attenuation;
 }
 
+const ZEAABBox& ZELight::GetBoundingBox() const
+{
+	if (DirtyFlags.GetFlags(ZE_LDF_BOUNDING_BOX))
+	{
+		CalculateBoundingBox();
+		DirtyFlags.UnraiseFlags(ZE_LDF_BOUNDING_BOX);
+	}
+
+	return ZEEntity::GetBoundingBox();
+}
+
 bool ZELight::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
+	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
 	if (CastsShadows)
 		Command.StageMask |= ZERN_STAGE_SHADOWING;
 
@@ -269,34 +323,19 @@ bool ZELight::PreRender(const ZERNPreRenderParameters* Parameters)
 	return true;
 }
 
-void ZELight::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
-{
-	ShadowRenderer.SetContext(Parameters->Context);
-
-	ZERNPreRenderParameters ShadowPreRenderParameters;
-	ShadowPreRenderParameters.Renderer = &ShadowRenderer;
-	ShadowPreRenderParameters.View = &ShadowRenderer.GetView();
-
-	GetOwnerScene()->PreRender(&ShadowPreRenderParameters);
-	ShadowRenderer.Render();
-}
-
 ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution)
 {
 	switch (ShadowResolution)
 	{
-		default:
-		case ZE_LSR_LOW:
-			return 256;
-
-		case ZE_LSR_MEDIUM:
-			return 512;
-
-		case ZE_LSR_HIGH:
-			return 1024;
-
-		case ZE_LSR_VERY_HIGH:
-			return 2048;
+	default:
+	case ZE_LSR_LOW:
+		return 256;
+	case ZE_LSR_MEDIUM:
+		return 512;
+	case ZE_LSR_HIGH:
+		return 1024;
+	case ZE_LSR_VERY_HIGH:
+		return 2048;
 	}
 }
 
@@ -304,17 +343,14 @@ ZEUInt ZELight::ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCo
 {
 	switch (ShadowSampleCount)
 	{
-		default:
-		case ZE_LSC_LOW:
-			return 4;
-
-		case ZE_LSC_MEDIUM:
-			return 8;
-
-		case ZE_LSC_HIGH:
-			return 16;
-
-		case ZE_LSC_VERY_HIGH:
-			return 16;
+	default:
+	case ZE_LSC_LOW:
+		return 4;
+	case ZE_LSC_MEDIUM:
+		return 8;
+	case ZE_LSC_HIGH:
+		return 16;
+	case ZE_LSC_VERY_HIGH:
+		return 16;
 	}
 }

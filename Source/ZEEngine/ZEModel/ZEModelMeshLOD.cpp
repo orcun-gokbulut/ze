@@ -89,7 +89,7 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 	if (Skinned)
 	{
 		Owner->UpdateConstantBufferBoneTransforms();
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_BONE_TRANSFORMS, Owner->ConstantBufferBoneTransforms);
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_BONE_TRANSFORMS, 1, Owner->ConstantBufferBoneTransforms.GetPointerToPointer());
 		Context->SetVertexBuffers(0, 1, VertexBufferSkin.GetPointerToPointer());
 	}
 	else
@@ -98,7 +98,8 @@ void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const 
 	}
 
 	OwnerMesh->UpdateConstantBuffer();
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, OwnerMesh->ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, OwnerMesh->ConstantBuffer.GetPointerToPointer());
+
 	Context->Draw(LODResource->VertexCount, 0);
 
 	Material->CleanupMaterial(Context, Stage);
@@ -119,9 +120,7 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Skinned = !LODResource->VertexBufferSkin.IsNull();
 
 	if (Skinned)
-	{
 		static_cast<ZERNFixedMaterial*>(const_cast<ZERNMaterial*>(Material.GetPointer()))->SetSkinningEnabled(Skinned);
-	}
 }
 
 void ZEModelMeshLOD::Deinitialize()

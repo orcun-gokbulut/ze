@@ -33,15 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEError.h"
-#include "ZEGRShader.h"
+#include "ZEGRVertexLayout.h"
 
+#include "ZEError.h"
+#include "ZEDS/ZEHashGenerator.h"
 #include "ZEFile/ZEFile.h"
 #include "ZEDefinitions.h"
-#include "ZEGRVertexLayout.h"
+#include "ZEGRShader.h"
 #include "ZEGRVertexBuffer.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEDS/ZEHashGenerator.h"
+#include "ZEGRGraphicsModule.h"
 #include "ZEGRShaderMeta.h"
 
 ZEGRStateType ZEGRVertexLayout::GetStateType() const
@@ -172,9 +172,4 @@ void ZEGRVertexLayout::SetToDefault()
 ZEGRVertexLayout::ZEGRVertexLayout()
 {
 	SetToDefault();
-}
-
-ZEGRVertexLayout::~ZEGRVertexLayout()
-{
-	
 }

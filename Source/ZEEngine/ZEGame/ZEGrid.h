@@ -35,10 +35,12 @@
 
 #pragma once
 
-#include "ZECanvasBrush.h"
 #include "ZEGame/ZEEntity.h"
+
+#include "ZEPointer/ZEHolder.h"
 #include "ZERenderer/ZERNCommand.h"
 
+class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
 class ZERNSimpleMaterial;
 
@@ -46,19 +48,13 @@ class ZEGrid : public ZEEntity
 {
 	ZE_OBJECT
 	private:
+		ZERNCommand						RenderCommand;
+
 		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
 		ZEHolder<ZEGRConstantBuffer>	ConstantBufferAxisTransform;
 		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMinorGridTransform;
 		ZEHolder<ZEGRConstantBuffer>	ConstantBufferMajorGridTransform;
 		ZEHolder<ZERNSimpleMaterial>	Material;
-		ZERNCommand						RenderCommand;
-
-		struct
-		{
-			ZEMatrix4x4					AxisTransform;
-			ZEMatrix4x4					MinorGridTransform;
-			ZEMatrix4x4					MajorGridTransform;
-		} Constants;
 
 		ZESize							MinorGridOffset;
 		ZESize							MinorGridCount;
@@ -79,6 +75,13 @@ class ZEGrid : public ZEEntity
 
 		bool							AxisEnabled;
 		ZEVector3						AxisColor;
+
+		struct
+		{
+			ZEMatrix4x4					AxisTransform;
+			ZEMatrix4x4					MinorGridTransform;
+			ZEMatrix4x4					MajorGridTransform;
+		} Constants;
 
 		void							GenerateGrid();
 

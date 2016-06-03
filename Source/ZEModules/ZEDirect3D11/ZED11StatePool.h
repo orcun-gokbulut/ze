@@ -58,7 +58,7 @@ class ZED11StatePool : public ZED11ComponentBase
 		ID3D11BlendState*						CreateBlendState(const ZEGRBlendState& BlendState) const;
 		ID3D11RasterizerState*					CreateRasterizerState(const ZEGRRasterizerState& RasterizerState) const;
 		ID3D11DepthStencilState*				CreateDepthStencilState(const ZEGRDepthStencilState& DepthStencilState) const;
-		ID3D11InputLayout*						CreateVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* Shader) const;
+		ID3D11InputLayout*						CreateVertexLayout(const ZEGRVertexLayout& VertexLayout, const ZEGRShader* Shader) const;
 
 		ZED11StateBase*							FindPoolEntry(ZEList2<ZED11StateBase>& Pool, const ZEGRState& State) const;
 
@@ -69,5 +69,5 @@ class ZED11StatePool : public ZED11ComponentBase
 		ZEHolder<const ZED11BlendState>			GetBlendState(const ZEGRBlendState& BlendState) const;
 		ZEHolder<const ZED11RasterizerState>	GetRasterizerState(const ZEGRRasterizerState& RasterizerState) const;
 		ZEHolder<const ZED11DepthStencilState>	GetDepthStencilState(const ZEGRDepthStencilState& DepthStencilState) const;
-		ZEHolder<const ZED11VertexLayout>		GetVertexLayout(const ZEGRVertexLayout& VertexLayout, ZEGRShader* VertexShader) const;
+		ZEHolder<const ZED11VertexLayout>		GetVertexLayout(const ZEGRVertexLayout& VertexLayout, const ZEGRShader* VertexShader) const;
 };

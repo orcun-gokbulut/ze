@@ -69,7 +69,7 @@ bool ZEDEntityWrapper::Update()
 		Material = ZERNSimpleMaterial::CreateInstance();
 		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 		Material->SetVertexColorEnabled(true);
-		Material->SetStageMask(ZERN_STAGE_FORWARD_POST);
+		Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 	}
 
 	if (ConstantBuffer.IsNull())
@@ -274,7 +274,9 @@ void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Update())
 		return;
 
-	Command.StageMask = Material->GetStageMask();
+	if (!Material->PreRender(Command))
+		return;
+
 	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDEntityWrapper, Render, this);
 	Parameters->Renderer->AddCommand(&Command);
 }
@@ -292,8 +294,8 @@ void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 		return;
 
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->Draw(VertexBuffer->GetSize() / VertexBuffer->GetVertexSize(), 0);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
+	Context->Draw(VertexBuffer->GetSize() / VertexBuffer->GetVertexStride(), 0);
 
 	Material->CleanupMaterial(Context, Parameters->Stage);
 }

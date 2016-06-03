@@ -57,6 +57,8 @@ class ZEATFog : public ZEEntity
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
+		float							Density;
+
 		struct 
 		{
 			float						Density;

@@ -35,6 +35,36 @@
 
 #include "ZEGRDepthStencilBuffer.h"
 
+void ZEGRDepthStencilBuffer::SetOwner(const ZEGRTexture* OwnerTexture)
+{
+	this->Owner = OwnerTexture;
+}
+
+const ZEGRTexture* ZEGRDepthStencilBuffer::GetOwner() const
+{
+	return Owner;
+}
+
+void ZEGRDepthStencilBuffer::SetReadOnly(bool ReadOnly)
+{
+	this->ReadOnly = ReadOnly;
+}
+
+bool ZEGRDepthStencilBuffer::GetReadOnly() const
+{
+	return ReadOnly;
+}
+
+void ZEGRDepthStencilBuffer::SetBound(bool Bound)
+{
+	this->Bound = Bound;
+}
+
+bool ZEGRDepthStencilBuffer::GetBound() const
+{
+	return Bound;
+}
+
 ZEGRResourceType ZEGRDepthStencilBuffer::GetResourceType() const
 {
 	return ZEGR_RT_DEPTH_STENCIL_BUFFER;
@@ -57,11 +87,13 @@ ZEGRFormat ZEGRDepthStencilBuffer::GetFormat() const
 
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
 {
-
+	Owner = NULL;
 }
 
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
 {
+	Owner = NULL;
+
 	this->Width = Width;
 	this->Height = Height;
 	this->Format = Format;
@@ -69,5 +101,10 @@ ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGR
 
 ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
 {
+	if (Owner != NULL)
+	{
 
+	}
+
+	Owner = NULL;
 }

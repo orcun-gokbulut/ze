@@ -1,0 +1,44 @@
+<RCC>
+  <qresource prefix="Zinek/ZEThemeDark">			
+		<file>ZEThemeDark.qss</file>
+		<file>ZEThemeDark-LeftArrow-Disabled.png</file>
+		<file>ZEThemeDark-LeftArrow.png</file>
+		<file>ZEThemeDark-RightArrow-Disabled.png</file>
+		<file>ZEThemeDark-RightArrow.png</file>    
+		<file>ZEThemeDark-UpArrow-Disabled.png</file>
+		<file>ZEThemeDark-UpArrow.png</file>
+		<file>ZEThemeDark-DownArrow-Disabled.png</file>
+		<file>ZEThemeDark-DownArrow.png</file>  
+		<file>ZEThemeDark-Branch-Closed-On.png</file>
+		<file>ZEThemeDark-Branch-Closed.png</file>
+		<file>ZEThemeDark-Branch-Open-On.png</file>
+		<file>ZEThemeDark-Branch-Open.png</file>
+		<file>ZEThemeDark-CheckBox-Checked-Disabled.png</file>
+		<file>ZEThemeDark-CheckBox-Checked-Focus.png</file>
+		<file>ZEThemeDark-CheckBox-Checked.png</file>
+		<file>ZEThemeDark-CheckBox-Indeterminate-Disabled.png</file>
+		<file>ZEThemeDark-CheckBox-Indeterminate-Focus.png</file>
+		<file>ZEThemeDark-CheckBox-Indeterminate.png</file>
+		<file>ZEThemeDark-CheckBox-Unchecked-Disabled.png</file>
+		<file>ZEThemeDark-CheckBox-Unchecked-Focus.png</file>
+		<file>ZEThemeDark-CheckBox-Unchecked.png</file>
+		<file>ZEThemeDark-Close-Hover.png</file>
+		<file>ZEThemeDark-Close-Pressed.png</file>
+		<file>ZEThemeDark-Close.png</file>
+		<file>ZEThemeDark-RadioButton-Checked-Disabled.png</file>
+		<file>ZEThemeDark-RadioButton-Checked-Focus.png</file>
+		<file>ZEThemeDark-RadioButton-Checked.png</file>
+		<file>ZEThemeDark-RadioButton-Unchecked-Disabled.png</file>
+		<file>ZEThemeDark-RadioButton-Unchecked-Focus.png</file>
+		<file>ZEThemeDark-RadioButton-Unchecked.png</file>
+		<file>ZEThemeDark-SizeGrip.png</file>
+		<file>ZEThemeDark-StyleSheet-Branch-End.png</file>
+		<file>ZEThemeDark-StyleSheet-Branch-More.png</file>
+		<file>ZEThemeDark-StyleSheet-VerticalLine.png</file>
+		<file>ZEThemeDark-Toolbar-Mover-Horizontal.png</file>
+		<file>ZEThemeDark-Toolbar-Mover-Vertical.png</file>
+		<file>ZEThemeDark-Toolbar-Separator-Horizontal.png</file>
+		<file>ZEThemeDark-Toolbar-Separator-Vertical.png</file>
+		<file>ZEThemeDark-Transparent.png</file>
+  </qresource>
+</RCC>

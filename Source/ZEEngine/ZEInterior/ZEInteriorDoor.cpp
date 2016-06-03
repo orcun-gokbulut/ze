@@ -156,12 +156,12 @@ void ZEInteriorDoor::Deinitialize()
 	Resource = NULL;
 }
 
-void ZEInteriorDoor::SetOpen(bool Open)
+void ZEInteriorDoor::SetOpened(bool Open)
 {
 	this->Open = Open;
 }
 
-bool ZEInteriorDoor::GetOpen()
+bool ZEInteriorDoor::GetOpened()
 {
 	return Open;
 }
@@ -170,7 +170,6 @@ ZEInteriorDoor::ZEInteriorDoor()
 {
 	Owner = NULL;
 	Resource = NULL;
-	DebugDrawComponents.Material = NULL;
 	Rooms[0] = NULL;
 	Rooms[1] = NULL;
 	Open = true;

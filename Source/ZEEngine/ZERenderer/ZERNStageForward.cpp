@@ -35,35 +35,170 @@
 
 #include "ZERNStageForward.h"
 
+#include "ZEMath/ZEAngle.h"
 #include "ZERNRenderer.h"
 #include "ZERNStageID.h"
+#include "ZERNCommand.h"
+#include "ZELightPoint.h"
+#include "ZELightDirectional.h"
+#include "ZELightProjective.h"
+#include "ZELightOmniProjective.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGraphics/ZEGRShader.h"
+#include "ZEGraphics/ZEGRStructuredBuffer.h"
+
+#define MAX_LIGHT					512
+#define TILE_DIMENSION				16
+
+#define ZERN_SFDF_SHADERS			1
+#define ZERN_SFDF_RENDER_STATES		2
+
+bool ZERNStageForward::InitializeSelf()
+{
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	return Update();
+}
 
 void ZERNStageForward::DeinitializeSelf()
 {
+	DirtyFlags.RaiseAll();
+
+	TiledForwardComputeShader.Release();
+	TiledForwardComputeRenderState.Release();
+
+	TileLightStructuredBuffer.Release();
+
 	ColorBuffer.Release();
-	ColorRenderTarget.Release();
 	DepthStencilBuffer.Release();
+
+	ColorTexture = NULL;
+	DepthTexture = NULL;
+
+	ZERNStage::DeinitializeSelf();
 }
 
-bool ZERNStageForward::UpdateRenderTargets()
+bool ZERNStageForward::UpdateShaders()
 {
-	BindOutput(ZERN_SO_COLOR, ZEGR_TF_R11G11B10_FLOAT, true, ColorBuffer, ColorRenderTarget);
-	BindDepthOutput(ZERN_SO_DEPTH, ZEGR_TF_D24_UNORM_S8_UINT, true, DepthBuffer, DepthStencilBuffer);
+	if (!DirtyFlags.GetFlags(ZERN_SFDF_SHADERS))
+		return true;
 
-	Viewport.SetWidth((float)ColorRenderTarget->GetWidth());
-	Viewport.SetHeight((float)ColorRenderTarget->GetHeight());
+	ZEGRShaderCompileOptions Options;
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTiledDeferredShadingCompute.hlsl";
+	Options.Model = ZEGR_SM_5_0;
+	Options.Type = ZEGR_ST_COMPUTE;
+	Options.EntryPoint = "ZERNTiledDeferredShadingCompute_ComputeShader_Main";
+
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
+	Options.Definitions.Add(ZEGRShaderDefinition("ZERN_TILED_FORWARD"));
+	TiledForwardComputeShader = ZEGRShader::Compile(Options);
+	zeCheckError(TiledForwardComputeShader == NULL, false, "Cannot set compute shader.");
+
+	DirtyFlags.UnraiseFlags(ZERN_SFDF_SHADERS);
+	DirtyFlags.RaiseFlags(ZERN_SFDF_RENDER_STATES);
+
+	return true;
+}
+
+bool ZERNStageForward::UpdateRenderStates()
+{
+	if (!DirtyFlags.GetFlags(ZERN_SFDF_RENDER_STATES))
+		return true;
+
+	ZEGRComputeRenderState ComputeRenderState;
+	ComputeRenderState.SetComputeShader(TiledForwardComputeShader);
+	TiledForwardComputeRenderState = ComputeRenderState.Compile();
+	zeCheckError(TiledForwardComputeRenderState == NULL, false, "Cannot set render state.");
+
+	DirtyFlags.UnraiseFlags(ZERN_SFDF_RENDER_STATES);
+
+	return true;
+}
+
+bool ZERNStageForward::UpdateInputOutputs()
+{
+	ColorTexture = GetPrevOutput(ZERN_SO_COLOR);
+	if (ColorTexture == NULL)
+	{
+		const ZEGRRenderTarget* MainRenderTarget = GetRenderer()->GetOutputRenderTarget();
+		if (MainRenderTarget == NULL)
+			return false;
+
+		if (ColorBuffer == NULL || 
+			ColorBuffer->GetWidth() != MainRenderTarget->GetWidth() || ColorBuffer->GetHeight() != MainRenderTarget->GetHeight())
+		{
+			ColorBuffer = ZEGRTexture2D::CreateInstance(
+														MainRenderTarget->GetWidth(), 
+														MainRenderTarget->GetHeight(), 
+														1, 
+														ZEGR_TF_R11G11B10_FLOAT, 
+														ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
+														ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+														1, 
+														ZEGRGraphicsModule::SAMPLE_COUNT);
+		}
+
+		ColorTexture = ColorBuffer;
+	}
+	else
+	{
+		ColorBuffer.Release();
+	}
+
+	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthTexture == NULL)
+	{
+		if (DepthStencilBuffer == NULL || 
+			DepthStencilBuffer->GetWidth() != ColorTexture->GetWidth() || 
+			DepthStencilBuffer->GetHeight() != ColorTexture->GetHeight())
+		{
+			DepthStencilBuffer = ZEGRTexture2D::CreateInstance(
+																ColorTexture->GetWidth(), 
+																ColorTexture->GetHeight(), 
+																1, 
+																ZEGR_TF_D24_UNORM_S8_UINT, 
+																ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
+																ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 
+																1, 
+																ZEGRGraphicsModule::SAMPLE_COUNT);
+		}
+
+		DepthTexture = DepthStencilBuffer;
+	}
+	else
+	{
+		DepthStencilBuffer.Release();
+	}
+
+	Viewport.SetWidth((float)ColorTexture->GetWidth());
+	Viewport.SetHeight((float)ColorTexture->GetHeight());
+
+	ZEUInt TileCountX = (ColorTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
+	ZEUInt TileCountY = (ColorTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
+	ZESize Size = TileCountX * TileCountY * (MAX_LIGHT + 2) * sizeof(ZEUInt);
+
+	if (TileLightStructuredBuffer == NULL || TileLightStructuredBuffer->GetSize() != Size)
+		TileLightStructuredBuffer = ZEGRStructuredBuffer::Create(TileCountX * TileCountY * (MAX_LIGHT + 2), sizeof(ZEUInt), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
 
 	return true;
 }
 
 bool ZERNStageForward::Update()
 {
-	if (!UpdateRenderTargets())
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderStates())
+		return false;
+
+	if (!UpdateInputOutputs())
 		return false;
 
 	return true;
@@ -76,37 +211,23 @@ ZEInt ZERNStageForward::GetId() const
 
 const ZEString& ZERNStageForward::GetName() const
 {
-	static ZEString Name = "Forward";
-
+	static const ZEString Name = "Stage Forward";
 	return Name;
-}
-
-const ZEGRRenderTarget*	ZERNStageForward::GetProvidedInput(ZERNStageBuffer Input) const
-{
-	if (GetEnabled() && Input == ZERN_SO_COLOR)
-		return ColorRenderTarget;
-	
-	return ZERNStage::GetProvidedInput(Input);
 }
 
 const ZEGRTexture2D* ZERNStageForward::GetOutput(ZERNStageBuffer Output) const
 {
 	if (GetEnabled())
 	{
-		switch (Output)
-		{
-			case ZERN_SO_COLOR:
-			case ZERN_SO_ACCUMULATION:
-				return ColorBuffer;
-
-			case ZERN_SO_DEPTH:
-				return DepthBuffer;
-		}
+		if ((Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION) && ColorBuffer != NULL)
+			return ColorBuffer;
+		
+		else if (Output == ZERN_SO_DEPTH && DepthStencilBuffer != NULL)
+			return DepthStencilBuffer;
 	}
 
 	return ZERNStage::GetOutput(Output);
 }
-
 
 bool ZERNStageForward::Setup(ZEGRContext* Context)
 {
@@ -116,7 +237,38 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (!Update())
 		return false;
 
-	Context->SetRenderTargets(1, ColorRenderTarget.GetPointerToPointer(), DepthStencilBuffer);
+	if (GetCommands().GetCount() == 0)
+		return false;
+
+	const ZEGRRenderTarget* RenderTarget = ColorTexture->GetRenderTarget();
+
+	if (ColorBuffer != NULL)
+		Context->ClearRenderTarget(RenderTarget, ZEVector4(0.0f, 0.0f, 0.0f, 0.0f));
+
+	const ZEGRDepthStencilBuffer* DepthBuffer = NULL;
+	if (DepthStencilBuffer != NULL)
+	{
+		DepthBuffer = DepthTexture->GetDepthStencilBuffer();
+		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
+	}
+	else
+	{
+		DepthBuffer = DepthTexture->GetDepthStencilBuffer(true);
+	}
+
+	Context->SetComputeRenderState(TiledForwardComputeRenderState);
+	Context->SetRWStructuredBuffers(0, 1, TileLightStructuredBuffer.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_COMPUTE, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+
+	ZEUInt TileCountX = (ColorTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
+	ZEUInt TileCountY = (ColorTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
+
+	Context->Dispatch(TileCountX, TileCountY, 1);
+
+	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 15, 1, TileLightStructuredBuffer.GetPointerToPointer());
+
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	Context->SetRenderTargets(1, &RenderTarget, DepthBuffer);
 	Context->SetViewports(1, &Viewport);
 
 	return true;
@@ -124,14 +276,15 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 
 void ZERNStageForward::CleanUp(ZEGRContext* Context)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 
 ZERNStageForward::ZERNStageForward()
 {
+	DirtyFlags.RaiseAll();
 
+	ColorTexture = NULL;
+	DepthTexture = NULL;
 }
 
 ZEGRRenderState ZERNStageForward::GetRenderState()
@@ -142,7 +295,7 @@ ZEGRRenderState ZERNStageForward::GetRenderState()
 	{
 		Initialized = true;
 
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R8G8B8A8_UNORM);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
 		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
 	}
 
@@ -156,36 +309,48 @@ ZEInt ZERNStageForwardTransparent::GetId() const
 
 const ZEString& ZERNStageForwardTransparent::GetName() const
 {
-	static ZEString Name = "ForwardTransparent";
+	static const ZEString Name = "Stage ForwardTransparent";
 	return Name;
-}
-
-ZERNStageForwardTransparent::ZERNStageForwardTransparent()
-{
 }
 
 ZEGRRenderState ZERNStageForwardTransparent::GetRenderState()
 {
-	return ZERNStageForward::GetRenderState();
-}
+	static ZEGRRenderState RenderState;
+	static bool Initialized = false;
+	if (!Initialized)
+	{
+		Initialized = true;
 
+		ZEGRDepthStencilState DepthStencilStateNoWrite;
+		DepthStencilStateNoWrite.SetDepthTestEnable(true);
+		DepthStencilStateNoWrite.SetDepthWriteEnable(false);
+
+		RenderState.SetDepthStencilState(DepthStencilStateNoWrite);
+
+		ZEGRBlendState BlendStateAlphaBlending;
+		BlendStateAlphaBlending.SetBlendEnable(true);
+		ZEGRBlendRenderTarget BlendRenderTargetAlphaBlending = BlendStateAlphaBlending.GetRenderTarget(0);
+		BlendRenderTargetAlphaBlending.SetBlendEnable(true);
+		BlendRenderTargetAlphaBlending.SetSource(ZEGRBlend::ZEGR_BO_SRC_ALPHA);
+		BlendRenderTargetAlphaBlending.SetDestination(ZEGRBlend::ZEGR_BO_INV_SRC_ALPHA);
+		BlendRenderTargetAlphaBlending.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+		BlendStateAlphaBlending.SetRenderTargetBlend(0, BlendRenderTargetAlphaBlending);
+
+		RenderState.SetBlendState(BlendStateAlphaBlending);
+
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
+	}
+
+	return RenderState;
+}
 
 ZEInt ZERNStageForwardPostHDR::GetId() const
 {
-	return ZERN_STAGE_FORWARD_POST;
+	return ZERN_STAGE_FORWARD_POST_HDR;
 }
 
 const ZEString& ZERNStageForwardPostHDR::GetName() const
 {
-	static ZEString Name = "ForwardPostHDR";
-	return Name;
-}
-
-ZERNStageForwardPostHDR::ZERNStageForwardPostHDR()
-{
-}
-
-ZEGRRenderState ZERNStageForwardPostHDR::GetRenderState()
-{
-	return ZERNStageForward::GetRenderState();
+	return "StageForwardPostHDR";
 }

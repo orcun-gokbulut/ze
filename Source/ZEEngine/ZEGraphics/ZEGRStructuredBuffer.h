@@ -38,10 +38,25 @@
 #include "ZEGRResource.h"
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
 #include "ZEGRDefinitions.h"
 
 class ZEGRStructuredBuffer : public ZEGRResource
 {
+	friend class ZEGRContext;
+	private:
+		struct BoundStage
+		{
+			bool								BoundAsShaderResource;
+			bool								BoundAsUnorderedAccess;
+			ZEInt								Slot;
+		};
+
+		ZEArray<BoundStage>						BoundStages;
+
+		void									SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource = true, bool BoundAsUnorderedAccess = false);
+		const ZEArray<BoundStage>&				GetBoundStages() const;
+
 	protected:
 		virtual bool							Initialize(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags);
 		virtual void							Deinitialize();

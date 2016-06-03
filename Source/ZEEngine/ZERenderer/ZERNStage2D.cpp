@@ -79,7 +79,6 @@ bool ZERNStage2D::Setup(ZEGRContext* Context)
 	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetVertexBuffers(0, 0, NULL);
 	Context->SetViewports(1, &Viewport);
 
 	return true;
@@ -87,9 +86,6 @@ bool ZERNStage2D::Setup(ZEGRContext* Context)
 
 void ZERNStage2D::CleanUp(ZEGRContext* Context)
 {
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 
@@ -103,7 +99,7 @@ ZEGRRenderState ZERNStage2D::GetRenderState()
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
 
-	if(!Initialized)
+	if (!Initialized)
 	{
 		Initialized = true;
 
@@ -125,8 +121,6 @@ ZEGRRenderState ZERNStage2D::GetRenderState()
 		DepthStencilState.SetDepthTestEnable(false);
 		DepthStencilState.SetDepthWriteEnable(false);
 		RenderState.SetDepthStencilState(DepthStencilState);
-
-		RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	}
 
 	return RenderState;

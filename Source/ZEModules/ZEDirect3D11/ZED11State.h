@@ -141,5 +141,6 @@ ZED11State<_ZEGRState, _IInterface>::~ZED11State()
 		break;
 	}
 
+	Owner = NULL;
 	ZEGR_RELEASE(Interface);
 }

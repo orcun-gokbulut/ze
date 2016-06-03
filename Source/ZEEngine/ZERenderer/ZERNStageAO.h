@@ -66,8 +66,8 @@ class ZERNStageAO : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>		InputDepth;
-		ZEHolder<const ZEGRTexture2D>		InputNormal;
+		const ZEGRTexture2D*				InputDepth;
+		const ZEGRTexture2D*				InputNormal;
 
 		ZEHolder<ZEGRTexture2D>				OcclusionMap;
 		ZEHolder<ZEGRTexture2D>				BlurTexture;

@@ -54,7 +54,7 @@ class ZERNStageInputTexture : public ZERNStage
 		void								SetBuffer(ZERNStageBuffer Output);
 		ZERNStageBuffer						GetBuffer() const;
 
-		void								SetTexture(const ZEGRTexture2D* Texture);
+		void								SetTextures(const ZEGRTexture2D* Texture);
 		const ZEGRTexture2D*				GetTexture() const;
 
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;

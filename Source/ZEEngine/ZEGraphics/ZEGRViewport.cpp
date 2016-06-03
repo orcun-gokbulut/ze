@@ -35,8 +35,6 @@
 
 #include "ZEGRViewPort.h"
 
-#include <memory>
-
 void ZEGRViewport::SetPosition(const ZEVector2& Position)
 {
 	StateData.Position = Position;
@@ -117,10 +115,10 @@ float ZEGRViewport::GetMaxDepth() const
 	return StateData.MaxDepth;
 }
 
-ZEGRViewport::ZEGRViewport(const ZEVector2& Position, const ZEVector2& Size, float MinDepth /*= 0.0f*/, float MaxDepth /*= 1.0f*/)
+ZEGRViewport::ZEGRViewport(const ZEVector2& Position, const ZEVector2& Size, float MinDepth, float MaxDepth)
 {
 	StateData.Position = Position;
-	StateData.Size =Size;
+	StateData.Size = Size;
 	StateData.MinDepth = MinDepth;
 	StateData.MaxDepth = MaxDepth;
 }

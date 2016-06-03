@@ -48,15 +48,16 @@ class ZED11ComponentBase
 	friend class ZED11Module;
 	private:
 		static ZED11Module*				Module;
-		static ID3D11Device1*			Device;
-		static ID3D11DeviceContext1*	Context;
+		static ID3D11Device*			Device;
+		static ID3D11DeviceContext*		Context;
 
 	public:
 		static ZED11Module*				GetModule();
-		ID3D11Device1*					GetDevice() const;
-		ID3D11DeviceContext1*			GetMainContext() const;
+		ID3D11Device*					GetDevice() const;
+		ID3D11DeviceContext*			GetMainContext() const;
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 		static D3D11_USAGE				ConvertUsage(ZEGRResourceUsage Usage);
 		static UINT						ConvertBindFlags(ZEFlags BindFlags);
+		static UINT						ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage);
 };

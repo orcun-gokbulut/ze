@@ -37,8 +37,6 @@
 #ifndef __ZE_INTERIOR_DOOR_H__
 #define __ZE_INTERIOR_DOOR_H__
 
-#include "ZEMeta/ZEObject.h"
-
 #include "ZEMath/ZERectangle3D.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZECanvas.h"
@@ -46,11 +44,8 @@
 ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
 ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
 
-struct ZEInteriorResourceDoor;
-class ZECanvas;
-class ZERNSimpleMaterial;
-class ZERNRenderer;
 class ZERNCommand;
+struct ZEInteriorResourceDoor;
 
 class ZEInteriorDoor : public ZEObject
 {
@@ -73,22 +68,13 @@ class ZEInteriorDoor : public ZEObject
 		bool							Open;
 		bool							SeenThrough;
 
-		struct
-		{
-			ZERNSimpleMaterial*			Material;
-			ZECanvas					BoxCanvas;
-			ZERNCommand					BoxRenderCommand;
-
-		} DebugDrawComponents;
-
-
-		void							DebugDraw(ZERNRenderer* Renderer);
 		void							CalculateRectangle();
 
 										ZEInteriorDoor();
 
 	public:
 		ZEInterior*						GetOwner();
+
 		const char*						GetName();
 
 		ZEInteriorRoom**				GetRooms();
@@ -106,12 +92,12 @@ class ZEInteriorDoor : public ZEObject
 		void							SetSeenThrough(bool Value);
 		bool							GetSeenThrough();
 
+		void							SetOpened(bool Open);
+		bool							GetOpened();
+
 		void							Initialize(ZEInterior* Owner, const ZEInteriorResourceDoor* Resource);
 		void							Deinitialize();
-
-		void							SetOpen(bool Open);
-		bool							GetOpen();
-
+		
 		static ZEInteriorDoor*			CreateInstance();
 };
 

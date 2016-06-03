@@ -49,7 +49,7 @@ ZERNMaterial::~ZERNMaterial()
 
 }
 
-bool ZERNMaterial::PreRender(ZERNCommand& Command)
+bool ZERNMaterial::PreRender(ZERNCommand& Command) const
 {
 	Command.StageMask = GetStageMask();
 	return true;
@@ -57,7 +57,7 @@ bool ZERNMaterial::PreRender(ZERNCommand& Command)
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
-	if(Stage == NULL || !Stage->GetEnabled())
+	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
 		return false;
 
 	return true;

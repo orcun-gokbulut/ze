@@ -42,7 +42,7 @@
 #include "ZERNTransformations.hlsl"
 #include "ZERNIntersections.hlsl"
 
-cbuffer ZERNFastLightScattering_Constants						: register(b8)
+cbuffer ZERNFastLightScattering_Constants						: register(b9)
 {
 	float3			ZERNFastLightScattering_SunDirection;
 	float			ZERNFastLightScattering_Reserved0;

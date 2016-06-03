@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_TEXTURE_DATA_H__
-#define __ZE_TEXTURE_DATA_H__
 
 #include "ZETypes.h"
 #include "ZEEndian.h"
@@ -53,7 +51,7 @@ struct ZETextureDataInfo
 	ZEUInt							LevelCount;
 	ZEUInt							Width;
 	ZEUInt							Height;
-	ZEGRFormat			PixelFormat;
+	ZEGRFormat						PixelFormat;
 	ZEGRTextureType					Type;
 };
 
@@ -130,7 +128,7 @@ class ZETextureData
 		ZEUInt							GetLevelCount();
 		ZEUInt							GetSurfaceCount();
 		ZEGRTextureType					GetType();
-		ZEGRFormat					GetPixelFormat();
+		ZEGRFormat						GetPixelFormat();
 
 		ZESize							GetSize();
 		ZESize							GetSizeOnDisk();
@@ -145,6 +143,3 @@ class ZETextureData
 										ZETextureData();
 										~ZETextureData();
 };
-
-
-#endif

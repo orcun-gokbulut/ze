@@ -80,7 +80,7 @@ class ZESoundModule : public ZEModule
 {
 	ZE_MODULE(ZESoundModule)
 
-	protected:
+	public:
 		static ZEOptionSection					SoundOptions;
 
 	public:

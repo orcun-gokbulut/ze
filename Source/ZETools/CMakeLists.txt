@@ -49,6 +49,7 @@ ze_add_module(ZESceneConverter)
 ze_add_module(ZEMLEditor)
 ze_add_module(ZETerrainExporter)
 ze_add_module(ZELCLicenseTool)
+ze_add_module(ZEITIntegrityTool)
 ze_add_module(ZEDSHShaderEditor)
 
 ze_add_cmake_project(ZETools)

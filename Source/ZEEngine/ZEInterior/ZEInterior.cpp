@@ -34,24 +34,22 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInterior.h"
-
-#include "ZEError.h"
-#include "ZEMath/ZETriangle.h"
-#include "ZEMath/ZERay.h"
-#include "ZEMath/ZEViewFrustum.h"
-#include "ZEMath/ZEAngle.h"
-
 #include "ZEInteriorResource.h"
 #include "ZEInteriorRoom.h"
 #include "ZEInteriorDoor.h"
 #include "ZEInteriorHelper.h"
+#include "ZEError.h"
 #include "ZECore/ZEConsole.h"
-#include "ZEGame/ZEEntityProvider.h"
+#include "ZEMath/ZETriangle.h"
+#include "ZEMath/ZERay.h"
+#include "ZEMath/ZEViewFrustum.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZERenderer/ZERNView.h"
-#include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZEGame/ZEEntityProvider.h"
+#include "ZERenderer\ZERNView.h"
+#include "ZEGraphics\ZEGRContext.h"
+#include "ZEGraphics\ZEGRConstantBuffer.h"
+#include "ZERenderer\ZERNRenderParameters.h"
 
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
@@ -360,7 +358,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 
 void ZEInterior::CullRoom(ZEInteriorDoor* Door, const ZERNPreRenderParameters* Parameters, ZEViewVolume* ViewVolume)
 {
-	if(!Door->GetOpen())
+	if(!Door->GetOpened())
 		return;
 	
 	if (ViewVolume->CullTest(Door->GetRectangle()))
@@ -479,12 +477,6 @@ bool ZEInterior::PreRender(const ZERNPreRenderParameters* Parameters)
 	CullRooms(Parameters);
 
 	return true;
-}
-
-void ZEInterior::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
-{
-	ZEExtraRenderParameters* ExtraParameters = (ZEExtraRenderParameters*)Command->ExtraParameters;
-	ExtraParameters->Room->Render(Parameters, Command);
 }
 
 void ZEInterior::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

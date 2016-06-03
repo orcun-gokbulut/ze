@@ -58,6 +58,7 @@ add_subdirectory(ZECompression)
 add_subdirectory(ZEProtect)
 add_subdirectory(ZEMeta)
 add_subdirectory(ZEPointer)
+add_subdirectory(ZEITIntegrity)
 
 ze_add_source(ZEAutoExp.txt				Sources Headers)
 ze_add_source(ZEData.h 					Sources Headers)

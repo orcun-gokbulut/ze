@@ -37,8 +37,6 @@
 
 #include "ZECanvas.h"
 #include "ZERNRenderer.h"
-#include "ZERNStageManager.h"
-#include "ZERNStage.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNStageForward.h"
 #include "ZEGraphics/ZEGRShader.h"
@@ -53,9 +51,9 @@
 #define ZERN_SMDF_CONSTANT_BUFFER	2
 #define ZERN_SMDF_SHADERS			4
 
-bool ZERNSimpleMaterial::UpdateShaders()
+bool ZERNSimpleMaterial::UpdateShaders() const
 {
-	if (!DirtyFlags.GetFlags(ZERN_SMDF_RENDER_STATE))
+	if (!DirtyFlags.GetFlags(ZERN_SMDF_SHADERS))
 		return true;
 
 	ZEGRShaderCompileOptions Options;
@@ -65,23 +63,32 @@ bool ZERNSimpleMaterial::UpdateShaders()
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNSimpleMaterial_VSMain_ForwardStage";
 	VertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(VertexShader == NULL, false, "Cannot compile vertex shader");
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSimpleMaterial_PSMain_ForwardStage";
 	PixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(PixelShader == NULL, false, "Cannot compile pixel shader");
 
-	DirtyFlags.UnraiseFlags(ZERN_SMDF_RENDER_STATE);
+	DirtyFlags.UnraiseFlags(ZERN_SMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
 
 	return true;
 }
 
-bool ZERNSimpleMaterial::UpdateRenderState()
+bool ZERNSimpleMaterial::UpdateRenderState() const
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_RENDER_STATE))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStageForward::GetRenderState();
+	ZEGRRenderState RenderState;
+	
+	if (StageMask & ZERN_STAGE_FORWARD)
+		RenderState = ZERNStageForward::GetRenderState();
+
+	else if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+		RenderState = ZERNStageForwardTransparent::GetRenderState();
+
 	RenderState.SetPrimitiveType(PrimitiveType);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
@@ -89,7 +96,6 @@ bool ZERNSimpleMaterial::UpdateRenderState()
 	{
 		ZEGRDepthStencilState DepthStencilState = RenderState.GetDepthStencilState();
 		DepthStencilState.SetDepthTestEnable(false);
-		DepthStencilState.SetStencilTestEnable(false);
 		RenderState.SetDepthStencilState(DepthStencilState);
 	}
 
@@ -102,20 +108,18 @@ bool ZERNSimpleMaterial::UpdateRenderState()
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 
 	RenderStateData = RenderState.Compile();
+	zeCheckError(RenderStateData == NULL, false, "Cannot set render state");
 
 	DirtyFlags.UnraiseFlags(ZERN_SMDF_RENDER_STATE);
 
 	return true;
 }
 
-bool ZERNSimpleMaterial::UpdateConstantBuffer()
+bool ZERNSimpleMaterial::UpdateConstantBuffer() const
 {
 	if (!DirtyFlags.GetFlags(ZERN_SMDF_CONSTANT_BUFFER))
 		return true;
-	
-	if (ConstantBuffer == NULL)
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-
+		
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
@@ -125,33 +129,52 @@ bool ZERNSimpleMaterial::UpdateConstantBuffer()
 
 bool ZERNSimpleMaterial::InitializeSelf()
 {
+	if (!ZERNMaterial::InitializeSelf())
+		return false;
+
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return Update();
+	StageMask |= Transparent ? ZERN_STAGE_FORWARD_TRANSPARENT : ZERN_STAGE_FORWARD;
+
+	if (!UpdateShaders())
+		return false;
+
+	if (!UpdateRenderState())
+		return false;
+
+	if (!UpdateConstantBuffer())
+		return false;
+
+	return true;
 }
 
 void ZERNSimpleMaterial::DeinitializeSelf()
 {
+	DirtyFlags.RaiseAll();
+	StageMask = 0;
+
 	VertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
 	ConstantBuffer.Release();
 
-	DirtyFlags.RaiseAll();
+	return ZERNMaterial::DeinitializeSelf();
 }
 
 ZERNSimpleMaterial::ZERNSimpleMaterial()
 {
-	Wireframe = false;
-	TwoSided = false;
-	StageMask = ZERN_STAGE_FORWARD;
-	DepthTestDisabled = false;
-	Constants.VertexColorEnabled = true;
-	Constants.TextureEnabled = false;
-	Constants.MaterialColor = ZEVector4::One;
-	PrimitiveType = ZEGR_PT_TRIANGLE_LIST;
-
 	DirtyFlags.RaiseAll();
+	StageMask = 0;
+	
+	TwoSided = false;
+	Wireframe = false;
+	DepthTestDisabled = false;
+	PrimitiveType = ZEGR_PT_LINE_LIST;
+	StageMask = ZERN_STAGE_FORWARD;
+
+	Constants.MaterialColor = ZEVector4::One;
+	Constants.TextureEnabled = false;
+	Constants.VertexColorEnabled = true;
 }
 
 void ZERNSimpleMaterial::SetStageMask(ZERNStageMask Mask)
@@ -201,7 +224,7 @@ void ZERNSimpleMaterial::SetPrimitiveType(ZEGRPrimitiveType Type)
 	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
 }
 
-ZEGRPrimitiveType ZERNSimpleMaterial::SetPrimitiveType() const
+ZEGRPrimitiveType ZERNSimpleMaterial::GetPrimitiveType() const
 {
 	return PrimitiveType;
 }
@@ -220,18 +243,46 @@ bool ZERNSimpleMaterial::GetDepthTestDisabled() const
 	return DepthTestDisabled;
 }
 
-void ZERNSimpleMaterial::SetVertexColorEnabled(bool Enable)
+void ZERNSimpleMaterial::SetTransparent(bool Transparent)
 {
-	if (Constants.VertexColorEnabled == Enable)
+	if (this->Transparent == Transparent)
 		return;
 
-	Constants.VertexColorEnabled = Enable;
+	this->Transparent = Transparent;
+	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
+}
+
+bool ZERNSimpleMaterial::GetTransparent() const
+{
+	return Transparent;
+}
+
+void ZERNSimpleMaterial::SetOpacity(float Opacity)
+{
+	if (Constants.Opacity == Opacity)
+		return;
+
+	Constants.Opacity = Opacity;
+	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
+}
+
+float ZERNSimpleMaterial::GetOpacity() const
+{
+	return Constants.Opacity;
+}
+
+void ZERNSimpleMaterial::SetVertexColorEnabled(bool Enabled)
+{
+	if ((bool)Constants.VertexColorEnabled == Enabled)
+		return;
+
+	Constants.VertexColorEnabled = Enabled;
 	DirtyFlags.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
 }
 
 bool ZERNSimpleMaterial::GetVertexColorEnabled() const
 {
-	return Constants.VertexColorEnabled;
+	return (bool)Constants.VertexColorEnabled;
 }
 
 void ZERNSimpleMaterial::SetMaterialColor(const ZEVector4& Color)
@@ -248,12 +299,12 @@ const ZEVector4& ZERNSimpleMaterial::GetMaterialColor() const
 	return Constants.MaterialColor;
 }
 
-void ZERNSimpleMaterial::SetTexture(const ZERNMap& Sampler)
+void ZERNSimpleMaterial::SetTexture(const ZERNMap& Map)
 {
-	TextureMap = Sampler;
+	TextureMap = Map;
 	
-	bool TextureEnabled = (Sampler.GetTexture() != NULL);
-	if (Constants.TextureEnabled == TextureEnabled)
+	bool TextureEnabled = (Map.GetTexture() != NULL);
+	if ((bool)Constants.TextureEnabled == TextureEnabled)
 		return;
 	
 	Constants.TextureEnabled = TextureEnabled;
@@ -265,7 +316,7 @@ const ZERNMap& ZERNSimpleMaterial::GetTexture() const
 	return TextureMap;
 }
 
-bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
+bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -273,29 +324,33 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* St
 	if (!Update())
 		return false;
 
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
+
 	Context->SetRenderState(RenderStateData);
 
 	if (Constants.TextureEnabled)
 	{
-		Context->SetTexture(ZEGR_ST_PIXEL, 0, TextureMap.GetTexture());
-		Context->SetSampler(ZEGR_ST_PIXEL, 0, TextureMap.GetSampler().GetPointer());
-	}
+		const ZEGRSampler* Sampler = TextureMap.GetSampler();
+		Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, &Sampler);
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
+		const ZEGRTexture* Texture = TextureMap.GetTexture();
+		Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, &Texture);
+	}
 
 	return true;
 }
 
-void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
+void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, NULL);
+	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
-bool ZERNSimpleMaterial::Update()
+bool ZERNSimpleMaterial::Update() const
 {
+	if (!IsInitialized())
+		return false;
+
 	if (!UpdateShaders())
 		return false;
 

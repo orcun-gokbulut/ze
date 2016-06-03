@@ -39,9 +39,8 @@
 
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEPointer/ZESharedPointer.h"
-#include "ZERNFilter.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZERNFilter.h"
 
 class ZEGRShader;
 class ZEGRSampler;
@@ -49,7 +48,6 @@ class ZEGRTexture2D;
 class ZEGRConstantBuffer;
 class ZEGRContext;
 class ZEGRRenderStateData;
-class ZEGRRenderState;
 class ZERNRenderer;
 class ZEGRRenderTarget;
 
@@ -76,8 +74,6 @@ class ZERNStageHDR : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 
-		ZEHolder<const ZEGRTexture2D>		InputTexture;
-		ZEHolder<const ZEGRRenderTarget>	OutputRenderTarget;
 		ZEHolder<const ZEGRTexture2D>		OutputTexture;
 
 		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexcoord;
@@ -105,9 +101,6 @@ class ZERNStageHDR : public ZERNStage
 		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceMips;
 		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
 		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
-		
-		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
-		ZEHolder<ZEGRSampler>				SamplerLinearBorder;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
@@ -131,6 +124,9 @@ class ZERNStageHDR : public ZERNStage
 			float							Reserved1;
 			float							Reserved2;
 		} Constants;
+
+		const ZEGRTexture2D*				InputTexture;
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		bool								UpdateInputOutput();
 		bool								UpdateTextures();

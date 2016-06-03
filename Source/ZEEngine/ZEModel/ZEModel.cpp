@@ -88,7 +88,6 @@ void ZEModel::CalculateBoundingBox() const
 	}
 
 	const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox);
-	DirtyBoundingBox = false;
 }
 
 ZEDrawFlags ZEModel::GetDrawFlags() const
@@ -104,8 +103,8 @@ void ZEModel::LoadModelResource()
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
 		Bones[I].Deinitialize();
-	Bones.SetCount(0);
 
+	Bones.SetCount(0);
 	Skeleton.SetCount(0);
 
 	for (ZESize I = 0; I < Helpers.GetCount(); I++)
@@ -122,7 +121,6 @@ void ZEModel::LoadModelResource()
 	}
 
 	Meshes.SetCount(ModelResource->GetMeshes().GetCount());
-
 	for (ZESize I = 0; I < ModelResource->GetMeshes().GetCount(); I++)
 	{
 		if (ModelResource->GetMeshes()[I].ParentMesh != -1)
@@ -132,7 +130,6 @@ void ZEModel::LoadModelResource()
 	}
 
 	Bones.SetCount(ModelResource->GetBones().GetCount());
-
 	for (ZESize I = 0; I < ModelResource->GetBones().GetCount(); I++)
 	{
 		if (ModelResource->GetBones()[I].ParentBone != -1)
@@ -203,13 +200,10 @@ void ZEModel::UpdateConstantBufferBoneTransforms()
 	if (!DirtyConstantBufferSkin)
 		return;
 
-	ZESize BoneCount = Bones.GetCount();
-	if (ConstantBufferBoneTransforms.IsNull() || ConstantBufferBoneTransforms->GetSize() != BoneCount * sizeof(ZEMatrix4x4))
-		ConstantBufferBoneTransforms = ZEGRConstantBuffer::Create(BoneCount * sizeof(ZEMatrix4x4));
-
 	void* Buffer;
 	ConstantBufferBoneTransforms->Lock(&Buffer);
-	
+
+		ZESize BoneCount = Bones.GetCount();
 		for (ZESize I = 0; I < BoneCount; I++)
 			static_cast<ZEMatrix4x4*>(Buffer)[I] = Bones[I].GetVertexTransform();
 
@@ -444,9 +438,6 @@ const ZEAABBox& ZEModel::GetBoundingBox() const
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (BoundingBoxIsUserDefined)
-		return ZEEntity::GetWorldBoundingBox();
-
 	if (DirtyBoundingBox && !BoundingBoxIsUserDefined)
 	{
 		CalculateBoundingBox();
@@ -509,7 +500,7 @@ void ZEModel::Render(const ZERNRenderParameters* RenderParameters, const ZERNCom
 
 void ZEModel::Tick(float ElapsedTime)
 {
-	for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+	for (ZESize I = 0; I < AnimationTracks.GetCount(); I++)
 	{
 		AnimationTracks[I].Tick(ElapsedTime);
 
@@ -517,7 +508,7 @@ void ZEModel::Tick(float ElapsedTime)
 			AnimationTracks[I].UpdateAnimation();
 	}
 
-	for(ZESize I = 0; I < IKChains.GetCount(); I++)
+	for (ZESize I = 0; I < IKChains.GetCount(); I++)
 		IKChains[I].Process();
 }
 
@@ -572,12 +563,12 @@ ZEModel::ZEModel()
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
 	BoundingBoxIsUserDefined = false;
 	DirtyBoundingBox = true;
+	DirtyConstantBufferSkin = true;
 }
 
 ZEModel::~ZEModel()
 {
-	if (ModelResource != NULL)
-		((ZEModelResource*)ModelResource)->Release();
+	Deinitialize();
 }
 
 bool ZEModel::InitializeSelf()
@@ -587,11 +578,26 @@ bool ZEModel::InitializeSelf()
 
 	LoadModelResource();
 
+	ConstantBufferBoneTransforms = ZEGRConstantBuffer::Create(150 * sizeof(ZEMatrix4x4));
+
 	return true;
 }
 
 bool ZEModel::DeinitializeSelf()
 {
+	if (ModelResource != NULL)
+		const_cast<ZEModelResource*>(ModelResource)->Release();
+
+	Skeleton.Clear();
+	LODRenderCommands.Clear();
+	Meshes.Clear();
+	Bones.Clear();
+	Helpers.Clear();
+
+	ConstantBufferBoneTransforms.Release();
+
+	AnimationTracks.Clear();
+
 	return ZEEntity::DeinitializeSelf();
 }
 

@@ -46,12 +46,22 @@ class ZERNStageParticleRendering : public ZERNStage
 	private:
 		ZEGRViewport					Viewport;
 
+		const ZEGRTexture2D*			AccumulationTexture;
+		const ZEGRTexture2D*			DepthTexture;
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
+		bool							UpdateInputOutputs();
+
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
 
 		virtual bool					Setup(ZEGRContext* Context);
 		virtual void					CleanUp(ZEGRContext* Context);
+
+		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
 
 										ZERNStageParticleRendering();
 

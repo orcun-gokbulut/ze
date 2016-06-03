@@ -48,28 +48,29 @@ class ZERNStageGBuffer : public ZERNStage
 {
 	ZE_OBJECT
 	private:
-		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
 		ZEHolder<ZEGRTexture2D>				GBuffer0;
 		ZEHolder<ZEGRTexture2D>				GBuffer1;
 		ZEHolder<ZEGRTexture2D>				GBuffer2;
 		ZEHolder<ZEGRTexture2D>				GBuffer3;
+		ZEHolder<ZEGRTexture2D>				DepthStencilBuffer;
 		const ZEGRRenderTarget*				RenderTargets[4];
 		ZEGRViewport						Viewport;
 
 		bool								UpdateRenderTargets();
 		bool								Update();
 
+		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		ZEGRTexture2D*						GetDiffuseColorMap() const;
-		ZEGRTexture2D*						GetSpecularColorMap() const;
-		ZEGRTexture2D*						GetNormalMap() const;
 		ZEGRTexture2D*						GetAccumulationMap() const;
-		ZEGRTexture2D*						GetDepthMap() const;
+		ZEGRTexture2D*						GetEmissiveGlossMap() const;
+		ZEGRTexture2D*						GetDiffuseSubSurfaceMap() const;
+		ZEGRTexture2D*						GetNormalSpecularMap() const;
+		ZEGRTexture2D*						GetDepthStencilMap() const;
 
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 

@@ -57,9 +57,9 @@ ZE_ENUM(ZERNStageDisplayScaleMode)
 ZE_ENUM(ZERNStageDisplayFlipMode)
 {
 	ZERN_SDMF_NONE,
-		ZERN_SDMF_VERTICAL,
-		ZERN_SDMF_HORIZONTAL,
-		ZERN_SDMF_BOTH,
+	ZERN_SDMF_VERTICAL,
+	ZERN_SDMF_HORIZONTAL,
+	ZERN_SDMF_BOTH
 };
 
 class ZEGRTexture2D;
@@ -81,7 +81,6 @@ class ZERNStageDisplay : public ZERNStage
 		ZEVector2								InputOffset;
 		ZEVector2								InputSize;
 												
-		ZEHolder<const ZEGRRenderTarget>		OutputRenderTarget;
 		ZEVector2								OutputOffset;
 		ZEVector2								OutputSize;
 		
@@ -104,10 +103,12 @@ class ZERNStageDisplay : public ZERNStage
 												
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
-		ZEHolder<const ZEGRTexture2D>			InputTexture;
-												
+		
 		ZELink<ZERNStageDisplay>				StageLink;
-												
+
+		const ZEGRTexture2D*					InputTexture;
+		const ZEGRRenderTarget*					OutputRenderTarget;	
+
 		virtual void							DeinitializeSelf();
 												
 		bool									UpdateInputOutput();

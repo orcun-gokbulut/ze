@@ -58,7 +58,8 @@ enum ZEGRVertexElementType
 	ZEGR_VET_FLOAT				= 9,
 	ZEGR_VET_FLOAT2				= 10,
 	ZEGR_VET_FLOAT3				= 11,
-	ZEGR_VET_FLOAT4				= 12
+	ZEGR_VET_FLOAT4				= 12,
+	ZEGR_VET_UINT8_4			= 13
 };
 
 enum ZEGRVertexUsage
@@ -117,5 +118,4 @@ class ZEGRVertexLayout : public ZEGRState
 		static ZEGRVertexLayout*	Generate(ZEGRShaderMeta* Shader);
 
 									ZEGRVertexLayout();
-									~ZEGRVertexLayout();
 };

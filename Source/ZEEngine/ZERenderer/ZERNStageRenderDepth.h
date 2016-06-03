@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNContactWidget.h
+ Zinek Engine - ZERNStageRenderDepth.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,18 +35,31 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include "ZERNStage.h"
 
-class Ui_ZELNContactWidget;
+class ZEGRTexture2D;
 
-class ZELNContactWidget: public QWidget
+class ZERNStageRenderDepth : public ZERNStage
 {
-	Q_OBJECT
-	friend class ZELNContactModule;
+	ZE_OBJECT
 	private:
-		Ui_ZELNContactWidget*		Form;
+		const ZEGRTexture2D*			DepthTexture;
+
+		virtual bool					InitializeSelf();						
+		virtual void					DeinitializeSelf();
+
+		bool							UpdateInputOutputs();
 
 	public:
-									ZELNContactWidget();
-									~ZELNContactWidget();
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
+
+		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
+
+		virtual bool					Setup(ZEGRContext* Context);
+		virtual void					CleanUp(ZEGRContext* Context);
+
+										ZERNStageRenderDepth();
+
+		static ZEGRRenderState			GetRenderState();
 };

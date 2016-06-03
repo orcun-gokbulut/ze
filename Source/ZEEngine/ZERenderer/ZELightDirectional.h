@@ -50,21 +50,21 @@ class ZELightDirectional : public ZELight
 	private:
 		struct ZECascade
 		{
+			ZEMatrix4x4						ViewTransform;
 			ZEMatrix4x4						ProjectionTransform;
+			ZEViewCuboid					ViewVolume;
 			ZEVector4						Borders;
-			ZEVector4						Band;
+			ZEUInt							SampleCount;
+			float							SampleLength;
+			float							DepthBias;
+			float							NormalBias;
+
+											ZECascade();
 		};
 
-		struct ZECascadeConstants
-		{
-			ZECascade						Cascades[4];
-			ZEUInt							CascadeCount;
-			ZEVector3						Reserved;
-		}CascadeConstants;
-
-		ZEHolder<ZEGRConstantBuffer>		CascadeConstantBuffer;
 		ZEHolder<ZEGRTexture2D>				CascadeShadowMaps;
-		ZEArray<ZEViewCuboid>				CascadeVolumes;
+
+		ZEArray<ZECascade>					Cascades;
 
 		float								CascadeDistanceFactor;
 		bool								UseSunLight;
@@ -86,11 +86,19 @@ class ZELightDirectional : public ZELight
 		virtual ZELightType					GetLightType() const;
 		virtual ZESize						GetViewCount() const;
 
+		const ZEArray<ZECascade>&			GetCascades() const;
+
 		void								SetCascadeCount(ZEUInt CascadeCount);
 		ZEUInt								GetCascadeCount() const;
 
 		void								SetCascadeDistanceFactor(float CascadeDistanceFactor);
 		float								GetCascadeDistanceFactor() const;
+
+		void								SetCascadeDepthBias(ZEUInt CascadeIndex, float CascadeDepthBias);
+		float								GetCascadeDepthBias(ZEUInt CascadeIndex) const;
+
+		void								SetCascadeNormalBias(ZEUInt CascadeIndex, float CascadeNormalBias);
+		float								GetCascadeNormalBias(ZEUInt CascadeIndex) const;
 
 		void								SetUseSunLight(bool UseSunLight);
 		bool								GetUseSunLight() const;
@@ -100,8 +108,6 @@ class ZELightDirectional : public ZELight
 
 		void								SetTerrestrialColor(const ZEVector3& TerrestrialColor);
 		const ZEVector3&					GetTerrestrialColor() const;
-
-		void								BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context);
 
 		virtual ZEGRTexture*				GetShadowMap(ZESize Index = 0) const;
 		virtual const ZEViewVolume&			GetViewVolume(ZESize Index = 0) const;
