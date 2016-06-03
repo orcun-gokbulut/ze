@@ -48,6 +48,11 @@ float ZERandom::GetFloatPositive()
 	return (float)rand() / (float)RAND_MAX;
 }
 
+float ZERandom::GetFloatRange(float Min, float Max)
+{
+	return Min + GetFloatPositive() * (Max - Min);
+}
+
 ZEInt ZERandom::GetInt()
 {
 	return rand() - rand();

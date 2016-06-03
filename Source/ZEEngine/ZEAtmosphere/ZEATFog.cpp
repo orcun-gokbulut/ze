@@ -35,11 +35,13 @@
 
 #include "ZEATFog.h"
 
+#include "ZEMath/ZEMath.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNStagePostProcess.h"
@@ -56,6 +58,7 @@ bool ZEATFog::UpdateShaders()
 	ZEGRShaderCompileOptions Options;
 	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNFog.hlsl";
 	Options.Model = ZEGR_SM_5_0;
+	Options.Definitions.Add(ZEGRShaderDefinition("SAMPLE_COUNT", ZEString(ZEGRGraphicsModule::SAMPLE_COUNT)));
 
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_Position";
@@ -108,6 +111,7 @@ bool ZEATFog::UpdateConstantBuffers()
 	if (!DirtyFlags.GetFlags(ZEAT_FDF_CONSTANT_BUFFERS))
 		return true;
 
+	Constants.Density = ZEMath::Power(Density, 8.0f);
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZEAT_FDF_CONSTANT_BUFFERS);
@@ -136,7 +140,7 @@ bool ZEATFog::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 bool ZEATFog::DeinitializeSelf()
@@ -174,17 +178,17 @@ ZEDrawFlags ZEATFog::GetDrawFlags() const
 
 void ZEATFog::SetDensity(float Density)
 {
-	if (Constants.Density == Density)
+	if (this->Density == Density)
 		return;
 
-	Constants.Density = Density;
+	this->Density = Density;
 
 	DirtyFlags.RaiseFlags(ZEAT_FDF_CONSTANT_BUFFERS);
 }
 
 float ZEATFog::GetDensity() const
 {
-	return Constants.Density;
+	return Density;
 }
 
 void ZEATFog::SetStartDistance(float StartDistance)
@@ -236,18 +240,14 @@ void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	const ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
+	//const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);
 
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, Stage->GetOutput(ZERN_SO_DEPTH));
-	Context->SetVertexBuffers(0, 0, NULL);
+	//Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthMap);
 	
 	Context->Draw(3, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 }
 
 ZEATFog* ZEATFog::CreateInstance()

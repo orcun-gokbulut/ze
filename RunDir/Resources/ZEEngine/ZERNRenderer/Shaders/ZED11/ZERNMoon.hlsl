@@ -36,7 +36,9 @@
 #ifndef __ZERN_MOON_H__
 #define __ZERN_MOON_H__
 
-cbuffer ZERNMoon_Constants						: register(b8)
+#include "ZERNSamplers.hlsl"
+
+cbuffer ZERNMoon_Constants						: register(b9)
 {
 	float2		ZERNMoon_PositionScreen;
 	float2		ZERNMoon_SizeScreen;
@@ -59,7 +61,6 @@ struct ZERNMoon_PixelShader_Input
 	float2		Texcoord						: TEXCOORD1;
 };
 
-SamplerState	ZERNMoon_SamplerLinearClamp		: register(s0);
 Texture3D		ZERNMoon_MoonTexture			: register(t5);
 
 ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_VertexID)
@@ -77,8 +78,8 @@ ZERNMoon_VertexShader_Output ZERNMoon_VertexShader_Main(uint VertexID : SV_Verte
 }
 
 float3 ZERNMoon_PixelShader_Main(ZERNMoon_PixelShader_Input Input) : SV_Target0
-{	
-	float4 PixelColor = ZERNMoon_MoonTexture.SampleLevel(ZERNMoon_SamplerLinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
+{
+	float4 PixelColor = ZERNMoon_MoonTexture.SampleLevel(ZERNSampler_LinearClamp, float3(Input.Texcoord, ZERNMoon_Phase), 0.0f);
 	
 	clip(PixelColor.a - 0.1f);
 	

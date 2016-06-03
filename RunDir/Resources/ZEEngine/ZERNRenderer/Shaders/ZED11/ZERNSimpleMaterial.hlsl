@@ -46,8 +46,8 @@ cbuffer ZERNSimpleMaterial_Constants						: register(ZERN_SHADER_CONSTANT_MATERI
 	float4			ZERNSimpleMaterial_Color;
 	bool			ZERNSimpleMaterial_EnableTexture;
 	bool			ZERNSimpleMaterial_EnableVertexColor;
+	float			ZERNSimpleMaterial_Opacity;
 	float			ZERNSimpleMaterial_Reserved0;
-	float			ZERNSimpleMaterial_Reserved1;
 };
 
 cbuffer ZERNSimpleMaterial_InstanceConstants				: register(ZERN_SHADER_CONSTANT_DRAW_TRANSFORM)
@@ -66,7 +66,7 @@ Texture2D<float4>	ZERNSimpleMaterial_Texture				: register(t0);
 struct ZERNSimpleMaterial_VSInput 
 {
 	float3			Position								: POSITION0;
-	float2			Textcoord								: TEXCOORD0;
+	float2			Texcoord								: TEXCOORD0;
 	float3			Normal									: NORMAL0;
 	float4			Color									: COLOR0;
 };
@@ -96,7 +96,7 @@ ZERNSimpleMaterial_VSOutput ZERNSimpleMaterial_VSMain_ForwardStage(ZERNSimpleMat
 	float4 PositionWorld = mul(ZERNSimpleMaterial_WorldTransform, float4(Input.Position, 1.0f));
 
 	Output.Position = ZERNTransformations_WorldToProjection(PositionWorld);
-	Output.Texcoord = Input.Textcoord;
+	Output.Texcoord = Input.Texcoord;
 	Output.Color = ZERNSimpleMaterial_Color;
 	
 	if (ZERNSimpleMaterial_EnableVertexColor)
@@ -115,7 +115,9 @@ float4 ZERNSimpleMaterial_PSMain_ForwardStage(ZERNSimpleMaterial_PSInput Input) 
 
 	if (ZERNSimpleMaterial_EnableTexture)
 		Color *= ZERNSimpleMaterial_Texture.Sample(ZERNSimpleMaterial_Sampler, Input.Texcoord);
-		
+	
+	Color.a = ZERNSimpleMaterial_Opacity;
+	
 	return Color;
 }
 

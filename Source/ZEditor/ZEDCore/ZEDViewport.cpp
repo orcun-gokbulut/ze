@@ -42,7 +42,6 @@
 #include "ZEGraphics\ZEGRRenderTarget.h"
 #include "ZERenderer\ZERNStageGBuffer.h"
 #include "ZERenderer\ZERNStageShadowing.h"
-#include "ZERenderer\ZERNStagePreProcess.h"
 #include "ZERenderer\ZERNStageLighting.h"
 #include "ZERenderer\ZERNStageParticleRendering.h"
 #include "ZERenderer\ZERNStagePostProcess.h"
@@ -57,6 +56,10 @@
 #include "ZEDViewportEvent.h"
 #include "ZEGame\ZEScene.h"
 #include "ZERenderer\ZERNRenderParameters.h"
+#include "ZEGraphics\ZEGRGraphicsModule.h"
+#include "ZERenderer\ZERNStageAtmosphere.h"
+#include "ZERenderer\ZERNStageRenderDepth.h"
+#include "ZERenderer\ZERNStageResolving.h"
 
 #define ZED_VDF_VIEW			0x01
 #define ZED_VDF_VIEW_PORT		0x02
@@ -164,6 +167,8 @@ bool ZEDViewport::InitializeSelf()
 {
 	zeCheckError(ViewportManager == NULL, false, "Cannot initialize. Viewport is not registered with a Viewport Manager.");
 	Window = ZEGRWindow::WrapHandle((void*)winId());
+	Renderer.SetOutputRenderTarget(Window->GetOutput()->GetRenderTarget());
+	Renderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
 
 	ZERNStageGBuffer* StageGBuffer = new ZERNStageGBuffer();
 	Renderer.AddStage(StageGBuffer);
@@ -174,14 +179,23 @@ bool ZEDViewport::InitializeSelf()
 	ZERNStageLighting* StageLighting = new ZERNStageLighting();
 	Renderer.AddStage(StageLighting);
 
+	ZERNStageAtmosphere* StageAtmosphere = new ZERNStageAtmosphere();
+	Renderer.AddStage(StageAtmosphere);
+
 	ZERNStageForward* StageForward = new ZERNStageForward();
 	Renderer.AddStage(StageForward);
 
-	/*ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
-	Renderer.AddStage(StagePostProcess);*/
+	ZERNStageForwardTransparent* StageForwardTransparent = new ZERNStageForwardTransparent();
+	Renderer.AddStage(StageForwardTransparent);
 
-	/*ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
-	Renderer.AddStage(StageParticleRendering);*/
+	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
+	Renderer.AddStage(StageParticleRendering);
+
+	ZERNStageRenderDepth* StageRenderDepth = new ZERNStageRenderDepth();
+	Renderer.AddStage(StageRenderDepth);
+
+	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
+	Renderer.AddStage(StagePostProcess);
 
 	ZERNStageHDR* StageHDR = new ZERNStageHDR();
 	StageHDR->SetToneMapOperator(ZERN_HTMO_UNCHARTED);
@@ -197,12 +211,14 @@ bool ZEDViewport::InitializeSelf()
 	StageHDR->SetSaturation(0.700000f);
 	Renderer.AddStage(StageHDR);
 
-	
+	ZERNStageResolving* StageResolving = new ZERNStageResolving();
+	Renderer.AddStage(StageResolving);
+
 	ZERNStageAntiAliasing* StageAntiAliasing = new ZERNStageAntiAliasing();
 	Renderer.AddStage(StageAntiAliasing);
 
-	ZERNStageForwardPostHDR* StagePostHDRForward = new ZERNStageForwardPostHDR();
-	Renderer.AddStage(StagePostHDRForward);
+	/*ZERNStageForwardPostHDR* StagePostHDRForward = new ZERNStageForwardPostHDR();
+	Renderer.AddStage(StagePostHDRForward);*/
 
 	ZERNStage2D* Stage2D = new ZERNStage2D();
 	Renderer.AddStage(Stage2D);

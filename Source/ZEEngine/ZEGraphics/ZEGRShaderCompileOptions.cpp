@@ -48,7 +48,7 @@ ZEGRShaderDefinition::ZEGRShaderDefinition(const ZEString& Name, const ZEString&
 ZEGRShaderCompileOptions::ZEGRShaderCompileOptions()
 {
 	Type = ZEGR_ST_NONE;
-	Model = ZEGR_SM_NONE;
+	Model = (ZEGRShaderModel)0;
 	Debug = false;
 	OptimizationLevel = 3;
 }

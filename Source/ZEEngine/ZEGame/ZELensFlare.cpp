@@ -34,14 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELensFlare.h"
-#include "ZEGame/ZEScene.h"
-#include "ZERenderer/ZECamera.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZERenderer/ZELightDirectional.h"
-#include "ZETexture/ZETextureCubeResource.h"
-#include "ZEWeather.h"
-
-#include <string.h>
 
 bool ZELensFlare::InitializeSelf()
 {

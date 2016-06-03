@@ -36,11 +36,11 @@
 #include "ZEMath/ZEMath.h"
 
 #include "ZEGrid.h"
-#include "ZEScene.h"
+
+#include "ZEMath/ZEMath.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
-#include "ZERenderer/ZERNFixedMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZEGraphics/ZEGRContext.h"
@@ -235,8 +235,10 @@ const ZEVector3& ZEGrid::GetAxisColor()
 
 bool ZEGrid::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	// Update Constants
 	ZEVector3 CameraPosition = Parameters->View->Position;
+
+	if (!Material->PreRender(RenderCommand))
+		return false;
 
 	if (AxisEnabled)
 	{
@@ -284,26 +286,28 @@ bool ZEGrid::PreRender(const ZERNPreRenderParameters* Parameters)
 void ZEGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
 	ZEGRContext* Context = Parameters->Context;
+	const ZERNStage* Stage = Parameters->Stage;
 
-	Material->SetupMaterial(Context, Parameters->Stage);
+	if (!Material->SetupMaterial(Context, Stage))
+		return;
 
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 
 	if (MinorGridEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferMinorGridTransform);
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferMinorGridTransform.GetPointerToPointer());
 		Context->Draw(MinorGridCount, MinorGridOffset);
 	}
 
 	if (MajorGridEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferMajorGridTransform);
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferMajorGridTransform.GetPointerToPointer());
 		Context->Draw(MajorGridCount, MajorGridOffset);
 	}
 
 	if (AxisEnabled)
 	{
-		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferAxisTransform);
+		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferAxisTransform.GetPointerToPointer());
 		Context->Draw(4, 0);
 	}
 
@@ -322,14 +326,13 @@ bool ZEGrid::InitializeSelf()
 	Material = ZERNSimpleMaterial::CreateInstance();
 	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	Material->SetVertexColorEnabled(true);
-	Material->SetStageMask(ZERN_STAGE_FORWARD_POST);
+	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 	Material->Update();
 
 	RenderCommand.Entity = this;
 	RenderCommand.Priority = 0;
 	RenderCommand.Order = 0;
 	RenderCommand.ExtraParameters = NULL;
-	RenderCommand.StageMask = Material->GetStageMask();
 
 	GenerateGrid();
 	
@@ -338,11 +341,13 @@ bool ZEGrid::InitializeSelf()
 
 bool ZEGrid::DeinitializeSelf()
 {
-	Material.Release();
 	VertexBuffer.Release();
+
 	ConstantBufferAxisTransform.Release();
 	ConstantBufferMinorGridTransform.Release();
 	ConstantBufferMajorGridTransform.Release();
+
+	Material.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }

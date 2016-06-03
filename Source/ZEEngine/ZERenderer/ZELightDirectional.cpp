@@ -38,10 +38,6 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
-
-#include "ZERNView.h"
-#include "ZERNRenderParameters.h"
-#include "ZERNStageShadowmapGeneration.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
@@ -49,12 +45,24 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
+#include "ZERNView.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNStage.h"
+#include "ZECamera.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
 #define ZE_LDF_PROJECTION_TRANSFORM		2
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
 #define ZE_LDF_CONSTANT_BUFFER			16
+
+ZELightDirectional::ZECascade::ZECascade()
+{
+	SampleCount = 16;
+	SampleLength = 1.0f;
+	DepthBias = 0.0005f;
+	NormalBias = 0.1f;
+}
 
 void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 {
@@ -65,12 +73,13 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 
 	ZEVector3 CascadeFrustumVerticesView[8];
 	ZEVector3 CascadeFrustumVerticesWorld[8];
-	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
+	ZEUInt CascadeCount = Cascades.GetCount();
+	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeCount; CascadeIndex++)
 	{
-		ZECascade& Cascade = CascadeConstants.Cascades[CascadeIndex];
+		ZECascade& Cascade = Cascades[CascadeIndex];
 
-		float CascadeNumberDividedByCount = (float)(CascadeIndex + 1) / CascadeConstants.CascadeCount;
-		Cascade.Borders.z = (CascadeIndex == 0) ? View.NearZ : CascadeConstants.Cascades[CascadeIndex - 1].Borders.w;
+		float CascadeNumberDividedByCount = (float)(CascadeIndex + 1) / CascadeCount;
+		Cascade.Borders.z = (CascadeIndex == 0) ? View.NearZ : Cascades[CascadeIndex - 1].Borders.w;
 		Cascade.Borders.w = CascadeDistanceFactor * (View.NearZ * ZEMath::Power(View.ShadowDistance / View.NearZ, CascadeNumberDividedByCount)) + 
 				  (1.0f - CascadeDistanceFactor) * (View.NearZ + (View.ShadowDistance - View.NearZ) * CascadeNumberDividedByCount);
 
@@ -152,25 +161,14 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 			0.0f, 0.0f, 1.0f / Depth, OffsetZ,
 			0.0f, 0.0f, 0.0f, 1.0f);
 
-		if (CascadeIndex != (CascadeConstants.CascadeCount - 1))
-		{
-			float BandLength = (Cascade.Borders.w - Cascade.Borders.z) * 0.05f;
-			Cascade.Band = ZEVector4(Cascade.Borders.x - BandLength, Cascade.Borders.x + BandLength, Cascade.Borders.w - BandLength, Cascade.Borders.w + BandLength);
-		}
-		else
-		{
-			Cascade.Band = ZEVector4(Cascade.Borders.x - View.ShadowFadeDistance, Cascade.Borders.x + View.ShadowFadeDistance, Cascade.Borders.w - View.ShadowFadeDistance, Cascade.Borders.w);
-		}
-
-		Cascade.ProjectionTransform = Cascade.ProjectionTransform * GetViewTransform();
-
 		ZEMatrix4x4 InvLightViewTransform;
 		ZEMatrix4x4::Transpose(InvLightViewTransform, GetViewTransform());
 
-		ZEVector4 CascadePositionWorld;
-		ZEMatrix4x4::Transform(CascadePositionWorld, InvLightViewTransform, ZEVector4(CascadeFrustumAABBLight.GetCenter(), 1.0f));
+		ZEVector3 CascadePositionWorld;
+		ZEMatrix4x4::Transform3x3(CascadePositionWorld, InvLightViewTransform, CascadeFrustumAABBLight.GetCenter());
 
-		CascadeVolumes[CascadeIndex].Create(CascadePositionWorld.ToVector3(), GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
+		Cascade.ViewVolume.Create(CascadePositionWorld, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
+		Cascade.ViewTransform = GetViewTransform();
 	}
 }
 
@@ -180,9 +178,7 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 		return;
 
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
-
-	CascadeShadowMaps.Release();
-	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL, CascadeConstants.CascadeCount);
+	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, Cascades.GetCount());
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
@@ -192,31 +188,27 @@ bool ZELightDirectional::InitializeSelf()
 	if (!ZELight::InitializeSelf())
 		return false;
 
-	CascadeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZECascadeConstants));
-
 	return true;
 }
 
 bool ZELightDirectional::DeinitializeSelf()
 {
-	CascadeConstantBuffer.Release();
 	CascadeShadowMaps.Release();
-	CascadeVolumes.Clear();
+	Cascades.Clear();
 
 	return ZELight::DeinitializeSelf();
 }
 
 ZELightDirectional::ZELightDirectional()
 {
+	Cascades.SetCount(3);
+
 	CascadeDistanceFactor = 0.5f;
-	CascadeConstants.CascadeCount = 3;
-	CascadeVolumes.Resize(3);
+	UseSunLight = false;
+	UseMoonLight = false;
 
 	Command.Entity = this;
 	Command.Priority = 1;
-
-	UseSunLight = false;
-	UseMoonLight = false;
 }
 
 ZELightDirectional::~ZELightDirectional()
@@ -231,18 +223,17 @@ ZEDrawFlags ZELightDirectional::GetDrawFlags() const
 
 void ZELightDirectional::SetCascadeCount(ZEUInt CascadeCount)
 {
-	if (CascadeConstants.CascadeCount == CascadeCount)
+	if (Cascades.GetCount() == CascadeCount)
 		return;
 
-	CascadeConstants.CascadeCount = CascadeCount;
-	CascadeVolumes.Resize(CascadeCount);
+	Cascades.SetCount(CascadeCount);
 
-	DirtyFlags.RaiseFlags(ZE_LDF_CONSTANT_BUFFER | ZE_LDF_SHADOW_MAP);
+	DirtyFlags.RaiseFlags(ZE_LDF_SHADOW_MAP);
 }
 
 ZEUInt ZELightDirectional::GetCascadeCount() const
 {
-	return CascadeConstants.CascadeCount;
+	return (ZEUInt)Cascades.GetCount();
 }
 
 void ZELightDirectional::SetCascadeDistanceFactor(float CascadeDistanceFactor)
@@ -253,6 +244,26 @@ void ZELightDirectional::SetCascadeDistanceFactor(float CascadeDistanceFactor)
 float ZELightDirectional::GetCascadeDistanceFactor() const
 {
 	return CascadeDistanceFactor;
+}
+
+void ZELightDirectional::SetCascadeDepthBias(ZEUInt CascadeIndex, float CascadeDepthBias)
+{
+	Cascades[CascadeIndex].DepthBias = CascadeDepthBias;
+}
+
+float ZELightDirectional::GetCascadeDepthBias(ZEUInt CascadeIndex) const
+{
+	return Cascades[CascadeIndex].DepthBias;
+}
+
+void ZELightDirectional::SetCascadeNormalBias(ZEUInt CascadeIndex, float CascadeNormalBias)
+{
+	Cascades[CascadeIndex].NormalBias = CascadeNormalBias;
+}
+
+float ZELightDirectional::GetCascadeNormalBias(ZEUInt CascadeIndex) const
+{
+	return Cascades[CascadeIndex].NormalBias;
 }
 
 void ZELightDirectional::SetUseSunLight(bool UseSunLight)
@@ -285,27 +296,6 @@ const ZEVector3& ZELightDirectional::GetTerrestrialColor() const
 	return TerrestrialColor;
 }
 
-void ZELightDirectional::BindCascades(ZERNRenderer* Renderer, ZEGRContext* Context)
-{
-	ZEMatrix4x4 TextureTransform;
-	ZEMatrix4x4::Create(TextureTransform,
-		0.5f, 0.0f, 0.0f, 0.5f,
-		0.0f, -0.5f, 0.0f, 0.5f,
-		0.0f, 0.0f, 1.0f, 0.0f,
-		0.0f, 0.0f, 0.0f, 1.0f);
-
-	for (ZEUInt I = 0; I < CascadeConstants.CascadeCount; I++)
-	{
-		ZECascade& Cascade = CascadeConstants.Cascades[I];
-		Cascade.ProjectionTransform = TextureTransform * Cascade.ProjectionTransform * Renderer->GetView().InvViewTransform;
-	}
-	
-	CascadeConstantBuffer->SetData(&CascadeConstants);
-
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, CascadeConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 9, CascadeConstantBuffer);
-}
-
 ZELightType ZELightDirectional::GetLightType() const
 {
 	return ZE_LT_DIRECTIONAL;
@@ -316,20 +306,22 @@ ZESize ZELightDirectional::GetViewCount() const
 	return 1;
 }
 
+const ZEArray<ZELightDirectional::ZECascade>& ZELightDirectional::GetCascades() const
+{
+	return Cascades;
+}
+
 ZEGRTexture* ZELightDirectional::GetShadowMap(ZESize Index) const
 {
-	if (Index >= CascadeConstants.CascadeCount)
-		return NULL;
+	if (Index >= Cascades.GetCount())
+		zeError("Index is out of range");
 
 	return CascadeShadowMaps;
 }
 
 const ZEViewVolume& ZELightDirectional::GetViewVolume(ZESize Index) const
 {
-	if (Index >= CascadeConstants.CascadeCount)
-		return ZEViewCuboid();
-
-	return CascadeVolumes[Index];
+	return Cascades[Index].ViewVolume;
 }
 
 const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index) const
@@ -345,14 +337,14 @@ const ZEMatrix4x4& ZELightDirectional::GetViewTransform(ZESize Index) const
 
 const ZEMatrix4x4& ZELightDirectional::GetProjectionTransform(ZESize Index) const
 {
-	if (Index >= CascadeConstants.CascadeCount)
-		return ZEMatrix4x4::Identity;
-
-	return CascadeConstants.Cascades[Index].ProjectionTransform;
+	return Cascades[Index].ProjectionTransform;
 }
 
 void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
+	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
+		return;
+
 	UpdateCascadeShadowMaps();
 	UpdateCascadeTransforms(*Parameters->View);
 
@@ -366,22 +358,27 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	View.V = GetWorldUp();
 	View.N = GetWorldFront();
 
-	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeConstants.CascadeCount; CascadeIndex++)
-	{
-		View.ViewVolume = &GetViewVolume(CascadeIndex);
-		View.ViewProjectionTransform = GetProjectionTransform(CascadeIndex);
+	ShadowRenderer.SetContext(Parameters->Context);
 
+	ZEUInt CascadeCount = Cascades.GetCount();
+	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeCount; CascadeIndex++)
+	{
+		View.ViewVolume = &Cascades[CascadeIndex].ViewVolume;
+		View.ViewProjectionTransform = Cascades[CascadeIndex].ProjectionTransform * Cascades[CascadeIndex].ViewTransform;
 		ShadowRenderer.SetView(View);
+
+		ZERNPreRenderParameters Parameters;
+		Parameters.Renderer = &ShadowRenderer;
+		Parameters.View = &View;
+		GetOwnerScene()->PreRender(&Parameters);
 
 		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
 		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
-		ZELight::Render(Parameters, Command);
+		ShadowRenderer.Render();
 	}
-
-	Context->SetRenderTargets(0, NULL, NULL);
 }
 
 ZELightDirectional* ZELightDirectional::CreateInstance()

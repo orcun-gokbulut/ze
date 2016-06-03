@@ -1035,15 +1035,13 @@ bool ZEDGizmo::InitializeSelf()
 	MaterialLines->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	MaterialLines->SetTwoSided(true);
 	MaterialLines->SetDepthTestDisabled(true);
-	MaterialLines->SetStageMask(ZERN_STAGE_FORWARD_POST);
+	MaterialLines->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 
 	MaterialTriangles = ZERNSimpleMaterial::CreateInstance();
 	MaterialTriangles->SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	MaterialTriangles->SetTwoSided(true);
 	MaterialTriangles->SetDepthTestDisabled(true);
-	MaterialTriangles->SetStageMask(ZERN_STAGE_FORWARD_POST);
-
-	RenderCommand.StageMask = MaterialLines->GetStageMask();
+	MaterialTriangles->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 
 	return true;
 }
@@ -1078,6 +1076,9 @@ bool ZEDGizmo::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!ZEEntity::PreRender(Parameters))
 		return true;
 	
+	if (!MaterialLines->PreRender(RenderCommand))
+		return false;
+
 	if (!DrawGizmo(*Parameters->View))
 		return false;
 
@@ -1097,7 +1098,7 @@ void ZEDGizmo::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 	
 	if (GizmoLines.GetBufferSize() != 0)

@@ -52,134 +52,70 @@
 #include "ZERenderer/ZERNParticleMaterial.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNStageGBuffer.h"
+#include "ZECore/ZECore.h"
 
-void ZEParticleEmitter::Tick(float TimeElapsed)
+bool ZEParticleEmitter::Initialize()
 {
-	AliveParticleCount = 0;
+	InstanceBuffer = ZEGRConstantBuffer::Create(sizeof(InstanceAttributes) * 1000);
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
-	if(Continuity == false)
-	{
-		if(EmittedParticleCount >= MaxParticleCount)
-		{
-			for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
-			{
-				if(ParticlePool[I].State != ZE_PAS_DEAD)
-				{
-					continue;
-				}
-				else
-				{
-					ParticlesPerSecond = 0;
-				}
-			}
-		}
-	}
-
-	ParticlesRemaining += ParticlesPerSecond * TimeElapsed;
-	ZEUInt ParticeCountForTimeElapsed = (ZEUInt)ParticlesRemaining;
-	ParticlesRemaining -= ParticeCountForTimeElapsed;
-
-	ZEUInt ParticlesEmmitedThisFrame = 0;
-
-	for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
-	{
-		if(ParticlePool[I].State == ZE_PAS_NEW)
-		{
-			ParticlePool[I].State = ZE_PAS_ALIVE;
-		}
-	}
-
-	if(ParticeCountForTimeElapsed != 0)
-	{
-		for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
-		{
-			if(ParticlePool[I].State == ZE_PAS_DEAD)
-			{
-				GenerateParticle(ParticlePool[I]);
-				EmittedParticleCount++;
-				ParticlesEmmitedThisFrame++;
-			}
-
-			if(ParticlesEmmitedThisFrame == ParticeCountForTimeElapsed)
-				break;
-		}
-	}
-
-	for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
-	{
-		if(ParticlePool[I].State == ZE_PAS_ALIVE)
-		{
-			ParticlePool[I].Life -= TimeElapsed;
-			AliveParticleCount++;
-		}
-
-		if(ParticlePool[I].State != ZE_PAS_DEAD  && ParticlePool[I].Life < 0.0f)
-		{
-			ParticlePool[I].State = ZE_PAS_DEAD;
-		}
-	}
-
-	for (ZESize I = 0; I < Modifiers.GetCount(); I++)
-	{
-		Modifiers[I]->Tick(TimeElapsed);
-	}
-
-	if(SortingEnabled)
-	{
-		SortParticles();
-	}
-	
-	//zeLog("APC : %u", AliveParticleCount);
+	return true;
 }
 
-void ZEParticleEmitter::InitializeParticlePool()
+void ZEParticleEmitter::Deinitialize()
 {
-	ParticlePool.SetCount((ZESize)MaxParticleCount);
+	Effect = NULL;
+	ParticlePool.Clear();
+	SortArray.Clear();
+	Modifiers.Clear();
+	
+	Material.Release();
 
-	for(ZESize I = 0; I < (ZESize)MaxParticleCount; I++)
-	{
-		GenerateParticle(ParticlePool[I]);
-	}
+	InstanceBuffer.Release();
+	ConstantBuffer.Release();
 }
 
 void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 {
+	if (Particle.State != ZE_PAS_DEAD)
+		return;
+
 	switch(Type)
 	{
-	case ZE_PET_POINT:
+		case ZE_PET_POINT:
 		{
 			Particle.Position = Position;
 			break;
 		}
-	case ZE_PET_PLANE:
+		case ZE_PET_PLANE:
 		{
-			Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.x / 2.0f, PlaneSize.x / 2.0f);
+			Particle.Position.x = Position.x + ZERandom::GetFloatRange(-PlaneSize.x / 2.0f, PlaneSize.x / 2.0f);
 			Particle.Position.y = Position.y;
-			Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-PlaneSize.y / 2.0f, PlaneSize.y / 2.0f);
+			Particle.Position.z = Position.z + ZERandom::GetFloatRange(-PlaneSize.y / 2.0f, PlaneSize.y / 2.0f);
 			break;
 		}
-	case ZE_PET_BOX:
+		case ZE_PET_BOX:
 		{
-			Particle.Position.x = Position.x + RAND_BETWEEN_TWO_FLOAT(-BoxSize.x / 2.0f, BoxSize.x / 2.0f);
-			Particle.Position.y = Position.y + RAND_BETWEEN_TWO_FLOAT(-BoxSize.y / 2.0f, BoxSize.y / 2.0f);
-			Particle.Position.z = Position.z + RAND_BETWEEN_TWO_FLOAT(-BoxSize.z / 2.0f, BoxSize.z / 2.0f);
+			Particle.Position.x = Position.x + ZERandom::GetFloatRange(-BoxSize.x / 2.0f, BoxSize.x / 2.0f);
+			Particle.Position.y = Position.y + ZERandom::GetFloatRange(-BoxSize.y / 2.0f, BoxSize.y / 2.0f);
+			Particle.Position.z = Position.z + ZERandom::GetFloatRange(-BoxSize.z / 2.0f, BoxSize.z / 2.0f);
 			break;
 		}
-	case ZE_PET_TORUS:
+		case ZE_PET_TORUS:
 		{
-			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
-			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
-			float TubeRadius = RAND_BETWEEN_TWO_FLOAT(0.0f, TorusSize.y);
+			float Theta = ZERandom::GetFloatRange(0.0f, (float)ZE_PIx2);
+			float Phi = ZERandom::GetFloatRange(0.0f, (float)ZE_PIx2);
+			float TubeRadius = ZERandom::GetFloatRange(0.0f, TorusSize.y);
 			Particle.Position.x = Position.x + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Cos(Theta);
 			Particle.Position.y = Position.y + (TorusSize.x + TubeRadius * ZEAngle::Cos(Phi)) * ZEAngle::Sin(Theta);
 			Particle.Position.z = Position.z + TubeRadius * ZEAngle::Sin(Phi);
 			break;
 		}
-	case ZE_PET_SPHERE:
+		case ZE_PET_SPHERE:
 		{
-			float Radius = RAND_BETWEEN_TWO_FLOAT(0.0f, SphereRadius);
-			float Theta = RAND_BETWEEN_TWO_FLOAT(0.0f, (float)ZE_PIx2);
-			float Phi = RAND_BETWEEN_TWO_FLOAT(0.0f, ZE_PI);
+			float Radius = ZERandom::GetFloatRange(0.0f, SphereRadius);
+			float Theta = ZERandom::GetFloatRange(0.0f, (float)ZE_PIx2);
+			float Phi = ZERandom::GetFloatRange(0.0f, ZE_PI);
 			Particle.Position.x = Position.x + Radius * ZEAngle::Cos(Theta) * ZEAngle::Sin(Phi);
 			Particle.Position.y = Position.y + Radius * ZEAngle::Sin(Theta) * ZEAngle::Sin(Phi);
 			Particle.Position.z = Position.z + Radius * ZEAngle::Cos(Phi);
@@ -187,25 +123,25 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 		}
 	}
 
-	Particle.TotalLife = RAND_BETWEEN_TWO_FLOAT(MinLife, MaxLife);
+	Particle.TotalLife = ZERandom::GetFloatRange(ParticleLifeMin, ParticleLifeMax);
 	Particle.Life = Particle.TotalLife;
 
 	if(ParticleFixedAspectRatio)
 	{
-		float ParticleAspectRatio = MaxSize.x / MaxSize.y;
-		Particle.Size2D.x = RAND_BETWEEN_TWO_FLOAT(MinSize.x, MaxSize.x);
+		float ParticleAspectRatio = ParticleSizeMax.x / ParticleSizeMax.y;
+		Particle.Size2D.x = ZERandom::GetFloatRange(ParticleSizeMin.x, ParticleSizeMax.x);
 		Particle.Size2D.y = Particle.Size2D.x  / ParticleAspectRatio;
 	}				
 	else
 	{
-		Particle.Size2D.x = RAND_BETWEEN_TWO_FLOAT(MinSize.x, MaxSize.x);
-		Particle.Size2D.y = RAND_BETWEEN_TWO_FLOAT(MinSize.y, MaxSize.y);
+		Particle.Size2D.x = ZERandom::GetFloatRange(ParticleSizeMin.x, ParticleSizeMax.x);
+		Particle.Size2D.y = ZERandom::GetFloatRange(ParticleSizeMin.y, ParticleSizeMax.y);
 	}
 
-	Particle.InitialColor.x = RAND_BETWEEN_TWO_FLOAT(MinColor.x, MaxColor.x);
-	Particle.InitialColor.y = RAND_BETWEEN_TWO_FLOAT(MinColor.y, MaxColor.y);
-	Particle.InitialColor.z = RAND_BETWEEN_TWO_FLOAT(MinColor.z, MaxColor.z);
-	Particle.InitialColor.w = RAND_BETWEEN_TWO_FLOAT(MinColor.w, MaxColor.w);
+	Particle.InitialColor.x = ZERandom::GetFloatRange(ParticleColorMin.x, ParticleColorMax.x);
+	Particle.InitialColor.y = ZERandom::GetFloatRange(ParticleColorMin.y, ParticleColorMax.y);
+	Particle.InitialColor.z = ZERandom::GetFloatRange(ParticleColorMin.z, ParticleColorMax.z);
+	Particle.InitialColor.w = ZERandom::GetFloatRange(ParticleColorMin.w, ParticleColorMax.w);
 	Particle.Color = Particle.InitialColor;
 	Particle.Rotation = 0.0f;
 	Particle.Cos_NegSin = ZEVector2::UnitX;
@@ -213,6 +149,114 @@ void ZEParticleEmitter::GenerateParticle(ZEParticle &Particle)
 	Particle.MaxTexCoord = ZEVector2::One;
 	Particle.State = ZE_PAS_NEW;
 
+	if (GetParticalSpace() == ZE_PS_WORLD)
+		Particle.Position = Effect->GetWorldTransform() * Particle.Position;
+}
+
+void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
+{
+	// Kill Them
+	if (!ParticleImmortal)
+	{
+		for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
+		{
+			if (ParticlePool[I].State == ZE_PAS_ALIVE)
+				ParticlePool[I].Life -= ElapsedTime;
+
+			if (ParticlePool[I].State != ZE_PAS_DEAD  && ParticlePool[I].Life < 0.0f)
+			{
+				ParticlePool[I].State = ZE_PAS_DEAD;
+				ParticlePool[I].Life = 0.0f;
+				AliveParticleCount--;
+			}
+		}
+	}
+
+	// Create Them
+	ParticlesAccumulation += ZERandom::GetFloatRange((float)ParticlesPerSecondMin, (float)ParticleLifeMax) * ElapsedTime;
+	if (ParticlesAccumulation >= 1.0f)
+	{
+		for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
+		{
+			if (ParticlePool[I].State == ZE_PAS_DEAD)
+			{
+				GenerateParticle(ParticlePool[I]);
+				AliveParticleCount++;
+				ParticlesAccumulation -= 1.0f;
+			}
+
+			if (ParticlesAccumulation < 1.0f)
+				break;
+		}
+	}
+
+	// If Pool is Filled
+	if (ParticlesAccumulation >= 1.0f)
+		ParticlesAccumulation -= (ZEUInt)ParticlesAccumulation;
+
+	// Update Them
+	for (ZESize I = 0; I < Modifiers.GetCount(); I++)
+	{
+		if (!Modifiers[I]->GetEnabled())
+			continue;
+
+		Modifiers[I]->Tick(ElapsedTime);
+	}
+
+	for (ZESize I = 0; I < ParticlePool.GetCount(); I++)
+	{
+		if (ParticlePool[I].State != ZE_PAS_NEW)
+			continue;
+		
+		ParticlePool[I].State = ZE_PAS_ALIVE;
+	}
+
+	/*if (SortingEnabled)
+		SortParticles();*/
+}
+
+ZEParticleEmitter::ZEParticleEmitter()
+{
+	Effect = NULL;
+
+	ParticlesAccumulation = 0.0f;
+	ParticlesPerSecondMin = 0;
+	ParticlesPerSecondMax = 0;
+	AliveParticleCount = 0;
+
+	Position = ZEVector3(0.0f, 0.0f, 0.0f);
+	Type = ZE_PET_POINT;
+	BoxSize = ZEVector3::One;
+	SphereRadius = 1.0f;
+	TorusSize = ZEVector2::One;
+	PlaneSize = ZEVector2::One;
+
+	ParticleSpace = ZE_PS_LOCAL;
+	ParticleImmortal = false;
+	ParticleLifeMin = 0.0f;		
+	ParticleLifeMax = 0.0f;									
+	ParticleSizeMin = ZEVector2::One;					
+	ParticleSizeMax = ZEVector2::One;
+	ParticleColorMin = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	ParticleColorMax = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
+	ParticleFixedAspectRatio = false;
+
+	BillboardType = ZE_PBT_SCREEN_ALIGNED;
+	AxisOrientation = -ZEVector3::UnitZ;
+	SortingEnabled = false;
+}
+
+ZEParticleEmitter::~ZEParticleEmitter()
+{
+	for (ZESize I = 0; I < Modifiers.GetCount(); I++)
+		delete Modifiers[I];
+
+	Modifiers.Clear();
+}
+
+ZEParticleEffect* ZEParticleEmitter::GetEffect() const
+{
+	return Effect;
 }
 
 void ZEParticleEmitter::SetName(const ZEString& Name)
@@ -225,65 +269,6 @@ const ZEString& ZEParticleEmitter::GetName() const
 	return Name;
 }
 
-void ZEParticleEmitter::SetOwner(ZEParticleEffect *Owner)
-{
-	this->Owner = Owner;
-}
-
-ZEParticleEffect* ZEParticleEmitter::GetOwner() const
-{
-	return Owner;
-}
-
-void ZEParticleEmitter::SetEmitterLocal(bool EmitterLocal)
-{
-	this->EmitterLocal = EmitterLocal;
-}
-
-bool ZEParticleEmitter::GetEmitterLocal() const
-{
-	return EmitterLocal;
-}
-
-void ZEParticleEmitter::SetSortingEnabled(bool SortingEnabled)
-{
-	this->SortingEnabled = SortingEnabled;
-}
-
-bool ZEParticleEmitter::GetSortingEnabled() const
-{
-	return SortingEnabled;
-}
-
-void ZEParticleEmitter::SetParticleFixedAspectRatio(bool ParticleFixedAspectRatio)
-{
-	this->ParticleFixedAspectRatio = ParticleFixedAspectRatio;
-}
-
-bool ZEParticleEmitter::GetParticleFixedAspectRatio() const
-{
-	return ParticleFixedAspectRatio;
-}
-
-ZEArray<ZEParticle>& ZEParticleEmitter::GetParticlePool()
-{
-	return ParticlePool;
-}
-
-void ZEParticleEmitter::SetParticlesPerSecond(ZEUInt ParticlesPerSecond)
-{
-	this->ParticlesPerSecond = ParticlesPerSecond;
-}
-
-ZEUInt ZEParticleEmitter::GetParticlesPerSecond() const
-{
-	return ParticlesPerSecond;
-}
-
-ZEUInt ZEParticleEmitter::GetAliveParticleCount() const
-{
-	return AliveParticleCount;
-}
 
 void ZEParticleEmitter::SetPosition(const ZEVector3& EmitterPosition)
 {
@@ -295,35 +280,14 @@ const ZEVector3& ZEParticleEmitter::GetPosition() const
 	return Position;
 }
 
-const ZEAABBox&	ZEParticleEmitter::GetBoundingBox() const
+void ZEParticleEmitter::SetType(ZEParticleEmitterType EmitterType)
 {
-	return BoundingBox;
+	Type = EmitterType;
 }
 
-const ZEArray<ZEParticleModifier*>& ZEParticleEmitter::GetModifiers()
+ZEParticleEmitterType ZEParticleEmitter::GetType() const
 {
-	return Modifiers;
-}
-
-void ZEParticleEmitter::AddModifier(ZEParticleModifier* Modifier)
-{
-	if (Modifier == NULL)
-		return;
-
-	if (!Modifiers.Exists(Modifier))
-	{
-		Modifiers.Add(Modifier);
-		Modifier->SetOwner(this);
-	}
-}
-
-void ZEParticleEmitter::RemoveModifier(ZEParticleModifier* Modifier)
-{
-	if (Modifier == NULL)
-		return;
-
-	if (Modifiers.Exists(Modifier))
-		Modifiers.RemoveValue(Modifier);
+	return Type;
 }
 
 void ZEParticleEmitter::SetSphereRadius(float SphereRadius)
@@ -366,112 +330,192 @@ const ZEVector3& ZEParticleEmitter::GetBoxSize() const
 	return BoxSize;
 }
 
-void ZEParticleEmitter::SetType(ZEParticleEmitterType EmitterType)
+const ZEArray<ZEParticle>& ZEParticleEmitter::GetPool() const
 {
-	Type = EmitterType;
+	return ParticlePool;
 }
 
-ZEParticleEmitterType ZEParticleEmitter::GetType() const
+void ZEParticleEmitter::SetPoolSize(ZESize PoolSize)
 {
-	return Type;
-}
-
-void ZEParticleEmitter::SetMinColor(const ZEVector4& Color)
-{
-	MinColor = Color;
-}
-
-const ZEVector4& ZEParticleEmitter::GetMinColor() const
-{
-	return MinColor;
-}
-
-void ZEParticleEmitter::SetMaxColor(const ZEVector4& Color)
-{
-	MaxColor = Color;
-}
-
-const ZEVector4& ZEParticleEmitter::GetMaxColor() const
-{
-	return MaxColor;
-}
-
-void ZEParticleEmitter::Reset()
-{
-	if (!Continuity)
-		EmittedParticleCount = 0;
-}
-
-void ZEParticleEmitter::SetContinuity(bool Continuity)
-{
-	this->Continuity = Continuity;
-}
-
-bool ZEParticleEmitter::GetContinuity() const
-{
-	return Continuity;
-}
-
-void ZEParticleEmitter::SetMinLife(float MinLife)
-{
-	this->MinLife = MinLife;
-}
-
-float ZEParticleEmitter::GetMinLife() const
-{
-	return MinLife;
-}
-
-void ZEParticleEmitter::SetMaxLife(float MaxLife)
-{
-	this->MaxLife = MaxLife;
-}
-
-float ZEParticleEmitter::GetMaxLife() const
-{
-	return MaxLife;
-}
-
-void ZEParticleEmitter::SetMaxParticleCount(ZEUInt MaxParticleCount)
-{
-	this->MaxParticleCount = MaxParticleCount;
-	
-	InstanceBuffer = ZEGRConstantBuffer::Create(sizeof(InstanceAttributes) * MaxParticleCount);
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	if (ParticlePool.GetCount() == PoolSize)
+		return;
 
 	ZESize OldSize = ParticlePool.GetCount();
+	ParticlePool.Resize((ZESize)PoolSize);
+	SortArray.Resize((ZESize)PoolSize);
 
-	ParticlePool.Resize((ZESize)MaxParticleCount);
-	SortArray.Resize((ZESize)MaxParticleCount);
-
-	for (ZESize I = OldSize; I < (ZESize)MaxParticleCount; I++)
-		GenerateParticle(ParticlePool[I]);
-
+	for (ZESize I = 0; I < Modifiers.GetCount(); I++)
+		Modifiers[I]->PoolSizeChanged(PoolSize);
 }
 
-ZEUInt ZEParticleEmitter::GetMaxParticleCount() const
+ZESize ZEParticleEmitter::GetPoolSize() const
 {
-	return MaxParticleCount;
+	return ParticlePool.GetCount();
 }
 
-void ZEParticleEmitter::SetMinSize(const ZEVector2& MinSize)
+ZEUInt ZEParticleEmitter::GetAliveParticleCount() const
 {
-	this->MinSize = MinSize;
+	return AliveParticleCount;
 }
 
-const ZEVector2& ZEParticleEmitter::GetMinSize() const
+void ZEParticleEmitter::SetSortingEnabled(bool SortingEnabled)
 {
-	return MinSize;
+	this->SortingEnabled = SortingEnabled;
 }
 
-void ZEParticleEmitter::SetMaxSize(const ZEVector2& MaxSize)
+bool ZEParticleEmitter::GetSortingEnabled() const
 {
-	this->MaxSize = MaxSize;
+	return SortingEnabled;
 }
 
-const ZEVector2& ZEParticleEmitter::GetMaxSize() const
+void ZEParticleEmitter::SetParticleSpace(ZEParticleSpace Space)
 {
-	return MaxSize;
+	ParticleSpace = Space;
+}
+
+ZEParticleSpace ZEParticleEmitter::GetParticalSpace() const
+{
+	return ParticleSpace;
+}
+
+void ZEParticleEmitter::SetParticlesPerSecond(ZEUInt ParticlesPerSecond)
+{
+	ParticlesPerSecondMin = ParticlesPerSecond;
+	ParticlesPerSecondMax = ParticlesPerSecond;
+}
+
+ZEUInt ZEParticleEmitter::GetParticlesPerSecond() const
+{
+	return (ParticlesPerSecondMin + ParticlesPerSecondMax) / 2;
+}
+
+void ZEParticleEmitter::SetParticlesPerSecondMin(ZEUInt ParticlesPerSecond)
+{
+	ParticlesPerSecondMin = ParticlesPerSecond;
+}
+
+ZEUInt ZEParticleEmitter::GetParticlesPerSecondMin() const
+{
+	return ParticlesPerSecondMin;
+}
+
+void ZEParticleEmitter::SetParticlesPerSecondMax(ZEUInt ParticlesPerSecond)
+{
+	ParticlesPerSecondMax = ParticlesPerSecond;
+}
+
+ZEUInt ZEParticleEmitter::GetParticlesPerSecondMax() const
+{
+	return ParticlesPerSecondMax;
+}
+
+void ZEParticleEmitter::SetParticleImmortal(bool Enabled)
+{
+	ParticleImmortal = Enabled;
+}
+
+bool ZEParticleEmitter::GetParticleImmortal() const
+{
+	return ParticleImmortal;
+}
+
+void ZEParticleEmitter::SetParticleLifeMin(float MinLife)
+{
+	this->ParticleLifeMin = MinLife;
+}
+
+float ZEParticleEmitter::GetParticleLifeMin() const
+{
+	return ParticleLifeMin;
+}
+
+void ZEParticleEmitter::SetParticleLifeMax(float MaxLife)
+{
+	this->ParticleLifeMax = MaxLife;
+}
+
+float ZEParticleEmitter::GetParticleLifeMax() const
+{
+	return ParticleLifeMax;
+}
+
+void ZEParticleEmitter::SetParticleSizeMin(const ZEVector2& MinSize)
+{
+	this->ParticleSizeMin = MinSize;
+}
+
+const ZEVector2& ZEParticleEmitter::GetParticleSizeMin() const
+{
+	return ParticleSizeMin;
+}
+
+void ZEParticleEmitter::SetParticleSizeMax(const ZEVector2& MaxSize)
+{
+	this->ParticleSizeMax = MaxSize;
+}
+
+const ZEVector2& ZEParticleEmitter::GetParticleSizeMax() const
+{
+	return ParticleSizeMax;
+}
+
+
+void ZEParticleEmitter::SetParticleColorMin(const ZEVector4& Color)
+{
+	ParticleColorMin = Color;
+}
+
+const ZEVector4& ZEParticleEmitter::GetParticleColorMin() const
+{
+	return ParticleColorMin;
+}
+
+void ZEParticleEmitter::SetParticleColorMax(const ZEVector4& Color)
+{
+	ParticleColorMax = Color;
+}
+
+const ZEVector4& ZEParticleEmitter::GetParticleColorMax() const
+{
+	return ParticleColorMax;
+}
+
+void ZEParticleEmitter::SetParticleFixedAspectRatio(bool ParticleFixedAspectRatio)
+{
+	this->ParticleFixedAspectRatio = ParticleFixedAspectRatio;
+}
+
+bool ZEParticleEmitter::GetParticleFixedAspectRatio() const
+{
+	return ParticleFixedAspectRatio;
+}
+
+const ZEArray<ZEParticleModifier*>& ZEParticleEmitter::GetModifiers() const
+{
+	return Modifiers;
+}
+
+void ZEParticleEmitter::AddModifier(ZEParticleModifier* Modifier)
+{
+	zeCheckError(Modifier == NULL, ZE_VOID, "Modifier is NULL.");
+	zeCheckError(Modifier->Emitter != NULL, ZE_VOID, "Modifier is already registered to a Particle Emitter.");
+
+	Modifier->Emitter = this;
+	Modifiers.Add(Modifier);
+}
+
+void ZEParticleEmitter::RemoveModifier(ZEParticleModifier* Modifier)
+{
+	zeCheckError(Modifier == NULL, ZE_VOID, "Modifier is NULL.");
+	zeCheckError(Modifier->Emitter != this, ZE_VOID, "Modifier is not registered to this Particle Emitter.");
+
+	Modifier->Emitter = NULL;
+	Modifiers.RemoveValue(Modifier);
+}
+
+const ZEAABBox&	ZEParticleEmitter::GetBoundingBox() const
+{
+	return BoundingBox;
 }
 
 void ZEParticleEmitter::SetBillboardType(ZEParticleBillboardType Type)
@@ -504,51 +548,40 @@ ZEHolder<ZERNParticleMaterial> ZEParticleEmitter::GetMaterial() const
 	return Material;
 }
 
-ZEParticleEmitter::ZEParticleEmitter()
+void ZEParticleEmitter::GeneratePool()
 {
-	EmittedParticleCount = 0;
-	MaxParticleCount = 30;
-	Owner = NULL;
-	ParticlesRemaining = 0.0f;
-	EmitterLocal = false;
-	SortingEnabled = false;
-	ParticleFixedAspectRatio = false;
-	AliveParticleCount = 0;
-			
-	ParticlesPerSecond = 0;
-	Position = ZEVector3(0.0f, 0.0f, 0.0f);
-	Type = ZE_PET_POINT;
-	MinColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
-	MaxColor = ZEVector4(0.0f, 0.0f, 0.0f, 1.0f);
-	
-	MinSize = ZEVector2::One;					
-	MaxSize = ZEVector2::One;
-	MinLife = 0.0f;		
-	MaxLife = 0.0f;									
-	Continuity = true;		
+	AliveParticleCount = ParticlePool.GetCount();
+	for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
+		GenerateParticle(ParticlePool[I]);
 
-	BoxSize = ZEVector3::One;
-	SphereRadius = 1.0f;
-	TorusSize = ZEVector2::One;
-	PlaneSize = ZEVector2::One;
-
-	Material = NULL;
-	
-	BillboardType = ZE_PBT_SCREEN_ALIGNED;
-	AxisOrientation = -ZEVector3::UnitZ;
+	UpdateParticles(0.0f);
 }
 
-ZEParticleEmitter::~ZEParticleEmitter()
+void ZEParticleEmitter::ResetPool()
+{
+	AliveParticleCount = 0;
+	for(ZESize I = 0; I < ParticlePool.GetCount(); I++)
+		ParticlePool[I].State = ZE_PAS_NEW;
+}
+
+void ZEParticleEmitter::Tick(float TimeElapsed)
 {
 
 }
 
 bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	RenderCommand.Entity = Owner;
-	RenderCommand.ExtraParameters = this;
-	RenderCommand.StageMask = Material->GetStageMask();
+	UpdateParticles(zeCore->GetElapsedTime());
 
+	if (GetAliveParticleCount() == 0)
+		return false;
+
+	RenderCommand.ExtraParameters = this;
+	RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEParticleEmitter, Render, this);
+
+	if (!Material->PreRender(RenderCommand))
+		return false;
+	
 	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
@@ -556,19 +589,22 @@ bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 
 void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
-	if (ParticlePool.GetCount() == 0)
-		return;
-
 	ZEGRContext* Context = RenderParameters->Context;
 	const ZERNStage* Stage = RenderParameters->Stage;
 
 	if (!Material->SetupMaterial(Context, Stage))
 		return;
 
-	ZEMatrix4x4 WorldMatrix;
-	ZEMatrix4x4::CreateOrientation(WorldMatrix, GetOwner()->GetWorldPosition(), ZEQuaternion::Identity, GetOwner()->GetWorldScale());
-
-	ConstantBuffer->SetData(&WorldMatrix);
+	if (GetParticalSpace() == ZE_PS_LOCAL)
+	{
+		ZEMatrix4x4 WorldMatrix;
+		ZEMatrix4x4::CreateOrientation(WorldMatrix, GetEffect()->GetWorldPosition(), ZEQuaternion::Identity, GetEffect()->GetWorldScale());
+		ConstantBuffer->SetData(&WorldMatrix);
+	}
+	else
+	{
+		ConstantBuffer->SetData(&ZEMatrix4x4::Identity);
+	}
 
 	InstanceAttributes* InstanceAttribute;
 	InstanceBuffer->Lock(reinterpret_cast<void**>(&InstanceAttribute));
@@ -585,28 +621,25 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 	}
 	InstanceBuffer->Unlock();
 
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, InstanceBuffer);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, Stage->GetOutput(ZERN_SO_DEPTH));
+	const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);
+
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, InstanceBuffer.GetPointerToPointer());
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, &DepthMap);
 
 	Context->DrawInstanced(4, 0, ParticleCount, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 
 	Material->CleanupMaterial(Context, Stage);
 }
 
-void ZEParticleEmitter::SortParticles()
+void ZEParticleEmitter::SortParticles(const ZERNView& View)
 {
-	ZEVector3 CamPos = zeScene->GetActiveCamera()->GetWorldPosition();
+	ZEVector3 CamPos = View.Position;
 	float DistanceSqr;
 
 	for (ZEInt I = 0; I < 32; I++)
 	{
 		ZEUInt Radix = (1 << I);
-
 		ZESize ParticleCount = ParticlePool.GetCount();
 
 		ZESize Count0 = 0;

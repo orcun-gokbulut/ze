@@ -65,7 +65,7 @@ ZERNStageBuffer ZERNStageInputTexture::GetBuffer() const
 	return Buffer;
 }
 
-void ZERNStageInputTexture::SetTexture(const ZEGRTexture2D* Texture)
+void ZERNStageInputTexture::SetTextures(const ZEGRTexture2D* Texture)
 {
 	this->Texture = Texture;
 }

@@ -34,3 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEParticle.h"
+
+ZEParticle::ZEParticle()
+{
+	State = ZE_PAS_DEAD;
+}

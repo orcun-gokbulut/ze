@@ -82,8 +82,8 @@ ZEGRVertexLayout* ZESkinnedModelVertex::GetVertexLayout()
 			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
 			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0},
-			{ZEGR_VES_BLEND_INDICES, 0, ZEGR_VET_UINT4,	 0, 56, ZEGR_VU_PER_VERTEX, 0},
-			{ZEGR_VES_BLEND_WEIGHTS, 0, ZEGR_VET_FLOAT4, 0, 60, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BLEND_INDICES, 0, ZEGR_VET_UINT8_4, 0, 56, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BLEND_WEIGHTS, 0, ZEGR_VET_FLOAT4, 0, 60, ZEGR_VU_PER_VERTEX, 0}
 		};
 
 		VertexLayout.SetElements(ElementArray, 7);
@@ -327,7 +327,7 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 
 			LOD->LODLevel = LODNode.ReadInt32("LODLevel");
 			LOD->LODStartDistance = LODNode.ReadInt32("LODStartDistance", (ZEInt32)I * 30);
-			LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 100000);
+			LOD->LODEndDistance = LODNode.ReadInt32("LODEndDistance", 10000);
 			LOD->MaterialId = LODNode.ReadInt32("MaterialId");
 
 			if (Mesh->IsSkinned)
@@ -345,34 +345,34 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 
 				LOD->VertexCount = (ZEUInt32)(LODNode.ReadDataSize("Vertices") / sizeof(ZESkinnedModelVertex));
 				LOD->TriangleCount = LOD->VertexCount / 3;
-				LOD->VertexBufferSkin = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZESkinnedModelVertex));
-				void* Buffer = NULL;
-				
-				LOD->VertexBufferSkin->Lock(&Buffer);
-					if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZESkinnedModelVertex), LOD->VertexCount))
-					{
-						LOD->VertexBufferSkin->Unlock();
-						return false;
-					}
-				
-					if (I == 0)
-					{
-						Mesh->Geometry.SetCount(LOD->VertexCount);
-						for (ZESize N = 0; N < LOD->VertexCount; N++)
-							Mesh->Geometry[N] = ((ZESkinnedModelVertex*)Buffer)[N].Position;
-					}
 
-					ZESkinnedModelVertex* BufferVertex = (ZESkinnedModelVertex*)Buffer;
+				ZESize Size = LOD->VertexCount * sizeof(ZESkinnedModelVertex);
+				ZEBYTE* Buffer = new ZEBYTE[Size];
+				
+				if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZESkinnedModelVertex), LOD->VertexCount))
+					return false;
+
+				ZESkinnedModelVertex* BufferVertex = reinterpret_cast<ZESkinnedModelVertex*>(Buffer);
+				for (ZESize N = 0; N < LOD->VertexCount; N++)
+				{
+					BufferVertex[N].BoneIndices[0] = AffectingBoneIds[BufferVertex[N].BoneIndices[0]];
+					BufferVertex[N].BoneIndices[1] = AffectingBoneIds[BufferVertex[N].BoneIndices[1]];
+					BufferVertex[N].BoneIndices[2] = AffectingBoneIds[BufferVertex[N].BoneIndices[2]];
+					BufferVertex[N].BoneIndices[3] = AffectingBoneIds[BufferVertex[N].BoneIndices[3]];
+				}
+
+				LOD->VertexBufferSkin = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZESkinnedModelVertex), ZEGR_RU_GPU_READ_ONLY, Buffer);
+
+				CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, true);
+
+				if (I == 0)
+				{
+					Mesh->Geometry.SetCount(LOD->VertexCount);
 					for (ZESize N = 0; N < LOD->VertexCount; N++)
-					{
-						BufferVertex[N].BoneIndices[0] = AffectingBoneIds[BufferVertex[N].BoneIndices[0]];
-						BufferVertex[N].BoneIndices[1] = AffectingBoneIds[BufferVertex[N].BoneIndices[1]];
-						BufferVertex[N].BoneIndices[2] = AffectingBoneIds[BufferVertex[N].BoneIndices[2]];
-						BufferVertex[N].BoneIndices[3] = AffectingBoneIds[BufferVertex[N].BoneIndices[3]];
-					}
+						Mesh->Geometry[N] = (reinterpret_cast<ZESkinnedModelVertex*>(Buffer))[N].Position;
+				}
 
-					CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, true);
-				LOD->VertexBufferSkin->Unlock();
+				delete[] Buffer;
 			}
 			else
 			{
@@ -381,25 +381,25 @@ bool ZEModelResource::ReadMeshes(ZEMLReaderNode* MeshesNode)
 
 				LOD->VertexCount = (ZEUInt32)(LODNode.ReadDataSize("Vertices") / sizeof(ZEModelVertex));
 				LOD->TriangleCount = LOD->VertexCount / 3;
-				LOD->VertexBuffer = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZEModelVertex));
-				void* Buffer = NULL;
-				LOD->VertexBuffer->Lock(&Buffer);
-					if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZEModelVertex), LOD->VertexCount))
-					{
-						LOD->VertexBuffer->Unlock();
-						return false;
-					}
 
-					CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, false);
+				ZESize Size = LOD->VertexCount * sizeof(ZEModelVertex);
+				ZEBYTE* Buffer = new ZEBYTE[Size];
 
-					if (I == 0)
-					{
-						Mesh->Geometry.SetCount(LOD->VertexCount);
-						for (ZESize N = 0; N < LOD->VertexCount; N++)
-							Mesh->Geometry[N] = ((ZEModelVertex*)Buffer)[N].Position;
-					}
+				if (!LODNode.ReadDataItems("Vertices", Buffer, sizeof(ZEModelVertex), LOD->VertexCount))
+					return false;
 
-				LOD->VertexBuffer->Unlock();
+				LOD->VertexBuffer = ZEGRVertexBuffer::Create(LOD->VertexCount, sizeof(ZEModelVertex), ZEGR_RU_GPU_READ_ONLY, Buffer);
+
+				CalculateBoundingBox(Mesh->BoundingBox, Buffer, LOD->VertexCount, false);
+
+				if (I == 0)
+				{
+					Mesh->Geometry.SetCount(LOD->VertexCount);
+					for (ZESize N = 0; N < LOD->VertexCount; N++)
+						Mesh->Geometry[N] = (reinterpret_cast<ZEModelVertex*>(Buffer))[N].Position;
+				}
+
+				delete[] Buffer;
 			}
 		}
 

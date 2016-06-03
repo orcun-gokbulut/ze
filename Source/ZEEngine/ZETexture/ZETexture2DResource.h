@@ -60,7 +60,7 @@ class ZETexture2DResource : public ZETextureResource
 
 		static void							CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
 
-		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL);
-		static ZETexture2DResource*			LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL);
+		static ZETexture2DResource*			LoadSharedResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL, bool sRGB = true);
+		static ZETexture2DResource*			LoadResource(const ZEString& FileName, const ZETextureOptions* UserOptions = NULL, bool sRGB = true);
+		static ZETexture2DResource*			LoadResource(ZEFile* ResourceFile, const ZETextureOptions* UserOptions = NULL, bool sRGB = true);
 };

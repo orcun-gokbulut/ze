@@ -42,13 +42,13 @@
 #include "ZEModel.h"
 #include "ZEModelMeshLOD.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNMaterial.h"
-#include "ZERenderer/ZERNRenderParameters.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
 #define ZEMD_MDF_LOCAL_TRANSFORM			0x0001
 #define ZEMD_MDF_INV_LOCAL_TRANSFORM		0x0002
@@ -62,12 +62,13 @@
 
 struct ZEModelMeshConstants
 {
-	ZEMatrix4x4						WorldTransform;
-	ZEMatrix4x4						PreSkinTransform;
-	ZEVector4						ClippingPlane0;
-	ZEVector4						ClippingPlane1;
-	ZEVector4						ClippingPlane2;
-	ZEVector4						ClippingPlane3;
+	ZEMatrix4x4	WorldTransform;
+	ZEMatrix4x4	WorldTransformInverseTranspose;
+	ZEMatrix4x4	PreSkinTransform;
+	ZEVector4	ClippingPlane0;
+	ZEVector4	ClippingPlane1;
+	ZEVector4	ClippingPlane2;
+	ZEVector4	ClippingPlane3;
 };
 
 void ZEModelMesh::UpdateConstantBuffer()
@@ -78,6 +79,7 @@ void ZEModelMesh::UpdateConstantBuffer()
 	ZEModelMeshConstants Constants;
 
 	Constants.WorldTransform = GetWorldTransform();
+	Constants.WorldTransformInverseTranspose = GetInvWorldTransform().Transpose();
 	Constants.PreSkinTransform = GetModelTransform();
 
 	if (ClippingPlanes.GetCount() > 0)
@@ -523,12 +525,12 @@ void ZEModelMesh::SetCustomDrawOrderEnabled(bool Enabled)
 	DrawOrderIsUserDefined = Enabled;
 }
 
-void ZEModelMesh::SetCustomDrawOrder(ZEUInt8 DrawOrder)
+void ZEModelMesh::SetCustomDrawOrder(ZEInt DrawOrder)
 {
 	UserDefinedDrawOrder = DrawOrder;
 }
 
-ZEUInt8 ZEModelMesh::GetCustomDrawOrder()
+ZEInt ZEModelMesh::GetCustomDrawOrder()
 {
 	return UserDefinedDrawOrder;
 }
@@ -708,43 +710,58 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Visible)
 		return false;
 
-	if (Parameters->View->ViewVolume != NULL && Parameters->View->ViewVolume->CullTest(GetWorldBoundingBox()))
+	ZEAABBox BoundingBox = GetWorldBoundingBox();
+
+	if (Parameters->View->ViewVolume != NULL && Parameters->View->ViewVolume->CullTest(BoundingBox))
 		return false;
 
-	ZEInt CurrentLOD = 0;
+	float ClosestBoundingBoxEdgeDistanceSquare = FLT_MAX;
+	float CurrentBoundingBoxEdgeDistanceSquare;
+
+	for (ZESize I = 0; I < 8; I++)
+	{
+		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, BoundingBox.GetVertex(I));
+
+		if (CurrentBoundingBoxEdgeDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
+			ClosestBoundingBoxEdgeDistanceSquare = CurrentBoundingBoxEdgeDistanceSquare;
+	}
+	
+	ZEInt32 CurrentLOD = 0;
 	float DrawOrder = 0.0f;
 	float LODDistanceSquare = 0.0f;
 
-	float EntityDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, GetWorldPosition());	
-	if (!DrawOrderIsUserDefined)
-		DrawOrder = EntityDistanceSquare;
-	else
-		DrawOrder = EntityDistanceSquare * (UserDefinedDrawOrder + 1);
+	//float EntityDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, GetWorldPosition());	
+	//if (!DrawOrderIsUserDefined)
+		DrawOrder = ClosestBoundingBoxEdgeDistanceSquare;
+	//else
+	//	DrawOrder = ClosestBoundingBoxEdgeDistanceSquare * (UserDefinedDrawOrder + 1);
  	
 	float CurrentDistanceSquare = 0.0f;
 	for (ZESize I = 0; I < LODs.GetCount(); I++)
 	{
-		LODDistanceSquare = (float)(LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance());
+		LODDistanceSquare = LODs[I].GetDrawStartDistance() * LODs[I].GetDrawStartDistance();
 
-		if (LODDistanceSquare < EntityDistanceSquare)
+		if (LODDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
 		{
 			if (CurrentDistanceSquare <= LODDistanceSquare)
 			{
 				CurrentDistanceSquare = LODDistanceSquare;
-				CurrentLOD = (ZEInt)I;
+				CurrentLOD = I;
 			}
 		}
 	}
 
-	/*if (EntityDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
-		return false;*/
+	if (ClosestBoundingBoxEdgeDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
+		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
-	RenderCommand.Priority = 0;
-	RenderCommand.Order = DrawOrder;
-	RenderCommand.StageMask = MeshLOD->GetMaterial()->GetStageMask();
+	RenderCommand.Priority = DrawOrderIsUserDefined ? UserDefinedDrawOrder : 255;
 	RenderCommand.Entity = Owner;
+	RenderCommand.Order = DrawOrder;
 	RenderCommand.ExtraParameters = MeshLOD;
+
+	if (!MeshLOD->GetMaterial()->PreRender(RenderCommand))
+		return false;
 
 	Parameters->Renderer->AddCommand(&RenderCommand);
 

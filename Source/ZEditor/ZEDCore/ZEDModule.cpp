@@ -240,7 +240,7 @@ void ZEDModule::StartUp()
 	SceneWrapper->AddChildWrapper(AtmosphereWrapper);*/
 
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
-	SkyBox->SetTexture("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	SkyBox->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	ZEDEntityWrapper* SkyBoxWrapper = ZEDEntityWrapper::CreateInstance();
 	SkyBoxWrapper->SetObject(SkyBox);
 	SkyBoxWrapper->SetSelectable(false);

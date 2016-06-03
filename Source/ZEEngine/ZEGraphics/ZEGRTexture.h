@@ -38,6 +38,8 @@
 #include "ZEGRResource.h"
 
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEGRFormat.h"
 
 enum ZEGRTextureType
@@ -54,27 +56,46 @@ struct ZERect
 	ZEInt Width, Height;
 };
 
+class ZEGRRenderTarget;
+class ZEGRDepthStencilBuffer;
+
 class ZEGRTexture : public ZEGRResource
 {
+	friend class ZEGRContext;
 	private:
-		ZEGRFormat					Format;
-		ZEUInt						LevelCount;
-		bool						IsRenderTarget;
+		ZEGRFormat											Format;
+		ZEUInt												LevelCount;
+
+		struct BoundStage
+		{
+			bool											BoundAsShaderResource;
+			bool											BoundAsUnorderedAccess;
+			ZEInt											Slot;
+		};
 
 	protected:
-		void						SetFormat(ZEGRFormat Format);
-		void						SetLevelCount(ZEUInt LevelCount);
-		void						SetIsRenderTarget(bool RenderTarget);
+		ZEArray<BoundStage>									BoundStages;
+		mutable ZEArray<ZEHolder<ZEGRRenderTarget>>			RenderTargets;
+		mutable ZEArray<ZEHolder<ZEGRDepthStencilBuffer>>	DepthStencilBuffers;
 
-		static ZESize				CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
-		static ZESize				CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		void												SetFormat(ZEGRFormat Format);
+		void												SetLevelCount(ZEUInt LevelCount);
 
-									ZEGRTexture();
+		void												SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource = true, bool BoundAsUnorderedAccess = false);
+		const ZEArray<BoundStage>&							GetBoundStages() const;
+
+		const ZEArray<ZEHolder<ZEGRRenderTarget>>&			GetRenderTargets() const;
+		const ZEArray<ZEHolder<ZEGRDepthStencilBuffer>>&	GetDepthStencilBuffers() const;
+
+		static ZESize										CalculateSize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format);
+		static ZESize										CalculateLevelCount(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+
+															ZEGRTexture();
+		virtual												~ZEGRTexture();
 
 	public:
-		ZEGRFormat					GetFormat() const;
-		ZEUInt						GetLevelCount() const;
-		bool						GetIsRenderTarget() const;
+		ZEGRFormat											GetFormat() const;
+		ZEUInt												GetLevelCount() const;
 
-		virtual ZEGRTextureType		GetTextureType() const = 0;
+		virtual ZEGRTextureType								GetTextureType() const = 0;
 };

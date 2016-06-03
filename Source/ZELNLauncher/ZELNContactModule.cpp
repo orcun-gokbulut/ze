@@ -34,7 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZELNContactModule.h"
-#include "ZELNContactWidget.h"
+
+#include "ui_ZELNContactWidget.h"
 
 ZELN_MODULE_DECRIPTION(ZELNContactModule, "Contact");
 
@@ -43,17 +44,23 @@ bool ZELNContactModule::InitializeSelf()
 	if (!ZEInitializable::InitializeSelf())
 		return false;
 
-	Widget = new ZELNContactWidget();
+	Widget = new QWidget();
+	Form = new Ui_ZELNContactWidget();
+	Form->setupUi(Widget);
 
 	return true;
+}
+
+void ZELNContactModule::DeinitializeSelf()
+{
+	delete Widget;
+	Widget = NULL;
+
+	delete Form;
+	Form = NULL;
 }
 
 QWidget* ZELNContactModule::GetWidget()
 {
 	return Widget;
-}
-
-Ui_ZELNContactWidget* ZELNContactModule::GetForm()
-{
-	return Widget->Form;
 }

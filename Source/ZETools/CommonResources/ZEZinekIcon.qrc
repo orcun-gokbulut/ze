@@ -1,0 +1,5 @@
+<RCC>
+	<qresource prefix="Zinek">			
+		<file>ZEZinekIcon.ico</file>
+	</qresource>
+</RCC>

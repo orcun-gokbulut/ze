@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLogWidget.cpp
+ Zinek Engine - ZERNStageAtmosphere.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNLogWidget.h"
-#include "ui_ZELNLogWidget.h"
+#pragma once
 
-ZELNLogWidget::ZELNLogWidget()
-{
-	Form = new Ui_ZELNLogWidget();
-	Form->setupUi(this);
-}
+#include "ZERNStage.h"
 
-ZELNLogWidget::~ZELNLogWidget()
+class ZEGRTexture2D;
+
+class ZERNStageAtmosphere : public ZERNStage
 {
-	delete Form;
-}
+	ZE_OBJECT
+	private:
+		const ZEGRTexture2D*			AccumulationTexture;
+		const ZEGRTexture2D*			DepthTexture;
+
+		virtual bool					InitializeSelf();						
+		virtual void					DeinitializeSelf();
+
+		bool							UpdateInputOutputs();
+
+	public:
+		virtual ZEInt					GetId() const;
+		virtual const ZEString&			GetName() const;
+
+		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
+
+		virtual bool					Setup(ZEGRContext* Context);
+		virtual void					CleanUp(ZEGRContext* Context);
+
+										ZERNStageAtmosphere();
+
+		static ZEGRRenderState			GetRenderState();
+};

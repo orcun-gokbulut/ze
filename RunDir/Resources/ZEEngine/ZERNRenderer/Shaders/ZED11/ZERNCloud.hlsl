@@ -39,6 +39,7 @@
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNMath.hlsl"
+#include "ZERNSamplers.hlsl"
 
 struct ZERNCloud_Plane_VertexShader_Input
 {
@@ -76,7 +77,7 @@ cbuffer ZERNCloud_Plane_Constant_Draw_Transform					: register(ZERN_SHADER_CONST
 	float4x4		ZERNCloud_Plane_WorldMatrix;
 };
 
-cbuffer ZERNCloud_Plane_Constants								: register(b8)
+cbuffer ZERNCloud_Plane_Constants								: register(b9)
 {
 	float			ZERNCloud_PlaneSubdivision;
 	float			ZERNCloud_CloudCoverage;
@@ -92,8 +93,6 @@ cbuffer ZERNCloud_Plane_Constants								: register(b8)
 	float2			ZERNCloud_Translation;
 	float2			ZERNCloud_Reserved2;
 };
-
-SamplerState		ZERNCloud_SamplerLinearWrap					: register(s0);
 
 Texture2D			ZERNCloud_CloudTexture						: register(t5);
 
@@ -201,15 +200,19 @@ float4 ZERNCloud_Plane_PixelShader_Main(ZERNCloud_Plane_PixelShader_Input Input)
 	float PhaseMie = AngularFactor * ((1.0f - GG) * (1.0f + CosLightView * CosLightView)) / ((2.0f + GG) * pow(abs(1.0f + GG - 2.0f * G * CosLightView), 1.5f));
 	
 	float2 TexCoord = Input.TexCoord + ZERNCloud_Translation;
-	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNCloud_SamplerLinearWrap, ZERNCloud_PlaneSubdivision * TexCoord, 0.0f);
+	float4 CloudSample = ZERNCloud_CloudTexture.SampleLevel(ZERNSampler_LinearWrap, ZERNCloud_PlaneSubdivision * TexCoord, 0.0f);
 	
-	float4 CloudCoverage = max(0.0f, ZERNCloud_CloudCoverage - float4(1.0f, 0.75f, 0.25f, 1.0f));
-	float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
-
-	float MieDensity = exp(-CloudDensity * CloudDensity);
-	float3 ResultColor = ZERNCloud_LightColor * PhaseMie * MieDensity + ZERNCloud_Inscattering;
+	//float4 CloudCoverage = max(0.0f, ZERNCloud_CloudCoverage - float4(0.25f, 0.50f, 0.75f, 0.75f));
+	//float CloudDensity = dot(CloudSample, CloudCoverage) * ZERNCloud_CloudDensity;
+	//float4 CloudPathLengthPerLayer = max(0.0f, CloudSample - (1.0f - ZERNCloud_CloudCoverage));
+	//float CloudCoverage = dot(ZERNCloud_CloudCoverage, float4(0.25f, 0.50f, 0.75f, 0.75f));
+	float CloudPathLength = dot(CloudSample + ZERNCloud_CloudCoverage, float4(0.25f, 0.50f, 0.75f, 0.75f));
 	
-	return float4(ResultColor, (CloudDensity / (CloudDensity + 1.0f)));
+	float Exponent = ZERNCloud_CloudDensity * CloudPathLength;
+	float Transmittance = exp(-Exponent * Exponent);
+	float3 ResultColor = ZERNCloud_LightColor * PhaseMie * Transmittance + ZERNCloud_Inscattering;
+	
+	return float4(ResultColor, max(1.0f - Transmittance, 0.0f));
 }
 
 #endif

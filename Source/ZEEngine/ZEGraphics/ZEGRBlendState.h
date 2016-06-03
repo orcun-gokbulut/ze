@@ -75,13 +75,13 @@ class ZEGRBlendRenderTarget
 	private:
 		struct ZEBlendStateData
 		{
-			bool						BlendEnable : 1;
-			ZEGRBlendOperation			Operation : 4;
-			ZEGRBlend					Source : 6;
-			ZEGRBlend					Destination : 6;
-			ZEGRBlendOperation			AlphaOperation : 4;
-			ZEGRBlend					SourceAlpha : 6;
-			ZEGRBlend					DestinationAlpha : 6;
+			bool						BlendEnable;
+			ZEGRBlendOperation			Operation;
+			ZEGRBlend					Source;
+			ZEGRBlend					Destination;
+			ZEGRBlendOperation			AlphaOperation;
+			ZEGRBlend					SourceAlpha;
+			ZEGRBlend					DestinationAlpha;
 			ZEGRColorMask				WriteMask;
 		} StateData;
 

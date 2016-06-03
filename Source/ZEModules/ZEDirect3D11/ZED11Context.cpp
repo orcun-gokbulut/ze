@@ -53,15 +53,14 @@
 #include "ZEGraphics/ZEGRDefinitions.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRScissorRect.h"
+#include "ZEGraphics/ZEGRStructuredBuffer.h"
 
-#include <d3d11_1.h>
+#define ZEGR_CDF_BLEND_STATE			1
+#define ZEGR_CDF_DEPTHSTENCIL_STATE		2
 
-#define ZEGR_CONTEXT_DIRTY_BLEND_STATE		1
-#define ZEGR_CONTEXT_DIRTY_STENCIL_STATE	2
-
-static DXGI_FORMAT ConverIndexBufferFormat(ZEGRIndexBufferFormat Format)
+static DXGI_FORMAT ConvertIndexBufferFormat(ZEGRIndexBufferFormat Format)
 {
-	switch(Format)
+	switch (Format)
 	{
 		default:
 		case ZEGR_IBF_NONE:
@@ -75,38 +74,58 @@ static DXGI_FORMAT ConverIndexBufferFormat(ZEGRIndexBufferFormat Format)
 	}
 }
 
-void ZED11Context::UpdateContext()
-{
-	if (RenderState == NULL)
-		return;
-
-	if (DirtyFlags.GetFlags(ZEGR_CONTEXT_DIRTY_BLEND_STATE))
-	{
-		Context->OMSetBlendState(RenderState->BlendState->GetInterface(), (float*)&BlendFactors, BlendMask);
-		DirtyFlags.UnraiseFlags(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
-	}
-
-
-	if (DirtyFlags.GetFlags(ZEGR_CONTEXT_DIRTY_STENCIL_STATE))
-	{
-		Context->OMSetDepthStencilState(RenderState->DepthStencilState->GetInterface(), StencilRef);
-		DirtyFlags.UnraiseFlags(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
-	}
-}
-
-void ZED11Context::Initialize(ID3D11DeviceContext1* Context)
+void ZED11Context::Initialize(ID3D11DeviceContext* Context)
 {
 	this->Context = Context;
+
+	GraphicsState = static_cast<ZED11RenderStateData*>(GetModule()->CreateRenderStateData());
+	ComputeState = static_cast<ZED11ComputeRenderStateData*>(GetModule()->CreateComputeRenderStateData());
 }
 
 void ZED11Context::Deinitialize()
 {
 	ZEGR_RELEASE(Context);
+	
+	DirtyFlags.RaiseAll();
+
+	GraphicsState.Release();
+	ComputeState.Release();
 }
 
-ID3D11DeviceContext1* ZED11Context::GetContext() const
+void ZED11Context::UpdateGraphicsState()
+{
+	if (DirtyFlags.GetFlags(ZEGR_CDF_BLEND_STATE))
+	{
+		Context->OMSetBlendState(GraphicsState->BlendState->GetInterface(), BlendFactors.M, BlendMask);
+		DirtyFlags.UnraiseFlags(ZEGR_CDF_BLEND_STATE);
+	}
+
+	if (DirtyFlags.GetFlags(ZEGR_CDF_DEPTHSTENCIL_STATE))
+	{
+		Context->OMSetDepthStencilState(GraphicsState->DepthStencilState->GetInterface(), StencilRef);
+		DirtyFlags.UnraiseFlags(ZEGR_CDF_DEPTHSTENCIL_STATE);
+	}
+}
+
+ID3D11DeviceContext* ZED11Context::GetContext() const
 {
 	return Context;
+}
+
+ZED11Context::ZED11Context()
+{
+	Context = NULL;
+
+	DirtyFlags.RaiseAll();
+
+	BlendFactors = ZEVector4::One;
+	BlendMask = 0xFFFFFFFF;
+	StencilRef = 0;
+}
+
+ZED11Context::~ZED11Context()
+{
+	Deinitialize();
 }
 
 void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
@@ -114,34 +133,89 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 	if (State == NULL)
 		return;
 
-	RenderState = static_cast<const ZED11RenderStateData*>(State);
+	const ZED11RenderStateData* D11State = static_cast<const ZED11RenderStateData*>(State);
 
-	if(RenderState->VertexLayout != NULL)
-		Context->IASetInputLayout(RenderState->VertexLayout->GetInterface());
+	for (ZEUInt I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+	{
+		const ZED11Shader* SrcShader = D11State->Shaders[(ZEGRShaderType)I];
+		const ZED11Shader* DestShader = GraphicsState->Shaders[(ZEGRShaderType)I];
+		bool SrcShaderExist = (SrcShader != NULL);
+		bool DestShaderExist = (DestShader != NULL);
 
-	Context->IASetPrimitiveTopology(RenderState->PrimitiveTopology);
+		if (!SrcShaderExist && !DestShaderExist)
+			continue;
 
-	#define _SetupShader(Prefix, Type, Getter) \
-		if (RenderState->Shaders[Type] == NULL) \
-			Context->Prefix##SetShader(NULL, NULL, 0); \
-		else \
-			Context->Prefix##SetShader(RenderState->Shaders[Type].Cast<ZED11Shader>()->Getter(), NULL, 0);
+		if (SrcShaderExist && DestShaderExist)
+		{	
+			const ZEArray<ZEBYTE>& DestShaderByteCode= DestShader->GetByteCode();
+			const ZEArray<ZEBYTE>& SrcShaderByteCode= SrcShader->GetByteCode();
 
-	_SetupShader(VS, ZEGR_ST_VERTEX, GetVertexShader)
-	_SetupShader(PS, ZEGR_ST_PIXEL, GetPixelShader)
-	_SetupShader(GS, ZEGR_ST_GEOMETRY, GetGeometryShader)
-	_SetupShader(DS, ZEGR_ST_DOMAIN, GetDomainShader)
-	_SetupShader(HS, ZEGR_ST_HULL, GetHullShader)
-	_SetupShader(CS, ZEGR_ST_COMPUTE, GetComputeShader)
-	
-	#undef _SetupShader
-	Context->RSSetState(RenderState->RasterizerState->GetInterface());
+			ZESize SrcShaderByteCodeLength = SrcShaderByteCode.GetCount();
+			if (SrcShaderByteCodeLength == DestShaderByteCode.GetCount() &&
+				memcmp(SrcShaderByteCode.GetConstCArray(), DestShaderByteCode.GetConstCArray(), SrcShaderByteCodeLength) == 0)
+				continue;
+		}
 
-	if (BlendState != RenderState->BlendState->GetInterface())
-		DirtyFlags.RaiseFlags(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
+		bool SetShaderNull = (!SrcShaderExist && DestShaderExist);
 
-	if (DepthStencilState != RenderState->DepthStencilState->GetInterface())
-		DirtyFlags.RaiseFlags(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
+		switch ((ZEGRShaderType)I)
+		{
+		case ZEGR_ST_VERTEX:
+			Context->VSSetShader(SetShaderNull ? NULL : SrcShader->GetVertexShader(), NULL, 0);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetShader(SetShaderNull ? NULL : SrcShader->GetDomainShader(), NULL, 0);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetShader(SetShaderNull ? NULL : SrcShader->GetHullShader(), NULL, 0);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetShader(SetShaderNull ? NULL : SrcShader->GetGeometryShader(), NULL, 0);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetShader(SetShaderNull ? NULL : SrcShader->GetPixelShader(), NULL, 0);
+			break;
+
+		default:
+			break;
+		}
+
+		GraphicsState->Shaders[(ZEGRShaderType)I] = D11State->Shaders[(ZEGRShaderType)I];
+	}
+
+	if (D11State->BlendState != NULL && GraphicsState->BlendState != D11State->BlendState)
+	{
+		GraphicsState->BlendState = D11State->BlendState;
+		DirtyFlags.RaiseFlags(ZEGR_CDF_BLEND_STATE);
+	}
+
+	if (D11State->RasterizerState != NULL && GraphicsState->RasterizerState != D11State->RasterizerState)
+	{
+		Context->RSSetState(D11State->RasterizerState->GetInterface());
+		GraphicsState->RasterizerState = D11State->RasterizerState;
+	}
+
+	if (D11State->DepthStencilState != NULL && GraphicsState->DepthStencilState != D11State->DepthStencilState)
+	{
+		GraphicsState->DepthStencilState = D11State->DepthStencilState;
+		DirtyFlags.RaiseFlags(ZEGR_CDF_DEPTHSTENCIL_STATE);
+	}
+
+	if (D11State->VertexLayout != NULL && GraphicsState->VertexLayout != D11State->VertexLayout)
+	{
+		Context->IASetInputLayout(D11State->VertexLayout->GetInterface());
+		GraphicsState->VertexLayout = D11State->VertexLayout;
+	}
+
+	if (GraphicsState->PrimitiveTopology != D11State->PrimitiveTopology)
+	{
+		Context->IASetPrimitiveTopology(D11State->PrimitiveTopology);
+		GraphicsState->PrimitiveTopology = D11State->PrimitiveTopology;
+	}
 }
 
 void ZED11Context::SetComputeRenderState(const ZEGRComputeRenderStateData* State)
@@ -149,33 +223,42 @@ void ZED11Context::SetComputeRenderState(const ZEGRComputeRenderStateData* State
 	if (State == NULL)
 		return;
 
-	const ZEGRShader* ComputeShader = static_cast<const ZED11ComputeRenderStateData*>(State)->ComputeShader;
-	if (ComputeShader == NULL)
-		return;
+	const ZED11ComputeRenderStateData* D11State = static_cast<const ZED11ComputeRenderStateData*>(State);
 
-	Context->CSSetShader(static_cast<const ZED11Shader*>(ComputeShader)->GetComputeShader(), NULL, 0);
+	const ZED11Shader* DestShader = ComputeState->ComputeShader;
+	const ZED11Shader* SrcShader = D11State->ComputeShader;
+
+	if (DestShader != NULL && SrcShader != NULL)
+	{	
+		const ZEArray<ZEBYTE>& DestShaderByteCode= DestShader->GetByteCode();
+		const ZEArray<ZEBYTE>& SrcShaderByteCode= SrcShader->GetByteCode();
+
+		ZESize SrcShaderByteCodeLength = SrcShaderByteCode.GetCount();
+		if (SrcShaderByteCodeLength == DestShaderByteCode.GetCount() &&
+			memcmp(SrcShaderByteCode.GetConstCArray(), DestShaderByteCode.GetConstCArray(), SrcShaderByteCodeLength) == 0)
+			return;
+	}
+
+	Context->CSSetShader(SrcShader->GetComputeShader(), NULL, 0);
+	ComputeState->ComputeShader = D11State->ComputeShader;
 }
 
 void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers)
 {
-	zeDebugCheck(Index >= D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT, "Vertex buffer index exceeds the max slot count.");
-	zeDebugCheck(Count >= (D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT - Index), "Vertex buffer count is too much.");
+	if (!CheckVertexBuffers(Index, Count, Buffers))
+		return;
 
-	ZEUInt Strides[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-	ZEUInt Offsets[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
-	ID3D11Buffer* NativeBuffers[D3D11_IA_VERTEX_INPUT_RESOURCE_SLOT_COUNT];
+	UINT Strides[ZEGR_MAX_VERTEX_BUFFER_SLOT] = {0};
+	UINT Offsets[ZEGR_MAX_VERTEX_BUFFER_SLOT] = {0};
+	ID3D11Buffer* NativeBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT] = {NULL};
 
-	memset(Strides, 0, sizeof(ZEUInt) * Count);
-	memset(Offsets, 0, sizeof(ZEUInt) * Count);
-	memset(NativeBuffers, NULL, sizeof(ID3D11Buffer*) * Count);
-
-	for(ZEUInt I = 0; I < Count; ++I)
+	for (ZEUInt I = 0; I < Count; I++)
 	{
-		if (Buffers[I] != NULL)
+		ZEUInt Slot = Index + I;
+		if (VertexBuffers[Slot] != NULL)
 		{
-			const ZED11VertexBuffer* D11Buffer = static_cast<const ZED11VertexBuffer*>(Buffers[I]);
-			Strides[I] = (ZEUInt)D11Buffer->GetVertexSize();
-			NativeBuffers[I] = D11Buffer->GetBuffer();
+			Strides[I] = static_cast<const ZED11VertexBuffer*>(VertexBuffers[Slot])->GetVertexStride();
+			NativeBuffers[I] = static_cast<const ZED11VertexBuffer*>(VertexBuffers[Slot])->GetBuffer();
 		}
 	}
 
@@ -184,72 +267,374 @@ void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertex
 
 void ZED11Context::SetIndexBuffer(const ZEGRIndexBuffer* Buffer)
 {
-	const ZED11IndexBuffer* D11Buffer = static_cast<const ZED11IndexBuffer*>(Buffer);
+	if (!CheckIndexBuffer(Buffer))
+		return;
 
 	ID3D11Buffer* NativeBuffer = NULL;
-	ZEGRIndexBufferFormat Format = ZEGRIndexBufferFormat::ZEGR_IBF_NONE;
-	if (D11Buffer != NULL)
+	DXGI_FORMAT Format = DXGI_FORMAT_UNKNOWN;
+	
+	if (IndexBuffer != NULL)
 	{
-		NativeBuffer = D11Buffer->GetBuffer();
-		Format = D11Buffer->GetFormat();
+		Format = ConvertIndexBufferFormat(Buffer->GetFormat());
+		NativeBuffer = static_cast<const ZED11IndexBuffer*>(Buffer)->GetBuffer();
 	}
 
-	Context->IASetIndexBuffer(NativeBuffer, ConverIndexBufferFormat(Format), 0);
+	Context->IASetIndexBuffer(NativeBuffer, Format, 0);
+}
+
+void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers)
+{
+	if (!CheckConstantBuffers(Shader, Index, Count, Buffers))
+		return;
+
+	ID3D11Buffer* NativeBuffers[ZEGR_MAX_CONSTANT_BUFFER_SLOT] = {NULL};
+	ZEUInt ShaderIndex = (Shader == ZEGR_ST_ALL) ? 0 : Shader;
+
+	for (ZEUInt I = 0; I < Count; I++)
+	{
+		ZEUInt Slot = Index + I;
+
+		if (ConstantBuffers[ShaderIndex][Slot] != NULL)
+			NativeBuffers[I] = static_cast<const ZED11ConstantBuffer*>(ConstantBuffers[ShaderIndex][Slot])->GetBuffer();
+	}
+
+	switch (Shader)
+	{
+		case ZEGR_ST_VERTEX:
+			Context->VSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->PSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->GSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->DSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->HSSetConstantBuffers(Index, Count, NativeBuffers);
+			Context->CSSetConstantBuffers(Index, Count, NativeBuffers);
+			break;
+
+		default:
+			break;
+	}
+}
+
+void ZED11Context::SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers)
+{
+	if (!CheckShaderResources(Shader, Index, Count, reinterpret_cast<const ZEGRResource*const*>(Buffers)))
+		return;
+
+	ID3D11ShaderResourceView* NativeShaderResources[ZEGR_MAX_TEXTURE_SLOT] = {NULL};
+	ZEUInt ShaderIndex = (Shader == ZEGR_ST_ALL) ? 0 : Shader;
+
+	for (ZEUInt I = 0; I < Count; I++)
+	{
+		ZEUInt Slot = Index + I;
+
+		const ZEGRResource* Resource = ShaderResources[ShaderIndex][Slot];
+		if (Resource == NULL)
+			continue;
+
+		switch (Resource->GetResourceType())
+		{
+			case ZEGR_RT_STRUCTURED_BUFFER:
+				{
+					NativeShaderResources[I] = static_cast<const ZED11StructuredBuffer*>(Resource)->GetShaderResourceView();
+				}
+				break;
+
+			case ZEGR_RT_TEXTURE:
+				{
+					const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(Resource);
+					switch (Texture->GetTextureType())
+					{
+						case ZEGR_TT_2D:
+							NativeShaderResources[I] = static_cast<const ZED11Texture2D*>(Texture)->GetShaderResourceView();
+							break;
+
+						case ZEGR_TT_3D:
+							NativeShaderResources[I] = static_cast<const ZED11Texture3D*>(Texture)->GetShaderResourceView();
+							break;
+
+						case ZEGR_TT_CUBE:
+							NativeShaderResources[I] = static_cast<const ZED11TextureCube*>(Texture)->GetShaderResourceView();
+							break;
+
+						default:
+							break;
+					}
+				}
+				break;
+
+			default:
+				break;
+		}
+	}
+
+	switch (Shader)
+	{
+		case ZEGR_ST_VERTEX:
+			Context->VSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->PSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->GSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->DSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->HSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->CSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		default:
+			break;
+	}
+}
+
+void ZED11Context::SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures)
+{
+	if (!CheckShaderResources(Shader, Index, Count, reinterpret_cast<const ZEGRResource*const*>(Textures)))
+		return;
+
+	ID3D11ShaderResourceView* NativeShaderResources[ZEGR_MAX_TEXTURE_SLOT] = {NULL};
+	ZEUInt ShaderIndex = (Shader == ZEGR_ST_ALL) ? 0 : Shader;
+
+	for (ZEUInt I = 0; I < Count; I++)
+	{
+		ZEUInt Slot = Index + I;
+
+		const ZEGRResource* Resource = static_cast<const ZEGRTexture*>(ShaderResources[ShaderIndex][Slot]);
+		if (Resource == NULL)
+			continue;
+
+		switch (Resource->GetResourceType())
+		{
+			case ZEGR_RT_STRUCTURED_BUFFER:
+				{
+					NativeShaderResources[I] = static_cast<const ZED11StructuredBuffer*>(Resource)->GetShaderResourceView();
+				}
+				break;
+
+			case ZEGR_RT_TEXTURE:
+				{
+					const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(Resource);
+					switch (Texture->GetTextureType())
+					{
+						case ZEGR_TT_2D:
+							NativeShaderResources[I] = static_cast<const ZED11Texture2D*>(Texture)->GetShaderResourceView();
+							break;
+
+						case ZEGR_TT_3D:
+							NativeShaderResources[I] = static_cast<const ZED11Texture3D*>(Texture)->GetShaderResourceView();
+							break;
+
+						case ZEGR_TT_CUBE:
+							NativeShaderResources[I] = static_cast<const ZED11TextureCube*>(Texture)->GetShaderResourceView();
+							break;
+
+						default:
+							break;
+					}
+				}
+				break;
+
+			default:
+				break;
+		}
+
+	}
+
+	switch (Shader)
+	{
+		case ZEGR_ST_VERTEX:
+			Context->VSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->PSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->GSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->DSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->HSSetShaderResources(Index, Count, NativeShaderResources);
+			Context->CSSetShaderResources(Index, Count, NativeShaderResources);
+			break;
+
+		default:
+			break;
+	}
+}
+
+void ZED11Context::SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers)
+{
+	if (!CheckSamplers(Shader, Index, Count, Samplers))
+		return;
+
+	ID3D11SamplerState* NativeSamplers[ZEGR_MAX_SAMPLER_SLOT] = {NULL};
+	ZEUInt ShaderIndex = (Shader == ZEGR_ST_ALL) ? 0 : Shader;
+
+	for (ZEUInt I = 0; I < Count; I++)
+	{
+		ZEUInt Slot = Index + I;
+
+		if (this->Samplers[ShaderIndex][Slot] != NULL)
+			NativeSamplers[I] = static_cast<const ZED11Sampler*>(this->Samplers[ShaderIndex][Slot])->GetInterface();
+	}
+
+	switch (Shader)
+	{
+		case ZEGR_ST_VERTEX:
+			Context->VSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		case ZEGR_ST_PIXEL:
+			Context->PSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		case ZEGR_ST_GEOMETRY:
+			Context->GSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		case ZEGR_ST_DOMAIN:
+			Context->DSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		case ZEGR_ST_HULL:
+			Context->HSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		case ZEGR_ST_COMPUTE:
+			Context->CSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		case ZEGR_ST_ALL:
+			Context->VSSetSamplers(Index, Count, NativeSamplers);
+			Context->PSSetSamplers(Index, Count, NativeSamplers);
+			Context->GSSetSamplers(Index, Count, NativeSamplers);
+			Context->DSSetSamplers(Index, Count, NativeSamplers);
+			Context->HSSetSamplers(Index, Count, NativeSamplers);
+			Context->CSSetSamplers(Index, Count, NativeSamplers);
+			break;
+
+		default:
+			break;
+	}
 }
 
 void ZED11Context::SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
-	zeDebugCheck(Count >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget count is too much.");
-	
-	if (Count >= ZEGR_MAX_RENDER_TARGET_SLOT)
-		Count = ZEGR_MAX_RENDER_TARGET_SLOT;
+	if (!CheckRenderTargetsAndDepthStencilBuffer(Count, RenderTargets, DepthStencilBuffer))
+		return;
 
-	ID3D11RenderTargetView* NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-	memset(&NativeRenderTargets[0], NULL, sizeof(ID3D11RenderTargetView*) * Count);
+	ID3D11RenderTargetView* NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT] = {NULL};
+	ID3D11DepthStencilView*	NativeDepthStencil = NULL;
 
-	for (ZESize I = 0; I < Count; I++)
+	for (ZEUInt I = 0; I < Count; I++)
 	{
-		if (RenderTargets[I] != NULL)
-			NativeRenderTargets[I] = static_cast<const ZED11RenderTarget*>(RenderTargets[I])->GetView();
+		if (this->RenderTargets[I] != NULL)
+			NativeRenderTargets[I] = static_cast<const ZED11RenderTarget*>(this->RenderTargets[I])->GetView();
 	}
 
-	ID3D11DepthStencilView* NativeDepthStencil = NULL;
-	if (DepthStencilBuffer != NULL)
-		NativeDepthStencil = static_cast<const ZED11DepthStencilBuffer*>(DepthStencilBuffer)->GetView();
-
-	Context->OMSetRenderTargets(Count, NativeRenderTargets, NativeDepthStencil);
+	if (this->DepthStencilBuffer != NULL)
+		NativeDepthStencil = static_cast<const ZED11DepthStencilBuffer*>(this->DepthStencilBuffer)->GetView();
+	
+	Context->OMSetRenderTargets(Count, (Count == 0) ? NULL : NativeRenderTargets, NativeDepthStencil);
 }
 
-void ZED11Context::GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets, ZEGRDepthStencilBuffer** DepthStencilBuffer)
+void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
 {
-	zeDebugCheck(Count >= ZEGR_MAX_RENDER_TARGET_SLOT, "RenderTarget count is too much.");
-	zeCheckError(RenderTargets == NULL && DepthStencilBuffer == NULL, ZE_VOID, "Both render target and depth-stencil buffer cannot be NULL.");
+	if (!CheckScissorRects(Count, Rects))
+		return;
 
-	if (Count >= ZEGR_MAX_RENDER_TARGET_SLOT)
-		Count = ZEGR_MAX_RENDER_TARGET_SLOT;
+	D3D11_RECT NativeRects[ZEGR_MAX_SCISSOR_SLOT];
 
-	ID3D11RenderTargetView* NativeRenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-	memset(&NativeRenderTargets[0], NULL, sizeof(ID3D11RenderTargetView*) * Count);
-	ID3D11DepthStencilView* NativeDepthStencil = NULL;
-
-	Context->OMGetRenderTargets(Count, NativeRenderTargets, &NativeDepthStencil);
-
-	ZED11RenderTarget* _RenderTargets[ZEGR_MAX_RENDER_TARGET_SLOT];
-	ZED11DepthStencilBuffer* _DepthStencilBuffer;
-
-	for(ZEUInt I = 0; I < Count; I++)
+	for (ZEUInt I = 0; I < Count; I++)
 	{
-		_RenderTargets[I] = new ZED11RenderTarget();
-		_RenderTargets[I]->View = NativeRenderTargets[I];
+		NativeRects[I].left = this->ScissorRects[I].GetLeft();
+		NativeRects[I].right = this->ScissorRects[I].GetRight();
+		NativeRects[I].top = this->ScissorRects[I].GetTop();
+		NativeRects[I].bottom = this->ScissorRects[I].GetBottom();
 	}
+	
+	Context->RSSetScissorRects(Count, NativeRects);
+}
 
-	_DepthStencilBuffer = new ZED11DepthStencilBuffer();
-	_DepthStencilBuffer->View = NativeDepthStencil;
+void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
+{
+	if (!CheckViewports(Count, Viewports))
+		return;
 
-	if(RenderTargets != NULL)
-		memcpy(RenderTargets, _RenderTargets, sizeof(ZEGRRenderTarget*) * Count);
-	if(DepthStencilBuffer != NULL)
-		*DepthStencilBuffer = _DepthStencilBuffer;
+	D3D11_VIEWPORT NativeViewports[ZEGR_MAX_VIEWPORT_SLOT];
+
+	for (ZEUInt I = 0; I < Count; I++)
+	{
+		NativeViewports[I].Width = this->Viewports[I].GetWidth();
+		NativeViewports[I].Height = this->Viewports[I].GetHeight();
+		NativeViewports[I].TopLeftX = this->Viewports[I].GetX();
+		NativeViewports[I].TopLeftY = this->Viewports[I].GetY();
+		NativeViewports[I].MinDepth = this->Viewports[I].GetMinDepth();
+		NativeViewports[I].MaxDepth = this->Viewports[I].GetMaxDepth();
+	}
+	
+	Context->RSSetViewports(Count, NativeViewports);
 }
 
 void ZED11Context::SetStencilRef(ZEUInt Reference)
@@ -258,16 +643,16 @@ void ZED11Context::SetStencilRef(ZEUInt Reference)
 		return;
 
 	StencilRef = Reference;
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_STENCIL_STATE);
+	DirtyFlags.RaiseFlags(ZEGR_CDF_DEPTHSTENCIL_STATE);
 }
 
-void ZED11Context::SetBlendFactors(ZEVector4& Factors)
+void ZED11Context::SetBlendFactors(const ZEVector4& Factors)
 {
 	if (BlendFactors == Factors)
 		return;
 
 	BlendFactors = Factors;
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
+	DirtyFlags.RaiseFlags(ZEGR_CDF_BLEND_STATE);
 }
 
 void ZED11Context::SetBlendMask(ZEUInt Mask)
@@ -276,411 +661,151 @@ void ZED11Context::SetBlendMask(ZEUInt Mask)
 		return;
 
 	BlendMask = Mask;
-	DirtyFlags.RaiseBit(ZEGR_CONTEXT_DIRTY_BLEND_STATE);
+	DirtyFlags.RaiseFlags(ZEGR_CDF_BLEND_STATE);
 }
 
-void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
+void ZED11Context::SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers)
 {
-	zeDebugCheck(Count > ZEGR_MAX_SCISSOR_SLOT, "Scisors Rect count is too much.");
+	if (!CheckUnorderedAccesses(Index, Count, reinterpret_cast<const ZEGRResource*const*>(Buffers)))
+		return;
 
-	if (Count > ZEGR_MAX_SCISSOR_SLOT)
-		Count = ZEGR_MAX_SCISSOR_SLOT;
-	
-	D3D11_RECT NativeRects[ZEGR_MAX_SCISSOR_SLOT];
-	for (ZESize I = 0; I < Count; I++)
+	ID3D11UnorderedAccessView* NativeUnorderedAccesses[ZEGR_MAX_RWTEXTURE_SLOT] = {NULL};
+
+	for (ZEUInt I = 0; I < Count; I++)
 	{
-		NativeRects[I].left = Rects[I].GetLeft();
-		NativeRects[I].right = Rects[I].GetRight();
-		NativeRects[I].top = Rects[I].GetTop();
-		NativeRects[I].bottom = Rects[I].GetBottom();
-	}
-	
-	Context->RSSetScissorRects(Count, NativeRects);
-}
+		ZEUInt Slot = Index + I;
 
-void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
-{
-	zeDebugCheck(Count > ZEGR_MAX_VIEWPORT_SLOT, "Viewport count is too much.");
-
-	if (Count > ZEGR_MAX_VIEWPORT_SLOT)
-		Count = ZEGR_MAX_VIEWPORT_SLOT;
-
-	D3D11_VIEWPORT NativeViewports[ZEGR_MAX_VIEWPORT_SLOT];
-	for (ZESize I = 0; I < Count; I++)
-	{
-		NativeViewports[I].Width = Viewports[I].GetWidth();
-		NativeViewports[I].Height = Viewports[I].GetHeight();
-		NativeViewports[I].TopLeftX = Viewports[I].GetX();
-		NativeViewports[I].TopLeftY = Viewports[I].GetY();
-		NativeViewports[I].MinDepth = Viewports[I].GetMinDepth();
-		NativeViewports[I].MaxDepth = Viewports[I].GetMaxDepth();
-	}
-	
-	Context->RSSetViewports(Count, NativeViewports);
-}
-
-void ZED11Context::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
-{
-	ID3D11ShaderResourceView* ResourceView = NULL;
-	if(Buffer != NULL)
-	{
-		ResourceView = static_cast<const ZED11StructuredBuffer*>(Buffer)->GetShaderResourceView();
-	}
-	
-	switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_VERTEX:
-			Context->VSSetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			Context->PSSetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			Context->GSSetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			Context->DSSetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_HULL:
-			Context->HSSetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_ALL:
-			Context->VSSetShaderResources(Index, 1, &ResourceView);
-			Context->PSSetShaderResources(Index, 1, &ResourceView);
-			Context->GSSetShaderResources(Index, 1, &ResourceView);
-			Context->DSSetShaderResources(Index, 1, &ResourceView);
-			Context->HSSetShaderResources(Index, 1, &ResourceView);
-			Context->CSSetShaderResources(Index, 1, &ResourceView);
-			break;
-	}
-}
-
-void ZED11Context::SetRWTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
-{
-	ID3D11UnorderedAccessView* NativeView = NULL;
-
-	if (Texture != NULL)
-	{
-		switch (Texture->GetTextureType())
+		const ZEGRResource* Resource = UnorderedAccesses[Slot];
+		if (Resource != NULL)
 		{
-			case ZEGR_TT_2D:
-				NativeView = static_cast<const ZED11Texture2D*>(Texture)->GetUnorderedAccessView();
-				break;
-			case ZEGR_TT_3D:
-				NativeView = static_cast<const ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
-				break;
+			switch (Resource->GetResourceType())
+			{
+				case ZEGR_RT_STRUCTURED_BUFFER:
+					{
+						NativeUnorderedAccesses[I] = static_cast<const ZED11StructuredBuffer*>(Resource)->GetUnorderedAccessView();
+					}
+					break;
 
-			default:
-				break;
+				case ZEGR_RT_TEXTURE:
+					{
+						const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(Resource);
+						switch (Texture->GetTextureType())
+						{
+							case ZEGR_TT_2D:
+								NativeUnorderedAccesses[I] = static_cast<const ZED11Texture2D*>(Texture)->GetUnorderedAccessView();
+								break;
+
+							case ZEGR_TT_3D:
+								NativeUnorderedAccesses[I] = static_cast<const ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
+								break;
+
+							default:
+								break;
+						}
+					}
+					break;
+
+				default:
+					break;
+			}
+		}
+	}
+	
+	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
+}
+
+void ZED11Context::SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures)
+{
+	if (!CheckUnorderedAccesses(Index, Count, reinterpret_cast<const ZEGRResource*const*>(Textures)))
+		return;
+	
+	ID3D11UnorderedAccessView* NativeUnorderedAccesses[ZEGR_MAX_RWTEXTURE_SLOT] = {NULL};
+
+	for (ZEUInt I = 0; I < Count; I++)
+	{
+		ZEUInt Slot = Index + I;
+
+		const ZEGRResource* Resource = UnorderedAccesses[Slot];
+		if (Resource != NULL)
+		{
+			switch (Resource->GetResourceType())
+			{
+				case ZEGR_RT_STRUCTURED_BUFFER:
+					{
+						NativeUnorderedAccesses[I] = static_cast<const ZED11StructuredBuffer*>(Resource)->GetUnorderedAccessView();
+					}
+					break;
+
+				case ZEGR_RT_TEXTURE:
+					{
+						const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(Resource);
+						switch (Texture->GetTextureType())
+						{
+							case ZEGR_TT_2D:
+								NativeUnorderedAccesses[I] = static_cast<const ZED11Texture2D*>(Texture)->GetUnorderedAccessView();
+								break;
+
+							case ZEGR_TT_3D:
+								NativeUnorderedAccesses[I] = static_cast<const ZED11Texture3D*>(Texture)->GetUnorderedAccessView();
+								break;
+
+							default:
+								break;
+						}
+					}
+					break;
+
+				default:
+					break;
+			}
 		}
 	}
 
-	switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetUnorderedAccessViews(Index, 1, &NativeView, NULL);
-			break;
-	}
-}
-
-void ZED11Context::SetRWStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
-{
-	ID3D11UnorderedAccessView* UnorderedAccessView = NULL;
-	if(UnorderedAccessView != NULL)
-	{
-		UnorderedAccessView = static_cast<const ZED11StructuredBuffer*>(Buffer)->GetUnorderedAccessView();
-	}
-
-	switch (Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetUnorderedAccessViews(Index, 1, &UnorderedAccessView, NULL);
-			break;
-	}
-}
-
-void ZED11Context::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRConstantBuffer* Buffer)
-{
-	ID3D11Buffer* NativeConstantBuffer = NULL;
-
-	if (Buffer != NULL)
-		 NativeConstantBuffer = static_cast<const ZED11ConstantBuffer*>(Buffer)->GetBuffer();
-
-	switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_VERTEX:
-			Context->VSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			Context->PSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			Context->GSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			Context->DSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-
-		case ZEGR_ST_HULL:
-			Context->HSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-
-		case ZEGR_ST_ALL:
-			Context->VSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			Context->PSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			Context->GSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			Context->DSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			Context->HSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			Context->CSSetConstantBuffers(Index, 1, &NativeConstantBuffer);
-			break;
-	}
-}
-
-void ZED11Context::GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer)
-{
-	zeCheckError(Buffer == NULL, ZE_VOID,"Constant buffer cannot be NULL.");
-	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL.");
-
-	ID3D11Buffer* NativeBuffer = NULL;
-
-	switch (Shader)
-	{
-	default:
-	case ZEGR_ST_NONE:
-		*Buffer = NULL;
-		break;
-	case ZEGR_ST_VERTEX:
-		Context->VSGetConstantBuffers(Index, 1, &NativeBuffer);
-		break;
-	case ZEGR_ST_PIXEL:
-		Context->PSGetConstantBuffers(Index, 1, &NativeBuffer);
-		break;
-	case ZEGR_ST_GEOMETRY:
-		Context->GSGetConstantBuffers(Index, 1, &NativeBuffer);
-		break;
-	case ZEGR_ST_DOMAIN:
-		Context->DSGetConstantBuffers(Index, 1, &NativeBuffer);
-		break;
-	case ZEGR_ST_HULL:
-		Context->HSGetConstantBuffers(Index, 1, &NativeBuffer);
-		break;
-	case ZEGR_ST_COMPUTE:
-		Context->CSGetConstantBuffers(Index, 1, &NativeBuffer);
-		break;
-	}
-
-	ZED11ConstantBuffer* ConstantBuffer = new ZED11ConstantBuffer();
-	ConstantBuffer->Buffer = NativeBuffer;
-
-	*Buffer = ConstantBuffer;
-}
-
-void ZED11Context::SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
-{
-	ID3D11ShaderResourceView* NativeTexture = NULL;
-
-	if (Texture != NULL)
-	{
-		switch (Texture->GetTextureType())
-		{
-			case ZEGR_TT_2D:
-				NativeTexture = static_cast<const ZED11Texture2D*>(Texture)->GetShaderResourceView();
-				break;
-
-			case ZEGR_TT_3D:
-				NativeTexture = static_cast<const ZED11Texture3D*>(Texture)->GetResourceView();
-				break;
-
-			case ZEGR_TT_CUBE:
-				NativeTexture = static_cast<const ZED11TextureCube*>(Texture)->GetResourceView();
-				break;
-
-			default:
-				break;
-		}
-	}
-
-	switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_VERTEX:
-			Context->VSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			Context->PSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			Context->GSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			Context->DSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-
-		case ZEGR_ST_HULL:
-			Context->HSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-
-		case ZEGR_ST_ALL:
-			Context->VSSetShaderResources(Index, 1, &NativeTexture);
-			Context->GSSetShaderResources(Index, 1, &NativeTexture);
-			Context->HSSetShaderResources(Index, 1, &NativeTexture);
-			Context->DSSetShaderResources(Index, 1, &NativeTexture);
-			Context->PSSetShaderResources(Index, 1, &NativeTexture);
-			Context->CSSetShaderResources(Index, 1, &NativeTexture);
-			break;
-	}
-}
-
-void ZED11Context::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture)
-{
-	zeCheckError(Texture == NULL, ZE_VOID, "Texture cannot be NULL");
-	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL");
-
-	ID3D11ShaderResourceView* ResourceView = NULL;
-
-	switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_VERTEX:
-			Context->VSGetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			Context->PSGetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			Context->GSGetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			Context->DSGetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_HULL:
-			Context->HSGetShaderResources(Index, 1, &ResourceView);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSGetShaderResources(Index, 1, &ResourceView);
-			break;
-	}
-
-	if(ResourceView != NULL)
-	{
-		ID3D11Resource* Resource;
-		ResourceView->GetResource(&Resource);
-		D3D11_RESOURCE_DIMENSION ResourceDimension;
-		Resource->GetType(&ResourceDimension);
-
-		if(ResourceDimension == D3D11_RESOURCE_DIMENSION_TEXTURE2D)
-		{
-			ZED11Texture2D *Texture2D = new ZED11Texture2D();
-			Texture2D->ShaderResourceView = ResourceView;
-
-			*Texture = Texture2D;
-		}
-		else if(ResourceDimension == D3D11_RESOURCE_DIMENSION_TEXTURE3D)
-		{
-			ZED11Texture3D *Texture3D = new ZED11Texture3D();
-			Texture3D->ResourceView = ResourceView;
-
-			*Texture = Texture3D;
-		}
-	}
-	else
-	{
-		*Texture = NULL;
-	}
-}
-
-void ZED11Context::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler)
-{
-	const ZED11Sampler* D11Sampler = static_cast<const ZED11Sampler*>(Sampler);
-
-	ID3D11SamplerState* NativeSampler = NULL;
-	if (D11Sampler != NULL)
-		NativeSampler = D11Sampler->GetInterface();
-
-	switch(Shader)
-	{
-		default:
-		case ZEGR_ST_NONE:
-			break;
-
-		case ZEGR_ST_VERTEX:
-			Context->VSSetSamplers(Index, 1, &NativeSampler);
-			break;
-
-		case ZEGR_ST_PIXEL:
-			Context->PSSetSamplers(Index, 1, &NativeSampler);
-			break;
-
-		case ZEGR_ST_GEOMETRY:
-			Context->GSSetSamplers(Index, 1, &NativeSampler);
-			break;
-
-		case ZEGR_ST_DOMAIN:
-			Context->DSSetSamplers(Index, 1, &NativeSampler);
-			break;
-
-		case ZEGR_ST_HULL:
-			Context->HSSetSamplers(Index, 1, &NativeSampler);
-			break;
-
-		case ZEGR_ST_COMPUTE:
-			Context->CSSetSamplers(Index, 1, &NativeSampler);
-			break;
-	}
+	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
 }
 
 void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource)
 {
+	zeDebugCheck(DestResource == NULL || SrcResource == NULL, "Source or destination resource cannot be NULL");
+
+	ID3D11Resource* DestNativeResource = NULL;
+	ID3D11Resource* SrcNativeResource = NULL;
+
+	switch (DestResource->GetResourceType())
+	{
+		case ZEGR_RT_TEXTURE:
+		{
+			ZEGRTexture* Texture = static_cast<ZEGRTexture*>(DestResource);
+			if (Texture->GetTextureType() == ZEGR_TT_2D)
+				DestNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+		}
+		break;
+
+		default:
+			return;
+	}
+
+	switch (SrcResource->GetResourceType())
+	{
+		case ZEGR_RT_TEXTURE:
+		{
+			ZEGRTexture* Texture = static_cast<ZEGRTexture*>(SrcResource);
+			if (Texture->GetTextureType() == ZEGR_TT_2D)
+				SrcNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+		}
+		break;
+
+		default:
+			return;
+	}
+
+	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
+}
+
+void ZED11Context::ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSubresource, ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format)
+{
+	zeDebugCheck(DestResource == NULL || SrcResource == NULL, "Source or destination resource cannot be NULL");
+
 	ID3D11Resource* DestNativeResource = NULL;
 	ID3D11Resource* SrcNativeResource = NULL;
 
@@ -691,9 +816,9 @@ void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcRes
 				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(DestResource);
 				if (Texture->GetTextureType() == ZEGR_TT_2D)
 					DestNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
-
-				break;
 			}
+			break;
+
 		default:
 			return;
 	}
@@ -705,31 +830,57 @@ void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcRes
 				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(SrcResource);
 				if (Texture->GetTextureType() == ZEGR_TT_2D)
 					SrcNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
-
-				break;
 			}
+			break;
+
 		default:
 			return;
 	}
 
-	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
+	GetMainContext()->ResolveSubresource(DestNativeResource, DestSubresource, SrcNativeResource, SrcSubresource, ConvertFormat(Format));
 }
 
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)
 {
-	UpdateContext();
+	UpdateGraphicsState();
 	GetMainContext()->Draw(VertexCount, FirstVertex);
 }
 
 void ZED11Context::DrawInstanced(ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
 {
-	UpdateContext();
+	UpdateGraphicsState();
 	GetMainContext()->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
 }
 
 void ZED11Context::Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ)
 {
 	GetMainContext()->Dispatch(GroupCountX, GroupCountY, GroupCountZ);
+}
+
+void ZED11Context::GenerateMipMaps(const ZEGRTexture* Texture)
+{
+	ID3D11ShaderResourceView* NativeShaderResource = NULL;
+
+	switch (Texture->GetTextureType())
+	{
+		case ZEGR_TT_2D:
+			NativeShaderResource = static_cast<const ZED11Texture2D*>(Texture)->GetShaderResourceView();
+			break;
+
+		case ZEGR_TT_3D:
+			NativeShaderResource = static_cast<const ZED11Texture3D*>(Texture)->GetShaderResourceView();
+			break;
+
+		case ZEGR_TT_CUBE:
+			NativeShaderResource = static_cast<const ZED11TextureCube*>(Texture)->GetShaderResourceView();
+			break;
+
+		default:
+			break;
+	}
+
+	if (NativeShaderResource != NULL)
+		GetMainContext()->GenerateMips(NativeShaderResource);
 }
 
 void ZED11Context::ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
@@ -759,24 +910,4 @@ void ZED11Context::ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZE
 	}
 
 	GetMainContext()->ClearUnorderedAccessViewFloat(NativeView, ClearColor.M);
-}
-
-ZED11Context::ZED11Context()
-{
-	Context = NULL;
-
-	DirtyFlags.UnraiseAll();
-
-	BlendState = NULL;
-	BlendFactors = ZEVector4::One;
-	BlendMask = 0xFFFFFFFF;
-	DepthStencilState = NULL;
-	StencilRef = 0;
-
-	RenderState = NULL;
-}
-
-ZED11Context::~ZED11Context()
-{
-	Deinitialize();
 }

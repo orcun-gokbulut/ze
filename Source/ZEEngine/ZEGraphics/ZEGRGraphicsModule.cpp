@@ -47,8 +47,9 @@
 
 #include <FreeImage.h>
 
-ZEOptionSection ZEGRGraphicsModule::GraphicsOptions;
+ZEUInt ZEGRGraphicsModule::SAMPLE_COUNT = 4;
 
+ZEOptionSection ZEGRGraphicsModule::GraphicsOptions;
 ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGRGraphicsModule, ZEModule, &ZEGRGraphicsModule::GraphicsOptions)
 
 void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
@@ -149,9 +150,4 @@ bool ZEGRGraphicsModule::DeinitializeSelf()
 ZEGRGraphicsModule::ZEGRGraphicsModule()
 {
 	TextureQuality = ZE_TQ_HIGH;
-}
-
-ZEGRGraphicsModule::~ZEGRGraphicsModule()
-{
-
 }

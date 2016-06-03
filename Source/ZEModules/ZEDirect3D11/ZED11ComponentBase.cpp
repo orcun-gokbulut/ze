@@ -37,20 +37,20 @@
 #include "ZEGraphics\ZEGRTexture.h"
 
 ZED11Module* ZED11ComponentBase::Module = NULL;
-ID3D11Device1* ZED11ComponentBase::Device = NULL;
-ID3D11DeviceContext1* ZED11ComponentBase::Context = NULL;
+ID3D11Device* ZED11ComponentBase::Device = NULL;
+ID3D11DeviceContext* ZED11ComponentBase::Context = NULL;
 
 ZED11Module* ZED11ComponentBase::GetModule()
 {
 	return Module;
 }
 
-ID3D11Device1* ZED11ComponentBase::GetDevice() const
+ID3D11Device* ZED11ComponentBase::GetDevice() const
 {
 	return Device;
 }
 
-ID3D11DeviceContext1* ZED11ComponentBase::GetMainContext() const
+ID3D11DeviceContext* ZED11ComponentBase::GetMainContext() const
 {
 	return Context;
 }
@@ -214,10 +214,10 @@ D3D11_USAGE ZED11ComponentBase::ConvertUsage(ZEGRResourceUsage Usage)
 {
 	switch (Usage)
 	{
-		default:
 		case ZEGR_RU_GPU_READ_ONLY:
 			return D3D11_USAGE_IMMUTABLE;
-
+			
+		default:
 		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
 			return D3D11_USAGE_DEFAULT;
 
@@ -234,7 +234,7 @@ UINT ZED11ComponentBase::ConvertBindFlags(ZEFlags BindFlags)
 	if (BindFlags == ZEGR_RBF_NONE)
 		return 0;
 
-	UINT Flags = D3D11_BIND_SHADER_RESOURCE;
+	UINT Flags = 0;
 
 	if (BindFlags.GetFlags(ZEGR_RBF_SHADER_RESOURCE))
 		Flags |= D3D11_BIND_SHADER_RESOURCE;
@@ -249,4 +249,20 @@ UINT ZED11ComponentBase::ConvertBindFlags(ZEFlags BindFlags)
 		Flags |= D3D11_BIND_UNORDERED_ACCESS;
 
 	return Flags;
+}
+
+UINT ZED11ComponentBase::ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage)
+{
+	switch (Usage)
+	{
+		case ZEGR_RU_GPU_READ_ONLY:
+		case ZEGR_RU_GPU_READ_WRITE_CPU_WRITE:
+			return 0;
+
+		case ZEGR_RU_GPU_READ_CPU_WRITE:
+			return D3D11_CPU_ACCESS_WRITE;
+
+		case ZEGR_RU_CPU_READ_WRITE:
+			return D3D11_CPU_ACCESS_READ | D3D11_CPU_ACCESS_WRITE;
+	}
 }

@@ -44,7 +44,7 @@
 
 cbuffer ZERNScene_Constants	: register(ZERN_SHADER_CONSTANT_SCENE)
 {
-	float	ZERNScene_AmbientColor;
+	float3	ZERNScene_AmbientColor;
 	float	ZERNScene_Reserved0;
 };
 

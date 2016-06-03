@@ -40,9 +40,7 @@
 #include "ZERandom.h"
 #include "ZEMath/ZEVector.h"
 
-#define RAND_BETWEEN_TWO_FLOAT(Min, Max) (((Max) - (Min)) * ZERandom::GetFloatPositive() + (Min))
-
-enum ZEParticleState
+ZE_ENUM(ZEParticleState)
 {
 	ZE_PAS_NEW,
 	ZE_PAS_ALIVE,
@@ -53,25 +51,26 @@ class ZEParticle : public ZEObject
 {
 	ZE_OBJECT
 	public:
-		ZEVector2		Size2D;
-		float			TotalLife;
-		float			Life;
-		ZEVector4		InitialColor;
-		ZEVector4		Color;
-		ZEVector3		Position;
+		ZEParticleState				State;
+		ZEVector3					Position;
+		ZEVector2					Size2D;
+		float						TotalLife;
+		float						Life;
+		ZEVector4					InitialColor;
+		ZEVector4					Color;
 
-		ZEVector2		MinTexCoord;
-		ZEVector2		MaxTexCoord;
+		ZEVector2					MinTexCoord;
+		ZEVector2					MaxTexCoord;
 
-		ZEVector3		InitialVelocity;
-		ZEVector3		Velocity;
-		ZEVector3		Acceleration;
+		ZEVector3					InitialVelocity;
+		ZEVector3					Velocity;
+		ZEVector3					Acceleration;
 
-		float			Rotation;
-		float			AngularVelocity;
-		float			AngularAcceleration;
+		float						Rotation;
+		float						AngularVelocity;
+		float						AngularAcceleration;
 
-		ZEVector2		Cos_NegSin;
-		
-		ZEParticleState	State;
+		ZEVector2					Cos_NegSin;
+
+									ZEParticle();
 };

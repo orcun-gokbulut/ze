@@ -51,7 +51,7 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
-#include "ZERenderer/ZERNStagePostProcess.h"
+#include "ZERenderer/ZERNStageAtmosphere.h"
 
 #define ZEAT_MDF_SHADERS				1
 #define ZEAT_MDF_RENDER_STATES			2
@@ -88,14 +88,8 @@ bool ZEATMoon::UpdateRenderStates()
 	if (!DirtyFlags.GetFlags(ZEAT_MDF_RENDER_STATES))
 		return true;
 
-	ZEGRRenderState RenderState = ZERNStagePostProcess::GetRenderState();
+	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
-
-	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
-	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
-	DepthStencilStateTestNoWrite.SetDepthWriteEnable(false);
-
-	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
@@ -162,7 +156,7 @@ bool ZEATMoon::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	return true;
+	return Update();
 }
 
 bool ZEATMoon::DeinitializeSelf()
@@ -183,7 +177,7 @@ ZEATMoon::ZEATMoon()
 	DirtyFlags.RaiseAll();
 
 	Command.Entity = this;
-	Command.StageMask = ZERN_STAGE_POST_EFFECT;
+	Command.StageMask = ZERN_STAGE_ATMOSPHERE;
 	Command.Priority = 2;
 
 	Direction = ZEVector3(0.0f, 1.0f, 0.0f);
@@ -288,26 +282,13 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
-	const ZEGRDepthStencilBuffer* DepthStencilBuffer = Stage->GetOutput(ZERN_SO_DEPTH)->GetDepthStencilBuffer(true);
-
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, ZEGRSampler::GetDefaultSampler());
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, PhaseTexture.GetTexture());
-
-	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
-	Context->SetVertexBuffers(0, 0, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, RenderTarget->GetWidth(), RenderTarget->GetHeight()));
+	const ZEGRTexture* Texture = PhaseTexture.GetTexture();
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	
 	Context->Draw(4, 0);
-
-	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, NULL);
-	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, NULL);
-	Context->SetSampler(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 5, NULL);
-	Context->SetRenderTargets(0, NULL, NULL);
 }
 
 ZEATMoon* ZEATMoon::CreateInstance()

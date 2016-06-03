@@ -35,11 +35,12 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZELCMain.cpp					Sources)
-ze_add_source(ZELCLicenseToolWindow.cpp		Sources)
-ze_add_source(ZELCLicenseToolWindow.h		Sources QtMocs)
-ze_add_source(ZELCLicenseToolWindow.ui		Sources QtUIs)
-ze_add_source(ZELCStyle.qrc					Sources QtResources)
+ze_add_source(ZELCMain.cpp								Sources)
+ze_add_source(ZELCLicenseToolWindow.cpp					Sources)
+ze_add_source(ZELCLicenseToolWindow.h					Sources QtMocs)
+ze_add_source(ZELCLicenseToolWindow.ui					Sources QtUIs)
+ze_add_source(../CommonResources/ZEZinekIcon.qrc		Sources QtResources)
+ze_add_source(../CommonResources/ZEThemeDark/ZEThemeDark.qrc Sources QtResources)
 
 qt5_wrap_ui(QtUIOutputs ${QtUIs})
 qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
@@ -52,3 +53,4 @@ ze_add_executable(TARGET ZELCLicensingTool
 	LIBS ZEFoundation ZEProtect)
 	
 qt5_use_modules(ZELCLicensingTool Widgets)
+source_group("Generated" FILES ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs})

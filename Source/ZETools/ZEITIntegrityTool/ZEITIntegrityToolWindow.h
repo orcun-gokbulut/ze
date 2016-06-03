@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNLogWidget.h
+ Zinek Engine - ZEITIntegrityToolWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,18 +35,71 @@
 
 #pragma once
 
-#include <QtWidgets/QWidget>
+#include "ZEITIntegrity/ZEITGenerator.h"
 
-class Ui_ZELNLogWidget;
+#include <QMainWindow>
 
-class ZELNLogWidget: public QWidget
+class QListWidgetItem;
+class QTableWidgetItem;
+class ZEITGeneratorWorker;
+class Ui_ZEITIntegrityToolWindow;
+
+class ZEITIntegrityToolWindow : public QMainWindow
 {
 	Q_OBJECT
-	friend class ZELNLogModule;
+	friend class ZELNContactModule;
 	private:
-		Ui_ZELNLogWidget*		Form;
+		Ui_ZEITIntegrityToolWindow*		Form;
+
+		ZEITGenerator					Generator;
+		ZEITGeneratorWorker*			GeneratorWorker;
+		QString							GeneratorFileName;
+
+		void							UpdateRecord(ZESize Index);
+		void							UpdateLists();
+		void							UpdateUI();
+
+		bool							Open(const QString& FileName);
+		bool							Save(const QString& FileName);
+
+		void							LoadRecentFiles();
+		void							RegisterRecentFile(const QString& FileName);
+
+	private slots:
+		void							GeneratorWorker_RecordUpdated(unsigned int RecordIndex);
+		void							GeneratorWorker_StateChanged();
+
+		void							actNew_triggered();
+		void							actOpen_triggered();
+		void							mnuRecentFiles_triggered();
+		void							actSave_triggered();
+		void							actSaveAs_triggered();
+		void							actQuit_triggered();
+
+		void							txtIntegrityFile_textEdited(const QString&);
+		void							btnBrowse_clicked();
+		void							btnScan_clicked();
+		void							btnGenerate_clicked();
+
+		void							lstIncludes_itemSelectionChanged();
+		void							lstIncludes_itemChanged(QListWidgetItem* Item);
+		void							btnIncludeAdd_clicked();
+		void							btnIncludeRemove_clicked();
+
+		void							lstExcludes_itemSelectionChanged();
+		void							lstExcludes_itemChanged(QListWidgetItem* Item);
+		void							btnExcludeAdd_clicked();
+		void							btnExcludeRemove_clicked();
+		
+		void							tblRecords_itemSelectionChanged();
+		void							tblRecords_itemChanged(QTableWidgetItem* Item);
+		void							btnRecordAdd_clicked();
+		void							btnRecordRemove_clicked();
+		void							btnRecordExclude_clicked();
+		void							btnRecordUpdate_clicked();
+		void							btnRecordClear_clicked();
 
 	public:
-									ZELNLogWidget();
-									~ZELNLogWidget();
+										ZEITIntegrityToolWindow();
+										~ZEITIntegrityToolWindow();
 };

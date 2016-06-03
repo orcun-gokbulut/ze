@@ -58,7 +58,6 @@ class ZEGRIndexBuffer : public ZEGRResource
 		virtual void						Deinitialize();
 
 											ZEGRIndexBuffer();
-		virtual								~ZEGRIndexBuffer();
 
 	public:
 		virtual ZEGRResourceType			GetResourceType() const;

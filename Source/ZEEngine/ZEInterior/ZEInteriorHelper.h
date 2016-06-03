@@ -34,24 +34,21 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INTERIOR_HELPER_H__
-#define __ZE_INTERIOR_HELPER_H__
 
 #include "ZEMeta/ZEObject.h"
-
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+
+ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+
+struct ZEInteriorResourceHelper;
 
 enum ZEInteriorHelperOwnerType
 {
 	ZE_IHOT_INTERIOR		= 0,
 	ZE_IHOT_ROOM			= 1
 };
-
-ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
-ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
-
-struct ZEInteriorResourceHelper;
 
 class ZEInteriorHelper : public ZEObject
 {
@@ -60,6 +57,7 @@ class ZEInteriorHelper : public ZEObject
 		ZEInterior*							OwnerInterior;
 		ZEInteriorHelperOwnerType			OwnerType;
 		ZEInteriorRoom*						OwnerRoom;
+
 		const ZEInteriorResourceHelper*		HelperResource;
 
 		ZEVector3							Position;
@@ -105,5 +103,3 @@ class ZEInteriorHelper : public ZEObject
 
 		static ZEInteriorHelper*			CreateInstance();
 };
-
-#endif

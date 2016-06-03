@@ -85,7 +85,7 @@ class ZEModelMesh : public ZEObject
 		ZEUInt								ActiveLOD;
 
 		bool								DrawOrderIsUserDefined;
-		ZEUInt8								UserDefinedDrawOrder;
+		ZEInt								UserDefinedDrawOrder;
 
 		ZEModelAnimationType				AnimationType;
 		bool								Visible;		
@@ -169,14 +169,13 @@ class ZEModelMesh : public ZEObject
 		const ZEPlane&						GetClippingPlane(ZESize Index);
 
 		void								SetCustomDrawOrderEnabled(bool Enabled);
-		void								SetCustomDrawOrder(ZEUInt8 DrawOrder);
-		ZEUInt8								GetCustomDrawOrder();
+		void								SetCustomDrawOrder(ZEInt DrawOrder);
+		ZEInt								GetCustomDrawOrder();
 
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
 		bool								PreRender(const ZERNPreRenderParameters* Parameters);
-
 		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();

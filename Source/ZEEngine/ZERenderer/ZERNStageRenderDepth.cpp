@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNStagePreProcess.cpp
+ Zinek Engine - ZERNStageRenderDepth.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,68 +33,85 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNStagePreProcess.h"
+#include "ZERNStageRenderDepth.h"
 
-#include "ZERNRenderer.h"
 #include "ZERNStageID.h"
-#include "ZERNStageGBuffer.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRContext.h"
-#include "ZEGraphics/ZEGRRenderTarget.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-ZEInt ZERNStagePreProcess::GetId() const
+bool ZERNStageRenderDepth::InitializeSelf()
 {
-	return ZERN_STAGE_PRE_EFFECT;
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	return UpdateInputOutputs();
 }
 
-const ZEString& ZERNStagePreProcess::GetName() const
+void ZERNStageRenderDepth::DeinitializeSelf()
 {
-	static const ZEString Name = "Pre Process Stage";
+	DepthTexture = NULL;
+
+	ZERNStage::DeinitializeSelf();
+}
+
+bool ZERNStageRenderDepth::UpdateInputOutputs()
+{
+	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	if (DepthTexture == NULL)
+		return false;
+
+	return true;
+}
+
+ZEInt ZERNStageRenderDepth::GetId() const
+{
+	return ZERN_STAGE_RENDER_DEPTH;
+}
+
+const ZEString& ZERNStageRenderDepth::GetName() const
+{
+	static const ZEString Name = "Stage render depth";
 	return Name;
 }
 
-bool ZERNStagePreProcess::Setup(ZEGRContext* Context)
+const ZEGRTexture2D* ZERNStageRenderDepth::GetOutput(ZERNStageBuffer Output) const
+{
+	if (GetEnabled() && (Output == ZERN_SO_DEPTH))
+		return DepthTexture;
+
+	return ZERNStage::GetOutput(Output);
+}
+
+bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
 {
 	if (!ZERNStage::Setup(Context))
+		return false;
+
+	if (!UpdateInputOutputs())
 		return false;
 
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	const ZEGRTexture2D* AccumulationMap = GetPrevOutput(ZERN_SO_COLOR);
-	if(AccumulationMap == NULL)
-		return false;
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, GetPrevOutput(ZERN_SO_DEPTH));
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, GetPrevOutput(ZERN_SO_NORMAL));
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, GetPrevOutput(ZERN_SO_GBUFFER_DIFFUSE));
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, GetPrevOutput(ZERN_SO_GBUFFER_SPECULAR));
-
-	const ZEGRRenderTarget* RenderTarget = AccumulationMap->GetRenderTarget();
-	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)RenderTarget->GetWidth(), (float)RenderTarget->GetHeight()));
+	Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer());
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
 
 	return true;
 }
 
-void ZERNStagePreProcess::CleanUp(ZEGRContext* Context)
+void ZERNStageRenderDepth::CleanUp(ZEGRContext* Context)
 {
-	Context->SetRenderTargets(0, NULL, NULL);
-
-	Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 2, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 3, NULL);
-	Context->SetTexture(ZEGR_ST_PIXEL, 4, NULL);
-
 	ZERNStage::CleanUp(Context);
 }
 
-ZERNStagePreProcess::ZERNStagePreProcess()
+ZERNStageRenderDepth::ZERNStageRenderDepth()
 {
-
+	DepthTexture = NULL;
 }
 
-ZEGRRenderState ZERNStagePreProcess::GetRenderState()
+ZEGRRenderState ZERNStageRenderDepth::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
@@ -103,13 +120,8 @@ ZEGRRenderState ZERNStagePreProcess::GetRenderState()
 	{
 		Initialized = true;
 
-		ZEGRDepthStencilState DepthStencilState;
-		DepthStencilState.SetDepthTestEnable(false);
-		DepthStencilState.SetDepthWriteEnable(false);
-
-		RenderState.SetDepthStencilState(DepthStencilState);
-
-		RenderState.SetRenderTargetFormat(0, ZEGR_TF_R11G11B10_FLOAT);
+		RenderState.SetDepthStencilFormat(ZEGR_TF_D24_UNORM_S8_UINT);
+		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);
 	}
 
 	return RenderState;

@@ -74,7 +74,7 @@ ZEVector2 ZEGRTexture2D::GetPixelSize() const
 	return ZEVector2(1.0f / Width, 1.0f / Height);
 }
 
-bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount)
+bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -84,7 +84,6 @@ bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 	SetResourceUsage(Usage);
 	SetResourceBindFlags(BindFlags);
 	SetLevelCount(LevelCount);
-	SetIsRenderTarget(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET));
 
 	SetSize(CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);
@@ -106,20 +105,27 @@ ZEGRTexture2D::ZEGRTexture2D()
 	SampleCount = 1;
 };
 
-ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount)
+ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data)
 {
-	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
-	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
-	zeCheckError(Width > ZEGR_MAX_TEXTURE_DIMENSION, NULL, "Width is too big.")
-	zeCheckError(Height > ZEGR_MAX_TEXTURE_DIMENSION, NULL, "Width is too big.")
-	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
-	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height)), NULL, "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Width == 0, "Width cannot be 0.");
+	zeDebugCheck(Height == 0, "Height cannot be 0.");
+	zeDebugCheck(Width > ZEGR_MAX_TEXTURE2D_DIMENSION, "Width is too big.");
+	zeDebugCheck(Height > ZEGR_MAX_TEXTURE2D_DIMENSION, "Height is too big.");
+	zeDebugCheck(LevelCount == 0, NULL, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height)), "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
+	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
+	zeDebugCheck(ArrayCount > ZEGR_MAX_TEXTURE2D_ARRAY_LENGTH, "Array count is too much");
+	zeDebugCheck(SampleCount > ZEGR_MAX_SAMPLE_COUNT, "Sample count is too much");
 
 	ZEGRTexture2D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture2D();
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, LevelCount, Format, Usage, BindFlags, ArrayCount, SampleCount))
+	if (!Texture->Initialize(Width, Height, LevelCount, Format, Usage, BindFlags, ArrayCount, SampleCount, Data))
 	{
 		Texture->Destroy();
 		return NULL;

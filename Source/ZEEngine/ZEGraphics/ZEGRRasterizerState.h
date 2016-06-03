@@ -98,10 +98,10 @@ class ZEGRRasterizerState : public ZEGRState
 	private:
 		struct ZERasterizerStateData	
 		{
-			ZEGRFillMode			FillMode				: 1;
-			ZEGRCullMode			CullMode				: 2;
-			bool					FrontIsCounterClockwise : 1;
-			bool					DepthClipEnable			: 1;
+			ZEGRFillMode			FillMode;
+			ZEGRCullMode			CullMode;
+			bool					FrontIsCounterClockwise;
+			bool					DepthClipEnable;
 			ZEInt					DepthBias;
 			float					DepthBiasClamp;
 			float					SlopeScaledDepthBias;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZELNContactWidget.cpp
+ Zinek Engine - ZEITChecker.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,31 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZELNContactWidget.h"
-#include "ui_ZELNContactWidget.h"
+#pragma once
 
-ZELNContactWidget::ZELNContactWidget()
-{
-	Form = new Ui_ZELNContactWidget();
-	Form->setupUi(this);
-}
+#include "ZEDS/ZEArray.h"
+#include "ZEITRecord.h"
 
-ZELNContactWidget::~ZELNContactWidget()
+class ZEITChecker
 {
-	delete Form;
-}
+	private:
+		ZEArray<ZEITRecord>					Records;
+		ZEString							IntegrityFile;
+		ZEITCheckResult						Result;
+
+	public:
+		const ZEArray<ZEITRecord>&			GetRecords() const;
+
+		void								SetIntegrityFile(const ZEString& FileName);
+		const ZEString&						GetIntegrityFile() const;
+
+		ZEITCheckResult						GetResult() const;
+
+		void								CheckStart();
+		bool								Check(ZESize Index);
+
+		bool								Load();
+		bool								Save();
+
+		ZEITChecker();
+};

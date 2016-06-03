@@ -47,20 +47,22 @@ class ZEGRRenderTarget;
 class ZED11TextureCube : public ZEGRTextureCube, public ZED11ComponentBase
 {
 	friend class ZED11Module;
+	friend class ZED11Context;
 	private:
-		ID3D11Texture2D*					Texture;
-		ID3D11ShaderResourceView*			ResourceView;
+		ID3D11Texture2D*			Texture;
+		ID3D11ShaderResourceView*	ShaderResourceView;
 
-		virtual bool						Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget);
-		virtual void						Deinitialize();
+		virtual bool				Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data);
+		virtual void				Deinitialize();
 
-											ZED11TextureCube();
+		ID3D11Texture2D*			GetTexture() const;
+		ID3D11ShaderResourceView*	GetShaderResourceView() const;
 
-	public:		
-		ID3D11Texture2D*					GetTexture() const;
-		ID3D11ShaderResourceView*			GetResourceView() const;
-		
-		virtual bool						UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
+									ZED11TextureCube();
+		virtual						~ZED11TextureCube();
 
-		ZEHolder<const ZEGRRenderTarget>	GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const;
+	public:
+		virtual void				UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch);
+
+		const ZEGRRenderTarget*		GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level) const;
 };

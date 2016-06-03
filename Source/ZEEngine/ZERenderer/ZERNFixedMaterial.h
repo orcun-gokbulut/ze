@@ -38,8 +38,6 @@
 #include "ZERNMaterial.h"
 
 #include "ZEDS/ZEString.h"
-#include "ZEDefinitions.h"
-#include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZERNMap.h"
@@ -74,15 +72,19 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZEString								Name;
 		ZEString								FileName;
 
+		mutable ZEUInt							StageMask;
 		mutable ZEFlags							DirtyFlags;
 		 
-		mutable ZEHolder<ZEGRShader>			StageGBuffer_VertexShader;
-		mutable ZEHolder<ZEGRShader>			StageGBuffer_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_RenderState;
+		mutable ZEHolder<ZEGRShader>			StageGBuffer_Forward_VertexShader;
+		mutable ZEHolder<ZEGRShader>			StageGBuffer_Forward_PixelShader;
+		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_Forward_RenderState;
 		 
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_VertexShader;
 		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
+
+		mutable ZEHolder<ZEGRShader>			StageRenderDepth_VertexShader;
+		mutable ZEHolder<ZEGRRenderStateData>	StageRenderDepth_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
@@ -161,7 +163,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZERNHeightMapTechnique					HeightMapTechnique;
 		bool									EmissiveEnabled;
 		float									EmissiveFactor;
-		ZEVector3								EmissiveColor;
+		ZEVector3								EmissiveColor; 
 		bool									EmissiveMapEnabled;
 		bool									SubSurfaceScatteringMapEnabled;
 		bool									ReflectionEnabled;
@@ -180,6 +182,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool									UpdateShaders() const;
 		bool									UpdateConstantBuffer() const;
 		bool									UpdateRenderState() const;
+		bool									UpdateStageMask() const;
 
 		void									Load(const ZEMLReaderNode& MaterialNode);
 
@@ -196,8 +199,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		const ZEString&							GetFileName() const;
 
-		void									SetSampler(ZEHolder<ZEGRSampler> Sampler);
-		ZEHolder<ZEGRSampler>					GetSampler() const;
+		void									SetSampler(const ZEHolder<ZEGRSampler>& Sampler);
+		const ZEHolder<ZEGRSampler>&			GetSampler() const;
 
 		void									SetShadowCaster(bool ShadowCaster);
 		bool									GetShadowCaster() const;
@@ -338,10 +341,10 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									GetDetailBaseMapAttenuationStart() const;
 		void									SetDetailBaseMapAttenuationFactor(float Factor);
 		float									GetDetailBaseMapAttenuationFactor() const;
-		void									SetDetailBaseMap(const ZERNMap& Map);
-		const ZERNMap&							GetDetailBaseMap() const;
+		void									SetDetailBaseMapFile(const ZEString& Filename);
+		const ZEString&							GetDetailBaseMapFile() const;
 
-		void									SetDetailNormalMapEnabled(bool Enabled); 
+		void									SetDetailNormalMapEnabled(bool Enabled);
 		bool									GetDetailNormalMapEnabled() const;
 		void									SetDetailNormalMapFactor(float Factor);
 		float									GetDetailNormalMapFactor() const;
@@ -351,12 +354,13 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									GetDetailNormalMapAttenuationStart() const;
 		void									SetDetailNormalMapAttenuationFactor(float Factor);
 		float									GetDetailNormalMapAttenuationFactor() const;
-		void									SetDetailNormalMap(const ZERNMap& Map);
-		const ZERNMap&							GetDetailNormalMap() const;
+		void									SetDetailNormalMapFile(const ZEString& Map);
+		const ZEString&							GetDetailNormalMapFile() const;
 
 		void									SetClippingPlanesEnabled(bool Enabled);
 		bool									GetClippingPlanesEnabled() const;
 
+		virtual bool							PreRender(ZERNCommand& Command) const;
 		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 

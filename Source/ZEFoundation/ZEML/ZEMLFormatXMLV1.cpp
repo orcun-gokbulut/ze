@@ -100,15 +100,15 @@ bool ZEMLFormatXMLV1Description::Determine(ZEFile* File)
 
 	if (Match.SubMatches[0].String.ToInt32() != 1)
 	{
-		zeWarning("Unknown XML based ZEML format version detected. File Name: \"%s\"", File->GetPath());
+		zeWarning("Unknown XML based ZEML format version detected. File Name: \"%s\"", File->GetPath().ToCString());
 		return false;
 	}
 
 	if (Match.SubMatches[1].String.ToInt32() != 0)
-		zeWarning("Unknown XML based ZEML format minor version is detected. Can cause problems. File Name: \"%s\"", File->GetPath());
+		zeWarning("Unknown XML based ZEML format minor version is detected. Can cause problems. File Name: \"%s\"", File->GetPath().ToCString());
 
 	if (File->GetSize() >= 64 * 1024)
-		zeWarning("Loading XML based ZEML format which is slow and has high memory allocation. Please convert it to a faster binary ZEML format. File Name: \"%s\"", File->GetPath());
+		zeWarning("Loading XML based ZEML format which is slow and has high memory allocation. Please convert it to a faster binary ZEML format. File Name: \"%s\"", File->GetPath().ToCString());
 
 	return true;
 }

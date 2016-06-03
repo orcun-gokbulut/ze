@@ -38,6 +38,16 @@
 #include "ZELNLicenseModule.h"
 #include "ZELNLogModule.h"
 #include "ZELNContactModule.h"
+#include "ZELNIntegrityModule.h"
+
+static ZELNModuleDescription* Modules[] =
+{
+	ZELNLogModule::Description(),
+	ZELNLicenseModule::Description(),
+	ZELNUpdateModule::Description(),
+	ZELNContactModule::Description(),
+	ZELNIntegrityModule::Description()
+};
 
 bool ZELNModule::OnPreLaunch()
 {
@@ -81,19 +91,11 @@ void ZELNModule::LoadConfiguration(const ZEMLReaderNode& ConfigurationNode)
 
 ZESize ZELNModule::GetModuleCount()
 {
-	return 4;
+	return sizeof(Modules) / sizeof(ZELNModuleDescription*);
 }
 
 ZELNModuleDescription** ZELNModule::GetModules()
 {
-	static ZELNModuleDescription* Modules[] =
-	{
-		ZELNLogModule::Description(),
-		ZELNLicenseModule::Description(),
-		ZELNUpdateModule::Description(),
-		ZELNContactModule::Description()
-	};
-
 	return Modules;
 }
 

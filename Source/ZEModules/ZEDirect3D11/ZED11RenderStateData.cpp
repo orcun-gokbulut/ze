@@ -42,15 +42,13 @@
 #include "ZEGraphics/ZEGRTexture.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 
-#include <d3d11.h>
-
-static D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitveType(ZEGRPrimitiveType Type)
+static D3D11_PRIMITIVE_TOPOLOGY ConvertPrimitiveType(ZEGRPrimitiveType Type)
 {
 	switch (Type)
 	{
 		default:
 		case ZEGR_PT_NONE:
-			return (D3D11_PRIMITIVE_TOPOLOGY)0;
+			return D3D11_PRIMITIVE_TOPOLOGY_UNDEFINED;
 
 		case ZEGR_PT_POINT_LIST:
 			return D3D11_PRIMITIVE_TOPOLOGY_POINTLIST;
@@ -73,21 +71,21 @@ bool ZED11RenderStateData::Initialize(const ZEGRRenderState& RenderState)
 {
 	ZED11StatePool* StatePool = GetModule()->GetStatePool();
 
-	VertexLayout = StatePool->GetVertexLayout(RenderState.GetVertexLayout(), RenderState.GetShader(ZEGR_ST_VERTEX));
+	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
+		Shaders[I] = static_cast<const ZED11Shader*>(RenderState.GetShader((ZEGRShaderType)I));
+
+	BlendState = StatePool->GetBlendState(RenderState.GetBlendState());
 	RasterizerState = StatePool->GetRasterizerState(RenderState.GetRasterizerState());
 	DepthStencilState = StatePool->GetDepthStencilState(RenderState.GetDepthStencilState());
-	BlendState = StatePool->GetBlendState(RenderState.GetBlendState());
-	PrimitiveTopology = ConvertPrimitveType(RenderState.GetPrimitiveType());
-	
-	for (ZESize I = 0; I < ZEGR_SHADER_TYPE_COUNT; I++)
-		Shaders[I] = RenderState.GetShader((ZEGRShaderType)I);
+	VertexLayout = StatePool->GetVertexLayout(RenderState.GetVertexLayout(), Shaders[ZEGR_ST_VERTEX]);
+	PrimitiveTopology = ConvertPrimitiveType(RenderState.GetPrimitiveType());
 	
 	return true;
 }
 
 bool ZED11ComputeRenderStateData::Initialize(const ZEGRComputeRenderState& RenderState)
 {
-	this->ComputeShader = RenderState.GetComputeShader();
+	this->ComputeShader = static_cast<const ZED11Shader*>(RenderState.GetComputeShader());
 
 	return true;
 }

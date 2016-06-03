@@ -805,13 +805,7 @@ bool ZECanvas::LoadFromFile(const ZEString& FileName)
 
 ZEHolder<ZEGRVertexBuffer> ZECanvas::CreateVertexBuffer()
 {
-	ZEHolder<ZEGRVertexBuffer> Buffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZECanvasVertex));
-	void* BufferPtr = NULL;
-	if (!Buffer->Lock(&BufferPtr))
-		return NULL;
-	memcpy(BufferPtr, Vertices.GetCArray(), Vertices.GetCount() * sizeof(ZECanvasVertex));
-	Buffer->Unlock();
-	return Buffer;
+	return  ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZECanvasVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
 }
 
 

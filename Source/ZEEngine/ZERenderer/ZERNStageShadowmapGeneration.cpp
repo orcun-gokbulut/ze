@@ -48,11 +48,6 @@ const ZEString& ZERNStageShadowmapGeneration::GetName() const
 	return Name;
 }
 
-ZERNStageShadowmapGeneration::ZERNStageShadowmapGeneration()
-{
-
-}
-
 ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
 {
 	static ZEGRRenderState RenderState;
@@ -61,15 +56,6 @@ ZEGRRenderState ZERNStageShadowmapGeneration::GetRenderState()
 	if(!Initialized)
 	{
 		Initialized = true;
-
-		ZEGRRasterizerState RasterizerState;
-		RasterizerState.SetDepthBias(0.0f);
-		RasterizerState.SetDepthBiasClamp(0.0f);
-		RasterizerState.SetSlopeScaledDepthBias(1.0f);
-		RasterizerState.SetDepthClipEnable(true);
-		RasterizerState.SetCullMode(ZEGR_CMD_NONE);
-
-		RenderState.SetRasterizerState(RasterizerState);
 
 		RenderState.SetDepthStencilFormat(ZEGR_TF_D32_FLOAT);
 		RenderState.SetRenderTargetFormat(0, ZEGR_TF_NONE);

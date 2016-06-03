@@ -51,34 +51,34 @@ class ZERNMap : public ZEObject
 	ZE_OBJECT
 	private:
 		ZETextureResource*				Resource;
-		ZEHolder<const ZEGRTexture>		Texture;
-		ZEHolder<const ZEGRSampler>		Sampler;
+		const ZEGRTexture*				Texture;
+		const ZEGRSampler*				Sampler;
 
 		void							Clean();
 
 	public:
-		void							SetSampler(ZEHolder<const ZEGRSampler> Sampler);
-		ZEHolder<const ZEGRSampler>		GetSampler() const;
+		void							SetSampler(const ZEGRSampler* Sampler);
+		const ZEGRSampler*				GetSampler() const;
 
 		void							SetTexture(const ZEGRTexture* Texture);
-		ZEHolder<const ZEGRTexture>		GetTexture() const;
+		const ZEGRTexture*				GetTexture() const;
 
 		void							SetTextureResource(ZETextureResource* Resource);
-		ZETextureResource*				GetTextureResource() const;
+		const ZETextureResource*		GetTextureResource() const;
 
 		const ZEString&					GetTextureFile() const;
 
 		bool							IsAvailable() const;
 
-		void							Load2D(const ZEString& FileName);
+		void							Load2D(const ZEString& FileName, bool sRGB = true);
 		void							Load3D(const ZEString& FileName, ZEUInt HorizontalTileCount, ZEUInt VerticalTileCount);
 		void							LoadCube(const ZEString& FileName);
 
 		void							Write(ZEMLWriterNode& ParentNode, const ZEString& Name);
-		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name);
+		void							Read(ZEMLReaderNode& ParentNode, const ZEString& Name, bool sRGB = true);
 
 										ZERNMap();
-										ZERNMap(const char* FileName, ZEGRTextureType Type = ZEGR_TT_2D, ZEGRSampler* Sampler = NULL);
+										ZERNMap(const ZEString& FileName, ZEGRTextureType Type = ZEGR_TT_2D, ZEGRSampler* Sampler = NULL);
 										ZERNMap(ZEGRTexture* Texture, ZEGRSampler* Sampler = NULL);
 										ZERNMap(ZETextureResource* Resource, ZEGRSampler* Sampler = NULL);
 										~ZERNMap();

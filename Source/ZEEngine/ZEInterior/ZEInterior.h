@@ -53,7 +53,6 @@ class ZEViewVolume;
 class ZEViewFrustum;
 class ZEInteriorResource;
 
-ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
 ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
 ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
 ZE_META_FORWARD_DECLARE(ZEInteriorHelper, "ZEInteriorHelper.h");
@@ -107,8 +106,6 @@ class ZEInterior : public ZEEntity
 		ZEInteriorCullMode						GetCullMode() const;
 
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
-
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInterior*						CreateInstance();

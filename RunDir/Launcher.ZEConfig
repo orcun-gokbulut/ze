@@ -22,6 +22,13 @@
    <Node Name="Configuration"/>
   </Node>
   <Node Name="Module">
+   <Property Name="Name" Type="String">Integrity</Property>
+   <Property Name="Enabled" Type="Bool">true</Property>
+   <Node Name="Configuration">
+    <Property Name="IntegrityFile" Type="String">#R:/ZETrainSimulator/ZETrainIG.ZEITIntegrity</Property>
+   </Node>
+  </Node>
+  <Node Name="Module">
    <Property Name="Name" Type="String">Update</Property>
    <Property Name="Enabled" Type="Bool">false</Property>
    <Node Name="Configuration"/>

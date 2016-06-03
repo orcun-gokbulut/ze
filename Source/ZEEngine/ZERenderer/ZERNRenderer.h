@@ -51,6 +51,7 @@ class ZERNCommand;
 class ZEGRContext;
 class ZEGRRenderTarget;
 class ZEGRConstantBuffer;
+class ZEGRSampler;
 
 class ZERNRenderer : public ZEObject, public ZEInitializable
 {
@@ -75,14 +76,24 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 			ZEMatrix3x3Shader					ScreenTransform;
 		} RendererConstants;
 
+		ZEHolder<ZEGRSampler>					SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>					SamplerLinearWrap;
+		ZEHolder<ZEGRSampler>					SamplerLinearBorderZero;
+		ZEHolder<ZEGRSampler>					SamplerPointClamp;
+		ZEHolder<ZEGRSampler>					SamplerPointWrap;
+		ZEHolder<ZEGRSampler>					SamplerComparisonLinearPointClamp;
+
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
+		
+		void									CreatePredefinedSamplers();
+
+		void									UpdateConstantBuffers();
+
 		void									SortStageCommands();
 		void									RenderStage(ZERNStage* Queue);
 		void									RenderStages();
 
-		void									UpdateConstantBuffers();
-
-		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
 
 	public:
 		void									SetContext(ZEGRContext* Context);

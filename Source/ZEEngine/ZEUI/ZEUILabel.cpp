@@ -224,7 +224,7 @@ void ZEUILabel::SetText(ZEString NewText)
 	}
 }
 
-const ZEString& ZEUILabel::GetText()
+const ZEString& ZEUILabel::GetText() const
 {
 	return Text;
 }

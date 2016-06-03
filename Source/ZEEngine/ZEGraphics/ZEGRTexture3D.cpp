@@ -38,7 +38,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEMath/ZEMath.h"
 
-bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
+bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
 {
 	this->Width = Width;
 	this->Height = Height;
@@ -46,7 +46,8 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 
 	SetLevelCount(LevelCount);
 	SetFormat(Format);
-	SetIsRenderTarget(RenderTarget);
+	SetResourceUsage(Usage);
+	SetResourceBindFlags(BindFlags);
 
 	SetSize(Depth * CalculateSize(Width, Height, LevelCount, Format));
 	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture3D, Texture);
@@ -97,19 +98,27 @@ ZEGRTexture3D::ZEGRTexture3D()
 	Depth = 0;
 }
 
-ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, bool RenderTarget, bool UAV)
+ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
 {
-	zeCheckError(Width == 0, NULL, "Width cannot be 0.");
-	zeCheckError(Height == 0, NULL, "Height cannot be 0.");
-	zeCheckError(Depth == 0, NULL, "Depth cannot be 0.");
-	zeCheckError(LevelCount == 0, NULL, "Level cannot be 0.");
-	zeCheckError(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), NULL, "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Width == 0, "Width cannot be 0.");
+	zeDebugCheck(Height == 0, "Height cannot be 0.");
+	zeDebugCheck(Depth == 0, "Depth cannot be 0.");
+	zeDebugCheck(Width > ZEGR_MAX_TEXTURE3D_DIMENSION, "Width is too big.");
+	zeDebugCheck(Height > ZEGR_MAX_TEXTURE3D_DIMENSION, "Height is too big.");
+	zeDebugCheck(Depth > ZEGR_MAX_TEXTURE3D_DIMENSION, "Depth is too big.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
+	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
 
 	ZEGRTexture3D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture3D();
 	if (Texture == NULL)
 		return NULL;
 
-	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, RenderTarget, UAV))
+	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, Usage, BindFlags, Data))
 	{
 		Texture->Destroy();
 		return NULL;

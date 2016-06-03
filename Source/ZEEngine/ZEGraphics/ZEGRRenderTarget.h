@@ -38,15 +38,28 @@
 #include "ZEGRResource.h"
 
 #include "ZETypes.h"
-#include "ZEMath\ZEVector.h"
+#include "ZEMath/ZEVector.h"
 #include "ZEGRFormat.h"
+
+class ZEGRTexture;
 
 class ZEGRRenderTarget : public ZEGRResource
 {
+	friend class ZEGRContext;
+	private:
+		const ZEGRTexture*			Owner;
+		bool						Bound;
+
 	protected:
 		ZEUInt						Width;
 		ZEUInt						Height;
 		ZEGRFormat					Format;
+
+		void						SetOwner(const ZEGRTexture* OwnerTexture);
+		const ZEGRTexture*			GetOwner() const;
+
+		void						SetBound(bool Bound);
+		bool						GetBound() const;
 
 									ZEGRRenderTarget();
 									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
