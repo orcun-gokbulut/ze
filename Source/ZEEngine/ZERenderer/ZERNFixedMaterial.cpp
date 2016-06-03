@@ -275,8 +275,8 @@ bool ZERNFixedMaterial::UpdateConstantBuffer() const
 
 bool ZERNFixedMaterial::Update() const
 {
-	if (!IsInitialized())
-		return true;
+	if (!ZERNMaterial::Update())
+		return false;
 
 	if (!UpdateStageMask())
 		return false;

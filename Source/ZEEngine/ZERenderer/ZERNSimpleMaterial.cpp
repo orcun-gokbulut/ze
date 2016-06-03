@@ -36,6 +36,7 @@
 #include "ZERNSimpleMaterial.h"
 
 #include "ZECanvas.h"
+#include "ZERNCommand.h"
 #include "ZERNRenderer.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNStageForward.h"
@@ -83,11 +84,10 @@ bool ZERNSimpleMaterial::UpdateRenderState() const
 
 	ZEGRRenderState RenderState;
 	
-	if (StageMask & ZERN_STAGE_FORWARD)
-		RenderState = ZERNStageForward::GetRenderState();
-
-	else if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+	if (GetTransparent())
 		RenderState = ZERNStageForwardTransparent::GetRenderState();
+	else
+		RenderState = ZERNStageForward::GetRenderState();
 
 	RenderState.SetPrimitiveType(PrimitiveType);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
@@ -134,8 +134,6 @@ bool ZERNSimpleMaterial::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	StageMask |= Transparent ? ZERN_STAGE_FORWARD_TRANSPARENT : ZERN_STAGE_FORWARD;
-
 	if (!UpdateShaders())
 		return false;
 
@@ -169,6 +167,7 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	TwoSided = false;
 	Wireframe = false;
 	DepthTestDisabled = false;
+	Transparent = false;
 	PrimitiveType = ZEGR_PT_LINE_LIST;
 	StageMask = ZERN_STAGE_FORWARD;
 
@@ -348,7 +347,7 @@ void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* 
 
 bool ZERNSimpleMaterial::Update() const
 {
-	if (!IsInitialized())
+	if (!ZERNMaterial::Update())
 		return false;
 
 	if (!UpdateShaders())
@@ -361,6 +360,17 @@ bool ZERNSimpleMaterial::Update() const
 		return false;
 
 	return true;
+}
+
+bool ZERNSimpleMaterial::PreRender(ZERNCommand& Command)
+{
+	Command.StageMask = ZERN_STAGE_DEBUG;
+	if (GetTransparent())
+		Command.StageMask |= ZERN_STAGE_FORWARD_TRANSPARENT;
+	else
+		Command.StageMask |= StageMask;
+
+	return StageMask;
 }
 
 ZEHolder<ZERNSimpleMaterial> ZERNSimpleMaterial::CreateInstance()
