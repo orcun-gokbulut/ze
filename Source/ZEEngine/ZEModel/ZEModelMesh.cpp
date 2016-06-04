@@ -83,22 +83,22 @@ void ZEModelMesh::UpdateConstantBuffer()
 	Constants.PreSkinTransform = GetModelTransform();
 
 	if (ClippingPlanes.GetCount() > 0)
-		Constants.ClippingPlane0 = GetInvWorldTransform().Transpose() * ClippingPlanes[0].ToABCD();
+		Constants.ClippingPlane0 = Constants.WorldTransformInverseTranspose * ClippingPlanes[0].ToABCD();
 	else
 		Constants.ClippingPlane0 = ZEVector4::Zero;
 
 	if (ClippingPlanes.GetCount() > 1)
-		Constants.ClippingPlane1 = GetWorldTransform() * ClippingPlanes[1].ToABCD();
+		Constants.ClippingPlane1 = Constants.WorldTransformInverseTranspose * ClippingPlanes[1].ToABCD();
 	else
 		Constants.ClippingPlane1 = ZEVector4::Zero;
 
 	if (ClippingPlanes.GetCount() > 2)
-		Constants.ClippingPlane2 = GetWorldTransform() * ClippingPlanes[2].ToABCD();
+		Constants.ClippingPlane2 = Constants.WorldTransformInverseTranspose * ClippingPlanes[2].ToABCD();
 	else
 		Constants.ClippingPlane2 = ZEVector4::Zero;
 
 	if (ClippingPlanes.GetCount() > 3)
-		Constants.ClippingPlane3 = GetWorldTransform() * ClippingPlanes[3].ToABCD();
+		Constants.ClippingPlane3 = Constants.WorldTransformInverseTranspose * ClippingPlanes[3].ToABCD();
 	else
 		Constants.ClippingPlane3 = ZEVector4::Zero;
 
