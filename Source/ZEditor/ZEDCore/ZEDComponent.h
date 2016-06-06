@@ -40,6 +40,7 @@
 
 class ZEDModule;
 class ZEDEvent;
+class ZEDObjectEvent;
 class ZEDSelectionEvent;
 class ZEDTransformationEvent;
 class ZEDViewportKeyboardEvent;
@@ -56,7 +57,7 @@ class ZEDComponent : public ZEInitializable
 	protected:
 		virtual void					EventReceived(const ZEDEvent* Event);
 	
-		virtual void					ObjectModifiedEvent(const ZEDEvent* Event);
+		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
 		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
 		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
 		virtual	void					TickEvent(const ZEDTickEvent* Event);

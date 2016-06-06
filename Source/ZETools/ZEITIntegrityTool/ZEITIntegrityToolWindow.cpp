@@ -47,7 +47,7 @@
 
 void ZEITIntegrityToolWindow::UpdateRecord(ZESize Index)
 {
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 
 	if (Form->tblRecords->item(Index, 0) == NULL)
 	{
@@ -129,8 +129,6 @@ void ZEITIntegrityToolWindow::UpdateRecord(ZESize Index)
 			Form->tblRecords->item(Index, 1)->setText("Checksum Failed");
 			break;
 	}
-	
-	Form->tblRecords->blockSignals(false);
 }
 
 void ZEITIntegrityToolWindow::UpdateLists()
@@ -157,12 +155,11 @@ void ZEITIntegrityToolWindow::UpdateLists()
 		Form->lstExludes->addItem(Item);
 	}
 
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 	const ZEArray<ZEITRecord>& Records = Generator.GetRecords();
 	Form->tblRecords->setRowCount(Records.GetCount());
 	for (ZESize I = 0; I < Records.GetCount(); I++)
 		UpdateRecord(I);
-	Form->tblRecords->blockSignals(false);
 }
 
 void ZEITIntegrityToolWindow::UpdateUI()
@@ -534,7 +531,7 @@ void ZEITIntegrityToolWindow::tblRecords_itemSelectionChanged()
 
 void ZEITIntegrityToolWindow::btnRecordAdd_clicked()
 {
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 
 	ZEITRecord Record;
 	Generator.AddRecord(Record);
@@ -543,13 +540,11 @@ void ZEITIntegrityToolWindow::btnRecordAdd_clicked()
 	UpdateRecord(Form->tblRecords->rowCount() - 1);
 	
 	UpdateUI();
-
-	Form->tblRecords->blockSignals(false);
 }
 
 void ZEITIntegrityToolWindow::btnRecordRemove_clicked()
 {
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 
 	QModelIndexList List = Form->tblRecords->selectionModel()->selectedRows();
 	for (int I = List.count() - 1; I >= 0; I--)
@@ -559,13 +554,11 @@ void ZEITIntegrityToolWindow::btnRecordRemove_clicked()
 	}
 
 	UpdateUI();
-
-	Form->tblRecords->blockSignals(false);
 }
 
 void ZEITIntegrityToolWindow::btnRecordExclude_clicked()
 {
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 
 	QModelIndexList List = Form->tblRecords->selectionModel()->selectedRows();
 	for (int I = List.count() - 1; I >= 0; I--)
@@ -585,13 +578,11 @@ void ZEITIntegrityToolWindow::btnRecordExclude_clicked()
 	}
 
 	UpdateUI();
-
-	Form->tblRecords->blockSignals(false);
 }
 
 void ZEITIntegrityToolWindow::btnRecordUpdate_clicked()
 {
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 
 	QModelIndexList List = Form->tblRecords->selectionModel()->selectedRows();
 	for (int I = 0; I < List.count(); I++)
@@ -601,19 +592,15 @@ void ZEITIntegrityToolWindow::btnRecordUpdate_clicked()
 	}
 
 	UpdateUI();
-
-	Form->tblRecords->blockSignals(false);
 }
 
 void ZEITIntegrityToolWindow::btnRecordClear_clicked()
 {
-	Form->tblRecords->blockSignals(true);
+	QSignalBlocker tblRecordsBlocker(Form->tblRecords);
 
 	Generator.ClearRecords();
 	UpdateLists();
 	UpdateUI();
-
-	Form->tblRecords->blockSignals(false);
 }
 
 ZEITIntegrityToolWindow::ZEITIntegrityToolWindow()

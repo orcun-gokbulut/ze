@@ -201,6 +201,7 @@ void ZEDModule::StartUp()
 
 	RootWrapper = ZEDSceneWrapper::CreateInstance();
 	RootWrapper->SetObject(Scene);
+	Browser->SetRootWrapper(RootWrapper);
 
 	ZEGrid* Grid = ZEGrid::CreateInstance();
 	ZEDEntityWrapper* GridWrapper = ZEDEntityWrapper::CreateInstance();

@@ -46,12 +46,14 @@ class ZEDPropertyEditorItemString : public QObject, public ZEDPropertyEditorItem
 	private:
 		QLineEdit*					TextEdit;
 		QToolButton*				DetailButton;
+		bool						ValueChanged;
 
 		virtual bool				InitializeSelf();
 
 		virtual bool				eventFilter(QObject* Object, QEvent* Event);
 
 	private slots:
+		void						TextEdit_textChanged(const QString&);
 		void						TextEdit_editingFinished();
 		void						DetailButton_clicked();
 

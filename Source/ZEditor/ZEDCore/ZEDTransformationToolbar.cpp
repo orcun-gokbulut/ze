@@ -45,15 +45,15 @@ void ZEDTransformationToolbar::UpdateUI()
 	if (TransformationManager == NULL)
 		return;
 	
-	Form->btnSelect->blockSignals(true);
-	Form->btnMove->blockSignals(true);
-	Form->btnRotate->blockSignals(true);
-	Form->btnScale->blockSignals(true);
-	Form->cmbSpace->blockSignals(true);
-	Form->cmbPivot->blockSignals(true);
-	Form->txtX->blockSignals(true);
-	Form->txtY->blockSignals(true);
-	Form->txtZ->blockSignals(true);
+	QSignalBlocker btnSelectBlocker(Form->btnSelect);
+	QSignalBlocker btnMoveBlocker(Form->btnMove);
+	QSignalBlocker btnRotatBlocker(Form->btnRotate);
+	QSignalBlocker btnScaleBlocker(Form->btnScale);
+	QSignalBlocker cmbSpaceBlocker(Form->cmbSpace);
+	QSignalBlocker cmbPivotBlocker(Form->cmbPivot);
+	QSignalBlocker txtXBlocker(Form->txtX);
+	QSignalBlocker txtYBlocker(Form->txtY);
+	QSignalBlocker txtZBlocker(Form->txtZ);
 
 	ZEDTransformType TransformType = TransformationManager->GetTransformType();
 	Form->btnSelect->setChecked(TransformType == ZED_TT_NONE);
@@ -114,16 +114,6 @@ void ZEDTransformationToolbar::UpdateUI()
 	Form->txtX->setEnabled(Result);
 	Form->txtY->setEnabled(Result);
 	Form->txtZ->setEnabled(Result);
-
-	Form->btnSelect->blockSignals(false);
-	Form->btnMove->blockSignals(false);
-	Form->btnRotate->blockSignals(false);
-	Form->btnScale->blockSignals(false);
-	Form->cmbSpace->blockSignals(false);
-	Form->cmbPivot->blockSignals(false);
-	Form->txtX->blockSignals(false);
-	Form->txtY->blockSignals(false);
-	Form->txtZ->blockSignals(false);
 }
 
 void ZEDTransformationToolbar::TransformationEvent(const ZEDTransformationEvent* Event)

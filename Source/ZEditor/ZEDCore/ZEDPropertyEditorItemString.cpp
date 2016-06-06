@@ -70,11 +70,11 @@ bool ZEDPropertyEditorItemString::InitializeSelf()
 	TextEdit->setReadOnly(Property->Access == ZEMT_PA_READ);
 	TextEdit->installEventFilter(this);
 	connect(TextEdit, SIGNAL(editingFinished()), this, SLOT(TextEdit_editingFinished()));
+	connect(TextEdit, SIGNAL(textChanged(const QString&)), this, SLOT(TextEdit_textChanged(const QString&)));
 
 	DetailButton = new QToolButton(Container);
 	DetailButton->setText("...");
 	DetailButton->setMinimumWidth(2);
-	//DetailButton->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
 	connect(DetailButton, SIGNAL(clicked()), this, SLOT(DetailButton_clicked()));
 	
 	QHBoxLayout* Layout = new QHBoxLayout();
@@ -95,8 +95,16 @@ bool ZEDPropertyEditorItemString::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
+void ZEDPropertyEditorItemString::TextEdit_textChanged(const QString&)
+{
+	ValueChanged = true;
+}
+
 void ZEDPropertyEditorItemString::TextEdit_editingFinished()
 {
+	if (!ValueChanged)
+		return;
+
 	ZEVariant Value;
 	Value.SetString(TextEdit->text().toUtf8().begin());
 
@@ -123,6 +131,8 @@ void ZEDPropertyEditorItemString::Update()
 {
 	if (!IsInitialized())
 		return;
+
+	ValueChanged = false;
 
 	QSignalBlocker Blocker(TextEdit);
 
@@ -163,6 +173,7 @@ void ZEDPropertyEditorItemString::Update()
 
 ZEDPropertyEditorItemString::ZEDPropertyEditorItemString()
 {
+	ValueChanged = false;
 	TextEdit = NULL;
 	DetailButton = NULL;
 }

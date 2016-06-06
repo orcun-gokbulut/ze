@@ -47,7 +47,13 @@ class ZEDObjectBrowser : public QTreeWidget, public ZEDComponent
 	private:
 		ZEDObjectWrapper*				RootWrapper;
 
+		ZEDObjectWrapper*				GetWrapper(QTreeWidgetItem* Item);
 		QTreeWidgetItem*				FindTreeItem(QTreeWidgetItem* Parent, ZEDObjectWrapper* Wrapper);
+		
+		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
+		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
+		
+		virtual bool					InitializeSelf();
 
 	private slots:
 		void							OnSelectionChanged();

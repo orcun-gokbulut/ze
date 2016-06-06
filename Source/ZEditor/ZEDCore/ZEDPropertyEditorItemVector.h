@@ -45,6 +45,7 @@ class ZEDPropertyEditorItemVector : public QObject, public ZEDPropertyEditorItem
 	private:
 		const char*					Labels[16];
 		QLineEdit*					TextEdits[16];
+		bool						ValueChanged;
 
 		bool						Detail;
 		ZESize						RowCount;

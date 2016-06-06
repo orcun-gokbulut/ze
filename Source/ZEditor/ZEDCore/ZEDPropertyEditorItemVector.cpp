@@ -393,6 +393,7 @@ bool ZEDPropertyEditorItemVector::InitializeSelf()
 		TextEdits[I]->setFrame(false);
 		TextEdits[I]->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
 		TextEdits[I]->setReadOnly(Property->Access == ZEMT_PA_READ);
+		TextEdits[I]->installEventFilter(this);
 		treeWidget()->setItemWidget(Item, 1, TextEdits[I]);
 
 		connect(TextEdits[I], SIGNAL(textChanged(const QString&)), this, SLOT(TextEdit_textChanged(const QString&)));
@@ -436,6 +437,7 @@ void ZEDPropertyEditorItemVector::TextEdit_textChanged(const QString& Text)
 	}
 	else
 	{
+		ValueChanged = true;
 		TextEdit->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
 	}
 }
@@ -443,7 +445,6 @@ void ZEDPropertyEditorItemVector::TextEdit_textChanged(const QString& Text)
 void ZEDPropertyEditorItemVector::TextEdit_editingFinished()
 {
 	QLineEdit* TextEdit = static_cast<QLineEdit*>(sender());
-
 	ZESSize Index = FindIndex(TextEdit);
 	if (Index == -1)
 		return;
@@ -456,6 +457,9 @@ void ZEDPropertyEditorItemVector::TextEdit_editingFinished()
 		return;
 	}
 	
+	if (!ValueChanged)
+		return;
+
 	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetPropertyEditor()->GetWrappers();
 	ZEArray<ZEVariant> Values;
 	Values.SetCount(Wrappers.GetCount());
@@ -477,6 +481,8 @@ void ZEDPropertyEditorItemVector::Update()
 {
 	if (!IsInitialized())
 		return;
+
+	ValueChanged = false;
 
 	const ZEArray<ZEDObjectWrapper*> Wrappers = (GetPropertyEditor()->GetWrappers());
 
@@ -532,7 +538,7 @@ void ZEDPropertyEditorItemVector::Update()
 
 		if (!MultiValue)
 		{
-			TextEdits[MemberIndex]->setText(QString::number(MemberValue));
+			TextEdits[MemberIndex]->setText(QString::number(MemberValue, 'f', 3));
 		}
 		else
 		{
@@ -584,6 +590,7 @@ ZEDPropertyEditorItemVector::ZEDPropertyEditorItemVector()
 {
 	memset(Labels, 0, sizeof(Labels));
 	memset(TextEdits, 0, sizeof(TextEdits));
+	ValueChanged = false;
 	Detail = false;
 	RowCount = 0;
 	ColumnCount = 0;

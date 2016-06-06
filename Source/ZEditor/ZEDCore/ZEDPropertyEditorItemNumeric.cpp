@@ -95,6 +95,8 @@ bool ZEDPropertyEditorItemNumeric::eventFilter(QObject* Object, QEvent* Event)
 
 void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 {
+	ValueChanged = true;
+
 	Value.SetUndefined();
 	switch(GetProperty()->Type.Type)
 	{
@@ -225,6 +227,7 @@ void ZEDPropertyEditorItemNumeric::TextEdit_textChanged(const QString& Text)
 
 void ZEDPropertyEditorItemNumeric::TextEdit_editingFinished()
 {
+	QObject* Sender = sender();
 	if (Error)
 	{
 		Update();
@@ -233,7 +236,10 @@ void ZEDPropertyEditorItemNumeric::TextEdit_editingFinished()
 
 	if (Value.IsUndefined())
 		return;
-	
+
+	if (!ValueChanged)
+		return;
+
 	Changed(Value);
 	Update();
 
@@ -245,6 +251,8 @@ void ZEDPropertyEditorItemNumeric::Update()
 	if (!IsInitialized())
 		return;
 	
+	ValueChanged = false;
+
 	QSignalBlocker Blocker(TextEdit);
 
 	Value.SetUndefined();
@@ -316,11 +324,11 @@ void ZEDPropertyEditorItemNumeric::Update()
 				break;
 
 			case ZE_TT_FLOAT:
-				TextEdit->setText(QString::number(Value.GetFloat()));
+				TextEdit->setText(QString::number(Value.GetFloat(), 'f', 3));
 				break;
 
 			case ZE_TT_DOUBLE:
-				TextEdit->setText(QString::number(Value.GetDouble()));
+				TextEdit->setText(QString::number(Value.GetDouble(), 'f', 3));
 				break;
 
 			default:
@@ -337,5 +345,6 @@ void ZEDPropertyEditorItemNumeric::Update()
 ZEDPropertyEditorItemNumeric::ZEDPropertyEditorItemNumeric()
 {
 	TextEdit = NULL;
+	ValueChanged = false;
 	Error = false;
 }

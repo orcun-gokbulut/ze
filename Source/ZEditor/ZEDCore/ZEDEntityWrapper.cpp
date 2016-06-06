@@ -116,7 +116,7 @@ void ZEDEntityWrapper::SetId(ZEInt Id)
 	static_cast<ZEEntity*>(Object)->SetEntityId(Id);
 }
 
-ZEInt ZEDEntityWrapper::GetId()
+ZEInt ZEDEntityWrapper::GetId() const
 {
 	return static_cast<ZEEntity*>(Object)->GetEntityId();
 }
@@ -126,7 +126,7 @@ void ZEDEntityWrapper::SetName(const ZEString& Name)
 	static_cast<ZEEntity*>(Object)->SetName(Name);
 }
 
-ZEString ZEDEntityWrapper::GetName()
+ZEString ZEDEntityWrapper::GetName() const
 {
 	return static_cast<ZEEntity*>(Object)->GetName();
 }
@@ -169,12 +169,12 @@ void ZEDEntityWrapper::SetVisible(bool Value)
 	static_cast<ZEEntity*>(GetObject())->SetVisible(Value);
 }
 
-bool ZEDEntityWrapper::GetVisible()
+bool ZEDEntityWrapper::GetVisible() const
 {
 	return static_cast<ZEEntity*>(GetObject())->GetVisible();
 }
 
-ZEAABBox ZEDEntityWrapper::GetLocalBoundingBox()
+ZEAABBox ZEDEntityWrapper::GetLocalBoundingBox() const
 {
 	if (GetObject() == NULL)
 		return ZEAABBox();
@@ -182,7 +182,7 @@ ZEAABBox ZEDEntityWrapper::GetLocalBoundingBox()
 	return static_cast<ZEEntity*>(GetObject())->GetWorldBoundingBox();
 }
 
-ZEMatrix4x4 ZEDEntityWrapper::GetWorldTransform()
+ZEMatrix4x4 ZEDEntityWrapper::GetWorldTransform() const
 {
 	if (GetObject() == NULL)
 		return ZEMatrix4x4::Identity;
@@ -200,7 +200,7 @@ void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 	Dirty = true;
 }
 
-ZEVector3 ZEDEntityWrapper::GetPosition()
+ZEVector3 ZEDEntityWrapper::GetPosition() const
 {
 	if (GetObject() == NULL)
 		return ZEVector3::Zero;
@@ -218,7 +218,7 @@ void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 	Dirty = true;
 }
 
-ZEQuaternion ZEDEntityWrapper::GetRotation()
+ZEQuaternion ZEDEntityWrapper::GetRotation() const
 {
 	if (GetObject() == NULL)
 		return ZEQuaternion::Identity;
@@ -236,7 +236,7 @@ void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 	Dirty = true;
 }
 
-ZEVector3 ZEDEntityWrapper::GetScale()
+ZEVector3 ZEDEntityWrapper::GetScale() const
 {
 	if (GetObject() == NULL)
 		return ZEVector3::One;

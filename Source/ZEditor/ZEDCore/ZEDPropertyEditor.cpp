@@ -209,7 +209,7 @@ void ZEDPropertyEditor::Populate()
 
 			case ZE_TT_CLASS:
 			{
-				QTreeWidgetItem* Item = new QTreeWidgetItem();
+				QTreeWidgetItem* Item = new ZEDPropertyEditorItem();
 				Item->setText(0, Properties[I].Name);
 				CurrentClassItem->addChild(Item);
 
@@ -241,30 +241,66 @@ void ZEDPropertyEditor::Populate()
 	}
 }
 
+void ZEDPropertyEditor::ObjectEvent(const ZEDObjectEvent* Event)
+{
+	if (!Wrappers.Exists(Event->GetWrapper()))
+		return;
+
+	if (Event->GetType() == ZED_OCET_REMOVED)
+		RemoveWrapper(Event->GetWrapper());
+	else if (Event->GetType() == ZED_OCET_CHANGED)
+		Update();
+}
+
 void ZEDPropertyEditor::SelectionEvent(const ZEDSelectionEvent* Event)
 {
-	if (Event->GetType() == ZED_SET_SELECTED || Event->GetType() == ZED_SET_DESELECTED)
-	{
-		for (ZESize I = 0; I < Event->GetUnselectedObjects().GetCount(); I++)
-			Wrappers.RemoveValue(Event->GetUnselectedObjects()[I]);
+	if (Event->GetType() != ZED_SET_SELECTED && Event->GetType() != ZED_SET_DESELECTED)
+		return;
 
-		for (ZESize I = 0; I < Event->GetSelectedObjects().GetCount(); I++)
-			Wrappers.Add(Event->GetSelectedObjects()[I]);
-	}
+	for (ZESize I = 0; I < Event->GetUnselectedObjects().GetCount(); I++)
+		Wrappers.RemoveValue(Event->GetUnselectedObjects()[I]);
+
+	for (ZESize I = 0; I < Event->GetSelectedObjects().GetCount(); I++)
+		Wrappers.Add(Event->GetSelectedObjects()[I]);
+
+	Dirty = true;
+}
+
+void ZEDPropertyEditor::TickEvent(const ZEDTickEvent* Event)
+{
+	if (!Dirty)
+		return;
 
 	Populate();
+	Dirty = false;
 }
 
 void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Value);
 	GetModule()->GetOperationManager()->DoOperation(Operation);
+	
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{
+		ZEDObjectEvent Event;
+		Event.SetType(ZED_OCET_CHANGED);
+		Event.SetWrapper(Wrappers[I]);
+		RaiseEvent(&Event);
+	}
 }
 
 void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Values);
 	GetModule()->GetOperationManager()->DoOperation(Operation);
+
+	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	{
+		ZEDObjectEvent Event;
+		Event.SetType(ZED_OCET_CHANGED);
+		Event.SetWrapper(Wrappers[I]);
+		RaiseEvent(&Event);
+	}
 }
 
 const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetWrappers() const
@@ -277,22 +313,34 @@ void ZEDPropertyEditor::AddWrapper(ZEDObjectWrapper* Wrapper)
 	zeCheckError(Wrappers.Exists(Wrapper), ZE_VOID, "Object wrapper is already added to list.");
 
 	Wrappers.Add(Wrapper);
+	Dirty = true;
 }
 
 void ZEDPropertyEditor::RemoveWrapper(ZEDObjectWrapper* Wrapper)
 {
 	Wrappers.RemoveValue(Wrapper);
+	Dirty = true;
 }
 
 void ZEDPropertyEditor::Update()
 {
 	int ItemCount = topLevelItemCount();
 	for (int I = 0; I < ItemCount; I++)
-		static_cast<ZEDPropertyEditorItem*>(topLevelItem(I))->Update();
+	{
+		QTreeWidgetItem* ClassItem = static_cast<ZEDPropertyEditorItem*>(topLevelItem(I));
+		for (ZESize N = 0; N < ClassItem->childCount(); N++)
+		{
+			ZEDPropertyEditorItem* Item = static_cast<ZEDPropertyEditorItem*>(ClassItem->child(N));
+			Item->Update();
+		}
+	}
 }
 
 ZEDPropertyEditor::ZEDPropertyEditor(QWidget* Parent) : QTreeWidget(Parent)
 {
+	Dirty = false;
+	BaseClass = NULL;
+
 	setWindowTitle("Property Editor");
 
 	setColumnCount(2);

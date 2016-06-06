@@ -35,6 +35,21 @@
 
 #include "ZEDOperation.h"
 
+#include "ZEDOperationManager.h"
+
+ZEDOperationManager* ZEDOperation::GetManager()
+{
+	return Manager;
+}
+
+ZEDModule* ZEDOperation::GetModule()
+{
+	if (Manager == NULL)
+		return NULL;
+	else
+		return Manager->GetModule();
+}
+
 void ZEDOperation::SetText(const ZEString& Text)
 {
 	this->Text = Text;
@@ -50,26 +65,6 @@ ZEDOperationStatus ZEDOperation::GetStatus() const
 	return Status;
 }
 
-void ZEDOperation::SetApplyEnabled(bool Value)
-{
-	ApplyEnabled = Value;
-}
-
-bool ZEDOperation::GetApplyEnabled() const
-{
-	return ApplyEnabled;
-}
-
-void ZEDOperation::SetRevertEnabled(bool Value)
-{
-	RevertEnabled = Value;
-}
-
-bool ZEDOperation::GetRevertEnabled() const
-{
-	return RevertEnabled;
-}
-
 bool ZEDOperation::Do()
 {
 	if (Status == ZED_OS_DONE)
@@ -77,9 +72,7 @@ bool ZEDOperation::Do()
 
 	bool Result = true;
 
-	if (ApplyEnabled)
-		Result = Apply();
-
+	Result = Apply();
 	if (Result)
 		Status = ZED_OS_DONE;
 
@@ -93,9 +86,7 @@ bool ZEDOperation::Undo()
 
 	bool Result = true;
 
-	if (RevertEnabled)
-		Result = Revert();
-
+	Result = Revert();
 	if (Result)
 		Status = ZED_OS_NOT_DONE;
 
@@ -109,9 +100,8 @@ void ZEDOperation::Destroy()
 
 ZEDOperation::ZEDOperation()
 {
+	Manager = NULL;
 	Status = ZED_OS_NONE;
-	ApplyEnabled = true;
-	RevertEnabled = true;
 }
 
 ZEDOperation::~ZEDOperation()

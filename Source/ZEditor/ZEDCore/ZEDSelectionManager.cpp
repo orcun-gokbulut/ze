@@ -50,7 +50,7 @@
 ZEDSelectionManager::ZEDSelectionManager()
 {
 	FocusedObject = NULL;
-	Filter = ZEDObjectWrapper::Class();
+	Filter = NULL;
 }
 
 ZEDSelectionManager::~ZEDSelectionManager()
@@ -93,7 +93,34 @@ ZEClass* ZEDSelectionManager::GetSelectionFilter()
 	return Filter;
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDSelectionManager::GetSelectedObjects()
+void ZEDSelectionManager::SetSelection(const ZEArray<ZEDObjectWrapper*>& NewSelection)
+{
+	ZEArray<ZEDObjectWrapper*> DeselectedObjects;
+	for (ZESize I = 0; I < Selection.GetCount(); I++)
+	{
+		if (NewSelection.Exists(Selection[I]))
+			continue;
+
+		DeselectedObjects.Add(Selection[I]);
+	}
+	
+	if (DeselectedObjects.GetCount() != 0)
+		DeselectObjects(DeselectedObjects);
+
+	ZEArray<ZEDObjectWrapper*> SelectedObjects;
+	for (ZESize I = 0; I < NewSelection.GetCount(); I++)
+	{
+		if (Selection.Exists(NewSelection[I]))
+			continue;
+
+		SelectedObjects.Add(NewSelection[I]);
+	}
+
+	if (SelectedObjects.GetCount() != 0)
+		SelectObjects(SelectedObjects);
+}
+
+const ZEArray<ZEDObjectWrapper*>& ZEDSelectionManager::GetSelection()
 {
 	return Selection;
 }
@@ -115,7 +142,7 @@ void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 	if (Selection.Exists(Object))
 		return;
 
-	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelectedObjects();
+	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelection();
 
 	Object->SetSelected(true);
 	Selection.Add(Object);
@@ -256,7 +283,7 @@ void ZEDSelectionManager::DeselectObject(ZEDObjectWrapper* Object)
 	if (!Selection.Exists(Object))
 		return;
 
-	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelectedObjects();
+	ZEArray<ZEDObjectWrapper*> OldSelection = GetSelection();
 
 	if (FocusedObject == Object)
 	{
@@ -296,7 +323,7 @@ void ZEDSelectionManager::DeselectObjects(const ZEArray<ZEDObjectWrapper*>& Obje
 
 		Objects[I]->SetSelected(false);
 		UnselectedObjects.Add(Objects[I]);
-		Selection.Remove(I);
+		Selection.RemoveValue(Objects[I]);
 	}
 
 	for (ZESize I = 0; I < UnselectedObjects.GetCount(); I++)

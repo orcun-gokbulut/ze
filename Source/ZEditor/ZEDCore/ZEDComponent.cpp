@@ -35,14 +35,17 @@
 
 #include "ZEDComponent.h"
 
+#include "ZEDModule.h"
+#include "ZEDObjectWrapper.h"
 #include "ZEDSelectionEvent.h"
 #include "ZEDViewportEvent.h"
-#include "ZEDModule.h"
 
 void ZEDComponent::EventReceived(const ZEDEvent* Event)
 {
 	if(ZEClass::IsDerivedFrom(ZEDTickEvent::Class(), Event->GetClass()))
 		TickEvent(static_cast<const ZEDTickEvent*>(Event));
+	else if(ZEClass::IsDerivedFrom(ZEDObjectEvent::Class(), Event->GetClass()))
+		ObjectEvent(static_cast<const ZEDObjectEvent*>(Event));
 	else if (ZEClass::IsDerivedFrom(ZEDSelectionEvent::Class(), Event->GetClass()))
 		SelectionEvent(static_cast<const ZEDSelectionEvent*>(Event));
 	else if(ZEClass::IsDerivedFrom(ZEDViewportKeyboardEvent::Class(), Event->GetClass()))
@@ -55,9 +58,9 @@ void ZEDComponent::EventReceived(const ZEDEvent* Event)
 		ViewportRenderEvent(static_cast<const ZEDViewportRenderEvent*>(Event));
 }
 
-void ZEDComponent::ObjectModifiedEvent(const ZEDEvent* Event)
+void ZEDComponent::ObjectEvent(const ZEDObjectEvent* Event)
 {
-
+	
 }
 
 void ZEDComponent::SelectionEvent(const ZEDSelectionEvent* Event)
