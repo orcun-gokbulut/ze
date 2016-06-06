@@ -122,7 +122,7 @@ void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		if (!Parameters.Filter(Wrappers[I]))
-			continue;;
+			continue;
 
 		Wrappers[I]->RayCast(Report, Parameters);
 

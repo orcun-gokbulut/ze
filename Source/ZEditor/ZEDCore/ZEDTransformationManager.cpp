@@ -166,7 +166,7 @@ void ZEDTransformationManager::UpdateToolbar()
 
 void ZEDTransformationManager::UpdateTransformStates()
 {
-	const ZEArray<ZEDObjectWrapper*>& Selection = GetModule()->GetSelectionManager()->GetSelectedObjects();
+	const ZEArray<ZEDObjectWrapper*>& Selection = GetModule()->GetSelectionManager()->GetSelection();
 
 	TransformStates.Clear();
 	TransformFocused = NULL;
@@ -263,9 +263,7 @@ void ZEDTransformationManager::EndTransform()
 		return;
 
 	ZEDTransformationOperation* Operation = ZEDTransformationOperation::Create(TransformType, TransformStates);
-	Operation->SetApplyEnabled(false);
 	GetModule()->GetOperationManager()->DoOperation(Operation);
-	Operation->SetApplyEnabled(true);
 
 	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
 	{

@@ -46,6 +46,7 @@ class ZEDPropertyEditorItemNumeric : public QObject, public ZEDPropertyEditorIte
 		QLineEdit*					TextEdit;
 		bool						Error;
 		ZEVariant					Value;
+		bool						ValueChanged;
 
 		virtual bool				InitializeSelf();
 

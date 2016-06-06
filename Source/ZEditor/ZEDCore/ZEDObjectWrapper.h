@@ -36,8 +36,10 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEDEvent.h"
 
 #include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEAABBox.h"
 
@@ -45,18 +47,46 @@
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
-#include <QWidget>
-#include <QMenu>
 
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
+class ZEDModule;
+class QWidget;
+class QMenu;
+
+enum ZEDObjectChangedEventType
+{
+	ZED_OCED_NONE,
+	ZED_OCET_ADDED,
+	ZED_OCET_REMOVED,
+	ZED_OCET_CHANGED
+};
+
+class ZEDObjectEvent : public ZEDEvent
+{
+	ZE_OBJECT
+	friend class ZEDObjectWrapper;
+	private:
+		ZEDObjectChangedEventType					Type;
+		ZEDObjectWrapper*							Wrapper;
+
+	public:	
+		void										SetType(ZEDObjectChangedEventType Type);
+		ZEDObjectChangedEventType					GetType() const;
+
+		void										SetWrapper(ZEDObjectWrapper* Wrapper);
+		ZEDObjectWrapper*							GetWrapper() const;
+
+													ZEDObjectEvent();
+};
 
 class ZEDObjectWrapper : public ZEObject
 {
-	//ZE_OBJECT
+	ZE_OBJECT
 	protected:
 		ZEObject*									Object;
 		ZEDObjectWrapper*							Parent;
+		ZEDModule*									Module;
 
 		ZEString									Icon;
 		bool										Selectable;
@@ -65,59 +95,63 @@ class ZEDObjectWrapper : public ZEObject
 		bool										Locked;
 
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
+		
+		void										SetModule(ZEDModule* Module);
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();
 
 	public:
 		virtual void								SetObject(ZEObject* Object);
-		virtual ZEObject*							GetObject();
+		ZEObject*									GetObject() const;
 		
 		virtual void								SetParent(ZEDObjectWrapper* Wrapper);
-		virtual ZEDObjectWrapper*					GetParent();
+		virtual ZEDObjectWrapper*					GetParent() const;
+
+		ZEDModule*									GetModule() const;
 
 		virtual void								SetId(ZEInt Id);
-		virtual ZEInt								GetId();
+		virtual ZEInt								GetId() const;
 
 		virtual void								SetName(const ZEString& Name);
-		virtual ZEString							GetName();
+		virtual ZEString							GetName() const;
 
-		void										SetIcon(const ZEString& Icon);
-		const ZEString&								GetIcon();
+		virtual void								SetIcon(const ZEString& Icon);
+		virtual const ZEString&						GetIcon() const;
 
 		virtual ZEAABBox							GetLocalBoundingBox();
 		virtual ZEMatrix4x4							GetWorldTransform();
 
 		virtual void								SetPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3							GetPosition();
+		virtual ZEVector3							GetPosition() const;
 
 		virtual void								SetRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion						GetRotation();
+		virtual ZEQuaternion						GetRotation() const;
 
 		virtual void								SetScale(const ZEVector3& NewScale);
-		virtual ZEVector3							GetScale();
+		virtual ZEVector3							GetScale() const;
 
 		virtual void								SetLocked(bool Value);
-		virtual bool								GetLocked();
+		bool										GetLocked() const;
 
-		void										SetSelectable(bool Value);
-		bool										GetSelectable();
+		virtual void								SetSelectable(bool Value);
+		virtual bool								GetSelectable() const;
 
 		virtual void								SetSelected(bool Selected);
-		virtual bool								GetSelected();
+		bool										GetSelected() const;
 
 		virtual void								SetFocused(bool Focused);
-		virtual bool								GetFocused();
+		bool										GetFocused() const;
 
 		virtual void								SetVisible(bool Value);
-		virtual bool								GetVisible();
+		virtual bool								GetVisible() const;
 
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
 		virtual void								AddChildWrapper(ZEDObjectWrapper* Wrapper);
 		virtual void								RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
 
-		virtual QWidget*							GetCustomWidget();
-		virtual QMenu*								GetPopupMenu();
+		virtual QWidget*							GetCustomWidget() const;
+		virtual QMenu*								GetPopupMenu() const;
 
 		virtual void								PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

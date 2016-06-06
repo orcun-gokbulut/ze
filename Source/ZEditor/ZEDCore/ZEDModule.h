@@ -52,7 +52,6 @@ class ZEDObjectWrapper;
 
 class ZEDModule : public ZEApplicationModule
 {
-	friend ZEDComponent;
 	private:
 		ZEArray<ZEDComponent*>				Components;
 		ZEDOperationManager*				OperationManager;
@@ -60,8 +59,6 @@ class ZEDModule : public ZEApplicationModule
 		ZEDTransformationManager*			TransformManager;
 		ZEDViewportManager*					ViewportManager;
 		ZEDObjectWrapper*					RootWrapper;
-
-		void								DistributeEvent(const ZEDEvent* Event);
 
 		virtual bool						InitializeSelf();
 		virtual bool						DeinitializeSelf();
@@ -78,6 +75,8 @@ class ZEDModule : public ZEApplicationModule
 
 		virtual void						Process(float ElapsedTime);
 		virtual void						PostProcess(float ElapsedTime);
+
+		void								DistributeEvent(const ZEDEvent* Event);
 
 		virtual void						StartUp();
 		virtual void						ShutDown();

@@ -65,26 +65,26 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						SetObject(ZEObject* Object);
 
 		virtual void						SetId(ZEInt Id);
-		virtual ZEInt						GetId();
+		virtual ZEInt						GetId() const;
 
 		virtual void						SetName(const ZEString& Name);
-		virtual ZEString					GetName();
+		virtual ZEString					GetName() const;
 
-		virtual ZEAABBox					GetLocalBoundingBox();
-		virtual ZEMatrix4x4					GetWorldTransform();
+		virtual ZEAABBox					GetLocalBoundingBox() const;
+		virtual ZEMatrix4x4					GetWorldTransform() const;
 
 		virtual void						SetPosition(const ZEVector3& NewPosition);
-		virtual ZEVector3					GetPosition();
+		virtual ZEVector3					GetPosition() const;
 		virtual void						SetRotation(const ZEQuaternion& NewRotation);
-		virtual ZEQuaternion				GetRotation();
+		virtual ZEQuaternion				GetRotation() const;
 		virtual void						SetScale(const ZEVector3& NewScale);
-		virtual ZEVector3					GetScale();
+		virtual ZEVector3					GetScale() const;
 
 		virtual void						SetSelected(bool Selected);
 		virtual void						SetFocused(bool Focused);
 
 		virtual void						SetVisible(bool Value);
-		virtual bool						GetVisible();
+		virtual bool						GetVisible() const;
 
 		virtual void						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);

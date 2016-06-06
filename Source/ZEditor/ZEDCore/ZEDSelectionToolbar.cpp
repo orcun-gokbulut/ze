@@ -47,9 +47,9 @@ void ZEDSelectionToolbar::UpdateUI()
 	if (SelectionManager == NULL)
 		return;
 
-	Form->cmbShape->blockSignals(true);
-	Form->cmbMode->blockSignals(true);
-	Form->btnFreeze->blockSignals(true);
+	QSignalBlocker cmbShapeBlocker(Form->cmbShape);
+	QSignalBlocker cmbModeBlocker(Form->cmbMode);
+	QSignalBlocker cmbFreezeBlocker(Form->btnFreeze);
 
 	switch (SelectionManager->GetSelectionMode())
 	{
@@ -78,10 +78,6 @@ void ZEDSelectionToolbar::UpdateUI()
 			Form->cmbMode->setCurrentText("Partially Inside");
 			break;
 	}
-
-	Form->cmbShape->blockSignals(false);
-	Form->cmbMode->blockSignals(false);
-	Form->btnFreeze->blockSignals(false);
 }
 
 void ZEDSelectionToolbar::btnSelectionList_clicked()

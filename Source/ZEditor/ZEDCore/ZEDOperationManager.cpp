@@ -103,11 +103,14 @@ bool ZEDOperationManager::Redo()
 
 bool ZEDOperationManager::DoOperation(ZEDOperation* Operation)
 {
-	if (Operation == NULL)
-		return false;
-	
+	zeCheckError(Operation == NULL, false, "Operation cannot be NULL.");
+	zeCheckError(Operation->GetManager() != NULL, false, "Operation alread associated with another manager.");
+
+	Operation->Manager = this;
+
 	if (!Operation->Do())
 	{
+		Operation->Manager = NULL;
 		zeError("Cannot do operation. Operation Text: \"%s\"", Stack[StackIndex]->GetText().ToCString());
 		return false;
 	}

@@ -44,16 +44,21 @@ enum ZEDOperationStatus
 	ZED_OS_NOT_DONE
 };
 
+class ZEDOperationManager;
+class ZEDModule;
+
 class ZEDOperation
 {
 	friend class ZEDOperationManager;
 	private:
+		ZEDOperationManager*		Manager;
 		ZEString					Text;
 		ZEDOperationStatus			Status;
-		bool						ApplyEnabled;
-		bool						RevertEnabled;
 
 	protected:
+		ZEDOperationManager*		GetManager();
+		ZEDModule*					GetModule();
+
 		void						SetText(const ZEString& Text);
 		
 		virtual bool				Apply() = 0;
@@ -65,12 +70,6 @@ class ZEDOperation
 	public:
 		const ZEString&				GetText() const;
 		ZEDOperationStatus			GetStatus() const;
-
-		void						SetApplyEnabled(bool Value);
-		bool						GetApplyEnabled() const;
-
-		void						SetRevertEnabled(bool Value);
-		bool						GetRevertEnabled() const;
 
 		bool						Do();
 		bool						Undo();
