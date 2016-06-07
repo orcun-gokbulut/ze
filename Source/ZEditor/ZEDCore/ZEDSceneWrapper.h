@@ -38,24 +38,27 @@
 #include "ZEDEntityWrapper.h"
 #include "ZEGame/ZERayCast.h"
 
+class ZEScene;
+
 class ZEDSceneWrapper : public ZEDObjectWrapper
 {
+	ZE_OBJECT
 	private:
-		ZEArray<ZEDEntityWrapper*>				Wrappers;
-
 		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 	public:
 		virtual void							SetObject(ZEObject* Object);
 		virtual ZEString						GetName();
+		
+		ZEScene*								GetScene();
 
-		virtual const ZEArray<ZEDObjectWrapper*>& GetChildWrappers();
-		virtual void							AddChildWrapper(ZEDObjectWrapper* Wrapper);
-		virtual void							RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
+		virtual bool							AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
 		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void							Update();
 
 		static ZEDSceneWrapper*					CreateInstance();
 };

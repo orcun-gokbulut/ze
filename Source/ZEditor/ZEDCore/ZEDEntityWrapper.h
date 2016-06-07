@@ -43,7 +43,7 @@ class ZERNSimpleMaterial;
 
 class ZEDEntityWrapper : public ZEDObjectWrapper
 {
-	//ZE_OBJECT
+	ZE_OBJECT
 	private:
 		bool								Dirty;
 		ZEHolder<ZEGRVertexBuffer>			VertexBuffer;
@@ -57,12 +57,13 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		ZECanvas							Canvas;
 
 		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
-		bool								Update();
+		bool								UpdateGraphics();
 
 											ZEDEntityWrapper();
 
 	public:
 		virtual void						SetObject(ZEObject* Object);
+		ZEEntity*							GetEntity() const;
 
 		virtual void						SetId(ZEInt Id);
 		virtual ZEInt						GetId() const;
@@ -86,10 +87,15 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible() const;
 
+		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool						RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+
 		virtual void						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void						Tick(float ElapsedTime);
 		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		virtual void						Update();
 
 		static ZEDEntityWrapper*			CreateInstance();
 };

@@ -105,10 +105,12 @@ ze_add_source(ZEDPropertyOperation.cpp					Sources)
 ze_add_source(ZEDPropertyOperation.h					Sources Header)
 
 
+ze_add_source(ZEDGrid.cpp								Sources)
+ze_add_source(ZEDGrid.h									Sources ZEMC)
 ze_add_source(ZEDSceneWrapper.cpp						Sources)
-ze_add_source(ZEDSceneWrapper.h							Sources)
+ze_add_source(ZEDSceneWrapper.h							Sources ZEMC)
 ze_add_source(ZEDEntityWrapper.cpp						Sources)
-ze_add_source(ZEDEntityWrapper.h						Sources)
+ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
 
 qt5_wrap_cpp (QtMocFiles ${QtMocs})
 qt5_wrap_ui (QtUIFiles ${QtUI})

@@ -82,34 +82,7 @@ void ZEDSceneWrapper::SetObject(ZEObject* Object)
 	if (!ZEClass::IsDerivedFrom(ZEScene::Class(), Object->GetClass()))
 		return;
 
-	ZEScene* Scene = static_cast<ZEScene*>(Object);
-	ZEDObjectWrapper::SetObject(Scene);
-
-	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
-	ChildWrappers.SetCount(Entities.GetCount());
-
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEClass* TargetClass = Entities[I]->GetClass();
-
-		/*Requires implementation with ZEMeta, making wrappers class identifiers identical with ZEEntity and derivations' class identifiers, 
-		thus returning the appropriate wrapper class if it exists, if it does not exist return it's parent's and so on.*/
-
-		/*const ZEArray<ZEClass*>& WrapperTypes = ZEDCore::GetInstance()->GetWrapperTypes();
-		
-		for (ZESize I = 0; I < WrapperTypes.GetCount(); I++)
-		{
-			if (WrapperTypes[]) //WrapperTypes[I]->GetAttributes()->Values*
-			{
-				ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)WrapperTypes[I]->CreateInstance();
-				Wrapper->SetObject(Object);
-			}
-		}*/
-
-		ZEDEntityWrapper* Temp = ZEDEntityWrapper::CreateInstance();
-		Temp->SetObject(Entities[I]);
-		ChildWrappers[I] = Temp;
-	}
+	ZEDObjectWrapper::SetObject(Object);
 }
 
 ZEString ZEDSceneWrapper::GetName()
@@ -117,8 +90,14 @@ ZEString ZEDSceneWrapper::GetName()
 	return "Scene";
 }
 
+ZEScene* ZEDSceneWrapper::GetScene()
+{
+	return static_cast<ZEScene*>(GetObject());
+}
+
 void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
+	ZEArray<ZEDObjectWrapper*> Wrappers = GetChildWrappers();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 	{
 		if (!Parameters.Filter(Wrappers[I]))
@@ -131,66 +110,97 @@ void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters
 	}
 }
 
+void ZEDSceneWrapper::Update()
+{
+	ZEScene* Scene = GetScene();
+	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
+
+	// Remove
+	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
+
+	for (ZESSize I = Wrappers.GetCount() - 1; I >= 0; I--)
+	{
+		bool Found = false;
+		for (ZESize N = 0; N < Entities.GetCount(); N++)
+		{
+			if (Wrappers[I]->GetObject() == Entities[N])
+			{
+				Found = true;
+				break;
+			}
+		}
+
+		if (!Found)
+			Wrappers[I]->Destroy();
+	}
+
+	// Add
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+	{
+		ZEDEntityWrapper* Wrapper = NULL;
+		const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
+		for (ZESize N = 0; N < Wrappers.GetCount(); N++)
+		{
+			if (Wrappers[N]->GetObject() == Entities[I])
+			{
+				Wrapper = static_cast<ZEDEntityWrapper*>(Wrappers[N]);
+				break;
+			}
+		}
+
+		if (Wrapper == NULL)
+		{
+			Wrapper = ZEDEntityWrapper::CreateInstance();
+			Wrapper->SetObject(Entities[I]);
+			AddChildWrapper(Wrapper, true);
+		}
+	}
+}
+
 ZEDSceneWrapper* ZEDSceneWrapper::CreateInstance()
 {
 	return new ZEDSceneWrapper();
 }
 
-const ZEArray<ZEDObjectWrapper*>& ZEDSceneWrapper::GetChildWrappers()
+bool ZEDSceneWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
-	return *reinterpret_cast<ZEArray<ZEDObjectWrapper*>*>(&Wrappers);
+	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
+		return false;
+
+	if (!ZEDObjectWrapper::AddChildWrapper(Wrapper, Update))
+		return false;
+
+	if (!Update)
+	{
+		if (GetScene() != NULL)
+			GetScene()->AddEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
+	}
+
+	return true;
 }
 
-void ZEDSceneWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper)
+bool ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
-	if (Object == NULL)
-		return;
+	if (!ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update))
+		return false;
 
-	if (Wrapper == NULL)
-		return;
+	if (!Update)
+	{
+		if (GetScene() != NULL)
+			GetScene()->RemoveEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
+	}
 
-	if (Wrapper->GetObject() == NULL)
-		return;
-
-	if (!ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
-		return;
-
-	if (Wrappers.Exists(static_cast<ZEDEntityWrapper*>(Wrapper)))
-		return;
-
-	ZEScene* Scene = static_cast<ZEScene*>(Object);
-	Scene->AddEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
-
-	Wrappers.Add(static_cast<ZEDEntityWrapper*>(Wrapper));
-}
-
-void ZEDSceneWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
-{
-	if (Object == NULL)
-		return;
-
-	if (Wrapper == NULL)
-		return;
-
-	if (Wrapper->GetObject() == NULL)
-		return;
-
-	if (!ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
-		return;
-
-	ZEScene* Scene = static_cast<ZEScene*>(Object);
-	Scene->RemoveEntity((ZEEntity*)Wrapper->GetObject());
-	
-	Wrappers.RemoveValue(static_cast<ZEDEntityWrapper*>(Wrapper));
+	return true;
 }
 
 void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	static_cast<ZEScene*>(GetObject())->PreRender(Parameters);
-
 	Parameters->Renderer->StartScene(NULL);
+
+	GetScene()->PreRender(Parameters);
+	ZEArray<ZEDObjectWrapper*> Wrappers = GetChildWrappers();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-		PreRenderEntity(Wrappers[I], Parameters);
+		PreRenderEntity(static_cast<ZEDEntityWrapper*>(Wrappers[I]), Parameters);
 
 	Parameters->Renderer->EndScene();
 }

@@ -83,7 +83,7 @@ class ZEDObjectEvent : public ZEDEvent
 class ZEDObjectWrapper : public ZEObject
 {
 	ZE_OBJECT
-	protected:
+	private:
 		ZEObject*									Object;
 		ZEDObjectWrapper*							Parent;
 		ZEDModule*									Module;
@@ -97,6 +97,9 @@ class ZEDObjectWrapper : public ZEObject
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
 		
 		void										SetModule(ZEDModule* Module);
+	
+	protected:
+		void										ClearChildWrappers();
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();
@@ -147,8 +150,8 @@ class ZEDObjectWrapper : public ZEObject
 		virtual bool								GetVisible() const;
 
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
-		virtual void								AddChildWrapper(ZEDObjectWrapper* Wrapper);
-		virtual void								RemoveChildWrapper(ZEDObjectWrapper* Wrapper);
+		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool								RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
 		virtual QWidget*							GetCustomWidget() const;
 		virtual QMenu*								GetPopupMenu() const;
@@ -157,6 +160,8 @@ class ZEDObjectWrapper : public ZEObject
 		virtual void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void								Tick(float ElapsedTime);
 		virtual void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		virtual void								Update();
 
 		virtual void								Destroy();
 };

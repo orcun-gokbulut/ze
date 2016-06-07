@@ -79,6 +79,12 @@ void ZEDObjectWrapper::SetModule(ZEDModule* Module)
 	this->Module = Module;
 }
 
+void ZEDObjectWrapper::ClearChildWrappers()
+{
+	for (ZESSize I = ChildWrappers.GetCount() -1; I >= 0; I--)
+		ChildWrappers[I]->Destroy();
+}
+
 ZEDObjectWrapper::ZEDObjectWrapper()
 {
 	Object = NULL;
@@ -92,15 +98,23 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 
 ZEDObjectWrapper::~ZEDObjectWrapper()
 {
+	ClearChildWrappers();
 
+	if (Parent != NULL)
+		Parent->RemoveChildWrapper(this, true);
 }
 
 void ZEDObjectWrapper::SetObject(ZEObject* Object)
 {
-	if (this->Object != NULL)
+	if (this->Object == Object)
 		return;
 
 	this->Object = Object;
+
+	if (Object == NULL)
+		ClearChildWrappers();
+
+	Update();
 }
 
 ZEObject* ZEDObjectWrapper::GetObject() const
@@ -264,16 +278,13 @@ const ZEArray<ZEDObjectWrapper*>& ZEDObjectWrapper::GetChildWrappers()
 	return ChildWrappers;
 }
 
-void ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper)
+bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
 	if (Wrapper == NULL)
-		return;
+		return false;
 
 	if (ChildWrappers.Exists(Wrapper))
-		return;
-
-	if (!ZEClass::IsDerivedFrom(Object->GetClass(), Wrapper->GetObject()->GetClass()))
-		return;
+		return false;
 
 	ChildWrappers.Add(Wrapper);
 	Wrapper->SetParent(this);
@@ -284,15 +295,17 @@ void ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper)
 	Event.Type = ZED_OCET_ADDED;
 	if (Module != NULL)
 		Module->DistributeEvent(&Event);
+
+	return true;
 }
 
-void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
+bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
 	if (Wrapper == NULL)
-		return;
+		return false;
 
 	if (!ChildWrappers.Exists(Wrapper))
-		return;
+		return false;
 
 	ChildWrappers.RemoveValue(Wrapper);
 	Wrapper->SetParent(NULL);
@@ -303,6 +316,8 @@ void ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper)
 	Event.Type = ZED_OCET_REMOVED;
 	if (Module != NULL)
 		Module->DistributeEvent(&Event);
+
+	return true;
 }
 
 void ZEDObjectWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
@@ -321,6 +336,11 @@ void ZEDObjectWrapper::Tick(float ElapsedTime)
 }
 
 void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+{
+
+}
+
+void ZEDObjectWrapper::Update()
 {
 
 }
