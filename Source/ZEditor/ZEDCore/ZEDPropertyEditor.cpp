@@ -301,6 +301,8 @@ void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEArra
 		Event.SetWrapper(Wrappers[I]);
 		RaiseEvent(&Event);
 	}
+
+
 }
 
 const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetWrappers() const

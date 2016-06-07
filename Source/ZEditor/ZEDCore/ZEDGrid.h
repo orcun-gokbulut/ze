@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGrid.h
+ Zinek Engine - ZEDGrid.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -44,7 +44,7 @@ class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
 class ZERNSimpleMaterial;
 
-class ZEGrid : public ZEEntity
+class ZEDGrid : public ZEEntity
 {
 	ZE_OBJECT
 	private:
@@ -88,7 +88,7 @@ class ZEGrid : public ZEEntity
 		virtual bool					InitializeSelf();
 		virtual bool					DeinitializeSelf();
 
-										ZEGrid();
+										ZEDGrid();
 
 	public:
 		ZEDrawFlags						GetDrawFlags() const;
@@ -118,5 +118,5 @@ class ZEGrid : public ZEEntity
 		virtual	bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		
-		static ZEGrid*					CreateInstance();
+		static ZEDGrid*					CreateInstance();
 };

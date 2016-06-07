@@ -46,20 +46,19 @@
 #include "ZEDObjectBrowser.h"
 #include "ZEDMainWindow.h"
 #include "ZEDViewportController.h"
+#include "ZEDGrid.h"
+#include "ZEDPropertyEditor.h"
+#include "ZEDSelectionToolbar.h"
+#include "ZEDTransformationToolbar.h"
+#include "ZEDTransformationManager.h"
 
-
-#include "ZEGame/ZEGrid.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEModel/ZEModel.h"
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-
-#include "ZEDPropertyEditor.h"
-#include "ZEDSelectionToolbar.h"
-#include "ZEDTransformationToolbar.h"
-#include "ZEDTransformationManager.h"
+#include "ZEGame/ZESector.h"
 
 void ZEDModule::DistributeEvent(const ZEDEvent* Event)
 {
@@ -203,37 +202,36 @@ void ZEDModule::StartUp()
 	RootWrapper->SetObject(Scene);
 	Browser->SetRootWrapper(RootWrapper);
 
-	ZEGrid* Grid = ZEGrid::CreateInstance();
-	ZEDEntityWrapper* GridWrapper = ZEDEntityWrapper::CreateInstance();
-	GridWrapper->SetObject(Grid);
-	GridWrapper->SetSelectable(false);
-	RootWrapper->AddChildWrapper(GridWrapper);
+	ZEDGrid* Grid = ZEDGrid::CreateInstance();
+	Scene->AddEntity(Grid);
 
 	ZEModel* Trial = ZEModel::CreateInstance();
 	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
-	ZEDEntityWrapper* Trial1Wrapper = ZEDEntityWrapper::CreateInstance();
-	Trial1Wrapper->SetObject(Trial);
-	RootWrapper->AddChildWrapper(Trial1Wrapper);
+	Scene->AddEntity(Trial);
 
 	ZEModel* Trial2 = ZEModel::CreateInstance();
-	//Trial2->SetBoundingBox(ZEAABBox(ZEVector3(-1.0f, -1.0f, -1.0f),ZEVector3(1.0f, 1.0f, 1.0f)));
-	//Trial2->SetUserDefinedBoundingBoxEnabled(true);
 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
 	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
-	ZEDEntityWrapper* Trial2Wrapper = ZEDEntityWrapper::CreateInstance();
-	Trial2Wrapper->SetObject(Trial2);
-	RootWrapper->AddChildWrapper(Trial2Wrapper);
+	Scene->AddEntity(Trial2);
+
+	RootWrapper->Update();
 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
-	ZEDEntityWrapper* Light1Wrapper = ZEDEntityWrapper::CreateInstance();
 	Light1->SetIntensity(1.0f);
 	Light1->SetColor(ZEVector3::One);
-	Light1Wrapper->SetObject(Light1);
-	RootWrapper->AddChildWrapper(Light1Wrapper);
+	Scene->AddEntity(Light1);
 
+	ZESector* Sector = ZESector::CreateInstance();
+	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZESector");
+	Scene->AddEntity(Sector);
+	
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
-	
+
+	Scene->RemoveEntity(Trial);
+
+	RootWrapper->Update();
+
 	/*ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
 	ZEDEntityWrapper* AtmosphereWrapper = ZEDEntityWrapper::CreateInstance();
 	AtmosphereWrapper->SetObject(Atmosphere);

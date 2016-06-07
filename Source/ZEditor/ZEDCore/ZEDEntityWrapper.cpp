@@ -35,9 +35,7 @@
 
 #include "ZEDEntityWrapper.h"
 
-#include "ZEDS/ZEDelegate.h"
 #include "ZEGame/ZEEntity.h"
-#include "ZEGame/ZEGizmo.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
@@ -52,7 +50,7 @@ bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void
 	return true;
 }
 
-bool ZEDEntityWrapper::Update()
+bool ZEDEntityWrapper::UpdateGraphics()
 {
 	if (!Dirty)
 		return true;
@@ -113,22 +111,22 @@ ZEDEntityWrapper::ZEDEntityWrapper()
 
 void ZEDEntityWrapper::SetId(ZEInt Id)
 {
-	static_cast<ZEEntity*>(Object)->SetEntityId(Id);
+	GetEntity()->SetEntityId(Id);
 }
 
 ZEInt ZEDEntityWrapper::GetId() const
 {
-	return static_cast<ZEEntity*>(Object)->GetEntityId();
+	return GetEntity()->GetEntityId();
 }
 
 void ZEDEntityWrapper::SetName(const ZEString& Name)
 {
-	static_cast<ZEEntity*>(Object)->SetName(Name);
+	GetEntity()->SetName(Name);
 }
 
 ZEString ZEDEntityWrapper::GetName() const
 {
-	return static_cast<ZEEntity*>(Object)->GetName();
+	return GetEntity()->GetName();
 }
 
 void ZEDEntityWrapper::SetObject(ZEObject* Object)
@@ -136,32 +134,15 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 	if (!ZEClass::IsDerivedFrom(ZEEntity::Class(), Object->GetClass()))
 		return;
 
-	ZEEntity* Entity = static_cast<ZEEntity*>(Object);
+	ZEDObjectWrapper::SetObject(Object);
+	GetEntity()->SetWrapper(this);
+	
+	Update();
+}
 
-	Entity->SetWrapper(this);
-	ZEDObjectWrapper::SetObject(Entity);
-
-	const ZEArray<ZEEntity*>& Children = Entity->GetChildEntities();
-
-	//Same finding suitable wrapper algorithm in ZEDScene.
-
-	// 	const ZEArray<ZEClass*>& WrapperTypes = ZEDCore::GetInstance()->GetWrapperTypes();
-	// 
-	// 	for (ZESize I = 0; I < WrapperTypes.GetCount(); I++)
-	// 	{
-	// 		if (WrapperTypes[]) //WrapperTypes[I]->GetAttributes()->Values*
-	// 		{
-	// 			ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)WrapperTypes[I]->CreateInstance();
-	// 			Wrapper->SetObject(Object);
-	// 		}
-	// 	}
-
-	for (ZESize I = 0; I < Children.GetCount(); I++)
-	{
-		ZEDEntityWrapper* ChildWrapper = ZEDEntityWrapper::CreateInstance();
-		ChildWrapper->SetObject(Children[I]);
-		AddChildWrapper(ChildWrapper);
-	}
+ZEEntity* ZEDEntityWrapper::GetEntity() const
+{
+	return static_cast<ZEEntity*>(GetObject());
 }
 
 void ZEDEntityWrapper::SetVisible(bool Value)
@@ -174,56 +155,90 @@ bool ZEDEntityWrapper::GetVisible() const
 	return static_cast<ZEEntity*>(GetObject())->GetVisible();
 }
 
+bool ZEDEntityWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
+{
+	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
+		return false;
+
+	if (!ZEDObjectWrapper::AddChildWrapper(Wrapper, Update))
+		return false;
+
+	if (!Update)
+	{
+		if (GetEntity() != NULL)
+			GetEntity()->AddChildEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
+	}
+
+	return true;
+}
+
+bool ZEDEntityWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
+{
+	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
+		return false;
+
+	if (!ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update))
+		return false;
+
+	if (!Update)
+	{
+		if (GetEntity() != NULL)
+			GetEntity()->RemoveChildEntity(static_cast<ZEEntity*>(Wrapper->GetObject()));
+	}
+
+	return true;
+}
+
 ZEAABBox ZEDEntityWrapper::GetLocalBoundingBox() const
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return ZEAABBox();
 
-	return static_cast<ZEEntity*>(GetObject())->GetWorldBoundingBox();
+	return GetEntity()->GetWorldBoundingBox();
 }
 
 ZEMatrix4x4 ZEDEntityWrapper::GetWorldTransform() const
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return ZEMatrix4x4::Identity;
 
-	return static_cast<ZEEntity*>(GetObject())->GetWorldTransform();
+	return GetEntity()->GetWorldTransform();
 }
 
 void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return;
 
-	static_cast<ZEEntity*>(GetObject())->SetWorldPosition(NewPosition);
+	GetEntity()->SetWorldPosition(NewPosition);
 
 	Dirty = true;
 }
 
 ZEVector3 ZEDEntityWrapper::GetPosition() const
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return ZEVector3::Zero;
 
-	return static_cast<ZEEntity*>(GetObject())->GetWorldPosition();
+	return GetEntity()->GetWorldPosition();
 }
 
 void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return;
 
-	static_cast<ZEEntity*>(GetObject())->SetWorldRotation(NewRotation);
+	GetEntity()->SetWorldRotation(NewRotation);
 
 	Dirty = true;
 }
 
 ZEQuaternion ZEDEntityWrapper::GetRotation() const
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return ZEQuaternion::Identity;
 
-	return static_cast<ZEEntity*>(GetObject())->GetWorldRotation();
+	return GetEntity()->GetWorldRotation();
 }
 
 void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
@@ -231,17 +246,17 @@ void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 	if (GetObject() == NULL)
 		return;
 
-	static_cast<ZEEntity*>(GetObject())->SetWorldScale(NewScale);
+	GetEntity()->SetWorldScale(NewScale);
 
 	Dirty = true;
 }
 
 ZEVector3 ZEDEntityWrapper::GetScale() const
 {
-	if (GetObject() == NULL)
+	if (GetEntity() == NULL)
 		return ZEVector3::One;
 
-	return static_cast<ZEEntity*>(GetObject())->GetWorldScale();
+	return GetEntity()->GetWorldScale();
 }
 
 void ZEDEntityWrapper::SetSelected(bool Selected)
@@ -265,13 +280,13 @@ void ZEDEntityWrapper::SetFocused(bool Focused)
 void ZEDEntityWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	Report.SetModifierFunction(ZEDelegateMethod(ZERayCastModifierFunction, ZEDEntityWrapper, RayCastModifier, this));
-	static_cast<ZEEntity*>(Object)->RayCast(Report, Parameters);
+	GetEntity()->RayCast(Report, Parameters);
 	Report.SetModifierFunction(ZERayCastModifierFunction());
 }
 
 void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!Update())
+	if (!UpdateGraphics())
 		return;
 
 	if (!Material->PreRender(Command))
@@ -303,6 +318,53 @@ void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 void ZEDEntityWrapper::Tick(float ElapsedTime)
 {
 	ZEDObjectWrapper::Tick(ElapsedTime);
+}
+
+void ZEDEntityWrapper::Update()
+{
+	ZEEntity* Entity = GetEntity();
+	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
+
+	// Remove
+	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
+
+	for (ZESSize I = Wrappers.GetCount() - 1; I >= 0; I--)
+	{
+		bool Found = false;
+		for (ZESize N = 0; N < ChildEntities.GetCount(); N++)
+		{
+			if (Wrappers[I]->GetObject() == ChildEntities[N])
+			{
+				Found = true;
+				break;
+			}
+		}
+
+		if (!Found)
+			Wrappers[I]->Destroy();
+	}
+
+	// Add
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+	{
+		ZEDEntityWrapper* Wrapper = NULL;
+		const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
+		for (ZESize N = 0; N < Wrappers.GetCount(); N++)
+		{
+			if (Wrappers[N]->GetObject() == ChildEntities[I])
+			{
+				Wrapper = static_cast<ZEDEntityWrapper*>(Wrappers[N]);
+				break;
+			}
+		}
+
+		if (Wrapper == NULL)
+		{
+			Wrapper = ZEDEntityWrapper::CreateInstance();
+			Wrapper->SetObject(ChildEntities[I]);
+			AddChildWrapper(Wrapper, true);
+		}
+	}
 }
 
 ZEDEntityWrapper* ZEDEntityWrapper::CreateInstance()
