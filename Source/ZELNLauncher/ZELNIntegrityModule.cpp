@@ -74,24 +74,26 @@ void ZELNIntegrityModule::CheckerWorker_StateChanged()
 			break;
 	}
 
+	Form->btnCheckIntegrity->setText("Check Integrity");
+
 	if (CheckerWorker->GetState() != ZELN_IWS_CANCELED)
 	{
-		if (Checker.GetResult() != ZEIT_CR_ERROR)
-		{
-			Form->prgProgress->setValue(Checker.GetRecords().GetCount());
-			Form->lblPath->setText("");
-		}
-
+		Form->prgProgress->setValue(Checker.GetRecords().GetCount());
+		Form->lblPath->setText("");
 		Form->lblStatus->setText(StatusText);
+
+		if (Checker.GetResult() == ZEIT_CR_ERROR)
+			Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: red; }");
+		else
+			Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 	}
 	else
 	{
 		Form->prgProgress->setEnabled(false);
 		Form->lblStatus->setText(QString("Canceled (%1)").arg(StatusText));
+		Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 	}
 
-	Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
-	Form->btnCheckIntegrity->setText("Check Integrity");
 }
 
 void ZELNIntegrityModule::CheckerWorker_RecordUpdated(unsigned int RecordIndex)
@@ -124,6 +126,9 @@ void ZELNIntegrityModule::CheckerWorker_RecordUpdated(unsigned int RecordIndex)
 	}
 
 	Form->lblStatus->setText(QString("Checking... (%1)").arg(StatusText));
+
+	if (Checker.GetResult() == ZEIT_CR_ERROR)
+		Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: red; }");
 }
 
 void ZELNIntegrityModule::UpdateRecord(ZESize Index)
@@ -208,7 +213,11 @@ bool ZELNIntegrityModule::InitializeSelf()
 		return false;
 	
 	if (!Checker.Load())
-		zeWarning("Cannot load Integrity records file.");
+	{
+		Form->lblStatus->setText("ERROR: Cannot load Integrity file.");
+		zeWarning("Cannot load Integrity file.");
+		Widget->setEnabled(false);
+	}
 
 	Update();
 
