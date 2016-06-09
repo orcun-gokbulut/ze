@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectBrowser.cpp
+ Zinek Engine - ZEDObjectTree.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,51 +33,21 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectBrowser.h"
+#include "ZEDObjectTree.h"
 
-#include "ZEDObjectWrapper.h"
-#include "ZEDCore.h"
-#include "ZEDModule.h"
-#include "ZEDSelectionEvent.h"
+#include "ZEDCore/ZEDModule.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDSelectionEvent.h"
 
 #include <QHeaderView>
 
 
-ZEDObjectWrapper* ZEDObjectBrowser::GetWrapper(QTreeWidgetItem* Item)
-{
-	bool Result;
-	ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)Item->data(0, Qt::UserRole).toULongLong(&Result);
-	if (!Result)
-		return NULL;
-
-	return Wrapper;
-}
-
-QTreeWidgetItem* ZEDObjectBrowser::FindTreeItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Target)
-{
-	ZEDObjectWrapper* Wrapper = GetWrapper(TreeItem);
-	if (Wrapper == NULL)
-		return false;
-
-	if (Wrapper == Target)
-		return TreeItem;
-
-	for (ZESize I = 0; I < TreeItem->childCount(); I++)
-	{
-		QTreeWidgetItem* Result = FindTreeItem(TreeItem->child((int)I), Target);
-		if (Result != NULL)
-			return Result;
-	}
-
-	return NULL;
-}
-
-void ZEDObjectBrowser::ObjectEvent(const ZEDObjectEvent* Event)
+void ZEDObjectTree::ObjectEvent(const ZEDObjectEvent* Event)
 {
 	UpdateWrapper(Event->GetWrapper());
 }
 
-void ZEDObjectBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
+void ZEDObjectTree::SelectionEvent(const ZEDSelectionEvent* Event)
 {
 	QSignalBlocker Blocker(this);
 
@@ -89,7 +59,7 @@ void ZEDObjectBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
 		const ZEArray<ZEDObjectWrapper*>& SelectedObjects = Event->GetSelectedObjects();
 		for (ZESize I = 0; I < SelectedObjects.GetCount(); I++)
 		{
-			QTreeWidgetItem* Item = FindTreeItem(SelectedObjects[I]);
+			QTreeWidgetItem* Item = GetTreeItem(SelectedObjects[I]);
 			if (Item == NULL)
 				continue;
 
@@ -102,7 +72,7 @@ void ZEDObjectBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
 		const ZEArray<ZEDObjectWrapper*>& DeselectedObjects = Event->GetUnselectedObjects();
 		for (ZESize I = 0; I < DeselectedObjects.GetCount(); I++)
 		{
-			QTreeWidgetItem* Item = FindTreeItem(DeselectedObjects[I]);
+			QTreeWidgetItem* Item = GetTreeItem(DeselectedObjects[I]);
 			if (Item == NULL)
 				continue;
 
@@ -111,7 +81,7 @@ void ZEDObjectBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
 	}	
 }
 
-bool ZEDObjectBrowser::InitializeSelf()
+bool ZEDObjectTree::InitializeSelf()
 {
 	if (!ZEDComponent::InitializeSelf())
 		return false;
@@ -121,7 +91,61 @@ bool ZEDObjectBrowser::InitializeSelf()
 	return true;
 }
 
-void ZEDObjectBrowser::OnSelectionChanged()
+QTreeWidgetItem* ZEDObjectTree::FindItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Target) const
+{
+	ZEDObjectWrapper* Wrapper = GetWrapper(TreeItem);
+	if (Wrapper == NULL)
+		return false;
+
+	if (Wrapper == Target)
+		return TreeItem;
+
+	for (ZESize I = 0; I < TreeItem->childCount(); I++)
+	{
+		QTreeWidgetItem* Result = FindItem(TreeItem->child((int)I), Target);
+		if (Result != NULL)
+			return Result;
+	}
+
+	return NULL;
+}
+
+bool ZEDObjectTree::FilterWrapper(ZEDObjectWrapper* Wrapper)
+{
+	if (!FilterSearch.pattern().isEmpty() && QString(Wrapper->GetName()).indexOf(FilterSearch) == -1)
+		return false;
+
+	if (FilterIncludedClasses.GetCount() != 0)
+	{
+		bool Found = false;
+		for (ZESize I = 0; I < FilterIncludedClasses.GetCount(); I++)
+		{
+			if (ZEClass::IsDerivedFrom(FilterIncludedClasses[I], Wrapper->GetObject()->GetClass()))
+			{
+				Found = true;
+				break;
+			}
+		}
+
+		if (!Found)
+			return false;
+	}
+
+
+	if (FilterExcludedClasses.GetCount() != 0)
+	{
+		bool Found = false;
+		for (ZESize I = 0; I < FilterExcludedClasses.GetCount(); I++)
+		{
+			if (ZEClass::IsDerivedFrom(FilterExcludedClasses[I], Wrapper->GetObject()->GetClass()))
+				return false;
+		}
+	}
+
+	return true;
+}
+
+void ZEDObjectTree::OnSelectionChanged()
 {
 	QList<QTreeWidgetItem*> SelectedItems = selectedItems();
 	ZEArray<ZEDObjectWrapper*> Wrappers;
@@ -137,34 +161,19 @@ void ZEDObjectBrowser::OnSelectionChanged()
 	GetModule()->GetSelectionManager()->SetSelection(Wrappers);
 }
 
-void ZEDObjectBrowser::UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper)
+void ZEDObjectTree::UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper)
 {
 	TreeItem->setText(0, Wrapper->GetName().ToCString());
 	TreeItem->setText(1, Wrapper->GetObject()->GetClass()->GetName());
 }
 
-void ZEDObjectBrowser::SetRootWrapper(ZEDObjectWrapper* Wrapper)
-{
-	RootWrapper = Wrapper;
-
-	if (IsInitialized())
-		Update();
-}
-
-ZEDObjectWrapper* ZEDObjectBrowser::GetRootWrapper()
-{
-	return RootWrapper;
-}
-
-QTreeWidgetItem* ZEDObjectBrowser::FindTreeItem(ZEDObjectWrapper* Wrapper)
-{
-	return FindTreeItem(topLevelItem(0), Wrapper);
-}
-
-void ZEDObjectBrowser::UpdateWrapper(QTreeWidgetItem* TreeItem)
+void ZEDObjectTree::UpdateWrapper(QTreeWidgetItem* TreeItem)
 {
 	ZEDObjectWrapper* Wrapper = GetWrapper(TreeItem);
 	if (Wrapper == NULL)
+		return;
+
+	if (!FilterWrapper(Wrapper))
 		return;
 
 	UpdateItem(TreeItem, Wrapper);
@@ -176,7 +185,7 @@ void ZEDObjectBrowser::UpdateWrapper(QTreeWidgetItem* TreeItem)
 		QTreeWidgetItem* ChildTreeItem = TreeItem->child((int)I);
 		ZEDObjectWrapper* ChildWrapper = GetWrapper(TreeItem);
 
-		if (ChildWrapper != NULL)
+		if (ChildWrapper == NULL)
 		{
 			delete ChildTreeItem;
 			I--;
@@ -184,6 +193,7 @@ void ZEDObjectBrowser::UpdateWrapper(QTreeWidgetItem* TreeItem)
 		else if (!ChildWrappers.Exists(Wrapper))
 		{
 			delete ChildTreeItem;
+			I--;
 		}
 	}
 
@@ -208,16 +218,93 @@ void ZEDObjectBrowser::UpdateWrapper(QTreeWidgetItem* TreeItem)
 	}
 }
 
-void ZEDObjectBrowser::UpdateWrapper(ZEDObjectWrapper* Wrapper)
+void ZEDObjectTree::UpdateWrapper(ZEDObjectWrapper* Wrapper)
 {
-	QTreeWidgetItem* Item = FindTreeItem(Wrapper);
+	QTreeWidgetItem* Item = GetTreeItem(Wrapper);
 	if (Item == NULL)
 		return;
 
 	UpdateWrapper(Item);
 }
 
-void ZEDObjectBrowser::Update()
+void ZEDObjectTree::SetRootWrapper(ZEDObjectWrapper* Wrapper)
+{
+	RootWrapper = Wrapper;
+
+	if (IsInitialized())
+		Update();
+}
+
+ZEDObjectWrapper* ZEDObjectTree::GetRootWrapper() const
+{
+	return RootWrapper;
+}
+
+ZEDObjectWrapper* ZEDObjectTree::GetWrapper(QTreeWidgetItem* Item) const
+{
+	if (Item == NULL)
+		return NULL;
+
+	bool Result;
+	ZEDObjectWrapper* Wrapper = (ZEDObjectWrapper*)Item->data(0, Qt::UserRole).toULongLong(&Result);
+	if (!Result)
+		return NULL;
+
+	return Wrapper;
+}
+
+QTreeWidgetItem* ZEDObjectTree::GetTreeItem(ZEDObjectWrapper* Wrapper) const
+{
+	return FindItem(topLevelItem(0), Wrapper);
+}
+
+void ZEDObjectTree::SetFilterPattern(const QString& Text)
+{
+	FilterSearch.setPattern(Text);
+}
+
+QString ZEDObjectTree::GetFilterPattern() const
+{
+	return FilterSearch.pattern();
+}
+
+const ZEArray<ZEClass*> ZEDObjectTree::GetFilterIncludedClasses() const
+{
+	return FilterIncludedClasses;
+}
+
+void ZEDObjectTree::AddFilterIncludedClass(ZEClass* Class)
+{
+	if (FilterExcludedClasses.Exists(Class))
+		return;
+
+	FilterIncludedClasses.Add(Class);
+}
+
+void ZEDObjectTree::RemoveFilterIncludedClass(ZEClass* Class)
+{
+	FilterIncludedClasses.RemoveValue(Class);
+}
+
+const ZEArray<ZEClass*> ZEDObjectTree::GetFilterExcludedClasses() const
+{
+	return FilterExcludedClasses;
+}
+
+void ZEDObjectTree::RemoveFilterExcludedClass(ZEClass* Class)
+{
+	if (FilterExcludedClasses.Exists(Class))
+		return;
+
+	FilterExcludedClasses.Add(Class);
+}
+
+void ZEDObjectTree::AddFilterExcludedClass(ZEClass* Class)
+{
+	FilterExcludedClasses.RemoveValue(Class);
+}
+
+void ZEDObjectTree::Update()
 {
 	if (RootWrapper == NULL)
 	{
@@ -228,6 +315,7 @@ void ZEDObjectBrowser::Update()
 	if (topLevelItem(0) == NULL)
 	{
 		QTreeWidgetItem* NewTreeItem = new QTreeWidgetItem();
+		NewTreeItem->setExpanded(true);
 		addTopLevelItem(NewTreeItem);
 	}
 	
@@ -235,7 +323,7 @@ void ZEDObjectBrowser::Update()
 	UpdateWrapper(topLevelItem(0));
 }
 
-ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QTreeWidget(Parent)
+ZEDObjectTree::ZEDObjectTree(QWidget* Parent) : QTreeWidget(Parent)
 {
 	setWindowTitle("Object Browser");
 
@@ -250,7 +338,7 @@ ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QTreeWidget(Parent)
 
 	header()->setStretchLastSection(false);
 	header()->setSectionResizeMode(0, QHeaderView::Stretch);
-	header()->setSectionResizeMode(0, QHeaderView::Interactive);
+	header()->setSectionResizeMode(1, QHeaderView::Interactive);
 
 	setSelectionBehavior(QAbstractItemView::SelectRows);
 	setSelectionMode(QAbstractItemView::ExtendedSelection);

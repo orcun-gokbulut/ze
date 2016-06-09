@@ -38,7 +38,7 @@
 #include "ZEDPropertyEditorItemEnumurator.h"
 
 #include "ZEMeta/ZEProperty.h"
-#include "ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDPropertyEditor.h"
 
 #include <QComboBox>

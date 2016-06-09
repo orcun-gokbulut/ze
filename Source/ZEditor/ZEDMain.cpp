@@ -44,6 +44,7 @@
 #include <windows.h>
 
 #include <QApplication>
+#include <QStyleFactory>
 
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
@@ -53,6 +54,8 @@ ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCm
 	bool StopMainLoop = false;
 	QApplication Application(argc, argv);
 	//Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
+
+	//qApp->setStyle(QStyleFactory::create("Fusion"));
 
 	ZEDCore::GetInstance()->SetModule(new ZEDModule());
 	if (!ZEDCore::GetInstance()->Initialize())

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDObjectTreeColumn.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,33 +35,30 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ZEDS/ZEString.h"
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
-
-class ZEDViewportController : public ZEDComponent
+class ZEDObjectTreeColumn
 {
 	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+		ZEString								PropertyName;
+		bool									Editable;
+		bool									Sortable;
+		ZEString								CheckedIcon;
+		ZEString								UncheckedIcon;
 
 	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+		void									SetProperty(const ZEString& Name);
+		const ZEString&							GetProperty() const;
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+		void									SetEditable(bool Editable);
+		bool									GetEditable() const;
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
+		void									SetSortable(bool Sortable);
+		bool									GetSortable() const;
 
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+		void									SetCheckedIcon(const ZEString& FileName);
+		const ZEString&							GetCheckedIcon();
 
-									ZEDViewportController();
-									~ZEDViewportController();
+		void									SetUncheckedIcon(const ZEString& FileName);
+		const ZEString&							GetUncheckedIcon();
 };

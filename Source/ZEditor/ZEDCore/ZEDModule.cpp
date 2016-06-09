@@ -37,28 +37,34 @@
 
 #include "ZEDCore.h"
 #include "ZEDSceneWrapper.h"
+#include "ZEDEntityWrapper.h"
 #include "ZEDSelectionManager.h"
+#include "ZEDTransformationManager.h"
 #include "ZEDViewport.h"
 #include "ZEDViewportManager.h"
 #include "ZEDViewportEvent.h"
-#include "ZEDGizmo.h"
-#include "ZEDEntityWrapper.h"
-#include "ZEDObjectBrowser.h"
-#include "ZEDMainWindow.h"
 #include "ZEDViewportController.h"
+
+#include "ZEDGizmo.h"
 #include "ZEDGrid.h"
-#include "ZEDPropertyEditor.h"
-#include "ZEDSelectionToolbar.h"
-#include "ZEDTransformationToolbar.h"
-#include "ZEDTransformationManager.h"
+
+#include "ZEDUserInterface/ZEDMainWindow.h"
+#include "ZEDUserInterface/ZEDSelectionToolbar.h"
+#include "ZEDUserInterface/ZEDTransformationToolbar.h"
+#include "ZEDUserInterface/ZEDPropertyEditor.h"
+#include "ZEDUserInterface/ZEDClassBrowser.h"
+#include "ZEDUserInterface/ZEDObjectBrowser.h"
+#include "ZEDUserInterface/ZEDAssetBrowser.h"
 
 #include "ZEGame/ZEScene.h"
+#include "ZEGame/ZESector.h"
 #include "ZEModel/ZEModel.h"
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGame/ZESector.h"
+#include "QDockWidget"
+#include "ZEDUserInterface/ZEDObjectTree.h"
 
 void ZEDModule::DistributeEvent(const ZEDEvent* Event)
 {
@@ -173,23 +179,45 @@ void ZEDModule::StartUp()
 	ZEDTransformationToolbar* TransformManagerToolbar = new ZEDTransformationToolbar();
 	TransformManagerToolbar->SetTransformManager(TransformManager);
 	AddComponent(TransformManagerToolbar);
-	TransformManagerToolbar->show();
+	MainWindow->addToolBar(TransformManagerToolbar);
 
 	ZEDSelectionToolbar* SelectionToolbar = new ZEDSelectionToolbar();
 	AddComponent(SelectionToolbar);
 	SelectionToolbar->SetSelectionManager(GetSelectionManager());
-	SelectionToolbar->show();
+	MainWindow->addToolBar(SelectionToolbar);
 
 	ZEDViewportController* Controller = new ZEDViewportController();
 	AddComponent(Controller);
 
-	ZEDObjectBrowser* Browser = new ZEDObjectBrowser();
-	AddComponent(Browser);
-	Browser->show();
+	ZEDObjectBrowser* ObjectBrowser = new ZEDObjectBrowser();
+	AddComponent(ObjectBrowser);
+	QDockWidget* ObjectBrowserDockWidget = new QDockWidget();
+	ObjectBrowserDockWidget->setWindowTitle(ObjectBrowser->windowTitle());
+	ObjectBrowserDockWidget->setWidget(ObjectBrowser);
+	MainWindow->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ObjectBrowserDockWidget);
 
-	ZEDPropertyEditor* Property = new ZEDPropertyEditor();
-	AddComponent(Property);
-	Property->show();
+	ZEDAssetBrowser* AssetBrowser = new ZEDAssetBrowser();
+	QDockWidget* AssetBrowserDockWidget = new QDockWidget();
+	AssetBrowserDockWidget->setWindowTitle(AssetBrowser->windowTitle());
+	AssetBrowserDockWidget->setWidget(AssetBrowser);
+	MainWindow->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, AssetBrowserDockWidget);
+
+	ZEDPropertyEditor* PropertyEditor = new ZEDPropertyEditor();
+	AddComponent(PropertyEditor);
+	QDockWidget* PropertyEditorDockWidget = new QDockWidget();
+	PropertyEditorDockWidget->setWindowTitle(PropertyEditor->windowTitle());
+	PropertyEditorDockWidget->setWidget(PropertyEditor);
+	MainWindow->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, PropertyEditorDockWidget);
+
+	ZEDClassBrowser* ClassBrowser = new ZEDClassBrowser();
+	AddComponent(ClassBrowser);
+	QDockWidget* ClassBrowserDockWidget = new QDockWidget();
+	ClassBrowserDockWidget->setWindowTitle(ClassBrowser->windowTitle());
+	ClassBrowserDockWidget->setWidget(ClassBrowser);
+	MainWindow->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, ClassBrowserDockWidget);
+
+	MainWindow->tabifyDockWidget(ObjectBrowserDockWidget, AssetBrowserDockWidget);
+	MainWindow->tabifyDockWidget(PropertyEditorDockWidget, ClassBrowserDockWidget);
 
 	ZEDViewport* Viewport = new ZEDViewport();
 	GetViewportManager()->RegisterViewport(Viewport);
@@ -200,7 +228,7 @@ void ZEDModule::StartUp()
 
 	RootWrapper = ZEDSceneWrapper::CreateInstance();
 	RootWrapper->SetObject(Scene);
-	Browser->SetRootWrapper(RootWrapper);
+	ObjectBrowser->GetObjectTree()->SetRootWrapper(RootWrapper);
 
 	ZEDGrid* Grid = ZEDGrid::CreateInstance();
 	Scene->AddEntity(Grid);
@@ -214,8 +242,6 @@ void ZEDModule::StartUp()
 	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 	Scene->AddEntity(Trial2);
 
-	RootWrapper->Update();
-
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
 	Light1->SetIntensity(1.0f);
 	Light1->SetColor(ZEVector3::One);
@@ -223,28 +249,20 @@ void ZEDModule::StartUp()
 
 	ZESector* Sector = ZESector::CreateInstance();
 	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZESector");
-	Scene->AddEntity(Sector);
+	//Scene->AddEntity(Sector);
 	
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
 
-	Scene->RemoveEntity(Trial);
 
-	RootWrapper->Update();
-
-	/*ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
-	ZEDEntityWrapper* AtmosphereWrapper = ZEDEntityWrapper::CreateInstance();
-	AtmosphereWrapper->SetObject(Atmosphere);
-	AtmosphereWrapper->SetSelectable(false);
-	SceneWrapper->AddChildWrapper(AtmosphereWrapper);*/
+	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
+	Scene->AddEntity(Atmosphere);
 
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
 	SkyBox->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
-	ZEDEntityWrapper* SkyBoxWrapper = ZEDEntityWrapper::CreateInstance();
-	SkyBoxWrapper->SetObject(SkyBox);
-	SkyBoxWrapper->SetSelectable(false);
-	RootWrapper->AddChildWrapper(SkyBoxWrapper);
+	Scene->AddEntity(SkyBox);
 
+	RootWrapper->Update();
 }
 
 void ZEDModule::ShutDown()

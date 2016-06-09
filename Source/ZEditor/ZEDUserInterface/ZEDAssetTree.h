@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDAssetTree.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,33 +35,50 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
+#include <QTreeWidget>
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
+class ZEDObjectWrapper;
+class ZEDSelectionManager;
 
-class ZEDViewportController : public ZEDComponent
+enum ZEDAssetTreeMode
 {
+	ZED_ATM_NONE,
+	ZED_ATM_LIST,
+	ZED_ATM_TREE,
+};
+
+class ZEDAssetTree : public QTreeWidget
+{
+	Q_OBJECT
 	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+		QString							Path;
+		QString							Extensions;
+		ZEDAssetTreeMode				Mode;
+		QRegExp							SearchPattern;
+		QRegExp							ExtensionPattern;
+
+		bool							Filter(const QString& FileName);
+
+		void							UpdateList();
+		void							UpdateDirectoryTree(const QString& Path, QTreeWidgetItem* PathItem);
+		void							UpdateCatagoryTree(const QString& CategoryPath, QTreeWidgetItem* CategoryItem);
 
 	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+		void							SetPath(const QString& Path);
+		const QString&					GetPath() const;
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+		void							SetExtensions(const QString& Extensions);
+		QString							GetExtensions() const;
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
+		void							SetMode(ZEDAssetTreeMode Mode);
+		ZEDAssetTreeMode				GetMode() const;
 
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+		void							SetSearchPattern(const QString& Text);
+		QString							GetSearchPattern() const;
 
-									ZEDViewportController();
-									~ZEDViewportController();
+		QString							GetSelectedPath() const;
+
+		void							Update();
+
+										ZEDAssetTree(QWidget* Parent = 0);
 };

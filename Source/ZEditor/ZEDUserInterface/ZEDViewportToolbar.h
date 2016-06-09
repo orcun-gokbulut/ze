@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDViewportToolbar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,31 +37,38 @@
 
 #include "ZEDCore/ZEDComponent.h"
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
+#include <QToolBar>
 
-class ZEDViewportController : public ZEDComponent
+class ZEDSelectionManager;
+class QToolButton;
+class QComboBox;
+
+class ZEDViewportToolbar : public QToolBar, public ZEDComponent
 {
+	Q_OBJECT
 	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+		ZEDSelectionManager*				SelectionManager;
+
+		QComboBox*							cmbShape;
+		QToolButton*						btnFreeze;
+		QToolButton*						btnUnfreezeAll;
+		QComboBox*							cmbMode;
+		QToolButton*						btnSelectionList;
+
+		void								SetupUI();
+		void								UpdateUI();
+
+	private slots:
+		void								btnSelectionList_clicked();
+		void								cmbShape_currentIndexChanged(const QString & text);
+		void								cmbMode_currentIndexChanged(const QString & text);
+		void								btnFreeze_clicked();
+		void								btnUnfreezeAll_clicked();
 
 	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+		void								SetSelectionManager(ZEDSelectionManager* Manager);
+		ZEDSelectionManager*				GetSelectionManager();
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
-
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
-
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-
-									ZEDViewportController();
-									~ZEDViewportController();
+											ZEDViewportToolbar(QWidget* Parent = NULL);
+											~ZEDViewportToolbar();
 };

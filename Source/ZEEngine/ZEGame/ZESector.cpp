@@ -108,20 +108,45 @@ bool ZESector::RestoreSector(ZEMLReaderNode* Unserializer)
 	return true;
 }
 
+bool ZESector::LoadSectorFile()
+{
+	ClearChildEntities();
+
+	if (SectorFile.IsEmpty())
+		return true;
+
+	ZEMLReader Reader;
+	if (!Reader.Open(GetSectorFile()))
+	{
+		zeError("Cannot open sector file. File Name: \"%s\".", GetSectorFile().ToCString());
+		return false;
+	}
+
+	if (!RestoreSector(&Reader.GetRootNode()))
+	{
+		zeError("Cannot load sector file. File Name: \"%s\".", GetSectorFile().ToCString());
+		return false;
+	}
+
+	return true;
+}
+
 bool ZESector::InitializeSelf()
 {
-// 	if (!SectorFile.IsEmpty())
-// 	{
-// 		ZESector* ReferenceSector = ZESectorSelector::GetInstance()->GetReferenceSector();
-// 
-// 		if (ReferenceSector == NULL)
-// 			return false;
-// 
-// 		if (!CheckAdjacency(ReferenceSector, ReferenceSector->GetAdjacencyDepth()))
-// 			return false;
-// 	}
+	if (!ZEGeographicEntity::InitializeSelf())
+		return false;
 
-	return ZEGeographicEntity::InitializeSelf();
+	if (!LoadSectorFile())
+		return false;
+
+	return true;
+}
+
+bool ZESector::DeinitializeSelf()
+{
+	ClearChildEntities();
+
+	return ZEEntity::DeinitializeSelf();
 }
 
 bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
@@ -166,7 +191,13 @@ const ZEGUID& ZESector::GetGUID() const
 
 void ZESector::SetSectorFile(const ZEString& FileName)
 {
+	if (SectorFile == FileName)
+		return;
+
 	SectorFile = FileName;
+
+	if (IsInitialized())
+		LoadSectorFile();
 }
 
 const ZEString& ZESector::GetSectorFile() const
@@ -212,12 +243,12 @@ bool ZESector::RemoveAdjacentSector(ZESector* Sector)
 	return true;
 }
 
-void ZESector::SetAdjacencyDepth(ZEInt8 Value)
+void ZESector::SetAdjacencyDepth(ZEUInt Value)
 {
 	AdjacencyDepth = Value;
 }
 
-ZEInt8 ZESector::GetAdjacencyDepth() const
+ZEUInt ZESector::GetAdjacencyDepth() const
 {
 	return AdjacencyDepth;
 }
@@ -260,23 +291,7 @@ bool ZESector::Restore(ZEMLReaderNode* Unserializer)
 	ZEMLReaderNode PropertiesNode = Unserializer->GetNode("Properties");
 	SetSectorFile(PropertiesNode.ReadString("SectorFile"));
 
-	ZEFile CurrentSectorFile;
-	if (!CurrentSectorFile.Open(SectorFile, ZE_FOM_READ, ZE_FCM_NONE))
-	{
-		zeError("Unserialization of entity \"%s\" has failed. Cannot open sector file. File Name: \"%s\".", GetName(), SectorFile.ToCString());
-		return false;
-	}
-
-	ZEMLReader SectorReader;
-	SectorReader.Open(&CurrentSectorFile);
-	ZEMLReaderNode SectorNode = SectorReader.GetRootNode();
-
-	return RestoreSector(&SectorNode);
-}
-
-void ZESector::Destroy()
-{
-	delete this;
+	return true;
 }
 
 ZESector* ZESector::CreateInstance()

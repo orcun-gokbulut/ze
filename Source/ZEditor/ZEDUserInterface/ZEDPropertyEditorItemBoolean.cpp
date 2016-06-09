@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDPropertyEditorItemString.cpp
+ Zinek Engine - ZEDPropertyEditorItemBoolean.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,19 +35,16 @@
 
 #pragma once
 
-#include "ZEDPropertyEditorItemString.h"
+#include "ZEDPropertyEditorItemBoolean.h"
 
 #include "ZEMeta/ZEProperty.h"
 #include "ZEDPropertyEditor.h"
-#include "ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
 
+#include <QComboBox>
 #include <QLineEdit>
-#include <QEvent.h>
-#include <QInputDialog>
-#include <QToolButton>
-#include <QBoxLayout>
 
-bool ZEDPropertyEditorItemString::InitializeSelf()
+bool ZEDPropertyEditorItemBoolean::InitializeSelf()
 {
 	if (!ZEDPropertyEditorItem::InitializeSelf())
 	{
@@ -56,99 +53,60 @@ bool ZEDPropertyEditorItemString::InitializeSelf()
 	}
 
 	const ZEProperty* Property = GetProperty();
-	if (Property->Type.Type != ZE_TT_STRING)
+	if (Property->Type.Type != ZE_TT_BOOLEAN)
 	{
 		setText(1, "Type Error");
 		return false;
 	}
 
-	QWidget* Container = new QWidget;
-	
-	TextEdit = new QLineEdit(Container);
-	TextEdit->setFrame(false);
-	TextEdit->setStyleSheet("* { background-color: rgba(0, 0, 0, 0); }");
-	TextEdit->setReadOnly(Property->Access == ZEMT_PA_READ);
-	TextEdit->installEventFilter(this);
-	connect(TextEdit, SIGNAL(editingFinished()), this, SLOT(TextEdit_editingFinished()));
-	connect(TextEdit, SIGNAL(textChanged(const QString&)), this, SLOT(TextEdit_textChanged(const QString&)));
+	ComboBox = new QComboBox();
+	ComboBox->setEditable(true);
+	ComboBox->lineEdit()->setReadOnly(true);
+	ComboBox->setFrame(false);
+	ComboBox->setStyleSheet("QComboBox { background-color: rgba(0, 0, 0, 0); }");
+	ComboBox->setEnabled(Property->Access == ZEMT_PA_READ);
 
-	DetailButton = new QToolButton(Container);
-	DetailButton->setText("...");
-	DetailButton->setMinimumWidth(2);
-	connect(DetailButton, SIGNAL(clicked()), this, SLOT(DetailButton_clicked()));
-	
-	QHBoxLayout* Layout = new QHBoxLayout();
-	Layout->setContentsMargins(0, 0, 0, 0);
-	Layout->addWidget(TextEdit);
-	Layout->addWidget(DetailButton);
-	Container->setLayout(Layout);
-	treeWidget()->setItemWidget(this, 1, Container);
-	
+	if (Property->Access == ZEMT_PA_READ_WRITE)
+	{
+		ComboBox->addItem("True");
+		ComboBox->addItem("False");
+	}
+	treeWidget()->setItemWidget(this, 1, ComboBox);
+
+	connect(ComboBox, SIGNAL(currentTextChanged(const QString&)), this, SLOT(ComboBox_currentTextChanged(const QString&)));
+
 	return true;
 }
 
-bool ZEDPropertyEditorItemString::eventFilter(QObject* Object, QEvent* Event)
+void ZEDPropertyEditorItemBoolean::ComboBox_currentTextChanged(const QString& Text)
 {
-	if(static_cast<QLineEdit*>(Object) == TextEdit && Event->type() == QEvent::KeyPress && static_cast<QKeyEvent*>(Event)->key() == Qt::Key_Escape)
-		Update();
-
-	return false;
-}
-
-void ZEDPropertyEditorItemString::TextEdit_textChanged(const QString&)
-{
-	ValueChanged = true;
-}
-
-void ZEDPropertyEditorItemString::TextEdit_editingFinished()
-{
-	if (!ValueChanged)
-		return;
-
 	ZEVariant Value;
-	Value.SetString(TextEdit->text().toUtf8().begin());
+	Value.SetBool(Text == "True");
 
 	Changed(Value);
 	Update();
 }
 
-void ZEDPropertyEditorItemString::DetailButton_clicked()
-{
-	bool Result = false;
-	QString String = QInputDialog::getMultiLineText(treeWidget(), "Edit Property Value", GetProperty()->Name, TextEdit->text(), &Result);
-	
-	if (!Result)
-		return;
-
-	ZEVariant Value;
-	Value.SetString(String.toUtf8().begin());
-
-	Changed(Value);
-	Update();
-}
-
-void ZEDPropertyEditorItemString::Update()
+void ZEDPropertyEditorItemBoolean::Update()
 {
 	if (!IsInitialized())
 		return;
 
-	ValueChanged = false;
+	QSignalBlocker Blocker(ComboBox);
 
-	QSignalBlocker Blocker(TextEdit);
-
-	const ZEArray<ZEDObjectWrapper*> Wrappers = (GetPropertyEditor()->GetWrappers());
+	const ZEArray<ZEDObjectWrapper*> ObjectWrappers = (GetPropertyEditor()->GetWrappers());
 	bool MultipleValue = false;
 	ZEVariant Value;
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
+	for (ZESize I = 0; I < ObjectWrappers.GetCount(); I++)
 	{
-		ZEObject* Object = Wrappers[I]->GetObject();
+		ZEObject* Object = ObjectWrappers[I]->GetObject();
 		ZEClass* Class = Object->GetClass();
 
 		ZEVariant CurrentValue;
 		if (!Class->GetProperty(Object, GetProperty()->ID, CurrentValue))
 		{
-			TextEdit->setText("Value Error");
-			TextEdit->setEnabled(false);
+			ComboBox->setCurrentText("Value Error");
+			ComboBox->setEnabled(false);
 			return;
 		}
 
@@ -156,24 +114,22 @@ void ZEDPropertyEditorItemString::Update()
 		{
 			Value = CurrentValue;
 		}
-		else if (CurrentValue.GetString() != Value.GetString())
+		else if (CurrentValue.GetBool() != Value.GetBool())
 		{
 			Value.SetUndefined();
 			break;
 		}
 	}
 
-	TextEdit->setEnabled(true);
+	ComboBox->setEnabled(true);
 
 	if (Value.IsUndefined())
-		TextEdit->setText("");
+		ComboBox->setCurrentText("");
 	else
-		TextEdit->setText(Value.GetString().ToCString());
+		ComboBox->setCurrentText(Value.GetBool() ? "True" : "False");
 }
 
-ZEDPropertyEditorItemString::ZEDPropertyEditorItemString()
+ZEDPropertyEditorItemBoolean::ZEDPropertyEditorItemBoolean()
 {
-	ValueChanged = false;
-	TextEdit = NULL;
-	DetailButton = NULL;
+	ComboBox = NULL;
 }

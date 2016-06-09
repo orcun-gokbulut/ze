@@ -49,7 +49,7 @@ class ZEDSceneWrapper : public ZEDObjectWrapper
 
 	public:
 		virtual void							SetObject(ZEObject* Object);
-		virtual ZEString						GetName();
+		virtual ZEString						GetName() const;
 		
 		ZEScene*								GetScene();
 

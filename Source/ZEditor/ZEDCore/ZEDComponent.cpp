@@ -113,7 +113,8 @@ ZEDComponent::ZEDComponent()
 
 ZEDComponent::~ZEDComponent()
 {
-	
+	if (Module != NULL)
+		Module->RemoveComponent(this);
 }
 
 ZEDModule* ZEDComponent::GetModule()

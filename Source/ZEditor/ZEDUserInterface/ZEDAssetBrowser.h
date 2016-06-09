@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectBrowser.h
+ Zinek Engine - ZEDAssetBrowser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,41 +35,24 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
-#include <QTreeWidget>
+#include <QWidget>
 
-class ZEDObjectWrapper;
-class ZEDSelectionManager;
+class Ui_ZEDAssetBrowser;
+class ZEDAssetTree;
 
-class ZEDObjectBrowser : public QTreeWidget, public ZEDComponent
+class ZEDAssetBrowser : public QWidget
 {
 	Q_OBJECT
 	private:
-		ZEDObjectWrapper*				RootWrapper;
-
-		ZEDObjectWrapper*				GetWrapper(QTreeWidgetItem* Item);
-		QTreeWidgetItem*				FindTreeItem(QTreeWidgetItem* Parent, ZEDObjectWrapper* Wrapper);
-		
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		
-		virtual bool					InitializeSelf();
+		Ui_ZEDAssetBrowser*					Form;
 
 	private slots:
-		void							OnSelectionChanged();
-
-	protected:
-		virtual void					UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper);
+		void								txtSearch_textChanged(const QString& Text);
+		void								cmbCategories_currentIndexChanged(const QString& Text);
 
 	public:
-		void							SetRootWrapper(ZEDObjectWrapper* Wrapper);
-		ZEDObjectWrapper*				GetRootWrapper();
+		ZEDAssetTree*						GetAssetTree();
 
-		QTreeWidgetItem*				FindTreeItem(ZEDObjectWrapper* Wrapper);
-
-		void							UpdateWrapper(ZEDObjectWrapper* Wrapper);
-		void							UpdateWrapper(QTreeWidgetItem* TreeItem);
-		void							Update();
-
-										ZEDObjectBrowser(QWidget* Parent = 0);
+											ZEDAssetBrowser(QWidget* Parent = NULL);
+											~ZEDAssetBrowser();
 };

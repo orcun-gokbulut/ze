@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDTransformationToolbar.h
+ Zinek Engine - ZEDAssetBrowser.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,39 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDAssetBrowser.h"
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include "ui_ZEDAssetBrowser.h"
 
-class ZEDTransformationManager;
-class Ui_ZEDTransformationToolbar;
-
-class ZEDTransformationToolbar : public QToolBar, public ZEDComponent
+void ZEDAssetBrowser::txtSearch_textChanged(const QString& Text)
 {
-	Q_OBJECT
-	private:
-		Ui_ZEDTransformationToolbar*		Form;
-		ZEDTransformationManager*			TransformationManager;
+	Form->trwAssets->SetSearchPattern(Text);
+}
 
-		void								UpdateUI();
-		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
+void ZEDAssetBrowser::cmbCategories_currentIndexChanged(const QString& text)
+{
 
-	private slots:
-		void								btnSelect_clicked();
-		void								btnMove_clicked();
-		void								btnRotate_clicked();
-		void								btnScale_clicked();
-		void								cmbSpace_currentIndexChanged(const QString & text);
-		void								cmbPivot_currentIndexChanged(const QString & text);
-		void								txtX_valueChanged(double d);
-		void								txtY_valueChanged(double d);
-		void								txtZ_valueChanged(double d);
+}
 
-	public:
-		void								SetTransformManager(ZEDTransformationManager* Manager);
-		ZEDTransformationManager*			GetTransformManager();
+ZEDAssetTree* ZEDAssetBrowser::GetAssetTree()
+{
+	return Form->trwAssets;
+}
 
-											ZEDTransformationToolbar(QWidget* Parent = NULL);
-											~ZEDTransformationToolbar();
-};
+ZEDAssetBrowser::ZEDAssetBrowser(QWidget* Parent) : QWidget(Parent)
+{
+	Form = new Ui_ZEDAssetBrowser();
+	Form->setupUi(this);
+	Form->trwAssets->Update();
+
+	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
+	connect(Form->cmbCategories, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbCategories_currentIndexChanged(const QString&)));
+}
+
+ZEDAssetBrowser::~ZEDAssetBrowser()
+{
+	delete Form;
+}

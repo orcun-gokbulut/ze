@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZEDOperation.h"
+#include "ZEDCore/ZEDOperation.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"

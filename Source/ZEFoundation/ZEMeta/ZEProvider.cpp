@@ -83,11 +83,6 @@ const ZEArray<ZEClass*>& ZEProvider::GetClasses()
 	return Classes;
 }
 
-const ZESize ZEProvider::GetClassCount()
-{
-	return Classes.GetCount();
-}
-
 ZEClass* ZEProvider::GetClass(const char* ClassName)
 {
 	for(ZESize I = 0; I < Classes.GetCount(); I++)

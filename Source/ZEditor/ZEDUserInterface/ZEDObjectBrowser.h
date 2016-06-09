@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDObjectBrowser.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -36,32 +36,26 @@
 #pragma once
 
 #include "ZEDCore/ZEDComponent.h"
+#include <QWidget>
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
+class Ui_ZEDObjectBrowser;
+class ZEDObjectTree;
 
-class ZEDViewportController : public ZEDComponent
+class ZEDObjectBrowser : public QWidget, public ZEDComponent
 {
+	Q_OBJECT
 	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+		Ui_ZEDObjectBrowser*				Form;
+
+		virtual bool						InitializeSelf();
+
+	private slots:
+		void								txtSearch_textChanged(const QString& Text);
+		void								btnDelete_clicked();
 
 	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+		ZEDObjectTree*						GetObjectTree();
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
-
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
-
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-
-									ZEDViewportController();
-									~ZEDViewportController();
+											ZEDObjectBrowser(QWidget* Parent = NULL);
+											~ZEDObjectBrowser();
 };

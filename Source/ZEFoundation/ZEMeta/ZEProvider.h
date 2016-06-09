@@ -57,10 +57,7 @@ class ZEProvider
 		void							UnregisterEnumerator(ZEEnumerator* Enumerator);
 
 		const ZEArray<ZEClass*>&		GetClasses();
-		const ZESize					GetClassCount();
-
 		const ZEArray<ZEEnumerator*>&	GetEnumerators();
-		const ZESize					GetEnumeratorCount();
 
 		ZEClass*						GetClass(const char* ClassName);
 		ZEArray<ZEClass*>				GetClass(ZEClass* ParentClass);

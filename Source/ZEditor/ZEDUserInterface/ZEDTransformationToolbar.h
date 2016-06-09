@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDPropertyEditor.h
+ Zinek Engine - ZEDTransformationToolbar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,39 +35,53 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
+#include "ZEDCore/ZEDComponent.h"
 
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEValue.h"
+#include <QToolBar>
 
-#include <QTreeWidget>
+class ZEDTransformationManager;
+class Ui_ZEDTransformationToolbar;
 
-class ZEDObjectWrapper;
+class QPushButton;
+class QComboBox;
+class QDoubleSpinBox;
 
-class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
+class ZEDTransformationToolbar : public QToolBar, public ZEDComponent
 {
-	friend class ZEDPropertyEditorItem;
+	Q_OBJECT
 	private:
-		ZEClass*							BaseClass;
-		ZEArray<ZEDObjectWrapper*>			Wrappers;
-		bool								Dirty;
+		QPushButton*						btnSelect;
+		QPushButton*						btnMove;
+		QPushButton*						btnRotate;
+		QPushButton*						btnScale;
+		QComboBox*							cmbSpace;
+		QComboBox*							cmbPivot;
+		QDoubleSpinBox*						txtX;
+		QDoubleSpinBox*						txtY;
+		QDoubleSpinBox*						txtZ;
 
-		void								Populate();
+		ZEDTransformationManager*			TransformationManager;
 
-		virtual void						ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void						TickEvent(const ZEDTickEvent* Event);
+		void								SetupUI();
+		void								UpdateUI();
 
-	protected:
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEVariant& Value);
-		virtual void						PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
+		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
+
+	private slots:
+		void								btnSelect_clicked();
+		void								btnMove_clicked();
+		void								btnRotate_clicked();
+		void								btnScale_clicked();
+		void								cmbSpace_currentIndexChanged(const QString & text);
+		void								cmbPivot_currentIndexChanged(const QString & text);
+		void								txtX_valueChanged(double d);
+		void								txtY_valueChanged(double d);
+		void								txtZ_valueChanged(double d);
 
 	public:
-		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;
-		void								AddWrapper(ZEDObjectWrapper* Wrapper);
-		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
+		void								SetTransformManager(ZEDTransformationManager* Manager);
+		ZEDTransformationManager*			GetTransformManager();
 
-		void								Update();
-
-											ZEDPropertyEditor(QWidget* Parent = 0);
+											ZEDTransformationToolbar(QWidget* Parent = NULL);
+											~ZEDTransformationToolbar();
 };

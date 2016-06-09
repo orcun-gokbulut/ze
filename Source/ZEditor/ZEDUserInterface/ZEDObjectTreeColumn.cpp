@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDObjectTreeColumn.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,54 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDObjectTreeColumn.h"
 
-#include "ZEDCore/ZEDComponent.h"
-
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
-
-class ZEDViewportController : public ZEDComponent
+void ZEDObjectTreeColumn::SetProperty(const ZEString& Name)
 {
-	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+	PropertyName = Name;
+}
 
-	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+const ZEString& ZEDObjectTreeColumn::GetProperty() const
+{
+	return PropertyName;
+}
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+void ZEDObjectTreeColumn::SetEditable(bool Editable)
+{
+	this->Editable = Editable;
+}
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
+bool ZEDObjectTreeColumn::GetEditable() const
+{
+	return Editable;
+}
 
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+void ZEDObjectTreeColumn::SetSortable(bool Sortable)
+{
+	this->Sortable = Sortable;
+}
 
-									ZEDViewportController();
-									~ZEDViewportController();
-};
+bool ZEDObjectTreeColumn::GetSortable() const
+{
+	return Sortable;
+}
+
+void ZEDObjectTreeColumn::SetCheckedIcon(const ZEString& FileName)
+{
+	CheckedIcon = FileName;
+}
+
+const ZEString& ZEDObjectTreeColumn::GetCheckedIcon()
+{
+	return CheckedIcon;
+}
+
+void ZEDObjectTreeColumn::SetUncheckedIcon(const ZEString& FileName)
+{
+	UncheckedIcon = FileName;
+}
+
+const ZEString& ZEDObjectTreeColumn::GetUncheckedIcon()
+{
+	return UncheckedIcon;
+}

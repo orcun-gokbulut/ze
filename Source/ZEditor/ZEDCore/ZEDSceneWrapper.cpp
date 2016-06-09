@@ -85,7 +85,7 @@ void ZEDSceneWrapper::SetObject(ZEObject* Object)
 	ZEDObjectWrapper::SetObject(Object);
 }
 
-ZEString ZEDSceneWrapper::GetName()
+ZEString ZEDSceneWrapper::GetName() const
 {
 	return "Scene";
 }

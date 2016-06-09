@@ -37,20 +37,20 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEClass.h"
-#include "ZEDModule.h"
-#include "ZEDObjectWrapper.h"
-#include "ZEDSelectionEvent.h"
-#include "ZEDPropertyOperation.h"
-#include "ZEDOperationManager.h"
+#include "ZEDCore/ZEDModule.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDSelectionEvent.h"
+#include "ZEDCore/ZEDOperationManager.h"
 #include "ZEDPropertyEditorItemNumeric.h"
 #include "ZEDPropertyEditorItemBoolean.h"
 #include "ZEDPropertyEditorItemString.h"
 #include "ZEDPropertyEditorItemEnumurator.h"
 #include "ZEDPropertyEditorItemVector.h"
+#include "ZEDPropertyOperation.h"
 
 #include <QHeaderView>
-#include "QStyledItemDelegate"
-#include "QPainter"
+#include <QStyledItemDelegate>
+#include <QPainter>
 
 class ZEDPropertyEditorGridDelegate : public QStyledItemDelegate
 {
