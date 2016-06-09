@@ -35,8 +35,8 @@
 
 #include "ZEDPropertyOperation.h"
 
-#include "ZEDObjectWrapper.h"
-#include "ZEMeta\ZEClass.h"
+#include "ZEMeta/ZEClass.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
 
 bool ZEDPropertyOperation::Apply()
 {

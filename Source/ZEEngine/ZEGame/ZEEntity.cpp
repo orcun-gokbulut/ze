@@ -143,6 +143,13 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 	Entity->SetOwnerScene(NULL);
 }
 
+
+void ZEEntity::ClearComponents()
+{
+	for (ZESSize I = Components.GetCount() - 1; I >= 0; I--)
+		RemoveComponent(Components[I]);
+}
+
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 {
 	if (Entity->Owner != NULL)
@@ -183,6 +190,12 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 
 	Entity->Owner = NULL;
 	Entity->SetOwnerScene(NULL);
+}
+
+void ZEEntity::ClearChildEntities()
+{
+	for (ZESSize I = ChildEntities.GetCount() - 1; I >= 0; I--)
+		RemoveChildEntity(ChildEntities[I]);
 }
 
 bool ZEEntity::SetOwner(ZEEntity* Owner)

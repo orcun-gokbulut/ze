@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSelectionToolbar.h
+ Zinek Engine - ZEDObjectTree.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,32 +35,68 @@
 
 #pragma once
 
-#include "ZEDComponent.h"
-#include <QToolBar>
+#include "ZEDCore/ZEDComponent.h"
+#include <QTreeWidget>
 
+#include "ZEDS/ZEArray.h"
+#include <QRegExp>
+
+class ZEClass;
+class ZEDObjectWrapper;
 class ZEDSelectionManager;
-class Ui_ZEDSelectionToolbar;
 
-class ZEDSelectionToolbar : public QToolBar, public ZEDComponent
+enum ZEDObjectTreeMode
+{
+	ZED_OTM_NONE,
+	ZED_OTM_LIST,
+	ZED_OTM_TREE
+};
+
+class ZEDObjectTree : public QTreeWidget, public ZEDComponent
 {
 	Q_OBJECT
 	private:
-		Ui_ZEDSelectionToolbar*				Form;
-		ZEDSelectionManager*				SelectionManager;
+		ZEDObjectWrapper*				RootWrapper;
+		
+		QRegExp							FilterSearch;
+		ZEArray<ZEClass*>				FilterIncludedClasses;
+		ZEArray<ZEClass*>				FilterExcludedClasses;
 
-		void								UpdateUI();
+		QTreeWidgetItem*				FindItem(QTreeWidgetItem* Parent, ZEDObjectWrapper* Wrapper)const;
+
+		bool							FilterWrapper(ZEDObjectWrapper* Wrapper);
+
+		void							UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper);
+		void							UpdateWrapper(ZEDObjectWrapper* Wrapper);
+		void							UpdateWrapper(QTreeWidgetItem* TreeItem);
+
+		virtual bool					InitializeSelf();
+
+		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
+		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
 
 	private slots:
-		void								btnSelectionList_clicked();
-		void								cmbShape_currentIndexChanged(const QString & text);
-		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+		void							OnSelectionChanged();
 
 	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
-		ZEDSelectionManager*				GetSelectionManager();
+		void							SetRootWrapper(ZEDObjectWrapper* Wrapper);
+		ZEDObjectWrapper*				GetRootWrapper() const;
 
-											ZEDSelectionToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionToolbar();
+		ZEDObjectWrapper*				GetWrapper(QTreeWidgetItem* Item) const;
+		QTreeWidgetItem*				GetTreeItem(ZEDObjectWrapper* Wrapper) const;
+
+		void							SetFilterPattern(const QString& Text);
+		QString							GetFilterPattern() const;
+
+		const ZEArray<ZEClass*>			GetFilterIncludedClasses() const;
+		void							AddFilterIncludedClass(ZEClass* Class);
+		void							RemoveFilterIncludedClass(ZEClass* Class);
+
+		const ZEArray<ZEClass*>			GetFilterExcludedClasses() const;
+		void							AddFilterExcludedClass(ZEClass* Class);
+		void							RemoveFilterExcludedClass(ZEClass* Class);
+
+		void							Update();
+
+										ZEDObjectTree(QWidget* Parent = 0);
 };

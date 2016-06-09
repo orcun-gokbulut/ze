@@ -40,7 +40,7 @@
 #include "ZEDS/ZEVariant.h"
 #include "ZEMeta/ZEProperty.h"
 #include "ZEDPropertyEditor.h"
-#include "ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
 
 #include "QEvent.h"
 #include <QLineEdit>

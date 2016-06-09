@@ -117,16 +117,17 @@ class ZEEntity : public ZEObject
 		virtual bool							SetOwner(ZEEntity* Owner);
 		void									SetOwnerScene(ZEScene* Scene);
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
-
+		const ZEArray<ZEEntity*>&				GetComponents() const;
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
-		const ZEArray<ZEEntity*>&				GetComponents() const;
+		void									ClearComponents();
 
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();
 		virtual void							BoundingBoxChanged();
+
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 												ZEEntity();
 		virtual									~ZEEntity();
@@ -146,6 +147,7 @@ class ZEEntity : public ZEObject
 		const ZEArray<ZEEntity*>&				GetChildEntities() const;
 		bool									AddChildEntity(ZEEntity* Entity);
 		void									RemoveChildEntity(ZEEntity* Entity);
+		void									ClearChildEntities();
 
 		void									SetBoundingBox(const ZEAABBox& BoundingBox);
 		virtual const ZEAABBox&					GetBoundingBox() const;

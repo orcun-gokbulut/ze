@@ -44,9 +44,9 @@
 #include "ZEDCore/ZEDOperationManager.h"
 #include "ZEDCore/ZEDTransformationManager.h"
 #include "ZEDCore/ZEDGizmo.h"
-#include "ZEDCore/ZEDTransformationToolbar.h"
-#include "ZEDCore/ZEDSelectionToolbar.h"
-#include "ZEDCore/ZEDObjectBrowser.h"
+#include "ZEDTransformationToolbar.h"
+#include "ZEDSelectionToolbar.h"
+#include "ZEDObjectTree.h"
 
 void ZEDMainWindow::closeEvent(QCloseEvent* Event)
 {

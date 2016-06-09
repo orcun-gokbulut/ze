@@ -68,6 +68,7 @@ bool ZEDEntityWrapper::UpdateGraphics()
 		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 		Material->SetVertexColorEnabled(true);
 		Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
+		Material->SetDepthTestDisabled(false);
 	}
 
 	if (ConstantBuffer.IsNull())

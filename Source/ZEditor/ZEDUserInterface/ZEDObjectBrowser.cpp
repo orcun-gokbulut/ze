@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDObjectBrowser.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,46 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDObjectBrowser.h"
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ui_ZEDObjectBrowser.h"
+#include "ZEDCore\ZEDModule.h"
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
-
-class ZEDViewportController : public ZEDComponent
+bool ZEDObjectBrowser::InitializeSelf()
 {
-	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+	if (!ZEDComponent::InitializeSelf())
+		return false;
 
-	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+	GetModule()->AddComponent(Form->trwObjects);
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+	return true;
+}
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
+void ZEDObjectBrowser::txtSearch_textChanged(const QString& Text)
+{
 
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+}
 
-									ZEDViewportController();
-									~ZEDViewportController();
-};
+void ZEDObjectBrowser::btnDelete_clicked()
+{
+
+}
+
+ZEDObjectTree* ZEDObjectBrowser::GetObjectTree()
+{
+	return Form->trwObjects;
+}
+
+ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QWidget(Parent)
+{
+	Form = new Ui_ZEDObjectBrowser();
+	Form->setupUi(this);
+
+	connect(Form->txtSearch, SIGNAL(clicked()), this, SLOT(txtSearch_textChanged(const QString&)));
+	connect(Form->btnDelete, SIGNAL(clicked()), this, SLOT(btnDelete_clicked()));
+}
+
+ZEDObjectBrowser::~ZEDObjectBrowser()
+{
+	delete Form;
+}

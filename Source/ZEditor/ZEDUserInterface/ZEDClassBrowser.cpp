@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDClassBrowser.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,35 +33,52 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDClassBrowser.h"
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ui_ZEDClassBrowser.h"
+#include "ZEDCore\ZEDModule.h"
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
-
-class ZEDViewportController : public ZEDComponent
+bool ZEDClassBrowser::InitializeSelf()
 {
-	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+	if (!ZEDComponent::InitializeSelf())
+		return false;
 
-	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+	GetModule()->AddComponent(Form->trwClasses);
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+	return true;
+}
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
+void ZEDClassBrowser::txtSearch_textChanged(const QString& Text)
+{
+	Form->trwClasses->SetSearchPattern(Text);
+}
 
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+void ZEDClassBrowser::cmbCategories_currentIndexChanged(const QString& text)
+{
 
-									ZEDViewportController();
-									~ZEDViewportController();
-};
+}
+
+void ZEDClassBrowser::btnAdd_clicked()
+{
+
+}
+
+ZEDClassTree* ZEDClassBrowser::GetClassTree()
+{
+	return Form->trwClasses;
+}
+
+ZEDClassBrowser::ZEDClassBrowser(QWidget* Parent) : QWidget(Parent)
+{
+	Form = new Ui_ZEDClassBrowser();
+	Form->setupUi(this);
+
+	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
+	connect(Form->cmbCategories, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbCategories_currentIndexChanged(const QString&)));
+	connect(Form->btnAdd, SIGNAL(clicked()), this, SLOT(btnAdd_clicked()));
+}
+
+ZEDClassBrowser::~ZEDClassBrowser()
+{
+	delete Form;
+}

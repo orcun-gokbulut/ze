@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDViewportController.h
+ Zinek Engine - ZEDPropertyEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,31 +37,37 @@
 
 #include "ZEDCore/ZEDComponent.h"
 
-class ZEDViewportMouseEvent;
-class ZEDViewportKeyboardEvent;
+#include "ZEDS/ZEArray.h"
+#include "ZEDS/ZEValue.h"
 
-class ZEDViewportController : public ZEDComponent
+#include <QTreeWidget>
+
+class ZEDObjectWrapper;
+
+class ZEDPropertyEditor : public QTreeWidget, public ZEDComponent
 {
+	friend class ZEDPropertyEditorItem;
 	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+		ZEClass*							BaseClass;
+		ZEArray<ZEDObjectWrapper*>			Wrappers;
+		bool								Dirty;
+
+		void								Populate();
+
+		virtual void						ObjectEvent(const ZEDObjectEvent* Event);
+		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual void						TickEvent(const ZEDTickEvent* Event);
+
+	protected:
+		virtual void						PropertyChanged(const ZEProperty* Property, const ZEVariant& Value);
+		virtual void						PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values);
 
 	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+		const ZEArray<ZEDObjectWrapper*>&	GetWrappers() const;
+		void								AddWrapper(ZEDObjectWrapper* Wrapper);
+		void								RemoveWrapper(ZEDObjectWrapper* Wrapper);
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+		void								Update();
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
-
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-
-									ZEDViewportController();
-									~ZEDViewportController();
+											ZEDPropertyEditor(QWidget* Parent = 0);
 };

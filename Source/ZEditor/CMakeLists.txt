@@ -43,14 +43,15 @@ find_package(Qt5 COMPONENTS Widgets)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 add_subdirectory(ZEDCore)
+add_subdirectory(ZEDUserInterface)
 add_subdirectory(ZEDConsole)
 
 ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine ZEDCore)
+	LIBS ZEEngine ZEDCore ZEDUserInterface ZETrainIGModule)
 
 qt5_use_modules(ZEditor Widgets)
 
-ze_meta_register(LIBS ZEDCore)
+ze_meta_register(LIBS ZEDCore ZETrainIGModule)
