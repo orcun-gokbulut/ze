@@ -20,23 +20,48 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_8">
     <item>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
-      <item>
+     <layout class="QFormLayout" name="formLayout">
+      <item row="0" column="0">
        <widget class="QLabel" name="label_5">
+        <property name="text">
+         <string>Engine Path</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QLineEdit" name="txtEnginePath"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnBrowseEnginePath">
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_7">
         <property name="text">
          <string>Integrity File</string>
         </property>
        </widget>
       </item>
-      <item>
-       <widget class="QLineEdit" name="txtIntegrityFile"/>
-      </item>
-      <item>
-       <widget class="QPushButton" name="btnBrowse">
-        <property name="text">
-         <string>Browse</string>
-        </property>
-       </widget>
+      <item row="1" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_9">
+        <item>
+         <widget class="QLineEdit" name="txtIntegrityFile"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="btnBrowseIntegrityFile">
+          <property name="text">
+           <string>Browse</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
      </layout>
     </item>

@@ -76,8 +76,11 @@ class ZEITIntegrityToolWindow : public QMainWindow
 		void							actSaveAs_triggered();
 		void							actQuit_triggered();
 
+		void							txtEnginePath_textEdited(const QString&);
+		void							btnBrowseEnginePath_clicked();
 		void							txtIntegrityFile_textEdited(const QString&);
-		void							btnBrowse_clicked();
+		void							btnBrowseIntegrityFile_clicked();
+
 		void							btnScan_clicked();
 		void							btnGenerate_clicked();
 

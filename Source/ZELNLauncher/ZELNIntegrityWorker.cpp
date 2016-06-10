@@ -57,9 +57,6 @@ void ZELNIntegrityWorker::run()
 		emit RecordUpdated(Index);
 		bool Result = Checker->Check(Index);
 		emit RecordUpdated(Index);
-
-		if (!Result)
-			break;
 	}
 
 	State = ZELN_IWS_DONE;
