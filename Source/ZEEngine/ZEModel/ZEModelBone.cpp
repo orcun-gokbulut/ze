@@ -195,7 +195,7 @@ const ZEMatrix4x4& ZEModelBone::GetWorldTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_BDF_WORLD_TRANSFORM))
 	{
-		if (Model == NULL)
+		if (Model != NULL)
 			ZEMatrix4x4::Multiply(WorldTransform, Model->GetWorldTransform(), GetModelTransform());
 		else
 			WorldTransform = GetModelTransform();

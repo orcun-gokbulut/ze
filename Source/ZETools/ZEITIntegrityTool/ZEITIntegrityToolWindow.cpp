@@ -173,8 +173,10 @@ void ZEITIntegrityToolWindow::UpdateUI()
 	Form->btnIncludeRemove->setEnabled(!GeneratorWorkerRunning && Form->lstIncludes->selectedItems().count() != 0);
 	Form->btnExcludeAdd->setEnabled(!GeneratorWorkerRunning);
 	Form->btnExcludeRemove->setEnabled(!GeneratorWorkerRunning && Form->lstExludes->selectedItems().count() != 0);
+	Form->txtEnginePath->setEnabled(!GeneratorWorkerRunning);
+	Form->btnBrowseEnginePath->setEnabled(!GeneratorWorkerRunning);
 	Form->txtIntegrityFile->setEnabled(!GeneratorWorkerRunning);
-	Form->btnBrowse->setEnabled(!GeneratorWorkerRunning);
+	Form->btnBrowseIntegrityFile->setEnabled(!GeneratorWorkerRunning);
 	Form->btnScan->setEnabled(!GeneratorWorkerRunning);
 	Form->btnRecordAdd->setEnabled(!GeneratorWorkerRunning);
 	Form->btnRecordRemove->setEnabled(!GeneratorWorkerRunning && Form->tblRecords->selectedItems().count() != 0);
@@ -226,6 +228,7 @@ bool ZEITIntegrityToolWindow::Open(const QString& FileName)
 	ZEPathManager::GetInstance()->SetAccessControl(true);
 	Form->stbStatusBar->showMessage(QString("Integrity Generator file \"%1\" opened.").arg(FileName), 5000);
 
+	Form->txtEnginePath->setText(Generator.GetEnginePath().ToCString());
 	Form->txtIntegrityFile->setText(Generator.GetIntegrityFileName().ToCString());
 	GeneratorFileName = FileName;
 
@@ -350,10 +353,10 @@ void ZEITIntegrityToolWindow::GeneratorWorker_StateChanged()
 
 void ZEITIntegrityToolWindow::actNew_triggered()
 {
+	Generator = ZEITGenerator();
 	GeneratorFileName = "";
-	Generator.SetIntegrityFileName("");
-	Generator.Clear();
 	Form->txtIntegrityFile->clear();
+	Form->txtEnginePath->clear();
 	Form->lstIncludes->clear();
 	Form->lstExludes->clear();
 	Form->tblRecords->clearContents();
@@ -402,20 +405,37 @@ void ZEITIntegrityToolWindow::actQuit_triggered()
 		qApp->exit(EXIT_SUCCESS);
 }
 
+
+void ZEITIntegrityToolWindow::txtEnginePath_textEdited(const QString&)
+{
+	Generator.SetEnginePath(Form->txtEnginePath->text().toUtf8().begin());
+}
+
+void ZEITIntegrityToolWindow::btnBrowseEnginePath_clicked()
+{
+	QString FileName = QFileDialog::getExistingDirectory(this, "Set Engine Path", Form->txtEnginePath->text());
+	if (FileName.isEmpty())
+		return;
+
+	Form->txtEnginePath->setText(FileName);
+	Generator.SetEnginePath(FileName.toUtf8().begin());
+}
+
 void ZEITIntegrityToolWindow::txtIntegrityFile_textEdited(const QString&)
 {
 	Generator.SetIntegrityFileName(Form->txtIntegrityFile->text().toUtf8().begin());
 }
 
-void ZEITIntegrityToolWindow::btnBrowse_clicked()
+void ZEITIntegrityToolWindow::btnBrowseIntegrityFile_clicked()
 {
-	QString FileName = QFileDialog::getSaveFileName(this, "Save Integrity File", QString(), "Integrity Generator files (*.ZEITIntegrity);;All files (*.*)");
+	QString FileName = QFileDialog::getSaveFileName(this, "Save Integrity File", Form->txtIntegrityFile->text(), "Integrity Generator files (*.ZEITIntegrity);;All files (*.*)");
 	if (FileName.isEmpty())
 		return;
 
 	Form->txtIntegrityFile->setText(FileName);
 	Generator.SetIntegrityFileName(FileName.toUtf8().begin());
 }
+
 
 void ZEITIntegrityToolWindow::lstIncludes_itemSelectionChanged()
 {
@@ -669,8 +689,12 @@ ZEITIntegrityToolWindow::ZEITIntegrityToolWindow()
 	connect(Form->actSaveAs,			SIGNAL(triggered()), this, SLOT(actSaveAs_triggered()));
 	connect(Form->actQuit,				SIGNAL(triggered()), this, SLOT(actQuit_triggered()));
 
-	connect(Form->btnBrowse,			SIGNAL(clicked()), this, SLOT(btnBrowse_clicked()));
+	connect(Form->btnBrowseEnginePath,	SIGNAL(clicked()), this, SLOT(btnBrowseEnginePath_clicked()));
+	connect(Form->txtEnginePath,		SIGNAL(textEdited(const QString&)), this, SLOT(txtEnginePath_textEdited(const QString&)));
+
+	connect(Form->btnBrowseIntegrityFile,SIGNAL(clicked()), this, SLOT(btnBrowseIntegrityFile_clicked()));
 	connect(Form->txtIntegrityFile,		SIGNAL(textEdited(const QString&)), this, SLOT(txtIntegrityFile_textEdited(const QString&)));
+
 	connect(Form->btnScan,				SIGNAL(clicked()), this, SLOT(btnScan_clicked()));
 	connect(Form->btnGenerate,			SIGNAL(clicked()), this, SLOT(btnGenerate_clicked()));
 	connect(GeneratorWorker,			SIGNAL(RecordUpdated(unsigned int)), this, SLOT(GeneratorWorker_RecordUpdated(unsigned int)));
