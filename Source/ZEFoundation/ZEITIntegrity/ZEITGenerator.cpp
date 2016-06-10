@@ -40,6 +40,7 @@
 #include "ZEML\ZEMLWriter.h"
 #include "ZEML\ZEMLFormat.h"
 #include "ZEML\ZEMLReader.h"
+#include "ZEFile\ZEPathManager.h"
 
 
 // ZEITScannerEntry
@@ -282,6 +283,16 @@ void ZEITGenerator::RemoveExclude(ZESize Index)
 	Excludes.Remove(Index);
 }
 
+void ZEITGenerator::SetEnginePath(const ZEString& Path)
+{
+	EnginePath = Path;
+}
+
+const ZEString& ZEITGenerator::GetEnginePath()
+{
+	return EnginePath;
+}
+
 void ZEITGenerator::SetIntegrityFileName(const ZEString& FileName)
 {
 	IntegrityFileName = FileName;
@@ -304,6 +315,9 @@ bool ZEITGenerator::GetDiscardDisabled() const
 
 void ZEITGenerator::Scan()
 {
+	ZEString EnginePathBackup = ZEPathManager::GetInstance()->GetEnginePath();
+	ZEPathManager::GetInstance()->SetEnginePath(EnginePath);
+	
 	for (ZESize I = 0; I < Includes.GetCount(); I++)
 	{
 		if (!Includes[I].GetEnabled())
@@ -311,11 +325,14 @@ void ZEITGenerator::Scan()
 
 		ScanDirectory(Includes[I].GetPath(), Includes[I].GetRecursive());
 	}
+	
+	ZEPathManager::GetInstance()->SetEnginePath(EnginePathBackup);
 }
 
 void ZEITGenerator::GenerateStart()
 {
-
+	EnginePathBackup = ZEPathManager::GetInstance()->GetEnginePath();
+	ZEPathManager::GetInstance()->SetEnginePath(EnginePath);
 }
 
 bool ZEITGenerator::Generate(ZESize Index)
@@ -330,6 +347,42 @@ bool ZEITGenerator::Generate(ZESize Index)
 		return false;
 
 	return true;
+}
+
+bool ZEITGenerator::GenerateIntegrityFile() const
+{
+	ZEMLWriter Writer;
+	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
+	if (!Writer.Open(IntegrityFileName))
+	{
+		zeError("Cannot write Integrity file. File Name: \"%s\".", IntegrityFileName.ToCString());
+		return false;
+	}
+
+	ZEMLWriterNode RootNode;
+	Writer.OpenRootNode("ZEITIntegrity", RootNode);
+
+	ZEMLWriterNode RecordsNode;
+	RootNode.OpenNode("Records", RecordsNode);
+
+	for (ZESize I = 0; I < Records.GetCount(); I++)
+	{
+		if (DiscardDisabled && !Records[I].GetEnabled())
+			continue;
+
+		Records[I].Save(&RecordsNode);
+	}
+
+	RecordsNode.CloseNode();
+	RootNode.CloseNode();
+	Writer.Close();
+
+	return true;
+}
+
+void ZEITGenerator::GenerateEnd()
+{
+	ZEPathManager::GetInstance()->SetEnginePath(EnginePathBackup);
 }
 
 void ZEITGenerator::Clear()
@@ -355,6 +408,7 @@ bool ZEITGenerator::LoadGeneratorFile(const ZEString& FileName)
 		return false;
 	}
 
+	EnginePath = RootNode.ReadString("EnginePath");
 	IntegrityFileName = RootNode.ReadString("IntegrityFileName");
 	
 	ZEMLReaderNode ScannerNode = RootNode.GetNode("Scanner");
@@ -408,6 +462,8 @@ bool ZEITGenerator::SaveGeneratorFile(const ZEString& FileName) const
 
 	ZEMLWriterNode RootNode;
 	Writer.OpenRootNode("ZEITIntegrityGenerator", RootNode);
+	
+	RootNode.WriteString("EnginePath", EnginePath);
 	RootNode.WriteString("IntegrityFileName", IntegrityFileName);
 
 	ZEMLWriterNode ScannerNode;
@@ -456,38 +512,8 @@ bool ZEITGenerator::SaveGeneratorFile(const ZEString& FileName) const
 	return true;
 }
 
-bool ZEITGenerator::GenerateIntegrityFile() const
-{
-	ZEMLWriter Writer;
-	Writer.SetFormat(ZEMLFormat::GetDefaultTextFormat()->CreateInstance());
-	if (!Writer.Open(IntegrityFileName))
-	{
-		zeError("Cannot write Integrity file. File Name: \"%s\".", IntegrityFileName.ToCString());
-		return false;
-	}
-
-	ZEMLWriterNode RootNode;
-	Writer.OpenRootNode("ZEITIntegrity", RootNode);
-
-	ZEMLWriterNode RecordsNode;
-	RootNode.OpenNode("Records", RecordsNode);
-
-	for (ZESize I = 0; I < Records.GetCount(); I++)
-	{
-		if (DiscardDisabled && !Records[I].GetEnabled())
-			continue;
-
-		Records[I].Save(&RecordsNode);
-	}
-
-	RecordsNode.CloseNode();
-	RootNode.CloseNode();
-	Writer.Close();
-
-	return true;
-}
-
 ZEITGenerator::ZEITGenerator()
 {
 	DiscardDisabled = true;
+	EnginePath = ZEPathManager::GetInstance()->GetEnginePath();
 }
