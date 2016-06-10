@@ -37,6 +37,9 @@
 
 #include "ZEDObjectWrapper.h"
 
+class ZEUIControl;
+class ZEUIFrameControl;
+class ZEUILabel;
 class ZEGRVertexBuffer;
 class ZEGRConstantBuffer;
 class ZERNSimpleMaterial;
@@ -50,6 +53,10 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZERNSimpleMaterial>		Material;
 		ZERNCommand							Command;
+	
+		ZEUIControl*						NamePlate;
+		ZEUIFrameControl*					NamePlateIcon;
+		ZEUILabel*							NamePlateLabel;
 
 		bool								AlterRaycast(ZERayCastCollision& Collision);
 
@@ -57,7 +64,10 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		ZECanvas							Canvas;
 
 		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
-		bool								UpdateGraphics();
+		virtual bool						UpdateGraphics();
+
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
 											ZEDEntityWrapper();
 

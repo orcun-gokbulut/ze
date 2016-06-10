@@ -38,19 +38,27 @@
 #include "ZEUI/ZEUIControl.h"
 #include "ZEUI/ZEUIRectangle.h"
 
+class ZETexture2DResource;
 
 class ZEUIFrameControl : public ZEUIControl
 {
 	ZE_OBJECT
 	public:
 		ZEUIRectangle				Frame;
+		ZEString					TexturePath;
+		ZETexture2DResource*		TextureResource;
 
 	public:
 		virtual void				SetPosition(const ZEVector2& Position);
 		virtual	void				SetSize(const ZEVector2& Size);
 		virtual void				SetWidth(float Width);
 		virtual void				SetHeight(float Height);
+
 		virtual void				SetTexture(const ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*		GetTexture();
+
+		virtual void				SetTexturePath(const ZEString& Path);
+		const ZEString&				GetTexturePath();
 
 		virtual void				Draw(ZEUIRenderer* Renderer);
 

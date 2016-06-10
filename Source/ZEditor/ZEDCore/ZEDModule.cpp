@@ -88,6 +88,18 @@ bool ZEDModule::InitializeSelf()
 		}
 	}
 
+	UIManager = ZEUIManager::CreateInstance();
+
+	if (RootWrapper != NULL)
+	{
+		RootWrapper->SetModule(this);
+
+		if (!RootWrapper->Initialize())
+			return false;
+
+		RootWrapper->Update();
+	}
+
 	return true;
 }
 
@@ -95,6 +107,11 @@ bool ZEDModule::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Deinitialize();
+
+	if (RootWrapper != NULL)
+		RootWrapper->Deinitialize();
+
+	UIManager->Destroy();
 
 	return true;
 }
@@ -117,6 +134,11 @@ ZEDTransformationManager* ZEDModule::GetTransformManager()
 ZEDViewportManager* ZEDModule::GetViewportManager()
 {
 	return ViewportManager;
+}
+
+ZEUIManager* ZEDModule::GetUIManager()
+{
+	return UIManager;
 }
 
 ZEDObjectWrapper* ZEDModule::GetRootWrapper()
@@ -261,8 +283,6 @@ void ZEDModule::StartUp()
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
 	SkyBox->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	Scene->AddEntity(SkyBox);
-
-	RootWrapper->Update();
 }
 
 void ZEDModule::ShutDown()

@@ -38,6 +38,7 @@
 #include "ZEUICheckBoxControl.h"
 #include "ZEUIHorizontalSliderControl.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZETexture/ZETexture2DResource.h"
 
 void ZEUIFrameControl::Draw(ZEUIRenderer* Renderer)
 {
@@ -74,7 +75,49 @@ void ZEUIFrameControl::SetHeight(float Height)
 
 void ZEUIFrameControl::SetTexture(const ZEGRTexture2D* Texture)
 {
+	if (Frame.Texture == Texture)
+		return;
+
+	if (TextureResource != NULL)
+	{
+		Frame.Texture.Release();
+		TextureResource->Release();
+		TextureResource = NULL;	
+	}
+
 	Frame.Texture = Texture;
+}
+
+const ZEGRTexture2D* ZEUIFrameControl::GetTexture()
+{
+	return Frame.Texture;
+}
+
+void ZEUIFrameControl::SetTexturePath(const ZEString& Path)
+{
+	if (TexturePath == Path)
+		return;
+
+	if (TextureResource != NULL)
+	{
+		Frame.Texture.Release();
+		TextureResource->Release();
+		TextureResource = NULL;
+	}
+
+	if (Path.IsEmpty())
+		return;
+
+	TextureResource = ZETexture2DResource::LoadSharedResource(Path);
+	if (TextureResource == NULL)
+		return;
+
+	Frame.Texture = TextureResource->GetTexture2D();
+}
+
+const ZEString& ZEUIFrameControl::GetTexturePath()
+{
+	return TexturePath;
 }
 
 void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
@@ -85,6 +128,8 @@ void ZEUIFrameControl::SetPosition(const ZEVector2& Position)
 
 ZEUIFrameControl::ZEUIFrameControl()
 {
+	TextureResource = NULL;
+
 	Frame.Color = ZEUIManager::GetDefaultBackgroundColor();
 	Frame.Texcoords.LeftUp = ZEVector2::Zero;
 	Frame.Texcoords.RightDown = ZEVector2::One;

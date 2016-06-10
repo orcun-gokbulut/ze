@@ -79,6 +79,28 @@ void ZEDObjectWrapper::SetModule(ZEDModule* Module)
 	this->Module = Module;
 }
 
+bool ZEDObjectWrapper::InitializeSelf()
+{
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+	{
+		if (!ChildWrappers[I]->Initialize())
+			return false;
+	}
+
+	return true;
+}
+
+void ZEDObjectWrapper::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+		ChildWrappers[I]->Deinitialize();
+
+	ZEInitializable::DeinitializeSelf();
+}
+
 void ZEDObjectWrapper::ClearChildWrappers()
 {
 	for (ZESSize I = ChildWrappers.GetCount() -1; I >= 0; I--)
@@ -296,6 +318,12 @@ bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 	if (Module != NULL)
 		Module->DistributeEvent(&Event);
 
+	if (IsInitialized())
+	{
+		if (!Wrapper->Initialize())
+			return false;
+	}
+
 	return true;
 }
 
@@ -316,6 +344,8 @@ bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 	Event.Type = ZED_OCET_REMOVED;
 	if (Module != NULL)
 		Module->DistributeEvent(&Event);
+
+	Wrapper->Deinitialize();
 
 	return true;
 }

@@ -43,6 +43,11 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
+#include "ZERenderer/ZERNScreenUtilities.h"
+
+#include "ZEUI/ZEUILabel.h"
+#include "ZEDModule.h"
+#include "ZEMath/ZEMath.h"
 
 bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void* Parameter)
 {
@@ -61,18 +66,6 @@ bool ZEDEntityWrapper::UpdateGraphics()
 	ZEMatrix4x4::CreateOrientation(WorldMatrix, BoundingBox.GetCenter(), 
 		ZEQuaternion::Identity, 
 		ZEVector3(BoundingBox.Max.x - BoundingBox.Min.x, BoundingBox.Max.y - BoundingBox.Min.y, BoundingBox.Max.z - BoundingBox.Min.z));
-
-	if (Material.IsNull())
-	{
-		Material = ZERNSimpleMaterial::CreateInstance();
-		Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
-		Material->SetVertexColorEnabled(true);
-		Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
-		Material->SetDepthTestDisabled(false);
-	}
-
-	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
 
 	ConstantBuffer->SetData(&WorldMatrix);
 
@@ -105,6 +98,51 @@ bool ZEDEntityWrapper::UpdateGraphics()
 	return true;
 }
 
+bool ZEDEntityWrapper::InitializeSelf()
+{
+	if (!ZEDObjectWrapper::InitializeSelf())
+		return false;
+
+	Material = ZERNSimpleMaterial::CreateInstance();
+	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	Material->SetVertexColorEnabled(true);
+	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
+	Material->SetDepthTestDisabled(false);
+
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+
+	NamePlate = new ZEUIControl();
+
+	NamePlateLabel = new ZEUILabel();
+	NamePlateIcon = new ZEUIFrameControl();
+	NamePlateIcon->SetSize(ZEVector2(32.0f, 32.0f));
+	NamePlateIcon->SetPosition(ZEVector2::Zero);
+
+	NamePlateIcon->SetTexturePath(GetIcon());
+	NamePlateIcon = new ZEUIFrameControl();
+	NamePlateIcon->SetSize(ZEVector2(100.0f, 40.0f));
+	NamePlateIcon->SetPosition(ZEVector2(36.0f, 0.0f));
+
+	NamePlate->AddChildControl(NamePlateIcon);
+	NamePlate->AddChildControl(NamePlateLabel);
+
+	ZEUIManager* UIManager = GetModule()->GetUIManager();
+	UIManager->AddControl(NamePlate);
+
+	return true;
+}
+
+void ZEDEntityWrapper::DeinitializeSelf()
+{
+	delete NamePlate;
+
+	Material.Release();
+	ConstantBuffer.Release();
+	VertexBuffer.Release();
+
+	ZEDObjectWrapper::Deinitialize();
+}
+
 ZEDEntityWrapper::ZEDEntityWrapper()
 {
 	Dirty = true;
@@ -123,6 +161,7 @@ ZEInt ZEDEntityWrapper::GetId() const
 void ZEDEntityWrapper::SetName(const ZEString& Name)
 {
 	GetEntity()->SetName(Name);
+	NamePlateLabel->SetText(Name);
 }
 
 ZEString ZEDEntityWrapper::GetName() const
@@ -138,7 +177,13 @@ void ZEDEntityWrapper::SetObject(ZEObject* Object)
 	ZEDObjectWrapper::SetObject(Object);
 	GetEntity()->SetWrapper(this);
 	
-	Update();
+	if (IsInitialized())
+	{
+		NamePlateLabel->SetText(static_cast<ZEEntity*>(Object)->GetName());
+		NamePlateIcon->SetTexturePath("#R:/Resources/ZEEngine/ZEGUI/Textures/SemiChecked.png");
+
+		Update();
+	}
 }
 
 ZEEntity* ZEDEntityWrapper::GetEntity() const
@@ -164,6 +209,9 @@ bool ZEDEntityWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 	if (!ZEDObjectWrapper::AddChildWrapper(Wrapper, Update))
 		return false;
 
+	if (!Wrapper->Initialize())
+		return false;
+
 	if (!Update)
 	{
 		if (GetEntity() != NULL)
@@ -177,6 +225,8 @@ bool ZEDEntityWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 {
 	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
 		return false;
+
+	Wrapper->Deinitialize();
 
 	if (!ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update))
 		return false;
@@ -295,6 +345,11 @@ void ZEDEntityWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	Command.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEDEntityWrapper, Render, this);
 	Parameters->Renderer->AddCommand(&Command);
+
+
+	ZEVector2 ScreenPosition = ZERNScreenUtilities::WorldToScreen(*Parameters->View, GetPosition());
+	NamePlate->SetPosition(ScreenPosition);
+	NamePlate->SetZOrder(ZEMath::Abs(Parameters->View->Position.z - GetPosition().z));
 }
 
 void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
