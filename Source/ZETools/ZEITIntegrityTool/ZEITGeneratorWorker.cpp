@@ -66,6 +66,8 @@ void ZEITGeneratorWorker::run()
 		emit RecordUpdated(Index);
 	}
 
+	Generator->GenerateEnd();
+
 	State = ZEIT_GWS_DONE;
 	emit StateChanged();
 }

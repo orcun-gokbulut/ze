@@ -139,12 +139,12 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 	{
 		QTableWidgetItem* StatusItem = new QTableWidgetItem();
 		StatusItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-		StatusItem->setFlags(StatusItem->flags() ^ Qt::ItemIsEditable);
+		StatusItem->setFlags(StatusItem->flags() & ~Qt::ItemIsEditable);
 		Form->tblRecords->setItem(Index, 0, StatusItem);
 
 		QTableWidgetItem* PathItem = new QTableWidgetItem();
 		PathItem->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		PathItem->setFlags(PathItem->flags() ^ Qt::ItemIsEditable);
+		PathItem->setFlags(PathItem->flags() & ~Qt::ItemIsEditable);
 		Form->tblRecords->setItem(Index, 1, PathItem);
 	}
 	  
@@ -197,6 +197,7 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 	}
 
 	Form->tblRecords->item(Index, 1)->setText(Record.GetPath().ToCString());
+	Form->tblRecords->item(Index, 1)->setToolTip(Record.GetPath().ToCString());
 }
 
 void ZELNIntegrityModule::Update()
@@ -242,7 +243,7 @@ ZELNIntegrityModule::ZELNIntegrityModule()
 	PathHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	Form->tblRecords->setHorizontalHeaderItem(1, PathHeader);
 
-	Form->tblRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+	Form->tblRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	Form->tblRecords->verticalHeader()->setVisible(false);
 
 	QHeaderView* verticalHeader = Form->tblRecords->verticalHeader();
@@ -251,6 +252,12 @@ ZELNIntegrityModule::ZELNIntegrityModule()
 
 	CheckerWorker = new ZELNIntegrityWorker();
 	CheckerWorker->SetChecker(&Checker);
+
+	Form->tblRecords->setSelectionBehavior(QAbstractItemView::SelectRows);
+	Form->tblRecords->setSelectionMode(QAbstractItemView::NoSelection);
+
+	Form->tblRecords->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+	Form->tblRecords->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 	connect(Form->btnCheckIntegrity, SIGNAL(clicked()), this, SLOT(btnCheckIntegrity_clicked()));
 	connect(Form->chkFilterAll,		SIGNAL(toggled(bool)), this, SLOT(chkFilter_toggled(bool)));
