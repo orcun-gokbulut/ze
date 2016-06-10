@@ -39,6 +39,7 @@
 
 #include "ZEDOperationManager.h"
 #include "ZEDViewportManager.h"
+#include "ZEUI/ZEUIManager.h"
 
 class ZEDComponent;
 class ZEDEvent;
@@ -58,6 +59,7 @@ class ZEDModule : public ZEApplicationModule
 		ZEDSelectionManager*				SelectionManager;
 		ZEDTransformationManager*			TransformManager;
 		ZEDViewportManager*					ViewportManager;
+		ZEUIManager*						UIManager;
 		ZEDObjectWrapper*					RootWrapper;
 
 		virtual bool						InitializeSelf();
@@ -68,6 +70,7 @@ class ZEDModule : public ZEApplicationModule
 		ZEDSelectionManager*				GetSelectionManager();
 		ZEDTransformationManager*			GetTransformManager();
 		ZEDViewportManager*					GetViewportManager();
+		ZEUIManager*						GetUIManager();
 		ZEDObjectWrapper*					GetRootWrapper();
 
 		virtual void						AddComponent(ZEDComponent* Component);

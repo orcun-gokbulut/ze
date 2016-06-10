@@ -36,6 +36,8 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
+
 #include "ZEDEvent.h"
 
 #include "ZEDS/ZEArray.h"
@@ -46,7 +48,6 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
-
 
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
@@ -80,9 +81,10 @@ class ZEDObjectEvent : public ZEDEvent
 													ZEDObjectEvent();
 };
 
-class ZEDObjectWrapper : public ZEObject
+class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
+	friend class ZEDModule;
 	private:
 		ZEObject*									Object;
 		ZEDObjectWrapper*							Parent;
@@ -97,9 +99,12 @@ class ZEDObjectWrapper : public ZEObject
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
 		
 		void										SetModule(ZEDModule* Module);
-	
+		
 	protected:
 		void										ClearChildWrappers();
+
+		bool										InitializeSelf();
+		void										DeinitializeSelf();
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();
