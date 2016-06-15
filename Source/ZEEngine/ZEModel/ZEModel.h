@@ -63,7 +63,6 @@ class ZEModel : public ZEEntity
 	friend class ZEModelMeshLOD;
 
 	private:
-		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERNCommand>				LODRenderCommands;

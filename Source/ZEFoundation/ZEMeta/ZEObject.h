@@ -39,7 +39,7 @@
 
 #include "ZEClass.h"
 
-#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_ATTRIBUTE_2("ForwardDeclaration", #ClassName, IncludeFile) ClassName;
+#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_META_ATTRIBUTE(ZEMeta.ForwardDeclaration, #ClassName, IncludeFile) ClassName;
 
 #define ZE_OBJECT \
 	public: \
@@ -47,7 +47,7 @@
 		static ZEClass*				Class(); \
 	private:
 		
-#define ZE_OBJECT_IMPLEMENTATION(ClassName) \
+#define ZE_META_OBJECT_IMPLEMENTATION(ClassName) \
 	ZEClass* ClassName::GetClass() const \
 	{ \
 		return ClassName::Class(); \

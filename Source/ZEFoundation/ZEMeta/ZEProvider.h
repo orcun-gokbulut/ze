@@ -50,19 +50,16 @@ class ZEProvider
 		ZEArray<ZEEnumerator*>			Enumerators;
 
 	public:
+		const ZEArray<ZEClass*>&		GetClasses();
+		ZEArray<ZEClass*>				GetClasses(ZEClass* ParentClass);
+		ZEClass*						GetClass(const char* ClassName);
 		bool							RegisterClass(ZEClass* Class);
 		void							UnregisterClass(ZEClass* Class);
 
+		const ZEArray<ZEEnumerator*>&	GetEnumerators();
+		ZEEnumerator*					GetEnumerator(const char* EnumeratorName);
 		bool							RegisterEnumerator(ZEEnumerator* Enumerator);
 		void							UnregisterEnumerator(ZEEnumerator* Enumerator);
-
-		const ZEArray<ZEClass*>&		GetClasses();
-		const ZEArray<ZEEnumerator*>&	GetEnumerators();
-
-		ZEClass*						GetClass(const char* ClassName);
-		ZEArray<ZEClass*>				GetClass(ZEClass* ParentClass);
-
-		ZEEnumerator*					GetEnumerator(const char* EnumeratorName);
 
 		ZEObject*						CreateInstance(const char* ClassName);
 		ZEObject*						CreateDerivedInstance(ZEClass* BaseClass, const char* ClassName);

@@ -60,7 +60,6 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	PropertyData->Type = PropertyType;
 	PropertyData->Access = PropertyType.TypeQualifier == ZEMC_TQ_VALUE ? ZEMC_PA_READ_WRITE : ZEMC_PA_READ;
 	
-
 	ParseAttributes(PropertyData, PropertyDeclaration);
 
 	ClassData->Properties.Add(PropertyData.Transfer());

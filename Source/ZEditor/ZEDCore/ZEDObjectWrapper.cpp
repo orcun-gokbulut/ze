@@ -38,35 +38,9 @@
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMath.h"
 
-#include "ZERenderer/ZERNSimpleMaterial.h"
 #include "ZEDModule.h"
-
-
-ZEDObjectEvent::ZEDObjectEvent()
-{
-	Type = ZED_OCED_NONE;
-	Wrapper = NULL;
-}
-
-void ZEDObjectEvent::SetType(ZEDObjectChangedEventType Type)
-{
-	this->Type = Type;
-}
-
-ZEDObjectChangedEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
-
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
-
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
-}
+#include "ZEDObjectEvent.h"
+#include "ZERenderer/ZERNSimpleMaterial.h"
 
 void ZEDObjectWrapper::SetModule(ZEDModule* Module)
 {
@@ -121,9 +95,6 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 ZEDObjectWrapper::~ZEDObjectWrapper()
 {
 	ClearChildWrappers();
-
-	if (Parent != NULL)
-		Parent->RemoveChildWrapper(this, true);
 }
 
 void ZEDObjectWrapper::SetObject(ZEObject* Object)
@@ -350,6 +321,11 @@ bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 	return true;
 }
 
+bool ZEDObjectWrapper::CheckChildrenClass(ZEClass* Class)
+{
+	return true;
+}
+
 void ZEDObjectWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 
@@ -373,6 +349,19 @@ void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameter
 void ZEDObjectWrapper::Update()
 {
 
+}
+
+ZEDObjectWrapper* ZEDObjectWrapper::Clone()
+{
+	ZEDObjectWrapper* CloneWrapper = static_cast<ZEDObjectWrapper*>(GetClass()->Clone(this));
+
+	ZEObject* CloneObject = NULL;
+	if (Object != NULL)
+		CloneObject	= Object->GetClass()->Clone(Object);
+
+	CloneWrapper->SetObject(CloneObject);
+
+	return CloneWrapper;
 }
 
 void ZEDObjectWrapper::Destroy()

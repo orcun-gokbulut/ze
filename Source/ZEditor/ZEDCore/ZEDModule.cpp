@@ -250,6 +250,7 @@ void ZEDModule::StartUp()
 
 	RootWrapper = ZEDSceneWrapper::CreateInstance();
 	RootWrapper->SetObject(Scene);
+	RootWrapper->SetModule(this);
 	ObjectBrowser->GetObjectTree()->SetRootWrapper(RootWrapper);
 
 	ZEDGrid* Grid = ZEDGrid::CreateInstance();
@@ -283,6 +284,8 @@ void ZEDModule::StartUp()
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
 	SkyBox->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	Scene->AddEntity(SkyBox);
+
+	RootWrapper->Update();
 }
 
 void ZEDModule::ShutDown()

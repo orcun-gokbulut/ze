@@ -40,6 +40,7 @@
 
 class Ui_ZEDObjectBrowser;
 class ZEDObjectTree;
+class ZEDObjectWrapper;
 
 class ZEDObjectBrowser : public QWidget, public ZEDComponent
 {
@@ -47,9 +48,20 @@ class ZEDObjectBrowser : public QWidget, public ZEDComponent
 	private:
 		Ui_ZEDObjectBrowser*				Form;
 
+		QPoint								DragStartPos;
+		ZEDObjectWrapper*					DragWrapper;
+
 		virtual bool						InitializeSelf();
 
+		bool								CheckDrop();
+		void								Drag();
+		void								DropReceived();
+		
+
+		virtual bool						eventFilter(QObject* Object, QEvent* Event);
+
 	private slots:
+		void								trwObjects_itemSelectionChanged();
 		void								txtSearch_textChanged(const QString& Text);
 		void								btnDelete_clicked();
 

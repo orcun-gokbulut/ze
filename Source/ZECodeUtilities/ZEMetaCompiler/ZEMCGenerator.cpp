@@ -37,6 +37,9 @@
 #include "ZEMCContext.h"
 #include "ZEDS\ZEFormat.h"
 #include <stdarg.h>
+#include "ZETimeStamp.h"
+#include "ZEVersion.h"
+#include "ZEFile\ZEPathInfo.h"
 
 
 bool ZEMCGenerator::OpenFile()
@@ -104,18 +107,30 @@ bool ZEMCGenerator::Generate()
 
 void ZEMCGenerator::GenerateHeading()
 {
-	WriteToFile("//////////////////////////////////////////////////\n");
-	WriteToFile("//  ZEMetaCompiler auto generated ZEMeta file.  //\n");
-	WriteToFile("//      DO NOT EDIT (HACK) THIS FILE !!!        //\n");
-	WriteToFile("//////////////////////////////////////////////////\n");
+	ZEString VersionString = ZEVersion::GetZinekVersion().GetLongString();
+	ZEString FileName = ZEPathInfo(Options->InputFileName).GetFileName();
+
+	ZETimeStamp TimeStamp = ZETimeStamp::Now();
+	ZEString TimeStampString = ZEFormat::Format("{0:d:04}-{1:d:02}-{2:d:02} {3:d:02}:{4:d:02}:{5:d:02}",
+		TimeStamp.GetYear(), TimeStamp.GetMonth(), TimeStamp.GetDay(),
+		TimeStamp.GetHour(), TimeStamp.GetMinute(), TimeStamp.GetSecond());
+
+	WriteToFile("//  ZEMetaCompiler auto generated ZEMeta file.\n");
+	WriteToFile("//  DO NOT EDIT (HACK) THIS FILE !!! \n");
+	WriteToFile("// -----------------------------------------------------------------------------------\n");
+	WriteToFile("//  Input File : %s\n", FileName.ToCString());
+	WriteToFile("//  Version    : %s\n", VersionString.ToCString());
+	WriteToFile("//  Time Stamp : %s\n", TimeStampString.ToCString());
+	WriteToFile("////////////////////////////////////////////////////////////////////////////////////////\n");
 	WriteToFile("\n");
+
 	WriteToFile("#include \"%s\"\n", Options->InputFileName.ToCString());
 	WriteToFile("#include \"ZEDS/ZEVariant.h\"\n");
 	WriteToFile("#include \"ZEDS/ZEReference.h\"\n");
 	WriteToFile("#include \"ZEMeta/ZEClass.h\"\n");
-	WriteToFile("#include \"ZEMeta/ZEBuiltIn.h\"\n");
+	WriteToFile("#include \"ZEMeta/ZEMTFundamental.h\"\n");
 	WriteToFile("\n");
-	WriteToFile("#include <stddef.h>\n\n");
+	WriteToFile("#include <stddef.h>\n");
 }
 
 void ZEMCGenerator::GenerateEnding()

@@ -201,17 +201,17 @@ void ZEMCGenerator::GenerateClassGetMethods_Attributes(ZEMCClass* CurrentClass)
 			if(CurrentAttribute->Parameters.GetCount() > 0)
 			{
 				WriteToFile(
-					"\t\t{\"%s\", Method%dAttribute%dParameters, %d", 
+					"\t\t{\"%s\", Method%dAttribute%dParameters, %d}", 
 					CurrentAttribute->Name.ToCString(),
 					I, J, 
 					CurrentAttribute->Parameters.GetCount());
 			}
 			else
 			{
-				WriteToFile("\t\t{\"%s\", NULL, 0", CurrentAttribute->Name.ToCString());
+				WriteToFile("\t\t{\"%s\", NULL, 0}", CurrentAttribute->Name.ToCString());
 			}
 
-			WriteToFile("}%s\n", J < CurrentMethod->Attributes.GetCount() - 1 ? "," : "");
+			WriteToFile("%s\n", J < CurrentMethod->Attributes.GetCount() - 1 ? "," : "");
 		}
 
 		WriteToFile("\t};\n\n");
@@ -343,7 +343,7 @@ void ZEMCGenerator::GenerateClassGetMethodCount(ZEMCClass* CurrentClass)
 
 void ZEMCGenerator::GenerateClassGetMethodId(ZEMCClass* CurrentClass)
 {
-	if (CurrentClass->IsBuiltInClass)
+	if (CurrentClass->IsFundamental)
 		return;
 
 	WriteToFile(

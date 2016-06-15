@@ -80,7 +80,7 @@ class ZEMCParser
 		bool CheckClassHasDerivedFromZEObject(CXXRecordDecl* Class);
 		bool CheckClassHasZEObjectMacro(CXXRecordDecl* Class);
 		bool CheckClass(CXXRecordDecl* Class);
-		bool CheckBuiltInClass(CXXRecordDecl* Class);
+		bool CheckFundamentalClass(CXXRecordDecl* Class);
 		bool CheckTargetDeclaration(Decl* Declaration);
 
 		// Memory Management

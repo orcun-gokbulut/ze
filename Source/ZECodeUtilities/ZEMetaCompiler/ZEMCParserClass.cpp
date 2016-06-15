@@ -164,7 +164,7 @@ bool ZEMCParser::CheckClass(CXXRecordDecl* Class)
 	return true;
 }
 
-bool ZEMCParser::CheckBuiltInClass(CXXRecordDecl* Class)
+bool ZEMCParser::CheckFundamentalClass(CXXRecordDecl* Class)
 {
 	for (CXXRecordDecl::method_iterator Iterator = Class->method_begin(); Iterator != Class->method_end(); Iterator++)
 	{
@@ -179,7 +179,7 @@ bool ZEMCParser::CheckBuiltInClass(CXXRecordDecl* Class)
 		ZEMCDeclaration Temp;
 		ParseAttributes(&Temp, *Iterator);
 
-		return CheckAttribute(&Temp, "BuiltIn");
+		return CheckAttribute(&Temp, "ZEMeta.Fundamental");
 	}
 
 	return false;
@@ -202,7 +202,7 @@ bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
 
-			if (AttributeData.Name == "ForwardDeclaration")
+			if (AttributeData.Name == "ZEMeta.ForwardDeclaration")
 			{
 				bool Found = false;
 				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
@@ -240,8 +240,8 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	if (!Class->isCompleteDefinition())
 		return;
 
-	bool BuiltInClass = CheckBuiltInClass(Class);
-	if (!BuiltInClass && !CheckClass(Class))
+	bool FundamentalClass = CheckFundamentalClass(Class);
+	if (!FundamentalClass && !CheckClass(Class))
 		return;
 	
 	ZEMCClass* ClassData = FindClass(Class->getNameAsString().c_str());
@@ -252,6 +252,7 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	}
 
 	ClassData->Name = Class->getNameAsString();
+	ClassData->MetaName = ClassData->Name + "Class";
 	ClassData->Hash = ClassData->Name.Hash();
 
 	ClassData->HasCreateInstanceMethod = false;
@@ -263,10 +264,10 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->HasPublicAssignmentOperator = true;
 	
 	ClassData->IsAbstract = Class->isAbstract();
-	ClassData->IsBuiltInClass = BuiltInClass;
+	ClassData->IsFundamental = FundamentalClass;
 	ClassData->IsForwardDeclared = false;
 
-	if (!ClassData->IsBuiltInClass)
+	if (!ClassData->IsFundamental)
 	{
 		for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
 		{
@@ -285,13 +286,24 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	// Combine Methods and Properties
 	if (ClassData->BaseClass != NULL)
 	{
-		ClassData->Methods = ClassData->BaseClass->Methods;
-		ClassData->Properties = ClassData->BaseClass->Properties;
+		for (ZESize I = 0; I < ClassData->BaseClass->Methods.GetCount(); I++)
+		{
+			ZEMCMethod* CloneMethod = new ZEMCMethod();
+			*CloneMethod = *ClassData->BaseClass->Methods[I];
+			ClassData->Methods.Add(CloneMethod);
+		}
+
+		for (ZESize I = 0; I < ClassData->BaseClass->Properties.GetCount(); I++)
+		{
+			ZEMCProperty* CloneProperty = new ZEMCProperty();
+			*CloneProperty = *ClassData->BaseClass->Properties[I];
+			ClassData->Properties.Add(CloneProperty);
+		}
 	}
 
-	ZEMCAttribute AttributeData;
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
+		ZEMCAttribute AttributeData;
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
 		ClassData->Attributes.Add(AttributeData);
 	}

@@ -38,7 +38,7 @@
 #define __ZE_MATH_MATRIX_H__
 
 #include "ZETypes.h"
-#include "ZEMeta\ZEBuiltIn.h"
+#include "ZEMeta\ZEMTFundamental.h"
 
 class ZEVector2;
 class ZEVector3;
@@ -79,7 +79,7 @@ class ZEMatrix3x3Shader
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix3x3
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 
 	public:
 		union
@@ -185,7 +185,7 @@ ZEMatrix3x3 operator*(float S, const ZEMatrix3x3& RightOperand);
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEMatrix4x4
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 
 	public:
 		union

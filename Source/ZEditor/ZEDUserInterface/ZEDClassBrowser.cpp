@@ -38,14 +38,109 @@
 #include "ui_ZEDClassBrowser.h"
 #include "ZEDCore\ZEDModule.h"
 
+#include <QMimeData>
+#include <QDrag>
+#include <qevent.h>
+#include "ZEDCore\ZEDObjectWrapper.h"
+#include "ZEDCore\ZEDSelectionManager.h"
+#include "ZEDCore\ZEDCreateOperation.h"
+
+void ZEDClassBrowser::UpdateUI()
+{
+	ZEClass* SelectedClass = GetClassTree()->GetSelectedClass();
+	if (SelectedClass == NULL)
+	{
+		Form->btnAdd->setVisible(false);
+		return;
+	}
+
+	if (SelectedClass->IsAbstract())
+	{
+		Form->btnAdd->setVisible(false);
+		return;
+	}
+
+	DestinationWrapper = NULL;
+	ZEDSelectionManager* SelectionManager = GetModule()->GetSelectionManager();
+	if (SelectionManager->GetSelection().GetCount() != 1)
+	{
+		if (SelectionManager->GetFocusedObject() != NULL)
+			DestinationWrapper = SelectionManager->GetFocusedObject();
+		else
+			DestinationWrapper = GetModule()->GetRootWrapper();
+	}
+	else
+	{
+		DestinationWrapper = SelectionManager->GetSelection()[0];
+	}
+
+	Form->btnAdd->setVisible(DestinationWrapper == NULL || !DestinationWrapper->CheckChildrenClass(SelectedClass));
+}
+
 bool ZEDClassBrowser::InitializeSelf()
 {
 	if (!ZEDComponent::InitializeSelf())
 		return false;
 
 	GetModule()->AddComponent(Form->trwClasses);
+	
+	UpdateUI();
 
 	return true;
+}
+
+void ZEDClassBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
+{
+	UpdateUI();
+}
+
+bool ZEDClassBrowser::eventFilter(QObject* Object, QEvent* Event)
+{
+	if (Object != Form->trwClasses->viewport())
+		return false;
+
+	if (Event->type() == QEvent::MouseButtonPress)
+	{
+		QMouseEvent* MouseEvent = static_cast<QMouseEvent*>(Event);
+		if ((MouseEvent->buttons() & Qt::LeftButton) == 0)
+			return false;
+
+		QTreeWidgetItem* Item = Form->trwClasses->itemAt(MouseEvent->pos());
+		if (Item == NULL)
+			return false;
+
+		DragClass = Form->trwClasses->GetSelectedClass();
+		if (DragClass == NULL)
+			return false;
+
+		DragStartPos = MouseEvent->pos();
+
+		return false;
+	}
+	else if (Event->type() == QEvent::MouseMove)
+	{
+		if (DragClass == NULL)
+			return false;
+
+		QMouseEvent* MouseEvent = static_cast<QMouseEvent*>(Event);
+
+		if ((MouseEvent->pos() - DragStartPos).manhattanLength() < QApplication::startDragDistance())
+			return false;
+
+		QMimeData* MimeData = new QMimeData;
+		MimeData->setData("application/vnd.zinek.zeclass", QByteArray((const char*)&DragClass, sizeof(DragClass)));
+
+		QDrag* Drag = new QDrag(this);
+		Drag->setMimeData(MimeData);
+
+		Qt::DropAction Action = Drag->exec();
+
+		DragClass = NULL;
+
+		return false;
+	}
+
+	return false;
 }
 
 void ZEDClassBrowser::txtSearch_textChanged(const QString& Text)
@@ -53,14 +148,15 @@ void ZEDClassBrowser::txtSearch_textChanged(const QString& Text)
 	Form->trwClasses->SetSearchPattern(Text);
 }
 
-void ZEDClassBrowser::cmbCategories_currentIndexChanged(const QString& text)
+void ZEDClassBrowser::trwClasses_itemSelectionChanged()
 {
-
+	UpdateUI();
 }
 
 void ZEDClassBrowser::btnAdd_clicked()
 {
-
+/*	ZEDCreateOperation* CreateOperation = ZEDCreateOperation::Create(DestinationWrapper, GetClassTree()->GetSelectedClass());
+	GetModule()->GetOperationManager()->DoOperation(CreateOperation);*/
 }
 
 ZEDClassTree* ZEDClassBrowser::GetClassTree()
@@ -73,9 +169,14 @@ ZEDClassBrowser::ZEDClassBrowser(QWidget* Parent) : QWidget(Parent)
 	Form = new Ui_ZEDClassBrowser();
 	Form->setupUi(this);
 
+	Form->trwClasses->viewport()->installEventFilter(this);
+	Form->trwClasses->setMouseTracking(true);
+
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
-	connect(Form->cmbCategories, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbCategories_currentIndexChanged(const QString&)));
+	connect(Form->trwClasses, SIGNAL(itemSelectionChanged()), this, SLOT(trwClasses_itemSelectionChanged()));
 	connect(Form->btnAdd, SIGNAL(clicked()), this, SLOT(btnAdd_clicked()));
+
+	DragClass = NULL;
 }
 
 ZEDClassBrowser::~ZEDClassBrowser()

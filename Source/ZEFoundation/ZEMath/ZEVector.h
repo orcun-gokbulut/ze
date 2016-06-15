@@ -38,13 +38,13 @@
 #define __ZE_MATH_VECTOR_H__
 
 #include <ZETypes.h>
-#include "ZEMeta/ZEBuiltIn.h"
+#include "ZEMeta/ZEMTFundamental.h"
 
 // ZEVector2
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector2
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 
 	public:
 		union
@@ -141,7 +141,7 @@ ZEVector2 operator*(float S, const ZEVector2& RightOperand);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector3
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 
 	public:
 		union
@@ -268,7 +268,7 @@ ZEVector3 operator*(float S, const ZEVector3& RightOperand);
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 class ZEVector4
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 
 	public:
 		union

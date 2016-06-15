@@ -281,7 +281,41 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (!ProcessMethodParameters(MethodData, MethodDecl))
 		return;
 
-	ClassData->Methods.Add(MethodData.Transfer());
+	ZEMCMethod* OverloadedMethod = NULL;
+	for (ZESize I = 0; I < ClassData->Methods.GetCount(); I++)
+	{
+		ZEMCMethod* CurrentMethod = ClassData->Methods[I];
+
+		if (CurrentMethod->Hash != MethodData->Hash && CurrentMethod->Name != MethodData->Name)
+			continue;
+
+		if (CurrentMethod->Parameters.GetCount() != MethodData->Parameters.GetCount())
+			continue;
+
+		if (CurrentMethod->Parameters.GetCount() != 0)
+		{
+			bool Found = true;
+			for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
+			{
+				if (CurrentMethod->Parameters[N].Type != MethodData->Parameters[N].Type)
+				{
+					Found = false;
+					break;
+				}
+			}
+
+			if (!Found)
+				continue;
+		}
+
+		OverloadedMethod = CurrentMethod;
+		break;
+	}
+
+	if (OverloadedMethod != NULL)
+		*OverloadedMethod = *MethodData.GetPointer();
+	else
+		ClassData->Methods.Add(MethodData.Transfer());
 }
 
 bool ZEMCParser::ProcessEvenParameters(ZEMCMethod* Method, CXXRecordDecl* EventTemplate)

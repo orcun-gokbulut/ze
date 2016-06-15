@@ -38,8 +38,6 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
-#include "ZEDEvent.h"
-
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZEVector.h"
@@ -48,38 +46,13 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEMeta/ZEEnumerator.h"
 
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
 class ZEDModule;
 class QWidget;
 class QMenu;
-
-enum ZEDObjectChangedEventType
-{
-	ZED_OCED_NONE,
-	ZED_OCET_ADDED,
-	ZED_OCET_REMOVED,
-	ZED_OCET_CHANGED
-};
-
-class ZEDObjectEvent : public ZEDEvent
-{
-	ZE_OBJECT
-	friend class ZEDObjectWrapper;
-	private:
-		ZEDObjectChangedEventType					Type;
-		ZEDObjectWrapper*							Wrapper;
-
-	public:	
-		void										SetType(ZEDObjectChangedEventType Type);
-		ZEDObjectChangedEventType					GetType() const;
-
-		void										SetWrapper(ZEDObjectWrapper* Wrapper);
-		ZEDObjectWrapper*							GetWrapper() const;
-
-													ZEDObjectEvent();
-};
 
 class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 {
@@ -158,6 +131,8 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 		virtual bool								RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
+		virtual bool								CheckChildrenClass(ZEClass* Class);
+
 		virtual QWidget*							GetCustomWidget() const;
 		virtual QMenu*								GetPopupMenu() const;
 
@@ -168,5 +143,6 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 
 		virtual void								Update();
 
+		virtual ZEDObjectWrapper*					Clone();
 		virtual void								Destroy();
 };
