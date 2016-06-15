@@ -37,6 +37,8 @@
 #ifndef __ZE_CLASS_H__
 #define __ZE_CLASS_H__
 
+#include "ZEMTDeclaration.h"
+
 #include "ZEAttribute.h"
 #include "ZEProperty.h"
 #include "ZEMethod.h"
@@ -45,16 +47,16 @@
 #include "ZEGUID.h"
 #include "ZEDS\ZEFlags.h"
 
-#define ZE_CLASS_DEFINITION(ClassName) \
+#define ZE_META_CLASS_DEFINITION(ClassName) \
 	class ClassName##Class : public ZEClass \
 	{ \
 		public: \
+			virtual const char*				GetName() const; \
+			virtual const ZEGUID&			GetGUID() const; \
+			virtual const ZEAttribute*		GetAttributes() const; \
+			virtual ZESize					GetAttributeCount() const; \
 			virtual ZEClass*				GetParentClass(); \
-			virtual const char*				GetName(); \
-			virtual ZEGUID					GetGUID(); \
 			virtual ZEClassFlags			GetFlags(); \
-			virtual const ZEAttribute*		GetAttributes(); \
-			virtual ZESize					GetAttributeCount(); \
 			virtual const ZEProperty*		GetProperties(); \
 			virtual ZESize					GetPropertyCount(); \
 			virtual const ZEMethod*			GetMethods(); \
@@ -93,7 +95,7 @@ class ZEMLWriterNode;
 
 typedef ZEUInt ZEClassFlags;
 #define ZE_CF_NONE						0
-#define ZE_CF_BUILTIN					1
+#define ZE_CF_FUNDAMENTAL				1
 #define ZE_CF_ABSTRACT					2
 #define ZE_CF_SCRIPT					4 
 #define ZE_CF_CREATE_INSTANCE			8 
@@ -112,20 +114,26 @@ struct ZEClassSortedData
 	const char*		Name;
 };
 
-class ZEClass
+class ZEClass : public ZEMTDeclaration
 {
 	protected:
 		static ZESSize					Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString& Name);
 
 	public:
+		virtual ZEMTDeclarationType		GetDeclarationType() const;
+		virtual const char*				GetName() const;
+		virtual const ZEGUID&			GetGUID() const;
+		virtual const ZEAttribute*		GetAttributes() const;
+		virtual ZESize					GetAttributeCount() const;
+
 		virtual ZEClass*				GetParentClass();
 
-		virtual const char*				GetName();
-		virtual ZEGUID					GetGUID();
 		virtual ZEClassFlags			GetFlags();
-
-		virtual const ZEAttribute*		GetAttributes();
-		virtual ZESize					GetAttributeCount();
+		bool							IsAbstract();
+		bool							IsFundamental();
+		bool							IsDynamic();
+		bool							IsValueObject();
+		bool							IsCloneable();
 
 		virtual const ZEProperty*		GetProperties();
 		virtual ZESize					GetPropertyCount();

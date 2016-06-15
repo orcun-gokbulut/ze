@@ -40,20 +40,29 @@
 
 class Ui_ZEDClassBrowser;
 class ZEDClassTree;
+class ZEDObjectWrapper;
 
 class ZEDClassBrowser : public QWidget, public ZEDComponent
 {
 	Q_OBJECT
 	private:
 		Ui_ZEDClassBrowser*					Form;
-	
+		
+		ZEClass*							DragClass;
+		QPoint								DragStartPos;
+
+		ZEDObjectWrapper*					DestinationWrapper;
+
 		virtual bool						InitializeSelf();
 
-		//virtual bool						eventFilter(QObject* Object, QEvent* Event);
+		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
+		virtual bool						eventFilter(QObject* Object, QEvent* Event);
+
+		void								UpdateUI();
 
 	private slots:
 		void								txtSearch_textChanged(const QString& Text);
-		void								cmbCategories_currentIndexChanged(const QString& Text);
+		void								trwClasses_itemSelectionChanged();
 		void								btnAdd_clicked();
 
 	public:

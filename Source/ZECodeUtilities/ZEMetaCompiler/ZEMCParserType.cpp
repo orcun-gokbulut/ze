@@ -127,7 +127,7 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 				return false;
 		}
 	}
-	else if (ClangType->isClassType()) // ZE Builtin Types
+	else if (ClangType->isClassType()) // ZE Fundamental Types
 	{
 		CXXRecordDecl* ClassDecl = ClangType->getAsCXXRecordDecl();
 		if (ClassDecl->getName() == "ZEString")
@@ -213,7 +213,7 @@ bool ZEMCParser::ProcessBaseType(ZEMCType& Output, const Type* ClangType)
 			if (Output.Class == NULL)
 				return false;
 
-			if (Output.Class->IsBuiltInClass)
+			if (Output.Class->IsFundamental)
 				return false;
 
 			if (!Output.Class->HasPublicCopyConstructor || !Output.Class->HasPublicDestructor || Output.Class->IsForwardDeclared)

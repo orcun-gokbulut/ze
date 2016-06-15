@@ -125,6 +125,11 @@ const ZEArray<ZEDObjectWrapper*>& ZEDSelectionManager::GetSelection()
 	return Selection;
 }
 
+ZEDObjectWrapper* ZEDSelectionManager::GetFocusedObject()
+{
+	return FocusedObject;
+}
+
 void ZEDSelectionManager::SelectObject(ZEDObjectWrapper* Object)
 {
 	if (Object == NULL)

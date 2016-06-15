@@ -40,7 +40,7 @@
 #include <string>
 #include "ZETypes.h"
 #include "ZEAllocator.h"
-#include "ZEMeta\ZEBuiltIn.h"
+#include "ZEMeta\ZEMTFundamental.h"
 
 class ZEString;
 
@@ -108,7 +108,7 @@ class ZECharacter
 
 class ZEString
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 	friend class ZEStringWriter;
 	private:
 		char*								Buffer;

@@ -189,6 +189,7 @@ class ZEMCDeclaration
 {
 	public:
 		ZEString Name;
+		ZEString MetaName;
 		ZEUInt32 Hash;
 		ZEArray<ZEMCAttribute> Attributes;
 
@@ -257,7 +258,6 @@ class ZEMCMethod : public ZEMCDeclaration
 		ZEMCClass* Class;
 
 		ZESize ID;
-		ZEString MemberOf;
 
 		bool IsVirtual;
 		bool IsPure;
@@ -287,7 +287,7 @@ class ZEMCClass : public ZEMCDeclaration
 		bool HasScriptBase;
 
 		bool IsAbstract;
-		bool IsBuiltInClass;
+		bool IsFundamental;
 
 		bool HasCreateInstanceMethod;
 		bool HasPublicCopyConstructor;

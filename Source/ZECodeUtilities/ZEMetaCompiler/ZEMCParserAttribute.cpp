@@ -93,7 +93,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 					State == ZE_PAS_PARAMETER_END;
 					AttributeIndex++;
 				}
-				else if (!isalnum(InputCharacter))
+				else if (!isalnum(InputCharacter) && InputCharacter != ':' && InputCharacter != '.')
 				{
 					RaiseError(Attribute->getLocation(), "Wrong identifier name.");
 					return false;

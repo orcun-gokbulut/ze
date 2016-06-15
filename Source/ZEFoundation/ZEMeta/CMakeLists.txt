@@ -35,8 +35,10 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZEBuiltIn.cpp						Sources Headers)
-ze_add_source(ZEBuiltIn.h						Sources)
+ze_add_source(ZEMTFundamental.cpp					Sources)
+ze_add_source(ZEMTFundamental.h					Sources Headers)
+ze_add_source(ZEMTDeclaration.cpp				Sources)
+ze_add_source(ZEMTDeclaration.h 				Sources Headers)
 ze_add_source(ZEClass.cpp						Sources)
 ze_add_source(ZEClass.h 						Sources Headers)
 ze_add_source(ZEClassOverloads.cpp				Sources)

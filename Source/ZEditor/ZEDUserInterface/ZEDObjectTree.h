@@ -57,7 +57,8 @@ class ZEDObjectTree : public QTreeWidget, public ZEDComponent
 	Q_OBJECT
 	private:
 		ZEDObjectWrapper*				RootWrapper;
-		
+		ZEDObjectTreeMode				Mode;
+
 		QRegExp							FilterSearch;
 		ZEArray<ZEClass*>				FilterIncludedClasses;
 		ZEArray<ZEClass*>				FilterExcludedClasses;
@@ -66,9 +67,11 @@ class ZEDObjectTree : public QTreeWidget, public ZEDComponent
 
 		bool							FilterWrapper(ZEDObjectWrapper* Wrapper);
 
+		bool							CheckWrapper(ZEDObjectWrapper* Wrapper);
+		void							AddWrapper(ZEDObjectWrapper* Wrapper);
+		void							RemoveWrapper(ZEDObjectWrapper* Wrapper);
+		
 		void							UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper);
-		void							UpdateWrapper(ZEDObjectWrapper* Wrapper);
-		void							UpdateWrapper(QTreeWidgetItem* TreeItem);
 
 		virtual bool					InitializeSelf();
 
@@ -81,6 +84,10 @@ class ZEDObjectTree : public QTreeWidget, public ZEDComponent
 	public:
 		void							SetRootWrapper(ZEDObjectWrapper* Wrapper);
 		ZEDObjectWrapper*				GetRootWrapper() const;
+
+		void							SetMode(ZEDObjectTreeMode Mode);
+		ZEDObjectTreeMode				GetMode() const;
+
 
 		ZEDObjectWrapper*				GetWrapper(QTreeWidgetItem* Item) const;
 		QTreeWidgetItem*				GetTreeItem(ZEDObjectWrapper* Wrapper) const;

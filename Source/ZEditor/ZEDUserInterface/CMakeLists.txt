@@ -81,8 +81,6 @@ ze_add_source(ZEDPropertyEditorItemEnumurator.cpp		Sources)
 ze_add_source(ZEDPropertyEditorItemEnumurator.h			Sources QtMocs)
 ze_add_source(ZEDPropertyEditorItemVector.cpp			Sources)
 ze_add_source(ZEDPropertyEditorItemVector.h				Sources QtMocs)
-ze_add_source(ZEDPropertyOperation.cpp					Sources)
-ze_add_source(ZEDPropertyOperation.h					Sources Header)
 
 qt5_wrap_cpp (QtMocFiles ${QtMocs})
 qt5_wrap_ui (QtUIFiles ${QtUI})

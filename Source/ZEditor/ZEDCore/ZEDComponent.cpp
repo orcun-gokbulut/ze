@@ -36,7 +36,7 @@
 #include "ZEDComponent.h"
 
 #include "ZEDModule.h"
-#include "ZEDObjectWrapper.h"
+#include "ZEDObjectEvent.h"
 #include "ZEDSelectionEvent.h"
 #include "ZEDViewportEvent.h"
 

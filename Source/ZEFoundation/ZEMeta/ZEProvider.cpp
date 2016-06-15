@@ -40,6 +40,35 @@
 #include "ZEML\ZEMLReader.h"
 #include "ZEObject.h"
 
+
+const ZEArray<ZEClass*>& ZEProvider::GetClasses()
+{
+	return Classes;
+}
+
+ZEArray<ZEClass*> ZEProvider::GetClasses(ZEClass* ParentClass)
+{
+	ZEArray<ZEClass*> DerivedClasses;
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
+	{
+		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
+			DerivedClasses.Add(Classes[I]);
+	}
+
+	return DerivedClasses;
+}
+
+ZEClass* ZEProvider::GetClass(const char* ClassName)
+{
+	for(ZESize I = 0; I < Classes.GetCount(); I++)
+	{
+		if(strcmp(Classes[I]->GetName(), ClassName) == 0)
+			return Classes[I];
+	}
+
+	return NULL;
+}
+
 bool ZEProvider::RegisterClass(ZEClass* Class)
 {
 	if (Class == NULL)
@@ -60,6 +89,22 @@ void ZEProvider::UnregisterClass(ZEClass* Class)
 	Classes.RemoveValue(Class);
 }
 
+const ZEArray<ZEEnumerator*>& ZEProvider::GetEnumerators()
+{
+	return Enumerators;
+}
+
+ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
+{
+	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
+	{
+		if(Enumerators[I]->GetName() == EnumeratorName)
+			return Enumerators[I];
+	}
+
+	return NULL;
+}
+
 bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
 {
 	if (Enumerator == NULL)
@@ -76,45 +121,6 @@ bool ZEProvider::RegisterEnumerator(ZEEnumerator* Enumerator)
 void ZEProvider::UnregisterEnumerator(ZEEnumerator* Enumerator)
 {
 	Enumerators.RemoveValue(Enumerator);
-}
-
-const ZEArray<ZEClass*>& ZEProvider::GetClasses()
-{
-	return Classes;
-}
-
-ZEClass* ZEProvider::GetClass(const char* ClassName)
-{
-	for(ZESize I = 0; I < Classes.GetCount(); I++)
-	{
-		if(strcmp(Classes[I]->GetName(), ClassName) == 0)
-			return Classes[I];
-	}
-
-	return NULL;
-}
-
-ZEArray<ZEClass*> ZEProvider::GetClass(ZEClass* ParentClass)
-{
-	ZEArray<ZEClass*> DerivedClasses;
-	for (ZESize I = 0; I < Classes.GetCount(); I++)
-	{
-		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
-			DerivedClasses.Add(Classes[I]);
-	}
-
-	return DerivedClasses;
-}
-
-ZEEnumerator* ZEProvider::GetEnumerator(const char* EnumeratorName)
-{
-	for(ZESize I = 0; I < Enumerators.GetCount(); I++)
-	{
-		if(Enumerators[I]->GetName() == EnumeratorName)
-			return Enumerators[I];
-	}
-
-	return NULL;
 }
 
 ZEObject* ZEProvider::CreateInstance(const char* ClassName)

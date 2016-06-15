@@ -57,8 +57,7 @@ void ZEDClassTree::UpdateAlphabeticList()
 	const ZEArray<ZEClass*>& Classes = ZEProvider::GetInstance()->GetClasses();
 	for (ZESize I = 0; I < Classes.GetCount(); I++)
 	{
-		bool Abstract = (Classes[I]->GetFlags() & ZE_CF_ABSTRACT) != 0;
-		if (ExcludeAbstract && Abstract)
+		if (ExcludeAbstract && Classes[I]->IsAbstract())
 			continue;
 
 		if (!Filter(Classes[I]))
@@ -67,7 +66,6 @@ void ZEDClassTree::UpdateAlphabeticList()
 		QTreeWidgetItem* Item = new QTreeWidgetItem();
 		Item->setText(0, Classes[I]->GetName());
 		Item->setExpanded(true);
-		Item->setDisabled(Abstract);	
 		Item->setData(0, Qt::UserRole, QVariant((unsigned long long)Classes[I]));
 	
 		addTopLevelItem(Item);
@@ -79,8 +77,7 @@ void ZEDClassTree::UpdateInheritanceTree(ZEClass* CurrentBaseClass, QTreeWidgetI
 	const ZEArray<ZEClass*>& Classes = ZEProvider::GetInstance()->GetClasses();
 	for (ZESize I = 0; I < Classes.GetCount(); I++)
 	{
-		bool Abstract = (Classes[I]->GetFlags() & ZE_CF_ABSTRACT) != 0;
-		if (ExcludeAbstract && Abstract)
+		if (ExcludeAbstract && Classes[I]->IsAbstract())
 			continue;
 
 		if (!Filter(Classes[I]))
@@ -92,13 +89,17 @@ void ZEDClassTree::UpdateInheritanceTree(ZEClass* CurrentBaseClass, QTreeWidgetI
 		QTreeWidgetItem* Item = new QTreeWidgetItem();
 		Item->setText(0, Classes[I]->GetName());
 		Item->setExpanded(true);
-		Item->setDisabled(Abstract);	
 		Item->setData(0, Qt::UserRole, QVariant((unsigned long long)Classes[I]));
 
 		if (ParentItem == NULL)
+		{
 			addTopLevelItem(Item);
+		}
 		else
+		{
 			ParentItem->addChild(Item);
+			ParentItem->setExpanded(true);
+		}
 
 		UpdateInheritanceTree(Classes[I], Item);
 	}

@@ -112,7 +112,7 @@ struct ZEMethod
 	ZEMethodParameter*	Parameters;
 	ZESize				ParameterCount;
 
-	ZEAttribute*	Attributes;
+	ZEAttribute*		Attributes;
 	ZESize				AttributeCount;
 };
 

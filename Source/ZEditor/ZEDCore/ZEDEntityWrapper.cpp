@@ -140,7 +140,7 @@ void ZEDEntityWrapper::DeinitializeSelf()
 	ConstantBuffer.Release();
 	VertexBuffer.Release();
 
-	ZEDObjectWrapper::Deinitialize();
+	ZEDObjectWrapper::DeinitializeSelf();
 }
 
 ZEDEntityWrapper::ZEDEntityWrapper()

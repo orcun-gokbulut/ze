@@ -48,7 +48,7 @@ bool ZEMCType::operator!=(const ZEMCType& Other) const
 
 bool ZEMCType::Equal(const ZEMCType& A, const ZEMCType& B)
 {
-	if (A.BaseType != B.BaseType && A.TypeQualifier != B.TypeQualifier)
+	if (A.BaseType != B.BaseType || A.TypeQualifier != B.TypeQualifier)
 		return false;
 
 	if (A.ContainerType != B.ContainerType)
@@ -203,25 +203,18 @@ ZEMCClass::ZEMCClass()
 	HasPublicAssignmentOperator = false;
 	HasPublicDestroyMethod = false;
 	IsAbstract = false;
-	IsBuiltInClass = false;
+	IsFundamental = false;
 	IsForwardDeclared = false;
 }
 
 ZEMCClass::~ZEMCClass()
 {
 	for (ZESize I = 0; I < Properties.GetCount(); I++)
-	{
-		if (Properties[I]->Class == this)
-			delete Properties[I];
-	}
-
+		delete Properties[I];
 	Properties.Clear();
 
 	for (ZESize I = 0; I < Methods.GetCount(); I++)
-	{
-		if (Methods[I]->Class == this)
-			delete Methods[I];
-	}
+		delete Methods[I];
 	Methods.Clear();
 }
 
@@ -232,20 +225,18 @@ ZEMCContext::ZEMCContext()
 
 ZEMCContext::~ZEMCContext()
 {
-	for (ZESSize I = (ZESSize)Classes.GetCount() - 1; I >= 0 ; I--)
+	for (ZESize I = 0; I < Classes.GetCount(); I++)
 		delete Classes[I];
-	
 	Classes.Clear();
 
 	for (ZESize I = 0; I < Enumerators.GetCount(); I++)
 		delete Enumerators[I];
-
 	Enumerators.Clear();
 
 	for (ZESize I = 0; I < ForwardDeclarations.GetCount(); I++)
 		delete ForwardDeclarations[I];
+	ForwardDeclarations.Clear();
 
 	TargetClasses.Clear();
 	TargetEnumerators.Clear();
-	ForwardDeclarations.Clear();
 }

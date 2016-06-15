@@ -37,6 +37,14 @@
 
 #include "ui_ZEDObjectBrowser.h"
 #include "ZEDCore\ZEDModule.h"
+#include "ZEDCore\ZEDObjectWrapper.h"
+
+#include <QEvent.h>
+#include <QDrag>
+#include <QMimeData>
+#include "ZEDCore\ZEDEntityWrapper.h"
+#include "QTreeWidget"
+#include "ZEDCore\ZEDDeleteOperation.h"
 
 bool ZEDObjectBrowser::InitializeSelf()
 {
@@ -48,14 +56,203 @@ bool ZEDObjectBrowser::InitializeSelf()
 	return true;
 }
 
+bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
+{
+	if (Object != Form->trwObjects->viewport())
+		return false;
+
+	if (Event->type() == QEvent::MouseButtonPress)
+	{
+		QMouseEvent* MouseEvent = static_cast<QMouseEvent*>(Event);
+		if ((MouseEvent->buttons() & Qt::LeftButton) == 0)
+			return false;
+
+		QTreeWidgetItem* Item = Form->trwObjects->itemAt(MouseEvent->pos());
+		if (Item == NULL)
+			return false;
+
+		DragWrapper = Form->trwObjects->GetWrapper(Item);
+		if (DragWrapper == NULL)
+			return false;
+
+		DragStartPos = MouseEvent->pos();
+
+		return false;
+	}
+	else if (Event->type() == QEvent::MouseMove)
+	{
+		if (DragWrapper == NULL)
+			return false;
+
+		QMouseEvent* MouseEvent = static_cast<QMouseEvent*>(Event);
+
+		if ((MouseEvent->pos() - DragStartPos).manhattanLength() < QApplication::startDragDistance())
+			return false;
+
+		QMimeData* MimeData = new QMimeData;
+		MimeData->setData("zinek/wrapper", QByteArray((const char*)&DragWrapper, sizeof(DragWrapper)));
+
+		QDrag* Drag = new QDrag(this);
+		Drag->setMimeData(MimeData);
+
+		Qt::DropAction Action = Drag->exec();
+
+		return false;
+	}
+	if (Event->type() == QEvent::DragEnter)
+	{
+		QDragEnterEvent* DragEvent = static_cast<QDragEnterEvent*>(Event);
+		
+		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper") || 
+			DragEvent->mimeData()->hasFormat("application/vnd.zinek.class") ||
+			DragEvent->mimeData()->hasFormat("application/vnd.zinek.asset"))
+		{
+			DragEvent->acceptProposedAction();
+			return true;
+		}
+
+		return false;
+	}
+	else if (Event->type() == QEvent::DragMove)
+	{
+		QDragMoveEvent* DragEvent = static_cast<QDragMoveEvent*>(Event);
+
+		QTreeWidgetItem* Item = Form->trwObjects->itemAt(DragEvent->pos());
+		if (Item == NULL)
+			return false;
+
+		ZEDObjectWrapper* TargetWrapper = Form->trwObjects->GetWrapper(Item);
+		if (TargetWrapper == NULL)
+			return false;
+
+		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper"))
+		{
+			ZEDObjectWrapper* Object = (ZEDObjectWrapper*)DragEvent->mimeData()->data("application/vnd.zinek.wrapper").data();
+			if (!TargetWrapper->CheckChildrenClass(Object->GetClass()))
+				return false;
+
+			DragEvent->acceptProposedAction();
+			return true;
+		}
+		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.class"))
+		{
+			ZEClass* Class = (ZEClass*)DragEvent->mimeData()->data("application/vnd.zinek.class").data();
+			
+			if (Class->IsAbstract())
+				return false;
+				
+			if (!TargetWrapper->CheckChildrenClass(Class))
+				return false;
+
+			DragEvent->acceptProposedAction();
+			return true;
+		}
+		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.assert"))
+		{
+			// Later
+			return false;
+		}
+	}
+	else if (Event->type() == QEvent::Drop)
+	{
+		QDropEvent* DropEvent = static_cast<QDropEvent*>(Event);
+
+		QTreeWidgetItem* TargetItem = Form->trwObjects->itemAt(DropEvent->pos());
+		if (TargetItem == NULL)
+			return false;
+
+		ZEDObjectWrapper* TargetWrapper = Form->trwObjects->GetWrapper(TargetItem);
+		if (TargetWrapper == NULL)
+			return false;
+
+		if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper"))
+		{
+			ZEDObjectWrapper* Object = (ZEDObjectWrapper*)DropEvent->mimeData()->data("application/vnd.zinek.wrapper").data();
+			
+			if (Object == TargetWrapper)
+				return false;
+
+			if (Object->GetParent() == TargetWrapper)
+				return false;
+
+			if (!TargetWrapper->CheckChildrenClass(Object->GetClass()))
+				return false;
+			
+			DropEvent->acceptProposedAction();
+
+			if (Object->GetParent() != NULL)
+				Object->GetParent()->RemoveChildWrapper(Object);
+
+			TargetWrapper->AddChildWrapper(Object);
+
+			return true;
+		}
+		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.class"))
+		{
+			ZEClass* Class = (ZEClass*)DropEvent->mimeData()->data("application/vnd.zinek.class").data();
+
+			if (Class->IsAbstract())
+				return false;
+
+			if (!TargetWrapper->CheckChildrenClass(Class))
+				return false;
+
+			DropEvent->acceptProposedAction();
+
+			ZEObject* Instance = Class->CreateInstance();
+			
+			ZEDObjectWrapper* Wrapper = ZEDEntityWrapper::CreateInstance();
+			Wrapper->SetObject(Instance);
+
+			TargetWrapper->AddChildWrapper(Wrapper);
+
+			return true;
+		}
+		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.asset"))
+		{
+			// Later
+			return false;
+		}
+
+		return false;
+	}
+
+	return false;
+}
+
+void ZEDObjectBrowser::trwObjects_itemSelectionChanged()
+{
+	bool RootSelected = false;
+	QList<QTreeWidgetItem*> Items = GetObjectTree()->selectedItems();
+	for (int I = 0; I < Items.count(); I++)
+	{
+		if (GetObjectTree()->GetWrapper(Items[I]) == GetObjectTree()->GetRootWrapper())
+			RootSelected = true;
+	}
+
+	Form->btnDelete->setEnabled(!RootSelected);
+}
+
 void ZEDObjectBrowser::txtSearch_textChanged(const QString& Text)
 {
+	if (Text.isEmpty())
+		Form->trwObjects->SetMode(ZED_OTM_TREE);
+	else
+		Form->trwObjects->SetMode(ZED_OTM_TREE);
 
+	Form->trwObjects->SetFilterPattern(Text);
+	Form->trwObjects->Update();
 }
 
 void ZEDObjectBrowser::btnDelete_clicked()
 {
+	ZEArray<ZEDObjectWrapper*> Wrappers;
+	QList<QTreeWidgetItem*> Items = GetObjectTree()->selectedItems();
+	for (int I = 0; I < Items.count(); I++)
+		Wrappers.Add(GetObjectTree()->GetWrapper(Items[I]));
 
+	ZEDDeleteOperation* Operation = ZEDDeleteOperation::Create(Wrappers);
+	GetModule()->GetOperationManager()->DoOperation(Operation);
 }
 
 ZEDObjectTree* ZEDObjectBrowser::GetObjectTree()
@@ -67,9 +264,13 @@ ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QWidget(Parent)
 {
 	Form = new Ui_ZEDObjectBrowser();
 	Form->setupUi(this);
+	
+	Form->trwObjects->setAcceptDrops(true);
+	Form->trwObjects->viewport()->installEventFilter(this);
 
-	connect(Form->txtSearch, SIGNAL(clicked()), this, SLOT(txtSearch_textChanged(const QString&)));
+	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
 	connect(Form->btnDelete, SIGNAL(clicked()), this, SLOT(btnDelete_clicked()));
+	connect(Form->trwObjects, SIGNAL(itemSelectionChanged()), this, SLOT(trwObjects_itemSelectionChanged()));
 }
 
 ZEDObjectBrowser::~ZEDObjectBrowser()

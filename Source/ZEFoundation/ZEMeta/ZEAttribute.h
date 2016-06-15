@@ -34,24 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_ATTRIBUTE_H__
-#define __ZE_ATTRIBUTE_H__
 
 #include "ZETypes.h"
 
+#include "ZEMacro/ZEMacro.h"
 #ifdef ZE_META_COMPILER
-	#define ZE_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
+	#define ZE_META_ATTRIBUTE(Args...) ZE_META_ATTRIBUTE_INTERNAL(#Args)
+	#define ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
 #else
-	#define ZE_ATTRIBUTE_INTERNAL(Value)
+	#define ZE_META_ATTRIBUTE(...)
 #endif
-
-#define ZE_ATTRIBUTE_0(Name) ZE_ATTRIBUTE_INTERNAL(#Name)
-#define ZE_ATTRIBUTE_1(Name, Parameter0) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0)
-#define ZE_ATTRIBUTE_2(Name, Parameter0, Parameter1) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1)
-#define ZE_ATTRIBUTE_3(Name, Parameter0, Parameter1, Parameter2) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2)
-#define ZE_ATTRIBUTE_4(Name, Parameter0, Parameter1, Parameter2, Parameter3) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3)
-#define ZE_ATTRIBUTE_5(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter3  "," #Parameter4)
-#define ZE_ATTRIBUTE_6(Name, Parameter0, Parameter1, Parameter2, Parameter3, Parameter4, Parameter5) ZE_ATTRIBUTE_INTERNAL(#Name "," #Parameter0 "," #Parameter1 "," #Parameter2 "," #Parameter4  "," #Parameter5)
 
 struct ZEAttribute
 {
@@ -59,5 +51,3 @@ struct ZEAttribute
 	const char**	Values;
 	ZESize			ValueCount;
 };
-
-#endif

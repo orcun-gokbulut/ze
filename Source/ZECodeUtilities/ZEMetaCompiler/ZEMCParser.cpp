@@ -94,9 +94,10 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 
 	ZEPointer<ZEMCEnumerator> Enumerator = new ZEMCEnumerator();
 	Enumerator->Name = EnumDeclaration->getNameAsString();
+	Enumerator->MetaName = Enumerator->Name + "Enumerator";
 
 	ParseAttributes(Enumerator, EnumDeclaration);
-	if (!CheckAttribute(Enumerator, "Enumerator"))
+	if (!CheckAttribute(Enumerator, "ZEMeta.Enumerator"))
 		return;
 
 	Enumerator->Hash = Enumerator->Name.Hash();

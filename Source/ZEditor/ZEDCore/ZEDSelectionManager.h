@@ -92,8 +92,11 @@ class ZEDSelectionManager : public ZEDComponent
 		void								SetSelectionFilter(ZEClass* Class);
 		ZEClass*							GetSelectionFilter();
 		
+
 		void								SetSelection(const ZEArray<ZEDObjectWrapper*>& Selection);
 		const ZEArray<ZEDObjectWrapper*>&	GetSelection();
+
+		ZEDObjectWrapper*					GetFocusedObject();
 
 		void								SelectObject(ZEDObjectWrapper* Object);
 		void								SelectObjects(const ZEArray<ZEDObjectWrapper*>& Objects);

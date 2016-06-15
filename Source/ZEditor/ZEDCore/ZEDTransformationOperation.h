@@ -64,7 +64,7 @@ class ZEDTransformationOperation : public ZEDOperation
 		virtual bool							Apply();
 		virtual bool							Revert();
 
-												ZEDTransformationOperation();										
+												ZEDTransformationOperation();
 	public:
 		static ZEDTransformationOperation*		Create(ZEDTransformType Type, const ZEArray<ZEDTransformationState>& State);
 };

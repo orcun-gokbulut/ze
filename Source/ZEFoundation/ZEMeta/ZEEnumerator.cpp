@@ -34,3 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEEnumerator.h"
+
+ZEMTDeclarationType ZEEnumerator::GetDeclarationType() const
+{
+	return ZEMT_DT_ENUMURATION;
+}

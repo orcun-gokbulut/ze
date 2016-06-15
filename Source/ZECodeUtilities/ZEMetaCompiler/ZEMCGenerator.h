@@ -73,10 +73,14 @@ class ZEMCGenerator
 		// Generic
 		void GenerateCastedObject(ZEMCClass* CurrentClass, const char* SourceName = "Object", const char* DestinationName = "CastedObject");
 
+		// Declaration
+		void GenerateDeclarationGetName(ZEMCDeclaration* Declaration);
+		void GenerateDeclarationGetGUID(ZEMCDeclaration* Declaration);
+		void GenerateDeclarationGetAttributes(ZEMCDeclaration* Declaration);
+		void GenerateDeclarationGetAttributeCount(ZEMCDeclaration* Declaration);
+
 		// Enumurator
 		void GenerateEnumeratorMacros(ZEMCEnumerator* Enumerator);
-		void GenerateEnumeratorGetName(ZEMCEnumerator* Enumerator);
-		void GenerateEnumeratorGetGUID(ZEMCEnumerator* Enumerator);
 		void GenerateEnumeratorGetItems(ZEMCEnumerator* Enumerator);
 		void GenerateEnumeratorGetItemCount(ZEMCEnumerator* Enumerator);
 		void GenerateEnumerator(ZEMCEnumerator* Enumerator);
@@ -86,11 +90,7 @@ class ZEMCGenerator
 		void GenerateClass(ZEMCClass* CurrentClass);
 		void GenerateClassForwardDeclarations(ZEMCClass* CurrentClass);
 		void GenerateClassGetParentClass(ZEMCClass* CurrentClass);
-		void GenerateClassGetName(ZEMCClass* CurrentClass);
-		void GenerateClassGetGUID(ZEMCClass* CurrentClass);
 		void GenerateClassGetFlags(ZEMCClass* CurrentClass);
-		void GenerateClassGetAttributes(ZEMCClass* CurrentClass);
-		void GenerateClassGetAttributeCount(ZEMCClass* CurrentClass);
 
 		// Properties
 		bool HasContainerProperty(ZEMCClass* CurrentClass);
