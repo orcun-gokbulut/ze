@@ -665,26 +665,28 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	if (SunLight != NULL)
 	{
-		TerrestrialSunAmbientColor *= SunLight->GetIntensity();
-
 		ZEQuaternion SunRotation;
 		ZEQuaternion::CreateFromDirection(SunRotation, -SunDirection);
 
 		SunLight->SetWorldRotation(SunRotation);
 		SunLight->SetVisible(SunVisible);
 		SunLight->SetTerrestrialColor(TerrestrialSunColor);
+		SunLight->SetTerrestrialIntensity(ZEMath::Exp(-Cloud->GetCloudDensity()) * SunLight->GetIntensity());
+
+		TerrestrialSunAmbientColor *= SunLight->GetIntensity();
 	}
 
 	if (MoonLight != NULL)
 	{
-		TerrestrialMoonAmbientColor *= MoonLight->GetIntensity();
-
 		ZEQuaternion MoonRotation;
 		ZEQuaternion::CreateFromDirection(MoonRotation, -MoonDirection);
 
 		MoonLight->SetWorldRotation(MoonRotation);
 		MoonLight->SetVisible(MoonVisible);
 		MoonLight->SetTerrestrialColor(TerrestrialMoonColor);
+		MoonLight->SetTerrestrialIntensity(ZEMath::Exp(-Cloud->GetCloudDensity()) * MoonLight->GetIntensity());
+
+		TerrestrialMoonAmbientColor *= MoonLight->GetIntensity();
 	}
 
 	ZEVector3 AmbientColor = ZEVector3(0.005f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
@@ -695,35 +697,35 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
 	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
-	Sun->SetColor(TerrestrialSunColor * 50.0f);
+	Sun->SetColor(TerrestrialSunColor * 20.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	Sun->SetVisible(SunVisible);
 
 	float MoonDiskRadiusDegree = ZEATAstronomy::GetMoonDiskRadius(Observer);
 	float MoonDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(MoonDiskRadiusDegree)) * HeightFromEarthCenter;
-	Moon->SetColor(TerrestrialMoonColor * 5.0f);
+	Moon->SetColor(TerrestrialMoonColor * 1.0f);
 	Moon->SetDirection(MoonDirection);
 	Moon->SetDiskRadius(MoonDiskRadiusFromObserver);
 	Moon->SetVisible(!SunVisible);
 
 	if (SunVisible)
 	{
-		float SunInscattering = 1.0f * (CosSunZenith * 0.5f + 0.5f);
+		float SunInscattering = (CosSunZenith * 0.5f + 0.5f);
 		
 		Cloud->SetLightDirection(-SunDirection);
 		Cloud->SetLightColor(TerrestrialSunColor * 10.0f);
-		Cloud->SetInscattering(SunInscattering);
+		Cloud->SetInscattering(SunInscattering * SunLight->GetTerrestrialIntensity());
 		Stars->SetBrightness(0.0f);
 		Fog->SetColor(ZEVector3(SunInscattering));
 	}
 	else
 	{
-		float MoonInscattering = 0.2f * (CosMoonZenith * 0.5f + 0.5f);
+		float MoonInscattering = (CosMoonZenith * 0.5f + 0.5f);
 
 		Cloud->SetLightDirection(-MoonDirection);
 		Cloud->SetLightColor(TerrestrialMoonColor * 1.0f);
-		Cloud->SetInscattering(MoonInscattering);
+		Cloud->SetInscattering(MoonInscattering * MoonLight->GetTerrestrialIntensity());
 		Stars->SetBrightness(0.5f);
 		Fog->SetColor(ZEVector3(MoonInscattering));
 	}

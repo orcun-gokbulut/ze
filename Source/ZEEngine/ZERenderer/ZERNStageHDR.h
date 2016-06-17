@@ -73,39 +73,34 @@ class ZERNStageHDR : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
-
-		ZEHolder<ZEGRTexture2D>				OutputTexture;
-
-		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexcoord;
-		ZEHolder<ZEGRShader>				CalculateLuminance_PixelShader;
-		ZEHolder<ZEGRShader>				CalculateAdaptedLuminance_PixelShader;
-		ZEHolder<ZEGRShader>				DownSampling_PixelShader;
-		ZEHolder<ZEGRShader>				CalculateBrightness_PixelShader;
-		ZEHolder<ZEGRShader>				ToneMapping_PixelShader;
-
-		ZEHolder<ZEGRRenderStateData>		CalculateLuminance_RenderState;
-		ZEHolder<ZEGRRenderStateData>		CalculateAdaptedLuminance_RenderState;
-		ZEHolder<ZEGRRenderStateData>		DownSampling_RenderState;
-		ZEHolder<ZEGRRenderStateData>		CalculateBrightness_RenderState;
-		ZEHolder<ZEGRRenderStateData>		ToneMapping_RenderState;
-	
 		ZERNFilter							Filter;
+		ZEGRViewport						Viewport;
 
-		ZEArray<ZEVector4>					HorizontalValues;
-		ZEArray<ZEVector4>					VerticalValues;
+		ZEHolder<ZEGRShader>				ScreenCoverPositionTexcoordVertexShader;
+		ZEHolder<ZEGRShader>				CalculateLuminancePixelShader;
+		ZEHolder<ZEGRShader>				CalculateAdaptedLuminancePixelShader;
+		ZEHolder<ZEGRShader>				CalculateBrightnessPixelShader;
+		ZEHolder<ZEGRShader>				ToneMappingPixelShader;
 
-		ZEHolder<ZEGRTexture2D>				BlurTextureTemp1;
-		ZEHolder<ZEGRTexture2D>				BlurTextureTemp2;
-		ZEHolder<ZEGRTexture2D>				BlurTextureFinal;
-		ZEHolder<ZEGRTexture2D>				BrightTexture;
-		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceMips;
-		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
-		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
+		ZEHolder<ZEGRRenderStateData>		CalculateLuminanceRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		CalculateAdaptedLuminanceRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		CalculateBrightnessRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		ToneMappingRenderStateData;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
+		ZEHolder<ZEGRTexture2D>				OutputTexture;
+		ZEHolder<ZEGRTexture2D>				BrightTexture;
+		ZEHolder<ZEGRTexture2D>				DownScaledTexture4x;
+		ZEHolder<ZEGRTexture2D>				DownScaledTexture8x;
+		ZEArray<ZEHolder<ZEGRTexture2D>>	LuminanceTextures;
+		ZEHolder<ZEGRTexture2D>				CurrentAdaptedLuminance;
+		ZEHolder<ZEGRTexture2D>				PreviousAdaptedLuminance;
+
 		ZERNHDRBlurTextureSize				BlurTextureSize;
-		ZEGRViewport						Viewport;
+
+		const ZEGRTexture2D*				InputTexture;
+		const ZEGRRenderTarget*				OutputRenderTarget;
 
 		struct
 		{	
@@ -125,8 +120,8 @@ class ZERNStageHDR : public ZERNStage
 			float							Reserved2;
 		} Constants;
 
-		const ZEGRTexture2D*				InputTexture;
-		const ZEGRRenderTarget*				OutputRenderTarget;
+		virtual bool						InitializeSelf();
+		virtual void						DeinitializeSelf();
 
 		bool								UpdateInputOutput();
 		bool								UpdateTextures();
@@ -135,18 +130,10 @@ class ZERNStageHDR : public ZERNStage
 		bool								UpdateConstantBuffer();
 		bool								Update();
 
-		void								CalculateLuminance(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
-		void								DownSample(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
-		void								GenerateMipMaps(ZEGRContext* Context);
+		void								CalculateAverageLuminance(ZEGRContext* Context);
 		void								CalculateAdaptedLuminance(ZEGRContext* Context);
-		void								CalculateBrightness(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
-		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
-		void								ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* Input, const ZEGRRenderTarget* Output);
-
-		bool								SetupInputOutput(ZERNRenderer* Renderer);
-
-		virtual bool						InitializeSelf();						
-		virtual void						DeinitializeSelf();
+		const ZEGRTexture2D*				CalculateBloom(ZEGRContext* Context);
+		void								ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* BloomTexture);
 
 	public:
 		virtual ZEInt						GetId() const;

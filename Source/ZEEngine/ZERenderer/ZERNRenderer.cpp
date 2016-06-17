@@ -273,6 +273,7 @@ bool ZERNRenderer::InitializeSelf()
 void ZERNRenderer::DeinitializeSelf()
 {
 	CleanCommands();
+	CleanStages();
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();

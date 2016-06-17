@@ -113,7 +113,6 @@ SamplerState		ZERNFixedMaterial_EnvironmentMapSampler		: register(s1);
 SamplerState		ZERNFixedMaterial_DetailBaseSampler			: register(s2);
 SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 
-
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -378,7 +377,7 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 	
 	#ifdef ZERN_FM_DEFERRED
 		ZERNGBuffer GBuffer = (ZERNGBuffer)0;
-		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient);
+		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient + Surface.Emissive);
 		ZERNGBuffer_SetViewNormal(GBuffer, Surface.NormalView);
 		ZERNGBuffer_SetSpecularColor(GBuffer, Surface.Specular);
 		ZERNGBuffer_SetDiffuseColor(GBuffer, Surface.Diffuse);
