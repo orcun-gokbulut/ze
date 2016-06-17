@@ -101,7 +101,7 @@ struct ZERNShading_DirectionalLight
 };
 
 struct ZERNShading_Surface				
-{				
+{
 	float3										PositionView;
 	float										Reserved0;
 	float3										NormalView;
@@ -183,7 +183,7 @@ bool ZERNShading_InsideLightVolume(float4x4 VolumeProjectionTransform, float3 Po
 }
 
 float3 ZERNShading_Diffuse_Lambert(float3 LightDirectionView, ZERNShading_Surface Surface)
-{	
+{
 	return (1.0f - Surface.SubsurfaceScattering) * Surface.Diffuse;
 }
 

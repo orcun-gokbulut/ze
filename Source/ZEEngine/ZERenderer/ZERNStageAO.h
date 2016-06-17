@@ -41,17 +41,16 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEPointer/ZESharedPointer.h"
 #include "ZEGraphics/ZEGRViewport.h"
+#include "ZERNFilter.h"
 
-class ZEGRTexture2D;
-class ZEGRRenderTarget;
-class ZEGRRenderStateData;
 class ZEGRShader;
 class ZEGRSampler;
-class ZEGRContext;
+class ZEGRTexture2D;
+class ZEGRRenderTarget;
 class ZEGRConstantBuffer;
-class ZERNRenderer;
+class ZEGRRenderStateData;
+class ZEGRDepthStencilBuffer;
 
 ZE_ENUM(ZERNSSAOSampleCount)
 {
@@ -65,59 +64,58 @@ class ZERNStageAO : public ZERNStage
 	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
+		ZERNFilter							Filter;
 
-		const ZEGRTexture2D*				InputDepth;
-		const ZEGRTexture2D*				InputNormal;
+		ZEHolder<ZEGRShader>				ScreenCoverPositionTexCoordVertexShader;
+		ZEHolder<ZEGRShader>				ResolveAndScalePixelShader;
+		ZEHolder<ZEGRShader>				SSAOPixelShader;
+		ZEHolder<ZEGRShader>				CrossBilateralBlurXPixelShader;
+		ZEHolder<ZEGRShader>				CrossBilateralBlurYPixelShader;
+		ZEHolder<ZEGRShader>				BlendPixelShader;
+
+		ZEHolder<ZEGRRenderStateData>		ResolveAndScaleRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		SSAORenderStateData;
+		ZEHolder<ZEGRRenderStateData>		CrossBilateralBlurXRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		CrossBilateralBlurYRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
+
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
 		ZEHolder<ZEGRTexture2D>				OcclusionMap;
-		ZEHolder<ZEGRTexture2D>				BlurTexture;
+		ZEHolder<ZEGRTexture2D>				BlurTempTexture;
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
-
-		ZEHolder<ZEGRConstantBuffer>		SSAOConstantBuffer;
-		ZEHolder<ZEGRConstantBuffer>		FilterConstantBuffer;
-
-		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPosition;
-		ZEHolder<ZEGRShader>				ScreenCoverVertexShaderPositionTexCoord;
-
-		ZEHolder<ZEGRShader>				SSAOPixelShader;
-		ZEHolder<ZEGRShader>				FilterPixelShader;
-
-		ZEHolder<ZEGRRenderStateData>		SSAORenderStateData;
-		ZEHolder<ZEGRRenderStateData>		FilterRenderStateData;
-
-		ZEHolder<ZEGRSampler>				SamplerPointWrap;
-		ZEHolder<ZEGRSampler>				SamplerPointClamp;
-
-		ZEArray<ZEVector4>					HorizontalValues;
-		ZEArray<ZEVector4>					VerticalValues;
+		ZEHolder<ZEGRTexture2D>				ResolvedScaledDepthTexture;
 
 		ZEGRViewport						Viewport;
 
-		ZEUInt								Width;
-		ZEUInt								Height;
-
 		ZERNSSAOSampleCount					SampleCount;
 
-		struct SSAOConstants
+		const ZEGRTexture2D*				DepthTexture;
+		const ZEGRTexture2D*				NormalTexture;
+		const ZEGRTexture2D*				AccumulationTexture;
+
+		struct
 		{
 			ZEVector4						SphereSamples[32];
 			ZEUInt							SampleCount;
-			ZEVector3						Reserved;
 			float							OcclusionRadius;
-			float							MinDepthBias;
+			float							NormalBias;
 			float							Intensity;
-			float							DownScale;
-		} Constants;
 
-		struct SSAOFilterConstants
-		{
-			ZEVector4						KernelValues[32];
-			ZEUInt							KernelSize;
-			ZEVector3						Reserved;
-		} FilterConstants;
+			ZEVector2						WidthHeight;
+			ZEVector2						InvWidthHeight;
+
+			ZEUInt							KernelRadius;
+			float							BlurSharpness;
+			float							DistanceThreshold;
+			float							Reserved;
+		} Constants;
 
 		void								CreateRandomVectors();
 		void								CreateSphereSamples();
+
+		virtual bool						InitializeSelf();	
+		virtual void						DeinitializeSelf();
 
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();
@@ -126,35 +124,29 @@ class ZERNStageAO : public ZERNStage
 		bool								UpdateTextures();
 		bool								Update();
 
-		void								GenerateOcclusionMap(ZEGRContext* Context);
-		void								ApplyBlur(ZEGRContext* Context);
-
-		virtual bool						InitializeSelf();						
-		virtual void						DeinitializeSelf();
+		void								ResolveAndScaleDepth(ZEGRContext* Context);
+		void								GenerateOcclusionMap(ZEGRContext* Context, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								BlendWithAccumulation(ZEGRContext* Context, const ZEGRTexture2D* InputTexture);
 
 	public:
 		virtual ZEInt						GetId() const;
 		virtual const ZEString&				GetName() const;
 
-		const ZEGRTexture2D*				GetOcclusionMap() const;
+		void								SetSampleCount(ZERNSSAOSampleCount SampleCount);
+		ZERNSSAOSampleCount					GetSampleCount() const;
 
 		void								SetOcclusionRadius(float Radius);
 		float								GetOcclusionRadius() const;
 
-		void								SetMinDepthBias(float MinDepthBias);
-		float								GetMinDepthBias() const;
+		void								SetNormalBias(float NormalBias);
+		float								GetNormalBias() const;
 
 		void								SetIntensity(float Intensity);
 		float								GetIntensity() const;
 
-		void								SetOcclusionMapDownScale(float DownScale);
-		float								GetOcclusionMapDownScale() const;
-
-		void								SetSampleCount(ZERNSSAOSampleCount SampleCount);
-		ZERNSSAOSampleCount					GetSampleCount() const;
-
-		void								SetFilterKernelValues(const ZEVector4* Values, ZESize KernelSize);
-		const ZEVector4* 					GetFilterKernelValues() const;
+		void								SetDistanceThreshold(float DistanceThreshold);
+		float								GetDistanceThreshold() const;
 
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 

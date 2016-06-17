@@ -116,7 +116,7 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 	if (ClippingPlanesEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
 
-	if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+	if (TransparencyEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_FORWARD"));
 	else
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEFERRED"));
@@ -173,7 +173,7 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 		return true;
 
 	ZEGRRenderState RenderState;
-	if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+	if (TransparencyEnabled)
 		RenderState = ZERNStageForwardTransparent::GetRenderState();
 	else
 		RenderState = ZERNStageGBuffer::GetRenderState();
@@ -184,6 +184,14 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 		RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
 	else
 		RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
+
+	if (AlphaCullEnabled && !TransparencyEnabled)
+	{
+		ZEGRBlendState BlendStateAlphaToCoverage;
+		BlendStateAlphaToCoverage.SetAlphaToCoverageEnable(true);
+
+		RenderState.SetBlendState(BlendStateAlphaToCoverage);
+	}
 
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());

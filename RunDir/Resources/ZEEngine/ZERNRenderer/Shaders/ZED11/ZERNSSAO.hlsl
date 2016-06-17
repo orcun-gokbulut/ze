@@ -39,104 +39,125 @@
 #include "ZERNScreenCover.hlsl"
 #include "ZERNTransformations.hlsl"
 #include "ZERNGBuffer.hlsl"
-
-Texture2D<float3>	ZERNSSAO_RandomVectorsTexture	: register(t5);
-Texture2D<float3>	ZERNSSAO_OcclusionTexture		: register(t6);
+#include "ZERNSamplers.hlsl"
 
 cbuffer ZERNSSAO_Constants							: register(b8)
 {
 	float4			ZERNSSAO_SphereSamples[32];
 	uint			ZERNSSAO_SampleCount;
-	float3			ZERNSSAO_Reserved0;
 	float			ZERNSSAO_OcclusionRadius;
-	float			ZERNSSAO_MinDepthBias;
+	float			ZERNSSAO_NormalBias;
 	float			ZERNSSAO_Intensity;
-	float			ZERNSSAO_DownScale;
-};
-
-cbuffer ZERNSSAO_FilterConstants					: register(b9)
-{
-	float4			ZERNSSAO_KernelValues[32];
-	uint			ZERNSSAO_KernelSize;
-	float3			ZERNSSAO_Reserved1;
-};
-
-SamplerState 		ZERNSSAO_SamplerPointWrap		: register(s0);
-SamplerState 		ZERNSSAO_SamplerPointClamp		: register(s1);
-
-float3 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
-{	
-	float2 OutputDimensions = ZERNGBuffer_GetDimensions() / ZERNSSAO_DownScale;
-	float2 TexCoord = ZERNTransformations_ViewportToTexelCenter(PositionViewport.xy, OutputDimensions);
-	float3 PositionView = ZERNTransformations_TexelToView(TexCoord, ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, TexCoord));
 	
-	if(PositionView.z < 100.0f)
-	{
-		float3 RandomVector = ZERNSSAO_RandomVectorsTexture.Sample(ZERNSSAO_SamplerPointWrap, 4.0f * TexCoord) * 2.0f - 1.0f;
-		RandomVector = normalize(RandomVector);
-		
-		float3 NormalView = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, TexCoord);
-		float3 NormalBiasedPositionView = PositionView + NormalView * ZERNSSAO_MinDepthBias;
-		
-		float TotalOcclusion = 0.0f;
-		for(uint I = 0; I < ZERNSSAO_SampleCount; I++)
-		{
-			float3 SampleOffsetVector = reflect(ZERNSSAO_SphereSamples[I].xyz, RandomVector);
-			float Flip = sign(dot(SampleOffsetVector, NormalView));
-			
-			float3 SamplePositionView = PositionView + Flip * SampleOffsetVector * ZERNSSAO_OcclusionRadius;
-			float2 SamplePositionTexelCenter = ZERNTransformations_ViewToTexelCenter(SamplePositionView, OutputDimensions);
-			
-			float OccluderDepthHomogeneous = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, SamplePositionTexelCenter);
-			float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(OccluderDepthHomogeneous);
-			float3 OccluderPositionView = SamplePositionView * (OccluderDepthView / SamplePositionView.z);
-			
-			float Angle = max(0.0f, dot(NormalView, normalize(OccluderPositionView - NormalBiasedPositionView)));
-			
-			float DistanceEuclidian = length(OccluderPositionView - NormalBiasedPositionView);
-			TotalOcclusion += Angle * saturate((ZERNSSAO_OcclusionRadius - DistanceEuclidian) / ZERNSSAO_OcclusionRadius);
-		}
-		
-		TotalOcclusion /= ZERNSSAO_SampleCount;
-		
-		float Accessilibity = saturate(1.0f - TotalOcclusion);
-		
-		return saturate(pow(Accessilibity, ZERNSSAO_Intensity));
-	}
-	else
-	{
-		return (float3)1.0f;
-	}
+	float2			ZERNSSAO_WidthHeight;
+	float2			ZERNSSAO_InvWidthHeight;
+	
+	uint			ZERNSSAO_KernelRadius;
+	float			ZERNSSAO_BlurSharpness;
+	float			ZERNSSAO_DistanceThreshold;
+	float			ZERNSSAO_Reserved;
+};
+
+Texture2D<float2>	ZERNSSAO_InputTexture			: register(t5);
+Texture2D<float3>	ZERNSSAO_RandomVectorsTexture	: register(t6);
+Texture2D<float>	ZERNSSAO_DepthTexture			: register(t7);
+
+float ZERNSSAO_GetCrossBilateralWeight(float SampleOffset, float SampleDepth, float CenterDepth)
+{
+    const float BlurSigma = (float)ZERNSSAO_KernelRadius * 0.5f;
+    const float BlurFalloff = 1.0f / (2.0f * BlurSigma * BlurSigma);
+
+    float DeltaZ = (SampleDepth - CenterDepth) * ZERNSSAO_BlurSharpness;
+
+    return exp2(-SampleOffset * SampleOffset * BlurFalloff - DeltaZ * DeltaZ);
 }
 
-float3 ZERNSSAO_Filter_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+float2 ZERNSSAO_ApplyCrossBilateralBlur(float2 TexCoord, float2 TexelOffset)
 {
-	float2 TextureSize;
-	ZERNSSAO_OcclusionTexture.GetDimensions(TextureSize.x, TextureSize.y);
-	float2 TexelOffset = 1.0f / TextureSize;
-	float2 TexCoord = PositionViewport.xy * TexelOffset;
+	float2 AO_Z = ZERNSSAO_InputTexture.SampleLevel(ZERNSampler_PointClamp, TexCoord, 0.0f).xy;
+	float TotalAO = AO_Z.x;
+	float CenterDepth = AO_Z.y;
+	float TotalWeight = 1.0f;
 	
-	float Depth = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, TexCoord);
-	float3 Normal = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, TexCoord);
-	
-	float3 ResultColor = 0.0f;
-	float TotalWeight = 0.0f;
-	for(uint I = 0; I < ZERNSSAO_KernelSize; I++)
+	for (uint I = 1; I <= ZERNSSAO_KernelRadius; I++)
 	{
-		float2 NeighborTexCoord = TexCoord + ZERNSSAO_KernelValues[I].xy * TexelOffset;
+		float2 SampleTexCoord = TexCoord - I * TexelOffset;
+		float2 SampleAO_Z = ZERNSSAO_InputTexture.SampleLevel(ZERNSampler_PointClamp, SampleTexCoord, 0.0f).xy;
 		
-		float SampleDepth = ZERNGBuffer_GetDepth(ZERNSSAO_SamplerPointClamp, NeighborTexCoord);
-		float3 SampleNormal = ZERNGBuffer_GetViewNormal(ZERNSSAO_SamplerPointClamp, NeighborTexCoord);
-		
-		if(abs(Depth - SampleDepth) <= 0.2f && dot(Normal, SampleNormal) >= 0.8f)
-		{
-			float3 SampleColor = ZERNSSAO_OcclusionTexture.SampleLevel(ZERNSSAO_SamplerPointClamp, NeighborTexCoord, 0);
-			ResultColor += SampleColor * ZERNSSAO_KernelValues[I].w;
-			TotalWeight += ZERNSSAO_KernelValues[I].w;
-		}
+		float Weight = ZERNSSAO_GetCrossBilateralWeight(I, SampleAO_Z.y, CenterDepth);
+		TotalAO += SampleAO_Z.x * Weight;
+		TotalWeight += Weight;
 	}
 	
-	return saturate(ResultColor) / TotalWeight;
+	for (uint J = 1; J <= ZERNSSAO_KernelRadius; J++)
+	{
+		float2 SampleTexCoord = TexCoord + J * TexelOffset;
+		float2 SampleAO_Z = ZERNSSAO_InputTexture.SampleLevel(ZERNSampler_PointClamp, SampleTexCoord, 0.0f).xy;
+		
+		float Weight = ZERNSSAO_GetCrossBilateralWeight(J, SampleAO_Z.y, CenterDepth);
+		TotalAO += SampleAO_Z.x * Weight;
+		TotalWeight += Weight;
+	}
+	
+	return float2(TotalAO / TotalWeight, CenterDepth);
+}
+
+float2 ZERNSSAO_PixelShader_Main(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
+{
+	float3 PositionView = ZERNTransformations_TexelToView(TexCoord, ZERNSSAO_DepthTexture[PositionViewport.xy]);
+	float3 NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy);
+	float3 NormalBiasedPositionView = PositionView + NormalView * ZERNSSAO_NormalBias;
+	float3 RandomVector = ZERNSSAO_RandomVectorsTexture.Sample(ZERNSampler_PointWrap, PositionViewport.xy / 4.0f);
+	
+	float TotalOcclusion = 0.0f;
+	for (uint I = 0; I < ZERNSSAO_SampleCount; I++)
+	{
+		float3 RandomOrientedSampleVector = reflect(ZERNSSAO_SphereSamples[I].xyz, RandomVector);
+		float Flip = sign(dot(RandomOrientedSampleVector, NormalView));
+		
+		float3 SamplePositionView = PositionView + Flip * RandomOrientedSampleVector * ZERNSSAO_OcclusionRadius;
+		float2 SamplePositionViewport = ZERNTransformations_ViewToViewport(SamplePositionView, ZERNSSAO_WidthHeight);
+		
+		float OccluderDepthView = ZERNTransformations_HomogeneousToViewDepth(ZERNSSAO_DepthTexture[SamplePositionViewport]);
+		float3 OccluderPositionView = SamplePositionView * (OccluderDepthView / SamplePositionView.z);
+		
+		float3 VectorToOccluder = OccluderPositionView - NormalBiasedPositionView;
+		float DistanceToOccluder = length(VectorToOccluder);
+		float Angle = max(0.0f, dot(NormalView, (VectorToOccluder / DistanceToOccluder)));
+		TotalOcclusion += Angle * saturate((ZERNSSAO_OcclusionRadius - DistanceToOccluder) / ZERNSSAO_OcclusionRadius);
+	}
+	
+	TotalOcclusion /= ZERNSSAO_SampleCount;
+	
+	return float2(pow(abs(1.0f - TotalOcclusion), ZERNSSAO_Intensity), PositionView.z);
+}
+
+float2 ZERNSSAO_CrossBilateralBlurX_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
+{
+	return ZERNSSAO_ApplyCrossBilateralBlur(TexCoord, float2(ZERNSSAO_InvWidthHeight.x, 0.0f));
+}
+
+float2 ZERNSSAO_CrossBilateralBlurY_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
+{
+	return ZERNSSAO_ApplyCrossBilateralBlur(TexCoord, float2(0.0f, ZERNSSAO_InvWidthHeight.y));
+}
+
+float ZERNSSAO_ResolveAndScale_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Depth
+{
+	float DepthHomogeneous = ZERNGBuffer_GetDepth(PositionViewport.xy, 0);
+	[unroll]
+	for (uint S = 1; S < SAMPLE_COUNT; S++)
+		DepthHomogeneous = min(DepthHomogeneous, ZERNGBuffer_GetDepth(PositionViewport.xy, S));
+	
+	float DepthView = ZERNTransformations_HomogeneousToViewDepth(DepthHomogeneous);
+	float Mask = (DepthView < ZERNSSAO_DistanceThreshold);
+	
+	return DepthHomogeneous * Mask;
+}
+
+float3 ZERNSSAO_Blend_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
+{
+	return ZERNSSAO_InputTexture.Sample(ZERNSampler_LinearClamp, TexCoord).rrr;
 }
 
 #endif

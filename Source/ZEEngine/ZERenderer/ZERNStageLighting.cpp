@@ -121,7 +121,6 @@ bool ZERNStageLighting::UpdateRenderState()
 		return true;
 
 	ZEGRRenderState GraphicsRenderState;
-	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
 	ZEGRBlendState BlendStateAdditive;
 	BlendStateAdditive.SetBlendEnable(true);
@@ -197,7 +196,6 @@ bool ZERNStageLighting::UpdateRenderState()
 
 	GraphicsRenderState.SetBlendState(BlendStateAdditive);
 	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLess);
-	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
 	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, AccumulateEmissivePixelShader);
 
@@ -206,15 +204,15 @@ bool ZERNStageLighting::UpdateRenderState()
 
 	GraphicsRenderState = ZEGRRenderState();
 
-	ZEGRDepthStencilState GenerateStencilState;
-	GenerateStencilState.SetDepthTestEnable(false);
-	GenerateStencilState.SetDepthWriteEnable(false);
-	GenerateStencilState.SetStencilTestEnable(true);
-	GenerateStencilState.SetFrontStencilPass(ZEGR_SO_REPLACE);
-	GenerateStencilState.SetBackStencilPass(ZEGR_SO_REPLACE);
+	ZEGRDepthStencilState DepthStencilStateTestNoWriteLessWriteStencil;
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthWriteEnable(false);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthFunction(ZEGR_CF_LESS);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetStencilTestEnable(true);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetFrontStencilPass(ZEGR_SO_REPLACE);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetBackStencilPass(ZEGR_SO_REPLACE);
 
-	GraphicsRenderState.SetDepthStencilState(GenerateStencilState);
-	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
+	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessWriteStencil);
 	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
 	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, EdgeDetectionPixelShader);
 
@@ -359,7 +357,7 @@ bool ZERNStageLighting::UpdateLightBuffers()
 				DestLight.CastShadow = static_cast<ZEBool32>(DirectionalLight->GetCastsShadow() & ShadowingEnabled);
 
 				if (DirectionalLight->GetUseSunLight() || DirectionalLight->GetUseMoonLight())
-					DestLight.Color = DirectionalLight->GetTerrestrialColor() * DirectionalLight->GetIntensity();
+					DestLight.Color = DirectionalLight->GetTerrestrialColor() * DirectionalLight->GetTerrestrialIntensity();
 				else
 					DestLight.Color = DirectionalLight->GetColor() * DirectionalLight->GetIntensity();
 
@@ -623,7 +621,7 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 13, 2, StructuredBuffers);
 	Context->SetStructuredBuffers(ZEGR_ST_COMPUTE, 13, 2, StructuredBuffers);
 
-	const ZEGRTexture* GBuffers[] = {GetPrevOutput(ZERN_SO_GBUFFER_EMISSIVE), GetPrevOutput(ZERN_SO_GBUFFER_DIFFUSE), GetPrevOutput(ZERN_SO_NORMAL), DepthTexture, };
+	const ZEGRTexture* GBuffers[] = {GetPrevOutput(ZERN_SO_GBUFFER_EMISSIVE), GetPrevOutput(ZERN_SO_GBUFFER_DIFFUSE), GetPrevOutput(ZERN_SO_NORMAL), DepthTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 1, 4, GBuffers);
 	const ZEGRTexture* ShadowRelatedTextures[] = {DirectionalLightShadowMaps[0], RandomVectorsTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 11, 2, ShadowRelatedTextures);
@@ -666,9 +664,6 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 				Context->SetStencilRef(1);
 				DrawLights(Context, true);
 			}
-
-			Context->SetRenderState(AccumulateEmissiveRenderState);
-			Context->Draw(3, 0);
 		}
 	}
 
