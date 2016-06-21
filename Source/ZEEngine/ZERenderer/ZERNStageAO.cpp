@@ -75,7 +75,6 @@ void ZERNStageAO::CreateRandomVectors()
 	const ZEUInt RandomVectorSize = 4;
 	ZEUInt Size = RandomVectorSize * RandomVectorSize;
 
-	ZEArray<ZEVector4> RandomVectors;
 	RandomVectors.SetCount(Size);
 
 	for (ZEUInt I = 0; I < Size; I++)
@@ -117,26 +116,49 @@ bool ZERNStageAO::UpdateShaders()
 	Options.Type = ZEGR_ST_VERTEX;
 	Options.EntryPoint = "ZERNScreenCover_VertexShader_PositionTexcoords";
 	ScreenCoverPositionTexCoordVertexShader = ZEGRShader::Compile(Options);
+	zeCheckError(ScreenCoverPositionTexCoordVertexShader == NULL, false, "Can not set vertex shader");
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNSSAO_ResolveAndScale_PixelShader";
-	ResolveAndScalePixelShader = ZEGRShader::Compile(Options);
+	Options.EntryPoint = "ZERNSSAO_ResolveDepth_PixelShader";
+	ResolveAndClampDepthPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(ResolveAndClampDepthPixelShader == NULL, false, "Can not set pixel shader");
 
 	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNSSAO_PixelShader_Main";
+	Options.EntryPoint = "ZERNSSAO_SSAO_PixelShader_Main";
 	SSAOPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(SSAOPixelShader == NULL, false, "Can not set pixel shader");
+
+	Options.Definitions.Add(ZEGRShaderDefinition("DEINTERLEAVED"));
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSSAO_ResolveDepth_PixelShader";
+	ResolveAndLinearizeDepthPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(ResolveAndLinearizeDepthPixelShader == NULL, false, "Can not set pixel shader");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSSAO_DeinterleaveDepth_PixelShader";
+	DeinterleaveDepthPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(DeinterleaveDepthPixelShader == NULL, false, "Can not set pixel shader");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSSAO_SSAO_PixelShader_Main";
+	DeinterleaveSSAOPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(DeinterleaveSSAOPixelShader == NULL, false, "Can not set pixel shader");
+
+	Options.Type = ZEGR_ST_PIXEL;
+	Options.EntryPoint = "ZERNSSAO_ReinterleaveSSAO_PixelShader";
+	ReinterleaveSSAOPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(ReinterleaveSSAOPixelShader == NULL, false, "Can not set pixel shader");
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSSAO_CrossBilateralBlurX_PixelShader";
 	CrossBilateralBlurXPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(CrossBilateralBlurXPixelShader == NULL, false, "Can not set pixel shader");
 
 	Options.Type = ZEGR_ST_PIXEL;
 	Options.EntryPoint = "ZERNSSAO_CrossBilateralBlurY_PixelShader";
 	CrossBilateralBlurYPixelShader = ZEGRShader::Compile(Options);
-
-	Options.Type = ZEGR_ST_PIXEL;
-	Options.EntryPoint = "ZERNSSAO_Blend_PixelShader";
-	BlendPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(CrossBilateralBlurYPixelShader == NULL, false, "Can not set pixel shader");
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_SHADER);
 	DirtyFlags.RaiseFlags(ZERN_AODF_RENDER_STATE);
@@ -153,16 +175,16 @@ bool ZERNStageAO::UpdateRenderStates()
 
 	RenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverPositionTexCoordVertexShader);
 
-	ZEGRDepthStencilState DepthStencilStateAlwaysTestWrite;
-	DepthStencilStateAlwaysTestWrite.SetDepthTestEnable(true);
-	DepthStencilStateAlwaysTestWrite.SetDepthWriteEnable(true);
-	DepthStencilStateAlwaysTestWrite.SetDepthFunction(ZEGR_CF_ALWAYS);
+	ZEGRDepthStencilState DepthStencilStateTestWriteAlways;
+	DepthStencilStateTestWriteAlways.SetDepthTestEnable(true);
+	DepthStencilStateTestWriteAlways.SetDepthWriteEnable(true);
+	DepthStencilStateTestWriteAlways.SetDepthFunction(ZEGR_CF_ALWAYS);
 
-	RenderState.SetDepthStencilState(DepthStencilStateAlwaysTestWrite);
+	RenderState.SetDepthStencilState(DepthStencilStateTestWriteAlways);
 
-	RenderState.SetShader(ZEGR_ST_PIXEL, ResolveAndScalePixelShader);
-	ResolveAndScaleRenderStateData = RenderState.Compile();
-	zeCheckError(ResolveAndScaleRenderStateData == NULL, false, "Cannot set render state.");
+	RenderState.SetShader(ZEGR_ST_PIXEL, ResolveAndClampDepthPixelShader);
+	ResolveAndClampDepthRenderStateData = RenderState.Compile();
+	zeCheckError(ResolveAndClampDepthRenderStateData == NULL, false, "Cannot set render state.");
 
 	ZEGRDepthStencilState DepthStencilStateTestNoWrite;
 	DepthStencilStateTestNoWrite.SetDepthTestEnable(true);
@@ -175,13 +197,29 @@ bool ZERNStageAO::UpdateRenderStates()
 	SSAORenderStateData = RenderState.Compile();
 	zeCheckError(SSAORenderStateData == NULL, false, "Cannot set render state.");
 
+	RenderState.SetDepthStencilState(DepthStencilStateTestWriteAlways);
+
+	RenderState.SetShader(ZEGR_ST_PIXEL, ResolveAndLinearizeDepthPixelShader);
+	ResolveAndLinearizeDepthRenderStateData = RenderState.Compile();
+	zeCheckError(ResolveAndLinearizeDepthRenderStateData == NULL, false, "Cannot set render state.");
+
+	RenderState.SetShader(ZEGR_ST_PIXEL, DeinterleaveDepthPixelShader);
+	DeinterleaveDepthRenderStateData = RenderState.Compile();
+	zeCheckError(DeinterleaveDepthRenderStateData == NULL, false, "Cannot set render state.");
+
+	RenderState.SetShader(ZEGR_ST_PIXEL, DeinterleaveSSAOPixelShader);
+	DeinterleaveSSAORenderStateData = RenderState.Compile();
+	zeCheckError(DeinterleaveSSAORenderStateData == NULL, false, "Cannot set render state.");
+
+	RenderState.SetShader(ZEGR_ST_PIXEL, ReinterleaveSSAOPixelShader);
+	ReinterleaveSSAORenderStateData = RenderState.Compile();
+	zeCheckError(ReinterleaveSSAORenderStateData == NULL, false, "Cannot set render state.");
+
+	RenderState.SetDepthStencilState(DepthStencilStateTestNoWrite);
+
 	RenderState.SetShader(ZEGR_ST_PIXEL, CrossBilateralBlurXPixelShader);
 	CrossBilateralBlurXRenderStateData = RenderState.Compile();
 	zeCheckError(CrossBilateralBlurXRenderStateData == NULL, false, "Cannot set render state.");
-
-	RenderState.SetShader(ZEGR_ST_PIXEL, CrossBilateralBlurYPixelShader);
-	CrossBilateralBlurYRenderStateData = RenderState.Compile();
-	zeCheckError(CrossBilateralBlurYRenderStateData == NULL, false, "Cannot set render state.");
 
 	ZEGRBlendState BlendState;
 	BlendState.SetBlendEnable(true);
@@ -194,9 +232,9 @@ bool ZERNStageAO::UpdateRenderStates()
 
 	RenderState.SetBlendState(BlendState);
 
-	RenderState.SetShader(ZEGR_ST_PIXEL, BlendPixelShader);
-	BlendRenderStateData = RenderState.Compile();
-	zeCheckError(BlendRenderStateData == NULL, false, "Cannot set render state.");
+	RenderState.SetShader(ZEGR_ST_PIXEL, CrossBilateralBlurYPixelShader);
+	CrossBilateralBlurYRenderStateData = RenderState.Compile();
+	zeCheckError(CrossBilateralBlurYRenderStateData == NULL, false, "Cannot set render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_RENDER_STATE);
 
@@ -252,9 +290,16 @@ bool ZERNStageAO::UpdateTextures()
 	ZEUInt Width = Constants.WidthHeight.x;
 	ZEUInt Height = Constants.WidthHeight.y;
 
-	OcclusionMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
+	AmbientOcclusionTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
 	BlurTempTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
-	ResolvedScaledDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+	
+	if (UseDeinterleavedTexturing)
+		ResolvedDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R32_FLOAT);
+	else
+		ResolvedDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+
+	DeinterleavedDepthtexture = ZEGRTexture2D::CreateInstance(Width / 4, Height / 4, 1, ZEGR_TF_R32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
+	DeinterleavedAmbientOcclusionTexture = ZEGRTexture2D::CreateInstance(Width / 4, Height / 4, 1, ZEGR_TF_R16G16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_TEXTURE);
 
@@ -281,29 +326,107 @@ bool ZERNStageAO::Update()
 	return true;
 }
 
-void ZERNStageAO::ResolveAndScaleDepth(ZEGRContext* Context)
+void ZERNStageAO::ResolveAndClampDepth(ZEGRContext* Context)
 {
-	Viewport.SetWidth((float)ResolvedScaledDepthTexture->GetWidth());
-	Viewport.SetHeight((float)ResolvedScaledDepthTexture->GetHeight());
+	Viewport.SetWidth((float)ResolvedDepthTexture->GetWidth());
+	Viewport.SetHeight((float)ResolvedDepthTexture->GetHeight());
 
-	Context->SetRenderState(ResolveAndScaleRenderStateData);
-	Context->SetRenderTargets(0, NULL, ResolvedScaledDepthTexture->GetDepthStencilBuffer());
+	Context->SetRenderState(ResolveAndClampDepthRenderStateData);
+	Context->SetRenderTargets(0, NULL, ResolvedDepthTexture->GetDepthStencilBuffer());
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);
 }
 
-void ZERNStageAO::GenerateOcclusionMap(ZEGRContext* Context, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
+void ZERNStageAO::AmbientOcclusion(ZEGRContext* Context, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
 {
-	Viewport.SetWidth((float)OcclusionMap->GetWidth());
-	Viewport.SetHeight((float)OcclusionMap->GetHeight());
+	Viewport.SetWidth((float)AmbientOcclusionTexture->GetWidth());
+	Viewport.SetHeight((float)AmbientOcclusionTexture->GetHeight());
 
-	const ZEGRRenderTarget* RenderTarget = OcclusionMap->GetRenderTarget();
-	const ZEGRTexture* Textures[] = {RandomVectorsTexture, ResolvedScaledDepthTexture};
+	const ZEGRRenderTarget* RenderTarget = AmbientOcclusionTexture->GetRenderTarget();
+	const ZEGRTexture* Textures[] = {RandomVectorsTexture, ResolvedDepthTexture};
 
 	Context->SetRenderState(SSAORenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetTextures(ZEGR_ST_PIXEL, 6, 2, Textures);
+	Context->SetViewports(1, &Viewport);
+
+	Context->Draw(3, 0);
+}
+
+void ZERNStageAO::ResolveAndLinearizeDepth(ZEGRContext* Context)
+{
+	Viewport.SetWidth((float)ResolvedDepthTexture->GetWidth());
+	Viewport.SetHeight((float)ResolvedDepthTexture->GetHeight());
+
+	const ZEGRRenderTarget* RenderTarget = ResolvedDepthTexture->GetRenderTarget();
+	//const ZEGRDepthStencilBuffer* DepthStencilBuffer = ResolvedDepthTexture->GetDepthStencilBuffer();
+
+	Context->SetRenderState(ResolveAndLinearizeDepthRenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	//Context->SetRenderTargets(0, NULL, DepthStencilBuffer);
+	Context->SetViewports(1, &Viewport);
+
+	Context->Draw(3, 0);
+}
+
+void ZERNStageAO::DeinterleaveDepth(ZEGRContext* Context)
+{
+	Viewport.SetWidth((float)DeinterleavedDepthtexture->GetWidth());
+	Viewport.SetHeight((float)DeinterleavedDepthtexture->GetHeight());
+
+	Context->SetRenderState(DeinterleaveDepthRenderStateData);
+	Context->SetTextures(ZEGR_ST_PIXEL, 7, 1, reinterpret_cast<const ZEGRTexture**>(&ResolvedDepthTexture));
+	Context->SetViewports(1, &Viewport);
+
+	ZEArray<const ZEGRRenderTarget*> RenderTargets;
+	RenderTargets.SetCount(16);
+	for (ZEUInt I = 0; I < 16; I++)
+		RenderTargets[I] = DeinterleavedDepthtexture->GetRenderTarget(0, I);
+
+	for (ZEUInt I = 0; I < 2; I++)
+	{
+		DeinterleavedConstants.Offset = ZEVector2(1.0f, I * 2 + 1);
+		DeinterleavedConstantBuffer->SetData(&DeinterleavedConstants);
+
+		Context->SetRenderTargets(8, &RenderTargets[I * 8], NULL);
+		Context->Draw(3, 0);
+	}
+
+}
+
+void ZERNStageAO::DeinterleaveAmbientOcclusion(ZEGRContext* Context)
+{
+	Viewport.SetWidth((float)DeinterleavedAmbientOcclusionTexture->GetWidth());
+	Viewport.SetHeight((float)DeinterleavedAmbientOcclusionTexture->GetHeight());
+
+	Context->SetRenderState(DeinterleaveSSAORenderStateData);
+	Context->SetTextures(ZEGR_ST_PIXEL, 8, 1, reinterpret_cast<const ZEGRTexture**>(&DeinterleavedDepthtexture));
+	Context->SetViewports(1, &Viewport);
+
+	for (ZEUInt I = 0; I < 16; I++)
+	{
+		DeinterleavedConstants.RandomVector = RandomVectors[I].ToVector3();
+		DeinterleavedConstants.DepthArrayIndex = I;
+		DeinterleavedConstants.Offset = ZEVector2(I % 4, I / 4) + ZEVector2(0.5f, 0.5f);
+		DeinterleavedConstantBuffer->SetData(&DeinterleavedConstants);
+
+		const ZEGRRenderTarget* RenderTarget = DeinterleavedAmbientOcclusionTexture->GetRenderTarget(0, I);
+		Context->SetRenderTargets(1, &RenderTarget, NULL);
+		Context->Draw(3, 0);
+	}
+}
+
+void ZERNStageAO::ReinterleaveAmbientOcclusion(ZEGRContext* Context)
+{
+	Viewport.SetWidth((float)AmbientOcclusionTexture->GetWidth());
+	Viewport.SetHeight((float)AmbientOcclusionTexture->GetHeight());
+
+	const ZEGRRenderTarget* RenderTarget = AmbientOcclusionTexture->GetRenderTarget();
+
+	Context->SetRenderState(ReinterleaveSSAORenderStateData);
+	Context->SetRenderTargets(1, &RenderTarget, NULL);
+	Context->SetTextures(ZEGR_ST_PIXEL, 9, 1, reinterpret_cast<const ZEGRTexture**>(&DeinterleavedAmbientOcclusionTexture));
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);
@@ -315,7 +438,6 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputText
 	Viewport.SetHeight((float)(InputTexture->GetHeight()));
 
 	const ZEGRRenderTarget* TempRenderTarget = BlurTempTexture->GetRenderTarget();
-	const ZEGRRenderTarget* OutputRenderTarget = InputTexture->GetRenderTarget();
 
 	Context->SetRenderState(CrossBilateralBlurXRenderStateData);
 	Context->SetRenderTargets(1, &TempRenderTarget, DepthStencilBuffer);
@@ -323,25 +445,15 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputText
 	Context->SetViewports(1, &Viewport);
 	Context->Draw(3, 0);
 
-	Context->SetRenderState(CrossBilateralBlurYRenderStateData);
-	Context->SetRenderTargets(1, &OutputRenderTarget, DepthStencilBuffer);
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&BlurTempTexture));
-	Context->SetViewports(1, &Viewport);
-	Context->Draw(3, 0);
-}
-
-void ZERNStageAO::BlendWithAccumulation(ZEGRContext* Context, const ZEGRTexture2D* InputTexture)
-{
-	Viewport.SetWidth((float)AccumulationTexture->GetWidth());
-	Viewport.SetHeight((float)AccumulationTexture->GetHeight());
+	Viewport.SetWidth((float)(AccumulationTexture->GetWidth()));
+	Viewport.SetHeight((float)(AccumulationTexture->GetHeight()));
 
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 
-	Context->SetRenderState(BlendRenderStateData);
+	Context->SetRenderState(CrossBilateralBlurYRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&BlurTempTexture));
 	Context->SetViewports(1, &Viewport);
-
 	Context->Draw(3, 0);
 }
 
@@ -356,6 +468,7 @@ bool ZERNStageAO::InitializeSelf()
 	CreateRandomVectors();
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	DeinterleavedConstantBuffer = ZEGRConstantBuffer::Create(sizeof(DeinterleavedConstants));
 
 	return Update();
 }
@@ -365,24 +478,38 @@ void ZERNStageAO::DeinitializeSelf()
 	DirtyFlags.RaiseAll();
 
 	ScreenCoverPositionTexCoordVertexShader.Release();
+
+	ResolveAndClampDepthPixelShader.Release();
 	SSAOPixelShader.Release();
+
+	ResolveAndLinearizeDepthPixelShader.Release();
+	DeinterleaveDepthPixelShader.Release();
+	DeinterleaveSSAOPixelShader.Release();
+	ReinterleaveSSAOPixelShader.Release();
+
 	CrossBilateralBlurXPixelShader.Release();
 	CrossBilateralBlurYPixelShader.Release();
-	ResolveAndScalePixelShader.Release();
-	BlendPixelShader.Release();
 
+	ResolveAndClampDepthRenderStateData.Release();
 	SSAORenderStateData.Release();
+
+	ResolveAndLinearizeDepthRenderStateData.Release();
+	DeinterleaveDepthRenderStateData.Release();
+	DeinterleaveSSAORenderStateData.Release();
+	ReinterleaveSSAORenderStateData.Release();
+
 	CrossBilateralBlurXRenderStateData.Release();
 	CrossBilateralBlurYRenderStateData.Release();
-	ResolveAndScaleRenderStateData.Release();
-	BlendRenderStateData.Release();
 
 	ConstantBuffer.Release();
+	DeinterleavedConstantBuffer.Release();
 
-	OcclusionMap.Release();
+	AmbientOcclusionTexture.Release();
 	BlurTempTexture.Release();
 	RandomVectorsTexture.Release();
-	ResolvedScaledDepthTexture.Release();
+	ResolvedDepthTexture.Release();
+	DeinterleavedDepthtexture.Release();
+	DeinterleavedAmbientOcclusionTexture.Release();
 
 	DepthTexture = NULL;
 	NormalTexture = NULL;
@@ -479,10 +606,25 @@ float ZERNStageAO::GetDistanceThreshold() const
 	return Constants.DistanceThreshold;
 }
 
+void ZERNStageAO::SetDeinterleavedTexturing(bool UseDeinterleavedTexturing)
+{
+	if (this->UseDeinterleavedTexturing == UseDeinterleavedTexturing)
+		return;
+
+	this->UseDeinterleavedTexturing = UseDeinterleavedTexturing;
+
+	DirtyFlags.RaiseFlags(ZERN_AODF_TEXTURE);
+}
+
+bool ZERNStageAO::GetDeinterleavedTexturing() const
+{
+	return UseDeinterleavedTexturing;
+}
+
 const ZEGRTexture2D* ZERNStageAO::GetOutput(ZERNStageBuffer Output) const
 {
 	if (GetEnabled() && Output == ZERN_SO_AMBIENT_OCCLUSION)
-		return OcclusionMap;
+		return AmbientOcclusionTexture;
 
 	return ZERNStage::GetOutput(Output);
 }
@@ -494,20 +636,33 @@ bool ZERNStageAO::Setup(ZEGRContext* Context)
 
 	if (!Update())
 		return false;
-	
-	Context->ClearDepthStencilBuffer(ResolvedScaledDepthTexture->GetDepthStencilBuffer(), true, true, 0.0f, 0x00);
-	Context->ClearRenderTarget(OcclusionMap->GetRenderTarget(), ZEVector4::One);
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->ClearRenderTarget(AmbientOcclusionTexture->GetRenderTarget(), ZEVector4::One);
+
+	const ZEGRConstantBuffer* ConstantBuffers[] = {ConstantBuffer, DeinterleavedConstantBuffer};
+	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 2, ConstantBuffers);
+
 	const ZEGRTexture* Textures[] = {NormalTexture, DepthTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 3, 2, Textures);
 
-	const ZEGRDepthStencilBuffer* ReadOnlyDepthBuffer = ResolvedScaledDepthTexture->GetDepthStencilBuffer(true);
+	const ZEGRDepthStencilBuffer* ReadonlyDepthStencilBuffer = NULL;
 
-	ResolveAndScaleDepth(Context);
-	GenerateOcclusionMap(Context, ReadOnlyDepthBuffer);
-	ApplyBlur(Context, OcclusionMap, ReadOnlyDepthBuffer);
-	BlendWithAccumulation(Context, OcclusionMap);
+	if (!UseDeinterleavedTexturing)
+	{
+		ReadonlyDepthStencilBuffer = ResolvedDepthTexture->GetDepthStencilBuffer(true);
+
+		ResolveAndClampDepth(Context);
+		AmbientOcclusion(Context, ReadonlyDepthStencilBuffer);
+	}
+	else
+	{
+		ResolveAndLinearizeDepth(Context);
+		DeinterleaveDepth(Context);
+		DeinterleaveAmbientOcclusion(Context);
+		ReinterleaveAmbientOcclusion(Context);
+	}
+
+	ApplyBlur(Context, AmbientOcclusionTexture, ReadonlyDepthStencilBuffer);
 
 	return true;
 }
@@ -522,6 +677,8 @@ ZERNStageAO::ZERNStageAO()
 	DirtyFlags.RaiseAll();
 
 	SampleCount = ZERN_AOSC_MEDIUM;
+
+	UseDeinterleavedTexturing = true;
 
 	DepthTexture = NULL;
 	NormalTexture = NULL;
@@ -538,4 +695,6 @@ ZERNStageAO::ZERNStageAO()
 	Constants.KernelRadius = 3;
 	Constants.BlurSharpness = 8.0f;
 	Constants.DistanceThreshold = 100.0f;
+
+	memset(&DeinterleavedConstants, 0, sizeof(DeinterleavedConstants));
 }
