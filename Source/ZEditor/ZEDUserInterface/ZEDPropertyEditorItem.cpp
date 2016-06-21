@@ -49,6 +49,9 @@ void ZEDPropertyEditorItem::Changed(const ZEArray<ZEVariant>& NewValues)
 
 bool ZEDPropertyEditorItem::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	if (Property == NULL)
 	{
 		setText(0, "Error");

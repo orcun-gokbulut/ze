@@ -35,7 +35,7 @@
 
 #include "ZEDTransformationOperation.h"
 
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectEvent.h"
 
@@ -47,11 +47,7 @@ bool ZEDTransformationOperation::Apply()
 		TransformState.Wrapper->SetPosition(TransformState.Position);
 		TransformState.Wrapper->SetRotation(TransformState.Rotation);
 		TransformState.Wrapper->SetScale(TransformState.Scale);
-		
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_CHANGED);
-		Event.SetWrapper(TransformState.Wrapper);
-		GetModule()->DistributeEvent(&Event);
+		TransformState.Wrapper->SendChangedEvent();
 	}
 
 	return true;
@@ -65,11 +61,7 @@ bool ZEDTransformationOperation::Revert()
 		TransformState.Wrapper->SetPosition(TransformState.OldPosition);
 		TransformState.Wrapper->SetRotation(TransformState.OldRotation);
 		TransformState.Wrapper->SetScale(TransformState.OldScale);
-
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_CHANGED);
-		Event.SetWrapper(TransformState.Wrapper);
-		GetModule()->DistributeEvent(&Event);
+		TransformState.Wrapper->SendChangedEvent();
 	}
 
 	return true;

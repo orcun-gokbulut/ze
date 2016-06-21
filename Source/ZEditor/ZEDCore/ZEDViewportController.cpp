@@ -41,35 +41,6 @@
 #include "ZECore\ZECore.h"
 #include "ZEMath\ZEAngle.h"
 
-void ZEDViewportController::SetLockCamera(bool Enabled)
-{
-	LockCamera = Enabled;
-}
-
-bool ZEDViewportController::GetLockCamera()
-{
-	return LockCamera;
-}
-
-void ZEDViewportController::SetStepSize(float StepSize)
-{
-	this->StepSize = StepSize;
-}
-
-float ZEDViewportController::GetStepSize()
-{
-	return StepSize;
-}
-
-void ZEDViewportController::SetMouseSensivity(float Sensivity)
-{
-	MouseSensivity = Sensivity;
-}
-
-float ZEDViewportController::GetMouseSensivity()
-{
-	return MouseSensivity;
-}
 
 void ZEDViewportController::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event)
 {
@@ -97,7 +68,7 @@ void ZEDViewportController::ViewportKeyboardEvent(const ZEDViewportKeyboardEvent
 		ZEVector3::Scale(PositionChange, PositionChange, ModStepSize * ElapsedTime);
 		ZEVector3::Add(Position, Position, PositionChange);
 		Event->GetViewport()->SetPosition(Position);
-		
+
 		Event->Acquire();
 	}
 	else if (Event->GetKey() == ZED_VKK_S)
@@ -185,4 +156,39 @@ ZEDViewportController::ZEDViewportController()
 ZEDViewportController::~ZEDViewportController()
 {
 
+}
+
+void ZEDViewportController::SetLockCamera(bool Enabled)
+{
+	LockCamera = Enabled;
+}
+
+bool ZEDViewportController::GetLockCamera()
+{
+	return LockCamera;
+}
+
+void ZEDViewportController::SetStepSize(float StepSize)
+{
+	this->StepSize = StepSize;
+}
+
+float ZEDViewportController::GetStepSize()
+{
+	return StepSize;
+}
+
+void ZEDViewportController::SetMouseSensivity(float Sensivity)
+{
+	MouseSensivity = Sensivity;
+}
+
+float ZEDViewportController::GetMouseSensivity()
+{
+	return MouseSensivity;
+}
+
+ZEDViewportController* ZEDViewportController::CreateInstance()
+{
+	return new ZEDViewportController();
 }

@@ -60,12 +60,13 @@ enum ZEDSelectionMode
 class ZEObject;
 class ZEClass;
 class ZEViewVolume;
-class ZEDModule;
+class ZEDEditor;
 class ZEDObjectWrapper;
 
 class ZEDSelectionManager : public ZEDComponent
 {
-	friend class ZEDCore;
+	ZE_OBJECT
+	friend class ZEDEditorCore;
 	private:
 		ZEArray<ZEDObjectWrapper*>			Selection;
 		ZEDObjectWrapper*					FocusedObject;

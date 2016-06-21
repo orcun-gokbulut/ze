@@ -35,17 +35,25 @@
 
 cmake_minimum_required(VERSION 2.8)
 
+ze_add_source(ZEDUserInterfaceComponent.cpp				Sources)
+ze_add_source(ZEDUserInterfaceComponent.h				Sources ZEMC QtMocs)
+ze_add_source(ZEDWindow.cpp								Sources)
+ze_add_source(ZEDWindow.h								Sources ZEMC QtMocs)
+ze_add_source(ZEDMenu.cpp								Sources)
+ze_add_source(ZEDMenu.h									Sources ZEMC)
+ze_add_source(ZEDToolbar.cpp							Sources)
+ze_add_source(ZEDToolbar.h								Sources ZEMC QtMocs)
 ze_add_source(ZEDMainWindow.cpp							Sources)
 ze_add_source(ZEDMainWindow.h							Sources QtMocs)
 ze_add_source(ZEDMainWindow.ui							Sources QtUI)
 
+# Common Controls
 ze_add_source(ZEDTransformationToolbar.cpp				Sources)
 ze_add_source(ZEDTransformationToolbar.h				Sources QtMocs)
 ze_add_source(ZEDSelectionToolbar.cpp					Sources)
 ze_add_source(ZEDSelectionToolbar.h						Sources QtMocs)
 ze_add_source(ZEDViewportToolbar.cpp					Sources)
 ze_add_source(ZEDViewportToolbar.h						Sources QtMocs)
-ze_add_source(ZEDViewportToolbar.ui						Sources QtUI)
 
 ze_add_source(ZEDObjectTree.cpp							Sources)
 ze_add_source(ZEDObjectTree.h							Sources QtMocs)

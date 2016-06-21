@@ -37,67 +37,50 @@
 
 #include "ZEDCore/ZEDComponent.h"
 #include <QMainWindow>
+#include "ZEDS/ZEArray.h"
 
-#include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDViewport.h"
-
+class ZEDMenu;
+class ZEDWindow;
+class ZEDToolbar;
 class ZEDViewport;
 class Ui_ZEDMainWindow;
+class QMenu;
 
-class ZEDMainWindow : public QMainWindow, public ZEDComponent
+class ZEDMainWindow : public QObject, public ZEDComponent
 {
 	Q_OBJECT
 	private:
 		Ui_ZEDMainWindow*					Form;
+		QMainWindow*						MainWindow;
 		ZEDViewport*						Viewport;
 
-		void								closeEvent(QCloseEvent* Event);
+		ZEArray<ZEDMenu*>					Menus;
+		ZEArray<ZEDToolbar*>				Toolbars;
+		ZEArray<ZEDWindow*>					Windows;
 
-		bool								InitializeSelf();
-		void								DeinitializeSelf();
+		bool								eventFilter(QObject* Object, QEvent* Event);
 
-	private slots:
-		//File Menu Actions
-		void								actNew_onTriggered();
-		void								actOpen_onTriggered();
-		void								actClose_onTriggered();
-		void								actSave_onTriggered();
-		void								actSaveAs_onTriggered();
-		void								actExit_onTriggered();
-		//Edit Menu Actions
- 		void								actUndo_onTriggered();
- 		void								actRedo_onTriggered();
- 		void								actClone_onTriggered();
- 		void								actDelete_onTriggered();
-		//Operations Menu Actions
- 		void								actSelect_onTriggered();
- 		void								actMove_onTriggered();
- 		void								actRotate_onTriggered();
- 		void								actScale_onTriggered();
-// 		void								actHide_onTriggered();
-// 		void								actUnhide_onTriggered();
-// 		void								actFreeze_onTriggered();
-// 		void								actUnfreeze_onTriggered();
-// 		void								actGoToEntity_onTriggered();
+		QMenu*								GetOrCreateMenu(QMenu* Parent, const ZEString& Target);
 
-		void								MainTimer_onTimeout();
-
-// 		virtual void						OnSelected();
-// 		virtual void						OnDeselected();
-// 		virtual void						OnCreated();
-// 		virtual void						OnDestroy();
-// 		virtual void						OnTransformed();
-// 		virtual void						OnChildObjectChanged();
-// 		virtual void						OnParentObjectChanged();
-// 		virtual void						OnOpenContainer();
-// 		virtual void						OnCloseContainer();
-// 		virtual void						Save();
-// 		virtual void						Load();
-		
+											ZEDMainWindow();
+											~ZEDMainWindow();
 	public:
+		QMainWindow*						GetMainWindow();
+		const ZEArray<ZEDMenu*>&			GetMenus();
+		const ZEArray<ZEDToolbar*>&			GetToolbars();
+		const ZEArray<ZEDWindow*>&			GetWindows();
+
+		void								AddWindow(ZEDWindow* Widget);
+		void								RemoveWindow(ZEDWindow* Widget);
+
+		void								AddToolbar(ZEDToolbar* Toolbar);
+		void								RemoveToolbar(ZEDToolbar* Toolbar);
+
+		void								AddMenu(ZEDMenu* Menu);
+		void								RemoveMenu(ZEDMenu* Menu);
+
 		void								SetViewport(ZEDViewport* Viewport);
 		ZEDViewport*						GetViewport();
 
-											ZEDMainWindow(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
-											~ZEDMainWindow();
+		static ZEDMainWindow*				CreateInstance();
 };

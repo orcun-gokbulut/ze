@@ -35,12 +35,13 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
-#include "ZEDEvent.h"
 
-class ZEDModule;
+class ZEDEditor;
 class ZEDEvent;
 class ZEDObjectEvent;
+class ZEDTickEvent;
 class ZEDSelectionEvent;
 class ZEDTransformationEvent;
 class ZEDViewportKeyboardEvent;
@@ -48,15 +49,17 @@ class ZEDViewportMouseEvent;
 class ZEDViewportChangedEvent;
 class ZEDViewportRenderEvent;
 
-class ZEDComponent : public ZEInitializable
+class ZEDComponent : public ZEObject, public ZEInitializable
 {
-	friend class ZEDModule;
+	ZE_OBJECT
+	friend class ZEDEditor;
 	private:
-		ZEDModule*						Module;
+		ZEDEditor*						Editor;
 
 	protected:
 		virtual void					EventReceived(const ZEDEvent* Event);
 	
+		virtual void					EditorChanged();
 		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
 		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
 		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
@@ -72,7 +75,7 @@ class ZEDComponent : public ZEInitializable
 		virtual							~ZEDComponent();
 
 	public:
-		ZEDModule*						GetModule();
+		ZEDEditor*						GetEditor();
 
 		virtual void					Destroy();
 };

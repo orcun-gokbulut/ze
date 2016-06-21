@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
 
 class ZEUIControl;
 class ZEUIFrameControl;
@@ -96,6 +96,8 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 
 		virtual void						SetVisible(bool Value);
 		virtual bool						GetVisible() const;
+		
+		virtual bool						CheckChildrenClass(ZEClass* Class);
 
 		virtual bool						AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 		virtual bool						RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
@@ -108,4 +110,5 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual void						Update();
 
 		static ZEDEntityWrapper*			CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);

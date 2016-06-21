@@ -44,6 +44,7 @@ class ZEDViewport;
 
 class ZEDViewportManager : public ZEDComponent
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEDViewport*>			Viewports;
 

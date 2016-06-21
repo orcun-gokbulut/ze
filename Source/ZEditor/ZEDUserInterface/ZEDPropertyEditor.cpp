@@ -37,7 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEClass.h"
-#include "ZEDCore/ZEDModule.h"
+#include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDCore/ZEDObjectEvent.h"
 #include "ZEDCore/ZEDSelectionEvent.h"
@@ -249,9 +249,9 @@ void ZEDPropertyEditor::ObjectEvent(const ZEDObjectEvent* Event)
 	if (!Wrappers.Exists(Event->GetWrapper()))
 		return;
 
-	if (Event->GetType() == ZED_OCET_REMOVED)
+	if (Event->GetType() == ZED_OET_REMOVED)
 		RemoveWrapper(Event->GetWrapper());
-	else if (Event->GetType() == ZED_OCET_CHANGED)
+	else if (Event->GetType() == ZED_OET_CHANGED)
 		Update();
 }
 
@@ -281,31 +281,13 @@ void ZEDPropertyEditor::TickEvent(const ZEDTickEvent* Event)
 void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEVariant& Value)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Value);
-	GetModule()->GetOperationManager()->DoOperation(Operation);
-	
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_CHANGED);
-		Event.SetWrapper(Wrappers[I]);
-		RaiseEvent(&Event);
-	}
+	GetEditor()->GetOperationManager()->DoOperation(Operation);
 }
 
 void ZEDPropertyEditor::PropertyChanged(const ZEProperty* Property, const ZEArray<ZEVariant>& Values)
 {
 	ZEDPropertyOperation* Operation = ZEDPropertyOperation::Create(Wrappers,Property, Values);
-	GetModule()->GetOperationManager()->DoOperation(Operation);
-
-	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
-	{
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_CHANGED);
-		Event.SetWrapper(Wrappers[I]);
-		RaiseEvent(&Event);
-	}
-
-
+	GetEditor()->GetOperationManager()->DoOperation(Operation);
 }
 
 const ZEArray<ZEDObjectWrapper*>& ZEDPropertyEditor::GetWrappers() const

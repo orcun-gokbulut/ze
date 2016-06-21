@@ -69,6 +69,7 @@ class ZERNView;
 
 class ZEDGizmo : public ZEEntity
 {
+	ZE_OBJECT
 	private:
 		ZEFlags							DirtyGizmoFlags;
 

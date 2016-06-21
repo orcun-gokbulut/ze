@@ -35,54 +35,61 @@
 
 #include "ZEDSelectionToolbar.h"
 
+#include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDSelectionManager.h"
+#include "ZEDUserInterfaceComponent.h"
+#include "ZEDMainWindow.h"
 
-#include <QToolButton>
+#include <QToolBar>
+#include <QAction>
+#include <QActionGroup>
 #include <QComboBox>
 #include <QMessageBox>
+#include <QMainWindow>
 
 void ZEDSelectionToolbar::SetupUI()
 {
-	btnSelectionList = new QToolButton();
-	btnSelectionList->setText("Selections");
-	addWidget(btnSelectionList);
+	Toolbar = new QToolBar();
 
-	addSeparator();
+	actSelectionList = new QAction(this);
+	actSelectionList->setText("Selections");
+	Toolbar->addAction(actSelectionList);
+
+	Toolbar->addSeparator();
 
 	cmbShape = new QComboBox();
 	cmbShape->addItem("Rectangle");
 	cmbShape->addItem("Circle");
 	cmbShape->addItem("Brush");
-	addWidget(cmbShape);
+	Toolbar->addWidget(cmbShape);
 
-	btnFreeze = new QToolButton();
-	btnFreeze->setText("Freeze");
-	btnFreeze->setCheckable(true);
-	addWidget(btnFreeze);
+	actFreeze = new QAction(this);
+	actFreeze->setText("Freeze");
+	actFreeze->setCheckable(true);
+	Toolbar->addAction(actFreeze);
 
-	btnUnfreezeAll = new QToolButton();
-	btnUnfreezeAll->setText("Unfreeze All");
-	addWidget(btnUnfreezeAll);
+	actUnfreezeAll = new QAction(this);
+	actUnfreezeAll->setText("Unfreeze All");
+	Toolbar->addAction(actUnfreezeAll);
 
 	cmbMode = new QComboBox();
 	cmbMode->clear();
 	cmbMode->addItem("Fully Inside");
 	cmbMode->addItem("Partially Inside");
-	addWidget(cmbMode);
+	Toolbar->addWidget(cmbMode);
 }
 
 void ZEDSelectionToolbar::UpdateUI()
 {
-	setEnabled(SelectionManager != NULL);
-
-	if (SelectionManager == NULL)
+	Toolbar->setEnabled(GetSelectionManager() == NULL);
+	
+	if (GetSelectionManager() == NULL)
 		return;
 
 	QSignalBlocker cmbShapeBlocker(cmbShape);
 	QSignalBlocker cmbModeBlocker(cmbMode);
-	QSignalBlocker cmbFreezeBlocker(btnFreeze);
 
-	switch (SelectionManager->GetSelectionMode())
+	switch (GetSelectionManager()->GetSelectionMode())
 	{
 		default:
 		case ZED_SS_RECTANGLE:
@@ -98,7 +105,7 @@ void ZEDSelectionToolbar::UpdateUI()
 			break;
 	}
 
-	switch (SelectionManager->GetSelectionMode())
+	switch (GetSelectionManager()->GetSelectionMode())
 	{
 		default:
 		case ZE_SM_FULLY_INSIDE:
@@ -111,72 +118,79 @@ void ZEDSelectionToolbar::UpdateUI()
 	}
 }
 
-void ZEDSelectionToolbar::btnSelectionList_clicked()
-{
-	QMessageBox::information(this, "Zinek", "Not implemented", QMessageBox::Ok);
-}
-
-void ZEDSelectionToolbar::cmbShape_currentIndexChanged(const QString & text)
-{
-	if (text == "Rectangle")
-		SelectionManager->SetSelectionShape(ZED_SS_RECTANGLE);
-	else if (text == "Circle")
-		SelectionManager->SetSelectionShape(ZED_SS_CIRCLE);
-	else if (text == "Brush")
-		SelectionManager->SetSelectionShape(ZED_SS_BRUSH);
-	else
-		SelectionManager->SetSelectionShape(ZED_SS_RECTANGLE);
-}
-
-void ZEDSelectionToolbar::cmbMode_currentIndexChanged(const QString & text)
-{
-	if (text == "Fully Inside")
-		SelectionManager->SetSelectionMode(ZE_SM_FULLY_INSIDE);
-	else if (text == "Partially Inside")
-		SelectionManager->SetSelectionMode(ZE_SM_PARTIALY_INSIDE);
-	else
-		SelectionManager->SetSelectionMode(ZE_SM_PARTIALY_INSIDE);
-}
-
-void ZEDSelectionToolbar::btnFreeze_clicked()
-{
-	QMessageBox::information(this, "Zinek", "Not implemented", QMessageBox::Ok);
-}
-
-void ZEDSelectionToolbar::btnUnfreezeAll_clicked()
-{
-	QMessageBox::information(this, "Zinek", "Not implemented", QMessageBox::Ok);
-}
-
-void ZEDSelectionToolbar::SetSelectionManager(ZEDSelectionManager* Manager)
-{
-	if (SelectionManager == Manager)
-		return;
-
-	SelectionManager = Manager;
-
-	UpdateUI();
-}
-
-ZEDSelectionManager* ZEDSelectionToolbar::GetSelectionManager()
-{
-	return SelectionManager;
-}
-
-ZEDSelectionToolbar::ZEDSelectionToolbar(QWidget* Parent) : QToolBar(Parent)
+ZEDSelectionToolbar::ZEDSelectionToolbar()
 {
 	SetupUI();
 
-	SelectionManager = NULL;
-
-	connect(btnSelectionList, SIGNAL(clicked()), this, SLOT(btnSelectionList_clicked()));
+	connect(actSelectionList, SIGNAL(triggered()), this, SLOT(actSelectionList_triggered()));
 	connect(cmbShape, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbShape_currentIndexChanged(const QString&)));
 	connect(cmbMode, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbMode_currentIndexChanged(const QString&)));
-	connect(btnFreeze, SIGNAL(clicked()), this, SLOT(btnFreeze_clicked()));
-	connect(btnUnfreezeAll, SIGNAL(clicked()), this, SLOT(btnUnfreezeAll_clicked()));
+	connect(actFreeze, SIGNAL(triggered()), this, SLOT(actFreeze_triggered()));
+	connect(actUnfreezeAll, SIGNAL(triggered()), this, SLOT(actUnfreezeAll_triggered()));
 }
 
 ZEDSelectionToolbar::~ZEDSelectionToolbar()
 {
+	delete Toolbar;
+}
 
+void ZEDSelectionToolbar::actSelectionList_triggered()
+{
+	QMessageBox::information(GetMainWindow()->GetMainWindow(), "Zinek", "Not implemented", QMessageBox::Ok);
+}
+
+void ZEDSelectionToolbar::cmbShape_currentIndexChanged(const QString & text)
+{
+	if (GetSelectionManager() == NULL)
+		return;
+
+	if (text == "Rectangle")
+		GetSelectionManager()->SetSelectionShape(ZED_SS_RECTANGLE);
+	else if (text == "Circle")
+		GetSelectionManager()->SetSelectionShape(ZED_SS_CIRCLE);
+	else if (text == "Brush")
+		GetSelectionManager()->SetSelectionShape(ZED_SS_BRUSH);
+	else
+		GetSelectionManager()->SetSelectionShape(ZED_SS_RECTANGLE);
+}
+
+void ZEDSelectionToolbar::cmbMode_currentIndexChanged(const QString & text)
+{
+	if (GetSelectionManager() == NULL)
+		return;
+
+	if (text == "Fully Inside")
+		GetSelectionManager()->SetSelectionMode(ZE_SM_FULLY_INSIDE);
+	else if (text == "Partially Inside")
+		GetSelectionManager()->SetSelectionMode(ZE_SM_PARTIALY_INSIDE);
+	else
+		GetSelectionManager()->SetSelectionMode(ZE_SM_PARTIALY_INSIDE);
+}
+
+void ZEDSelectionToolbar::actFreeze_triggered()
+{
+	QMessageBox::information(GetMainWindow()->GetMainWindow(), "Zinek", "Not implemented", QMessageBox::Ok);
+}
+
+void ZEDSelectionToolbar::actUnfreezeAll_triggered()
+{
+	QMessageBox::information(GetMainWindow()->GetMainWindow(), "Zinek", "Not implemented", QMessageBox::Ok);
+}
+
+QToolBar* ZEDSelectionToolbar::GetToolbar()
+{
+	return Toolbar;
+}
+
+ZEDSelectionManager* ZEDSelectionToolbar::GetSelectionManager()
+{
+	if (GetEditor() == NULL)
+		return NULL;
+
+	return GetEditor()->GetSelectionManager();
+}
+
+ZEDSelectionToolbar* ZEDSelectionToolbar::CreateInstance()
+{
+	return new ZEDSelectionToolbar();
 }

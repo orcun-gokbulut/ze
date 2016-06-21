@@ -50,18 +50,18 @@
 
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
-class ZEDModule;
+class ZEDObjectEvent;
 class QWidget;
 class QMenu;
 
 class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
-	friend class ZEDModule;
+	friend class ZEDObjectManager;
 	private:
 		ZEObject*									Object;
 		ZEDObjectWrapper*							Parent;
-		ZEDModule*									Module;
+		ZEDObjectManager*							Manager;
 
 		ZEString									Icon;
 		bool										Selectable;
@@ -71,9 +71,15 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 
 		ZEArray<ZEDObjectWrapper*>					ChildWrappers;
 		
-		void										SetModule(ZEDModule* Module);
+		void										SetManager(ZEDObjectManager* Module);
 		
+		void										RaiseEvent(ZEDObjectEvent* Event);
+
 	protected:
+		void										DrawBoundingBox();
+		void										DrawNamePlate();
+
+		void										SyncronizeChildWrappers(ZEObject*const* TargetList, ZESize TargetListSize);
 		void										ClearChildWrappers();
 
 		bool										InitializeSelf();
@@ -83,22 +89,19 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		virtual										~ZEDObjectWrapper();
 
 	public:
+		ZEDObjectManager*							GetManager() const;
+
 		virtual void								SetObject(ZEObject* Object);
 		ZEObject*									GetObject() const;
 		
 		virtual void								SetParent(ZEDObjectWrapper* Wrapper);
-		virtual ZEDObjectWrapper*					GetParent() const;
-
-		ZEDModule*									GetModule() const;
+		ZEDObjectWrapper*							GetParent() const;
 
 		virtual void								SetId(ZEInt Id);
 		virtual ZEInt								GetId() const;
 
 		virtual void								SetName(const ZEString& Name);
 		virtual ZEString							GetName() const;
-
-		virtual void								SetIcon(const ZEString& Icon);
-		virtual const ZEString&						GetIcon() const;
 
 		virtual ZEAABBox							GetLocalBoundingBox();
 		virtual ZEMatrix4x4							GetWorldTransform();
@@ -112,11 +115,14 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		virtual void								SetScale(const ZEVector3& NewScale);
 		virtual ZEVector3							GetScale() const;
 
+		virtual void								SetVisible(bool Value);
+		virtual bool								GetVisible() const;
+
 		virtual void								SetLocked(bool Value);
 		bool										GetLocked() const;
 
 		virtual void								SetSelectable(bool Value);
-		virtual bool								GetSelectable() const;
+		bool										GetSelectable() const;
 
 		virtual void								SetSelected(bool Selected);
 		bool										GetSelected() const;
@@ -124,8 +130,8 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		virtual void								SetFocused(bool Focused);
 		bool										GetFocused() const;
 
-		virtual void								SetVisible(bool Value);
-		virtual bool								GetVisible() const;
+		virtual void								SetIcon(const ZEString& Icon);
+		const ZEString&								GetIcon() const;
 
 		virtual const ZEArray<ZEDObjectWrapper*>&	GetChildWrappers();
 		virtual bool								AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
@@ -141,8 +147,11 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		virtual void								Tick(float ElapsedTime);
 		virtual void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
+		virtual void								SendChangedEvent();
+
 		virtual void								Update();
 
 		virtual ZEDObjectWrapper*					Clone();
 		virtual void								Destroy();
-};
+}
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEObject);

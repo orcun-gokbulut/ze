@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEDUserInterfaceComponent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,35 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+#pragma once
 
+#include "ZEDCore/ZEDComponent.h"
+#include "ZEDS/ZEString.h"
 
-ZEDObjectEvent::ZEDObjectEvent()
+class ZEDEditor;
+class ZEDMainWindow;
+class ZEDMenu;
+class QAction;
+
+class ZEDUserInterfaceComponent :  public ZEDComponent
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
-}
+	ZE_OBJECT
+	friend class ZEDMainWindow;
+	private:
+		ZEString							Name;
+		ZEString							Category;
+		ZEDMenu*							Menu;
+		QAction*							Action;
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
-{
-	this->Type = Type;
-}
+	protected:
+											ZEDUserInterfaceComponent();
 
-ZEDObjectEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
+	public:
+		ZEDMainWindow*						GetMainWindow();
 
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
+		void								SetName(const ZEString& Name);
+		const ZEString&						GetName();
 
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
-}
+		void								SetCategory(const ZEString& Name);
+		const ZEString&						GetCategory();
+};

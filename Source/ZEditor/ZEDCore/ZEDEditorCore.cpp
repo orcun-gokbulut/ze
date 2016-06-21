@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.cpp
+ Zinek Engine - ZEDEditorCore.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,22 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDCore.h"
+#include "ZEDEditorCore.h"
 
 #include "ZEMeta/ZEProvider.h"
-#include "ZEDModule.h"
 #include "ZECore/ZECore.h"
-#include "ZECore/ZESystemMessageManager.h"
 #include "ZECore/ZEOptionManager.h"
+#include "ZECore/ZESystemMessageManager.h"
+#include "ZEDEditor.h"
 
+#include <QApplication>
+#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <QtCore/QObject>
 
 #undef RegisterClass
 
 extern HINSTANCE ApplicationInstance;
 
-void ZEDCore::LoadClasses()
+void ZEDEditorCore::LoadClasses()
 {
 	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration();
 	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
@@ -63,74 +64,111 @@ void ZEDCore::LoadClasses()
 	#undef ZE_META_REGISTER_CLASS
 }
 
-bool ZEDCore::InitializeSelf()
+bool ZEDEditorCore::InitializeSelf()
 {
-	zeCheckError(Module == NULL, false, "Module is not available.");
+	if (!ZEInitializable::InitializeSelf())
+		return false;
 
-	zeCore->SetApplicationModule(Module);
+	ZEInt argc = 0;
+	char** argv = NULL;
+	Application = new QApplication(argc, argv);
 
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	zeCore->GetSystemMessageManager()->SetEnabled(false);
+	EngineCore = ZECore::GetInstance();
+
+	EngineCore->GetOptions()->Load("options.ini");
+	EngineCore->GetOptions()->ResetChanges();
+	EngineCore->GetSystemMessageManager()->SetEnabled(false);
 	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
 
-	if (!zeCore->StartUp())
+	LoadClasses();
+
+	if (!EngineCore->StartUp())
 	{
 		zeError("Cannot start up core.");
 		return false;
 	}
 
-	zeCore->SetCoreState(ZE_CS_RUNNING);
+	EngineCore->SetCoreState(ZE_CS_RUNNING);
+
+	for (ZESize I = 0; I < Editors.GetCount(); I++)
+		Editors[I]->Initialize();
 
 	return true;
 }
 
-void ZEDCore::DeinitializeSelf()
+void ZEDEditorCore::DeinitializeSelf()
 {
+	for (ZESize I = 0; I < Editors.GetCount(); I++)
+		Editors[I]->Deinitialize();
+
 	zeCore->ShutDown();
+	Application->exit();
+
+	ZEInitializable::DeinitializeSelf();
 }
 
-ZEDCore::ZEDCore()
+ZEDEditorCore::ZEDEditorCore()
 {
-	LoadClasses();
+	Application = NULL;
+	EngineCore = NULL;
+	ExitFlag = false;
 }
 
-ZEDCore::~ZEDCore()
+ZEDEditorCore::~ZEDEditorCore()
 {
-
+	delete Application;
 }
 
-void ZEDCore::SetModule(ZEDModule* Module)
+const ZEArray<ZEDEditor*>& ZEDEditorCore::GetEditors()
 {
-	if (IsInitialized())
-		return;
-
-	this->Module = Module;
+	return Editors;
 }
 
-ZEDModule* ZEDCore::GetModule()
+void ZEDEditorCore::ExecuteEditor(ZEDEditor* Editor)
 {
-	return Module;
+	zeCheckError(Editor == NULL, ZE_VOID, "Editor is NULL.");
+	zeCheckError(Editors.Exists(Editor), ZE_VOID, "Editor is already executing.");
+
+	Editors.Add(Editor);
+	Editor->Core = this;
+
+	if (IsInitializedOrInitializing())
+		Editor->Initialize();
 }
 
-void ZEDCore::ProcessEngine()
+void ZEDEditorCore::Execute()
 {
-	ZECoreState State = zeCore->GetCoreState();
+	while(!ExitFlag)
+	{
+		ZECoreState State = EngineCore->GetCoreState();
 
-	if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
-		DeinitializeSelf();
+		if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
+			DeinitializeSelf();
 
-	zeCore->MainLoop();
+		EngineCore->MainLoop();
+
+		for (ZESize I = 0; I < Editors.GetCount(); I++)
+			Editors[I]->Process(EngineCore->GetElapsedTime());
+
+		for (ZESize I = 0; I < Editors.GetCount(); I++)
+			Editors[I]->PostProcess(EngineCore->GetElapsedTime());
+
+		Application->processEvents();
+	}
 }
 
+void ZEDEditorCore::Exit()
+{
+	Deinitialize();
+	std::exit(EXIT_SUCCESS);
+}
 
-void ZEDCore::Destroy()
+void ZEDEditorCore::Destroy()
 {
 	delete this;
 }
 
-ZEDCore* ZEDCore::GetInstance()
+ZEDEditorCore* ZEDEditorCore::CreateInstance()
 {
-	static ZEDCore Core;
-	return &Core;
+	return new ZEDEditorCore();
 }

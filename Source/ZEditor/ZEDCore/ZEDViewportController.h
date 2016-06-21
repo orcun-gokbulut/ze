@@ -42,26 +42,29 @@ class ZEDViewportKeyboardEvent;
 
 class ZEDViewportController : public ZEDComponent
 {
+	ZE_OBJECT
 	private:
-		bool						LockCamera;
-		float						StepSize;
-		float						MouseSensivity;
-		bool						Active;
-		float						Rx, Ry, Rz;
+		bool								LockCamera;
+		float								StepSize;
+		float								MouseSensivity;
+		bool								Active;
+		float								Rx, Ry, Rz;
+
+		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
+		virtual void						ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
+
+											ZEDViewportController();
+		virtual								~ZEDViewportController();
 
 	public:
-		void						SetLockCamera(bool Enabled);
-		bool						GetLockCamera();
+		void								SetLockCamera(bool Enabled);
+		bool								GetLockCamera();
 
-		void						SetStepSize(float StepSize);
-		float						GetStepSize();
+		void								SetStepSize(float StepSize);
+		float								GetStepSize();
 
-		void						SetMouseSensivity(float Sensivity);
-		float						GetMouseSensivity();
+		void								SetMouseSensivity(float Sensivity);
+		float								GetMouseSensivity();
 
-		virtual void				ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void				ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-
-									ZEDViewportController();
-									~ZEDViewportController();
+		static ZEDViewportController*		CreateInstance();
 };

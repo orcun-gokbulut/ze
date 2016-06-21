@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,34 +30,21 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+cmake_minimum_required(VERSION 2.8)
 
+ze_add_source(ZEDSceneEditor.cpp						Sources)
+ze_add_source(ZEDSceneEditor.h							Sources ZEMC)
+ze_add_source(ZEDSceneWrapper.cpp						Sources)
+ze_add_source(ZEDSceneWrapper.h							Sources ZEMC)
+ze_add_source(ZEDEntityWrapper.cpp						Sources)
+ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
 
-ZEDObjectEvent::ZEDObjectEvent()
-{
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
-}
+ze_add_library(TARGET ZEDSceneEditor 
+	ZEMC ${ZEMC}
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	LIBS ZEFoundation ZEDCore ZEDUserInterface)
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
-{
-	this->Type = Type;
-}
-
-ZEDObjectEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
-
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
-
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
-}
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

@@ -175,12 +175,10 @@ enum ZEUIMouseKey;
 ZE_META_FORWARD_DECLARE(ZEUIControl, "ZEUIControl.h")
 ZE_META_FORWARD_DECLARE(ZEUICursorControl, "ZEUICursorControl.h")
 
-class ZEUIManager : public ZEObject
+class ZEUIManager : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
-
 	private:
-		
 		ZEInputMap					InputMap;
 
 		ZEArray<ZEUIControl*>		Controls;
@@ -202,20 +200,19 @@ class ZEUIManager : public ZEObject
 		static ZEVector4			DefaultForegroundColor;
 		//static ZEFontResource*		DefaultFontResource;
 
+		bool						InitializeSelf();
+		void						DeinitializeSelf();
+
 									ZEUIManager();
 									~ZEUIManager();
 
 	public:
-	
 		void						SetActiveCursor(ZEUICursorControl* Cursor);
 
 		void						AddControl(ZEUIControl* Control);
 		void						RemoveControl(ZEUIControl* Control);
 		ZEArray<ZEUIControl*>&		GetControls();
 
-		bool						Initialize();
-		void						Deinitialize();
-		
 		void						ProcessEvents();
 		void						Render(ZERNRenderer* Render);
 		void						Tick(float ElapsedTime);

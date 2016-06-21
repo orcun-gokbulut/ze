@@ -36,7 +36,7 @@
 #include "ZEDComponent.h"
 
 #include "ZETypes.h"
-#include "ZEDS\ZEArray.h"
+#include "ZEDS/ZEArray.h"
 
 class ZEClass;
 class ZEDObjectWrapper;
@@ -46,11 +46,12 @@ class ZEDWrapperRegistration
 	public:
 		ZEClass*								WrapperClass;
 		ZEClass*								TargetClass;
-
 };
 
 class ZEDObjectManager : public ZEDComponent
 {
+	ZE_OBJECT
+	friend class ZEDObjectWrapper;
 	private:
 		ZEArray<ZEDWrapperRegistration>			WrapperClasses;
 		ZEDObjectWrapper*						RootWrapper;
@@ -58,6 +59,9 @@ class ZEDObjectManager : public ZEDComponent
 		void									LoadWrapperClasses();
 
 		bool									InitializeSelf();
+		void									DeinitializeSelf();
+
+		void									RaiseEvent(const ZEDObjectEvent* Event);
 
 												ZEDObjectManager();
 												~ZEDObjectManager();
@@ -73,13 +77,13 @@ class ZEDObjectManager : public ZEDComponent
 		ZEClass*								FindWrapperClass(ZEClass* ObjectClass);
 		ZEDObjectWrapper*						FindWrapper(ZEObject* Object, ZEDObjectWrapper* ParentWrapper = NULL);
 
-		void									CreateObject(ZEDObjectWrapper* Parent, ZEClass* Class);
-		void									AddObject(ZEDObjectWrapper* Parent, ZEDObjectWrapper* Wrapper);
-		void									RemoveObject(ZEDObjectWrapper* Wrapper);
-		void									RemoveObjects(const ZEArray<ZEDObjectWrapper*> Wrappers);
+		ZEDObjectWrapper*						WrapObject(ZEObject* Object);
+
+		void									CreateObject(ZEDObjectWrapper* Destination, ZEClass* Class);
 		void									DeleteObject(ZEDObjectWrapper* Wrapper);
 		void									DeleteObjects(const ZEArray<ZEDObjectWrapper*> Wrappers);
-
 		void									RelocateObject(ZEDObjectWrapper* Destination, ZEDObjectWrapper* Wrapper);
-		void									RelocateObject(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers);
+		void									RelocateObjects(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers);
+
+		static ZEDObjectManager*				CreateInstance();
 };

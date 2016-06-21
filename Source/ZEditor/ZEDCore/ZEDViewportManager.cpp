@@ -36,7 +36,7 @@
 #include "ZEDViewportManager.h"
 
 #include "ZEDViewport.h"
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEError.h"
 
 ZEDViewportManager::ZEDViewportManager()
@@ -64,7 +64,7 @@ void ZEDViewportManager::RegisterViewport(ZEDViewport* Viewport)
 	Viewport->ViewportManager = this;
 	Viewports.Add(Viewport);
 
-	GetModule()->AddComponent(Viewport);
+	GetEditor()->AddComponent(Viewport);
 }
 
 void ZEDViewportManager::UnregisterViewport(ZEDViewport* Viewport)
@@ -74,7 +74,7 @@ void ZEDViewportManager::UnregisterViewport(ZEDViewport* Viewport)
 	Viewport->ViewportManager = NULL;
 	Viewports.RemoveValue(Viewport);
 
-	GetModule()->RemoveComponent(Viewport);
+	GetEditor()->RemoveComponent(Viewport);
 }
 
 void ZEDViewportManager::Render()

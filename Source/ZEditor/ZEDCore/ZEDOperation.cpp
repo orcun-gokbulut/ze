@@ -42,12 +42,12 @@ ZEDOperationManager* ZEDOperation::GetManager()
 	return Manager;
 }
 
-ZEDModule* ZEDOperation::GetModule()
+ZEDEditor* ZEDOperation::GetEditor()
 {
 	if (Manager == NULL)
 		return NULL;
 	else
-		return Manager->GetModule();
+		return Manager->GetEditor();
 }
 
 void ZEDOperation::SetText(const ZEString& Text)

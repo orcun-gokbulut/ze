@@ -42,6 +42,7 @@
 
 class ZEDOperationManager : public ZEDComponent
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEDOperation*>			Stack;
 		ZESSize							StackIndex;

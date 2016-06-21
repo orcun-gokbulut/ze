@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEDToolbar.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,15 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+#pragma once
 
+#include "ZEDUserInterfaceComponent.h"
 
-ZEDObjectEvent::ZEDObjectEvent()
+class QToolBar;
+
+class ZEDToolbar : public ZEDUserInterfaceComponent
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
-}
-
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
-{
-	this->Type = Type;
-}
-
-ZEDObjectEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
-
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
-
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
-}
+	ZE_OBJECT
+	public:
+		virtual QToolBar*			GetToolbar() = 0;
+};

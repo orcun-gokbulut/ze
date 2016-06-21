@@ -255,6 +255,9 @@ void ZERNRenderer::RenderStages()
 
 bool ZERNRenderer::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	ze_for_each(Stage, Stages)
 	{
 		if (!Stage->Initialize())
@@ -278,6 +281,8 @@ void ZERNRenderer::DeinitializeSelf()
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
+
+	ZEInitializable::DeinitializeSelf();
 }
 
 void ZERNRenderer::SetContext(ZEGRContext* Context)

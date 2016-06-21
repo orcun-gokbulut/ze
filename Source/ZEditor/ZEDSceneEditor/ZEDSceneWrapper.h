@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEDSceneWrapper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,36 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+#pragma once
 
+#include "ZEDCore/ZEDObjectWrapper.h"
 
-ZEDObjectEvent::ZEDObjectEvent()
+#include "ZEDEntityWrapper.h"
+#include "ZEGame/ZERayCast.h"
+
+class ZEScene;
+
+class ZEDSceneWrapper : public ZEDObjectWrapper
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
-}
+	ZE_OBJECT
+	private:
+		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
+		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
-{
-	this->Type = Type;
-}
+	public:
+		virtual void							SetObject(ZEObject* Object);
+		virtual ZEString						GetName() const;
+		
+		ZEScene*								GetScene();
 
-ZEDObjectEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
+		virtual bool							CheckChildrenClass(ZEClass* Class);
+		virtual bool							AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
+		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
 
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
+		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void							Update();
 
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
+		static ZEDSceneWrapper*					CreateInstance();
 }
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEScene);

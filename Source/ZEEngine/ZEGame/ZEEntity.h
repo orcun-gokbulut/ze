@@ -203,4 +203,8 @@ class ZEEntity : public ZEObject
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		ZEDObjectWrapper*						GetWrapper() const;
-};
+}
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.Icon, "#R:/ZEDEditor/Entity/Icons/Entity.png")
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.NamePlate, true)
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.Selectable, true)
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.Visualization, BoundingBox);

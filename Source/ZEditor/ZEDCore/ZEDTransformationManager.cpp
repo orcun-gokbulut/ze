@@ -36,8 +36,7 @@
 #include "ZEDTransformationManager.h"
 
 #include "ZEMath\ZEAngle.h"
-#include "ZEDCore.h"
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEDGizmo.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDOperationManager.h"
@@ -166,7 +165,7 @@ void ZEDTransformationManager::UpdateToolbar()
 
 void ZEDTransformationManager::UpdateTransformStates()
 {
-	const ZEArray<ZEDObjectWrapper*>& Selection = GetModule()->GetSelectionManager()->GetSelection();
+	const ZEArray<ZEDObjectWrapper*>& Selection = GetEditor()->GetSelectionManager()->GetSelection();
 
 	TransformStates.Clear();
 	TransformFocused = NULL;
@@ -263,7 +262,7 @@ void ZEDTransformationManager::EndTransform()
 		return;
 
 	ZEDTransformationOperation* Operation = ZEDTransformationOperation::Create(TransformType, TransformStates);
-	GetModule()->GetOperationManager()->DoOperation(Operation);
+	GetEditor()->GetOperationManager()->DoOperation(Operation);
 
 	for (ZESize I = 0; I < TransformStates.GetCount(); I++)
 	{

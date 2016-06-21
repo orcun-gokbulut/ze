@@ -38,22 +38,16 @@
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectEvent.h"
 
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 
 bool ZEDDeleteOperation::Apply()
 {
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		if (Items[I].Parent != NULL)
-		{
-			Items[I].Parent->RemoveChildWrapper(Items[I].Wrapper);
-		
-			ZEDObjectEvent Event;
-			Event.SetType(ZED_OCET_REMOVED);
-			Event.SetWrapper(Items[I].Wrapper);
-			GetModule()->DistributeEvent(&Event);
-		}
+		if (Items[I].Parent == NULL)
+			continue;
 
+		Items[I].Parent->RemoveChildWrapper(Items[I].Wrapper);
 	}
 
 	return true;
@@ -63,13 +57,10 @@ bool ZEDDeleteOperation::Revert()
 {
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
-		if (Items[I].Parent != NULL)
-			Items[I].Parent->AddChildWrapper(Items[I].Wrapper);
+		if (Items[I].Parent == NULL)
+			continue;
 
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_ADDED);
-		Event.SetWrapper(Items[I].Wrapper);
-		GetModule()->DistributeEvent(&Event);
+		Items[I].Parent->AddChildWrapper(Items[I].Wrapper);
 	}
 
 	return true;
@@ -82,11 +73,14 @@ ZEDDeleteOperation::ZEDDeleteOperation()
 
 ZEDDeleteOperation::~ZEDDeleteOperation()
 {
-	if (GetStatus() != ZED_OS_NOT_DONE)
+	if (GetStatus() == ZED_OS_DONE)
 		return;
 
 	for (ZESize I = 0; I < Items.GetCount(); I++)
 	{
+		if (Items[I].Wrapper->GetObject() != NULL)
+			delete Items[I].Wrapper->GetObject();
+
 		if (Items[I].Wrapper != NULL)
 			Items[I].Wrapper->Destroy();
 	}

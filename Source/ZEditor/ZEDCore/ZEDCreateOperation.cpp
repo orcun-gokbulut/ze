@@ -35,37 +35,81 @@
 
 #include "ZEDCreateOperation.h"
 
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
+#include "ZEDObjectManager.h"
 
 bool ZEDCreateOperation::Apply()
 {
+	if (Parent == NULL)
+		return false;
+
+	if (!Parent->CheckChildrenClass(TargetClass))
+		return false;
+
+	ZEClass* WrapperClass = GetEditor()->GetObjectManager()->FindWrapperClass(TargetClass);
+	if (WrapperClass == NULL)
+		return false;
+
+	ZEObject* Object = TargetClass->CreateInstance();
+	if (Object == NULL)
+		return false;
+
+	if (Wrapper == NULL)
+		Wrapper = static_cast<ZEDObjectWrapper*>(WrapperClass->CreateInstance());
+
+	if (Wrapper == NULL)
+		return false;
+
+	Wrapper->SetObject(Object);
+
+	if (!Parent->AddChildWrapper(Wrapper))
+		return false;
+
 	return true;
 }
 
 bool ZEDCreateOperation::Revert()
 {
+	if (Parent == NULL)
+		return false;
+	
+	if (Wrapper == NULL)
+		return false;
+
+	if (!Parent->RemoveChildWrapper(Wrapper))
+		return false;
+
 	return true;
+}
+
+ZEDCreateOperation::ZEDCreateOperation()
+{
+	TargetClass = NULL;
+	Wrapper = NULL;
+	Parent = NULL;
 }
 
 ZEDCreateOperation::~ZEDCreateOperation()
 {
-	if (GetStatus() != ZED_OS_NOT_DONE)
-		return;
-	
-	if (Wrapper != NULL)
+	if (GetStatus() != ZED_OS_DONE)
 		return;
 
-	Wrapper->Destroy();
+	if (Wrapper->GetObject() != NULL)
+		delete Wrapper->GetObject();
+
+	if (Wrapper != NULL)
+		Wrapper->Destroy();
 }
-/*
+
 ZEDCreateOperation* ZEDCreateOperation::Create(ZEClass* Class, ZEDObjectWrapper* Parent)
 {
 	ZEDCreateOperation* Operation = new ZEDCreateOperation();
 
-	Operation->Class = Class;
-	Operation->Wrapper = Wrapper;
+	Operation->TargetClass = Class;
+	Operation->Wrapper = NULL;
 	Operation->Parent = Parent;
-	
+	Operation->SetText("Create Object");
+
 	return Operation;
-}*/
+}

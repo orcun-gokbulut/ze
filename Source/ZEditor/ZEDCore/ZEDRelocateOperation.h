@@ -52,6 +52,7 @@ class ZEDRelocatedItem
 
 class ZEDRelocateOperation : public ZEDOperation
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEDRelocatedItem>				Items;
 

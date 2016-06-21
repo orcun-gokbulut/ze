@@ -52,6 +52,7 @@ struct ZEDPropertyOperationItem
 
 class ZEDPropertyOperation : public ZEDOperation
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEDPropertyOperationItem>		Items;
 		ZEDObjectWrapper*						Wrappers;
