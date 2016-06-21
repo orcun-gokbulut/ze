@@ -65,30 +65,45 @@ class ZERNStageAO : public ZERNStage
 	private:
 		ZEFlags								DirtyFlags;
 		ZERNFilter							Filter;
+		ZEGRViewport						Viewport;
+		ZERNSSAOSampleCount					SampleCount;
+		ZEArray<ZEVector4>					RandomVectors;
 
 		ZEHolder<ZEGRShader>				ScreenCoverPositionTexCoordVertexShader;
-		ZEHolder<ZEGRShader>				ResolveAndScalePixelShader;
+
+		ZEHolder<ZEGRShader>				ResolveAndClampDepthPixelShader;
 		ZEHolder<ZEGRShader>				SSAOPixelShader;
+
+		ZEHolder<ZEGRShader>				ResolveAndLinearizeDepthPixelShader;
+		ZEHolder<ZEGRShader>				DeinterleaveDepthPixelShader;
+		ZEHolder<ZEGRShader>				DeinterleaveSSAOPixelShader;
+		ZEHolder<ZEGRShader>				ReinterleaveSSAOPixelShader;
+
 		ZEHolder<ZEGRShader>				CrossBilateralBlurXPixelShader;
 		ZEHolder<ZEGRShader>				CrossBilateralBlurYPixelShader;
-		ZEHolder<ZEGRShader>				BlendPixelShader;
 
-		ZEHolder<ZEGRRenderStateData>		ResolveAndScaleRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		ResolveAndClampDepthRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		SSAORenderStateData;
+
+		ZEHolder<ZEGRRenderStateData>		ResolveAndLinearizeDepthRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		DeinterleaveDepthRenderStateData;
+		ZEHolder<ZEGRRenderStateData>		DeinterleaveSSAORenderStateData;
+		ZEHolder<ZEGRRenderStateData>		ReinterleaveSSAORenderStateData;
+
 		ZEHolder<ZEGRRenderStateData>		CrossBilateralBlurXRenderStateData;
 		ZEHolder<ZEGRRenderStateData>		CrossBilateralBlurYRenderStateData;
-		ZEHolder<ZEGRRenderStateData>		BlendRenderStateData;
 
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		DeinterleavedConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>				OcclusionMap;
+		ZEHolder<ZEGRTexture2D>				AmbientOcclusionTexture;
 		ZEHolder<ZEGRTexture2D>				BlurTempTexture;
 		ZEHolder<ZEGRTexture2D>				RandomVectorsTexture;
-		ZEHolder<ZEGRTexture2D>				ResolvedScaledDepthTexture;
+		ZEHolder<ZEGRTexture2D>				ResolvedDepthTexture;
+		ZEHolder<ZEGRTexture2D>				DeinterleavedDepthtexture;
+		ZEHolder<ZEGRTexture2D>				DeinterleavedAmbientOcclusionTexture;
 
-		ZEGRViewport						Viewport;
-
-		ZERNSSAOSampleCount					SampleCount;
+		bool								UseDeinterleavedTexturing;
 
 		const ZEGRTexture2D*				DepthTexture;
 		const ZEGRTexture2D*				NormalTexture;
@@ -108,13 +123,22 @@ class ZERNStageAO : public ZERNStage
 			ZEUInt							KernelRadius;
 			float							BlurSharpness;
 			float							DistanceThreshold;
-			float							Reserved;
+			float							Reserved0;
 		} Constants;
+
+		struct
+		{
+			ZEVector3						RandomVector;
+			ZEUInt							DepthArrayIndex;
+
+			ZEVector2						Offset;
+			ZEVector2						Reserved;
+		} DeinterleavedConstants;
 
 		void								CreateRandomVectors();
 		void								CreateSphereSamples();
 
-		virtual bool						InitializeSelf();	
+		virtual bool						InitializeSelf();
 		virtual void						DeinitializeSelf();
 
 		bool								UpdateShaders();
@@ -124,10 +148,13 @@ class ZERNStageAO : public ZERNStage
 		bool								UpdateTextures();
 		bool								Update();
 
-		void								ResolveAndScaleDepth(ZEGRContext* Context);
-		void								GenerateOcclusionMap(ZEGRContext* Context, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								ResolveAndClampDepth(ZEGRContext* Context);
+		void								AmbientOcclusion(ZEGRContext* Context, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
+		void								ResolveAndLinearizeDepth(ZEGRContext* Context);
+		void								DeinterleaveDepth(ZEGRContext* Context);
+		void								DeinterleaveAmbientOcclusion(ZEGRContext* Context);
+		void								ReinterleaveAmbientOcclusion(ZEGRContext* Context);
 		void								ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRDepthStencilBuffer* DepthStencilBuffer);
-		void								BlendWithAccumulation(ZEGRContext* Context, const ZEGRTexture2D* InputTexture);
 
 	public:
 		virtual ZEInt						GetId() const;
@@ -147,6 +174,9 @@ class ZERNStageAO : public ZERNStage
 
 		void								SetDistanceThreshold(float DistanceThreshold);
 		float								GetDistanceThreshold() const;
+
+		void								SetDeinterleavedTexturing(bool UseDeinterleavedTexturing);
+		bool								GetDeinterleavedTexturing() const;
 
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 
