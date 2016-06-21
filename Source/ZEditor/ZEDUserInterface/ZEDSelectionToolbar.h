@@ -35,40 +35,41 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
+#include "ZEDToolbar.h"
+#include <QObject>
 
-#include <QToolBar>
-
-class ZEDSelectionManager;
-class QToolButton;
+class QAction;
 class QComboBox;
+class ZEDSelectionManager;
 
-class ZEDSelectionToolbar : public QToolBar, public ZEDComponent
+class ZEDSelectionToolbar : public QObject, public ZEDToolbar
 {
 	Q_OBJECT
 	private:
-		ZEDSelectionManager*				SelectionManager;
+		QToolBar*							Toolbar;
 
 		QComboBox*							cmbShape;
-		QToolButton*						btnFreeze;
-		QToolButton*						btnUnfreezeAll;
+		QAction*							actFreeze;
+		QAction*							actUnfreezeAll;
 		QComboBox*							cmbMode;
-		QToolButton*						btnSelectionList;
+		QAction*							actSelectionList;
 
 		void								SetupUI();
 		void								UpdateUI();
 
+											ZEDSelectionToolbar();
+		virtual								~ZEDSelectionToolbar();
+
 	private slots:
-		void								btnSelectionList_clicked();
+		void								actSelectionList_triggered();
 		void								cmbShape_currentIndexChanged(const QString & text);
 		void								cmbMode_currentIndexChanged(const QString & text);
-		void								btnFreeze_clicked();
-		void								btnUnfreezeAll_clicked();
+		void								actFreeze_triggered();
+		void								actUnfreezeAll_triggered();
 
 	public:
-		void								SetSelectionManager(ZEDSelectionManager* Manager);
+		virtual QToolBar*					GetToolbar();
 		ZEDSelectionManager*				GetSelectionManager();
 
-											ZEDSelectionToolbar(QWidget* Parent = NULL);
-											~ZEDSelectionToolbar();
+		static ZEDSelectionToolbar*			CreateInstance();
 };

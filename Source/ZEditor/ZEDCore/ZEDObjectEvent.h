@@ -39,12 +39,12 @@
 
 class ZEDObjectWrapper;
 
-enum ZEDObjectChangedEventType
+enum ZEDObjectEventType
 {
-	ZED_OCED_NONE,
-	ZED_OCET_ADDED,
-	ZED_OCET_REMOVED,
-	ZED_OCET_CHANGED
+	ZED_OET_NONE,
+	ZED_OET_ADDED,
+	ZED_OET_REMOVED,
+	ZED_OET_CHANGED
 };
 
 class ZEDObjectEvent : public ZEDEvent
@@ -52,15 +52,15 @@ class ZEDObjectEvent : public ZEDEvent
 	ZE_OBJECT
 	friend class ZEDObjectWrapper;
 	private:
-		ZEDObjectChangedEventType					Type;
-		ZEDObjectWrapper*							Wrapper;
+		ZEDObjectEventType						Type;
+		ZEDObjectWrapper*						Wrapper;
 
 	public:	
-		void										SetType(ZEDObjectChangedEventType Type);
-		ZEDObjectChangedEventType					GetType() const;
+		void									SetType(ZEDObjectEventType Type);
+		ZEDObjectEventType						GetType() const;
 
-		void										SetWrapper(ZEDObjectWrapper* Wrapper);
-		ZEDObjectWrapper*							GetWrapper() const;
+		void									SetWrapper(ZEDObjectWrapper* Wrapper);
+		ZEDObjectWrapper*						GetWrapper() const;
 
-													ZEDObjectEvent();
+												ZEDObjectEvent();
 };

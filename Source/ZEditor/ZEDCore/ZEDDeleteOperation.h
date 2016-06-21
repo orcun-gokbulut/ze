@@ -50,6 +50,7 @@ class ZEDDeletedItem
 
 class ZEDDeleteOperation : public ZEDOperation
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEDDeletedItem>					Items;
 

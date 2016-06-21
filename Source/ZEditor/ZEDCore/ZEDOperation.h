@@ -35,7 +35,9 @@
 
 #pragma once
 
-#include "ZEDS\ZEString.h"
+#include "ZEMeta/ZEObject.h"
+
+#include "ZEDS/ZEString.h"
 
 enum ZEDOperationStatus
 {
@@ -45,10 +47,11 @@ enum ZEDOperationStatus
 };
 
 class ZEDOperationManager;
-class ZEDModule;
+class ZEDEditor;
 
-class ZEDOperation
+class ZEDOperation : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEDOperationManager;
 	private:
 		ZEDOperationManager*		Manager;
@@ -57,7 +60,7 @@ class ZEDOperation
 
 	protected:
 		ZEDOperationManager*		GetManager();
-		ZEDModule*					GetModule();
+		ZEDEditor*					GetEditor();
 
 		void						SetText(const ZEString& Text);
 		

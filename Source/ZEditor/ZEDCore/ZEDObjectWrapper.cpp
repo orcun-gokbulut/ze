@@ -37,20 +37,26 @@
 
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEMath.h"
-
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
+#include "ZEDObjectManager.h"
 #include "ZEDObjectEvent.h"
 #include "ZERenderer/ZERNSimpleMaterial.h"
 
-void ZEDObjectWrapper::SetModule(ZEDModule* Module)
+void ZEDObjectWrapper::SetManager(ZEDObjectManager* Manager)
 {
-	if (this->Module == Module)
+	if (this->Manager == Manager)
 		return;
 
 	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
-		ChildWrappers[I]->SetModule(Module);
+		ChildWrappers[I]->SetManager(Manager);
 
-	this->Module = Module;
+	this->Manager = Manager;
+}
+
+void ZEDObjectWrapper::RaiseEvent(ZEDObjectEvent* Event)
+{
+	if (Manager != NULL)
+		Manager->RaiseEvent(Event);
 }
 
 bool ZEDObjectWrapper::InitializeSelf()
@@ -64,6 +70,8 @@ bool ZEDObjectWrapper::InitializeSelf()
 			return false;
 	}
 
+	Update();
+
 	return true;
 }
 
@@ -73,6 +81,52 @@ void ZEDObjectWrapper::DeinitializeSelf()
 		ChildWrappers[I]->Deinitialize();
 
 	ZEInitializable::DeinitializeSelf();
+}
+
+void ZEDObjectWrapper::SyncronizeChildWrappers(ZEObject*const*  TargetList, ZESize TargetListSize)
+{
+	// Remove
+	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
+
+	for (ZESSize I = Wrappers.GetCount() - 1; I >= 0; I--)
+	{
+		bool Found = false;
+		for (ZESize N = 0; N < TargetListSize; N++)
+		{
+			if (Wrappers[I]->GetObject() == TargetList[N])
+			{
+				Found = true;
+				break;
+			}
+		}
+
+		if (!Found)
+			Wrappers[I]->Destroy();
+
+		Wrappers[I]->Update();
+	}
+
+	// Add
+	for (ZESize I = 0; I < TargetListSize; I++)
+	{
+		ZEDObjectWrapper* Wrapper = NULL;
+		const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
+		for (ZESize N = 0; N < Wrappers.GetCount(); N++)
+		{
+			if (Wrappers[N]->GetObject() == TargetList[I])
+			{
+				Wrapper = Wrappers[N];
+				break;
+			}
+		}
+
+		if (Wrapper == NULL)
+		{
+			Wrapper = GetManager()->WrapObject(TargetList[I]);
+			if (Wrapper != NULL)
+				AddChildWrapper(Wrapper, true);
+		}
+	}
 }
 
 void ZEDObjectWrapper::ClearChildWrappers()
@@ -85,7 +139,7 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 {
 	Object = NULL;
 	Parent = NULL;
-	Module = NULL;
+	Manager = NULL;
 	Selectable = true;
 	Selected = false;
 	Locked = false;
@@ -102,10 +156,8 @@ void ZEDObjectWrapper::SetObject(ZEObject* Object)
 	if (this->Object == Object)
 		return;
 
+	ClearChildWrappers();
 	this->Object = Object;
-
-	if (Object == NULL)
-		ClearChildWrappers();
 
 	Update();
 }
@@ -114,7 +166,6 @@ ZEObject* ZEDObjectWrapper::GetObject() const
 {
 	return Object;
 }
-
 
 void ZEDObjectWrapper::SetParent(ZEDObjectWrapper* Wrapper)
 {
@@ -126,9 +177,9 @@ ZEDObjectWrapper* ZEDObjectWrapper::GetParent() const
 	return Parent;
 }
 
-ZEDModule* ZEDObjectWrapper::GetModule() const
+ZEDObjectManager* ZEDObjectWrapper::GetManager() const
 {
-	return Module;
+	return Manager;
 }
 
 void ZEDObjectWrapper::SetId(ZEInt Id)
@@ -173,7 +224,8 @@ ZEMatrix4x4 ZEDObjectWrapper::GetWorldTransform()
 
 void ZEDObjectWrapper::SetPosition(const ZEVector3& NewPosition)
 {
-
+	ZEDObjectEvent Event;
+	
 }
 
 ZEVector3 ZEDObjectWrapper::GetPosition() const
@@ -183,7 +235,7 @@ ZEVector3 ZEDObjectWrapper::GetPosition() const
 
 void ZEDObjectWrapper::SetRotation(const ZEQuaternion& NewRotation)
 {
-
+	
 }
 
 ZEQuaternion ZEDObjectWrapper::GetRotation() const
@@ -281,13 +333,12 @@ bool ZEDObjectWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 
 	ChildWrappers.Add(Wrapper);
 	Wrapper->SetParent(this);
-	Wrapper->SetModule(Module);
+	Wrapper->SetManager(Manager);
 
 	ZEDObjectEvent Event;
 	Event.Wrapper = Wrapper;
-	Event.Type = ZED_OCET_ADDED;
-	if (Module != NULL)
-		Module->DistributeEvent(&Event);
+	Event.Type = ZED_OET_ADDED;
+	RaiseEvent(&Event);
 
 	if (IsInitialized())
 	{
@@ -306,17 +357,16 @@ bool ZEDObjectWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 	if (!ChildWrappers.Exists(Wrapper))
 		return false;
 
+	Wrapper->Deinitialize();
+
 	ChildWrappers.RemoveValue(Wrapper);
 	Wrapper->SetParent(NULL);
-	Wrapper->SetModule(NULL);
+	Wrapper->SetManager(NULL);
 
 	ZEDObjectEvent Event;
 	Event.Wrapper = Wrapper;
-	Event.Type = ZED_OCET_REMOVED;
-	if (Module != NULL)
-		Module->DistributeEvent(&Event);
-
-	Wrapper->Deinitialize();
+	Event.Type = ZED_OET_REMOVED;
+	RaiseEvent(&Event);
 
 	return true;
 }
@@ -344,6 +394,14 @@ void ZEDObjectWrapper::Tick(float ElapsedTime)
 void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 
+}
+
+void ZEDObjectWrapper::SendChangedEvent()
+{
+	ZEDObjectEvent Event;
+	Event.Wrapper = this;
+	Event.Type = ZED_OET_CHANGED;
+	RaiseEvent(&Event);
 }
 
 void ZEDObjectWrapper::Update()

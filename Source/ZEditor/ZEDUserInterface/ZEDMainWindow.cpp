@@ -34,158 +34,244 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDMainWindow.h"
-
 #include "ui_ZEDMainWindow.h"
 
-#include "ZEMath/ZEAngle.h"
-#include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDModule.h"
-#include "ZEDCore/ZEDViewport.h"
-#include "ZEDCore/ZEDOperationManager.h"
-#include "ZEDCore/ZEDTransformationManager.h"
-#include "ZEDCore/ZEDGizmo.h"
-#include "ZEDTransformationToolbar.h"
-#include "ZEDSelectionToolbar.h"
-#include "ZEDObjectTree.h"
+#include "ZEError.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEPathTokenizer.h"
+#include "ZERegEx/ZERegEx.h"
 
-void ZEDMainWindow::closeEvent(QCloseEvent* Event)
+#include "ZEDWindow.h"
+#include "ZEDToolbar.h"
+#include "ZEDMenu.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDCore/ZEDViewPort.h"
+#include "ZEDUserInterfaceComponent.h"
+
+#include <QDockWidget>
+#include <QToolBar>
+#include <QMessageBox>
+
+class ZEDMenuWrapper : public QMenu
 {
-	actExit_onTriggered();
+	public:
+		ZEString Section;
+};
+
+bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
+{
+	if (Object != GetMainWindow())
+		return false;
+
+	if (Event->type() == QEvent::Close)
+	{
+		int Result = QMessageBox::question(static_cast<QWidget*>(Object), "ZEDEditor", "Are you sure that you want to quit ?", QMessageBox::Yes, QMessageBox::No);
+		if (Result)
+		{
+			GetEditor()->Exit();
+			return false;
+		}
+		else
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
-bool ZEDMainWindow::InitializeSelf()
+QMenu* ZEDMainWindow::GetOrCreateMenu(QMenu* Parent, const ZEString& Target)
 {
-	connect(Form->actNew, SIGNAL(triggered(bool)), this, SLOT(actNew_onTriggered()));
-	connect(Form->actOpen, SIGNAL(triggered(bool)), this, SLOT(actOpen_onTriggered()));
-	connect(Form->actClose, SIGNAL(triggered(bool)), this, SLOT(actClose_onTriggered()));
-	connect(Form->actSave, SIGNAL(triggered(bool)), this, SLOT(actSave_onTriggered()));
-	connect(Form->actSaveAs, SIGNAL(triggered(bool)), this, SLOT(actSaveAs_onTriggered()));
-	connect(Form->actExit, SIGNAL(triggered(bool)), this, SLOT(actExit_onTriggered()));
-	connect(Form->actSelect, SIGNAL(triggered(bool)), this, SLOT(actSelect_onTriggered()));
-	connect(Form->actMove, SIGNAL(triggered(bool)), this, SLOT(actMove_onTriggered()));
-	connect(Form->actRotate, SIGNAL(triggered(bool)), this, SLOT(actRotate_onTriggered()));
-	connect(Form->actScale, SIGNAL(triggered(bool)), this, SLOT(actScale_onTriggered()));
-	connect(Form->actUndo, SIGNAL(triggered(bool)), this, SLOT(actUndo_onTriggered()));
-	connect(Form->actRedo, SIGNAL(triggered(bool)), this, SLOT(actRedo_onTriggered()));
+	ZERegEx RegExp("(.*)(::)+(.*)");
+	ZERegExMatch Match;
+	RegExp.Match(Target, Match, ZE_REF_NO_MATCH_STRING);
 
-	return true;
+	ZEString& Section = Match.SubMatches[0].String;
+	ZEString& Name = Match.SubMatches[2].String;
+	
+	if (Match.SubMatches[1].String != "::")
+	{
+		Name = Section;
+		Section = ZEString::Empty;
+	}
+
+	QWidget* ParentWidget = Parent;
+	if (ParentWidget == NULL)
+		ParentWidget = MainWindow->menuBar();
+
+	QList<QMenu*> ChildMenus = Parent->findChildren<QMenu*>();
+	for (ZESize I = 0; I < ChildMenus.count(); I++)
+	{
+		ZEDMenuWrapper* ChildMenu = static_cast<ZEDMenuWrapper*>(ChildMenus[I]);
+		if (ChildMenu->title() == Name && ChildMenu->Section == Section)
+			return ChildMenu;
+	}
+
+	return NULL;
 }
 
-void ZEDMainWindow::DeinitializeSelf()
+ZEDMainWindow::ZEDMainWindow()
 {
+	MainWindow = new QMainWindow();
+	Form = new Ui_ZEDMainWindow();
+	Form->setupUi(MainWindow);
 
+	MainWindow->installEventFilter(this);
+
+	MainWindow->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
+	MainWindow->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
 }
 
-void ZEDMainWindow::actNew_onTriggered()
-{
-
-}
-
-void ZEDMainWindow::actOpen_onTriggered()
-{
-
-}
-
-void ZEDMainWindow::actClose_onTriggered()
-{
-
-}
-
-void ZEDMainWindow::actSave_onTriggered()
-{
-
-}
-
-void ZEDMainWindow::actSaveAs_onTriggered()
-{
-
-}
-
-void ZEDMainWindow::actExit_onTriggered()
-{
-	exit(0);
-}
-
-void ZEDMainWindow::actUndo_onTriggered()
-{
-	GetModule()->GetOperationManager()->Undo();
-}
-
-void ZEDMainWindow::actRedo_onTriggered()
-{
-	GetModule()->GetOperationManager()->Redo();
-}
-
-void ZEDMainWindow::actClone_onTriggered()
+ZEDMainWindow::~ZEDMainWindow()
 {
 
 }
 
-void ZEDMainWindow::actDelete_onTriggered()
+QMainWindow* ZEDMainWindow::GetMainWindow()
+{
+	return MainWindow;
+}
+
+const ZEArray<ZEDMenu*>& ZEDMainWindow::GetMenus()
+{
+	return Menus;
+}
+
+const ZEArray<ZEDToolbar*>& ZEDMainWindow::GetToolbars()
+{
+	return Toolbars;
+}
+
+const ZEArray<ZEDWindow*>& ZEDMainWindow::GetWindows()
+{
+	return Windows;
+}
+
+void ZEDMainWindow::AddMenu(ZEDMenu* Menu)
+{
+	zeCheckError(Menu == NULL, ZE_VOID, "Menu is NULL.");
+	zeCheckError(Menu->GetMainWindow() != NULL, ZE_VOID, "Menu is already added to a Main Window. Menu Path: \"%s\".", Menu->GetPath().ToCString());
+
+	ZEPathTokenizer Tokenizer;
+	Tokenizer.Tokenize(Menu->GetPath());
+
+	QMenu* Parent = NULL;
+	for (ZESize I = 0; I < Tokenizer.GetTokenCount() - 1; I++)
+	{
+		QMenu* Menu = GetOrCreateMenu(Parent, Tokenizer.GetToken(I));
+		Parent = Menu;
+	}
+
+	QMenu* SectionStart = NULL;
+	QMenu* SectionEnd = NULL;
+	QList<QMenu*> List = findChildren<QMenu*>();
+	for (ZESize I = 0; I < List.count(); I++)
+	{
+		if (static_cast<ZEDMenuWrapper*>(List[I])->Section == Menu->GetSection())
+		{
+			SectionStart = List[I];
+			continue;
+		}
+		else if (SectionStart != NULL && static_cast<ZEDMenuWrapper*>(List[I])->Section != Menu->GetSection())
+		{
+			SectionEnd = List[I];
+			break;
+		}
+	}
+
+	if (SectionEnd == NULL && List.count() != 0)
+		Parent->insertSeparator(SectionEnd->menuAction());
+
+	if (Menu->GetAction() != NULL)
+		Parent->insertAction(SectionEnd->menuAction(), Menu->GetAction());
+
+	if (Menu->GetMenu() != NULL)
+		Parent->insertMenu(SectionEnd->menuAction(), Menu->GetMenu());
+}
+
+void ZEDMainWindow::RemoveMenu(ZEDMenu* Menu)
 {
 
 }
 
-void ZEDMainWindow::actSelect_onTriggered()
+void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar)
 {
-	Form->actMove->setChecked(false);
-	Form->actRotate->setChecked(false);
-	Form->actScale->setChecked(false);
+	zeCheckError(Toolbar == NULL, ZE_VOID, "Toolbar is NULL.");
+	zeCheckError(Toolbar->GetMainWindow() != NULL, ZE_VOID, "Toolbar already added to a Main Window. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
-	if(!Form->actSelect->isChecked())
-		Form->actSelect->setChecked(true);
+	Toolbars.Add(Toolbar);
+	GetEditor()->AddComponent(Toolbar);
+	GetMainWindow()->addToolBar(Toolbar->GetToolbar());
 
-	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_NONE);
+	QAction* Action = new QAction(this);
+	Action->setText(Toolbar->GetName().ToCString());
+	Action->setCheckable(true);
+	Action->setChecked(Toolbar->GetToolbar()->isVisible());
+	QObject::connect(Toolbar->GetToolbar(), SIGNAL(visibilityChanged(bool)), Toolbar->Action, SLOT(setChecked(bool)));
+	QObject::connect(Toolbar->Action, SIGNAL(toggled(bool)), Toolbar->GetToolbar(), SLOT(setVisible(bool)));
+
+	Toolbar->Menu = new ZEDMenu();
+	if (Toolbar->GetCategory().IsEmpty())
+		Toolbar->Menu->SetPath(ZEFormat::Format("Windows/Toolbars/{0}", Toolbar->GetName()));
+	else
+		Toolbar->Menu->SetPath(ZEFormat::Format("Windows/Toolbars/{0}::{1}", Toolbar->GetCategory(), Toolbar->GetName()));
+	Toolbar->Menu->SetAction(Action);
+	//AddMenu(Toolbar->Menu);
 }
 
-void ZEDMainWindow::actMove_onTriggered()
+void ZEDMainWindow::RemoveToolbar(ZEDToolbar* Toolbar)
 {
-	Form->actSelect->setChecked(false);
-	Form->actRotate->setChecked(false);
-	Form->actScale->setChecked(false);
+	zeCheckError(Toolbar == NULL, ZE_VOID, "Toolbar is NULL.");
+	zeCheckError(Toolbar->GetMainWindow() != this, ZE_VOID, "Toolbar does not belong to this Main Window. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
-	if(!Form->actMove->isChecked())
-		Form->actMove->setChecked(true);
+	GetMainWindow()->removeToolBar(Toolbar->GetToolbar());
+	RemoveMenu(Toolbar->Menu);
 
-	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_TRANSLATE);
+	GetEditor()->RemoveComponent(Toolbar);
+	Toolbars.RemoveValue(Toolbar);
 }
 
-void ZEDMainWindow::actRotate_onTriggered()
+void ZEDMainWindow::AddWindow(ZEDWindow* Window)
 {
-	Form->actSelect->setChecked(false);
-	Form->actMove->setChecked(false);
-	Form->actScale->setChecked(false);
+	zeCheckError(Window == NULL, ZE_VOID, "Window is NULL.");
+	zeCheckError(Window->GetMainWindow() == this, ZE_VOID, "Window is already added to Main Window. Window Name: \"%s\".", Window->GetName().ToCString());
+	
+	Windows.Add(Window);
 
-	if(!Form->actRotate->isChecked())
-		Form->actRotate->setChecked(true);
+	QAction* Action = new QAction(this);
+	Action->setText(Window->GetName().ToCString());
+	Action->setCheckable(true);
+	Action->setChecked(Window->GetWidget()->isVisible());
+	connect(Window->GetWidget(), SIGNAL(visibilityChanged(bool)), Window->Action, SLOT(setChecked(bool)));
+	connect(Window->Action, SIGNAL(toggled(bool)), Window->GetWidget(), SLOT(setVisible(bool)));
 
-	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_ROTATE);
+	Window->Menu = new ZEDMenu();
+	if (Window->GetCategory().IsEmpty())
+		Window->Menu->SetPath(ZEFormat::Format("Windows/{0}", Window->GetName()));
+	else
+		Window->Menu->SetPath(ZEFormat::Format("Windows/{0}::{1}", Window->GetCategory(), Window->GetName()));
+	Window->Menu->SetAction(Action);
+	AddMenu(Window->Menu);
+	
+	if (IsInitialized())
+		Window->InitializeSelf();
 }
 
-void ZEDMainWindow::actScale_onTriggered()
+void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)
 {
-	Form->actSelect->setChecked(false);
-	Form->actMove->setChecked(false);
-	Form->actRotate->setChecked(false);
+	zeCheckError(Window == NULL, ZE_VOID, "Window is NULL.");
+	zeCheckError(Window->GetMainWindow() != this, ZE_VOID, "Window does not belong to this Main Window. Window Name: \"%s\".", Window->GetName().ToCString());
 
-	if(!Form->actScale->isChecked())
-		Form->actScale->setChecked(true);
+	Window->Deinitialize();
+	Windows.RemoveValue(Window);
 
-	GetModule()->GetTransformManager()->SetTransformType(ZED_TT_SCALE);
-}
-
-void ZEDMainWindow::MainTimer_onTimeout()
-{
-	ZEDCore::GetInstance()->ProcessEngine();
-
-	Form->actUndo->setEnabled(GetModule()->GetOperationManager()->CanUndo());
-	Form->actRedo->setEnabled(GetModule()->GetOperationManager()->CanRedo());
+	RemoveMenu(Window->Menu);
 }
 
 void ZEDMainWindow::SetViewport(ZEDViewport* Viewport)
 {
 	this->Viewport = Viewport;
-	setCentralWidget(Viewport);
+	MainWindow->setCentralWidget(Viewport);
 }
 
 ZEDViewport* ZEDMainWindow::GetViewport()
@@ -193,18 +279,7 @@ ZEDViewport* ZEDMainWindow::GetViewport()
 	return Viewport;
 }
 
-ZEDMainWindow::ZEDMainWindow(QWidget* Parent, Qt::WindowFlags Flags) : QMainWindow(Parent, Flags)
+ZEDMainWindow* ZEDMainWindow::CreateInstance()
 {
-	Form = new Ui_ZEDMainWindow();
-	Form->setupUi(this);
-	
-	showMaximized();
-	
-	setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
-	setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
-}
-
-ZEDMainWindow::~ZEDMainWindow()
-{
-
+	return new ZEDMainWindow();
 }

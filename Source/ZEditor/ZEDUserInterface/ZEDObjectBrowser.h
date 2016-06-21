@@ -56,7 +56,6 @@ class ZEDObjectBrowser : public QWidget, public ZEDComponent
 		bool								CheckDrop();
 		void								Drag();
 		void								DropReceived();
-		
 
 		virtual bool						eventFilter(QObject* Object, QEvent* Event);
 

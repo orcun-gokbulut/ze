@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDSceneWrapper.h
+ Zinek Engine - ZEDSceneEditor.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,30 +35,43 @@
 
 #pragma once
 
-#include "ZEDEntityWrapper.h"
-#include "ZEGame/ZERayCast.h"
+#include "ZEDCore/ZEDEditor.h"
 
+class ZEDViewport;
+class ZEDViewportController;
+class ZEDObjectBrowser;
+class ZEDClassBrowser;
+class ZEDAssetBrowser;
+class ZEDPropertyEditor;
+class ZEDSelectionToolbar;
+class ZEDTransformationToolbar;
 class ZEScene;
 
-class ZEDSceneWrapper : public ZEDObjectWrapper
+class ZEDSceneEditor : public ZEDEditor
 {
 	ZE_OBJECT
 	private:
-		void									PreRenderEntity(ZEDEntityWrapper* Wrapper, const ZERNPreRenderParameters* Parameters);
-		void									RayCastEntity(ZEDEntityWrapper* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		ZEDViewport*						Viewport;
+		ZEDViewportController*				Controller;
+		ZEDObjectBrowser*					ObjectBrowser;
+		ZEDClassBrowser*					ClassBrowser;
+		ZEDAssetBrowser*					AssetBrowser;
+		ZEDPropertyEditor*					PropertyEditor;
+		ZEDSelectionToolbar*				SelectionToolbar;
+		ZEDTransformationToolbar*			TransformationToolbar;
+		ZEScene*							Scene;
+
+		virtual bool						InitializeSelf();
+
+											ZEDSceneEditor();
+		virtual								~ZEDSceneEditor();
 
 	public:
-		virtual void							SetObject(ZEObject* Object);
-		virtual ZEString						GetName() const;
-		
-		ZEScene*								GetScene();
+		virtual void						New();
+		virtual bool						Save(const ZEString& FileName);
+		virtual bool						Load(const ZEString& FileName);
+		virtual void						Close();
 
-		virtual bool							AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
-		virtual bool							RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update = false);
-
-		virtual void							PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-		virtual void							Update();
-
-		static ZEDSceneWrapper*					CreateInstance();
-};
+		static ZEDSceneEditor*				CreateInstance();
+}
+ZE_META_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZEScene");

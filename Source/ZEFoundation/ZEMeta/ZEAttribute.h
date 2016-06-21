@@ -40,9 +40,13 @@
 #include "ZEMacro/ZEMacro.h"
 #ifdef ZE_META_COMPILER
 	#define ZE_META_ATTRIBUTE(Args...) ZE_META_ATTRIBUTE_INTERNAL(#Args)
+	#define ZE_META_ATTRIBUTE_APPEND(Args...) ZE_META_ATTRIBUTE_INTERNAL("+" #Args)
+	#define ZE_META_ATTRIBUTE_REMOVE(Args...) ZE_META_ATTRIBUTE_INTERNAL("-" #Args)
 	#define ZE_META_ATTRIBUTE_INTERNAL(Value) __attribute__((annotate(Value)))
 #else
 	#define ZE_META_ATTRIBUTE(...)
+	#define ZE_META_ATTRIBUTE_APPEND(...)
+	#define ZE_META_ATTRIBUTE_REMOVE(...)
 #endif
 
 struct ZEAttribute

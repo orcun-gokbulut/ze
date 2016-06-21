@@ -36,9 +36,9 @@
 #include "ZEDSelectionManager.h"
 
 #include "ZEMath/ZEViewVolume.h"
-#include "ZEDCore.h"
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
+#include "ZEDObjectManager.h"
 #include "ZEDGizmo.h"
 #include "ZEDViewPort.h"
 #include "ZEDViewportEvent.h"
@@ -538,7 +538,7 @@ void ZEDSelectionManager::ViewportMouseEvent(const ZEDViewportMouseEvent* Event)
 		ZERayCastReport Report;
 		Report.SetParameters(&Parameters);
 
-		GetModule()->GetRootWrapper()->RayCast(Report, Parameters);	
+		GetEditor()->GetObjectManager()->GetRootWrapper()->RayCast(Report, Parameters);	
 		if (Report.GetResult())
 		{
 			ZEDObjectWrapper* Wrapper = static_cast<ZEDObjectWrapper*>(Report.GetCollision().Object);

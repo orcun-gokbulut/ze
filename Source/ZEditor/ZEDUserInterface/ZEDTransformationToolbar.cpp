@@ -35,40 +35,49 @@
 
 #include "ZEDTransformationToolbar.h"
 
+#include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDTransformationManager.h"
+#include "ZEDCore/ZEDTransformationEvent.h"
 
-#include <QPushButton>
+#include <QToolBar>
+#include <QAction>
+#include <QActionGroup>
 #include <QLabel>
 #include <QComboBox>
 #include <QDoubleSpinBox>
 
+
 void ZEDTransformationToolbar::SetupUI()
 {
-	btnSelect = new QPushButton();
-	btnSelect->setText("Select");
-	btnSelect->setCheckable(true);
-	btnSelect->setAutoExclusive(true);
-	addWidget(btnSelect);
+	Toolbar = new QToolBar();
 
-	btnMove = new QPushButton();
-	btnMove->setText("Move");
-	btnMove->setCheckable(true);
-	btnMove->setAutoExclusive(true);
-	addWidget(btnMove);
+	ActionGroup = new QActionGroup(this);
+
+	actSelect = new QAction(this);
+	actSelect->setText("Select");
+	actSelect->setCheckable(true);
+	ActionGroup->addAction(actSelect);
+	Toolbar->addAction(actSelect);
+
+	actMove = new QAction(this);
+	actMove->setText("Move");
+	actMove->setCheckable(true);
+	ActionGroup->addAction(actMove);
+	Toolbar->addAction(actMove);
 	
-	btnRotate = new QPushButton();
-	btnRotate->setText("Rotate");
-	btnRotate->setCheckable(true);
-	btnRotate->setAutoExclusive(true);
-	addWidget(btnRotate);
+	actRotate = new QAction(this);
+	actRotate->setText("Rotate");
+	actRotate->setCheckable(true);
+	ActionGroup->addAction(actRotate);
+	Toolbar->addAction(actRotate);
 
-	btnScale = new QPushButton();
-	btnScale->setText("Scale");
-	btnScale->setCheckable(true);
-	btnScale->setAutoExclusive(true);
-	addWidget(btnScale);
+	actScale = new QAction(this);
+	actScale->setText("Scale");
+	actScale->setCheckable(true);
+	ActionGroup->addAction(actScale);
+	Toolbar->addAction(actScale);
 
-	addSeparator();
+	Toolbar->addSeparator();
 
 	cmbSpace = new QComboBox();
 	cmbSpace->clear();
@@ -76,7 +85,7 @@ void ZEDTransformationToolbar::SetupUI()
 	cmbSpace->addItem("Local Space");
 	cmbSpace->addItem("Parent Space");
 	cmbSpace->addItem("View Space");
-	addWidget(cmbSpace);
+	Toolbar->addWidget(cmbSpace);
 
 	cmbPivot = new QComboBox();
 	cmbPivot->clear();
@@ -84,57 +93,56 @@ void ZEDTransformationToolbar::SetupUI()
 	cmbPivot->addItem("Focused Object Pivot");
 	cmbPivot->addItem("Center Pivot");
 	cmbPivot->addItem("World Pivot");
-	addWidget(cmbPivot);
+	Toolbar->addWidget(cmbPivot);
 	
-	addSeparator();
+	Toolbar->addSeparator();
 
 	QLabel* lblX = new QLabel();
 	lblX->setText("x:");
-	addWidget(lblX);
+	Toolbar->addWidget(lblX);
 
 	txtX = new QDoubleSpinBox();
-	addWidget(txtX);
+	Toolbar->addWidget(txtX);
 
 	QLabel* lblY = new QLabel();
 	lblY->setText("y:");
-	addWidget(lblY);
+	Toolbar->addWidget(lblY);
 
 	txtY = new QDoubleSpinBox();
-	addWidget(txtY);
+	Toolbar->addWidget(txtY);
 
 	QLabel* lblZ = new QLabel();
 	lblZ->setText("z:");
-	addWidget(lblZ);
+	Toolbar->addWidget(lblZ);
 
 	txtZ = new QDoubleSpinBox();
-	addWidget(txtZ);
-
+	Toolbar->addWidget(txtZ);
 }
 
 void ZEDTransformationToolbar::UpdateUI()
 {
-	setEnabled(TransformationManager != NULL);
+	Toolbar->setEnabled(GetTransformationManager() != NULL);
 
-	if (TransformationManager == NULL)
+	if (GetTransformationManager() == NULL)
 		return;
 	
-	QSignalBlocker btnSelectBlocker(btnSelect);
-	QSignalBlocker btnMoveBlocker(btnMove);
-	QSignalBlocker btnRotatBlocker(btnRotate);
-	QSignalBlocker btnScaleBlocker(btnScale);
+	QSignalBlocker btnSelectBlocker(actSelect);
+	QSignalBlocker btnMoveBlocker(actMove);
+	QSignalBlocker btnRotatBlocker(actRotate);
+	QSignalBlocker btnScaleBlocker(actScale);
 	QSignalBlocker cmbSpaceBlocker(cmbSpace);
 	QSignalBlocker cmbPivotBlocker(cmbPivot);
 	QSignalBlocker txtXBlocker(txtX);
 	QSignalBlocker txtYBlocker(txtY);
 	QSignalBlocker txtZBlocker(txtZ);
 
-	ZEDTransformType TransformType = TransformationManager->GetTransformType();
-	btnSelect->setChecked(TransformType == ZED_TT_NONE);
-	btnMove->setChecked(TransformType == ZED_TT_TRANSLATE);
-	btnRotate->setChecked(TransformType == ZED_TT_ROTATE);
-	btnScale->setChecked(TransformType == ZED_TT_SCALE);
+	ZEDTransformType TransformType = GetTransformationManager()->GetTransformType();
+	actSelect->setChecked(TransformType == ZED_TT_NONE);
+	actMove->setChecked(TransformType == ZED_TT_TRANSLATE);
+	actRotate->setChecked(TransformType == ZED_TT_ROTATE);
+	actScale->setChecked(TransformType == ZED_TT_SCALE);
 	
-	switch (TransformationManager->GetTransformSpace())
+	switch (GetTransformationManager()->GetTransformSpace())
 	{
 		default:
 		case ZED_TS_WORLD:
@@ -155,7 +163,7 @@ void ZEDTransformationToolbar::UpdateUI()
 			break;
 	}
 
-	switch (TransformationManager->GetTransformPivot())
+	switch (GetTransformationManager()->GetTransformPivot())
 	{
 		default:
 		case ZED_TP_OBJECT:
@@ -177,11 +185,11 @@ void ZEDTransformationToolbar::UpdateUI()
 
 	bool Result = true;
 	bool Valid = false;
-	txtX->setValue(TransformationManager->GetX(Valid));
+	txtX->setValue(GetTransformationManager()->GetX(Valid));
 	Result &= Valid;
-	txtY->setValue(TransformationManager->GetY(Valid));
+	txtY->setValue(GetTransformationManager()->GetY(Valid));
 	Result &= Valid;
-	txtZ->setValue(TransformationManager->GetZ(Valid));
+	txtZ->setValue(GetTransformationManager()->GetZ(Valid));
 	Result &= Valid;
 
 	txtX->setEnabled(Result);
@@ -191,100 +199,18 @@ void ZEDTransformationToolbar::UpdateUI()
 
 void ZEDTransformationToolbar::TransformationEvent(const ZEDTransformationEvent* Event)
 {
-
+	if (Event->GetType() == ZED_TET_MANAGER_STATE_CHANGED)
+		UpdateUI();
 }
 
-void ZEDTransformationToolbar::btnSelect_clicked()
+ZEDTransformationToolbar::ZEDTransformationToolbar()
 {
-	TransformationManager->SetTransformType(ZED_TT_NONE);
-}
-
-void ZEDTransformationToolbar::btnMove_clicked()
-{
-	TransformationManager->SetTransformType(ZED_TT_TRANSLATE);
-}
-
-void ZEDTransformationToolbar::btnRotate_clicked()
-{
-	TransformationManager->SetTransformType(ZED_TT_ROTATE);
-}
-
-void ZEDTransformationToolbar::btnScale_clicked()
-{
-	TransformationManager->SetTransformType(ZED_TT_SCALE);
-}
-
-void ZEDTransformationToolbar::cmbSpace_currentIndexChanged(const QString & text)
-{
-	if (text == "World Space")
-		TransformationManager->SetTransformSpace(ZED_TS_WORLD);
-	else if (text == "Local Space")
-		TransformationManager->SetTransformSpace(ZED_TS_LOCAL);
-	else if (text == "Parent Space")
-		TransformationManager->SetTransformSpace(ZED_TS_PARENT);
-	else if (text == "View Space")
-		TransformationManager->SetTransformSpace(ZED_TS_VIEW);
-	else if (text == "Object Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_OBJECT);
-	else
-		TransformationManager->SetTransformSpace(ZED_TS_WORLD);
-}
-
-void ZEDTransformationToolbar::cmbPivot_currentIndexChanged(const QString & text)
-{
-
-	if (text == "Object Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_OBJECT);
-	else if (text == "Focused Object Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_FOCUSED_OBJECT);
-	else if (text == "Center Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_CENTER);
-	else if (text == "World Pivot")
-		TransformationManager->SetTransformPivot(ZED_TP_WORLD);
-	else
-		TransformationManager->SetTransformPivot(ZED_TP_OBJECT);
-}
-
-void ZEDTransformationToolbar::txtX_valueChanged(double d)
-{
-	TransformationManager->SetX(d);
-}
-
-void ZEDTransformationToolbar::txtY_valueChanged(double d)
-{
-	TransformationManager->SetY(d);
-}
-
-void ZEDTransformationToolbar::txtZ_valueChanged(double d)
-{
-	TransformationManager->SetZ(d);
-}
-
-void ZEDTransformationToolbar::SetTransformManager(ZEDTransformationManager* Manager)
-{
-	if (TransformationManager == Manager)
-		return;
-	
-	TransformationManager = Manager;
-	
-	UpdateUI();
-}
-
-ZEDTransformationManager* ZEDTransformationToolbar::GetTransformManager()
-{
-	return TransformationManager;
-}
-
-ZEDTransformationToolbar::ZEDTransformationToolbar(QWidget* Parent) : QToolBar(Parent)
-{
-	TransformationManager = NULL;
-
 	SetupUI();
 
-	connect(btnSelect, SIGNAL(clicked()), this, SLOT(btnSelect_clicked()));
-	connect(btnMove, SIGNAL(clicked()), this, SLOT(btnMove_clicked()));
-	connect(btnRotate, SIGNAL(clicked()), this, SLOT(btnRotate_clicked()));
-	connect(btnScale, SIGNAL(clicked()), this, SLOT(btnScale_clicked()));
+	connect(actSelect, SIGNAL(triggered()),	this, SLOT(actSelect_triggered()));
+	connect(actMove, SIGNAL(triggered()),	this, SLOT(actMove_triggered()));
+	connect(actRotate, SIGNAL(triggered()),	this, SLOT(actRotate_triggered()));
+	connect(actScale, SIGNAL(triggered()),	this, SLOT(actScale_triggered()));
 	connect(cmbSpace, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbSpace_currentIndexChanged(const QString&)));
 	connect(cmbPivot, SIGNAL(currentIndexChanged(const QString&)), this, SLOT(cmbPivot_currentIndexChanged(const QString&)));
 	connect(txtX, SIGNAL(valueChanged(double)), this, SLOT(txtX_valueChanged(double)));
@@ -294,5 +220,112 @@ ZEDTransformationToolbar::ZEDTransformationToolbar(QWidget* Parent) : QToolBar(P
 
 ZEDTransformationToolbar::~ZEDTransformationToolbar()
 {
+	delete Toolbar;
+}
 
+void ZEDTransformationToolbar::actSelect_triggered()
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	GetTransformationManager()->SetTransformType(ZED_TT_NONE);
+}
+
+void ZEDTransformationToolbar::actMove_triggered()
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	GetTransformationManager()->SetTransformType(ZED_TT_TRANSLATE);
+}
+
+void ZEDTransformationToolbar::actRotate_triggered()
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	GetTransformationManager()->SetTransformType(ZED_TT_ROTATE);
+}
+
+void ZEDTransformationToolbar::actScale_triggered()
+{
+	GetTransformationManager()->SetTransformType(ZED_TT_SCALE);
+}
+
+void ZEDTransformationToolbar::cmbSpace_currentIndexChanged(const QString & text)
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	if (text == "World Space")
+		GetTransformationManager()->SetTransformSpace(ZED_TS_WORLD);
+	else if (text == "Local Space")
+		GetTransformationManager()->SetTransformSpace(ZED_TS_LOCAL);
+	else if (text == "Parent Space")
+		GetTransformationManager()->SetTransformSpace(ZED_TS_PARENT);
+	else if (text == "View Space")
+		GetTransformationManager()->SetTransformSpace(ZED_TS_VIEW);
+	else if (text == "Object Pivot")
+		GetTransformationManager()->SetTransformPivot(ZED_TP_OBJECT);
+	else
+		GetTransformationManager()->SetTransformSpace(ZED_TS_WORLD);
+}
+
+void ZEDTransformationToolbar::cmbPivot_currentIndexChanged(const QString & text)
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	if (text == "Object Pivot")
+		GetTransformationManager()->SetTransformPivot(ZED_TP_OBJECT);
+	else if (text == "Focused Object Pivot")
+		GetTransformationManager()->SetTransformPivot(ZED_TP_FOCUSED_OBJECT);
+	else if (text == "Center Pivot")
+		GetTransformationManager()->SetTransformPivot(ZED_TP_CENTER);
+	else if (text == "World Pivot")
+		GetTransformationManager()->SetTransformPivot(ZED_TP_WORLD);
+	else
+		GetTransformationManager()->SetTransformPivot(ZED_TP_OBJECT);
+}
+
+void ZEDTransformationToolbar::txtX_valueChanged(double d)
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	GetTransformationManager()->SetX(d);
+}
+
+void ZEDTransformationToolbar::txtY_valueChanged(double d)
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	GetTransformationManager()->SetY(d);
+}
+
+void ZEDTransformationToolbar::txtZ_valueChanged(double d)
+{
+	if (GetTransformationManager() == NULL)
+		return;
+
+	GetTransformationManager()->SetZ(d);
+}
+
+QToolBar* ZEDTransformationToolbar::GetToolbar()
+{
+	return Toolbar;
+}
+
+ZEDTransformationManager* ZEDTransformationToolbar::GetTransformationManager()
+{
+	if (GetEditor() == NULL)
+		return false;
+
+	return GetEditor()->GetTransformationManager();
+}
+
+ZEDTransformationToolbar* ZEDTransformationToolbar::CreateInstance()
+{
+	return new ZEDTransformationToolbar();
 }

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEDWindow.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,25 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+#include "ZEDWindow.h"
 
-
-ZEDObjectEvent::ZEDObjectEvent()
+ZEDWindow::ZEDWindow()
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
+	Widget = NULL;
+	DockWidget = NULL;
 }
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
+ZEDWindow::~ZEDWindow()
 {
-	this->Type = Type;
+
 }
 
-ZEDObjectEventType ZEDObjectEvent::GetType() const
+QDockWidget* ZEDWindow::GetDockWidget()
 {
-	return Type;
+	return DockWidget;
 }
 
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
+QWidget* ZEDWindow::GetWidget()
 {
-	this->Wrapper = Wrapper;
-}
-
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
+	return Widget;
 }

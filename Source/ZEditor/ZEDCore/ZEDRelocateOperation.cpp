@@ -37,7 +37,7 @@
 
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectEvent.h"
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 
 bool ZEDRelocateOperation::Apply()
 {
@@ -47,24 +47,10 @@ bool ZEDRelocateOperation::Apply()
 			continue;
 
 		if (Items[I].OldParent != NULL)
-		{
 			Items[I].OldParent->RemoveChildWrapper(Items[I].Wrapper);
 
-			ZEDObjectEvent Event;
-			Event.SetType(ZED_OCET_REMOVED);
-			Event.SetWrapper(Items[I].Wrapper);
-			GetModule()->DistributeEvent(&Event);
-		}
-		
 		if (Items[I].NewParent != NULL)
-		{
 			Items[I].NewParent->AddChildWrapper(Items[I].Wrapper);
-
-			ZEDObjectEvent Event;
-			Event.SetType(ZED_OCET_ADDED);
-			Event.SetWrapper(Items[I].Wrapper);
-			GetModule()->DistributeEvent(&Event);
-		}
 	}
 
 	return true;
@@ -78,24 +64,10 @@ bool ZEDRelocateOperation::Revert()
 			continue;
 
 		if (Items[I].NewParent != NULL)
-		{
 			Items[I].NewParent->RemoveChildWrapper(Items[I].Wrapper);
 
-			ZEDObjectEvent Event;
-			Event.SetType(ZED_OCET_REMOVED);
-			Event.SetWrapper(Items[I].Wrapper);
-			GetModule()->DistributeEvent(&Event);
-		}
-
 		if (Items[I].OldParent != NULL)
-		{
 			Items[I].OldParent->AddChildWrapper(Items[I].Wrapper);
-
-			ZEDObjectEvent Event;
-			Event.SetType(ZED_OCET_ADDED);
-			Event.SetWrapper(Items[I].Wrapper);
-			GetModule()->DistributeEvent(&Event);
-		}
 	}
 
 	return true;
@@ -106,7 +78,7 @@ ZEDRelocateOperation::ZEDRelocateOperation()
 
 }
 
-ZEDRelocateOperation* ZEDRelocateOperation::Create(ZEDObjectWrapper* NewParent, const ZEArray<ZEDObjectWrapper*>& Wrappers)
+ZEDRelocateOperation* ZEDRelocateOperation::Create(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*>& Wrappers)
 {
 	ZEDRelocateOperation* Operation = new ZEDRelocateOperation();
 
@@ -114,7 +86,7 @@ ZEDRelocateOperation* ZEDRelocateOperation::Create(ZEDObjectWrapper* NewParent, 
 	for (ZESize I = 0; I < Operation->Items.GetCount(); I++)
 	{
 		Operation->Items[I].Wrapper = Wrappers[I];
-		Operation->Items[I].NewParent = NewParent;
+		Operation->Items[I].NewParent = Destination;
 		Operation->Items[I].OldParent = Wrappers[I]->GetParent();
 	}
 

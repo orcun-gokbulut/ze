@@ -35,39 +35,22 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZEDCore/ZEDCore.h"
-#include "ZEDCore/ZEDModule.h"
+#include "ZEDCore/ZEDEditorCore.h"
+#include "ZEDSceneEditor/ZEDSceneEditor.h"
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <QApplication>
-#include <QStyleFactory>
-
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
-	ZEInt argc = 0;
-	char** argv = NULL;
-
-	bool StopMainLoop = false;
-	QApplication Application(argc, argv);
-	//Application.connect(&Application, &QApplication::lastWindowClosed, [&]() { StopMainLoop = true; });
-
-	//qApp->setStyle(QStyleFactory::create("Fusion"));
-
-	ZEDCore::GetInstance()->SetModule(new ZEDModule());
-	if (!ZEDCore::GetInstance()->Initialize())
+	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
+	if (!Core->Initialize())
 		return EXIT_FAILURE;
 
-	while (!StopMainLoop)
-	{
-		Application.processEvents();
-		ZEDCore::GetInstance()->ProcessEngine();
-	}
-	
-	ZEDCore::GetInstance()->Deinitialize();
+	Core->ExecuteEditor(ZEDSceneEditor::CreateInstance());
+	Core->Execute();
+
+	Core->Deinitialize();
 
 	return EXIT_SUCCESS;
 }

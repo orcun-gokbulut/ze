@@ -50,8 +50,8 @@
 #include "ZERenderer\ZERNStage2D.h"
 #include "ZERenderer\ZERNStageOutput.h"
 #include "ZERenderer\ZERNStageForward.h"
-#include "ZEDCore.h"
-#include "ZEDModule.h"
+#include "ZEDEditorCore.h"
+#include "ZEDEditor.h"
 #include "ZEDViewportManager.h"
 #include "ZEDViewportEvent.h"
 #include "ZEGame\ZEScene.h"
@@ -165,6 +165,9 @@ bool ZEDViewport::Update()
 
 bool ZEDViewport::InitializeSelf()
 {
+	if (!ZEDComponent::InitializeSelf())
+		return false;
+
 	zeCheckError(ViewportManager == NULL, false, "Cannot initialize. Viewport is not registered with a Viewport Manager.");
 	Window = ZEGRWindow::WrapHandle((void*)winId());
 	Renderer.SetOutputRenderTarget(Window->GetOutput()->GetRenderTarget());
@@ -232,6 +235,17 @@ bool ZEDViewport::InitializeSelf()
 	return true;
 }
 
+
+void ZEDViewport::DeinitializeSelf()
+{
+	DirtyFlags.RaiseAll();
+	Renderer.Deinitialize();
+	Window->Destroy();
+	Window = NULL;
+
+	ZEDComponent::DeinitializeSelf();
+}
+
 void ZEDViewport::TickEvent(const ZEDTickEvent* Event)
 {
 	for (ZESize I = 0; I < KeyboardEvents.GetCount(); I++)
@@ -250,15 +264,6 @@ void ZEDViewport::TickEvent(const ZEDTickEvent* Event)
 	}
 
 	MouseDelta = ZEVector2::Zero;
-}
-
-
-void ZEDViewport::DeinitializeSelf()
-{
-	DirtyFlags.RaiseAll();
-	Renderer.Deinitialize();
-	Window->Destroy();
-	Window = NULL;
 }
 
 void ZEDViewport::mousePressEvent(QMouseEvent* Event)

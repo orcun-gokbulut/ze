@@ -37,7 +37,7 @@
 
 #include "ZEDOperation.h"
 #include "ZEError.h"
-#include "ZEDCore.h"
+#include "ZEDEditorCore.h"
 
 ZEDOperationManager::ZEDOperationManager()
 {

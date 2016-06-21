@@ -34,8 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDObjectManager.h"
-#include "ZEDObjectWrapper.h"
+
 #include "ZEMeta\ZEProvider.h"
+
+#include "ZEDEditor.h"
+#include "ZEDObjectWrapper.h"
+#include "ZEDObjectEvent.h"
+#include "ZEDOperationManager.h"
+#include "ZEDCreateOperation.h"
+#include "ZEDDeleteOperation.h"
+#include "ZEDRelocateOperation.h"
 
 void ZEDObjectManager::LoadWrapperClasses()
 {
@@ -51,10 +59,28 @@ bool ZEDObjectManager::InitializeSelf()
 {
 	if (!ZEInitializable::InitializeSelf())
 		return false;
-
+	
 	LoadWrapperClasses();
 
+	if (RootWrapper != NULL)
+	{
+		RootWrapper->Update();
+		RootWrapper->Initialize();
+	}
+
 	return true;
+}
+
+void ZEDObjectManager::DeinitializeSelf()
+{
+	if (RootWrapper != NULL)
+		RootWrapper->Deinitialize();
+}
+
+void ZEDObjectManager::RaiseEvent(const ZEDObjectEvent* Event)
+{
+	if (GetEditor() != NULL && IsInitialized())
+		GetEditor()->DistributeEvent(Event);
 }
 
 ZEDObjectManager::ZEDObjectManager()
@@ -94,7 +120,7 @@ void ZEDObjectManager::RegisterWrapperClass(ZEClass* WrapperClass)
 	}
 
 	ZEClass* TargetClass = ZEProvider::GetInstance()->GetClass(TargetClassName);
-	if (TargetClassName == NULL)
+	if (TargetClass == NULL)
 	{
 		zeError("Target class of Wrapper class does not exists. Wrapper Class Name: \"%s\", Target Class Name: \"%s\".", 
 			WrapperClass->GetName(),
@@ -130,9 +156,13 @@ void ZEDObjectManager::SetRootWrapper(ZEDObjectWrapper* Wrapper)
 		return;
 
 	RootWrapper = Wrapper;
+	RootWrapper->SetManager(this);
 
-	if (IsInitialized() && RootWrapper != NULL)
+	if (IsInitialized())
+	{
 		RootWrapper->Update();
+		RootWrapper->Initialize();
+	}
 }
 
 ZEDObjectWrapper* ZEDObjectManager::GetRootWrapper()
@@ -151,17 +181,23 @@ ZEClass* ZEDObjectManager::FindWrapperClass(ZEClass* ObjectClass)
 		ZEClass* CurrentClass = ObjectClass;
 		while (CurrentClass != NULL)
 		{
-			if (CurrentClass == WrapperClasses[I].TargetClass)
+			if (LocalDistance > BestWrapperClassDistance)
 				break;
+
+			if (CurrentClass->IsAbstract())
+			{
+				CurrentClass = CurrentClass->GetParentClass();
+				continue;
+			}
+
+			if (CurrentClass == WrapperClasses[I].TargetClass)
+			{
+				BestWrapperClass = WrapperClasses[I].WrapperClass;
+				BestWrapperClassDistance = LocalDistance;
+			}
 
 			LocalDistance++;
 			CurrentClass = CurrentClass->GetParentClass();
-		}
-
-		if (CurrentClass != NULL && LocalDistance < BestWrapperClassDistance)
-		{
-			BestWrapperClass = CurrentClass;
-			BestWrapperClassDistance = LocalDistance;
 		}
 	}
 
@@ -188,50 +224,62 @@ ZEDObjectWrapper* ZEDObjectManager::FindWrapper(ZEObject* Object, ZEDObjectWrapp
 	return NULL;
 }
 
+ZEDObjectWrapper* ZEDObjectManager::WrapObject(ZEObject* Object)
+{
+	if (Object == NULL)
+		return NULL;
+
+	ZEDObjectWrapper* Wrapper = NULL;
+	ZEClass* WrapperClass = FindWrapperClass(Object->GetClass());
+	if (WrapperClass != NULL)
+		Wrapper = static_cast<ZEDObjectWrapper*>(WrapperClass->CreateInstance());
+
+	if (Wrapper != NULL)
+	{
+		Wrapper->SetManager(this);
+		Wrapper->SetObject(Object);
+	}
+
+	return Wrapper;
+}
+
 void ZEDObjectManager::CreateObject(ZEDObjectWrapper* Parent, ZEClass* Class)
 {
-	ZEClass* WrapperClass = FindWrapperClass(Class);
-	if (WrapperClass == NULL)
-		return;
-
-	ZEDObjectWrapper* Wrapper = static_cast<ZEDObjectWrapper*>(WrapperClass->CreateInstance());
-	if (Wrapper == NULL)
-		return;
-
-}
-
-void ZEDObjectManager::AddObject(ZEDObjectWrapper* Parent, ZEDObjectWrapper* Wrapper)
-{
-
-}
-
-void ZEDObjectManager::RemoveObject(ZEDObjectWrapper* Wrapper)
-{
-
-}
-
-void ZEDObjectManager::RemoveObjects(const ZEArray<ZEDObjectWrapper*> Wrappers)
-{
-
+	ZEDCreateOperation* CreateOperation = ZEDCreateOperation::Create(Class, Parent);
+	GetEditor()->GetOperationManager()->DoOperation(CreateOperation);
 }
 
 void ZEDObjectManager::DeleteObject(ZEDObjectWrapper* Wrapper)
 {
+	ZEArray<ZEDObjectWrapper*> Wrappers;
+	Wrappers.Add(Wrapper);
 
+	ZEDDeleteOperation* DeleteOpeeration = ZEDDeleteOperation::Create(Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
 }
 
 void ZEDObjectManager::DeleteObjects(const ZEArray<ZEDObjectWrapper*> Wrappers)
 {
-
+	ZEDDeleteOperation* DeleteOpeeration = ZEDDeleteOperation::Create(Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
 }
-
 
 void ZEDObjectManager::RelocateObject(ZEDObjectWrapper* Destination, ZEDObjectWrapper* Wrapper)
 {
+	ZEArray<ZEDObjectWrapper*> Wrappers;
+	Wrappers.Add(Wrapper);
 
+	ZEDRelocateOperation* DeleteOpeeration = ZEDRelocateOperation::Create(Destination, Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
 }
 
-void ZEDObjectManager::RelocateObject(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers)
+void ZEDObjectManager::RelocateObjects(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers)
 {
+	ZEDRelocateOperation* DeleteOpeeration = ZEDRelocateOperation::Create(Destination, Wrappers);
+	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
+}
 
+ZEDObjectManager* ZEDObjectManager::CreateInstance()
+{
+	return new ZEDObjectManager();
 }

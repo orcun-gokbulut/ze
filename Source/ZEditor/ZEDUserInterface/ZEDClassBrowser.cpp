@@ -36,45 +36,46 @@
 #include "ZEDClassBrowser.h"
 
 #include "ui_ZEDClassBrowser.h"
-#include "ZEDCore\ZEDModule.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDSelectionManager.h"
+#include "ZEDCore/ZEDObjectManager.h"
 
 #include <QMimeData>
 #include <QDrag>
 #include <qevent.h>
-#include "ZEDCore\ZEDObjectWrapper.h"
-#include "ZEDCore\ZEDSelectionManager.h"
-#include "ZEDCore\ZEDCreateOperation.h"
+
 
 void ZEDClassBrowser::UpdateUI()
 {
 	ZEClass* SelectedClass = GetClassTree()->GetSelectedClass();
 	if (SelectedClass == NULL)
 	{
-		Form->btnAdd->setVisible(false);
+		Form->btnAdd->setEnabled(false);
 		return;
 	}
 
 	if (SelectedClass->IsAbstract())
 	{
-		Form->btnAdd->setVisible(false);
+		Form->btnAdd->setEnabled(false);
 		return;
 	}
 
 	DestinationWrapper = NULL;
-	ZEDSelectionManager* SelectionManager = GetModule()->GetSelectionManager();
+	ZEDSelectionManager* SelectionManager = GetEditor()->GetSelectionManager();
 	if (SelectionManager->GetSelection().GetCount() != 1)
 	{
 		if (SelectionManager->GetFocusedObject() != NULL)
 			DestinationWrapper = SelectionManager->GetFocusedObject();
 		else
-			DestinationWrapper = GetModule()->GetRootWrapper();
+			DestinationWrapper = GetEditor()->GetObjectManager()->GetRootWrapper();
 	}
 	else
 	{
 		DestinationWrapper = SelectionManager->GetSelection()[0];
 	}
 
-	Form->btnAdd->setVisible(DestinationWrapper == NULL || !DestinationWrapper->CheckChildrenClass(SelectedClass));
+	Form->btnAdd->setEnabled(DestinationWrapper != NULL && DestinationWrapper->CheckChildrenClass(SelectedClass));
 }
 
 bool ZEDClassBrowser::InitializeSelf()
@@ -82,7 +83,7 @@ bool ZEDClassBrowser::InitializeSelf()
 	if (!ZEDComponent::InitializeSelf())
 		return false;
 
-	GetModule()->AddComponent(Form->trwClasses);
+	GetEditor()->AddComponent(Form->trwClasses);
 	
 	UpdateUI();
 
@@ -155,8 +156,7 @@ void ZEDClassBrowser::trwClasses_itemSelectionChanged()
 
 void ZEDClassBrowser::btnAdd_clicked()
 {
-/*	ZEDCreateOperation* CreateOperation = ZEDCreateOperation::Create(DestinationWrapper, GetClassTree()->GetSelectedClass());
-	GetModule()->GetOperationManager()->DoOperation(CreateOperation);*/
+	GetEditor()->GetObjectManager()->CreateObject(DestinationWrapper,  GetClassTree()->GetSelectedClass());
 }
 
 ZEDClassTree* ZEDClassBrowser::GetClassTree()

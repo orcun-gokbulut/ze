@@ -37,7 +37,7 @@
 
 #include "ZEMeta/ZEClass.h"
 
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEDObjectWrapper.h"
 #include "ZEDObjectEvent.h"
 
@@ -48,12 +48,10 @@ bool ZEDPropertyOperation::Apply()
 		ZEObject* Object = Items[I].Wrapper->GetObject();
 		ZEClass* Class = Object->GetClass();
 
-		Class->SetProperty(Object, Property->ID, Items[I].NewValue);
+		bool Result = Class->SetProperty(Object, Property->ID, Items[I].NewValue);
 
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_CHANGED);
-		Event.SetWrapper(Items[I].Wrapper);
-		GetModule()->DistributeEvent(&Event);
+		if (Result)
+			Items[I].Wrapper->SendChangedEvent();
 	}
 
 	return true;
@@ -66,12 +64,10 @@ bool ZEDPropertyOperation::Revert()
 		ZEObject* Object = Items[I].Wrapper->GetObject();
 		ZEClass* Class = Object->GetClass();
 
-		Class->SetProperty(Object, Property->ID, Items[I].OldValue);
+		bool Result = Class->SetProperty(Object, Property->ID, Items[I].OldValue);
 
-		ZEDObjectEvent Event;
-		Event.SetType(ZED_OCET_CHANGED);
-		Event.SetWrapper(Items[I].Wrapper);
-		GetModule()->DistributeEvent(&Event);
+		if (Result)
+			Items[I].Wrapper->SendChangedEvent();
 	}
 
 	return true;

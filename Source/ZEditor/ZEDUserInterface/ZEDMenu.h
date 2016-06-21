@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEDMenu.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+#pragma once
 
+#include "ZEDS/ZEArray.h"
 
-ZEDObjectEvent::ZEDObjectEvent()
+class ZEDMainWindow;
+class QMenu;
+class QAction;
+
+class ZEDMenu
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
-}
+	private:
+		ZEDMainWindow*						MainWindow;
+		ZEString							Path;
+		QMenu*								Menu;
+		QAction*							Action;
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
-{
-	this->Type = Type;
-}
+	public:
+		ZEDMainWindow*						GetMainWindow();
+		QMenu*								GetMenu();
 
-ZEDObjectEventType ZEDObjectEvent::GetType() const
-{
-	return Type;
-}
+		void								SetPath(const ZEString& Name);
+		const ZEString&						GetPath();
 
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
-{
-	this->Wrapper = Wrapper;
-}
+		const ZEString&						GetName();
+		const ZEString&						GetSection();
 
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
-{
-	return Wrapper;
-}
+		void								SetAction(QAction* Action);
+		QAction*							GetAction();
+
+											ZEDMenu();
+};

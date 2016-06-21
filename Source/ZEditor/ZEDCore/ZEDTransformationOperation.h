@@ -58,6 +58,7 @@ class ZEDTransformItem
 
 class ZEDTransformationOperation : public ZEDOperation
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEDTransformItem> Transforms;
 

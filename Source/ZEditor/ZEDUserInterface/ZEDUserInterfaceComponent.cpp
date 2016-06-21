@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDModule.h
+ Zinek Engine - ZEDUserInterfaceComponent.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,58 +33,41 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDUserInterfaceComponent.h"
 
-#include "ZECore/ZEApplicationModule.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDMainWindow.h"
 
-#include "ZEDOperationManager.h"
-#include "ZEDViewportManager.h"
-#include "ZEUI/ZEUIManager.h"
-
-class ZEDComponent;
-class ZEDEvent;
-class ZEDObjectWrapper;
-class ZEDSelectionManager;
-class ZEDTransformationManager;
-class ZEDOperationManager;
-class ZEDViewportManager;
-class ZEDObjectWrapper;
-
-
-class ZEDModule : public ZEApplicationModule
+ZEDUserInterfaceComponent::ZEDUserInterfaceComponent()
 {
-	private:
-		ZEArray<ZEDComponent*>				Components;
-		ZEDOperationManager*				OperationManager;
-		ZEDSelectionManager*				SelectionManager;
-		ZEDTransformationManager*			TransformManager;
-		ZEDViewportManager*					ViewportManager;
-		ZEUIManager*						UIManager;
-		ZEDObjectWrapper*					RootWrapper;
+	Action = NULL;
+	Menu = NULL;
+}
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+ZEDMainWindow* ZEDUserInterfaceComponent::GetMainWindow()
+{
+	if (GetEditor() == NULL)
+		return NULL;
 
-	public:
-		ZEDOperationManager*				GetOperationManager();
-		ZEDSelectionManager*				GetSelectionManager();
-		ZEDTransformationManager*			GetTransformManager();
-		ZEDViewportManager*					GetViewportManager();
-		ZEUIManager*						GetUIManager();
-		ZEDObjectWrapper*					GetRootWrapper();
+	return GetEditor()->GetMainWindow();
+}
 
-		virtual void						AddComponent(ZEDComponent* Component);
-		virtual void						RemoveComponent(ZEDComponent* Component);
+void ZEDUserInterfaceComponent::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
 
-		virtual void						Process(float ElapsedTime);
-		virtual void						PostProcess(float ElapsedTime);
+const ZEString& ZEDUserInterfaceComponent::GetName()
+{
+	return Name;
+}
 
-		void								DistributeEvent(const ZEDEvent* Event);
+void ZEDUserInterfaceComponent::SetCategory(const ZEString& Name)
+{
+	Category = Name;
+}
 
-		virtual void						StartUp();
-		virtual void						ShutDown();
-
-											ZEDModule();
-		virtual								~ZEDModule();
-
-};
+const ZEString& ZEDUserInterfaceComponent::GetCategory()
+{
+	return Category;
+}

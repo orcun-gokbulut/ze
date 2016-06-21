@@ -36,22 +36,21 @@
 #include "ZEDObjectBrowser.h"
 
 #include "ui_ZEDObjectBrowser.h"
-#include "ZEDCore\ZEDModule.h"
+#include "ZEDCore\ZEDEditor.h"
 #include "ZEDCore\ZEDObjectWrapper.h"
+#include "ZEDCore\ZEDObjectManager.h"
 
 #include <QEvent.h>
 #include <QDrag>
 #include <QMimeData>
-#include "ZEDCore\ZEDEntityWrapper.h"
-#include "QTreeWidget"
-#include "ZEDCore\ZEDDeleteOperation.h"
+#include <QTreeWidget>
 
 bool ZEDObjectBrowser::InitializeSelf()
 {
 	if (!ZEDComponent::InitializeSelf())
 		return false;
 
-	GetModule()->AddComponent(Form->trwObjects);
+	GetEditor()->AddComponent(Form->trwObjects);
 
 	return true;
 }
@@ -167,23 +166,20 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 
 		if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper"))
 		{
-			ZEDObjectWrapper* Object = (ZEDObjectWrapper*)DropEvent->mimeData()->data("application/vnd.zinek.wrapper").data();
+			ZEDObjectWrapper* ObjectWrapper = (ZEDObjectWrapper*)DropEvent->mimeData()->data("application/vnd.zinek.wrapper").data();
 			
-			if (Object == TargetWrapper)
+			if (ObjectWrapper == TargetWrapper)
 				return false;
 
-			if (Object->GetParent() == TargetWrapper)
+			if (ObjectWrapper->GetParent() == TargetWrapper)
 				return false;
 
-			if (!TargetWrapper->CheckChildrenClass(Object->GetClass()))
+			if (!TargetWrapper->CheckChildrenClass(ObjectWrapper->GetClass()))
 				return false;
 			
 			DropEvent->acceptProposedAction();
 
-			if (Object->GetParent() != NULL)
-				Object->GetParent()->RemoveChildWrapper(Object);
-
-			TargetWrapper->AddChildWrapper(Object);
+			GetEditor()->GetObjectManager()->RelocateObject(TargetWrapper, ObjectWrapper);
 
 			return true;
 		}
@@ -198,13 +194,8 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 				return false;
 
 			DropEvent->acceptProposedAction();
-
-			ZEObject* Instance = Class->CreateInstance();
 			
-			ZEDObjectWrapper* Wrapper = ZEDEntityWrapper::CreateInstance();
-			Wrapper->SetObject(Instance);
-
-			TargetWrapper->AddChildWrapper(Wrapper);
+			GetEditor()->GetObjectManager()->CreateObject(TargetWrapper, Class);
 
 			return true;
 		}
@@ -251,8 +242,7 @@ void ZEDObjectBrowser::btnDelete_clicked()
 	for (int I = 0; I < Items.count(); I++)
 		Wrappers.Add(GetObjectTree()->GetWrapper(Items[I]));
 
-	ZEDDeleteOperation* Operation = ZEDDeleteOperation::Create(Wrappers);
-	GetModule()->GetOperationManager()->DoOperation(Operation);
+	GetEditor()->GetObjectManager()->DeleteObjects(Wrappers);
 }
 
 ZEDObjectTree* ZEDObjectBrowser::GetObjectTree()

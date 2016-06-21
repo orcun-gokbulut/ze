@@ -95,6 +95,11 @@ ZEScene* ZEDSceneWrapper::GetScene()
 	return static_cast<ZEScene*>(GetObject());
 }
 
+bool ZEDSceneWrapper::CheckChildrenClass(ZEClass* Class)
+{
+	return ZEClass::IsDerivedFrom(ZEEntity::Class(), Class);
+}
+
 void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	ZEArray<ZEDObjectWrapper*> Wrappers = GetChildWrappers();
@@ -114,47 +119,7 @@ void ZEDSceneWrapper::Update()
 {
 	ZEScene* Scene = GetScene();
 	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
-
-	// Remove
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
-
-	for (ZESSize I = Wrappers.GetCount() - 1; I >= 0; I--)
-	{
-		bool Found = false;
-		for (ZESize N = 0; N < Entities.GetCount(); N++)
-		{
-			if (Wrappers[I]->GetObject() == Entities[N])
-			{
-				Found = true;
-				break;
-			}
-		}
-
-		if (!Found)
-			Wrappers[I]->Destroy();
-	}
-
-	// Add
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEDEntityWrapper* Wrapper = NULL;
-		const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
-		for (ZESize N = 0; N < Wrappers.GetCount(); N++)
-		{
-			if (Wrappers[N]->GetObject() == Entities[I])
-			{
-				Wrapper = static_cast<ZEDEntityWrapper*>(Wrappers[N]);
-				break;
-			}
-		}
-
-		if (Wrapper == NULL)
-		{
-			Wrapper = ZEDEntityWrapper::CreateInstance();
-			Wrapper->SetObject(Entities[I]);
-			AddChildWrapper(Wrapper, true);
-		}
-	}
+	SyncronizeChildWrappers((ZEObject*const*)Entities.GetConstCArray(), Entities.GetCount());
 }
 
 ZEDSceneWrapper* ZEDSceneWrapper::CreateInstance()

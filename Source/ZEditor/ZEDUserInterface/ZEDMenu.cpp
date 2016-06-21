@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDObjectEvent.cpp
+ Zinek Engine - ZEDMenu.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,31 +33,73 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEDObjectEvent.h"
+#include "ZEDMenu.h"
+#include "ZERegEx\ZERegEx.h"
 
+static ZERegEx RegExp("(.*)(::)+(.*)");
 
-ZEDObjectEvent::ZEDObjectEvent()
+ZEDMainWindow* ZEDMenu::GetMainWindow()
 {
-	Type = ZED_OET_NONE;
-	Wrapper = NULL;
+	return MainWindow;
 }
 
-void ZEDObjectEvent::SetType(ZEDObjectEventType Type)
+QMenu* ZEDMenu::GetMenu()
 {
-	this->Type = Type;
+	return Menu;
 }
 
-ZEDObjectEventType ZEDObjectEvent::GetType() const
+void ZEDMenu::SetPath(const ZEString& Path)
 {
-	return Type;
+	this->Path = Path;
 }
 
-void ZEDObjectEvent::SetWrapper(ZEDObjectWrapper* Wrapper)
+const ZEString& ZEDMenu::GetPath()
 {
-	this->Wrapper = Wrapper;
+	return Path;
 }
 
-ZEDObjectWrapper* ZEDObjectEvent::GetWrapper() const
+const ZEString& ZEDMenu::GetName()
 {
-	return Wrapper;
+	ZERegExMatch Match;
+	if (!RegExp.Match(Path, Match, ZE_REF_NO_MATCH_STRING))
+		return ZEString::Empty;
+
+	ZEString& Section = Match.SubMatches[0].String;
+	ZEString& Name = Match.SubMatches[2].String;
+
+	if (Match.SubMatches[1].String != "::")
+		return Match.SubMatches[2].String;
+	else
+		return Match.SubMatches[0].String;
+}
+
+const ZEString& ZEDMenu::GetSection()
+{
+	ZERegExMatch Match;
+	if (!RegExp.Match(Path, Match, ZE_REF_NO_MATCH_STRING))
+		return ZEString::Empty;
+	
+	ZEString& Section = Match.SubMatches[0].String;
+	ZEString& Name = Match.SubMatches[2].String;
+
+	if (Match.SubMatches[1].String != "::")
+		return Match.SubMatches[2].String;
+	else
+		return ZEString::Empty;
+}
+
+void ZEDMenu::SetAction(QAction* Action)
+{
+	this->Action = Action;
+}
+
+QAction* ZEDMenu::GetAction()
+{
+	return Action;
+}
+
+ZEDMenu::ZEDMenu()
+{
+	Action = NULL;
+	Menu = NULL;
 }

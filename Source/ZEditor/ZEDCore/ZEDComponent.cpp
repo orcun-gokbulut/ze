@@ -35,7 +35,7 @@
 
 #include "ZEDComponent.h"
 
-#include "ZEDModule.h"
+#include "ZEDEditor.h"
 #include "ZEDObjectEvent.h"
 #include "ZEDSelectionEvent.h"
 #include "ZEDViewportEvent.h"
@@ -56,6 +56,11 @@ void ZEDComponent::EventReceived(const ZEDEvent* Event)
 		ViewportChangedEvent(static_cast<const ZEDViewportChangedEvent*>(Event));
 	else if(ZEClass::IsDerivedFrom(ZEDViewportRenderEvent::Class(), Event->GetClass()))
 		ViewportRenderEvent(static_cast<const ZEDViewportRenderEvent*>(Event));
+}
+
+void ZEDComponent::EditorChanged()
+{
+
 }
 
 void ZEDComponent::ObjectEvent(const ZEDObjectEvent* Event)
@@ -100,26 +105,26 @@ void ZEDComponent::ViewportRenderEvent(const ZEDViewportRenderEvent* Event)
 
 void ZEDComponent::RaiseEvent(const ZEDEvent* Event)
 {
-	if (Module == NULL)
+	if (Editor == NULL)
 		return;
 
-	Module->DistributeEvent(Event);
+	Editor->DistributeEvent(Event);
 }
 
 ZEDComponent::ZEDComponent()
 {
-	Module = NULL;
+	Editor = NULL;
 }
 
 ZEDComponent::~ZEDComponent()
 {
-	if (Module != NULL)
-		Module->RemoveComponent(this);
+	if (Editor != NULL)
+		Editor->RemoveComponent(this);
 }
 
-ZEDModule* ZEDComponent::GetModule()
+ZEDEditor* ZEDComponent::GetEditor()
 {
-	return Module;
+	return Editor;
 }
 
 void ZEDComponent::Destroy()

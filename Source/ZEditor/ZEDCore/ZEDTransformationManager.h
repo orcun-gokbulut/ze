@@ -42,7 +42,7 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
 
-class ZEDModule;
+class ZEDEditor;
 class ZEDObjectWrapper;
 class ZEDGizmo;
 class ZEDSelectionEvent;
@@ -95,7 +95,8 @@ class ZEDTransformationState
 
 class ZEDTransformationManager : public ZEDComponent
 {
-	friend class ZEDCore;
+	ZE_OBJECT
+	friend class ZEDEditorCore;
 	private:
 		ZEDTransformType						TransformType;
 		ZEDTransformSpace						TransformSpace;

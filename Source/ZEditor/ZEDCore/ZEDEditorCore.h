@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDCore.h
+ Zinek Engine - ZEDEditorCore.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,35 +35,43 @@
 
 #pragma once
 
-#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
-class ZEDOperationManager;
-class ZEDSelectionManager;
-class ZEDTransformationManager;
-class ZEDModule;
-class ZEClass;
+#include "ZEDS\ZEArray.h"
 
-class ZEDCore : public ZEInitializable
+class ZECore;
+class ZEDEditor;
+class QApplication;
+
+class ZEDEditorCore : public ZEObject, public ZEInitializable
 {
+	ZE_OBJECT
 	private:
-		ZEDModule*							Module;
+		ZECore*								EngineCore;
+		QApplication*						Application;
+		ZEArray<ZEDEditor*>					Editors;
+		bool								ExitFlag;
 
 		void								LoadClasses();
 
 		bool								InitializeSelf();
 		void								DeinitializeSelf();
 
-											ZEDCore();
-											~ZEDCore();
+											ZEDEditorCore();
+											~ZEDEditorCore();
 
 	public:
-		void								SetModule(ZEDModule* Module);
-		ZEDModule*							GetModule();
+		ZECore*								GetEngineCore();
+		QApplication*						GetApplication();
 
-		void								ProcessEngine();
+		const ZEArray<ZEDEditor*>&			GetEditors();
+		void								ExecuteEditor(ZEDEditor* Editor);
+
+		void								Execute();
+		void								Exit();
+
 		void								Destroy();
 
-		static ZEDCore*						GetInstance();
+		static ZEDEditorCore*				CreateInstance();
 };
-

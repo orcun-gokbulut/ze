@@ -35,7 +35,7 @@
 
 #include "ZEDObjectTree.h"
 
-#include "ZEDCore/ZEDModule.h"
+#include "ZEDCore/ZEDEditor.h"
 #include "ZEDCore/ZEDSelectionEvent.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
 #include "ZEDCore/ZEDObjectEvent.h"
@@ -45,7 +45,7 @@
 
 void ZEDObjectTree::ObjectEvent(const ZEDObjectEvent* Event)
 {
-	if (Event->GetType() != ZED_OCET_REMOVED)
+	if (Event->GetType() != ZED_OET_REMOVED)
 	{
 		bool ParentFound = false;
 		ZEDObjectWrapper* Current = Event->GetWrapper();
@@ -66,15 +66,15 @@ void ZEDObjectTree::ObjectEvent(const ZEDObjectEvent* Event)
 
 	switch (Event->GetType())
 	{
-		case ZED_OCET_ADDED:
+		case ZED_OET_ADDED:
 			AddWrapper(Event->GetWrapper());
 			break;
 
-		case ZED_OCET_REMOVED:
+		case ZED_OET_REMOVED:
 			RemoveWrapper(Event->GetWrapper());
 			break;
 
-		case ZED_OCET_CHANGED:
+		case ZED_OET_CHANGED:
 			UpdateItem(GetTreeItem(Event->GetWrapper()), Event->GetWrapper());
 			break;
 
@@ -307,7 +307,7 @@ void ZEDObjectTree::OnSelectionChanged()
 		Wrappers.Add(Wrapper);
 	}
 
-	GetModule()->GetSelectionManager()->SetSelection(Wrappers);
+	GetEditor()->GetSelectionManager()->SetSelection(Wrappers);
 }
 
 void ZEDObjectTree::UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper)

@@ -41,7 +41,9 @@ class ZEDObjectWrapper;
 
 class ZEDCreateOperation : public ZEDOperation
 {
+	ZE_OBJECT
 	private:
+		ZEClass*								TargetClass;
 		ZEDObjectWrapper*						Wrapper;
 		ZEDObjectWrapper*						Parent;
 
@@ -52,5 +54,5 @@ class ZEDCreateOperation : public ZEDOperation
 		virtual									~ZEDCreateOperation();
 
 	public:
-		static ZEDCreateOperation*				Create(ZEDObjectWrapper* Wrapper, ZEDObjectWrapper* Parent);
+		static ZEDCreateOperation*				Create(ZEClass* Class, ZEDObjectWrapper* Parent);
 };

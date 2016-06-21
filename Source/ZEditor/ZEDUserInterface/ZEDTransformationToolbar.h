@@ -35,43 +35,49 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
-
-#include <QToolBar>
+#include "ZEDToolbar.h"
+#include <QObject>
 
 class ZEDTransformationManager;
 class Ui_ZEDTransformationToolbar;
 
+class QAction;
+class QActionGroup;
 class QPushButton;
 class QComboBox;
 class QDoubleSpinBox;
 
-class ZEDTransformationToolbar : public QToolBar, public ZEDComponent
+class ZEDTransformationToolbar : public QObject, public ZEDToolbar
 {
 	Q_OBJECT
 	private:
-		QPushButton*						btnSelect;
-		QPushButton*						btnMove;
-		QPushButton*						btnRotate;
-		QPushButton*						btnScale;
+		QToolBar*							Toolbar;
+
+		QAction*							actSelect;
+		QAction*							actMove;
+		QAction*							actRotate;
+		QAction*							actScale;
+		QActionGroup*						ActionGroup;
+
 		QComboBox*							cmbSpace;
 		QComboBox*							cmbPivot;
 		QDoubleSpinBox*						txtX;
 		QDoubleSpinBox*						txtY;
 		QDoubleSpinBox*						txtZ;
 
-		ZEDTransformationManager*			TransformationManager;
-
 		void								SetupUI();
 		void								UpdateUI();
 
 		virtual void						TransformationEvent(const ZEDTransformationEvent* Event);
 
+											ZEDTransformationToolbar();
+		virtual								~ZEDTransformationToolbar();
+
 	private slots:
-		void								btnSelect_clicked();
-		void								btnMove_clicked();
-		void								btnRotate_clicked();
-		void								btnScale_clicked();
+		void								actSelect_triggered();
+		void								actMove_triggered();
+		void								actRotate_triggered();
+		void								actScale_triggered();
 		void								cmbSpace_currentIndexChanged(const QString & text);
 		void								cmbPivot_currentIndexChanged(const QString & text);
 		void								txtX_valueChanged(double d);
@@ -79,9 +85,8 @@ class ZEDTransformationToolbar : public QToolBar, public ZEDComponent
 		void								txtZ_valueChanged(double d);
 
 	public:
-		void								SetTransformManager(ZEDTransformationManager* Manager);
-		ZEDTransformationManager*			GetTransformManager();
+		virtual QToolBar*					GetToolbar();
+		ZEDTransformationManager*			GetTransformationManager();
 
-											ZEDTransformationToolbar(QWidget* Parent = NULL);
-											~ZEDTransformationToolbar();
+		static ZEDTransformationToolbar*	CreateInstance();
 };

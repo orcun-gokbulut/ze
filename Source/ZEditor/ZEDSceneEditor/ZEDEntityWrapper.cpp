@@ -35,6 +35,7 @@
 
 #include "ZEDEntityWrapper.h"
 
+#include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
@@ -44,10 +45,9 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
-
 #include "ZEUI/ZEUILabel.h"
-#include "ZEDModule.h"
-#include "ZEMath/ZEMath.h"
+#include "ZEDCore/ZEDEditor.h"
+#include "ZEDCore/ZEDObjectManager.h"
 
 bool ZEDEntityWrapper::RayCastModifier(ZERayCastCollision& Collision, const void* Parameter)
 {
@@ -126,8 +126,8 @@ bool ZEDEntityWrapper::InitializeSelf()
 	NamePlate->AddChildControl(NamePlateIcon);
 	NamePlate->AddChildControl(NamePlateLabel);
 
-	ZEUIManager* UIManager = GetModule()->GetUIManager();
-	UIManager->AddControl(NamePlate);
+	/*ZEUIManager* UIManager = GetManager()->GetEditor()->GetUIManager();
+	UIManager->AddControl(NamePlate);*/
 
 	return true;
 }
@@ -201,15 +201,17 @@ bool ZEDEntityWrapper::GetVisible() const
 	return static_cast<ZEEntity*>(GetObject())->GetVisible();
 }
 
+bool ZEDEntityWrapper::CheckChildrenClass(ZEClass* Class)
+{
+	return ZEClass::IsDerivedFrom(ZEEntity::Class(), Class);
+}
+
 bool ZEDEntityWrapper::AddChildWrapper(ZEDObjectWrapper* Wrapper, bool Update)
 {
 	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
 		return false;
 
 	if (!ZEDObjectWrapper::AddChildWrapper(Wrapper, Update))
-		return false;
-
-	if (!Wrapper->Initialize())
 		return false;
 
 	if (!Update)
@@ -225,8 +227,6 @@ bool ZEDEntityWrapper::RemoveChildWrapper(ZEDObjectWrapper* Wrapper, bool Update
 {
 	if (Wrapper != NULL && !ZEClass::IsDerivedFrom(ZEDEntityWrapper::Class(), Wrapper->GetClass()))
 		return false;
-
-	Wrapper->Deinitialize();
 
 	if (!ZEDObjectWrapper::RemoveChildWrapper(Wrapper, Update))
 		return false;
@@ -264,6 +264,8 @@ void ZEDEntityWrapper::SetPosition(const ZEVector3& NewPosition)
 	GetEntity()->SetWorldPosition(NewPosition);
 
 	Dirty = true;
+
+	ZEDObjectWrapper::SetPosition(NewPosition);
 }
 
 ZEVector3 ZEDEntityWrapper::GetPosition() const
@@ -282,6 +284,8 @@ void ZEDEntityWrapper::SetRotation(const ZEQuaternion& NewRotation)
 	GetEntity()->SetWorldRotation(NewRotation);
 
 	Dirty = true;
+
+	ZEDObjectWrapper::SetRotation(NewRotation);
 }
 
 ZEQuaternion ZEDEntityWrapper::GetRotation() const
@@ -297,9 +301,11 @@ void ZEDEntityWrapper::SetScale(const ZEVector3& NewScale)
 	if (GetObject() == NULL)
 		return;
 
-	GetEntity()->SetWorldScale(NewScale);
+	GetEntity()->SetScale(NewScale);
 
 	Dirty = true;
+
+	ZEDObjectWrapper::SetScale(NewScale);
 }
 
 ZEVector3 ZEDEntityWrapper::GetScale() const
@@ -381,46 +387,7 @@ void ZEDEntityWrapper::Update()
 	ZEEntity* Entity = GetEntity();
 	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
 
-	// Remove
-	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
-
-	for (ZESSize I = Wrappers.GetCount() - 1; I >= 0; I--)
-	{
-		bool Found = false;
-		for (ZESize N = 0; N < ChildEntities.GetCount(); N++)
-		{
-			if (Wrappers[I]->GetObject() == ChildEntities[N])
-			{
-				Found = true;
-				break;
-			}
-		}
-
-		if (!Found)
-			Wrappers[I]->Destroy();
-	}
-
-	// Add
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-	{
-		ZEDEntityWrapper* Wrapper = NULL;
-		const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
-		for (ZESize N = 0; N < Wrappers.GetCount(); N++)
-		{
-			if (Wrappers[N]->GetObject() == ChildEntities[I])
-			{
-				Wrapper = static_cast<ZEDEntityWrapper*>(Wrappers[N]);
-				break;
-			}
-		}
-
-		if (Wrapper == NULL)
-		{
-			Wrapper = ZEDEntityWrapper::CreateInstance();
-			Wrapper->SetObject(ChildEntities[I]);
-			AddChildWrapper(Wrapper, true);
-		}
-	}
+	SyncronizeChildWrappers((ZEObject*const*)ChildEntities.GetConstCArray(), ChildEntities.GetCount());
 }
 
 ZEDEntityWrapper* ZEDEntityWrapper::CreateInstance()

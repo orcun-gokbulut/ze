@@ -35,21 +35,45 @@
 
 #pragma once
 
+#include "ZEMeta\ZEEnumerator.h"
+
+ZE_ENUM(ZEInitializationState)
+{
+	ZE_IS_INITIALIZING,
+	ZE_IS_INITIALIZED,
+	ZE_IS_DEINITIALIZING,
+	ZE_IS_UNINITIALIZED,
+	ZE_IS_ERROR_INITIALIZATION,
+	ZE_IS_ERROR_DEINITIALIZATION
+};
+
+class ZEClass;
+
 class ZEInitializable
 {
 	private:
-		bool			Initialized;
+		ZEInitializationState		InitializationState;
+		#ifdef ZE_DEBUG_ENABLE
+		bool						CallChainCompleted;
+		#endif
+
 
 	protected:
-		virtual bool	InitializeSelf();
-		virtual void	DeinitializeSelf();
+		virtual bool				InitializeSelf();
+		virtual void				DeinitializeSelf();
 
 	public:
-		bool			IsInitialized() const;
-		bool			Initialize();
-		void			Deinitialize();
-		bool			Reinitialize();
+		virtual ZEClass*			GetClass() const;
 
-						ZEInitializable();
-		virtual			~ZEInitializable();
+		ZEInitializationState		GetInitializationState() const;
+
+		bool						IsInitialized() const;
+		bool						IsInitializedOrInitializing() const;
+
+		bool						Initialize();
+		bool						Deinitialize();
+		bool						Reinitialize();
+
+									ZEInitializable();
+		virtual						~ZEInitializable();
 };
