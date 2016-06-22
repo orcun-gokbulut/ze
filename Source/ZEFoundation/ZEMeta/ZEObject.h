@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_OBJECT_H__
-#define __ZE_OBJECT_H__
 
 #include "ZEClass.h"
 
@@ -69,6 +67,10 @@ class ZEObject
 	public:
 		virtual	ZEClass*			GetClass() const;
 		static ZEClass*				Class();
-};
-
-#endif
+}
+ZE_META_ATTRIBUTE_MEMBER(*, ZEMeta.Export, true)
+ZE_META_ATTRIBUTE_MEMBER(@*, ZEMeta.Serialization, true)
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.Icon, "#R:/ZEDEditor/Entity/Icons/Object.png")
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.NamePlate, true)
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.Selectable, true)
+ZE_META_ATTRIBUTE(ZEDObjectWrapper.Visualization, None);

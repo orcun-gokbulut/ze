@@ -301,12 +301,15 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		}
 	}
 
+	ClassData->Attributes = ClassData->BaseClass->Attributes;
 	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
 	{
 		ZEMCAttribute AttributeData;
 		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
 		ClassData->Attributes.Add(AttributeData);
 	}
+
+	NormalizeAttributeData(ClassData->Attributes);
 
 	for(CXXRecordDecl::decl_iterator Current = Class->decls_begin(), End = Class->decls_end(); Current != End; ++Current)
 	{
