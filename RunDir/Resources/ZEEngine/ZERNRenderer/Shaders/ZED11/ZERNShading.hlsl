@@ -39,7 +39,7 @@
 #include "ZERNView.hlsl"
 #include "ZERNSamplers.hlsl"
 
-#define MAX_LIGHT			512
+#define MAX_LIGHT			1024
 
 #define TILE_DIMENSION		16
 #define TILE_SIZE			(TILE_DIMENSION * TILE_DIMENSION)
@@ -125,7 +125,7 @@ cbuffer	ZERNShading_Constants																	: register(b8)
 	uint										ZERNShading_TileCountX;
 };
 
-//Texture2D<float4>								ZERNShading_ProjectionMap						: register(t5);
+Texture2D<float4>								ZERNShading_ProjectionMap						: register(t10);
 Texture2DArray<float>							ZERNShading_ShadowMaps							: register(t11);
 Texture2D<float2>								ZERNShading_RandomVectors						: register(t12);
 
@@ -174,7 +174,8 @@ float ZERNShading_CalculateVisibility(uint SampleCount, float SampleLength, uint
 
 bool ZERNShading_InsideLightVolume(float4x4 VolumeProjectionTransform, float3 PositionLightView, inout float3 OutTexCoordDepth)
 {
-	OutTexCoordDepth = mul(VolumeProjectionTransform, float4(PositionLightView, 1.0f)).xyz;
+	float4 TexCoordDepth = mul(VolumeProjectionTransform, float4(PositionLightView, 1.0f));
+	OutTexCoordDepth = TexCoordDepth.xyz / TexCoordDepth.w;
 	
 	if (all(OutTexCoordDepth >= 0.0f && OutTexCoordDepth <= 1.0f))
 		return true;
@@ -299,7 +300,7 @@ float3 ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLight ProjectiveLight
 	if (!ZERNShading_InsideLightVolume(ProjectiveLight.ProjectionTransform, Surface.PositionView, TexCoordDepth))
 		return ResultColor;
 	
-	//ProjectiveLight.Color *= ZERNShading_ProjectionMap.SampleLevel(ZERNSampler_LinearBorder, TexCoordDepth.xy, 0.0f).rgb;
+	ProjectiveLight.Color *= ZERNShading_ProjectionMap.SampleLevel(ZERNSampler_LinearBorderZero, TexCoordDepth.xy, 0.0f).rgb;
 		
 	ResultColor = ZERNShading_TotalBRDF(LightDirectionView, Surface) * ProjectiveLight.Color * NdotL * ZERNShading_DistanceAttenuation(ProjectiveLight.Attenuation, DistanceToLight);
 	ResultColor *= ZERNShading_ProjectiveShadowing(ProjectiveLight, Surface, TexCoordDepth);
