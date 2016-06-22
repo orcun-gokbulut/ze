@@ -61,7 +61,7 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-#define MAX_LIGHT				512
+#define MAX_LIGHT				1024
 #define TILE_DIMENSION			16
 
 #define ZERN_SLDF_LIGHT_BUFFER	1
@@ -404,7 +404,14 @@ bool ZERNStageLighting::UpdateLightBuffers()
 				DestLight.ShadowSampleLength = ProjectiveLight->GetShadowSampleLength();
 				DestLight.ShadowDepthBias = ProjectiveLight->GetShadowDepthBias();
 
-				DestLight.ProjectionTransform = ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * View.InvViewTransform;
+				ZEMatrix4x4 TextureTransform;
+				ZEMatrix4x4::Create(TextureTransform,
+					0.5f, 0.0f, 0.0f, 0.5f,
+					0.0f, -0.5f, 0.0f, 0.5f,
+					0.0f, 0.0f, 1.0f, 0.0f,
+					0.0f, 0.0f, 0.0f, 1.0f);
+
+				DestLight.ProjectionTransform = TextureTransform * ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * View.InvViewTransform;
 
 				float TanFovRange = ZEAngle::Tan(ProjectiveLight->GetFOV() * 0.5f) * ProjectiveLight->GetRange();
 				ZEMatrix4x4::CreateOrientation(
@@ -414,6 +421,8 @@ bool ZERNStageLighting::UpdateLightBuffers()
 					ZEVector3(TanFovRange * ProjectiveLight->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight->GetRange()));
 
 				ProjectiveLights.AddByRef(DestLight);
+
+				ProjectiveLightTexture = ProjectiveLight->GetProjectionTexture();
 			}
 			break;
 
@@ -553,6 +562,7 @@ void ZERNStageLighting::DrawLights(ZEGRContext* Context, bool PerSample)
 
 	if (Constants.ProjectiveLightCount > 0)
 	{
+		Context->SetTextures(ZEGR_ST_PIXEL, 10, 1, &ProjectiveLightTexture);
 		Context->SetRenderState(PerSample ? DeferredProjectiveLightRenderStatePerSample : DeferredProjectiveLightRenderState);
 		Context->DrawInstanced(18, 4542, Constants.ProjectiveLightCount, 0);
 	}
@@ -694,4 +704,6 @@ ZERNStageLighting::ZERNStageLighting()
 
 	memset(&Constants, 0, sizeof(Constants));
 	memset(&DirectionalLightShadowMaps, NULL, sizeof(ZEGRTexture*) * 2);
+
+	ProjectiveLightTexture = NULL;
 }
