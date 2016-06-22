@@ -168,19 +168,23 @@ class ZEEntity : public ZEObject
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
 		const ZEVector3&						GetPosition() const;
+
 		void									SetWorldPosition(const ZEVector3& NewPosition);
 		const ZEVector3							GetWorldPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
+
 		void									SetWorldRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion						GetWorldRotation() const;
 
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
+
 		void									SetWorldScale(const ZEVector3& NewScale);
 		const ZEVector3							GetWorldScale() const;
 
+												ZE_META_ATTRIBUTE(ZEDPropertyEditor.Exclude)
 		ZEVector3								GetFront();
 		ZEVector3								GetRight();
 		ZEVector3								GetUp();
@@ -204,7 +208,16 @@ class ZEEntity : public ZEObject
 
 		ZEDObjectWrapper*						GetWrapper() const;
 }
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.Icon, "#R:/ZEDEditor/Entity/Icons/Entity.png")
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.NamePlate, true)
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.Selectable, true)
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.Visualization, BoundingBox);
+ZE_META_ATTRIBUTE_PROPERTY(WorldPosition,		ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldRotation,		ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldScale,			ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(Transform,			ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldTransform,		ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(InvWorldTransform,	ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(State,				ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDPropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDPropertyEditor.Display, false);

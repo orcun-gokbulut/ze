@@ -52,7 +52,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 		ZE_PAS_PARAMETER_START,
 		ZE_PAS_PARAMETER,
 		ZE_PAS_PARAMETER_END,
-		ZE_PAS_QUATATION,
+		ZE_PAS_QUOTATION,
 		ZE_PAS_ESCAPE
 	} State = ZE_PAS_PARAMETER_START;
 
@@ -67,18 +67,20 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 				{
 					AttributeIndex++;
 				}
-				else if (isalnum(InputCharacter))
+				else if (isalnum(InputCharacter) || 
+					InputCharacter == '@' || InputCharacter == '~' || InputCharacter ==  '*' ||
+					InputCharacter == '+' || InputCharacter == '-' || InputCharacter ==  '%' ||	InputCharacter == '!') 
 				{
 					State = ZE_PAS_PARAMETER;
 				}
 				else if (InputCharacter == '\"')
 				{
-					State = ZE_PAS_QUATATION;
+					State = ZE_PAS_QUOTATION;
 					AttributeIndex++;
 				}
 				else
 				{
-					RaiseError(Attribute->getLocation(), "Wrong identifier name.");
+					RaiseError(Attribute->getLocation(), "Wrong ZEMeta attribute identifier name.");
 					return false;
 				}				
 				break;
@@ -93,22 +95,24 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 					State == ZE_PAS_PARAMETER_END;
 					AttributeIndex++;
 				}
-				else if (!isalnum(InputCharacter) && InputCharacter != ':' && InputCharacter != '.')
-				{
-					RaiseError(Attribute->getLocation(), "Wrong identifier name.");
-					return false;
-				}
-				else
+				else if (isalnum(InputCharacter) || InputCharacter == ':' || InputCharacter == '.' || 
+					InputCharacter == '@' || InputCharacter == '~' || InputCharacter ==  '*' ||
+					InputCharacter == '+' || InputCharacter == '-' || InputCharacter ==  '%' ||	InputCharacter == '!')
 				{
 					if (ParameterTextIndex >= 1024)
 					{
-						RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+						RaiseError(Attribute->getLocation(), "ZEMeta attribute max parameter size reached.");
 						return false;
 					}
 
 					ParameterText[ParameterTextIndex] = InputCharacter;
 					ParameterTextIndex++;
 					AttributeIndex++;
+				}
+				else
+				{
+					RaiseError(Attribute->getLocation(), "Wrong ZEMeta attribute identifier name.");
+					return false;
 				}
 				break;
 
@@ -130,15 +134,20 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 					ParameterTextIndex = 0;
 					AttributeIndex++;
 				}
+				else if (InputCharacter == '\"')
+				{
+					State = ZE_PAS_QUOTATION;
+					AttributeIndex++;
+				}
 				else
 				{
-					RaiseError(Attribute->getLocation(), "Wrong parameter termination character.");
+					RaiseError(Attribute->getLocation(), "Wrong ZEMeta attribute parameter termination character.");
 					return false;
 				}
 				break;
 
 
-			case ZE_PAS_QUATATION:
+			case ZE_PAS_QUOTATION:
 				if (InputCharacter == '\\')
 				{
 					State = ZE_PAS_ESCAPE;
@@ -153,7 +162,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 				{
 					if (ParameterTextIndex >= 1024)
 					{
-						RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+						RaiseError(Attribute->getLocation(), "ZEMeta attribute max parameter size reached.");
 						return false;
 					}
 					ParameterText[ParameterTextIndex] = InputCharacter;
@@ -196,7 +205,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 			}
 
 			AttributeIndex++;
-			State = ZE_PAS_QUATATION;
+			State = ZE_PAS_QUOTATION;
 		}
 	}
 

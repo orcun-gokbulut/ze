@@ -40,7 +40,7 @@
 #define ZE_MACRO_COMMA() ,
 #define ZE_MACRO_EMPTY()
 
-#define ZE_MACRO_TO_VALUE(Argument) Argument
+#define ZE_MACRO_EVALUATE(Argument) Argument
 
 #define ZE_MACRO_CONCAT_INTERNAL(A, B) A##B
 #define ZE_MACRO_CONCAT(A, B) ZE_MACRO_CONCAT_INTERNAL(A, B)

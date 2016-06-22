@@ -88,32 +88,38 @@ enum ZEMetaOperatorType
 
 struct ZEMethodParameter
 {
-	const char*			Name;
-	ZEType				Type;
+	const char*							Name;
+	ZEType								Type;
 };
 
 struct ZEMethod
 {
-	ZESize				Id;
-	const char*			Name;
-	ZEUInt32			Hash;
+	ZESize								Id;
+	const char*							Name;
+	ZEUInt32							Hash;
 
-	ZEClass*			MemberOf;
-	void*				MethodPtr;
+	ZEClass*							MemberOf;
+	void*								MethodPtr;
 
-	bool				IsConst;
-	bool				IsEvent;
-	bool				IsVirtual;
-	bool				IsStatic;
-	bool				IsOperator;
+	bool								IsConst;
+	bool								IsEvent;
+	bool								IsVirtual;
+	bool								IsStatic;
+	bool								IsOperator;
 
-	ZEMetaOperatorType	OperatorType;
-	ZEType				ReturnType;
-	ZEMethodParameter*	Parameters;
-	ZESize				ParameterCount;
+	ZEMetaOperatorType					OperatorType;
+	ZEType								ReturnType;
+	ZEMethodParameter*					Parameters;
+	ZESize								ParameterCount;
 
-	ZEAttribute*		Attributes;
-	ZESize				AttributeCount;
+	ZEAttribute*						Attributes;
+	ZESize								AttributeCount;
+
+	const ZEAttribute*					GetAttribute(const char* Name) const;
+	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = NULL) const;
+
+	bool								CheckAttribute(const char* Name) const;
+	bool								CheckAttributeHasValue(const char* Name, const char* Value) const;
 };
 
 #endif

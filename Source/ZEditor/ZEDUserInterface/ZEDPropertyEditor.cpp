@@ -54,25 +54,6 @@
 #include <QStyledItemDelegate>
 #include <QPainter>
 
-
-class ZEDPropertyEditorGridDelegate : public QStyledItemDelegate
-{
-	public:
-		explicit ZEDPropertyEditorGridDelegate(QObject * parent = 0) : QStyledItemDelegate(parent) { }
-
-		void paint(QPainter* painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
-		{		
-			QStyledItemDelegate::paint(painter, option, index);
-
-			QPalette Palatte;
-			painter->save();
-			painter->setPen(QColor(76, 70, 70));
-			painter->drawRect(option.rect);
-			painter->restore();
-
-		}
-};
-
 void ZEDPropertyEditor::Populate()
 {
 	clear();
@@ -129,6 +110,9 @@ void ZEDPropertyEditor::Populate()
 			continue;
 
 		if (Properties[I].Type.ContainerType != ZE_CT_NONE)
+			continue;
+
+		if (Properties[I].CheckAttribute("ZEDPropertyEditor.Exclude"))
 			continue;
 
 		switch (Properties[I].Type.Type)
@@ -336,7 +320,6 @@ ZEDPropertyEditor::ZEDPropertyEditor(QWidget* Parent) : QTreeWidget(Parent)
 	setRootIsDecorated(false);
 	setSelectionMode(QAbstractItemView::NoSelection);
 	setSelectionBehavior(QAbstractItemView::SelectRows);
-	//setItemDelegate(new ZEDPropertyEditorGridDelegate(this));
 
 	QTreeWidgetItem* Item = new QTreeWidgetItem();
 	Item->setText(0, "Name");

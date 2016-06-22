@@ -37,7 +37,7 @@
 
 #include "ZEMeta\ZEEnumerator.h"
 
-ZE_ENUM(ZEInitializationState)
+enum ZEInitializationState
 {
 	ZE_IS_INITIALIZING,
 	ZE_IS_INITIALIZED,
