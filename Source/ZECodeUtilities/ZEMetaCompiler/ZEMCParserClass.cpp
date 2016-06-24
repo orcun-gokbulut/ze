@@ -178,8 +178,9 @@ bool ZEMCParser::CheckFundamentalClass(CXXRecordDecl* Class)
 
 		ZEMCDeclaration Temp;
 		ParseAttributes(&Temp, *Iterator);
+		Temp.NormalizeAttributeStack();
 
-		return CheckAttribute(&Temp, "ZEMeta.Fundamental");
+		return Temp.CheckAttribute("ZEMC.Fundamental");
 	}
 
 	return false;
@@ -202,12 +203,12 @@ bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
 		{
 			ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
 
-			if (AttributeData.Name == "ZEMeta.ForwardDeclaration")
+			if (AttributeData.Name == "ZEMC.ForwardDeclaration")
 			{
 				bool Found = false;
 				for (ZESize I = 0; I < Context->ForwardDeclarations.GetCount(); I++)
 				{
-					if (Context->ForwardDeclarations[I]->ClassName == AttributeData.Parameters[0])
+					if (Context->ForwardDeclarations[I]->ClassName == AttributeData.Values[0])
 					{
 						Found = true;
 						break;
@@ -218,8 +219,8 @@ bool ZEMCParser::ProcessForwardDeclaration(CXXRecordDecl* Class)
 				{
 					ZEMCForwardDeclaration* ForwardDeclaredClass = new ZEMCForwardDeclaration();
 
-					ForwardDeclaredClass->ClassName = AttributeData.Parameters[0].ToCString();
-					ForwardDeclaredClass->HeaderName = AttributeData.Parameters[1].ToCString();
+					ForwardDeclaredClass->ClassName = AttributeData.Values[0].ToCString();
+					ForwardDeclaredClass->HeaderName = AttributeData.Values[1].ToCString();
 
 					Context->ForwardDeclarations.Add(ForwardDeclaredClass);
 
@@ -283,6 +284,8 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		ClassData->BaseClass = NULL;
 	}
 
+	ProcessClassAttributes(ClassData, Class);
+
 	// Combine Methods and Properties
 	if (ClassData->BaseClass != NULL)
 	{
@@ -301,15 +304,6 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 		}
 	}
 
-	ClassData->Attributes = ClassData->BaseClass->Attributes;
-	for(CXXRecordDecl::attr_iterator CurrentAttr = Class->attr_begin(), LastAttr = Class->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
-	{
-		ZEMCAttribute AttributeData;
-		ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr)));
-		ClassData->Attributes.Add(AttributeData);
-	}
-
-	NormalizeAttributeData(ClassData->Attributes);
 
 	for(CXXRecordDecl::decl_iterator Current = Class->decls_begin(), End = Class->decls_end(); Current != End; ++Current)
 	{
@@ -357,5 +351,28 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	}
 
 	if (CheckTargetDeclaration(Class))
+	{
+		RemoveMetaCompilerAttributes(ClassData);
 		Context->TargetClasses.Add(ClassData);
+	}
+}
+
+void ZEMCParser::ProcessClassAttributes(ZEMCClass* ClassData, CXXRecordDecl* ClassDeclaration)
+{
+	if (ClassData->BaseClass != NULL)
+		ClassData->AttributeStack = ClassData->BaseClass->AttributeStack;
+	
+	ParseAttributes(ClassData, ClassDeclaration);
+	
+	/*for(CXXRecordDecl::attr_iterator CurrentAttr = ClassDeclaration->attr_begin(), LastAttr = ClassDeclaration->attr_end(); CurrentAttr != LastAttr; ++CurrentAttr)
+	{
+		ZEMCAttribute AttributeData;
+		if (!ParseAttribute(AttributeData, ((AnnotateAttr*)(*CurrentAttr))))
+			continue;
+
+		AttributeData.Owner = ClassData;
+		ClassData->AttributeStack.Add(AttributeData);
+	}*/
+
+	ClassData->NormalizeAttributeStack();
 }

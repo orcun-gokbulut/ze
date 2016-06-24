@@ -97,7 +97,9 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 	Enumerator->MetaName = Enumerator->Name + "Enumerator";
 
 	ParseAttributes(Enumerator, EnumDeclaration);
-	if (!CheckAttribute(Enumerator, "ZEMeta.Enumerator"))
+	Enumerator->NormalizeAttributeStack();
+
+	if (!Enumerator->CheckAttribute("ZEMC.Enumerator"))
 		return;
 
 	Enumerator->Hash = Enumerator->Name.Hash();
@@ -118,6 +120,44 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 
 	if (CheckTargetDeclaration(EnumDeclaration))
 		Context->TargetEnumerators.Add(Context->Enumerators.GetLastItem());
+}
+
+void ZEMCParser::RemoveMetaCompilerAttributes(ZEMCClass* Class)
+{
+	for (ZESize I = 0; I < Class->Attributes.GetCount(); I++)
+	{
+		if (Class->Attributes[I].Name.Left(5) == "ZEMC.")
+		{
+			Class->Attributes.Remove(I);
+			I--;
+		}
+	}
+
+	for (ZESize N = 0; N < Class->Properties.GetCount(); N++)
+	{
+		ZEMCProperty* Property = Class->Properties[N];
+		for (ZESize I = 0; I < Property->Attributes.GetCount(); I++)
+		{
+			if (Property->Attributes[I].Name.Left(5) == "ZEMC.")
+			{
+				Property->Attributes.Remove(I);
+				I--;
+			}
+		}
+	}
+
+	for (ZESize N = 0; N < Class->Methods.GetCount(); N++)
+	{
+		ZEMCMethod* Method = Class->Methods[N];
+		for (ZESize I = 0; I < Method->Attributes.GetCount(); I++)
+		{
+			if (Method->Attributes[I].Name.Left(5) == "ZEMC.")
+			{
+				Method->Attributes.Remove(I);
+				I--;
+			}
+		}
+	}
 }
 
 class ZEMetaCompilerASTConsumer : public clang::ASTConsumer

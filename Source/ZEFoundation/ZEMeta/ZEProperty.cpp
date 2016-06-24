@@ -78,7 +78,7 @@ bool ZEProperty::CheckAttributeHasValue(const char* Name, const char* Value) con
 
 	for (ZESize I = 0; I < Attribute->ValueCount; I++)
 	{
-		if (strcmp(Attribute->Values[I], Value) != 0)
+		if (strcmp(Attribute->Values[I], Value) == 0)
 			return true;
 	}
 

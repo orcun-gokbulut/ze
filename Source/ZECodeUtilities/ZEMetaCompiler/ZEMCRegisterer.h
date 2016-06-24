@@ -43,21 +43,21 @@
 class ZEMCRegisterContext
 {
 	public:
-		ZEString RegisterName;
-		ZEArray<ZEString> Includes;
-		ZEArray<ZEString> Classes;
-		ZEArray<ZEString> Enumerators;
+		ZEString					RegisterName;
+		ZEArray<ZEString>			Includes;
+		ZEArray<ZEString>			Classes;
+		ZEArray<ZEString>			Enumerators;
 };
 
 class ZEMCRegisterer
 {
 	private:
-		ZEMCOptions* Options;
+		ZEMCOptions*				Options;
 
 	public:
-		void SetOptions(ZEMCOptions* Options);
+		void						SetOptions(ZEMCOptions* Options);
 
-		void GenerateRegisterFile(ZEMCContext* Context);
+		void						GenerateRegisterFile(ZEMCContext* Context);
 };
 
 #endif

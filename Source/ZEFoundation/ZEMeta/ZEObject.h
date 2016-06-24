@@ -37,7 +37,7 @@
 
 #include "ZEClass.h"
 
-#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_META_ATTRIBUTE(ZEMeta.ForwardDeclaration, #ClassName, IncludeFile) ClassName;
+#define ZE_META_FORWARD_DECLARE(ClassName, IncludeFile) class ZE_META_ATTRIBUTE(ZEMC.ForwardDeclaration, #ClassName, IncludeFile) ClassName;
 
 #define ZE_OBJECT \
 	public: \
@@ -68,9 +68,11 @@ class ZEObject
 		virtual	ZEClass*			GetClass() const;
 		static ZEClass*				Class();
 }
-ZE_META_ATTRIBUTE_MEMBER(*, ZEMeta.Export, true)
+ZE_META_ATTRIBUTE_MEMBER(*, ZEMC.Export, true)
+ZE_META_ATTRIBUTE_MEMBER(~*, ZEMC.Accessor, true)
 ZE_META_ATTRIBUTE_MEMBER(@*, ZEMeta.Serialization, true)
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.Icon, "#R:/ZEDEditor/Entity/Icons/Object.png")
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.NamePlate, true)
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.Selectable, true)
-ZE_META_ATTRIBUTE(ZEDObjectWrapper.Visualization, None);
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Icon, "#R:/ZEDEditor/Entity/Icons/Object.png")
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.NamePlate, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Selectable, true)
+ZE_META_ATTRIBUTE(ZEDEditor.ObjectWrapper.Visualization, None)
+ZE_META_ATTRIBUTE_MEMBER(@*, ZEDEditor.PropertyEditor.Display, true);

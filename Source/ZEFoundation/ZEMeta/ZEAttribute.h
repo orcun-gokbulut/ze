@@ -45,35 +45,9 @@
 	#define ZE_META_ATTRIBUTE(...)
 #endif
 
-#define ZE_META_ATTRIBUTE_DELETE(AttributeName)										ZE_META_ATTRIBUTE("!"#AttributeName)
-#define ZE_META_ATTRIBUTE_VALUES_APPEND(AttributeName, ...)							ZE_META_ATTRIBUTE("+"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_VALUES_REMOVE(AttributeName, ...)							ZE_META_ATTRIBUTE("-"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_VALUES_CLEAR(AttributeName)								ZE_META_ATTRIBUTE("%"#AttributeName)
-
-// Member Naming:
-// @ Property (@EntityId)
-// ~ Method (~Tick(float ElapsedTime)
-// * Everything
-// @* All Attributes
-// #* All Methods
-
 #define ZE_META_ATTRIBUTE_MEMBER(MemberName, AttributeName, ...)					ZE_META_ATTRIBUTE(#MemberName, #AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_MEMBER_DELETE(MemberName, AttributeName)					ZE_META_ATTRIBUTE(#MemberName, "!"#AttributeName)
-#define ZE_META_ATTRIBUTE_MEMBER_ADD_VALUE(MemberName, AttributeName, ...)			ZE_META_ATTRIBUTE(#MemberName, "+"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_MEMBER_REMOVE_VALUE(MemberName, AttributeName, ...)		ZE_META_ATTRIBUTE(#MemberName, "-"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_MEMBER_CLEAR_VALUES(MemberName, AttributeName)			ZE_META_ATTRIBUTE(#MemberName, "%"#AttributeName)
-
 #define ZE_META_ATTRIBUTE_PROPERTY(PropertyName, AttributeName, ...)				ZE_META_ATTRIBUTE("@"#PropertyName, #AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_PROPERTY_DELETE(PropertyName, AttributeName)				ZE_META_ATTRIBUTE("@"#PropertyName, "!"#AttributeName)
-#define ZE_META_ATTRIBUTE_PROPERTY_ADD_VALUE(PropertyName, AttributeName, ...)		ZE_META_ATTRIBUTE("@"#PropertyName, "+"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_PROPERTY_REMOVE_VALUE(PropertyName, AttributeName, ...)	ZE_META_ATTRIBUTE("@"#PropertyName, "-"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_PROPERTY_CLEAR_VALUES(PropertyName, AttributeName)		ZE_META_ATTRIBUTE("@"#PropertyName, "%"#AttributeName)
-
-#define ZE_META_ATTRIBUTE_METHOD(MethodName, AttributeName, ...)					ZE_META_ATTRIBUTE("~"#MethodName, "#"AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_METHOD_DELETE(MethodName, AttributeName)					ZE_META_ATTRIBUTE("~"#MethodName, "!"#AttributeName)
-#define ZE_META_ATTRIBUTE_METHOD_ADD_VALUE(MethodName, AttributeName, ...)			ZE_META_ATTRIBUTE("~"#MethodName, "+"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_METHOD_REMOVE_VALUE(MethodName, AttributeName, ...)		ZE_META_ATTRIBUTE("~"#MethodName, "-"#AttributeName, __VA_ARGS__)
-#define ZE_META_ATTRIBUTE_METHOD_CLEAR_VALUES(MethodName, AttributeName)			ZE_META_ATTRIBUTE("~"#MethodName, "%"#AttributeName)
+#define ZE_META_ATTRIBUTE_METHOD(MethodName, AttributeName, ...)					ZE_META_ATTRIBUTE("~"#MethodName, #AttributeName, __VA_ARGS__)
 
 struct ZEAttribute
 {

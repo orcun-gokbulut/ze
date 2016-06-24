@@ -141,178 +141,187 @@ enum ZEMCContainerType
 	ZEMC_CT_CONTAINER
 };
 
+class ZEMCDeclaration;
 class ZEMCEnumerator;
 class ZEMCMethod;
 
 class ZEMCType
 {
 	public:
-		ZEMCBaseType BaseType;
-		ZEMCTypeQualifier TypeQualifier;
-		ZEMCContainerType ContainerType;
+		ZEMCBaseType					BaseType;
+		ZEMCTypeQualifier				TypeQualifier;
+		ZEMCContainerType				ContainerType;
 
-		ZEMCClass* Class;
-		ZEMCEnumerator* Enumurator;
+		ZEMCClass*						Class;
+		ZEMCEnumerator*					Enumurator;
 
-		bool operator==(const ZEMCType& Other) const;
-		bool operator!=(const ZEMCType& Other) const;
+		bool							operator==(const ZEMCType& Other) const;
+		bool							operator!=(const ZEMCType& Other) const;
 
-		static bool Equal(const ZEMCType& A, const ZEMCType& B);
+		static bool						Equal(const ZEMCType& A, const ZEMCType& B);
 
-		ZEMCType();
-		~ZEMCType();
+										ZEMCType();
+										~ZEMCType();
 };
 
 class ZEMCAttribute
 {
 	public:
-		ZEString Name;
-		ZEString MemberOf;
-		ZEArray<ZEString> Parameters;
+		ZEMCDeclaration*				Owner;
+		ZEString						Name;
+		ZEArray<ZEString>				Values;
 
-		ZEMCAttribute();
-		~ZEMCAttribute();
+										ZEMCAttribute();
+										~ZEMCAttribute();
 };
 
 class ZEMCForwardDeclaration
 {
 	public:
-		ZEString HeaderFileDeclaredIn;
-		ZEString ClassName;
-		ZEString HeaderName;
+		ZEString						HeaderFileDeclaredIn;
+		ZEString						ClassName;
+		ZEString						HeaderName;
 		
-		ZEMCForwardDeclaration();
-		~ZEMCForwardDeclaration();
+										ZEMCForwardDeclaration();
+										~ZEMCForwardDeclaration();
 };
 
 class ZEMCDeclaration
 {
 	public:
-		ZEString Name;
-		ZEString MetaName;
-		ZEUInt32 Hash;
-		ZEArray<ZEMCAttribute> Attributes;
+		ZEString						Name;
+		ZEString						MetaName;
+		ZEUInt32						Hash;
 
-		bool CheckAttribute(const char* Name);
-		ZEMCAttribute* GetAttribute(const char* Name);
+		ZEArray<ZEMCAttribute>			AttributeStack;
+		ZEArray<ZEMCAttribute>			Attributes;
 
-		ZEMCDeclaration();
-		virtual ~ZEMCDeclaration();
+		void							NormalizeAttributeStack();
+
+		ZEMCAttribute*					GetAttribute(const char* Name);
+		const char*						GetAttributeValue(const char* Name, ZESize Index = 0, const char* DefaultValue = NULL);
+
+		bool							CheckAttribute(const char* Name);
+		bool							CheckAttributeValue(const char* Name, const char* TestValue, ZESize Index = 0, const char* DefaultValue = NULL);
+		bool							CheckAttributeHasValue(const char* Name, const char* Value);
+
+										ZEMCDeclaration();
+		virtual							~ZEMCDeclaration();
 };
 
 class ZEMCEnumeratorItem
 {
 	public:
-		ZEString Name;
-		ZEUInt32 Value;
+		ZEString						Name;
+		ZEUInt32						Value;
 
-		ZEMCEnumeratorItem();
-		~ZEMCEnumeratorItem();
+										ZEMCEnumeratorItem();
+										~ZEMCEnumeratorItem();
 };
 
 class ZEMCEnumerator : public ZEMCDeclaration
 {
 	public:
-		ZEArray<ZEMCEnumeratorItem> Items;
+		ZEArray<ZEMCEnumeratorItem>		Items;
 
-		ZEMCEnumerator();
-		~ZEMCEnumerator();
+										ZEMCEnumerator();
+										~ZEMCEnumerator();
 };
 
 class ZEMCProperty : public ZEMCDeclaration
 {
 	public:
-		ZEMCClass* Class;
+		ZEMCClass*						Class;
 
-		ZESize ID;
-		ZEMCType Type;
+		ZESize							ID;
+		ZEMCType						Type;
 
-		bool HasAccessors;
-		ZEMCMethod* Getter;
-		ZEMCMethod* Setter;
-		ZEMCMethod* Adder;
-		ZEMCMethod* Remover;
+		bool							HasAccessors;
+		ZEMCMethod*						Getter;
+		ZEMCMethod*						Setter;
+		ZEMCMethod*						Adder;
+		ZEMCMethod*						Remover;
 
-		bool IsStatic;
-		bool IsContainer;
+		bool							IsStatic;
+		bool							IsContainer;
 
-		ZEMCPropertyAccess Access;
+		ZEMCPropertyAccess				Access;
 
-		ZEMCProperty();
-		~ZEMCProperty();
+										ZEMCProperty();
+										~ZEMCProperty();
 };
 
 class ZEMCMethodParameter
 {
 	public:
-		ZEString Name;
-		ZEMCType Type;
+		ZEString						Name;
+		ZEMCType						Type;
 
-		ZEMCMethodParameter();
-		~ZEMCMethodParameter();
+										ZEMCMethodParameter();
+										~ZEMCMethodParameter();
 };
 
 class ZEMCMethod : public ZEMCDeclaration
 {
 	public:
-		ZEMCClass* Class;
+		ZEMCClass*						Class;
 
-		ZESize ID;
+		ZESize							ID;
 
-		bool IsVirtual;
-		bool IsPure;
-		bool IsStatic;
-		bool IsEvent;
-		bool IsConst;
-		bool IsConstructor;
-		bool IsOperator;
+		bool							IsVirtual;
+		bool							IsPure;
+		bool							IsStatic;
+		bool							IsEvent;
+		bool							IsConst;
+		bool							IsConstructor;
+		bool							IsOperator;
 
-		ZEMCMetaOperatorType OperatorType;
+		ZEMCMetaOperatorType			OperatorType;
 
-		ZEMCType ReturnValue;
-		ZEArray<ZEMCMethodParameter> Parameters;
+		ZEMCType						ReturnValue;
+		ZEArray<ZEMCMethodParameter>	Parameters;
 
-		ZEMCMethod();
-		virtual ~ZEMCMethod();
+										ZEMCMethod();
+		virtual							~ZEMCMethod();
 };
 
 class ZEMCClass : public ZEMCDeclaration
 {
 	public:
-		ZEMCClass* BaseClass;
-		ZEArray<ZEMCProperty*> Properties;
-		ZEArray<ZEMCMethod*> Methods;
+		ZEMCClass*						BaseClass;
+		ZEArray<ZEMCProperty*>			Properties;
+		ZEArray<ZEMCMethod*>			Methods;
 
-		bool IsForwardDeclared;
-		bool HasScriptBase;
+		bool							IsForwardDeclared;
+		bool							HasScriptBase;
 
-		bool IsAbstract;
-		bool IsFundamental;
+		bool							IsAbstract;
+		bool							IsFundamental;
 
-		bool HasCreateInstanceMethod;
-		bool HasPublicCopyConstructor;
-		bool HasPublicDefaultConstructor;
-		bool HasPublicDestructor;
-		bool HasPublicAssignmentOperator;
-		bool HasPublicDestroyMethod;
+		bool							HasCreateInstanceMethod;
+		bool							HasPublicCopyConstructor;
+		bool							HasPublicDefaultConstructor;
+		bool							HasPublicDestructor;
+		bool							HasPublicAssignmentOperator;
+		bool							HasPublicDestroyMethod;
 
-		ZEMCClass();
-		virtual ~ZEMCClass();
+										ZEMCClass();
+		virtual							~ZEMCClass();
 };
 
 class ZEMCContext
 {
 	public:
-		ZEArray<ZEMCClass*> Classes;
-		ZEArray<ZEMCEnumerator*> Enumerators;
+		ZEArray<ZEMCClass*>				Classes;
+		ZEArray<ZEMCEnumerator*>		Enumerators;
 
-		ZEArray<ZEMCClass*> TargetClasses;
-		ZEArray<ZEMCEnumerator*> TargetEnumerators;
+		ZEArray<ZEMCClass*>				TargetClasses;
+		ZEArray<ZEMCEnumerator*>		TargetEnumerators;
 
 		ZEArray<ZEMCForwardDeclaration*> ForwardDeclarations;
 
-		ZEMCContext();
-		~ZEMCContext();
+										ZEMCContext();
+										~ZEMCContext();
 };
 
 #endif

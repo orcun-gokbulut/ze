@@ -45,7 +45,7 @@
 
 #define ZE_ENUM(Name) \
 	ZEEnumerator* Name##_Declaration();\
-	enum ZE_META_ATTRIBUTE(ZEMeta.Enumerator) Name
+	enum ZE_META_ATTRIBUTE(ZEMC.Enumerator) Name
 
 #define ZE_META_ENUMERATOR_IMPLEMENTATION(Name) \
 	class Name##Enumerator : public ZEEnumerator \
