@@ -53,22 +53,25 @@ class ZEPathManager : public ZEInitializable
 		ZEString				UserStoragePath;
 		ZEString				SystemStoragePath;
 
-		void					SetEnginePath(const ZEString& Path);
-		void					SetResourcePath(const ZEString& Path);
-		void					SetStoragePath(const ZEString& Path);
-		void					SetUserStoragePath(const ZEString& Path);
-		void					SetSystemStoragePath(const ZEString& Path);
-
 		virtual bool			InitializeSelf();
 
 	public:
 		void					SetAccessControl(bool Enable);
 		bool					GetAccessControl();
 
+		void					SetEnginePath(const ZEString& Path);
 		const ZEString&			GetEnginePath();
+
+		void					SetResourcePath(const ZEString& Path);
 		const ZEString&			GetResourcePath();
+
+		void					SetStoragePath(const ZEString& Path);
 		const ZEString&			GetStoragePath();
+
+		void					SetUserStoragePath(const ZEString& Path);
 		const ZEString&			GetUserStoragePath();
+
+		void					SetSystemStoragePath(const ZEString& Path);
 		const ZEString&			GetSystemStoragePath();
 
 		ZERealPath				TranslateToRealPath(const char* Path);

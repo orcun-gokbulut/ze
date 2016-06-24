@@ -74,24 +74,26 @@ void ZELNIntegrityModule::CheckerWorker_StateChanged()
 			break;
 	}
 
+	Form->btnCheckIntegrity->setText("Check Integrity");
+
 	if (CheckerWorker->GetState() != ZELN_IWS_CANCELED)
 	{
-		if (Checker.GetResult() != ZEIT_CR_ERROR)
-		{
-			Form->prgProgress->setValue(Checker.GetRecords().GetCount());
-			Form->lblPath->setText("");
-		}
-
+		Form->prgProgress->setValue(Checker.GetRecords().GetCount());
+		Form->lblPath->setText("");
 		Form->lblStatus->setText(StatusText);
+
+		if (Checker.GetResult() == ZEIT_CR_ERROR)
+			Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: red; }");
+		else
+			Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 	}
 	else
 	{
 		Form->prgProgress->setEnabled(false);
 		Form->lblStatus->setText(QString("Canceled (%1)").arg(StatusText));
+		Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
 	}
 
-	Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: gray; }");
-	Form->btnCheckIntegrity->setText("Check Integrity");
 }
 
 void ZELNIntegrityModule::CheckerWorker_RecordUpdated(unsigned int RecordIndex)
@@ -124,6 +126,9 @@ void ZELNIntegrityModule::CheckerWorker_RecordUpdated(unsigned int RecordIndex)
 	}
 
 	Form->lblStatus->setText(QString("Checking... (%1)").arg(StatusText));
+
+	if (Checker.GetResult() == ZEIT_CR_ERROR)
+		Form->prgProgress->setStyleSheet(Form->prgProgress->property("defaultStyleSheet").toString() + " QProgressBar::chunk { background: red; }");
 }
 
 void ZELNIntegrityModule::UpdateRecord(ZESize Index)
@@ -134,12 +139,12 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 	{
 		QTableWidgetItem* StatusItem = new QTableWidgetItem();
 		StatusItem->setTextAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
-		StatusItem->setFlags(StatusItem->flags() ^ Qt::ItemIsEditable);
+		StatusItem->setFlags(StatusItem->flags() & ~Qt::ItemIsEditable);
 		Form->tblRecords->setItem(Index, 0, StatusItem);
 
 		QTableWidgetItem* PathItem = new QTableWidgetItem();
 		PathItem->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-		PathItem->setFlags(PathItem->flags() ^ Qt::ItemIsEditable);
+		PathItem->setFlags(PathItem->flags() & ~Qt::ItemIsEditable);
 		Form->tblRecords->setItem(Index, 1, PathItem);
 	}
 	  
@@ -192,6 +197,7 @@ void ZELNIntegrityModule::UpdateRecord(ZESize Index)
 	}
 
 	Form->tblRecords->item(Index, 1)->setText(Record.GetPath().ToCString());
+	Form->tblRecords->item(Index, 1)->setToolTip(Record.GetPath().ToCString());
 }
 
 void ZELNIntegrityModule::Update()
@@ -208,7 +214,11 @@ bool ZELNIntegrityModule::InitializeSelf()
 		return false;
 	
 	if (!Checker.Load())
-		zeWarning("Cannot load Integrity records file.");
+	{
+		Form->lblStatus->setText("ERROR: Cannot load Integrity file.");
+		zeWarning("Cannot load Integrity file.");
+		Widget->setEnabled(false);
+	}
 
 	Update();
 
@@ -233,7 +243,7 @@ ZELNIntegrityModule::ZELNIntegrityModule()
 	PathHeader->setTextAlignment(Qt::AlignLeft | Qt::AlignVCenter);
 	Form->tblRecords->setHorizontalHeaderItem(1, PathHeader);
 
-	Form->tblRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::Stretch);
+	Form->tblRecords->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	Form->tblRecords->verticalHeader()->setVisible(false);
 
 	QHeaderView* verticalHeader = Form->tblRecords->verticalHeader();
@@ -242,6 +252,12 @@ ZELNIntegrityModule::ZELNIntegrityModule()
 
 	CheckerWorker = new ZELNIntegrityWorker();
 	CheckerWorker->SetChecker(&Checker);
+
+	Form->tblRecords->setSelectionBehavior(QAbstractItemView::SelectRows);
+	Form->tblRecords->setSelectionMode(QAbstractItemView::NoSelection);
+
+	Form->tblRecords->setHorizontalScrollMode(QAbstractItemView::ScrollPerPixel);
+	Form->tblRecords->setVerticalScrollMode(QAbstractItemView::ScrollPerPixel);
 
 	connect(Form->btnCheckIntegrity, SIGNAL(clicked()), this, SLOT(btnCheckIntegrity_clicked()));
 	connect(Form->chkFilterAll,		SIGNAL(toggled(bool)), this, SLOT(chkFilter_toggled(bool)));

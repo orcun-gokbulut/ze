@@ -273,7 +273,8 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 	if (this->ModelResource != NULL)
 		((ZEModelResource*)this->ModelResource)->Release();
 
-	ModelResource->AddReferance();
+	if (ModelResource != NULL)
+		ModelResource->AddReferance();
 
 	this->ModelResource = ModelResource;
 
@@ -304,14 +305,6 @@ const ZEArray<ZEModelMesh>& ZEModel::GetMeshes()
 const ZEArray<ZEModelHelper>& ZEModel::GetHelpers()
 {
 	return Helpers;
-}
-
-const ZEArray<ZEModelAnimation>* ZEModel::GetAnimations()
-{
-	if (ModelResource == NULL)
-		return  NULL;
-
-	return &ModelResource->GetAnimations();
 }
 
 void ZEModel::SetActiveLOD(ZEUInt LOD)
