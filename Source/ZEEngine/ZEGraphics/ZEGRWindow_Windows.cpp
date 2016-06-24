@@ -654,6 +654,9 @@ void ZEGRWindow::Destroy()
 
 bool ZEGRWindow::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
 	GetWin32Style(this, Win32StyleExt, Win32Style);
@@ -710,6 +713,35 @@ bool ZEGRWindow::InitializeSelf()
 	return true;
 }
 
+
+void ZEGRWindow::DeinitializeSelf()
+{
+	if (Handle != NULL)
+	{
+		BOOL Result = DestroyWindow((HWND)Handle);
+		if (Result == 0)
+		{
+			HandleWin32Error(GetLastError());
+			return;
+		}
+
+		Handle = NULL;
+	}
+
+	WindowCount--;
+
+	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();
+
+	if (!UnRegisterWindowClass(Instance))
+	{
+		zeError("Cannot unregister class.");
+		return;
+	}
+
+	ZEInitializable::DeinitializeSelf();
+}
+
+
 ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 {
 	HWND Handle = (HWND)ExistingHandle;
@@ -759,31 +791,6 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	}
 
 	return Window;
-}
-
-void ZEGRWindow::DeinitializeSelf()
-{
-	if (Handle != NULL)
-	{
-		BOOL Result = DestroyWindow((HWND)Handle);
-		if (Result == 0)
-		{
-			HandleWin32Error(GetLastError());
-			return;
-		}
-	
-		Handle = NULL;
-	}
-
-	WindowCount--;
-
-	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();
-
-	if (!UnRegisterWindowClass(Instance))
-	{
-		zeError("Cannot unregister class.");
-		return;
-	}
 }
 
 void ZEGRWindow::Show()
