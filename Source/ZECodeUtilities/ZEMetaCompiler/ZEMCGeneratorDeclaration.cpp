@@ -68,18 +68,18 @@ void ZEMCGenerator::GenerateDeclarationGetAttributes(ZEMCDeclaration* Declaratio
 	for(ZESize I = 0; I < Declaration->Attributes.GetCount(); I++)
 	{
 		ZEMCAttribute* CurrentAttribute = &Declaration->Attributes[I];
-		if (CurrentAttribute->Parameters.GetCount() == 0)
+		if (CurrentAttribute->Values.GetCount() == 0)
 			continue;
 
 		WriteToFile(
 			"\tstatic const char* Attribute%dParameters[%d] = {", 
-			I, CurrentAttribute->Parameters.GetCount());
+			I, CurrentAttribute->Values.GetCount());
 
-		for(ZESize J = 0; J < CurrentAttribute->Parameters.GetCount(); J++)
+		for(ZESize J = 0; J < CurrentAttribute->Values.GetCount(); J++)
 		{
 			WriteToFile("\"%s\"%s", 
-				CurrentAttribute->Parameters[J].ToCString(), 
-				J != CurrentAttribute->Parameters.GetCount() - 1 ? ", " : "");
+				CurrentAttribute->Values[J].ToCString(), 
+				J != CurrentAttribute->Values.GetCount() - 1 ? ", " : "");
 		}
 
 		WriteToFile("};\n");
@@ -100,13 +100,13 @@ void ZEMCGenerator::GenerateDeclarationGetAttributes(ZEMCDeclaration* Declaratio
 		for(ZESize I = 0; I < Declaration->Attributes.GetCount(); I++)
 		{
 			ZEMCAttribute* CurrentAttribute = &Declaration->Attributes[I];
-			if (CurrentAttribute->Parameters.GetCount() > 0)
+			if (CurrentAttribute->Values.GetCount() > 0)
 			{
 				WriteToFile(
 					"\t\t{\"%s\", Attribute%dParameters, %d}",
 					CurrentAttribute->Name.ToCString(), 
 					I, 
-					CurrentAttribute->Parameters.GetCount());
+					CurrentAttribute->Values.GetCount());
 			}
 			else
 			{

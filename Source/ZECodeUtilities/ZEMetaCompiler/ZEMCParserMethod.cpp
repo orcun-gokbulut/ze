@@ -37,6 +37,7 @@
 #include "ZEMCOptions.h"
 #include "ZEPointer\ZEPointer.h"
 #include "llvm\Support\raw_ostream.h"
+#include "ZEDS\ZEFormat.h"
 
 ZEMCMetaOperatorType ZEMCParser::GetOperatorType(OverloadedOperatorKind OperatorKind)
 {
@@ -214,7 +215,6 @@ void ZEMCParser::CheckDestroyMethod(ZEMCClass* Class, CXXMethodDecl* MethodDecl)
 
 void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 {
-	//zeBreak(ClassData->Name == "ZETerrain");
 	if (!MethodDecl->getType()->isFunctionType())
 		return;
 
@@ -248,7 +248,41 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	MethodData->Hash = MethodData->Name.Hash();
 	MethodData->ReturnValue = ReturnType;
 
-	ParseAttributes(MethodData, MethodDecl);
+	ZEMCMethod* OverriddenMethod = NULL;
+	for (ZESize I = 0; I < ClassData->Methods.GetCount(); I++)
+	{
+		ZEMCMethod* CurrentMethod = ClassData->Methods[I];
+
+		if (CurrentMethod->Hash != MethodData->Hash && CurrentMethod->Name != MethodData->Name)
+			continue;
+
+		if (CurrentMethod->Parameters.GetCount() != MethodData->Parameters.GetCount())
+			continue;
+
+		if (CurrentMethod->Parameters.GetCount() != 0)
+		{
+			bool Found = true;
+			for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
+			{
+				if (CurrentMethod->Parameters[N].Type != MethodData->Parameters[N].Type)
+				{
+					Found = false;
+					break;
+				}
+			}
+
+			if (!Found)
+				continue;
+		}
+
+		OverriddenMethod = CurrentMethod;
+		break;
+	}
+
+	ProcessMemberAttributes(MethodData, MethodDecl, true, OverriddenMethod);
+
+	if (!MethodData->CheckAttributeValue("ZEMC.Export", "true", 0, "false"))
+		return;
 
 	if (MethodDecl->isCopyAssignmentOperator())
 	{
@@ -281,39 +315,8 @@ void ZEMCParser::ProcessMethod(ZEMCClass* ClassData, CXXMethodDecl* MethodDecl)
 	if (!ProcessMethodParameters(MethodData, MethodDecl))
 		return;
 
-	ZEMCMethod* OverloadedMethod = NULL;
-	for (ZESize I = 0; I < ClassData->Methods.GetCount(); I++)
-	{
-		ZEMCMethod* CurrentMethod = ClassData->Methods[I];
-
-		if (CurrentMethod->Hash != MethodData->Hash && CurrentMethod->Name != MethodData->Name)
-			continue;
-
-		if (CurrentMethod->Parameters.GetCount() != MethodData->Parameters.GetCount())
-			continue;
-
-		if (CurrentMethod->Parameters.GetCount() != 0)
-		{
-			bool Found = true;
-			for (ZESize N = 0; N < CurrentMethod->Parameters.GetCount(); N++)
-			{
-				if (CurrentMethod->Parameters[N].Type != MethodData->Parameters[N].Type)
-				{
-					Found = false;
-					break;
-				}
-			}
-
-			if (!Found)
-				continue;
-		}
-
-		OverloadedMethod = CurrentMethod;
-		break;
-	}
-
-	if (OverloadedMethod != NULL)
-		*OverloadedMethod = *MethodData.GetPointer();
+	if (OverriddenMethod != NULL)
+		*OverriddenMethod = *MethodData.GetPointer();
 	else
 		ClassData->Methods.Add(MethodData.Transfer());
 }
@@ -360,9 +363,55 @@ void ZEMCParser::ProcessEvent(ZEMCClass* ClassData, DeclaratorDecl* EventDeclara
 	MethodData->IsEvent = true;
 	MethodData->IsStatic = llvm::cast<FieldDecl>(EventDeclaration) == NULL;
 
+	ProcessMemberAttributes(MethodData, EventDeclaration, true, NULL);
+
+	if (!MethodData->CheckAttributeValue("ZEMC.Export", "true", 0, "false"))
+		return;
 
 	if (!ProcessEvenParameters(MethodData, EventDeclaration->getType()->getAsCXXRecordDecl()))
 		return;
 
 	ClassData->Methods.Add(MethodData.Transfer());
+}
+
+
+void ZEMCParser::ProcessMemberAttributes(ZEMCDeclaration* Declaration, Decl* ClangDeclaration, bool IsMethod, ZEMCDeclaration* Overriden)
+{
+	ZEMCClass* Class;
+	if (IsMethod)
+		Class = static_cast<ZEMCMethod*>(Declaration)->Class;
+	else
+		Class = static_cast<ZEMCProperty*>(Declaration)->Class;
+
+	ZEString AttributeMemberName = ZEFormat::Format("{0}{1}", (IsMethod ? "~" : "@"), Declaration->Name);
+	const char* AttributeMemberGroup = (IsMethod ? "~*" : "@*");
+	ZEArray<ZEMCAttribute>& ClassAttributes = Class->AttributeStack;
+	for (ZESize I = 0; I < ClassAttributes.GetCount(); I++)
+	{
+		if (ClassAttributes[I].Owner == Class && Overriden != NULL)
+		{
+			Declaration->AttributeStack = Overriden->AttributeStack;	
+			Overriden = NULL;
+		}
+
+		if (ClassAttributes[I].Values.GetCount() == 0)
+			continue;
+
+		if (ClassAttributes[I].Name == AttributeMemberName ||
+			ClassAttributes[I].Name == AttributeMemberGroup ||
+			ClassAttributes[I].Name == "*")
+		{
+			ZEMCAttribute NewAttribute;
+			NewAttribute.Owner = Declaration;
+			NewAttribute.Name = ClassAttributes[I].Values[0];
+			NewAttribute.Values.MassAdd(ClassAttributes[I].Values.GetCArray() + 1, ClassAttributes[I].Values.GetCount() - 1);
+			Declaration->AttributeStack.Add(NewAttribute);
+		}
+	}
+
+	if (ClangDeclaration != NULL)
+		ParseAttributes(Declaration, ClangDeclaration);
+
+
+	Declaration->NormalizeAttributeStack();
 }

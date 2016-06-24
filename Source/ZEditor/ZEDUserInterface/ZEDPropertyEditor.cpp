@@ -112,7 +112,7 @@ void ZEDPropertyEditor::Populate()
 		if (Properties[I].Type.ContainerType != ZE_CT_NONE)
 			continue;
 
-		if (Properties[I].CheckAttribute("ZEDPropertyEditor.Exclude"))
+		if (!Properties[I].CheckAttributeHasValue("ZEDEditor.PropertyEditor.Display", "true"))
 			continue;
 
 		switch (Properties[I].Type.Type)

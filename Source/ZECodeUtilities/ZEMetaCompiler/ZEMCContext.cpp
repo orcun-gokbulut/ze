@@ -100,7 +100,7 @@ ZEMCEnumeratorItem::~ZEMCEnumeratorItem()
 
 ZEMCAttribute::ZEMCAttribute()
 {
-
+	Owner = NULL;
 }
 
 ZEMCAttribute::~ZEMCAttribute()
@@ -117,9 +117,33 @@ ZEMCEnumerator::~ZEMCEnumerator()
 {
 }
 
-bool ZEMCDeclaration::CheckAttribute(const char* Name)
+void ZEMCDeclaration::NormalizeAttributeStack()
 {
-	return GetAttribute(Name) != NULL;
+	Attributes.Clear();
+	for (ZESize I = 0; I < AttributeStack.GetCount(); I++)
+	{
+		if (AttributeStack[I].Name.IsEmpty() ||
+			AttributeStack[I].Name[0] == "*" ||
+			AttributeStack[I].Name[0] == "@" ||
+			AttributeStack[I].Name[0] == "~")
+		{
+			continue;
+		}
+
+		bool Found = false;
+		for (ZESize N = 0; N < Attributes.GetCount(); N++)
+		{
+			if (Attributes[N].Name == AttributeStack[I].Name)
+			{
+				Attributes[N] = AttributeStack[I];
+				Found = true;
+				break;
+			}
+		}
+
+		if (!Found)
+			Attributes.Add(AttributeStack[I]);
+	}
 }
 
 ZEMCAttribute* ZEMCDeclaration::GetAttribute(const char* Name)
@@ -128,6 +152,66 @@ ZEMCAttribute* ZEMCDeclaration::GetAttribute(const char* Name)
 	{
 		if (Attributes[I].Name == Name)
 			return &Attributes[I];
+	}
+
+	return false;
+}
+
+const char* ZEMCDeclaration::GetAttributeValue(const char* Name, ZESize Index, const char* DefaultValue)
+{
+	ZEMCAttribute* Attribute = GetAttribute(Name);
+
+	if (Attribute == NULL)
+		return NULL;
+
+	if (Index >= Attribute->Values.GetCount())
+		return false;
+
+	return Attribute->Values[Index].ToCString();
+}
+
+
+bool ZEMCDeclaration::CheckAttribute(const char* Name)
+{
+	return GetAttribute(Name) != NULL;
+}
+
+bool ZEMCDeclaration::CheckAttributeValue(const char* Name, const char* TestValue, ZESize Index, const char* DefaultValue)
+{
+	if (TestValue == NULL)
+		return false;
+
+	ZEMCAttribute* Attribute = GetAttribute(Name);
+	if (Attribute == NULL)
+	{
+		if (DefaultValue == NULL)
+			return false;
+
+		return (strcmp(TestValue, DefaultValue) == 0);
+	}
+
+	if (Index >= Attribute->Values.GetCount())
+	{
+		if (DefaultValue == NULL)
+			return false;
+
+		return (strcmp(TestValue, DefaultValue) == 0);
+	}
+
+	return (strcmp(Attribute->Values[Index], TestValue) == 0);
+}
+
+bool ZEMCDeclaration::CheckAttributeHasValue(const char* Name, const char* Value)
+{
+	ZEMCAttribute* Attribute = GetAttribute(Name);
+
+	if (Attribute == NULL)
+		return NULL;
+
+	for (ZESize I = 0; Attribute->Values.GetCount(); I++)
+	{
+		if (Attribute->Values[I] == Value)
+			return true;
 	}
 
 	return false;
