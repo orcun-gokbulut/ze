@@ -120,7 +120,10 @@ void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEMode
 	Skinned = !LODResource->VertexBufferSkin.IsNull();
 
 	if (Skinned)
+	{
 		static_cast<ZERNFixedMaterial*>(const_cast<ZERNMaterial*>(Material.GetPointer()))->SetSkinningEnabled(Skinned);
+		Material->Update();
+	}
 }
 
 void ZEModelMeshLOD::Deinitialize()
