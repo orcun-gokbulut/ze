@@ -173,6 +173,7 @@ class ZERNStageLighting : public ZERNStage
 		ZESmartArray<ProjectiveLightStruct>		ProjectiveLights;
 
 		const ZEGRTexture*						DirectionalLightShadowMaps[2];
+		const ZEGRTexture*						ProjectiveLightTexture;
 
 		void									CreateRandomVectors();
 		void									CreateLightGeometries();
