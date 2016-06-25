@@ -81,6 +81,7 @@ void ZERNStageForward::DeinitializeSelf()
 
 	ColorTexture = NULL;
 	DepthTexture = NULL;
+	TransparentDepthTexture = NULL;
 
 	ZERNStage::DeinitializeSelf();
 }
@@ -153,7 +154,8 @@ bool ZERNStageForward::UpdateInputOutputs()
 	}
 
 	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
-	if (DepthTexture == NULL)
+	TransparentDepthTexture = GetPrevOutput(ZERN_SO_TRANSPARENT_DEPTH);
+	if (DepthTexture == NULL || TransparentDepthTexture == NULL)
 	{
 		if (DepthStencilBuffer == NULL || 
 			DepthStencilBuffer->GetWidth() != ColorTexture->GetWidth() || 
@@ -258,7 +260,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 
 	Context->SetComputeRenderState(TiledForwardComputeRenderState);
 	Context->SetRWStructuredBuffers(0, 1, TileLightStructuredBuffer.GetPointerToPointer());
-	Context->SetTextures(ZEGR_ST_COMPUTE, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	Context->SetTextures(ZEGR_ST_COMPUTE, 4, 1, reinterpret_cast<const ZEGRTexture**>(&TransparentDepthTexture));
 
 	ZEUInt TileCountX = (ColorTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
 	ZEUInt TileCountY = (ColorTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
@@ -267,7 +269,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 
 	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 15, 1, TileLightStructuredBuffer.GetPointerToPointer());
 
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&TransparentDepthTexture));
 	Context->SetRenderTargets(1, &RenderTarget, DepthBuffer);
 	Context->SetViewports(1, &Viewport);
 
@@ -285,6 +287,7 @@ ZERNStageForward::ZERNStageForward()
 
 	ColorTexture = NULL;
 	DepthTexture = NULL;
+	TransparentDepthTexture = NULL;
 }
 
 ZEGRRenderState ZERNStageForward::GetRenderState()

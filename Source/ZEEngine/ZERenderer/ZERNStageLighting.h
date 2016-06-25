@@ -77,9 +77,10 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRShader>					DeferredDirectionalLightPixelShaderPerSample;
 		ZEHolder<ZEGRShader>					DeferredProjectiveLightPixelShaderPerSample;
 		ZEHolder<ZEGRShader>					DeferredPointLightPixelShaderPerSample;
-		ZEHolder<ZEGRShader>					TiledDeferredComputeShader;
-		ZEHolder<ZEGRShader>					AccumulateEmissivePixelShader;
 		ZEHolder<ZEGRShader>					EdgeDetectionPixelShader;
+		ZEHolder<ZEGRShader>					BlendPixelShader;
+		ZEHolder<ZEGRShader>					BlendPixelShaderPerSample;
+		ZEHolder<ZEGRShader>					TiledDeferredComputeShader;
 
 		ZEHolder<ZEGRRenderStateData>			DeferredDirectionalLightRenderState;
 		ZEHolder<ZEGRRenderStateData>			DeferredPointLightRenderState;
@@ -87,9 +88,10 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRRenderStateData>			DeferredDirectionalLightRenderStatePerSample;
 		ZEHolder<ZEGRRenderStateData>			DeferredPointLightRenderStatePerSample;
 		ZEHolder<ZEGRRenderStateData>			DeferredProjectiveLightRenderStatePerSample;
-		ZEHolder<ZEGRComputeRenderStateData>	TiledDeferredComputeRenderState;
-		ZEHolder<ZEGRRenderStateData>			AccumulateEmissiveRenderState;
 		ZEHolder<ZEGRRenderStateData>			EdgeDetectionRenderState;
+		ZEHolder<ZEGRRenderStateData>			BlendRenderState;
+		ZEHolder<ZEGRRenderStateData>			BlendRenderStatePerSample;
+		ZEHolder<ZEGRComputeRenderStateData>	TiledDeferredComputeRenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 		ZEHolder<ZEGRStructuredBuffer>			PointLightStructuredBuffer;
@@ -97,6 +99,7 @@ class ZERNStageLighting : public ZERNStage
 		ZEHolder<ZEGRVertexBuffer>				DeferredLightVertexBuffer;
 
 		ZEHolder<ZEGRTexture2D>					RandomVectorsTexture;
+		ZEHolder<ZEGRTexture2D>					TiledDeferredOutputTexture;
 
 		const ZEGRTexture2D*					AccumulationTexture;
 		const ZEGRTexture2D*					DepthTexture;
@@ -122,6 +125,9 @@ class ZERNStageLighting : public ZERNStage
 		{
 			ZEVector3							PositionView;
 			float								Range;
+
+			ZEVector3							CullPositionView;
+			float								CullRange;
 
 			ZEVector3							Color;
 			ZEInt								Type;
@@ -150,7 +156,7 @@ class ZERNStageLighting : public ZERNStage
 		};
 
 		struct DirectionalLightStruct
-		{	
+		{
 			ZEVector3							DirectionView;
 			ZEBool32							CastShadow;
 
@@ -167,18 +173,22 @@ class ZERNStageLighting : public ZERNStage
 			ZEUInt								PointLightCount;
 			ZEUInt								ProjectiveLightCount;
 			ZEUInt								TileCountX;
+
+			ZEBool32							AddTiledDeferredOutput;
+			ZEVector3							Reserved;
 		} Constants;
 
 		ZESmartArray<PointLightStruct>			PointLights;
 		ZESmartArray<ProjectiveLightStruct>		ProjectiveLights;
 
 		const ZEGRTexture*						DirectionalLightShadowMaps[2];
+		const ZEGRTexture*						ProjectiveLightTexture;
 
 		void									CreateRandomVectors();
 		void									CreateLightGeometries();
 
-		bool									UpdateRenderState();
 		bool									UpdateShaders();
+		bool									UpdateRenderState();
 		bool									UpdateInputOutputs();
 		bool									UpdateLightBuffers();
 		bool									Update();
@@ -187,6 +197,7 @@ class ZERNStageLighting : public ZERNStage
 		virtual void							DeinitializeSelf();
 
 		void									DrawLights(ZEGRContext* Context, bool PerSample);
+		void									BlendTiledDeferred(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, bool PerSample);
 
 	public:
 		virtual ZEInt							GetId() const;
