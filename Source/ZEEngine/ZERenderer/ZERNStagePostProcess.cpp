@@ -64,7 +64,7 @@ bool ZERNStagePostProcess::UpdateInputOutputs()
 	if (AccumulationTexture == NULL)
 		return false;
 
-	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	DepthTexture = GetPrevOutput(ZERN_SO_TRANSPARENT_DEPTH);
 	if (DepthTexture == NULL)
 		return false;
 

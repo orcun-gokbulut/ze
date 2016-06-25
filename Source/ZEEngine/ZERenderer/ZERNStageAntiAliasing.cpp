@@ -61,7 +61,7 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 	if (InputTexture == NULL)
 		return false;
 
-	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	DepthTexture = GetPrevOutput(ZERN_SO_TRANSPARENT_DEPTH);
 	if (DepthTexture == NULL)
 		return false;
 
@@ -339,7 +339,7 @@ const ZEGRRenderTarget* ZERNStageAntiAliasing::GetProvidedInput(ZERNStageBuffer 
 
 const ZEGRTexture2D* ZERNStageAntiAliasing::GetOutput(ZERNStageBuffer Output) const
 {
-	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_HDR))
+	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_HDR) && OutputTexture != NULL)
 		return OutputTexture;
 
 	return ZERNStage::GetOutput(Output);

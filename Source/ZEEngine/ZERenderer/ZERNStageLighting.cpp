@@ -278,8 +278,7 @@ bool ZERNStageLighting::UpdateRenderState()
 	DeferredPointLightRenderStatePerSample = GraphicsRenderState.Compile();
 	zeCheckError(DeferredPointLightRenderStatePerSample == NULL, false, "Cannot set render state.");
 
-	GraphicsRenderState = ZEGRRenderState();
-
+	GraphicsRenderState.SetRasterizerState(ZEGRRasterizerState());
 	GraphicsRenderState.SetBlendState(BlendStateAdditive);
 	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessTestStencil);
 	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
