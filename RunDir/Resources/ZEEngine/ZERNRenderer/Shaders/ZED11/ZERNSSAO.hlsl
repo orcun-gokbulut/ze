@@ -139,8 +139,12 @@ float2 ZERNSSAO_ApplyCrossBilateralBlur(float2 TexCoord, float2 TexelOffset)
 float2 ZERNSSAO_SSAO_PixelShader_Main(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
 {
 	#ifdef DEINTERLEAVED
+		float DepthView = ZERNSSAO_DeinterleavedDepth[int3(PositionViewport.xy, ZERNSSAO_DepthArrayIndex)];
+		if (DepthView > 100.0f)
+			return float2(1.0f, PositionView.z);
+	
+		float3 PositionView = ZERNTransformations_TexelToView2(TexCoord, DepthView);
 		float2 PositionFullResViewport = floor(PositionViewport.xy) * 4.0f + ZERNSSAO_Offset;
-		float3 PositionView = ZERNTransformations_TexelToView2(TexCoord, ZERNSSAO_DeinterleavedDepth[int3(PositionViewport.xy, ZERNSSAO_DepthArrayIndex)]);
 		float3 NormalView = ZERNGBuffer_GetViewNormal(PositionFullResViewport.xy);
 		float3 RandomVector = ZERNSSAO_RandomVector;
 	#else

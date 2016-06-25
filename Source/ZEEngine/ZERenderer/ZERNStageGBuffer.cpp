@@ -160,6 +160,7 @@ const ZEGRTexture2D* ZERNStageGBuffer::GetOutput(ZERNStageBuffer Output) const
 				return GetNormalSpecularMap();	
 
 			case ZERN_SO_DEPTH:
+			case ZERN_SO_TRANSPARENT_DEPTH:
 				return GetDepthStencilMap();
 		}
 	}
