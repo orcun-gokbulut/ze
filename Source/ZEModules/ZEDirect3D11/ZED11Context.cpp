@@ -764,7 +764,7 @@ void ZED11Context::SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*c
 	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
 }
 
-void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource)
+void ZED11Context::CopyResource(const ZEGRResource* DestResource, const ZEGRResource* SrcResource)
 {
 	zeDebugCheck(DestResource == NULL || SrcResource == NULL, "Source or destination resource cannot be NULL");
 
@@ -775,9 +775,9 @@ void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcRes
 	{
 		case ZEGR_RT_TEXTURE:
 		{
-			ZEGRTexture* Texture = static_cast<ZEGRTexture*>(DestResource);
+			const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(DestResource);
 			if (Texture->GetTextureType() == ZEGR_TT_2D)
-				DestNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+				DestNativeResource = static_cast<const ZED11Texture2D*>(Texture)->GetResource();
 		}
 		break;
 
@@ -789,9 +789,9 @@ void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcRes
 	{
 		case ZEGR_RT_TEXTURE:
 		{
-			ZEGRTexture* Texture = static_cast<ZEGRTexture*>(SrcResource);
+			const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(SrcResource);
 			if (Texture->GetTextureType() == ZEGR_TT_2D)
-				SrcNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+				SrcNativeResource = static_cast<const ZED11Texture2D*>(Texture)->GetResource();
 		}
 		break;
 
@@ -802,7 +802,7 @@ void ZED11Context::CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcRes
 	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
 }
 
-void ZED11Context::ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSubresource, ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format)
+void ZED11Context::ResolveSubresource(const ZEGRResource* DestResource, ZEUInt DestSubresource, const ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format)
 {
 	zeDebugCheck(DestResource == NULL || SrcResource == NULL, "Source or destination resource cannot be NULL");
 
@@ -813,9 +813,9 @@ void ZED11Context::ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSub
 	{
 		case ZEGR_RT_TEXTURE:
 			{
-				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(DestResource);
+				const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(DestResource);
 				if (Texture->GetTextureType() == ZEGR_TT_2D)
-					DestNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+					DestNativeResource = static_cast<const ZED11Texture2D*>(Texture)->GetResource();
 			}
 			break;
 
@@ -827,9 +827,9 @@ void ZED11Context::ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSub
 	{
 		case ZEGR_RT_TEXTURE:
 			{
-				ZEGRTexture* Texture = static_cast<ZEGRTexture*>(SrcResource);
+				const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(SrcResource);
 				if (Texture->GetTextureType() == ZEGR_TT_2D)
-					SrcNativeResource = static_cast<ZED11Texture2D*>(Texture)->GetResource();
+					SrcNativeResource = static_cast<const ZED11Texture2D*>(Texture)->GetResource();
 			}
 			break;
 

@@ -108,6 +108,7 @@ void ZERNRenderer::CreatePredefinedSamplers()
 
 	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
 	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
+	Context->SetSamplers(ZEGR_ST_COMPUTE, 10, 6, Samplers);
 }
 
 void ZERNRenderer::UpdateConstantBuffers()

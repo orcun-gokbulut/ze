@@ -51,6 +51,8 @@ bool ZERNStageRenderDepth::InitializeSelf()
 
 void ZERNStageRenderDepth::DeinitializeSelf()
 {
+	TransparentDepthBuffer.Release();
+
 	DepthTexture = NULL;
 
 	ZERNStage::DeinitializeSelf();
@@ -62,6 +64,13 @@ bool ZERNStageRenderDepth::UpdateInputOutputs()
 	if (DepthTexture == NULL)
 		return false;
 
+	ZEUInt Width = DepthTexture->GetWidth();
+	ZEUInt Height = DepthTexture->GetHeight();
+
+	if (TransparentDepthBuffer == NULL || 
+		TransparentDepthBuffer->GetWidth() != Width || TransparentDepthBuffer->GetHeight() != Height)
+		TransparentDepthBuffer = ZEGRTexture2D::CreateInstance(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
+	
 	return true;
 }
 
@@ -78,8 +87,14 @@ const ZEString& ZERNStageRenderDepth::GetName() const
 
 const ZEGRTexture2D* ZERNStageRenderDepth::GetOutput(ZERNStageBuffer Output) const
 {
-	if (GetEnabled() && (Output == ZERN_SO_DEPTH))
-		return DepthTexture;
+	if (GetEnabled())
+	{
+		if (Output == ZERN_SO_DEPTH)
+			return DepthTexture;
+
+		else if (Output == ZERN_SO_TRANSPARENT_DEPTH)
+			return TransparentDepthBuffer;
+	}
 
 	return ZERNStage::GetOutput(Output);
 }
@@ -95,9 +110,11 @@ bool ZERNStageRenderDepth::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer());
-	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
+	Context->CopyResource(TransparentDepthBuffer, const_cast<ZEGRTexture2D*>(DepthTexture));
 
+	Context->SetRenderTargets(0, NULL, TransparentDepthBuffer->GetDepthStencilBuffer());
+	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)DepthTexture->GetWidth(), (float)DepthTexture->GetHeight()));
+	
 	return true;
 }
 
@@ -116,7 +133,7 @@ ZEGRRenderState ZERNStageRenderDepth::GetRenderState()
 	static ZEGRRenderState RenderState;
 	static bool Initialized = false;
 
-	if(!Initialized)
+	if (!Initialized)
 	{
 		Initialized = true;
 
