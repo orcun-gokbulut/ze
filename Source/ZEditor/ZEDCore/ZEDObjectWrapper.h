@@ -93,6 +93,7 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 
 		virtual void								SetObject(ZEObject* Object);
 		ZEObject*									GetObject() const;
+		ZEClass*									GetObjectClass();
 		
 		virtual void								SetParent(ZEDObjectWrapper* Wrapper);
 		ZEDObjectWrapper*							GetParent() const;

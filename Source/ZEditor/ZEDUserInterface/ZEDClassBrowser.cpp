@@ -128,8 +128,9 @@ bool ZEDClassBrowser::eventFilter(QObject* Object, QEvent* Event)
 		if ((MouseEvent->pos() - DragStartPos).manhattanLength() < QApplication::startDragDistance())
 			return false;
 
+		QByteArray ClassPointerData((const char*)&DragClass, sizeof(ZEClass*));
 		QMimeData* MimeData = new QMimeData;
-		MimeData->setData("application/vnd.zinek.zeclass", QByteArray((const char*)&DragClass, sizeof(DragClass)));
+		MimeData->setData("application/vnd.zinek.zeclass", ClassPointerData);
 
 		QDrag* Drag = new QDrag(this);
 		Drag->setMimeData(MimeData);
