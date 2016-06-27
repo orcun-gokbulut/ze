@@ -130,7 +130,7 @@ class ZERNStageLighting : public ZERNStage
 			float								CullRange;
 
 			ZEVector3							Color;
-			ZEInt								Type;
+			ZEUInt								ShadowMapIndex;
 
 			ZEVector3  							Attenuation;
 			ZEBool32							CastShadow;
@@ -181,7 +181,7 @@ class ZERNStageLighting : public ZERNStage
 		ZESmartArray<PointLightStruct>			PointLights;
 		ZESmartArray<ProjectiveLightStruct>		ProjectiveLights;
 
-		const ZEGRTexture*						DirectionalLightShadowMaps[2];
+		const ZEGRTexture*						DirectionalLightShadowMap;
 		const ZEGRTexture*						ProjectiveLightTexture;
 
 		void									CreateRandomVectors();

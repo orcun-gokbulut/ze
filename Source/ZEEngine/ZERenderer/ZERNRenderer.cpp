@@ -196,7 +196,7 @@ void ZERNRenderer::SortStageCommands()
 
 void ZERNRenderer::RenderStages()
 {
-	if(Context == NULL)
+	if (Context == NULL)
 		Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
 
 	ZERNRenderParameters Parameters;
@@ -219,7 +219,7 @@ void ZERNRenderer::RenderStages()
 	ZEGRConstantBuffer* ConstantBuffers[] = {RendererConstantBuffer, SceneConstantBuffer, ViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, ConstantBuffers);
 
-	if(OutputRenderTarget != NULL)
+	if (OutputRenderTarget != NULL)
 	{
 		Context->ClearRenderTarget(OutputRenderTarget, ZEVector4::Zero);
 

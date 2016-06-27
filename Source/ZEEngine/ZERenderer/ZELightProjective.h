@@ -53,6 +53,7 @@ class ZELightProjective : public ZELight
 		mutable ZEViewFrustum			ViewVolume;
 		ZEHolder<const ZEGRTexture2D>	ProjectionTexture;
 		ZEHolder<ZEGRTexture2D>			ShadowMap;
+		ZEUInt							ShadowMapIndex;
 
 		ZETexture2DResource*			ProjectionTextureResource;
 		ZEString						ProjectionTextureFile;
@@ -74,6 +75,9 @@ class ZELightProjective : public ZELight
 
 		void							SetAspectRatio(float AspectRatio);
 		float							GetAspectRatio() const;
+
+		void							SetShadowMapIndex(ZEUInt ShadowMapIndex);
+		ZEUInt							GetShadowMapIndex() const;
 
 		void							SetProjectionTextureFile(const ZEString& Filename);
 		const ZEString&					GetProjectionTextureFile() const;

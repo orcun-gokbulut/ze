@@ -67,7 +67,7 @@ struct ZERNShading_ProjectiveLight
 	float										CullRange;
 	
 	float3										Color;
-	int											Type;
+	uint										ShadowMapIndex;
 	
 	float3  									Attenuation;
 	bool										CastShadow;
@@ -132,12 +132,13 @@ cbuffer	ZERNShading_Constants																	: register(b8)
 };
 
 Texture2D<float4>								ZERNShading_ProjectionTexture					: register(t10);
-Texture2DArray<float>							ZERNShading_ShadowMaps							: register(t11);
-Texture2D<float2>								ZERNShading_RandomVectors						: register(t12);
+Texture2DArray<float>							ZERNShading_CascadeShadowMaps					: register(t11);
+Texture2DArray<float>							ZERNShading_ProjectiveShadowMaps				: register(t12);
+Texture2D<float2>								ZERNShading_RandomVectors						: register(t13);
 
-StructuredBuffer<ZERNShading_PointLight>		ZERNShading_PointLights							: register(t13);
-StructuredBuffer<ZERNShading_ProjectiveLight>	ZERNShading_ProjectiveLights					: register(t14);
-StructuredBuffer<uint>							ZERNShading_TileLightIndices					: register(t15);
+StructuredBuffer<ZERNShading_PointLight>		ZERNShading_PointLights							: register(t14);
+StructuredBuffer<ZERNShading_ProjectiveLight>	ZERNShading_ProjectiveLights					: register(t15);
+StructuredBuffer<uint>							ZERNShading_TileLightIndices					: register(t16);
 
 static const float2 ZERNShading_PoissonDiskSamples[] = 
 {
@@ -159,18 +160,18 @@ static const float2 ZERNShading_PoissonDiskSamples[] =
 	float2(0.8985078f, 0.4366908f)
 };
 
-float ZERNShading_CalculateVisibility(uint SampleCount, float SampleLength, uint ShadowMapIndex, float2 ShadowMapDimensions, float3 TexCoordDepth)
+float ZERNShading_CalculateVisibility(uint SampleCount, float SampleLength, Texture2DArray<float> ShadowMap, uint ShadowMapIndex, float2 ShadowMapDimensions, float3 TexCoordDepth)
 {		
 	float Visibility = 0.0f;
 	
-	float2 RandomVector = ZERNShading_RandomVectors.SampleLevel(ZERNSampler_PointWrap, 128.0f * TexCoordDepth.xy, 0.0f) * 2.0f - 1.0f;
+	float2 RandomVector = ZERNShading_RandomVectors.SampleLevel(ZERNSampler_PointWrap, 4.0f * TexCoordDepth.xy, 0.0f) * 2.0f - 1.0f;
 	RandomVector = normalize(RandomVector);
 	
 	for (uint I = 0; I < SampleCount; I++)
 	{
 		float2 RandomOrientedSample = reflect(ZERNShading_PoissonDiskSamples[I], RandomVector);
 		float2 Offset = RandomOrientedSample * SampleLength / ShadowMapDimensions;
-		Visibility += ZERNShading_ShadowMaps.SampleCmpLevelZero(ZERNSampler_ComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, ShadowMapIndex), TexCoordDepth.z);
+		Visibility += ShadowMap.SampleCmpLevelZero(ZERNSampler_ComparisonLinearPointClamp, float3(TexCoordDepth.xy + Offset, ShadowMapIndex), TexCoordDepth.z);
 	}
 	
 	Visibility /= SampleCount;
@@ -228,7 +229,7 @@ float3 ZERNShading_DirectionalShadowing(ZERNShading_DirectionalLight Directional
 		{
 			float2 ShadowMapDimensions;
 			float Index = 0.0f;
-			ZERNShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
+			ZERNShading_CascadeShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 		
 			for (uint CascadeIndex = 0; CascadeIndex < DirectionalLight.CascadeCount; CascadeIndex++)
 			{
@@ -242,7 +243,7 @@ float3 ZERNShading_DirectionalShadowing(ZERNShading_DirectionalLight Directional
 				if (ZERNShading_InsideLightVolume(Cascade.ProjectionTransform, PositionLightView, TexCoordDepth))
 				{
 					TexCoordDepth.z += Cascade.DepthBias;
-					Visibility = ZERNShading_CalculateVisibility(Cascade.SampleCount, Cascade.SampleLength, CascadeIndex, ShadowMapDimensions, TexCoordDepth);
+					Visibility = ZERNShading_CalculateVisibility(Cascade.SampleCount, Cascade.SampleLength, ZERNShading_CascadeShadowMaps, CascadeIndex, ShadowMapDimensions, TexCoordDepth);
 					
 					break;
 				}
@@ -278,10 +279,10 @@ float3 ZERNShading_ProjectiveShadowing(ZERNShading_ProjectiveLight ProjectiveLig
 		{
 			float2 ShadowMapDimensions;
 			float Index = 0.0f;
-			ZERNShading_ShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
+			ZERNShading_ProjectiveShadowMaps.GetDimensions(ShadowMapDimensions.x, ShadowMapDimensions.y, Index);
 			
 			TexCoordDepth.z += ProjectiveLight.ShadowDepthBias;
-			Visibility = ZERNShading_CalculateVisibility(ProjectiveLight.ShadowSampleCount, ProjectiveLight.ShadowSampleLength, 0, ShadowMapDimensions, TexCoordDepth);
+			Visibility = ZERNShading_CalculateVisibility(ProjectiveLight.ShadowSampleCount, ProjectiveLight.ShadowSampleLength, ZERNShading_ProjectiveShadowMaps, ProjectiveLight.ShadowMapIndex, ShadowMapDimensions, TexCoordDepth);
 		}
 	}
 	
