@@ -89,7 +89,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 			return false;
 
 		QMimeData* MimeData = new QMimeData;
-		MimeData->setData("zinek/wrapper", QByteArray((const char*)&DragWrapper, sizeof(DragWrapper)));
+		MimeData->setData("application/vnd.zinek.zeobjectwrapper", QByteArray((const char*)&DragWrapper, sizeof(ZEDObjectWrapper)));
 
 		QDrag* Drag = new QDrag(this);
 		Drag->setMimeData(MimeData);
@@ -102,9 +102,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 	{
 		QDragEnterEvent* DragEvent = static_cast<QDragEnterEvent*>(Event);
 		
-		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper") || 
-			DragEvent->mimeData()->hasFormat("application/vnd.zinek.class") ||
-			DragEvent->mimeData()->hasFormat("application/vnd.zinek.asset"))
+		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeobjectwrapper") || 
+			DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeclass") ||
+			DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeasset"))
 		{
 			DragEvent->acceptProposedAction();
 			return true;
@@ -124,18 +124,25 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 		if (TargetWrapper == NULL)
 			return false;
 
-		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper"))
+		if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeobjectwrapper"))
 		{
-			ZEDObjectWrapper* Object = (ZEDObjectWrapper*)DragEvent->mimeData()->data("application/vnd.zinek.wrapper").data();
-			if (!TargetWrapper->CheckChildrenClass(Object->GetClass()))
+			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DragEvent->mimeData()->data("application/vnd.zinek.zeobjectwrapper").data();
+			
+			if (ObjectWrapper == TargetWrapper)
+				return false;
+
+			if (ObjectWrapper->GetParent() == TargetWrapper)
+				return false;
+
+			if (!TargetWrapper->CheckChildrenClass(ObjectWrapper->GetObjectClass()))
 				return false;
 
 			DragEvent->acceptProposedAction();
 			return true;
 		}
-		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.class"))
+		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeclass"))
 		{
-			ZEClass* Class = (ZEClass*)DragEvent->mimeData()->data("application/vnd.zinek.class").data();
+			ZEClass* Class = *(ZEClass**)DragEvent->mimeData()->data("application/vnd.zinek.zeclass").data();
 			
 			if (Class->IsAbstract())
 				return false;
@@ -146,7 +153,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 			DragEvent->acceptProposedAction();
 			return true;
 		}
-		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.assert"))
+		else if (DragEvent->mimeData()->hasFormat("application/vnd.zinek.zeassert"))
 		{
 			// Later
 			return false;
@@ -164,9 +171,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 		if (TargetWrapper == NULL)
 			return false;
 
-		if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.wrapper"))
+		if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.zeobjectwrapper"))
 		{
-			ZEDObjectWrapper* ObjectWrapper = (ZEDObjectWrapper*)DropEvent->mimeData()->data("application/vnd.zinek.wrapper").data();
+			ZEDObjectWrapper* ObjectWrapper = *(ZEDObjectWrapper**)DropEvent->mimeData()->data("application/vnd.zinek.zeobjectwrapper").data();
 			
 			if (ObjectWrapper == TargetWrapper)
 				return false;
@@ -174,7 +181,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 			if (ObjectWrapper->GetParent() == TargetWrapper)
 				return false;
 
-			if (!TargetWrapper->CheckChildrenClass(ObjectWrapper->GetClass()))
+			if (!TargetWrapper->CheckChildrenClass(ObjectWrapper->GetObjectClass()))
 				return false;
 			
 			DropEvent->acceptProposedAction();
@@ -183,9 +190,9 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 
 			return true;
 		}
-		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.class"))
+		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.zeclass"))
 		{
-			ZEClass* Class = (ZEClass*)DropEvent->mimeData()->data("application/vnd.zinek.class").data();
+			ZEClass* Class = *(ZEClass**)DropEvent->mimeData()->data("application/vnd.zinek.zeclass").data();
 
 			if (Class->IsAbstract())
 				return false;
@@ -199,7 +206,7 @@ bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 
 			return true;
 		}
-		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.asset"))
+		else if (DropEvent->mimeData()->hasFormat("application/vnd.zinek.zeasset"))
 		{
 			// Later
 			return false;

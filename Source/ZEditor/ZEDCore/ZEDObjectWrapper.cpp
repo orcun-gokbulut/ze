@@ -167,6 +167,14 @@ ZEObject* ZEDObjectWrapper::GetObject() const
 	return Object;
 }
 
+ZEClass* ZEDObjectWrapper::GetObjectClass()
+{
+	if (Object == NULL)
+		return NULL;
+
+	return Object->GetClass();
+}
+
 void ZEDObjectWrapper::SetParent(ZEDObjectWrapper* Wrapper)
 {
 	Parent = Wrapper;
