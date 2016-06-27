@@ -235,7 +235,7 @@ bool ZERNStageForward::Setup(ZEGRContext* Context)
 	if (OutputTexture != NULL)
 		Context->ClearRenderTarget(RenderTarget, ZEVector4::Zero);
 
-	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 15, 1, TileLightStructuredBuffer.GetPointerToPointer());
+	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 16, 1, TileLightStructuredBuffer.GetPointerToPointer());
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
 	Context->SetViewports(1, &Viewport);
 

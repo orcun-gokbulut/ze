@@ -141,28 +141,45 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 	
 	GroupMemoryBarrierWithGroupSync();
 	
-	uint TilePointLightCount = TileLightCount;
+	#ifdef ZERN_TILED_FORWARD
+		uint TilePointLightCount = TileLightCount;
 	
-	for (uint ProjectiveLightIndex = GroupIndex; ProjectiveLightIndex < ZERNShading_ProjectiveLightCount; ProjectiveLightIndex += TILE_SIZE)
-	{
-		bool InsideFrustum = true;
-		ZERNShading_ProjectiveLight ProjectiveLight = ZERNShading_ProjectiveLights[ProjectiveLightIndex];
-		
-		for (uint I = 0; I < 6; I++)
-			InsideFrustum = InsideFrustum && (dot(TileFrustumPlanes[I], float4(ProjectiveLight.CullPositionView, 1.0f)) >= -ProjectiveLight.CullRange);
-		
-		if (InsideFrustum)
+		for (uint ProjectiveLightIndex = GroupIndex; ProjectiveLightIndex < ZERNShading_ProjectiveLightCount; ProjectiveLightIndex += TILE_SIZE)
 		{
-			uint Index;
-			InterlockedAdd(TileLightCount, 1, Index);
-			TileLightIndices[Index] = ProjectiveLightIndex;
+			bool InsideFrustum = true;
+			ZERNShading_ProjectiveLight ProjectiveLight = ZERNShading_ProjectiveLights[ProjectiveLightIndex];
+			
+			for (uint I = 0; I < 6; I++)
+				InsideFrustum = InsideFrustum && (dot(TileFrustumPlanes[I], float4(ProjectiveLight.CullPositionView, 1.0f)) >= -ProjectiveLight.CullRange);
+			
+			if (InsideFrustum)
+			{
+				uint Index;
+				InterlockedAdd(TileLightCount, 1, Index);
+				TileLightIndices[Index] = ProjectiveLightIndex;
+			}
 		}
-	}
-	
-	GroupMemoryBarrierWithGroupSync();
-	
-	#ifdef ZERN_TILED_DEFERRED
-		if (all(PixelCoord < GBufferDimensions))
+		
+		GroupMemoryBarrierWithGroupSync();
+		
+		uint TileIndex = GroupId.y * ZERNShading_TileCountX + GroupId.x;
+		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
+		uint TileTotalLightCount = TileLightCount;
+			
+		for (uint M = GroupIndex; M < TilePointLightCount; M += TILE_SIZE)
+			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 1 + M] = TileLightIndices[M];
+			
+		for (uint N = (GroupIndex + TilePointLightCount); N < TileTotalLightCount; N += TILE_SIZE)
+			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 2 + N] = TileLightIndices[N];
+			
+		if (GroupIndex == 0)
+		{
+			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset] = TilePointLightCount;
+			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 1 + TilePointLightCount] = TileTotalLightCount;
+		}
+	#elif defined ZERN_TILED_DEFERRED
+		uint TilePointLightCount = TileLightCount;
+		if (all(PixelCoord < GBufferDimensions) && TilePointLightCount > 0)
 		{
 			Surfaces[0].PositionView = ZERNTransformations_ViewportToView2(PixelCoord + 0.5f, GBufferDimensions, Surfaces[0].PositionView.z);
 			Surfaces[0].Diffuse = ZERNGBuffer_GetDiffuseColor(PixelCoord);
@@ -175,10 +192,6 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 			
 			for (uint I = 0; I < TilePointLightCount; I++)
 				ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[TileLightIndices[I]], Surfaces[0]);
-			
-			uint TileTotalLightCount = TileLightCount;
-			for (uint J = TilePointLightCount; J < TileTotalLightCount; J++)
-				ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[TileLightIndices[J]], Surfaces[0]);
 			
 			#ifdef MSAA_ENABLED
 				uint2 MSAAPixelCoord = PixelCoord * uint2(2, 2);
@@ -239,30 +252,10 @@ void ZERNTiledDeferredShadingCompute_ComputeShader_Main(uint3 GroupId						: SV_
 				for (uint I = 0; I < TilePointLightCount; I++)
 					ResultColor += ZERNShading_PointShading(ZERNShading_PointLights[TileLightIndices[I]], Surface);
 				
-				uint TileTotalLightCount = TileLightCount;
-				for (uint J = TilePointLightCount; J < TileTotalLightCount; J++)
-					ResultColor += ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[TileLightIndices[J]], Surface);
-				
 				uint2 SamplePixelCoord = PixelXY * uint2(2, 2) + uint2(SampleIndex & 1, SampleIndex > 1);
 				ZERNTiledDeferredShadingCompute_OutputColorBuffer[SamplePixelCoord] = ResultColor;
 			}
 		#endif
-	#elif defined ZERN_TILED_FORWARD
-		uint TileIndex = GroupId.y * ZERNShading_TileCountX + GroupId.x;
-		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
-		uint TileTotalLightCount = TileLightCount;
-			
-		for (uint M = GroupIndex; M < TilePointLightCount; M += TILE_SIZE)
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 1 + M] = TileLightIndices[M];
-			
-		for (uint N = (GroupIndex + TilePointLightCount); N < TileTotalLightCount; N += TILE_SIZE)
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 2 + N] = TileLightIndices[N];
-			
-		if (GroupIndex == 0)
-		{
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset] = TilePointLightCount;
-			ZERNTiledDeferredShadingCompute_OutputTileLightIndices[TileStartOffset + 1 + TilePointLightCount] = TileTotalLightCount;
-		}
 	#endif
 }
 
