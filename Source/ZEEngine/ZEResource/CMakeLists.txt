@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZESector.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - CMakeLists.txt
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,52 +30,18 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+cmake_minimum_required (VERSION 2.8)
 
-#include "ZEGame/ZEGeographicEntity.h"
-#include "ZEFoundation/ZEGUID.h"
+ze_add_source(ZERSResource.cpp				Sources)
+ze_add_source(ZERSResource.h				Sources Headers ZEMC)
+ze_add_source(ZERSManager.cpp				Sources)
+ze_add_source(ZERSManager.h					Sources Headers ZEMC)
 
-class ZESector : public ZEGeographicEntity
-{
-	ZE_OBJECT;
-	private:
-		ZEGUID						GUID;
-		ZEString					SectorFile;
-
-		ZEArray<ZEGUID>				AdjacentSectorIds;
-		ZEInt8						AdjacencyDepth;
-
-		virtual bool				SaveSector(ZEMLWriterNode* Serializer);
-		virtual bool				RestoreSector(ZEMLReaderNode* Unserializer);
-
-		bool						CheckParent(ZEEntity* Entity);
-
-		virtual bool				InitializeSelf();
-
-									ZESector();
-
-	public:
-		void						SetGUID(const ZEGUID& GUID);
-		const ZEGUID&				GetGUID() const;
-
-		void						SetSectorFile(const ZEString& FileName);
-		const ZEString&				GetSectorFile() const;
-
-		bool						CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
-		const ZEArray<ZEGUID>&		GetAdjacentSectorIds() const;
-		bool						AddAdjacentSector(ZESector* Sector);
-		bool						RemoveAdjacentSector(ZESector* Sector);
-		
-		void						SetAdjacencyDepth(ZEInt8 Value);
-		ZEInt8						GetAdjacencyDepth() const;
-
-		virtual bool				Save(ZEMLWriterNode* Serializer);
-		virtual bool				Restore(ZEMLReaderNode* Unserializer);
-
-		virtual void				Destroy();
-
-		static ZESector*			CreateInstance();
-};
+ze_add_library(TARGET ZEResource
+	ZEMC ${ZEMC}
+	SOURCES ${Sources}
+	HEADERS ${Headers}
+	LIBS ZEFoundation)

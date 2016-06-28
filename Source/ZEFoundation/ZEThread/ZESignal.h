@@ -54,7 +54,7 @@ class ZESignal
         #endif
 
 		bool InitialState;
-		mutable ZELock InitializeLock;
+		mutable ZELock SignalLock;
 		void Initialize() const;
 
 	public:
@@ -67,3 +67,4 @@ class ZESignal
 		ZESignal();
 		~ZESignal();
 };
+

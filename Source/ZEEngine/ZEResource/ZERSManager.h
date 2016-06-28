@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETask.cpp
+ Zinek Engine - ZERSManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,140 +33,47 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETask.h"
-#include "ZETaskThread.h"
-#include "ZETaskPool.h"
-#include "ZETaskManager.h"
+#pragma once
 
-void ZETask::Setup()
+#include "ZEMeta\ZEObject.h"
+#include "ZERSResource.h"
+#include "ZEDS\ZEList2.h"
+#include "ZECommon.h"
+
+typedef ZERSResource* ZERSInstanciator();
+
+class ZERSManager : public ZEObject
 {
-	Status = ZE_TS2_WAITING;
-}
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERSManager)
+	friend class ZERSResource;
+	private:
+		ZELock ManagerLock;
+		ZEList2<const ZERSResource>	Resources;
 
-void ZETask::Activate(ZETaskThread* Thread)
-{
-	TaskLock.Lock();
-	{
-		if (Status != ZE_TS2_WAITING)
-		{
-			TaskLock.Unlock();
-			return;
-		}
+		ZESize MemoryUsage[ZERS_MP_TOTAL];
+		ZESize CacheSize[ZERS_MP_TOTAL];
+		ZESize CacheUsage[ZERS_MP_TOTAL];
+		
+		ZEHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
+		void RegisterResourceInternal(const ZERSResource* Resource);
+		ZEHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, const ZERSLoadingOptions* LoadingOptions);
 
-		Thread->SetTask(this);
-		Status = ZE_TS2_RUNNING;
-	}
-	TaskLock.Unlock();
+		void RegisterResource(const ZERSResource* Resource);
+		void ReleaseResource(const ZERSResource* Resource);
+									
+		ZERSManager();
+		~ZERSManager();
 
-	ZETaskResult Result = ZE_TR_DONE;
-	if (!Function.IsNull())
-		Result = Function(Thread, Parameter);
+	public:
+		ZESize GetMemoryUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
+		ZESize GetCacheUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 
-	TaskLock.Lock();
-	{
-		if (Result == ZE_TR_DONE)
-		{
-			Status = ZE_TS2_DONE;
-			Signal.Signal();
-		}
-		else if (Result == ZE_TR_COOPERATING)
-		{
-			Status = ZE_TS2_WAITING;
-		}
-		else
-		{
-			Status = ZE_TS2_FAILED;
-		}
-	}
-	TaskLock.Unlock();
-}
+		void SetCacheSize(ZERSMemoryPool Pool, ZESize Size);
+		ZESize SetCacheSize(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
 
-ZETaskStatus ZETask::GetStatus() const
-{
-	return Status;
-}
+		ZEHolder<const ZERSResource> GetResource(const ZEString& FilePath);
+		ZEHolder<const ZERSResource> GetResource(const ZEGUID& GUID);
 
-
-void ZETask::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
-
-const ZEString ZETask::GetName() const
-{
-	return Name;
-}
-
-void ZETask::SetPriority(ZEInt Priority)
-{
-	this->Priority = Priority;
-}
-
-ZEInt ZETask::GetPriority() const
-{
-	return Priority;
-}
-
-void ZETask::SetFunction(const ZETaskFunction& Function)
-{
-	this->Function = Function;
-}
-
-const ZETaskFunction& ZETask::GetFunction() const
-{
-	return Function;
-}
-
-void ZETask::SetParameter(void* Parameters)
-{
-	this->Parameter = Parameters;
-}
-
-void* ZETask::GetParameter() const
-{
-	return Parameter;
-}
-
-void ZETask::SetPool(ZEInt PoolId)
-{
-	PoolId = PoolId;
-}
-
-ZEInt ZETask::GetPool() const
-{
-	return PoolId;
-}
-
-
-void ZETask::Run()
-{
-	if (Function.IsNull())
-		return;
-
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool == NULL)
-		return;
-
-	Pool->RunTask(this);
-}
-
-void ZETask::Wait()
-{
-	if (Status == ZE_TS2_NONE)
-		return;
-
-	Signal.Wait();
-}
-
-ZETask::ZETask() : Link(this)
-{
-	Status = ZE_TS2_NONE;
-	Priority = 0;
-	PoolId = ZE_TPI_DEFAULT;
-	Parameter = NULL;
-}
-
-ZETask::~ZETask()
-{
-
-}
+		static ZERSManager* GetInstance();
+};

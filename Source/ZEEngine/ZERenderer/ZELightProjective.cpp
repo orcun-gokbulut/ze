@@ -226,6 +226,9 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
 		return;
 
+	if (GetScene() == NULL)
+		return;
+
 	UpdateShadowMap();
 
 	ZERNView View = ShadowRenderer.GetView();
@@ -235,27 +238,23 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	View.U = GetWorldRight();
 	View.V = GetWorldUp();
 	View.N = GetWorldFront();
-
 	View.VerticalFOV = FOV;
 	View.HorizontalFOV = FOV;
 	View.AspectRatio = AspectRatio;
-
 	View.NearZ = 0.1f;
 	View.FarZ = GetRange();
-
 	View.ViewVolume = &GetViewVolume();
 	View.ViewProjectionTransform = GetProjectionTransform() * GetViewTransform();
 
-	ShadowRenderer.SetView(View);
+	ZERNPreRenderParameters PreRenderParameters;
+	PreRenderParameters.Renderer = &ShadowRenderer;
+	PreRenderParameters.View = &View;
 
 	ZEGRContext* Context = Parameters->Context;
 	ShadowRenderer.SetContext(Context);
-	
-	ShadowRenderer.StartScene(GetOwnerScene()->GetConstantBuffer());
-		ZERNPreRenderParameters PreRenderParameters;
-		PreRenderParameters.Renderer = &ShadowRenderer;
-		PreRenderParameters.View = &View;
-		GetOwnerScene()->PreRender(&PreRenderParameters);
+	ShadowRenderer.SetView(View);
+	ShadowRenderer.StartScene(GetScene()->GetConstantBuffer());
+		GetScene()->PreRender(&PreRenderParameters);
 	ShadowRenderer.EndScene();
 
 	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);

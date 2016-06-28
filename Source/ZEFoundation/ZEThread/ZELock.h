@@ -38,20 +38,55 @@
 #include "ZETypes.h"
 #include "ZECommon.h"
 
+#define ZE_LOCK_SECTION(Lock) for (ZELockSectionLoopVariable LoopVariable(Lock); LoopVariable.Control; LoopVariable.Control = false)
+#define ZE_CRITICAL_SECTION_BEGIN(Name)	static ZELock Name##CriticalSection; Name##CriticalSection.Lock();
+#define ZE_CRITICAL_SECTION_END(Name) Name##CriticalSection.Unlock();
+
 class ZELock
 {
 	ZE_COPY_NO_ACTION(ZELock)
 	private:
-		volatile ZEInt32	CurrentNumber;
-		volatile ZEInt32	NextNumber;
+		volatile ZEInt32		CurrentNumber;
+		volatile ZEInt32		NextNumber;
 
 	public:
-        bool				IsLocked();
-        void				Lock();
-        void				Wait();
-		void				Unlock();
+		bool					IsLocked() const;
 
+		// Async Methods
+		ZEUInt32				Queue();
+		bool					Check(ZEUInt32 Number) const;
+		void					Wait(ZEUInt32 Number) const;
+		void					Release(ZEUInt32 Number);
 
-							ZELock();
-							~ZELock();
+		// Sync Methods
+        void					Lock();
+        void					Wait() const;
+		void					Unlock();
+
+								ZELock();
+								~ZELock();
+};
+
+class ZELockHolder
+{
+	ZE_COPY_NO_ACTION(ZELockHolder)
+	private:
+		ZELock*					TargetLock;
+
+	public:
+								void Lock(ZELock& Lock);
+								void Unlock();
+
+								ZELockHolder();
+								ZELockHolder(ZELock& Lock);
+								~ZELockHolder();
+};
+
+class ZELockSectionLoopVariable 
+{
+	public:
+		ZELockHolder			LockHolder;
+		bool					Control;
+
+								ZELockSectionLoopVariable(ZELock& Lock);
 };

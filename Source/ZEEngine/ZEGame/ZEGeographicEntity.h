@@ -53,7 +53,7 @@ class ZEGeographicEntity : public ZEEntity
 		mutable ZEMatrix4x4d				InvGeographicTransform;
 
 	protected:
-		virtual	bool						SetOwner(ZEEntity* Owner);
+		virtual	bool						CheckParent(ZEEntity* Parent);
 
 		virtual void						GeographicTransformChanged();
 

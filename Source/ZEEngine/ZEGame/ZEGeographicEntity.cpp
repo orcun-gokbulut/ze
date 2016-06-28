@@ -40,24 +40,23 @@
 #define ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM		0x0002
 
 
-bool ZEGeographicEntity::SetOwner(ZEEntity* Owner)
+bool ZEGeographicEntity::CheckParent(ZEEntity* Parent)
 {
-	if (!ZEClass::IsDerivedFrom(ZESectorManager::Class(), Owner->GetClass()))
+	if (!ZEClass::IsDerivedFrom(ZESectorManager::Class(), Parent->GetClass()))
 		return false;
 
-	return ZEEntity::SetOwner(Owner);
+	return true;
 }
 
 void ZEGeographicEntity::GeographicTransformChanged()
 {
 	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM);
 
-	ZESectorManager* Owner = (ZESectorManager*)GetOwner();
-
-	if (Owner == NULL)
+	ZESectorManager* Parent = static_cast<ZESectorManager*>(GetParent());
+	if (Parent == NULL)
 		return;
 
-	Owner->UpdateTransformation(this);
+	Parent->UpdateTransformation(this);
 }
 
 ZEGeographicEntity::ZEGeographicEntity()
