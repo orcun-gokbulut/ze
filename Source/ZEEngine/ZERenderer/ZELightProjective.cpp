@@ -49,6 +49,7 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERNStageShadowmapGeneration.h"
 #include "ZERNRenderParameters.h"
+#include "ZERNStageShadowing.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1
@@ -140,6 +141,16 @@ float ZELightProjective::GetAspectRatio() const
 	return AspectRatio;
 }
 
+void ZELightProjective::SetShadowMapIndex(ZEUInt ShadowMapIndex)
+{
+	this->ShadowMapIndex = ShadowMapIndex;
+}
+
+ZEUInt ZELightProjective::GetShadowMapIndex() const
+{
+	return ShadowMapIndex;
+}
+
 void ZELightProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
 	if (FileName.GetLength() == 0 || ProjectionTextureFile == FileName)
@@ -212,10 +223,13 @@ const ZEMatrix4x4& ZELightProjective::GetProjectionTransform(ZESize Index) const
 
 void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
+	if (Parameters->Stage->GetId() != ZERN_STAGE_SHADOWING)
+		return;
+
 	UpdateShadowMap();
 
 	ZERNView View = ShadowRenderer.GetView();
-	View.Position = GetWorldPosition();
+	View.Position = Parameters->View->Position;
 	View.Rotation = GetWorldRotation();
 	View.Direction = GetWorldFront();
 	View.U = GetWorldRight();
@@ -235,15 +249,24 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	ShadowRenderer.SetView(View);
 
 	ZEGRContext* Context = Parameters->Context;
-	const ZEGRDepthStencilBuffer* DepthBuffer = ShadowMap->GetDepthStencilBuffer();
+	ShadowRenderer.SetContext(Context);
+	
+	ShadowRenderer.StartScene(GetOwnerScene()->GetConstantBuffer());
+		ZERNPreRenderParameters PreRenderParameters;
+		PreRenderParameters.Renderer = &ShadowRenderer;
+		PreRenderParameters.View = &View;
+		GetOwnerScene()->PreRender(&PreRenderParameters);
+	ShadowRenderer.EndScene();
+
+	const ZERNStageShadowing* StageShadowing = static_cast<const ZERNStageShadowing*>(Parameters->Stage);
+	this->ShadowMapIndex = StageShadowing->ShadowMapCount;
+	const ZEGRDepthStencilBuffer* DepthBuffer = StageShadowing->ProjectiveShadowMaps->GetDepthStencilBuffer(false, const_cast<ZERNStageShadowing*>(StageShadowing)->ShadowMapCount++);
 
 	Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
 	Context->SetRenderTargets(0, NULL, DepthBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
-
-	ZELight::Render(Parameters, Command);
-
-	Context->SetRenderTargets(0, NULL, NULL);
+	
+	ShadowRenderer.Render();
 }
 
 ZELightProjective* ZELightProjective::CreateInstance()

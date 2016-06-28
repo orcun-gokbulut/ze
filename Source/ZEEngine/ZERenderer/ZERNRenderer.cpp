@@ -187,7 +187,7 @@ void ZERNRenderer::SortStageCommands()
 
 void ZERNRenderer::RenderStages()
 {
-	if(Context == NULL)
+	if (Context == NULL)
 		Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
 
 	ZERNRenderParameters Parameters;
@@ -278,6 +278,7 @@ bool ZERNRenderer::InitializeSelf()
 void ZERNRenderer::DeinitializeSelf()
 {
 	CleanCommands();
+	CleanStages();
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();

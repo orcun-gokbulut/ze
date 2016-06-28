@@ -308,7 +308,7 @@ void ZERNStageMultiplexer::DeinitializeSelf()
 
 	OutputRenderTarget = NULL;
 
-	ZERNStage::Deinitialize();
+	ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageMultiplexer::GetId() const

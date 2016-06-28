@@ -37,12 +37,16 @@
 
 #include "ZERNStage.h"
 
+#include "ZEPointer/ZEHolder.h"
+
 class ZEGRTexture2D;
 
 class ZERNStageRenderDepth : public ZERNStage
 {
 	ZE_OBJECT
 	private:
+		ZEHolder<ZEGRTexture2D>			TransparentDepthBuffer;
+
 		const ZEGRTexture2D*			DepthTexture;
 
 		virtual bool					InitializeSelf();						

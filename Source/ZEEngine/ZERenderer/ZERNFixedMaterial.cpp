@@ -117,7 +117,7 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 	if (ClippingPlanesEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_CLIPPING_PLANES"));
 
-	if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+	if (TransparencyEnabled)
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_FORWARD"));
 	else
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEFERRED"));
@@ -157,11 +157,6 @@ bool ZERNFixedMaterial::UpdateShaders() const
 	StageShadowmapGeneration_PixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(StageShadowmapGeneration_PixelShader == NULL, false, "Cannot set pixel shader.");
 
-	//Options.Type = ZEGR_ST_VERTEX;
-	//Options.EntryPoint = "ZERNFixedMaterial_VertexShader_StageRenderDepth";
-	//StageRenderDepth_VertexShader = ZEGRShader::Compile(Options);
-	//zeCheckError(StageRenderDepth_VertexShader == NULL, false, "Cannot set vertex shader.");
-
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -174,7 +169,7 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 		return true;
 
 	ZEGRRenderState RenderState;
-	if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
+	if (TransparencyEnabled)
 		RenderState = ZERNStageForwardTransparent::GetRenderState();
 	else
 		RenderState = ZERNStageGBuffer::GetRenderState();
@@ -185,6 +180,14 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 		RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
 	else
 		RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
+
+	if (AlphaCullEnabled && !TransparencyEnabled)
+	{
+		ZEGRBlendState BlendStateAlphaToCoverage;
+		BlendStateAlphaToCoverage.SetAlphaToCoverageEnable(true);
+
+		RenderState.SetBlendState(BlendStateAlphaToCoverage);
+	}
 
 	ZEGRRasterizerState RasterizerState = RenderState.GetRasterizerState();
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
@@ -215,23 +218,6 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 
 	StageShadowmapGeneration_RenderState = RenderState.Compile();
 	zeCheckError(StageShadowmapGeneration_RenderState == NULL, false, "Cannot set shadow map generation render state.");
-
-	//RenderState = ZERNStageRenderDepth::GetRenderState();
-	//RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	//
-	//RasterizerState = RenderState.GetRasterizerState();
-	//RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
-	//RenderState.SetRasterizerState(RasterizerState);
-	//
-	//if (SkinningEnabled)
-	//	RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
-	//else
-	//	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
-	//
-	//RenderState.SetShader(ZEGR_ST_VERTEX, StageRenderDepth_VertexShader);
-	//
-	//StageRenderDepth_RenderState = RenderState.Compile();
-	//zeCheckError(StageRenderDepth_RenderState == NULL, false, "Cannot set render depth render state.");
 
 	DirtyFlags.UnraiseFlags(ZERN_FMDF_RENDER_STATE);
 
@@ -327,9 +313,6 @@ void ZERNFixedMaterial::DeinitializeSelf()
 	StageShadowmapGeneration_VertexShader.Release();
 	StageShadowmapGeneration_RenderState.Release();
 	StageShadowmapGeneration_RenderState.Release();
-
-	StageRenderDepth_VertexShader.Release();
-	StageRenderDepth_RenderState.Release();
 
 	ConstantBuffer.Release();
 	Sampler.Release();

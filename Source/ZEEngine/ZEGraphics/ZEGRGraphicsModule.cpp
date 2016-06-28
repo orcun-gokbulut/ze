@@ -33,17 +33,17 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZEGRGraphicsModule.h"
 
 #include "ZECore/ZECore.h"
+#include "ZECore/ZEOption.h"
+#include "ZECore/ZEOptionManager.h"
 #include "ZEGRIndexBuffer.h"
 #include "ZEGRTextureCube.h"
 #include "ZEGRRenderTarget.h"
 #include "ZEGRVertexBuffer.h"
-#include "ZECore/ZEOption.h"
-#include "ZEGRGraphicsModule.h"
 #include "ZEGRConstantBuffer.h"
 #include "ZEGRDepthStencilBuffer.h"
-#include "ZECore/ZEOptionManager.h"
 
 #include <FreeImage.h>
 

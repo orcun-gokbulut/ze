@@ -110,6 +110,16 @@ float3 ZERNTransformations_TexelToView(float2 TexCoord, float DepthHomogeneous)
 	return ZERNTransformations_HomogeneousToView(VectorHomogeneous, DepthHomogeneous);
 }
 
+float3 ZERNTransformations_TexelToView2(float2 TexCoord, float DepthView)
+{
+	float2 VectorHomogeneous = ZERNTransformations_TexelToHomogeneous(TexCoord);
+	VectorHomogeneous *= DepthView;
+	VectorHomogeneous -= DepthView * float2(ZERNView_ProjectionTransform._13, ZERNView_ProjectionTransform._23);
+	float2 VectorView = ZERNTransformations_HomogeneousToView(VectorHomogeneous);
+	
+	return float3(VectorView, DepthView);
+}
+
 float2 ZERNTransformations_TexelToViewport(float2 TexCoord, float2 ViewportDimensions)
 {
 	return TexCoord * ViewportDimensions;
@@ -141,6 +151,16 @@ float3 ZERNTransformations_ViewportToView(float2 VectorViewport, float2 Viewport
 	return ZERNTransformations_HomogeneousToView(VectorHomogeneous, DepthHomogeneous);
 }
 
+float3 ZERNTransformations_ViewportToView2(float2 VectorViewport, float2 ViewportDimensions, float DepthView)
+{
+	float2 VectorHomogeneous = ZERNTransformations_ViewportToHomogeneous(VectorViewport, ViewportDimensions);
+	VectorHomogeneous *= DepthView;
+	VectorHomogeneous -= DepthView * float2(ZERNView_ProjectionTransform._13, ZERNView_ProjectionTransform._23);
+	float2 VectorView = ZERNTransformations_HomogeneousToView(VectorHomogeneous);
+	
+	return float3(VectorView, DepthView);
+}
+
 float2 ZERNTransformations_ViewportToView(float2 VectorViewport, float2 ViewportDimensions)
 {
 	float2 VectorHomogeneous = ZERNTransformations_ViewportToHomogeneous(VectorViewport, ViewportDimensions);
@@ -170,6 +190,13 @@ float2 ZERNTransformations_ViewToTexelCenter(float3 VectorView, float2 Dimension
 	float3 VectorHomogeneous = ZERNTransformations_ViewToHomogeneous(VectorView);
 	
 	return ZERNTransformations_HomogeneousToTexelCenter(VectorHomogeneous.xy, Dimensions);
+}
+
+float2 ZERNTransformations_ViewToViewport(float3 VectorView, float2 ViewportDimensions)
+{
+	float2 TexelCorner = ZERNTransformations_ViewToTexelCorner(VectorView);
+	
+	return ZERNTransformations_TexelToViewport(TexelCorner, ViewportDimensions);
 }
 
 float4 ZERNTransformations_ViewToProjection(float3 VectorView)
