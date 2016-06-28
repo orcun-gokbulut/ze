@@ -160,4 +160,6 @@ class ZELight : public ZEEntity
 
 		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
 		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
-};
+}
+ZE_META_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color")
+ZE_META_ATTRIBUTE_PROPERTY(Attenuation, ZEDEditor.PropertyEditor.Semantic, "Attenuation");

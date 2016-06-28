@@ -46,6 +46,7 @@
 #include <QInputDialog>
 #include <QToolButton>
 #include <QBoxLayout>
+#include "ZEDAssetBrowser.h"
 
 bool ZEDPropertyEditorItemString::InitializeSelf()
 {
@@ -114,17 +115,24 @@ void ZEDPropertyEditorItemString::TextEdit_editingFinished()
 
 void ZEDPropertyEditorItemString::DetailButton_clicked()
 {
-	bool Result = false;
-	QString String = QInputDialog::getMultiLineText(treeWidget(), "Edit Property Value", GetProperty()->Name, TextEdit->text(), &Result);
-	
-	if (!Result)
-		return;
+	if (IsAsset)
+	{
+		
+	}
+	else
+	{
+		bool Result = false;
+		QString String = QInputDialog::getMultiLineText(treeWidget(), "Edit Property Value", GetProperty()->Name, TextEdit->text(), &Result);
 
-	ZEVariant Value;
-	Value.SetString(String.toUtf8().begin());
+		if (!Result)
+			return;
 
-	Changed(Value);
-	Update();
+		ZEVariant Value;
+		Value.SetString(String.toUtf8().begin());
+
+		Changed(Value);
+		Update();
+	}
 }
 
 void ZEDPropertyEditorItemString::Update()

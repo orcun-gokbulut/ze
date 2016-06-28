@@ -163,4 +163,5 @@ class ZEModel : public ZEEntity
 		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEModel*						CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE_PROPERTY("ModelFile", "ZEDEditor.PropertyEditor.Semantic", "Asset", "ZEModelAsset");

@@ -70,7 +70,7 @@ struct ZEProperty
 	ZESize								AttributeCount;
 
 	const ZEAttribute*					GetAttribute(const char* Name) const;
-	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = NULL) const;
+	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = "") const;
 
 	bool								CheckAttribute(const char* Name) const;
 	bool								CheckAttributeHasValue(const char* Name, const char* Value) const;

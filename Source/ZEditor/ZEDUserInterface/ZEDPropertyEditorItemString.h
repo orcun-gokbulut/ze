@@ -47,6 +47,8 @@ class ZEDPropertyEditorItemString : public QObject, public ZEDPropertyEditorItem
 		QLineEdit*					TextEdit;
 		QToolButton*				DetailButton;
 		bool						ValueChanged;
+		bool						IsAsset;
+
 
 		virtual bool				InitializeSelf();
 
@@ -62,3 +64,22 @@ class ZEDPropertyEditorItemString : public QObject, public ZEDPropertyEditorItem
 
 									ZEDPropertyEditorItemString();
 };
+
+/*
+class ZEAssetType
+{
+	public:
+		const ZEString&	GetPath()
+	GetFileInfo();
+
+	ZEWidget* Preview();
+	ZEDEditor* OpenEditor();
+	ZEObject* Instanciate();
+
+	Update();
+};
+
+class ZEDAssert
+{
+
+};*/

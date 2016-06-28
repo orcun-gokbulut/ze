@@ -40,6 +40,9 @@
 
 const ZEAttribute* ZEProperty::GetAttribute(const char* Name) const
 {
+	if (Name == NULL)
+		return NULL;
+
 	for (ZESize I = 0; I < AttributeCount; I++)
 	{
 		if (strcmp(Attributes[I].Name, Name) == 0)
@@ -72,6 +75,9 @@ bool ZEProperty::CheckAttribute(const char* Name) const
 
 bool ZEProperty::CheckAttributeHasValue(const char* Name, const char* Value) const
 {
+	if (Value == NULL)
+		return false;
+
 	const ZEAttribute* Attribute = GetAttribute(Name);
 	if (Attribute == NULL)
 		return false;
