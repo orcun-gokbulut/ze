@@ -198,6 +198,9 @@ void ZEMCParser::ProcessPropertyAccessors(ZEMCClass* ClassData)
 
 			ProcessMemberAttributes(PropertyData, NULL, false, NULL);
 
+			if (!PropertyData->CheckAttributeValue("ZEMC.Export", "true", 0, "false"))
+				return;
+
 			ClassData->Properties.Add(PropertyData);
 		}
 

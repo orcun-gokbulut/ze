@@ -38,6 +38,7 @@
 #include "ZEDPropertyEditorItemVector.h"
 
 #include "ZEDS/ZEVariant.h"
+#include "ZEMath/ZEAngle.h"
 #include "ZEMeta/ZEProperty.h"
 #include "ZEDPropertyEditor.h"
 #include "ZEDCore/ZEDObjectWrapper.h"
@@ -45,7 +46,10 @@
 #include "QEvent.h"
 #include <QLineEdit>
 #include <QGuiApplication>
-#include "ZEMath/ZEAngle.h"
+#include <QColorDialog>
+#include <QToolButton>
+#include <QBoxLayout>
+#include <QLabel>
 
 void ZEDPropertyEditorItemVector::SetMemeberValue(ZEVariant& Variant, ZESize MemberIndex, double MemberValue)
 {
@@ -232,147 +236,95 @@ bool ZEDPropertyEditorItemVector::InitializeSelf()
 	switch (GetProperty()->Type.Type)
 	{
 		case ZE_TT_VECTOR2:
-			Labels[0]  = "x"; 
-			Labels[1]  = "y";
-			RowCount = 1;
-			ColumnCount = 2;
-			Detail = false;
-			break;
-
 		case ZE_TT_VECTOR2D:
-			Labels[0]  = "x"; 
-			Labels[1]  = "y";
+			ShortLabels[0] = Labels[0] = "x"; 
+			ShortLabels[1] = Labels[1] = "y";
 			RowCount = 1;
 			ColumnCount = 2;
 			Detail = false;
 			break;
 
 		case ZE_TT_VECTOR3:
-			Labels[0]  = "x"; 
-			Labels[1]  = "y";
-			Labels[2]  = "z";
+		case ZE_TT_VECTOR3D:
+			ShortLabels[0] = Labels[0] = "x"; 
+			ShortLabels[1] = Labels[1] = "y";
+			ShortLabels[2] = Labels[2] = "z";
 			RowCount = 1;
 			ColumnCount = 3;
 			Detail = false;
 			break;
 
-		case ZE_TT_VECTOR3D:
-			Labels[0]  = "x"; 
-			Labels[1]  = "y";
-			Labels[2]  = "z";
-			RowCount = 1;
-			ColumnCount = 4;
-			Detail = false;
-			break;
-
 		case ZE_TT_VECTOR4:
-			Labels[0]  = "x"; 
-			Labels[1]  = "y";
-			Labels[2]  = "z";
-			Labels[3]  = "w";
-			RowCount = 1;
-			ColumnCount = 4;
-			Detail = false;
-			break;
-
 		case ZE_TT_VECTOR4D:
-			Labels[0]  = "x"; 
-			Labels[1]  = "y";
-			Labels[2]  = "z";
-			Labels[3]  = "w";
+			ShortLabels[0] = Labels[0] = "x"; 
+			ShortLabels[1] = Labels[1] = "y";
+			ShortLabels[2] = Labels[2] = "z";
+			ShortLabels[3] = Labels[3] = "w";
 			RowCount = 1;
 			ColumnCount = 4;
 			Detail = false;
 			break;
 
 		case ZE_TT_QUATERNION:
-			Labels[0]  = "Rx"; 
-			Labels[1]  = "Ry";
-			Labels[2]  = "Rz";
-			Labels[3]  = "Qw";
-			Labels[4]  = "Qx"; 
-			Labels[5]  = "Qy";
-			Labels[6]  = "Qz";
+			Labels[0] = "Euler.x (Pitch)"; 
+			Labels[1] = "Euler.y (Yaw)";
+			Labels[2] = "Euler.z (Roll)";
+			Labels[3] = "Quaternion.w";
+			Labels[4] = "Quaternion.x"; 
+			Labels[5] = "Quaternion.y";
+			Labels[6] = "Quaternion.z";
+
+			ShortLabels[0] = "rx"; 
+			ShortLabels[1] = "ry";
+			ShortLabels[2] = "rz";
+			ShortLabels[3] = "qw";
+			ShortLabels[4] = "qx"; 
+			ShortLabels[5] = "qy";
+			ShortLabels[6] = "qz";
+
 			RowCount = 1;
 			ColumnCount = 7;
-			Detail = true;
+			Detail = false;
 			break;
+
 
 		case ZE_TT_MATRIX3X3:
-			Labels[0]  = "M11";
-			Labels[1]  = "M21"; 
-			Labels[2]  = "M31";
-			Labels[4]  = "M12";
-			Labels[5]  = "M22";
-			Labels[6]  = "M32";
-			Labels[8]  = "M13";
-			Labels[9]  = "M23";
-			Labels[10] = "M33";
-			Labels[12] = "M14";
-			Labels[13] = "M24";
-			Labels[14] = "M34";
-			RowCount = 3;
-			ColumnCount = 3;
-			Detail = true;
-			break;
-
 		case ZE_TT_MATRIX3X3D:
-			Labels[0]  = "M11";
-			Labels[1]  = "M21"; 
-			Labels[2]  = "M31";
-			Labels[4]  = "M12";
-			Labels[5]  = "M22";
-			Labels[6]  = "M32";
-			Labels[8]  = "M13";
-			Labels[9]  = "M23";
-			Labels[10] = "M33";
-			Labels[12] = "M14";
-			Labels[13] = "M24";
-			Labels[14] = "M34";
+			ShortLabels[0]  = Labels[0]  = "M11";
+			ShortLabels[1]  = Labels[1]  = "M21"; 
+			ShortLabels[2]  = Labels[2]  = "M31";
+			ShortLabels[4]  = Labels[4]  = "M12";
+			ShortLabels[5]  = Labels[5]  = "M22";
+			ShortLabels[6]  = Labels[6]  = "M32";
+			ShortLabels[8]  = Labels[8]  = "M13";
+			ShortLabels[9]  = Labels[9]  = "M23";
+			ShortLabels[10] = Labels[10] = "M33";
+			ShortLabels[12] = Labels[12] = "M14";
+			ShortLabels[13] = Labels[13] = "M24";
+			ShortLabels[14] = Labels[14] = "M34";
 			RowCount = 3;
 			ColumnCount = 3;
 			Detail = true;
 			break;
 
 		case ZE_TT_MATRIX4X4:
-			Labels[0]  = "M11";
-			Labels[1]  = "M21"; 
-			Labels[2]  = "M31";
-			Labels[3]  = "M41";
-			Labels[4]  = "M12";
-			Labels[5]  = "M22";
-			Labels[6]  = "M32";
-			Labels[7]  = "M42";
-			Labels[8]  = "M13";
-			Labels[9]  = "M23";
-			Labels[10] = "M33";
-			Labels[11] = "M43";
-			Labels[12] = "M14";
-			Labels[13] = "M24";
-			Labels[14] = "M34";
-			Labels[15] = "M44";
-			RowCount = 4;
-			ColumnCount = 4;
-			Detail = true;
-			break;
-
 		case ZE_TT_MATRIX4X4D:
-			Labels[0]  = "M11";
-			Labels[1]  = "M21"; 
-			Labels[2]  = "M31";
-			Labels[3]  = "M41";
-			Labels[4]  = "M12";
-			Labels[5]  = "M22";
-			Labels[6]  = "M32";
-			Labels[7]  = "M42";
-			Labels[8]  = "M13";
-			Labels[9]  = "M23";
-			Labels[10] = "M33";
-			Labels[11] = "M43";
-			Labels[12] = "M14";
-			Labels[13] = "M24";
-			Labels[14] = "M34";
-			Labels[15] = "M44";
+			ShortLabels[0]  = Labels[0]  = "M11";
+			ShortLabels[1]  = Labels[1]  = "M21"; 
+			ShortLabels[2]  = Labels[2]  = "M31";
+			ShortLabels[3]  = Labels[3]  = "M41";
+			ShortLabels[4]  = Labels[4]  = "M12";
+			ShortLabels[5]  = Labels[5]  = "M22";
+			ShortLabels[6]  = Labels[6]  = "M32";
+			ShortLabels[7]  = Labels[7]  = "M42";
+			ShortLabels[8]  = Labels[8]  = "M13";
+			ShortLabels[9]  = Labels[9]  = "M23";
+			ShortLabels[10] = Labels[10] = "M33";
+			ShortLabels[11] = Labels[11] = "M43";
+			ShortLabels[12] = Labels[12] = "M14";
+			ShortLabels[13] = Labels[13] = "M24";
+			ShortLabels[14] = Labels[14] = "M34";
+			ShortLabels[15] = Labels[15] = "M44";
 			RowCount = 4;
 			ColumnCount = 4;
 			Detail = true;
@@ -381,6 +333,77 @@ bool ZEDPropertyEditorItemVector::InitializeSelf()
 		default:
 			setText(1, "Type Error");
 			return false;
+	}
+	
+	Container = new QWidget();
+	Layout = new QHBoxLayout();
+	Layout->setContentsMargins(0, 0, 0, 0);
+	Container->setLayout(Layout);
+	Label = new QLabel(Container);
+	Layout->addWidget(Label);
+	treeWidget()->setItemWidget(this, 1, Container);
+
+	const char* Type = Property->GetAttributeValue("ZEDEditor.PropertyEditor.Semantic");
+	if (strcmp(Type, "Color") == 0 && 
+		(Property->Type.Type == ZE_TT_VECTOR3 || Property->Type.Type == ZE_TT_VECTOR3D ||
+		Property->Type.Type == ZE_TT_VECTOR4 || Property->Type.Type == ZE_TT_VECTOR4D))
+	{
+		if (Property->Type.Type == ZE_TT_VECTOR3 || Property->Type.Type == ZE_TT_VECTOR3D)
+		{
+			Labels[0] = "Red";
+			Labels[1] = "Green";
+			Labels[2] = "Blue";
+
+			ShortLabels[0] = "r";
+			ShortLabels[1] = "g";
+			ShortLabels[2] = "b";
+		}
+		else if (Property->Type.Type == ZE_TT_VECTOR4 || Property->Type.Type == ZE_TT_VECTOR4D)
+		{
+			Labels[0] = "Red";
+			Labels[1] = "Green";
+			Labels[2] = "Blue";
+			Labels[3] = "Alpha";
+
+			ShortLabels[0] = "r";
+			ShortLabels[1] = "g";
+			ShortLabels[2] = "b";
+			ShortLabels[3] = "a";
+
+		}
+	
+		IsColor = true;
+
+		ColorBox = new QLabel();
+		ColorBox->setMinimumWidth(18);
+		ColorBox->setSizePolicy(QSizePolicy::Maximum, QSizePolicy::Maximum);
+		Layout->insertWidget(0, ColorBox);
+
+		Detail = true;
+	}
+	else if (strcmp(Type, "EulerAngles") == 0 && (Property->Type.Type == ZE_TT_VECTOR3 || Property->Type.Type == ZE_TT_VECTOR3D))
+	{
+		Labels[0] = "Euler.x (Pitch)";
+		Labels[1] = "Euler.y (Yaw)";
+		Labels[2] = "Euler.z (Roll)";
+
+		ShortLabels[0] = "rx";
+		ShortLabels[1] = "ry";
+		ShortLabels[2] = "rz";
+
+		IsEulerAngles = true;
+	}
+	else if (strcmp(Type, "Attenuation") == 0 && (Property->Type.Type == ZE_TT_VECTOR3 || Property->Type.Type == ZE_TT_VECTOR3D))
+	{
+		Labels[0] = "Constant";
+		Labels[1] = "Linear";
+		Labels[2] = "Quadratic";
+
+		ShortLabels[0] = "c";
+		ShortLabels[1] = "l";
+		ShortLabels[2] = "q";
+
+		IsEulerAngles = true;
 	}
 
 	for (ZESize I = 0; I < RowCount * ColumnCount; I++)
@@ -398,6 +421,14 @@ bool ZEDPropertyEditorItemVector::InitializeSelf()
 
 		connect(TextEdits[I], SIGNAL(textChanged(const QString&)), this, SLOT(TextEdit_textChanged(const QString&)));
 		connect(TextEdits[I], SIGNAL(editingFinished()), this, SLOT(TextEdit_editingFinished()));
+	}
+	
+	if (Detail)
+	{
+		DetailButton = new QToolButton(Container);
+		DetailButton->setText("...");
+		Layout->addWidget(DetailButton);
+		connect(DetailButton, SIGNAL(clicked()), this, SLOT(DetailButton_clicked()));
 	}
 
 	return true;
@@ -477,6 +508,54 @@ void ZEDPropertyEditorItemVector::TextEdit_editingFinished()
 	Update();
 }
 
+void ZEDPropertyEditorItemVector::DetailButton_clicked()
+{
+	if (IsColor)
+	{
+		QColorDialog Dialog;
+		Dialog.setWindowTitle("Pick Color");
+
+		QColor CurrentColor;
+		CurrentColor.setRedF(TextEdits[0]->text().toFloat());
+		CurrentColor.setGreenF(TextEdits[1]->text().toFloat());
+		CurrentColor.setBlueF(TextEdits[2]->text().toFloat());
+
+		if (GetProperty()->Type.Type == ZE_TT_VECTOR4 || GetProperty()->Type.Type ==  ZE_TT_VECTOR4D)
+		{
+			CurrentColor.setAlphaF(TextEdits[3]->text().toFloat());
+			Dialog.setOptions(QColorDialog::ShowAlphaChannel);
+		}
+
+		Dialog.setCurrentColor(CurrentColor);
+
+		Dialog.exec();
+		if (Dialog.result() == QDialog::Rejected)
+			return;
+
+		switch (GetProperty()->Type.Type)
+		{
+			case ZE_TT_VECTOR3:
+				Changed(ZEVector3(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF()));
+				break;
+
+			case ZE_TT_VECTOR3D:
+				Changed(ZEVector3d(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF()));
+				break;
+
+			case ZE_TT_VECTOR4:
+				Changed(ZEVector4(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF(), Dialog.selectedColor().alphaF()));
+				break;
+
+			case ZE_TT_VECTOR4D:
+				Changed(ZEVector4d(Dialog.selectedColor().redF(), Dialog.selectedColor().greenF(), Dialog.selectedColor().blueF(), Dialog.selectedColor().alphaF()));
+				break;
+		}
+
+		Update();
+	}
+
+}
+
 void ZEDPropertyEditorItemVector::Update()
 {
 	if (!IsInitialized())
@@ -551,38 +630,60 @@ void ZEDPropertyEditorItemVector::Update()
 	{
 		case ZE_TT_VECTOR2:
 		case ZE_TT_VECTOR2D:
-			setText(1, QString("<x:%1, y:%2>")
-				.arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0]))
-				.arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1])));
+			Label->setText(QString("<%1:%2, %3:%4>")
+				.arg(ShortLabels[0]).arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0], 'f', 3))
+				.arg(ShortLabels[1]).arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1], 'f', 3)));
 			break;
 
 		case ZE_TT_VECTOR3:
 		case ZE_TT_VECTOR3D:
-			setText(1, QString("<x:%1, y:%2, z:%3>")
-				.arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0]))
-				.arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1]))
-				.arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2])));
+		case ZE_TT_QUATERNION:
+			Label->setText(QString("<%1:%2, %3:%4, %5:%6>")
+				.arg(ShortLabels[0]).arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0], 'f', 3))
+				.arg(ShortLabels[1]).arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1], 'f', 3))
+				.arg(ShortLabels[2]).arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2], 'f', 3)));
 			break;
 
 		case ZE_TT_VECTOR4:
 		case ZE_TT_VECTOR4D:
-			setText(1, QString("<x:%1, y:%2, z:%3, w:%4>")
-				.arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0]))
-				.arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1]))
-				.arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2]))
-				.arg(VectorMembersMultiValue[3] ? "..." : QString::number(VectorMembers[3])));
-			break;
-
-		case ZE_TT_QUATERNION:
-			setText(1, QString("<Rx:%1, Ry:%2, Rz:%3>")
-				.arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0]))
-				.arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1]))
-				.arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2])));
+			Label->setText(QString("<%1:%2, %3:%4, %5:%6, %7:%8>")
+				.arg(ShortLabels[0]).arg(VectorMembersMultiValue[0] ? "..." : QString::number(VectorMembers[0], 'f', 3))
+				.arg(ShortLabels[1]).arg(VectorMembersMultiValue[1] ? "..." : QString::number(VectorMembers[1], 'f', 3))
+				.arg(ShortLabels[2]).arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2], 'f', 3))
+				.arg(ShortLabels[3]).arg(VectorMembersMultiValue[2] ? "..." : QString::number(VectorMembers[2], 'f', 3)));
 			break;
 
 		default:
 			setText(1, "...");
 			break;
+	}
+
+	if (IsColor)
+	{
+		if (VectorMembersMultiValue[0] ||
+			VectorMembersMultiValue[1] ||
+			VectorMembersMultiValue[2] ||
+			((GetProperty()->Type.Type == ZE_TT_VECTOR4 || GetProperty()->Type.Type == ZE_TT_VECTOR4D) && VectorMembersMultiValue[3]))
+		{
+			ColorBox->setStyleSheet(
+				"* { "
+					"background-color: qlineargradient(spread:pad, x1:0, y1:0, x2:1, y2:0, stop:0 rgba(255, 0, 0, 255), stop:0.166 rgba(255, 255, 0, 255), stop:0.333 rgba(0, 255, 0, 255), stop:0.5 rgba(0, 255, 255, 255), stop:0.666 rgba(0, 0, 255, 255), stop:0.833 rgba(255, 0, 255, 255), stop:1 rgba(255, 0, 0, 255));"
+					"border: 1 solid black;"
+				"}");
+		}
+		else
+		{
+			ColorBox->setStyleSheet(
+				QString(
+					"* { "
+						"background-color: rgba(%1, %2, %3, %4);"
+						"border: 1 solid black;"
+					"}")
+				.arg(VectorMembersMultiValue[0] ? 0 : QString::number(VectorMembers[0] * 255))
+				.arg(VectorMembersMultiValue[1] ? 0 : QString::number(VectorMembers[1] * 255))
+				.arg(VectorMembersMultiValue[2] ? 0 : QString::number(VectorMembers[2] * 255))
+				.arg(VectorMembersMultiValue[3] ? 0 : QString::number(VectorMembers[3] * 255)));	
+		}
 	}
 }
 
@@ -591,7 +692,17 @@ ZEDPropertyEditorItemVector::ZEDPropertyEditorItemVector()
 	memset(Labels, 0, sizeof(Labels));
 	memset(TextEdits, 0, sizeof(TextEdits));
 	ValueChanged = false;
-	Detail = false;
+
 	RowCount = 0;
 	ColumnCount = 0;
+
+	Container = NULL;
+	Layout = NULL;
+	DetailButton = NULL;
+	Label = NULL;
+	ColorBox = NULL;
+
+	Detail = false;
+	IsEulerAngles = false;
+	IsColor = false;
 }

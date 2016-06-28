@@ -38,19 +38,34 @@
 #include "ZEDPropertyEditorItem.h"
 
 class QLineEdit;
+class QHBoxLayout;
+class QLabel;
+class QToolButton;
 
 class ZEDPropertyEditorItemVector : public QObject, public ZEDPropertyEditorItem
 {
 	Q_OBJECT
 	private:
 		const char*					Labels[16];
+		const char*					ShortLabels[16];
 		QLineEdit*					TextEdits[16];
 		bool						ValueChanged;
 
-		bool						Detail;
 		ZESize						RowCount;
 		ZESize						ColumnCount;
+		
+		QWidget*					Container;
+		QHBoxLayout*				Layout;
+		QToolButton*				DetailButton;
+		QLabel*						Label;
+		QLabel*						ColorBox;
 
+		bool						Detail;
+		bool						IsEulerAngles;
+		bool						IsColor;
+
+		void						CollapseValues();
+	
 		void						SetMemeberValue(ZEVariant& Variant, ZESize MemberIndex, double MemberValue);
 		double						GetMemeberValue(const ZEVariant& Variant, ZESize Index);
 
@@ -63,6 +78,7 @@ class ZEDPropertyEditorItemVector : public QObject, public ZEDPropertyEditorItem
 	private slots:
 		void						TextEdit_textChanged(const QString&);
 		void						TextEdit_editingFinished();
+		void						DetailButton_clicked();
 
 	public:
 		virtual void				Update();
