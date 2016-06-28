@@ -40,14 +40,16 @@ ze_set_project_folder("ZETools")
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
 
-ze_add_module(ZE3dsMax)
+find_package(Qt5 COMPONENTS Widgets)
+
+ze_add_module(ZE3dsMaxExporter)
 ze_add_module(ZEFontBaker)
-ze_add_module(ZEToolComponents)
 ze_add_module(ZECrashReport)
 ze_add_module(ZESceneConverter)
 ze_add_module(ZEMLEditor)
 ze_add_module(ZETerrainExporter)
 ze_add_module(ZELCLicenseTool)
 ze_add_module(ZEITIntegrityTool)
+ze_add_module(ZEDSHShaderEditor)
 
 ze_add_cmake_project(ZETools)

@@ -36,27 +36,23 @@
 cmake_minimum_required (VERSION 2.8)
 
 project (ZEditor)
-ze_set_project_folder("ZEditor")
+ze_set_project_folder("ZEDEditor")
+
+find_package(Qt5 COMPONENTS Widgets)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-add_subdirectory(ZEDBrowser)
-add_subdirectory(ZEDCommonControls)
-add_subdirectory(ZEDCommonEntities)
 add_subdirectory(ZEDCore)
+add_subdirectory(ZEDConsole)
+add_subdirectory(ZEDUserInterface)
 add_subdirectory(ZEDSceneEditor)
-add_subdirectory(ZEDMaterialEditor)
-add_subdirectory(ZEDNodeEditor)
-add_subdirectory(ZEDScriptEditor)
-add_subdirectory(ZEDUndoRedo)
-add_subdirectory(ZEDSoundExtensionsPlugIn)
-add_subdirectory(ZEDImageExtensionsPlugIn)
 
 ze_add_source(ZEDMain.cpp		Sources)
 
-ze_add_executable(TARGET ZEditor 
+ze_add_executable(TARGET ZEDEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine
-		ZEDCommonControls ZEDCommonEntities ZEDCore ZEDImageExtensionsPlugIn ZEDMaterialEditor ZEDPropertyWindowManager
-		ZEDSceneEditor ZEDScriptEditor ZEDSoundExtensionsPlugIn ZEDUndoRedo ZEDBrowser ZEDNodeEditor
-		libQt)
+	LIBS ZEEngine ZEDSceneEditor ZETrainIGModule)
+
+qt5_use_modules(ZEDEditor Widgets)
+
+ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDSceneEditor ZETrainIGModule)

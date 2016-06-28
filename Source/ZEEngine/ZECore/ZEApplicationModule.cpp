@@ -50,44 +50,55 @@ ZEUInt32 ZEApplicationModule::GetLoadingScreenColor()
 
 void ZEApplicationModule::PreProcess()
 {
+
 }
 
 void ZEApplicationModule::Process(float ElapsedTime)
 {
+
 }
 
 void ZEApplicationModule::PostProcess(float ElapsedTime)
 {
+
 }
 
 void ZEApplicationModule::StartUp()
 {
+
 }
 
 void ZEApplicationModule::ShutDown()
 {
+
 }
 
 void ZEApplicationModule::Start()
 {
+
 }
 
 void ZEApplicationModule::Stop()
 {
+
 }
 
 void ZEApplicationModule::Tick(float ElapsedTime)
 {
+
 }
 
 void ZEApplicationModule::Render(float ElapsedTime)
 {
+
 }
 
 ZEApplicationModule::ZEApplicationModule()
 {
+
 }
 
 ZEApplicationModule::~ZEApplicationModule()
 {
+
 }

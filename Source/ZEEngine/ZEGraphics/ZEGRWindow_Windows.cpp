@@ -220,7 +220,7 @@ static bool RegisterWindowClass(HINSTANCE Instance)
 	WindowClass.hIconSm			= NULL;
 
 	BOOL Result = RegisterClassEx(&WindowClass);
-	if(Result == 0)
+	if (Result == 0)
 	{
 		HandleWin32Error(GetLastError());
 		return false;
@@ -654,6 +654,9 @@ void ZEGRWindow::Destroy()
 
 bool ZEGRWindow::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	DWORD Win32Style = 0;
 	DWORD Win32StyleExt = 0;
 	GetWin32Style(this, Win32StyleExt, Win32Style);
@@ -704,11 +707,40 @@ bool ZEGRWindow::InitializeSelf()
 	WindowCount++;
 
 	Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
-	if(Output == NULL)
+	if (Output == NULL)
 		return false;
 
 	return true;
 }
+
+
+void ZEGRWindow::DeinitializeSelf()
+{
+	if (Handle != NULL)
+	{
+		BOOL Result = DestroyWindow((HWND)Handle);
+		if (Result == 0)
+		{
+			HandleWin32Error(GetLastError());
+			return;
+		}
+
+		Handle = NULL;
+	}
+
+	WindowCount--;
+
+	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();
+
+	if (!UnRegisterWindowClass(Instance))
+	{
+		zeError("Cannot unregister class.");
+		return;
+	}
+
+	ZEInitializable::DeinitializeSelf();
+}
+
 
 ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 {
@@ -723,18 +755,7 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	}
 
 	LONG_PTR Win32Style = GetWindowLongPtr(Handle, GWL_STYLE);
-	if (Win32Style == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return NULL;
-	}
-
 	LONG_PTR Win32StyleEx = GetWindowLongPtr(Handle, GWL_EXSTYLE);
-	if (Win32StyleEx == 0)
-	{
-		HandleWin32Error(GetLastError());
-		return NULL;
-	}
 
 	RECT Rectangle = {0};
 	BOOL Result = GetClientRect(Handle, &Rectangle);
@@ -762,37 +783,19 @@ ZEGRWindow* ZEGRWindow::WrapHandle(void* ExistingHandle)
 	Window->ShowInTaskbar = (Win32StyleEx & WS_EX_APPWINDOW) == WS_EX_APPWINDOW;
 	Window->AlwaysOnTop = (Win32StyleEx & WS_EX_TOPMOST) == WS_EX_TOPMOST;
 
+	Window->Output = ZEGROutput::Create(Window, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+	if (Window->Output == NULL)
+	{
+		delete Window;
+		return NULL;
+	}
+
 	return Window;
-}
-
-void ZEGRWindow::DeinitializeSelf()
-{
-	if (Handle != NULL)
-	{
-		BOOL Result = DestroyWindow((HWND)Handle);
-		if (Result == 0)
-		{
-			HandleWin32Error(GetLastError());
-			return;
-		}
-	
-		Handle = NULL;
-	}
-
-	WindowCount--;
-
-	HINSTANCE Instance = (HINSTANCE)zeCore->GetApplicationInstance();
-
-	if (!UnRegisterWindowClass(Instance))
-	{
-		zeError("Cannot unregister class.");
-		return;
-	}
 }
 
 void ZEGRWindow::Show()
 {
-	if(!IsInitialized())
+	if (!IsInitialized())
 		return;
 
 	if (GetVisible())

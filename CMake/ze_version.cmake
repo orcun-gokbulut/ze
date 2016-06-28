@@ -50,7 +50,6 @@ macro(ze_version_get)
 	if ("${VERSION_STRING}" MATCHES "[ \\t]*Version[ \\t]*:[ \\t]*[0-9]+[ \\t]*\\.[ \\t]*[0-9]+\\.[ \\t]*([0-9]+).*")
 		set(VERSION_INTERNAL ${CMAKE_MATCH_1})
 	endif()
-
 endmacro()
 
 macro(ze_version_get_branch)
@@ -62,8 +61,6 @@ macro(ze_version_get_branch)
 			set(VERSION_BRANCH ${CMAKE_MATCH_1})
 		endif()
 	endif()
-
-
 endmacro()
 
 macro(ze_version_get_revision_number)
@@ -91,9 +88,6 @@ macro(ze_version_init)
 	set(ZEBUILD_VERSION_BRANCH ${VERSION_BRANCH})
 	set(ZEBUILD_VERSION "${ZEBUILD_VERSION_MAJOR}.${ZEBUILD_VERSION_MINOR}.${ZEBUILD_VERSION_INTERNAL} - Rev:${ZEBUILD_VERSION_REVISION} (Branch:${ZEBUILD_VERSION_BRANCH})")
 
-	ze_version_generate_version_txt()
-	ze_version_generate_zeversiondata_h()
-
 	message(STATUS "[ZEBuild] Version           : ${ZEBUILD_VERSION}")
 	message(STATUS "[ZEBuild] Major Version     : ${ZEBUILD_VERSION_MAJOR}")
 	message(STATUS "[ZEBuild] Minor Version     : ${ZEBUILD_VERSION_MINOR}")
@@ -101,11 +95,15 @@ macro(ze_version_init)
 	message(STATUS "[ZEBuild] Build             : ${ZEBUILD_VERSION_REVISION}")
 	message(STATUS "[ZEBuild] Branch            : ${ZEBUILD_VERSION_BRANCH}")
 	message(STATUS "[ZEBuild] Version information has been collected.")
+	
+	ze_version_generate_files()
+	
 	message(STATUS "")
 	message(STATUS "")
 endmacro()
 
 macro(ze_version_generate_version_txt)
+	message(STATUS "[ZEBuild] Generating Version.txt.")
 	file(WRITE "${CMAKE_SOURCE_DIR}/Rundir/Version.txt"
 		"Company: Zinek Code House\n"
 		"Product: Zinek Engine\n"
@@ -113,6 +111,7 @@ macro(ze_version_generate_version_txt)
 endmacro()
 
 macro(ze_version_generate_zeversiondata_h)
+	message(STATUS "[ZEBuild] Version: Generating ZEVersionData.h.")
 	file(WRITE "${CMAKE_BINARY_DIR}/ZEVersionData.h"
 		"// ZEBuild - Auto Generated Version File - DO NOT MODIFY ! \n"
 		"////////////////////////////////////////////////////////////////////////\n\n"
@@ -127,12 +126,30 @@ endmacro()
 
 macro(ze_version_generate_zeversion_rc PARAMETER_TARGET PARAMETER_EXTENSION PARAMETER_DESCRIPTION PARAMETER_SOURCES)
 	if(ZEBUILD_PLATFORM_WINDOWS)
-		configure_file(
-			"${CMAKE_SOURCE_DIR}/CMake/ze_version.rc.in"
-			"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc"
-			@ONLY)
-		set(${PARAMETER_SOURCES} ${${PARAMETER_SOURCES}} "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
-		source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+		if ("${CMAKE_BINARY_DIR}/LastRevision.txt" IS_NEWER_THAN "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+			message(STATUS "[ZEBuild] Generating ZEVersion.rc for ${PARAMETER_TARGET}.")
+			configure_file(
+				"${CMAKE_SOURCE_DIR}/CMake/ze_version.rc.in"
+				"${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc"
+				@ONLY)
+			set(${PARAMETER_SOURCES} ${${PARAMETER_SOURCES}} "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+			source_group("Generated" FILES "${CMAKE_CURRENT_BINARY_DIR}/ZEVersion.rc")
+		endif()
+	endif()
+endmacro()
+
+macro(ze_version_generate_files)
+	if (EXISTS "${CMAKE_BINARY_DIR}/LastRevision.txt")
+		file(READ "${CMAKE_BINARY_DIR}/LastRevision.txt" LAST_REVISION)
+		if (NOT (LAST_REVISION EQUAL ZEBUILD_VERSION_REVISION))
+			ze_version_generate_version_txt()
+			ze_version_generate_zeversiondata_h()
+			file(WRITE "${CMAKE_BINARY_DIR}/LastRevision.txt" ${ZEBUILD_VERSION_REVISION})
+		endif()	
+	else()
+		ze_version_generate_version_txt()
+		ze_version_generate_zeversiondata_h()
+		file(WRITE "${CMAKE_BINARY_DIR}/LastRevision.txt" ${ZEBUILD_VERSION_REVISION})
 	endif()
 endmacro()
 

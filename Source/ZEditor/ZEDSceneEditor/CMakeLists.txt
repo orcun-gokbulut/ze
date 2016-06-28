@@ -33,26 +33,18 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required (VERSION 2.8)
+cmake_minimum_required(VERSION 2.8)
 
-ze_add_source(ZEDEntitySelectionItem.cpp		Sources)
-ze_add_source(ZEDEntitySelectionItem.h			Sources)
-ze_add_source(ZEDEntitySelector.cpp				Sources)
-ze_add_source(ZEDEntitySelector.h				Sources QtMocs)
-ze_add_source(ZEDSceneEditor.cpp				Sources)
-ze_add_source(ZEDSceneEditor.ui					Sources QtUI)
-ze_add_source(ZEDSceneEditor.h					Sources QtMocs)
-ze_add_source(ZEDSceneList.cpp					Sources)
-ze_add_source(ZEDSceneList.h					Sources)
-ze_add_source(ZEDSelectionItem.cpp				Sources)
-ze_add_source(ZEDSelectionItem.h				Sources)
-ze_add_source(ZEDSelectionItemPlugin.cpp		Sources)
-ze_add_source(ZEDSelectionItemPlugin.h			Sources)
-
-qt4_add_resources (QtResourceFiles ${QtResources})
-qt4_wrap_ui (QtUIFiles ${QtUI})
-qt4_wrap_cpp (QtMocFiles  ${QtMocs})
+ze_add_source(ZEDSceneEditor.cpp						Sources)
+ze_add_source(ZEDSceneEditor.h							Sources ZEMC)
+ze_add_source(ZEDSceneWrapper.cpp						Sources)
+ze_add_source(ZEDSceneWrapper.h							Sources ZEMC)
+ze_add_source(ZEDEntityWrapper.cpp						Sources)
+ze_add_source(ZEDEntityWrapper.h						Sources ZEMC)
 
 ze_add_library(TARGET ZEDSceneEditor 
-	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} ${QtResourceFiles}
-	LIBS libQt)
+	ZEMC ${ZEMC}
+	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	LIBS ZEFoundation ZEDCore ZEDUserInterface)
+
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

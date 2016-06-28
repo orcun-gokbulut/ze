@@ -38,7 +38,6 @@
 #include "ZEMath/ZEViewVolume.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNCommand.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNView.h"
 
 ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
@@ -65,24 +64,15 @@ bool ZEParticleEffect::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-bool ZEParticleEffect::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEParticleEffect::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
-			Emitters[I]->PreRender(CullParameters);
+			Emitters[I]->PreRender(Parameters);
 
 	return true;
-}
-
-void ZEParticleEffect::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
-{
-	ZEParticleEmitter* Emitter = static_cast<ZEParticleEmitter*>(Command->ExtraParameters);
-	if(Emitter == NULL)
-		return;
-
-	Emitter->Render(RenderParameters, Command);
 }
 
 void ZEParticleEffect::Tick(float TimeElapsed)

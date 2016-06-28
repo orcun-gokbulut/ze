@@ -34,11 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_OPERATION_COPY_H__
-#define __ZE_OPERATION_COPY_H__
 
 #include "ZEDOperation.h"
-#include <QtGui\QTreeWidgetItem>
+
+#include <QTreeWidgetItem>
 
 class ZEMLNode;
 class ZEMLElement;
@@ -53,5 +52,3 @@ class ZEOperationCopy : public ZEDOperation
 		ZEOperationCopy(ZEMLNode* ClipBoard, const QList<QTreeWidgetItem*>& Items);
 
 };
-
-#endif

@@ -34,11 +34,15 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_INTERIOR_HELPER_H__
-#define __ZE_INTERIOR_HELPER_H__
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
+
+ZE_META_FORWARD_DECLARE(ZEInterior, "ZEInterior.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+
+struct ZEInteriorResourceHelper;
 
 enum ZEInteriorHelperOwnerType
 {
@@ -46,72 +50,56 @@ enum ZEInteriorHelperOwnerType
 	ZE_IHOT_ROOM			= 1
 };
 
-class ZEInterior;
-struct ZEInteriorResourceHelper;
-class ZEInteriorRoom;
-
-class ZEInteriorHelper
+class ZEInteriorHelper : public ZEObject
 {
-private:
+	ZE_OBJECT
+	private:
+		ZEInterior*							OwnerInterior;
+		ZEInteriorHelperOwnerType			OwnerType;
+		ZEInteriorRoom*						OwnerRoom;
 
-	ZEInterior*							OwnerInterior;
+		const ZEInteriorResourceHelper*		HelperResource;
 
-	ZEInteriorHelperOwnerType			OwnerType;
+		ZEVector3							Position;
+		ZEVector3							Scale;
+		ZEQuaternion						Rotation;
 
-	ZEInteriorRoom*						OwnerRoom;
+											ZEInteriorHelper();
 
-	const ZEInteriorResourceHelper*		HelperResource;
+	public:
+		const char*							GetName();
+		ZEInteriorHelperOwnerType			GetOwnerType();
+		ZEInteriorRoom*						GetRoomOwner();
 
-	ZEVector3							Position;
-	ZEVector3							Scale;
-	ZEQuaternion						Rotation;
+		void								SetPosition(const ZEVector3& LocalPosition);
+		const ZEVector3&					GetPosition();
+		const ZEVector3						GetInteriorPosition();
+		const ZEVector3						GetWorldPosition();
 
-										ZEInteriorHelper();
+		void								SetRotation(const ZEQuaternion& LocalRotation);
+		const ZEQuaternion&					GetRotation();
+		const ZEQuaternion					GetInteriorRotation();
+		const ZEQuaternion					GetWorldRotation();
 
-public:
+		void								SetScale(const ZEVector3& LocalScale);
+		const ZEVector3&					GetScale();
+		const ZEVector3						GetInteriorScale();
+		const ZEVector3						GetWorldScale();
 
-	const char*							GetName();
+		ZEVector3							GetFront();
+		ZEVector3							GetRight();
+		ZEVector3							GetUp();
 
-	ZEInteriorHelperOwnerType			GetOwnerType();
+		ZEVector3							GetInteriorFront();
+		ZEVector3							GetInteriorRight();
+		ZEVector3							GetInteriorUp();
 
-	ZEInteriorRoom*						GetRoomOwner();
+		ZEVector3							GetWorldFront();
+		ZEVector3							GetWorldRight();
+		ZEVector3							GetWorldUp();
 
-	void								SetPosition(const ZEVector3& LocalPosition);
-	const ZEVector3&					GetPosition();
-	const ZEVector3						GetInteriorPosition();
-	const ZEVector3						GetWorldPosition();
+		void								Initialize(ZEInterior* Interior, const ZEInteriorResourceHelper* HelperResource);
+		void								Deinitialize();
 
-	void								SetRotation(const ZEQuaternion& LocalRotation);
-	const ZEQuaternion&					GetRotation();
-	const ZEQuaternion					GetInteriorRotation();
-	const ZEQuaternion					GetWorldRotation();
-
-	void								SetScale(const ZEVector3& LocalScale);
-	const ZEVector3&					GetScale();
-	const ZEVector3						GetInteriorScale();
-	const ZEVector3						GetWorldScale();
-
-	ZEVector3							GetFront();
-	ZEVector3							GetRight();
-	ZEVector3							GetUp();
-
-	ZEVector3							GetInteriorFront();
-	ZEVector3							GetInteriorRight();
-	ZEVector3							GetInteriorUp();
-
-	ZEVector3							GetWorldFront();
-	ZEVector3							GetWorldRight();
-	ZEVector3							GetWorldUp();
-
-	void								Initialize(ZEInterior* Interior, const ZEInteriorResourceHelper* HelperResource);
-	void								Deinitialize();
-
-	static ZEInteriorHelper*			CreateInstance();
-
-										
-
+		static ZEInteriorHelper*			CreateInstance();
 };
-
-
-
-#endif

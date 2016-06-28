@@ -1,0 +1,462 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>ZEDMainWindow</class>
+ <widget class="QMainWindow" name="ZEDMainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1307</width>
+    <height>856</height>
+   </rect>
+  </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
+  <property name="windowTitle">
+   <string>ZEditor</string>
+  </property>
+  <property name="windowIcon">
+   <iconset>
+    <normaloff>:/ApplicationIcon/ZEDITOR.ico</normaloff>:/ApplicationIcon/ZEDITOR.ico</iconset>
+  </property>
+  <property name="styleSheet">
+   <string/>
+  </property>
+  <property name="iconSize">
+   <size>
+    <width>24</width>
+    <height>24</height>
+   </size>
+  </property>
+  <widget class="QWidget" name="CentralWidget">
+   <layout class="QGridLayout">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
+    <property name="spacing">
+     <number>2</number>
+    </property>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1307</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuFile">
+    <property name="title">
+     <string>File</string>
+    </property>
+    <addaction name="actNew"/>
+    <addaction name="actOpen"/>
+    <addaction name="actClose"/>
+    <addaction name="separator"/>
+    <addaction name="actSave"/>
+    <addaction name="actSaveAs"/>
+    <addaction name="separator"/>
+    <addaction name="actExit"/>
+   </widget>
+   <widget class="QMenu" name="menuOperations">
+    <property name="title">
+     <string>Operations</string>
+    </property>
+    <addaction name="actSelect"/>
+    <addaction name="actMove"/>
+    <addaction name="actRotate"/>
+    <addaction name="actScale"/>
+    <addaction name="separator"/>
+    <addaction name="actHide"/>
+    <addaction name="actUnhide"/>
+    <addaction name="separator"/>
+    <addaction name="actFreeze"/>
+    <addaction name="actUnfreeze"/>
+    <addaction name="separator"/>
+    <addaction name="actGoToEntity"/>
+   </widget>
+   <widget class="QMenu" name="menuHelp">
+    <property name="title">
+     <string>Help</string>
+    </property>
+    <addaction name="actHelp"/>
+    <addaction name="actionTutorials"/>
+    <addaction name="separator"/>
+    <addaction name="actionEngine_Web"/>
+    <addaction name="separator"/>
+    <addaction name="actionAbout"/>
+   </widget>
+   <widget class="QMenu" name="menuWindows">
+    <property name="title">
+     <string>Windows</string>
+    </property>
+    <widget class="QMenu" name="menuToolbars">
+     <property name="title">
+      <string>Toolbars</string>
+     </property>
+     <addaction name="EditToolbarOpenAction"/>
+     <addaction name="OperationsToolbarOpenAction"/>
+    </widget>
+    <addaction name="separator"/>
+    <addaction name="menuToolbars"/>
+   </widget>
+   <widget class="QMenu" name="menuEdit">
+    <property name="title">
+     <string>Edit</string>
+    </property>
+    <addaction name="actUndo"/>
+    <addaction name="actRedo"/>
+    <addaction name="separator"/>
+    <addaction name="actClone"/>
+    <addaction name="DeleteAction"/>
+   </widget>
+   <widget class="QMenu" name="menuView">
+    <property name="title">
+     <string>View</string>
+    </property>
+    <widget class="QMenu" name="menuDraw">
+     <property name="title">
+      <string>Draw</string>
+     </property>
+     <addaction name="actMap"/>
+     <addaction name="actEntities"/>
+     <addaction name="actSkybox"/>
+    </widget>
+    <addaction name="actWireframe"/>
+    <addaction name="menuDraw"/>
+    <addaction name="actRenderType"/>
+    <addaction name="actOptions"/>
+    <addaction name="separator"/>
+    <addaction name="actGridToogle"/>
+   </widget>
+   <addaction name="menuFile"/>
+   <addaction name="menuEdit"/>
+   <addaction name="menuOperations"/>
+   <addaction name="menuView"/>
+   <addaction name="menuWindows"/>
+   <addaction name="menuHelp"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <action name="actSave">
+   <property name="text">
+    <string>Save</string>
+   </property>
+  </action>
+  <action name="actExit">
+   <property name="text">
+    <string>Exit</string>
+   </property>
+  </action>
+  <action name="actRotate">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Rotate</string>
+   </property>
+  </action>
+  <action name="actMove">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Move</string>
+   </property>
+  </action>
+  <action name="actScale">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Scale</string>
+   </property>
+  </action>
+  <action name="actHelp">
+   <property name="text">
+    <string>Help</string>
+   </property>
+  </action>
+  <action name="actNew">
+   <property name="text">
+    <string>New</string>
+   </property>
+  </action>
+  <action name="ObjectSellectorOpenAction">
+   <property name="text">
+    <string>Object Sellector</string>
+   </property>
+  </action>
+  <action name="actOpenConsole">
+   <property name="text">
+    <string>Console</string>
+   </property>
+  </action>
+  <action name="actOpenAssets">
+   <property name="text">
+    <string>Asserts</string>
+   </property>
+  </action>
+  <action name="PropertiesWindow_2">
+   <property name="text">
+    <string>Properties</string>
+   </property>
+  </action>
+  <action name="AboutOpenAction">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="GizmoOpenAction">
+   <property name="text">
+    <string>Gizmo</string>
+   </property>
+  </action>
+  <action name="actSelect">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Select</string>
+   </property>
+  </action>
+  <action name="DeleteAction">
+   <property name="text">
+    <string>Delete</string>
+   </property>
+  </action>
+  <action name="actHide">
+   <property name="text">
+    <string>Hide</string>
+   </property>
+  </action>
+  <action name="actUnhide">
+   <property name="text">
+    <string>Unhide</string>
+   </property>
+  </action>
+  <action name="actFreeze">
+   <property name="text">
+    <string>Freeze</string>
+   </property>
+  </action>
+  <action name="actUnfreeze">
+   <property name="text">
+    <string>Unfreeze</string>
+   </property>
+  </action>
+  <action name="OperationsToolbarOpenAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Operations</string>
+   </property>
+  </action>
+  <action name="EditToolbarOpenAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Edit</string>
+   </property>
+  </action>
+  <action name="FileToolbarOpenAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>File</string>
+   </property>
+  </action>
+  <action name="actClose">
+   <property name="text">
+    <string>Close</string>
+   </property>
+  </action>
+  <action name="SaveAsAction">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+  <action name="actClone">
+   <property name="text">
+    <string>Clone</string>
+   </property>
+  </action>
+  <action name="CutAction">
+   <property name="text">
+    <string>Cut</string>
+   </property>
+  </action>
+  <action name="PasteAction">
+   <property name="text">
+    <string>Paste</string>
+   </property>
+  </action>
+  <action name="actionIndex">
+   <property name="text">
+    <string>Index</string>
+   </property>
+  </action>
+  <action name="actionTutorials">
+   <property name="text">
+    <string>Tutorials</string>
+   </property>
+  </action>
+  <action name="actionEngine_Web">
+   <property name="text">
+    <string>Engine Web</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="text">
+    <string>About</string>
+   </property>
+  </action>
+  <action name="actWireframe">
+   <property name="text">
+    <string>Wireframe</string>
+   </property>
+  </action>
+  <action name="actMap">
+   <property name="text">
+    <string>Map</string>
+   </property>
+  </action>
+  <action name="actEntities">
+   <property name="text">
+    <string>Entities</string>
+   </property>
+  </action>
+  <action name="actSkybox">
+   <property name="text">
+    <string>Skybox</string>
+   </property>
+  </action>
+  <action name="actOptions">
+   <property name="text">
+    <string>Options</string>
+   </property>
+  </action>
+  <action name="actRenderType">
+   <property name="text">
+    <string>Render Type</string>
+   </property>
+  </action>
+  <action name="actGoToEntity">
+   <property name="text">
+    <string>Go To Entity</string>
+   </property>
+  </action>
+  <action name="Assert_BrowserOpenAction">
+   <property name="text">
+    <string>Assert Browser</string>
+   </property>
+  </action>
+  <action name="actionLoad_Environment">
+   <property name="text">
+    <string>Load Environment</string>
+   </property>
+  </action>
+  <action name="actOpen">
+   <property name="text">
+    <string>Open</string>
+   </property>
+  </action>
+  <action name="actSaveAs">
+   <property name="text">
+    <string>Save As</string>
+   </property>
+  </action>
+  <action name="QuickSelectorOpenAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Quick Selector</string>
+   </property>
+  </action>
+  <action name="actUndo">
+   <property name="text">
+    <string>Undo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Z</string>
+   </property>
+  </action>
+  <action name="actRedo">
+   <property name="text">
+    <string>Redo</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Y</string>
+   </property>
+  </action>
+  <action name="SceneListOpenAction">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>Scene List</string>
+   </property>
+  </action>
+  <action name="actGridToogle">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
+   </property>
+   <property name="text">
+    <string>Grid</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>actExit</sender>
+   <signal>triggered(bool)</signal>
+   <receiver>ZEDMainWindow</receiver>
+   <slot>close()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>535</x>
+     <y>460</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+</ui>

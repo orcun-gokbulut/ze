@@ -57,7 +57,7 @@
 #pragma warning(disable:4482 4996 4244 4800)
 
 template<typename ZEReturnType>
-inline ZEReturnType ZEVariant::ConvertIntegerValue() const
+inline ZEReturnType ZEVariant::ConvertValue() const
 {
 	if (ValueType.TypeQualifier ==  ZE_TQ_VALUE)
 	{
@@ -1081,9 +1081,15 @@ void ZEVariant::SetValue(const ZEValue& Value)
 			break;
 	}
 }
+
+bool ZEVariant::IsUndefined() const
+{
+	return (GetType().Type == ZE_TT_UNDEFINED);
+}
+
 ZEInt8 ZEVariant::GetInt8() const
 {
-	return ConvertIntegerValue<ZEInt8>();
+	return ConvertValue<ZEInt8>();
 }
 
 ZEInt8& ZEVariant::GetInt8Ref() const
@@ -1098,7 +1104,7 @@ const ZEInt8& ZEVariant::GetInt8ConstRef() const
 
 ZEInt16 ZEVariant::GetInt16() const
 {
-	return ConvertIntegerValue<ZEInt16>();
+	return ConvertValue<ZEInt16>();
 }
 
 ZEInt16& ZEVariant::GetInt16Ref() const
@@ -1113,7 +1119,7 @@ const ZEInt16& ZEVariant::GetInt16ConstRef() const
 
 ZEInt32 ZEVariant::GetInt32() const
 {
-	return ConvertIntegerValue<ZEInt32>();
+	return ConvertValue<ZEInt32>();
 }
 
 ZEInt32& ZEVariant::GetInt32Ref() const
@@ -1128,7 +1134,7 @@ const ZEInt32& ZEVariant::GetInt32ConstRef() const
 
 ZEInt64 ZEVariant::GetInt64() const
 {
-	return ConvertIntegerValue<ZEInt64>();
+	return ConvertValue<ZEInt64>();
 }
 
 ZEInt64& ZEVariant::GetInt64Ref() const
@@ -1143,7 +1149,7 @@ const ZEInt64& ZEVariant::GetInt64ConstRef() const
 
 ZEUInt8 ZEVariant::GetUInt8() const
 {
-	return ConvertIntegerValue<ZEUInt8>();
+	return ConvertValue<ZEUInt8>();
 }
 
 ZEUInt8& ZEVariant::GetUInt8Ref() const
@@ -1158,7 +1164,7 @@ const ZEUInt8& ZEVariant::GetUInt8ConstRef() const
 
 ZEUInt16 ZEVariant::GetUInt16() const
 {
-	return ConvertIntegerValue<ZEUInt16>();
+	return ConvertValue<ZEUInt16>();
 }
 
 ZEUInt16& ZEVariant::GetUInt16Ref() const
@@ -1173,7 +1179,7 @@ const ZEUInt16& ZEVariant::GetUInt16ConstRef() const
 
 ZEUInt32 ZEVariant::GetUInt32() const
 {
-	return ConvertIntegerValue<ZEUInt32>();
+	return ConvertValue<ZEUInt32>();
 }
 
 ZEUInt32& ZEVariant::GetUInt32Ref() const
@@ -1188,7 +1194,7 @@ const ZEUInt32& ZEVariant::GetUInt32ConstRef() const
 
 ZEUInt64 ZEVariant::GetUInt64() const
 {
-	return ConvertIntegerValue<ZEUInt64>();
+	return ConvertValue<ZEUInt64>();
 }
 
 ZEUInt64& ZEVariant::GetUInt64Ref() const
@@ -1203,7 +1209,7 @@ const ZEUInt64& ZEVariant::GetUInt64ConstRef() const
 
 float ZEVariant::GetFloat() const
 {
-	return ConvertIntegerValue<float>();
+	return ConvertValue<float>();
 }
 
 float& ZEVariant::GetFloatRef() const
@@ -1218,7 +1224,7 @@ const float& ZEVariant::GetFloatConstRef() const
 
 double ZEVariant::GetDouble() const
 {
-	return ConvertIntegerValue<double>();
+	return ConvertValue<double>();
 }
 
 double& ZEVariant::GetDoubleRef() const
@@ -1233,7 +1239,7 @@ const double& ZEVariant::GetDoubleConstRef() const
 
 bool ZEVariant::GetBool() const
 {
-	return ConvertIntegerValue<bool>();
+	return ConvertValue<bool>();
 }
 
 bool& ZEVariant::GetBoolRef() const
@@ -1248,7 +1254,7 @@ const bool& ZEVariant::GetBoolConstRef() const
 
 ZEInt32 ZEVariant::GetEnum() const
 {
-	return ConvertIntegerValue<ZEInt32>();
+	return ConvertValue<ZEInt32>();
 }
 
 const ZEVector2& ZEVariant::GetVector2() const
@@ -1635,6 +1641,8 @@ ZEValue ZEVariant::GetValue()
 ZEVariant::ZEVariant()
 {
 	Value.Pointer = NULL;
+	Deleter = NULL;
+	Cloner = NULL;
 }
 
 ZEVariant::ZEVariant(const ZEVariant& Value)

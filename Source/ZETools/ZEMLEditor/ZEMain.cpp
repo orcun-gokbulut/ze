@@ -34,10 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMLEditorWindow.h"
-#include "ZEFile/ZEPathManager.h"
-#include "ZEPlatform.h"
 
-#include <QtGui/QApplication>
+#include "ZEPlatform.h"
+#include "ZEFile/ZEPathManager.h"
+
+#include <QApplication>
 
 #ifdef ZE_PLATFORM_WINDOWS
 	#define  WIN32_LEAN_AND_MEAN

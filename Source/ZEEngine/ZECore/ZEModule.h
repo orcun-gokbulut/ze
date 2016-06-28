@@ -45,7 +45,6 @@
 class ZEModule : public ZEExtension
 {
 	ZE_MODULE(ZEModule)
-
 	private:
 		bool							Enabled;
 

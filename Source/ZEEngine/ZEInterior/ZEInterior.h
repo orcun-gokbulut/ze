@@ -52,26 +52,17 @@ class ZERay;
 class ZEViewVolume;
 class ZEViewFrustum;
 class ZEInteriorResource;
-class ZEInteriorRoom;
-class ZEInteriorDoor;
-class ZEInteriorHelper;
 
-struct ZEExtraRenderParameters
-{
-	ZEUInt			VertexOffset;
-	ZEUInt			VertexCount;
-	ZERNMaterial*	Material;
-	ZEInteriorRoom*	Room;
-};
+ZE_META_FORWARD_DECLARE(ZEInteriorRoom, "ZEInteriorRoom.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorDoor, "ZEInteriorDoor.h");
+ZE_META_FORWARD_DECLARE(ZEInteriorHelper, "ZEInteriorHelper.h");
 
 class ZEInterior : public ZEEntity
 {
+	ZE_OBJECT
 	friend class ZEInteriorDoor;
 	friend class ZEInteriorHelper;
 	friend class ZEInteriorDebugDrawer;
-
-	ZE_OBJECT
-
 	private:
 		const ZEInteriorResource*				InteriorResource;
 
@@ -83,12 +74,11 @@ class ZEInterior : public ZEEntity
 		void									LoadInteriorResource();
 
 		static bool								GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor* Door, const ZEViewVolume* OldViewVolume);
-		void									CullRoom(ZEInteriorDoor* Door, const ZERNCullParameters* CullParameters, ZEViewVolume* ViewVolume);
-		void									CullRooms(const ZERNCullParameters* CullParameters);
+		void									CullRoom(ZEInteriorDoor* Door, const ZERNPreRenderParameters* Parameters, ZEViewVolume* ViewVolume);
+		void									CullRooms(const ZERNPreRenderParameters* Parameters);
 
 		virtual	void							ParentTransformChanged();
 
-	protected:
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
 
@@ -115,10 +105,8 @@ class ZEInterior : public ZEEntity
 		void									SetCullMode(ZEInteriorCullMode Value);
 		ZEInteriorCullMode						GetCullMode() const;
 
-		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
-		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
-
-		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 		static ZEInterior*						CreateInstance();
 };

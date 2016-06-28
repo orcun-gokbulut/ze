@@ -55,12 +55,10 @@ typedef ZEFlags ZECameraSettingFlags;
 class ZECamera : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
 		mutable ZECameraDirtyFlags		CameraDirtyFlags;
 		mutable ZERNView				View;
 
-		ZEGRViewport					Viewport;
 		ZEViewFrustum					ViewFrustum;
 		bool							AutoAspectRatio;
 
@@ -122,7 +120,7 @@ class ZECamera : public ZEEntity
 		const ZERNView&					GetView();
 		const ZEViewVolume&				GetViewVolume();
 
-		void							GetScreenRay(ZERay& Ray, ZEInt ScreenX, ZEInt ScreenY);
+		ZERay							GetScreenRay(ZEInt ScreenX, ZEInt ScreenY);
 		ZEVector2						GetScreenPosition(const ZEVector3& WorldPosition);
 
 		static ZECamera*				CreateInstance();

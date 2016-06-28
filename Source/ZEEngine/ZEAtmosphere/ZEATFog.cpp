@@ -44,7 +44,6 @@
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNStagePostProcess.h"
 
 #define	ZEAT_FDF_SHADERS			1
@@ -222,12 +221,12 @@ const ZEVector3& ZEATFog::GetColor() const
 	return Constants.Color;
 }
 
-bool ZEATFog::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATFog::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	CullParameters->Renderer->AddCommand(&Command);
+	Parameters->Renderer->AddCommand(&Command);
 
 	return true;
 }
@@ -238,7 +237,7 @@ void ZEATFog::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	const ZEGRRenderTarget* RenderTarget = Stage->GetProvidedInput(ZERN_SO_COLOR);
 	//const ZEGRTexture* DepthMap = Stage->GetOutput(ZERN_SO_DEPTH);

@@ -35,11 +35,11 @@
 
 #include "ZERNRenderer.h"
 
-#include "ZERNCuller.h"
 #include "ZERNStage.h"
 #include "ZERNCommand.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNRenderParameters.h"
+#include "ZECore\ZECore.h"
 #include "ZEGame\ZEScene.h"
 #include "ZEGame\ZEEntity.h"
 #include "ZEGraphics\ZEGRShader.h"
@@ -52,40 +52,50 @@
 #include "ZEGraphics\ZEGRConstantBuffer.h"
 #include "ZEGraphics\ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics\ZEGRSampler.h"
-#include "ZECore\ZECore.h"
 
 static ZEInt CompareCommands(const ZERNCommand* A, const ZERNCommand* B)
 {
-	if (A->Priority < B->Priority)
+	if (A->SceneIndex < B->SceneIndex)
+	{
 		return -1;
-	else if (A->Priority > B->Priority)
+	}
+	else if (A->SceneIndex > B->SceneIndex)
+	{
 		return 1;
+	}
 	else
-		return (ZEInt)(A->Order - B->Order);
+	{
+		if (A->Priority < B->Priority)
+			return -1;
+		else if (A->Priority > B->Priority)
+			return 1;
+		else
+			return (ZEInt)(A->Order - B->Order);
+	}
 }
 
 void ZERNRenderer::CreatePredefinedSamplers()
 {
-	ZEHolder<ZEGRSampler> SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
+	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
 	ZEGRSamplerDescription SamplerLinearWrapDescription;
 	SamplerLinearWrapDescription.AddressU = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressV = ZEGR_TAM_WRAP;
 	SamplerLinearWrapDescription.AddressW = ZEGR_TAM_WRAP;
-	ZEHolder<ZEGRSampler> SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
+	SamplerLinearWrap = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
 
 	ZEGRSamplerDescription SamplerLinearBorderZeroDescription;
 	SamplerLinearBorderZeroDescription.AddressU = ZEGR_TAM_BORDER;
 	SamplerLinearBorderZeroDescription.AddressV = ZEGR_TAM_BORDER;
 	SamplerLinearBorderZeroDescription.AddressW = ZEGR_TAM_BORDER;
 	SamplerLinearBorderZeroDescription.BorderColor = ZEVector4::Zero;
-	ZEHolder<ZEGRSampler> SamplerLinearBorderZero = ZEGRSampler::GetSampler(SamplerLinearBorderZeroDescription);
+	SamplerLinearBorderZero = ZEGRSampler::GetSampler(SamplerLinearBorderZeroDescription);
 
 	ZEGRSamplerDescription SamplerPointClampDescription;
 	SamplerPointClampDescription.MinFilter = ZEGR_TFM_POINT;
 	SamplerPointClampDescription.MagFilter = ZEGR_TFM_POINT;
 	SamplerPointClampDescription.MipFilter = ZEGR_TFM_POINT;
-	ZEHolder<ZEGRSampler> SamplerPointClamp = ZEGRSampler::GetSampler(SamplerPointClampDescription);
+	SamplerPointClamp = ZEGRSampler::GetSampler(SamplerPointClampDescription);
 
 	ZEGRSamplerDescription SamplerPointWrapDescription;
 	SamplerPointWrapDescription.MinFilter = ZEGR_TFM_POINT;
@@ -94,7 +104,7 @@ void ZERNRenderer::CreatePredefinedSamplers()
 	SamplerPointWrapDescription.AddressU = ZEGR_TAM_WRAP;
 	SamplerPointWrapDescription.AddressV = ZEGR_TAM_WRAP;
 	SamplerPointWrapDescription.AddressW = ZEGR_TAM_WRAP;
-	ZEHolder<ZEGRSampler> SamplerPointWrap = ZEGRSampler::GetSampler(SamplerPointWrapDescription);
+	SamplerPointWrap = ZEGRSampler::GetSampler(SamplerPointWrapDescription);
 
 	ZEGRSamplerDescription SamplerComparisonLinearPointClampDescription;
 	SamplerComparisonLinearPointClampDescription.MinFilter = ZEGR_TFM_LINEAR;
@@ -104,10 +114,7 @@ void ZERNRenderer::CreatePredefinedSamplers()
 	SamplerComparisonLinearPointClampDescription.AddressV = ZEGR_TAM_CLAMP;
 	SamplerComparisonLinearPointClampDescription.AddressW = ZEGR_TAM_CLAMP;
 	SamplerComparisonLinearPointClampDescription.ComparisonFunction = ZEGR_CF_GREATER;
-	ZEHolder<ZEGRSampler> SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerComparisonLinearPointClampDescription);
-
-	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
-	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
+	SamplerComparisonLinearPointClamp = ZEGRSampler::GetSampler(SamplerComparisonLinearPointClampDescription);
 }
 
 void ZERNRenderer::UpdateConstantBuffers()
@@ -125,8 +132,8 @@ void ZERNRenderer::UpdateConstantBuffers()
 	Buffer->InvProjectionTransform = View.InvProjectionTransform;			
 	Buffer->InvViewProjectionTransform = View.InvViewProjectionTransform;
 
-	Buffer->Width = View.Viewport != NULL ? View.Viewport->GetWidth() : 0.0f;
-	Buffer->Height = View.Viewport != NULL ? View.Viewport->GetHeight() : 0.0f;
+	Buffer->Width = View.Viewport.GetWidth();
+	Buffer->Height = View.Viewport.GetHeight();
 	Buffer->VerticalFOV = View.VerticalFOV;
 	Buffer->HorizontalFOV = View.HorizontalFOV;
 	Buffer->AspectRatio = View.AspectRatio;
@@ -170,21 +177,6 @@ void ZERNRenderer::UpdateConstantBuffers()
 		0.0f, 0.0f, 1.0f);
 	RendererConstants.ScreenTransform = ScreenTransform.ToMatrix3x3Shader();
 	RendererConstantBuffer->SetData(&RendererConstants);
-
-	SceneConstants.AmbientColor = Scene->GetAmbientColor() * Scene->GetAmbientFactor();
-	SceneConstantBuffer->SetData(&SceneConstants);
-}
-
-void ZERNRenderer::Cull()
-{
-	ZERNCullParameters CullParameters;
-	CullParameters.Renderer = this;
-	CullParameters.View = &View;
-
-	ZESceneCuller Culler;
-	Culler.SetScene(Scene);
-	Culler.SetCullParameters(CullParameters);
-	Culler.Cull();
 }
 
 void ZERNRenderer::SortStageCommands()
@@ -195,28 +187,33 @@ void ZERNRenderer::SortStageCommands()
 
 void ZERNRenderer::RenderStages()
 {
-	if(Context == NULL)
+	if (Context == NULL)
 		Context = ZEGRGraphicsModule::GetInstance()->GetMainContext();
 
 	ZERNRenderParameters Parameters;
 	Parameters.FrameId = 0;
 	Parameters.ElapsedTime = RendererConstants.Elapsedtime;
 	Parameters.Time = 0;
-	Parameters.Scene = Scene;
 	Parameters.Context = Context;
 	Parameters.View = &View;
 	Parameters.Renderer = this;
-	Parameters.Type = ZERN_DT_NORMAL;
 
 	UpdateConstantBuffers();
 
-	ZEGRConstantBuffer* PrevViewConstantBuffer;
-	ZEGRConstantBuffer* PrevRendererConstantBuffer;
-	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_VIEW, &PrevViewConstantBuffer);
-	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, &PrevRendererConstantBuffer);
+	ZEGRSampler* Samplers[] = {SamplerLinearClamp, SamplerLinearWrap, SamplerLinearBorderZero, SamplerPointClamp, SamplerPointWrap, SamplerComparisonLinearPointClamp};
+	Context->SetSamplers(ZEGR_ST_PIXEL, 10, 6, Samplers);
 
-	ZEGRConstantBuffer* ConstantBuffers[] = {RendererConstantBuffer, SceneConstantBuffer, ViewConstantBuffer};
-	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, ConstantBuffers);
+	ZEGRConstantBuffer* PrevRendererConstantBuffer;
+	ZEGRConstantBuffer* PrevViewConstantBuffer;
+	ZEGRConstantBuffer* PrevSceneConstantBuffer;
+	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_RENDERER, &PrevRendererConstantBuffer);
+	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_VIEW, &PrevViewConstantBuffer);
+	Context->GetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_SCENE, &PrevSceneConstantBuffer);
+
+	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, PrevViewConstantBuffer, PrevSceneConstantBuffer};
+
+	ZEGRConstantBuffer* ConstantBuffers[] = {RendererConstantBuffer, ViewConstantBuffer};
+	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 2, ConstantBuffers);
 
 	if(OutputRenderTarget != NULL)
 	{
@@ -235,8 +232,15 @@ void ZERNRenderer::RenderStages()
 			continue;
 
 		Parameters.Stage = Stage.GetPointer();
+		ZEInt LastSceneIndex = -1;
 		ze_for_each(Command, Stage->Commands)
 		{
+			if (Command->SceneIndex != LastSceneIndex)
+			{
+				Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, 1, SceneConstants[Command->SceneIndex].GetPointerToPointer());
+				LastSceneIndex = Command->SceneIndex;
+			}
+
 			Parameters.Command = Command.GetPointer();
 			Command->Execute(&Parameters);
 		}
@@ -246,12 +250,14 @@ void ZERNRenderer::RenderStages()
 
 	CleanCommands();
 
-	ZEGRConstantBuffer* PrevConstantBuffers[] = {PrevRendererConstantBuffer, SceneConstantBuffer, PrevViewConstantBuffer};
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
 }
 
 bool ZERNRenderer::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	ze_for_each(Stage, Stages)
 	{
 		if (!Stage->Initialize())
@@ -263,7 +269,6 @@ bool ZERNRenderer::InitializeSelf()
 
 	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
 	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
-	SceneConstantBuffer = ZEGRConstantBuffer::Create(sizeof(SceneConstants));
 
 	CreatePredefinedSamplers();
 
@@ -273,10 +278,12 @@ bool ZERNRenderer::InitializeSelf()
 void ZERNRenderer::DeinitializeSelf()
 {
 	CleanCommands();
+	CleanStages();
 
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
-	SceneConstantBuffer.Release();
+
+	ZEInitializable::DeinitializeSelf();
 }
 
 void ZERNRenderer::SetContext(ZEGRContext* Context)
@@ -297,16 +304,6 @@ void ZERNRenderer::SetView(const ZERNView& View)
 const ZERNView& ZERNRenderer::GetView()
 {
 	return View;
-}
-
-void ZERNRenderer::SetScene(ZEScene* Scene)
-{
-	this->Scene = Scene;
-}
-
-ZEScene* ZERNRenderer::GetScene()
-{
-	return Scene;
 }
 
 void ZERNRenderer::SetOutputRenderTarget(ZEGRRenderTarget* OutputRenderTarget)
@@ -378,8 +375,20 @@ void ZERNRenderer::CleanStages()
 	}
 }
 
+void ZERNRenderer::StartScene(const ZEGRConstantBuffer* ConstantBuffer)
+{
+	SceneConstants.Add(ConstantBuffer);
+}
+
+void ZERNRenderer::EndScene()
+{
+
+}
+
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
+	Command->SceneIndex = SceneConstants.GetCount() - 1;
+
 	ze_for_each(Stage, Stages)
 	{
 		if ((Command->StageMask & Stage->GetId()) == 0)
@@ -411,6 +420,7 @@ void ZERNRenderer::RemoveCommand(ZERNCommand* Command)
 
 void ZERNRenderer::CleanCommands()
 {
+	SceneConstants.Clear();
 	ze_for_each(Stage, Stages)
 		Stage->Commands.Clean();
 }
@@ -429,24 +439,18 @@ bool ZERNRenderer::ContainsCommand(ZERNCommand* Command)
 	return false;
 }
 
-void ZERNRenderer::Render(float ElapsedTime)
+void ZERNRenderer::Render()
 {
 	if (!IsInitialized())
 		return;
 
-	if (Scene != NULL)
-	{
-		Cull();
-		SortStageCommands();
-	}
-
+	SortStageCommands();
 	RenderStages();
 }
 
 ZERNRenderer::ZERNRenderer()
 {
 	Context = NULL;
-	Scene = NULL;
 	OutputRenderTarget = NULL;
 }
 

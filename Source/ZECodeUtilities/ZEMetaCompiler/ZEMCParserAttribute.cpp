@@ -52,7 +52,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 		ZE_PAS_PARAMETER_START,
 		ZE_PAS_PARAMETER,
 		ZE_PAS_PARAMETER_END,
-		ZE_PAS_QUATATION,
+		ZE_PAS_QUOTATION,
 		ZE_PAS_ESCAPE
 	} State = ZE_PAS_PARAMETER_START;
 
@@ -67,18 +67,20 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 				{
 					AttributeIndex++;
 				}
-				else if (isalnum(InputCharacter))
+				else if (isalnum(InputCharacter) || 
+					InputCharacter == '@' || InputCharacter == '~' || InputCharacter ==  '*' ||
+					InputCharacter == '+' || InputCharacter == '-' || InputCharacter ==  '%' ||	InputCharacter == '!') 
 				{
 					State = ZE_PAS_PARAMETER;
 				}
 				else if (InputCharacter == '\"')
 				{
-					State = ZE_PAS_QUATATION;
+					State = ZE_PAS_QUOTATION;
 					AttributeIndex++;
 				}
 				else
 				{
-					RaiseError(Attribute->getLocation(), "Wrong identifier name.");
+					RaiseError(Attribute->getLocation(), "Wrong ZEMeta attribute identifier name.");
 					return false;
 				}				
 				break;
@@ -93,22 +95,24 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 					State == ZE_PAS_PARAMETER_END;
 					AttributeIndex++;
 				}
-				else if (!isalnum(InputCharacter))
-				{
-					RaiseError(Attribute->getLocation(), "Wrong identifier name.");
-					return false;
-				}
-				else
+				else if (isalnum(InputCharacter) || InputCharacter == ':' || InputCharacter == '.' || 
+					InputCharacter == '@' || InputCharacter == '~' || InputCharacter ==  '*' ||
+					InputCharacter == '+' || InputCharacter == '-' || InputCharacter ==  '%' ||	InputCharacter == '!')
 				{
 					if (ParameterTextIndex >= 1024)
 					{
-						RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+						RaiseError(Attribute->getLocation(), "ZEMeta attribute max parameter size reached.");
 						return false;
 					}
 
 					ParameterText[ParameterTextIndex] = InputCharacter;
 					ParameterTextIndex++;
 					AttributeIndex++;
+				}
+				else
+				{
+					RaiseError(Attribute->getLocation(), "Wrong ZEMeta attribute identifier name.");
+					return false;
 				}
 				break;
 
@@ -123,22 +127,27 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 					if (ParameterIndex == 0)
 						Data.Name = ParameterText;
 					else
-						Data.Parameters.Add(ParameterText);
+						Data.Values.Add(ParameterText);
 
 					ParameterIndex++;
 					State = ZE_PAS_PARAMETER_START;
 					ParameterTextIndex = 0;
 					AttributeIndex++;
 				}
+				else if (InputCharacter == '\"')
+				{
+					State = ZE_PAS_QUOTATION;
+					AttributeIndex++;
+				}
 				else
 				{
-					RaiseError(Attribute->getLocation(), "Wrong parameter termination character.");
+					RaiseError(Attribute->getLocation(), "Wrong ZEMeta attribute parameter termination character.");
 					return false;
 				}
 				break;
 
 
-			case ZE_PAS_QUATATION:
+			case ZE_PAS_QUOTATION:
 				if (InputCharacter == '\\')
 				{
 					State = ZE_PAS_ESCAPE;
@@ -153,7 +162,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 				{
 					if (ParameterTextIndex >= 1024)
 					{
-						RaiseError(Attribute->getLocation(), "Max parameter size reached.");
+						RaiseError(Attribute->getLocation(), "ZEMeta attribute max parameter size reached.");
 						return false;
 					}
 					ParameterText[ParameterTextIndex] = InputCharacter;
@@ -196,7 +205,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 			}
 
 			AttributeIndex++;
-			State = ZE_PAS_QUATATION;
+			State = ZE_PAS_QUOTATION;
 		}
 	}
 
@@ -206,7 +215,7 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 		if (Data.Name.IsEmpty())
 			Data.Name = ParameterText;
 		else
-			Data.Parameters.Add(ParameterText);
+			Data.Values.Add(ParameterText);
 
 		ParameterTextIndex = 0;
 		AttributeIndex++;
@@ -222,28 +231,20 @@ bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribu
 
 void ZEMCParser::ParseAttributes(ZEMCDeclaration* Decleration, Decl* ClangDecl)
 {
-	for(Decl::attr_iterator CurrentAttr = ClangDecl->attr_begin(); CurrentAttr != ClangDecl->attr_end(); CurrentAttr++)
+	if (!ClangDecl->hasAttr<AnnotateAttr>())
+		return;
+
+	clang::AttrVec& Attributes = ClangDecl->getAttrs();
+	for (ZESSize I =  Attributes.size() - 1; I >= 0; I--)
 	{
+		if (!AnnotateAttr::classof(Attributes[I]))
+			continue;
+
 		ZEMCAttribute Attribute;
-		if (ParseAttribute(Attribute, ((AnnotateAttr*)(*CurrentAttr))))
-			Decleration->Attributes.Add(Attribute);
+		if (!ParseAttribute(Attribute, static_cast<AnnotateAttr*>(Attributes[I])))
+			continue;
+
+		Attribute.Owner = Decleration;
+		Decleration->AttributeStack.Add(Attribute);
 	}
-}
-
-bool ZEMCParser::CheckAttribute(ZEMCDeclaration* Declaration, const char* AttributeName)
-{
-	for (int I = 0; I < Declaration->Attributes.GetCount(); I++)
-		if (Declaration->Attributes[I].Name == AttributeName)
-			return true;
-
-	return false;
-}
-
-const ZEArray<ZEString>* ZEMCParser::GetAttribute(ZEMCDeclaration* Declaration, const char* AttributeName)
-{
-	for (int I = 0; I < Declaration->Attributes.GetCount(); I++)
-		if (Declaration->Attributes[I].Name == AttributeName)
-			return &Declaration->Attributes[I].Parameters;
-
-	return NULL;
 }

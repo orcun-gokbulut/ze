@@ -64,10 +64,14 @@ ze_add_source(ZEOperationChangePropertyValue.h		Sources)
 ze_add_source(ZEOperationDeleteElements.cpp			Sources)
 ze_add_source(ZEOperationDeleteElements.h			Sources)
 
-qt4_wrap_ui(QtUIOutputs ${QtUIs})
-qt4_wrap_cpp(QtMocOutputs  ${QtMocs})
-qt4_add_resources(QtResourceOutputs ${QtResources})
+qt5_wrap_ui(QtUIOutputs ${QtUIs})
+qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
+qt5_add_resources(QtResourceOutputs ${QtResources})
+
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
 
 ze_add_executable(TARGET ZEMLEditor 
 	SOURCES ${Sources} ${QtMocOutputs} ${QtUIOutputs} ${QtResourceOutputs}
-	LIBS ZEFoundation libQt libMSVCRv100)
+	LIBS ZEFoundation)
+	
+qt5_use_modules(ZEMLEditor Widgets)

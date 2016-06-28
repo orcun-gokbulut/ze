@@ -37,8 +37,18 @@ macro (ze_platform_init)
 	if (NOT ZEBUILD_HAVE_TOOLCHAIN_FILE)
 		ze_platform_auto_init()
 	endif()
+
+	if (EXISTS "${CMAKE_BINARY_DIR}/ZEPlatform.txt")
+		file(READ "${CMAKE_BINARY_DIR}/ZEPlatform.txt" ZEPLATFORM_TXT)
+		if (NOT(ZEPLATFORM_TXT STREQUAL ZEBUILD_PLATFORM_NAME))
+			ze_platform_generate_zeplatform_h()
+		endif()	
+	else()
+		ze_platform_generate_zeplatform_h()
+	endif()
 	
-	ze_platform_generate_zeplatform_h()
+	message(STATUS "")
+	message(STATUS "")
 endmacro()
 
 macro (ze_platform_auto_init)
@@ -260,11 +270,11 @@ macro (ze_platform_auto_init)
 	message(STATUS "[ZEBuild] DLL Extension : ${ZEBUILD_PLATFORM_DLL_EXTENSION}")
 	message(STATUS "[ZEBuild] Bin Extension : ${ZEBUILD_PLATFORM_BIN_EXTENSION}")
 	message(STATUS "[ZEBuild] Platform has been detected.")
-	message(STATUS "")
-	message(STATUS "")
 endmacro()
 
 macro(ze_platform_generate_zeplatform_h)
+	message(STATUS "[ZEBuild] Generating ZEPlatform.h.")
+	
 	if (ZEBUILD_PLATFORM_UNIX)
 		set(VAR_PLATFORMS ${VAR_PLATFORMS} "#define ZE_PLATFORM_UNIX\n")
 	endif()
@@ -300,7 +310,8 @@ macro(ze_platform_generate_zeplatform_h)
 	if (ZEBUILD_PLATFORM_PS3)      
 		set(VAR_PLATFORMS ${VAR_PLATFORMS} "#define ZE_PLATFORM_PS3\n")
     endif()
-	
+
+	file(WRITE "${CMAKE_BINARY_DIR}/ZEPlatform.txt" "${ZEBUILD_PLATFORM_NAME}")
 	file(WRITE "${CMAKE_BINARY_DIR}/ZEPlatform.h"
 		"// ZEBuild - Auto Generated Platform File - DO NOT MODIFY ! \n"
 		"////////////////////////////////////////////////////////////////////////\n\n"

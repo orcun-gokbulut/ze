@@ -35,29 +35,22 @@
 
 #pragma once
 
+#include "ZEDCore/ZEDEditorCore.h"
+#include "ZEDSceneEditor/ZEDSceneEditor.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
-#include <QtGui/QApplication>
-
-#include "ZETypes.h"
-#include "ZEDSceneEditor/ZEDSceneEditor.h"
-#include "ZEDMaterialEditor/ZEDMaterialEditor.h"
-#include "ZEDBrowser/ZEDBrowser.h"
-#include "ZEDNodeEditor/ZEDNodeEditor.h"
-
 ZEInt __stdcall WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, ZEInt nCmdShow)
 {
-	ZEInt argc = 0;
-	char** argv = NULL;
+	ZEDEditorCore* Core = ZEDEditorCore::CreateInstance();
+	if (!Core->Initialize())
+		return EXIT_FAILURE;
 
-	QApplication a(argc, argv);
-	MapEditor w;
-	//ZEDMaterialEditor w;
-	// ZEDBrowser w;
-	// ZEDNodeEditor w;
+	Core->ExecuteEditor(ZEDSceneEditor::CreateInstance());
+	Core->Execute();
 
-	w.show();
-	a.connect(&a, SIGNAL(lastWindowClosed()), &a, SLOT(quit()));
-	return a.exec();
+	Core->Deinitialize();
+
+	return EXIT_SUCCESS;
 }

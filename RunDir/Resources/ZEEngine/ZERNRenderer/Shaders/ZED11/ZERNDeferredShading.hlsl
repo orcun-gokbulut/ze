@@ -61,6 +61,8 @@ struct ZERNDeferredShading_PixelShader_Input
 	uint	InstanceID			: SV_InstanceID;
 };
 
+Texture2D<float3>	TiledDeferredOutputTexture	: register(t5);
+
 ZERNShading_Surface ZERNDeferredShading_GetSurfaceDataFromGBuffers(float2 PositionViewport, uint SampleIndex = 0)
 {
 	ZERNShading_Surface Surface;
@@ -74,12 +76,16 @@ ZERNShading_Surface ZERNDeferredShading_GetSurfaceDataFromGBuffers(float2 Positi
 	return Surface;
 }
 
-float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID)
+float3 ZERNDeferredShading_Shade(ZERNShading_Surface Surface, uint InstanceID, uint2 PixelCoord = 0.0f)
 {
 	float3 ResultColor = 0.0f;
 	
 	#if defined ZERN_RENDER_DIRECTIONAL_LIGHT
-		ResultColor = ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[InstanceID], Surface);
+		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
+			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
+		
+		if (ZERNShading_AddTiledDeferredOutput)
+			ResultColor += TiledDeferredOutputTexture[PixelCoord];
 	#elif defined ZERN_RENDER_PROJECTIVE_LIGHT
 		ResultColor = ZERNShading_ProjectiveShading(ZERNShading_ProjectiveLights[InstanceID], Surface);
 	#elif defined ZERN_RENDER_POINT_LIGHT
@@ -110,14 +116,30 @@ ZERNDeferredShading_VertexShader_Output ZERNDeferredShading_VertexShader_Lightin
 
 float3 ZERNDeferredShading_PixelShader_LightingStage(ZERNDeferredShading_PixelShader_Input Input) : SV_Target0
 {
+	#ifdef MSAA_ENABLED
+		uint2 PixelCoord = floor(Input.PositionViewport.xy) * uint2(2, 2);
+	#else
+		uint2 PixelCoord = Input.PositionViewport.xy;
+	#endif
+			
 	ZERNShading_Surface Surface = ZERNDeferredShading_GetSurfaceDataFromGBuffers(Input.PositionViewport.xy);
-	return ZERNDeferredShading_Shade(Surface, Input.InstanceID);
+	float3 ResultColor = ZERNDeferredShading_Shade(Surface, Input.InstanceID, PixelCoord);
+	
+	return ResultColor;
 }
 
 float3 ZERNDeferredShading_PixelShader_PerSample_LightingStage(ZERNDeferredShading_PixelShader_Input Input, uint SampleIndex : SV_SampleIndex) : SV_Target0
 {
+	#ifdef MSAA_ENABLED
+		uint2 PixelCoord = floor(Input.PositionViewport.xy) * uint2(2, 2) + uint2(SampleIndex & 1, SampleIndex > 1);
+	#else
+		uint2 PixelCoord = Input.PositionViewport.xy;
+	#endif
+	
 	ZERNShading_Surface Surface = ZERNDeferredShading_GetSurfaceDataFromGBuffers(Input.PositionViewport.xy, SampleIndex);
-	return ZERNDeferredShading_Shade(Surface, Input.InstanceID);
+	float3 ResultColor = ZERNDeferredShading_Shade(Surface, Input.InstanceID, PixelCoord);
+	
+	return ResultColor;
 }
 
 float3 ZERNDeferredShading_Accumulate_Emissive_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
@@ -128,24 +150,36 @@ float3 ZERNDeferredShading_Accumulate_Emissive_PixelShader_Main(float4 PositionV
 void ZERNDeferredShading_EdgeDetection_PixelShader_Main(float4 PositionViewport : SV_Position)
 {
 	ZERNShading_Surface Surfaces[SAMPLE_COUNT];
-	[unroll]
-    for (uint I = 0; I < SAMPLE_COUNT; I++)
-	{
-		Surfaces[I].PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy, I));
-		Surfaces[I].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, I);
-	}
 	
+	Surfaces[0].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport.xy, 0));
+	Surfaces[0].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, 0);
+		
 	bool EdgePixel = false;
 	[unroll]
-	for (uint J = 1; J < SAMPLE_COUNT; J++)
+	for (uint S = 1; S < SAMPLE_COUNT; S++)
 	{
-		if (abs(Surfaces[J].PositionView.z - Surfaces[0].PositionView.z) > 0.1f ||
-			dot(Surfaces[J].NormalView, Surfaces[0].NormalView) < 0.99f)
-			EdgePixel = true;	
+		Surfaces[S].PositionView.z = ZERNTransformations_HomogeneousToViewDepth(ZERNGBuffer_GetDepth(PositionViewport.xy, S));
+		Surfaces[S].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, S);
+	
+		EdgePixel = EdgePixel || (abs(Surfaces[S].PositionView.z - Surfaces[0].PositionView.z) > 0.1f) || (dot(Surfaces[S].NormalView, Surfaces[0].NormalView) < 0.99f);
 	}
 	
 	if (!EdgePixel)
 		discard;
+}
+
+float3 ZERNDeferredShading_Blend_PixelShader_Main(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	uint2 PixelCoord = floor(PositionViewport.xy) * uint2(2, 2);
+	
+	return TiledDeferredOutputTexture[PixelCoord];
+}
+
+float3 ZERNDeferredShading_BlendPerSample_PixelShader_Main(float4 PositionViewport : SV_Position, uint SampleIndex : SV_SampleIndex) : SV_Target0
+{
+	uint2 PixelCoord = floor(PositionViewport.xy) * uint2(2, 2) + uint2(SampleIndex & 1, SampleIndex > 1);
+	
+	return TiledDeferredOutputTexture[PixelCoord];
 }
 
 #endif

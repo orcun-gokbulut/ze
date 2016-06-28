@@ -35,18 +35,18 @@
 
 #pragma once
 
-enum ZEInitializationState
+enum ZEBaseState
 {
-	ZE_IS_NOT_INITIALIZED				= 0,
-	ZE_IS_INITIALIZING					= 1,
-	ZE_IS_INITIALIZED					= 2,
-	ZE_IS_DEINITIALIZING				= 3
+	ZE_BS_NOT_INITIALIZED				= 0,
+	ZE_BS_INITIALIZING					= 1,
+	ZE_BS_INITIALIZED					= 2,
+	ZE_BS_DEINITIALIZING				= 3
 };
 
 class ZEBase
 {
 	private:
-		ZEInitializationState	InitializationState;
+		ZEBaseState				InitializationState;
 
 	protected:
 		virtual bool			InitializeSelf();
@@ -56,8 +56,9 @@ class ZEBase
 		virtual					~ZEBase();
 
 	public:
-		ZEInitializationState	GetInitializationState() const;
+		ZEBaseState				GetInitializationState() const;
 		bool					IsInitialized() const;
+
 		bool					Initialize();
 		bool					Deinitialize();
 

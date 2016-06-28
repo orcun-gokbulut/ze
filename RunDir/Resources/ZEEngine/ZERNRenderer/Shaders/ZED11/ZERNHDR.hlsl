@@ -54,22 +54,22 @@
 #define ZERN_HTMO_FILMIC				4
 #define ZERN_HTMO_UNCHARTED				5
 
-cbuffer ZERNHDR_Constants								: register(b8)
+cbuffer ZERNHDR_Constants													: register(b8)
 {	
-	float			ZERNHDR_Key;
-	float			ZERNHDR_WhiteLevel;
-	float			ZERNHDR_BloomFactor;
-	float			ZERNHDR_BloomThreshold;
+	float								ZERNHDR_Key;
+	float								ZERNHDR_WhiteLevel;
+	float								ZERNHDR_BloomFactor;
+	float								ZERNHDR_BloomThreshold;
 	
-	bool			ZERNHDR_AutoKey;
-	uint			ZERNHDR_ToneMapOperator;
-	bool			ZERNHDR_BloomEnabled;
-	float			ZERNHDR_Saturation;
-
-	float			ZERNHDR_LuminanceMin;
-	float			ZERNHDR_LuminanceMax;
-	float			ZERNHDR_Reserved1;
-	float			ZERNHDR_Reserved2;
+	bool								ZERNHDR_AutoKey;
+	uint								ZERNHDR_ToneMapOperator;
+	bool								ZERNHDR_BloomEnabled;
+	float								ZERNHDR_Saturation;
+	
+	float								ZERNHDR_LuminanceMin;
+	float								ZERNHDR_LuminanceMax;
+	float								ZERNHDR_Reserved1;
+	float								ZERNHDR_Reserved2;
 };
 
 static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.072169f);
@@ -77,13 +77,13 @@ static const float3	ZERNHDR_LuminanceWeights = float3(0.212671f, 0.715160f, 0.07
 // TEXTURES
 ///////////////////////////////////////////////////////////////////////////////
 #ifdef MSAA
-	Texture2DMS<float3, SAMPLE_COUNT>	ZERNHDR_InputTexture				: register(t5);
+	Texture2DMS<float3, SAMPLE_COUNT>	ZERNHDR_InputTexture					: register(t5);
 #else
-	Texture2D<float3>					ZERNHDR_InputTexture				: register(t5);
+	Texture2D<float3>					ZERNHDR_InputTexture					: register(t5);
 #endif
-Texture2D<float3>						ZERNHDR_BlurTexture					: register(t6);
-Texture2D<float>						ZERNHDR_CurrentLuminanceTexture		: register(t7);
-Texture2D<float>						ZERNHDR_PreviousLuminanceTexture	: register(t8);
+Texture2D<float3>						ZERNHDR_BloomTexture					: register(t6);
+Texture2D<float>						ZERNHDR_CurrentAverageLuminanceTexture	: register(t7);
+Texture2D<float>						ZERNHDR_PreviousAdaptedLuminanceTexture	: register(t8);
 
 // LUMINANCE CALCULATE
 ///////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ float ZERNHDR_Calculate_Key(float AvgLuminance)
 
 float ZERNHDR_Calculate_ScaledLuminance(float PixelLuminance)
 {
-	float AverageLuminance = ZERNHDR_CurrentLuminanceTexture.Load(int3(0, 0, 0));
+	float AverageLuminance = ZERNHDR_CurrentAverageLuminanceTexture.Load(int3(0, 0, 0));
 	AverageLuminance = clamp(AverageLuminance, ZERNHDR_LuminanceMin, ZERNHDR_LuminanceMax);
 	
 	float Key = ZERNHDR_Key;
@@ -169,11 +169,8 @@ float3 ZERNHDR_ToneMapOperator_Filmic(float3 PixelColor, float PixelLuminance, f
 	return pow(ScaledColor, 2.2f);
 }
 
-float3 ZERNHDR_ToneMap(float3 PixelColor)
-{
-	float Luminance = ZERNHDR_Calculate_Luminance(PixelColor);
-	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
-	
+float3 ZERNHDR_ToneMap(float3 PixelColor, float Luminance, float ScaledLuminance)
+{	
 	switch (ZERNHDR_ToneMapOperator)
 	{
 		case ZERN_HTMO_LOGARITHMIC:
@@ -231,7 +228,7 @@ float ZERNHDR_Luminance_Calculate_PixelShader(float4 PositionViewport : SV_Posit
 		Luminance[I] /= SAMPLE_COUNT; 
 	}
 	
-	return dot(Luminance, float4(1.0f, 1.0f, 1.0f, 1.0f)) / 4.0f;
+	return dot(Luminance, (float4)0.25f);
 #else
 	float4 ColorReds = ZERNHDR_InputTexture.GatherRed(ZERNSampler_LinearClamp, TexCoord);
 	float4 ColorGreens = ZERNHDR_InputTexture.GatherGreen(ZERNSampler_LinearClamp, TexCoord);
@@ -248,23 +245,13 @@ float ZERNHDR_Luminance_Calculate_PixelShader(float4 PositionViewport : SV_Posit
 
 }
 
-// LUMINANCE DOWNSCALE PIXEL SHADER
-///////////////////////////////////////////////////////////////////////////////
-
-float ZERNHDR_Luminance_DownScale_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
-{
-	#ifndef MSAA
-		return ZERNHDR_InputTexture.Sample(ZERNSampler_LinearClamp, TexCoord).r;
-	#endif
-}
-
 // LUMINANCE CALCULATE ADAPTED PIXEL SHADER
 ///////////////////////////////////////////////////////////////////////////////
 
 float ZERNHDR_Luminance_CalculateAdapted_PixelShader() : SV_Target0
 {
-	float CurrentLuminance = exp(ZERNHDR_CurrentLuminanceTexture.Load(int3(0, 0, 0)));
-	float PreviousLuminance = ZERNHDR_PreviousLuminanceTexture.Load(int3(0, 0, 0));
+	float CurrentLuminance = exp(ZERNHDR_CurrentAverageLuminanceTexture.Load(int3(0, 0, 0)));
+	float PreviousLuminance = ZERNHDR_PreviousAdaptedLuminanceTexture.Load(int3(0, 0, 0));
 	
 	float RodSensitivity = 0.04f / (0.04f + CurrentLuminance);
 	float AdaptionConstant = RodSensitivity * 0.4f + (1.0f - RodSensitivity) * 0.1f;
@@ -299,8 +286,8 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 PositionViewport : SV_Positio
 			float3 SampleColor = ZERNHDR_InputTexture.Load(SamplePosition, S);
 			float Luminance = ZERNHDR_Calculate_Luminance(SampleColor);
 			float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
-			float Bright = (ScaledLuminance > ZERNHDR_BloomThreshold); //max(ScaledLuminance - ZERNHDR_BloomThreshold, 0.0f);
-			ResultColors[I] += (SampleColor / Luminance * Bright);
+			float Bright = (ScaledLuminance > ZERNHDR_BloomThreshold);
+			ResultColors[I] += (SampleColor / Luminance * ScaledLuminance) * Bright;
 		}
 		ResultColors[I] /= SAMPLE_COUNT;
 	}
@@ -317,7 +304,7 @@ float3 ZERNHDR_Bright_Calculate_PixelShader(float4 PositionViewport : SV_Positio
 		float Luminance = ZERNHDR_Calculate_Luminance(Color);
 		float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
 		float Bright = (ScaledLuminance > ZERNHDR_BloomThreshold);
-		ResultColor += (Color / Luminance * Bright);
+		ResultColor += (Color / Luminance * ScaledLuminance) * Bright;
 	}
 	
 	return ResultColor / 4.0f;
@@ -338,10 +325,17 @@ float3 ZERNHDR_ToneMapping_PixelShader(float4 PositionViewport : SV_Position, fl
 #else
 	float3 PixelColor = ZERNHDR_InputTexture.Load(int3(PositionViewport.xy, 0));
 #endif
-	if (ZERNHDR_BloomEnabled)
-		PixelColor += ZERNHDR_BloomFactor * ZERNHDR_BlurTexture.Sample(ZERNSampler_LinearBorderZero, TexCoord).rgb;
 
-	ResultColor += ZERNHDR_ToneMap(PixelColor);
+	float Luminance = ZERNHDR_Calculate_Luminance(PixelColor);
+	float ScaledLuminance = ZERNHDR_Calculate_ScaledLuminance(Luminance);
+	ResultColor += ZERNHDR_ToneMap(PixelColor, Luminance, ScaledLuminance);
+	
+	if (ZERNHDR_BloomEnabled)
+	{
+		float3 BloomColor = ZERNHDR_BloomFactor * ZERNHDR_BloomTexture.Sample(ZERNSampler_LinearBorderZero, TexCoord);
+		ResultColor += ZERNHDR_ToneMapOperator_Uncharted(BloomColor) * rcp(ZERNHDR_ToneMapOperator_Uncharted(ZERNHDR_WhiteLevel));
+	}
+	
 #ifdef MSAA
 	}
 	ResultColor /= SAMPLE_COUNT;

@@ -66,6 +66,7 @@ class ZEModelMeshLOD
 
 		ZEHolder<const ZERNMaterial>		Material;
 		bool								Skinned;
+
 	public:
 		bool								IsSkinned() const;
 

@@ -34,137 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef MAPEDITOR_H
-#define MAPEDITOR_H
 
-#include <QtGui/QMainWindow>
-#include <QtCore/QPoint.h>
-#include <QtCore/QTimer.h>
-#include <QtCore/QString.h>
-#include "ZEDCommonControls\ZEDViewPort.h"
-#include "ZEGame\ZEEntity.h"
-#include "ZEDEntitySelector.h"
-#include "ZEDCommonControls/ZEDPropertyWindowManager/ZEDPropertyWindowManager.h"
-#include "ZEDCommonControls\ZEDLoadingScreen.h"
-#include "ZEDCommonControls\ZEDConsoleInterface.h"
-#include "ZEDCore\ZEDPlugIn.h"
-#include "..\ZEDUndoRedo\ZEDUndoRedo.h"
-#include "ZEDSelectionItem.h"
-#include "ZEDSelectionItemPlugin.h"
-#include "ZEDSceneList.h"
-#include <ZEModel/ZEModel.h>
+#include "ZEDCore/ZEDEditor.h"
 
-class ZEGrid;
+class ZEDViewport;
+class ZEDViewportController;
+class ZEDObjectBrowser;
+class ZEDClassBrowser;
+class ZEDAssetBrowser;
+class ZEDPropertyEditor;
+class ZEDSelectionToolbar;
+class ZEDTransformationToolbar;
+class ZEScene;
 
-using namespace Qt;
-
-namespace Ui
+class ZEDSceneEditor : public ZEDEditor
 {
-	class MapEditorClass;
-}
-
-class MapEditor : public QMainWindow
-{
-	Q_OBJECT
-	friend class ZEDViewPort;
-
+	ZE_OBJECT
 	private:
+		ZEDViewport*						Viewport;
+		ZEDViewportController*				Controller;
+		ZEDObjectBrowser*					ObjectBrowser;
+		ZEDClassBrowser*					ClassBrowser;
+		ZEDAssetBrowser*					AssetBrowser;
+		ZEDPropertyEditor*					PropertyEditor;
+		ZEDSelectionToolbar*				SelectionToolbar;
+		ZEDTransformationToolbar*			TransformationToolbar;
+		ZEScene*							Scene;
 
-		bool						SaveFlag;
-		bool						SelectionDirtyFlag;
+		virtual bool						InitializeSelf();
 
-		ZEScene*					Scene;
-		ZEGame*						Game;
-		ZEPlayer*					Player;
-		ZEDGizmoMode				GizmoMode;
-		ZEDSceneList*				SceneList;
-		ZEDUndoRedoManagerOld		UndoRedoManager;
-		ZEDLoadingScreen*			SplashScreen;
-		ZEGrid*						Grid;
-
-		ZEDSelectionItem*			CreateSelectionItem(ZEEntity* Entity);
-		void						MakeConnections();
-		void						SelectionChangedEvent();
-		void						ReadOptions();
-		void						WriteOptions();
-
-		void						StartEngine();
-		void						DisplaySelectedEntityProperties();
-		void						UpdatePropertyWidgetValues();
-		void						GenerateAssertList();
-		void						InitializeAdditionalToolBarItems();
-		void						InitializePlugIns();
-
-		//Test
-		//NewZEDAssertBrowser*		AssertBrowser;
-		//test
-
-
-
-	private slots:
-
-		void						LoadMapActionTriggered();
-		void						LoadSceneActionTriggered();
-		void						NewMapActionTriggered();
-		void						MoveActionTriggered();
-		void						RotateActionTriggered();
-		void						ScaleActionTriggered();
-		void						SelectActionTriggered();
-		void						StepSizeChanged();
-		void						DeleteActionTriggered();
-		void						CopyActionTriggered();
-		void						GoToEntityActionTriggered();
-		void						HideActionTriggered();
-		void						UnHideActionTriggered();
-		void						CloseMapActionTriggered();
-		void						SaveSceneActionTriggered();
-		void						SaveSceneAsActionTriggered();
-		void						ChangeGizmoWorkingSpace(QString Text);
-		void						SceneListOpenActionTriggered(bool Checked);
-		void						ChangeGridVisibility(bool Visibility);
-
-		void						EngineMainLoop();
-		void						EventsLoop();
-		void						SelectionsLoop();
-		void						UpdateCamPos();
-
-	public slots:
-
-		void						ConsoleInput();
-		void						ShowEntitySelector();
-		void						UpdateSelectedEntitiesByRayCast();
-		void						UpdateSelectedEntitiesBySceneList();
-		void						NewEntityToScene();
-		void						UndoActionTriggered();
-		void						RedoActionTriggered();
-
-		void						BackupSave();
+											ZEDSceneEditor();
+		virtual								~ZEDSceneEditor();
 
 	public:
+		virtual void						New();
+		virtual bool						Save(const ZEString& FileName);
+		virtual bool						Load(const ZEString& FileName);
+		virtual void						Close();
 
-		QString								CurrentFileName;
-		QString								WorkingDirectory;
-		QTimer*								MainLoopTimer;
-		QTimer*								BackupSaveTimer;
-		ZEDEntitySelector*					EntitySelector;
-		ZEDViewPort*						ViewPort;
-
-		ZEDPropertyWindowManager*			PropertyWindowManager;
-		ZEArray<QWidget*>					CustomPropertyWidgets;
-
-		ZEDConsole*							Console;
-		QComboBox*							OperationSpaceComboBox;
-		QLabel*								OperationSpaceLabel;
-
-		ZEArray<ZEDSelectionItemPlugin*>	SelectionItemPlugIns;
-//		ZEArray<ZEDFilePlugIn*>				FileTypePlugIns;
-
-		ZEArray<ZEDSelectionItem*>			SelectedItems;
-//		ZEArray<ZEDPlugin*>					PlugIns;
-		Ui::MapEditorClass*					ui;
-
-											MapEditor(QWidget *parent = 0, WFlags flags = 0);
-											~MapEditor();
-};
-
-#endif // MAPEDITOR_H
+		static ZEDSceneEditor*				CreateInstance();
+}
+ZE_META_ATTRIBUTE(ZEDEditor.TargetFileExtensions, "*.ZEScene");

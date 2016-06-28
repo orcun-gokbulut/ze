@@ -273,7 +273,8 @@ void ZEModel::SetModelResource(const ZEModelResource* ModelResource)
 	if (this->ModelResource != NULL)
 		((ZEModelResource*)this->ModelResource)->Release();
 
-	ModelResource->AddReferance();
+	if (ModelResource != NULL)
+		ModelResource->AddReferance();
 
 	this->ModelResource = ModelResource;
 
@@ -463,9 +464,9 @@ void ZEModel::LinkParentlessBones( ZEModelBone* ParentlessBone )
 	ParentlessBoneJoint->Initialize();
 }
 
-bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEModel::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
 	if (AnimationUpdateMode == ZE_MAUM_VISUAL)
@@ -477,7 +478,7 @@ bool ZEModel::PreRender(const ZERNCullParameters* CullParameters)
 	bool Result = false;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
 	{
-		if (Meshes[I].PreRender(CullParameters))
+		if (Meshes[I].PreRender(Parameters))
 			Result = true;
 	}
 
@@ -593,19 +594,21 @@ bool ZEModel::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-bool ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	bool Result = false;
 	for (ZESize I = 0; I < Meshes.GetCount(); I++)
-		Result |= Meshes[I].RayCast(Report, Parameters);
+	{
+		Meshes[I].RayCast(Report, Parameters);
+		if (Report.CheckDone())
+			return;
+	}
 
 	for (ZESize I = 0; I < Bones.GetCount(); I++)
-		Result |= Bones[I].RayCast(Report, Parameters);
-	
-	if (Result)
-		Report.Entity = this;
-
-	return Result;
+	{
+		Bones[I].RayCast(Report, Parameters);
+		if (Report.CheckDone())
+			return;
+	}
 }
 
 ZEModel* ZEModel::CreateInstance()

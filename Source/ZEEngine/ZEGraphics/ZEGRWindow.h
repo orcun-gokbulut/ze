@@ -120,6 +120,7 @@ class ZEGRWindow : public ZEObject, public ZEInitializable
 		virtual void					DeinitializeSelf();
 
 										ZEGRWindow();
+										~ZEGRWindow();
 
 	public:
 		ZEUInt							GetId() const;
@@ -207,6 +208,8 @@ class ZEGRWindow : public ZEObject, public ZEInitializable
 		void							Minimize();
 		void							Maximize();
 		void							Restore();
+
+		void							WrapperResized(ZEUInt Width, ZEUInt Height);
 
 		void							Show();
 		virtual void					Destroy();

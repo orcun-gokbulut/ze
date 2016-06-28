@@ -53,8 +53,9 @@
 #include "ZEMeta/ZEEnumerator.h"
 
 class ZEScene;
+class ZEDObjectWrapper;
 class ZERNDrawParameters;
-class ZERNCullParameters;
+class ZERNPreRenderParameters;
 class ZERNRenderParameters;
 class ZERNCommand;
 class ZEMLWriterNode;
@@ -82,15 +83,13 @@ ZE_ENUM(ZEEntityState)
 
 class ZEEntity : public ZEObject
 {
-	friend class ZEScene;
-	friend class ZESceneCuller;
-	friend class ZEDebugDrawer;
-
 	ZE_OBJECT
-
+	friend class ZEScene;
+	friend class ZEDEntityWrapper;
 	private: 
 		ZEEntity*								Owner;
 		ZEScene*								OwnerScene;
+		ZEDObjectWrapper*						Wrapper;
 
 		ZEString								Name;
 		ZEEntityState							State;
@@ -112,20 +111,23 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
+		void									SetWrapper(ZEDObjectWrapper* Wrapper);
+
 	protected:
 		virtual bool							SetOwner(ZEEntity* Owner);
 		void									SetOwnerScene(ZEScene* Scene);
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
-
+		const ZEArray<ZEEntity*>&				GetComponents() const;
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
-		const ZEArray<ZEEntity*>&				GetComponents() const;
+		void									ClearComponents();
 
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();
 		virtual void							BoundingBoxChanged();
+
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 												ZEEntity();
 		virtual									~ZEEntity();
@@ -145,6 +147,7 @@ class ZEEntity : public ZEObject
 		const ZEArray<ZEEntity*>&				GetChildEntities() const;
 		bool									AddChildEntity(ZEEntity* Entity);
 		void									RemoveChildEntity(ZEEntity* Entity);
+		void									ClearChildEntities();
 
 		void									SetBoundingBox(const ZEAABBox& BoundingBox);
 		virtual const ZEAABBox&					GetBoundingBox() const;
@@ -165,19 +168,23 @@ class ZEEntity : public ZEObject
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
 		const ZEVector3&						GetPosition() const;
+
 		void									SetWorldPosition(const ZEVector3& NewPosition);
 		const ZEVector3							GetWorldPosition() const;
 
 		virtual void							SetRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion&						GetRotation() const;
+
 		void									SetWorldRotation(const ZEQuaternion& NewRotation);
 		const ZEQuaternion						GetWorldRotation() const;
 
 		virtual void							SetScale(const ZEVector3& NewScale);
 		const ZEVector3&						GetScale() const;
+
 		void									SetWorldScale(const ZEVector3& NewScale);
 		const ZEVector3							GetWorldScale() const;
 
+												ZE_META_ATTRIBUTE(ZEDPropertyEditor.Exclude)
 		ZEVector3								GetFront();
 		ZEVector3								GetRight();
 		ZEVector3								GetUp();
@@ -195,8 +202,22 @@ class ZEEntity : public ZEObject
 
 		virtual void							Tick(float Time);
 
-		virtual bool							PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		virtual bool							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-};
+		ZEDObjectWrapper*						GetWrapper() const;
+}
+ZE_META_ATTRIBUTE_PROPERTY(WorldPosition,		ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldRotation,		ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldScale,			ZEMeta.Serialization, false)
+ZE_META_ATTRIBUTE_PROPERTY(Transform,			ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldTransform,		ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(InvWorldTransform,	ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(State,				ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false);

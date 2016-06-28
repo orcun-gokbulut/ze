@@ -48,7 +48,6 @@
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRSampler.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNStage.h"
@@ -246,12 +245,12 @@ const ZEString& ZEATMoon::GetTextureFile() const
 	return PhaseTexture.GetTextureFile();
 }
 
-bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATMoon::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	const ZERNView& View = *CullParameters->View;
+	const ZERNView& View = *Parameters->View;
 
 	ZEVector2 MoonPositionScreen;
 	if (!CalculateMoonPositionScreen(View, MoonPositionScreen))
@@ -270,7 +269,7 @@ bool ZEATMoon::PreRender(const ZERNCullParameters* CullParameters)
 		DirtyFlags.RaiseFlags(ZEAT_MDF_CONSTANT_BUFFERS);
 	}
 
-	CullParameters->Renderer->AddCommand(&Command);
+	Parameters->Renderer->AddCommand(&Command);
 
 	return true;
 }
@@ -281,7 +280,7 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());

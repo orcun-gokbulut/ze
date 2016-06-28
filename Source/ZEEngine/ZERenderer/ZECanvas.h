@@ -63,7 +63,7 @@ class ZECanvasVertex
 
 class ZECanvas
 {
-	public:
+	private:
 		ZESmartArray<ZECanvasVertex>	Vertices;
 		ZESmartArray<ZEMatrix4x4>		TransformationStack;
 		ZEMatrix4x4						Transformation;
@@ -130,7 +130,8 @@ class ZECanvas
 		// Custom Vertices
 		void							AddVertex(const ZECanvasVertex& Vertex);
 		void							AddVertices(const ZECanvasVertex* Vertices, ZESize Count);
-		
+		ZECanvasVertex*					AddVertices(ZESize Count);
+
 		void							CalculateBoundingBox(ZEAABBox& BoundingBox);
 
 		bool							IsEmpty();
@@ -141,8 +142,9 @@ class ZECanvas
 		bool							LoadFromFile(const ZEString& FileName);
 		void							SaveToFile(const ZEString& FileName);
 
-		virtual ZESize					GetBufferSize();
-		virtual void*					GetVertexBuffer();
+		ZESize							GetVertexCount();
+		ZESize							GetBufferSize();
+		void*							GetBuffer();
 		
 										ZECanvas();
 };

@@ -34,21 +34,24 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+
+#include "ZETypes.h"
+#include "ZEBase64.h"
+#include "ZEDS/ZEFormat.h"
+
+#include "ZECore/ZECrashHandler.h"
+#include "ZECrashReportUIMainWindow.h"
+#include "ZECrashReportSender.h"
+#include "ZECrashReportFileProvider.h"
+#include "ZECrashReportApplicationInformationProvider.h"
+#include "ZECrashReportSystemInformationProvider.h"
+#include "ZECrashReportDumpProvider.h"
+
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <QtGui/QApplication>
-#include "ZETypes.h"
-#include "ZEFoundation/ZEBase64.h"
-#include "ZECrashReportUIMainWindow.h"
-#include "ZECrashReport/ZECrashReportSender.h"
-#include "ZECrashReport/ZECrashReportFileProvider.h"
-#include "ZECrashReport/ZECrashReportApplicationInformationProvider.h"
-#include "ZECrashReport/ZECrashReportSystemInformationProvider.h"
-#include "ZECrashReport/ZECrashReportDumpProvider.h"
-#include "tinyxml.h"
-#include "tinystr.h"
-#include "ZECore/ZECrashHandler.h"
-#include "ZEDS/ZEFormat.h"
+#include <QApplication>
+#include <tinyxml.h>
+#include <tinystr.h>
 
 ZEInt RunUI(ZECrashReport& CrashReport, const ZEString& UploadURL)
 {

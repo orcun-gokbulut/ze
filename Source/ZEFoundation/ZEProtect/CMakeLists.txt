@@ -39,8 +39,6 @@ ze_add_source(ZELCLicense.cpp						Sources)
 ze_add_source(ZELCLicense.h							Sources)
 ze_add_source(ZELCLicenseManager.cpp				Sources)
 ze_add_source(ZELCLicenseManager.h					Sources)
-ze_add_source(ZELCEncryption.cpp					Sources)
-ze_add_source(ZELCEncryption.h						Sources)
 ze_add_source(ZELCChecker.cpp						Sources)
 ze_add_source(ZELCChecker.h							Sources)
 ze_add_source(ZELCSerialKeyGenerator.cpp			Sources)
@@ -57,5 +55,4 @@ ze_add_source(ZELCUtils.h							Sources)
 
 ze_add_library(TARGET ZEProtect
 	SOURCES ${Sources} 
-	HEADERS ${Headers}
-	LIBS libCryptopp)
+	HEADERS ${Headers})

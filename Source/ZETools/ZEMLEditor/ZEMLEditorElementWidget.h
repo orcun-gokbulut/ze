@@ -34,13 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZEML_EDITOR_ELEMENT_WIDGET_H__
-#define __ZEML_EDITOR_ELEMENT_WIDGET_H__
-
-#include <QtGui/QMainWindow>
 
 #include "ZEDS/ZEString.h"
 #include "ZEML/ZEMLRoot.h"
+
+#include <QMainWindow>
 
 class Ui_ZEMLEditorElementWidget;
 class QTextDocument;
@@ -87,5 +85,3 @@ class ZEMLEditorElementWidget : public QWidget
 								ZEMLEditorElementWidget(QWidget* Parent = NULL);
 								~ZEMLEditorElementWidget();
 };
-
-#endif

@@ -45,10 +45,12 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPointer/ZEHolder.h"
 
-class ZEViewVolume;
+#include "ZEGraphics/ZEGRViewport.h"
+#include "ZEMath/ZERay.h"
+
 class ZEEntity;
-class ZEGROutput;
-class ZEGRConstantBuffer;
+class ZEViewVolume;
+
 ZE_META_FORWARD_DECLARE(ZEGRViewport, "ZEGRViewport.h");
 
 ZE_ENUM(ZERNViewType)
@@ -56,16 +58,46 @@ ZE_ENUM(ZERNViewType)
 	ZERN_VT_NONE,
 	ZERN_VT_CAMERA,
 	ZERN_VT_SHADOW_CASTER,
-	ZERN_VT_PROBE
+	ZERN_VT_PROBE,
+	ZERN_VT_VIEWPORT
 };
 
 ZE_ENUM(ZERNProjectionType)
 {
+	ZERN_PT_NONE,
 	ZERN_PT_PERSPECTIVE,
 	ZERN_PT_PERSPECTIVE_OFFCENTER,
 	ZERN_PT_ORTHOGONAL,
 	ZERN_PT_ORTHOGONAL_OFFCENTER,
 	ZERN_PT_PARABOLOID
+};
+
+struct ZERNViewConstantBuffer
+{
+	ZEMatrix4x4						ViewTransform;
+	ZEMatrix4x4						ProjectionTransform;		
+	ZEMatrix4x4						ViewProjectionTransform;
+	ZEMatrix4x4						InvViewTransform;
+	ZEMatrix4x4						InvProjectionTransform;			
+	ZEMatrix4x4						InvViewProjectionTransform;
+
+	ZEVector3						Position;
+	float							Width;
+	ZEQuaternion					RotationQuaternion;
+	ZEVector3						RotationEuler;
+	float							Height;
+
+	ZEVector3						RightVector;
+	float							VerticalFOV;
+	ZEVector3						UpVector;
+	float							HorizontalFOV;
+	ZEVector3						FrontVector;
+	float							AspectRatio;
+
+	float							ShadowDistance;
+	float							ShadowFadeDistance;
+	float							NearZ;
+	float							FarZ;
 };
 
 class ZERNView : public ZEObject
@@ -104,34 +136,8 @@ class ZERNView : public ZEObject
 		ZEVector3					U, V, N;
 
 		// Others
-		const ZEGRViewport*			Viewport;
+		ZEGRViewport				Viewport;
 		const ZEViewVolume*			ViewVolume;
-};
 
-struct ZERNViewConstantBuffer
-{
-	ZEMatrix4x4				ViewTransform;
-	ZEMatrix4x4				ProjectionTransform;		
-	ZEMatrix4x4				ViewProjectionTransform;
-	ZEMatrix4x4				InvViewTransform;
-	ZEMatrix4x4				InvProjectionTransform;			
-	ZEMatrix4x4				InvViewProjectionTransform;
-
-	ZEVector3				Position;
-	float					Width;
-	ZEQuaternion			RotationQuaternion;
-	ZEVector3				RotationEuler;
-	float					Height;
-
-	ZEVector3				RightVector;
-	float					VerticalFOV;
-	ZEVector3				UpVector;
-	float					HorizontalFOV;
-	ZEVector3				FrontVector;
-	float					AspectRatio;
-
-	float					ShadowDistance;
-	float					ShadowFadeDistance;
-	float					NearZ;
-	float					FarZ;
+									ZERNView();
 };

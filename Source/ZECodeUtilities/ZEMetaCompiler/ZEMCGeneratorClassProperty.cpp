@@ -96,38 +96,46 @@ void ZEMCGenerator::GenerateClassGetProperties_Attributes(ZEMCClass* CurrentClas
 			for (ZESize J = 0; J < CurrentProperty->Attributes.GetCount(); J++)
 			{
 				ZEMCAttribute* CurrentAttribute = &CurrentProperty->Attributes[J];
-				if(CurrentAttribute->Parameters.GetCount() == 0)
+				if(CurrentAttribute->Values.GetCount() == 0)
 					continue;
 
 				WriteToFile(
 					"\tstatic const char* Property%dAttribute%dParameters[%d] = {", 
 					I, J, 
-					CurrentAttribute->Parameters.GetCount());
+					CurrentAttribute->Values.GetCount());
 
-				for (ZESize K = 0; K < CurrentAttribute->Parameters.GetCount(); K++)
+				for (ZESize K = 0; K < CurrentAttribute->Values.GetCount(); K++)
 				{
 					WriteToFile("\"%s\"%s", 
-						CurrentAttribute->Parameters[K].ToCString(), 
-						K != CurrentAttribute->Parameters.GetCount() - 1 ? ", " : "");
+						CurrentAttribute->Values[K].ToCString(), 
+						K != CurrentAttribute->Values.GetCount() - 1 ? ", " : "");
 				}
 
 				WriteToFile("};\n\n");
 			}
 
 			WriteToFile(
-				"\tstatic ZEMetaAttribute Property%dAttributes[%d] =\n"
+				"\tstatic ZEAttribute Property%dAttributes[%d] =\n"
 				"\t{\n", 
 				I, CurrentProperty->Attributes.GetCount());
 
 			for (ZESize J = 0; J < CurrentProperty->Attributes.GetCount(); J++)
 			{
-				ZEMCAttribute* currentAttribute = &CurrentProperty->Attributes[I];
-				WriteToFile(
-					"\t\t{\"%s\", %s, %d}%s\n", 
-					currentAttribute->Name.ToCString(),
-					(currentAttribute->Parameters.GetCount() == 0 ? "NULL" : "Property%dAttribute%dParameters"),
-					currentAttribute->Parameters.GetCount(),
-					J < CurrentProperty->Attributes.GetCount() - 1 ? "," : "");
+				ZEMCAttribute* CurrentAttribute = &CurrentProperty->Attributes[J];
+				if(CurrentAttribute->Values.GetCount() > 0)
+				{
+					WriteToFile(
+						"\t\t{\"%s\", Property%dAttribute%dParameters, %d}", 
+						CurrentAttribute->Name.ToCString(),
+						I, J, 
+						CurrentAttribute->Values.GetCount());
+				}
+				else
+				{
+					WriteToFile("\t\t{\"%s\", NULL, 0}", CurrentAttribute->Name.ToCString());
+				}
+
+				WriteToFile("%s\n", J < CurrentProperty->Attributes.GetCount() - 1 ? "," : "");
 			}
 
 			WriteToFile("\t};\n\n");
@@ -469,7 +477,7 @@ void ZEMCGenerator::GenerateClassGetProperty(ZEMCClass* CurrentClass)
 
 void ZEMCGenerator::GenerateClassSetPropertyItem(ZEMCClass* CurrentClass)
 {
-	if (CurrentClass->IsBuiltInClass)
+	if (CurrentClass->IsFundamental)
 		return;
 
 	WriteToFile(

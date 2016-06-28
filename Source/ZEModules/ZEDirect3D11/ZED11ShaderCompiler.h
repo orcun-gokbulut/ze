@@ -37,6 +37,7 @@
 
 #include "ZEGraphics/ZEGRShaderCompiler.h"
 
+#define NOMINMAX
 #include <d3dcompiler.h>
 
 class ZED11Module;

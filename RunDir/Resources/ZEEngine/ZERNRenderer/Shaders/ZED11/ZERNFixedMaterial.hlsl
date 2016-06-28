@@ -113,7 +113,6 @@ SamplerState		ZERNFixedMaterial_EnvironmentMapSampler		: register(s1);
 SamplerState		ZERNFixedMaterial_DetailBaseSampler			: register(s2);
 SamplerState		ZERNFixedMaterial_DetailNormalSampler		: register(s3);
 
-
 // INPUT OUTPUTS
 ///////////////////////////////////////////////////////////////////////////////
 
@@ -213,18 +212,6 @@ struct ZERNFixedMaterial_ShadowMapGenerationStage_PSInput
 	float4 Position			: SV_Position;
 	float2 Texcoord         : TEXCOORD0;
 };
-
-float4 ZERNFixedMaterial_VertexShader_StageRenderDepth(ZERNFixedMaterial_VSInput Input) : SV_Position
-{
-	#ifdef ZERN_FM_SKIN_TRANSFORM
-		float4x4 SkinTransform = ZERNSkin_GetSkinTransform(Input.BoneIndices, Input.BoneWeights);
-		Input.Position = mul(SkinTransform, float4(Input.Position, 1.0f)).xyz;
-	#endif
-	
-	float4 PositionWorld = mul(ZERNFixedMaterial_WorldTransform, float4(Input.Position, 1.0f));
-	
-	return ZERNTransformations_WorldToProjection(PositionWorld);
-}
 
 ZERNFixedMaterial_VSOutput ZERNFixedMaterial_VertexShader(ZERNFixedMaterial_VSInput Input)
 {
@@ -378,7 +365,7 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 	
 	#ifdef ZERN_FM_DEFERRED
 		ZERNGBuffer GBuffer = (ZERNGBuffer)0;
-		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient);
+		ZERNGBuffer_SetAccumulationColor(GBuffer, Surface.Ambient + Surface.Emissive);
 		ZERNGBuffer_SetViewNormal(GBuffer, Surface.NormalView);
 		ZERNGBuffer_SetSpecularColor(GBuffer, Surface.Specular);
 		ZERNGBuffer_SetDiffuseColor(GBuffer, Surface.Diffuse);
@@ -393,7 +380,7 @@ ZERNFixedMaterial_PSOutput ZERNFixedMaterial_PixelShader(ZERNFixedMaterial_PSInp
 		for (uint I = 0; I < ZERNShading_DirectionalLightCount; I++)
 			ResultColor += ZERNShading_DirectionalShading(ZERNShading_DirectionalLights[I], Surface);
 		
-		uint2 TileId = (Input.Position.xy - 0.5f) / TILE_DIMENSION;
+		uint2 TileId = floor(Input.Position.xy) / TILE_DIMENSION;
 		uint TileIndex = TileId.y * ZERNShading_TileCountX + TileId.x;
 		uint TileStartOffset = (MAX_LIGHT + 2) * TileIndex;
 		
@@ -445,7 +432,7 @@ void ZERNFixedMaterial_ShadowMapGenerationStage_PixelShader_Main(ZERNFixedMateri
 	float Alpha = ZERNFixedMaterial_Opacity;
 	#ifdef ZERN_FM_OPACITY_MAP
 		Alpha = ZERNFixedMaterial_OpacityMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).x;
-	#elif defined(ZERN_FM_OPACITY_BASE_ALPHA)
+	#elif defined ZERN_FM_OPACITY_BASE_ALPHA
 		Alpha = ZERNFixedMaterial_BaseMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).w;
 	#endif
 	

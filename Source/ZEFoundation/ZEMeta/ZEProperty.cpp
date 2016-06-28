@@ -34,3 +34,59 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEProperty.h"
+
+#include "ZEAttribute.h"
+#include <string.h>
+
+const ZEAttribute* ZEProperty::GetAttribute(const char* Name) const
+{
+	if (Name == NULL)
+		return NULL;
+
+	for (ZESize I = 0; I < AttributeCount; I++)
+	{
+		if (strcmp(Attributes[I].Name, Name) == 0)
+			return &Attributes[I];
+	}
+
+	return NULL;
+}
+
+const char* ZEProperty::GetAttributeValue(const char* Name, ZESize Index, const char* DefaultValue) const
+{
+	const ZEAttribute* Attribute = GetAttribute(Name);
+	if (Attribute == NULL)
+		return DefaultValue;
+
+	if (Attribute->ValueCount < Index)
+		return DefaultValue;
+
+	return Attribute->Values[Index];
+}
+
+bool ZEProperty::CheckAttribute(const char* Name) const
+{
+	const ZEAttribute* Attribute = GetAttribute(Name);
+	if (Attribute != NULL)
+		return true;
+
+	return false;
+}
+
+bool ZEProperty::CheckAttributeHasValue(const char* Name, const char* Value) const
+{
+	if (Value == NULL)
+		return false;
+
+	const ZEAttribute* Attribute = GetAttribute(Name);
+	if (Attribute == NULL)
+		return false;
+
+	for (ZESize I = 0; I < Attribute->ValueCount; I++)
+	{
+		if (strcmp(Attribute->Values[I], Value) == 0)
+			return true;
+	}
+
+	return false;
+}

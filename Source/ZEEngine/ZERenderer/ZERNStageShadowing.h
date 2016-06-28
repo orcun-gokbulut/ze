@@ -37,10 +37,28 @@
 
 #include "ZERNStage.h"
 
+#include "ZEPointer/ZEHolder.h"
+
+class ZEGRTexture2D;
+
 class ZERNStageShadowing : public ZERNStage
 {
+	friend class ZELightProjective;
 	ZE_OBJECT
+	private:
+		ZEHolder<ZEGRTexture2D>			ProjectiveShadowMaps;
+		ZEUInt							ShadowMapCount;
+
+		virtual bool					InitializeSelf();
+		virtual void					DeinitializeSelf();
+
 	public:
 		virtual ZEInt					GetId() const;
 		virtual const ZEString&			GetName() const;
+
+		virtual const ZEGRTexture2D*	GetOutput(ZERNStageBuffer Output) const;
+
+		virtual bool					Setup(ZEGRContext* Context);
+										
+										ZERNStageShadowing();
 };

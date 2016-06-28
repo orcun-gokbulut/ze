@@ -79,7 +79,7 @@ bool ZEModelMeshLOD::IsSkinned() const
 void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
 	ZEGRContext* Context = RenderParameters->Context;
-	ZERNStage* Stage = RenderParameters->Stage;
+	const ZERNStage* Stage = RenderParameters->Stage;
 	if (!Material->SetupMaterial(Context, Stage))
 	{
 		zeError("Cannot setup material");

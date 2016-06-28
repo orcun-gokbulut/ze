@@ -35,17 +35,17 @@
 
 #include "ZEParticleEmitter.h"
 
+#include "ZERandom.h"
+#include "ZEMath/ZEAngle.h"
+
 #include "ZEParticleEffect.h"
 #include "ZEParticleModifier.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZERandom.h"
 #include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRStructuredBuffer.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZERenderer/ZERNStageID.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderParameters.h"
@@ -211,8 +211,8 @@ void ZEParticleEmitter::UpdateParticles(float ElapsedTime)
 		ParticlePool[I].State = ZE_PAS_ALIVE;
 	}
 
-	if (SortingEnabled)
-		SortParticles();
+	/*if (SortingEnabled)
+		SortParticles();*/
 }
 
 ZEParticleEmitter::ZEParticleEmitter()
@@ -569,18 +569,20 @@ void ZEParticleEmitter::Tick(float TimeElapsed)
 
 }
 
-bool ZEParticleEmitter::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEParticleEmitter::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	UpdateParticles(zeCore->GetElapsedTime());
 
 	if (GetAliveParticleCount() == 0)
 		return false;
 
-	RenderCommand.Entity = Effect;
 	RenderCommand.ExtraParameters = this;
-	RenderCommand.StageMask = Material->GetStageMask();
+	RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEParticleEmitter, Render, this);
 
-	CullParameters->Renderer->AddCommand(&RenderCommand);
+	if (!Material->PreRender(RenderCommand))
+		return false;
+	
+	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }
@@ -588,7 +590,7 @@ bool ZEParticleEmitter::PreRender(const ZERNCullParameters* CullParameters)
 void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
 {
 	ZEGRContext* Context = RenderParameters->Context;
-	ZERNStage* Stage = RenderParameters->Stage;
+	const ZERNStage* Stage = RenderParameters->Stage;
 
 	if (!Material->SetupMaterial(Context, Stage))
 		return;
@@ -630,9 +632,9 @@ void ZEParticleEmitter::Render(const ZERNRenderParameters* RenderParameters, con
 	Material->CleanupMaterial(Context, Stage);
 }
 
-void ZEParticleEmitter::SortParticles()
+void ZEParticleEmitter::SortParticles(const ZERNView& View)
 {
-	ZEVector3 CamPos = zeScene->GetRenderer()->GetView().Position;
+	ZEVector3 CamPos = View.Position;
 	float DistanceSqr;
 
 	for (ZEInt I = 0; I < 32; I++)
