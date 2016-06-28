@@ -42,8 +42,8 @@
 #include "ZEVersion.h"
 #include "ZERandom.h"
 
-#include <QtGui\QMessageBox>
-#include <QtGui\QInputDialog>
+#include <QMessageBox>
+#include <QInputDialog>
 
 void ZELCLicenseToolWindow::btnGenerateSerial_clicked()
 {

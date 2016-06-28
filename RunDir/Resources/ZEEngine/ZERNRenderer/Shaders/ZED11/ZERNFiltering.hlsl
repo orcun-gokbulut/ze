@@ -37,32 +37,70 @@
 #define __ZERN_FILTERING_H__
 
 #include "ZERNScreenCover.hlsl"
+#include "ZERNMath.hlsl"
+#include "ZERNGBuffer.hlsl"
 #include "ZERNSamplers.hlsl"
+#include "ZERNTransformations.hlsl"
+#include "ZERNShading.hlsl"
 
-cbuffer ZERNFiltering_Constants					: register(b8)
+cbuffer ZERNFiltering_Constants									: register(b8)
 {
-	int			ZERNFiltering_KernelSize;
-	int3		ZERNFiltering_Reserved;
-	float4		ZERNFiltering_KernelValues[64];
+	uint			ZERNFiltering_KernelRadius;
+	float3			ZERNFiltering_Reserved;
 };
 
-Texture2D		ZERNFiltering_InputTexture		: register(t5);
+Texture2D			ZERNFiltering_InputTexture					: register(t5);
 
-float4 ZERNFiltering_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+static const float	ZERNFiltering_StandartDeviationSquare = 2.0f * 2.0f;
+
+float ZERNFiltering_GetGaussianWeight(float SampleOffset)
 {
-	float4 ResultColor = {0.0f, 0.0f, 0.0f, 1.0f};
-	float2 ScreenSize;
-	ZERNFiltering_InputTexture.GetDimensions(ScreenSize.x, ScreenSize.y);
-	float2 TexelOffset = 1.0f / ScreenSize;
-	float2 TexCoord = PositionViewport.xy * TexelOffset;
+	float Temp = 1.0f / sqrt(2.0f * ZERNMath_PI * ZERNFiltering_StandartDeviationSquare);
+    return Temp * exp(-(SampleOffset * SampleOffset) / (2.0f * ZERNFiltering_StandartDeviationSquare));
+}
+
+float4 ZERNFiltering_ApplyBlur(float2 PositionViewport, float2 SampleDirection)
+{
+	float4 ResultColor = ZERNFiltering_InputTexture[PositionViewport] * ZERNFiltering_GetGaussianWeight(0.0f);
 	
-	for(int I = 0; I < ZERNFiltering_KernelSize; ++I)
+	for (uint I = 1; I <= ZERNFiltering_KernelRadius; I++)
+		ResultColor += (ZERNFiltering_InputTexture[PositionViewport.xy - I * SampleDirection] + ZERNFiltering_InputTexture[PositionViewport.xy + I * SampleDirection]) * ZERNFiltering_GetGaussianWeight(I);
+	
+	return ResultColor;
+}
+
+float4 ZERNFiltering_BlurHorizontal_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	return ZERNFiltering_ApplyBlur(PositionViewport.xy, float2(1.0f, 0.0f));
+}
+
+float4 ZERNFiltering_BlurVertical_PixelShader(float4 PositionViewport : SV_Position) : SV_Target0
+{
+	return ZERNFiltering_ApplyBlur(PositionViewport.xy, float2(0.0f, 1.0f));
+}
+
+float4 ZERNFiltering_Scale_PixelShader(float4 PositionViewport : SV_Position, float2 TexCoord : TEXCOORD0) : SV_Target0
+{
+	return ZERNFiltering_InputTexture.SampleLevel(ZERNSampler_LinearClamp, TexCoord, 0.0f);
+}
+
+void ZERNFiltering_EdgeDetection_PixelShader(float4 PositionViewport : SV_Position)
+{
+	ZERNShading_Surface Surfaces[SAMPLE_COUNT];
+	[unroll]
+    for (uint I = 0; I < SAMPLE_COUNT; I++)
 	{
-		float4 SampleColor = ZERNFiltering_InputTexture.Sample(ZERNSampler_PointClamp, TexCoord + ZERNFiltering_KernelValues[I].xy * TexelOffset);
-		ResultColor += SampleColor * ZERNFiltering_KernelValues[I].w;
+		Surfaces[I].PositionView = ZERNTransformations_ViewportToView(PositionViewport.xy, ZERNGBuffer_GetDimensions(), ZERNGBuffer_GetDepth(PositionViewport.xy, I));
+		Surfaces[I].NormalView = ZERNGBuffer_GetViewNormal(PositionViewport.xy, I);
 	}
 	
-	return saturate(ResultColor);
+	bool EdgePixel = false;
+	[unroll]
+	for (uint J = 1; J < SAMPLE_COUNT; J++)
+		EdgePixel = EdgePixel || ((abs(Surfaces[J].PositionView.z - Surfaces[0].PositionView.z) > 0.1f) || (dot(Surfaces[J].NormalView, Surfaces[0].NormalView) < 0.99f));
+	
+	if (!EdgePixel)
+		discard;
 }
 
 #endif

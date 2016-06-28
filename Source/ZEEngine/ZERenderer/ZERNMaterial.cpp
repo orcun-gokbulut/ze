@@ -36,6 +36,7 @@
 #include "ZERNMaterial.h"
 
 #include "ZERNStage.h"
+#include "ZERNCommand.h"
 #include "ZEGraphics/ZEGRContext.h"
 
 ZERNMaterial::ZERNMaterial()
@@ -48,7 +49,13 @@ ZERNMaterial::~ZERNMaterial()
 
 }
 
-bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+bool ZERNMaterial::PreRender(ZERNCommand& Command) const
+{
+	Command.StageMask = GetStageMask();
+	return true;
+}
+
+bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
 		return false;
@@ -56,12 +63,18 @@ bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
 	return true;
 }
 
-void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 
 }
 
 bool ZERNMaterial::Update() const
 {
+	if (!IsInitialized())
+	{
+		if (!const_cast<ZERNMaterial*>(this)->Initialize())
+			return false;
+	}
+
 	return true;
 }

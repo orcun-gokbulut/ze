@@ -41,8 +41,8 @@
 ///////////////////////////////////////////////////////////////////////////////
 
 #define ZERN_SHADER_CONSTANT_RENDERER			b0
-#define ZERN_SHADER_CONSTANT_SCENE				b1
-#define ZERN_SHADER_CONSTANT_VIEW				b2
+#define ZERN_SHADER_CONSTANT_VIEW				b1
+#define ZERN_SHADER_CONSTANT_SCENE				b2
 #define ZERN_SHADER_CONSTANT_STAGE				b3
 #define ZERN_SHADER_CONSTANT_MATERIAL			b4
 #define ZERN_SHADER_CONSTANT_DRAW_MATERIAL		b5

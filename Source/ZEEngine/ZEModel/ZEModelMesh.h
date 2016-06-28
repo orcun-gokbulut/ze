@@ -44,7 +44,7 @@
 #include "ZEGame/ZERayCast.h"
 #include "ZERenderer/ZERNCommand.h"
 
-class ZERNCullParameters;
+class ZERNPreRenderParameters;
 class ZEPhysicalCloth;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
@@ -95,8 +95,6 @@ class ZEModelMesh : public ZEObject
 		ZEArray<ZEPlane>					ClippingPlanes;
 		ZERNCommand							RenderCommand;
 		
-		bool								RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex);
-
 		void								UpdateConstantBuffer();
 
 		void								LocalTransformChanged();
@@ -177,9 +175,8 @@ class ZEModelMesh : public ZEObject
 		void								Initialize(ZEModel* Model, const ZEModelResourceMesh* MeshResource);
 		void								Deinitialize();
 
-		bool								PreRender(const ZERNCullParameters* CullParameters);
-
-		bool								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		bool								PreRender(const ZERNPreRenderParameters* Parameters);
+		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
 											ZEModelMesh();
 											~ZEModelMesh();

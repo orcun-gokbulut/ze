@@ -35,56 +35,122 @@
 
 #include "ZEInitializable.h"
 
+#include "ZEMeta\ZEClass.h"
+
 bool ZEInitializable::InitializeSelf()
 {
+	#ifdef ZE_DEBUG_ENABLE
+	CallChainCompleted = true;
+	#endif
+
 	return true;
 }
 
 void ZEInitializable::DeinitializeSelf()
 {
+	#ifdef ZE_DEBUG_ENABLE
+	CallChainCompleted = true;
+	#endif
 
+	//return true;
+}
+
+ZEClass* ZEInitializable::GetClass() const
+{
+	return NULL;
+}
+
+ZEInitializationState ZEInitializable::GetInitializationState() const
+{
+	return InitializationState;
 }
 
 bool ZEInitializable::IsInitialized() const
 {
-	return Initialized;
+	return InitializationState == ZE_IS_INITIALIZED;
+}
+
+bool ZEInitializable::IsInitializedOrInitializing() const
+{
+	return InitializationState == ZE_IS_INITIALIZED || InitializationState == ZE_IS_INITIALIZING;
 }
 
 bool ZEInitializable::Initialize()
 {
-	if (Initialized)
+	if (InitializationState == ZE_IS_INITIALIZED)
 		return true;
 
-	if (!InitializeSelf())
+	if (InitializationState != ZE_IS_UNINITIALIZED && InitializationState != ZE_IS_ERROR_INITIALIZATION)
 		return false;
 
-	Initialized = true;
+	InitializationState = ZE_IS_INITIALIZING;
+
+	#ifdef ZE_DEBUG_ENABLE
+	CallChainCompleted = false;
+	#endif
+
+	if (!InitializeSelf())
+	{
+		zeError("Initialization failed. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");
+		InitializationState = ZE_IS_ERROR_INITIALIZATION;
+		return false;
+	}
+
+	#ifdef ZE_DEBUG_ENABLE
+	if (!CallChainCompleted)
+		zeWarning("Initialization chain is not complete. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");	
+	#endif
+
+	InitializationState = ZE_IS_INITIALIZED;
 
 	return true;
 }
 
-void ZEInitializable::Deinitialize()
+bool ZEInitializable::Deinitialize()
 {
-	if (!Initialized)
-		return;
+	if (InitializationState == ZE_IS_UNINITIALIZED)
+		return true;
+
+	if (InitializationState != ZE_IS_INITIALIZED && InitializationState == ZE_IS_ERROR_DEINITIALIZATION)
+		return false;
+
+	InitializationState = ZE_IS_DEINITIALIZING;
+
+	#ifdef ZE_DEBUG_ENABLE
+	CallChainCompleted = false;
+	#endif
 
 	DeinitializeSelf();
 
-	Initialized = false;
+	/*if (!DeinitializeSelf())
+	{
+		zeError("Deinitalization failed. Class Name: %s.", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");
+		InitializationState == ZE_IS_ERROR_DEINITIALIZATION;
+		return false;
+	}*/
+
+	#ifdef ZE_DEBUG_ENABLE
+	if (!CallChainCompleted)
+		zeWarning("Initialization chain is not complete. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");	
+	#endif
+	
+	InitializationState = ZE_IS_UNINITIALIZED;
 }
 
 bool ZEInitializable::Reinitialize()
 {
-	if (!Initialized)
+	if (!Deinitialize())
 		return false;
 
-	Deinitialize();
-	return Initialize();
+	if (!Initialize())
+		return false;
+
+	return true;
 }
 
 ZEInitializable::ZEInitializable()
 {
-	Initialized = false;
+	InitializationState = ZE_IS_UNINITIALIZED;
 }
 
 ZEInitializable::~ZEInitializable()

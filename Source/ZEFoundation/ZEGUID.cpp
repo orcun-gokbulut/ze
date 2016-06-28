@@ -38,6 +38,8 @@
 #include "ZERandom.h"
 #include "ZERegEx/ZERegEx.h"
 
+const ZEGUID ZEGUID::Zero;
+
 ZEInt ZEGUID::Compare(const ZEGUID& Other) const
 {
 	if (Data1 == Other.Data1)

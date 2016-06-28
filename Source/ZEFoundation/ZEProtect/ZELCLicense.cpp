@@ -35,12 +35,13 @@
 
 #include "ZELCLicense.h"
 
-#include "ZELCEncryption.h"
+#include "ZEEncryption.h"
+#include "ZEML\ZEMLReader.h"
+#include "ZEML\ZEMLWriter.h"
+
 #include "ZELCKeys.h"
 #include "ZELCUtils.h"
 #include "ZELCActivationData.h"
-#include "ZEML\ZEMLReader.h"
-#include "ZEML\ZEMLWriter.h"
 
 static __forceinline bool ConverSerial(ZEUInt32* SerialKeyBinary, const ZEString& SerialKey)
 {

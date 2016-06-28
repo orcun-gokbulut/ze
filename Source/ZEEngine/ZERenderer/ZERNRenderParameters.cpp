@@ -33,7 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNCommand.h"
-#include "ZECommon.h"
+#include "ZERNRenderParameters.h"
 
-ZE_SUPPRESS_LNK4221
+#include "ZECore\ZECore.h"
+
+void ZERNPreRenderParameters::UpdateTime()
+{
+	ZECore* Core = ZECore::GetInstance();
+
+	FrameId = Core->GetFrameId();
+	ElapsedTime = Core->GetElapsedTime();
+	Time = Core->GetRuningTime();
+}
+
+ZERNPreRenderParameters::ZERNPreRenderParameters()
+{
+	FrameId = 0;
+	ElapsedTime = 0.0f;
+	Time = 0.0f;
+	View = NULL;
+	Renderer = NULL;
+
+	UpdateTime();
+}
+
+void ZERNRenderParameters::UpdateTime()
+{
+	ZECore* Core = ZECore::GetInstance();
+
+	FrameId = Core->GetFrameId();
+	ElapsedTime = Core->GetElapsedTime();
+	Time = Core->GetRuningTime();
+}
+
+ZERNRenderParameters::ZERNRenderParameters()
+{
+	FrameId = 0;
+	ElapsedTime = 0.0f;
+	Time = 0.0f;
+	Context = NULL;
+	View = NULL;
+	Renderer = NULL;
+	Stage = NULL;
+	Command = NULL;
+
+	UpdateTime();
+}

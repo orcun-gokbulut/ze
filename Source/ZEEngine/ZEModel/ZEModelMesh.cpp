@@ -45,10 +45,10 @@
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZEPhysics/ZEPhysicalCloth.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
 #define ZEMD_MDF_LOCAL_TRANSFORM			0x0001
 #define ZEMD_MDF_INV_LOCAL_TRANSFORM		0x0002
@@ -705,42 +705,14 @@ void ZEModelMesh::Deinitialize()
 	DirtyFlags.RaiseAll();
 }
 
-
-bool ZEModelMesh::RayCastPoligons(const ZERay& Ray, float& MinT, ZESize& PoligonIndex)
-{
-	if (MeshResource->LODs.GetCount() == 0)
-		return false;
-
-	bool HaveIntersection = false;
-
-	const ZEArray<ZEVector3>& Vertices = MeshResource->Geometry;
-	for (ZESize I = 0; I < Vertices.GetCount(); I += 3)
-	{
-		ZETriangle Triangle(Vertices[I], Vertices[I + 1], Vertices[I + 2]);
-
-		float RayT;
-		if (ZETriangle::IntersectionTest(Triangle, Ray, RayT))
-		{
-			if (RayT < MinT)
-			{
-				MinT = RayT;
-				PoligonIndex = I / 3;
-				HaveIntersection = true;
-			}
-		}
-	}
-
-	return HaveIntersection;
-}
-
-bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	if (!Visible)
 		return false;
 
 	ZEAABBox BoundingBox = GetWorldBoundingBox();
 
-	if (CullParameters->View->ViewVolume != NULL && CullParameters->View->ViewVolume->CullTest(BoundingBox))
+	if (Parameters->View->ViewVolume != NULL && Parameters->View->ViewVolume->CullTest(BoundingBox))
 		return false;
 
 	float ClosestBoundingBoxEdgeDistanceSquare = FLT_MAX;
@@ -748,7 +720,7 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 
 	for (ZESize I = 0; I < 8; I++)
 	{
-		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(CullParameters->View->Position, BoundingBox.GetVertex(I));
+		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, BoundingBox.GetVertex(I));
 
 		if (CurrentBoundingBoxEdgeDistanceSquare < ClosestBoundingBoxEdgeDistanceSquare)
 			ClosestBoundingBoxEdgeDistanceSquare = CurrentBoundingBoxEdgeDistanceSquare;
@@ -779,79 +751,36 @@ bool ZEModelMesh::PreRender(const ZERNCullParameters* CullParameters)
 		}
 	}
 
-	if (ClosestBoundingBoxEdgeDistanceSquare > (LODs[CurrentLOD].GetDrawEndDistance() * LODs[CurrentLOD].GetDrawEndDistance()))
+	if (ClosestBoundingBoxEdgeDistanceSquare > ((float)LODs[CurrentLOD].GetDrawEndDistance() * (float)LODs[CurrentLOD].GetDrawEndDistance()))
 		return false;
 
 	ZEModelMeshLOD* MeshLOD = &LODs[(ZESize)CurrentLOD];
 	RenderCommand.Priority = DrawOrderIsUserDefined ? UserDefinedDrawOrder : 255;
-	RenderCommand.Order = (MeshLOD->GetMaterial()->GetStageMask() & ZERN_STAGE_FORWARD_TRANSPARENT) ? -DrawOrder : DrawOrder;
-	RenderCommand.StageMask = MeshLOD->GetMaterial()->GetStageMask();
 	RenderCommand.Entity = Owner;
+	RenderCommand.Order = DrawOrder;
 	RenderCommand.ExtraParameters = MeshLOD;
 
-	CullParameters->Renderer->AddCommand(&RenderCommand);
+	if (!MeshLOD->GetMaterial()->PreRender(RenderCommand))
+		return false;
+
+	Parameters->Renderer->AddCommand(&RenderCommand);
 
 	return true;
 }
 
-bool ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	if (MeshResource == NULL || MeshResource->IsSkinned)
-		return false;
+	ZERayCastHelper Helper;
+	Helper.SetReport(&Report);
+	Helper.SetWorldTransform(&GetWorldTransform());
+	Helper.SetInvWorldTransform(&GetInvWorldTransform());
+	Helper.SetObject(Owner);
+	Helper.SetSubObject(this);
 
-	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
-	LocalRay.v.NormalizeSelf();
+	if (!Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetLocalBoundingBox()))
+		return;
 
-	float RayT;
-	if (!ZEAABBox::IntersectionTest(GetLocalBoundingBox(), LocalRay, RayT))
-		return false;
-
-	float MinT = ZE_FLOAT_MAX;
-	ZESize PoligonIndex;
-	if (RayCastPoligons(LocalRay, MinT, PoligonIndex))
-	{
-		ZEVector3 WorldPosition;
-		ZEMatrix4x4::Transform(WorldPosition, GetWorldTransform(), LocalRay.GetPointOn(MinT));
-
-		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, WorldPosition);
-		if (Parameters.MinimumDistance * Parameters.MinimumDistance < DistanceSquare && DistanceSquare <= Parameters.MaximumDistance * Parameters.MaximumDistance)
-		{
-			Report.Distance = ZEMath::Sqrt(DistanceSquare);
-			Report.Position = WorldPosition;
-			Report.SubComponent = this;
-			Report.PoligonIndex = PoligonIndex;
-
- 			if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL) || Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
- 			{
- 				ZEVector3 V0 = MeshResource->Geometry[3 * Report.PoligonIndex];
- 				ZEVector3 V1 = MeshResource->Geometry[3 * Report.PoligonIndex + 1];
- 				ZEVector3 V2 = MeshResource->Geometry[3 * Report.PoligonIndex + 2];
- 
- 				ZEVector3 Binormal = ZEVector3(V0, V1);
- 				ZEVector3 Tangent = ZEVector3(V0, V2);
- 				ZEVector3 Normal;
- 				ZEVector3::CrossProduct(Normal, Binormal, Tangent);
- 
- 				if (Parameters.Extras.GetFlags(ZE_RCRE_NORMAL))
- 				{
- 					ZEMatrix4x4::Transform3x3(Report.Normal, GetWorldTransform(), Normal);
- 					Report.Normal.NormalizeSelf();
- 				}
- 
- 				if (Parameters.Extras.GetFlags(ZE_RCRE_BINORMAL))
- 				{
- 					ZEMatrix4x4::Transform3x3(Report.Binormal, GetWorldTransform(), Binormal);
- 					Report.Binormal.NormalizeSelf();
- 				}
- 			}
-
-			return true;
-		}
-	}
-
-	return false;
+	Helper.RayCastMesh(MeshResource->Geometry.GetConstCArray(), MeshResource->Geometry.GetCount(), sizeof(ZEVector3));
 }
 
 ZEModelMesh::ZEModelMesh()

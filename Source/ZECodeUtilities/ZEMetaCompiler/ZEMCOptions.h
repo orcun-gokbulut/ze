@@ -42,19 +42,19 @@
 
 struct ZEMCOptions
 {
-	ZEString BinaryPath;
-	ZEString InputFileName;
-	ZEString OutputFileName;
-	ZEArray<ZEString> IncludeDirectories;
-	ZEArray<ZEString> Definitions;
-	ZEString RegisterFileName;
+	ZEString					BinaryPath;
+	ZEString					InputFileName;
+	ZEString					OutputFileName;
+	ZEArray<ZEString>			IncludeDirectories;
+	ZEArray<ZEString>			Definitions;
+	ZEString					RegisterFileName;
 
-	const char** Argv;
-	int Argc;
+	const char**				Argv;
+	int							Argc;
 
-	bool Quiet;
-	bool MSVC;
-	bool Benchmark;
+	bool						Quiet;
+	bool						MSVC;
+	bool						Benchmark;
 };
 
 #endif

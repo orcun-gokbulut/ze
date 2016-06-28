@@ -45,7 +45,6 @@
 #include "ZEMeta/ZEProvider.h"
 
 #include "ZEScene.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNView.h"
 
 #define ZE_EDF_LOCAL_TRANSFORM					0x0001
@@ -53,6 +52,17 @@
 #define ZE_EDF_WORLD_TRANSFORM					0x0004
 #define ZE_EDF_INV_WORLD_TRANSFORM				0x0008
 #define ZE_EDF_WORLD_BOUNDING_BOX				0x0010
+
+
+void ZEEntity::SetWrapper(ZEDObjectWrapper* Wrapper)
+{
+	this->Wrapper = Wrapper;
+}
+
+ZEDObjectWrapper* ZEEntity::GetWrapper() const
+{
+	return Wrapper;
+}
 
 void ZEEntity::LocalTransformChanged()
 {
@@ -133,6 +143,13 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 	Entity->SetOwnerScene(NULL);
 }
 
+
+void ZEEntity::ClearComponents()
+{
+	for (ZESSize I = Components.GetCount() - 1; I >= 0; I--)
+		RemoveComponent(Components[I]);
+}
+
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 {
 	if (Entity->Owner != NULL)
@@ -173,6 +190,12 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 
 	Entity->Owner = NULL;
 	Entity->SetOwnerScene(NULL);
+}
+
+void ZEEntity::ClearChildEntities()
+{
+	for (ZESSize I = ChildEntities.GetCount() - 1; I >= 0; I--)
+		RemoveChildEntity(ChildEntities[I]);
 }
 
 bool ZEEntity::SetOwner(ZEEntity* Owner)
@@ -226,6 +249,7 @@ ZEEntity::ZEEntity()
 	Enabled = true;
 	Visible = true;
 	State = ZE_ES_NOT_INITIALIZED;
+	Wrapper = NULL;
 	LocalTransformChanged();
 }
 
@@ -585,9 +609,9 @@ void ZEEntity::Tick(float Time)
 
 }
 
-bool ZEEntity::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEEntity::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!GetEnabled() || !GetVisible())
+	if (!GetVisible() || !IsInitialized())
 		return false;
 
 	ZEDrawFlags Flags = GetDrawFlags();
@@ -602,37 +626,16 @@ void ZEEntity::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	
 }
 
-bool ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
-	if (!ZEAABBox::IntersectionTest(GetWorldBoundingBox(), Parameters.Ray))
-		return false;
+	ZERayCastHelper Helper;
+	Helper.SetReport(&Report);
+	Helper.SetObject(this);
+	Helper.SetSubObject(NULL);
+	Helper.SetWorldTransform(&GetWorldTransform());
+	Helper.SetInvWorldTransform(&GetInvWorldTransform());
 
-	ZERay LocalRay;
-	ZEMatrix4x4::Transform(LocalRay.p, GetInvWorldTransform(), Parameters.Ray.p);
-	ZEMatrix4x4::Transform3x3(LocalRay.v, GetInvWorldTransform(), Parameters.Ray.v);
-	LocalRay.v.NormalizeSelf();
-
-	float TMin;
-	if (!ZEAABBox::IntersectionTest(BoundingBox, LocalRay, TMin))
-		return false;
-
-	ZEVector3 IntersectionPoint;
-	ZEMatrix4x4::Transform(IntersectionPoint, GetWorldTransform(), LocalRay.GetPointOn(TMin));
-	float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, IntersectionPoint);
-	if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
-	{
-		Report.Position = IntersectionPoint;
-		Report.Distance = ZEMath::Sqrt(DistanceSquare);
-		Report.Entity = this;
-		Report.SubComponent = NULL;
-		Report.PoligonIndex = 0;
-		Report.Normal = ZEVector3::Zero;
-		Report.Binormal = ZEVector3::Zero;
-		
-		return true;
-	}
-
-	return false;
+	Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
 }
 
 

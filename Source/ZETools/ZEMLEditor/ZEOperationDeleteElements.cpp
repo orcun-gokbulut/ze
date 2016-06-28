@@ -34,10 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEOperationDeleteElements.h"
-#include "ZEML/ZEMLNode.h"
-#include "ZETypes.h"
 
-#include <QtGui/QTreeWidgetItem>
+#include "ZETypes.h"
+#include "ZEML/ZEMLNode.h"
+
+#include <QTreeWidgetItem>
 
 
 bool ZEOperationDeleteElements::Apply()

@@ -38,34 +38,17 @@
 
 void ZEMCGenerator::GenerateEnumeratorMacros(ZEMCEnumerator* CurrentEnumerator)
 {
-	WriteToFile("ZE_ENUMERATOR_IMPLEMENTATION(%s);\n\n", CurrentEnumerator->Name.ToCString());
-	WriteToFile("ZE_ENUMERATOR_DECLARATION(%s);\n", CurrentEnumerator->Name.ToCString());
-}
+	WriteToFile("\n\n");
+	WriteToFile("// %s\n", CurrentEnumerator->Name.ToCString());
+	WriteToFile("////////////////////////////////////////////////////////////////////////////////////////\n\n");
 
-void ZEMCGenerator::GenerateEnumeratorGetName(ZEMCEnumerator* CurrentEnumerator)
-{
-	WriteToFile(
-		"const char* %sEnumerator::GetName()\n"
-		"{\n"
-		"\treturn \"%s\";\n"
-		"}\n\n",
-		CurrentEnumerator->Name.ToCString(), 
-		CurrentEnumerator->Name.ToCString());
-}
-
-void ZEMCGenerator::GenerateEnumeratorGetGUID(ZEMCEnumerator* CurrentEnumerator)
-{
-	WriteToFile(
-		"ZEGUID %sEnumerator::GetGUID()\n"
-		"{\n"
-		"\treturn ZEGUID();\n"
-		"}\n\n", 
-		CurrentEnumerator->Name.ToCString());
+	WriteToFile("ZE_META_ENUMERATOR_IMPLEMENTATION(%s);\n", CurrentEnumerator->Name.ToCString());
+	WriteToFile("ZE_META_ENUMERATOR_DECLARATION(%s);\n\n", CurrentEnumerator->Name.ToCString());
 }
 
 void ZEMCGenerator::GenerateEnumeratorGetItems(ZEMCEnumerator* CurrentEnumerator)
 {
-	WriteToFile("const ZEEnumeratorItem* %sEnumerator::GetItems()\n"
+	WriteToFile("const ZEEnumeratorItem* %sEnumerator::GetItems() const\n"
 		"{\n", CurrentEnumerator->Name.ToCString());
 
 	if (CurrentEnumerator->Items.GetCount() != 0)
@@ -98,7 +81,7 @@ void ZEMCGenerator::GenerateEnumeratorGetItems(ZEMCEnumerator* CurrentEnumerator
 
 void ZEMCGenerator::GenerateEnumeratorGetItemCount(ZEMCEnumerator* CurrentEnumerator)
 {
-	WriteToFile("ZESize %sEnumerator::GetItemCount()\n"
+	WriteToFile("ZESize %sEnumerator::GetItemCount() const\n"
 		"{\n"
 		"\treturn %d;\n"
 		"}\n\n", 
@@ -108,8 +91,12 @@ void ZEMCGenerator::GenerateEnumeratorGetItemCount(ZEMCEnumerator* CurrentEnumer
 void ZEMCGenerator::GenerateEnumerator(ZEMCEnumerator* CurrentEnumerator)
 {
 	GenerateEnumeratorMacros(CurrentEnumerator);
-	GenerateEnumeratorGetName(CurrentEnumerator);
-	GenerateEnumeratorGetGUID(CurrentEnumerator);
+
+	GenerateDeclarationGetName(CurrentEnumerator);
+	GenerateDeclarationGetGUID(CurrentEnumerator);
+	GenerateDeclarationGetAttributes(CurrentEnumerator);
+	GenerateDeclarationGetAttributeCount(CurrentEnumerator);
+
 	GenerateEnumeratorGetItems(CurrentEnumerator);
 	GenerateEnumeratorGetItemCount(CurrentEnumerator);
 }

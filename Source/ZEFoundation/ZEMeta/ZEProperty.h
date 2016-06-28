@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_PROPERTY_H__
-#define __ZE_PROPERTY_H__
 
 #include "ZETypes.h"
 #include "ZEType.h"
@@ -54,22 +52,26 @@ enum ZEPropertyAccess
 
 struct ZEProperty
 {
-	ZESize				ID;
-	ZEClass*			MemberOf;
+	ZESize								ID;
+	ZEClass*							MemberOf;
 
-	const char*			Name;
-	ZEUInt32			Hash;
-	void*				OffsetOrAddress;
-	ZEType				Type;
+	const char*							Name;
+	ZEUInt32							Hash;
+	void*								OffsetOrAddress;
+	ZEType								Type;
 
-	ZEPropertyAccess	Access;
+	ZEPropertyAccess					Access;
 
-	bool				IsGenerated;
-	bool				IsContainer;
-	bool				IsStatic;
+	bool								IsGenerated;
+	bool								IsContainer;
+	bool								IsStatic;
 
-	ZEAttribute*		Attributes;
-	ZESize				AttributeCount;
+	ZEAttribute*						Attributes;
+	ZESize								AttributeCount;
+
+	const ZEAttribute*					GetAttribute(const char* Name) const;
+	const char*							GetAttributeValue(const char* AttributeName, ZESize Index = 0, const char* DefaultValue = "") const;
+
+	bool								CheckAttribute(const char* Name) const;
+	bool								CheckAttributeHasValue(const char* Name, const char* Value) const;
 };
-
-#endif

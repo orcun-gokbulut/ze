@@ -37,6 +37,24 @@
 
 #include "ZERNStageID.h"
 #include "ZEDS/ZEString.h"
+#include "ZEGraphics/ZEGRTexture2D.h"
+
+bool ZERNStageShadowing::InitializeSelf()
+{
+	if (!ZERNStage::InitializeSelf())
+		return false;
+
+	ProjectiveShadowMaps = ZEGRTexture2D::CreateInstance(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
+
+	return true;
+}
+
+void ZERNStageShadowing::DeinitializeSelf()
+{
+	ProjectiveShadowMaps.Release();
+
+	ZERNStage::DeinitializeSelf();
+}
 
 ZEInt ZERNStageShadowing::GetId() const
 {
@@ -47,4 +65,30 @@ const ZEString& ZERNStageShadowing::GetName() const
 {
 	static const ZEString Name = "Shadowing";
 	return Name;
+}
+
+const ZEGRTexture2D* ZERNStageShadowing::GetOutput(ZERNStageBuffer Output) const
+{
+	if (GetEnabled() && (Output == ZERN_SO_PROJECTIVE_SHADOWMAPS))
+		return ProjectiveShadowMaps;
+
+	return ZERNStage::GetOutput(Output);
+}
+
+bool ZERNStageShadowing::Setup(ZEGRContext* Context)
+{
+	if (!ZERNStage::Setup(Context))
+		return false;
+
+	if (GetCommands().GetCount() == 0)
+		return false;
+
+	ShadowMapCount = 0;
+
+	return true;
+}
+
+ZERNStageShadowing::ZERNStageShadowing()
+{
+	ShadowMapCount = 0;
 }

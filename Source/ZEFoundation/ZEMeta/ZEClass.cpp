@@ -80,19 +80,34 @@ ZESSize ZEClass::Search(ZEClassSortedData* Data, ZESize DataSize, const ZEString
 	return -1;
 }
 
-ZEClass* ZEClass::GetParentClass()
+ZEMTDeclarationType ZEClass::GetDeclarationType() const
+{
+	return ZEMT_DT_CLASS;
+}
+
+const char* ZEClass::GetName() const
+{
+	return "ZEObject";
+}
+
+const ZEGUID& ZEClass::GetGUID() const
+{
+	return ZEGUID::Zero;
+}
+
+const ZEAttribute* ZEClass::GetAttributes() const
 {
 	return NULL;
 }
 
-const char* ZEClass::GetName()
+ZESize ZEClass::GetAttributeCount() const
 {
-	return "";
+	return 0;
 }
 
-ZEGUID ZEClass::GetGUID()
+ZEClass* ZEClass::GetParentClass()
 {
-	return ZEGUID(0, 0, 0, 0);
+	return NULL;
 }
 
 ZEClassFlags ZEClass::GetFlags()
@@ -100,14 +115,29 @@ ZEClassFlags ZEClass::GetFlags()
 	return ZE_CF_CREATE_INSTANCE | ZE_CF_DESTROY | ZE_CF_ASSIGN | ZE_CF_CLONE | ZE_CF_CONSTRUCT | ZE_CF_DECONSTRUCT;
 }
 
-const ZEAttribute* ZEClass::GetAttributes()
+bool ZEClass::IsAbstract()
 {
-	return NULL;
+	return (GetFlags() & ZE_CF_ABSTRACT) != 0;
 }
 
-ZESize ZEClass::GetAttributeCount()
+bool ZEClass::IsFundamental()
 {
-	return 0;
+	return (GetFlags() & ZE_CF_FUNDAMENTAL) != 0;
+}
+
+bool ZEClass::IsDynamic()
+{
+	return (GetFlags() & ZE_CF_SCRIPT) != 0;
+}
+
+bool ZEClass::IsValueObject()
+{
+	return (GetFlags() & ZE_CF_VALUE_OBJECT) != 0;
+}
+
+bool ZEClass::IsCloneable()
+{
+	return (GetFlags() & ZE_CF_CLONE) != 0;
 }
 
 const ZEProperty* ZEClass::GetProperties()

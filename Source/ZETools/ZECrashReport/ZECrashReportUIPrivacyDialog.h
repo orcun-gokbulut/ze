@@ -37,7 +37,7 @@
 #ifndef __ZE_CRASHREPORT_PRIVACYDIALOG_H__
 #define __ZE_CRASHREPORT_PRIVACYDIALOG_H__
 
-#include <QtGui/QDialog>
+#include <QDialog>
 
 namespace Ui
 {
@@ -49,7 +49,7 @@ class ZECrashReportUIPrivacyDialog : public QDialog
 	Q_OBJECT
 
 public:	
-							ZECrashReportUIPrivacyDialog(QWidget *Parent = 0, Qt::WFlags Flags = 0);
+							ZECrashReportUIPrivacyDialog(QWidget *Parent = 0, Qt::WindowFlags Flags = 0);
 							~ZECrashReportUIPrivacyDialog();	
 
 private:

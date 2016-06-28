@@ -73,9 +73,10 @@ class ZEParticleEffect;
 class ZEParticleModifier;
 class ZEGRConstantBuffer;
 class ZEGRStructuredBuffer;
+class ZERNView;
 class ZERNParticleMaterial;
 class ZERNRenderParameters;
-class ZERNCullParameters;
+class ZERNPreRenderParameters;
 
 class ZEParticleEmitter : public ZEObject
 {
@@ -139,7 +140,7 @@ class ZEParticleEmitter : public ZEObject
 
 		void								GenerateParticle(ZEParticle &Particle);
 		void								UpdateParticles(float ElapsedTime);
-		void								SortParticles();
+		void								SortParticles(const ZERNView& View);
 
 
 											ZEParticleEmitter();
@@ -241,8 +242,8 @@ class ZEParticleEmitter : public ZEObject
 		void								ResetPool();
 
 		void								Tick(float ElapsedTime);
-		bool								PreRender(const ZERNCullParameters* CullParameters);
-		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
+		bool								PreRender(const ZERNPreRenderParameters* Parameters);
+		void								Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEParticleEmitter*			CreateInstance();
 };

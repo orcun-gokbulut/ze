@@ -36,10 +36,11 @@
 #include "ZED11ShaderCompilerIncludeInterface.h"
 
 #include "ZEGraphics\ZEGRShaderCompileOptions.h"
-#include "ZEFile\ZEFile.h"
+
 #include "ZEDS\ZEFormat.h"
+#include "ZEEncryption.h"
+#include "ZEFile\ZEFile.h"
 #include "ZEFile\ZEFileInfo.h"
-#include "ZEProtect\ZELCEncryption.h"
 #include "ZEFile\ZEPathManager.h"
 
 void  ZED11ShaderCompilerIncludeInterface::SetCompileOptions(const ZEGRShaderCompileOptions* Options)

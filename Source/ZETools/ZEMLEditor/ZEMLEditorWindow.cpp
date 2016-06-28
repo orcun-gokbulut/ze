@@ -36,6 +36,11 @@
 #include "ZEMLEditorWindow.h"
 #include "ui_ZEMLEditorWindow.h"
 
+#include "ZEFile\ZEFileInfo.h"
+#include "ZEML\ZEMLProperty.h"
+#include "ZEML\ZEMLData.h"
+#include "ZEML\ZEMLFormatXMLV1.h"
+
 #include "ZEDOperation.h"
 #include "ZEOperationAddElement.h"
 #include "ZEDOperationManager.h"
@@ -45,21 +50,17 @@
 #include "ZEOperationCopy.h"
 #include "ZEOperationCut.h"
 #include "ZEOperationPaste.h"
-#include "ZEML\ZEMLProperty.h"
-#include "ZEML\ZEMLData.h"
-
-#include <QtCore\QCoreApplication>
-#include <QtCore\QSettings>
-#include <QtCore\QUrl>
-#include <QtGui\QTreeWidget>
-#include <QtGui\QMessageBox>
-#include <QtGui\QFileDialog>
-#include <QtGui\QDesktopServices>
-#include <QtGui\QTreeWidgetItem>
-#include "QtGui\qlabel.h"
-#include "ZEML\ZEMLFormatXMLV1.h"
 #include "ZEMLEditorFormatSelector.h"
-#include "ZEFile\ZEFileInfo.h"
+
+#include <QCoreApplication>
+#include <QSettings>
+#include <QUrl>
+#include <QTreeWidget>
+#include <QMessageBox>
+#include <QFileDialog>
+#include <QDesktopServices>
+#include <QTreeWidgetItem>
+#include <QLabel>
 
 ZEMLEditorWindow* ZEMLEditorWindow::Instance = NULL;
 
@@ -571,8 +572,8 @@ ZEMLEditorWindow::ZEMLEditorWindow()
 	Form->trwElementTree->setEnabled(false);
 	Form->trwElementTree->setAlternatingRowColors(true);
 	Form->trwElementTree->header()->setStretchLastSection(false);
-	Form->trwElementTree->header()->setResizeMode(0, QHeaderView::Stretch);
-	Form->trwElementTree->header()->setResizeMode(1, QHeaderView::Interactive);
+	Form->trwElementTree->header()->setSectionResizeMode(0, QHeaderView::Stretch);
+	Form->trwElementTree->header()->setSectionResizeMode(1, QHeaderView::Interactive);
 	
 	Form->statusbar->showMessage("Ready.");
 

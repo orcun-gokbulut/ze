@@ -354,6 +354,9 @@ const ZEVector3 ZEVector3::One = ZEVector3(1.0f, 1.0f, 1.0f);
 const ZEVector3 ZEVector3::UnitX = ZEVector3(1.0f, 0.0f, 0.0f);
 const ZEVector3 ZEVector3::UnitY = ZEVector3(0.0f, 1.0f, 0.0f);
 const ZEVector3 ZEVector3::UnitZ = ZEVector3(0.0f, 0.0f, 1.0f);
+const ZEVector3 ZEVector3::NegUnitX = ZEVector3(-1.0f, 0.0f, 0.0f);
+const ZEVector3 ZEVector3::NegUnitY = ZEVector3(0.0f, -1.0f, 0.0f);
+const ZEVector3 ZEVector3::NegUnitZ = ZEVector3(0.0f, 0.0f, -1.0f);
 const ZEVector3 ZEVector3::MinValue	= ZEVector3(ZE_FLOAT_MIN, ZE_FLOAT_MIN, ZE_FLOAT_MIN);
 const ZEVector3 ZEVector3::MaxValue	= ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX);
 

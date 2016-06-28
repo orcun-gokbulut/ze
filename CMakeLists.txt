@@ -50,6 +50,7 @@ add_definitions(-DZE_EDITION=${ZEBUILD_EDITION_UPPER})
 ## Build system initalization
 #########################################################################################
 set(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/CMake/External" "${PROJECT_SOURCE_DIR}/CMake" "${CMAKE_MODULE_PATH}")
+set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
 
 include(ze)
 ze_init()
@@ -81,6 +82,7 @@ if ("${ZEBUILD_PLATFORM_COMPILER}" EQUAL "MSVC")
 
 	set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} /GL /Zi")
 	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF,ICF")
+	set(CMAKE_EXE_LINKER_FLAGS_RELEASE "${CMAKE_EXE_LINKER_FLAGS_RELEASE} /LTCG /DEBUG /DEBUGTYPE:cv /OPT:REF,ICF")
 
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS _CRT_SECURE_NO_WARNINGS)
 endif()
@@ -94,7 +96,6 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEEngine
 	${CMAKE_CURRENT_SOURCE_DIR}/Source/ZEFoundation)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-include(ze_qt)
 
 add_definitions(-DFREEIMAGE_LIB)
 

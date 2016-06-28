@@ -150,6 +150,9 @@ class ZEReference
 		void							SetObjectPtrRef(ZEObject*& Object);
 		void							SetObjectPtrConstRef(const ZEObject*& Object);
 
+		void							SetClassRef(ZEClass*& Class);
+		void							SetClassConstRef(const ZEClass*& Class);
+
 		template<typename ZEItemType>
 		void							SetArrayRef(ZEArray<ZEItemType>& Array);
 		template<typename ZEItemType>
@@ -212,6 +215,9 @@ class ZEReference
 		ZEObject*&						GetObjectPtrRef() const;
 		ZEObject*const&					GetObjectPtrConstRef() const;
 
+		ZEClass*&						GetClassRef() const;
+		ZEClass* const& 				GetClassConstRef() const;
+
 		template<typename ZEObjecType>
 		ZEObjecType&					GetObjectRef() const;
 		template<typename ZEObjecType>
@@ -221,11 +227,7 @@ class ZEReference
 		ZEArray<ZEItemType>&			GetArrayRef() const;
 		template<typename ZEItemType>
 		const ZEArray<ZEItemType>&		GetArrayConstRef() const;
-
-		ZEClass*&						GetClassRef() const;
-		ZEClass* const& 				GetClassConstRef() const;
-
-
+		
 
 		ZEReference&					operator=(const ZEReference& Value);
 

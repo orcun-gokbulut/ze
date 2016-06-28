@@ -714,6 +714,11 @@ void ZECanvas::AddVertices(const ZECanvasVertex* Vertices, ZESize Count)
 	this->Vertices.MassAdd(Vertices, Count);
 }
 
+ZECanvasVertex* ZECanvas::AddVertices(ZESize Count)
+{
+	return Vertices.MassAdd(Count);
+}
+
 void ZECanvas::CalculateBoundingBox(ZEAABBox& BoundingBox)
 {
 	if (Vertices.GetCount() == 0)
@@ -803,12 +808,18 @@ ZEHolder<ZEGRVertexBuffer> ZECanvas::CreateVertexBuffer()
 	return  ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZECanvasVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
 }
 
+
+ZESize ZECanvas::GetVertexCount()
+{
+	return Vertices.GetCount();
+}
+
 ZESize ZECanvas::GetBufferSize()
 {
 	return Vertices.GetCount() * sizeof(ZECanvasVertex);
 }
 
-void* ZECanvas::GetVertexBuffer()
+void* ZECanvas::GetBuffer()
 {
 	return Vertices.GetCArray();
 }

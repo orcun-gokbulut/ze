@@ -33,821 +33,168 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#define WIN32_LEAN_AND_MEAN
-#include "ui_ZEDSceneEditor.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9FrameRenderer.h"
-#include "ZEModules/ZEDirect3D9/ZED3D9DOFProcessor.h"
-#include <QtGui/QFileDialog.h>
-#include <QtGui/QWidget>
-#include <QtGui/QAction>
-#include <QtGui/QLabel>
-#include <QtCore/QFile>
-#include <QtCore/QTextStream>
-#include <QtCore/QString>
-#include <QtGui/QTabWidget>
-#include <windows.h>
-#include "ZESDK.h"
 #include "ZEDSceneEditor.h"
-#include "ZEGame\ZEPlayer.h"
-#include "ZEGame\ZEGame.h"
-#include "ZEGame\ZEScene.h"
-#include "ZECore\ZEModuleManager.h"
-#include "ZECore\ZEWindow.h"
-#include "ZEGraphics/ZECamera.h"
-#include "ZEMath/ZEMath.h"
 
-#include "ZEDCommonEntities/ZEDScreenAxis.h"
+#include "ZEDCore/ZEDGrid.h"
+#include "ZEDCore/ZEDObjectWrapper.h"
+#include "ZEDCore/ZEDObjectManager.h"
+#include "ZEDCore/ZEDViewPort.h"
+#include "ZEDCore/ZEDViewportManager.h"
+#include "ZEDCore/ZEDViewportController.h"
+#include "ZEDUserInterface/ZEDMainWindow.h"
+#include "ZEDUserInterface/ZEDTransformationToolbar.h"
+#include "ZEDUserInterface/ZEDSelectionToolbar.h"
+#include "ZEDUserInterface/ZEDObjectBrowser.h"
+#include "ZEDUserInterface/ZEDAssetBrowser.h"
+#include "ZEDUserInterface/ZEDPropertyEditor.h"
+#include "ZEDUserInterface/ZEDClassBrowser.h"
+#include "ZEDUserInterface/ZEDObjectTree.h"
+#include "ZEGame/ZEScene.h"
+#include "ZEGame/ZESector.h"
+#include "ZEModel/ZEModel.h"
+#include "ZEAtmosphere/ZEATAtmosphere.h"
+#include "ZEAtmosphere/ZEATSkyBox.h"
+#include "ZERenderer/ZELightDirectional.h"
 
-
-#include <ZEMeta\ZEProvider.h>
-#include <ZEGraphics\ZEDirectionalLight.h>
-#include <ZECore\ZEOptionManager.h>
-#include <ZEModel\ZEModel.h>
-#include <ZEGame\ZESkyBrush.h>
-#include "ZEDCommonControls\CSS.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZEDEntitySelectionItem.h"
-#include "ZEGame/ZEGrid.h"
-#include "ZEGraphics/ZEPointLight.h"
-#include "ZEInterior/ZEInterior.h"
-#include "ZEGame/ZEWeather.h"
-#include "ZEGame/ZESea.h"
-#include "ZEFile/ZEPathManager.h"
-#include "ZEGame/ZEFoliage.h"
+#include <QDockWidget>
 
 
-
-
-MapEditor::MapEditor(QWidget *parent, Qt::WFlags flags)
-	: QMainWindow(parent, flags)
+bool ZEDSceneEditor::InitializeSelf()
 {
-	SplashScreen = new ZEDLoadingScreen();
-	//SplashScreen->show();
+	if (!ZEDEditor::InitializeSelf())
+		return false;
 
-	SplashScreen->SetNotificationText("Setting Up UI...");
-
-	ui = new Ui::MapEditorClass();
-	ui->setupUi(this);
-	showMaximized();
-
-// 	ZEString DefaultCompanyName = "Zinek";
-// 	ZEString DefaultApplicationName = "Engine";
-// 	ZEString DefaultResourcesDirectoryName = "Resources";
-// 	ZEPathManager::CustomizePaths(&DefaultCompanyName, &DefaultApplicationName, &DefaultResourcesDirectoryName);
-
-	SplashScreen->SetNotificationText("Reading Working Directory...");
-	this->WorkingDirectory = ZEPathManager::GetInstance()->GetEnginePath() + "\\";
-
-	SplashScreen->SetNotificationText("Setting Up Assert Browser...");
-	//AssertBrowser = new NewZEDAssertBrowser(QDir::currentPath());	
-
-	SelectionDirtyFlag = false;
+	TransformationToolbar = ZEDTransformationToolbar::CreateInstance();
+	GetMainWindow()->AddToolbar(TransformationToolbar);
 	
-	this->MainLoopTimer = new QTimer(this);
+	SelectionToolbar = ZEDSelectionToolbar::CreateInstance();
+	GetMainWindow()->AddToolbar(SelectionToolbar);
 
-	BackupSaveTimer = new QTimer();
-	//BackupSaveTimer->start(120000);
+	ZEDViewportController* Controller = ZEDViewportController::CreateInstance();
+	AddComponent(Controller);
 
-	SplashScreen->SetNotificationText("Making Connections...");
-	MakeConnections();
-	SplashScreen->SetNotificationText("Loading Selection Item Plugnins...");
+	ObjectBrowser = new ZEDObjectBrowser();
+	QDockWidget* ObjectBrowserDockWidget = new QDockWidget();
+	ObjectBrowserDockWidget->setWindowTitle(ObjectBrowser->windowTitle());
+	ObjectBrowserDockWidget->setWidget(ObjectBrowser);
+	AddComponent(ObjectBrowser);
+	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ObjectBrowserDockWidget);
 
-	SplashScreen->SetNotificationText("Loading Plugins...");
-	this->InitializePlugIns();
+	AssetBrowser = new ZEDAssetBrowser();
+	QDockWidget* AssetBrowserDockWidget = new QDockWidget();
+	AssetBrowserDockWidget->setWindowTitle(AssetBrowser->windowTitle());
+	AssetBrowserDockWidget->setWidget(AssetBrowser);
+	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, AssetBrowserDockWidget);
 
-	SplashScreen->SetNotificationText("Setting Up Viewport...");
-	ViewPort = new ZEDViewPort(this ,&(this->SelectedItems), this->WorkingDirectory, ui->centralWidget);
-	ui->ViewPort = ViewPort;
-	ui->gridLayout->addWidget(ui->ViewPort, 0, 0, 1, 1);
+	PropertyEditor = new ZEDPropertyEditor();
+	QDockWidget* PropertyEditorDockWidget = new QDockWidget();
+	PropertyEditorDockWidget->setWindowTitle(PropertyEditor->windowTitle());
+	PropertyEditorDockWidget->setWidget(PropertyEditor);
+	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, PropertyEditorDockWidget);
+	AddComponent(PropertyEditor);
 
-	PropertyWindowManager = NULL;
-	SplashScreen->SetNotificationText("Setting Up Console...");
-	this->Console = new ZEDConsole(ui->ConsoleInput,ui->ConsoleOutput);
+	ClassBrowser = new ZEDClassBrowser();
+	QDockWidget* ClassBrowserDockWidget = new QDockWidget();
+	ClassBrowserDockWidget->setWindowTitle(ClassBrowser->windowTitle());
+	ClassBrowserDockWidget->setWidget(ClassBrowser);
+	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, ClassBrowserDockWidget);
+	AddComponent(ClassBrowser);
 
-	SplashScreen->SetNotificationText("Initializing Engine...");
-	StartEngine();
+	GetMainWindow()->GetMainWindow()->tabifyDockWidget(ObjectBrowserDockWidget, AssetBrowserDockWidget);
+	GetMainWindow()->GetMainWindow()->tabifyDockWidget(PropertyEditorDockWidget, ClassBrowserDockWidget);
 
-	this->Game = zeCore->GetGame();
-	this->Scene = zeCore->GetGame()->GetScene();
-	this->Player = ZEPlayer::CreateInstance();
-	this->Scene->SetActiveCamera(this->Player->GetCamera());
-	this->Scene->AddEntity(this->Player);
-	Player->SetPosition(ZEVector3(0.0f, 2.0f, 0.0f));
-	this->Player->GetCamera()->SetHorizontalFOV(ZE_PI / 3);
+	Viewport = new ZEDViewport();
+	GetViewportManager()->RegisterViewport(Viewport);
+	GetMainWindow()->SetViewport(Viewport);
 
-	this->GenerateAssertList();	
-	EntitySelector = new ZEDEntitySelector();
-	this->InitializeAdditionalToolBarItems();
-	this->SaveFlag = false;	
-	ViewPort->SetPlayerHandle(Player);
-	ViewPort->SetSceneHandle(this->Scene);
+	ZEScene* Scene = new ZEScene();
+	Scene->Initialize();
 
-	SplashScreen->SetNotificationText("Initializing Gizmos...");
-	ZEDGizmo::BaseInitialize();
-	GizmoMode = ZED_GM_NONE;
+	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
+	ObjectBrowser->GetObjectTree()->SetRootWrapper(GetObjectManager()->GetRootWrapper());
 
-	SceneList = new ZEDSceneList(Scene, this);
-	addDockWidget(Qt::LeftDockWidgetArea, SceneList);
-
-	QObject::connect(this->SceneList->SceneTree, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateSelectedEntitiesBySceneList()));
-	QObject::connect(this->SceneList, SIGNAL(visibilityChanged(bool)), ui->SceneListOpenAction, SLOT(setChecked(bool)));
-
-	SplashScreen->hide();
-	this->statusBar()->showMessage("Ready");
-	Grid = ZEGrid::CreateInstance();
+	ZEDGrid* Grid = ZEDGrid::CreateInstance();
 	Scene->AddEntity(Grid);
 
-	//ZEDScreenAxisHelper* Helper = new ZEDScreenAxisHelper(Player);
-	//Scene->AddEntity(Helper);
+	ZEModel* Trial = ZEModel::CreateInstance();
+	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+	Scene->AddEntity(Trial);
 
-	ZEDirectionalLight* SceneLight = ZEDirectionalLight::CreateInstance();
-	SceneLight->Destroy();
+	ZEModel* Trial2 = ZEModel::CreateInstance();
+	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
+	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+	Scene->AddEntity(Trial2);
 
-	ZEModel* Model = ZEModel::CreateInstance();
-	Model->Destroy();
+	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
+	Light1->SetIntensity(1.0f);
+	Light1->SetColor(ZEVector3::One);
+	Scene->AddEntity(Light1);
 
-	ZEPointLight* PointLight = ZEPointLight::CreateInstance();
-	PointLight->Destroy();
-
-	ZEInterior* Interior = ZEInterior::CreateInstance();
-	Interior->Destroy();
-
-	ZESkyBrush* Sky = ZESkyBrush::CreateInstance();
-	Sky->Destroy();
-
-	ZEWeather* Weather = ZEWeather::CreateInstance();
-	Weather->Destroy();
-
-	ZESea* Sea = ZESea::CreateInstance();
-	Sea->Destroy();
-
-	ZEFoliage* Foliage = ZEFoliage::CreateInstance();
-	Foliage->Destroy();
-
-	//setStyleSheet(GetCSSFromFile(":/CSS/MapEditor.qss"));
-
-	ZED3D9FrameRenderer* Renderer = ((ZED3D9FrameRenderer*)(Scene->GetRenderer()));
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HDRProcessor, QString()), QString("HDR"));
-	QVBoxLayout* TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(1));
-	ui->PropertiesTabWidget->widget(1)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SunRaysProcessor, QString()), QString("SunRays"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(2));
-	ui->PropertiesTabWidget->widget(2)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->DOFProcessor, QString()), QString("DOF"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(3));
-	ui->PropertiesTabWidget->widget(3)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->MLAAProcessor, QString()), QString("MLAA"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(4));
-	ui->PropertiesTabWidget->widget(4)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->FogProcessor, QString()), QString("FOG"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(5));
-	ui->PropertiesTabWidget->widget(5)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->AerialPerspectiveProcessor, QString()), QString("Aerial"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(6));
-	ui->PropertiesTabWidget->widget(6)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->HBAOProcessor, QString()), QString("HBAO"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(7));
-	ui->PropertiesTabWidget->widget(7)->setLayout(TempLayout);
-
-	ui->PropertiesTabWidget->addTab(new ZEDPropertyWindowManager(ui->PropertiesTabWidget, &Renderer->SSAOProcessor, QString()), QString("SSAO"));
-	TempLayout = new QVBoxLayout(ui->PropertiesTabWidget->widget(8));
-	ui->PropertiesTabWidget->widget(8)->setLayout(TempLayout);
+	ZESector* Sector = ZESector::CreateInstance();
+	Sector->SetSectorFile("#R:/ZETrainSimulator/Sectors/Sector003/Sector003.ZESector");
+	Scene->AddEntity(Sector);
 
 	Scene->SetAmbientColor(ZEVector3::One);
 	Scene->SetAmbientFactor(0.2f);
 
-	MainLoopTimer->start(0);
+	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
+	Scene->AddEntity(Atmosphere);
+
+	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
+	SkyBox->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	Scene->AddEntity(SkyBox);
+
+	GetObjectManager()->GetRootWrapper()->Update();
+	GetMainWindow()->GetMainWindow()->show();
 }
 
-void MapEditor::MakeConnections()
+ZEDSceneEditor::ZEDSceneEditor()
 {
-	QObject::connect(MainLoopTimer,					SIGNAL(timeout()),			this,					SLOT(EngineMainLoop()));
-	QObject::connect(MainLoopTimer,					SIGNAL(timeout()),			this,					SLOT(EventsLoop()));
-	QObject::connect(MainLoopTimer,					SIGNAL(timeout()),			this,					SLOT(SelectionsLoop()));
-	QObject::connect(MainLoopTimer,					SIGNAL(timeout()),			this,					SLOT(UpdateCamPos()));
-
-	QObject::connect(BackupSaveTimer,				SIGNAL(timeout()),			this,					SLOT(BackupSave()));
-
-	QObject::connect(ui->NewAction,					SIGNAL(triggered(bool)),	this,					SLOT(NewMapActionTriggered()));
-	QObject::connect(ui->LoadAction,					SIGNAL(triggered(bool)),	this,					SLOT(LoadMapActionTriggered()));
-	QObject::connect(ui->SaveAction,					SIGNAL(triggered(bool)),	this,					SLOT(SaveSceneActionTriggered()));
-	QObject::connect(ui->LoadSceneAction,			SIGNAL(triggered(bool)),	this,					SLOT(LoadSceneActionTriggered()));
-	QObject::connect(ui->ConsoleInput,				SIGNAL(returnPressed()),	this,					SLOT(ConsoleInput()));
-	QObject::connect(ui->EntityBrowserOpenAction,	SIGNAL(triggered(bool)),	this,					SLOT(ShowEntitySelector()));
-	QObject::connect(ui->AddButton,					SIGNAL(clicked()),			this,					SLOT(NewEntityToScene()));
-	QObject::connect(ui->MoveAction,					SIGNAL(triggered(bool)),	this,					SLOT(MoveActionTriggered()));
-	QObject::connect(ui->RotateAction,				SIGNAL(triggered(bool)),	this,					SLOT(RotateActionTriggered()));
-	QObject::connect(ui->ScaleAction,				SIGNAL(triggered(bool)),	this,					SLOT(ScaleActionTriggered()));
-	QObject::connect(ui->SelectAction,				SIGNAL(triggered(bool)),	this,					SLOT(SelectActionTriggered()));
-	QObject::connect(ui->StepSizeSpinBox,			SIGNAL(valueChanged(double)),	this,				SLOT(StepSizeChanged()));
-	QObject::connect(ui->DeleteAction,				SIGNAL(triggered(bool)),	this,					SLOT(DeleteActionTriggered()));
-	QObject::connect(ui->CopyAction,					SIGNAL(triggered(bool)),	this,					SLOT(CopyActionTriggered()));
-	QObject::connect(ui->GoToEntityAction,			SIGNAL(triggered(bool)),	this,					SLOT(GoToEntityActionTriggered()));
-	QObject::connect(ui->CloseAction,				SIGNAL(triggered(bool)),	this,					SLOT(CloseMapActionTriggered()));
-	QObject::connect(ui->SaveSceneAsAction,			SIGNAL(triggered(bool)),	this,					SLOT(SaveSceneAsActionTriggered()));
-	//QObject::connect(ui->AssertsWindowOpenAction,	SIGNAL(triggered(bool)),	this->AssertBrowser,	SLOT(show()));
-	QObject::connect(ui->actionUndo,					SIGNAL(triggered(bool)),	this,					SLOT(UndoActionTriggered()));
-	QObject::connect(ui->actionRedo,					SIGNAL(triggered(bool)),	this,					SLOT(RedoActionTriggered()));
-	QObject::connect(ui->HideAction,					SIGNAL(triggered(bool)),	this,					SLOT(HideActionTriggered()));
-	QObject::connect(ui->UnhideAction,				SIGNAL(triggered(bool)),	this,					SLOT(UnHideActionTriggered()));
-	QObject::connect(ui->SceneListOpenAction,		SIGNAL(triggered(bool)),	this,					SLOT(SceneListOpenActionTriggered(bool)));
-	QObject::connect(this->ui->GridToogleAction,		SIGNAL(toggled(bool)),		this,					SLOT(ChangeGridVisibility(bool)));
+	Viewport = NULL;
+	Controller = NULL;
+	ObjectBrowser = NULL;
+	ClassBrowser = NULL;
+	AssetBrowser = NULL;
+	PropertyEditor = NULL;
+	SelectionToolbar = NULL;
+	TransformationToolbar = NULL;
 }
 
-void MapEditor::StartEngine()
-{
-	zeCore->GetOptions()->Load("options.ini");
-	zeCore->GetOptions()->ResetChanges();
-	zeCore->GetWindow()->SetWindowType(ZE_WT_COMPONENT);
-	zeCore->GetWindow()->SetComponentWindowHandle(ui->ViewPort->winId());
-	zeInitialize(GetModuleHandle(NULL), ui->ViewPort->winId());
-}
-
-MapEditor::~MapEditor()
-{
-	ZEConsole::GetInstance()->SetConsoleInterface(NULL);
-}
-
-void MapEditor::BackupSave()
-{	
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		delete SelectedItems[I];
-	}
-
-	SelectedItems.Clear();
-	SelectionDirtyFlag = true;
-
-	zeCore->GetGame()->GetScene()->Save("Backup.ZESCENE");
-}
-
-void MapEditor::NewMapActionTriggered()
-{
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("New Map"),QString(this->WorkingDirectory),QString("*.ZEINTERIOR"),0,0);
-	
-	if(SelectedFilePath.count() != 0)
-	{
-		SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-		//zeCore->GetGame()->GetScene()->LoadMap((const char*)SelectedFilePath.toLatin1());
-	}
-}
-
-
-void MapEditor::LoadMapActionTriggered()
-{
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Map"),QString(this->WorkingDirectory),QString("*.ZEINTERIOR"),0,0);
-
-	if(SelectedFilePath.count() != 0)
-	{
-		SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-		//zeCore->GetGame()->GetScene()->LoadMap((const char*)SelectedFilePath.toLatin1());
-	}
-}
-
-void MapEditor::LoadSceneActionTriggered()
-{
-	QString SelectedFilePath = QFileDialog::getOpenFileName(0,QString("Load Scene"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
-	SelectedFilePath.replace("/", "\\");
-
-	if(SelectedFilePath.count() != 0)
-	{
-		SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-		zeCore->GetGame()->GetScene()->Load((const char*)SelectedFilePath.toLatin1());
-	}
-
-	SceneList->Update();
-
-	for (ZESize I = 0; I < Scene->GetEntities().GetCount(); I++)
-	{
-		if(QString(Scene->GetEntities()[I]->GetClass()->GetName()) == QString("ZEPlayer"))
-			ViewPort->SetPlayerHandle((ZEPlayer*)(Scene->GetEntities()[I]));
-	}
-}
-
-void MapEditor::SaveSceneActionTriggered()
-{
-
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		delete SelectedItems[I];
-	}
-
-	SelectedItems.Clear();
-	SelectionDirtyFlag = true;
-
-	if(SaveFlag == false)
-	{
-		QString SelectedFilePath = QFileDialog::getSaveFileName(0,QString("Save Scene"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
-	
-		if(SelectedFilePath.count() != 0)
-		{
-			SelectedFilePath.replace("/", "\\");
-			SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-			
-			zeCore->GetGame()->GetScene()->Save((const char*)SelectedFilePath.toLatin1());
-			this->CurrentFileName = SelectedFilePath;
-			SaveFlag = true;
-		}
-	}
-
-	if(SaveFlag == true)
-	{
-		zeCore->GetGame()->GetScene()->Save((const char*)this->CurrentFileName.toLatin1());
-	}
-}
-
-void MapEditor::SaveSceneAsActionTriggered()
-{
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		delete SelectedItems[I];
-	}
-
-	SelectedItems.Clear();
-	SelectionDirtyFlag = true;
-
-	QString SelectedFilePath = QFileDialog::getSaveFileName(0,QString("Save Scene As"),QString(this->WorkingDirectory),QString("*.ZESCENE"),0,0);
-
-	if(SelectedFilePath.count() != 0)
-	{
-		SelectedFilePath = SelectedFilePath.remove(this->WorkingDirectory);
-		SelectedFilePath = SelectedFilePath.remove(0,1);
-		zeCore->GetGame()->GetScene()->Save((const char*)SelectedFilePath.toLatin1());
-		this->CurrentFileName = SelectedFilePath;
-		SaveFlag = true;
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-void MapEditor::EngineMainLoop()
-{
-	MainLoopTimer->stop();
-	zeMainLoop();
-	MainLoopTimer->start();
-}
-
-void MapEditor::EventsLoop()
-{
-	if(SelectionDirtyFlag == true)
-		SelectionChangedEvent();
-
-	SelectionDirtyFlag = false;
-}
-
-void MapEditor::SelectionChangedEvent()
-{
-	if(PropertyWindowManager != NULL)
-	{
-		PropertyWindowManager->close();
-		delete PropertyWindowManager;
-		PropertyWindowManager = NULL;
-
-		for (ZESize I = 0; I < CustomPropertyWidgets.GetCount(); I++)
-		{
-			CustomPropertyWidgets[I]->close();
-			delete CustomPropertyWidgets[I];
-		}
-	}
-
-	CustomPropertyWidgets.Clear();
-
-	ui->SelectedEntityCounterLabel->setText(QString().setNum(SelectedItems.GetCount()) + QString(" Item(s) Selected"));
-
-	if(SelectedItems.GetCount() == 0)
-		SceneList->ClearAllSelections();
-
-	this->ViewPort->setFocus(Qt::OtherFocusReason);
-
-	if(SelectedItems.GetCount() != 1)
-		return;
-
-	if(SelectedItems.GetCount() == 1)
-		DisplaySelectedEntityProperties();
-}
-
-void MapEditor::SelectionsLoop()
-{
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		SelectedItems[I]->Update();
-	}
-}
-
-void MapEditor::ConsoleInput()
-{
-	this->Console->Input((const char*)ui->ConsoleInput->text().toLatin1());
-	ui->ConsoleInput->clear();
-}
-
-void MapEditor::ShowEntitySelector()
-{
-	ZEArray<ZEEntity*>	SelectedEntites;
-	EntitySelector->GetSelectedEntities(&SelectedEntites);
-	
-	ZEEntity* CurrentEntity;
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		delete SelectedItems[I];
-
-	SelectedItems.Clear();
-
-	for(ZESize I = 0;  I < SelectedEntites.GetCount(); I++)
-	{
-		CurrentEntity = SelectedEntites[I];
-		SelectedItems.Add(CreateSelectionItem(CurrentEntity));
-	}
-
-	SelectionDirtyFlag = true;
-}
-
-void MapEditor::SceneListOpenActionTriggered(bool Checked)
-{
-	if (Checked)
-		SceneList->show();
-	else
-		SceneList->hide();
-}
-
-void MapEditor::DisplaySelectedEntityProperties()
-{
-	ZEArray<QWidget*> CPropertyWidgets = SelectedItems[0]->GetCustomPropertyWidgets(ui->PropertiesTabWidget);
-	if (CPropertyWidgets.GetCount() != 0)
-	{
-		for(ZESize I = 0; I < CPropertyWidgets.GetCount(); I++)
-		{
-			ui->PropertiesTabWidget->addTab(CPropertyWidgets[I], CPropertyWidgets[I]->objectName());
-			CustomPropertyWidgets.Add(CPropertyWidgets[I]);
-		}
-	}
-
-	PropertyWindowManager = new ZEDPropertyWindowManager(ui->PropertiesTabWidget, SelectedItems[0]->GetClass(), WorkingDirectory);
-	ui->PropertiesTabLayout->addWidget(PropertyWindowManager);
-}
-
-void MapEditor::UpdatePropertyWidgetValues()
-{
-	if (PropertyWindowManager != NULL)
-		PropertyWindowManager->UpdatePropertyWidgetValues();
-}
-
-
-void MapEditor::GenerateAssertList()
-{	
-	ZEArray<ZEClass*> EntityClasses = ZEProvider::GetInstance()->GetClass(ZEEntity::Class());
-	for(ZESize I = 0; I < EntityClasses.GetCount(); I++)
-	{
-		if ((EntityClasses[I]->GetFlags() & ZE_CF_CREATE_INSTANCE) == 0)
-			continue;
-		
-		QString Temp = ZEProvider::GetInstance()->GetClasses().GetItem(I)->GetName();
-		ui->AssertsList->addItem(QString(EntityClasses[I]->GetName()));
-	}
-}
-
-
-void MapEditor::NewEntityToScene()
-{
-	QString TempString = ui->AssertsList->currentItem()->text().toLatin1();
-
-	ZEClass* Class = ZEProvider::GetInstance()->GetClass((const char*)TempString.toLatin1());
-	if (Class == NULL)
-		return;
-
-	ZEEntity* Entity = static_cast<ZEEntity*>(Class->CreateInstance());
-	if (Entity == NULL)
-		return;
-
-	Scene->AddEntity(Entity);
-
-	TempString = TempString.remove(QString("ZE"));
-	QString EntityName = TempString + QString(" ") + QString().setNum(Entity->GetEntityId());
-	Entity->SetName((const char*)EntityName.toLatin1());
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		delete SelectedItems[I];
-
-	SelectedItems.Clear();
-	SelectedItems.Add(CreateSelectionItem(Entity));
-	SelectionDirtyFlag = true;
-
-	SceneList->AddItem(Entity);
-}
-
-void MapEditor::SelectActionTriggered()
-{
-	ui->MoveAction->setChecked(false);
-	ui->ScaleAction->setChecked(false);
-	ui->RotateAction->setChecked(false);
-	
-	if(!ui->SelectAction->isChecked())
-		ui->SelectAction->setChecked(true);
-	
-	GizmoMode = ZED_GM_NONE;
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		SelectedItems[I]->SetGizmoMode(GizmoMode);
-}
-
-void MapEditor::MoveActionTriggered()
-{
-	ui->SelectAction->setChecked(false);
-	ui->ScaleAction->setChecked(false);
-	ui->RotateAction->setChecked(false);
-	
-	if(!ui->MoveAction->isChecked())
-		ui->MoveAction->setChecked(true);
-	
-	GizmoMode = ZED_GM_MOVE;
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		SelectedItems[I]->SetGizmoMode(GizmoMode);
-}
-void MapEditor::RotateActionTriggered()
-{
-	ui->SelectAction->setChecked(false);
-	ui->ScaleAction->setChecked(false);
-	ui->MoveAction->setChecked(false);
-	
-	if(!ui->RotateAction->isChecked())
-		ui->RotateAction->setChecked(true);
-	
-	GizmoMode = ZED_GM_ROTATE;
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		SelectedItems[I]->SetGizmoMode(GizmoMode);
-}
-
-void MapEditor::ScaleActionTriggered()
-{
-	ui->SelectAction->setChecked(false);
-	ui->MoveAction->setChecked(false);
-	ui->RotateAction->setChecked(false);
-	
-	if(!ui->ScaleAction->isChecked())
-		ui->ScaleAction->setChecked(true);
-	
-	GizmoMode = ZED_GM_SCALE;
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		SelectedItems[I]->SetGizmoMode(GizmoMode);
-}
-
-void MapEditor::StepSizeChanged()
-{
-	this->ViewPort->UpdateStepSize(ui->StepSizeSpinBox->value());
-}
-
-void MapEditor::DeleteActionTriggered()
-{
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		QObject::disconnect(this->SceneList->SceneTree, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateSelectedEntitiesBySceneList()));
-		SceneList->RemoveItem(((ZEEntity*)SelectedItems[I]->GetClass()));
-		QObject::connect(this->SceneList->SceneTree, SIGNAL(itemSelectionChanged()), this, SLOT(UpdateSelectedEntitiesBySceneList()));
-		Scene->RemoveEntity((ZEEntity*)SelectedItems[I]->GetClass());
-	}
-
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		delete SelectedItems[I];
-	}
-
-	SelectedItems.Clear();
-	SelectionDirtyFlag = true;
-}
-
-void MapEditor::CopyActionTriggered()
-{
-	ZEEntity* EntityToCopy;
-	ZEClass* Class;
-	const ZEProperty* Properties;
-	ZEInt	PropertyCount = 0;
-	ZEEntity* NewEntity = NULL;
-	ZEVariant TempVariant;
-
-	QString EntityName;
-
-	ZEArray<ZEEntity*> CreatedEntities;
-
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		EntityToCopy = ((ZEEntity*)(SelectedItems[I]->GetClass()));
-		Class = EntityToCopy->GetClass();
-		NewEntity = (ZEEntity*)(ZEProvider::GetInstance()->GetClass(Class->GetName())->CreateInstance());
-		Scene->AddEntity(NewEntity);
-
-		ZEInt TrueId = NewEntity->GetEntityId();
-		EntityName = QString(Class->GetName()) + QString(" ") + QString().setNum(TrueId);
-		EntityName = EntityName.remove(QString("ZE"));
-				
-		while (Class != NULL)
-		{
-			PropertyCount = Class->GetPropertyCount();
-			Properties = Class->GetProperties();
-
-			for(ZEInt J = 0; J < PropertyCount; J++)
-			{
-				EntityToCopy->GetClass()->GetProperty(EntityToCopy, Properties[J].Name, TempVariant);
-				NewEntity->GetClass()->SetProperty(NewEntity, Properties[J].Name, TempVariant);			
-			}			
-
-			Class = Class->GetParentClass();
-		}
-		
-		NewEntity->SetEntityId(TrueId);
-		NewEntity->SetName((const char*)EntityName.toLatin1());
-		CreatedEntities.Add(NewEntity);
-	}
-
-	for(ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		delete SelectedItems[I];
-
-	SelectedItems.Clear();
-
-	for (ZESize I = 0; I < CreatedEntities.GetCount(); I++)
-	{
-		SelectedItems.Add(CreateSelectionItem(CreatedEntities[I]));
-		SceneList->AddItem(CreatedEntities[I]);
-	}
-
-	SelectionDirtyFlag = true;
-}
-
-void MapEditor::GoToEntityActionTriggered()
-{
-	ZEVector3	FocusPosition;
-	ZESize		SelectedItemCount = SelectedItems.GetCount();
-
-	for (ZESize I = 0; I < SelectedItemCount; I++)
-		FocusPosition = FocusPosition + SelectedItems[I]->GetPosition().GetVector3();
-
-	FocusPosition.x = FocusPosition.x / SelectedItemCount;
-	FocusPosition.y = FocusPosition.y / SelectedItemCount;
-	FocusPosition.z = FocusPosition.z / SelectedItemCount;
-
-	ZEVector3 NewPosition, NewDirection;
-	ZEQuaternion Direction;
-	Direction = zeCore->GetGame()->GetScene()->GetActiveCamera()->GetWorldRotation();
-	ZEQuaternion::VectorProduct(NewDirection,Direction,ZEVector3(0.0f,0.0f,1.0f));
-	ZEVector3::Scale(NewDirection,NewDirection, (zeCore->GetGame()->GetScene()->GetActiveCamera()->GetNearZ() + 10.0f));
-	ZEVector3::Sub(NewPosition, FocusPosition, NewDirection);
-	zeCore->GetGame()->GetScene()->GetActiveCamera()->GetOwner()->SetPosition(NewPosition);
-}
-
-void MapEditor::CloseMapActionTriggered()
+ZEDSceneEditor::~ZEDSceneEditor()
 {
 
 }
 
-void MapEditor::UpdateSelectedEntitiesByRayCast()
+void ZEDSceneEditor::New()
 {
-
+	Scene->ClearEntities();
+	ZEDEditor::New();
 }
 
-void MapEditor::UpdateSelectedEntitiesBySceneList()
+bool ZEDSceneEditor::Save(const ZEString& FileName)
 {
-	const QList<QTreeWidgetItem*> SelectedListItems = SceneList->SceneTree->selectedItems();
-	ZEArray<ZEEntity*>			SelectedListEntities;
+	if (!Scene->Save(FileName))
+		return false;
 
-	for(ZEInt I = 0; I < SelectedListItems.count(); I++)
-	{
-		if(SelectedListItems[I]->childCount() != 0)
-		{
-			ZEInt ChildCount = SelectedListItems[I]->childCount();
-
-			for (ZEInt J = 0; J < ChildCount; J++)
-			{
-				SelectedListEntities.Add(((ZEDSceneListItem*)(SelectedListItems[I]->child(J)))->Entity);
-			}
-		}
-		else
-		{
-			 SelectedListEntities.Add(((ZEDSceneListItem*)(SelectedListItems[I]))->Entity);
-		}
-	}
-
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-		delete SelectedItems[I];
-
-	SelectedItems.Clear();
-
-	for (ZESize I = 0; I < SelectedListEntities.GetCount(); I++)
-		SelectedItems.Add(CreateSelectionItem(SelectedListEntities[I]));
-
-	SelectionDirtyFlag = true;
+	return ZEDEditor::Save(FileName);
 }
 
-void MapEditor::InitializeAdditionalToolBarItems()
+bool ZEDSceneEditor::Load(const ZEString& FileName)
 {
-	this->ui->OperationsToolBar->addSeparator();
-	this->OperationSpaceLabel = new QLabel(QString(" Working Space  "), this->ui->OperationsToolBar);
-	this->OperationSpaceComboBox = new QComboBox(this->ui->OperationsToolBar);
-	this->OperationSpaceComboBox->addItem(QString(" World	"));
-	this->OperationSpaceComboBox->addItem(QString(" Local	"));
-	this->OperationSpaceComboBox->addItem(QString(" View	"));
-	this->OperationSpaceComboBox->setMinimumWidth(50);
-	this->OperationSpaceLabel->setMinimumWidth(50);
-	this->ui->OperationsToolBar->addWidget(this->OperationSpaceLabel);
-	this->ui->OperationsToolBar->addWidget(this->OperationSpaceComboBox);
-	QObject::connect(this->OperationSpaceComboBox, SIGNAL(currentIndexChanged(QString)), this, SLOT(ChangeGizmoWorkingSpace(QString)));	
+	Scene->ClearEntities();
+	if (!Scene->Load(FileName))
+		return false;
+
+	return ZEDEditor::Load(FileName);
 }
 
-void MapEditor::InitializePlugIns()
+void ZEDSceneEditor::Close()
 {
-
+	Scene->ClearEntities();
+	ZEDEditor::Close();
 }
 
-void MapEditor::ChangeGizmoWorkingSpace(QString Text)
+ZEDSceneEditor* ZEDSceneEditor::CreateInstance()
 {
-	if (Text == QString(" Local   "))
-	{
-		for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-			SelectedItems[I]->SetGizmoSpace(ZED_GS_LOCAL);
-	}
-	else if (Text == QString(" World   "))
-	{
-		for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-			SelectedItems[I]->SetGizmoSpace(ZED_GS_WORLD);
-	}
-	else if (Text == QString(" View   "))
-	{
-		for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-			SelectedItems[I]->SetGizmoSpace(ZED_GS_VIEW);
-	}
-}
-
-void MapEditor::ChangeGridVisibility(bool Visibility)
-{
-	Grid->SetVisible(Visibility);	
-}
-		
-void MapEditor::UndoActionTriggered()
-{
-	UndoRedoManager.PerformUndo();
-}
-		
-void MapEditor::RedoActionTriggered()
-{
-	UndoRedoManager.PerformRedo();
-}
-
-ZEDSelectionItem* MapEditor::CreateSelectionItem(ZEEntity* Entity)
-{
-	if(Entity == NULL)
-		return NULL;
-
-	for (ZESize I = 0; I < SelectionItemPlugIns.GetCount(); I++)
-	{
-		if (QString(Entity->GetClass()->GetName()) == SelectionItemPlugIns[I]->GetSupportedClassName())
-			return SelectionItemPlugIns[I]->CreateSelectionItem(((ZEObject*)(Entity)), GizmoMode, Scene);
-	}
-
-	//return SelectionItemPlugIns[3]->CreateSelectionItem(((ZEObject*)Entity), GizmoMode, Scene); //Fix hard-coded index
-
-	return new ZEDEntitySelectionItem(Entity, GizmoMode, Scene);
-
-	//return NULL;
-}
-
-void MapEditor::HideActionTriggered()
-{
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		SelectedItems[I]->SetVisiblity(false);
-	}
-}
-
-void MapEditor::UnHideActionTriggered()
-{
-	for (ZESize I = 0; I < SelectedItems.GetCount(); I++)
-	{
-		SelectedItems[I]->SetVisiblity(true);
-	}
-}
-
-void MapEditor::ReadOptions()
-{
-
-}
-
-void MapEditor::WriteOptions()
-{
-
-}
-
-void MapEditor::UpdateCamPos()
-{
-	ZEVector3 PlayerPosition = this->Player->GetPosition();
-
-	ui->CamPosXLabel->setText(QString("X:") + QString().setNum(PlayerPosition.x));
-	ui->CamPosYLabel->setText(QString("Y:") + QString().setNum(PlayerPosition.y));
-	ui->CamPosZLabel->setText(QString("Z:") + QString().setNum(PlayerPosition.z));
+	return new ZEDSceneEditor();
 }

@@ -41,15 +41,15 @@
 #include "ZETypes.h"
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZEGraphics/ZEGRFormat.h"
 
 class ZEString;
 class ZEGRContext;
 class ZEGRTexture2D;
 class ZEGRRenderState;
 class ZEGRRenderTarget;
-class ZERNCommand;
-class ZERNRenderer;
-class ZEString;
+class ZEGRDepthStencilBuffer;
 class ZERNRenderer;
 class ZERNCommand;
 
@@ -63,9 +63,11 @@ ZE_ENUM(ZERNStageBuffer)
 	ZERN_SO_GBUFFER_DIFFUSE,
 	ZERN_SO_NORMAL,
 	ZERN_SO_DEPTH,
+	ZERN_SO_TRANSPARENT_DEPTH,
 	ZERN_SO_COLOR,
 	ZERN_SO_HDR,
 	ZERN_SO_AMBIENT_OCCLUSION,
+	ZERN_SO_PROJECTIVE_SHADOWMAPS,
 	ZERN_SO_CUSTOM_0,
 	ZERN_SO_CUSTOM_1,
 	ZERN_SO_CUSTOM_2,
@@ -92,6 +94,10 @@ class ZERNStage : public ZEObject, public ZEInitializable
 		const ZEGRTexture2D*				GetPrevOutput(ZERNStageBuffer Input) const;
 		const ZEGRRenderTarget*				GetNextProvidedInput(ZERNStageBuffer RenderTarget) const;
 
+		bool								BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRRenderTarget>& Target);
+		bool								BindDepthOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothWay, ZEHolder<const ZEGRTexture2D>& Buffer, ZEHolder<const ZEGRDepthStencilBuffer>& Target);
+
+
 	public:
 		virtual ZEInt						GetId() const = 0;
 		virtual const ZEString&				GetName() const = 0;
@@ -103,7 +109,7 @@ class ZERNStage : public ZEObject, public ZEInitializable
 		void								SetEnabled(bool Enable);
 		bool								GetEnabled() const;
 
-		const ZEList2<ZERNCommand>&			GetCommands();
+		const ZEList2<ZERNCommand>&			GetCommands() const;
 
 		virtual const ZEGRTexture2D*		GetOutput(ZERNStageBuffer Output) const;
 		virtual const ZEGRRenderTarget*		GetProvidedInput(ZERNStageBuffer Input) const;

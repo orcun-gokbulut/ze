@@ -47,7 +47,6 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZERenderer/ZELightDirectional.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZERenderer/ZERNCuller.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNStageAtmosphere.h"
@@ -251,12 +250,12 @@ ZEATSkyBox::~ZEATSkyBox()
 
 }
 
-bool ZEATSkyBox::PreRender(const ZERNCullParameters* CullParameters)
+bool ZEATSkyBox::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
-	CullParameters->Renderer->AddCommand(&SkyRenderCommand);
+	Parameters->Renderer->AddCommand(&SkyRenderCommand);
 
 	return true;
 }
@@ -273,7 +272,7 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ConstantBufferTransform->SetData(&WorldMatrix);
 
 	ZEGRContext* Context = Parameters->Context;
-	ZERNStage* Stage = Parameters->Stage;
+	const ZERNStage* Stage = Parameters->Stage;
 
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferTransform.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());

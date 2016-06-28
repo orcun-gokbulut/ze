@@ -45,7 +45,6 @@
 #include "ZEGraphics/ZEGRTexture2D.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZERNCuller.h"
 #include "ZERNView.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStage.h"
@@ -297,6 +296,16 @@ const ZEVector3& ZELightDirectional::GetTerrestrialColor() const
 	return TerrestrialColor;
 }
 
+void ZELightDirectional::SetTerrestrialIntensity(float TerrestrialIntensity)
+{
+	this->TerrestrialIntensity = TerrestrialIntensity;
+}
+
+float ZELightDirectional::GetTerrestrialIntensity() const
+{
+	return TerrestrialIntensity;
+}
+
 ZELightType ZELightDirectional::GetLightType() const
 {
 	return ZE_LT_DIRECTIONAL;
@@ -358,24 +367,27 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 	View.U = GetWorldRight();
 	View.V = GetWorldUp();
 	View.N = GetWorldFront();
-	View.Viewport = NULL;
 
 	ShadowRenderer.SetContext(Parameters->Context);
-	ShadowRenderer.SetScene(Parameters->Scene);
+
 	ZEUInt CascadeCount = Cascades.GetCount();
 	for (ZEUInt CascadeIndex = 0; CascadeIndex < CascadeCount; CascadeIndex++)
 	{
 		View.ViewVolume = &Cascades[CascadeIndex].ViewVolume;
 		View.ViewProjectionTransform = Cascades[CascadeIndex].ProjectionTransform * Cascades[CascadeIndex].ViewTransform;
-
 		ShadowRenderer.SetView(View);
+
+		ZERNPreRenderParameters Parameters;
+		Parameters.Renderer = &ShadowRenderer;
+		Parameters.View = &View;
+		GetOwnerScene()->PreRender(&Parameters);
 
 		const ZEGRDepthStencilBuffer* DepthBuffer = CascadeShadowMaps->GetDepthStencilBuffer(false, CascadeIndex);
 		Context->ClearDepthStencilBuffer(DepthBuffer, true, true, 0.0f, 0x00);
 		Context->SetRenderTargets(0, NULL, DepthBuffer);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, DepthBuffer->GetWidth(), DepthBuffer->GetHeight()));
 
-		ShadowRenderer.Render(0.0f);
+		ShadowRenderer.Render();
 	}
 }
 

@@ -61,7 +61,7 @@
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
-#define MAX_LIGHT				1024
+#define MAX_LIGHT				512
 #define TILE_DIMENSION			16
 
 #define ZERN_SLDF_LIGHT_BUFFER	1
@@ -74,12 +74,12 @@ void ZERNStageLighting::CreateRandomVectors()
 	ZEUInt Size = 128 * 128 * 2;
 	ZEArray<ZEUInt8> RandomVectors;
 	RandomVectors.SetCount(Size);
-	for(ZEUInt I = 0; I < Size; I += 2)
+	for (ZEUInt I = 0; I < Size; I += 2)
 	{
 		RandomVectors[I]		= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
 		RandomVectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
 	}
-
+	
 	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
@@ -113,117 +113,6 @@ void ZERNStageLighting::CreateLightGeometries()
 	Canvas.AddPyramid(1.0f, 1.0f, 1.0f);
 
 	DeferredLightVertexBuffer = Canvas.CreateVertexBuffer();
-}
-
-bool ZERNStageLighting::UpdateRenderState()
-{
-	if(!DirtyFlags.GetFlags(ZERN_SLDF_RENDER_STATE))
-		return true;
-
-	ZEGRRenderState GraphicsRenderState;
-	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-
-	ZEGRBlendState BlendStateAdditive;
-	BlendStateAdditive.SetBlendEnable(true);
-	ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
-	BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_ONE);
-	BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
-	BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
-	BlendRenderTargetAdditive.SetBlendEnable(true);
-	BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
-
-	GraphicsRenderState.SetBlendState(BlendStateAdditive);
-
-	ZEGRDepthStencilState DepthStencilStateTestNoWriteLessTestStencil;
-	DepthStencilStateTestNoWriteLessTestStencil.SetDepthTestEnable(true);
-	DepthStencilStateTestNoWriteLessTestStencil.SetDepthWriteEnable(false);
-	DepthStencilStateTestNoWriteLessTestStencil.SetDepthFunction(ZEGR_CF_LESS);
-	DepthStencilStateTestNoWriteLessTestStencil.SetStencilTestEnable(true);
-	DepthStencilStateTestNoWriteLessTestStencil.SetFrontStencilFunction(ZEGR_CF_EQUAL);
-	DepthStencilStateTestNoWriteLessTestStencil.SetBackStencilFunction(ZEGR_CF_EQUAL);
-
-	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessTestStencil);
-
-	ZEGRRasterizerState RasterizerStateCullFront;
-	RasterizerStateCullFront.SetCullMode(ZEGR_CMD_FRONT);
-
-	GraphicsRenderState.SetRasterizerState(RasterizerStateCullFront);
-	GraphicsRenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
-
-	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredDirectionalLightVertexShader);
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredDirectionalLightPixelShader);
-
-	DeferredDirectionalLightRenderState = GraphicsRenderState.Compile();
-	zeCheckError(DeferredDirectionalLightRenderState == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredDirectionalLightPixelShaderPerSample);
-
-	DeferredDirectionalLightRenderStatePerSample = GraphicsRenderState.Compile();
-	zeCheckError(DeferredDirectionalLightRenderStatePerSample == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredProjectiveLightVertexShader);
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredProjectiveLightPixelShader);
-
-	DeferredProjectiveLightRenderState = GraphicsRenderState.Compile();
-	zeCheckError(DeferredProjectiveLightRenderState == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredProjectiveLightPixelShaderPerSample);
-
-	DeferredProjectiveLightRenderStatePerSample = GraphicsRenderState.Compile();
-	zeCheckError(DeferredProjectiveLightRenderStatePerSample == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredPointLightVertexShader);
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredPointLightPixelShader);
-
-	DeferredPointLightRenderState = GraphicsRenderState.Compile();
-	zeCheckError(DeferredPointLightRenderState == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredPointLightPixelShaderPerSample);
-
-	DeferredPointLightRenderStatePerSample = GraphicsRenderState.Compile();
-	zeCheckError(DeferredPointLightRenderStatePerSample == NULL, false, "Cannot set render state.");
-
-	ZEGRComputeRenderState ComputeRenderState;
-	ComputeRenderState.SetComputeShader(TiledDeferredComputeShader);
-	TiledDeferredComputeRenderState = ComputeRenderState.Compile();
-	zeCheckError(TiledDeferredComputeRenderState == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState = ZEGRRenderState();
-
-	ZEGRDepthStencilState DepthStencilStateTestNoWriteLess;
-	DepthStencilStateTestNoWriteLess.SetDepthTestEnable(true);
-	DepthStencilStateTestNoWriteLess.SetDepthWriteEnable(false);
-	DepthStencilStateTestNoWriteLess.SetDepthFunction(ZEGR_CF_LESS);
-
-	GraphicsRenderState.SetBlendState(BlendStateAdditive);
-	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLess);
-	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, AccumulateEmissivePixelShader);
-
-	AccumulateEmissiveRenderState = GraphicsRenderState.Compile();
-	zeCheckError(AccumulateEmissiveRenderState == NULL, false, "Cannot set render state.");
-
-	GraphicsRenderState = ZEGRRenderState();
-
-	ZEGRDepthStencilState GenerateStencilState;
-	GenerateStencilState.SetDepthTestEnable(false);
-	GenerateStencilState.SetDepthWriteEnable(false);
-	GenerateStencilState.SetStencilTestEnable(true);
-	GenerateStencilState.SetFrontStencilPass(ZEGR_SO_REPLACE);
-	GenerateStencilState.SetBackStencilPass(ZEGR_SO_REPLACE);
-
-	GraphicsRenderState.SetDepthStencilState(GenerateStencilState);
-	GraphicsRenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
-	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, EdgeDetectionPixelShader);
-
-	EdgeDetectionRenderState = GraphicsRenderState.Compile();
-	zeCheckError(EdgeDetectionRenderState == NULL, false, "Cannot set render state.");
-
-	DirtyFlags.UnraiseFlags(ZERN_SLDF_RENDER_STATE);
-
-	return true;
 }
 
 bool ZERNStageLighting::UpdateShaders()
@@ -296,16 +185,19 @@ bool ZERNStageLighting::UpdateShaders()
 	zeCheckError(DeferredPointLightPixelShaderPerSample == NULL, false, "Cannot set pixel shader.");
 
 
-	Options.EntryPoint = "ZERNDeferredShading_Accumulate_Emissive_PixelShader_Main";
-	AccumulateEmissivePixelShader = ZEGRShader::Compile(Options);
-	zeCheckError(AccumulateEmissivePixelShader == NULL, false, "Cannot set pixel shader.");
-
 	Options.EntryPoint = "ZERNDeferredShading_EdgeDetection_PixelShader_Main";
 	EdgeDetectionPixelShader = ZEGRShader::Compile(Options);
 	zeCheckError(EdgeDetectionPixelShader == NULL, false, "Cannot set pixel shader.");
 
-	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTiledDeferredShadingCompute.hlsl";
+	Options.EntryPoint = "ZERNDeferredShading_Blend_PixelShader_Main";
+	BlendPixelShader = ZEGRShader::Compile(Options);
+	zeCheckError(BlendPixelShader == NULL, false, "Cannot set pixel shader.");
 
+	Options.EntryPoint = "ZERNDeferredShading_BlendPerSample_PixelShader_Main";
+	BlendPixelShaderPerSample = ZEGRShader::Compile(Options);
+	zeCheckError(BlendPixelShaderPerSample == NULL, false, "Cannot set pixel shader.");
+
+	Options.FileName = "#R:/ZEEngine/ZERNRenderer/Shaders/ZED11/ZERNTiledDeferredShadingCompute.hlsl";
 	Options.Type = ZEGR_ST_COMPUTE;
 	Options.EntryPoint = "ZERNTiledDeferredShadingCompute_ComputeShader_Main";
 
@@ -315,6 +207,113 @@ bool ZERNStageLighting::UpdateShaders()
 
 	DirtyFlags.UnraiseFlags(ZERN_SLDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZERN_SLDF_RENDER_STATE);
+
+	return true;
+}
+
+bool ZERNStageLighting::UpdateRenderState()
+{
+	if (!DirtyFlags.GetFlags(ZERN_SLDF_RENDER_STATE))
+		return true;
+
+	ZEGRRenderState GraphicsRenderState;
+
+	ZEGRBlendState BlendStateAdditive;
+	BlendStateAdditive.SetBlendEnable(true);
+	ZEGRBlendRenderTarget BlendRenderTargetAdditive = BlendStateAdditive.GetRenderTarget(0);
+	BlendRenderTargetAdditive.SetSource(ZEGRBlend::ZEGR_BO_ONE);
+	BlendRenderTargetAdditive.SetDestination(ZEGRBlend::ZEGR_BO_ONE);
+	BlendRenderTargetAdditive.SetOperation(ZEGRBlendOperation::ZEGR_BE_ADD);
+	BlendRenderTargetAdditive.SetBlendEnable(true);
+	BlendStateAdditive.SetRenderTargetBlend(0, BlendRenderTargetAdditive);
+
+	GraphicsRenderState.SetBlendState(BlendStateAdditive);
+
+	ZEGRDepthStencilState DepthStencilStateTestNoWriteLessTestStencil;
+	DepthStencilStateTestNoWriteLessTestStencil.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWriteLessTestStencil.SetDepthWriteEnable(false);
+	DepthStencilStateTestNoWriteLessTestStencil.SetDepthFunction(ZEGR_CF_LESS);
+	DepthStencilStateTestNoWriteLessTestStencil.SetStencilTestEnable(true);
+	DepthStencilStateTestNoWriteLessTestStencil.SetFrontStencilFunction(ZEGR_CF_EQUAL);
+	DepthStencilStateTestNoWriteLessTestStencil.SetBackStencilFunction(ZEGR_CF_EQUAL);
+
+	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessTestStencil);
+
+	ZEGRRasterizerState RasterizerStateCullFront;
+	RasterizerStateCullFront.SetCullMode(ZEGR_CMD_FRONT);
+
+	GraphicsRenderState.SetRasterizerState(RasterizerStateCullFront);
+	GraphicsRenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
+
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredDirectionalLightVertexShader);
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredDirectionalLightPixelShader);
+
+	DeferredDirectionalLightRenderState = GraphicsRenderState.Compile();
+	zeCheckError(DeferredDirectionalLightRenderState == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredDirectionalLightPixelShaderPerSample);
+
+	DeferredDirectionalLightRenderStatePerSample = GraphicsRenderState.Compile();
+	zeCheckError(DeferredDirectionalLightRenderStatePerSample == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredProjectiveLightVertexShader);
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredProjectiveLightPixelShader);
+
+	DeferredProjectiveLightRenderState = GraphicsRenderState.Compile();
+	zeCheckError(DeferredProjectiveLightRenderState == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredProjectiveLightPixelShaderPerSample);
+
+	DeferredProjectiveLightRenderStatePerSample = GraphicsRenderState.Compile();
+	zeCheckError(DeferredProjectiveLightRenderStatePerSample == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, DeferredPointLightVertexShader);
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredPointLightPixelShader);
+
+	DeferredPointLightRenderState = GraphicsRenderState.Compile();
+	zeCheckError(DeferredPointLightRenderState == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, DeferredPointLightPixelShaderPerSample);
+
+	DeferredPointLightRenderStatePerSample = GraphicsRenderState.Compile();
+	zeCheckError(DeferredPointLightRenderStatePerSample == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetRasterizerState(ZEGRRasterizerState());
+	GraphicsRenderState.SetBlendState(BlendStateAdditive);
+	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessTestStencil);
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
+
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, BlendPixelShader);
+	BlendRenderState = GraphicsRenderState.Compile();
+	zeCheckError(BlendRenderState == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, BlendPixelShaderPerSample);
+	BlendRenderStatePerSample = GraphicsRenderState.Compile();
+	zeCheckError(BlendRenderStatePerSample == NULL, false, "Cannot set render state.");
+
+	GraphicsRenderState = ZEGRRenderState();
+
+	ZEGRDepthStencilState DepthStencilStateTestNoWriteLessWriteStencil;
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthTestEnable(true);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthWriteEnable(false);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetDepthFunction(ZEGR_CF_LESS);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetStencilTestEnable(true);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetFrontStencilPass(ZEGR_SO_REPLACE);
+	DepthStencilStateTestNoWriteLessWriteStencil.SetBackStencilPass(ZEGR_SO_REPLACE);
+
+	GraphicsRenderState.SetDepthStencilState(DepthStencilStateTestNoWriteLessWriteStencil);
+	GraphicsRenderState.SetShader(ZEGR_ST_VERTEX, ScreenCoverVertexShader);
+	GraphicsRenderState.SetShader(ZEGR_ST_PIXEL, EdgeDetectionPixelShader);
+
+	EdgeDetectionRenderState = GraphicsRenderState.Compile();
+	zeCheckError(EdgeDetectionRenderState == NULL, false, "Cannot set render state.");
+
+	ZEGRComputeRenderState ComputeRenderState;
+	ComputeRenderState.SetComputeShader(TiledDeferredComputeShader);
+	TiledDeferredComputeRenderState = ComputeRenderState.Compile();
+	zeCheckError(TiledDeferredComputeRenderState == NULL, false, "Cannot set render state.");
+
+	DirtyFlags.UnraiseFlags(ZERN_SLDF_RENDER_STATE);
 
 	return true;
 }
@@ -329,8 +328,20 @@ bool ZERNStageLighting::UpdateInputOutputs()
 	if (DepthTexture == NULL)
 		return false;
 
-	Viewport.SetWidth((float)AccumulationTexture->GetWidth());
-	Viewport.SetHeight((float)AccumulationTexture->GetHeight());
+	ZEUInt Width = AccumulationTexture->GetWidth();
+	ZEUInt Height = AccumulationTexture->GetHeight();
+
+	if (TiledDeferredOutputTexture == NULL || 
+		TiledDeferredOutputTexture->GetWidth() != Width || TiledDeferredOutputTexture->GetHeight() != Height)
+	{
+		if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
+		{
+			Width *= 2;
+			Height *= 2;
+		}
+
+		TiledDeferredOutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, AccumulationTexture->GetFormat(), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
+	}
 
 	return true;
 }
@@ -344,6 +355,13 @@ bool ZERNStageLighting::UpdateLightBuffers()
 
 	ZEUInt DirectionalLightCount = 0;
 
+	ZEMatrix4x4 TextureTransform;
+	ZEMatrix4x4::Create(TextureTransform,
+		0.5f, 0.0f, 0.0f, 0.5f,
+		0.0f, -0.5f, 0.0f, 0.5f,
+		0.0f, 0.0f, 1.0f, 0.0f,
+		0.0f, 0.0f, 0.0f, 1.0f);
+
 	ze_for_each(Command, GetCommands())
 	{
 		ZELight* Light = static_cast<ZELight*>(Command->Entity);
@@ -353,25 +371,18 @@ bool ZERNStageLighting::UpdateLightBuffers()
 			{
 				ZELightDirectional* DirectionalLight = static_cast<ZELightDirectional*>(Light);
 
-				DirectionalLightStruct& DestLight = Constants.DirectionalLights[DirectionalLightCount];
+				DirectionalLightStruct& DestLight = Constants.DirectionalLights[DirectionalLightCount++];
 				ZEMatrix4x4::Transform3x3(DestLight.DirectionView, View.ViewTransform, DirectionalLight->GetWorldRotation() * -ZEVector3::UnitZ);
 				DestLight.DirectionView.NormalizeSelf();
-				DestLight.CastShadow = static_cast<ZEBool32>(DirectionalLight->GetCastsShadow() & ShadowingEnabled);
+				DestLight.CastShadow = (ZEBool32)(DirectionalLight->GetCastsShadow() & ShadowingEnabled);
 
 				if (DirectionalLight->GetUseSunLight() || DirectionalLight->GetUseMoonLight())
-					DestLight.Color = DirectionalLight->GetTerrestrialColor() * DirectionalLight->GetIntensity();
+					DestLight.Color = DirectionalLight->GetTerrestrialColor() * DirectionalLight->GetTerrestrialIntensity();
 				else
 					DestLight.Color = DirectionalLight->GetColor() * DirectionalLight->GetIntensity();
 
 				if (DestLight.CastShadow)
 				{
-					ZEMatrix4x4 TextureTransform;
-					ZEMatrix4x4::Create(TextureTransform,
-						0.5f, 0.0f, 0.0f, 0.5f,
-						0.0f, -0.5f, 0.0f, 0.5f,
-						0.0f, 0.0f, 1.0f, 0.0f,
-						0.0f, 0.0f, 0.0f, 1.0f);
-
 					ze_for_each(Cascade, DirectionalLight->GetCascades())
 					{
 						ZEUInt CascadeIndex = Cascade.GetIndex();
@@ -383,9 +394,9 @@ bool ZERNStageLighting::UpdateLightBuffers()
 						DestLight.Cascades[CascadeIndex].NormalBias = Cascade->NormalBias;
 					}
 					DestLight.CascadeCount = DirectionalLight->GetCascadeCount();
+					
+					DirectionalLightShadowMap = DirectionalLight->GetShadowMap();
 				}
-				DirectionalLightShadowMaps[DirectionalLightCount] = DirectionalLight->GetShadowMap();
-				DirectionalLightCount++;
 			}
 			break;
 
@@ -397,19 +408,16 @@ bool ZERNStageLighting::UpdateLightBuffers()
 				ZEMatrix4x4::Transform(DestLight.PositionView, View.ViewTransform, ProjectiveLight->GetWorldPosition());
 				DestLight.Range = ProjectiveLight->GetRange();
 				DestLight.Color = ProjectiveLight->GetColor() * ProjectiveLight->GetIntensity();
-				DestLight.Type = ProjectiveLight->GetLightType();
 				DestLight.Attenuation = ProjectiveLight->GetAttenuation();
 				DestLight.CastShadow = (ZEBool32)(ProjectiveLight->GetCastsShadow() & ShadowingEnabled);
-				DestLight.ShadowSampleCount = ZELight::ConvertShadowSampleCount(ProjectiveLight->GetShadowSampleCount());
-				DestLight.ShadowSampleLength = ProjectiveLight->GetShadowSampleLength();
-				DestLight.ShadowDepthBias = ProjectiveLight->GetShadowDepthBias();
-
-				ZEMatrix4x4 TextureTransform;
-				ZEMatrix4x4::Create(TextureTransform,
-					0.5f, 0.0f, 0.0f, 0.5f,
-					0.0f, -0.5f, 0.0f, 0.5f,
-					0.0f, 0.0f, 1.0f, 0.0f,
-					0.0f, 0.0f, 0.0f, 1.0f);
+				if (DestLight.CastShadow)
+				{
+					DestLight.ShadowMapIndex = ProjectiveLight->GetShadowMapIndex();
+					DestLight.ShadowSampleCount = ZELight::ConvertShadowSampleCount(ProjectiveLight->GetShadowSampleCount());
+					DestLight.ShadowSampleLength = ProjectiveLight->GetShadowSampleLength();
+					DestLight.ShadowDepthBias = ProjectiveLight->GetShadowDepthBias();
+					DestLight.ShadowNormalBias = ProjectiveLight->GetShadowNormalBias();
+				}
 
 				DestLight.ProjectionTransform = TextureTransform * ProjectiveLight->GetProjectionTransform() * ProjectiveLight->GetViewTransform() * View.InvViewTransform;
 
@@ -419,6 +427,12 @@ bool ZERNStageLighting::UpdateLightBuffers()
 					ProjectiveLight->GetWorldPosition(), 
 					ProjectiveLight->GetWorldRotation(),
 					ZEVector3(TanFovRange * ProjectiveLight->GetAspectRatio() * 2.0f, TanFovRange * 2.0f, ProjectiveLight->GetRange()));
+
+				ZEVector3 Direction = ProjectiveLight->GetWorldRotation() * ZEVector3::UnitZ;
+				Direction.NormalizeSelf();
+				const ZEViewFrustum& ViewFrustum = static_cast<const ZEViewFrustum&>(ProjectiveLight->GetViewVolume());
+				DestLight.CullRange = ZEVector3::Length(ViewFrustum.GetVertex(ZE_VFV_FARRIGHTUP) - ViewFrustum.GetVertex(ZE_VFV_NEARLEFTDOWN)) * 0.5f;
+				ZEMatrix4x4::Transform(DestLight.CullPositionView, View.ViewTransform, ProjectiveLight->GetWorldPosition() + DestLight.CullRange * Direction);
 
 				ProjectiveLights.AddByRef(DestLight);
 
@@ -454,6 +468,8 @@ bool ZERNStageLighting::UpdateLightBuffers()
 	Constants.ProjectiveLightCount = ProjectiveLights.GetCount();
 	Constants.TileCountX = (Viewport.GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
 
+	Constants.AddTiledDeferredOutput = (UseTiledDeferred && Constants.PointLightCount > 0) ? ZEGR_TRUE : ZEGR_FALSE;
+
 	ConstantBuffer->SetData(&Constants);
 
 	if (PointLights.GetCount() > 0)
@@ -461,7 +477,7 @@ bool ZERNStageLighting::UpdateLightBuffers()
 		PointLightStruct* DestPointLights;
 		if (!PointLightStructuredBuffer->Lock(reinterpret_cast<void**>(&DestPointLights)))
 			return false;
-			memcpy(DestPointLights, PointLights.GetConstCArray(), PointLights.GetCount() * sizeof(PointLightStruct));
+			memcpy(DestPointLights, PointLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, PointLights.GetCount()) * sizeof(PointLightStruct));
 		PointLightStructuredBuffer->Unlock();
 	}
 
@@ -470,7 +486,7 @@ bool ZERNStageLighting::UpdateLightBuffers()
 		ProjectiveLightStruct* DestProjectiveLights;
 		if (!ProjectiveLightStructuredBuffer->Lock(reinterpret_cast<void**>(&DestProjectiveLights)))
 			return false;
-			memcpy(DestProjectiveLights, ProjectiveLights.GetConstCArray(), ProjectiveLights.GetCount() * sizeof(ProjectiveLightStruct));
+			memcpy(DestProjectiveLights, ProjectiveLights.GetConstCArray(), ZEMath::Min((ZESize)MAX_LIGHT, ProjectiveLights.GetCount()) * sizeof(ProjectiveLightStruct));
 		ProjectiveLightStructuredBuffer->Unlock();
 	}
 
@@ -526,8 +542,8 @@ void ZERNStageLighting::DeinitializeSelf()
 	DeferredDirectionalLightPixelShaderPerSample.Release();
 	DeferredProjectiveLightPixelShaderPerSample.Release();
 	DeferredPointLightPixelShaderPerSample.Release();
+	EdgeDetectionPixelShader.Release();
 	TiledDeferredComputeShader.Release();
-	AccumulateEmissivePixelShader.Release();
 
 	DeferredDirectionalLightRenderState.Release();
 	DeferredPointLightRenderState.Release();
@@ -535,9 +551,8 @@ void ZERNStageLighting::DeinitializeSelf()
 	DeferredDirectionalLightRenderStatePerSample.Release();
 	DeferredPointLightRenderStatePerSample.Release();
 	DeferredProjectiveLightRenderStatePerSample.Release();
-	TiledDeferredComputeRenderState.Release();
-	AccumulateEmissiveRenderState.Release();
 	EdgeDetectionRenderState.Release();
+	TiledDeferredComputeRenderState.Release();
 
 	ConstantBuffer.Release();
 	PointLightStructuredBuffer.Release();
@@ -545,6 +560,7 @@ void ZERNStageLighting::DeinitializeSelf()
 	DeferredLightVertexBuffer.Release();
 
 	RandomVectorsTexture.Release();
+	TiledDeferredOutputTexture.Release();
 
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
@@ -554,23 +570,35 @@ void ZERNStageLighting::DeinitializeSelf()
 
 void ZERNStageLighting::DrawLights(ZEGRContext* Context, bool PerSample)
 {
-	if (Constants.DirectionalLightCount > 0)
+	if (!UseTiledDeferred)
 	{
-		Context->SetRenderState(PerSample ? DeferredDirectionalLightRenderStatePerSample: DeferredDirectionalLightRenderState);
-		Context->DrawInstanced(6, 0, Constants.DirectionalLightCount, 0);
+		if (Constants.PointLightCount > 0)
+		{
+			Context->SetRenderState(PerSample ? DeferredPointLightRenderStatePerSample : DeferredPointLightRenderState);
+			Context->DrawInstanced(3600, 942, Constants.PointLightCount, 0);
+		}
 	}
 
 	if (Constants.ProjectiveLightCount > 0)
 	{
-		Context->SetTextures(ZEGR_ST_PIXEL, 10, 1, &ProjectiveLightTexture);
 		Context->SetRenderState(PerSample ? DeferredProjectiveLightRenderStatePerSample : DeferredProjectiveLightRenderState);
 		Context->DrawInstanced(18, 4542, Constants.ProjectiveLightCount, 0);
 	}
 
-	if (Constants.PointLightCount > 0)
+	if (Constants.DirectionalLightCount > 0)
 	{
-		Context->SetRenderState(PerSample ? DeferredPointLightRenderStatePerSample : DeferredPointLightRenderState);
-		Context->DrawInstanced(3600, 942, Constants.PointLightCount, 0);
+		Context->SetRenderState(PerSample ? DeferredDirectionalLightRenderStatePerSample: DeferredDirectionalLightRenderState);
+		Context->Draw(6, 0);
+	}
+}
+
+void ZERNStageLighting::BlendTiledDeferred(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, bool PerSample)
+{
+	if (UseTiledDeferred && Constants.DirectionalLightCount == 0)
+	{
+		Context->SetRenderState(PerSample ? BlendRenderStatePerSample : BlendRenderState);
+		Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
+		Context->Draw(3, 0);
 	}
 }
 
@@ -609,7 +637,7 @@ const ZEGRTexture2D* ZERNStageLighting::GetOutput(ZERNStageBuffer Output) const
 {
 	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION))
 		return AccumulationTexture;
-	
+
 	return ZERNStage::GetOutput(Output);
 }
 
@@ -629,57 +657,63 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	Context->SetConstantBuffers(ZEGR_ST_COMPUTE, 8, 1, ConstantBuffer.GetPointerToPointer());
 
 	const ZEGRStructuredBuffer* StructuredBuffers[] = {PointLightStructuredBuffer, ProjectiveLightStructuredBuffer};
-	Context->SetStructuredBuffers(ZEGR_ST_VERTEX, 13, 2, StructuredBuffers);
-	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 13, 2, StructuredBuffers);
-	Context->SetStructuredBuffers(ZEGR_ST_COMPUTE, 13, 2, StructuredBuffers);
+	Context->SetStructuredBuffers(ZEGR_ST_VERTEX, 14, 2, StructuredBuffers);
+	Context->SetStructuredBuffers(ZEGR_ST_PIXEL, 14, 2, StructuredBuffers);
+	Context->SetStructuredBuffers(ZEGR_ST_COMPUTE, 14, 2, StructuredBuffers);
 
-	const ZEGRTexture* GBuffers[] = {GetPrevOutput(ZERN_SO_GBUFFER_EMISSIVE), GetPrevOutput(ZERN_SO_GBUFFER_DIFFUSE), GetPrevOutput(ZERN_SO_NORMAL), DepthTexture, };
+	const ZEGRTexture* GBuffers[] = {GetPrevOutput(ZERN_SO_GBUFFER_EMISSIVE), GetPrevOutput(ZERN_SO_GBUFFER_DIFFUSE), GetPrevOutput(ZERN_SO_NORMAL), DepthTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 1, 4, GBuffers);
-	const ZEGRTexture* ShadowRelatedTextures[] = {DirectionalLightShadowMaps[0], RandomVectorsTexture};
-	Context->SetTextures(ZEGR_ST_PIXEL, 11, 2, ShadowRelatedTextures);
 
-	if (UseTiledDeferred)
+	const ZEGRTexture* InputTextures[] = {ProjectiveLightTexture, DirectionalLightShadowMap, GetPrevOutput(ZERN_SO_PROJECTIVE_SHADOWMAPS), RandomVectorsTexture};
+	Context->SetTextures(ZEGR_ST_PIXEL, 10, 4, InputTextures);
+
+	ZERNStage* StageGBuffer = GetRenderer()->GetStage(ZERN_STAGE_GBUFFER);
+	if (StageGBuffer == NULL || !StageGBuffer->GetEnabled() || StageGBuffer->GetCommands().GetCount() == 0)
+		return false;
+
+	if (UseTiledDeferred && Constants.PointLightCount > 0)
 	{
+		Context->ClearUnorderedAccessView(TiledDeferredOutputTexture, ZEVector4::Zero);
+
 		Context->SetComputeRenderState(TiledDeferredComputeRenderState);
-		Context->SetRWTextures(0, 1, reinterpret_cast<const ZEGRTexture**>(&AccumulationTexture));	//Doesnt work with multi-sampled texture
+		Context->SetRWTextures(0, 1, reinterpret_cast<const ZEGRTexture**>(&TiledDeferredOutputTexture));
 		Context->SetTextures(ZEGR_ST_COMPUTE, 1, 4, GBuffers);
+		Context->SetTextures(ZEGR_ST_COMPUTE, 10, 1, &ProjectiveLightTexture);
 
 		ZEUInt TileCountX = (AccumulationTexture->GetWidth() + TILE_DIMENSION - 1) / TILE_DIMENSION;
 		ZEUInt TileCountY = (AccumulationTexture->GetHeight() + TILE_DIMENSION - 1) / TILE_DIMENSION;
 
 		Context->Dispatch(TileCountX, TileCountY, 1);
+
+		Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&TiledDeferredOutputTexture));
 	}
-	else
+
+	Viewport.SetWidth((float)AccumulationTexture->GetWidth());
+	Viewport.SetHeight((float)AccumulationTexture->GetHeight());
+
+	Context->SetViewports(1, &Viewport);
+
+	if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
 	{
-		ZERNStage* StageGBuffer = GetRenderer()->GetStage(ZERN_STAGE_GBUFFER);
-		if (StageGBuffer != NULL && StageGBuffer->GetEnabled() && StageGBuffer->GetCommands().GetCount() > 0)
-		{
-			Context->SetViewports(1, &Viewport);
+		Context->SetRenderState(EdgeDetectionRenderState);
+		Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer(true));
+		Context->SetStencilRef(1);
+		Context->Draw(3, 0);
+	}
 
-			if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
-			{
-				Context->SetRenderState(EdgeDetectionRenderState);
-				Context->SetRenderTargets(0, NULL, DepthTexture->GetDepthStencilBuffer(true));
-				Context->SetStencilRef(1);
-				Context->Draw(3, 0);
-			}
+	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
+	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
+	Context->SetVertexBuffers(0, 1, DeferredLightVertexBuffer.GetPointerToPointer());
 
-			Context->SetVertexBuffers(0, 1, DeferredLightVertexBuffer.GetPointerToPointer());
-			const ZEGRRenderTarget* OutputRenderTarget = AccumulationTexture->GetRenderTarget();
-			Context->SetRenderTargets(1, &OutputRenderTarget, DepthTexture->GetDepthStencilBuffer(true));
-			
-			Context->SetStencilRef(0);
-			DrawLights(Context, false);
+	Context->SetStencilRef(0);
+	BlendTiledDeferred(Context, RenderTarget, false);
+	DrawLights(Context, false);
 
-			if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
-			{
-				Context->SetStencilRef(1);
-				DrawLights(Context, true);
-			}
-
-			Context->SetRenderState(AccumulateEmissiveRenderState);
-			Context->Draw(3, 0);
-		}
+	if (ZEGRGraphicsModule::SAMPLE_COUNT > 1)
+	{
+		Context->SetStencilRef(1);
+		BlendTiledDeferred(Context, RenderTarget, true);
+		DrawLights(Context, true);
 	}
 
 	CleanUp(Context);
@@ -703,7 +737,7 @@ ZERNStageLighting::ZERNStageLighting()
 	UseTiledDeferred = false;
 
 	memset(&Constants, 0, sizeof(Constants));
-	memset(&DirectionalLightShadowMaps, NULL, sizeof(ZEGRTexture*) * 2);
 
+	DirectionalLightShadowMap = NULL;
 	ProjectiveLightTexture = NULL;
 }

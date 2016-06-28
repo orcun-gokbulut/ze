@@ -108,8 +108,8 @@ class ZEGRContext
 		virtual void					SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers) = 0;
 		virtual void					SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures) = 0;
 
-		virtual	void					CopyResource(ZEGRResource* DestResource, ZEGRResource* SrcResource) = 0;
-		virtual void					ResolveSubresource(ZEGRResource* DestResource, ZEUInt DestSubresource, ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format) = 0;
+		virtual	void					CopyResource(const ZEGRResource* DestResource, const ZEGRResource* SrcResource) = 0;
+		virtual void					ResolveSubresource(const ZEGRResource* DestResource, ZEUInt DestSubresource, const ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format) = 0;
 
 		virtual void					ClearShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count);
 		virtual void					ClearUnorderedAccesses(ZEUInt Index, ZEUInt Count);

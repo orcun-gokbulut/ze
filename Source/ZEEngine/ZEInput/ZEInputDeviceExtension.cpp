@@ -56,7 +56,7 @@ bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 
 	Devices.Add(Device);
 
-	if (GetInitializationState() == ZE_IS_INITIALIZING || GetInitializationState() == ZE_IS_INITIALIZED)
+	if (GetInitializationState() == ZE_BS_INITIALIZING || GetInitializationState() == ZE_BS_INITIALIZED)
 	{
 		if (!Device->Initialize())
 		{
@@ -70,7 +70,7 @@ bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 
 void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
 {
-	if (GetInitializationState() == ZE_IS_DEINITIALIZING || GetInitializationState() == ZE_IS_NOT_INITIALIZED)
+	if (GetInitializationState() == ZE_BS_DEINITIALIZING || GetInitializationState() == ZE_BS_NOT_INITIALIZED)
 		Device->Deinitialize();
 
 	Devices.RemoveValue(Device);

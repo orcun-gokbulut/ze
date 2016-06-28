@@ -59,15 +59,14 @@ void ZEMCParser::ProcessProperty(ZEMCClass* ClassData, DeclaratorDecl* PropertyD
 	PropertyData->IsContainer = PropertyType.ContainerType != ZEMC_CT_NONE;
 	PropertyData->Type = PropertyType;
 	PropertyData->Access = PropertyType.TypeQualifier == ZEMC_TQ_VALUE ? ZEMC_PA_READ_WRITE : ZEMC_PA_READ;
-	
 
-	ParseAttributes(PropertyData, PropertyDeclaration);
+	ProcessMemberAttributes(PropertyData, PropertyDeclaration, false, NULL);
+	
+	if (!PropertyData->CheckAttributeValue("ZEMC.Export", "true", 0, "false"))
+		return;
 
 	ClassData->Properties.Add(PropertyData.Transfer());
 }
-
-#define GET_ATTRIBUTE(Attributes, Name) 0
-#define CHECK_ATTRIBUTE(Attributes, Name) false
 
 static void WipeAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEString Name)
 {
@@ -130,6 +129,9 @@ void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCM
 		if (MethodData->Parameters.GetCount() != 1)
 			return;
 
+		if (!MethodData->CheckAttributeValue("ZEMC.Accessor", "true", 0, "false"))
+			return;
+
 		ZEMCAccessor Accessor;
 		Accessor.Name = MethodData->Name.Right(MethodData->Name.GetLength() - 3);
 		Accessor.Type = ZEMC_AT_SETTER;
@@ -145,6 +147,9 @@ void ZEMCParser::ProcessPropertyAccessor(ZEArray<ZEMCAccessor>& Accessors, ZEMCM
 			return;
 		
 		if (MethodData->ReturnValue.BaseType == ZEMC_BT_VOID)
+			return;
+
+		if (!MethodData->CheckAttributeValue("ZEMC.Accessor", "true", 0, "false"))
 			return;
 
 		ZEMCAccessor Accessor;
@@ -190,6 +195,12 @@ void ZEMCParser::ProcessPropertyAccessors(ZEMCClass* ClassData)
 			PropertyData->Type = AccessorData.PropertyType;
 			PropertyData->IsContainer = AccessorData.PropertyType.ContainerType != ZEMC_CT_NONE;
 			PropertyData->Hash = PropertyData->Name.Hash();
+
+			ProcessMemberAttributes(PropertyData, NULL, false, NULL);
+
+			if (!PropertyData->CheckAttributeValue("ZEMC.Export", "true", 0, "false"))
+				return;
+
 			ClassData->Properties.Add(PropertyData);
 		}
 

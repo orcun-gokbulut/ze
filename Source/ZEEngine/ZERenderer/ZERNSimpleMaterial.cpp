@@ -36,6 +36,7 @@
 #include "ZERNSimpleMaterial.h"
 
 #include "ZECanvas.h"
+#include "ZERNCommand.h"
 #include "ZERNRenderer.h"
 #include "ZERNShaderSlots.h"
 #include "ZERNStageForward.h"
@@ -83,13 +84,12 @@ bool ZERNSimpleMaterial::UpdateRenderState() const
 
 	ZEGRRenderState RenderState;
 	
-	if (StageMask & ZERN_STAGE_FORWARD)
+	if (GetTransparent())
+		RenderState = ZERNStageForwardTransparent::GetRenderState();
+	else
 		RenderState = ZERNStageForward::GetRenderState();
 
-	else if (StageMask & ZERN_STAGE_FORWARD_TRANSPARENT)
-		RenderState = ZERNStageForwardTransparent::GetRenderState();
-
-	RenderState.SetPrimitiveType(ZEGR_PT_LINE_LIST);
+	RenderState.SetPrimitiveType(PrimitiveType);
 	RenderState.SetVertexLayout(*ZECanvasVertex::GetVertexLayout());
 
 	if (DepthTestDisabled)
@@ -134,8 +134,6 @@ bool ZERNSimpleMaterial::InitializeSelf()
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
 
-	StageMask |= Transparent ? ZERN_STAGE_FORWARD_TRANSPARENT : ZERN_STAGE_FORWARD;
-
 	if (!UpdateShaders())
 		return false;
 
@@ -169,10 +167,18 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	TwoSided = false;
 	Wireframe = false;
 	DepthTestDisabled = false;
+	Transparent = false;
+	PrimitiveType = ZEGR_PT_LINE_LIST;
+	StageMask = ZERN_STAGE_FORWARD;
 
 	Constants.MaterialColor = ZEVector4::One;
 	Constants.TextureEnabled = false;
 	Constants.VertexColorEnabled = true;
+}
+
+void ZERNSimpleMaterial::SetStageMask(ZERNStageMask Mask)
+{
+	StageMask = Mask;
 }
 
 ZERNStageMask ZERNSimpleMaterial::GetStageMask() const
@@ -206,6 +212,20 @@ void ZERNSimpleMaterial::SetWireframe(bool Enable)
 bool ZERNSimpleMaterial::GetWireframe() const
 {
 	return Wireframe;
+}
+
+void ZERNSimpleMaterial::SetPrimitiveType(ZEGRPrimitiveType Type)
+{
+	if (PrimitiveType == Type)
+		return;
+
+	PrimitiveType = Type;
+	DirtyFlags.RaiseFlags(ZERN_SMDF_RENDER_STATE);
+}
+
+ZEGRPrimitiveType ZERNSimpleMaterial::GetPrimitiveType() const
+{
+	return PrimitiveType;
 }
 
 void ZERNSimpleMaterial::SetDepthTestDisabled(bool Disabled)
@@ -250,18 +270,18 @@ float ZERNSimpleMaterial::GetOpacity() const
 	return Constants.Opacity;
 }
 
-void ZERNSimpleMaterial::SetVertexColorEnabled(bool Enable)
+void ZERNSimpleMaterial::SetVertexColorEnabled(bool Enabled)
 {
-	if (Constants.VertexColorEnabled == Enable)
+	if ((bool)Constants.VertexColorEnabled == Enabled)
 		return;
 
-	Constants.VertexColorEnabled = Enable;
+	Constants.VertexColorEnabled = Enabled;
 	DirtyFlags.RaiseFlags(ZERN_SMDF_CONSTANT_BUFFER);
 }
 
 bool ZERNSimpleMaterial::GetVertexColorEnabled() const
 {
-	return Constants.VertexColorEnabled;
+	return (bool)Constants.VertexColorEnabled;
 }
 
 void ZERNSimpleMaterial::SetMaterialColor(const ZEVector4& Color)
@@ -283,7 +303,7 @@ void ZERNSimpleMaterial::SetTexture(const ZERNMap& Map)
 	TextureMap = Map;
 	
 	bool TextureEnabled = (Map.GetTexture() != NULL);
-	if (Constants.TextureEnabled == TextureEnabled)
+	if ((bool)Constants.TextureEnabled == TextureEnabled)
 		return;
 	
 	Constants.TextureEnabled = TextureEnabled;
@@ -295,7 +315,7 @@ const ZERNMap& ZERNSimpleMaterial::GetTexture() const
 	return TextureMap;
 }
 
-bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
@@ -320,14 +340,14 @@ bool ZERNSimpleMaterial::SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) c
 	return true;
 }
 
-void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const
+void ZERNSimpleMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
 bool ZERNSimpleMaterial::Update() const
 {
-	if (!IsInitialized())
+	if (!ZERNMaterial::Update())
 		return false;
 
 	if (!UpdateShaders())
@@ -340,6 +360,17 @@ bool ZERNSimpleMaterial::Update() const
 		return false;
 
 	return true;
+}
+
+bool ZERNSimpleMaterial::PreRender(ZERNCommand& Command)
+{
+	Command.StageMask = ZERN_STAGE_DEBUG;
+	if (GetTransparent())
+		Command.StageMask |= ZERN_STAGE_FORWARD_TRANSPARENT;
+	else
+		Command.StageMask |= StageMask;
+
+	return StageMask;
 }
 
 ZEHolder<ZERNSimpleMaterial> ZERNSimpleMaterial::CreateInstance()

@@ -63,7 +63,6 @@ class ZEModel : public ZEEntity
 	friend class ZEModelMeshLOD;
 
 	private:
-		//ZE_ATTRIBUTE_1(ModelResource, "ResourcePath")
 		const ZEModelResource*				ModelResource;
 		ZEArray<ZEModelBone*>				Skeleton;
 		ZEArray<ZERNCommand>				LODRenderCommands;
@@ -156,12 +155,13 @@ class ZEModel : public ZEEntity
 
 		void								Tick(float ElapsedTime);
 		
-		virtual bool						PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void						Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
 		void								TransformChangeEvent(ZEPhysicalObject* PhysicalObject, ZEVector3 NewPosition, ZEQuaternion NewRotation);	
 		void								LinkParentlessBones(ZEModelBone* ParentlessBone);
-		virtual bool						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void						RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		static ZEModel*						CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE_PROPERTY("ModelFile", "ZEDEditor.PropertyEditor.Semantic", "Asset", "ZEModelAsset");

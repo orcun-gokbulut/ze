@@ -86,9 +86,7 @@ ze_add_source(ZELNContactWidget.ui				Sources QtUIs)
 ze_add_source(../ZEEngine/ZECore/ZEWindowResources.rc 	Sources)
 
 set(CMAKE_LIBRARY_PATH "C:\\Program Files (x86)\\Windows Kits\\8.0\\Lib\\win8\\um\\x64")
-
-find_package(Qt5Core)
-find_package(Qt5Widgets)
+find_package(Qt5 COMPONENTS Widgets)
 
 qt5_wrap_ui(QtUIOutputs ${QtUIs})
 qt5_wrap_cpp(QtMocOutputs  ${QtMocs})
@@ -103,13 +101,13 @@ qt5_use_modules(ZELNLauncher Widgets)
 
 add_custom_command(TARGET ZELNLauncher POST_BUILD
 	# DEBUG
-	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Cored.dll 		${CMAKE_CURRENT_BINARY_DIR}/Debug
-	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Guid.dll		${CMAKE_CURRENT_BINARY_DIR}/Debug
-	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Widgetsd.dll 	${CMAKE_CURRENT_BINARY_DIR}/Debug
+	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Cored.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Debug"
+	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Guid.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Debug"
+	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgetsd.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Debug"
 	# RELEASE
-	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Core.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
-	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Gui.dll			${CMAKE_CURRENT_BINARY_DIR}/Release
-	COMMAND ${CMAKE_COMMAND} -E copy ${Qt5Core_DIR}/../../../bin/Qt5Widgets.dll		${CMAKE_CURRENT_BINARY_DIR}/Release
+	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Core.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Release"
+	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Gui.dll"		"${CMAKE_CURRENT_BINARY_DIR}/Release"
+	COMMAND "${CMAKE_COMMAND}" ARGS "-E" "copy_if_different" "${Qt5_DIR}/../../../bin/Qt5Widgets.dll"	"${CMAKE_CURRENT_BINARY_DIR}/Release"
 	# Output Message
 	COMMENT "Copying Qt binaries" VERBATIM)
 	

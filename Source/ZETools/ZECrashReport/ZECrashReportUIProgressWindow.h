@@ -34,17 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_CRASHREPORT_PROGRESSWINDOW_H__
-#define __ZE_CRASHREPORT_PROGRESSWINDOW_H__
 
-#include <QtGui/QMainWindow>
-#include <QtGui/QMessageBox>
-#include <QtCore/QTimer>
 #include "ZECrashReportUIClickableLabel.h"
 #include "ZECrashReport/ZECrashReport.h"
 #include "ZECrashReportUICompletedWindow.h"
 #include "ZEThread/ZEThread.h"
 #include "ZECrashReportSender.h"
+
+#include <QMainWindow>
+#include <QMessageBox>
+#include <QTimer>
 
 namespace Ui
 {
@@ -54,12 +53,11 @@ namespace Ui
 class ZECrashReportUIProgressWindow : public QMainWindow
 {
 	Q_OBJECT
-
 	public:
 		void									TerminateProcess();
 		void									Process();
 
-												ZECrashReportUIProgressWindow(QWidget* Parent = 0, Qt::WFlags Flags = 0);
+												ZECrashReportUIProgressWindow(QWidget* Parent = 0, Qt::WindowFlags Flags = 0);
 												ZECrashReportUIProgressWindow(QMainWindow* ParentWidget, ZECrashReport* CrashReport, const ZEString& UploadURL);
 												~ZECrashReportUIProgressWindow();
 
@@ -102,4 +100,3 @@ class ZECrashReportUIProgressWindow : public QMainWindow
 		void									ProgressCanceled();
 
 };
-#endif

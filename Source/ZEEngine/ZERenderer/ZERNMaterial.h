@@ -41,19 +41,21 @@
 
 class ZEGRContext;
 class ZERNStage;
+class ZERNCommand;
 
 class ZERNMaterial : public ZEObject, public ZEReferenceCounted, public ZEInitializable
 {
 	ZE_OBJECT
 	protected:
-						ZERNMaterial();
-		virtual			~ZERNMaterial();
+										ZERNMaterial();
+		virtual							~ZERNMaterial();
 
 	public:
-		virtual ZEUInt	GetStageMask() const = 0;
+		virtual ZEUInt					GetStageMask() const = 0;
 
-		virtual bool	SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
-		virtual void	CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual bool					PreRender(ZERNCommand& Command) const;
+		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
-		virtual bool	Update() const;
+		virtual bool					Update() const;
 };

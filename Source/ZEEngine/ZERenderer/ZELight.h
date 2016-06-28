@@ -156,8 +156,10 @@ class ZELight : public ZEEntity
 		virtual const ZEMatrix4x4&		GetViewTransform(ZESize Index = 0) const = 0;
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const = 0;
 		
-		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 
 		static ZEUInt					ConvertShadowResolution(ZELightShadowResolution ShadowResolution);
 		static ZEUInt					ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCount);
-};
+}
+ZE_META_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color")
+ZE_META_ATTRIBUTE_PROPERTY(Attenuation, ZEDEditor.PropertyEditor.Semantic, "Attenuation");

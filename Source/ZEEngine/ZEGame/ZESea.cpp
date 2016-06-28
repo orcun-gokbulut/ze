@@ -200,29 +200,45 @@ ZESea* ZESea::CreateInstance()
 	return new ZESea();
 }
 
-bool ZESea::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
+void ZESea::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	float Height = GetWorldPosition().y;
 	ZEPlane Plane(ZEVector3::UnitY, ZEVector3(0.0f, Height, 0.0f));
 	
 	float MinT;
-	if (ZEPlane::IntersectionTest(Plane, Parameters.Ray, MinT))
-	{
-		ZEVector3 InsersectionPosition = Parameters.Ray.GetPointOn(MinT);
-		float DistanceSquare = ZEVector3::DistanceSquare(Parameters.Ray.p, InsersectionPosition);
-		if (Report.Distance * Report.Distance > DistanceSquare && DistanceSquare < Parameters.MaximumDistance * Parameters.MaximumDistance)
-		{
-			Report.Distance = ZEMath::Sqrt(DistanceSquare);
-			Report.Position = InsersectionPosition;
-			Report.PoligonIndex = 0;
-			Report.SubComponent = NULL;
-			Report.Material = NULL;
-			Report.Binormal = ZEVector3::UnitZ;
-			Report.Normal = ZEVector3::UnitY;
-		}
+	if (!ZEPlane::IntersectionTest(Plane, Parameters.Ray, MinT))
+		return;
 
-		return true;
+	if (!Report.CheckDistance(MinT))
+		return;
+
+	ZERayCastCollision Collision;
+	Collision.Object = this;
+	Collision.Position = Parameters.Ray.GetPointOn(MinT);
+	Collision.Distance = MinT;
+
+	if (Parameters.Components.GetFlags(ZE_RCRE_BOUNDING_BOX_ENTER))
+	{
+		Collision.Type = ZE_RCCT_BOUNDING_BOX_ENTER;
+		Report.AddCollision(Collision);
 	}
 
-	return false;
+	if (Parameters.Components.GetFlags(ZE_RCRE_BOUNDING_BOX_EXIT) && !Report.CheckDone())
+	{
+		Collision.Type = ZE_RCCT_BOUNDING_BOX_EXIT;
+		Report.AddCollision(Collision);
+	}
+
+	if (Parameters.Components.GetFlags(ZE_RCRE_POLYGONS) && !Report.CheckDone())
+	{
+		ZEVector3 Binormal, Tangent;
+		ZEVector3::CrossProduct(Binormal, Plane.n, ZEVector3::UnitX);
+		ZEVector3::CrossProduct(Tangent, Plane.n, Binormal);
+			
+		Collision.Type = ZE_RCCT_POLGON;
+		Collision.Polygon.V0 = Plane.p;
+		Collision.Polygon.V1 = Plane.p + Tangent;
+		Collision.Polygon.V2 = Plane.p + Binormal;	
+		Report.AddCollision(Collision);
+	}
 }

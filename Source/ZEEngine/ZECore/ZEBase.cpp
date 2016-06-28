@@ -37,24 +37,24 @@
 
 bool ZEBase::InitializeSelf()
 {
-	InitializationState = ZE_IS_INITIALIZING;
+	InitializationState = ZE_BS_INITIALIZING;
 	return true;
 }
 
 bool ZEBase::DeinitializeSelf()
 {
-	InitializationState = ZE_IS_NOT_INITIALIZED;
+	InitializationState = ZE_BS_NOT_INITIALIZED;
 	return true;
 }
 
-ZEInitializationState ZEBase::GetInitializationState() const
+ZEBaseState ZEBase::GetInitializationState() const
 {
 	return InitializationState;
 }
 
 bool ZEBase::IsInitialized() const
 {
-	return (InitializationState == ZE_IS_INITIALIZED);
+	return (InitializationState == ZE_BS_INITIALIZED);
 }
 
 bool ZEBase::Initialize()
@@ -65,10 +65,10 @@ bool ZEBase::Initialize()
 	if (!InitializeSelf())
 		return false;
 
-	if (InitializationState != ZE_IS_INITIALIZING)
+	if (InitializationState != ZE_BS_INITIALIZING)
 		return false;
 
-	InitializationState = ZE_IS_INITIALIZED;
+	InitializationState = ZE_BS_INITIALIZED;
 
 	return true;
 }
@@ -78,12 +78,12 @@ bool ZEBase::Deinitialize()
 	if (!IsInitialized())
 		return true;
 
-	InitializationState = ZE_IS_DEINITIALIZING;
+	InitializationState = ZE_BS_DEINITIALIZING;
 
 	if (!DeinitializeSelf())
 		return false;
 
-	if (InitializationState != ZE_IS_NOT_INITIALIZED)
+	if (InitializationState != ZE_BS_NOT_INITIALIZED)
 		return false;
 
 	return true;
@@ -97,7 +97,7 @@ void ZEBase::Destroy()
 
 ZEBase::ZEBase()
 {
-	InitializationState = ZE_IS_NOT_INITIALIZED;
+	InitializationState = ZE_BS_NOT_INITIALIZED;
 }
 
 ZEBase::~ZEBase()

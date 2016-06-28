@@ -37,7 +37,6 @@
 
 #include "ZEMath\ZEViewFrustum.h"
 #include "ZERNRenderer.h"
-#include "ZERNCuller.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStageShadowmapGeneration.h"
 #include "ZEGraphics\ZEGRGraphicsModule.h"
@@ -310,16 +309,16 @@ const ZEAABBox& ZELight::GetBoundingBox() const
 	return ZEEntity::GetBoundingBox();
 }
 
-bool ZELight::PreRender(const ZERNCullParameters* CullParameters)
+bool ZELight::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!ZEEntity::PreRender(CullParameters))
+	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
 	Command.StageMask = ZERN_STAGE_LIGHTING | ZERN_STAGE_DEBUG;
 	if (CastsShadows)
 		Command.StageMask |= ZERN_STAGE_SHADOWING;
 
-	CullParameters->Renderer->AddCommand(&Command);
+	Parameters->Renderer->AddCommand(&Command);
 
 	return true;
 }

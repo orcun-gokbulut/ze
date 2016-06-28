@@ -49,7 +49,7 @@ class ZEGRRenderStateData;
 class ZEGRSampler;
 class ZERNRenderer;
 class ZERNRenderParameters;
-class ZERNCullParameters;
+class ZERNPreRenderParameters;
 
 struct ZEUIVertex
 {

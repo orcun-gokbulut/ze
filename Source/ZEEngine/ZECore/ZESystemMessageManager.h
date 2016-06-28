@@ -45,12 +45,16 @@ class ZESystemMessageManager
 {
 	friend class ZECore;
 	private:
+		bool								Enabled;
 		ZEArray<ZESystemMessageHandler*>	Handlers;
 
 											ZESystemMessageManager();
 											~ZESystemMessageManager();
 
 	public:
+		void								SetEnabled(bool Enabled);
+		bool								GetEnabled();
+
 		const 
 		ZEArray<ZESystemMessageHandler*>&	GetMessageHandlers();
 

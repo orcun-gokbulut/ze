@@ -75,4 +75,5 @@ class ZELightOmniProjective : public ZELight
 		virtual const ZEMatrix4x4&		GetProjectionTransform(ZESize Index = 0) const;
 
 		static ZELightOmniProjective*	CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE_PROPERTY(ProjectionTextureFile, ZEDEditor.PropertyEditor.Semantic, "Asset", "ZEDTextureAsset");

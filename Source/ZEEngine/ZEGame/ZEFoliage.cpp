@@ -187,28 +187,28 @@ void ZEFoliage::Tile()
 	HaltonSequence HaltonSeqZ((((10.0f) - (2.0f)) * ZERandom::GetFloatPositive() + (2.0f)));
 
 	ZERayCastParameters Parameters;
-	ZERayCastReport		Report;
+	Parameters.MaximumDistance = 10000.0f;
+	Parameters.MinimumDistance = 0.1f;
+	Parameters.Ray.v = -ZEVector3::UnitY;
 
+	ZERayCastReport		Report;
 	for (ZESize I = 0; I < BrushDensity; I++)
 	{
+		float PositionX = (HaltonSeqX.GetNext() - 0.5f) * BrushSize.x;
+		float PositionZ = (HaltonSeqZ.GetNext() - 0.5f) * BrushSize.y;
+
+		Parameters.Ray.p = ZEVector3(PositionX, GetWorldPosition().y, PositionZ);
+		Ground->RayCast(Report, Parameters);
+
+		if (Report.GetResult())
+			continue;
+
 		ZEModel* Tree = ZEModel::CreateInstance();
 		Tree->SetModelResource(Trees[ZERandom::GetUInt8() % 4]);
 		AddChildEntity(Tree);
 
-		float PositionX = (HaltonSeqX.GetNext() - 0.5f) * BrushSize.x;
-		float PositionZ = (HaltonSeqZ.GetNext() - 0.5f) * BrushSize.y;
-
 		float ScalarValue = (((MaxScale) - (MinScale)) * ZERandom::GetFloatPositive() + (MinScale));
-
-		Parameters.MaximumDistance = 10000.0f;
-		Parameters.MinimumDistance = 0.1f;
-		Parameters.Ray.p = ZEVector3(PositionX, GetWorldPosition().y, PositionZ);
-		Parameters.Ray.v = -ZEVector3::UnitY;
-		Parameters.Extras = ZE_RCRE_NONE;
-
-		Ground->RayCast(Report, Parameters);
-
-		Tree->SetWorldPosition(ZEVector3(PositionX, Report.Position.y, PositionZ));
+		Tree->SetWorldPosition(ZEVector3(PositionX, Report.GetCollision().Position.y, PositionZ));
 		Tree->SetWorldRotation(ZEQuaternion((((ZE_PI) - (0.0f)) * ZERandom::GetFloatPositive() + (0.0f)), ZEVector3::UnitY));
 		Tree->SetWorldScale(ZEVector3(ScalarValue, ScalarValue, ScalarValue));
 	}
@@ -230,11 +230,11 @@ void ZEFoliage::Realign()
 		Parameters.MinimumDistance = 0.1f;
 		Parameters.Ray.p = ZEVector3(OldPosition.x, GetWorldPosition().y, OldPosition.z);
 		Parameters.Ray.v = -ZEVector3::UnitY;
-		Parameters.Extras = ZE_RCRE_NONE;
 
 		Ground->RayCast(Report, Parameters);
 
-		GetChildEntities()[I]->SetWorldPosition(ZEVector3(OldPosition.x, Report.Position.y, OldPosition.z));
+		if (Report.GetResult())
+			GetChildEntities()[I]->SetWorldPosition(ZEVector3(OldPosition.x, Report.GetCollision().Position.y, OldPosition.z));
 	}
 }
 

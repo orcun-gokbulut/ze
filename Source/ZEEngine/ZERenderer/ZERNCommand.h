@@ -62,6 +62,7 @@ class ZERNCommand : public ZEObject
 
 		ZEInt							Priority;
 		float							Order;
+		ZEInt							SceneIndex;
 		ZEUInt							StageMask;
 		void*							ExtraParameters;
 

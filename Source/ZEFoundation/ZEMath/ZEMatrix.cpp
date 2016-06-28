@@ -346,7 +346,7 @@ bool ZEMatrix3x3::Equals(const ZEMatrix3x3& Matrix, float Threshold)
 	return true;
 }
 
-ZEQuaternion ZEMatrix3x3::GetRotation()
+ZEQuaternion ZEMatrix3x3::GetRotation() const
 {
 	ZEVector3 TempScale;
 	TempScale.x = ZEVector3(M11, M21, M31).Length();
@@ -363,7 +363,7 @@ ZEQuaternion ZEMatrix3x3::GetRotation()
 	return Rotation;
 }
 
-ZEVector3 ZEMatrix3x3::GetScale()
+ZEVector3 ZEMatrix3x3::GetScale() const
 {
 	ZEVector3 Scale;
 
@@ -388,17 +388,17 @@ void ZEMatrix3x3::GetDecomposition(ZEQuaternion& Rotation, ZEVector3& Scale, con
 	ZEQuaternion::CreateFromMatrix(Rotation, RotationMatrix);
 }
 
-ZEVector2 ZEMatrix3x3::Get2DTranslation()
+ZEVector2 ZEMatrix3x3::Get2DTranslation() const
 {
 	return ZEVector2(M13, M23);
 }
 
-float ZEMatrix3x3::Get2DRotation()
+float ZEMatrix3x3::Get2DRotation() const
 {
 	return ZEAngle::ArcTan2(M12, M22);
 }
 
-ZEVector2 ZEMatrix3x3::Get2DScale()
+ZEVector2 ZEMatrix3x3::Get2DScale() const
 {
 	ZEVector2 Scale;
 
@@ -1072,12 +1072,12 @@ bool ZEMatrix4x4::Equals(const ZEMatrix4x4& Matrix, float Threshold) const
 	return true;
 }
 
-ZEVector3 ZEMatrix4x4::GetTranslation()
+ZEVector3 ZEMatrix4x4::GetTranslation() const
 {
 	return ZEVector3(M14, M24, M34);
 }
 
-ZEQuaternion ZEMatrix4x4::GetRotation()
+ZEQuaternion ZEMatrix4x4::GetRotation() const
 {
 	ZEVector3 TempScale;
 	TempScale.x = ZEVector3(M11, M21, M31).Length();
@@ -1094,7 +1094,7 @@ ZEQuaternion ZEMatrix4x4::GetRotation()
 	return Rotation;
 }
 
-ZEVector3 ZEMatrix4x4::GetScale()
+ZEVector3 ZEMatrix4x4::GetScale() const
 {
 	ZEVector3 Scale;
 

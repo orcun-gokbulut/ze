@@ -190,7 +190,7 @@ bool ZERNStageResolving::UpdateInputOutputs()
 	if (NormalTexture == NULL)
 		return false;
 
-	DepthTexture = GetPrevOutput(ZERN_SO_DEPTH);
+	DepthTexture = GetPrevOutput(ZERN_SO_TRANSPARENT_DEPTH);
 	if (DepthTexture == NULL)
 		return false;
 
@@ -324,7 +324,7 @@ const ZEGRTexture2D* ZERNStageResolving::GetOutput(ZERNStageBuffer Output) const
 		else if (Output == ZERN_SO_NORMAL && ResolvedNormalTexture != NULL)
 			return ResolvedNormalTexture;
 
-		else if (Output == ZERN_SO_DEPTH && ResolvedDepthTexture != NULL)
+		else if ((Output == ZERN_SO_DEPTH || Output == ZERN_SO_TRANSPARENT_DEPTH) && ResolvedDepthTexture != NULL)
 			return ResolvedDepthTexture;
 	}
 

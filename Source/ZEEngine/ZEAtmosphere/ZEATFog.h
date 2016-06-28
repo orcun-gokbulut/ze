@@ -92,7 +92,7 @@ class ZEATFog : public ZEEntity
 		void							SetColor(const ZEVector3& Color);
 		const ZEVector3&				GetColor() const;
 
-		virtual bool					PreRender(const ZERNCullParameters* CullParameters);
+		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEATFog*					CreateInstance();

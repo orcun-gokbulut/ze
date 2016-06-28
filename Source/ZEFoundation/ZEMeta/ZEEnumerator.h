@@ -37,25 +37,29 @@
 #ifndef __ZE_ENUMERATOR_H__
 #define __ZE_ENUMERATOR_H__
 
+#include "ZEMTDeclaration.h"
+
 #include "ZETypes.h"
 #include "ZEGUID.h"
 #include "ZEAttribute.h"
 
 #define ZE_ENUM(Name) \
 	ZEEnumerator* Name##_Declaration();\
-	enum ZE_ATTRIBUTE_0(Enumerator) Name
+	enum ZE_META_ATTRIBUTE(ZEMC.Enumerator) Name
 
-#define ZE_ENUMERATOR_IMPLEMENTATION(Name) \
+#define ZE_META_ENUMERATOR_IMPLEMENTATION(Name) \
 	class Name##Enumerator : public ZEEnumerator \
 	{ \
 		public: \
-			virtual const char* GetName(); \
-			virtual ZEGUID GetGUID(); \
-			virtual const ZEEnumeratorItem* GetItems(); \
-			virtual ZESize GetItemCount(); \
+			virtual const char* GetName() const; \
+			virtual const ZEGUID& GetGUID() const; \
+			virtual const ZEAttribute* GetAttributes() const; \
+			virtual ZESize GetAttributeCount() const; \
+			virtual const ZEEnumeratorItem* GetItems() const; \
+			virtual ZESize GetItemCount() const; \
 	};
 
-#define ZE_ENUMERATOR_DECLARATION(Name) \
+#define ZE_META_ENUMERATOR_DECLARATION(Name) \
 	ZEEnumerator* Name##_Declaration() \
 	{ \
 		static Name##Enumerator Enumerator; \
@@ -68,15 +72,13 @@ struct ZEEnumeratorItem
 	ZEUInt32					Value;
 };
 
-class ZEEnumerator
+class ZEEnumerator : public ZEMTDeclaration
 {
 	public:
-		virtual const char*				GetName() = 0;
-		virtual ZEGUID					GetGUID() = 0;
+		virtual ZEMTDeclarationType			GetDeclarationType() const;
 
-
-	virtual const ZEEnumeratorItem*		GetItems() = 0;
-	virtual ZESize						GetItemCount() = 0;
+		virtual const ZEEnumeratorItem*		GetItems() const = 0;
+		virtual ZESize						GetItemCount() const = 0;
 };
 
 

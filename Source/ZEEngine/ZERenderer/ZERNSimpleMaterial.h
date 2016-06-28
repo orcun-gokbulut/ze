@@ -42,6 +42,8 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEMath/ZEVector.h"
 #include "ZERNMap.h"
+#include "ZERNStageID.h"
+#include "ZEGraphics/ZEGRRasterizerState.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
@@ -53,17 +55,16 @@ class ZERNSimpleMaterial : public ZERNMaterial
 	private:
 		mutable ZEFlags							DirtyFlags;
 
-		ZEUInt									StageMask;
-
 		bool									TwoSided;
 		bool									Wireframe;
 		bool									DepthTestDisabled;
 		bool									Transparent;
+		ZERNStageMask							StageMask;
+		ZEGRPrimitiveType						PrimitiveType;
 
 		mutable ZEHolder<ZEGRShader>			VertexShader;
 		mutable ZEHolder<ZEGRShader>			PixelShader;
 		mutable ZEHolder<ZEGRRenderStateData>	RenderStateData;
-
 		mutable ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
 		ZERNMap									TextureMap;
@@ -87,6 +88,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 												ZERNSimpleMaterial();
 
 	public:
+		void									SetStageMask(ZERNStageMask Mask);
 		virtual ZEUInt							GetStageMask() const;
 
 		void									SetTwoSided(bool Enable);
@@ -97,6 +99,9 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		void									SetDepthTestDisabled(bool Disabled);
 		bool									GetDepthTestDisabled() const;
+
+		void									SetPrimitiveType(ZEGRPrimitiveType Type);
+		ZEGRPrimitiveType						GetPrimitiveType() const;
 
 		void									SetTransparent(bool Transparent);
 		bool									GetTransparent() const;
@@ -115,8 +120,9 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		virtual bool							Update() const;
 
-		virtual bool							SetupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
-		virtual void							CleanupMaterial(ZEGRContext* Context, ZERNStage* Stage) const;
+		virtual bool							PreRender(ZERNCommand& Command);
+		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
+		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
 		static ZEHolder<ZERNSimpleMaterial>		CreateInstance();
 };

@@ -40,11 +40,11 @@
 #include "ZETypes.h"
 #include "ZEVector.h"
 #include "ZEMatrix.h"
-#include "ZEMeta\ZEBuiltIn.h"
+#include "ZEMeta\ZEMTFundamental.h"
 
 class ZEQuaternion
 {
-	ZE_BUILTIN_OBJECT
+	ZE_FUNDAMENTAL
 
 	public:
 		static const ZEQuaternion		Zero;

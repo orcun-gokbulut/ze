@@ -64,7 +64,7 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 	ZEGRShaderCompileOptions ResultOptions = Options;
 
 	// Compile
-	HRESULT Result = D3DCompile(Options.SourceData, Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, 0, &ByteCode, &CompileOutput);
+	HRESULT Result = D3DCompile(Options.SourceData.ToCString(), Options.SourceData.GetSize(), Options.FileName, Macros.GetConstCArray(), &IncludeInterface, Options.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, 0, &ByteCode, &CompileOutput);
 	if (FAILED(Result))
 	{	
 		if (!ShaderEditorOpen)
@@ -74,7 +74,7 @@ bool ZED11ShaderCompiler::Compile(ZEArray<ZEBYTE>& OutputByteCode, const ZEGRSha
 				if(!PrepareOptions(ResultOptions, Macros, IncludeInterface, Profile))
 					return false;
 
-				Result = D3DCompile(ResultOptions.SourceData, ResultOptions.SourceData.GetSize(), ResultOptions.FileName, Macros.GetConstCArray(), &IncludeInterface, ResultOptions.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
+				Result = D3DCompile(ResultOptions.SourceData.ToCString(), ResultOptions.SourceData.GetSize(), ResultOptions.FileName, Macros.GetConstCArray(), &IncludeInterface, ResultOptions.EntryPoint, Profile, ZE_SHADER_COMPILER_PARAMETERS, NULL, &ByteCode, &CompileOutput);
 			}
 		}
 		// Compile

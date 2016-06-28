@@ -37,9 +37,11 @@
 #ifndef __ZE_SCENE_H__
 #define __ZE_SCENE_H__
 
-#include "ZEDS/ZEArray.h"
 #include "ZETypes.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEMeta/ZEObject.h"
+
 #include "ZERayCast.h"
 
 ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
@@ -53,12 +55,8 @@ ZE_META_FORWARD_DECLARE(ZEPostProcessor,	"ZEPostProcessor/ZEPostProcessor.h")
 
 class ZEPhysicalWorld;
 class ZERNRenderer;
-
-#define ZE_RCF_ENTITY							1
-#define ZE_RCF_COMPONENT						2
-#define ZE_RCF_MAP								4
-#define ZE_RCF_POSITON							8
-#define ZE_RCF_NORMAL							16
+class ZEGRConstantBuffer;
+class ZERNPreRenderParameters;
 
 #define zeScene ZEScene::GetInstance()
 
@@ -67,6 +65,7 @@ class ZEScene : public ZEObject
 	ZE_OBJECT
 
 	private:
+		ZEFlags									SceneDirtyFlags;
 		bool									Initialized;
 		ZEUInt									LastEntityId;
 		ZESmartArray<ZEEntity*>					Entities;
@@ -76,22 +75,23 @@ class ZEScene : public ZEObject
 		bool									Enabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
-		ZERNRenderer*							Renderer;
+		
+		struct
+		{
+			ZEVector3							AmbientColor;
+			float								Reserved0;
+		} Constants;
 
-		void									Tick(ZEEntity* Entity, float ElapsedTime);
+		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 
+		void									UpdateConstantBuffer();
+
+		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
+		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
+		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		
 	public:
-		void									AddEntity(ZEEntity* Entity);
-		void									RemoveEntity(ZEEntity* Entity);
-
-		const ZESmartArray<ZEEntity*>&			GetEntities();
-		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);
-
-		void									ClearEntities();
-
-		void									SetRenderer(ZERNRenderer* Renderer);
-		ZERNRenderer*							GetRenderer();
-		ZERNRenderer*							GetShadowRenderer();
+		const ZEGRConstantBuffer*				GetConstantBuffer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
 
 		void									SetActiveCamera(ZECamera* Camera);
@@ -103,22 +103,28 @@ class ZEScene : public ZEObject
 		void									SetEnabled(bool Enabled);
 		bool									GetEnabled() const;
 
-		bool									Save(const ZEString& FileName);
-		bool									Load(const ZEString& FileName);
+		void									SetAmbientFactor(float Factor);
+		float									GetAmbientFactor() const;
+
+		void									SetAmbientColor(ZEVector3 Color);
+		const ZEVector3&						GetAmbientColor() const;
+
+		const ZESmartArray<ZEEntity*>&			GetEntities();
+		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);
+		void									AddEntity(ZEEntity* Entity);
+		void									RemoveEntity(ZEEntity* Entity);
+		void									ClearEntities();
 
 		bool									Initialize();
 		void									Deinitialize();
 		void									Destroy();
 
 		void									Tick(float ElapsedTime);
-		void									Render(float ElapsedTime);
-		bool									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void									PreRender(const ZERNPreRenderParameters* Parameters);
+		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		void									SetAmbientFactor(float Factor);
-		float									GetAmbientFactor() const;
-
-		void									SetAmbientColor(ZEVector3 Color);
-		const ZEVector3&						GetAmbientColor() const;
+		bool									Save(const ZEString& FileName);
+		bool									Load(const ZEString& FileName);
 
 												ZEScene();
 		virtual									~ZEScene();
