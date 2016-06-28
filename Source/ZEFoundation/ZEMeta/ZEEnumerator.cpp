@@ -39,3 +39,14 @@ ZEMTDeclarationType ZEEnumerator::GetDeclarationType() const
 {
 	return ZEMT_DT_ENUMURATION;
 }
+
+const char* ZEEnumerator::ToText(ZEInt Value, const char* Default)
+{
+	ZESize Count = GetItemCount();
+	const ZEEnumeratorItem* Items = GetItems();
+	for (ZESize I = 0; I < Count; I++)
+	{
+		if (Items[I].Value == Value)
+			return Items[I].Name;
+	}
+}

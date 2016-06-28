@@ -92,33 +92,30 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 {
 	while(Thread->ControlPoint())
 	{
-		SchedulerLock.Lock();
 		ZETask* Task = NULL;
-		if (Tasks.GetFirst() != NULL)
+		SchedulerLock.Lock();
 		{
-			Task = Tasks.GetFirst()->GetItem();
-		}		
-		else
-		{
-			ReleaseThread((ZETaskThread*)Thread);
-			SchedulerLock.Unlock();
-			Thread->Suspend();
-			continue;
+			if (Tasks.GetFirst() != NULL)
+			{
+				Task = Tasks.GetFirst()->GetItem();
+				Tasks.Remove(&Task->Link);
+			}		
+			else
+			{
+				ReleaseThread((ZETaskThread*)Thread);
+				SchedulerLock.Unlock();
+				Thread->Suspend();
+				continue;
+			}
 		}
 		SchedulerLock.Unlock();
 
-		bool Requeue = Task->Activate((ZETaskThread*)Thread);
+		Task->Activate((ZETaskThread*)Thread);
 
 		SchedulerLock.Lock();
-		if (Requeue)
 		{
-			Tasks.Remove(&Task->Link);
-			Tasks.AddEnd(&Task->Link);
-		}
-		else
-		{
-			if (Task->Link.GetInUse())
-				Tasks.Remove(&Task->Link);
+			if (Task->GetStatus() == ZE_TS2_WAITING && !Task->Link.GetInUse())
+				Reschedule(Task);
 		}
 		SchedulerLock.Unlock();
 	}
@@ -126,13 +123,12 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 
 void ZETaskPool::Reschedule(ZETask* Task)
 {
-	ZEInt TaskEffectivePriority = Task->GetPriority() + (ZEInt)Task->DependentCount;
+	ZEInt TaskEffectivePriority = Task->GetPriority();
 	ze_for_each_reverse(CurrentTask, Tasks)
 	{
-		if (TaskEffectivePriority > CurrentTask->GetPriority() + (ZEInt)CurrentTask->DependentCount)
+		if (TaskEffectivePriority > CurrentTask->GetPriority())
 		{
 			Tasks.InsertBefore(&CurrentTask->Link, &Task->Link);
-			SchedulerLock.Unlock();
 			return;
 		}
 	}
@@ -145,21 +141,21 @@ void ZETaskPool::RunTask(ZETask* Task)
 	Task->Setup();
 
 	SchedulerLock.Lock();
-	
+
+	if (Task->Link.GetInUse())
+	{
+		SchedulerLock.Unlock();
+		return;
+	}
+
 	PurgeThreads();
 	Reschedule(Task);
 
-	ZESize InstanceCount = Task->GetInstanceCount();
-	for (ZESize I = 0; I < InstanceCount; I++)
-	{
-		ZETaskThread* Thread = RequestThread();
-		if (Thread == NULL)
-			break;
-
-		Thread->Run();
-	}
-
+	ZETaskThread* Thread = RequestThread();
 	SchedulerLock.Unlock();
+
+	if (Thread != NULL)
+		Thread->Run();
 }
 
 void ZETaskPool::SetId(ZEInt Id)

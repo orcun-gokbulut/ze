@@ -79,6 +79,8 @@ class ZEEnumerator : public ZEMTDeclaration
 
 		virtual const ZEEnumeratorItem*		GetItems() const = 0;
 		virtual ZESize						GetItemCount() const = 0;
+
+		const char*							ToText(ZEInt Value, const char* Default);
 };
 
 

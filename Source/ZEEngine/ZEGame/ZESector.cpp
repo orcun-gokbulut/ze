@@ -108,6 +108,15 @@ bool ZESector::RestoreSector(ZEMLReaderNode* Unserializer)
 	return true;
 }
 
+bool ZESector::CheckParent(ZEEntity* Owner)
+{
+	/*if (Owner != NULL)
+		return false;
+
+	return ZEGeographicEntity::SetParent(Owner);*/
+	return true;
+}
+
 bool ZESector::InitializeSelf()
 {
 // 	if (!SectorFile.IsEmpty())
@@ -140,7 +149,7 @@ bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
 
 	for (ZESize I = 0; I < SectorIds.GetCount(); I++)
 	{
-		CurrentSector = ((ZESectorManager*)GetOwner())->GetSector(SectorIds[I]);
+		CurrentSector = static_cast<ZESectorManager*>(GetParent())->GetSector(SectorIds[I]);
 
 		if (CheckAdjacency(CurrentSector, (Depth - 1)))
 			return true;

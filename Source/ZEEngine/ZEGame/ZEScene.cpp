@@ -61,6 +61,9 @@
 
 void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 {
+	if (Entity->GetState() != ZE_ES_INITIALIZED)
+		return;
+
 	if (!Entity->GetEnabled())
 		return;
 
@@ -79,6 +82,9 @@ void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 
 void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
+	if (Entity->GetState() < ZE_ES_LOADED)
+		return;
+	
 	if (!Entity->GetVisible())
 		return;
 
@@ -108,6 +114,9 @@ void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* P
 
 void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
+	if (Entity->GetState() < ZE_ES_LOADED)
+		return;
+
 	Entity->RayCast(Report, Parameters);
 
 	if (Report.CheckDone())
@@ -239,36 +248,48 @@ ZEArray<ZEEntity*> ZEScene::GetEntities(ZEClass* Class)
 
 void ZEScene::AddEntity(ZEEntity* Entity)
 {
-	zeCheckError(Entity->GetOwnerScene() != NULL, ZE_VOID, "Entity is already added to a scene.");
+	zeCheckError(Entity == NULL, ZE_VOID, "Entity is NULL.");
+	zeCheckError(Entity->GetScene() != NULL, ZE_VOID, "Entity is already added to a scene.");
 
-	Entity->SetEntityId(LastEntityId++);
-	Entities.Add(Entity);
-	Entity->SetOwnerScene(this);
+	ZE_LOCK_SECTION(SceneLock)
+	{
+		Entity->SetEntityId(LastEntityId++);
+		Entities.Add(Entity);
+	}
+	
+	Entity->SetScene(this);
+	Entity->Load();
 
 	if(Entity->GetName().GetLength() == 0)
 		Entity->SetName(Entity->GetClass()->GetName() + ZEString(LastEntityId));
 
-	Entity->Initialize();
+	if (Initialized)
+		Entity->Initialize();
 }
 
 void ZEScene::RemoveEntity(ZEEntity* Entity)
 {
-	zeCheckError(Entity->GetOwnerScene() != this, ZE_VOID, "Entity does not belong to this scene.");
+	zeCheckError(Entity == NULL, ZE_VOID, "Entity is NULL.");
+	zeCheckError(Entity->GetScene() != this, ZE_VOID, "Entity does not belong to this scene.");
+	zeCheckError(Entity->GetParent() != NULL, ZE_VOID, "Entity is not a root entity.");
 
-	if (Entity->GetOwner() != NULL)
-		Entity->GetOwner()->RemoveChildEntity(Entity);
-	else
+	Entity->Deinitialize();
+	Entity->SetScene(NULL);
+
+	ZE_LOCK_SECTION(SceneLock)
+	{
 		Entities.RemoveValue(Entity);
-
-	Entity->SetOwnerScene(NULL);
+	}
 }
 
 void ZEScene::ClearEntities()
 {
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Destroy();
-
-	Entities.Clear();
+	{
+		ZEEntity* Entity = Entities[I];
+		RemoveEntity(Entity);
+		Entity->Destroy();
+	}
 }
 
 bool ZEScene::Initialize()
@@ -292,13 +313,9 @@ bool ZEScene::Initialize()
 	}
 
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
-	{
-		Entities[I]->SetOwnerScene(this);
 		Entities[I]->Initialize();
-	}
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-
 	SceneDirtyFlags.RaiseAll();
 
 	Initialized = true;
@@ -317,7 +334,6 @@ void ZEScene::Deinitialize()
 		PhysicalWorld->Deinitialize();
 
 	ConstantBuffer.Release();
-
 	SceneDirtyFlags.RaiseAll();
 
 	Initialized = false;

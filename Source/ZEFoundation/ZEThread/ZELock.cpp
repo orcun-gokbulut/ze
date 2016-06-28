@@ -58,12 +58,33 @@ static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
 	#endif
 }
 
-bool ZELock::IsLocked()
+bool ZELock::IsLocked() const
 {
     return (CurrentNumber != NextNumber + 1);
 }
 
-void ZELock::Wait()
+ZEUInt32 ZELock::Queue()
+{
+	return AtomicIncrement(&NextNumber);
+}
+
+bool ZELock::Check(ZEUInt32 Number) const
+{
+	return (Number != CurrentNumber);
+}
+
+void ZELock::Wait(ZEUInt32 Number) const
+{
+	while(Check(Number));
+}
+
+void ZELock::Release(ZEUInt32 Number)
+{
+	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acuired yet by given number");
+	CurrentNumber++;
+}
+
+void ZELock::Wait() const
 {
     while(IsLocked());
 }
@@ -74,8 +95,9 @@ void ZELock::Lock()
 	__itt_sync_prepare(this);
 	#endif
     
-	ZEInt32 MyNumber = AtomicIncrement(&NextNumber);
-	while(MyNumber != CurrentNumber);
+	ZEInt32 MyNumber = Queue();
+
+	Wait(MyNumber);
 
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_acquired(this);
@@ -88,9 +110,8 @@ void ZELock::Unlock()
 	__itt_sync_releasing(this);
 	#endif
 
-	CurrentNumber++;
+	Release(CurrentNumber);
 }
-
 
 ZELock::ZELock()
 {
@@ -108,4 +129,41 @@ ZELock::~ZELock()
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_destroy(this);
 	#endif
+}
+
+ZE_COPY_NO_ACTION_IMP(ZELockHolder)
+
+void ZELockHolder::Lock(ZELock& Lock)
+{
+	TargetLock = &Lock;
+	TargetLock->Lock();
+}
+
+void ZELockHolder::Unlock()
+{
+	if (TargetLock == NULL)
+		return;
+
+	TargetLock->Unlock();
+	TargetLock = NULL;
+}
+
+ZELockHolder::ZELockHolder()
+{
+	TargetLock = NULL;
+}
+
+ZELockHolder::ZELockHolder(ZELock& TargetLock)
+{
+	Lock(TargetLock);
+}
+
+ZELockHolder::~ZELockHolder()
+{
+	Unlock();
+}
+
+ZELockSectionLoopVariable::ZELockSectionLoopVariable(ZELock& Lock) : LockHolder(Lock), Control(true)
+{
+
 }

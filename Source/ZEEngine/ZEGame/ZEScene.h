@@ -75,7 +75,8 @@ class ZEScene : public ZEObject
 		bool									Enabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
-		
+		ZELock									SceneLock;
+
 		struct
 		{
 			ZEVector3							AmbientColor;
