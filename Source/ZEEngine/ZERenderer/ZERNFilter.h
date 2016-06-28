@@ -41,65 +41,62 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEPointer/ZESharedPointer.h"
+#include "ZEGraphics/ZEGRViewport.h"
 
-class ZEGRTexture2D;
-class ZEGRContext;
 class ZEGRShader;
-class ZEGRSampler;
-class ZEGRRenderStateData;
+class ZEGRContext;
+class ZEGRTexture2D;
 class ZEGRConstantBuffer;
+class ZEGRRenderStateData;
+class ZEGRComputeRenderStateData;
 class ZEGRRenderTarget;
 
 class ZERNFilter : public ZEInitializable
 {
 	private:
-		ZEFlags							DirtyFlags;
+		ZEFlags									DirtyFlags;
+		ZEGRViewport							Viewport;
 
-		const ZEGRTexture2D*			Input;
-		const ZEGRRenderTarget*			Output;
+		ZEHolder<ZEGRShader>					ScreenCoverVertexShader;
+		ZEHolder<ZEGRShader>					BlurHorizontalPixelShader;
+		ZEHolder<ZEGRShader>					BlurVerticalPixelShader;
+		ZEHolder<ZEGRShader>					BlurHorizontalComputeShader;
+		ZEHolder<ZEGRShader>					BlurVerticalComputeShader;
+		ZEHolder<ZEGRShader>					ScalePixelShader;
+		ZEHolder<ZEGRShader>					EdgeDetectionPixelShader;
 
-		ZEHolder<ZEGRShader>			VertexShader;
-		ZEHolder<ZEGRShader>			PixelShader;
-		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRRenderStateData>			BlurHorizontalGraphicsRenderStateData;
+		ZEHolder<ZEGRRenderStateData>			BlurVerticalGraphicsRenderStateData;
+		ZEHolder<ZEGRRenderStateData>			ScaleGraphicsRenderStateData;
+		ZEHolder<ZEGRRenderStateData>			EdgeDetectionGraphicsRenderStateData;
+
+		ZEHolder<ZEGRComputeRenderStateData>	BlurHorizontalComputeRenderStateData;
+		ZEHolder<ZEGRComputeRenderStateData>	BlurVerticalComputeRenderStateData;
+
+		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+
+		ZEHolder<ZEGRTexture2D>					TempTexture;
 
 		struct FilterConstants
 		{
-			ZEUInt						KernelSize;
-			ZEUInt						Reserved[3];
-			ZEVector4					KernelValues[64];
-		}Constants;
+			ZEUInt								KernelRadius;
+			ZEVector3							Reserved;
+		} Constants;
 
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		virtual bool							InitializeSelf();
+		virtual void							DeinitializeSelf();
 
-	private:
-
-		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
-
-		bool							UpdateShaders();
-		bool							UpdateConstantBuffer();
-		bool							UpdateRenderState();
-		bool							Update();
-
-		void							ComputeLinearFilter(const ZEVector4* Values, ZESize KernelSize);
+		bool									UpdateShaders();
+		bool									UpdateRenderStates();
+		bool									UpdateConstantBuffer();
+		bool									Update();
 
 	public:
+		void									ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, ZEUInt KernelRadius, float StandartDeviation, bool PixelShader = true);
+		void									ApplyScale(ZEGRContext* Context, const ZEGRTexture2D* InputTexture, const ZEGRRenderTarget* OutputRenderTarget);
+		void									ApplyEdgeDetection(ZEGRContext* Context, float StencilRef);
 
-		void							SetInput(const ZEGRTexture2D* Input);
-		const ZEGRTexture2D*			GetInput() const;
+												ZERNFilter();
 
-		void							SetOutput(const ZEGRRenderTarget* Output);
-		const ZEGRRenderTarget*			GetOutput() const;
-
-		ZEUInt							GetKernelSize() const;
-
-		void							SetKernelValues(const ZEVector4* Values, ZESize KernelSize);
-		const ZEVector4* 				GetKernelValues();
-
-		void							Process(ZEGRContext* Context);
-
-										ZERNFilter();
-
-		static void						GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal = true);
+		static void								GenerateGaussianKernel(ZEArray<ZEVector4>& Values, ZEInt Size, float StandartDeviation, bool Horizontal = true);
 };

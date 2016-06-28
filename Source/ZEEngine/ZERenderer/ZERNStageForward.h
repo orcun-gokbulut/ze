@@ -60,11 +60,11 @@ class ZERNStageForward : public ZERNStage
 
 		ZEHolder<ZEGRStructuredBuffer>			TileLightStructuredBuffer;
 		
-		ZEHolder<ZEGRTexture2D>					ColorBuffer;
-		ZEHolder<ZEGRTexture2D>					DepthStencilBuffer;
+		ZEHolder<ZEGRTexture2D>					OutputTexture;
 
-		const ZEGRTexture2D*					ColorTexture;
+		const ZEGRTexture2D*					AccumulationTexture;
 		const ZEGRTexture2D*					DepthTexture;
+		const ZEGRTexture2D*					TransparentDepthTexture;
 
 		virtual bool							InitializeSelf();
 		virtual void							DeinitializeSelf();

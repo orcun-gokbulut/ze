@@ -158,11 +158,11 @@ bool ZED11Module::InitializeSelf()
 	CurrentAdapter = new ZED11Adapter(Adapter);
 
 	UINT DeviceFlags = 0;
-#ifdef _DEBUG
-//	DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
-#else
-	DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
-#endif
+	#ifdef _DEBUG
+		//DeviceFlags = D3D11_CREATE_DEVICE_DEBUG;
+	#else
+		DeviceFlags = D3D11_CREATE_DEVICE_PREVENT_ALTERING_LAYER_SETTINGS_FROM_REGISTRY;
+	#endif
 
 	Result = D3D11CreateDevice(Adapter, D3D_DRIVER_TYPE_UNKNOWN, NULL, DeviceFlags, FeatureLevelArr, _countof(FeatureLevelArr), D3D11_SDK_VERSION, &Device, NULL, NULL);
 	if (FAILED(Result))

@@ -71,6 +71,7 @@ class ZELightDirectional : public ZELight
 		bool								UseMoonLight;
 
 		ZEVector3							TerrestrialColor;
+		float								TerrestrialIntensity;
 
 		void								UpdateCascadeTransforms(const ZERNView& View);
 		void								UpdateCascadeShadowMaps();
@@ -108,6 +109,9 @@ class ZELightDirectional : public ZELight
 
 		void								SetTerrestrialColor(const ZEVector3& TerrestrialColor);
 		const ZEVector3&					GetTerrestrialColor() const;
+
+		void								SetTerrestrialIntensity(float TerrestrialIntensity);
+		float								GetTerrestrialIntensity() const;
 
 		virtual ZEGRTexture*				GetShadowMap(ZESize Index = 0) const;
 		virtual const ZEViewVolume&			GetViewVolume(ZESize Index = 0) const;

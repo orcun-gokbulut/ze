@@ -296,6 +296,16 @@ const ZEVector3& ZELightDirectional::GetTerrestrialColor() const
 	return TerrestrialColor;
 }
 
+void ZELightDirectional::SetTerrestrialIntensity(float TerrestrialIntensity)
+{
+	this->TerrestrialIntensity = TerrestrialIntensity;
+}
+
+float ZELightDirectional::GetTerrestrialIntensity() const
+{
+	return TerrestrialIntensity;
+}
+
 ZELightType ZELightDirectional::GetLightType() const
 {
 	return ZE_LT_DIRECTIONAL;

@@ -381,8 +381,8 @@ void ZEMLEditorElementWidget::ConfigureEditMode()
 	bool EditMode = ZEMLEditorWindow::GetInstance()->GetEditMode();
 
 	Form->txtName->setReadOnly(!EditMode);
-	Form->cmbValueType->setEnabled(!EditMode);
-	Form->chkValueBoolean->setEnabled(!EditMode);
+	Form->cmbValueType->setEnabled(EditMode);
+	Form->chkValueBoolean->setEnabled(EditMode);
 	Form->txtValueString->setReadOnly(!EditMode);
 	Form->txtValueInt->setReadOnly(!EditMode);
 	Form->txtValueFloat11->setReadOnly(!EditMode);
@@ -402,7 +402,7 @@ void ZEMLEditorElementWidget::ConfigureEditMode()
 	Form->txtValueFloat42->setReadOnly(!EditMode);
 	Form->txtValueFloat43->setReadOnly(!EditMode);
 	Form->txtValueFloat44->setReadOnly(!EditMode);
-	Form->btnDataLoad->setEnabled(!EditMode);
+	Form->btnDataLoad->setEnabled(EditMode);
 }
 
 void ZEMLEditorElementWidget::txtName_OnTextEdited(const QString& NewText)
