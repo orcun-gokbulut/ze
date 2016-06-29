@@ -105,6 +105,8 @@ void ZEDEditor::DeinitializeSelf()
 		Components[I]->Deinitialize();
 
 	UIManager->Deinitialize();
+
+	ZEInitializable::DeinitializeSelf();
 }
 
 ZEDEditorCore* ZEDEditor::GetCore()

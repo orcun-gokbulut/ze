@@ -57,7 +57,7 @@ void ZEDObjectManager::LoadWrapperClasses()
 
 bool ZEDObjectManager::InitializeSelf()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEDComponent::InitializeSelf())
 		return false;
 	
 	LoadWrapperClasses();
@@ -75,6 +75,8 @@ void ZEDObjectManager::DeinitializeSelf()
 {
 	if (RootWrapper != NULL)
 		RootWrapper->Deinitialize();
+
+	ZEDComponent::DeinitializeSelf();
 }
 
 void ZEDObjectManager::RaiseEvent(const ZEDObjectEvent* Event)
