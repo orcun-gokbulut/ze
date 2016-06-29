@@ -268,15 +268,19 @@ void ZEMCParser::ProcessClass(CXXRecordDecl* Class)
 	ClassData->IsFundamental = FundamentalClass;
 	ClassData->IsForwardDeclared = false;
 
-	if (!ClassData->IsFundamental)
+	if (!ClassData->IsFundamental && ClassData->Name != "ZEObject")
 	{
 		for(CXXRecordDecl::base_class_iterator CurrentBaseClass = Class->bases_begin(), LastBaseClass = Class->bases_end(); CurrentBaseClass != LastBaseClass; ++CurrentBaseClass)
 		{
 			ClassData->BaseClass = FindClass(CurrentBaseClass->getType()->getAsCXXRecordDecl()->getNameAsString().c_str());
-			if (ClassData == NULL) // Non-Object Base
-			{
-				RaiseError(Class->getLocStart(), "Non-object base class.");
-			}
+			if (ClassData->BaseClass != NULL)
+				break;
+		}
+
+		if (ClassData->BaseClass == NULL) // Non-Object Base
+		{
+			RaiseError(Class->getLocStart(), "Class does not have ZEObject in its inheritance tree.");
+			return;
 		}
 	}
 	else
