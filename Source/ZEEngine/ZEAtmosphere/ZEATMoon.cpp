@@ -38,7 +38,6 @@
 #include "ZEMath/ZEAngle.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEATPeriodicTerms.h"
-#include "ZEGame/ZEMoon.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"

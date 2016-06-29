@@ -57,7 +57,6 @@
 #include "ZEInput/ZEInputModule.h"
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZESound/ZESoundModule.h"
-#include "ZEGame/ZEGame.h"
 #include "ZECrashHandler.h"
 
 #include "ZEMeta/ZEProvider.h"
@@ -271,17 +270,6 @@ bool ZECore::SetNetworkModule(ZENetworkModule* Module)
 ZENetworkModule* ZECore::GetNetworkModule()
 {
 	return NetworkModule;
-}
-
-bool ZECore::SetGame(ZEGame* Game)
-{
-	this->Game = Game;
-	return true;
-}
-
-ZEGame* ZECore::GetGame()
-{
-	return Game;
 }
 
 void ZECore::SetApplicationModule(ZEApplicationModule* Component)
@@ -568,8 +556,6 @@ bool ZECore::StartUp(void* WindowHandle)
 	zeLog("Modules initialized.");
 
 	Console->EnableInput();
-	if (Game != NULL)
-		Game->Initialize();
 
 	QueryPerformanceFrequency(&PerformanceCounterFreq);
 	zeLog("Core initialized.");
@@ -578,7 +564,10 @@ bool ZECore::StartUp(void* WindowHandle)
 		Application->StartUp();
 
 	if (Application != NULL)
-		Application->Initialize();
+	{
+		if (!Application->Initialize())
+			zeCriticalError("Can not initialize application module.");
+	}
 
 	return true;
 }
@@ -588,29 +577,19 @@ void ZECore::ShutDown()
 	zeLog("Deinitializing Core.");
 	SetCoreState(ZE_CS_SHUTDOWN);
 
+	zeLog("Deinitializing application module.");
 	if (Application != NULL)
 	{
-		Application->ShutDown();
 		Application->Deinitialize();
+		Application->ShutDown();
 		Application->Destroy();
 		Application = NULL;
-	}
-
-	// Destroy game
-	zeLog("Deinitializing Running Games.");
-	if (Game != NULL)
-	{
-		Game->Deinitialize();
-		Game->Destroy();
-		Game = NULL;
 	}
 
 	zeLog("Saving options.");
 	if (CoreState == ZE_CS_CRITICAL_ERROR)
 		zeLog("Core detected that there is a critical error. It is posible that error can be occured becouse of options. Your old options.ini copied to options.ini.bak.");
 	OptionManager->Save("#E:/options.ini");
-
-	zeLog("Releasing game content data.");
 
 	zeLog("Releasing shared resources.");
 	ResourceManager->ReleaseAllResources();
@@ -679,14 +658,9 @@ void ZECore::MainLoop()
 	if (Application != NULL)
 		Application->Process(ElapsedTime);
 
-	if (Game != NULL)
-		Game->Tick(ElapsedTime);
-
 	// Engine Logic
 	PhysicsModule->Process(ElapsedTime);
 	SoundModule->ProcessSound(ElapsedTime);
-	if (Game != NULL)
-		Game->Render(ElapsedTime);
 	PhysicsModule->UpdateWorlds();
 
 	if (Application != NULL)
@@ -697,12 +671,6 @@ void ZECore::Run()
 {
 	SetCoreState(ZE_CS_RUNNING);
 	
-	if (Application != NULL && !Application->IsInitialized())
-	{
-		if (!Application->Initialize())
-			zeCriticalError("Can not initialize application.");
-	}
-
 	RealTimeClock->ResetFrameTime();
 	while(CoreState != ZE_CS_TERMINATE && CoreState != ZE_CS_SHUTDOWN)
 		MainLoop();
@@ -725,7 +693,7 @@ ZECore::ZECore()
 	PerformanceCount.QuadPart = 0;
 	OldPerformanceCount.QuadPart = 0;
 
-	Application	= NULL;
+	Application				= NULL;
 	CrashHandler			= new ZECrashHandler();
 	RealTimeClock			= new ZERealTimeClock();
 	TimerManager			= new ZETimerManager();
@@ -740,7 +708,6 @@ ZECore::ZECore()
 	ModuleManager			= new ZEModuleManager();
 	ExtensionManager		= new ZEExtensionManager();
 	PluginManager			= new ZEPluginManager();
-	Game					= new ZEGame();
 	
 	ElapsedTime				= 0.0f;
 
@@ -754,12 +721,10 @@ ZECore::ZECore()
 
 ZECore::~ZECore()
 {
-	
 	ZEGRGraphicsModule::BaseDeinitialize();
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 
-	delete Game;
 	delete PluginManager;
 	delete ExtensionManager;
 	delete ModuleManager;

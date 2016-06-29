@@ -177,6 +177,11 @@ bool ZEModelMesh::GetVisible()
 	return Visible;
 }
 
+ZEModel* ZEModelMesh::GetModel()
+{
+	return Owner;
+}
+
 ZEModelMesh* ZEModelMesh::GetParentMesh()
 {
 	return ParentMesh;
@@ -650,7 +655,7 @@ void ZEModelMesh::Initialize(ZEModel* Model,  const ZEModelResourceMesh* MeshRes
 				}
 			}
 
-			PhysicalBody->SetPhysicalWorld(zeScene->GetPhysicalWorld());
+			PhysicalBody->SetPhysicalWorld(GetModel()->GetScene()->GetPhysicalWorld());
 			PhysicalBody->Initialize();
 		}
 		else if(MeshResource->PhysicalBody.Type == ZE_MRPBT_CLOTH)

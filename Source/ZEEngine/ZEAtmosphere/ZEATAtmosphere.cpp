@@ -468,21 +468,21 @@ bool ZEATAtmosphere::InitializeSelf()
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);
 
 	Sun = ZEATSun::CreateInstance();
-	zeScene->AddEntity(Sun);
+	AddComponent(Sun);
 
 	Moon = ZEATMoon::CreateInstance();
 	Moon->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
-	zeScene->AddEntity(Moon);
+	AddComponent(Moon);
 
 	Fog = ZEATFog::CreateInstance();
 	Fog->SetDensity(0.0f);
 	Fog->SetStartDistance(0.0f);
 	Fog->SetColor(ZEVector3(0.5f));
-	zeScene->AddEntity(Fog);
+	AddComponent(Fog);
 
 	Cloud = ZEATCloud::CreateInstance();
 	Cloud->SetCloudTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
-	zeScene->AddEntity(Cloud);
+	AddComponent(Cloud);
 
 	Stars = ZEATSkyBox::CreateInstance();
 	Stars->SetName("StarMap");
@@ -491,7 +491,7 @@ bool ZEATAtmosphere::InitializeSelf()
 	Stars->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	Stars->SetColor(ZEVector3::One);
 	Stars->SetBrightness(0.1f);
-	zeScene->AddEntity(Stars);
+	AddComponent(Stars);
 
 	if (!Update())
 		return false;
@@ -690,8 +690,8 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	}
 
 	ZEVector3 AmbientColor = ZEVector3(0.005f) + TerrestrialSunAmbientColor + TerrestrialMoonAmbientColor;
-	zeScene->SetAmbientColor(AmbientColor);
-	zeScene->SetAmbientFactor(1.0f);
+	GetScene()->SetAmbientColor(AmbientColor);
+	GetScene()->SetAmbientFactor(1.0f);
 
 	float HeightFromEarthCenter = (Observer.Space.Elevation + EARTH_RADIUS) * 1e-6f;
 

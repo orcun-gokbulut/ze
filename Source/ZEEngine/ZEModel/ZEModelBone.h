@@ -86,6 +86,7 @@ class ZEModelBone : public ZEObject
 		void								ParentTransformChanged();
 
 	public:
+		ZEModel*							GetModel();
 		ZEModelBone*						GetParentBone();
 		const ZEArray<ZEModelBone*>&		GetChildBones();
 		const char*							GetName();

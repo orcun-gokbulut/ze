@@ -101,6 +101,7 @@ class ZEModelMesh : public ZEObject
 		void								ParentTransformChanged();
 
 	public:
+		ZEModel*							GetModel();
 		ZEModelMesh*						GetParentMesh();
 		const ZEArray<ZEModelMesh*>&		GetChildMeshes();
 		const char*							GetName();

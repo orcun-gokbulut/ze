@@ -36,7 +36,6 @@
 #include "ZELightOmniProjective.h"
 
 #include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZETexture/ZETextureCubeResource.h"
 

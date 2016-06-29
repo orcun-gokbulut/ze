@@ -63,6 +63,9 @@ static float GausianFunction(float X, float Y, float StandartDeviation)
 
 bool ZERNFilter::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(FilterConstants));
 
 	return Update();
@@ -87,6 +90,8 @@ void ZERNFilter::DeinitializeSelf()
 	ConstantBuffer.Release();
 	
 	TempTexture.Release();
+
+	ZEInitializable::DeinitializeSelf();
 }
 
 bool ZERNFilter::UpdateShaders()

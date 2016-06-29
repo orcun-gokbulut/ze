@@ -43,19 +43,17 @@
 #include "ZEML/ZEMLWriter.h"
 #include "ZEMeta/ZEProvider.h"
 
-#include "ZEGame.h"
 #include "ZEEntity.h"
-#include "ZEEntityProvider.h"
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEConsole.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZELight.h"
 #include "ZERenderer/ZECamera.h"
 #include "ZESound/ZESoundModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
 
 #include <memory.h>
-#include "ZERenderer/ZERNRenderParameters.h"
 
 #define ZE_SDF_CONSTANT_BUFFER		0x01
 
@@ -145,6 +143,50 @@ void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZER
 		if (Report.CheckDone())
 			return;
 	}
+}
+
+
+bool ZEScene::InitializeSelf()
+{
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
+	if (PhysicalWorld == NULL)
+		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
+
+	if (PhysicalWorld == NULL)
+	{
+		zeCriticalError("Can not create physical world.");
+		return false;
+	}
+
+	if (!PhysicalWorld->Initialize())
+	{
+		zeCriticalError("Can not create physical world.");
+		return false;
+	}
+
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Initialize();
+
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	SceneDirtyFlags.RaiseAll();
+
+	return true;
+}
+
+void ZEScene::DeinitializeSelf()
+{
+	for (ZESize I = 0; I < Entities.GetCount(); I++)
+		Entities[I]->Deinitialize();
+
+	if (PhysicalWorld != NULL)
+		PhysicalWorld->Deinitialize();
+
+	ConstantBuffer.Release();
+	SceneDirtyFlags.RaiseAll();
+
+	DeinitializeSelf();
 }
 
 void ZEScene::UpdateConstantBuffer()
@@ -263,7 +305,7 @@ void ZEScene::AddEntity(ZEEntity* Entity)
 	if(Entity->GetName().GetLength() == 0)
 		Entity->SetName(Entity->GetClass()->GetName() + ZEString(LastEntityId));
 
-	if (Initialized)
+	if (IsInitializedOrInitializing())
 		Entity->Initialize();
 }
 
@@ -290,53 +332,6 @@ void ZEScene::ClearEntities()
 		RemoveEntity(Entity);
 		Entity->Destroy();
 	}
-}
-
-bool ZEScene::Initialize()
-{
-	if (Initialized)
-		return true;
-
-	if (PhysicalWorld == NULL)
-		PhysicalWorld = ZEPhysicalWorld::CreateInstance();
-
-	if (PhysicalWorld == NULL)
-	{
-		zeCriticalError("Can not create physical world.");
-		return false;
-	}
-
-	if (!PhysicalWorld->Initialize())
-	{
-		zeCriticalError("Can not create physical world.");
-		return false;
-	}
-
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Initialize();
-
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	SceneDirtyFlags.RaiseAll();
-
-	Initialized = true;
-	return true;
-}
-
-void ZEScene::Deinitialize()
-{
-	if (!Initialized)
-		return;
-
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Deinitialize();
-
-	if (PhysicalWorld != NULL)
-		PhysicalWorld->Deinitialize();
-
-	ConstantBuffer.Release();
-	SceneDirtyFlags.RaiseAll();
-
-	Initialized = false;
 }
 
 void ZEScene::Destroy()
@@ -516,7 +511,6 @@ bool ZEScene::Load(const ZEString& FileName)
 ZEScene::ZEScene()
 {
 	SceneDirtyFlags.RaiseAll();
-	Initialized = false;
 	LastEntityId = 0;
 	ActiveCamera = NULL;
 	ActiveListener = NULL;
@@ -534,7 +528,7 @@ ZEScene::~ZEScene()
 		Entities[I]->Destroy();
 }
 
-ZEScene* ZEScene::GetInstance()
+ZEScene* ZEScene::CreateInstance()
 {
-	return zeGame->GetScene();
+	return new ZEScene();
 }

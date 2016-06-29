@@ -35,18 +35,15 @@
 
 #include "ZEPlayer.h"
 
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEMath/ZERay.h"
+
 #include "ZECore/ZEConsole.h"
 #include "ZEInput/ZEInputModule.h"
 #include "ZEInput/ZEInputDefinitions.h"
-#include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGame.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZEMath/ZERay.h"
 #include "ZESound/ZEListener.h"
-#include "ZEEntityProvider.h"
 #include "ZERenderer/ZECamera.h"
-#include "ZERenderer/ZELightProjective.h"
-#include "ZEMath/ZEMath.h"
 
 #define ACTIONID_FORWARD			0
 #define ACTIONID_BACKWARD			1
@@ -233,12 +230,6 @@ float ZEPlayer::GetFOV()
 	return FOV;
 }
 
-void ZEPlayer::Activate()
-{
-	zeScene->SetActiveCamera(Camera);
-	zeScene->SetActiveListener(Listener);
-}
-
 void ZEPlayer::Tick(float Time)
 {
 	ZEQuaternion RotationChange;
@@ -264,28 +255,9 @@ void ZEPlayer::Tick(float Time)
 	ZEActor::Tick(Time);
 }
 
-bool ZEPlayer::InitializeSelf()
-{
-	if (!ZEActor::InitializeSelf())
-		return false;
-
-	zeScene->SetActiveCamera(Camera);
-	zeScene->SetActiveListener(Listener);
-
-	return true;
-}
-
-bool ZEPlayer::DeinitializeSelf()
-{
-	return ZEActor::DeinitializeSelf();
-}
-
-#include "ZETexture/ZETexture2DResource.h"
 ZEPlayer::ZEPlayer()
 {
-
 	FOV = ZEAngle::ToRadian(50);
-
 	InputMap.AddButtonAction("Keyboard", ZE_IKB_GRAVE, ZE_IS_PRESSED, ACTIONID_CONSOLE);
 
 	Camera = ZECamera::CreateInstance();
@@ -303,7 +275,7 @@ ZEPlayer::ZEPlayer()
 
 ZEPlayer::~ZEPlayer()
 {
-	Deinitialize();
+
 }
 
 ZEPlayer* ZEPlayer::CreateInstance()

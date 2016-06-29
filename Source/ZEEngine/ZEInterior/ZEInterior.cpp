@@ -34,22 +34,23 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInterior.h"
-#include "ZEInteriorResource.h"
-#include "ZEInteriorRoom.h"
-#include "ZEInteriorDoor.h"
-#include "ZEInteriorHelper.h"
+
 #include "ZEError.h"
-#include "ZECore/ZEConsole.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEViewFrustum.h"
 #include "ZEMath/ZEAngle.h"
+
+#include "ZEInteriorResource.h"
+#include "ZEInteriorRoom.h"
+#include "ZEInteriorDoor.h"
+#include "ZEInteriorHelper.h"
+#include "ZECore/ZEConsole.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
-#include "ZEGame/ZEEntityProvider.h"
-#include "ZERenderer\ZERNView.h"
-#include "ZEGraphics\ZEGRContext.h"
-#include "ZEGraphics\ZEGRConstantBuffer.h"
-#include "ZERenderer\ZERNRenderParameters.h"
+#include "ZERenderer/ZERNView.h"
+#include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
 ZEDrawFlags ZEInterior::GetDrawFlags() const
 {
