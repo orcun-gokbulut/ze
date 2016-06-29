@@ -61,6 +61,7 @@ enum ZECoreState
 	ZE_CS_CRITICAL_ERROR
 };
 
+class ZEModule;
 class ZEModuleManager;
 class ZEErrorManager;
 class ZEOptionManager;
@@ -72,8 +73,6 @@ class ZEGRGraphicsModule;
 class ZESoundModule;
 class ZEInputModule;
 class ZEPhysicsModule;
-class ZEGame;
-class ZEModule;
 class ZENetworkModule;
 class ZEApplicationModule;
 class ZEExtensionManager;
@@ -117,7 +116,6 @@ class ZECore
 		ZEInputModule*					InputModule;
 		ZEPhysicsModule*				PhysicsModule;
 		ZENetworkModule*				NetworkModule;
-		ZEGame*							Game;
 
 		ZESystemMessageManager*			SystemMessageManager;
 		ZESystemMessageHandler*			SystemMessageHandler;
@@ -165,9 +163,6 @@ class ZECore
 
 		bool							SetNetworkModule(ZENetworkModule* Module);
 		ZENetworkModule*				GetNetworkModule();
-
-		bool							SetGame(ZEGame* Game);
-		ZEGame*							GetGame();
 
 		void							SetApplicationModule(ZEApplicationModule* Module);
 		ZEApplicationModule*			GetApplicationModule();

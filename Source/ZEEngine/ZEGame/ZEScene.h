@@ -37,6 +37,8 @@
 #ifndef __ZE_SCENE_H__
 #define __ZE_SCENE_H__
 
+#include "ZEInitializable.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
@@ -58,15 +60,12 @@ class ZERNRenderer;
 class ZEGRConstantBuffer;
 class ZERNPreRenderParameters;
 
-#define zeScene ZEScene::GetInstance()
-
-class ZEScene : public ZEObject
+class ZEScene : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 
 	private:
 		ZEFlags									SceneDirtyFlags;
-		bool									Initialized;
 		ZEUInt									LastEntityId;
 		ZESmartArray<ZEEntity*>					Entities;
 		ZEPhysicalWorld*						PhysicalWorld;
@@ -91,6 +90,12 @@ class ZEScene : public ZEObject
 		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
+		bool									InitializeSelf();
+		void									DeinitializeSelf();
+
+												ZEScene();
+		virtual									~ZEScene();
+
 	public:
 		const ZEGRConstantBuffer*				GetConstantBuffer();
 		ZEPhysicalWorld*						GetPhysicalWorld();
@@ -116,10 +121,6 @@ class ZEScene : public ZEObject
 		void									RemoveEntity(ZEEntity* Entity);
 		void									ClearEntities();
 
-		bool									Initialize();
-		void									Deinitialize();
-		void									Destroy();
-
 		void									Tick(float ElapsedTime);
 		void									PreRender(const ZERNPreRenderParameters* Parameters);
 		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
@@ -127,10 +128,9 @@ class ZEScene : public ZEObject
 		bool									Save(const ZEString& FileName);
 		bool									Load(const ZEString& FileName);
 
-												ZEScene();
-		virtual									~ZEScene();
+		virtual void							Destroy();
 
-		static ZEScene*							GetInstance();
+		static ZEScene*							CreateInstance();
 };
 
 #endif

@@ -38,8 +38,11 @@
 #include "ZEError.h"
 #include "ZERandom.h"
 #include "ZEMath/ZEAngle.h"
+
+#include "ZERNStageShadowmapGeneration.h"
+#include "ZERNRenderParameters.h"
+#include "ZERNStageShadowing.h"
 #include "ZEGame/ZEScene.h"
-#include "ZEGame/ZEEntityProvider.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
@@ -47,9 +50,6 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZERNStageShadowmapGeneration.h"
-#include "ZERNRenderParameters.h"
-#include "ZERNStageShadowing.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_LDF_VIEW_TRANSFORM			1

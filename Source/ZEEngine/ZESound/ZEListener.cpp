@@ -35,7 +35,6 @@
 
 #include "ZEListener.h"
 #include "ZESoundModule.h"
-#include "ZEGame/ZEEntityProvider.h"
 
 ZEListener::ZEListener()
 {

@@ -369,7 +369,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 			PhysicalMesh->SetScale(Owner->GetWorldScale() * Scale);
 			PhysicalMesh->SetEnabled(Resource->PhysicalMesh.PhysicalMeshEnabled);
 			PhysicalMesh->Initialize();
-			zeScene->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
+			GetOwner()->GetScene()->GetPhysicalWorld()->AddPhysicalObject(PhysicalMesh);
 		}
 	}
 
