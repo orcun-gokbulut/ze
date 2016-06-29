@@ -39,7 +39,7 @@ ze_add_module(ZEFoundation)
 ze_add_module(ZECodeUtilities)
 ze_add_module(ZEEngine)
 ze_add_module(ZEModules				OPTIONAL DEFAULT)
-ze_add_module(ZEditor				OPTIONAL DEFAULT)
+ze_add_module(ZEDEditor				OPTIONAL DEFAULT)
 ze_add_module(ZETools				OPTIONAL DEFAULT)
 ze_add_module(ZELNLauncher			OPTIONAL DEFAULT)
 

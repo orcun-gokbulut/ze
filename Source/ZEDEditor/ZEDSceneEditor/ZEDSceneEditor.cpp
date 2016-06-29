@@ -107,7 +107,7 @@ bool ZEDSceneEditor::InitializeSelf()
 	GetViewportManager()->RegisterViewport(Viewport);
 	GetMainWindow()->SetViewport(Viewport);
 
-	ZEScene* Scene = new ZEScene();
+	ZEScene* Scene = ZEScene::CreateInstance();
 	Scene->Initialize();
 
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
