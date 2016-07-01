@@ -332,7 +332,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	ZESize DrawCount = Draws.GetCount();
 	for (ZESize I = 0; I < DrawCount; I++)
 	{
-		Draws[I].RenderCommand.Entity = Owner;
+		Draws[I].RenderCommand.Entity = NULL;
 		Draws[I].RenderCommand.Order = 0;
 		Draws[I].RenderCommand.Priority = 0;
 		Draws[I].RenderCommand.ExtraParameters = &Draws[I];

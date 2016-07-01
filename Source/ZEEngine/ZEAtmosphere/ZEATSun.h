@@ -50,6 +50,7 @@ class ZEGRConstantBuffer;
 
 class ZEATSun : public ZEEntity
 {
+	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
 		ZERNCommand						Command;
@@ -101,4 +102,5 @@ class ZEATSun : public ZEEntity
 		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
 		static ZEATSun*					CreateInstance();
-};
+}
+ZE_META_ATTRIBUTE_PROPERTY(Color, ZEDEditor.PropertyEditor.Semantic, "Color");

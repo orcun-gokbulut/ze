@@ -51,6 +51,7 @@ class ZEGRConstantBuffer;
 
 class ZEATMoon : public ZEEntity
 {
+	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
 		ZERNCommand						Command;

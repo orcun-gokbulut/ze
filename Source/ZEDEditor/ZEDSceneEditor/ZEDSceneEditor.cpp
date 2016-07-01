@@ -126,8 +126,9 @@ bool ZEDSceneEditor::InitializeSelf()
 	Scene->AddEntity(Trial2);
 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
-	Light1->SetIntensity(1.0f);
+	Light1->SetIntensity(3.0f);
 	Light1->SetColor(ZEVector3::One);
+	Light1->SetUseSunLight(true);
 	Scene->AddEntity(Light1);
 
 	ZESector* Sector = ZESector::CreateInstance();
@@ -138,6 +139,7 @@ bool ZEDSceneEditor::InitializeSelf()
 	Scene->SetAmbientFactor(0.2f);
 
 	ZEATAtmosphere* Atmosphere = ZEATAtmosphere::CreateInstance();
+	Atmosphere->SetSunLight(Light1);
 	Scene->AddEntity(Atmosphere);
 
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();

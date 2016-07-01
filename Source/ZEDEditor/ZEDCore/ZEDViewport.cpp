@@ -185,6 +185,9 @@ bool ZEDViewport::InitializeSelf()
 	ZERNStageAtmosphere* StageAtmosphere = new ZERNStageAtmosphere();
 	Renderer.AddStage(StageAtmosphere);
 
+	ZERNStageRenderDepth* StageRenderDepth = new ZERNStageRenderDepth();
+	Renderer.AddStage(StageRenderDepth);
+
 	ZERNStageForward* StageForward = new ZERNStageForward();
 	Renderer.AddStage(StageForward);
 
@@ -194,21 +197,18 @@ bool ZEDViewport::InitializeSelf()
 	ZERNStageParticleRendering* StageParticleRendering = new ZERNStageParticleRendering();
 	Renderer.AddStage(StageParticleRendering);
 
-	ZERNStageRenderDepth* StageRenderDepth = new ZERNStageRenderDepth();
-	Renderer.AddStage(StageRenderDepth);
-
 	ZERNStagePostProcess* StagePostProcess = new ZERNStagePostProcess();
 	Renderer.AddStage(StagePostProcess);
 
 	ZERNStageHDR* StageHDR = new ZERNStageHDR();
 	StageHDR->SetToneMapOperator(ZERN_HTMO_UNCHARTED);
-	StageHDR->SetKey(0.180000f);
+	StageHDR->SetKey(0.18f);
 	StageHDR->SetAutoKey(false);
-	StageHDR->SetWhiteLevel(1.000000f);
+	StageHDR->SetWhiteLevel(2.000000f);
 	StageHDR->SetBlurTextureSize(ZERN_HBTS_HALF);
 	StageHDR->SetBloomEnabled(true);
 	StageHDR->SetBloomFactor(2.000000f);
-	StageHDR->SetBloomThreshold(1.000000f);
+	StageHDR->SetBloomThreshold(6.000000f);
 	StageHDR->SetLuminanceMin(0.100000f);
 	StageHDR->SetLuminanceMax(10.000000f);
 	StageHDR->SetSaturation(0.700000f);

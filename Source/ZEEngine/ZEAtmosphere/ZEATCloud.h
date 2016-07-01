@@ -55,6 +55,7 @@ class ZETexture2DResource;
 
 class ZEATCloud : public ZEEntity
 {
+	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
 		ZERNCommand						RenderCommand;

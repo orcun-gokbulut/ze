@@ -50,6 +50,7 @@ class ZEGRSampler;
 
 class ZEATSkyBox : public ZEEntity
 {
+	ZE_OBJECT
 	private:
 		ZEFlags								DirtyFlags;
 		ZERNCommand							SkyRenderCommand;

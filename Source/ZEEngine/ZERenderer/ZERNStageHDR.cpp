@@ -545,7 +545,7 @@ const ZEGRRenderTarget* ZERNStageHDR::GetProvidedInput(ZERNStageBuffer Input) co
 
 const ZEGRTexture2D* ZERNStageHDR::GetOutput(ZERNStageBuffer Output) const
 {
-	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_HDR) && OutputTexture != NULL)
+	if (GetEnabled() && (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION || Output == ZERN_SO_HDR) && OutputTexture != NULL)
 		return OutputTexture;
 
 	return ZERNStage::GetOutput(Output);
