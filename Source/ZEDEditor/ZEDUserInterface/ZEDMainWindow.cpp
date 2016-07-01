@@ -80,34 +80,9 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
-QMenu* ZEDMainWindow::GetOrCreateMenu(QMenu* Parent, const ZEString& Target)
+void ZEDMainWindow::ToolbarActionCallback(ZEDMenu* Menu)
 {
-	ZERegEx RegExp("(.*)(::)+(.*)");
-	ZERegExMatch Match;
-	RegExp.Match(Target, Match, ZE_REF_NO_MATCH_STRING);
 
-	ZEString& Section = Match.SubMatches[0].String;
-	ZEString& Name = Match.SubMatches[2].String;
-	
-	if (Match.SubMatches[1].String != "::")
-	{
-		Name = Section;
-		Section = ZEString::Empty;
-	}
-
-	QWidget* ParentWidget = Parent;
-	if (ParentWidget == NULL)
-		ParentWidget = MainWindow->menuBar();
-
-	QList<QMenu*> ChildMenus = Parent->findChildren<QMenu*>();
-	for (ZESize I = 0; I < ChildMenus.count(); I++)
-	{
-		ZEDMenuWrapper* ChildMenu = static_cast<ZEDMenuWrapper*>(ChildMenus[I]);
-		if (ChildMenu->title() == Name && ChildMenu->Section == Section)
-			return ChildMenu;
-	}
-
-	return NULL;
 }
 
 ZEDMainWindow::ZEDMainWindow()
@@ -120,6 +95,8 @@ ZEDMainWindow::ZEDMainWindow()
 
 	MainWindow->setCorner(Qt::TopRightCorner, Qt::RightDockWidgetArea);
 	MainWindow->setCorner(Qt::BottomRightCorner, Qt::RightDockWidgetArea);
+
+	RootMenu.MenuBar = MainWindow->menuBar();
 }
 
 ZEDMainWindow::~ZEDMainWindow()
@@ -132,66 +109,27 @@ QMainWindow* ZEDMainWindow::GetMainWindow()
 	return MainWindow;
 }
 
-const ZEArray<ZEDMenu*>& ZEDMainWindow::GetMenus()
+ZEDMenu* ZEDMainWindow::GetRootMenu()
 {
-	return Menus;
+	return &RootMenu;
 }
 
-const ZEArray<ZEDToolbar*>& ZEDMainWindow::GetToolbars()
-{
-	return Toolbars;
-}
-
-const ZEArray<ZEDWindow*>& ZEDMainWindow::GetWindows()
-{
-	return Windows;
-}
-
-void ZEDMainWindow::AddMenu(ZEDMenu* Menu)
+void ZEDMainWindow::AddMenu(const ZEString& Path, ZEDMenu* Menu)
 {
 	zeCheckError(Menu == NULL, ZE_VOID, "Menu is NULL.");
-	zeCheckError(Menu->GetMainWindow() != NULL, ZE_VOID, "Menu is already added to a Main Window. Menu Path: \"%s\".", Menu->GetPath().ToCString());
-
-	ZEPathTokenizer Tokenizer;
-	Tokenizer.Tokenize(Menu->GetPath());
-
-	QMenu* Parent = NULL;
-	for (ZESize I = 0; I < Tokenizer.GetTokenCount() - 1; I++)
-	{
-		QMenu* Menu = GetOrCreateMenu(Parent, Tokenizer.GetToken(I));
-		Parent = Menu;
-	}
-
-	QMenu* SectionStart = NULL;
-	QMenu* SectionEnd = NULL;
-	QList<QMenu*> List = findChildren<QMenu*>();
-	for (ZESize I = 0; I < List.count(); I++)
-	{
-		if (static_cast<ZEDMenuWrapper*>(List[I])->Section == Menu->GetSection())
-		{
-			SectionStart = List[I];
-			continue;
-		}
-		else if (SectionStart != NULL && static_cast<ZEDMenuWrapper*>(List[I])->Section != Menu->GetSection())
-		{
-			SectionEnd = List[I];
-			break;
-		}
-	}
-
-	if (SectionEnd == NULL && List.count() != 0)
-		Parent->insertSeparator(SectionEnd->menuAction());
-
-	if (Menu->GetAction() != NULL)
-		Parent->insertAction(SectionEnd->menuAction(), Menu->GetAction());
-
-	if (Menu->GetMenu() != NULL)
-		Parent->insertMenu(SectionEnd->menuAction(), Menu->GetMenu());
+	RootMenu.AddMenu(Path, Menu);
 }
 
 void ZEDMainWindow::RemoveMenu(ZEDMenu* Menu)
 {
+	zeCheckError(Menu == NULL, ZE_VOID, "Menu is NULL.");
+	RootMenu.RemoveMenu(Menu);
+}
 
+
+const ZEArray<ZEDToolbar*>& ZEDMainWindow::GetToolbars()
+{
+	return Toolbars;
 }
 
 void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar)
@@ -211,12 +149,9 @@ void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar)
 	QObject::connect(Toolbar->Action, SIGNAL(toggled(bool)), Toolbar->GetToolbar(), SLOT(setVisible(bool)));
 
 	Toolbar->Menu = new ZEDMenu();
-	if (Toolbar->GetCategory().IsEmpty())
-		Toolbar->Menu->SetPath(ZEFormat::Format("Windows/Toolbars/{0}", Toolbar->GetName()));
-	else
-		Toolbar->Menu->SetPath(ZEFormat::Format("Windows/Toolbars/{0}::{1}", Toolbar->GetCategory(), Toolbar->GetName()));
-	Toolbar->Menu->SetAction(Action);
-	//AddMenu(Toolbar->Menu);
+	Toolbar->Menu->SetName(Toolbar->GetName());
+	Toolbar->Menu->SetSection(Toolbar->GetCategory());
+	AddMenu("User Interface/Toolbars", Toolbar->Menu);
 }
 
 void ZEDMainWindow::RemoveToolbar(ZEDToolbar* Toolbar)
@@ -229,6 +164,13 @@ void ZEDMainWindow::RemoveToolbar(ZEDToolbar* Toolbar)
 
 	GetEditor()->RemoveComponent(Toolbar);
 	Toolbars.RemoveValue(Toolbar);
+
+	RemoveMenu(Toolbar->Menu);
+}
+
+const ZEArray<ZEDWindow*>& ZEDMainWindow::GetWindows()
+{
+	return Windows;
 }
 
 void ZEDMainWindow::AddWindow(ZEDWindow* Window)
@@ -246,12 +188,10 @@ void ZEDMainWindow::AddWindow(ZEDWindow* Window)
 	connect(Window->Action, SIGNAL(toggled(bool)), Window->GetWidget(), SLOT(setVisible(bool)));
 
 	Window->Menu = new ZEDMenu();
-	if (Window->GetCategory().IsEmpty())
-		Window->Menu->SetPath(ZEFormat::Format("Windows/{0}", Window->GetName()));
-	else
-		Window->Menu->SetPath(ZEFormat::Format("Windows/{0}::{1}", Window->GetCategory(), Window->GetName()));
-	Window->Menu->SetAction(Action);
-	AddMenu(Window->Menu);
+	Window->Menu->SetName(Window->GetName());
+	Window->Menu->SetSection(Window->GetCategory());
+
+	AddMenu("UserInterface", Window->Menu);
 	
 	if (IsInitialized())
 		Window->InitializeSelf();

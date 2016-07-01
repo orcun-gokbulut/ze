@@ -205,6 +205,7 @@ void ZEDTransformationToolbar::TransformationEvent(const ZEDTransformationEvent*
 
 ZEDTransformationToolbar::ZEDTransformationToolbar()
 {
+	SetName("Transformation");
 	SetupUI();
 
 	connect(actSelect, SIGNAL(triggered()),	this, SLOT(actSelect_triggered()));

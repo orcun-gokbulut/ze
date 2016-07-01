@@ -120,6 +120,7 @@ void ZEDSelectionToolbar::UpdateUI()
 
 ZEDSelectionToolbar::ZEDSelectionToolbar()
 {
+	SetName("Selection");
 	SetupUI();
 
 	connect(actSelectionList, SIGNAL(triggered()), this, SLOT(actSelectionList_triggered()));
