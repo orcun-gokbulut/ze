@@ -656,6 +656,14 @@ ZEVector3 ZEATAtmosphere::GetTerrestrialMoonAmbientColor()
 
 void ZEATAtmosphere::Tick(float ElapsedTime)
 {
+
+}
+
+bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
+{
+	if (!ZEEntity::PreRender(Parameters))
+		return false;
+
 	ZEVector3 SunDirection = ZEATAstronomy::GetSunDirection(Observer);
 	SunDirection.NormalizeSelf();
 	ZEVector3 MoonDirection = ZEATAstronomy::GetMoonDirection(Observer);
@@ -720,7 +728,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 	if (SunVisible)
 	{
 		float SunInscattering = (CosSunZenith * 0.5f + 0.5f);
-		
+
 		Cloud->SetLightDirection(-SunDirection);
 		Cloud->SetLightColor(TerrestrialSunColor * 10.0f);
 		Cloud->SetInscattering(SunInscattering * SunLight->GetTerrestrialIntensity());
@@ -749,12 +757,6 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	ZEUInt SunsetHour = (ZEUInt)Sunset % 24;
 	ZEUInt SunsetMinute = (ZEUInt)(Sunset * 60.0) % 60;
-}
-
-bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-	if (!ZEEntity::PreRender(Parameters))
-		return false;
 
 	if (SunLight != NULL)
 	{
