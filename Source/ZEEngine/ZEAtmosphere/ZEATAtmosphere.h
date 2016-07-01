@@ -58,6 +58,7 @@ class ZEATSkyBox;
 
 class ZEATAtmosphere : public ZEEntity
 {
+	ZE_OBJECT
 	private:
 		ZEFlags							DirtyFlags;
 		ZERNCommand						Command;
@@ -109,14 +110,14 @@ class ZEATAtmosphere : public ZEEntity
 		struct
 		{
 			ZEVector3					SunDirection;
-			float						SunIntensity;
-			ZEVector3					SunColor;
 			float						Reserved0;
+			ZEVector3					SunColor;
+			float						Reserved1;
 
 			ZEVector3					MoonDirection;
-			float						MoonIntensity;
+			float						Reserved2;
 			ZEVector3					MoonColor;
-			float						Reserved1;
+			float						Reserved3;
 		} Constants;
 
 		struct

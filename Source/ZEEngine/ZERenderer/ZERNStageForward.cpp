@@ -202,7 +202,7 @@ const ZEGRTexture2D* ZERNStageForward::GetOutput(ZERNStageBuffer Output) const
 {
 	if (GetEnabled())
 	{
-		if ((Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION))
+		if (Output == ZERN_SO_COLOR || Output == ZERN_SO_ACCUMULATION)
 			return AccumulationTexture;
 	}
 

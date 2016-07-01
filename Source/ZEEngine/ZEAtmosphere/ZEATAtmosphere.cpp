@@ -553,11 +553,19 @@ ZEATAtmosphere::ZEATAtmosphere()
 	TerrestrialMoonColor = ZEVector3::Zero;
 	TerrestrialMoonAmbientColor = ZEVector3::Zero;
 
+	Sun = NULL;
+	Moon = NULL;
+	Fog = NULL;
+	Cloud = NULL;
+	Stars = NULL;
+
 	OrderCount = 4;
 	UseMultipleScattering = true;
 
 	SunLight = NULL;
 	MoonLight = NULL;
+
+	memset(&Constants, 0, sizeof(Constants));
 }
 
 ZEATAtmosphere::~ZEATAtmosphere()
@@ -697,7 +705,7 @@ void ZEATAtmosphere::Tick(float ElapsedTime)
 
 	float SunDiskRadiusDegree = ZEATAstronomy::GetSunDiskRadius(Observer);
 	float SunDiskRadiusFromObserver = ZEAngle::Tan(ZEAngle::ToRadian(SunDiskRadiusDegree)) * HeightFromEarthCenter;
-	Sun->SetColor(TerrestrialSunColor * 20.0f);
+	Sun->SetColor(TerrestrialSunColor * 50.0f);
 	Sun->SetDirection(SunDirection);
 	Sun->SetDiskRadius(SunDiskRadiusFromObserver);
 	Sun->SetVisible(SunVisible);
@@ -760,12 +768,26 @@ bool ZEATAtmosphere::PreRender(const ZERNPreRenderParameters* Parameters)
 
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
+	else
+	{
+		Constants.SunColor = ZEVector3::One * 10.0f;
+		ZEVector3::Normalize(Constants.SunDirection, ZEVector3::One);
+
+		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
+	}
 
 	if (MoonLight != NULL)
 	{
 		Constants.MoonColor = MoonLight->GetColor() * MoonLight->GetIntensity();
 		Constants.MoonDirection = MoonLight->GetWorldRotation() * -ZEVector3::UnitZ;
 		Constants.MoonDirection.NormalizeSelf();
+
+		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
+	}
+	else
+	{
+		Constants.MoonColor = ZEVector3::Zero;
+		ZEVector3::Normalize(Constants.MoonDirection, ZEVector3::One);
 
 		DirtyFlags.RaiseFlags(ZEAT_ADF_CONSTANT_BUFFER);
 	}
