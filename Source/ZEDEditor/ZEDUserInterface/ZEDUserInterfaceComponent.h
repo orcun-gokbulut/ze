@@ -54,14 +54,14 @@ class ZEDUserInterfaceComponent :  public ZEDComponent
 		QAction*							Action;
 
 	protected:
+		void								SetName(const ZEString& Name);
+		void								SetCategory(const ZEString& Name);
+		
 											ZEDUserInterfaceComponent();
 
 	public:
 		ZEDMainWindow*						GetMainWindow();
 
-		void								SetName(const ZEString& Name);
 		const ZEString&						GetName();
-
-		void								SetCategory(const ZEString& Name);
 		const ZEString&						GetCategory();
 };

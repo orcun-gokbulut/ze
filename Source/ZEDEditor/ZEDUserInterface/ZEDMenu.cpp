@@ -34,72 +34,311 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDMenu.h"
+
 #include "ZERegEx\ZERegEx.h"
 
-static ZERegEx RegExp("(.*)(::)+(.*)");
+#include <QMenu>
+#include <QMenuBar>
 
-ZEDMainWindow* ZEDMenu::GetMainWindow()
+void ZEDMenu::Update()
 {
-	return MainWindow;
-}
+	if (MenuBar == NULL && Menu == NULL && ChildMenus.GetCount() != 0)
+	{
+		Menu = new QMenu();
+		Action->setMenu(Menu);
+	}
 
-QMenu* ZEDMenu::GetMenu()
-{
-	return Menu;
-}
+	for (ZESize I = 0; I < ChildMenus.GetCount(); I++)
+	{
+		if (MenuBar != NULL)
+			MenuBar->removeAction(ChildMenus[I]->Action);
+		else
+			Menu->removeAction(ChildMenus[I]->Action);
+	}
 
-void ZEDMenu::SetPath(const ZEString& Path)
-{
-	this->Path = Path;
-}
-
-const ZEString& ZEDMenu::GetPath()
-{
-	return Path;
-}
-
-const ZEString& ZEDMenu::GetName()
-{
-	ZERegExMatch Match;
-	if (!RegExp.Match(Path, Match, ZE_REF_NO_MATCH_STRING))
-		return ZEString::Empty;
-
-	ZEString& Section = Match.SubMatches[0].String;
-	ZEString& Name = Match.SubMatches[2].String;
-
-	if (Match.SubMatches[1].String != "::")
-		return Match.SubMatches[2].String;
+	QObjectList Children;
+	if (MenuBar != NULL)
+		Children = MenuBar->children();
 	else
-		return Match.SubMatches[0].String;
+		Children = Menu->children();
+
+	for (int I = 0; I < Children.count(); I++)
+	{
+		if (qobject_cast<QAction*>(Children[I]) != NULL)
+			delete qobject_cast<QAction*>(Children[I]);
+		else if (qobject_cast<QMenu*>(Children[I]) != NULL)
+			delete qobject_cast<QMenu*>(Children[I]);
+	}
+
+	const ZEString CurrentSection = ChildMenus[0]->GetSection();
+	for (ZESize I = 0; I < ChildMenus.GetCount(); I++)
+	{
+		if (CurrentSection != ChildMenus[I]->GetSection() &&  (I != (ZESSize)ChildMenus.GetCount() - 1))
+		{
+			if (MenuBar != NULL)
+				MenuBar->addSeparator();
+			else
+				Menu->addSeparator();
+		}
+
+		if (MenuBar != NULL)
+			MenuBar->addAction(ChildMenus[I]->Action);
+		else
+			Menu->addAction(ChildMenus[I]->Action);
+
+	}
 }
 
-const ZEString& ZEDMenu::GetSection()
+void ZEDMenu::Action_triggered()
 {
-	ZERegExMatch Match;
-	if (!RegExp.Match(Path, Match, ZE_REF_NO_MATCH_STRING))
-		return ZEString::Empty;
+	Callback.CheckAndCall(this);
+}
+
+ZEDMenu* ZEDMenu::GetParent()
+{
+	return Parent;
+}
+
+ void ZEDMenu::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+	Action->setText(Name.ToCString());
+}
+
+ZEString ZEDMenu::GetName() const
+{
+	return Name;
+}
+
+void ZEDMenu::SetSection(const ZEString& Name)
+{
+	if (this->Section == Section)
+		return;
+
+	this->Section = Section;
+
+	Parent->Update();
+}
+
+const ZEString& ZEDMenu::GetSection() const
+{
+	return Section;
+}
+
+void ZEDMenu::SetIconPath(const ZEString& Path)
+{
+	IconPath = Path;
+	Action->setIcon(QIcon(Path.ToCString()));
+}
+
+const ZEString& ZEDMenu::GetIconPath() const
+{
+	return IconPath;
+}
+
+void ZEDMenu::SetEnabled(bool Enabled)
+{
+	Action->setEnabled(Enabled);
+}
+
+bool ZEDMenu::GetEnabled() const
+{
+	return Action->isEnabled();
+}
+
+void ZEDMenu::SetVisible(bool Visible)
+{
+	Action->setVisible(Visible);
+}
+
+bool ZEDMenu::GetVisible() const
+{
+	return Action->isVisible();
+}
+
+void ZEDMenu::SetCheckable(bool Checkable)
+{
+	this->Checkable = Checkable;
+	Action->setCheckable(Checkable);
+}
+
+bool ZEDMenu::GetCheckable()
+{
+	return Checked;
+}
+
+void ZEDMenu::SetChecked(bool Checked)
+{
+	this->Checked = Checked;
+	Action->setChecked(Checked);
+}
+
+bool ZEDMenu::GetChecked()
+{
+	return Checked;
+}
+
+void ZEDMenu::SetUserData(void* Data)
+{
+	this->UserData = Data;
+}
+
+void* ZEDMenu::GetUserData()
+{
+	return UserData;
+}
+
+void ZEDMenu::SetCallback(const ZEDMenuCallback& Callback)
+{
+	this->Callback = Callback;
+}
+
+const ZEDMenuCallback& ZEDMenu::GetCallback()
+{
+	return Callback;
+}
+
+const ZEArray<ZEDMenu*>& ZEDMenu::GetMenus() const
+{
+	return ChildMenus;
+}
+
+void ZEDMenu::AddMenu(ZEDMenu* Menu)
+{
+	zeCheckError(Menu == NULL, ZE_VOID, "SubMenu is NULL.");
+	zeCheckError(Menu->GetParent() != NULL, ZE_VOID, "Item is already added to a Menu. Menu Name: \"%s\", Item Name: \"%s\".", 
+		GetName().ToCString(), Menu->GetName().ToCString());
+
+	ZESize I;
+	bool Found = false;
+	for (I = 0; I < ChildMenus.GetCount(); I++)
+	{
+		if (ChildMenus[I]->GetSection() == Menu->GetSection())
+		{
+			Found = true;
+			continue;
+		}
+
+		if (Found && ChildMenus[I]->GetSection() != Menu->GetSection())
+		{
+			ChildMenus.Insert(I, Menu);
+			break;
+		}
+	}
 	
-	ZEString& Section = Match.SubMatches[0].String;
-	ZEString& Name = Match.SubMatches[2].String;
+	ChildMenus.Insert(I, Menu);
 
-	if (Match.SubMatches[1].String != "::")
-		return Match.SubMatches[2].String;
+	Update();
+}
+
+void ZEDMenu::AddMenu(const ZEString& Path, ZEDMenu* Menu)
+{
+	ZERegEx PathRegEx("(.*?)[/\\\\](.*)");
+	ZERegEx SectionRegEx("(.*)::(.*)");
+
+	ZEString Current;
+	ZEString Remaining;
+	ZERegExMatch PathMatch;
+	if (PathRegEx.Match(Path, PathMatch))
+	{
+		Current = PathMatch.SubMatches[0].String;
+		Remaining = PathMatch.SubMatches[1].String;
+	}
 	else
-		return ZEString::Empty;
+	{
+		Current = Path;
+	}
+
+	ZEString Name;
+	ZEString Section;
+	ZERegExMatch SectionMatch;
+	if (SectionRegEx.Match(Current, SectionMatch))
+	{
+		Name = SectionMatch.SubMatches[1].String;
+		Section = SectionMatch.SubMatches[0].String;
+	}
+	else
+	{
+		Name = Current;
+	}
+
+	if (!Current.IsEmpty())
+	{
+		for(ZESize I = 0; I < ChildMenus.GetCount(); I++)
+		{
+			if (ChildMenus[I]->GetSection() == Menu->GetSection() && 
+				ChildMenus[I]->GetName() == Name)
+			{
+				ChildMenus[I]->AddMenu(Remaining, Menu);
+				return;
+			}
+		}
+
+		ZEDMenu* NewMenu = new ZEDMenu();
+		NewMenu->SetName(Name);
+		NewMenu->SetSection(Section);
+		NewMenu->AutoGenerated = true;
+		AddMenu(NewMenu);
+
+		NewMenu->AddMenu(Remaining, Menu);
+	}
+	else
+	{
+		AddMenu(Menu);
+	}
 }
 
-void ZEDMenu::SetAction(QAction* Action)
+bool ZEDMenu::RemoveMenu(ZEDMenu* Menu)
 {
-	this->Action = Action;
-}
+	zeCheckError(Menu == NULL, false, "Section is NULL.");
 
-QAction* ZEDMenu::GetAction()
-{
-	return Action;
+	if (ChildMenus.Exists(Menu))
+	{
+		ChildMenus.RemoveValue(Menu);
+		Menu->Parent = NULL;
+
+		if (ChildMenus.GetCount() == 0 && AutoGenerated)
+		{
+			if (Parent != NULL)
+				Parent->RemoveMenu(this);
+			delete this;
+		}
+		else
+		{
+			Update();
+		}
+
+		return true;
+	}
+	else
+	{
+		for (ZESize I = 0; I < ChildMenus.GetCount(); I++)
+		{
+			if (ChildMenus[I]->RemoveMenu(Menu))
+				break;
+		}
+	}
 }
 
 ZEDMenu::ZEDMenu()
 {
-	Action = NULL;
+	Parent = NULL;
+	AutoGenerated = false;
+	Checkable = false;
+	Checked = false;
 	Menu = NULL;
+	MenuBar = NULL;
+	UserData = NULL;
+
+	Action = new QAction(this);
+	connect(Action, SIGNAL(triggered()), this, SLOT(Action_triggered()));
+}
+
+ZEDMenu::~ZEDMenu()
+{
+	for (ZESize I = 0; I < ChildMenus.GetCount(); I++)
+		delete ChildMenus[I];
+	ChildMenus.Clear();
+
+	delete Action;
 }

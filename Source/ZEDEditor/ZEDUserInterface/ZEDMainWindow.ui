@@ -51,6 +51,7 @@
     </property>
    </layout>
   </widget>
+  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -60,98 +61,7 @@
      <height>21</height>
     </rect>
    </property>
-   <widget class="QMenu" name="menuFile">
-    <property name="title">
-     <string>File</string>
-    </property>
-    <addaction name="actNew"/>
-    <addaction name="actOpen"/>
-    <addaction name="actClose"/>
-    <addaction name="separator"/>
-    <addaction name="actSave"/>
-    <addaction name="actSaveAs"/>
-    <addaction name="separator"/>
-    <addaction name="actExit"/>
-   </widget>
-   <widget class="QMenu" name="menuOperations">
-    <property name="title">
-     <string>Operations</string>
-    </property>
-    <addaction name="actSelect"/>
-    <addaction name="actMove"/>
-    <addaction name="actRotate"/>
-    <addaction name="actScale"/>
-    <addaction name="separator"/>
-    <addaction name="actHide"/>
-    <addaction name="actUnhide"/>
-    <addaction name="separator"/>
-    <addaction name="actFreeze"/>
-    <addaction name="actUnfreeze"/>
-    <addaction name="separator"/>
-    <addaction name="actGoToEntity"/>
-   </widget>
-   <widget class="QMenu" name="menuHelp">
-    <property name="title">
-     <string>Help</string>
-    </property>
-    <addaction name="actHelp"/>
-    <addaction name="actionTutorials"/>
-    <addaction name="separator"/>
-    <addaction name="actionEngine_Web"/>
-    <addaction name="separator"/>
-    <addaction name="actionAbout"/>
-   </widget>
-   <widget class="QMenu" name="menuWindows">
-    <property name="title">
-     <string>Windows</string>
-    </property>
-    <widget class="QMenu" name="menuToolbars">
-     <property name="title">
-      <string>Toolbars</string>
-     </property>
-     <addaction name="EditToolbarOpenAction"/>
-     <addaction name="OperationsToolbarOpenAction"/>
-    </widget>
-    <addaction name="separator"/>
-    <addaction name="menuToolbars"/>
-   </widget>
-   <widget class="QMenu" name="menuEdit">
-    <property name="title">
-     <string>Edit</string>
-    </property>
-    <addaction name="actUndo"/>
-    <addaction name="actRedo"/>
-    <addaction name="separator"/>
-    <addaction name="actClone"/>
-    <addaction name="DeleteAction"/>
-   </widget>
-   <widget class="QMenu" name="menuView">
-    <property name="title">
-     <string>View</string>
-    </property>
-    <widget class="QMenu" name="menuDraw">
-     <property name="title">
-      <string>Draw</string>
-     </property>
-     <addaction name="actMap"/>
-     <addaction name="actEntities"/>
-     <addaction name="actSkybox"/>
-    </widget>
-    <addaction name="actWireframe"/>
-    <addaction name="menuDraw"/>
-    <addaction name="actRenderType"/>
-    <addaction name="actOptions"/>
-    <addaction name="separator"/>
-    <addaction name="actGridToogle"/>
-   </widget>
-   <addaction name="menuFile"/>
-   <addaction name="menuEdit"/>
-   <addaction name="menuOperations"/>
-   <addaction name="menuView"/>
-   <addaction name="menuWindows"/>
-   <addaction name="menuHelp"/>
   </widget>
-  <widget class="QStatusBar" name="statusBar"/>
   <action name="actSave">
    <property name="text">
     <string>Save</string>

@@ -38,13 +38,13 @@
 #include "ZEDCore/ZEDComponent.h"
 #include <QMainWindow>
 #include "ZEDS/ZEArray.h"
+#include "ZEDMenu.h"
 
 class ZEDMenu;
 class ZEDWindow;
 class ZEDToolbar;
 class ZEDViewport;
 class Ui_ZEDMainWindow;
-class QMenu;
 
 class ZEDMainWindow : public QObject, public ZEDComponent
 {
@@ -53,31 +53,34 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		Ui_ZEDMainWindow*					Form;
 		QMainWindow*						MainWindow;
 		ZEDViewport*						Viewport;
+		ZEDMenu								RootMenu;
 
-		ZEArray<ZEDMenu*>					Menus;
 		ZEArray<ZEDToolbar*>				Toolbars;
 		ZEArray<ZEDWindow*>					Windows;
 
 		bool								eventFilter(QObject* Object, QEvent* Event);
+		
+		void								ToolbarActionCallback(ZEDMenu* Menu);
 
-		QMenu*								GetOrCreateMenu(QMenu* Parent, const ZEString& Target);
+		void								AddMenu(QMenu* Parent, const ZEString& RemainingPath, QAction* Action);
+		bool								RemoveMenu(QMenu* Parent, QAction* Action);
 
 											ZEDMainWindow();
 											~ZEDMainWindow();
 	public:
 		QMainWindow*						GetMainWindow();
-		const ZEArray<ZEDMenu*>&			GetMenus();
-		const ZEArray<ZEDToolbar*>&			GetToolbars();
-		const ZEArray<ZEDWindow*>&			GetWindows();
 
+		ZEDMenu*							GetRootMenu();
+		void								AddMenu(const ZEString& Path, ZEDMenu* Menu);
+		void								RemoveMenu(ZEDMenu* Menu);
+
+		const ZEArray<ZEDWindow*>&			GetWindows();
 		void								AddWindow(ZEDWindow* Widget);
 		void								RemoveWindow(ZEDWindow* Widget);
 
+		const ZEArray<ZEDToolbar*>&			GetToolbars();
 		void								AddToolbar(ZEDToolbar* Toolbar);
 		void								RemoveToolbar(ZEDToolbar* Toolbar);
-
-		void								AddMenu(ZEDMenu* Menu);
-		void								RemoveMenu(ZEDMenu* Menu);
 
 		void								SetViewport(ZEDViewport* Viewport);
 		ZEDViewport*						GetViewport();
