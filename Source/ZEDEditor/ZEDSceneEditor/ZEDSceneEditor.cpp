@@ -107,7 +107,7 @@ bool ZEDSceneEditor::InitializeSelf()
 	GetViewportManager()->RegisterViewport(Viewport);
 	GetMainWindow()->SetViewport(Viewport);
 
-	ZEScene* Scene = ZEScene::CreateInstance();
+	Scene = ZEScene::CreateInstance();
 	Scene->Initialize();
 
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
@@ -148,6 +148,8 @@ bool ZEDSceneEditor::InitializeSelf()
 
 	GetObjectManager()->GetRootWrapper()->Update();
 	GetMainWindow()->GetMainWindow()->show();
+
+	return true;
 }
 
 ZEDSceneEditor::ZEDSceneEditor()
@@ -160,6 +162,7 @@ ZEDSceneEditor::ZEDSceneEditor()
 	PropertyEditor = NULL;
 	SelectionToolbar = NULL;
 	TransformationToolbar = NULL;
+	Scene = NULL;
 }
 
 ZEDSceneEditor::~ZEDSceneEditor()
@@ -169,7 +172,8 @@ ZEDSceneEditor::~ZEDSceneEditor()
 
 void ZEDSceneEditor::New()
 {
-	Scene->ClearEntities();
+	Close();
+
 	ZEDEditor::New();
 }
 
@@ -183,7 +187,8 @@ bool ZEDSceneEditor::Save(const ZEString& FileName)
 
 bool ZEDSceneEditor::Load(const ZEString& FileName)
 {
-	Scene->ClearEntities();
+	Close();
+
 	if (!Scene->Load(FileName))
 		return false;
 

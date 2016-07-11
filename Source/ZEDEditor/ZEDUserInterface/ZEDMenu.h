@@ -45,12 +45,14 @@ class QMenuBar;
 class QAction;
 class ZEDMenu;
 
-typedef ZEDelegate<void (ZEDMenu* Menu)> ZEDMenuCallback;
+typedef ZEDelegate<void (ZEDMenu*)> ZEDMenuCallback;
 
 class ZEDMenu : public QObject
 {
+	Q_OBJECT
 	friend class ZEDMainWindow;
 	private:
+		ZEDMainWindow*						MainWindow;
 		ZEDMenu*							Parent;
 		ZEString							Name;
 		ZEString							Section;
@@ -74,6 +76,7 @@ class ZEDMenu : public QObject
 
 	public:
 		ZEDMenu*							GetParent();
+		ZEDMainWindow*						GetMainWindow();
 
 		void								SetName(const ZEString&	 Name);
 		ZEString							GetName() const;
@@ -102,8 +105,10 @@ class ZEDMenu : public QObject
 		void								SetCallback(const ZEDMenuCallback& Callback);
 		const ZEDMenuCallback&				GetCallback();
 
-		const ZEArray<ZEDMenu*>&			GetMenus() const;
-		void								AddMenu(ZEDMenu* Menu);
+		const ZEArray<ZEDMenu*>&			GetChildMenus() const;
+		void								AddChildMenu(ZEDMenu* Menu);
+		bool								RemoveChildMenu(ZEDMenu* Item);
+
 		void								AddMenu(const ZEString& Path, ZEDMenu* Menu);
 		bool								RemoveMenu(ZEDMenu* Item);
 		

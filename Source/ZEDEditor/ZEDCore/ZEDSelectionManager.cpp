@@ -44,8 +44,8 @@
 #include "ZEDViewportEvent.h"
 #include "ZEDTransformationManager.h"
 #include "ZEDSelectionEvent.h"
+#include "ZEDEditorEvent.h"
 #include "ZERenderer/ZERNScreenUtilities.h"
-
 
 ZEDSelectionManager::ZEDSelectionManager()
 {
@@ -63,9 +63,22 @@ bool ZEDSelectionManager::FilterSelection(ZEObject* Object, void* Class)
 	return ZEClass::IsDerivedFrom((ZEClass*)Class, Object->GetClass());
 }
 
+void ZEDSelectionManager::EditorEvent(const ZEDEditorEvent* Event)
+{
+	if (Event->GetType() == ZED_EET_FILE_CLOSED)
+		ClearSelection();
+}
+
 void ZEDSelectionManager::SetSelectionMode(ZEDSelectionMode Mode)
 {
 	SelectionMode = Mode;
+
+	ZEDSelectionEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_SET_MANAGER_STATE_CHANGED;
+	Event.Selection = &Selection;
+	Event.FocusedObject = FocusedObject;
+	RaiseEvent(&Event);
 }
 
 ZEDSelectionMode ZEDSelectionManager::GetSelectionMode()
@@ -76,6 +89,13 @@ ZEDSelectionMode ZEDSelectionManager::GetSelectionMode()
 void ZEDSelectionManager::SetSelectionShape(ZEDSelectionShape Shape)
 {
 	SelectionShape = Shape;
+
+	ZEDSelectionEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_SET_MANAGER_STATE_CHANGED;
+	Event.Selection = &Selection;
+	Event.FocusedObject = FocusedObject;
+	RaiseEvent(&Event);
 }
 
 ZEDSelectionShape ZEDSelectionManager::GetSelectionShape()

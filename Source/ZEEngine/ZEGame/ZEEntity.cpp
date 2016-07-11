@@ -205,7 +205,7 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 	else if (State == ZE_ES_INITIALIZED || State == ZE_ES_INITIALIZING)
 		Entity->Initialize();
 
-	if(Entity->GetName().IsEmpty())
+	if (Entity->GetName().IsEmpty())
 		Entity->SetName(GetName() + "->" +  Entity->GetClass()->GetName());
 
 	return true;
@@ -480,9 +480,6 @@ ZEEntity::~ZEEntity()
 {
 	Unload();
 
-	if (Scene != NULL)
-		Scene->RemoveEntity(this);
-
 	if (Parent != NULL)
 	{
 		if (Parent->GetComponents().Exists(this))
@@ -490,12 +487,16 @@ ZEEntity::~ZEEntity()
 		else if (Parent->GetChildEntities().Exists(this))
 			Parent->RemoveChildEntity(this);
 	}
+	else if (Scene != NULL)
+	{
+		Scene->RemoveEntity(this);
+	}
 
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		Components[I]->Destroy();
+	while(Components.GetCount() != 0)
+		Components.GetFirstItem()->Destroy();
 
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		ChildEntities[I]->Destroy();
+	while(ChildEntities.GetCount() != 0)
+		ChildEntities.GetFirstItem()->Destroy();
 }
 
 ZEDrawFlags ZEEntity::GetDrawFlags() const

@@ -61,6 +61,8 @@ class ZEDObjectManager : public ZEDComponent
 		bool									InitializeSelf();
 		void									DeinitializeSelf();
 
+		virtual void							EditorEvent(const ZEDEditorEvent* Event);
+
 		void									RaiseEvent(const ZEDObjectEvent* Event);
 
 												ZEDObjectManager();

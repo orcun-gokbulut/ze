@@ -77,6 +77,7 @@ class ZEDSelectionManager : public ZEDComponent
 
 		bool								FilterSelection(ZEObject* Object, void* Class);
 
+		virtual void						EditorEvent(const ZEDEditorEvent* Event);
 		virtual void						ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
 		virtual void						ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
 

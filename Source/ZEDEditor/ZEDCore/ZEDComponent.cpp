@@ -39,26 +39,29 @@
 #include "ZEDObjectEvent.h"
 #include "ZEDSelectionEvent.h"
 #include "ZEDViewportEvent.h"
+#include "ZEDEditorEvent.h"
 
 void ZEDComponent::EventReceived(const ZEDEvent* Event)
 {
-	if(ZEClass::IsDerivedFrom(ZEDTickEvent::Class(), Event->GetClass()))
+	if (ZEClass::IsDerivedFrom(ZEDTickEvent::Class(), Event->GetClass()))
 		TickEvent(static_cast<const ZEDTickEvent*>(Event));
-	else if(ZEClass::IsDerivedFrom(ZEDObjectEvent::Class(), Event->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDObjectEvent::Class(), Event->GetClass()))
 		ObjectEvent(static_cast<const ZEDObjectEvent*>(Event));
 	else if (ZEClass::IsDerivedFrom(ZEDSelectionEvent::Class(), Event->GetClass()))
 		SelectionEvent(static_cast<const ZEDSelectionEvent*>(Event));
-	else if(ZEClass::IsDerivedFrom(ZEDViewportKeyboardEvent::Class(), Event->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDViewportKeyboardEvent::Class(), Event->GetClass()))
 		ViewportKeyboardEvent(static_cast<const ZEDViewportKeyboardEvent*>(Event));
-	else if(ZEClass::IsDerivedFrom(ZEDViewportMouseEvent::Class(), Event->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDViewportMouseEvent::Class(), Event->GetClass()))
 		ViewportMouseEvent(static_cast<const ZEDViewportMouseEvent*>(Event));
-	else if(ZEClass::IsDerivedFrom(ZEDViewportChangedEvent::Class(), Event->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDViewportChangedEvent::Class(), Event->GetClass()))
 		ViewportChangedEvent(static_cast<const ZEDViewportChangedEvent*>(Event));
-	else if(ZEClass::IsDerivedFrom(ZEDViewportRenderEvent::Class(), Event->GetClass()))
+	else if (ZEClass::IsDerivedFrom(ZEDViewportRenderEvent::Class(), Event->GetClass()))
 		ViewportRenderEvent(static_cast<const ZEDViewportRenderEvent*>(Event));
+	else if (ZEClass::IsDerivedFrom(ZEDEditorEvent::Class(), Event->GetClass()))
+		EditorEvent(static_cast<const ZEDEditorEvent*>(Event));
 }
 
-void ZEDComponent::EditorChanged()
+void ZEDComponent::EditorEvent(const ZEDEditorEvent* Event)
 {
 
 }

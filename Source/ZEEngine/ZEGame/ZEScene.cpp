@@ -326,12 +326,8 @@ void ZEScene::RemoveEntity(ZEEntity* Entity)
 
 void ZEScene::ClearEntities()
 {
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-	{
-		ZEEntity* Entity = Entities[I];
-		RemoveEntity(Entity);
-		Entity->Destroy();
-	}
+	while(Entities.GetCount() != 0)
+		Entities.GetFirstItem()->Destroy();
 }
 
 void ZEScene::Destroy()

@@ -38,51 +38,12 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
 
-class ZEDMainWindow;
-
-//////////////////////////////////////////////////////////////////////////////////////
-//                                                                                  //
-//  ZEDModule.h - Zinek Engine v0.6.2 Source Code                                   //
-// -------------------------------------------------------------------------------//
-//  Copyright (c) 2007-2010 Y. Orçun GÖKBULUT. All rights reserved.                 //
-//                                                                                  //
-//                 READ TERMS BELLOW BEFORE TAKING ANY ACTION !                     //
-//                                                                                  //
-//  These coded instructions, statements, and computer programs contain             //
-//  unpublished proprietary information belongs to Y. Orçun GÖKBULUT and they are   //
-//  protected by international copyright laws. This file is intellectual property   //
-//  of the Y. Orçun GÖKBULUT. Storing this file, using this file, changing content  //
-//  of this file, copying or duplicating this file, compiling this file, publishing //
-//  this file to anykind media or network, editing  this file, selling this file,   //
-//  booking this file, reading this file are probited without notice and written    //
-//  permision of Y. Orçun GÖKBULUT.                                                 //
-//  These terms at above can only be changed by Y. Orçun GÖKBULUT.                  //
-//                                                                                  //
-//  Contact Information:                                                            //
-//     Adress : Zinek Code House & Game Studio                                      //
-//              Aydinlar Mahallesi.                                                 //
-//              Mimar Sokak. 33/5                                                   //
-//              06450  Ankara/TURKEY                                                //
-//     Phone  : +90 (533) 734 21 22                                                 //
-//     E-Mail : contact@zinekengine.com                                             //
-//     WWW    : http://www.zinekengine.com                                          //
-//                                                                                  //
-//*                                                                                *//
-//  DESCRIPTION         :                                                           //
-//  AUTHOR(S)           : Y. Orçun GÖKBULUT                                         //
-//*                                                                                *//
-//////////////////////////////////////////////////////////////////////////////////////
-
-#pragma once
-
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-
 #include "ZEDS/ZEArray.h"
 
-class ZEDEditorCore;
 class ZEDComponent;
 class ZEDEvent;
+class ZEDEditorCore;
+class ZEDEditorEvent;
 class ZEDObjectManager;
 class ZEDOperationManager;
 class ZEDSelectionManager;
@@ -90,6 +51,14 @@ class ZEDTransformationManager;
 class ZEDViewportManager;
 class ZEDMainWindow;
 class ZEUIManager;
+class ZEDMenu;
+
+enum ZEDFileState
+{
+	ZED_ES_NONE,
+	ZED_ES_UNMODIFIED,
+	ZED_ES_MODIFIED
+};
 
 class ZEDEditor : public ZEObject, public ZEInitializable
 {
@@ -97,6 +66,9 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 	friend class ZEDEditorCore;
 	private:
 		ZEDEditorCore*						Core;
+		ZEDFileState						FileState;
+		ZEString							FileName;
+		ZEArray<ZEString>					RecentFiles;
 
 		ZEArray<ZEDComponent*>				Components;
 		ZEDObjectManager*					ObjectManager;
@@ -106,6 +78,29 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 		ZEDViewportManager*					ViewportManager;
 		ZEDMainWindow*						MainWindow;
 		ZEUIManager*						UIManager;
+
+		ZEDMenu*							NewMenu;
+		ZEDMenu*							OpenMenu;
+		ZEDMenu*							SaveMenu;
+		ZEDMenu*							SaveAsMenu;
+		ZEDMenu*							CloseMenu;
+		ZEDMenu*							ExitMenu;
+		ZEDMenu*							RecentFilesMenu;
+
+		void								NewMenu_activated(ZEDMenu* Menu);
+		void								OpenMenu_activated(ZEDMenu* Menu);
+		void								SaveMenu_activated(ZEDMenu* Menu);
+		void								SaveAsMenu_activated(ZEDMenu* Menu);
+		void								CloseMenu_activated(ZEDMenu* Menu);
+		void								ExitMenu_activated(ZEDMenu* Menu);
+		void								RecentFilesMenu_activated(ZEDMenu* Menu);
+
+		void								UpdateMenu();
+		void								InitializeMenu();
+		void								DeinitializeMenu();
+
+		void								PopulateRecentFiles();
+		void								RegisterRecentFile(const ZEString& FileName);
 
 	protected:
 		virtual bool						InitializeSelf();
@@ -129,7 +124,10 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 		void								AddComponent(ZEDComponent* Component);
 		void								RemoveComponent(ZEDComponent* Component);
 
-		void								DistributeEvent(const ZEDEvent* Event);
+		ZEDFileState						GetFileState();
+		const ZEString&						GetFileName();
+
+		virtual ZEString					GetExtensions();
 
 		virtual void						Process(float ElapsedTime);
 		virtual void						PostProcess(float ElapsedTime);
@@ -139,7 +137,12 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 		virtual bool						Load(const ZEString& FileName);
 		virtual void						Close();
 
-		void								Exit();
+		virtual void						Exit();
+
+		void								MarkDocumentModified();
+		void								UnmarkDocumentModified();
+
+		void								DistributeEvent(const ZEDEvent* Event);
 
 		virtual void						Destroy();
 };
