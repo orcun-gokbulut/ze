@@ -35,6 +35,8 @@
 
 #include "ZEDEditor.h"
 
+#include "ZEDS/ZEDelegate.h"
+#include "ZEDEditorEvent.h"
 #include "ZEDEvent.h"
 #include "ZEDComponent.h"
 #include "ZEDOperationManager.h"
@@ -44,10 +46,14 @@
 #include "ZEDObjectWrapper.h"
 #include "ZEDViewPort.h"
 #include "ZEDViewportManager.h"
-#include "ZERenderer\ZERNRenderParameters.h"
-#include "ZEUI\ZEUIManager.h"
-#include "ZEDUserInterface\ZEDMainWindow.h"
 #include "ZEDEditorCore.h"
+#include "ZEDUserInterface/ZEDMainWindow.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZEUI/ZEUIManager.h"
+
+#include <QFileDialog>
+#include <QMessageBox>
+#include <QSettings>
 
 
 void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
@@ -61,6 +67,190 @@ void ZEDEditor::DistributeEvent(const ZEDEvent* Event)
 	}
 }
 
+void ZEDEditor::NewMenu_activated(ZEDMenu* Menu)
+{
+	New();
+}
+
+void ZEDEditor::OpenMenu_activated(ZEDMenu* Menu)
+{
+	QString Result = QFileDialog::getOpenFileName(GetMainWindow()->GetMainWindow(), "Open", QString(), GetExtensions().ToCString());
+	if (Result.isEmpty())
+		return;
+
+	if (!Load(Result.toUtf8().begin()))
+		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot load file.", "Error", QMessageBox::Ok);
+}
+
+void ZEDEditor::SaveMenu_activated(ZEDMenu* Menu)
+{
+	if (FileState == ZED_ES_NONE)
+		return;
+
+	if (!Save(FileName))
+		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot save file.", "Error", QMessageBox::Ok);
+}
+
+void ZEDEditor::SaveAsMenu_activated(ZEDMenu* Menu)
+{
+	if (FileState == ZED_ES_NONE)
+		return;
+
+	QString Result = QFileDialog::getOpenFileName(GetMainWindow()->GetMainWindow(), "Open", QString(), GetExtensions().ToCString());
+	if (Result.isEmpty())
+		return;
+
+	if (!Save(FileName))
+		QMessageBox::critical(GetMainWindow()->GetMainWindow(), "Cannot save file.", "Error", QMessageBox::Ok);
+}
+
+void ZEDEditor::CloseMenu_activated(ZEDMenu* Menu)
+{
+	if (FileState == ZED_ES_NONE)
+		return;
+
+	if (FileState == ZED_ES_MODIFIED)
+	{
+		int Result = QMessageBox::question(GetMainWindow()->GetMainWindow(), "ZEDEditor", "Are you sure that you want to close this file ? All of your changes will be gone.", QMessageBox::Yes, QMessageBox::No);
+		if (Result == QMessageBox::No)
+			return;
+	}
+
+	Close();
+}
+
+void ZEDEditor::ExitMenu_activated(ZEDMenu* Menu)
+{
+	int Result;
+	if (FileState == ZED_ES_MODIFIED)
+		Result = QMessageBox::question(GetMainWindow()->GetMainWindow(), "ZEDEditor", "Are you sure that you want to exit ? You unsaved changes in this file. All of your changes will be gone.", QMessageBox::Yes, QMessageBox::No);
+	else
+		Result = QMessageBox::question(GetMainWindow()->GetMainWindow(), "ZEDEditor", "Are you sure that you want to exit ?", QMessageBox::Yes, QMessageBox::No);
+
+	if (Result == QMessageBox::No)
+		return;
+
+	Exit();
+}
+
+void ZEDEditor::RecentFilesMenu_activated(ZEDMenu* Menu)
+{
+	Load(Menu->GetName());
+}
+
+void ZEDEditor::UpdateMenu()
+{
+	SaveMenu->SetEnabled(FileState != ZED_ES_NONE);
+	SaveAsMenu->SetEnabled(FileState != ZED_ES_NONE);
+	CloseMenu->SetEnabled(FileState != ZED_ES_NONE);
+}
+
+void ZEDEditor::InitializeMenu()
+{
+	NewMenu = new ZEDMenu();
+	NewMenu->SetName("New");
+	NewMenu->SetSection("Open");
+	NewMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, NewMenu_activated, this));
+	GetMainWindow()->AddMenu("File", NewMenu);
+	
+	OpenMenu = new ZEDMenu();
+	OpenMenu->SetName("Open");
+	OpenMenu->SetSection("Open");
+	OpenMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, OpenMenu_activated, this));
+	GetMainWindow()->AddMenu("File", OpenMenu);
+	
+	RecentFilesMenu = new ZEDMenu();
+	RecentFilesMenu->SetName("Recent Files");
+	RecentFilesMenu->SetSection("Open");
+	GetMainWindow()->AddMenu("File", RecentFilesMenu);
+
+	SaveMenu = new ZEDMenu();
+	SaveMenu->SetName("Save");
+	SaveMenu->SetSection("Save");
+	SaveMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, SaveMenu_activated, this));
+	GetMainWindow()->AddMenu("File", SaveMenu);
+	
+	SaveAsMenu = new ZEDMenu();
+	SaveAsMenu->SetName("Save As");
+	SaveAsMenu->SetSection("Save");
+	SaveAsMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, SaveAsMenu_activated, this));
+	GetMainWindow()->AddMenu("File", SaveAsMenu);
+
+	CloseMenu = new ZEDMenu();
+	CloseMenu->SetName("Close");
+	CloseMenu->SetSection("Close");
+	CloseMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, CloseMenu_activated, this));
+	GetMainWindow()->AddMenu("File", CloseMenu);
+
+	ExitMenu = new ZEDMenu();
+	ExitMenu->SetName("Exit");
+	ExitMenu->SetSection("Exit");
+	ExitMenu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, ExitMenu_activated, this));
+	GetMainWindow()->AddMenu("File", ExitMenu);
+
+	UpdateMenu();
+}
+
+void ZEDEditor::DeinitializeMenu()
+{
+	delete NewMenu;
+	NewMenu = NULL;
+
+	delete OpenMenu;
+	OpenMenu = NULL;
+
+	delete SaveMenu;
+	SaveMenu = NULL;
+
+	delete SaveAsMenu;
+	SaveAsMenu = NULL;
+
+	delete CloseMenu;
+	CloseMenu = NULL;
+
+	delete ExitMenu;
+	ExitMenu = NULL;
+
+	delete RecentFilesMenu;
+	RecentFilesMenu = NULL;
+}
+
+void ZEDEditor::PopulateRecentFiles()
+{
+	QSettings Settings("Zinek", GetClass()->GetName());
+	QStringList RecentFiles = Settings.value("RecentFiles", QStringList()).toStringList();
+
+	while (RecentFilesMenu->GetChildMenus().GetCount() != 0)
+		delete RecentFilesMenu->GetChildMenus().GetFirstItem();
+
+	for (int I = 0; I < RecentFiles.size(); I++)
+	{
+		ZEDMenu* Menu = new ZEDMenu();
+		Menu->SetName(RecentFiles[I].toUtf8().begin());
+		Menu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDEditor, RecentFilesMenu_activated, this));
+		GetMainWindow()->AddMenu("File/Open::Recent Files", Menu);
+	}
+}
+
+void ZEDEditor::RegisterRecentFile(const ZEString& FileName)
+{
+	QSettings Settings("Zinek", GetClass()->GetName());
+	QStringList RecentFiles = Settings.value("RecentFiles", QStringList()).toStringList();
+
+	int Index = RecentFiles.indexOf(FileName.ToCString());
+	if (Index != -1)
+		RecentFiles.removeAt(Index);
+
+	if (RecentFiles.size() > 10)
+		RecentFiles.removeLast();
+
+	RecentFiles.insert(0, FileName.ToCString());
+
+	Settings.setValue("File/Open::RecentFiles", RecentFiles);
+
+	PopulateRecentFiles();
+}
+
 bool ZEDEditor::InitializeSelf()
 {
 	if (!ZEInitializable::InitializeSelf())
@@ -68,6 +258,8 @@ bool ZEDEditor::InitializeSelf()
 
 	MainWindow = ZEDMainWindow::CreateInstance();
 	AddComponent(MainWindow);
+
+	InitializeMenu();
 
 	ViewportManager = ZEDViewportManager::CreateInstance();
 	AddComponent(ViewportManager);
@@ -96,6 +288,8 @@ bool ZEDEditor::InitializeSelf()
 		}
 	}
 
+	PopulateRecentFiles();
+
 	return true;
 }
 
@@ -105,6 +299,8 @@ void ZEDEditor::DeinitializeSelf()
 		Components[I]->Deinitialize();
 
 	UIManager->Deinitialize();
+	
+	DeinitializeMenu();
 
 	ZEInitializable::DeinitializeSelf();
 }
@@ -164,6 +360,21 @@ void ZEDEditor::RemoveComponent(ZEDComponent* Component)
 	Component->Editor = NULL;
 }
 
+ZEDFileState ZEDEditor::GetFileState()
+{
+	return FileState;
+}
+
+const ZEString& ZEDEditor::GetFileName()
+{
+	return FileName;
+}
+
+ZEString ZEDEditor::GetExtensions()
+{
+	return "*.*";
+}
+
 void ZEDEditor::Process(float ElapsedTime)
 {
 	ZEDTickEvent Event;
@@ -193,28 +404,94 @@ void ZEDEditor::PostProcess(float ElapsedTime)
 
 void ZEDEditor::New()
 {
+	FileState = ZED_ES_UNMODIFIED;
+	FileName = "";
 
+	UpdateMenu();
+
+	ZEDEditorEvent Event;
+	Event.FileName = FileName;
+	Event.Type = ZED_EET_NEW_FILE;
+	DistributeEvent(&Event);
 }
 
 bool ZEDEditor::Save(const ZEString& FileName)
 {
+	FileState = ZED_ES_UNMODIFIED;
+	this->FileName = FileName;
+
+	UpdateMenu();
+
+	ZEDEditorEvent Event;
+	Event.FileName = FileName;
+	Event.Type = ZED_EET_FILE_SAVED;
+	DistributeEvent(&Event);
+
 	return true;
 }
 
 bool ZEDEditor::Load(const ZEString& FileName)
 {
+	FileState = ZED_ES_UNMODIFIED;
+	this->FileName = FileName;
+
+	UpdateMenu();
+
+	ZEDEditorEvent Event;
+	Event.FileName = FileName;
+	Event.Type = ZED_EET_FILE_LOADED;
+	DistributeEvent(&Event);
+
 	return true;
 }
 
 void ZEDEditor::Close()
 {
-	
+	FileState = ZED_ES_NONE;
+	FileName = NULL;
+
+	UpdateMenu();
+
+	ZEDEditorEvent Event;
+	Event.FileName = FileName;
+	Event.Type = ZED_EET_FILE_CLOSED;
+	DistributeEvent(&Event);
 }
 
 void ZEDEditor::Exit()
 {
 	if (GetCore() != NULL)
 		GetCore()->Exit();
+}
+
+void ZEDEditor::MarkDocumentModified()
+{
+	if (FileState == ZED_ES_NONE)
+		return;
+
+	FileState = ZED_ES_MODIFIED;
+
+	UpdateMenu();
+
+	ZEDEditorEvent Event;
+	Event.FileName = FileName;
+	Event.Type = ZED_EET_FILE_MODIFIED;
+	DistributeEvent(&Event);
+}
+
+void ZEDEditor::UnmarkDocumentModified()
+{
+	if (FileState == ZED_ES_NONE)
+		return;
+
+	FileState = ZED_ES_UNMODIFIED;
+
+	UpdateMenu();
+
+	ZEDEditorEvent Event;
+	Event.FileName = FileName;
+	Event.Type = ZED_EET_FILE_UNMODIFIED;
+	DistributeEvent(&Event);
 }
 
 void ZEDEditor::Destroy()
@@ -225,6 +502,23 @@ void ZEDEditor::Destroy()
 ZEDEditor::ZEDEditor()
 {
 	Core = NULL;
+	FileState = ZED_ES_NONE;
+
+	ObjectManager = NULL;
+	OperationManager = NULL;
+	SelectionManager = NULL;
+	TransformationManager = NULL;
+	ViewportManager = NULL;
+	MainWindow = NULL;
+	UIManager = NULL;
+
+	NewMenu = NULL;
+	OpenMenu = NULL;
+	SaveMenu = NULL;
+	SaveAsMenu = NULL;
+	CloseMenu = NULL;
+	ExitMenu = NULL;
+	RecentFilesMenu = NULL;
 }
 
 ZEDEditor::~ZEDEditor()

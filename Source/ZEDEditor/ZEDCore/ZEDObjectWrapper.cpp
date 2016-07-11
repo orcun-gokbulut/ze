@@ -102,8 +102,8 @@ void ZEDObjectWrapper::SyncronizeChildWrappers(ZEObject*const*  TargetList, ZESi
 
 		if (!Found)
 			Wrappers[I]->Destroy();
-
-		Wrappers[I]->Update();
+		else
+			Wrappers[I]->Update();
 	}
 
 	// Add
@@ -149,6 +149,9 @@ ZEDObjectWrapper::ZEDObjectWrapper()
 ZEDObjectWrapper::~ZEDObjectWrapper()
 {
 	ClearChildWrappers();
+
+	if (GetParent() != NULL)
+		GetParent()->RemoveChildWrapper(this, true);
 }
 
 void ZEDObjectWrapper::SetObject(ZEObject* Object)

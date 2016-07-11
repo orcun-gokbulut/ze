@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDComponent.h
+ Zinek Engine - ZEDEditorEvent.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,48 +35,31 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
+#include "ZEDEvent.h"
 
-class ZEDEditor;
-class ZEDEditorEvent;
-class ZEDEvent;
-class ZEDObjectEvent;
-class ZEDTickEvent;
-class ZEDSelectionEvent;
-class ZEDTransformationEvent;
-class ZEDViewportKeyboardEvent;
-class ZEDViewportMouseEvent;
-class ZEDViewportChangedEvent;
-class ZEDViewportRenderEvent;
 
-class ZEDComponent : public ZEObject, public ZEInitializable
+enum ZEDEditorEventType
+{
+	ZED_EET_NONE,
+	ZED_EET_NEW_FILE,
+	ZED_EET_FILE_LOADED,
+	ZED_EET_FILE_SAVED,
+	ZED_EET_FILE_CLOSED,
+	ZED_EET_FILE_MODIFIED,
+	ZED_EET_FILE_UNMODIFIED
+};
+
+class ZEDEditorEvent : public ZEDEvent
 {
 	ZE_OBJECT
 	friend class ZEDEditor;
 	private:
-		ZEDEditor*						Editor;
+		ZEDEditorEventType					Type;
+		ZEString							FileName;
 
-	protected:
-		virtual void					EventReceived(const ZEDEvent* Event);
-	
-		virtual void					EditorEvent(const ZEDEditorEvent* Event);
-		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
-		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);
-		virtual void					TransformationEvent(const ZEDTransformationEvent* Event);
-		virtual	void					TickEvent(const ZEDTickEvent* Event);
-		virtual void					ViewportKeyboardEvent(const ZEDViewportKeyboardEvent* Event);
-		virtual void					ViewportMouseEvent(const ZEDViewportMouseEvent* Event);
-		virtual void					ViewportChangedEvent(const ZEDViewportChangedEvent* Event);
-		virtual void					ViewportRenderEvent(const ZEDViewportRenderEvent* Event);
-
-		void							RaiseEvent(const ZEDEvent* Event);
-	
-										ZEDComponent();
-		virtual							~ZEDComponent();
+											ZEDEditorEvent();
 
 	public:
-		ZEDEditor*						GetEditor();
-
-		virtual void					Destroy();
+		ZEDEditorEventType					GetType() const;
+		ZEString							GetFileName() const;
 };

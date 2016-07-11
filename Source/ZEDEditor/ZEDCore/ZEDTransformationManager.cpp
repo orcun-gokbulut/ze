@@ -46,6 +46,7 @@
 #include "ZEDViewportEvent.h"
 #include "ZERenderer\ZERNScreenUtilities.h"
 #include "ZERenderer\ZERNRenderParameters.h"
+#include "ZEDTransformationEvent.h"
 
 
 // ZEDTransformationState
@@ -254,6 +255,12 @@ void ZEDTransformationManager::StartTransform(ZEDGizmo* TransformGizmo)
 {
 	TransformActive = true;
 	this->TransformGizmo = TransformGizmo;
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_TRANSFORMATION_STARTED;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 void ZEDTransformationManager::EndTransform()
@@ -281,6 +288,12 @@ void ZEDTransformationManager::EndTransform()
 	TransformActive = false;
 
 	UpdateTransformStates();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_TRANSFORMATION_ENDED;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 void ZEDTransformationManager::ResetTransform()
@@ -311,6 +324,12 @@ void ZEDTransformationManager::ResetTransform()
 	TransformActive = false;
 
 	UpdateTransformStates();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_TRANSFORMATION_RESET;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 void ZEDTransformationManager::ApplyTranslation(const ZEVector3& Translation)
@@ -329,6 +348,12 @@ void ZEDTransformationManager::ApplyTranslation(const ZEVector3& Translation)
 
 	UpdateGizmos();
 	UpdateToolbar();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_TRANSFORMING;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 void ZEDTransformationManager::ApplyRotation(const ZEQuaternion& Rotation)
@@ -352,6 +377,12 @@ void ZEDTransformationManager::ApplyRotation(const ZEQuaternion& Rotation)
 
 	UpdateGizmos();
 	UpdateToolbar();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_TRANSFORMING;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 void ZEDTransformationManager::ApplyScale(const ZEVector3& Scale)
@@ -375,6 +406,12 @@ void ZEDTransformationManager::ApplyScale(const ZEVector3& Scale)
 
 	//UpdateGizmos();
 	UpdateToolbar();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_TRANSFORMING;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 ZEVector3 ZEDTransformationManager::GetPosition(bool& Valid)
@@ -469,7 +506,6 @@ ZEVector3 ZEDTransformationManager::GetScale(bool& Valid)
 {
 	return ZEVector3::Zero;
 }
-
 
 void ZEDTransformationManager::SelectionEvent(const ZEDSelectionEvent* Event)
 {
@@ -640,6 +676,12 @@ void ZEDTransformationManager::SetTransformType(ZEDTransformType Type)
 	TransformType = Type;
 
 	UpdateTransformStates();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_MANAGER_STATE_CHANGED;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 ZEDTransformType ZEDTransformationManager::GetTransformType()
@@ -655,6 +697,12 @@ void ZEDTransformationManager::SetTransformSpace(ZEDTransformSpace Space)
 	TransformSpace = Space;
 
 	UpdateTransformStates();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_MANAGER_STATE_CHANGED;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 ZEDTransformSpace ZEDTransformationManager::GetTransformSpace()
@@ -670,6 +718,12 @@ void ZEDTransformationManager::SetTransformPivot(ZEDTransformPivot Pivot)
 	TransformPivot = Pivot;
 
 	UpdateTransformStates();
+
+	ZEDTransformationEvent Event;
+	Event.Manager = this;
+	Event.Type = ZED_TET_MANAGER_STATE_CHANGED;
+	Event.TransformationStates = &TransformStates;
+	RaiseEvent(&Event);
 }
 
 ZEDTransformPivot ZEDTransformationManager::GetTransformPivot()

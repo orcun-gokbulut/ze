@@ -47,6 +47,8 @@ class ZEDOperationManager : public ZEDComponent
 		ZEArray<ZEDOperation*>			Stack;
 		ZESSize							StackIndex;
 
+		virtual void					EditorEvent(const ZEDEditorEvent* Event);
+
 										ZEDOperationManager();
 										~ZEDOperationManager();
 

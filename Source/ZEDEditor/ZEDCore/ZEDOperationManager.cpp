@@ -35,9 +35,16 @@
 
 #include "ZEDOperationManager.h"
 
-#include "ZEDOperation.h"
 #include "ZEError.h"
+#include "ZEDOperation.h"
 #include "ZEDEditorCore.h"
+#include "ZEDEditorEvent.h"
+
+void ZEDOperationManager::EditorEvent(const ZEDEditorEvent* Event)
+{
+	if (Event->GetType() == ZED_EET_FILE_CLOSED)
+		Clear();
+}
 
 ZEDOperationManager::ZEDOperationManager()
 {

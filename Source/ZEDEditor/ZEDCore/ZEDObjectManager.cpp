@@ -44,6 +44,7 @@
 #include "ZEDCreateOperation.h"
 #include "ZEDDeleteOperation.h"
 #include "ZEDRelocateOperation.h"
+#include "ZEDEditorEvent.h"
 
 void ZEDObjectManager::LoadWrapperClasses()
 {
@@ -77,6 +78,12 @@ void ZEDObjectManager::DeinitializeSelf()
 		RootWrapper->Deinitialize();
 
 	ZEDComponent::DeinitializeSelf();
+}
+
+void ZEDObjectManager::EditorEvent(const ZEDEditorEvent* Event)
+{
+	if (Event->GetType() == ZED_EET_FILE_CLOSED)
+		GetRootWrapper()->ClearChildWrappers();
 }
 
 void ZEDObjectManager::RaiseEvent(const ZEDObjectEvent* Event)

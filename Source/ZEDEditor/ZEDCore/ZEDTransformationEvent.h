@@ -51,12 +51,14 @@ enum ZEDTransformationEventType
 	ZED_TET_TRANSFORMATION_STARTED,
 	ZED_TET_TRANSFORMING,
 	ZED_TET_TRANSFORMATION_ENDED,
+	ZED_TET_TRANSFORMATION_RESET,
 	ZED_TET_MANAGER_STATE_CHANGED,
 };
 
 class ZEDTransformationEvent : public ZEDEvent
 {
 	ZE_OBJECT
+	friend class ZEDTransformationManager;
 	private:
 		ZEDTransformationManager*				Manager;
 		ZEDTransformationEventType				Type;
