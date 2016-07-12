@@ -41,7 +41,7 @@ ZELN_MODULE_DECRIPTION(ZELNContactModule, "Contact");
 
 bool ZELNContactModule::InitializeSelf()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZELNModule::InitializeSelf())
 		return false;
 
 	Widget = new QWidget();
@@ -51,13 +51,15 @@ bool ZELNContactModule::InitializeSelf()
 	return true;
 }
 
-void ZELNContactModule::DeinitializeSelf()
+bool ZELNContactModule::DeinitializeSelf()
 {
 	delete Widget;
 	Widget = NULL;
 
 	delete Form;
 	Form = NULL;
+
+	return ZELNModule::DeinitializeSelf();
 }
 
 QWidget* ZELNContactModule::GetWidget()

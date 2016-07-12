@@ -45,7 +45,7 @@
 #define ZERN_SDDF_SAMPLER			0x01
 #define ZERN_SDDF_CONSTANT_BUFFER	0x02
 
-void ZERNStageDisplay::DeinitializeSelf()
+bool ZERNStageDisplay::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -54,6 +54,8 @@ void ZERNStageDisplay::DeinitializeSelf()
 
 	InputTexture = NULL;
 	OutputRenderTarget = NULL;
+
+	return ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStageDisplay::UpdateInputOutput()

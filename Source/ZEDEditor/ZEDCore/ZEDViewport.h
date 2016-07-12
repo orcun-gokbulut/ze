@@ -42,7 +42,7 @@
 #include "ZERenderer/ZECamera.h"
 #include "ZEGraphics/ZEGRWindow.h"
 
-#include <QFrame>
+#include <QWidget>
 #include <QMouseEvent>
 #include <QKeyEvent>
 #include <QDropEvent>
@@ -52,7 +52,7 @@
 
 class ZEDViewportManager;
 
-class ZEDViewport : public QFrame, public ZEDComponent
+class ZEDViewport : public QWidget, public ZEDComponent
 {
 	Q_OBJECT
 	friend ZEDViewportManager;
@@ -83,10 +83,11 @@ class ZEDViewport : public QFrame, public ZEDComponent
 		bool								Update();
 
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 		virtual void						TickEvent(const ZEDTickEvent* Tick);
 
+		virtual void						paintEvent(QPaintEvent* PaintEvent);
 		virtual void						mousePressEvent(QMouseEvent* MouseEvent);
 		virtual void						mouseMoveEvent(QMouseEvent* MouseEvent);
 		virtual void						mouseReleaseEvent(QMouseEvent* MouseEvent);

@@ -67,7 +67,7 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		virtual bool						UpdateGraphics();
 
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 											ZEDEntityWrapper();
 

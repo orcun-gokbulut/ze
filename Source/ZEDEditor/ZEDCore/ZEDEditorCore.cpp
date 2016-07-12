@@ -96,7 +96,7 @@ bool ZEDEditorCore::InitializeSelf()
 	return true;
 }
 
-void ZEDEditorCore::DeinitializeSelf()
+bool ZEDEditorCore::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < Editors.GetCount(); I++)
 		Editors[I]->Deinitialize();
@@ -104,7 +104,7 @@ void ZEDEditorCore::DeinitializeSelf()
 	zeCore->ShutDown();
 	Application->exit();
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 ZEDEditorCore::ZEDEditorCore()

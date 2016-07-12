@@ -473,7 +473,7 @@ bool ZERNStageAO::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageAO::DeinitializeSelf()
+bool ZERNStageAO::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -515,7 +515,7 @@ void ZERNStageAO::DeinitializeSelf()
 	NormalTexture = NULL;
 	AccumulationTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageAO::GetId() const

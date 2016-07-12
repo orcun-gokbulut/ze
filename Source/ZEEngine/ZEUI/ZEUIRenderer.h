@@ -83,7 +83,7 @@ class ZEUIRenderer : public ZEInitializable
 		void								UpdateBatches();
 
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 											ZEUIRenderer();
 											~ZEUIRenderer();

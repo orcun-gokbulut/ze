@@ -78,7 +78,7 @@ class ZELNLauncher : public ZEInitializable
 		void							InitializeModules(const ZEMLReaderNode& ModulesNode);
 
 		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 	public:
 		const ZEArray<ZELNModule*>		GetModules();

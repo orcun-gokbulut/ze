@@ -75,12 +75,12 @@ bool ZEDObjectWrapper::InitializeSelf()
 	return true;
 }
 
-void ZEDObjectWrapper::DeinitializeSelf()
+bool ZEDObjectWrapper::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
 		ChildWrappers[I]->Deinitialize();
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 void ZEDObjectWrapper::SyncronizeChildWrappers(ZEObject*const*  TargetList, ZESize TargetListSize)

@@ -40,7 +40,7 @@ ZELN_MODULE_DECRIPTION(ZELNUpdateModule, "Update");
 
 bool ZELNUpdateModule::InitializeSelf()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZELNModule::InitializeSelf())
 		return false;
 
 	Widget = new ZELNUpdateWidget();

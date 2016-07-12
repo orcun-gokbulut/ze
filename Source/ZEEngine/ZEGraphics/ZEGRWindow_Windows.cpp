@@ -714,7 +714,7 @@ bool ZEGRWindow::InitializeSelf()
 }
 
 
-void ZEGRWindow::DeinitializeSelf()
+bool ZEGRWindow::DeinitializeSelf()
 {
 	if (Handle != NULL)
 	{
@@ -722,7 +722,7 @@ void ZEGRWindow::DeinitializeSelf()
 		if (Result == 0)
 		{
 			HandleWin32Error(GetLastError());
-			return;
+			return false;
 		}
 
 		Handle = NULL;
@@ -735,10 +735,10 @@ void ZEGRWindow::DeinitializeSelf()
 	if (!UnRegisterWindowClass(Instance))
 	{
 		zeError("Cannot unregister class.");
-		return;
+		return false;
 	}
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 

@@ -139,7 +139,7 @@ class ZERNStageAO : public ZERNStage
 		void								CreateSphereSamples();
 
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();

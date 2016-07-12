@@ -172,11 +172,13 @@ bool ZEUIRenderer::InitializeSelf()
 	return true;
 }
 
-void ZEUIRenderer::DeinitializeSelf()
+bool ZEUIRenderer::DeinitializeSelf()
 {
 	VertexBuffer.Release();
 	RenderStateData.Release();
 	Sampler.Release();
+
+	return ZEInitializable::DeinitializeSelf();
 }
 
 ZEUIRenderer::ZEUIRenderer()

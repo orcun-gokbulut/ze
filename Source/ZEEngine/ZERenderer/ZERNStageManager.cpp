@@ -38,6 +38,9 @@
 
 bool ZERNStageManager::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	for (ZESize I = 0; I < Stages.GetCount(); I++)
 		if (!Stages[I]->Initialize())
 			return false;
@@ -45,10 +48,12 @@ bool ZERNStageManager::InitializeSelf()
 	return true;
 }
 
-void ZERNStageManager::DeinitializeSelf()
+bool ZERNStageManager::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < Stages.GetCount(); I++)
 		Stages[I]->Deinitialize();
+
+	return ZEInitializable::DeinitializeSelf();
 }
 
 ZERNStageManager::ZERNStageManager()

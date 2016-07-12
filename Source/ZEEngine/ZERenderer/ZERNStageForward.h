@@ -67,7 +67,7 @@ class ZERNStageForward : public ZERNStage
 		const ZEGRTexture2D*					TransparentDepthTexture;
 
 		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 		bool									UpdateShaders();
 		bool									UpdateRenderStates();

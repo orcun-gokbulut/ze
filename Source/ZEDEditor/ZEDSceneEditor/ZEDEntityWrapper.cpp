@@ -132,7 +132,7 @@ bool ZEDEntityWrapper::InitializeSelf()
 	return true;
 }
 
-void ZEDEntityWrapper::DeinitializeSelf()
+bool ZEDEntityWrapper::DeinitializeSelf()
 {
 	delete NamePlate;
 
@@ -140,7 +140,7 @@ void ZEDEntityWrapper::DeinitializeSelf()
 	ConstantBuffer.Release();
 	VertexBuffer.Release();
 
-	ZEDObjectWrapper::DeinitializeSelf();
+	return ZEDObjectWrapper::DeinitializeSelf();
 }
 
 ZEDEntityWrapper::ZEDEntityWrapper()

@@ -50,7 +50,7 @@ class ZERNStageShadowing : public ZERNStage
 		ZEUInt							ShadowMapCount;
 
 		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 	public:
 		virtual ZEInt					GetId() const;

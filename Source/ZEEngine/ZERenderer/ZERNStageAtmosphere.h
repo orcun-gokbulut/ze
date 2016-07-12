@@ -47,7 +47,7 @@ class ZERNStageAtmosphere : public ZERNStage
 		const ZEGRTexture2D*			DepthTexture;
 
 		virtual bool					InitializeSelf();						
-		virtual void					DeinitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 		bool							UpdateInputOutputs();
 

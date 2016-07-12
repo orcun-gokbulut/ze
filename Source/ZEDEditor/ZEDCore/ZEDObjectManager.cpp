@@ -72,12 +72,12 @@ bool ZEDObjectManager::InitializeSelf()
 	return true;
 }
 
-void ZEDObjectManager::DeinitializeSelf()
+bool ZEDObjectManager::DeinitializeSelf()
 {
 	if (RootWrapper != NULL)
 		RootWrapper->Deinitialize();
 
-	ZEDComponent::DeinitializeSelf();
+	return ZEDComponent::DeinitializeSelf();
 }
 
 void ZEDObjectManager::EditorEvent(const ZEDEditorEvent* Event)

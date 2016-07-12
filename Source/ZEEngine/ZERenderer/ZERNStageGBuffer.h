@@ -60,7 +60,7 @@ class ZERNStageGBuffer : public ZERNStage
 		bool								Update();
 
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 	public:
 		virtual ZEInt						GetId() const;

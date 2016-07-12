@@ -104,7 +104,7 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 
 	protected:
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 											ZEDEditor();
 											~ZEDEditor();

@@ -46,13 +46,13 @@ bool ZEInitializable::InitializeSelf()
 	return true;
 }
 
-void ZEInitializable::DeinitializeSelf()
+bool ZEInitializable::DeinitializeSelf()
 {
 	#ifdef ZE_DEBUG_ENABLE
 	CallChainCompleted = true;
 	#endif
 
-	//return true;
+	return true;
 }
 
 ZEClass* ZEInitializable::GetClass() const

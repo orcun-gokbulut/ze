@@ -210,7 +210,7 @@ void ZELNIntegrityModule::Update()
 
 bool ZELNIntegrityModule::InitializeSelf()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZELNModule::InitializeSelf())
 		return false;
 	
 	if (!Checker.Load())

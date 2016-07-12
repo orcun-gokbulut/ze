@@ -84,7 +84,7 @@ class ZERNFilter : public ZEInitializable
 		} Constants;
 
 		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 		bool									UpdateShaders();
 		bool									UpdateRenderStates();

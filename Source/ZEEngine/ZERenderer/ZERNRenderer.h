@@ -84,7 +84,7 @@ class ZERNRenderer : public ZEObject, public ZEInitializable
 		ZEHolder<ZEGRSampler>					SamplerComparisonLinearPointClamp;
 
 		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 		
 		void									CreatePredefinedSamplers();
 

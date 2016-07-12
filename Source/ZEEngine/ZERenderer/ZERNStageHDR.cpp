@@ -329,7 +329,7 @@ bool ZERNStageHDR::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageHDR::DeinitializeSelf()
+bool ZERNStageHDR::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 	Filter.Deinitialize();
@@ -361,7 +361,7 @@ void ZERNStageHDR::DeinitializeSelf()
 	InputTexture = NULL;
 	OutputRenderTarget = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageHDR::GetId() const

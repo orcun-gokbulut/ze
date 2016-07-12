@@ -83,7 +83,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool									UpdateConstantBuffer() const;
 
 		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 												ZERNSimpleMaterial();
 

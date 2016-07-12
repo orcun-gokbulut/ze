@@ -74,7 +74,7 @@ void ZELNLicenseModule::LoadLicense()
 
 bool ZELNLicenseModule::InitializeSelf()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZELNModule::InitializeSelf())
 		return false;
 	
 	Widget = new ZELNLicenseWidget();

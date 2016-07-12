@@ -91,7 +91,7 @@ class ZEScene : public ZEObject, public ZEInitializable
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		bool									InitializeSelf();
-		void									DeinitializeSelf();
+		bool									DeinitializeSelf();
 
 												ZEScene();
 		virtual									~ZEScene();
@@ -125,8 +125,8 @@ class ZEScene : public ZEObject, public ZEInitializable
 		void									PreRender(const ZERNPreRenderParameters* Parameters);
 		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		bool									Save(const ZEString& FileName);
-		bool									Load(const ZEString& FileName);
+		bool									Serialize(const ZEString& FileName);
+		bool									Unserialize(const ZEString& FileName);
 
 		virtual void							Destroy();
 

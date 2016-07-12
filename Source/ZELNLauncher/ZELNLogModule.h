@@ -51,7 +51,7 @@ class ZELNLogModule  : public ZELNModule
 		static void					LogCallback(const char* Module, ZELogType Type, const char* LogText, void* ExtraParameters);
 		
 		virtual bool				InitializeSelf();
-		virtual void				DeinitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 	public:
 		virtual QWidget*			GetWidget();

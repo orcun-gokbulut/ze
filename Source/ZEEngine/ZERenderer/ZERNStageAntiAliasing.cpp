@@ -288,7 +288,7 @@ bool ZERNStageAntiAliasing::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageAntiAliasing::DeinitializeSelf()
+bool ZERNStageAntiAliasing::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -315,7 +315,7 @@ void ZERNStageAntiAliasing::DeinitializeSelf()
 
 	SamplerLinearClamp.Release();
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageAntiAliasing::GetId() const

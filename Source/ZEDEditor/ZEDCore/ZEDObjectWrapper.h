@@ -83,7 +83,7 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		void										ClearChildWrappers();
 
 		bool										InitializeSelf();
-		void										DeinitializeSelf();
+		bool										DeinitializeSelf();
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();
