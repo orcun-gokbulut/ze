@@ -82,8 +82,8 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		void										SyncronizeChildWrappers(ZEObject*const* TargetList, ZESize TargetListSize);
 		void										ClearChildWrappers();
 
-		bool										InitializeSelf();
-		bool										DeinitializeSelf();
+		virtual bool								InitializeInternal();
+		virtual bool								DeinitializeInternal();
 
 													ZEDObjectWrapper();
 		virtual										~ZEDObjectWrapper();

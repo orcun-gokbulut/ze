@@ -259,14 +259,14 @@ ZESize ZEInputDeviceIndexes::GetNewDeviceIndex(ZEInputDeviceType Type)
 	return Index;
 }
 
-bool ZEInputDevice::InitializeSelf()
+bool ZEInputDevice::InitializeInternal()
 {
 	LifeState = ZE_IDLS_INITIALIZING;
 	
 	return true;
 }
 
-bool ZEInputDevice::DeinitializeSelf()
+bool ZEInputDevice::DeinitializeInternal()
 {
 	LifeState = ZE_IDLS_NOT_INITIALIZED;
 
@@ -321,7 +321,7 @@ bool ZEInputDevice::Initialize()
 	if (IsInitialized())
 		return true;
 
-	if (!InitializeSelf())
+	if (!InitializeInternal())
 		return false;
 
 	if (LifeState != ZE_IDLS_INITIALIZING)
@@ -341,7 +341,7 @@ bool ZEInputDevice::Deinitialize()
 
 	LifeState = ZE_IDLS_DEINITIALIZING;
 
-	if (!DeinitializeSelf())
+	if (!DeinitializeInternal())
 		return false;
 
 	if (LifeState != ZE_IDLS_NOT_INITIALIZED)

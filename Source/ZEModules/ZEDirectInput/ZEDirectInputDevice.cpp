@@ -86,9 +86,9 @@ void ZEDirectInputDevice::UnAcquire()
 	ZEInputDevice::UnAcquire();
 }
 
-bool ZEDirectInputDevice::InitializeSelf()
+bool ZEDirectInputDevice::InitializeInternal()
 {
-	if (!ZEInputDevice::InitializeSelf())
+	if (!ZEInputDevice::InitializeInternal())
 		return false;
 
 	const char* NamePrefix;
@@ -184,7 +184,7 @@ bool ZEDirectInputDevice::InitializeSelf()
 	return true;
 }
 
-bool ZEDirectInputDevice::DeinitializeSelf()
+bool ZEDirectInputDevice::DeinitializeInternal()
 {
 	UnAcquire();
 
@@ -194,7 +194,7 @@ bool ZEDirectInputDevice::DeinitializeSelf()
 		DirectInputDevice = NULL;
 	}
 
-	return ZEInputDevice::DeinitializeSelf();
+	return ZEInputDevice::DeinitializeInternal();
 }
 
 void ZEDirectInputDevice::Process()

@@ -107,8 +107,8 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		void								DoBlendingWeightCalculation(ZEGRContext* Context);
 		void								DoNeighborhoodBlending(ZEGRContext* Context);
 
-		virtual bool						InitializeSelf();						
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();						
+		virtual bool						DeinitializeInternal();
 
 	public:
 		virtual ZEInt						GetId() const;

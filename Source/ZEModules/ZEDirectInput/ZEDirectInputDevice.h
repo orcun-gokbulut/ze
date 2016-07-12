@@ -47,8 +47,8 @@ class ZEDirectInputModule;
 class ZEDirectInputDevice : public ZEInputDevice
 {
 	protected:
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 	public:
 		ZEString								DeviceName;

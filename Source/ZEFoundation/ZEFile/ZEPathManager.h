@@ -53,7 +53,7 @@ class ZEPathManager : public ZEInitializable
 		ZEString				UserStoragePath;
 		ZEString				SystemStoragePath;
 
-		virtual bool			InitializeSelf();
+		virtual bool			InitializeInternal();
 
 	public:
 		void					SetAccessControl(bool Enable);

@@ -61,7 +61,7 @@ class ZEDSceneEditor : public ZEDEditor
 		ZEDTransformationToolbar*			TransformationToolbar;
 		ZEScene*							Scene;
 
-		virtual bool						InitializeSelf();
+		virtual bool						InitializeInternal();
 
 											ZEDSceneEditor();
 		virtual								~ZEDSceneEditor();

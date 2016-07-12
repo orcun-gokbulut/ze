@@ -59,9 +59,9 @@ void ZEDObjectWrapper::RaiseEvent(ZEDObjectEvent* Event)
 		Manager->RaiseEvent(Event);
 }
 
-bool ZEDObjectWrapper::InitializeSelf()
+bool ZEDObjectWrapper::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
@@ -75,12 +75,12 @@ bool ZEDObjectWrapper::InitializeSelf()
 	return true;
 }
 
-bool ZEDObjectWrapper::DeinitializeSelf()
+bool ZEDObjectWrapper::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
 		ChildWrappers[I]->Deinitialize();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 void ZEDObjectWrapper::SyncronizeChildWrappers(ZEObject*const*  TargetList, ZESize TargetListSize)

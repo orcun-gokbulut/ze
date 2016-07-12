@@ -146,9 +146,9 @@ void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZER
 }
 
 
-bool ZEScene::InitializeSelf()
+bool ZEScene::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	if (PhysicalWorld == NULL)
@@ -175,7 +175,7 @@ bool ZEScene::InitializeSelf()
 	return true;
 }
 
-bool ZEScene::DeinitializeSelf()
+bool ZEScene::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Deinitialize();
@@ -186,7 +186,7 @@ bool ZEScene::DeinitializeSelf()
 	ConstantBuffer.Release();
 	SceneDirtyFlags.RaiseAll();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 void ZEScene::UpdateConstantBuffer()

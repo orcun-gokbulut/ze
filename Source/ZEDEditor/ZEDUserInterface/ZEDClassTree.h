@@ -65,7 +65,7 @@ class ZEDClassTree : public QTreeWidget, public ZEDComponent
 		void							UpdateInheritanceTree(ZEClass* CurrentBaseClass, QTreeWidgetItem* Item);
 		void							UpdateCatagoryTree(QTreeWidgetItem* Item);
 
-		virtual bool					InitializeSelf();
+		virtual bool					InitializeInternal();
 
 	public:
 		void							SetBaseClass(ZEClass* Wrapper);

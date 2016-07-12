@@ -61,7 +61,7 @@ class ZELNIntegrityModule : public QObject, public ZELNModule
 		void							UpdateRecord(ZESize RecordIndex);
 		void							Update();
 
-		virtual bool					InitializeSelf();
+		virtual bool					InitializeInternal();
 
 										ZELNIntegrityModule();
 

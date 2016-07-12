@@ -72,9 +72,9 @@ void ZELNLicenseModule::LoadLicense()
 	ZELNLauncher::GetInstance()->Update();
 }
 
-bool ZELNLicenseModule::InitializeSelf()
+bool ZELNLicenseModule::InitializeInternal()
 {
-	if (!ZELNModule::InitializeSelf())
+	if (!ZELNModule::InitializeInternal())
 		return false;
 	
 	Widget = new ZELNLicenseWidget();

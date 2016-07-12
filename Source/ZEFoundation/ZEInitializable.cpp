@@ -37,7 +37,7 @@
 
 #include "ZEMeta\ZEClass.h"
 
-bool ZEInitializable::InitializeSelf()
+bool ZEInitializable::InitializeInternal()
 {
 	#ifdef ZE_DEBUG_ENABLE
 	CallChainCompleted = true;
@@ -46,7 +46,7 @@ bool ZEInitializable::InitializeSelf()
 	return true;
 }
 
-bool ZEInitializable::DeinitializeSelf()
+bool ZEInitializable::DeinitializeInternal()
 {
 	#ifdef ZE_DEBUG_ENABLE
 	CallChainCompleted = true;
@@ -89,7 +89,7 @@ bool ZEInitializable::Initialize()
 	CallChainCompleted = false;
 	#endif
 
-	if (!InitializeSelf())
+	if (!InitializeInternal())
 	{
 		zeError("Initialization failed. Class Name: \"%s\".", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");
 		InitializationState = ZE_IS_ERROR_INITIALIZATION;
@@ -120,14 +120,12 @@ bool ZEInitializable::Deinitialize()
 	CallChainCompleted = false;
 	#endif
 
-	DeinitializeSelf();
-
-	/*if (!DeinitializeSelf())
+	if (!DeinitializeInternal())
 	{
 		zeError("Deinitalization failed. Class Name: %s.", GetClass() != NULL ? GetClass()->GetName() : "<Non-ZEObject>");
-		InitializationState == ZE_IS_ERROR_DEINITIALIZATION;
+		InitializationState = ZE_IS_ERROR_DEINITIALIZATION;
 		return false;
-	}*/
+	}
 
 	#ifdef ZE_DEBUG_ENABLE
 	if (!CallChainCompleted)
@@ -135,6 +133,8 @@ bool ZEInitializable::Deinitialize()
 	#endif
 	
 	InitializationState = ZE_IS_UNINITIALIZED;
+
+	return true;
 }
 
 bool ZEInitializable::Reinitialize()

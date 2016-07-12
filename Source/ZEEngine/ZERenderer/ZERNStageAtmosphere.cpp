@@ -41,20 +41,20 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-bool ZERNStageAtmosphere::InitializeSelf()
+bool ZERNStageAtmosphere::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	return UpdateInputOutputs();
 }
 
-bool ZERNStageAtmosphere::DeinitializeSelf()
+bool ZERNStageAtmosphere::DeinitializeInternal()
 {
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 bool ZERNStageAtmosphere::UpdateInputOutputs()

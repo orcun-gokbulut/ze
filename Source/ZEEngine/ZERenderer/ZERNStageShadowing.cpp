@@ -39,9 +39,9 @@
 #include "ZEDS/ZEString.h"
 #include "ZEGraphics/ZEGRTexture2D.h"
 
-bool ZERNStageShadowing::InitializeSelf()
+bool ZERNStageShadowing::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	ProjectiveShadowMaps = ZEGRTexture2D::CreateInstance(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
@@ -49,11 +49,11 @@ bool ZERNStageShadowing::InitializeSelf()
 	return true;
 }
 
-bool ZERNStageShadowing::DeinitializeSelf()
+bool ZERNStageShadowing::DeinitializeInternal()
 {
 	ProjectiveShadowMaps.Release();
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageShadowing::GetId() const

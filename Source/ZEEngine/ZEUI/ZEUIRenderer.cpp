@@ -124,9 +124,9 @@ void ZEUIRenderer::UpdateBatches()
 	VertexBuffer->Unlock();
 }
 
-bool ZEUIRenderer::InitializeSelf()
+bool ZEUIRenderer::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	ZEGRRenderState RenderState = ZERNStage2D::GetRenderState();
@@ -172,13 +172,13 @@ bool ZEUIRenderer::InitializeSelf()
 	return true;
 }
 
-bool ZEUIRenderer::DeinitializeSelf()
+bool ZEUIRenderer::DeinitializeInternal()
 {
 	VertexBuffer.Release();
 	RenderStateData.Release();
 	Sampler.Release();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 ZEUIRenderer::ZEUIRenderer()

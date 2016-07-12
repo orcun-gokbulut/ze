@@ -82,8 +82,8 @@ class ZERNStageDebug : public ZERNStage
 
 		bool							SetupBoundingBoxVertexBuffer();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual bool					InitializeInternal();
+		virtual bool					DeinitializeInternal();
 
 	public:
 		virtual ZEInt					GetId() const;

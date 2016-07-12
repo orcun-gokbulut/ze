@@ -45,9 +45,9 @@
 #include <QMimeData>
 #include <QTreeWidget>
 
-bool ZEDObjectBrowser::InitializeSelf()
+bool ZEDObjectBrowser::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 
 	GetEditor()->AddComponent(Form->trwObjects);

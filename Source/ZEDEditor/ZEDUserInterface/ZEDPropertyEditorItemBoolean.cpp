@@ -44,9 +44,9 @@
 #include <QComboBox>
 #include <QLineEdit>
 
-bool ZEDPropertyEditorItemBoolean::InitializeSelf()
+bool ZEDPropertyEditorItemBoolean::InitializeInternal()
 {
-	if (!ZEDPropertyEditorItem::InitializeSelf())
+	if (!ZEDPropertyEditorItem::InitializeInternal())
 	{
 		setText(1, "Error");
 		return false;

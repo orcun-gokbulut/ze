@@ -47,9 +47,9 @@ void ZEDPropertyEditorItem::Changed(const ZEArray<ZEVariant>& NewValues)
 	GetPropertyEditor()->PropertyChanged(Property, NewValues);
 }
 
-bool ZEDPropertyEditorItem::InitializeSelf()
+bool ZEDPropertyEditorItem::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	if (Property == NULL)

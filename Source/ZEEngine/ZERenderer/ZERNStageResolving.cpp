@@ -49,9 +49,9 @@
 #define ZERN_SRDF_RENDER_STATE		1
 #define ZERN_SRDF_CONSTANT_BUFFER	2
 
-bool ZERNStageResolving::InitializeSelf()
+bool ZERNStageResolving::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
@@ -59,7 +59,7 @@ bool ZERNStageResolving::InitializeSelf()
 	return Update();
 }
 
-bool ZERNStageResolving::DeinitializeSelf()
+bool ZERNStageResolving::DeinitializeInternal()
 {
 	ResolveGBuffersRenderStateData.Release();
 	ResolveCustomRenderStateData.Release();
@@ -76,7 +76,7 @@ bool ZERNStageResolving::DeinitializeSelf()
 	EmissiveTexture = NULL;
 	DiffuseTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 bool ZERNStageResolving::UpdateRenderStates()

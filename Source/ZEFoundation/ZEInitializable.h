@@ -59,8 +59,8 @@ class ZEInitializable
 
 
 	protected:
-		virtual bool				InitializeSelf();
-		virtual bool				DeinitializeSelf();
+		virtual bool				InitializeInternal();
+		virtual bool				DeinitializeInternal();
 
 	public:
 		virtual ZEClass*			GetClass() const;

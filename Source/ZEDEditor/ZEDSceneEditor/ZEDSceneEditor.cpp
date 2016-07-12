@@ -59,9 +59,9 @@
 #include <QDockWidget>
 
 
-bool ZEDSceneEditor::InitializeSelf()
+bool ZEDSceneEditor::InitializeInternal()
 {
-	if (!ZEDEditor::InitializeSelf())
+	if (!ZEDEditor::InitializeInternal())
 		return false;
 
 	TransformationToolbar = ZEDTransformationToolbar::CreateInstance();

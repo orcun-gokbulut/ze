@@ -59,8 +59,8 @@ class ZERNStageGBuffer : public ZERNStage
 		bool								UpdateRenderTargets();
 		bool								Update();
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 	public:
 		virtual ZEInt						GetId() const;

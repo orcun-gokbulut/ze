@@ -457,9 +457,9 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputText
 	Context->Draw(3, 0);
 }
 
-bool ZERNStageAO::InitializeSelf()
+bool ZERNStageAO::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	Filter.Initialize();
@@ -473,7 +473,7 @@ bool ZERNStageAO::InitializeSelf()
 	return Update();
 }
 
-bool ZERNStageAO::DeinitializeSelf()
+bool ZERNStageAO::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -515,7 +515,7 @@ bool ZERNStageAO::DeinitializeSelf()
 	NormalTexture = NULL;
 	AccumulationTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageAO::GetId() const

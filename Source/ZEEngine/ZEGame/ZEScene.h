@@ -90,8 +90,8 @@ class ZEScene : public ZEObject, public ZEInitializable
 		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
-		bool									InitializeSelf();
-		bool									DeinitializeSelf();
+		bool									InitializeInternal();
+		bool									DeinitializeInternal();
 
 												ZEScene();
 		virtual									~ZEScene();

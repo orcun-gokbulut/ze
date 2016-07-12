@@ -41,21 +41,21 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 
-bool ZERNStageRenderDepth::InitializeSelf()
+bool ZERNStageRenderDepth::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	return UpdateInputOutputs();
 }
 
-bool ZERNStageRenderDepth::DeinitializeSelf()
+bool ZERNStageRenderDepth::DeinitializeInternal()
 {
 	TransparentDepthBuffer.Release();
 
 	DepthTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 bool ZERNStageRenderDepth::UpdateInputOutputs()

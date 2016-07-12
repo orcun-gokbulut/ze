@@ -51,7 +51,7 @@ class ZEDObjectBrowser : public QWidget, public ZEDComponent
 		QPoint								DragStartPos;
 		ZEDObjectWrapper*					DragWrapper;
 
-		virtual bool						InitializeSelf();
+		virtual bool						InitializeInternal();
 
 		bool								CheckDrop();
 		void								Drag();

@@ -224,9 +224,9 @@ ZESSize ZEDPropertyEditorItemVector::FindIndex(QLineEdit* TextEdit)
 	return -1;
 }
 
-bool ZEDPropertyEditorItemVector::InitializeSelf()
+bool ZEDPropertyEditorItemVector::InitializeInternal()
 {
-	if (!ZEDPropertyEditorItem::InitializeSelf())
+	if (!ZEDPropertyEditorItem::InitializeInternal())
 	{
 		setText(1, "Error");
 		return false;

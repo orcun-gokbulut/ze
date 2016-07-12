@@ -46,9 +46,9 @@
 #include <QLineEdit>
 #include <QGuiApplication>
 
-bool ZEDPropertyEditorItemNumeric::InitializeSelf()
+bool ZEDPropertyEditorItemNumeric::InitializeInternal()
 {
-	if (!ZEDPropertyEditorItem::InitializeSelf())
+	if (!ZEDPropertyEditorItem::InitializeInternal())
 	{
 		setText(1, "Error");
 		return false;

@@ -513,9 +513,9 @@ bool ZERNStageLighting::Update()
 	return true;
 }
 
-bool ZERNStageLighting::InitializeSelf()
+bool ZERNStageLighting::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	CreateRandomVectors();
@@ -528,7 +528,7 @@ bool ZERNStageLighting::InitializeSelf()
 	return Update();
 }
 
-bool ZERNStageLighting::DeinitializeSelf()
+bool ZERNStageLighting::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -565,7 +565,7 @@ bool ZERNStageLighting::DeinitializeSelf()
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 void ZERNStageLighting::DrawLights(ZEGRContext* Context, bool PerSample)

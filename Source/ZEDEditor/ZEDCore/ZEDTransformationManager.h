@@ -117,8 +117,8 @@ class ZEDTransformationManager : public ZEDComponent
 		void									UpdateToolbar();
 		void									UpdateTransformStates();
 
-		bool									InitializeSelf();
-		bool									DeinitializeSelf();
+		bool									InitializeInternal();
+		bool									DeinitializeInternal();
 
 		void									StartTransform(ZEDGizmo* TransformGizmo);
 		void									EndTransform();

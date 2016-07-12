@@ -279,9 +279,9 @@ bool ZERNFixedMaterial::Update() const
 	return true;
 }
 
-bool ZERNFixedMaterial::InitializeSelf()
+bool ZERNFixedMaterial::InitializeInternal()
 {
-	if (!ZERNMaterial::InitializeSelf())
+	if (!ZERNMaterial::InitializeInternal())
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
@@ -301,7 +301,7 @@ bool ZERNFixedMaterial::InitializeSelf()
 	return true;
 }
 
-bool ZERNFixedMaterial::DeinitializeSelf()
+bool ZERNFixedMaterial::DeinitializeInternal()
 {
 	StageMask = 0;
 	DirtyFlags.RaiseAll();
@@ -317,7 +317,7 @@ bool ZERNFixedMaterial::DeinitializeSelf()
 	ConstantBuffer.Release();
 	Sampler.Release();
 
-	return ZERNMaterial::DeinitializeSelf();
+	return ZERNMaterial::DeinitializeInternal();
 }
 
 ZERNFixedMaterial::ZERNFixedMaterial()

@@ -162,8 +162,8 @@ class ZEInputDevice
 		ZEInputDeviceState						State;
 		ZEInputDeviceDescription				Description;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 	public:
 		const ZEString&							GetName();

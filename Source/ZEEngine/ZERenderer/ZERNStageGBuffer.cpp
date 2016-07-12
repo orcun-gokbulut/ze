@@ -85,15 +85,15 @@ bool ZERNStageGBuffer::Update()
 	return true;
 }
 
-bool ZERNStageGBuffer::InitializeSelf()
+bool ZERNStageGBuffer::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	return Update();
 }
 
-bool ZERNStageGBuffer::DeinitializeSelf()
+bool ZERNStageGBuffer::DeinitializeInternal()
 {
 	GBuffer0.Release();
 	GBuffer1.Release();
@@ -101,7 +101,7 @@ bool ZERNStageGBuffer::DeinitializeSelf()
 	GBuffer3.Release();
 	DepthStencilBuffer.Release();
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageGBuffer::GetId() const

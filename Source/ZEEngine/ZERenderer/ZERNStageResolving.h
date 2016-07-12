@@ -87,8 +87,8 @@ class ZERNStageResolving : public ZERNStage
 			float						Reserved0[3];
 		} Constants;
 
-		virtual bool					InitializeSelf();						
-		virtual bool					DeinitializeSelf();
+		virtual bool					InitializeInternal();						
+		virtual bool					DeinitializeInternal();
 
 		bool							UpdateRenderStates();
 		bool							UpdateConstantBuffers();

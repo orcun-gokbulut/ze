@@ -233,22 +233,22 @@ void ZEDTransformationManager::UpdateTransformStates()
 	UpdateToolbar();
 }
 
-bool ZEDTransformationManager::InitializeSelf()
+bool ZEDTransformationManager::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 
 	return true;
 }
 
-bool ZEDTransformationManager::DeinitializeSelf()
+bool ZEDTransformationManager::DeinitializeInternal()
 {
 	ResetTransform();
 	TransformStates.Clear();
 	TransformFocused = NULL;
 	TransformGizmo = NULL;
 
-	return ZEDComponent::DeinitializeSelf();
+	return ZEDComponent::DeinitializeInternal();
 }
 
 void ZEDTransformationManager::StartTransform(ZEDGizmo* TransformGizmo)

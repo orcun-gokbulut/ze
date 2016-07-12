@@ -38,9 +38,9 @@
 
 ZELN_MODULE_DECRIPTION(ZELNUpdateModule, "Update");
 
-bool ZELNUpdateModule::InitializeSelf()
+bool ZELNUpdateModule::InitializeInternal()
 {
-	if (!ZELNModule::InitializeSelf())
+	if (!ZELNModule::InitializeInternal())
 		return false;
 
 	Widget = new ZELNUpdateWidget();

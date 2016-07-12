@@ -48,7 +48,7 @@ class ZEWindowsInputMouseDevice : public ZEInputDevice
 {
 	friend class ZEWindowsInputModule;
 	protected:
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 	public:
 		virtual void				UnAcquire();

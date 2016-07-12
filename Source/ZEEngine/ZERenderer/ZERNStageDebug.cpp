@@ -204,9 +204,9 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 	return true;
 }
 
-bool ZERNStageDebug::InitializeSelf()
+bool ZERNStageDebug::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
@@ -214,7 +214,7 @@ bool ZERNStageDebug::InitializeSelf()
 	return Update();
 }
 
-bool ZERNStageDebug::DeinitializeSelf()
+bool ZERNStageDebug::DeinitializeInternal()
 {
 	VertexShader.Release();
 	GeometryShader.Release();
@@ -230,7 +230,7 @@ bool ZERNStageDebug::DeinitializeSelf()
 
 	DepthMap.Release();
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageDebug::GetId() const

@@ -61,9 +61,9 @@ static float GausianFunction(float X, float Y, float StandartDeviation)
 	return (1.0f / (2.0f * ZE_PI * StandartDeviation * StandartDeviation)) * ZEMath::Exp(-(X * X + Y * Y) / (2.0f * StandartDeviation * StandartDeviation)); 
 }
 
-bool ZERNFilter::InitializeSelf()
+bool ZERNFilter::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(FilterConstants));
@@ -71,7 +71,7 @@ bool ZERNFilter::InitializeSelf()
 	return Update();
 }
 
-bool ZERNFilter::DeinitializeSelf()
+bool ZERNFilter::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -91,7 +91,7 @@ bool ZERNFilter::DeinitializeSelf()
 	
 	TempTexture.Release();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 bool ZERNFilter::UpdateShaders()

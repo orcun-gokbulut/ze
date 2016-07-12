@@ -127,9 +127,9 @@ bool ZERNSimpleMaterial::UpdateConstantBuffer() const
 	return true;
 }
 
-bool ZERNSimpleMaterial::InitializeSelf()
+bool ZERNSimpleMaterial::InitializeInternal()
 {
-	if (!ZERNMaterial::InitializeSelf())
+	if (!ZERNMaterial::InitializeInternal())
 		return false;
 
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
@@ -146,7 +146,7 @@ bool ZERNSimpleMaterial::InitializeSelf()
 	return true;
 }
 
-bool ZERNSimpleMaterial::DeinitializeSelf()
+bool ZERNSimpleMaterial::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 	StageMask = 0;
@@ -156,7 +156,7 @@ bool ZERNSimpleMaterial::DeinitializeSelf()
 	RenderStateData.Release();
 	ConstantBuffer.Release();
 
-	return ZERNMaterial::DeinitializeSelf();
+	return ZERNMaterial::DeinitializeInternal();
 }
 
 ZERNSimpleMaterial::ZERNSimpleMaterial()

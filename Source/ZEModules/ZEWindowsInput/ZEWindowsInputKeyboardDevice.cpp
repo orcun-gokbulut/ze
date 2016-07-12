@@ -55,9 +55,9 @@ void ZEWindowsInputKeyboardDevice::UnAcquire()
 	State.Reset();
 }
 
-bool ZEWindowsInputKeyboardDevice::InitializeSelf()
+bool ZEWindowsInputKeyboardDevice::InitializeInternal()
 {	
-	if (!ZEInputDevice::InitializeSelf())
+	if (!ZEInputDevice::InitializeInternal())
 		return false;
 
 	Description.Type = ZE_IDT_KEYBOARD;

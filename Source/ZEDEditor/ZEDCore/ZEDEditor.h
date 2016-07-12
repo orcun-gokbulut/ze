@@ -103,8 +103,8 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 		void								RegisterRecentFile(const ZEString& FileName);
 
 	protected:
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 											ZEDEditor();
 											~ZEDEditor();

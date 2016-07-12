@@ -49,7 +49,7 @@ class ZELNLicenseModule : public ZELNModule
 		ZELCLicense					License;
 		bool						LicenseValid;
 
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 	public:
 		virtual QWidget*			GetWidget();

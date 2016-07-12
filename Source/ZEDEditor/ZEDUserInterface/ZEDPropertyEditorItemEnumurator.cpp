@@ -46,9 +46,9 @@
 #include <QPalette>
 #include <QGuiApplication>
 
-bool ZEDPropertyEditorItemEnumurator::InitializeSelf()
+bool ZEDPropertyEditorItemEnumurator::InitializeInternal()
 {
-	if (!ZEDPropertyEditorItem::InitializeSelf())
+	if (!ZEDPropertyEditorItem::InitializeInternal())
 	{
 		setText(1, "Error");
 		return false;

@@ -78,9 +78,9 @@ void ZEDClassBrowser::UpdateUI()
 	Form->btnAdd->setEnabled(DestinationWrapper != NULL && DestinationWrapper->CheckChildrenClass(SelectedClass));
 }
 
-bool ZEDClassBrowser::InitializeSelf()
+bool ZEDClassBrowser::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 
 	GetEditor()->AddComponent(Form->trwClasses);

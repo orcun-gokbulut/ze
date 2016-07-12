@@ -253,9 +253,9 @@ void ZERNRenderer::RenderStages()
 	Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_RENDERER, 3, PrevConstantBuffers);
 }
 
-bool ZERNRenderer::InitializeSelf()
+bool ZERNRenderer::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	ze_for_each(Stage, Stages)
@@ -275,7 +275,7 @@ bool ZERNRenderer::InitializeSelf()
 	return true;
 }
 
-bool ZERNRenderer::DeinitializeSelf()
+bool ZERNRenderer::DeinitializeInternal()
 {
 	CleanCommands();
 	CleanStages();
@@ -283,7 +283,7 @@ bool ZERNRenderer::DeinitializeSelf()
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 void ZERNRenderer::SetContext(ZEGRContext* Context)

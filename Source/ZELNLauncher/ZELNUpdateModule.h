@@ -47,7 +47,7 @@ class ZELNUpdateModule  : public ZELNModule
 	private:
 		ZELNUpdateWidget*			Widget;
 
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 	public:
 		virtual QWidget*			GetWidget();

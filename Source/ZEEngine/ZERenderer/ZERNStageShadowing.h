@@ -49,8 +49,8 @@ class ZERNStageShadowing : public ZERNStage
 		ZEHolder<ZEGRTexture2D>			ProjectiveShadowMaps;
 		ZEUInt							ShadowMapCount;
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual bool					InitializeInternal();
+		virtual bool					DeinitializeInternal();
 
 	public:
 		virtual ZEInt					GetId() const;
