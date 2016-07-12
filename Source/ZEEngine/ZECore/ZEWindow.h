@@ -72,7 +72,7 @@ class ZEWindow : public ZEInitializable
 		void					ChangeWidowGeometry();
 
 		virtual bool			InitializeSelf();
-		virtual void			DeinitializeSelf();
+		virtual bool			DeinitializeSelf();
 
 								ZEWindow();
 								~ZEWindow();

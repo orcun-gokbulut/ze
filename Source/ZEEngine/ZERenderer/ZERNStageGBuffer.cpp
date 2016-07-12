@@ -93,7 +93,7 @@ bool ZERNStageGBuffer::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageGBuffer::DeinitializeSelf()
+bool ZERNStageGBuffer::DeinitializeSelf()
 {
 	GBuffer0.Release();
 	GBuffer1.Release();
@@ -101,7 +101,7 @@ void ZERNStageGBuffer::DeinitializeSelf()
 	GBuffer3.Release();
 	DepthStencilBuffer.Release();
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageGBuffer::GetId() const

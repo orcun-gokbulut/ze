@@ -152,7 +152,7 @@ bool ZERNParticleMaterial::InitializeSelf()
 	return true;
 }
 
-void ZERNParticleMaterial::DeinitializeSelf()
+bool ZERNParticleMaterial::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -162,7 +162,7 @@ void ZERNParticleMaterial::DeinitializeSelf()
 
 	ConstantBuffer.Release();
 
-	ZERNMaterial::DeinitializeSelf();
+	return ZERNMaterial::DeinitializeSelf();
 }
 
 ZERNParticleMaterial::ZERNParticleMaterial()

@@ -214,7 +214,7 @@ bool ZERNStageDebug::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageDebug::DeinitializeSelf()
+bool ZERNStageDebug::DeinitializeSelf()
 {
 	VertexShader.Release();
 	GeometryShader.Release();
@@ -230,7 +230,7 @@ void ZERNStageDebug::DeinitializeSelf()
 
 	DepthMap.Release();
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageDebug::GetId() const

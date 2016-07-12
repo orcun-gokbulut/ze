@@ -109,7 +109,7 @@ class ZERNStageDisplay : public ZERNStage
 		const ZEGRTexture2D*					InputTexture;
 		const ZEGRRenderTarget*					OutputRenderTarget;	
 
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 												
 		bool									UpdateInputOutput();
 		bool									UpdateConstantBuffer();

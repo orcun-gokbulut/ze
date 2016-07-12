@@ -293,7 +293,7 @@ bool ZEDEditor::InitializeSelf()
 	return true;
 }
 
-void ZEDEditor::DeinitializeSelf()
+bool ZEDEditor::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Deinitialize();
@@ -302,7 +302,7 @@ void ZEDEditor::DeinitializeSelf()
 	
 	DeinitializeMenu();
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 ZEDEditorCore* ZEDEditor::GetCore()

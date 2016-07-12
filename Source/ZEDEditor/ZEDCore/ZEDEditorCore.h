@@ -56,7 +56,7 @@ class ZEDEditorCore : public ZEObject, public ZEInitializable
 		void								LoadClasses();
 
 		bool								InitializeSelf();
-		void								DeinitializeSelf();
+		bool								DeinitializeSelf();
 
 											ZEDEditorCore();
 											~ZEDEditorCore();

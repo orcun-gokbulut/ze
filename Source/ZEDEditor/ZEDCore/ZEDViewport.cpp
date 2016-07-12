@@ -236,14 +236,14 @@ bool ZEDViewport::InitializeSelf()
 }
 
 
-void ZEDViewport::DeinitializeSelf()
+bool ZEDViewport::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 	Renderer.Deinitialize();
 	Window->Destroy();
 	Window = NULL;
 
-	ZEDComponent::DeinitializeSelf();
+	return ZEDComponent::DeinitializeSelf();
 }
 
 void ZEDViewport::TickEvent(const ZEDTickEvent* Event)
@@ -281,7 +281,7 @@ void ZEDViewport::mousePressEvent(QMouseEvent* Event)
 
 	RaiseEvent(&MouseEvent);
 
-	QFrame::mousePressEvent(Event);
+	QWidget::mousePressEvent(Event);
 }
 
 void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
@@ -309,7 +309,7 @@ void ZEDViewport::mouseMoveEvent(QMouseEvent* Event)
 
 	RaiseEvent(&MouseEvent);
 
-	QFrame::mouseMoveEvent(Event);
+	QWidget::mouseMoveEvent(Event);
 }
 
 void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
@@ -333,26 +333,26 @@ void ZEDViewport::mouseReleaseEvent(QMouseEvent* Event)
 
 	RaiseEvent(&MouseEvent);
 
-	QFrame::mouseMoveEvent(Event);
+	QWidget::mouseMoveEvent(Event);
 }
 
 void ZEDViewport::enterEvent(QEvent* Event)
 {
 	LastMousePosition = ZEVector2(-1.0f, -1.0f);
-	QFrame::enterEvent(Event);
+	QWidget::enterEvent(Event);
 }
 
 void ZEDViewport::leaveEvent(QEvent* Event)
 {
 	LastMousePosition = ZEVector2(-1.0f, -1.0f);
-	QFrame::leaveEvent(Event);
+	QWidget::leaveEvent(Event);
 }
 
 void ZEDViewport::keyPressEvent(QKeyEvent* Event)
 {
 	if (Event->isAutoRepeat())
 	{
-		QFrame::keyReleaseEvent(Event);
+		QWidget::keyReleaseEvent(Event);
 		return;
 	}
 
@@ -380,14 +380,14 @@ void ZEDViewport::keyPressEvent(QKeyEvent* Event)
 
 	RaiseEvent(&KeyboardEvent);
 
-	QFrame::keyPressEvent(Event);
+	QWidget::keyPressEvent(Event);
 }
 
 void ZEDViewport::keyReleaseEvent(QKeyEvent* Event)
 {
 	if (Event->isAutoRepeat())
 	{
-		QFrame::keyReleaseEvent(Event);
+		QWidget::keyReleaseEvent(Event);
 		return;
 	}
 
@@ -422,7 +422,7 @@ void ZEDViewport::keyReleaseEvent(QKeyEvent* Event)
 	if (Event->key() == Qt::Key_Meta)
 		Modifiers &= ~ZED_VKM_WINDOWS;
 
-	QFrame::keyReleaseEvent(Event);
+	QWidget::keyReleaseEvent(Event);
 }
 
 void ZEDViewport::resizeEvent(QResizeEvent* Event)
@@ -432,12 +432,12 @@ void ZEDViewport::resizeEvent(QResizeEvent* Event)
 	if (Window != NULL)
 		Window->WrapperResized(NewSize.width(), NewSize.height());
 
-	QFrame::resizeEvent(Event);
+	QWidget::resizeEvent(Event);
 }
 
 void ZEDViewport::focusInEvent(QFocusEvent* Event)
 {
-	QFrame::focusInEvent(Event);
+	QWidget::focusInEvent(Event);
 }
 
 void ZEDViewport::focusOutEvent(QFocusEvent* Event)
@@ -461,7 +461,7 @@ void ZEDViewport::focusOutEvent(QFocusEvent* Event)
 
 	MouseEvents.Clear();
 
-	QFrame::focusOutEvent(Event);
+	QWidget::focusOutEvent(Event);
 }
 
 ZEDViewportManager* ZEDViewport::GetViewportManager()
@@ -568,7 +568,7 @@ void ZEDViewport::Present()
 	Output->Present();
 }
 
-ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
+ZEDViewport::ZEDViewport(QWidget* Parent) : QWidget(Parent)
 {
 	DirtyFlags.RaiseAll();
 	ViewportManager = NULL;
@@ -581,4 +581,9 @@ ZEDViewport::ZEDViewport(QWidget* Parent) : QFrame(Parent)
 	MouseDelta = ZEVector2::Zero;
 	setMouseTracking(true);
 	setFocusPolicy(Qt::StrongFocus);
+}
+
+void ZEDViewport::paintEvent(QPaintEvent* PaintEvent)
+{
+
 }

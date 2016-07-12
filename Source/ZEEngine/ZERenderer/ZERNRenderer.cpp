@@ -275,7 +275,7 @@ bool ZERNRenderer::InitializeSelf()
 	return true;
 }
 
-void ZERNRenderer::DeinitializeSelf()
+bool ZERNRenderer::DeinitializeSelf()
 {
 	CleanCommands();
 	CleanStages();
@@ -283,7 +283,7 @@ void ZERNRenderer::DeinitializeSelf()
 	ViewConstantBuffer.Release();
 	RendererConstantBuffer.Release();
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 void ZERNRenderer::SetContext(ZEGRContext* Context)

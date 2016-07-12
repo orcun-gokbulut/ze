@@ -49,7 +49,7 @@ class ZELNContactModule  : public ZELNModule
 		Ui_ZELNContactWidget*		Form;
 
 		virtual bool				InitializeSelf();
-		virtual void				DeinitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 	public:
 		virtual QWidget*			GetWidget();

@@ -110,7 +110,7 @@ class ZERNParticleMaterial : public ZERNMaterial
 		bool									UpdateConstantBuffer() const;
 
 		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 												ZERNParticleMaterial();
 

@@ -194,7 +194,7 @@ class ZERNStageLighting : public ZERNStage
 		bool									Update();
 
 		virtual bool							InitializeSelf();
-		virtual void							DeinitializeSelf();
+		virtual bool							DeinitializeSelf();
 
 		void									DrawLights(ZEGRContext* Context, bool PerSample);
 		void									BlendTiledDeferred(ZEGRContext* Context, const ZEGRRenderTarget* RenderTarget, bool PerSample);

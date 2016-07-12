@@ -51,12 +51,12 @@ bool ZERNStageParticleRendering::InitializeSelf()
 	return UpdateInputOutputs();
 }
 
-void ZERNStageParticleRendering::DeinitializeSelf()
+bool ZERNStageParticleRendering::DeinitializeSelf()
 {
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStageParticleRendering::UpdateInputOutputs()

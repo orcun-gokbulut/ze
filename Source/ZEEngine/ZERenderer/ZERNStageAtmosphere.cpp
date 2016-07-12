@@ -49,12 +49,12 @@ bool ZERNStageAtmosphere::InitializeSelf()
 	return UpdateInputOutputs();
 }
 
-void ZERNStageAtmosphere::DeinitializeSelf()
+bool ZERNStageAtmosphere::DeinitializeSelf()
 {
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStageAtmosphere::UpdateInputOutputs()

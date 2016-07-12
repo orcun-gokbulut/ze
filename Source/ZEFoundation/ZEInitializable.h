@@ -60,7 +60,7 @@ class ZEInitializable
 
 	protected:
 		virtual bool				InitializeSelf();
-		virtual void				DeinitializeSelf();
+		virtual bool				DeinitializeSelf();
 
 	public:
 		virtual ZEClass*			GetClass() const;

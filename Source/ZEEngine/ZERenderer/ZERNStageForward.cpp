@@ -67,7 +67,7 @@ bool ZERNStageForward::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageForward::DeinitializeSelf()
+bool ZERNStageForward::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -82,7 +82,7 @@ void ZERNStageForward::DeinitializeSelf()
 	DepthTexture = NULL;
 	TransparentDepthTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStageForward::UpdateShaders()

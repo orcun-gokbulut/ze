@@ -71,7 +71,7 @@ bool ZERNFilter::InitializeSelf()
 	return Update();
 }
 
-void ZERNFilter::DeinitializeSelf()
+bool ZERNFilter::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -91,7 +91,7 @@ void ZERNFilter::DeinitializeSelf()
 	
 	TempTexture.Release();
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 bool ZERNFilter::UpdateShaders()

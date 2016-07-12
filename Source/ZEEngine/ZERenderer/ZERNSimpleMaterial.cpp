@@ -146,7 +146,7 @@ bool ZERNSimpleMaterial::InitializeSelf()
 	return true;
 }
 
-void ZERNSimpleMaterial::DeinitializeSelf()
+bool ZERNSimpleMaterial::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 	StageMask = 0;

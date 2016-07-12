@@ -444,7 +444,9 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 bool ZEUIManager::InitializeSelf()
 {
 	if (!ZEInitializable::InitializeSelf())
-		UIRenderer->Initialize();
+		return false;
+		
+	UIRenderer->Initialize();
 
 	InputMap.AddButtonAction("Keyboard",ZE_IKB_ESCAPE,			 ZE_IS_PRESSED, ZE_IKB_ESCAPE);
 	InputMap.AddButtonAction("Keyboard",ZE_IKB_1,				 ZE_IS_PRESSED, ZE_IKB_1);
@@ -572,10 +574,11 @@ bool ZEUIManager::InitializeSelf()
 	return true;
 }
 
-void ZEUIManager::DeinitializeSelf()
+bool ZEUIManager::DeinitializeSelf()
 {
 	UIRenderer->Deinitialize();
-	ZEInitializable::DeinitializeSelf();
+
+	return ZEInitializable::DeinitializeSelf();
 }
 
 void ZEUIManager::Render(ZERNRenderer* Renderer)

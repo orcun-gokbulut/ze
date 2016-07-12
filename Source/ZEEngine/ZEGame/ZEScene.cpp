@@ -175,7 +175,7 @@ bool ZEScene::InitializeSelf()
 	return true;
 }
 
-void ZEScene::DeinitializeSelf()
+bool ZEScene::DeinitializeSelf()
 {
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Deinitialize();
@@ -186,7 +186,7 @@ void ZEScene::DeinitializeSelf()
 	ConstantBuffer.Release();
 	SceneDirtyFlags.RaiseAll();
 
-	DeinitializeSelf();
+	return ZEInitializable::DeinitializeSelf();
 }
 
 void ZEScene::UpdateConstantBuffer()
@@ -378,7 +378,7 @@ void ZEScene::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parame
 	}
 }
 
-bool ZEScene::Save(const ZEString& FileName)
+bool ZEScene::Serialize(const ZEString& FileName)
 {
 	zeLog("Saving scene file \"%s\".", FileName.GetValue());
 
@@ -413,7 +413,7 @@ bool ZEScene::Save(const ZEString& FileName)
 		EntitiesNode.OpenNode("Entity", EntityNode);
 		EntityNode.WriteString("Class", Entities[I]->GetClass()->GetName());
 
-		if (!Entities[I]->Save(&EntityNode))
+		if (!Entities[I]->Serialize(&EntityNode))
 		{
 			zeError("Serialization of entity \"%s\" has failed.", Entities[I]->GetName());
 			zeError("Serialization failed.");
@@ -437,7 +437,7 @@ bool ZEScene::Save(const ZEString& FileName)
 	return true;
 }
 
-bool ZEScene::Load(const ZEString& FileName)
+bool ZEScene::Unserialize(const ZEString& FileName)
 {
 	zeLog("Loading scene file \"%s\".", FileName.GetValue());
 	
@@ -488,7 +488,7 @@ bool ZEScene::Load(const ZEString& FileName)
 			return false; 
 		}
 
-		if (!NewEntity->Restore(&EntityNode))
+		if (!NewEntity->Unserialize(&EntityNode))
 		{
 			zeError("Unserialization failed. Unserialization of entity has failed. Class Name: \"%s\".", EntityNode.ReadString("Class").ToCString());
 			SceneFile.Close();

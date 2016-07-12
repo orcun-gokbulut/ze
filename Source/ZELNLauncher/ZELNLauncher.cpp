@@ -178,7 +178,7 @@ bool ZELNLauncher::InitializeSelf()
 	return true;
 }
 
-void ZELNLauncher::DeinitializeSelf()
+bool ZELNLauncher::DeinitializeSelf()
 {
 	Window->close();
 
@@ -186,6 +186,8 @@ void ZELNLauncher::DeinitializeSelf()
 		Modules[I]->Deinitialize();
 
 	delete Window;
+
+	return ZEInitializable::DeinitializeSelf();
 }
 
 const ZEArray<ZELNModule*> ZELNLauncher::GetModules()

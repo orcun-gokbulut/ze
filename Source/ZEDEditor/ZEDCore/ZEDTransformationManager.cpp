@@ -235,20 +235,20 @@ void ZEDTransformationManager::UpdateTransformStates()
 
 bool ZEDTransformationManager::InitializeSelf()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEDComponent::InitializeSelf())
 		return false;
 
 	return true;
 }
 
-void ZEDTransformationManager::DeinitializeSelf()
+bool ZEDTransformationManager::DeinitializeSelf()
 {
 	ResetTransform();
 	TransformStates.Clear();
 	TransformFocused = NULL;
 	TransformGizmo = NULL;
 
-	ZEInitializable::DeinitializeSelf();
+	return ZEDComponent::DeinitializeSelf();
 }
 
 void ZEDTransformationManager::StartTransform(ZEDGizmo* TransformGizmo)

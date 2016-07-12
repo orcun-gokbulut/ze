@@ -116,15 +116,15 @@ bool ZEDSceneEditor::InitializeSelf()
 	ZEDGrid* Grid = ZEDGrid::CreateInstance();
 	Scene->AddEntity(Grid);
 
-	ZEModel* Trial = ZEModel::CreateInstance();
-	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
-	Scene->AddEntity(Trial);
-
-	ZEModel* Trial2 = ZEModel::CreateInstance();
-	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
-	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
-	Scene->AddEntity(Trial2);
-
+// 	ZEModel* Trial = ZEModel::CreateInstance();
+// 	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+// 	Scene->AddEntity(Trial);
+// 
+// 	ZEModel* Trial2 = ZEModel::CreateInstance();
+// 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
+// 	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+// 	Scene->AddEntity(Trial2);
+// 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();
 	Light1->SetIntensity(3.0f);
 	Light1->SetColor(ZEVector3::One);
@@ -179,7 +179,7 @@ void ZEDSceneEditor::New()
 
 bool ZEDSceneEditor::Save(const ZEString& FileName)
 {
-	if (!Scene->Save(FileName))
+	if (!Scene->Serialize(FileName))
 		return false;
 
 	return ZEDEditor::Save(FileName);
@@ -189,7 +189,7 @@ bool ZEDSceneEditor::Load(const ZEString& FileName)
 {
 	Close();
 
-	if (!Scene->Load(FileName))
+	if (!Scene->Unserialize(FileName))
 		return false;
 
 	return ZEDEditor::Load(FileName);

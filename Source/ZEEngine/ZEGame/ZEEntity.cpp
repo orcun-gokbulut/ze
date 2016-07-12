@@ -98,39 +98,30 @@ void ZEEntity::BoundingBoxChanged()
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
 {
-	if (Entity->Parent != NULL)
-	{
-		zeError("Component already has an owner. Can not register component.");
-		return false;
-	}
-
-	if (!(Entity->Scene == NULL || Entity->Scene == this->Scene))
-	{
-		zeError("Component already has been entitled to another scene. Can not register component.");
-		return false;
-	}
-
-	if (!Entity->CheckParent(this))
-	{
-		zeError("Child entity's parent check failed.");
-		return false;
-	}
-
-	if (!CheckComponent(this))
-	{
-		zeError("Component entity check failed.");
-		return false;
-	}
+	zeCheckError(Entity == NULL, false, "Cannot add component entity. Component Entity is NULL.");
+	zeCheckError(Entity->Parent != NULL, false, 
+		"Can not add component entity. Component entity belongs to another Entity. Parent Entity Name: \"%s\", Component Entity Name: \"%s\".", 
+		GetName().ToCString(), Entity->GetName().ToCString());
+	zeCheckError(Entity->Scene != NULL , false, 
+		"Can not add component entity. Component entity already added to a scene. Parent Entity Name: \"%s\", Component Entity Name: \"%s\".",
+		GetName().ToCString(), Entity->GetName().ToCString());
+	zeCheckError(!Entity->CheckParent(this), false, 
+		"Can not add component entity. Component entity rejected parent entity. Parent Entity Name: \"%s\", Component Entity Name: \"%s\".", 
+		GetName().ToCString(), Entity->GetName().ToCString());
+	zeCheckError(!CheckComponent(this), false, 
+		"Can not add component entity. Parent entity rejected the component entity. Parent Entity Name: \"%s\", Component Entity Name: \"%s\".", 
+		GetName().ToCString(), Entity->GetName().ToCString());
 
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	if (!Entity->SetParent(this))
-		return false;
-
+	Entity->SetParent(this);
 	Entity->SetScene(this->Scene);
 
-	Components.Add(Entity);
+	ZE_LOCK_SECTION(EntityLock)
+	{
+		Components.Add(Entity);
+	}
 
 	if (State == ZE_ES_LOADED || State == ZE_ES_LOADING)
 		Entity->Load();
@@ -145,15 +136,15 @@ bool ZEEntity::AddComponent(ZEEntity* Entity)
 
 void ZEEntity::RemoveComponent(ZEEntity* Entity)
 {
-	if (Entity->Parent != this)
-	{
-		zeError("Can not remove non-component entity.");
-		return;
-	}
+	zeCheckError(Entity->Parent != this, ZE_VOID, "Cannot remove non-component entity.");
 
 	Entity->Deinitialize();
-	Components.RemoveValue(Entity);
 
+	ZE_LOCK_SECTION(EntityLock)
+	{
+		Components.RemoveValue(Entity);
+	}
+	
 	Entity->Parent = NULL;
 	Entity->SetScene(NULL);
 }
@@ -167,38 +158,31 @@ void ZEEntity::ClearComponents()
 
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 {
-	if (Entity->Parent != NULL)
-	{
-		zeError("Entity already has an owner. Can not register entity.");
-		return false;
-	}
-
-	if (!(Entity->Scene == NULL || Entity->Scene == this->Scene))
-	{
-		zeError("Child entity already has been entitled to another scene. Can not register child entity.");
-		return false;
-	}
-
-	if (!Entity->CheckParent(this))
-	{
-		zeError("Child entity's parent check failed.");
-		return false;
-	}
-
-	if (!CheckChildEntity(this))
-	{
-		zeError("Component entity check failed.");
-		return false;
-	}
+	// [Operation failed]. [Explanation]. [Markers1: \"Marker Value\", Marker2: MarkerValue2,...]
+	zeCheckError(Entity == NULL, false, "Cannot add child entity. Child Entity is NULL.");
+	zeCheckError(Entity->Parent != NULL, false, 
+		"Can not add child entity. Child entity belongs to another Entity. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".", 
+		GetName().ToCString(), Entity->GetName().ToCString());
+	zeCheckError(Entity->Scene != NULL , false, 
+		"Can not add child entity. Child entity already added to a scene. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".",
+		GetName().ToCString(), Entity->GetName().ToCString());
+	zeCheckError(!Entity->CheckParent(this), false, 
+		"Can not add child entity. Child entity rejected parent entity. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".", 
+		GetName().ToCString(), Entity->GetName().ToCString());
+	zeCheckError(!CheckChildEntity(this), false, 
+		"Can not add child entity. Parent entity rejected the child entity. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".", 
+		GetName().ToCString(), Entity->GetName().ToCString());
 
 	if (State == ZE_ES_DEINITIALIZING)
 		return false;
 
-	if (!Entity->SetParent(this))
-		return false;
-
+	Entity->SetParent(this);
 	Entity->SetScene(this->Scene);
-	ChildEntities.Add(Entity);
+
+	ZE_LOCK_SECTION(EntityLock)
+	{
+		ChildEntities.Add(Entity);
+	}
 
 	if (State == ZE_ES_LOADED || State == ZE_ES_LOADING)
 		Entity->Load();
@@ -213,9 +197,12 @@ bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 
 void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 {
-	zeCheckError(Entity->Parent != this, ZE_VOID, "Can not remove non-child entity.");
+	zeCheckError(Entity->Parent != this, ZE_VOID, "Cannot remove non-child entity.");
 
-	ChildEntities.RemoveValue(Entity);
+	ZE_LOCK_SECTION(EntityLock)
+	{
+		ChildEntities.RemoveValue(Entity);
+	}
 
 	Entity->Parent = NULL;
 	Entity->SetScene(NULL);
@@ -242,13 +229,11 @@ bool ZEEntity::CheckChildEntity(ZEEntity* Parent)
 	return true;
 }
 
-bool ZEEntity::SetParent(ZEEntity* Parent)
+void ZEEntity::SetParent(ZEEntity* Parent)
 {
 	this->Parent = Parent;
 	ParentTransformChanged();
-	return true;
 }
-
 
 void ZEEntity::SetScene(ZEScene* Scene)
 {
@@ -874,7 +859,7 @@ void ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 }
 
 
-bool ZEEntity::Save(ZEMLWriterNode* Serializer)
+bool ZEEntity::Serialize(ZEMLWriterNode* Serializer)
 {	
 	if (Serializer == NULL)
 		return false;
@@ -920,7 +905,7 @@ bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 		{
 			SubEntitiesNode.OpenNode("Entity", EntityNode);
 			EntityNode.WriteString("Class", ChildEntities[I]->GetClass()->GetName());
-			ChildEntities[I]->Save(&EntityNode);
+			ChildEntities[I]->Serialize(&EntityNode);
 			EntityNode.CloseNode();
 		}
 
@@ -930,7 +915,7 @@ bool ZEEntity::Save(ZEMLWriterNode* Serializer)
 	return true;
 }
 
-bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
+bool ZEEntity::Unserialize(ZEMLReaderNode* Unserializer)
 {
 	if (Unserializer == NULL)
 		return false;
@@ -982,7 +967,7 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 			return false;
 		}
 
-		if (!NewSubEntity->Restore(&SubEntityNode))
+		if (!NewSubEntity->Unserialize(&SubEntityNode))
 		{
 			zeError("Unserialization failed. Unserialization of child entity has failed. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
 			NewSubEntity->Destroy();
@@ -991,13 +976,15 @@ bool ZEEntity::Restore(ZEMLReaderNode* Unserializer)
 
 		ChildEntities[I] = NewSubEntity;
 
-		if (!NewSubEntity->SetParent(this))
+		if (!NewSubEntity->CheckParent(this))
 		{
 			zeError("Unserialization failed. Cannot add child entity. Class Name: \"%s\".", SubEntityNode.ReadString("Class").ToCString());
 			ChildEntities[I] = NULL;
 			NewSubEntity->Destroy();
 			return false;
 		}
+
+		NewSubEntity->SetParent(this);
 	}
 
 	return true;

@@ -44,16 +44,14 @@ class ZESector : public ZEGeographicEntity
 	private:
 		ZEGUID						GUID;
 		ZEString					SectorFile;
+		ZESize						LoadingIndex;
+		ZELock						SectorLock;
 
 		ZEArray<ZEGUID>				AdjacentSectorIds;
 		ZEInt8						AdjacencyDepth;
 
-		virtual bool				SaveSector(ZEMLWriterNode* Serializer);
-		virtual bool				RestoreSector(ZEMLReaderNode* Unserializer);
-
-		bool						CheckParent(ZEEntity* Entity);
-
-		virtual bool				InitializeSelf();
+		virtual ZEEntityResult		LoadInternal();
+		virtual ZEEntityResult		UnloadInternal();
 
 									ZESector();
 
@@ -61,7 +59,7 @@ class ZESector : public ZEGeographicEntity
 		void						SetGUID(const ZEGUID& GUID);
 		const ZEGUID&				GetGUID() const;
 
-		void						SetSectorFile(const ZEString& FileName);
+		void						SetSectorFile(const ZEString& FilePath);
 		const ZEString&				GetSectorFile() const;
 
 		bool						CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
@@ -72,8 +70,10 @@ class ZESector : public ZEGeographicEntity
 		void						SetAdjacencyDepth(ZEInt8 Value);
 		ZEInt8						GetAdjacencyDepth() const;
 
-		virtual bool				Save(ZEMLWriterNode* Serializer);
-		virtual bool				Restore(ZEMLReaderNode* Unserializer);
+		bool						Save();
+
+		virtual bool				Serialize(ZEMLWriterNode* Serializer);
+		virtual bool				Unserialize(ZEMLReaderNode* Unserializer);
 
 		virtual void				Destroy();
 

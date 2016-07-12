@@ -119,6 +119,7 @@ class ZEEntity : public ZEObject
 		bool									Enabled;
 		bool									Visible;
 		bool									SerialOperation;
+		mutable ZELock							EntityLock;
 		
 		mutable ZEFlags							EntityDirtyFlags;
 		mutable ZEMatrix4x4						Transform;
@@ -135,25 +136,20 @@ class ZEEntity : public ZEObject
 		ZETaskResult							ManageStates(ZETaskThread* Thread, void* Parameters);
 		void									ManagetStatesSerial();
 
-		virtual bool							CheckParent(ZEEntity* Parent);
-		virtual bool							CheckComponent(ZEEntity* Parent);
-		virtual bool							CheckChildEntity(ZEEntity* Parent);
-
-		virtual bool							SetParent(ZEEntity* Parent);
+		void									SetParent(ZEEntity* Parent);
 		void									SetScene(ZEScene* Scene);
-
 		void									SetWrapper(ZEDObjectWrapper* Wrapper);
 
 	protected:
 		void									SetSerialOperation(bool SerialOperation);
 		bool									GetSerialOperation() const;
 
-		const ZEArray<ZEEntity*>&				GetComponents() const;
 		virtual ZEEntityResult					LoadInternal();
 		virtual ZEEntityResult					UnloadInternal();
 		virtual ZEEntityResult					InitializeInternal();
 		virtual ZEEntityResult					DeinitializeInternal();
 
+		const ZEArray<ZEEntity*>&				GetComponents() const;
 		bool									AddComponent(ZEEntity* Entity); 
 		void									RemoveComponent(ZEEntity* Entity);
 		void									ClearComponents();
@@ -161,6 +157,10 @@ class ZEEntity : public ZEObject
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();
 		virtual void							BoundingBoxChanged();
+
+		virtual bool							CheckParent(ZEEntity* Parent);
+		virtual bool							CheckComponent(ZEEntity* Parent);
+		virtual bool							CheckChildEntity(ZEEntity* Parent);
 
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
@@ -235,8 +235,8 @@ class ZEEntity : public ZEObject
 		void									Load();
 		void									Unload();
 			
-		virtual bool							Save(ZEMLWriterNode* Serializer);
-		virtual bool							Restore(ZEMLReaderNode* Unserializer);
+		virtual bool							Serialize(ZEMLWriterNode* Serializer);
+		virtual bool							Unserialize(ZEMLReaderNode* Unserializer);
 
 		virtual void							Tick(float Time);
 

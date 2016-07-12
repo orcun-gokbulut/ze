@@ -81,7 +81,7 @@ class ZERNStageMultiplexer : public ZERNStage
 		void								DrawCustom(ZEGRContext* Context);
 
 		virtual bool						InitializeSelf();
-		virtual void						DeinitializeSelf();
+		virtual bool						DeinitializeSelf();
 
 	public:
 		virtual ZEInt						GetId() const;

@@ -59,7 +59,7 @@ bool ZERNStageResolving::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageResolving::DeinitializeSelf()
+bool ZERNStageResolving::DeinitializeSelf()
 {
 	ResolveGBuffersRenderStateData.Release();
 	ResolveCustomRenderStateData.Release();

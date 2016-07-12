@@ -201,7 +201,7 @@ class ZEUIManager : public ZEObject, public ZEInitializable
 		//static ZEFontResource*		DefaultFontResource;
 
 		bool						InitializeSelf();
-		void						DeinitializeSelf();
+		bool						DeinitializeSelf();
 
 									ZEUIManager();
 									~ZEUIManager();

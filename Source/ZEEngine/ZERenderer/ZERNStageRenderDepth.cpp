@@ -49,13 +49,13 @@ bool ZERNStageRenderDepth::InitializeSelf()
 	return UpdateInputOutputs();
 }
 
-void ZERNStageRenderDepth::DeinitializeSelf()
+bool ZERNStageRenderDepth::DeinitializeSelf()
 {
 	TransparentDepthBuffer.Release();
 
 	DepthTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStageRenderDepth::UpdateInputOutputs()

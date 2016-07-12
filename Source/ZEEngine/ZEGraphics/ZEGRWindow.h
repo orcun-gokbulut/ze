@@ -117,7 +117,7 @@ class ZEGRWindow : public ZEObject, public ZEInitializable
 		virtual void					OnSize();
 
 		virtual bool					InitializeSelf();
-		virtual void					DeinitializeSelf();
+		virtual bool					DeinitializeSelf();
 
 										ZEGRWindow();
 										~ZEGRWindow();

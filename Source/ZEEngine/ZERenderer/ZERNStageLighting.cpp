@@ -528,7 +528,7 @@ bool ZERNStageLighting::InitializeSelf()
 	return Update();
 }
 
-void ZERNStageLighting::DeinitializeSelf()
+bool ZERNStageLighting::DeinitializeSelf()
 {
 	DirtyFlags.RaiseAll();
 
@@ -565,7 +565,7 @@ void ZERNStageLighting::DeinitializeSelf()
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 void ZERNStageLighting::DrawLights(ZEGRContext* Context, bool PerSample)

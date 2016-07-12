@@ -298,7 +298,7 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	return UpdateInputOutputs();
 }
 
-void ZERNStageMultiplexer::DeinitializeSelf()
+bool ZERNStageMultiplexer::DeinitializeSelf()
 {
 	OutputTexture.Release();
 	RenderStateData.Release();
@@ -308,7 +308,7 @@ void ZERNStageMultiplexer::DeinitializeSelf()
 
 	OutputRenderTarget = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageMultiplexer::GetId() const

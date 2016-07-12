@@ -301,7 +301,7 @@ bool ZERNFixedMaterial::InitializeSelf()
 	return true;
 }
 
-void ZERNFixedMaterial::DeinitializeSelf()
+bool ZERNFixedMaterial::DeinitializeSelf()
 {
 	StageMask = 0;
 	DirtyFlags.RaiseAll();
@@ -317,7 +317,7 @@ void ZERNFixedMaterial::DeinitializeSelf()
 	ConstantBuffer.Release();
 	Sampler.Release();
 
-	ZERNMaterial::DeinitializeSelf();
+	return ZERNMaterial::DeinitializeSelf();
 }
 
 ZERNFixedMaterial::ZERNFixedMaterial()

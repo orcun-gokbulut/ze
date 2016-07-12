@@ -370,16 +370,23 @@ bool ZEWindow::DestroyWindow()
 
 bool ZEWindow::InitializeSelf()
 {
+	if (!ZEInitializable::InitializeSelf())
+		return false;
+
 	if (!CreateWindow_())
 		return false;
 
 	//Output = ZEGROutput::Create(this, ZEGR_TF_R8G8B8A8_UNORM);
+
+	return true;
 }
 
-void ZEWindow::DeinitializeSelf()
+bool ZEWindow::DeinitializeSelf()
 {
 	Output = NULL;
 	DestroyWindow();
+
+	return ZEInitializable::DeinitializeSelf();
 }
 
 void* ZEWindow::GetHandle()

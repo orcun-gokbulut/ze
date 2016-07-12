@@ -49,11 +49,11 @@ bool ZERNStageShadowing::InitializeSelf()
 	return true;
 }
 
-void ZERNStageShadowing::DeinitializeSelf()
+bool ZERNStageShadowing::DeinitializeSelf()
 {
 	ProjectiveShadowMaps.Release();
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 ZEInt ZERNStageShadowing::GetId() const

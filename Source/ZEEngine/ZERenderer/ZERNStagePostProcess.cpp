@@ -50,12 +50,12 @@ bool ZERNStagePostProcess::InitializeSelf()
 	return UpdateInputOutputs();
 }
 
-void ZERNStagePostProcess::DeinitializeSelf()
+bool ZERNStagePostProcess::DeinitializeSelf()
 {
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeSelf();
 }
 
 bool ZERNStagePostProcess::UpdateInputOutputs()
