@@ -39,12 +39,43 @@
 #include <QMainWindow>
 #include "ZEDS/ZEArray.h"
 #include "ZEDMenu.h"
+#include "ZEDWindow.h"
+#include "ZEDS/ZEFlags.h"
 
 class ZEDMenu;
 class ZEDWindow;
 class ZEDToolbar;
 class ZEDViewport;
 class Ui_ZEDMainWindow;
+
+enum ZEDWindowDefault
+{
+	ZED_WD_NONE					= 0x00,
+	ZED_WD_VISIBLE				= 0x01,
+	ZED_WD_DOCK_LEFT			= 0x10,
+	ZED_WD_DOCK_RIGHT			= 0x20,
+	ZED_WD_DOCK_TOP				= 0x30,
+	ZED_WD_DOCK_BOTTOM			= 0x40,
+	ZED_WD_STACK_LEFT			= 0x50,
+	ZED_WD_STACK_RIGHT			= 0x60,
+	ZED_WD_STACK_TOP			= 0x70,
+	ZED_WD_STACK_BOTTOM			= 0x80,
+
+};
+
+typedef ZEFlags ZEDWindowDefaults;
+
+enum ZEDToolbarDefault
+{
+	ZED_TD_NONE					= 0x00,
+	ZED_TD_VISIBLE				= 0x01,
+	ZED_TD_PLACE_LEFT			= 0x10,
+	ZED_TD_PLACE_RIGHT			= 0x20,
+	ZED_TD_PLACE_TOP			= 0x30,
+	ZED_TD_PLACE_BOTTOM			= 0x40,
+};
+
+typedef ZEFlags ZEDToolbarDefaults;
 
 class ZEDMainWindow : public QObject, public ZEDComponent
 {
@@ -59,8 +90,9 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		ZEArray<ZEDWindow*>					Windows;
 
 		bool								eventFilter(QObject* Object, QEvent* Event);
-		
-		void								ToolbarActionCallback(ZEDMenu* Menu);
+
+		void								WindowMenuCallback(ZEDMenu* Menu);
+		void								ToolbarMenuCallback(ZEDMenu* Menu);
 
 		void								AddMenu(QMenu* Parent, const ZEString& RemainingPath, QAction* Action);
 		bool								RemoveMenu(QMenu* Parent, QAction* Action);
@@ -75,11 +107,11 @@ class ZEDMainWindow : public QObject, public ZEDComponent
 		void								RemoveMenu(ZEDMenu* Menu);
 
 		const ZEArray<ZEDWindow*>&			GetWindows();
-		void								AddWindow(ZEDWindow* Widget);
+		void								AddWindow(ZEDWindow* Widget, ZEDWindowDefaults = ZED_WD_VISIBLE);
 		void								RemoveWindow(ZEDWindow* Widget);
 
 		const ZEArray<ZEDToolbar*>&			GetToolbars();
-		void								AddToolbar(ZEDToolbar* Toolbar);
+		void								AddToolbar(ZEDToolbar* Toolbar, ZEDToolbarDefaults Default = ZED_TD_VISIBLE | ZED_TD_PLACE_TOP);
 		void								RemoveToolbar(ZEDToolbar* Toolbar);
 
 		void								SetViewport(ZEDViewport* Viewport);

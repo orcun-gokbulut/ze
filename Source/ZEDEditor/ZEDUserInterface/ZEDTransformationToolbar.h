@@ -51,8 +51,6 @@ class ZEDTransformationToolbar : public QObject, public ZEDToolbar
 {
 	Q_OBJECT
 	private:
-		QToolBar*							Toolbar;
-
 		QAction*							actSelect;
 		QAction*							actMove;
 		QAction*							actRotate;
@@ -85,7 +83,6 @@ class ZEDTransformationToolbar : public QObject, public ZEDToolbar
 		void								txtZ_valueChanged(double d);
 
 	public:
-		virtual QToolBar*					GetToolbar();
 		ZEDTransformationManager*			GetTransformationManager();
 
 		static ZEDTransformationToolbar*	CreateInstance();

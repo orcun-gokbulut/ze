@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAssetBrowser.h
+ Zinek Engine - ZEDPropertyWindow.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,27 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZEDPropertyWindow.h"
 
-#include "ZEDWindow.h"
+#include "ZEDPropertyEditor.h"
+#include "ZEDCore/ZEDEditor.h"
 
-class Ui_ZEDAssetBrowser;
-class ZEDAssetTree;
-
-class ZEDAssetBrowser : public ZEDWindow
+bool ZEDPropertyWindow::InitializeInternal()
 {
-	Q_OBJECT
-	private:
-		QWidget*							Widget;
-		Ui_ZEDAssetBrowser*					Form;
+	if (!ZEDWindow::InitializeInternal())
+		return false;
 
-	private slots:
-		void								txtSearch_textChanged(const QString& Text);
-		void								cmbCategories_currentIndexChanged(const QString& Text);
+	GetEditor()->AddComponent(Widget);
 
-	public:
-		ZEDAssetTree*						GetAssetTree();
+	return true;
+}
 
-											ZEDAssetBrowser();
-											~ZEDAssetBrowser();
-};
+bool ZEDPropertyWindow::DeinitializeInternal()
+{
+	GetEditor()->RemoveComponent(Widget);
+
+	return ZEDWindow::DeinitializeInternal();
+}
+
+ZEDPropertyEditor* ZEDPropertyWindow::GetPropertyEditor()
+{
+	return Widget;
+}
+
+ZEDPropertyWindow::ZEDPropertyWindow()
+{
+	SetName("Properties");
+
+	Widget = new ZEDPropertyEditor();
+	SetWidget(Widget);
+}
+
+ZEDPropertyWindow::~ZEDPropertyWindow()
+{
+	delete Widget;
+}

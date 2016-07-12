@@ -46,7 +46,7 @@
 #include "ZEDUserInterface/ZEDSelectionToolbar.h"
 #include "ZEDUserInterface/ZEDObjectBrowser.h"
 #include "ZEDUserInterface/ZEDAssetBrowser.h"
-#include "ZEDUserInterface/ZEDPropertyEditor.h"
+#include "ZEDUserInterface/ZEDPropertyWindow.h"
 #include "ZEDUserInterface/ZEDClassBrowser.h"
 #include "ZEDUserInterface/ZEDObjectTree.h"
 #include "ZEGame/ZEScene.h"
@@ -55,9 +55,6 @@
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
-
-#include <QDockWidget>
-
 
 bool ZEDSceneEditor::InitializeInternal()
 {
@@ -74,34 +71,16 @@ bool ZEDSceneEditor::InitializeInternal()
 	AddComponent(Controller);
 
 	ObjectBrowser = new ZEDObjectBrowser();
-	QDockWidget* ObjectBrowserDockWidget = new QDockWidget();
-	ObjectBrowserDockWidget->setWindowTitle(ObjectBrowser->windowTitle());
-	ObjectBrowserDockWidget->setWidget(ObjectBrowser);
-	AddComponent(ObjectBrowser);
-	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, ObjectBrowserDockWidget);
+	GetMainWindow()->AddWindow(ObjectBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_LEFT);
 
 	AssetBrowser = new ZEDAssetBrowser();
-	QDockWidget* AssetBrowserDockWidget = new QDockWidget();
-	AssetBrowserDockWidget->setWindowTitle(AssetBrowser->windowTitle());
-	AssetBrowserDockWidget->setWidget(AssetBrowser);
-	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::LeftDockWidgetArea, AssetBrowserDockWidget);
+	GetMainWindow()->AddWindow(AssetBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
 
-	PropertyEditor = new ZEDPropertyEditor();
-	QDockWidget* PropertyEditorDockWidget = new QDockWidget();
-	PropertyEditorDockWidget->setWindowTitle(PropertyEditor->windowTitle());
-	PropertyEditorDockWidget->setWidget(PropertyEditor);
-	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, PropertyEditorDockWidget);
-	AddComponent(PropertyEditor);
+	PropertyWindow = new ZEDPropertyWindow();
+	GetMainWindow()->AddWindow(PropertyWindow, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
 
 	ClassBrowser = new ZEDClassBrowser();
-	QDockWidget* ClassBrowserDockWidget = new QDockWidget();
-	ClassBrowserDockWidget->setWindowTitle(ClassBrowser->windowTitle());
-	ClassBrowserDockWidget->setWidget(ClassBrowser);
-	GetMainWindow()->GetMainWindow()->addDockWidget(Qt::DockWidgetArea::RightDockWidgetArea, ClassBrowserDockWidget);
-	AddComponent(ClassBrowser);
-
-	GetMainWindow()->GetMainWindow()->tabifyDockWidget(ObjectBrowserDockWidget, AssetBrowserDockWidget);
-	GetMainWindow()->GetMainWindow()->tabifyDockWidget(PropertyEditorDockWidget, ClassBrowserDockWidget);
+	GetMainWindow()->AddWindow(ClassBrowser, ZED_WD_VISIBLE | ZED_WD_STACK_RIGHT);
 
 	Viewport = new ZEDViewport();
 	GetViewportManager()->RegisterViewport(Viewport);
@@ -159,7 +138,7 @@ ZEDSceneEditor::ZEDSceneEditor()
 	ObjectBrowser = NULL;
 	ClassBrowser = NULL;
 	AssetBrowser = NULL;
-	PropertyEditor = NULL;
+	PropertyWindow = NULL;
 	SelectionToolbar = NULL;
 	TransformationToolbar = NULL;
 	Scene = NULL;

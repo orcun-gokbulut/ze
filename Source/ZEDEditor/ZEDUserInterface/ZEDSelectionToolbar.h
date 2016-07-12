@@ -46,8 +46,6 @@ class ZEDSelectionToolbar : public QObject, public ZEDToolbar
 {
 	Q_OBJECT
 	private:
-		QToolBar*							Toolbar;
-
 		QComboBox*							cmbShape;
 		QAction*							actFreeze;
 		QAction*							actUnfreezeAll;
@@ -68,7 +66,6 @@ class ZEDSelectionToolbar : public QObject, public ZEDToolbar
 		void								actUnfreezeAll_triggered();
 
 	public:
-		virtual QToolBar*					GetToolbar();
 		ZEDSelectionManager*				GetSelectionManager();
 
 		static ZEDSelectionToolbar*			CreateInstance();

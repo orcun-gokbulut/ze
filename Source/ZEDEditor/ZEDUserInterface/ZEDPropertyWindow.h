@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEDAssetBrowser.h
+ Zinek Engine - ZEDPropertyWindow.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -37,23 +37,19 @@
 
 #include "ZEDWindow.h"
 
-class Ui_ZEDAssetBrowser;
-class ZEDAssetTree;
+class ZEDPropertyEditor;
 
-class ZEDAssetBrowser : public ZEDWindow
+class ZEDPropertyWindow : public ZEDWindow
 {
-	Q_OBJECT
 	private:
-		QWidget*							Widget;
-		Ui_ZEDAssetBrowser*					Form;
+		ZEDPropertyEditor*					Widget;
 
-	private slots:
-		void								txtSearch_textChanged(const QString& Text);
-		void								cmbCategories_currentIndexChanged(const QString& Text);
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 	public:
-		ZEDAssetTree*						GetAssetTree();
+		ZEDPropertyEditor*					GetPropertyEditor();
 
-											ZEDAssetBrowser();
-											~ZEDAssetBrowser();
+											ZEDPropertyWindow();
+											~ZEDPropertyWindow();
 };

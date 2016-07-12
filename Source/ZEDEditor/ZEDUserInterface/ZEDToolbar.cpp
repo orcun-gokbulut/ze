@@ -34,3 +34,53 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDToolbar.h"
+
+#include "ZEDMenu.h"
+
+#include <QToolbar>
+
+void ZEDToolbar::SetName(const ZEString& Name)
+{
+	Toolbar->setWindowTitle(Name.ToCString());
+	ZEDUserInterfaceComponent::SetName(Name);
+}
+
+ZEDToolbar::ZEDToolbar()
+{
+	Toolbar = new QToolBar();
+}
+
+ZEDToolbar::~ZEDToolbar()
+{
+	delete Toolbar;
+}
+
+QToolBar* ZEDToolbar::GetToolbar()
+{
+	return Toolbar;
+}
+
+void ZEDToolbar::SetEnabled(bool Enabled)
+{
+	GetToolbar()->setEnabled(Enabled);
+}
+
+bool ZEDToolbar::GetEnabled()
+{
+	return GetToolbar()->isEnabled();
+}
+
+void ZEDToolbar::SetVisible(bool Visible)
+{
+	GetToolbar()->setVisible(Visible);
+	
+	if (Menu == NULL)
+		return;
+
+	Menu->SetChecked(Visible);
+}
+
+bool ZEDToolbar::GetVisible()
+{
+	return GetToolbar()->isVisible();
+}

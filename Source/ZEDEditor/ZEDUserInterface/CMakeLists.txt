@@ -42,7 +42,7 @@ ze_add_source(ZEDWindow.h								Sources ZEMC QtMocs)
 ze_add_source(ZEDMenu.cpp								Sources)
 ze_add_source(ZEDMenu.h									Sources QtMocs)
 ze_add_source(ZEDToolbar.cpp							Sources)
-ze_add_source(ZEDToolbar.h								Sources ZEMC QtMocs)
+ze_add_source(ZEDToolbar.h								Sources ZEMC)
 ze_add_source(ZEDMainWindow.cpp							Sources)
 ze_add_source(ZEDMainWindow.h							Sources QtMocs)
 ze_add_source(ZEDMainWindow.ui							Sources QtUI)
@@ -89,15 +89,19 @@ ze_add_source(ZEDPropertyEditorItemEnumurator.cpp		Sources)
 ze_add_source(ZEDPropertyEditorItemEnumurator.h			Sources QtMocs)
 ze_add_source(ZEDPropertyEditorItemVector.cpp			Sources)
 ze_add_source(ZEDPropertyEditorItemVector.h				Sources QtMocs)
+ze_add_source(ZEDPropertyWindow.cpp						Sources)
+ze_add_source(ZEDPropertyWindow.h						Sources Headers QtMocs)
 
 qt5_wrap_cpp (QtMocFiles ${QtMocs})
 qt5_wrap_ui (QtUIFiles ${QtUI})
 
+include_directories(${Qt5Widgets_INCLUDE_DIRS})
+
 ze_add_library(TARGET ZEDUserInterface
-	ZEMC ${ZEMC}
 	SOURCES ${Sources} ${QtMocFiles} ${QtUIFiles} 
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation ZEDCore)
 
-source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})
-
 qt5_use_modules(ZEDUserInterface Widgets)
+
+source_group("Generated" FILES ${QtMocFiles} ${QtUIFiles})

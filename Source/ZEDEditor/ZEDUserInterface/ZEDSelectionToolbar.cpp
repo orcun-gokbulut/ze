@@ -49,39 +49,37 @@
 
 void ZEDSelectionToolbar::SetupUI()
 {
-	Toolbar = new QToolBar();
-
 	actSelectionList = new QAction(this);
 	actSelectionList->setText("Selections");
-	Toolbar->addAction(actSelectionList);
+	GetToolbar()->addAction(actSelectionList);
 
-	Toolbar->addSeparator();
+	GetToolbar()->addSeparator();
 
 	cmbShape = new QComboBox();
 	cmbShape->addItem("Rectangle");
 	cmbShape->addItem("Circle");
 	cmbShape->addItem("Brush");
-	Toolbar->addWidget(cmbShape);
+	GetToolbar()->addWidget(cmbShape);
 
 	actFreeze = new QAction(this);
 	actFreeze->setText("Freeze");
 	actFreeze->setCheckable(true);
-	Toolbar->addAction(actFreeze);
+	GetToolbar()->addAction(actFreeze);
 
 	actUnfreezeAll = new QAction(this);
 	actUnfreezeAll->setText("Unfreeze All");
-	Toolbar->addAction(actUnfreezeAll);
+	GetToolbar()->addAction(actUnfreezeAll);
 
 	cmbMode = new QComboBox();
 	cmbMode->clear();
 	cmbMode->addItem("Fully Inside");
 	cmbMode->addItem("Partially Inside");
-	Toolbar->addWidget(cmbMode);
+	GetToolbar()->addWidget(cmbMode);
 }
 
 void ZEDSelectionToolbar::UpdateUI()
 {
-	Toolbar->setEnabled(GetSelectionManager() == NULL);
+	GetToolbar()->setEnabled(GetSelectionManager() != NULL && GetEditor()->GetFileState() != ZED_ES_NONE);
 	
 	if (GetSelectionManager() == NULL)
 		return;
@@ -132,7 +130,7 @@ ZEDSelectionToolbar::ZEDSelectionToolbar()
 
 ZEDSelectionToolbar::~ZEDSelectionToolbar()
 {
-	delete Toolbar;
+
 }
 
 void ZEDSelectionToolbar::actSelectionList_triggered()
@@ -176,11 +174,6 @@ void ZEDSelectionToolbar::actFreeze_triggered()
 void ZEDSelectionToolbar::actUnfreezeAll_triggered()
 {
 	QMessageBox::information(GetMainWindow()->GetMainWindow(), "Zinek", "Not implemented", QMessageBox::Ok);
-}
-
-QToolBar* ZEDSelectionToolbar::GetToolbar()
-{
-	return Toolbar;
 }
 
 ZEDSelectionManager* ZEDSelectionToolbar::GetSelectionManager()

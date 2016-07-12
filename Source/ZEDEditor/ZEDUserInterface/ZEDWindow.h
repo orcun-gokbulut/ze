@@ -36,24 +36,39 @@
 #pragma once
 
 #include "ZEDUserInterfaceComponent.h"
+#include "ZECommon.h"
+#include <QObject>
 
 class ZEDMainWindow;
-class QWidget;
 class QDockWidget;
 
-class ZEDWindow : public ZEDUserInterfaceComponent
+class ZEDWindow : public QObject, public ZEDUserInterfaceComponent
 {
+	Q_OBJECT
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEDWindow)
 	friend class ZEDMainWindow;
 	private:
-		QWidget*					Widget;
 		QDockWidget*				DockWidget;
+		ZEDMenu*					Menu;
+
+	private slots:
+		void						visibilityChanged(bool Visibilty);
 
 	protected:
+		virtual void				SetName(const ZEString& Name);
+		void						SetWidget(QWidget* Widget);
+
 									ZEDWindow();
 		virtual						~ZEDWindow();
 
 	public:
 		QDockWidget*				GetDockWidget();
 		QWidget*					GetWidget();
+
+		void						SetEnabled(bool Enabled);
+		bool						GetEnabled();
+
+		void						SetVisible(bool Visible);
+		bool						GetVisible();
 };

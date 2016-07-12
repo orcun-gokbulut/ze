@@ -52,10 +52,15 @@ ZEDAssetTree* ZEDAssetBrowser::GetAssetTree()
 	return Form->trwAssets;
 }
 
-ZEDAssetBrowser::ZEDAssetBrowser(QWidget* Parent) : QWidget(Parent)
+ZEDAssetBrowser::ZEDAssetBrowser()
 {
+	SetName("Asset Browser");
+
+	Widget = new QWidget();
+	SetWidget(Widget);
+
 	Form = new Ui_ZEDAssetBrowser();
-	Form->setupUi(this);
+	Form->setupUi(Widget);
 	Form->trwAssets->Update();
 
 	connect(Form->txtSearch, SIGNAL(textChanged(const QString&)), this, SLOT(txtSearch_textChanged(const QString&)));
@@ -65,4 +70,5 @@ ZEDAssetBrowser::ZEDAssetBrowser(QWidget* Parent) : QWidget(Parent)
 ZEDAssetBrowser::~ZEDAssetBrowser()
 {
 	delete Form;
+	delete Widget;
 }
