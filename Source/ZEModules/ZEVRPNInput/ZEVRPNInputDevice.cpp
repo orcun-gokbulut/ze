@@ -85,9 +85,9 @@ static void VRPN_CALLBACK Axis_ChangeHandler(void* UserData, const vrpn_ANALOGCB
 		Handle->State->Axises.CurrentValues[I] = (float)(Data.channel[I]);
 }
 
-bool ZEVRPNInputDevice::InitializeSelf()
+bool ZEVRPNInputDevice::InitializeInternal()
 {
-	if (!ZEInputDevice::InitializeSelf())
+	if (!ZEInputDevice::InitializeInternal())
 		return false;
 
 	bool Clash = false;
@@ -129,7 +129,7 @@ bool ZEVRPNInputDevice::InitializeSelf()
 	return true;
 }
 
-bool ZEVRPNInputDevice::DeinitializeSelf()
+bool ZEVRPNInputDevice::DeinitializeInternal()
 {
 	if (VRPNDevice != NULL)
 	{
@@ -137,7 +137,7 @@ bool ZEVRPNInputDevice::DeinitializeSelf()
 		VRPNDevice = NULL;
 	}
 
-	return ZEInputDevice::DeinitializeSelf();
+	return ZEInputDevice::DeinitializeInternal();
 }
 
 void ZEVRPNInputDevice::Process()

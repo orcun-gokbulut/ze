@@ -163,9 +163,9 @@ bool ZEDViewport::Update()
 	return true;
 }
 
-bool ZEDViewport::InitializeSelf()
+bool ZEDViewport::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 
 	zeCheckError(ViewportManager == NULL, false, "Cannot initialize. Viewport is not registered with a Viewport Manager.");
@@ -236,14 +236,14 @@ bool ZEDViewport::InitializeSelf()
 }
 
 
-bool ZEDViewport::DeinitializeSelf()
+bool ZEDViewport::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 	Renderer.Deinitialize();
 	Window->Destroy();
 	Window = NULL;
 
-	return ZEDComponent::DeinitializeSelf();
+	return ZEDComponent::DeinitializeInternal();
 }
 
 void ZEDViewport::TickEvent(const ZEDTickEvent* Event)

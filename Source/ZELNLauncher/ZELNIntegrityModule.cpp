@@ -208,9 +208,9 @@ void ZELNIntegrityModule::Update()
 		UpdateRecord(I);
 }
 
-bool ZELNIntegrityModule::InitializeSelf()
+bool ZELNIntegrityModule::InitializeInternal()
 {
-	if (!ZELNModule::InitializeSelf())
+	if (!ZELNModule::InitializeInternal())
 		return false;
 	
 	if (!Checker.Load())

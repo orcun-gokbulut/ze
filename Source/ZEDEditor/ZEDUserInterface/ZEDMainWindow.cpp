@@ -194,7 +194,7 @@ void ZEDMainWindow::AddWindow(ZEDWindow* Window)
 	AddMenu("UserInterface", Window->Menu);
 	
 	if (IsInitialized())
-		Window->InitializeSelf();
+		Window->InitializeInternal();
 }
 
 void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)

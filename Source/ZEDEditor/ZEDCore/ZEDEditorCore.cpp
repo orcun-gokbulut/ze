@@ -64,9 +64,9 @@ void ZEDEditorCore::LoadClasses()
 	#undef ZE_META_REGISTER_CLASS
 }
 
-bool ZEDEditorCore::InitializeSelf()
+bool ZEDEditorCore::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	ZEInt argc = 0;
@@ -96,7 +96,7 @@ bool ZEDEditorCore::InitializeSelf()
 	return true;
 }
 
-bool ZEDEditorCore::DeinitializeSelf()
+bool ZEDEditorCore::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Editors.GetCount(); I++)
 		Editors[I]->Deinitialize();
@@ -104,7 +104,7 @@ bool ZEDEditorCore::DeinitializeSelf()
 	zeCore->ShutDown();
 	Application->exit();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 ZEDEditorCore::ZEDEditorCore()
@@ -143,7 +143,7 @@ void ZEDEditorCore::Execute()
 		ZECoreState State = EngineCore->GetCoreState();
 
 		if (State == ZE_CS_TERMINATE || State ==  ZE_CS_SHUTDOWN)
-			DeinitializeSelf();
+			DeinitializeInternal();
 
 		EngineCore->MainLoop();
 

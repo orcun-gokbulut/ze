@@ -48,9 +48,9 @@
 #include <QBoxLayout>
 #include "ZEDAssetBrowser.h"
 
-bool ZEDPropertyEditorItemString::InitializeSelf()
+bool ZEDPropertyEditorItemString::InitializeInternal()
 {
-	if (!ZEDPropertyEditorItem::InitializeSelf())
+	if (!ZEDPropertyEditorItem::InitializeInternal())
 	{
 		setText(1, "Error");
 		return false;

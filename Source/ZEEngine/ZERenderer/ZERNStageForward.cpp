@@ -59,15 +59,15 @@
 #define ZERN_SFDF_SHADERS			1
 #define ZERN_SFDF_RENDER_STATES		2
 
-bool ZERNStageForward::InitializeSelf()
+bool ZERNStageForward::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	return Update();
 }
 
-bool ZERNStageForward::DeinitializeSelf()
+bool ZERNStageForward::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -82,7 +82,7 @@ bool ZERNStageForward::DeinitializeSelf()
 	DepthTexture = NULL;
 	TransparentDepthTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 bool ZERNStageForward::UpdateShaders()

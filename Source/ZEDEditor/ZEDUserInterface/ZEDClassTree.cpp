@@ -110,9 +110,9 @@ void ZEDClassTree::UpdateCatagoryTree(QTreeWidgetItem* Item)
 
 }
 
-bool ZEDClassTree::InitializeSelf()
+bool ZEDClassTree::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 
 	Update();

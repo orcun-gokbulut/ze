@@ -200,8 +200,8 @@ class ZEUIManager : public ZEObject, public ZEInitializable
 		static ZEVector4			DefaultForegroundColor;
 		//static ZEFontResource*		DefaultFontResource;
 
-		bool						InitializeSelf();
-		bool						DeinitializeSelf();
+		bool						InitializeInternal();
+		bool						DeinitializeInternal();
 
 									ZEUIManager();
 									~ZEUIManager();

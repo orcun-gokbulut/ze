@@ -73,7 +73,7 @@ class ZEDObjectTree : public QTreeWidget, public ZEDComponent
 		
 		void							UpdateItem(QTreeWidgetItem* TreeItem, ZEDObjectWrapper* Wrapper);
 
-		virtual bool					InitializeSelf();
+		virtual bool					InitializeInternal();
 
 		virtual void					ObjectEvent(const ZEDObjectEvent* Event);
 		virtual void					SelectionEvent(const ZEDSelectionEvent* Event);

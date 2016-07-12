@@ -117,9 +117,9 @@ void ZEDObjectTree::SelectionEvent(const ZEDSelectionEvent* Event)
 	}	
 }
 
-bool ZEDObjectTree::InitializeSelf()
+bool ZEDObjectTree::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 
 	Update();

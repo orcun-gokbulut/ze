@@ -48,8 +48,8 @@ class ZERNStageManager : public ZEObject, public ZEInitializable
 	private:
 		ZEArray<ZERNStage*>				Stages;
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual bool					InitializeInternal();
+		virtual bool					DeinitializeInternal();
 
 		ZERNStageManager();
 		~ZERNStageManager();

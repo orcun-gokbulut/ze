@@ -368,9 +368,9 @@ bool ZEWindow::DestroyWindow()
 	return true;
 }
 
-bool ZEWindow::InitializeSelf()
+bool ZEWindow::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	if (!CreateWindow_())
@@ -381,12 +381,12 @@ bool ZEWindow::InitializeSelf()
 	return true;
 }
 
-bool ZEWindow::DeinitializeSelf()
+bool ZEWindow::DeinitializeInternal()
 {
 	Output = NULL;
 	DestroyWindow();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 void* ZEWindow::GetHandle()

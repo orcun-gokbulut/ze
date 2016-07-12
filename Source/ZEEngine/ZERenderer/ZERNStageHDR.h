@@ -120,8 +120,8 @@ class ZERNStageHDR : public ZERNStage
 			float							Reserved2;
 		} Constants;
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 		bool								UpdateInputOutput();
 		bool								UpdateTextures();

@@ -73,7 +73,7 @@ class ZEDPropertyEditorItemVector : public QObject, public ZEDPropertyEditorItem
 
 		virtual bool				eventFilter(QObject* Object, QEvent* Event);
 
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 	private slots:
 		void						TextEdit_textChanged(const QString&);

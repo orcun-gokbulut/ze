@@ -183,8 +183,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void									Load(const ZEMLReaderNode& MaterialNode);
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZERNFixedMaterial();
 

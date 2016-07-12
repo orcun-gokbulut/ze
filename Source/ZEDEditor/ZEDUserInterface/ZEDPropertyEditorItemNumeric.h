@@ -48,7 +48,7 @@ class ZEDPropertyEditorItemNumeric : public QObject, public ZEDPropertyEditorIte
 		ZEVariant					Value;
 		bool						ValueChanged;
 
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 		virtual bool				eventFilter(QObject* Object, QEvent* Event);
 

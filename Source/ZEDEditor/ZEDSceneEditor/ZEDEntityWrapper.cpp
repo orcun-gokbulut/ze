@@ -98,9 +98,9 @@ bool ZEDEntityWrapper::UpdateGraphics()
 	return true;
 }
 
-bool ZEDEntityWrapper::InitializeSelf()
+bool ZEDEntityWrapper::InitializeInternal()
 {
-	if (!ZEDObjectWrapper::InitializeSelf())
+	if (!ZEDObjectWrapper::InitializeInternal())
 		return false;
 
 	Material = ZERNSimpleMaterial::CreateInstance();
@@ -132,7 +132,7 @@ bool ZEDEntityWrapper::InitializeSelf()
 	return true;
 }
 
-bool ZEDEntityWrapper::DeinitializeSelf()
+bool ZEDEntityWrapper::DeinitializeInternal()
 {
 	delete NamePlate;
 
@@ -140,7 +140,7 @@ bool ZEDEntityWrapper::DeinitializeSelf()
 	ConstantBuffer.Release();
 	VertexBuffer.Release();
 
-	return ZEDObjectWrapper::DeinitializeSelf();
+	return ZEDObjectWrapper::DeinitializeInternal();
 }
 
 ZEDEntityWrapper::ZEDEntityWrapper()

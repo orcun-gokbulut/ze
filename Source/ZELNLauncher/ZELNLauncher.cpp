@@ -138,9 +138,9 @@ void ZELNLauncher::InitializeModules(const ZEMLReaderNode& ModulesNode)
 	zeLog("Modules initialized.");
 }
 
-bool ZELNLauncher::InitializeSelf()
+bool ZELNLauncher::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	ZELNModule* LogModule = ZELNLogModule::Description()->CreateInstance();
@@ -178,7 +178,7 @@ bool ZELNLauncher::InitializeSelf()
 	return true;
 }
 
-bool ZELNLauncher::DeinitializeSelf()
+bool ZELNLauncher::DeinitializeInternal()
 {
 	Window->close();
 
@@ -187,7 +187,7 @@ bool ZELNLauncher::DeinitializeSelf()
 
 	delete Window;
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 const ZEArray<ZELNModule*> ZELNLauncher::GetModules()

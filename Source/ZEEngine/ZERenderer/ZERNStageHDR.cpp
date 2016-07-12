@@ -317,9 +317,9 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* BloomT
 	Context->Draw(3, 0);
 }
 
-bool ZERNStageHDR::InitializeSelf()
+bool ZERNStageHDR::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 	
 	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
@@ -329,7 +329,7 @@ bool ZERNStageHDR::InitializeSelf()
 	return Update();
 }
 
-bool ZERNStageHDR::DeinitializeSelf()
+bool ZERNStageHDR::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 	Filter.Deinitialize();
@@ -361,7 +361,7 @@ bool ZERNStageHDR::DeinitializeSelf()
 	InputTexture = NULL;
 	OutputRenderTarget = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageHDR::GetId() const

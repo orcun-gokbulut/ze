@@ -50,7 +50,7 @@ class ZEDPropertyEditorItemString : public QObject, public ZEDPropertyEditorItem
 		bool						IsAsset;
 
 
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 		virtual bool				eventFilter(QObject* Object, QEvent* Event);
 

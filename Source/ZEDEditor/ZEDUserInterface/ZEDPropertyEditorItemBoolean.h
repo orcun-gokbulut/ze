@@ -45,7 +45,7 @@ class ZEDPropertyEditorItemBoolean : public QObject, public ZEDPropertyEditorIte
 	private:
 		QComboBox*					ComboBox;
 
-		virtual bool				InitializeSelf();
+		virtual bool				InitializeInternal();
 
 	private slots:
 		void						ComboBox_currentTextChanged(const QString& Text);

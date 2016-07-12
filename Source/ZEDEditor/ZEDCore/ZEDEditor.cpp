@@ -251,9 +251,9 @@ void ZEDEditor::RegisterRecentFile(const ZEString& FileName)
 	PopulateRecentFiles();
 }
 
-bool ZEDEditor::InitializeSelf()
+bool ZEDEditor::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	MainWindow = ZEDMainWindow::CreateInstance();
@@ -293,7 +293,7 @@ bool ZEDEditor::InitializeSelf()
 	return true;
 }
 
-bool ZEDEditor::DeinitializeSelf()
+bool ZEDEditor::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Components.GetCount(); I++)
 		Components[I]->Deinitialize();
@@ -302,7 +302,7 @@ bool ZEDEditor::DeinitializeSelf()
 	
 	DeinitializeMenu();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 ZEDEditorCore* ZEDEditor::GetCore()

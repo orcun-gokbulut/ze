@@ -53,7 +53,7 @@ class ZEDClassBrowser : public QWidget, public ZEDComponent
 
 		ZEDObjectWrapper*					DestinationWrapper;
 
-		virtual bool						InitializeSelf();
+		virtual bool						InitializeInternal();
 
 		virtual void						SelectionEvent(const ZEDSelectionEvent* Event);
 		virtual bool						eventFilter(QObject* Object, QEvent* Event);

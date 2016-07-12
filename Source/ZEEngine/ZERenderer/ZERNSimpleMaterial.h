@@ -82,8 +82,8 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		bool									UpdateRenderState() const;
 		bool									UpdateConstantBuffer() const;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZERNSimpleMaterial();
 

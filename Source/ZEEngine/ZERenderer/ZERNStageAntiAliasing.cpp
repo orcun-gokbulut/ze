@@ -275,9 +275,9 @@ void ZERNStageAntiAliasing::DoNeighborhoodBlending(ZEGRContext* Context)
 	Context->Draw(3, 0);
 }
 
-bool ZERNStageAntiAliasing::InitializeSelf()
+bool ZERNStageAntiAliasing::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
@@ -288,7 +288,7 @@ bool ZERNStageAntiAliasing::InitializeSelf()
 	return Update();
 }
 
-bool ZERNStageAntiAliasing::DeinitializeSelf()
+bool ZERNStageAntiAliasing::DeinitializeInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -315,7 +315,7 @@ bool ZERNStageAntiAliasing::DeinitializeSelf()
 
 	SamplerLinearClamp.Release();
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageAntiAliasing::GetId() const

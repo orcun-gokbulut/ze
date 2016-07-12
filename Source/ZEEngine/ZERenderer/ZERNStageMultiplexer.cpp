@@ -265,9 +265,9 @@ void ZERNStageMultiplexer::DrawCustom(ZEGRContext* Context)
 		Input->Setup(Context);
 }
 
-bool ZERNStageMultiplexer::InitializeSelf()
+bool ZERNStageMultiplexer::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	ZEGRShaderCompileOptions Options;
@@ -298,7 +298,7 @@ bool ZERNStageMultiplexer::InitializeSelf()
 	return UpdateInputOutputs();
 }
 
-bool ZERNStageMultiplexer::DeinitializeSelf()
+bool ZERNStageMultiplexer::DeinitializeInternal()
 {
 	OutputTexture.Release();
 	RenderStateData.Release();
@@ -308,7 +308,7 @@ bool ZERNStageMultiplexer::DeinitializeSelf()
 
 	OutputRenderTarget = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 ZEInt ZERNStageMultiplexer::GetId() const

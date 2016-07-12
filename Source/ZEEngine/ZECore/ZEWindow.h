@@ -71,8 +71,8 @@ class ZEWindow : public ZEInitializable
 		void					ChangeWindowConfiguration();
 		void					ChangeWidowGeometry();
 
-		virtual bool			InitializeSelf();
-		virtual bool			DeinitializeSelf();
+		virtual bool			InitializeInternal();
+		virtual bool			DeinitializeInternal();
 
 								ZEWindow();
 								~ZEWindow();

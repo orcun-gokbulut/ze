@@ -48,8 +48,8 @@ class ZELNContactModule  : public ZELNModule
 		QWidget*					Widget;
 		Ui_ZELNContactWidget*		Form;
 
-		virtual bool				InitializeSelf();
-		virtual bool				DeinitializeSelf();
+		virtual bool				InitializeInternal();
+		virtual bool				DeinitializeInternal();
 
 	public:
 		virtual QWidget*			GetWidget();

@@ -52,9 +52,9 @@ void ZELNLogModule::LogCallback(const char* ModuleName, ZELogType Type, const ch
 		.arg(LogText));
 }
 
-bool ZELNLogModule::InitializeSelf()
+bool ZELNLogModule::InitializeInternal()
 {
-	if (!ZELNModule::InitializeSelf())
+	if (!ZELNModule::InitializeInternal())
 		return false;
 
 	Widget = new QWidget();
@@ -67,7 +67,7 @@ bool ZELNLogModule::InitializeSelf()
 	return true;
 }
 
-bool ZELNLogModule::DeinitializeSelf()
+bool ZELNLogModule::DeinitializeInternal()
 {
 	ZELog::GetInstance()->SetCallbackParameter(NULL);
 	ZELog::GetInstance()->SetCallback(NULL);
@@ -78,7 +78,7 @@ bool ZELNLogModule::DeinitializeSelf()
 	delete Form;
 	Form = NULL;
 
-	return ZELNModule::DeinitializeSelf();
+	return ZELNModule::DeinitializeInternal();
 }
 
 QWidget* ZELNLogModule::GetWidget()

@@ -82,8 +82,8 @@ class ZEUIRenderer : public ZEInitializable
 	protected:
 		void								UpdateBatches();
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 											ZEUIRenderer();
 											~ZEUIRenderer();

@@ -441,9 +441,9 @@ ZEUIControl* ZEUIManager::FindEventReciever(ZEUIControl* ParentControl)
 	return ParentControl;
 }
 
-bool ZEUIManager::InitializeSelf()
+bool ZEUIManager::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 		
 	UIRenderer->Initialize();
@@ -574,11 +574,11 @@ bool ZEUIManager::InitializeSelf()
 	return true;
 }
 
-bool ZEUIManager::DeinitializeSelf()
+bool ZEUIManager::DeinitializeInternal()
 {
 	UIRenderer->Deinitialize();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 void ZEUIManager::Render(ZERNRenderer* Renderer)

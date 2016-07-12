@@ -66,8 +66,8 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 		bool								RayCastModifier(ZERayCastCollision& Collision, const void* Parameter);
 		virtual bool						UpdateGraphics();
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 											ZEDEntityWrapper();
 

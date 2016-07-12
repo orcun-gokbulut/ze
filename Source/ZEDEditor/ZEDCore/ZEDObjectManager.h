@@ -58,8 +58,8 @@ class ZEDObjectManager : public ZEDComponent
 
 		void									LoadWrapperClasses();
 
-		bool									InitializeSelf();
-		bool									DeinitializeSelf();
+		bool									InitializeInternal();
+		bool									DeinitializeInternal();
 
 		virtual void							EditorEvent(const ZEDEditorEvent* Event);
 

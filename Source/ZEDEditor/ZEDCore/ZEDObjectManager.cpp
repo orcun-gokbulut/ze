@@ -56,9 +56,9 @@ void ZEDObjectManager::LoadWrapperClasses()
 	}
 }
 
-bool ZEDObjectManager::InitializeSelf()
+bool ZEDObjectManager::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeSelf())
+	if (!ZEDComponent::InitializeInternal())
 		return false;
 	
 	LoadWrapperClasses();
@@ -72,12 +72,12 @@ bool ZEDObjectManager::InitializeSelf()
 	return true;
 }
 
-bool ZEDObjectManager::DeinitializeSelf()
+bool ZEDObjectManager::DeinitializeInternal()
 {
 	if (RootWrapper != NULL)
 		RootWrapper->Deinitialize();
 
-	return ZEDComponent::DeinitializeSelf();
+	return ZEDComponent::DeinitializeInternal();
 }
 
 void ZEDObjectManager::EditorEvent(const ZEDEditorEvent* Event)

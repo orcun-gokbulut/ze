@@ -49,8 +49,8 @@ class ZERNStageRenderDepth : public ZERNStage
 
 		const ZEGRTexture2D*			DepthTexture;
 
-		virtual bool					InitializeSelf();						
-		virtual bool					DeinitializeSelf();
+		virtual bool					InitializeInternal();						
+		virtual bool					DeinitializeInternal();
 
 		bool							UpdateInputOutputs();
 

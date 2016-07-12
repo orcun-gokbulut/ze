@@ -120,9 +120,9 @@ const ZEString& ZEPathManager::GetSystemStoragePath()
 #include <windows.h>
 #include <shlobj.h>
 
-bool ZEPathManager::InitializeSelf()
+bool ZEPathManager::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	char Buffer[MAX_PATH];

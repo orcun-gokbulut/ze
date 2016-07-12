@@ -43,20 +43,20 @@
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNCommand.h"
 
-bool ZERNStageParticleRendering::InitializeSelf()
+bool ZERNStageParticleRendering::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	return UpdateInputOutputs();
 }
 
-bool ZERNStageParticleRendering::DeinitializeSelf()
+bool ZERNStageParticleRendering::DeinitializeInternal()
 {
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 bool ZERNStageParticleRendering::UpdateInputOutputs()

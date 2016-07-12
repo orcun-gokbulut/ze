@@ -652,9 +652,9 @@ void ZEGRWindow::Destroy()
 	delete this;
 }
 
-bool ZEGRWindow::InitializeSelf()
+bool ZEGRWindow::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	DWORD Win32Style = 0;
@@ -714,7 +714,7 @@ bool ZEGRWindow::InitializeSelf()
 }
 
 
-bool ZEGRWindow::DeinitializeSelf()
+bool ZEGRWindow::DeinitializeInternal()
 {
 	if (Handle != NULL)
 	{
@@ -738,7 +738,7 @@ bool ZEGRWindow::DeinitializeSelf()
 		return false;
 	}
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 

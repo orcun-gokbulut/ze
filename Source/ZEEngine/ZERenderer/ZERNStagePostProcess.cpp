@@ -42,20 +42,20 @@
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRViewport.h"
 
-bool ZERNStagePostProcess::InitializeSelf()
+bool ZERNStagePostProcess::InitializeInternal()
 {
-	if (!ZERNStage::InitializeSelf())
+	if (!ZERNStage::InitializeInternal())
 		return false;
 
 	return UpdateInputOutputs();
 }
 
-bool ZERNStagePostProcess::DeinitializeSelf()
+bool ZERNStagePostProcess::DeinitializeInternal()
 {
 	AccumulationTexture = NULL;
 	DepthTexture = NULL;
 
-	return ZERNStage::DeinitializeSelf();
+	return ZERNStage::DeinitializeInternal();
 }
 
 bool ZERNStagePostProcess::UpdateInputOutputs()

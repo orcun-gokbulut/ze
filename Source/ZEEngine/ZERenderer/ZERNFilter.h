@@ -83,8 +83,8 @@ class ZERNFilter : public ZEInitializable
 			ZEVector3							Reserved;
 		} Constants;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 		bool									UpdateShaders();
 		bool									UpdateRenderStates();

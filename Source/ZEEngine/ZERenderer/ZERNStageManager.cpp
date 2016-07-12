@@ -36,9 +36,9 @@
 #include "ZERNStageManager.h"
 #include "ZERNStage.h"
 
-bool ZERNStageManager::InitializeSelf()
+bool ZERNStageManager::InitializeInternal()
 {
-	if (!ZEInitializable::InitializeSelf())
+	if (!ZEInitializable::InitializeInternal())
 		return false;
 
 	for (ZESize I = 0; I < Stages.GetCount(); I++)
@@ -48,12 +48,12 @@ bool ZERNStageManager::InitializeSelf()
 	return true;
 }
 
-bool ZERNStageManager::DeinitializeSelf()
+bool ZERNStageManager::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Stages.GetCount(); I++)
 		Stages[I]->Deinitialize();
 
-	return ZEInitializable::DeinitializeSelf();
+	return ZEInitializable::DeinitializeInternal();
 }
 
 ZERNStageManager::ZERNStageManager()
