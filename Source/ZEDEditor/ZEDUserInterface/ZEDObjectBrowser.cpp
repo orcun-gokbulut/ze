@@ -55,6 +55,13 @@ bool ZEDObjectBrowser::InitializeInternal()
 	return true;
 }
 
+bool ZEDObjectBrowser::DeinitializeInternal()
+{
+	GetEditor()->RemoveComponent(Form->trwObjects);
+
+	return ZEDWindow::DeinitializeInternal();
+}
+
 bool ZEDObjectBrowser::eventFilter(QObject* Object, QEvent* Event)
 {
 	if (Object != Form->trwObjects->viewport())
@@ -257,10 +264,15 @@ ZEDObjectTree* ZEDObjectBrowser::GetObjectTree()
 	return Form->trwObjects;
 }
 
-ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QWidget(Parent)
+ZEDObjectBrowser::ZEDObjectBrowser()
 {
+	SetName("Object Browser");
+
+	Widget = new QWidget();
+	SetWidget(Widget);
+
 	Form = new Ui_ZEDObjectBrowser();
-	Form->setupUi(this);
+	Form->setupUi(Widget);
 	
 	Form->trwObjects->setAcceptDrops(true);
 	Form->trwObjects->viewport()->installEventFilter(this);
@@ -273,4 +285,5 @@ ZEDObjectBrowser::ZEDObjectBrowser(QWidget* Parent) : QWidget(Parent)
 ZEDObjectBrowser::~ZEDObjectBrowser()
 {
 	delete Form;
+	delete Widget;
 }

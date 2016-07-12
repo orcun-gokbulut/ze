@@ -34,16 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEDWindow.h"
+#include "ZEDMenu.h"
+
+#include <QDockWidget>
+
+void ZEDWindow::visibilityChanged(bool Visibilty)
+{
+	Menu->SetChecked(Visibilty);
+}
+
+void ZEDWindow::SetName(const ZEString& Name)
+{
+	DockWidget->setWindowTitle(Name.ToCString());
+	ZEDUserInterfaceComponent::SetName(Name);
+}
+
+void ZEDWindow::SetWidget(QWidget* Widget)
+{
+	DockWidget->setWidget(Widget);
+}
 
 ZEDWindow::ZEDWindow()
 {
-	Widget = NULL;
-	DockWidget = NULL;
+	Menu = new ZEDMenu();
+	DockWidget = new QDockWidget();
 }
 
 ZEDWindow::~ZEDWindow()
 {
-
+	delete DockWidget;
 }
 
 QDockWidget* ZEDWindow::GetDockWidget()
@@ -53,5 +72,25 @@ QDockWidget* ZEDWindow::GetDockWidget()
 
 QWidget* ZEDWindow::GetWidget()
 {
-	return Widget;
+	return DockWidget->widget();
+}
+
+void ZEDWindow::SetEnabled(bool Enabled)
+{
+	DockWidget->setEnabled(Enabled);
+}
+
+bool ZEDWindow::GetEnabled()
+{
+	return DockWidget->isEnabled();
+}
+
+void ZEDWindow::SetVisible(bool Visible)
+{
+	DockWidget->setVisible(Visible);
+}
+
+bool ZEDWindow::GetVisible()
+{
+	return DockWidget->isVisible();
 }

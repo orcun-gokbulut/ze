@@ -50,12 +50,13 @@ class ZEDUserInterfaceComponent :  public ZEDComponent
 	private:
 		ZEString							Name;
 		ZEString							Category;
-		ZEDMenu*							Menu;
 		QAction*							Action;
 
 	protected:
-		void								SetName(const ZEString& Name);
-		void								SetCategory(const ZEString& Name);
+		ZEDMenu*							Menu;
+
+		virtual void						SetName(const ZEString& Name);
+		virtual void						SetCategory(const ZEString& Name);
 		
 											ZEDUserInterfaceComponent();
 

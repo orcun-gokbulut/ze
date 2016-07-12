@@ -49,35 +49,33 @@
 
 void ZEDTransformationToolbar::SetupUI()
 {
-	Toolbar = new QToolBar();
-
 	ActionGroup = new QActionGroup(this);
 
 	actSelect = new QAction(this);
 	actSelect->setText("Select");
 	actSelect->setCheckable(true);
 	ActionGroup->addAction(actSelect);
-	Toolbar->addAction(actSelect);
+	GetToolbar()->addAction(actSelect);
 
 	actMove = new QAction(this);
 	actMove->setText("Move");
 	actMove->setCheckable(true);
 	ActionGroup->addAction(actMove);
-	Toolbar->addAction(actMove);
+	GetToolbar()->addAction(actMove);
 	
 	actRotate = new QAction(this);
 	actRotate->setText("Rotate");
 	actRotate->setCheckable(true);
 	ActionGroup->addAction(actRotate);
-	Toolbar->addAction(actRotate);
+	GetToolbar()->addAction(actRotate);
 
 	actScale = new QAction(this);
 	actScale->setText("Scale");
 	actScale->setCheckable(true);
 	ActionGroup->addAction(actScale);
-	Toolbar->addAction(actScale);
+	GetToolbar()->addAction(actScale);
 
-	Toolbar->addSeparator();
+	GetToolbar()->addSeparator();
 
 	cmbSpace = new QComboBox();
 	cmbSpace->clear();
@@ -85,7 +83,7 @@ void ZEDTransformationToolbar::SetupUI()
 	cmbSpace->addItem("Local Space");
 	cmbSpace->addItem("Parent Space");
 	cmbSpace->addItem("View Space");
-	Toolbar->addWidget(cmbSpace);
+	GetToolbar()->addWidget(cmbSpace);
 
 	cmbPivot = new QComboBox();
 	cmbPivot->clear();
@@ -93,35 +91,35 @@ void ZEDTransformationToolbar::SetupUI()
 	cmbPivot->addItem("Focused Object Pivot");
 	cmbPivot->addItem("Center Pivot");
 	cmbPivot->addItem("World Pivot");
-	Toolbar->addWidget(cmbPivot);
+	GetToolbar()->addWidget(cmbPivot);
 	
-	Toolbar->addSeparator();
+	GetToolbar()->addSeparator();
 
 	QLabel* lblX = new QLabel();
 	lblX->setText("x:");
-	Toolbar->addWidget(lblX);
+	GetToolbar()->addWidget(lblX);
 
 	txtX = new QDoubleSpinBox();
-	Toolbar->addWidget(txtX);
+	GetToolbar()->addWidget(txtX);
 
 	QLabel* lblY = new QLabel();
 	lblY->setText("y:");
-	Toolbar->addWidget(lblY);
+	GetToolbar()->addWidget(lblY);
 
 	txtY = new QDoubleSpinBox();
-	Toolbar->addWidget(txtY);
+	GetToolbar()->addWidget(txtY);
 
 	QLabel* lblZ = new QLabel();
 	lblZ->setText("z:");
-	Toolbar->addWidget(lblZ);
+	GetToolbar()->addWidget(lblZ);
 
 	txtZ = new QDoubleSpinBox();
-	Toolbar->addWidget(txtZ);
+	GetToolbar()->addWidget(txtZ);
 }
 
 void ZEDTransformationToolbar::UpdateUI()
 {
-	Toolbar->setEnabled(GetTransformationManager() != NULL);
+	GetToolbar()->setEnabled(GetTransformationManager() != NULL && GetEditor()->GetFileState() != ZED_ES_NONE);
 
 	if (GetTransformationManager() == NULL)
 		return;
@@ -221,7 +219,7 @@ ZEDTransformationToolbar::ZEDTransformationToolbar()
 
 ZEDTransformationToolbar::~ZEDTransformationToolbar()
 {
-	delete Toolbar;
+
 }
 
 void ZEDTransformationToolbar::actSelect_triggered()
@@ -311,11 +309,6 @@ void ZEDTransformationToolbar::txtZ_valueChanged(double d)
 		return;
 
 	GetTransformationManager()->SetZ(d);
-}
-
-QToolBar* ZEDTransformationToolbar::GetToolbar()
-{
-	return Toolbar;
 }
 
 ZEDTransformationManager* ZEDTransformationToolbar::GetTransformationManager()

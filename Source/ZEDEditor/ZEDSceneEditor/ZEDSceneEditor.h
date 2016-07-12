@@ -42,7 +42,7 @@ class ZEDViewportController;
 class ZEDObjectBrowser;
 class ZEDClassBrowser;
 class ZEDAssetBrowser;
-class ZEDPropertyEditor;
+class ZEDPropertyWindow;
 class ZEDSelectionToolbar;
 class ZEDTransformationToolbar;
 class ZEScene;
@@ -56,7 +56,7 @@ class ZEDSceneEditor : public ZEDEditor
 		ZEDObjectBrowser*					ObjectBrowser;
 		ZEDClassBrowser*					ClassBrowser;
 		ZEDAssetBrowser*					AssetBrowser;
-		ZEDPropertyEditor*					PropertyEditor;
+		ZEDPropertyWindow*					PropertyWindow;
 		ZEDSelectionToolbar*				SelectionToolbar;
 		ZEDTransformationToolbar*			TransformationToolbar;
 		ZEScene*							Scene;

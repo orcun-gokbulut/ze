@@ -39,6 +39,9 @@
 
 bool ZEMCParser::ParseAttribute(ZEMCAttribute& Data, const AnnotateAttr* Attribute)
 {
+	if (!AnnotateAttr::classof(Attribute))
+		return false;
+
 	std::string Temp = Attribute->getAnnotation().str();
 	const char* AttributeText = Temp.c_str();
 

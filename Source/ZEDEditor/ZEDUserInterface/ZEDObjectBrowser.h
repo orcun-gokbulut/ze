@@ -35,23 +35,26 @@
 
 #pragma once
 
-#include "ZEDCore/ZEDComponent.h"
-#include <QWidget>
+#include "ZEDWindow.h"
+#include <QPoint>
 
 class Ui_ZEDObjectBrowser;
+class QWidget;
 class ZEDObjectTree;
 class ZEDObjectWrapper;
 
-class ZEDObjectBrowser : public QWidget, public ZEDComponent
+class ZEDObjectBrowser : public ZEDWindow
 {
 	Q_OBJECT
 	private:
+		QWidget*							Widget;
 		Ui_ZEDObjectBrowser*				Form;
 
 		QPoint								DragStartPos;
 		ZEDObjectWrapper*					DragWrapper;
 
 		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 		bool								CheckDrop();
 		void								Drag();
@@ -67,6 +70,6 @@ class ZEDObjectBrowser : public QWidget, public ZEDComponent
 	public:
 		ZEDObjectTree*						GetObjectTree();
 
-											ZEDObjectBrowser(QWidget* Parent = NULL);
+											ZEDObjectBrowser();
 											~ZEDObjectBrowser();
 };

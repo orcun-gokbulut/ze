@@ -80,7 +80,7 @@ void ZEDClassBrowser::UpdateUI()
 
 bool ZEDClassBrowser::InitializeInternal()
 {
-	if (!ZEDComponent::InitializeInternal())
+	if (!ZEDWindow::InitializeInternal())
 		return false;
 
 	GetEditor()->AddComponent(Form->trwClasses);
@@ -88,6 +88,13 @@ bool ZEDClassBrowser::InitializeInternal()
 	UpdateUI();
 
 	return true;
+}
+
+bool ZEDClassBrowser::DeinitializeInternal()
+{
+	GetEditor()->RemoveComponent(Form->trwClasses);
+
+	return ZEDWindow::DeinitializeInternal();
 }
 
 void ZEDClassBrowser::SelectionEvent(const ZEDSelectionEvent* Event)
@@ -165,10 +172,15 @@ ZEDClassTree* ZEDClassBrowser::GetClassTree()
 	return Form->trwClasses;
 }
 
-ZEDClassBrowser::ZEDClassBrowser(QWidget* Parent) : QWidget(Parent)
+ZEDClassBrowser::ZEDClassBrowser()
 {
+	SetName("Class Browser");
+
+	Widget = new QWidget();
+	SetWidget(Widget);
+
 	Form = new Ui_ZEDClassBrowser();
-	Form->setupUi(this);
+	Form->setupUi(Widget);
 
 	Form->trwClasses->viewport()->installEventFilter(this);
 	Form->trwClasses->setMouseTracking(true);
@@ -183,4 +195,5 @@ ZEDClassBrowser::ZEDClassBrowser(QWidget* Parent) : QWidget(Parent)
 ZEDClassBrowser::~ZEDClassBrowser()
 {
 	delete Form;
+	delete Widget;
 }

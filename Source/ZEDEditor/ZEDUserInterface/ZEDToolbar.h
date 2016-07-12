@@ -36,12 +36,28 @@
 #pragma once
 
 #include "ZEDUserInterfaceComponent.h"
+#include "ZECommon.h"
 
 class QToolBar;
 
 class ZEDToolbar : public ZEDUserInterfaceComponent
 {
 	ZE_OBJECT
+	private:
+		QToolBar*					Toolbar;
+
+	protected:
+		virtual void				SetName(const ZEString& Name);
+
+									ZEDToolbar();
+		virtual						~ZEDToolbar();
+
 	public:
-		virtual QToolBar*			GetToolbar() = 0;
+		QToolBar*					GetToolbar();
+
+		void						SetEnabled(bool Enabled);
+		bool						GetEnabled();
+
+		void						SetVisible(bool Visible);
+		bool						GetVisible();
 };

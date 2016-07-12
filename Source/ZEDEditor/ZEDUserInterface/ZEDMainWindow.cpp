@@ -80,9 +80,22 @@ bool ZEDMainWindow::eventFilter(QObject* Object, QEvent* Event)
 	return false;
 }
 
-void ZEDMainWindow::ToolbarActionCallback(ZEDMenu* Menu)
+void ZEDMainWindow::WindowMenuCallback(ZEDMenu* Menu)
 {
+	ZEDWindow* Window = static_cast<ZEDWindow*>(Menu->GetUserData());
+	if (Window == NULL)
+		return;
 
+	Window->SetVisible(Menu->GetChecked());
+}
+
+void ZEDMainWindow::ToolbarMenuCallback(ZEDMenu* Menu)
+{
+	ZEDToolbar* Toolbar = static_cast<ZEDToolbar*>(Menu->GetUserData());
+	if (Toolbar == NULL)
+		return;
+
+	Toolbar->SetVisible(Menu->GetChecked());
 }
 
 ZEDMainWindow::ZEDMainWindow()
@@ -132,25 +145,46 @@ const ZEArray<ZEDToolbar*>& ZEDMainWindow::GetToolbars()
 	return Toolbars;
 }
 
-void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar)
+void ZEDMainWindow::AddToolbar(ZEDToolbar* Toolbar, ZEDToolbarDefaults Default)
 {
 	zeCheckError(Toolbar == NULL, ZE_VOID, "Toolbar is NULL.");
 	zeCheckError(Toolbar->GetMainWindow() != NULL, ZE_VOID, "Toolbar already added to a Main Window. Toolbar Name: \"%s\".", Toolbar->GetName().ToCString());
 
 	Toolbars.Add(Toolbar);
 	GetEditor()->AddComponent(Toolbar);
-	GetMainWindow()->addToolBar(Toolbar->GetToolbar());
 
-	QAction* Action = new QAction(this);
-	Action->setText(Toolbar->GetName().ToCString());
-	Action->setCheckable(true);
-	Action->setChecked(Toolbar->GetToolbar()->isVisible());
-	QObject::connect(Toolbar->GetToolbar(), SIGNAL(visibilityChanged(bool)), Toolbar->Action, SLOT(setChecked(bool)));
-	QObject::connect(Toolbar->Action, SIGNAL(toggled(bool)), Toolbar->GetToolbar(), SLOT(setVisible(bool)));
+	switch (Default & 0xF0)
+	{
+		case ZED_WD_DOCK_LEFT:
+			MainWindow->addToolBar(Qt::LeftToolBarArea, Toolbar->GetToolbar());
+			break;
+
+		case ZED_WD_DOCK_RIGHT:
+			MainWindow->addToolBar(Qt::RightToolBarArea, Toolbar->GetToolbar());
+			break;
+
+		case ZED_WD_DOCK_TOP:
+			MainWindow->addToolBar(Qt::TopToolBarArea, Toolbar->GetToolbar());
+			break;
+
+		case ZED_WD_DOCK_BOTTOM:
+			MainWindow->addToolBar(Qt::BottomToolBarArea, Toolbar->GetToolbar());
+			break;
+
+		default:
+			MainWindow->addToolBar(Qt::NoToolBarArea, Toolbar->GetToolbar());
+			break;
+	}
+	
+	Toolbar->SetVisible(Default & ZED_WD_VISIBLE);
 
 	Toolbar->Menu = new ZEDMenu();
 	Toolbar->Menu->SetName(Toolbar->GetName());
 	Toolbar->Menu->SetSection(Toolbar->GetCategory());
+	Toolbar->Menu->SetCheckable(true);
+	Toolbar->Menu->SetChecked(Default & ZED_WD_VISIBLE);
+	Toolbar->Menu->SetUserData(Toolbar);
+	Toolbar->Menu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDMainWindow, ToolbarMenuCallback, this));
 	AddMenu("User Interface/Toolbars", Toolbar->Menu);
 }
 
@@ -173,28 +207,68 @@ const ZEArray<ZEDWindow*>& ZEDMainWindow::GetWindows()
 	return Windows;
 }
 
-void ZEDMainWindow::AddWindow(ZEDWindow* Window)
+void ZEDMainWindow::AddWindow(ZEDWindow* Window, ZEDWindowDefaults Default)
 {
 	zeCheckError(Window == NULL, ZE_VOID, "Window is NULL.");
 	zeCheckError(Window->GetMainWindow() == this, ZE_VOID, "Window is already added to Main Window. Window Name: \"%s\".", Window->GetName().ToCString());
 	
 	Windows.Add(Window);
+	GetEditor()->AddComponent(Window);
 
-	QAction* Action = new QAction(this);
-	Action->setText(Window->GetName().ToCString());
-	Action->setCheckable(true);
-	Action->setChecked(Window->GetWidget()->isVisible());
-	connect(Window->GetWidget(), SIGNAL(visibilityChanged(bool)), Window->Action, SLOT(setChecked(bool)));
-	connect(Window->Action, SIGNAL(toggled(bool)), Window->GetWidget(), SLOT(setVisible(bool)));
+	switch (Default & 0xF0)
+	{
+		case ZED_WD_DOCK_LEFT:
+			MainWindow->addDockWidget(Qt::LeftDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_DOCK_RIGHT:
+			MainWindow->addDockWidget(Qt::RightDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_DOCK_TOP:
+			MainWindow->addDockWidget(Qt::TopDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_DOCK_BOTTOM:
+			MainWindow->addDockWidget(Qt::BottomDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_STACK_LEFT:
+			MainWindow->addDockWidget(Qt::LeftDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_STACK_RIGHT:
+			MainWindow->addDockWidget(Qt::RightDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_STACK_TOP:
+			MainWindow->addDockWidget(Qt::TopDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		case ZED_WD_STACK_BOTTOM:
+			MainWindow->addDockWidget(Qt::BottomDockWidgetArea, Window->GetDockWidget());
+			break;
+
+		default:
+			MainWindow->addDockWidget(Qt::NoDockWidgetArea, Window->GetDockWidget());
+			break;
+	}
+
+	Window->SetVisible(Default & ZED_WD_VISIBLE);
 
 	Window->Menu = new ZEDMenu();
 	Window->Menu->SetName(Window->GetName());
 	Window->Menu->SetSection(Window->GetCategory());
+	Window->Menu->SetCheckable(true);
+	Window->Menu->SetChecked(Default & ZED_WD_VISIBLE);
+	Window->Menu->SetUserData(Window);
+	Window->Menu->SetCallback(ZEDelegateMethod(ZEDMenuCallback, ZEDMainWindow, WindowMenuCallback, this));
 
-	AddMenu("UserInterface", Window->Menu);
-	
-	if (IsInitialized())
-		Window->InitializeInternal();
+	if (Window->GetCategory().IsEmpty())
+		AddMenu("User Interface/Windows", Window->Menu);
+	else
+		AddMenu(ZEFormat::Format("User Interface/Windows/{0}", Window->GetCategory()), Window->Menu);
+
 }
 
 void ZEDMainWindow::RemoveWindow(ZEDWindow* Window)

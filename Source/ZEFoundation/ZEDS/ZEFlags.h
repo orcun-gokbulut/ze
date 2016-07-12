@@ -113,41 +113,9 @@ class ZEFlagsBase
 			return Value;
 		}
 
-		inline ZEFlagsBase<Type> operator&(const Type& Other) const
-		{
-			return ZEFlagsBase<Type>(this->Value & Other);		
-		}
-
-		inline ZEFlagsBase<Type> operator&(const ZEFlagsBase<Type>& Other) const
-		{
-			return ZEFlagsBase<Type>(this->Value & Other.Value);			
-		}
-
-		inline ZEFlagsBase<Type>& operator&=(const Type& Other)
-		{
-			this->Value &= Other;
-			return *this;
-		}
-
 		inline ZEFlagsBase<Type>& operator&=(const ZEFlagsBase<Type>& Other)
 		{
 			this->Value &= Other.Value;
-			return *this;
-		}
-
-		inline ZEFlagsBase<Type> operator|(const Type& Other) const
-		{
-			return ZEFlagsBase<Type>(this->Value | Other);
-		}
-
-		inline ZEFlagsBase<Type> operator|(const ZEFlagsBase<Type>& Other) const
-		{
-			return ZEFlagsBase<Type>(this->Value | Other.Value);
-		}
-
-		inline ZEFlagsBase<Type>& operator|=(const Type& Other)
-		{
-			this->Value |= Other;
 			return *this;
 		}
 
@@ -157,39 +125,12 @@ class ZEFlagsBase
 			return *this;
 		}
 
-		inline ZEFlagsBase<Type> operator^(const Type& Other) const
-		{
-			return ZEFlagsBase<Type>(this->Value ^ Other);
-		}
-
-		inline ZEFlagsBase<Type> operator^(const ZEFlagsBase<Type>& Other) const
-		{
-			return ZEFlagsBase<Type>(this->Value ^ Other.Value);
-		}
-
-		inline ZEFlagsBase<Type>& operator^=(const Type& Other)
-		{
-			this->Value ^= Other;
-			return *this;
-		}
-
 		inline ZEFlagsBase<Type>& operator^=(const ZEFlagsBase<Type>& Other)
 		{
 			this->Value ^= Other.Value;
 			return *this;
 		}
 
-		inline ZEFlagsBase<Type>& operator~() const
-		{
-			return ZEFlagsBase<Type>(~this->Value);
-		}
-
-		inline ZEFlagsBase<Type>& operator=(const Type& Other)
-		{
-			this->Value = Other;
-			return *this;
-		}
-		
 		inline ZEFlagsBase<Type>& operator=(const ZEFlagsBase<Type>& Other)
 		{
 			this->Value = Other.Value;
@@ -201,7 +142,7 @@ class ZEFlagsBase
 			Value = 0;
 		}
 
-		inline ZEFlagsBase(const Type& Value)
+		inline ZEFlagsBase(Type Value)
 		{
 			this->Value = Value;
 		}
