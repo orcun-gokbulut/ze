@@ -35,19 +35,9 @@
 
 #include "ZEModule.h"
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEModule, ZEExtension, NULL)
-
-bool ZEModule::InitializeSelf()
+ZECore* ZEModule::GetCore()
 {
-	if (!ZEBase::InitializeSelf())
-		return false;
-
-	return true;
-}
-
-bool ZEModule::DeinitializeSelf()
-{
-	return ZEBase::DeinitializeSelf();
+	return Core;
 }
 
 bool ZEModule::GetEnabled()
@@ -59,18 +49,23 @@ void ZEModule::SetEnabled(bool Enabled)
 	this->Enabled = Enabled;
 }
 
+void ZEModule::PreProcess()
+{
+
+}
+
+void ZEModule::PostProcess()
+{
+
+}
+
 ZEModule::ZEModule()
 {
+	Core = NULL;
 	Enabled = true;
 }
 
 ZEModule::~ZEModule()
 {
-	Deinitialize();
-}
 
-void ZEModule::Destroy()
-{
-	this->Deinitialize();
-	delete this;
 }

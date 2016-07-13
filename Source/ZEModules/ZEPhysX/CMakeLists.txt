@@ -35,14 +35,14 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEPhysXModule.cpp					Sources)
+ze_add_source(ZEPhysXModule.h					Sources ZEMC)
 ze_add_source(ZEPhysXCollisionManager.cpp		Sources)
 ze_add_source(ZEPhysXCollisionManager.h			Sources)
 ze_add_source(ZEPhysXComponentBase.cpp			Sources)
 ze_add_source(ZEPhysXComponentBase.h			Sources)
 ze_add_source(ZEPhysXConversion.cpp				Sources)
 ze_add_source(ZEPhysXConversion.h				Sources)
-ze_add_source(ZEPhysXModule.cpp					Sources)
-ze_add_source(ZEPhysXModule.h					Sources)
 ze_add_source(ZEPhysXPhysicalCloth.cpp			Sources)
 ze_add_source(ZEPhysXPhysicalCloth.h			Sources)
 ze_add_source(ZEPhysXPhysicalJoint.cpp			Sources)
@@ -60,4 +60,5 @@ ze_add_source(ZEPhysXUserOutputStream.h			Sources)
 
 ze_add_library(TARGET ZEPhysX 
 	SOURCES ${Sources}
+	ZEMC ${ZEMC}
 	LIBS libPhysX2)

@@ -36,7 +36,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 ze_add_source(ZEGRGraphicsModule.cpp 		Sources)
-ze_add_source(ZEGRGraphicsModule.h 			Sources Headers)
+ze_add_source(ZEGRGraphicsModule.h 			Sources Headers ZEMC)
 ze_add_source(ZEGRContext.cpp				Sources)
 ze_add_source(ZEGRContext.h					Sources Headers)
 ze_add_source(ZEGRRenderState.cpp			Sources)
@@ -121,5 +121,5 @@ ze_add_source(ZEGRTracerEvent.h				Sources Headers)
 ze_add_library(TARGET ZEGraphics 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
-	LIBS ZEFoundation libFreeImage
-	ZEMC ${ZEMC})
+	ZEMC ${ZEMC}
+	LIBS ZEFoundation libFreeImage)

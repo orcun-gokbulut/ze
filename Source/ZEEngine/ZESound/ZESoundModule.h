@@ -78,8 +78,7 @@ struct ZESoundDevice
 
 class ZESoundModule : public ZEModule
 {
-	ZE_MODULE(ZESoundModule)
-
+	ZE_OBJECT
 	public:
 		static ZEOptionSection					SoundOptions;
 

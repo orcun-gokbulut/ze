@@ -45,8 +45,6 @@
 #include <dsound.h>
 #include "ZEMath/ZEMath.h"
 
-ZE_MODULE_DESCRIPTION(ZEDSModule, ZESoundModule, NULL)
-
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
 
@@ -133,16 +131,15 @@ const ZEArray<ZESoundDevice>& ZEDSModule::GetDeviceList()
 	return DeviceList;
 }
 
-bool ZEDSModule::InitializeSelf()
+bool ZEDSModule::InitializeInternal()
 {	
+	if (!ZESoundModule::InitializeInternal())
+		return false;
+
 	zeLog("Initializing DirectSound module.");
 	zeLog("Enumerating sound devices.");
 
-	if (!ZESoundModule::InitializeSelf())
-		return false;
-
 	HRESULT hr;
-	
 	DeviceList.Clear();
 	DeviceList.Add();
 
@@ -231,7 +228,7 @@ bool ZEDSModule::InitializeSelf()
 	return true;
 }
 
-bool ZEDSModule::DeinitializeSelf()
+bool ZEDSModule::DeinitializeInternal()
 {	
 	zeOutput("Destroying DirectSound.\r\n");
 	if (DSListener != NULL)
@@ -252,7 +249,7 @@ bool ZEDSModule::DeinitializeSelf()
 		DS = NULL;
 	}
 
-	return ZESoundModule::DeinitializeSelf();
+	return ZESoundModule::DeinitializeInternal();
 }
 
 void ZEDSModule::SetSpeakerLayout(ZESpeakerLayout Layout)
@@ -369,4 +366,9 @@ ZEListener* ZEDSModule::CreateListener()
 	ZEDSListener* Listener = new ZEDSListener();
 	Listeners.Add(Listener);
 	return Listener;
+}
+
+ZEDSModule* ZEDSModule::CreateInstance()
+{
+	return new ZEDSModule();
 }

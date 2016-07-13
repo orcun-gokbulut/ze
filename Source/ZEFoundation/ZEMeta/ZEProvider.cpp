@@ -46,11 +46,14 @@ const ZEArray<ZEClass*>& ZEProvider::GetClasses()
 	return Classes;
 }
 
-ZEArray<ZEClass*> ZEProvider::GetClasses(ZEClass* ParentClass)
+ZEArray<ZEClass*> ZEProvider::GetClasses(ZEClass* ParentClass, bool ExcludeParentClass)
 {
 	ZEArray<ZEClass*> DerivedClasses;
 	for (ZESize I = 0; I < Classes.GetCount(); I++)
 	{
+		if (ExcludeParentClass && Classes[I] == ParentClass)
+			continue;
+
 		if (ZEClass::IsDerivedFrom(ParentClass, Classes[I]))
 			DerivedClasses.Add(Classes[I]);
 	}

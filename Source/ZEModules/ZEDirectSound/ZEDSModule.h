@@ -53,13 +53,11 @@ enum ZESoundSourceType;
 #undef PlaySound
 class ZEDSModule : public ZESoundModule
 {
-	ZE_MODULE(ZEDSModule)
-
+	ZE_OBJECT
 	friend class ZEDSListener;
 	friend class ZEDSSoundSource;
 	friend class ZEDSSoundSource3D;
 	friend BOOL CALLBACK DSEnumProc(LPGUID GUID, LPCTSTR DeviceName, LPCTSTR DriverName, LPVOID ModulePointer);
-
 	private:
 		ZEArray<ZESoundDevice>					DeviceList;
 		ZEArray<GUID>							DeviceGUIDList;
@@ -84,8 +82,8 @@ class ZEDSModule : public ZESoundModule
 		void									UpdateVolumes(ZESoundSourceType SourceType);
 		void									UpdateStreams();
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZEDSModule();
 		virtual									~ZEDSModule();
@@ -121,5 +119,7 @@ class ZEDSModule : public ZESoundModule
 		virtual ZESoundSource*					CreateSoundSource();
 		virtual ZESoundSource3D*				CreateSoundSource3D();
 		virtual ZEListener*						CreateListener();
+
+		static ZEDSModule*						CreateInstance();
 };		
 #endif

@@ -39,26 +39,26 @@
 #define __ZE_PHYSX_PHYSICS_MODULE_H__
 
 #include "ZEPhysics/ZEPhysicsModule.h"
-#include "ZEPhysXUserOutputStream.h"
+
 #include "ZEDS/ZEArray.h"
 
 class NxPhysicsSDK;
 class NxCookingInterface;
 class ZEPhysXPhysicalWorld;
+class ZEPhysXUserOutputStream;
 
 class ZEPhysXModule : public ZEPhysicsModule
 {
-	ZE_MODULE(ZEPhysXModule)
-
+	ZE_OBJECT
 	friend class ZEPhysXPhysicalWorld;
 	private:
-		ZEPhysXUserOutputStream					OutputStream;
+		ZEPhysXUserOutputStream*				OutputStream;
 		NxPhysicsSDK*							PhysicsSDK;
 		NxCookingInterface*						CookingInterface;
 		ZEArray<ZEPhysXPhysicalWorld*>			PhysicalWorlds;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZEPhysXModule();
 		virtual									~ZEPhysXModule();
@@ -90,6 +90,8 @@ class ZEPhysXModule : public ZEPhysicsModule
 		virtual ZEPhysicalCharacterController*	CreatePhysicalController();
 
 		virtual void							ConnectToVisualDebugger(const char* Adress, ZEInt Port);
+
+		static ZEPhysXModule*					CreateInstance();
 };
 
 #endif

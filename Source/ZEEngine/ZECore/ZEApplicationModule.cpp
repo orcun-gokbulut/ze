@@ -34,9 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEApplicationModule.h"
-#include "ZEFile/ZEPathManager.h"
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEApplicationModule, ZEModule, NULL)
+#include "ZEFile/ZEPathManager.h"
 
 ZEData* ZEApplicationModule::GetLoadingScreen()
 {

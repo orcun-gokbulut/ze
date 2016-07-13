@@ -42,8 +42,7 @@ class ZEData;
 
 class ZEApplicationModule : public ZEModule
 {
-	ZE_MODULE(ZEApplicationModule)
-
+	ZE_OBJECT
 	public:
 		virtual ZEData*		GetLoadingScreen();
 		virtual ZEUInt32	GetLoadingScreenColor();

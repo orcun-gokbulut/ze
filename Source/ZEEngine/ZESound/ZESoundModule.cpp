@@ -41,8 +41,6 @@
 
 ZEOptionSection  ZESoundModule::SoundOptions;
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZESoundModule, ZEModule, &ZESoundModule::SoundOptions)
-
 static void OnOptionsChanged(ZEOption* Option)
 {
 	if (zeSound != NULL)

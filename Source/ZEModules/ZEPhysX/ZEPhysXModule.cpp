@@ -34,28 +34,30 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEPhysXModule.h"
+
+
+#include "ZEError.h"
+#include "ZECore/ZEConsole.h"
 #include "ZEPhysXPhysicalWorld.h"
 #include "ZEPhysXPhysicalRigidBody.h"
 #include "ZEPhysXPhysicalMesh.h"
 #include "ZEPhysXPhysicalJoint.h"
 #include "ZEPhysXPhysicalCloth.h"
-#include "ZEError.h"
-#include "ZECore/ZEConsole.h"
+#include "ZEPhysXUserOutputStream.h"
 
 #include <NxPhysics.h>
 #include <NxCooking.h>
 
-ZE_MODULE_DESCRIPTION(ZEPhysXModule, ZEPhysicsModule, NULL)
-
 ZEPhysXModule::ZEPhysXModule()
 {
+	OutputStream = new ZEPhysXUserOutputStream();
 	CookingInterface = NULL;
 	PhysicsSDK = NULL;
 }
 
 ZEPhysXModule::~ZEPhysXModule()
 {
-
+	delete OutputStream;
 }
 
 NxPhysicsSDK* ZEPhysXModule::GetPhysicsSDK()
@@ -68,14 +70,14 @@ NxCookingInterface* ZEPhysXModule::GetCookingInterface()
 	return CookingInterface;
 }
 
-bool ZEPhysXModule::InitializeSelf()
+bool ZEPhysXModule::InitializeInternal()
 {
-	if (!ZEPhysicsModule::InitializeSelf())
+	if (!ZEPhysicsModule::InitializeInternal())
 		return false;
 
 	zeLog("Initializing PhysX module.");
 
-	PhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, NULL, &OutputStream);
+	PhysicsSDK = NxCreatePhysicsSDK(NX_PHYSICS_SDK_VERSION, NULL, OutputStream);
 	if(!PhysicsSDK)
 	{
 		zeError("Can not create PhysX SDK.");
@@ -104,7 +106,7 @@ bool ZEPhysXModule::InitializeSelf()
 	return true;
 }
 
-bool ZEPhysXModule::DeinitializeSelf()
+bool ZEPhysXModule::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < PhysicalWorlds.GetCount(); I++)
 		PhysicalWorlds[I]->Destroy();
@@ -123,7 +125,7 @@ bool ZEPhysXModule::DeinitializeSelf()
 		CookingInterface = NULL;
 	}
 
-	return ZEPhysicsModule::DeinitializeSelf();
+	return ZEPhysicsModule::DeinitializeInternal();
 }
 
 void ZEPhysXModule::Process(float ElapsedTime)
@@ -213,4 +215,9 @@ ZEPhysicalCharacterController* ZEPhysXModule::CreatePhysicalController()
 void ZEPhysXModule::ConnectToVisualDebugger(const char* Adress, ZEInt Port)
 {
 	PhysicsSDK->getFoundationSDK().getRemoteDebugger()->connect(Adress, Port);
+}
+
+ZEPhysXModule* ZEPhysXModule::CreateInstance()
+{
+	return  new ZEPhysXModule();
 }

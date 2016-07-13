@@ -45,8 +45,6 @@
 #include <memory.h>
 #include <stdio.h>
 
-ZE_EXTENSION_DESCRIPTION(ZEWindowsInputModule, ZEInputDeviceModule, NULL)
-
 bool ZEWindowsInputSystemMessageHandler::Callback(MSG* Message)
 {
 	if (Module->RawInputCount >= ZE_MAX_RAW_INPUT_COUNT)
@@ -61,11 +59,23 @@ bool ZEWindowsInputSystemMessageHandler::Callback(MSG* Message)
 	return true;
 }
 
-bool ZEWindowsInputModule::InitializeSelf()
+ZEWindowsInputModule::ZEWindowsInputModule()
+{
+	MouseDevice = NULL;
+	KeyboardDevice = NULL;
+	RawInputCount = 0;
+}
+
+ZEWindowsInputModule::~ZEWindowsInputModule()
+{
+
+}
+
+bool ZEWindowsInputModule::InitializeInternal()
 {	
 	zeLog("Initializing Windows Input.");
 
-	if (!ZEInputDeviceModule::InitializeSelf())
+	if (!ZEInputDeviceModule::InitializeInternal())
 		return false;
 
 	RAWINPUTDEVICE Rid[2];    
@@ -105,13 +115,13 @@ bool ZEWindowsInputModule::InitializeSelf()
 	return true;
 }
 
-bool ZEWindowsInputModule::DeinitializeSelf()
+bool ZEWindowsInputModule::DeinitializeInternal()
 {
 	KeyboardDevice->Deinitialize();
 	MouseDevice->Deinitialize();
 	MessageHandler.Unregister();
 
-	return ZEInputDeviceModule::DeinitializeSelf();
+	return ZEInputDeviceModule::DeinitializeInternal();
 }
 
 void ZEWindowsInputModule::Process()
@@ -132,9 +142,8 @@ void ZEWindowsInputModule::Process()
 	RawInputCount = 0;
 }
 
-ZEWindowsInputModule::ZEWindowsInputModule()
+
+ZEWindowsInputModule* ZEWindowsInputModule::CreateInstance()
 {
-	MouseDevice = NULL;
-	KeyboardDevice = NULL;
-	RawInputCount = 0;
+	return new ZEWindowsInputModule();
 }

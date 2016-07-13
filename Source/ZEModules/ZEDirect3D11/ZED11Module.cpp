@@ -66,8 +66,6 @@
 
 #pragma warning(disable:4267)
 
-ZE_MODULE_DESCRIPTION(ZED11Module, ZEGRGraphicsModule, NULL)
-
 static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device* Device)
 {
 	IDXGIDevice* DXGIDevice;
@@ -103,9 +101,9 @@ static IDXGIFactory2* GetFactoryOfDevice(ID3D11Device* Device)
 	return DXGIFactory;
 }
 
-bool ZED11Module::InitializeSelf()
+bool ZED11Module::InitializeInternal()
 {
-	if (!ZEGRGraphicsModule::InitializeSelf())
+	if (!ZEGRGraphicsModule::InitializeInternal())
 		return false;
 
 	#ifdef ZE_DEBUG_ENABLE
@@ -183,7 +181,7 @@ bool ZED11Module::InitializeSelf()
 	return true;
 }
 
-bool ZED11Module::DeinitializeSelf()
+bool ZED11Module::DeinitializeInternal()
 {
 	ZEGR_RELEASE(Device);
 
@@ -196,7 +194,12 @@ bool ZED11Module::DeinitializeSelf()
 
 	Adapters.Clear();
 
-	return ZEGRGraphicsModule::DeinitializeSelf();
+	return ZEGRGraphicsModule::DeinitializeInternal();
+}
+
+ZED11Module::ZED11Module()
+{
+	Device = NULL;
 }
 
 ZED11StatePool* ZED11Module::GetStatePool()
@@ -313,7 +316,7 @@ ZEGRShaderCompiler* ZED11Module::CreateShaderCompiler()
 	return new ZED11ShaderCompiler();
 }
 
-ZED11Module::ZED11Module()
+ZED11Module* ZED11Module::CreateInstance()
 {
-	Device = NULL;
+	return new ZED11Module();
 }

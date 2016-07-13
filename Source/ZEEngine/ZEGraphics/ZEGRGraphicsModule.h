@@ -63,13 +63,13 @@ class ZEGRStructuredBuffer;
 
 class ZEGRGraphicsModule : public ZEModule
 {
-	ZE_MODULE(ZEGRGraphicsModule)
+	ZE_OBJECT
 	friend class ZEGRContext;
 	protected:
 		ZEGRCounter								Counter;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZEGRGraphicsModule();
 

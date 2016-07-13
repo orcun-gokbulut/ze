@@ -53,12 +53,10 @@ enum ZESoundSourceType;
 #undef PlaySound
 class ZEALModule : public ZESoundModule
 {
-	ZE_MODULE(ZEALModule)
-
+	ZE_OBJECT
 	friend class ZEALSoundListener;
 	friend class ZEALSoundSource;
 	friend class ZEALSoundSource3D;
-
 	private:
 		ZEArray<ZESoundDevice>					DeviceList;
 
@@ -81,8 +79,8 @@ class ZEALModule : public ZESoundModule
 		void									UpdateVolumes(ZESoundSourceType SourceType);
 		void									UpdateStreams();
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZEALModule();
 		virtual									~ZEALModule();
@@ -118,5 +116,7 @@ class ZEALModule : public ZESoundModule
 		virtual ZESoundSource*					CreateSoundSource();
 		virtual ZESoundSource3D*				CreateSoundSource3D();
 		virtual ZEListener*						CreateListener();
+
+		static ZEALModule*						CreateInstance();
 };		
 #endif

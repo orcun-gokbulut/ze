@@ -35,29 +35,30 @@
 
 #pragma once
 
-#include "ZEExtension.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
-#define ZE_MODULE ZE_EXTENSION
-#define ZE_MODULE_DESCRIPTION ZE_EXTENSION_DESCRIPTION
-#define ZE_MODULE_DESCRIPTION_ABSTRACT ZE_EXTENSION_DESCRIPTION_ABSTRACT
+class ZECore;
 
-
-class ZEModule : public ZEExtension
+class ZEModule : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
-	ZE_MODULE(ZEModule)
+	ZE_OBJECT
+	friend class ZECore;
 	private:
+		ZECore*							Core;
 		bool							Enabled;
 
 	protected:
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
-
 										ZEModule();
 		virtual							~ZEModule();
 
 	public:
+		ZECore*							GetCore();
+
 		virtual bool					GetEnabled();
 		virtual void					SetEnabled(bool Enabled);
 
-		virtual void					Destroy();
+		virtual void					PreProcess();
+		virtual void					PostProcess();
 };

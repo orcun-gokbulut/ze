@@ -56,8 +56,7 @@ class ZEPhysicalMaterial;
 
 class ZEPhysicsModule : public ZEModule
 {
-	ZE_MODULE(ZEPhysicsModule)
-
+	ZE_OBJECT
 	public:
 		virtual ZEPhysicalWorld*				CreatePhysicalWorld() = 0;
 

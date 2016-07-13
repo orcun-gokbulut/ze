@@ -114,15 +114,12 @@ endfunction()
 set(ze_process_source_parameters "ZEMC;ZEFC")
 macro(ze_process_sources)
 	if (PARAMETER_ZEMC)
-		ze_meta_compiler(TARGET ${PARAMETER_TARGET} FILES ${PARAMETER_ZEMC} OUTPUTS VARIABLE_ZEMC_OUTPUTS)
+		ze_meta_compiler(TARGET ${PARAMETER_TARGET} FILES ${PARAMETER_ZEMC})
 	endif()
 	
 	if (PARAMETER_ZEFC)
-		ze_file_compiler(TARGET ${PARAMETER_TARGET} FILES ${PARAMETER_ZEFC} OUTPUTS VARIABLE_ZEFC_OUTPUTS)
+		ze_file_compiler(TARGET ${PARAMETER_TARGET} FILES ${PARAMETER_ZEFC})
 	endif()
-	
-	set(PARAMETER_SOURCES ${PARAMETER_SOURCES} ${VARIABLE_ZEMC_OUTPUTS} ${VARIABLE_ZEFC_OUTPUTS})
-	source_group("Generated" FILES ${VARIABLE_ZEMC_OUTPUTS} ${VARIABLE_ZEFC_OUTPUTS})		
 endmacro()
 
 
@@ -146,7 +143,6 @@ function(ze_add_executable)
 		endif()
 	endif()
 
-	ze_process_sources()
 	ze_version_generate_zeversion_rc(${PARAMETER_TARGET} "exe" "${PARAMETER_DESCRIPTION}" PARAMETER_SOURCES)
 	
 	add_executable(${PARAMETER_TARGET} ${VARIABLE_EXECUTABLE_TYPE} ${PARAMETER_SOURCES})
@@ -165,6 +161,8 @@ function(ze_add_executable)
 	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})
 	ze_static_analysis(${PARAMETER_TARGET})
 	
+	ze_process_sources()
+
 	if (PARAMETER_INSTALL)
 		if (NOT PARAMETER_DESTINATION)
 			set(PARAMETER_DESTINATION "Bin")
@@ -185,7 +183,6 @@ function(ze_add_plugin)
 		return()
 	endif()
 
-	ze_process_sources()
 	ze_version_generate_zeversion_rc(${PARAMETER_TARGET} "dll" "${PARAMETER_DESCRIPTION}" PARAMETER_SOURCES)
 
 	add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
@@ -204,7 +201,9 @@ function(ze_add_plugin)
 	ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_LIBS})
 	ze_copy_runtime_dlls(TARGET ${PARAMETER_TARGET})
 	ze_static_analysis(${PARAMETER_TARGET})
-		
+
+	ze_process_sources()
+
 	if (PARAMETER_INSTALL)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Symbol)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Engine/Plugin/$(CONFIGURATION))
@@ -221,8 +220,6 @@ function (ze_add_library)
 		return()
 	endif()
 
-	ze_process_sources()
-	
 	if (PARAMETER_DLL)
 		ze_version_generate_zeversion_rc(${PARAMETER_TARGET} "dll" "${PARAMETER_DESCRIPTION}" PARAMETER_SOURCES)
 		add_library(${PARAMETER_TARGET} SHARED ${PARAMETER_SOURCES})
@@ -242,6 +239,8 @@ function (ze_add_library)
 	
 	ze_link(TARGET ${PARAMETER_TARGET} LIBS ${PARAMETER_LIBS})
 
+	ze_process_sources()
+		
 	if (PARAMETER_INSTALL)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY PDB_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Symbol)
 		ze_set_property_all_config(TARGET ${PARAMETER_TARGET} PROPERTY ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/Output/Lib/$(CONFIGURATION))

@@ -46,8 +46,6 @@
 #define MAX_SOUNDBUFFER_COUNT	256
 #define MapVector3(A, B)		(A).x = (B).x; (A).y = (B).y; (A).z = (B).z
 
-ZE_MODULE_DESCRIPTION(ZEALModule, ZESoundModule, NULL)
-
 const ZEArray<ZESoundDevice>& ZEALModule::GetDeviceList()
 {
 	return DeviceList;
@@ -93,11 +91,11 @@ ALCcontext* ZEALModule::GetContext()
 	return Context;
 }
 
-bool ZEALModule::InitializeSelf()
+bool ZEALModule::InitializeInternal()
 {	
 	zeLog("Initializing OpenAL module.");
 
-	if (!ZESoundModule::InitializeSelf())
+	if (!ZESoundModule::InitializeInternal())
 		return false;
 	
 
@@ -134,7 +132,7 @@ bool ZEALModule::InitializeSelf()
 	return true;
 }
 
-bool ZEALModule::DeinitializeSelf()
+bool ZEALModule::DeinitializeInternal()
 {	
 	zeLog("Destroying OpenAL.");
 
@@ -142,7 +140,7 @@ bool ZEALModule::DeinitializeSelf()
 	alcDestroyContext(Context);
 	alcCloseDevice(Device);
 
-	return ZESoundModule::DeinitializeSelf();
+	return ZESoundModule::DeinitializeInternal();
 }
 
 void ZEALModule::SetSpeakerLayout(ZESpeakerLayout Layout)
@@ -252,4 +250,9 @@ ZESoundSource3D* ZEALModule::CreateSoundSource3D()
 ZEListener* ZEALModule::CreateListener()
 {
 	return new ZEALListener();
+}
+
+ZEALModule* ZEALModule::CreateInstance()
+{
+	return new ZEALModule();
 }

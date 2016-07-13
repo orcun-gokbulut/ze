@@ -47,14 +47,13 @@ class ZEInputDeviceModule;
 
 class ZEInputModule : public ZEModule 
 {
-	ZE_MODULE(ZEInputModule)
-
+	ZE_OBJECT
 	private:
 		ZEArray<ZEInputDeviceModule*>		DeviceModules;
 		bool								Acquired;
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
 											ZEInputModule();
 
@@ -74,5 +73,6 @@ class ZEInputModule : public ZEModule
 		virtual void						Process();
 		
 		static ZEInputModule*				GetInstance();
+		static ZEInputModule*				CreateInstance();
 };
 #endif

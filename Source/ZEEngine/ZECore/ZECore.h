@@ -62,22 +62,18 @@ enum ZECoreState
 };
 
 class ZEModule;
-class ZEModuleManager;
 class ZEErrorManager;
 class ZEOptionManager;
 class ZEResourceManager;
 class ZECommandManager;
 class ZEConsole;
-class ZEWindow;
 class ZEGRGraphicsModule;
 class ZESoundModule;
 class ZEInputModule;
 class ZEPhysicsModule;
 class ZENetworkModule;
 class ZEApplicationModule;
-class ZEExtensionManager;
 class ZESystemMessageManager;
-class ZEPluginManager;
 class ZESystemMessageHandler;
 class ZERealTimeClock;
 class ZEProfiler;
@@ -100,9 +96,6 @@ class ZECore
 		float							ElapsedTime;
 
 		ZECrashHandler*					CrashHandler;
-		ZEModuleManager*				ModuleManager;
-		ZEExtensionManager*				ExtensionManager;
-		ZEPluginManager*				PluginManager;
 		ZEApplicationModule*			Application;
 		ZEErrorManager*					ErrorManager;
 		ZEOptionManager*				OptionManager;
@@ -123,6 +116,7 @@ class ZECore
 	public:
 		void							LoadClasses();
 
+		ZEModule*						FindModule(ZEClass* Class, const char* Name);
 		bool							InitializeModule(ZEModule* Module);
 		void							DeInitializeModule(ZEModule** Module);
 
@@ -137,9 +131,6 @@ class ZECore
 		ZEResourceManager*				GetResourceManager();
 		ZECommandManager*				GetCommands();
 		ZEConsole*						GetConsole();
-		ZEModuleManager*				GetModuleManager();
-		ZEExtensionManager*				GetExtensionManager();
-		ZEPluginManager*				GetPluginManager();
 		ZESystemMessageManager*			GetSystemMessageManager();
 		ZETimerManager*					GetTimerManager();
 		ZERealTimeClock*				GetRealTimeClock();
@@ -149,16 +140,16 @@ class ZECore
 		void							SetResourceDirector(const char* Directory);
 		const char*						GetResourceDirectory();
 
-		bool							SetGraphicsModule(ZEModule* Module);
+		bool							SetGraphicsModule(ZEGRGraphicsModule* Module);
 		ZEGRGraphicsModule*				GetGraphicsModule();
 
-		bool							SetSoundModule(ZEModule* Module);
+		bool							SetSoundModule(ZESoundModule* Module);
 		ZESoundModule*					GetSoundModule();
 
-		bool							SetInputModule(ZEModule* Module);
+		bool							SetInputModule(ZEInputModule* Module);
 		ZEInputModule*					GetInputModule();
 
-		bool							SetPhysicsModule(ZEModule* Module);
+		bool							SetPhysicsModule(ZEPhysicsModule* Module);
 		ZEPhysicsModule*				GetPhysicsModule();
 
 		bool							SetNetworkModule(ZENetworkModule* Module);

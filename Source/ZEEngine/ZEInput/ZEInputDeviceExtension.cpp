@@ -35,8 +35,6 @@
 
 #include "ZEInputDeviceExtension.h"
 
-ZE_EXTENSION_DESCRIPTION_ABSTRACT(ZEInputDeviceModule, ZEExtension, NULL)
-
 bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 {
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
@@ -56,7 +54,7 @@ bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 
 	Devices.Add(Device);
 
-	if (GetInitializationState() == ZE_BS_INITIALIZING || GetInitializationState() == ZE_BS_INITIALIZED)
+	if (IsInitializedOrInitializing())
 	{
 		if (!Device->Initialize())
 		{
@@ -70,7 +68,7 @@ bool ZEInputDeviceModule::RegisterDevice(ZEInputDevice* Device)
 
 void ZEInputDeviceModule::UnregisterDevice(ZEInputDevice* Device)
 {
-	if (GetInitializationState() == ZE_BS_DEINITIALIZING || GetInitializationState() == ZE_BS_NOT_INITIALIZED)
+	if (IsInitializedOrInitializing())
 		Device->Deinitialize();
 
 	Devices.RemoveValue(Device);
@@ -90,12 +88,12 @@ const ZEArray<ZEInputDevice*>& ZEInputDeviceModule::GetDevices()
 	return Devices;
 }
 
-bool ZEInputDeviceModule::DeinitializeSelf()
+bool ZEInputDeviceModule::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Devices.GetCount(); I++)
 		Devices[I]->Deinitialize();
 
-	return ZEExtension::Deinitialize();
+	return ZEModule::DeinitializeInternal();
 }
 
 void ZEInputDeviceModule::Acquire()

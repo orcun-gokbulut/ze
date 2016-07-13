@@ -57,8 +57,7 @@ class ZEWindowsInputSystemMessageHandler : public ZESystemMessageHandler
 
 class ZEWindowsInputModule : public ZEInputDeviceModule
 {
-	ZE_EXTENSION(ZEWindowsInputModule)
-
+	ZE_OBJECT
 	friend class ZEWindowsInputSystemMessageHandler;
 	private:
 		ZEWindowsInputSystemMessageHandler	MessageHandler;
@@ -67,14 +66,18 @@ class ZEWindowsInputModule : public ZEInputDeviceModule
 		ZEWindowsInputMouseDevice*			MouseDevice;
 		ZEWindowsInputKeyboardDevice*		KeyboardDevice;
 
-	protected:
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
+
+											ZEWindowsInputModule();
+		virtual								~ZEWindowsInputModule();
 
 	public:
 		virtual void						Process();
 
-											ZEWindowsInputModule();
+		static ZEWindowsInputModule*		CreateInstance();
+
 };
 
 #endif

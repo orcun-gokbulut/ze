@@ -45,6 +45,7 @@ ze_add_cmake_project(CMakeScripts
 		ze_merge_libraries.cmake
 		ze_merge_libraries_unix.cmake.in
 		ze_meta.cmake
+		ze_file_compiler.cmake
 		ze_platform.cmake
 		ze_static_check.cmake
 		ze_symbol_server.cmake

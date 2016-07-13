@@ -34,13 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEInputModule.h"
-#include "ZEInputDevice.h"
-#include "ZECore/ZECore.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEInputDeviceExtension.h"
-#include "ZECore/ZEExtensionManager.h"
 
-ZE_MODULE_DESCRIPTION(ZEInputModule, ZEModule, NULL)
+#include "ZEDS/ZEArray.h"
+#include "ZEMeta/ZEProvider.h"
+
+#include "ZECore/ZECore.h"
+#include "ZEInputDevice.h"
+#include "ZEInputDeviceExtension.h"
 
 ZEInputModule::ZEInputModule()
 {
@@ -88,23 +88,30 @@ void ZEInputModule::UnAcquire()
 		DeviceModules[I]->UnAcquire();
 }
 
-bool ZEInputModule::InitializeSelf()
+bool ZEInputModule::InitializeInternal()
 {
-	if (!ZEModule::InitializeSelf())
+	if (!ZEModule::InitializeInternal())
 		return false;
 
 	zeLog("Initializing Input.");
 
 	zeLog("Loading Input Device modules.");
-	ZEArray<ZEExtensionDescription*> DeviceModuleDescriptions = ZEExtensionManager::GetInstance()->GetExtensionDescriptions(ZEInputDeviceModule::Description());
+	ZEArray<ZEClass*> DeviceModuleClasses = ZEProvider::GetInstance()->GetClasses(ZEInputDeviceModule::Class(), true);
 
-	for (ZESize I = 0; I < DeviceModuleDescriptions.GetCount(); I++)
+	for (ZESize I = 0; I < DeviceModuleClasses.GetCount(); I++)
 	{
-		ZEInputDeviceModule* DeviceModule = (ZEInputDeviceModule*)DeviceModuleDescriptions[I]->CreateInstance();
+		ZEInputDeviceModule* DeviceModule = static_cast<ZEInputDeviceModule*>(DeviceModuleClasses[I]->CreateInstance());
+		if (DeviceModule == NULL)
+		{	
+			zeError("Cannot create instance of Input Device Module. Name: \"%s\".", DeviceModuleClasses[I]->GetName());
+			continue;
+		}
+
 		bool Result = DeviceModule->Initialize();
 		if (!Result)
 		{
 			zeError("Can not initialize input device module.");
+			DeviceModule->Destroy();
 			continue;
 		}
 
@@ -113,25 +120,22 @@ bool ZEInputModule::InitializeSelf()
 		const ZEArray<ZEInputDevice*>& Devices = DeviceModule->GetDevices();
 		for (ZESize I = 0; I < DeviceModule->GetDevices().GetCount(); I++)
 		{
-			if (!Devices[I]->IsInitialized())
-			{
-				if (!Devices[I]->Initialize())
-					zeError("Cannot initialize input device.");
-			}
+			if (!Devices[I]->Initialize())
+				zeError("Cannot initialize input device.");
 		}
 	}
 
 	return true;
 }
 
-bool ZEInputModule::DeinitializeSelf()
+bool ZEInputModule::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < DeviceModules.GetCount(); I++)
 		DeviceModules[I]->Destroy();
 
 	DeviceModules.Clear();
 
-	return ZEModule::DeinitializeSelf();
+	return ZEModule::DeinitializeInternal();
 }
 
 void ZEInputModule::Process()
@@ -147,4 +151,9 @@ void ZEInputModule::Process()
 ZEInputModule* ZEInputModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetInputModule();
+}
+
+ZEInputModule* ZEInputModule::CreateInstance()
+{
+	return new ZEInputModule();
 }

@@ -35,12 +35,12 @@
 
 cmake_minimum_required (VERSION 2.8)
 
+ze_add_source(ZEDSModule.cpp				Sources)
+ze_add_source(ZEDSModule.h					Sources ZEMC)
 ze_add_source(ZEDSComponentBase.cpp			Sources)
 ze_add_source(ZEDSComponentBase.h			Sources)
 ze_add_source(ZEDSListener.cpp				Sources)
 ze_add_source(ZEDSListener.h				Sources)
-ze_add_source(ZEDSModule.cpp				Sources)
-ze_add_source(ZEDSModule.h					Sources)
 ze_add_source(ZEDSSoundSource.cpp			Sources)
 ze_add_source(ZEDSSoundSource.h				Sources)
 ze_add_source(ZEDSSoundSource3D.cpp			Sources)
@@ -49,4 +49,5 @@ ze_add_source(ZEDSSoundSource3D.h			Sources)
 
 ze_add_library(TARGET ZEDirectSound 
 	SOURCES ${Sources}
+	ZEMC ${ZEMC}
 	LIBS libDirectSound)
