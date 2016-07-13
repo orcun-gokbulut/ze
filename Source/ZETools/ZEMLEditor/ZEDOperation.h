@@ -37,6 +37,8 @@
 #ifndef __ZED_OPERATION_H__
 #define __ZED_OPERATION_H__
 
+#include "ZEDestroyable.h"
+
 #include "ZEDS\ZEString.h"
 
 enum ZEDOperationStatus
@@ -46,7 +48,7 @@ enum ZEDOperationStatus
 	ZED_OS_NOT_DONE
 };
 
-class ZEDOperation
+class ZEDOperation : public ZEDestroyable
 {
 	friend class ZEDOperationManager;
 	private:
@@ -65,8 +67,6 @@ class ZEDOperation
 
 		bool Do();
 		bool Undo();
-
-		virtual void Destroy();
 
 		ZEDOperation();
 		virtual ~ZEDOperation();

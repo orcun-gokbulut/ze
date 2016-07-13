@@ -57,14 +57,15 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 		bool										Enabled;
 		bool										Visualize;
 
-		void										InitializeDebugDraw();
-
 	protected:
 		NxSceneDesc									SceneDesc;
 		NxScene*									Scene;
 
 		ZEArray<ZEPhysicalObject*>					PhysicalObjects;
 		ZEVector3									Gravity;
+		
+		virtual bool								InitializeInternal();
+		virtual bool								DeinitializeInternal();
 
 													ZEPhysXPhysicalWorld();
 		virtual										~ZEPhysXPhysicalWorld();
@@ -84,11 +85,6 @@ class ZEPhysXPhysicalWorld : public ZEPhysicalWorld, public ZEPhysXComponentBase
 
 		virtual void								SetEnabled(bool Enabled);
 		virtual bool								GetEnabled();
-
-		virtual bool								Initialize();
-		virtual void								Deinitialize();
-
-		virtual void								Destroy();
 
 		virtual void								Process(float ElapsedTime);
 		virtual void								Update();

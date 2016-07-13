@@ -1189,10 +1189,7 @@ ZEUInt32 ZEPhysXPhysicalJoint::GetCollisionEventFlags()
 	return NULL;
 }
 
-//////////////////////////////////////////////////////////////////////////
-
-
-bool ZEPhysXPhysicalJoint::Initialize()
+bool ZEPhysXPhysicalJoint::InitializeInternal()
 {
 	if (Joint != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
 		return false;
@@ -1208,13 +1205,15 @@ bool ZEPhysXPhysicalJoint::Initialize()
 	return true;
 }
 
-void ZEPhysXPhysicalJoint::Deinitialize()
+bool ZEPhysXPhysicalJoint::DeinitializeInternal()
 {
 	if (Joint != NULL)
 	{
 		PhysicalWorld->GetScene()->releaseJoint(*Joint);	
 		Joint = NULL;
 	}
+
+	return ZEPhysicalJoint::DeinitializeInternal();
 }
 
 ZEPhysXPhysicalJoint::ZEPhysXPhysicalJoint()

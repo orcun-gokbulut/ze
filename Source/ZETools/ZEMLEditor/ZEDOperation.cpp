@@ -74,11 +74,6 @@ bool ZEDOperation::Undo()
 	return Result;
 }
 
-void ZEDOperation::Destroy()
-{
-	delete this;
-}
-
 ZEDOperation::ZEDOperation()
 {
 	Status = ZED_OS_NONE;

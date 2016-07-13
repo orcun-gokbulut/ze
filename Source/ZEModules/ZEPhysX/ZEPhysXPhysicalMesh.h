@@ -50,7 +50,6 @@ class ZEPhysXPhysicalWorld;
 class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 {
 	friend class ZEPhysXModule;
-
 	private:
 		ZEPhysXPhysicalWorld*				PhysicalWorld;
 		
@@ -66,6 +65,9 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 		float								SkinWidth;
 
 		void								ReCreate();
+
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();	
 
 											ZEPhysXPhysicalMesh();
 		virtual								~ZEPhysXPhysicalMesh();
@@ -94,11 +96,7 @@ class ZEPhysXPhysicalMesh : public ZEPhysicalMesh, private ZEPhysXComponentBase
 													const ZEPhysicalMaterial* Materials, ZEUInt MaterialCount);
 
 		virtual void						SetCollisionCallbackFlags(ZEUInt32 CollisionCallbackFlags);
-		virtual ZEUInt32						GetCollisionCallbackFlags();
-
-		virtual bool						Initialize();
-		virtual void						Deinitialize();	
-
+		virtual ZEUInt32					GetCollisionCallbackFlags();
 };
 
 #endif

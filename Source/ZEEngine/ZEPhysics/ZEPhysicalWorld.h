@@ -40,6 +40,9 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZERay.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
+#include "ZEInitializable.h"
 
 class ZEPhysicsWorldInfo;
 class ZEPhysicsCollision;
@@ -55,18 +58,19 @@ struct ZERayCastResultDetails
 	float	  ImpactDistance;
 };
 
-enum ZEPhysicsRayCastFilterShapeType
+ZE_ENUM(ZEPhysicsRayCastFilterShapeType)
 {
 	ZE_PRCFST_STATIC_SHAPES		= 1,
 	ZE_PRCFST_DYNAMIC_SHAPES	= 2,
 	ZE_PRCFST_ALL_SHAPES		= 3,
 };
 
-class ZEPhysicalWorld
+class ZEPhysicalWorld : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
+	ZE_OBJECT
 	protected:
-										ZEPhysicalWorld(){}
-		virtual							~ZEPhysicalWorld(){}
+										ZEPhysicalWorld();
+		virtual							~ZEPhysicalWorld();
 
 	public:
 		virtual void					SetGravity(const ZEVector3& Gravity) = 0;
@@ -83,13 +87,8 @@ class ZEPhysicalWorld
 		virtual void					SetVisualize(bool Enabled) = 0;
 		virtual bool					GetVisualize() = 0;
 
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
-
 		virtual void					Process(float ElapsedTime) = 0;
 		virtual void					Update() = 0;
-		
-		virtual void					Destroy();
 
 		virtual ZEPhysicalShape*		RayCastToClosestShape(ZERay Ray, ZEPhysicsRayCastFilterShapeType Type, ZERayCastResultDetails& ResultDetails) = 0;
 

@@ -109,7 +109,7 @@ ZEEntityResult ZESector::LoadInternal()
 	zeCheckError(!SubEntitiesNode.IsValid(), ZE_ER_FAILED, "ZESector Load failed. Corrupt ZESector file. File Name: \"%s\".", SectorFile.ToCString());
 
 	ZESize ChildNodeCount = SubEntitiesNode.GetNodeCount("Entity");
-	zeCheckError(LoadingIndex >= ChildNodeCount, ZE_ER_FAILED, "ZESector Load failed. ZESector child loading index greater than child count. Sector Name: \"%s\".", GetName());
+	zeCheckError(LoadingIndex >= ChildNodeCount, ZE_ER_FAILED, "ZESector Load failed. ZESector child loading index greater than child count. Sector Name: \"%s\".", GetName().ToCString());
 
 	ZESize ChildLoadPassCount = 5;
 	ZEClass* NewChildEntityClass = NULL;
@@ -122,7 +122,8 @@ ZEEntityResult ZESector::LoadInternal()
 			ZEMLReaderNode ChildEntityNode = SubEntitiesNode.GetNode("Entity", LoadingIndex);
 
 			NewChildEntityClass = ZEProvider::GetInstance()->GetClass(ChildEntityNode.ReadString("Class"));
-			zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\".", GetName());
+			zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\", Class Name: \"%s\".", 
+				GetName().ToCString(), ChildEntityNode.ReadString("Class").ToCString());
 
 			NewChildEntity = (ZEEntity*)NewChildEntityClass->CreateInstance();
 
@@ -385,11 +386,6 @@ bool ZESector::Unserialize(ZEMLReaderNode* Unserializer)
 	SetSectorFile(PropertiesNode.ReadString("SectorFile"));
 
 	return true;
-}
-
-void ZESector::Destroy()
-{
-	delete this;
 }
 
 ZESector* ZESector::CreateInstance()

@@ -163,11 +163,6 @@ void ZEDEditorCore::Exit()
 	std::exit(EXIT_SUCCESS);
 }
 
-void ZEDEditorCore::Destroy()
-{
-	delete this;
-}
-
 ZEDEditorCore* ZEDEditorCore::CreateInstance()
 {
 	return new ZEDEditorCore();

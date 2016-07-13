@@ -33,17 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
 #ifndef	__ZE_PHYSICAL_SHAPES_H__
 #define __ZE_PHYSICAL_SHAPES_H__
+
+#include "ZEMeta/ZEObject.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPhysicalMaterial.h"
 
-enum  ZEPhysicalShapeType
+
+ZE_ENUM(ZEPhysicalShapeType)
 {
 	ZE_PST_BOX			= 0,
 	ZE_PST_SPHERE		= 1,
@@ -54,8 +56,9 @@ enum  ZEPhysicalShapeType
 
 class ZEPhysicalObject;
 
-class ZEPhysicalShape
+class ZEPhysicalShape : public ZEObject
 {
+	ZE_OBJECT
 	private:
 		ZEPhysicalObject*				Owner;
 		ZEVector3						Position;
@@ -82,8 +85,9 @@ class ZEPhysicalShape
 		virtual							~ZEPhysicalShape();
 };
 
-class  ZEPhysicalBoxShape : public  ZEPhysicalShape
+class ZEPhysicalBoxShape : public  ZEPhysicalShape
 {
+	ZE_OBJECT
 	private:
 		float							Width;
 		float							Height;
@@ -106,6 +110,7 @@ class  ZEPhysicalBoxShape : public  ZEPhysicalShape
 
 class  ZEPhysicalSphereShape : public  ZEPhysicalShape
 {
+	ZE_OBJECT
 	private:
 		float							Radius;
 
@@ -120,6 +125,7 @@ class  ZEPhysicalSphereShape : public  ZEPhysicalShape
 
 class  ZEPhysicalCapsuleShape : public  ZEPhysicalShape
 {
+	ZE_OBJECT
 	private:
 		float							Radius;
 		float							Height;
@@ -138,6 +144,7 @@ class  ZEPhysicalCapsuleShape : public  ZEPhysicalShape
 
 class ZEPhysicalCylinderShape : public  ZEPhysicalShape
 {
+	ZE_OBJECT
 	private:
 		float							Radius;
 		float							Height;
@@ -156,6 +163,7 @@ class ZEPhysicalCylinderShape : public  ZEPhysicalShape
 
 class  ZEPhysicalConvexShape : public  ZEPhysicalShape
 {
+	ZE_OBJECT
 	private:
 		ZEArray<ZEVector3>				ConvexVertices;
 

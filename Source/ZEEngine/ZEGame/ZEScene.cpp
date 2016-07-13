@@ -330,21 +330,6 @@ void ZEScene::ClearEntities()
 		Entities.GetFirstItem()->Destroy();
 }
 
-void ZEScene::Destroy()
-{
-	Deinitialize();
-
-	ClearEntities();
-
-	if (PhysicalWorld != NULL)
-	{
-		PhysicalWorld->Destroy();
-		PhysicalWorld = NULL;
-	}
-
-	delete this;
-}
-
 void ZEScene::Tick(float ElapsedTime)
 {
 	if (!Enabled)
@@ -518,10 +503,13 @@ ZEScene::ZEScene()
 
 ZEScene::~ZEScene()
 {
-	Deinitialize();
+	ClearEntities();
 
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		Entities[I]->Destroy();
+	if (PhysicalWorld != NULL)
+	{
+		PhysicalWorld->Destroy();
+		PhysicalWorld = NULL;
+	}
 }
 
 ZEScene* ZEScene::CreateInstance()

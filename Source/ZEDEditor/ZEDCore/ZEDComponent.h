@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 class ZEDEditor;
 class ZEDEditorEvent;
@@ -50,7 +51,7 @@ class ZEDViewportMouseEvent;
 class ZEDViewportChangedEvent;
 class ZEDViewportRenderEvent;
 
-class ZEDComponent : public ZEObject, public ZEInitializable
+class ZEDComponent : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEDEditor;
@@ -77,6 +78,4 @@ class ZEDComponent : public ZEObject, public ZEInitializable
 
 	public:
 		ZEDEditor*						GetEditor();
-
-		virtual void					Destroy();
 };

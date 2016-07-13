@@ -33,14 +33,19 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-
 #pragma once
 #ifndef	__ZE_PHYSICAL_MATERIAL_H__
 #define __ZE_PHYSICAL_MATERIAL_H__
 
+#include "ZEMeta\ZEObject.h"
+#include "ZEInitializable.h"
+#include "ZEDestroyable.h"
+
 class ZEPhysicalWorld;
-class ZEPhysicalMaterial
+
+class ZEPhysicalMaterial : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
+	ZE_OBJECT
 	protected:
 										ZEPhysicalMaterial();
 		virtual							~ZEPhysicalMaterial();
@@ -52,18 +57,12 @@ class ZEPhysicalMaterial
 		virtual void					SetStaticFriction(float Friction) = 0;
 		virtual float					GetStaticFriction() const = 0;
 
-
 		virtual void					SetDynamicFriction(float Friction) = 0;
 		virtual float					GetDynamicFriction() const = 0;
 
 		virtual void					SetRestitution(float Restitution) = 0;
 		virtual float					GetRestitution() const = 0;
 		
-		virtual bool					Initialize() = 0;
-		virtual void					Deinitialize() = 0;
-		
-		virtual void					Destroy() = 0;
-
 		static ZEPhysicalMaterial*		CreateInstance();
 };
 

@@ -43,5 +43,5 @@ ZEPhysicalObjectType ZEPhysicalRigidBody::GetPhysicalObjectType()
 
 ZEPhysicalRigidBody* ZEPhysicalRigidBody::CreateInstance()
 {
-	return zePhysics->CreatePhysicalRigidBody();
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalRigidBody();
 }

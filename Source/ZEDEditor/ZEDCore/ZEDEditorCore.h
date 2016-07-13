@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 #include "ZEDS\ZEArray.h"
 
@@ -44,7 +45,7 @@ class ZECore;
 class ZEDEditor;
 class QApplication;
 
-class ZEDEditorCore : public ZEObject, public ZEInitializable
+class ZEDEditorCore : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	private:
@@ -70,8 +71,6 @@ class ZEDEditorCore : public ZEObject, public ZEInitializable
 
 		void								Execute();
 		void								Exit();
-
-		void								Destroy();
 
 		static ZEDEditorCore*				CreateInstance();
 };

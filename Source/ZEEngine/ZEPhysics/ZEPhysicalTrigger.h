@@ -44,13 +44,13 @@ class	ZEPhysicalWorld;
 class	ZEPhysicalObject;
 class	ZEPhysicalShape;
 
-enum ZEPhysicalTriggerType
+ZE_ENUM(ZEPhysicalTriggerType)
 {
 	ZE_PTT_DYNAMIC			= 0,
 	ZE_PTT_KINEMATIC		= 1
 };
 
-enum ZEPhysicalTriggerActivationType
+ZE_ENUM(ZEPhysicalTriggerActivationType)
 {
 	ZE_PTAT_ON_ENTER		= 0,
 	ZE_PTAT_ON_LEAVE		= 1,
@@ -61,10 +61,9 @@ typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, bool, 
 
 class ZEPhysicalTrigger: public ZEPhysicalObject
 {
+	ZE_OBJECT
 	protected:
 		ZEPhysicalTriggerEvent				TriggerEvent;
-											ZEPhysicalTrigger();
-		virtual								~ZEPhysicalTrigger();
 
 	public:
 		virtual	void						SetTriggerShape(ZEPhysicalShape* TriggerShape) = 0;
@@ -96,12 +95,6 @@ class ZEPhysicalTrigger: public ZEPhysicalObject
 		virtual const 
 		ZEPhysicalTriggerEvent&				GetTriggerEvent();
 
-		virtual bool						Initialize() = 0;
-		virtual void						Deinitialize() = 0;
-
-		virtual void						Destroy();
-
 		static ZEPhysicalTrigger*			CreateInstance();
 };
-
 #endif

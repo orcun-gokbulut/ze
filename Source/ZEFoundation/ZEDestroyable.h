@@ -34,11 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 
+#pragma once
+
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
 #include "ZEMeta/ZEEnumerator.h"
 
-ZE_ENUM(ZEDestroyableState)
+enum ZEDestroyableState
 {
 	ZE_DS_ALIVE,
 	ZE_DS_WAITING_DESTRUCTION,
@@ -58,7 +60,7 @@ class ZEDestroyable
 
 	public:
 		virtual	void				Destroy() final;
-		void						DestroyDeffered(bool DefferDestructor = true);
+		void						DestroyDeferred(bool DeferDestructor = true);
 
 									ZEDestroyable();
 		virtual						~ZEDestroyable();

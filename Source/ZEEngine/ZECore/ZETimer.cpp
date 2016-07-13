@@ -104,12 +104,6 @@ ZETimer* ZETimer::CreateInstance()
 	return Timer;
 }
 
-void ZETimer::Destroy()
-{
-	ZETimerManager::GetInstance()->UnregisterTimer(this);
-	delete this;
-}
-
 void ZETimer::CreateAutoTimer(float Interval, const ZETimerEvent& Event)
 {
 	ZETimer* TempTimer = new ZETimer();

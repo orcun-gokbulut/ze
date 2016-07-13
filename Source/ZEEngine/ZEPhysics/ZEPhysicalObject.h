@@ -37,21 +37,27 @@
 #ifndef __ZE_PHYSICAL_OBJECT_H__
 #define __ZE_PHYSICAL_OBJECT_H__
 
+#include "ZEMeta/ZEObject.h"
+#include "ZEMeta/ZEEnumerator.h"
+#include "ZEInitializable.h"
+
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEDS/ZEDelegate.h"
 #include "ZETypes.h"
+#include "ZEDestroyable.h"
 
 #define ZE_PCCF_ON_TOUCH			1
 #define ZE_PCCF_ON_START_TOUCH		2
 #define ZE_PCCF_ON_END_TOUCH		4
 
 class ZEPhysicalObject;
+class ZEPhysicalWorld;
 
 typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, ZEVector3, float)> ZEPhysicalCollisionEvent;
 typedef ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)> ZEPhysicalTransformChangeEvent;
 
-enum ZEPhysicalObjectType
+ZE_ENUM(ZEPhysicalObjectType)
 {
 	ZE_POT_STATIC_OBJECT,
 	ZE_POT_STATIC_MESH,
@@ -64,15 +70,15 @@ enum ZEPhysicalObjectType
 	ZE_POT_FORCE_FIELD,
 };
 
-class ZEPhysicalWorld;
-class ZEPhysicalObject
+class ZEPhysicalObject : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
+	ZE_OBJECT
 	protected:
 		ZEPhysicalCollisionEvent				CollisionEvent;
 		ZEPhysicalTransformChangeEvent			TransformChangeEvent;
 
-												ZEPhysicalObject(){}
-		virtual									~ZEPhysicalObject(){}
+												ZEPhysicalObject();
+		virtual									~ZEPhysicalObject();
 
 	public:
 		virtual ZEPhysicalObjectType			GetPhysicalObjectType() = 0;
@@ -102,11 +108,6 @@ class ZEPhysicalObject
 		virtual void							SetTransformChangeEvent(const ZEPhysicalTransformChangeEvent& Event);
 		virtual const
 		ZEPhysicalTransformChangeEvent&			GetTransformChangeEvent();
-
-		virtual bool							Initialize() = 0;
-		virtual void							Deinitialize() = 0;
-
-		void									Destroy();
 };
 
 #endif

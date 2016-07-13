@@ -36,13 +36,17 @@
 #include "ZEPhysicsModule.h"
 #include "ZEPhysics/ZEPhysicalWorld.h"
 
-void ZEPhysicalWorld::Destroy()
+ZEPhysicalWorld::ZEPhysicalWorld()
 {
-	Deinitialize();
-	delete this;
+
+}
+
+ZEPhysicalWorld::~ZEPhysicalWorld()
+{
+
 }
 
 ZEPhysicalWorld* ZEPhysicalWorld::CreateInstance()
 {
-	return zePhysics->CreatePhysicalWorld();
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalWorld();
 }

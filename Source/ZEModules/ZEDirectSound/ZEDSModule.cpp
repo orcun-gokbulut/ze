@@ -38,7 +38,6 @@
 #include "ZECore/ZECore.h"
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
-#include "ZECore/ZEWindow.h"
 #include "ZEDSListener.h"
 #include "ZEDSSoundSource.h"
 #include "ZEDSSoundSource3D.h"

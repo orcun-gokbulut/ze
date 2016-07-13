@@ -35,23 +35,7 @@
 
 #include "ZEPhysicalCloth.h"
 
-ZEPhysicalCloth::ZEPhysicalCloth()
-{
-
-}
-
-ZEPhysicalCloth::~ZEPhysicalCloth()
-{
-
-}
-
 ZEPhysicalCloth* ZEPhysicalCloth::CreateInstance()
 {
-	return zePhysics->CreatePhysicalCloth();
-}
-
-void ZEPhysicalCloth::Destroy()
-{
-	Deinitialize();
-	delete this;
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalCloth();
 }

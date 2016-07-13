@@ -59,7 +59,6 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEOptionManager.h"
 #include "ZECore/ZEModule.h"
-#include "ZECore/ZEWindow.h"
 
 #include <d3d11_1.h>
 #include <dxgi1_2.h>

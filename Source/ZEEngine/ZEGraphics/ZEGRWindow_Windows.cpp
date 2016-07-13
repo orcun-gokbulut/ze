@@ -647,11 +647,6 @@ ZESSize ZEGRWindow::HandleMessage(ZEUInt32 Message, ZESize wParam, ZESSize lPara
 	return Return;
 }
 
-void ZEGRWindow::Destroy()
-{
-	delete this;
-}
-
 bool ZEGRWindow::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())

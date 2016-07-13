@@ -43,5 +43,5 @@ ZEPhysicalObjectType ZEPhysicalMesh::GetPhysicalObjectType()
 
 ZEPhysicalMesh* ZEPhysicalMesh::CreateInstance()
 {
-	return zePhysics->CreatePhysicalStaticMesh();
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalStaticMesh();
 }

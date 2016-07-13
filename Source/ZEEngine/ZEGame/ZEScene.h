@@ -38,6 +38,7 @@
 #define __ZE_SCENE_H__
 
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
@@ -45,6 +46,7 @@
 #include "ZEMeta/ZEObject.h"
 
 #include "ZERayCast.h"
+
 
 ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
 ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
@@ -60,10 +62,9 @@ class ZERNRenderer;
 class ZEGRConstantBuffer;
 class ZERNPreRenderParameters;
 
-class ZEScene : public ZEObject, public ZEInitializable
+class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
-
 	private:
 		ZEFlags									SceneDirtyFlags;
 		ZEUInt									LastEntityId;
@@ -127,8 +128,6 @@ class ZEScene : public ZEObject, public ZEInitializable
 
 		bool									Serialize(const ZEString& FileName);
 		bool									Unserialize(const ZEString& FileName);
-
-		virtual void							Destroy();
 
 		static ZEScene*							CreateInstance();
 };

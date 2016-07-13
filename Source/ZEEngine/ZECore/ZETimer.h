@@ -37,13 +37,14 @@
 #ifndef __ZE_TIMER_H__
 #define __ZE_TIMER_H__
 
+#include "ZEDestroyable.h"
 #include "ZEDS/ZEDelegate.h"
 
 typedef	ZEDelegate<void (float)> ZETimerEvent;
 
 class ZETimerManager;
 
-class ZETimer
+class ZETimer : public ZEDestroyable
 {
 	friend class ZETimerManager;
 
@@ -81,8 +82,6 @@ class ZETimer
 		void					Reset();
 
 		static ZETimer*			CreateInstance();
-		void					Destroy();
-
 		static void				CreateAutoTimer(float Interval, const ZETimerEvent& Event);
 };
 

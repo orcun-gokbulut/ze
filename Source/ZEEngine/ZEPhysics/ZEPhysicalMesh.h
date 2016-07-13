@@ -48,6 +48,7 @@ struct ZEPhysicalTriangle
 
 class ZEPhysicalMesh : public ZEPhysicalObject
 {
+	ZE_OBJECT
 	public:
 		virtual ZEPhysicalObjectType	GetPhysicalObjectType();
 
@@ -55,7 +56,7 @@ class ZEPhysicalMesh : public ZEPhysicalObject
 												const ZEPhysicalTriangle* Triangles, ZEUInt PolygonCount, 
 												const ZEPhysicalMaterial* Materials, ZEUInt MaterialCount) = 0;
 
-		static ZEPhysicalMesh*	CreateInstance();
+		static ZEPhysicalMesh*			CreateInstance();
 };
 
 #endif

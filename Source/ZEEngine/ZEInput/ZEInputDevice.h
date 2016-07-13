@@ -37,19 +37,14 @@
 #ifndef	__ZE_INPUT_DEVICE_H__
 #define __ZE_INPUT_DEVICE_H__
 
+#include "ZEDestroyable.h"
+#include "ZEInitializable.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-
-enum ZEInputDeviceLifeState
-{
-	ZE_IDLS_NOT_INITIALIZED				= 0,
-	ZE_IDLS_INITIALIZING				= 1,
-	ZE_IDLS_INITIALIZED					= 2,
-	ZE_IDLS_DEINITIALIZING				= 3
-};
 
 enum ZEInputDeviceType
 {
@@ -66,27 +61,27 @@ enum ZEInputDeviceType
 class ZEInputDeviceDescription
 {
 	public:
-		ZEString							Name;
-		ZEUInt								NameHash;
-		ZEUInt								Index;
-		ZEInputDeviceType					Type;
+		ZEString								Name;
+		ZEUInt									NameHash;
+		ZEUInt									Index;
+		ZEInputDeviceType						Type;
 
-		ZEString							FullName;
+		ZEString								FullName;
 
-		ZEString							SinkName;
-		ZEUInt								SinkNameHash;
-		bool								Sink;
+		ZEString								SinkName;
+		ZEUInt									SinkNameHash;
+		bool									Sink;
 
-		ZESize								ButtonCount;
-		ZESize								AxisCount;
-		ZESize								POVCount;
-		ZESize								SwitchCount;
-		ZESize								VectorCount;
-		ZESize								QuaternionCount;
+		ZESize									ButtonCount;
+		ZESize									AxisCount;
+		ZESize									POVCount;
+		ZESize									SwitchCount;
+		ZESize									VectorCount;
+		ZESize									QuaternionCount;
 
-		void								Clear();
+		void									Clear();
 
-											ZEInputDeviceDescription();
+												ZEInputDeviceDescription();
 };
 
 class ZEInputDeviceState
@@ -94,46 +89,46 @@ class ZEInputDeviceState
 	public:
 		struct  
 		{
-			ZEArray<bool>					OldValues;
-			ZEArray<bool>					CurrentValues;
+			ZEArray<bool>						OldValues;
+			ZEArray<bool>						CurrentValues;
 
 		} Buttons;
 
 		struct  
 		{
-			ZEArray<float>					OldValues;
-			ZEArray<float>					CurrentValues;
+			ZEArray<float>						OldValues;
+			ZEArray<float>						CurrentValues;
 		} Axises;
 
 		struct  
 		{
-			ZEArray<ZEInt>					OldValues;
-			ZEArray<ZEInt>					CurrentValues;
+			ZEArray<ZEInt>						OldValues;
+			ZEArray<ZEInt>						CurrentValues;
 		} POVs;
 
 		struct  
 		{
-			ZEArray<ZEUInt>					OldValues;
-			ZEArray<ZEUInt>					CurrentValues;
+			ZEArray<ZEUInt>						OldValues;
+			ZEArray<ZEUInt>						CurrentValues;
 		} Switches;
 
 		struct  
 		{
-			ZEArray<ZEVector4>				OldValues;
-			ZEArray<ZEVector4>				CurrentValues;
+			ZEArray<ZEVector4>					OldValues;
+			ZEArray<ZEVector4>					CurrentValues;
 		} Vectors;
 
 		struct  
 		{
-			ZEArray<ZEQuaternion>			OldValues;
-			ZEArray<ZEQuaternion>			CurrentValues;
+			ZEArray<ZEQuaternion>				OldValues;
+			ZEArray<ZEQuaternion>				CurrentValues;
 		} Quaternions;
 
-		void								Initialize(const ZEInputDeviceDescription& Description);
-		void								Reset();
-		void								Advance();
-		void								AdvanceAndReset();
-		void								Clear();
+		void									Initialize(const ZEInputDeviceDescription& Description);
+		void									Reset();
+		void									Advance();
+		void									AdvanceAndReset();
+		void									Clear();
 };
 
 class ZEInputDeviceIndexes
@@ -151,12 +146,11 @@ class ZEInputDeviceIndexes
 		static ZESize							GetNewDeviceIndex(ZEInputDeviceType Type);
 };
 
-class ZEInputDevice
+class ZEInputDevice : public ZEInitializable, public ZEDestroyable
 {
 	private:
 		bool									Enabled;
 		bool									Acquired;
-		ZEInputDeviceLifeState					LifeState;
 
 	protected:
 		ZEInputDeviceState						State;
@@ -165,9 +159,13 @@ class ZEInputDevice
 		virtual bool							InitializeInternal();
 		virtual bool							DeinitializeInternal();
 
+												ZEInputDevice();
+		virtual									~ZEInputDevice();
+
 	public:
 		const ZEString&							GetName();
 		virtual const ZEInputDeviceDescription&	GetDescription();
+		const ZEInputDeviceState&				GetState();
 
 		virtual void							SetEnabled(bool Enabled);
 		bool									GetEnabled();
@@ -176,16 +174,6 @@ class ZEInputDevice
 		virtual void							Acquire();
 		virtual void							UnAcquire();
 
-		bool									IsInitialized();
-		bool									Initialize();
-		bool									Deinitialize();
-
-		const ZEInputDeviceState&				GetState();
-
-		virtual void							Destroy();
-
-												ZEInputDevice();
-		virtual									~ZEInputDevice();
 };
 
 #endif

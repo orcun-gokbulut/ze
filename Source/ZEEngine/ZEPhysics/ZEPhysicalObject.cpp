@@ -35,6 +35,17 @@
 
 #include "ZEPhysicalObject.h"
 
+
+ZEPhysicalObject::ZEPhysicalObject()
+{
+
+}
+
+ZEPhysicalObject::~ZEPhysicalObject()
+{
+
+}
+
 void ZEPhysicalObject::SetCollisionEvent(const ZEPhysicalCollisionEvent& Event)
 {
 	CollisionEvent = Event;
@@ -53,10 +64,4 @@ void ZEPhysicalObject::SetTransformChangeEvent(const ZEPhysicalTransformChangeEv
 const ZEPhysicalTransformChangeEvent& ZEPhysicalObject::GetTransformChangeEvent()
 {
 	return TransformChangeEvent;	
-}
-
-void ZEPhysicalObject::Destroy()
-{
-	Deinitialize(); 
-	delete this;
 }

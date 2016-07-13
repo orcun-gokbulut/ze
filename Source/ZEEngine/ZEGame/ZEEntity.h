@@ -35,6 +35,9 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
@@ -49,7 +52,6 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZERayCast.h"
 
-#include "ZEMeta/ZEObject.h"
 #include "ZEMeta/ZEEnumerator.h"
 #include "ZEThread/ZETask.h"
 
@@ -62,17 +64,18 @@ class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
-
-// ZEDrawFlags
 typedef ZEFlags ZEDrawFlags;
-#define ZE_DF_NONE								0
-#define ZE_DF_DRAW								1
-#define ZE_DF_DRAW_COMPONENTS					2
-#define ZE_DF_LIGHT_SOURCE						4
-#define ZE_DF_LIGHT_RECEIVER					8
-#define ZE_DF_CULL								16
-#define ZE_DF_CULL_COMPONENTS					32
-#define ZE_DF_AUTO								64
+ZE_ENUM(ZEDrawFlag)
+{
+	ZE_DF_NONE						= 0,
+	ZE_DF_DRAW						= 1,
+	ZE_DF_DRAW_COMPONENTS			= 2,
+	ZE_DF_LIGHT_SOURCE				= 4,
+	ZE_DF_LIGHT_RECEIVER			= 8,
+	ZE_DF_CULL						= 16,
+	ZE_DF_CULL_COMPONENTS			= 32,
+	ZE_DF_AUTO						= 64
+};
 
 ZE_ENUM(ZEEntityResult)
 {
@@ -99,7 +102,7 @@ ZE_ENUM(ZEEntityState)
 	ZE_ES_INITIALIZED					= 8
 };
 
-class ZEEntity : public ZEObject
+class ZEEntity : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEScene;
@@ -243,8 +246,6 @@ class ZEEntity : public ZEObject
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
-
-		virtual void							Destroy();
 
 		ZEDObjectWrapper*						GetWrapper() const;
 }

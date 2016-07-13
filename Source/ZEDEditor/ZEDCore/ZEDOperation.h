@@ -36,10 +36,11 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEDS/ZEString.h"
 
-enum ZEDOperationStatus
+ZE_ENUM(ZEDOperationStatus)
 {
 	ZED_OS_NONE,
 	ZED_OS_DONE,
@@ -49,33 +50,31 @@ enum ZEDOperationStatus
 class ZEDOperationManager;
 class ZEDEditor;
 
-class ZEDOperation : public ZEObject
+class ZEDOperation : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEDOperationManager;
 	private:
-		ZEDOperationManager*		Manager;
-		ZEString					Text;
-		ZEDOperationStatus			Status;
+		ZEDOperationManager*				Manager;
+		ZEString							Text;
+		ZEDOperationStatus					Status;
 
 	protected:
-		ZEDOperationManager*		GetManager();
-		ZEDEditor*					GetEditor();
+		ZEDOperationManager*				GetManager();
+		ZEDEditor*							GetEditor();
 
-		void						SetText(const ZEString& Text);
+		void								SetText(const ZEString& Text);
 		
-		virtual bool				Apply() = 0;
-		virtual bool				Revert() = 0;
+		virtual bool						Apply() = 0;
+		virtual bool						Revert() = 0;
 
-									ZEDOperation();
-		virtual						~ZEDOperation();
+											ZEDOperation();
+		virtual								~ZEDOperation();
 
 	public:
-		const ZEString&				GetText() const;
-		ZEDOperationStatus			GetStatus() const;
+		const ZEString&						GetText() const;
+		ZEDOperationStatus					GetStatus() const;
 
-		bool						Do();
-		bool						Undo();
-
-		virtual void				Destroy();
+		bool								Do();
+		bool								Undo();
 };

@@ -74,6 +74,8 @@ bool ZEWindowsInputKeyboardDevice::InitializeInternal()
 	State.Initialize(Description);
 	State.Reset();
 
+	Acquire();
+
 	return true;
 }
 
