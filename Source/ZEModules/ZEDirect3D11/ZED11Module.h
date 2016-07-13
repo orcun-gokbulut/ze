@@ -55,7 +55,7 @@ class ZEGRStructuredBuffer;
 
 class ZED11Module : public ZEGRGraphicsModule
 {
-	ZE_MODULE(ZED11Module)
+	ZE_OBJECT
 	protected:
 		ID3D11Device*							Device;
 		ZED11Context							Context;
@@ -64,8 +64,8 @@ class ZED11Module : public ZEGRGraphicsModule
 		ZED11StatePool							StatePool;
 		ZED11Tracer								Tracer;
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZED11Module();
 
@@ -91,4 +91,6 @@ class ZED11Module : public ZEGRGraphicsModule
 		virtual ZEGRShaderCompiler*				CreateShaderCompiler();
 		virtual ZEGRRenderStateData*			CreateRenderStateData();
 		virtual ZEGRComputeRenderStateData*		CreateComputeRenderStateData();
+
+		static ZED11Module*						CreateInstance();
 };

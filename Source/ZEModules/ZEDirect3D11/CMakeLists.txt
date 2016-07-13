@@ -48,6 +48,8 @@ if(ZEBUILD_D3D9_DEBUG_SHADERS_RELEASE)
 	ze_append_property(DIRECTORY PROPERTY COMPILE_DEFINITIONS_RELEASE ZE_DEBUG_D3D10_DEBUG_SHADERS)
 endif()
 
+ze_add_source(ZED11Module.cpp							Sources)
+ze_add_source(ZED11Module.h								Sources ZEMC)
 ze_add_source(ZED11ComponentBase.cpp					Sources)
 ze_add_source(ZED11ComponentBase.h						Sources)
 ze_add_source(ZED11DepthStencilBuffer.cpp				Sources)
@@ -56,8 +58,6 @@ ze_add_source(ZED11Tracer.cpp							Sources)
 ze_add_source(ZED11Tracer.h								Sources)
 ze_add_source(ZED11Context.cpp							Sources)
 ze_add_source(ZED11Context.h							Sources)
-ze_add_source(ZED11Module.cpp							Sources)
-ze_add_source(ZED11Module.h								Sources)
 ze_add_source(ZED11Adapter.cpp							Sources)
 ze_add_source(ZED11Adapter.h							Sources)
 ze_add_source(ZED11IndexBuffer.cpp						Sources)
@@ -98,4 +98,5 @@ ze_add_source(ZED11Sampler.h							Sources)
 
 ze_add_library(TARGET ZEDirect3D11
 	SOURCES ${Sources}
+	ZEMC ${ZEMC}
 	LIBS d3d11 dxguid dxgi d3dcompiler)

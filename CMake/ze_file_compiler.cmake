@@ -1,6 +1,6 @@
-//ZE_SOURCE_PROCESSOR_START(License, 1.0)
-/*******************************************************************************
- Zinek Engine - ZEXSensInputModule.h
+#ZE_SOURCE_PROCESSOR_START(License, 1.0)
+#[[*****************************************************************************
+ Zinek Engine - ze_file_compiler.cmake
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -30,30 +30,32 @@
   Name: Yiğit Orçun GÖKBULUT
   Contact: orcun.gokbulut@gmail.com
   Github: https://www.github.com/orcun-gokbulut/ZE
-*******************************************************************************/
-//ZE_SOURCE_PROCESSOR_END()
+*****************************************************************************]]
+#ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_XSENS_INPUT_MODULE_H__
-#define __ZE_XSENS_INPUT_MODULE_H__
+function(ze_file_compiler)
+	parse_arguments(PARAMETER "TARGET;FILES;OUTPUTS" "" ${ARGV})
 
-#include "ZEInput/ZEInputDeviceExtension.h"
-
-class ZEInputDevice;
-struct XsControl;
-
-class ZEXSensInputModule : public ZEInputDeviceModule
-{
-	ZE_EXTENSION(ZEXSensInputModule)
-	friend class ZEXSensInputDevice;
-	private:
-		XsControl*					Control;
-		bool						InitializeSelf();
-		bool						DeinitializeSelf();
-
-									ZEXSensInputModule();
-	public:
-		virtual void				Process();
-};
-
-#endif
+	foreach(VARIABLE_FILE ${PARAMETER_FILES})
+		get_filename_component(VARIABLE_FILE_NORMALIZED ${VARIABLE_FILE} ABSOLUTE)
+		get_filename_component(VARIABLE_FILE_NAME ${VARIABLE_FILE} NAME)
+		string(REPLACE  "." "_" PARAMETER_CLASS ${VARIABLE_FILE_NAME})
+		add_custom_command(
+			OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h"
+			COMMAND "$<TARGET_FILE:ZEFileCompiler>"
+			ARGS "-q" "\"${VARIABLE_FILE_NORMALIZED}\"" "-c" "\"${PARAMETER_CLASS}\"" "-os" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp\"" "-oh" "\"${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h\""
+			MAIN_DEPENDENCY "${VARIABLE_FILE_NORMALIZED}"
+			WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}"
+			DEPENDS ZEFileCompiler)
+		set(VARIABLE_OUTPUTS ${VARIABLE_OUTPUTS} "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.cpp" "${CMAKE_CURRENT_BINARY_DIR}/${VARIABLE_FILE_NAME}.h")
+	endforeach()
+	
+	if (PARAMETER_TARGET)
+		target_sources(${PARAMETER_TARGET} PRIVATE ${VARIABLE_OUTPUTS})
+		source_group("Generated" FILES ${VARIABLE_OUTPUTS})
+	endif()
+	
+	if (PARAMETER_OUTPUTS)
+		set(${PARAMETER_OUTPUTS} ${VARIABLE_OUTPUTS} PARENT_SCOPE)
+	endif()
+endfunction()

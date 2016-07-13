@@ -37,7 +37,6 @@
 #include "ZECore.h"
 #include "ZEErrorManager.h"
 #include "ZEModule.h"
-#include "ZEModuleManager.h"
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
 #include "ZEResourceManager.h"
@@ -45,8 +44,6 @@
 #include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"
-#include "ZEPluginManager.h"
-#include "ZEExtensionManager.h"
 #include "ZESystemMessageManager.h"
 #include "ZESystemMessageHandler.h"
 #include "ZERealTimeClock.h"
@@ -64,6 +61,7 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <time.h>
+#include "ZEMeta/ZEClass.h"
 
 
 ZEOptionSection ZECore::CoreOptions; 
@@ -116,21 +114,6 @@ ZEConsole* ZECore::GetConsole()
 	return Console;
 }
 
-ZEModuleManager* ZECore::GetModuleManager()
-{
-	return ModuleManager;
-}
-
-ZEExtensionManager* ZECore::GetExtensionManager()
-{
-	return ExtensionManager;
-}
-
-ZEPluginManager* ZECore::GetPluginManager()
-{
-	return PluginManager;
-}
-
 ZESystemMessageManager* ZECore::GetSystemMessageManager()
 {
 	return SystemMessageManager;
@@ -156,21 +139,9 @@ ZECrashHandler* ZECore::GetCrashHandler()
 	return CrashHandler;
 }
 		
-bool ZECore::SetGraphicsModule(ZEModule* Module)
+bool ZECore::SetGraphicsModule(ZEGRGraphicsModule* Module)
 {
-	if (Module != NULL)
-	{
-		if (Module->GetDescription() != ZEGRGraphicsModule::Description() && Module->GetDescription()->GetParent() != ZEGRGraphicsModule::Description())
-		{
-			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
-				(const char*)Module->GetDescription()->GetName());
-			return false;
-		}
-		GraphicsModule = (ZEGRGraphicsModule*)Module;
-	}
-	else
-		GraphicsModule = NULL;
-
+	GraphicsModule = Module;
 	return true;
 }
 
@@ -179,21 +150,9 @@ ZEGRGraphicsModule* ZECore::GetGraphicsModule()
 	return GraphicsModule;
 }
 
-bool ZECore::SetSoundModule(ZEModule* Module)
+bool ZECore::SetSoundModule(ZESoundModule* Module)
 {
-	if (Module != NULL)
-	{
-		if (Module->GetDescription() != ZESoundModule::Description() && Module->GetDescription()->GetParent() != ZESoundModule::Description())
-		{
-			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
-				(const char*)Module->GetDescription()->GetName());
-			return false;
-		}
-		SoundModule = (ZESoundModule*)Module;
-	}
-	else
-		SoundModule = NULL;
-
+	SoundModule = Module;
 	return true;
 }
 
@@ -202,21 +161,9 @@ ZESoundModule* ZECore::GetSoundModule()
 	return SoundModule;
 }
 
-bool ZECore::SetInputModule(ZEModule* Module)
+bool ZECore::SetInputModule(ZEInputModule* Module)
 {
-	if (Module != NULL)
-	{
-		if (Module->GetDescription() != ZEInputModule::Description() && Module->GetDescription()->GetParent() != ZEInputModule::Description())
-		{
-			zeError("Module type mismatch. This module is not a input module. Module Name : \"%s\"", 
-				(const char*)Module->GetDescription()->GetName());
-			return false;
-		}
-		InputModule = (ZEInputModule*)Module;
-	}
-	else
-		InputModule = NULL;
-
+	InputModule = Module;
 	return true;
 }
 
@@ -226,21 +173,9 @@ ZEInputModule* ZECore::GetInputModule()
 	return InputModule;
 }
 
-bool ZECore::SetPhysicsModule(ZEModule* Module)
+bool ZECore::SetPhysicsModule(ZEPhysicsModule* Module)
 {
-	if (Module != NULL)
-	{
-		if (Module->GetDescription() != ZEPhysicsModule::Description() && Module->GetDescription()->GetParent() != ZEPhysicsModule::Description())
-		{
-			zeError("Module type mismatch. This module is not a physics module. Module Name : \"%s\"", 
-				(const char*)Module->GetDescription()->GetName());
-			return false;
-		}
-		PhysicsModule = (ZEPhysicsModule*)Module;
-	}
-	else
-		PhysicsModule = NULL;
-
+	PhysicsModule = Module;
 	return true;
 }
 
@@ -251,19 +186,7 @@ ZEPhysicsModule* ZECore::GetPhysicsModule()
 
 bool ZECore::SetNetworkModule(ZENetworkModule* Module)
 {
-	/*if (Module != NULL)
-	{
-		if (Module->GetDescription()->GetType() != ZE_MT_SOUND)
-		{
-			zeError("Module type mismatch. This module is not a sound module. Module Name : \"%s\"", 
-				(const char*)Module->GetDescription()->GetName());
-			return false;
-		}
-		Network = (ZENetworkModule*)Module;
-	}
-	else
-		Network = NULL;*/
-
+	//Network = Module;
 	return true;
 }
 
@@ -272,9 +195,9 @@ ZENetworkModule* ZECore::GetNetworkModule()
 	return NetworkModule;
 }
 
-void ZECore::SetApplicationModule(ZEApplicationModule* Component)
+void ZECore::SetApplicationModule(ZEApplicationModule* Module)
 {
-	Application = Component;
+	Application = Module;
 }
 
 ZEApplicationModule* ZECore::GetApplicationModule()
@@ -416,7 +339,7 @@ bool ZECore::InitializeModule(ZEModule* Module)
 	{
 		Module->Destroy();
 		zeError("Can not initialize module. Module Name : \"%s\".",
-			(const char*)Module->GetDescription()->GetName());
+			(const char*)Module->GetClass()->GetName());
 		return false;
 	}
 	return true;
@@ -434,16 +357,16 @@ bool ZECore::InitializeModules()
 	zeLog("Initializing modules.");
 
 	if (GraphicsModule == NULL)
-		zeCore->SetGraphicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEGRGraphicsModule::Description()));
+		SetGraphicsModule(static_cast<ZEGRGraphicsModule*>(FindModule(ZEGRGraphicsModule::Class(), OptionManager->GetOption("ZECore", "ZEGRGraphicsModule")->GetValue())));
 	
 	if (SoundModule == NULL)
-		zeCore->SetSoundModule(zeCore->GetModuleManager()->CreateModuleInstance(ZESoundModule::Description()));
+		SetSoundModule(static_cast<ZESoundModule*>(FindModule(ZESoundModule::Class(), OptionManager->GetOption("ZECore", "ZESoundModule")->GetValue())));
 
 	if (InputModule == NULL)
-		zeCore->SetInputModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEInputModule::Description()));
+		SetInputModule(static_cast<ZEInputModule*>(FindModule(ZEInputModule::Class(), OptionManager->GetOption("ZECore", "ZEInputModule")->GetValue())));
 
 	if (PhysicsModule == NULL)
-		zeCore->SetPhysicsModule(zeCore->GetModuleManager()->CreateModuleInstance(ZEPhysicsModule::Description()));
+		SetPhysicsModule(static_cast<ZEPhysicsModule*>(FindModule(ZEPhysicsModule::Class(), OptionManager->GetOption("ZECore", "ZEPhysicsModule")->GetValue())));
 
 	// Graphics module !
 	zeLog("Initializing graphics module.");	
@@ -522,14 +445,41 @@ void ZECore::LoadClasses()
 	#define ZE_META_REGISTER_ENUM(Name) ZEEnumerator* Name ## _Declaration();
 	#define ZE_META_REGISTER_CLASS(Name) ZEClass* Name ## _Class();
 	#include "../ZEMetaRegister.h"
+	#include "../../ZEModules/ZEMetaRegister.h"
 	#undef ZE_META_REGISTER_ENUM
 	#undef ZE_META_REGISTER_CLASS
 	
 	#define ZE_META_REGISTER_ENUM(Name) ZEProvider::GetInstance()->RegisterEnumerator(Name ## _Declaration());
 	#define ZE_META_REGISTER_CLASS(Name) ZEProvider::GetInstance()->RegisterClass(Name ## _Class());
 	#include "../ZEMetaRegister.h"
+	#include "../../ZEModules/ZEMetaRegister.h"
 	#undef ZE_META_REGISTER_ENUM
 	#undef ZE_META_REGISTER_CLASS
+}
+
+ZEModule* ZECore::FindModule(ZEClass* BaseClass, const char* Name)
+{
+	ZEClass* Class = ZEProvider::GetInstance()->GetClass(Name);
+	if (Class == NULL)
+	{
+		zeError("Cannot find required module. Module Name: \"%s\".", Name);
+		return NULL;
+	}
+
+	if (!ZEClass::IsDerivedFrom(BaseClass, Class))
+	{
+		zeError("Module class is not derived from expected class. Module Name: \"%s\", Expected Base Class: \"%s\".", Name, BaseClass->GetName());
+		return NULL;
+	}
+
+	ZEObject* Module = Class->CreateInstance();
+	if (Module == NULL)
+	{
+		zeError("Cannot create instance of module. Module Name: \"%s\".", Name);
+		return false;
+	}
+
+	return static_cast<ZEModule*>(Module);
 }
 
 bool ZECore::StartUp(void* WindowHandle)
@@ -705,9 +655,6 @@ ZECore::ZECore()
 	OptionManager			= new ZEOptionManager();
 	ErrorManager			= new ZEErrorManager();
 	ResourceManager			= new ZEResourceManager();
-	ModuleManager			= new ZEModuleManager();
-	ExtensionManager		= new ZEExtensionManager();
-	PluginManager			= new ZEPluginManager();
 	
 	ElapsedTime				= 0.0f;
 
@@ -716,7 +663,16 @@ ZECore::ZECore()
 	ZEGRGraphicsModule::BaseInitialize();
 	ZESoundModule::BaseInitialize();
 	ZEInputModule::BaseInitialize();
-
+	
+	static ZEOptionSection CoreOptions;
+	CoreOptions.SetName("ZECore");
+	CoreOptions.AddOption(new ZEOption("ZEGRGraphicsModule", "ZED11Module", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZEInputModule", "ZEWindowsInputModule", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZESoundModule", "ZEDSModule", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZENetworkModule", "ZEWinNetwork", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZEPhysicsModule", "ZEPhysXModule", ZE_OA_NORMAL));
+	CoreOptions.AddOption(new ZEOption("ZEGameModule", "ZETestGame", ZE_OA_NORMAL));
+	ZEOptionManager::GetInstance()->RegisterSection(&CoreOptions);
 }
 
 ZECore::~ZECore()
@@ -725,9 +681,6 @@ ZECore::~ZECore()
 	ZESoundModule::BaseDeinitialize();
 	ZEInputModule::BaseDeinitialize();
 
-	delete PluginManager;
-	delete ExtensionManager;
-	delete ModuleManager;
 	delete ResourceManager;
 	delete ErrorManager;
 	delete OptionManager;

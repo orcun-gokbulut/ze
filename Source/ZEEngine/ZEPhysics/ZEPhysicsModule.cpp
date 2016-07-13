@@ -36,8 +36,6 @@
 #include "ZEPhysicsModule.h"
 #include "ZECore/ZECore.h"
 
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEPhysicsModule, ZEModule, NULL)
-
 ZEPhysicsModule* ZEPhysicsModule::GetInstance()
 {
 	return ZECore::GetInstance()->GetPhysicsModule();

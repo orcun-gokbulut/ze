@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEXSensInputDevice.h
+ Zinek Engine - ZEDestroyableCollector.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,43 +34,27 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_XSENS_INPUT_DEVICE_H__
-#define __ZE_XSENS_INPUT_DEVICE_H__
 
-#include "ZETypes.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEInput/ZEInputDevice.h"
-#include "ZEThread/ZELock.h"
+#include "ZEDS/ZEList2.h"
 
-#include "xsensdeviceapi.h"
+class ZEDestroyable;
+class ZEClass;
 
-class ZEXSensInputDevice;
-
-class ZEXSensCallback : public XsCallback
+class ZEDestroyableCollector
 {
-	public:
-		ZEXSensInputDevice*			Device;
-		virtual void				onDataAvailable(XsDevice* Device, const XsDataPacket* Packet);
-};
-
-class ZEXSensInputDevice : public ZEInputDevice
-{
-	friend class ZEXSensInputModule;
-	friend class ZEXSensCallback;
+	friend class ZEDestroyable;
 	private:
 		ZELock							Lock;
-		XsDevice*						XSensDevice;
-		XsPortInfo						PortInfo;
-		ZEXSensInputModule*				Module;
-		ZEXSensCallback					Callback;
+		ZEList2<ZEDestroyable>			DestructionQueue;
+	
+		void							AddToQueue(ZEDestroyable* Destroyable);
 
-		void							Process();
+										ZEDestroyableCollector();
+										~ZEDestroyableCollector();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+	public:
+		const ZEList2<ZEDestroyable>&	GetDestructionQueue();
+		void							Destroy(ZESSize Limit = -1);
 
-										ZEXSensInputDevice();
+		static ZEDestroyableCollector*	GetInstance();
 };
-
-#endif

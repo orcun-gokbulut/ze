@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEBase.cpp
+ Zinek Engine - ZEDestroyableCollector.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,74 +33,63 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEBase.h"
+#include "ZEDestroyableCollector.h"
 
-bool ZEBase::InitializeSelf()
+#include "ZEMeta\ZEObject.h"
+#include "ZEMeta\ZEClass.h"
+#include "ZEDestroyable.h"
+
+void ZEDestroyableCollector::AddToQueue(ZEDestroyable* Destroyable)
 {
-	InitializationState = ZE_BS_INITIALIZING;
-	return true;
+	ZE_LOCK_SECTION(Lock)
+	{
+		DestructionQueue.AddEnd(&Destroyable->DestructionQueueLink);
+	}
 }
 
-bool ZEBase::DeinitializeSelf()
+ZEDestroyableCollector::ZEDestroyableCollector()
 {
-	InitializationState = ZE_BS_NOT_INITIALIZED;
-	return true;
+
 }
 
-ZEBaseState ZEBase::GetInitializationState() const
+ZEDestroyableCollector::~ZEDestroyableCollector()
 {
-	return InitializationState;
+	Destroy();
 }
 
-bool ZEBase::IsInitialized() const
+const ZEList2<ZEDestroyable>& ZEDestroyableCollector::GetDestructionQueue()
 {
-	return (InitializationState == ZE_BS_INITIALIZED);
+	return DestructionQueue;
 }
 
-bool ZEBase::Initialize()
+void ZEDestroyableCollector::Destroy(ZESSize Limit)
 {
-	if (IsInitialized())
-		return false;
+	while(true)
+	{
+		if (Limit == 0)
+			break;
 
-	if (!InitializeSelf())
-		return false;
+		ZEDestroyable* Destroyable;
+		ZE_LOCK_SECTION(Lock)
+		{
+			if (DestructionQueue.GetFirst() == NULL)
+				break;
 
-	if (InitializationState != ZE_BS_INITIALIZING)
-		return false;
+			Destroyable = DestructionQueue.GetFirst()->GetItem();
+			DestructionQueue.Remove(&Destroyable->DestructionQueueLink);
+		}
 
-	InitializationState = ZE_BS_INITIALIZED;
+		if (Destroyable->DestructionState == ZE_DS_DESTROYED)
+			operator delete(Destroyable);
+		else
+			Destroyable->Destroy();
 
-	return true;
+		Limit--;
+	}
 }
 
-bool ZEBase::Deinitialize()
+ZEDestroyableCollector* ZEDestroyableCollector::GetInstance()
 {
-	if (!IsInitialized())
-		return true;
-
-	InitializationState = ZE_BS_DEINITIALIZING;
-
-	if (!DeinitializeSelf())
-		return false;
-
-	if (InitializationState != ZE_BS_NOT_INITIALIZED)
-		return false;
-
-	return true;
-}
-
-void ZEBase::Destroy()
-{
-	Deinitialize();
-	delete this;
-}
-
-ZEBase::ZEBase()
-{
-	InitializationState = ZE_BS_NOT_INITIALIZED;
-}
-
-ZEBase::~ZEBase()
-{
-	Deinitialize();
+	static ZEDestroyableCollector Instance;
+	return &Instance;
 }

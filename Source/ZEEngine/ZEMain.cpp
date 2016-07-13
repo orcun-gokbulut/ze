@@ -40,7 +40,6 @@
 #include "ZECore/ZECore.h"
 #include "ZECore/ZEWindow.h"
 #include "ZECore/ZEConsoleWindow.h"
-#include "ZECore/ZEModuleManager.h"
 #include "ZECore/ZEOptionManager.h"
 
 extern HINSTANCE ApplicationInstance;

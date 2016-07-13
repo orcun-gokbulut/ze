@@ -50,7 +50,6 @@
 ZEUInt ZEGRGraphicsModule::SAMPLE_COUNT = 4;
 
 ZEOptionSection ZEGRGraphicsModule::GraphicsOptions;
-ZE_MODULE_DESCRIPTION_ABSTRACT(ZEGRGraphicsModule, ZEModule, &ZEGRGraphicsModule::GraphicsOptions)
 
 void FreeImageOutput(FREE_IMAGE_FORMAT Bitmap, const char* Message)
 {
@@ -76,13 +75,12 @@ void ZEGRGraphicsModule::BaseInitialize()
 	GraphicsOptions.AddOption(new ZEOption("HDRQuality", 5, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("ShadowQuality", 1, ZE_OA_NORMAL));
 	GraphicsOptions.AddOption(new ZEOption("LightQuantity", 1, ZE_OA_NORMAL));
-	// ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
+	ZEOptionManager::GetInstance()->RegisterSection(&GraphicsOptions);
 }
 
 void ZEGRGraphicsModule::BaseDeinitialize()
 {
 	FreeImage_DeInitialise();
-
 	ZEOptionManager::GetInstance()->UnregisterSection(&GraphicsOptions);
 }
 
@@ -134,17 +132,14 @@ ZEGRGraphicsModule* ZEGRGraphicsModule::GetInstance()
 	return ZECore::GetInstance()->GetGraphicsModule();
 }
 
-bool ZEGRGraphicsModule::InitializeSelf()
+bool ZEGRGraphicsModule::InitializeInternal()
 {
-	if (!ZEModule::InitializeSelf())
-		return false;
-
-	return true;
+	return ZEModule::InitializeInternal();
 }
 
-bool ZEGRGraphicsModule::DeinitializeSelf()
+bool ZEGRGraphicsModule::DeinitializeInternal()
 {
-	return ZEModule::Deinitialize();
+	return ZEModule::DeinitializeInternal();
 }
 
 ZEGRGraphicsModule::ZEGRGraphicsModule()

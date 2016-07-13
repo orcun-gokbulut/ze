@@ -37,14 +37,12 @@
 #ifndef	__ZE_INPUT_DEVICE_EXTENSION_H__
 #define __ZE_INPUT_DEVICE_EXTENSION_H__
 
-#include "ZECore/ZEExtension.h"
+#include "ZECore/ZEModule.h"
 #include "ZEInputDevice.h"
 
-class  ZEExtensionDescription;
-
-class ZEInputDeviceModule : public ZEExtension
+class ZEInputDeviceModule : public ZEModule
 {
-	ZE_EXTENSION(ZEInputDeviceModule)
+	ZE_OBJECT
 	private:
 		ZEArray<ZEInputDevice*>				Devices;
 
@@ -53,7 +51,7 @@ class ZEInputDeviceModule : public ZEExtension
 		void								UnregisterDevice(ZEInputDevice* Device);
 		void								DestroyDevices();
 
-		virtual bool						DeinitializeSelf();
+		virtual bool						DeinitializeInternal();
 
 		virtual								~ZEInputDeviceModule();
 

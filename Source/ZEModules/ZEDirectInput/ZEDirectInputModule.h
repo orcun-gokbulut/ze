@@ -44,20 +44,21 @@
 
 class ZEDirectInputModule : public ZEInputDeviceModule
 {
-	ZE_EXTENSION(ZEDirectInputModule)
-
+	ZE_OBJECT
 	friend BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceDescription, LPVOID Ref);
+	private:
+		virtual bool						InitializeInternal();
+		virtual bool						DeinitializeInternal();
 
-	protected:
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+											ZEDirectInputModule();
+		virtual								~ZEDirectInputModule();
 
 	public:
-		LPDIRECTINPUT8					DirectInput;
+		LPDIRECTINPUT8						DirectInput;
 
-		virtual void					Process();
+		virtual void						Process();
 
-										ZEDirectInputModule();
+		static ZEDirectInputModule*			CreateInstance();
 };
 
 #endif

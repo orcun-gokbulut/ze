@@ -36,7 +36,7 @@
 cmake_minimum_required (VERSION 2.8)
 
 ze_add_source(ZEDirectInputModule.cpp			Sources)
-ze_add_source(ZEDirectInputModule.h				Sources)
+ze_add_source(ZEDirectInputModule.h				Sources ZEMC)
 ze_add_source(ZEDirectInputDevice.cpp			Sources)
 ze_add_source(ZEDirectInputDevice.h				Sources)
 
@@ -48,4 +48,5 @@ link_directories(
 
 ze_add_library(TARGET ZEDirectInput 
 	SOURCES ${Sources}
+	ZEMC ${ZEMC}
 	LIBS libDirectInput)

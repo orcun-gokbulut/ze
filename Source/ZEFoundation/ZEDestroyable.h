@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEData.cpp
+ Zinek Engine - ZEDestroyable.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,3 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEList2.h"
+#include "ZEMeta/ZEEnumerator.h"
+
+ZE_ENUM(ZEDestroyableState)
+{
+	ZE_DS_ALIVE,
+	ZE_DS_WAITING_DESTRUCTION,
+	ZE_DS_DESTROYED,
+};
+
+class ZEClass;
+
+class ZEDestroyable
+{
+	friend class ZEDestroyableCollector;
+	private:
+		ZELink<ZEDestroyable>		DestructionQueueLink;
+		ZEDestroyableState			DestructionState;
+
+		virtual ZEClass*			GetClass();
+
+	public:
+		virtual	void				Destroy() final;
+		void						DestroyDeffered(bool DefferDestructor = true);
+
+									ZEDestroyable();
+		virtual						~ZEDestroyable();
+
+};

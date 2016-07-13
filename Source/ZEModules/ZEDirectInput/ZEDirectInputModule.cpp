@@ -37,8 +37,6 @@
 #include "ZEError.h"
 #include "ZEDirectInputModule.h"
 
-ZE_EXTENSION_DESCRIPTION(ZEDirectInputModule, ZEInputDeviceModule, NULL)
-
 BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceInstance, LPVOID Ref)
 {
 	if ((DeviceInstance->dwDevType & DI8DEVCLASS_GAMECTRL) != DI8DEVCLASS_GAMECTRL)
@@ -56,9 +54,9 @@ BOOL CALLBACK CheckDirectInputDevices(const LPCDIDEVICEINSTANCE DeviceInstance, 
 	return TRUE;
 }
 
-bool ZEDirectInputModule::InitializeSelf()
+bool ZEDirectInputModule::InitializeInternal()
 {
-	if (!ZEInputDeviceModule::InitializeSelf())
+	if (!ZEInputDeviceModule::InitializeInternal())
 		return false;
 
 	HRESULT hr;
@@ -81,7 +79,7 @@ bool ZEDirectInputModule::InitializeSelf()
 	return true;
 }
 
-bool ZEDirectInputModule::DeinitializeSelf()
+bool ZEDirectInputModule::DeinitializeInternal()
 {
 	const ZEArray<ZEInputDevice*>& Devices = GetDevices();
 	for(ZESize I = 0; I < Devices.GetCount(); I++)
@@ -93,7 +91,17 @@ bool ZEDirectInputModule::DeinitializeSelf()
 		DirectInput = NULL;
 	}
 
-	return ZEInputDeviceModule::DeinitializeSelf();
+	return ZEInputDeviceModule::DeinitializeInternal();
+}
+
+ZEDirectInputModule::ZEDirectInputModule()
+{
+	DirectInput = NULL;
+}
+
+ZEDirectInputModule::~ZEDirectInputModule()
+{
+
 }
 
 void ZEDirectInputModule::Process()
@@ -104,7 +112,8 @@ void ZEDirectInputModule::Process()
 
 }
 
-ZEDirectInputModule::ZEDirectInputModule()
+
+ZEDirectInputModule* ZEDirectInputModule::CreateInstance()
 {
-	DirectInput = NULL;
+	return new ZEDirectInputModule();
 }

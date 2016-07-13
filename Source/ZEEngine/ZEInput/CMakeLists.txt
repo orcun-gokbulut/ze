@@ -46,11 +46,12 @@ ze_add_source(ZEInputDefinitions.h						Sources Headers)
 ze_add_source(ZEInputDevice.cpp							Sources)
 ze_add_source(ZEInputDevice.h							Sources Headers)
 ze_add_source(ZEInputDeviceExtension.cpp				Sources)
-ze_add_source(ZEInputDeviceExtension.h					Sources Headers)
+ze_add_source(ZEInputDeviceExtension.h					Sources Headers ZEMC)
 ze_add_source(ZEInputModule.cpp							Sources)
-ze_add_source(ZEInputModule.h							Sources Headers)
+ze_add_source(ZEInputModule.h							Sources Headers ZEMC)
 
 ze_add_library(TARGET ZEInput 
 	SOURCES ${Sources}
 	HEADERS ${Headers}
+	ZEMC ${ZEMC}
 	LIBS ZEFoundation)
