@@ -37,7 +37,6 @@
 #include "ZEInput/ZEInputDefinitions.h"
 #include "zeui/ZEUIRenderer.h"
 #include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
 #include "ZETexture/ZETexture2DResource.h"
 
 #define ACTIONID_UP				0

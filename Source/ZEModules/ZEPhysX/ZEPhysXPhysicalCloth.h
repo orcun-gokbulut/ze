@@ -52,7 +52,6 @@
 class ZEPhysXPhysicalCloth : public ZEPhysicalCloth
 {
 	friend class ZEPhysXModule;
-
 	private:
 		ZEUInt32								ParticleCount;
 
@@ -72,6 +71,9 @@ class ZEPhysXPhysicalCloth : public ZEPhysicalCloth
 		NxMeshData								MeshData;
 
 		virtual void							ReCreate();
+
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZEPhysXPhysicalCloth();
 		virtual									~ZEPhysXPhysicalCloth();
@@ -135,12 +137,9 @@ class ZEPhysXPhysicalCloth : public ZEPhysicalCloth
 		virtual void							AttachVertex(const ZEUInt VertexId, const ZEVector3& WorldPosition);
 		virtual void							DetachVertex(const ZEUInt VertexId);
 
-		virtual ZEClothVertexAttachment			GetVertexAttachment(ZEUInt VertexId) const;
+		virtual const ZEClothVertexAttachment*	GetVertexAttachment(ZEUInt VertexId) const;
 
 		virtual bool							TearVertex(const ZEUInt VertexId, const ZEVector3& Normal);
-
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
 };
 
 #endif

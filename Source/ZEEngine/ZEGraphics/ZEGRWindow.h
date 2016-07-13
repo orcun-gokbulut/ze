@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZEFlags.h"
@@ -53,7 +54,7 @@ enum ZEGRWindowType : ZEUInt8
 class ZEGRMonitor;
 class ZEGROutput;
 
-class ZEGRWindow : public ZEObject, public ZEInitializable
+class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	private:
@@ -212,7 +213,6 @@ class ZEGRWindow : public ZEObject, public ZEInitializable
 		void							WrapperResized(ZEUInt Width, ZEUInt Height);
 
 		void							Show();
-		virtual void					Destroy();
 
 		static ZEUInt					GetWindowCount();
 		virtual ZESSize					HandleMessage(ZEUInt32 Message, ZESize Param1, ZESSize Param2);

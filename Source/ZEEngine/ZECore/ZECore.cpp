@@ -40,7 +40,6 @@
 #include "ZEConsole.h"
 #include "ZEConsoleWindow.h"
 #include "ZEResourceManager.h"
-#include "ZEWindow.h"
 #include "ZEApplicationModule.h"
 #include "ZEOptionManager.h"
 #include "ZECommandManager.h"

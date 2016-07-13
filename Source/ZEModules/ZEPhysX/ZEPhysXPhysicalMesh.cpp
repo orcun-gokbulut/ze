@@ -46,6 +46,43 @@
 #include <NxQuat.h>
 #include <NxVec3.h>
 
+void ZEPhysXPhysicalMesh::ReCreate()
+{
+	ActorDesc.globalPose.t = Actor->getGlobalPosition();
+	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
+	Initialize();
+}
+
+bool ZEPhysXPhysicalMesh::InitializeInternal()
+{
+	if (!ZEPhysicalMesh::InitializeInternal())
+		return false;
+
+	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+		return false;
+
+	NxScene* Scene = PhysicalWorld->GetScene();
+	Actor = Scene->createActor(ActorDesc);
+	if (Actor == NULL)
+	{
+		zeError("Can not create actor.");
+		return false;
+	}
+
+	return true;
+}
+
+bool ZEPhysXPhysicalMesh::DeinitializeInternal()
+{
+	if (Actor != NULL && PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
+	{
+		PhysicalWorld->GetScene()->releaseActor(*Actor);
+		Actor = NULL;
+	}
+
+	return ZEPhysicalMesh::DeinitializeInternal();
+}
+
 ZEPhysXPhysicalMesh::ZEPhysXPhysicalMesh()
 {
 	PhysicalWorld = NULL;
@@ -174,13 +211,6 @@ float ZEPhysXPhysicalMesh::GetSkinWidth() const
 	return this->SkinWidth;
 }
 
-void ZEPhysXPhysicalMesh::ReCreate()
-{
-	ActorDesc.globalPose.t = Actor->getGlobalPosition();
-	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
-	Initialize();
-}
-
 bool ZEPhysXPhysicalMesh::SetData(const ZEVector3* Vertices, ZEUInt VertexCount, const ZEPhysicalTriangle* Triangles, ZEUInt TriangleCount, const ZEPhysicalMaterial* Materials, ZEUInt MaterialCount)
 {
 	if (TriangleMeshShapeDesc.meshData != NULL)
@@ -242,30 +272,4 @@ ZEUInt32 ZEPhysXPhysicalMesh::GetCollisionCallbackFlags()
 	return (ActorDesc.contactReportFlags & NX_NOTIFY_ON_START_TOUCH ? ZE_PCCF_ON_START_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_END_TOUCH ? ZE_PCCF_ON_END_TOUCH : NULL) |
 		(ActorDesc.contactReportFlags & NX_NOTIFY_ON_TOUCH ? ZE_PCCF_ON_TOUCH : NULL);
-}
-
-bool ZEPhysXPhysicalMesh::Initialize()
-{
-	Deinitialize();
-	if (PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
-		return false;
-	
-	NxScene* Scene = PhysicalWorld->GetScene();
-	Actor = Scene->createActor(ActorDesc);
-	if (Actor == NULL)
-	{
-		zeError("Can not create actor.");
-		return false;
-	}
-
-	return true;
-}
-
-void ZEPhysXPhysicalMesh::Deinitialize()
-{
-	if (Actor != NULL && PhysicalWorld != NULL && PhysicalWorld->GetScene() != NULL)
-	{
-		PhysicalWorld->GetScene()->releaseActor(*Actor);
-		Actor = NULL;
-	}
 }

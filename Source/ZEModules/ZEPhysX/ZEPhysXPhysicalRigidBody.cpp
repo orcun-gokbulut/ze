@@ -50,6 +50,156 @@
 #include <NxQuat.h>
 #include <NxVec3.h>
 
+void ZEPhysXPhysicalRigidBody::ReCreate()
+{
+	Deinitialize();
+	ActorDesc.globalPose.t = Actor->getGlobalPosition();
+	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
+	BodyDesc.linearVelocity = Actor->getLinearVelocity();
+	BodyDesc.angularVelocity = Actor->getAngularVelocity();
+	BodyDesc.linearDamping = Actor->getLinearDamping();
+	BodyDesc.angularDamping = Actor->getAngularDamping();
+	Initialize();
+}
+			
+bool ZEPhysXPhysicalRigidBody::InitializeInternal()
+{
+	if (!ZEPhysicalRigidBody::InitializeInternal())
+		return false;
+
+	if (Actor != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+	{
+		zeError("Can not create actor. Physical world is not initialized.");
+		return false;
+	}
+
+	ZEArray<NxShapeDesc*> ShapeDescList;
+
+	ActorDesc.shapes.clear();
+	for (ZESize I = 0; I < Shapes.GetCount(); I++)
+	{
+		ZEPhysicalShape* CurrentShape = Shapes[I];
+
+		switch (CurrentShape->GetPhysicalShapeType())
+		{
+			case ZE_PST_BOX:
+			{
+				NxBoxShapeDesc* BoxShapeDesc = new NxBoxShapeDesc();
+				BoxShapeDesc->setToDefault();
+
+				BoxShapeDesc->userData = CurrentShape;
+				BoxShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
+				BoxShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
+
+				BoxShapeDesc->dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth();
+				BoxShapeDesc->dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight();
+				BoxShapeDesc->dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength();
+				BoxShapeDesc->dimensions.arrayMultiply(BoxShapeDesc->dimensions, ZE_TO_NX(Scale)); 
+
+				ShapeDescList.Add(BoxShapeDesc);
+				ActorDesc.shapes.push_back(BoxShapeDesc);
+				break;
+			}
+
+			case ZE_PST_SPHERE:
+			{
+				zeDebugCheckWarning(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
+
+				NxSphereShapeDesc* SphereShapeDesc = new NxSphereShapeDesc();
+				SphereShapeDesc->setToDefault();
+
+				SphereShapeDesc->userData = CurrentShape;
+				SphereShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
+				SphereShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
+
+				SphereShapeDesc->radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
+
+				ShapeDescList.Add(SphereShapeDesc);
+				ActorDesc.shapes.push_back(SphereShapeDesc);
+				break;
+			}
+
+			case ZE_PST_CAPSULE:
+			{
+				zeDebugCheckWarning(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
+				
+				NxCapsuleShapeDesc* CapsuleShapeDesc = new NxCapsuleShapeDesc();
+				CapsuleShapeDesc->setToDefault();
+
+				CapsuleShapeDesc->userData = CurrentShape;
+				CapsuleShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
+				CapsuleShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
+
+				CapsuleShapeDesc->radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
+				CapsuleShapeDesc->height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc->radius;
+
+				ShapeDescList.Add(CapsuleShapeDesc);
+				ActorDesc.shapes.push_back(CapsuleShapeDesc);
+				break;
+			}
+
+			case ZE_PST_CYLINDER:
+			{
+				zeDebugCheckWarning(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Cylinder physical shape does not support scaling. Shape did not scaled.");
+				break;
+			}
+
+			case ZE_PST_CONVEX:
+			{
+				break;
+			}
+		}
+	}
+
+	switch (PhysicalBodyType)
+	{
+		case ZE_PBT_DYNAMIC:
+			break;
+
+		case ZE_PBT_KINEMATIC:
+			if (Enabled)
+			{
+				BodyDesc.flags |= NX_BF_KINEMATIC;
+				if (Actor != NULL)
+					Actor->raiseBodyFlag(NX_BF_KINEMATIC);
+			}
+			else
+			{
+				BodyDesc.flags &= ~NX_BF_KINEMATIC;
+				if (Actor != NULL)
+					Actor->clearBodyFlag(NX_BF_KINEMATIC);
+			}
+			break;
+
+		case ZE_PBT_STATIC:
+			ActorDesc.body = NULL;
+			break;
+	}
+
+	NxScene* Scene = PhysicalWorld->GetScene();
+	Actor = Scene->createActor(ActorDesc);
+	if (Actor == NULL)
+		zeError("Can not create actor.");
+
+	for (ZESize I = 0; I < ShapeDescList.GetCount(); I++)
+		delete ShapeDescList[I];
+	ShapeDescList.Clear();
+
+	return Actor != NULL;
+}
+
+bool ZEPhysXPhysicalRigidBody::DeinitializeInternal()
+{
+	if (Actor != NULL)
+	{
+		PhysicalWorld->GetScene()->releaseActor(*Actor);
+		Actor = NULL;
+	}
+
+	return ZEPhysicalRigidBody::DeinitializeInternal();
+}
+
+
 ZEPhysXPhysicalRigidBody::ZEPhysXPhysicalRigidBody()
 {
 	Actor = NULL;
@@ -464,148 +614,4 @@ void ZEPhysXPhysicalRigidBody::ApplyLocalForceAtLocalPosition(const ZEVector3& F
 float ZEPhysXPhysicalRigidBody::GetComputedKineticEnergy() const
 {
 	return Actor->computeKineticEnergy();
-}
-
-void ZEPhysXPhysicalRigidBody::ReCreate()
-{
-	Deinitialize();
-	ActorDesc.globalPose.t = Actor->getGlobalPosition();
-	ActorDesc.globalPose.M.fromQuat(Actor->getGlobalOrientationQuat()); 
-	BodyDesc.linearVelocity = Actor->getLinearVelocity();
-	BodyDesc.angularVelocity = Actor->getAngularVelocity();
-	BodyDesc.linearDamping = Actor->getLinearDamping();
-	BodyDesc.angularDamping = Actor->getAngularDamping();
-	Initialize();
-}
-			
-bool ZEPhysXPhysicalRigidBody::Initialize()
-{
-	if (Actor != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
-	{
-		zeError("Can not create actor. Physical world is not initialized.");
-		return false;
-	}
-
-	ZEArray<NxShapeDesc*> ShapeDescList;
-
-	ActorDesc.shapes.clear();
-	for (ZESize I = 0; I < Shapes.GetCount(); I++)
-	{
-		ZEPhysicalShape* CurrentShape = Shapes[I];
-
-		switch (CurrentShape->GetPhysicalShapeType())
-		{
-			case ZE_PST_BOX:
-			{
-				NxBoxShapeDesc* BoxShapeDesc = new NxBoxShapeDesc();
-				BoxShapeDesc->setToDefault();
-
-				BoxShapeDesc->userData = CurrentShape;
-				BoxShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
-				BoxShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
-
-				BoxShapeDesc->dimensions.x = ((ZEPhysicalBoxShape*)CurrentShape)->GetWidth();
-				BoxShapeDesc->dimensions.y = ((ZEPhysicalBoxShape*)CurrentShape)->GetHeight();
-				BoxShapeDesc->dimensions.z = ((ZEPhysicalBoxShape*)CurrentShape)->GetLength();
-				BoxShapeDesc->dimensions.arrayMultiply(BoxShapeDesc->dimensions, ZE_TO_NX(Scale)); 
-
-				ShapeDescList.Add(BoxShapeDesc);
-				ActorDesc.shapes.push_back(BoxShapeDesc);
-				break;
-			}
-
-			case ZE_PST_SPHERE:
-			{
-				zeDebugCheckWarning(Scale.x != Scale.y && Scale.y != Scale.z, "Sphere physical shape does not support non uniform scaling. Only scale.x parameter will be used.");
-
-				NxSphereShapeDesc* SphereShapeDesc = new NxSphereShapeDesc();
-				SphereShapeDesc->setToDefault();
-
-				SphereShapeDesc->userData = CurrentShape;
-				SphereShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
-				SphereShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
-
-				SphereShapeDesc->radius = Scale.x * ((ZEPhysicalSphereShape*)CurrentShape)->GetRadius();
-
-				ShapeDescList.Add(SphereShapeDesc);
-				ActorDesc.shapes.push_back(SphereShapeDesc);
-				break;
-			}
-
-			case ZE_PST_CAPSULE:
-			{
-				zeDebugCheckWarning(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Capsule physical shape does not support scaling. Shape did not scaled.");
-				
-				NxCapsuleShapeDesc* CapsuleShapeDesc = new NxCapsuleShapeDesc();
-				CapsuleShapeDesc->setToDefault();
-
-				CapsuleShapeDesc->userData = CurrentShape;
-				CapsuleShapeDesc->localPose.t = ZE_TO_NX(CurrentShape->GetPosition());
-				CapsuleShapeDesc->localPose.M.fromQuat(ZE_TO_NX(CurrentShape->GetRotation()));
-
-				CapsuleShapeDesc->radius = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetRadius();
-				CapsuleShapeDesc->height = ((ZEPhysicalCapsuleShape*)CurrentShape)->GetHeight() - 2 * CapsuleShapeDesc->radius;
-
-				ShapeDescList.Add(CapsuleShapeDesc);
-				ActorDesc.shapes.push_back(CapsuleShapeDesc);
-				break;
-			}
-
-			case ZE_PST_CYLINDER:
-			{
-				zeDebugCheckWarning(Scale.x != 1.0f && Scale.x != Scale.y && Scale.y != Scale.z, "Cylinder physical shape does not support scaling. Shape did not scaled.");
-				break;
-			}
-
-			case ZE_PST_CONVEX:
-			{
-				break;
-			}
-		}
-	}
-
-	switch (PhysicalBodyType)
-	{
-		case ZE_PBT_DYNAMIC:
-			break;
-
-		case ZE_PBT_KINEMATIC:
-			if (Enabled)
-			{
-				BodyDesc.flags |= NX_BF_KINEMATIC;
-				if (Actor != NULL)
-					Actor->raiseBodyFlag(NX_BF_KINEMATIC);
-			}
-			else
-			{
-				BodyDesc.flags &= ~NX_BF_KINEMATIC;
-				if (Actor != NULL)
-					Actor->clearBodyFlag(NX_BF_KINEMATIC);
-			}
-			break;
-
-		case ZE_PBT_STATIC:
-			ActorDesc.body = NULL;
-			break;
-	}
-
-	NxScene* Scene = PhysicalWorld->GetScene();
-	Actor = Scene->createActor(ActorDesc);
-	if (Actor == NULL)
-		zeError("Can not create actor.");
-
-	for (ZESize I = 0; I < ShapeDescList.GetCount(); I++)
-		delete ShapeDescList[I];
-	ShapeDescList.Clear();
-
-	return Actor != NULL;
-}
-
-void ZEPhysXPhysicalRigidBody::Deinitialize()
-{
-	if (Actor != NULL)
-	{
-		PhysicalWorld->GetScene()->releaseActor(*Actor);
-		Actor = NULL;
-	}
 }

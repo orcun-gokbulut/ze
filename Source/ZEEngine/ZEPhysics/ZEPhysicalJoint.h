@@ -49,7 +49,7 @@
 class	ZEPhysicalWorld;
 class	ZEPhysicalObject;		
 
-enum ZEPhysicalJointType
+ZE_ENUM(ZEPhysicalJointType)
 {
 	ZE_PJT_NONE					= 0,
 	ZE_PJT_SPHERICAL			= 1,
@@ -64,45 +64,45 @@ enum ZEPhysicalJointType
 	ZE_PJT_FREE					= 10,
 };
 
-enum ZEPhysicalJointState
+ZE_ENUM(ZEPhysicalJointState)
 {
 	ZE_PJS_UNBOUND				= 0,
 	ZE_PJS_SIMULATING			= 1,
 	ZE_PJS_BROKEN				= 2,
 };
 
-enum ZEPhysicalJointMotion
+ZE_ENUM(ZEPhysicalJointMotion)
 {
 	ZE_PJMOTION_FREE			= 1,
 	ZE_PJMOTION_LIMITED			= 2,
 	ZE_PJMOTION_LOCKED			= 3,
 };
 
-enum ZEPhysicalJointProjectionMode
+ZE_ENUM(ZEPhysicalJointProjectionMode)
 {
 	ZE_PJPM_NONE				= 0,
 	ZE_PJPM_POINT_MINDIST		= 1,
 	ZE_PJPM_LINEAR_MINDIST		= 2,
 };
 
-enum ZEPhysicalJointFlags
+ZE_ENUM(ZEPhysicalJointFlags)
 {
 	ZE_PJF_COLLISION_ENABLED	= 0,
 	ZE_PJF_VISUALIZATION		= 1,
 };
 
-enum ZEPhysicalJointVisualizations
+ZE_ENUM(ZEPhysicalJointVisualizations)
 {
 	ZE_PJV_LOCAL_AXES			= 0,
 	ZE_PJV_WORLD_AXES			= 1,
 	ZE_PJV_LIMITS				= 2,
 };
 
-enum ZEPhysicalJointMotorType
+ZE_ENUM(ZEPhysicalJointMotorType)
 {
 	ZE_PJMT_NONE				= 0,
-	ZE_PJMT_POSITION			= 1<<0,
-	ZE_PJMT_VELOCITY			= 1<<1,
+	ZE_PJMT_POSITION			= 1,
+	ZE_PJMT_VELOCITY			= 2,
 };
 
 typedef ZEDelegate<void (ZEPhysicalObject*, ZEPhysicalObject*, ZEVector3, ZEQuaternion, bool)> ZEPhysicalJointEvent;
@@ -114,11 +114,9 @@ struct ZEPhysicalLimitPlane : ZEPlane
 
 class ZEPhysicalJoint : public ZEPhysicalObject
 {
+	ZE_OBJECT
 	protected:
 		ZEPhysicalJointEvent					JointEvent;
-
-												ZEPhysicalJoint();
-		virtual									~ZEPhysicalJoint();
 
 	public:
 		virtual ZEPhysicalWorld*				GetPhysicalWorld() = 0;
@@ -363,13 +361,8 @@ class ZEPhysicalJoint : public ZEPhysicalObject
 		virtual const
 		ZEPhysicalJointEvent&					GetJointEvent();		
 
-		virtual bool							Initialize() = 0;
-		virtual void							Deinitialize() = 0;
-
 		virtual void							ReCreate() = 0;
-
-		virtual void							Destroy();
-		
+	
 		static ZEPhysicalJoint*					CreateInstance();
 };
 

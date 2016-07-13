@@ -48,7 +48,7 @@ void ZEDestroyable::Destroy()
 	delete this;
 }
 
-void ZEDestroyable::DestroyDeffered(bool DefferDestructor)
+void ZEDestroyable::DestroyDeferred(bool DefferDestructor)
 {
 	if (!DefferDestructor)
 	{

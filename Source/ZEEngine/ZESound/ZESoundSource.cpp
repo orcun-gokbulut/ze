@@ -374,11 +374,6 @@ float ZESoundSource::GetLoopingLenghtPercent()
 	return (GetLoopingLength() / SoundResource->GetSampleCount()) * 100.0f;
 }
 
-void ZESoundSource::Destroy()
-{
-	delete this;
-}
-
 void ZESoundSource::SetSoundResource(ZESoundResource* Resource)
 {
 	if (SoundResource != NULL)

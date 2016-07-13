@@ -75,7 +75,5 @@ class ZESector : public ZEGeographicEntity
 		virtual bool				Serialize(ZEMLWriterNode* Serializer);
 		virtual bool				Unserialize(ZEMLReaderNode* Unserializer);
 
-		virtual void				Destroy();
-
 		static ZESector*			CreateInstance();
 };

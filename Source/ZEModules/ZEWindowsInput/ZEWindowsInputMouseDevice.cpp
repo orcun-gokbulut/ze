@@ -72,6 +72,8 @@ bool ZEWindowsInputMouseDevice::InitializeInternal()
 	State.Initialize(Description);
 	State.Reset();
 
+	Acquire();
+
 	return true;
 }
 

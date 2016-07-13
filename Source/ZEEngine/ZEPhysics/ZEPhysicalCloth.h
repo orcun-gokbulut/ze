@@ -37,33 +37,36 @@
 #ifndef	__ZE_PHYSICAL_CLOTH_H__
 #define __ZE_PHYSICAL_CLOTH_H__
 
+#include "ZEMeta/ZEObject.h"
+#include "ZEInitializable.h"
+#include "ZEDestroyable.h"
+
 #include "ZETypes.h"
 #include "ZEPhysics/ZEPhysicsModule.h"
 #include "ZEPhysics/ZEPhysicalShapes.h"
 #include "ZEPhysics/ZEPhysicalRigidBody.h"
 #include "ZEDS/ZEFlags.h"
 
-enum ZEClothVertexAttachmentStatus
+ZE_ENUM(ZEClothVertexAttachmentStatus)
 {
 	ZE_PCVA_NONE	= 0,
 	ZE_PCVA_GLOBAL	= 1,
 	ZE_PCVA_SHAPE	= 2,
 };
 
-struct ZEClothVertexAttachment 
+class ZEClothVertexAttachment : public ZEObject
 {
-	ZEUInt32						VertexId;
-	ZEClothVertexAttachmentStatus	AttachmentStatus;
-	ZEPhysicalShape*				AttachmentShape;
-	ZEVector3						AttachmentPosition;
+	ZE_OBJECT
+	public:
+		ZEUInt32								VertexId;
+		ZEClothVertexAttachmentStatus			AttachmentStatus;
+		ZEPhysicalShape*						AttachmentShape;
+		ZEVector3								AttachmentPosition;
 };
 
-class ZEPhysicalCloth
+class ZEPhysicalCloth : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
-	protected:
-												ZEPhysicalCloth();
-		virtual									~ZEPhysicalCloth();
-
+	ZE_OBJECT
 	public:
 		virtual void							SetEnabled(bool IsEnabled = true) = 0;
 		virtual bool							GetEnabled() const = 0;
@@ -123,16 +126,12 @@ class ZEPhysicalCloth
 		virtual void							AttachVertex(ZEUInt VertexId, const ZEPhysicalShape* Shape, const ZEVector3& LocalPosition) = 0;
 		virtual void							DetachVertex(const ZEUInt VertexId) = 0;
 
-		virtual ZEClothVertexAttachment			GetVertexAttachment(ZEUInt VertexId) const = 0;
+		ZE_META_ATTRIBUTE(ZEMC.Export, false)
+		virtual const ZEClothVertexAttachment*	GetVertexAttachment(ZEUInt VertexId) const = 0;
 
 		virtual bool							TearVertex(const ZEUInt VertexId, const ZEVector3& Normal) = 0;
 
-		virtual bool							Initialize() = 0;
-		virtual void							Deinitialize() = 0;
-
 		virtual void							ReCreate() = 0;
-
-		virtual void							Destroy();
 
 		static ZEPhysicalCloth*					CreateInstance();
 };

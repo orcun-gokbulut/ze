@@ -93,11 +93,6 @@ bool ZEDOperation::Undo()
 	return Result;
 }
 
-void ZEDOperation::Destroy()
-{
-	delete this;
-}
-
 ZEDOperation::ZEDOperation()
 {
 	Manager = NULL;

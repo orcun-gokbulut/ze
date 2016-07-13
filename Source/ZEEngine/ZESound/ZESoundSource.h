@@ -161,8 +161,6 @@ class ZESoundSource : public ZEEntity
 		virtual void				Resume() = 0;
 		virtual void				Pause() = 0;
 		virtual void				Stop() = 0;
-						
-		void						Destroy();
 
 		virtual void				SetSoundResource(ZESoundResource* Resource) = 0;
 		ZESoundResource*			GetSoundResource() const;

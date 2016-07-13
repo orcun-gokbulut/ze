@@ -51,10 +51,143 @@ enum ZEClothBehaviourFlags
 	ZE_CBF_TEARABLE					= 4096
 };
 
+static void WeldVertices(ZEArray<ZEVector3>& InputVertices, ZEArray<ZEVector3>& OutputVertices, ZEArray<ZEUInt32>& OutputIndices)
+{
+	ZEUInt32 ParticleCount = InputVertices.GetCount();
+
+	OutputVertices.Clear();
+
+	OutputIndices.Clear();
+	OutputIndices.SetCount(ParticleCount);
+
+	for (ZESize I = 0; I < ParticleCount; I++)
+	{
+		OutputIndices[I] = I;
+	}
+
+	ZEArray<ZEVector3> TempVerts = InputVertices;
+	for(ZESize I = 0; I < ParticleCount; I++)
+	{
+		for(ZESize J = I + 1; J < ParticleCount; J++)
+		{
+			if(InputVertices[I] == TempVerts[J])
+			{
+				TempVerts[J] = ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX);
+			}
+		}
+	}
+
+	for(ZESize I = 0; I < ParticleCount; I++)
+	{
+		if(TempVerts[I] != ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX))
+		{
+			OutputVertices.Add(TempVerts[I]);
+		}
+	}
+
+	for(ZESize I = 0; I < OutputVertices.GetCount(); I++)
+	{
+		for(ZESize J = 0; J < ParticleCount; J++)
+		{
+			if(OutputVertices[I] == InputVertices[J])
+			{
+				OutputIndices[J] = I;
+			}
+		}
+	}
+}
+
 void ZEPhysXPhysicalCloth::ReCreate()
 {
 	Deinitialize();
 	Initialize();
+}
+
+bool ZEPhysXPhysicalCloth::InitializeInternal()
+{
+	if (!ZEPhysicalCloth::InitializeInternal())
+		return false;
+
+	if (Cloth != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
+		return false;
+
+	ClothMeshDesc.weldingDistance = 0;
+	ClothMeshDesc.flags |= NX_CLOTH_MESH_WELD_VERTICES;
+
+	ClothDesc.flags |= ZE_CBF_GRAVITY;
+	ClothDesc.flags |= ZE_CBF_COLLISION_TWOWAY;
+
+	ParticleCount = ClothVertices.GetCount();
+
+	ZEArray<ZEVector3> WeldedVertices;
+	WeldVertices(ClothVertices, WeldedVertices, ClothIndices);
+
+	ClothMeshDesc.numVertices				= WeldedVertices.GetCount();
+	ClothMeshDesc.numTriangles				= ClothIndices.GetCount() / 3;
+	ClothMeshDesc.pointStrideBytes			= sizeof(ZEVector3);
+	ClothMeshDesc.triangleStrideBytes		= sizeof(ZEUInt32) * 3;
+	ClothMeshDesc.points					= WeldedVertices.GetCArray();
+	ClothMeshDesc.triangles					= ClothIndices.GetCArray();
+
+	NxInitCooking();
+	ZEPhysXMemoryWriteStream MemoryWriteStream;
+	NxCookClothMesh(ClothMeshDesc, MemoryWriteStream);
+
+	ZEPhysXMemoryReadStream MemoryReadStream;
+	MemoryReadStream.SetData(MemoryWriteStream.GetData());
+	ClothMesh = PhysicalWorld->GetPhysicsSDK()->createClothMesh(MemoryReadStream);
+	NxCloseCooking();
+
+	MeshData.verticesPosBegin = ClothVertices.GetCArray();
+	MeshData.verticesPosByteStride = sizeof(ZEVector3);
+	MeshData.maxVertices = ParticleCount;
+	MeshData.numVerticesPtr = &ParticleCount;
+
+	MeshData.indicesBegin = ClothIndices.GetCArray();
+	MeshData.indicesByteStride = sizeof(ZEUInt32);
+	MeshData.maxIndices = ParticleCount;
+	MeshData.numIndicesPtr = &ParticleCount;
+
+	*MeshData.numVerticesPtr = 0;
+	*MeshData.numIndicesPtr = 0;
+
+	ClothDesc.clothMesh = ClothMesh;
+	ClothDesc.meshData	= MeshData;
+
+	NxScene* Scene = PhysicalWorld->GetScene();
+	Cloth = (NxCloth*)Scene->createCloth(ClothDesc);
+	if(Cloth == NULL)
+	{
+		zeError("Can not create cloth.");
+		return false;
+	}
+
+	WeldedVertices.Clear();
+
+	return true;
+}
+
+bool ZEPhysXPhysicalCloth::DeinitializeInternal()
+{
+	if (Cloth != NULL)
+	{
+		PhysicalWorld->GetScene()->releaseCloth(*Cloth);	
+		Cloth = NULL;
+	}
+
+	return ZEPhysicalCloth::DeinitializeInternal();
+}
+
+ZEPhysXPhysicalCloth::ZEPhysXPhysicalCloth()
+{
+	Cloth = NULL;
+	PhysicalWorld = NULL;
+	ClothDesc.userData = this;
+}
+
+ZEPhysXPhysicalCloth::~ZEPhysXPhysicalCloth()
+{
+	Deinitialize();
 }
 
 ZEArray<ZEVector3>& ZEPhysXPhysicalCloth::GetVertices()
@@ -291,144 +424,16 @@ void ZEPhysXPhysicalCloth::DetachVertex(const ZEUInt VertexId)
 			Attachments.Remove(I);
 }
 
-ZEClothVertexAttachment ZEPhysXPhysicalCloth::GetVertexAttachment(ZEUInt VertexId) const
+const ZEClothVertexAttachment* ZEPhysXPhysicalCloth::GetVertexAttachment(ZEUInt VertexId) const
 {
 	for(ZESize I = 0; I < Attachments.GetCount(); I++)
 		if(Attachments[I].VertexId == VertexId)
-			return Attachments[I];
+			return &Attachments[I];
+
+	return NULL;
 }
 
 bool ZEPhysXPhysicalCloth::TearVertex(const ZEUInt VertexId, const ZEVector3& Normal)
 {
 	return Cloth->tearVertex(VertexId, ZE_TO_NX(Normal));
 }
-
-void WeldVertices(ZEArray<ZEVector3>& InputVertices, ZEArray<ZEVector3>& OutputVertices, ZEArray<ZEUInt32>& OutputIndices)
-{
-	ZEUInt32 ParticleCount = InputVertices.GetCount();
-
-	OutputVertices.Clear();
-
-	OutputIndices.Clear();
-	OutputIndices.SetCount(ParticleCount);
-
-	for (ZESize I = 0; I < ParticleCount; I++)
-	{
-		OutputIndices[I] = I;
-	}
-
-	ZEArray<ZEVector3> TempVerts = InputVertices;
-	for(ZESize I = 0; I < ParticleCount; I++)
-	{
-		for(ZESize J = I + 1; J < ParticleCount; J++)
-		{
-			if(InputVertices[I] == TempVerts[J])
-			{
-				TempVerts[J] = ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX);
-			}
-		}
-	}
-
-	for(ZESize I = 0; I < ParticleCount; I++)
-	{
-		if(TempVerts[I] != ZEVector3(ZE_FLOAT_MAX, ZE_FLOAT_MAX, ZE_FLOAT_MAX))
-		{
-			OutputVertices.Add(TempVerts[I]);
-		}
-	}
-
-	for(ZESize I = 0; I < OutputVertices.GetCount(); I++)
-	{
-		for(ZESize J = 0; J < ParticleCount; J++)
-		{
-			if(OutputVertices[I] == InputVertices[J])
-			{
-				OutputIndices[J] = I;
-			}
-		}
-	}
-}
-
-bool ZEPhysXPhysicalCloth::Initialize()
-{
-	if (Cloth != NULL || PhysicalWorld == NULL || PhysicalWorld->GetScene() == NULL)
-		return false;
-
-	ClothMeshDesc.weldingDistance = 0;
-	ClothMeshDesc.flags |= NX_CLOTH_MESH_WELD_VERTICES;
-
-	ClothDesc.flags |= ZE_CBF_GRAVITY;
-	ClothDesc.flags |= ZE_CBF_COLLISION_TWOWAY;
-
-	ParticleCount = ClothVertices.GetCount();
-
-	ZEArray<ZEVector3> WeldedVertices;
-	WeldVertices(ClothVertices, WeldedVertices, ClothIndices);
-
-	ClothMeshDesc.numVertices				= WeldedVertices.GetCount();
-	ClothMeshDesc.numTriangles				= ClothIndices.GetCount() / 3;
-	ClothMeshDesc.pointStrideBytes			= sizeof(ZEVector3);
-	ClothMeshDesc.triangleStrideBytes		= sizeof(ZEUInt32) * 3;
-	ClothMeshDesc.points					= WeldedVertices.GetCArray();
-	ClothMeshDesc.triangles					= ClothIndices.GetCArray();
-
-	NxInitCooking();
-	ZEPhysXMemoryWriteStream MemoryWriteStream;
-	NxCookClothMesh(ClothMeshDesc, MemoryWriteStream);
-
-	ZEPhysXMemoryReadStream MemoryReadStream;
-	MemoryReadStream.SetData(MemoryWriteStream.GetData());
-	ClothMesh = PhysicalWorld->GetPhysicsSDK()->createClothMesh(MemoryReadStream);
-	NxCloseCooking();
-
-	MeshData.verticesPosBegin = ClothVertices.GetCArray();
-	MeshData.verticesPosByteStride = sizeof(ZEVector3);
-	MeshData.maxVertices = ParticleCount;
-	MeshData.numVerticesPtr = &ParticleCount;
-	
-	MeshData.indicesBegin = ClothIndices.GetCArray();
-	MeshData.indicesByteStride = sizeof(ZEUInt32);
-	MeshData.maxIndices = ParticleCount;
-	MeshData.numIndicesPtr = &ParticleCount;
-
-	*MeshData.numVerticesPtr = 0;
-	*MeshData.numIndicesPtr = 0;
-
-	ClothDesc.clothMesh = ClothMesh;
-	ClothDesc.meshData	= MeshData;
-
-	NxScene* Scene = PhysicalWorld->GetScene();
-	Cloth = (NxCloth*)Scene->createCloth(ClothDesc);
-	if(Cloth == NULL)
-	{
-		zeError("Can not create cloth.");
-		return false;
-	}
-
-	WeldedVertices.Clear();
-
-	return true;
-}
-
-void ZEPhysXPhysicalCloth::Deinitialize()
-{
-	if (Cloth != NULL)
-	{
-		PhysicalWorld->GetScene()->releaseCloth(*Cloth);	
-		Cloth = NULL;
-	}
-}
-
-ZEPhysXPhysicalCloth::ZEPhysXPhysicalCloth()
-{
-	Cloth = NULL;
-	PhysicalWorld = NULL;
-	ClothDesc.userData = this;
-}
-
-ZEPhysXPhysicalCloth::~ZEPhysXPhysicalCloth()
-{
-	Deinitialize();
-}
-
-

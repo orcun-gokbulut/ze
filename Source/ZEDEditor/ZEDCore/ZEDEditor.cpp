@@ -494,11 +494,6 @@ void ZEDEditor::UnmarkDocumentModified()
 	DistributeEvent(&Event);
 }
 
-void ZEDEditor::Destroy()
-{
-	delete this;
-}
-
 ZEDEditor::ZEDEditor()
 {
 	Core = NULL;

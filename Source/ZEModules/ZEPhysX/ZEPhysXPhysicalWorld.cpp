@@ -51,6 +51,53 @@ static ZEVector4 NX_TO_ZE(NxU32 color)
 	return ZEVector4(1.0f, Red, Green, Blue);
 }
 
+bool ZEPhysXPhysicalWorld::InitializeInternal()
+{	
+	if (!ZEPhysicalWorld::InitializeInternal())
+		return false;
+
+	SceneDesc.gravity = ZE_TO_NX(ZEVector3(0.0f, -9.8f, 0.0f));
+	SceneDesc.flags |= NX_SF_ENABLE_ACTIVETRANSFORMS;
+
+	Scene = GetPhysicsSDK()->createScene(SceneDesc);
+	if (Scene == NULL) 
+	{
+		zeError("Can not create scene.");
+		return false;
+	}
+
+	NxMaterial* DefaultMaterial = Scene->getMaterialFromIndex(0);
+	DefaultMaterial->setRestitution(0.5f);
+	DefaultMaterial->setDynamicFriction(0.5f);
+	DefaultMaterial->setStaticFriction(0.5f);
+
+	Scene->setTiming(1.0f / 60.0f, 4, NX_TIMESTEP_FIXED);
+
+	for (ZESize I = 0; I < PhysicalObjects.GetCount(); I++)
+		PhysicalObjects[I]->Initialize();
+
+	for (ZESize I = 0; I < PhysicalObjects.GetCount(); I++)
+		PhysicalObjects[I]->Initialize();
+
+	Scene->setUserContactReport(&CollisionManager);
+
+	return true;
+}
+
+bool ZEPhysXPhysicalWorld::DeinitializeInternal()
+{
+	for (ZESize I = 0; I < PhysicalObjects.GetCount(); I++)
+		PhysicalObjects[I]->Deinitialize();
+
+	if (Scene != NULL)
+	{
+		GetPhysicsSDK()->releaseScene(*Scene);
+		Scene = NULL;
+	}
+
+	return ZEPhysicalWorld::DeinitializeInternal();
+}
+
 ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 {
 	Scene = NULL;
@@ -65,7 +112,7 @@ ZEPhysXPhysicalWorld::ZEPhysXPhysicalWorld()
 
 ZEPhysXPhysicalWorld::~ZEPhysXPhysicalWorld()
 {
-	Deinitialize();
+	GetModule()->PhysicalWorlds.RemoveValue(this);
 }
 
 NxScene* ZEPhysXPhysicalWorld::GetScene()
@@ -126,59 +173,11 @@ bool ZEPhysXPhysicalWorld::GetEnabled()
 	return Enabled;
 }
 
-bool ZEPhysXPhysicalWorld::Initialize()
-{	
-	SceneDesc.gravity = ZE_TO_NX(ZEVector3(0.0f, -9.8f, 0.0f));
-	SceneDesc.flags |= NX_SF_ENABLE_ACTIVETRANSFORMS;
-
-	Scene = GetPhysicsSDK()->createScene(SceneDesc);
-	if (Scene == NULL) 
-	{
-		zeError("Can not create scene.");
-		return false;
-	}
-
-	NxMaterial* DefaultMaterial = Scene->getMaterialFromIndex(0);
-	DefaultMaterial->setRestitution(0.5f);
-	DefaultMaterial->setDynamicFriction(0.5f);
-	DefaultMaterial->setStaticFriction(0.5f);
-
-	Scene->setTiming(1.0f / 60.0f, 4, NX_TIMESTEP_FIXED);
-
-	for (ZESize I = 0; I < PhysicalObjects.GetCount(); I++)
-		PhysicalObjects[I]->Initialize();
-
-	for (ZESize I = 0; I < PhysicalObjects.GetCount(); I++)
-		PhysicalObjects[I]->Initialize();
-
-	Scene->setUserContactReport(&CollisionManager);
-
-	return true;
-}
-
-void ZEPhysXPhysicalWorld::Deinitialize()
-{
-	for (ZESize I = 0; I < PhysicalObjects.GetCount(); I++)
-		PhysicalObjects[I]->Deinitialize();
-
-	if (Scene != NULL)
-	{
-		GetPhysicsSDK()->releaseScene(*Scene);
-		Scene = NULL;
-	}
-}
-
 void ZEPhysXPhysicalWorld::Process(float ElapsedTime)
 {
 	Scene->simulate(ElapsedTime);
 
 	Scene->flushStream();
-}
-
-void ZEPhysXPhysicalWorld::Destroy()
-{
-	GetModule()->PhysicalWorlds.RemoveValue(this);
-	delete this; 
 }
 
 void ZEPhysXPhysicalWorld::Update()

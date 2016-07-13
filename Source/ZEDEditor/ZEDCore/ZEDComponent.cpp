@@ -129,8 +129,3 @@ ZEDEditor* ZEDComponent::GetEditor()
 {
 	return Editor;
 }
-
-void ZEDComponent::Destroy()
-{
-	delete this;
-}

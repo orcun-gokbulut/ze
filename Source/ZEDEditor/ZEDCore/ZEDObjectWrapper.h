@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEVariant.h"
@@ -54,7 +55,7 @@ class ZEDObjectEvent;
 class QWidget;
 class QMenu;
 
-class ZEDObjectWrapper : public ZEObject, public ZEInitializable
+class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEDObjectManager;
@@ -153,6 +154,5 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable
 		virtual void								Update();
 
 		virtual ZEDObjectWrapper*					Clone();
-		virtual void								Destroy();
 }
 ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEObject);

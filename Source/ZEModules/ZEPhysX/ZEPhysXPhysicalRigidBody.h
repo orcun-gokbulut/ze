@@ -48,7 +48,6 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 {
 	friend class ZEPhysXPhysicalJoint;
 	friend class ZEPhysXModule;
-
 	private:
 		ZEPhysXPhysicalWorld*			PhysicalWorld;
 		ZEArray<ZEPhysicalShape*>		Shapes;
@@ -143,8 +142,8 @@ class ZEPhysXPhysicalRigidBody : public ZEPhysicalRigidBody
 
 		virtual float					GetComputedKineticEnergy() const;
 								
-		virtual bool					Initialize();
-		virtual void					Deinitialize();
+		virtual bool					InitializeInternal();
+		virtual bool					DeinitializeInternal();
 };
 
 #endif

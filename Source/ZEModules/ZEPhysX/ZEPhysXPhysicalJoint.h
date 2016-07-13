@@ -51,7 +51,6 @@ class ZEPhysicalJoint;
 class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 {
 	friend class ZEPhysXModule;
-
 	private:
 		ZEPhysXPhysicalWorld*					PhysicalWorld;
 		NxD6Joint*								Joint;
@@ -67,6 +66,9 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 		ZEArray<ZEPhysicalLimitPlane>			LimitPlanes;
 
 		virtual void							ReCreate();
+
+		virtual bool							InitializeInternal();
+		virtual bool							DeinitializeInternal();
 
 												ZEPhysXPhysicalJoint();										
 		virtual									~ZEPhysXPhysicalJoint();
@@ -323,9 +325,6 @@ class ZEPhysXPhysicalJoint: public ZEPhysicalJoint
 		virtual ZEUInt32						GetCollisionEventFlags();
 
 		//virtual void							SetDefaultValues(ZEPhysicalJointType Type);
-
-		virtual bool							Initialize();
-		virtual void							Deinitialize();
 };
 
 #endif

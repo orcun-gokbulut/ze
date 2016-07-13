@@ -45,23 +45,7 @@ const ZEPhysicalTriggerEvent& ZEPhysicalTrigger::GetTriggerEvent()
 	return TriggerEvent;
 }
 
-ZEPhysicalTrigger::ZEPhysicalTrigger()
-{
-
-}
-
-ZEPhysicalTrigger::~ZEPhysicalTrigger()
-{
-
-}
-
 ZEPhysicalTrigger* ZEPhysicalTrigger::CreateInstance()
 {
-	return zePhysics->CreatePhysicalTrigger();
-}
-
-void ZEPhysicalTrigger::Destroy()
-{
-	Deinitialize();
-	delete this;
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalTrigger();
 }

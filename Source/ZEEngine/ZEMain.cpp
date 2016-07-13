@@ -38,7 +38,6 @@
 #include <windows.h>
 
 #include "ZECore/ZECore.h"
-#include "ZECore/ZEWindow.h"
 #include "ZECore/ZEConsoleWindow.h"
 #include "ZECore/ZEOptionManager.h"
 

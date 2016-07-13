@@ -432,8 +432,3 @@ ZEDObjectWrapper* ZEDObjectWrapper::Clone()
 
 	return CloneWrapper;
 }
-
-void ZEDObjectWrapper::Destroy()
-{
-	delete this;
-}

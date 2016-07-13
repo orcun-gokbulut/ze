@@ -45,23 +45,7 @@ const ZEPhysicalJointEvent& ZEPhysicalJoint::GetJointEvent()
 	return JointEvent;
 }
 
-ZEPhysicalJoint::ZEPhysicalJoint()
-{
-
-}
-
-ZEPhysicalJoint::~ZEPhysicalJoint()
-{
-
-}
-
 ZEPhysicalJoint* ZEPhysicalJoint::CreateInstance()
 {
-	return zePhysics->CreatePhysicalJoint();
-}
-
-void ZEPhysicalJoint::Destroy()
-{
-	Deinitialize();
-	delete this;
+	return ZEPhysicsModule::GetInstance()->CreatePhysicalJoint();
 }

@@ -37,6 +37,7 @@
 
 #include "ZEMeta/ZEObject.h"
 #include "ZEInitializable.h"
+#include "ZEDestroyable.h"
 
 #include "ZEDS/ZEArray.h"
 
@@ -60,7 +61,7 @@ enum ZEDFileState
 	ZED_ES_MODIFIED
 };
 
-class ZEDEditor : public ZEObject, public ZEInitializable
+class ZEDEditor : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEDEditorCore;
@@ -143,6 +144,4 @@ class ZEDEditor : public ZEObject, public ZEInitializable
 		void								UnmarkDocumentModified();
 
 		void								DistributeEvent(const ZEDEvent* Event);
-
-		virtual void						Destroy();
 };

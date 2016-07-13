@@ -819,11 +819,6 @@ void ZEEntity::Unload()
 		ManageTask.Run();
 }
 
-void ZEEntity::Destroy()
-{
-	delete this;
-}
-
 void ZEEntity::Tick(float Time)
 {
 
