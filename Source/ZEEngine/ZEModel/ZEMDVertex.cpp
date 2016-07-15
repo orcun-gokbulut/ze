@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelIKChain.h
+ Zinek Engine - ZEMDVertex.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,60 +33,49 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
-#ifndef	__ZE_MODEL_IK_CHAIN_H__
-#define __ZE_MODEL_IK_CHAIN_H__
+#include "ZEMDVertex.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEModelIKChainNode.h"
+#include "ZEGraphics\ZEGRVertexLayout.h"
 
-class ZEModel;
-
-class ZEModelIKChain
+const ZEGRVertexLayout& ZEMDVertex::GetVertexLayout()
 {
-	friend class ZEModel;
-	private:
-		ZEString							Name;
+	static ZEGRVertexLayout VertexLayout;
+	if (VertexLayout.GetElementCount() == 0)
+	{
+		static ZEGRVertexElement ElementArray[] = 
+		{
+			{ZEGR_VES_POSITION,	0, ZEGR_VET_FLOAT3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0}
+		};
 
-		bool								Enabled;
+		VertexLayout.SetElements(ElementArray, 5);
+	}
 
-		ZEVector3							EffectorPosition;
-		ZEQuaternion						EffectorRotation;
+	return VertexLayout;
+}
 
-		float								ErrorThreshold;
-		ZEUInt								MaxIterationCount;
 
-		float								RotationLimit;
+const ZEGRVertexLayout& ZEMDVertexSkin::GetVertexLayout()
+{
+	static ZEGRVertexLayout VertexLayout;
+	if (VertexLayout.GetElementCount() == 0)
+	{
+		static ZEGRVertexElement ElementArray[] = 
+		{
+			{ZEGR_VES_POSITION,	0, ZEGR_VET_FLOAT3, 0, 0,  ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_NORMAL,	0, ZEGR_VET_FLOAT3, 0, 12, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TANGENT,	0, ZEGR_VET_FLOAT3, 0, 24, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BINORMAL,	0, ZEGR_VET_FLOAT3, 0, 36, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_TEXCOORD,	0, ZEGR_VET_FLOAT2, 0, 48, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BLEND_INDICES, 0, ZEGR_VET_UINT4,	 0, 56, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_BLEND_WEIGHTS, 0, ZEGR_VET_FLOAT4, 0, 60, ZEGR_VU_PER_VERTEX, 0},
+		};
 
-		void								Iterate();
+		VertexLayout.SetElements(ElementArray, 4);
+	}
 
-	public:
-		const ZEString&						GetName();
-		void								SetName(ZEString Name);
-
-		ZEArray<ZEModelIKChainNode>			Nodes;
-
-		void								SetEnabled(bool Enabled);
-		bool								GetEnabled();
-
-		const ZEVector3&					GetEffectorPosition();
-		void								SetEffectorPosition(const ZEVector3& Position);
-
-		const ZEQuaternion&					GetEffectorRotation();
-		void								SetEffectorRotation(const ZEQuaternion& Rotation);
-
-		void								SetMaxIterationCount(ZEUInt Value);
-		ZEUInt								GetMaxIterationCount();
-
-		void								SetErrorThreshold(float Value);
-		float								GetErrorThreshold();
-
-		void								Process();
-
-											ZEModelIKChain();
-};
-#endif
+	return VertexLayout;
+}

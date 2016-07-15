@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelIKChain.h
+ Zinek Engine - ZEMDResourceAnimation.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,59 +34,84 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_IK_CHAIN_H__
-#define __ZE_MODEL_IK_CHAIN_H__
+
+#include "ZEMeta\ZEObject.h"
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEModelIKChainNode.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEArray.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEQuaternion.h"
 
-class ZEModel;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
-class ZEModelIKChain
+
+// struct Key
+// {
+// 	ZEVector3 Key;
+// 	float Duration;
+// };
+// 
+// struct Animation
+// {
+// 	ZEMDObjectType Type;
+// 	ZEString ObjectName;
+// 	ZEArray<Key> PositionKeys;
+// 	ZEArray<Key> RotationKeys;
+// 	ZEArray<Key> ScaleKeys;
+// };
+// 
+// class ZEModelMesh;
+// 
+// ZEQuaternion KeyToQuad(ZEVector3 Key)
+// {
+// 	ZEQuaternion Output;
+// 	Output.x = Key.x;
+// 	Output.y = Key.y;
+// 	Output.z = Key.z;
+// 	Output.w = sqrt(1.0f - Key.x * Key.x - Key.y * Key.y - Key.z * Key.z);
+// 	return Output;
+// }
+
+struct ZEModelResourceAnimationKey
 {
-	friend class ZEModel;
+	ZEUInt32 ItemId;
+	ZEVector3 Position;
+	ZEQuaternion Rotation;
+	ZEVector3 Scale;
+};
+
+struct ZEModelResourceAnimationFrame
+{
+	ZEArray<ZEModelResourceAnimationKey> BoneKeys;
+	ZEArray<ZEModelResourceAnimationKey> MeshKeys;
+};
+
+class ZEModelResourceAnimation : public ZEObject
+{
+	ZE_OBJECT
+	friend class ZEModelResource;
 	private:
-		ZEString							Name;
+		ZELink<ZEModelResourceAnimation> Link;
 
-		bool								Enabled;
-
-		ZEVector3							EffectorPosition;
-		ZEQuaternion						EffectorRotation;
-
-		float								ErrorThreshold;
-		ZEUInt								MaxIterationCount;
-
-		float								RotationLimit;
-
-		void								Iterate();
+		ZEString Name;
+		ZEArray<ZEModelResourceAnimationFrame> Frames;
+		ZEArray<ZEGUID> ItemGUIDS;
 
 	public:
-		const ZEString&						GetName();
-		void								SetName(ZEString Name);
+		void SetName(const ZEString& Name);
+		const ZEString& GetName() const;
 
-		ZEArray<ZEModelIKChainNode>			Nodes;
+		void SetFrames(ZEArray<ZEModelResourceAnimationFrame>& Frames);
+		const ZEArray<ZEModelResourceAnimationFrame>& GetFrames() const;
+		
+		void AddFrame(const ZEModelResourceAnimationFrame& Frame);
+		void RemoveFrame(ZESize Index);
 
-		void								SetEnabled(bool Enabled);
-		bool								GetEnabled();
+		bool Load(const ZEMLReaderNode& AnimationNode);
+		bool Save(ZEMLWriterNode& AnimationNode) const;
 
-		const ZEVector3&					GetEffectorPosition();
-		void								SetEffectorPosition(const ZEVector3& Position);
-
-		const ZEQuaternion&					GetEffectorRotation();
-		void								SetEffectorRotation(const ZEQuaternion& Rotation);
-
-		void								SetMaxIterationCount(ZEUInt Value);
-		ZEUInt								GetMaxIterationCount();
-
-		void								SetErrorThreshold(float Value);
-		float								GetErrorThreshold();
-
-		void								Process();
-
-											ZEModelIKChain();
+		ZEModelResourceAnimation();
 };
-#endif

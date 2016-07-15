@@ -34,68 +34,70 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_HELPER_H__
-#define __ZE_MODEL_HELPER_H__
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZEMeta/ZEObject.h"
+#include "ZEModelMesh.h"
+#include "ZEModelBone.h"
 
-enum ZEModelHelperOwnerType
-{
-	ZE_MHOT_MODEL			= 0,
-	ZE_MHOT_MESH			= 1,
-	ZE_MHOT_BONE			= 2
-};
-struct ZEModelResourceHelper;
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEModelMesh,"ZEModelMesh.h")
 ZE_META_FORWARD_DECLARE(ZEModelBone,"ZEModelBone.h")
 
-#include "ZEModelMesh.h"
-#include "ZEModelBone.h"
+enum ZEModelHelperParentType
+{
+	ZE_MHPT_MODEL			= 0,
+	ZE_MHPT_MESH			= 1,
+	ZE_MHPT_BONE			= 2
+};
 
 class ZEModelHelper : public ZEObject
 {
 	ZE_OBJECT
-
+	friend class ZEModel;
 	private:
+		ZEModelHelperParentType				ParentType;
 
-		ZEModel*							OwnerModel;
-
-		ZEModelHelperOwnerType				OwnerType;
-
-		ZEModelMesh*						OwnerMesh;
-		ZEModelBone*						OwnerBone;
+		ZEModel*							ParentModel;
+		ZEModelMesh*						ParentMesh;
+		ZEModelBone*						ParentBone;
+		ZELink<ZEModelHelper>				ParentLink;
 
 		const ZEModelResourceHelper*		HelperResource;
 
 		ZEVector3							Position;
-		ZEVector3							Scale;
 		ZEQuaternion						Rotation;
+		ZEVector3							Scale;
+
+		void								SetParent(ZEModel* Model);
+		void								SetParent(ZEModelMesh* Mesh);
+		void								SetParent(ZEModelBone* Bone);
 
 	public:
-
 		const char*							GetName() const;
 
-		ZEModelHelperOwnerType				GetOwnerType() const;
-		const ZEString&						GetUserDefinedProperties() const;
+		ZEModelHelperParentType				GetParentType() const;
+		ZEString							GetUserDefinedProperties() const;
 
-		ZEModelMesh*						GetMeshOwner() const;
-		ZEModelBone*						GetBoneOwner() const;
+		ZEModel*							GetParentModel() const;
+		ZEModelMesh*						GetParentMesh() const;
+		ZEModelBone*						GetParentBone() const;
 
-		void								SetPosition(const ZEVector3& LocalPosition);
+		void								SetPosition(const ZEVector3& Position);
 		const ZEVector3&					GetPosition() const;
+
+		void								SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&					GetRotation() const;
+
+		void								SetScale(const ZEVector3& Scale);
+		const ZEVector3&					GetScale() const;
+
 		const ZEVector3						GetModelPosition() const;
 		const ZEVector3						GetWorldPosition() const;
 
-		void								SetRotation(const ZEQuaternion& LocalRotation);
-		const ZEQuaternion&					GetRotation() const;
 		const ZEQuaternion					GetModelRotation() const;
 		const ZEQuaternion					GetWorldRotation() const;
 
-		void								SetScale(const ZEVector3& LocalScale);
-		const ZEVector3&					GetScale() const;
 		const ZEVector3						GetModelScale() const;
 		const ZEVector3						GetWorldScale() const;
 
@@ -111,13 +113,10 @@ class ZEModelHelper : public ZEObject
 		ZEVector3							GetWorldRight() const;
 		ZEVector3							GetWorldUp() const;
 
-		void								Initialize(ZEModel* Model, const ZEModelResourceHelper* HelperResource);
-		void								Deinitialize();
+		void								Load(ZEModel* Model, ZEHolder<const ZEModelResource> Resource, const ZEModelResourceHelper* HelperResource);
+		void								Unload();
 
 											ZEModelHelper();
+		virtual								~ZEModelHelper();
 
 };
-
-
-
-#endif

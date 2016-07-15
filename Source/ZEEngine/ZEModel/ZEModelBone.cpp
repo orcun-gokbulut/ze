@@ -38,32 +38,76 @@
 #include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEScene.h"
 
-#define ZEMD_BDF_LOCAL_TRANSFORM			0x0001
-#define ZEMD_BDF_INV_LOCAL_TRANSFORM		0x0002
-#define ZEMD_BDF_MODEL_TRANSFORM			0x0004
-#define ZEMD_BDF_INV_MODEL_TRANSFORM		0x0008
-#define ZEMD_BDF_WORLD_TRANSFORM			0x0010
-#define ZEMD_BDF_INV_WORLD_TRANSFORM		0x0020
-#define ZEMD_BDF_FORWARD_TRANSFORM			0x0040
-#define ZEMD_BDF_INVERSE_TRANSFORM			0x0080
-#define ZEMD_BDF_VERTEX_TRANSFORM			0x0100
-#define ZEMD_BDF_MODEL_BOUNDING_BOX			0x0200
-#define ZEMD_BDF_WORLD_BOUNDING_BOX			0x0400
+#define ZEMD_BDF_INITIAL_TRANSFORM				0x0001
+#define ZEMD_BDF_INV_INITIAL_TRANSFORM			0x0002
+#define ZEMD_BDF_INITIAL_MODEL_TRANSFORM		0x0004
+#define ZEMD_BDF_INV_INITIAL_MODEL_TRANSFORM	0x0008
+#define ZEMD_BDF_TRANSFORM						0x0010
+#define ZEMD_BDF_INV_TRANSFORM					0x0020
+#define ZEMD_BDF_MODEL_TRANSFORM				0x0040
+#define ZEMD_BDF_MODEL_INV_TRANSFORM			0x0080
+#define ZEMD_BDF_MODEL_BOUNDING_BOX				0x0100
+#define ZEMD_BDF_WORLD_TRANSFORM				0x0200
+#define ZEMD_BDF_WORLD_INV_TRANSFORM			0x0400
+#define ZEMD_BDF_WORLD_BOUNDING_BOX				0x0800
+#define ZEMD_BDF_VERTEX_TRANSFORM				0x1000
 
 #include <stdio.h>
 
-void ZEModelBone::LocalTransformChanged()
+// void ZEModelBone::LocalTransformChanged()
+// {
+// 	DirtyFlags.RaiseFlags(
+// 		ZEMD_BDF_TRANSFORM | ZEMD_BDF_INV_TRANSFORM |
+// 		ZEMD_BDF_MODEL_TRANSFORM | ZEMD_BDF_MODEL_INV_TRANSFORM |
+// 		ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_WORLD_INV_TRANSFORM |
+// 		ZEMD_BDF_VERTEX_TRANSFORM |
+// 		ZEMD_BDF_MODEL_BOUNDING_BOX |
+// 		ZEMD_BDF_WORLD_BOUNDING_BOX);
+// 
+// 	ze_for_each(ChildBone, ChildBones)
+// 		ChildBone->ParentTransformChanged();
+// 
+// 	if (Model != NULL)
+// 	{
+// 		Model->ChildBoundingBoxChanged();
+// 		Model->DirtyConstantBufferSkin = true;
+// 	}
+// }
+// 
+// void ZEModelBone::ParentTransformChanged()
+// {
+// 	DirtyFlags.RaiseFlags(
+// 		ZEMD_BDF_MODEL_TRANSFORM | ZEMD_BDF_INV_MODEL_TRANSFORM |
+// 		ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_INV_WORLD_TRANSFORM |
+// 		ZEMD_BDF_VERTEX_TRANSFORM |
+// 		ZEMD_BDF_MODEL_BOUNDING_BOX |
+// 		ZEMD_BDF_WORLD_BOUNDING_BOX);
+// 
+// 	ze_for_each(ChildBone, ChildBones)
+// 		ChildBone->ParentTransformChanged();
+// }
+
+void ZEModelBone::ParentChanged()
+{
+	if (Parent != NULL)
+		SetModel(Parent->Model);
+
+	TransformChangedInitialModel();
+	TransformChangedModel();
+
+	ze_for_each(ChildBone, ChildBones)
+		ChildBone->ParentChanged();
+}
+
+void ZEModelBone::TransformChangedInitialLocal()
 {
 	DirtyFlags.RaiseFlags(
-		ZEMD_BDF_LOCAL_TRANSFORM | ZEMD_BDF_INV_LOCAL_TRANSFORM |
-		ZEMD_BDF_MODEL_TRANSFORM | ZEMD_BDF_INV_MODEL_TRANSFORM |
-		ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_INV_WORLD_TRANSFORM |
-		ZEMD_BDF_VERTEX_TRANSFORM |
-		ZEMD_BDF_MODEL_BOUNDING_BOX |
-		ZEMD_BDF_WORLD_BOUNDING_BOX);
+		ZEMD_BDF_INITIAL_TRANSFORM | ZEMD_BDF_INV_INITIAL_TRANSFORM | 
+		ZEMD_BDF_INITIAL_MODEL_TRANSFORM | ZEMD_BDF_INV_INITIAL_MODEL_TRANSFORM |
+		ZEMD_BDF_VERTEX_TRANSFORM);
 
-	for (ZESize I = 0; I < ChildBones.GetCount(); I++)
-		ChildBones[I]->ParentTransformChanged();
+	ze_for_each(ChildBone, ChildBones)
+		ChildBone->TransformChangedInitialModel();
 
 	if (Model != NULL)
 	{
@@ -72,65 +116,101 @@ void ZEModelBone::LocalTransformChanged()
 	}
 }
 
-void ZEModelBone::ParentTransformChanged()
+void ZEModelBone::TransformChangedInitialModel()
 {
-	if (PhysicalBody != NULL)
-	{
-		PhysicalBody->SetPosition(GetWorldPosition());
-		PhysicalBody->SetRotation(GetWorldRotation());
-	}
-
 	DirtyFlags.RaiseFlags(
-		ZEMD_BDF_MODEL_TRANSFORM | ZEMD_BDF_INV_MODEL_TRANSFORM |
-		ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_INV_WORLD_TRANSFORM |
-		ZEMD_BDF_VERTEX_TRANSFORM |
-		ZEMD_BDF_MODEL_BOUNDING_BOX |
-		ZEMD_BDF_WORLD_BOUNDING_BOX);
+		ZEMD_BDF_INITIAL_MODEL_TRANSFORM | ZEMD_BDF_INV_INITIAL_MODEL_TRANSFORM |
+		ZEMD_BDF_VERTEX_TRANSFORM);
 
-	for (ZESize I = 0; I < ChildBones.GetCount(); I++)
-		ChildBones[I]->ParentTransformChanged();
+	ze_for_each(ChildBone, ChildBones)
+		ChildBone->TransformChangedInitialModel();
 }
 
-const char* ZEModelBone::GetName()
+void ZEModelBone::TransformChangedLocal()
 {
-	return BoneResource->Name;
+	DirtyFlags.RaiseFlags(
+		ZEMD_BDF_TRANSFORM | ZEMD_BDF_INV_TRANSFORM |
+		ZEMD_BDF_MODEL_TRANSFORM | ZEMD_BDF_MODEL_INV_TRANSFORM	| ZEMD_BDF_MODEL_BOUNDING_BOX |
+		ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_WORLD_INV_TRANSFORM	| ZEMD_BDF_WORLD_BOUNDING_BOX |
+		ZEMD_BDF_VERTEX_TRANSFORM);
+
+	ze_for_each(ChildBone, ChildBones)
+		ChildBone->TransformChangedModel();
 }
 
-ZEModel* ZEModelBone::GetModel()
+void ZEModelBone::TransformChangedModel()
+{
+	DirtyFlags.RaiseFlags(
+		ZEMD_BDF_MODEL_TRANSFORM | ZEMD_BDF_MODEL_INV_TRANSFORM	| ZEMD_BDF_MODEL_BOUNDING_BOX |
+		ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_WORLD_INV_TRANSFORM	| ZEMD_BDF_WORLD_BOUNDING_BOX |
+		ZEMD_BDF_VERTEX_TRANSFORM);
+
+	ze_for_each(ChildBone, ChildBones)
+		ChildBone->TransformChangedModel();
+}
+
+void ZEModelBone::TransformChangedWorld()
+{
+	DirtyFlags.RaiseFlags(ZEMD_BDF_WORLD_TRANSFORM | ZEMD_BDF_WORLD_INV_TRANSFORM | ZEMD_BDF_WORLD_BOUNDING_BOX);
+
+	ze_for_each(ChildBone, ChildBones)
+		ChildBone->TransformChangedWorld();
+}
+
+void ZEModelBone::SetModel(ZEModel* Model)
+{
+	if (this->Model == Model)
+		return;
+
+	this->Model = Model;
+	TransformChangedWorld();
+}
+
+void ZEModelBone::SetParent(ZEModelBone* Bone)
+{
+	if (Parent == Bone)
+		return;
+
+	Parent = Bone;
+	ParentChanged();
+}
+
+ZEModel* ZEModelBone::GetModel() const
 {
 	return Model;
 }
 
-ZEModelBone* ZEModelBone::GetParentBone()
+ZEModelBone* ZEModelBone::GetParent() const
 {
 	return Parent;
 }
 
-const ZEArray<ZEModelBone*>& ZEModelBone::GetChildBones()
+void ZEModelBone::SetName(const ZEString& Name)
 {
-	return ChildBones;
+	this->Name = Name;
 }
 
-ZEPhysicalRigidBody* ZEModelBone::GetPhysicalBody()
+const ZEString& ZEModelBone::GetName() const
 {
-	return PhysicalBody;
+	return Name;
 }
 
-bool ZEModelBone::IsRootBone()
+void ZEModelBone::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
-	return Parent == NULL;
+	this->BoundingBox = BoundingBox;
+	DirtyFlags.RaiseFlags(ZEMD_BDF_WORLD_BOUNDING_BOX | ZEMD_BDF_WORLD_BOUNDING_BOX);
 }
 
 const ZEAABBox& ZEModelBone::GetBoundingBox() const
 {
-	return BoneResource->BoundingBox;
+	return BoundingBox;
 }
 
 const ZEAABBox& ZEModelBone::GetModelBoundingBox() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_BDF_MODEL_BOUNDING_BOX))
 	{
-		ZEAABBox::Transform(ModelBoundingBox, BoneResource->BoundingBox, GetModelTransform());
+		ZEAABBox::Transform(ModelBoundingBox, BoundingBox, GetModelTransform());
 		DirtyFlags.UnraiseFlags(ZEMD_BDF_MODEL_BOUNDING_BOX);
 	}
 
@@ -141,33 +221,81 @@ const ZEAABBox& ZEModelBone::GetWorldBoundingBox() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_BDF_WORLD_BOUNDING_BOX))
 	{
-		ZEAABBox::Transform(WorldBoundingBox, BoneResource->BoundingBox, GetWorldTransform());
+		ZEAABBox::Transform(WorldBoundingBox, BoundingBox, GetWorldTransform());
 		DirtyFlags.UnraiseFlags(ZEMD_BDF_WORLD_BOUNDING_BOX);
 	}
 
 	return WorldBoundingBox;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetLocalTransform() const
+const ZEMatrix4x4& ZEModelBone::GetInitialTransform() const
 {
-	if (DirtyFlags.GetFlags(ZEMD_BDF_LOCAL_TRANSFORM))
+	if (DirtyFlags.GetFlags(ZEMD_BDF_INITIAL_TRANSFORM))
 	{
-		ZEMatrix4x4::CreateOrientation(LocalTransform, Position, Rotation);
-		DirtyFlags.UnraiseFlags(ZEMD_BDF_LOCAL_TRANSFORM);
+		ZEMatrix4x4::CreateOrientation(InitialTransform, InitialPosition, InitialRotation);
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_INITIAL_TRANSFORM);
 	}
 
-	return LocalTransform;
+	return InitialTransform;
 }
 
-const ZEMatrix4x4& ZEModelBone::GetInvLocalTransform() const
+const ZEMatrix4x4& ZEModelBone::GetInvInitialTransform() const
 {
-	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_LOCAL_TRANSFORM))
+	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_INITIAL_TRANSFORM))
 	{
-		ZEMatrix4x4::Inverse(InvLocalTransform, GetLocalTransform());
-		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_LOCAL_TRANSFORM);
+		ZEMatrix4x4::Inverse(InvInitialTransform, GetInitialTransform());
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_INITIAL_TRANSFORM);
 	}
 
-	return InvLocalTransform;
+	return InvInitialTransform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetInitialModelTransform() const
+{
+	if (DirtyFlags.GetFlags(ZEMD_BDF_INITIAL_MODEL_TRANSFORM))
+	{
+		if (Parent == NULL)
+			InitialModelTransform = GetTransform();
+		else
+			ZEMatrix4x4::Multiply(InitialModelTransform, Parent->GetInitialModelTransform(), GetInitialTransform());
+
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_INITIAL_MODEL_TRANSFORM);
+	}
+
+	return InitialModelTransform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetInvInitialModelTransform() const
+{
+	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_INITIAL_MODEL_TRANSFORM))
+	{
+		ZEMatrix4x4::Inverse(InvInitialModelTransform, GetInitialModelTransform());
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_INITIAL_MODEL_TRANSFORM);
+	}
+
+	return InvInitialModelTransform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetTransform() const
+{
+	if (DirtyFlags.GetFlags(ZEMD_BDF_TRANSFORM))
+	{
+		ZEMatrix4x4::CreateOrientation(Transform, Position, Rotation);
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_TRANSFORM);
+	}
+
+	return Transform;
+}
+
+const ZEMatrix4x4& ZEModelBone::GetInvTransform() const
+{
+	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_TRANSFORM))
+	{
+		ZEMatrix4x4::Inverse(InvTransform, GetTransform());
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_TRANSFORM);
+	}
+
+	return InvTransform;
 }
 
 const ZEMatrix4x4& ZEModelBone::GetModelTransform() const
@@ -175,9 +303,9 @@ const ZEMatrix4x4& ZEModelBone::GetModelTransform() const
 	if (DirtyFlags.GetFlags(ZEMD_BDF_MODEL_TRANSFORM))
 	{
 		if (Parent == NULL)
-			ModelTransform = GetLocalTransform();
+			ModelTransform = GetTransform();
 		else
-			ZEMatrix4x4::Multiply(ModelTransform, Parent->GetModelTransform(), GetLocalTransform());
+			ZEMatrix4x4::Multiply(ModelTransform, Parent->GetModelTransform(), GetTransform());
 
 		DirtyFlags.UnraiseFlags(ZEMD_BDF_MODEL_TRANSFORM);
 	}
@@ -187,10 +315,10 @@ const ZEMatrix4x4& ZEModelBone::GetModelTransform() const
 
 const ZEMatrix4x4& ZEModelBone::GetInvModelTransform() const
 {
-	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_MODEL_TRANSFORM))
+	if (DirtyFlags.GetFlags(ZEMD_BDF_MODEL_INV_TRANSFORM))
 	{
 		ZEMatrix4x4::Inverse(InvModelTransform, GetModelTransform());
-		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_MODEL_TRANSFORM);
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_MODEL_INV_TRANSFORM);
 	}
 
 	return InvModelTransform;
@@ -213,50 +341,53 @@ const ZEMatrix4x4& ZEModelBone::GetWorldTransform() const
 
 const ZEMatrix4x4& ZEModelBone::GetInvWorldTransform() const
 {
-	if (DirtyFlags.GetFlags(ZEMD_BDF_INV_WORLD_TRANSFORM))
+	if (DirtyFlags.GetFlags(ZEMD_BDF_WORLD_INV_TRANSFORM))
 	{
 		ZEMatrix4x4::Inverse(InvWorldTransform, GetWorldTransform());
-		DirtyFlags.UnraiseFlags(ZEMD_BDF_INV_WORLD_TRANSFORM);
+		DirtyFlags.UnraiseFlags(ZEMD_BDF_WORLD_INV_TRANSFORM);
 	}
 
 	return InvWorldTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetForwardTrasnform() const
-{
-	return BoneResource->ForwardTransform;
-}
-
-const ZEMatrix4x4& ZEModelBone::GetInverseTransform() const
-{
-	return BoneResource->InverseTransform;
 }
 
 const ZEMatrix4x4& ZEModelBone::GetVertexTransform() const
 {
 	if (DirtyFlags.GetFlags(ZEMD_BDF_VERTEX_TRANSFORM))
 	{
-		ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), GetInverseTransform());
+		ZEMatrix4x4::Multiply(VertexTransform, GetModelTransform(), GetInvInitialModelTransform());
 		DirtyFlags.UnraiseFlags(ZEMD_BDF_VERTEX_TRANSFORM);
 	}
 
 	return VertexTransform;
 }
 
+void ZEModelBone::SetInitialPosition(const ZEVector3& Position)
+{
+	InitialPosition = Position;
+	TransformChangedInitialLocal();
+}
+
+
 const ZEVector3& ZEModelBone::GetInitialPosition() const
 {
-	return BoneResource->Position;
+	return InitialPosition;
+}
+
+void ZEModelBone::SetInitialRotation(const ZEQuaternion& Rotation)
+{
+	InitialRotation = Rotation;
+	TransformChangedInitialLocal();
 }
 
 const ZEQuaternion& ZEModelBone::GetInitialRotation() const
 {
-	return BoneResource->Rotation;
+	return InitialRotation;
 }
 
 void ZEModelBone::SetPosition(const ZEVector3& Position)
 {
 	this->Position = Position;
-	LocalTransformChanged();
+	TransformChangedLocal();
 }
 
 const ZEVector3& ZEModelBone::GetPosition() const
@@ -267,7 +398,7 @@ const ZEVector3& ZEModelBone::GetPosition() const
 void ZEModelBone::SetRotation(const ZEQuaternion& Rotation)
 {
 	this->Rotation = Rotation;
-	LocalTransformChanged();
+	TransformChangedLocal();
 }
 
 const ZEQuaternion& ZEModelBone::GetRotation() const
@@ -284,7 +415,7 @@ void ZEModelBone::SetModelPosition(const ZEVector3& ModelPosition)
 	else
 	{
 		ZEVector3 Result;
-		ZEMatrix4x4::Transform(Result, Parent->GetModelTransform().Inverse(), ModelPosition);
+		ZEMatrix4x4::Transform(Result, Parent->GetInvModelTransform(), ModelPosition);
 		SetPosition(Result);
 	}
 }
@@ -335,69 +466,97 @@ const ZEQuaternion ZEModelBone::GetModelRotation() const
 
 void ZEModelBone::SetWorldPosition(const ZEVector3& WorldPosition)
 {
-	if (Parent == NULL)
+	if (Model == NULL)
 	{
-		ZEVector3 Result;
-		ZEMatrix4x4::Transform(Result, Model->GetWorldTransform().Inverse(), WorldPosition);
-		SetPosition(Result);
+		SetModelPosition(WorldPosition);
 	}
 	else
 	{
-		ZEVector3 Result;
-		ZEMatrix4x4::Transform(Result, Parent->GetWorldTransform().Inverse(), WorldPosition);
-		SetPosition(Result);
+		if (Parent == NULL)
+		{
+			ZEVector3 Result;
+			ZEMatrix4x4::Transform(Result, Model->GetInvWorldTransform(), WorldPosition);
+			SetPosition(Result);
+		}
+		else
+		{
+			ZEVector3 Result;
+			ZEMatrix4x4::Transform(Result, Parent->GetInvWorldTransform(), WorldPosition);
+			SetPosition(Result);
+		}
 	}
 }
 
 const ZEVector3 ZEModelBone::GetWorldPosition() const
 {
-	if (Parent == NULL)
+	if (Model == NULL)
 	{
-		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, Model->GetWorldTransform(), Position);
-		return Temp;
+		return GetModelPosition();
 	}
 	else
 	{
-		ZEVector3 Temp;
-		ZEMatrix4x4::Transform(Temp, Parent->GetWorldTransform(), Position);
-		return Temp;
+		if (Parent == NULL)
+		{
+			ZEVector3 Temp;
+			ZEMatrix4x4::Transform(Temp, Model->GetWorldTransform(), Position);
+			return Temp;
+		}
+		else
+		{
+			ZEVector3 Temp;
+			ZEMatrix4x4::Transform(Temp, Parent->GetWorldTransform(), Position);
+			return Temp;
+		}
 	}
 }
 
 void ZEModelBone::SetWorldRotation(const ZEQuaternion& WorldRotation)
 {
-	if (Parent == NULL)
-	{	
-		ZEQuaternion Temp, Result;
-		ZEQuaternion::Conjugate(Temp, Model->GetWorldRotation());
-		ZEQuaternion::Product(Result, Temp, WorldRotation);
-		SetRotation(Result);
+	if (Model == NULL)
+	{
+		SetModelRotation(WorldRotation);
 	}
 	else
 	{
-		ZEQuaternion Temp, Result;
-		ZEQuaternion::Conjugate(Temp, Parent->GetWorldRotation());
-		ZEQuaternion::Product(Result, Temp, WorldRotation);
-		SetRotation(Result);
+		if (Parent == NULL)
+		{	
+			ZEQuaternion Temp, Result;
+			ZEQuaternion::Conjugate(Temp, Model->GetWorldRotation());
+			ZEQuaternion::Product(Result, Temp, WorldRotation);
+			SetRotation(Result);
+		}
+		else
+		{
+			ZEQuaternion Temp, Result;
+			ZEQuaternion::Conjugate(Temp, Parent->GetWorldRotation());
+			ZEQuaternion::Product(Result, Temp, WorldRotation);
+			SetRotation(Result);
+		}
 	}
 }
 
 const ZEQuaternion ZEModelBone::GetWorldRotation() const
 {
-	if (Parent == NULL)
+	if (Model == NULL)
 	{
-		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Model->GetWorldRotation(), Rotation);
-		ZEQuaternion::Normalize(Temp, Temp);
-		return Temp;
+		return GetModelRotation();
 	}
 	else
 	{
-		ZEQuaternion Temp;
-		ZEQuaternion::Product(Temp, Parent->GetWorldRotation(), Rotation);
-		ZEQuaternion::Normalize(Temp, Temp);
-		return Temp;
+		if (Parent == NULL)
+		{
+			ZEQuaternion Temp;
+			ZEQuaternion::Product(Temp, Model->GetWorldRotation(), Rotation);
+			ZEQuaternion::Normalize(Temp, Temp);
+			return Temp;
+		}
+		else
+		{
+			ZEQuaternion Temp;
+			ZEQuaternion::Product(Temp, Parent->GetWorldRotation(), Rotation);
+			ZEQuaternion::Normalize(Temp, Temp);
+			return Temp;
+		}
 	}
 }
 
@@ -411,271 +570,56 @@ ZEModelAnimationType ZEModelBone::GetAnimationType() const
 	return AnimationType;
 }
 
-void ZEModelBone::AddChild(ZEModelBone* Bone)
+const ZEList2<ZEModelBone>& ZEModelBone::GetChildBones() const
 {
-	Bone->Parent = this;
-	ChildBones.Add(Bone);
+	return ChildBones;
 }
 
-void ZEModelBone::RemoveChild(ZEModelBone* Bone)
+void ZEModelBone::AddChildBone(ZEModelBone* Bone)
 {
-	Bone->Parent = NULL;
-	ChildBones.RemoveValue(Bone);
+	zeCheckError(Bone == NULL, ZE_VOID, "Bone cannot be null.");
+	zeCheckError(Bone->GetParent() != NULL, ZE_VOID, "Bone is already added to another bone or model.");
+	zeCheckError(Bone->GetModel() != NULL, ZE_VOID, "Bone is already used by a model.");
+
+	Bone->SetParent(this);
+	ChildBones.AddEnd(&Bone->ParentLink);
 }
 
-void ZEModelBone::SetPhysicsEnabled(bool Enabled)
+void ZEModelBone::RemoveChildBone(ZEModelBone* Bone)
 {
-	PhysicsEnabled = Enabled;
+	zeCheckError(Bone == NULL, ZE_VOID, "Bone cannot be null.");
+	zeCheckError(!ChildBones.Exists(&Bone->ParentLink), ZE_VOID, "Bone is not a child of this mesh.");
+
+	Bone->SetParent(NULL);
+	ChildBones.Remove(&Bone->ParentLink);
 }
 
-bool ZEModelBone::GetPhysicsEnabled() const
-{
-	return PhysicsEnabled;
-}
-
-void ZEModelBone::Initialize(ZEModel* Model, const ZEModelResourceBone* BoneResource)
+void ZEModelBone::Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceBone* BoneResource)
 {
 	this->Model = Model;
+	this->ModelResource = ModelResource;
 	this->BoneResource = BoneResource;
-	Position = BoneResource->Position;
-	Rotation = BoneResource->Rotation;
-	LocalTransformChanged();
 
-	ZEArray<ZEPhysicalShape*> ShapeList;
-	if(BoneResource->PhysicalBody.Type != ZE_MRPBT_NONE)
-	{
-		PhysicalBody = ZEPhysicalRigidBody::CreateInstance();
-
-		PhysicalBody->SetEnabled(BoneResource->PhysicalBody.Enabled);
-		PhysicalBody->SetPhysicalBodyType(BoneResource->PhysicalBody.IsKinematic ? ZE_PBT_KINEMATIC : ZE_PBT_DYNAMIC);
-		PhysicalBody->SetMass(BoneResource->PhysicalBody.Mass);
-		PhysicalBody->SetLinearDamping(BoneResource->PhysicalBody.LinearDamping);
-		PhysicalBody->SetAngularDamping(BoneResource->PhysicalBody.AngularDamping);
-		PhysicalBody->SetPosition(this->GetWorldPosition());
-		PhysicalBody->SetRotation(this->GetWorldRotation());
-		PhysicalBody->SetMassCenterPosition(BoneResource->PhysicalBody.MassCenter);
-		PhysicalBody->SetTransformChangeEvent(ZEDelegate<void (ZEPhysicalObject*, ZEVector3, ZEQuaternion)>::Create<ZEModel, &ZEModel::TransformChangeEvent>(this->Model));
-
-		for (ZESize I = 0; I < BoneResource->PhysicalBody.Shapes.GetCount(); I++)
-		{
-			const ZEModelResourcePhysicalShape* Shape = &BoneResource->PhysicalBody.Shapes[I];
-			switch(Shape->Type)
-			{
-				case ZE_PST_BOX:
-				{
-					ZEPhysicalBoxShape* BoxShape = new ZEPhysicalBoxShape();
-					BoxShape->SetWidth(Shape->Box.Width / 2.0f);
-					BoxShape->SetHeight(Shape->Box.Height / 2.0f);
-					BoxShape->SetLength(Shape->Box.Length / 2.0f);
-					BoxShape->SetPosition(Shape->Position);
-					BoxShape->SetRotation(Shape->Rotation);
-					ShapeList.Add(BoxShape);
-					PhysicalBody->AddPhysicalShape(BoxShape);
-					break;
-				}
-
-				case ZE_PST_SPHERE:
-				{
-					ZEPhysicalSphereShape* SphereShape = new ZEPhysicalSphereShape();
-					SphereShape->SetRadius(Shape->Sphere.Radius);
-					SphereShape->SetPosition(Shape->Position);
-					SphereShape->SetRotation(Shape->Rotation);
-					ShapeList.Add(SphereShape);
-					PhysicalBody->AddPhysicalShape(SphereShape);
-					break;
-				}
-				case ZE_PST_CYLINDER:
-				{
-					// Problematic
-					break;
-				}
-
-				case ZE_PST_CAPSULE:
-				{
-					ZEPhysicalCapsuleShape* CapsuleShape = new ZEPhysicalCapsuleShape();
-					CapsuleShape->SetRadius(Shape->Capsule.Radius);
-					CapsuleShape->SetHeight(Shape->Capsule.Height);
-					CapsuleShape->SetPosition(Shape->Position);
-					CapsuleShape->SetRotation(Shape->Rotation);
-					ShapeList.Add(CapsuleShape);
-					PhysicalBody->AddPhysicalShape(CapsuleShape);
-					break;
-				}
-
-				case ZE_PST_CONVEX:
-					// Problematic
-					break;
-			}
-		}
-		PhysicalBody->SetPhysicalWorld(GetModel()->GetScene()->GetPhysicalWorld());
-		PhysicalBody->Initialize();
-
-	}
-
-	if (BoneResource->PhysicalJoint.JointType != ZE_PJT_NONE && BoneResource->ParentBone != -1)
-	{
-		if (PhysicalJoint == NULL)
-			PhysicalJoint = ZEPhysicalJoint::CreateInstance();
-		else
-			PhysicalJoint->Deinitialize();
-
-		PhysicalJoint->SetBodyA(PhysicalBody);
-		PhysicalJoint->SetBodyB(Parent->PhysicalBody);
-
-		PhysicalJoint->SetEnabled(BoneResource->PhysicalJoint.Enabled);
-
-		PhysicalJoint->SetPosition(PhysicalBody->GetPosition());
-		PhysicalJoint->SetRotation(PhysicalBody->GetRotation());
-
-		if(BoneResource->PhysicalJoint.Breakable)
-		{
-			PhysicalJoint->SetBreakForce(BoneResource->PhysicalJoint.BreakForce);
-			PhysicalJoint->SetBreakTorque(BoneResource->PhysicalJoint.BreakTorque);
-		}
-
-		float MassInertia = PhysicalBody->GetMass() * 0.13f; // Optimum mass inertia tensor is (%13 mass)
-		PhysicalJoint->SetMassInertiaTensor(ZEVector3(MassInertia, MassInertia, MassInertia));
-		PhysicalJoint->SetBodiesCollide(BoneResource->PhysicalJoint.CollideBodies);
-
-		PhysicalJoint->SetXMotion(BoneResource->PhysicalJoint.XMotion);
-		PhysicalJoint->SetYMotion(BoneResource->PhysicalJoint.YMotion);
-		PhysicalJoint->SetZMotion(BoneResource->PhysicalJoint.ZMotion);
-
-		if(BoneResource->PhysicalJoint.XMotion != ZE_PJMOTION_LOCKED || BoneResource->PhysicalJoint.YMotion != ZE_PJMOTION_LOCKED || BoneResource->PhysicalJoint.ZMotion != ZE_PJMOTION_LOCKED)
-		{
-			PhysicalJoint->SetLinearLimitValue(BoneResource->PhysicalJoint.LinearLimitValue);
-			PhysicalJoint->SetLinearLimitRestitution(BoneResource->PhysicalJoint.LinearLimitRestitution);
-			PhysicalJoint->SetLinearLimitSpring(BoneResource->PhysicalJoint.LinearLimitSpring);
-			PhysicalJoint->SetLinearLimitDamping(BoneResource->PhysicalJoint.LinearLimitDamping);
-		}
-
-		PhysicalJoint->SetSwing1Motion(BoneResource->PhysicalJoint.Swing1Motion);
-
-		if (BoneResource->PhysicalJoint.Swing1Motion != ZE_PJMOTION_LOCKED)
-		{
-			PhysicalJoint->SetSwing1LimitValue(BoneResource->PhysicalJoint.Swing1LimitValue);
-			PhysicalJoint->SetSwing1LimitRestitution(BoneResource->PhysicalJoint.Swing1LimitRestitution);
-			PhysicalJoint->SetSwing1LimitSpring(BoneResource->PhysicalJoint.Swing1LimitSpring);
-			PhysicalJoint->SetSwing1LimitDamping(BoneResource->PhysicalJoint.Swing1LimitDamping);
-		}
-
-		PhysicalJoint->SetSwing2Motion(BoneResource->PhysicalJoint.Swing2Motion);
-
-		if (BoneResource->PhysicalJoint.Swing2Motion != ZE_PJMOTION_LOCKED)
-		{
-			PhysicalJoint->SetSwing2LimitValue(BoneResource->PhysicalJoint.Swing2LimitValue);
-			PhysicalJoint->SetSwing2LimitRestitution(BoneResource->PhysicalJoint.Swing2LimitRestitution);
-			PhysicalJoint->SetSwing2LimitSpring(BoneResource->PhysicalJoint.Swing2LimitSpring);
-			PhysicalJoint->SetSwing2LimitDamping(BoneResource->PhysicalJoint.Swing2LimitDamping);
-		}
-
-		PhysicalJoint->SetTwistMotion(BoneResource->PhysicalJoint.TwistMotion);
-
-		if (BoneResource->PhysicalJoint.TwistMotion != ZE_PJMOTION_LOCKED)
-		{
-			PhysicalJoint->SetTwistLowLimitValue(BoneResource->PhysicalJoint.TwistLowLimitValue);
-			PhysicalJoint->SetTwistLowLimitRestitution(BoneResource->PhysicalJoint.TwistLowLimitRestitution);
-			PhysicalJoint->SetTwistLowLimitSpring(BoneResource->PhysicalJoint.TwistLowLimitSpring);
-			PhysicalJoint->SetTwistLowLimitDamping(BoneResource->PhysicalJoint.TwistLowLimitDamping);
-
-			PhysicalJoint->SetTwistHighLimitValue(BoneResource->PhysicalJoint.TwistHighLimitValue);
-			PhysicalJoint->SetTwistHighLimitRestitution(BoneResource->PhysicalJoint.TwistHighLimitRestitution);
-			PhysicalJoint->SetTwistHighLimitSpring(BoneResource->PhysicalJoint.TwistHighLimitSpring);
-			PhysicalJoint->SetTwistHighLimitDamping(BoneResource->PhysicalJoint.TwistHighLimitDamping);
-		}
-
-		PhysicalJoint->SetMotorTargetPosition(BoneResource->PhysicalJoint.MotorTargetPosition);
-		PhysicalJoint->SetMotorTargetOrientation(BoneResource->PhysicalJoint.MotorTargetOrientation);
-		PhysicalJoint->SetMotorTargetVelocity(BoneResource->PhysicalJoint.MotorTargetVelocity);
-		PhysicalJoint->SetMotorTargetAngularVelocity(BoneResource->PhysicalJoint.MotorTargetAngularVelocity);
-
-		if(BoneResource->PhysicalJoint.LinearXMotor != ZE_PJMT_NONE)
-		{
-			PhysicalJoint->SetLinearXMotor(BoneResource->PhysicalJoint.LinearXMotor);
-			PhysicalJoint->SetLinearXMotorForce(BoneResource->PhysicalJoint.LinearXMotorForce);
-			PhysicalJoint->SetLinearXMotorSpring(BoneResource->PhysicalJoint.LinearXMotorSpring);
-			PhysicalJoint->SetLinearXMotorDamper(BoneResource->PhysicalJoint.LinearXMotorDamper);
-		}
-
-		if(BoneResource->PhysicalJoint.LinearYMotor != ZE_PJMT_NONE)
-		{
-			PhysicalJoint->SetLinearYMotor(BoneResource->PhysicalJoint.LinearYMotor);
-			PhysicalJoint->SetLinearYMotorForce(BoneResource->PhysicalJoint.LinearYMotorForce);
-			PhysicalJoint->SetLinearYMotorSpring(BoneResource->PhysicalJoint.LinearYMotorSpring);
-			PhysicalJoint->SetLinearYMotorDamper(BoneResource->PhysicalJoint.LinearYMotorDamper);
-		}
-
-		if(BoneResource->PhysicalJoint.LinearZMotor != ZE_PJMT_NONE)
-		{
-			PhysicalJoint->SetLinearZMotor(BoneResource->PhysicalJoint.LinearZMotor);
-			PhysicalJoint->SetLinearZMotorForce(BoneResource->PhysicalJoint.LinearZMotorForce);
-			PhysicalJoint->SetLinearZMotorSpring(BoneResource->PhysicalJoint.LinearZMotorSpring);
-			PhysicalJoint->SetLinearZMotorDamper(BoneResource->PhysicalJoint.LinearZMotorDamper);
-		}
-
-		if(BoneResource->PhysicalJoint.AngularSwingMotor != ZE_PJMT_NONE)
-		{
-			PhysicalJoint->SetAngularSwingMotor(BoneResource->PhysicalJoint.AngularSwingMotor);
-			PhysicalJoint->SetAngularSwingMotorForce(BoneResource->PhysicalJoint.AngularSwingMotorForce);
-			PhysicalJoint->SetAngularSwingMotorSpring(BoneResource->PhysicalJoint.AngularSwingMotorSpring);
-			PhysicalJoint->SetAngularSwingMotorDamper(BoneResource->PhysicalJoint.AngularSwingMotorDamper);
-		}
-
-		if(BoneResource->PhysicalJoint.AngularTwistMotor != ZE_PJMT_NONE)
-		{
-			PhysicalJoint->SetAngularTwistMotor(BoneResource->PhysicalJoint.AngularTwistMotor);
-			PhysicalJoint->SetAngularTwistMotorForce(BoneResource->PhysicalJoint.AngularTwistMotorForce);
-			PhysicalJoint->SetAngularTwistMotorSpring(BoneResource->PhysicalJoint.AngularTwistMotorSpring);
-			PhysicalJoint->SetAngularTwistMotorDamper(BoneResource->PhysicalJoint.AngularTwistMotorDamper);
-		}
-
-		if(BoneResource->PhysicalJoint.AngularSlerpMotor != ZE_PJMT_NONE)
-		{
-			PhysicalJoint->SetAngularSlerpMotor(BoneResource->PhysicalJoint.AngularSlerpMotor);
-			PhysicalJoint->SetAngularSlerpMotorForce(BoneResource->PhysicalJoint.AngularSlerpMotorForce);
-			PhysicalJoint->SetAngularSlerpMotorSpring(BoneResource->PhysicalJoint.AngularSlerpMotorSpring);
-			PhysicalJoint->SetAngularSlerpMotorDamper(BoneResource->PhysicalJoint.AngularSlerpMotorDamper);
-		}
-
-		PhysicalJoint->SetPhysicalWorld(GetModel()->GetScene()->GetPhysicalWorld());
-		PhysicalJoint->Initialize();
-	}
+	SetName(BoneResource->GetName());
+	SetBoundingBox(BoneResource->GetBoundingBox());
+	SetInitialPosition(BoneResource->GetPosition());
+	SetInitialRotation(BoneResource->GetRotation());
+	SetPosition(BoneResource->GetPosition());
+	SetRotation(BoneResource->GetRotation());
 }
 
-void ZEModelBone::Deinitialize()
+void ZEModelBone::Unload()
 {
 	Model = NULL;
 	Parent = NULL;
-	if (PhysicalBody != NULL)
+
+	ze_for_each(Bone, ChildBones)
 	{
-		PhysicalBody->Destroy();
-		PhysicalBody = NULL;
+		RemoveChildBone(Bone.GetPointer());
+		delete Bone.GetPointer();
 	}
 
-	if (PhysicalJoint != NULL)
-	{
-		PhysicalJoint->Destroy();
-		PhysicalJoint = NULL;
-	}
-
-	ChildBones.Clear();
-}
-
-ZEModelBone::ZEModelBone()
-{
-	Model = NULL;
-	Parent = NULL;
-	PhysicalJoint = NULL;
-	PhysicalBody = NULL;
-	BoneResource = NULL;
-	PhysicsEnabled = false;
-	AnimationType = ZE_MAT_NOANIMATION;
-	LocalTransformChanged();
-}
-
-ZEModelBone::~ZEModelBone()
-{
-	Deinitialize();
+	DirtyFlags.RaiseAll();
 }
 
 void ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -688,4 +632,39 @@ void ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	Helper.SetSubObject(this);
 
 	Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
+}
+
+ZEModelBone::ZEModelBone() : ParentLink(this), ModelLink(this)
+{
+	DirtyFlags.RaiseAll();
+	Model = NULL;
+	Parent = NULL;
+	BoneResource = NULL;
+
+	InitialPosition = ZEVector3::Zero;
+	InitialRotation = ZEQuaternion::Identity;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+
+	InitialTransform = ZEMatrix4x4::Identity;
+	InvInitialTransform = ZEMatrix4x4::Identity;
+	InitialModelTransform = ZEMatrix4x4::Identity;
+	InvInitialModelTransform = ZEMatrix4x4::Identity;
+	Transform = ZEMatrix4x4::Identity;
+	InvTransform = ZEMatrix4x4::Identity;
+	ModelTransform = ZEMatrix4x4::Identity;
+	InvModelTransform = ZEMatrix4x4::Identity;
+	WorldTransform = ZEMatrix4x4::Identity;
+	InvWorldTransform = ZEMatrix4x4::Identity;
+
+	BoundingBox = ZEAABBox::Zero;
+	ModelBoundingBox = ZEAABBox::Zero;
+	WorldBoundingBox = ZEAABBox::Zero;
+
+	AnimationType = ZE_MAT_NOANIMATION;
+}
+
+ZEModelBone::~ZEModelBone()
+{
+	Unload();
 }

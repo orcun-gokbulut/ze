@@ -121,7 +121,7 @@ bool ZERNStageDebug::UpdateRenderStates()
 
 	ZEGRRenderState RenderState;
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
-	RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
+	RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 	
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_GEOMETRY, GeometryShader);
