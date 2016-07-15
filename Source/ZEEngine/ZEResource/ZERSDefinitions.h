@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEReferenceCounted.h
+ Zinek Engine - ZERSDefinitions.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,34 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#pragma  once
 
-#include "ZETypes.h"
-#include "ZECommon.h"
-#include "ZEThread/ZELock.h"
+#include "ZEMeta/ZEEnumerator.h"
 
-class ZEReferenceCounted
+#define ZERS_MEMORY_POOL_COUNT 2
+
+ZE_ENUM(ZERSMemoryPool)
 {
-	ZE_COPY_NO_ACTION(ZEReferenceCounted)
-	template<typename ZEReferenceCountedClass> friend class ZEHolder;
-	friend class ZERSResource;
-	private:
-		mutable ZELock			ReferenceCountLock;
-		mutable ZESSize			ReferenceCount;
-	
-		void					Release() const;
-		void					Reference() const;
-	
-	protected:
-		virtual void			Destroy() const;
-
-	public:
-								ZEReferenceCounted();
-		virtual					~ZEReferenceCounted();
+	ZERS_MP_CPU,
+	ZERS_MP_GPU
 };
+
+ZE_ENUM( ZERSResourceType)
+{
+	ZERS_RT_NONE,
+	ZERS_RT_NORMAL,
+	ZERS_RT_LOADABLE
+};
+
+ZE_ENUM(ZERSResourceState)
+{
+	ZERS_RS_NONE,
+	ZERS_RS_STAGING,
+	ZERS_RS_ALIVE
+};
+
+class ZERSResource;
+class ZERSResourceLoadable;
+
+typedef ZERSResource* (*ZERSInstanciator)();
+typedef ZERSResourceLoadable* (*ZERSInstanciatorLoadable)();

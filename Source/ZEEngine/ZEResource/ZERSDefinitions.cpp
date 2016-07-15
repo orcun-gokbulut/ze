@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERSManager.h
+ Zinek Engine - ZERSDefinitions.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,47 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZERSDefinitions.h"
 
-#include "ZEMeta\ZEObject.h"
-#include "ZERSResource.h"
-#include "ZEDS\ZEList2.h"
 #include "ZECommon.h"
 
-typedef ZERSResource* ZERSInstanciator();
-
-class ZERSManager : public ZEObject
-{
-	ZE_OBJECT
-	ZE_DISALLOW_COPY(ZERSManager)
-	friend class ZERSResource;
-	private:
-		ZELock ManagerLock;
-		ZEList2<const ZERSResource>	Resources;
-
-		ZESize MemoryUsage[ZERS_MP_TOTAL];
-		ZESize CacheSize[ZERS_MP_TOTAL];
-		ZESize CacheUsage[ZERS_MP_TOTAL];
-		
-		ZEHolder<const ZERSResource> GetResourceInternal(const ZEString& FilePath);
-		void RegisterResourceInternal(const ZERSResource* Resource);
-		ZEHolder<const ZERSResource> LoadResource(const ZEString& FilePath, ZERSInstanciator Instanciator, const ZERSLoadingOptions* LoadingOptions);
-
-		void RegisterResource(const ZERSResource* Resource);
-		void ReleaseResource(const ZERSResource* Resource);
-									
-		ZERSManager();
-		~ZERSManager();
-
-	public:
-		ZESize GetMemoryUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
-		ZESize GetCacheUsage(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
-
-		void SetCacheSize(ZERSMemoryPool Pool, ZESize Size);
-		ZESize SetCacheSize(ZERSMemoryPool Pool = ZERS_MP_TOTAL);
-
-		ZEHolder<const ZERSResource> GetResource(const ZEString& FilePath);
-		ZEHolder<const ZERSResource> GetResource(const ZEGUID& GUID);
-
-		static ZERSManager* GetInstance();
-};
+ZE_SUPPRESS_LNK4221

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEReferenceCounted.h
+ Zinek Engine - ZERSTemplates.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,28 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#pragma once
+#include "ZERSTemplates.h"
 
-#include "ZETypes.h"
 #include "ZECommon.h"
-#include "ZEThread/ZELock.h"
 
-class ZEReferenceCounted
-{
-	ZE_COPY_NO_ACTION(ZEReferenceCounted)
-	template<typename ZEReferenceCountedClass> friend class ZEHolder;
-	friend class ZERSResource;
-	private:
-		mutable ZELock			ReferenceCountLock;
-		mutable ZESSize			ReferenceCount;
-	
-		void					Release() const;
-		void					Reference() const;
-	
-	protected:
-		virtual void			Destroy() const;
-
-	public:
-								ZEReferenceCounted();
-		virtual					~ZEReferenceCounted();
-};
+ZE_SUPPRESS_LNK4221

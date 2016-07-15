@@ -35,190 +35,225 @@
 
 #include "ZERSResource.h"
 
-#include "ZERSManager.h"
-#include "ZEFile\ZEFileInfo.h"
+#include "ZERSResourceManager.h"
+#include "ZEFile\ZEPathInfo.h"
 
-void ZERSResource::AddReferance() const
+
+void ZERSResource::Reference() const
 {
-	ReferenceCounterLock.Lock();
+	Lock.Lock();
+
 	ReferenceCount++;
-	ReferenceCounterLock.Unlock();
+	
+	if (Parent != NULL)
+		Parent->Reference();
+
+	Lock.Unlock();
 }
 
 void ZERSResource::Release() const
 {
-	ReferenceCounterLock.Lock();
+	Lock.Lock();
+	
 	ReferenceCount--;
-	if (ReferenceCount == 0)
-		ZERSManager::GetInstance()->ReleaseResource(this);
-	ReferenceCounterLock.Unlock();
+	if (Parent != NULL)
+	{
+		Parent->Release();
+	}
+	else
+	{
+		if (ReferenceCount <= 0)
+			Destroy();
+	}
+
+	Lock.Unlock();
 }
 
-ZETaskResult ZERSResource::AsyncLoaderFunction(ZETaskThread* TaskThread, void* Parameters)
+void ZERSResource::Destroy() const
 {
-	return LoadInternal((ZERSLoadingOptions*)Parameters) == false ? ZE_TR_DONE : ZE_TR_COOPERATING;
+	if (IsShared())
+		ZERSResourceManager::GetInstance()->DestroyResource(this);
+	else
+		delete this;
+}
+
+void ZERSResource::UpdateMemoryConsumption()
+{
+	Lock.Lock();
+	{
+		ZESize OldMemoryUsage[ZERS_MEMORY_POOL_COUNT];
+		memcpy(OldMemoryUsage, MemoryUsage, sizeof(MemoryUsage));
+		memset(MemoryUsage, 0, sizeof(MemoryUsage));
+
+		for (ZEUInt Pool = 0 ; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
+		{
+			for (ZESize I = 0; I < ChildResources.GetCount(); I++)
+				MemoryUsage[Pool] += ChildResources[I]->GetMemoryUsage((ZERSMemoryPool)Pool);
+
+			MemoryUsage[Pool] += MemoryUsageSelf[Pool];
+		}
+
+		if (Parent != NULL)
+		{
+			Parent->UpdateMemoryConsumption();
+		}
+		else
+		{
+			ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT];
+			for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
+				MemoryUsageDelta[Pool] = (ZESSize)MemoryUsage[Pool] - (ZESSize)OldMemoryUsage[Pool];
+
+			ZERSResourceManager::GetInstance()->UpdateMemoryUsage(this, MemoryUsageDelta);
+		}
+	}
+	Lock.Unlock();
+}
+
+void ZERSResource::SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size)
+{
+	MemoryUsage[Pool] = Size;
+
+	if (Parent != NULL)
+		Parent->UpdateMemoryConsumption();
+}
+
+void ZERSResource::AddChildResource(ZERSResource* ChildResource)
+{
+	zeCheckError(ChildResource == NULL, ZE_VOID, "Cannot add child resource. ChildResource is NULL.");
+	zeCheckError(ChildResource->Parent != NULL, ZE_VOID, "Cannot add child resource. Resource is already child resource of a resource.");
+
+	ChildResources.Add(ChildResource);
+	ChildResource->Parent = this;
+
+	if (Parent != NULL)
+		Parent->UpdateMemoryConsumption();
+}
+
+void ZERSResource::RemoveChildResource(ZERSResource* ChildResource)
+{
+	zeCheckError(ChildResource == NULL, ZE_VOID, "Cannot remove child resource. ChildResource is NULL.");
+	zeCheckError(ChildResource->Parent != NULL, ZE_VOID, "Cannot remove child resource. Child resource is not owned by this resource.");
+
+	ChildResources.RemoveValue(ChildResource);
+	ChildResource->Parent = NULL;
+
+	if (Parent != NULL)
+		Parent->UpdateMemoryConsumption();
+}
+
+ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
+{
+	GUID = ZEGUID::Zero;
+	State = ZERS_RS_NONE;
+	Parent = NULL;
+	Shared = false;
+	ReferenceCount = 0;
+	memset(MemoryUsage, 0, sizeof(MemoryUsage));
+	memset(MemoryUsageSelf, 0, sizeof(MemoryUsage));
+
+	ZERSResourceManager::GetInstance()->RegisterResource(this);
 }
 
 ZERSResource::~ZERSResource()
 {
+	if (Shared)
+		Unshare();
 
+	while(ChildResources.GetCount() != 0)
+		ChildResources.GetFirstItem()->Destroy();
+
+	if (Parent != NULL)
+		Parent->RemoveChildResource(this);
+
+	ZERSResourceManager::GetInstance()->UnregisterResource(this);
 }
 
-void ZERSResource::AddSubResource(const ZEHolder<ZERSResource>& Resource)
+ZERSResource* ZERSResource::GetParent()
 {
-	if (SubResources.Exists(Resource))
-		return;
-
-	SubResources.Add(Resource);
+	return Parent;
 }
 
-void ZERSResource::RemoveSubResource(const ZEHolder<ZERSResource>& Resource)
+const ZERSResource* ZERSResource::GetParent() const
 {
-	SubResources.RemoveValue(Resource);
+	return Parent;
 }
 
-void ZERSResource::SetFilePath(const ZEString& FilePath)
+ZERSResourceType ZERSResource::GetType() const
 {
-	this->FilePath = FilePath;
-	FilePathNormalized = ZEFileInfo(FilePath).Normalize().Lower();
-	Hash = FilePathNormalized.Lower().Hash();
+	return ZERS_RT_NORMAL;
 }
 
 void ZERSResource::SetGUID(const ZEGUID& GUID)
 {
+	zeCheckError(Shared, ZE_VOID, "You cannot change enlisted resource's GUID.");
 	this->GUID = GUID;
 }
 
-void ZERSResource::SetSize(ZERSMemoryPool Pool, ZESize NewSize)
-{
-	if (Pool >= ZERS_MP_TOTAL)
-		return;
-
-	Size[Pool] = NewSize;
-}
-
-void ZERSResource::SetLoadMethod(ZERSLoadMethod Method)
-{
-	LoadMethod = Method;
-}
-
-void ZERSResource::SetLoadProgress(ZEUInt Percent)
-{
-	if (Percent > 100)
-		Percent = 100;
-
-	LoadProgress = Percent;
-}
-
-
-bool ZERSResource::LoadInternal(const ZERSLoadingOptions* Option)
-{
-	return false;
-}
-
-ZERSResource::ZERSResource() : ManagerLink(this)
-{
-	State = ZERS_S_NOT_LOADED;
-	Hash = 0;
-	ReferenceCount = 0;
-	Cached = true;
-	CachePriority = 0;
-	LoadProgress = 0;
-	LoadMethod = ZERS_LM_SYNC;
-	memset(Size, 0, sizeof(Size));
-	
-	AsyncLoader.SetPool(ZE_TPI_IO);
-	AsyncLoader.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, AsyncLoaderFunction, this));
-}
-
-const ZEString& ZERSResource::GetFilePath() const
-{
-	return FilePath;
-}
-
-ZERSState ZERSResource::GetState() const
-{
-	return State;
-}
-
-ZEGUID ZERSResource::GetGUID() const
+const ZEGUID& ZERSResource::GetGUID() const
 {
 	return GUID;
 }
 
-ZESize ZERSResource::GetReferanceCount() const
+ZERSResourceState ZERSResource::GetState() const
+{
+	return State;
+}
+
+ZESize ZERSResource::GetReferenceCount() const
 {
 	return ReferenceCount;
 }
 
-ZESize ZERSResource::GetSize(ZERSMemoryPool Pool) const
+ZESize ZERSResource::GetMemoryUsage(ZERSMemoryPool Pool) const
 {
-	if (Pool > ZERS_MP_TOTAL)
-	{
-		return 0;
-	}
-	else if (Pool == ZERS_MP_TOTAL)
-	{
-		ZESize Sum = 0;
-		for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
-			Sum += Size[I];
-		return Sum;
-	}
-	else
-	{
-		return Size[Pool];
-	}
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Unknown memory pool.");
+	return MemoryUsage[Pool];
 }
 
-ZESize ZERSResource::GetTotalSize(ZERSMemoryPool Pool) const
+ZESize ZERSResource::GetTotalMemoryUsage() const
 {
-	ZESize Sum = GetSize(Pool);
-	for (ZESize I = 0; I < ZERS_MP_TOTAL; I++)
-		Sum += SubResources[I]->GetTotalSize(Pool);
-	
-	return Sum;
+	ZESize Total = 0;
+	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
+		Total += GetMemoryUsage((ZERSMemoryPool)Pool);
+
+	return Total;
 }
 
-ZERSLoadMethod ZERSResource::GetLoadMethod() const
+bool ZERSResource::IsShared() const
 {
-	return LoadMethod;
+	return Shared;
 }
 
-ZEUInt ZERSResource::GetLoadProgress() const
+void ZERSResource::Share()
 {
-	ZEUInt32 TotalProgress = 0;
-	for (ZESize I = 0; I < SubResources.GetCount(); I++)
-		TotalProgress += SubResources[I]->GetLoadProgress();
+	if (IsShared())
+		return;
 
-	return (LoadProgress + TotalProgress) / ((ZEUInt)SubResources.GetCount() + 1);
+	zeCheckError(GUID == ZEGUID::Zero, ZE_VOID, "Cannot share resource. Ilvalid GUID.");
+	ZERSResourceManager::GetInstance()->EnlistResource(this);
 }
 
-const ZEArray<ZEHolder<ZERSResource>>& ZERSResource::GetSubResources() const
+void ZERSResource::Unshare()
 {
-	return SubResources;
+	if (!IsShared())
+		return;
+
+	ZERSResourceManager::GetInstance()->DelistResource(this);
 }
 
-void ZERSResource::SetCached(bool Enabled)
+
+bool ZERSResource::IsStaging()
 {
-	Cached = Enabled;
+	return State == ZERS_RS_STAGING;
 }
 
-bool ZERSResource::GetCached() const
+void ZERSResource::StagingWait()
 {
-	return Cached;
+	while(State == ZERS_RS_STAGING);
 }
 
-void ZERSResource::SetCachePriority(ZEInt Priority)
+void ZERSResource::StagingRealize()
 {
-	CachePriority = Priority;
-}
-
-ZEInt ZERSResource::GetCachePriority() const
-{
-	return CachePriority;
-}
-
-void ZERSResource::Wait() const
-{
-	WaitSignal.Wait();
+	if (State == ZERS_RS_STAGING)
+		State = ZERS_RS_ALIVE;
 }

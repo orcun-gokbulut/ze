@@ -45,6 +45,10 @@
 	#include <intrin.h>
 #endif
 
+
+// ZELock
+//////////////////////////////////////////////////////////////////////////////////////
+
 ZE_COPY_NO_ACTION_IMP(ZELock)
 
 static inline ZEInt32 AtomicIncrement(volatile ZEInt32* NextNumber)
@@ -130,6 +134,10 @@ ZELock::~ZELock()
 	__itt_sync_destroy(this);
 	#endif
 }
+
+
+// ZELockHolder
+//////////////////////////////////////////////////////////////////////////////////////
 
 ZE_COPY_NO_ACTION_IMP(ZELockHolder)
 
