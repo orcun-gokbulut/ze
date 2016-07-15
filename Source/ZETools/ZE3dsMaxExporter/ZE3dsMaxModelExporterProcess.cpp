@@ -65,11 +65,11 @@ enum ZEPhysicalShapeType
 	ZE_PBST_CONVEX			= 4
 };
 
-enum ZEModelHelperOwnerType
+enum ZEModelHelperParentType
 {
-	ZE_MHOT_MODEL			= 0,
-	ZE_MHOT_MESH			= 1,
-	ZE_MHOT_BONE			= 2
+	ZE_MHPT_MODEL			= 0,
+	ZE_MHPT_MESH			= 1,
+	ZE_MHPT_BONE			= 2
 };
 
 ZEPackStruct(
@@ -1598,7 +1598,7 @@ bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode
 
 	INode* OwnerNode = NULL;
 	ZEInt32 OwnerId;
-	ZEModelHelperOwnerType OwnerType;
+	ZEModelHelperParentType OwnerType;
 	
 	if (!ZE3dsMaxUtils::GetProperty(Helper, ZEString("Owner"), OwnerNode))
 		zeError("Can not find helper property: Owner");
@@ -1610,7 +1610,7 @@ bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode
 		zeWarning("Helper \"%s\" has no immediate owner parameter. Model will be set as owner.", NodeName.ToCString());
 
 		OwnerId = -1;
-		OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+		OwnerType = ZEModelHelperParentType::ZE_MHPT_MODEL;
 	}
 	else
 	{
@@ -1626,12 +1626,12 @@ bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode
 			if (CurrentExportOption)
 			{
 				OwnerId = ZE3dsMaxModelExporter::GetMeshId(OwnerGameNode);
-				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MESH;
+				OwnerType = ZEModelHelperParentType::ZE_MHPT_MESH;
 			}
 			else
 			{
 				OwnerId = -1;
-				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+				OwnerType = ZEModelHelperParentType::ZE_MHPT_MODEL;
 
 				zeWarning("Since mesh export option is disabled, Helper \"%s\" will be exported without an owner.", NodeName.ToCString());
 			}
@@ -1643,12 +1643,12 @@ bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode
 			if (CurrentExportOption)
 			{
 				OwnerId = ZE3dsMaxModelExporter::GetBoneId(OwnerGameNode);
-				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_BONE;	
+				OwnerType = ZEModelHelperParentType::ZE_MHPT_BONE;	
 			}
 			else
 			{
 				OwnerId = -1;
-				OwnerType = ZEModelHelperOwnerType::ZE_MHOT_MODEL;
+				OwnerType = ZEModelHelperParentType::ZE_MHPT_MODEL;
 
 				zeWarning("Since bone export option is disabled, Helper \"%s\" will be exported without an owner.", NodeName.ToCString());
 			}
@@ -1661,7 +1661,7 @@ bool ZE3dsMaxModelExporter::ProcessHelper(IGameNode* Node, ZEMLNode* HelpersNode
 		}
 	}
 
-	if (OwnerId < 0 && OwnerType != ZE_MHOT_MODEL)
+	if (OwnerId < 0 && OwnerType != ZE_MHPT_MODEL)
 	{
 		zeError("Helper \"%s\" has invalid owner parameter.", NodeName.ToCString());
 		return false;

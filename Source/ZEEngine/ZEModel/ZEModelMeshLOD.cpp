@@ -36,126 +36,269 @@
 #include "ZEModelMeshLOD.h"
 
 #include "ZEModel.h"
+#include "ZERenderer/ZERNRenderer.h"
 #include "ZEMath/ZEAngle.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZERenderer/ZERNRenderer.h"
+#include "ZEDS/ZEDelegate.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZERenderer/ZERNFixedMaterial.h"
-#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZERenderer/ZERNMaterial.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRIndexBuffer.h"
+#include "ZERenderer/ZERNShaderSlots.h"
+#include "ZERenderer/ZERNStageShadowmapGeneration.h"
 
-void ZEModelMeshLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
+
+ZEModelMeshLOD* ZEModelDraw::GetLOD()
+{
+	return LOD;
+}
+
+const ZEModelMeshLOD* ZEModelDraw::GetLOD() const
+{
+	return LOD;
+}
+
+void ZEModelDraw::SetOffset(ZESize Offset)
+{
+	this->Offset = Offset;
+}
+
+ZESize ZEModelDraw::GetOffset() const
+{
+	return Offset;
+}
+
+void ZEModelDraw::SetCount(ZESize Count)
+{
+	this->Count = Count;
+}
+
+ZESize ZEModelDraw::GetCount() const
+{
+	return Count;
+}
+
+void ZEModelDraw::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
 
-ZEHolder<const ZERNMaterial> ZEModelMeshLOD::GetMaterial() const
+ZEHolder<const ZERNMaterial> ZEModelDraw::GetMaterial() const
 {
 	return Material;
 }
 
-const ZEModelResourceMeshLOD* ZEModelMeshLOD::GetLODResource() const
+ZEModelDraw::ZEModelDraw()
 {
-	return LODResource;
+	LOD = NULL;
+	Offset = 0;
+	Count = 0;
+	RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEModelDraw, Render, this);
 }
 
-ZEInt32 ZEModelMeshLOD::GetDrawStartDistance() const
+void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
-	return DrawStartDistance;
-}
-
-ZEInt32 ZEModelMeshLOD::GetDrawEndDistance() const
-{
-	return DrawEndDistance;
-}
-
-bool ZEModelMeshLOD::IsSkinned() const
-{
-	return Skinned;
-}
-
-void ZEModelMeshLOD::Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command)
-{
-	ZEGRContext* Context = RenderParameters->Context;
-	const ZERNStage* Stage = RenderParameters->Stage;
-	if (!Material->SetupMaterial(Context, Stage))
-	{
-		zeError("Cannot setup material");
+	if (GetLOD() == NULL)
 		return;
-	}
 
-	if (Skinned)
+	if (GetLOD()->GetMesh() == NULL)
+		return;
+
+	if (GetLOD()->VertexBufferBase.IsNull())
+		return;
+
+	ZEGRContext* Context = Parameters->Context;
+	Context->SetVertexBuffers(0, 1, GetLOD()->VertexBufferBase.GetPointerToPointer());
+	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, GetLOD()->GetMesh()->ConstantBuffer.GetPointerToPointer());
+
+	GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage);
+	Context->Draw(GetCount(), GetOffset());
+	GetMaterial()->CleanupMaterial(Parameters->Context, Parameters->Stage);
+
+	/*Context->SetIndexBuffer(IndexBuffer);
+	if (RenderParameters->Stage == ZERNStageShadowmapGeneration::Class())
 	{
-		Owner->UpdateConstantBufferBoneTransforms();
-		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_BONE_TRANSFORMS, 1, Owner->ConstantBufferBoneTransforms.GetPointerToPointer());
-		Context->SetVertexBuffers(0, 1, VertexBufferSkin.GetPointerToPointer());
+		Context->SetVertexBuffers(0, 1, VertexBufferBase.GetPointerToPointer());
+		if (GetVertexType() == ZEMD_VT_SKINNED)
+			Context->SetVertexBuffers(2, 1, VertexBufferSkin.GetPointerToPointer);
 	}
 	else
 	{
-		Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
-	}
+		const ZEGRVertexBuffer* Buffers[2];
+		Buffers[0] = VertexBufferBase;
+		Buffers[1] = VertexBufferNormals;
+		Context->SetVertexBuffers(0, 2, Buffers);
+	}*/
 
-	OwnerMesh->UpdateConstantBuffer();
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, OwnerMesh->ConstantBuffer.GetPointerToPointer());
-
-	Context->Draw(LODResource->VertexCount, 0);
-
-	Material->CleanupMaterial(Context, Stage);
 }
 
-void ZEModelMeshLOD::Initialize(ZEModel* Model, ZEModelMesh* Mesh,  const ZEModelResourceMeshLOD* LODResource)
+ZEModel* ZEModelMeshLOD::GetModel()
 {
-	Owner = Model;
-	OwnerMesh = Mesh;
-	this->LODResource = LODResource;
-	DrawStartDistance = LODResource->LODStartDistance;
-	DrawEndDistance = LODResource->LODEndDistance;
-	Material = Model->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId].GetPointer();
-	VertexBuffer = LODResource->VertexBuffer;
-	VertexBufferNormals = LODResource->VertexBufferNormals;
-	VertexBufferSkin = LODResource->VertexBufferSkin;
-	IndexBuffer = LODResource->IndexBuffer;
-	Skinned = !LODResource->VertexBufferSkin.IsNull();
+	return Model;
+}
 
-	if (Skinned)
+ZEModelMesh* ZEModelMeshLOD::GetMesh()
+{
+	return Mesh;
+}
+
+void ZEModelMeshLOD::SetVertexType(ZEMDVertexType Type)
+{
+	VertexType = Type;
+}
+
+ZEMDVertexType ZEModelMeshLOD::GetVertexType() const
+{
+	return VertexType;
+}
+
+void ZEModelMeshLOD::SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+{
+	VertexBufferBase = VertexBuffer;
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferBase() const
+{
+	return VertexBufferBase;
+}
+
+void ZEModelMeshLOD::SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+{
+	VertexBufferNormals = VertexBufferNormals;
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferNormals() const
+{
+	return VertexBufferNormals;
+}
+
+void ZEModelMeshLOD::SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+{
+	VertexBufferSkin = VertexBufferSkin;
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferSkin() const
+{
+	return VertexBufferSkin;
+}
+
+void ZEModelMeshLOD::SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+{
+
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferExtra() const
+{
+	return NULL;
+}
+
+void ZEModelMeshLOD::SetIndexType(ZEMDVertexIndexType Type)
+{
+	IndexType = Type;
+}
+
+ZEMDVertexIndexType ZEModelMeshLOD::GetIndexType() const
+{
+	return IndexType;
+}
+
+void ZEModelMeshLOD::SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer)
+{
+	this->IndexBuffer = IndexBuffer;
+}
+
+ZEHolder<const ZEGRIndexBuffer> ZEModelMeshLOD::GetIndexBuffer() const
+{
+	return IndexBuffer;
+}
+
+void ZEModelMeshLOD::SetStartDistance(float Distance)
+{
+	StartDistance = Distance;
+}
+
+float ZEModelMeshLOD::GetStartDistance() const
+{
+	return StartDistance;
+}
+
+void ZEModelMeshLOD::SetEndDistance(float Distance)
+{
+	EndDistance = Distance;
+}
+
+float ZEModelMeshLOD::GetEndDistance() const 
+{
+	return EndDistance;
+}
+
+const ZEArray<ZEModelDraw>& ZEModelMeshLOD::GetDraws()
+{
+	return Draws;
+}
+
+void ZEModelMeshLOD::AddDraw(const ZEModelDraw& Draw)
+{
+	Draws.Add(Draw);
+	Draws.GetLastItem().LOD = this;
+}
+
+void ZEModelMeshLOD::RemoveDraw(ZESize Index)
+{
+	Draws.Remove(Index);
+}
+
+void ZEModelMeshLOD::Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMeshLOD* Resource)
+{
+	this->Model = Model;
+	LODResource = Resource;
+	this->ModelResource = ModelResource;
+	SetStartDistance(Resource->GetStartDistance());
+	SetEndDistance(Resource->GetEndDistance());
+	SetVertexBufferBase(Resource->GetVertexBufferBase());
+	SetVertexBufferNormals(Resource->GetVertexBufferNormals());
+	SetVertexBufferSkin(Resource->GetVertexBufferSkin());
+	SetIndexBuffer(Resource->GetIndexBuffer());
+
+	ZESize DrawCount = Resource->GetDraws().GetCount();
+	Draws.SetCount(DrawCount);
+
+	for (ZESize I = 0; I < DrawCount; I++)
 	{
-		static_cast<ZERNFixedMaterial*>(const_cast<ZERNMaterial*>(Material.GetPointer()))->SetSkinningEnabled(Skinned);
-		Material->Update();
+		const ZEMDResourceDraw* ResourceDraw = &Resource->GetDraws()[I];
+		Draws[I].SetMaterial(Resource->GetMaterial());
+		Draws[I].SetOffset(ResourceDraw->GetOffset());
+		Draws[I].SetCount(ResourceDraw->GetCount());
+		Draws[I].LOD = this;
 	}
 }
 
-void ZEModelMeshLOD::Deinitialize()
+void ZEModelMeshLOD::Unload()
 {
-	Owner = NULL;
-	OwnerMesh = NULL;
-	DrawStartDistance = 0;
-	DrawEndDistance = 0;
-	VertexBuffer = NULL;
-	LODResource = NULL;
-	Material = NULL;
-	Skinned = false;
+	Model = NULL;
+	ModelResource = NULL;
+	SetStartDistance(0);
+	SetEndDistance(0);
+	SetVertexBufferBase(NULL);
+	SetVertexBufferNormals(NULL);
+	SetVertexBufferSkin(NULL);
+	SetIndexBuffer(NULL);
 }
 
-void ZEModelMeshLOD::ResetMaterial()
+ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
 {
-	SetMaterial(Owner->GetModelResource()->GetMaterials()[(ZESize)LODResource->MaterialId]);
-}
-
-ZEModelMeshLOD::ZEModelMeshLOD()
-{
-	Skinned = false;
-	Owner = NULL;
-	OwnerMesh = NULL;
-	DrawStartDistance = 0;
-	DrawEndDistance = 0;
-	VertexBuffer = NULL;
+	Model = NULL;
+	Mesh = NULL;
 	LODResource = NULL;
-	Material = NULL;
+
+	StartDistance = 0;
+	EndDistance = 0;
+	VertexType = ZEMD_VT_NORMAL;
+	IndexType = ZEMD_VIT_NONE;
 }
 
 ZEModelMeshLOD::~ZEModelMeshLOD()
 {
-	Deinitialize();
+	Unload();
 }

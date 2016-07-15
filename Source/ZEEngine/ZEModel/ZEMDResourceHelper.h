@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelIKChain.h
+ Zinek Engine - ZEMDResourceHelper.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,59 +34,63 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_IK_CHAIN_H__
-#define __ZE_MODEL_IK_CHAIN_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEModelIKChainNode.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEQuaternion.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMeta\ZEObject.h"
 
-class ZEModel;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
-class ZEModelIKChain
+enum ZEModelResourceHelperParentType
 {
-	friend class ZEModel;
+	ZE_MRHPT_MODEL	= 0,
+	ZE_MRHPT_MESH	= 1,
+	ZE_MRHPT_BONE	= 2
+};
+
+class ZEModelResourceHelper : public ZEObject
+{
+	ZE_OBJECT
+	friend class ZEModelResource;
 	private:
-		ZEString							Name;
+		ZELink<ZEModelResourceHelper> Link;
 
-		bool								Enabled;
-
-		ZEVector3							EffectorPosition;
-		ZEQuaternion						EffectorRotation;
-
-		float								ErrorThreshold;
-		ZEUInt								MaxIterationCount;
-
-		float								RotationLimit;
-
-		void								Iterate();
+		ZEString Name;
+		ZEModelResourceHelperParentType OwnerType;
+		ZEInt32 OwnerId;
+		ZEVector3 Position;
+		ZEQuaternion Rotation;
+		ZEVector3 Scale;
+		ZEString UserDefinedProperties;
 
 	public:
-		const ZEString&						GetName();
-		void								SetName(ZEString Name);
+		void SetName(const ZEString& Name);
+		const ZEString& GetName() const;
 
-		ZEArray<ZEModelIKChainNode>			Nodes;
+		void SetOwnerType(ZEModelResourceHelperParentType OwnerType);
+		ZEModelResourceHelperParentType GetOwnerType() const;
 
-		void								SetEnabled(bool Enabled);
-		bool								GetEnabled();
+		void SetOwnerId(ZEInt32 OwnerId);
+		ZEInt32 GetOwnerId() const;
 
-		const ZEVector3&					GetEffectorPosition();
-		void								SetEffectorPosition(const ZEVector3& Position);
+		void SetPosition(const ZEVector3& Position);
+		const ZEVector3& GetPosition() const;
 
-		const ZEQuaternion&					GetEffectorRotation();
-		void								SetEffectorRotation(const ZEQuaternion& Rotation);
+		void SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion& GetRotation() const;
 
-		void								SetMaxIterationCount(ZEUInt Value);
-		ZEUInt								GetMaxIterationCount();
+		void SetScale(const ZEVector3& Scale);
+		const ZEVector3& GetScale() const;
 
-		void								SetErrorThreshold(float Value);
-		float								GetErrorThreshold();
+		void SetUserDefinedProperties(ZEString UserDefinedProperties);
+		ZEString GetUserDefinedProperties() const;
 
-		void								Process();
+		bool Load(const ZEMLReaderNode& HelperNode);
+		bool Save(ZEMLWriterNode& HelperNode) const;
 
-											ZEModelIKChain();
+		ZEModelResourceHelper();
 };
-#endif

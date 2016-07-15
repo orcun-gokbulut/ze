@@ -33,8 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#ifndef __ZE_MODEL_ANIMATION_TRACK_H__
-#define __ZE_MODEL_ANIMATION_TRACK_H__
+#pragma once
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
@@ -52,11 +51,12 @@ enum ZEModelAnimationBlendMode
 
 class ZEModelAnimationTrack : public ZEObject
 {
-	friend class ZEModel;
 	ZE_OBJECT
-
+	friend class ZEModel;
 	private:
-		ZEModel*						Owner;
+		ZEModel*						Model;
+		ZELink<ZEModelAnimationTrack>	ModelLink;
+		ZEString						AnimationName;
 		const ZEModelAnimation*			Animation;
 
 		ZEModelAnimationState			State;
@@ -76,19 +76,24 @@ class ZEModelAnimationTrack : public ZEObject
 		ZEUInt							LOD;
 		bool							Looping;
 
+		ZEHolder<const ZEModelResource>	Resource;
+
+// 		ZEArray<ZEModelMesh*>			MeshObjects;
+// 		ZEArray<ZEModelBone*>			BoneObjects;
 		
+		void							BindAnimation();
 		void							UpdateAnimation();
 		void							UpdateMeshesAndBones();
 		void							ApplyLimits();
 
 	public:
-		void							SetOwner(ZEModel* Model);
-		ZEModel*						GetOwner();
+		void							SetModel(ZEModel* Model);
+		ZEModel*						GetModel();
 
-		void							SetAnimation(const ZEModelAnimation* Animation);
-		const ZEModelAnimation*			GetAnimation();
+		void							SetResource(ZEHolder<const ZEModelResource> ModelResource);
+		ZEHolder<const ZEModelResource> GetResource();
 
-		void							SetAnimationByName(const ZEString& Name);
+		void							SetAnimationName(const ZEString& Name);
 		const ZEString&					GetAnimationName();
 
 		void							SetState(ZEModelAnimationState State);
@@ -146,5 +151,3 @@ class ZEModelAnimationTrack : public ZEObject
 
 										ZEModelAnimationTrack();
 };
-
-#endif

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelIKChain.h
+ Zinek Engine - ZEMDResourceBone.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,59 +34,67 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_IK_CHAIN_H__
-#define __ZE_MODEL_IK_CHAIN_H__
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEModelIKChainNode.h"
+#include "ZEMeta\ZEObject.h"
+#include "ZEDS\ZELink.h"
+#include "ZEDS\ZEString.h"
+#include "ZEMath\ZEVector.h"
+#include "ZEMath\ZEAABBox.h"
+#include "ZEMath\ZEMatrix.h"
+#include "ZEMDResourcePhysics.h"
 
-class ZEModel;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
 
-class ZEModelIKChain
+class ZEModelResourceBone : public ZEObject
 {
-	friend class ZEModel;
+	ZE_OBJECT
+	friend class ZEModelResource;
 	private:
-		ZEString							Name;
+		ZELink<ZEModelResourceBone> Link;
 
-		bool								Enabled;
-
-		ZEVector3							EffectorPosition;
-		ZEQuaternion						EffectorRotation;
-
-		float								ErrorThreshold;
-		ZEUInt								MaxIterationCount;
-
-		float								RotationLimit;
-
-		void								Iterate();
+		ZEString Name;
+		ZEInt32 ParentBone;
+		ZEVector3 Position;
+		ZEQuaternion Rotation;
+		ZEVector3 Scale;
+		ZEAABBox BoundingBox;
+		ZEModelResourcePhysicalBody PhysicalBody;
+		ZEModelResourcePhysicalJoint PhysicalJoint;
+		ZEString UserDefinedProperties;
 
 	public:
-		const ZEString&						GetName();
-		void								SetName(ZEString Name);
+		void SetName(const ZEString& Name);
+		const ZEString& GetName() const;
 
-		ZEArray<ZEModelIKChainNode>			Nodes;
+		void SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox& GetBoundingBox() const;
 
-		void								SetEnabled(bool Enabled);
-		bool								GetEnabled();
+		void SetParentBone(ZEInt32 ParentBone);
+		ZEInt32 GetParentBone() const;
 
-		const ZEVector3&					GetEffectorPosition();
-		void								SetEffectorPosition(const ZEVector3& Position);
+		void SetPosition(const ZEVector3& Position);
+		const ZEVector3& GetPosition() const;
 
-		const ZEQuaternion&					GetEffectorRotation();
-		void								SetEffectorRotation(const ZEQuaternion& Rotation);
+		void SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion& GetRotation() const;
 
-		void								SetMaxIterationCount(ZEUInt Value);
-		ZEUInt								GetMaxIterationCount();
+		void SetScale(const ZEVector3& Scale);
+		const ZEVector3& GetScale() const;
 
-		void								SetErrorThreshold(float Value);
-		float								GetErrorThreshold();
+		void SetPhysicalJoint(const ZEModelResourcePhysicalBody& Body);
+		const ZEModelResourcePhysicalBody& GetPhysicalBody() const;
+		ZEModelResourcePhysicalBody& GetPhysicalBody();
 
-		void								Process();
+		void SetPhysicalJoint(const ZEModelResourcePhysicalJoint& Joint);
+		const ZEModelResourcePhysicalJoint& GetPhysicalJoint() const;
+		ZEModelResourcePhysicalJoint& GetPhysicalJoint();
 
-											ZEModelIKChain();
+		void SetUserDefinedProperties(const ZEString& UserDefinedProperties);
+		const ZEString& GetUserDefinedProperties() const;
+
+		bool Load(const ZEMLReaderNode& BoneNode);
+		bool Save(ZEMLWriterNode& BoneNode) const;
+
+		ZEModelResourceBone();
 };
-#endif

@@ -35,368 +35,68 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZECore/ZEResource.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEMath/ZEMatrix.h"
-#include "ZEMath/ZEAABBox.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEPhysics/ZEPhysicalRigidBody.h"
-#include "ZEPhysics/ZEPhysicalJoint.h"
-#include "ZEPhysics/ZEPhysicalShapes.h"
+#include "ZEResource/ZERSResource.h"
+#include "ZEMDResourceMesh.h"
+#include "ZEMDResourceBone.h"
+#include "ZEMDResourceAnimation.h"
+#include "ZEMDResourceHelper.h"
 #include "ZEGraphics/ZEGRVertexLayout.h"
 #include "ZEPointer/ZEHolder.h"
 #include "ZEDS/ZEString.h"
 
-#define ZE_MDLF_MAX_NAME_SIZE					128
-#define ZE_MDLF_MAX_FILENAME_SIZE				256
-
-class ZEGRIndexBuffer;
-class ZEGRVertexBuffer;
-class ZEGRTexture2D;
 class ZETexture2DResource;
-class ZERNMaterial;
-class ZEPhysicalJoint;
-class ZEMLReaderNode;
+class ZETexture2D;
 
-enum ZEModelResourcePhysicalShapeType
-{
-	ZE_MRPST_BOX			= 0,
-	ZE_MRPST_SPHERE			= 1,
-	ZE_MRPST_CAPSULE		= 2,
-	ZE_MRPST_CYLINDER		= 3,
-	ZE_MRPST_CONVEX			= 4,
-};
-
-enum ZEModelResourcePhysicalBodyType
-{
-	ZE_MRPBT_NONE			= 0,
-	ZE_MRPBT_RIGID			= 1,
-	ZE_MRPBT_DEFORMABLE		= 2,
-	ZE_MRPBT_CLOTH			= 3
-};
-
-enum ZEModelResourceHelperOwnerType
-{
-	ZE_MRHOT_MODEL			= 0,
-	ZE_MRHOT_MESH			= 1,
-	ZE_MRHOT_BONE			= 2
-};
-
-struct ZEModelVertex
-{
-	private:
-		static ZEGRVertexLayout			VertexLayout;
-
-	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector3						Tangent;
-		ZEVector3						Binormal;
-		ZEVector2						Texcoord;
-
-		static ZEGRVertexLayout*		GetVertexLayout();
-};
-
-struct ZESkinnedModelVertex
-{
-	private:
-		static ZEGRVertexLayout			VertexLayout;
-
-	public:
-		ZEVector3						Position;
-		ZEVector3						Normal;
-		ZEVector3						Tangent;
-		ZEVector3						Binormal;
-		ZEVector2						Texcoord;
-		ZEUInt8							BoneIndices[4];
-		float							BoneWeights[4];
-
-		static ZEGRVertexLayout*		GetVertexLayout();
-};
-
-struct ZEModelResourcePhysicalPolygon
-{
-	ZEInt										VertexIndexes[3];
-};
-
-struct ZEModelResourcePhysicalShape
-{
-
-	ZEModelResourcePhysicalShapeType			Type;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	float										Restitution;
-	float										StaticFriction;
-	float										DynamicFriction;
-	ZEString									UserDefinedProperties;
-
-	union
-	{
-		struct
-		{
-			float								Width;
-			float								Height;
-			float								Length;
-		} Box;	
-
-		struct
-		{
-			float								Radius;
-		} Sphere;
-
-		struct
-		{
-			float								Radius;
-			float								Height;
-		} Capsule;
-
-		struct
-		{
-			float								Radius;
-			float								Height;
-		} Cylinder;
-	};
-
-	struct
-	{
-		ZEArray<ZEVector3>						Vertices;
-	} Convex;
-};
-
-struct ZEModelResourcePhysicalBody
-{
-	ZEModelResourcePhysicalBodyType				Type;
-	bool										Enabled;
-	bool										IsKinematic;
-	float										Mass;
-	float										LinearDamping;
-	float										AngularDamping;
-	ZEVector3									Position;
-	ZEQuaternion								Orientation;
-	ZEVector3									MassCenter;
-	ZEArray<ZEModelResourcePhysicalShape>		Shapes;
-};
-
-struct ZEModelResourcePhysicalJoint
-{
-	ZEPhysicalJointType							JointType;
-
-	bool										Enabled;
-
-	ZEUInt32									Body1Id;
-	ZEUInt32									Body2Id;
-
-	bool										CollideBodies;
-
-	bool										UseGlobalAnchorAxis;
-
-	ZEVector3									GlobalAnchor;
-	ZEQuaternion								GlobalAxis;
-
-	ZEVector3									LocalAnchor1;
-	ZEVector3									LocalAnchor2;
-
-	ZEQuaternion								LocalAxis1;
-	ZEQuaternion								LocalAxis2;
-
-	bool										Breakable;
-	float										BreakForce;
-	float										BreakTorque;
-
-	ZEPhysicalJointMotion						XMotion;
-	ZEPhysicalJointMotion 						YMotion;
-	ZEPhysicalJointMotion 						ZMotion;
-
-	float 										LinearLimitValue;
-	float 										LinearLimitRestitution;
-	float 										LinearLimitSpring;
-	float 										LinearLimitDamping;
-
-	ZEPhysicalJointMotion						TwistMotion;
-	float 										TwistLowLimitValue;
-	float 										TwistLowLimitRestitution;
-	float 										TwistLowLimitSpring;
-	float 										TwistLowLimitDamping;
-	float 										TwistHighLimitValue;
-	float 										TwistHighLimitRestitution;
-	float 										TwistHighLimitSpring;
-	float 										TwistHighLimitDamping;
-						
-	ZEPhysicalJointMotion						Swing1Motion;
-	float 										Swing1LimitValue;
-	float 										Swing1LimitRestitution;
-	float 										Swing1LimitSpring;
-	float 										Swing1LimitDamping;
-	
-	ZEPhysicalJointMotion						Swing2Motion;
-	float 										Swing2LimitValue;
-	float 										Swing2LimitRestitution;
-	float 										Swing2LimitSpring;
-	float 										Swing2LimitDamping;
-
-	ZEVector3 									MotorTargetPosition;
-	ZEQuaternion 								MotorTargetOrientation;
-	ZEVector3 									MotorTargetVelocity;
-	ZEVector3 									MotorTargetAngularVelocity;
-
-	ZEPhysicalJointMotorType					LinearXMotor;
-	float 										LinearXMotorForce;
-	float 										LinearXMotorSpring;
-	float 										LinearXMotorDamper;
-
-	ZEPhysicalJointMotorType					LinearYMotor;
-	float 										LinearYMotorForce;
-	float 										LinearYMotorSpring;
-	float 										LinearYMotorDamper;
-
-	ZEPhysicalJointMotorType					LinearZMotor;
-	float 										LinearZMotorForce;
-	float 										LinearZMotorSpring;
-	float 										LinearZMotorDamper;
-
-	ZEPhysicalJointMotorType					AngularSwingMotor;
-	float										AngularSwingMotorForce;
-	float										AngularSwingMotorSpring;
-	float										AngularSwingMotorDamper;
-
-	ZEPhysicalJointMotorType					AngularTwistMotor;
-	float										AngularTwistMotorForce;
-	float										AngularTwistMotorSpring;
-	float										AngularTwistMotorDamper;
-
-	ZEPhysicalJointMotorType					AngularSlerpMotor;
-	float										AngularSlerpMotorForce;
-	float										AngularSlerpMotorSpring;
-	float										AngularSlerpMotorDamper;
-};
-
-struct ZEModelResourceAnimationKey
-{
-	ZEUInt32									ItemId;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-};
-
-struct ZEModelResourceAnimationFrame
-{
-	ZEArray<ZEModelResourceAnimationKey>		BoneKeys;
-	ZEArray<ZEModelResourceAnimationKey>		MeshKeys;
-};
-
-struct ZEModelResourceAnimation
-{
-	ZEString									Name;
-	ZEArray<ZEModelResourceAnimationFrame>		Frames;
-};
-
-
-class ZEModelResourceMeshLOD
-{
-	public:
-		ZEHolder<ZEGRVertexBuffer>				VertexBuffer;
-		ZEHolder<ZEGRVertexBuffer>				VertexBufferNormals;
-		ZEHolder<ZEGRVertexBuffer>				VertexBufferSkin;
-		ZEHolder<ZEGRIndexBuffer>				IndexBuffer;
-		
-		ZEUInt32								TriangleCount;
-		ZEUInt32								VertexCount;
-
-		ZEInt32									LODLevel;
-		ZEInt32									LODStartDistance;
-		ZEInt32									LODEndDistance;
-		ZEInt32									MaterialId;
-};
-
-struct ZEModelResourceMesh
-{
-	ZEString									Name; 
-	ZEAABBox									BoundingBox;
-	ZEInt32										ParentMesh;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-	bool										IsVisible;
-	bool										IsSkinned;
-	ZEArray<ZEModelResourceMeshLOD>				LODs;
-	ZEModelResourcePhysicalBody					PhysicalBody;
-	ZEString									UserDefinedProperties;
-	ZEArray<ZEVector3>							Geometry;
-};
-
-struct ZEModelResourceBone
-{
-	ZEString									Name;
-	ZEAABBox									BoundingBox;
-	ZEInt32										ParentBone;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-	ZEMatrix4x4									LocalTransform;
-	ZEMatrix4x4									ForwardTransform;
-	ZEMatrix4x4									InverseTransform;
-	ZEModelResourcePhysicalBody					PhysicalBody;
-	ZEModelResourcePhysicalJoint				PhysicalJoint;
-	ZEString									UserDefinedProperties;
-};
-
-struct ZEModelResourceHelper
-{
-	ZEString									Name;
-	ZEModelResourceHelperOwnerType				OwnerType;
-	ZEInt32										OwnerId;
-	ZEModelResourceMesh*						OwnerMesh;
-	ZEModelResourceBone*						OwnerBone;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-	ZEString									UserDefinedProperties;
-};
-
-class ZEModelResource : public ZEResource
+class ZEModelResource : public ZERSResource
 {
 	ZE_OBJECT
+		ZE_DISALLOW_COPY(ZEModelResource)
+private:
+	ZEList2<ZEModelResourceMesh> Meshes;
+	ZEList2<ZEModelResourceBone> Bones;
+	ZEList2<ZEModelResourceHelper> Helpers;
+	ZEList2<ZEModelResourceAnimation> Animations;
 
-	private:
-		ZEArray<ZEModelResourceMesh>				Meshes;
-		ZEArray<ZEModelResourceBone>				Bones;
-		ZEArray<ZEModelResourceHelper>				Helpers;
-		ZEArray<ZEModelResourceAnimation>			Animations;
-		ZESmartArray<ZETexture2DResource*>			TextureResources;
-		ZEArray<ZEHolder<ZERNMaterial>>				Materials;
+	bool BoundingBoxIsUserDefined;
+	ZEAABBox UserDefinedBoundingBox;
 
-		bool										BoundingBoxIsUserDefined;
-		ZEAABBox									UserDefinedBoundingBox;
+	bool ReadMeshes(const ZEMLReaderNode& MeshesNode);
+	bool ReadBones(const ZEMLReaderNode& BonesNode);
+	bool ReadAnimations(const ZEMLReaderNode& AnimationsNode);
+	bool ReadHelpers(const ZEMLReaderNode& HelpersNode);
+	bool ReadMaterials(const ZEMLReaderNode& MaterialsNode);
+	virtual bool LoadInternal(const ZERSLoadingOptions* Option);
 
-		bool										ReadBones(ZEMLReaderNode* BonesNode);
-		void										ProcessBones(ZEModelResourceBone* Bone, ZEInt BoneId);
-		bool										ReadMeshes(ZEMLReaderNode* MeshesNode);
-		bool										ReadHelpers(ZEMLReaderNode* HelpersNode);
-		bool										ReadAnimations(ZEMLReaderNode* AnimationsNode);
-		bool										ReadMaterials(ZEMLReaderNode* MaterialsNode);
-		bool										ReadPhysicalBody(ZEModelResourcePhysicalBody* Body, ZEMLReaderNode* PhysicalBodyNode);
-		bool										ReadPhysicalJoint(ZEModelResourcePhysicalJoint* Joint, ZEMLReaderNode* PhysicalJointNode);
+	virtual ~ZEModelResource();
 
-		const ZEGRTexture2D*						ManageModelMaterialTextures(const ZEString& FileName);
-		bool  										ReadModelFromFileV0(ZEFile* ResourceFile);
+public:
+	bool GetUserDefinedBoundingBoxEnabled() const;
+	const ZEAABBox& GetUserDefinedBoundingBox() const;
 
-		virtual										~ZEModelResource();
+	const ZEList2<ZEModelResourceMesh>& GetMeshes();
+	const ZEList2<const ZEModelResourceMesh>& GetMeshes() const;
+	void AddMesh(ZEModelResourceMesh* Mesh);
+	void RemoveMesh(ZEModelResourceMesh* Mesh);
 
-	public:
-		const char*									GetResourceType() const;
-		
-		bool										GetUserDefinedBoundingBoxEnabled() const;
-		const ZEAABBox&								GetUserDefinedBoundingBox() const;
-		const ZESmartArray<ZETexture2DResource*>&	GetTextures() const;
-		const ZEArray<ZEHolder<ZERNMaterial>>&		GetMaterials() const;
-		const ZEArray<ZEModelResourceBone>&			GetBones() const;
-		const ZEArray<ZEModelResourceMesh>&			GetMeshes() const;
-		const ZEArray<ZEModelResourceHelper>&		GetHelpers() const;
-		const ZEArray<ZEModelResourceAnimation>&	GetAnimations() const;
+	const ZEList2<ZEModelResourceBone>& GetBones();
+	const ZEList2<const ZEModelResourceBone>& GetBones() const;
+	void AddBone(ZEModelResourceBone* Bone);
+	void RemoveBone(ZEModelResourceBone* Bone);
 
-		static ZEModelResource*						LoadResource(const ZEString& FileName);
-		static ZEModelResource*						LoadSharedResource(const ZEString& FileName);
-		static void									CacheResource(const ZEString& FileName);
+	const ZEList2<ZEModelResourceAnimation>& GetAnimations();
+	const ZEList2<const ZEModelResourceAnimation>& GetAnimations() const;
+	void AddAnimation(ZEModelResourceAnimation* Animation);
+	void RemoveAnimation(ZEModelResourceAnimation* Animation);
+
+	const ZEList2<ZEModelResourceHelper>& GetHelpers();
+	const ZEList2<const ZEModelResourceHelper>& GetHelpers() const;
+	void AddHelper(ZEModelResourceHelper* Helper);
+	void RemoveHelper(ZEModelResourceHelper* Helper);
+
+	bool Load(const ZEMLReaderNode& ModelNode);
+	bool Save(ZEMLWriterNode& ModelNode) const;
+
+	ZEModelResource();
+
+	static ZEHolder<ZEModelResource> Load(const ZEString& FileName);
 };

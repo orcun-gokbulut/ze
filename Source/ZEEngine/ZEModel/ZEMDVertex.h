@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelIKChain.h
+ Zinek Engine - ZEMDVertex.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -34,59 +34,40 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_IK_CHAIN_H__
-#define __ZE_MODEL_IK_CHAIN_H__
 
 #include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
-#include "ZEModelIKChainNode.h"
+#include "ZEMath\ZEVector.h"
 
-class ZEModel;
+class ZEGRVertexLayout;
 
-class ZEModelIKChain
+enum ZEMDVertexType
 {
-	friend class ZEModel;
-	private:
-		ZEString							Name;
-
-		bool								Enabled;
-
-		ZEVector3							EffectorPosition;
-		ZEQuaternion						EffectorRotation;
-
-		float								ErrorThreshold;
-		ZEUInt								MaxIterationCount;
-
-		float								RotationLimit;
-
-		void								Iterate();
-
-	public:
-		const ZEString&						GetName();
-		void								SetName(ZEString Name);
-
-		ZEArray<ZEModelIKChainNode>			Nodes;
-
-		void								SetEnabled(bool Enabled);
-		bool								GetEnabled();
-
-		const ZEVector3&					GetEffectorPosition();
-		void								SetEffectorPosition(const ZEVector3& Position);
-
-		const ZEQuaternion&					GetEffectorRotation();
-		void								SetEffectorRotation(const ZEQuaternion& Rotation);
-
-		void								SetMaxIterationCount(ZEUInt Value);
-		ZEUInt								GetMaxIterationCount();
-
-		void								SetErrorThreshold(float Value);
-		float								GetErrorThreshold();
-
-		void								Process();
-
-											ZEModelIKChain();
+	ZEMD_VT_NORMAL = 0,
+	ZEMD_VT_SKINNED = 1
 };
-#endif
+
+enum ZEMDVertexIndexType
+{
+	ZEMD_VIT_NONE = 0,
+	ZEMD_VIT_16BIT = 16,
+	ZEMD_VIT_32BIT = 32
+};
+
+struct ZEMDVertex
+{
+	ZEVector3 Position;
+	ZEVector3 Texcoords;
+	ZEVector3 Normal;
+	ZEVector3 Tangent;
+	ZEVector3 Binormal;
+
+	static const ZEGRVertexLayout& GetVertexLayout();
+};
+
+struct ZEMDVertexSkin : public ZEMDVertex
+{
+	ZEUInt32 Indices[4];
+	ZEVector4 Weights;
+	
+	static const ZEGRVertexLayout& GetVertexLayout();
+};

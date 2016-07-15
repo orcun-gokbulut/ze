@@ -177,9 +177,9 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 
 	if (SkinningEnabled)
-		RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
+		RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
 	else
-		RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
+		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
 	if (AlphaCullEnabled && !TransparencyEnabled)
 	{
@@ -208,9 +208,9 @@ bool ZERNFixedMaterial::UpdateRenderState() const
 		RenderState.SetShader(ZEGR_ST_PIXEL, StageShadowmapGeneration_PixelShader);
 
 	if (SkinningEnabled)
-		RenderState.SetVertexLayout(*ZESkinnedModelVertex::GetVertexLayout());
+		RenderState.SetVertexLayout(ZEMDVertexSkin::GetVertexLayout());
 	else
-		RenderState.SetVertexLayout(*ZEModelVertex::GetVertexLayout());
+		RenderState.SetVertexLayout(ZEMDVertex::GetVertexLayout());
 
 	RasterizerState = RenderState.GetRasterizerState();
 	RasterizerState.SetCullMode(TwoSided ? ZEGR_CMD_NONE : RasterizerState.GetCullMode());
