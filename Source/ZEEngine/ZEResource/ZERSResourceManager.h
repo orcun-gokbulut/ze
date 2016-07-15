@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEReferenceCounted.h
+ Zinek Engine - ZERSResourceManager.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,26 +35,57 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZECommon.h"
-#include "ZEThread/ZELock.h"
+#include "ZEMeta\ZEObject.h"
 
-class ZEReferenceCounted
+#include "ZECommon.h"
+#include "ZEDS\ZEList2.h"
+#include "ZERSHolder.h"
+#include "ZERSDefinitions.h"
+
+class ZERSResource;
+class ZERSResourceLoadable;
+
+class ZERSResourceManager : public ZEObject
 {
-	ZE_COPY_NO_ACTION(ZEReferenceCounted)
-	template<typename ZEReferenceCountedClass> friend class ZEHolder;
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERSResourceManager)
 	friend class ZERSResource;
 	private:
-		mutable ZELock			ReferenceCountLock;
-		mutable ZESSize			ReferenceCount;
-	
-		void					Release() const;
-		void					Reference() const;
-	
-	protected:
-		virtual void			Destroy() const;
+		ZEList2<const ZERSResource>				Resources;
+		ZEList2<const ZERSResource>				SharedResources;
+		ZESize									MemoryUsagePrivate[ZERS_MEMORY_POOL_COUNT];
+		ZESize									MemoryUsageShared[ZERS_MEMORY_POOL_COUNT];
+		ZELock									ManagerLock;
+
+		void									UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT]);
+
+		const ZERSResource*						GetResourceInternal(const ZEGUID& GUID);
+		const ZERSResourceLoadable*				GetResourceInternal(const ZEString& FileName);
+
+		void									RegisterResource(const ZERSResource* Resource);
+		void									UnregisterResource(const ZERSResource* Resource);
+
+		void									EnlistResource(const ZERSResource* Resource);
+		void									DelistResource(const ZERSResource* Resource);
+
+		void									DestroyResource(const ZERSResource* Resource);
+
+												ZERSResourceManager();
+												~ZERSResourceManager();
 
 	public:
-								ZEReferenceCounted();
-		virtual					~ZEReferenceCounted();
+		ZESize									GetPrivateResourceCount();
+		ZESize									GetSharedResourceCount();
+
+		ZESize									GetMemoryUsagePrivate(ZERSMemoryPool Pool);
+		ZESize									GetMemoryUsageShared(ZERSMemoryPool Pool);
+		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool);
+
+		ZERSHolder<const ZERSResource>			GetResource(const ZEGUID& GUID);
+		ZERSHolder<const ZERSResourceLoadable>	GetResource(const ZEString& FileName);
+
+		ZERSHolder<const ZERSResource>			StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciaor, ZERSResource** StagingResource = NULL);
+		ZERSHolder<const ZERSResourceLoadable>	StageResource(const ZEString& FileName, ZERSInstanciatorLoadable Insanciaor, ZERSResourceLoadable** StagingResource = NULL);
+
+		static ZERSResourceManager*				GetInstance();
 };

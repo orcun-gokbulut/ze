@@ -125,7 +125,7 @@ ZEEntityResult ZESector::LoadInternal()
 			zeCheckError(NewChildEntityClass == NULL, ZE_ER_FAILED, "ZESector Load failed. ZESector child entity class is unknown. Sector Name: \"%s\", Class Name: \"%s\".", 
 				GetName().ToCString(), ChildEntityNode.ReadString("Class").ToCString());
 
-			NewChildEntity = (ZEEntity*)NewChildEntityClass->CreateInstance();
+			NewChildEntity = static_cast<ZEEntity*>(NewChildEntityClass->CreateInstance());
 
 			if (NewChildEntity == NULL)
 			{

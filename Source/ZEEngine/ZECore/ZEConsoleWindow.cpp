@@ -229,9 +229,8 @@ void ZEConsoleWindow::TerminationState()
 
 void ZEConsoleWindow::Output(const char* OutputText)
 {
-	ZEInt Length = GetWindowTextLength(GetDlgItem((HWND)Handle, IDC_OUTPUT)); 
-	SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)Length, (LPARAM)Length);
-	SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT) ,EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)OutputText);
+	PostMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+	PostMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT) ,EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)OutputText);
 
 	UpdateWindow((HWND)Handle);
 }
@@ -244,5 +243,6 @@ ZEConsoleWindow::ZEConsoleWindow(void)
 
 ZEConsoleWindow::~ZEConsoleWindow(void)
 {
+
 }
 #pragma warning(pop)

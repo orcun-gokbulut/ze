@@ -35,10 +35,18 @@
 
 cmake_minimum_required (VERSION 2.8)
 
-ze_add_source(ZERSResource.cpp				Sources)
-ze_add_source(ZERSResource.h				Sources Headers ZEMC)
-ze_add_source(ZERSManager.cpp				Sources)
-ze_add_source(ZERSManager.h					Sources Headers ZEMC)
+ze_add_source(ZERSResource.cpp					Sources)
+ze_add_source(ZERSResource.h					Sources Headers ZEMC)
+ze_add_source(ZERSResourceLoadable.cpp			Sources)
+ze_add_source(ZERSResourceLoadable.h			Sources Headers ZEMC)
+ze_add_source(ZERSResourceManager.cpp			Sources)
+ze_add_source(ZERSResourceManager.h				Sources Headers ZEMC)
+ze_add_source(ZERSDefinitions.cpp				Sources)
+ze_add_source(ZERSDefinitions.h					Sources Headers ZEMC)
+ze_add_source(ZERSHolder.cpp					Sources)
+ze_add_source(ZERSHolder.h						Sources Headers)
+ze_add_source(ZERSTemplates.cpp					Sources)
+ze_add_source(ZERSTemplates.h					Sources Headers)
 
 ze_add_library(TARGET ZEResource
 	ZEMC ${ZEMC}

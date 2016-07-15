@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEReferenceCounted.h
+ Zinek Engine - ZERSResourceLoadable.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,26 +35,56 @@
 
 #pragma once
 
-#include "ZETypes.h"
-#include "ZECommon.h"
-#include "ZEThread/ZELock.h"
+#include "ZERSResource.h"
 
-class ZEReferenceCounted
+#include "ZETypes.h"
+#include "ZEGUID.h"
+#include "ZEDS/ZEString.h"
+#include "ZEThread/ZETask.h"
+
+ZE_ENUM(ZERSLoadState)
 {
-	ZE_COPY_NO_ACTION(ZEReferenceCounted)
-	template<typename ZEReferenceCountedClass> friend class ZEHolder;
-	friend class ZERSResource;
+	ZERS_LS_NOT_LOADED,
+	ZERS_LS_LOADING,
+	ZERS_LS_ITERATING,
+	ZERS_LS_LOADED,
+	ZERS_LS_UNLOADING,
+	ZERS_LS_ERROR_LOADING,
+	ZERS_LS_ERROR_UNLOADING
+};
+
+class ZERSResourceLoadable : public ZERSResource
+{
+	ZE_OBJECT
+	friend class ZERSResourceManager;
 	private:
-		mutable ZELock			ReferenceCountLock;
-		mutable ZESSize			ReferenceCount;
-	
-		void					Release() const;
-		void					Reference() const;
-	
+		ZERSLoadState							LoadState;
+		ZERSLoadState							TargetState;
+
+		ZEString								FileName;
+		ZEUInt32								FileNameHash;
+
+		ZETask									ManageStatesTask;
+		ZETaskResult							ManageStatesFunction(ZETaskThread* TaskThread, void* Parameters);
+
 	protected:
-		virtual void			Destroy() const;
+		virtual ZETaskResult					LoadInternal();
+		virtual ZETaskResult					UnloadInternal();
+
+												ZERSResourceLoadable();
+		virtual									~ZERSResourceLoadable();
 
 	public:
-								ZEReferenceCounted();
-		virtual					~ZEReferenceCounted();
+		virtual ZERSResourceType				GetType() const;
+		ZERSLoadState							GetLoadState() const;
+		const ZEString&							GetFileName() const;
+
+		bool									IsLoaded();
+		bool									IsFailed();
+
+		void									Load(const ZEString& FileName);
+		void									Unload();
+
+		void									WaitLoad();
+		void									WaitUnload();
 };

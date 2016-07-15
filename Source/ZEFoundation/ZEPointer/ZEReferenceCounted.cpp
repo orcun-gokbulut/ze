@@ -50,7 +50,7 @@ void ZEReferenceCounted::Release() const
 {
 	ReferenceCountLock.Lock();
 	ReferenceCount--;
-	if (ReferenceCount == 0)
+	if (ReferenceCount <= 0)
 	{
 		ReferenceCountLock.Unlock();
 		Destroy();
