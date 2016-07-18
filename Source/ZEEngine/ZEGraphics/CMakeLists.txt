@@ -122,4 +122,4 @@ ze_add_library(TARGET ZEGraphics
 	SOURCES ${Sources}
 	HEADERS ${Headers}
 	ZEMC ${ZEMC}
-	LIBS ZEFoundation libFreeImage)
+	LIBS ZEFoundation libFreeImage libDirectXTex)

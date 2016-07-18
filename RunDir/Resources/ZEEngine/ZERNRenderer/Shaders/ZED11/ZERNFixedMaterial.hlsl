@@ -274,11 +274,13 @@ ZERNShading_Surface GetSurfaceDataFromResources(ZERNFixedMaterial_PSInput Input)
 	float3 Binormal = normalize(Input.Binormal);
 	#ifdef ZERN_FM_NORMAL_MAP
 		float3 NormalSample = ZERNFixedMaterial_NormalMap.Sample(ZERNFixedMaterial_TextureSampler, Input.Texcoord).xyz * 2.0f - 1.0f;
+		NormalSample.z = sqrt(1.0f - dot(NormalSample.xy, NormalSample.xy));
 		Normal = normalize(NormalSample.x * Tangent + NormalSample.y * Binormal + NormalSample.z * Normal);
 	#endif
 
 	#ifdef ZERN_FM_DETAIL_NORMAL_MAP
 		float3 DetailNormalSample = ZERNFixedMaterial_DetailNormalMap.Sample(ZERNFixedMaterial_DetailNormalSampler, Input.Texcoord * ZERNFixedMaterial_DetailNormalMapTiling) * 2.0f - 1.0f;
+		DetailNormalSample.z = sqrt(1.0f - dot(DetailNormalSample.xy, DetailNormalSample.xy));
 		float3 DetailNormal = normalize(DetailNormalSample.x * Tangent + DetailNormalSample.y * Binormal + DetailNormalSample.z * Normal);
 		DetailNormal = normalize(Normal + DetailNormal);	
 	

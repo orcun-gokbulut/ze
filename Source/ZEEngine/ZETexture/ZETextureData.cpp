@@ -117,7 +117,7 @@ static bool IsLevelValid(ZEUInt Surface, ZEUInt Level)
 
 static bool IsCompressed(ZEGRFormat Format)
 {
-	return Format == ZEGR_TF_DXT1_UNORM || Format == ZEGR_TF_DXT1_UNORM || Format == ZEGR_TF_DXT1_UNORM;
+	return Format == ZEGR_TF_BC1_UNORM || Format == ZEGR_TF_BC3_UNORM || Format == ZEGR_TF_BC7_UNORM;
 }
 
 // Returns owner surface of level

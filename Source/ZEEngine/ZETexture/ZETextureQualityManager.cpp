@@ -86,13 +86,13 @@ static ZEGRFormat GetCompressedPixelFormat(ZETextureCompressionType CompressionT
 	switch (CompressionType)
 	{
 		case ZE_TCT_DXT1:
-			return ZEGR_TF_DXT1_UNORM;
+			return ZEGR_TF_BC1_UNORM;
 			break;
 		case ZE_TCT_DXT3:
-			return ZEGR_TF_DXT3_UNORM;
+			return ZEGR_TF_BC3_UNORM;
 			break;
 		case ZE_TCT_DXT5:
-			return ZEGR_TF_DXT5_UNORM;
+			return ZEGR_TF_BC3_UNORM;
 			break;
 		default:
 			return ZEGR_TF_NONE;
@@ -109,13 +109,11 @@ static ZETextureCompressionType GetCompressionType(ZEGRFormat PixelFormat)
 		case ZEGR_TF_R8G8B8A8_UNORM:
 			return ZE_TCT_NONE;
 			break;
-		case ZEGR_TF_DXT1_UNORM:
+		case ZEGR_TF_BC1_UNORM:
 			return ZE_TCT_DXT1;
 			break;
-		case ZEGR_TF_DXT3_UNORM:
-			return ZE_TCT_DXT3;
-			break;
-		case ZEGR_TF_DXT5_UNORM:
+
+		case ZEGR_TF_BC3_UNORM:
 			return ZE_TCT_DXT5;
 			break;
 		default:
