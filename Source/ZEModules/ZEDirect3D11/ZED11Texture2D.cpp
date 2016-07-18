@@ -115,21 +115,27 @@ bool ZED11Texture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, 
 	TextureDesc.Usage = ConvertUsage(Usage);
 	TextureDesc.BindFlags = ConvertBindFlags(BindFlags);
 	TextureDesc.CPUAccessFlags = ConvertUsageToCpuAccessFlags(Usage);
-	TextureDesc.MiscFlags = (LevelCount > 1 && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET)) ? D3D11_RESOURCE_MISC_GENERATE_MIPS : 0;
+	TextureDesc.MiscFlags = 0;
 
 	ZEPointer<D3D11_SUBRESOURCE_DATA, ZEDeletorArray<D3D11_SUBRESOURCE_DATA>> SubresourceData;
 	if (Data != NULL)
 	{
 		SubresourceData = new D3D11_SUBRESOURCE_DATA[ArrayCount * LevelCount];
-		ZEUInt PixelSize = ZEGRFormatDefinition::GetDefinition(Format)->BlockSize;
+		const ZEGRFormatDefinition* FormatInfo = ZEGRFormatDefinition::GetDefinition(Format);
 		ZESize Offset = 0;
 		for (ZEUInt J = 0; J < ArrayCount; J++)
 		{
 			ZEUInt SubresourceIndex = J * LevelCount;
 			for (ZEUInt I = 0; I < LevelCount; I++)
 			{
-				ZESize RowPitch = (Width >> I) * PixelSize;
-				ZESize SlicePitch = RowPitch * (Height >> I);
+				ZEUInt NewWidth = Width >> I;
+				ZEUInt NewHeight = Height >> I;
+
+				NewWidth = (FormatInfo->Compressed && NewWidth < FormatInfo->BlockDimension) ? FormatInfo->BlockDimension : NewWidth;
+				NewHeight = (FormatInfo->Compressed && NewHeight < FormatInfo->BlockDimension) ? FormatInfo->BlockDimension : NewHeight;
+
+				ZESize RowPitch = (NewWidth / FormatInfo->BlockDimension) * FormatInfo->BlockSize;
+				ZESize SlicePitch = RowPitch * (NewHeight / FormatInfo->BlockDimension);
 
 				SubresourceData[SubresourceIndex].pSysMem = static_cast<const ZEBYTE*>(Data) + Offset;
 				SubresourceData[SubresourceIndex].SysMemPitch = RowPitch;

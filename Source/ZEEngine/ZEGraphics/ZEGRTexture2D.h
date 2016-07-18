@@ -40,6 +40,7 @@
 #include "ZETypes.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZETexture/ZETextureOptions.h"
 
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
@@ -87,4 +88,6 @@ class ZEGRTexture2D : public ZEGRTexture
 																		ZEUInt ArrayCount = 1, 
 																		ZEUInt SampleCount = 1, 
 																		const void* Data = NULL);
+
+		static ZEHolder<ZEGRTexture2D>					CreateFromFile(const ZEString& Filename, bool RGBColorMap = true, bool NormalMap = false, bool GrayscaleMap = false);
 };

@@ -69,8 +69,8 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 	if (NormalTexture == NULL)
 		return false;
 
-	const ZEGRRenderTarget* NewOutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
-	if (NewOutputRenderTarget == NULL)
+	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
+	if (OutputRenderTarget == NULL)
 	{
 		ZEUInt Width = InputTexture->GetWidth();
 		ZEUInt Height = InputTexture->GetHeight();
@@ -80,21 +80,19 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
 			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 
-		NewOutputRenderTarget = OutputTexture->GetRenderTarget();
+		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
 	else
 	{
 		OutputTexture.Release();
 	}
 
-	if (NewOutputRenderTarget != OutputRenderTarget)
+	if (Constants.OutputSize.x != (float)OutputRenderTarget->GetWidth() || 
+		Constants.OutputSize.y != (float)OutputRenderTarget->GetHeight())
 	{
-		OutputRenderTarget = NewOutputRenderTarget;
-		Viewport.SetWidth(OutputRenderTarget->GetWidth());
-		Viewport.SetHeight(OutputRenderTarget->GetHeight());
-		Constants.OutputSize = ZEVector2(Viewport.GetWidth(), Viewport.GetHeight());
+		Constants.OutputSize = ZEVector2(OutputRenderTarget->GetWidth(), OutputRenderTarget->GetHeight());
 
-		DirtyFlags.RaiseFlags(ZERN_AADF_CONSTANT_BUFFER);
+		DirtyFlags.RaiseFlags(ZERN_AADF_CONSTANT_BUFFER | ZERN_AADF_TEXTURE);
 	}
 
 	return true;
@@ -350,15 +348,6 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	if (!ZERNStage::Setup(Context))
 		return false;
 
-	ZEUInt Width = GetRenderer()->GetOutputRenderTarget()->GetWidth();
-	ZEUInt Height = GetRenderer()->GetOutputRenderTarget()->GetHeight();
-
-	if (EdgeTexture == NULL ||
-		EdgeTexture->GetWidth() != Width || EdgeTexture->GetHeight() != Height)
-	{
-		DirtyFlags.RaiseFlags(ZERN_AADF_TEXTURE);
-	}
-
 	if (!Update())
 		return false;
 
@@ -368,6 +357,8 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	Context->SetStencilRef(1);
 	const ZEGRTexture* Textures[] = {InputTexture, NormalTexture, AreaTexture, SearchTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 4, Textures);
+	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
+	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
 	Context->SetViewports(1, &Viewport);
 
 	ClearTextures(Context);
