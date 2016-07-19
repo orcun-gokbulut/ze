@@ -54,100 +54,93 @@ class ZEModelAnimationTrack : public ZEObject
 	ZE_OBJECT
 	friend class ZEModel;
 	private:
-		ZEModel*							Model;
-		ZELink<ZEModelAnimationTrack>		ModelLink;
-		ZEString							AnimationName;
-		const ZEModelAnimation*				Animation;
+		ZEModel*								Model;
+		ZELink<ZEModelAnimationTrack>			ModelLink;
+		ZEString								AnimationName;
+		const ZEModelAnimation*					Animation;
 
-		ZEModelAnimationState				State;
+		ZEModelAnimationState					State;
 
-		float								BlendFactor;
-		ZEModelAnimationBlendMode			BlendMode;
+		float									BlendFactor;
+		ZEModelAnimationBlendMode				BlendMode;
 
-		ZEUInt								StartFrame;
-		ZEUInt								EndFrame;
+		ZEUInt									StartFrame;
+		ZEUInt									EndFrame;
 
-		ZEUInt								EffectiveStartFrame;
-		ZEUInt								EffectiveEndFrame;
-		bool								LimitsEnabled;
+		ZEUInt									EffectiveStartFrame;
+		ZEUInt									EffectiveEndFrame;
+		bool									LimitsEnabled;
 
-		float								Speed;
-		float								CurrentFrame;
-		ZEUInt								LOD;
-		bool								Looping;
+		float									Speed;
+		float									CurrentFrame;
+		ZEUInt									LOD;
+		bool									Looping;
 
-		ZERSHolder<const ZEMDResource>	Resource;
+		ZERSHolder<const ZEMDResourceAnimation>	Resource;
 
-// 		ZEArray<ZEModelMesh*>				MeshObjects;
-// 		ZEArray<ZEModelBone*>				BoneObjects;
-		
-		void								BindAnimation();
-		void								UpdateAnimation();
-		void								UpdateMeshesAndBones();
-		void								ApplyLimits();
+		void									BindAnimation();
+		void									UpdateAnimation();
+		void									UpdateMeshesAndBones();
+		void									ApplyLimits();
 
 	public:
-		void								SetModel(ZEModel* Model);
-		ZEModel*							GetModel();
+		ZEModel*								GetModel();
 
-		void								SetResource(ZERSHolder<const ZEMDResource> ModelResource);
-		ZERSHolder<const ZEMDResource>	GetResource();
+		void									SetState(ZEModelAnimationState State);
+		ZEModelAnimationState					GetState();
 
-		void								SetAnimationName(const ZEString& Name);
-		const ZEString&						GetAnimationName();
+		void									SetLOD(ZEUInt LOD);
+		ZEUInt									GetLOD();
 
-		void								SetState(ZEModelAnimationState State);
-		ZEModelAnimationState				GetState();
+		void									SetSpeed(float FPS);
+		float									GetSpeed();
 
-		void								SetLOD(ZEUInt LOD);
-		ZEUInt								GetLOD();
+		void									SetBlendMode(ZEModelAnimationBlendMode Mode);
+		ZEModelAnimationBlendMode				GetBlendMode();
 
-		void								SetSpeed(float FPS);
-		float								GetSpeed();
+		void									SetBlendFactor(float Factor);
+		float									GetBlendFactor();
 
-		void								SetBlendMode(ZEModelAnimationBlendMode Mode);
-		ZEModelAnimationBlendMode			GetBlendMode();
+		void									SetLooping(bool Looping);
+		bool									GetLooping();
 
-		void								SetBlendFactor(float Factor);
-		float								GetBlendFactor();
+		void									SetLimitsEnabled(bool Enabled);
+		bool									GetLimitsEnabled();
 
-		void								SetLooping(bool Looping);
-		bool								GetLooping();
+		void									SetCurrentFrame(float Frame);
+		void									SetCurrentFrameByTime(float Seconds);
+		void									SetCurrentFrameByPercentage(float Percentage);
 
-		void								SetLimitsEnabled(bool Enabled);
-		bool								GetLimitsEnabled();
+		float 									GetCurrentFrame();
+		float									GetCurrentFrameByTime();
+		float									GetCurrentFrameByPercentage();
 
-		void								SetCurrentFrame(float Frame);
-		void								SetCurrentFrameByTime(float Seconds);
-		void								SetCurrentFrameByPercentage(float Percentage);
+		void									SetStartFrame(ZEUInt Frame);
+		void									SetStartFrameByTime(float Seconds);
+		void									SetStartFrameByPercentage(float Percentage);
 
-		float 								GetCurrentFrame();
-		float								GetCurrentFrameByTime();
-		float								GetCurrentFrameByPercentage();
+		ZEUInt									GetStartFrame();
+		float									GetStartFrameByTime();
+		float									GetStartFrameByPercentage();
 
-		void								SetStartFrame(ZEUInt Frame);
-		void								SetStartFrameByTime(float Seconds);
-		void								SetStartFrameByPercentage(float Percentage);
+		void									SetEndFrame(ZEUInt Frame);
+		void									SetEndFrameByTime(float Seconds);
+		void									SetEndFrameByPercentage(float Percentage);
 
-		ZEUInt								GetStartFrame();
-		float								GetStartFrameByTime();
-		float								GetStartFrameByPercentage();
+		ZEUInt									GetEndFrame();
+		float									GetEndFrameByTime();
+		float									GetEndFrameByPercentage();
+		
+		void									SetResource(ZERSHolder<const ZEMDResourceAnimation> Resource);
+		ZERSHolder<const ZEMDResourceAnimation>	GetResource();
 
-		void								SetEndFrame(ZEUInt Frame);
-		void								SetEndFrameByTime(float Seconds);
-		void								SetEndFrameByPercentage(float Percentage);
+		void									Play(ZEUInt StartFrame, ZEUInt EndFrame);
+		void									Play();
+		void									Resume();
+		void									Pause();
+		void									Stop();
 
-		ZEUInt								GetEndFrame();
-		float								GetEndFrameByTime();
-		float								GetEndFrameByPercentage();
+		void									Tick(float ElapsedTime);
 
-		void								Play(ZEUInt StartFrame, ZEUInt EndFrame);
-		void								Play();
-		void								Resume();
-		void								Pause();
-		void								Stop();
-
-		void								Tick(float ElapsedTime);
-
-											ZEModelAnimationTrack();
+												ZEModelAnimationTrack();
 };

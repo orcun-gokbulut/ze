@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZEMeta\ZEObject.h"
+#include "ZEResource/ZERSResource.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
@@ -46,11 +46,12 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMDResourcePhysics.h"
 
-class ZEMDResourceMesh : public ZEObject
+class ZEMDResourceMesh : public ZERSResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEMDResourceMesh)
 	friend class ZEMDResource;
-	friend class ZEModelResourceMeshLOD;
+	friend class ZEMDResourceLOD;
 	private:
 		ZELink<ZEMDResourceMesh>						Link;
 
@@ -64,7 +65,7 @@ class ZEMDResourceMesh : public ZEObject
 		bool											Skinned;
 		ZEMDResourcePhysicalBody						PhysicalBody;
 		ZEString										UserDefinedProperties;
-		ZEList2<ZEModelResourceMeshLOD>					LODs;
+		ZEList2<ZEMDResourceLOD>						LODs;
 		ZEArray<ZEVector3>								Geometry;
 
 	public:
@@ -95,11 +96,12 @@ class ZEMDResourceMesh : public ZEObject
 		void											SetUserDefinedProperties(const ZEString& UserDefinedProperties);
 		const ZEString&									GetUserDefinedProperties() const;
 
-		const ZEList2<ZEModelResourceMeshLOD>&			GetLODs();
-		const ZEList2<const ZEModelResourceMeshLOD>&	GetLODs() const;
-		void											AddLOD(ZEModelResourceMeshLOD* LOD);
-		void											RemoveLOD(ZEModelResourceMeshLOD* LOD);
+		const ZEList2<ZEMDResourceLOD>&					GetLODs();
+		const ZEList2<const ZEMDResourceLOD>&			GetLODs() const;
+		void											AddLOD(ZEMDResourceLOD* LOD);
+		void											RemoveLOD(ZEMDResourceLOD* LOD);
 
+		void											SetGeometry(const ZEArray<ZEVector3>& Vertices);
 		const ZEArray<ZEVector3>&						GetGeometry() const;
 
 		bool											Load(const ZEMLReaderNode& MeshNode);

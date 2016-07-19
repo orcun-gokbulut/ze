@@ -47,24 +47,6 @@
 
 #include <string.h>
 
-void ZEModelAnimationTrack::BindAnimation()
-{
-	if (Resource == NULL)
-	{
-		Animation = NULL;
-		return;
-	}
-
-	ze_for_each(Animation, Resource->GetAnimations())
-	{
-		if (Animation->GetName() != AnimationName)
-			continue;
-
-		this->Animation = Animation.GetPointer();
-		ApplyLimits();
-	}
-}
-
 void ZEModelAnimationTrack::UpdateAnimation()
 {
 	if (State == ZE_MAS_PLAYING && !(BlendFactor == 0.0f)) // && !(LOD != -1 && Model->ActiveLOD > LOD) //ActiveLOD Removed from Model.
@@ -196,11 +178,6 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 	}
 }
 
-void ZEModelAnimationTrack::SetModel(ZEModel* Model)
-{
-	this->Model = Model;
-}
-
 ZEModel* ZEModelAnimationTrack::GetModel()
 {
 	return Model;
@@ -229,28 +206,16 @@ ZEUInt ZEModelAnimationTrack::GetLOD()
 	return LOD;
 }
 
-void ZEModelAnimationTrack::SetResource(ZERSHolder<const ZEMDResource> ModelResource)
+void ZEModelAnimationTrack::SetResource(ZERSHolder<const ZEMDResourceAnimation> Resource)
 {
-	Resource = ModelResource;
-	BindAnimation();
+	this->Resource = Resource;
+	Animation = Resource;
 	ApplyLimits();
 }
 
-ZERSHolder<const ZEMDResource> ZEModelAnimationTrack::GetResource()
+ZERSHolder<const ZEMDResourceAnimation> ZEModelAnimationTrack::GetResource()
 {
 	return Resource;
-}
-
-void ZEModelAnimationTrack::SetAnimationName(const ZEString& AnimationName)
-{
-	this->AnimationName = AnimationName;
-	BindAnimation();
-	ApplyLimits();
-}	
-
-const ZEString& ZEModelAnimationTrack::GetAnimationName()
-{
-	return AnimationName;
 }
 
 void ZEModelAnimationTrack::SetCurrentFrame(float Frame)

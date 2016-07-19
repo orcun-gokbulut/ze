@@ -47,7 +47,6 @@ ZE_META_FORWARD_DECLARE(ZEMDResourceBone, "ZEMDResourceBone.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceAnimation, "ZEMDResourceAnimation.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceHelper, "ZEMDResourceHelper.h");
 
-
 class ZEMDResource : public ZERSResourceLoadable
 {
 	ZE_OBJECT

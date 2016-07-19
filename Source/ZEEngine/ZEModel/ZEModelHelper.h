@@ -39,6 +39,7 @@
 
 #include "ZEModelMesh.h"
 #include "ZEModelBone.h"
+#include "ZEResource/ZERSResource.h"
 
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
@@ -59,69 +60,75 @@ class ZEModelHelper : public ZEObject
 	ZE_OBJECT
 	friend class ZEModel;
 	private:
-		ZEModelHelperParentType				ParentType;
+		ZEModel*								Model;
+		ZELink<ZEModelHelper>					ModelLink;
 
-		ZEModel*							ParentModel;
-		ZEModelMesh*						ParentMesh;
-		ZEModelBone*						ParentBone;
-		ZELink<ZEModelHelper>				ParentLink;
+		ZEModelHelperParentType					ParentType;
+		ZEModelMesh*							ParentMesh;
+		ZEModelBone*							ParentBone;
 
-		const ZEMDResourceHelper*			HelperResource;
+		ZEString								Name;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
+		ZEVector3								Scale;
+		ZEString								UserDefinedProperties;
 
-		ZEString*							Name;
+		ZERSHolder<const ZEMDResourceHelper>	Resource;
 
-		ZEVector3							Position;
-		ZEQuaternion						Rotation;
-		ZEVector3							Scale;
-
-		void								SetParent(ZEModel* Model);
-		void								SetParent(ZEModelMesh* Mesh);
-		void								SetParent(ZEModelBone* Bone);
+		bool									Load();
+		bool									Unload();
 
 	public:
-		const char*							GetName() const;
+		ZEModel*								GetModel() const;
 
-		ZEModelHelperParentType				GetParentType() const;
-		ZEString							GetUserDefinedProperties() const;
+		ZEModelHelperParentType					GetParentType() const;
 
-		ZEModel*							GetParentModel() const;
-		ZEModelMesh*						GetParentMesh() const;
-		ZEModelBone*						GetParentBone() const;
+		void									SetParentMesh(ZEModelMesh* Mesh);
+		ZEModelMesh*							GetParentMesh() const;
 
-		void								SetPosition(const ZEVector3& Position);
-		const ZEVector3&					GetPosition() const;
+		void									SetParentBone(ZEModelBone* Bone);
+		ZEModelBone*							GetParentBone() const;
 
-		void								SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion&					GetRotation() const;
+		void									SetName(const ZEString& Name);
+		const ZEString&							GetName() const;
 
-		void								SetScale(const ZEVector3& Scale);
-		const ZEVector3&					GetScale() const;
+		void									SetPosition(const ZEVector3& Position);
+		const ZEVector3&						GetPosition() const;
 
-		const ZEVector3						GetModelPosition() const;
-		const ZEVector3						GetWorldPosition() const;
+		void									SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&						GetRotation() const;
 
-		const ZEQuaternion					GetModelRotation() const;
-		const ZEQuaternion					GetWorldRotation() const;
+		void									SetScale(const ZEVector3& Scale);
+		const ZEVector3&						GetScale() const;
 
-		const ZEVector3						GetModelScale() const;
-		const ZEVector3						GetWorldScale() const;
+		const ZEVector3							GetModelPosition() const;
+		const ZEVector3							GetWorldPosition() const;
 
-		ZEVector3							GetFront() const;
-		ZEVector3							GetRight() const;
-		ZEVector3							GetUp() const;
+		const ZEQuaternion						GetModelRotation() const;
+		const ZEQuaternion						GetWorldRotation() const;
 
-		ZEVector3							GetModelFront() const;
-		ZEVector3							GetModelRight() const;
-		ZEVector3							GetModelUp() const;
+		const ZEVector3							GetModelScale() const;
+		const ZEVector3							GetWorldScale() const;
 
-		ZEVector3							GetWorldFront() const;
-		ZEVector3							GetWorldRight() const;
-		ZEVector3							GetWorldUp() const;
+		ZEVector3								GetFront() const;
+		ZEVector3								GetRight() const;
+		ZEVector3								GetUp() const;
 
-		void								Load(ZEModel* Model, ZERSHolder<const ZEMDResource> Resource, const ZEMDResourceHelper* HelperResource);
-		void								Unload();
+		ZEVector3								GetModelFront() const;
+		ZEVector3								GetModelRight() const;
+		ZEVector3								GetModelUp() const;
 
-											ZEModelHelper();
-		virtual								~ZEModelHelper();
+		ZEVector3								GetWorldFront() const;
+		ZEVector3								GetWorldRight() const;
+		ZEVector3								GetWorldUp() const;
+
+		void									SetUserDefinedProperties(const ZEString& Properties);
+		const ZEString&							GetUserDefinedProperties() const;
+
+		void									SetResource(ZERSHolder<const ZEMDResourceHelper> Resource);
+		ZERSHolder<const ZEMDResourceHelper>	GetResource();
+
+												ZEModelHelper();
+		virtual									~ZEModelHelper();
 
 };

@@ -39,197 +39,198 @@
 #include "ZEGraphics\ZEGRVertexBuffer.h"
 #include "ZEGraphics\ZEGRIndexBuffer.h"
 #include "ZERenderer\ZERNMaterial.h"
+#include "ZEUI\ZEUTextEditControl.h"
 
-void ZEModelResourceMeshLOD::SetLevel(ZEInt32 LODLevel)
+void ZEMDResourceLOD::SetLevel(ZEInt32 LODLevel)
 {
 	this->Level = LODLevel;
 }
 
-ZEInt32 ZEModelResourceMeshLOD::GetLevel() const 
+ZEInt32 ZEMDResourceLOD::GetLevel() const 
 {
 	return Level;
 }
 
-void ZEModelResourceMeshLOD::SetStartDistance(float StartDistance)
+void ZEMDResourceLOD::SetStartDistance(float StartDistance)
 {
 	this->StartDistance = StartDistance;
 }
 
-float ZEModelResourceMeshLOD::GetStartDistance() const 
+float ZEMDResourceLOD::GetStartDistance() const 
 {
 	return StartDistance;
 }
 
-void ZEModelResourceMeshLOD::SetEndDistance(float EndDistance)
+void ZEMDResourceLOD::SetEndDistance(float EndDistance)
 {
 	this->EndDistance = EndDistance;
 }
 
-float ZEModelResourceMeshLOD::GetEndDistance() const 
+float ZEMDResourceLOD::GetEndDistance() const 
 {
 	return EndDistance;
 }
 
-void ZEModelResourceMeshLOD::SetVertexType(ZEMDVertexType VertexType)
+void ZEMDResourceLOD::SetVertexType(ZEMDVertexType VertexType)
 {
 	this->VertexType = VertexType;
 }
 
-ZEMDVertexType ZEModelResourceMeshLOD::GetVertexType() const
+ZEMDVertexType ZEMDResourceLOD::GetVertexType() const
 {
 	return VertexType;
 }
 
-void ZEModelResourceMeshLOD::SetIndexType(ZEMDVertexIndexType IndexType)
+void ZEMDResourceLOD::SetIndexType(ZEMDVertexIndexType IndexType)
 {
 	this->IndexType = IndexType;
 }
 
-ZEMDVertexIndexType ZEModelResourceMeshLOD::GetIndexType() const
+ZEMDVertexIndexType ZEMDResourceLOD::GetIndexType() const
 {
 	return IndexType;
 }
 
-void ZEModelResourceMeshLOD::SetVertices(const ZEArray<ZEMDVertex>& Vertices)
+void ZEMDResourceLOD::SetVertices(const ZEArray<ZEMDVertex>& Vertices)
 {
 	this->Vertices = Vertices;
 	this->VerticesSkin.Clear();
 }
 
-const ZEArray<ZEMDVertex>& ZEModelResourceMeshLOD::GetVertices() const
+const ZEArray<ZEMDVertex>& ZEMDResourceLOD::GetVertices() const
 {
 	return Vertices;
 }
 
-void ZEModelResourceMeshLOD::SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin)
+void ZEMDResourceLOD::SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin)
 {
 	this->VerticesSkin = VerticesSkin;
 	this->Vertices.Clear();
 }
 
-const ZEArray<ZEMDVertexSkin>& ZEModelResourceMeshLOD::GetVerticesSkin() const
+const ZEArray<ZEMDVertexSkin>& ZEMDResourceLOD::GetVerticesSkin() const
 {
 	return VerticesSkin;
 }
 
-void ZEModelResourceMeshLOD::SetIndices(const ZEArray<ZEUInt16>& Indices)
+void ZEMDResourceLOD::SetIndices(const ZEArray<ZEUInt16>& Indices)
 {
 	this->Indices = Indices;
 	this->Indices32.Clear();
 }
 
-const ZEArray<ZEUInt16>& ZEModelResourceMeshLOD::GetIndices() const
+const ZEArray<ZEUInt16>& ZEMDResourceLOD::GetIndices() const
 {
 	return Indices;
 }
 
-void ZEModelResourceMeshLOD::SetIndices32(const ZEArray<ZEUInt32>& Indices)
+void ZEMDResourceLOD::SetIndices32(const ZEArray<ZEUInt32>& Indices)
 {
 	this->Indices32 = Indices;
 	this->Indices.Clear();
 }
 
-const ZEArray<ZEUInt32>& ZEModelResourceMeshLOD::GetIndices32() const
+const ZEArray<ZEUInt32>& ZEMDResourceLOD::GetIndices32() const
 {
 	return Indices32;
 }
 
-void ZEModelResourceMeshLOD::SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds)
+void ZEMDResourceLOD::SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds)
 {
 	AffectingBoneIds = BoneIds;
 }
 
-const ZEArray<ZEUInt16>& ZEModelResourceMeshLOD::GetAffectingBoneIds() const
+const ZEArray<ZEUInt16>& ZEMDResourceLOD::GetAffectingBoneIds() const
 {
 	return AffectingBoneIds;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferBase(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferBase(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferBase = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferBase() const
+ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferBase() const
 {
 	return VertexBufferBase;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferNormals(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferNormals(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferNormals = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferNormals() const
+ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferNormals() const
 {
 	return VertexBufferNormals;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferSkin(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferSkin(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferSkin = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferSkin() const
+ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferSkin() const
 {
 	return VertexBufferSkin;
 }
 
-void ZEModelResourceMeshLOD::SetVertexBufferExtra(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferExtra(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferExtra = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEModelResourceMeshLOD::GetVertexBufferExtra() const
+ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferExtra() const
 {
 	return VertexBufferExtra;
 }
 
-void ZEModelResourceMeshLOD::SetIndexBuffer(ZEHolder<ZEGRIndexBuffer> IndexBuffer)
+void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<ZEGRIndexBuffer> IndexBuffer)
 {
 	this->IndexBuffer = IndexBuffer;
 }
 
-ZEHolder<ZEGRIndexBuffer> ZEModelResourceMeshLOD::GetIndexBuffer() const
+ZEHolder<ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
 {
 	return IndexBuffer;
 }
 
-void ZEModelResourceMeshLOD::SetMaterial(ZEHolder<ZERNMaterial> Material)
+void ZEMDResourceLOD::SetMaterial(ZEHolder<ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
 
-ZEHolder<const ZERNMaterial> ZEModelResourceMeshLOD::GetMaterial() const
+ZEHolder<const ZERNMaterial> ZEMDResourceLOD::GetMaterial() const
 {
 	return Material;
 }
 
-void ZEModelResourceMeshLOD::SetMaterialFileName(const ZEString& MaterialFilePath)
+void ZEMDResourceLOD::SetMaterialFileName(const ZEString& MaterialFilePath)
 {
 	//Implementation required.
 }
 
-const ZEString& ZEModelResourceMeshLOD::GetMaterialFileName()
+const ZEString& ZEMDResourceLOD::GetMaterialFileName()
 {
 	return ZEString::Empty; //Implementation required.
 }
 
-const ZEArray<ZEMDResourceDraw>& ZEModelResourceMeshLOD::GetDraws() const
+const ZEArray<ZEMDResourceDraw>& ZEMDResourceLOD::GetDraws() const
 {
 	return Draws;
 }
 
-void ZEModelResourceMeshLOD::AddDraw(const ZEMDResourceDraw& Draw)
+void ZEMDResourceLOD::AddDraw(const ZEMDResourceDraw& Draw)
 {
 	Draws.Add(Draw);
 }
 
-void ZEModelResourceMeshLOD::RemoveDraw(ZESize Index)
+void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 {
 	Draws.Remove(Index);
 }
 
-void ZEModelResourceMeshLOD::GenerateBuffers()
+void ZEMDResourceLOD::GenerateBuffers()
 {
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 		VertexBufferBase = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
@@ -237,7 +238,7 @@ void ZEModelResourceMeshLOD::GenerateBuffers()
 		VertexBufferBase = ZEGRVertexBuffer::Create(VerticesSkin.GetCount(), sizeof(ZEMDVertexSkin), ZEGR_RU_GPU_READ_ONLY, VerticesSkin.GetCArray());
 }
 
-bool ZEModelResourceMeshLOD::Load(const ZEMLReaderNode& LODNode)
+bool ZEMDResourceLOD::Load(const ZEMLReaderNode& LODNode)
 {
 	zeCheckError(!LODNode.IsValid(), false, "Invalid LOD node.");
 	zeCheckError(LODNode.GetName() != "LOD", false, "Invalid LOD node name.");
@@ -270,6 +271,7 @@ bool ZEModelResourceMeshLOD::Load(const ZEMLReaderNode& LODNode)
 		Vertices.SetCount(LODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertex));
 		if (!LODNode.ReadDataItems("Vertices", Vertices.GetCArray(), sizeof(ZEMDVertex), Vertices.GetCount()))
 			return false;
+
 	}
 	else if (GetVertexType() == ZEMD_VT_SKINNED)
 	{
@@ -328,12 +330,12 @@ bool ZEModelResourceMeshLOD::Load(const ZEMLReaderNode& LODNode)
 	return true;
 }
 
-bool ZEModelResourceMeshLOD::Save(ZEMLWriterNode& LODNode) const
+bool ZEMDResourceLOD::Save(ZEMLWriterNode& LODNode) const
 {
 	return false; //Implementation required.
 }
 
-ZEModelResourceMeshLOD::ZEModelResourceMeshLOD() : Link(this)
+ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 {
 	Level = 0;
 	StartDistance = 0;
@@ -343,7 +345,7 @@ ZEModelResourceMeshLOD::ZEModelResourceMeshLOD() : Link(this)
 	IndexType = ZEMD_VIT_NONE;
 }
 
-ZEModelResourceMeshLOD::~ZEModelResourceMeshLOD()
+ZEMDResourceLOD::~ZEMDResourceLOD()
 {
 
 }

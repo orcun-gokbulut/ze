@@ -58,6 +58,7 @@ ZE_ENUM(ZERSLoadState)
 class ZERSResourceLoadable : public ZERSResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERSResourceLoadable)
 	friend class ZERSResourceManager;
 	private:
 		ZERSLoadState							LoadState;

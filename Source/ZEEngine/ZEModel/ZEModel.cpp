@@ -38,6 +38,7 @@
 #include "ZEModelBone.h"
 #include "ZEMDResourceMesh.h"
 #include "ZEMDResourceBone.h"
+#include "ZEMDResourceHelper.h"
 
 #include "ZEError.h"
 #include "ZEGame/ZEScene.h"
@@ -58,21 +59,25 @@ void ZEModel::CalculateBoundingBox() const
 
 	ze_for_each(Mesh, Meshes)
 	{
-		if (!Mesh->MeshResource->GetSkinned())
+		ze_for_each(LOD, Mesh->GetLODs())
 		{
-			const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
-
-			for (ZEInt N = 0; N < 8; N++)
+			if (!LOD->GetVertexType() != ZEMD_VT_SKINNED)
 			{
-				ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
-				if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-				if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-				if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+				const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
 
-				if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-				if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-				if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+				for (ZEInt N = 0; N < 8; N++)
+				{
+					ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
+					if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+					if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+					if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+
+					if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+					if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+					if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+				}
 			}
+
 		}
 	}
 
@@ -164,31 +169,42 @@ ZEEntityResult ZEModel::LoadInternal()
 
 	ze_for_each(ResourceMesh, Resource->GetMeshes())
 	{
-		ZEPointer<ZEModelMesh> Mesh = new ZEModelMesh();
-		Mesh->Load(this, Resource, ResourceMesh.GetPointer());
-		AddMesh(Mesh.Transfer());
+		ZEModelMesh* Mesh = new ZEModelMesh();
+		AddMesh(Mesh);
+		Mesh->SetResouce(ResourceMesh.GetPointer());
+		Mesh->Load();
 	}
 
 	for (ZESize I = 0; I < Resource->GetMeshes().GetCount(); I++)
-		if (Resource->GetMeshes()[I]->GetParentMesh() != -1)
-			Meshes[(ZESize)Resource->GetMeshes()[I]->GetParentMesh()]->AddChildMesh(Meshes[I]);
+	{
+		if (Resource->GetMeshes()[I]->GetParentMesh() != -1 || Resource->GetMeshes()[I]->GetParentMesh() >= Meshes.GetCount())
+			continue;
+
+		Meshes[(ZESize)Resource->GetMeshes()[I]->GetParentMesh()]->AddChildMesh(Meshes[I]);
+	}
 
 	ze_for_each(ResourceBone, Resource->GetBones())
 	{
-		ZEPointer<ZEModelBone> Bone = new ZEModelBone();
-		Bone->Load(this, Resource, ResourceBone.GetPointer());
-		AddBone(Bone.Transfer());
+		ZEModelBone* Bone = new ZEModelBone();	
+		AddBone(Bone);
+		Bone->SetResource(ResourceBone.GetPointer());
+		Bone->Load();
 	}
 
 	for (ZESize I = 0; I < Resource->GetBones().GetCount(); I++)
-		if (Resource->GetBones()[I]->GetParentBone() != -1)
-			Bones[(ZESize)Resource->GetBones()[I]->GetParentBone()]->AddChildBone(Bones[I]);
+	{
+		if (Resource->GetBones()[I]->GetParentBone() != -1 || Resource->GetBones()[I]->GetParentBone() >= Bones.GetCount())
+			continue;
+
+		Bones[(ZESize)Resource->GetBones()[I]->GetParentBone()]->AddChildBone(Bones[I]);
+	}
 
 	ze_for_each(ResourceHelper, Resource->GetHelpers())
 	{
-		ZEPointer<ZEModelHelper> Helper = new ZEModelHelper();
-		Helper->Load(this, Resource, ResourceHelper.GetPointer());
-		AddHelper(Helper.Transfer());
+		ZEModelHelper* Helper = new ZEModelHelper();
+		AddHelper(Helper);
+		Helper->SetResource(ResourceHelper.GetPointer());
+		Helper->Load();
 	}
 
 	DirtyConstantBufferSkin = true;
@@ -254,7 +270,8 @@ const ZEList2<ZEModelMesh>& ZEModel::GetMeshes()
 
 ZEModelMesh* ZEModel::GetMesh(ZEUInt32 Id)
 {
-	return Meshes[Id]; //Check -- Index access changed to Id?
+	zeCheckError(Id >= Meshes.GetCount(), NULL, "Cannot get mesh by id. Index out of range.");
+	return Meshes[Id];
 }
 
 ZEModelMesh* ZEModel::GetMesh(const char* Name)
@@ -282,7 +299,6 @@ void ZEModel::AddMesh(ZEModelMesh* Mesh)
 		GetName().ToCString(), Mesh->GetName().ToCString());
 
 	Mesh->SetModel(this);
-
 	Meshes.AddEnd(&Mesh->ModelLink);
 }
 
@@ -293,7 +309,6 @@ void ZEModel::RemoveMesh(ZEModelMesh* Mesh)
 		Mesh->GetModel()->GetName().ToCString(), Mesh->GetName().ToCString());
 
 	Mesh->SetModel(NULL);
-
 	Meshes.Remove(&Mesh->ModelLink);
 }
 
@@ -304,7 +319,8 @@ const ZEList2<ZEModelBone>& ZEModel::GetBones()
 
 ZEModelBone* ZEModel::GetBone(ZEUInt32 Id)
 {
-	return Bones[Id]; //Check -- Index access changed to Id?
+	zeCheckError(Id >= Bones.GetCount(), NULL, "Cannot get bone by id. Index out of range.");
+	return Bones[Id];
 }
 
 ZEModelBone* ZEModel::GetBone(const char* Name)
@@ -332,7 +348,6 @@ void ZEModel::AddBone(ZEModelBone* Bone)
 		GetName().ToCString(), Bone->GetName().ToCString());
 
 	Bone->SetModel(this);
-
 	Bones.AddEnd(&Bone->ModelLink);
 }
 
@@ -343,7 +358,6 @@ void ZEModel::RemoveBone(ZEModelBone* Bone)
 		Bone->GetModel()->GetName().ToCString(), Bone->GetName().ToCString());
 
 	Bone->SetModel(NULL);
-
 	Bones.Remove(&Bone->ModelLink);
 }
 
@@ -354,7 +368,8 @@ const ZEList2<ZEModelHelper>& ZEModel::GetHelpers()
 
 ZEModelHelper* ZEModel::GetHelper(ZEUInt32 Id)
 {
-	return Helpers[Id]; //Check -- Index access changed to Id?
+	zeCheckError(Id >= Helpers.GetCount(), NULL, "Cannot get helper by id. Index out of range.");
+	return Helpers[Id];
 }
 
 ZEModelHelper* ZEModel::GetHelper(const char* Name)
@@ -371,32 +386,24 @@ ZEModelHelper* ZEModel::GetHelper(const char* Name)
 void ZEModel::AddHelper(ZEModelHelper* Helper)
 {
 	zeCheckError(Helper == NULL, ZE_VOID, "Cannot add helper. Helper is NULL.");
-	zeCheckError(Helper->GetParentMesh() != NULL, ZE_VOID, 
-		"Can not add helper. Helper belongs to another Mesh. Parent Mesh Name: \"%s\", Helper Name: \"%s\".", 
+	zeCheckError(Helper->GetParentMesh() != NULL, ZE_VOID, "Can not add helper. Helper belongs to another Mesh. Parent Mesh Name: \"%s\", Helper Name: \"%s\".", 
 		Helper->GetParentMesh()->GetName().ToCString(), Helper->GetName());
-	zeCheckError(Helper->GetParentBone() != NULL, ZE_VOID, 
-		"Can not add helper. Helper belongs to another Bone. Parent Bone Name: \"%s\", Helper Name: \"%s\".", 
+	zeCheckError(Helper->GetParentBone() != NULL, ZE_VOID, "Can not add helper. Helper belongs to another Bone. Parent Bone Name: \"%s\", Helper Name: \"%s\".", 
 		Helper->GetParentBone()->GetName().ToCString(), Helper->GetName());
-	zeCheckError((Helper->GetParentModel() != NULL) && (Helper->GetParentModel() != this), ZE_VOID, 
-		"Can not add helper. Helper already added to another Model. Model Name: \"%s\", Helper Name: \"%s\".",
-		Helper->GetParentModel()->GetName().ToCString(), Helper->GetName());
-	zeCheckError(Helpers.Exists(&Helper->ParentLink), ZE_VOID, 
-		"Can not add helper. Helper already added to this Model. Model Name: \"%s\", Helper Name: \"%s\".",
-		GetName().ToCString(), Helper->GetName());
+	zeCheckError(Helper->GetModel() != NULL, ZE_VOID,  "Can not add helper. Helper already added to a Model. Model Name: \"%s\", Helper Name: \"%s\".",
+		Helper->GetModel()->GetName().ToCString(), Helper->GetName());
 
-	Helper->SetParent(this);
-
-	Helpers.AddEnd(&Helper->ParentLink);
+	Helper->Model = this;
+	Helpers.AddEnd(&Helper->ModelLink);
 }
 
 void ZEModel::RemoveHelper(ZEModelHelper* Helper)
 {
 	zeCheckError(Helper == NULL, ZE_VOID, "Cannot remove helper. Helper is NULL.");
-	zeCheckError(Helper->GetParentModel() != this, ZE_VOID, "Cannot remove helper. Helper does not belong this Model. Helper Name: \"%s\".", Helper->GetName());
+	zeCheckError(Helper->GetModel() != this, ZE_VOID, "Cannot remove helper. Helper does not belong this Model. Helper Name: \"%s\".", Helper->GetName());
 
-	Helper->SetParent(static_cast<ZEModel*>(NULL));
-
-	Helpers.Remove(&Helper->ParentLink);
+	Helper->Model = NULL;
+	Helpers.Remove(&Helper->ModelLink);
 }
 
 const ZEList2<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
@@ -406,23 +413,19 @@ const ZEList2<ZEModelAnimationTrack>& ZEModel::GetAnimationTracks()
 
 void ZEModel::AddAnimationTrack(ZEModelAnimationTrack* Track)
 {
-	if (Track == NULL)
-		return;
+	zeCheckError(Track == NULL, ZE_VOID, "Cannot add animation track. Track is NULL.");
+	zeCheckError(Track->GetModel() != NULL, ZE_VOID, "Can not add animation track. Track is already added to a model.");
 
-	if (Track->GetModel() != NULL)
-		return;
-
+	AnimationTrack->Model = this;
 	AnimationTracks.AddEnd(&Track->ModelLink);
 }
 
 void ZEModel::RemoveAnimationTrack(ZEModelAnimationTrack* Track)
 {
-	if (Track == NULL)
-		return;
+	zeCheckError(Track == NULL, ZE_VOID, "Cannot remove animation track. Track is NULL.");
+	zeCheckError(Track->GetModel() != this, ZE_VOID, "Can not remove animation track. Track belongs to another model.");
 
-	if (Track->GetModel() != this)
-		return;
-
+	AnimationTrack->Model = NULL;
 	AnimationTracks.Remove(&Track->ModelLink);
 }
 

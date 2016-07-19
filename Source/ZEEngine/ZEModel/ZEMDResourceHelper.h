@@ -35,12 +35,14 @@
 
 #pragma once
 
+#include "ZEResource/ZERSResource.h"
+
 #include "ZETypes.h"
-#include "ZEDS\ZELink.h"
-#include "ZEDS\ZEString.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMeta\ZEObject.h"
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEQuaternion.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMeta/ZEObject.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
@@ -52,9 +54,10 @@ enum ZEMDResourceHelperParentType
 	ZE_MRHPT_BONE	= 2
 };
 
-class ZEMDResourceHelper : public ZEObject
+class ZEMDResourceHelper : public ZERSResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEMDResourceHelper)
 	friend class ZEMDResource;
 	private:
 		ZELink<ZEMDResourceHelper>		Link;
