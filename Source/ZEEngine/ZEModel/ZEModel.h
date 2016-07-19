@@ -46,6 +46,7 @@
 #include "ZEModelIKChain.h"
 
 #include "ZETypes.h"
+#include "ZECommon.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEPointer/ZEHolder.h"
@@ -63,6 +64,7 @@ class ZERNSimpleMaterial;
 class ZEModel : public ZEEntity
 {	
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEModel)
 	friend class ZEPhysicalEnvironment;
 	friend class ZEModelBone;
 	friend class ZEModelMesh;
@@ -73,7 +75,7 @@ class ZEModel : public ZEEntity
 		ZEList2<ZEModelBone>					Bones;
 		ZEList2<ZEModelHelper>					Helpers;
 		ZEList2<ZEModelIKChain>					IKChains;
-		
+
 		ZEModelAnimationType					AnimationType;
 		ZEModelAnimationUpdateMode				AnimationUpdateMode;
 		ZEList2<ZEModelAnimationTrack>			AnimationTracks;
@@ -85,7 +87,7 @@ class ZEModel : public ZEEntity
 		mutable bool							DirtyBoundingBox;
 		bool									BoundingBoxIsUserDefined;
 
-		ZERSHolder<const ZEMDResource>		Resource;
+		ZERSHolder<const ZEMDResource>			Resource;
 
 		void									CalculateBoundingBox() const;
 
@@ -138,7 +140,7 @@ class ZEModel : public ZEEntity
 		const ZEString&							GetModelFile() const;
 
 		void									SetModelResource(ZERSHolder<const ZEMDResource> ModelResource);	
-		ZERSHolder<const ZEMDResource>		GetModelResource() const;
+		ZERSHolder<const ZEMDResource>			GetModelResource() const;
 
 		void									SetAnimationType(ZEModelAnimationType AnimationType);
 		ZEModelAnimationType					GetAnimationType();

@@ -54,122 +54,125 @@ class ZEModelBone : public ZEObject
 	friend class ZEModel;
 	friend class ZEModelIKChain;
 	private:
-		mutable ZEFlags						DirtyFlags;
+		mutable ZEFlags							DirtyFlags;
 
-		ZEModel*							Model;
-		ZELink<ZEModelBone>					ModelLink;
-		ZEString							Name;
-		ZEModelBone*						Parent;
-		ZELink<ZEModelBone>					ParentLink;
+		ZEModel*								Model;
+		ZELink<ZEModelBone>						ModelLink;
+		ZEString								Name;
+		ZEModelBone*							Parent;
+		ZELink<ZEModelBone>						ParentLink;
 		
-		ZEVector3							InitialPosition;
-		ZEQuaternion						InitialRotation;
+		ZEVector3								InitialPosition;
+		ZEQuaternion							InitialRotation;
 
-		ZEVector3							Position;
-		ZEQuaternion						Rotation;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
 
-		mutable ZEAABBox					BoundingBox;
-		mutable ZEAABBox					ModelBoundingBox;
-		mutable ZEAABBox					WorldBoundingBox;
+		mutable ZEAABBox						BoundingBox;
+		mutable ZEAABBox						ModelBoundingBox;
+		mutable ZEAABBox						WorldBoundingBox;
 		
-		mutable ZEMatrix4x4					InitialTransform;
-		mutable ZEMatrix4x4					InvInitialTransform;
-		mutable ZEMatrix4x4					InitialModelTransform;
-		mutable ZEMatrix4x4					InvInitialModelTransform;
-		mutable ZEMatrix4x4					Transform;
-		mutable ZEMatrix4x4					InvTransform;
-		mutable ZEMatrix4x4					ModelTransform;
-		mutable ZEMatrix4x4					InvModelTransform;
-		mutable ZEMatrix4x4					WorldTransform;
-		mutable ZEMatrix4x4					InvWorldTransform;
-		mutable ZEMatrix4x4					VertexTransform; // ModelTransform (ForwardTransfomr) * InvInitialModelTransform (InverseTransform) * Vertex
+		mutable ZEMatrix4x4						InitialTransform;
+		mutable ZEMatrix4x4						InvInitialTransform;
+		mutable ZEMatrix4x4						InitialModelTransform;
+		mutable ZEMatrix4x4						InvInitialModelTransform;
+		mutable ZEMatrix4x4						Transform;
+		mutable ZEMatrix4x4						InvTransform;
+		mutable ZEMatrix4x4						ModelTransform;
+		mutable ZEMatrix4x4						InvModelTransform;
+		mutable ZEMatrix4x4						WorldTransform;
+		mutable ZEMatrix4x4						InvWorldTransform;
+		mutable ZEMatrix4x4						VertexTransform; // ModelTransform (ForwardTransfomr) * InvInitialModelTransform (InverseTransform) * Vertex
 
-		ZEModelAnimationType				AnimationType;
+		ZEModelAnimationType					AnimationType;
 
-		ZEList2<ZEModelBone>				ChildBones;
+		ZEList2<ZEModelBone>					ChildBones;
 		
-		ZERSHolder<const ZEMDResource>	ModelResource;
-		const ZEMDResourceBone*			BoneResource;
+		ZERSHolder<const ZEMDResourceBone>		Resource;
 
-		void								SetModel(ZEModel* Model);
-		void								SetParent(ZEModelBone* ParentBone);
+		void									SetModel(ZEModel* Model);
+		void									SetParent(ZEModelBone* ParentBone);
 
-		void								ParentChanged();
-		void								TransformChangedInitialLocal();
-		void								TransformChangedInitialModel();
-		void								TransformChangedLocal();
-		void								TransformChangedModel();
-		void								TransformChangedWorld();
+		void									ParentChanged();
+		void									TransformChangedInitialLocal();
+		void									TransformChangedInitialModel();
+		void									TransformChangedLocal();
+		void									TransformChangedModel();
+		void									TransformChangedWorld();
 
-		//void								LocalTransformChanged();
-		//void								ParentTransformChanged();
+		//void									LocalTransformChanged();
+		//void									ParentTransformChanged();
+
+
+		bool									Load();
+		bool									Unload();
 
 	public:
-		ZEModel*							GetModel() const;
-		ZEModelBone*						GetParent() const;
+		ZEModel*								GetModel() const;
+		ZEModelBone*							GetParent() const;
 
-		void								SetName(const ZEString& Name);
-		const ZEString&						GetName() const;
+		void									SetName(const ZEString& Name);
+		const ZEString&							GetName() const;
 
-		void								SetBoundingBox(const ZEAABBox& BoundingBox);
-		const ZEAABBox&						GetBoundingBox() const;
+		void									SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox&							GetBoundingBox() const;
 
-		const ZEAABBox&						GetModelBoundingBox() const;
-		const ZEAABBox&						GetWorldBoundingBox() const;
+		const ZEAABBox&							GetModelBoundingBox() const;
+		const ZEAABBox&							GetWorldBoundingBox() const;
 
-		const ZEMatrix4x4&					GetTransform() const;
-		const ZEMatrix4x4&					GetInvTransform() const;
+		const ZEMatrix4x4&						GetTransform() const;
+		const ZEMatrix4x4&						GetInvTransform() const;
 
-		const ZEMatrix4x4&					GetModelTransform() const;
-		const ZEMatrix4x4&					GetInvModelTransform() const;
+		const ZEMatrix4x4&						GetModelTransform() const;
+		const ZEMatrix4x4&						GetInvModelTransform() const;
 
-		const ZEMatrix4x4&					GetWorldTransform() const;		
-		const ZEMatrix4x4&					GetInvWorldTransform() const;		
+		const ZEMatrix4x4&						GetWorldTransform() const;		
+		const ZEMatrix4x4&						GetInvWorldTransform() const;		
 
-		const ZEMatrix4x4&					GetInitialTransform() const;
-		const ZEMatrix4x4&					GetInvInitialTransform() const;
+		const ZEMatrix4x4&						GetInitialTransform() const;
+		const ZEMatrix4x4&						GetInvInitialTransform() const;
 
-		const ZEMatrix4x4&					GetInitialModelTransform() const;
-		const ZEMatrix4x4&					GetInvInitialModelTransform() const;
+		const ZEMatrix4x4&						GetInitialModelTransform() const;
+		const ZEMatrix4x4&						GetInvInitialModelTransform() const;
 
-		const ZEMatrix4x4&					GetVertexTransform() const;	
+		const ZEMatrix4x4&						GetVertexTransform() const;	
 
-		void								SetInitialPosition(const ZEVector3& Position);
-		const ZEVector3&					GetInitialPosition() const;
+		void									SetInitialPosition(const ZEVector3& Position);
+		const ZEVector3&						GetInitialPosition() const;
 
-		void								SetInitialRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion&					GetInitialRotation() const;
+		void									SetInitialRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&						GetInitialRotation() const;
 
-		void								SetPosition(const ZEVector3& Position);
-		const ZEVector3&					GetPosition() const;
+		void									SetPosition(const ZEVector3& Position);
+		const ZEVector3&						GetPosition() const;
 
-		void								SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion&					GetRotation() const;
+		void									SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&						GetRotation() const;
 
-		void								SetModelPosition(const ZEVector3& ModelPosition);
-		const ZEVector3						GetModelPosition() const;
+		void									SetModelPosition(const ZEVector3& ModelPosition);
+		const ZEVector3							GetModelPosition() const;
 
-		void								SetModelRotation(const ZEQuaternion& ModelRotation);
-		const ZEQuaternion					GetModelRotation() const;
+		void									SetModelRotation(const ZEQuaternion& ModelRotation);
+		const ZEQuaternion						GetModelRotation() const;
 
-		void								SetWorldPosition(const ZEVector3& WorldPosition);
-		const ZEVector3						GetWorldPosition() const;
+		void									SetWorldPosition(const ZEVector3& WorldPosition);
+		const ZEVector3							GetWorldPosition() const;
 
-		void								SetWorldRotation(const ZEQuaternion& WorldRotation);
-		const ZEQuaternion					GetWorldRotation() const;
+		void									SetWorldRotation(const ZEQuaternion& WorldRotation);
+		const ZEQuaternion						GetWorldRotation() const;
 
-		void								SetAnimationType(ZEModelAnimationType AnimationType);
-		ZEModelAnimationType				GetAnimationType() const;
+		void									SetAnimationType(ZEModelAnimationType AnimationType);
+		ZEModelAnimationType					GetAnimationType() const;
 
-		const ZEList2<ZEModelBone>&			GetChildBones() const;
-		void								AddChildBone(ZEModelBone* Bone);
-		void								RemoveChildBone(ZEModelBone* Bone);
+		const ZEList2<ZEModelBone>&				GetChildBones() const;
+		void									AddChildBone(ZEModelBone* Bone);
+		void									RemoveChildBone(ZEModelBone* Bone);
 
-		void								Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceBone* BoneResource);
-		void								Unload();
+		void									SetResource(ZERSHolder<const ZEMDResourceBone> Resource);
+		ZERSHolder<const ZEMDResourceBone>		GetResource();
 
-		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-											ZEModelBone();
-		virtual								~ZEModelBone();
+												ZEModelBone();
+		virtual									~ZEModelBone();
 };

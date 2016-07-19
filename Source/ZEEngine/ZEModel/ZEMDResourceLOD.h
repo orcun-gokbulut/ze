@@ -35,27 +35,28 @@
 
 #pragma once
 
-#include "ZEMeta\ZEObject.h"
+#include "ZEResource/ZERSResource.h"
 
 #include "ZEMDVertex.h"
 #include "ZEMDResourceDraw.h"
 
-#include "ZEDS\ZELink.h"
-#include "ZEDS\ZEArray.h"
-#include "ZEPointer\ZEHolder.h"
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRVertexBuffer;
 class ZEGRIndexBuffer;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEModelResourceMeshLOD : public ZEObject
+class ZEMDResourceLOD : public ZERSResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEMDResourceLOD)
 	friend class ZEMDResourceMesh;
 	friend class ZEMDResource;
 	private:
-		ZELink<ZEModelResourceMeshLOD>			Link;
+		ZELink<ZEMDResourceLOD>					Link;
 
 		ZEInt32									Level;
 		float									StartDistance;
@@ -141,6 +142,6 @@ class ZEModelResourceMeshLOD : public ZEObject
 		bool									Load(const ZEMLReaderNode& LODNode);
 		bool									Save(ZEMLWriterNode& LODNode) const;
 
-												ZEModelResourceMeshLOD();
-												~ZEModelResourceMeshLOD();
+												ZEMDResourceLOD();
+												~ZEMDResourceLOD();
 };

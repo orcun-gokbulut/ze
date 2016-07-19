@@ -39,51 +39,52 @@
 #include "ZEMDResource.h"
 #include "ZEMDResourceHelper.h"
 
-void ZEModelHelper::SetParent(ZEModel* Model)
+bool ZEModelHelper::Load()
 {
-	if (Model == NULL)
+	Unload();
+
+	if (Resource == NULL)
+		return true;
+
+	Position = Resource->GetPosition();
+	Rotation = Resource->GetRotation();
+	Scale = Resource->GetScale();
+	UserDefinedProperties = Resource->GetUserDefinedProperties();
+
+	if (Model != NULL)
 	{
-		ParentModel = Model;
-		return;
+		switch (ParentType)
+		{
+			case ZE_MHPT_MESH:
+				SetParentMesh(Resource->GetOwnerId() < Model->Meshes.GetCount() ? Model->Meshes[Resource->GetOwnerId()] : NULL);
+				break;
+
+			case ZE_MHPT_BONE:
+				SetParentBone(Resource->GetOwnerId() < Model->Bones.GetCount() ? Model->Bones[Resource->GetOwnerId()] : NULL);
+				break;
+
+			default:
+				SetParentMesh(NULL);
+				break;
+		}
+	}
+	else
+	{
+		SetParentMesh(NULL);
 	}
 
-	ParentType = ZE_MHPT_MODEL;
-	ParentMesh = NULL;
-	ParentBone = NULL;
-	ParentModel = Model;
+
+	return true;
 }
 
-void ZEModelHelper::SetParent(ZEModelMesh* Mesh)
+bool ZEModelHelper::Unload()
 {
-	if (Mesh == NULL)
-	{
-		ParentMesh = Mesh;
-		return;
-	}
-
-	ParentType = ZE_MHPT_MESH;
-	ParentModel = NULL;
-	ParentBone = NULL;
-	ParentMesh = Mesh;
+	return true;
 }
 
-void ZEModelHelper::SetParent(ZEModelBone* Bone)
+ZEModel* ZEModelHelper::GetModel() const
 {
-	if (Bone == NULL)
-	{
-		ParentBone = Bone;
-		return;
-	}
-
-	ParentType = ZE_MHPT_BONE;
-	ParentModel = NULL;
-	ParentMesh = NULL;
-	ParentBone = Bone;
-}
-
-const char* ZEModelHelper::GetName() const
-{
-	return HelperResource->GetName();
+	return Model;
 }
 
 ZEModelHelperParentType ZEModelHelper::GetParentType() const
@@ -91,24 +92,56 @@ ZEModelHelperParentType ZEModelHelper::GetParentType() const
 	return ParentType;
 }
 
-ZEString ZEModelHelper::GetUserDefinedProperties() const
+void ZEModelHelper::SetParentMesh(ZEModelMesh* Mesh)
 {
-	return HelperResource->GetUserDefinedProperties();
-}
+	zeCheckError(GetModel() != NULL && Mesh->GetModel() != GetModel(), ZE_VOID, "Cannot set helper parent to a mesh. Mesh belongs to another model.");
 
-ZEModel* ZEModelHelper::GetParentModel() const
-{
-	return ParentModel;
+	ParentMesh = Mesh;
+	ParentBone = NULL;
+
+	if (Mesh != NULL)
+		ParentType = ZE_MHPT_MESH;
+	else
+		ParentType = ZE_MHPT_MODEL;
 }
 
 ZEModelMesh* ZEModelHelper::GetParentMesh() const
 {
+	if (ParentType != ZE_MHPT_MESH)
+		return NULL;
+
 	return ParentMesh;
+}
+
+void ZEModelHelper::SetParentBone(ZEModelBone* Bone)
+{
+	zeCheckError(GetModel() != NULL && Bone->GetModel() != GetModel(), ZE_VOID, "Cannot set helper parent to a bone. Bone belongs to another model.");
+
+	ParentBone = Bone;
+	ParentMesh = NULL;
+
+	if (Bone != NULL)
+		ParentType = ZE_MHPT_BONE;
+	else
+		ParentType = ZE_MHPT_MODEL;
 }
 
 ZEModelBone* ZEModelHelper::GetParentBone() const
 {
+	if (ParentType != ZE_MHPT_BONE)
+		return NULL;
+
 	return ParentBone;
+}
+
+void ZEModelHelper::SetName(const ZEString& Name)
+{
+	this->Name = Name;
+}
+
+const ZEString& ZEModelHelper::GetName() const
+{
+	return Name;
 }
 
 void ZEModelHelper::SetPosition(const ZEVector3& Position)
@@ -143,113 +176,81 @@ const ZEVector3& ZEModelHelper::GetScale() const
 
 const ZEVector3 ZEModelHelper::GetModelPosition() const
 {
-	ZEVector3 Temp;
-
-	if (ParentType == ZE_MHPT_MESH)
-		ZEMatrix4x4::Transform(Temp, ParentMesh->GetTransform(), GetPosition());
-	else if (ParentType == ZE_MHPT_BONE)
-		ZEMatrix4x4::Transform(Temp, ParentBone->GetModelTransform(), GetPosition());
+	if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
+		return ParentMesh->GetModelTransform() * GetPosition();
+	else if (ParentType == ZE_MHPT_BONE && ParentBone != NULL)
+		return ParentBone->GetModelTransform() * GetPosition();
 	else
-		Temp = GetPosition();
-
-	return Temp;
+		return  GetPosition();
 }
 
 const ZEVector3 ZEModelHelper::GetWorldPosition() const
 {
-	ZEVector3 Temp;
-
-	if (ParentType == ZE_MHPT_MESH)
-		ZEMatrix4x4::Transform(Temp, ParentMesh->GetWorldTransform(), GetPosition());
-	else if (ParentType == ZE_MHPT_BONE)
-		ZEMatrix4x4::Transform(Temp, ParentBone->GetWorldTransform(), GetPosition());
+	if (ParentType == ZE_MHPT_MODEL && Model != NULL)
+		return Model->GetWorldTransform() * GetPosition();
+	else if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
+		return ParentMesh->GetWorldTransform() * GetPosition();
+	else if (ParentType == ZE_MHPT_BONE && ParentBone != NULL)
+		return ParentBone->GetWorldTransform() * GetPosition();
 	else
-		ZEMatrix4x4::Transform(Temp, ParentModel->GetWorldTransform(), GetPosition());
-
-	return Temp;
+		return GetPosition();
 }
 
 const ZEQuaternion ZEModelHelper::GetModelRotation() const
 {
-	ZEQuaternion Temp;
-
-	if (ParentType == ZE_MHPT_MESH)
-		ZEQuaternion::Product(Temp, ParentMesh->GetRotation(), GetRotation());
-	else if (ParentType == ZE_MHPT_BONE)
-		ZEQuaternion::Product(Temp, ParentBone->GetModelRotation(), GetRotation());
+	if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
+		return (ParentMesh->GetModelRotation() * GetRotation()).Normalize();
+	else if (ParentType == ZE_MHPT_BONE && ParentBone != NULL)
+		return (ParentBone->GetModelRotation() * GetRotation()).Normalize();
 	else
-		Temp = GetRotation();
-
-	ZEQuaternion::Normalize(Temp, Temp);
-	return Temp;
+		return GetRotation();
 }
 
 const ZEQuaternion ZEModelHelper::GetWorldRotation() const
 {
-	ZEQuaternion Temp;
-
-	if (ParentType == ZE_MHPT_MESH)
-	{
-		ZEQuaternion OwnerRotation;
-		ZEQuaternion::Product(OwnerRotation, ParentModel->GetWorldRotation(), ParentMesh->GetRotation());
-		ZEQuaternion::Product(Temp, OwnerRotation, GetRotation());
-	}
-	else if (ParentType == ZE_MHPT_BONE)
-	{
-		ZEQuaternion::Product(Temp, ParentBone->GetWorldRotation(), GetRotation());
-	}
+	if (ParentType == ZE_MRHPT_MODEL && Model != NULL)
+		return (Model->GetWorldRotation() * GetRotation()).Normalize();
+	else if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
+		return (ParentMesh->GetWorldRotation() * GetRotation()).Normalize();
+	else if (ParentType == ZE_MHPT_BONE && ParentBone != NULL)
+		return (ParentBone->GetWorldRotation() * GetRotation()).Normalize();
 	else
-	{
-		ZEQuaternion::Product(Temp, ParentModel->GetWorldRotation(), GetRotation());
-	}
-
-	ZEQuaternion::Normalize(Temp, Temp);
-	return Temp;
+		return GetRotation();
 }
 
 const ZEVector3 ZEModelHelper::GetModelScale() const
 {
-	ZEVector3 Temp;
-
-	if (ParentType == ZE_MHPT_MESH)
-		ZEVector3::Multiply(Temp, ParentMesh->GetScale(), GetScale());
+	if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
+		return ParentMesh->GetModelScale() * GetScale();
 	else
-		Temp = GetScale();
-
-	return Temp;
+		return GetScale();
 }
 
 const ZEVector3 ZEModelHelper::GetWorldScale() const
 {
-	ZEVector3 Temp;
-
-	if (ParentType == ZE_MHPT_MESH)
-	{
-		ZEVector3 OwnerScale;
-		ZEVector3::Multiply(OwnerScale, ParentModel->GetWorldScale(), ParentMesh->GetScale());
-		ZEVector3::Multiply(Temp, OwnerScale, GetScale());
-	}
+	if (ParentType == ZE_MHPT_MODEL && Model != NULL)
+		return Model->GetWorldScale() * GetScale();
+	else if (ParentType == ZE_MHPT_MESH && ParentMesh != NULL)
+		return ParentMesh->GetWorldScale() * GetScale();
+	else if (ParentType == ZE_MHPT_BONE && ParentBone != NULL && ParentBone->GetModel() != NULL)
+		return ParentBone->GetModel()->GetWorldScale() * GetScale();
 	else
-	{
-		ZEVector3::Multiply(Temp, ParentModel->GetWorldScale(), GetScale());
-	}
-
-	return Temp;
+		return GetScale();
 }
 
 ZEVector3 ZEModelHelper::GetFront() const
 {
-	return Rotation * ZEVector3::UnitZ;
+	return GetRotation() * ZEVector3::UnitZ;
 }
 
 ZEVector3 ZEModelHelper::GetRight() const
 {
-	return Rotation * ZEVector3::UnitX;
+	return GetRotation() * ZEVector3::UnitX;
 }
 
 ZEVector3 ZEModelHelper::GetUp() const
 {
-	return Rotation * ZEVector3::UnitY;
+	return GetRotation() * ZEVector3::UnitY;
 }
 
 ZEVector3 ZEModelHelper::GetModelFront() const
@@ -282,47 +283,34 @@ ZEVector3 ZEModelHelper::GetWorldUp() const
 	return GetWorldRotation() * ZEVector3::UnitY;
 }
 
-void ZEModelHelper::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> Resource, const ZEMDResourceHelper* HelperResource)
+void ZEModelHelper::SetUserDefinedProperties(const ZEString& Properties)
 {
-	ParentModel = Model;
-	this->HelperResource = HelperResource;
-	ParentType = (ZEModelHelperParentType)HelperResource->GetOwnerType();
-	Position = HelperResource->GetPosition();
-	Rotation = HelperResource->GetRotation();
-	Scale = HelperResource->GetScale();
-
-	switch (ParentType)
-	{
-		case ZE_MHPT_MESH:
-			ParentMesh = ParentModel->Meshes[HelperResource->GetOwnerId()];
-			break;
-		case ZE_MHPT_BONE:
-			ParentBone = ParentModel->Bones[HelperResource->GetOwnerId()];
-			break;
-		default:
-			break;
-	}
-
+	UserDefinedProperties = Properties;
 }
 
-void ZEModelHelper::Unload()
+const ZEString& ZEModelHelper::GetUserDefinedProperties() const
 {
-	ParentModel = NULL;
-	ParentMesh = NULL;
-	ParentBone = NULL;
-	HelperResource = NULL;
+	return UserDefinedProperties;
 }
 
-ZEModelHelper::ZEModelHelper() : ParentLink(this)
+void ZEModelHelper::SetResource(ZERSHolder<const ZEMDResourceHelper> Resource)
 {
+	this->Resource = Resource;
+}
+
+ZERSHolder<const ZEMDResourceHelper> ZEModelHelper::GetResource()
+{
+	return Resource;
+}
+
+ZEModelHelper::ZEModelHelper() : ModelLink(this)
+{
+	Model = NULL;
+
 	ParentType = ZE_MHPT_MODEL;
-
-	ParentModel = NULL;
 	ParentMesh = NULL;
 	ParentBone = NULL;
-
-	HelperResource = NULL;
-
+	
 	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
@@ -331,7 +319,6 @@ ZEModelHelper::ZEModelHelper() : ParentLink(this)
 ZEModelHelper::~ZEModelHelper()
 {
 	Unload();
+	if (GetModel() != NULL)
+		GetModel()->RemoveHelper(this);
 }
-
-
-

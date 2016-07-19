@@ -327,11 +327,13 @@ void ZEMDResource::AddBone(ZEMDResourceBone* Bone)
 {
 	zeCheckError(Bone->Link.GetInUse(), ZE_VOID, "Bone already added to a resource.");
 	Bones.AddEnd(&Bone->Link);
+	AddChildResource(Bone);
 }
 
 void ZEMDResource::RemoveBone(ZEMDResourceBone* Bone)
 {
 	Bones.Remove(&Bone->Link);
+	RemoveChildResource(Bone);
 }
 
 const ZEList2<ZEMDResourceAnimation>& ZEMDResource::GetAnimations()
@@ -348,11 +350,13 @@ void ZEMDResource::AddAnimation(ZEMDResourceAnimation* Animation)
 {
 	zeCheckError(Animation->Link.GetInUse(), ZE_VOID, "Animation already added to a resource.");
 	Animations.AddEnd(&Animation->Link);
+	AddChildResource(Animation);
 }
 
 void ZEMDResource::RemoveAnimation(ZEMDResourceAnimation* Animation)
 {
 	Animations.Remove(&Animation->Link);
+	RemoveChildResource(Animation);
 }
 
 const ZEList2<const ZEMDResourceHelper>& ZEMDResource::GetHelpers() const
@@ -364,11 +368,13 @@ void ZEMDResource::AddHelper(ZEMDResourceHelper* Helper)
 {
 	zeCheckError(Helper->Link.GetInUse(), ZE_VOID, "Helper is already added to a resource.");
 	Helpers.AddEnd(&Helper->Link);
+	AddChildResource(Helper);
 }
 
 void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 {
 	Helpers.Remove(&Helper->Link);
+	RemoveChildResource(Helper);
 }
 
 ZEMDResource::ZEMDResource()

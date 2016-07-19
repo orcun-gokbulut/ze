@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMDResourceAnimation.h
+ Zinek Engine - ZEModelDraw.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -35,56 +35,41 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResource.h"
+#include "ZEMeta/ZEObject.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZELink.h"
-#include "ZEDS/ZEArray.h"
-#include "ZEDS/ZEString.h"
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
+#include "ZEPointer/ZEHolder.h"
+#include "ZERenderer/ZERNCommand.h"
 
-class ZEMLReaderNode;
-class ZEMLWriterNode;
+class ZEModelMesh;
+class ZEModelMeshLOD;
+class ZERNMaterial;
 
-struct ZEMDResourceAnimationKey
-{
-	ZEUInt32			ItemId;
-	ZEVector3			Position;
-	ZEQuaternion		Rotation;
-	ZEVector3			Scale;
-};
-
-struct ZEMDResourceAnimationFrame
-{
-	ZEArray<ZEMDResourceAnimationKey>		BoneKeys;
-	ZEArray<ZEMDResourceAnimationKey>		MeshKeys;
-};
-
-class ZEMDResourceAnimation : public ZERSResource
+class ZEModelDraw : public ZEObject
 {
 	ZE_OBJECT
-	ZE_DISALLOW_COPY(ZEMDResourceAnimation)
-	friend class ZEMDResource;
+	friend class ZEModelMesh;
+	friend class ZEModelMeshLOD;
 	private:
-		ZELink<ZEMDResourceAnimation>				Link;
-
-		ZEString									Name;
-		ZEArray<ZEMDResourceAnimationFrame>			Frames;
-		ZEArray<ZEGUID>								ItemGUIDS;
+		ZEModelMeshLOD*								LOD;
+		ZESize										Offset;
+		ZESize										Count;
+		ZEHolder<const ZERNMaterial>				Material;
+		mutable ZERNCommand							RenderCommand;
 
 	public:
-		void										SetName(const ZEString& Name);
-		const ZEString&								GetName() const;
+		ZEModelMeshLOD*								GetLOD();
+		const ZEModelMeshLOD*						GetLOD() const;
 
-		void										SetFrames(ZEArray<ZEMDResourceAnimationFrame>& Frames);
-		const ZEArray<ZEMDResourceAnimationFrame>&	GetFrames() const;
+		void										SetOffset(ZESize Offset);
+		ZESize										GetOffset() const;
 
-		void										AddFrame(const ZEMDResourceAnimationFrame& Frame);
-		void										RemoveFrame(ZESize Index);
+		void										SetCount(ZESize Count);
+		ZESize										GetCount() const;
 
-		bool										Load(const ZEMLReaderNode& AnimationNode);
-		bool										Save(ZEMLWriterNode& AnimationNode) const;
+		void										SetMaterial(ZEHolder<const ZERNMaterial> Material);
+		ZEHolder<const ZERNMaterial>				GetMaterial() const;
 
-													ZEMDResourceAnimation();
+		void										Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+
+													ZEModelDraw();
 };

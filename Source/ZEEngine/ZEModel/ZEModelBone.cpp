@@ -34,7 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelBone.h"
+
 #include "ZEModel.h"
+#include "ZEMDResourceBone.h"
+
 #include "ZEMath/ZEMath.h"
 #include "ZEGame/ZEScene.h"
 
@@ -53,7 +56,25 @@
 #define ZEMD_BDF_VERTEX_TRANSFORM				0x1000
 
 #include <stdio.h>
-#include "ZEMDResourceBone.h"
+
+
+void ZEModelBone::SetModel(ZEModel* Model)
+{
+	if (this->Model == Model)
+		return;
+
+	this->Model = Model;
+	TransformChangedWorld();
+}
+
+void ZEModelBone::SetParent(ZEModelBone* Bone)
+{
+	if (Parent == Bone)
+		return;
+
+	Parent = Bone;
+	ParentChanged();
+}
 
 // void ZEModelBone::LocalTransformChanged()
 // {
@@ -103,7 +124,7 @@ void ZEModelBone::ParentChanged()
 void ZEModelBone::TransformChangedInitialLocal()
 {
 	DirtyFlags.RaiseFlags(
-		ZEMD_BDF_INITIAL_TRANSFORM | ZEMD_BDF_INV_INITIAL_TRANSFORM | 
+		ZEMD_BDF_INITIAL_TRANSFORM		 | ZEMD_BDF_INV_INITIAL_TRANSFORM | 
 		ZEMD_BDF_INITIAL_MODEL_TRANSFORM | ZEMD_BDF_INV_INITIAL_MODEL_TRANSFORM |
 		ZEMD_BDF_VERTEX_TRANSFORM);
 
@@ -158,22 +179,28 @@ void ZEModelBone::TransformChangedWorld()
 		ChildBone->TransformChangedWorld();
 }
 
-void ZEModelBone::SetModel(ZEModel* Model)
+bool ZEModelBone::Load()
 {
-	if (this->Model == Model)
-		return;
+	if (Resource == NULL)
+		return true;
 
-	this->Model = Model;
-	TransformChangedWorld();
+	DirtyFlags.RaiseAll();
+
+	SetName(Resource->GetName());
+	SetBoundingBox(Resource->GetBoundingBox());
+	SetInitialPosition(Resource->GetPosition());
+	SetInitialRotation(Resource->GetRotation());
+	SetPosition(Resource->GetPosition());
+	SetRotation(Resource->GetRotation());
+
+	return true;
 }
 
-void ZEModelBone::SetParent(ZEModelBone* Bone)
+bool ZEModelBone::Unload()
 {
-	if (Parent == Bone)
-		return;
+	DirtyFlags.RaiseAll();
 
-	Parent = Bone;
-	ParentChanged();
+	return true;
 }
 
 ZEModel* ZEModelBone::GetModel() const
@@ -595,32 +622,14 @@ void ZEModelBone::RemoveChildBone(ZEModelBone* Bone)
 	ChildBones.Remove(&Bone->ParentLink);
 }
 
-void ZEModelBone::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceBone* BoneResource)
+void ZEModelBone::SetResource(ZERSHolder<const ZEMDResourceBone> Resource)
 {
-	this->Model = Model;
-	this->ModelResource = ModelResource;
-	this->BoneResource = BoneResource;
-
-	SetName(BoneResource->GetName());
-	SetBoundingBox(BoneResource->GetBoundingBox());
-	SetInitialPosition(BoneResource->GetPosition());
-	SetInitialRotation(BoneResource->GetRotation());
-	SetPosition(BoneResource->GetPosition());
-	SetRotation(BoneResource->GetRotation());
+	this->Resource = Resource;
 }
 
-void ZEModelBone::Unload()
+ZERSHolder<const ZEMDResourceBone> ZEModelBone::GetResource()
 {
-	Model = NULL;
-	Parent = NULL;
-
-	ze_for_each(Bone, ChildBones)
-	{
-		RemoveChildBone(Bone.GetPointer());
-		delete Bone.GetPointer();
-	}
-
-	DirtyFlags.RaiseAll();
+	return Resource;
 }
 
 void ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -640,7 +649,6 @@ ZEModelBone::ZEModelBone() : ParentLink(this), ModelLink(this)
 	DirtyFlags.RaiseAll();
 	Model = NULL;
 	Parent = NULL;
-	BoneResource = NULL;
 
 	InitialPosition = ZEVector3::Zero;
 	InitialRotation = ZEQuaternion::Identity;

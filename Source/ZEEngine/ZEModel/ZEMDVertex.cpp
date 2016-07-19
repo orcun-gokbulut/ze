@@ -74,7 +74,7 @@ const ZEGRVertexLayout& ZEMDVertexSkin::GetVertexLayout()
 			{ZEGR_VES_BLEND_WEIGHTS, 0, ZEGR_VET_FLOAT4, 0, 60, ZEGR_VU_PER_VERTEX, 0},
 		};
 
-		VertexLayout.SetElements(ElementArray, 4);
+		VertexLayout.SetElements(ElementArray, 7);
 	}
 
 	return VertexLayout;

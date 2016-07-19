@@ -35,20 +35,23 @@
 
 #pragma once
 
-#include "ZEMeta\ZEObject.h"
-#include "ZEDS\ZELink.h"
-#include "ZEDS\ZEString.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEAABBox.h"
-#include "ZEMath\ZEMatrix.h"
+#include "ZEResource/ZERSResource.h"
+
 #include "ZEMDResourcePhysics.h"
+
+#include "ZEDS/ZELink.h"
+#include "ZEDS/ZEString.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEMatrix.h"
 
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDResourceBone : public ZEObject
+class ZEMDResourceBone : public ZERSResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEMDResourceBone)
 	friend class ZEMDResource;
 	private:
 		ZELink<ZEMDResourceBone>				Link;
@@ -60,7 +63,7 @@ class ZEMDResourceBone : public ZEObject
 		ZEVector3								Scale;
 		ZEAABBox								BoundingBox;
 		ZEMDResourcePhysicalBody				PhysicalBody;
-		ZEMDResourcePhysicalJoint			PhysicalJoint;
+		ZEMDResourcePhysicalJoint				PhysicalJoint;
 		ZEString								UserDefinedProperties;
 
 	public:
@@ -83,12 +86,12 @@ class ZEMDResourceBone : public ZEObject
 		const ZEVector3&						GetScale() const;
 
 		void									SetPhysicalJoint(const ZEMDResourcePhysicalBody& Body);
-		const ZEMDResourcePhysicalBody&		GetPhysicalBody() const;
-		ZEMDResourcePhysicalBody&			GetPhysicalBody();
+		const ZEMDResourcePhysicalBody&			GetPhysicalBody() const;
+		ZEMDResourcePhysicalBody&				GetPhysicalBody();
 
 		void									SetPhysicalJoint(const ZEMDResourcePhysicalJoint& Joint);
 		const ZEMDResourcePhysicalJoint&		GetPhysicalJoint() const;
-		ZEMDResourcePhysicalJoint&			GetPhysicalJoint();
+		ZEMDResourcePhysicalJoint&				GetPhysicalJoint();
 
 		void									SetUserDefinedProperties(const ZEString& UserDefinedProperties);
 		const ZEString&							GetUserDefinedProperties() const;

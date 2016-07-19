@@ -36,17 +36,20 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
-#include "ZEPointer/ZEReferenceCounted.h"
+
+#include "ZERSDefinitions.h"
 
 #include "ZETypes.h"
 #include "ZEGUID.h"
+#include "ZECommon.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZELink.h"
-#include "ZERSDefinitions.h"
+
 
 class ZERSResource : public ZEObject
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERSResource)
 	friend class ZERSResourceManager;
 	template<typename ZERSResourceClass> friend class ZERSHolder;
 	friend class ZERSTemplates;

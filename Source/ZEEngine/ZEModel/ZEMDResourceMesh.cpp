@@ -131,25 +131,30 @@ const ZEString& ZEMDResourceMesh::GetUserDefinedProperties() const
 	return UserDefinedProperties;
 }
 
-const ZEList2<ZEModelResourceMeshLOD>& ZEMDResourceMesh::GetLODs()
+const ZEList2<ZEMDResourceLOD>& ZEMDResourceMesh::GetLODs()
 {
 	return LODs;
 }
 
-const ZEList2<const ZEModelResourceMeshLOD>& ZEMDResourceMesh::GetLODs() const
+const ZEList2<const ZEMDResourceLOD>& ZEMDResourceMesh::GetLODs() const
 {
-	return *(const ZEList2<const ZEModelResourceMeshLOD>*)&LODs;
+	return *(const ZEList2<const ZEMDResourceLOD>*)&LODs;
 }
 
-void ZEMDResourceMesh::AddLOD(ZEModelResourceMeshLOD* LOD)
+void ZEMDResourceMesh::AddLOD(ZEMDResourceLOD* LOD)
 {
 	zeCheckError(LOD->Link.GetInUse(), ZE_VOID, "LOD is already added to Mesh.");
 	LODs.AddEnd(&LOD->Link);
 }
 
-void ZEMDResourceMesh::RemoveLOD(ZEModelResourceMeshLOD* LOD)
+void ZEMDResourceMesh::RemoveLOD(ZEMDResourceLOD* LOD)
 {
 	LODs.Remove(&LOD->Link);
+}
+
+void ZEMDResourceMesh::SetGeometry(const ZEArray<ZEVector3>& Vertices)
+{
+	Geometry = Vertices;
 }
 
 bool ZEMDResourceMesh::Load(const ZEMLReaderNode& MeshNode)
@@ -179,11 +184,9 @@ bool ZEMDResourceMesh::Load(const ZEMLReaderNode& MeshNode)
 		if (!LODNode.IsValid())
 			return false;
 		
-		ZEPointer<ZEModelResourceMeshLOD> LOD = new ZEModelResourceMeshLOD();
+		ZEPointer<ZEMDResourceLOD> LOD = new ZEMDResourceLOD();
 		if (!LOD->Load(LODNode))
 			return false;
-
-		//--TEMP-- Geometry is required for Mesh RayCast temporarily
 
 		if (LOD->GetLevel() == 0)
 		{
@@ -200,8 +203,6 @@ bool ZEMDResourceMesh::Load(const ZEMLReaderNode& MeshNode)
 					Geometry[N] = LOD->GetVertices()[N].Position;
 			}
 		}
-
-		//--TEMP--
 
 		AddLOD(LOD.Transfer());
 	}

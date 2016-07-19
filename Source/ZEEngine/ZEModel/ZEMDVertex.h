@@ -36,38 +36,41 @@
 #pragma once
 
 #include "ZETypes.h"
+#include "ZEPacking.h"
 #include "ZEMath\ZEVector.h"
 
 class ZEGRVertexLayout;
 
 enum ZEMDVertexType
 {
-	ZEMD_VT_NORMAL = 0,
-	ZEMD_VT_SKINNED = 1
+	ZEMD_VT_NORMAL		= 0,
+	ZEMD_VT_SKINNED		= 1
 };
 
 enum ZEMDVertexIndexType
 {
-	ZEMD_VIT_NONE = 0,
-	ZEMD_VIT_16BIT = 16,
-	ZEMD_VIT_32BIT = 32
+	ZEMD_VIT_NONE		= 0,
+	ZEMD_VIT_16BIT		= 16,
+	ZEMD_VIT_32BIT		= 32
 };
 
+ZEPackStruct(
 struct ZEMDVertex
 {
-	ZEVector3 Position;
-	ZEVector3 Texcoords;
-	ZEVector3 Normal;
-	ZEVector3 Tangent;
-	ZEVector3 Binormal;
+	ZEVector3						Position;
+	ZEVector3						Normal;
+	ZEVector3						Tangent;
+	ZEVector3						Binormal;
+	ZEVector2						Texcoords;
 
-	static const ZEGRVertexLayout& GetVertexLayout();
-};
+	static const ZEGRVertexLayout&	GetVertexLayout();
+});
 
+ZEPackStruct(
 struct ZEMDVertexSkin : public ZEMDVertex
 {
-	ZEUInt32 Indices[4];
-	ZEVector4 Weights;
+	ZEUInt8							Indices[4];
+	ZEVector4						Weights;
 	
-	static const ZEGRVertexLayout& GetVertexLayout();
-};
+	static const ZEGRVertexLayout&	GetVertexLayout();
+});

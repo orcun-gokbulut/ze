@@ -36,9 +36,11 @@
 #include "ZEModelMesh.h"
 
 #include "ZEModel.h"
+#include "ZEModelDraw.h"
 #include "ZEModelMeshLOD.h"
 #include "ZEMDResource.h"
 #include "ZEMDResourceMesh.h"
+#include "ZEMDResourceLOD.h"
 
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
@@ -48,7 +50,6 @@
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-
 
 #define ZEMD_MDF_TRANSFORM					0x0001
 #define ZEMD_MDF_INV_TRANSFORM				0x0002
@@ -99,6 +100,24 @@ struct ZEModelMeshConstants
 // 		ChildMesh->ParentTransformChanged();
 // }
 
+void ZEModelMesh::SetModel(ZEModel* Model)
+{
+	if (this->Model == Model)
+		return;
+
+	this->Model = Model;
+	TransformChangedWorld();
+}
+
+void ZEModelMesh::SetParent(ZEModelMesh* Mesh)
+{
+	if (Parent == Mesh)
+		return;
+
+	Parent = Mesh;
+	ParentChanged();
+}
+
 void ZEModelMesh::ParentChanged()
 {
 	if (Parent != NULL)
@@ -145,33 +164,6 @@ void ZEModelMesh::TransformChangedWorld()
 		ChildMesh->TransformChangedWorld();
 }
 
-void ZEModelMesh::SetModel(ZEModel* Model)
-{
-	if (this->Model == Model)
-		return;
-
-	this->Model = Model;
-	TransformChangedWorld();
-}
-
-void ZEModelMesh::SetParent(ZEModelMesh* Mesh)
-{
-	if (Parent == Mesh)
-		return;
-
-	Parent = Mesh;
-	ParentChanged();
-}
-
-ZEModel* ZEModelMesh::GetModel() const
-{
-	return Model;
-}
-
-ZEModelMesh* ZEModelMesh::GetParent() const
-{
-	return Parent;
-}
 
 void ZEModelMesh::UpdateConstantBuffer()
 {
@@ -207,6 +199,58 @@ void ZEModelMesh::UpdateConstantBuffer()
 	ConstantBuffer->SetData(&Constants);
 
 	DirtyFlags.UnraiseFlags(ZEMD_MDF_CONSTANT_BUFFER);
+}
+
+bool ZEModelMesh::Load()
+{
+	Unload();
+
+	if (Resource == NULL)
+		return true;
+
+	DirtyFlags.RaiseAll();
+
+	AnimationType = ZE_MAT_PREDEFINED;
+	
+	SetPosition(Resource->GetPosition());
+	SetRotation(Resource->GetRotation());
+	SetScale(Resource->GetScale());
+	SetVisible(Resource->GetVisible());
+	SetBoundingBox(Resource->GetBoundingBox());
+	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEModelMeshConstants));
+
+	ze_for_each(ResourceLOD, Resource->GetLODs())
+	{
+		ZEModelMeshLOD* NewLOD = new ZEModelMeshLOD();
+		AddLOD(NewLOD);
+		NewLOD->SetResource(ResourceLOD.GetPointer());
+		NewLOD->Load();
+	}
+
+	return true;
+}
+
+bool ZEModelMesh::Unload()
+{
+	ze_for_each(LOD, LODs)
+	{
+		RemoveLOD(LOD.GetPointer());
+		delete LOD.GetPointer();
+	}
+
+	DirtyFlags.RaiseAll();
+
+	return true;
+}
+
+ZEModel* ZEModelMesh::GetModel() const
+{
+	return Model;
+}
+
+ZEModelMesh* ZEModelMesh::GetParent() const
+{
+	return Parent;
 }
 
 void ZEModelMesh::SetName(const ZEString& Name)
@@ -624,7 +668,6 @@ void ZEModelMesh::AddLOD(ZEModelMeshLOD* LOD)
 {
 	zeCheckError(LOD == NULL, ZE_VOID, "Mesh cannot be null.");
 	zeCheckError(LOD->GetMesh() != NULL, ZE_VOID, "Mesh is already added to another mesh.");
-	zeCheckError(LOD->GetModel() != GetModel(), ZE_VOID, "Mesh is already used by a model.");
 
 	LOD->Mesh = this;
 	LOD->Model = GetModel();
@@ -635,7 +678,7 @@ void ZEModelMesh::AddLOD(ZEModelMeshLOD* LOD)
 void ZEModelMesh::RemoveLOD(ZEModelMeshLOD* LOD)
 {
 	zeCheckError(LOD == NULL, ZE_VOID, "Mesh cannot be null.");
-	zeCheckError(!LODs.Exists(&LOD->MeshLink), ZE_VOID, "Mesh is not a child mesh of this mesh.");
+	zeCheckError(LOD->GetMesh() != this, ZE_VOID, "Mesh is not a child mesh of this mesh.");
 
 	LOD->Mesh = NULL;
 	LOD->Model = NULL;
@@ -797,49 +840,18 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	if (!Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox()))
 		return;
 
-	Helper.RayCastMesh(MeshResource->GetGeometry().GetConstCArray(), MeshResource->GetGeometry().GetCount(), sizeof(ZEVector3));
+	if (Resource != NULL)
+		Helper.RayCastMesh(Resource->GetGeometry().GetConstCArray(), Resource->GetGeometry().GetCount(), sizeof(ZEVector3));
 }
 
-void ZEModelMesh::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceMesh* MeshResource)
+void ZEModelMesh::SetResouce(ZERSHolder<const ZEMDResourceMesh> Resource)
 {
-	this->Model = Model;
-	this->ModelResource = ModelResource;
-	this->MeshResource = MeshResource;
-
-	AnimationType = ZE_MAT_PREDEFINED;
-	SetPosition(MeshResource->GetPosition());
-	SetRotation(MeshResource->GetRotation());
-	SetScale(MeshResource->GetScale());
-	SetVisible(MeshResource->GetVisible());
-	SetBoundingBox(MeshResource->GetBoundingBox());
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEModelMeshConstants));
-
-	ze_for_each(ResourceLOD, MeshResource->GetLODs())
-	{
-		ZEPointer<ZEModelMeshLOD> NewLOD = new ZEModelMeshLOD();
-		NewLOD->Load(Model, ModelResource, &(*ResourceLOD));
-		AddLOD(NewLOD.Transfer());
-	}
+	this->Resource = Resource;
 }
 
-void ZEModelMesh::Unload()
+ZERSHolder<const ZEMDResourceMesh> ZEModelMesh::GetResource()
 {
-	Model = NULL;
-	Parent = NULL;
-
-	ze_for_each(Mesh, ChildMeshes)
-	{
-		RemoveChildMesh(Mesh.GetPointer());
-		delete Mesh.GetPointer();
-	}
-
-	ze_for_each(LOD, LODs)
-	{
-		RemoveLOD(LOD.GetPointer());
-		delete LOD.GetPointer();
-	}
-
-	DirtyFlags.RaiseAll();
+	return Resource;
 }
 
 ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
@@ -849,7 +861,6 @@ ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
 	Model = NULL;
 	Parent = NULL;
 	Visible = true;
-	MeshResource = NULL;
 
 	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
@@ -874,4 +885,10 @@ ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
 ZEModelMesh::~ZEModelMesh()
 {
 	Unload();
+
+	if (GetParent() == NULL)
+		GetParent()->RemoveChildMesh(this);
+	
+	if (GetModel() != NULL)
+		GetModel()->RemoveMesh(this);
 }
