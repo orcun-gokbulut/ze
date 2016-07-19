@@ -48,6 +48,7 @@ class ZETaskThread : public ZEThread
 		ZETask*					Task;
 		ZEUInt					InstanceIndex;
 		ZELink<ZETaskThread>	PoolLink;
+		bool					TaskDestroyed;
 
 		void					SetInstanceIndex(ZEUInt InstanceIndex);
 		void					SetTask(ZETask* Task);

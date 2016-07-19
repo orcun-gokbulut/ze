@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEModelResource.cpp
+ Zinek Engine - ZEMDResource.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,16 +33,23 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEModelResource.h"
+#include "ZEMDResource.h"
+
+#include "ZEMDResourceMesh.h"
+#include "ZEMDResourceBone.h"
+#include "ZEMDResourceAnimation.h"
+#include "ZEMDResourceHelper.h"
+#include "ZEMDResourceLOD.h"
 
 #include "ZEError.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZEResource/ZERSHolder.h"
+#include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
-#include "ZEFile/ZEFileInfo.h"
 #include "ZERenderer/ZERNFixedMaterial.h"
+#include "ZEResource/ZERSTemplates.h"
 
-static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
+static void CalculateBoundingBox(ZEMDResourceMesh* Mesh)
 {
 	if (Mesh == NULL)
 		return;
@@ -88,7 +95,7 @@ static void CalculateBoundingBox(ZEModelResourceMesh* Mesh)
 	Mesh->SetBoundingBox(BoundingBox);
 }
 
-bool ZEModelResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
+bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 {
 	zeCheckError(!MeshesNode.IsValid(), false, "Invalid Meshes node.");
 	zeCheckError(MeshesNode.GetName() != "Meshes", false, "Invalid Meshes node name.");
@@ -100,7 +107,7 @@ bool ZEModelResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 		if (!MeshNode.IsValid())
 			return false;
 
-		ZEPointer<ZEModelResourceMesh> Mesh = new ZEModelResourceMesh();
+		ZEPointer<ZEMDResourceMesh> Mesh = new ZEMDResourceMesh();
 		if (!Mesh->Load(MeshNode))
 			return false;
 
@@ -110,7 +117,7 @@ bool ZEModelResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 	return true;
 }
 
-bool ZEModelResource::ReadBones(const ZEMLReaderNode& BonesNode)
+bool ZEMDResource::ReadBones(const ZEMLReaderNode& BonesNode)
 {
 	zeCheckError(!BonesNode.IsValid(), false, "Invalid Bones node.");
 	zeCheckError(BonesNode.GetName() != "Bones", false, "Invalid Bones node name.");
@@ -122,7 +129,7 @@ bool ZEModelResource::ReadBones(const ZEMLReaderNode& BonesNode)
 		if (!BoneNode.IsValid())
 			return false;
 
-		ZEPointer<ZEModelResourceBone> Bone = new ZEModelResourceBone();
+		ZEPointer<ZEMDResourceBone> Bone = new ZEMDResourceBone();
 		if (!Bone->Load(BoneNode))
 			return false;
 
@@ -132,7 +139,7 @@ bool ZEModelResource::ReadBones(const ZEMLReaderNode& BonesNode)
 	return true;
 }
 
-bool ZEModelResource::ReadHelpers(const ZEMLReaderNode& HelpersNode)
+bool ZEMDResource::ReadHelpers(const ZEMLReaderNode& HelpersNode)
 {
 	zeCheckError(!HelpersNode.IsValid(), false, "Invalid Helpers node.");
 	zeCheckError(HelpersNode.GetName() != "Helpers", false, "Invalid Helpers node name.");
@@ -144,7 +151,7 @@ bool ZEModelResource::ReadHelpers(const ZEMLReaderNode& HelpersNode)
 		if (!HelperNode.IsValid())
 			return false;
 
-		ZEPointer<ZEModelResourceHelper> Helper = new ZEModelResourceHelper();
+		ZEPointer<ZEMDResourceHelper> Helper = new ZEMDResourceHelper();
 		if (!Helper->Load(HelperNode))
 			return false;
 
@@ -154,7 +161,7 @@ bool ZEModelResource::ReadHelpers(const ZEMLReaderNode& HelpersNode)
 	return true;
 }
 
-bool ZEModelResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
+bool ZEMDResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 {
 	zeCheckError(!AnimationsNode.IsValid(), false, "Invalid Animations node.");
 	zeCheckError(AnimationsNode.GetName() != "Animations", false, "Invalid Animations node name.");
@@ -167,7 +174,7 @@ bool ZEModelResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 		if (!AnimationNode.IsValid())
 			return false;
 
-		ZEPointer<ZEModelResourceAnimation> Animation = new ZEModelResourceAnimation();
+		ZEPointer<ZEMDResourceAnimation> Animation = new ZEMDResourceAnimation();
 		if (!Animation->Load(AnimationNode))
 			return false;
 
@@ -177,7 +184,7 @@ bool ZEModelResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 	return true;
 }
 
-bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
+bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 {
 	zeCheckError(!MaterialsNode.IsValid(), false, "Invalid Materials node.");
 	zeCheckError(MaterialsNode.GetName() != "Materials", false, "Invalid Materials node name.");
@@ -187,7 +194,7 @@ bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
 		ZEMLReaderNode MaterialNode = MaterialsNode.GetNode("Material", I);
-		ZEString MaterialPath = ZEFileInfo(this->GetFilePath()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
+		ZEString MaterialPath = ZEFileInfo(this->GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
 
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
@@ -209,20 +216,16 @@ bool ZEModelResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 	return true;
 }
 
-bool ZEModelResource::LoadInternal(const ZERSLoadingOptions* Option)
+ZETaskResult ZEMDResource::LoadInternal()
 {
 	ZEMLReader Reader;
-	if (!Reader.Open(GetFilePath()))
-		return false;
+	if (!Reader.Open(GetFileName()))
+		return ZE_TR_FAILED;
 
-	return Load(Reader.GetRootNode());
-}
+	ZEMLReaderNode ModelNode = Reader.GetRootNode();
 
-bool ZEModelResource::Load(const ZEMLReaderNode& ModelNode)
-{
-	zeCheckError(!ModelNode.IsValid(), false, "Invalid Model node.");
-	zeCheckError(ModelNode.GetName() != "ZEModel", false, "Invalid Model node name.");
-
+	zeCheckError(!ModelNode.IsValid(), ZE_TR_FAILED, "Invalid Model node.");
+	zeCheckError(ModelNode.GetName() != "ZEModel", ZE_TR_FAILED, "Invalid Model node name.");
 
 	ZEMLReaderNode UserDefinedBoundingBoxNode = ModelNode.GetNode("UserDefinedBoundingBox");
 	if (UserDefinedBoundingBoxNode.IsValid())
@@ -240,135 +243,140 @@ bool ZEModelResource::Load(const ZEMLReaderNode& ModelNode)
 	if (MeshesNode.IsValid())
 	{
 		if (!ReadMeshes(MeshesNode))
-			return false;
+			return ZE_TR_FAILED;
 	}
 
 	ZEMLReaderNode BonesNode = ModelNode.GetNode("Bones");
 	if (BonesNode.IsValid())
 	{
 		if (!ReadBones(BonesNode))
-			return false;
+			return ZE_TR_FAILED;
 	}
 
 	ZEMLReaderNode HelpersNode = ModelNode.GetNode("Helpers");
 	if (HelpersNode.IsValid())
 	{
 		if (!ReadHelpers(HelpersNode))
-			return false;
+			return ZE_TR_FAILED;
 	}
 
 	ZEMLReaderNode AnimationsNode = ModelNode.GetNode("Animations");
 	if (AnimationsNode.IsValid())
 	{
 		if (!ReadAnimations(AnimationsNode))
-			return false;
+			return ZE_TR_FAILED;
 	}
 
 	ZEMLReaderNode MaterialsNode = ModelNode.GetNode("Materials");
 	if (MaterialsNode.IsValid())
 	{
 		if (!ReadMaterials(MaterialsNode))
-			return false;
+			return ZE_TR_FAILED;
 	}
 
-	return true;
+	return ZE_TR_DONE;
 }
 
-bool ZEModelResource::GetUserDefinedBoundingBoxEnabled() const
+ZETaskResult ZEMDResource::UnloadInternal()
+{
+	return ZE_TR_DONE;
+}
+
+bool ZEMDResource::GetUserDefinedBoundingBoxEnabled() const
 {
 	return BoundingBoxIsUserDefined;
 }
 
-const ZEAABBox& ZEModelResource::GetUserDefinedBoundingBox() const
+const ZEAABBox& ZEMDResource::GetUserDefinedBoundingBox() const
 {
 	return UserDefinedBoundingBox;
 }
 
-const ZEList2<ZEModelResourceMesh>& ZEModelResource::GetMeshes()
+const ZEList2<ZEMDResourceMesh>& ZEMDResource::GetMeshes()
 {
 	return Meshes;
 }
 
-const ZEList2<const ZEModelResourceMesh>& ZEModelResource::GetMeshes() const
+const ZEList2<const ZEMDResourceMesh>& ZEMDResource::GetMeshes() const
 {
 	return Meshes.ToInspector();
 }
 
-void ZEModelResource::AddMesh(ZEModelResourceMesh* Mesh)
+void ZEMDResource::AddMesh(ZEMDResourceMesh* Mesh)
 {
 	zeCheckError(Mesh->Link.GetInUse(), ZE_VOID, "Mesh already added to a resource.");
 	Meshes.AddEnd(&Mesh->Link);
 }
 
-void ZEModelResource::RemoveMesh(ZEModelResourceMesh* Mesh)
+void ZEMDResource::RemoveMesh(ZEMDResourceMesh* Mesh)
 {
 	Meshes.Remove(&Mesh->Link);
 }
 
-const ZEList2<ZEModelResourceBone>& ZEModelResource::GetBones() 
+const ZEList2<ZEMDResourceBone>& ZEMDResource::GetBones() 
 {
 	return Bones;
 }
 
-const ZEList2<const ZEModelResourceBone>& ZEModelResource::GetBones() const
+const ZEList2<const ZEMDResourceBone>& ZEMDResource::GetBones() const
 {
 	return Bones.ToInspector();
 }
 
-void ZEModelResource::AddBone(ZEModelResourceBone* Bone)
+void ZEMDResource::AddBone(ZEMDResourceBone* Bone)
 {
 	zeCheckError(Bone->Link.GetInUse(), ZE_VOID, "Bone already added to a resource.");
 	Bones.AddEnd(&Bone->Link);
 }
 
-void ZEModelResource::RemoveBone(ZEModelResourceBone* Bone)
+void ZEMDResource::RemoveBone(ZEMDResourceBone* Bone)
 {
 	Bones.Remove(&Bone->Link);
 }
 
-const ZEList2<ZEModelResourceAnimation>& ZEModelResource::GetAnimations()
+const ZEList2<ZEMDResourceAnimation>& ZEMDResource::GetAnimations()
 {
 	return Animations;
 }
 
-const ZEList2<const ZEModelResourceAnimation>& ZEModelResource::GetAnimations() const
+const ZEList2<const ZEMDResourceAnimation>& ZEMDResource::GetAnimations() const
 {
 	return Animations.ToInspector();
 }
 
-void ZEModelResource::AddAnimation(ZEModelResourceAnimation* Animation)
+void ZEMDResource::AddAnimation(ZEMDResourceAnimation* Animation)
 {
 	zeCheckError(Animation->Link.GetInUse(), ZE_VOID, "Animation already added to a resource.");
 	Animations.AddEnd(&Animation->Link);
 }
 
-void ZEModelResource::RemoveAnimation(ZEModelResourceAnimation* Animation)
+void ZEMDResource::RemoveAnimation(ZEMDResourceAnimation* Animation)
 {
 	Animations.Remove(&Animation->Link);
 }
 
-const ZEList2<const ZEModelResourceHelper>& ZEModelResource::GetHelpers() const
+const ZEList2<const ZEMDResourceHelper>& ZEMDResource::GetHelpers() const
 {
 	return Helpers.ToInspector();
 }
 
-void ZEModelResource::AddHelper(ZEModelResourceHelper* Helper)
+void ZEMDResource::AddHelper(ZEMDResourceHelper* Helper)
 {
 	zeCheckError(Helper->Link.GetInUse(), ZE_VOID, "Helper is already added to a resource.");
 	Helpers.AddEnd(&Helper->Link);
 }
 
-void ZEModelResource::RemoveHelper(ZEModelResourceHelper* Helper)
+void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 {
 	Helpers.Remove(&Helper->Link);
 }
 
-ZEModelResource::ZEModelResource()
+ZEMDResource::ZEMDResource()
 {
-	SetLoadMethod(ZERS_LM_ASYNC);
+
 }
 
-ZEModelResource::~ZEModelResource()
+ZEMDResource::~ZEMDResource()
 {
 	ze_for_each(Mesh, Meshes)
 	{
@@ -395,43 +403,12 @@ ZEModelResource::~ZEModelResource()
 	}
 }
 
-ZEHolder<ZEModelResource> ZEModelResource::Load(const ZEString& FileName)
+ZERSHolder<ZEMDResource> ZEMDResource::LoadResource(const ZEString& FileName)
 {
-	bool Result;
-	ZEFile ResourceFile;
-	Result = ResourceFile.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-	if (Result)
-	{
-		ZEModelResource* NewResource = new ZEModelResource();
-		NewResource->SetFilePath(FileName);
-		NewResource->SetCached(false);
-		/*NewResource->ReferenceCount = 0;*/
+	return ZERSTemplates::LoadResource<ZEMDResource>(FileName);
+}
 
-		ZEMLReader ModelReader;
-
-		if (!ModelReader.Open(&ResourceFile))
-			return false;
-
-		ZEMLReaderNode ModelNode = ModelReader.GetRootNode();
-		if (!ModelNode.IsValid())
-			return false;
-
-		if (!NewResource->Load(ModelNode))
-		{
-			zeError("Can not load model file. (FileName : \"%s\")", FileName.ToCString());
-			ResourceFile.Close();
-			delete NewResource;
-			return NULL;
-		}
-		else
-		{
-			ResourceFile.Close();
-			return NewResource;
-		}
-	}
-	else
-	{
-		zeError("Model file does not exists. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
+ZERSHolder<const ZEMDResource> ZEMDResource::LoadResourceShared(const ZEString& FileName)
+{
+	return ZERSTemplates::LoadResourceShared<ZEMDResource>(FileName);
 }

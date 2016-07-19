@@ -150,8 +150,6 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	ReferenceCount = 0;
 	memset(MemoryUsage, 0, sizeof(MemoryUsage));
 	memset(MemoryUsageSelf, 0, sizeof(MemoryUsage));
-
-	ZERSResourceManager::GetInstance()->RegisterResource(this);
 }
 
 ZERSResource::~ZERSResource()
@@ -164,8 +162,6 @@ ZERSResource::~ZERSResource()
 
 	if (Parent != NULL)
 		Parent->RemoveChildResource(this);
-
-	ZERSResourceManager::GetInstance()->UnregisterResource(this);
 }
 
 ZERSResource* ZERSResource::GetParent()

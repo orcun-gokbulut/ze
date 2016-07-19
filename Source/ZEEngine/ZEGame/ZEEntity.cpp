@@ -35,16 +35,16 @@
 
 #include "ZEEntity.h"
 
+#include "ZEScene.h"
+
 #include "ZEError.h"
 #include "ZEDS/ZEVariant.h"
 #include "ZEMath/ZERay.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEViewVolume.h"
+#include "ZEMeta/ZEProvider.h"
 #include "ZEML/ZEMLWriter.h"
 #include "ZEML/ZEMLReader.h"
-#include "ZEMeta/ZEProvider.h"
-
-#include "ZEScene.h"
 #include "ZERenderer/ZERNView.h"
 
 #define ZE_EDF_LOCAL_TRANSFORM					0x0001
@@ -149,7 +149,6 @@ void ZEEntity::RemoveComponent(ZEEntity* Entity)
 	Entity->SetScene(NULL);
 }
 
-
 void ZEEntity::ClearComponents()
 {
 	for (ZESSize I = Components.GetCount() - 1; I >= 0; I--)
@@ -158,7 +157,6 @@ void ZEEntity::ClearComponents()
 
 bool ZEEntity::AddChildEntity(ZEEntity* Entity)
 {
-	// [Operation failed]. [Explanation]. [Markers1: \"Marker Value\", Marker2: MarkerValue2,...]
 	zeCheckError(Entity == NULL, false, "Cannot add child entity. Child Entity is NULL.");
 	zeCheckError(Entity->Parent != NULL, false, 
 		"Can not add child entity. Child entity belongs to another Entity. Parent Entity Name: \"%s\", Child Entity Name: \"%s\".", 
@@ -204,7 +202,7 @@ void ZEEntity::RemoveChildEntity(ZEEntity* Entity)
 		ChildEntities.RemoveValue(Entity);
 	}
 
-	Entity->Parent = NULL;
+	Entity->SetParent(NULL);
 	Entity->SetScene(NULL);
 }
 
@@ -256,10 +254,10 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 
 ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 {
-	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
+	zeLog("%s::ManageStates, State: %s, TargetState:%s", 
 		GetName().ToCString(), 
 		ZEEntityState_Declaration()->ToText(State, "Unknown"), 
-		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));*/
+		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));
 
 	if (State == ZE_ES_NONE)
 	{
@@ -274,6 +272,23 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 
 			return ZE_TR_COOPERATING;
 		}
+		else if (TargetState == ZE_ES_DESTROYED)
+		{
+			TargetState = ZE_ES_DESTROYING;
+
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Destroy();
+
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Destroy();
+		}
+	}
+	else if (State == ZE_ES_DESTROYING)
+	{
+		if (ChildEntities.GetCount() != 0 || Components.GetCount() != 0)
+			return ZE_TR_COOPERATING;
+
+		State = ZE_ES_DESTROYED;
 	}
 	else if (State == ZE_ES_LOADED)
 	{
@@ -286,9 +301,6 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 
 			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 				ChildEntities[I]->Unload();
-
-
-			return ZE_TR_COOPERATING;
 		}
 		else if (TargetState == ZE_ES_INITIALIZED)
 		{
@@ -299,8 +311,6 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 
 			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 				ChildEntities[I]->Initialize();
-
-			return ZE_TR_COOPERATING;
 		}
 	}
 	else if (State == ZE_ES_INITIALIZED)
@@ -314,11 +324,10 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 
 			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 				ChildEntities[I]->Deinitialize();
-
-			return ZE_TR_COOPERATING;
 		}
 	}
-	else if (State == ZE_ES_LOADING)
+	
+	if (State == ZE_ES_LOADING)
 	{
 		ZEEntityResult Result = LoadInternal();
 		if (Result == ZE_ER_DONE)
@@ -341,7 +350,7 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 		ZEEntityResult Result = UnloadInternal();
 		if (Result == ZE_ER_DONE)
 		{
-			State = ZE_ES_NOT_LOADED;
+			State = ZE_ES_NONE;
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -377,7 +386,7 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 		ZEEntityResult Result = DeinitializeInternal();
 		if (Result == ZE_ER_DONE)
 		{
-			State = ZE_ES_LOADED;
+			State = ZE_ES_NONE;
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -389,6 +398,10 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 			State = ZE_ES_ERROR_DEINITIALIZATION;
 			return ZE_TR_FAILED;
 		}
+	}
+	else if (State == ZE_ES_DESTROYED)
+	{
+		delete this;
 	}
 
 	return ZE_TR_DONE;
@@ -455,7 +468,7 @@ ZEEntity::ZEEntity()
 	Enabled = true;
 	Visible = true;
 	SerialOperation = true;
-	State = ZE_ES_NOT_INITIALIZED;
+	State = ZE_ES_NONE;
 	ManageTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, ManageStates, this));
 	Wrapper = NULL;
 	LocalTransformChanged();
@@ -464,6 +477,8 @@ ZEEntity::ZEEntity()
 ZEEntity::~ZEEntity()
 {
 	Unload();
+
+	while(State >= ZE_ES_NONE);
 
 	if (Parent != NULL)
 	{
@@ -755,7 +770,7 @@ ZEEntityState ZEEntity::GetState() const
 
 bool ZEEntity::IsLoaded() const
 {
-	return State >= ZE_ES_LOADED && State != ZE_ES_ERROR_LOADING && State != ZE_ES_ERROR_UNLOADING;
+	return State >= ZE_ES_LOADED;
 }
 
 bool ZEEntity::IsInitialized() const
@@ -763,9 +778,17 @@ bool ZEEntity::IsInitialized() const
 	return State == ZE_ES_INITIALIZED;
 }
 
+bool ZEEntity::IsFailed() const
+{
+	return State <= ZE_ES_ERROR_LOADING;
+}
+
 void ZEEntity::Initialize()
 {
 	if (TargetState == ZE_ES_INITIALIZED)
+		return;
+
+	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
 		return;
 
 	TargetState = ZE_ES_INITIALIZED;
@@ -780,6 +803,9 @@ void ZEEntity::Initialize()
 void ZEEntity::Deinitialize()
 {
 	if (TargetState == ZE_ES_DEINITIALIZED)
+		return;
+
+	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
 		return;
 
 	if (TargetState >= ZE_ES_LOADED)
@@ -798,6 +824,9 @@ void ZEEntity::Load()
 	if (TargetState == ZE_ES_LOADED)
 		return;
 
+	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
+		return;
+
 	TargetState = ZE_ES_LOADED;
 	
 	if (SerialOperation)
@@ -808,20 +837,31 @@ void ZEEntity::Load()
 
 void ZEEntity::Unload()
 {
-	if (TargetState == ZE_ES_NONE)
+	if (TargetState == ZE_ES_NONE || TargetState == ZE_ES_UNLOADING)
 		return;
 
+	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
+		return;
+
+	while(State == ZE_ES_LOADING || State == ZE_ES_LOADING);
+
 	TargetState = ZE_ES_NONE;
-	
-	if (SerialOperation)
-		ManagetStatesSerial();
-	else
-		ManageTask.Run();
+	ManagetStatesSerial();
+}
+
+void ZEEntity::Destroy()
+{
+	if (GetParent() != NULL)
+		GetParent()->RemoveChildEntity(this);
+	else if (GetScene() != NULL)
+		GetScene()->RemoveEntity(this);
+
+	TargetState = ZE_ES_DESTROYED;
 }
 
 void ZEEntity::Tick(float Time)
 {
-
+	   
 }
 
 bool ZEEntity::PreRender(const ZERNPreRenderParameters* Parameters)

@@ -46,55 +46,55 @@
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEModelResourceBone : public ZEObject
+class ZEMDResourceBone : public ZEObject
 {
 	ZE_OBJECT
-	friend class ZEModelResource;
+	friend class ZEMDResource;
 	private:
-		ZELink<ZEModelResourceBone> Link;
+		ZELink<ZEMDResourceBone>				Link;
 
-		ZEString Name;
-		ZEInt32 ParentBone;
-		ZEVector3 Position;
-		ZEQuaternion Rotation;
-		ZEVector3 Scale;
-		ZEAABBox BoundingBox;
-		ZEModelResourcePhysicalBody PhysicalBody;
-		ZEModelResourcePhysicalJoint PhysicalJoint;
-		ZEString UserDefinedProperties;
+		ZEString								Name;
+		ZEInt32									ParentBone;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
+		ZEVector3								Scale;
+		ZEAABBox								BoundingBox;
+		ZEMDResourcePhysicalBody				PhysicalBody;
+		ZEMDResourcePhysicalJoint			PhysicalJoint;
+		ZEString								UserDefinedProperties;
 
 	public:
-		void SetName(const ZEString& Name);
-		const ZEString& GetName() const;
+		void									SetName(const ZEString& Name);
+		const ZEString&							GetName() const;
 
-		void SetBoundingBox(const ZEAABBox& BoundingBox);
-		const ZEAABBox& GetBoundingBox() const;
+		void									SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox&							GetBoundingBox() const;
 
-		void SetParentBone(ZEInt32 ParentBone);
-		ZEInt32 GetParentBone() const;
+		void									SetParentBone(ZEInt32 ParentBone);
+		ZEInt32									GetParentBone() const;
 
-		void SetPosition(const ZEVector3& Position);
-		const ZEVector3& GetPosition() const;
+		void									SetPosition(const ZEVector3& Position);
+		const ZEVector3&						GetPosition() const;
 
-		void SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion& GetRotation() const;
+		void									SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&						GetRotation() const;
 
-		void SetScale(const ZEVector3& Scale);
-		const ZEVector3& GetScale() const;
+		void									SetScale(const ZEVector3& Scale);
+		const ZEVector3&						GetScale() const;
 
-		void SetPhysicalJoint(const ZEModelResourcePhysicalBody& Body);
-		const ZEModelResourcePhysicalBody& GetPhysicalBody() const;
-		ZEModelResourcePhysicalBody& GetPhysicalBody();
+		void									SetPhysicalJoint(const ZEMDResourcePhysicalBody& Body);
+		const ZEMDResourcePhysicalBody&		GetPhysicalBody() const;
+		ZEMDResourcePhysicalBody&			GetPhysicalBody();
 
-		void SetPhysicalJoint(const ZEModelResourcePhysicalJoint& Joint);
-		const ZEModelResourcePhysicalJoint& GetPhysicalJoint() const;
-		ZEModelResourcePhysicalJoint& GetPhysicalJoint();
+		void									SetPhysicalJoint(const ZEMDResourcePhysicalJoint& Joint);
+		const ZEMDResourcePhysicalJoint&		GetPhysicalJoint() const;
+		ZEMDResourcePhysicalJoint&			GetPhysicalJoint();
 
-		void SetUserDefinedProperties(const ZEString& UserDefinedProperties);
-		const ZEString& GetUserDefinedProperties() const;
+		void									SetUserDefinedProperties(const ZEString& UserDefinedProperties);
+		const ZEString&							GetUserDefinedProperties() const;
 
-		bool Load(const ZEMLReaderNode& BoneNode);
-		bool Save(ZEMLWriterNode& BoneNode) const;
+		bool									Load(const ZEMLReaderNode& BoneNode);
+		bool									Save(ZEMLWriterNode& BoneNode) const;
 
-		ZEModelResourceBone();
+												ZEMDResourceBone();
 };

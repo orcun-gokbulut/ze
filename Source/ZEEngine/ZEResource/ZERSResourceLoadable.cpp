@@ -41,13 +41,23 @@
 
 ZETaskResult ZERSResourceLoadable::ManageStatesFunction(ZETaskThread* TaskThread, void* Parameters)
 {
-	if (LoadState == ZERS_LS_LOADED && TargetState == ZERS_LS_NOT_LOADED)
+	if (LoadState == ZERS_LS_LOADED && (TargetState == ZERS_LS_NONE || TargetState == ZERS_LS_DESTROYED))
 	{
 		LoadState = ZERS_LS_UNLOADING;
 	}
-	else if (LoadState == ZERS_LS_NOT_LOADED && TargetState == ZERS_LS_LOADED)
+	else if (LoadState == ZERS_LS_NONE)
 	{
-		LoadState = ZERS_LS_LOADING;
+		if (TargetState == ZERS_LS_LOADED)
+			LoadState = ZERS_LS_LOADING;
+		else if (TargetState == ZERS_LS_DESTROYED)
+			LoadState = ZERS_LS_DESTROYING;
+	}
+	else if (LoadState == ZERS_LS_ERROR_LOADING || LoadState == ZERS_LS_ERROR_UNLOADING)
+	{
+		if (TargetState == ZERS_LS_DESTROYED)
+			LoadState = ZERS_LS_DESTROYING;
+		else
+			return ZE_TR_DONE;
 	}
 	
 	if (LoadState == ZERS_LS_LOADING)
@@ -63,7 +73,7 @@ ZETaskResult ZERSResourceLoadable::ManageStatesFunction(ZETaskThread* TaskThread
 		{
 			zeError("Resource loading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
 			LoadState = ZERS_LS_ERROR_LOADING;
-			return ZE_TR_DONE;
+			return ZE_TR_COOPERATING;
 		}
 		else
 		{
@@ -76,22 +86,31 @@ ZETaskResult ZERSResourceLoadable::ManageStatesFunction(ZETaskThread* TaskThread
 		if (Result == ZE_TR_DONE)
 		{
 			zeLog("Resource unloaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-			LoadState = ZERS_LS_NOT_LOADED;
+			LoadState = ZERS_LS_NONE;
 			return ZE_TR_DONE;
 		}
 		else if (Result == ZE_TR_FAILED)
 		{
 			zeError("Resource unloading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
 			LoadState = ZERS_LS_ERROR_UNLOADING;
-			return ZE_TR_DONE;
+			return ZE_TR_COOPERATING;
 		}
 		else
 		{
 			return Result;
 		}
 	}
+	else if (LoadState == ZERS_LS_DESTROYING)
+	{
+		delete this;
+	}
 
 	return ZE_TR_DONE;
+}
+
+void ZERSResourceLoadable::Destroy() const
+{
+
 }
 
 ZETaskResult ZERSResourceLoadable::LoadInternal()
@@ -106,8 +125,8 @@ ZETaskResult ZERSResourceLoadable::UnloadInternal()
 
 ZERSResourceLoadable::ZERSResourceLoadable()
 {
-	LoadState = ZERS_LS_NOT_LOADED;
-	TargetState = ZERS_LS_NOT_LOADED;
+	LoadState = ZERS_LS_NONE;
+	TargetState = ZERS_LS_NONE;
 	FileNameHash = 0;
 	ManageStatesTask.SetPool(ZE_TPI_IO);
 	ManageStatesTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResourceLoadable, ManageStatesFunction, this));
@@ -116,6 +135,7 @@ ZERSResourceLoadable::ZERSResourceLoadable()
 ZERSResourceLoadable::~ZERSResourceLoadable()
 {
 	Unload();
+	ManageStatesTask.Wait();
 }
 
 ZERSResourceType ZERSResourceLoadable::GetType() const
@@ -133,12 +153,12 @@ const ZEString& ZERSResourceLoadable::GetFileName() const
 	return FileName;
 }
 
-bool ZERSResourceLoadable::IsLoaded()
+bool ZERSResourceLoadable::IsLoaded() const
 {
 	return LoadState == ZERS_LS_LOADED;
 }
 
-bool ZERSResourceLoadable::IsFailed()
+bool ZERSResourceLoadable::IsFailed() const
 {
 	return LoadState == ZERS_LS_ERROR_LOADING || LoadState == ZERS_LS_ERROR_UNLOADING;
 }
@@ -148,12 +168,12 @@ void ZERSResourceLoadable::Load(const ZEString& FileName)
 	if (LoadState == ZERS_LS_LOADING || LoadState == ZERS_LS_LOADED)
 		return;
 
-	zeCheckError(IsShared(), ZE_VOID, "Shared resources cannot be loaded again. File Name: \"%s\".", FileName.ToCString());
-
-	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+	if (LoadState == ZERS_LS_DESTROYING || LoadState == ZERS_LS_DESTROYED)
+		return;
 
 	this->FileName = ZEPathInfo(FileName).Normalize();
 	FileNameHash = this->FileName.Lower().Hash();
+	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
 
 	TargetState = ZERS_LS_LOADED;
 	ManageStatesTask.Run();
@@ -161,12 +181,15 @@ void ZERSResourceLoadable::Load(const ZEString& FileName)
 
 void ZERSResourceLoadable::Unload()
 {
-	if (LoadState == ZERS_LS_NOT_LOADED || LoadState == ZERS_LS_UNLOADING)
+	if (LoadState == ZERS_LS_NONE || LoadState == ZERS_LS_UNLOADING)
+		return;
+
+	if (LoadState == ZERS_LS_DESTROYING || LoadState == ZERS_LS_DESTROYED)
 		return;
 
 	zeLog("Unloading resource. Resource Class: \"%s\", File Name: \"%s\".", GetClass()->GetName(), this->FileName.ToCString());
 	
-	TargetState = ZERS_LS_NOT_LOADED;
+	TargetState = ZERS_LS_NONE;
 	ManageStatesTask.Run();
 }
 

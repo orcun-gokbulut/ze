@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETask.cpp
+ Zinek Engine - ZEMDResourceDraw.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,99 +33,61 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETask.h"
-#include "ZETaskThread.h"
-#include "ZETaskPool.h"
-#include "ZETaskManager.h"
+#include "ZEMDResourceDraw.h"
 
-ZETaskStatus ZETask::GetStatus() const
+#include "ZEError.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZERenderer/ZERNMaterial.h"
+
+
+void ZEMDResourceDraw::SetOffset(ZESize PoligonOffset)
 {
-	return Status;
+	this->Offset = PoligonOffset;
 }
 
-void ZETask::SetName(const ZEString& Name)
+ZESize ZEMDResourceDraw::GetOffset() const 
 {
-	this->Name = Name;
+	return Offset;
 }
 
-const ZEString ZETask::GetName() const
+void ZEMDResourceDraw::SetCount(ZESize PoligonCount)
 {
-	return Name;
+	this->Count = PoligonCount;
 }
 
-void ZETask::SetPriority(ZEInt Priority)
+ZESize ZEMDResourceDraw::GetCount() const 
 {
-	this->Priority = Priority;
+	return Count;
 }
 
-ZEInt ZETask::GetPriority() const
+void ZEMDResourceDraw::SetMaterial(ZEHolder<ZERNMaterial> Material)
 {
-	return Priority;
+	this->Material = Material;
 }
 
-void ZETask::SetFunction(const ZETaskFunction& Function)
+ZEHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
 {
-	this->Function = Function;
+	return Material;
 }
 
-const ZETaskFunction& ZETask::GetFunction() const
+bool ZEMDResourceDraw::Load(ZEMLReaderNode& DrawNode)
 {
-	return Function;
+	zeCheckError(!DrawNode.IsValid(), false, "Invalid Draw node.");
+	zeCheckError(DrawNode.GetName() != "Draw", false, "Invalid Draw node name.");
+
+	SetOffset(DrawNode.ReadUInt32("Offset", 0));
+	SetCount(DrawNode.ReadUInt32("Count", 0));
+
+	return true;
 }
 
-void ZETask::SetParameter(void* Parameters)
+bool ZEMDResourceDraw::Save(ZEMLWriterNode& DrawNode) const
 {
-	this->Parameter = Parameters;
+	return false;
 }
 
-void* ZETask::GetParameter() const
+ZEMDResourceDraw::ZEMDResourceDraw()
 {
-	return Parameter;
-}
-
-void ZETask::SetPool(ZEInt PoolId)
-{
-	PoolId = PoolId;
-}
-
-ZEInt ZETask::GetPool() const
-{
-	return PoolId;
-}
-
-void ZETask::Run()
-{
-	if (Function.IsNull())
-		return;
-
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool == NULL)
-		return;
-
-	Pool->RunTask(this);
-}
-
-void ZETask::Wait()
-{
-	if (Status == ZE_TS2_NONE)
-		return;
-
-	while(Status == ZE_TS_RUNNING);
-}
-
-ZETask::ZETask() : Link(this)
-{
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool != NULL)
-		Pool->TaskDestroyed(this);
-
-	Status = ZE_TS2_NONE;
-	Priority = 0;
-	PoolId = ZE_TPI_DEFAULT;
-	Parameter = NULL;
-}
-
-ZETask::~ZETask()
-{
-
+	Offset = 0;
+	Count = 0;
 }

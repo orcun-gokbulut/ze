@@ -34,11 +34,17 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelAnimationTrack.h"
-#include "ZEModelResource.h"
+
+#include "ZEModel.h"
 #include "ZEModelBone.h"
 #include "ZEModelMesh.h"
-#include "ZEModel.h"
-#include "ZEMath\ZEMath.h"
+#include "ZEMDResource.h"
+#include "ZEMDResourceAnimation.h"
+#include "ZEMDResourceBone.h"
+#include "ZEMDResourceMesh.h"
+
+#include "ZEMath/ZEMath.h"
+
 #include <string.h>
 
 void ZEModelAnimationTrack::BindAnimation()
@@ -86,14 +92,14 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 	}
 
 	// Get frames
-	const ZEModelResourceAnimationFrame* Frame = &Animation->GetFrames()[(ZESize)ZEMath::Floor(CurrentFrame)];
-	const ZEModelResourceAnimationFrame* NextFrame = &Animation->GetFrames()[NextFrameId]; //Looping bugu olabilir arrayden circular ile alımmalımı looping ise?
+	const ZEMDResourceAnimationFrame* Frame = &Animation->GetFrames()[(ZESize)ZEMath::Floor(CurrentFrame)];
+	const ZEMDResourceAnimationFrame* NextFrame = &Animation->GetFrames()[NextFrameId]; //Looping bugu olabilir arrayden circular ile alımmalımı looping ise?
 
 	// Update Bones 
 	for (ZESize I = 0; I < Frame->BoneKeys.GetCount(); I++)
 	{
-		const ZEModelResourceAnimationKey* Key = &Frame->BoneKeys[I];
-		const ZEModelResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
+		const ZEMDResourceAnimationKey* Key = &Frame->BoneKeys[I];
+		const ZEMDResourceAnimationKey* NextKey = &NextFrame->BoneKeys[I];
 
 		ZESize ItemId = (ZESize)Key->ItemId;
 
@@ -120,14 +126,15 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 			// Select blending mode
 			switch(BlendMode)
 			{
-			case ZE_MABM_INTERPOLATE:
-				ZEVector3::Lerp(PositionBlend, Model->Bones[ItemId]->GetPosition(), Position, BlendFactor);
-				ZEQuaternion::Slerp(RotationBlend, Model->Bones[ItemId]->GetRotation(), Rotation, BlendFactor);
-				break;
-			case ZE_MABM_ADDITIVE:		
-				PositionBlend = Model->Bones[ItemId]->GetPosition() + (Position - Model->Resource->GetBones()[ItemId]->GetPosition()) * BlendFactor;
-				RotationBlend = Model->Bones[ItemId]->GetRotation() * (Model->Resource->GetBones()[ItemId]->GetRotation().Conjugate() * Rotation);
-				break;
+				case ZE_MABM_INTERPOLATE:
+					ZEVector3::Lerp(PositionBlend, Model->Bones[ItemId]->GetPosition(), Position, BlendFactor);
+					ZEQuaternion::Slerp(RotationBlend, Model->Bones[ItemId]->GetRotation(), Rotation, BlendFactor);
+					break;
+
+				case ZE_MABM_ADDITIVE:		
+					PositionBlend = Model->Bones[ItemId]->GetPosition() + (Position - Model->Resource->GetBones()[ItemId]->GetPosition()) * BlendFactor;
+					RotationBlend = Model->Bones[ItemId]->GetRotation() * (Model->Resource->GetBones()[ItemId]->GetRotation().Conjugate() * Rotation);
+					break;
 			}
 
 			// Update bone
@@ -140,8 +147,8 @@ void ZEModelAnimationTrack::UpdateMeshesAndBones()
 	// Mechanism is same as above (Update Bones)
 	for (ZESize I = 0; I < Frame->MeshKeys.GetCount(); I++)
 	{
-		const ZEModelResourceAnimationKey* Key = &Frame->MeshKeys[I];
-		const ZEModelResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];
+		const ZEMDResourceAnimationKey* Key = &Frame->MeshKeys[I];
+		const ZEMDResourceAnimationKey* NextKey = &NextFrame->MeshKeys[I];
 
 		ZESize ItemId = (ZESize)Key->ItemId;
 
@@ -222,14 +229,14 @@ ZEUInt ZEModelAnimationTrack::GetLOD()
 	return LOD;
 }
 
-void ZEModelAnimationTrack::SetResource(ZEHolder<const ZEModelResource> ModelResource)
+void ZEModelAnimationTrack::SetResource(ZERSHolder<const ZEMDResource> ModelResource)
 {
 	Resource = ModelResource;
 	BindAnimation();
 	ApplyLimits();
 }
 
-ZEHolder<const ZEModelResource> ZEModelAnimationTrack::GetResource()
+ZERSHolder<const ZEMDResource> ZEModelAnimationTrack::GetResource()
 {
 	return Resource;
 }

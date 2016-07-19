@@ -36,13 +36,16 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+
 #include "ZEModelMeshLOD.h"
+#include "ZEModelAnimation.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMath/ZEMatrix.h"
-#include "ZEModelAnimation.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZERNPreRenderParameters;
 class ZEGRConstantBuffer;
@@ -51,8 +54,8 @@ class ZERayCastReport;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEModelMeshLOD, "ZEModelMeshLOD.h")
-ZE_META_FORWARD_DECLARE(ZEModelResource, "ZEModelResource.h")
-ZE_META_FORWARD_DECLARE(ZEModelResourceMesh, "ZEMDResourceMesh.h")
+ZE_META_FORWARD_DECLARE(ZEMDResource, "ZEMDResource.h")
+ZE_META_FORWARD_DECLARE(ZEMDResourceMesh, "ZEMDResourceMesh.h")
 
 class ZEModelMesh : public ZEObject
 {
@@ -95,8 +98,8 @@ class ZEModelMesh : public ZEObject
 		ZEArray<ZEPlane>					ClippingPlanes;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
-		ZEHolder<const ZEModelResource>		ModelResource;
-		const ZEModelResourceMesh*			MeshResource;
+		ZERSHolder<const ZEMDResource>		ModelResource;
+		const ZEMDResourceMesh*				MeshResource;
 
 		void								SetModel(ZEModel* Model);
 		void								SetParent(ZEModelMesh* Mesh);
@@ -188,7 +191,7 @@ class ZEModelMesh : public ZEObject
 		bool								PreRender(const ZERNPreRenderParameters* Parameters);
 		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		void								Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMesh* MeshResource);
+		void								Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceMesh* MeshResource);
 		void								Unload();
 
 											ZEModelMesh();

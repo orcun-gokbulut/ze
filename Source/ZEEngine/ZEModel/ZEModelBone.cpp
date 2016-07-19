@@ -53,6 +53,7 @@
 #define ZEMD_BDF_VERTEX_TRANSFORM				0x1000
 
 #include <stdio.h>
+#include "ZEMDResourceBone.h"
 
 // void ZEModelBone::LocalTransformChanged()
 // {
@@ -594,7 +595,7 @@ void ZEModelBone::RemoveChildBone(ZEModelBone* Bone)
 	ChildBones.Remove(&Bone->ParentLink);
 }
 
-void ZEModelBone::Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceBone* BoneResource)
+void ZEModelBone::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceBone* BoneResource)
 {
 	this->Model = Model;
 	this->ModelResource = ModelResource;

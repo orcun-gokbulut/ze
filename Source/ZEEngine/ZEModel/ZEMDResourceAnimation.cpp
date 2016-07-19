@@ -36,37 +36,37 @@
 #include "ZEMDResourceAnimation.h"
 #include "ZEML\ZEMLReader.h"
 
-void ZEModelResourceAnimation::SetName(const ZEString& Name)
+void ZEMDResourceAnimation::SetName(const ZEString& Name)
 {
 	this->Name = Name;
 }
 
-const ZEString& ZEModelResourceAnimation::GetName() const
+const ZEString& ZEMDResourceAnimation::GetName() const
 {
 	return Name;
 }
 
-void ZEModelResourceAnimation::SetFrames(ZEArray<ZEModelResourceAnimationFrame>& Frames)
+void ZEMDResourceAnimation::SetFrames(ZEArray<ZEMDResourceAnimationFrame>& Frames)
 {
 	this->Frames = Frames;
 }
 
-const ZEArray<ZEModelResourceAnimationFrame>& ZEModelResourceAnimation::GetFrames() const
+const ZEArray<ZEMDResourceAnimationFrame>& ZEMDResourceAnimation::GetFrames() const
 {
 	return Frames;
 }
 
-void ZEModelResourceAnimation::AddFrame(const ZEModelResourceAnimationFrame& Frame)
+void ZEMDResourceAnimation::AddFrame(const ZEMDResourceAnimationFrame& Frame)
 {
 	Frames.AddByRef(Frame);
 }
 
-void ZEModelResourceAnimation::RemoveFrame(ZESize Index)
+void ZEMDResourceAnimation::RemoveFrame(ZESize Index)
 {
 	Frames.Remove(Index);
 }
 
-bool ZEModelResourceAnimation::Load(const ZEMLReaderNode& AnimationNode)
+bool ZEMDResourceAnimation::Load(const ZEMLReaderNode& AnimationNode)
 {
 	zeCheckError(!AnimationNode.IsValid(), false, "Invalid Animation node.");
 	zeCheckError(AnimationNode.GetName() == "Animation", false, "Invalid Animation node name.");
@@ -76,33 +76,33 @@ bool ZEModelResourceAnimation::Load(const ZEMLReaderNode& AnimationNode)
 	ZEUInt MeshKeyCount = AnimationNode.ReadUInt32("MeshKeyCount");
 	ZEUInt FrameKeyCount = BoneKeyCount + MeshKeyCount;
 
-	Frames.SetCount(((ZESize)AnimationNode.ReadDataSize("Frames") / sizeof(ZEModelResourceAnimationKey)) / (ZESize)FrameKeyCount);
+	Frames.SetCount(((ZESize)AnimationNode.ReadDataSize("Frames") / sizeof(ZEMDResourceAnimationKey)) / (ZESize)FrameKeyCount);
 
 	for (ZESize I = 0; I < Frames.GetCount(); I++)
 	{
-		ZEModelResourceAnimationFrame* CurrentAnimationFrame = &Frames[I];
+		ZEMDResourceAnimationFrame* CurrentAnimationFrame = &Frames[I];
 		CurrentAnimationFrame->BoneKeys.SetCount(BoneKeyCount);
 
 		if (BoneKeyCount != 0)
-			if (!AnimationNode.ReadDataItems("Frames", CurrentAnimationFrame->BoneKeys.GetCArray(), sizeof(ZEModelResourceAnimationKey), BoneKeyCount, (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey)))
+			if (!AnimationNode.ReadDataItems("Frames", CurrentAnimationFrame->BoneKeys.GetCArray(), sizeof(ZEMDResourceAnimationKey), BoneKeyCount, (I * FrameKeyCount) * sizeof(ZEMDResourceAnimationKey)))
 				return false;
 
 		CurrentAnimationFrame->MeshKeys.SetCount(MeshKeyCount);
 
 		if (MeshKeyCount != 0)
-			if (!AnimationNode.ReadDataItems("Frames", CurrentAnimationFrame->MeshKeys.GetCArray(), sizeof(ZEModelResourceAnimationKey), MeshKeyCount, (I * FrameKeyCount) * sizeof(ZEModelResourceAnimationKey) + BoneKeyCount * sizeof(ZEModelResourceAnimationKey)))
+			if (!AnimationNode.ReadDataItems("Frames", CurrentAnimationFrame->MeshKeys.GetCArray(), sizeof(ZEMDResourceAnimationKey), MeshKeyCount, (I * FrameKeyCount) * sizeof(ZEMDResourceAnimationKey) + BoneKeyCount * sizeof(ZEMDResourceAnimationKey)))
 				return false;
 	}
 
 	return true;
 }
 
-bool ZEModelResourceAnimation::Save(ZEMLWriterNode& AnimationNode) const
+bool ZEMDResourceAnimation::Save(ZEMLWriterNode& AnimationNode) const
 {
 	return false;
 }
 
-ZEModelResourceAnimation::ZEModelResourceAnimation() : Link(this)
+ZEMDResourceAnimation::ZEMDResourceAnimation() : Link(this)
 {
 
 }

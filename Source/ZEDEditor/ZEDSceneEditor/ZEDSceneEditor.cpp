@@ -96,12 +96,12 @@ bool ZEDSceneEditor::InitializeInternal()
 	Scene->AddEntity(Grid);
 
 // 	ZEModel* Trial = ZEModel::CreateInstance();
-// 	Trial->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+// 	Trial->SetModelResource(ZEMDResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 // 	Scene->AddEntity(Trial);
 // 
 // 	ZEModel* Trial2 = ZEModel::CreateInstance();
 // 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
-// 	Trial2->SetModelResource(ZEModelResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
+// 	Trial2->SetModelResource(ZEMDResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
 // 	Scene->AddEntity(Trial2);
 // 
 	ZELightDirectional* Light1 = ZELightDirectional::CreateInstance();

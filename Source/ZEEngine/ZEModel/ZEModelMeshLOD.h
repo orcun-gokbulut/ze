@@ -37,14 +37,16 @@
 
 #include "ZEMeta/ZEObject.h"
 
+#include "ZEMDVertex.h"
+
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
-#include "ZEMDVertex.h"
 #include "ZERenderer/ZERNCommand.h"
+#include "ZEResource/ZERSHolder.h"
 
 class ZEModel;
 class ZEModelMesh;
-class ZEModelResource;
+class ZEMDResource;
 class ZEModelResourceMeshLOD;
 class ZEGRVertexBuffer;
 class ZEGRIndexBuffer;
@@ -108,7 +110,6 @@ class ZEModelMeshLOD : public ZEObject
 
 		ZEArray<ZEModelDraw>				Draws;
 
-		ZEHolder<const ZEModelResource>		ModelResource;
 		const ZEModelResourceMeshLOD*		LODResource;
 
 	public:
@@ -148,7 +149,7 @@ class ZEModelMeshLOD : public ZEObject
 
 		void								Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
-		void								Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMeshLOD* Resource);
+		void								Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEModelResourceMeshLOD* Resource);
 		void								Unload();
 
 											ZEModelMeshLOD();

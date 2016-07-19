@@ -48,7 +48,7 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
-#include "ZEModel/ZEModelResource.h"
+#include "ZEModel/ZEMDResource.h"
 #include "ZERNCommand.h"
 #include "ZEGame/ZEEntity.h"
 #include "ZEModel/ZEModel.h"

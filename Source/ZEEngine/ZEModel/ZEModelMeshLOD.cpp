@@ -36,15 +36,17 @@
 #include "ZEModelMeshLOD.h"
 
 #include "ZEModel.h"
-#include "ZERenderer/ZERNRenderer.h"
-#include "ZEMath/ZEAngle.h"
-#include "ZEPointer/ZEHolder.h"
+#include "ZEMDResourceLOD.h"
+
 #include "ZEDS/ZEDelegate.h"
-#include "ZERenderer/ZERNRenderParameters.h"
-#include "ZERenderer/ZERNMaterial.h"
+#include "ZEMath/ZEAngle.h"
+#include "ZEResource/ZERSHolder.h"
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRIndexBuffer.h"
+#include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
+#include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNStageShadowmapGeneration.h"
 
@@ -249,11 +251,10 @@ void ZEModelMeshLOD::RemoveDraw(ZESize Index)
 	Draws.Remove(Index);
 }
 
-void ZEModelMeshLOD::Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMeshLOD* Resource)
+void ZEModelMeshLOD::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEModelResourceMeshLOD* Resource)
 {
 	this->Model = Model;
 	LODResource = Resource;
-	this->ModelResource = ModelResource;
 	SetStartDistance(Resource->GetStartDistance());
 	SetEndDistance(Resource->GetEndDistance());
 	SetVertexBufferBase(Resource->GetVertexBufferBase());
@@ -277,7 +278,6 @@ void ZEModelMeshLOD::Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelR
 void ZEModelMeshLOD::Unload()
 {
 	Model = NULL;
-	ModelResource = NULL;
 	SetStartDistance(0);
 	SetEndDistance(0);
 	SetVertexBufferBase(NULL);

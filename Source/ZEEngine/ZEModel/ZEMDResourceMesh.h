@@ -37,202 +37,74 @@
 
 #include "ZEMeta\ZEObject.h"
 
-#include "ZEMDVertex.h"
+#include "ZETypes.h"
+#include "ZEDS/ZEString.h"
+#include "ZEDS/ZEList2.h"
+#include "ZEDS/ZEArray.h"
+#include "ZEMath/ZEAABBox.h"
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEMDResourcePhysics.h"
 
-#include "ZETypes.h"
-#include "ZEDS\ZEList2.h"
-#include "ZEMath\ZEVector.h"
-#include "ZEMath\ZEQuaternion.h"
-#include "ZEMath\ZEAABBox.h"
-#include "ZEPointer\ZEHolder.h"
-#include "ZERenderer\ZERNCommand.h"
-
-class ZEMLReaderNode;
-class ZEMLWriterNode;
-class ZEGRVertexBuffer;
-class ZEGRIndexBuffer;
-class ZERNMaterial;
-
-class ZEMDResourceDraw : public ZEObject
+class ZEMDResourceMesh : public ZEObject
 {
 	ZE_OBJECT
-	private:
-		ZESize Offset;
-		ZESize Count;
-		ZEHolder<ZERNMaterial> Material;
-
-	public:
-		void SetOffset(ZESize Offset);
-		ZESize GetOffset() const;
-
-		void SetCount(ZESize Count);
-		ZESize GetCount() const;
-
-		void SetMaterial(ZEHolder<ZERNMaterial> Material);
-		ZEHolder<ZERNMaterial> GetMaterial() const;
-
-		bool Load(ZEMLReaderNode& DrawNode);
-		bool Save(ZEMLWriterNode& DrawNode) const;
-
-		ZEMDResourceDraw();
-};
-
-class ZEModelResourceMeshLOD : public ZEObject
-{
-	ZE_OBJECT
-	friend class ZEModelResourceMesh;
-	friend class ZEModelResource;
-	private:
-		ZELink<ZEModelResourceMeshLOD> Link;
-
-		ZEInt32 Level;
-		float StartDistance;
-		float EndDistance;
-		ZEArray<ZEUInt16> AffectingBoneIds;
-
-		ZEMDVertexType VertexType;
-		ZEArray<ZEMDVertex> Vertices;
-		ZEArray<ZEMDVertexSkin> VerticesSkin;
-		ZEArray<ZEMDResourceDraw> Draws;
-		
-		ZEMDVertexIndexType IndexType;
-		ZEArray<ZEUInt16> Indices;
-		ZEArray<ZEUInt32> Indices32;
-
-		ZEHolder<ZEGRVertexBuffer> VertexBufferBase;
-		ZEHolder<ZEGRVertexBuffer> VertexBufferNormals;
-		ZEHolder<ZEGRVertexBuffer> VertexBufferSkin;
-		ZEHolder<ZEGRVertexBuffer> VertexBufferExtra;
-		ZEHolder<ZEGRIndexBuffer> IndexBuffer;
-
-		ZEInt MaterialID; // Backwards Compatibility
-		ZEHolder<ZERNMaterial> Material;
-
-	public:
-		void SetLevel(ZEInt32 LODLevel);
-		ZEInt32 GetLevel() const;
-
-		void SetStartDistance(float StartDistance);
-		float GetStartDistance() const;
-
-		void SetEndDistance(float EndDistance);
-		float GetEndDistance() const;
-
-		void SetVertexType(ZEMDVertexType VertexType);
-		ZEMDVertexType GetVertexType() const;
-
-		void SetIndexType(ZEMDVertexIndexType IndexType);
-		ZEMDVertexIndexType GetIndexType() const;
-
-		void SetVertices(const ZEArray<ZEMDVertex>& Vertices);
-		const ZEArray<ZEMDVertex>& GetVertices() const;
-
-		void SetVerticesSkin(const ZEArray<ZEMDVertexSkin>& VerticesSkin);
-		const ZEArray<ZEMDVertexSkin>& GetVerticesSkin() const;
-	
-		void SetIndices(const ZEArray<ZEUInt16>& Indices);
-		const ZEArray<ZEUInt16>& GetIndices() const;
-
-		void SetIndices32(const ZEArray<ZEUInt32>& Indices);
-		const ZEArray<ZEUInt32>& GetIndices32() const;
-
-		void SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds);
-		const ZEArray<ZEUInt16>& GetAffectingBoneIds() const;
-
-		void SetVertexBufferBase(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer> GetVertexBufferBase() const;
-
-		void SetVertexBufferNormals(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer> GetVertexBufferNormals() const;
-
-		void SetVertexBufferSkin(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer> GetVertexBufferSkin() const;
-
-		void SetVertexBufferExtra(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer> GetVertexBufferExtra() const;
-
-		void SetIndexBuffer(ZEHolder<ZEGRIndexBuffer> IndexBuffer);
-		ZEHolder<ZEGRIndexBuffer> GetIndexBuffer() const;
-
-		void SetMaterialFilePath(const ZEString& MaterialFilePath);
-		const ZEString& GetMaterialFilePath();
-
-		void SetMaterial(ZEHolder<ZERNMaterial> Material);
-		ZEHolder<const ZERNMaterial> GetMaterial() const;
-
-		const ZEArray<ZEMDResourceDraw>& GetDraws() const;
-		void AddDraw(const ZEMDResourceDraw& Draw);
-		void RemoveDraw(ZESize Index);
-
-		void GenerateBuffers();
-
-		bool Load(const ZEMLReaderNode& LODNode);
-		bool Save(ZEMLWriterNode& LODNode) const;
-
-		ZEModelResourceMeshLOD();
-		~ZEModelResourceMeshLOD();
-};
-
-class ZEModelResourceMesh : public ZEObject
-{
-	ZE_OBJECT
-	friend class ZEModelResource;
+	friend class ZEMDResource;
 	friend class ZEModelResourceMeshLOD;
 	private:
-		ZELink<ZEModelResourceMesh> Link;
+		ZELink<ZEMDResourceMesh>						Link;
 
-		ZEString Name; 
-		ZEAABBox BoundingBox;
-		ZEInt32 ParentMesh;
-		ZEVector3 Position;
-		ZEQuaternion Rotation;
-		ZEVector3 Scale;
-		bool Visible;
-		bool Skinned;
-		ZEModelResourcePhysicalBody PhysicalBody;
-		ZEString UserDefinedProperties;
-		ZEList2<ZEModelResourceMeshLOD> LODs;
-		ZEArray<ZEVector3> Geometry; //Temporary
+		ZEString										Name; 
+		ZEAABBox										BoundingBox;
+		ZEInt32											ParentMesh;
+		ZEVector3										Position;
+		ZEQuaternion									Rotation;
+		ZEVector3										Scale;
+		bool											Visible;
+		bool											Skinned;
+		ZEMDResourcePhysicalBody						PhysicalBody;
+		ZEString										UserDefinedProperties;
+		ZEList2<ZEModelResourceMeshLOD>					LODs;
+		ZEArray<ZEVector3>								Geometry;
 
 	public:
-		void SetParentMesh(ZEInt32 ParentMesh);
-		ZEInt32 GetParentMesh() const;
+		void											SetParentMesh(ZEInt32 ParentMesh);
+		ZEInt32											GetParentMesh() const;
 
-		void SetName(const ZEString& Name);
-		const ZEString& GetName() const;
+		void											SetName(const ZEString& Name);
+		const ZEString&									GetName() const;
 
-		void SetBoundingBox(const ZEAABBox& BoundingBox);
-		const ZEAABBox& GetBoundingBox() const;
+		void											SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox&									GetBoundingBox() const;
 
-		void SetPosition(const ZEVector3& Position);
-		const ZEVector3& GetPosition() const;
+		void											SetPosition(const ZEVector3& Position);
+		const ZEVector3&								GetPosition() const;
 
-		void SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion& GetRotation() const;
+		void											SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&								GetRotation() const;
 
-		void SetScale(const ZEVector3& Scale);
-		const ZEVector3& GetScale() const;
+		void											SetScale(const ZEVector3& Scale);
+		const ZEVector3&								GetScale() const;
 
-		void SetVisible(bool IsVisible);
-		bool GetVisible() const;
+		void											SetVisible(bool IsVisible);
+		bool											GetVisible() const;
 
-		void SetSkinned(bool IsSkinned);
-		bool GetSkinned() const;
+		void											SetSkinned(bool IsSkinned);
+		bool											GetSkinned() const;
 
-		void SetUserDefinedProperties(const ZEString& UserDefinedProperties);
-		const ZEString& GetUserDefinedProperties() const;
+		void											SetUserDefinedProperties(const ZEString& UserDefinedProperties);
+		const ZEString&									GetUserDefinedProperties() const;
 
-		const ZEList2<ZEModelResourceMeshLOD>& GetLODs();
-		const ZEList2<const ZEModelResourceMeshLOD>& GetLODs() const;
-		void AddLOD(ZEModelResourceMeshLOD* LOD);
-		void RemoveLOD(ZEModelResourceMeshLOD* LOD);
+		const ZEList2<ZEModelResourceMeshLOD>&			GetLODs();
+		const ZEList2<const ZEModelResourceMeshLOD>&	GetLODs() const;
+		void											AddLOD(ZEModelResourceMeshLOD* LOD);
+		void											RemoveLOD(ZEModelResourceMeshLOD* LOD);
 
-		const ZEArray<ZEVector3>& GetGeometry() const;
+		const ZEArray<ZEVector3>&						GetGeometry() const;
 
-		bool Load(const ZEMLReaderNode& MeshNode);
-		bool Save(ZEMLWriterNode& MeshNode) const;
+		bool											Load(const ZEMLReaderNode& MeshNode);
+		bool											Save(ZEMLWriterNode& MeshNode) const;
 
-		ZEModelResourceMesh();
-		~ZEModelResourceMesh();
+														ZEMDResourceMesh();
+														~ZEMDResourceMesh();
 };

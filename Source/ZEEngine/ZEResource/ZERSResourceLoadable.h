@@ -44,13 +44,15 @@
 
 ZE_ENUM(ZERSLoadState)
 {
-	ZERS_LS_NOT_LOADED,
+	ZERS_LS_ERROR_LOADING,
+	ZERS_LS_ERROR_UNLOADING,
+	ZERS_LS_DESTROYED,
+	ZERS_LS_DESTROYING,
+	ZERS_LS_NONE,
 	ZERS_LS_LOADING,
 	ZERS_LS_ITERATING,
 	ZERS_LS_LOADED,
 	ZERS_LS_UNLOADING,
-	ZERS_LS_ERROR_LOADING,
-	ZERS_LS_ERROR_UNLOADING
 };
 
 class ZERSResourceLoadable : public ZERSResource
@@ -66,6 +68,8 @@ class ZERSResourceLoadable : public ZERSResource
 
 		ZETask									ManageStatesTask;
 		ZETaskResult							ManageStatesFunction(ZETaskThread* TaskThread, void* Parameters);
+		
+		virtual void							Destroy() const;
 
 	protected:
 		virtual ZETaskResult					LoadInternal();
@@ -79,8 +83,8 @@ class ZERSResourceLoadable : public ZERSResource
 		ZERSLoadState							GetLoadState() const;
 		const ZEString&							GetFileName() const;
 
-		bool									IsLoaded();
-		bool									IsFailed();
+		bool									IsLoaded() const;
+		bool									IsFailed() const;
 
 		void									Load(const ZEString& FileName);
 		void									Unload();

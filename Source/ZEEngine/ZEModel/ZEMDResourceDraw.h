@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZETask.cpp
+ Zinek Engine - ZEMDResourceDraw.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,99 +33,37 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZETask.h"
-#include "ZETaskThread.h"
-#include "ZETaskPool.h"
-#include "ZETaskManager.h"
+#pragma once
 
-ZETaskStatus ZETask::GetStatus() const
+#include "ZEMeta/ZEObject.h"
+
+#include "ZETypes.h"
+#include "ZEPointer/ZEHolder.h"
+
+class ZERNMaterial;
+class ZEMLReaderNode;
+class ZEMLWriterNode;
+
+class ZEMDResourceDraw : public ZEObject
 {
-	return Status;
-}
+	ZE_OBJECT
+	private:
+		ZESize							Offset;
+		ZESize							Count;
+		ZEHolder<ZERNMaterial>			Material;
 
-void ZETask::SetName(const ZEString& Name)
-{
-	this->Name = Name;
-}
+	public:
+		void							SetOffset(ZESize Offset);
+		ZESize							GetOffset() const;
 
-const ZEString ZETask::GetName() const
-{
-	return Name;
-}
+		void							SetCount(ZESize Count);
+		ZESize							GetCount() const;
 
-void ZETask::SetPriority(ZEInt Priority)
-{
-	this->Priority = Priority;
-}
+		void							SetMaterial(ZEHolder<ZERNMaterial> Material);
+		ZEHolder<ZERNMaterial>			GetMaterial() const;
 
-ZEInt ZETask::GetPriority() const
-{
-	return Priority;
-}
+		bool							Load(ZEMLReaderNode& DrawNode);
+		bool							Save(ZEMLWriterNode& DrawNode) const;
 
-void ZETask::SetFunction(const ZETaskFunction& Function)
-{
-	this->Function = Function;
-}
-
-const ZETaskFunction& ZETask::GetFunction() const
-{
-	return Function;
-}
-
-void ZETask::SetParameter(void* Parameters)
-{
-	this->Parameter = Parameters;
-}
-
-void* ZETask::GetParameter() const
-{
-	return Parameter;
-}
-
-void ZETask::SetPool(ZEInt PoolId)
-{
-	PoolId = PoolId;
-}
-
-ZEInt ZETask::GetPool() const
-{
-	return PoolId;
-}
-
-void ZETask::Run()
-{
-	if (Function.IsNull())
-		return;
-
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool == NULL)
-		return;
-
-	Pool->RunTask(this);
-}
-
-void ZETask::Wait()
-{
-	if (Status == ZE_TS2_NONE)
-		return;
-
-	while(Status == ZE_TS_RUNNING);
-}
-
-ZETask::ZETask() : Link(this)
-{
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool != NULL)
-		Pool->TaskDestroyed(this);
-
-	Status = ZE_TS2_NONE;
-	Priority = 0;
-	PoolId = ZE_TPI_DEFAULT;
-	Parameter = NULL;
-}
-
-ZETask::~ZETask()
-{
-
-}
+										ZEMDResourceDraw();
+}; 
