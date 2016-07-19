@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_MODEL_BONE_H__
-#define __ZE_MODEL_BONE_H__
 
 #include "ZEMeta/ZEObject.h"
 
@@ -43,6 +41,7 @@
 #include "ZEDS/ZEFlags.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMatrix.h"
+#include "ZEMath/ZEQuaternion.h"
 #include "ZEModelAnimation.h"
 #include "ZEGame/ZERayCast.h"
 
@@ -89,8 +88,8 @@ class ZEModelBone : public ZEObject
 
 		ZEList2<ZEModelBone>				ChildBones;
 		
-		ZEHolder<const ZEModelResource>		ModelResource;
-		const ZEModelResourceBone*			BoneResource;
+		ZERSHolder<const ZEMDResource>	ModelResource;
+		const ZEMDResourceBone*			BoneResource;
 
 		void								SetModel(ZEModel* Model);
 		void								SetParent(ZEModelBone* ParentBone);
@@ -102,8 +101,8 @@ class ZEModelBone : public ZEObject
 		void								TransformChangedModel();
 		void								TransformChangedWorld();
 
-// 		void								LocalTransformChanged();
-// 		void								ParentTransformChanged();
+		//void								LocalTransformChanged();
+		//void								ParentTransformChanged();
 
 	public:
 		ZEModel*							GetModel() const;
@@ -166,7 +165,7 @@ class ZEModelBone : public ZEObject
 		void								AddChildBone(ZEModelBone* Bone);
 		void								RemoveChildBone(ZEModelBone* Bone);
 
-		void								Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceBone* BoneResource);
+		void								Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceBone* BoneResource);
 		void								Unload();
 
 		void								RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
@@ -174,4 +173,3 @@ class ZEModelBone : public ZEObject
 											ZEModelBone();
 		virtual								~ZEModelBone();
 };
-#endif

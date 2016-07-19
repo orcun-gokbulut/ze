@@ -37,14 +37,17 @@
 
 #include "ZEModel.h"
 #include "ZEModelMeshLOD.h"
+#include "ZEMDResource.h"
+#include "ZEMDResourceMesh.h"
+
+#include "ZEMath/ZEMath.h"
+#include "ZEMath/ZEViewVolume.h"
 #include "ZEGame/ZEScene.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNView.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
-#include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEMath\ZEMath.h"
-#include "ZEMath\ZEViewVolume.h"
 
 
 #define ZEMD_MDF_TRANSFORM					0x0001
@@ -797,7 +800,7 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	Helper.RayCastMesh(MeshResource->GetGeometry().GetConstCArray(), MeshResource->GetGeometry().GetCount(), sizeof(ZEVector3));
 }
 
-void ZEModelMesh::Load(ZEModel* Model, ZEHolder<const ZEModelResource> ModelResource, const ZEModelResourceMesh* MeshResource)
+void ZEModelMesh::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> ModelResource, const ZEMDResourceMesh* MeshResource)
 {
 	this->Model = Model;
 	this->ModelResource = ModelResource;

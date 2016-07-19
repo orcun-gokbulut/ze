@@ -59,8 +59,8 @@ class ZERSResourceManager : public ZEObject
 
 		void									UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT]);
 
-		const ZERSResource*						GetResourceInternal(const ZEGUID& GUID);
-		const ZERSResourceLoadable*				GetResourceInternal(const ZEString& FileName);
+		ZERSHolder<const ZERSResource>			GetResourceInternal(const ZEGUID& GUID);
+		ZERSHolder<const ZERSResourceLoadable>	GetResourceInternal(const ZEString& FileName);
 
 		void									RegisterResource(const ZERSResource* Resource);
 		void									UnregisterResource(const ZERSResource* Resource);

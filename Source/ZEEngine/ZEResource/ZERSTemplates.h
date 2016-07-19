@@ -113,7 +113,7 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::GetResource(const ZEGUID& GUI
 	if (SharedResource == NULL)
 		return NULL;
 
-	if (CheckResourceClass<ZERSResourceClass>(SharedResource))
+	if (!CheckResourceClass<ZERSResourceClass>(SharedResource))
 		return NULL;
 	
 	return static_cast<const ZERSResourceClass*>(SharedResource.GetPointer());
@@ -127,7 +127,7 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::GetResource(const ZEString& F
 	if (SharedResource == NULL)
 		return NULL;
 
-	if (CheckResourceClass<ZERSResourceClass>(SharedResource))
+	if (!CheckResourceClass<ZERSResourceClass>(SharedResource))
 		return NULL;
 
 	return static_cast<const ZERSResourceClass*>(SharedResource.GetPointer());
@@ -148,7 +148,7 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::CreateResourceShared(const ZE
 	if (SharedResource == NULL)
 		return NULL;
 
-	if (CheckResourceClass<ZERSResourceClass>(SharedResource))
+	if (!CheckResourceClass<ZERSResourceClass>(SharedResource))
 		return NULL;
 
 	if (StagingResource != NULL)
@@ -174,7 +174,7 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::LoadResourceShared(const ZESt
 	if (SharedResource == NULL)
 		return NULL;
 
-	if (CheckResourceClass<ZERSResourceClass>(SharedResource))
+	if (!CheckResourceClass<ZERSResourceClass>(SharedResource))
 		return NULL;
 
 	if (StagingResource != NULL)

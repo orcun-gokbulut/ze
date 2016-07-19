@@ -86,12 +86,12 @@ ZE_ENUM(ZEEntityResult)
 
 ZE_ENUM(ZEEntityState)
 {
-	ZE_ES_ERROR_DEINITIALIZATION		= -4,
-	ZE_ES_ERROR_INITIALIZATION			= -3,
-	ZE_ES_ERROR_UNLOADING				= -2,
-	ZE_ES_ERROR_LOADING					= -1,
-	ZE_ES_NOT_INITIALIZED				= 0,
-	ZE_ES_NOT_LOADED					= 0,
+	ZE_ES_ERROR_DEINITIALIZATION		= -6,
+	ZE_ES_ERROR_INITIALIZATION			= -5,
+	ZE_ES_ERROR_UNLOADING				= -4,
+	ZE_ES_ERROR_LOADING					= -3,
+	ZE_ES_DESTROYED						= -2,
+	ZE_ES_DESTROYING					= -1,
 	ZE_ES_NONE							= 0,
 	ZE_ES_UNLOADING						= 1,
 	ZE_ES_DEINITIALIZED					= 2,
@@ -99,10 +99,11 @@ ZE_ENUM(ZEEntityState)
 	ZE_ES_LOADING						= 5,
 	ZE_ES_LOADED						= 6,
 	ZE_ES_INITIALIZING					= 7,
-	ZE_ES_INITIALIZED					= 8
+	ZE_ES_INITIALIZED					= 8,
+
 };
 
-class ZEEntity : public ZEObject, public ZEDestroyable
+class ZEEntity : public ZEObject
 {
 	ZE_OBJECT
 	friend class ZEScene;
@@ -231,13 +232,16 @@ class ZEEntity : public ZEObject, public ZEDestroyable
 		ZEEntityState							GetState() const;
 		bool									IsLoaded() const;
 		bool									IsInitialized() const;
+		bool									IsFailed() const;
 
 		void									Initialize();
 		void									Deinitialize();
 
 		void									Load();
 		void									Unload();
-			
+
+		void									Destroy();
+
 		virtual bool							Serialize(ZEMLWriterNode* Serializer);
 		virtual bool							Unserialize(ZEMLReaderNode* Unserializer);
 

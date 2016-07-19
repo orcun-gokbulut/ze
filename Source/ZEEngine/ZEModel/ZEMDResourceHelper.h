@@ -45,52 +45,52 @@
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-enum ZEModelResourceHelperParentType
+enum ZEMDResourceHelperParentType
 {
 	ZE_MRHPT_MODEL	= 0,
 	ZE_MRHPT_MESH	= 1,
 	ZE_MRHPT_BONE	= 2
 };
 
-class ZEModelResourceHelper : public ZEObject
+class ZEMDResourceHelper : public ZEObject
 {
 	ZE_OBJECT
-	friend class ZEModelResource;
+	friend class ZEMDResource;
 	private:
-		ZELink<ZEModelResourceHelper> Link;
+		ZELink<ZEMDResourceHelper>		Link;
 
-		ZEString Name;
-		ZEModelResourceHelperParentType OwnerType;
-		ZEInt32 OwnerId;
-		ZEVector3 Position;
-		ZEQuaternion Rotation;
-		ZEVector3 Scale;
-		ZEString UserDefinedProperties;
+		ZEString						Name;
+		ZEMDResourceHelperParentType	OwnerType;
+		ZEInt32							OwnerId;
+		ZEVector3						Position;
+		ZEQuaternion					Rotation;
+		ZEVector3						Scale;
+		ZEString						UserDefinedProperties;
 
 	public:
-		void SetName(const ZEString& Name);
-		const ZEString& GetName() const;
+		void							SetName(const ZEString& Name);
+		const ZEString&					GetName() const;
 
-		void SetOwnerType(ZEModelResourceHelperParentType OwnerType);
-		ZEModelResourceHelperParentType GetOwnerType() const;
+		void							SetOwnerType(ZEMDResourceHelperParentType OwnerType);
+		ZEMDResourceHelperParentType	GetOwnerType() const;
 
-		void SetOwnerId(ZEInt32 OwnerId);
-		ZEInt32 GetOwnerId() const;
+		void							SetOwnerId(ZEInt32 OwnerId);
+		ZEInt32							GetOwnerId() const;
 
-		void SetPosition(const ZEVector3& Position);
-		const ZEVector3& GetPosition() const;
+		void							SetPosition(const ZEVector3& Position);
+		const ZEVector3&				GetPosition() const;
 
-		void SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion& GetRotation() const;
+		void							SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&				GetRotation() const;
 
-		void SetScale(const ZEVector3& Scale);
-		const ZEVector3& GetScale() const;
+		void							SetScale(const ZEVector3& Scale);
+		const ZEVector3&				GetScale() const;
 
-		void SetUserDefinedProperties(ZEString UserDefinedProperties);
-		ZEString GetUserDefinedProperties() const;
+		void							SetUserDefinedProperties(ZEString UserDefinedProperties);
+		ZEString						GetUserDefinedProperties() const;
 
-		bool Load(const ZEMLReaderNode& HelperNode);
-		bool Save(ZEMLWriterNode& HelperNode) const;
+		bool							Load(const ZEMLReaderNode& HelperNode);
+		bool							Save(ZEMLWriterNode& HelperNode) const;
 
-		ZEModelResourceHelper();
+										ZEMDResourceHelper();
 };

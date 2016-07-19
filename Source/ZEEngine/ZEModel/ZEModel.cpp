@@ -34,11 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModel.h"
-#include "ZERenderer/ZERNRenderer.h"
+
+#include "ZEModelBone.h"
+#include "ZEMDResourceMesh.h"
+#include "ZEMDResourceBone.h"
+
+#include "ZEError.h"
+#include "ZEGame/ZEScene.h"
 #include "ZEGraphics/ZEGRResource.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGame/ZEScene.h"
-#include "ZEError.h"
+#include "ZERenderer/ZERNRenderer.h"
 
 
 void ZEModel::CalculateBoundingBox() const
@@ -149,6 +154,11 @@ ZEEntityResult ZEModel::LoadInternal()
 	if (Resource == NULL)
 		return ZE_ER_DONE;
 
+	if (!Resource->IsLoaded())
+		return ZE_ER_WAIT;
+	else if (Resource->IsFailed())
+		return ZE_ER_FAILED;
+
 	BoundingBoxIsUserDefined = Resource->GetUserDefinedBoundingBoxEnabled();
 	const_cast<ZEModel*>(this)->SetBoundingBox(Resource->GetUserDefinedBoundingBox());
 
@@ -192,7 +202,7 @@ ZEEntityResult ZEModel::LoadInternal()
 ZEEntityResult ZEModel::UnloadInternal()
 {
 // 	if (ModelResource != NULL)
-// 		const_cast<ZEModelResource*>(ModelResource)->Release();
+// 		const_cast<ZEMDResource*>(ModelResource)->Release();
 
 	ze_for_each(Mesh, Meshes)
 	{
@@ -453,13 +463,13 @@ const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 	return ZEEntity::GetWorldBoundingBox();
 }
 
-void ZEModel::SetModelFile(const ZEString& ModelFile)
+void ZEModel::SetModelFile(const ZEString& FileName)
 {
-	ZEHolder<const ZEModelResource> ModelResource = ZEModelResource::Load(ModelFile);
+	ZERSHolder<const ZEMDResource> ModelResource = ZEMDResource::LoadResourceShared(FileName);
 
 	if (ModelResource.IsNull())
 	{
-		zeError("Can not load model file. File Name : \"%s\"", ModelFile.ToCString());
+		zeError("Can not load model file. File Name : \"%s\"", FileName.ToCString());
 		return;
 	}
 
@@ -471,10 +481,10 @@ const ZEString& ZEModel::GetModelFile() const
 	if (Resource.IsNull())
 		return ZEString::Empty;
 
-	return Resource->GetFilePath();
+	return Resource->GetFileName();
 }
 
-void ZEModel::SetModelResource(ZEHolder<const ZEModelResource> ModelResource)
+void ZEModel::SetModelResource(ZERSHolder<const ZEMDResource> ModelResource)
 {
 	bool ReloadingRequired = IsLoaded();
 
@@ -487,7 +497,7 @@ void ZEModel::SetModelResource(ZEHolder<const ZEModelResource> ModelResource)
 		Load();
 }
 
-ZEHolder<const ZEModelResource> ZEModel::GetModelResource() const
+ZERSHolder<const ZEMDResource> ZEModel::GetModelResource() const
 {
 	return Resource;
 }

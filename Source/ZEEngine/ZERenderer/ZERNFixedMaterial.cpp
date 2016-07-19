@@ -52,7 +52,7 @@
 #include "ZERNStageGBuffer.h"
 #include "ZERNStageID.h"
 #include "ZERNShaderSlots.h"
-#include "ZEModel/ZEModelResource.h"
+#include "ZEModel/ZEMDResource.h"
 #include "ZECanvas.h"
 #include "ZEInterior/ZEInterior.h"
 #include "ZEInterior/ZEInteriorResource.h"
@@ -62,6 +62,7 @@
 #include "ZERNStageForward.h"
 #include "ZERNStageRenderDepth.h"
 #include "ZERNCommand.h"
+#include "ZEModel/ZEMDVertex.h"
 
 #define ZERN_FMDF_CONSTANT_BUFFER		1
 #define ZERN_FMDF_RENDER_STATE			2

@@ -63,8 +63,9 @@ class ZETaskPool
 		void							Schedule(ZEThread* Thread, void* ExtraParameter);
 		void							Reschedule(ZETask* Task);
 		void							RunTask(ZETask* Task);
+		void							TaskDestroyed(ZETask* Task);
 
-public:
+	public:
 		void							SetId(ZEInt Id);
 		ZEInt							GetId();
 

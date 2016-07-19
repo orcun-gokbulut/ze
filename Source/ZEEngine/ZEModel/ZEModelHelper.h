@@ -35,10 +35,13 @@
 
 #pragma once
 
-#include "ZEMath/ZEVector.h"
-#include "ZEMath/ZEQuaternion.h"
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEModelMesh.h"
 #include "ZEModelBone.h"
+
+#include "ZEMath/ZEVector.h"
+#include "ZEMath/ZEQuaternion.h"
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEModelMesh,"ZEModelMesh.h")
@@ -63,7 +66,9 @@ class ZEModelHelper : public ZEObject
 		ZEModelBone*						ParentBone;
 		ZELink<ZEModelHelper>				ParentLink;
 
-		const ZEModelResourceHelper*		HelperResource;
+		const ZEMDResourceHelper*			HelperResource;
+
+		ZEString*							Name;
 
 		ZEVector3							Position;
 		ZEQuaternion						Rotation;
@@ -113,7 +118,7 @@ class ZEModelHelper : public ZEObject
 		ZEVector3							GetWorldRight() const;
 		ZEVector3							GetWorldUp() const;
 
-		void								Load(ZEModel* Model, ZEHolder<const ZEModelResource> Resource, const ZEModelResourceHelper* HelperResource);
+		void								Load(ZEModel* Model, ZERSHolder<const ZEMDResource> Resource, const ZEMDResourceHelper* HelperResource);
 		void								Unload();
 
 											ZEModelHelper();

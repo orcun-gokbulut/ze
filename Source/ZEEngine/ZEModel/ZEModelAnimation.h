@@ -37,7 +37,7 @@
 #ifndef	__ZE_MODEL_ANIMATION_H__
 #define __ZE_MODEL_ANIMATION_H__
 
-#include "ZEModelResource.h"
+#include "ZEMDResource.h"
 
 enum ZEModelAnimationState
 {
@@ -60,6 +60,6 @@ enum ZEModelAnimationUpdateMode
 	ZE_MAUM_VISUAL
 };
 
-typedef ZEModelResourceAnimation ZEModelAnimation;
+typedef ZEMDResourceAnimation ZEModelAnimation;
 
 #endif

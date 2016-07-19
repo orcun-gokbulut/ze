@@ -40,137 +40,137 @@
 // ZEMDResourcePhysicalShape
 /////////////////////////////////////////////////////////////////////////////
 
-void ZEModelResourcePhysicalShape::SetType(ZEModelResourcePhysicalShapeType Type)
+void ZEMDResourcePhysicalShape::SetType(ZEMDResourcePhysicalShapeType Type)
 {
 	this->Type = Type;
 }
 
-ZEModelResourcePhysicalShapeType ZEModelResourcePhysicalShape::GetType() const
+ZEMDResourcePhysicalShapeType ZEMDResourcePhysicalShape::GetType() const
 {
 	return Type;
 }
 
-void ZEModelResourcePhysicalShape::SetPosition(const ZEVector3& Position)
+void ZEMDResourcePhysicalShape::SetPosition(const ZEVector3& Position)
 {
 	this->Position = Position;
 }
 
-const ZEVector3& ZEModelResourcePhysicalShape::GetPosition() const
+const ZEVector3& ZEMDResourcePhysicalShape::GetPosition() const
 {
 	return Position;
 }
 
-void ZEModelResourcePhysicalShape::SetRotation(const ZEQuaternion& Rotation)
+void ZEMDResourcePhysicalShape::SetRotation(const ZEQuaternion& Rotation)
 {
 	this->Rotation = Rotation;
 }
 
-const ZEQuaternion& ZEModelResourcePhysicalShape::GetRotation() const
+const ZEQuaternion& ZEMDResourcePhysicalShape::GetRotation() const
 {
 	return Rotation;
 }
 
-void ZEModelResourcePhysicalShape::SetRestitution(float Restitution)
+void ZEMDResourcePhysicalShape::SetRestitution(float Restitution)
 {
 	this->Restitution = Restitution;
 }
 
-float ZEModelResourcePhysicalShape::GetRestitution() const 
+float ZEMDResourcePhysicalShape::GetRestitution() const 
 {
 	return Restitution;
 }
 
-void ZEModelResourcePhysicalShape::SetStaticFriction(float StaticFriction)
+void ZEMDResourcePhysicalShape::SetStaticFriction(float StaticFriction)
 {
 	this->StaticFriction = StaticFriction;
 }
 
-float ZEModelResourcePhysicalShape::GetStaticFriction() const 
+float ZEMDResourcePhysicalShape::GetStaticFriction() const 
 {
 	return StaticFriction;
 }
 
-void ZEModelResourcePhysicalShape::SetDynamicFriction(float DynamicFriction)
+void ZEMDResourcePhysicalShape::SetDynamicFriction(float DynamicFriction)
 {
 	this->DynamicFriction = DynamicFriction;
 }
 
-float ZEModelResourcePhysicalShape::GetDynamicFriction() const 
+float ZEMDResourcePhysicalShape::GetDynamicFriction() const 
 {
 	return DynamicFriction;
 }
 
-void ZEModelResourcePhysicalShape::SetWidth(float Width)
+void ZEMDResourcePhysicalShape::SetWidth(float Width)
 {
 	this->Width = Width;
 }
 
-float ZEModelResourcePhysicalShape::GetWidth() const 
+float ZEMDResourcePhysicalShape::GetWidth() const 
 {
 	return Width;
 }
 
-void ZEModelResourcePhysicalShape::SetHeight(float Height)
+void ZEMDResourcePhysicalShape::SetHeight(float Height)
 {
 	this->Height = Height;
 }
 
-float ZEModelResourcePhysicalShape::GetHeight() const 
+float ZEMDResourcePhysicalShape::GetHeight() const 
 {
 	return Height;
 }
 
-void ZEModelResourcePhysicalShape::SetLength(float Length)
+void ZEMDResourcePhysicalShape::SetLength(float Length)
 {
 	this->Length = Length;
 }
 
-float ZEModelResourcePhysicalShape::GetLength() const 
+float ZEMDResourcePhysicalShape::GetLength() const 
 {
 	return Length;
 }
 
-void ZEModelResourcePhysicalShape::SetRadius(float Radius)
+void ZEMDResourcePhysicalShape::SetRadius(float Radius)
 {
 	this->Radius = Radius;
 }
 
-float ZEModelResourcePhysicalShape::GetRadius() const 
+float ZEMDResourcePhysicalShape::GetRadius() const 
 {
 	return Radius;
 }
 
-void ZEModelResourcePhysicalShape::SetVertices(const ZEArray<ZEVector3>& Vertices)
+void ZEMDResourcePhysicalShape::SetVertices(const ZEArray<ZEVector3>& Vertices)
 {
 	this->Vertices = Vertices;
 }
 
-const ZEArray<ZEVector3> ZEModelResourcePhysicalShape::GetVertices()
+const ZEArray<ZEVector3> ZEMDResourcePhysicalShape::GetVertices()
 {
 	return Vertices;
 }
 
-void ZEModelResourcePhysicalShape::SetIndices(const ZEArray<ZEUInt16>& Indices)
+void ZEMDResourcePhysicalShape::SetIndices(const ZEArray<ZEUInt16>& Indices)
 {
 	this->Indices = Indices;
 }
 
-const ZEArray<ZEUInt16> ZEModelResourcePhysicalShape::GetIndices()
+const ZEArray<ZEUInt16> ZEMDResourcePhysicalShape::GetIndices()
 {
 	return Indices;
 }
 
-void ZEModelResourcePhysicalShape::SetUserDefinedProperties(ZEString UserDefinedProperties)
+void ZEMDResourcePhysicalShape::SetUserDefinedProperties(ZEString UserDefinedProperties)
 {
 	this->UserDefinedProperties = UserDefinedProperties;
 }
 
-ZEString ZEModelResourcePhysicalShape::GetUserDefinedProperties() const 
+ZEString ZEMDResourcePhysicalShape::GetUserDefinedProperties() const 
 {
 	return UserDefinedProperties;
 }
 
-bool ZEModelResourcePhysicalShape::Load(const ZEMLReaderNode& ShapeNode)
+bool ZEMDResourcePhysicalShape::Load(const ZEMLReaderNode& ShapeNode)
 {
 	zeCheckError(!ShapeNode.IsValid(), false, "Invalid Shape node.");
 	zeCheckError(ShapeNode.GetName() != "Shape", false, "Invalid Shape node name.");
@@ -180,7 +180,7 @@ bool ZEModelResourcePhysicalShape::Load(const ZEMLReaderNode& ShapeNode)
 	SetRestitution(ShapeNode.ReadFloat("Restitution", 0.0f));
 	SetDynamicFriction(ShapeNode.ReadFloat("DynamicFriction", 0.0f));
 	SetStaticFriction(ShapeNode.ReadFloat("StaticFriction"));
-	SetType((ZEModelResourcePhysicalShapeType)ShapeNode.ReadInt32("Type", ZE_MRPST_BOX));
+	SetType((ZEMDResourcePhysicalShapeType)ShapeNode.ReadInt32("Type", ZE_MRPST_BOX));
 	SetUserDefinedProperties(ShapeNode.ReadString("UserDefinedProperties"));
 	SetWidth(ShapeNode.ReadFloat("Width", 0.0f));
 	SetHeight(ShapeNode.ReadFloat("Height", 0.0f));
@@ -219,12 +219,12 @@ bool ZEModelResourcePhysicalShape::Load(const ZEMLReaderNode& ShapeNode)
 	return true;
 }
 
-bool ZEModelResourcePhysicalShape::Save(ZEMLWriterNode& ShapeNode) const
+bool ZEMDResourcePhysicalShape::Save(ZEMLWriterNode& ShapeNode) const
 {
 	return false;
 }
 
-ZEModelResourcePhysicalShape::ZEModelResourcePhysicalShape()
+ZEMDResourcePhysicalShape::ZEMDResourcePhysicalShape()
 {
 	Type = ZE_MRPST_BOX;
 	Position = ZEVector3::One;
@@ -243,112 +243,112 @@ ZEModelResourcePhysicalShape::ZEModelResourcePhysicalShape()
 // ZEMDResourcePhysicalBody
 /////////////////////////////////////////////////////////////////////////////
 
-void ZEModelResourcePhysicalBody::SetType(ZEModelResourcePhysicalBodyType Type)
+void ZEMDResourcePhysicalBody::SetType(ZEModelResourcePhysicalBodyType Type)
 {
 	this->Type = Type;
 }
 
-ZEModelResourcePhysicalBodyType ZEModelResourcePhysicalBody::GetType() const 
+ZEModelResourcePhysicalBodyType ZEMDResourcePhysicalBody::GetType() const 
 {
 	return Type;
 }
 
-void ZEModelResourcePhysicalBody::SetPosition(const ZEVector3& Position)
+void ZEMDResourcePhysicalBody::SetPosition(const ZEVector3& Position)
 {
 	this->Position = Position;
 }
 
-const ZEVector3& ZEModelResourcePhysicalBody::GetPosition() const 
+const ZEVector3& ZEMDResourcePhysicalBody::GetPosition() const 
 {
 	return Position;
 }
 
-void ZEModelResourcePhysicalBody::SetOrientation(const ZEQuaternion& Orientation)
+void ZEMDResourcePhysicalBody::SetOrientation(const ZEQuaternion& Orientation)
 {
 	this->Orientation = Orientation;
 }
 
-const ZEQuaternion& ZEModelResourcePhysicalBody::GetOrientation() const 
+const ZEQuaternion& ZEMDResourcePhysicalBody::GetOrientation() const 
 {
 	return Orientation;
 }
 
-void ZEModelResourcePhysicalBody::SetEnabled(bool Enabled)
+void ZEMDResourcePhysicalBody::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 }
 
-bool ZEModelResourcePhysicalBody::GetEnabled() const 
+bool ZEMDResourcePhysicalBody::GetEnabled() const 
 {
 	return Enabled;
 }
 
-void ZEModelResourcePhysicalBody::SetKinematic(bool Kinematic)
+void ZEMDResourcePhysicalBody::SetKinematic(bool Kinematic)
 {
 	this->Kinematic = Kinematic;
 }
 
-bool ZEModelResourcePhysicalBody::GetKinematic() const 
+bool ZEMDResourcePhysicalBody::GetKinematic() const 
 {
 	return Kinematic;
 }
 
-void ZEModelResourcePhysicalBody::SetMass(float Mass)
+void ZEMDResourcePhysicalBody::SetMass(float Mass)
 {
 	this->Mass = Mass;
 }
 
-float ZEModelResourcePhysicalBody::GetMass() const 
+float ZEMDResourcePhysicalBody::GetMass() const 
 {
 	return Mass;
 }
 
-void ZEModelResourcePhysicalBody::SetCenterOfMass(const ZEVector3& CenterOfMass)
+void ZEMDResourcePhysicalBody::SetCenterOfMass(const ZEVector3& CenterOfMass)
 {
 	this->CenterOfMass = CenterOfMass;
 }
 
-const ZEVector3& ZEModelResourcePhysicalBody::GetCenterOfMass() const 
+const ZEVector3& ZEMDResourcePhysicalBody::GetCenterOfMass() const 
 {
 	return CenterOfMass;
 }
 
-void ZEModelResourcePhysicalBody::SetLinearDamping(float LinearDamping)
+void ZEMDResourcePhysicalBody::SetLinearDamping(float LinearDamping)
 {
 	this->LinearDamping = LinearDamping;
 }
 
-float ZEModelResourcePhysicalBody::GetLinearDamping() const 
+float ZEMDResourcePhysicalBody::GetLinearDamping() const 
 {
 	return LinearDamping;
 }
 
-void ZEModelResourcePhysicalBody::SetAngularDamping(float AngularDamping)
+void ZEMDResourcePhysicalBody::SetAngularDamping(float AngularDamping)
 {
 	this->AngularDamping = AngularDamping;
 }
 
-float ZEModelResourcePhysicalBody::GetAngularDamping() const 
+float ZEMDResourcePhysicalBody::GetAngularDamping() const 
 {
 	return AngularDamping;
 }
 
-const ZEArray<ZEModelResourcePhysicalShape>& ZEModelResourcePhysicalBody::GetShapes() const
+const ZEArray<ZEMDResourcePhysicalShape>& ZEMDResourcePhysicalBody::GetShapes() const
 {
 	return Shapes;
 }
 
-void ZEModelResourcePhysicalBody::AddShape(const ZEModelResourcePhysicalShape& Shape)
+void ZEMDResourcePhysicalBody::AddShape(const ZEMDResourcePhysicalShape& Shape)
 {
 	Shapes.Add(Shape);
 }
 
-void ZEModelResourcePhysicalBody::RemoveShape(ZESize Index)
+void ZEMDResourcePhysicalBody::RemoveShape(ZESize Index)
 {
 	Shapes.Remove(Index);
 }
 
-bool ZEModelResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
+bool ZEMDResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
 {
 	zeCheckError(!BodyNode.IsValid(), false, "Invalid Body node.");
 	zeCheckError(BodyNode.GetName() != "PhysicalBody", false, "Invalid Body node name.");
@@ -370,7 +370,7 @@ bool ZEModelResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
 	for (ZESize I = 0; I < ShapeCount; I++)
 	{
 		ZEMLReaderNode ShapesNode = ShapesNode.GetNode("PhysicalShape", I);
-		ZEModelResourcePhysicalShape Shape;
+		ZEMDResourcePhysicalShape Shape;
 		if (!Shape.Load(ShapesNode))
 			return false;
 		AddShape(Shape);
@@ -379,12 +379,12 @@ bool ZEModelResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
 	return true;
 }
 
-bool ZEModelResourcePhysicalBody::Save(ZEMLWriterNode& BodyNode) const
+bool ZEMDResourcePhysicalBody::Save(ZEMLWriterNode& BodyNode) const
 {
 	return false;
 }
 
-ZEModelResourcePhysicalBody::ZEModelResourcePhysicalBody()
+ZEMDResourcePhysicalBody::ZEMDResourcePhysicalBody()
 {
 	Type = ZE_MRPBT_NONE;
 	Enabled = true;
@@ -401,697 +401,697 @@ ZEModelResourcePhysicalBody::ZEModelResourcePhysicalBody()
 // ZEMDResourcePhysicalBody
 /////////////////////////////////////////////////////////////////////////////
 
-void ZEModelResourcePhysicalJoint::SetJointType(ZEPhysicalJointType JointType)
+void ZEMDResourcePhysicalJoint::SetJointType(ZEPhysicalJointType JointType)
 {
 	this->JointType = JointType;
 }
 
-ZEPhysicalJointType ZEModelResourcePhysicalJoint::GetJointType() const 
+ZEPhysicalJointType ZEMDResourcePhysicalJoint::GetJointType() const 
 {
 	return JointType;
 }
 
-void ZEModelResourcePhysicalJoint::SetEnabled(bool Enabled)
+void ZEMDResourcePhysicalJoint::SetEnabled(bool Enabled)
 {
 	this->Enabled = Enabled;
 }
 
-bool ZEModelResourcePhysicalJoint::GetEnabled() const 
+bool ZEMDResourcePhysicalJoint::GetEnabled() const 
 {
 	return Enabled;
 }
 
-void ZEModelResourcePhysicalJoint::SetBody1Id(ZEUInt32 Body1Id)
+void ZEMDResourcePhysicalJoint::SetBody1Id(ZEUInt32 Body1Id)
 {
 	this->Body1Id = Body1Id;
 }
 
-ZEUInt32 ZEModelResourcePhysicalJoint::GetBody1Id() const 
+ZEUInt32 ZEMDResourcePhysicalJoint::GetBody1Id() const 
 {
 	return Body1Id;
 }
 
-void ZEModelResourcePhysicalJoint::SetBody2Id(ZEUInt32 Body2Id)
+void ZEMDResourcePhysicalJoint::SetBody2Id(ZEUInt32 Body2Id)
 {
 	this->Body2Id = Body2Id;
 }
 
-ZEUInt32 ZEModelResourcePhysicalJoint::GetBody2Id() const 
+ZEUInt32 ZEMDResourcePhysicalJoint::GetBody2Id() const 
 {
 	return Body2Id;
 }
 
-void ZEModelResourcePhysicalJoint::SetCollideBodies(bool CollideBodies)
+void ZEMDResourcePhysicalJoint::SetCollideBodies(bool CollideBodies)
 {
 	this->CollideBodies = CollideBodies;
 }
 
-bool ZEModelResourcePhysicalJoint::GetCollideBodies() const 
+bool ZEMDResourcePhysicalJoint::GetCollideBodies() const 
 {
 	return CollideBodies;
 }
 
-void ZEModelResourcePhysicalJoint::SetUseGlobalAnchorAxis(bool UseGlobalAnchorAxis)
+void ZEMDResourcePhysicalJoint::SetUseGlobalAnchorAxis(bool UseGlobalAnchorAxis)
 {
 	this->UseGlobalAnchorAxis = UseGlobalAnchorAxis;
 }
 
-bool ZEModelResourcePhysicalJoint::GetUseGlobalAnchorAxis() const 
+bool ZEMDResourcePhysicalJoint::GetUseGlobalAnchorAxis() const 
 {
 	return UseGlobalAnchorAxis;
 }
 
-void ZEModelResourcePhysicalJoint::SetGlobalAnchor(const ZEVector3& GlobalAnchor)
+void ZEMDResourcePhysicalJoint::SetGlobalAnchor(const ZEVector3& GlobalAnchor)
 {
 	this->GlobalAnchor = GlobalAnchor;
 }
 
-const ZEVector3& ZEModelResourcePhysicalJoint::GetGlobalAnchor() const 
+const ZEVector3& ZEMDResourcePhysicalJoint::GetGlobalAnchor() const 
 {
 	return GlobalAnchor;
 }
 
-void ZEModelResourcePhysicalJoint::SetGlobalAxis(const ZEQuaternion& GlobalAxis)
+void ZEMDResourcePhysicalJoint::SetGlobalAxis(const ZEQuaternion& GlobalAxis)
 {
 	this->GlobalAxis = GlobalAxis;
 }
 
-const ZEQuaternion& ZEModelResourcePhysicalJoint::GetGlobalAxis() const 
+const ZEQuaternion& ZEMDResourcePhysicalJoint::GetGlobalAxis() const 
 {
 	return GlobalAxis;
 }
 
-void ZEModelResourcePhysicalJoint::SetLocalAnchor1(const ZEVector3& LocalAnchor1)
+void ZEMDResourcePhysicalJoint::SetLocalAnchor1(const ZEVector3& LocalAnchor1)
 {
 	this->LocalAnchor1 = LocalAnchor1;
 }
 
-const ZEVector3& ZEModelResourcePhysicalJoint::GetLocalAnchor1() const 
+const ZEVector3& ZEMDResourcePhysicalJoint::GetLocalAnchor1() const 
 {
 	return LocalAnchor1;
 }
 
-void ZEModelResourcePhysicalJoint::SetLocalAnchor2(const ZEVector3& LocalAnchor2)
+void ZEMDResourcePhysicalJoint::SetLocalAnchor2(const ZEVector3& LocalAnchor2)
 {
 	this->LocalAnchor2 = LocalAnchor2;
 }
 
-const ZEVector3& ZEModelResourcePhysicalJoint::GetLocalAnchor2() const 
+const ZEVector3& ZEMDResourcePhysicalJoint::GetLocalAnchor2() const 
 {
 	return LocalAnchor2;
 }
 
-void ZEModelResourcePhysicalJoint::SetLocalAxis1(const ZEQuaternion& LocalAxis1)
+void ZEMDResourcePhysicalJoint::SetLocalAxis1(const ZEQuaternion& LocalAxis1)
 {
 	this->LocalAxis1 = LocalAxis1;
 }
 
-const ZEQuaternion& ZEModelResourcePhysicalJoint::GetLocalAxis1() const 
+const ZEQuaternion& ZEMDResourcePhysicalJoint::GetLocalAxis1() const 
 {
 	return LocalAxis1;
 }
 
-void ZEModelResourcePhysicalJoint::SetLocalAxis2(const ZEQuaternion& LocalAxis2)
+void ZEMDResourcePhysicalJoint::SetLocalAxis2(const ZEQuaternion& LocalAxis2)
 {
 	this->LocalAxis2 = LocalAxis2;
 }
 
-const ZEQuaternion& ZEModelResourcePhysicalJoint::GetLocalAxis2() const 
+const ZEQuaternion& ZEMDResourcePhysicalJoint::GetLocalAxis2() const 
 {
 	return LocalAxis2;
 }
 
-void ZEModelResourcePhysicalJoint::SetBreakable(bool Breakable)
+void ZEMDResourcePhysicalJoint::SetBreakable(bool Breakable)
 {
 	this->Breakable = Breakable;
 }
 
-bool ZEModelResourcePhysicalJoint::GetBreakable() const 
+bool ZEMDResourcePhysicalJoint::GetBreakable() const 
 {
 	return Breakable;
 }
 
-void ZEModelResourcePhysicalJoint::SetBreakForce(float BreakForce)
+void ZEMDResourcePhysicalJoint::SetBreakForce(float BreakForce)
 {
 	this->BreakForce = BreakForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetBreakForce() const 
+float ZEMDResourcePhysicalJoint::GetBreakForce() const 
 {
 	return BreakForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetBreakTorque(float BreakTorque)
+void ZEMDResourcePhysicalJoint::SetBreakTorque(float BreakTorque)
 {
 	this->BreakTorque = BreakTorque;
 }
 
-float ZEModelResourcePhysicalJoint::GetBreakTorque() const 
+float ZEMDResourcePhysicalJoint::GetBreakTorque() const 
 {
 	return BreakTorque;
 }
 
-void ZEModelResourcePhysicalJoint::SetXMotion(ZEPhysicalJointMotion XMotion)
+void ZEMDResourcePhysicalJoint::SetXMotion(ZEPhysicalJointMotion XMotion)
 {
 	this->XMotion = XMotion;
 }
 
-ZEPhysicalJointMotion ZEModelResourcePhysicalJoint::GetXMotion() const 
+ZEPhysicalJointMotion ZEMDResourcePhysicalJoint::GetXMotion() const 
 {
 	return XMotion;
 }
 
-void ZEModelResourcePhysicalJoint::SetYMotion(ZEPhysicalJointMotion YMotion)
+void ZEMDResourcePhysicalJoint::SetYMotion(ZEPhysicalJointMotion YMotion)
 {
 	this->YMotion = YMotion;
 }
 
-ZEPhysicalJointMotion ZEModelResourcePhysicalJoint::GetYMotion() const 
+ZEPhysicalJointMotion ZEMDResourcePhysicalJoint::GetYMotion() const 
 {
 	return YMotion;
 }
 
-void ZEModelResourcePhysicalJoint::SetZMotion(ZEPhysicalJointMotion ZMotion)
+void ZEMDResourcePhysicalJoint::SetZMotion(ZEPhysicalJointMotion ZMotion)
 {
 	this->ZMotion = ZMotion;
 }
 
-ZEPhysicalJointMotion ZEModelResourcePhysicalJoint::GetZMotion() const 
+ZEPhysicalJointMotion ZEMDResourcePhysicalJoint::GetZMotion() const 
 {
 	return ZMotion;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearLimitValue(float LinearLimitValue)
+void ZEMDResourcePhysicalJoint::SetLinearLimitValue(float LinearLimitValue)
 {
 	this->LinearLimitValue = LinearLimitValue;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearLimitValue() const 
+float ZEMDResourcePhysicalJoint::GetLinearLimitValue() const 
 {
 	return LinearLimitValue;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearLimitRestitution(float LinearLimitRestitution)
+void ZEMDResourcePhysicalJoint::SetLinearLimitRestitution(float LinearLimitRestitution)
 {
 	this->LinearLimitRestitution = LinearLimitRestitution;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearLimitRestitution() const 
+float ZEMDResourcePhysicalJoint::GetLinearLimitRestitution() const 
 {
 	return LinearLimitRestitution;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearLimitSpring(float LinearLimitSpring)
+void ZEMDResourcePhysicalJoint::SetLinearLimitSpring(float LinearLimitSpring)
 {
 	this->LinearLimitSpring = LinearLimitSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearLimitSpring() const 
+float ZEMDResourcePhysicalJoint::GetLinearLimitSpring() const 
 {
 	return LinearLimitSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearLimitDamping(float LinearLimitDamping)
+void ZEMDResourcePhysicalJoint::SetLinearLimitDamping(float LinearLimitDamping)
 {
 	this->LinearLimitDamping = LinearLimitDamping;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearLimitDamping() const 
+float ZEMDResourcePhysicalJoint::GetLinearLimitDamping() const 
 {
 	return LinearLimitDamping;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistMotion(ZEPhysicalJointMotion TwistMotion)
+void ZEMDResourcePhysicalJoint::SetTwistMotion(ZEPhysicalJointMotion TwistMotion)
 {
 	this->TwistMotion = TwistMotion;
 }
 
-ZEPhysicalJointMotion ZEModelResourcePhysicalJoint::GetTwistMotion() const 
+ZEPhysicalJointMotion ZEMDResourcePhysicalJoint::GetTwistMotion() const 
 {
 	return TwistMotion;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistLowLimitValue(float TwistLowLimitValue)
+void ZEMDResourcePhysicalJoint::SetTwistLowLimitValue(float TwistLowLimitValue)
 {
 	this->TwistLowLimitValue = TwistLowLimitValue;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistLowLimitValue() const 
+float ZEMDResourcePhysicalJoint::GetTwistLowLimitValue() const 
 {
 	return TwistLowLimitValue;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistLowLimitRestitution(float TwistLowLimitRestitution)
+void ZEMDResourcePhysicalJoint::SetTwistLowLimitRestitution(float TwistLowLimitRestitution)
 {
 	this->TwistLowLimitRestitution = TwistLowLimitRestitution;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistLowLimitRestitution() const 
+float ZEMDResourcePhysicalJoint::GetTwistLowLimitRestitution() const 
 {
 	return TwistLowLimitRestitution;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistLowLimitSpring(float TwistLowLimitSpring)
+void ZEMDResourcePhysicalJoint::SetTwistLowLimitSpring(float TwistLowLimitSpring)
 {
 	this->TwistLowLimitSpring = TwistLowLimitSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistLowLimitSpring() const 
+float ZEMDResourcePhysicalJoint::GetTwistLowLimitSpring() const 
 {
 	return TwistLowLimitSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistLowLimitDamping(float TwistLowLimitDamping)
+void ZEMDResourcePhysicalJoint::SetTwistLowLimitDamping(float TwistLowLimitDamping)
 {
 	this->TwistLowLimitDamping = TwistLowLimitDamping;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistLowLimitDamping() const 
+float ZEMDResourcePhysicalJoint::GetTwistLowLimitDamping() const 
 {
 	return TwistLowLimitDamping;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistHighLimitValue(float TwistHighLimitValue)
+void ZEMDResourcePhysicalJoint::SetTwistHighLimitValue(float TwistHighLimitValue)
 {
 	this->TwistHighLimitValue = TwistHighLimitValue;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistHighLimitValue() const 
+float ZEMDResourcePhysicalJoint::GetTwistHighLimitValue() const 
 {
 	return TwistHighLimitValue;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistHighLimitRestitution(float TwistHighLimitRestitution)
+void ZEMDResourcePhysicalJoint::SetTwistHighLimitRestitution(float TwistHighLimitRestitution)
 {
 	this->TwistHighLimitRestitution = TwistHighLimitRestitution;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistHighLimitRestitution() const 
+float ZEMDResourcePhysicalJoint::GetTwistHighLimitRestitution() const 
 {
 	return TwistHighLimitRestitution;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistHighLimitSpring(float TwistHighLimitSpring)
+void ZEMDResourcePhysicalJoint::SetTwistHighLimitSpring(float TwistHighLimitSpring)
 {
 	this->TwistHighLimitSpring = TwistHighLimitSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistHighLimitSpring() const 
+float ZEMDResourcePhysicalJoint::GetTwistHighLimitSpring() const 
 {
 	return TwistHighLimitSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetTwistHighLimitDamping(float TwistHighLimitDamping)
+void ZEMDResourcePhysicalJoint::SetTwistHighLimitDamping(float TwistHighLimitDamping)
 {
 	this->TwistHighLimitDamping = TwistHighLimitDamping;
 }
 
-float ZEModelResourcePhysicalJoint::GetTwistHighLimitDamping() const 
+float ZEMDResourcePhysicalJoint::GetTwistHighLimitDamping() const 
 {
 	return TwistHighLimitDamping;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing1Motion(ZEPhysicalJointMotion Swing1Motion)
+void ZEMDResourcePhysicalJoint::SetSwing1Motion(ZEPhysicalJointMotion Swing1Motion)
 {
 	this->Swing1Motion = Swing1Motion;
 }
 
-ZEPhysicalJointMotion ZEModelResourcePhysicalJoint::GetSwing1Motion() const 
+ZEPhysicalJointMotion ZEMDResourcePhysicalJoint::GetSwing1Motion() const 
 {
 	return Swing1Motion;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing1LimitValue(float Swing1LimitValue)
+void ZEMDResourcePhysicalJoint::SetSwing1LimitValue(float Swing1LimitValue)
 {
 	this->Swing1LimitValue = Swing1LimitValue;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing1LimitValue() const 
+float ZEMDResourcePhysicalJoint::GetSwing1LimitValue() const 
 {
 	return Swing1LimitValue;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing1LimitRestitution(float Swing1LimitRestitution)
+void ZEMDResourcePhysicalJoint::SetSwing1LimitRestitution(float Swing1LimitRestitution)
 {
 	this->Swing1LimitRestitution = Swing1LimitRestitution;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing1LimitRestitution() const 
+float ZEMDResourcePhysicalJoint::GetSwing1LimitRestitution() const 
 {
 	return Swing1LimitRestitution;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing1LimitSpring(float Swing1LimitSpring)
+void ZEMDResourcePhysicalJoint::SetSwing1LimitSpring(float Swing1LimitSpring)
 {
 	this->Swing1LimitSpring = Swing1LimitSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing1LimitSpring() const 
+float ZEMDResourcePhysicalJoint::GetSwing1LimitSpring() const 
 {
 	return Swing1LimitSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing1LimitDamping(float Swing1LimitDamping)
+void ZEMDResourcePhysicalJoint::SetSwing1LimitDamping(float Swing1LimitDamping)
 {
 	this->Swing1LimitDamping = Swing1LimitDamping;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing1LimitDamping() const 
+float ZEMDResourcePhysicalJoint::GetSwing1LimitDamping() const 
 {
 	return Swing1LimitDamping;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing2Motion(ZEPhysicalJointMotion Swing2Motion)
+void ZEMDResourcePhysicalJoint::SetSwing2Motion(ZEPhysicalJointMotion Swing2Motion)
 {
 	this->Swing2Motion = Swing2Motion;
 }
 
-ZEPhysicalJointMotion ZEModelResourcePhysicalJoint::GetSwing2Motion() const 
+ZEPhysicalJointMotion ZEMDResourcePhysicalJoint::GetSwing2Motion() const 
 {
 	return Swing2Motion;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing2LimitValue(float Swing2LimitValue)
+void ZEMDResourcePhysicalJoint::SetSwing2LimitValue(float Swing2LimitValue)
 {
 	this->Swing2LimitValue = Swing2LimitValue;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing2LimitValue() const 
+float ZEMDResourcePhysicalJoint::GetSwing2LimitValue() const 
 {
 	return Swing2LimitValue;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing2LimitRestitution(float Swing2LimitRestitution)
+void ZEMDResourcePhysicalJoint::SetSwing2LimitRestitution(float Swing2LimitRestitution)
 {
 	this->Swing2LimitRestitution = Swing2LimitRestitution;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing2LimitRestitution() const 
+float ZEMDResourcePhysicalJoint::GetSwing2LimitRestitution() const 
 {
 	return Swing2LimitRestitution;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing2LimitSpring(float Swing2LimitSpring)
+void ZEMDResourcePhysicalJoint::SetSwing2LimitSpring(float Swing2LimitSpring)
 {
 	this->Swing2LimitSpring = Swing2LimitSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing2LimitSpring() const 
+float ZEMDResourcePhysicalJoint::GetSwing2LimitSpring() const 
 {
 	return Swing2LimitSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetSwing2LimitDamping(float Swing2LimitDamping)
+void ZEMDResourcePhysicalJoint::SetSwing2LimitDamping(float Swing2LimitDamping)
 {
 	this->Swing2LimitDamping = Swing2LimitDamping;
 }
 
-float ZEModelResourcePhysicalJoint::GetSwing2LimitDamping() const 
+float ZEMDResourcePhysicalJoint::GetSwing2LimitDamping() const 
 {
 	return Swing2LimitDamping;
 }
 
-void ZEModelResourcePhysicalJoint::SetMotorTargetPosition(const ZEVector3& MotorTargetPosition)
+void ZEMDResourcePhysicalJoint::SetMotorTargetPosition(const ZEVector3& MotorTargetPosition)
 {
 	this->MotorTargetPosition = MotorTargetPosition;
 }
 
-const ZEVector3& ZEModelResourcePhysicalJoint::GetMotorTargetPosition() const 
+const ZEVector3& ZEMDResourcePhysicalJoint::GetMotorTargetPosition() const 
 {
 	return MotorTargetPosition;
 }
 
-void ZEModelResourcePhysicalJoint::SetMotorTargetOrientation(const ZEQuaternion& MotorTargetOrientation)
+void ZEMDResourcePhysicalJoint::SetMotorTargetOrientation(const ZEQuaternion& MotorTargetOrientation)
 {
 	this->MotorTargetOrientation = MotorTargetOrientation;
 }
 
-const ZEQuaternion& ZEModelResourcePhysicalJoint::GetMotorTargetOrientation() const 
+const ZEQuaternion& ZEMDResourcePhysicalJoint::GetMotorTargetOrientation() const 
 {
 	return MotorTargetOrientation;
 }
 
-void ZEModelResourcePhysicalJoint::SetMotorTargetVelocity(const ZEVector3& MotorTargetVelocity)
+void ZEMDResourcePhysicalJoint::SetMotorTargetVelocity(const ZEVector3& MotorTargetVelocity)
 {
 	this->MotorTargetVelocity = MotorTargetVelocity;
 }
 
-const ZEVector3& ZEModelResourcePhysicalJoint::GetMotorTargetVelocity() const 
+const ZEVector3& ZEMDResourcePhysicalJoint::GetMotorTargetVelocity() const 
 {
 	return MotorTargetVelocity;
 }
 
-void ZEModelResourcePhysicalJoint::SetMotorTargetAngularVelocity(const ZEVector3& MotorTargetAngularVelocity)
+void ZEMDResourcePhysicalJoint::SetMotorTargetAngularVelocity(const ZEVector3& MotorTargetAngularVelocity)
 {
 	this->MotorTargetAngularVelocity = MotorTargetAngularVelocity;
 }
 
-const ZEVector3& ZEModelResourcePhysicalJoint::GetMotorTargetAngularVelocity() const 
+const ZEVector3& ZEMDResourcePhysicalJoint::GetMotorTargetAngularVelocity() const 
 {
 	return MotorTargetAngularVelocity;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearXMotor(ZEPhysicalJointMotorType LinearXMotor)
+void ZEMDResourcePhysicalJoint::SetLinearXMotor(ZEPhysicalJointMotorType LinearXMotor)
 {
 	this->LinearXMotor = LinearXMotor;
 }
 
-ZEPhysicalJointMotorType ZEModelResourcePhysicalJoint::GetLinearXMotor() const 
+ZEPhysicalJointMotorType ZEMDResourcePhysicalJoint::GetLinearXMotor() const 
 {
 	return LinearXMotor;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearXMotorForce(float LinearXMotorForce)
+void ZEMDResourcePhysicalJoint::SetLinearXMotorForce(float LinearXMotorForce)
 {
 	this->LinearXMotorForce = LinearXMotorForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearXMotorForce() const 
+float ZEMDResourcePhysicalJoint::GetLinearXMotorForce() const 
 {
 	return LinearXMotorForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearXMotorSpring(float LinearXMotorSpring)
+void ZEMDResourcePhysicalJoint::SetLinearXMotorSpring(float LinearXMotorSpring)
 {
 	this->LinearXMotorSpring = LinearXMotorSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearXMotorSpring() const 
+float ZEMDResourcePhysicalJoint::GetLinearXMotorSpring() const 
 {
 	return LinearXMotorSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearXMotorDamper(float LinearXMotorDamper)
+void ZEMDResourcePhysicalJoint::SetLinearXMotorDamper(float LinearXMotorDamper)
 {
 	this->LinearXMotorDamper = LinearXMotorDamper;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearXMotorDamper() const 
+float ZEMDResourcePhysicalJoint::GetLinearXMotorDamper() const 
 {
 	return LinearXMotorDamper;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearYMotor(ZEPhysicalJointMotorType LinearYMotor)
+void ZEMDResourcePhysicalJoint::SetLinearYMotor(ZEPhysicalJointMotorType LinearYMotor)
 {
 	this->LinearYMotor = LinearYMotor;
 }
 
-ZEPhysicalJointMotorType ZEModelResourcePhysicalJoint::GetLinearYMotor() const 
+ZEPhysicalJointMotorType ZEMDResourcePhysicalJoint::GetLinearYMotor() const 
 {
 	return LinearYMotor;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearYMotorForce(float LinearYMotorForce)
+void ZEMDResourcePhysicalJoint::SetLinearYMotorForce(float LinearYMotorForce)
 {
 	this->LinearYMotorForce = LinearYMotorForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearYMotorForce() const 
+float ZEMDResourcePhysicalJoint::GetLinearYMotorForce() const 
 {
 	return LinearYMotorForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearYMotorSpring(float LinearYMotorSpring)
+void ZEMDResourcePhysicalJoint::SetLinearYMotorSpring(float LinearYMotorSpring)
 {
 	this->LinearYMotorSpring = LinearYMotorSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearYMotorSpring() const 
+float ZEMDResourcePhysicalJoint::GetLinearYMotorSpring() const 
 {
 	return LinearYMotorSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearYMotorDamper(float LinearYMotorDamper)
+void ZEMDResourcePhysicalJoint::SetLinearYMotorDamper(float LinearYMotorDamper)
 {
 	this->LinearYMotorDamper = LinearYMotorDamper;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearYMotorDamper() const 
+float ZEMDResourcePhysicalJoint::GetLinearYMotorDamper() const 
 {
 	return LinearYMotorDamper;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearZMotor(ZEPhysicalJointMotorType LinearZMotor)
+void ZEMDResourcePhysicalJoint::SetLinearZMotor(ZEPhysicalJointMotorType LinearZMotor)
 {
 	this->LinearZMotor = LinearZMotor;
 }
 
-ZEPhysicalJointMotorType ZEModelResourcePhysicalJoint::GetLinearZMotor() const 
+ZEPhysicalJointMotorType ZEMDResourcePhysicalJoint::GetLinearZMotor() const 
 {
 	return LinearZMotor;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearZMotorForce(float LinearZMotorForce)
+void ZEMDResourcePhysicalJoint::SetLinearZMotorForce(float LinearZMotorForce)
 {
 	this->LinearZMotorForce = LinearZMotorForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearZMotorForce() const 
+float ZEMDResourcePhysicalJoint::GetLinearZMotorForce() const 
 {
 	return LinearZMotorForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearZMotorSpring(float LinearZMotorSpring)
+void ZEMDResourcePhysicalJoint::SetLinearZMotorSpring(float LinearZMotorSpring)
 {
 	this->LinearZMotorSpring = LinearZMotorSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearZMotorSpring() const 
+float ZEMDResourcePhysicalJoint::GetLinearZMotorSpring() const 
 {
 	return LinearZMotorSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetLinearZMotorDamper(float LinearZMotorDamper)
+void ZEMDResourcePhysicalJoint::SetLinearZMotorDamper(float LinearZMotorDamper)
 {
 	this->LinearZMotorDamper = LinearZMotorDamper;
 }
 
-float ZEModelResourcePhysicalJoint::GetLinearZMotorDamper() const 
+float ZEMDResourcePhysicalJoint::GetLinearZMotorDamper() const 
 {
 	return LinearZMotorDamper;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSwingMotor(ZEPhysicalJointMotorType AngularSwingMotor)
+void ZEMDResourcePhysicalJoint::SetAngularSwingMotor(ZEPhysicalJointMotorType AngularSwingMotor)
 {
 	this->AngularSwingMotor = AngularSwingMotor;
 }
 
-ZEPhysicalJointMotorType ZEModelResourcePhysicalJoint::GetAngularSwingMotor() const 
+ZEPhysicalJointMotorType ZEMDResourcePhysicalJoint::GetAngularSwingMotor() const 
 {
 	return AngularSwingMotor;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSwingMotorForce(float AngularSwingMotorForce)
+void ZEMDResourcePhysicalJoint::SetAngularSwingMotorForce(float AngularSwingMotorForce)
 {
 	this->AngularSwingMotorForce = AngularSwingMotorForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularSwingMotorForce() const 
+float ZEMDResourcePhysicalJoint::GetAngularSwingMotorForce() const 
 {
 	return AngularSwingMotorForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSwingMotorSpring(float AngularSwingMotorSpring)
+void ZEMDResourcePhysicalJoint::SetAngularSwingMotorSpring(float AngularSwingMotorSpring)
 {
 	this->AngularSwingMotorSpring = AngularSwingMotorSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularSwingMotorSpring() const 
+float ZEMDResourcePhysicalJoint::GetAngularSwingMotorSpring() const 
 {
 	return AngularSwingMotorSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSwingMotorDamper(float AngularSwingMotorDamper)
+void ZEMDResourcePhysicalJoint::SetAngularSwingMotorDamper(float AngularSwingMotorDamper)
 {
 	this->AngularSwingMotorDamper = AngularSwingMotorDamper;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularSwingMotorDamper() const 
+float ZEMDResourcePhysicalJoint::GetAngularSwingMotorDamper() const 
 {
 	return AngularSwingMotorDamper;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularTwistMotor(ZEPhysicalJointMotorType AngularTwistMotor)
+void ZEMDResourcePhysicalJoint::SetAngularTwistMotor(ZEPhysicalJointMotorType AngularTwistMotor)
 {
 	this->AngularTwistMotor = AngularTwistMotor;
 }
 
-ZEPhysicalJointMotorType ZEModelResourcePhysicalJoint::GetAngularTwistMotor() const 
+ZEPhysicalJointMotorType ZEMDResourcePhysicalJoint::GetAngularTwistMotor() const 
 {
 	return AngularTwistMotor;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularTwistMotorForce(float AngularTwistMotorForce)
+void ZEMDResourcePhysicalJoint::SetAngularTwistMotorForce(float AngularTwistMotorForce)
 {
 	this->AngularTwistMotorForce = AngularTwistMotorForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularTwistMotorForce() const 
+float ZEMDResourcePhysicalJoint::GetAngularTwistMotorForce() const 
 {
 	return AngularTwistMotorForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularTwistMotorSpring(float AngularTwistMotorSpring)
+void ZEMDResourcePhysicalJoint::SetAngularTwistMotorSpring(float AngularTwistMotorSpring)
 {
 	this->AngularTwistMotorSpring = AngularTwistMotorSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularTwistMotorSpring() const 
+float ZEMDResourcePhysicalJoint::GetAngularTwistMotorSpring() const 
 {
 	return AngularTwistMotorSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularTwistMotorDamper(float AngularTwistMotorDamper)
+void ZEMDResourcePhysicalJoint::SetAngularTwistMotorDamper(float AngularTwistMotorDamper)
 {
 	this->AngularTwistMotorDamper = AngularTwistMotorDamper;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularTwistMotorDamper() const 
+float ZEMDResourcePhysicalJoint::GetAngularTwistMotorDamper() const 
 {
 	return AngularTwistMotorDamper;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSlerpMotor(ZEPhysicalJointMotorType AngularSlerpMotor)
+void ZEMDResourcePhysicalJoint::SetAngularSlerpMotor(ZEPhysicalJointMotorType AngularSlerpMotor)
 {
 	this->AngularSlerpMotor = AngularSlerpMotor;
 }
 
-ZEPhysicalJointMotorType ZEModelResourcePhysicalJoint::GetAngularSlerpMotor() const 
+ZEPhysicalJointMotorType ZEMDResourcePhysicalJoint::GetAngularSlerpMotor() const 
 {
 	return AngularSlerpMotor;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSlerpMotorForce(float AngularSlerpMotorForce)
+void ZEMDResourcePhysicalJoint::SetAngularSlerpMotorForce(float AngularSlerpMotorForce)
 {
 	this->AngularSlerpMotorForce = AngularSlerpMotorForce;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularSlerpMotorForce() const 
+float ZEMDResourcePhysicalJoint::GetAngularSlerpMotorForce() const 
 {
 	return AngularSlerpMotorForce;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSlerpMotorSpring(float AngularSlerpMotorSpring)
+void ZEMDResourcePhysicalJoint::SetAngularSlerpMotorSpring(float AngularSlerpMotorSpring)
 {
 	this->AngularSlerpMotorSpring = AngularSlerpMotorSpring;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularSlerpMotorSpring() const 
+float ZEMDResourcePhysicalJoint::GetAngularSlerpMotorSpring() const 
 {
 	return AngularSlerpMotorSpring;
 }
 
-void ZEModelResourcePhysicalJoint::SetAngularSlerpMotorDamper(float AngularSlerpMotorDamper)
+void ZEMDResourcePhysicalJoint::SetAngularSlerpMotorDamper(float AngularSlerpMotorDamper)
 {
 	this->AngularSlerpMotorDamper = AngularSlerpMotorDamper;
 }
 
-float ZEModelResourcePhysicalJoint::GetAngularSlerpMotorDamper() const 
+float ZEMDResourcePhysicalJoint::GetAngularSlerpMotorDamper() const 
 {
 	return AngularSlerpMotorDamper;
 }
 
-bool ZEModelResourcePhysicalJoint::Load(const ZEMLReaderNode& JointNode)
+bool ZEMDResourcePhysicalJoint::Load(const ZEMLReaderNode& JointNode)
 {
 	zeCheckError(!JointNode.IsValid(), false, "Invalid Joint node.");
 	zeCheckError(JointNode.GetName() != "PhysicalJoint", false, "Invalid Joint node name.");
@@ -1189,12 +1189,12 @@ bool ZEModelResourcePhysicalJoint::Load(const ZEMLReaderNode& JointNode)
 	return true;
 }
 
-bool ZEModelResourcePhysicalJoint::Save(ZEMLWriterNode& JointNode) const
+bool ZEMDResourcePhysicalJoint::Save(ZEMLWriterNode& JointNode) const
 {
 	return false;
 }
 
-ZEModelResourcePhysicalJoint::ZEModelResourcePhysicalJoint()
+ZEMDResourcePhysicalJoint::ZEMDResourcePhysicalJoint()
 {
 	JointType = ZE_PJT_NONE;
 

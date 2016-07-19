@@ -55,6 +55,8 @@ class ZERSHolder
 		void						Copy(const ZERSHolder<Type>& OtherHolder);
 		Type*						Transfer();
 
+		void						ManuelAssign(Type* RawPointer); // Dont use this function for regular operations
+
 		template<typename TargetType>
 		TargetType*					Cast() const;
 		template<typename TargetType>
@@ -150,6 +152,13 @@ Type* ZERSHolder<Type>::Transfer()
 	Type* Temp = Pointer;
 	Pointer = NULL;
 	return Temp;
+}
+
+template<typename Type>
+void ZERSHolder<Type>::ManuelAssign(Type* RawPointer)
+{
+	Release();
+	Pointer = RawPointer;
 }
 
 template<typename Type>

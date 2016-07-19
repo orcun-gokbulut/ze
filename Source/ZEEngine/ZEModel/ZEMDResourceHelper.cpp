@@ -37,83 +37,83 @@
 
 #include "ZEML\ZEMLReader.h"
 
-void ZEModelResourceHelper::SetName(const ZEString& Name)
+void ZEMDResourceHelper::SetName(const ZEString& Name)
 {
 	this->Name = Name;
 }
 
-const ZEString& ZEModelResourceHelper::GetName() const 
+const ZEString& ZEMDResourceHelper::GetName() const 
 {
 	return Name;
 }
 
-void ZEModelResourceHelper::SetOwnerType(ZEModelResourceHelperParentType OwnerType)
+void ZEMDResourceHelper::SetOwnerType(ZEMDResourceHelperParentType OwnerType)
 {
 	this->OwnerType = OwnerType;
 }
 
-ZEModelResourceHelperParentType ZEModelResourceHelper::GetOwnerType() const 
+ZEMDResourceHelperParentType ZEMDResourceHelper::GetOwnerType() const 
 {
 	return OwnerType;
 }
 
-void ZEModelResourceHelper::SetOwnerId(ZEInt32 OwnerId)
+void ZEMDResourceHelper::SetOwnerId(ZEInt32 OwnerId)
 {
 	this->OwnerId = OwnerId;
 }
 
-ZEInt32 ZEModelResourceHelper::GetOwnerId() const 
+ZEInt32 ZEMDResourceHelper::GetOwnerId() const 
 {
 	return OwnerId;
 }
 
-void ZEModelResourceHelper::SetPosition(const ZEVector3& Position)
+void ZEMDResourceHelper::SetPosition(const ZEVector3& Position)
 {
 	this->Position = Position;
 }
 
-const ZEVector3& ZEModelResourceHelper::GetPosition() const 
+const ZEVector3& ZEMDResourceHelper::GetPosition() const 
 {
 	return Position;
 }
 
-void ZEModelResourceHelper::SetRotation(const ZEQuaternion& Rotation)
+void ZEMDResourceHelper::SetRotation(const ZEQuaternion& Rotation)
 {
 	this->Rotation = Rotation;
 }
 
-const ZEQuaternion& ZEModelResourceHelper::GetRotation() const 
+const ZEQuaternion& ZEMDResourceHelper::GetRotation() const 
 {
 	return Rotation;
 }
 
-void ZEModelResourceHelper::SetScale(const ZEVector3& Scale)
+void ZEMDResourceHelper::SetScale(const ZEVector3& Scale)
 {
 	this->Scale = Scale;
 }
 
-const ZEVector3& ZEModelResourceHelper::GetScale() const 
+const ZEVector3& ZEMDResourceHelper::GetScale() const 
 {
 	return Scale;
 }
 
-void ZEModelResourceHelper::SetUserDefinedProperties(ZEString UserDefinedProperties)
+void ZEMDResourceHelper::SetUserDefinedProperties(ZEString UserDefinedProperties)
 {
 	this->UserDefinedProperties = UserDefinedProperties;
 }
 
-ZEString ZEModelResourceHelper::GetUserDefinedProperties() const 
+ZEString ZEMDResourceHelper::GetUserDefinedProperties() const 
 {
 	return UserDefinedProperties;
 }
 
-bool ZEModelResourceHelper::Load(const ZEMLReaderNode& HelperNode)
+bool ZEMDResourceHelper::Load(const ZEMLReaderNode& HelperNode)
 {
 	zeCheckError(!HelperNode.IsValid(), false, "Invalid Helper node.");
 	zeCheckError(HelperNode.GetName() != "Helper", false, "Invalid Helper node name.");
 
 	SetName(HelperNode.ReadString("Name"));
-	SetOwnerType((ZEModelResourceHelperParentType)HelperNode.ReadInt32("OwnerType", ZE_MRHPT_MODEL));
+	SetOwnerType((ZEMDResourceHelperParentType)HelperNode.ReadInt32("OwnerType", ZE_MRHPT_MODEL));
 	SetOwnerId(HelperNode.ReadInt32("OwnerId", -1));
 	SetPosition(HelperNode.ReadVector3("Position", ZEVector3::Zero));
 	SetRotation(HelperNode.ReadQuaternion("Rotation", ZEQuaternion::Identity));
@@ -123,12 +123,12 @@ bool ZEModelResourceHelper::Load(const ZEMLReaderNode& HelperNode)
 	return true;
 }
 
-bool ZEModelResourceHelper::Save(ZEMLWriterNode& HelperNode) const
+bool ZEMDResourceHelper::Save(ZEMLWriterNode& HelperNode) const
 {
 	return false;
 }
 
-ZEModelResourceHelper::ZEModelResourceHelper() : Link(this)
+ZEMDResourceHelper::ZEMDResourceHelper() : Link(this)
 {
 	OwnerType = ZE_MRHPT_MODEL;
 	OwnerId = -1;

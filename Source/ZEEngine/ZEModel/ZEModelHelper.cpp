@@ -34,8 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEModelHelper.h"
-#include "ZEModelResource.h"
+
 #include "ZEModel.h"
+#include "ZEMDResource.h"
+#include "ZEMDResourceHelper.h"
 
 void ZEModelHelper::SetParent(ZEModel* Model)
 {
@@ -280,7 +282,7 @@ ZEVector3 ZEModelHelper::GetWorldUp() const
 	return GetWorldRotation() * ZEVector3::UnitY;
 }
 
-void ZEModelHelper::Load(ZEModel* Model, ZEHolder<const ZEModelResource> Resource, const ZEModelResourceHelper* HelperResource)
+void ZEModelHelper::Load(ZEModel* Model, ZERSHolder<const ZEMDResource> Resource, const ZEMDResourceHelper* HelperResource)
 {
 	ParentModel = Model;
 	this->HelperResource = HelperResource;

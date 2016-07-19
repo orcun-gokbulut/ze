@@ -36,103 +36,103 @@
 #include "ZEMDResourceBone.h"
 #include "ZEML\ZEMLReader.h"
 
-void ZEModelResourceBone::SetName(const ZEString& Value)
+void ZEMDResourceBone::SetName(const ZEString& Value)
 {
 	Name = Value;
 }
 
-const ZEString& ZEModelResourceBone::GetName() const 
+const ZEString& ZEMDResourceBone::GetName() const 
 {
 	return Name;
 }
 
-void ZEModelResourceBone::SetBoundingBox(const ZEAABBox& Value)
+void ZEMDResourceBone::SetBoundingBox(const ZEAABBox& Value)
 {
 	BoundingBox = Value;
 }
 
-const ZEAABBox& ZEModelResourceBone::GetBoundingBox() const 
+const ZEAABBox& ZEMDResourceBone::GetBoundingBox() const 
 {
 	return BoundingBox;
 }
-void ZEModelResourceBone::SetParentBone(ZEInt32 BoneId)
+void ZEMDResourceBone::SetParentBone(ZEInt32 BoneId)
 {
 	ParentBone = BoneId;
 }
 
-ZEInt32 ZEModelResourceBone::GetParentBone() const 
+ZEInt32 ZEMDResourceBone::GetParentBone() const 
 {
 	return ParentBone;
 }
-void ZEModelResourceBone::SetPosition(const ZEVector3& Position)
+void ZEMDResourceBone::SetPosition(const ZEVector3& Position)
 {
 	this->Position = Position;
 }
 
-const ZEVector3& ZEModelResourceBone::GetPosition() const 
+const ZEVector3& ZEMDResourceBone::GetPosition() const 
 {
 	return Position;
 }
-void ZEModelResourceBone::SetRotation(const ZEQuaternion& Rotation)
+void ZEMDResourceBone::SetRotation(const ZEQuaternion& Rotation)
 {
 	this->Rotation = Rotation;
 }
 
-const ZEQuaternion& ZEModelResourceBone::GetRotation() const 
+const ZEQuaternion& ZEMDResourceBone::GetRotation() const 
 {
 	return Rotation;
 }
-void ZEModelResourceBone::SetScale(const ZEVector3& Scale)
+void ZEMDResourceBone::SetScale(const ZEVector3& Scale)
 {
 	this->Scale = Scale;
 }
 
-const ZEVector3& ZEModelResourceBone::GetScale() const 
+const ZEVector3& ZEMDResourceBone::GetScale() const 
 {
 	return Scale;
 }
 
-const ZEModelResourcePhysicalBody& ZEModelResourceBone::GetPhysicalBody() const
+const ZEMDResourcePhysicalBody& ZEMDResourceBone::GetPhysicalBody() const
 {
 	return PhysicalBody;
 }
 
-ZEModelResourcePhysicalBody& ZEModelResourceBone::GetPhysicalBody()
+ZEMDResourcePhysicalBody& ZEMDResourceBone::GetPhysicalBody()
 {
 	return PhysicalBody;
 }
 
-void ZEModelResourceBone::SetPhysicalJoint(const ZEModelResourcePhysicalBody& Body)
+void ZEMDResourceBone::SetPhysicalJoint(const ZEMDResourcePhysicalBody& Body)
 {
 	PhysicalBody = Body;
 }
 
-void ZEModelResourceBone::SetPhysicalJoint(const ZEModelResourcePhysicalJoint& Joint)
+void ZEMDResourceBone::SetPhysicalJoint(const ZEMDResourcePhysicalJoint& Joint)
 {
 	PhysicalJoint = Joint;
 }
 
-const ZEModelResourcePhysicalJoint& ZEModelResourceBone::GetPhysicalJoint() const
+const ZEMDResourcePhysicalJoint& ZEMDResourceBone::GetPhysicalJoint() const
 {
 	return PhysicalJoint;
 }
 
-ZEModelResourcePhysicalJoint& ZEModelResourceBone::GetPhysicalJoint()
+ZEMDResourcePhysicalJoint& ZEMDResourceBone::GetPhysicalJoint()
 {
 	return PhysicalJoint;
 }
 
-void ZEModelResourceBone::SetUserDefinedProperties(const ZEString& UserDefinedProperties)
+void ZEMDResourceBone::SetUserDefinedProperties(const ZEString& UserDefinedProperties)
 {
 	this->UserDefinedProperties = UserDefinedProperties;
 }
 
-const ZEString& ZEModelResourceBone::GetUserDefinedProperties() const
+const ZEString& ZEMDResourceBone::GetUserDefinedProperties() const
 {
 	return UserDefinedProperties;
 }
 
-bool ZEModelResourceBone::Load(const ZEMLReaderNode& BoneNode)
+bool ZEMDResourceBone::Load(const ZEMLReaderNode& BoneNode)
 {
 	zeCheckError(!BoneNode.IsValid(), false, "Invalid Bone node.");
 	zeCheckError(BoneNode.GetName() != "Bone", false, "Invalid Bone node name.");
@@ -157,7 +157,7 @@ bool ZEModelResourceBone::Load(const ZEMLReaderNode& BoneNode)
 	}
 	else
 	{
-		PhysicalJoint = ZEModelResourcePhysicalJoint();
+		PhysicalJoint = ZEMDResourcePhysicalJoint();
 	}
 
 	ZEMLReaderNode PhysicalBodyNode = BoneNode.GetNode("PhysicalBody");
@@ -168,18 +168,18 @@ bool ZEModelResourceBone::Load(const ZEMLReaderNode& BoneNode)
 	}
 	else
 	{
-		PhysicalBody = ZEModelResourcePhysicalBody();
+		PhysicalBody = ZEMDResourcePhysicalBody();
 	}
 
 	return true;
 }
 
-bool ZEModelResourceBone::Save(ZEMLWriterNode& BoneNode) const
+bool ZEMDResourceBone::Save(ZEMLWriterNode& BoneNode) const
 {
 	return false;
 }
 
-ZEModelResourceBone::ZEModelResourceBone() : Link(this)
+ZEMDResourceBone::ZEMDResourceBone() : Link(this)
 {
 	ParentBone = -1;
 	Position = ZEVector3::Zero;

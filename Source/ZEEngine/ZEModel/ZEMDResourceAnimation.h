@@ -75,7 +75,7 @@ class ZEMLWriterNode;
 // 	return Output;
 // }
 
-struct ZEModelResourceAnimationKey
+struct ZEMDResourceAnimationKey
 {
 	ZEUInt32 ItemId;
 	ZEVector3 Position;
@@ -83,35 +83,35 @@ struct ZEModelResourceAnimationKey
 	ZEVector3 Scale;
 };
 
-struct ZEModelResourceAnimationFrame
+struct ZEMDResourceAnimationFrame
 {
-	ZEArray<ZEModelResourceAnimationKey> BoneKeys;
-	ZEArray<ZEModelResourceAnimationKey> MeshKeys;
+	ZEArray<ZEMDResourceAnimationKey> BoneKeys;
+	ZEArray<ZEMDResourceAnimationKey> MeshKeys;
 };
 
-class ZEModelResourceAnimation : public ZEObject
+class ZEMDResourceAnimation : public ZEObject
 {
 	ZE_OBJECT
-	friend class ZEModelResource;
+	friend class ZEMDResource;
 	private:
-		ZELink<ZEModelResourceAnimation> Link;
+		ZELink<ZEMDResourceAnimation> Link;
 
 		ZEString Name;
-		ZEArray<ZEModelResourceAnimationFrame> Frames;
+		ZEArray<ZEMDResourceAnimationFrame> Frames;
 		ZEArray<ZEGUID> ItemGUIDS;
 
 	public:
 		void SetName(const ZEString& Name);
 		const ZEString& GetName() const;
 
-		void SetFrames(ZEArray<ZEModelResourceAnimationFrame>& Frames);
-		const ZEArray<ZEModelResourceAnimationFrame>& GetFrames() const;
+		void SetFrames(ZEArray<ZEMDResourceAnimationFrame>& Frames);
+		const ZEArray<ZEMDResourceAnimationFrame>& GetFrames() const;
 		
-		void AddFrame(const ZEModelResourceAnimationFrame& Frame);
+		void AddFrame(const ZEMDResourceAnimationFrame& Frame);
 		void RemoveFrame(ZESize Index);
 
 		bool Load(const ZEMLReaderNode& AnimationNode);
 		bool Save(ZEMLWriterNode& AnimationNode) const;
 
-		ZEModelResourceAnimation();
+		ZEMDResourceAnimation();
 };
