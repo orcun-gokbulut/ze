@@ -57,6 +57,7 @@ class ZED11ComponentBase
 		ID3D11DeviceContext*			GetMainContext() const;
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
+		static ZEGRFormat				ConvertDXGIFormat(DXGI_FORMAT Format);
 		static D3D11_USAGE				ConvertUsage(ZEGRResourceUsage Usage);
 		static UINT						ConvertBindFlags(ZEFlags BindFlags);
 		static UINT						ConvertUsageToCpuAccessFlags(ZEGRResourceUsage Usage);

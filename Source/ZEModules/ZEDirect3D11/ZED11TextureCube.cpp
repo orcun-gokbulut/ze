@@ -62,18 +62,29 @@ bool ZED11TextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat F
 	if (Data != NULL)
 	{
 		SubresourceData = new D3D11_SUBRESOURCE_DATA[6];
-		ZEUInt PixelSize = ZEGRFormatDefinition::GetDefinition(Format)->BlockSize;
+		const ZEGRFormatDefinition* FormatInfo = ZEGRFormatDefinition::GetDefinition(Format);
 		ZESize Offset = 0;
-		for (ZEUInt I = 0; I < 6; I++)
+		for (ZEUInt J = 0; J < 6; J++)
 		{
-			ZESize RowPitch = Length * PixelSize;
-			ZESize SlicePitch = RowPitch * Length;
+			ZEUInt SubresourceIndex = J * LevelCount;
+			for (ZEUInt I = 0; I < LevelCount; I++)
+			{
+				ZEUInt NewWidth = Length >> I;
+				ZEUInt NewHeight = Length >> I;
 
-			SubresourceData[I].pSysMem = static_cast<const ZEBYTE*>(Data) + Offset;
-			SubresourceData[I].SysMemPitch = RowPitch;
-			SubresourceData[I].SysMemSlicePitch = SlicePitch;
+				NewWidth = (FormatInfo->Compressed && NewWidth < FormatInfo->BlockDimension) ? FormatInfo->BlockDimension : NewWidth;
+				NewHeight = (FormatInfo->Compressed && NewHeight < FormatInfo->BlockDimension) ? FormatInfo->BlockDimension : NewHeight;
 
-			Offset += SlicePitch;
+				ZESize RowPitch = (NewWidth / FormatInfo->BlockDimension) * FormatInfo->BlockSize;
+				ZESize SlicePitch = RowPitch * (NewHeight / FormatInfo->BlockDimension);
+
+				SubresourceData[SubresourceIndex].pSysMem = static_cast<const ZEBYTE*>(Data) + Offset;
+				SubresourceData[SubresourceIndex].SysMemPitch = RowPitch;
+				SubresourceData[SubresourceIndex].SysMemSlicePitch = SlicePitch;
+
+				SubresourceIndex++;
+				Offset += SlicePitch;
+			}
 		}
 	}
 

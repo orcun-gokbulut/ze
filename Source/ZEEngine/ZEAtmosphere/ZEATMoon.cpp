@@ -42,7 +42,7 @@
 #include "ZEGraphics/ZEGRViewport.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTexture3D.h"
 #include "ZEGraphics/ZEGRShader.h"
 #include "ZEGraphics/ZEGRRenderState.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
@@ -233,15 +233,18 @@ const ZEVector3& ZEATMoon::GetColor() const
 
 void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
-	if (FileName.IsEmpty())
-		return;
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = false;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
 
-	PhaseTexture.Load3D(FileName, HorizTileCount, VertTileCount);
+	PhaseTexture = ZEGRTexture3D::CreateFromFile(FileName, TextureOptions, HorizTileCount, VertTileCount);
 }
 
 const ZEString& ZEATMoon::GetTextureFile() const
 {
-	return PhaseTexture.GetTextureFile();
+	return PhaseTexture != NULL ? PhaseTexture->GetName() : ZEString::Empty;
 }
 
 bool ZEATMoon::PreRender(const ZERNPreRenderParameters* Parameters)
@@ -284,7 +287,7 @@ void ZEATMoon::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
-	const ZEGRTexture* Texture = PhaseTexture.GetTexture();
+	const ZEGRTexture* Texture = PhaseTexture;
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	
 	Context->Draw(4, 0);

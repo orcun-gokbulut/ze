@@ -35,7 +35,6 @@
 
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
-#include "ZECore/ZEWindow.h"
 #include "ZEDS/ZEFormat.h"
 
 #include "ZEDirectInputDevice.h"

@@ -51,7 +51,6 @@
 #include "ZERenderer/ZERNStageAtmosphere.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNFilter.h"
-#include "ZETexture/ZETexture2DResource.h"
 
 #define ZE_CDF_SHADERS			1
 #define ZE_CDF_RENDER_STATES	2
@@ -273,22 +272,18 @@ ZEDrawFlags ZEATCloud::GetDrawFlags() const
 
 void ZEATCloud::SetCloudTexture(const ZEString& FileName)
 {
-	ZETextureOptions TextureOption = 
-	{
-		ZE_TCT_NONE,
-		ZE_TCQ_LOW,
-		ZE_TDS_NONE,
-		ZE_TFC_DISABLED,
-		ZE_TMM_DISABLED,
-		1
-	};
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC3_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = false;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
 
-	CloudTexture = ZETexture2DResource::LoadResource(FileName, &TextureOption);
+	CloudTexture = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 }
 
 const ZEString& ZEATCloud::GetCloudTexture() const
 {
-	return CloudTexture == NULL ? ZEString::Empty : CloudTexture->GetFileName();
+	return CloudTexture == NULL ? ZEString::Empty : CloudTexture->GetName();
 }
 
 void ZEATCloud::SetCloudCoverage(float CloudCoverage)
@@ -425,7 +420,7 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	Context->SetConstantBuffers(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, PlaneTransformConstantBuffer.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_ALL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(PlaneRenderStateData);
-	ZEGRTexture* Texture = CloudTexture->GetTexture();
+	const ZEGRTexture* Texture = CloudTexture;
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
 

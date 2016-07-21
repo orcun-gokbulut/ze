@@ -89,5 +89,5 @@ class ZEGRTexture2D : public ZEGRTexture
 																		ZEUInt SampleCount = 1, 
 																		const void* Data = NULL);
 
-		static ZEHolder<ZEGRTexture2D>					CreateFromFile(const ZEString& Filename, bool RGBColorMap = true, bool NormalMap = false, bool GrayscaleMap = false);
+		static ZEHolder<ZEGRTexture2D>					CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions);
 };
