@@ -41,7 +41,7 @@
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRSampler.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
-#include "ZEGraphics/ZEGRTexture2D.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZEGraphics/ZEGRRenderTarget.h"
 #include "ZEGraphics/ZEGRDepthStencilBuffer.h"
 #include "ZERenderer/ZECamera.h"
@@ -50,7 +50,6 @@
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
 #include "ZERenderer/ZERNStageAtmosphere.h"
-#include "ZETexture/ZETextureCubeResource.h"
 
 #define	ZEAT_SBDF_SHADERS			1
 #define	ZEAT_SBDF_RENDER_STATE		2
@@ -63,29 +62,18 @@ ZEDrawFlags ZEATSkyBox::GetDrawFlags() const
 
 void ZEATSkyBox::SetTextureFile(const ZEString& FileName)
 {
-	if (SkyTexture != NULL)
-	{
-		SkyTexture->Release();
-		SkyTexture = NULL;
-	}
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = false;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
 
-	ZETextureOptions Options;
-	Options.CompressionQuality = ZE_TCQ_HIGH;
-	Options.CompressionType = ZE_TCT_NONE;
-	Options.DownSample = ZE_TDS_NONE;
-	Options.FileCaching = ZE_TFC_DISABLED;
-	Options.MaximumMipmapLevel = 1;
-	Options.MipMapping = ZE_TMM_DISABLED;
-
-	SkyTexture = ZETextureCubeResource::LoadResource(FileName, &Options);
+	SkyTexture = ZEGRTextureCube::CreateFromFile(FileName, TextureOptions);
 }
 
 const ZEString& ZEATSkyBox::GetTextureFile() const
 {
-	if (SkyTexture == NULL)
-		return ZEString::Empty;
-
-	return SkyTexture->GetFileName();
+	return SkyTexture != NULL ? SkyTexture->GetName() : ZEString::Empty;
 }
 
 void ZEATSkyBox::SetBrightness(float Brightness)
@@ -143,12 +131,7 @@ bool ZEATSkyBox::DeinitializeSelf()
 	VertexBuffer.Release();
 	ConstantBuffer.Release();
 	ConstantBufferTransform.Release();
-
-	if (SkyTexture != NULL)
-	{
-		SkyTexture->Release();
-		SkyTexture = NULL;
-	}
+	SkyTexture.Release();
 
 	return ZEEntity::DeinitializeSelf();
 }
@@ -277,7 +260,7 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferTransform.GetPointerToPointer());
 	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
 	Context->SetRenderState(RenderStateData);
-	ZEGRTexture* Texture = SkyTexture->GetTexture();
+	const ZEGRTexture* Texture = SkyTexture;
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
 	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
 

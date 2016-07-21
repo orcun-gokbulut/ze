@@ -609,12 +609,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetSubSurfaceScatteringMap() const
 
 void ZERNFixedMaterial::SetSubSurfaceScatteringMapFile(const ZEString& Filename)
 {
-	SubSurfaceScatteringMap = ZEGRTexture2D::CreateFromFile(Filename, false, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = false;
+
+	SubSurfaceScatteringMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetSubSurfaceScatteringMapFile() const
 {
-	return SubSurfaceScatteringMap->GetName();
+	return SubSurfaceScatteringMap != NULL ? SubSurfaceScatteringMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetBaseMapEnabled(bool Enabled)
@@ -644,12 +650,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetBaseMap() const
 
 void ZERNFixedMaterial::SetBaseMapFile(const ZEString& Filename)
 {
-	BaseMap = ZEGRTexture2D::CreateFromFile(Filename);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+
+	BaseMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetBaseMapFile() const
 {
-	return BaseMap->GetName();
+	return BaseMap != NULL ? BaseMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetAmbientEnabled(bool Enabled)
@@ -845,12 +857,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularMap() const
 
 void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& Filename)
 {
-	SpecularMap = ZEGRTexture2D::CreateFromFile(Filename, false, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+
+	SpecularMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetSpecularMapFile() const
 {
-	return SpecularMap->GetName();
+	return SpecularMap != NULL ? SpecularMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetSpecularGlossMapEnabled(bool Enabled)
@@ -880,12 +898,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularGlossMap() const
 
 void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& Filename)
 {
-	SpecularGlossMap = ZEGRTexture2D::CreateFromFile(Filename, false, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = false;
+
+	SpecularGlossMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetSpecularGlossMapFile() const
 {
-	return SpecularGlossMap->GetName();
+	return SpecularGlossMap != NULL ? SpecularGlossMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetEmissiveEnabled(bool Enabled)
@@ -960,12 +984,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetEmissiveMap() const
 
 void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& Filename)
 {
-	EmissiveMap = ZEGRTexture2D::CreateFromFile(Filename);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+
+	EmissiveMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetEmissiveMapFile() const
 {
-	return EmissiveMap->GetName();
+	return EmissiveMap != NULL ? EmissiveMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetNormalMapEnabled(bool Enabled)
@@ -995,12 +1025,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetNormalMap() const
 
 void ZERNFixedMaterial::SetNormalMapFile(const ZEString& Filename)
 {
-	NormalMap = ZEGRTexture2D::CreateFromFile(Filename, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = false;
+
+	NormalMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetNormalMapFile() const
 {
-	return NormalMap->GetName();
+	return NormalMap != NULL ? NormalMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetHeightMapEnabled(bool Enabled)
@@ -1075,12 +1111,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetHeightMap() const
 
 void ZERNFixedMaterial::SetHeightMapFile(const ZEString& Filename)
 {
-	HeightMap = ZEGRTexture2D::CreateFromFile(Filename, false, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = false;
+
+	HeightMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetHeightMapFile() const
 {
-	return HeightMap->GetName();
+	return HeightMap != NULL ? HeightMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetOpacity(float Value)
@@ -1124,12 +1166,18 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetOpacityMap() const
 
 void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& Filename)
 {
-	OpacityMap = ZEGRTexture2D::CreateFromFile(Filename, false, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+
+	OpacityMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetOpacityMapFile() const
 {
-	return OpacityMap->GetName();
+	return OpacityMap != NULL ? OpacityMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetEnvironmentMap(ZEGRTexture2D* Texture)
@@ -1350,12 +1398,18 @@ float ZERNFixedMaterial::GetDetailBaseMapAttenuationFactor() const
 
 void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& Filename)
 {
-	DetailBaseMap = ZEGRTexture2D::CreateFromFile(Filename);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+
+	DetailBaseMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetDetailBaseMapFile() const
 {
-	return DetailBaseMap->GetName();
+	return DetailBaseMap != NULL ? DetailBaseMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetDetailNormalMapEnabled(bool Enabled)
@@ -1435,12 +1489,18 @@ float ZERNFixedMaterial::GetDetailNormalMapAttenuationFactor() const
 
 void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& Filename)
 {
-	DetailNormalMap = ZEGRTexture2D::CreateFromFile(Filename, false, true);
+	ZEGRTextureOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = false;
+
+	DetailNormalMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
 }
 
 const ZEString& ZERNFixedMaterial::GetDetailNormalMapFile() const
 {
-	return DetailNormalMap->GetName();
+	return DetailNormalMap != NULL ? DetailNormalMap->GetName() : ZEString::Empty;
 }
 
 void ZERNFixedMaterial::SetClippingPlanesEnabled(bool Enabled)
@@ -1554,11 +1614,11 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteBool("AlphaCullEnabled", GetAlphaCullEnabled());
 	ConfigurationNode.WriteFloat("AlphaCullLimit", GetAlphaCullLimit());
 
-	ConfigurationNode.WriteString("BaseMap", BaseMap->GetName());
+	ConfigurationNode.WriteString("BaseMap", GetBaseMapFile());
 
 	ConfigurationNode.WriteFloat("SubSurfaceScatteringFactor", GetSubSurfaceScatteringFactor());
 	ConfigurationNode.WriteBool("SubSurfaceScatteringMapEnabled", GetSubSurfaceScatteringMapEnabled());
-	ConfigurationNode.WriteString("SubSurfaceScatteringMap", SubSurfaceScatteringMap->GetName());
+	ConfigurationNode.WriteString("SubSurfaceScatteringMap", GetSubSurfaceScatteringMapFile());
 
 	ConfigurationNode.WriteBool("AmbientEnabled", GetAmbientEnabled());
 	ConfigurationNode.WriteFloat("AmbientFactor", GetAmbientFactor());
@@ -1573,30 +1633,30 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteFloat("SpecularFactor", GetSpecularFactor());
 	ConfigurationNode.WriteVector3("SpecularColor", GetSpecularColor());
 	ConfigurationNode.WriteBool("SpecularMapEnabled", GetSpecularMapEnabled());
-	ConfigurationNode.WriteString("SpecularMap", SpecularMap->GetName());
+	ConfigurationNode.WriteString("SpecularMap", GetSpecularMapFile());
 	ConfigurationNode.WriteBool("SpecularGlossMapEnabled", GetSpecularGlossMapEnabled());
-	ConfigurationNode.WriteString("SpecularGlossMap", SpecularGlossMap->GetName());
+	ConfigurationNode.WriteString("SpecularGlossMap", GetSpecularGlossMapFile());
 
 	ConfigurationNode.WriteBool("EmissiveEnabled", GetEmissiveEnabled());
 	ConfigurationNode.WriteFloat("EmissiveFactor", GetEmissiveFactor());
 	ConfigurationNode.WriteVector3("EmissiveColor", GetEmissiveColor());
 	ConfigurationNode.WriteBool("EmissiveMapEnabled", GetEmissiveMapEnabled());
-	ConfigurationNode.WriteString("EmissiveMap", EmissiveMap->GetName());
+	ConfigurationNode.WriteString("EmissiveMap", GetEmissiveMapFile());
 
 	ConfigurationNode.WriteBool("NormalMapEnabled", GetNormalMapEnabled());
-	ConfigurationNode.WriteString("NormalMap", NormalMap->GetName());
+	ConfigurationNode.WriteString("NormalMap", GetNormalMapFile());
 
 	ConfigurationNode.WriteBool("HeightMapEnabled", GetHeightMapEnabled());
 	ConfigurationNode.WriteUInt8("HeightMapTechnique", GetHeightMapEnabled());
 	ConfigurationNode.WriteFloat("HeightMapOffset", GetHeightMapOffset());
 	ConfigurationNode.WriteFloat("HeightMapScale", GetHeightMapScale());
-	ConfigurationNode.WriteString("HeightMap", HeightMap->GetName());
+	ConfigurationNode.WriteString("HeightMap", GetHeightMapFile());
 
 	ConfigurationNode.WriteFloat("Opacity", GetOpacity());
 	ConfigurationNode.WriteBool("OpacityMapEnabled", GetOpacityMapEnabled());
-	ConfigurationNode.WriteString("OpacityMap", OpacityMap->GetName());
+	ConfigurationNode.WriteString("OpacityMap", GetOpacityMapFile());
 
-	ConfigurationNode.WriteString("EnvironmentMap", EnvironmentMap->GetName());
+	ConfigurationNode.WriteString("EnvironmentMap", GetEnvironmentMapFile());
 
 	ConfigurationNode.WriteBool("ReflectionEnabled", GetReflectionEnabled());
 	ConfigurationNode.WriteFloat("ReflectionFactor", GetReflectionFactor());
@@ -1611,14 +1671,14 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	ConfigurationNode.WriteVector2("DetailBaseMapTiling", GetDetailBaseMapTiling());
 	ConfigurationNode.WriteFloat("DetailBaseMapAttenuationStart", GetDetailBaseMapAttenuationStart());
 	ConfigurationNode.WriteFloat("DetailBaseMapAttenuationFactor", GetDetailBaseMapAttenuationFactor());
-	ConfigurationNode.WriteString("DetailBaseMap", DetailBaseMap->GetName());
+	ConfigurationNode.WriteString("DetailBaseMap", GetDetailBaseMapFile());
 
 	ConfigurationNode.WriteBool("DetailNormalMapEnabled", GetDetailNormalMapEnabled());
 	ConfigurationNode.WriteFloat("DetailNormalMapColor", GetDetailNormalMapFactor());
 	ConfigurationNode.WriteVector2("DetailNormalMapTiling", GetDetailNormalMapTiling());
 	ConfigurationNode.WriteFloat("DetailNormalMapAttenuationStart", GetDetailNormalMapAttenuationStart());
 	ConfigurationNode.WriteFloat("DetailNormalMapAttenuationFactor", GetDetailNormalMapAttenuationFactor());
-	ConfigurationNode.WriteString("DetailNormalMap", DetailNormalMap->GetName());
+	ConfigurationNode.WriteString("DetailNormalMap", GetDetailNormalMapFile());
 
 	ConfigurationNode.WriteBool("ClippingPlanesEnabled", GetClippingPlanesEnabled());
 

@@ -56,6 +56,14 @@ struct ZERect
 	ZEInt Width, Height;
 };
 
+struct ZEGRTextureOptions
+{
+	ZEGRFormat	CompressionFormat;
+	ZEUInt		MaximumMipmapLevel;
+	bool		GenerateMipMaps;
+	bool		sRGB;
+};
+
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 

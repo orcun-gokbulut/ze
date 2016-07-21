@@ -75,5 +75,7 @@ class ZEGRTexture3D : public ZEGRTexture
 												ZEGRFormat Format, 
 												ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
 												ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
-												const void* Data = NULL);	
+												const void* Data = NULL);
+
+		static ZEHolder<ZEGRTexture3D>	CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions, ZEUInt HorizTileCount, ZEUInt VertTileCount);
 };

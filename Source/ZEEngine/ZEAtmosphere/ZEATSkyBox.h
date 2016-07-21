@@ -41,7 +41,7 @@
 #include "ZERenderer/ZECanvas.h"
 #include "ZERenderer/ZERNCommand.h"
 
-class ZETextureCubeResource;
+class ZEGRTextureCube;
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRVertexBuffer;
@@ -62,7 +62,7 @@ class ZEATSkyBox : public ZEEntity
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBufferTransform;
 
-		ZETextureCubeResource*				SkyTexture;
+		ZEHolder<ZEGRTextureCube>			SkyTexture;
 
 		float								Brightness;
 		ZEVector3							Color;

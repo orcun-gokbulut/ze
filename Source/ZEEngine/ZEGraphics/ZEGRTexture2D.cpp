@@ -41,40 +41,10 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEPointer/ZEPointer.h"
 
-#include <d3d11.h>
+#include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
-static ZEGRFormat ConvertDXGIFormat(DXGI_FORMAT Format)
-{
-	switch (Format)
-	{
-		case DXGI_FORMAT_BC1_UNORM:
-			return ZEGR_TF_BC1_UNORM;
-
-		case DXGI_FORMAT_BC1_UNORM_SRGB:
-			return ZEGR_TF_BC1_UNORM_SRGB;
-
-		case DXGI_FORMAT_BC3_UNORM:
-			return ZEGR_TF_BC3_UNORM;
-
-		case DXGI_FORMAT_BC3_UNORM_SRGB:
-			return ZEGR_TF_BC3_UNORM_SRGB;
-
-		case DXGI_FORMAT_BC4_UNORM:
-			return ZEGR_TF_BC4_UNORM;
-
-		case DXGI_FORMAT_BC5_UNORM:
-			return ZEGR_TF_BC5_UNORM;
-
-		case DXGI_FORMAT_BC7_UNORM:
-			return ZEGR_TF_BC7_UNORM;
-
-		case DXGI_FORMAT_BC7_UNORM_SRGB:
-			return ZEGR_TF_BC7_UNORM_SRGB;
-
-		default:
-			return ZEGR_TF_NONE;
-	}
-}
+#include "DirectXTex.h"
+using namespace DirectX;
 
 ZEGRResourceType ZEGRTexture2D::GetResourceType() const
 {
@@ -171,10 +141,7 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateInstance(ZEUInt Width, ZEUInt Heigh
 	return Texture;
 }
 
-#include "DirectXTex.h"
-using namespace DirectX;
-
-ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateFromFile(const ZEString& Filename, bool RGBColorMap, bool NormalMap, bool GrayscaleMap)
+ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions)
 {
 	if (Filename.IsEmpty())
 		return NULL;
@@ -226,7 +193,7 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateFromFile(const ZEString& Filename, 
 			}
 			else
 			{
-				HR = LoadFromWICFile(FileRealPath, WIC_FLAGS_NONE, &FinalMetaData, *FinalImage);
+				HR = LoadFromWICFile(FileRealPath, WIC_FLAGS_FORCE_RGB | WIC_FLAGS_IGNORE_SRGB, &FinalMetaData, *FinalImage);
 				if (FAILED(HR))
 				{
 					zeError("Loading from %s file failed (%x)\n", Extension, HR);
@@ -234,73 +201,81 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateFromFile(const ZEString& Filename, 
 				}
 			}
 
-			if (!ZEMath::IsPowerOfTwo(FinalMetaData.width) || !ZEMath::IsPowerOfTwo(FinalMetaData.height))
+			if (TextureOptions.sRGB)
 			{
-				float PowerWidth = ZEMath::Log(FinalMetaData.width) / ZEMath::Log(2);
-				float PowerHeight = ZEMath::Log(FinalMetaData.height) / ZEMath::Log(2);
+				FinalImage->OverrideFormat(MakeSRGB(FinalMetaData.format));
+				FinalMetaData = FinalImage->GetMetadata();
+			}
 
-				ZEUInt NearestPowerWidth = ZEMath::Floor(PowerWidth + 0.5f);
-				ZEUInt NearestPowerHeight = ZEMath::Floor(PowerHeight + 0.5f);
+			if (TextureOptions.GenerateMipMaps)
+			{
+				if (!ZEMath::IsPowerOfTwo(FinalMetaData.width) || !ZEMath::IsPowerOfTwo(FinalMetaData.height))
+				{
+					float PowerWidth = ZEMath::Log(FinalMetaData.width) / ZEMath::Log(2);
+					float PowerHeight = ZEMath::Log(FinalMetaData.height) / ZEMath::Log(2);
 
-				ZEUInt ResizedWidth = ZEMath::Power(2, NearestPowerWidth);
-				ZEUInt ResizedHeight = ZEMath::Power(2, NearestPowerHeight);
+					ZEUInt NearestPowerWidth = ZEMath::Floor(PowerWidth + 0.5f);
+					ZEUInt NearestPowerHeight = ZEMath::Floor(PowerHeight + 0.5f);
 
-				ZEPointer<ScratchImage> ResizedImage = new ScratchImage();
-				HR = Resize(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, ResizedWidth, ResizedHeight, TEX_FILTER_DEFAULT, *ResizedImage);
+					ZEUInt ResizedWidth = ZEMath::Power(2, NearestPowerWidth);
+					ZEUInt ResizedHeight = ZEMath::Power(2, NearestPowerHeight);
+
+					ZEPointer<ScratchImage> ResizedImage = new ScratchImage();
+					HR = Resize(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, ResizedWidth, ResizedHeight, TEX_FILTER_DEFAULT, *ResizedImage);
+					if (FAILED(HR))
+					{
+						zeError("Resizing to nearest power of two failed (%x)\n", HR);
+						return NULL;
+					}
+
+					FinalMetaData = ResizedImage->GetMetadata();
+					FinalImage = ResizedImage.Transfer();
+				}
+
+				ZEPointer<ScratchImage> MipmapChain = new ScratchImage();
+				HR = GenerateMipMaps(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, TEX_FILTER_DEFAULT, TextureOptions.MaximumMipmapLevel, *MipmapChain);
 				if (FAILED(HR))
 				{
-					zeError("Resizing to nearest power of two failed (%x)\n", HR);
+					zeError("Mip map generation failed (%x)\n", HR);
 					return NULL;
 				}
 
-				FinalMetaData = ResizedImage->GetMetadata();
-				FinalImage = ResizedImage.Transfer();
+				FinalMetaData = MipmapChain->GetMetadata();
+				FinalImage = MipmapChain.Transfer();
 			}
 
-			ScratchImage MipmapChain;
-			HR = GenerateMipMaps(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, TEX_FILTER_DEFAULT, 0, MipmapChain);
-			if (FAILED(HR))
+			const ZEGRFormatDefinition* FormatInfo = ZEGRFormatDefinition::GetDefinition(TextureOptions.CompressionFormat);
+			if (FormatInfo->Compressed)
 			{
-				zeError("Mip map generation failed (%x)\n", HR);
-				return NULL;
-			}
+				DXGI_FORMAT CompressionFormat = ZED11ComponentBase::ConvertFormat(FormatInfo->Format);
+				DWORD CompressionFlags = TEX_COMPRESS_DEFAULT;
 
-			DXGI_FORMAT CompressionFormat = DXGI_FORMAT_UNKNOWN;
-			DWORD CompressionFlags = TEX_COMPRESS_DEFAULT;
-			if (RGBColorMap)
-			{
-				CompressionFormat = DXGI_FORMAT_BC1_UNORM_SRGB;
-				CompressionFlags = TEX_COMPRESS_SRGB;
-			}
-			else if (NormalMap)
-			{
-				CompressionFormat = DXGI_FORMAT_BC5_UNORM;
-			}
-			else if (GrayscaleMap)
-			{
-				CompressionFormat = DXGI_FORMAT_BC4_UNORM;
-				CompressionFlags = TEX_COMPRESS_UNIFORM | TEX_COMPRESS_SRGB_IN;
-			}
+				if (FormatInfo->Type == ZEGR_FT_UNORM_SRGB)
+					CompressionFlags |= TEX_COMPRESS_SRGB;
 
-			ZEPointer<ScratchImage> CompressedImage = new ScratchImage();
-			HR = Compress(MipmapChain.GetImages(), MipmapChain.GetImageCount(), MipmapChain.GetMetadata(), CompressionFormat, CompressionFlags, 0.5f, *CompressedImage);
-			if (FAILED(HR))
-			{
-				zeError("Compression failed (%x)\n", HR);
-				return NULL;
+				if (FormatInfo->Structure == ZEGR_FS_BC4)
+					CompressionFlags |= TEX_COMPRESS_SRGB_IN;
+
+				ZEPointer<ScratchImage> CompressedImage = new ScratchImage();
+				HR = Compress(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, CompressionFormat, CompressionFlags, 0.5f, *CompressedImage);
+				if (FAILED(HR))
+				{
+					zeError("Compression failed (%x)\n", HR);
+					return NULL;
+				}
+
+				FinalMetaData = CompressedImage->GetMetadata();
+				FinalImage = CompressedImage.Transfer();
 			}
 
 			ZEString NewFilename = PathInfo.GetName() + ".dds";
 			ZEString NewFileRealPath = ZEPathInfo::CombineRelativePath(FileRealPath, NewFilename);
-			HR = SaveToDDSFile(CompressedImage->GetImages(), CompressedImage->GetImageCount(), CompressedImage->GetMetadata(), DDS_FLAGS_NONE, NewFileRealPath);
+			HR = SaveToDDSFile(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, DDS_FLAGS_NONE, NewFileRealPath);
 			if (FAILED(HR))
 			{
 				zeError("Saving to dds file failed (%x)\n", HR);
 				return NULL;
 			}
-
-			FinalMetaData = CompressedImage->GetMetadata();
-			FinalImage = CompressedImage.Transfer();
 		}
 	}
 
@@ -308,7 +283,7 @@ ZEHolder<ZEGRTexture2D> ZEGRTexture2D::CreateFromFile(const ZEString& Filename, 
 										FinalMetaData.width, 
 										FinalMetaData.height, 
 										FinalMetaData.mipLevels, 
-										ConvertDXGIFormat(FinalMetaData.format), 
+										ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
 										ZEGR_RU_GPU_READ_ONLY, 
 										ZEGR_RBF_SHADER_RESOURCE, 
 										FinalMetaData.arraySize, 

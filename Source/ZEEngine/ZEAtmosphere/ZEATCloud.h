@@ -51,7 +51,7 @@ class ZEGRSampler;
 class ZEGRContext;
 class ZEGRDepthStencilBuffer;
 class ZEGRRenderTarget;
-class ZETexture2DResource;
+class ZEGRTexture2D;
 
 class ZEATCloud : public ZEEntity
 {
@@ -70,7 +70,7 @@ class ZEATCloud : public ZEEntity
 
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZETexture2DResource*			CloudTexture;
+		ZEHolder<ZEGRTexture2D>			CloudTexture;
 
 		struct  
 		{

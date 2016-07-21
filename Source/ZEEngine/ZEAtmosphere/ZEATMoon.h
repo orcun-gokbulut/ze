@@ -43,11 +43,11 @@
 #include "ZEATCommon.h"
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
-#include "ZERenderer/ZERNMap.h"
 
 class ZEGRShader;
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
+class ZEGRTexture3D;
 
 class ZEATMoon : public ZEEntity
 {
@@ -62,7 +62,7 @@ class ZEATMoon : public ZEEntity
 
 		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
 
-		ZERNMap							PhaseTexture;
+		ZEHolder<ZEGRTexture3D>			PhaseTexture;
 
 		ZEVector3						Direction;
 		float							DiskRadius;
