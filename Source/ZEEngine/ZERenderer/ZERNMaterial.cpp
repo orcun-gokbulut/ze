@@ -41,12 +41,22 @@
 
 ZERNMaterial::ZERNMaterial()
 {
-
+	GUID = ZEGUID::Zero;
 }
 
 ZERNMaterial::~ZERNMaterial()
 {
 
+}
+
+void ZERNMaterial::SetGUID(const ZEGUID& GUID)
+{
+	this->GUID = GUID;
+}
+
+const ZEGUID& ZERNMaterial::GetGUID() const
+{
+	return GUID;
 }
 
 bool ZERNMaterial::PreRender(ZERNCommand& Command) const
@@ -68,13 +78,13 @@ void ZERNMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage)
 
 }
 
-bool ZERNMaterial::Update() const
+bool ZERNMaterial::Update()
 {
-	if (!IsInitialized())
-	{
-		if (!const_cast<ZERNMaterial*>(this)->Initialize())
-			return false;
-	}
+// 	if (!IsInitialized())
+// 	{
+// 		if (!const_cast<ZERNMaterial*>(this)->Initialize())
+// 			return false;
+// 	}
 
 	return true;
 }
