@@ -40,6 +40,7 @@
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZEResource/ZERSHolder.h"
 
 class ZEGRRenderStateData;
 class ZEGRConstantBuffer;
@@ -47,6 +48,7 @@ class ZEGRShader;
 class ZEGRSampler;
 class ZEGRTexture2D;
 class ZEMLReaderNode;
+enum ZEGRFormat;
 struct ZEGRShaderCompileOptions;
 
 enum ZERNHeightMapTechnique : ZEUInt8
@@ -68,20 +70,21 @@ enum ZERNTransparencyMode : ZEUInt8
 class ZERNFixedMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
-	protected:
+	ZE_DISALLOW_COPY(ZERNFixedMaterial)
+	friend class ZERSTemplates;
+	private:
 		ZEString								Name;
-		ZEString								FileName;
 
-		mutable ZEUInt							StageMask;
-		mutable ZEFlags							DirtyFlags;
-		 
-		mutable ZEHolder<ZEGRShader>			StageGBuffer_Forward_VertexShader;
-		mutable ZEHolder<ZEGRShader>			StageGBuffer_Forward_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	StageGBuffer_Forward_RenderState;
-		 
-		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_VertexShader;
-		mutable ZEHolder<ZEGRShader>			StageShadowmapGeneration_PixelShader;
-		mutable ZEHolder<ZEGRRenderStateData>	StageShadowmapGeneration_RenderState;
+		ZEUInt									StageMask;
+		ZEFlags									DirtyFlags;
+		
+		ZEHolder<ZEGRShader>					StageGBuffer_Forward_VertexShader;
+		ZEHolder<ZEGRShader>					StageGBuffer_Forward_PixelShader;
+		ZEHolder<ZEGRRenderStateData>			StageGBuffer_Forward_RenderState;
+		
+		ZEHolder<ZEGRShader>					StageShadowmapGeneration_VertexShader;
+		ZEHolder<ZEGRShader>					StageShadowmapGeneration_PixelShader;
+		ZEHolder<ZEGRRenderStateData>			StageShadowmapGeneration_RenderState;
 
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 		ZEHolder<ZEGRSampler>					Sampler;
@@ -144,6 +147,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool									TransparencyEnabled;
 		ZERNTransparencyMode					TransparencyMode;
 		bool									BaseMapEnabled;
+		ZEString								BaseMapFile;
 		bool									AmbientEnabled;
 		float									AmbientFactor;
 		ZEVector3								AmbientColor;
@@ -152,17 +156,23 @@ class ZERNFixedMaterial : public ZERNMaterial
 		ZEVector3								DiffuseColor;
 		bool									SpecularEnabled;
 		bool									SpecularMapEnabled;
+		ZEString								SpecularMapFile;
 		bool									SpecularGlossMapEnabled;
+		ZEString								SpecularGlossMapFile;
 		float									SpecularFactor;
 		ZEVector3								SpecularColor;
 		bool									NormalMapEnabled;
+		ZEString								NormalMapFile;
 		bool									HeightMapEnabled;
+		ZEString								HeightMapFile;
 		ZERNHeightMapTechnique					HeightMapTechnique;
 		bool									EmissiveEnabled;
 		float									EmissiveFactor;
 		ZEVector3								EmissiveColor; 
 		bool									EmissiveMapEnabled;
+		ZEString								EmissiveMapFile;
 		bool									SubSurfaceScatteringMapEnabled;
+		ZEString								SubSurfaceScatteringMapFile;
 		bool									ReflectionEnabled;
 		float									ReflectionFactor;
 		ZEVector3								ReflectionColor;
@@ -170,21 +180,25 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									RefractionFactor;
 		ZEVector3								RefractionColor;
 		bool									OpacityMapEnabled;
+		ZEString								OpacityMapFile;
 		bool									EnvironmentMapEnabled;
+		ZEString								EnvironmentMapFile;
 		bool									DetailBaseMapEnabled;
+		ZEString								DetailBaseMapFile;
 		bool									DetailNormalMapEnabled;
+		ZEString								DetailNormalMapFile;
 		bool									ClippingPlanesEnabled;
 		
 		void									UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const;
-		bool									UpdateShaders() const;
-		bool									UpdateConstantBuffer() const;
-		bool									UpdateRenderState() const;
-		bool									UpdateStageMask() const;
+		bool									UpdateShaders();
+		bool									UpdateConstantBuffer();
+		bool									UpdateRenderState();
+		bool									UpdateStageMask();
+		bool									UpdateTextures();
+		bool									UpdateTexture(ZEGRTexture2D* Map, const ZEString& MapFile, ZEGRFormat CompressionFormat, bool GenerateMipMaps, ZEUInt MaximumMipmapLevel, bool sRGB);
 
-		void									Load(const ZEMLReaderNode& MaterialNode);
-
-		virtual bool							InitializeInternal();
-		virtual bool							DeinitializeInternal();
+		virtual ZETaskResult					LoadInternal();
+		virtual ZETaskResult					UnloadInternal();
 
 												ZERNFixedMaterial();
 
@@ -193,8 +207,6 @@ class ZERNFixedMaterial : public ZERNMaterial
 
 		void									SetName(const ZEString& Name);
 		const ZEString&							GetName() const;
-
-		const ZEString&							GetFileName() const;
 
 		void									SetSampler(const ZEHolder<ZEGRSampler>& Sampler);
 		const ZEHolder<ZEGRSampler>&			GetSampler() const;
@@ -319,6 +331,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		void									SetOpacityMapFile(const ZEString& Filename);
 		const ZEString&							GetOpacityMapFile() const;
 
+		void									SetEnvironmentMapEnabled(bool Enabled);
+		bool									GetEnvironmentMapEnabled() const;
 		void									SetEnvironmentMap(ZEGRTexture2D* Texture);
 		const ZEGRTexture2D*					GetEnvironmentMap() const;
 		void									SetEnvironmentMapFile(const ZEString& Filename);
@@ -353,6 +367,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									GetDetailBaseMapAttenuationStart() const;
 		void									SetDetailBaseMapAttenuationFactor(float Factor);
 		float									GetDetailBaseMapAttenuationFactor() const;
+		void									SetDetailBaseMap(ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*					GetDetailBaseMap() const;
 		void									SetDetailBaseMapFile(const ZEString& Filename);
 		const ZEString&							GetDetailBaseMapFile() const;
 
@@ -366,6 +382,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		float									GetDetailNormalMapAttenuationStart() const;
 		void									SetDetailNormalMapAttenuationFactor(float Factor);
 		float									GetDetailNormalMapAttenuationFactor() const;
+		void									SetDetailNormalMap(ZEGRTexture2D* Texture);
+		const ZEGRTexture2D*					GetDetailNormalMap() const;
 		void									SetDetailNormalMapFile(const ZEString& Filename);
 		const ZEString&							GetDetailNormalMapFile() const;
 
@@ -376,10 +394,12 @@ class ZERNFixedMaterial : public ZERNMaterial
 		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
-		virtual bool							Update() const;
+		virtual bool							Update();
 
 		void									WriteToFile(const ZEString& FileName);
-		void									ReadFromFile(const ZEString& FileName);
 
 		static ZEHolder<ZERNFixedMaterial>		CreateInstance();
+
+		static ZERSHolder<ZERNFixedMaterial>		LoadResource(const ZEString& FileName);
+		static ZERSHolder<const ZERNFixedMaterial>	LoadResourceShared(const ZEString& FileName);
 };

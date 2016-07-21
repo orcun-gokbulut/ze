@@ -35,27 +35,31 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEInitializable.h"
-#include "ZEPointer/ZEReferenceCounted.h"
+#include "ZEResource/ZERSResourceLoadable.h"
 
 class ZEGRContext;
 class ZERNStage;
 class ZERNCommand;
 
-class ZERNMaterial : public ZEObject, public ZEReferenceCounted, public ZEInitializable
+class ZERNMaterial : public ZERSResourceLoadable
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERNMaterial)
 	protected:
+		ZEGUID							GUID;
+
 										ZERNMaterial();
 		virtual							~ZERNMaterial();
 
 	public:
+		void							SetGUID(const ZEGUID& GUID);
+		const ZEGUID&					GetGUID() const;
+
 		virtual ZEUInt					GetStageMask() const = 0;
 
 		virtual bool					PreRender(ZERNCommand& Command) const;
 		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
-		virtual bool					Update() const;
+		virtual bool					Update();
 };
