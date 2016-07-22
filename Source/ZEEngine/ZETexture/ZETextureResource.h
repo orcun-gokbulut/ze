@@ -52,7 +52,6 @@ class ZEFileCacheManager
 class ZETextureResource : public ZEResource
 {
 	ZE_OBJECT
-
 	public:
 		virtual ZEGRTextureType				GetTextureType() const = 0;
 		virtual ZEGRTexture*				GetTexture() const = 0;

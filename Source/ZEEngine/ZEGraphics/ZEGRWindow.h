@@ -57,6 +57,7 @@ class ZEGROutput;
 class ZEGRWindow : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRWindow)
 	private:
 		ZEUInt							Id;
 		static ZEUInt					WindowCount;

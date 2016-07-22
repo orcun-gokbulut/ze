@@ -44,6 +44,7 @@ ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZETexture2D.h")
 class ZETexture2DResource : public ZETextureResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZETexture2DResource)
 	private:
 		ZEHolder<ZEGRTexture2D>				Texture;
 

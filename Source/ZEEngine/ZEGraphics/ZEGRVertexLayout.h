@@ -37,14 +37,16 @@
 
 #include "ZEGRResource.h"
 
-#include "ZETypes.h"
-#include "ZEDS/ZEArray.h"
 #include "ZEGRDefinitions.h"
 #include "ZEGRState.h"
 
-struct ZEGRShaderMeta;
+#include "ZETypes.h"
+#include "ZECommon.h"
+#include "ZEDS/ZEArray.h"
 
-enum ZEGRVertexElementType
+class ZEGRShaderMeta;
+
+ZE_ENUM(ZEGRVertexElementType)
 {
 	ZEGR_VET_NONE				= 0,
 	ZEGR_VET_INT				= 1,
@@ -62,13 +64,13 @@ enum ZEGRVertexElementType
 	ZEGR_VET_UINT8_4			= 13
 };
 
-enum ZEGRVertexUsage
+ZE_ENUM(ZEGRVertexUsage)
 {
 	ZEGR_VU_PER_VERTEX			= 0,
 	ZEGR_VU_PER_INSTANCE		= 1
 };
 
-enum ZEGRVertexElementSemantic
+ZE_ENUM(ZEGRVertexElementSemantic)
 {
 	ZEGR_VES_UNKNOWN			= 0,
 	ZEGR_VES_POSITION			= 1,
@@ -96,26 +98,27 @@ struct ZEGRVertexElement
 
 class ZEGRVertexLayout : public ZEGRState
 {
+	ZE_OBJECT
 	private:
 		struct ZEVertexLayoutData
 		{
-			ZEUInt8					ElementCount;
-			ZEGRVertexElement		Elements[ZEGR_MAX_VERTEX_LAYOUT_ELEMENT];		
+			ZEUInt8							ElementCount;
+			ZEGRVertexElement				Elements[ZEGR_MAX_VERTEX_LAYOUT_ELEMENT];		
 		} StateData;
 
 	public:
-		virtual ZEGRStateType		GetStateType() const;
-		virtual const void*			GetData() const;
-		virtual ZESize				GetDataSize() const;
+		virtual ZEGRStateType				GetStateType() const;
+		virtual const void*					GetData() const;
+		virtual ZESize						GetDataSize() const;
 
-		bool						SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount);
+		bool								SetElements(const ZEGRVertexElement* VertexElements, ZEUInt ElementCount);
 		
-		ZEUInt						GetElementCount() const;
-		const ZEGRVertexElement*	GetElements() const;
+		ZEUInt								GetElementCount() const;
+		const ZEGRVertexElement*			GetElements() const;
 		
-		void						SetToDefault();
+		void								SetToDefault();
 
-		static ZEGRVertexLayout*	Generate(ZEGRShaderMeta* Shader);
+		static ZEGRVertexLayout*			Generate(ZEGRShaderMeta* Shader);
 
-									ZEGRVertexLayout();
+											ZEGRVertexLayout();
 };

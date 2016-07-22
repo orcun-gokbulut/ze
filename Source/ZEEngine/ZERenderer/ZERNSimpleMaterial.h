@@ -52,6 +52,7 @@ class ZEGRConstantBuffer;
 class ZERNSimpleMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERNSimpleMaterial)
 	private:
 		mutable ZEFlags							DirtyFlags;
 

@@ -47,6 +47,7 @@ class ZED11Monitor;
 
 class ZED11Output : public ZEGROutput, ZED11ComponentBase
 {
+	ZE_DISALLOW_COPY(ZED11Output)
 	friend class ZED11Module;
 	private:
 		void*								Handle;

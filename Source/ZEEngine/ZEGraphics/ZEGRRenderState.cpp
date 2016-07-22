@@ -40,6 +40,11 @@
 
 ZEGRRenderState ZEGRRenderState::Default;
 
+ZEGRRenderStateData::ZEGRRenderStateData()
+{
+
+}
+
 ZEGRRenderStateData* ZEGRRenderStateData::Create(const ZEGRRenderState& RenderState)
 {
 	ZEGRRenderStateData* RenderStateData = ZEGRGraphicsModule::GetInstance()->CreateRenderStateData();

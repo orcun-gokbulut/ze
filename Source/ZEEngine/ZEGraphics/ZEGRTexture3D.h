@@ -44,6 +44,8 @@ class ZEGRRenderTarget;
 
 class ZEGRTexture3D : public ZEGRTexture
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRTexture3D)
 	protected:
 		ZEUInt							Width;
 		ZEUInt							Height;

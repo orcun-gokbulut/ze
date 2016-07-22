@@ -35,6 +35,9 @@
 
 #pragma once
 
+#include "ZEMeta/ZEEnumerator.h"
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEInitializable.h"
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEList2.h"
@@ -44,7 +47,8 @@
 
 #include "ZEGRState.h"
 
-enum ZEGRTextureAddressing : ZEUInt8
+
+ZE_ENUM_TYPED(ZEGRTextureAddressing, ZEUInt8)
 {
 	ZEGR_TAM_WRAP						= 0,
 	ZEGR_TAM_MIRROR						= 1,
@@ -52,7 +56,7 @@ enum ZEGRTextureAddressing : ZEUInt8
 	ZEGR_TAM_BORDER						= 3
 };
 
-enum ZEGRTextureFilter : ZEUInt8
+ZE_ENUM_TYPED(ZEGRTextureFilter, ZEUInt8)
 {
 	ZEGR_TFM_POINT						= 0,
 	ZEGR_TFM_LINEAR						= 1,
@@ -78,8 +82,9 @@ struct ZEGRSamplerDescription
 											ZEGRSamplerDescription();
 };
 
-class ZEGRSampler : public ZEReferenceCounted
+class ZEGRSampler : public ZEObject, public ZEReferenceCounted
 {
+	ZE_OBJECT
 	private:
 		static ZEList2<ZEGRSampler>			SamplerCache;
 		static ZELock						SamplerCacheLock;

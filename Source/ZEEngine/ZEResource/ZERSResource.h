@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEPointer/ZEReferenceCounted.h"
 
 #include "ZERSDefinitions.h"
 
@@ -46,13 +47,14 @@
 #include "ZEDS/ZELink.h"
 
 
-class ZERSResource : public ZEObject
+class ZERSResource : public ZEObject, public ZEReferenceCounted
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERSResource)
 	friend class ZERSResourceManager;
-	template<typename ZERSResourceClass> friend class ZERSHolder;
+	friend class ZERSResourceLoadable;
 	friend class ZERSTemplates;
+	template<typename ZERSResourceClass> friend class ZERSHolder;
 	private:
 		ZEGUID									GUID;
 		ZERSResourceState						State;
@@ -61,18 +63,18 @@ class ZERSResource : public ZEObject
 		mutable ZELink<const ZERSResource>		ManagerSharedLink;
 		ZEArray<ZERSResource*>					ChildResources;
 		mutable bool							Shared;
-		mutable ZESSize							ReferenceCount;
 		ZESize									MemoryUsageSelf[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
-		mutable ZELock							Lock;
 		
-		void									Reference() const;
-		void									Release() const;
+		virtual void							Reference() const;
+		virtual void							Release() const;
 		virtual void							Destroy() const;
 
 		void									UpdateMemoryConsumption();
 
 	protected:
+		mutable ZELock							ResourceLock;
+
 		void									SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size);
 
 		void									AddChildResource(ZERSResource* Resource);
@@ -94,7 +96,7 @@ class ZERSResource : public ZEObject
 		ZESize									GetReferenceCount() const;
 		ZESize									GetMemoryUsage(ZERSMemoryPool Pool) const;
 		ZESize									GetTotalMemoryUsage() const;
-		
+
 		bool									IsShared() const;
 		void									Share();
 		void									Unshare();

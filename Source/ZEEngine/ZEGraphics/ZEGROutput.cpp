@@ -37,6 +37,11 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRWindow.h"
 
+ZEGROutput::ZEGROutput()
+{
+
+}
+
 ZEGRResourceType ZEGROutput::GetResourceType() const
 {
 	return ZEGR_RT_OUTPUT;

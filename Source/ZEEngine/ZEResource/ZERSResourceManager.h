@@ -53,7 +53,7 @@ class ZERSResourceManager : public ZEObject
 	private:
 		ZEList2<const ZERSResource>				Resources;
 		ZEList2<const ZERSResource>				SharedResources;
-		ZESize									MemoryUsagePrivate[ZERS_MEMORY_POOL_COUNT];
+		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsageShared[ZERS_MEMORY_POOL_COUNT];
 		ZELock									ManagerLock;
 
@@ -61,12 +61,12 @@ class ZERSResourceManager : public ZEObject
 
 		ZERSHolder<const ZERSResource>			GetResourceInternal(const ZEGUID& GUID);
 		ZERSHolder<const ZERSResourceLoadable>	GetResourceInternal(const ZEString& FileName);
+	
+		void									RegisterResourceInternal(ZERSResource* Resource);
+		void									UnregisterResourceInternal(ZERSResource* Resource);
 
-		void									RegisterResource(const ZERSResource* Resource);
-		void									UnregisterResource(const ZERSResource* Resource);
-
-		void									EnlistResource(const ZERSResource* Resource);
-		void									DelistResource(const ZERSResource* Resource);
+		void									ShareResourceInternal(ZERSResource* Resource);
+		void									UnshareResourceInternal(ZERSResource* Resource);
 
 		void									DestroyResource(const ZERSResource* Resource);
 
@@ -77,12 +77,18 @@ class ZERSResourceManager : public ZEObject
 		ZESize									GetPrivateResourceCount();
 		ZESize									GetSharedResourceCount();
 
-		ZESize									GetMemoryUsagePrivate(ZERSMemoryPool Pool);
+		ZESize									GetMemoryUsage(ZERSMemoryPool Pool);
 		ZESize									GetMemoryUsageShared(ZERSMemoryPool Pool);
 		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool);
 
 		ZERSHolder<const ZERSResource>			GetResource(const ZEGUID& GUID);
 		ZERSHolder<const ZERSResourceLoadable>	GetResource(const ZEString& FileName);
+
+		void									RegisterResource(ZERSResource* Resource);
+		void									UnregisterResource(ZERSResource* Resource);
+
+		void									ShareResource(ZERSResource* Resource);
+		void									UnshareResource(ZERSResource* Resource);
 
 		ZERSHolder<const ZERSResource>			StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciaor, ZERSResource** StagingResource = NULL);
 		ZERSHolder<const ZERSResourceLoadable>	StageResource(const ZEString& FileName, ZERSInstanciatorLoadable Insanciaor, ZERSResourceLoadable** StagingResource = NULL);

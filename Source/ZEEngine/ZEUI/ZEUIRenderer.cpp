@@ -228,15 +228,15 @@ void ZEUIRenderer::Render(const ZERNRenderParameters* RenderParameters, const ZE
 
 	ZEGRContext* Context = RenderParameters->Context;
 	Context->SetRenderState(RenderStateData);
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
-	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
+	Context->SetVertexBuffer(0, VertexBuffer);
 
 	ze_for_each(Batch, Batches)
 	{
 		if (Batch->Texture != NULL)
-			Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, reinterpret_cast<ZEGRTexture**>(&Batch->Texture));
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, Batch->Texture);
 		else
-			Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, NULL);
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, NULL);
 
 		Context->Draw(Batch->Count, Batch->Offset);
 	}

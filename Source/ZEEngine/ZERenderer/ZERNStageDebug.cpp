@@ -327,7 +327,7 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = DepthMap->GetDepthStencilBuffer();
 	Context->ClearDepthStencilBuffer(DepthStencilBuffer, true, true, 0.0f, 0x00);
-	Context->SetConstantBuffers(ZEGR_ST_GEOMETRY, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_GEOMETRY, 8, ConstantBuffer);
 	Context->SetRenderTargets(1, &RenderTarget, DepthStencilBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, Width, Height));
 
@@ -336,7 +336,7 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 		if (SetupBoundingBoxVertexBuffer())
 		{
 			Context->SetRenderState(BoundingBoxRenderStateData);
-			Context->SetVertexBuffers(0, 1, BoundingBoxVertexBuffer.GetPointerToPointer());
+			Context->SetVertexBuffer(0, BoundingBoxVertexBuffer);
 			Context->Draw(BoundingBoxVertexBuffer->GetVertexCount(), 0);
 
 			CleanUp(Context);

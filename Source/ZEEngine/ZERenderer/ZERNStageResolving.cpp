@@ -273,11 +273,11 @@ bool ZERNStageResolving::Setup(ZEGRContext* Context)
 
 	if (ResolvedInputTexture != NULL)
 	{
-		Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+		Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 		Context->SetRenderState(ResolveCustomRenderStateData);
 		const ZEGRRenderTarget* RenderTarget = ResolvedInputTexture->GetRenderTarget();
 		Context->SetRenderTargets(1, &RenderTarget, NULL);
-		Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+		Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 		Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f,(float)ResolvedInputTexture->GetWidth(), (float)ResolvedInputTexture->GetHeight()));
 		Context->Draw(3, 0);
 	}

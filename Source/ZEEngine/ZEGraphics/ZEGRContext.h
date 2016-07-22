@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEGRRenderState.h"
 #include "ZEGRViewport.h"
 #include "ZEGRScissorRect.h"
@@ -50,8 +52,9 @@ class ZEGRTexture;
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 
-class ZEGRContext
+class ZEGRContext : public ZEObject
 {
+	ZE_OBJECT
 	protected:
 		const ZEGRResource*				VertexBuffers[ZEGR_MAX_VERTEX_BUFFER_SLOT];
 		const ZEGRResource*				IndexBuffer;
@@ -83,15 +86,23 @@ class ZEGRContext
 		virtual void					SetRenderState(const ZEGRRenderStateData* State) = 0;
 		virtual void					SetComputeRenderState(const ZEGRComputeRenderStateData* State) = 0;
 
-		virtual void					SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers) = 0;
 		virtual void					SetIndexBuffer(const ZEGRIndexBuffer* Buffer) = 0;
+
+		void							SetVertexBuffer(ZEUInt Index, const ZEGRVertexBuffer* Buffers);
+		virtual void					SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertexBuffer*const* Buffers) = 0;
+		
+		void							SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRConstantBuffer* Buffer);
 		virtual void					SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers) = 0;
 		virtual void					GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer);
 
+		void							SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer);
 		virtual void					SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffer) = 0;
+
+		void							SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture);
 		virtual void					SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures) = 0;
 		virtual void					GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture);
 
+		void							SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler);
 		virtual void					SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers) = 0;
 		
 		virtual void					SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer) = 0;
@@ -105,7 +116,10 @@ class ZEGRContext
 		virtual void					SetBlendFactors(const ZEVector4& Factors) = 0;
 		virtual void					SetBlendMask(ZEUInt Mask) = 0;
 
+		void							SetRWStructuredBuffer(ZEUInt Index, const ZEGRStructuredBuffer* Buffer);
 		virtual void					SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers) = 0;
+	
+		void							SetRWTexture(ZEUInt8 Index, const ZEGRTexture* Texture);
 		virtual void					SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures) = 0;
 
 		virtual	void					CopyResource(const ZEGRResource* DestResource, const ZEGRResource* SrcResource) = 0;

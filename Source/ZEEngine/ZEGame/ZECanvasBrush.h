@@ -53,8 +53,8 @@ class ZECanvasBrush : public ZEEntity
 		ZERNCommand						RenderCommand;
 		ZESize							OldVertexCount;
 		ZEHolder<ZEGRRenderStateData>	RenderStateData;
-		ZEHolder<ZEGRVertexBuffer>	VertexBuffer;
-		ZEHolder<ZERNMaterial>		Material;
+		ZEHolder<ZEGRVertexBuffer>		VertexBuffer;
+		ZEHolder<ZERNMaterial>			Material;
 		ZECanvas						Canvas;
 
 		void							UpdateRenderState();

@@ -598,6 +598,16 @@ bool ZEGRContext::CheckScissorRects(ZEUInt Count, const ZEGRScissorRect* Scissor
 	return Dirty;
 }
 
+void ZEGRContext::SetVertexBuffer(ZEUInt Index, const ZEGRVertexBuffer* Buffer)
+{
+	SetVertexBuffers(Index, 1, &Buffer);
+}
+
+void ZEGRContext::SetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRConstantBuffer* Buffer)
+{
+	SetConstantBuffers(Shader, Index, 1, &Buffer);
+}
+
 void ZEGRContext::GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRConstantBuffer** Buffer)
 {
 	zeCheckError(Buffer == NULL, ZE_VOID,"Constant buffer cannot be NULL.");
@@ -606,12 +616,27 @@ void ZEGRContext::GetConstantBuffer(ZEGRShaderType Shader, ZEUInt Index, ZEGRCon
 	*Buffer = static_cast<ZEGRConstantBuffer*>(const_cast<ZEGRResource*>(ConstantBuffers[Shader][Index]));
 }
 
+void ZEGRContext::SetStructuredBuffer(ZEGRShaderType Shader, ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
+{
+	SetStructuredBuffers(Shader, Index, 1, &Buffer);
+}
+
+void ZEGRContext::SetTexture(ZEGRShaderType Shader, ZEUInt Index, const ZEGRTexture* Texture)
+{
+	SetTextures(Shader, Index, 1, &Texture);
+}
+
 void ZEGRContext::GetTexture(ZEGRShaderType Shader, ZEUInt Index, ZEGRTexture** Texture)
 {
 	zeCheckError(Texture == NULL, ZE_VOID, "Texture cannot be NULL");
 	zeCheckError(Shader == ZEGR_ST_ALL, ZE_VOID, "Shader type cannot be ZEGR_ST_ALL");
 
 	*Texture = static_cast<ZEGRTexture*>(const_cast<ZEGRResource*>(ShaderResources[Shader][Index]));
+}
+
+void ZEGRContext::SetSampler(ZEGRShaderType Shader, ZEUInt Index, const ZEGRSampler* Sampler)
+{
+	SetSamplers(Shader, Index, 1, &Sampler);
 }
 
 void ZEGRContext::GetRenderTargets(ZEUInt Count, ZEGRRenderTarget** RenderTargets)
@@ -627,6 +652,16 @@ void ZEGRContext::GetDepthStencilBuffer(ZEGRDepthStencilBuffer** DepthStencilBuf
 	zeDebugCheck(DepthStencilBuffer == NULL, "Depth-stencil buffer out parameter cannot be NULL.");
 
 	*DepthStencilBuffer = const_cast<ZEGRDepthStencilBuffer*>(this->DepthStencilBuffer);
+}
+
+void ZEGRContext::SetRWStructuredBuffer(ZEUInt Index, const ZEGRStructuredBuffer* Buffer)
+{
+	SetRWStructuredBuffers(Index, 1, &Buffer);
+}
+
+void ZEGRContext::SetRWTexture(ZEUInt8 Index, const ZEGRTexture* Texture)
+{
+	SetRWTextures(Index, 1, &Texture);
 }
 
 void ZEGRContext::ClearShaderResources(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count)

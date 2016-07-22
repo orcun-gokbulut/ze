@@ -47,6 +47,10 @@
 	ZEEnumerator* Name##_Declaration();\
 	enum ZE_META_ATTRIBUTE(ZEMC.Enumerator) Name
 
+#define ZE_ENUM_TYPED(Name, Type) \
+	ZEEnumerator* Name##_Declaration(); \
+	enum ZE_META_ATTRIBUTE(ZEMC.Enumerator) Name : Type
+
 #define ZE_META_ENUMERATOR_IMPLEMENTATION(Name) \
 	class Name##Enumerator : public ZEEnumerator \
 	{ \

@@ -33,6 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
+#include "ZETextureCubeResource.h"
+
 #include "ZEError.h"
 #include "ZECore/ZEConsole.h"
 #include "ZECore/ZEResourceManager.h"
@@ -40,11 +42,11 @@
 #include "ZEPointer/ZEPointer.h"
 #include "ZETextureData.h"
 #include "ZETextureLoader.h"
-#include "ZETextureCubeResource.h"
 #include "ZETextureQualityManager.h"
 #include "ZETextureCacheDataIdentifier.h"
 #include "ZEGraphics/ZEGRTextureCube.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
+#include "ZEGraphics/ZEGRTextureCube.h"
 
 void ZETextureCubeResource::CacheResource(const ZEString& FileName, const ZETextureOptions* UserOptions)
 {

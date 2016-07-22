@@ -415,8 +415,8 @@ void ZEInteriorRoom::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 
 	UpdateConstantBuffer();
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	Context->SetVertexBuffer(0, VertexBuffer);
 
 	Context->Draw(Draw->VertexCount, Draw->VertexOffset);
 

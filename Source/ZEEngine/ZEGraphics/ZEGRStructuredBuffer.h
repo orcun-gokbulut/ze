@@ -37,12 +37,15 @@
 
 #include "ZEGRResource.h"
 
+#include "ZEGRDefinitions.h"
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
-#include "ZEGRDefinitions.h"
+#include "ZEPointer/ZEHolder.h"
 
 class ZEGRStructuredBuffer : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRStructuredBuffer)
 	friend class ZEGRContext;
 	private:
 		struct BoundStage

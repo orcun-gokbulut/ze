@@ -52,6 +52,7 @@ class ZEGRSampler;
 class ZERNParticleMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZERNParticleMaterial)
 	private:
 		ZEString								Filename;
 

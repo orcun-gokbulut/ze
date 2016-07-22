@@ -245,9 +245,9 @@ bool ZERNStageDisplay::Update()
 bool ZERNStageDisplay::Draw(ZEGRContext* Context)
 {
 	Context->SetViewports(1, &Viewport);
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_STAGE, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_STAGE, ConstantBuffer);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 
 	Context->Draw(3, 0);
 

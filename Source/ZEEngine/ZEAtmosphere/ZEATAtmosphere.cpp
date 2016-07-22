@@ -272,8 +272,8 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 	ZEArray<const ZEGRRenderTarget*> MultipleScatteringRenderTargets;
 	MultipleScatteringRenderTargets.Resize(1024);	//64 * 16
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, PrecomputeConstantBuffer.GetPointerToPointer());
-	Context->SetTextures(ZEGR_ST_PIXEL, 2, 1, reinterpret_cast<ZEGRTexture**>(&RandomVectorsTexture));
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, PrecomputeConstantBuffer);
+	Context->SetTexture(ZEGR_ST_PIXEL, 2, RandomVectorsTexture);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 32.0f, 128.0f));
 
 	for (ZEUInt I = 0; I < 1024; I++)
@@ -304,7 +304,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 			PrecomputeConstants.IndexW = ((float)(J / 64) + 0.5f) / 16.0f;
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
-			Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, (S == 1) ? reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedHighOrderInScatteringBuffer));
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, (S == 1) ? PrecomputedSingleScatteringBuffer : PrecomputedHighOrderInScatteringBuffer);
 
 			Context->SetRenderTargets(1, &RenderTarget, NULL);
 			Context->SetRenderState(PrecomputeHighOrderScatteringRenderStateData);
@@ -319,7 +319,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 			PrecomputeConstants.IndexW = ((float)(J / 64) + 0.5f) / 16.0f;
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
-			Context->SetTextures(ZEGR_ST_PIXEL, 1, 1, reinterpret_cast<ZEGRTexture**>(&PrecomputedHighOrderScatteringBuffer));
+			Context->SetTexture(ZEGR_ST_PIXEL, 1, PrecomputedHighOrderScatteringBuffer);
 			Context->SetRenderTargets(1, &RenderTarget, NULL);
 			Context->SetRenderState(PrecomputeHighOrderInScatteringRenderStateData);
 
@@ -332,7 +332,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 			PrecomputeConstants.IndexZ = (float)J;
 			PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
-			Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, reinterpret_cast<ZEGRTexture**>(&PrecomputedHighOrderInScatteringBuffer));
+			Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedHighOrderInScatteringBuffer);
 			Context->SetRenderTargets(1, &RenderTarget, NULL);
 			Context->SetRenderState(AddOrdersRenderStateData);
 
@@ -346,7 +346,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 		PrecomputeConstants.IndexZ = (float)K;
 		PrecomputeConstantBuffer->SetData(&PrecomputeConstants);
 
-		Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
+		Context->SetTexture(ZEGR_ST_PIXEL, 0, PrecomputedSingleScatteringBuffer);
 		Context->SetRenderTargets(1, &RenderTarget, NULL);
 		Context->SetRenderState(AddOrdersRenderStateData);
 
@@ -358,7 +358,7 @@ void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 
 	Context->SetRenderState(PrecomputeSkyAmbientRenderStateData);
 	Context->SetRenderTargets(1, &SkyAmbientRenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 0, 1, UseMultipleScattering ? reinterpret_cast<ZEGRTexture**>(&PrecomputedMultipleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
+	Context->SetTexture(ZEGR_ST_PIXEL, 0, UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, 1024.0f, 1.0f));
 
 	Context->Draw(3, 0);
@@ -809,10 +809,13 @@ void ZEATAtmosphere::Render(const ZERNRenderParameters* Parameters, const ZERNCo
 
 	const ZEGRTexture2D* DepthTexture = Stage->GetOutput(ZERN_SO_DEPTH);
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, SkyConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, SkyConstantBuffer);
 	Context->SetRenderState(SkyRenderStateData);
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, UseMultipleScattering ? reinterpret_cast<ZEGRTexture**>(&PrecomputedMultipleScatteringBuffer) : reinterpret_cast<ZEGRTexture**>(&PrecomputedSingleScatteringBuffer));
+
+	const ZEGRTexture* Textures[2];
+	Textures[0] = DepthTexture;
+	Textures[1] = UseMultipleScattering ? PrecomputedMultipleScatteringBuffer : PrecomputedSingleScatteringBuffer;
+	Context->SetTextures(ZEGR_ST_PIXEL, 4, 2, Textures);
 
 	Context->Draw(3, 0);
 }

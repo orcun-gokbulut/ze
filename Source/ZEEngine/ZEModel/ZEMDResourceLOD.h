@@ -44,10 +44,12 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
 
-class ZEGRVertexBuffer;
-class ZEGRIndexBuffer;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
+
+ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
+ZE_META_FORWARD_DECLARE(ZEGRVertexBuffer, "ZERenderer/ZEGRVertexBuffer.h");
+ZE_META_FORWARD_DECLARE(ZEGRIndexBuffer, "ZERenderer/ZEGRIndexBuffer.h");
 
 class ZEMDResourceLOD : public ZERSResource
 {

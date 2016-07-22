@@ -127,7 +127,7 @@ ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUIn
 
 	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, Usage, BindFlags, Data))
 	{
-		Texture->Destroy();
+		delete Texture;
 		return NULL;
 	}
 

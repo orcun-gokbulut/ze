@@ -253,7 +253,7 @@ void ZERNStageHDR::CalculateAverageLuminance(ZEGRContext* Context)
 
 	Context->SetRenderState(CalculateLuminanceRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);
@@ -285,11 +285,11 @@ const ZEGRTexture2D* ZERNStageHDR::CalculateBloom(ZEGRContext* Context)
 	Viewport.SetWidth((float)RenderTarget->GetWidth());
 	Viewport.SetHeight((float)RenderTarget->GetHeight());
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(CalculateBrightnessRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
-	Context->SetTextures(ZEGR_ST_PIXEL, 7, 1, reinterpret_cast<ZEGRTexture**>(&CurrentAdaptedLuminance));
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
+	Context->SetTexture(ZEGR_ST_PIXEL, 7, CurrentAdaptedLuminance);
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);
@@ -307,7 +307,7 @@ void ZERNStageHDR::ToneMapping(ZEGRContext* Context, const ZEGRTexture2D* BloomT
 	Viewport.SetWidth((float)OutputRenderTarget->GetWidth());
 	Viewport.SetHeight((float)OutputRenderTarget->GetHeight());
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetRenderState(ToneMappingRenderStateData);
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
 	const ZEGRTexture* Textures[] = {InputTexture, BloomTexture, CurrentAdaptedLuminance};

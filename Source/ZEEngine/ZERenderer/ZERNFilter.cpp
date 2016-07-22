@@ -245,8 +245,8 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 		TempTexture->GetWidth() != Width || TempTexture->GetHeight() != Height)
 		TempTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_COMPUTE, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, ConstantBuffer);
 
 	if (PixelShader)
 	{
@@ -257,12 +257,12 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 
 		Context->SetRenderState(BlurHorizontalGraphicsRenderStateData);
 		Context->SetRenderTargets(1, &TempRenderTarget, NULL);
-		Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+		Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 		Context->Draw(3, 0);
 
 		Context->SetRenderState(BlurVerticalGraphicsRenderStateData);
 		Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
-		Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&TempTexture));
+		Context->SetTexture(ZEGR_ST_PIXEL, 5, TempTexture);
 		Context->Draw(3, 0);
 	}
 	else
@@ -270,15 +270,15 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 		const ZEUInt GroupDimX = 320;
 
 		Context->SetComputeRenderState(BlurHorizontalComputeRenderStateData);
-		Context->SetTextures(ZEGR_ST_COMPUTE, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
-		Context->SetRWTextures(0, 1, reinterpret_cast<const ZEGRTexture**>(&TempTexture));
+		Context->SetTexture(ZEGR_ST_COMPUTE, 5, InputTexture);
+		Context->SetRWTexture(0, TempTexture);
 
 		ZEUInt GroupCountX = (Width + GroupDimX - 1) / GroupDimX;
 		Context->Dispatch(GroupCountX, Height, 1);
 
 		Context->SetComputeRenderState(BlurVerticalComputeRenderStateData);
-		Context->SetTextures(ZEGR_ST_COMPUTE, 5, 1, reinterpret_cast<const ZEGRTexture**>(&TempTexture));
-		Context->SetRWTextures(0, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+		Context->SetTexture(ZEGR_ST_COMPUTE, 5, TempTexture);
+		Context->SetRWTexture(0, InputTexture);
 
 		GroupCountX = (Height + GroupDimX - 1) / GroupDimX;
 		Context->Dispatch(GroupCountX, Width, 1);
@@ -299,7 +299,7 @@ void ZERNFilter::ApplyScale(ZEGRContext* Context, const ZEGRTexture2D* InputText
 
 	Context->SetRenderState(ScaleGraphicsRenderStateData);
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 	Context->SetViewports(1, &Viewport);
 	Context->Draw(3, 0);
 }

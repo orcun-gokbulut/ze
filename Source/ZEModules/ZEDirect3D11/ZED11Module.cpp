@@ -186,8 +186,6 @@ bool ZED11Module::DeinitializeInternal()
 
 	delete (ZED11Adapter*)CurrentAdapter;
 
-	Context.Deinitialize();
-
 	for (ZESize I = 0; I < Adapters.GetCount(); I++)
 		delete (ZED11Adapter*)Adapters[I];
 

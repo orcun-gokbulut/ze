@@ -35,25 +35,29 @@
 
 #pragma once
 
-#include "ZETypes.h"
 #include "ZEGRResource.h"
+
 #include "ZEGRDefinitions.h"
+#include "ZETypes.h"
+#include "ZEPointer\ZEHolder.h"
 
 class ZEGRConstantBuffer : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRConstantBuffer)
 	protected:
-		virtual bool						Initialize(ZESize BufferSize);
-		virtual void						Deinitialize();
+		virtual bool								Initialize(ZESize BufferSize);
+		virtual void								Deinitialize();
 
-											ZEGRConstantBuffer();
+													ZEGRConstantBuffer();
 
 	public:
-		ZEGRResourceType					GetResourceType() const;
+		ZEGRResourceType							GetResourceType() const;
 
-		void								SetData(const void* ConstantData);
+		void										SetData(const void* ConstantData);
 
-		virtual bool						Lock(void** Buffer) = 0;
-		virtual void						Unlock() = 0;
+		virtual bool								Lock(void** Buffer) = 0;
+		virtual void								Unlock() = 0;
 
-		static ZEHolder<ZEGRConstantBuffer>	Create(ZESize BufferSize);
+		static ZEHolder<ZEGRConstantBuffer>			Create(ZESize BufferSize);
 };

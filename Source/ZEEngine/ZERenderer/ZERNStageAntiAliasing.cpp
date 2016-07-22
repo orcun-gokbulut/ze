@@ -259,7 +259,7 @@ void ZERNStageAntiAliasing::DoBlendingWeightCalculation(ZEGRContext* Context)
 {
 	Context->SetRenderState(BlendingWeightCalculationPassRenderStateData);
 	Context->SetRenderTargets(1, &BlendRenderTarget, DepthTexture->GetDepthStencilBuffer());
-	Context->SetTextures(ZEGR_ST_PIXEL, 9, 1, reinterpret_cast<ZEGRTexture**>(&EdgeTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 9, EdgeTexture);
 
 	Context->Draw(3, 0);
 }
@@ -268,7 +268,7 @@ void ZERNStageAntiAliasing::DoNeighborhoodBlending(ZEGRContext* Context)
 {
 	Context->SetRenderState(NeighborhoodBlendingPassRenderStateData);
 	Context->SetRenderTargets(1, &OutputRenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 10, 1, reinterpret_cast<ZEGRTexture**>(&BlendTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 10, BlendTexture);
 
 	Context->Draw(3, 0);
 }
@@ -351,9 +351,9 @@ bool ZERNStageAntiAliasing::Setup(ZEGRContext* Context)
 	if (!Update())
 		return false;
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_POST_PROCESSOR, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_POST_PROCESSOR, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, SamplerLinearClamp.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_POST_PROCESSOR, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_POST_PROCESSOR, ConstantBuffer);
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, SamplerLinearClamp);
 	Context->SetStencilRef(1);
 	const ZEGRTexture* Textures[] = {InputTexture, NormalTexture, AreaTexture, SearchTexture};
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 4, Textures);

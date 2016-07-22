@@ -93,7 +93,7 @@ bool ZERNStagePostProcess::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	Context->SetTextures(ZEGR_ST_PIXEL, 4, 1, reinterpret_cast<const ZEGRTexture**>(&DepthTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 4, DepthTexture);
 	Context->SetViewports(1, &ZEGRViewport(0.0f, 0.0f, (float)AccumulationTexture->GetWidth(), (float)AccumulationTexture->GetHeight()));
 
 	return true;

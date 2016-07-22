@@ -38,6 +38,7 @@
 void ZEGRResource::SetSize(ZESize Size)
 {
 	this->Size = Size;
+	this->SetMemoryUsage(ZERS_MP_GPU, Size);
 }
 
 void ZEGRResource::SetResourceUsage(ZEGRResourceUsage Usage)

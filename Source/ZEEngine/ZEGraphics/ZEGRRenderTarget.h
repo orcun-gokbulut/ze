@@ -45,6 +45,8 @@ class ZEGRTexture;
 
 class ZEGRRenderTarget : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRRenderTarget)
 	friend class ZEGRContext;
 	private:
 		const ZEGRTexture*			Owner;

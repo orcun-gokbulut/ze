@@ -39,6 +39,8 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRTexture.h"
 #include "ZEGRContext.h"
+#include "ZEGRDepthStencilBuffer.h"
+#include "ZEGRRenderTarget.h"
 
 void ZEGRTexture::SetFormat(ZEGRFormat Format)
 {

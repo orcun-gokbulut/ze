@@ -136,7 +136,9 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::GetResource(const ZEString& F
 template<typename ZERSResourceClass>
 ZERSHolder<ZERSResourceClass> ZERSTemplates::CreateResource()
 {
-	return new ZERSResourceClass();
+	ZERSResourceClass* Resource = new ZERSResourceClass();
+	ZERSResourceManager::GetInstance()->RegisterResource(Resource);
+	return Resource;
 }
 
 template<typename ZERSResourceClass>

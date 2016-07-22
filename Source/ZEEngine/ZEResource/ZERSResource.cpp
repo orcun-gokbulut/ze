@@ -41,20 +41,16 @@
 
 void ZERSResource::Reference() const
 {
-	Lock.Lock();
-
-	ReferenceCount++;
-	
+	ReferenceCountLock.Lock();
 	if (Parent != NULL)
 		Parent->Reference();
-
-	Lock.Unlock();
+	ReferenceCount++;
+	ReferenceCountLock.Unlock();
 }
 
 void ZERSResource::Release() const
 {
-	Lock.Lock();
-	
+	ReferenceCountLock.Lock();
 	ReferenceCount--;
 	if (Parent != NULL)
 	{
@@ -63,23 +59,30 @@ void ZERSResource::Release() const
 	else
 	{
 		if (ReferenceCount <= 0)
-			Destroy();
+		{
+			if (IsShared())
+			{
+				const_cast<ZERSResource*>(this)->Unshare();
+				ReferenceCountLock.Unlock();
+			}
+			else
+			{
+				ReferenceCountLock.Unlock();
+				delete this;
+			}
+		}
 	}
-
-	Lock.Unlock();
+	ReferenceCountLock.Unlock();
 }
 
 void ZERSResource::Destroy() const
 {
-	if (IsShared())
-		ZERSResourceManager::GetInstance()->DestroyResource(this);
-	else
-		delete this;
+
 }
 
 void ZERSResource::UpdateMemoryConsumption()
 {
-	Lock.Lock();
+	ResourceLock.Lock();
 	{
 		ZESize OldMemoryUsage[ZERS_MEMORY_POOL_COUNT];
 		memcpy(OldMemoryUsage, MemoryUsage, sizeof(MemoryUsage));
@@ -106,7 +109,7 @@ void ZERSResource::UpdateMemoryConsumption()
 			ZERSResourceManager::GetInstance()->UpdateMemoryUsage(this, MemoryUsageDelta);
 		}
 	}
-	Lock.Unlock();
+	ResourceLock.Unlock();
 }
 
 void ZERSResource::SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size)
@@ -162,6 +165,8 @@ ZERSResource::~ZERSResource()
 
 	if (Parent != NULL)
 		Parent->RemoveChildResource(this);
+
+	ZERSResourceManager::GetInstance()->UnregisterResource(this);
 }
 
 ZERSResource* ZERSResource::GetParent()
@@ -226,7 +231,7 @@ void ZERSResource::Share()
 		return;
 
 	zeCheckError(GUID == ZEGUID::Zero, ZE_VOID, "Cannot share resource. Ilvalid GUID.");
-	ZERSResourceManager::GetInstance()->EnlistResource(this);
+	ZERSResourceManager::GetInstance()->ShareResource(this);
 }
 
 void ZERSResource::Unshare()
@@ -234,7 +239,7 @@ void ZERSResource::Unshare()
 	if (!IsShared())
 		return;
 
-	ZERSResourceManager::GetInstance()->DelistResource(this);
+	ZERSResourceManager::GetInstance()->UnshareResource(this);
 }
 
 

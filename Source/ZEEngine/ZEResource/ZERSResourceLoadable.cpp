@@ -43,14 +43,20 @@ ZETaskResult ZERSResourceLoadable::ManageStatesFunction(ZETaskThread* TaskThread
 {
 	if (LoadState == ZERS_LS_LOADED && (TargetState == ZERS_LS_NONE || TargetState == ZERS_LS_DESTROYED))
 	{
+		UnloadInternalDone = false;
 		LoadState = ZERS_LS_UNLOADING;
 	}
 	else if (LoadState == ZERS_LS_NONE)
 	{
 		if (TargetState == ZERS_LS_LOADED)
+		{
+			LoadInternalDone = false;
 			LoadState = ZERS_LS_LOADING;
+		}
 		else if (TargetState == ZERS_LS_DESTROYED)
+		{
 			LoadState = ZERS_LS_DESTROYING;
+		}
 	}
 	else if (LoadState == ZERS_LS_ERROR_LOADING || LoadState == ZERS_LS_ERROR_UNLOADING)
 	{
@@ -62,43 +68,77 @@ ZETaskResult ZERSResourceLoadable::ManageStatesFunction(ZETaskThread* TaskThread
 	
 	if (LoadState == ZERS_LS_LOADING)
 	{
-		ZETaskResult Result = LoadInternal();
-		if (Result == ZE_TR_DONE)
+		if (!LoadInternalDone)
 		{
-			zeLog("Resource loaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-			LoadState = ZERS_LS_LOADED;
-			return ZE_TR_DONE;
+			ZETaskResult Result = LoadInternal();
+			if (Result == ZE_TR_DONE)
+			{
+				zeLog("Resource loaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				LoadInternalDone = true;
+				SetLoadProgress(100);
+			}
+			else if (Result == ZE_TR_FAILED)
+			{
+				zeError("Resource loading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				LoadState = ZERS_LS_ERROR_LOADING;
+				return ZE_TR_COOPERATING;
+			}
+			else
+			{
+				 return Result;
+			}
 		}
-		else if (Result == ZE_TR_FAILED)
+
+		ze_for_each(ExternalResource, ExternalResources)
 		{
-			zeError("Resource loading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-			LoadState = ZERS_LS_ERROR_LOADING;
-			return ZE_TR_COOPERATING;
+			if ((*ExternalResource)->LoadState == ZERS_LS_LOADING)
+				return ZE_TR_COOPERATING;
 		}
-		else
+
+		ze_for_each(ChildResource, ChildResources)
 		{
-			 return Result;
+			if ((*ChildResource)->GetType() == ZERS_RT_LOADABLE)
+
+			if (LoadState == ZERS_LS_LOADING)
+				return ZE_TR_COOPERATING;
 		}
+
+		LoadState = ZERS_LS_LOADED;
+		return ZE_TR_DONE;
 	}
 	else if (LoadState == ZERS_LS_UNLOADING)
 	{
-		ZETaskResult Result = UnloadInternal();
-		if (Result == ZE_TR_DONE)
+		if (!UnloadInternalDone)
 		{
-			zeLog("Resource unloaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-			LoadState = ZERS_LS_NONE;
-			return ZE_TR_DONE;
+			ZETaskResult Result = UnloadInternal();
+			if (Result == ZE_TR_DONE)
+			{
+				zeLog("Resource unloaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				SetLoadProgress(0);
+				UnloadInternalDone = true;
+			}
+			else if (Result == ZE_TR_FAILED)
+			{
+				zeError("Resource unloading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				LoadState = ZERS_LS_ERROR_UNLOADING;
+				return ZE_TR_COOPERATING;
+			}
+			else
+			{
+				return Result;
+			}
 		}
-		else if (Result == ZE_TR_FAILED)
+
+		ze_for_each(ChildResource, ChildResources)
 		{
-			zeError("Resource unloading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-			LoadState = ZERS_LS_ERROR_UNLOADING;
-			return ZE_TR_COOPERATING;
+			if ((*ChildResource)->GetType() == ZERS_RT_LOADABLE)
+
+				if (LoadState == ZERS_LS_UNLOADING)
+					return ZE_TR_COOPERATING;
 		}
-		else
-		{
-			return Result;
-		}
+			
+		LoadState = ZERS_LS_NONE;
+		return ZE_TR_DONE;
 	}
 	else if (LoadState == ZERS_LS_DESTROYING)
 	{
@@ -111,6 +151,36 @@ ZETaskResult ZERSResourceLoadable::ManageStatesFunction(ZETaskThread* TaskThread
 void ZERSResourceLoadable::Destroy() const
 {
 
+}
+
+void ZERSResourceLoadable::SetLoadProgress(ZEUInt Percentage)
+{
+	if (Percentage > 100)
+		Percentage = 100;
+
+	LoadProgress = Percentage;
+}
+
+void ZERSResourceLoadable::SetLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage)
+{
+	if (Count == 0)
+	{
+		SetLoadProgress(0);
+		return;
+	}
+
+	SetLoadProgress(StartPercentage + (Index + 1) * (EndPercentage - StartPercentage) / Count);
+}
+
+void ZERSResourceLoadable::RegisterExternalResource(ZERSResourceLoadable* Resource)
+{
+	zeCheckError(ExternalResources.Exists(Resource), ZE_VOID, "Resource is already added as external resource.");
+	ExternalResources.Add(Resource);
+}
+
+void ZERSResourceLoadable::UnregisterExternalResource(ZERSResourceLoadable* Resource)
+{
+	ExternalResources.RemoveValue(Resource);
 }
 
 ZETaskResult ZERSResourceLoadable::LoadInternal()
@@ -128,6 +198,9 @@ ZERSResourceLoadable::ZERSResourceLoadable()
 	LoadState = ZERS_LS_NONE;
 	TargetState = ZERS_LS_NONE;
 	FileNameHash = 0;
+	LoadProgress = 0;
+	LoadInternalDone = false;
+	UnloadInternalDone = false;
 	ManageStatesTask.SetPool(ZE_TPI_IO);
 	ManageStatesTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResourceLoadable, ManageStatesFunction, this));
 }
@@ -146,6 +219,34 @@ ZERSResourceType ZERSResourceLoadable::GetType() const
 ZERSLoadState ZERSResourceLoadable::GetLoadState() const
 {
 	return LoadState;
+}
+
+ZEUInt ZERSResourceLoadable::GetLoadProgress() const
+{
+	ResourceLock.Lock();
+
+	ZEUInt TotalProgress = LoadProgress;
+	ZEUInt TotalItems = 1;
+
+	ze_for_each(ExternalResource, ExternalResources)
+	{
+		TotalProgress += (*ExternalResource)->GetLoadProgress();
+		TotalItems++;
+	}
+
+	ZESize LoadableCount = 0;
+	ze_for_each(ChildResource, ChildResources)
+	{
+		if ((*ChildResource)->GetType() == ZERS_RT_LOADABLE)
+		{
+			TotalProgress += static_cast<ZERSResourceLoadable*>(*ChildResource)->GetLoadProgress();
+			TotalItems++;
+		}
+	}
+
+	ResourceLock.Unlock();
+
+	return TotalProgress / TotalItems;
 }
 
 const ZEString& ZERSResourceLoadable::GetFileName() const

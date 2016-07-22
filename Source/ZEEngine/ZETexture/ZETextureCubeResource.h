@@ -44,6 +44,7 @@ ZE_META_FORWARD_DECLARE(ZEGRTextureCube, "ZEGraphics/ZETextureCube.h")
 class ZETextureCubeResource : public ZETextureResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZETextureCubeResource)
 	private:
 		ZEHolder<ZEGRTextureCube>			Texture;
 

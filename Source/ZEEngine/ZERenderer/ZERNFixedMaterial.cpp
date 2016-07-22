@@ -1889,7 +1889,7 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Sta
 	if (!const_cast<ZERNFixedMaterial*>(this)->Update())
 		return false;
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 
 	ZEUInt StageID = Stage->GetId();
 	if (StageID == ZERN_STAGE_GBUFFER || StageID == ZERN_STAGE_FORWARD_TRANSPARENT)
@@ -1923,9 +1923,8 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Sta
 		{
 			if (OpacityMapEnabled)
 			{
-				const ZEGRTexture* Texture = OpacityMap;
-				Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
-				Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
+				Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
+				Context->SetTexture(ZEGR_ST_PIXEL, 5, OpacityMap);
 			}
 		}
 	}

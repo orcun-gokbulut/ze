@@ -650,11 +650,11 @@ bool ZERNParticleMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* 
 	if (!Update())
 		return false;
 
-	Context->SetSamplers(ZEGR_ST_PIXEL, 0, 1, Sampler.GetPointerToPointer());
+	Context->SetSampler(ZEGR_ST_PIXEL, 0, Sampler);
 	const ZEGRTexture* Textures[] = {DiffuseMap.GetTexture(), EmissiveMap.GetTexture(), NormalMap.GetTexture(), OpacityMap.GetTexture()};
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 4, Textures);
 
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
 	Context->SetRenderState(StageParticleRendering_RenderState);
 
 	return true;

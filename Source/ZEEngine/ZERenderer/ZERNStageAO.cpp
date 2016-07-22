@@ -376,7 +376,7 @@ void ZERNStageAO::DeinterleaveDepth(ZEGRContext* Context)
 	Viewport.SetHeight((float)DeinterleavedDepthtexture->GetHeight());
 
 	Context->SetRenderState(DeinterleaveDepthRenderStateData);
-	Context->SetTextures(ZEGR_ST_PIXEL, 7, 1, reinterpret_cast<const ZEGRTexture**>(&ResolvedDepthTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 7, ResolvedDepthTexture);
 	Context->SetViewports(1, &Viewport);
 
 	ZEArray<const ZEGRRenderTarget*> RenderTargets;
@@ -401,7 +401,7 @@ void ZERNStageAO::DeinterleaveAmbientOcclusion(ZEGRContext* Context)
 	Viewport.SetHeight((float)DeinterleavedAmbientOcclusionTexture->GetHeight());
 
 	Context->SetRenderState(DeinterleaveSSAORenderStateData);
-	Context->SetTextures(ZEGR_ST_PIXEL, 8, 1, reinterpret_cast<const ZEGRTexture**>(&DeinterleavedDepthtexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 8, DeinterleavedDepthtexture);
 	Context->SetViewports(1, &Viewport);
 
 	for (ZEUInt I = 0; I < 16; I++)
@@ -426,7 +426,7 @@ void ZERNStageAO::ReinterleaveAmbientOcclusion(ZEGRContext* Context)
 
 	Context->SetRenderState(ReinterleaveSSAORenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	Context->SetTextures(ZEGR_ST_PIXEL, 9, 1, reinterpret_cast<const ZEGRTexture**>(&DeinterleavedAmbientOcclusionTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 9, DeinterleavedAmbientOcclusionTexture);
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);
@@ -441,7 +441,7 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputText
 
 	Context->SetRenderState(CrossBilateralBlurXRenderStateData);
 	Context->SetRenderTargets(1, &TempRenderTarget, DepthStencilBuffer);
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&InputTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, InputTexture);
 	Context->SetViewports(1, &Viewport);
 	Context->Draw(3, 0);
 
@@ -452,7 +452,7 @@ void ZERNStageAO::ApplyBlur(ZEGRContext* Context, const ZEGRTexture2D* InputText
 
 	Context->SetRenderState(CrossBilateralBlurYRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&BlurTempTexture));
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, BlurTempTexture);
 	Context->SetViewports(1, &Viewport);
 	Context->Draw(3, 0);
 }

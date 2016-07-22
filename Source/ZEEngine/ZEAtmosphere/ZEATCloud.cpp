@@ -417,12 +417,12 @@ void ZEATCloud::Render(const ZERNRenderParameters* Parameters, const ZERNCommand
 	ZEGRContext* Context = Parameters->Context;	
 	const ZERNStage* Stage = Parameters->Stage;
 
-	Context->SetConstantBuffers(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, PlaneTransformConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_ALL, 9, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_DOMAIN, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, PlaneTransformConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_ALL, 9, ConstantBuffer);
 	Context->SetRenderState(PlaneRenderStateData);
 	const ZEGRTexture* Texture = CloudTexture;
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
-	Context->SetVertexBuffers(0, 1, PlaneVertexBuffer.GetPointerToPointer());
+	Context->SetVertexBuffer(0, PlaneVertexBuffer);
 
 	Context->Draw(PlaneVertexBuffer->GetVertexCount(), 0);
 }
