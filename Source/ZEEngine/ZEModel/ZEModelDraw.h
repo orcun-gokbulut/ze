@@ -42,7 +42,8 @@
 
 class ZEModelMesh;
 class ZEModelMeshLOD;
-class ZERNMaterial;
+
+ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
 
 class ZEModelDraw : public ZEObject
 {

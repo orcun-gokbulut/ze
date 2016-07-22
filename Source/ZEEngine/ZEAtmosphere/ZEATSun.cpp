@@ -267,8 +267,8 @@ void ZEATSun::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 9, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 9, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);
 
 	Context->Draw(4, 0);

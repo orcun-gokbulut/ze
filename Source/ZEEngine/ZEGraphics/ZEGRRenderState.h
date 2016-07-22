@@ -35,6 +35,7 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
 #include "ZEPointer/ZEReferenceCounted.h"
 
 #include "ZETypes.h"
@@ -47,27 +48,31 @@
 #include "ZEGRRasterizerState.h"
 #include "ZEGRDepthStencilState.h"
 
+
 typedef ZEGRColorMask ColorBlendMask;
 
-class ZEGRShader;
-class ZEGRContext;
-class ZEGRRenderState;
+ZE_META_FORWARD_DECLARE(ZEGRShader, "ZEGRShader.h");
+ZE_META_FORWARD_DECLARE(ZEGRContext, "ZEGRContext.h");
+ZE_META_FORWARD_DECLARE(ZEGRRenderState, "ZEGRRenderState.h");
 
-class ZEGRRenderStateData : public ZEReferenceCounted
+class ZEGRRenderStateData :  public ZEObject, public ZEReferenceCounted
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRRenderStateData)
 	friend class ZEGRRenderState;
-
 	protected:
 		virtual bool							Initialize(const ZEGRRenderState& RenderState) = 0;
+
+												ZEGRRenderStateData();
 
 	public:
 		static ZEGRRenderStateData*				Create(const ZEGRRenderState& RenderState);
 };
 
-class ZEGRRenderState
+class ZEGRRenderState : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEGRContext;
-
 	private:
 		ZEHolder<const ZEGRShader>				Shaders[ZEGR_SHADER_TYPE_COUNT];
 		ZEGRBlendState							BlendState;

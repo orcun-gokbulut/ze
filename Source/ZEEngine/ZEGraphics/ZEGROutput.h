@@ -47,9 +47,13 @@ class ZEGRWindow;
 
 class ZEGROutput : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGROutput)
 	protected:
 		virtual bool						Initialize(void* Handle, ZEUInt Width, ZEUInt Height, ZEGRFormat Format) = 0;
 		virtual void						Deinitialize() = 0;
+
+											ZEGROutput();
 
 	public:
 		virtual ZEGRResourceType			GetResourceType() const;

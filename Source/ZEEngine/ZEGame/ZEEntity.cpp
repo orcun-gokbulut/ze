@@ -254,10 +254,10 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 
 ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 {
-	zeLog("%s::ManageStates, State: %s, TargetState:%s", 
-		GetName().ToCString(), 
+	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
+		GetClass()->GetName(), 
 		ZEEntityState_Declaration()->ToText(State, "Unknown"), 
-		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));
+		ZEEntityState_Declaration()->ToText(TargetState, "Unknown"));*/
 
 	if (State == ZE_ES_NONE)
 	{

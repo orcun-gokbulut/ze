@@ -53,6 +53,7 @@ enum ZEGRStencilOperation
 
 class ZEGRDepthStencilState : public ZEGRState
 {
+	ZE_OBJECT
 	private:
 		struct ZEDepthStencilStateData
 		{

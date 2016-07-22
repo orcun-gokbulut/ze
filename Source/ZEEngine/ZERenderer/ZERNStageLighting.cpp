@@ -652,9 +652,9 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 	if (GetCommands().GetCount() == 0)
 		return false;
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, 8, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 8, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_COMPUTE, 8, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, 8, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, ConstantBuffer);
 
 	const ZEGRStructuredBuffer* StructuredBuffers[] = {PointLightStructuredBuffer, ProjectiveLightStructuredBuffer};
 	Context->SetStructuredBuffers(ZEGR_ST_VERTEX, 14, 2, StructuredBuffers);
@@ -676,7 +676,7 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 		Context->ClearUnorderedAccessView(TiledDeferredOutputTexture, ZEVector4::Zero);
 
 		Context->SetComputeRenderState(TiledDeferredComputeRenderState);
-		Context->SetRWTextures(0, 1, reinterpret_cast<const ZEGRTexture**>(&TiledDeferredOutputTexture));
+		Context->SetRWTexture(0, TiledDeferredOutputTexture);
 		Context->SetTextures(ZEGR_ST_COMPUTE, 1, 4, GBuffers);
 		Context->SetTextures(ZEGR_ST_COMPUTE, 10, 1, &ProjectiveLightTexture);
 
@@ -685,7 +685,7 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 
 		Context->Dispatch(TileCountX, TileCountY, 1);
 
-		Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, reinterpret_cast<const ZEGRTexture**>(&TiledDeferredOutputTexture));
+		Context->SetTexture(ZEGR_ST_PIXEL, 5, TiledDeferredOutputTexture);
 	}
 
 	Viewport.SetWidth((float)AccumulationTexture->GetWidth());
@@ -703,7 +703,7 @@ bool ZERNStageLighting::Setup(ZEGRContext* Context)
 
 	const ZEGRRenderTarget* RenderTarget = AccumulationTexture->GetRenderTarget();
 	Context->SetRenderTargets(1, &RenderTarget, DepthTexture->GetDepthStencilBuffer(true));
-	Context->SetVertexBuffers(0, 1, DeferredLightVertexBuffer.GetPointerToPointer());
+	Context->SetVertexBuffer(0, DeferredLightVertexBuffer);
 
 	Context->SetStencilRef(0);
 	BlendTiledDeferred(Context, RenderTarget, false);

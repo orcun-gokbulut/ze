@@ -38,9 +38,12 @@
 #include "ZEGRResource.h"
 
 #include "ZETypes.h"
+#include "ZEPointer\ZEHolder.h"
 
 class ZEGRVertexBuffer : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRVertexBuffer)
 	private:
 		ZESize								VertexCount;
 		ZEUInt								VertexStride;

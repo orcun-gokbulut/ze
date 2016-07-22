@@ -137,13 +137,13 @@ bool ZEMCParser::CheckClassHasZEObjectMacro(CXXRecordDecl* Class)
 	
 	if (!HasGetClassMethodFound)
 	{
-		RaiseError(Class->getLocation(), "virtual GetClass() const method has not found. Please make sure that ZE_OBJECT macro has been defined inside the class.");
+		RaiseNote(Class->getLocation(), "virtual GetClass() const method has not found. Please make sure that ZE_OBJECT macro has been defined inside the class. Class will not be exported.");
 		return false;
 	}
 
 	if (!HasClassMethodFound)
 	{
-		RaiseError(Class->getLocation(), "static Class() const method has not found. Please make sure that ZE_OBJECT macro has been defined inside the class.");
+		RaiseNote(Class->getLocation(), "static Class() const method has not found. Please make sure that ZE_OBJECT macro has been defined inside the class. Class will not be exported.");
 		return false;
 	}
 

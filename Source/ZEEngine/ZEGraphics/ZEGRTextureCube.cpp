@@ -110,7 +110,7 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt 
 
 	if (!Texture->Initialize(Length, LevelCount, Format, Usage, BindFlags, Data))
 	{
-		Texture->Destroy();
+		delete Texture;
 		return NULL;
 	}
 

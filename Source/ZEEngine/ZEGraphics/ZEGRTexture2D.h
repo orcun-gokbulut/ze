@@ -47,9 +47,10 @@ class ZEGRDepthStencilBuffer;
 
 class ZEGRTexture2D : public ZEGRTexture
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRTexture2D)
 	friend class ZEGRContext;
 	friend class ZEGRGraphicsModule;
-
 	protected:
 		ZEUInt											Width;
 		ZEUInt											Height;

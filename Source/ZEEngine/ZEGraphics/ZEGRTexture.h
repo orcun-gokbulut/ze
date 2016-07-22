@@ -69,6 +69,8 @@ class ZEGRDepthStencilBuffer;
 
 class ZEGRTexture : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRTexture)
 	friend class ZEGRContext;
 	private:
 		ZEGRFormat											Format;

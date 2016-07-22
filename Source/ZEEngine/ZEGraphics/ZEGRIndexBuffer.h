@@ -38,8 +38,9 @@
 
 #include "ZETypes.h"
 #include "ZEGRResource.h"
+#include "ZEPointer\ZEHolder.h"
 
-enum ZEGRIndexBufferFormat
+ZE_ENUM(ZEGRIndexBufferFormat)
 {
 	ZEGR_IBF_NONE		= 0,
 	ZEGR_IBF_INDEX16	= 1,
@@ -48,6 +49,8 @@ enum ZEGRIndexBufferFormat
 
 class ZEGRIndexBuffer : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRIndexBuffer)
 	friend class ZEGRGraphicsModule;
 	private:
 		ZESize								IndexCount;

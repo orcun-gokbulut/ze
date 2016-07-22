@@ -44,6 +44,8 @@ class ZEGRTexture;
 
 class ZEGRDepthStencilBuffer : public ZEGRResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRDepthStencilBuffer)
 	friend class ZEGRContext;
 	private:
 		const ZEGRTexture*				Owner;

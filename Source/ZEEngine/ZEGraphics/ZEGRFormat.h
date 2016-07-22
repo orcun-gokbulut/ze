@@ -36,7 +36,10 @@
 
 #pragma once
 
-enum ZEGRFormatStructure
+#include "ZEMeta\ZEObject.h"
+#include "ZEMeta\ZEEnumerator.h"
+
+ZE_ENUM(ZEGRFormatStructure)
 {
 	ZEGR_FS_NONE,
 	ZEGR_FS_R8,
@@ -61,7 +64,7 @@ enum ZEGRFormatStructure
 	ZEGR_FS_D32_S8X24
 };
 
-enum ZEGRFormatType
+ZE_ENUM(ZEGRFormatType)
 {
 	ZEGR_FT_NONE,
 	ZEGR_FT_SINT,
@@ -74,14 +77,14 @@ enum ZEGRFormatType
 	ZEGR_FT_FLOAT_UINT
 };
 
-enum ZEGRFormatEncoding
+ZE_ENUM(ZEGRFormatEncoding)
 {
 	ZEGR_FE_NONE,
 	ZEGR_FE_PIXEL,
 	ZEGR_FE_BLOCK
 };
 
-enum ZEGRFormat
+ZE_ENUM(ZEGRFormat)
 {
 	ZEGR_TF_NONE = 0,
 

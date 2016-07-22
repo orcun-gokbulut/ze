@@ -45,10 +45,8 @@ ZE_META_FORWARD_DECLARE(ZEResourceManager, "ZEResourceManager.h")
 
 class ZEResource : public ZEObject
 {
-	friend class ZEResourceManager;
-
 	ZE_OBJECT
-
+	friend class ZEResourceManager;
 	private:
 		ZEString				FileName;
 

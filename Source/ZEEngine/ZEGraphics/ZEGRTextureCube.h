@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 
-enum ZEGRTextureCubeFace
+ZE_ENUM(ZEGRTextureCubeFace)
 {
 	ZEGR_TCF_POSITIVEX		= 0,
 	ZEGR_TCF_NEGATIVEX		= 1,
@@ -53,6 +53,8 @@ class ZEGRRenderTarget;
 
 class ZEGRTextureCube : public ZEGRTexture
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRTextureCube)
 	private:
 		ZEUInt										Length;
 

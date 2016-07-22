@@ -35,24 +35,29 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEGRDefinitions.h"
 #include "ZEGRFormat.h"
 #include "ZETypes.h"
-#include "ZEMath/ZERectangle.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEArray.h"
+#include "ZEMath/ZERectangle.h"
 
 class ZEGRAdapter;
 class ZEGRMonitor;
 
-struct ZEGRRefreshRate
+class ZEGRRefreshRate : public ZEObject
 {
-	ZEUInt										Numerator;
-	ZEUInt										Denominator;
+	ZE_OBJECT
+	public:
+		ZEUInt									Numerator;
+		ZEUInt									Denominator;
 };
 
-class ZEGRMonitorMode
+class ZEGRMonitorMode : public ZEObject
 {
+	ZE_OBJECT
 	public:
 		const ZEGRMonitor*						Monitor;
 		ZEUInt									Width;
@@ -71,8 +76,9 @@ class ZEGRMonitorMode
 
 };
 
-class ZEGRMonitor
+class ZEGRMonitor : public ZEObject
 {
+	ZE_OBJECT
 	protected:
 		const ZEGRAdapter*						Adapter;
 		void*									Handle;
@@ -91,8 +97,9 @@ class ZEGRMonitor
 		virtual	const ZEArray<ZEGRMonitorMode>&	GetModes() const = 0;
 };
 
-class ZEGRAdapter
+class ZEGRAdapter : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEGRGraphicsModule;
 	protected:
 		ZEUInt64								Id;

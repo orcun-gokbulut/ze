@@ -35,34 +35,37 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
 #include "ZEGRDefinitions.h"
 
-#define ZEGR_SCF_DEBUG
-#define ZEGR_SCF_STRIPT
-
-struct ZEGRShaderDefinition
+class ZEGRShaderDefinition : public ZEObject
 {
-	ZEString		Name;
-	ZEString		Value;
+	ZE_OBJECT
+	public:
+		ZEString						Name;
+		ZEString						Value;
 
-					ZEGRShaderDefinition();
-					ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value = "");
+										ZEGRShaderDefinition();
+										ZEGRShaderDefinition(const ZEString& Name, const ZEString& Value = "");
 };
 
-struct ZEGRShaderCompileOptions
+class ZEGRShaderCompileOptions : public ZEObject
 {
-	ZEGRShaderType					Type;
-	ZEGRShaderModel					Model;
-	bool							Debug;
-	ZEUInt							OptimizationLevel;
-	ZEString						FileName;
-	ZEString						EntryPoint;
-	ZEString						SourceData;
-	ZEArray<ZEGRShaderDefinition>	Definitions;
-	ZEArray<ZEString>				IncludeDirectories;
+	ZE_OBJECT
+	public:
+		ZEGRShaderType					Type;
+		ZEGRShaderModel					Model;
+		bool							Debug;
+		ZEUInt							OptimizationLevel;
+		ZEString						FileName;
+		ZEString						EntryPoint;
+		ZEString						SourceData;
+		ZEArray<ZEGRShaderDefinition>	Definitions;
+		ZEArray<ZEString>				IncludeDirectories;
 
-									ZEGRShaderCompileOptions();
+										ZEGRShaderCompileOptions();
 };

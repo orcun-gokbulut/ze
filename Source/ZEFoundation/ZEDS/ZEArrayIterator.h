@@ -214,8 +214,8 @@ template<typename ZEItemType, typename ZEAllocatorType>
 void ZEArrayIteratorConst<ZEItemType, ZEAllocatorType>::Next()
 {	
 	Index++;
-	if (Index >= Array->GetCount())
-		Index = Array->GetCount();
+	if (Index >= (ZESSize)Array->GetCount())
+		Index = (ZESSize)Array->GetCount();
 }
 
 template<typename ZEItemType, typename ZEAllocatorType>

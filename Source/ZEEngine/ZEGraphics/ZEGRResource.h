@@ -36,13 +36,15 @@
 #pragma once
 
 #include "ZEPointer/ZEReferenceCounted.h"
+#include "ZEResource/ZERSResource.h"
 
 #include "ZEGRDefinitions.h"
+#include "ZECommon.h"
 #include "ZEDS/ZEString.h"
 #include "ZEDS/ZEFlags.h"
-#include "ZECommon.h"
 
-enum ZEGRResourceType
+
+ZE_ENUM(ZEGRResourceType)
 {
 	ZEGR_RT_NONE						= 0,
 	ZEGR_RT_VERTEX_BUFFER				= 1,
@@ -58,7 +60,7 @@ enum ZEGRResourceType
 	ZEGR_RT_STRUCTURED_BUFFER			= 11
 };
 
-enum ZEGRResourceUsage
+ZE_ENUM(ZEGRResourceUsage)
 {
 	ZEGR_RU_GPU_READ_ONLY				= 0,
 	ZEGR_RU_GPU_READ_WRITE_CPU_WRITE	= 1,
@@ -66,7 +68,7 @@ enum ZEGRResourceUsage
 	ZEGR_RU_CPU_READ_WRITE				= 3
 };
 
-enum ZEGRResourceBindFlag
+ZE_ENUM(ZEGRResourceBindFlag)
 {
 	ZEGR_RBF_NONE						= 0,
 	ZEGR_RBF_SHADER_RESOURCE			= 1,
@@ -76,8 +78,9 @@ enum ZEGRResourceBindFlag
 	ZEGR_RBF_VERTEX_BUFFER				= 16
 };
 
-class ZEGRResource : public ZEReferenceCounted
+class ZEGRResource : public ZERSResource
 {
+	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRResource)
 	friend class ZEGRGraphicsModule;
 	private:

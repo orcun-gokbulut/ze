@@ -46,6 +46,8 @@ struct ZETextureOptions;
 
 class ZETexture3DResource : public ZETextureResource
 {
+	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZETexture3DResource)
 	private:
 		ZEHolder<ZEGRTexture3D>			Texture;
 

@@ -160,7 +160,10 @@ ZEEntityResult ZEModel::LoadInternal()
 		return ZE_ER_DONE;
 
 	if (!Resource->IsLoaded())
+	{
+		zeLog("Load progress %d", Resource->GetLoadProgress());
 		return ZE_ER_WAIT;
+	}
 	else if (Resource->IsFailed())
 		return ZE_ER_FAILED;
 

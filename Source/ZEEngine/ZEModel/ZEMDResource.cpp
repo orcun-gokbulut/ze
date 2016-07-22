@@ -112,6 +112,7 @@ bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 			return false;
 
 		AddMesh(Mesh.Transfer());
+		SetLoadProgress(I, SubNodeCount, 10, 50);
 	}
 
 	return true;
@@ -179,6 +180,7 @@ bool ZEMDResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 			return false;
 
 		AddAnimation(Animation.Transfer());
+		SetLoadProgress(I, SubNodeCount, 60, 95);
 	}
 
 	return true;
@@ -189,7 +191,7 @@ bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 	zeCheckError(!MaterialsNode.IsValid(), false, "Invalid Materials node.");
 	zeCheckError(MaterialsNode.GetName() != "Materials", false, "Invalid Materials node name.");
 
-	ZEArray<ZEHolder<ZERNFixedMaterial>> Materials;
+	ZEArray<ZEHolder<const ZERNFixedMaterial>> Materials;
 	ZESize SubNodeCount = MaterialsNode.GetNodeCount("Material");
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -199,9 +201,7 @@ bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
-		ZEHolder<ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::CreateInstance();
-		CurrentMaterial->ReadFromFile(MaterialPath);
-		CurrentMaterial->Initialize();
+		ZEHolder<const ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::LoadResourceShared(MaterialPath);
 		Materials.Add(CurrentMaterial);
 	}
 
@@ -221,6 +221,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 	ZEMLReader Reader;
 	if (!Reader.Open(GetFileName()))
 		return ZE_TR_FAILED;
+	SetLoadProgress(5);
 
 	ZEMLReaderNode ModelNode = Reader.GetRootNode();
 
@@ -238,6 +239,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 	{
 		BoundingBoxIsUserDefined = false;
 	}
+	SetLoadProgress(10);
 
 	ZEMLReaderNode MeshesNode = ModelNode.GetNode("Meshes");
 	if (MeshesNode.IsValid())
@@ -245,6 +247,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadMeshes(MeshesNode))
 			return ZE_TR_FAILED;
 	}
+	SetLoadProgress(50);
 
 	ZEMLReaderNode BonesNode = ModelNode.GetNode("Bones");
 	if (BonesNode.IsValid())
@@ -252,6 +255,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadBones(BonesNode))
 			return ZE_TR_FAILED;
 	}
+	SetLoadProgress(55);
 
 	ZEMLReaderNode HelpersNode = ModelNode.GetNode("Helpers");
 	if (HelpersNode.IsValid())
@@ -259,6 +263,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadHelpers(HelpersNode))
 			return ZE_TR_FAILED;
 	}
+	SetLoadProgress(60);
 
 	ZEMLReaderNode AnimationsNode = ModelNode.GetNode("Animations");
 	if (AnimationsNode.IsValid())
@@ -266,6 +271,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadAnimations(AnimationsNode))
 			return ZE_TR_FAILED;
 	}
+	SetLoadProgress(95);
 
 	ZEMLReaderNode MaterialsNode = ModelNode.GetNode("Materials");
 	if (MaterialsNode.IsValid())
@@ -273,6 +279,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadMaterials(MaterialsNode))
 			return ZE_TR_FAILED;
 	}
+	SetLoadProgress(100);
 
 	return ZE_TR_DONE;
 }

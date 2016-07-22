@@ -237,7 +237,7 @@ void ZERNRenderer::RenderStages()
 		{
 			if (Command->SceneIndex != LastSceneIndex)
 			{
-				Context->SetConstantBuffers(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, 1, SceneConstants[Command->SceneIndex].GetPointerToPointer());
+				Context->SetConstantBuffer(ZEGR_ST_ALL, ZERN_SHADER_CONSTANT_SCENE, SceneConstants[Command->SceneIndex]);
 				LastSceneIndex = Command->SceneIndex;
 			}
 

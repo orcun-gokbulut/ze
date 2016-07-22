@@ -35,12 +35,15 @@
 
 #pragma once
 
+#include "ZEMeta/ZEObject.h"
+
 #include "ZEGRShaderCompileOptions.h"
 
 struct ZEGRShaderMeta;
 
-class ZEGRShaderCompiler
+class ZEGRShaderCompiler : public ZEObject
 {
+	ZE_OBJECT
 	public:
 		virtual bool				Compile(ZEArray<ZEBYTE>& ByteCode, const ZEGRShaderCompileOptions& Options, ZEGRShaderMeta* Meta, ZEString* Output, bool ShaderEditorOpen = false) = 0;
 

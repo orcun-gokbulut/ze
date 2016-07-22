@@ -36,12 +36,13 @@
 #pragma once
 
 #include "ZEDS/ZEFlags.h"
+#include "ZEMeta/ZEEnumerator.h"
 
 //#define ZE_GRAPHIC_LOG_ENABLE
 //#define ZE_GRAPHICS_DEVICE_DEBUG_LAYER_ENABLED
 //#define ZE_GRAPHICS_CONTENT_PROTECTION
 
-enum ZEGRShaderModel
+ZE_ENUM(ZEGRShaderModel)
 {
 	ZEGR_SM_3_0		= 0,
 	ZEGR_SM_4_0		= 1,
@@ -49,7 +50,7 @@ enum ZEGRShaderModel
 	ZEGR_SM_5_0		= 3
 };
 
-enum ZEGRShaderType
+ZE_ENUM(ZEGRShaderType)
 {
 	ZEGR_ST_VERTEX		= 0,
 	ZEGR_ST_PIXEL		= 1,

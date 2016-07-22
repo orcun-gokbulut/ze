@@ -257,12 +257,12 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	ZEGRContext* Context = Parameters->Context;
 	const ZERNStage* Stage = Parameters->Stage;
 
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferTransform.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_PIXEL, 9, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferTransform);
+	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);
 	const ZEGRTexture* Texture = SkyTexture;
 	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
-	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	Context->SetVertexBuffer(0, VertexBuffer);
 
 	Context->Draw(VertexBuffer->GetVertexCount(), 0);
 }

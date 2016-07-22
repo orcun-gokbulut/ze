@@ -39,7 +39,7 @@
 #include "ZETypes.h"
 #include "ZEGRDefinitions.h"
 
-enum ZEGRBlend 
+ZE_ENUM(ZEGRBlend)
 {	
 	ZEGR_BO_ZERO				= 1,
 	ZEGR_BO_ONE					= 2,
@@ -60,7 +60,7 @@ enum ZEGRBlend
 	ZEGR_BO_INV_SRC1_ALPHA		= 19
 };
 
-enum ZEGRBlendOperation 
+ZE_ENUM(ZEGRBlendOperation)
 {
 	ZEGR_BE_ADD					= 1,
 	ZEGR_BE_SUBTRACT			= 2,
@@ -69,8 +69,9 @@ enum ZEGRBlendOperation
 	ZEGR_BE_MAX					= 5 
 };
 
-class ZEGRBlendRenderTarget
+class ZEGRBlendRenderTarget : public ZEObject
 {
+	ZE_OBJECT
 	friend class ZEGRBlendState;
 	private:
 		struct ZEBlendStateData
@@ -119,6 +120,7 @@ class ZEGRBlendRenderTarget
 
 class ZEGRBlendState : public ZEGRState
 {
+	ZE_OBJECT
 	private:
 		struct ZEGRBlendStateData
 		{

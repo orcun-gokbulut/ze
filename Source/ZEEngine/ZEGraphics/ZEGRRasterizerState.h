@@ -39,7 +39,7 @@
 
 #include "ZETypes.h"
 
-enum ZEGRPrimitiveType
+ZE_ENUM(ZEGRPrimitiveType)
 {
 	ZEGR_PT_NONE						= 0,
 	ZEGR_PT_POINT_LIST					= 1,
@@ -80,13 +80,13 @@ enum ZEGRPrimitiveType
 	ZEGR_PT_32_CONTROL_POINT_PATCHLIST	= 36
 };
 
-enum ZEGRFillMode : ZEUInt8
+ZE_ENUM_TYPED(ZEGRFillMode, ZEUInt8)
 {
 	ZEGR_FM_SOLID						= 0,
 	ZEGR_FM_WIREFRAME					= 1
 };
 
-enum ZEGRCullMode : ZEUInt8
+ZE_ENUM_TYPED(ZEGRCullMode, ZEUInt8)
 {
 	ZEGR_CMD_NONE						= 0,
 	ZEGR_CMD_FRONT						= 1,
@@ -95,6 +95,7 @@ enum ZEGRCullMode : ZEUInt8
 
 class ZEGRRasterizerState : public ZEGRState
 {
+	ZE_OBJECT
 	private:
 		struct ZERasterizerStateData	
 		{

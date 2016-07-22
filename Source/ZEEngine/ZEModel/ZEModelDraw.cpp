@@ -39,6 +39,8 @@
 #include "ZEModelMeshLOD.h"
 
 #include "ZEGraphics/ZEGRContext.h"
+#include "ZEGraphics/ZEGRVertexBuffer.h"
+#include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNMaterial.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 #include "ZERenderer/ZERNShaderSlots.h"
@@ -97,8 +99,8 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	Context->SetVertexBuffers(0, 1, GetLOD()->VertexBufferBase.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, GetLOD()->GetMesh()->ConstantBuffer.GetPointerToPointer());
+	Context->SetVertexBuffer(0, GetLOD()->VertexBufferBase);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetLOD()->GetMesh()->ConstantBuffer);
 
 	GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage);
 	Context->Draw(GetCount(), GetOffset());

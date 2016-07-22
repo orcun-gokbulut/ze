@@ -42,52 +42,38 @@ template<typename Type>
 class ZEHolder
 {
 	private:
-		const ZEReferenceCounted*	Pointer;
+		const ZEReferenceCounted*			Pointer;
 
 	public:
-		bool						IsNull() const;
-		Type*						GetPointer() const;
-		Type**						GetPointerToPointer() const;
+		bool								IsNull() const;
+		Type*								GetPointer() const;
+		Type&								GetValue() const;
 
-		void						Assign(Type* RawPointer);
-		void						Release();
-		void						Copy(const ZEHolder<Type>& OtherHolder);
-		Type*						Transfer();
+		void								Reference(Type* RawPointer);
+		void								Overwrite(Type* RawPointer);
+		void								Release();
+		void								Copy(const ZEHolder<Type>& OtherHolder);
+		Type*								Transfer();
 
 		template<typename TargetType>
-		TargetType*					Cast() const;
+		TargetType*							Cast() const;
 		template<typename TargetType>
-		const TargetType*			ConstCast() const;
+		const TargetType*					ConstCast() const;
 
-		Type&						operator*() const;
-		Type*						operator->() const;
+		Type&								operator*() const;
+		Type*								operator->() const;
 
-		ZEHolder<Type>&				operator=(Type* Source);
-		ZEHolder<Type>&				operator=(const ZEHolder<Type>& Source);
+		ZEHolder<Type>&						operator=(Type* RawPointer);
+		ZEHolder<Type>&						operator=(const ZEHolder<Type>& OtherHolder);
 
-		bool						operator==(const Type* RawPointer) const;
-		bool						operator==(const ZEHolder<Type>& Pointer) const;
-		bool						operator!=(const Type* RawPointer) const;
-		bool						operator!=(const ZEHolder<Type>& Pointer) const;
+											operator Type*() const;
+											operator ZEHolder<const Type>() const;
 
-									operator Type*() const;
-									operator ZEHolder<const Type>() const;
-
-									#if ZE_DISABLED_CODE
-									// Not available unless "C++11 - Explicit Casting Operators" becomes available.
-										template<typename TargetType>
-										explicit operator TargetType*();
-										template<typename TargetType>
-										explicit operator const TargetType*();
-									#endif
-
-
-									ZEHolder();
-									ZEHolder(Type* RawPointer);
-									explicit ZEHolder(const ZEHolder<Type>& OtherHolder);
-									~ZEHolder();
+											ZEHolder();
+											ZEHolder(Type* RawPointer);
+		explicit							ZEHolder(const ZEHolder<Type>& OtherHolder);
+											~ZEHolder();
 };
-
 
 template<typename Type>
 bool ZEHolder<Type>::IsNull() const
@@ -102,13 +88,12 @@ Type* ZEHolder<Type>::GetPointer() const
 }
 
 template<typename Type>
-Type** ZEHolder<Type>::GetPointerToPointer() const
+Type& ZEHolder<Type>::GetValue() const
 {
-	return (Type**)&Pointer;
+	return *GetPointer();
 }
-
 template<typename Type>
-void ZEHolder<Type>::Assign(Type* RawPointer)
+void ZEHolder<Type>::Reference(Type* RawPointer)
 {
 	const ZEReferenceCounted* CastedPointer = static_cast<const ZEReferenceCounted*>(RawPointer);
 	if (Pointer == CastedPointer)
@@ -131,13 +116,21 @@ void ZEHolder<Type>::Release()
 }
 
 template<typename Type>
-void ZEHolder<Type>::Copy(const ZEHolder<Type>& Source)
+void ZEHolder<Type>::Copy(const ZEHolder<Type>& OtherHolder)
 {
 	Release();
 	
-	Pointer = Source.Pointer;
+	Pointer = OtherHolder.Pointer;
 	if (Pointer != NULL)
 		Pointer->Reference();
+}
+
+
+template<typename Type>
+void ZEHolder<Type>::Overwrite(Type* RawPointer)
+{
+	Release();
+	Pointer = RawPointer;
 }
 
 template<typename Type>
@@ -177,41 +170,17 @@ Type* ZEHolder<Type>::operator->() const
 }
 
 template<typename Type>
-ZEHolder<Type>& ZEHolder<Type>::operator=(Type* Source)
+ZEHolder<Type>& ZEHolder<Type>::operator=(Type* RawPointer)
 {
-	Assign(Source);
+	Reference(RawPointer);
 	return *this;
 }
 
 template<typename Type>
-ZEHolder<Type>& ZEHolder<Type>::operator=(const ZEHolder<Type>& Source)
+ZEHolder<Type>& ZEHolder<Type>::operator=(const ZEHolder<Type>& OtherHolder)
 {
-	Copy(Source);
+	Copy(OtherHolder);
 	return *this;
-}
-
-template<typename Type>
-bool ZEHolder<Type>::operator==(const ZEHolder<Type>& Holder) const
-{
-	return (Pointer == Holder.Pointer);
-}
-
-template<typename Type>
-bool ZEHolder<Type>::operator==(const Type* RawPointer) const
-{
-	return (GetPointer() == RawPointer);
-}
-
-template<typename Type>
-bool ZEHolder<Type>::operator!=(const ZEHolder<Type>& Holder) const
-{
-	return (Pointer != Holder.Pointer);
-}
-
-template<typename Type>
-bool ZEHolder<Type>::operator!=(const Type* RawPointer) const
-{
-	return (GetPointer() != RawPointer);
 }
 
 template<typename Type>
@@ -226,22 +195,6 @@ ZEHolder<Type>::operator ZEHolder<const Type>() const
 	return ZEHolder<const Type>(GetPointer());
 }
 
-#if ZE_DISABLED
-template<typename Type>
-template<typename TargetType>
-ZEHolder<Type>::operator TargetType*()
-{
-	return Cast<TargetType>();
-}
-
-template<typename Type>
-template<typename TargetType>
-ZEHolder<Type>::operator const TargetType*()
-{
-	return ConstCast<TargetType>();
-}
-#endif
-
 template<typename Type>
 ZEHolder<Type>::ZEHolder()
 {
@@ -252,7 +205,7 @@ template<typename Type>
 ZEHolder<Type>::ZEHolder(Type* RawPointer)
 {
 	Pointer = NULL;
-	Assign(RawPointer);
+	Reference(RawPointer);
 }
 
 template<typename Type>

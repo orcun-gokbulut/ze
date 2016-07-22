@@ -63,16 +63,26 @@ class ZERSResourceLoadable : public ZERSResource
 	private:
 		ZERSLoadState							LoadState;
 		ZERSLoadState							TargetState;
-
+		ZEUInt									LoadProgress;
+		bool									LoadInternalDone;
+		bool									UnloadInternalDone;
 		ZEString								FileName;
 		ZEUInt32								FileNameHash;
+		ZEArray<const ZERSResourceLoadable*>	ExternalResources;
 
 		ZETask									ManageStatesTask;
 		ZETaskResult							ManageStatesFunction(ZETaskThread* TaskThread, void* Parameters);
 		
+	public:
 		virtual void							Destroy() const;
 
 	protected:
+		void									SetLoadProgress(ZEUInt Percentage);
+		void									SetLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage);
+
+		void									RegisterExternalResource(ZERSResourceLoadable* Resource);
+		void									UnregisterExternalResource(ZERSResourceLoadable* Resource);
+
 		virtual ZETaskResult					LoadInternal();
 		virtual ZETaskResult					UnloadInternal();
 
@@ -82,6 +92,7 @@ class ZERSResourceLoadable : public ZERSResource
 	public:
 		virtual ZERSResourceType				GetType() const;
 		ZERSLoadState							GetLoadState() const;
+		ZEUInt									GetLoadProgress() const;
 		const ZEString&							GetFileName() const;
 
 		bool									IsLoaded() const;

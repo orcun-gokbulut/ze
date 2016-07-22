@@ -42,19 +42,19 @@
 class ZEReferenceCounted
 {
 	ZE_COPY_NO_ACTION(ZEReferenceCounted)
-	template<typename ZEReferenceCountedClass> friend class ZEHolder;
 	friend class ZERSResource;
+	friend class ZERSResourceManager;
+	template<typename ZEReferenceCountedClass> friend class ZEHolder;
 	private:
-		mutable ZELock			ReferenceCountLock;
-		mutable ZESSize			ReferenceCount;
-	
-		void					Release() const;
-		void					Reference() const;
-	
+		mutable ZELock					ReferenceCountLock;
+		mutable ZESSize					ReferenceCount;
+
 	protected:
-		virtual void			Destroy() const;
+		virtual void					Release() const;
+		virtual void					Reference() const;
+		virtual void					Destroy() const;
 
 	public:
-								ZEReferenceCounted();
-		virtual					~ZEReferenceCounted();
+										ZEReferenceCounted();
+		virtual							~ZEReferenceCounted();
 };
