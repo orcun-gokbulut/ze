@@ -35,13 +35,14 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResourceLoadable.h"
+#include "ZEResource/ZERSResource.h"
+#include "ZEInitializable.h"
 
 class ZEGRContext;
 class ZERNStage;
 class ZERNCommand;
 
-class ZERNMaterial : public ZERSResourceLoadable
+class ZERNMaterial : public ZERSResource, public ZEInitializable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERNMaterial)
@@ -61,5 +62,5 @@ class ZERNMaterial : public ZERSResourceLoadable
 		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
-		virtual bool					Update();
+		virtual bool					Update() const;
 };

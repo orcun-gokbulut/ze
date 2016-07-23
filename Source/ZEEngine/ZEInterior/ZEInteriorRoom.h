@@ -60,7 +60,7 @@ struct ZEInteriorRoomDraw
 {
 	ZEUInt										VertexOffset;
 	ZEUInt										VertexCount;
-	ZEHolder<ZERNMaterial>						Material;
+	ZEHolder<const ZERNMaterial>				Material;
 	ZERNCommand									RenderCommand;
 };
 

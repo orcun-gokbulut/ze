@@ -45,19 +45,21 @@ class ZEGRConstantBuffer : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRConstantBuffer)
+	friend class ZERSTemplates;
 	protected:
-		virtual bool								Initialize(ZESize BufferSize);
-		virtual void								Deinitialize();
+		virtual bool									Initialize(ZESize BufferSize);
+		virtual void									Deinitialize();
 
-													ZEGRConstantBuffer();
+														ZEGRConstantBuffer();
 
 	public:
-		ZEGRResourceType							GetResourceType() const;
+		ZEGRResourceType								GetResourceType() const;
 
-		void										SetData(const void* ConstantData);
+		void											SetData(const void* ConstantData);
 
-		virtual bool								Lock(void** Buffer) = 0;
-		virtual void								Unlock() = 0;
+		virtual bool									Lock(void** Buffer) = 0;
+		virtual void									Unlock() = 0;
 
-		static ZEHolder<ZEGRConstantBuffer>			Create(ZESize BufferSize);
+		static ZEHolder<ZEGRConstantBuffer>				CreateResource(ZESize BufferSize);
+		static ZEHolder<const ZEGRConstantBuffer>		CreateResourceShared(const ZEGUID& GUID, ZESize BufferSize, ZEGRConstantBuffer** StagingResource = NULL);
 };

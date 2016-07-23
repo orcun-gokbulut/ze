@@ -327,7 +327,7 @@ bool ZERNFixedMaterial::Update()
 		return false;
 
 	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	if (!UpdateStageMask())
 		return false;
@@ -486,27 +486,16 @@ ZETaskResult ZERNFixedMaterial::UnloadInternal()
 	Sampler.Release();
 
 	BaseMap = NULL;
-	BaseMapFile.Clear();
 	SpecularMap = NULL;
-	SpecularMapFile.Clear();
 	SpecularGlossMap = NULL;
-	SpecularGlossMapFile.Clear();
 	EmissiveMap = NULL;
-	EmissiveMapFile.Clear();
 	NormalMap = NULL;
-	NormalMapFile.Clear();
 	HeightMap = NULL;
-	HeightMapFile.Clear();
 	OpacityMap = NULL;
-	OpacityMapFile.Clear();
 	SubSurfaceScatteringMap = NULL;
-	SubSurfaceScatteringMapFile.Clear();
 	EnvironmentMap = NULL;
-	EnvironmentMapFile.Clear();
 	DetailBaseMap = NULL;
-	DetailBaseMapFile.Clear();
 	DetailNormalMap = NULL;
-	DetailNormalMapFile.Clear();
 
 	return ZE_TR_DONE;
 }
@@ -785,11 +774,7 @@ bool ZERNFixedMaterial::GetSubSurfaceScatteringMapEnabled() const
 void ZERNFixedMaterial::SetSubSurfaceScatteringMap(ZEGRTexture2D* Texture)
 {
 	SubSurfaceScatteringMap = Texture;
-
-	if (!SubSurfaceScatteringMap.IsNull())
-		SubSurfaceScatteringMapFile = SubSurfaceScatteringMap->GetName();
-	else
-		SubSurfaceScatteringMapFile = NULL;
+	SubSurfaceScatteringMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetSubSurfaceScatteringMap() const
@@ -797,21 +782,22 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetSubSurfaceScatteringMap() const
 	return SubSurfaceScatteringMap;
 }
 
-void ZERNFixedMaterial::SetSubSurfaceScatteringMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileName)
 {
-	SubSurfaceScatteringMapFile = Filename;
+	if (SubSurfaceScatteringMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	SubSurfaceScatteringMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
-
-		SubSurfaceScatteringMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		SubSurfaceScatteringMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -838,11 +824,7 @@ bool ZERNFixedMaterial::GetBaseMapEnabled() const
 void ZERNFixedMaterial::SetBaseMap(ZEGRTexture2D* Map)
 {
 	BaseMap = Map;
-
-	if (!BaseMap.IsNull())
-		BaseMapFile = BaseMap->GetName();
-	else
-		BaseMapFile = NULL;
+	BaseMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetBaseMap() const
@@ -850,13 +832,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetBaseMap() const
 	return BaseMap;
 }
 
-void ZERNFixedMaterial::SetBaseMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetBaseMapFile(const ZEString& FileName)
 {
-	BaseMapFile = Filename;
+	if (BaseMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	BaseMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
@@ -864,7 +848,7 @@ void ZERNFixedMaterial::SetBaseMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		BaseMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		BaseMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1056,11 +1040,7 @@ bool ZERNFixedMaterial::GetSpecularMapEnabled() const
 void ZERNFixedMaterial::SetSpecularMap(ZEGRTexture2D* Texture)
 {
 	SpecularMap = Texture;
-
-	if (!SpecularMap.IsNull())
-		SpecularMapFile = SpecularMap->GetName();
-	else
-		SpecularMapFile = NULL;
+	SpecularMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularMap() const
@@ -1068,13 +1048,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularMap() const
 	return SpecularMap;
 }
 
-void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& FileName)
 {
-	SpecularMapFile = Filename;
+	if (SpecularMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	SpecularMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
@@ -1082,7 +1064,7 @@ void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		SpecularMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		SpecularMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1109,11 +1091,7 @@ bool ZERNFixedMaterial::GetSpecularGlossMapEnabled() const
 void ZERNFixedMaterial::SetSpecularGlossMap(ZEGRTexture2D* Texture)
 {
 	SpecularGlossMap = Texture;
-
-	if (!SpecularGlossMap.IsNull())
-		SpecularGlossMapFile = SpecularGlossMap->GetName();
-	else
-		SpecularGlossMapFile = NULL;
+	SpecularGlossMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularGlossMap() const
@@ -1121,13 +1099,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularGlossMap() const
 	return SpecularGlossMap;
 }
 
-void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
 {
-	SpecularGlossMapFile = Filename;
+	if (SpecularGlossMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	SpecularGlossMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
@@ -1135,7 +1115,7 @@ void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		SpecularGlossMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		SpecularGlossMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1207,11 +1187,7 @@ bool ZERNFixedMaterial::GetEmissiveMapEnabled() const
 void ZERNFixedMaterial::SetEmissiveMap(ZEGRTexture2D* Texture)
 {
 	EmissiveMap = Texture;
-
-	if (!EmissiveMap.IsNull())
-		EmissiveMapFile = EmissiveMap->GetName();
-	else
-		EmissiveMapFile = NULL;
+	EmissiveMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetEmissiveMap() const
@@ -1219,13 +1195,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetEmissiveMap() const
 	return EmissiveMap;
 }
 
-void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& FileName)
 {
-	EmissiveMapFile = Filename;
+	if (EmissiveMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
-
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	EmissiveMapFile = FileName;
+	
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
@@ -1233,7 +1211,7 @@ void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		EmissiveMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		EmissiveMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1260,11 +1238,7 @@ bool ZERNFixedMaterial::GetNormalMapEnabled() const
 void ZERNFixedMaterial::SetNormalMap(ZEGRTexture2D* Texture)
 {
 	NormalMap = Texture;
-
-	if (!NormalMap.IsNull())
-		NormalMapFile = NormalMap->GetName();
-	else
-		NormalMapFile = NULL;
+	NormalMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetNormalMap() const
@@ -1272,13 +1246,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetNormalMap() const
 	return NormalMap;
 }
 
-void ZERNFixedMaterial::SetNormalMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetNormalMapFile(const ZEString& FileName)
 {
-	NormalMapFile = Filename;
+	if (NormalMapFile == FileName)
+		return;
+	
+	NormalMapFile = FileName;
 
-	ZERSLoadState State = GetLoadState();
-
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
@@ -1286,7 +1262,7 @@ void ZERNFixedMaterial::SetNormalMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		NormalMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		NormalMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1358,11 +1334,7 @@ float ZERNFixedMaterial::GetHeightMapScale() const
 void ZERNFixedMaterial::SetHeightMap(ZEGRTexture2D* Texture)
 {
 	HeightMap = Texture;
-
-	if (!HeightMap.IsNull())
-		HeightMapFile = HeightMap->GetName();
-	else
-		HeightMapFile = NULL;
+	HeightMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetHeightMap() const
@@ -1370,13 +1342,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetHeightMap() const
 	return HeightMap;
 }
 
-void ZERNFixedMaterial::SetHeightMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetHeightMapFile(const ZEString& FileName)
 {
-	HeightMapFile = Filename;
+	if (HeightMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	HeightMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
@@ -1384,7 +1358,7 @@ void ZERNFixedMaterial::SetHeightMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		HeightMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		HeightMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1425,11 +1399,7 @@ bool ZERNFixedMaterial::GetOpacityMapEnabled() const
 void ZERNFixedMaterial::SetOpacityMap(ZEGRTexture2D* Texture)
 {
 	OpacityMap = Texture;
-
-	if (!OpacityMap.IsNull())
-		OpacityMapFile = OpacityMap->GetName();
-	else
-		OpacityMapFile = NULL;
+	OpacityMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetOpacityMap() const
@@ -1437,13 +1407,15 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetOpacityMap() const
 	return OpacityMap;
 }
 
-void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& FileName)
 {
-	OpacityMapFile = Filename;
+	if (OpacityMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	OpacityMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
@@ -1451,7 +1423,7 @@ void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		OpacityMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		OpacityMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1478,11 +1450,7 @@ bool ZERNFixedMaterial::GetEnvironmentMapEnabled() const
 void ZERNFixedMaterial::SetEnvironmentMap(ZEGRTexture2D* Texture)
 {
 	EnvironmentMap = Texture;
-
-	if (!EnvironmentMap.IsNull())
-		EnvironmentMapFile = EnvironmentMap->GetName();
-	else
-		EnvironmentMapFile = NULL;
+	EnvironmentMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetEnvironmentMap() const
@@ -1490,13 +1458,16 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetEnvironmentMap() const
 	return EnvironmentMap;
 }
 
-void ZERNFixedMaterial::SetEnvironmentMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 {
-	EnvironmentMapFile = Filename;
+	if (EnvironmentMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	EnvironmentMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
@@ -1504,7 +1475,7 @@ void ZERNFixedMaterial::SetEnvironmentMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		EnvironmentMapFile = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		EnvironmentMapFile = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1712,11 +1683,7 @@ float ZERNFixedMaterial::GetDetailBaseMapAttenuationFactor() const
 void ZERNFixedMaterial::SetDetailBaseMap(ZEGRTexture2D* Texture)
 {
 	DetailBaseMap = Texture;
-
-	if (!DetailBaseMap.IsNull())
-		DetailBaseMapFile = DetailBaseMap->GetName();
-	else
-		DetailBaseMapFile = NULL;
+	DetailBaseMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetDetailBaseMap() const
@@ -1724,13 +1691,16 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetDetailBaseMap() const
 	return DetailBaseMap;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 {
-	DetailBaseMapFile = Filename;
+	if (DetailBaseMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	DetailBaseMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
@@ -1738,7 +1708,7 @@ void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		DetailBaseMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		DetailBaseMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -1825,11 +1795,7 @@ float ZERNFixedMaterial::GetDetailNormalMapAttenuationFactor() const
 void ZERNFixedMaterial::SetDetailNormalMap(ZEGRTexture2D* Texture)
 {
 	DetailNormalMap = Texture;
-
-	if (!DetailNormalMap.IsNull())
-		DetailNormalMapFile = DetailNormalMap->GetName();
-	else
-		DetailNormalMapFile = NULL;
+	DetailNormalMapFile = "";
 }
 
 const ZEGRTexture2D* ZERNFixedMaterial::GetDetailNormalMap() const
@@ -1837,13 +1803,16 @@ const ZEGRTexture2D* ZERNFixedMaterial::GetDetailNormalMap() const
 	return DetailNormalMap;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& Filename)
+void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 {
-	DetailNormalMapFile = Filename;
+	if (DetailNormalMapFile == FileName)
+		return;
 
-	ZERSLoadState State = GetLoadState();
+	DetailNormalMapFile = FileName;
 
-	if (State == ZERS_LS_LOADED || State == ZERS_LS_LOADING)
+	ZERSResourceState State = GetState();
+
+	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
 	{
 		ZEGRTextureOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
@@ -1851,7 +1820,7 @@ void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& Filename)
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		DetailNormalMap = ZEGRTexture2D::CreateFromFile(Filename, TextureOptions);
+		DetailNormalMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
 	}
 }
 
@@ -2053,10 +2022,10 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 
 ZERSHolder<ZERNFixedMaterial> ZERNFixedMaterial::LoadResource(const ZEString& FileName)
 {
-	return ZERSTemplates::LoadResource<ZERNFixedMaterial>(FileName);
+	return ZERSTemplates::LoadResource<ZERNFixedMaterial>(FileName, ZERSTemplates::InstanciatorFunction<ZERNFixedMaterial>);
 }
 
 ZERSHolder<const ZERNFixedMaterial> ZERNFixedMaterial::LoadResourceShared(const ZEString& FileName)
 {
-	return ZERSTemplates::LoadResourceShared<ZERNFixedMaterial>(FileName);
+	return ZERSTemplates::LoadResourceShared<ZERNFixedMaterial>(FileName, ZERSTemplates::InstanciatorFunction<ZERNFixedMaterial>);
 }

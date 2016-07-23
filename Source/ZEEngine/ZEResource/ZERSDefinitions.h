@@ -54,13 +54,19 @@ ZE_ENUM( ZERSResourceType)
 
 ZE_ENUM(ZERSResourceState)
 {
-	ZERS_RS_NONE,
-	ZERS_RS_STAGING,
-	ZERS_RS_ALIVE
+	ZERS_RS_ERROR_UNLOADING		= -3,
+	ZERS_RS_ERROR_LOADING		= -2,
+	ZERS_RS_ERROR_STAGING		= -1,
+	ZERS_RS_NONE				= 0,
+	ZERS_RS_DESTROYED			= 1,
+	ZERS_RS_DESTROYING			= 2,
+	ZERS_RS_STAGING				= 3,
+	ZERS_RS_STAGED				= 4,
+	ZERS_RS_UNLOADING			= 5,
+	ZERS_RS_LOADING				= 6,
+	ZERS_RS_ITERATING			= 7,
+	ZERS_RS_LOADED				= 8
 };
 
 class ZERSResource;
-class ZERSResourceLoadable;
-
-typedef ZERSResource* (*ZERSInstanciator)();
-typedef ZERSResourceLoadable* (*ZERSInstanciatorLoadable)();
+typedef ZERSResource* (_cdecl *ZERSInstanciator)();

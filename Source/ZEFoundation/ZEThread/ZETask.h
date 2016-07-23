@@ -52,7 +52,6 @@ enum  ZETaskPoolId
 
 enum ZETaskStatus
 {
-	ZE_TS2_DESTROYING	= -2,
 	ZE_TS2_FAILED		= -1,
 	ZE_TS2_NONE			= 0,
 	ZE_TS2_WAITING		= 1,
@@ -62,8 +61,6 @@ enum ZETaskStatus
 
 enum ZETaskResult
 {
-	ZE_TR_DESTROYED		= -3,
-	ZE_TR_DESTROYING	= -2,
 	ZE_TR_FAILED		= -1,
 	ZE_TR_COOPERATING	= 0,
 	ZE_TR_DONE			= 1

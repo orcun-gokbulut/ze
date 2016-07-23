@@ -86,7 +86,7 @@ bool ZEDEntityWrapper::UpdateGraphics()
 
 	if (VertexBuffer.IsNull() ||
 		VertexBuffer->GetSize() < Canvas.GetBufferSize())
-		VertexBuffer = ZEGRVertexBuffer::Create(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
+		VertexBuffer = ZEGRVertexBuffer::CreateResource(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
 
 	void* Buffer;
 	VertexBuffer->Lock(&Buffer);
@@ -109,7 +109,7 @@ bool ZEDEntityWrapper::InitializeInternal()
 	Material->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
 	Material->SetDepthTestDisabled(false);
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 
 	NamePlate = new ZEUIControl();
 
@@ -370,8 +370,8 @@ void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 	if (!Material->SetupMaterial(Context, Parameters->Stage))
 		return;
 
-	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
+	Context->SetVertexBuffer(0, VertexBuffer);
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
 	Context->Draw(VertexBuffer->GetSize() / VertexBuffer->GetVertexStride(), 0);
 
 	Material->CleanupMaterial(Context, Parameters->Stage);

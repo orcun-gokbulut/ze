@@ -104,7 +104,7 @@ bool ZERNStageAntiAliasing::UpdateConstantBuffers()
 		return true;
 
 	if (ConstantBuffer == NULL)
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	ConstantBuffer->SetData(&Constants);
 

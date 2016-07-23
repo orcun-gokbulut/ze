@@ -198,7 +198,7 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 	if (BoundingBoxVertexBuffer == NULL || 
 		BoundingBoxVertexBuffer->GetVertexCount() != VertexCount)
 	{
-		BoundingBoxVertexBuffer = ZEGRVertexBuffer::Create(VertexCount, sizeof(ZEVector3), ZEGR_RU_GPU_READ_ONLY, &Vertices[0]);
+		BoundingBoxVertexBuffer = ZEGRVertexBuffer::CreateResource(VertexCount, sizeof(ZEVector3), ZEGR_RU_GPU_READ_ONLY, &Vertices[0]);
 	}
 
 	return true;
@@ -209,7 +209,7 @@ bool ZERNStageDebug::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	return Update();
 }

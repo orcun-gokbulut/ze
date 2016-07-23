@@ -606,7 +606,7 @@ bool ZEDGizmo::UpdateVertexBuffer()
 	if (VertexBuffer.IsNull() ||
 		VertexBuffer->GetSize() < VertexBufferSize)
 	{
-		VertexBuffer = ZEGRVertexBuffer::Create(VertexBufferSize / sizeof(ZECanvasVertex), sizeof(ZECanvasVertex));
+		VertexBuffer = ZEGRVertexBuffer::CreateResource(VertexBufferSize / sizeof(ZECanvasVertex), sizeof(ZECanvasVertex));
 		if (VertexBuffer.IsNull())
 			return false;
 	}
@@ -628,7 +628,7 @@ bool ZEDGizmo::UpdateConstantBuffer()
 		return true;
 
 	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 
 	if (GetMode() == ZED_GM_ROTATE)
 		ConstantBuffer->SetData(&ZEMatrix4x4::Identity);
@@ -1027,7 +1027,7 @@ bool ZEDGizmo::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 
 	MaterialLines = ZERNSimpleMaterial::CreateInstance();
 	MaterialLines->SetPrimitiveType(ZEGR_PT_LINE_LIST);
@@ -1094,8 +1094,8 @@ void ZEDGizmo::Render(const ZERNRenderParameters* Parameters, const ZERNCommand*
 		return;
 
 	ZEGRContext* Context = Parameters->Context;
-	Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBuffer.GetPointerToPointer());
-	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBuffer);
+	Context->SetVertexBuffer(0, VertexBuffer);
 	
 	if (GizmoLines.GetBufferSize() != 0)
 	{

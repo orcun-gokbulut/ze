@@ -138,7 +138,7 @@ bool ZEATFog::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	return Update();
 }

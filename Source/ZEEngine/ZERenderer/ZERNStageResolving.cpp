@@ -54,7 +54,7 @@ bool ZERNStageResolving::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	return Update();
 }

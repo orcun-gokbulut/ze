@@ -145,57 +145,57 @@ const ZEArray<ZEUInt16>& ZEMDResourceLOD::GetAffectingBoneIds() const
 	return AffectingBoneIds;
 }
 
-void ZEMDResourceLOD::SetVertexBufferBase(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferBase = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferBase() const
+ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferBase() const
 {
 	return VertexBufferBase;
 }
 
-void ZEMDResourceLOD::SetVertexBufferNormals(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferNormals = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferNormals() const
+ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferNormals() const
 {
 	return VertexBufferNormals;
 }
 
-void ZEMDResourceLOD::SetVertexBufferSkin(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferSkin = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferSkin() const
+ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferSkin() const
 {
 	return VertexBufferSkin;
 }
 
-void ZEMDResourceLOD::SetVertexBufferExtra(ZEHolder<ZEGRVertexBuffer> VertexBuffer)
+void ZEMDResourceLOD::SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
 	this->VertexBufferExtra = VertexBuffer;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferExtra() const
+ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferExtra() const
 {
 	return VertexBufferExtra;
 }
 
-void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<ZEGRIndexBuffer> IndexBuffer)
+void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer)
 {
 	this->IndexBuffer = IndexBuffer;
 }
 
-ZEHolder<ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
+ZEHolder<const ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
 {
 	return IndexBuffer;
 }
 
-void ZEMDResourceLOD::SetMaterial(ZEHolder<ZERNMaterial> Material)
+void ZEMDResourceLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
@@ -233,12 +233,12 @@ void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 void ZEMDResourceLOD::GenerateBuffers()
 {
 	if (GetVertexType() == ZEMD_VT_NORMAL)
-		VertexBufferBase = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
+		VertexBufferBase = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray()).GetPointer();
 	else
-		VertexBufferBase = ZEGRVertexBuffer::Create(VerticesSkin.GetCount(), sizeof(ZEMDVertexSkin), ZEGR_RU_GPU_READ_ONLY, VerticesSkin.GetCArray());
+		VertexBufferBase = ZEGRVertexBuffer::CreateResource(VerticesSkin.GetCount(), sizeof(ZEMDVertexSkin), ZEGR_RU_GPU_READ_ONLY, VerticesSkin.GetCArray()).GetPointer();
 }
 
-bool ZEMDResourceLOD::Load(const ZEMLReaderNode& LODNode)
+bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 {
 	zeCheckError(!LODNode.IsValid(), false, "Invalid LOD node.");
 	zeCheckError(LODNode.GetName() != "LOD", false, "Invalid LOD node name.");
@@ -307,7 +307,7 @@ bool ZEMDResourceLOD::Load(const ZEMLReaderNode& LODNode)
 			ZEMLReaderNode DrawNode = DrawsNode.GetNode("Draw", I);
 			
 			ZEMDResourceDraw Draw;
-			if (!Draw.Load(DrawNode))
+			if (!Draw.Unserialize(DrawNode))
 				return false;
 			
 			Draws.Add(Draw);
@@ -330,7 +330,7 @@ bool ZEMDResourceLOD::Load(const ZEMLReaderNode& LODNode)
 	return true;
 }
 
-bool ZEMDResourceLOD::Save(ZEMLWriterNode& LODNode) const
+bool ZEMDResourceLOD::Serialize(ZEMLWriterNode& LODNode) const
 {
 	return false; //Implementation required.
 }

@@ -157,7 +157,7 @@ void ZEMDResourceMesh::SetGeometry(const ZEArray<ZEVector3>& Vertices)
 	Geometry = Vertices;
 }
 
-bool ZEMDResourceMesh::Load(const ZEMLReaderNode& MeshNode)
+bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 {
 	zeCheckError(!MeshNode.IsValid(), false, "Invalid Mesh node.");
 	zeCheckError(MeshNode.GetName() != "Mesh", false, "Invalid Mesh node name.");
@@ -185,7 +185,7 @@ bool ZEMDResourceMesh::Load(const ZEMLReaderNode& MeshNode)
 			return false;
 		
 		ZEPointer<ZEMDResourceLOD> LOD = new ZEMDResourceLOD();
-		if (!LOD->Load(LODNode))
+		if (!LOD->Unserialize(LODNode))
 			return false;
 
 		if (LOD->GetLevel() == 0)
@@ -210,7 +210,7 @@ bool ZEMDResourceMesh::Load(const ZEMLReaderNode& MeshNode)
 	return true;
 }
 
-bool ZEMDResourceMesh::Save(ZEMLWriterNode& MeshNode) const
+bool ZEMDResourceMesh::Serialize(ZEMLWriterNode& MeshNode) const
 {
 	return false;
 }

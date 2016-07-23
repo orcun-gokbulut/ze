@@ -289,23 +289,23 @@ void ZEDGrid::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* 
 	if (!Material->SetupMaterial(Context, Stage))
 		return;
 
-	Context->SetVertexBuffers(0, 1, VertexBuffer.GetPointerToPointer());
+	Context->SetVertexBuffer(0, VertexBuffer);
 
 	if (MinorGridEnabled)
 	{
-		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferMinorGridTransform.GetPointerToPointer());
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferMinorGridTransform);
 		Context->Draw(MinorGridCount, MinorGridOffset);
 	}
 
 	if (MajorGridEnabled)
 	{
-		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferMajorGridTransform.GetPointerToPointer());
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferMajorGridTransform);
 		Context->Draw(MajorGridCount, MajorGridOffset);
 	}
 
 	if (AxisEnabled)
 	{
-		Context->SetConstantBuffers(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, 1, ConstantBufferAxisTransform.GetPointerToPointer());
+		Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferAxisTransform);
 		Context->Draw(4, 0);
 	}
 
@@ -317,9 +317,9 @@ bool ZEDGrid::InitializeSelf()
 	if (!ZEEntity::InitializeSelf())
 		return false;
 
-	ConstantBufferAxisTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
-	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
-	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBufferAxisTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 
 	Material = ZERNSimpleMaterial::CreateInstance();
 	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);

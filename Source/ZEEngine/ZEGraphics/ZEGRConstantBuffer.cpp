@@ -38,6 +38,7 @@
 #include "ZEPointer\ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
+#include "ZEResource\ZERSTemplates.h"
 
 ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
 {
@@ -73,11 +74,41 @@ ZEGRConstantBuffer::ZEGRConstantBuffer()
 
 }
 
-ZEHolder<ZEGRConstantBuffer> ZEGRConstantBuffer::Create(ZESize BufferSize)
+static ZERSResource* Instanciator()
 {
-	ZEHolder<ZEGRConstantBuffer> ConstantBuffer = ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
-	if (!ConstantBuffer->Initialize(BufferSize))
+	return ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
+}
+
+ZEHolder<ZEGRConstantBuffer> ZEGRConstantBuffer::CreateResource(ZESize BufferSize)
+{
+	const ZEHolder<ZEGRConstantBuffer> Resource = ZERSTemplates::CreateResource<ZEGRConstantBuffer>(Instanciator);
+	if (Resource == NULL)
+		return NULL;
+
+	if (!Resource->Initialize(BufferSize))
 		return NULL;
 	
-	return ConstantBuffer;
+	return Resource;
+}
+
+ZEHolder<const ZEGRConstantBuffer> ZEGRConstantBuffer::CreateResourceShared(const ZEGUID& GUID, ZESize BufferSize, ZEGRConstantBuffer** StagingResource)
+{
+	ZEGRConstantBuffer* StagingResourceTemp;
+	ZEHolder<const ZEGRConstantBuffer> Resource = ZERSTemplates::CreateResourceShared<ZEGRConstantBuffer>(GUID, &StagingResourceTemp, Instanciator);
+
+	if (Resource == NULL)
+		return NULL;
+
+	if (StagingResourceTemp != NULL)
+	{
+		if (!StagingResourceTemp->Initialize(BufferSize))
+			return NULL;
+
+		if (StagingResource != NULL)
+			*StagingResource = StagingResourceTemp;
+		else
+			StagingResourceTemp->StagingRealized();
+	}
+
+	return Resource;
 }

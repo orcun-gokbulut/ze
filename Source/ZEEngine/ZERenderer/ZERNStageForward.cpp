@@ -168,7 +168,7 @@ bool ZERNStageForward::UpdateInputOutputs()
 	ZESize Size = TileCountX * TileCountY * (MAX_LIGHT + 2) * sizeof(ZEUInt);
 
 	if (TileLightStructuredBuffer == NULL || TileLightStructuredBuffer->GetSize() != Size)
-		TileLightStructuredBuffer = ZEGRStructuredBuffer::Create(TileCountX * TileCountY * (MAX_LIGHT + 2), sizeof(ZEUInt), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
+		TileLightStructuredBuffer = ZEGRStructuredBuffer::CreateResource(TileCountX * TileCountY * (MAX_LIGHT + 2), sizeof(ZEUInt), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_UNORDERED_ACCESS);
 
 	return true;
 }

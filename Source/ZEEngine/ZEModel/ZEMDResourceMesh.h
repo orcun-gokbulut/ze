@@ -104,8 +104,8 @@ class ZEMDResourceMesh : public ZERSResource
 		void											SetGeometry(const ZEArray<ZEVector3>& Vertices);
 		const ZEArray<ZEVector3>&						GetGeometry() const;
 
-		bool											Load(const ZEMLReaderNode& MeshNode);
-		bool											Save(ZEMLWriterNode& MeshNode) const;
+		bool											Unserialize(const ZEMLReaderNode& MeshNode);
+		bool											Serialize(ZEMLWriterNode& MeshNode) const;
 
 														ZEMDResourceMesh();
 														~ZEMDResourceMesh();

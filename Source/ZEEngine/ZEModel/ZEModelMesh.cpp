@@ -217,7 +217,7 @@ bool ZEModelMesh::Load()
 	SetScale(Resource->GetScale());
 	SetVisible(Resource->GetVisible());
 	SetBoundingBox(Resource->GetBoundingBox());
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEModelMeshConstants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEModelMeshConstants));
 
 	ze_for_each(ResourceLOD, Resource->GetLODs())
 	{

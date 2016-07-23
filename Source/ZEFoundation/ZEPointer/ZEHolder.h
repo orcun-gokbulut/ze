@@ -125,7 +125,6 @@ void ZEHolder<Type>::Copy(const ZEHolder<Type>& OtherHolder)
 		Pointer->Reference();
 }
 
-
 template<typename Type>
 void ZEHolder<Type>::Overwrite(Type* RawPointer)
 {

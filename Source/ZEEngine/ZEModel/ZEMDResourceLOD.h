@@ -74,14 +74,14 @@ class ZEMDResourceLOD : public ZERSResource
 		ZEArray<ZEUInt16>						Indices;
 		ZEArray<ZEUInt32>						Indices32;
 
-		ZEHolder<ZEGRVertexBuffer>				VertexBufferBase;
-		ZEHolder<ZEGRVertexBuffer>				VertexBufferNormals;
-		ZEHolder<ZEGRVertexBuffer>				VertexBufferSkin;
-		ZEHolder<ZEGRVertexBuffer>				VertexBufferExtra;
-		ZEHolder<ZEGRIndexBuffer>				IndexBuffer;
+		ZEHolder<const ZEGRVertexBuffer>		VertexBufferBase;
+		ZEHolder<const ZEGRVertexBuffer>		VertexBufferNormals;
+		ZEHolder<const ZEGRVertexBuffer>		VertexBufferSkin;
+		ZEHolder<const ZEGRVertexBuffer>		VertexBufferExtra;
+		ZEHolder<const ZEGRIndexBuffer>			IndexBuffer;
 
 		ZEInt									MaterialID; // Backwards Compatibility
-		ZEHolder<ZERNMaterial>					Material;
+		ZEHolder<const ZERNMaterial>			Material;
 
 	public:
 		void									SetLevel(ZEInt32 LODLevel);
@@ -114,22 +114,22 @@ class ZEMDResourceLOD : public ZERSResource
 		void									SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds);
 		const ZEArray<ZEUInt16>&				GetAffectingBoneIds() const;
 
-		void									SetVertexBufferBase(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer>				GetVertexBufferBase() const;
+		void									SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferBase() const;
 
-		void									SetVertexBufferNormals(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer>				GetVertexBufferNormals() const;
+		void									SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferNormals() const;
 
-		void									SetVertexBufferSkin(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer>				GetVertexBufferSkin() const;
+		void									SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferSkin() const;
 
-		void									SetVertexBufferExtra(ZEHolder<ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<ZEGRVertexBuffer>				GetVertexBufferExtra() const;
+		void									SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>		GetVertexBufferExtra() const;
 
-		void									SetIndexBuffer(ZEHolder<ZEGRIndexBuffer> IndexBuffer);
-		ZEHolder<ZEGRIndexBuffer>				GetIndexBuffer() const;
+		void									SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer);
+		ZEHolder<const ZEGRIndexBuffer>			GetIndexBuffer() const;
 
-		void									SetMaterial(ZEHolder<ZERNMaterial> Material);
+		void									SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>			GetMaterial() const;
 
 		void									SetMaterialFileName(const ZEString& MaterialFilePath);
@@ -141,8 +141,8 @@ class ZEMDResourceLOD : public ZERSResource
 
 		void									GenerateBuffers();
 
-		bool									Load(const ZEMLReaderNode& LODNode);
-		bool									Save(ZEMLWriterNode& LODNode) const;
+		bool									Unserialize(const ZEMLReaderNode& LODNode);
+		bool									Serialize(ZEMLWriterNode& LODNode) const;
 
 												ZEMDResourceLOD();
 												~ZEMDResourceLOD();

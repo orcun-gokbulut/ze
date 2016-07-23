@@ -467,8 +467,8 @@ bool ZERNStageAO::InitializeInternal()
 	CreateSphereSamples();
 	CreateRandomVectors();
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	DeinterleavedConstantBuffer = ZEGRConstantBuffer::Create(sizeof(DeinterleavedConstants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	DeinterleavedConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(DeinterleavedConstants));
 
 	return Update();
 }

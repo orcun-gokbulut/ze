@@ -48,32 +48,32 @@ class ZEGRDepthStencilBuffer : public ZEGRResource
 	ZE_DISALLOW_COPY(ZEGRDepthStencilBuffer)
 	friend class ZEGRContext;
 	private:
-		const ZEGRTexture*				Owner;
-		bool							ReadOnly;
-		bool							Bound;
+		const ZEGRTexture*						Owner;
+		bool									ReadOnly;
+		bool									Bound;
 
 	protected:
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEGRFormat						Format;
+		ZEUInt									Width;
+		ZEUInt									Height;
+		ZEGRFormat								Format;
 
-		void							SetOwner(const ZEGRTexture* OwnerTexture);
-		const ZEGRTexture*				GetOwner() const;
+		void									SetOwner(const ZEGRTexture* OwnerTexture);
+		const ZEGRTexture*						GetOwner() const;
 
-		void							SetReadOnly(bool ReadOnly);
-		bool							GetReadOnly() const;
+		void									SetReadOnly(bool ReadOnly);
+		bool									GetReadOnly() const;
 
-		void							SetBound(bool Bound);
-		bool							GetBound() const;
+		void									SetBound(bool Bound);
+		bool									GetBound() const;
 
-										ZEGRDepthStencilBuffer();
-										ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-		virtual							~ZEGRDepthStencilBuffer();
+												ZEGRDepthStencilBuffer();
+												ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		virtual									~ZEGRDepthStencilBuffer();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() const;
+		virtual ZEGRResourceType				GetResourceType() const;
 
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEGRFormat						GetFormat() const;
+		ZEUInt									GetWidth() const;
+		ZEUInt									GetHeight() const;
+		ZEGRFormat								GetFormat() const;
 };

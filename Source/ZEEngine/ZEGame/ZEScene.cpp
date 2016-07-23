@@ -169,7 +169,7 @@ bool ZEScene::InitializeInternal()
 	for (ZESize I = 0; I < Entities.GetCount(); I++)
 		Entities[I]->Initialize();
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 	SceneDirtyFlags.RaiseAll();
 
 	return true;

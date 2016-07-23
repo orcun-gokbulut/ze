@@ -87,7 +87,7 @@ void ZEUIRenderer::UpdateBatches()
 	if (VertexBuffer == NULL ||
 		VertexBuffer->GetSize() < VertexBufferSize)
 	{
-		VertexBuffer = ZEGRVertexBuffer::Create((ZEUInt)Rectangles.GetCount() * 6, sizeof(ZEUIVertex));
+		VertexBuffer = ZEGRVertexBuffer::CreateResource((ZEUInt)Rectangles.GetCount() * 6, sizeof(ZEUIVertex));
 	}
 
 	Batches.Clear();

@@ -412,9 +412,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 
 		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
 
-		ZERNFixedMaterial* CurrentMaterial = static_cast<ZERNFixedMaterial*>(Materials[I].GetPointer());
-		CurrentMaterial->ReadFromFile(MaterialPath);
-		CurrentMaterial->Initialize();
+		Materials[I] = ZERNFixedMaterial::LoadResourceShared(MaterialPath);
 	}
 
 	return true;
@@ -430,7 +428,7 @@ const ZEArray<ZETexture2DResource*>& ZEInteriorResource::GetTextures() const
 	return TextureResources;
 }
 
-const ZEArray<ZEHolder<ZERNMaterial>>& ZEInteriorResource::GetMaterials() const
+const ZEArray<ZEHolder<const ZERNMaterial>>& ZEInteriorResource::GetMaterials() const
 {
 	return Materials;
 }

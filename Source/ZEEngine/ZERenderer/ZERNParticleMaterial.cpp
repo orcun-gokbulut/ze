@@ -138,7 +138,7 @@ bool ZERNParticleMaterial::InitializeInternal()
 	if (!ZERNMaterial::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	if (!UpdateShaders())
 		return false;

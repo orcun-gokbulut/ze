@@ -45,7 +45,8 @@
 #include "ZECommon.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZELink.h"
-
+#include "ZEDS/ZEString.h"
+#include "ZEThread/ZETask.h"
 
 class ZERSResource : public ZEObject, public ZEReferenceCounted
 {
@@ -56,52 +57,87 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 	friend class ZERSTemplates;
 	template<typename ZERSResourceClass> friend class ZERSHolder;
 	private:
-		ZEGUID									GUID;
-		ZERSResourceState						State;
 		ZERSResource*							Parent;
 		mutable ZELink<const ZERSResource>		ManagerLink;
 		mutable ZELink<const ZERSResource>		ManagerSharedLink;
+
+		ZEGUID									GUID;
+		ZEString								FileName;
+		ZEUInt32								FileNameHash;
+
 		ZEArray<ZERSResource*>					ChildResources;
+		ZEArray<const ZERSResource*>			ExternalResources;
+
 		mutable bool							Shared;
 		ZESize									MemoryUsageSelf[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
-		
+		ZERSResourceState						State;
+		ZERSResourceState						TargetState;
+		ZETask									UpdateStateTask;
+
+		ZEUInt									LoadProgress;
+
+		bool									LoadInternalDone;
+		bool									UnloadInternalDone;
+		bool									Destroying;
+
+		mutable ZELock							ResourceLock;
+
 		virtual void							Reference() const;
 		virtual void							Release() const;
 		virtual void							Destroy() const;
 
+		ZETaskResult							UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters);
 		void									UpdateMemoryConsumption();
 
 	protected:
-		mutable ZELock							ResourceLock;
-
+		void									SetGUID(const ZEGUID& GUID);
 		void									SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size);
+		void									SetLoadProgress(ZEUInt Percentage);
+		void									SetLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage);
 
 		void									AddChildResource(ZERSResource* Resource);
 		void									RemoveChildResource(ZERSResource* Resource);
 
-		void									SetGUID(const ZEGUID& GUID);
+		void									RegisterExternalResource(ZERSResource* Resource);
+		void									UnregisterExternalResource(ZERSResource* Resource);
+
+		virtual ZETaskResult					LoadInternal();
+		virtual ZETaskResult					UnloadInternal();
+		virtual void							PreDestroy();
 
 												ZERSResource();
 		virtual									~ZERSResource();
 
 	public:
-		ZERSResourceType						GetType() const;
-
-		const ZEGUID&							GetGUID() const;
-		ZERSResourceState						GetState() const;
 		ZERSResource*							GetParent();
 		const ZERSResource*						GetParent() const;
-				
+
+		const ZEGUID&							GetGUID() const;
+		const ZEString&							GetFileName() const;
+		ZEUInt32								GetFileNameHash() const;
+
+		ZERSResourceState						GetState() const;
+		ZEUInt									GetLoadProgress() const;
 		ZESize									GetReferenceCount() const;
 		ZESize									GetMemoryUsage(ZERSMemoryPool Pool) const;
 		ZESize									GetTotalMemoryUsage() const;
 
+		bool									IsStaged() const;
+		bool									IsLoaded() const;
+		bool									IsFailed() const;
 		bool									IsShared() const;
+
+		void									StagingRealized();
+		void									StagingFailed();
+		void									Load(const ZEString& FileName);
+		void									Unload();
+
 		void									Share();
 		void									Unshare();
 
-		bool									IsStaging();
-		void									StagingWait();
-		void									StagingRealize();
+		void									WaitStaging() const;
+		void									WaitLoading() const;
+		void									WaitUnloading() const;
+
 };

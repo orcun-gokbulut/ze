@@ -70,7 +70,7 @@ ZEHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const
 	return Material;
 }
 
-bool ZEMDResourceDraw::Load(ZEMLReaderNode& DrawNode)
+bool ZEMDResourceDraw::Unserialize(ZEMLReaderNode& DrawNode)
 {
 	zeCheckError(!DrawNode.IsValid(), false, "Invalid Draw node.");
 	zeCheckError(DrawNode.GetName() != "Draw", false, "Invalid Draw node name.");
@@ -81,7 +81,7 @@ bool ZEMDResourceDraw::Load(ZEMLReaderNode& DrawNode)
 	return true;
 }
 
-bool ZEMDResourceDraw::Save(ZEMLWriterNode& DrawNode) const
+bool ZEMDResourceDraw::Serialize(ZEMLWriterNode& DrawNode) const
 {
 	return false;
 }

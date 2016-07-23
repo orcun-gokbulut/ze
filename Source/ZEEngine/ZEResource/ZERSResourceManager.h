@@ -60,7 +60,7 @@ class ZERSResourceManager : public ZEObject
 		void									UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT]);
 
 		ZERSHolder<const ZERSResource>			GetResourceInternal(const ZEGUID& GUID);
-		ZERSHolder<const ZERSResourceLoadable>	GetResourceInternal(const ZEString& FileName);
+		ZERSHolder<const ZERSResource>			GetResourceInternal(const ZEString& FileName);
 	
 		void									RegisterResourceInternal(ZERSResource* Resource);
 		void									UnregisterResourceInternal(ZERSResource* Resource);
@@ -82,7 +82,7 @@ class ZERSResourceManager : public ZEObject
 		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool);
 
 		ZERSHolder<const ZERSResource>			GetResource(const ZEGUID& GUID);
-		ZERSHolder<const ZERSResourceLoadable>	GetResource(const ZEString& FileName);
+		ZERSHolder<const ZERSResource>			GetResource(const ZEString& FileName);
 
 		void									RegisterResource(ZERSResource* Resource);
 		void									UnregisterResource(ZERSResource* Resource);
@@ -91,7 +91,7 @@ class ZERSResourceManager : public ZEObject
 		void									UnshareResource(ZERSResource* Resource);
 
 		ZERSHolder<const ZERSResource>			StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciaor, ZERSResource** StagingResource = NULL);
-		ZERSHolder<const ZERSResourceLoadable>	StageResource(const ZEString& FileName, ZERSInstanciatorLoadable Insanciaor, ZERSResourceLoadable** StagingResource = NULL);
+		ZERSHolder<const ZERSResource>			StageResource(const ZEString& FileName, ZERSInstanciator Insanciaor, ZERSResource** StagingResource = NULL);
 
 		static ZERSResourceManager*				GetInstance();
 };

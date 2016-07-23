@@ -35,7 +35,7 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResourceLoadable.h"
+#include "ZEResource/ZERSResource.h"
 
 #include "ZEDS/ZEString.h"
 #include "ZEMath/ZEAABBox.h"
@@ -47,7 +47,7 @@ ZE_META_FORWARD_DECLARE(ZEMDResourceBone, "ZEMDResourceBone.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceAnimation, "ZEMDResourceAnimation.h");
 ZE_META_FORWARD_DECLARE(ZEMDResourceHelper, "ZEMDResourceHelper.h");
 
-class ZEMDResource : public ZERSResourceLoadable
+class ZEMDResource : public ZERSResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResource)

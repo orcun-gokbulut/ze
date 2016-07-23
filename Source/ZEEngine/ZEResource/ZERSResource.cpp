@@ -59,25 +59,16 @@ void ZERSResource::Release() const
 	else
 	{
 		if (ReferenceCount <= 0)
-		{
-			if (IsShared())
-			{
-				const_cast<ZERSResource*>(this)->Unshare();
-				ReferenceCountLock.Unlock();
-			}
-			else
-			{
-				ReferenceCountLock.Unlock();
-				delete this;
-			}
-		}
+			Destroy();
 	}
 	ReferenceCountLock.Unlock();
 }
 
 void ZERSResource::Destroy() const
 {
-
+	const_cast<ZERSResource*>(this)->TargetState = ZERS_RS_DESTROYED;
+	const_cast<ZERSResource*>(this)->PreDestroy();
+	const_cast<ZERSResource*>(this)->UpdateStateTask.Run();
 }
 
 void ZERSResource::UpdateMemoryConsumption()
@@ -112,12 +103,193 @@ void ZERSResource::UpdateMemoryConsumption()
 	ResourceLock.Unlock();
 }
 
+ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* Parameters)
+{
+	if (State == ZERS_RS_NONE)
+	{
+		if (TargetState == ZERS_RS_NONE)
+		{
+			return ZE_TR_DONE;
+		}
+		else if (TargetState == ZERS_RS_STAGED)
+		{
+			return ZE_TR_COOPERATING;
+		}
+		else if (TargetState == ZERS_RS_LOADED)
+		{
+			return ZE_TR_COOPERATING;
+		}
+		else if (TargetState == ZERS_RS_DESTROYED)
+		{
+			State = ZERS_RS_DESTROYING;
+		}
+	}
+	else if (State == ZERS_RS_STAGED)
+	{
+		if (TargetState == ZERS_RS_STAGED)
+		{
+			return ZE_TR_DONE;
+		}
+		else if (TargetState == ZERS_RS_LOADED)
+		{
+			LoadInternalDone = false;
+			State = ZERS_RS_LOADING;
+		}
+		else if (TargetState == ZERS_RS_DESTROYED)
+		{
+			State = ZERS_RS_DESTROYING;
+		}
+	}
+	else if (State == ZERS_RS_LOADED)
+	{
+		 if (TargetState == ZERS_RS_LOADED)
+		 {
+			 return ZE_TR_DONE;
+		 }
+		 else if (TargetState == ZERS_RS_STAGED)
+		 {
+			 UnloadInternalDone = false;
+			 State == ZERS_RS_UNLOADING;
+		 }
+		 else if (TargetState == ZERS_RS_DESTROYED)
+		 {
+			 State = ZERS_RS_DESTROYING;
+		 }
+	}
+	else if (State < 0)
+	{
+		if (TargetState == ZERS_RS_DESTROYED)
+			TargetState = ZERS_RS_DESTROYING;
+		else
+			return ZE_TR_DONE;
+	}
+
+	if (State == ZERS_RS_LOADING)
+	{
+		if (!LoadInternalDone)
+		{
+			ZETaskResult Result = LoadInternal();
+			if (Result == ZE_TR_DONE)
+			{
+				zeLog("Resource loaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				LoadInternalDone = true;
+				SetLoadProgress(100);
+			}
+			else if (Result == ZE_TR_FAILED)
+			{
+				zeError("Resource loading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				State = ZERS_RS_ERROR_LOADING;
+				return ZE_TR_COOPERATING;
+			}
+			else
+			{
+				return Result;
+			}
+		}
+
+		ze_for_each(ChildResource, ChildResources)
+		{
+			ZERSResourceState ChildResourceState = (*ChildResource)->State;
+			if (ChildResourceState < 0)
+			{
+				State = ZERS_RS_ERROR_LOADING;
+				return ZE_TR_COOPERATING;
+			}
+			else if (ChildResourceState <= ZERS_RS_LOADING)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		ze_for_each(ExternalResource, ExternalResources)
+		{
+			if ((*ExternalResource)->State <= ZERS_RS_LOADING)
+				return ZE_TR_COOPERATING;
+		}
+
+		State = ZERS_RS_LOADED;
+		return ZE_TR_COOPERATING;
+	}
+	else if (State == ZERS_RS_UNLOADING)
+	{
+		if (!UnloadInternalDone)
+		{
+			ZETaskResult Result = UnloadInternal();
+			if (Result == ZE_TR_DONE)
+			{
+				zeLog("Resource unloaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+				SetLoadProgress(0);
+				UnloadInternalDone = true;
+			}
+			else if (Result == ZE_TR_FAILED)
+			{
+				zeError("Resource unloading failed. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());			
+				State = ZERS_RS_ERROR_UNLOADING;
+				return ZE_TR_COOPERATING;
+			}
+			else
+			{
+				return Result;
+			}
+		}
+
+		ze_for_each(ChildResource, ChildResources)
+		{
+			ZERSResourceState ChildResourceState = (*ChildResource)->State;
+			if (ChildResourceState < 0)
+			{
+				State = ZERS_RS_ERROR_UNLOADING;
+				return ZE_TR_COOPERATING;
+			}
+			else if (State > ZERS_RS_STAGED)
+			{
+				return ZE_TR_COOPERATING;
+			}
+		}
+
+		State = ZERS_RS_STAGED;
+		return ZE_TR_COOPERATING;
+	}
+	else if (State == ZERS_RS_STAGING)
+	{
+		if (TargetState > ZERS_RS_STAGED)
+			return ZE_TR_COOPERATING;
+	}
+	else if (State == ZERS_RS_DESTROYING)
+	{
+		delete this;
+		return ZE_TR_DONE;
+	}
+
+	return ZE_TR_DONE;
+}
+
+
 void ZERSResource::SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size)
 {
 	MemoryUsage[Pool] = Size;
 
 	if (Parent != NULL)
 		Parent->UpdateMemoryConsumption();
+}
+
+void ZERSResource::SetLoadProgress(ZEUInt Percentage)
+{
+	if (Percentage > 100)
+		Percentage = 100;
+
+	LoadProgress = Percentage;
+}
+
+void ZERSResource::SetLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage)
+{
+	if (Count == 0)
+	{
+		SetLoadProgress(0);
+		return;
+	}
+
+	SetLoadProgress(StartPercentage + (Index + 1) * (EndPercentage - StartPercentage) / Count);
 }
 
 void ZERSResource::AddChildResource(ZERSResource* ChildResource)
@@ -144,6 +316,36 @@ void ZERSResource::RemoveChildResource(ZERSResource* ChildResource)
 		Parent->UpdateMemoryConsumption();
 }
 
+void ZERSResource::RegisterExternalResource(ZERSResource* Resource)
+{
+	zeCheckError(ExternalResources.Exists(Resource), ZE_VOID, "Resource is already added as external resource.");
+	ExternalResources.Add(Resource);
+}
+
+void ZERSResource::UnregisterExternalResource(ZERSResource* Resource)
+{
+	ExternalResources.RemoveValue(Resource);
+}
+
+ZETaskResult ZERSResource::LoadInternal()
+{
+	return ZE_TR_DONE;
+}
+
+ZETaskResult ZERSResource::UnloadInternal()
+{
+	return ZE_TR_DONE;
+}
+
+void ZERSResource::PreDestroy()
+{
+	if (Shared)
+		Unshare();
+
+	while(ChildResources.GetCount() != 0)
+		ChildResources.GetFirstItem()->Destroy();
+}
+
 ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 {
 	GUID = ZEGUID::Zero;
@@ -153,20 +355,25 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	ReferenceCount = 0;
 	memset(MemoryUsage, 0, sizeof(MemoryUsage));
 	memset(MemoryUsageSelf, 0, sizeof(MemoryUsage));
+	TargetState = ZERS_RS_NONE;
+	FileNameHash = 0;
+	LoadProgress = 0;
+	LoadInternalDone = false;
+	UnloadInternalDone = false;
+	Destroying = false;
+	UpdateStateTask.SetPool(ZE_TPI_IO);
+	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, UpdateStateFunction, this));
 }
 
 ZERSResource::~ZERSResource()
 {
-	if (Shared)
-		Unshare();
-
-	while(ChildResources.GetCount() != 0)
-		ChildResources.GetFirstItem()->Destroy();
 
 	if (Parent != NULL)
 		Parent->RemoveChildResource(this);
 
 	ZERSResourceManager::GetInstance()->UnregisterResource(this);
+
+	State = ZERS_RS_DESTROYED;
 }
 
 ZERSResource* ZERSResource::GetParent()
@@ -179,11 +386,6 @@ const ZERSResource* ZERSResource::GetParent() const
 	return Parent;
 }
 
-ZERSResourceType ZERSResource::GetType() const
-{
-	return ZERS_RT_NORMAL;
-}
-
 void ZERSResource::SetGUID(const ZEGUID& GUID)
 {
 	zeCheckError(Shared, ZE_VOID, "You cannot change enlisted resource's GUID.");
@@ -193,6 +395,16 @@ void ZERSResource::SetGUID(const ZEGUID& GUID)
 const ZEGUID& ZERSResource::GetGUID() const
 {
 	return GUID;
+}
+
+const ZEString& ZERSResource::GetFileName() const
+{
+	return FileName;
+}
+
+ZEUInt32 ZERSResource::GetFileNameHash() const
+{
+	return FileNameHash;
 }
 
 ZERSResourceState ZERSResource::GetState() const
@@ -220,6 +432,46 @@ ZESize ZERSResource::GetTotalMemoryUsage() const
 	return Total;
 }
 
+ZEUInt ZERSResource::GetLoadProgress() const
+{
+	ResourceLock.Lock();
+
+	ZEUInt TotalProgress = LoadProgress;
+	ZEUInt TotalItems = 1;
+
+	ze_for_each(ExternalResource, ExternalResources)
+	{
+		TotalProgress += (*ExternalResource)->GetLoadProgress();
+		TotalItems++;
+	}
+
+	ZESize LoadableCount = 0;
+	ze_for_each(ChildResource, ChildResources)
+	{
+		TotalProgress += (*ChildResource)->GetLoadProgress();
+		TotalItems++;
+	}
+
+	ResourceLock.Unlock();
+
+	return TotalProgress / TotalItems;
+}
+
+bool ZERSResource::IsStaged() const
+{
+	return State >= ZERS_RS_STAGED;
+}
+
+bool ZERSResource::IsLoaded() const
+{
+	return State >= ZERS_RS_LOADED;
+}
+
+bool ZERSResource::IsFailed() const
+{
+	return State <= ZERS_RS_ERROR_STAGING;
+}
+
 bool ZERSResource::IsShared() const
 {
 	return Shared;
@@ -227,7 +479,7 @@ bool ZERSResource::IsShared() const
 
 void ZERSResource::Share()
 {
-	if (IsShared())
+	if (IsShared() || TargetState == ZERS_RS_DESTROYED)
 		return;
 
 	zeCheckError(GUID == ZEGUID::Zero, ZE_VOID, "Cannot share resource. Ilvalid GUID.");
@@ -243,18 +495,61 @@ void ZERSResource::Unshare()
 }
 
 
-bool ZERSResource::IsStaging()
-{
-	return State == ZERS_RS_STAGING;
-}
-
-void ZERSResource::StagingWait()
-{
-	while(State == ZERS_RS_STAGING);
-}
-
-void ZERSResource::StagingRealize()
+void ZERSResource::StagingRealized()
 {
 	if (State == ZERS_RS_STAGING)
-		State = ZERS_RS_ALIVE;
+		State = ZERS_RS_STAGED;
+}
+
+void ZERSResource::StagingFailed()
+{
+	if (State == ZERS_RS_STAGING)
+		State = ZERS_RS_ERROR_STAGING;
+}
+
+void ZERSResource::Load(const ZEString& FileName)
+{
+	if (TargetState == ZERS_RS_DESTROYED)
+		return;
+
+	if (State == ZERS_RS_LOADING || State == ZERS_RS_LOADED)
+		return;
+
+	if (Destroying)
+		return;
+
+	this->FileName = ZEPathInfo(FileName).Normalize();
+	FileNameHash = this->FileName.Lower().Hash();
+	zeLog("Loading resource. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
+
+	TargetState = ZERS_RS_LOADED;
+	UpdateStateTask.Run();
+}
+
+void ZERSResource::Unload()
+{
+	if (State < ZERS_RS_STAGED)
+		return;
+
+	if (Destroying)
+		return;
+
+	zeLog("Unloading resource. Resource Class: \"%s\", File Name: \"%s\".", GetClass()->GetName(), this->FileName.ToCString());
+	TargetState = ZERS_RS_STAGED;
+	UpdateStateTask.Run();
+}
+
+void ZERSResource::WaitStaging() const
+{
+	while(State < ZERS_RS_STAGED && State > 0);
+}
+
+void ZERSResource::WaitLoading() const
+{
+	while(State < ZERS_RS_LOADED && State > 0);
+}
+
+void ZERSResource::WaitUnloading() const
+{
+	while(State >= ZERS_RS_STAGED);
 }

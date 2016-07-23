@@ -267,7 +267,7 @@ ZEVector3 ZEATAtmosphere::GetAmbientColorFromLUT(float CosLightZenith)
 
 void ZEATAtmosphere::PrecomputeBuffers(ZEGRContext* Context)
 {
-	ZEHolder<ZEGRConstantBuffer> PrecomputeConstantBuffer = ZEGRConstantBuffer::Create(sizeof(PrecomputeConstants));
+	ZEHolder<ZEGRConstantBuffer> PrecomputeConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(PrecomputeConstants));
 
 	ZEArray<const ZEGRRenderTarget*> MultipleScatteringRenderTargets;
 	MultipleScatteringRenderTargets.Resize(1024);	//64 * 16
@@ -462,7 +462,7 @@ bool ZEATAtmosphere::InitializeSelf()
 
 	CreateRandomVectors();
 
-	SkyConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	SkyConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	PrecomputedSingleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);
 	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::Create(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);

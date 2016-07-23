@@ -39,6 +39,7 @@
 #include "ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
 #include "ZEGRContext.h"
+#include "ZEResource\ZERSTemplates.h"
 
 void ZEGRStructuredBuffer::SetBoundStage(ZEGRShaderType Shader, ZEInt Slot, bool BoundAsShaderResource, bool BoundAsUnorderedAccess)
 {
@@ -112,11 +113,41 @@ ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
 	}
 }
 
-ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::Create(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)
+static ZERSResource* Instanciator()
 {
-	ZEHolder<ZEGRStructuredBuffer> StructuredBuffer = ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
-	if (!StructuredBuffer->Initialize(ElementCount, ElementSize, Usage, BindFlags))
+	return ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
+}
+
+ZEHolder<ZEGRStructuredBuffer> ZEGRStructuredBuffer::CreateResource(ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags)
+{
+	ZEHolder<ZEGRStructuredBuffer> Resource = ZERSTemplates::CreateResource<ZEGRStructuredBuffer>(Instanciator);
+	if (Resource == NULL)
 		return NULL;
-	
-	return StructuredBuffer;
+
+	if (!Resource->Initialize(ElementCount, ElementSize, Usage, BindFlags))
+		return NULL;
+
+	return Resource;
+}
+
+ZEHolder<const ZEGRStructuredBuffer> ZEGRStructuredBuffer::CreateResourceShared(const ZEGUID& GUID, ZESize ElementCount, ZESize ElementSize, ZEGRResourceUsage Usage, ZEFlags BindFlags, ZEGRStructuredBuffer** StagingResource)
+{
+	ZEGRStructuredBuffer* StagingResourceTemp;
+	ZEHolder<const ZEGRStructuredBuffer> Resource = ZERSTemplates::CreateResourceShared<ZEGRStructuredBuffer>(GUID, &StagingResourceTemp, Instanciator);
+
+	if (Resource == NULL)
+		return NULL;
+
+	if (StagingResourceTemp != NULL)
+	{
+		if (!StagingResourceTemp->Initialize(ElementCount, ElementSize, Usage, BindFlags))
+			return NULL;
+
+		if (StagingResource != NULL)
+			*StagingResource = StagingResourceTemp;
+		else
+			StagingResourceTemp->StagingRealized();
+	}
+
+	return Resource;
 }
