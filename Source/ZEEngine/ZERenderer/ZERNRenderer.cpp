@@ -267,8 +267,8 @@ bool ZERNRenderer::InitializeInternal()
 		}
 	}
 
-	ViewConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZERNViewConstantBuffer));
-	RendererConstantBuffer = ZEGRConstantBuffer::Create(sizeof(RendererConstants));
+	ViewConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZERNViewConstantBuffer));
+	RendererConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(RendererConstants));
 
 	CreatePredefinedSamplers();
 

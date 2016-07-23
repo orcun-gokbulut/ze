@@ -66,7 +66,7 @@ void ZEMDResourceAnimation::RemoveFrame(ZESize Index)
 	Frames.Remove(Index);
 }
 
-bool ZEMDResourceAnimation::Load(const ZEMLReaderNode& AnimationNode)
+bool ZEMDResourceAnimation::Unserialize(const ZEMLReaderNode& AnimationNode)
 {
 	zeCheckError(!AnimationNode.IsValid(), false, "Invalid Animation node.");
 	zeCheckError(AnimationNode.GetName() == "Animation", false, "Invalid Animation node name.");
@@ -97,7 +97,7 @@ bool ZEMDResourceAnimation::Load(const ZEMLReaderNode& AnimationNode)
 	return true;
 }
 
-bool ZEMDResourceAnimation::Save(ZEMLWriterNode& AnimationNode) const
+bool ZEMDResourceAnimation::Serialize(ZEMLWriterNode& AnimationNode) const
 {
 	return false;
 }

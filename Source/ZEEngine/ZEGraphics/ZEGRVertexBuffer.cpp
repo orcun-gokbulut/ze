@@ -34,6 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEGRVertexBuffer.h"
+
+#include "ZEResource/ZERSTemplates.h"
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 
 bool ZEGRVertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data)
@@ -76,18 +78,49 @@ ZEUInt ZEGRVertexBuffer::GetVertexStride() const
 	return VertexStride;
 }
 
-ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data)
+static ZERSResource* Instanciator()
+{
+	return ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
+}
+
+ZEHolder<ZEGRVertexBuffer> ZEGRVertexBuffer::CreateResource(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data)
 {
 	zeDebugCheck(VertexCount == 0, "Vertex count cannot be zero.");
 	zeDebugCheck(VertexStride == 0, "Vertex stride cannot be zero.");
 	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static vertex buffer");
 
-	ZEHolder<ZEGRVertexBuffer> VertexBuffer = ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
-	if (VertexBuffer == NULL)
+	ZEHolder<ZEGRVertexBuffer> Resource = ZERSTemplates::CreateResource<ZEGRVertexBuffer>(Instanciator);
+	if (Resource == NULL)
 		return NULL;
 
-	if (!VertexBuffer->Initialize(VertexCount, VertexStride, Usage, Data))
+	if (!Resource->Initialize(VertexCount, VertexStride, Usage, Data))
 		return NULL;
 
-	return VertexBuffer;
+	return Resource;
+}
+
+ZEHolder<const ZEGRVertexBuffer> ZEGRVertexBuffer::CreateResourceShared(const ZEGUID& GUID, ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data, ZEGRVertexBuffer** StagingResource)
+{
+	zeDebugCheck(VertexCount == 0, "Vertex count cannot be zero.");
+	zeDebugCheck(VertexStride == 0, "Vertex stride cannot be zero.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Data cannot be NULL on static vertex buffer");
+
+	ZEGRVertexBuffer* StagingResourceTemp;
+	ZEHolder<const ZEGRVertexBuffer> Resource = ZERSTemplates::CreateResourceShared<ZEGRVertexBuffer>(GUID, &StagingResourceTemp, Instanciator);
+
+	if (Resource == NULL)
+		return NULL;
+
+	if (StagingResourceTemp != NULL)
+	{
+		if (!StagingResourceTemp->Initialize(VertexCount, VertexStride, Usage, Data))
+			return NULL;
+
+		if (StagingResource != NULL)
+			*StagingResource = StagingResourceTemp;
+		else
+			StagingResourceTemp->StagingRealized();
+	}
+
+	return Resource;
 }

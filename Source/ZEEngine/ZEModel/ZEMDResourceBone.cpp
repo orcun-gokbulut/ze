@@ -132,7 +132,7 @@ const ZEString& ZEMDResourceBone::GetUserDefinedProperties() const
 	return UserDefinedProperties;
 }
 
-bool ZEMDResourceBone::Load(const ZEMLReaderNode& BoneNode)
+bool ZEMDResourceBone::Unserialize(const ZEMLReaderNode& BoneNode)
 {
 	zeCheckError(!BoneNode.IsValid(), false, "Invalid Bone node.");
 	zeCheckError(BoneNode.GetName() != "Bone", false, "Invalid Bone node name.");
@@ -152,7 +152,7 @@ bool ZEMDResourceBone::Load(const ZEMLReaderNode& BoneNode)
 	ZEMLReaderNode PhysicalJointNode = BoneNode.GetNode("PhysicalJoint");
 	if (PhysicalJointNode.IsValid())
 	{
-		if (!PhysicalJoint.Load(PhysicalJointNode))
+		if (!PhysicalJoint.Unserialize(PhysicalJointNode))
 			return false;
 	}
 	else
@@ -163,7 +163,7 @@ bool ZEMDResourceBone::Load(const ZEMLReaderNode& BoneNode)
 	ZEMLReaderNode PhysicalBodyNode = BoneNode.GetNode("PhysicalBody");
 	if (PhysicalBodyNode.IsValid())
 	{
-		if (!PhysicalBody.Load(PhysicalBodyNode))
+		if (!PhysicalBody.Unserialize(PhysicalBodyNode))
 			return false;
 	}
 	else
@@ -174,7 +174,7 @@ bool ZEMDResourceBone::Load(const ZEMLReaderNode& BoneNode)
 	return true;
 }
 
-bool ZEMDResourceBone::Save(ZEMLWriterNode& BoneNode) const
+bool ZEMDResourceBone::Serialize(ZEMLWriterNode& BoneNode) const
 {
 	return false;
 }

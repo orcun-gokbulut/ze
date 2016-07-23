@@ -108,7 +108,7 @@ bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 			return false;
 
 		ZEPointer<ZEMDResourceMesh> Mesh = new ZEMDResourceMesh();
-		if (!Mesh->Load(MeshNode))
+		if (!Mesh->Unserialize(MeshNode))
 			return false;
 
 		AddMesh(Mesh.Transfer());
@@ -131,7 +131,7 @@ bool ZEMDResource::ReadBones(const ZEMLReaderNode& BonesNode)
 			return false;
 
 		ZEPointer<ZEMDResourceBone> Bone = new ZEMDResourceBone();
-		if (!Bone->Load(BoneNode))
+		if (!Bone->Unserialize(BoneNode))
 			return false;
 
 		AddBone(Bone.Transfer());
@@ -153,7 +153,7 @@ bool ZEMDResource::ReadHelpers(const ZEMLReaderNode& HelpersNode)
 			return false;
 
 		ZEPointer<ZEMDResourceHelper> Helper = new ZEMDResourceHelper();
-		if (!Helper->Load(HelperNode))
+		if (!Helper->Unserialize(HelperNode))
 			return false;
 
 		AddHelper(Helper.Transfer());
@@ -176,7 +176,7 @@ bool ZEMDResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 			return false;
 
 		ZEPointer<ZEMDResourceAnimation> Animation = new ZEMDResourceAnimation();
-		if (!Animation->Load(AnimationNode))
+		if (!Animation->Unserialize(AnimationNode))
 			return false;
 
 		AddAnimation(Animation.Transfer());
@@ -210,7 +210,7 @@ bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 		ze_for_each(LOD, Mesh->GetLODs())
 		{
 			if (LOD->MaterialID >= 0 && LOD->MaterialID <= Materials.GetCount())
-				LOD->SetMaterial(Materials[LOD->MaterialID].Cast<ZERNMaterial>());
+				LOD->SetMaterial(Materials[LOD->MaterialID].Cast<const ZERNMaterial>());
 		}
 	}
 	return true;
@@ -418,10 +418,10 @@ ZEMDResource::~ZEMDResource()
 
 ZERSHolder<ZEMDResource> ZEMDResource::LoadResource(const ZEString& FileName)
 {
-	return ZERSTemplates::LoadResource<ZEMDResource>(FileName);
+	return ZERSTemplates::LoadResource<ZEMDResource>(FileName, ZERSTemplates::InstanciatorFunction<ZEMDResource>);
 }
 
 ZERSHolder<const ZEMDResource> ZEMDResource::LoadResourceShared(const ZEString& FileName)
 {
-	return ZERSTemplates::LoadResourceShared<ZEMDResource>(FileName);
+	return ZERSTemplates::LoadResourceShared<ZEMDResource>(FileName, ZERSTemplates::InstanciatorFunction<ZEMDResource>);
 }

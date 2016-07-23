@@ -521,9 +521,9 @@ bool ZERNStageLighting::InitializeInternal()
 	CreateRandomVectors();
 	CreateLightGeometries();
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	PointLightStructuredBuffer = ZEGRStructuredBuffer::Create(MAX_LIGHT, sizeof(PointLightStruct));
-	ProjectiveLightStructuredBuffer = ZEGRStructuredBuffer::Create(MAX_LIGHT, sizeof(ProjectiveLightStruct));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	PointLightStructuredBuffer = ZEGRStructuredBuffer::CreateResource(MAX_LIGHT, sizeof(PointLightStruct));
+	ProjectiveLightStructuredBuffer = ZEGRStructuredBuffer::CreateResource(MAX_LIGHT, sizeof(ProjectiveLightStruct));
 
 	return Update();
 }

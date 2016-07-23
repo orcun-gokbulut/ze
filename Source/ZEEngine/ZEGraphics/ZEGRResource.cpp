@@ -60,7 +60,7 @@ ZEGRResource::ZEGRResource()
 
 ZEGRResource::~ZEGRResource()
 {
-
+	SetSize(0);
 }
 
 void ZEGRResource::SetName(const ZEString& Name)

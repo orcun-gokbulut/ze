@@ -83,8 +83,8 @@ class ZEMDResourceAnimation : public ZERSResource
 		void										AddFrame(const ZEMDResourceAnimationFrame& Frame);
 		void										RemoveFrame(ZESize Index);
 
-		bool										Load(const ZEMLReaderNode& AnimationNode);
-		bool										Save(ZEMLWriterNode& AnimationNode) const;
+		bool										Unserialize(const ZEMLReaderNode& AnimationNode);
+		bool										Serialize(ZEMLWriterNode& AnimationNode) const;
 
 													ZEMDResourceAnimation();
 };

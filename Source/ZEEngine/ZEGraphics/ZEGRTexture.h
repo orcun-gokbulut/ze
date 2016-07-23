@@ -58,10 +58,10 @@ struct ZERect
 
 struct ZEGRTextureOptions
 {
-	ZEGRFormat	CompressionFormat;
-	ZEUInt		MaximumMipmapLevel;
-	bool		GenerateMipMaps;
-	bool		sRGB;
+	ZEGRFormat					CompressionFormat;
+	ZEUInt						MaximumMipmapLevel;
+	bool						GenerateMipMaps;
+	bool						sRGB;
 };
 
 class ZEGRRenderTarget;

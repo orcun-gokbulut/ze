@@ -44,24 +44,26 @@ class ZEGRVertexBuffer : public ZEGRResource
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRVertexBuffer)
+	friend class ZERSTemplates;
 	private:
-		ZESize								VertexCount;
-		ZEUInt								VertexStride;
+		ZESize										VertexCount;
+		ZEUInt										VertexStride;
 
 	protected:
-		virtual bool						Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data);
-		virtual void						Deinitialize();
+		virtual bool								Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data);
+		virtual void								Deinitialize();
 
-											ZEGRVertexBuffer();
+													ZEGRVertexBuffer();
 
 	public:
-		virtual ZEGRResourceType			GetResourceType() const;
+		virtual ZEGRResourceType					GetResourceType() const;
 
-		ZESize								GetVertexCount() const;
-		ZEUInt								GetVertexStride() const;
+		ZESize										GetVertexCount() const;
+		ZEUInt										GetVertexStride() const;
 
-		virtual bool						Lock(void** Data) = 0;
-		virtual void						Unlock() = 0;
+		virtual bool								Lock(void** Data) = 0;
+		virtual void								Unlock() = 0;
 		
-		static ZEHolder<ZEGRVertexBuffer>	Create(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, const void* Data = NULL);
+		static ZEHolder<ZEGRVertexBuffer>			CreateResource(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, const void* Data = NULL);
+		static ZEHolder<const ZEGRVertexBuffer>		CreateResourceShared(const ZEGUID& GUID, ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_CPU_WRITE, const void* Data = NULL, ZEGRVertexBuffer** StagingResource = NULL);
 };

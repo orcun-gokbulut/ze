@@ -286,7 +286,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 	this->Rotation = Resource->Rotation;
 	this->Scale = Resource->Scale;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEInteriorTransformConstants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEInteriorTransformConstants));
 	
 	ZESize PolygonCount = Resource->Polygons.GetCount();
 
@@ -305,8 +305,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 
 		if (!Processed[N])
 		{
-			ZERNMaterial* Material = Resource->Polygons[N].Material;
-
+			const ZERNMaterial* Material = Resource->Polygons[N].Material;
 			for (ZESize I = N; I < PolygonCount; I++)
 			{
 				if (Resource->Polygons[I].Material != Material)
@@ -327,7 +326,7 @@ bool ZEInteriorRoom::Initialize(ZEInterior* Owner, ZEInteriorResourceRoom* Resou
 		}
 	}
 
-	VertexBuffer = ZEGRVertexBuffer::Create(Vertices.GetCount(), sizeof(ZEInteriorVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
+	VertexBuffer = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEInteriorVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray());
 
 	ZESize DrawCount = Draws.GetCount();
 	for (ZESize I = 0; I < DrawCount; I++)

@@ -78,7 +78,7 @@ struct ZEInteriorVertex
 struct ZEInteriorPolygon
 {
 	ZEInteriorVertex					Vertices[3];
-	ZERNMaterial*						Material;
+	const ZERNMaterial*					Material;
 	ZEUInt32							LastIteration;
 };
 
@@ -144,32 +144,32 @@ class ZEFile;
 class ZEInteriorResource : public ZEResource
 {
 	private:
-		ZEArray<ZETexture2DResource*>				TextureResources;
-		ZEArray<ZEHolder<ZERNMaterial>>				Materials;
-		ZEArray<ZEInteriorResourceDoor>				Doors;
-		ZEArray<ZEInteriorResourceRoom>				Rooms;
-		ZEArray<ZEInteriorResourceHelper>			Helpers;
+		ZEArray<ZETexture2DResource*>					TextureResources;
+		ZEArray<ZEHolder<const ZERNMaterial>>			Materials;
+		ZEArray<ZEInteriorResourceDoor>					Doors;
+		ZEArray<ZEInteriorResourceRoom>					Rooms;
+		ZEArray<ZEInteriorResourceHelper>				Helpers;
 
-		bool										ReadDoors(ZEMLReaderNode* DoorsNode);
-		bool										ReadRooms(ZEMLReaderNode* RoomsNode);
-		bool										ReadHelpers(ZEMLReaderNode* HelpersNode);
-		bool										ReadMaterials(ZEMLReaderNode* MaterialsNode);
+		bool											ReadDoors(ZEMLReaderNode* DoorsNode);
+		bool											ReadRooms(ZEMLReaderNode* RoomsNode);
+		bool											ReadHelpers(ZEMLReaderNode* HelpersNode);
+		bool											ReadMaterials(ZEMLReaderNode* MaterialsNode);
 
-		const ZEGRTexture2D*						ManageInteriorMaterialTextures(const ZEString& FileName);
-		bool  										ReadInteriorFromFile(ZEFile* ResourceFile);
+		const ZEGRTexture2D*							ManageInteriorMaterialTextures(const ZEString& FileName);
+		bool  											ReadInteriorFromFile(ZEFile* ResourceFile);
 
-		virtual										~ZEInteriorResource();
+		virtual											~ZEInteriorResource();
 
 	public:
-		const char*									GetResourceType() const;
+		const char*										GetResourceType() const;
 
-		const ZEArray<ZETexture2DResource*>&		GetTextures() const;
-		const ZEArray<ZEHolder<ZERNMaterial>>&		GetMaterials() const;
-		const ZEArray<ZEInteriorResourceRoom>&		GetRooms() const;
-		const ZEArray<ZEInteriorResourceDoor>&		GetDoors() const;
-		const ZEArray<ZEInteriorResourceHelper>&	GetHelpers() const;
+		const ZEArray<ZETexture2DResource*>&			GetTextures() const;
+		const ZEArray<ZEHolder<const ZERNMaterial>>&	GetMaterials() const;
+		const ZEArray<ZEInteriorResourceRoom>&			GetRooms() const;
+		const ZEArray<ZEInteriorResourceDoor>&			GetDoors() const;
+		const ZEArray<ZEInteriorResourceHelper>&		GetHelpers() const;
 
-		static ZEInteriorResource*					LoadResource(const ZEString& FileName);
-		static ZEInteriorResource*					LoadSharedResource(const ZEString& FileName);
-		static void									CacheResource(const ZEString& FileName);
+		static ZEInteriorResource*						LoadResource(const ZEString& FileName);
+		static ZEInteriorResource*						LoadSharedResource(const ZEString& FileName);
+		static void										CacheResource(const ZEString& FileName);
 };

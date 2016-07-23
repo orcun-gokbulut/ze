@@ -128,8 +128,8 @@ class ZEMDResourcePhysicalShape : public ZEObject
 		void								SetUserDefinedProperties(ZEString UserDefinedProperties);
 		ZEString							GetUserDefinedProperties() const;
 
-		bool								Load(const ZEMLReaderNode& ShapeNode);
-		bool								Save(ZEMLWriterNode& ShapeNode) const;
+		bool								Unserialize(const ZEMLReaderNode& ShapeNode);
+		bool								Serialize(ZEMLWriterNode& ShapeNode) const;
 
 											ZEMDResourcePhysicalShape();
 };
@@ -182,8 +182,8 @@ class ZEMDResourcePhysicalBody : public ZEObject
 		void								AddShape(const ZEMDResourcePhysicalShape& Shape);
 		void								RemoveShape(ZESize Index);
 
-		bool								Load(const ZEMLReaderNode& BodyNode);
-		bool								Save(ZEMLWriterNode& BodyNode) const;
+		bool								Unserialize(const ZEMLReaderNode& BodyNode);
+		bool								Serialize(ZEMLWriterNode& BodyNode) const;
 
 											ZEMDResourcePhysicalBody();
 };
@@ -490,8 +490,8 @@ struct ZEMDResourcePhysicalJoint : public ZEObject
 		void								SetAngularSlerpMotorDamper(float AngularSlerpMotorDamper);
 		float								GetAngularSlerpMotorDamper() const;
 
-		bool								Load(const ZEMLReaderNode& JointNode);
-		bool								Save(ZEMLWriterNode& JointNode) const;
+		bool								Unserialize(const ZEMLReaderNode& JointNode);
+		bool								Serialize(ZEMLWriterNode& JointNode) const;
 
 											ZEMDResourcePhysicalJoint();
 };

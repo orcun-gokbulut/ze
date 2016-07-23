@@ -107,7 +107,7 @@ ZEString ZEMDResourceHelper::GetUserDefinedProperties() const
 	return UserDefinedProperties;
 }
 
-bool ZEMDResourceHelper::Load(const ZEMLReaderNode& HelperNode)
+bool ZEMDResourceHelper::Unserialize(const ZEMLReaderNode& HelperNode)
 {
 	zeCheckError(!HelperNode.IsValid(), false, "Invalid Helper node.");
 	zeCheckError(HelperNode.GetName() != "Helper", false, "Invalid Helper node name.");
@@ -123,7 +123,7 @@ bool ZEMDResourceHelper::Load(const ZEMLReaderNode& HelperNode)
 	return true;
 }
 
-bool ZEMDResourceHelper::Save(ZEMLWriterNode& HelperNode) const
+bool ZEMDResourceHelper::Serialize(ZEMLWriterNode& HelperNode) const
 {
 	return false;
 }

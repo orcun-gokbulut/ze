@@ -106,7 +106,7 @@ void ZEATCloud::CreatePlane()
 		{ ZEVector3(10.0f, 0.0f, -10.0f), ZEVector2(1.0f, 1.0f) }
 	};
 
-	PlaneVertexBuffer = ZEGRVertexBuffer::Create(16, sizeof(Vertex));
+	PlaneVertexBuffer = ZEGRVertexBuffer::CreateResource(16, sizeof(Vertex));
 
 	void* Data;
 	PlaneVertexBuffer->Lock(&Data);
@@ -220,8 +220,8 @@ bool ZEATCloud::InitializeSelf()
 
 	CreatePlane();
 
-	PlaneTransformConstantBuffer = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	PlaneTransformConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	return Update();
 }

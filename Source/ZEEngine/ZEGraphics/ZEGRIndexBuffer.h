@@ -52,26 +52,28 @@ class ZEGRIndexBuffer : public ZEGRResource
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRIndexBuffer)
 	friend class ZEGRGraphicsModule;
+	friend class ZERSTemplates;
 	private:
-		ZESize								IndexCount;
-		ZEGRIndexBufferFormat				Format;
+		ZESize										IndexCount;
+		ZEGRIndexBufferFormat						Format;
 
 	protected:
-		virtual bool						Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
-		virtual void						Deinitialize();
+		virtual bool								Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		virtual void								Deinitialize();
 
-											ZEGRIndexBuffer();
+													ZEGRIndexBuffer();
 
 	public:
-		virtual ZEGRResourceType			GetResourceType() const;
+		virtual ZEGRResourceType					GetResourceType() const;
 
-		ZESize								GetIndexCount() const;
-		ZEGRIndexBufferFormat				GetFormat() const;
+		ZESize										GetIndexCount() const;
+		ZEGRIndexBufferFormat						GetFormat() const;
 
-		virtual bool						Lock(void** Data) = 0;
-		virtual void						Unlock() = 0;
+		virtual bool								Lock(void** Data) = 0;
+		virtual void								Unlock() = 0;
 	
-		static ZEHolder<ZEGRIndexBuffer>	Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		static ZEHolder<ZEGRIndexBuffer>			CreateResource(ZEUInt IndexCount, ZEGRIndexBufferFormat Format);
+		static ZEHolder<const ZEGRIndexBuffer>		CreateResourceShared(const ZEGUID& GUID, ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRIndexBuffer** StagingResource = NULL);
 };
 
 #endif

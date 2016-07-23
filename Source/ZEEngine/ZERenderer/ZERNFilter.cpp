@@ -66,7 +66,7 @@ bool ZERNFilter::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(FilterConstants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(FilterConstants));
 
 	return Update();
 }

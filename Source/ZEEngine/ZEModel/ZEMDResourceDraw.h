@@ -62,8 +62,8 @@ class ZEMDResourceDraw : public ZEObject
 		void							SetMaterial(ZEHolder<ZERNMaterial> Material);
 		ZEHolder<ZERNMaterial>			GetMaterial() const;
 
-		bool							Load(ZEMLReaderNode& DrawNode);
-		bool							Save(ZEMLWriterNode& DrawNode) const;
+		bool							Unserialize(ZEMLReaderNode& DrawNode);
+		bool							Serialize(ZEMLWriterNode& DrawNode) const;
 
 										ZEMDResourceDraw();
 }; 

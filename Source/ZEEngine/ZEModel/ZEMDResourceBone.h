@@ -96,8 +96,8 @@ class ZEMDResourceBone : public ZERSResource
 		void									SetUserDefinedProperties(const ZEString& UserDefinedProperties);
 		const ZEString&							GetUserDefinedProperties() const;
 
-		bool									Load(const ZEMLReaderNode& BoneNode);
-		bool									Save(ZEMLWriterNode& BoneNode) const;
+		bool									Unserialize(const ZEMLReaderNode& BoneNode);
+		bool									Serialize(ZEMLWriterNode& BoneNode) const;
 
 												ZEMDResourceBone();
 };

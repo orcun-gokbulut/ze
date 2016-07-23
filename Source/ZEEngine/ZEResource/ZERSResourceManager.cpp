@@ -35,10 +35,10 @@
 
 #include "ZERSResourceManager.h"
 
+#include "ZERSResource.h"
 #include "ZEError.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
-#include "ZERSResourceLoadable.h"
 
 void ZERSResourceManager::UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT])
 {
@@ -52,7 +52,7 @@ void ZERSResourceManager::UpdateMemoryUsage(ZERSResource* Resource, ZESSize Memo
 	ManagerLock.Unlock();
 }
 
-ZERSHolder<const ZERSResourceLoadable> ZERSResourceManager::GetResourceInternal(const ZEString& FileName)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(const ZEString& FileName)
 {
 	ZEFileInfo FileInfo(FileName);
 	ZEString FileNameNormalized = FileInfo.Normalize();
@@ -63,21 +63,20 @@ ZERSHolder<const ZERSResourceLoadable> ZERSResourceManager::GetResourceInternal(
 	ze_for_each(Resource, SharedResources)
 	{
 		Resource->ResourceLock.Lock();
-		if (Resource->GetType() != ZERS_RT_LOADABLE)
+		if (Resource->GetFileNameHash() == 0)
 		{
 			Resource->ResourceLock.Unlock();
 			continue;
 		}
 
-		const ZERSResourceLoadable* ResourceLoadable = static_cast<const ZERSResourceLoadable*>(Resource.GetPointer());	
-		if (ResourceLoadable->FileNameHash == Hash && ResourceLoadable->FileName == FileNameNormalized)
+		if (Resource->GetFileNameHash() == Hash && Resource->GetFileName() == FileNameNormalized)
 		{
-			ZERSHolder<const ZERSResourceLoadable> Output;
-			Output.Overwrite(ResourceLoadable);
+			ZERSHolder<const ZERSResource> Output;
+			Output.Overwrite(Output);
 			Resource->ReferenceCount++;
 			Resource->ResourceLock.Unlock();
 
-			return ResourceLoadable;
+			return Output;
 		}
 		Resource->ResourceLock.Unlock();
 	}
@@ -194,10 +193,10 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(const ZEGUID& GU
 	return Resource;
 }
 
-ZERSHolder<const ZERSResourceLoadable> ZERSResourceManager::GetResource(const ZEString& FileName)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(const ZEString& FileName)
 {
 	ManagerLock.Lock();
-	ZERSHolder<const ZERSResourceLoadable> Resource = GetResourceInternal(FileName);
+	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(FileName);
 	ManagerLock.Unlock();
 
 	return Resource;
@@ -238,14 +237,23 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 	if (Resource == NULL)
 	{
 		ZERSResource* NewResouce = Insanciator();
+		if (NewResouce == NULL)
+		{
+			ManagerLock.Unlock();
+			return NULL;
+		}
+
 		NewResouce->SetGUID(GUID);
 		NewResouce->State = ZERS_RS_STAGING;
+		NewResouce->TargetState = ZERS_RS_STAGED;
 		RegisterResourceInternal(NewResouce);
 		ShareResourceInternal(NewResouce);
 		ManagerLock.Unlock();
 
 		if (StagingResource != NULL)
 			*StagingResource = NewResouce;
+		else
+			NewResouce->StagingRealized();
 
 		return NewResouce;
 	}
@@ -257,16 +265,23 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 	}
 }
 
-ZERSHolder<const ZERSResourceLoadable> ZERSResourceManager::StageResource(const ZEString& FileName, ZERSInstanciatorLoadable Insanciator, ZERSResourceLoadable** StagingResource)
+ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString& FileName, ZERSInstanciator Insanciator, ZERSResource** StagingResource)
 {
 	ManagerLock.Lock();
-	const ZERSResourceLoadable* Resource = GetResourceInternal(FileName);
+	const ZERSResource* Resource = GetResourceInternal(FileName);
 	if (Resource == NULL)
 	{
-		ZERSResourceLoadable* NewResouce = Insanciator();
+		ZERSResource* NewResouce = Insanciator();
+		if (NewResouce == NULL)
+		{
+			ManagerLock.Unlock();
+			return NULL;
+		}
+
 		NewResouce->FileName = ZEPathInfo(FileName).Normalize();
 		NewResouce->FileNameHash = NewResouce->FileName.Lower().Hash();
 		NewResouce->State = ZERS_RS_STAGING;
+		NewResouce->TargetState = ZERS_RS_STAGED;
 		RegisterResourceInternal(NewResouce);
 		ShareResourceInternal(NewResouce);
 		ManagerLock.Unlock();

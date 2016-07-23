@@ -50,9 +50,7 @@ class ZERSTemplates
 		template<typename ZERSResourceClass>
 		static bool										CheckResourceClass(const ZERSResource* SharedResource);
 		template<typename ZERSResourceClass>
-		static ZERSResource*							Instanciator();
-		template<typename ZERSResourceClass>
-		static ZERSResourceLoadable*					InstanciatorLoadable();
+		static ZERSResource*							InstanciatorFunction();
 
 		template<typename ZERSResourceClass>
 		static ZERSHolder<const ZERSResourceClass>		GetResource(const ZEGUID& GUID);
@@ -60,14 +58,14 @@ class ZERSTemplates
 		static ZERSHolder<const ZERSResourceClass>		GetResource(const ZEString& FileName);
 
 		template<typename ZERSResourceClass>
-		static ZERSHolder<ZERSResourceClass>			CreateResource();
+		static ZERSHolder<ZERSResourceClass>			CreateResource(ZERSInstanciator Instanciator);
 		template<typename ZERSResourceClass>
-		static ZERSHolder<const ZERSResourceClass>		CreateResourceShared(const ZEGUID& GUID, ZERSResourceClass** StagingResource);
+		static ZERSHolder<const ZERSResourceClass>		CreateResourceShared(const ZEGUID& GUID, ZERSResourceClass** StagingResource, ZERSInstanciator Instanciator);
 		
 		template<typename ZERSResourceClass>
-		static ZERSHolder<ZERSResourceClass>			LoadResource(const ZEString& FileName);
+		static ZERSHolder<ZERSResourceClass>			LoadResource(const ZEString& FileName, ZERSInstanciator Instanciator);
 		template<typename ZERSResourceClass>
-		static ZERSHolder<const ZERSResourceClass>		LoadResourceShared(const ZEString& FileName);
+		static ZERSHolder<const ZERSResourceClass>		LoadResourceShared(const ZEString& FileName, ZERSInstanciator Instanciator);
 };
 
 
@@ -75,13 +73,7 @@ class ZERSTemplates
 //////////////////////////////////////////////////////////////////////////////////////
 
 template<typename ZERSResourceClass>
-ZERSResource* ZERSTemplates::Instanciator()
-{
-	return new ZERSResourceClass();
-}
-
-template<typename ZERSResourceClass>
-ZERSResourceLoadable* ZERSTemplates::InstanciatorLoadable()
+ZERSResource* ZERSTemplates::InstanciatorFunction()
 {
 	return new ZERSResourceClass();
 }
@@ -96,8 +88,8 @@ bool ZERSTemplates::CheckResourceClass(const ZERSResource* SharedResource)
 			"Requested Resource Class: \"%s\", "
 			"Shared Resource Class: \"%s\".",
 			SharedResource->GetGUID().ToString().ToCString(),
-			ZERSResourceClass::Class(),
-			SharedResource->GetClass());
+			ZERSResourceClass::Class()->GetName(),
+			SharedResource->GetClass()->GetName());
 
 		return false;
 	}
@@ -134,18 +126,28 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::GetResource(const ZEString& F
 }
 
 template<typename ZERSResourceClass>
-ZERSHolder<ZERSResourceClass> ZERSTemplates::CreateResource()
+ZERSHolder<ZERSResourceClass> ZERSTemplates::CreateResource(ZERSInstanciator Instanciator)
 {
-	ZERSResourceClass* Resource = new ZERSResourceClass();
+	if (Instanciator == NULL)
+		return NULL;
+
+	ZERSResourceClass* Resource = static_cast<ZERSResourceClass*>(Instanciator());
+	if (Resource == NULL)
+		return NULL;
+
 	ZERSResourceManager::GetInstance()->RegisterResource(Resource);
+	
 	return Resource;
 }
 
 template<typename ZERSResourceClass>
-ZERSHolder<const ZERSResourceClass> ZERSTemplates::CreateResourceShared(const ZEGUID& GUID, ZERSResourceClass** StagingResource)
+ZERSHolder<const ZERSResourceClass> ZERSTemplates::CreateResourceShared(const ZEGUID& GUID, ZERSResourceClass** StagingResource, ZERSInstanciator Instanciator)
 {
+	if (Instanciator == NULL)
+		return NULL;
+
 	ZERSResource* StagingResourceTemp = NULL;
-	ZERSHolder<const ZERSResource> SharedResource = ZERSResourceManager::GetInstance()->StageResource(GUID, Instanciator<ZERSResourceClass>, &StagingResourceTemp);
+	ZERSHolder<const ZERSResource> SharedResource = ZERSResourceManager::GetInstance()->StageResource(GUID, Instanciator, &StagingResourceTemp);
 	
 	if (SharedResource == NULL)
 		return NULL;
@@ -155,23 +157,37 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::CreateResourceShared(const ZE
 
 	if (StagingResource != NULL)
 		*StagingResource = static_cast<ZERSResourceClass*>(StagingResourceTemp);
+	else
+		StagingResourceTemp->StagingRealized();
 
 	return static_cast<const ZERSResourceClass*>(SharedResource.GetPointer());
 }
 
 template<typename ZERSResourceClass>
-ZERSHolder<ZERSResourceClass> ZERSTemplates::LoadResource(const ZEString& FileName)
+ZERSHolder<ZERSResourceClass> ZERSTemplates::LoadResource(const ZEString& FileName, ZERSInstanciator Instanciator)
 {
-	ZERSHolder<ZERSResourceClass> Resource = CreateResource<ZERSResourceClass>();
+	if (Instanciator == NULL)
+		return NULL;
+
+	ZERSHolder<ZERSResourceClass> Resource = static_cast<ZERSResourceClass*>(Instanciator());
+	if (Resource == NULL)
+		return NULL;
+
+	ZERSResourceManager::GetInstance()->RegisterResource(Resource);
+	Resource->StagingRealized();
 	Resource->Load(FileName);
+
 	return Resource;
 }
 
 template<typename ZERSResourceClass>
-ZERSHolder<const ZERSResourceClass> ZERSTemplates::LoadResourceShared(const ZEString& FileName)
+ZERSHolder<const ZERSResourceClass> ZERSTemplates::LoadResourceShared(const ZEString& FileName, ZERSInstanciator Instanciator)
 {
-	ZERSResourceLoadable* StagingResource = NULL;
-	ZERSHolder<const ZERSResourceLoadable> SharedResource = ZERSResourceManager::GetInstance()->StageResource(FileName, InstanciatorLoadable<ZERSResourceClass>, &StagingResource);
+	if (Instanciator == NULL)
+		return NULL;
+
+	ZERSResource* StagingResource = NULL;
+	ZERSHolder<const ZERSResource> SharedResource = ZERSResourceManager::GetInstance()->StageResource(FileName, Instanciator, &StagingResource);
 	
 	if (SharedResource == NULL)
 		return NULL;
@@ -180,7 +196,10 @@ ZERSHolder<const ZERSResourceClass> ZERSTemplates::LoadResourceShared(const ZESt
 		return NULL;
 
 	if (StagingResource != NULL)
+	{
+		StagingResource->StagingRealized();
 		StagingResource->Load(FileName);
+	}
 
 	return static_cast<const ZERSResourceClass*>(SharedResource.GetPointer());
 }

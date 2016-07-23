@@ -132,7 +132,7 @@ bool ZERNSimpleMaterial::InitializeInternal()
 	if (!ZERNMaterial::InitializeInternal())
 		return false;
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	if (!UpdateShaders())
 		return false;
@@ -362,7 +362,7 @@ bool ZERNSimpleMaterial::Update() const
 	return true;
 }
 
-bool ZERNSimpleMaterial::PreRender(ZERNCommand& Command)
+bool ZERNSimpleMaterial::PreRender(ZERNCommand& Command) const
 {
 	Command.StageMask = ZERN_STAGE_DEBUG;
 	if (GetTransparent())

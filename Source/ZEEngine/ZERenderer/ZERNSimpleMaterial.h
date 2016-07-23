@@ -121,7 +121,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 
 		virtual bool							Update() const;
 
-		virtual bool							PreRender(ZERNCommand& Command);
+		virtual bool							PreRender(ZERNCommand& Command) const;
 		virtual bool							SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void							CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 

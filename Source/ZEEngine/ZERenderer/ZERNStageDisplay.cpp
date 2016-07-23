@@ -102,7 +102,7 @@ bool ZERNStageDisplay::UpdateConstantBuffer()
 		return true;
 
 	if (ConstantBuffer.IsNull())
-		ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
+		ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
 	if (ConstantBuffer.IsNull())
 		return false;

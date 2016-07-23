@@ -66,7 +66,7 @@ void ZECanvasBrush::UpdateCanvas()
 	if (OldVertexCount != Canvas.GetVertexCount())
 	{
 		OldVertexCount = Canvas.GetVertexCount();
-		VertexBuffer = VertexBuffer->Create(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
+		VertexBuffer = VertexBuffer->CreateResource(Canvas.GetVertexCount(), sizeof(ZECanvasVertex));
 		if (VertexBuffer != NULL)
 			zeCriticalError("Can not create Static Vertex Buffer.");
 	}

@@ -170,7 +170,7 @@ ZEString ZEMDResourcePhysicalShape::GetUserDefinedProperties() const
 	return UserDefinedProperties;
 }
 
-bool ZEMDResourcePhysicalShape::Load(const ZEMLReaderNode& ShapeNode)
+bool ZEMDResourcePhysicalShape::Unserialize(const ZEMLReaderNode& ShapeNode)
 {
 	zeCheckError(!ShapeNode.IsValid(), false, "Invalid Shape node.");
 	zeCheckError(ShapeNode.GetName() != "Shape", false, "Invalid Shape node name.");
@@ -219,7 +219,7 @@ bool ZEMDResourcePhysicalShape::Load(const ZEMLReaderNode& ShapeNode)
 	return true;
 }
 
-bool ZEMDResourcePhysicalShape::Save(ZEMLWriterNode& ShapeNode) const
+bool ZEMDResourcePhysicalShape::Serialize(ZEMLWriterNode& ShapeNode) const
 {
 	return false;
 }
@@ -348,7 +348,7 @@ void ZEMDResourcePhysicalBody::RemoveShape(ZESize Index)
 	Shapes.Remove(Index);
 }
 
-bool ZEMDResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
+bool ZEMDResourcePhysicalBody::Unserialize(const ZEMLReaderNode& BodyNode)
 {
 	zeCheckError(!BodyNode.IsValid(), false, "Invalid Body node.");
 	zeCheckError(BodyNode.GetName() != "PhysicalBody", false, "Invalid Body node name.");
@@ -371,7 +371,7 @@ bool ZEMDResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
 	{
 		ZEMLReaderNode ShapesNode = ShapesNode.GetNode("PhysicalShape", I);
 		ZEMDResourcePhysicalShape Shape;
-		if (!Shape.Load(ShapesNode))
+		if (!Shape.Unserialize(ShapesNode))
 			return false;
 		AddShape(Shape);
 	}
@@ -379,7 +379,7 @@ bool ZEMDResourcePhysicalBody::Load(const ZEMLReaderNode& BodyNode)
 	return true;
 }
 
-bool ZEMDResourcePhysicalBody::Save(ZEMLWriterNode& BodyNode) const
+bool ZEMDResourcePhysicalBody::Serialize(ZEMLWriterNode& BodyNode) const
 {
 	return false;
 }
@@ -1091,7 +1091,7 @@ float ZEMDResourcePhysicalJoint::GetAngularSlerpMotorDamper() const
 	return AngularSlerpMotorDamper;
 }
 
-bool ZEMDResourcePhysicalJoint::Load(const ZEMLReaderNode& JointNode)
+bool ZEMDResourcePhysicalJoint::Unserialize(const ZEMLReaderNode& JointNode)
 {
 	zeCheckError(!JointNode.IsValid(), false, "Invalid Joint node.");
 	zeCheckError(JointNode.GetName() != "PhysicalJoint", false, "Invalid Joint node name.");
@@ -1189,7 +1189,7 @@ bool ZEMDResourcePhysicalJoint::Load(const ZEMLReaderNode& JointNode)
 	return true;
 }
 
-bool ZEMDResourcePhysicalJoint::Save(ZEMLWriterNode& JointNode) const
+bool ZEMDResourcePhysicalJoint::Serialize(ZEMLWriterNode& JointNode) const
 {
 	return false;
 }

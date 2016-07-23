@@ -49,29 +49,29 @@ class ZEGRRenderTarget : public ZEGRResource
 	ZE_DISALLOW_COPY(ZEGRRenderTarget)
 	friend class ZEGRContext;
 	private:
-		const ZEGRTexture*			Owner;
-		bool						Bound;
+		const ZEGRTexture*					Owner;
+		bool								Bound;
 
 	protected:
-		ZEUInt						Width;
-		ZEUInt						Height;
-		ZEGRFormat					Format;
+		ZEUInt								Width;
+		ZEUInt								Height;
+		ZEGRFormat							Format;
 
-		void						SetOwner(const ZEGRTexture* OwnerTexture);
-		const ZEGRTexture*			GetOwner() const;
+		void								SetOwner(const ZEGRTexture* OwnerTexture);
+		const ZEGRTexture*					GetOwner() const;
 
-		void						SetBound(bool Bound);
-		bool						GetBound() const;
+		void								SetBound(bool Bound);
+		bool								GetBound() const;
 
-									ZEGRRenderTarget();
-									ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
-		virtual						~ZEGRRenderTarget();
+											ZEGRRenderTarget();
+											ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format);
+		virtual								~ZEGRRenderTarget();
 
 	public:
-		virtual ZEGRResourceType	GetResourceType() const;
+		virtual ZEGRResourceType			GetResourceType() const;
 
-		ZEUInt						GetWidth() const;
-		ZEUInt						GetHeight() const;
-		ZEGRFormat					GetFormat() const;
-		ZEVector2					GetPixelSize() const;
+		ZEUInt								GetWidth() const;
+		ZEUInt								GetHeight() const;
+		ZEGRFormat							GetFormat() const;
+		ZEVector2							GetPixelSize() const;
 };

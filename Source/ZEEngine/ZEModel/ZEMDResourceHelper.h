@@ -92,8 +92,8 @@ class ZEMDResourceHelper : public ZERSResource
 		void							SetUserDefinedProperties(ZEString UserDefinedProperties);
 		ZEString						GetUserDefinedProperties() const;
 
-		bool							Load(const ZEMLReaderNode& HelperNode);
-		bool							Save(ZEMLWriterNode& HelperNode) const;
+		bool							Unserialize(const ZEMLReaderNode& HelperNode);
+		bool							Serialize(ZEMLWriterNode& HelperNode) const;
 
 										ZEMDResourceHelper();
 };

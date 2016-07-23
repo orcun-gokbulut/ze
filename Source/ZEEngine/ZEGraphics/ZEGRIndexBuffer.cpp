@@ -37,6 +37,7 @@
 
 #include "ZEGraphics/ZEGRGraphicsModule.h"
 #include "ZEGRCounter.h"
+#include "ZEResource/ZERSTemplates.h"
 
 inline ZESize SizeOfIndex(ZEGRIndexBufferFormat Format)
 {
@@ -63,14 +64,11 @@ bool ZEGRIndexBuffer::Initialize(ZEUInt IndexCount, ZEGRIndexBufferFormat Format
 
 	SetSize(IndexCount * SizeOfIndex(Format));
 
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, IndexBuffer, Geometry);
-
 	return true;
 }
 
 void ZEGRIndexBuffer::Deinitialize()
 {
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, IndexBuffer, Geometry);
 	SetSize(0);
 }
 
@@ -94,11 +92,33 @@ ZEGRIndexBuffer::ZEGRIndexBuffer()
 	Format = ZEGR_IBF_NONE;
 }
 
-ZEHolder<ZEGRIndexBuffer> ZEGRIndexBuffer::Create(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+static ZERSResource* Instanciator()
 {
-	ZEHolder<ZEGRIndexBuffer> IndexBuffer = ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
-	if (!IndexBuffer->Initialize(IndexCount, Format))
+	return ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
+}
+
+ZEHolder<ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResource(ZEUInt IndexCount, ZEGRIndexBufferFormat Format)
+{
+	return ZERSTemplates::CreateResource<ZEGRIndexBuffer>(Instanciator);
+}
+
+ZEHolder<const ZEGRIndexBuffer> ZEGRIndexBuffer::CreateResourceShared(const ZEGUID& GUID, ZEUInt IndexCount, ZEGRIndexBufferFormat Format, ZEGRIndexBuffer** StagingResource)
+{
+	ZEGRIndexBuffer* StagingResourceTemp;
+	ZEHolder<const ZEGRIndexBuffer> Resource = ZERSTemplates::CreateResourceShared<ZEGRIndexBuffer>(GUID, &StagingResourceTemp, Instanciator);
+	if (Resource == NULL)
 		return NULL;
 
-	return IndexBuffer;
+	if (StagingResourceTemp != NULL)
+	{
+		if (!StagingResourceTemp->Initialize(IndexCount, Format))
+			return NULL;
+
+		if (StagingResource != NULL)
+			*StagingResource = StagingResourceTemp;
+		else
+			StagingResourceTemp->StagingRealized();
+	}
+
+	return Resource;
 }

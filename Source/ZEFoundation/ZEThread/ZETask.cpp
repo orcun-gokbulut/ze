@@ -115,10 +115,6 @@ void ZETask::Wait()
 
 ZETask::ZETask() : Link(this)
 {
-	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
-	if (Pool != NULL)
-		Pool->TaskDestroyed(this);
-
 	Status = ZE_TS2_NONE;
 	Priority = 0;
 	PoolId = ZE_TPI_DEFAULT;
@@ -127,5 +123,7 @@ ZETask::ZETask() : Link(this)
 
 ZETask::~ZETask()
 {
-
+	ZETaskPool* Pool = ZETaskManager::GetInstance()->GetPool(PoolId);
+	if (Pool != NULL)
+		Pool->TaskDestroyed(this);
 }

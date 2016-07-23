@@ -115,8 +115,8 @@ bool ZEATSkyBox::InitializeSelf()
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
 	VertexBuffer = SkyBox.CreateVertexBuffer();
 
-	ConstantBuffer = ZEGRConstantBuffer::Create(sizeof(Constants));
-	ConstantBufferTransform = ZEGRConstantBuffer::Create(sizeof(ZEMatrix4x4));
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	ConstantBufferTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 
 	return Update();
 }
