@@ -343,10 +343,6 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-
-	if (Link->Prev == NULL && Link->Next == NULL)
-		return;
-
 	zeDebugCheck(!Exists(Link), "Link is not in this list.");
 
 	if (Link->Prev == NULL)
