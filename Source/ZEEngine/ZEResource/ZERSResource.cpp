@@ -363,11 +363,12 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	Destroying = false;
 	UpdateStateTask.SetPool(ZE_TPI_IO);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, UpdateStateFunction, this));
+
+	ZERSResourceManager::GetInstance()->RegisterResource(this);
 }
 
 ZERSResource::~ZERSResource()
 {
-
 	if (Parent != NULL)
 		Parent->RemoveChildResource(this);
 
@@ -464,7 +465,7 @@ bool ZERSResource::IsStaged() const
 
 bool ZERSResource::IsLoaded() const
 {
-	return State >= ZERS_RS_LOADED;
+	return State > ZERS_RS_LOADING;
 }
 
 bool ZERSResource::IsFailed() const

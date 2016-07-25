@@ -67,6 +67,9 @@ bool ZERNMaterial::PreRender(ZERNCommand& Command) const
 
 bool ZERNMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
+	if (!IsInitialized() || !IsLoaded())
+		return false;
+
 	if (Context == NULL || Stage == NULL || !Stage->GetEnabled())
 		return false;
 

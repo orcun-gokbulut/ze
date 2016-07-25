@@ -102,8 +102,11 @@ void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNComma
 	Context->SetVertexBuffer(0, GetLOD()->VertexBufferBase);
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, GetLOD()->GetMesh()->ConstantBuffer);
 
-	GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage);
+	if (!GetMaterial()->SetupMaterial(Parameters->Context, Parameters->Stage))
+		return;
+
 	Context->Draw(GetCount(), GetOffset());
+
 	GetMaterial()->CleanupMaterial(Parameters->Context, Parameters->Stage);
 
 	/*Context->SetIndexBuffer(IndexBuffer);

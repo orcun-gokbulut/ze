@@ -40,7 +40,6 @@
 #include "ZEDS\ZEList2.h"
 #include "ZEDS\ZEDelegate.h"
 #include "ZEThread.h"
-#include "ZESignal.h"
 
 enum  ZETaskPoolId
 {
@@ -85,8 +84,6 @@ class ZETask
 	
 		ZETaskFunction					Function;
 		void*							Parameter;	
-
-		ZELock							TaskLock;
 		
 	public:
 		ZETaskStatus					GetStatus() const;

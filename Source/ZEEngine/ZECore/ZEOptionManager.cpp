@@ -226,7 +226,7 @@ bool ZEOptionManager::ListOptionsCommand(ZECommand* Command, const ZECommandPara
 					zeOutput("NULL\r\n");
 					break;
 				case ZE_VRT_STRING:
-					zeOutput("\"%s\"\r\n", Opt->GetValue().GetString());
+					zeOutput("\"%s\"\r\n", Opt->GetValue().GetString().ToCString());
 					break;
 				default:
 					zeOutput("Error\r\n");

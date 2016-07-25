@@ -40,6 +40,8 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
 
+static __declspec(thread) bool StagingInstanciator = false;
+
 void ZERSResourceManager::UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT])
 {
 	ManagerLock.Lock();
@@ -204,9 +206,16 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(const ZEString& 
 
 void ZERSResourceManager::RegisterResource(ZERSResource* Resource)
 {
-	ManagerLock.Lock();
-	RegisterResourceInternal(Resource);
-	ManagerLock.Unlock();
+	if (!StagingInstanciator)
+	{
+		ManagerLock.Lock();
+		RegisterResourceInternal(Resource);
+		ManagerLock.Unlock();
+	}
+	else
+	{
+		RegisterResourceInternal(Resource);
+	}
 }
 
 void ZERSResourceManager::UnregisterResource(ZERSResource* Resource)
@@ -236,7 +245,10 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(GUID);
 	if (Resource == NULL)
 	{
+		StagingInstanciator = true;
 		ZERSResource* NewResouce = Insanciator();
+		StagingInstanciator = false;
+
 		if (NewResouce == NULL)
 		{
 			ManagerLock.Unlock();
@@ -246,7 +258,6 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 		NewResouce->SetGUID(GUID);
 		NewResouce->State = ZERS_RS_STAGING;
 		NewResouce->TargetState = ZERS_RS_STAGED;
-		RegisterResourceInternal(NewResouce);
 		ShareResourceInternal(NewResouce);
 		ManagerLock.Unlock();
 
@@ -271,7 +282,10 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString
 	const ZERSResource* Resource = GetResourceInternal(FileName);
 	if (Resource == NULL)
 	{
+		StagingInstanciator = true;
 		ZERSResource* NewResouce = Insanciator();
+		StagingInstanciator = false;
+
 		if (NewResouce == NULL)
 		{
 			ManagerLock.Unlock();
@@ -282,7 +296,6 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString
 		NewResouce->FileNameHash = NewResouce->FileName.Lower().Hash();
 		NewResouce->State = ZERS_RS_STAGING;
 		NewResouce->TargetState = ZERS_RS_STAGED;
-		RegisterResourceInternal(NewResouce);
 		ShareResourceInternal(NewResouce);
 		ManagerLock.Unlock();
 

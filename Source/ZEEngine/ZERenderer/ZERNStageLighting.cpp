@@ -332,7 +332,8 @@ bool ZERNStageLighting::UpdateInputOutputs()
 	ZEUInt Height = AccumulationTexture->GetHeight();
 
 	if (TiledDeferredOutputTexture == NULL || 
-		TiledDeferredOutputTexture->GetWidth() != Width || TiledDeferredOutputTexture->GetHeight() != Height)
+		TiledDeferredOutputTexture->GetWidth() != Width * (ZEGRGraphicsModule::SAMPLE_COUNT == 4 ? 2 : 1) ||
+		TiledDeferredOutputTexture->GetHeight() != Height * (ZEGRGraphicsModule::SAMPLE_COUNT == 4 ? 2 : 1))
 	{
 		if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
 		{

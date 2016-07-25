@@ -58,6 +58,8 @@ class ZEConsoleInterface
 		virtual void			Output(const char* Output) = 0;
 		void					Input(const char* Input);
 
+		virtual void			Process() = 0;
+
 		virtual					~ZEConsoleInterface();
 };
 
@@ -92,6 +94,8 @@ class ZEConsole
 		void					Log(const char* Module, const char* Format, ...);
 		void					Output(const char* Format, ...);
 		void					Input(const char* Input);
+
+		void					Process();
 
 		static ZEConsole*		GetInstance();
 };

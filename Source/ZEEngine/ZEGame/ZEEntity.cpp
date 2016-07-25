@@ -252,7 +252,7 @@ void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 	BoundingBoxChanged();
 }
 
-ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
+ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters)
 {
 	/*zeLog("%s::ManageStates, State: %s, TargetState:%s", 
 		GetClass()->GetName(), 
@@ -261,7 +261,19 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 
 	if (State == ZE_ES_NONE)
 	{
-		if (TargetState == ZE_ES_LOADED || TargetState == ZE_ES_INITIALIZED)
+		if (TargetState == ZE_ES_DESTROYED)
+		{
+			State = ZE_ES_DESTROYING;
+
+			DestroyInternal();
+			
+			for (ZESize I = 0; I < Components.GetCount(); I++)
+				Components[I]->Destroy();
+
+			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+				ChildEntities[I]->Destroy();
+		}
+		else if (TargetState >= ZE_ES_LOADED)
 		{
 			State = ZE_ES_LOADING;
 			for (ZESize I = 0; I < Components.GetCount(); I++)
@@ -272,27 +284,11 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 
 			return ZE_TR_COOPERATING;
 		}
-		else if (TargetState == ZE_ES_DESTROYED)
-		{
-			TargetState = ZE_ES_DESTROYING;
 
-			for (ZESize I = 0; I < Components.GetCount(); I++)
-				Components[I]->Destroy();
-
-			for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-				ChildEntities[I]->Destroy();
-		}
-	}
-	else if (State == ZE_ES_DESTROYING)
-	{
-		if (ChildEntities.GetCount() != 0 || Components.GetCount() != 0)
-			return ZE_TR_COOPERATING;
-
-		State = ZE_ES_DESTROYED;
 	}
 	else if (State == ZE_ES_LOADED)
 	{
-		if (TargetState == ZE_ES_NONE)
+		if (TargetState < ZE_ES_LOADED)
 		{
 			State = ZE_ES_UNLOADING;
 
@@ -315,7 +311,7 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 	}
 	else if (State == ZE_ES_INITIALIZED)
 	{
-		if (TargetState == ZE_ES_LOADED || TargetState == ZE_ES_NONE)
+		if (TargetState < ZE_ES_INITIALIZED)
 		{
 			State = ZE_ES_DEINITIALIZING;
 
@@ -327,7 +323,16 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 		}
 	}
 	
-	if (State == ZE_ES_LOADING)
+	if (State == ZE_ES_DESTROYING)
+	{
+		if (ChildEntities.GetCount() != 0 || Components.GetCount() != 0)
+			return ZE_TR_COOPERATING;
+
+		State = ZE_ES_DESTROYED;
+		delete this;
+		return ZE_TR_DONE;
+	}
+	else if (State == ZE_ES_LOADING)
 	{
 		ZEEntityResult Result = LoadInternal();
 		if (Result == ZE_ER_DONE)
@@ -399,17 +404,21 @@ ZETaskResult ZEEntity::ManageStates(ZETaskThread* Thread, void* Parameters)
 			return ZE_TR_FAILED;
 		}
 	}
-	else if (State == ZE_ES_DESTROYED)
-	{
-		delete this;
-	}
 
 	return ZE_TR_DONE;
 }
 
-void ZEEntity::ManagetStatesSerial()
+void ZEEntity::UpdateStateSerial()
 {
-	while (ManageStates(NULL, 0) == ZE_TR_COOPERATING);
+	while (UpdateStateTaskFunction(NULL, 0) == ZE_TR_COOPERATING);
+}
+
+void ZEEntity::UpdateState()
+{
+	if (SerialOperation)
+		UpdateStateSerial();
+	else
+		UpdateStateTask.Run();
 }
 
 void ZEEntity::SetSerialOperation(bool SerialOperation)
@@ -420,6 +429,11 @@ void ZEEntity::SetSerialOperation(bool SerialOperation)
 bool ZEEntity::GetSerialOperation() const 
 {
 	return SerialOperation;
+}
+
+ZEEntityResult ZEEntity::DestroyInternal()
+{
+	return ZE_ER_DONE;
 }
 
 bool ZEEntity::InitializeSelf()
@@ -467,9 +481,9 @@ ZEEntity::ZEEntity()
 	Scale = ZEVector3::One;
 	Enabled = true;
 	Visible = true;
-	SerialOperation = true;
+	SerialOperation = false;
 	State = ZE_ES_NONE;
-	ManageTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, ManageStates, this));
+	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
 	Wrapper = NULL;
 	LocalTransformChanged();
 }
@@ -773,95 +787,99 @@ bool ZEEntity::IsLoaded() const
 	return State >= ZE_ES_LOADED;
 }
 
+bool ZEEntity::IsLoadedOrLoading() const
+{
+	return State >= ZE_ES_LOADING;
+}
+
 bool ZEEntity::IsInitialized() const
 {
-	return State == ZE_ES_INITIALIZED;
+	return State >= ZE_ES_INITIALIZED;
+}
+
+bool ZEEntity::IsInitializedOrInitializing() const
+{
+	return State >= ZE_ES_INITIALIZING;
 }
 
 bool ZEEntity::IsFailed() const
 {
-	return State <= ZE_ES_ERROR_LOADING;
+	return State <= 0;
+}
+
+bool ZEEntity::IsDestroyed() const
+{
+	return TargetState == ZE_ES_DESTROYED;
 }
 
 void ZEEntity::Initialize()
 {
-	if (TargetState == ZE_ES_INITIALIZED)
+	if (TargetState >= ZE_ES_INITIALIZED)
 		return;
-
-	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
+	
+	if (IsDestroyed())
 		return;
 
 	TargetState = ZE_ES_INITIALIZED;
 
-	if (SerialOperation)
-		ManagetStatesSerial();
-	else
-		ManageTask.Run();
-	
+	UpdateState();
 }
 
 void ZEEntity::Deinitialize()
 {
-	if (TargetState == ZE_ES_DEINITIALIZED)
+	if (TargetState <= ZE_ES_LOADED)
 		return;
 
-	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
+	if (IsDestroyed())
 		return;
 
-	if (TargetState >= ZE_ES_LOADED)
-		TargetState = ZE_ES_LOADED;
-	else
-		TargetState = ZE_ES_NONE;
-
-	if (SerialOperation)
-		ManagetStatesSerial();
-	else
-		ManageTask.Run();
+	UpdateState();
 }
 
 void ZEEntity::Load()
 {
-	if (TargetState == ZE_ES_LOADED)
+	if (TargetState >= ZE_ES_LOADED)
 		return;
 
-	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
+	if (IsDestroyed())
 		return;
 
 	TargetState = ZE_ES_LOADED;
 	
-	if (SerialOperation)
-		ManagetStatesSerial();
-	else
-		ManageTask.Run();
+	UpdateState();
 }
 
 void ZEEntity::Unload()
 {
-	if (TargetState == ZE_ES_NONE || TargetState == ZE_ES_UNLOADING)
+	if (TargetState <= ZE_ES_NONE)
 		return;
 
-	if (TargetState == ZE_ES_DESTROYING || TargetState == ZE_ES_DESTROYED)
+	if (IsDestroyed())
 		return;
 
-	while(State == ZE_ES_LOADING || State == ZE_ES_LOADING);
-
+	
 	TargetState = ZE_ES_NONE;
-	ManagetStatesSerial();
+
+	UpdateState();
 }
 
 void ZEEntity::Destroy()
 {
+	DestroyInternal();
+
 	if (GetParent() != NULL)
 		GetParent()->RemoveChildEntity(this);
 	else if (GetScene() != NULL)
 		GetScene()->RemoveEntity(this);
 
-	TargetState = ZE_ES_DESTROYED;
+	TargetState = ZE_ES_DESTROYING;
+
+	UpdateState();
 }
 
 void ZEEntity::Tick(float Time)
 {
-	   
+
 }
 
 bool ZEEntity::PreRender(const ZERNPreRenderParameters* Parameters)

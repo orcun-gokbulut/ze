@@ -45,6 +45,8 @@
 #include <windows.h>
 #endif
 
+ZELock ZE_BREAK_LOCK_INTERNAL;
+
 static void DefaultErrorCallback(ZEErrorType Level)
 {
 	if (Level >= ZE_ET_CRITICAL_ERROR)

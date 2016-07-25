@@ -96,7 +96,7 @@ INT_PTR CALLBACK ConsoleCallback(HWND hwndDlg, UINT uMsg, WPARAM wParam, LPARAM 
 		case WM_INITDIALOG:
 			SendMessage(GetDlgItem(hwndDlg, IDC_OUTPUT), EM_SETLIMITTEXT, 0, 0);
 			SendMessage(GetDlgItem(hwndDlg,IDC_INPUT), EM_SETLIMITTEXT, 99, 0);			
-			SendMessage(GetDlgItem(hwndDlg, IDC_OUTPUT), WM_SETFONT, (WPARAM)GetStockObject(ANSI_FIXED_FONT), MAKELPARAM(TRUE, 0));
+			SendMessage(GetDlgItem(hwndDlg, IDC_OUTPUT), WM_SETFONT, (WPARAM)GetStockObject(SYSTEM_FIXED_FONT), MAKELPARAM(TRUE, 0));
 			#ifdef ZE_PLATFORM_ARCHITECTURE_X64
 				OrgInputBoxCallback = (WNDPROC)SetWindowLongPtr(GetDlgItem(hwndDlg, IDC_INPUT), GWLP_WNDPROC, (LONG_PTR)InputBoxCallback);
 			#else
@@ -170,16 +170,20 @@ void ZEConsoleWindow::Deinitialize()
 	DestroyWindow((HWND)Handle);
 }
 
-void ZEConsoleWindow::ProcessConsole()
+void ZEConsoleWindow::Process()
 {
-	MSG msg;
-	if (PeekMessage(&msg, (HWND)Handle, 0, 0, PM_REMOVE))
+	BufferLock.Lock();
+	if (!Buffer.IsEmpty())
 	{
-		if (msg.message == WM_QUIT)
-			return;
-		TranslateMessage(&msg);
-		DispatchMessage(&msg);
+		SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)0, (LPARAM)-1);
+		SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
+		SendMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)Buffer.GetValue());
+
+		Buffer.Clear();
+
+		UpdateWindow((HWND)Handle);
 	}
+	BufferLock.Unlock();
 }
 
 void ZEConsoleWindow::EnableInput()
@@ -229,10 +233,27 @@ void ZEConsoleWindow::TerminationState()
 
 void ZEConsoleWindow::Output(const char* OutputText)
 {
-	PostMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT), EM_SETSEL, (WPARAM)-1, (LPARAM)-1);
-	PostMessage(GetDlgItem((HWND)Handle, IDC_OUTPUT) ,EM_REPLACESEL, (WPARAM)FALSE, (LPARAM)OutputText);
+	BufferLock.Lock();
+	const char* Current = OutputText;
+	const char* Start = Current;
 
-	UpdateWindow((HWND)Handle);
+	while (*Current != '\0')
+	{
+		if (*Current == '\n')
+		{
+			if (Current != Start)
+				Buffer.Append(Start, Current - Start - (Current != OutputText && Current[-1] == '\r' ? 1 : 0));
+
+			Buffer.Append("\r\n");
+			Start = Current + 1;
+		}
+		Current++;
+	}
+
+	if (Current != Start)
+		Buffer.Append(Start);
+
+	BufferLock.Unlock();
 }
 
 ZEConsoleWindow::ZEConsoleWindow(void)
