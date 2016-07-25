@@ -145,6 +145,8 @@ void ZETaskPool::Schedule(ZEThread* Thread, void* ExtraParameter)
 
 void ZETaskPool::Reschedule(ZETask* Task)
 {
+	Task->Status = ZE_TS2_WAITING;
+
 	ZEInt TaskEffectivePriority = Task->GetPriority();
 	ze_for_each_reverse(CurrentTask, Tasks)
 	{
@@ -180,13 +182,16 @@ void ZETaskPool::RunTask(ZETask* Task)
 void ZETaskPool::TaskDestroyed(ZETask* Task)
 {
 	SchedulerLock.Lock();
-	if (Task->GetStatus() != ZE_TS2_RUNNING)
+	if (Task->GetStatus() == ZE_TS2_WAITING)
 		Tasks.Remove(&Task->Link);
 	
-	ze_for_each(Thread, ActiveThreads)
+	if (Task->GetStatus() == ZE_TS2_RUNNING)
 	{
-		if (Thread->Task == Task)
-			Thread->TaskDestroyed = true;
+		ze_for_each(Thread, ActiveThreads)
+		{
+			if (Thread->Task == Task)
+				Thread->TaskDestroyed = true;
+		}
 	}
 
 	SchedulerLock.Unlock();

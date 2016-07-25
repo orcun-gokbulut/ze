@@ -1024,25 +1024,32 @@ ZESize ZEString::GetLength() const
 
 void ZEString::Append(const char* String)
 {
-	zeDebugCheck(String == NULL, "String parameter is invalid.");
-
-	if (Buffer == NULL)
-		SetValue(String);
-	else
-	{
-		BufferChanged = true;
-		ZESize Length = strlen(Buffer);
-		ZESize StringLength = strlen(String);
-		Allocator.Reallocate(&Buffer, (Length + StringLength + 1) * sizeof(char));
-		memcpy(Buffer + Length, String, (StringLength + 1) * sizeof(char));
-	}
-
-	ZEDebugCheckMemory();
+	Append(String, strlen(String));
 }
 
 void ZEString::Append(const ZEString& String)
 {
-	Append(String.GetValue());
+	Append(String.GetValue(), strlen(String.GetValue()));
+}
+
+void ZEString::Append(const char* String, ZESize Size)
+{
+	zeDebugCheck(String == NULL, "String parameter is invalid.");
+
+	if (Buffer == NULL)
+	{
+		SetValue(String, Size);
+	}
+	else
+	{
+		BufferChanged = true;
+		ZESize Length = strlen(Buffer);
+		Allocator.Reallocate(&Buffer, (Length + Size + 1) * sizeof(char));
+		memcpy(Buffer + Length, String, Size * sizeof(char));
+		Buffer[Length + Size] = '\0';
+	}
+	
+	ZEDebugCheckMemory();
 }
 
 void ZEString::Insert(const char* String)

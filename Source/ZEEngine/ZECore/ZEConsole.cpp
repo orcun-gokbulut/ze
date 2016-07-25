@@ -527,6 +527,12 @@ void ZEConsole::Input(const char* Input)
 	}
 }
 
+void ZEConsole::Process()
+{
+	if (ConsoleInterface != NULL)
+		ConsoleInterface->Process();
+}
+
 ZEConsole* ZEConsole::GetInstance()
 {
 	return ZECore::GetInstance()->GetConsole();

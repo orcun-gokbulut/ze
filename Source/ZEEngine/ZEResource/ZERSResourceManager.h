@@ -83,10 +83,11 @@ class ZERSResourceManager : public ZEObject
 
 		ZERSHolder<const ZERSResource>			GetResource(const ZEGUID& GUID);
 		ZERSHolder<const ZERSResource>			GetResource(const ZEString& FileName);
-
+	private:
 		void									RegisterResource(ZERSResource* Resource);
 		void									UnregisterResource(ZERSResource* Resource);
-
+	
+	public:
 		void									ShareResource(ZERSResource* Resource);
 		void									UnshareResource(ZERSResource* Resource);
 

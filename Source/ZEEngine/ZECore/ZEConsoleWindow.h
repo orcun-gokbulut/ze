@@ -43,21 +43,23 @@ class ZEConsoleWindow : public ZEConsoleInterface
 {
 	private:
 		void*					Handle;
+		ZEString				Buffer;
+		ZELock					BufferLock;
 
 	public:
-		bool					Initialize();
-		void					Deinitialize();
+		virtual bool			Initialize();
+		virtual void			Deinitialize();
 
-		void					EnableInput();
-		void					DisableInput();
+		virtual void			EnableInput();
+		virtual void			DisableInput();
 
-		void					ShowConsole();
-		void					HideConsole();
+		virtual void			ShowConsole();
+		virtual void			HideConsole();
 
-		void					Output(const char* OutputText);
+		virtual void			Output(const char* OutputText);
 		void					TerminationState();
 
-		void					ProcessConsole();
+		virtual void			Process();
 
 								ZEConsoleWindow();
 								~ZEConsoleWindow();

@@ -59,7 +59,7 @@
 
 void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 {
-	if (Entity->GetState() != ZE_ES_INITIALIZED)
+	if (Entity->IsInitialized())
 		return;
 
 	if (!Entity->GetEnabled())
@@ -80,7 +80,7 @@ void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 
 void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
-	if (Entity->GetState() < ZE_ES_LOADED)
+	if (Entity->IsLoaded())
 		return;
 	
 	if (!Entity->GetVisible())

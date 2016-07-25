@@ -86,20 +86,20 @@ ZE_ENUM(ZEEntityResult)
 
 ZE_ENUM(ZEEntityState)
 {
-	ZE_ES_ERROR_DEINITIALIZATION		= -6,
-	ZE_ES_ERROR_INITIALIZATION			= -5,
-	ZE_ES_ERROR_UNLOADING				= -4,
-	ZE_ES_ERROR_LOADING					= -3,
-	ZE_ES_DESTROYED						= -2,
-	ZE_ES_DESTROYING					= -1,
-	ZE_ES_NONE							= 0,
-	ZE_ES_UNLOADING						= 1,
-	ZE_ES_DEINITIALIZED					= 2,
-	ZE_ES_DEINITIALIZING				= 4,
-	ZE_ES_LOADING						= 5,
-	ZE_ES_LOADED						= 6,
+	ZE_ES_ERROR_DESTRUCTION				= -5,
+	ZE_ES_ERROR_DEINITIALIZATION		= -4,
+	ZE_ES_ERROR_INITIALIZATION			= -3,
+	ZE_ES_ERROR_UNLOADING				= -2,
+	ZE_ES_ERROR_LOADING					= -1,
+	ZE_ES_DESTROYED						= 0,
+	ZE_ES_DESTROYING					= 1,
+	ZE_ES_NONE							= 2,
+	ZE_ES_UNLOADING						= 3,
+	ZE_ES_LOADING						= 4,
+	ZE_ES_LOADED						= 5,
+	ZE_ES_DEINITIALIZING				= 6,
 	ZE_ES_INITIALIZING					= 7,
-	ZE_ES_INITIALIZED					= 8,
+	ZE_ES_INITIALIZED					= 8
 
 };
 
@@ -136,9 +136,10 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
-		ZETask									ManageTask;
-		ZETaskResult							ManageStates(ZETaskThread* Thread, void* Parameters);
-		void									ManagetStatesSerial();
+		ZETask									UpdateStateTask;
+		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters);
+		void									UpdateStateSerial();
+		void									UpdateState();
 
 		void									SetParent(ZEEntity* Parent);
 		void									SetScene(ZEScene* Scene);
@@ -148,6 +149,7 @@ class ZEEntity : public ZEObject
 		void									SetSerialOperation(bool SerialOperation);
 		bool									GetSerialOperation() const;
 
+		virtual ZEEntityResult					DestroyInternal();
 		virtual ZEEntityResult					LoadInternal();
 		virtual ZEEntityResult					UnloadInternal();
 		virtual ZEEntityResult					InitializeInternal();
@@ -231,8 +233,11 @@ class ZEEntity : public ZEObject
 
 		ZEEntityState							GetState() const;
 		bool									IsLoaded() const;
+		bool									IsLoadedOrLoading() const;
 		bool									IsInitialized() const;
+		bool									IsInitializedOrInitializing() const;
 		bool									IsFailed() const;
+		bool									IsDestroyed() const;
 
 		void									Initialize();
 		void									Deinitialize();

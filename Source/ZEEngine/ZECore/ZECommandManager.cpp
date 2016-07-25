@@ -72,7 +72,7 @@ bool ZECommandManager::Callback_ListSections(ZECommand* Command, const ZECommand
 					 "-----------------------------------------------\r\n");
 
 	for (ZESize I = Index; I < Sections.GetCount() && I <= Count; I++)
-		zeOutput(" %-30s      %d\r\n", Sections.GetItem(I)->GetName(), Sections.GetItem(I)->GetNumberOfCommands());
+		zeOutput(" %-30s      %d\r\n", Sections.GetItem(I)->GetName().ToCString(), Sections.GetItem(I)->GetNumberOfCommands());
 	return true;
 }
 

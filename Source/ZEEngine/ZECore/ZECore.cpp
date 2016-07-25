@@ -599,6 +599,7 @@ void ZECore::MainLoop()
 
 	TimerManager->Tick(ElapsedTime);
 	
+	GetConsole()->Process();
 	SystemMessageManager->ProcessMessages();
 
 	// Game Logic

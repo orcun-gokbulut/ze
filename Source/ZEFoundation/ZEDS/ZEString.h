@@ -162,6 +162,7 @@ class ZEString
 
 		void								Append(const ZEString& String);
 		void								Append(const char* String);
+		void								Append(const char* String, ZESize Size);
 		void								Insert(const ZEString& String);
 		void								Insert(const char* String);
 		void								Insert(ZESize Position, const ZEString& String);
@@ -176,11 +177,11 @@ class ZEString
 		bool								Equals(const ZEString& String) const;
 		bool								Equals(const char* String) const;
 
-		bool						EqualsIncase(const ZEString& String) const;
-		bool						EqualsIncase(const char* String) const;
+		bool								EqualsIncase(const ZEString& String) const;
+		bool								EqualsIncase(const char* String) const;
 
-		void						CopyTo(ZEString& String) const;
-		void						CopyFrom(const ZEString& String);
+		void								CopyTo(ZEString& String) const;
+		void								CopyFrom(const ZEString& String);
 
 		ZEString							Left(ZESize Count) const;
 		ZEString							Right(ZESize Count) const;

@@ -58,14 +58,14 @@ class ZERSTemplates
 		static ZERSHolder<const ZERSResourceClass>		GetResource(const ZEString& FileName);
 
 		template<typename ZERSResourceClass>
-		static ZERSHolder<ZERSResourceClass>			CreateResource(ZERSInstanciator Instanciator);
+		static ZERSHolder<ZERSResourceClass>			CreateResource(ZERSInstanciator Instanciator = NULL);
 		template<typename ZERSResourceClass>
-		static ZERSHolder<const ZERSResourceClass>		CreateResourceShared(const ZEGUID& GUID, ZERSResourceClass** StagingResource, ZERSInstanciator Instanciator);
+		static ZERSHolder<const ZERSResourceClass>		CreateResourceShared(const ZEGUID& GUID, ZERSResourceClass** StagingResource, ZERSInstanciator Instanciator = NULL);
 		
 		template<typename ZERSResourceClass>
-		static ZERSHolder<ZERSResourceClass>			LoadResource(const ZEString& FileName, ZERSInstanciator Instanciator);
+		static ZERSHolder<ZERSResourceClass>			LoadResource(const ZEString& FileName, ZERSInstanciator Instanciator = NULL);
 		template<typename ZERSResourceClass>
-		static ZERSHolder<const ZERSResourceClass>		LoadResourceShared(const ZEString& FileName, ZERSInstanciator Instanciator);
+		static ZERSHolder<const ZERSResourceClass>		LoadResourceShared(const ZEString& FileName, ZERSInstanciator Instanciator = NULL);
 };
 
 
@@ -135,8 +135,6 @@ ZERSHolder<ZERSResourceClass> ZERSTemplates::CreateResource(ZERSInstanciator Ins
 	if (Resource == NULL)
 		return NULL;
 
-	ZERSResourceManager::GetInstance()->RegisterResource(Resource);
-	
 	return Resource;
 }
 
@@ -173,7 +171,6 @@ ZERSHolder<ZERSResourceClass> ZERSTemplates::LoadResource(const ZEString& FileNa
 	if (Resource == NULL)
 		return NULL;
 
-	ZERSResourceManager::GetInstance()->RegisterResource(Resource);
 	Resource->StagingRealized();
 	Resource->Load(FileName);
 
