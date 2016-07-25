@@ -161,7 +161,7 @@ void ZETaskPool::Reschedule(ZETask* Task)
 void ZETaskPool::RunTask(ZETask* Task)
 {
 	SchedulerLock.Lock();
-	if (Task->Status == ZE_TS2_RUNNING)
+	if (Task->Status == ZE_TS2_RUNNING || Task->Status == ZE_TS2_WAITING)
 	{
 		SchedulerLock.Unlock();
 		return;
