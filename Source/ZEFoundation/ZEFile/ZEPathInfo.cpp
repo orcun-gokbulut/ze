@@ -405,6 +405,12 @@ ZEPathInfo::ZEPathInfo(const char* Path)
 
 ZEString ZEPathInfo::CombineRelativePath(const char* ParentFilePath, const char* Path)
 {
+	if (ParentFilePath == NULL || ParentFilePath[0] == '\0' ||
+		Path == NULL || Path[0] == '\0' )
+	{
+		return ZEString::Empty;
+	}
+
 	if (ZEPathInfo(Path).GetRoot() == ZE_PR_UNKOWN)
 	{
 		// No root in path. Relative.

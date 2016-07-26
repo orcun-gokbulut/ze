@@ -39,7 +39,7 @@
 
 #include "ZEGRShaderCompileOptions.h"
 
-struct ZEGRShaderMeta;
+class ZEGRShaderMeta;
 
 class ZEGRShaderCompiler : public ZEObject
 {

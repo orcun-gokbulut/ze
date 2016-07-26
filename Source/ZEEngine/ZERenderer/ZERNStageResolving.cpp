@@ -155,7 +155,7 @@ bool ZERNStageResolving::UpdateInputOutputs()
 
 		if (ResolvedInputTexture == NULL || 
 			ResolvedInputTexture->GetWidth() != Width || ResolvedInputTexture->GetHeight() != Height)
-			ResolvedInputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, InputTexture->GetFormat());
+			ResolvedInputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, InputTexture->GetFormat());
 	}
 	else
 	{
@@ -180,8 +180,8 @@ bool ZERNStageResolving::UpdateInputOutputs()
 			if (ResolvedGbufferEmissive == NULL || 
 				ResolvedGbufferEmissive->GetWidth() != Width || ResolvedGbufferEmissive->GetHeight() != Height)
 			{
-				ResolvedGbufferEmissive = ZEGRTexture2D::CreateInstance(Width, Height, 1, EmissiveTexture->GetFormat());
-				ResolvedGbufferDiffuse = ZEGRTexture2D::CreateInstance(Width, Height, 1, DiffuseTexture->GetFormat());
+				ResolvedGbufferEmissive = ZEGRTexture2D::CreateResource(Width, Height, 1, EmissiveTexture->GetFormat());
+				ResolvedGbufferDiffuse = ZEGRTexture2D::CreateResource(Width, Height, 1, DiffuseTexture->GetFormat());
 			}
 		}
 	}
@@ -202,8 +202,8 @@ bool ZERNStageResolving::UpdateInputOutputs()
 		if (ResolvedDepthTexture == NULL || 
 			ResolvedDepthTexture->GetWidth() != Width || ResolvedDepthTexture->GetHeight() != Height)
 		{
-			ResolvedNormalTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, NormalTexture->GetFormat());
-			ResolvedDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+			ResolvedNormalTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, NormalTexture->GetFormat());
+			ResolvedDepthTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
 		}
 	}
 	

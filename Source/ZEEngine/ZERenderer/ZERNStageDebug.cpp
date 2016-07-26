@@ -322,7 +322,7 @@ bool ZERNStageDebug::Setup(ZEGRContext* Context)
 	if (DepthMap == NULL || 
 		DepthMap->GetWidth() != Width || DepthMap->GetHeight() != Height)
 	{
-		DepthMap = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
+		DepthMap = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D24_UNORM_S8_UINT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL);
 	}
 
 	const ZEGRDepthStencilBuffer* DepthStencilBuffer = DepthMap->GetDepthStencilBuffer();

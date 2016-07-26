@@ -92,7 +92,7 @@ ZEGRIndexBuffer::ZEGRIndexBuffer()
 	Format = ZEGR_IBF_NONE;
 }
 
-static ZERSResource* Instanciator()
+static ZERSResource* Instanciator(const void*)
 {
 	return ZEGRGraphicsModule::GetInstance()->CreateIndexBuffer();
 }

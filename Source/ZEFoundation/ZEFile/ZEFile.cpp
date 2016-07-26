@@ -296,7 +296,7 @@ bool ZEFile::Open(const ZEString& FilePath, const ZEFileOpenMode FileOpenMode, c
 		return false;
 	}
 
-	Path = RealPath.Path;
+	Path = FilePath;
 	OpenMode = FileOpenMode;
 	CreationMode = FileCreationMode;
 

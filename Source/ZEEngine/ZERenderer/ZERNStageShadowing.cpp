@@ -44,7 +44,7 @@ bool ZERNStageShadowing::InitializeInternal()
 	if (!ZERNStage::InitializeInternal())
 		return false;
 
-	ProjectiveShadowMaps = ZEGRTexture2D::CreateInstance(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
+	ProjectiveShadowMaps = ZEGRTexture2D::CreateResource(512, 512, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, 4);
 
 	return true;
 }

@@ -42,42 +42,59 @@
 
 class ZEGRRenderTarget;
 
+class ZEGRTexture3DOptions : public ZEGRTextureOptions
+{
+	public:
+		ZEUInt									HorizontalTileCount;
+		ZEUInt									VerticalTileCount;
+
+												ZEGRTexture3DOptions();
+};
+
 class ZEGRTexture3D : public ZEGRTexture
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRTexture3D)
+	friend class ZERSTemplates;
+	private:
+		ZEUInt									Width;
+		ZEUInt									Height;
+		ZEUInt									Depth;
+		ZEGRTexture3DOptions					TextureOptions;
+
+		static ZERSResource*					Instanciator(const void* Parameter);
+
 	protected:
-		ZEUInt							Width;
-		ZEUInt							Height;
-		ZEUInt							Depth;
+		static bool								CheckParameters(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data);
 
-		virtual bool					Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlag, const void* Data);
-		virtual void					Deinitialize();	
+		virtual bool							Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlag, const void* Data);
+		virtual void							Deinitialize();	
 
-										ZEGRTexture3D();
+		ZETaskResult							LoadInternal();
+		ZETaskResult							UnloadInternal();
+
+												ZEGRTexture3D();
 
 	public:
-		virtual ZEGRResourceType		GetResourceType() const;
-		virtual ZEGRTextureType			GetTextureType() const;
+		virtual ZEGRResourceType				GetResourceType() const;
+		virtual ZEGRTextureType					GetTextureType() const;
 
-		ZEUInt							GetWidth() const;
-		ZEUInt							GetHeight() const;
-		ZEUInt							GetDepth() const;
-		ZEVector3						GetPixelSize() const;
+		ZEUInt									GetWidth() const;
+		ZEUInt									GetHeight() const;
+		ZEUInt									GetDepth() const;
+		ZEVector3								GetPixelSize() const;
 
-		virtual void					UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch) = 0;
+		virtual void							UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch) = 0;
 
-		virtual const ZEGRRenderTarget*	GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
+		virtual const ZEGRRenderTarget*			GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
 
-		static ZEHolder<ZEGRTexture3D>	Create(
-												ZEUInt Width, 
-												ZEUInt Height, 
-												ZEUInt Depth, 
-												ZEUInt LevelCount, 
-												ZEGRFormat Format, 
-												ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
-												ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
-												const void* Data = NULL);
+		static ZEHolder<ZEGRTexture3D>			CreateResource(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, 
+													ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+													const void* Data = NULL);
+		static ZEHolder<const ZEGRTexture3D>	CreateResourceShared(const ZEGUID& GUID, ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, 
+													ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+													const void* Data = NULL, ZEGRTexture3D** StagingResource = NULL);
 
-		static ZEHolder<ZEGRTexture3D>	CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		static ZEHolder<ZEGRTexture3D>			LoadResource(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions);
+		static ZEHolder<const ZEGRTexture3D>	LoadResourceShared(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions);
 };

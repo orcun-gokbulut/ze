@@ -88,7 +88,7 @@ class ZEALSoundSource : public ZESoundSource, public ZEALComponentBase
 
 		void						Update(float ElapsedTime);
 
-		virtual void				SetSoundResource(ZESoundResource* Resource);
+		virtual void				SetSoundResource(ZEHolder<const ZESoundResource> Resource);
 };
 
 #endif

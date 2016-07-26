@@ -246,7 +246,7 @@ ZETexture2DResource* ZETexture2DResource::LoadResource(ZEFile* ResourceFile, con
 	ZEGRFormat Format = sRGB ? ZEGR_TF_R8G8B8A8_UNORM_SRGB : ZEGR_TF_R8G8B8A8_UNORM;
 
 	ZEPointer<ZETexture2DResource, ZEDeletorRelease<ZETexture2DResource>> TextureResource = new ZETexture2DResource();	
-	TextureResource->Texture = ZEGRTexture2D::CreateInstance(TextureData.GetWidth(), TextureData.GetHeight(), FinalOptions.MaximumMipmapLevel, Format);
+	TextureResource->Texture = ZEGRTexture2D::CreateResource(TextureData.GetWidth(), TextureData.GetHeight(), FinalOptions.MaximumMipmapLevel, Format);
 	if (TextureResource->Texture == NULL)
 	{
 		zeError("Can not create texture resource. FileName : \"%s\"", ResourceFile->GetPath().GetValue());

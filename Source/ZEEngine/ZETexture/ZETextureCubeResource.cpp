@@ -224,13 +224,7 @@ ZETextureCubeResource* ZETextureCubeResource::LoadResource(ZEFile* ResourceFile,
 
 	// Create TextureCubeResource 
 	ZEPointer<ZETextureCubeResource, ZEDeletorRelease<ZETextureCubeResource>> TextureResource = new ZETextureCubeResource();
-	TextureResource->Texture = ZEGRTextureCube::CreateInstance(
-															TextureDataCube.GetWidth(), 
-															TextureDataCube.GetLevelCount(), 
-															TextureDataCube.GetPixelFormat(), 
-															ZEGR_RU_GPU_READ_ONLY, 
-															ZEGR_RBF_SHADER_RESOURCE, 
-															Data);
+	TextureResource->Texture = ZEGRTextureCube::CreateResource(TextureDataCube.GetWidth(), TextureDataCube.GetLevelCount(), TextureDataCube.GetPixelFormat(), ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, Data);
 
 	if (TextureResource->Texture == NULL)
 	{

@@ -57,78 +57,78 @@ class ZEATCloud : public ZEEntity
 {
 	ZE_OBJECT
 	private:
-		ZEFlags							DirtyFlags;
-		ZERNCommand						RenderCommand;
+		ZEFlags									DirtyFlags;
+		ZERNCommand								RenderCommand;
 
-		ZEHolder<ZEGRShader>			PlaneVertexShader;
-		ZEHolder<ZEGRShader>			PlaneHullShader;
-		ZEHolder<ZEGRShader>			PlaneDomainShader;
-		ZEHolder<ZEGRShader>			PlanePixelShader;
-		ZEHolder<ZEGRRenderStateData>	PlaneRenderStateData;
-		ZEHolder<ZEGRVertexBuffer>		PlaneVertexBuffer;
-		ZEHolder<ZEGRConstantBuffer>	PlaneTransformConstantBuffer;
+		ZEHolder<ZEGRShader>					PlaneVertexShader;
+		ZEHolder<ZEGRShader>					PlaneHullShader;
+		ZEHolder<ZEGRShader>					PlaneDomainShader;
+		ZEHolder<ZEGRShader>					PlanePixelShader;
+		ZEHolder<ZEGRRenderStateData>			PlaneRenderStateData;
+		ZEHolder<ZEGRVertexBuffer>				PlaneVertexBuffer;
+		ZEHolder<ZEGRConstantBuffer>			PlaneTransformConstantBuffer;
 
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 
-		ZEHolder<ZEGRTexture2D>			CloudTexture;
+		ZEHolder<const ZEGRTexture2D>			CloudTexture;
 
 		struct  
 		{
-			float						PlaneSubdivision;
-			float						CloudCoverage;
-			float						CloudDensity;
-			float						Reserved0;
+			float								PlaneSubdivision;
+			float								CloudCoverage;
+			float								CloudDensity;
+			float								Reserved0;
 
-			ZEVector3					LightColor;
-			float						Inscattering;
+			ZEVector3							LightColor;
+			float								Inscattering;
 
-			ZEVector3					LightDirection;
-			float						Reserved1;
+			ZEVector3							LightDirection;
+			float								Reserved1;
 
-			ZEVector2					Translation;
-			ZEVector2					Reserved2;
+			ZEVector2							Translation;
+			ZEVector2							Reserved2;
 		} Constants;
 
-		void							CreatePlane();
+		void									CreatePlane();
 
-		bool							UpdateShaders();
-		bool							UpdateRenderStates();
-		bool							UpdateConstantBuffers();
-		bool							Update();
+		bool									UpdateShaders();
+		bool									UpdateRenderStates();
+		bool									UpdateConstantBuffers();
+		bool									Update();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual bool							InitializeSelf();
+		virtual bool							DeinitializeSelf();
 
-										ZEATCloud();
-		virtual							~ZEATCloud();
+												ZEATCloud();
+		virtual									~ZEATCloud();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
+		virtual ZEDrawFlags						GetDrawFlags() const;
 
-		void							SetCloudTexture(const ZEString& FileName);
-		const ZEString&					GetCloudTexture() const;
+		void									SetCloudTexture(const ZEString& FileName);
+		const ZEString&							GetCloudTexture() const;
 
-		void							SetCloudCoverage(float CloudCoverage);
-		float							GetCloudCoverage() const;
+		void									SetCloudCoverage(float CloudCoverage);
+		float									GetCloudCoverage() const;
 
-		void							SetCloudDensity(float CloudDensity);
-		float							GetCloudDensity() const;
+		void									SetCloudDensity(float CloudDensity);
+		float									GetCloudDensity() const;
 
-		void							SetLightColor(const ZEVector3& LightColor);
-		const ZEVector3&				GetLightColor() const;
+		void									SetLightColor(const ZEVector3& LightColor);
+		const ZEVector3&						GetLightColor() const;
 
-		void							SetInscattering(float Inscattering);
-		float							GetInscattering() const;
+		void									SetInscattering(float Inscattering);
+		float									GetInscattering() const;
 
-		void							SetLightDirection(const ZEVector3& SunDirection);
-		const ZEVector3&				GetLightDirection() const;
+		void									SetLightDirection(const ZEVector3& SunDirection);
+		const ZEVector3&						GetLightDirection() const;
 
-		void							SetTranslation(const ZEVector2& Translation);
-		const ZEVector2&				GetTranslation() const;
+		void									SetTranslation(const ZEVector2& Translation);
+		const ZEVector2&						GetTranslation() const;
 
-		virtual void					Tick(float Time);
-		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual void							Tick(float Time);
+		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
+		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		static ZEATCloud*				CreateInstance();
+		static ZEATCloud*						CreateInstance();
 };

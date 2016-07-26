@@ -178,7 +178,7 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 		return;
 
 	ZEUInt Size = ZELight::ConvertShadowResolution(ShadowResolution);
-	CascadeShadowMaps = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, Cascades.GetCount());
+	CascadeShadowMaps = ZEGRTexture2D::CreateResource(Size, Size, 1, ZEGR_TF_D32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_DEPTH_STENCIL, Cascades.GetCount());
 
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }

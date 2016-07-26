@@ -113,7 +113,7 @@ ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
 	}
 }
 
-static ZERSResource* Instanciator()
+static ZERSResource* Instanciator(const void*)
 {
 	return ZEGRGraphicsModule::GetInstance()->CreateStructuredBuffer();
 }

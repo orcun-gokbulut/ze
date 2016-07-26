@@ -56,12 +56,16 @@ struct ZERect
 	ZEInt Width, Height;
 };
 
-struct ZEGRTextureOptions
+class ZEGRTextureOptions : public ZEObject
 {
-	ZEGRFormat					CompressionFormat;
-	ZEUInt						MaximumMipmapLevel;
-	bool						GenerateMipMaps;
-	bool						sRGB;
+	ZE_OBJECT
+	public:
+		ZEGRFormat					CompressionFormat;
+		ZEUInt						MaximumMipmapLevel;
+		bool						GenerateMipMaps;
+		bool						sRGB;
+
+									ZEGRTextureOptions();
 };
 
 class ZEGRRenderTarget;

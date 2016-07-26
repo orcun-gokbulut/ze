@@ -233,13 +233,15 @@ const ZEVector3& ZEATMoon::GetColor() const
 
 void ZEATMoon::SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount)
 {
-	ZEGRTextureOptions TextureOptions;
+	ZEGRTexture3DOptions TextureOptions;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
+	TextureOptions.HorizontalTileCount = HorizTileCount;
+	TextureOptions.VerticalTileCount = VertTileCount;
 
-	PhaseTexture = ZEGRTexture3D::CreateFromFile(FileName, TextureOptions, HorizTileCount, VertTileCount);
+	PhaseTexture = ZEGRTexture3D::LoadResourceShared(FileName, TextureOptions);
 }
 
 const ZEString& ZEATMoon::GetTextureFile() const

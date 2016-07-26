@@ -34,8 +34,140 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResourceWAV.h"
+
 #include "ZEError.h"
+#include "ZEFile/ZEFile.h"
+
 #include <memory.h>
+
+ZEPackStruct
+(
+	struct ZEWAVRiffHeader
+	{	
+		ZEUInt32	Header;
+		ZEUInt32	Size;
+		ZEUInt32	Format;
+	}
+);
+
+ZEPackStruct
+(
+	struct ZEWAVFMTHeader
+	{ 
+		ZEUInt32 Header;      
+		ZEUInt32 Size;    
+		ZEUInt16 AudioFormat;
+		ZEUInt16 NumChannels;     
+		ZEUInt32 SampleRate;       
+		ZEUInt32 ByteRate;         
+		ZEUInt16 BlockAlign;       
+		ZEUInt16 BitsPerSample;
+	};
+);
+
+ZEPackStruct
+(
+	struct ZEWAVDataHeader
+	{
+		ZEUInt32 Header;    
+		ZEUInt32 Size;     
+	}
+);
+
+ZETaskResult ZESoundResourceWAV::LoadInternal()
+{
+	ZEFile File;
+	if (!File.Open(GetFileName(), ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot load sound resource. Cannot open wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	ZEWAVRiffHeader RiffHeader;
+	if (File.Read(&RiffHeader, sizeof(RiffHeader), 1) != 1)
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (RiffHeader.Header != 'FFIR')
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (RiffHeader.Format != 'EVAW')
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	ZEWAVFMTHeader FMTHeader;
+	if (File.Read(&FMTHeader, sizeof(FMTHeader), 1) != 1)
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (FMTHeader.Header != ' tmf')
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (FMTHeader.AudioFormat != 1)
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	ZEWAVDataHeader DataHeader;
+	if (File.Read(&DataHeader, sizeof(DataHeader), 1) != 1)
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (DataHeader.Header != 'atad')
+	{
+		zeError("Cannot load sound resource. Corrupted or unknown wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	BitsPerSample = FMTHeader.BitsPerSample;
+	BlockAlign = FMTHeader.BlockAlign;
+	ChannelCount = FMTHeader.NumChannels;
+	SamplesPerSecond = (ZESize)FMTHeader.SampleRate;
+	DataSize = (ZESize)DataHeader.Size;
+	SampleCount = DataSize / BlockAlign;
+	Data = new ZEBYTE[DataSize];
+	
+	if (File.Read(Data, DataSize, 1) != 1)
+	{
+		zeError("Cannot load sound resource. Cannot read data in file. Corrupted wav file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	File.Close();
+
+	return ZE_TR_DONE;
+}
+
+ZETaskResult ZESoundResourceWAV::UnloadInternal()
+{
+	if (Data != NULL)
+		delete Data;
+
+	Data = NULL;
+	DataSize = 0;
+	ChannelCount = 0;
+	BitsPerSample = 0;
+	SamplesPerSecond = 0;
+	BlockAlign = 0;
+	SampleCount = 0;
+
+	return ZE_TR_DONE;
+}
 
 ZESoundResourceWAV::ZESoundResourceWAV()
 {
@@ -58,92 +190,15 @@ const void* ZESoundResourceWAV::GetData() const
 	return Data;
 }
 
-void ZESoundResourceWAV::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
+bool ZESoundResourceWAV::Decode(void* Buffer, ZESize SampleIndex, ZESize Count) const
 {
-	zeDebugCheck(SampleIndex + Count > SampleCount, "Sample decoding range (SampleIndex + Count) exceed sample count.");
+	if (!IsLoaded() || SampleIndex + Count > SampleCount)
+	{
+		memcpy(Buffer, 0, Count);
+		return false;
+	}
+
 	memcpy(Buffer, (ZEUInt8*)Data + SampleIndex * BlockAlign, Count * BlockAlign);
-}
 
-ZESoundResource* ZESoundResourceWAV::LoadResource(const ZEString& FileName)
-{
-	bool Result;
-	ZEFile File;
-	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-	if (!Result)
-	{
-		zeError("Can not load WAV resource. Can not open file. (Filename : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-
-	struct
-	{	
-		ZEUInt	Header;
-		ZEUInt	Size;
-		ZEUInt	Format;
-	} Riff;
-
-	struct
-	{ 
-		ZEUInt	Header;      
-		ZEUInt	Size;    
-		unsigned short	AudioFormat;
-		unsigned short	NumChannels;     
-		ZEUInt	SampleRate;       
-		ZEUInt	ByteRate;         
-		unsigned short	BlockAlign;       
-		unsigned short	BitsPerSample;
-	}Fmt;
-
-	struct
-	{
-		ZEUInt	Header;    
-		ZEUInt	Size;     
-	}Data;
-
-	File.Read(&Riff, sizeof(Riff), 1);
-	if (Riff.Header != 'FFIR')
-	{
-		zeError("Wrong wave file. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-
-	if (Riff.Format != 'EVAW')
-	{
-		zeError("Wave file format it not supported. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-
-	File.Read(&Fmt, sizeof(Fmt), 1);
-	if (Fmt.Header != ' tmf')
-	{
-		zeError("Wrong wave file. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-	
-	if (Fmt.AudioFormat != 1)
-	{
-		zeError("Wave file audio format it not supported. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-
-	File.Read(&Data, sizeof(Data), 1);
-	if (Data.Header != 'atad')
-	{
-		zeError("Wrong wave file. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-
-	ZESoundResourceWAV* NewResource = new ZESoundResourceWAV();
-	NewResource->SetFileName(FileName);
-	NewResource->BitsPerSample		= Fmt.BitsPerSample;
-	NewResource->BlockAlign			= Fmt.BlockAlign;
-	NewResource->ChannelCount		= Fmt.NumChannels;
-	NewResource->SamplesPerSecond	= (ZESize)Fmt.SampleRate;
-	NewResource->DataSize			= (ZESize)Data.Size;
-	NewResource->SampleCount			= NewResource->DataSize / NewResource->BlockAlign;
-	NewResource->Data				= new unsigned char[NewResource->DataSize];
-	File.Read(NewResource->Data, 1, NewResource->DataSize);	
-	File.Close();
-
-	return NewResource;
+	return true;
 }

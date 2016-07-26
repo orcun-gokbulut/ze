@@ -42,6 +42,15 @@
 #include "ZEGRDepthStencilBuffer.h"
 #include "ZEGRRenderTarget.h"
 
+
+ZEGRTextureOptions::ZEGRTextureOptions()
+{
+	CompressionFormat = ZEGR_TF_NONE;
+	MaximumMipmapLevel = 0;
+	GenerateMipMaps = false;
+	sRGB = false;
+}
+
 void ZEGRTexture::SetFormat(ZEGRFormat Format)
 {
 	this->Format = Format;
@@ -159,3 +168,4 @@ ZEUInt ZEGRTexture::GetLevelCount() const
 {
 	return LevelCount;
 }
+

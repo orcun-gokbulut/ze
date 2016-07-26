@@ -62,5 +62,5 @@ class ZERNMaterial : public ZERSResource, public ZEInitializable
 		virtual bool					SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 		virtual void					CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const;
 
-		virtual bool					Update() const;
+		virtual bool					Update() const;	
 };

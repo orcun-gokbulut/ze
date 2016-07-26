@@ -34,32 +34,44 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResource.h"
+
 #include "ZEError.h"
-#include "ZECore/ZEConsole.h"
-#include "ZECore/ZEResourceManager.h"
+#include "ZEFile/ZEPathInfo.h"
 #include "ZESoundResourceMP3.h"
 #include "ZESoundResourceOGG.h"
 #include "ZESoundResourceWAV.h"
+#include "ZEResource/ZERSTemplates.h"
 
-ZESoundFileFormat ZESoundResource::GetFileFormat(const ZEString& FileName)
+
+ZESoundResource::ZESoundResource()
 {
-	if (FileName.Right(3).Lower() == "mp3")
-	{
-		return ZE_SFF_MP3;
-	}
-	else if(FileName.Right(3).Lower() == "wav")
-	{
-		return  ZE_SFF_WAVE;
-	}
-	else if(FileName.Right(3).Lower() == "ogg")
-	{
-		return  ZE_SFF_OGG;
-	}
-	else
-	{
-		return  ZE_SFF_NONE;
-	}
+	FileFormat = ZE_SFF_NONE;
+	SampleCount = 0;
+	SamplesPerSecond = 0;
+	ChannelCount = 0;
+	BitsPerSample = 0;
+	BlockAlign = 0;
 }
+
+ZESoundResource::~ZESoundResource()
+{
+
+}
+
+ZERSResource* ZESoundResource::Instanciator(const void* Parameters)
+{
+	ZEPathInfo FileInfo(*reinterpret_cast<const ZEString*>(Parameters));
+
+	if (FileInfo.GetExtension().Lower() == "mp3")
+		return new ZESoundResourceMP3();
+	else if(FileInfo.GetExtension().Lower() == "wav")
+		return  new ZESoundResourceWAV();
+	else if(FileInfo.GetExtension().Lower() == "ogg")
+		return  new ZESoundResourceOGG();
+	
+	return  NULL;
+}
+
 
 const char* ZESoundResource::GetResourceType() const
 {
@@ -101,89 +113,12 @@ ZESize ZESoundResource::GetUncompressedDataSize() const
 	return SampleCount * BlockAlign;
 }
 
-ZESoundResource* ZESoundResource::LoadResource(const ZEString& FileName)
+ZEHolder<ZESoundResource> ZESoundResource::LoadResource(const ZEString& FileName)
 {
-	zeLog("Loading sound file \"%s\"", FileName.ToCString());
-
-	ZESoundResource* Temp = NULL;
-	switch(GetFileFormat(FileName))
-	{
-		case ZE_SFF_WAVE:		
-			Temp = ZESoundResourceWAV::LoadResource(FileName);
-			break;
-			
-		case ZE_SFF_OGG:
-			Temp = ZESoundResourceOGG::LoadResource(FileName);
-			break;
-		
-		case ZE_SFF_MP3:
-			Temp = ZESoundResourceMP3::LoadResource(FileName);
-			break;
-
-		default:	
-		case ZE_SFF_NONE:			
-			zeError("Unknown sound file format. (FileName : \"%s\")" , FileName.ToCString());
-			return NULL;
-			break;
-	}
-
-	if (Temp == NULL)
-	{
-		zeError("Could not load sound file. (FileName : \"%s\")" , FileName.ToCString());
-		return NULL;
-	}
-
-	zeLog("Sound file \"%s\" has been loaded.", FileName.ToCString());
-
-	return Temp;
+	return ZERSTemplates::LoadResource<ZESoundResource>(FileName, Instanciator, &FileName);
 }
 
-ZESoundResource* ZESoundResource::LoadSharedResource(const ZEString& FileName)
+ZEHolder<const ZESoundResource> ZESoundResource::LoadResourceShared(const ZEString& FileName)
 {
-	ZESoundResource* NewResource =(ZESoundResource*)zeResources->GetResource(FileName);
-	if (NewResource == NULL)
-	{
-		NewResource = LoadResource(FileName);
-		if (NewResource != NULL)
-		{
-			NewResource->Cached = false;
-			NewResource->ReferenceCount = 1;
-			zeResources->AddResource(NewResource);
-			return NewResource;
-		}
-		else
-			return NULL;
-	}
-	else
-		return NewResource;
-}
-
-void ZESoundResource::CacheResource(const ZEString& FileName)
-{
-	ZESoundResource* NewResource = (ZESoundResource*)zeResources->GetResource(FileName);
-	if (NewResource == NULL)
-	{
-		NewResource = LoadResource(FileName);
-		if (NewResource != NULL)
-		{
-			NewResource->Cached = true;
-			NewResource->ReferenceCount = 0;
-			zeResources->AddResource(NewResource);
-		}
-	}
-}
-
-ZESoundResource::ZESoundResource()
-{
-	FileFormat = ZE_SFF_NONE;
-	SampleCount = 0;
-	SamplesPerSecond = 0;
-	ChannelCount = 0;
-	BitsPerSample = 0;
-	BlockAlign = 0;
-}
-
-ZESoundResource::~ZESoundResource()
-{
-
+	return ZERSTemplates::LoadResourceShared<ZESoundResource>(FileName, Instanciator, &FileName);
 }

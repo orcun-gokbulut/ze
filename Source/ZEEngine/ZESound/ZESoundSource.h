@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_SOURCE_H__
-#define __ZE_SOUND_SOURCE_H__
 
 #include "ZETypes.h"
 #include "ZEGame/ZEEntity.h"
@@ -54,7 +52,7 @@
 
 #define ZE_SS_MAX_TYPE 256
 
-enum ZESoundSourceType
+ZE_ENUM(ZESoundSourceType)
 {
 	ZE_SST_NONE					= 0,
 	ZE_SST_EFFECT				= 1,
@@ -64,7 +62,7 @@ enum ZESoundSourceType
 	ZE_SST_PLAYER_COMM			= 5
 };
 
-enum  ZESoundSourceState
+ZE_ENUM(ZESoundSourceState)
 {
 	ZE_SSS_NONE,
 	ZE_SSS_PLAYING,
@@ -77,94 +75,92 @@ class ZESoundSourceEffect;
 class ZESoundSource : public ZEEntity
 {
 	ZE_OBJECT
-
 	private:
-		ZESize						StartPosition;
-		ZESize						EndPosition;
+		ZESize								StartPosition;
+		ZESize								EndPosition;
 
 	protected:
-		ZESoundResource*			SoundResource;
-		ZESoundSourceState			SoundSourceState;
-		ZESoundSourceType			SoundSourceType;
+		ZEHolder<const ZESoundResource>		SoundResource;
+		ZESoundSourceState					SoundSourceState;
+		ZESoundSourceType					SoundSourceType;
 
-		ZEInt						Pan;
-		float						PlaybackSpeed;
-		ZEUInt						Volume;
-		bool						Looping;
-		bool						Streaming;
+		ZEInt								Pan;
+		float								PlaybackSpeed;
+		ZEUInt								Volume;
+		bool								Looping;
+		bool								Streaming;
 
-		ZESize						CurrentPosition;
-		ZESize						LocalOldPosition;
+		ZESize								CurrentPosition;
+		ZESize								LocalOldPosition;
 
-		ZESize						EffectiveStartPosition;
-		ZESize						EffectiveEndPosition;
-		bool						LimitsEnabled;
+		ZESize								EffectiveStartPosition;
+		ZESize								EffectiveEndPosition;
+		bool								LimitsEnabled;
 
-		void						ResetParameters();
+		void								ResetParameters();
 
-									ZESoundSource();
-		virtual 					~ZESoundSource();
+											ZESoundSource();
+		virtual 							~ZESoundSource();
 
 	public:
-		bool						IsStreaming() const;
+		bool								IsStreaming() const;
 
-		virtual void				SetSoundSourceState(ZESoundSourceState State) = 0;
-		ZESoundSourceState			GetSoundSourceState() const;
+		virtual void						SetSoundSourceState(ZESoundSourceState State) = 0;
+		ZESoundSourceState					GetSoundSourceState() const;
 	
-		ZESoundSourceType			GetSoundSourceType();
-		void						SetSoundSourceType(ZESoundSourceType Type);
+		ZESoundSourceType					GetSoundSourceType();
+		void								SetSoundSourceType(ZESoundSourceType Type);
 
-		virtual void				SetCurrentPosition(ZESize SampleIndex);
-		void						SetCurrentPositionTime(float Seconds);
-		void						SetCurrentPositionPersentage(float Percent);
+		virtual void						SetCurrentPosition(ZESize SampleIndex);
+		void								SetCurrentPositionTime(float Seconds);
+		void								SetCurrentPositionPersentage(float Percent);
 
-		ZESize						GetCurrentPosition() const;
-		ZEUInt						GetCurrentPositionTime() const;
-		float						GetCurrentPositionPersentage() const;
+		ZESize								GetCurrentPosition() const;
+		ZEUInt								GetCurrentPositionTime() const;
+		float								GetCurrentPositionPersentage() const;
 
-		void						SetLimitsEnabled(bool Enabled);
-		bool						GetLimitsEnabled() const;
+		void								SetLimitsEnabled(bool Enabled);
+		bool								GetLimitsEnabled() const;
 
-		virtual void				SetStartPosition(ZESize SampleIndex);
-		void						SetStartPositionTime(float Seconds);
-		void						SetStartPositionPersentage(float Percent);
+		virtual void						SetStartPosition(ZESize SampleIndex);
+		void								SetStartPositionTime(float Seconds);
+		void								SetStartPositionPersentage(float Percent);
 
-		ZESize						GetStartPosition() const;
-		float						GetStartPositionTime() const;
-		float						GetStartPositionPersentage() const;
+		ZESize								GetStartPosition() const;
+		float								GetStartPositionTime() const;
+		float								GetStartPositionPersentage() const;
 
-		virtual void				SetEndPosition(ZESize SampleIndex);
-		void						SetEndPositionTime(float Seconds);
-		void						SetEndPositionPercentage(float Percentage);
+		virtual void						SetEndPosition(ZESize SampleIndex);
+		void								SetEndPositionTime(float Seconds);
+		void								SetEndPositionPercentage(float Percentage);
 
-		ZESize						GetEndPosition() const;
-		float						GetEndPositionTime() const;
-		float						GetEndPositionPercentage() const;
+		ZESize								GetEndPosition() const;
+		float								GetEndPositionTime() const;
+		float								GetEndPositionPercentage() const;
 
-		virtual void				SetLooping(bool Enabled) = 0;
-		bool						GetLooping() const;
+		virtual void						SetLooping(bool Enabled) = 0;
+		bool								GetLooping() const;
 
-		ZESize						GetLoopingLength();
-		float						GetLoopingLenghtTime();
-		float						GetLoopingLenghtPercent();
+		ZESize								GetLoopingLength();
+		float								GetLoopingLenghtTime();
+		float								GetLoopingLenghtPercent();
 
-		virtual void				SetPan(ZEInt NewPan) = 0;
-		ZEInt						GetPan() const;
+		virtual void						SetPan(ZEInt NewPan) = 0;
+		ZEInt								GetPan() const;
 							
-		virtual void				SetPlaybackSpeed(float Speed);
-		float						GetPlaybackSpeed() const;
-												
-		virtual void				SetVolume(ZEUInt NewVolume) = 0;
-		ZEUInt						GetVolume() const;
+		virtual void						SetPlaybackSpeed(float Speed);
+		float								GetPlaybackSpeed() const;
+														
+		virtual void						SetVolume(ZEUInt NewVolume) = 0;
+		ZEUInt								GetVolume() const;
 						
-		virtual void				Play() = 0;
-		virtual void				Resume() = 0;
-		virtual void				Pause() = 0;
-		virtual void				Stop() = 0;
+		virtual void						Play() = 0;
+		virtual void						Resume() = 0;
+		virtual void						Pause() = 0;
+		virtual void						Stop() = 0;
 
-		virtual void				SetSoundResource(ZESoundResource* Resource) = 0;
-		ZESoundResource*			GetSoundResource() const;
+		virtual void						SetSoundResource(ZEHolder<const ZESoundResource> Resource) = 0;
+		ZEHolder<const ZESoundResource>		GetSoundResource() const;
 
-		static ZESoundSource*		CreateInstance();
+		static ZESoundSource*				CreateInstance();
 };
-#endif

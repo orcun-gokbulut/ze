@@ -77,7 +77,7 @@ void ZEUIFontTrueType::SetFontSize(ZEUInt32 FontSize)
 void ZEUIFontTrueType::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
 {
 	Textures.Add();
-	Textures.GetLastItem() = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	Textures.GetLastItem() = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 }
 
 const char* ZEUIFontTrueType::GetResourceType() const

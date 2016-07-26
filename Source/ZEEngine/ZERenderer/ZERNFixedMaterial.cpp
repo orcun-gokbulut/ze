@@ -261,66 +261,6 @@ bool ZERNFixedMaterial::UpdateConstantBuffer()
 	return true;
 }
 
-bool ZERNFixedMaterial::UpdateTextures()
-{
-	if (!UpdateTexture(BaseMap.GetPointer(), BaseMapFile, ZEGR_TF_BC1_UNORM_SRGB, true, 0, true))
-		return false;
-
-	if (!UpdateTexture(SpecularMap.GetPointer(), SpecularMapFile, ZEGR_TF_BC4_UNORM, true, 0, true))
-		return false;
-
-	if (!UpdateTexture(SpecularGlossMap.GetPointer(), SpecularGlossMapFile, ZEGR_TF_BC4_UNORM, true, 0, false))
-		return false;
-
-	if (!UpdateTexture(EmissiveMap.GetPointer(), EmissiveMapFile, ZEGR_TF_BC1_UNORM_SRGB, true, 0, true))
-		return false;
-
-	if (!UpdateTexture(NormalMap.GetPointer(), NormalMapFile, ZEGR_TF_BC5_UNORM, true, 0, false))
-		return false;
-
-	if (!UpdateTexture(HeightMap.GetPointer(), HeightMapFile, ZEGR_TF_BC4_UNORM, true, 0, false))
-		return false;
-
-	if (!UpdateTexture(OpacityMap.GetPointer(), OpacityMapFile, ZEGR_TF_BC4_UNORM, true, 0, false))
-		return false;
-
-	if (!UpdateTexture(SubSurfaceScatteringMap.GetPointer(), SubSurfaceScatteringMapFile, ZEGR_TF_BC4_UNORM, true, 0, false))
-		return false;
-
-	if (!UpdateTexture(EnvironmentMap.GetPointer(), EnvironmentMapFile, ZEGR_TF_BC1_UNORM_SRGB, true, 0, true))
-		return false;
-
-	if (!UpdateTexture(DetailBaseMap.GetPointer(), DetailBaseMapFile, ZEGR_TF_BC1_UNORM_SRGB, true, 0, true))
-		return false;
-
-	if (!UpdateTexture(DetailNormalMap.GetPointer(), DetailNormalMapFile, ZEGR_TF_BC5_UNORM, true, 0, false))
-		return false;
-
-	return true;
-}
-
-bool ZERNFixedMaterial::UpdateTexture(ZEGRTexture2D* Map, const ZEString& MapFile, ZEGRFormat CompressionFormat, bool GenerateMipMaps, ZEUInt MaximumMipmapLevel, bool sRGB)
-{
-	if (MapFile.IsEmpty())
-		return true;
-
-	if (Map != NULL && (MapFile.Hash() == Map->GetName().Hash()))
-		return true;
-
-	ZEGRTextureOptions TextureOptions;
-	TextureOptions.CompressionFormat = CompressionFormat;
-	TextureOptions.GenerateMipMaps = GenerateMipMaps;
-	TextureOptions.MaximumMipmapLevel = MaximumMipmapLevel;
-	TextureOptions.sRGB = sRGB;
-
-	Map = ZEGRTexture2D::CreateFromFile(BaseMapFile, TextureOptions);
-
-	if (Map == NULL)
-		return false;
-
-	return true;
-}
-
 bool ZERNFixedMaterial::Update()
 {
 	if (!ZERNMaterial::Update())
@@ -341,130 +281,29 @@ bool ZERNFixedMaterial::Update()
 	if (!UpdateConstantBuffer())
 		return false;
 
-	if (!UpdateTextures())
-		return false;
-
 	return true;
 }
 
 ZETaskResult ZERNFixedMaterial::LoadInternal()
 {
-	if (GetFileName().IsEmpty())
+	if (!GetFileName().IsEmpty())
 	{
-		Update();
-		return ZE_TR_DONE;
+		ZEFile File;
+		if(!File.Open(GetFileName(), ZE_FOM_READ, ZE_FCM_NONE))
+			zeError("Can not open given file. File : %s", GetFileName().ToCString());
+
+		ZEMLReader MaterialReader;
+		if (!MaterialReader.Open(&File))
+			return ZE_TR_FAILED;
+
+		ZEMLReaderNode MaterialNode = MaterialReader.GetRootNode();
+		if (!Unserialize(&MaterialNode))
+			return ZE_TR_FAILED;
 	}
 
-	ZEFile File;
-	if(!File.Open(GetFileName(), ZE_FOM_READ, ZE_FCM_NONE))
-		zeError("Can not open given file. File : %s", GetFileName().ToCString());
-
-	ZEMLReader MaterialReader;
-	if (!MaterialReader.Open(&File))
+	DirtyFlags.RaiseAll();
+	if (!Update())
 		return ZE_TR_FAILED;
-
-	ZEMLReaderNode MaterialNode = MaterialReader.GetRootNode();
-
-	zeCheckError(!MaterialNode.IsValid(), ZE_TR_FAILED, "ZERNStandardMaterial loading failed. ZEML Root Node is not valid. File : \"%s\"", GetFileName());
-
-	ZEUInt8 FileMajorVersion = MaterialNode.ReadUInt8("MajorVersion", 0);
-
-	zeCheckError(FileMajorVersion != 2, ZE_TR_FAILED, 
-		"ZERNStandardMaterial loading failed. Old depricated ZEMaterial file version detected. Cannot read this version. Current Version: \"2.0\" Detected Version: \"%d.0\" File Name: \"%s\".", FileMajorVersion, File.GetPath().ToCString());
-
-	ZEMLReaderNode PropertiesNode = MaterialNode.GetNode("Properties");
-
-	zeCheckError(!PropertiesNode.IsValid(), ZE_TR_FAILED, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", GetFileName());
-
-	SetName(PropertiesNode.ReadString("Name"));
-	SetShadowCaster(PropertiesNode.ReadBoolean("ShadowCaster", false));
-	//SetShadowReceiver(PropertiesNode.ReadBoolean("ShadowReceiver", false));
-	SetWireframe(PropertiesNode.ReadBoolean("Wireframe", false));
-	SetTwoSided(PropertiesNode.ReadBoolean("TwoSided", false));
-	SetSkinningEnabled(PropertiesNode.ReadBoolean("SkinningEnabled", false));
-	SetVertexColorEnabled(PropertiesNode.ReadBoolean("VertexColorEnabled", false));
-
-	SetTransparencyEnabled(PropertiesNode.ReadBoolean("TransparencyEnabled", false));
-	SetTransparencyMode((ZERNTransparencyMode)PropertiesNode.ReadInt32("TransparencyMode", ZERN_TM_NONE));
-	SetAlphaCullEnabled(PropertiesNode.ReadBoolean("AlphaCullEnabled", false));
-	SetAlphaCullLimit(PropertiesNode.ReadFloat("AlphaCullLimit", 0.5f));
-
-	SetBaseMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("BaseMap")));
-	SetBaseMapEnabled(PropertiesNode.ReadBoolean("BaseMapEnabled", !BaseMap.IsNull()));
-
-	SetDiffuseEnabled(PropertiesNode.ReadBoolean("DiffuseEnabled", true));
-	SetDiffuseFactor(PropertiesNode.ReadFloat("DiffuseFactor", 1.0f));
-	SetDiffuseColor(PropertiesNode.ReadVector3("DiffuseColor", ZEVector3::One));
-
-	SetNormalMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("NormalMap")));
-	SetNormalMapEnabled(PropertiesNode.ReadBoolean("NormalMapEnabled", !NormalMap.IsNull()));
-
-	SetSpecularEnabled(PropertiesNode.ReadBoolean("SpecularEnabled", true));
-	SetSpecularFactor(PropertiesNode.ReadFloat("SpecularFactor", 1.0f));
-	SetSpecularShininess(PropertiesNode.ReadFloat("SpecularShininess", 1.0f));
-	SetSpecularColor(PropertiesNode.ReadVector3("SpecularColor", ZEVector3::One));
-	SetSpecularMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("SpecularMap")));
-	SetSpecularMapEnabled(PropertiesNode.ReadBoolean("SpecularMapEnabled", !SpecularMap.IsNull()));
-	SetSpecularGlossMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("SpecularGlossMap")));
-	SetSpecularGlossMapEnabled(PropertiesNode.ReadBoolean("SpecularGlossMapEnabled", !SpecularGlossMap.IsNull()));
-
-	SetAmbientEnabled(PropertiesNode.ReadBoolean("AmbientEnabled", false));
-	SetSceneAmbientEnabled(PropertiesNode.ReadBoolean("SceneAmbientEnabled", true));
-	SetAmbientFactor(PropertiesNode.ReadFloat("AmbientFactor", 1.0f));
-	SetAmbientColor(PropertiesNode.ReadVector3("AmbientColor", ZEVector3::One));
-
-	SetEmissiveEnabled(PropertiesNode.ReadBoolean("EmissiveEnabled", false));
-	SetEmissiveFactor(PropertiesNode.ReadFloat("EmissiveFactor", 1.0f));
-	SetEmissiveColor(PropertiesNode.ReadVector3("EmissiveColor", ZEVector3::One));
-	SetEmissiveMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("EmissiveMap")));
-	SetEmissiveMapEnabled(PropertiesNode.ReadBoolean("EmissiveMapEnabled", !EmissiveMap.IsNull()));
-
-	SetHeightMapEnabled(PropertiesNode.ReadBoolean("HeightEnabled", false));
-	SetHeightMapTechnique((ZERNHeightMapTechnique)PropertiesNode.ReadUInt8("HeigthMapTechnique", ZERN_HMT_NONE));
-	SetHeightMapOffset(PropertiesNode.ReadFloat("HeightMapOffset"));
-	SetHeightMapScale(PropertiesNode.ReadFloat("HeightMapScale"));
-
-	SetOpacity(PropertiesNode.ReadFloat("Opacity", 1.0f));
-	SetOpacityMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("OpacityMap")));
-	SetOpacityMapEnabled(PropertiesNode.ReadBoolean("OpacityMapEnabled", !OpacityMap.IsNull()));
-
-	SetSubSurfaceScatteringFactor(PropertiesNode.ReadFloat("SubSurfaceScatteringFactor", 0.0f));
-	SetSubSurfaceScatteringMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("SubSurfaceScatteringMap")));
-	SetSubSurfaceScatteringMapEnabled(PropertiesNode.ReadBoolean("SubSurfaceScatteringMapEnabled", !SubSurfaceScatteringMap.IsNull()));
-
-	SetEnvironmentMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("EnvironmentMap")));
-	SetEnvironmentMapEnabled(PropertiesNode.ReadBoolean("EnvironmentMapEnabled", !EnvironmentMap.IsNull()));
-	SetReflectionEnabled(PropertiesNode.ReadBoolean("ReflectionEnabled", false));
-	SetReflectionFactor(PropertiesNode.ReadFloat("ReflectionFactor", 1.0f));
-	SetReflectionColor(PropertiesNode.ReadVector3("ReflectionColor", ZEVector3::One));
-
-	SetRefractionEnabled(PropertiesNode.ReadBoolean("RefractionEnabled", false));
-	SetRefractionFactor(PropertiesNode.ReadFloat("RefractionFactor", 1.0f));
-	SetRefractionColor(PropertiesNode.ReadVector3("RefractionColor", ZEVector3::One));
-	SetRefractionIndex(PropertiesNode.ReadFloat("RefractionIndex", 1.0f));
-
-	SetDetailBaseMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("DetailBaseMap")));
-	SetDetailBaseMapEnabled(PropertiesNode.ReadBoolean("DetailBaseMapEnabled", !DetailBaseMap.IsNull()));
-	SetDetailBaseMapColor(PropertiesNode.ReadVector3("DetailBaseMapColor", ZEVector3::One));
-	SetDetailMapTiling(PropertiesNode.ReadVector2("DetailBaseMapTiling", ZEVector2::One));
-	SetDetailBaseMapAttenuationStart(PropertiesNode.ReadFloat("DetailBaseMapAttenuationStart", 10.0f));
-	SetDetailBaseMapAttenuationFactor(PropertiesNode.ReadFloat("DetailBaseMapAttenuationFactor", 0.01f));
-
-	SetDetailNormalMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("DetailNormalMap")));
-	SetDetailNormalMapEnabled(PropertiesNode.ReadBoolean("DetailNormalMapEnabled", !DetailNormalMap.IsNull()));
-	SetDetailNormalMapFactor(PropertiesNode.ReadFloat("DetailNormalMapFactor", 1.0f));
-	SetDetailNormalMapTiling(PropertiesNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
-	SetDetailNormalMapAttenuationStart(PropertiesNode.ReadFloat("DetailNormalMapAttenuationStart", 10.0f));
-	SetDetailNormalMapAttenuationFactor(PropertiesNode.ReadFloat("DetailNormalMapAttenuationFactor", 0.01f));
-
-	SetClippingPlanesEnabled(PropertiesNode.ReadBoolean("ClippingPlanesEnabled", false));
-
-	MaterialReader.Close();
-
-	if(File.IsOpen())
-		File.Close();
-
-	Update();
 
 	return ZE_TR_DONE;
 }
@@ -477,25 +316,22 @@ ZETaskResult ZERNFixedMaterial::UnloadInternal()
 	StageGBuffer_Forward_VertexShader.Release();
 	StageGBuffer_Forward_PixelShader.Release();
 	StageGBuffer_Forward_RenderState.Release();
-
 	StageShadowmapGeneration_VertexShader.Release();
 	StageShadowmapGeneration_RenderState.Release();
 	StageShadowmapGeneration_RenderState.Release();
-
 	ConstantBuffer.Release();
 	Sampler.Release();
-
-	BaseMap = NULL;
-	SpecularMap = NULL;
-	SpecularGlossMap = NULL;
-	EmissiveMap = NULL;
-	NormalMap = NULL;
-	HeightMap = NULL;
-	OpacityMap = NULL;
-	SubSurfaceScatteringMap = NULL;
-	EnvironmentMap = NULL;
-	DetailBaseMap = NULL;
-	DetailNormalMap = NULL;
+	BaseMap.Release();
+	SpecularMap.Release();
+	SpecularGlossMap.Release();
+	EmissiveMap.Release();
+	NormalMap.Release();
+	HeightMap.Release();
+	OpacityMap.Release();
+	SubSurfaceScatteringMap.Release();
+	EnvironmentMap.Release();
+	DetailBaseMap.Release();
+	DetailNormalMap.Release();
 
 	return ZE_TR_DONE;
 }
@@ -773,7 +609,9 @@ bool ZERNFixedMaterial::GetSubSurfaceScatteringMapEnabled() const
 
 void ZERNFixedMaterial::SetSubSurfaceScatteringMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(Texture);
 	SubSurfaceScatteringMap = Texture;
+	RegisterExternalResource(Texture);
 	SubSurfaceScatteringMapFile = "";
 }
 
@@ -790,14 +628,16 @@ void ZERNFixedMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileName)
 	SubSurfaceScatteringMapFile = FileName;
 
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
-		SubSurfaceScatteringMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(SubSurfaceScatteringMap);
+		SubSurfaceScatteringMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(SubSurfaceScatteringMap);
 	}
 }
 
@@ -823,7 +663,9 @@ bool ZERNFixedMaterial::GetBaseMapEnabled() const
 
 void ZERNFixedMaterial::SetBaseMap(ZEGRTexture2D* Map)
 {
+	UnregisterExternalResource(BaseMap);
 	BaseMap = Map;
+	RegisterExternalResource(BaseMap);
 	BaseMapFile = "";
 }
 
@@ -839,16 +681,17 @@ void ZERNFixedMaterial::SetBaseMapFile(const ZEString& FileName)
 
 	BaseMapFile = FileName;
 
-	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		BaseMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(BaseMap);
+		BaseMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(BaseMap);
 	}
 }
 
@@ -1039,7 +882,9 @@ bool ZERNFixedMaterial::GetSpecularMapEnabled() const
 
 void ZERNFixedMaterial::SetSpecularMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(SpecularMap);
 	SpecularMap = Texture;
+	RegisterExternalResource(SpecularMap);
 	SpecularMapFile = "";
 }
 
@@ -1056,15 +901,17 @@ void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& FileName)
 	SpecularMapFile = FileName;
 
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		SpecularMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(SpecularMap);
+		SpecularMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(SpecularMap);
 	}
 }
 
@@ -1090,7 +937,9 @@ bool ZERNFixedMaterial::GetSpecularGlossMapEnabled() const
 
 void ZERNFixedMaterial::SetSpecularGlossMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(SpecularGlossMap);
 	SpecularGlossMap = Texture;
+	RegisterExternalResource(SpecularGlossMap);
 	SpecularGlossMapFile = "";
 }
 
@@ -1107,15 +956,17 @@ void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
 	SpecularGlossMapFile = FileName;
 
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		SpecularGlossMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(SpecularGlossMap);
+		SpecularGlossMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(SpecularGlossMap);
 	}
 }
 
@@ -1186,7 +1037,9 @@ bool ZERNFixedMaterial::GetEmissiveMapEnabled() const
 
 void ZERNFixedMaterial::SetEmissiveMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(EmissiveMap);
 	EmissiveMap = Texture;
+	RegisterExternalResource(EmissiveMap);
 	EmissiveMapFile = "";
 }
 
@@ -1203,15 +1056,17 @@ void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& FileName)
 	EmissiveMapFile = FileName;
 	
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		EmissiveMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(EmissiveMap);
+		EmissiveMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(EmissiveMap);
 	}
 }
 
@@ -1254,15 +1109,17 @@ void ZERNFixedMaterial::SetNormalMapFile(const ZEString& FileName)
 	NormalMapFile = FileName;
 
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		NormalMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(NormalMap);
+		NormalMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(NormalMap);
 	}
 }
 
@@ -1333,7 +1190,9 @@ float ZERNFixedMaterial::GetHeightMapScale() const
 
 void ZERNFixedMaterial::SetHeightMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(HeightMap);
 	HeightMap = Texture;
+	RegisterExternalResource(HeightMap);
 	HeightMapFile = "";
 }
 
@@ -1350,15 +1209,17 @@ void ZERNFixedMaterial::SetHeightMapFile(const ZEString& FileName)
 	HeightMapFile = FileName;
 
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		HeightMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(HeightMap);
+		HeightMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(HeightMap);
 	}
 }
 
@@ -1415,15 +1276,17 @@ void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& FileName)
 	OpacityMapFile = FileName;
 
 	ZERSResourceState State = GetState();
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC4_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		OpacityMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(OpacityMap);
+		OpacityMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(OpacityMap);
 	}
 }
 
@@ -1465,17 +1328,17 @@ void ZERNFixedMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 
 	EnvironmentMapFile = FileName;
 
-	ZERSResourceState State = GetState();
-
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		EnvironmentMapFile = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(EnvironmentMap);
+		EnvironmentMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(EnvironmentMap);
 	}
 }
 
@@ -1682,7 +1545,9 @@ float ZERNFixedMaterial::GetDetailBaseMapAttenuationFactor() const
 
 void ZERNFixedMaterial::SetDetailBaseMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(DetailBaseMap);
 	DetailBaseMap = Texture;
+	RegisterExternalResource(DetailBaseMap);
 	DetailBaseMapFile = "";
 }
 
@@ -1698,17 +1563,17 @@ void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 
 	DetailBaseMapFile = FileName;
 
-	ZERSResourceState State = GetState();
-
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = true;
 
-		DetailBaseMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(DetailBaseMap);
+		DetailBaseMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(DetailBaseMap);
 	}
 }
 
@@ -1794,7 +1659,9 @@ float ZERNFixedMaterial::GetDetailNormalMapAttenuationFactor() const
 
 void ZERNFixedMaterial::SetDetailNormalMap(ZEGRTexture2D* Texture)
 {
+	UnregisterExternalResource(DetailNormalMap);
 	DetailNormalMap = Texture;
+	RegisterExternalResource(DetailNormalMap);
 	DetailNormalMapFile = "";
 }
 
@@ -1810,17 +1677,17 @@ void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 
 	DetailNormalMapFile = FileName;
 
-	ZERSResourceState State = GetState();
-
-	if (State == ZERS_RS_LOADED || State == ZERS_RS_LOADING)
+	if (IsLoadedOrLoading())
 	{
-		ZEGRTextureOptions TextureOptions;
+		ZEGRTexture2DOptions TextureOptions;
 		TextureOptions.CompressionFormat = ZEGR_TF_BC5_UNORM;
 		TextureOptions.GenerateMipMaps = true;
 		TextureOptions.MaximumMipmapLevel = 0;
 		TextureOptions.sRGB = false;
 
-		DetailNormalMap = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+		UnregisterExternalResource(DetailNormalMap);
+		DetailNormalMap = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
+		RegisterExternalResource(DetailNormalMap);
 	}
 }
 
@@ -1906,30 +1773,15 @@ void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* S
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
-ZEHolder<ZERNFixedMaterial> ZERNFixedMaterial::CreateInstance()
+bool ZERNFixedMaterial::Serialize(ZEMLWriterNode* MaterialNode)
 {
-	return new ZERNFixedMaterial;
-}
-
-void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
-{
-	ZEFile File;
-	if(!File.Open(FilePath, ZE_FOM_WRITE, ZE_FCM_OVERWRITE))
-		zeError("Can not open given file. File : %s", FilePath.ToCString());
-
-	ZEMLWriter MaterialWriter;
-	MaterialWriter.Open(&File);
-
-	ZEMLWriterNode MaterialNode;
-	MaterialWriter.OpenRootNode("ZERNMaterial", MaterialNode);
-
-	MaterialNode.WriteUInt8("MajorVersion", 2);
-	MaterialNode.WriteUInt8("MinorVersion", 2);
-	MaterialNode.WriteString("GUID", GetGUID().ToString());
-	MaterialNode.WriteString("Class", GetClass()->GetName());
+	MaterialNode->WriteUInt8("MajorVersion", 2);
+	MaterialNode->WriteUInt8("MinorVersion", 2);
+	MaterialNode->WriteString("GUID", GetGUID().ToString());
+	MaterialNode->WriteString("Class", GetClass()->GetName());
 
 	ZEMLWriterNode PropertiesNode;
-	MaterialNode.OpenNode("Properties", PropertiesNode);
+	MaterialNode->OpenNode("Properties", PropertiesNode);
 
 	PropertiesNode.WriteString("Name", GetName().ToCString()); //Will be changed when configuration is implemented.
 	PropertiesNode.WriteBool("TwoSided", GetTwoSided());
@@ -1995,7 +1847,7 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	PropertiesNode.WriteVector3("RefractionColor", GetRefractionColor());
 	PropertiesNode.WriteFloat("RefractionFactor", GetRefractionFactor());
 	PropertiesNode.WriteFloat("RefractionIndex", GetRefractionIndex());
-	
+
 	PropertiesNode.WriteBool("DetailBaseMapEnabled", GetDetailBaseMapEnabled());
 	PropertiesNode.WriteVector3("DetailBaseMapColor", GetDetailBaseMapColor());
 	PropertiesNode.WriteVector2("DetailBaseMapTiling", GetDetailBaseMapTiling());
@@ -2013,11 +1865,123 @@ void ZERNFixedMaterial::WriteToFile(const ZEString& FilePath)
 	PropertiesNode.WriteBool("ClippingPlanesEnabled", GetClippingPlanesEnabled());
 
 	PropertiesNode.CloseNode();
-	MaterialNode.CloseNode();
-	MaterialWriter.Close();
 
-	if(File.IsOpen())
-		File.Close();
+	return true;
+}
+
+bool ZERNFixedMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
+{
+	ZEString FileName = MaterialNode->GetFile()->GetPath();
+
+	zeCheckError(MaterialNode == NULL || !MaterialNode->IsValid(), false, "ZERNStandardMaterial loading failed. ZEML Root Node is not valid. File : \"%s\"", FileName.ToCString());
+
+	ZEUInt8 FileMajorVersion = MaterialNode->ReadUInt8("MajorVersion", 0);
+	if (FileMajorVersion < 2)
+		zeWarning("ZERNStandardMaterial loading warning. Old depricated file version detected. Current Version: \"2.0\" Detected Version: \"%d.0\" File Name: \"%s\".", FileMajorVersion, FileName.ToCString());
+	
+	ZEString ClassName = MaterialNode->ReadString("Class");
+	if (ClassName.IsEmpty())
+		zeWarning("Class tag in ZERNMaterial is empty. Unknown material class. This can cause problems. File Name: \"%s\".", FileName.ToCString());
+	else
+		zeCheckError(ClassName != GetClass()->GetName(), false, "Cannot load ZERNStandardMaterial. Class is different than ZERNStandartMaterial. Class Name: \"%s\", File Name: \"%s\".", ClassName.ToCString(), FileName.ToCString());
+	
+	ZEMLReaderNode PropertiesNode;
+	if (FileMajorVersion < 2)
+		PropertiesNode = *MaterialNode;
+	else
+		PropertiesNode = MaterialNode->GetNode("Properties");
+	
+	zeCheckError(!PropertiesNode.IsValid(), false, "ZERNStandardMaterial loading failed. ZEML \"Properties\" Node is not valid. File : \"%s\"", FileName.ToCString());
+
+	SetGUID(ZEGUID::FromString(MaterialNode->ReadString("GUID")));
+	SetName(PropertiesNode.ReadString("Name"));
+	SetShadowCaster(PropertiesNode.ReadBoolean("ShadowCaster", false));
+	SetWireframe(PropertiesNode.ReadBoolean("Wireframe", false));
+	SetTwoSided(PropertiesNode.ReadBoolean("TwoSided", false));
+	SetSkinningEnabled(PropertiesNode.ReadBoolean("SkinningEnabled", false));
+	SetVertexColorEnabled(PropertiesNode.ReadBoolean("VertexColorEnabled", false));
+
+	SetTransparencyEnabled(PropertiesNode.ReadBoolean("TransparencyEnabled", false));
+	SetTransparencyMode((ZERNTransparencyMode)PropertiesNode.ReadInt32("TransparencyMode", ZERN_TM_NONE));
+	SetAlphaCullEnabled(PropertiesNode.ReadBoolean("AlphaCullEnabled", false));
+	SetAlphaCullLimit(PropertiesNode.ReadFloat("AlphaCullLimit", 0.5f));
+
+	SetBaseMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("BaseMap")));
+	SetBaseMapEnabled(PropertiesNode.ReadBoolean("BaseMapEnabled", !BaseMap.IsNull()));
+
+	SetDiffuseEnabled(PropertiesNode.ReadBoolean("DiffuseEnabled", true));
+	SetDiffuseFactor(PropertiesNode.ReadFloat("DiffuseFactor", 1.0f));
+	SetDiffuseColor(PropertiesNode.ReadVector3("DiffuseColor", ZEVector3::One));
+
+	SetNormalMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("NormalMap")));
+	SetNormalMapEnabled(PropertiesNode.ReadBoolean("NormalMapEnabled", !NormalMap.IsNull()));
+
+	SetSpecularEnabled(PropertiesNode.ReadBoolean("SpecularEnabled", true));
+	SetSpecularFactor(PropertiesNode.ReadFloat("SpecularFactor", 1.0f));
+	SetSpecularShininess(PropertiesNode.ReadFloat("SpecularShininess", 1.0f));
+	SetSpecularColor(PropertiesNode.ReadVector3("SpecularColor", ZEVector3::One));
+	SetSpecularMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("SpecularMap")));
+	SetSpecularMapEnabled(PropertiesNode.ReadBoolean("SpecularMapEnabled", !SpecularMap.IsNull()));
+	SetSpecularGlossMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("SpecularGlossMap")));
+	SetSpecularGlossMapEnabled(PropertiesNode.ReadBoolean("SpecularGlossMapEnabled", !SpecularGlossMap.IsNull()));
+
+	SetAmbientEnabled(PropertiesNode.ReadBoolean("AmbientEnabled", false));
+	SetSceneAmbientEnabled(PropertiesNode.ReadBoolean("SceneAmbientEnabled", true));
+	SetAmbientFactor(PropertiesNode.ReadFloat("AmbientFactor", 1.0f));
+	SetAmbientColor(PropertiesNode.ReadVector3("AmbientColor", ZEVector3::One));
+
+	SetEmissiveEnabled(PropertiesNode.ReadBoolean("EmissiveEnabled", false));
+	SetEmissiveFactor(PropertiesNode.ReadFloat("EmissiveFactor", 1.0f));
+	SetEmissiveColor(PropertiesNode.ReadVector3("EmissiveColor", ZEVector3::One));
+	SetEmissiveMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("EmissiveMap")));
+	SetEmissiveMapEnabled(PropertiesNode.ReadBoolean("EmissiveMapEnabled", !EmissiveMap.IsNull()));
+
+	SetHeightMapEnabled(PropertiesNode.ReadBoolean("HeightEnabled", false));
+	SetHeightMapTechnique((ZERNHeightMapTechnique)PropertiesNode.ReadUInt8("HeigthMapTechnique", ZERN_HMT_NONE));
+	SetHeightMapOffset(PropertiesNode.ReadFloat("HeightMapOffset"));
+	SetHeightMapScale(PropertiesNode.ReadFloat("HeightMapScale"));
+
+	SetOpacity(PropertiesNode.ReadFloat("Opacity", 1.0f));
+	SetOpacityMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("OpacityMap")));
+	SetOpacityMapEnabled(PropertiesNode.ReadBoolean("OpacityMapEnabled", !OpacityMap.IsNull()));
+
+	SetSubSurfaceScatteringFactor(PropertiesNode.ReadFloat("SubSurfaceScatteringFactor", 0.0f));
+	SetSubSurfaceScatteringMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("SubSurfaceScatteringMap")));
+	SetSubSurfaceScatteringMapEnabled(PropertiesNode.ReadBoolean("SubSurfaceScatteringMapEnabled", !SubSurfaceScatteringMap.IsNull()));
+
+	SetEnvironmentMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("EnvironmentMap")));
+	SetEnvironmentMapEnabled(PropertiesNode.ReadBoolean("EnvironmentMapEnabled", !EnvironmentMap.IsNull()));
+	SetReflectionEnabled(PropertiesNode.ReadBoolean("ReflectionEnabled", false));
+	SetReflectionFactor(PropertiesNode.ReadFloat("ReflectionFactor", 1.0f));
+	SetReflectionColor(PropertiesNode.ReadVector3("ReflectionColor", ZEVector3::One));
+
+	SetRefractionEnabled(PropertiesNode.ReadBoolean("RefractionEnabled", false));
+	SetRefractionFactor(PropertiesNode.ReadFloat("RefractionFactor", 1.0f));
+	SetRefractionColor(PropertiesNode.ReadVector3("RefractionColor", ZEVector3::One));
+	SetRefractionIndex(PropertiesNode.ReadFloat("RefractionIndex", 1.0f));
+
+	SetDetailBaseMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("DetailBaseMap")));
+	SetDetailBaseMapEnabled(PropertiesNode.ReadBoolean("DetailBaseMapEnabled", !DetailBaseMap.IsNull()));
+	SetDetailBaseMapColor(PropertiesNode.ReadVector3("DetailBaseMapColor", ZEVector3::One));
+	SetDetailMapTiling(PropertiesNode.ReadVector2("DetailBaseMapTiling", ZEVector2::One));
+	SetDetailBaseMapAttenuationStart(PropertiesNode.ReadFloat("DetailBaseMapAttenuationStart", 10.0f));
+	SetDetailBaseMapAttenuationFactor(PropertiesNode.ReadFloat("DetailBaseMapAttenuationFactor", 0.01f));
+
+	SetDetailNormalMapFile(ZEPathInfo::CombineRelativePath(PropertiesNode.GetFile()->GetPath(), PropertiesNode.ReadString("DetailNormalMap")));
+	SetDetailNormalMapEnabled(PropertiesNode.ReadBoolean("DetailNormalMapEnabled", !DetailNormalMap.IsNull()));
+	SetDetailNormalMapFactor(PropertiesNode.ReadFloat("DetailNormalMapFactor", 1.0f));
+	SetDetailNormalMapTiling(PropertiesNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
+	SetDetailNormalMapAttenuationStart(PropertiesNode.ReadFloat("DetailNormalMapAttenuationStart", 10.0f));
+	SetDetailNormalMapAttenuationFactor(PropertiesNode.ReadFloat("DetailNormalMapAttenuationFactor", 0.01f));
+
+	SetClippingPlanesEnabled(PropertiesNode.ReadBoolean("ClippingPlanesEnabled", false));
+
+	return true;
+}
+
+ZEHolder<ZERNFixedMaterial> ZERNFixedMaterial::CreateInstance()
+{
+	return new ZERNFixedMaterial;
 }
 
 ZERSHolder<ZERNFixedMaterial> ZERNFixedMaterial::LoadResource(const ZEString& FileName)

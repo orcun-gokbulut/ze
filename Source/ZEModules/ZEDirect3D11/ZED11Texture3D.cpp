@@ -192,7 +192,7 @@ const ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Lev
 		return NULL;
 	}
 	
-	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(Width >> Level, Height >> Level, GetFormat(), RenderTargetView);
+	ZED11RenderTarget* RenderTarget = new ZED11RenderTarget(GetWidth() >> Level, GetHeight() >> Level, GetFormat(), RenderTargetView);
 	RenderTarget->SetOwner(this);
 
 	RenderTargets.Add(RenderTarget);

@@ -69,4 +69,4 @@ ZE_ENUM(ZERSResourceState)
 };
 
 class ZERSResource;
-typedef ZERSResource* (_cdecl *ZERSInstanciator)();
+typedef ZERSResource* (_cdecl *ZERSInstanciator)(const void*);

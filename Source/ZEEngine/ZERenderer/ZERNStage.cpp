@@ -87,7 +87,7 @@ bool ZERNStage::BindOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool BothW
 		Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
 		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
 	{
-		Buffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_RENDER_TARGET).GetPointer();
+		Buffer = ZEGRTexture2D::CreateResource(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_RENDER_TARGET).GetPointer();
 		Target = Buffer->GetRenderTarget();
 	}
 
@@ -111,7 +111,7 @@ bool ZERNStage::BindDepthOutput(ZERNStageBuffer Output, ZEGRFormat Format, bool 
 	if (Buffer->GetWidth() != OriginalRenderTarget->GetWidth() ||
 		Buffer->GetHeight() != OriginalRenderTarget->GetHeight())
 	{
-		Buffer = ZEGRTexture2D::CreateInstance(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL).GetPointer();
+		Buffer = ZEGRTexture2D::CreateResource(OriginalRenderTarget->GetWidth(), OriginalRenderTarget->GetHeight(), 1, Format, ZEGR_RU_GPU_READ_CPU_WRITE, ZEGR_RBF_DEPTH_STENCIL).GetPointer();
 		Target = Buffer->GetDepthStencilBuffer(0);
 	}
 

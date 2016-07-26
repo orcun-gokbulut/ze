@@ -454,12 +454,16 @@ void ZEDSSoundSource::Update(float ElapsedTime)
 		Stream();
 }
 
-void ZEDSSoundSource::SetSoundResource(ZESoundResource* Resource)
+void ZEDSSoundSource::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
 {
+	if (SoundResource == Resource)
+		return;
+
+	SoundResource = Resource;
+
 	if (Resource != NULL)
 	{
-		Resource->AddReferance();
-		SoundResource = Resource;
+
 		CreateBuffer(false);
 		SetLimitsEnabled(LimitsEnabled);
 

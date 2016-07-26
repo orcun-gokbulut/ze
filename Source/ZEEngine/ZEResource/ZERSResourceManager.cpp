@@ -239,14 +239,14 @@ void ZERSResourceManager::UnshareResource(ZERSResource* Resource)
 	ManagerLock.Unlock();
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciator, ZERSResource** StagingResource)
+ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciator, const void* InstanciatorParameter, ZERSResource** StagingResource)
 {
 	ManagerLock.Lock();
 	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(GUID);
 	if (Resource == NULL)
 	{
 		StagingInstanciator = true;
-		ZERSResource* NewResouce = Insanciator();
+		ZERSResource* NewResouce = Insanciator(InstanciatorParameter);
 		StagingInstanciator = false;
 
 		if (NewResouce == NULL)
@@ -276,14 +276,14 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 	}
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString& FileName, ZERSInstanciator Insanciator, ZERSResource** StagingResource)
+ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString& FileName, ZERSInstanciator Insanciator, const void* InstanciatorParameter, ZERSResource** StagingResource)
 {
 	ManagerLock.Lock();
 	const ZERSResource* Resource = GetResourceInternal(FileName);
 	if (Resource == NULL)
 	{
 		StagingInstanciator = true;
-		ZERSResource* NewResouce = Insanciator();
+		ZERSResource* NewResouce = Insanciator(InstanciatorParameter);
 		StagingInstanciator = false;
 
 		if (NewResouce == NULL)

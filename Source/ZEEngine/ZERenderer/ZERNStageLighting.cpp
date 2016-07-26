@@ -80,7 +80,7 @@ void ZERNStageLighting::CreateRandomVectors()
 		RandomVectors[I + 1]	= (ZEUInt8)(ZERandom::GetFloatPositive() * 255.0f + 0.5f);
 	}
 	
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
+	RandomVectorsTexture = ZEGRTexture2D::CreateResource(128, 128, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageLighting::CreateLightGeometries()
@@ -341,7 +341,7 @@ bool ZERNStageLighting::UpdateInputOutputs()
 			Height *= 2;
 		}
 
-		TiledDeferredOutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, AccumulationTexture->GetFormat(), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
+		TiledDeferredOutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, AccumulationTexture->GetFormat(), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
 	}
 
 	return true;
