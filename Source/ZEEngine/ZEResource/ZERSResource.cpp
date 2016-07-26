@@ -316,14 +316,20 @@ void ZERSResource::RemoveChildResource(ZERSResource* ChildResource)
 		Parent->UpdateMemoryConsumption();
 }
 
-void ZERSResource::RegisterExternalResource(ZERSResource* Resource)
+void ZERSResource::RegisterExternalResource(const ZERSResource* Resource)
 {
+	if (Resource == NULL)
+		return;
+
 	zeCheckError(ExternalResources.Exists(Resource), ZE_VOID, "Resource is already added as external resource.");
 	ExternalResources.Add(Resource);
 }
 
-void ZERSResource::UnregisterExternalResource(ZERSResource* Resource)
+void ZERSResource::UnregisterExternalResource(const ZERSResource* Resource)
 {
+	if (Resource == NULL)
+		return;
+
 	ExternalResources.RemoveValue(Resource);
 }
 
@@ -465,12 +471,18 @@ bool ZERSResource::IsStaged() const
 
 bool ZERSResource::IsLoaded() const
 {
-	return State > ZERS_RS_LOADING;
+	return State >= ZERS_RS_LOADED;
+}
+
+
+bool ZERSResource::IsLoadedOrLoading() const
+{
+	return State >= ZERS_RS_LOADING;
 }
 
 bool ZERSResource::IsFailed() const
 {
-	return State <= ZERS_RS_ERROR_STAGING;
+	return State <= 0;
 }
 
 bool ZERSResource::IsShared() const
@@ -494,7 +506,6 @@ void ZERSResource::Unshare()
 
 	ZERSResourceManager::GetInstance()->UnshareResource(this);
 }
-
 
 void ZERSResource::StagingRealized()
 {

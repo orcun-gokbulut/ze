@@ -91,8 +91,8 @@ class ZERSResourceManager : public ZEObject
 		void									ShareResource(ZERSResource* Resource);
 		void									UnshareResource(ZERSResource* Resource);
 
-		ZERSHolder<const ZERSResource>			StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciaor, ZERSResource** StagingResource = NULL);
-		ZERSHolder<const ZERSResource>			StageResource(const ZEString& FileName, ZERSInstanciator Insanciaor, ZERSResource** StagingResource = NULL);
+		ZERSHolder<const ZERSResource>			StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
+		ZERSHolder<const ZERSResource>			StageResource(const ZEString& FileName, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
 
 		static ZERSResourceManager*				GetInstance();
 };

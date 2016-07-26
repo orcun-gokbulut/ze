@@ -134,7 +134,7 @@ bool ZERNStageForward::UpdateInputOutputs()
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != MainRenderTarget->GetWidth() || OutputTexture->GetHeight() != MainRenderTarget->GetHeight())
 		{
-			OutputTexture = ZEGRTexture2D::CreateInstance(
+			OutputTexture = ZEGRTexture2D::CreateResource(
 														MainRenderTarget->GetWidth(), 
 														MainRenderTarget->GetHeight(), 
 														1, 

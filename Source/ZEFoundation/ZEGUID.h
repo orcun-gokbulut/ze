@@ -62,7 +62,6 @@ ZEPackStruct(
 			bool					operator==(const ZEGUID& Other) const;
 			bool					operator!=(const ZEGUID& Other) const;
 
-			bool					FromString(const ZEString& String);
 			ZEString				ToString() const;
 
 									ZEGUID();
@@ -71,6 +70,7 @@ ZEPackStruct(
 									ZEGUID(ZEUInt32 Data1, ZEUInt16 Data2, ZEUInt16 Data3, ZEUInt16 Data4FirstTwo, ZEUInt64 Data4Remaining);
 
 			static ZEGUID			Generate();
+			static ZEGUID			FromString(const ZEString& String, bool* Result = NULL);
 	}
 );
 

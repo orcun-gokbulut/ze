@@ -62,7 +62,7 @@ bool ZERNStageMultiplexer::UpdateInputOutputs()
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() !=  Height)
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}

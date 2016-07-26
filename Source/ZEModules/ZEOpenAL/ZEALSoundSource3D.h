@@ -87,7 +87,7 @@ class ZEALSoundSource3D : public ZESoundSource3D, public ZEALComponentBase
 
 		void					Update(float ElapsedTime);
 
-		virtual void			SetSoundResource(ZESoundResource* Resource);
+		virtual void			SetSoundResource(ZEHolder<const ZESoundResource> Resource);
 
 		virtual void			SetPosition(const ZEVector3& NewPosition);
 		virtual void			SetRotation(const ZEQuaternion& NewRotation);

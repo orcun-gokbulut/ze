@@ -74,7 +74,7 @@ ZEGRConstantBuffer::ZEGRConstantBuffer()
 
 }
 
-static ZERSResource* Instanciator()
+static ZERSResource* Instanciator(const void*)
 {
 	return ZEGRGraphicsModule::GetInstance()->CreateConstantBuffer();
 }

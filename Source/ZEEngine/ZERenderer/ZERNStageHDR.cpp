@@ -175,7 +175,7 @@ bool ZERNStageHDR::UpdateInputOutput()
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
+			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -196,9 +196,9 @@ bool ZERNStageHDR::UpdateTextures()
 	ZEUInt CurrentWidth = OutputRenderTarget->GetWidth();
 	ZEUInt CurrentHeight = OutputRenderTarget->GetHeight();
 
-	BrightTexture = ZEGRTexture2D::CreateInstance(CurrentWidth / 2, CurrentHeight / 2, 1, ZEGR_TF_R11G11B10_FLOAT);
-	DownScaledTexture4x = ZEGRTexture2D::CreateInstance(CurrentWidth / 4, CurrentHeight / 4, 1, ZEGR_TF_R11G11B10_FLOAT);
-	DownScaledTexture8x = ZEGRTexture2D::CreateInstance(CurrentWidth / 8, CurrentHeight / 8, 1, ZEGR_TF_R11G11B10_FLOAT);
+	BrightTexture = ZEGRTexture2D::CreateResource(CurrentWidth / 2, CurrentHeight / 2, 1, ZEGR_TF_R11G11B10_FLOAT);
+	DownScaledTexture4x = ZEGRTexture2D::CreateResource(CurrentWidth / 4, CurrentHeight / 4, 1, ZEGR_TF_R11G11B10_FLOAT);
+	DownScaledTexture8x = ZEGRTexture2D::CreateResource(CurrentWidth / 8, CurrentHeight / 8, 1, ZEGR_TF_R11G11B10_FLOAT);
 
 	ZEInt ExponentWidth = (ZEInt)(ZEMath::Log10((float)CurrentWidth) / ZEMath::Log10(2.0f));
 	ZEInt ExponentHeight = (ZEInt)(ZEMath::Log10((float)CurrentHeight) / ZEMath::Log10(2.0f));
@@ -210,11 +210,11 @@ bool ZERNStageHDR::UpdateTextures()
 	for (ZEInt I = (LevelCount - 1); I >= 0; I--)
 	{
 		ZEUInt Size = (ZEUInt)ZEMath::Power(2.0f, (float)I);
-		LuminanceTextures[Index++] = ZEGRTexture2D::CreateInstance(Size, Size, 1, ZEGR_TF_R16_FLOAT);
+		LuminanceTextures[Index++] = ZEGRTexture2D::CreateResource(Size, Size, 1, ZEGR_TF_R16_FLOAT);
 	}
 
-	CurrentAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, ZEGR_TF_R16_FLOAT);
-	PreviousAdaptedLuminance = ZEGRTexture2D::CreateInstance(1, 1, 1, ZEGR_TF_R16_FLOAT);
+	CurrentAdaptedLuminance = ZEGRTexture2D::CreateResource(1, 1, 1, ZEGR_TF_R16_FLOAT);
+	PreviousAdaptedLuminance = ZEGRTexture2D::CreateResource(1, 1, 1, ZEGR_TF_R16_FLOAT);
 
 	ZEUInt16 One = 1;
 	PreviousAdaptedLuminance->UpdateSubResource(0, 0, NULL, &One, 1);

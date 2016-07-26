@@ -85,7 +85,7 @@ void ZERNStageAO::CreateRandomVectors()
 		RandomVectors[I] = ZEVector4(Vector, 0.0f);
 	}
 
-	RandomVectorsTexture = ZEGRTexture2D::CreateInstance(RandomVectorSize, RandomVectorSize, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
+	RandomVectorsTexture = ZEGRTexture2D::CreateResource(RandomVectorSize, RandomVectorSize, 1, ZEGR_TF_R32G32B32A32_FLOAT, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, RandomVectors.GetConstCArray());
 }
 
 void ZERNStageAO::CreateSphereSamples()
@@ -290,16 +290,16 @@ bool ZERNStageAO::UpdateTextures()
 	ZEUInt Width = Constants.WidthHeight.x;
 	ZEUInt Height = Constants.WidthHeight.y;
 
-	AmbientOcclusionTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
-	BlurTempTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
+	AmbientOcclusionTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
+	BlurTempTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R16G16_FLOAT);
 	
 	if (UseDeinterleavedTexturing)
-		ResolvedDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R32_FLOAT);
+		ResolvedDepthTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R32_FLOAT);
 	else
-		ResolvedDepthTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
+		ResolvedDepthTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_D32_FLOAT, DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags());
 
-	DeinterleavedDepthtexture = ZEGRTexture2D::CreateInstance(Width / 4, Height / 4, 1, ZEGR_TF_R32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
-	DeinterleavedAmbientOcclusionTexture = ZEGRTexture2D::CreateInstance(Width / 4, Height / 4, 1, ZEGR_TF_R16G16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
+	DeinterleavedDepthtexture = ZEGRTexture2D::CreateResource(Width / 4, Height / 4, 1, ZEGR_TF_R32_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
+	DeinterleavedAmbientOcclusionTexture = ZEGRTexture2D::CreateResource(Width / 4, Height / 4, 1, ZEGR_TF_R16G16_FLOAT, ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 16);
 
 	DirtyFlags.UnraiseFlags(ZERN_AODF_TEXTURE);
 

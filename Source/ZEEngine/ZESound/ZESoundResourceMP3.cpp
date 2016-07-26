@@ -39,12 +39,16 @@
 
 #include <mpg123.h>
 #include <stdio.h>
+#include "ZEFile/ZEFile.h"
 
 static ZEChunkArray<ZESoundResourceMP3*, 50> Indexes;
+static ZELock IndexesLock;
 
-static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
+ssize_t ZESoundResourceMP3::MP3Read(ZEInt fd, void *buffer, ZESize nbyte)
 {
+	IndexesLock.Lock();
 	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)Indexes[fd];
+	IndexesLock.Unlock();
 
 	if (Resource->MemoryCursor == Resource->DataSize)
 		return 0;
@@ -56,7 +60,7 @@ static ssize_t Memory_Read(ZEInt fd, void *buffer, ZESize nbyte)
 	return (ssize_t)BytesRead;
 }
 
-static off_t Memory_Seek(ZEInt fd, off_t offset, ZEInt whence)
+off_t ZESoundResourceMP3::MP3Seek(ZEInt fd, off_t offset, ZEInt whence)
 {
 	ZESoundResourceMP3* Resource = (ZESoundResourceMP3*)Indexes[fd];
 
@@ -76,6 +80,115 @@ static off_t Memory_Seek(ZEInt fd, off_t offset, ZEInt whence)
 	}
 
 	return (off_t)Resource->MemoryCursor;
+}
+
+ZETaskResult ZESoundResourceMP3::LoadInternal()
+{
+	static bool MPG123Initialized = false;
+	if (MPG123Initialized)
+	{
+		mpg123_init();
+		MPG123Initialized = true;
+	}
+
+	ZEFile File;
+	if (!File.Open(GetFileName(), ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot load sound resource. Cannot open mp3 file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	File.Seek(0, ZE_SF_END);
+	DataSize = File.Tell();
+	Data = new unsigned char[DataSize];
+	File.Seek(0, ZE_SF_BEGINING);
+	File.Read(Data, 1, DataSize);
+	File.Close();
+
+	MemoryCursor = 0;
+
+	mpg123 = mpg123_new(NULL, NULL);
+	if (mpg123 == NULL)
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	if (mpg123_param(mpg123, MPG123_RESYNC_LIMIT, -1, 0) != MPG123_OK) /* New in library version 0.0.1 . */
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;	
+	}
+
+	if (mpg123_replace_reader(mpg123, &ZESoundResourceMP3::MP3Read, &ZESoundResourceMP3::MP3Seek) != MPG123_OK)
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;	
+	}
+
+	IndexesLock.Lock();
+	Indexes.Add(this);
+	int fd = (int)Indexes.GetCount();
+	IndexesLock.Unlock();
+
+	if (mpg123_open_fd(mpg123, fd) != MPG123_OK)
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;	
+	}
+	long Rate;
+	ZEInt Channels, Encoding;
+	if (mpg123_getformat(mpg123, &Rate, &Channels, &Encoding) != MPG123_OK)
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;	
+	}
+
+	FileFormat = ZE_SFF_MP3;
+	BitsPerSample = 16;
+	ChannelCount = Channels;
+	SamplesPerSecond = (ZESize)Rate;
+	BlockAlign = (ZESize)ChannelCount * ((ZESize)BitsPerSample / 8);
+	
+	if (mpg123_scan(mpg123) != MPG123_OK)
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;	
+	}
+
+	SampleCount = (ZESize)mpg123_length(mpg123);
+	if (SampleCount == MPG123_ERR)
+	{
+		zeError("Cannot load sound resource. Decoder error. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;	
+	}
+
+	return ZE_TR_DONE;
+}
+
+ZETaskResult ZESoundResourceMP3::UnloadInternal()
+{
+	if (mpg123 != NULL)
+	{
+		mpg123_delete(mpg123);
+		mpg123 = NULL;
+	}
+
+	if (Data != NULL)
+	{
+		delete Data;
+		Data = NULL;
+	}
+
+	DataSize = 0;
+	MemoryCursor = 0;
+	ChannelCount = 0;
+	BitsPerSample = 0;
+	SamplesPerSecond = 0;
+	BlockAlign = 0;
+	SampleCount = 0;
+
+	return ZE_TR_DONE;
 }
 
 ZESoundResourceMP3::ZESoundResourceMP3()
@@ -103,85 +216,34 @@ const void* ZESoundResourceMP3::GetData() const
 	return Data;
 }
 
-void ZESoundResourceMP3::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
+bool ZESoundResourceMP3::Decode(void* Buffer, ZESize SampleIndex, ZESize Count) const
 {
-	mpg123_seek(mpg123, (off_t)SampleIndex, SEEK_SET);
+	if (!IsLoaded())
+	{
+		memset(Buffer, 0, Count);
+		return false;
+	}
 	
 	ZESize BytesRead = 1;
 	ZESize Position = 0;
 	ZEInt Result;
+
+	DecodeLock.Lock();
+	mpg123_seek(mpg123, (off_t)SampleIndex, SEEK_SET);
 
 	while(Position < (Count * BlockAlign))
 	{
 		Result = mpg123_read(mpg123, (unsigned char*)Buffer, Count * BlockAlign - Position, &BytesRead);
 		if (Result != MPG123_OK && Result != MPG123_DONE && Result != MPG123_NEED_MORE)
 		{
-			zeError("Error decoding mp3. (FileName : \"%s\", Error Code : %d)", GetFileName().ToCString(), Result);
-			return;
+			DecodeLock.Unlock();
+			zeError("Error decoding MP3 packet. File Name : \"%s\", Error Code : %d.", GetFileName().ToCString(), Result);
+			return false;
 		}
 		Position += BytesRead;
 	}
-}
 
-void ZESoundResourceMP3::BaseInitialize()
-{
-	mpg123_init();
-}
+	DecodeLock.Unlock();
 
-void ZESoundResourceMP3::BaseDeinitialize()
-{
-	mpg123_exit();
-}
-
-ZESoundResource* ZESoundResourceMP3::LoadResource(const ZEString& FileName)
-{
-	bool Result;
-
-	ZEFile File;
-	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-	if(!Result)
-	{
-		zeError("Can not open mp3 file. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-
-	ZESoundResourceMP3* NewResource = new ZESoundResourceMP3();
-
-	File.Seek(0, ZE_SF_END);
-	NewResource->DataSize = File.Tell();
-	NewResource->Data = new unsigned char[NewResource->DataSize];
-	File.Seek(0, ZE_SF_BEGINING);
-	File.Read(NewResource->Data, 1, NewResource->DataSize);
-	File.Close();
-
-	NewResource->SetFileName(FileName);	
-	NewResource->MemoryCursor = 0;
-
-	NewResource->mpg123 = mpg123_new(NULL, NULL);
-	if (NewResource->mpg123 == NULL)
-	{
-		zeError("Can not create MP3 handle. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
-	
-	mpg123_param(NewResource->mpg123, MPG123_RESYNC_LIMIT, -1, 0); /* New in library version 0.0.1 . */
-
-	mpg123_replace_reader(NewResource->mpg123, Memory_Read, Memory_Seek);
-
-	Indexes.Add(NewResource);
-	mpg123_open_fd(NewResource->mpg123, Indexes.GetCount() - 1);
-
-	long Rate;
-	ZEInt Channels, Encoding;
-	mpg123_getformat(NewResource->mpg123, &Rate, &Channels, &Encoding);
-
-	NewResource->FileFormat			= ZE_SFF_MP3;
-	NewResource->BitsPerSample		= 16;
-	NewResource->ChannelCount		= Channels;
-	NewResource->SamplesPerSecond	= (ZESize)Rate;
-	NewResource->BlockAlign			= (ZESize)NewResource->ChannelCount * ((ZESize)NewResource->BitsPerSample / 8);
-	mpg123_scan(NewResource->mpg123);
-	NewResource->SampleCount = (ZESize)mpg123_length(NewResource->mpg123);
-
-	return NewResource;
+	return true;
 }

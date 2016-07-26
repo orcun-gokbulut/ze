@@ -45,22 +45,40 @@
 class ZEGRRenderTarget;
 class ZEGRDepthStencilBuffer;
 
+class ZEGRTexture2DOptions : public ZEGRTextureOptions
+{
+
+};
+
 class ZEGRTexture2D : public ZEGRTexture
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRTexture2D)
 	friend class ZEGRContext;
 	friend class ZEGRGraphicsModule;
+	friend class ZERSTemplates;
 	protected:
 		ZEUInt											Width;
 		ZEUInt											Height;
 		ZEUInt											ArrayCount;
 		ZEUInt											SampleCount;
+		ZEGRTexture2DOptions							TextureOptions;
 
-		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlag, ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data);	
+		static bool										CheckParameters(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, 
+															ZEGRResourceUsage Usage, ZEFlags BindFlag, ZEUInt 
+															ArrayCount, ZEUInt SampleCount, const void* Data);	
+
+		virtual bool									Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, 
+															ZEGRResourceUsage Usage, ZEFlags BindFlag, 
+															ZEUInt ArrayCount, ZEUInt SampleCount, const void* Data);	
 		virtual void									Deinitialize();
 
+		ZETaskResult									LoadInternal();
+		ZETaskResult									UnloadInternal();
+
 														ZEGRTexture2D();
+
+		static ZERSResource*							Instanciator(const void* Parameters);
 
 	public:
 		ZEUInt											GetWidth() const;
@@ -68,6 +86,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZEUInt											GetArrayCount() const;
 		ZEUInt											GetSampleCount() const;
 		ZEVector2										GetPixelSize() const;
+		const ZEGRTextureOptions&						GetTextureOptions() const;
 
 		virtual ZEGRResourceType						GetResourceType() const;
 		virtual ZEGRTextureType							GetTextureType() const;
@@ -79,13 +98,13 @@ class ZEGRTexture2D : public ZEGRTexture
 		virtual bool									Lock(void** Buffer, ZESize* RowPitch = NULL, ZESize* SlicePitch = NULL, ZEUInt ArrayIndex = 0, ZEUInt Level = 0) = 0;
 		virtual void									Unlock() = 0;
 
-		static ZEHolder<ZEGRTexture2D>					CreateInstance(
-															ZEUInt Width, ZEUInt Height, 
-															ZEUInt LevelCount, ZEGRFormat Format, 
-															ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
-															ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
-															ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1, 
-															const void* Data = NULL);
-
-		static ZEHolder<ZEGRTexture2D>					CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions);
+		static ZEHolder<ZEGRTexture2D>					CreateResource(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, 
+															ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+															ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1, const void* Data = NULL);
+		static ZEHolder<const ZEGRTexture2D>			CreateResourceShared(const ZEGUID& GUID, ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, ZEGRFormat Format, 
+															ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+															ZEUInt ArrayCount = 1, ZEUInt SampleCount = 1, const void* Data = NULL, ZEGRTexture2D** StagingResource = NULL);
+		
+		static ZEHolder<ZEGRTexture2D>					LoadResource(const ZEString& FileName, const ZEGRTexture2DOptions& TextureOptions);
+		static ZEHolder<const ZEGRTexture2D>			LoadResourceShared(const ZEString& FileName, const ZEGRTexture2DOptions& TextureOptions);
 };

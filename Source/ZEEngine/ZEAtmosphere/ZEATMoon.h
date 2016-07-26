@@ -53,59 +53,59 @@ class ZEATMoon : public ZEEntity
 {
 	ZE_OBJECT
 	private:
-		ZEFlags							DirtyFlags;
-		ZERNCommand						Command;
+		ZEFlags								DirtyFlags;
+		ZERNCommand							Command;
 
-		ZEHolder<ZEGRShader>			VertexShader;
-		ZEHolder<ZEGRShader>			PixelShader;
-		ZEHolder<ZEGRRenderStateData>	RenderStateData;
+		ZEHolder<ZEGRShader>				VertexShader;
+		ZEHolder<ZEGRShader>				PixelShader;
+		ZEHolder<ZEGRRenderStateData>		RenderStateData;
 
-		ZEHolder<ZEGRConstantBuffer>	ConstantBuffer;
+		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 
-		ZEHolder<ZEGRTexture3D>			PhaseTexture;
+		ZEHolder<const ZEGRTexture3D>		PhaseTexture;
 
-		ZEVector3						Direction;
-		float							DiskRadius;
+		ZEVector3							Direction;
+		float								DiskRadius;
 
 		struct
 		{
-			ZEVector2					PositionScreen;
-			ZEVector2					SizeScreen;
+			ZEVector2						PositionScreen;
+			ZEVector2						SizeScreen;
 
-			float						Phase;
-			ZEVector3					Color;
+			float							Phase;
+			ZEVector3						Color;
 		} Constants;
 
-		bool							UpdateShaders();
-		bool							UpdateRenderStates();
-		bool							UpdateConstantBuffers();
-		bool							Update();
+		bool								UpdateShaders();
+		bool								UpdateRenderStates();
+		bool								UpdateConstantBuffers();
+		bool								Update();
 
-		bool							CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector);
+		bool								CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector);
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual bool						InitializeSelf();
+		virtual bool						DeinitializeSelf();
 	
-										ZEATMoon();
-		virtual							~ZEATMoon();
+											ZEATMoon();
+		virtual								~ZEATMoon();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
+		virtual ZEDrawFlags					GetDrawFlags() const;
 
-		void							SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
-		const ZEString&					GetTextureFile() const;
+		void								SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
+		const ZEString&						GetTextureFile() const;
 
-		void							SetDirection(const ZEVector3& Direction);
-		const ZEVector3&				GetDirection() const;
+		void								SetDirection(const ZEVector3& Direction);
+		const ZEVector3&					GetDirection() const;
 
-		void							SetDiskRadius(float DiskRadius);
-		float							GetDiskRadius() const;
+		void								SetDiskRadius(float DiskRadius);
+		float								GetDiskRadius() const;
 
-		void							SetColor(const ZEVector3& Color);
-		const ZEVector3&				GetColor() const;
+		void								SetColor(const ZEVector3& Color);
+		const ZEVector3&					GetColor() const;
 
-		virtual bool					PreRender(const ZERNPreRenderParameters* Parameters);
-		virtual void					Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
+		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
+		virtual void						Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 
-		static ZEATMoon*				CreateInstance();
+		static ZEATMoon*					CreateInstance();
 };

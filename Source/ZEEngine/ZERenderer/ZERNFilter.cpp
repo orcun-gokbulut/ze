@@ -243,7 +243,7 @@ void ZERNFilter::ApplyGaussianBlur(ZEGRContext* Context, const ZEGRTexture2D* In
 
 	if (TempTexture == NULL || 
 		TempTexture->GetWidth() != Width || TempTexture->GetHeight() != Height)
-		TempTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
+		TempTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, InputTexture->GetFormat(), InputTexture->GetResourceUsage(), InputTexture->GetResourceBindFlags());
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 8, ConstantBuffer);
 	Context->SetConstantBuffer(ZEGR_ST_COMPUTE, 8, ConstantBuffer);

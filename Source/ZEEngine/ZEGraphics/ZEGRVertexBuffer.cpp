@@ -78,7 +78,7 @@ ZEUInt ZEGRVertexBuffer::GetVertexStride() const
 	return VertexStride;
 }
 
-static ZERSResource* Instanciator()
+static ZERSResource* Instanciator(const void*)
 {
 	return ZEGRGraphicsModule::GetInstance()->CreateVertexBuffer();
 }

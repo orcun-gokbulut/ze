@@ -69,7 +69,7 @@ bool ZERNStageRenderDepth::UpdateInputOutputs()
 
 	if (TransparentDepthBuffer == NULL || 
 		TransparentDepthBuffer->GetWidth() != Width || TransparentDepthBuffer->GetHeight() != Height)
-		TransparentDepthBuffer = ZEGRTexture2D::CreateInstance(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
+		TransparentDepthBuffer = ZEGRTexture2D::CreateResource(Width, Height, 1, DepthTexture->GetFormat(), DepthTexture->GetResourceUsage(), DepthTexture->GetResourceBindFlags(), 1, DepthTexture->GetSampleCount());
 	
 	return true;
 }

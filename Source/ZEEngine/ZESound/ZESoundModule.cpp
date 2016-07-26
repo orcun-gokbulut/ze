@@ -63,13 +63,10 @@ void ZESoundModule::BaseInitialize()
 	SoundOptions.AddOption(new ZEOption("VideoVolume", 100, ZE_OA_NORMAL));
 	SoundOptions.AddOption(new ZEOption("PlayerCommVolume", 100, ZE_OA_NORMAL));
 	ZEOptionManager::GetInstance()->RegisterSection(&SoundOptions);
-
-	ZESoundResourceMP3::BaseInitialize();
 }
 
 void ZESoundModule::BaseDeinitialize()
 {
-	ZESoundResourceMP3::BaseDeinitialize();
 	ZEOptionManager::GetInstance()->UnregisterSection(&SoundOptions);
 }
 

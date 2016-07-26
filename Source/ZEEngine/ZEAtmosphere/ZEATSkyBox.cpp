@@ -62,13 +62,13 @@ ZEDrawFlags ZEATSkyBox::GetDrawFlags() const
 
 void ZEATSkyBox::SetTextureFile(const ZEString& FileName)
 {
-	ZEGRTextureOptions TextureOptions;
+	ZEGRTextureCubeOptions TextureOptions;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
 
-	SkyTexture = ZEGRTextureCube::CreateFromFile(FileName, TextureOptions);
+	SkyTexture = ZEGRTextureCube::LoadResourceShared(FileName, TextureOptions);
 }
 
 const ZEString& ZEATSkyBox::GetTextureFile() const

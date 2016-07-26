@@ -78,7 +78,7 @@ bool ZERNStageAntiAliasing::UpdateInputOutput()
 		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-			OutputTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
+			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
@@ -210,10 +210,10 @@ bool ZERNStageAntiAliasing::UpdateTextures()
 	ZEUInt Width = OutputRenderTarget->GetWidth();
 	ZEUInt Height = OutputRenderTarget->GetHeight();
 
-	EdgeTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	EdgeTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 	EdgeRenderTarget = EdgeTexture->GetRenderTarget();
 
-	BlendTexture = ZEGRTexture2D::CreateInstance(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
+	BlendTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
 	BlendRenderTarget = BlendTexture->GetRenderTarget();
 
 	DirtyFlags.UnraiseFlags(ZERN_AADF_TEXTURE);
@@ -280,8 +280,8 @@ bool ZERNStageAntiAliasing::InitializeInternal()
 
 	SamplerLinearClamp = ZEGRSampler::GetDefaultSampler();
 
-	AreaTexture = ZEGRTexture2D::CreateInstance(AREATEX_WIDTH, AREATEX_HEIGHT, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, areaTexBytes);
-	SearchTexture = ZEGRTexture2D::CreateInstance(SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, 1, ZEGR_TF_R8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, searchTexBytes);
+	AreaTexture = ZEGRTexture2D::CreateResource(AREATEX_WIDTH, AREATEX_HEIGHT, 1, ZEGR_TF_R8G8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, areaTexBytes);
+	SearchTexture = ZEGRTexture2D::CreateResource(SEARCHTEX_WIDTH, SEARCHTEX_HEIGHT, 1, ZEGR_TF_R8_UNORM, ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 1, 1, searchTexBytes);
 
 	return Update();
 }

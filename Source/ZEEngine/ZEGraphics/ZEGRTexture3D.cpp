@@ -39,11 +39,37 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEPointer/ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
-
+#include "ZEResource/ZERSTemplates.h"
 #include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
 #include "DirectXTex.h"
+
 using namespace DirectX;
+
+ZEGRTexture3DOptions::ZEGRTexture3DOptions()
+{
+	VerticalTileCount = 1;
+	HorizontalTileCount = 1;
+}
+
+bool ZEGRTexture3D::CheckParameters(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
+{
+	zeDebugCheck(Width == 0, "Width cannot be 0.");
+	zeDebugCheck(Height == 0, "Height cannot be 0.");
+	zeDebugCheck(Depth == 0, "Depth cannot be 0.");
+	zeDebugCheck(Width > ZEGR_MAX_TEXTURE3D_DIMENSION, "Width is too big.");
+	zeDebugCheck(Height > ZEGR_MAX_TEXTURE3D_DIMENSION, "Height is too big.");
+	zeDebugCheck(Depth > ZEGR_MAX_TEXTURE3D_DIMENSION, "Depth is too big.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
+	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
+
+	return false;
+}
 
 bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
 {
@@ -66,6 +92,185 @@ void ZEGRTexture3D::Deinitialize()
 {
 	SetSize(0);
 	ZEGR_COUNTER_RESOURCE_DECREASE(this, Texture3D, Texture);
+}
+
+ZETaskResult ZEGRTexture3D::LoadInternal()
+{
+	if (GetFileName().IsEmpty())
+		return ZE_TR_DONE;
+
+	ZEPathInfo PathInfo = GetFileName();
+	ZEString Extension = PathInfo.GetExtension();
+
+	if (Extension.IsEmpty())
+	{
+		zeError("Cannot load texture. Unknwon file extension. File Name: \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	ZEString FileRealPath = PathInfo.GetRealPath().Path;
+
+	HRESULT HR;
+	TexMetadata FinalMetaData;
+	ZEPointer<ScratchImage> FinalImage = new ScratchImage();
+
+	if (Extension == ".dds")
+	{
+		HR = LoadFromDDSFile(FileRealPath, DDS_FLAGS_NONE, &FinalMetaData, *FinalImage);
+		if (FAILED(HR))
+		{
+			zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+			return ZE_TR_FAILED;
+		}
+	}
+	else
+	{
+		ZEString DDSFile = PathInfo.GetName() + ".dds";
+		ZEPathInfo DDSFilePathInfo = ZEPathInfo::CombineRelativePath(PathInfo.GetPath(), DDSFile);
+		if (DDSFilePathInfo.GetModificationTime() > PathInfo.GetModificationTime())
+		{
+			HR = LoadFromDDSFile(DDSFilePathInfo.GetRealPath().Path, DDS_FLAGS_NONE, &FinalMetaData, *FinalImage);
+			if (FAILED(HR))
+			{
+				zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+				return ZE_TR_FAILED;
+			}
+		}
+		else
+		{
+			if (Extension == ".tga")
+			{
+				HR = LoadFromTGAFile(FileRealPath, &FinalMetaData, *FinalImage);
+				if (FAILED(HR))
+				{
+					zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
+				}
+			}
+			else
+			{
+				HR = LoadFromWICFile(FileRealPath, WIC_FLAGS_FORCE_RGB | WIC_FLAGS_IGNORE_SRGB, &FinalMetaData, *FinalImage);
+				if (FAILED(HR))
+				{
+					zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
+				}
+			}
+
+			const Image* SrcImage = FinalImage->GetImage(0, 0, 0);
+			ZEUInt TargetRowpitch = (ZEUInt)SrcImage->rowPitch / TextureOptions.HorizontalTileCount;
+			ZEUInt TargetHeight = (ZEUInt)SrcImage->height / TextureOptions.VerticalTileCount;
+			ZEUInt TargetDepth = TextureOptions.HorizontalTileCount * TextureOptions.VerticalTileCount;
+
+			ZEPointer<ScratchImage> VolumeMap = new ScratchImage();
+			VolumeMap->Initialize3D(FinalMetaData.format, FinalMetaData.width / TextureOptions.HorizontalTileCount, FinalMetaData.height / TextureOptions.VerticalTileCount, TargetDepth, 1);
+			for (ZEUInt J = 0; J < TextureOptions.VerticalTileCount; J++)
+			{
+				ZESize Index = J * TextureOptions.HorizontalTileCount;
+				ZESize Offset = J * TargetHeight * SrcImage->rowPitch;
+				for (ZEUInt I = 0; I < TextureOptions.HorizontalTileCount; I++)
+				{
+					for (ZEUInt K = 0; K < TargetHeight; K++)
+						memcpy(VolumeMap->GetImages()[Index + I].pixels + K * TargetRowpitch, SrcImage->pixels + (Offset + I * TargetRowpitch) + K * SrcImage->rowPitch, TargetRowpitch);
+				}
+			}
+
+			FinalMetaData = VolumeMap->GetMetadata();
+			FinalImage = VolumeMap.Transfer();
+
+			if (TextureOptions.sRGB)
+			{
+				FinalImage->OverrideFormat(MakeSRGB(FinalMetaData.format));
+				FinalMetaData = FinalImage->GetMetadata();
+			}
+
+			if (TextureOptions.GenerateMipMaps)
+			{
+				if (!ZEMath::IsPowerOfTwo((ZEUInt)FinalMetaData.width) || !ZEMath::IsPowerOfTwo((ZEUInt)FinalMetaData.height))
+				{
+					float PowerWidth = ZEMath::Log((float)FinalMetaData.width) / ZEMath::Log(2);
+					float PowerHeight = ZEMath::Log((float)FinalMetaData.height) / ZEMath::Log(2);
+
+					ZEUInt NearestPowerWidth = (ZEUInt)ZEMath::Floor(PowerWidth + 0.5f);
+					ZEUInt NearestPowerHeight = (ZEUInt)ZEMath::Floor(PowerHeight + 0.5f);
+
+					ZEUInt ResizedWidth = (ZEUInt)ZEMath::Power(2, (float)NearestPowerWidth);
+					ZEUInt ResizedHeight = (ZEUInt)ZEMath::Power(2, (float)NearestPowerHeight);
+
+					ZEPointer<ScratchImage> ResizedImage = new ScratchImage();
+					HR = Resize(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, ResizedWidth, ResizedHeight, TEX_FILTER_DEFAULT, *ResizedImage);
+					if (FAILED(HR))
+					{
+						zeError("Cannot load texture. Resizing to nearest power of two failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+						return ZE_TR_FAILED;
+					}
+
+					FinalMetaData = ResizedImage->GetMetadata();
+					FinalImage = ResizedImage.Transfer();
+				}
+
+				ZEPointer<ScratchImage> MipmapChain = new ScratchImage();
+				HR = GenerateMipMaps3D(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, TEX_FILTER_DEFAULT, TextureOptions.MaximumMipmapLevel, *MipmapChain);
+				if (FAILED(HR))
+				{
+					zeError("Cannot load texture. Mip map generation failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
+				}
+
+				FinalMetaData = MipmapChain->GetMetadata();
+				FinalImage = MipmapChain.Transfer();
+			}
+
+			const ZEGRFormatDefinition* FormatInfo = ZEGRFormatDefinition::GetDefinition(TextureOptions.CompressionFormat);
+			if (FormatInfo->Compressed)
+			{
+				DXGI_FORMAT CompressionFormat = ZED11ComponentBase::ConvertFormat(FormatInfo->Format);
+				DWORD CompressionFlags = TEX_COMPRESS_DEFAULT;
+
+				if (FormatInfo->Type == ZEGR_FT_UNORM_SRGB)
+					CompressionFlags |= TEX_COMPRESS_SRGB;
+
+				if (FormatInfo->Structure == ZEGR_FS_BC4)
+					CompressionFlags |= TEX_COMPRESS_SRGB_IN;
+
+				ZEPointer<ScratchImage> CompressedImage = new ScratchImage();
+				HR = Compress(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, CompressionFormat, CompressionFlags, 0.5f, *CompressedImage);
+				if (FAILED(HR))
+				{
+					zeError("Cannot load texture. Compression failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
+				}
+
+				FinalMetaData = CompressedImage->GetMetadata();
+				FinalImage = CompressedImage.Transfer();
+			}
+
+			ZEString NewFilename = PathInfo.GetName() + ".dds";
+			ZEString NewFileRealPath = ZEPathInfo::CombineRelativePath(FileRealPath, NewFilename);
+			HR = SaveToDDSFile(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, DDS_FLAGS_NONE, NewFileRealPath);
+			if (FAILED(HR))
+			{
+				zeError("Cannot load texture. Saving to dds file failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+				return ZE_TR_FAILED;
+			}
+		}
+	}
+
+	if (ZEGRTexture3D::Initialize((ZEUInt)FinalMetaData.width, (ZEUInt)FinalMetaData.height, (ZEUInt)FinalMetaData.depth, (ZEUInt)FinalMetaData.mipLevels, 
+		ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 
+		FinalImage->GetPixels()))
+	{
+		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", HR, GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	return ZE_TR_DONE;
+}
+
+ZETaskResult ZEGRTexture3D::UnloadInternal()
+{
+	Deinitialize();
+	return ZE_TR_DONE;
 }
 
 ZEGRResourceType ZEGRTexture3D::GetResourceType() const
@@ -105,201 +310,70 @@ ZEGRTexture3D::ZEGRTexture3D()
 	Depth = 0;
 }
 
-ZEHolder<ZEGRTexture3D> ZEGRTexture3D::Create(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
+ZERSResource* ZEGRTexture3D::Instanciator(const void* Parameters)
 {
-	zeDebugCheck(Width == 0, "Width cannot be 0.");
-	zeDebugCheck(Height == 0, "Height cannot be 0.");
-	zeDebugCheck(Depth == 0, "Depth cannot be 0.");
-	zeDebugCheck(Width > ZEGR_MAX_TEXTURE3D_DIMENSION, "Width is too big.");
-	zeDebugCheck(Height > ZEGR_MAX_TEXTURE3D_DIMENSION, "Height is too big.");
-	zeDebugCheck(Depth > ZEGR_MAX_TEXTURE3D_DIMENSION, "Depth is too big.");
-	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
-	zeDebugCheck(LevelCount > 1 && (!ZEMath::IsPowerOfTwo(Width) || !ZEMath::IsPowerOfTwo(Height) || !ZEMath::IsPowerOfTwo(Depth)), "Level must be 1 for non-power of two textures.");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
-	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
-	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
+	ZEGRTexture3D* Resource = ZEGRGraphicsModule::GetInstance()->CreateTexture3D();
+	
+	if (Parameters != NULL && Resource != NULL)
+		Resource->TextureOptions = *reinterpret_cast<const ZEGRTexture3DOptions*>(Parameters);
 
-	ZEGRTexture3D* Texture = ZEGRGraphicsModule::GetInstance()->CreateTexture3D();
+	return Resource;
+}
+
+ZEHolder<ZEGRTexture3D> ZEGRTexture3D::CreateResource(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
+{
+	if (!CheckParameters(Width, Height, Depth, LevelCount, Format, Usage, BindFlags, Data))
+		return NULL;
+
+	ZEHolder<ZEGRTexture3D> Texture = ZERSTemplates::CreateResource<ZEGRTexture3D>(Instanciator);
 	if (Texture == NULL)
 		return NULL;
 
 	if (!Texture->Initialize(Width, Height, Depth, LevelCount, Format, Usage, BindFlags, Data))
 	{
-		delete Texture;
+		Texture->StagingFailed();
 		return NULL;
 	}
+
+	Texture->StagingRealized();
 
 	return Texture;
 }
 
-ZEHolder<ZEGRTexture3D> ZEGRTexture3D::CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions, ZEUInt HorizTileCount, ZEUInt VertTileCount)
+ZEHolder<const ZEGRTexture3D> ZEGRTexture3D::CreateResourceShared(const ZEGUID& GUID, ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data, ZEGRTexture3D** StagingResource)
 {
-	if (Filename.IsEmpty())
+	if (!CheckParameters(Width, Height, Depth, LevelCount, Format, Usage, BindFlags, Data))
 		return NULL;
 
-	ZEPathInfo PathInfo = Filename;
-	ZEString Extension = PathInfo.GetExtension();
-
-	if (Extension.IsEmpty())
+	ZEGRTexture3D* StagingResourceTemp = NULL;
+	ZEHolder<const ZEGRTexture3D> Texture = ZERSTemplates::CreateResourceShared<ZEGRTexture3D>(GUID, &StagingResourceTemp, Instanciator);
+	if (Texture == NULL)
 		return NULL;
 
-	ZEString FileRealPath = PathInfo.GetRealPath().Path;
-
-	HRESULT HR;
-	TexMetadata FinalMetaData;
-	ZEPointer<ScratchImage> FinalImage = new ScratchImage();
-
-	if (Extension == ".dds")
+	if (StagingResourceTemp != NULL)
 	{
-		HR = LoadFromDDSFile(FileRealPath, DDS_FLAGS_NONE, &FinalMetaData, *FinalImage);
-		if (FAILED(HR))
+		if (!StagingResourceTemp->Initialize(Width, Height, Depth, LevelCount, Format, Usage, BindFlags, Data))
 		{
-			zeError("Loading from dds file failed (%x)\n", HR);
+			StagingResourceTemp->StagingFailed();
 			return NULL;
 		}
-	}
-	else
-	{
-		ZEString DDSFile = PathInfo.GetName() + ".dds";
-		ZEPathInfo DDSFilePathInfo = ZEPathInfo::CombineRelativePath(PathInfo.GetPath(), DDSFile);
-		if (DDSFilePathInfo.GetModificationTime() > PathInfo.GetModificationTime())
-		{
-			HR = LoadFromDDSFile(DDSFilePathInfo.GetRealPath().Path, DDS_FLAGS_NONE, &FinalMetaData, *FinalImage);
-			if (FAILED(HR))
-			{
-				zeError("Loading from dds file failed (%x)\n", HR);
-				return NULL;
-			}
-		}
-		else
-		{
-			if (Extension == ".tga")
-			{
-				HR = LoadFromTGAFile(FileRealPath, &FinalMetaData, *FinalImage);
-				if (FAILED(HR))
-				{
-					zeError("Loading from tga file failed (%x)\n", HR);
-					return NULL;
-				}
-			}
-			else
-			{
-				HR = LoadFromWICFile(FileRealPath, WIC_FLAGS_FORCE_RGB | WIC_FLAGS_IGNORE_SRGB, &FinalMetaData, *FinalImage);
-				if (FAILED(HR))
-				{
-					zeError("Loading from %s file failed (%x)\n", Extension, HR);
-					return NULL;
-				}
-			}
 
-			const Image* SrcImage = FinalImage->GetImage(0, 0, 0);
-			ZEUInt TargetRowpitch = SrcImage->rowPitch / HorizTileCount;
-			ZEUInt TargetHeight = SrcImage->height / VertTileCount;
-			ZEUInt TargetDepth = HorizTileCount * VertTileCount;
-
-			ZEPointer<ScratchImage> VolumeMap = new ScratchImage();
-			VolumeMap->Initialize3D(FinalMetaData.format, FinalMetaData.width / HorizTileCount, FinalMetaData.height / VertTileCount, TargetDepth, 1);
-			for (ZEUInt J = 0; J < VertTileCount; J++)
-			{
-				ZEUInt Index = J * HorizTileCount;
-				ZEUInt Offset = J * TargetHeight * SrcImage->rowPitch;
-				for (ZEUInt I = 0; I < HorizTileCount; I++)
-				{
-					for (ZEUInt K = 0; K < TargetHeight; K++)
-						memcpy(VolumeMap->GetImages()[Index + I].pixels + K * TargetRowpitch, SrcImage->pixels + (Offset + I * TargetRowpitch) + K * SrcImage->rowPitch, TargetRowpitch);
-				}
-			}
-
-			FinalMetaData = VolumeMap->GetMetadata();
-			FinalImage = VolumeMap.Transfer();
-
-			if (TextureOptions.sRGB)
-			{
-				FinalImage->OverrideFormat(MakeSRGB(FinalMetaData.format));
-				FinalMetaData = FinalImage->GetMetadata();
-			}
-
-			if (TextureOptions.GenerateMipMaps)
-			{
-				if (!ZEMath::IsPowerOfTwo(FinalMetaData.width) || !ZEMath::IsPowerOfTwo(FinalMetaData.height))
-				{
-					float PowerWidth = ZEMath::Log(FinalMetaData.width) / ZEMath::Log(2);
-					float PowerHeight = ZEMath::Log(FinalMetaData.height) / ZEMath::Log(2);
-
-					ZEUInt NearestPowerWidth = ZEMath::Floor(PowerWidth + 0.5f);
-					ZEUInt NearestPowerHeight = ZEMath::Floor(PowerHeight + 0.5f);
-
-					ZEUInt ResizedWidth = ZEMath::Power(2, NearestPowerWidth);
-					ZEUInt ResizedHeight = ZEMath::Power(2, NearestPowerHeight);
-
-					ZEPointer<ScratchImage> ResizedImage = new ScratchImage();
-					HR = Resize(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, ResizedWidth, ResizedHeight, TEX_FILTER_DEFAULT, *ResizedImage);
-					if (FAILED(HR))
-					{
-						zeError("Resizing to nearest power of two failed (%x)\n", HR);
-						return NULL;
-					}
-
-					FinalMetaData = ResizedImage->GetMetadata();
-					FinalImage = ResizedImage.Transfer();
-				}
-
-				ZEPointer<ScratchImage> MipmapChain = new ScratchImage();
-				HR = GenerateMipMaps3D(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, TEX_FILTER_DEFAULT, TextureOptions.MaximumMipmapLevel, *MipmapChain);
-				if (FAILED(HR))
-				{
-					zeError("Mip map generation failed (%x)\n", HR);
-					return NULL;
-				}
-
-				FinalMetaData = MipmapChain->GetMetadata();
-				FinalImage = MipmapChain.Transfer();
-			}
-
-			const ZEGRFormatDefinition* FormatInfo = ZEGRFormatDefinition::GetDefinition(TextureOptions.CompressionFormat);
-			if (FormatInfo->Compressed)
-			{
-				DXGI_FORMAT CompressionFormat = ZED11ComponentBase::ConvertFormat(FormatInfo->Format);
-				DWORD CompressionFlags = TEX_COMPRESS_DEFAULT;
-
-				if (FormatInfo->Type == ZEGR_FT_UNORM_SRGB)
-					CompressionFlags |= TEX_COMPRESS_SRGB;
-
-				if (FormatInfo->Structure == ZEGR_FS_BC4)
-					CompressionFlags |= TEX_COMPRESS_SRGB_IN;
-
-				ZEPointer<ScratchImage> CompressedImage = new ScratchImage();
-				HR = Compress(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, CompressionFormat, CompressionFlags, 0.5f, *CompressedImage);
-				if (FAILED(HR))
-				{
-					zeError("Compression failed (%x)\n", HR);
-					return NULL;
-				}
-
-				FinalMetaData = CompressedImage->GetMetadata();
-				FinalImage = CompressedImage.Transfer();
-			}
-
-			ZEString NewFilename = PathInfo.GetName() + ".dds";
-			ZEString NewFileRealPath = ZEPathInfo::CombineRelativePath(FileRealPath, NewFilename);
-			HR = SaveToDDSFile(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, DDS_FLAGS_NONE, NewFileRealPath);
-			if (FAILED(HR))
-			{
-				zeError("Saving to dds file failed (%x)\n", HR);
-				return NULL;
-			}
-		}
+		StagingResourceTemp->StagingRealized();
 	}
 
-	return ZEGRTexture3D::Create(
-								FinalMetaData.width, 
-								FinalMetaData.height, 
-								FinalMetaData.depth, 
-								FinalMetaData.mipLevels, 
-								ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
-								ZEGR_RU_GPU_READ_ONLY, 
-								ZEGR_RBF_SHADER_RESOURCE, 
-								FinalImage->GetPixels());
+	if (*StagingResource != NULL)
+		*StagingResource = StagingResourceTemp;
+
+	return Texture;
+}
+
+ZEHolder<ZEGRTexture3D> ZEGRTexture3D::LoadResource(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions)
+{
+	return ZERSTemplates::LoadResource<ZEGRTexture3D>(FileName, Instanciator, &TextureOptions);
+}
+
+ZEHolder<const ZEGRTexture3D> ZEGRTexture3D::LoadResourceShared(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions)
+{
+
+	return ZERSTemplates::LoadResourceShared<ZEGRTexture3D>(FileName, Instanciator, &TextureOptions);
 }

@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_RESOURCE_OGG_H__
-#define __ZE_SOUND_RESOURCE_OGG_H__
 
 #include "ZETypes.h"
 #include "ZESoundResource.h"
@@ -44,30 +42,28 @@
 
 class ZESoundResourceOGG : public ZESoundResource
 {
-	friend ZESize	OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource);
-	friend ZEInt	OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence);
-	friend long		OggMemory_Tell(void *datasource);
-
+	friend class ZESoundResource;
 	private:
 		void*							Data;
 		ZESize							DataSize;
 		
 		ZESize							MemoryCursor;
-		OggVorbis_File					OggFile;
-		
+		mutable OggVorbis_File			OggFile;	
+		mutable ZELock					DecodeLock;
+
+		virtual ZETaskResult			LoadInternal();
+		virtual ZETaskResult			UnloadInternal();
+
 										ZESoundResourceOGG();
 		virtual							~ZESoundResourceOGG();
 
-	public:
+		static ZESize					OggRead(void *ptr, ZESize size, ZESize nmemb, void *datasource);
+		static ZEInt					OggSeek(void *datasource, ogg_int64_t offset, ZEInt whence);
+		static long						OggTell(void *datasource);
 
+	public:
 		virtual ZESize					GetDataSize() const;		
 		virtual const void*				GetData() const;
 		
-
-
-		virtual void					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount);
-
-		static ZESoundResource*			LoadResource(const ZEString& FileName);
+		virtual bool					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount) const;
 };
-
-#endif

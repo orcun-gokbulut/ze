@@ -44,7 +44,23 @@
 #include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
 #include "DirectXTex.h"
+#include "ZEResource/ZERSTemplates.h"
 using namespace DirectX;
+
+bool ZEGRTextureCube::CheckParameters(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
+{
+	zeDebugCheck(Length == 0, "length cannot be 0.");
+	zeDebugCheck(Length > ZEGR_MAX_TEXTURECUBE_DIMENSION, "length is too big.");
+	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
+	zeDebugCheck(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), NULL, "Level must be 1 for non-power of two textures.");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
+	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
+	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
+
+	return true;
+}
 
 bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
 {
@@ -67,66 +83,19 @@ void ZEGRTextureCube::Deinitialize()
 }
 
 
-ZEGRResourceType ZEGRTextureCube::GetResourceType() const
+ZETaskResult ZEGRTextureCube::LoadInternal()
 {
-	return ZEGR_RT_TEXTURE;
-}
+	if (GetFileName().IsEmpty())
+		return ZE_TR_DONE;
 
-ZEGRTextureType ZEGRTextureCube::GetTextureType() const
-{
-	return ZEGR_TT_CUBE;
-}
-
-ZEUInt ZEGRTextureCube::GetLength() const
-{
-	return Length;
-}
-
-float ZEGRTextureCube::GetPixelSize() const
-{
-	return 1.0f / (float)GetLength();
-}
-
-ZEGRTextureCube::ZEGRTextureCube()
-{
-	Length = 0;
-}
-
-ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateInstance(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
-{	
-	zeDebugCheck(Length == 0, "length cannot be 0.");
-	zeDebugCheck(Length > ZEGR_MAX_TEXTURECUBE_DIMENSION, "length is too big.");
-	zeDebugCheck(LevelCount == 0, "Level cannot be 0.");
-	zeDebugCheck(LevelCount > 1 && !ZEMath::IsPowerOfTwo(Length), NULL, "Level must be 1 for non-power of two textures.");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && Data == NULL, "Immutable textures must be initialized with data");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_ONLY && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL), "Immutable textures cannot be bound as render target or depth-stencil");
-	zeDebugCheck(Usage == ZEGR_RU_GPU_READ_CPU_WRITE && BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_DEPTH_STENCIL),  "Dynamic textures cannot be bound as render target or depth-stencil");
-	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
-	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
-
-	ZEGRTextureCube* Texture = ZEGRGraphicsModule::GetInstance()->CreateTextureCube();
-	if (Texture == NULL)
-		return NULL;
-
-	if (!Texture->Initialize(Length, LevelCount, Format, Usage, BindFlags, Data))
-	{
-		delete Texture;
-		return NULL;
-	}
-
-	return Texture;
-}
-
-ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions)
-{
-	if (Filename.IsEmpty())
-		return NULL;
-
-	ZEPathInfo PathInfo = Filename;
+	ZEPathInfo PathInfo = GetFileName();
 	ZEString Extension = PathInfo.GetExtension();
 
 	if (Extension.IsEmpty())
-		return NULL;
+	{
+		zeError("Cannot load texture. Unknwon file extension. File Name: \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
 
 	ZEString FileRealPath = PathInfo.GetRealPath().Path;
 
@@ -139,8 +108,8 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 		HR = LoadFromDDSFile(FileRealPath, DDS_FLAGS_NONE, &FinalMetaData, *FinalImage);
 		if (FAILED(HR))
 		{
-			zeError("Loading from dds file failed (%x)\n", HR);
-			return NULL;
+			zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+			return ZE_TR_FAILED;
 		}
 	}
 	else
@@ -152,8 +121,8 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 			HR = LoadFromDDSFile(DDSFilePathInfo.GetRealPath().Path, DDS_FLAGS_NONE, &FinalMetaData, *FinalImage);
 			if (FAILED(HR))
 			{
-				zeError("Loading from dds file failed (%x)\n", HR);
-				return NULL;
+				zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+				return ZE_TR_FAILED;
 			}
 		}
 		else
@@ -163,8 +132,8 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 				HR = LoadFromTGAFile(FileRealPath, &FinalMetaData, *FinalImage);
 				if (FAILED(HR))
 				{
-					zeError("Loading from tga file failed (%x)\n", HR);
-					return NULL;
+					zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
 				}
 			}
 			else
@@ -172,16 +141,16 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 				HR = LoadFromWICFile(FileRealPath, WIC_FLAGS_FORCE_RGB | WIC_FLAGS_IGNORE_SRGB, &FinalMetaData, *FinalImage);
 				if (FAILED(HR))
 				{
-					zeError("Loading from %s file failed (%x)\n", Extension, HR);
-					return NULL;
+					zeError("Cannot load texture. Cannot read from file. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
 				}
 			}
 
 			const Image* SrcImage = FinalImage->GetImage(0, 0, 0);
-			ZEUInt FaceRowpitch = SrcImage->rowPitch / 3;
-			ZEUInt FaceHeight = SrcImage->height / 2;
+			ZEUInt FaceRowpitch = (ZEUInt)SrcImage->rowPitch / 3;
+			ZEUInt FaceHeight = (ZEUInt)SrcImage->height / 2;
 
-			ZEUInt Offsets[6] = 
+			ZESize Offsets[6] = 
 			{															// Copy Order
 				2 * FaceRowpitch,										// +X Face
 				0,														// -X Face
@@ -210,23 +179,23 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 
 			if (TextureOptions.GenerateMipMaps)
 			{
-				if (!ZEMath::IsPowerOfTwo(FinalMetaData.width) || !ZEMath::IsPowerOfTwo(FinalMetaData.height))
+				if (!ZEMath::IsPowerOfTwo((ZEUInt)FinalMetaData.width) || !ZEMath::IsPowerOfTwo((ZEUInt)FinalMetaData.height))
 				{
-					float PowerWidth = ZEMath::Log(FinalMetaData.width) / ZEMath::Log(2);
-					float PowerHeight = ZEMath::Log(FinalMetaData.height) / ZEMath::Log(2);
+					float PowerWidth = ZEMath::Log((float)FinalMetaData.width) / ZEMath::Log(2);
+					float PowerHeight = ZEMath::Log((float)FinalMetaData.height) / ZEMath::Log(2);
 
-					ZEUInt NearestPowerWidth = ZEMath::Floor(PowerWidth + 0.5f);
-					ZEUInt NearestPowerHeight = ZEMath::Floor(PowerHeight + 0.5f);
+					ZEUInt NearestPowerWidth = (ZEUInt)ZEMath::Floor(PowerWidth + 0.5f);
+					ZEUInt NearestPowerHeight = (ZEUInt)ZEMath::Floor(PowerHeight + 0.5f);
 
-					ZEUInt ResizedWidth = ZEMath::Power(2, NearestPowerWidth);
-					ZEUInt ResizedHeight = ZEMath::Power(2, NearestPowerHeight);
+					ZEUInt ResizedWidth = (ZEUInt)ZEMath::Power(2, (float)NearestPowerWidth);
+					ZEUInt ResizedHeight = (ZEUInt)ZEMath::Power(2, (float)NearestPowerHeight);
 
 					ZEPointer<ScratchImage> ResizedImage = new ScratchImage();
 					HR = Resize(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, ResizedWidth, ResizedHeight, TEX_FILTER_DEFAULT, *ResizedImage);
 					if (FAILED(HR))
 					{
-						zeError("Resizing to nearest power of two failed (%x)\n", HR);
-						return NULL;
+						zeError("Cannot load texture. Resizing to nearest power of two failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+						return ZE_TR_FAILED;
 					}
 
 					FinalMetaData = ResizedImage->GetMetadata();
@@ -237,8 +206,8 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 				HR = GenerateMipMaps(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, TEX_FILTER_DEFAULT, TextureOptions.MaximumMipmapLevel, *MipmapChain);
 				if (FAILED(HR))
 				{
-					zeError("Mip map generation failed (%x)\n", HR);
-					return NULL;
+					zeError("Cannot load texture. Mip map generation failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
 				}
 
 				FinalMetaData = MipmapChain->GetMetadata();
@@ -261,8 +230,8 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 				HR = Compress(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, CompressionFormat, CompressionFlags, 0.5f, *CompressedImage);
 				if (FAILED(HR))
 				{
-					zeError("Compression failed (%x)\n", HR);
-					return NULL;
+					zeError("Cannot load texture. Compression failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+					return ZE_TR_FAILED;
 				}
 
 				FinalMetaData = CompressedImage->GetMetadata();
@@ -274,17 +243,118 @@ ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateFromFile(const ZEString& Filena
 			HR = SaveToDDSFile(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalMetaData, DDS_FLAGS_NONE, NewFileRealPath);
 			if (FAILED(HR))
 			{
-				zeError("Saving to dds file failed (%x)\n", HR);
-				return NULL;
+				zeError("Cannot load texture. Saving to dds file failed. Result: 0x%X, File Name: \"%s\".", HR, GetFileName().ToCString());
+				return ZE_TR_FAILED;
 			}
 		}
 	}
 
-	return ZEGRTextureCube::CreateInstance(
-										FinalMetaData.width, 
-										FinalMetaData.mipLevels, 
-										ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
-										ZEGR_RU_GPU_READ_ONLY, 
-										ZEGR_RBF_SHADER_RESOURCE, 
-										FinalImage->GetPixels());
+	if (!Initialize((ZEUInt)FinalMetaData.width, (ZEUInt)FinalMetaData.mipLevels, ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
+		ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, FinalImage->GetPixels()))
+	{
+		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", HR, GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	return ZE_TR_DONE;
+
+}
+
+ZETaskResult ZEGRTextureCube::UnloadInternal()
+{
+	Deinitialize();
+	return ZE_TR_DONE;
+}
+
+ZEGRResourceType ZEGRTextureCube::GetResourceType() const
+{
+	return ZEGR_RT_TEXTURE;
+}
+
+ZEGRTextureType ZEGRTextureCube::GetTextureType() const
+{
+	return ZEGR_TT_CUBE;
+}
+
+ZEUInt ZEGRTextureCube::GetLength() const
+{
+	return Length;
+}
+
+float ZEGRTextureCube::GetPixelSize() const
+{
+	return 1.0f / (float)GetLength();
+}
+
+ZEGRTextureCube::ZEGRTextureCube()
+{
+	Length = 0;
+}
+
+ZERSResource* ZEGRTextureCube::Instanciator(const void* Parameters)
+{
+	ZEGRTextureCube* Resource = ZEGRGraphicsModule::GetInstance()->CreateTextureCube();
+	
+	if (Parameters != NULL && Resource != NULL)
+		Resource->TextureOptions = *reinterpret_cast<const ZEGRTextureCubeOptions*>(Parameters);
+
+	return Resource;
+}
+
+ZEHolder<ZEGRTextureCube> ZEGRTextureCube::CreateResource(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
+{
+	if (!CheckParameters(Length, LevelCount, Format, Usage, BindFlags, Data))
+		return NULL;
+
+	ZEHolder<ZEGRTextureCube> Texture = ZERSTemplates::CreateResource<ZEGRTextureCube>(Instanciator);
+	if (Texture == NULL)
+		return NULL;
+
+	if (!Texture->Initialize(Length, LevelCount, Format, Usage, BindFlags, Data))
+	{
+		Texture->StagingFailed();
+		return NULL;
+	}
+
+	Texture->StagingRealized();
+
+	return Texture;
+}
+
+ZEHolder<const ZEGRTextureCube> ZEGRTextureCube::CreateResourceShared(const ZEGUID& GUID, ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data, ZEGRTextureCube** StagingResource)
+{
+	if (!CheckParameters(Length, LevelCount, Format, Usage, BindFlags, Data))
+		return NULL;
+
+	ZEGRTextureCube* StagingResourceTemp = NULL;
+	ZEHolder<const ZEGRTextureCube> Texture = ZERSTemplates::CreateResourceShared<ZEGRTextureCube>(GUID, &StagingResourceTemp, Instanciator);
+	if (Texture == NULL)
+		return NULL;
+
+	if (StagingResourceTemp != NULL)
+	{
+		if (!StagingResourceTemp->Initialize(Length, LevelCount, Format, Usage, BindFlags, Data))
+		{
+			StagingResourceTemp->StagingFailed();
+			return NULL;
+		}
+
+		StagingResourceTemp->StagingRealized();
+	}
+
+	if (*StagingResource != NULL)
+		*StagingResource = StagingResourceTemp;
+
+	return Texture;
+}
+
+ZEHolder<ZEGRTextureCube> ZEGRTextureCube::LoadResource(const ZEString& FileName, const ZEGRTextureCubeOptions& TextureOptions)
+{
+	return ZERSTemplates::LoadResource<ZEGRTextureCube>(FileName, Instanciator, &TextureOptions);
+}
+
+ZEHolder<const ZEGRTextureCube> ZEGRTextureCube::LoadResourceShared(const ZEString& FileName, const ZEGRTextureCubeOptions& TextureOptions)
+{
+
+	return ZERSTemplates::LoadResourceShared<ZEGRTextureCube>(FileName, Instanciator, &TextureOptions);
 }

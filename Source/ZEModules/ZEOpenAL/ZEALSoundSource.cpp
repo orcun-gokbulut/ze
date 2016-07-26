@@ -58,7 +58,7 @@ static const char* ConvertErrorToString(ALenum Error)
 	}
 }
 
-static ALenum GetBufferFormat(ZESoundResource* SoundResource)
+static ALenum GetBufferFormat(const ZESoundResource* SoundResource)
 {
 	switch(SoundResource->GetChannelCount())
 	{
@@ -531,13 +531,10 @@ void ZEALSoundSource::Update(float ElapsedTime)
 		Stream();
 }
 
-void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
+void ZEALSoundSource::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
 {
-	if (SoundResource != NULL)
-	{
-		SoundResource->Release();
-		SoundResource = NULL;
-	}
+	if (SoundResource == Resource)
+		return;
 
 	if (Resource != NULL)
 	{
@@ -548,8 +545,6 @@ void ZEALSoundSource::SetSoundResource(ZESoundResource* Resource)
 			SoundResource = NULL;
 			return;
 		}
-
-		SoundResource->AddReferance();
 	}
 	else
 	{

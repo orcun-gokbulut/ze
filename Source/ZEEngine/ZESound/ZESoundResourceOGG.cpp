@@ -34,14 +34,16 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESoundResourceOGG.h"
+
 #include "ZEError.h"
+#include "ZEFile/ZEFile.h"
 
 #include <ogg/ogg.h>
 #include <vorbis/vorbisfile.h>
 #include <Memory.h>
 
-// MEMORY SEEK
-static ZESize OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasource)
+
+ZESize ZESoundResourceOGG::OggRead(void *ptr, ZESize size, ZESize nmemb, void *datasource)
 {
 	ZESoundResourceOGG* Resource = (ZESoundResourceOGG*)datasource;
 
@@ -62,7 +64,7 @@ static ZESize OggMemory_Read(void *ptr, ZESize size, ZESize nmemb, void *datasou
 	}
 }
 
-static ZEInt OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence)
+ZEInt ZESoundResourceOGG::OggSeek(void *datasource, ogg_int64_t offset, ZEInt whence)
 {
 	ZESoundResourceOGG* Resource = (ZESoundResourceOGG*)datasource;
 	switch(whence)
@@ -83,20 +85,82 @@ static ZEInt OggMemory_Seek(void *datasource, ogg_int64_t offset, ZEInt whence)
 	return 0;
 }
 
-static long OggMemory_Tell(void *datasource)
+long ZESoundResourceOGG::OggTell(void *datasource)
 {
 	return (long)((ZESoundResourceOGG*)datasource)->MemoryCursor;
+}
+
+ZETaskResult ZESoundResourceOGG::LoadInternal()
+{
+	ZEFile File; 
+	if(!File.Open(GetFileName(), ZE_FOM_READ, ZE_FCM_NONE))
+	{
+		zeError("Cannot load sound resource. Cannot open ogg file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	File.Seek(0, ZE_SF_END);
+	DataSize = File.Tell();
+	Data = new unsigned char[DataSize];
+	File.Seek(0, ZE_SF_BEGINING);
+	File.Read(Data, 1, DataSize);
+	File.Close();
+
+	MemoryCursor = 0;
+
+	ov_callbacks Callbacks;
+	Callbacks.close_func = NULL;
+	Callbacks.read_func = &ZESoundResourceOGG::OggRead;
+	Callbacks.seek_func = &ZESoundResourceOGG::OggSeek;
+	Callbacks.tell_func = &ZESoundResourceOGG::OggTell;
+
+	if(!ov_open_callbacks(this, &OggFile, NULL, 0, Callbacks)==0)
+	{
+		zeError("Cannot load sound resource. Cannot open ogg file. File Name : \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	vorbis_info* VorbisInfo = ov_info(&OggFile, -1);
+	ChannelCount = VorbisInfo->channels;
+	BitsPerSample = 16;
+	SamplesPerSecond = (ZESize)VorbisInfo->rate;
+	BlockAlign = 2 * (ZESize)VorbisInfo->channels;
+	SampleCount = (ZESize)ov_pcm_total(&OggFile, -1);
+	ov_seekable(&OggFile);
+
+	return ZE_TR_DONE;
+}
+
+ZETaskResult ZESoundResourceOGG::UnloadInternal()
+{
+	if (Data != NULL)
+		delete Data;
+
+	Data = NULL;
+	DataSize = 0;
+	MemoryCursor = 0;
+	memset(&OggFile, 0, sizeof(OggVorbis_File));
+
+	ChannelCount = 0;
+	BitsPerSample = 0;
+	SamplesPerSecond = 0;
+	BlockAlign = 0;
+	SampleCount = 0;
+
+	return ZE_TR_DONE;
 }
 
 ZESoundResourceOGG::ZESoundResourceOGG()
 {
 	Data = NULL;
+	DataSize = 0;
+	MemoryCursor = 0;
+	memset(&OggFile, 0, sizeof(OggVorbis_File));
 }
 
 ZESoundResourceOGG::~ZESoundResourceOGG()
 {
-	if (Data != NULL)
-		delete Data;
+
 }
 
 ZESize ZESoundResourceOGG::GetDataSize() const
@@ -109,8 +173,16 @@ const void* ZESoundResourceOGG::GetData() const
 	return Data;
 }
 
-void ZESoundResourceOGG::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
+bool ZESoundResourceOGG::Decode(void* Buffer, ZESize SampleIndex, ZESize Count) const
 {
+	if (!IsLoaded())
+	{
+		memset(Buffer, 0, Count);
+		return false;
+	}
+	
+	DecodeLock.Lock();
+
 	ov_pcm_seek_lap(&OggFile, SampleIndex);	
 
 	long BytesRead	= 1;
@@ -123,56 +195,14 @@ void ZESoundResourceOGG::Decode(void* Buffer, ZESize SampleIndex, ZESize Count)
 		BytesRead = ov_read(&OggFile, ((char*)(Buffer)) + Position, (int)((Count * BlockAlign) - Position), 0, 2, 1, &Section);
 		if(BytesRead < 0)
 		{
-			zeError("Error decoding ogg. (FileName : \"%s\")", GetFileName().ToCString());
-			return;
+			DecodeLock.Unlock();
+			zeError("Error decoding ogg. File Name : \"%s\".", GetFileName().ToCString());
+			return false;
 		}
 		Position += (ZESize)BytesRead;
 	}
-}
 
-ZESoundResource* ZESoundResourceOGG::LoadResource(const ZEString& FileName)
-{
-	bool Result;
-	ZEFile File; 
-	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-	if(!Result)
-	{
-		zeError("Can not open ogg file. (FileName : \"%s\")", FileName.ToCString());
-		return NULL;
-	}
+	DecodeLock.Unlock();
 
-	ZESoundResourceOGG* NewResource = new ZESoundResourceOGG();
-
-	File.Seek(0, ZE_SF_END);
-	NewResource->DataSize = File.Tell();
-	NewResource->Data = new unsigned char[NewResource->DataSize];
-	File.Seek(0, ZE_SF_BEGINING);
-	File.Read(NewResource->Data, 1, NewResource->DataSize);
-	File.Close();
-
-	NewResource->SetFileName(FileName);	
-	
-	NewResource->MemoryCursor = 0;
-	
-	ov_callbacks Callbacks;
-	Callbacks.close_func = NULL;
-	Callbacks.read_func = OggMemory_Read;
-	Callbacks.seek_func = OggMemory_Seek;
-	Callbacks.tell_func = OggMemory_Tell;
-
-	if(!ov_open_callbacks(NewResource, &NewResource->OggFile, NULL, 0, Callbacks)==0)
-	{
-		zeError("Can not read ogg. (FileName : \"%s\")", FileName.ToCString());
-		delete NewResource;
-		return NULL;
-	}
-
-	vorbis_info* VorbisInfo			= ov_info(&NewResource->OggFile, -1);
-	NewResource->ChannelCount		= VorbisInfo->channels;
-	NewResource->BitsPerSample		= 16;
-	NewResource->SamplesPerSecond	= (ZESize)VorbisInfo->rate;
-	NewResource->BlockAlign			= 2 * (ZESize)VorbisInfo->channels;
-	NewResource->SampleCount			= (ZESize)ov_pcm_total(&NewResource->OggFile, -1);
-	ov_seekable(&NewResource->OggFile);
-	return NewResource;
+	return true;
 }

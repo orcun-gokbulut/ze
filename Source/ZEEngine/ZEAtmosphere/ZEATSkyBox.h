@@ -62,7 +62,7 @@ class ZEATSkyBox : public ZEEntity
 		ZEHolder<ZEGRConstantBuffer>		ConstantBuffer;
 		ZEHolder<ZEGRConstantBuffer>		ConstantBufferTransform;
 
-		ZEHolder<ZEGRTextureCube>			SkyTexture;
+		ZEHolder<const ZEGRTextureCube>		SkyTexture;
 
 		float								Brightness;
 		ZEVector3							Color;

@@ -100,28 +100,6 @@ bool ZEGUID::operator!=(const ZEGUID& Other) const
 	return !Equals(Other);
 }
 
-bool ZEGUID::FromString(const ZEString& String)
-{
-	ZERegEx RegEx(
-		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
-		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
-		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
-		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
-		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*");
-	ZERegExMatch Match;
-	if (!RegEx.Match(String, Match))
-		return false;
-
-	new (this) ZEGUID(
-		Match.SubMatches[0].String.ToUInt32(16),
-		Match.SubMatches[1].String.ToUInt16(16),
-		Match.SubMatches[2].String.ToUInt16(16),
-		Match.SubMatches[3].String.ToUInt16(16),
-		Match.SubMatches[4].String.ToUInt64(16));
-
-	return true;
-}
-
 ZEString ZEGUID::ToString() const
 {
 	return ZEFormat::Format("{0:X:08}-{1:X:04}-{2:X:04}-{3:X:04}-{4:X:012}", Data1, Data2, Data3, Data4 >> 48, Data4 & (ZEUInt64)0x0000FFFFFFFFFFFF);
@@ -166,4 +144,34 @@ ZEGUID ZEGUID::Generate()
 	GUID.Data4 = ZERandom::GetUInt64();
 
 	return GUID;
+}
+
+ZEGUID ZEGUID::FromString(const ZEString& String, bool* Result)
+{
+	ZERegEx RegEx(
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*-"
+		"[\\n\\r\\s]*([0-9a-fA-F]+)[\\n\\r\\s]*");
+
+	ZERegExMatch Match;
+	if (!RegEx.Match(String, Match))
+	{
+		if (Result != NULL)
+			*Result = false;
+		return ZEGUID::Zero;
+	}
+
+	ZEGUID Output(
+		Match.SubMatches[0].String.ToUInt32(16), 
+		Match.SubMatches[1].String.ToUInt16(16), 
+		Match.SubMatches[2].String.ToUInt16(16), 
+		Match.SubMatches[3].String.ToUInt16(16), 
+		Match.SubMatches[4].String.ToUInt64(16));
+
+	if (Result != NULL)
+		*Result = true;
+
+	return Output;
 }

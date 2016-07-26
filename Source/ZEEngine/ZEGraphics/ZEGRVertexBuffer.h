@@ -50,6 +50,8 @@ class ZEGRVertexBuffer : public ZEGRResource
 		ZEUInt										VertexStride;
 
 	protected:
+		static bool									Check();
+
 		virtual bool								Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRResourceUsage Usage, const void* Data);
 		virtual void								Deinitialize();
 

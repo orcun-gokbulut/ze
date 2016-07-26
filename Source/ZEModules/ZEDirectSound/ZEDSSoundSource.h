@@ -81,7 +81,7 @@ class ZEDSSoundSource : public ZESoundSource, public ZEDSComponentBase
 
 		void						Update(float ElapsedTime);
 
-		virtual void				SetSoundResource(ZESoundResource* Resource);
+		virtual void				SetSoundResource(ZEHolder<const ZESoundResource> Resource);
 };
 
 #endif

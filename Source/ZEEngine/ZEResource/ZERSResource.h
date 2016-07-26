@@ -46,6 +46,7 @@
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZELink.h"
 #include "ZEDS/ZEString.h"
+#include "ZEPointer/ZEHolder.h"
 #include "ZEThread/ZETask.h"
 
 class ZERSResource : public ZEObject, public ZEReferenceCounted
@@ -99,8 +100,8 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		void									AddChildResource(ZERSResource* Resource);
 		void									RemoveChildResource(ZERSResource* Resource);
 
-		void									RegisterExternalResource(ZERSResource* Resource);
-		void									UnregisterExternalResource(ZERSResource* Resource);
+		void									RegisterExternalResource(const ZERSResource* Resource);
+		void									UnregisterExternalResource(const ZERSResource* Resource);
 
 		virtual ZETaskResult					LoadInternal();
 		virtual ZETaskResult					UnloadInternal();
@@ -125,16 +126,18 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 
 		bool									IsStaged() const;
 		bool									IsLoaded() const;
+		bool									IsLoadedOrLoading() const;
 		bool									IsFailed() const;
+
 		bool									IsShared() const;
+		void									Share();
+		void									Unshare();
 
 		void									StagingRealized();
 		void									StagingFailed();
+
 		void									Load(const ZEString& FileName);
 		void									Unload();
-
-		void									Share();
-		void									Unshare();
 
 		void									WaitStaging() const;
 		void									WaitLoading() const;

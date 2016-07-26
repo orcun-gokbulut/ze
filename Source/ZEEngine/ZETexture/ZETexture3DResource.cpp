@@ -264,14 +264,9 @@ ZETexture3DResource* ZETexture3DResource::LoadResource(ZEFile* ResourceFile, ZEU
 		TextureData3D.GetSurfaces()[I].GetLevels()[0].CopyTo(Data + I * DepthPitch, RowPitch);
 
 	ZEPointer<ZETexture3DResource, ZEDeletorRelease<ZETexture3DResource>> TextureResource = new ZETexture3DResource();
-	TextureResource->Texture = ZEGRTexture3D::Create(
-													TextureData3D.GetWidth(), 
-													TextureData3D.GetHeight(), 
-													TextureData3D.GetSurfaceCount(), 
-													TextureData3D.GetLevelCount(), 
-													TextureData3D.GetPixelFormat(), 
-													ZEGR_RU_GPU_READ_ONLY, 
-													ZEGR_RBF_SHADER_RESOURCE, 
+	TextureResource->Texture = ZEGRTexture3D::CreateResource(
+		TextureData3D.GetWidth(), TextureData3D.GetHeight(), TextureData3D.GetSurfaceCount(), TextureData3D.GetLevelCount(), 
+		TextureData3D.GetPixelFormat(), ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 
 													Data);
 	if (TextureResource->Texture == NULL)
 	{

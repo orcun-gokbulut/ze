@@ -34,8 +34,6 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUND_RESOURCE_MP3_H__
-#define __ZE_SOUND_RESOURCE_MP3_H__
 
 #include "ZETypes.h"
 #include "ZESoundResource.h"
@@ -44,29 +42,27 @@ struct mpg123_handle_struct;
 
 class ZESoundResourceMP3 : public ZESoundResource
 {
-	friend long Memory_Read(ZEInt fd, void *buffer, ZESize nbytes);
-	friend long Memory_Seek(ZEInt fd, long offset, ZEInt whence);
-
+	friend class ZESoundResource;
 	private:
 		unsigned char*					Data;
 		ZESize							DataSize;
 
 		mpg123_handle_struct*			mpg123;
 		ZESize							MemoryCursor;
+		mutable ZELock					DecodeLock;
+		
+		ZETaskResult					LoadInternal();
+		ZETaskResult					UnloadInternal();
 
 										ZESoundResourceMP3();
 		virtual							~ZESoundResourceMP3();
+
+		static long						MP3Read(ZEInt fd, void *buffer, ZESize nbytes);
+		static long						MP3Seek(ZEInt fd, long offset, ZEInt whence);
 
 	public:
 		virtual ZESize					GetDataSize() const;		
 		virtual const void*				GetData() const;
 
-		virtual void					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount);
-
-		static void						BaseInitialize();
-		static void						BaseDeinitialize();
-
-		static ZESoundResource*			LoadResource(const ZEString& FileName);
+		virtual bool					Decode(void* DestinationBuffer, ZESize SampleIndex, ZESize SampleCount) const;
 };
-
-#endif

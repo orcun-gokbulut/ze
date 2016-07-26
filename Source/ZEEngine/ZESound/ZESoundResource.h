@@ -34,13 +34,10 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef	__ZE_SOUNDRESOURCE_H__
-#define __ZE_SOUNDRESOURCE_H__
 
-#include "ZECore/ZEResource.h"
-#include "ZETypes.h"
+#include "ZEResource/ZERSResource.h"
 
-enum ZESoundFileFormat
+ZE_ENUM(ZESoundFileFormat)
 {
 	ZE_SFF_NONE,
 	ZE_SFF_WAVE,
@@ -48,43 +45,41 @@ enum ZESoundFileFormat
 	ZE_SFF_MP3
 };
 
-class ZESoundResource : public ZEResource
+class ZESoundResource : public ZERSResource
 {
 	ZE_OBJECT
-
+	ZE_DISALLOW_COPY(ZESoundResource)
+	friend class ZERSTemplates;
 	protected:
-		ZESoundFileFormat				FileFormat;
+		ZESoundFileFormat							FileFormat;
 
-		ZESize							SamplesPerSecond;
-		ZEUInt							ChannelCount;
-		ZEUInt							BitsPerSample;
-		ZESize							BlockAlign;
-		ZESize							SampleCount;
+		ZESize										SamplesPerSecond;
+		ZEUInt										ChannelCount;
+		ZEUInt										BitsPerSample;
+		ZESize										BlockAlign;
+		ZESize										SampleCount;
+
+													ZESoundResource();
+		virtual										~ZESoundResource();
 		
-		static ZESoundFileFormat		GetFileFormat(const ZEString& FileName);
-
-										ZESoundResource();
-		virtual							~ZESoundResource();
+		static ZERSResource*						Instanciator(const void* Parameters);
 
 	public:
-		const char*						GetResourceType() const;
-		ZESoundFileFormat				GetSoundFileFormat() const;
+		const char*									GetResourceType() const;
+		ZESoundFileFormat							GetSoundFileFormat() const;
 
-		ZESize							GetSamplesPerSecond() const;
-		ZEUInt							GetChannelCount() const;
-		ZEUInt							GetBitsPerSample() const;
-		ZESize							GetSampleCount() const;
-		ZESize							GetBlockAlign() const;
-		ZESize							GetUncompressedDataSize() const;
+		ZESize										GetSamplesPerSecond() const;
+		ZEUInt										GetChannelCount() const;
+		ZEUInt										GetBitsPerSample() const;
+		ZESize										GetSampleCount() const;
+		ZESize										GetBlockAlign() const;
+		ZESize										GetUncompressedDataSize() const;
 
-		virtual ZESize					GetDataSize() const = 0;		
-		virtual const void*				GetData() const = 0;
+		virtual ZESize								GetDataSize() const = 0;		
+		virtual const void*							GetData() const = 0;
 
-		virtual void					Decode(void* Buffer, ZESize SampleIndex, ZESize SampleCount) = 0;
+		virtual bool								Decode(void* Buffer, ZESize SampleIndex, ZESize SampleCount) const = 0;
 
-		static void						CacheResource(const ZEString& FileName);
-		static ZESoundResource*			LoadSharedResource(const ZEString& FileName); 
-		static ZESoundResource*			LoadResource(const ZEString& FileName);
+		static ZEHolder<ZESoundResource>			LoadResource(const ZEString& FileName);
+		static ZEHolder<const ZESoundResource>		LoadResourceShared(const ZEString& FileName); 
 };
-
-#endif

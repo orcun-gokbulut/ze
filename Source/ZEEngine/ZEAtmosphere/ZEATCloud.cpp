@@ -272,13 +272,13 @@ ZEDrawFlags ZEATCloud::GetDrawFlags() const
 
 void ZEATCloud::SetCloudTexture(const ZEString& FileName)
 {
-	ZEGRTextureOptions TextureOptions;
+	ZEGRTexture2DOptions TextureOptions;
 	TextureOptions.CompressionFormat = ZEGR_TF_BC3_UNORM_SRGB;
 	TextureOptions.GenerateMipMaps = false;
 	TextureOptions.MaximumMipmapLevel = 0;
 	TextureOptions.sRGB = true;
 
-	CloudTexture = ZEGRTexture2D::CreateFromFile(FileName, TextureOptions);
+	CloudTexture = ZEGRTexture2D::LoadResourceShared(FileName, TextureOptions);
 }
 
 const ZEString& ZEATCloud::GetCloudTexture() const

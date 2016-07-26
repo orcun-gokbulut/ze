@@ -516,8 +516,13 @@ void ZEDSSoundSource3D::Update(float ElapsedTime)
 
 }
 
-void ZEDSSoundSource3D::SetSoundResource(ZESoundResource* Resource)
+void ZEDSSoundSource3D::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
 {
+	if (SoundResource == Resource)
+		return;
+
+	SoundResource = Resource;
+
 	if (Resource != NULL)
 	{
 		if (Resource->GetChannelCount() != 1)
@@ -526,8 +531,6 @@ void ZEDSSoundSource3D::SetSoundResource(ZESoundResource* Resource)
 			return;
 		}
 
-		Resource->AddReferance();
-		SoundResource = Resource;
 		SoundSourceState = ZE_SSS_STOPPED;
 		CreateBuffer();
 		SetLimitsEnabled(LimitsEnabled);

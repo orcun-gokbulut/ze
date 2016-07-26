@@ -51,37 +51,50 @@ ZE_ENUM(ZEGRTextureCubeFace)
 
 class ZEGRRenderTarget;
 
+class ZEGRTextureCubeOptions : public ZEGRTextureOptions
+{
+	
+};
+
 class ZEGRTextureCube : public ZEGRTexture
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEGRTextureCube)
+	friend class ZERSTemplates;
 	private:
 		ZEUInt										Length;
+		ZEGRTextureCubeOptions						TextureOptions;
+
+		static ZERSResource*						Instanciator(const void* Parameters);
 
 	protected:
+		static bool									CheckParameters(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data);
+
 		virtual	bool								Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data) = 0;
 		virtual void								Deinitialize();
+
+		virtual ZETaskResult						LoadInternal();
+		virtual ZETaskResult						UnloadInternal();
 
 													ZEGRTextureCube();
 
 	public:
 		ZEGRResourceType							GetResourceType() const;
 		ZEGRTextureType								GetTextureType() const;
-
 		ZEUInt										GetLength() const;
 		float										GetPixelSize() const;
+		const ZEGRTextureCubeOptions&				GetTextureOptions() const;
+		virtual const ZEGRRenderTarget*				GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) const = 0;
 
 		virtual void								UpdateSubResource(ZEGRTextureCubeFace DestFace, ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch) = 0;
 		
-		virtual const ZEGRRenderTarget*				GetRenderTarget(ZEGRTextureCubeFace Face, ZEUInt Level = 0) const = 0;
+		static ZEHolder<ZEGRTextureCube>			CreateResource(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, 
+														ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+														const void* Data = NULL);
+		static ZEHolder<const ZEGRTextureCube>		CreateResourceShared(const ZEGUID& GUID, ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, 
+														ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
+														const void* Data = NULL, ZEGRTextureCube** StagingResource = NULL);
 
-		static ZEHolder<ZEGRTextureCube>			CreateInstance(
-																	ZEUInt Length, 
-																	ZEUInt LevelCount, 
-																	ZEGRFormat Format, 
-																	ZEGRResourceUsage Usage = ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, 
-																	ZEFlags BindFlags = ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET, 
-																	const void* Data = NULL);
-
-		static ZEHolder<ZEGRTextureCube>			CreateFromFile(const ZEString& Filename, const ZEGRTextureOptions& TextureOptions);
+		static ZEHolder<ZEGRTextureCube>			LoadResource(const ZEString& FileName, const ZEGRTextureCubeOptions& TextureOptions);
+		static ZEHolder<const ZEGRTextureCube>		LoadResourceShared(const ZEString& FileName, const ZEGRTextureCubeOptions& TextureOptions);
 };

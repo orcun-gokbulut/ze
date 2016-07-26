@@ -57,8 +57,7 @@ ZESoundSource::ZESoundSource()
 
 ZESoundSource::~ZESoundSource()
 {
-	if (SoundResource != NULL)
-		SoundResource->Release();
+
 }
 
 bool ZESoundSource::IsStreaming() const
@@ -98,12 +97,9 @@ void ZESoundSource::SetCurrentPositionTime(float Seconds)
 {
 	if (SoundResource != NULL)
 	{
-		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);
-		
+		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);	
 		if (SampleIndex < SoundResource->GetSampleCount())
-		{
 			SetCurrentPosition(SampleIndex);
-		}
 	}
 }
 
@@ -112,17 +108,11 @@ void ZESoundSource::SetCurrentPositionPersentage(float Percentage)
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
-		{
 			SetCurrentPosition(0);
-		}
 		else if (Percentage > 100.0f)
-		{
 			SetCurrentPosition(SoundResource->GetSampleCount());
-		}
 		else
-		{
 			SetCurrentPosition((ZESize)(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage));
-		}
 	}
 }
 
@@ -134,13 +124,9 @@ ZESize ZESoundSource::GetCurrentPosition() const
 ZEUInt ZESoundSource::GetCurrentPositionTime() const
 {
 	if (SoundResource != NULL)
-	{
 		return (ZEUInt)(CurrentPosition / SoundResource->GetSamplesPerSecond());
-	}
 	else
-	{
 		return 0;
-	}
 }
 
 float ZESoundSource::GetCurrentPositionPersentage() const
@@ -165,8 +151,6 @@ void ZESoundSource::SetLimitsEnabled(bool Enabled)
 		EffectiveStartPosition = StartPosition % SoundResource->GetSampleCount();	
 		EffectiveEndPosition = EndPosition % SoundResource->GetSampleCount();	
 	}
-
-
 }
 
 bool ZESoundSource::GetLimitsEnabled() const
@@ -181,9 +165,7 @@ void ZESoundSource::SetStartPosition(ZESize SampleIndex)
 	if (SoundResource != NULL)
 	{
 		if (LimitsEnabled)
-		{
 			EffectiveStartPosition = StartPosition % SoundResource->GetSampleCount();
-		}
 	}
 }
 
@@ -194,13 +176,9 @@ void ZESoundSource::SetStartPositionTime(float Seconds)
 		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);
 
 		if (SampleIndex > SoundResource->GetSampleCount())
-		{
 			SetStartPosition(SoundResource->GetSampleCount());
-		}
 		else
-		{
 			SetStartPosition(SampleIndex);
-		}
 	}
 }
 
@@ -209,13 +187,9 @@ void ZESoundSource::SetStartPositionPersentage(float Percentage)
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
-		{
 			SetStartPosition(0);
-		}
 		else
-		{
 			SetStartPosition((ZESize)(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage));
-		}
 	}
 }
 
@@ -247,9 +221,7 @@ void ZESoundSource::SetEndPosition(ZESize SampleIndex)
 	if (SoundResource != NULL)
 	{
 		if (LimitsEnabled)
-		{
 			EffectiveEndPosition = EndPosition % SoundResource->GetSampleCount();
-		}
 	}
 }
 
@@ -260,13 +232,9 @@ void ZESoundSource::SetEndPositionTime(float Seconds)
 		ZESize SampleIndex = (ZESize)((float)SoundResource->GetSamplesPerSecond() * Seconds);
 
 		if (SampleIndex > SoundResource->GetSampleCount())
-		{
 			SetEndPosition(SoundResource->GetSampleCount());
-		}
 		else
-		{
 			SetEndPosition(SampleIndex);
-		}
 	}
 }
 
@@ -275,13 +243,9 @@ void ZESoundSource::SetEndPositionPercentage(float Percentage)
 	if (SoundResource != NULL)
 	{
 		if (Percentage < 0.0f)
-		{
 			SetEndPosition(0);
-		}
 		else
-		{
 			SetEndPosition((ZESize)(((float)SoundResource->GetSampleCount() / 100.0f) * Percentage));
-		}
 	}
 }
 
@@ -334,9 +298,7 @@ float ZESoundSource::GetPlaybackSpeed() const
 void ZESoundSource::SetVolume(ZEUInt NewVolume)
 {
 	if (NewVolume > ZE_SS_VOLUME_MAX)
-	{
 		NewVolume = ZE_SS_VOLUME_MAX;
-	}
 
 	Volume = (ZEUInt)((float)NewVolume * ((float)zeSound->GetTypeVolume(SoundSourceType) / (float)ZE_SS_VOLUME_MAX));
 }
@@ -374,10 +336,10 @@ float ZESoundSource::GetLoopingLenghtPercent()
 	return (GetLoopingLength() / SoundResource->GetSampleCount()) * 100.0f;
 }
 
-void ZESoundSource::SetSoundResource(ZESoundResource* Resource)
+void ZESoundSource::SetSoundResource(ZEHolder<const ZESoundResource> Resource)
 {
-	if (SoundResource != NULL)
-		SoundResource->Release();
+	if(SoundResource == Resource)
+		return;
 
 	if (!LimitsEnabled)
 	{
@@ -385,11 +347,10 @@ void ZESoundSource::SetSoundResource(ZESoundResource* Resource)
 		EffectiveEndPosition = SoundResource->GetSampleCount();
 	}
 
-	Resource->AddReferance();
 	SoundResource = Resource;
 }
 
-ZESoundResource* ZESoundSource::GetSoundResource() const
+ZEHolder<const ZESoundResource> ZESoundSource::GetSoundResource() const
 {
 	return SoundResource;
 }
