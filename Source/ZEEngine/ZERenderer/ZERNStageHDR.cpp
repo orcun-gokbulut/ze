@@ -166,22 +166,21 @@ bool ZERNStageHDR::UpdateInputOutput()
 	ZEUInt Width = InputTexture->GetWidth();
 	ZEUInt Height = InputTexture->GetHeight();
 
-	if (Viewport.GetWidth() != Width || Viewport.GetHeight() != Height)
+	if (OutputRenderTarget != NULL &&
+		(OutputRenderTarget->GetWidth() != Width || OutputRenderTarget->GetHeight() != Height))
 		DirtyFlags.RaiseFlags(ZERN_HSDF_RESIZE);
 
 	OutputRenderTarget = GetNextProvidedInput(ZERN_SO_COLOR);
 	if (OutputRenderTarget == NULL)
 	{
-		// No Provided Output - Create Own Buffer
 		if (OutputTexture == NULL || 
 			OutputTexture->GetWidth() != Width || OutputTexture->GetHeight() != Height)
-			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB).GetPointer();
+			OutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM_SRGB);
 
 		OutputRenderTarget = OutputTexture->GetRenderTarget();
 	}
 	else
 	{
-		// Output is provided - Release own output texture and use provided one.
 		OutputTexture.Release();
 	}
 

@@ -360,11 +360,9 @@ void ZERNStageAO::ResolveAndLinearizeDepth(ZEGRContext* Context)
 	Viewport.SetHeight((float)ResolvedDepthTexture->GetHeight());
 
 	const ZEGRRenderTarget* RenderTarget = ResolvedDepthTexture->GetRenderTarget();
-	//const ZEGRDepthStencilBuffer* DepthStencilBuffer = ResolvedDepthTexture->GetDepthStencilBuffer();
 
 	Context->SetRenderState(ResolveAndLinearizeDepthRenderStateData);
 	Context->SetRenderTargets(1, &RenderTarget, NULL);
-	//Context->SetRenderTargets(0, NULL, DepthStencilBuffer);
 	Context->SetViewports(1, &Viewport);
 
 	Context->Draw(3, 0);

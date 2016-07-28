@@ -96,13 +96,23 @@ void ZED11Context::UpdateGraphicsState()
 {
 	if (DirtyFlags.GetFlags(ZEGR_CDF_BLEND_STATE))
 	{
+		LockContext();
+
 		Context->OMSetBlendState(GraphicsState->BlendState->GetInterface(), BlendFactors.M, BlendMask);
+
+		UnlockContext();
+
 		DirtyFlags.UnraiseFlags(ZEGR_CDF_BLEND_STATE);
 	}
 
 	if (DirtyFlags.GetFlags(ZEGR_CDF_DEPTHSTENCIL_STATE))
 	{
+		LockContext();
+
 		Context->OMSetDepthStencilState(GraphicsState->DepthStencilState->GetInterface(), StencilRef);
+
+		UnlockContext();
+
 		DirtyFlags.UnraiseFlags(ZEGR_CDF_DEPTHSTENCIL_STATE);
 	}
 }
@@ -158,6 +168,8 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 
 		bool SetShaderNull = (!SrcShaderExist && DestShaderExist);
 
+		LockContext();
+
 		switch ((ZEGRShaderType)I)
 		{
 		case ZEGR_ST_VERTEX:
@@ -183,6 +195,8 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 		default:
 			break;
 		}
+		
+		UnlockContext();
 
 		GraphicsState->Shaders[(ZEGRShaderType)I] = D11State->Shaders[(ZEGRShaderType)I];
 	}
@@ -195,7 +209,12 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 
 	if (D11State->RasterizerState != NULL && GraphicsState->RasterizerState != D11State->RasterizerState)
 	{
+		LockContext();
+
 		Context->RSSetState(D11State->RasterizerState->GetInterface());
+
+		UnlockContext();
+
 		GraphicsState->RasterizerState = D11State->RasterizerState;
 	}
 
@@ -207,13 +226,23 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 
 	if (D11State->VertexLayout != NULL && GraphicsState->VertexLayout != D11State->VertexLayout)
 	{
+		LockContext();
+
 		Context->IASetInputLayout(D11State->VertexLayout->GetInterface());
+
+		UnlockContext();
+
 		GraphicsState->VertexLayout = D11State->VertexLayout;
 	}
 
 	if (GraphicsState->PrimitiveTopology != D11State->PrimitiveTopology)
 	{
+		LockContext();
+
 		Context->IASetPrimitiveTopology(D11State->PrimitiveTopology);
+
+		UnlockContext();
+
 		GraphicsState->PrimitiveTopology = D11State->PrimitiveTopology;
 	}
 }
@@ -239,7 +268,12 @@ void ZED11Context::SetComputeRenderState(const ZEGRComputeRenderStateData* State
 			return;
 	}
 
+	LockContext();
+
 	Context->CSSetShader(SrcShader->GetComputeShader(), NULL, 0);
+
+	LockContext();
+
 	ComputeState->ComputeShader = D11State->ComputeShader;
 }
 
@@ -262,7 +296,11 @@ void ZED11Context::SetVertexBuffers(ZEUInt Index, ZEUInt Count, const ZEGRVertex
 		}
 	}
 
+	LockContext();
+
 	Context->IASetVertexBuffers(Index, Count, NativeBuffers, Strides, Offsets);
+
+	UnlockContext();
 }
 
 void ZED11Context::SetIndexBuffer(const ZEGRIndexBuffer* Buffer)
@@ -279,7 +317,11 @@ void ZED11Context::SetIndexBuffer(const ZEGRIndexBuffer* Buffer)
 		NativeBuffer = static_cast<const ZED11IndexBuffer*>(Buffer)->GetBuffer();
 	}
 
+	LockContext();
+
 	Context->IASetIndexBuffer(NativeBuffer, Format, 0);
+
+	UnlockContext();
 }
 
 void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRConstantBuffer*const* Buffers)
@@ -297,6 +339,8 @@ void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUIn
 		if (ConstantBuffers[ShaderIndex][Slot] != NULL)
 			NativeBuffers[I] = static_cast<const ZED11ConstantBuffer*>(ConstantBuffers[ShaderIndex][Slot])->GetBuffer();
 	}
+
+	LockContext();
 
 	switch (Shader)
 	{
@@ -336,6 +380,8 @@ void ZED11Context::SetConstantBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUIn
 		default:
 			break;
 	}
+
+	UnlockContext();
 }
 
 void ZED11Context::SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRStructuredBuffer*const* Buffers)
@@ -390,6 +436,8 @@ void ZED11Context::SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEU
 		}
 	}
 
+	LockContext();
+
 	switch (Shader)
 	{
 		case ZEGR_ST_VERTEX:
@@ -428,6 +476,8 @@ void ZED11Context::SetStructuredBuffers(ZEGRShaderType Shader, ZEUInt Index, ZEU
 		default:
 			break;
 	}
+
+	UnlockContext();
 }
 
 void ZED11Context::SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures)
@@ -483,6 +533,8 @@ void ZED11Context::SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count
 
 	}
 
+	LockContext();
+
 	switch (Shader)
 	{
 		case ZEGR_ST_VERTEX:
@@ -521,6 +573,8 @@ void ZED11Context::SetTextures(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count
 		default:
 			break;
 	}
+
+	UnlockContext();
 }
 
 void ZED11Context::SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count, const ZEGRSampler*const* Samplers)
@@ -539,6 +593,8 @@ void ZED11Context::SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count
 			NativeSamplers[I] = static_cast<const ZED11Sampler*>(this->Samplers[ShaderIndex][Slot])->GetInterface();
 	}
 
+	LockContext();
+
 	switch (Shader)
 	{
 		case ZEGR_ST_VERTEX:
@@ -577,6 +633,8 @@ void ZED11Context::SetSamplers(ZEGRShaderType Shader, ZEUInt Index, ZEUInt Count
 		default:
 			break;
 	}
+
+	UnlockContext();
 }
 
 void ZED11Context::SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* RenderTargets, const ZEGRDepthStencilBuffer* DepthStencilBuffer)
@@ -596,7 +654,11 @@ void ZED11Context::SetRenderTargets(ZEUInt Count, const ZEGRRenderTarget*const* 
 	if (this->DepthStencilBuffer != NULL)
 		NativeDepthStencil = static_cast<const ZED11DepthStencilBuffer*>(this->DepthStencilBuffer)->GetView();
 	
+	LockContext();
+
 	Context->OMSetRenderTargets(Count, (Count == 0) ? NULL : NativeRenderTargets, NativeDepthStencil);
+
+	UnlockContext();
 }
 
 void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
@@ -614,7 +676,11 @@ void ZED11Context::SetScissorRects(ZEUInt Count, const ZEGRScissorRect* Rects)
 		NativeRects[I].bottom = this->ScissorRects[I].GetBottom();
 	}
 	
+	LockContext();
+
 	Context->RSSetScissorRects(Count, NativeRects);
+
+	UnlockContext();
 }
 
 void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
@@ -634,7 +700,11 @@ void ZED11Context::SetViewports(ZEUInt Count, const ZEGRViewport* Viewports)
 		NativeViewports[I].MaxDepth = this->Viewports[I].GetMaxDepth();
 	}
 	
+	LockContext();
+
 	Context->RSSetViewports(Count, NativeViewports);
+
+	UnlockContext();
 }
 
 void ZED11Context::SetStencilRef(ZEUInt Reference)
@@ -711,7 +781,11 @@ void ZED11Context::SetRWStructuredBuffers(ZEUInt Index, ZEUInt Count, const ZEGR
 		}
 	}
 	
+	LockContext();
+
 	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
+
+	UnlockContext();
 }
 
 void ZED11Context::SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*const* Textures)
@@ -761,7 +835,11 @@ void ZED11Context::SetRWTextures(ZEUInt Index, ZEUInt Count, const ZEGRTexture*c
 		}
 	}
 
+	LockContext();
+
 	Context->CSSetUnorderedAccessViews(Index, Count, NativeUnorderedAccesses, NULL);
+
+	UnlockContext();
 }
 
 void ZED11Context::CopyResource(const ZEGRResource* DestResource, const ZEGRResource* SrcResource)
@@ -776,8 +854,12 @@ void ZED11Context::CopyResource(const ZEGRResource* DestResource, const ZEGRReso
 		case ZEGR_RT_TEXTURE:
 		{
 			const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(DestResource);
+
 			if (Texture->GetTextureType() == ZEGR_TT_2D)
 				DestNativeResource = static_cast<const ZED11Texture2D*>(Texture)->GetResource();
+
+			else if (Texture->GetTextureType() == ZEGR_TT_3D)
+				DestNativeResource = static_cast<const ZED11Texture3D*>(Texture)->GetResource();
 		}
 		break;
 
@@ -790,8 +872,12 @@ void ZED11Context::CopyResource(const ZEGRResource* DestResource, const ZEGRReso
 		case ZEGR_RT_TEXTURE:
 		{
 			const ZEGRTexture* Texture = static_cast<const ZEGRTexture*>(SrcResource);
+
 			if (Texture->GetTextureType() == ZEGR_TT_2D)
 				SrcNativeResource = static_cast<const ZED11Texture2D*>(Texture)->GetResource();
+
+			else if (Texture->GetTextureType() == ZEGR_TT_3D)
+				SrcNativeResource = static_cast<const ZED11Texture3D*>(Texture)->GetResource();
 		}
 		break;
 
@@ -799,7 +885,11 @@ void ZED11Context::CopyResource(const ZEGRResource* DestResource, const ZEGRReso
 			return;
 	}
 
+	LockContext();
+
 	GetMainContext()->CopyResource(DestNativeResource, SrcNativeResource);
+
+	UnlockContext();
 }
 
 void ZED11Context::ResolveSubresource(const ZEGRResource* DestResource, ZEUInt DestSubresource, const ZEGRResource* SrcResource, ZEUInt SrcSubresource, ZEGRFormat Format)
@@ -837,24 +927,42 @@ void ZED11Context::ResolveSubresource(const ZEGRResource* DestResource, ZEUInt D
 			return;
 	}
 
+	LockContext();
+
 	GetMainContext()->ResolveSubresource(DestNativeResource, DestSubresource, SrcNativeResource, SrcSubresource, ConvertFormat(Format));
+
+	UnlockContext();
 }
 
 void ZED11Context::Draw(ZEUInt VertexCount, ZEUInt FirstVertex)
 {
 	UpdateGraphicsState();
+
+	LockContext();
+
 	GetMainContext()->Draw(VertexCount, FirstVertex);
+
+	UnlockContext();
 }
 
 void ZED11Context::DrawInstanced(ZEUInt VertexCount, ZEUInt FirstVertex, ZEUInt InstanceCount, ZEUInt FirstInstance)
 {
 	UpdateGraphicsState();
+
+	LockContext();
+
 	GetMainContext()->DrawInstanced(VertexCount, InstanceCount, FirstVertex, FirstInstance);
+
+	UnlockContext();
 }
 
 void ZED11Context::Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ)
 {
+	LockContext();
+
 	GetMainContext()->Dispatch(GroupCountX, GroupCountY, GroupCountZ);
+
+	UnlockContext();
 }
 
 void ZED11Context::GenerateMipMaps(const ZEGRTexture* Texture)
@@ -880,12 +988,22 @@ void ZED11Context::GenerateMipMaps(const ZEGRTexture* Texture)
 	}
 
 	if (NativeShaderResource != NULL)
+	{
+		LockContext();
+
 		GetMainContext()->GenerateMips(NativeShaderResource);
+
+		UnlockContext();
+	}
 }
 
 void ZED11Context::ClearRenderTarget(const ZEGRRenderTarget* RenderTarget, const ZEVector4& ClearColor)
 {
+	LockContext();
+
 	GetMainContext()->ClearRenderTargetView(static_cast<const ZED11RenderTarget*>(RenderTarget)->GetView(), ClearColor.M);
+
+	UnlockContext();
 }
 
 void ZED11Context::ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthStencil, bool Depth, bool Stencil, float DepthValue, ZEUInt8 StencilValue)
@@ -894,7 +1012,11 @@ void ZED11Context::ClearDepthStencilBuffer(const ZEGRDepthStencilBuffer* DepthSt
 	ClearFlag |= Depth ? D3D11_CLEAR_DEPTH : 0;
 	ClearFlag |= Stencil ? D3D11_CLEAR_STENCIL : 0;
 
+	LockContext();
+
 	GetMainContext()->ClearDepthStencilView(static_cast<const ZED11DepthStencilBuffer*>(DepthStencil)->GetView(), ClearFlag, DepthValue, StencilValue);
+
+	UnlockContext();
 }
 
 void ZED11Context::ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZEVector4& ClearColor)
@@ -909,5 +1031,9 @@ void ZED11Context::ClearUnorderedAccessView(const ZEGRTexture* Texture, const ZE
 			NativeView = static_cast<const ZED11Texture2D*>(Texture)->GetUnorderedAccessView();
 	}
 
+	LockContext();
+
 	GetMainContext()->ClearUnorderedAccessViewFloat(NativeView, ClearColor.M);
+
+	UnlockContext();
 }

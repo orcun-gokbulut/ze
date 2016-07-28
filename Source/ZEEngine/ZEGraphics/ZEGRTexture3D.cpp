@@ -39,6 +39,7 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEPointer/ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
+#include "ZEGRContext.h"
 #include "ZEResource/ZERSTemplates.h"
 #include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
@@ -68,7 +69,7 @@ bool ZEGRTexture3D::CheckParameters(ZEUInt Width, ZEUInt Height, ZEUInt Depth, Z
 	zeDebugCheck(Usage == ZEGR_RU_CPU_READ_WRITE && !BindFlags.GetFlags(ZEGR_RBF_NONE), "Staging textures cannot be bound to gpu");
 	zeDebugCheck(BindFlags.GetFlags(ZEGR_RBF_RENDER_TARGET) && BindFlags.GetFlags(ZEGR_RBF_DEPTH_STENCIL), "Both render target and depth-stencil bind flags cannot be set");
 
-	return false;
+	return true;
 }
 
 bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
@@ -104,7 +105,7 @@ ZETaskResult ZEGRTexture3D::LoadInternal()
 
 	if (Extension.IsEmpty())
 	{
-		zeError("Cannot load texture. Unknwon file extension. File Name: \"%s\".", GetFileName().ToCString());
+		zeError("Cannot load texture. Unknown file extension. File Name: \"%s\".", GetFileName().ToCString());
 		return ZE_TR_FAILED;
 	}
 
@@ -256,8 +257,14 @@ ZETaskResult ZEGRTexture3D::LoadInternal()
 		}
 	}
 
-	if (ZEGRTexture3D::Initialize((ZEUInt)FinalMetaData.width, (ZEUInt)FinalMetaData.height, (ZEUInt)FinalMetaData.depth, (ZEUInt)FinalMetaData.mipLevels, 
-		ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 
+	if (!Initialize(
+		(ZEUInt)FinalMetaData.width, 
+		(ZEUInt)FinalMetaData.height, 
+		(ZEUInt)FinalMetaData.depth, 
+		(ZEUInt)FinalMetaData.mipLevels, 
+		ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
+		ZEGR_RU_GPU_READ_ONLY, 
+		ZEGR_RBF_SHADER_RESOURCE, 
 		FinalImage->GetPixels()))
 	{
 		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", GetFileName().ToCString());
@@ -381,6 +388,81 @@ ZEHolder<ZEGRTexture3D> ZEGRTexture3D::LoadResource(const ZEString& FileName, co
 
 ZEHolder<const ZEGRTexture3D> ZEGRTexture3D::LoadResourceShared(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions)
 {
-
 	return ZERSTemplates::LoadResourceShared<ZEGRTexture3D>(FileName, Instanciator, &TextureOptions);
+}
+
+bool ZEGRTexture3D::SaveToFile(const ZEString& Filename, const ZEGRTexture3D* Texture, const ZEGRTexture3DOptions& TextureOptions)
+{
+	zeCheckError(Texture == NULL, false, "Cannot save texture. Texture is NULL.");
+	zeCheckError(Filename.IsEmpty(), false, "Cannot save texture. Filename is empty.");
+
+	ZEPathInfo PathInfo = Filename;
+	ZEString Extension = PathInfo.GetExtension();
+
+	if (Extension.IsEmpty())
+	{
+		zeError("Cannot save texture. Unknown file extension. File Name: \"%s\".", Filename.ToCString());
+		return false;
+	}
+
+	if (Extension != ".dds")
+	{
+		zeError("Cannot save texture. Volume textures must be saved dds file. File Name: \"%s\".", Filename.ToCString());
+		return false;
+	}
+
+	ZEHolder<ZEGRTexture3D> StagingTexture = ZEGRTexture3D::CreateResource(
+																			Texture->GetWidth(), 
+																			Texture->GetHeight(), 
+																			Texture->GetDepth(), 
+																			Texture->GetLevelCount(), 
+																			Texture->GetFormat(), 
+																			ZEGR_RU_CPU_READ_WRITE, 
+																			ZEGR_RBF_NONE);
+
+	if (StagingTexture == NULL)
+	{
+		zeError("Cannot save texture. Staging texture used for gpu readback cannot be created. File Name: \"%s\".", Filename.ToCString());
+		return false;
+	}
+
+	ZEGRGraphicsModule::GetInstance()->GetMainContext()->CopyResource(StagingTexture, Texture);
+
+	ZEPointer<ScratchImage> FinalImage = new ScratchImage();
+	HRESULT HR = FinalImage->Initialize3D(ZED11ComponentBase::ConvertFormat(Texture->GetFormat()), Texture->GetWidth(), Texture->GetHeight(), Texture->GetDepth(), Texture->GetLevelCount());
+	if (FAILED(HR))
+	{
+		zeError("Cannot save texture. Temporary buffer initialization failed. Result: 0x%X, File Name: \"%s\".", HR, Filename.ToCString());
+		return false;
+	}
+
+	ZEBYTE* Data;
+	ZESize RowPitch, SlicePitch;
+	if (!StagingTexture->Lock(reinterpret_cast<void**>(&Data), &RowPitch, &SlicePitch))
+	{
+		zeError("Cannot save texture. Staging texture cannot be mapped for CPU reading. File Name: \"%s\".", Filename.ToCString());
+		return false;
+	}
+
+	for (ZEUInt J = 0; J < Texture->GetDepth(); J++)
+	{
+		ZEUInt Offset = J * SlicePitch;
+
+		for (ZEUInt I = 0; I < Texture->GetHeight(); I++)
+		{
+			memcpy(FinalImage->GetImages()[J].pixels + I * RowPitch, Data + Offset + I * RowPitch, RowPitch);
+		}
+	}
+
+	StagingTexture->Unlock();
+
+	ZEString FileRealPath = PathInfo.GetRealPath().Path;
+	HR = SaveToDDSFile(FinalImage->GetImages(), FinalImage->GetImageCount(), FinalImage->GetMetadata(), DDS_FLAGS_NONE, FileRealPath);
+	if (FAILED(HR))
+	{
+		zeError("Cannot save texture. Saving to dds file failed. Result: 0x%X, File Name: \"%s\".", HR, Filename.ToCString());
+		return false;
+	}
+
+	return true;
 }

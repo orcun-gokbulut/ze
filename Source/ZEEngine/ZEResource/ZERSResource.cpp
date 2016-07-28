@@ -550,7 +550,7 @@ void ZERSResource::Unshare()
 
 void ZERSResource::StagingRealized()
 {
-	if (State == ZERS_RS_STAGING)
+	if (State == ZERS_RS_NONE || State == ZERS_RS_STAGING)
 		State = ZERS_RS_STAGED;
 }
 

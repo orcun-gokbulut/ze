@@ -130,6 +130,16 @@ void ZED11Texture3D::Deinitialize()
 	ZEGRTexture3D::Deinitialize();
 }
 
+ID3D11Resource* ZED11Texture3D::GetResource() const
+{
+	ID3D11Resource* Resource = NULL;
+
+	if (Texture3D != NULL)
+		Texture3D->QueryInterface(__uuidof(ID3D11Resource), reinterpret_cast<void**>(&Resource));
+
+	return Resource;
+}
+
 ID3D11Texture3D* ZED11Texture3D::GetTexture() const
 {
 	return Texture3D;
@@ -198,4 +208,51 @@ const ZEGRRenderTarget* ZED11Texture3D::GetRenderTarget(ZEUInt Depth, ZEUInt Lev
 	RenderTargets.Add(RenderTarget);
 
 	return RenderTarget;
+}
+
+bool ZED11Texture3D::Lock(void** Buffer, ZESize* RowPitch, ZESize* SlicePitch, ZEUInt Level)
+{
+	zeDebugCheck(Texture3D == NULL, "Texture is not initialized.");
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_CPU_WRITE && GetLevelCount() > 1, "Dynamic texture having subresource cannot be mapped");
+	zeDebugCheck(GetResourceUsage() == ZEGR_RU_GPU_READ_ONLY || GetResourceUsage() == ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, "Texture had not been created for mapping");
+
+	D3D11_MAP MapType;
+	if (GetResourceUsage() == ZEGR_RU_CPU_READ_WRITE)
+		MapType = D3D11_MAP_READ_WRITE;
+	else if (GetResourceUsage() == ZEGR_RU_GPU_READ_CPU_WRITE)
+		MapType = D3D11_MAP_WRITE_DISCARD;
+	else
+		return false;
+
+	LockContext();
+
+	D3D11_MAPPED_SUBRESOURCE MapData = {};
+	HRESULT Result = GetMainContext()->Map(Texture3D, Level, MapType, 0, &MapData);
+
+	UnlockContext();
+
+	if (FAILED(Result))
+	{
+		zeError("Cannot lock texture 3d resource.");
+		return false;
+	}
+
+	*Buffer = MapData.pData;
+	if (RowPitch != NULL)
+		*RowPitch = MapData.RowPitch;
+	if (SlicePitch != NULL)
+		*SlicePitch = MapData.DepthPitch;
+
+	return true;
+}
+
+void ZED11Texture3D::Unlock(ZEUInt Level)
+{
+	zeDebugCheck(Texture3D == NULL, "Texture is not initialized.");
+
+	LockContext();
+
+	GetMainContext()->Unmap(Texture3D, Level);
+
+	UnlockContext();
 }

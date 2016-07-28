@@ -184,10 +184,10 @@ bool ZED11Module::DeinitializeInternal()
 {
 	ZEGR_RELEASE(Device);
 
-	delete (ZED11Adapter*)CurrentAdapter;
+	delete static_cast<ZED11Adapter*>(CurrentAdapter);
 
 	for (ZESize I = 0; I < Adapters.GetCount(); I++)
-		delete (ZED11Adapter*)Adapters[I];
+		delete static_cast<ZED11Adapter*>(Adapters[I]);
 
 	Adapters.Clear();
 
@@ -197,6 +197,11 @@ bool ZED11Module::DeinitializeInternal()
 ZED11Module::ZED11Module()
 {
 	Device = NULL;
+}
+
+ZED11Module::~ZED11Module()
+{
+	Deinitialize();
 }
 
 ZED11StatePool* ZED11Module::GetStatePool()

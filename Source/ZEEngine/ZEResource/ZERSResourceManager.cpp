@@ -140,7 +140,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 	{
 		Resource->ResourceLock.Lock();
 		if (Resource->GetGUID() == GUID)
-		{	
+		{
 			ZERSHolder<const ZERSResource> Output;
 			Output.Overwrite(Resource.GetPointer());
 			Resource->ReferenceCount++;

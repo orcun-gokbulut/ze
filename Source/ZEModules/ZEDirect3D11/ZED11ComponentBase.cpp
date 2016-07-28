@@ -34,11 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZED11ComponentBase.h"
+
 #include "ZEGraphics\ZEGRTexture.h"
 
 ZED11Module* ZED11ComponentBase::Module = NULL;
 ID3D11Device* ZED11ComponentBase::Device = NULL;
 ID3D11DeviceContext* ZED11ComponentBase::Context = NULL;
+ZELock ZED11ComponentBase::ContextLock;
 
 ZED11Module* ZED11ComponentBase::GetModule()
 {
@@ -53,6 +55,16 @@ ID3D11Device* ZED11ComponentBase::GetDevice() const
 ID3D11DeviceContext* ZED11ComponentBase::GetMainContext() const
 {
 	return Context;
+}
+
+void ZED11ComponentBase::LockContext()
+{
+	ContextLock.Lock();
+}
+
+void ZED11ComponentBase::UnlockContext()
+{
+	ContextLock.Unlock();
 }
 
 DXGI_FORMAT ZED11ComponentBase::ConvertFormat(ZEGRFormat Format)
