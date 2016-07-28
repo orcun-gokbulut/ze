@@ -100,4 +100,5 @@ class ZEMDResourceBone : public ZERSResource
 		bool									Serialize(ZEMLWriterNode& BoneNode) const;
 
 												ZEMDResourceBone();
+		virtual									~ZEMDResourceBone();
 };

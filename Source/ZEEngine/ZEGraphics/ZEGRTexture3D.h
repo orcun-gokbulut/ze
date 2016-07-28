@@ -74,6 +74,7 @@ class ZEGRTexture3D : public ZEGRTexture
 		ZETaskResult							UnloadInternal();
 
 												ZEGRTexture3D();
+		virtual									~ZEGRTexture3D();
 
 	public:
 		virtual ZEGRResourceType				GetResourceType() const;

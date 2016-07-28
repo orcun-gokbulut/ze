@@ -96,4 +96,5 @@ class ZEMDResourceHelper : public ZERSResource
 		bool							Serialize(ZEMLWriterNode& HelperNode) const;
 
 										ZEMDResourceHelper();
+		virtual							~ZEMDResourceHelper();
 };

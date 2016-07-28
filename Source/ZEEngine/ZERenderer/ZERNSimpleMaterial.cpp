@@ -174,6 +174,13 @@ ZERNSimpleMaterial::ZERNSimpleMaterial()
 	Constants.MaterialColor = ZEVector4::One;
 	Constants.TextureEnabled = false;
 	Constants.VertexColorEnabled = true;
+
+	Register();
+}
+
+ZERNSimpleMaterial::~ZERNSimpleMaterial()
+{
+	Unregister();
 }
 
 void ZERNSimpleMaterial::SetStageMask(ZERNStageMask Mask)

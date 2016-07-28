@@ -40,7 +40,7 @@ ZEMTDeclarationType ZEEnumerator::GetDeclarationType() const
 	return ZEMT_DT_ENUMURATION;
 }
 
-const char* ZEEnumerator::ToText(ZEInt Value, const char* Default)
+ZEString ZEEnumerator::ToText(ZEInt Value, const char* Default)
 {
 	ZESize Count = GetItemCount();
 	const ZEEnumeratorItem* Items = GetItems();
@@ -49,4 +49,9 @@ const char* ZEEnumerator::ToText(ZEInt Value, const char* Default)
 		if (Items[I].Value == Value)
 			return Items[I].Name;
 	}
+
+	if (Default == NULL)
+		return ZEString(Value);
+	else
+		return Default;
 }

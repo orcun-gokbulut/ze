@@ -415,6 +415,13 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	SamplerLinearWrapDescription.MagFilter = ZEGR_TFM_ANISOTROPIC;
 	SamplerLinearWrapDescription.MaxAnisotropy = 4;
 	Sampler = ZEGRSampler::GetSampler(SamplerLinearWrapDescription);
+
+	Register();
+}
+
+ZERNFixedMaterial::~ZERNFixedMaterial()
+{
+	Unregister();
 }
 
 ZEUInt ZERNFixedMaterial::GetStageMask() const
@@ -1981,7 +1988,7 @@ bool ZERNFixedMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 
 ZEHolder<ZERNFixedMaterial> ZERNFixedMaterial::CreateInstance()
 {
-	return new ZERNFixedMaterial;
+	return ZERSTemplates::CreateResource<ZERNFixedMaterial>(ZERSTemplates::InstanciatorFunction<ZERNFixedMaterial>);
 }
 
 ZERSHolder<ZERNFixedMaterial> ZERNFixedMaterial::LoadResource(const ZEString& FileName)

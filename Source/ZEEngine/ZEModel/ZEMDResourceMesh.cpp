@@ -157,6 +157,11 @@ void ZEMDResourceMesh::SetGeometry(const ZEArray<ZEVector3>& Vertices)
 	Geometry = Vertices;
 }
 
+const ZEArray<ZEVector3>& ZEMDResourceMesh::GetGeometry() const
+{
+	return Geometry;
+}
+
 bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 {
 	zeCheckError(!MeshNode.IsValid(), false, "Invalid Mesh node.");
@@ -224,15 +229,14 @@ ZEMDResourceMesh::ZEMDResourceMesh() : Link(this)
 	BoundingBox = ZEAABBox::Zero;
 	Visible = true;
 	Skinned = false;
+
+	Register();
 }
 
 ZEMDResourceMesh::~ZEMDResourceMesh()
 {
 	ze_for_each(LOD, LODs)
 		delete &LOD.GetItem();
-}
 
-const ZEArray<ZEVector3>& ZEMDResourceMesh::GetGeometry() const
-{
-	return Geometry;
+	Unregister();
 }

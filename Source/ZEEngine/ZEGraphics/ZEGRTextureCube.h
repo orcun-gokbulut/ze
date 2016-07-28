@@ -77,6 +77,7 @@ class ZEGRTextureCube : public ZEGRTexture
 		virtual ZETaskResult						UnloadInternal();
 
 													ZEGRTextureCube();
+		virtual 									~ZEGRTextureCube();
 
 	public:
 		ZEGRResourceType							GetResourceType() const;

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEGROutput.cpp
+ Zinek Engine - ZERSResourceGroup.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,33 +33,53 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEGROutput.h"
-#include "ZEGRGraphicsModule.h"
-#include "ZEGRWindow.h"
+#pragma once
 
-ZEGROutput::ZEGROutput()
+#include "ZEMeta/ZEObject.h"
+
+#include "ZERSDefinitions.h"
+#include "ZEDS/ZEList2.h"
+#include "ZEDS/ZEArray.h"
+
+class ZERSResourceGroup : public ZEObject
 {
-	Register();
-}
+	ZE_OBJECT
+	friend class ZERSResourceManager;
+	public:
+		ZERSResourceGroup*						Parent;
+		ZEClass*								ResourceClass;
+		ZEArray<ZERSResourceGroup*>				ChildGroups;
 
-ZEGRResourceType ZEGROutput::GetResourceType() const
-{
-	return ZEGR_RT_OUTPUT;
-}
+		ZEList2<ZERSResource>					Resources;
+		ZEList2<const ZERSResource>				SharedResources;
 
-ZEGROutput* ZEGROutput::Create(ZEGRWindow* Window, ZEGRFormat Format)
-{
-	zeCheckError(Window == NULL, NULL, "Window cannot be NULL.");
+		ZESize									ResourceCount;
+		ZESize									SharedResourceCount;
 
-	ZEGROutput* Output = ZEGRGraphicsModule::GetInstance()->CreateOutput();
-	if (Output == NULL)
-		return NULL;
+		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
+		ZESize									MemoryUsageShared[ZERS_MEMORY_POOL_COUNT];
 
-	if (!Output->Initialize(Window->GetHandle(), Window->GetWidth(), Window->GetHeight(), Format))
-	{
-		delete Output;
-		return NULL;
-	}
+		void									UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT]);
 
-	return Output;
-}
+		void									RegisterResource(const ZERSResource* Class);
+		void									UnregisterResource(const ZERSResource* Class);
+
+		void									ShareResource(const ZERSResource* Class);
+		void									UnshareResource(const ZERSResource* Class);
+
+												ZERSResourceGroup();
+												~ZERSResourceGroup();
+
+	public:
+		ZERSResourceGroup*						GetParent() const;
+		ZEClass*								GetResourceClass() const;
+		const ZEArray<ZERSResourceGroup*>		GetChildGroups() const;
+
+		ZESize									GetResourceCount() const;
+		ZESize									GetSharedResourceCount() const;
+
+		ZESize									GetMemoryUsage(ZERSMemoryPool Pool) const;
+		ZESize									GetMemoryUsageShared(ZERSMemoryPool Pool) const;
+		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool) const;
+		ZESize									GetMemoryUsageTotal() const;
+};

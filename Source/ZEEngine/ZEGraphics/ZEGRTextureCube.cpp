@@ -289,6 +289,12 @@ float ZEGRTextureCube::GetPixelSize() const
 ZEGRTextureCube::ZEGRTextureCube()
 {
 	Length = 0;
+	Register();
+}
+
+ZEGRTextureCube::~ZEGRTextureCube()
+{
+	Unregister();
 }
 
 ZERSResource* ZEGRTextureCube::Instanciator(const void* Parameters)

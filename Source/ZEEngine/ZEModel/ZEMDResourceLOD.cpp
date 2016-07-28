@@ -343,9 +343,11 @@ ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 	MaterialID = -1;
 	VertexType = ZEMD_VT_NORMAL;
 	IndexType = ZEMD_VIT_NONE;
+
+	Register();
 }
 
 ZEMDResourceLOD::~ZEMDResourceLOD()
 {
-
+	Unregister();
 }

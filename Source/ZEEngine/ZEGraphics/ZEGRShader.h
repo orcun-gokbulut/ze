@@ -35,15 +35,14 @@
 
 #pragma once
 
-#include "ZEMeta/ZEObject.h"
-#include "ZEPointer/ZEReferenceCounted.h"
+#include "ZEGRResource.h"
 
-#include "ZEPointer/ZEHolder.h"
 #include "ZEGRShaderCompileOptions.h"
 
-class ZEGRShader : public ZEObject, public ZEReferenceCounted
+class ZEGRShader : public ZEGRResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEGRShader)
 	private:
 		ZEGRShaderType					ShaderType;
 
@@ -52,8 +51,10 @@ class ZEGRShader : public ZEObject, public ZEReferenceCounted
 		virtual void					Deinitialize();
 
 										ZEGRShader();
+		virtual							~ZEGRShader();
 
 	public:
+		virtual ZEGRResourceType		GetResourceType() const;
 		virtual ZEGRShaderType			GetShaderType() const;
 
 		static ZEHolder<ZEGRShader>		CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size);

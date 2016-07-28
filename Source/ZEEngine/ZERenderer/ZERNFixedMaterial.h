@@ -199,6 +199,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		virtual ZETaskResult						UnloadInternal();
 
 													ZERNFixedMaterial();
+		virtual										~ZERNFixedMaterial();
 
 	public:
 		virtual ZEUInt								GetStageMask() const;

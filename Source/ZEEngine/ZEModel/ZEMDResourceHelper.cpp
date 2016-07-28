@@ -135,4 +135,11 @@ ZEMDResourceHelper::ZEMDResourceHelper() : Link(this)
 	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
+
+	Register();
+}
+
+ZEMDResourceHelper::~ZEMDResourceHelper()
+{
+	Unregister();
 }

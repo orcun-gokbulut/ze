@@ -954,7 +954,6 @@ void ZEVariant::SetClass(ZEClass* Class)
 	SetType(Type);
 
 	Value.Pointer = Class;
-
 }
 
 void ZEVariant::SetClassRef(ZEClass*& Class)

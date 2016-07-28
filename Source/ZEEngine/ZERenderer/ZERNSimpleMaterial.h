@@ -87,6 +87,7 @@ class ZERNSimpleMaterial : public ZERNMaterial
 		virtual bool							DeinitializeInternal();
 
 												ZERNSimpleMaterial();
+		virtual									~ZERNSimpleMaterial();
 
 	public:
 		void									SetStageMask(ZERNStageMask Mask);

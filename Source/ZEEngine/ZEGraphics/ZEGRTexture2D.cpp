@@ -295,6 +295,13 @@ ZEGRTexture2D::ZEGRTexture2D()
 	Height = 0;
 	ArrayCount = 1;
 	SampleCount = 1;
+
+	Register();
+}
+
+ZEGRTexture2D::~ZEGRTexture2D()
+{
+	Unregister();
 }
 
 ZERSResource* ZEGRTexture2D::Instanciator(const void* Parameters)
