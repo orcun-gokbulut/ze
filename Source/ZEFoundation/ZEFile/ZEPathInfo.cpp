@@ -374,7 +374,7 @@ bool ZEPathInfo::Operate(const char* TargetDirectory, ZEPathOperationFunction Fu
 					return false;
 			}
 
-			if (!Operate(SubDirectoryPath, Function, ZE_POE_DIRECTORY, Recursive))
+			if (!Operate(SubDirectoryPath, Function, Elements, Recursive))
 				return false;
 		}
 	}
