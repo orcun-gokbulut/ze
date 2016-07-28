@@ -41,6 +41,8 @@
 
 void ZERSResource::Reference() const
 {
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
 	ReferenceCountLock.Lock();
 	if (Parent != NULL)
 		Parent->Reference();
@@ -66,9 +68,20 @@ void ZERSResource::Release() const
 
 void ZERSResource::Destroy() const
 {
-	const_cast<ZERSResource*>(this)->TargetState = ZERS_RS_DESTROYED;
-	const_cast<ZERSResource*>(this)->PreDestroy();
-	const_cast<ZERSResource*>(this)->UpdateStateTask.Run();
+	ZERSResource* Resource = const_cast<ZERSResource*>(this);
+	
+	if (Shared)
+		Resource->Unshare();
+
+	while(ChildResources.GetCount() != 0)
+		ChildResources.GetFirstItem()->Destroy();
+
+	if (Parent != NULL)
+		Parent->RemoveChildResource(Resource);
+
+	Resource->TargetState = ZERS_RS_DESTROYED;
+	Resource->PreDestroy();
+	Resource->UpdateStateTask.Run();
 }
 
 void ZERSResource::UpdateMemoryConsumption()
@@ -333,6 +346,23 @@ void ZERSResource::UnregisterExternalResource(const ZERSResource* Resource)
 	ExternalResources.RemoveValue(Resource);
 }
 
+
+void ZERSResource::Register()
+{
+	if (Manager != NULL)
+		return;
+
+	ZERSResourceManager::GetInstance()->RegisterResource(this);
+}
+
+void ZERSResource::Unregister()
+{
+	if (Manager == NULL)
+		return;
+
+	ZERSResourceManager::GetInstance()->UnregisterResource(this);
+}
+
 ZETaskResult ZERSResource::LoadInternal()
 {
 	return ZE_TR_DONE;
@@ -345,15 +375,13 @@ ZETaskResult ZERSResource::UnloadInternal()
 
 void ZERSResource::PreDestroy()
 {
-	if (Shared)
-		Unshare();
 
-	while(ChildResources.GetCount() != 0)
-		ChildResources.GetFirstItem()->Destroy();
 }
 
 ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 {
+	Manager = NULL;
+	Group = NULL;
 	GUID = ZEGUID::Zero;
 	State = ZERS_RS_NONE;
 	Parent = NULL;
@@ -369,14 +397,15 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	Destroying = false;
 	UpdateStateTask.SetPool(ZE_TPI_IO);
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZERSResource, UpdateStateFunction, this));
-
-	ZERSResourceManager::GetInstance()->RegisterResource(this);
 }
 
 ZERSResource::~ZERSResource()
 {
 	if (Parent != NULL)
 		Parent->RemoveChildResource(this);
+
+	zeDebugCheck(ManagerSharedLink.GetInUse(), "Resource is shared.");
+	zeDebugCheck(Manager != NULL || ManagerLink.GetInUse(), "Resource is not registered.");
 
 	ZERSResourceManager::GetInstance()->UnregisterResource(this);
 
@@ -391,6 +420,16 @@ ZERSResource* ZERSResource::GetParent()
 const ZERSResource* ZERSResource::GetParent() const
 {
 	return Parent;
+}
+
+const ZERSResourceManager* ZERSResource::GetManager() const
+{
+	return Manager;
+}
+
+const ZERSResourceGroup* ZERSResource::GetGroup() const
+{
+	return Group;
 }
 
 void ZERSResource::SetGUID(const ZEGUID& GUID)
@@ -492,6 +531,8 @@ bool ZERSResource::IsShared() const
 
 void ZERSResource::Share()
 {
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
 	if (IsShared() || TargetState == ZERS_RS_DESTROYED)
 		return;
 
@@ -521,6 +562,8 @@ void ZERSResource::StagingFailed()
 
 void ZERSResource::Load(const ZEString& FileName)
 {
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
 	if (TargetState == ZERS_RS_DESTROYED)
 		return;
 
@@ -540,6 +583,8 @@ void ZERSResource::Load(const ZEString& FileName)
 
 void ZERSResource::Unload()
 {
+	zeDebugCheck(Manager == NULL, "Resource is not registered.");
+
 	if (State < ZERS_RS_STAGED)
 		return;
 

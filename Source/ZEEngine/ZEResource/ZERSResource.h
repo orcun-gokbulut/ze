@@ -49,17 +49,23 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEThread/ZETask.h"
 
+class ZERSResourceManager;
+class ZERSResourceGroup;
+
 class ZERSResource : public ZEObject, public ZEReferenceCounted
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZERSResource)
 	friend class ZERSResourceManager;
-	friend class ZERSResourceLoadable;
+	friend class ZERSResourceGroup;
 	friend class ZERSTemplates;
-	template<typename ZERSResourceClass> friend class ZERSHolder;
+	template<typename ZERSResourceGroup> friend class ZERSHolder;
 	private:
+		const ZERSResourceManager*				Manager;
+		const ZERSResourceGroup*				Group;
+
 		ZERSResource*							Parent;
-		mutable ZELink<const ZERSResource>		ManagerLink;
+		mutable ZELink<ZERSResource>			ManagerLink;
 		mutable ZELink<const ZERSResource>		ManagerSharedLink;
 
 		ZEGUID									GUID;
@@ -103,6 +109,9 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		void									RegisterExternalResource(const ZERSResource* Resource);
 		void									UnregisterExternalResource(const ZERSResource* Resource);
 
+		void									Register();
+		void									Unregister();
+
 		virtual ZETaskResult					LoadInternal();
 		virtual ZETaskResult					UnloadInternal();
 		virtual void							PreDestroy();
@@ -113,6 +122,8 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 	public:
 		ZERSResource*							GetParent();
 		const ZERSResource*						GetParent() const;
+		const ZERSResourceManager*				GetManager() const;
+		const ZERSResourceGroup*				GetGroup() const;
 
 		const ZEGUID&							GetGUID() const;
 		const ZEString&							GetFileName() const;

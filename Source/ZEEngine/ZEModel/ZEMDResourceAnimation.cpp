@@ -104,5 +104,9 @@ bool ZEMDResourceAnimation::Serialize(ZEMLWriterNode& AnimationNode) const
 
 ZEMDResourceAnimation::ZEMDResourceAnimation() : Link(this)
 {
-
+	Register();
+}
+ZEMDResourceAnimation::~ZEMDResourceAnimation()
+{
+	Unregister();
 }

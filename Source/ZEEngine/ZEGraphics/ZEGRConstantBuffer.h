@@ -51,6 +51,7 @@ class ZEGRConstantBuffer : public ZEGRResource
 		virtual void									Deinitialize();
 
 														ZEGRConstantBuffer();
+		virtual											~ZEGRConstantBuffer();
 
 	public:
 		ZEGRResourceType								GetResourceType() const;

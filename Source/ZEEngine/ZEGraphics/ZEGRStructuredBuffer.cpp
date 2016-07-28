@@ -95,6 +95,8 @@ ZEGRStructuredBuffer::ZEGRStructuredBuffer()
 	Stage.BoundAsUnorderedAccess = false;
 	Stage.Slot = -1;
 	BoundStages.Fill(Stage);
+
+	Register();
 }
 
 ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
@@ -111,6 +113,8 @@ ZEGRStructuredBuffer::~ZEGRStructuredBuffer()
 				Context->ClearUnorderedAccesses(Stage->Slot, 1);
 		}
 	}
+
+	Unregister();
 }
 
 static ZERSResource* Instanciator(const void*)

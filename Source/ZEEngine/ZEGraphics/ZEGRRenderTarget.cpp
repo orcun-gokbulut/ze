@@ -64,6 +64,7 @@ ZEGRRenderTarget::ZEGRRenderTarget()
 {
 	Owner = NULL;
 	Bound = false;
+	Register();
 }
 
 ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
@@ -74,6 +75,7 @@ ZEGRRenderTarget::ZEGRRenderTarget(ZEUInt Width, ZEUInt Height, ZEGRFormat Forma
 	this->Width = Width;
 	this->Height = Height;
 	this->Format = Format;
+	Register();
 }
 
 ZEGRRenderTarget::~ZEGRRenderTarget()
@@ -88,6 +90,8 @@ ZEGRRenderTarget::~ZEGRRenderTarget()
 	}
 
 	Owner = NULL;
+
+	Unregister();
 }
 
 ZEGRResourceType ZEGRRenderTarget::GetResourceType() const

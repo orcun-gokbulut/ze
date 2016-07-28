@@ -77,6 +77,7 @@ class ZEGRTexture2D : public ZEGRTexture
 		ZETaskResult									UnloadInternal();
 
 														ZEGRTexture2D();
+		virtual											~ZEGRTexture2D();
 
 		static ZERSResource*							Instanciator(const void* Parameters);
 

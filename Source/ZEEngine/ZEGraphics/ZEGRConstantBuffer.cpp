@@ -71,7 +71,12 @@ void ZEGRConstantBuffer::SetData(const void* Data)
 
 ZEGRConstantBuffer::ZEGRConstantBuffer()
 {
+	Register();
+}
 
+ZEGRConstantBuffer::~ZEGRConstantBuffer()
+{
+	Unregister();
 }
 
 static ZERSResource* Instanciator(const void*)

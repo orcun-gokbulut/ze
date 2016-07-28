@@ -36,6 +36,7 @@
 #include "ZERSResourceManager.h"
 
 #include "ZERSResource.h"
+#include "ZERSResourceGroup.h"
 #include "ZEError.h"
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
@@ -45,6 +46,12 @@ static __declspec(thread) bool StagingInstanciator = false;
 void ZERSResourceManager::UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT])
 {
 	ManagerLock.Lock();
+
+	ZERSResourceGroup* Group = GetResourceGroupInternal(Resource->GetClass());
+	zeDebugCheck(Group == NULL, "Resource group corruption.");
+
+	Group->UpdateMemoryUsage(Resource, MemoryUsageDelta);
+	
 	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
 	{
 		MemoryUsage[Pool] += MemoryUsageDelta[Pool];
@@ -54,15 +61,52 @@ void ZERSResourceManager::UpdateMemoryUsage(ZERSResource* Resource, ZESSize Memo
 	ManagerLock.Unlock();
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(const ZEString& FileName)
+ZERSResourceGroup* ZERSResourceManager::CreateResourceGroup(ZEClass* ResourceClass)
 {
+	ZERSResourceGroup* ParentGroup = NULL;
+
+	if (ResourceClass != ZERSResource::Class())
+	{
+		ParentGroup = GetResourceGroupInternal(ResourceClass->GetParentClass());
+		if (ParentGroup == NULL)
+			ParentGroup = CreateResourceGroup(ResourceClass->GetParentClass());
+	}
+
+	ZERSResourceGroup* ResourceGroup = new ZERSResourceGroup();
+	ResourceGroup->ResourceClass = ResourceClass;
+	ResourceGroup->Parent = ParentGroup;
+	ResourceGroups.Add(ResourceGroup);
+
+	if (ResourceGroup->Parent != NULL)
+		ResourceGroup->Parent->ChildGroups.Add(ResourceGroup);
+	
+	return ResourceGroup;
+}
+
+ZERSResourceGroup* ZERSResourceManager::GetResourceGroupInternal(ZEClass* ResourceClass)
+{
+	for (ZESize I = 0; I < ResourceGroups.GetCount(); I++)
+	{
+		if (ResourceGroups[I]->GetResourceClass() == ResourceClass)
+			return ResourceGroups[I];
+	}
+
+	return NULL;
+}
+
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass* ResourceClass, const ZEString& FileName)
+{
+	ZERSResourceGroup* Group = GetResourceGroupInternal(ResourceClass);
+	if (Group == NULL)
+		return NULL;
+
 	ZEFileInfo FileInfo(FileName);
 	ZEString FileNameNormalized = FileInfo.Normalize();
 	if (FileNameNormalized.IsEmpty())
 		return NULL;
 
 	ZEUInt64 Hash = FileName.Lower().Hash();
-	ze_for_each(Resource, SharedResources)
+	ze_for_each(Resource, Group->SharedResources)
 	{
 		Resource->ResourceLock.Lock();
 		if (Resource->GetFileNameHash() == 0)
@@ -86,9 +130,13 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(const ZE
 	return NULL;
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(const ZEGUID& GUID)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass* ResourceClass, const ZEGUID& GUID)
 {
-	ze_for_each(Resource, SharedResources)
+	ZERSResourceGroup* Group = GetResourceGroupInternal(ResourceClass);
+	if (Group == NULL)
+		return NULL;
+	
+	ze_for_each(Resource, Group->SharedResources)
 	{
 		Resource->ResourceLock.Lock();
 		if (Resource->GetGUID() == GUID)
@@ -107,7 +155,23 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(const ZE
 
 void ZERSResourceManager::RegisterResourceInternal(ZERSResource* Resource)
 {
-	Resources.AddEnd(&Resource->ManagerLink);
+	if (Resource->Manager != NULL)
+		return;
+
+	zeDebugCheck(Resource->Manager != NULL, "Resource is already registered.");
+
+	ZERSResourceGroup* Group = GetResourceGroupInternal(Resource->GetClass());
+	if (Group == NULL)
+	{
+		Group = CreateResourceGroup(Resource->GetClass());
+		zeDebugCheck(Group == NULL, "Resource group corruption.");
+	}
+
+	Resource->Manager = this;
+	Resource->Group = Group;
+	ResourceCount++;
+
+	Group->RegisterResource(Resource);
 
 	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
 		MemoryUsage[Pool] += Resource->MemoryUsage[Pool];
@@ -115,25 +179,47 @@ void ZERSResourceManager::RegisterResourceInternal(ZERSResource* Resource)
 
 void ZERSResourceManager::UnregisterResourceInternal(ZERSResource* Resource)
 {
-	Resources.Remove(&Resource->ManagerLink);
+	if (Resource->Manager == NULL)
+		return;
+
+	ZERSResourceGroup* Group = GetResourceGroupInternal(Resource->GetClass());
+	zeDebugCheck(Group == NULL, "Resource group corruption.");
+	
+	Resource->Manager = NULL;
+	Resource->Group = NULL;
+	ResourceCount--;
+
+	Group->UnregisterResource(Resource);
+
 	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
 		MemoryUsage[Pool] -= Resource->MemoryUsage[Pool];
 }
 
 void ZERSResourceManager::ShareResourceInternal(ZERSResource* Resource)
 {
-	SharedResources.AddEnd(&Resource->ManagerSharedLink);
+	ZERSResourceGroup* Group = GetResourceGroupInternal(Resource->GetClass());
+	zeDebugCheck(Group == NULL, "Resource group corruption.");
+
+	Group->ShareResource(Resource);
 	Resource->Shared = true;
+	SharedResourceCount++;
 	
-	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
+	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++) 
 		MemoryUsageShared[Pool] += Resource->MemoryUsage[Pool];
 }
 
 void ZERSResourceManager::UnshareResourceInternal(ZERSResource* Resource)
 {
-	SharedResources.Remove(&Resource->ManagerSharedLink);
+	if (!Resource->IsShared())
+		return;
+		
+	ZERSResourceGroup* Group = GetResourceGroupInternal(Resource->GetClass());
+	zeDebugCheck(Group == NULL, "Resource group corruption.");
+
+	Group->UnshareResource(Resource);
 	Resource->Shared = false;
-	
+	SharedResourceCount--;
+
 	for (ZESize Pool = 0; Pool < ZERS_MEMORY_POOL_COUNT; Pool++)
 		MemoryUsageShared[Pool] -= Resource->MemoryUsage[Pool];
 }
@@ -159,25 +245,35 @@ ZERSResourceManager::~ZERSResourceManager()
 	
 }
 
-ZESize ZERSResourceManager::GetPrivateResourceCount()
+ZEArray<const ZERSResourceGroup*> ZERSResourceManager::GetResourceGroups()
 {
-	return SharedResources.GetCount();
+	ManagerLock.Lock();
+	ZEArray<const ZERSResourceGroup*> Snapshot;
+	Snapshot.MassAdd(ResourceGroups.GetCArray(), ResourceGroups.GetCount());
+	ManagerLock.Unlock();
+
+	return Snapshot;
+}
+
+ZESize ZERSResourceManager::GetResourceCount()
+{
+	return ResourceCount;
 }
 
 ZESize ZERSResourceManager::GetSharedResourceCount()
 {
-	return SharedResources.GetCount();
+	return SharedResourceCount;
 }
 
 ZESize ZERSResourceManager::GetMemoryUsage(ZERSMemoryPool Pool)
 {
-	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Unknown memory pool.");
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Declaration()->ToText(Pool).ToCString());
 	return MemoryUsage[Pool];
 }
 
 ZESize ZERSResourceManager::GetMemoryUsageShared(ZERSMemoryPool Pool)
 {
-	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Unknown memory pool.");
+	zeCheckError(Pool >= ZERS_MEMORY_POOL_COUNT, 0, "Cannot get memory usage. Unknown memory pool. Memory Pool: %s.", ZERSMemoryPool_Declaration()->ToText(Pool).ToCString());
 	return MemoryUsageShared[Pool];
 }
 
@@ -186,19 +282,23 @@ ZESize ZERSResourceManager::GetMemoryUsageTotal(ZERSMemoryPool Pool)
 	return GetMemoryUsage(Pool) + GetMemoryUsageShared(Pool);
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(const ZEGUID& GUID)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(ZEClass* ResourceClass, const ZEGUID& GUID)
 {
+	zeCheckError(ResourceClass == NULL, NULL, "Cannot get resource Resource Class is NULL.");
+
 	ManagerLock.Lock();
-	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(GUID);
+	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(ResourceClass, GUID);
 	ManagerLock.Unlock();
 
 	return Resource;
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(const ZEString& FileName)
+ZERSHolder<const ZERSResource> ZERSResourceManager::GetResource(ZEClass* ResourceClass, const ZEString& FileName)
 {
+	zeCheckError(ResourceClass == NULL, NULL, "Cannot get resource. Resource Class is NULL.");
+
 	ManagerLock.Lock();
-	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(FileName);
+	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(ResourceClass, FileName);
 	ManagerLock.Unlock();
 
 	return Resource;
@@ -227,6 +327,9 @@ void ZERSResourceManager::UnregisterResource(ZERSResource* Resource)
 
 void ZERSResourceManager::ShareResource(ZERSResource* Resource)
 {
+	if (Resource == NULL)
+		return;
+
 	ManagerLock.Lock();
 	ShareResourceInternal(Resource);
 	ManagerLock.Unlock();
@@ -234,15 +337,20 @@ void ZERSResourceManager::ShareResource(ZERSResource* Resource)
 
 void ZERSResourceManager::UnshareResource(ZERSResource* Resource)
 {
+	if (Resource == NULL)
+		return;
+
 	ManagerLock.Lock();
 	UnshareResourceInternal(Resource);
 	ManagerLock.Unlock();
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciator, const void* InstanciatorParameter, ZERSResource** StagingResource)
+ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* ResourceClass, const ZEGUID& GUID, ZERSInstanciator Insanciator, const void* InstanciatorParameter, ZERSResource** StagingResource)
 {
+	zeCheckError(ResourceClass == NULL, NULL, "Cannot stage resource. Resource Class is NULL.");
+
 	ManagerLock.Lock();
-	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(GUID);
+	ZERSHolder<const ZERSResource> Resource = GetResourceInternal(ResourceClass, GUID);
 	if (Resource == NULL)
 	{
 		StagingInstanciator = true;
@@ -251,7 +359,15 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 
 		if (NewResouce == NULL)
 		{
+			zeError("Cannot stage resource. Instanciator returns NULL. Resource Class: \"%s\".", ResourceClass->GetName());
 			ManagerLock.Unlock();
+			return NULL;
+		}
+
+		if (NewResouce->GetClass() != ResourceClass)
+		{
+			zeError("Cannot stage resource. Invalid Instanciator. Resource Class: \"%s\".", ResourceClass->GetName());
+			ManagerLock.Unlock();	 
 			return NULL;
 		}
 
@@ -276,10 +392,12 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEGUID& 
 	}
 }
 
-ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString& FileName, ZERSInstanciator Insanciator, const void* InstanciatorParameter, ZERSResource** StagingResource)
+ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(ZEClass* ResourceClass, const ZEString& FileName, ZERSInstanciator Insanciator, const void* InstanciatorParameter, ZERSResource** StagingResource)
 {
+	zeCheckError(ResourceClass == NULL, NULL, "Cannot stage resource. Resource Class is NULL.");
+
 	ManagerLock.Lock();
-	const ZERSResource* Resource = GetResourceInternal(FileName);
+	const ZERSResource* Resource = GetResourceInternal(ResourceClass, FileName);
 	if (Resource == NULL)
 	{
 		StagingInstanciator = true;
@@ -288,7 +406,15 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::StageResource(const ZEString
 
 		if (NewResouce == NULL)
 		{
+			zeError("Cannot stage resource. Instanciator returns NULL. Resource Class: \"%s\".", ResourceClass->GetName());
 			ManagerLock.Unlock();
+			return NULL;
+		}
+
+		if (NewResouce->GetClass() != ResourceClass)
+		{
+			zeError("Cannot stage resource. Invalid Instanciator. Resource Class: \"%s\".", ResourceClass->GetName());
+			ManagerLock.Unlock();	 
 			return NULL;
 		}
 

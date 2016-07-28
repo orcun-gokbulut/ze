@@ -260,7 +260,7 @@ ZETaskResult ZEGRTexture3D::LoadInternal()
 		ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, 
 		FinalImage->GetPixels()))
 	{
-		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", HR, GetFileName().ToCString());
+		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", GetFileName().ToCString());
 		return ZE_TR_FAILED;
 	}
 
@@ -308,6 +308,13 @@ ZEGRTexture3D::ZEGRTexture3D()
 	Width = 0;
 	Height = 0;
 	Depth = 0;
+
+	Register();
+}
+
+ZEGRTexture3D::~ZEGRTexture3D()
+{
+	Unregister();
 }
 
 ZERSResource* ZEGRTexture3D::Instanciator(const void* Parameters)

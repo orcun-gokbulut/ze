@@ -87,4 +87,5 @@ class ZEMDResourceAnimation : public ZERSResource
 		bool										Serialize(ZEMLWriterNode& AnimationNode) const;
 
 													ZEMDResourceAnimation();
+		virtual										~ZEMDResourceAnimation();
 };

@@ -39,11 +39,12 @@
 
 #include "ZECommon.h"
 #include "ZEDS\ZEList2.h"
+#include "ZEDS\ZEArray.h"
 #include "ZERSHolder.h"
 #include "ZERSDefinitions.h"
 
 class ZERSResource;
-class ZERSResourceLoadable;
+class ZERSResourceGroup;
 
 class ZERSResourceManager : public ZEObject
 {
@@ -51,16 +52,22 @@ class ZERSResourceManager : public ZEObject
 	ZE_DISALLOW_COPY(ZERSResourceManager)
 	friend class ZERSResource;
 	private:
-		ZEList2<const ZERSResource>				Resources;
-		ZEList2<const ZERSResource>				SharedResources;
+		ZEArray<ZERSResourceGroup*>				ResourceGroups;
+
+		ZESize									ResourceCount;
+		ZESize									SharedResourceCount;
+
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsageShared[ZERS_MEMORY_POOL_COUNT];
 		ZELock									ManagerLock;
 
 		void									UpdateMemoryUsage(ZERSResource* Resource, ZESSize MemoryUsageDelta[ZERS_MEMORY_POOL_COUNT]);
 
-		ZERSHolder<const ZERSResource>			GetResourceInternal(const ZEGUID& GUID);
-		ZERSHolder<const ZERSResource>			GetResourceInternal(const ZEString& FileName);
+		ZERSResourceGroup*						CreateResourceGroup(ZEClass* ResourceClass);
+		ZERSResourceGroup*						GetResourceGroupInternal(ZEClass* ResourceClass);
+
+		ZERSHolder<const ZERSResource>			GetResourceInternal(ZEClass* ResourceClass, const ZEGUID& GUID);
+		ZERSHolder<const ZERSResource>			GetResourceInternal(ZEClass* ResourceClass, const ZEString& FileName);
 	
 		void									RegisterResourceInternal(ZERSResource* Resource);
 		void									UnregisterResourceInternal(ZERSResource* Resource);
@@ -68,31 +75,40 @@ class ZERSResourceManager : public ZEObject
 		void									ShareResourceInternal(ZERSResource* Resource);
 		void									UnshareResourceInternal(ZERSResource* Resource);
 
+		void									UnregisterResource(ZERSResource* Resource);
+
 		void									DestroyResource(const ZERSResource* Resource);
 
 												ZERSResourceManager();
 												~ZERSResourceManager();
 
 	public:
-		ZESize									GetPrivateResourceCount();
+		ZEArray<const ZERSResourceGroup*>		GetResourceGroups();
+		const ZERSResourceGroup*				GetResourceGroup(ZEClass* ResourceClass);
+
+		ZESize									GetResourceCount(); 
 		ZESize									GetSharedResourceCount();
 
 		ZESize									GetMemoryUsage(ZERSMemoryPool Pool);
 		ZESize									GetMemoryUsageShared(ZERSMemoryPool Pool);
 		ZESize									GetMemoryUsageTotal(ZERSMemoryPool Pool);
 
-		ZERSHolder<const ZERSResource>			GetResource(const ZEGUID& GUID);
-		ZERSHolder<const ZERSResource>			GetResource(const ZEString& FileName);
-	private:
+		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEGUID& GUID);
+		ZERSHolder<const ZERSResource>			GetResource(ZEClass* ResourceClass, const ZEString& FileName);
+
 		void									RegisterResource(ZERSResource* Resource);
-		void									UnregisterResource(ZERSResource* Resource);
-	
-	public:
+
 		void									ShareResource(ZERSResource* Resource);
 		void									UnshareResource(ZERSResource* Resource);
 
-		ZERSHolder<const ZERSResource>			StageResource(const ZEGUID& GUID, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
-		ZERSHolder<const ZERSResource>			StageResource(const ZEString& FileName, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
+		ZERSHolder<const ZERSResource>			StageResource(ZEClass* ResourceClass, const ZEGUID& GUID, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
+		ZERSHolder<const ZERSResource>			StageResource(ZEClass* ResourceClass, const ZEString& FileName, ZERSInstanciator Insanciaor, const void* InstanciatorParameter = NULL, ZERSResource** StagingResource = NULL);
+
+
+		/*ZEString								ListResources(const ZEString& GroupName = "", bool DisplayLikeTree = true);
+		ZEString								ListResourceGroups(const ZEString& GroupName = "", bool DisplayLikeTree = true);
+		ZEString								ShowResource(const ZEString& GUIDOrFileName);
+		ZEString								ShowResourceGroup(const ZEString& GUIDOrFileName);*/
 
 		static ZERSResourceManager*				GetInstance();
 };

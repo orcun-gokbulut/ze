@@ -386,7 +386,12 @@ class ZEVariant
 										
 										template<typename ZEObjectType>
 										ZEVariant(const ZEObjectType& Value);
-										ZEVariant(ZEObject* Value);
+
+										template<typename ZEObjectType>
+										ZEVariant(ZEObjectType* Value);
+
+										template<typename ZEObjectType>
+										ZEVariant(const ZEObjectType* Value);
 
 										template<typename ZEArrayType>
 										ZEVariant(const ZEArray<ZEArrayType>& Value);
@@ -592,6 +597,19 @@ ZEVariant::ZEVariant(const ZEObjectType& Value)
 {
 	SetObject(Value);
 }
+
+template<typename ZEObjectType>
+ZEVariant::ZEVariant(ZEObjectType* Value)
+{
+	SetObjectPtr(Value);
+}
+
+template<typename ZEObjectType>
+ZEVariant::ZEVariant(const ZEObjectType* Value)
+{
+	SetObjectPtrConstRef(Value);
+}
+
 
 template<typename ZEArrayType>
 ZEVariant::ZEVariant(const ZEArray<ZEArrayType>& Value)

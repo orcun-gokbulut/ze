@@ -56,6 +56,7 @@ class ZEGRVertexBuffer : public ZEGRResource
 		virtual void								Deinitialize();
 
 													ZEGRVertexBuffer();
+		virtual										~ZEGRVertexBuffer();
 
 	public:
 		virtual ZEGRResourceType					GetResourceType() const;

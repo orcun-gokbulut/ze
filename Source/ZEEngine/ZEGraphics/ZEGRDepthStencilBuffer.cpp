@@ -88,6 +88,7 @@ ZEGRFormat ZEGRDepthStencilBuffer::GetFormat() const
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer()
 {
 	Owner = NULL;
+	Register();
 }
 
 ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGRFormat Format)
@@ -97,6 +98,8 @@ ZEGRDepthStencilBuffer::ZEGRDepthStencilBuffer(ZEUInt Width, ZEUInt Height, ZEGR
 	this->Width = Width;
 	this->Height = Height;
 	this->Format = Format;
+
+	Register();
 }
 
 ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
@@ -107,4 +110,6 @@ ZEGRDepthStencilBuffer::~ZEGRDepthStencilBuffer()
 	}
 
 	Owner = NULL;
+
+	Unregister();
 }

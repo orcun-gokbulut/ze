@@ -59,6 +59,17 @@ void ZEGRShader::Deinitialize()
 ZEGRShader::ZEGRShader()
 {
 	ShaderType = ZEGR_ST_NONE;
+	Register();
+}
+
+ZEGRShader::~ZEGRShader()
+{
+	Unregister();
+}
+
+ZEGRResourceType ZEGRShader::GetResourceType() const
+{
+	return ZEGR_RT_SHADER;
 }
 
 ZEGRShaderType ZEGRShader::GetShaderType() const
@@ -68,15 +79,12 @@ ZEGRShaderType ZEGRShader::GetShaderType() const
 
 ZEHolder<ZEGRShader> ZEGRShader::CreateInstance(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
-	ZEGRShader* Shader = ZEGRGraphicsModule::GetInstance()->CreateShader();
+	ZEHolder<ZEGRShader> Shader = ZEGRGraphicsModule::GetInstance()->CreateShader();
 	if (Shader == NULL)
 		return NULL;
 
 	if (!Shader->Initialize(ShaderType, ShaderBinary, Size))
-	{
-		Shader->Destroy();
 		return NULL;
-	}
 
 	return Shader;
 }

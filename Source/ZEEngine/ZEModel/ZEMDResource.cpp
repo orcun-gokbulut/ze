@@ -386,7 +386,7 @@ void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 
 ZEMDResource::ZEMDResource()
 {
-
+	Register();
 }
 
 ZEMDResource::~ZEMDResource()
@@ -414,6 +414,8 @@ ZEMDResource::~ZEMDResource()
 		RemoveHelper(&(*Helper));
 		delete &(*Helper);
 	}
+
+	Unregister();
 }
 
 ZERSHolder<ZEMDResource> ZEMDResource::LoadResource(const ZEString& FileName)

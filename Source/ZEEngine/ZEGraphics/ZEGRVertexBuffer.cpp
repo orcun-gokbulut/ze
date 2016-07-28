@@ -61,6 +61,13 @@ ZEGRVertexBuffer::ZEGRVertexBuffer()
 {
 	VertexCount = 0;
 	VertexStride = 0;
+
+	Register();
+}
+
+ZEGRVertexBuffer::~ZEGRVertexBuffer()
+{
+	Unregister();
 }
 
 ZEGRResourceType ZEGRVertexBuffer::GetResourceType() const

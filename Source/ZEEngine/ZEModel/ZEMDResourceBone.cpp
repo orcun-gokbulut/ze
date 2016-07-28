@@ -186,4 +186,11 @@ ZEMDResourceBone::ZEMDResourceBone() : Link(this)
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	BoundingBox = ZEAABBox::Zero;
+
+	Register();
+}
+
+ZEMDResourceBone::~ZEMDResourceBone()
+{
+	Unregister();
 }

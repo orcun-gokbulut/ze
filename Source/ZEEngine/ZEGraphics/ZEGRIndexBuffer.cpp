@@ -90,6 +90,12 @@ ZEGRIndexBufferFormat ZEGRIndexBuffer::GetFormat() const
 ZEGRIndexBuffer::ZEGRIndexBuffer()
 {
 	Format = ZEGR_IBF_NONE;
+	Register();
+}
+
+ZEGRIndexBuffer::~ZEGRIndexBuffer()
+{
+	Unregister();
 }
 
 static ZERSResource* Instanciator(const void*)

@@ -398,11 +398,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 	if (!MaterialsNode->IsValid())
 		return false;
 
-	for(ZESize I = 0; I < Materials.GetCount(); I++)
-		Materials[I] = ZERNFixedMaterial::CreateInstance();
-
 	ZESize SubNodeCount = MaterialsNode->GetNodeCount("Material");
-
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
 		ZEMLReaderNode MaterialNode = MaterialsNode->GetNode("Material", I);
@@ -411,7 +407,6 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 			return false;
 
 		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
-
 		Materials[I] = ZERNFixedMaterial::LoadResourceShared(MaterialPath);
 	}
 
