@@ -38,6 +38,7 @@
 #include <d3d11_1.h>
 
 #include "ZEDS/ZEFlags.h"
+#include "ZEThread/ZELock.h"
 
 class ZED11Module;
 enum ZEGRFormat;
@@ -50,11 +51,15 @@ class ZED11ComponentBase
 		static ZED11Module*				Module;
 		static ID3D11Device*			Device;
 		static ID3D11DeviceContext*		Context;
+		static ZELock					ContextLock;
 
 	public:
 		static ZED11Module*				GetModule();
 		ID3D11Device*					GetDevice() const;
 		ID3D11DeviceContext*			GetMainContext() const;
+
+		void							LockContext();
+		void							UnlockContext();
 
 		static DXGI_FORMAT				ConvertFormat(ZEGRFormat Format);
 		static ZEGRFormat				ConvertDXGIFormat(DXGI_FORMAT Format);

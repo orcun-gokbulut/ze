@@ -86,6 +86,8 @@ class ZEGRTexture3D : public ZEGRTexture
 		ZEVector3								GetPixelSize() const;
 
 		virtual void							UpdateSubResource(ZEUInt DestLevel, const void* SrcData, ZESize SrcRowPitch, ZESize SrcDepthPitch) = 0;
+		virtual bool							Lock(void** Buffer, ZESize* RowPitch = NULL, ZESize* SlicePitch = NULL, ZEUInt Level = 0) = 0;
+		virtual void							Unlock(ZEUInt Level = 0) = 0;
 
 		virtual const ZEGRRenderTarget*			GetRenderTarget(ZEUInt Depth, ZEUInt MipLevel = 0) const = 0;
 
@@ -98,4 +100,6 @@ class ZEGRTexture3D : public ZEGRTexture
 
 		static ZEHolder<ZEGRTexture3D>			LoadResource(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions);
 		static ZEHolder<const ZEGRTexture3D>	LoadResourceShared(const ZEString& FileName, const ZEGRTexture3DOptions& TextureOptions);
+
+		static bool								SaveToFile(const ZEString& Filename, const ZEGRTexture3D* Texture, const ZEGRTexture3DOptions& TextureOptions);
 };

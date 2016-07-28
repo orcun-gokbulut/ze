@@ -331,18 +331,16 @@ bool ZERNStageLighting::UpdateInputOutputs()
 	ZEUInt Width = AccumulationTexture->GetWidth();
 	ZEUInt Height = AccumulationTexture->GetHeight();
 
-	if (TiledDeferredOutputTexture == NULL || 
-		TiledDeferredOutputTexture->GetWidth() != Width * (ZEGRGraphicsModule::SAMPLE_COUNT == 4 ? 2 : 1) ||
-		TiledDeferredOutputTexture->GetHeight() != Height * (ZEGRGraphicsModule::SAMPLE_COUNT == 4 ? 2 : 1))
+	if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
 	{
-		if (ZEGRGraphicsModule::SAMPLE_COUNT == 4)
-		{
-			Width *= 2;
-			Height *= 2;
-		}
-
-		TiledDeferredOutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, AccumulationTexture->GetFormat(), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
+		Width *= 2;
+		Height *= 2;
 	}
+
+	if (TiledDeferredOutputTexture == NULL || 
+		TiledDeferredOutputTexture->GetWidth() != Width || 
+		TiledDeferredOutputTexture->GetHeight() != Height)
+		TiledDeferredOutputTexture = ZEGRTexture2D::CreateResource(Width, Height, 1, AccumulationTexture->GetFormat(), ZEGR_RU_GPU_READ_WRITE_CPU_WRITE, ZEGR_RBF_SHADER_RESOURCE | ZEGR_RBF_RENDER_TARGET | ZEGR_RBF_UNORDERED_ACCESS);
 
 	return true;
 }

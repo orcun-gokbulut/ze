@@ -93,7 +93,7 @@ ZETaskResult ZEGRTextureCube::LoadInternal()
 
 	if (Extension.IsEmpty())
 	{
-		zeError("Cannot load texture. Unknwon file extension. File Name: \"%s\".", GetFileName().ToCString());
+		zeError("Cannot load texture. Unknown file extension. File Name: \"%s\".", GetFileName().ToCString());
 		return ZE_TR_FAILED;
 	}
 
@@ -249,10 +249,15 @@ ZETaskResult ZEGRTextureCube::LoadInternal()
 		}
 	}
 
-	if (!Initialize((ZEUInt)FinalMetaData.width, (ZEUInt)FinalMetaData.mipLevels, ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
-		ZEGR_RU_GPU_READ_ONLY, ZEGR_RBF_SHADER_RESOURCE, FinalImage->GetPixels()))
+	if (!Initialize(
+		(ZEUInt)FinalMetaData.width, 
+		(ZEUInt)FinalMetaData.mipLevels, 
+		ZED11ComponentBase::ConvertDXGIFormat(FinalMetaData.format), 
+		ZEGR_RU_GPU_READ_ONLY, 
+		ZEGR_RBF_SHADER_RESOURCE, 
+		FinalImage->GetPixels()))
 	{
-		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", HR, GetFileName().ToCString());
+		zeError("Cannot load texture. Initialization failed. File Name: \"%s\".", GetFileName().ToCString());
 		return ZE_TR_FAILED;
 	}
 

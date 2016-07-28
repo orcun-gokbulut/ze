@@ -106,12 +106,7 @@ void ZEATCloud::CreatePlane()
 		{ ZEVector3(10.0f, 0.0f, -10.0f), ZEVector2(1.0f, 1.0f) }
 	};
 
-	PlaneVertexBuffer = ZEGRVertexBuffer::CreateResource(16, sizeof(Vertex));
-
-	void* Data;
-	PlaneVertexBuffer->Lock(&Data);
-	memcpy(Data, &Vertices, sizeof(Vertex) * 16);
-	PlaneVertexBuffer->Unlock();
+	PlaneVertexBuffer = ZEGRVertexBuffer::CreateResource(16, sizeof(Vertex), ZEGR_RU_GPU_READ_ONLY, Vertices);
 }
 
 bool ZEATCloud::UpdateShaders()

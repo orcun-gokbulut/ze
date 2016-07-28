@@ -121,26 +121,34 @@ ZED11State<_ZEGRState, _IInterface>::ZED11State()
 template<typename _ZEGRState, typename _IInterface>
 ZED11State<_ZEGRState, _IInterface>::~ZED11State() 
 {
-	ZEGRStateType StateType = this->GetState().GetStateType();
-
-	switch (StateType)
+	if (Link->GetInUse())
 	{
-	case ZEGRStateType::ZEGR_ST_VERTEX_LAYOUT:
-		Owner->VertexLayoutPool.Remove(Link);
-		break;
-	case ZEGRStateType::ZEGR_ST_RASTERIZER:
-		Owner->RasterizerStatePool.Remove(Link);
-		break;
-	case ZEGRStateType::ZEGR_ST_DEPTH_STENCIL:
-		Owner->DepthStencilStatePool.Remove(Link);
-		break;
-	case ZEGRStateType::ZEGR_ST_BLEND:
-		Owner->BlendStatePool.Remove(Link);
-		break;
-	default:
-		break;
+		ZEGRStateType StateType = this->GetState().GetStateType();
+
+		switch (StateType)
+		{
+			case ZEGRStateType::ZEGR_ST_VERTEX_LAYOUT:
+				Owner->VertexLayoutPool.Remove(Link);
+				break;
+
+			case ZEGRStateType::ZEGR_ST_RASTERIZER:
+				Owner->RasterizerStatePool.Remove(Link);
+				break;
+
+			case ZEGRStateType::ZEGR_ST_DEPTH_STENCIL:
+				Owner->DepthStencilStatePool.Remove(Link);
+				break;
+
+			case ZEGRStateType::ZEGR_ST_BLEND:
+				Owner->BlendStatePool.Remove(Link);
+				break;
+
+			default:
+				break;
+		}
 	}
 
+	delete Link;
 	Owner = NULL;
 	ZEGR_RELEASE(Interface);
 }

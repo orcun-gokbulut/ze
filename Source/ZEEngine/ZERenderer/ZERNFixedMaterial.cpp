@@ -302,6 +302,7 @@ ZETaskResult ZERNFixedMaterial::LoadInternal()
 	}
 
 	DirtyFlags.RaiseAll();
+
 	if (!Update())
 		return ZE_TR_FAILED;
 
@@ -1854,7 +1855,7 @@ bool ZERNFixedMaterial::Serialize(ZEMLWriterNode* MaterialNode)
 	PropertiesNode.WriteVector3("RefractionColor", GetRefractionColor());
 	PropertiesNode.WriteFloat("RefractionFactor", GetRefractionFactor());
 	PropertiesNode.WriteFloat("RefractionIndex", GetRefractionIndex());
-
+	
 	PropertiesNode.WriteBool("DetailBaseMapEnabled", GetDetailBaseMapEnabled());
 	PropertiesNode.WriteVector3("DetailBaseMapColor", GetDetailBaseMapColor());
 	PropertiesNode.WriteVector2("DetailBaseMapTiling", GetDetailBaseMapTiling());

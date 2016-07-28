@@ -79,6 +79,7 @@ class ZERNStageAntiAliasing  : public ZERNStage
 		ZEHolder<ZEGRTexture2D>				SearchTexture;
 
 		ZEHolder<ZEGRSampler>				SamplerLinearClamp;
+		ZEHolder<ZEGRSampler>				SamplerPointClamp;
 
 		ZEGRViewport						Viewport;
 

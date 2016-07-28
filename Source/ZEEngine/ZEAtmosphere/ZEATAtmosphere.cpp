@@ -38,7 +38,7 @@
 #include "ZERandom.h"
 #include "ZEMath/ZEMath.h"
 #include "ZEMath/ZEAngle.h"
-#include "ZEMath/ZEViewVolume.h""
+#include "ZEMath/ZEViewVolume.h"
 
 #include "ZEATAstronomy.h"
 #include "ZEATSun.h"
@@ -250,17 +250,16 @@ bool ZEATAtmosphere::Update()
 
 ZEVector3 ZEATAtmosphere::GetAmbientColorFromLUT(float CosLightZenith)
 {
-	CosLightZenith = CosLightZenith * 0.5f + 0.5f;
+	float U = CosLightZenith * 0.5f + 0.5f;
+	float Index = U * 1024.0f;
+	ZEUInt Index0 = ZEMath::Floor(Index);
+	ZEUInt Index1 = ZEMath::Ceil(Index);
+	float Weight = Index - Index0;
 
-	float TexelWidth = 1.0f / 1024.0f;
-	float TexelIndex1 = CosLightZenith - TexelWidth;
-	float TexelIndex2 = CosLightZenith + TexelWidth;
-	ZEUInt Index1 = TexelIndex1 * 1023.0f + 0.5f;
-	ZEUInt Index2 = TexelIndex2 * 1023.0f + 0.5f;
-	float Weight1 = CosLightZenith - ((Index1 + 0.5f) / 1024.0f);
-	float Weight2 = ((Index2 + 0.5f) / 1024.0f) - CosLightZenith;
+	ZEVector4 Color0 = (Index0 >= 0 && Index0 < 1024) ? SkyAmbient[Index0] : ZEVector4::Zero;
+	ZEVector4 Color1 = (Index1 >= 0 && Index1 < 1024) ? SkyAmbient[Index1] : ZEVector4::Zero;
 
-	ZEVector4 InterpolatedAmbient = (Weight1 * SkyAmbient[Index1] + Weight2 * SkyAmbient[Index2]) / (Weight1 + Weight2);
+	ZEVector4 InterpolatedAmbient = (1.0f - Weight) * Color0 + Weight * Color1;
 
 	return InterpolatedAmbient.ToVector3();
 }
@@ -464,14 +463,14 @@ bool ZEATAtmosphere::InitializeSelf()
 
 	SkyConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 
-	PrecomputedSingleScatteringBuffer = ZEGRTexture3D::CreateResource(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);
-	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::CreateResource(32, 128, 64 * 16, 1, ZEGR_TF_R16G16B16A16_FLOAT);
+	ZEGRTexture3DOptions TextureOptions;
+	PrecomputedMultipleScatteringBuffer = ZEGRTexture3D::LoadResource("#R:/ZEEngine/ZEATAtmosphere/MultipleScatteringLUT.dds", TextureOptions);
 
 	Sun = ZEATSun::CreateInstance();
 	AddComponent(Sun);
 
 	Moon = ZEATMoon::CreateInstance();
-	Moon->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/MoonFrame.png", 53, 1);
+	Moon->SetTextureFile("#R:/ZEEngine/ZEATAtmosphere/MoonPhases.dds", 53, 1);
 	AddComponent(Moon);
 
 	Fog = ZEATFog::CreateInstance();
@@ -481,24 +480,19 @@ bool ZEATAtmosphere::InitializeSelf()
 	AddComponent(Fog);
 
 	Cloud = ZEATCloud::CreateInstance();
-	Cloud->SetCloudTexture("#R:/ZEEngine/ZEAtmosphere/Textures/Cloud.bmp");
+	Cloud->SetCloudTexture("#R:/ZEEngine/ZEATAtmosphere/Clouds.dds");
 	AddComponent(Cloud);
 
 	Stars = ZEATSkyBox::CreateInstance();
 	Stars->SetName("StarMap");
 	Stars->SetVisible(true);
 	Stars->SetEnabled(true);
-	Stars->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
+	Stars->SetTextureFile("#R:/ZEEngine/ZEATAtmosphere/StarMap.dds");
 	Stars->SetColor(ZEVector3::One);
 	Stars->SetBrightness(0.1f);
 	AddComponent(Stars);
 
-	if (!Update())
-		return false;
-	
-	PrecomputeBuffers(ZEGRGraphicsModule::GetInstance()->GetMainContext());
-
-	return true;
+	return Update();
 }
 
 bool ZEATAtmosphere::DeinitializeSelf()

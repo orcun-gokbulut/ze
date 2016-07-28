@@ -75,8 +75,13 @@ void ZED11ConstantBuffer::Deinitialize()
 
 bool ZED11ConstantBuffer::Lock(void** Buffer)
 {
+	LockContext();
+
 	D3D11_MAPPED_SUBRESOURCE Map;
 	HRESULT Result = GetMainContext()->Map(this->Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Map);
+
+	UnlockContext();
+
 	if (FAILED(Result))
 	{
 		zeError("Cannot lock constant buffer.");
@@ -89,9 +94,14 @@ bool ZED11ConstantBuffer::Lock(void** Buffer)
 
 	return true;
 }
+
 void ZED11ConstantBuffer::Unlock()
 {
+	LockContext();
+
 	GetMainContext()->Unmap(Buffer, 0);
+
+	UnlockContext();
 }
 
 ZED11ConstantBuffer::ZED11ConstantBuffer()
