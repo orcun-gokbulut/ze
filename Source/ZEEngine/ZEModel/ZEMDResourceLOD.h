@@ -57,6 +57,7 @@ class ZEMDResourceLOD : public ZERSResource
 	ZE_DISALLOW_COPY(ZEMDResourceLOD)
 	friend class ZEMDResourceMesh;
 	friend class ZEMDResource;
+	friend class ZEMDResourceDraw;
 	private:
 		ZELink<ZEMDResourceLOD>					Link;
 

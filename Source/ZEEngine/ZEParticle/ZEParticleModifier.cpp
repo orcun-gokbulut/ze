@@ -40,7 +40,7 @@
 #include "ZERandom.h"
 #include "ZEMath\ZEAngle.h"
 #include "ZEMath\ZEMath.h"
-#include "ZERenderer\ZERNFixedMaterial.h"
+#include "ZERenderer\ZERNStandardMaterial.h"
 #include "ZEGame\ZEEntity.h"
 
 

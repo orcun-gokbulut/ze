@@ -72,12 +72,6 @@ ZERSResource* ZESoundResource::Instanciator(const void* Parameters)
 	return  NULL;
 }
 
-
-const char* ZESoundResource::GetResourceType() const
-{
-	return "Sound Resource";
-}
-
 ZESoundFileFormat ZESoundResource::GetSoundFileFormat() const
 { 
 	return FileFormat;

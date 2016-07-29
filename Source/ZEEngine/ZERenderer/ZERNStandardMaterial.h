@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNFixedMaterial.h
+ Zinek Engine - ZERNStandardMaterial.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -67,10 +67,10 @@ enum ZERNTransparencyMode : ZEUInt8
 	ZERN_TM_ADDITIVE
 };
 
-class ZERNFixedMaterial : public ZERNMaterial
+class ZERNStandardMaterial : public ZERNMaterial
 {
 	ZE_OBJECT
-	ZE_DISALLOW_COPY(ZERNFixedMaterial)
+	ZE_DISALLOW_COPY(ZERNStandardMaterial)
 	friend class ZERSTemplates;
 	private:
 		ZEString									Name;
@@ -198,8 +198,8 @@ class ZERNFixedMaterial : public ZERNMaterial
 		virtual ZETaskResult						LoadInternal();
 		virtual ZETaskResult						UnloadInternal();
 
-													ZERNFixedMaterial();
-		virtual										~ZERNFixedMaterial();
+													ZERNStandardMaterial();
+		virtual										~ZERNStandardMaterial();
 
 	public:
 		virtual ZEUInt								GetStageMask() const;
@@ -398,7 +398,7 @@ class ZERNFixedMaterial : public ZERNMaterial
 		bool										Serialize(ZEMLWriterNode* Node);
 		bool										Unserialize(ZEMLReaderNode* Node);
 
-		static ZEHolder<ZERNFixedMaterial>			CreateInstance();
-		static ZERSHolder<ZERNFixedMaterial>		LoadResource(const ZEString& FileName);
-		static ZERSHolder<const ZERNFixedMaterial>	LoadResourceShared(const ZEString& FileName);
+		static ZEHolder<ZERNStandardMaterial>			CreateInstance();
+		static ZERSHolder<ZERNStandardMaterial>		LoadResource(const ZEString& FileName);
+		static ZERSHolder<const ZERNStandardMaterial>	LoadResourceShared(const ZEString& FileName);
 };

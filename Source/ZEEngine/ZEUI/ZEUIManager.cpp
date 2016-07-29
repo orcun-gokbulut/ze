@@ -57,9 +57,9 @@ const ZEVector4& ZEUIManager::GetDefaultForegroundColor()
 	return DefaultForegroundColor;
 }
 
-ZEUIFont* ZEUIManager::GetDefaultFontResource()
+ZEHolder<const ZEUIFont> ZEUIManager::GetDefaultFontResource()
 {
-	return ZEUIFontTrueType::LoadSharedResource("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Regular.ttf", 12);
+	return ZEUIFontTrueType::LoadResourceShared("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Regular.ttf", 12);
 }
 
 ZEUIManager::ZEUIManager() 

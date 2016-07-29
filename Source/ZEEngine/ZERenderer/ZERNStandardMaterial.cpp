@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNFixedMaterial.cpp
+ Zinek Engine - ZERNStandardMaterial.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,7 +33,7 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNFixedMaterial.h"
+#include "ZERNStandardMaterial.h"
 
 #include "ZEError.h"
 #include "ZEML/ZEMLReader.h"
@@ -70,7 +70,7 @@
 #define ZERN_FMDF_SHADERS				4
 #define ZERN_FMDF_STAGE_MASK			8
 
-void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const
+void ZERNStandardMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Options) const
 {
 	Options.Definitions.Clear();
 
@@ -125,7 +125,7 @@ void ZERNFixedMaterial::UpdateShaderDefinitions(ZEGRShaderCompileOptions& Option
 		Options.Definitions.Add(ZEGRShaderDefinition("ZERN_FM_DEFERRED"));
 }
 
-bool ZERNFixedMaterial::UpdateShaders()
+bool ZERNStandardMaterial::UpdateShaders()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_SHADERS))
 		return true;
@@ -165,7 +165,7 @@ bool ZERNFixedMaterial::UpdateShaders()
 	return true;
 }
 
-bool ZERNFixedMaterial::UpdateRenderState()
+bool ZERNStandardMaterial::UpdateRenderState()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_RENDER_STATE))
 		return true;
@@ -226,7 +226,7 @@ bool ZERNFixedMaterial::UpdateRenderState()
 	return true;
 }
 
-bool ZERNFixedMaterial::UpdateStageMask()
+bool ZERNStandardMaterial::UpdateStageMask()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_STAGE_MASK))
 		return true;
@@ -240,7 +240,7 @@ bool ZERNFixedMaterial::UpdateStageMask()
 	return true;
 }
 
-bool ZERNFixedMaterial::UpdateConstantBuffer()
+bool ZERNStandardMaterial::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZERN_FMDF_CONSTANT_BUFFER))
 		return true;
@@ -261,7 +261,7 @@ bool ZERNFixedMaterial::UpdateConstantBuffer()
 	return true;
 }
 
-bool ZERNFixedMaterial::Update()
+bool ZERNStandardMaterial::Update()
 {
 	if (!ZERNMaterial::Update())
 		return false;
@@ -284,7 +284,7 @@ bool ZERNFixedMaterial::Update()
 	return true;
 }
 
-ZETaskResult ZERNFixedMaterial::LoadInternal()
+ZETaskResult ZERNStandardMaterial::LoadInternal()
 {
 	if (!GetFileName().IsEmpty())
 	{
@@ -309,7 +309,7 @@ ZETaskResult ZERNFixedMaterial::LoadInternal()
 	return ZE_TR_DONE;
 }
 
-ZETaskResult ZERNFixedMaterial::UnloadInternal()
+ZETaskResult ZERNStandardMaterial::UnloadInternal()
 {
 	StageMask = 0;
 	DirtyFlags.RaiseAll();
@@ -337,7 +337,7 @@ ZETaskResult ZERNFixedMaterial::UnloadInternal()
 	return ZE_TR_DONE;
 }
 
-ZERNFixedMaterial::ZERNFixedMaterial()
+ZERNStandardMaterial::ZERNStandardMaterial()
 {
 	StageMask = 0;
 	DirtyFlags.RaiseAll();
@@ -420,37 +420,37 @@ ZERNFixedMaterial::ZERNFixedMaterial()
 	Register();
 }
 
-ZERNFixedMaterial::~ZERNFixedMaterial()
+ZERNStandardMaterial::~ZERNStandardMaterial()
 {
 	Unregister();
 }
 
-ZEUInt ZERNFixedMaterial::GetStageMask() const
+ZEUInt ZERNStandardMaterial::GetStageMask() const
 {
 	return StageMask;
 }
 
-void ZERNFixedMaterial::SetName(const ZEString& Name)
+void ZERNStandardMaterial::SetName(const ZEString& Name)
 {
 	this->Name = Name;
 }
 
-const ZEString& ZERNFixedMaterial::GetName() const
+const ZEString& ZERNStandardMaterial::GetName() const
 {
 	return Name;
 }
 
-void ZERNFixedMaterial::SetSampler(const ZEHolder<ZEGRSampler>& Sampler)
+void ZERNStandardMaterial::SetSampler(const ZEHolder<ZEGRSampler>& Sampler)
 {
 	this->Sampler = Sampler;
 }
 
-const ZEHolder<ZEGRSampler>& ZERNFixedMaterial::GetSampler() const
+const ZEHolder<ZEGRSampler>& ZERNStandardMaterial::GetSampler() const
 {
 	return Sampler;
 }
 
-void ZERNFixedMaterial::SetShadowCaster(bool ShadowCaster)
+void ZERNStandardMaterial::SetShadowCaster(bool ShadowCaster)
 {
 	if (this->ShadowCaster == ShadowCaster)
 		return;
@@ -460,12 +460,12 @@ void ZERNFixedMaterial::SetShadowCaster(bool ShadowCaster)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_STAGE_MASK);
 }
 
-bool ZERNFixedMaterial::GetShadowCaster() const
+bool ZERNStandardMaterial::GetShadowCaster() const
 {
 	return ShadowCaster;
 }
 
-void ZERNFixedMaterial::SetTwoSided(bool Enable)
+void ZERNStandardMaterial::SetTwoSided(bool Enable)
 {
 	if (TwoSided == Enable)
 		return;
@@ -475,12 +475,12 @@ void ZERNFixedMaterial::SetTwoSided(bool Enable)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
 }
 
-bool ZERNFixedMaterial::GetTwoSided() const
+bool ZERNStandardMaterial::GetTwoSided() const
 {
 	return TwoSided;
 }
 
-void ZERNFixedMaterial::SetWireframe(bool Enable)
+void ZERNStandardMaterial::SetWireframe(bool Enable)
 {
 	if (Wireframe == Enable)
 		return;
@@ -490,12 +490,12 @@ void ZERNFixedMaterial::SetWireframe(bool Enable)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_RENDER_STATE);
 }
 
-bool ZERNFixedMaterial::GetWireframe() const
+bool ZERNStandardMaterial::GetWireframe() const
 {
 	return Wireframe;
 }
 
-void ZERNFixedMaterial::SetSkinningEnabled(bool Enabled)
+void ZERNStandardMaterial::SetSkinningEnabled(bool Enabled)
 {
 	if (SkinningEnabled == Enabled)
 		return;
@@ -505,12 +505,12 @@ void ZERNFixedMaterial::SetSkinningEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetSkinningEnabled() const
+bool ZERNStandardMaterial::GetSkinningEnabled() const
 {
 	return SkinningEnabled;
 }
 
-void ZERNFixedMaterial::SetVertexColorEnabled(bool Enabled)
+void ZERNStandardMaterial::SetVertexColorEnabled(bool Enabled)
 {
 	if (VertexColorEnabled == Enabled)
 		return;
@@ -520,12 +520,12 @@ void ZERNFixedMaterial::SetVertexColorEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetVertexColorEnabled() const
+bool ZERNStandardMaterial::GetVertexColorEnabled() const
 {
 	return VertexColorEnabled;
 }
 
-void ZERNFixedMaterial::SetTransparencyEnabled(bool Enabled)
+void ZERNStandardMaterial::SetTransparencyEnabled(bool Enabled)
 {
 	if (TransparencyEnabled == Enabled)
 		return;
@@ -535,12 +535,12 @@ void ZERNFixedMaterial::SetTransparencyEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_STAGE_MASK);
 }
 
-bool ZERNFixedMaterial::GetTransparencyEnabled() const
+bool ZERNStandardMaterial::GetTransparencyEnabled() const
 {
 	return TransparencyEnabled;
 }
 
-void ZERNFixedMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
+void ZERNStandardMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
 {
 	if (TransparencyMode == Mode)
 		return;
@@ -550,12 +550,12 @@ void ZERNFixedMaterial::SetTransparencyMode(ZERNTransparencyMode Mode)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-ZERNTransparencyMode ZERNFixedMaterial::GetTransparencyMode() const
+ZERNTransparencyMode ZERNStandardMaterial::GetTransparencyMode() const
 {
 	return TransparencyMode;
 }
 
-void ZERNFixedMaterial::SetAlphaCullEnabled(bool Enabled)
+void ZERNStandardMaterial::SetAlphaCullEnabled(bool Enabled)
 {
 	if (AlphaCullEnabled == Enabled)
 		return;
@@ -565,12 +565,12 @@ void ZERNFixedMaterial::SetAlphaCullEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetAlphaCullEnabled() const
+bool ZERNStandardMaterial::GetAlphaCullEnabled() const
 {
 	return AlphaCullEnabled;
 }
 
-void ZERNFixedMaterial::SetAlphaCullLimit(float Limit)
+void ZERNStandardMaterial::SetAlphaCullLimit(float Limit)
 {
 	if (Constants.AlphaCullLimit == Limit)
 		return;
@@ -580,12 +580,12 @@ void ZERNFixedMaterial::SetAlphaCullLimit(float Limit)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetAlphaCullLimit() const
+float ZERNStandardMaterial::GetAlphaCullLimit() const
 {
 	return Constants.AlphaCullLimit;
 }
 
-void ZERNFixedMaterial::SetSubSurfaceScatteringFactor(float Factor)
+void ZERNStandardMaterial::SetSubSurfaceScatteringFactor(float Factor)
 {
 	if (Constants.SubSurfaceScatteringFactor == Factor)
 		return;
@@ -595,12 +595,12 @@ void ZERNFixedMaterial::SetSubSurfaceScatteringFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetSubSurfaceScatteringFactor() const
+float ZERNStandardMaterial::GetSubSurfaceScatteringFactor() const
 {
 	return Constants.SubSurfaceScatteringFactor;
 }
 
-void ZERNFixedMaterial::SetSubSurfaceScatteringMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetSubSurfaceScatteringMapEnabled(bool Enabled)
 {
 	if (SubSurfaceScatteringMapEnabled == Enabled)
 		return;
@@ -610,12 +610,12 @@ void ZERNFixedMaterial::SetSubSurfaceScatteringMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetSubSurfaceScatteringMapEnabled() const
+bool ZERNStandardMaterial::GetSubSurfaceScatteringMapEnabled() const
 {
 	return SubSurfaceScatteringMapEnabled;
 }
 
-void ZERNFixedMaterial::SetSubSurfaceScatteringMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSubSurfaceScatteringMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(Texture);
 	SubSurfaceScatteringMap = Texture;
@@ -623,12 +623,12 @@ void ZERNFixedMaterial::SetSubSurfaceScatteringMap(ZEGRTexture2D* Texture)
 	SubSurfaceScatteringMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetSubSurfaceScatteringMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetSubSurfaceScatteringMap() const
 {
 	return SubSurfaceScatteringMap;
 }
 
-void ZERNFixedMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileName)
 {
 	if (SubSurfaceScatteringMapFile == FileName)
 		return;
@@ -649,12 +649,12 @@ void ZERNFixedMaterial::SetSubSurfaceScatteringMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetSubSurfaceScatteringMapFile() const
+const ZEString& ZERNStandardMaterial::GetSubSurfaceScatteringMapFile() const
 {
 	return SubSurfaceScatteringMapFile;
 }
 
-void ZERNFixedMaterial::SetBaseMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetBaseMapEnabled(bool Enabled)
 {
 	if (BaseMapEnabled == Enabled)
 		return;
@@ -664,12 +664,12 @@ void ZERNFixedMaterial::SetBaseMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetBaseMapEnabled() const
+bool ZERNStandardMaterial::GetBaseMapEnabled() const
 {
 	return BaseMapEnabled;
 }
 
-void ZERNFixedMaterial::SetBaseMap(ZEGRTexture2D* Map)
+void ZERNStandardMaterial::SetBaseMap(ZEGRTexture2D* Map)
 {
 	UnregisterExternalResource(BaseMap);
 	BaseMap = Map;
@@ -677,12 +677,12 @@ void ZERNFixedMaterial::SetBaseMap(ZEGRTexture2D* Map)
 	BaseMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetBaseMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetBaseMap() const
 {
 	return BaseMap;
 }
 
-void ZERNFixedMaterial::SetBaseMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetBaseMapFile(const ZEString& FileName)
 {
 	if (BaseMapFile == FileName)
 		return;
@@ -703,12 +703,12 @@ void ZERNFixedMaterial::SetBaseMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetBaseMapFile() const
+const ZEString& ZERNStandardMaterial::GetBaseMapFile() const
 {
 	return BaseMapFile;
 }
 
-void ZERNFixedMaterial::SetAmbientEnabled(bool Enabled)
+void ZERNStandardMaterial::SetAmbientEnabled(bool Enabled)
 {
 	if (AmbientEnabled == Enabled)
 		return;
@@ -718,12 +718,12 @@ void ZERNFixedMaterial::SetAmbientEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetAmbientEnabled() const
+bool ZERNStandardMaterial::GetAmbientEnabled() const
 {
 	return AmbientEnabled;
 }
 
-void ZERNFixedMaterial::SetSceneAmbientEnabled(bool Enabled)
+void ZERNStandardMaterial::SetSceneAmbientEnabled(bool Enabled)
 {
 	if ((Constants.SceneAmbientEnabled != 0) == Enabled)
 		return;
@@ -733,12 +733,12 @@ void ZERNFixedMaterial::SetSceneAmbientEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetSceneAmbientEnabled() const
+bool ZERNStandardMaterial::GetSceneAmbientEnabled() const
 {
 	return Constants.SceneAmbientEnabled != 0;
 }
 
-void ZERNFixedMaterial::SetAmbientFactor(float Factor)
+void ZERNStandardMaterial::SetAmbientFactor(float Factor)
 {
 	if (AmbientFactor == Factor)
 		return;
@@ -748,12 +748,12 @@ void ZERNFixedMaterial::SetAmbientFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetAmbientFactor() const
+float ZERNStandardMaterial::GetAmbientFactor() const
 {
 	return AmbientFactor;
 }
 
-void ZERNFixedMaterial::SetAmbientColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetAmbientColor(const ZEVector3& Color)
 {
 	if (AmbientColor == Color)
 		return;
@@ -763,12 +763,12 @@ void ZERNFixedMaterial::SetAmbientColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetAmbientColor() const
+const ZEVector3& ZERNStandardMaterial::GetAmbientColor() const
 {
 	return AmbientColor;
 }
 
-void ZERNFixedMaterial::SetDiffuseEnabled(bool Enabled)
+void ZERNStandardMaterial::SetDiffuseEnabled(bool Enabled)
 {
 	if (DiffuseEnabled == Enabled)
 		return;
@@ -778,12 +778,12 @@ void ZERNFixedMaterial::SetDiffuseEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetDiffuseEnabled() const
+bool ZERNStandardMaterial::GetDiffuseEnabled() const
 {
 	return DiffuseEnabled;
 }
 
-void ZERNFixedMaterial::SetDiffuseFactor(float Factor)
+void ZERNStandardMaterial::SetDiffuseFactor(float Factor)
 {
 	if (DiffuseFactor == Factor)
 		return;
@@ -793,12 +793,12 @@ void ZERNFixedMaterial::SetDiffuseFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetDiffuseFactor() const
+float ZERNStandardMaterial::GetDiffuseFactor() const
 {
 	return DiffuseFactor;
 }
 
-void ZERNFixedMaterial::SetDiffuseColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetDiffuseColor(const ZEVector3& Color)
 {
 	if (DiffuseColor == Color)
 		return;
@@ -808,12 +808,12 @@ void ZERNFixedMaterial::SetDiffuseColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetDiffuseColor() const
+const ZEVector3& ZERNStandardMaterial::GetDiffuseColor() const
 {
 	return DiffuseColor;
 }
 
-void ZERNFixedMaterial::SetSpecularEnabled(bool Enabled)
+void ZERNStandardMaterial::SetSpecularEnabled(bool Enabled)
 {
 	if (SpecularEnabled == Enabled)
 		return;
@@ -823,12 +823,12 @@ void ZERNFixedMaterial::SetSpecularEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetSpecularEnabled() const
+bool ZERNStandardMaterial::GetSpecularEnabled() const
 {
 	return SpecularEnabled;
 }
 
-void ZERNFixedMaterial::SetSpecularFactor(float Factor)
+void ZERNStandardMaterial::SetSpecularFactor(float Factor)
 {
 	if (SpecularFactor == Factor)
 		return;
@@ -838,12 +838,12 @@ void ZERNFixedMaterial::SetSpecularFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetSpecularFactor() const
+float ZERNStandardMaterial::GetSpecularFactor() const
 {
 	return SpecularFactor;
 }
 
-void ZERNFixedMaterial::SetSpecularColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetSpecularColor(const ZEVector3& Color)
 {
 	if (SpecularColor == Color)
 		return;
@@ -853,12 +853,12 @@ void ZERNFixedMaterial::SetSpecularColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetSpecularColor() const
+const ZEVector3& ZERNStandardMaterial::GetSpecularColor() const
 {
 	return SpecularColor;
 }
 
-void ZERNFixedMaterial::SetSpecularShininess(float Power)
+void ZERNStandardMaterial::SetSpecularShininess(float Power)
 {
 	if (Constants.SpecularPower == Power)
 		return;
@@ -868,12 +868,12 @@ void ZERNFixedMaterial::SetSpecularShininess(float Power)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetSpecularShininess() const
+float ZERNStandardMaterial::GetSpecularShininess() const
 {
 	return Constants.SpecularPower;
 }
 
-void ZERNFixedMaterial::SetSpecularMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetSpecularMapEnabled(bool Enabled)
 {
 	if (SpecularMapEnabled == Enabled)
 		return;
@@ -883,12 +883,12 @@ void ZERNFixedMaterial::SetSpecularMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetSpecularMapEnabled() const
+bool ZERNStandardMaterial::GetSpecularMapEnabled() const
 {
 	return SpecularMapEnabled;		
 }
 
-void ZERNFixedMaterial::SetSpecularMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSpecularMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(SpecularMap);
 	SpecularMap = Texture;
@@ -896,12 +896,12 @@ void ZERNFixedMaterial::SetSpecularMap(ZEGRTexture2D* Texture)
 	SpecularMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetSpecularMap() const
 {
 	return SpecularMap;
 }
 
-void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetSpecularMapFile(const ZEString& FileName)
 {
 	if (SpecularMapFile == FileName)
 		return;
@@ -923,12 +923,12 @@ void ZERNFixedMaterial::SetSpecularMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetSpecularMapFile() const
+const ZEString& ZERNStandardMaterial::GetSpecularMapFile() const
 {
 	return SpecularMapFile;
 }
 
-void ZERNFixedMaterial::SetSpecularGlossMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetSpecularGlossMapEnabled(bool Enabled)
 {
 	if (SpecularGlossMapEnabled == Enabled)
 		return;
@@ -938,12 +938,12 @@ void ZERNFixedMaterial::SetSpecularGlossMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetSpecularGlossMapEnabled() const
+bool ZERNStandardMaterial::GetSpecularGlossMapEnabled() const
 {
 	return SpecularGlossMapEnabled;
 }
 
-void ZERNFixedMaterial::SetSpecularGlossMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSpecularGlossMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(SpecularGlossMap);
 	SpecularGlossMap = Texture;
@@ -951,12 +951,12 @@ void ZERNFixedMaterial::SetSpecularGlossMap(ZEGRTexture2D* Texture)
 	SpecularGlossMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetSpecularGlossMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetSpecularGlossMap() const
 {
 	return SpecularGlossMap;
 }
 
-void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
 {
 	if (SpecularGlossMapFile == FileName)
 		return;
@@ -978,12 +978,12 @@ void ZERNFixedMaterial::SetSpecularGlossMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetSpecularGlossMapFile() const
+const ZEString& ZERNStandardMaterial::GetSpecularGlossMapFile() const
 {
 	return SpecularGlossMapFile;
 }
 
-void ZERNFixedMaterial::SetEmissiveEnabled(bool Enabled)
+void ZERNStandardMaterial::SetEmissiveEnabled(bool Enabled)
 {
 	if (EmissiveEnabled == Enabled)
 		return;
@@ -993,12 +993,12 @@ void ZERNFixedMaterial::SetEmissiveEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetEmissiveEnabled() const
+bool ZERNStandardMaterial::GetEmissiveEnabled() const
 {
 	return EmissiveEnabled;
 }
 
-void ZERNFixedMaterial::SetEmissiveFactor(float Factor)
+void ZERNStandardMaterial::SetEmissiveFactor(float Factor)
 {
 	if (EmissiveFactor == Factor)
 		return;
@@ -1008,12 +1008,12 @@ void ZERNFixedMaterial::SetEmissiveFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetEmissiveFactor() const
+float ZERNStandardMaterial::GetEmissiveFactor() const
 {
 	return EmissiveFactor;
 }
 
-void ZERNFixedMaterial::SetEmissiveColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetEmissiveColor(const ZEVector3& Color)
 {
 	if (EmissiveColor == Color)
 		return;
@@ -1023,12 +1023,12 @@ void ZERNFixedMaterial::SetEmissiveColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetEmissiveColor() const
+const ZEVector3& ZERNStandardMaterial::GetEmissiveColor() const
 {
 	return EmissiveColor;
 }
 
-void ZERNFixedMaterial::SetEmissiveMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetEmissiveMapEnabled(bool Enabled)
 {
 	if (EmissiveMapEnabled == Enabled)
 		return;
@@ -1038,12 +1038,12 @@ void ZERNFixedMaterial::SetEmissiveMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetEmissiveMapEnabled() const
+bool ZERNStandardMaterial::GetEmissiveMapEnabled() const
 {
 	return EmissiveMapEnabled;
 }
 
-void ZERNFixedMaterial::SetEmissiveMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetEmissiveMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(EmissiveMap);
 	EmissiveMap = Texture;
@@ -1051,12 +1051,12 @@ void ZERNFixedMaterial::SetEmissiveMap(ZEGRTexture2D* Texture)
 	EmissiveMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetEmissiveMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetEmissiveMap() const
 {
 	return EmissiveMap;
 }
 
-void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetEmissiveMapFile(const ZEString& FileName)
 {
 	if (EmissiveMapFile == FileName)
 		return;
@@ -1078,12 +1078,12 @@ void ZERNFixedMaterial::SetEmissiveMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetEmissiveMapFile() const
+const ZEString& ZERNStandardMaterial::GetEmissiveMapFile() const
 {
 	return EmissiveMapFile;
 }
 
-void ZERNFixedMaterial::SetNormalMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetNormalMapEnabled(bool Enabled)
 {
 	if (NormalMapEnabled == Enabled)
 		return;
@@ -1093,23 +1093,23 @@ void ZERNFixedMaterial::SetNormalMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetNormalMapEnabled() const
+bool ZERNStandardMaterial::GetNormalMapEnabled() const
 {
 	return NormalMapEnabled;
 }
 
-void ZERNFixedMaterial::SetNormalMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetNormalMap(ZEGRTexture2D* Texture)
 {
 	NormalMap = Texture;
 	NormalMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetNormalMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetNormalMap() const
 {
 	return NormalMap;
 }
 
-void ZERNFixedMaterial::SetNormalMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetNormalMapFile(const ZEString& FileName)
 {
 	if (NormalMapFile == FileName)
 		return;
@@ -1131,12 +1131,12 @@ void ZERNFixedMaterial::SetNormalMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetNormalMapFile() const
+const ZEString& ZERNStandardMaterial::GetNormalMapFile() const
 {
 	return NormalMapFile;
 }
 
-void ZERNFixedMaterial::SetHeightMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetHeightMapEnabled(bool Enabled)
 {
 	if (HeightMapEnabled == Enabled)
 		return;
@@ -1146,12 +1146,12 @@ void ZERNFixedMaterial::SetHeightMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetHeightMapEnabled() const
+bool ZERNStandardMaterial::GetHeightMapEnabled() const
 {
 	return HeightMapEnabled;
 }
 
-void ZERNFixedMaterial::SetHeightMapTechnique(ZERNHeightMapTechnique Technique)
+void ZERNStandardMaterial::SetHeightMapTechnique(ZERNHeightMapTechnique Technique)
 {
 	if (HeightMapTechnique == Technique)
 		return;
@@ -1161,12 +1161,12 @@ void ZERNFixedMaterial::SetHeightMapTechnique(ZERNHeightMapTechnique Technique)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-ZERNHeightMapTechnique ZERNFixedMaterial::GetHeightMapTechnique() const
+ZERNHeightMapTechnique ZERNStandardMaterial::GetHeightMapTechnique() const
 {
 	return HeightMapTechnique;
 }
 
-void ZERNFixedMaterial::SetHeightMapOffset(float Offset)
+void ZERNStandardMaterial::SetHeightMapOffset(float Offset)
 {
 	if (Constants.HeightMapOffset == Offset)
 		return;
@@ -1176,12 +1176,12 @@ void ZERNFixedMaterial::SetHeightMapOffset(float Offset)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetHeightMapOffset() const
+float ZERNStandardMaterial::GetHeightMapOffset() const
 {
 	return Constants.HeightMapOffset;
 }
 
-void ZERNFixedMaterial::SetHeightMapScale(float Scale)
+void ZERNStandardMaterial::SetHeightMapScale(float Scale)
 {
 	if (Constants.HeightMapScale == Scale)
 		return;
@@ -1191,12 +1191,12 @@ void ZERNFixedMaterial::SetHeightMapScale(float Scale)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetHeightMapScale() const
+float ZERNStandardMaterial::GetHeightMapScale() const
 {
 	return Constants.HeightMapScale;
 }
 
-void ZERNFixedMaterial::SetHeightMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetHeightMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(HeightMap);
 	HeightMap = Texture;
@@ -1204,12 +1204,12 @@ void ZERNFixedMaterial::SetHeightMap(ZEGRTexture2D* Texture)
 	HeightMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetHeightMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetHeightMap() const
 {
 	return HeightMap;
 }
 
-void ZERNFixedMaterial::SetHeightMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetHeightMapFile(const ZEString& FileName)
 {
 	if (HeightMapFile == FileName)
 		return;
@@ -1231,12 +1231,12 @@ void ZERNFixedMaterial::SetHeightMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetHeightMapFile() const
+const ZEString& ZERNStandardMaterial::GetHeightMapFile() const
 {
 	return HeightMapFile;
 }
 
-void ZERNFixedMaterial::SetOpacity(float Value)
+void ZERNStandardMaterial::SetOpacity(float Value)
 {
 	if (Constants.Opacity == Value)
 		return;
@@ -1246,12 +1246,12 @@ void ZERNFixedMaterial::SetOpacity(float Value)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetOpacity() const
+float ZERNStandardMaterial::GetOpacity() const
 {
 	return Constants.Opacity;
 }
 
-void ZERNFixedMaterial::SetOpacityMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetOpacityMapEnabled(bool Enabled)
 {
 	if (OpacityMapEnabled == Enabled)
 		return;
@@ -1260,23 +1260,23 @@ void ZERNFixedMaterial::SetOpacityMapEnabled(bool Enabled)
 
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_STAGE_MASK);
 }
-bool ZERNFixedMaterial::GetOpacityMapEnabled() const
+bool ZERNStandardMaterial::GetOpacityMapEnabled() const
 {
 	return OpacityMapEnabled;
 }
 
-void ZERNFixedMaterial::SetOpacityMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetOpacityMap(ZEGRTexture2D* Texture)
 {
 	OpacityMap = Texture;
 	OpacityMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetOpacityMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetOpacityMap() const
 {
 	return OpacityMap;
 }
 
-void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetOpacityMapFile(const ZEString& FileName)
 {
 	if (OpacityMapFile == FileName)
 		return;
@@ -1298,12 +1298,12 @@ void ZERNFixedMaterial::SetOpacityMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetOpacityMapFile() const
+const ZEString& ZERNStandardMaterial::GetOpacityMapFile() const
 {
 	return OpacityMapFile;
 }
 
-void ZERNFixedMaterial::SetEnvironmentMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetEnvironmentMapEnabled(bool Enabled)
 {
 	if (EnvironmentMapEnabled == Enabled)
 		return;
@@ -1313,23 +1313,23 @@ void ZERNFixedMaterial::SetEnvironmentMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetEnvironmentMapEnabled() const
+bool ZERNStandardMaterial::GetEnvironmentMapEnabled() const
 {
 	return EnvironmentMapEnabled;
 }
 
-void ZERNFixedMaterial::SetEnvironmentMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetEnvironmentMap(ZEGRTexture2D* Texture)
 {
 	EnvironmentMap = Texture;
 	EnvironmentMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetEnvironmentMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetEnvironmentMap() const
 {
 	return EnvironmentMap;
 }
 
-void ZERNFixedMaterial::SetEnvironmentMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 {
 	if (EnvironmentMapFile == FileName)
 		return;
@@ -1350,12 +1350,12 @@ void ZERNFixedMaterial::SetEnvironmentMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetEnvironmentMapFile() const
+const ZEString& ZERNStandardMaterial::GetEnvironmentMapFile() const
 {
 	return EnvironmentMapFile;
 }
 
-void ZERNFixedMaterial::SetReflectionEnabled(bool Enabled)
+void ZERNStandardMaterial::SetReflectionEnabled(bool Enabled)
 {
 	if (ReflectionEnabled == Enabled)
 		return;
@@ -1365,12 +1365,12 @@ void ZERNFixedMaterial::SetReflectionEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetReflectionEnabled() const
+bool ZERNStandardMaterial::GetReflectionEnabled() const
 {
 	return ReflectionEnabled;
 }
 
-void ZERNFixedMaterial::SetReflectionFactor(float Factor)
+void ZERNStandardMaterial::SetReflectionFactor(float Factor)
 {
 	if (ReflectionFactor == Factor)
 		return;
@@ -1380,12 +1380,12 @@ void ZERNFixedMaterial::SetReflectionFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetReflectionFactor() const
+float ZERNStandardMaterial::GetReflectionFactor() const
 {
 	return ReflectionFactor;
 }
 
-void ZERNFixedMaterial::SetReflectionColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetReflectionColor(const ZEVector3& Color)
 {
 	if (ReflectionColor == Color)
 		return;
@@ -1395,12 +1395,12 @@ void ZERNFixedMaterial::SetReflectionColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetReflectionColor() const
+const ZEVector3& ZERNStandardMaterial::GetReflectionColor() const
 {
 	return ReflectionColor;
 }
 
-void ZERNFixedMaterial::SetRefractionEnabled(bool Enabled)
+void ZERNStandardMaterial::SetRefractionEnabled(bool Enabled)
 {
 	if (RefractionEnabled == Enabled)
 		return;
@@ -1410,12 +1410,12 @@ void ZERNFixedMaterial::SetRefractionEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS | ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-bool ZERNFixedMaterial::GetRefractionEnabled() const
+bool ZERNStandardMaterial::GetRefractionEnabled() const
 {
 	return RefractionEnabled;
 }
 
-void ZERNFixedMaterial::SetRefractionFactor(float Factor)
+void ZERNStandardMaterial::SetRefractionFactor(float Factor)
 {
 	if (RefractionFactor == Factor)
 		return;
@@ -1425,12 +1425,12 @@ void ZERNFixedMaterial::SetRefractionFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetRefractionFactor() const
+float ZERNStandardMaterial::GetRefractionFactor() const
 {
 	return RefractionFactor;
 }
 
-void ZERNFixedMaterial::SetRefractionColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetRefractionColor(const ZEVector3& Color)
 {
 	if (RefractionColor == Color)
 		return;
@@ -1440,12 +1440,12 @@ void ZERNFixedMaterial::SetRefractionColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetRefractionColor() const
+const ZEVector3& ZERNStandardMaterial::GetRefractionColor() const
 {
 	return RefractionColor;
 }
 
-void ZERNFixedMaterial::SetRefractionIndex(float Index)
+void ZERNStandardMaterial::SetRefractionIndex(float Index)
 {
 	if (Constants.RefractionIndex == Index)
 		return;
@@ -1455,12 +1455,12 @@ void ZERNFixedMaterial::SetRefractionIndex(float Index)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetRefractionIndex() const
+float ZERNStandardMaterial::GetRefractionIndex() const
 {
 	return Constants.RefractionIndex;
 }
 
-void ZERNFixedMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
+void ZERNStandardMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
 {
 	if (Constants.DetailBaseMapTiling == Tiling && Constants.DetailNormalMapTiling == Tiling)
 		return;
@@ -1471,12 +1471,12 @@ void ZERNFixedMaterial::SetDetailMapTiling(const ZEVector2& Tiling)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector2& ZERNFixedMaterial::GetDetailMapTiling() const
+const ZEVector2& ZERNStandardMaterial::GetDetailMapTiling() const
 {
 	return Constants.DetailBaseMapTiling;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetDetailBaseMapEnabled(bool Enabled)
 {
 	if (DetailBaseMapEnabled == Enabled)
 		return;
@@ -1486,12 +1486,12 @@ void ZERNFixedMaterial::SetDetailBaseMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetDetailBaseMapEnabled() const
+bool ZERNStandardMaterial::GetDetailBaseMapEnabled() const
 {
 	return DetailBaseMapEnabled;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapColor(const ZEVector3& Color)
+void ZERNStandardMaterial::SetDetailBaseMapColor(const ZEVector3& Color)
 {
 	if (Constants.DetailBaseMapColor == Color)
 		return;
@@ -1501,12 +1501,12 @@ void ZERNFixedMaterial::SetDetailBaseMapColor(const ZEVector3& Color)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector3& ZERNFixedMaterial::GetDetailBaseMapColor() const
+const ZEVector3& ZERNStandardMaterial::GetDetailBaseMapColor() const
 {
 	return Constants.DetailBaseMapColor;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapTiling(const ZEVector2& Tiling)
+void ZERNStandardMaterial::SetDetailBaseMapTiling(const ZEVector2& Tiling)
 {
 	if (Constants.DetailBaseMapTiling == Tiling)
 		return;
@@ -1516,12 +1516,12 @@ void ZERNFixedMaterial::SetDetailBaseMapTiling(const ZEVector2& Tiling)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector2& ZERNFixedMaterial::GetDetailBaseMapTiling() const
+const ZEVector2& ZERNStandardMaterial::GetDetailBaseMapTiling() const
 {
 	return Constants.DetailBaseMapTiling;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapAttenuationStart(float Start)
+void ZERNStandardMaterial::SetDetailBaseMapAttenuationStart(float Start)
 {
 	if (Constants.DetailBaseMapAttenuationStart == Start)
 		return;
@@ -1531,12 +1531,12 @@ void ZERNFixedMaterial::SetDetailBaseMapAttenuationStart(float Start)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetDetailBaseMapAttenuationStart() const
+float ZERNStandardMaterial::GetDetailBaseMapAttenuationStart() const
 {
 	return Constants.DetailBaseMapAttenuationStart;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapAttenuationFactor(float Factor)
+void ZERNStandardMaterial::SetDetailBaseMapAttenuationFactor(float Factor)
 {
 	if (Constants.DetailBaseMapAttenuationFactor == Factor)
 		return;
@@ -1546,12 +1546,12 @@ void ZERNFixedMaterial::SetDetailBaseMapAttenuationFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetDetailBaseMapAttenuationFactor() const
+float ZERNStandardMaterial::GetDetailBaseMapAttenuationFactor() const
 {
 	return Constants.DetailBaseMapAttenuationFactor;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetDetailBaseMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(DetailBaseMap);
 	DetailBaseMap = Texture;
@@ -1559,12 +1559,12 @@ void ZERNFixedMaterial::SetDetailBaseMap(ZEGRTexture2D* Texture)
 	DetailBaseMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetDetailBaseMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetDetailBaseMap() const
 {
 	return DetailBaseMap;
 }
 
-void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 {
 	if (DetailBaseMapFile == FileName)
 		return;
@@ -1585,12 +1585,12 @@ void ZERNFixedMaterial::SetDetailBaseMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetDetailBaseMapFile() const
+const ZEString& ZERNStandardMaterial::GetDetailBaseMapFile() const
 {
 	return DetailBaseMapFile;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapEnabled(bool Enabled)
+void ZERNStandardMaterial::SetDetailNormalMapEnabled(bool Enabled)
 {
 	if (DetailNormalMapEnabled == Enabled)
 		return;
@@ -1600,12 +1600,12 @@ void ZERNFixedMaterial::SetDetailNormalMapEnabled(bool Enabled)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_SHADERS);
 }
 
-bool ZERNFixedMaterial::GetDetailNormalMapEnabled() const
+bool ZERNStandardMaterial::GetDetailNormalMapEnabled() const
 {
 	return DetailNormalMapEnabled;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapFactor(float Factor)
+void ZERNStandardMaterial::SetDetailNormalMapFactor(float Factor)
 {
 	if (Constants.DetailNormalMapFactor == Factor)
 		return;
@@ -1615,12 +1615,12 @@ void ZERNFixedMaterial::SetDetailNormalMapFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetDetailNormalMapFactor() const
+float ZERNStandardMaterial::GetDetailNormalMapFactor() const
 {
 	return Constants.DetailNormalMapFactor;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapTiling(const ZEVector2& Tiling)
+void ZERNStandardMaterial::SetDetailNormalMapTiling(const ZEVector2& Tiling)
 {
 	if (Constants.DetailNormalMapTiling == Tiling)
 		return;
@@ -1630,12 +1630,12 @@ void ZERNFixedMaterial::SetDetailNormalMapTiling(const ZEVector2& Tiling)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-const ZEVector2& ZERNFixedMaterial::GetDetailNormalMapTiling() const
+const ZEVector2& ZERNStandardMaterial::GetDetailNormalMapTiling() const
 {
 	return Constants.DetailNormalMapTiling;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapAttenuationStart(float Start)
+void ZERNStandardMaterial::SetDetailNormalMapAttenuationStart(float Start)
 {
 	if (Constants.DetailNormalMapAttenuationStart == Start)
 		return;
@@ -1645,12 +1645,12 @@ void ZERNFixedMaterial::SetDetailNormalMapAttenuationStart(float Start)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetDetailNormalMapAttenuationStart() const
+float ZERNStandardMaterial::GetDetailNormalMapAttenuationStart() const
 {
 	return Constants.DetailNormalMapAttenuationStart;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapAttenuationFactor(float Factor)
+void ZERNStandardMaterial::SetDetailNormalMapAttenuationFactor(float Factor)
 {
 	if (Constants.DetailNormalMapAttenuationFactor == Factor)
 		return;
@@ -1660,12 +1660,12 @@ void ZERNFixedMaterial::SetDetailNormalMapAttenuationFactor(float Factor)
 	DirtyFlags.RaiseFlags(ZERN_FMDF_CONSTANT_BUFFER);
 }
 
-float ZERNFixedMaterial::GetDetailNormalMapAttenuationFactor() const
+float ZERNStandardMaterial::GetDetailNormalMapAttenuationFactor() const
 {
 	return Constants.DetailNormalMapAttenuationFactor;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetDetailNormalMap(ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(DetailNormalMap);
 	DetailNormalMap = Texture;
@@ -1673,12 +1673,12 @@ void ZERNFixedMaterial::SetDetailNormalMap(ZEGRTexture2D* Texture)
 	DetailNormalMapFile = "";
 }
 
-const ZEGRTexture2D* ZERNFixedMaterial::GetDetailNormalMap() const
+const ZEGRTexture2D* ZERNStandardMaterial::GetDetailNormalMap() const
 {
 	return DetailNormalMap;
 }
 
-void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& FileName)
+void ZERNStandardMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 {
 	if (DetailNormalMapFile == FileName)
 		return;
@@ -1699,22 +1699,22 @@ void ZERNFixedMaterial::SetDetailNormalMapFile(const ZEString& FileName)
 	}
 }
 
-const ZEString& ZERNFixedMaterial::GetDetailNormalMapFile() const
+const ZEString& ZERNStandardMaterial::GetDetailNormalMapFile() const
 {
 	return DetailNormalMapFile;
 }
 
-void ZERNFixedMaterial::SetClippingPlanesEnabled(bool Enabled)
+void ZERNStandardMaterial::SetClippingPlanesEnabled(bool Enabled)
 {
 	ClippingPlanesEnabled = Enabled;
 }
 
-bool ZERNFixedMaterial::GetClippingPlanesEnabled() const
+bool ZERNStandardMaterial::GetClippingPlanesEnabled() const
 {
 	return ClippingPlanesEnabled;
 }
 
-bool ZERNFixedMaterial::PreRender(ZERNCommand& Command) const
+bool ZERNStandardMaterial::PreRender(ZERNCommand& Command) const
 {
 	if (!ZERNMaterial::PreRender(Command))
 		return false;
@@ -1725,12 +1725,12 @@ bool ZERNFixedMaterial::PreRender(ZERNCommand& Command) const
 	return true;
 }
 
-bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+bool ZERNStandardMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	if (!ZERNMaterial::SetupMaterial(Context, Stage))
 		return false;
 
-	if (!const_cast<ZERNFixedMaterial*>(this)->Update())
+	if (!const_cast<ZERNStandardMaterial*>(this)->Update())
 		return false;
 
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, ZERN_SHADER_CONSTANT_MATERIAL, ConstantBuffer);
@@ -1776,12 +1776,12 @@ bool ZERNFixedMaterial::SetupMaterial(ZEGRContext* Context, const ZERNStage* Sta
 	return true;
 }
 
-void ZERNFixedMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
+void ZERNStandardMaterial::CleanupMaterial(ZEGRContext* Context, const ZERNStage* Stage) const
 {
 	ZERNMaterial::CleanupMaterial(Context, Stage);
 }
 
-bool ZERNFixedMaterial::Serialize(ZEMLWriterNode* MaterialNode)
+bool ZERNStandardMaterial::Serialize(ZEMLWriterNode* MaterialNode)
 {
 	MaterialNode->WriteUInt8("MajorVersion", 2);
 	MaterialNode->WriteUInt8("MinorVersion", 2);
@@ -1877,7 +1877,7 @@ bool ZERNFixedMaterial::Serialize(ZEMLWriterNode* MaterialNode)
 	return true;
 }
 
-bool ZERNFixedMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
+bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 {
 	ZEString FileName = MaterialNode->GetFile()->GetPath();
 
@@ -1987,17 +1987,17 @@ bool ZERNFixedMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 	return true;
 }
 
-ZEHolder<ZERNFixedMaterial> ZERNFixedMaterial::CreateInstance()
+ZEHolder<ZERNStandardMaterial> ZERNStandardMaterial::CreateInstance()
 {
-	return ZERSTemplates::CreateResource<ZERNFixedMaterial>(ZERSTemplates::InstanciatorFunction<ZERNFixedMaterial>);
+	return ZERSTemplates::CreateResource<ZERNStandardMaterial>(ZERSTemplates::InstanciatorFunction<ZERNStandardMaterial>);
 }
 
-ZERSHolder<ZERNFixedMaterial> ZERNFixedMaterial::LoadResource(const ZEString& FileName)
+ZERSHolder<ZERNStandardMaterial> ZERNStandardMaterial::LoadResource(const ZEString& FileName)
 {
-	return ZERSTemplates::LoadResource<ZERNFixedMaterial>(FileName, ZERSTemplates::InstanciatorFunction<ZERNFixedMaterial>);
+	return ZERSTemplates::LoadResource<ZERNStandardMaterial>(FileName, ZERSTemplates::InstanciatorFunction<ZERNStandardMaterial>);
 }
 
-ZERSHolder<const ZERNFixedMaterial> ZERNFixedMaterial::LoadResourceShared(const ZEString& FileName)
+ZERSHolder<const ZERNStandardMaterial> ZERNStandardMaterial::LoadResourceShared(const ZEString& FileName)
 {
-	return ZERSTemplates::LoadResourceShared<ZERNFixedMaterial>(FileName, ZERSTemplates::InstanciatorFunction<ZERNFixedMaterial>);
+	return ZERSTemplates::LoadResourceShared<ZERNStandardMaterial>(FileName, ZERSTemplates::InstanciatorFunction<ZERNStandardMaterial>);
 }

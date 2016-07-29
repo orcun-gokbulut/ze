@@ -58,7 +58,7 @@ class ZEPhysicalRigidBody;
 class ZEPhysicalJoint;
 class ZEPhysicalBoxShape;
 class ZERNDrawParameters;
-class ZERNFixedMaterial;
+class ZERNStandardMaterial;
 class ZERNSimpleMaterial;
 
 class ZEModel : public ZEEntity

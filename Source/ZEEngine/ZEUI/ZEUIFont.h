@@ -35,54 +35,59 @@
 
 #pragma once
 
-#include "ZECore/ZEResource.h"
+#include "ZEResource/ZERSResource.h"
 
-#include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEPointer/ZEHolder.h"
 
-class ZEGRTexture2D;
+ZE_META_FORWARD_DECLARE(ZEGRTexture2D, "ZEGraphics/ZEGRTexture2D.h");
 
-enum ZEUIFontType
+ZE_ENUM(ZEUIFontType)
 {
 	ZEUI_FT_NONE,
 	ZEUI_FT_BITMAP,
 	ZEUI_FT_TRUE_TYPE
 };
 
-struct ZEUIFontCharacterMetric
+class ZEUIFontCharacterMetric : public ZEObject
 {
-	ZEUInt32							FontSize;
-	ZEUInt32							MaximumHeight;
+	public:
+		ZEUInt32							FontSize;
+		ZEUInt32							MaximumHeight;
 
-	ZEInt32								Height;
-	ZEInt32								Width;
+		ZEInt32								Height;
+		ZEInt32								Width;
 
-	ZEInt32								HorizontalAdvance;
-	ZEInt32								VerticalAdvance;
+		ZEInt32								HorizontalAdvance;
+		ZEInt32								VerticalAdvance;
 
-	ZEInt32								HorizontalBearingX;
-	ZEInt32								HorizontalBearingY;
+		ZEInt32								HorizontalBearingX;
+		ZEInt32								HorizontalBearingY;
 
-	ZEInt32								VerticalBearingX;
-	ZEInt32								VerticalBearingY;
+		ZEInt32								VerticalBearingX;
+		ZEInt32								VerticalBearingY;
 };
 
-struct ZEUIFontCharacter
+class ZEUIFontCharacter : public ZEObject
 {
-	ZEHolder<const ZEGRTexture2D>		Texture;
-	ZEUInt32							GlyphIndex;
-	char								Character;
-	ZEUIFontCharacterMetric				CharacterMetric;
-	ZERectangle							CoordinateRectangle;
+	public:
+		ZEHolder<const ZEGRTexture2D>		Texture;
+		ZEUInt32							GlyphIndex;
+		char								Character;
+		ZEUIFontCharacterMetric				CharacterMetric;
+		ZERectangle							CoordinateRectangle;
 };
 
-class ZEUIFont : public ZEResource
+class ZEUIFont : public ZERSResource
 {
 	ZE_OBJECT
+	ZE_DISALLOW_COPY(ZEUIFont)
+	protected:
+											ZEUIFont();
+		virtual								~ZEUIFont();
+
 	public:
-		virtual ZEUIFontType					GetFontResourceType() const = 0;
-		virtual const ZEUIFontCharacter&		GetCharacter(char Character) = 0;
-		virtual const ZEUIFontCharacter&		GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance) = 0;
+		virtual ZEUIFontType				GetFontResourceType() const = 0;
+		virtual ZEUIFontCharacter			GetCharacter(char Character) const = 0;
+		virtual ZEUIFontCharacter			GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance) const = 0;
 };

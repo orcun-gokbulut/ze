@@ -67,7 +67,7 @@ class ZEUILabel : public ZEUIFrameControl
 		ZEArray<ZEUITextCharacter>			Characters;
 		ZEArray<ZEInt32>					LineTextWidths;
 
-		ZEUIFont*							FontResource;
+		ZEHolder<const ZEUIFont>			FontResource;
 		ZEVector4							FontColor;
 
 		ZERectangle							TextRenderingArea;
@@ -85,8 +85,8 @@ class ZEUILabel : public ZEUIFrameControl
 	public:
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
-		void								SetFontResource(ZEUIFont* Resource);
-		ZEUIFont*							GetFontResource();
+		void								SetFontResource(ZEHolder<const ZEUIFont> Resource);
+		ZEHolder<const ZEUIFont>			GetFontResource();
 
 		void								SetFontColor(const ZEVector4& Color);
 		const ZEVector4&					GetFontColor() const;

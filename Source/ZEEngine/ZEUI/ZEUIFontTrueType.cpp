@@ -42,6 +42,8 @@
 #include <ft2build.h>
 #include <freetype\freetype.h>
 #include <freetype\ftglyph.h>
+#include "ZEFile\ZEFileInfo.h"
+#include "ZEResource\ZERSTemplates.h"
 
 struct ZEFreeType
 {
@@ -60,29 +62,47 @@ struct ZEFontPixel
 	ZEUInt8	A;
 };
 
-void ZEUIFontTrueType::SetFontFile(ZEString FontFilePath)
+ZETaskResult ZEUIFontTrueType::LoadInternal()
 {
-	this->FontFile = FontFilePath;
+	LastCharacterPosition.x = 0;
+	LastCharacterPosition.y = 0;
+	LastTextureId = 0;
+	LastTextureLine = 0;
 
 	FT_Init_FreeType(&FreeType->Library);
-	FT_New_Face(FreeType->Library, FontFilePath, 0, &FreeType->Face);
+
+	ZERealPath RealPath = ZEFileInfo(GetFileName()).GetRealPath();
+	if ((RealPath.Access & ZE_PA_READ) == 0)
+	{
+		zeError("Cannot load font resource. File is not accesible. File Name: \"%s\".", GetFileName().ToCString());
+		return ZE_TR_FAILED;
+	}
+
+	FT_New_Face(FreeType->Library, RealPath.Path, 0, &FreeType->Face);
 	FontSupportsKerning = FT_HAS_KERNING(FreeType->Face);
+
+	CreateNewTexture(256, 256);
+
+	return ZE_TR_DONE;
 }
 
-void ZEUIFontTrueType::SetFontSize(ZEUInt32 FontSize)
+ZETaskResult ZEUIFontTrueType::UnloadInternal()
 {
-	this->FontSize = FontSize;
+	LastCharacterPosition.x = 0;
+	LastCharacterPosition.y = 0;
+	LastTextureId = 0;
+	LastTextureLine = 0;
+
+	FontCharacters.Clear();
+	Textures.Clear();
+	
+	return ZE_TR_DONE;
 }
 
-void ZEUIFontTrueType::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height)
+void ZEUIFontTrueType::CreateNewTexture(ZEUInt32 Width, ZEUInt32 Height) const
 {
 	Textures.Add();
 	Textures.GetLastItem() = ZEGRTexture2D::CreateResource(Width, Height, 1, ZEGR_TF_R8G8B8A8_UNORM);
-}
-
-const char* ZEUIFontTrueType::GetResourceType() const
-{
-	return "ZEFontResourceDynamic";
 }
 
 ZEUIFontType ZEUIFontTrueType::GetFontResourceType() const
@@ -95,217 +115,154 @@ ZEUInt32 ZEUIFontTrueType::GetFontSize() const
 	return this->FontSize;
 }
 
-const ZEUIFontCharacter& ZEUIFontTrueType::GetCharacter(char Character)
+ZEUIFontCharacter ZEUIFontTrueType::GetCharacter(char Character) const
 {
 	ZEInt64 KerningDistance;
 	return GetCharacter(Character, Character, KerningDistance);
 }
 
-const ZEUIFontCharacter& ZEUIFontTrueType::GetCharacter(char Character, char PreviousCharacter, ZEInt64& KerningDistance)
+ZEUIFontCharacter ZEUIFontTrueType::GetCharacter(char Character, char PreviousCharacter, ZEInt64& KerningDistance) const
 {
 	ZESize TexturePitch;
 	ZEUInt32 LastItem = 0;
 	ZEUInt32 CurrentGlyphIndex, PreviousGlyphIndex;
 	KerningDistance = 0;
 
-	for(ZESize I = 0; I < FontCharacters.GetCount(); I++)
+	ZEUIFontCharacter Output;
+	ZE_LOCK_SECTION(Lock)
 	{
-		if(FontCharacters[I].Character == Character)
+		for(ZESize I = 0; I < FontCharacters.GetCount(); I++)
 		{
-			if(isspace(Character))
-				CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
-			else
-				CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, Character);
-
-			if(isspace(PreviousCharacter))
-				PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
-			else
-				PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, PreviousCharacter);
-
-			if(FontSupportsKerning)
+			if(FontCharacters[I].Character == Character)
 			{
-				FT_Vector Delta;
-				FT_Get_Kerning(FreeType->Face, PreviousGlyphIndex, CurrentGlyphIndex, FT_KERNING_DEFAULT, &Delta);
-				//26.6 formatting 26 bits for pixel, 6 bits for subpixel
-				KerningDistance = Delta.x >> 6;
+				if(isspace(Character))
+					CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
+				else
+					CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, Character);
+
+				if(isspace(PreviousCharacter))
+					PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
+				else
+					PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, PreviousCharacter);
+
+				if(FontSupportsKerning)
+				{
+					FT_Vector Delta;
+					FT_Get_Kerning(FreeType->Face, PreviousGlyphIndex, CurrentGlyphIndex, FT_KERNING_DEFAULT, &Delta);
+					//26.6 formatting 26 bits for pixel, 6 bits for subpixel
+					KerningDistance = Delta.x >> 6;
+				}
+				return FontCharacters[I];
 			}
-			return FontCharacters[I];
 		}
-	}
 
-	FontCharacters.Add();
-	LastItem = FontCharacters.GetCount() - 1;
-	FontCharacters[LastItem].Character = Character;
+		FontCharacters.Add();
+		LastItem = FontCharacters.GetCount() - 1;
+		FontCharacters[LastItem].Character = Character;
 
-	if(isspace(Character))
-		CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
-	else
-		CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, Character);
-
-	//Character size in 1/64th of points (PointFactor of 64)
-	FT_Set_Char_Size(FreeType->Face, 0, FontSize * PointFactor, HorizontalOutputDPI, VerticalOutputDPI);
-	FT_Load_Glyph(FreeType->Face, CurrentGlyphIndex, FT_LOAD_DEFAULT);
-
-	FontCharacters[LastItem].GlyphIndex = CurrentGlyphIndex;
-		
-	FontCharacters[LastItem].CharacterMetric.FontSize			= FontSize;
-	FontCharacters[LastItem].CharacterMetric.Height				= FreeType->Face->glyph->metrics.height		/ PointFactor;
-	FontCharacters[LastItem].CharacterMetric.Width				= FreeType->Face->glyph->metrics.width			/ PointFactor;
-	FontCharacters[LastItem].CharacterMetric.HorizontalAdvance	= FreeType->Face->glyph->metrics.horiAdvance	/ PointFactor;
-	FontCharacters[LastItem].CharacterMetric.VerticalAdvance	= FreeType->Face->glyph->metrics.vertAdvance	/ PointFactor;
-	FontCharacters[LastItem].CharacterMetric.HorizontalBearingX	= FreeType->Face->glyph->metrics.horiBearingX / PointFactor;
-	FontCharacters[LastItem].CharacterMetric.HorizontalBearingY	= FreeType->Face->glyph->metrics.horiBearingY / PointFactor;
-	FontCharacters[LastItem].CharacterMetric.VerticalBearingX	= FreeType->Face->glyph->metrics.vertBearingX / PointFactor;
-	FontCharacters[LastItem].CharacterMetric.VerticalBearingY	= FreeType->Face->glyph->metrics.vertBearingY / PointFactor;
-
-	FT_Glyph Glyph;
-	FT_Get_Glyph(FreeType->Face->glyph, &Glyph);
-	FT_Glyph_To_Bitmap(&Glyph, FT_RENDER_MODE_NORMAL, 0, 1);
-	FT_Bitmap FTBitmap = ((FT_BitmapGlyph)Glyph)->bitmap;
-
-	//Warning! Pot. bug
-	//////////////////////////////////////////////////////////////////////////
-	FT_Load_Glyph(FreeType->Face, FT_Get_Char_Index(FreeType->Face, 'O'), FT_LOAD_DEFAULT);
-	FontCharacters[LastItem].CharacterMetric.MaximumHeight = FreeType->Face->glyph->metrics.height / PointFactor;
-
-	if(isspace(PreviousCharacter))
-		PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
-	else
-		PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, PreviousCharacter);
-
-	if(LastCharacterPosition.x + FTBitmap.width > Textures[LastTextureId]->GetWidth())
-	{
-		LastTextureLine++;
-		LastCharacterPosition.x = 0;
-	}
-
-	if(FontSize * LastTextureLine + FontSize > Textures[LastTextureId]->GetHeight())
-	{
-		LastTextureLine = 0;
-		LastCharacterPosition.x = 0;
-		CreateNewTexture(512, 512);
-		LastTextureId++;
-	}
-
-	LastCharacterPosition.y = FontSize * LastTextureLine;
-	
-	ZEArray<ZEUInt32> Buffer;
-	Buffer.SetCount(FTBitmap.rows * FTBitmap.width);
-
-	for (ZESize y = 0; y < FTBitmap.rows; y++)
-	{
-		for (ZESize x = 0; x <  FTBitmap.width; x++)
-		{
-			ZEUInt32 Color = FTBitmap.buffer[FTBitmap.pitch * y + x];
-			Buffer[FTBitmap.width * y + x] = (Color << 24) | 0xFFFFFF;
-		}
-	}
-
-	ZERect DestRect;
-	DestRect.x = LastCharacterPosition.x;
-	DestRect.y = LastCharacterPosition.y;
-	DestRect.Width = FTBitmap.width;
-	DestRect.Height = FTBitmap.rows;
-	Textures[LastTextureId]->UpdateSubResource(0, 0, &DestRect, Buffer.GetCArray(), FTBitmap.width * sizeof(ZEUInt32));
-
-	FontCharacters[LastItem].CoordinateRectangle.LeftUp.x = LastCharacterPosition.x  / Textures[LastTextureId]->GetWidth();
-	FontCharacters[LastItem].CoordinateRectangle.LeftUp.y = (LastCharacterPosition.y) / Textures[LastTextureId]->GetHeight();
-
-	FontCharacters[LastItem].CoordinateRectangle.RightDown.x = (LastCharacterPosition.x + FontCharacters[LastItem].CharacterMetric.HorizontalAdvance) / Textures[LastTextureId]->GetWidth();
-	FontCharacters[LastItem].CoordinateRectangle.RightDown.y = (LastCharacterPosition.y + FontCharacters[LastItem].CharacterMetric.Height) / Textures[LastTextureId]->GetHeight();
-
-	if(FontSupportsKerning)
-	{
-		FT_Vector Delta;
-		FT_Get_Kerning(FreeType->Face, PreviousGlyphIndex, CurrentGlyphIndex, FT_KERNING_DEFAULT, &Delta);
-		//26.6 formatting 26 bits for pixel, 6 bits for subpixel
-		KerningDistance = Delta.x >> 6;
-	}
-
-	LastCharacterPosition.x += FontCharacters[LastItem].CharacterMetric.HorizontalAdvance + CHARACTER_SPACING;
-
-	FontCharacters[LastItem].Texture = Textures[LastTextureId].GetPointer();
-
-	return FontCharacters[LastItem];
-}
-
-const ZEGRTexture2D* ZEUIFontTrueType::GetTexture(ZEUInt32 TextureId)
-{
-	return Textures[TextureId];
-}
-
-ZEUIFontTrueType* ZEUIFontTrueType::LoadSharedResource(const ZEString& FileName, ZEUInt32 FontSize)
-{
-	ZEUIFontTrueType* NewResource = (ZEUIFontTrueType*)zeResources->GetResource(FileName.GetValue());
-	if (NewResource == NULL)
-	{
-		NewResource = LoadResource(FileName, FontSize);
-		if (NewResource != NULL)
-		{
-			NewResource->Shared = true;
-			NewResource->Cached = false;
-			NewResource->ReferenceCount = 1;
-			zeResources->AddResource(NewResource);
-			return NewResource;
-		}
+		if(isspace(Character))
+			CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
 		else
+			CurrentGlyphIndex = FT_Get_Char_Index(FreeType->Face, Character);
+
+		//Character size in 1/64th of points (PointFactor of 64)
+		FT_Set_Char_Size(FreeType->Face, 0, FontSize * PointFactor, HorizontalOutputDPI, VerticalOutputDPI);
+		FT_Load_Glyph(FreeType->Face, CurrentGlyphIndex, FT_LOAD_DEFAULT);
+
+		FontCharacters[LastItem].GlyphIndex = CurrentGlyphIndex;
+		
+		FontCharacters[LastItem].CharacterMetric.FontSize			= FontSize;
+		FontCharacters[LastItem].CharacterMetric.Height				= FreeType->Face->glyph->metrics.height		/ PointFactor;
+		FontCharacters[LastItem].CharacterMetric.Width				= FreeType->Face->glyph->metrics.width			/ PointFactor;
+		FontCharacters[LastItem].CharacterMetric.HorizontalAdvance	= FreeType->Face->glyph->metrics.horiAdvance	/ PointFactor;
+		FontCharacters[LastItem].CharacterMetric.VerticalAdvance	= FreeType->Face->glyph->metrics.vertAdvance	/ PointFactor;
+		FontCharacters[LastItem].CharacterMetric.HorizontalBearingX	= FreeType->Face->glyph->metrics.horiBearingX / PointFactor;
+		FontCharacters[LastItem].CharacterMetric.HorizontalBearingY	= FreeType->Face->glyph->metrics.horiBearingY / PointFactor;
+		FontCharacters[LastItem].CharacterMetric.VerticalBearingX	= FreeType->Face->glyph->metrics.vertBearingX / PointFactor;
+		FontCharacters[LastItem].CharacterMetric.VerticalBearingY	= FreeType->Face->glyph->metrics.vertBearingY / PointFactor;
+
+		FT_Glyph Glyph;
+		FT_Get_Glyph(FreeType->Face->glyph, &Glyph);
+		FT_Glyph_To_Bitmap(&Glyph, FT_RENDER_MODE_NORMAL, 0, 1);
+		FT_Bitmap FTBitmap = ((FT_BitmapGlyph)Glyph)->bitmap;
+
+		//Warning! Pot. bug
+		//////////////////////////////////////////////////////////////////////////
+		FT_Load_Glyph(FreeType->Face, FT_Get_Char_Index(FreeType->Face, 'O'), FT_LOAD_DEFAULT);
+		FontCharacters[LastItem].CharacterMetric.MaximumHeight = FreeType->Face->glyph->metrics.height / PointFactor;
+
+		if(isspace(PreviousCharacter))
+			PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, UTF8_SPACE_CHARACTER);
+		else
+			PreviousGlyphIndex = FT_Get_Char_Index(FreeType->Face, PreviousCharacter);
+
+		if(LastCharacterPosition.x + FTBitmap.width > Textures[LastTextureId]->GetWidth())
 		{
-			return NULL;
+			LastTextureLine++;
+			LastCharacterPosition.x = 0;
 		}
-	}
-	else
-		return NewResource;
-}
 
-void ZEUIFontTrueType::CacheResource(const ZEString& FileName, ZEUInt32 FontSize)
-{
-	ZEUIFontTrueType* NewResource = (ZEUIFontTrueType*)zeResources->GetResource(FileName.GetValue());
-	if (NewResource == NULL)
-	{
-		NewResource = LoadResource(FileName, FontSize);
-		if (NewResource != NULL)
+		if(FontSize * LastTextureLine + FontSize > Textures[LastTextureId]->GetHeight())
 		{
-			NewResource->Cached = true;
-			NewResource->ReferenceCount = 0;
-			zeResources->AddResource(NewResource);
+			LastTextureLine = 0;
+			LastCharacterPosition.x = 0;
+			CreateNewTexture(512, 512);
+			LastTextureId++;
 		}
+
+		LastCharacterPosition.y = FontSize * LastTextureLine;
+	
+		ZEArray<ZEUInt32> Buffer;
+		Buffer.SetCount(FTBitmap.rows * FTBitmap.width);
+
+		for (ZESize y = 0; y < FTBitmap.rows; y++)
+		{
+			for (ZESize x = 0; x <  FTBitmap.width; x++)
+			{
+				ZEUInt32 Color = FTBitmap.buffer[FTBitmap.pitch * y + x];
+				Buffer[FTBitmap.width * y + x] = (Color << 24) | 0xFFFFFF;
+			}
+		}
+
+		ZERect DestRect;
+		DestRect.x = LastCharacterPosition.x;
+		DestRect.y = LastCharacterPosition.y;
+		DestRect.Width = FTBitmap.width;
+		DestRect.Height = FTBitmap.rows;
+		Textures[LastTextureId]->UpdateSubResource(0, 0, &DestRect, Buffer.GetCArray(), FTBitmap.width * sizeof(ZEUInt32));
+
+		FontCharacters[LastItem].CoordinateRectangle.LeftUp.x = LastCharacterPosition.x  / Textures[LastTextureId]->GetWidth();
+		FontCharacters[LastItem].CoordinateRectangle.LeftUp.y = (LastCharacterPosition.y) / Textures[LastTextureId]->GetHeight();
+
+		FontCharacters[LastItem].CoordinateRectangle.RightDown.x = (LastCharacterPosition.x + FontCharacters[LastItem].CharacterMetric.HorizontalAdvance) / Textures[LastTextureId]->GetWidth();
+		FontCharacters[LastItem].CoordinateRectangle.RightDown.y = (LastCharacterPosition.y + FontCharacters[LastItem].CharacterMetric.Height) / Textures[LastTextureId]->GetHeight();
+
+		if(FontSupportsKerning)
+		{
+			FT_Vector Delta;
+			FT_Get_Kerning(FreeType->Face, PreviousGlyphIndex, CurrentGlyphIndex, FT_KERNING_DEFAULT, &Delta);
+			//26.6 formatting 26 bits for pixel, 6 bits for subpixel
+			KerningDistance = Delta.x >> 6;
+		}
+
+		LastCharacterPosition.x += FontCharacters[LastItem].CharacterMetric.HorizontalAdvance + CHARACTER_SPACING;
+
+		FontCharacters[LastItem].Texture = Textures[LastTextureId].GetPointer();
+
+		Output = FontCharacters[LastItem];
 	}
+
+	return Output;
 }
 
-ZEUIFontTrueType* ZEUIFontTrueType::LoadResource(const ZEString& FileName, ZEUInt32 FontSize)
+ZEHolder<ZEUIFontTrueType> ZEUIFontTrueType::LoadResource(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	bool Result;
-	ZEUIFontTrueType* FontResource;
-
-	ZEFile File;
-	Result = File.Open(FileName, ZE_FOM_READ, ZE_FCM_NONE);
-	if (Result)
-	{
-		FontResource = LoadResource(&File, FontSize);
-		File.Close();
-
-		return FontResource;
-	}
-	else
-	{
-		zeError("Font file not found. FilePath : \"%s\"", FileName.GetValue());
-		return NULL;
-	}
+	return ZERSTemplates::LoadResource<ZEUIFontTrueType>(FileName, Instanciator, &FontSize);
 }
 
-ZEUIFontTrueType* ZEUIFontTrueType::LoadResource(ZEFile* ResourceFile, ZEUInt32 FontSize)
+ZEHolder<const ZEUIFontTrueType> ZEUIFontTrueType::LoadResourceShared(const ZEString& FileName, ZEUInt32 FontSize)
 {
-	zeLog("Loading font file \"%s\".", ResourceFile->GetPath().GetValue());
-
-	ZEUIFontTrueType* NewResource = new ZEUIFontTrueType();
-	NewResource->SetFileName(ResourceFile->GetPath());
-
-	NewResource->SetFontFile(ResourceFile->GetPath());
-	NewResource->SetFontSize(FontSize);
-
-	zeLog("Font file \"%s\" has been loaded.", ResourceFile->GetPath().GetValue());
-
-	return NewResource;
+	return ZERSTemplates::LoadResourceShared<ZEUIFontTrueType>(FileName, Instanciator, &FontSize);
 }
 
 ZEUIFontTrueType::ZEUIFontTrueType()
@@ -323,11 +280,20 @@ ZEUIFontTrueType::ZEUIFontTrueType()
 	LastTextureId = 0;
 	LastTextureLine = 0;
 
-	CreateNewTexture(512, 512);
+	Register();
 }
 
 ZEUIFontTrueType::~ZEUIFontTrueType()
 {
+	Unregister();
+
 	delete FreeType;
 	FreeType = 0;
+}
+
+ZERSResource* ZEUIFontTrueType::Instanciator(const void* Parameters)
+{
+	ZEUIFontTrueType* Resource = new ZEUIFontTrueType();
+	Resource->FontSize = *(const ZEUInt32*)Parameters;
+	return Resource;
 }
