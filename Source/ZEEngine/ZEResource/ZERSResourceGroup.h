@@ -56,6 +56,9 @@ class ZERSResourceGroup : public ZEObject
 		ZESize									ResourceCount;
 		ZESize									SharedResourceCount;
 
+		ZESize									CreateCount;
+		ZESize									DestroyCount;
+
 		ZESize									MemoryUsage[ZERS_MEMORY_POOL_COUNT];
 		ZESize									MemoryUsageShared[ZERS_MEMORY_POOL_COUNT];
 

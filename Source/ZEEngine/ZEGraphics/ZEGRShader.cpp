@@ -47,13 +47,14 @@
 bool ZEGRShader::Initialize(ZEGRShaderType ShaderType, const void* ShaderBinary, ZESize Size)
 {
 	this->ShaderType = ShaderType;
+	SetSize(Size);
 
 	return true;
 }
 
 void ZEGRShader::Deinitialize()
 {
-
+	SetSize(0);
 }
 
 ZEGRShader::ZEGRShader()

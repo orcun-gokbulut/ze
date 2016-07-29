@@ -56,7 +56,7 @@ void ZEMCRegisterer::GenerateRegisterFile(ZEMCContext* Context)
 	fprintf(File, "// ZEMetaCompiler output file. Do not change by hand.\n\n");
 
 	for (ZESize I = 0; I < Context->TargetEnumerators.GetCount(); I++)
-		fprintf(File, "ZE_META_REGISTER_ENUM(%s)\n", Context->Enumerators[I]->Name.ToCString());
+		fprintf(File, "ZE_META_REGISTER_ENUM(%s)\n", Context->TargetEnumerators[I]->Name.ToCString());
 
 	for (ZESize I = 0; I < Context->TargetClasses.GetCount(); I++)
 		if (!Context->TargetClasses[I]->IsFundamental)

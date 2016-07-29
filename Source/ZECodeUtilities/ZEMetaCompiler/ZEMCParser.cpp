@@ -92,6 +92,9 @@ void ZEMCParser::ProcessEnumerator(EnumDecl* EnumDeclaration)
 	if (EnumDeclaration->getNameAsString().empty())
 		return;
 
+	if (!EnumDeclaration->isCompleteDefinition())
+		return;
+
 	ZEPointer<ZEMCEnumerator> Enumerator = new ZEMCEnumerator();
 	Enumerator->Name = EnumDeclaration->getNameAsString();
 	Enumerator->MetaName = Enumerator->Name + "Enumerator";

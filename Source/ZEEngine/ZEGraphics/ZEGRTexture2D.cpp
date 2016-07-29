@@ -118,7 +118,6 @@ bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 	SetLevelCount(LevelCount);
 
 	SetSize(CalculateSize(Width, Height, LevelCount, Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture2D, Texture);
 
 	return true;
 }
@@ -126,7 +125,6 @@ bool ZEGRTexture2D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt LevelCount, Z
 void ZEGRTexture2D::Deinitialize()
 {
 	SetSize(0);
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, Texture2D, Texture);
 }
 
 ZETaskResult ZEGRTexture2D::LoadInternal()

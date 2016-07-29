@@ -154,7 +154,7 @@ ZEMCAttribute* ZEMCDeclaration::GetAttribute(const char* Name)
 			return &Attributes[I];
 	}
 
-	return false;
+	return NULL;
 }
 
 const char* ZEMCDeclaration::GetAttributeValue(const char* Name, ZESize Index, const char* DefaultValue)
