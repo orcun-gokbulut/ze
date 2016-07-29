@@ -272,7 +272,7 @@ void ZED11Context::SetComputeRenderState(const ZEGRComputeRenderStateData* State
 
 	Context->CSSetShader(SrcShader->GetComputeShader(), NULL, 0);
 
-	LockContext();
+	UnlockContext();
 
 	ComputeState->ComputeShader = D11State->ComputeShader;
 }

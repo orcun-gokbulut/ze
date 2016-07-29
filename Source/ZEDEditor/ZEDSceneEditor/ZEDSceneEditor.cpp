@@ -95,9 +95,9 @@ bool ZEDSceneEditor::InitializeInternal()
 	ZEDGrid* Grid = ZEDGrid::CreateInstance();
 	Scene->AddEntity(Grid);
 
-// 	ZEModel* Trial = ZEModel::CreateInstance();
-// 	Trial->SetModelResource(ZEMDResource::LoadSharedResource("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL"));
-// 	Scene->AddEntity(Trial);
+ 	ZEModel* Trial = ZEModel::CreateInstance();
+ 	Trial->SetModelFile("#R:/GraphicsTest/Sponza_Model/Sponza.ZEMODEL");
+ 	Scene->AddEntity(Trial);
 // 
 // 	ZEModel* Trial2 = ZEModel::CreateInstance();
 // 	Trial2->SetPosition(ZEVector3(5.0f, 0.0f, 5.0f));
