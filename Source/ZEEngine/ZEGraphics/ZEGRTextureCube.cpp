@@ -40,11 +40,11 @@
 #include "ZEFile/ZEPathInfo.h"
 #include "ZEPointer/ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
-
+#include "ZEResource/ZERSTemplates.h"
 #include "ZEModules/ZEDirect3D11/ZED11ComponentBase.h"
 
 #include "DirectXTex.h"
-#include "ZEResource/ZERSTemplates.h"
+
 using namespace DirectX;
 
 bool ZEGRTextureCube::CheckParameters(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Format, ZEGRResourceUsage Usage, ZEFlags BindFlags, const void* Data)
@@ -71,7 +71,6 @@ bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Fo
 	SetResourceBindFlags(BindFlags);
 
 	SetSize(CalculateSize(Length, Length, LevelCount, Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, TextureCube, Texture);
 
 	return true;
 }
@@ -79,7 +78,6 @@ bool ZEGRTextureCube::Initialize(ZEUInt Length, ZEUInt LevelCount, ZEGRFormat Fo
 void ZEGRTextureCube::Deinitialize()
 {
 	SetSize(0);
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, TextureCube, Texture);
 }
 
 

@@ -59,7 +59,7 @@ const ZEVector4& ZEUIManager::GetDefaultForegroundColor()
 
 ZEUIFont* ZEUIManager::GetDefaultFontResource()
 {
-	return ZEUIFontTrueType::LoadSharedResource("#R:/ZEEngine/ZEGUI/Fonts/arialbd.ttf", 12);
+	return ZEUIFontTrueType::LoadSharedResource("#R:/ZEEngine/ZEGUI/Fonts/NotoSans-Regular.ttf", 12);
 }
 
 ZEUIManager::ZEUIManager() 

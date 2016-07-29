@@ -162,7 +162,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 		 else if (TargetState == ZERS_RS_STAGED)
 		 {
 			 UnloadInternalDone = false;
-			 State == ZERS_RS_UNLOADING;
+			 State = ZERS_RS_UNLOADING;
 		 }
 		 else if (TargetState == ZERS_RS_DESTROYED)
 		 {
@@ -280,10 +280,8 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 
 void ZERSResource::SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size)
 {
-	MemoryUsage[Pool] = Size;
-
-	if (Parent != NULL)
-		Parent->UpdateMemoryConsumption();
+	MemoryUsageSelf[Pool] = Size;
+	UpdateMemoryConsumption();
 }
 
 void ZERSResource::SetLoadProgress(ZEUInt Percentage)

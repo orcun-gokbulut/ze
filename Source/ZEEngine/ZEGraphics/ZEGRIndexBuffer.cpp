@@ -36,7 +36,6 @@
 #include "ZEGRIndexBuffer.h"
 
 #include "ZEGraphics/ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
 #include "ZEResource/ZERSTemplates.h"
 
 inline ZESize SizeOfIndex(ZEGRIndexBufferFormat Format)

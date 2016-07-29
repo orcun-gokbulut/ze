@@ -46,14 +46,12 @@ bool ZEGRVertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGRR
 	SetResourceUsage(Usage);
 	SetResourceBindFlags(ZEGR_RBF_VERTEX_BUFFER);
 	SetSize(VertexCount * VertexStride);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, VertexBuffer, Geometry);
 
 	return true;
 }
 
 void ZEGRVertexBuffer::Deinitialize()
 {
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, VertexBuffer, Geometry);
 	SetSize(0);
 }
 

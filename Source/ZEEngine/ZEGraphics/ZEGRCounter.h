@@ -38,40 +38,6 @@
 #include "ZETypes.h"
 #include "ZEThread/ZELock.h"
 
-#define ZEGR_COUNTER_RESOURCE_INCREASE(Pointer, Type, SuperType) \
-	{ \
-		ZEGRGraphicsModule* Module = ZEGRGraphicsModule::GetInstance(); \
-		if (Module != NULL) \
-		{ \
-			ZEGRCounter& Counter = Module->GetCounter(); \
-			Counter.UpdateLock.Lock(); \
-			Counter.ObjectCount.Object++; \
-			Counter.ObjectCount.Type++; \
-			Counter.ObjectCount.SuperType++; \
-			Counter.MemoryUsage.Resource += Pointer->GetSize(); \
-			Counter.MemoryUsage.Type += Pointer->GetSize(); \
-			Counter.MemoryUsage.SuperType += Pointer->GetSize(); \
-			Counter.UpdateLock.Unlock(); \
-		} \
-	}
-		
-#define ZEGR_COUNTER_RESOURCE_DECREASE(Pointer, Type, SuperType) \
-	{ \
-		ZEGRGraphicsModule* Module = ZEGRGraphicsModule::GetInstance(); \
-		if (Module != NULL) \
-		{ \
-			ZEGRCounter& Counter = ZEGRGraphicsModule::GetInstance()->GetCounter(); \
-			Counter.UpdateLock.Lock(); \
-			Counter.ObjectCount.Object--; \
-			Counter.ObjectCount.Type--; \
-			Counter.ObjectCount.SuperType--; \
-			Counter.MemoryUsage.Resource -= Pointer->GetSize(); \
-			Counter.MemoryUsage.Type -= Pointer->GetSize(); \
-			Counter.MemoryUsage.SuperType -= Pointer->GetSize(); \
-			Counter.UpdateLock.Unlock(); \
-		} \
-	}
-
 struct ZEGRDrawStatistics
 {
 	ZESize		FrameCount;
@@ -79,50 +45,6 @@ struct ZEGRDrawStatistics
 	ZESize		InstancedDrawCall;
 	ZESize		DrawedPrimtivies;
 	ZESize		StateChanges;
-};
-
-struct ZEGRMemoryUsage
-{
-	ZESize		Resource;
-
-	ZESize		Geometry;
-	ZESize		IndexBuffer;
-	ZESize		VertexBuffer;
-
-	ZESize		Pipeline;
-	ZESize		Shader;
-	ZESize		RenderState;
-	ZESize		ConstantBuffer;	
-	ZESize		StructuredBuffer;
-
-	ZESize		Texture;
-	ZESize		Texture3D;
-	ZESize		Texture2D;
-	ZESize		TextureCube;
-	ZESize		RenderTarget;
-	ZESize		DepthStencilBuffer;
-};
-
-struct ZEGRObjectsCount
-{
-	ZESize		Object;
-
-	ZESize		Geometry;
-	ZESize		IndexBuffer;
-	ZESize		VertexBuffer;
-
-	ZESize		Pipeline;
-	ZESize		Shader;
-	ZESize		RenderState;
-	ZESize		ConstantBuffer;	
-	ZESize		StructuredBuffer;
-
-	ZESize		Texture;
-	ZESize		Texture3D;
-	ZESize		Texture2D;
-	ZESize		TextureCube;
-	ZESize		RenderTarget;
-	ZESize		DepthStencilBuffer;
 };
 
 class ZEGRCounter
@@ -144,10 +66,7 @@ class ZEGRCounter
 
 	private:
 		ZELock						UpdateLock;
-
 		ZEGRDrawStatistics			DrawStatistics;
-		ZEGRMemoryUsage				MemoryUsage;
-		ZEGRObjectsCount			ObjectCount;
 
 		void						Clean();
 		void						Reset();
@@ -156,6 +75,4 @@ class ZEGRCounter
 
 	public:
 		const ZEGRDrawStatistics&	GetDrawStatistics();
-		const ZEGRMemoryUsage&		GetMemoryUsage();
-		const ZEGRObjectsCount&		GetObjectCount();
 };

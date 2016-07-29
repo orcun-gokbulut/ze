@@ -46,6 +46,9 @@ void ZERSResourceGroup::UpdateMemoryUsage(ZERSResource* Resource, ZESSize Memory
 		if (Resource->IsShared())
 			MemoryUsageShared[Pool] += MemoryUsageDelta[Pool];
 	}
+
+	if (Parent != NULL)
+		Parent->UpdateMemoryUsage(Resource, MemoryUsageDelta);
 }
 
 void ZERSResourceGroup::RegisterResource(const ZERSResource* Resource)
@@ -54,6 +57,7 @@ void ZERSResourceGroup::RegisterResource(const ZERSResource* Resource)
 		Resources.AddEnd(&Resource->ManagerLink);
 	
 	ResourceCount++;
+	CreateCount++;
 
 	for (ZESize I = 0; I < ZERS_MEMORY_POOL_COUNT; I++)
 	{
@@ -72,6 +76,7 @@ void ZERSResourceGroup::UnregisterResource(const ZERSResource* Resource)
 		Resources.Remove(&Resource->ManagerLink);
 
 	ResourceCount--;
+	DestroyCount++;
 
 	for (ZESize I = 0; I < ZERS_MEMORY_POOL_COUNT; I++)
 	{
@@ -119,6 +124,9 @@ ZERSResourceGroup::ZERSResourceGroup()
 
 	ResourceCount = 0;
 	SharedResourceCount = 0;
+
+	CreateCount = 0;
+	DestroyCount = 0;
 
 	memset(MemoryUsage, 0, sizeof(MemoryUsage));
 	memset(MemoryUsageShared, 0, sizeof(MemoryUsageShared));

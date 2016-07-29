@@ -37,7 +37,6 @@
 
 #include "ZEPointer\ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
 #include "ZEResource\ZERSTemplates.h"
 
 ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
@@ -47,14 +46,12 @@ ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
 
 bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
 {
-	SetSize(BufferSize);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, ConstantBuffer, Pipeline);
+	SetMemoryUsage(ZERS_MP_GPU, BufferSize);
 	return true;
 }
 
 void ZEGRConstantBuffer::Deinitialize()
 {
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, ConstantBuffer, Pipeline);
 	SetSize(0);
 }
 

@@ -37,7 +37,6 @@
 
 #include "ZEPointer\ZEPointer.h"
 #include "ZEGRGraphicsModule.h"
-#include "ZEGRCounter.h"
 #include "ZEGRContext.h"
 #include "ZEResource\ZERSTemplates.h"
 
@@ -65,14 +64,12 @@ bool ZEGRStructuredBuffer::Initialize(ZESize ElementCount, ZESize ElementSize, Z
 	SetSize(ElementCount * ElementSize);
 	SetResourceUsage(Usage);
 	SetResourceBindFlags(BindFlags);
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, StructuredBuffer, Pipeline);
 
 	return true;
 }
 
 void ZEGRStructuredBuffer::Deinitialize()
 {
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, StructuredBuffer, Pipeline);
 	SetSize(0);
 }
 

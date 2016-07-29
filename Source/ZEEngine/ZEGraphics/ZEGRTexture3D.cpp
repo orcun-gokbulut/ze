@@ -84,7 +84,6 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 	SetResourceBindFlags(BindFlags);
 
 	SetSize(Depth * CalculateSize(Width, Height, LevelCount, Format));
-	ZEGR_COUNTER_RESOURCE_INCREASE(this, Texture3D, Texture);
 
 	return true;
 }
@@ -92,7 +91,6 @@ bool ZEGRTexture3D::Initialize(ZEUInt Width, ZEUInt Height, ZEUInt Depth, ZEUInt
 void ZEGRTexture3D::Deinitialize()
 {
 	SetSize(0);
-	ZEGR_COUNTER_RESOURCE_DECREASE(this, Texture3D, Texture);
 }
 
 ZETaskResult ZEGRTexture3D::LoadInternal()

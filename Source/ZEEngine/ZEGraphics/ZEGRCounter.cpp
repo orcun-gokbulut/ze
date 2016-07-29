@@ -40,9 +40,6 @@
 void ZEGRCounter::Clean()
 {
 	memset(&DrawStatistics, 0, sizeof(ZEGRDrawStatistics));
-	memset(&MemoryUsage, 0, sizeof(ZEGRMemoryUsage));
-	memset(&ObjectCount, 0, sizeof(ZEGRObjectsCount));
-
 }
 
 void ZEGRCounter::Reset()
@@ -61,14 +58,4 @@ ZEGRCounter::ZEGRCounter()
 const ZEGRDrawStatistics& ZEGRCounter::GetDrawStatistics()
 {
 	return DrawStatistics;
-}
-
-const ZEGRMemoryUsage& ZEGRCounter::GetMemoryUsage()
-{
-	return MemoryUsage;
-}
-
-const ZEGRObjectsCount& ZEGRCounter::GetObjectCount()
-{
-	return ObjectCount;
 }
