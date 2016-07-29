@@ -46,7 +46,7 @@
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEML/ZEMLWriter.h"
-#include "ZERenderer/ZERNFixedMaterial.h"
+#include "ZERenderer/ZERNStandardMaterial.h"
 #include "ZEResource/ZERSTemplates.h"
 
 static void CalculateBoundingBox(ZEMDResourceMesh* Mesh)
@@ -191,7 +191,7 @@ bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 	zeCheckError(!MaterialsNode.IsValid(), false, "Invalid Materials node.");
 	zeCheckError(MaterialsNode.GetName() != "Materials", false, "Invalid Materials node name.");
 
-	ZEArray<ZEHolder<const ZERNFixedMaterial>> Materials;
+	ZEArray<ZEHolder<const ZERNStandardMaterial>> Materials;
 	ZESize SubNodeCount = MaterialsNode.GetNodeCount("Material");
 	for (ZESize I = 0; I < SubNodeCount; I++)
 	{
@@ -201,7 +201,7 @@ bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 		if (!ZEFileInfo(MaterialPath).IsFile())
 			return false;
 
-		ZEHolder<const ZERNFixedMaterial> CurrentMaterial = ZERNFixedMaterial::LoadResourceShared(MaterialPath);
+		ZEHolder<const ZERNStandardMaterial> CurrentMaterial = ZERNStandardMaterial::LoadResourceShared(MaterialPath);
 		Materials.Add(CurrentMaterial);
 	}
 

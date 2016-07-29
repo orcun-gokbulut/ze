@@ -41,7 +41,7 @@
 #include "ZECore/ZEResource.h"
 #include "ZECore/ZEResourceManager.h"
 #include "ZETexture/ZETexture2DResource.h"
-#include "ZERenderer/ZERNFixedMaterial.h"
+#include "ZERenderer/ZERNStandardMaterial.h"
 #include "ZEPhysics/ZEPhysicalMesh.h"
 #include "ZEFile/ZEFileInfo.h"
 #include "ZEML/ZEMLReader.h"
@@ -407,7 +407,7 @@ bool ZEInteriorResource::ReadMaterials(ZEMLReaderNode* MaterialsNode)
 			return false;
 
 		ZEString MaterialPath = ZEFileInfo(GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
-		Materials[I] = ZERNFixedMaterial::LoadResourceShared(MaterialPath);
+		Materials[I] = ZERNStandardMaterial::LoadResourceShared(MaterialPath);
 	}
 
 	return true;

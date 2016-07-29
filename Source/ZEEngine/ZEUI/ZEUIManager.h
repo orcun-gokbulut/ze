@@ -179,51 +179,51 @@ class ZEUIManager : public ZEObject, public ZEInitializable
 {
 	ZE_OBJECT
 	private:
-		ZEInputMap					InputMap;
+		ZEInputMap							InputMap;
 
-		ZEArray<ZEUIControl*>		Controls;
-		ZEUIRenderer*				UIRenderer;
-		ZEUICursorControl*			Cursor;
+		ZEArray<ZEUIControl*>				Controls;
+		ZEUIRenderer*						UIRenderer;
+		ZEUICursorControl*					Cursor;
 		
-		ZEUIControl*				LastHoveredControl;
-		ZEUIControl*				LastPressedControl;
-		ZEUIControl*				LastFocusedControl;
+		ZEUIControl*						LastHoveredControl;
+		ZEUIControl*						LastPressedControl;
+		ZEUIControl*						LastFocusedControl;
 
-		ZEUIMouseKey				PreviousPressedButton;
+		ZEUIMouseKey						PreviousPressedButton;
 
-		ZEVector2					OldMousePosition;
-		bool						MouseMoveEventFlag;
+		ZEVector2							OldMousePosition;
+		bool								MouseMoveEventFlag;
 
-		ZEUIControl*				FindEventReciever(ZEUIControl* ParentControl);
+		ZEUIControl*						FindEventReciever(ZEUIControl* ParentControl);
 
-		static ZEVector4			DefaultBackgroundColor;
-		static ZEVector4			DefaultForegroundColor;
-		//static ZEFontResource*		DefaultFontResource;
+		static ZEVector4					DefaultBackgroundColor;
+		static ZEVector4					DefaultForegroundColor;
+		//static ZEFontResource*				DefaultFontResource;
 
-		bool						InitializeInternal();
-		bool						DeinitializeInternal();
+		bool								InitializeInternal();
+		bool								DeinitializeInternal();
 
-									ZEUIManager();
-									~ZEUIManager();
+											ZEUIManager();
+											~ZEUIManager();
 
 	public:
-		void						SetActiveCursor(ZEUICursorControl* Cursor);
+		void								SetActiveCursor(ZEUICursorControl* Cursor);
 
-		void						AddControl(ZEUIControl* Control);
-		void						RemoveControl(ZEUIControl* Control);
-		ZEArray<ZEUIControl*>&		GetControls();
+		void								AddControl(ZEUIControl* Control);
+		void								RemoveControl(ZEUIControl* Control);
+		ZEArray<ZEUIControl*>&				GetControls();
 
-		void						ProcessEvents();
-		void						Render(ZERNRenderer* Render);
-		void						Tick(float ElapsedTime);
+		void								ProcessEvents();
+		void								Render(ZERNRenderer* Render);
+		void								Tick(float ElapsedTime);
 
-		void						Destroy();
+		void								Destroy();
 
-		static ZEUIManager*			CreateInstance();
+		static ZEUIManager*					CreateInstance();
 
-		static const ZEVector4&		GetDefaultBackgroundColor();
-		static const ZEVector4&		GetDefaultForegroundColor();
-		static ZEUIFont*			GetDefaultFontResource();
+		static const ZEVector4&				GetDefaultBackgroundColor();
+		static const ZEVector4&				GetDefaultForegroundColor();
+		static ZEHolder<const ZEUIFont>		GetDefaultFontResource();
 };
 
 #endif

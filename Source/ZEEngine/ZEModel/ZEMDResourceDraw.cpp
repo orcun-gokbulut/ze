@@ -37,8 +37,9 @@
 
 #include "ZEError.h"
 #include "ZEML/ZEMLReader.h"
+#include "ZEModelMeshLOD.h"
+#include "ZEMDResourceLOD.h"
 #include "ZERenderer/ZERNMaterial.h"
-
 
 void ZEMDResourceDraw::SetOffset(ZESize PoligonOffset)
 {
@@ -62,7 +63,13 @@ ZESize ZEMDResourceDraw::GetCount() const
 
 void ZEMDResourceDraw::SetMaterial(ZEHolder<ZERNMaterial> Material)
 {
+	if (LOD != NULL) 
+		LOD->UnregisterExternalResource(Material);
+	
 	this->Material = Material;
+	
+	if (LOD != NULL) 
+		LOD->RegisterExternalResource(Material);
 }
 
 ZEHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 

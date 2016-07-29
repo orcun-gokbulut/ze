@@ -65,7 +65,6 @@ class ZESoundResource : public ZERSResource
 		static ZERSResource*						Instanciator(const void* Parameters);
 
 	public:
-		const char*									GetResourceType() const;
 		ZESoundFileFormat							GetSoundFileFormat() const;
 
 		ZESize										GetSamplesPerSecond() const;

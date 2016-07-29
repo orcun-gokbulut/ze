@@ -34,3 +34,13 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEUIFont.h"
+
+ZEUIFont::ZEUIFont()
+{
+
+}
+
+ZEUIFont::~ZEUIFont()
+{
+
+}

@@ -41,13 +41,16 @@
 #include "ZEPointer/ZEHolder.h"
 
 class ZERNMaterial;
+class ZEMDResourceLOD;
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
 class ZEMDResourceDraw : public ZEObject
 {
 	ZE_OBJECT
+	friend class ZEMDResourceLOD;
 	private:
+		ZEMDResourceLOD*				LOD;
 		ZESize							Offset;
 		ZESize							Count;
 		ZEHolder<ZERNMaterial>			Material;

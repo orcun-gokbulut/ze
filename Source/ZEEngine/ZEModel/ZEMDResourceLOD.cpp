@@ -197,7 +197,9 @@ ZEHolder<const ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
 
 void ZEMDResourceLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
+	UnregisterExternalResource(Material);
 	this->Material = Material;
+	RegisterExternalResource(Material);
 }
 
 ZEHolder<const ZERNMaterial> ZEMDResourceLOD::GetMaterial() const
@@ -223,10 +225,16 @@ const ZEArray<ZEMDResourceDraw>& ZEMDResourceLOD::GetDraws() const
 void ZEMDResourceLOD::AddDraw(const ZEMDResourceDraw& Draw)
 {
 	Draws.Add(Draw);
+	Draws.GetLastItem().LOD = this;
+	if (Draw.GetMaterial() != NULL)
+		RegisterExternalResource(Draw.GetMaterial());
 }
 
 void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 {
+	Draws[Index].LOD = NULL;
+	if (Draws[Index].GetMaterial() != NULL)
+		UnregisterExternalResource(Draws[Index].GetMaterial());
 	Draws.Remove(Index);
 }
 
