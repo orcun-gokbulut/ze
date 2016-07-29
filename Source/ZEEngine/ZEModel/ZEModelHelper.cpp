@@ -94,7 +94,7 @@ ZEModelHelperParentType ZEModelHelper::GetParentType() const
 
 void ZEModelHelper::SetParentMesh(ZEModelMesh* Mesh)
 {
-	zeCheckError(GetModel() != NULL && Mesh->GetModel() != GetModel(), ZE_VOID, "Cannot set helper parent to a mesh. Mesh belongs to another model.");
+	zeCheckError(Mesh != NULL && GetModel() != NULL && Mesh->GetModel() != GetModel(), ZE_VOID, "Cannot set helper parent to a mesh. Mesh belongs to another model.");
 
 	ParentMesh = Mesh;
 	ParentBone = NULL;
@@ -115,7 +115,7 @@ ZEModelMesh* ZEModelHelper::GetParentMesh() const
 
 void ZEModelHelper::SetParentBone(ZEModelBone* Bone)
 {
-	zeCheckError(GetModel() != NULL && Bone->GetModel() != GetModel(), ZE_VOID, "Cannot set helper parent to a bone. Bone belongs to another model.");
+	zeCheckError(Bone != NULL && GetModel() != NULL && Bone->GetModel() != GetModel(), ZE_VOID, "Cannot set helper parent to a bone. Bone belongs to another model.");
 
 	ParentBone = Bone;
 	ParentMesh = NULL;

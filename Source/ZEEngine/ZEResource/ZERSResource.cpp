@@ -208,7 +208,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 				State = ZERS_RS_ERROR_LOADING;
 				return ZE_TR_COOPERATING;
 			}
-			else if (ChildResourceState <= ZERS_RS_LOADING)
+			else if (ChildResourceState == ZERS_RS_LOADING)
 			{
 				return ZE_TR_COOPERATING;
 			}
