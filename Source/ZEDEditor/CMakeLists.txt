@@ -51,8 +51,8 @@ ze_add_source(ZEDMain.cpp		Sources)
 
 ze_add_executable(TARGET ZEDEditor 
 	SOURCES ${Sources}
-	LIBS ZEEngine ZEDSceneEditor ZETrainIGModule)
+	LIBS ZEEngine ZEDSceneEditor)
 
 qt5_use_modules(ZEDEditor Widgets)
 
-ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDSceneEditor ZETrainIGModule)
+ze_meta_register(LIBS ZEDCore ZEDUserInterface ZEDSceneEditor)

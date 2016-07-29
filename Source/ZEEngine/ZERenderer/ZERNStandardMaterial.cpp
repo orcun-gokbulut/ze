@@ -1895,7 +1895,7 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 	
 	ZEMLReaderNode PropertiesNode;
 	if (FileMajorVersion < 2)
-		PropertiesNode = *MaterialNode;
+		PropertiesNode = MaterialNode->GetNode("Configuration");
 	else
 		PropertiesNode = MaterialNode->GetNode("Properties");
 	

@@ -46,7 +46,7 @@ ZEGRResourceType ZEGRConstantBuffer::GetResourceType() const
 
 bool ZEGRConstantBuffer::Initialize(ZESize BufferSize)
 {
-	SetMemoryUsage(ZERS_MP_GPU, BufferSize);
+	SetSize(BufferSize);
 	return true;
 }
 
