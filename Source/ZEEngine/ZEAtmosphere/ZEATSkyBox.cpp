@@ -55,57 +55,6 @@
 #define	ZEAT_SBDF_RENDER_STATE		2
 #define	ZEAT_SBDF_CONSTANT_BUFFER	4
 
-ZEDrawFlags ZEATSkyBox::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
-
-void ZEATSkyBox::SetTextureFile(const ZEString& FileName)
-{
-	ZEGRTextureCubeOptions TextureOptions;
-	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
-	TextureOptions.GenerateMipMaps = false;
-	TextureOptions.MaximumMipmapLevel = 0;
-	TextureOptions.sRGB = true;
-
-	SkyTexture = ZEGRTextureCube::LoadResourceShared(FileName, TextureOptions);
-}
-
-const ZEString& ZEATSkyBox::GetTextureFile() const
-{
-	return SkyTexture != NULL ? SkyTexture->GetName() : ZEString::Empty;
-}
-
-void ZEATSkyBox::SetBrightness(float Brightness)
-{
-	if (this->Brightness == Brightness)
-		return;
-
-	this->Brightness = Brightness;
-
-	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
-}
-
-float ZEATSkyBox::GetBrightness() const
-{
-	return Brightness;
-}
-
-void ZEATSkyBox::SetColor(const ZEVector3& Color)
-{
-	if (this->Color == Color)
-		return;
-
-	this->Color = Color;
-
-	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
-}
-
-const ZEVector3& ZEATSkyBox::GetColor() const
-{
-	return Constants.Color;
-}
-
 bool ZEATSkyBox::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
@@ -157,7 +106,7 @@ bool ZEATSkyBox::UpdateShaders()
 
 	DirtyFlags.UnraiseFlags(ZEAT_SBDF_SHADERS);
 	DirtyFlags.RaiseFlags(ZEAT_SBDF_RENDER_STATE);
-	
+
 	return true;
 }
 
@@ -174,7 +123,7 @@ bool ZEATSkyBox::UpdateRenderStates()
 	RasterizerStateFrontCCW.SetFrontIsCounterClockwise(true);
 
 	RenderState.SetRasterizerState(RasterizerStateFrontCCW);
-	
+
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
 
@@ -226,11 +175,59 @@ ZEATSkyBox::ZEATSkyBox()
 	Brightness = 1.0f;
 
 	Constants.Color = ZEVector3::One;
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEATSkyBox::~ZEATSkyBox()
 {
 
+}
+
+void ZEATSkyBox::SetTextureFile(const ZEString& FileName)
+{
+	ZEGRTextureCubeOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = false;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+
+	SkyTexture = ZEGRTextureCube::LoadResourceShared(FileName, TextureOptions);
+}
+
+const ZEString& ZEATSkyBox::GetTextureFile() const
+{
+	return SkyTexture != NULL ? SkyTexture->GetName() : ZEString::Empty;
+}
+
+void ZEATSkyBox::SetBrightness(float Brightness)
+{
+	if (this->Brightness == Brightness)
+		return;
+
+	this->Brightness = Brightness;
+
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
+}
+
+float ZEATSkyBox::GetBrightness() const
+{
+	return Brightness;
+}
+
+void ZEATSkyBox::SetColor(const ZEVector3& Color)
+{
+	if (this->Color == Color)
+		return;
+
+	this->Color = Color;
+
+	DirtyFlags.RaiseFlags(ZEAT_SBDF_CONSTANT_BUFFER);
+}
+
+const ZEVector3& ZEATSkyBox::GetColor() const
+{
+	return Constants.Color;
 }
 
 bool ZEATSkyBox::PreRender(const ZERNPreRenderParameters* Parameters)

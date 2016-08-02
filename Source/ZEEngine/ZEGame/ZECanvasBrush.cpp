@@ -51,11 +51,6 @@ ZERNMaterial* ZECanvasBrush::GetMaterial() const
 	return Material;
 }
 
-ZEDrawFlags ZECanvasBrush::GetDrawFlags() const
-{
-	return ZE_DF_DRAW | ZE_DF_CULL;
-}
-
 ZECanvas* ZECanvasBrush::GetCanvas()
 {
 	return &Canvas;
@@ -93,14 +88,9 @@ bool ZECanvasBrush::DeinitializeSelf()
 	return ZEEntity::DeinitializeSelf();
 }
 
-void ZECanvasBrush::Tick(float ElapsedTime)
-{
-
-}
-
 ZECanvasBrush::ZECanvasBrush()
 {
-
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_CULLABLE);
 }
 
 ZECanvasBrush::~ZECanvasBrush()

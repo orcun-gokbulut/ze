@@ -103,8 +103,6 @@ class ZEATCloud : public ZEEntity
 		virtual									~ZEATCloud();
 
 	public:
-		virtual ZEDrawFlags						GetDrawFlags() const;
-
 		void									SetCloudTexture(const ZEString& FileName);
 		const ZEString&							GetCloudTexture() const;
 
@@ -126,7 +124,6 @@ class ZEATCloud : public ZEEntity
 		void									SetTranslation(const ZEVector2& Translation);
 		const ZEVector2&						GetTranslation() const;
 
-		virtual void							Tick(float Time);
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 

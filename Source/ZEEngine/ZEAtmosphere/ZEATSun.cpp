@@ -183,16 +183,13 @@ ZEATSun::ZEATSun()
 	DiskRadius = 0.266f;
 
 	Constants.Color = ZEVector3::One;
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEATSun::~ZEATSun()
 {
 
-}
-
-ZEDrawFlags ZEATSun::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
 }
 
 void ZEATSun::SetDirection(const ZEVector3& Direction)

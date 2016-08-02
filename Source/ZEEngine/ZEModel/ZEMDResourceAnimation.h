@@ -72,6 +72,7 @@ class ZEMDResourceAnimation : public ZERSResource
 		ZEString									Name;
 		ZEArray<ZEMDResourceAnimationFrame>			Frames;
 		ZEArray<ZEGUID>								ItemGUIDS;
+		float										FramesPerSecond;
 
 	public:
 		void										SetName(const ZEString& Name);
@@ -82,6 +83,9 @@ class ZEMDResourceAnimation : public ZERSResource
 
 		void										AddFrame(const ZEMDResourceAnimationFrame& Frame);
 		void										RemoveFrame(ZESize Index);
+
+		void										SetFramesPerSecond(float FramesPerSecond);
+		float										GetFramesPerSecond() const;
 
 		bool										Unserialize(const ZEMLReaderNode& AnimationNode);
 		bool										Serialize(ZEMLWriterNode& AnimationNode) const;

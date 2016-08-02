@@ -90,8 +90,6 @@ class ZEATMoon : public ZEEntity
 		virtual								~ZEATMoon();
 
 	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
-
 		void								SetTextureFile(const ZEString& FileName, ZEUInt HorizTileCount, ZEUInt VertTileCount);
 		const ZEString&						GetTextureFile() const;
 

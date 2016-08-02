@@ -649,6 +649,12 @@ void ZEDTransformationManager::ViewportRenderEvent(const ZEDViewportRenderEvent*
 		if (TransformStates[I].Gizmo == NULL)
 			continue;
 
+		if (!TransformStates[I].Gizmo->IsInitialized())
+		{
+			TransformStates[I].Gizmo->Initialize();
+			continue;
+		}
+
 		TransformStates[I].Gizmo->PreRender(&PreRenderParameters);
 	}
 	PreRenderParameters.Renderer->EndScene();

@@ -560,16 +560,13 @@ ZEATAtmosphere::ZEATAtmosphere()
 	MoonLight = NULL;
 
 	memset(&Constants, 0, sizeof(Constants));
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEATAtmosphere::~ZEATAtmosphere()
 {
 
-}
-
-ZEDrawFlags ZEATAtmosphere::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
 }
 
 void ZEATAtmosphere::SetSunLight(ZELightDirectional* SunLight)

@@ -77,7 +77,9 @@ class ZEModelAnimationTrack : public ZEObject
 		bool									Looping;
 
 		ZERSHolder<const ZEMDResourceAnimation>	Resource;
-
+		
+		void									SetState(ZEModelAnimationState State);
+		
 		void									BindAnimation();
 		void									UpdateAnimation();
 		void									UpdateMeshesAndBones();
@@ -86,14 +88,15 @@ class ZEModelAnimationTrack : public ZEObject
 	public:
 		ZEModel*								GetModel();
 
-		void									SetState(ZEModelAnimationState State);
 		ZEModelAnimationState					GetState();
 
 		void									SetLOD(ZEUInt LOD);
 		ZEUInt									GetLOD();
 
-		void									SetSpeed(float FPS);
+		void									SetSpeed(float Speed);
 		float									GetSpeed();
+
+		float									GetFrameRate();
 
 		void									SetBlendMode(ZEModelAnimationBlendMode Mode);
 		ZEModelAnimationBlendMode				GetBlendMode();

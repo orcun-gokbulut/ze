@@ -136,16 +136,13 @@ ZELight::ZELight()
 
 	ViewTransform = ZEMatrix4x4::Identity;
 	ProjectionTransform = ZEMatrix4x4::Identity;
+
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_CULLABLE);
 }
 
 ZELight::~ZELight()
 {
 
-}
-
-ZEDrawFlags ZELight::GetDrawFlags() const
-{
-	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE | ZE_DF_CULL;
 }
 
 void ZELight::SetCastsShadow(bool NewValue)

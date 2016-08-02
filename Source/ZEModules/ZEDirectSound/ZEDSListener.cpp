@@ -79,6 +79,7 @@ void ZEDSListener::ResetParameters()
 
 ZEDSListener::ZEDSListener()
 {
+	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
 ZEDSListener::~ZEDSListener()

@@ -45,6 +45,7 @@
 #include "ZEGraphics/ZEGRResource.h"
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNRenderer.h"
+#include "ZERenderer/ZERNRenderParameters.h"
 
 
 void ZEModel::CalculateBoundingBox() const
@@ -154,6 +155,33 @@ void ZEModel::ParentTransformChanged()
 	DirtyBoundingBox = true;
 }
 
+void ZEModel::AnimationStateChanged()
+{
+	if (AnimationTrack == NULL && AnimationTracks.GetCount() == 0)
+	{
+		SetEntityFlags(GetEntityFlags() & ~ZE_EF_TICKABLE);
+	}
+	else
+	{
+		if (AnimationTrack != NULL && AnimationTrack->GetState() == ZE_MAS_PLAYING)
+		{
+			SetEntityFlags(GetEntityFlags() | ZE_EF_TICKABLE);
+			return;
+		}
+
+		for(ZESize I = 0; I < AnimationTracks.GetCount(); I++)
+		{
+			if (AnimationTracks[I]->GetState() == ZE_MAS_PLAYING)
+			{
+				SetEntityFlags(GetEntityFlags() | ZE_EF_TICKABLE);
+				return;
+			}
+			
+			SetEntityFlags(GetEntityFlags() & (~ZE_EF_TICKABLE));
+		}
+	}
+}
+
 ZEEntityResult ZEModel::LoadInternal()
 {
 	if (Resource == NULL)
@@ -261,9 +289,20 @@ ZEEntityResult ZEModel::UnloadInternal()
 	return ZE_ER_DONE;
 }
 
-ZEDrawFlags ZEModel::GetDrawFlags() const
+ZEModel::ZEModel()
 {
-	return ZE_DF_CULL | ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER;
+	Resource = NULL;
+	AnimationUpdateMode = ZE_MAUM_LOGICAL;
+	BoundingBoxIsUserDefined = false;
+	DirtyBoundingBox = true;
+	DirtyConstantBufferSkin = true;
+
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_CULLABLE);
+}
+
+ZEModel::~ZEModel()
+{
+	Unload();
 }
 
 const ZEList2<ZEModelMesh>& ZEModel::GetMeshes()
@@ -526,7 +565,12 @@ ZEModelAnimationType ZEModel::GetAnimationType()
 
 void ZEModel::SetAnimationUpdateMode(ZEModelAnimationUpdateMode AnimationUpdateMode)
 {
+	if (this->AnimationUpdateMode == AnimationUpdateMode)
+		return;
+
 	this->AnimationUpdateMode = AnimationUpdateMode;
+
+	AnimationStateChanged();
 }
 
 ZEModelAnimationUpdateMode ZEModel::GetAnimationUpdateMode()
@@ -576,20 +620,6 @@ void ZEModel::Tick(float ElapsedTime)
 
 	ze_for_each(IKChain, IKChains)
 		IKChain->Process();
-}
-
-ZEModel::ZEModel()
-{
-	Resource = NULL;
-	AnimationUpdateMode = ZE_MAUM_LOGICAL;
-	BoundingBoxIsUserDefined = false;
-	DirtyBoundingBox = true;
-	DirtyConstantBufferSkin = true;
-}
-
-ZEModel::~ZEModel()
-{
-	Unload();
 }
 
 void ZEModel::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)

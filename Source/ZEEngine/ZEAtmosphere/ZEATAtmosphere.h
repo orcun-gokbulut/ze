@@ -147,8 +147,6 @@ class ZEATAtmosphere : public ZEEntity
 		virtual							~ZEATAtmosphere();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
 		void							SetObserver(const ZEATObserver& Observer);
 		const ZEATObserver&				GetObserver() const;
 

@@ -202,13 +202,6 @@ ZESteeringOutput ZESteeringPlayerFree::Process(float ElapsedTime)
 	return Output;
 }
 
-
-
-ZEDrawFlags ZEPlayer::GetDrawFlags()
-{
-	return ZE_DF_NONE | ZE_DF_LIGHT_SOURCE;
-}
-
 ZECamera* ZEPlayer::GetCamera()
 {
 	return Camera;
@@ -271,6 +264,8 @@ ZEPlayer::ZEPlayer()
 
 	Listener = ZEListener::CreateInstance();
 	AddComponent(Listener);
+
+	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
 ZEPlayer::~ZEPlayer()

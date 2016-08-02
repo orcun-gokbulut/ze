@@ -91,8 +91,6 @@ class ZEDGrid : public ZEEntity
 										ZEDGrid();
 
 	public:
-		ZEDrawFlags						GetDrawFlags() const;
-
 		void							SetGridSize(const ZEVector2& Size);
 		const ZEVector2&				GetGridSize();
 

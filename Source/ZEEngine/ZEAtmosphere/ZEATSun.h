@@ -87,8 +87,6 @@ class ZEATSun : public ZEEntity
 		virtual							~ZEATSun();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
 		void							SetDirection(const ZEVector3& Direction);
 		const ZEVector3&				GetDirection() const;
 

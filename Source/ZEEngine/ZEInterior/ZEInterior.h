@@ -94,8 +94,6 @@ class ZEInterior : public ZEEntity
 		ZEInteriorDoor*							GetDoor(const ZEString& Name);
 		ZEInteriorHelper*						GetHelper(const ZEString& Name);
 
-		virtual ZEDrawFlags						GetDrawFlags() const;
-
 		virtual void							SetInteriorFile(const ZEString& InteriorFile);
 		virtual const ZEString&					GetInteriorFile() const;
 

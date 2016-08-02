@@ -65,6 +65,7 @@ class ZERNPreRenderParameters;
 class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 {
 	ZE_OBJECT
+	friend class ZEEntity;
 	private:
 		ZEFlags									SceneDirtyFlags;
 		ZEUInt									LastEntityId;
@@ -77,6 +78,9 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEVector3								AmbientColor;
 		ZELock									SceneLock;
 
+		ZEList2<ZEEntity>						TickList;
+		ZEList2<ZEEntity>						RenderList;
+
 		struct
 		{
 			ZEVector3							AmbientColor;
@@ -84,6 +88,14 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		} Constants;
 
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
+
+		void									AddToTickList(ZEEntity* Entity);
+		void									RemoveFromTickList(ZEEntity* Entity);
+
+		void									AddToRenderList(ZEEntity* Entity);
+		void									RemoveFromRenderList(ZEEntity* Entity);
+
+		void									EntityBoundingBoxChanged(ZEEntity* Entity);
 
 		void									UpdateConstantBuffer();
 
@@ -93,6 +105,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		
 		bool									InitializeInternal();
 		bool									DeinitializeInternal();
+
 
 												ZEScene();
 		virtual									~ZEScene();
@@ -115,6 +128,8 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		void									SetAmbientColor(ZEVector3 Color);
 		const ZEVector3&						GetAmbientColor() const;
+
+		ZEUInt									GetLoadingPercentage();
 
 		const ZESmartArray<ZEEntity*>&			GetEntities();
 		ZEArray<ZEEntity*>						GetEntities(ZEClass* Class);
