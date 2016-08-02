@@ -70,6 +70,10 @@ class ZEActor : public ZEEntity
 
 		ZEArray<ZESteering*>		Steerings;
 
+	protected:
+									ZEActor();
+		virtual						~ZEActor();
+
 	public:
 		void						SetLinearVelocity(const ZEVector3& Velocity);
 		const ZEVector3&			GetLinearVelocity();
@@ -106,9 +110,6 @@ class ZEActor : public ZEEntity
 		void						RemoveSteering(ZESteering* Steering);
 
 		virtual void				Tick(float ElapsedTime);
-
-									ZEActor();
-									~ZEActor();
 };
 
 #endif

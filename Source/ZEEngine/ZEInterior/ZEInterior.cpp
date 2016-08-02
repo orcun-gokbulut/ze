@@ -52,11 +52,6 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZERenderer/ZERNRenderParameters.h"
 
-ZEDrawFlags ZEInterior::GetDrawFlags() const
-{
-	return ZE_DF_DRAW | ZE_DF_LIGHT_RECEIVER | ZE_DF_CULL;
-}
-
 void ZEInterior::LoadInteriorResource()
 {
 	for (ZESize I = 0; I < Rooms.GetCount(); I++)
@@ -111,6 +106,8 @@ ZEInterior::ZEInterior()
 {
 	InteriorResource = NULL;
 	CullMode = ZE_ICM_NONE;
+
+	SetEntityFlags(ZE_EF_RENDERABLE |  ZE_EF_CULLABLE);
 }
 
 ZEInterior::~ZEInterior()

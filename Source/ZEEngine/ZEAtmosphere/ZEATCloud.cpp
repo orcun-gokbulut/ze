@@ -253,16 +253,13 @@ ZEATCloud::ZEATCloud()
 	Constants.Inscattering = 0.05f;
 	Constants.LightDirection = ZEVector3::One;
 	Constants.Translation = ZEVector2::Zero;
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEATCloud::~ZEATCloud()
 {
 
-}
-
-ZEDrawFlags ZEATCloud::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
 }
 
 void ZEATCloud::SetCloudTexture(const ZEString& FileName)
@@ -375,10 +372,13 @@ const ZEVector2& ZEATCloud::GetTranslation() const
 	return Constants.Translation;
 }
 
-void ZEATCloud::Tick(float Time)
+bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
 {
+	if (!ZEEntity::PreRender(Parameters))
+		return false;
+
 	static ZEVector2 Translation = ZEVector2(0.0f, 0.0f);
-	Translation += Time * ZEVector2(0.0001f, 0.0003f);
+	Translation += Parameters->ElapsedTime * ZEVector2(0.0001f, 0.0003f);
 
 	if (Translation.x > 1.0f)
 		Translation.x = 0.0f;
@@ -387,12 +387,6 @@ void ZEATCloud::Tick(float Time)
 		Translation.y = 0.0f;
 
 	SetTranslation(Translation);
-}
-
-bool ZEATCloud::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-	if (!ZEEntity::PreRender(Parameters))
-		return false;
 
 	Parameters->Renderer->AddCommand(&RenderCommand);
 

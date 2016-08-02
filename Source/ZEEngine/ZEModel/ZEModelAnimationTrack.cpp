@@ -47,9 +47,20 @@
 
 #include <string.h>
 
+void ZEModelAnimationTrack::SetState(ZEModelAnimationState State)
+{
+	if (this->State == State)
+		return;
+
+	this->State = State;
+
+	if (GetModel() != NULL)
+		GetModel()->AnimationStateChanged();
+}
+
 void ZEModelAnimationTrack::UpdateAnimation()
 {
-	if (State == ZE_MAS_PLAYING && !(BlendFactor == 0.0f)) // && !(LOD != -1 && Model->ActiveLOD > LOD) //ActiveLOD Removed from Model.
+	if (GetState() == ZE_MAS_PLAYING && !(BlendFactor == 0.0f)) // && !(LOD != -1 && Model->ActiveLOD > LOD) //ActiveLOD Removed from Model.
 	{
 		UpdateMeshesAndBones();
 	}
@@ -183,14 +194,6 @@ ZEModel* ZEModelAnimationTrack::GetModel()
 	return Model;
 }
 
-void ZEModelAnimationTrack::SetState(ZEModelAnimationState State)
-{
-	if (Animation == NULL)
-		State = ZE_MAS_STOPPED;
-	else
-		this->State = State;
-}
-
 ZEModelAnimationState ZEModelAnimationTrack::GetState()
 {
 	return State;
@@ -208,8 +211,14 @@ ZEUInt ZEModelAnimationTrack::GetLOD()
 
 void ZEModelAnimationTrack::SetResource(ZERSHolder<const ZEMDResourceAnimation> Resource)
 {
+	if (this->Resource == Resource)
+		return;
+
+	Stop();
+
 	this->Resource = Resource;
 	Animation = Resource;
+
 	ApplyLimits();
 }
 
@@ -241,7 +250,7 @@ void ZEModelAnimationTrack::SetCurrentFrameByTime(float Seconds)
 	if (Animation->GetFrames().GetCount() == 0)
 		return;
 
-	float TempCurrentFrameValue = (Speed * Seconds);
+	float TempCurrentFrameValue = (GetFrameRate() * Seconds);
 
 	if (TempCurrentFrameValue > (float)Animation->GetFrames().GetCount() - 1.0f)
 	{
@@ -285,7 +294,7 @@ float ZEModelAnimationTrack::GetCurrentFrameByTime()
 	if (Animation->GetFrames().GetCount() == 0)
 		return 0.0f;
 
-	return CurrentFrame / Speed;
+	return CurrentFrame / GetFrameRate();
 
 }
 
@@ -316,7 +325,7 @@ void ZEModelAnimationTrack::SetStartFrameByTime(float Seconds)
 	if (Animation->GetFrames().GetCount() == 0)
 		return;
 
-	ZEUInt TempStartFrameValue = (ZEUInt)(Speed * Seconds);
+	ZEUInt TempStartFrameValue = (ZEUInt)(GetFrameRate() * Seconds);
 
 	if (TempStartFrameValue > (ZEUInt)Animation->GetFrames().GetCount() - 1)
 	{
@@ -359,7 +368,7 @@ float ZEModelAnimationTrack::GetStartFrameByTime()
 	if (Animation->GetFrames().GetCount() == 0)
 		return 0.0f;
 
-	return (float)StartFrame / Speed;
+	return (float)StartFrame / GetFrameRate();
 }
 
 float ZEModelAnimationTrack::GetStartFrameByPercentage()
@@ -389,7 +398,7 @@ void ZEModelAnimationTrack::SetEndFrameByTime(float Seconds)
 	if (Animation->GetFrames().GetCount() == 0)
 		return;
 
-	ZEUInt TempEndFrameValue = (ZEUInt)(Speed * Seconds);
+	ZEUInt TempEndFrameValue = (ZEUInt)(GetFrameRate() * Seconds);
 
 	if (TempEndFrameValue > (ZEUInt)Animation->GetFrames().GetCount() - 1)
 	{
@@ -433,7 +442,7 @@ float ZEModelAnimationTrack::GetEndFrameByTime()
 	if (Animation->GetFrames().GetCount() == 0)
 		return 0.0f;
 
-	return (float)EndFrame / Speed;
+	return (float)EndFrame / GetFrameRate();
 }
 
 float ZEModelAnimationTrack::GetEndFrameByPercentage()
@@ -499,14 +508,22 @@ float ZEModelAnimationTrack::GetBlendFactor()
 	return BlendFactor;
 }
 
-void ZEModelAnimationTrack::SetSpeed(float FPS)
+void ZEModelAnimationTrack::SetSpeed(float Speed)
 {
-	Speed = FPS;
+	this->Speed = Speed;
 }
 
 float ZEModelAnimationTrack::GetSpeed()
 {
 	return Speed;
+}
+
+float ZEModelAnimationTrack::GetFrameRate()
+{
+	if (Animation != NULL)
+		return Speed / Animation->GetFramesPerSecond();
+	else
+		return Speed / 30.0f;
 }
 
 void ZEModelAnimationTrack::SetBlendMode(ZEModelAnimationBlendMode Mode)
@@ -521,27 +538,24 @@ ZEModelAnimationBlendMode ZEModelAnimationTrack::GetBlendMode()
 
 void ZEModelAnimationTrack::Play()
 {
-	if (State == ZE_MAS_PLAYING)
+	if (GetState() == ZE_MAS_PLAYING)
 		return;
 
 	if (Animation == NULL)
 	{
-		State = ZE_MAS_STOPPED;
+		SetState(ZE_MAS_STOPPED);
 		return;
 	}
 
 	CurrentFrame = (float)EffectiveStartFrame;
 	
-	State = ZE_MAS_PLAYING;
+	SetState(ZE_MAS_PLAYING);
 }
 
 void ZEModelAnimationTrack::Play(ZEUInt StartFrame, ZEUInt EndFrame)
 {
 	if (Animation == NULL)
-	{
-		State = ZE_MAS_STOPPED;
 		return;
-	}
 
 	LimitsEnabled = true;
 
@@ -552,44 +566,39 @@ void ZEModelAnimationTrack::Play(ZEUInt StartFrame, ZEUInt EndFrame)
 
 	CurrentFrame = (float)EffectiveStartFrame;
 	
-	State = ZE_MAS_PLAYING;
+	SetState(ZE_MAS_PLAYING);
 }
 
 void ZEModelAnimationTrack::Resume()
 {
 	if (Animation == NULL)
-	{
-		State = ZE_MAS_STOPPED;
 		return;
-	}
 
 	ApplyLimits();
 
 	if (CurrentFrame > (float)EffectiveEndFrame)
 		CurrentFrame = (float)EffectiveEndFrame;
 
-	State = ZE_MAS_PLAYING;
+	SetState(ZE_MAS_PLAYING);
 }
 
 void ZEModelAnimationTrack::Pause()
 {
-	State = ZE_MAS_PAUSED;
+	SetState(ZE_MAS_PAUSED);
 }
 
 void ZEModelAnimationTrack::Stop()
 {
-	State = ZE_MAS_STOPPED;
 	Tick(0.0f);
+	SetState(ZE_MAS_STOPPED);
 }
-
-
 
 void ZEModelAnimationTrack::Tick(float ElapsedTime)
 {
 	if (BlendFactor == 0.0f)
 		return;
 
-	if (State == ZE_MAS_PLAYING)
+	if (GetState() == ZE_MAS_PLAYING)
 	{
 		// Check LOD status if Model's current LOD is lower than current track do not calculate it
 // 		if (LOD != -1 && Owner->ActiveLOD > LOD)
@@ -598,7 +607,7 @@ void ZEModelAnimationTrack::Tick(float ElapsedTime)
 // 		}
 
 		//Update CurrentFrame
-		CurrentFrame += Speed * ElapsedTime;
+		CurrentFrame += GetFrameRate() * ElapsedTime;
 
 		// Check animation limits
 		if (CurrentFrame >= (float)EffectiveEndFrame)
@@ -613,7 +622,7 @@ void ZEModelAnimationTrack::Tick(float ElapsedTime)
 			{
 				// End Animation
 				CurrentFrame = (float)EffectiveEndFrame;
-				State = ZE_MAS_STOPPED;
+				SetState(ZE_MAS_STOPPED);
 				return;
 			}
 		}
@@ -622,21 +631,21 @@ void ZEModelAnimationTrack::Tick(float ElapsedTime)
 
 ZEModelAnimationTrack::ZEModelAnimationTrack() : ModelLink(this)
 {
-	Model			= NULL;
-	Animation		= NULL;	
-	State			= ZE_MAS_STOPPED;
+	Model = NULL;
+	Animation = NULL;	
+	State = ZE_MAS_STOPPED;
 
 	EffectiveStartFrame = 0;
 	EffectiveEndFrame = 0;
 	LimitsEnabled = false;
 
-	CurrentFrame	= 0.0f;
-	StartFrame		= 0;
-	EndFrame		= 0;
+	CurrentFrame = 0.0f;
+	StartFrame = 0;
+	EndFrame = 0;
 
-	Speed			= 30.0f;
-	BlendFactor		= 0.5f;
-	Looping			= false;
-	BlendMode		= ZE_MABM_INTERPOLATE;
-	LOD				= 0;
+	Speed = 30.0f;
+	BlendFactor	= 0.5f;
+	Looping = false;
+	BlendMode = ZE_MABM_INTERPOLATE;
+	LOD = 0;
 }

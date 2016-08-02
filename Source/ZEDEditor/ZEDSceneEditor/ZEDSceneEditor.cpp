@@ -122,7 +122,6 @@ bool ZEDSceneEditor::InitializeInternal()
 	Scene->AddEntity(Atmosphere);
 
 	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
-	SkyBox->SetTextureFile("#R:/ZEEngine/ZEAtmosphere/Textures/StarMap.png");
 	Scene->AddEntity(SkyBox);
 
 	GetObjectManager()->GetRootWrapper()->Update();

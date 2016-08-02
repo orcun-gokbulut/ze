@@ -209,16 +209,13 @@ ZELightDirectional::ZELightDirectional()
 
 	Command.Entity = this;
 	Command.Priority = 1;
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZELightDirectional::~ZELightDirectional()
 {
 
-}
-
-ZEDrawFlags ZELightDirectional::GetDrawFlags() const
-{
-	return ZE_DF_DRAW | ZE_DF_LIGHT_SOURCE;
 }
 
 void ZELightDirectional::SetCascadeCount(ZEUInt CascadeCount)

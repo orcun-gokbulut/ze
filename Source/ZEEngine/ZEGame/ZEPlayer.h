@@ -78,8 +78,6 @@ class ZEPlayer : public ZEActor
 		virtual					~ZEPlayer();
 
 	public:
-		virtual ZEDrawFlags		GetDrawFlags();
-
 		ZECamera*				GetCamera();
 		ZEListener*				GetListener();
 

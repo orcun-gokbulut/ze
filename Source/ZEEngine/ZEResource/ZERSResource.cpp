@@ -61,7 +61,10 @@ void ZERSResource::Release() const
 	else
 	{
 		if (ReferenceCount <= 0)
+		{
 			Destroy();
+			return;
+		}
 	}
 	ReferenceCountLock.Unlock();
 }
@@ -81,6 +84,8 @@ void ZERSResource::Destroy() const
 
 	Resource->TargetState = ZERS_RS_DESTROYED;
 	Resource->PreDestroy();
+	ReferenceCountLock.Unlock();
+
 	Resource->UpdateStateTask.Run();
 }
 
@@ -497,6 +502,9 @@ ZEUInt ZERSResource::GetLoadProgress() const
 	}
 
 	ResourceLock.Unlock();
+
+	if (TotalItems == 0)
+		return 0;
 
 	return TotalProgress / TotalItems;
 }

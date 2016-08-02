@@ -59,55 +59,33 @@
 
 void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 {
-	if (!Entity->IsInitialized())
-		return;
+	bool Custom = Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM);
+	bool Initialized = Entity->IsInitialized();
 
-	if (!Entity->GetEnabled())
-		return;
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized(), "Ticking an entity which is not initialized.");
+	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
 
 	Entity->Tick(ElapsedTime);
-
-	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
-	for (ZESize N = 0; N < Components.GetCount(); N++)
-		TickEntity(Components[N], ElapsedTime);
-
-
-	const ZEArray<ZEEntity*>& SubEntities = Entity->GetChildEntities();
-	for (ZESize N = 0; N < SubEntities.GetCount(); N++)
-		TickEntity(SubEntities[N], ElapsedTime);
-
 }
 
 void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
-	if (!Entity->IsLoaded())
-		return;
-	
-	if (!Entity->GetVisible())
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "PreRendering an entity which is not loaded.");
+	zeDebugCheck(!Entity->GetVisible(), "PreRendering an entity which is not visible.");
+
+	if (!Entity->IsInitialized())
 		return;
 
-	ZEUInt EntityDrawFlags = Entity->GetDrawFlags();
-
-	if ((EntityDrawFlags & ZE_DF_DRAW) == ZE_DF_DRAW)
+	bool Cullable = Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE);
+	if (Cullable && Parameters->View->ViewVolume != NULL)
 	{
-		if ((EntityDrawFlags & ZE_DF_CULL) == ZE_DF_CULL && Parameters->View->ViewVolume != NULL)
-		{
-			if (!Parameters->View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
-				Entity->PreRender(Parameters);
-		}
-		else
-		{
+		if (!Parameters->View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
 			Entity->PreRender(Parameters);
-		}
 	}
-
-	const ZEArray<ZEEntity*>& Components = Entity->GetComponents();
-	for (ZESize I = 0; I < Components.GetCount(); I++)
-		PreRenderEntity(Components[I], Parameters);
-
-	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-		PreRenderEntity(ChildEntities[I], Parameters);
+	else
+	{
+		Entity->PreRender(Parameters);
+	}
 }
 
 void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters)
@@ -189,6 +167,65 @@ bool ZEScene::DeinitializeInternal()
 	return ZEInitializable::DeinitializeInternal();
 }
 
+void ZEScene::AddToTickList(ZEEntity* Entity)
+{
+	bool Custom = Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM);
+	bool Initialized = Entity->IsInitialized();
+
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized(), "Ticking an entity which is not initialized.");
+	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
+
+
+	if (Entity->TickListLink.GetInUse())
+		return;
+
+	ZE_LOCK_SECTION(SceneLock)
+	{
+		TickList.AddEnd(&Entity->TickListLink);
+	}
+}
+
+void ZEScene::RemoveFromTickList(ZEEntity* Entity)
+{
+	if (!Entity->TickListLink.GetInUse())
+		return;
+
+	ZE_LOCK_SECTION(SceneLock)
+	{
+		TickList.Remove(&Entity->TickListLink);
+	}
+}
+
+void ZEScene::AddToRenderList(ZEEntity* Entity)
+{
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "PreRendering an entity which is not loaded.");
+	zeDebugCheck(!Entity->GetVisible(), "PreRendering an entity which is not visible.");
+
+	if (Entity->RenderListLink.GetInUse())
+		return;
+
+	ZE_LOCK_SECTION(SceneLock)
+	{
+		RenderList.AddEnd(&Entity->RenderListLink);
+	}
+}
+
+void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
+{
+	if (!Entity->RenderListLink.GetInUse())
+		return;
+
+	ZE_LOCK_SECTION(SceneLock)
+	{
+		RenderList.Remove(&Entity->RenderListLink);
+	}
+}
+
+void ZEScene::EntityBoundingBoxChanged(ZEEntity* Entity)
+{
+
+}
+
 void ZEScene::UpdateConstantBuffer()
 {
 	if (!SceneDirtyFlags.GetFlags(ZE_SDF_CONSTANT_BUFFER))
@@ -267,6 +304,21 @@ const ZEVector3& ZEScene::GetAmbientColor() const
 	return AmbientColor;
 }
 
+
+ZEUInt ZEScene::GetLoadingPercentage()
+{
+	ZESize Total = 0;
+	ZE_LOCK_SECTION(SceneLock)
+	{
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+			Total += Entities[I]->GetLoadingPercentage();
+
+		Total /= Entities.GetCount() * 100;
+	}
+
+	return (ZEUInt)Total;
+}
+
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
 {
 	return Entities;
@@ -335,16 +387,16 @@ void ZEScene::Tick(float ElapsedTime)
 	if (!Enabled)
 		return;
 
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		TickEntity(Entities[I], ElapsedTime);
+	ze_for_each(Entity, TickList)
+		TickEntity(Entity.GetPointer(), ElapsedTime);
 }
 
 void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	Parameters->Renderer->StartScene(GetConstantBuffer());
 
-	for (ZESize I = 0; I < Entities.GetCount(); I++)
-		PreRenderEntity(Entities[I], Parameters);
+	ze_for_each(Entity, RenderList)
+		PreRenderEntity(Entity.GetPointer(), Parameters);
 
 	Parameters->Renderer->EndScene();
 }

@@ -59,8 +59,6 @@ class ZEParticleEffect : public ZEEntity
 		virtual								~ZEParticleEffect();
 
 	public:
-		virtual	ZEDrawFlags					GetDrawFlags() const;
-
 		const ZEArray<ZEParticleEmitter*>&	GetEmitters();
 		void								ResetEmitters();
 		void								AddEmitter(ZEParticleEmitter* Emitter);

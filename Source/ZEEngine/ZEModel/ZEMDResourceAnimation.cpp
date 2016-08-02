@@ -66,12 +66,24 @@ void ZEMDResourceAnimation::RemoveFrame(ZESize Index)
 	Frames.Remove(Index);
 }
 
+
+void ZEMDResourceAnimation::SetFramesPerSecond(float FramesPerSecond)
+{
+	this->FramesPerSecond = FramesPerSecond;
+}
+
+float ZEMDResourceAnimation::GetFramesPerSecond() const
+{
+	return FramesPerSecond;
+}
+
 bool ZEMDResourceAnimation::Unserialize(const ZEMLReaderNode& AnimationNode)
 {
 	zeCheckError(!AnimationNode.IsValid(), false, "Invalid Animation node.");
 	zeCheckError(AnimationNode.GetName() == "Animation", false, "Invalid Animation node name.");
 	
 	SetName(AnimationNode.ReadString("Name"));
+	FramesPerSecond = AnimationNode.ReadFloat("FramesPerSecond", 30);
 	ZEUInt BoneKeyCount = AnimationNode.ReadUInt32("BoneKeyCount");
 	ZEUInt MeshKeyCount = AnimationNode.ReadUInt32("MeshKeyCount");
 	ZEUInt FrameKeyCount = BoneKeyCount + MeshKeyCount;
@@ -104,8 +116,10 @@ bool ZEMDResourceAnimation::Serialize(ZEMLWriterNode& AnimationNode) const
 
 ZEMDResourceAnimation::ZEMDResourceAnimation() : Link(this)
 {
+	FramesPerSecond = 30; 
 	Register();
 }
+
 ZEMDResourceAnimation::~ZEMDResourceAnimation()
 {
 	Unregister();

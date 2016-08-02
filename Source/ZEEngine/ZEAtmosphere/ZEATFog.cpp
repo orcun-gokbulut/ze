@@ -164,16 +164,13 @@ ZEATFog::ZEATFog()
 	Constants.Density = 0.5f;
 	Constants.StartDistance = 0.0f;
 	Constants.Color = ZEVector3(0.5f);
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEATFog::~ZEATFog()
 {
 
-}
-
-ZEDrawFlags ZEATFog::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
 }
 
 void ZEATFog::SetDensity(float Density)

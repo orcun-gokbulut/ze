@@ -85,8 +85,6 @@ class ZEATSkyBox : public ZEEntity
 		virtual								~ZEATSkyBox();
 
 	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
-
 		void								SetTextureFile(const ZEString& FileName);
 		const ZEString&						GetTextureFile() const;
 	

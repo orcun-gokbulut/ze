@@ -68,7 +68,7 @@ void ZEALListener::ResetParameters()
 
 ZEALListener::ZEALListener()
 {
-
+	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
 ZEALListener::~ZEALListener()

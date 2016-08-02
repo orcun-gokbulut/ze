@@ -41,6 +41,31 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEMath.h"
 
+
+ZEActor::ZEActor()
+{
+	static ZEInt Index		= 0;
+	MinLinearAcceleration	= 0.01f;
+	MinAngularAcceleration	= 0.01f;
+	MaxAngularVelocity		= ZE_PI_2;
+	MaxLinearVelocity		= 1.0f;
+	LinearVelocity			= ZEVector3::Zero;
+	AngularVelocity			= ZEQuaternion::Identity;
+	LinearAcceleration		= ZEVector3::Zero;
+	AngularAcceleration		= ZEQuaternion::Identity;
+
+	MaxAngularAcceleration	= 1.0f;
+	MaxLinearAcceleration	= 1.0f;
+	Radius					= 1.0f;
+
+	SetEntityFlags(ZE_EF_TICKABLE);
+}
+
+ZEActor::~ZEActor()
+{
+}
+
+
 void ZEActor::SetLinearVelocity(const ZEVector3& Velocity)
 {
 	LinearVelocity = Velocity;
@@ -262,25 +287,4 @@ void ZEActor::Tick(float ElapsedTime)
 
 
 	ZEEntity::Tick(ElapsedTime);
-}
-
-ZEActor::ZEActor()
-{
-	static ZEInt Index		= 0;
-	MinLinearAcceleration	= 0.01f;
-	MinAngularAcceleration	= 0.01f;
-	MaxAngularVelocity		= ZE_PI_2;
-	MaxLinearVelocity		= 1.0f;
-	LinearVelocity			= ZEVector3::Zero;
-	AngularVelocity			= ZEQuaternion::Identity;
-	LinearAcceleration		= ZEVector3::Zero;
-	AngularAcceleration		= ZEQuaternion::Identity;
-
-	MaxAngularAcceleration	= 1.0f;
-	MaxLinearAcceleration	= 1.0f;
-	Radius					= 1.0f;
-}
-
-ZEActor::~ZEActor()
-{
 }

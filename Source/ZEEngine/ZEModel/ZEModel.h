@@ -96,6 +96,7 @@ class ZEModel : public ZEEntity
 		virtual void							ChildBoundingBoxChanged();
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();
+		void									AnimationStateChanged();
 
 	protected:
 		virtual ZEEntityResult					LoadInternal();
@@ -105,8 +106,6 @@ class ZEModel : public ZEEntity
 		virtual									~ZEModel();
 
 	public:
-		virtual ZEDrawFlags						GetDrawFlags() const;
-
 		const ZEList2<ZEModelMesh>&				GetMeshes();
 		ZEModelMesh*							GetMesh(ZEUInt32 Id);
 		ZEModelMesh*							GetMesh(const char* Name);

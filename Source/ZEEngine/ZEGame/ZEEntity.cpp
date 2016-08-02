@@ -59,6 +59,75 @@ void ZEEntity::SetWrapper(ZEDObjectWrapper* Wrapper)
 	this->Wrapper = Wrapper;
 }
 
+void ZEEntity::UpdateTickabilityState()
+{
+	if (GetScene() == NULL)
+		return;
+
+	bool Tickable = EnabledFlattened &&
+		(GetEntityFlags().GetFlags(ZE_EF_TICKABLE) && IsInitialized() ||
+		GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM));
+
+	if (Tickable)
+		GetScene()->AddToTickList(this);
+	else
+		GetScene()->RemoveFromTickList(this);
+}
+
+void ZEEntity::UpdateRenderabilityState()
+{
+	if (GetScene() == NULL)
+		return;
+
+	bool Renderable = VisibleFlattened &&
+		(GetEntityFlags().GetFlags(ZE_EF_RENDERABLE) && IsLoaded() ||
+		 GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM));
+
+	if (Renderable)
+		GetScene()->AddToRenderList(this);
+	else
+		GetScene()->RemoveFromRenderList(this);
+}
+
+
+void ZEEntity::ParentVisibleChanged()
+{
+	bool NewState = GetVisible();
+	if (GetParent() != NULL)
+		NewState &= GetParent()->VisibleFlattened;
+
+	if (VisibleFlattened == NewState)
+		return;
+
+	VisibleFlattened = NewState;
+	UpdateRenderabilityState();
+
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->ParentVisibleChanged();
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		ChildEntities[I]->ParentVisibleChanged();
+}
+
+void ZEEntity::ParentEnabledChanged()
+{
+	bool NewState = GetEnabled();
+	if (GetParent() != NULL)
+		NewState &= GetParent()->EnabledFlattened;
+
+	if (EnabledFlattened == NewState)
+		return;
+
+	EnabledFlattened = NewState;
+	UpdateTickabilityState();
+
+	for (ZESize I = 0; I < Components.GetCount(); I++)
+		Components[I]->ParentEnabledChanged();
+
+	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+		ChildEntities[I]->ParentEnabledChanged();
+}
+
 ZEDObjectWrapper* ZEEntity::GetWrapper() const
 {
 	return Wrapper;
@@ -89,11 +158,17 @@ void ZEEntity::ParentTransformChanged()
 
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 		ChildEntities[I]->ParentTransformChanged();
+
+	if (GetStatic() && GetScene() != NULL)
+		GetScene()->EntityBoundingBoxChanged(this);
 }
 
 void ZEEntity::BoundingBoxChanged()
 {
 	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
+
+	if (GetStatic() && GetScene() != NULL)
+		GetScene()->EntityBoundingBoxChanged(this);
 }
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
@@ -231,11 +306,31 @@ void ZEEntity::SetParent(ZEEntity* Parent)
 {
 	this->Parent = Parent;
 	ParentTransformChanged();
+	ParentEnabledChanged();
+	ParentVisibleChanged();
 }
 
-void ZEEntity::SetScene(ZEScene* Scene)
+void ZEEntity::SetScene(ZEScene* NewScene)
 {
-	this->Scene = Scene;
+	if (Scene == NewScene)
+		return;
+
+	if (Scene != NULL)
+	{
+		if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM))
+			Scene->RemoveFromTickList(this);
+
+		if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM))
+			Scene->RemoveFromRenderList(this);
+	}
+
+	Scene = NewScene;
+
+	if (Scene != NULL)
+	{
+		UpdateTickabilityState();
+		UpdateRenderabilityState();
+	}
 
 	ZESize SubItemCount = Components.GetCount();
 	for (ZESize I = 0; I < SubItemCount; I++)
@@ -338,6 +433,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_LOADED;
+
+			UpdateRenderabilityState();
+
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -356,6 +454,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_NONE;
+
+			UpdateRenderabilityState();
+			
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -374,6 +475,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_INITIALIZED;
+
+			UpdateTickabilityState();
+
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -392,6 +496,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		if (Result == ZE_ER_DONE)
 		{
 			State = ZE_ES_NONE;
+
+			UpdateTickabilityState();
+
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -419,6 +526,27 @@ void ZEEntity::UpdateState()
 		UpdateStateSerial();
 	else
 		UpdateStateTask.Run();
+}
+
+void ZEEntity::SetEntityFlags(ZEEntityFlags Flags)
+{
+	if (EntityFlags == Flags)
+		return;
+
+	EntityFlags = Flags;
+
+	if (Scene == NULL)
+		return;
+
+	if (GetEntityFlags().GetFlags(ZE_EF_TICKABLE))
+		GetScene()->AddToTickList(this);
+	else
+		GetScene()->RemoveFromTickList(this);
+
+	if (GetEntityFlags().GetFlags(ZE_EF_RENDERABLE))
+		GetScene()->AddToTickList(this);
+	else
+		GetScene()->RemoveFromTickList(this);
 }
 
 void ZEEntity::SetSerialOperation(bool SerialOperation)
@@ -472,7 +600,7 @@ ZEEntityResult ZEEntity::DeinitializeInternal()
 	return ZE_ER_DONE;
 }
 
-ZEEntity::ZEEntity()
+ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 {
 	Parent = NULL;
 	Scene = NULL;
@@ -480,11 +608,15 @@ ZEEntity::ZEEntity()
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;
+	EnabledFlattened = true;
 	Visible = true;
+	VisibleFlattened = true;
 	SerialOperation = false;
 	State = ZE_ES_NONE;
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
 	Wrapper = NULL;
+	Static = false;
+	EntityFlags = ZE_EF_NONE;
 	LocalTransformChanged();
 }
 
@@ -511,11 +643,6 @@ ZEEntity::~ZEEntity()
 
 	while(ChildEntities.GetCount() != 0)
 		ChildEntities.GetFirstItem()->Destroy();
-}
-
-ZEDrawFlags ZEEntity::GetDrawFlags() const
-{
-	return ZE_DF_NONE;
 }
 
 ZEEntity* ZEEntity::GetParent() const
@@ -614,24 +741,9 @@ ZEString ZEEntity::GetName() const
 	return Name;
 }
 
-void ZEEntity::SetVisible(bool Visibility)
+ZEEntityFlags ZEEntity::GetEntityFlags() const
 {
-	this->Visible = Visibility;
-}
-
-bool ZEEntity::GetVisible() const
-{
-	return Visible;
-}
-
-void ZEEntity::SetEnabled(bool Enabled)
-{
-	this->Enabled = Enabled;
-}
-
-bool ZEEntity::GetEnabled() const
-{
-	return Enabled;
+	return EntityFlags;
 }
 
 void ZEEntity::SetPosition(const ZEVector3& NewPosition)
@@ -812,6 +924,69 @@ bool ZEEntity::IsDestroyed() const
 	return TargetState == ZE_ES_DESTROYED;
 }
 
+ZEUInt ZEEntity::GetLoadingPercentage()
+{
+	ZESize Total = 0;
+	ZESize Count;
+	ZE_LOCK_SECTION(EntityLock)
+	{
+		for (ZESize I = 0; I < Components.GetCount(); I++)
+			Total = Components[I]->GetLoadingPercentage();
+		Count = Components.GetCount();
+
+		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
+			Total = ChildEntities[I]->GetLoadingPercentage();
+		Count += ChildEntities.GetCount();
+
+	}
+
+	if (Count == 0)
+		return 0;
+
+	Total /= Count * 100;
+	return (ZEUInt)Total;
+}
+
+void ZEEntity::SetEnabled(bool Enabled)
+{
+	if (this->Enabled == Enabled)
+		return;
+
+	this->Enabled = Enabled;
+
+	ParentEnabledChanged();
+}
+
+bool ZEEntity::GetEnabled() const
+{
+	return Enabled;
+}
+
+void ZEEntity::SetVisible(bool Visible)
+{
+	if (this->Visible == Visible)
+		return;
+
+	this->Visible = Visible;
+
+	ParentVisibleChanged();
+}
+
+bool ZEEntity::GetVisible() const
+{
+	return Visible;
+}
+
+void ZEEntity::SetStatic(bool Static)
+{
+	this->Static = Static;
+}
+
+bool ZEEntity::GetStatic()
+{
+	return Static;
+}
+
 void ZEEntity::Initialize()
 {
 	if (TargetState >= ZE_ES_INITIALIZED)
@@ -884,13 +1059,6 @@ void ZEEntity::Tick(float Time)
 
 bool ZEEntity::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!GetVisible() || !IsInitialized())
-		return false;
-
-	ZEDrawFlags Flags = GetDrawFlags();
-	if (!Flags.GetFlags(ZE_DF_DRAW))
-		return false;
-
 	return true;
 }
 

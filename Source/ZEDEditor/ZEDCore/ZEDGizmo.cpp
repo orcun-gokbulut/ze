@@ -952,11 +952,6 @@ ZEDGizmoAxis ZEDGizmo::PickScaleAxis(const ZERNView& View, const ZERay& Ray, flo
 	return PickedAxis;
 }
 
-ZEDrawFlags ZEDGizmo::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
-
 void ZEDGizmo::SetMode(ZEDGizmoMode Mode)
 {
 	if (this->Mode == Mode)
@@ -1241,6 +1236,8 @@ ZEDGizmo::ZEDGizmo()
 	InitialScale = ZEVector3::One;
 
 	RenderCommand.Entity = this;
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEDGizmo* ZEDGizmo::CreateInstance()

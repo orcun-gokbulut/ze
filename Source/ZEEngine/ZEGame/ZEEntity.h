@@ -50,31 +50,31 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEMath/ZEBSphere.h"
 #include "ZEMath/ZEQuaternion.h"
-#include "ZERayCast.h"
-
 #include "ZEMeta/ZEEnumerator.h"
 #include "ZEThread/ZETask.h"
+#include "ZERayCast.h"
 
 class ZEScene;
 class ZEDObjectWrapper;
-class ZERNDrawParameters;
 class ZERNPreRenderParameters;
 class ZERNRenderParameters;
 class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
-typedef ZEFlags ZEDrawFlags;
-ZE_ENUM(ZEDrawFlag)
+typedef ZEFlags ZEEntityFlags;
+ZE_ENUM(ZEEntityFlag)
 {
-	ZE_DF_NONE						= 0,
-	ZE_DF_DRAW						= 1,
-	ZE_DF_DRAW_COMPONENTS			= 2,
-	ZE_DF_LIGHT_SOURCE				= 4,
-	ZE_DF_LIGHT_RECEIVER			= 8,
-	ZE_DF_CULL						= 16,
-	ZE_DF_CULL_COMPONENTS			= 32,
-	ZE_DF_AUTO						= 64
+	ZE_EF_NONE						= 0x00,
+	ZE_EF_TICKABLE					= 0x01,
+	ZE_EF_TICKABLE_CUSTOM			= 0x02,
+	ZE_EF_RENDERABLE				= 0x04,
+	ZE_EF_RENDERABLE_CUSTOM			= 0x08,
+	ZE_EF_CULLABLE					= 0x10,
+	ZE_EF_RAY_CASTABLE				= 0x20,
+	ZE_EF_RAY_CASTABLE_CUSTOM		= 0x20,
+	ZE_EF_VOLUME_CASTABLE			= 0x40,
+	ZE_EF_VOLUME_CASTABLE_CUSTOM	= 0x80
 };
 
 ZE_ENUM(ZEEntityResult)
@@ -122,8 +122,13 @@ class ZEEntity : public ZEObject
 		ZEVector3								Scale;
 		bool									Enabled;
 		bool									Visible;
+		bool									Static;
 		bool									SerialOperation;
+		ZEEntityFlags							EntityFlags;
 		mutable ZELock							EntityLock;
+
+		bool									EnabledFlattened;
+		bool									VisibleFlattened;
 		
 		mutable ZEFlags							EntityDirtyFlags;
 		mutable ZEMatrix4x4						Transform;
@@ -136,6 +141,9 @@ class ZEEntity : public ZEObject
 		ZEArray<ZEEntity*>						Components;
 		ZEArray<ZEEntity*>						ChildEntities;
 
+		ZELink<ZEEntity>						TickListLink;
+		ZELink<ZEEntity>						RenderListLink;
+
 		ZETask									UpdateStateTask;
 		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters);
 		void									UpdateStateSerial();
@@ -145,7 +153,15 @@ class ZEEntity : public ZEObject
 		void									SetScene(ZEScene* Scene);
 		void									SetWrapper(ZEDObjectWrapper* Wrapper);
 
+		void									UpdateRenderabilityState();
+		void									UpdateTickabilityState();
+
+		void									ParentVisibleChanged();
+		void									ParentEnabledChanged();
+
 	protected:
+		void									SetEntityFlags(ZEEntityFlags Flags);
+
 		void									SetSerialOperation(bool SerialOperation);
 		bool									GetSerialOperation() const;
 
@@ -170,7 +186,7 @@ class ZEEntity : public ZEObject
 
 		virtual bool							InitializeSelf();
 		virtual bool							DeinitializeSelf();
-
+		
 												ZEEntity();
 		virtual									~ZEEntity();
 
@@ -184,7 +200,7 @@ class ZEEntity : public ZEObject
 		void									SetName(ZEString NewName);
 		ZEString								GetName() const;
 
-		virtual ZEDrawFlags						GetDrawFlags() const;
+		virtual ZEEntityFlags					GetEntityFlags() const final;
 
 		const ZEArray<ZEEntity*>&				GetChildEntities() const;
 		bool									AddChildEntity(ZEEntity* Entity);
@@ -198,12 +214,6 @@ class ZEEntity : public ZEObject
 		const ZEMatrix4x4&						GetTransform() const;
 		const ZEMatrix4x4&						GetWorldTransform() const;
 		const ZEMatrix4x4&						GetInvWorldTransform() const;
-
-		virtual void							SetVisible(bool Visibility);
-		bool									GetVisible() const;
-
-		virtual void							SetEnabled(bool Enabled);
-		bool									GetEnabled() const;
 
 		virtual void							SetPosition(const ZEVector3& NewPosition);
 		const ZEVector3&						GetPosition() const;
@@ -238,6 +248,16 @@ class ZEEntity : public ZEObject
 		bool									IsInitializedOrInitializing() const;
 		bool									IsFailed() const;
 		bool									IsDestroyed() const;
+		ZEUInt									GetLoadingPercentage();
+
+		virtual void							SetEnabled(bool Enabled);
+		bool									GetEnabled() const;
+		
+		virtual void							SetVisible(bool Visibility);
+		bool									GetVisible() const;
+
+		virtual void							SetStatic(bool Static);
+		bool									GetStatic();
 
 		void									Initialize();
 		void									Deinitialize();
@@ -247,14 +267,14 @@ class ZEEntity : public ZEObject
 
 		void									Destroy();
 
-		virtual bool							Serialize(ZEMLWriterNode* Serializer);
-		virtual bool							Unserialize(ZEMLReaderNode* Unserializer);
-
 		virtual void							Tick(float Time);
 
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+
+		virtual bool							Serialize(ZEMLWriterNode* Serializer);
+		virtual bool							Unserialize(ZEMLReaderNode* Unserializer);
 
 		ZEDObjectWrapper*						GetWrapper() const;
 }
@@ -268,6 +288,6 @@ ZE_META_ATTRIBUTE_PROPERTY(State,				ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false);
+ZE_META_ATTRIBUTE_PROPERTY(WorldRight,			ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldUp,				ZEDEditor.PropertyEditor.Display, false)
+ZE_META_ATTRIBUTE_PROPERTY(WorldFront,			ZEDEditor.PropertyEditor.Display, false);

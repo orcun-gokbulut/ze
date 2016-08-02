@@ -40,11 +40,6 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
 
-ZEDrawFlags ZEParticleEffect::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
-}
-
 bool ZEParticleEffect::InitializeSelf()
 {
 	if (!ZEEntity::InitializeSelf())
@@ -112,7 +107,7 @@ void ZEParticleEffect::ResetEmitters()
 
 ZEParticleEffect::ZEParticleEffect()
 {
-
+	SetEntityFlags(ZE_EF_RENDERABLE | ZE_EF_TICKABLE);
 }
 
 ZEParticleEffect::~ZEParticleEffect()

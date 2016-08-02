@@ -83,7 +83,6 @@ class ZELightDirectional : public ZELight
 		virtual								~ZELightDirectional();
 
 	public:
-		virtual ZEDrawFlags					GetDrawFlags() const;
 		virtual ZELightType					GetLightType() const;
 		virtual ZESize						GetViewCount() const;
 

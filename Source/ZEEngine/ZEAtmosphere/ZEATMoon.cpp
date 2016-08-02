@@ -184,16 +184,13 @@ ZEATMoon::ZEATMoon()
 
 	Constants.Phase = 31.5f / 53.0f;
 	Constants.Color = ZEVector3::One;
+
+	SetEntityFlags(ZE_EF_RENDERABLE);
 }
 
 ZEATMoon::~ZEATMoon()
 {
 
-}
-
-ZEDrawFlags ZEATMoon::GetDrawFlags() const
-{
-	return ZE_DF_DRAW;
 }
 
 void ZEATMoon::SetDirection(const ZEVector3& Direction)

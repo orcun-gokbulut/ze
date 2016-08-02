@@ -44,7 +44,7 @@
 #include "ZERNView.h"
 #include "ZERNCommand.h"
 
-enum ZELightType				: ZEUInt8
+ZE_ENUM_TYPED(ZELightType, ZEUInt8)
 {
 	ZE_LT_NONE				= 0,
 	ZE_LT_POINT				= 1,
@@ -53,7 +53,7 @@ enum ZELightType				: ZEUInt8
 	ZE_LT_OMNIPROJECTIVE	= 4
 };
 
-enum ZELightShadowResolution	: ZEUInt8
+ZE_ENUM_TYPED(ZELightShadowResolution, ZEUInt8)
 {
 	ZE_LSR_LOW				= 0,
 	ZE_LSR_MEDIUM			= 1,
@@ -61,7 +61,7 @@ enum ZELightShadowResolution	: ZEUInt8
 	ZE_LSR_VERY_HIGH		= 3
 };
 
-enum ZELightShadowSampleCount	: ZEUInt8
+ZE_ENUM_TYPED(ZELightShadowSampleCount, ZEUInt8)
 {
 	ZE_LSC_LOW				= 0,
 	ZE_LSC_MEDIUM			= 1,
@@ -113,8 +113,6 @@ class ZELight : public ZEEntity
 		virtual							~ZELight();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
 		virtual ZELightType				GetLightType() const = 0;
 		virtual ZESize					GetViewCount() const = 0;
 

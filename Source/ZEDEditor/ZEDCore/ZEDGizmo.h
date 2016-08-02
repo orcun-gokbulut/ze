@@ -119,8 +119,6 @@ class ZEDGizmo : public ZEEntity
 										ZEDGizmo();
 
 	public:
-		ZEDrawFlags						GetDrawFlags() const;
-
 		void							SetMode(ZEDGizmoMode Mode);
 		ZEDGizmoMode					GetMode();
 	

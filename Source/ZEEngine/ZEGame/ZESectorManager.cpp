@@ -104,6 +104,8 @@ void ZESectorManager::UpdateActiveSectors()
 ZESectorManager::ZESectorManager()
 {
 	OriginSector = NULL;
+
+	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
 bool ZESectorManager::InitializeSelf()

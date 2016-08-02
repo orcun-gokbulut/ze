@@ -82,8 +82,6 @@ class ZEATFog : public ZEEntity
 		virtual							~ZEATFog();
 
 	public:
-		virtual ZEDrawFlags				GetDrawFlags() const;
-
 		void							SetDensity(float Density);
 		float							GetDensity() const;
 
