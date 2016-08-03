@@ -236,7 +236,7 @@ const ZEArray<ZEGRAdapter*>& ZED11Module::GetAdapters()
 	return Adapters;
 }
 
-ZEGRContext*  ZED11Module::GetMainContext()
+ZEGRContext* ZED11Module::GetMainContext()
 {
 	return &Context;
 }

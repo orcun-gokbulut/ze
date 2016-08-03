@@ -34,7 +34,35 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMDResourceBone.h"
-#include "ZEML\ZEMLReader.h"
+
+#include "ZEML/ZEMLReader.h"
+#include "ZEMDResource.h"
+
+ZEMDResourceBone::ZEMDResourceBone() : Link(this)
+{
+	Resource = NULL;
+	ParentBoneId = -1;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+	BoundingBox = ZEAABBox::Zero;
+}
+
+ZEMDResourceBone::~ZEMDResourceBone()
+{
+	if (GetResource() != NULL)
+		GetResource()->RemoveBone(this);
+}
+
+ZEMDResource* ZEMDResourceBone::GetResource()
+{
+	return Resource;
+}
+
+const ZEMDResource* ZEMDResourceBone::GetResource() const
+{
+	return Resource;
+}
 
 void ZEMDResourceBone::SetName(const ZEString& Value)
 {
@@ -55,14 +83,14 @@ const ZEAABBox& ZEMDResourceBone::GetBoundingBox() const
 {
 	return BoundingBox;
 }
-void ZEMDResourceBone::SetParentBone(ZEInt32 BoneId)
+void ZEMDResourceBone::SetParentBoneId(ZEInt32 BoneId)
 {
-	ParentBone = BoneId;
+	ParentBoneId = BoneId;
 }
 
-ZEInt32 ZEMDResourceBone::GetParentBone() const 
+ZEInt32 ZEMDResourceBone::GetParentBoneId() const 
 {
-	return ParentBone;
+	return ParentBoneId;
 }
 void ZEMDResourceBone::SetPosition(const ZEVector3& Position)
 {
@@ -138,7 +166,7 @@ bool ZEMDResourceBone::Unserialize(const ZEMLReaderNode& BoneNode)
 	zeCheckError(BoneNode.GetName() != "Bone", false, "Invalid Bone node name.");
 
 	SetName(BoneNode.ReadString("Name"));
-	SetParentBone(BoneNode.ReadInt32("ParentBone", -1));
+	SetParentBoneId(BoneNode.ReadInt32("ParentBone", -1));
 	SetPosition(BoneNode.ReadVector3("RelativePosition", ZEVector3::Zero));
 	SetRotation(BoneNode.ReadQuaternion("RelativeRotation", ZEQuaternion::Identity));
 	SetScale(BoneNode.ReadVector3("RelativeScale", ZEVector3::One));
@@ -179,18 +207,7 @@ bool ZEMDResourceBone::Serialize(ZEMLWriterNode& BoneNode) const
 	return false;
 }
 
-ZEMDResourceBone::ZEMDResourceBone() : Link(this)
+ZEMDResourceBone* ZEMDResourceBone::CreateInstance()
 {
-	ParentBone = -1;
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
-	BoundingBox = ZEAABBox::Zero;
-
-	Register();
-}
-
-ZEMDResourceBone::~ZEMDResourceBone()
-{
-	Unregister();
+	return new ZEMDResourceBone();
 }

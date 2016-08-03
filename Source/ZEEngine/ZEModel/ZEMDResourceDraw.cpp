@@ -63,13 +63,7 @@ ZESize ZEMDResourceDraw::GetCount() const
 
 void ZEMDResourceDraw::SetMaterial(ZEHolder<ZERNMaterial> Material)
 {
-	if (LOD != NULL) 
-		LOD->UnregisterExternalResource(Material);
-	
 	this->Material = Material;
-	
-	if (LOD != NULL) 
-		LOD->RegisterExternalResource(Material);
 }
 
 ZEHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 

@@ -71,6 +71,8 @@ class ZEModel : public ZEEntity
 	friend class ZEModelAnimationTrack;
 	friend class ZEModelHelper;
 	private:
+		ZEString								ModelFileName;
+
 		ZEList2<ZEModelMesh>					Meshes;
 		ZEList2<ZEModelBone>					Bones;
 		ZEList2<ZEModelHelper>					Helpers;
@@ -79,7 +81,7 @@ class ZEModel : public ZEEntity
 		ZEModelAnimationType					AnimationType;
 		ZEModelAnimationUpdateMode				AnimationUpdateMode;
 		ZEList2<ZEModelAnimationTrack>			AnimationTracks;
-		ZEPointer<ZEModelAnimationTrack>		AnimationTrack;
+		ZEModelAnimationTrack*					AnimationTrack;
 
 		bool									DirtyConstantBufferSkin;
 		ZEHolder<ZEGRConstantBuffer>			ConstantBufferBoneTransforms;
@@ -98,7 +100,6 @@ class ZEModel : public ZEEntity
 		virtual void							ParentTransformChanged();
 		void									AnimationStateChanged();
 
-	protected:
 		virtual ZEEntityResult					LoadInternal();
 		virtual ZEEntityResult					UnloadInternal();
 

@@ -99,7 +99,11 @@ bool ZED11VertexBuffer::Lock(void** Data)
 	zeDebugCheck(GetResourceUsage() != ZEGR_RU_GPU_READ_CPU_WRITE, "Vertex buffer is not dynamic");
 
 	D3D11_MAPPED_SUBRESOURCE Map;
+
+	LockContext();
 	HRESULT Result = GetMainContext()->Map(Buffer, 0, D3D11_MAP_WRITE_DISCARD, 0, &Map);
+	UnlockContext();
+
 	if (FAILED(Result))
 		return false;
 
@@ -114,5 +118,7 @@ void ZED11VertexBuffer::Unlock()
 {
 	zeDebugCheck(GetResourceUsage() != ZEGR_RU_GPU_READ_CPU_WRITE, "Vertex buffer is not dynamic");
 
+	LockContext();
 	GetMainContext()->Unmap(Buffer, 0);
+	UnlockContext();
 }

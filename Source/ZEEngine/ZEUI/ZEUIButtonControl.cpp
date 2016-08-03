@@ -82,7 +82,7 @@ const ZEString& ZEUIButtonControl::GetText() const
 
 ZEUIButtonControl::ZEUIButtonControl()
 {
-	TextLabel = new ZEUILabel();
+	TextLabel = ZEUILabel::CreateInstance();
 	TextLabel->SetWordWrapping(false);
 	TextLabel->SetBackgroundColor(ZEUIManager::GetDefaultBackgroundColor());
 	SetBackgroundColor(ZEUIManager::GetDefaultBackgroundColor());

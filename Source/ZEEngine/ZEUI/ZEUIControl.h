@@ -193,6 +193,8 @@ class ZEUIControl : public ZEObject
 		virtual void					Draw(ZEUIRenderer* Renderer);
 		virtual void					Tick(float ElapsedTime);
 
+		virtual void					Destroy();
+
 										ZEUIControl();
 										~ZEUIControl();
 };

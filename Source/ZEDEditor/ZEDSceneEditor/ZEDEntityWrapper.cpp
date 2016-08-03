@@ -113,7 +113,7 @@ bool ZEDEntityWrapper::InitializeInternal()
 
 	NamePlate = new ZEUIControl();
 
-	NamePlateLabel = new ZEUILabel();
+	NamePlateLabel = ZEUILabel::CreateInstance();
 	NamePlateIcon = new ZEUIFrameControl();
 	NamePlateIcon->SetSize(ZEVector2(32.0f, 32.0f));
 	NamePlateIcon->SetPosition(ZEVector2::Zero);

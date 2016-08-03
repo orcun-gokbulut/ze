@@ -35,7 +35,34 @@
 
 #include "ZEMDResourceHelper.h"
 
-#include "ZEML\ZEMLReader.h"
+#include "ZEML/ZEMLReader.h"
+#include "ZEMDResource.h"
+
+ZEMDResourceHelper::ZEMDResourceHelper() : Link(this)
+{
+	Resource = NULL;
+	OwnerType = ZE_MRHPT_MODEL;
+	OwnerId = -1;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+}
+
+ZEMDResourceHelper::~ZEMDResourceHelper()
+{
+	if (GetResource() != NULL)
+		GetResource()->RemoveHelper(this);
+}
+
+ZEMDResource* ZEMDResourceHelper::GetResource()
+{
+	return Resource;
+}
+
+const ZEMDResource* ZEMDResourceHelper::GetResource() const
+{
+	return Resource;
+}
 
 void ZEMDResourceHelper::SetName(const ZEString& Name)
 {
@@ -128,18 +155,7 @@ bool ZEMDResourceHelper::Serialize(ZEMLWriterNode& HelperNode) const
 	return false;
 }
 
-ZEMDResourceHelper::ZEMDResourceHelper() : Link(this)
+ZEMDResourceHelper* ZEMDResourceHelper::CreateInstance()
 {
-	OwnerType = ZE_MRHPT_MODEL;
-	OwnerId = -1;
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
-
-	Register();
-}
-
-ZEMDResourceHelper::~ZEMDResourceHelper()
-{
-	Unregister();
+	return new ZEMDResourceHelper();
 }

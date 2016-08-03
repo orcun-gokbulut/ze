@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResource.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEMDResourcePhysics.h"
 
@@ -48,16 +49,18 @@
 class ZEMLReaderNode;
 class ZEMLWriterNode;
 
-class ZEMDResourceBone : public ZERSResource
+class ZEMDResourceBone : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceBone)
 	friend class ZEMDResource;
 	private:
+		ZEMDResource*							Resource;
+	
 		ZELink<ZEMDResourceBone>				Link;
 
 		ZEString								Name;
-		ZEInt32									ParentBone;
+		ZEInt32									ParentBoneId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
@@ -66,15 +69,21 @@ class ZEMDResourceBone : public ZERSResource
 		ZEMDResourcePhysicalJoint				PhysicalJoint;
 		ZEString								UserDefinedProperties;
 
+												ZEMDResourceBone();
+		virtual									~ZEMDResourceBone();
+
 	public:
+		ZEMDResource*							GetResource();
+		const ZEMDResource*						GetResource() const;
+
 		void									SetName(const ZEString& Name);
 		const ZEString&							GetName() const;
 
 		void									SetBoundingBox(const ZEAABBox& BoundingBox);
 		const ZEAABBox&							GetBoundingBox() const;
 
-		void									SetParentBone(ZEInt32 ParentBone);
-		ZEInt32									GetParentBone() const;
+		void									SetParentBoneId(ZEInt32 ParentBone);
+		ZEInt32									GetParentBoneId() const;
 
 		void									SetPosition(const ZEVector3& Position);
 		const ZEVector3&						GetPosition() const;
@@ -99,6 +108,5 @@ class ZEMDResourceBone : public ZERSResource
 		bool									Unserialize(const ZEMLReaderNode& BoneNode);
 		bool									Serialize(ZEMLWriterNode& BoneNode) const;
 
-												ZEMDResourceBone();
-		virtual									~ZEMDResourceBone();
+		static ZEMDResourceBone*				CreateInstance();
 };

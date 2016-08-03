@@ -121,7 +121,7 @@ void ZEUICheckBoxControl::SetPosition(const ZEVector2& Position)
 ZEUICheckBoxControl::ZEUICheckBoxControl()
 {
 	State = ZE_UI_CBS_UNCHECKED;
-	Label = new ZEUILabel();
+	Label = ZEUILabel::CreateInstance();
 	AddChildControl(Label);
 	Label->SetTextMargins(ZEVector4(0, 2, 0, 0));
 	Box.Positions.LeftUp = GetPosition();

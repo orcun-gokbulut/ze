@@ -39,17 +39,47 @@
 #include "ZEGraphics\ZEGRVertexBuffer.h"
 #include "ZEGraphics\ZEGRIndexBuffer.h"
 #include "ZERenderer\ZERNMaterial.h"
+#include "ZEMDResource.h"
 #include "ZEMDResourceLOD.h"
 
-
-void ZEMDResourceMesh::SetParentMesh(ZEInt32 ParentMesh)
+ZEMDResourceMesh::ZEMDResourceMesh() : Link(this)
 {
-	this->ParentMesh = ParentMesh;
+	Resource = NULL;
+	MeshId = -1;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+	BoundingBox = ZEAABBox::Zero;
+	Visible = true;
+	Skinned = false;
 }
 
-ZEInt32 ZEMDResourceMesh::GetParentMesh() const 
+ZEMDResourceMesh::~ZEMDResourceMesh()
 {
-	return ParentMesh;
+	while (LODs.GetFirst() != NULL)
+	{
+		ZEMDResourceLOD* LOD = LODs.GetFirst()->GetItem();
+		RemoveLOD(LOD);
+		delete LOD;
+	}
+
+	if (GetResource() != NULL)
+		GetResource()->RemoveMesh(this);
+}
+
+ZEMDResource* ZEMDResourceMesh::GetResource()
+{
+	return Resource;
+}
+
+void ZEMDResourceMesh::SetParentMeshId(ZEInt32 ParentMesh)
+{
+	this->MeshId = ParentMesh;
+}
+
+ZEInt32 ZEMDResourceMesh::GetParentMeshId() const 
+{
+	return MeshId;
 }
 
 void ZEMDResourceMesh::SetName(const ZEString& Name)
@@ -143,12 +173,19 @@ const ZEList2<const ZEMDResourceLOD>& ZEMDResourceMesh::GetLODs() const
 
 void ZEMDResourceMesh::AddLOD(ZEMDResourceLOD* LOD)
 {
-	zeCheckError(LOD->Link.GetInUse(), ZE_VOID, "LOD is already added to Mesh.");
+	zeCheckError(LOD == NULL, ZE_VOID, "Cannot add LOD. LOD is NULL.");
+	zeCheckError(LOD->ResourceMesh != NULL, ZE_VOID, "Cannot add LOD. LOD already added to a mesh resource.");
+	
+	LOD->ResourceMesh = this;
 	LODs.AddEnd(&LOD->Link);
 }
 
 void ZEMDResourceMesh::RemoveLOD(ZEMDResourceLOD* LOD)
 {
+	zeCheckError(LOD == NULL, ZE_VOID, "Cannot add LOD. LOD is NULL.");
+	zeCheckError(LOD->ResourceMesh != this, ZE_VOID, "Cannot remove LOD. LOD does not belong to this mesh resource.");
+
+	LOD->ResourceMesh = NULL;
 	LODs.Remove(&LOD->Link);
 }
 
@@ -167,7 +204,7 @@ bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 	zeCheckError(!MeshNode.IsValid(), false, "Invalid Mesh node.");
 	zeCheckError(MeshNode.GetName() != "Mesh", false, "Invalid Mesh node name.");
 
-	SetParentMesh(MeshNode.ReadInt32("ParentMesh", -1));
+	SetParentMeshId(MeshNode.ReadInt32("ParentMesh", -1));
 	SetName(MeshNode.ReadString("Name"));
 	SetPosition(MeshNode.ReadVector3("Position", ZEVector3::Zero));
 	SetRotation(MeshNode.ReadQuaternion("Rotation", ZEQuaternion::Identity));
@@ -189,9 +226,12 @@ bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 		if (!LODNode.IsValid())
 			return false;
 		
-		ZEPointer<ZEMDResourceLOD> LOD = new ZEMDResourceLOD();
+		ZEMDResourceLOD* LOD = ZEMDResourceLOD::CreateInstance();
 		if (!LOD->Unserialize(LODNode))
+		{
+			LOD->Destroy();
 			return false;
+		}
 
 		if (LOD->GetLevel() == 0)
 		{
@@ -209,7 +249,7 @@ bool ZEMDResourceMesh::Unserialize(const ZEMLReaderNode& MeshNode)
 			}
 		}
 
-		AddLOD(LOD.Transfer());
+		AddLOD(LOD);
 	}
 
 	return true;
@@ -220,23 +260,7 @@ bool ZEMDResourceMesh::Serialize(ZEMLWriterNode& MeshNode) const
 	return false;
 }
 
-ZEMDResourceMesh::ZEMDResourceMesh() : Link(this)
+ZEMDResourceMesh* ZEMDResourceMesh::CreateInstance()
 {
-	ParentMesh = -1;
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
-	BoundingBox = ZEAABBox::Zero;
-	Visible = true;
-	Skinned = false;
-
-	Register();
-}
-
-ZEMDResourceMesh::~ZEMDResourceMesh()
-{
-	ze_for_each(LOD, LODs)
-		delete &LOD.GetItem();
-
-	Unregister();
+	return new ZEMDResourceMesh();
 }

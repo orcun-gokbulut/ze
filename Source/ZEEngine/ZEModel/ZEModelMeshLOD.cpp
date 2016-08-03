@@ -45,7 +45,7 @@
 #include "ZEGraphics/ZEGRConstantBuffer.h"
 #include "ZEGraphics/ZEGRIndexBuffer.h"
 
-bool ZEModelMeshLOD::Load()
+bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 {
 	Unload();
 
@@ -86,9 +86,30 @@ bool ZEModelMeshLOD::Unload()
 	return true;
 }
 
+
+ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
+{
+	Mesh = NULL;
+	StartDistance = 0;
+	EndDistance = 0;
+	VertexType = ZEMD_VT_NORMAL;
+	IndexType = ZEMD_VIT_NONE;
+}
+
+ZEModelMeshLOD::~ZEModelMeshLOD()
+{
+	Unload();
+
+	if (GetMesh() != NULL)
+		GetMesh()->RemoveLOD(this);
+}
+
 ZEModel* ZEModelMeshLOD::GetModel()
 {
-	return Model;
+	if (Mesh != NULL)
+		return Mesh->GetModel();
+	else
+		return NULL;
 }
 
 ZEModelMesh* ZEModelMeshLOD::GetMesh()
@@ -203,28 +224,7 @@ float ZEModelMeshLOD::GetEndDistance() const
 	return EndDistance;
 }
 
-void ZEModelMeshLOD::SetResource(ZERSHolder<const ZEMDResourceLOD> Resource)
+ZEModelMeshLOD* ZEModelMeshLOD::CreateInstance()
 {
-	this->Resource = Resource;
-}
-
-ZERSHolder<const ZEMDResourceLOD> ZEModelMeshLOD::GetResource()
-{
-	return Resource;
-}
-
-ZEModelMeshLOD::ZEModelMeshLOD() : MeshLink(this)
-{
-	Model = NULL;
-	Mesh = NULL;
-
-	StartDistance = 0;
-	EndDistance = 0;
-	VertexType = ZEMD_VT_NORMAL;
-	IndexType = ZEMD_VIT_NONE;
-}
-
-ZEModelMeshLOD::~ZEModelMeshLOD()
-{
-	Unload();
+	return new ZEModelMeshLOD();
 }

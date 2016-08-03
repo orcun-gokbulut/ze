@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEFlags.h"
@@ -48,7 +49,7 @@
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 ZE_META_FORWARD_DECLARE(ZEAABBox, "ZEMath/ZEAABBox.h")
 
-class ZEModelBone : public ZEObject
+class ZEModelBone : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEModel;
@@ -88,8 +89,6 @@ class ZEModelBone : public ZEObject
 
 		ZEList2<ZEModelBone>					ChildBones;
 		
-		ZERSHolder<const ZEMDResourceBone>		Resource;
-
 		void									SetModel(ZEModel* Model);
 		void									SetParent(ZEModelBone* ParentBone);
 
@@ -103,9 +102,11 @@ class ZEModelBone : public ZEObject
 		//void									LocalTransformChanged();
 		//void									ParentTransformChanged();
 
-
-		bool									Load();
+		bool									Load(const ZEMDResourceBone* Resource);
 		bool									Unload();
+
+												ZEModelBone();
+		virtual									~ZEModelBone();
 
 	public:
 		ZEModel*								GetModel() const;
@@ -168,11 +169,7 @@ class ZEModelBone : public ZEObject
 		void									AddChildBone(ZEModelBone* Bone);
 		void									RemoveChildBone(ZEModelBone* Bone);
 
-		void									SetResource(ZERSHolder<const ZEMDResourceBone> Resource);
-		ZERSHolder<const ZEMDResourceBone>		GetResource();
-
 		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-												ZEModelBone();
-		virtual									~ZEModelBone();
+		static ZEModelBone*						CreateInstance();
 };

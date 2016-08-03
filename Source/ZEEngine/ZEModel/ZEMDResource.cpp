@@ -107,11 +107,14 @@ bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 		if (!MeshNode.IsValid())
 			return false;
 
-		ZEPointer<ZEMDResourceMesh> Mesh = new ZEMDResourceMesh();
+		ZEMDResourceMesh* Mesh = ZEMDResourceMesh::CreateInstance();
 		if (!Mesh->Unserialize(MeshNode))
+		{
+			Mesh->Destroy();
 			return false;
+		}
 
-		AddMesh(Mesh.Transfer());
+		AddMesh(Mesh);
 		SetLoadProgress(I, SubNodeCount, 10, 50);
 	}
 
@@ -130,11 +133,14 @@ bool ZEMDResource::ReadBones(const ZEMLReaderNode& BonesNode)
 		if (!BoneNode.IsValid())
 			return false;
 
-		ZEPointer<ZEMDResourceBone> Bone = new ZEMDResourceBone();
+		ZEMDResourceBone* Bone = ZEMDResourceBone::CreateInstance();
 		if (!Bone->Unserialize(BoneNode))
+		{
+			Bone->Destroy();
 			return false;
+		}
 
-		AddBone(Bone.Transfer());
+		AddBone(Bone);
 	}
 
 	return true;
@@ -152,11 +158,11 @@ bool ZEMDResource::ReadHelpers(const ZEMLReaderNode& HelpersNode)
 		if (!HelperNode.IsValid())
 			return false;
 
-		ZEPointer<ZEMDResourceHelper> Helper = new ZEMDResourceHelper();
+		ZEMDResourceHelper* Helper = ZEMDResourceHelper::CreateInstance();
 		if (!Helper->Unserialize(HelperNode))
 			return false;
 
-		AddHelper(Helper.Transfer());
+		AddHelper(Helper);
 	}
 
 	return true;
@@ -175,11 +181,14 @@ bool ZEMDResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 		if (!AnimationNode.IsValid())
 			return false;
 
-		ZEPointer<ZEMDResourceAnimation> Animation = new ZEMDResourceAnimation();
+		ZEMDResourceAnimation* Animation = ZEMDResourceAnimation::CreateInstance();
 		if (!Animation->Unserialize(AnimationNode))
+		{
+			Animation->Destroy();
 			return false;
+		}
 
-		AddAnimation(Animation.Transfer());
+		AddAnimation(Animation);
 		SetLoadProgress(I, SubNodeCount, 60, 95);
 	}
 
@@ -286,6 +295,34 @@ ZETaskResult ZEMDResource::LoadInternal()
 
 ZETaskResult ZEMDResource::UnloadInternal()
 {
+	while (Bones.GetFirst() != NULL)
+	{
+		ZEMDResourceMesh* Mesh = Meshes.GetFirst()->GetItem();
+		RemoveMesh(Mesh);
+		delete Mesh;
+	}
+
+	while (Bones.GetFirst() != NULL)
+	{
+		ZEMDResourceBone* Bone = Bones.GetFirst()->GetItem();
+		RemoveBone(Bone);
+		delete Bone;
+	}
+
+	while (Animations.GetFirst() != NULL)
+	{
+		ZEMDResourceAnimation* Animation = Animations.GetFirst()->GetItem();
+		RemoveAnimation(Animation);
+		delete Animation;
+	}
+
+	while (Helpers.GetFirst() != NULL)
+	{
+		ZEMDResourceHelper* Helper = Helpers.GetFirst()->GetItem();
+		RemoveHelper(Helper);
+		delete Helper;
+	}
+
 	return ZE_TR_DONE;
 }
 
@@ -311,12 +348,19 @@ const ZEList2<const ZEMDResourceMesh>& ZEMDResource::GetMeshes() const
 
 void ZEMDResource::AddMesh(ZEMDResourceMesh* Mesh)
 {
-	zeCheckError(Mesh->Link.GetInUse(), ZE_VOID, "Mesh already added to a resource.");
+	zeCheckError(Mesh == NULL, ZE_VOID, "Cannot add mesh. Mesh is NULL.");
+	zeCheckError(Mesh->Resource != NULL, ZE_VOID, "Cannot add mesh. Mesh already added to a resource.");
+
+	Mesh->Resource = this;
 	Meshes.AddEnd(&Mesh->Link);
 }
 
 void ZEMDResource::RemoveMesh(ZEMDResourceMesh* Mesh)
 {
+	zeCheckError(Mesh == NULL, ZE_VOID, "Cannot add mesh. Mesh is NULL.");
+	zeCheckError(Mesh->Resource != this, ZE_VOID, "Cannot remove mesh. Mesh does not belong to this resource.");
+
+	Mesh->Resource = NULL;
 	Meshes.Remove(&Mesh->Link);
 }
 
@@ -332,15 +376,19 @@ const ZEList2<const ZEMDResourceBone>& ZEMDResource::GetBones() const
 
 void ZEMDResource::AddBone(ZEMDResourceBone* Bone)
 {
-	zeCheckError(Bone->Link.GetInUse(), ZE_VOID, "Bone already added to a resource.");
+	zeCheckError(Bone == NULL, ZE_VOID, "Cannot add bone. Bone is NULL.");
+	zeCheckError(Bone->Resource != NULL, ZE_VOID, "Cannot add bone. Bone already added to a resource.");
+
+	Bone->Resource = this;
 	Bones.AddEnd(&Bone->Link);
-	AddChildResource(Bone);
 }
 
 void ZEMDResource::RemoveBone(ZEMDResourceBone* Bone)
 {
+	zeCheckError(Bone == NULL, ZE_VOID, "Cannot add bone. Bone is NULL.");
+	zeCheckError(Bone->Resource != this, ZE_VOID, "Cannot remove bone. Bone does not belong to this resource.");
+
 	Bones.Remove(&Bone->Link);
-	RemoveChildResource(Bone);
 }
 
 const ZEList2<ZEMDResourceAnimation>& ZEMDResource::GetAnimations()
@@ -355,15 +403,20 @@ const ZEList2<const ZEMDResourceAnimation>& ZEMDResource::GetAnimations() const
 
 void ZEMDResource::AddAnimation(ZEMDResourceAnimation* Animation)
 {
-	zeCheckError(Animation->Link.GetInUse(), ZE_VOID, "Animation already added to a resource.");
+	zeCheckError(Animation == NULL, ZE_VOID, "Cannot add animation. Animation is NULL.");
+	zeCheckError(Animation->Resource != NULL, ZE_VOID, "Animation already added to a resource.");
+
+	Animation->Resource = this;
 	Animations.AddEnd(&Animation->Link);
-	AddChildResource(Animation);
 }
 
 void ZEMDResource::RemoveAnimation(ZEMDResourceAnimation* Animation)
 {
+	zeCheckError(Animation == NULL, ZE_VOID, "Cannot remove animation. Animation is NULL.");
+	zeCheckError(Animation->Resource != this, ZE_VOID, "Cannot remove animation. Animation does not belong to this resource.");
+
+	Animation->Resource = NULL;
 	Animations.Remove(&Animation->Link);
-	RemoveChildResource(Animation);
 }
 
 const ZEList2<const ZEMDResourceHelper>& ZEMDResource::GetHelpers() const
@@ -373,15 +426,18 @@ const ZEList2<const ZEMDResourceHelper>& ZEMDResource::GetHelpers() const
 
 void ZEMDResource::AddHelper(ZEMDResourceHelper* Helper)
 {
-	zeCheckError(Helper->Link.GetInUse(), ZE_VOID, "Helper is already added to a resource.");
+	zeCheckError(Helper == NULL, ZE_VOID, "Cannot add helper. Helper is NULL.");
+	zeCheckError(Helper->Resource != NULL, ZE_VOID, "Helper already added to a resource.");
+
 	Helpers.AddEnd(&Helper->Link);
-	AddChildResource(Helper);
 }
 
 void ZEMDResource::RemoveHelper(ZEMDResourceHelper* Helper)
 {
+	zeCheckError(Helper == NULL, ZE_VOID, "Cannot remove helper. Helper is NULL.");
+	zeCheckError(Helper->Resource != this, ZE_VOID, "Cannot remove helper. Helper does not belong to this resource.");
+
 	Helpers.Remove(&Helper->Link);
-	RemoveChildResource(Helper);
 }
 
 ZEMDResource::ZEMDResource()
@@ -391,30 +447,6 @@ ZEMDResource::ZEMDResource()
 
 ZEMDResource::~ZEMDResource()
 {
-	ze_for_each(Mesh, Meshes)
-	{
-		RemoveMesh(&(*Mesh));
-		delete &(*Mesh);
-	}
-
-	ze_for_each(Bone, Bones)
-	{
-		RemoveBone(&(*Bone));
-		delete &(*Bone);
-	}
-
-	ze_for_each(Animation, Animations)
-	{
-		RemoveAnimation(&(*Animation));
-		delete &(*Animation);
-	}
-
-	ze_for_each(Helper, Helpers)
-	{
-		RemoveHelper(&(*Helper));
-		delete &(*Helper);
-	}
-
 	Unregister();
 }
 

@@ -82,6 +82,10 @@ class ZEUILabel : public ZEUIFrameControl
 		ZEVector2							CalculateLineStartPoint(ZESize LineIndex);
 		void								UpdateTextRenderingArea();
 
+
+											ZEUILabel();
+		virtual								~ZEUILabel();
+
 	public:
 		virtual void						Draw(ZEUIRenderer* Renderer);
 
@@ -109,8 +113,7 @@ class ZEUILabel : public ZEUIFrameControl
 		virtual void						SetWidth(float Width);
 		virtual void						SetHeight(float Height);
 
-											ZEUILabel();
-											~ZEUILabel();
+		static ZEUILabel*					CreateInstance();
 };
 
 #endif

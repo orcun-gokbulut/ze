@@ -53,7 +53,8 @@ ze_add_source(ZESectorManager.cpp		Sources)
 ze_add_source(ZESectorManager.h			Sources Headers ZEMC)
 ze_add_source(ZESectorSelector.cpp		Sources)
 ze_add_source(ZESectorSelector.h		Sources Headers ZEMC)
-
+ze_add_source(ZEStateScreen.cpp			Sources)
+ze_add_source(ZEStateScreen.h			Sources Headers ZEMC)
 
 ze_add_library(TARGET ZEGame 
 	ZEMC ${ZEMC}

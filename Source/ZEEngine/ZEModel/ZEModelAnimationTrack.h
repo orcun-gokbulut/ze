@@ -34,10 +34,11 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZETypes.h"
 #include "ZEModelAnimation.h"
-#include "ZEMeta/ZEObject.h"
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 
@@ -49,7 +50,7 @@ enum ZEModelAnimationBlendMode
 	ZE_MABM_OVERWRITE	= 3,
 };
 
-class ZEModelAnimationTrack : public ZEObject
+class ZEModelAnimationTrack : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEModel;
@@ -57,8 +58,6 @@ class ZEModelAnimationTrack : public ZEObject
 		ZEModel*								Model;
 		ZELink<ZEModelAnimationTrack>			ModelLink;
 		ZEString								AnimationName;
-		const ZEModelAnimation*					Animation;
-
 		ZEModelAnimationState					State;
 
 		float									BlendFactor;
@@ -76,7 +75,8 @@ class ZEModelAnimationTrack : public ZEObject
 		ZEUInt									LOD;
 		bool									Looping;
 
-		ZERSHolder<const ZEMDResourceAnimation>	Resource;
+		ZERSHolder<const ZEMDResource>			Resource;
+		const ZEMDResourceAnimation*			ResourceAnimation;
 		
 		void									SetState(ZEModelAnimationState State);
 		
@@ -84,6 +84,9 @@ class ZEModelAnimationTrack : public ZEObject
 		void									UpdateAnimation();
 		void									UpdateMeshesAndBones();
 		void									ApplyLimits();
+
+												ZEModelAnimationTrack();
+		virtual									~ZEModelAnimationTrack();
 
 	public:
 		ZEModel*								GetModel();
@@ -134,8 +137,8 @@ class ZEModelAnimationTrack : public ZEObject
 		float									GetEndFrameByTime();
 		float									GetEndFrameByPercentage();
 		
-		void									SetResource(ZERSHolder<const ZEMDResourceAnimation> Resource);
-		ZERSHolder<const ZEMDResourceAnimation>	GetResource();
+		void									SetResource(const ZEMDResourceAnimation* Resource);
+		const ZEMDResourceAnimation*			GetResource();
 
 		void									Play(ZEUInt StartFrame, ZEUInt EndFrame);
 		void									Play();
@@ -145,5 +148,5 @@ class ZEModelAnimationTrack : public ZEObject
 
 		void									Tick(float ElapsedTime);
 
-												ZEModelAnimationTrack();
+		static ZEModelAnimationTrack*			CreateInstance();
 };

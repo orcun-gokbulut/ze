@@ -34,7 +34,31 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEMDResourceAnimation.h"
-#include "ZEML\ZEMLReader.h"
+
+#include "ZEML/ZEMLReader.h"
+#include "ZEMDResource.h"
+
+ZEMDResourceAnimation::ZEMDResourceAnimation() : Link(this)
+{
+	Resource = NULL;
+	FramesPerSecond = 30; 
+}
+
+ZEMDResourceAnimation::~ZEMDResourceAnimation()
+{
+	if (GetResource() != NULL)
+		GetResource()->RemoveAnimation(this);
+}
+
+ZEMDResource* ZEMDResourceAnimation::GetResource()
+{
+	return Resource;
+}
+
+const ZEMDResource* ZEMDResourceAnimation::GetResource() const
+{
+	return Resource;
+}
 
 void ZEMDResourceAnimation::SetName(const ZEString& Name)
 {
@@ -114,13 +138,7 @@ bool ZEMDResourceAnimation::Serialize(ZEMLWriterNode& AnimationNode) const
 	return false;
 }
 
-ZEMDResourceAnimation::ZEMDResourceAnimation() : Link(this)
+ZEMDResourceAnimation* ZEMDResourceAnimation::CreateInstance()
 {
-	FramesPerSecond = 30; 
-	Register();
-}
-
-ZEMDResourceAnimation::~ZEMDResourceAnimation()
-{
-	Unregister();
+	return new ZEMDResourceAnimation();
 }

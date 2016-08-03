@@ -249,6 +249,7 @@ void ZELightProjective::Render(const ZERNRenderParameters* Parameters, const ZER
 	ZERNPreRenderParameters PreRenderParameters;
 	PreRenderParameters.Renderer = &ShadowRenderer;
 	PreRenderParameters.View = &View;
+	PreRenderParameters.Type = ZERN_PRT_SHADOW;
 
 	ZEGRContext* Context = Parameters->Context;
 	ShadowRenderer.SetContext(Context);

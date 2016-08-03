@@ -179,28 +179,58 @@ void ZEModelBone::TransformChangedWorld()
 		ChildBone->TransformChangedWorld();
 }
 
-bool ZEModelBone::Load()
+bool ZEModelBone::Load(const ZEMDResourceBone* Resource)
 {
-	if (Resource == NULL)
-		return true;
-
 	DirtyFlags.RaiseAll();
-
 	SetName(Resource->GetName());
 	SetBoundingBox(Resource->GetBoundingBox());
 	SetInitialPosition(Resource->GetPosition());
 	SetInitialRotation(Resource->GetRotation());
 	SetPosition(Resource->GetPosition());
 	SetRotation(Resource->GetRotation());
-
 	return true;
 }
 
 bool ZEModelBone::Unload()
 {
-	DirtyFlags.RaiseAll();
-
 	return true;
+}
+
+ZEModelBone::ZEModelBone() : ParentLink(this), ModelLink(this)
+{
+	DirtyFlags.RaiseAll();
+	Model = NULL;
+	Parent = NULL;
+
+	InitialPosition = ZEVector3::Zero;
+	InitialRotation = ZEQuaternion::Identity;
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+
+	InitialTransform = ZEMatrix4x4::Identity;
+	InvInitialTransform = ZEMatrix4x4::Identity;
+	InitialModelTransform = ZEMatrix4x4::Identity;
+	InvInitialModelTransform = ZEMatrix4x4::Identity;
+	Transform = ZEMatrix4x4::Identity;
+	InvTransform = ZEMatrix4x4::Identity;
+	ModelTransform = ZEMatrix4x4::Identity;
+	InvModelTransform = ZEMatrix4x4::Identity;
+	WorldTransform = ZEMatrix4x4::Identity;
+	InvWorldTransform = ZEMatrix4x4::Identity;
+
+	BoundingBox = ZEAABBox::Zero;
+	ModelBoundingBox = ZEAABBox::Zero;
+	WorldBoundingBox = ZEAABBox::Zero;
+
+	AnimationType = ZE_MAT_NOANIMATION;
+}
+
+ZEModelBone::~ZEModelBone()
+{
+	Unload();
+
+	if (GetModel() != NULL)
+		GetModel()->RemoveBone(this);
 }
 
 ZEModel* ZEModelBone::GetModel() const
@@ -622,16 +652,6 @@ void ZEModelBone::RemoveChildBone(ZEModelBone* Bone)
 	ChildBones.Remove(&Bone->ParentLink);
 }
 
-void ZEModelBone::SetResource(ZERSHolder<const ZEMDResourceBone> Resource)
-{
-	this->Resource = Resource;
-}
-
-ZERSHolder<const ZEMDResourceBone> ZEModelBone::GetResource()
-{
-	return Resource;
-}
-
 void ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
 {
 	ZERayCastHelper Helper;
@@ -644,36 +664,7 @@ void ZEModelBone::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 	Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
 }
 
-ZEModelBone::ZEModelBone() : ParentLink(this), ModelLink(this)
+ZEModelBone* ZEModelBone::CreateInstance()
 {
-	DirtyFlags.RaiseAll();
-	Model = NULL;
-	Parent = NULL;
-
-	InitialPosition = ZEVector3::Zero;
-	InitialRotation = ZEQuaternion::Identity;
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-
-	InitialTransform = ZEMatrix4x4::Identity;
-	InvInitialTransform = ZEMatrix4x4::Identity;
-	InitialModelTransform = ZEMatrix4x4::Identity;
-	InvInitialModelTransform = ZEMatrix4x4::Identity;
-	Transform = ZEMatrix4x4::Identity;
-	InvTransform = ZEMatrix4x4::Identity;
-	ModelTransform = ZEMatrix4x4::Identity;
-	InvModelTransform = ZEMatrix4x4::Identity;
-	WorldTransform = ZEMatrix4x4::Identity;
-	InvWorldTransform = ZEMatrix4x4::Identity;
-
-	BoundingBox = ZEAABBox::Zero;
-	ModelBoundingBox = ZEAABBox::Zero;
-	WorldBoundingBox = ZEAABBox::Zero;
-
-	AnimationType = ZE_MAT_NOANIMATION;
-}
-
-ZEModelBone::~ZEModelBone()
-{
-	Unload();
+	return new ZEModelBone();
 }

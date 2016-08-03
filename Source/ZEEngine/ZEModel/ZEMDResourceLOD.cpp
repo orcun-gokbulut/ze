@@ -36,10 +36,52 @@
 #include "ZEMDResourceLOD.h"
 
 #include "ZEML\ZEMLReader.h"
+#include "ZEMDResourceMesh.h"
 #include "ZEGraphics\ZEGRVertexBuffer.h"
 #include "ZEGraphics\ZEGRIndexBuffer.h"
 #include "ZERenderer\ZERNMaterial.h"
 #include "ZEUI\ZEUTextEditControl.h"
+
+
+ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
+{
+	ResourceMesh = NULL;
+	Level = 0;
+	StartDistance = 0;
+	EndDistance = 1000000;
+	MaterialID = -1;
+	VertexType = ZEMD_VT_NORMAL;
+	IndexType = ZEMD_VIT_NONE;
+}
+
+ZEMDResourceLOD::~ZEMDResourceLOD()
+{
+	if (GetResourceMesh() != NULL)
+		GetResourceMesh()->RemoveLOD(this);
+}
+
+ZEMDResource* ZEMDResourceLOD::GetResource()
+{
+	if (ResourceMesh == NULL)
+		return NULL;
+	else
+		return ResourceMesh->GetResource();
+}
+
+const ZEMDResource* ZEMDResourceLOD::GetResource() const
+{
+	return GetResource();
+}
+
+ZEMDResourceMesh* ZEMDResourceLOD::GetResourceMesh()
+{
+	return ResourceMesh;
+}
+
+const ZEMDResourceMesh* ZEMDResourceLOD::GetResourceMesh() const
+{
+	return ResourceMesh;
+}
 
 void ZEMDResourceLOD::SetLevel(ZEInt32 LODLevel)
 {
@@ -197,9 +239,7 @@ ZEHolder<const ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
 
 void ZEMDResourceLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
-	UnregisterExternalResource(Material);
 	this->Material = Material;
-	RegisterExternalResource(Material);
 }
 
 ZEHolder<const ZERNMaterial> ZEMDResourceLOD::GetMaterial() const
@@ -226,15 +266,11 @@ void ZEMDResourceLOD::AddDraw(const ZEMDResourceDraw& Draw)
 {
 	Draws.Add(Draw);
 	Draws.GetLastItem().LOD = this;
-	if (Draw.GetMaterial() != NULL)
-		RegisterExternalResource(Draw.GetMaterial());
 }
 
 void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 {
 	Draws[Index].LOD = NULL;
-	if (Draws[Index].GetMaterial() != NULL)
-		UnregisterExternalResource(Draws[Index].GetMaterial());
 	Draws.Remove(Index);
 }
 
@@ -343,19 +379,7 @@ bool ZEMDResourceLOD::Serialize(ZEMLWriterNode& LODNode) const
 	return false; //Implementation required.
 }
 
-ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
+ZEMDResourceLOD* ZEMDResourceLOD::CreateInstance()
 {
-	Level = 0;
-	StartDistance = 0;
-	EndDistance = 1000000;
-	MaterialID = -1;
-	VertexType = ZEMD_VT_NORMAL;
-	IndexType = ZEMD_VIT_NONE;
-
-	Register();
-}
-
-ZEMDResourceLOD::~ZEMDResourceLOD()
-{
-	Unregister();
+	return new ZEMDResourceLOD();
 }

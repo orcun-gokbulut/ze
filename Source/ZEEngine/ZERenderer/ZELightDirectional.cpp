@@ -377,6 +377,7 @@ void ZELightDirectional::Render(const ZERNRenderParameters* Parameters, const ZE
 		ZERNPreRenderParameters Parameters;
 		Parameters.Renderer = &ShadowRenderer;
 		Parameters.View = &View;
+		Parameters.Type = ZERN_PRT_SHADOW;
 		
 		ShadowRenderer.StartScene(GetScene()->GetConstantBuffer());
 			GetScene()->PreRender(&Parameters);
