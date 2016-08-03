@@ -483,6 +483,11 @@ void ZEUIControl::Tick(float ElapsedTime)
 			ChildControls[I]->Tick(ElapsedTime);
 }
 
+void ZEUIControl::Destroy()
+{
+	delete this;
+}
+
 ZEUIControl::ZEUIControl()
 {
 	ParentControl	= NULL;

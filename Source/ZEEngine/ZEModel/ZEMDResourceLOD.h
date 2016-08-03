@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResource.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEMDVertex.h"
 #include "ZEMDResourceDraw.h"
@@ -51,7 +52,7 @@ ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
 ZE_META_FORWARD_DECLARE(ZEGRVertexBuffer, "ZERenderer/ZEGRVertexBuffer.h");
 ZE_META_FORWARD_DECLARE(ZEGRIndexBuffer, "ZERenderer/ZEGRIndexBuffer.h");
 
-class ZEMDResourceLOD : public ZERSResource
+class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceLOD)
@@ -59,6 +60,7 @@ class ZEMDResourceLOD : public ZERSResource
 	friend class ZEMDResource;
 	friend class ZEMDResourceDraw;
 	private:
+		ZEMDResourceMesh*						ResourceMesh;
 		ZELink<ZEMDResourceLOD>					Link;
 
 		ZEInt32									Level;
@@ -84,7 +86,17 @@ class ZEMDResourceLOD : public ZERSResource
 		ZEInt									MaterialID; // Backwards Compatibility
 		ZEHolder<const ZERNMaterial>			Material;
 
+
+												ZEMDResourceLOD();
+		virtual									~ZEMDResourceLOD();
+
 	public:
+		ZEMDResource*							GetResource();
+		const ZEMDResource*						GetResource() const;
+
+		ZEMDResourceMesh*						GetResourceMesh();
+		const ZEMDResourceMesh*					GetResourceMesh() const;
+
 		void									SetLevel(ZEInt32 LODLevel);
 		ZEInt32									GetLevel() const;
 
@@ -145,6 +157,5 @@ class ZEMDResourceLOD : public ZERSResource
 		bool									Unserialize(const ZEMLReaderNode& LODNode);
 		bool									Serialize(ZEMLWriterNode& LODNode) const;
 
-												ZEMDResourceLOD();
-												~ZEMDResourceLOD();
+		static ZEMDResourceLOD*					CreateInstance();
 };

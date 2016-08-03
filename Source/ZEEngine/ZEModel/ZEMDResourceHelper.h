@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResource.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZELink.h"
@@ -54,47 +55,53 @@ enum ZEMDResourceHelperParentType
 	ZE_MRHPT_BONE	= 2
 };
 
-class ZEMDResourceHelper : public ZERSResource
+class ZEMDResourceHelper : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceHelper)
 	friend class ZEMDResource;
 	private:
-		ZELink<ZEMDResourceHelper>		Link;
+		ZEMDResource*							Resource;
+		ZELink<ZEMDResourceHelper>				Link;
 
-		ZEString						Name;
-		ZEMDResourceHelperParentType	OwnerType;
-		ZEInt32							OwnerId;
-		ZEVector3						Position;
-		ZEQuaternion					Rotation;
-		ZEVector3						Scale;
-		ZEString						UserDefinedProperties;
+		ZEString								Name;
+		ZEMDResourceHelperParentType			OwnerType;
+		ZEInt32									OwnerId;
+		ZEVector3								Position;
+		ZEQuaternion							Rotation;
+		ZEVector3								Scale;
+		ZEString								UserDefinedProperties;
+
+												ZEMDResourceHelper();
+		virtual									~ZEMDResourceHelper();
 
 	public:
-		void							SetName(const ZEString& Name);
-		const ZEString&					GetName() const;
+		ZEMDResource*							GetResource();
+		const ZEMDResource*						GetResource() const;
 
-		void							SetOwnerType(ZEMDResourceHelperParentType OwnerType);
-		ZEMDResourceHelperParentType	GetOwnerType() const;
+		void									SetName(const ZEString& Name);
+		const ZEString&							GetName() const;
 
-		void							SetOwnerId(ZEInt32 OwnerId);
-		ZEInt32							GetOwnerId() const;
+		void									SetOwnerType(ZEMDResourceHelperParentType OwnerType);
+		ZEMDResourceHelperParentType			GetOwnerType() const;
 
-		void							SetPosition(const ZEVector3& Position);
-		const ZEVector3&				GetPosition() const;
+		void									SetOwnerId(ZEInt32 OwnerId);
+		ZEInt32									GetOwnerId() const;
 
-		void							SetRotation(const ZEQuaternion& Rotation);
-		const ZEQuaternion&				GetRotation() const;
+		void									SetPosition(const ZEVector3& Position);
+		const ZEVector3&						GetPosition() const;
 
-		void							SetScale(const ZEVector3& Scale);
-		const ZEVector3&				GetScale() const;
+		void									SetRotation(const ZEQuaternion& Rotation);
+		const ZEQuaternion&						GetRotation() const;
 
-		void							SetUserDefinedProperties(ZEString UserDefinedProperties);
-		ZEString						GetUserDefinedProperties() const;
+		void									SetScale(const ZEVector3& Scale);
+		const ZEVector3&						GetScale() const;
 
-		bool							Unserialize(const ZEMLReaderNode& HelperNode);
-		bool							Serialize(ZEMLWriterNode& HelperNode) const;
+		void									SetUserDefinedProperties(ZEString UserDefinedProperties);
+		ZEString								GetUserDefinedProperties() const;
 
-										ZEMDResourceHelper();
-		virtual							~ZEMDResourceHelper();
+		bool									Unserialize(const ZEMLReaderNode& HelperNode);
+		bool									Serialize(ZEMLWriterNode& HelperNode) const;
+
+		static ZEMDResourceHelper*				CreateInstance();
 };

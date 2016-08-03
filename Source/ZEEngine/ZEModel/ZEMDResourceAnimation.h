@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResource.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZELink.h"
@@ -61,12 +62,13 @@ struct ZEMDResourceAnimationFrame
 	ZEArray<ZEMDResourceAnimationKey>		MeshKeys;
 };
 
-class ZEMDResourceAnimation : public ZERSResource
+class ZEMDResourceAnimation : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceAnimation)
 	friend class ZEMDResource;
 	private:
+		ZEMDResource*								Resource;
 		ZELink<ZEMDResourceAnimation>				Link;
 
 		ZEString									Name;
@@ -74,7 +76,13 @@ class ZEMDResourceAnimation : public ZERSResource
 		ZEArray<ZEGUID>								ItemGUIDS;
 		float										FramesPerSecond;
 
+													ZEMDResourceAnimation();
+		virtual										~ZEMDResourceAnimation();
+
 	public:
+		ZEMDResource*								GetResource();
+		const ZEMDResource*							GetResource() const;
+
 		void										SetName(const ZEString& Name);
 		const ZEString&								GetName() const;
 
@@ -90,6 +98,5 @@ class ZEMDResourceAnimation : public ZERSResource
 		bool										Unserialize(const ZEMLReaderNode& AnimationNode);
 		bool										Serialize(ZEMLWriterNode& AnimationNode) const;
 
-													ZEMDResourceAnimation();
-		virtual										~ZEMDResourceAnimation();
+		static ZEMDResourceAnimation*				CreateInstance();
 };

@@ -298,6 +298,11 @@ void ZEUILabel::SetHeight(float Height)
 	UpdateTextRenderingArea();
 }
 
+ZEUILabel* ZEUILabel::CreateInstance()
+{
+	return new ZEUILabel();
+}
+
 void ZEUILabel::SetFontResource(ZEHolder<const ZEUIFont> Resource)
 {
 	FontResource = Resource;

@@ -85,7 +85,7 @@ class ZEUIFontTrueType : public ZEUIFont
 
 	public:
 		virtual ZEUIFontType						GetFontResourceType() const;
-		ZEUInt32									GetFontSize() const const ;
+		ZEUInt32									GetFontSize() const;
 
 		virtual ZEUIFontCharacter					GetCharacter(char Character) const;
 		virtual ZEUIFontCharacter					GetCharacter(char CurrentChar, char NextChar, ZEInt64& KerningDistance) const;

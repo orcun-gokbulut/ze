@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEModelDraw.h"
 #include "ZEMDVertex.h"
@@ -56,14 +57,13 @@ class ZERNRenderParameters;
 
 ZE_META_FORWARD_DECLARE(ZEMDResourceLOD, "ZEMDResourceLOD.h")
 
-class ZEModelMeshLOD : public ZEObject
+class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEModelMeshLOD)
 	friend class ZEModelMesh;
 	friend class ZEModelDraw;
 	private:
-		ZEModel*									Model;
 		ZEModelMesh*								Mesh;
 		ZELink<ZEModelMeshLOD>						MeshLink;
 
@@ -80,10 +80,11 @@ class ZEModelMeshLOD : public ZEObject
 
 		ZEArray<ZEModelDraw>						Draws;
 
-		ZERSHolder<const ZEMDResourceLOD>			Resource;
-
-		bool										Load();
+		bool										Load(const ZEMDResourceLOD* Resource);
 		bool										Unload();
+				
+													ZEModelMeshLOD();
+		virtual										~ZEModelMeshLOD();
 
 	public:
 		ZEModel*									GetModel();
@@ -125,6 +126,5 @@ class ZEModelMeshLOD : public ZEObject
 
 		void										Render(const ZERNRenderParameters* RenderParameters, const ZERNCommand* Command);
 
-													ZEModelMeshLOD();
-													~ZEModelMeshLOD();
+		static ZEModelMeshLOD*						CreateInstance();
 };

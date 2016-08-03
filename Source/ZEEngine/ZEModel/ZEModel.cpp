@@ -185,7 +185,12 @@ void ZEModel::AnimationStateChanged()
 ZEEntityResult ZEModel::LoadInternal()
 {
 	if (Resource == NULL)
-		return ZE_ER_DONE;
+	{
+		if (ModelFileName.IsEmpty())
+			return ZE_ER_DONE;
+		else
+			Resource = ZEMDResource::LoadResourceShared(ModelFileName);
+	}
 
 	if (!Resource->IsLoaded())
 	{
@@ -193,49 +198,48 @@ ZEEntityResult ZEModel::LoadInternal()
 		return ZE_ER_WAIT;
 	}
 	else if (Resource->IsFailed())
+	{
 		return ZE_ER_FAILED;
+	}
 
 	BoundingBoxIsUserDefined = Resource->GetUserDefinedBoundingBoxEnabled();
 	const_cast<ZEModel*>(this)->SetBoundingBox(Resource->GetUserDefinedBoundingBox());
 
 	ze_for_each(ResourceMesh, Resource->GetMeshes())
 	{
-		ZEModelMesh* Mesh = new ZEModelMesh();
+		ZEModelMesh* Mesh = ZEModelMesh::CreateInstance();
 		AddMesh(Mesh);
-		Mesh->SetResouce(ResourceMesh.GetPointer());
-		Mesh->Load();
+		Mesh->Load(ResourceMesh.GetPointer());
 	}
 
 	for (ZESize I = 0; I < Resource->GetMeshes().GetCount(); I++)
 	{
-		if (Resource->GetMeshes()[I]->GetParentMesh() != -1 || Resource->GetMeshes()[I]->GetParentMesh() >= Meshes.GetCount())
+		if (Resource->GetMeshes()[I]->GetParentMeshId() != -1 || Resource->GetMeshes()[I]->GetParentMeshId() >= Meshes.GetCount())
 			continue;
 
-		Meshes[(ZESize)Resource->GetMeshes()[I]->GetParentMesh()]->AddChildMesh(Meshes[I]);
+		Meshes[(ZESize)Resource->GetMeshes()[I]->GetParentMeshId()]->AddChildMesh(Meshes[I]);
 	}
 
 	ze_for_each(ResourceBone, Resource->GetBones())
 	{
-		ZEModelBone* Bone = new ZEModelBone();	
+		ZEModelBone* Bone = ZEModelBone::CreateInstance();	
 		AddBone(Bone);
-		Bone->SetResource(ResourceBone.GetPointer());
-		Bone->Load();
+		Bone->Load(ResourceBone.GetPointer());
 	}
 
 	for (ZESize I = 0; I < Resource->GetBones().GetCount(); I++)
 	{
-		if (Resource->GetBones()[I]->GetParentBone() != -1 || Resource->GetBones()[I]->GetParentBone() >= Bones.GetCount())
+		if (Resource->GetBones()[I]->GetParentBoneId() != -1 || Resource->GetBones()[I]->GetParentBoneId() >= Bones.GetCount())
 			continue;
 
-		Bones[(ZESize)Resource->GetBones()[I]->GetParentBone()]->AddChildBone(Bones[I]);
+		Bones[(ZESize)Resource->GetBones()[I]->GetParentBoneId()]->AddChildBone(Bones[I]);
 	}
 
 	ze_for_each(ResourceHelper, Resource->GetHelpers())
 	{
-		ZEModelHelper* Helper = new ZEModelHelper();
+		ZEModelHelper* Helper = ZEModelHelper::CreateInstance();
 		AddHelper(Helper);
-		Helper->SetResource(ResourceHelper.GetPointer());
-		Helper->Load();
+		Helper->Load(ResourceHelper.GetPointer());
 	}
 
 	DirtyConstantBufferSkin = true;
@@ -251,38 +255,35 @@ ZEEntityResult ZEModel::UnloadInternal()
 // 	if (ModelResource != NULL)
 // 		const_cast<ZEMDResource*>(ModelResource)->Release();
 
-	ze_for_each(Mesh, Meshes)
+	while (Meshes.GetFirst() != NULL)
 	{
-		RemoveMesh(Mesh.GetPointer());
-		delete Mesh.GetPointer();
+		ZEModelMesh* Mesh = Meshes.GetFirst()->GetItem();
+		Mesh->Destroy();
 	}
 
-	ze_for_each(Bone, Bones)
+	while (Bones.GetFirst() != NULL)
 	{
-		RemoveBone(Bone.GetPointer());
-		delete Bone.GetPointer();
+		ZEModelBone* Bone = Bones.GetFirst()->GetItem();
+		Bone->Destroy();
 	}
 
-
-	ze_for_each(Helper, Helpers)
+	while (Helpers.GetFirst() != NULL)
 	{
-		RemoveHelper(Helper.GetPointer());
-		delete Helper.GetPointer();
+		ZEModelHelper* Helper = Helpers.GetFirst()->GetItem();
+		Helper->Destroy();
 	}
 
-// 	ze_for_each(IKChain, IKChains)
-// 	{
-// 		RemoveIKChain(IKChain.GetPointer());
-// 		delete IKChain.GetPointer();
-// 	}
-
-	ze_for_each(AnimationTrack, AnimationTracks)
+	while (AnimationTracks.GetFirst() != NULL)
 	{
-		RemoveAnimationTrack(AnimationTrack.GetPointer());
-		delete AnimationTrack.GetPointer();
+		ZEModelAnimationTrack* AnimationTrack = AnimationTracks.GetFirst()->GetItem();
+		AnimationTrack->Destroy();
 	}
 
-	AnimationTrack = NULL;
+	if (AnimationTrack != NULL)
+	{
+		AnimationTrack->Destroy();
+		AnimationTrack = NULL;
+	}
 
 	ConstantBufferBoneTransforms.Release();
 
@@ -293,6 +294,7 @@ ZEModel::ZEModel()
 {
 	Resource = NULL;
 	AnimationUpdateMode = ZE_MAUM_LOGICAL;
+	AnimationTrack = NULL;
 	BoundingBoxIsUserDefined = false;
 	DirtyBoundingBox = true;
 	DirtyConstantBufferSkin = true;
@@ -350,6 +352,15 @@ void ZEModel::RemoveMesh(ZEModelMesh* Mesh)
 	zeCheckError(Mesh->GetModel() != this, ZE_VOID, "Cannot remove mesh. Mesh does not belong this Model. Parent Model Name: \"%s\", Mesh Name: \"%s\".",
 		Mesh->GetModel()->GetName().ToCString(), Mesh->GetName().ToCString());
 
+	while (Mesh->ChildMeshes.GetFirst() != NULL)
+	{
+		ZEModelMesh* ChildMesh = Mesh->ChildMeshes.GetFirst()->GetItem();
+		Mesh->RemoveChildMesh(ChildMesh);
+	}
+
+	if (Mesh->GetParent() != NULL)
+		Mesh->GetParent()->RemoveChildMesh(Mesh);
+
 	Mesh->SetModel(NULL);
 	Meshes.Remove(&Mesh->ModelLink);
 }
@@ -398,6 +409,15 @@ void ZEModel::RemoveBone(ZEModelBone* Bone)
 	zeCheckError(Bone == NULL, ZE_VOID, "Cannot remove bone. Bone is NULL.");
 	zeCheckError(Bone->GetModel() != this, ZE_VOID, "Cannot remove bone. Bone does not belong this Model. Parent Model Name: \"%s\", Bone Name: \"%s\".",
 		Bone->GetModel()->GetName().ToCString(), Bone->GetName().ToCString());
+
+	while (Bone->ChildBones.GetFirst() != NULL)
+	{
+		ZEModelBone* ChildBone = Bone->ChildBones.GetFirst()->GetItem();
+		Bone->RemoveChildBone(ChildBone);
+	}
+
+	if (Bone->GetParent() != NULL)
+		Bone->GetParent()->RemoveChildBone(Bone);
 
 	Bone->SetModel(NULL);
 	Bones.Remove(&Bone->ModelLink);
@@ -511,35 +531,23 @@ const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 void ZEModel::SetModelFile(const ZEString& FileName)
 {
 	ZERSHolder<const ZEMDResource> ModelResource = ZEMDResource::LoadResourceShared(FileName);
-
-	if (ModelResource.IsNull())
-	{
-		zeError("Can not load model file. File Name : \"%s\"", FileName.ToCString());
-		return;
-	}
-
 	SetModelResource(ModelResource);
 }
 
 const ZEString& ZEModel::GetModelFile() const
 {
-	if (Resource.IsNull())
-		return ZEString::Empty;
-
-	return Resource->GetFileName();
+	return ModelFileName;
 }
 
 void ZEModel::SetModelResource(ZERSHolder<const ZEMDResource> ModelResource)
 {
-	bool ReloadingRequired = IsLoaded();
-
-	if (ReloadingRequired)
-		Unload();
+	if (Resource == ModelResource)
+		return;
 
 	Resource = ModelResource;
-
-	if (ReloadingRequired)
-		Load();
+	ModelFileName = Resource->GetFileName();
+	
+	Reload();
 }
 
 ZERSHolder<const ZEMDResource> ZEModel::GetModelResource() const

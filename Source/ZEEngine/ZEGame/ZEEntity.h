@@ -113,9 +113,13 @@ class ZEEntity : public ZEObject
 		ZEScene*								Scene;
 		ZEDObjectWrapper*						Wrapper;
 
-		ZEString								Name;
 		ZEEntityState							State;
 		ZEEntityState							TargetState;
+		bool									ReinitializeFlag;
+		bool									ReloadFlag;
+		bool									SerialOperation;
+
+		ZEString								Name;
 		ZEInt									EntityId;
 		ZEVector3								Position;
 		ZEQuaternion							Rotation;
@@ -123,7 +127,6 @@ class ZEEntity : public ZEObject
 		bool									Enabled;
 		bool									Visible;
 		bool									Static;
-		bool									SerialOperation;
 		ZEEntityFlags							EntityFlags;
 		mutable ZELock							EntityLock;
 
@@ -261,9 +264,11 @@ class ZEEntity : public ZEObject
 
 		void									Initialize();
 		void									Deinitialize();
+		void									Reinitialize();
 
 		void									Load();
 		void									Unload();
+		void									Reload();
 
 		void									Destroy();
 

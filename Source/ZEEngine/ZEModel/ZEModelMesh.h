@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEModelMeshLOD.h"
 #include "ZEModelAnimation.h"
@@ -54,7 +55,7 @@ class ZERayCastReport;
 
 ZE_META_FORWARD_DECLARE(ZEModel, "ZEModel.h")
 
-class ZEModelMesh : public ZEObject
+class ZEModelMesh : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEModelMesh)
@@ -96,7 +97,7 @@ class ZEModelMesh : public ZEObject
 		ZEArray<ZEPlane>						ClippingPlanes;
 		ZEHolder<ZEGRConstantBuffer>			ConstantBuffer;
 
-		ZERSHolder<const ZEMDResourceMesh>		Resource;
+		const ZEMDResourceMesh*					Resource;
 
 		void									SetModel(ZEModel* Model);
 		void									SetParent(ZEModelMesh* Mesh);
@@ -111,8 +112,11 @@ class ZEModelMesh : public ZEObject
 
 		void									UpdateConstantBuffer();
 
-		bool									Load();
+		bool									Load(const ZEMDResourceMesh* Resource);
 		bool									Unload();
+
+												ZEModelMesh();
+		virtual									~ZEModelMesh();
 
 	public:
 		ZEModel*								GetModel() const;
@@ -191,9 +195,5 @@ class ZEModelMesh : public ZEObject
 		bool									PreRender(const ZERNPreRenderParameters* Parameters);
 		void									RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 
-		void									SetResouce(ZERSHolder<const ZEMDResourceMesh> Resource);
-		ZERSHolder<const ZEMDResourceMesh>		GetResource();
-
-												ZEModelMesh();
-		virtual									~ZEModelMesh();
+		static ZEModelMesh*						CreateInstance();
 };

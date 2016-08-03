@@ -36,6 +36,7 @@
 #pragma once
 
 #include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZEModelMesh.h"
 #include "ZEModelBone.h"
@@ -55,7 +56,7 @@ enum ZEModelHelperParentType
 	ZE_MHPT_BONE			= 2
 };
 
-class ZEModelHelper : public ZEObject
+class ZEModelHelper : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	friend class ZEModel;
@@ -73,10 +74,11 @@ class ZEModelHelper : public ZEObject
 		ZEVector3								Scale;
 		ZEString								UserDefinedProperties;
 
-		ZERSHolder<const ZEMDResourceHelper>	Resource;
-
-		bool									Load();
+		bool									Load(const ZEMDResourceHelper* Resource);
 		bool									Unload();
+	
+												ZEModelHelper();
+		virtual									~ZEModelHelper();
 
 	public:
 		ZEModel*								GetModel() const;
@@ -125,10 +127,5 @@ class ZEModelHelper : public ZEObject
 		void									SetUserDefinedProperties(const ZEString& Properties);
 		const ZEString&							GetUserDefinedProperties() const;
 
-		void									SetResource(ZERSHolder<const ZEMDResourceHelper> Resource);
-		ZERSHolder<const ZEMDResourceHelper>	GetResource();
-
-												ZEModelHelper();
-		virtual									~ZEModelHelper();
-
+		static ZEModelHelper*					CreateInstance();
 };

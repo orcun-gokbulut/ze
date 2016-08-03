@@ -70,8 +70,10 @@ void ZEScene::TickEntity(ZEEntity* Entity, float ElapsedTime)
 
 void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters)
 {
-	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "PreRendering an entity which is not loaded.");
 	zeDebugCheck(!Entity->GetVisible(), "PreRendering an entity which is not visible.");
+
+	if (!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded())
+		return;
 
 	if (!Entity->IsInitialized())
 		return;
@@ -307,16 +309,16 @@ const ZEVector3& ZEScene::GetAmbientColor() const
 
 ZEUInt ZEScene::GetLoadingPercentage()
 {
-	ZESize Total = 0;
+	ZESize Total = 100;
+	ZESize Count;
 	ZE_LOCK_SECTION(SceneLock)
 	{
-		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		Count = Entities.GetCount();
+		for (ZESize I = 0; I < Count; I++)
 			Total += Entities[I]->GetLoadingPercentage();
-
-		Total /= Entities.GetCount() * 100;
 	}
 
-	return (ZEUInt)Total;
+	return (ZEUInt)(Total / (Count + 1));
 }
 
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()

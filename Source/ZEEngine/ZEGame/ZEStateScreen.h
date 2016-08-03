@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZERNRenderParameters.cpp
+ Zinek Engine - ZEStateScreen.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,50 +33,44 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZERNRenderParameters.h"
+#pragma once
 
-#include "ZECore\ZECore.h"
+#include "ZETypes.h"
+#include "ZEEntity.h"
+#include "ZEUI/ZEUILabel.h"
 
-void ZERNPreRenderParameters::UpdateTime()
+class ZERNMaterial;
+class ZEGRVertexBuffer;
+class ZEUIFontTrueType;
+class ZEUIManager;
+
+class ZEStateScreen : public ZEEntity
 {
-	ZECore* Core = ZECore::GetInstance();
+	ZE_OBJECT
+	private:
+		ZEUIManager*						Manager;
 
-	FrameId = Core->GetFrameId();
-	ElapsedTime = Core->GetElapsedTime();
-	Time = Core->GetRuningTime();
-}
+		ZEArray<ZEUILabel*>					ConsoleLines;
+		ZEUILabel*							LoadingLabel;
 
-ZERNPreRenderParameters::ZERNPreRenderParameters()
-{
-	FrameId = 0;
-	ElapsedTime = 0.0f;
-	Time = 0.0f;
-	View = NULL;
-	Renderer = NULL;
-	Type = ZERN_PRT_COLOR;
+		ZEUIFrameControl*					LoadingIndicatorFrame;
+		ZEHolder<const ZEUIFontTrueType>	Font;
 
-	UpdateTime();
-}
+		ZEUInt								LastLoadingPercentage;
+		ZESize								LastOutputBufferCount;
 
-void ZERNRenderParameters::UpdateTime()
-{
-	ZECore* Core = ZECore::GetInstance();
+		virtual ZEEntityResult				LoadInternal();
+		virtual ZEEntityResult				UnloadInternal();
 
-	FrameId = Core->GetFrameId();
-	ElapsedTime = Core->GetElapsedTime();
-	Time = Core->GetRuningTime();
-}
+											ZEStateScreen();
+		virtual								~ZEStateScreen();
 
-ZERNRenderParameters::ZERNRenderParameters()
-{
-	FrameId = 0;
-	ElapsedTime = 0.0f;
-	Time = 0.0f;
-	Context = NULL;
-	View = NULL;
-	Renderer = NULL;
-	Stage = NULL;
-	Command = NULL;
+	public:
+		void								SetManager(ZEUIManager* Manager);
+		ZEUIManager*						GetManager();
 
-	UpdateTime();
-}
+		virtual void						Tick(float ElapsedTime);
+		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
+
+		static ZEStateScreen*				CreateInstance();
+};

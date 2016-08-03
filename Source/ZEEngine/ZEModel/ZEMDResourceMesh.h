@@ -35,7 +35,8 @@
 
 #pragma once
 
-#include "ZEResource/ZERSResource.h"
+#include "ZEMeta/ZEObject.h"
+#include "ZEDestroyable.h"
 
 #include "ZETypes.h"
 #include "ZEDS/ZEString.h"
@@ -46,18 +47,19 @@
 #include "ZEMath/ZEQuaternion.h"
 #include "ZEMDResourcePhysics.h"
 
-class ZEMDResourceMesh : public ZERSResource
+class ZEMDResourceMesh : public ZEObject, public ZEDestroyable
 {
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResourceMesh)
 	friend class ZEMDResource;
 	friend class ZEMDResourceLOD;
 	private:
+		ZEMDResource*									Resource;
 		ZELink<ZEMDResourceMesh>						Link;
 
 		ZEString										Name; 
 		ZEAABBox										BoundingBox;
-		ZEInt32											ParentMesh;
+		ZEInt32											MeshId;
 		ZEVector3										Position;
 		ZEQuaternion									Rotation;
 		ZEVector3										Scale;
@@ -68,9 +70,14 @@ class ZEMDResourceMesh : public ZERSResource
 		ZEList2<ZEMDResourceLOD>						LODs;
 		ZEArray<ZEVector3>								Geometry;
 
+														ZEMDResourceMesh();
+		virtual											~ZEMDResourceMesh();
+
 	public:
-		void											SetParentMesh(ZEInt32 ParentMesh);
-		ZEInt32											GetParentMesh() const;
+		ZEMDResource*									GetResource();
+
+		void											SetParentMeshId(ZEInt32 ParentMesh);
+		ZEInt32											GetParentMeshId() const;
 
 		void											SetName(const ZEString& Name);
 		const ZEString&									GetName() const;
@@ -107,6 +114,5 @@ class ZEMDResourceMesh : public ZERSResource
 		bool											Unserialize(const ZEMLReaderNode& MeshNode);
 		bool											Serialize(ZEMLWriterNode& MeshNode) const;
 
-														ZEMDResourceMesh();
-														~ZEMDResourceMesh();
+		static ZEMDResourceMesh*						CreateInstance();
 };

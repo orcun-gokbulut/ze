@@ -39,7 +39,7 @@
 #include "ZEMDResource.h"
 #include "ZEMDResourceHelper.h"
 
-bool ZEModelHelper::Load()
+bool ZEModelHelper::Load(const ZEMDResourceHelper* Resource)
 {
 	Unload();
 
@@ -73,13 +73,33 @@ bool ZEModelHelper::Load()
 		SetParentMesh(NULL);
 	}
 
-
 	return true;
 }
 
 bool ZEModelHelper::Unload()
 {
 	return true;
+}
+
+ZEModelHelper::ZEModelHelper() : ModelLink(this)
+{
+	Model = NULL;
+
+	ParentType = ZE_MHPT_MODEL;
+	ParentMesh = NULL;
+	ParentBone = NULL;
+
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+}
+
+ZEModelHelper::~ZEModelHelper()
+{
+	Unload();
+
+	if (GetModel() != NULL)
+		GetModel()->RemoveHelper(this);
 }
 
 ZEModel* ZEModelHelper::GetModel() const
@@ -293,32 +313,7 @@ const ZEString& ZEModelHelper::GetUserDefinedProperties() const
 	return UserDefinedProperties;
 }
 
-void ZEModelHelper::SetResource(ZERSHolder<const ZEMDResourceHelper> Resource)
+ZEModelHelper* ZEModelHelper::CreateInstance()
 {
-	this->Resource = Resource;
-}
-
-ZERSHolder<const ZEMDResourceHelper> ZEModelHelper::GetResource()
-{
-	return Resource;
-}
-
-ZEModelHelper::ZEModelHelper() : ModelLink(this)
-{
-	Model = NULL;
-
-	ParentType = ZE_MHPT_MODEL;
-	ParentMesh = NULL;
-	ParentBone = NULL;
-	
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
-}
-
-ZEModelHelper::~ZEModelHelper()
-{
-	Unload();
-	if (GetModel() != NULL)
-		GetModel()->RemoveHelper(this);
+	return new ZEModelHelper();
 }

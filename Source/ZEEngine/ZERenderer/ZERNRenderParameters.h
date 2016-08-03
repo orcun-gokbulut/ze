@@ -50,6 +50,12 @@ ZE_META_FORWARD_DECLARE(ZERNStage, "ZERNStage.h");
 ZE_META_FORWARD_DECLARE(ZERNCommand, "ZERNCommand.h");
 ZE_META_FORWARD_DECLARE(ZERNView, "ZERNView.h");
 
+ZE_ENUM(ZERNPreRenderType)
+{
+	ZERN_PRT_COLOR,
+	ZERN_PRT_SHADOW,
+	ZERN_PRT_OTHER
+};
 
 class ZERNPreRenderParameters : public ZEObject
 {
@@ -60,6 +66,7 @@ class ZERNPreRenderParameters : public ZEObject
 		float						Time;
 		ZERNRenderer*				Renderer;
 		const ZERNView*				View;
+		ZERNPreRenderType			Type;
 
 		void						UpdateTime();
 

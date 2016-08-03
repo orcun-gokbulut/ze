@@ -356,6 +356,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 
 	if (State == ZE_ES_NONE)
 	{
+		ReloadFlag = false;
+		ReinitializeFlag = false;
+
 		if (TargetState == ZE_ES_DESTROYED)
 		{
 			State = ZE_ES_DESTROYING;
@@ -383,7 +386,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_LOADED)
 	{
-		if (TargetState < ZE_ES_LOADED)
+		ReinitializeFlag = false;
+
+		if (ReloadFlag || TargetState < ZE_ES_LOADED)
 		{
 			State = ZE_ES_UNLOADING;
 
@@ -406,7 +411,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_INITIALIZED)
 	{
-		if (TargetState < ZE_ES_INITIALIZED)
+		if (ReloadFlag || ReinitializeFlag || TargetState < ZE_ES_INITIALIZED)
 		{
 			State = ZE_ES_DEINITIALIZING;
 
@@ -617,6 +622,8 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	Wrapper = NULL;
 	Static = false;
 	EntityFlags = ZE_EF_NONE;
+	ReloadFlag = false;
+	ReinitializeFlag = false;
 	LocalTransformChanged();
 }
 
@@ -926,7 +933,7 @@ bool ZEEntity::IsDestroyed() const
 
 ZEUInt ZEEntity::GetLoadingPercentage()
 {
-	ZESize Total = 0;
+	ZESize Total = IsLoaded() ? 100 : 0;
 	ZESize Count;
 	ZE_LOCK_SECTION(EntityLock)
 	{
@@ -940,10 +947,7 @@ ZEUInt ZEEntity::GetLoadingPercentage()
 
 	}
 
-	if (Count == 0)
-		return 0;
-
-	Total /= Count * 100;
+	Total /= (Count + 1);
 	return (ZEUInt)Total;
 }
 
@@ -1011,6 +1015,19 @@ void ZEEntity::Deinitialize()
 	UpdateState();
 }
 
+void ZEEntity::Reinitialize()
+{
+	if (IsDestroyed())
+		return;
+
+	ReinitializeFlag = true;
+
+	if (TargetState < ZE_ES_INITIALIZED)
+		TargetState = ZE_ES_INITIALIZED;
+
+	UpdateState();
+}
+
 void ZEEntity::Load()
 {
 	if (TargetState >= ZE_ES_LOADED)
@@ -1032,8 +1049,20 @@ void ZEEntity::Unload()
 	if (IsDestroyed())
 		return;
 
-	
 	TargetState = ZE_ES_NONE;
+
+	UpdateState();
+}
+
+void ZEEntity::Reload()
+{
+	if (IsDestroyed())
+		return;
+
+	ReloadFlag = true;
+
+	if (TargetState <= ZE_ES_LOADED)
+		TargetState = ZE_ES_LOADED;
 
 	UpdateState();
 }

@@ -164,7 +164,6 @@ void ZEModelMesh::TransformChangedWorld()
 		ChildMesh->TransformChangedWorld();
 }
 
-
 void ZEModelMesh::UpdateConstantBuffer()
 {
 	if (!DirtyFlags.GetFlags(ZEMD_MDF_CONSTANT_BUFFER))
@@ -201,10 +200,45 @@ void ZEModelMesh::UpdateConstantBuffer()
 	DirtyFlags.UnraiseFlags(ZEMD_MDF_CONSTANT_BUFFER);
 }
 
-bool ZEModelMesh::Load()
+ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
+{
+	DirtyFlags.RaiseAll();
+
+	Resource = NULL;
+	Model = NULL;
+	Parent = NULL;
+	Visible = true;
+
+	Position = ZEVector3::Zero;
+	Rotation = ZEQuaternion::Identity;
+	Scale = ZEVector3::One;
+
+	BoundingBox = ZEAABBox::Zero;
+	ModelBoundingBox = ZEAABBox::Zero;
+	WorldBoundingBox = ZEAABBox::Zero;
+
+	Transform = ZEMatrix4x4::Identity;
+	InvTransform = ZEMatrix4x4::Identity;
+	ModelTransform = ZEMatrix4x4::Identity;
+	InvModelTransform = ZEMatrix4x4::Identity;
+	WorldTransform = ZEMatrix4x4::Identity;
+	InvWorldTransform = ZEMatrix4x4::Identity;
+
+	AnimationType = ZE_MAT_NOANIMATION;
+	CustomDrawOrderEnabled = false;
+	CustomDrawOrder = 0;
+}
+
+ZEModelMesh::~ZEModelMesh()
 {
 	Unload();
 
+	if (GetModel() != NULL)
+		GetModel()->RemoveMesh(this);
+}
+
+bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
+{
 	if (Resource == NULL)
 		return true;
 
@@ -221,24 +255,25 @@ bool ZEModelMesh::Load()
 
 	ze_for_each(ResourceLOD, Resource->GetLODs())
 	{
-		ZEModelMeshLOD* NewLOD = new ZEModelMeshLOD();
+		ZEModelMeshLOD* NewLOD = ZEModelMeshLOD::CreateInstance();
 		AddLOD(NewLOD);
-		NewLOD->SetResource(ResourceLOD.GetPointer());
-		NewLOD->Load();
+		NewLOD->Load(ResourceLOD.GetPointer());
 	}
+
+	this->Resource = Resource;
 
 	return true;
 }
 
 bool ZEModelMesh::Unload()
 {
-	ze_for_each(LOD, LODs)
-	{
-		RemoveLOD(LOD.GetPointer());
-		delete LOD.GetPointer();
-	}
-
 	DirtyFlags.RaiseAll();
+
+	while (LODs.GetFirst() != NULL)
+	{
+		ZEModelMeshLOD* LOD = LODs.GetFirst()->GetItem();
+		LOD->Destroy();
+	}
 
 	return true;
 }
@@ -670,9 +705,7 @@ void ZEModelMesh::AddLOD(ZEModelMeshLOD* LOD)
 	zeCheckError(LOD->GetMesh() != NULL, ZE_VOID, "Mesh is already added to another mesh.");
 
 	LOD->Mesh = this;
-	LOD->Model = GetModel();
 	LODs.AddEnd(&LOD->MeshLink);
-
 }
 
 void ZEModelMesh::RemoveLOD(ZEModelMeshLOD* LOD)
@@ -681,7 +714,6 @@ void ZEModelMesh::RemoveLOD(ZEModelMeshLOD* LOD)
 	zeCheckError(LOD->GetMesh() != this, ZE_VOID, "Mesh is not a child mesh of this mesh.");
 
 	LOD->Mesh = NULL;
-	LOD->Model = NULL;
 	LODs.Remove(&LOD->MeshLink);
 }
 
@@ -844,51 +876,7 @@ void ZEModelMesh::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Pa
 		Helper.RayCastMesh(Resource->GetGeometry().GetConstCArray(), Resource->GetGeometry().GetCount(), sizeof(ZEVector3));
 }
 
-void ZEModelMesh::SetResouce(ZERSHolder<const ZEMDResourceMesh> Resource)
+ZEModelMesh* ZEModelMesh::CreateInstance()
 {
-	this->Resource = Resource;
-}
-
-ZERSHolder<const ZEMDResourceMesh> ZEModelMesh::GetResource()
-{
-	return Resource;
-}
-
-ZEModelMesh::ZEModelMesh() : ParentLink(this), ModelLink(this)
-{
-	DirtyFlags.RaiseAll();
-
-	Model = NULL;
-	Parent = NULL;
-	Visible = true;
-
-	Position = ZEVector3::Zero;
-	Rotation = ZEQuaternion::Identity;
-	Scale = ZEVector3::One;
-
-	BoundingBox = ZEAABBox::Zero;
-	ModelBoundingBox = ZEAABBox::Zero;
-	WorldBoundingBox = ZEAABBox::Zero;
-
-	Transform = ZEMatrix4x4::Identity;
-	InvTransform = ZEMatrix4x4::Identity;
-	ModelTransform = ZEMatrix4x4::Identity;
-	InvModelTransform = ZEMatrix4x4::Identity;
-	WorldTransform = ZEMatrix4x4::Identity;
-	InvWorldTransform = ZEMatrix4x4::Identity;
-
-	AnimationType = ZE_MAT_NOANIMATION;
-	CustomDrawOrderEnabled = false;
-	CustomDrawOrder = 0;
-}
-
-ZEModelMesh::~ZEModelMesh()
-{
-	Unload();
-
-	if (GetParent() == NULL)
-		GetParent()->RemoveChildMesh(this);
-	
-	if (GetModel() != NULL)
-		GetModel()->RemoveMesh(this);
+	return new ZEModelMesh();
 }
