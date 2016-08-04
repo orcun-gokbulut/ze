@@ -446,7 +446,8 @@ bool ZEUIManager::InitializeInternal()
 	if (!ZEInitializable::InitializeInternal())
 		return false;
 		
-	UIRenderer->Initialize();
+	if (!UIRenderer->Initialize())
+		return false;
 
 	InputMap.AddButtonAction("Keyboard",ZE_IKB_ESCAPE,			 ZE_IS_PRESSED, ZE_IKB_ESCAPE);
 	InputMap.AddButtonAction("Keyboard",ZE_IKB_1,				 ZE_IS_PRESSED, ZE_IKB_1);

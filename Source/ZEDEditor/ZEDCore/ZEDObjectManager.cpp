@@ -288,6 +288,12 @@ void ZEDObjectManager::RelocateObjects(ZEDObjectWrapper* Destination, const ZEAr
 	GetEditor()->GetOperationManager()->DoOperation(DeleteOpeeration);
 }
 
+void ZEDObjectManager::Tick(float ElapsedTime)
+{
+	if (RootWrapper != NULL)
+		RootWrapper->Tick(ElapsedTime);
+}
+
 ZEDObjectManager* ZEDObjectManager::CreateInstance()
 {
 	return new ZEDObjectManager();

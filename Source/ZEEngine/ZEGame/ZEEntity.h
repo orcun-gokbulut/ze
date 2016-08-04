@@ -53,6 +53,7 @@
 #include "ZEMeta/ZEEnumerator.h"
 #include "ZEThread/ZETask.h"
 #include "ZERayCast.h"
+#include "ZEVolumeCast.h"
 
 class ZEScene;
 class ZEDObjectWrapper;
@@ -115,9 +116,10 @@ class ZEEntity : public ZEObject
 
 		ZEEntityState							State;
 		ZEEntityState							TargetState;
-		bool									ReinitializeFlag;
 		bool									ReloadFlag;
+		bool									ReinitializeFlag;
 		bool									SerialOperation;
+		ZETask									UpdateStateTask;
 
 		ZEString								Name;
 		ZEInt									EntityId;
@@ -125,14 +127,13 @@ class ZEEntity : public ZEObject
 		ZEQuaternion							Rotation;
 		ZEVector3								Scale;
 		bool									Enabled;
+		bool									EnabledFlattened;
 		bool									Visible;
+		bool									VisibleFlattened;
 		bool									Static;
 		ZEEntityFlags							EntityFlags;
 		mutable ZELock							EntityLock;
 
-		bool									EnabledFlattened;
-		bool									VisibleFlattened;
-		
 		mutable ZEFlags							EntityDirtyFlags;
 		mutable ZEMatrix4x4						Transform;
 		mutable ZEMatrix4x4						InvTransform;
@@ -147,7 +148,6 @@ class ZEEntity : public ZEObject
 		ZELink<ZEEntity>						TickListLink;
 		ZELink<ZEEntity>						RenderListLink;
 
-		ZETask									UpdateStateTask;
 		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters);
 		void									UpdateStateSerial();
 		void									UpdateState();
@@ -277,6 +277,7 @@ class ZEEntity : public ZEObject
 		virtual bool							PreRender(const ZERNPreRenderParameters* Parameters);
 		virtual void							Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
+		virtual void							VolumeCast(ZEVolumeCastReport& Report, const ZEVolumeCastParameters& Parameters);
 
 		virtual bool							Serialize(ZEMLWriterNode* Serializer);
 		virtual bool							Unserialize(ZEMLReaderNode* Unserializer);

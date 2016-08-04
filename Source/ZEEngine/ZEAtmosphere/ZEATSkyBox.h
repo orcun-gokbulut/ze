@@ -54,7 +54,8 @@ class ZEATSkyBox : public ZEEntity
 	private:
 		ZEFlags								DirtyFlags;
 		ZERNCommand							SkyRenderCommand;
-		
+		ZEString							TextureFileName;
+
 		ZEHolder<ZEGRShader>				VertexShader;
 		ZEHolder<ZEGRShader>				PixelShader;
 		ZEHolder<ZEGRRenderStateData>		RenderStateData;
@@ -73,8 +74,10 @@ class ZEATSkyBox : public ZEEntity
 			float							Reserved;
 		} Constants;
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		void								LoadTexture();
+
+		virtual ZEEntityResult				LoadInternal();
+		virtual ZEEntityResult				UnloadInternal();
 
 		bool								UpdateShaders();
 		bool								UpdateRenderStates();

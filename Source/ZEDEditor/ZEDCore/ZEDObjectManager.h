@@ -87,5 +87,7 @@ class ZEDObjectManager : public ZEDComponent
 		void									RelocateObject(ZEDObjectWrapper* Destination, ZEDObjectWrapper* Wrapper);
 		void									RelocateObjects(ZEDObjectWrapper* Destination, const ZEArray<ZEDObjectWrapper*> Wrappers);
 
+		void									Tick(float ElapsedTime);
+
 		static ZEDObjectManager*				CreateInstance();
 };

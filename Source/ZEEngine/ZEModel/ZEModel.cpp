@@ -547,7 +547,8 @@ void ZEModel::SetModelResource(ZERSHolder<const ZEMDResource> ModelResource)
 	Resource = ModelResource;
 	ModelFileName = Resource->GetFileName();
 	
-	Reload();
+	if (IsLoaded())
+		Reload();
 }
 
 ZERSHolder<const ZEMDResource> ZEModel::GetModelResource() const

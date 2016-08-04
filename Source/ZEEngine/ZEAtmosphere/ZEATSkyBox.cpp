@@ -55,10 +55,28 @@
 #define	ZEAT_SBDF_RENDER_STATE		2
 #define	ZEAT_SBDF_CONSTANT_BUFFER	4
 
-bool ZEATSkyBox::InitializeSelf()
+void ZEATSkyBox::LoadTexture()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	if (TextureFileName.IsEmpty())
+		return;
+
+	ZEGRTextureCubeOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = false;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+	SkyTexture = ZEGRTextureCube::LoadResourceShared(TextureFileName, TextureOptions);
+}
+
+ZEEntityResult ZEATSkyBox::LoadInternal()
+{
+	if (SkyTexture != NULL)
+	{
+		if (!SkyTexture->IsLoaded())
+			return ZE_ER_WAIT;
+		else if (SkyTexture->IsFailed())
+			return ZE_ER_FAILED;
+	}
 
 	ZECanvas SkyBox;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
@@ -67,10 +85,15 @@ bool ZEATSkyBox::InitializeSelf()
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
 	ConstantBufferTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 
-	return Update();
+	LoadTexture();
+
+	if (!Update())
+		return ZE_ER_FAILED;
+
+	return ZE_ER_DONE;
 }
 
-bool ZEATSkyBox::DeinitializeSelf()
+ZEEntityResult ZEATSkyBox::UnloadInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -82,7 +105,7 @@ bool ZEATSkyBox::DeinitializeSelf()
 	ConstantBufferTransform.Release();
 	SkyTexture.Release();
 
-	return ZEEntity::DeinitializeSelf();
+	return ZE_ER_DONE;
 }
 
 bool ZEATSkyBox::UpdateShaders()
@@ -186,13 +209,13 @@ ZEATSkyBox::~ZEATSkyBox()
 
 void ZEATSkyBox::SetTextureFile(const ZEString& FileName)
 {
-	ZEGRTextureCubeOptions TextureOptions;
-	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
-	TextureOptions.GenerateMipMaps = false;
-	TextureOptions.MaximumMipmapLevel = 0;
-	TextureOptions.sRGB = true;
+	if (TextureFileName == FileName)
+		return;
 
-	SkyTexture = ZEGRTextureCube::LoadResourceShared(FileName, TextureOptions);
+	TextureFileName = FileName;
+
+	if (IsLoadedOrLoading())
+		LoadTexture();
 }
 
 const ZEString& ZEATSkyBox::GetTextureFile() const
@@ -232,6 +255,9 @@ const ZEVector3& ZEATSkyBox::GetColor() const
 
 bool ZEATSkyBox::PreRender(const ZERNPreRenderParameters* Parameters)
 {
+	if (SkyTexture == NULL || !SkyTexture->IsLoaded())
+		return false;
+
 	if (!ZEEntity::PreRender(Parameters))
 		return false;
 
@@ -257,8 +283,7 @@ void ZEATSkyBox::Render(const ZERNRenderParameters* Parameters, const ZERNComman
 	Context->SetConstantBuffer(ZEGR_ST_VERTEX, ZERN_SHADER_CONSTANT_DRAW_TRANSFORM, ConstantBufferTransform);
 	Context->SetConstantBuffer(ZEGR_ST_PIXEL, 9, ConstantBuffer);
 	Context->SetRenderState(RenderStateData);
-	const ZEGRTexture* Texture = SkyTexture;
-	Context->SetTextures(ZEGR_ST_PIXEL, 5, 1, &Texture);
+	Context->SetTexture(ZEGR_ST_PIXEL, 5, SkyTexture);
 	Context->SetVertexBuffer(0, VertexBuffer);
 
 	Context->Draw(VertexBuffer->GetVertexCount(), 0);
