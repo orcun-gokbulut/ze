@@ -133,24 +133,28 @@ bool ZEATFog::Update()
 	return true;
 }
 
-bool ZEATFog::InitializeSelf()
+ZEEntityResult ZEATFog::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	return Update();
+	if (!Update())
+		return ZE_ER_FAILED_CLEANUP;
+
+	return ZE_ER_DONE;
 }
 
-bool ZEATFog::DeinitializeSelf()
+ZEEntityResult ZEATFog::UnloadInternal()
 {
 	ScreenCoverVertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
 	ConstantBuffer.Release();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 ZEATFog::ZEATFog()

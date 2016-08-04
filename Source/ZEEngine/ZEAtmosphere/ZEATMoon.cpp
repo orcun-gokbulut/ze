@@ -89,10 +89,8 @@ bool ZEATMoon::UpdateRenderStates()
 
 	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
-
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
-
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set sun render state.");
 
@@ -148,27 +146,29 @@ bool ZEATMoon::CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutV
 	return false;
 }
 
-bool ZEATMoon::InitializeSelf()
+ZEEntityResult ZEATMoon::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	return Update();
+	if (!Update())
+		return ZE_ER_FAILED_CLEANUP;
+
+	return ZE_ER_DONE;
 }
 
-bool ZEATMoon::DeinitializeSelf()
+ZEEntityResult ZEATMoon::UnloadInternal()
 {
 	DirtyFlags.RaiseAll();
-
 	VertexShader.Release();
 	PixelShader.Release();
 	RenderStateData.Release();
-
 	ConstantBuffer.Release();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 ZEATMoon::ZEATMoon()

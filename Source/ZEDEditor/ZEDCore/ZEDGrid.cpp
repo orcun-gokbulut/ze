@@ -95,19 +95,23 @@ void ZEDGrid::GenerateGrid()
 	for (ZEInt Y = -MajorGridLineCountY; Y <= MajorGridLineCountY; Y++)
 		Canvas.AddLine(ZEVector3(-GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y), ZEVector3(GridSize.y * 0.5f, 0.0f, Y * MajorGridUnitSize.y));
 
-	MajorGridCount = Canvas.GetVertexCount() - MajorGridOffset;
+	MajorGridCount = Canvas.GetVertexCount() - MajorGridOffset;	
 
 	VertexBuffer = Canvas.CreateVertexBuffer();
 }
 
-bool ZEDGrid::InitializeSelf()
+ZEEntityResult ZEDGrid::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	ConstantBufferAxisTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	zeCheckError(ConstantBufferAxisTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
+	
 	ConstantBufferMinorGridTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	zeCheckError(ConstantBufferMinorGridTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
+	
 	ConstantBufferMajorGridTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	zeCheckError(ConstantBufferMajorGridTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	Material = ZERNSimpleMaterial::CreateInstance();
 	Material->SetPrimitiveType(ZEGR_PT_LINE_LIST);
@@ -121,21 +125,21 @@ bool ZEDGrid::InitializeSelf()
 	RenderCommand.ExtraParameters = NULL;
 
 	GenerateGrid();
+	zeCheckError(VertexBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create vertex buffer.");
 
-	return true;
+	return ZE_ER_DONE;
 }
 
-bool ZEDGrid::DeinitializeSelf()
+ZEEntityResult ZEDGrid::UnloadInternal()
 {
 	VertexBuffer.Release();
-
 	ConstantBufferAxisTransform.Release();
 	ConstantBufferMinorGridTransform.Release();
 	ConstantBufferMajorGridTransform.Release();
-
 	Material.Release();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 ZEDGrid::ZEDGrid()
@@ -162,7 +166,9 @@ void ZEDGrid::SetGridSize(const ZEVector2& Size)
 		return;
 
 	GridSize = Size;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 const ZEVector2& ZEDGrid::GetGridSize()
@@ -176,7 +182,9 @@ void ZEDGrid::SetMinorGridEnabled(bool Enable)
 		return;
 
 	MinorGridEnabled = Enable;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 bool ZEDGrid::GetMinorGridEnabled()
@@ -190,7 +198,9 @@ void ZEDGrid::SetMinorGridUnitSize(const ZEVector2& Size)
 		return;
 
 	MinorGridUnitSize = Size;
-	GenerateGrid();
+	
+	if (IsLoadedOrLoading())
+		Reload();
 }
 
 const ZEVector2& ZEDGrid::GetMinorGridUnitSize()
@@ -204,7 +214,9 @@ void ZEDGrid::SetMinorGridColor(const ZEVector3& Color)
 		return;
 
 	MinorGridColor = Color;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 const ZEVector3& ZEDGrid::GetMinorGridColor()
@@ -218,7 +230,9 @@ void ZEDGrid::SetMajorGridEnabled(bool Enabled)
 		return;
 
 	MajorGridEnabled = Enabled;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 bool ZEDGrid::GetMajorGridEnabled()
@@ -232,7 +246,9 @@ void ZEDGrid::SetMajorGridUnitSize(const ZEVector2& Size)
 		return;
 
 	MajorGridUnitSize = Size;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 const ZEVector2& ZEDGrid::GetMajorGridUnitSize()
@@ -246,7 +262,9 @@ void ZEDGrid::SetMajorGridColor(const ZEVector3& Color)
 		return;
 
 	MajorGridColor = Color;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 const ZEVector3& ZEDGrid::GetMajorGridColor()
@@ -260,7 +278,9 @@ void ZEDGrid::SetAxisEnabled(bool Enabled)
 		return;
 
 	AxisEnabled = Enabled;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 bool ZEDGrid::GetAxisEnabled()
@@ -274,7 +294,9 @@ void ZEDGrid::SetAxisColor(const ZEVector3& Color)
 		return;
 
 	this->AxisColor = Color;
-	GenerateGrid();
+
+	if (IsLoadedOrLoading())
+		GenerateGrid();
 }
 
 const ZEVector3& ZEDGrid::GetAxisColor()

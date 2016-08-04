@@ -42,7 +42,6 @@
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;
-class ZETexture2DResource;
 
 class ZELightProjective : public ZELight
 {
@@ -54,14 +53,13 @@ class ZELightProjective : public ZELight
 		ZEHolder<const ZEGRTexture2D>	ProjectionTexture;
 		ZEHolder<ZEGRTexture2D>			ShadowMap;
 		ZEUInt							ShadowMapIndex;
-
-		ZETexture2DResource*			ProjectionTextureResource;
-		ZEString						ProjectionTextureFile;
+		ZEString						ProjectionTextureFileName;
 
 		void							UpdateShadowMap();
+		void							LoadProjectionTexture();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZELightProjective();
 		virtual							~ZELightProjective();

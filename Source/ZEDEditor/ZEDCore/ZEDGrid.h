@@ -85,8 +85,8 @@ class ZEDGrid : public ZEEntity
 
 		void							GenerateGrid();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZEDGrid();
 

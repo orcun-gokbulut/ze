@@ -54,7 +54,7 @@ class ZESectorManager : public ZEEntity
 		void								UpdateTransformations();
 		void								UpdateActiveSectors();
 
-		virtual bool						InitializeSelf();
+		virtual ZEEntityResult				InitializeInternal();
 
 											ZESectorManager();
 

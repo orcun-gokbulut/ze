@@ -184,6 +184,8 @@ void ZEModel::AnimationStateChanged()
 
 ZEEntityResult ZEModel::LoadInternal()
 {
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
+
 	if (Resource == NULL)
 	{
 		if (ModelFileName.IsEmpty())
@@ -209,7 +211,8 @@ ZEEntityResult ZEModel::LoadInternal()
 	{
 		ZEModelMesh* Mesh = ZEModelMesh::CreateInstance();
 		AddMesh(Mesh);
-		Mesh->Load(ResourceMesh.GetPointer());
+		if (!Mesh->Load(ResourceMesh.GetPointer()))
+			return ZE_ER_FAILED_CLEANUP;
 	}
 
 	for (ZESize I = 0; I < Resource->GetMeshes().GetCount(); I++)
@@ -224,7 +227,8 @@ ZEEntityResult ZEModel::LoadInternal()
 	{
 		ZEModelBone* Bone = ZEModelBone::CreateInstance();	
 		AddBone(Bone);
-		Bone->Load(ResourceBone.GetPointer());
+		if (!Bone->Load(ResourceBone.GetPointer()))
+			return ZE_ER_FAILED_CLEANUP;
 	}
 
 	for (ZESize I = 0; I < Resource->GetBones().GetCount(); I++)
@@ -239,7 +243,8 @@ ZEEntityResult ZEModel::LoadInternal()
 	{
 		ZEModelHelper* Helper = ZEModelHelper::CreateInstance();
 		AddHelper(Helper);
-		Helper->Load(ResourceHelper.GetPointer());
+		if (!Helper->Load(ResourceHelper.GetPointer()))
+			return ZE_ER_FAILED_CLEANUP;
 	}
 
 	DirtyConstantBufferSkin = true;
@@ -287,6 +292,7 @@ ZEEntityResult ZEModel::UnloadInternal()
 
 	ConstantBufferBoneTransforms.Release();
 
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
 }
 

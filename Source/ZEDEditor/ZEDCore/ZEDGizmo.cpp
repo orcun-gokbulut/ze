@@ -1017,29 +1017,31 @@ float ZEDGizmo::GetAxisLength()
 	return AxisLength;
 }
 
-bool ZEDGizmo::InitializeSelf()
+ZEEntityResult ZEDGizmo::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
 
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	MaterialLines = ZERNSimpleMaterial::CreateInstance();
 	MaterialLines->SetPrimitiveType(ZEGR_PT_LINE_LIST);
 	MaterialLines->SetTwoSided(true);
 	MaterialLines->SetDepthTestDisabled(true);
 	MaterialLines->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
+	zeCheckError(MaterialLines == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create line material.");
 
 	MaterialTriangles = ZERNSimpleMaterial::CreateInstance();
 	MaterialTriangles->SetPrimitiveType(ZEGR_PT_TRIANGLE_LIST);
 	MaterialTriangles->SetTwoSided(true);
 	MaterialTriangles->SetDepthTestDisabled(true);
 	MaterialTriangles->SetStageMask(ZERN_STAGE_FORWARD_POST_HDR);
+	zeCheckError(MaterialTriangles == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create triangle material.");
 
-	return true;
+	return ZE_ER_DONE;
 }
 
-bool ZEDGizmo::DeinitializeSelf()
+ZEEntityResult ZEDGizmo::UnloadInternal()
 {	
 	GizmoLines.Clean();
 	GizmoTriangles.Clean();
@@ -1049,7 +1051,8 @@ bool ZEDGizmo::DeinitializeSelf()
 	MaterialTriangles.Release();
 	DirtyGizmoFlags.RaiseAll();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_DEINITIALIZE_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 void ZEDGizmo::LocalTransformChanged()

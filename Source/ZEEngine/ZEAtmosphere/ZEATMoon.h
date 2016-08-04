@@ -83,8 +83,8 @@ class ZEATMoon : public ZEEntity
 
 		bool								CalculateMoonPositionScreen(const ZERNView& View, ZEVector2& OutVector);
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual ZEEntityResult				LoadInternal();
+		virtual ZEEntityResult				UnloadInternal();
 	
 											ZEATMoon();
 		virtual								~ZEATMoon();

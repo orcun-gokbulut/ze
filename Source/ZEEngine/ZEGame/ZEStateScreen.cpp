@@ -46,6 +46,8 @@
 
 ZEEntityResult ZEStateScreen::LoadInternal()
 {
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
+
 	if (Manager == NULL)
 		return ZE_ER_FAILED;
 
@@ -76,6 +78,7 @@ ZEEntityResult ZEStateScreen::UnloadInternal()
 	Manager->RemoveControl(LoadingLabel);
 	LoadingLabel->Destroy();
 
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
 }
 

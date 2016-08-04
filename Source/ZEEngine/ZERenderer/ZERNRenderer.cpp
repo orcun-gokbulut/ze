@@ -387,7 +387,12 @@ void ZERNRenderer::EndScene()
 
 void ZERNRenderer::AddCommand(ZERNCommand* Command)
 {
-	Command->SceneIndex = SceneConstants.GetCount() - 1;
+	if (!IsInitialized())
+		return;
+
+	Command->SceneIndex = (ZEInt)SceneConstants.GetCount() - 1;
+	
+	zeBreak(Command->SceneIndex < 0 || Command->SceneIndex > 100);
 
 	ze_for_each(Stage, Stages)
 	{

@@ -57,10 +57,7 @@ class ZECanvasBrush : public ZEEntity
 		ZEHolder<ZERNMaterial>			Material;
 		ZECanvas						Canvas;
 
-		void							UpdateRenderState();
-
-	protected:
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZECanvasBrush();
 		virtual							~ZECanvasBrush();

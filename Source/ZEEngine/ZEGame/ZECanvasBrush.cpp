@@ -81,11 +81,13 @@ void ZECanvasBrush::UpdateCanvas()
 	SetBoundingBox(BoundingBox);
 }
 
-bool ZECanvasBrush::DeinitializeSelf()
+ZEEntityResult ZECanvasBrush::UnloadInternal()
 {	
 	Canvas.Clean();
 	VertexBuffer.Release();
-	return ZEEntity::DeinitializeSelf();
+
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 ZECanvasBrush::ZECanvasBrush()

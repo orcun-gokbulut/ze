@@ -208,20 +208,25 @@ bool ZEATCloud::Update()
 	return true;
 }
 
-bool ZEATCloud::InitializeSelf()
+ZEEntityResult ZEATCloud::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	CreatePlane();
 
 	PlaneTransformConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
-	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	zeCheckError(PlaneTransformConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	return Update();
+	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
+
+	if (!Update())
+		return ZE_ER_FAILED_CLEANUP;
+
+	return ZE_ER_DONE;
 }
 
-bool ZEATCloud::DeinitializeSelf()
+ZEEntityResult ZEATCloud::UnloadInternal()
 {
 	PlaneVertexShader.Release();
 	PlaneHullShader.Release();
@@ -230,10 +235,10 @@ bool ZEATCloud::DeinitializeSelf()
 	PlaneRenderStateData.Release();
 	PlaneVertexBuffer.Release();
 	PlaneTransformConstantBuffer.Release();
-	
 	ConstantBuffer.Release();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 ZEATCloud::ZEATCloud()

@@ -75,8 +75,8 @@ class ZEATFog : public ZEEntity
 		bool							UpdateConstantBuffers();
 		bool							Update();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZEATFog();
 		virtual							~ZEATFog();

@@ -70,6 +70,8 @@ void ZEATSkyBox::LoadTexture()
 
 ZEEntityResult ZEATSkyBox::LoadInternal()
 {
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
+
 	if (SkyTexture != NULL)
 	{
 		if (!SkyTexture->IsLoaded())
@@ -81,14 +83,18 @@ ZEEntityResult ZEATSkyBox::LoadInternal()
 	ZECanvas SkyBox;
 	SkyBox.AddBox(2.0f, 2.0, 2.0f);
 	VertexBuffer = SkyBox.CreateVertexBuffer();
+	zeCheckError(VertexBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
+
 	ConstantBufferTransform = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
+	zeCheckError(ConstantBufferTransform == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
 	LoadTexture();
 
 	if (!Update())
-		return ZE_ER_FAILED;
+		return ZE_ER_FAILED_CLEANUP;
 
 	return ZE_ER_DONE;
 }
@@ -105,6 +111,7 @@ ZEEntityResult ZEATSkyBox::UnloadInternal()
 	ConstantBufferTransform.Release();
 	SkyTexture.Release();
 
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
 }
 

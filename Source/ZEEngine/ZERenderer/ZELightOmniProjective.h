@@ -48,13 +48,13 @@ class ZELightOmniProjective : public ZELight
 	ZE_OBJECT
 	private:
 		ZEHolder<const ZEGRTextureCube>	ProjectionTexture;
+		ZEString						ProjectionTextureFileName;
 		mutable ZEViewSphere			ViewVolume;
 
-		ZETextureCubeResource*			ProjectionTextureResource;
-		ZEString						ProjectionTextureFile;
+		void							LoadProjectionTexture();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZELightOmniProjective();
 		virtual							~ZELightOmniProjective();
@@ -76,4 +76,4 @@ class ZELightOmniProjective : public ZELight
 
 		static ZELightOmniProjective*	CreateInstance();
 }
-ZE_META_ATTRIBUTE_PROPERTY(ProjectionTextureFile, ZEDEditor.PropertyEditor.Semantic, "Asset", "ZEDTextureAsset");
+ZE_META_ATTRIBUTE_PROPERTY(ProjectionTextureFileName, ZEDEditor.PropertyEditor.Semantic, "Asset", "ZEDTextureAsset");

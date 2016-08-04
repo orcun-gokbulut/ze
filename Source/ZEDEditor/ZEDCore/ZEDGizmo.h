@@ -110,8 +110,8 @@ class ZEDGizmo : public ZEEntity
 		bool							UpdateMaterials();
 		bool							Update();
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 		virtual void					LocalTransformChanged();
 		virtual void					ParentTransformChanged();
