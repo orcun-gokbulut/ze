@@ -380,6 +380,9 @@ void ZEDEditor::Process(float ElapsedTime)
 	ZEDTickEvent Event;
 	Event.SetElapsedTime(ElapsedTime);
 	DistributeEvent(&Event);
+
+	if (GetObjectManager() != NULL)
+		GetObjectManager()->Tick(ElapsedTime);
 }
 
 void ZEDEditor::PostProcess(float ElapsedTime)

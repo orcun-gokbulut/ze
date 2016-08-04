@@ -121,9 +121,6 @@ bool ZEDSceneEditor::InitializeInternal()
 	Atmosphere->SetSunLight(Light1);
 	Scene->AddEntity(Atmosphere);
 
-	ZEATSkyBox* SkyBox = ZEATSkyBox::CreateInstance();
-	Scene->AddEntity(SkyBox);
-
 	GetObjectManager()->GetRootWrapper()->Update();
 	GetMainWindow()->GetMainWindow()->show();
 

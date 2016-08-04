@@ -380,6 +380,9 @@ void ZEDEntityWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 void ZEDEntityWrapper::Tick(float ElapsedTime)
 {
 	ZEDObjectWrapper::Tick(ElapsedTime);
+
+	if (GetEntity() != NULL && GetEntity()->GetState() == ZE_ES_LOADING)
+		Update();
 }
 
 void ZEDEntityWrapper::Update()

@@ -609,21 +609,32 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 {
 	Parent = NULL;
 	Scene = NULL;
-	Position = ZEVector3(0.0f, 0.0f, 0.0f);
+	Wrapper = NULL;
+
+	State = ZE_ES_NONE;
+	TargetState = ZE_ES_NONE;
+	ReloadFlag = false;
+	ReinitializeFlag = false;
+	SerialOperation = false;
+	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
+
+	EntityId = 0;
+	Position = ZEVector3::Zero;
 	Rotation = ZEQuaternion::Identity;
 	Scale = ZEVector3::One;
 	Enabled = true;
 	EnabledFlattened = true;
 	Visible = true;
 	VisibleFlattened = true;
-	SerialOperation = false;
-	State = ZE_ES_NONE;
-	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
-	Wrapper = NULL;
-	Static = false;
 	EntityFlags = ZE_EF_NONE;
-	ReloadFlag = false;
-	ReinitializeFlag = false;
+	
+	Transform = ZEMatrix4x4::Identity;
+	InvTransform = ZEMatrix4x4::Identity;
+	WorldTransform = ZEMatrix4x4::Identity;
+	InvWorldTransform = ZEMatrix4x4::Identity;
+	BoundingBox = ZEAABBox::Zero;
+	WorldBoundingBox = ZEAABBox::Zero;
+
 	LocalTransformChanged();
 }
 
@@ -1108,6 +1119,19 @@ void ZEEntity::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Param
 	Helper.RayCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
 }
 
+
+
+void ZEEntity::VolumeCast(ZEVolumeCastReport& Report, const ZEVolumeCastParameters& Parameters)
+{
+	ZEVolumeCastHelper Helper;
+	Helper.SetReport(&Report);
+	Helper.SetObject(this);
+	Helper.SetSubObject(NULL);
+	Helper.SetWorldTransform(&GetWorldTransform());
+	Helper.SetInvWorldTransform(&GetInvWorldTransform());
+
+	Helper.VolumeCastBoundingBox(GetWorldBoundingBox(), GetBoundingBox());
+}
 
 bool ZEEntity::Serialize(ZEMLWriterNode* Serializer)
 {	

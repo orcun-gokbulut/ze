@@ -399,7 +399,8 @@ void ZEDObjectWrapper::Render(const ZERNRenderParameters* Parameters, const ZERN
 
 void ZEDObjectWrapper::Tick(float ElapsedTime)
 {
-
+	for (ZESize I = 0; I < ChildWrappers.GetCount(); I++)
+		ChildWrappers[I]->Tick(ElapsedTime);
 }
 
 void ZEDObjectWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters)
