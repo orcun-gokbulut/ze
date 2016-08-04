@@ -80,8 +80,8 @@ class ZEATSun : public ZEEntity
 
 		bool							CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVector);
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZEATSun();
 		virtual							~ZEATSun();

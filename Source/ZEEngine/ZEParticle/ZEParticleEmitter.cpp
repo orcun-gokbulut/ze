@@ -58,7 +58,6 @@ bool ZEParticleEmitter::Initialize()
 {
 	InstanceBuffer = ZEGRConstantBuffer::CreateResource(sizeof(InstanceAttributes) * 1000);
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
-
 	return true;
 }
 

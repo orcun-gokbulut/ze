@@ -140,8 +140,8 @@ class ZEATAtmosphere : public ZEEntity
 		void							ComputeTerrestrialColors(const ZEVector3& SunDirection, const ZEVector3& MoonDirection);
 		void							ComputeAmbientColors(float CosSunZenith, float CosMoonZenith);
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 										ZEATAtmosphere();
 		virtual							~ZEATAtmosphere();

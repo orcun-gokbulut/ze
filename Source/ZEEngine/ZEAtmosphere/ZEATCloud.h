@@ -96,8 +96,8 @@ class ZEATCloud : public ZEEntity
 		bool									UpdateConstantBuffers();
 		bool									Update();
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual ZEEntityResult					LoadInternal();
+		virtual ZEEntityResult					UnloadInternal();
 
 												ZEATCloud();
 		virtual									~ZEATCloud();

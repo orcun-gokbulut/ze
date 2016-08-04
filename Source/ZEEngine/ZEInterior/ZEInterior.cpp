@@ -54,24 +54,6 @@
 
 void ZEInterior::LoadInteriorResource()
 {
-	for (ZESize I = 0; I < Rooms.GetCount(); I++)
-		Rooms[I]->Deinitialize();
-
-	Rooms.SetCount(0);
-
-	for (ZESize I = 0; I < Doors.GetCount(); I++)
-		Doors[I]->Deinitialize();
-
-	Doors.SetCount(0);
-
-	for (ZESize I = 0; I < Helpers.GetCount(); I++)
-		Helpers[I]->Deinitialize();
-
-	Helpers.SetCount(0);
-
-	if (InteriorResource == NULL)
-		return;
-
 	ZEAABBox TempBoundingBox(ZEVector3(FLT_MAX), ZEVector3(FLT_MIN));
 
 	ZESize RoomCount = InteriorResource->GetRooms().GetCount();
@@ -159,19 +141,30 @@ ZEInteriorHelper* ZEInterior::GetHelper(const ZEString& Name)
 	return NULL;
 }
 
-bool ZEInterior::InitializeSelf()
+ZEEntityResult ZEInterior::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
-
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
 	LoadInteriorResource();
-
-	return true;
+	return ZE_ER_DONE;
 }
 
-bool ZEInterior::DeinitializeSelf()
+ZEEntityResult ZEInterior::UnloadInternal()
 {
-	return ZEEntity::DeinitializeSelf();
+	for (ZESize I = 0; I < Rooms.GetCount(); I++)
+		Rooms[I]->Deinitialize();
+	Rooms.Clear();
+
+	for (ZESize I = 0; I < Doors.GetCount(); I++)
+		Doors[I]->Deinitialize();
+	Doors.Clear();
+
+	for (ZESize I = 0; I < Helpers.GetCount(); I++)
+		Helpers[I]->Deinitialize();
+	Helpers.Clear();
+
+
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 void ZEInterior::SetInteriorFile(const ZEString& InteriorFile)
@@ -204,8 +197,8 @@ void ZEInterior::SetInteriorResource(const ZEInteriorResource* InteriorResource)
 
 	this->InteriorResource = InteriorResource;
 
-	if (IsInitialized())
-		LoadInteriorResource();
+	if (IsLoaded())
+		Reload();
 }
 
 const ZEInteriorResource* ZEInterior::GetInteriorResource() const

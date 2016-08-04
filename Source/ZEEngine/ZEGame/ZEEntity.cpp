@@ -363,8 +363,14 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		{
 			State = ZE_ES_DESTROYING;
 
+			#ifdef ZE_DEBUG_ENABLE
+			DestroyInternalChainCheck = false;
+			#endif
+
 			DestroyInternal();
 			
+			zeDebugCheck(!DestroyInternalChainCheck, "DestroyInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
+
 			for (ZESize I = 0; I < Components.GetCount(); I++)
 				Components[I]->Destroy();
 
@@ -434,11 +440,16 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_LOADING)
 	{
-		ZEEntityResult Result = LoadInternal();
+		#ifdef ZE_DEBUG_ENABLE
+		LoadInternalChainCheck = false;
+		#endif
+
+		ZEEntityResult Result = LoadInternal();	
 		if (Result == ZE_ER_DONE)
 		{
-			State = ZE_ES_LOADED;
+			zeDebugCheck(!LoadInternalChainCheck, "LoadInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
+			State = ZE_ES_LOADED;
 			UpdateRenderabilityState();
 
 			return ZE_TR_COOPERATING;
@@ -446,6 +457,12 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		else if (Result == ZE_ER_WAIT)
 		{
 			return ZE_TR_COOPERATING;
+		}
+		else if (Result == ZE_ER_FAILED_CLEANUP)
+		{
+			UnloadInternal();
+			State = ZE_ES_ERROR_LOADING;
+			return ZE_TR_FAILED;
 		}
 		else
 		{
@@ -455,11 +472,16 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_UNLOADING)
 	{
+		#ifdef ZE_DEBUG_ENABLE
+		UnloadInternalChainCheck = false;
+		#endif
+
 		ZEEntityResult Result = UnloadInternal();
 		if (Result == ZE_ER_DONE)
 		{
-			State = ZE_ES_NONE;
+			zeDebugCheck(!UnloadInternalChainCheck, "UnloadInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
+			State = ZE_ES_NONE;
 			UpdateRenderabilityState();
 			
 			return ZE_TR_COOPERATING;
@@ -476,11 +498,16 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_INITIALIZING)
 	{
+		#ifdef ZE_DEBUG_ENABLE
+		InitializeInternalChainCheck = false;
+		#endif
+
 		ZEEntityResult Result = InitializeInternal();
 		if (Result == ZE_ER_DONE)
 		{
-			State = ZE_ES_INITIALIZED;
+			zeDebugCheck(!InitializeInternalChainCheck, "InitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
+			State = ZE_ES_INITIALIZED;
 			UpdateTickabilityState();
 
 			return ZE_TR_COOPERATING;
@@ -488,6 +515,12 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		else if (Result == ZE_ER_WAIT)
 		{
 			return ZE_TR_COOPERATING;
+		}
+		else if (Result == ZE_ER_FAILED_CLEANUP)
+		{
+			DeinitializeInternal();
+			State = ZE_ES_ERROR_LOADING;
+			return ZE_TR_FAILED;
 		}
 		else
 		{
@@ -497,11 +530,16 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_DEINITIALIZING)
 	{
+		#ifdef ZE_DEBUG_ENABLE
+		DeinitializeInternalChainCheck = false;
+		#endif
+
 		ZEEntityResult Result = DeinitializeInternal();
 		if (Result == ZE_ER_DONE)
 		{
-			State = ZE_ES_NONE;
+			zeDebugCheck(!DeinitializeInternalChainCheck, "DeinitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
+			State = ZE_ES_NONE;
 			UpdateTickabilityState();
 
 			return ZE_TR_COOPERATING;
@@ -564,11 +602,6 @@ bool ZEEntity::GetSerialOperation() const
 	return SerialOperation;
 }
 
-ZEEntityResult ZEEntity::DestroyInternal()
-{
-	return ZE_ER_DONE;
-}
-
 bool ZEEntity::InitializeSelf()
 {
 	return true;
@@ -579,28 +612,63 @@ bool ZEEntity::DeinitializeSelf()
 	return true;
 }
 
+ZEEntityResult ZEEntity::DestroyInternal()
+{
+	zeDebugCheck(GetState() != ZE_ES_DESTROYING, "DestroyInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+
+	#ifdef ZE_DEBUG_ENABLE
+	DestroyInternalChainCheck = true;
+	#endif
+
+	return ZE_ER_DONE;
+}
+
+
 ZEEntityResult ZEEntity::LoadInternal()
 {
+	zeDebugCheck(GetState() != ZE_ES_LOADING, "LoadInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+
+	#ifdef ZE_DEBUG_ENABLE
+	LoadInternalChainCheck = true;
+	#endif
+
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZEEntity::UnloadInternal()
 {
+	zeDebugCheck(GetState() != ZE_ES_UNLOADING  && GetState() != ZE_ES_LOADING, "UnloadInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+
+	#ifdef ZE_DEBUG_ENABLE
+	UnloadInternalChainCheck = true;
+	#endif
+
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZEEntity::InitializeInternal()
 {
-	if (!InitializeSelf())
-		return ZE_ER_FAILED;
+	zeDebugCheck(GetState() != ZE_ES_INITIALIZING, "InitializeInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+
+	#ifdef ZE_DEBUG_ENABLE
+	InitializeInternalChainCheck = true;
+	#endif
 
 	return ZE_ER_DONE;
 }
 
 ZEEntityResult ZEEntity::DeinitializeInternal()
 {
-	if (!DeinitializeSelf())
-		return ZE_ER_FAILED;
+	zeDebugCheck(GetState() != ZE_ES_INITIALIZING && GetState() != ZE_ES_DEINITIALIZING, "DeinitializeInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
+
+	#ifdef ZE_DEBUG_ENABLE
+	DeinitializeInternalChainCheck = true;
+	#endif
 
 	return ZE_ER_DONE;
 }

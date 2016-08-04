@@ -55,23 +55,23 @@ float ZELight::AttenuationFunction(float RootToTry)
 	return Result;
 }
 
-bool ZELight::InitializeSelf()
+ZEEntityResult ZELight::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	ShadowRenderer.AddStage(new ZERNStageShadowmapGeneration());
-
 	ShadowRenderer.SetContext(ZEGRGraphicsModule::GetInstance()->GetMainContext());
+	ShadowRenderer.Initialize();
 
-	return ShadowRenderer.Initialize();
+	return ZE_ER_DONE;
 }
 
-bool ZELight::DeinitializeSelf()
+ZEEntityResult ZELight::UnloadInternal()
 {
 	ShadowRenderer.Deinitialize();
-
-	return ZEEntity::DeinitializeSelf();
+	
+	ZE_ENTITY_UNLOAD_CHAIN();
+	return ZE_ER_DONE;
 }
 
 void ZELight::CalculateBoundingBox() const
@@ -324,15 +324,15 @@ ZEUInt ZELight::ConvertShadowResolution(ZELightShadowResolution ShadowResolution
 {
 	switch (ShadowResolution)
 	{
-	default:
-	case ZE_LSR_LOW:
-		return 256;
-	case ZE_LSR_MEDIUM:
-		return 512;
-	case ZE_LSR_HIGH:
-		return 1024;
-	case ZE_LSR_VERY_HIGH:
-		return 2048;
+		default:
+		case ZE_LSR_LOW:
+			return 256;
+		case ZE_LSR_MEDIUM:
+			return 512;
+		case ZE_LSR_HIGH:
+			return 1024;
+		case ZE_LSR_VERY_HIGH:
+			return 2048;
 	}
 }
 
@@ -340,14 +340,14 @@ ZEUInt ZELight::ConvertShadowSampleCount(ZELightShadowSampleCount ShadowSampleCo
 {
 	switch (ShadowSampleCount)
 	{
-	default:
-	case ZE_LSC_LOW:
-		return 4;
-	case ZE_LSC_MEDIUM:
-		return 8;
-	case ZE_LSC_HIGH:
-		return 16;
-	case ZE_LSC_VERY_HIGH:
-		return 16;
+		default:
+		case ZE_LSC_LOW:
+			return 4;
+		case ZE_LSC_MEDIUM:
+			return 8;
+		case ZE_LSC_HIGH:
+			return 16;
+		case ZE_LSC_VERY_HIGH:
+			return 16;
 	}
 }

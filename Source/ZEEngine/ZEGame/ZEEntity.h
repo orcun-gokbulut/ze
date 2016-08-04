@@ -82,7 +82,8 @@ ZE_ENUM(ZEEntityResult)
 {
 	ZE_ER_DONE,
 	ZE_ER_WAIT,
-	ZE_ER_FAILED
+	ZE_ER_FAILED,
+	ZE_ER_FAILED_CLEANUP
 };
 
 ZE_ENUM(ZEEntityState)
@@ -103,6 +104,13 @@ ZE_ENUM(ZEEntityState)
 	ZE_ES_INITIALIZED					= 8
 
 };
+
+#define ZE_ENTITY_FUNCTION_CHAIN(BaseClass, Function) do {ZEEntityResult Result = __super::Function(); if (Result != ZE_ER_DONE) return Result;} while(false)
+#define ZE_ENTITY_LOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
+#define ZE_ENTITY_UNLOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
+#define ZE_ENTITY_INITIALIZE_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
+#define ZE_ENTITY_DEINITIALIZE_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
+#define ZE_ENTITY_DESTROY_CHAING(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
 
 class ZEEntity : public ZEObject
 {
@@ -148,6 +156,14 @@ class ZEEntity : public ZEObject
 		ZELink<ZEEntity>						TickListLink;
 		ZELink<ZEEntity>						RenderListLink;
 
+		#ifdef ZE_DEBUG_ENABLE
+		bool									LoadInternalChainCheck;
+		bool									UnloadInternalChainCheck;
+		bool									InitializeInternalChainCheck;
+		bool									DeinitializeInternalChainCheck;
+		bool									DestroyInternalChainCheck;
+		#endif
+
 		ZETaskResult							UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters);
 		void									UpdateStateSerial();
 		void									UpdateState();
@@ -187,8 +203,8 @@ class ZEEntity : public ZEObject
 		virtual bool							CheckComponent(ZEEntity* Parent);
 		virtual bool							CheckChildEntity(ZEEntity* Parent);
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual bool							InitializeSelf() final;
+		virtual bool							DeinitializeSelf() final;
 		
 												ZEEntity();
 		virtual									~ZEEntity();

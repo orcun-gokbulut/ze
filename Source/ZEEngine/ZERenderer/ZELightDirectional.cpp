@@ -183,20 +183,18 @@ void ZELightDirectional::UpdateCascadeShadowMaps()
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
 
-bool ZELightDirectional::InitializeSelf()
+ZEEntityResult ZELightDirectional::LoadInternal()
 {
-	if (!ZELight::InitializeSelf())
-		return false;
-
-	return true;
+	ZE_ENTITY_LOAD_CHAIN(ZELight);
+	return ZE_ER_DONE;
 }
 
-bool ZELightDirectional::DeinitializeSelf()
+ZEEntityResult ZELightDirectional::UnloadInternal()
 {
 	CascadeShadowMaps.Release();
 	Cascades.Clear();
 
-	return ZELight::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZELight);
 }
 
 ZELightDirectional::ZELightDirectional()

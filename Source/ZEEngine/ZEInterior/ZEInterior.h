@@ -79,8 +79,8 @@ class ZEInterior : public ZEEntity
 
 		virtual	void							ParentTransformChanged();
 
-		virtual bool							InitializeSelf();
-		virtual bool							DeinitializeSelf();
+		virtual ZEEntityResult					LoadInternal();
+		virtual ZEEntityResult					UnloadInternal();
 
 												ZEInterior();
 		virtual									~ZEInterior();

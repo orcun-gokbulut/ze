@@ -108,10 +108,9 @@ ZESectorManager::ZESectorManager()
 	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
-bool ZESectorManager::InitializeSelf()
+ZEEntityResult ZESectorManager::InitializeInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
 
 	OriginSector = NULL;
 	Sectors.Clear();
@@ -135,7 +134,7 @@ bool ZESectorManager::InitializeSelf()
 			continue;
 	}
 
-	return true;
+	return ZE_ER_DONE;
 }
 
 const ZEArray<ZESector*>& ZESectorManager::GetSectors() const

@@ -68,30 +68,41 @@ void ZELightProjective::UpdateShadowMap()
 	DirtyFlags.UnraiseFlags(ZE_LDF_SHADOW_MAP);
 }
 
-bool ZELightProjective::InitializeSelf()
+void ZELightProjective::LoadProjectionTexture()
 {
-	if (!ZELight::InitializeSelf())
-		return false;
+	if (ProjectionTextureFileName.IsEmpty())
+		return;
 
-	SetProjectionTextureFile(ProjectionTextureFile);
-
-	return true;
+	ZEGRTexture2DOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+	ProjectionTexture = ZEGRTexture2D::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
 }
 
-bool ZELightProjective::DeinitializeSelf()
+ZEEntityResult ZELightProjective::LoadInternal()
+{
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+
+	LoadProjectionTexture();
+
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZELightProjective::UnloadInternal()
 {
 	ProjectionTexture.Release();
 	ShadowMap.Release();
 
-	return ZELight::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZELight);
+	return ZE_ER_DONE;
 }
 
 ZELightProjective::ZELightProjective()
 {
 	FOV = ZE_PI_4;
 	AspectRatio = 1.0f;
-	ProjectionTextureResource = NULL;
-
 	Command.Entity = this;
 	Command.Priority = 1;
 }
@@ -153,29 +164,27 @@ ZEUInt ZELightProjective::GetShadowMapIndex() const
 
 void ZELightProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
-	if (FileName.GetLength() == 0 || ProjectionTextureFile == FileName)
+	if (FileName.IsEmpty() || ProjectionTextureFileName == FileName)
 		return;
 
-	ProjectionTextureFile = FileName;
+	ProjectionTextureFileName = FileName;
 
-	if (ProjectionTextureResource != NULL)
-		ProjectionTextureResource->Release();
-
-	ProjectionTextureResource = ZETexture2DResource::LoadSharedResource(ProjectionTextureFile);
-	if (ProjectionTextureResource != NULL)
-		ProjectionTexture = ProjectionTextureResource->GetTexture2D();
-	else
-		zeError("Can not load projection texture.");
+	if (IsLoadedOrLoading())
+		LoadProjectionTexture();
 }
 
 const ZEString& ZELightProjective::GetProjectionTextureFile() const
 {
-	return ProjectionTextureFile;
+	return ProjectionTextureFileName;
 }
 
 void ZELightProjective::SetProjectionTexture(const ZEGRTexture2D* Texture)
 {
+	if (ProjectionTexture == Texture)
+		return;
+
 	ProjectionTexture = Texture;
+	ProjectionTextureFileName = Texture->GetFileName();
 }
 
 const ZEGRTexture2D* ZELightProjective::GetProjectionTexture() const

@@ -89,10 +89,8 @@ bool ZEATSun::UpdateRenderStates()
 
 	ZEGRRenderState RenderState = ZERNStageAtmosphere::GetRenderState();
 	RenderState.SetPrimitiveType(ZEGR_PT_TRIANGLE_STRIPT);
-
 	RenderState.SetShader(ZEGR_ST_VERTEX, VertexShader);
 	RenderState.SetShader(ZEGR_ST_PIXEL, PixelShader);
-
 	RenderStateData = RenderState.Compile();
 	zeCheckError(RenderStateData == NULL, false, "Cannot set sun render state.");
 
@@ -148,17 +146,20 @@ bool ZEATSun::CalculateSunPositionScreen(const ZERNView& View, ZEVector2& OutVec
 	return false;
 }
 
-bool ZEATSun::InitializeSelf()
+ZEEntityResult ZEATSun::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 	
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(Constants));
+	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");
 
-	return Update();
+	if (!Update())
+		return ZE_ER_FAILED_CLEANUP;
+
+	return ZE_ER_DONE;
 }
 
-bool ZEATSun::DeinitializeSelf()
+ZEEntityResult ZEATSun::UnloadInternal()
 {
 	DirtyFlags.RaiseAll();
 
@@ -168,7 +169,8 @@ bool ZEATSun::DeinitializeSelf()
 
 	ConstantBuffer.Release();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 ZEATSun::ZEATSun()

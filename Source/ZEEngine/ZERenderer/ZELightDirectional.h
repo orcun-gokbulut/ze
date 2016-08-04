@@ -76,8 +76,8 @@ class ZELightDirectional : public ZELight
 		void								UpdateCascadeTransforms(const ZERNView& View);
 		void								UpdateCascadeShadowMaps();
 
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual ZEEntityResult				LoadInternal();
+		virtual ZEEntityResult				UnloadInternal();
 
 											ZELightDirectional();
 		virtual								~ZELightDirectional();

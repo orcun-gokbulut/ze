@@ -454,10 +454,9 @@ void ZEATAtmosphere::ComputeAmbientColors(float CosSunZenith, float CosMoonZenit
 	TerrestrialMoonAmbientColor = GetAmbientColorFromLUT(CosMoonZenith);
 }
 
-bool ZEATAtmosphere::InitializeSelf()
+ZEEntityResult ZEATAtmosphere::LoadInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	CreateRandomVectors();
 
@@ -492,26 +491,27 @@ bool ZEATAtmosphere::InitializeSelf()
 	Stars->SetBrightness(0.1f);
 	AddComponent(Stars);
 
-	return Update();
+	if (!Update())
+		return ZE_ER_FAILED_CLEANUP;
+
+	return ZE_ER_DONE;
 }
 
-bool ZEATAtmosphere::DeinitializeSelf()
+ZEEntityResult ZEATAtmosphere::UnloadInternal()
 {
 	DirtyFlags.RaiseAll();
 
 	ScreenCoverVertexShader.Release();
-
 	SkyPixelShader.Release();
 	SkyRenderStateData.Release();
 	SkyConstantBuffer.Release();
-
 	PrecomputedSingleScatteringBuffer.Release();
 	PrecomputedMultipleScatteringBuffer.Release();
-
 	SunLight = NULL;
 	MoonLight = NULL;
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 void ZEATAtmosphere::SetObserver(const ZEATObserver& Observer)

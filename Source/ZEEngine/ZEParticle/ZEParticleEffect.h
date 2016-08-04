@@ -51,9 +51,8 @@ class ZEParticleEffect : public ZEEntity
 	private:
 		ZEArray<ZEParticleEmitter*>			Emitters;
 
-	protected:
-		virtual bool						InitializeSelf();
-		virtual bool						DeinitializeSelf();
+		virtual ZEEntityResult				InitializeInternal();
+		virtual ZEEntityResult				DeinitializeInternal();
 
 											ZEParticleEffect();
 		virtual								~ZEParticleEffect();

@@ -44,28 +44,39 @@
 #define ZE_LDF_SHADOW_MAP				4
 #define ZE_LDF_VIEW_VOLUME				8
 
-bool ZELightOmniProjective::InitializeSelf()
+void ZELightOmniProjective::LoadProjectionTexture()
 {
-	if (!ZELight::InitializeSelf())
-		return false;
+	if (ProjectionTextureFileName.IsEmpty())
+		return;
 
-	SetProjectionTextureFile(ProjectionTextureFile);
-
-	return true;
+	ZEGRTextureCubeOptions TextureOptions;
+	TextureOptions.CompressionFormat = ZEGR_TF_BC1_UNORM_SRGB;
+	TextureOptions.GenerateMipMaps = true;
+	TextureOptions.MaximumMipmapLevel = 0;
+	TextureOptions.sRGB = true;
+	ProjectionTexture = ZEGRTextureCube::LoadResourceShared(ProjectionTextureFileName, TextureOptions);
 }
 
-bool ZELightOmniProjective::DeinitializeSelf()
+ZEEntityResult ZELightOmniProjective::LoadInternal()
+{
+	ZE_ENTITY_LOAD_CHAIN(ZELight);
+
+	LoadProjectionTexture();
+
+	return ZE_ER_DONE;
+}
+
+ZEEntityResult ZELightOmniProjective::UnloadInternal()
 {
 	ProjectionTexture.Release();
 
-	return ZELight::DeinitializeSelf();
+	ZE_ENTITY_UNLOAD_CHAIN(ZELight);
+	return ZE_ER_DONE;
 }
 
 ZELightOmniProjective::ZELightOmniProjective()
 {
 	ProjectionTexture = NULL;
-	ProjectionTextureResource = NULL;
-
 	Command.Entity = this;
 	Command.Priority = 1;
 }
@@ -87,27 +98,18 @@ ZESize ZELightOmniProjective::GetViewCount() const
 
 void ZELightOmniProjective::SetProjectionTextureFile(const ZEString& FileName)
 {
-	if (FileName.GetLength() == 0 || ProjectionTextureFile == FileName)
+	if (FileName.IsEmpty() || ProjectionTextureFileName == FileName)
 		return;
 
-	ProjectionTextureFile = FileName;
+	ProjectionTextureFileName = FileName;
 
-	if (IsInitialized())
-	{
-		if (ProjectionTextureResource != NULL)
-			ProjectionTextureResource->Release();
-
-		ProjectionTextureResource = ZETextureCubeResource::LoadSharedResource(ProjectionTextureFile);
-		if (ProjectionTextureResource != NULL)
-			ProjectionTexture = ProjectionTextureResource->GetTextureCube();
-		else
-			zeError("Can not load projection cube texture.");
-	}
+	if (IsLoadedOrLoading())
+		LoadProjectionTexture();
 }
 
 const ZEString& ZELightOmniProjective::GetProjectionTextureFile() const
 {
-	return ProjectionTextureFile;
+	return ProjectionTextureFileName;
 }
 
 const ZEGRTextureCube* ZELightOmniProjective::GetProjectionTexture()

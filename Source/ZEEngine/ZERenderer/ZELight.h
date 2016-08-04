@@ -100,8 +100,8 @@ class ZELight : public ZEEntity
 		ZERNRenderer					ShadowRenderer;
 		ZERNCommand						Command;
 
-		virtual bool					InitializeSelf();
-		virtual bool					DeinitializeSelf();
+		virtual ZEEntityResult			LoadInternal();
+		virtual ZEEntityResult			UnloadInternal();
 
 		void							CalculateBoundingBox() const;
 

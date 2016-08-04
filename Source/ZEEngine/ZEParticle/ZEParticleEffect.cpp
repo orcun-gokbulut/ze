@@ -40,23 +40,23 @@
 #include "ZERenderer/ZERNCommand.h"
 #include "ZERenderer/ZERNView.h"
 
-bool ZEParticleEffect::InitializeSelf()
+ZEEntityResult ZEParticleEffect::InitializeInternal()
 {
-	if (!ZEEntity::InitializeSelf())
-		return false;
+	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
 
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Initialize();
 
-	return true;
+	return ZE_ER_DONE;
 }
 
-bool ZEParticleEffect::DeinitializeSelf()
+ZEEntityResult ZEParticleEffect::DeinitializeInternal()
 {
 	for (ZESize I = 0; I < Emitters.GetCount(); I++)
 		Emitters[I]->Deinitialize();
 
-	return ZEEntity::DeinitializeSelf();
+	ZE_ENTITY_DEINITIALIZE_CHAIN(ZEEntity);
+	return ZE_ER_DONE;
 }
 
 bool ZEParticleEffect::PreRender(const ZERNPreRenderParameters* Parameters)
