@@ -47,9 +47,9 @@ class ZEMTInterpreterToken
 		ZECommandTokenType			Type;
 		ZEString					Text;
 		ZEValue						Value;
-		ZESize						Offset;
 		ZESize						Line;
 		ZESize						Column;	
+		ZESize						Length;
 };
 
 class ZEMTInterpreterLexer

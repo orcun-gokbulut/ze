@@ -55,6 +55,10 @@ void ZEDConsoleWidget::Execute()
 
 	ZEString Output = Engine.Execute(Form->txtCommand->text().toUtf8().cbegin());
 	Form->txtOutput->setPlainText(Form->txtOutput->toPlainText() + Output + "\n");
+	
+	QTextCursor Cursor(Form->txtOutput->textCursor());
+	Cursor.movePosition(QTextCursor::End, QTextCursor::MoveAnchor);
+	Form->txtOutput->setTextCursor(Cursor);
 
 	Form->txtCommand->setText("");
 }

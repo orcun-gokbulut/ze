@@ -8,7 +8,9 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 {
 	std:
 	TokenMarker = Cursor;
- 
+	if (Cursor == Limit)
+		return false;
+
 	/*!re2c
 		re2c:define:YYCTYPE = "char";
 		re2c:define:YYCURSOR = Cursor;
@@ -22,23 +24,32 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 		IDENTIFIER = [a-zA-Z_][a-zA-Z0-9_]*;
 		INTEGER = [1-9][0-9]*;
 		HEXADECIMAL = '0x' [0-9a-fA-F] [0-9a-fA-F]*;
-		FLOAT = [0-9] [0-9]* '.' [0-9] [0-9]* 'f';
+		FLOAT = [0-9][0-9]* '.' [0-9][0-9]* 'f';
 		DOUBLE = [0-9][0-9]* '.' [0-9][0-9]*;
         COMMENT = "//" [^\n]* "\n";
 		MULTI_LINE_COMMENT = "/*" ([^*] | ("*" [^/]))* "*""/";
-        WHITE_SPACE = ([ \t\v\n\r] | COMMENT | MULTI_LINE_COMMENT)+;
+        WHITE_SPACE = ([ \t\v\r] | COMMENT | MULTI_LINE_COMMENT)+;
 		
-		IDENTIFIER		
+		'true'
 		{
 			InitializeToken(Token);
-			Token.Type = ZEMT_IT_IDENTIFIER;
+			Token.Type = ZEMT_IT_VALUE;
+			Token.Value.SetBoolean(true);
+			return true;
+		}
+		
+		'false'
+		{
+			InitializeToken(Token);
+			Token.Type = ZEMT_IT_VALUE;
+			Token.Value.SetBoolean(false);
 			return true;
 		}
 		
 		INTEGER
 		{
 			InitializeToken(Token);
-			Token.Type = ZEMT_IT_INTEGER;
+			Token.Type = ZEMT_IT_VALUE;
 			Token.Value.SetInt64(ZEString(Token.Text).ToInt64());
 			return true;
 		}
@@ -46,7 +57,7 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 		HEXADECIMAL
 		{
 			InitializeToken(Token);
-			Token.Type = ZEMT_IT_INTEGER;
+			Token.Type = ZEMT_IT_VALUE;
 			Token.Value.SetInt64(ZEString(Token.Text).ToInt64());
 			return true;
 		}
@@ -54,7 +65,7 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 		FLOAT
 		{
 			InitializeToken(Token);
-			Token.Type = ZEMT_IT_FLOAT;
+			Token.Type = ZEMT_IT_VALUE;
 			Token.Value.SetFloat(ZEString(Token.Text).ToFloat());
 			return true;
 		}
@@ -62,8 +73,15 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 		DOUBLE
 		{
 			InitializeToken(Token);
-			Token.Type = ZEMT_IT_DOUBLE;
+			Token.Type = ZEMT_IT_VALUE;
 			Token.Value.SetFloat(ZEString(Token.Text).ToDouble());
+			return true;
+		}
+		
+		IDENTIFIER		
+		{
+			InitializeToken(Token);
+			Token.Type = ZEMT_IT_IDENTIFIER;
 			return true;
 		}
 
@@ -102,7 +120,7 @@ bool ZEMTInterpreterLexer::Scan(ZEMTInterpreterToken& Token, ZEString& Output)
 
 		[^]
 		{
-			Output += ZEFormat::Format("Unexpected character: '{0:c}'. (Line: {1}, Column: {2})\n", *TokenMarker, Line, Cursor - LineStart);
+			Output += ZEFormat::Format("Unexpected character: {0}'{0:c}'. (Line: {1}, Column: {2})\n", *TokenMarker, Line, Cursor - LineStart);
 			return false;
 		}
 	*/
