@@ -168,13 +168,19 @@ ZEString ZEMTInterpreter::Execute(const ZEString& Input)
 	ZEMTInterpreterParser Parser;
 	Parser.Initialize();
 
+	ZEMTInterpreterToken* Token;
 	while (true)
 	{
-		ZEMTInterpreterToken* Token = new ZEMTInterpreterToken();
+		Token = new ZEMTInterpreterToken();
 		if (!Lexer.Scan(*Token, Output))
 			break;
+
 		Parser.Parse(*Token, &Output);
 	}
+
+	Token->Type = 0;
+	Parser.Parse(*Token, &Output);
+	Parser.Deinitialize();
 
 	return Output;
 }

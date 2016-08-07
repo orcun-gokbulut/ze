@@ -79,7 +79,9 @@ add_custom_command(
 	
 ze_add_executable(TARGET ZEDConsole 
 	ZEMC ${ZEMC}
-	SOURCES ${Sources} ${QtMocFiles} ${QtUiFiles} 
+	SOURCES ${Sources} ${QtMocFiles} ${QtUiFiles}
+	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterLexer.l.cpp"
+	"${CMAKE_CURRENT_BINARY_DIR}/ZEMTInterpreterParser.y.h" 
 	LIBS ZEFoundation ZEEngine)
 
 source_group("Generated" FILES 
