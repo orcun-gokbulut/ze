@@ -109,7 +109,7 @@ void ZEInteriorRoom::RayCastOctree(const ZEOctree<ZESize>& Octree, ZERayCastRepo
 
 	for (ZESize I = 0; I < 8; I++)
 	{
-		const ZEOctree<ZESize>* SubTree = Octree.GetNodes()[I];
+		const ZEOctree<ZESize>* SubTree = Octree.GetNode(I);
 		if (SubTree != NULL)
 			RayCastOctree(*SubTree, Report, Helper);
 

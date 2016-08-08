@@ -79,6 +79,20 @@ void ZETriangle::GetCentroid(const ZETriangle& Triangle, ZEVector3& Centroid)
 	Centroid.z = (Triangle.V0.z + Triangle.V1.z + Triangle.V2.z) / 3.0f;
 }
 
+
+ZEAABBox ZETriangle::GetBoundingBox() const
+{
+	ZEAABBox Box;
+
+	ZEVector3::Max(Box.Max, V0, V1);
+	ZEVector3::Max(Box.Max, Box.Max, V2);
+
+	ZEVector3::Min(Box.Min, V0, V1);
+	ZEVector3::Min(Box.Min, Box.Max, V2);
+
+	return Box;
+}
+
 void ZETriangle::GetSurfacePlane(const ZETriangle& Triangle, ZEPlane& Plane)
 {
 	Plane.p = Triangle.V1;

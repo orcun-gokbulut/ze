@@ -34,356 +34,588 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE_OCTREE_H__
-#define __ZE_OCTREE_H__
 
 #include "ZETypes.h"
 #include "ZEMath/ZEAABBox.h"
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEMath/ZETriangle.h"
+#include "ZEOctreeIterator.h"
 
-template < typename Type, typename Allocator = ZEAllocatorBase<Type> >
+#define ZE_OO_OUTSIDE	-2
+#define ZE_OO_MULTIPLE	-1
+
+template<typename ZEItemType>
 class ZEOctree
 {
 	private:
-		ZEOctree* Parent;
-		ZEUInt Depth;
-		ZEUInt MaxDepth;
-		ZEUInt Octant;
-		ZEArray<Type, Allocator> Items;
-		ZEOctree* Nodes[8];
-		ZEAABBox BoundingBox;
+		ZEOctree*								Parent;
+		ZEInt									ParentOctant;
+		ZEInt									Depth;
+		ZEUInt									MaxDepth;
+		ZEArray<ZEItemType>						Items;
+		ZEOctree*								Nodes[8];
+		ZEAABBox								BoundingBox;
+
+		void									Expand();
+		void									Shrink();
+		void									CreateChildNode(ZEInt Octant);
+
+		ZEInt									FindOctant(const ZEVector3& Point) const;
+		ZEInt									FindOctant(const ZEAABBox& BoundingBox) const;
 
 	public:
-		ZEOctree* GetParent()
-		{
-			return Parent;
-		}
+		ZEOctree*								GetParent();
+		const ZEOctree*							GetParent() const;
+		ZEUInt									GetParentOctant() const;	
+		ZEUInt									GetDepth() const;
 
-		const ZEOctree* GetParent() const
-		{
-			return Parent;
-		}
+		void									SetBoundingBox(const ZEAABBox& BoundingBox);
+		const ZEAABBox&							GetBoundingBox() const;
 
-		const ZEOctree** const GetNodes()
-		{
-			return Nodes;
-		}
+		void									SetMaxDepth(ZEUInt Depth);
+		ZEUInt									GetMaxDepth() const;
 
-		const ZEOctree** const GetNodes()  const
-		{
-			return (const ZEOctree** const)Nodes;
-		}
+		ZEOctree*								GetNode(ZESize Octant);
+		const ZEOctree*							GetNode(ZESize Octant) const;
 
-		ZEUInt GetDepth()  const
-		{
-			return Depth;
-		}
+		ZEOctree*								GetNode(const ZEVector3& Point);
+		const ZEOctree*							GetNode(const ZEVector3& Point) const;
 
-		ZEUInt GetOctant()  const
-		{
-			return Octant;
-		}
-
-		void SetMaxDepth(ZEUInt Depth)
-		{
-			MaxDepth = Depth;
-		}
-
-		ZEUInt GetMaxDepth()  const
-		{
-			return MaxDepth;
-		}
-
-		const ZEAABBox& GetBoundingBox()  const
-		{
-			return BoundingBox;
-		}
-
-		void SetBoundingBox(const ZEAABBox& BoundingBox)
-		{
-			this->BoundingBox = BoundingBox;
-		}
-
-		ZESize GetItemCount()  const
-		{
-			return Items.GetCount();
-		}
-
-		const Type& GetItem(ZESize Index) const
-		{
-			return Items[Index];
-		}
-
-		Type& GetItem(ZESize Index)
-		{
-			return Items[Index];
-		}
-
-		const ZEArray<Type, Allocator>& GetItems() const
-		{
-			return Items;
-		}
-
-		void CreateNode(ZEInt Octant)
-		{
-			ZEVector3 Center = BoundingBox.GetCenter();
-
-			if (Nodes[Octant] == NULL && MaxDepth != 0)
-			{
-				Nodes[Octant] = new ZEOctree();
-				Nodes[Octant]->Parent = this;
-				Nodes[Octant]->Octant = Octant;
-				Nodes[Octant]->Depth = Depth + 1;
-				Nodes[Octant]->MaxDepth = MaxDepth - 1;
-
-				if (Octant & 0x01) // Right
-				{
-					Nodes[Octant]->BoundingBox.Min.x = Center.x;
-					Nodes[Octant]->BoundingBox.Max.x = BoundingBox.Max.x;		
-				}
-				else
-				{
-					Nodes[Octant]->BoundingBox.Min.x = BoundingBox.Min.x;
-					Nodes[Octant]->BoundingBox.Max.x = Center.x;
-				}
-
-				if (Octant & 0x02) // Up
-				{
-					Nodes[Octant]->BoundingBox.Min.y = Center.y;
-					Nodes[Octant]->BoundingBox.Max.y = BoundingBox.Max.y;		
-				}
-				else
-				{
-					Nodes[Octant]->BoundingBox.Min.y = BoundingBox.Min.y;
-					Nodes[Octant]->BoundingBox.Max.y = Center.y;
-				}
-
-				if (Octant & 0x04) // Front
-				{
-					Nodes[Octant]->BoundingBox.Min.z = Center.z;
-					Nodes[Octant]->BoundingBox.Max.z = BoundingBox.Max.z;		
-				}
-				else
-				{
-					Nodes[Octant]->BoundingBox.Min.z = BoundingBox.Min.z;
-					Nodes[Octant]->BoundingBox.Max.z = Center.z;
-				}
-			}
-		}
-
-		void AddItem(const Type& Item, const ZEVector3& Point)
-		{
-			if (MaxDepth == 0)
-				Items.Add(Item);
-			else
-			{
-				ZEInt ItemOctant = GetOctantIndex(Point);
-				if (ItemOctant == -1)
-					Items.Add(Item);
-				else
-				{
-					CreateNode(ItemOctant);
-					Nodes[ItemOctant]->AddItem(Item, Point);
-				}
-			}
-		}
-
-		void AddItem(const Type& Item, const ZETriangle& Triangle)
-		{
-			if (MaxDepth == 0)
-				Items.Add(Item);
-			else
-			{
-				ZEInt ItemOctant = GetOctantIndex(Triangle);
-				if (ItemOctant == -1)
-					Items.Add(Item);
-				else
-				{
-					CreateNode(ItemOctant);
-					Nodes[ItemOctant]->AddItem(Item, Triangle);
-				}
-			}
-		}
-
-		void AddItem(const Type& Item, const ZEAABBox& Volume)
-		{
-			if (MaxDepth == 0)
-				Items.Add(Item);
-			else
-			{
-				ZEInt ItemOctant = GetOctantIndex(Volume);
-				if (ItemOctant == -1)
-					Items.Add(Item);
-				else
-				{
-					CreateNode(ItemOctant);
-					Nodes[ItemOctant]->AddItem(Item, Volume);
-				}
-			}
-		}
+		ZEOctree*								GetNode(const ZEAABBox& BoundingBox);
+		const ZEOctree*							GetNode(const ZEAABBox& BoundingBox) const;
 		
-		void RemoveItem(ZESize Index)
+		ZESize									GetItemCount() const;	
+		const ZEArray<ZEItemType>&				GetItems();
+		const ZEArray<const ZEItemType>&		GetItems() const;
+		ZEItemType&								GetItem(ZESize Index);
+		const ZEItemType&						GetItem(ZESize Index) const;
+
+		void									AddItem(const ZEItemType& Item, const ZEVector3& Point);
+		void									AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
+
+		void									RemoveItem(ZESize Index);
+		bool									RemoveItem(const ZEItemType& Item);
+		bool									RemoveItem(const ZEItemType& Item, const ZEVector3& Point);
+		bool									RemoveItem(const ZEItemType& Item, const ZEAABBox& Volume);
+
+		void									Clear();
+
+		ZEOctreeIterator<ZEItemType>			Traverse(const ZEAABBox& BoundingBox);
+
+												ZEOctree();
+												~ZEOctree();
+};
+
+
+// IMPLEMENTATION
+//////////////////////////////////////////////////////////////////////////////////////
+
+template<typename ZEItemType>
+ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEVector3& Point) const
+{
+	if (Point.x < BoundingBox.Min.x || Point.x > BoundingBox.Max.x)
+		return ZE_OO_OUTSIDE;
+
+	if (Point.y < BoundingBox.Min.y || Point.y > BoundingBox.Max.y)
+		return ZE_OO_OUTSIDE;
+
+	if (Point.z < BoundingBox.Min.z || Point.z > BoundingBox.Max.z)
+		return ZE_OO_OUTSIDE;
+
+	ZEVector3& Center = BoundingBox.GetCenter();
+	return (Point.z > Center.z ? 4 : 0) + (Point.y > Center.y ? 2 : 0) + (Point.x > Center.x ? 1 : 0);
+}
+
+template<typename ZEItemType>
+ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEAABBox& BoundingBox) const
+{
+	ZEInt MinOctantIndex = FindOctant(BoundingBox.Min);
+	if (MinOctantIndex == ZE_OO_OUTSIDE)
+		return ZE_OO_OUTSIDE;
+
+	ZEInt MaxOctantIndex = FindOctant(BoundingBox.Max);
+	if (MaxOctantIndex == ZE_OO_OUTSIDE)
+		return ZE_OO_OUTSIDE;
+
+	if (MinOctantIndex == MaxOctantIndex)
+		return MinOctantIndex;
+	else
+		return ZE_OO_MULTIPLE;
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::Expand()
+{
+	zeDebugCheck(Parent != NULL, "Uplifiting non root octree.");
+
+	// Calculate New Bounding Box
+	float Width_2 = (BoundingBox.Max.x - BoundingBox.Min.x) / 2;
+	BoundingBox.Min.x -= Width_2;
+	BoundingBox.Max.x += Width_2;	
+
+	float Height_2 = (BoundingBox.Max.y - BoundingBox.Min.y) / 2;
+	BoundingBox.Min.y -= Height_2;
+	BoundingBox.Max.y += Height_2;
+
+	float Depth_2 = (BoundingBox.Max.z - BoundingBox.Min.z) / 2;
+	BoundingBox.Min.z -= Depth_2;
+	BoundingBox.Max.z += Depth_2;
+
+	// Create New Child Nodes for Expansion
+	for (ZEUInt I = 0; I < 8; I++)
+	{
+		if (Nodes[I] == NULL)
+			continue;
+
+		// Remove Old Child
+		ZEOctree<ZEItemType>* Temp = Nodes[I];
+		Nodes[I] = NULL;
+		
+		// Generate New Child
+		CreateChildNode(I);
+		Nodes[I]->Depth = Depth;
+		Nodes[I]->MaxDepth = MaxDepth;
+
+		// Add Old Child to New Child
+		Temp->Parent = Nodes[I];
+		Temp->ParentOctant = (~I) & 0x07;
+		Nodes[I]->Nodes[Temp->ParentOctant] = Temp;
+	}
+
+	// Uplift
+	Depth = Depth - 1;
+	MaxDepth = MaxDepth + 1;
+}
+
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::Shrink()
+{
+	if (Items.GetCount() != 0)
+		return;
+
+	for (ZEInt I = 0; I < 8; I++)
+	{
+		if (Nodes[I] != NULL)
+			return;
+	}
+
+	if (Parent != NULL)
+	{
+		ZEOctree<ZEItemType>* ParentPointer = Parent;
+
+		ParentPointer->Nodes[ParentOctant] = NULL;
+		delete this;
+
+		ParentPointer->Shrink();
+	}
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::CreateChildNode(ZEInt Octant)
+{
+	ZEVector3 Center = BoundingBox.GetCenter();
+
+	if (Nodes[Octant] != NULL || MaxDepth == 0)
+		return;
+
+	Nodes[Octant] = new ZEOctree();
+	Nodes[Octant]->Parent = this;
+	Nodes[Octant]->ParentOctant = Octant;
+	Nodes[Octant]->Depth = Depth + 1;
+	Nodes[Octant]->MaxDepth = MaxDepth - 1;
+
+	if (Octant & 0x01) // Right
+	{
+		Nodes[Octant]->BoundingBox.Min.x = Center.x;
+		Nodes[Octant]->BoundingBox.Max.x = BoundingBox.Max.x;		
+	}
+	else
+	{
+		Nodes[Octant]->BoundingBox.Min.x = BoundingBox.Min.x;
+		Nodes[Octant]->BoundingBox.Max.x = Center.x;
+	}
+
+	if (Octant & 0x02) // Up
+	{
+		Nodes[Octant]->BoundingBox.Min.y = Center.y;
+		Nodes[Octant]->BoundingBox.Max.y = BoundingBox.Max.y;		
+	}
+	else
+	{
+		Nodes[Octant]->BoundingBox.Min.y = BoundingBox.Min.y;
+		Nodes[Octant]->BoundingBox.Max.y = Center.y;
+	}
+
+	if (Octant & 0x04) // Front
+	{
+		Nodes[Octant]->BoundingBox.Min.z = Center.z;
+		Nodes[Octant]->BoundingBox.Max.z = BoundingBox.Max.z;		
+	}
+	else
+	{
+		Nodes[Octant]->BoundingBox.Min.z = BoundingBox.Min.z;
+		Nodes[Octant]->BoundingBox.Max.z = Center.z;
+	}
+}
+
+template<typename ZEItemType>
+ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetParent()
+{
+	return Parent;
+}
+
+template<typename ZEItemType>
+const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetParent() const
+{
+	return Parent;
+}
+
+template<typename ZEItemType>
+ZEUInt ZEOctree<ZEItemType>::GetDepth() const
+{
+	return Depth;
+}
+
+template<typename ZEItemType>
+	ZEUInt ZEOctree<ZEItemType>::GetParentOctant() const
+{
+	return ParentOctant;
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::SetBoundingBox(const ZEAABBox& BoundingBox)
+{
+	zeCheckError(Parent != NULL, ZE_VOID, "You can only change bounding box of a root octree.");
+	this->BoundingBox = BoundingBox;
+}
+
+template<typename ZEItemType>
+const ZEAABBox& ZEOctree<ZEItemType>::GetBoundingBox()  const
+{
+	return BoundingBox;
+}
+
+template<typename ZEItemType>
+ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(ZESize OctantIndex)
+{
+	zeDebugCheck(OctantIndex >= 8, "Index out of bounds.");
+	return Nodes[OctantIndex];
+}
+
+template<typename ZEItemType>
+const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(ZESize OctantIndex) const 
+{
+	zeDebugCheck(OctantIndex >= 8, "Index out of bounds.");
+	return Nodes[OctantIndex];
+}
+
+template<typename ZEItemType>
+ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEVector3& Point)
+{
+	if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
+		return NULL;
+
+	ZEInt OctantIndex = FindOctant(Point);
+	if (Nodes[OctantIndex] != NULL)
+		return Nodes[OctantIndex]->GetNode(Point);
+	else
+		return this;
+}
+
+template<typename ZEItemType>
+const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEVector3& Point) const
+{
+	ZEInt OctantIndex = FindOctant(Point);
+	if (OctantIndex == ZE_OO_OUTSIDE)
+	{
+		return NULL;
+	}
+	else
+	{
+		if (Nodes[OctantIndex] != NULL)
+			return Nodes[OctantIndex]->GetNode(Point);
+		else
+			return this;
+	}
+}
+
+template<typename ZEItemType>
+ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEAABBox& SearchVolume)
+{
+	ZEInt OctantIndex = FindOctant(SearchVolume);
+	if (OctantIndex == ZE_OO_OUTSIDE)
+	{
+		return NULL;
+	}
+	else if (OctantIndex == ZE_OO_MULTIPLE)
+	{
+		return this;
+	}
+	else 
+	{
+		if (Nodes[OctantIndex] != NULL)
+			return Nodes[OctantIndex]->GetNode(SearchVolume);
+		else
+			return this;
+	}
+}
+
+template<typename ZEItemType>
+const ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::GetNode(const ZEAABBox& SearchVolume) const
+{
+	ZEInt OctantIndex = FindOctant(SearchVolume);
+	if (OctantIndex == ZE_OO_OUTSIDE)
+	{
+		return NULL;
+	}
+	else if (OctantIndex == ZE_OO_MULTIPLE)
+	{
+		return this;
+	}
+	else 
+	{
+		if (Nodes[OctantIndex] != NULL)
+			return Nodes[OctantIndex]->GetNode(SearchVolume);
+		else
+			return this;
+	}
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::SetMaxDepth(ZEUInt Depth)
+{
+	MaxDepth = Depth;
+}
+
+template<typename ZEItemType>
+ZEUInt ZEOctree<ZEItemType>::GetMaxDepth()  const
+{
+	return MaxDepth;
+}
+
+template<typename ZEItemType>
+ZESize ZEOctree<ZEItemType>::GetItemCount()  const
+{
+	return Items.GetCount();
+}
+
+template<typename ZEItemType>
+const ZEItemType& ZEOctree<ZEItemType>::GetItem(ZESize Index) const
+{
+	return Items[Index];
+}
+
+template<typename ZEItemType>
+ZEItemType& ZEOctree<ZEItemType>::GetItem(ZESize Index)
+{
+	return Items[Index];
+}
+
+template<typename ZEItemType>
+const ZEArray<ZEItemType>& ZEOctree<ZEItemType>::GetItems() 
+{
+	return Items;
+}
+
+template<typename ZEItemType>
+const ZEArray<const ZEItemType>& ZEOctree<ZEItemType>::GetItems() const
+{
+	return reinterpret_cast<const ZEArray<const ZEItemType>&>(Items);
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEVector3& Point)
+{
+	ZEInt ItemOctant = FindOctant(Point);
+	if (ItemOctant == ZE_OO_MULTIPLE)
+	{
+		Items.Add(Item);
+	}
+	else if (ItemOctant == ZE_OO_OUTSIDE)
+	{
+		if (Parent == NULL)
+		{
+			Expand();
+			AddItem(Item, Point);
+		}
+		else
+		{
+			Parent->AddItem(Item, Point);
+		}
+	}
+	else
+	{
+		if (MaxDepth == 0)
+		{
+			Items.Add(Item);
+		}
+		else
+		{
+			CreateChildNode(ItemOctant);
+			Nodes[ItemOctant]->AddItem(Item, Point);
+		}
+	}
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEAABBox& Volume)
+{
+	ZEInt ItemOctant = FindOctant(Volume);
+	if (ItemOctant == ZE_OO_MULTIPLE)
+	{
+		Items.Add(Item);
+	}
+	else if (ItemOctant == ZE_OO_OUTSIDE)
+	{
+		if (Parent == NULL)
+		{
+			Expand();
+			AddItem(Item, Volume);
+		}
+		else
+		{
+			Parent->AddItem(Item, Volume);
+		}
+	}
+	else
+	{
+		if (MaxDepth == 0)
+		{
+			Items.Add(Item);
+		}
+		else
+		{
+			CreateChildNode(ItemOctant);
+			Nodes[ItemOctant]->AddItem(Item, Volume);
+		}
+	}
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::RemoveItem(ZESize Index)
+{
+	Items.Remove(Index);
+	Shrink();
+}
+
+template<typename ZEItemType>
+bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item)
+{
+	ZEInt Index = Items.FindIndex(Item);
+	if (Index != -1)
+	{
+		Items.Remove(Index);
+		Shrink();
+		return true;
+	}
+	else
+	{
+		for (ZESize I = 0; I < 8; I++)
+		{
+			if (Nodes[I] != NULL)
+			{
+				bool Result = Nodes[I]->RemoveItem(Item);
+				if (Result)
+					return true;
+			}
+		}
+
+		return false;
+	}
+}
+
+template<typename ZEItemType>
+bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEVector3& Point)
+{
+	ZEInt ItemOctant = FindOctant(Point);
+	if (ItemOctant == ZE_OO_OUTSIDE)
+	{
+		return false;
+	}
+	else if (ItemOctant == ZE_OO_MULTIPLE)
+	{
+		ZEInt Index = Items.FindIndex(Item);
+		if (Index != -1)
 		{
 			Items.Remove(Index);
+			Shrink();
+			return true;
 		}
+	}
+	else
+	{
+		if (Nodes[ItemOctant] != NULL)
+			return Nodes[ItemOctant]->RemoveItem(Item, Point);		
+	}
+}
 
-		void Clear()
+template<typename ZEItemType>
+bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Volume)
+{
+	ZEInt ItemOctant = FindOctant(Volume);
+	if (ItemOctant == ZE_OO_OUTSIDE)
+	{
+		return false;
+	}
+	else if (ItemOctant == ZE_OO_MULTIPLE)
+	{
+		ZEInt Index = Items.FindIndex(Item);
+		if (Index != -1)
 		{
-			Items.Clear();
-			for (ZEInt I = 0; I < 8; I++)
-				if (Nodes[I] != NULL)
-				{
-					delete Nodes[I];
-					Nodes[I] = NULL;
-				}
-		}
-
-		ZEInt GetOctantIndex(const ZEVector3& Point) const
-		{
-			ZEVector3& Center = BoundingBox.GetCenter();
-
-			if (Point.x == Center.x || Point.y == Center.y || Point.z == Center.z)
-				return -1;
-			
-			return (Point.z > Center.z ? 4 : 0) + (Point.y > Center.y ? 2 : 0) + (Point.x > Center.x ? 1 : 0);
-		}
-
-		ZEInt GetOctantIndex(const ZETriangle& Triangle) const
-		{
-			ZEInt OctantIndexA = GetOctantIndex(Triangle.V0);
-			ZEInt OctantIndexB = GetOctantIndex(Triangle.V1);
-			if (OctantIndexA != OctantIndexB)
-				return -1;
-
-			OctantIndexB = GetOctantIndex(Triangle.V2);
-			if (OctantIndexA != OctantIndexB)
-				return -1;
-
-			return OctantIndexA;
-		}
-
-		ZEInt GetOctantIndex(const ZEAABBox& BoundingBox) const
-		{
-			ZEInt MinOctantIndex = GetOctantIndex(BoundingBox.Min);
-			ZEInt MaxOctantIndex = GetOctantIndex(BoundingBox.Max);
-			if (MinOctantIndex == MaxOctantIndex)
-				return MinOctantIndex;
-			else
-				return -1;
-		}
-
-		ZEOctree* GetNode(ZESize OctantIndex)
-		{
-			return Nodes[OctantIndex];
-		}
-
-		const ZEOctree* GetNode(ZESize OctantIndex) const 
-		{
-			return Nodes[OctantIndex];
-		}
-
-
-		ZEOctree* GetNode(const ZEVector3& Point)
-		{
-			if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
-				return NULL;
-
-			ZEInt OctantIndex = GetOctantIndex(Point);
-			if (Nodes[OctantIndex] != NULL)
-				return Nodes[OctantIndex]->GetNode(Point);
-			else
-				return this;
-		}
-
-		const ZEOctree* GetNode(const ZEVector3& Point) const
-		{
-			if (!ZEAABBox::IntersectionTest(BoundingBox, Point))
-				return NULL;
-
-			ZEInt OctantIndex = GetOctantIndex(Point);
-			if (Nodes[OctantIndex] != NULL)
-				return Nodes[OctantIndex]->GetNode(Point);
-			else
-				return this;
-		}
-
-		ZEOctree* GetNode(const ZEAABBox& SearchVolume)
-		{
-			if (!ZEAABBox::IntersectionTest(BoundingBox, SearchVolume))
-				return NULL;
-
-			ZEInt OctantIndex = GetOctantIndex(SearchVolume);
-			if (OctantIndex == -1)
-				return this;
-			else
-			{
-				if (Nodes[OctantIndex] != NULL)
-					return Nodes[OctantIndex]->GetNode(SearchVolume);
-				else
-					return this;
-			}
-		}
-
-		const ZEOctree* GetNode(const ZEAABBox& SearchVolume) const
-		{
-			if (!ZEAABBox::IntersectionTest(BoundingBox, SearchVolume))
-				return NULL;
-
-			ZEInt OctantIndex = GetOctantIndex(SearchVolume);
-			if (OctantIndex == -1)
-				return this;
-			else
-			{
-				if (Nodes[OctantIndex] != NULL)
-					return Nodes[OctantIndex]->GetNode(SearchVolume);
-				else
-					return this;
-			}
-		}
-
-		bool Shrink()
-		{
-			bool Found = false;
-			for (ZEInt I = 0; I < 8; I++)
-				if (Nodes[I] != NULL)
-				{
-					if (Nodes[I]->Shrink())
-					{
-						delete Nodes[I];
-						Nodes[I] = NULL;
-					}
-					else
-						Found = true;
-				}
-
-			if (Items.GetCount() != 0)
-				return false;
-
-			if (Found)
-				return false;
-
+			Items.Remove(Index);
+			Shrink();
 			return true;
 		}
 
-		ZEOctree()
+		return false;
+	}
+	else
+	{
+		if (Nodes[ItemOctant] != NULL)
+			return Nodes[ItemOctant]->RemoveItem(Item, Point);		
+	}
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::Clear()
+{
+	Items.Clear();
+	for (ZEInt I = 0; I < 8; I++)
+	{
+		if (Nodes[I] != NULL)
 		{
-			Parent = NULL;
-			for (ZEInt I = 0; I < 8; I++)
-				Nodes[I] = NULL;
-
-			Depth = 0;
-			MaxDepth = 0;
-			Octant = 0;
+			delete Nodes[I];
+			Nodes[I] = NULL;
 		}
+	}
+}
 
-		~ZEOctree()
-		{
-			for (ZEInt I = 0; I < 8; I++)
-				if (Nodes[I] != NULL)
-					delete Nodes[I];
-		}
-};
+template<typename ZEItemType>
+ZEOctreeIterator<ZEItemType> ZEOctree<ZEItemType>::Traverse(const ZEAABBox& BoudingBox)
+{
+	return ZEOctreeIterator<ZEItemType>(this, 0, BoudingBox);
+}
 
-#endif
+template<typename ZEItemType>
+ZEOctree<ZEItemType>::ZEOctree()
+{
+	Parent = NULL;
+	for (ZEInt I = 0; I < 8; I++)
+		Nodes[I] = NULL;
+
+	Depth = 0;
+	MaxDepth = 0;
+	ParentOctant = ZE_OO_MULTIPLE;
+}
+
+template<typename ZEItemType>
+ZEOctree<ZEItemType>::~ZEOctree()
+{
+	for (ZEInt I = 0; I < 8; I++)
+	{
+		if (Nodes[I] != NULL)
+			delete Nodes[I];
+	}
+}

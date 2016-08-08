@@ -335,7 +335,7 @@ bool ZEInteriorResource::ReadRooms(ZEMLReaderNode* RoomsNode)
 				for (ZESize I = 0; I < Room->Polygons.GetCount(); I++)
 				{
 					ZETriangle Triangle(Room->Polygons[I].Vertices[0].Position, Room->Polygons[I].Vertices[1].Position, Room->Polygons[I].Vertices[2].Position);
-					Room->Octree.AddItem(I, Triangle);
+					Room->Octree.AddItem(I, Triangle.GetBoundingBox());
 				}
 			}
 			else
