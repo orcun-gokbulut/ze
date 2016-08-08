@@ -186,22 +186,12 @@ ZEEntityResult ZEModel::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	if (Resource == NULL)
+	ZE_ENTITY_RESOURCE_FENCE_LOADED(Resource, ZE_ER_FAILED)
 	{
 		if (ModelFileName.IsEmpty())
 			return ZE_ER_DONE;
-		else
-			Resource = ZEMDResource::LoadResourceShared(ModelFileName);
-	}
-
-	if (!Resource->IsLoaded())
-	{
-		zeLog("Load progress %d", Resource->GetLoadProgress());
-		return ZE_ER_WAIT;
-	}
-	else if (Resource->IsFailed())
-	{
-		return ZE_ER_FAILED;
+		
+		Resource = ZEMDResource::LoadResourceShared(ModelFileName);
 	}
 
 	BoundingBoxIsUserDefined = Resource->GetUserDefinedBoundingBoxEnabled();

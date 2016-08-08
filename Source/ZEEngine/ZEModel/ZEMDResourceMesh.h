@@ -75,6 +75,7 @@ class ZEMDResourceMesh : public ZEObject, public ZEDestroyable
 
 	public:
 		ZEMDResource*									GetResource();
+		const ZEMDResource*								GetResource() const;
 
 		void											SetParentMeshId(ZEInt32 ParentMesh);
 		ZEInt32											GetParentMeshId() const;

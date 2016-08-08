@@ -70,7 +70,10 @@ ZEMDResource* ZEMDResourceLOD::GetResource()
 
 const ZEMDResource* ZEMDResourceLOD::GetResource() const
 {
-	return GetResource();
+	if (ResourceMesh == NULL)
+		return NULL;
+	else
+		return ResourceMesh->GetResource();
 }
 
 ZEMDResourceMesh* ZEMDResourceLOD::GetResourceMesh()
@@ -365,6 +368,8 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 			Draw.SetCount(Vertices.GetCount());
 		else
 			Draw.SetCount(VerticesSkin.GetCount());
+
+		Draw.SetMaterial(GetMaterial());
 
 		Draws.Add(Draw);
 	}

@@ -61,12 +61,12 @@ ZESize ZEMDResourceDraw::GetCount() const
 	return Count;
 }
 
-void ZEMDResourceDraw::SetMaterial(ZEHolder<ZERNMaterial> Material)
+void ZEMDResourceDraw::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
 	this->Material = Material;
 }
 
-ZEHolder<ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
+ZEHolder<const ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
 {
 	return Material;
 }

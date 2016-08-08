@@ -1883,7 +1883,7 @@ bool ZERNStandardMaterial::Unserialize(ZEMLReaderNode* MaterialNode)
 
 	zeCheckError(MaterialNode == NULL || !MaterialNode->IsValid(), false, "ZERNStandardMaterial loading failed. ZEML Root Node is not valid. File : \"%s\"", FileName.ToCString());
 
-	ZEUInt8 FileMajorVersion = MaterialNode->ReadUInt8("MajorVersion", 0);
+	ZEUInt8 FileMajorVersion = MaterialNode->ReadUInt8("VersionMajor", 0);
 	if (FileMajorVersion < 2)
 		zeWarning("ZERNStandardMaterial loading warning. Old depricated file version detected. Current Version: \"2.0\" Detected Version: \"%d.0\" File Name: \"%s\".", FileMajorVersion, FileName.ToCString());
 	

@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESectorManager.h
+ Zinek Engine - ZEEntityMacros.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,8 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMeta/ZEObject.h"
-#include "ZESector.h"
-#include "ZEDS/ZEList2.h"
-#include "ZEDS/ZEArray.h"
+#include "ZEEntityMacros.h"
 
-class ZESectorSelector;
-class ZEGeographicEntity;
+#include "ZECommon.h"
 
-class ZESectorManager : public ZEObject
-{
-	ZE_OBJECT;
-
-	protected:
-		ZESector* 							OriginSector;
-		ZEList2<ZEGeographicEntity>			Sectors;
-		ZEList2<ZEGeographicEntity>			Selectors;
-		ZEList2<ZEGeographicEntity>			GeographicEntities;
-
-		void								UpdateTransformation(ZEGeographicEntity* Entity);
-		void								UpdateTransformations();
-		void								UpdateActiveSectors();
-
-											ZESectorManager();
-
-	public:
-		const ZEList2<ZEGeographicEntity>&	GetSectors() const;
-		ZEArray<ZESector*>					GetSectors(const ZEVector3d& Position) const;
-		ZESector*							GetSector(const ZEGUID& Id) const;
-		ZESector*							GetSector(const ZEVector3d& Position, bool Proximity = false) const;
-		ZESector*							GetOriginSector();
-		bool								AddSector(ZESector* Sector);
-		void								RemoveSector(ZESector* Sector);
-
-		const ZEList2<ZEGeographicEntity>&	GetSelectors() const;
-		bool								AddSelector(ZESectorSelector* Selector);
-		void								RemoveSelector(ZESectorSelector* Selector);
-
-		const ZEList2<ZEGeographicEntity>&	GetGeographicEntities() const;
-		bool								AddGeographicEntity(ZEGeographicEntity* Entity);
-		void								RemoveGeographicEntity(ZEGeographicEntity* Entity);
-
-		virtual void						Process(float Time);
-
-		static ZESectorManager*				CreateInstance();
-};
+ZE_SUPPRESS_LNK4221

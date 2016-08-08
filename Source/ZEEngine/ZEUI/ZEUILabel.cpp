@@ -39,6 +39,9 @@
 
 void ZEUILabel::UpdateCharacters()
 {
+	if (FontResource == NULL || !FontResource->IsLoaded())
+		return;
+
 	ZEInt64 KerningDistance = 0;
 	ZEUIFontCharacter Character;
 	ZEUIRectangle Output;

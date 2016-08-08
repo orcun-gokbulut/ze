@@ -38,28 +38,31 @@
 
 #define ZE_GEDF_GEOGRAPHIC_TRANSFORM			0x0001
 #define ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM		0x0002
+#define ZE_GEDF_LOCAL_TRANSFORM					0x0004 
 
 
 bool ZEGeographicEntity::CheckParent(ZEEntity* Parent)
 {
-	if (!ZEClass::IsDerivedFrom(ZESectorManager::Class(), Parent->GetClass()))
-		return false;
+// 	if (!ZEClass::IsDerivedFrom(ZESectorManager::Class(), Parent->GetClass()))
+// 		return false;
+// 
+// 	return true;
 
-	return true;
+	return false;
 }
 
 void ZEGeographicEntity::GeographicTransformChanged()
 {
-	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM);
+	GeographicEntityDirtyFlags.RaiseFlags(ZE_GEDF_GEOGRAPHIC_TRANSFORM | ZE_GEDF_INV_GEOGRAPHIC_TRANSFORM | ZE_GEDF_LOCAL_TRANSFORM);
 
-	ZESectorManager* Parent = static_cast<ZESectorManager*>(GetParent());
-	if (Parent == NULL)
-		return;
-
-	Parent->UpdateTransformation(this);
+// 	ZESectorManager* Parent = static_cast<ZESectorManager*>(GetParent());
+// 	if (Parent == NULL)
+// 		return;
+// 
+// 	Parent->UpdateTransformation(this);
 }
 
-ZEGeographicEntity::ZEGeographicEntity()
+ZEGeographicEntity::ZEGeographicEntity() : GeoLink(this)
 {
 	GeographicPosition = ZEVector3d::Zero;
 	GeographicRotation = ZEQuaternion::Identity;
