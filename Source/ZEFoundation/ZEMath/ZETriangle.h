@@ -40,6 +40,7 @@
 #include "ZEVector.h"
 #include "ZELine.h"
 #include "ZEPlane.h"
+#include "ZEAABBox.h"
 
 class ZETriangle
 {
@@ -65,6 +66,7 @@ class ZETriangle
 		static bool					IntersectionTest(const ZETriangle& Triangle, const ZEPlane & Plane2, ZELine & Line);
 
 		ZEVector3					GetCentroid() const;
+		ZEAABBox					GetBoundingBox() const;
 
 									ZETriangle();
 									ZETriangle(const ZEVector3& V0, const ZEVector3& V1, const ZEVector3& V2);

@@ -531,8 +531,6 @@ void ZENavigationMeshGenerator::Generate(const ZEArray<ZEPolygon>& Input, ZENavi
 		if (!PolygonCulled)
 			break;
 	}
-
-	Mesh.Octree.Shrink();
 }
 
 ZENavigationMeshGenerator::ZENavigationMeshGenerator()

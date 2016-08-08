@@ -39,6 +39,8 @@ ze_add_source(ZEQuadTree.cpp			Sources)
 ze_add_source(ZEQuadTree.h				Sources Headers)
 ze_add_source(ZEOctree.cpp				Sources)
 ze_add_source(ZEOctree.h				Sources Headers)
+ze_add_source(ZEOctreeIterator.cpp		Sources)
+ze_add_source(ZEOctreeIterator.h		Sources Headers)
 
 ze_add_library(TARGET ZESpatial 
 	SOURCES ${Sources} 

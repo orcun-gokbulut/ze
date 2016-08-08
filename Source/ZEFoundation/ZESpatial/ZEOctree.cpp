@@ -34,3 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZEOctree.h"
+
+#include "ZECommon.h"
+
+ZE_SUPPRESS_LNK4221

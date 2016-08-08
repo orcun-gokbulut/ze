@@ -42,7 +42,7 @@
 #include "ZEMath/ZEVector.h"
 #include "ZEDS/ZEArray.h"
 
-template < typename Type, typename Allocator = ZEAllocatorBase<Type> >
+template < typename ZEItemType, typename Allocator = ZEAllocatorBase<ZEItemType> >
 class ZEQuadTree
 {
 	private:
@@ -50,7 +50,7 @@ class ZEQuadTree
 		ZEUInt Depth;
 		ZEUInt MaxDepth;
 		ZEUInt Quadrant;
-		ZEArray<Type, Allocator> Items;
+		ZEArray<ZEItemType, Allocator> Items;
 		ZEQuadTree* Nodes[4];
 		ZEAABBox BoundingBox;
 
@@ -100,17 +100,17 @@ class ZEQuadTree
 			return Items.GetCount();
 		}
 
-		const Type& GetItem(ZESize Index) const
+		const ZEItemType& GetItem(ZESize Index) const
 		{
 			return Items[Index];
 		}
 
-		Type& GetItem(ZESize Index)
+		ZEItemType& GetItem(ZESize Index)
 		{
 			return Items[Index];
 		}
 
-		const ZEArray<Type, Allocator>& GetItems()
+		const ZEArray<ZEItemType, Allocator>& GetItems()
 		{
 			return Items;
 		}
@@ -151,7 +151,7 @@ class ZEQuadTree
 			}
 		}
 
-		void AddItem(const Type& Item, const ZEVector3& Point)
+		void AddItem(const ZEItemType& Item, const ZEVector3& Point)
 		{
 			if (MaxDepth == 0)
 				Items.Add(Item);
@@ -168,7 +168,7 @@ class ZEQuadTree
 			}
 		}
 
-		void AddItem(const Type& Item, const ZEAABBox& Volume)
+		void AddItem(const ZEItemType& Item, const ZEAABBox& Volume)
 		{
 			if (MaxDepth == 0)
 				Items.Add(Item);
