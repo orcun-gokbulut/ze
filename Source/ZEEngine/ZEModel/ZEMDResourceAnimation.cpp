@@ -104,7 +104,7 @@ float ZEMDResourceAnimation::GetFramesPerSecond() const
 bool ZEMDResourceAnimation::Unserialize(const ZEMLReaderNode& AnimationNode)
 {
 	zeCheckError(!AnimationNode.IsValid(), false, "Invalid Animation node.");
-	zeCheckError(AnimationNode.GetName() == "Animation", false, "Invalid Animation node name.");
+	zeCheckError(AnimationNode.GetName() != "Animation", false, "Invalid Animation node name.");
 	
 	SetName(AnimationNode.ReadString("Name"));
 	FramesPerSecond = AnimationNode.ReadFloat("FramesPerSecond", 30);

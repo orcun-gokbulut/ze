@@ -38,18 +38,24 @@
 #include "ZEGame/ZEGeographicEntity.h"
 #include "ZEFoundation/ZEGUID.h"
 
+class ZESectorManager;
+
 class ZESector : public ZEGeographicEntity
 {
+	friend class ZESectorManager;
 	ZE_OBJECT;
 	private:
 		ZEGUID						GUID;
 		ZEString					SectorFile;
+		ZESectorManager*			Manager;
 		ZESize						LoadingIndex;
 		ZELock						SectorLock;
 
 		ZEArray<ZEGUID>				AdjacentSectorIds;
 		ZEInt8						AdjacencyDepth;
 
+		void						SetManager(ZESectorManager* Manager);
+		
 		virtual ZEEntityResult		LoadInternal();
 		virtual ZEEntityResult		UnloadInternal();
 
@@ -61,6 +67,8 @@ class ZESector : public ZEGeographicEntity
 
 		void						SetSectorFile(const ZEString& FilePath);
 		const ZEString&				GetSectorFile() const;
+
+		ZESectorManager*			GetManager() const;
 
 		bool						CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth);
 		const ZEArray<ZEGUID>&		GetAdjacentSectorIds() const;

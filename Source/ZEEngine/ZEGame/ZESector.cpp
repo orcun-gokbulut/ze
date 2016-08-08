@@ -43,6 +43,11 @@
 #include "ZEDS\ZEVariant.h"
 #include "ZEMeta\ZEProvider.h"
 
+void ZESector::SetManager(ZESectorManager* Manager)
+{
+	this->Manager = Manager;
+}
+
 ZEEntityResult ZESector::LoadInternal()
 {
 	if (SectorFile.IsEmpty())
@@ -168,9 +173,17 @@ ZEEntityResult ZESector::UnloadInternal()
 	return ZE_ER_DONE;
 }
 
+ZESectorManager* ZESector::GetManager() const
+{
+	return Manager;
+}
+
 bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
 {
 	if (TargetSector == NULL)
+		return false;
+
+	if (Manager == NULL)
 		return false;
 
 	if (this == TargetSector)
@@ -184,7 +197,7 @@ bool ZESector::CheckAdjacency(ZESector* TargetSector, ZEInt8 Depth)
 
 	for (ZESize I = 0; I < SectorIds.GetCount(); I++)
 	{
-		CurrentSector = static_cast<ZESectorManager*>(GetParent())->GetSector(SectorIds[I]);
+		CurrentSector = Manager->GetSector(SectorIds[I]);
 
 		if (CheckAdjacency(CurrentSector, (Depth - 1)))
 			return true;
@@ -234,14 +247,10 @@ const ZEArray<ZEGUID>& ZESector::GetAdjacentSectorIds() const
 
 bool ZESector::AddAdjacentSector(ZESector* Sector)
 {
-	if (Sector == this)
-		return false;
-
-	if (Sector == NULL)
-		return false;
-
-	if (AdjacentSectorIds.Exists(Sector->GetGUID()))
-		return false;
+	zeCheckError(Sector == NULL, false, "Cannot add adjacent sector. Sector is NULL.");
+	zeCheckError(Sector == this, false, "Cannot add adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(Sector == this, false, "Cannot add adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(AdjacentSectorIds.Exists(Sector->GetGUID()), false, "Cannot add adjacent sector. Sector is already added as adjacent sector. Sector Name: \"%s\".", Sector->GetName());
 
 	ZE_LOCK_SECTION(SectorLock)
 	{
@@ -253,14 +262,10 @@ bool ZESector::AddAdjacentSector(ZESector* Sector)
 
 bool ZESector::RemoveAdjacentSector(ZESector* Sector)
 {
-	if (Sector == this)
-		return false;
-
-	if (Sector == NULL)
-		return false;
-
-	if (!AdjacentSectorIds.Exists(Sector->GetGUID()))
-		return false;
+	zeCheckError(Sector == NULL, false, "Cannot remove adjacent sector. Sector is NULL.");
+	zeCheckError(Sector == this, false, "Cannot remove adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(Sector == this, false, "Cannot add adjacent sector. Sector is same sector. Sector Name: \"%s\".", Sector->GetName());
+	zeCheckError(!AdjacentSectorIds.Exists(Sector->GetGUID()), false, "Cannot remove adjacent sector. Sector is not added as adjacent sector. Sector Name: \"%s\".", Sector->GetName());
 
 	ZE_LOCK_SECTION(SectorLock)
 	{
@@ -392,6 +397,5 @@ ZESector* ZESector::CreateInstance()
 {
 	return new ZESector();
 }
-
 
 

@@ -72,6 +72,11 @@ ZEMDResource* ZEMDResourceMesh::GetResource()
 	return Resource;
 }
 
+const ZEMDResource* ZEMDResourceMesh::GetResource() const
+{
+	return Resource;
+}
+
 void ZEMDResourceMesh::SetParentMeshId(ZEInt32 ParentMesh)
 {
 	this->MeshId = ParentMesh;

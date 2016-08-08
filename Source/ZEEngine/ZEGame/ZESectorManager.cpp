@@ -34,30 +34,36 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZESectorManager.h"
-#include "ZESector.h"
 #include "ZESectorSelector.h"
+#include "ZEGeographicEntity.h"
 #include "ZEMath\ZEMath.h"
+
+#define ZE_GEDF_LOCAL_TRANSFORM 0x0004
 
 void ZESectorManager::UpdateTransformation(ZEGeographicEntity* Entity)
 {
 	if (OriginSector == NULL)
 		return;
 
-	ZEMatrix4x4d EntityLocalTransform;
-	ZEMatrix4x4d::Multiply(EntityLocalTransform, OriginSector->GetInvGeographicTransform(), Entity->GetGeographicTransform());
-	Entity->SetPosition(EntityLocalTransform.GetTranslation().ToVector3());
-	Entity->SetRotation(EntityLocalTransform.GetRotation());
-	Entity->SetScale(EntityLocalTransform.GetScale().ToVector3());
+	if (Entity->GeographicEntityDirtyFlags.GetFlags(ZE_GEDF_LOCAL_TRANSFORM))
+	{
+		ZEMatrix4x4d EntityLocalTransform;
+		ZEMatrix4x4d::Multiply(EntityLocalTransform, OriginSector->GetInvGeographicTransform(), Entity->GetGeographicTransform());
+		Entity->SetPosition(EntityLocalTransform.GetTranslation().ToVector3());
+		Entity->SetRotation(EntityLocalTransform.GetRotation());
+		Entity->SetScale(EntityLocalTransform.GetScale().ToVector3());
+		Entity->GeographicEntityDirtyFlags.UnraiseFlags(ZE_GEDF_LOCAL_TRANSFORM);
+	}
 }
 
 void ZESectorManager::UpdateTransformations()
 {
 	ZEVector3d GeographicRelativeOrigin = ZEVector3d::Zero;
 
-	for (ZESize I = 0; I < Selectors.GetCount(); I++)
-		GeographicRelativeOrigin += Selectors[I]->GetGeographicPosition();
+	ze_for_each(Selector, Selectors)
+		GeographicRelativeOrigin += Selector->GetGeographicPosition();
 
-	GeographicRelativeOrigin = GeographicRelativeOrigin / Selectors.GetCount();
+	GeographicRelativeOrigin = GeographicRelativeOrigin / (double)Selectors.GetCount();
 
 	ZESector* ResultSector = GetSector(GeographicRelativeOrigin, true);
 
@@ -66,14 +72,14 @@ void ZESectorManager::UpdateTransformations()
 	
 	OriginSector = ResultSector;
 
-	for (ZESize I = 0; I < Sectors.GetCount(); I++)
-		UpdateTransformation(Sectors[I]);
+	ze_for_each(Sector, Sectors)
+		UpdateTransformation(Sector.GetPointer());
 
-	for (ZESize I = 0; I < Selectors.GetCount(); I++)
-		UpdateTransformation(Selectors[I]);
+	ze_for_each(Selector, Selectors)
+		UpdateTransformation(Selector.GetPointer());
 
-	for (ZESize I = 0; I < GeographicEntities.GetCount(); I++)
-		UpdateTransformation(GeographicEntities[I]);
+	ze_for_each(Entity, GeographicEntities)
+		UpdateTransformation(Entity.GetPointer());
 	
 }
 
@@ -81,22 +87,23 @@ void ZESectorManager::UpdateActiveSectors()
 {
 	ZESector* CurrentSelectedSector = NULL;
 
-	for (ZESize I = 0; I < Selectors.GetCount(); I++)
+	ze_for_each(Selector, Selectors)
 	{
-		CurrentSelectedSector = GetSector(Selectors[I]->GetGeographicPosition(), true);
+		CurrentSelectedSector = GetSector(Selector->GetGeographicPosition(), true);
 
 		if (CurrentSelectedSector == NULL)
 			continue;
 
-		for (ZESize J = 0; J < Sectors.GetCount(); J++)
+		ze_for_each(Sector, Sectors)
 		{
-			bool Result = Sectors[J]->CheckAdjacency(CurrentSelectedSector, CurrentSelectedSector->GetAdjacencyDepth());
+			ZESector* Temp = static_cast<ZESector*>(Sector.GetPointer());
+			bool Result = Temp->CheckAdjacency(CurrentSelectedSector, CurrentSelectedSector->GetAdjacencyDepth());
 
-			if (!Sectors[J]->GetEnabled())
-				UpdateTransformation(Sectors[J]);
+			if (!Temp->GetEnabled()) //Investigate Possible bug
+				UpdateTransformation(Temp);
 
-			Sectors[J]->SetEnabled(Result);
-			Sectors[J]->SetVisible(Result);
+			Temp->SetEnabled(Result);
+			Temp->SetVisible(Result);
 		}
 	}
 }
@@ -104,58 +111,24 @@ void ZESectorManager::UpdateActiveSectors()
 ZESectorManager::ZESectorManager()
 {
 	OriginSector = NULL;
-
-	SetEntityFlags(ZE_EF_TICKABLE);
 }
 
-ZEEntityResult ZESectorManager::InitializeInternal()
-{
-	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
-
-	OriginSector = NULL;
-	Sectors.Clear();
-	Selectors.Clear();
-	GeographicEntities.Clear();
-
-	const ZEArray<ZEEntity*>& ChildEntities = GetChildEntities();
-	ZEEntity* CurrentEntity = NULL;
-
-	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-	{
-		CurrentEntity = ChildEntities[I];
-
-		if (ZEClass::IsDerivedFrom(ZESector::Class(), CurrentEntity->GetClass()))
-			Sectors.Add((ZESector*)CurrentEntity);
-		else if (ZEClass::IsDerivedFrom(ZESectorSelector::Class(), CurrentEntity->GetClass()))
-			Selectors.Add((ZESectorSelector*)CurrentEntity);
-		else if (ZEClass::IsDerivedFrom(ZEGeographicEntity::Class(), CurrentEntity->GetClass()))
-			GeographicEntities.Add((ZEGeographicEntity*)CurrentEntity);
-		else
-			continue;
-	}
-
-	return ZE_ER_DONE;
-}
-
-const ZEArray<ZESector*>& ZESectorManager::GetSectors() const
+const ZEList2<ZEGeographicEntity>& ZESectorManager::GetSectors() const
 {
 	return Sectors;
 }
 
 ZEArray<ZESector*> ZESectorManager::GetSectors(const ZEVector3d& Position) const
 {
-	ZESector* CurrentSector = NULL;
 	ZEArray<ZESector*> Results;
 	ZEVector3 LocalizedTestPosition;
 
-	for (ZESize I = 0; I < Sectors.GetCount(); I++)
+	ze_for_each(Sector, Sectors)
 	{
-		CurrentSector = Sectors[I];
+		LocalizedTestPosition = (Position - Sector->GetGeographicPosition()).ToVector3();
 
-		LocalizedTestPosition = (Position - CurrentSector->GetGeographicPosition()).ToVector3();
-
-		if (ZEAABBox::IntersectionTest(CurrentSector->GetBoundingBox(), LocalizedTestPosition))
-			Results.Add(CurrentSector);
+		if (ZEAABBox::IntersectionTest(Sector->GetBoundingBox(), LocalizedTestPosition))
+			Results.Add(static_cast<ZESector*>(Sector.GetPointer()));
 	}
 
 	return Results;
@@ -163,49 +136,49 @@ ZEArray<ZESector*> ZESectorManager::GetSectors(const ZEVector3d& Position) const
 
 ZESector* ZESectorManager::GetSector(const ZEGUID& Id) const
 {
-	for (ZESize I = 0; I < Sectors.GetCount(); I++)
-		if (((ZESector*)Sectors[I])->GetGUID() == Id)
-			return (ZESector*)Sectors[I];
+	ze_for_each(Sector, Sectors)
+	{
+		ZESector* Temp = static_cast<ZESector*>(Sector.GetPointer());
+		if (Temp->GetGUID() == Id)
+			return Temp;
+	}
 
 	return NULL;
 }
 
 ZESector* ZESectorManager::GetSector(const ZEVector3d& Position, bool Proximity) const
 {
-	ZESector* ResultSector = NULL;
-	ZESector* ClosestSector = NULL;
-	ZESector* CurrentSector = NULL;
+	ZEGeographicEntity* ResultSector = NULL;
+	ZEGeographicEntity* ClosestSector = NULL;
 	double DistanceToResult = 0.0;
 	double DistanceToCurrent = 0.0;
 	double DistanceToClosest = ZE_DOUBLE_MAX;
 	ZEVector3 LocalizedTestPosition;
 
-	for (ZESize I = 0; I < Sectors.GetCount(); I++)
+	ze_for_each(Sector, Sectors)
 	{
-		CurrentSector = Sectors[I];
+		LocalizedTestPosition = (Position - Sector->GetGeographicPosition()).ToVector3();
 
-		LocalizedTestPosition = (Position - CurrentSector->GetGeographicPosition()).ToVector3();
-
-		DistanceToCurrent = ZEVector3d::DistanceSquare(CurrentSector->GetGeographicPosition(), Position);
+		DistanceToCurrent = ZEVector3d::DistanceSquare(Sector->GetGeographicPosition(), Position);
 
 		if (DistanceToCurrent < DistanceToClosest)
 		{
 			DistanceToClosest = DistanceToCurrent;
-			ClosestSector = CurrentSector;
+			ClosestSector = Sector.GetPointer();
 		}
 
-		if (ZEAABBox::IntersectionTest(CurrentSector->GetBoundingBox(), LocalizedTestPosition))
+		if (ZEAABBox::IntersectionTest(Sector->GetBoundingBox(), LocalizedTestPosition))
 		{
 			if (ResultSector != NULL)
 			{
 				DistanceToResult = ZEVector3d::DistanceSquare(ResultSector->GetGeographicPosition(), Position);
 
 				if (DistanceToCurrent < DistanceToResult)
-					ResultSector = CurrentSector;
+					ResultSector = Sector.GetPointer();
 			}
 			else
 			{
-				ResultSector = CurrentSector;
+				ResultSector = Sector.GetPointer();
 			}
 		}
 	}
@@ -215,7 +188,7 @@ ZESector* ZESectorManager::GetSector(const ZEVector3d& Position, bool Proximity)
 	if (ResultSector == NULL && Proximity)
 		ResultSector = ClosestSector;
 
-	return ResultSector;
+	return static_cast<ZESector*>(ResultSector);
 }
 
 ZESector* ZESectorManager::GetOriginSector()
@@ -225,66 +198,77 @@ ZESector* ZESectorManager::GetOriginSector()
 
 bool ZESectorManager::AddSector(ZESector* Sector)
 {
-	if (!AddChildEntity(Sector))
-		return false;
+	zeCheckError(Sector == NULL, false, "Cannot add sector. Sector is NULL.");
+	zeCheckError(Sectors.Exists(&Sector->GeoLink), false, 
+		"Can not add sector. Sector already registered to this Manager. Sector Name: \"%s\".", Sector->GetName().ToCString());
 
-	Sectors.Add(Sector);
+	Sectors.AddEnd(&Sector->GeoLink);
+	Sector->SetManager(this);
 
 	return true;
 }
 
 void ZESectorManager::RemoveSector(ZESector* Sector)
 {
-	Sectors.RemoveValue(Sector);
+	zeCheckError(Sector == NULL, ZE_VOID, "Cannot remove sector. Sector is NULL.");
+	zeCheckError(!Sectors.Exists(&Sector->GeoLink), ZE_VOID, 
+		"Can not remove sector. Sector is not registered to this manager. Sector Name: \"%s\".", Sector->GetName().ToCString());
 
-	RemoveChildEntity(Sector);
+	Sector->SetManager(NULL);
+	Sectors.Remove(&Sector->GeoLink);
 }
 
-const ZEArray<ZESectorSelector*>& ZESectorManager::GetSelectors() const
+const ZEList2<ZEGeographicEntity>& ZESectorManager::GetSelectors() const
 {
 	return Selectors;
 }
 
 bool ZESectorManager::AddSelector(ZESectorSelector* Selector)
 {
-	if (!AddChildEntity(Selector))
-		return false;
+	zeCheckError(Selector == NULL, false, "Cannot add selector. Selector is NULL.");
+	zeCheckError(Selectors.Exists(&Selector->GeoLink), false, 
+		"Can not add selector. Selector already registered to this manager. Selector Name: \"%s\".", Selector->GetName().ToCString());
 
-	Selectors.Add(Selector);
+	Selectors.AddEnd(&Selector->GeoLink);
 
 	return true;
 }
 
 void ZESectorManager::RemoveSelector(ZESectorSelector* Selector)
 {
-	Selectors.RemoveValue(Selector);
+	zeCheckError(Selector == NULL, ZE_VOID, "Cannot remove selector. Selector is NULL.");
+	zeCheckError(!Selectors.Exists(&Selector->GeoLink), ZE_VOID, 
+		"Can not remove selector. Selector is not registered to this manager. Selector Name: \"%s\".", Selector->GetName().ToCString());
 
-	RemoveChildEntity(Selector);
+	Selectors.Remove(&Selector->GeoLink);
 }
 
-const ZEArray<ZEGeographicEntity*>& ZESectorManager::GetGeographicEntities() const
+const ZEList2<ZEGeographicEntity>& ZESectorManager::GetGeographicEntities() const
 {
 	return GeographicEntities;
 }
 
 bool ZESectorManager::AddGeographicEntity(ZEGeographicEntity* Entity)
 {
-	if (!AddChildEntity(Entity))
-		return false;
+	zeCheckError(Entity == NULL, false, "Cannot add entity. Entity is NULL.");
+	zeCheckError(GeographicEntities.Exists(&Entity->GeoLink), false, 
+		"Can not add entity. Entity already registered to this manager. Entity Name: \"%s\".", Entity->GetName().ToCString());
 
-	GeographicEntities.Add(Entity);
+	GeographicEntities.AddEnd(&Entity->GeoLink);
 
 	return true;
 }
 
 void ZESectorManager::RemoveGeographicEntity(ZEGeographicEntity* Entity)
 {
-	GeographicEntities.RemoveValue(Entity);
+	zeCheckError(Entity == NULL, ZE_VOID, "Cannot remove entity. Entity is NULL.");
+	zeCheckError(!GeographicEntities.Exists(&Entity->GeoLink), ZE_VOID, 
+		"Can not remove entity. Entity is not registered to this manager. Entity Name: \"%s\".", Entity->GetName().ToCString());
 
-	RemoveChildEntity(Entity);
+	GeographicEntities.Remove(&Entity->GeoLink);
 }
 
-void ZESectorManager::Tick(float Time)
+void ZESectorManager::Process(float Time)
 {
 	UpdateTransformations();
 

@@ -37,6 +37,7 @@
 
 #include "ZEModelMesh.h"
 #include "ZEModelMeshLOD.h"
+#include "ZEMDResourceDraw.h"
 
 #include "ZEGraphics/ZEGRContext.h"
 #include "ZEGraphics/ZEGRVertexBuffer.h"
@@ -86,6 +87,10 @@ ZEHolder<const ZERNMaterial> ZEModelDraw::GetMaterial() const
 	return Material;
 }
 
+void ZEModelDraw::ResetMaterial()
+{
+	SetMaterial(Resource->GetMaterial());
+}
 
 void ZEModelDraw::Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command)
 {
@@ -132,5 +137,6 @@ ZEModelDraw::ZEModelDraw()
 	LOD = NULL;
 	Offset = 0;
 	Count = 0;
+	Resource = NULL;
 	RenderCommand.Callback = ZEDelegateMethod(ZERNCommandCallback, ZEModelDraw, Render, this);
 }

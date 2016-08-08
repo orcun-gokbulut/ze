@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZESectorManager.h
+ Zinek Engine - ZEEntityMacros.h
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,48 +33,42 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMeta/ZEObject.h"
-#include "ZESector.h"
-#include "ZEDS/ZEList2.h"
-#include "ZEDS/ZEArray.h"
+#pragma once
 
-class ZESectorSelector;
-class ZEGeographicEntity;
+#define ZE_ENTITY_FUNCTION_CHAIN(BaseClass, Function) do {ZEEntityResult Result = __super::Function(); if (Result != ZE_ER_DONE) return Result;} while(false)
+#define ZE_ENTITY_LOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
+#define ZE_ENTITY_UNLOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, UnloadInternal)
+#define ZE_ENTITY_INITIALIZE_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, InitializeInternal)
+#define ZE_ENTITY_DEINITIALIZE_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, DeinitializeInternal)
+#define ZE_ENTITY_DESTROY_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, DestroyInternal)
 
-class ZESectorManager : public ZEObject
-{
-	ZE_OBJECT;
+#define ZE_ENTITY_FENCE(Entity, TargetState, FailedReturn) \
+	if (Entity != NULL) \
+	{ \
+		if (Entity->GetState() >= TargetState) \
+		{ \
+			if (!Entity->IsFailed()) \
+				return ZE_ER_WAIT; \
+			else \
+				return FailedReturn; \
+		} \
+	} \
+	else
 
-	protected:
-		ZESector* 							OriginSector;
-		ZEList2<ZEGeographicEntity>			Sectors;
-		ZEList2<ZEGeographicEntity>			Selectors;
-		ZEList2<ZEGeographicEntity>			GeographicEntities;
+#define ZE_ENTITY_RESOURCE_FENCE(Resource, TargetState, FailedReturn) \
+	if (Resource != NULL) \
+	{ \
+		if (Resource->GetState() >= TargetState) \
+		{ \
+			if (!Resource->IsFailed()) \
+				return ZE_ER_WAIT; \
+			else \
+				return FailedReturn; \
+		} \
+	} \
+	else
 
-		void								UpdateTransformation(ZEGeographicEntity* Entity);
-		void								UpdateTransformations();
-		void								UpdateActiveSectors();
-
-											ZESectorManager();
-
-	public:
-		const ZEList2<ZEGeographicEntity>&	GetSectors() const;
-		ZEArray<ZESector*>					GetSectors(const ZEVector3d& Position) const;
-		ZESector*							GetSector(const ZEGUID& Id) const;
-		ZESector*							GetSector(const ZEVector3d& Position, bool Proximity = false) const;
-		ZESector*							GetOriginSector();
-		bool								AddSector(ZESector* Sector);
-		void								RemoveSector(ZESector* Sector);
-
-		const ZEList2<ZEGeographicEntity>&	GetSelectors() const;
-		bool								AddSelector(ZESectorSelector* Selector);
-		void								RemoveSelector(ZESectorSelector* Selector);
-
-		const ZEList2<ZEGeographicEntity>&	GetGeographicEntities() const;
-		bool								AddGeographicEntity(ZEGeographicEntity* Entity);
-		void								RemoveGeographicEntity(ZEGeographicEntity* Entity);
-
-		virtual void						Process(float Time);
-
-		static ZESectorManager*				CreateInstance();
-};
+#define ZE_ENTITY_FENCE_LOADED(Entity, FailedReturn) ZE_ENTITY_FENCE(Entity, ZE_ES_LOADED, FailedReturn)
+#define ZE_ENTITY_FENCE_INITIALIZED(Entity, FailedReturn) ZE_ENTITY_FENCE(Entity, ZE_ES_INITIALIZED, FailedReturn)
+#define ZE_ENTITY_RESOURCE_FENCE_STAGED(Resource, FailedReturn) ZE_ENTITY_RESOURCE_FENCE(Resource, ZERS_RS_STAGED, FailedReturn)
+#define ZE_ENTITY_RESOURCE_FENCE_LOADED(Resource, FailedReturn) ZE_ENTITY_RESOURCE_FENCE(Resource, ZERS_RS_LOADED, FailedReturn)

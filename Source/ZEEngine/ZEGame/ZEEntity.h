@@ -38,6 +38,8 @@
 #include "ZEMeta/ZEObject.h"
 #include "ZEDestroyable.h"
 
+#include "ZEEntityMacros.h"
+
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEDS/ZEString.h"
@@ -104,13 +106,6 @@ ZE_ENUM(ZEEntityState)
 	ZE_ES_INITIALIZED					= 8
 
 };
-
-#define ZE_ENTITY_FUNCTION_CHAIN(BaseClass, Function) do {ZEEntityResult Result = __super::Function(); if (Result != ZE_ER_DONE) return Result;} while(false)
-#define ZE_ENTITY_LOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
-#define ZE_ENTITY_UNLOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
-#define ZE_ENTITY_INITIALIZE_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
-#define ZE_ENTITY_DEINITIALIZE_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
-#define ZE_ENTITY_DESTROY_CHAING(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
 
 class ZEEntity : public ZEObject
 {

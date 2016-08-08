@@ -72,7 +72,7 @@ static void ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serial
 	PropertiesNode.WriteBool("AlphaCullEnabled", ConfigurationNode.ReadBoolean("AlphaCullEnabled", false));
 	PropertiesNode.WriteFloat("AlphaCullLimit", ConfigurationNode.ReadFloat("AlphaCullLimit", 0.1f));
 	PropertiesNode.WriteBool("TransparencyEnabled", ConfigurationNode.ReadBoolean("TransparencyEnabled", ConfigurationNode.ReadBoolean("Transparant", false))); 
-	PropertiesNode.WriteFloat("TransparencyMode", ConfigurationNode.ReadFloat("TransparencyMode", 0));
+	PropertiesNode.WriteInt32("TransparencyMode", ConfigurationNode.ReadInt32("TransparencyMode", 0));
 
 	PropertiesNode.WriteBool("DiffuseEnabled", ConfigurationNode.ReadBoolean("DiffuseEnabled", false));
 	PropertiesNode.WriteVector3("DiffuseColor", ConfigurationNode.ReadVector3("DiffuseColor"));
@@ -145,6 +145,7 @@ static void ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serial
 	ZEString DetailBaseMap = ConfigurationNode.ReadString("DetailBaseMap");
 	PropertiesNode.WriteBool("DetailBaseMapEnabled", ConfigurationNode.ReadBoolean("DetailBaseMapEnabled", !DetailBaseMap.IsEmpty()));
 	PropertiesNode.WriteString("DetailBaseMap", DetailBaseMap);
+	PropertiesNode.WriteVector3("DetailBaseMapColor", ConfigurationNode.ReadVector3("DetailBaseMapColor", ZEVector3::One));
 	PropertiesNode.WriteVector2("DetailBaseMapTiling", ConfigurationNode.ReadVector2("DetailBaseMapTiling", ZEVector2::One));
 	PropertiesNode.WriteFloat("DetailBaseMapAttenuationStart", ConfigurationNode.ReadFloat("DetailBaseMapAttenuationStart", 10.0f));
 	PropertiesNode.WriteFloat("DetailBaseMapAttenuationFactor", ConfigurationNode.ReadFloat("DetailBaseMapAttenuationFactor", 0.01f));
@@ -152,6 +153,7 @@ static void ConvertMaterial(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serial
 	ZEString DetailNormalMap = ConfigurationNode.ReadString("DetailNormalMap");
 	PropertiesNode.WriteBool("DetailNormalMapEnabled", ConfigurationNode.ReadBoolean("DetailNormalMapEnabled", !DetailNormalMap.IsEmpty()));
 	PropertiesNode.WriteString("DetailNormalMap", DetailNormalMap);
+	PropertiesNode.WriteFloat("DetailNormalMapFactor", ConfigurationNode.ReadFloat("DetailNormalMapFactor", 1.0f));
 	PropertiesNode.WriteVector2("DetailNormalMapTiling", ConfigurationNode.ReadVector2("DetailNormalMapTiling", ZEVector2::One));
 	PropertiesNode.WriteFloat("DetailNormalMapAttenuationStart", ConfigurationNode.ReadFloat("DetailNormalMapAttenuationStart", 10.0f));
 	PropertiesNode.WriteFloat("DetailNormalMapAttenuationFactor", ConfigurationNode.ReadFloat("DetailNormalMapAttenuationFactor", 0.01f));

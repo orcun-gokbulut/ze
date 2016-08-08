@@ -53,7 +53,7 @@ class ZEMDResourceDraw : public ZEObject
 		ZEMDResourceLOD*				LOD;
 		ZESize							Offset;
 		ZESize							Count;
-		ZEHolder<ZERNMaterial>			Material;
+		ZEHolder<const ZERNMaterial>	Material;
 
 	public:
 		void							SetOffset(ZESize Offset);
@@ -62,8 +62,8 @@ class ZEMDResourceDraw : public ZEObject
 		void							SetCount(ZESize Count);
 		ZESize							GetCount() const;
 
-		void							SetMaterial(ZEHolder<ZERNMaterial> Material);
-		ZEHolder<ZERNMaterial>			GetMaterial() const;
+		void							SetMaterial(ZEHolder<const ZERNMaterial> Material);
+		ZEHolder<const ZERNMaterial>	GetMaterial() const;
 
 		bool							Unserialize(ZEMLReaderNode& DrawNode);
 		bool							Serialize(ZEMLWriterNode& DrawNode) const;

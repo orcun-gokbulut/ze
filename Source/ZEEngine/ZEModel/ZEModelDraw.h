@@ -42,6 +42,7 @@
 
 class ZEModelMesh;
 class ZEModelMeshLOD;
+class ZEMDResourceDraw;
 
 ZE_META_FORWARD_DECLARE(ZERNMaterial, "ZERenderer/ZERNMaterial.h");
 
@@ -51,6 +52,7 @@ class ZEModelDraw : public ZEObject
 	friend class ZEModelMesh;
 	friend class ZEModelMeshLOD;
 	private:
+		const ZEMDResourceDraw*						Resource;
 		ZEModelMeshLOD*								LOD;
 		ZESize										Offset;
 		ZESize										Count;
@@ -69,6 +71,7 @@ class ZEModelDraw : public ZEObject
 
 		void										SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>				GetMaterial() const;
+		void										ResetMaterial();
 
 		void										Render(const ZERNRenderParameters* Parameters, const ZERNCommand* Command);
 

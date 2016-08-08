@@ -41,8 +41,10 @@
 
 class ZEGeographicEntity : public ZEEntity
 {
+	friend class ZESectorManager;
 	ZE_OBJECT;
 	private:
+		ZELink<ZEGeographicEntity>			GeoLink;
 		mutable ZEFlags						GeographicEntityDirtyFlags;
 
 		ZEVector3d							GeographicPosition;
