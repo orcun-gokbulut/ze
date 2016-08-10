@@ -39,35 +39,50 @@
 
 #include "ZEVector.h"
 #include "ZELine.h"
+#include "ZEViewVolume.h"
 
 class ZEPlane;
 class ZELineSegment : public ZELine
 {
 	public:
+		float							Length;
 
-		float				Length;
+		static void						Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End);
+		static void						CreateParametric(ZELineSegment& LineSegment, const ZEVector3& v, const ZEVector3& p);
 
-		static void			Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End);
-		static void			CreateParametric(ZELineSegment& LineSegment, const ZEVector3& v, const ZEVector3& p);
-
-		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point);
-		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point, float &TLine);
-		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZELine& Line);
-		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZELine& Line, float& TLineSegment, float& TLine);
-		static float		MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB);
-		static float		MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB, float& TLineSegmentA, float& TLineSegment);
-		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray);
-		static float		MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray, float& TLine, float& TRay);
+		static float					MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point);
+		static float					MinimumDistance(const ZELineSegment& LineSegment, const ZEVector3& Point, float &TLine);
+		static float					MinimumDistance(const ZELineSegment& LineSegment, const ZELine& Line);
+		static float					MinimumDistance(const ZELineSegment& LineSegment, const ZELine& Line, float& TLineSegment, float& TLine);
+		static float					MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB);
+		static float					MinimumDistance(const ZELineSegment& LineSegmentA, const ZELineSegment& LineSegmentB, float& TLineSegmentA, float& TLineSegment);
+		static float					MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray);
+		static float					MinimumDistance(const ZELineSegment& LineSegment, const ZERay& Ray, float& TLine, float& TRay);
 	
-		static void			GetPointOn(ZEVector3& Point, const ZELineSegment& LineSegment, float TLineSegment);
-		static void			GetStartPoint(ZEVector3& Point, const ZELineSegment& LineSegment);
-		static void			GetEndPoint(ZEVector3& Point, const ZELineSegment& LineSegment);
+		static void						GetPointOn(ZEVector3& Point, const ZELineSegment& LineSegment, float TLineSegment);
+		static void						GetStartPoint(ZEVector3& Point, const ZELineSegment& LineSegment);
+		static void						GetEndPoint(ZEVector3& Point, const ZELineSegment& LineSegment);
 
-		ZEVector3			GetPointOn(float TLineSegment) const;
-		const ZEVector3&	GetStartPoint() const;
-		ZEVector3			GetEndPoint() const;
+		ZEVector3						GetPointOn(float TLineSegment) const;
+		const ZEVector3&				GetStartPoint() const;
+		ZEVector3						GetEndPoint() const;
 
-							ZELineSegment(const ZEVector3& Start, const ZEVector3& End);
-							ZELineSegment();
+										ZELineSegment(const ZEVector3& Start, const ZEVector3& End);
+										ZELineSegment();
 };
+
+class ZEViewLineSegment : public ZELine, public ZEViewVolume
+{
+	public :
+		virtual ZEViewVolumeType		GetViewVolumeType() const;
+
+		virtual bool					IntersectionTest(const ZEBSphere& BoundingSphere) const;
+		virtual bool					IntersectionTest(const ZEAABBox& BoundingBox) const;
+		virtual bool					IntersectionTest(const ZEOBBox& BoundingBox) const;
+		virtual bool					IntersectionTest(const ZERectangle3D& Rectangle) const;
+
+										ZEViewLineSegment(const ZEVector3& Start, const ZEVector3& End);
+										ZEViewLineSegment();
+};
+
 #endif

@@ -45,24 +45,39 @@ class ZELineSegment;
 class ZERay : public ZELine
 {
 	public:
-		static void			Create(ZERay & Ray,const ZEVector3 & P0,const ZEVector3 & P1);
-		static void			CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p);
+		static void						Create(ZERay & Ray,const ZEVector3 & P0,const ZEVector3 & P1);
+		static void						CreateParametric(ZERay & Ray,const ZEVector3 & v,const ZEVector3 & p);
 
-		static float		MinimumDistance(const ZERay& Ray, const ZEVector3& Point);
-		static float		MinimumDistance(const ZERay& Ray, const ZEVector3& Point, float &TRay);
-		static float		MinimumDistance(const ZERay& Ray, const ZELine& Line);
-		static float		MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, float& TLine);
-		static float		MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment);
-		static float		MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment, float& TRay, float& TLine);
-		static float		MinimumDistance(const ZERay& RayA, const ZERay& RayB);
-		static float		MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA, float& TRayB);
+		static float					MinimumDistance(const ZERay& Ray, const ZEVector3& Point);
+		static float					MinimumDistance(const ZERay& Ray, const ZEVector3& Point, float &TRay);
+		static float					MinimumDistance(const ZERay& Ray, const ZELine& Line);
+		static float					MinimumDistance(const ZERay& Ray, const ZELine& Line, float& TRay, float& TLine);
+		static float					MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment);
+		static float					MinimumDistance(const ZERay& Ray, const ZELineSegment& LineSegment, float& TRay, float& TLine);
+		static float					MinimumDistance(const ZERay& RayA, const ZERay& RayB);
+		static float					MinimumDistance(const ZERay& RayA, const ZERay& RayB, float& TRayA, float& TRayB);
 
-		static void			GetPointOn(ZEVector3& Point, const ZERay& RayA, float TRay);
-		ZEVector3			GetPointOn(float TRay) const;
+		static void						GetPointOn(ZEVector3& Point, const ZERay& RayA, float TRay);
+		ZEVector3						GetPointOn(float TRay) const;
 
-		const ZEVector3&	GetStartPoint() const;
+		const ZEVector3&				GetStartPoint() const;
 
-							ZERay(const ZEVector3 &Direction, const ZEVector3 &Position);
-							ZERay();
+										ZERay(const ZEVector3 &Direction, const ZEVector3 &Position);
+										ZERay();
 };
+
+class ZEViewRay : public ZELine, public ZEViewVolume
+{
+	public :
+		virtual ZEViewVolumeType		GetViewVolumeType() const;
+
+		virtual bool					IntersectionTest(const ZEBSphere& BoundingSphere) const;
+		virtual bool					IntersectionTest(const ZEAABBox& BoundingBox) const;
+		virtual bool					IntersectionTest(const ZEOBBox& BoundingBox) const;
+		virtual bool					IntersectionTest(const ZERectangle3D& Rectangle) const;
+
+										ZEViewRay(const ZEVector3 &Direction, const ZEVector3 &Position);
+										ZEViewRay();
+};
+
 #endif

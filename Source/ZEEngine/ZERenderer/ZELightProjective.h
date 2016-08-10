@@ -38,7 +38,7 @@
 #include "ZELight.h"
 
 #include "ZEDS/ZEString.h"
-#include "ZEMath/ZEViewFrustum.h"
+#include "ZEMath/ZEFrustum.h"
 #include "ZEPointer/ZEHolder.h"
 
 class ZEGRTexture2D;

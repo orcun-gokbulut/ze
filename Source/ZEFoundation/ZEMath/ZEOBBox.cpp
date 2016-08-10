@@ -431,3 +431,62 @@ ZEOBBox::ZEOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const 
 {
 	CreateFromOrientation(*this, Position, Rotation, Size);
 }
+
+
+// ZEViewOBBox
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEViewVolumeType ZEViewOBBox::GetViewVolumeType() const
+{
+	return ZE_VVT_ORIENTED_BOX;
+}
+
+bool ZEViewOBBox::IntersectionTest(const ZEBSphere& BoundingSphere) const
+{
+	return ZEOBBox::IntersectionTest(*this, BoundingSphere);
+}
+
+bool ZEViewOBBox::IntersectionTest(const ZEAABBox& BoundingBox) const
+{
+	return ZEOBBox::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewOBBox::IntersectionTest(const ZEOBBox& BoundingBox) const
+{
+	return ZEOBBox::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewOBBox::IntersectionTest(const ZERectangle3D& Rectangle) const
+{
+	zeDebugCheck(true, "NOT IMPLEMENTED");
+	return false;
+}
+
+ZEViewOBBox::ZEViewOBBox()
+{
+
+}
+
+ZEViewOBBox::ZEViewOBBox(const ZEVector3& Center, const ZEVector3& Right, const ZEVector3& Up, const ZEVector3& Front, const ZEVector3& HalfSize)
+{
+	this->Center = Center;
+	this->Right = Right;
+	this->Up = Up;
+	this->Front = Front;
+	this->HalfSize = HalfSize;
+}
+
+ZEViewOBBox::ZEViewOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, const ZEVector3& Size)
+{
+	CreateFromOrientation(*this, Position, Rotation, Size);
+}
+
+ZEViewOBBox::ZEViewOBBox(const ZEVector3& Position, const ZEQuaternion& Rotation, float Width, float Height, float NearZ, float FarZ)
+{
+	ZEQuaternion::VectorProduct(Right, Rotation, ZEVector3::UnitX);
+	ZEQuaternion::VectorProduct(Up, Rotation, ZEVector3::UnitY);
+	ZEQuaternion::VectorProduct(Front, Rotation, ZEVector3::UnitZ);
+
+	HalfSize = ZEVector3(Width * 0.5f, Height * 0.5f, (FarZ - NearZ) * 0.5f);
+	Center = Position;
+}

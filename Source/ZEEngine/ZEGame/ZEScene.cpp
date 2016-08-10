@@ -81,7 +81,7 @@ void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* P
 	bool Cullable = Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE);
 	if (Cullable && Parameters->View->ViewVolume != NULL)
 	{
-		if (!Parameters->View->ViewVolume->CullTest(Entity->GetWorldBoundingBox()))
+		if (Parameters->View->ViewVolume->IntersectionTest(Entity->GetWorldBoundingBox()))
 			Entity->PreRender(Parameters);
 	}
 	else

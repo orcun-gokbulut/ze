@@ -614,7 +614,7 @@ bool ZEEntity::DeinitializeSelf()
 
 ZEEntityResult ZEEntity::DestroyInternal()
 {
-	zeDebugCheck(GetState() != ZE_ES_DESTROYING, "DestroyInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
+	zeDebugCheck(TargetState != ZE_ES_DESTROYED, "DestroyInternal chain problem. Entity state is wrong. State: %s, Class Name: \"%s\".", 
 		ZEEntityState_Declaration()->ToText(GetState(), "Unknown").ToCString(), GetClass()->GetName());
 
 	#ifdef ZE_DEBUG_ENABLE
@@ -980,6 +980,12 @@ ZEEntityState ZEEntity::GetState() const
 	return State;
 }
 
+
+ZEEntityState ZEEntity::GetTargetState() const
+{
+	return TargetState;
+}
+
 bool ZEEntity::IsLoaded() const
 {
 	return State >= ZE_ES_LOADED;
@@ -1148,14 +1154,14 @@ void ZEEntity::Reload()
 
 void ZEEntity::Destroy()
 {
+	TargetState = ZE_ES_DESTROYED;
+
 	DestroyInternal();
 
 	if (GetParent() != NULL)
 		GetParent()->RemoveChildEntity(this);
 	else if (GetScene() != NULL)
 		GetScene()->RemoveEntity(this);
-
-	TargetState = ZE_ES_DESTROYING;
 
 	UpdateState();
 }

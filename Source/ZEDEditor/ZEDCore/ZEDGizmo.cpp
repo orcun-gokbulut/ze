@@ -1019,7 +1019,7 @@ float ZEDGizmo::GetAxisLength()
 
 ZEEntityResult ZEDGizmo::LoadInternal()
 {
-	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
 	ConstantBuffer = ZEGRConstantBuffer::CreateResource(sizeof(ZEMatrix4x4));
 	zeCheckError(ConstantBuffer == NULL, ZE_ER_FAILED_CLEANUP, "Cannot create constant buffer.");

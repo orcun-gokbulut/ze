@@ -37,7 +37,7 @@
 
 #include "ZELight.h"
 
-#include "ZEMath/ZEViewCuboid.h"
+#include "ZEMath/ZEOBBox.h"
 #include "ZEMath/ZEMatrix.h"
 #include "ZEMath/ZEVector.h"
 
@@ -52,7 +52,7 @@ class ZELightDirectional : public ZELight
 		{
 			ZEMatrix4x4						ViewTransform;
 			ZEMatrix4x4						ProjectionTransform;
-			ZEViewCuboid					ViewVolume;
+			ZEViewOBBox						ViewVolume;
 			ZEVector4						Borders;
 			ZEUInt							SampleCount;
 			float							SampleLength;

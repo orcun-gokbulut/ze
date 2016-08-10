@@ -35,7 +35,7 @@
 
 #include "ZELight.h"
 
-#include "ZEMath\ZEViewFrustum.h"
+#include "ZEMath\ZEFrustum.h"
 #include "ZERNRenderer.h"
 #include "ZERNRenderParameters.h"
 #include "ZERNStageShadowmapGeneration.h"
@@ -84,7 +84,7 @@ void ZELight::CalculateBoundingBox() const
 		const ZEViewFrustum& ViewFrustum = static_cast<const ZEViewFrustum&>(ViewVolume);
 		for (ZEUInt I = 0; I < 8; I++)
 		{
-			ZEVector3 VertexLocal = GetInvWorldTransform() * ViewFrustum.GetVertex((ZEViewFrustumVertex)I);
+			ZEVector3 VertexLocal = GetInvWorldTransform() * ViewFrustum.GetVertex((ZEFrustumVertex)I);
 
 			ZEVector3::Min(AABB.Min, AABB.Min, VertexLocal);
 			ZEVector3::Max(AABB.Max, AABB.Max, VertexLocal);

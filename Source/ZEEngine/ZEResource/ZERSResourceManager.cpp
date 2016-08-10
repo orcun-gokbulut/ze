@@ -118,7 +118,7 @@ ZERSHolder<const ZERSResource> ZERSResourceManager::GetResourceInternal(ZEClass*
 		if (Resource->GetFileNameHash() == Hash && Resource->GetFileName() == FileNameNormalized)
 		{
 			ZERSHolder<const ZERSResource> Output;
-			Output.Overwrite(Output);
+			Output.Overwrite(Resource.GetPointer());
 			Resource->ReferenceCount++;
 			Resource->ResourceLock.Unlock();
 

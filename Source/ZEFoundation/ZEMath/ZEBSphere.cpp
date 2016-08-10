@@ -41,6 +41,7 @@
 #include "ZELine.h"
 #include "ZEMath.h"
 #include "ZEAngle.h"
+#include "ZEError.h"
 
 static inline void SWAP(float a, float b)
 {
@@ -49,6 +50,10 @@ static inline void SWAP(float a, float b)
 	a = b;
 	b = t;
 }
+
+
+// ZEViewHemiSphere
+//////////////////////////////////////////////////////////////////////////////////////
 
 void ZEBSphere::GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point)
 {
@@ -291,4 +296,92 @@ ZEBSphere::ZEBSphere(const ZEVector3& Position, float Radius)
 {
 	ZEBSphere::Position = Position;
 	ZEBSphere::Radius = Radius;
+}
+
+
+ZEViewVolumeType ZEViewSphere::GetViewVolumeType() const
+{
+	return ZE_VVT_SPHERE;
+}
+
+
+// ZEViewHemiSphere
+//////////////////////////////////////////////////////////////////////////////////////
+
+bool ZEViewSphere::IntersectionTest(const ZEBSphere& BoundingSphere) const
+{
+	return ZEBSphere::IntersectionTest(*this, BoundingSphere);
+}
+
+bool ZEViewSphere::IntersectionTest(const ZEAABBox& BoundingBox) const
+{
+	return ZEBSphere::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewSphere::IntersectionTest(const ZEOBBox& BoundingBox) const
+{
+	return ZEBSphere::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewSphere::IntersectionTest(const ZERectangle3D& Rectangle) const
+{
+	zeDebugCheck(true, "NOT IMPLAMENTED");
+	return false;
+}
+
+ZEViewSphere::ZEViewSphere()
+{
+
+}
+
+
+// ZEViewHemiSphere
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEViewVolumeType ZEViewHemiSphere::GetViewVolumeType() const
+{
+	return ZE_VVT_HEMISPHERE;
+}
+
+bool ZEViewHemiSphere::IntersectionTest(const ZEBSphere& BoundingSphere) const
+{
+	if (ZEBSphere::IntersectionTest(BoundingSphere, HalfSpacePlane) == ZE_HS_NEGATIVE_SIDE)
+		return false;
+
+	return ZEBSphere::IntersectionTest(*this, BoundingSphere);
+}
+
+bool ZEViewHemiSphere::IntersectionTest(const ZEAABBox& BoundingBox) const
+{
+	if (ZEAABBox::IntersectionTest(BoundingBox, HalfSpacePlane) == ZE_HS_NEGATIVE_SIDE)
+		return false;
+
+	return ZEBSphere::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewHemiSphere::IntersectionTest(const ZEOBBox& BoundingBox) const
+{
+	if (ZEOBBox::IntersectionTest(BoundingBox, HalfSpacePlane) == ZE_HS_NEGATIVE_SIDE)
+		return false;
+
+	return ZEBSphere::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewHemiSphere::IntersectionTest(const ZERectangle3D& Rectangle) const
+{
+	zeDebugCheck(true, "NOT IMPLEMENTED");
+	return false;
+}
+
+ZEViewHemiSphere::ZEViewHemiSphere()
+{
+
+}
+
+ZEViewHemiSphere::ZEViewHemiSphere(const ZEVector3& Position, float Radius, const ZEVector3& HalfSpaceDirection)
+{
+	this->Position = Position;
+	this->Radius = Radius;
+	HalfSpacePlane.p = Position;
+	HalfSpacePlane.n = HalfSpaceDirection;
 }

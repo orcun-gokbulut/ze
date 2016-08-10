@@ -131,7 +131,8 @@ const ZEViewVolume& ZELightOmniProjective::GetViewVolume(ZESize Index) const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
-		ViewVolume.Create(GetWorldPosition(), GetRange(), 0.0f);
+		ViewVolume.Position = GetWorldPosition();
+		ViewVolume.Radius = GetRange();
 		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_VOLUME);
 	}
 

@@ -424,7 +424,7 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 	{
 		if (GetProjectionType() == ZERN_PT_PERSPECTIVE)
 		{
-			ViewFrustum.Create(GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
+			ZEFrustum::Create(ViewFrustum, GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
 		}
 		else if (GetProjectionType() == ZERN_PT_PERSPECTIVE_OFFCENTER)
 		{
@@ -453,7 +453,7 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 				ZEMatrix4x4::Transform(FrustumPlanes[I].p, InverseViewTransform, Point);
 			}
 
-			ViewFrustum.Create(FrustumPlanes[0], FrustumPlanes[3], FrustumPlanes[1], FrustumPlanes[2], FrustumPlanes[5], FrustumPlanes[4]);
+			ZEFrustum::Create(ViewFrustum, FrustumPlanes[0], FrustumPlanes[3], FrustumPlanes[1], FrustumPlanes[2], FrustumPlanes[5], FrustumPlanes[4]);
 		}
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_FRUSTUM);

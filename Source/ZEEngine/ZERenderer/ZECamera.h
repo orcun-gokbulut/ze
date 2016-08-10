@@ -41,7 +41,7 @@
 #include "ZEPointer/ZEHolder.h"
 #include "ZEMath/ZEPlane.h"
 #include "ZEMath/ZERectangle.h"
-#include "ZEMath/ZEViewFrustum.h"
+#include "ZEMath/ZEFrustum.h"
 
 #include "ZERenderer/ZERNRenderer.h"
 #include "ZERenderer/ZECanvas.h"

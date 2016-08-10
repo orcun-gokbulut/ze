@@ -61,9 +61,6 @@ class ZEOctree
 		void									Shrink();
 		void									CreateChildNode(ZEInt Octant);
 
-		ZEInt									FindOctant(const ZEVector3& Point) const;
-		ZEInt									FindOctant(const ZEAABBox& BoundingBox) const;
-
 	public:
 		ZEOctree*								GetParent();
 		const ZEOctree*							GetParent() const;
@@ -84,7 +81,10 @@ class ZEOctree
 
 		ZEOctree*								GetNode(const ZEAABBox& BoundingBox);
 		const ZEOctree*							GetNode(const ZEAABBox& BoundingBox) const;
-		
+
+		ZEInt									FindOctant(const ZEVector3& Point) const;
+		ZEInt									FindOctant(const ZEAABBox& BoundingBox) const;
+
 		ZESize									GetItemCount() const;	
 		const ZEArray<ZEItemType>&				GetItems();
 		const ZEArray<const ZEItemType>&		GetItems() const;
@@ -101,7 +101,7 @@ class ZEOctree
 
 		void									Clear();
 
-		ZEOctreeIterator<ZEItemType>			Traverse(const ZEAABBox& BoundingBox);
+		ZEOctreeIterator<ZEItemType>			Traverse(const ZEViewVolume* Volume);
 
 												ZEOctree();
 												~ZEOctree();
@@ -593,9 +593,9 @@ void ZEOctree<ZEItemType>::Clear()
 }
 
 template<typename ZEItemType>
-ZEOctreeIterator<ZEItemType> ZEOctree<ZEItemType>::Traverse(const ZEAABBox& BoudingBox)
+ZEOctreeIterator<ZEItemType> ZEOctree<ZEItemType>::Traverse(const ZEViewVolume* Volume)
 {
-	return ZEOctreeIterator<ZEItemType>(this, 0, BoudingBox);
+	return ZEOctreeIterator<ZEItemType>(this, Volume);
 }
 
 template<typename ZEItemType>
