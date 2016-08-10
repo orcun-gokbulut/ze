@@ -44,31 +44,29 @@ class ZEViewVolume;
 template<typename ZEItemType>
 class ZEOctreeIterator : public ZEIterator<ZEItemType>
 {
-	private:
-		ZEOctree<ZEItemType>*				Octree;
-		ZEInt								OctanctIndex;
-		const ZEViewVolume*					Volume;
+	protected:
+		ZEOctree<ZEItemType>*					Octree;
+		ZEInt									Octant;
+		const ZEViewVolume*						Volume;
 
 	public:
-		bool								IsValid() const;
+		bool									IsValid() const;
 
-		ZEOctree<ZEItemType>&				GetItem() const;
-		ZEOctree<ZEItemType>*				GetPointer() const;
+		ZEOctree<ZEItemType>&					GetItem() const;
+		ZEOctree<ZEItemType>*					GetPointer() const;
 
-		void								Prev();
-		void								Next();
+		void									Next();
 
-		bool								operator==(const ZEOctreeIterator& Iterator) const;
+		ZEOctreeIterator<ZEItemType>&			operator++();
 
-		ZEOctreeIterator<ZEItemType>&		operator--();
-		ZEOctreeIterator<ZEItemType>&		operator++();
+		bool									operator==(const ZEOctreeIterator& Iterator) const;
 
-		ZEOctree<ZEItemType>&				operator*() const;
-		ZEOctree<ZEItemType>*				operator->() const;
-		
-											ZEOctreeIterator(ZEOctree<ZEItemType>* Octree, ZEUInt OctantIndex, const ZEViewVolume* Volume);
+		ZEOctree<ZEItemType>&					operator*() const;
+		ZEOctree<ZEItemType>*					operator->() const;	
+
+												ZEOctreeIterator(ZEOctree<ZEItemType>* Octree, const ZEViewVolume* Volume);
+
 };
-
 
 // ZEOctreeIterator
 /////////////////////////////////////////////////////////////////////////////
@@ -91,71 +89,35 @@ inline ZEOctree<ZEItemType>* ZEOctreeIterator<ZEItemType>::GetPointer() const
 	return Octree;
 }
 
-template<typename ZEItemType>
-void ZEOctreeIterator<ZEItemType>::Prev()
-{
-	while(OctanctIndex--)
-	{
-		if (Octant == -1)
-		{
-			if (Current->GetParent() == NULL)
-				return NULL;
-
-			OctantIndex = Octree->GetParentOctant();
-			Octree = Octree->GetParent();
-
-			return GetPrev();
-		}
-
-		ZEOctreeType* CurrentOctree = Octree->GetNode(OctanctIndex);
-		if (Current->GetNode(Octant) != NULL)
-			continue;
-
-		if (!Volume->CullTest(Current->GetNode(Octant)))
-			continue;
-	}
-
-	Octree = NULL;
-}
 
 template<typename ZEItemType>
 void ZEOctreeIterator<ZEItemType>::Next()
 {	
-	while(OctanctIndex++)
+	while (Octant <= 7)
 	{
-		if (Octant == 8)
+		ZEOctree<ZEItemType>* ChildOctree = Octree->GetNode(Octant);
+		if (ChildOctree == NULL || !Volume->IntersectionTest(ChildOctree->GetBoundingBox()))
 		{
-			if (Current->GetParent() == NULL)
-				return NULL;
-
-			OctantIndex = Octree->GetParentOctant();
-			Octree = Octree->GetParent();
-
-			return GetNext();
+			Octant++;
+			continue;
 		}
 
-		ZEOctreeType* CurrentOctree = Octree->GetNode(OctanctIndex);
-		if (Current->GetNode(Octant) != NULL)
-			continue;
+		Octree = ChildOctree;
+		Octant = 0;
 
-		if (!Volume->CullTest(Current->GetNode(Octant)))
-			continue;
+		return;
 	}
 
-	Octree = NULL;
-}
+	if (Octree->GetParent() == NULL)
+	{
+		Octree = NULL;
+		return;
+	}
 
-template<typename ZEItemType>
-inline bool ZEOctreeIterator<ZEItemType>::operator==(const ZEOctreeIterator& Iterator) const
-{
-	return (Iterator.Octree == Octree && Iterator.OctantIndex = OctanctIndex);
-}
+	Octant = Octree->GetParentOctant() + 1;
+	Octree = Octree->GetParent();
 
-template<typename ZEItemType>
-inline ZEOctreeIterator<ZEItemType>& ZEOctreeIterator<ZEItemType>::operator--()
-{
-	Prev();
-	return *this;
+	return Next();
 }
 
 template<typename ZEItemType>
@@ -163,6 +125,12 @@ inline ZEOctreeIterator<ZEItemType>& ZEOctreeIterator<ZEItemType>::operator++()
 {
 	Next();
 	return *this;
+}
+
+template<typename ZEItemType>
+inline bool ZEOctreeIterator<ZEItemType>::operator==(const ZEOctreeIterator& Iterator) const
+{
+	return (Iterator.Octree == Octree && Iterator.Octant = Octant);
 }
 
 template<typename ZEItemType>
@@ -178,9 +146,9 @@ inline ZEOctree<ZEItemType>* ZEOctreeIterator<ZEItemType>::operator->() const
 }
 
 template<typename ZEItemType>
-ZEOctreeIterator<ZEItemType>::ZEOctreeIterator(ZEOctree<ZEItemType>* Octree, ZEUInt OctantIndex, const ZEViewVolume* Volume)
+ZEOctreeIterator<ZEItemType>::ZEOctreeIterator(ZEOctree<ZEItemType>* Octree, const ZEViewVolume* Volume)
 {
 	this->Octree = Octree;
-	this->OctantIndex = OctantIndex;
+	this->Octant = 0;
 	this->Volume = Volume;
 }

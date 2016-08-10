@@ -37,10 +37,10 @@
 #ifndef __ZE_VIEW_VOLUME_H__
 #define __ZE_VIEW_VOLUME_H__
 
-#include "ZEMath/ZEBSphere.h"
-#include "ZEMath/ZEAABBox.h"
-#include "ZEMath/ZEOBBox.h"
-#include "ZEMath/ZERectangle3D.h"
+class ZEBSphere;
+class ZEAABBox;
+class ZEOBBox;
+class ZERectangle3D;
 
 enum ZEViewVolumeType
 {
@@ -48,21 +48,30 @@ enum ZEViewVolumeType
 	ZE_VVT_FRUSTUM,
 	ZE_VVT_SPHERE,
 	ZE_VVT_HEMISPHERE,
-	ZE_VVT_CUBOID,
+	ZE_VVT_ORIENTED_BOX,
+	ZE_VVT_AXIS_ALIGNED_BOX,
 	ZE_VVT_CONE,
-	ZE_VVT_PLANE
+	ZE_VVT_PLANE,
+	ZE_VVT_RAY,
+	ZE_VVT_SEGMENT,
+	ZE_VVT_LINE,
 };
-
 
 class ZEViewVolume
 {
 	public:
 		virtual ZEViewVolumeType			GetViewVolumeType() const = 0;
 
-		virtual bool						CullTest(const ZEBSphere& BoundingBox) const = 0;
-		virtual bool						CullTest(const ZEAABBox& BoundingBox) const = 0;
-		virtual bool						CullTest(const ZEOBBox& BoundingBox) const = 0;
-		virtual bool						CullTest(const ZERectangle3D& PortalDoor) const = 0;
+		virtual bool						IntersectionTest(const ZEBSphere& BoundingBox) const = 0;
+		virtual bool						IntersectionTest(const ZEAABBox& BoundingBox) const = 0;
+		virtual bool						IntersectionTest(const ZEOBBox& BoundingBox) const = 0;
+		virtual bool						IntersectionTest(const ZERectangle3D& PortalDoor) const = 0;
+
+		/*virtual bool						IntersectionTest1(const ZEBSphere& BoundingBox) const;
+		virtual bool						IntersectionTest1(const ZEAABBox& BoundingBox) const;
+		virtual bool						IntersectionTest1(const ZEOBBox& BoundingBox) const;
+		virtual bool						IntersectionTest1(const ZERectangle3D& PortalDoor) const;*/
+
 };
 
 #endif

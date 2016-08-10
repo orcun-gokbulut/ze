@@ -33,13 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath.h"
 #include "ZELineSegment.h"
+
+#include "ZEError.h"
+#include "ZEMath.h"
 #include "ZERay.h"
 #include "ZEVector.h"
 #include "ZEPlane.h"
+#include "ZEBSphere.h"
+#include "ZEAABBox.h"
+#include "ZEOBBox.h"
 
-#include "ZEMath/ZEMath.h"
+
+// ZELineSegment
+//////////////////////////////////////////////////////////////////////////////////////
 
 inline void ZELineSegment::Create(ZELineSegment& LineSegment, const ZEVector3& Start, const ZEVector3& End)
 {
@@ -345,6 +352,46 @@ ZELineSegment::ZELineSegment(const ZEVector3& Start, const ZEVector3& End)
 }
 
 ZELineSegment::ZELineSegment()
+{
+
+}
+
+
+// ZEViewLineSegment
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEViewVolumeType ZEViewLineSegment::GetViewVolumeType() const
+{
+	return ZE_VVT_LINE;
+}
+
+bool ZEViewLineSegment::IntersectionTest(const ZEBSphere& BoundingSphere) const
+{
+	return ZEBSphere::IntersectionTest(BoundingSphere, *this);
+}
+
+bool ZEViewLineSegment::IntersectionTest(const ZEAABBox& BoundingBox) const
+{
+	return ZEAABBox::IntersectionTest(BoundingBox, *this);
+}
+
+bool ZEViewLineSegment::IntersectionTest(const ZEOBBox& BoundingBox) const
+{
+	return ZEOBBox::IntersectionTest(BoundingBox, *this);
+}
+
+bool ZEViewLineSegment::IntersectionTest(const ZERectangle3D& Rectangle) const
+{
+	zeDebugCheck(true, "NOT IMPLEMENTED");
+	return false;
+}
+
+ZEViewLineSegment::ZEViewLineSegment(const ZEVector3& P0, const ZEVector3& P1)
+{
+	Create(*this, P0, P1);
+}
+
+ZEViewLineSegment::ZEViewLineSegment()
 {
 
 }

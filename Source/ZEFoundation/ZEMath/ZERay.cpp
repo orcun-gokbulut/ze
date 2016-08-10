@@ -33,13 +33,20 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMath.h"
 #include "ZERay.h"
-#include "ZELineSegment.h"
+
+#include "ZEError.h"
+#include "ZEMath.h"
 #include "ZEVector.h"
+#include "ZELineSegment.h"
+#include "ZEBSphere.h"
+#include "ZEAABBox.h"
+#include "ZEOBBox.h"
 #include "ZEPlane.h"
 
-#include "ZEMath/ZEMath.h"
+
+// ZERay
+//////////////////////////////////////////////////////////////////////////////////////
 
 void ZERay::Create(ZERay & Ray, const ZEVector3 & P0,const ZEVector3 & P1)
 {
@@ -232,4 +239,44 @@ ZERay::ZERay(const ZEVector3 & Direction,const ZEVector3 &Position)
 
 ZERay::ZERay() 
 {
+}
+
+
+// ZEViewRay
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEViewVolumeType ZEViewRay::GetViewVolumeType() const
+{
+	return ZE_VVT_RAY;
+}
+
+bool ZEViewRay::IntersectionTest(const ZEBSphere& BoundingSphere) const
+{
+	return ZEBSphere::IntersectionTest(BoundingSphere, *this);
+}
+
+bool ZEViewRay::IntersectionTest(const ZEAABBox& BoundingBox) const
+{
+	return ZEAABBox::IntersectionTest(BoundingBox, *this);
+}
+
+bool ZEViewRay::IntersectionTest(const ZEOBBox& BoundingBox) const
+{
+	return ZEOBBox::IntersectionTest(BoundingBox, *this);
+}
+
+bool ZEViewRay::IntersectionTest(const ZERectangle3D& Rectangle) const
+{
+	zeDebugCheck(true, "NOT IMPLEMENTED");
+	return false;
+}
+
+ZEViewRay::ZEViewRay(const ZEVector3 &Direction, const ZEVector3 &Position)
+{
+
+}
+
+ZEViewRay::ZEViewRay()
+{
+
 }

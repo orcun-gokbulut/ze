@@ -801,7 +801,7 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 
 	ZEAABBox BoundingBox = GetWorldBoundingBox();
 
-	if (Parameters->View->ViewVolume != NULL && Parameters->View->ViewVolume->CullTest(BoundingBox))
+	if (Parameters->View->ViewVolume != NULL && !Parameters->View->ViewVolume->IntersectionTest(BoundingBox))
 		return false;
 
 	float ClosestBoundingBoxEdgeDistanceSquare = FLT_MAX;

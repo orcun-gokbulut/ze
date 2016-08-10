@@ -256,13 +256,15 @@ class ZEEntity : public ZEObject
 		ZEVector3								GetWorldUp() const;
 
 		ZEEntityState							GetState() const;
+		ZEEntityState							GetTargetState() const;
+		ZEUInt									GetLoadingPercentage();
+
 		bool									IsLoaded() const;
 		bool									IsLoadedOrLoading() const;
 		bool									IsInitialized() const;
 		bool									IsInitializedOrInitializing() const;
 		bool									IsFailed() const;
 		bool									IsDestroyed() const;
-		ZEUInt									GetLoadingPercentage();
 
 		virtual void							SetEnabled(bool Enabled);
 		bool									GetEnabled() const;
@@ -301,7 +303,7 @@ ZE_META_ATTRIBUTE_PROPERTY(WorldScale,			ZEMeta.Serialization, false)
 ZE_META_ATTRIBUTE_PROPERTY(Transform,			ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(WorldTransform,		ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(InvWorldTransform,	ZEDEditor.PropertyEditor.Display, false)
-ZE_META_ATTRIBUTE_PROPERTY(State,				ZEDEditor.PropertyEditor.Display, false)
+//ZE_META_ATTRIBUTE_PROPERTY(State,				ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(Right,				ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(Up,					ZEDEditor.PropertyEditor.Display, false)
 ZE_META_ATTRIBUTE_PROPERTY(Front,				ZEDEditor.PropertyEditor.Display, false)

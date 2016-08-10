@@ -40,37 +40,69 @@
 #include "ZEVector.h"
 #include "ZEMatrix.h"
 #include "ZEPlane.h"
+#include "ZEViewVolume.h"
 
 class ZEOBBox;
 class ZEAABBox;
 class ZEBSphere
 {
 	public:
-		ZEVector3				Position;
-		float					Radius;
+		ZEVector3							Position;
+		float								Radius;
 
-		static void				GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point);
+		static void							GetSurfaceNormal(ZEVector3& Normal, const ZEBSphere& BoundingSphere, const ZEVector3& Point);
 
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3& Point);
-		static ZEHalfSpace		IntersectionTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZEVector3& Point);
+		static ZEHalfSpace					IntersectionTest(const ZEBSphere& BoundingSphere, const ZEPlane& Plane);
 
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZELine& Line, float& MinT, float& MaxT);
 
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZELineSegment& LineSegment, float& MinT, float& MaxT);
 
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZERay& Ray, float& MinT, float& MaxT);
 
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox);
-		static bool				IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZEAABBox& BoundingBox);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere, const ZEOBBox& BoundingBox);
+		static bool							IntersectionTest(const ZEBSphere& BoundingSphere1, const ZEBSphere& BoundingSphere2);
 
-								ZEBSphere();
-								ZEBSphere(const ZEVector3& Position, float Radius);
+											ZEBSphere();
+											ZEBSphere(const ZEVector3& Position, float Radius);
 };
+
+class ZEViewSphere : public ZEBSphere, public ZEViewVolume
+{
+	public:
+		virtual ZEViewVolumeType			GetViewVolumeType() const;
+
+		virtual bool						IntersectionTest(const ZEBSphere& BoundingSphere) const;
+		virtual bool						IntersectionTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						IntersectionTest(const ZEOBBox& BoundingBox) const;
+		virtual bool						IntersectionTest(const ZERectangle3D& Rectangle) const;
+
+											ZEViewSphere();
+											ZEViewSphere(const ZEVector3& Position, float Radius);
+};
+
+class ZEViewHemiSphere : public ZEViewSphere
+{
+	public:
+		ZEPlane								HalfSpacePlane;
+
+		virtual ZEViewVolumeType			GetViewVolumeType() const;
+
+		virtual bool						IntersectionTest(const ZEBSphere& BoundingSphere) const;
+		virtual bool						IntersectionTest(const ZEAABBox& BoundingBox) const;
+		virtual bool						IntersectionTest(const ZEOBBox& BoundingBox) const;
+		virtual bool						IntersectionTest(const ZERectangle3D& Rectangle) const;
+
+											ZEViewHemiSphere();
+											ZEViewHemiSphere(const ZEVector3& Position, float Radius, const ZEVector3& HalfSpaceDirection);
+};
+
 #endif

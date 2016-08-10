@@ -37,7 +37,7 @@
 
 #include "ZELight.h"
 
-#include "ZEMath/ZEViewSphere.h"
+#include "ZEMath/ZEBSphere.h"
 
 class ZELightPoint : public ZELight
 {

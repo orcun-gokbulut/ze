@@ -102,7 +102,7 @@ bool ZEDViewport::UpdateView()
 	ZEMatrix4x4::Inverse(View.InvProjectionTransform, View.ProjectionTransform);
 	ZEMatrix4x4::Inverse(View.InvViewProjectionTransform, View.ViewProjectionTransform);
 
-	ViewFrustum.Create(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
+	ViewFrustum = ZEViewFrustum(View.Position, View.Rotation, View.VerticalFOV, View.AspectRatio, View.NearZ, View.FarZ);
 	View.ViewVolume = &ViewFrustum;
 
 	View.ShadowDistance = 100.0f;

@@ -38,7 +38,7 @@
 #include "ZEError.h"
 #include "ZEMath/ZETriangle.h"
 #include "ZEMath/ZERay.h"
-#include "ZEMath/ZEViewFrustum.h"
+#include "ZEMath/ZEFrustum.h"
 #include "ZEMath/ZEAngle.h"
 
 #include "ZEInteriorResource.h"
@@ -143,7 +143,7 @@ ZEInteriorHelper* ZEInterior::GetHelper(const ZEString& Name)
 
 ZEEntityResult ZEInterior::LoadInternal()
 {
-	ZE_ENTITY_INITIALIZE_CHAIN(ZEEntity);
+	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 	LoadInteriorResource();
 	return ZE_ER_DONE;
 }
@@ -290,7 +290,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 
 		for (ZESize I = 0; I < PointsCount; I++)
 		{
-			ZEPlane::Create(VerticalPlane, Frustum->GetPosition(), Points[I], Points[I] - Frustum->GetUp());
+			ZEPlane::Create(VerticalPlane, Frustum->Position, Points[I], Points[I] - Frustum->Up);
 
 			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_LEFT).n, VerticalPlane.n);
 
@@ -298,7 +298,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 			{
 				LeftDotProduct = TempDotProduct;
 				LeftPlane.n = VerticalPlane.n;
-				LeftPlane.p = Frustum->GetPosition();
+				LeftPlane.p = Frustum->Position;
 				//LeftPoint = Points[I];
 			}
 
@@ -308,11 +308,11 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 			{
 				RightDotProduct = TempDotProduct;
 				RightPlane.n = -VerticalPlane.n;
-				RightPlane.p = Frustum->GetPosition();
+				RightPlane.p = Frustum->Position;
 				//RightPoint = Points[I];
 			}
 
-			ZEPlane::Create(HorizontalPlane, Frustum->GetPosition(), Points[I], Points[I] - Frustum->GetRight());
+			ZEPlane::Create(HorizontalPlane, Frustum->Position, Points[I], Points[I] - Frustum->Right);
 
 			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_TOP).n, HorizontalPlane.n);
 
@@ -320,7 +320,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 			{
 				TopDotProduct = TempDotProduct;
 				TopPlane.n = HorizontalPlane.n;
-				TopPlane.p = Frustum->GetPosition();
+				TopPlane.p = Frustum->Position;
 				//TopPoint = Points[I];
 			}
 
@@ -330,16 +330,16 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 			{
 				BottomDotProduct = TempDotProduct;
 				BottomPlane.n = -HorizontalPlane.n;
-				BottomPlane.p = Frustum->GetPosition();
+				BottomPlane.p = Frustum->Position;
 				//BottomPoint = Points[I];
 			}
 		}
 
-		NewViewVolume.Create(RightPlane, BottomPlane, LeftPlane, TopPlane, Frustum->GetClippingPlane(ZE_VFP_FAR), Frustum->GetClippingPlane(ZE_VFP_NEAR));
-		NewViewVolume.SetPosition(Frustum->GetPosition());
-		NewViewVolume.Right = Frustum->GetRight();
-		NewViewVolume.Up = Frustum->GetUp();
-		NewViewVolume.Look = Frustum->GetDirection();
+		NewViewVolume = ZEViewFrustum(RightPlane, BottomPlane, LeftPlane, TopPlane, Frustum->GetClippingPlane(ZE_VFP_FAR), Frustum->GetClippingPlane(ZE_VFP_NEAR));
+		NewViewVolume.Position = Frustum->Position;
+		NewViewVolume.Right = Frustum->Right;
+		NewViewVolume.Up = Frustum->Up;
+		NewViewVolume.Look = Frustum->Look;
 
 		return true;
 	}
@@ -352,7 +352,7 @@ void ZEInterior::CullRoom(ZEInteriorDoor* Door, const ZERNPreRenderParameters* P
 	if(!Door->GetOpened())
 		return;
 	
-	if (ViewVolume->CullTest(Door->GetRectangle()))
+	if (!ViewVolume->IntersectionTest(Door->GetRectangle()))
 		return;
 
 	ZEInteriorRoom** DoorRooms = Door->GetRooms();
@@ -395,7 +395,7 @@ void ZEInterior::CullRooms(const ZERNPreRenderParameters* Parameters)
 		if (Parameters->View->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
 		{
 			ZEViewFrustum* Frustum = (ZEViewFrustum*)Parameters->View->ViewVolume;
-			ZEVector3 FrustumPosition = Frustum->GetPosition();
+			ZEVector3 FrustumPosition = Frustum->Position;
 
 			for (ZESize I = 0; I < RoomCount; I++)
 			{
@@ -420,7 +420,7 @@ void ZEInterior::CullRooms(const ZERNPreRenderParameters* Parameters)
 		{
 			for (ZESize I = 0; I < RoomCount; I++)
 			{
-				if (!Parameters->View->ViewVolume->CullTest(Rooms[I]->GetWorldBoundingBox()))
+				if (Parameters->View->ViewVolume->IntersectionTest(Rooms[I]->GetWorldBoundingBox()))
 					Rooms[I]->PreRender(Parameters);
 			}
 		}

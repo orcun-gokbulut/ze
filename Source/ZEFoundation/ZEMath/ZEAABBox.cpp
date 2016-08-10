@@ -43,6 +43,7 @@
 
 #include <float.h>
 #include "ZEMath/ZEMath.h"
+#include "ZEError.h"
 
 #define		X_AXIS		(ZEUInt)0x01
 #define		Y_AXIS		(ZEUInt)0x02
@@ -420,6 +421,47 @@ ZEAABBox::ZEAABBox()
 }
 
 ZEAABBox::ZEAABBox(const ZEVector3& Min, const ZEVector3& Max)
+{
+	this->Min = Min;
+	this->Max = Max;
+}
+
+
+// ZEViewAABBox
+//////////////////////////////////////////////////////////////////////////////////////
+
+ZEViewVolumeType ZEViewAABBox::GetViewVolumeType() const
+{
+	return ZE_VVT_AXIS_ALIGNED_BOX;
+}
+
+bool ZEViewAABBox::IntersectionTest(const ZEBSphere& BoundingSphere) const
+{
+	return ZEAABBox::IntersectionTest(*this, BoundingSphere);
+}
+
+bool ZEViewAABBox::IntersectionTest(const ZEAABBox& BoundingBox) const
+{
+	return ZEAABBox::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewAABBox::IntersectionTest(const ZEOBBox& BoundingBox) const
+{
+	return ZEAABBox::IntersectionTest(*this, BoundingBox);
+}
+
+bool ZEViewAABBox::IntersectionTest(const ZERectangle3D& Rectangle) const
+{
+	zeDebugCheck(true, "NOT IMPLEMENTED");
+	return false;
+}
+
+ZEViewAABBox::ZEViewAABBox()
+{
+
+}
+
+ZEViewAABBox::ZEViewAABBox(const ZEVector3& Min, const ZEVector3& Max)
 {
 	this->Min = Min;
 	this->Max = Max;

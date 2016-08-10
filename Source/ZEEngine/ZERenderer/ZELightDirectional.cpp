@@ -167,7 +167,7 @@ void ZELightDirectional::UpdateCascadeTransforms(const ZERNView& View)
 		ZEVector3 CascadePositionWorld;
 		ZEMatrix4x4::Transform3x3(CascadePositionWorld, InvLightViewTransform, CascadeFrustumAABBLight.GetCenter());
 
-		Cascade.ViewVolume.Create(CascadePositionWorld, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
+		Cascade.ViewVolume = ZEViewOBBox(CascadePositionWorld, GetWorldRotation(), Width, Height, CascadeFrustumAABBLight.Min.z, CascadeFrustumAABBLight.Max.z);
 		Cascade.ViewTransform = GetViewTransform();
 	}
 }
