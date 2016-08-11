@@ -55,6 +55,7 @@
 #include "ZEAtmosphere/ZEATAtmosphere.h"
 #include "ZEAtmosphere/ZEATSkyBox.h"
 #include "ZERenderer/ZELightDirectional.h"
+#include "ZEGame/ZEStateScreen.h"
 
 bool ZEDSceneEditor::InitializeInternal()
 {
@@ -91,6 +92,10 @@ bool ZEDSceneEditor::InitializeInternal()
 
 	GetObjectManager()->SetRootWrapper(GetObjectManager()->WrapObject(Scene));
 	ObjectBrowser->GetObjectTree()->SetRootWrapper(GetObjectManager()->GetRootWrapper());
+
+	ZEStateScreen* StateScreen = ZEStateScreen::CreateInstance();
+	StateScreen->SetManager(GetUIManager());
+	Scene->AddEntity(StateScreen);
 
 	ZEDGrid* Grid = ZEDGrid::CreateInstance();
 	Scene->AddEntity(Grid);

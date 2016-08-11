@@ -54,6 +54,7 @@ class ZEMDResourceDraw : public ZEObject
 		ZESize							Offset;
 		ZESize							Count;
 		ZEHolder<const ZERNMaterial>	Material;
+		ZEString						MaterialFileName;
 
 	public:
 		void							SetOffset(ZESize Offset);
@@ -61,6 +62,9 @@ class ZEMDResourceDraw : public ZEObject
 
 		void							SetCount(ZESize Count);
 		ZESize							GetCount() const;
+
+		void							SetMaterialFileName(const ZEString& Name);
+		const ZEString&					GetMaterialFileName();
 
 		void							SetMaterial(ZEHolder<const ZERNMaterial> Material);
 		ZEHolder<const ZERNMaterial>	GetMaterial() const;

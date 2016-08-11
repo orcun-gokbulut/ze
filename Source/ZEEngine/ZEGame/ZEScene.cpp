@@ -75,7 +75,7 @@ void ZEScene::PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* P
 	if (!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded())
 		return;
 
-	if (!Entity->IsInitialized())
+	if (!Entity->IsLoaded())
 		return;
 
 	bool Cullable = Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE);

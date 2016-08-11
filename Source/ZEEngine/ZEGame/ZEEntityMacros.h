@@ -45,12 +45,13 @@
 #define ZE_ENTITY_FENCE(Entity, TargetState, FailedReturn) \
 	if (Entity != NULL) \
 	{ \
-		if (Entity->GetState() >= TargetState) \
+		if (Resource->IsFailed()) \
 		{ \
-			if (!Entity->IsFailed()) \
-				return ZE_ER_WAIT; \
-			else \
-				return FailedReturn; \
+			return FailedReturn; \
+		} \
+		else if (Entity->GetState() < TargetState) \
+		{ \
+			return ZE_ER_WAIT; \
 		} \
 	} \
 	else
@@ -58,12 +59,13 @@
 #define ZE_ENTITY_RESOURCE_FENCE(Resource, TargetState, FailedReturn) \
 	if (Resource != NULL) \
 	{ \
-		if (Resource->GetState() >= TargetState) \
+		if (Resource->IsFailed()) \
 		{ \
-			if (!Resource->IsFailed()) \
-				return ZE_ER_WAIT; \
-			else \
-				return FailedReturn; \
+			return FailedReturn; \
+		} \
+		else if (Resource->GetState() < TargetState) \
+		{ \
+			return ZE_ER_WAIT; \
 		} \
 	} \
 	else

@@ -38,8 +38,10 @@
 #include "ZEError.h"
 #include "ZEML/ZEMLReader.h"
 #include "ZEModelMeshLOD.h"
+#include "ZEMDResource.h"
 #include "ZEMDResourceLOD.h"
 #include "ZERenderer/ZERNMaterial.h"
+#include "ZERenderer/ZERNStandardMaterial.h"
 
 void ZEMDResourceDraw::SetOffset(ZESize PoligonOffset)
 {
@@ -61,9 +63,35 @@ ZESize ZEMDResourceDraw::GetCount() const
 	return Count;
 }
 
+void ZEMDResourceDraw::SetMaterialFileName(const ZEString& FileName)
+{
+	if (MaterialFileName == FileName)
+		return;
+
+	MaterialFileName = FileName;
+	
+	SetMaterial(ZERNStandardMaterial::LoadResourceShared(FileName).GetPointer());
+}
+
+const ZEString& ZEMDResourceDraw::GetMaterialFileName()
+{
+	return MaterialFileName;
+}
+
 void ZEMDResourceDraw::SetMaterial(ZEHolder<const ZERNMaterial> Material)
 {
+	if (this->Material == Material)
+		return;
+
 	this->Material = Material;
+	
+	if (Material == NULL)
+		MaterialFileName = ZEString::Empty;
+	else
+		MaterialFileName = Material->GetFileName();
+
+	if (LOD != NULL && LOD->GetResource() != NULL)
+		LOD->GetResource()->RegisterExternalResource(Material);
 }
 
 ZEHolder<const ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
@@ -78,6 +106,7 @@ bool ZEMDResourceDraw::Unserialize(ZEMLReaderNode& DrawNode)
 
 	SetOffset(DrawNode.ReadUInt32("Offset", 0));
 	SetCount(DrawNode.ReadUInt32("Count", 0));
+	SetMaterialFileName(DrawNode.ReadString("MaterialFileName"));
 
 	return true;
 }
@@ -89,6 +118,7 @@ bool ZEMDResourceDraw::Serialize(ZEMLWriterNode& DrawNode) const
 
 ZEMDResourceDraw::ZEMDResourceDraw()
 {
+	LOD = NULL;
 	Offset = 0;
 	Count = 0;
 }

@@ -48,6 +48,7 @@
 #include "ZEML/ZEMLWriter.h"
 #include "ZERenderer/ZERNStandardMaterial.h"
 #include "ZEResource/ZERSTemplates.h"
+#include "ZEMDResourceDraw.h"
 
 static void CalculateBoundingBox(ZEMDResourceMesh* Mesh)
 {
@@ -219,7 +220,10 @@ bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
 		ze_for_each(LOD, Mesh->GetLODs())
 		{
 			if (LOD->MaterialID >= 0 && LOD->MaterialID <= Materials.GetCount())
-				LOD->SetMaterial(Materials[LOD->MaterialID].Cast<const ZERNMaterial>());
+			{
+				if (LOD->GetDraws().GetCount() == 1)
+					const_cast<ZEMDResourceDraw*>(&LOD->GetDraws()[0])->SetMaterial(Materials[LOD->MaterialID].Cast<const ZERNMaterial>());
+			}
 		}
 	}
 	return true;

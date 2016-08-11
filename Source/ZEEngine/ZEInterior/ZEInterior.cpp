@@ -272,10 +272,10 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 
 		ZEVector3 PointsTemp[32];
 		ZESize PointTempCount;
-		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetClippingPlane(ZE_VFP_LEFT),		Points, PointsCount);
-		IntersectionTest(Points, PointsCount,			Frustum->GetClippingPlane(ZE_VFP_RIGHT),	PointsTemp, PointTempCount);
-		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetClippingPlane(ZE_VFP_BOTTOM),	Points, PointsCount);
-		IntersectionTest(Points, PointsCount,			Frustum->GetClippingPlane(ZE_VFP_TOP),		PointsTemp, PointTempCount);
+		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetClippingPlane(ZE_FP_LEFT),		Points, PointsCount);
+		IntersectionTest(Points, PointsCount,			Frustum->GetClippingPlane(ZE_FP_RIGHT),		PointsTemp, PointTempCount);
+		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetClippingPlane(ZE_FP_DOWN),		Points, PointsCount);
+		IntersectionTest(Points, PointsCount,			Frustum->GetClippingPlane(ZE_FP_UP),		PointsTemp, PointTempCount);
 
 		if (PointsCount == 0)
 			return false;
@@ -292,7 +292,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 		{
 			ZEPlane::Create(VerticalPlane, Frustum->Position, Points[I], Points[I] - Frustum->Up);
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_LEFT).n, VerticalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_LEFT).n, VerticalPlane.n);
 
 			if (TempDotProduct > LeftDotProduct)
 			{
@@ -302,7 +302,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 				//LeftPoint = Points[I];
 			}
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_RIGHT).n, -VerticalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_RIGHT).n, -VerticalPlane.n);
 
 			if (TempDotProduct > RightDotProduct)
 			{
@@ -314,7 +314,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 
 			ZEPlane::Create(HorizontalPlane, Frustum->Position, Points[I], Points[I] - Frustum->Right);
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_TOP).n, HorizontalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_UP).n, HorizontalPlane.n);
 
 			if (TempDotProduct > TopDotProduct)
 			{
@@ -324,7 +324,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 				//TopPoint = Points[I];
 			}
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_VFP_BOTTOM).n, -HorizontalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_DOWN).n, -HorizontalPlane.n);
 
 			if (TempDotProduct > BottomDotProduct)
 			{
@@ -335,7 +335,7 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 			}
 		}
 
-		NewViewVolume = ZEViewFrustum(RightPlane, BottomPlane, LeftPlane, TopPlane, Frustum->GetClippingPlane(ZE_VFP_FAR), Frustum->GetClippingPlane(ZE_VFP_NEAR));
+		ZEViewFrustum::Create(NewViewVolume, LeftPlane, RightPlane, BottomPlane, TopPlane, Frustum->GetClippingPlane(ZE_FP_NEAR), Frustum->GetClippingPlane(ZE_FP_FAR));
 		NewViewVolume.Position = Frustum->Position;
 		NewViewVolume.Right = Frustum->Right;
 		NewViewVolume.Up = Frustum->Up;

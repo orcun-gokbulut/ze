@@ -1023,7 +1023,7 @@ ZEUInt ZEEntity::GetLoadingPercentage()
 	ZE_LOCK_SECTION(EntityLock)
 	{
 		for (ZESize I = 0; I < Components.GetCount(); I++)
-			Total = Components[I]->GetLoadingPercentage();
+			Total += Components[I]->GetLoadingPercentage();
 		Count = Components.GetCount();
 
 		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
