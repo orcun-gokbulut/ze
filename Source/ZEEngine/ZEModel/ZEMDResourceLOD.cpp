@@ -35,13 +35,14 @@
 
 #include "ZEMDResourceLOD.h"
 
-#include "ZEML\ZEMLReader.h"
+#include "ZEMDResource.h"
 #include "ZEMDResourceMesh.h"
+
+#include "ZEML\ZEMLReader.h"
 #include "ZEGraphics\ZEGRVertexBuffer.h"
 #include "ZEGraphics\ZEGRIndexBuffer.h"
 #include "ZERenderer\ZERNMaterial.h"
 #include "ZEUI\ZEUTextEditControl.h"
-
 
 ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 {
@@ -240,26 +241,6 @@ ZEHolder<const ZEGRIndexBuffer> ZEMDResourceLOD::GetIndexBuffer() const
 	return IndexBuffer;
 }
 
-void ZEMDResourceLOD::SetMaterial(ZEHolder<const ZERNMaterial> Material)
-{
-	this->Material = Material;
-}
-
-ZEHolder<const ZERNMaterial> ZEMDResourceLOD::GetMaterial() const
-{
-	return Material;
-}
-
-void ZEMDResourceLOD::SetMaterialFileName(const ZEString& MaterialFilePath)
-{
-	//Implementation required.
-}
-
-const ZEString& ZEMDResourceLOD::GetMaterialFileName()
-{
-	return ZEString::Empty; //Implementation required.
-}
-
 const ZEArray<ZEMDResourceDraw>& ZEMDResourceLOD::GetDraws() const
 {
 	return Draws;
@@ -300,7 +281,6 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	VertexBufferNormals = NULL;
 	VertexBufferSkin = NULL;
 	VertexBufferExtra = NULL;
-	Material = NULL;
 
 	SetLevel(LODNode.ReadInt32("Level", LODNode.ReadInt32("LODLevel", 0)));
 	SetStartDistance(LODNode.ReadFloat("StartDistance", (float)LODNode.ReadInt32("LODStartDistance", GetLevel() * 30)));
@@ -310,8 +290,6 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	MaterialID = LODNode.ReadInt32("MaterialId", 0);
 
 	ZEString MaterialFileName = LODNode.ReadString("MaterialFilePath");
-	if (!MaterialFileName.IsEmpty())
-		SetMaterialFileName(MaterialFileName);
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 	{
@@ -369,8 +347,7 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 		else
 			Draw.SetCount(VerticesSkin.GetCount());
 
-		Draw.SetMaterial(GetMaterial());
-
+		Draw.SetMaterialFileName(MaterialFileName);
 		Draws.Add(Draw);
 	}
 

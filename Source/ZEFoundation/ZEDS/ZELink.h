@@ -47,6 +47,9 @@ class ZELink
 	friend class ZEList2<ZEItemType>;
 	private:
 		bool								InUse;
+		#ifdef ZE_DEBUG_ENABLE
+		ZEList2<ZEItemType>*				List;
+		#endif
 		ZEItemType*							Item;
 		ZELink*								Prev;
 		ZELink*								Next;
@@ -141,6 +144,10 @@ ZELink<ZEItemType>::ZELink(const ZELink& Other)
 template<typename ZEItemType>
 ZELink<ZEItemType>::ZELink()
 {
+	#ifdef ZE_DEBUG_ENABLE
+	List = NULL;
+	#endif
+
 	InUse = false;
 	Prev = NULL;
 	Next = NULL;
@@ -150,10 +157,14 @@ ZELink<ZEItemType>::ZELink()
 template<typename ZEItemType>
 ZELink<ZEItemType>::ZELink(ZEItemType* Object)
 {
-	 InUse = false;
-	 Prev = NULL;
-	 Next = NULL;
-	 this->Item = Object;
+	#ifdef ZE_DEBUG_ENABLE
+	List = NULL;
+	#endif
+
+	InUse = false;
+	Prev = NULL;
+	Next = NULL;
+	this->Item = Object;
 }
 
 template<typename ZEItemType>

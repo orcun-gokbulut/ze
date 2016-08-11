@@ -201,7 +201,7 @@ const ZEViewVolume& ZELightProjective::GetViewVolume(ZESize Index) const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_VIEW_VOLUME))
 	{
-		ViewVolume = ZEViewFrustum(GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.1f, Range);
+		ZEViewFrustum::Create(ViewVolume, GetWorldPosition(), GetWorldRotation(), FOV, AspectRatio, 0.1f, Range);
 		DirtyFlags.UnraiseFlags(ZE_LDF_VIEW_VOLUME);
 	}
 

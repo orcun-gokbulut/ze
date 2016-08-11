@@ -53,18 +53,24 @@ const ZEPlane& ZEFrustum::GetClippingPlane(ZEFrustumPlane Plane) const
 {
 	switch(Plane)
 	{
-		case ZE_VFP_RIGHT:
+		case ZE_FP_RIGHT:
 			return RightClippingPlane;
-		case ZE_VFP_LEFT:
+
+		case ZE_FP_LEFT:
 			return LeftClippingPlane;
-		case ZE_VFP_TOP:
-			return TopClippingPlane;
-		case ZE_VFP_BOTTOM:
-			return BottomClippingPlane;
-		case ZE_VFP_FAR:
+
+		case ZE_FP_UP:
+			return UpClippingPlane;
+
+		case ZE_FP_DOWN:
+			return DownClippingPlane;
+
+		case ZE_FP_FAR:
 			return FarClippingPlane;
-		case ZE_VFP_NEAR:
+
+		case ZE_FP_NEAR:
 			return NearClippingPlane;
+
 		default:
 			return LeftClippingPlane;
 	}
@@ -87,62 +93,62 @@ ZELineSegment ZEFrustum::GetEdge(ZEFrustumEdge Edge) const
 	ZEVector3 P1, P2;
 	switch(Edge)
 	{
-		case ZE_VFE_FAR_RIGHT:
+		case ZE_FE_RIGHT_FAR:
 			P1 = FarPlaneCenter + (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
 			P2 = FarPlaneCenter - (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_FAR_BOTTOM:
+		case ZE_FE_BOTTOM_FAR:
 			P1 = FarPlaneCenter - (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
 			P2 = FarPlaneCenter - (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_FAR_LEFT:
+		case ZE_FE_LEFT_FAR:
 			P1 = FarPlaneCenter - (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
 			P2 = FarPlaneCenter + (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_FAR_TOP:
+		case ZE_FE_TOP_FAR:
 			P1 = FarPlaneCenter + (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
 			P2 = FarPlaneCenter + (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_RIGHT_UP:
+		case ZE_FE_RIGHT_UP:
 			P1 = NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
 			P2 = FarPlaneCenter + (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_RIGHT_DOWN:
+		case ZE_FE_RIGHT_DOWN:
 			P1 = NearPlaneCenter - (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
 			P2 = FarPlaneCenter - (Up * FarPlaneHeight) + (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_LEFT_DOWN:
+		case ZE_FE_LEFT_DOWN:
 			P1 = NearPlaneCenter - (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
 			P2 = FarPlaneCenter - (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_LEFT_UP:
+		case ZE_FE_LEFT_UP:
 			P1 = NearPlaneCenter + (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
 			P2 = FarPlaneCenter + (Up * FarPlaneHeight) - (Right * FarPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_NEAR_RIGHT:
+		case ZE_FE_RIGHT_NEAR:
 			P1 = NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
 			P2 = NearPlaneCenter - (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_NEAR_BOTTOM:
+		case ZE_FE_BOTTOM_NEAR:
 			P1 = NearPlaneCenter - (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
 			P2 = NearPlaneCenter - (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_NEAR_LEFT:
+		case ZE_FE_LEFT_NEAR:
 			P1 = NearPlaneCenter - (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
 			P2 = NearPlaneCenter + (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
 			return ZELineSegment(P1, P2);
 		
-		case ZE_VFE_NEARTOP:
+		case ZE_FE_TOP_NEAR:
 			P1 = NearPlaneCenter + (Up * NearPlaneHeight) - (Right * NearPlaneWidth);
 			P2 = NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth);
 			return ZELineSegment(P1, P2);
@@ -169,22 +175,30 @@ ZEVector3 ZEFrustum::GetVertex(ZEFrustumVertex Vertex) const
 
 	switch(Vertex)
 	{
-		case ZE_VFV_RIGHT_UP_FAR:
-			return (FarPlaneCenter + (Up * FarPlaneHeight) + (Right * FarPlaneWidth));
-		case ZE_VFV_RIGHT_DOWN_FAR:
-			return (FarPlaneCenter - (Up * FarPlaneHeight) + (Right * FarPlaneWidth));
-		case ZE_VFV_LEFT_DOWN_FAR:
-			return (FarPlaneCenter - (Up * FarPlaneHeight) - (Right * FarPlaneWidth));
-		case ZE_VFV_LEFT_UP_FAR:
-			return (FarPlaneCenter + (Up * FarPlaneHeight) - (Right * FarPlaneWidth));
-		case ZE_VFV_RIGHT_UP_NEAR:
-			return (NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth));
-		case ZE_VFV_RIGHT_DOWN_NEAR:
-			return (NearPlaneCenter - (Up * NearPlaneHeight) + (Right * NearPlaneWidth));
-		case ZE_VFV_LEFT_DOWN_NEAR:
+		case ZE_FV_LEFT_DOWN_NEAR:
 			return (NearPlaneCenter - (Up * NearPlaneHeight) - (Right * NearPlaneWidth));
-		case ZE_VFV_LEFT_UP_NEAR:
+
+		case ZE_FV_LEFT_DOWN_FAR:
+			return (FarPlaneCenter - (Up * FarPlaneHeight) - (Right * FarPlaneWidth));
+
+		case ZE_FV_LEFT_UP_NEAR:
 			return (NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth));
+
+		case ZE_FV_LEFT_UP_FAR:
+			return (FarPlaneCenter + (Up * FarPlaneHeight) - (Right * FarPlaneWidth));
+
+		case ZE_FV_RIGHT_DOWN_NEAR:
+			return (NearPlaneCenter - (Up * NearPlaneHeight) + (Right * NearPlaneWidth));
+
+		case ZE_FV_RIGHT_DOWN_FAR:
+			return (FarPlaneCenter - (Up * FarPlaneHeight) + (Right * FarPlaneWidth));
+
+		case ZE_FV_RIGHT_UP_NEAR:
+			return (NearPlaneCenter + (Up * NearPlaneHeight) + (Right * NearPlaneWidth));
+
+		case ZE_FV_RIGHT_UP_FAR:
+			return (FarPlaneCenter + (Up * FarPlaneHeight) + (Right * FarPlaneWidth));
+
 		default:
 			return ZEVector3::Zero;
 	}
@@ -200,9 +214,9 @@ ZEFrustum::ZEFrustum(const ZEVector3& Position, const ZEQuaternion& Rotation, fl
 	Create(*this, Position, Rotation, FOV, AspectRatio, NearZ, FarZ);
 }
 
-ZEFrustum::ZEFrustum(const ZEPlane& RightClippingPlane, const ZEPlane& BottomClippingPlane, const ZEPlane& LeftClippingPlane, const ZEPlane& TopClippingPlane, const ZEPlane& FarClippingPlane, const ZEPlane& NearClippingPlane)
+ZEFrustum::ZEFrustum(const ZEPlane& LeftClippingPlane, const ZEPlane& RightClippingPlane, const ZEPlane& DownClippingPlane, const ZEPlane& UpClippingPlane, const ZEPlane& NearClippingPlane, const ZEPlane& FarClippingPlane)
 {
-	Create(*this, RightClippingPlane, BottomClippingPlane, LeftClippingPlane, TopClippingPlane, FarClippingPlane, NearClippingPlane);
+	Create(*this, LeftClippingPlane, RightClippingPlane, DownClippingPlane, UpClippingPlane, NearClippingPlane, FarClippingPlane);
 }
 
 void ZEFrustum::Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ)
@@ -220,8 +234,8 @@ void ZEFrustum::Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQu
 	Frustum.FOV = FOV;
 	Frustum.AspectRatio = AspectRatio;
 
-	ZEQuaternion::VectorProduct(Frustum.TopClippingPlane.n, Rotation, ZEVector3(0.0f, -CosFov, SinFov));
-	ZEQuaternion::VectorProduct(Frustum.BottomClippingPlane.n, Rotation, ZEVector3(0.0f, CosFov, SinFov));
+	ZEQuaternion::VectorProduct(Frustum.UpClippingPlane.n, Rotation, ZEVector3(0.0f, -CosFov, SinFov));
+	ZEQuaternion::VectorProduct(Frustum.DownClippingPlane.n, Rotation, ZEVector3(0.0f, CosFov, SinFov));
 
 	ZEQuaternion::VectorProduct(Frustum.RightClippingPlane.n, Rotation, ZEVector3(-CosFov, 0.0f, SinFovAT));
 	Frustum.RightClippingPlane.n.NormalizeSelf();
@@ -231,8 +245,11 @@ void ZEFrustum::Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQu
 	ZEQuaternion::VectorProduct(Frustum.NearClippingPlane.n, Rotation, ZEVector3(0.0f, 0.0f, 1.0f));
 	ZEQuaternion::VectorProduct(Frustum.FarClippingPlane.n, Rotation, ZEVector3(0.0f, 0.0f, -1.0f));
 
-
-	Frustum.LeftClippingPlane.p = Frustum.RightClippingPlane.p = Frustum.TopClippingPlane.p = Frustum.BottomClippingPlane.p = Position;
+	Frustum.Position = Position;
+	Frustum.LeftClippingPlane.p = Frustum.Position;
+	Frustum.RightClippingPlane.p = Frustum.Position;
+	Frustum.UpClippingPlane.p = Frustum.Position;
+	Frustum.DownClippingPlane.p = Frustum.Position;
 
 	ZEVector3 Temp;
 	ZEVector3::Scale(Temp, Frustum.NearClippingPlane.n, NearZ);
@@ -242,7 +259,6 @@ void ZEFrustum::Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQu
 	ZEVector3::Add(Frustum.FarClippingPlane.p, Position, Temp);
 
 	// View cone
-
 	Frustum.Position = Position;
 	ZEQuaternion::VectorProduct(Frustum.CenterVector, Rotation, ZEVector3(0.0f, 0.0f, 1.0f));
 
@@ -255,66 +271,82 @@ void ZEFrustum::Create(ZEFrustum& Frustum, const ZEVector3& Position, const ZEQu
 	Frustum.SinRatio = radius / ZEMath::Sqrt(radius * radius + NearZ * NearZ);
 }
 
-void ZEFrustum::Create(ZEFrustum& Frustum, const ZEPlane& RightClippingPlane, const ZEPlane& BottomClippingPlane, const ZEPlane& LeftClippingPlane, const ZEPlane& TopClippingPlane, const ZEPlane& FarClippingPlane, const ZEPlane& NearClippingPlane)
+void ZEFrustum::Create(ZEFrustum& Frustum, const ZEPlane& LeftClippingPlane, const ZEPlane& RightClippingPlane, const ZEPlane& DownClippingPlane, const ZEPlane& UpClippingPlane, const ZEPlane& NearClippingPlane, const ZEPlane& FarClippingPlane)
 {
-	Frustum.RightClippingPlane = RightClippingPlane;
-	Frustum.BottomClippingPlane = BottomClippingPlane;
 	Frustum.LeftClippingPlane = LeftClippingPlane;
-	Frustum.TopClippingPlane = TopClippingPlane;
-	Frustum.FarClippingPlane = FarClippingPlane;
+	Frustum.RightClippingPlane = RightClippingPlane;
+	Frustum.DownClippingPlane = DownClippingPlane;
+	Frustum.UpClippingPlane = UpClippingPlane;
 	Frustum.NearClippingPlane = NearClippingPlane;
+	Frustum.FarClippingPlane = FarClippingPlane;
 }
 
 bool ZEFrustum::IntersectionTest(const ZEFrustum& Frustum, const ZEBSphere& BoundingSphere)
 {
-	if ((ZEBSphere::IntersectionTest(BoundingSphere, Frustum.NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+	return 
+		!((ZEBSphere::IntersectionTest(BoundingSphere, Frustum.NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.UpClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
-		return false;
-
-	return true;
+		(ZEBSphere::IntersectionTest(BoundingSphere, Frustum.DownClippingPlane)		== ZE_HS_NEGATIVE_SIDE));
 }
 
 bool ZEFrustum::IntersectionTest(const ZEFrustum& Frustum, const ZEAABBox& BoundingBox)
 {
-	if ((ZEAABBox::IntersectionTest(BoundingBox, Frustum.NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+	return 
+		!((ZEAABBox::IntersectionTest(BoundingBox, Frustum.NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.UpClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
-		return false;
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.DownClippingPlane)		== ZE_HS_NEGATIVE_SIDE));
 
-	return true;
+	/*return 
+		((ZEAABBox::IntersectionTest(BoundingBox, Frustum.NearClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.LeftClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.RightClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.UpClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.FarClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEAABBox::IntersectionTest(BoundingBox, Frustum.DownClippingPlane)		!= ZE_HS_NEGATIVE_SIDE));*/
 }
 
 bool ZEFrustum::IntersectionTest(const ZEFrustum& Frustum, const ZEOBBox& BoundingBox)
 {
-	if ((ZEOBBox::IntersectionTest(BoundingBox, Frustum.NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+	return 
+		!((ZEOBBox::IntersectionTest(BoundingBox, Frustum.NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.RightClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.UpClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
 		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
-		return false;
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.DownClippingPlane)		== ZE_HS_NEGATIVE_SIDE));
 
-	return true;
+	/*return 
+		((ZEOBBox::IntersectionTest(BoundingBox, Frustum.NearClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.LeftClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.RightClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.UpClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.FarClippingPlane)		!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZEOBBox::IntersectionTest(BoundingBox, Frustum.DownClippingPlane)		!= ZE_HS_NEGATIVE_SIDE));*/
 }
 
 bool ZEFrustum::IntersectionTest(const ZEFrustum& Frustum, const ZERectangle3D& Rectangle)
 {
-	if ((ZERectangle3D::IntersectionTest(Rectangle, Frustum.NearClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.LeftClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.RightClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.TopClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.FarClippingPlane)		== ZE_HS_NEGATIVE_SIDE) ||
-		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.BottomClippingPlane)	== ZE_HS_NEGATIVE_SIDE))
-		return true;
+	return 
+		!((ZERectangle3D::IntersectionTest(Rectangle, Frustum.NearClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.LeftClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.RightClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.UpClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.FarClippingPlane)	== ZE_HS_NEGATIVE_SIDE) ||
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.DownClippingPlane)	== ZE_HS_NEGATIVE_SIDE));
 
-	return false;
+	/*return 
+		((ZERectangle3D::IntersectionTest(Rectangle, Frustum.NearClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.LeftClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.RightClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.UpClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.FarClippingPlane)	!= ZE_HS_NEGATIVE_SIDE) &&
+		(ZERectangle3D::IntersectionTest(Rectangle, Frustum.DownClippingPlane)	!= ZE_HS_NEGATIVE_SIDE));*/
 }
 
 
@@ -351,16 +383,12 @@ ZEViewFrustum::ZEViewFrustum()
 
 }
 
-ZEViewFrustum::ZEViewFrustum(const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ) : ZEFrustum(Position, Rotation, FOV, AspectRatio, NearZ, FarZ)
+ZEViewFrustum::ZEViewFrustum(const ZEVector3& Position, const ZEQuaternion& Rotation, float FOV, float AspectRatio, float NearZ, float FarZ)
 {
-
+	Create(*this, Position, Rotation, FOV, AspectRatio, NearZ, FarZ);
 }
 
-ZEViewFrustum::ZEViewFrustum(
-	const ZEPlane& RightClippingPlane, const ZEPlane& BottomClippingPlane, 
-	const ZEPlane& LeftClippingPlane, const ZEPlane& TopClippingPlane, 
-	const ZEPlane& FarClippingPlane, const ZEPlane& NearClippingPlane) 
-	: ZEFrustum(RightClippingPlane, BottomClippingPlane, LeftClippingPlane, TopClippingPlane, FarClippingPlane, NearClippingPlane)
+ZEViewFrustum::ZEViewFrustum(const ZEPlane& LeftClippingPlane, const ZEPlane& RightClippingPlane, const ZEPlane& DownClippingPlane, const ZEPlane& UpClippingPlane, const ZEPlane& NearClippingPlane, const ZEPlane& FarClippingPlane)
 {
-
+	Create(*this, LeftClippingPlane, RightClippingPlane, DownClippingPlane, UpClippingPlane, NearClippingPlane, FarClippingPlane);
 }

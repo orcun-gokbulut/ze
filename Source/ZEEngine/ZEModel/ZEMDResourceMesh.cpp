@@ -183,6 +183,10 @@ void ZEMDResourceMesh::AddLOD(ZEMDResourceLOD* LOD)
 	
 	LOD->ResourceMesh = this;
 	LODs.AddEnd(&LOD->Link);
+
+	for (ZESize I = 0; I < LOD->GetDraws().GetCount(); I++)
+		GetResource()->UnregisterExternalResource(LOD->GetDraws()[I].GetMaterial());
+
 }
 
 void ZEMDResourceMesh::RemoveLOD(ZEMDResourceLOD* LOD)
@@ -192,6 +196,9 @@ void ZEMDResourceMesh::RemoveLOD(ZEMDResourceLOD* LOD)
 
 	LOD->ResourceMesh = NULL;
 	LODs.Remove(&LOD->Link);
+
+	for (ZESize I = 0; I < LOD->GetDraws().GetCount(); I++)
+		GetResource()->RegisterExternalResource(LOD->GetDraws()[I].GetMaterial());
 }
 
 void ZEMDResourceMesh::SetGeometry(const ZEArray<ZEVector3>& Vertices)

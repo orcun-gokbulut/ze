@@ -69,7 +69,6 @@ class ZEStateScreen : public ZEEntity
 		void								SetManager(ZEUIManager* Manager);
 		ZEUIManager*						GetManager();
 
-		virtual void						Tick(float ElapsedTime);
 		virtual bool						PreRender(const ZERNPreRenderParameters* Parameters);
 
 		static ZEStateScreen*				CreateInstance();

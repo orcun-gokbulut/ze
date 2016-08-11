@@ -340,6 +340,11 @@ ZEDMainWindow* ZEDEditor::GetMainWindow()
 	return MainWindow;
 }
 
+ZEUIManager* ZEDEditor::GetUIManager()
+{
+	return UIManager;
+}
+
 void ZEDEditor::AddComponent(ZEDComponent* Component)
 {
 	zeCheckError(Component->Editor != NULL, ZE_VOID, "Component is already registered to a module.");
@@ -400,6 +405,8 @@ void ZEDEditor::PostProcess(float ElapsedTime)
 		
 		if (GetObjectManager()->GetRootWrapper() != NULL)
 			GetObjectManager()->GetRootWrapper()->PreRender(&PreRenderParameters);
+		
+		UIManager->Render(Renderer);
 	}
 
 	ViewportManager->Render();

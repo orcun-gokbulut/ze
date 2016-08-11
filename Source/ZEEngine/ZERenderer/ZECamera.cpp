@@ -424,7 +424,7 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 	{
 		if (GetProjectionType() == ZERN_PT_PERSPECTIVE)
 		{
-			ZEFrustum::Create(ViewFrustum, GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
+			ZEViewFrustum::Create(ViewFrustum, GetWorldPosition(), GetWorldRotation(), GetVerticalFOV(), GetAspectRatio(), GetNearZ(), GetFarZ());
 		}
 		else if (GetProjectionType() == ZERN_PT_PERSPECTIVE_OFFCENTER)
 		{
@@ -434,12 +434,12 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 			ZEVector3 Column4 = ZEVector3::UnitZ;
 
 			ZEPlane FrustumPlanes[6];
-			FrustumPlanes[0] = ZEPlane(Column4 - Column1, ZEVector3::Zero);						//Right
-			FrustumPlanes[1] = ZEPlane(Column4 + Column1, ZEVector3::Zero);						//Left
-			FrustumPlanes[2] = ZEPlane(Column4 - Column2, ZEVector3::Zero);						//Top
-			FrustumPlanes[3] = ZEPlane(Column4 + Column2, ZEVector3::Zero);						//Bottom
-			FrustumPlanes[4] = ZEPlane(ZEVector3::UnitZ, ZEVector3(0.0f, 0.0f, GetNearZ()));	//Near
-			FrustumPlanes[5] = ZEPlane(-ZEVector3::UnitZ, ZEVector3(0.0f, 0.0f, GetFarZ()));	//Far
+			FrustumPlanes[0] = ZEPlane(Column4 + Column1, ZEVector3::Zero);						// Left
+			FrustumPlanes[1] = ZEPlane(Column4 - Column1, ZEVector3::Zero);						// Right
+			FrustumPlanes[2] = ZEPlane(Column4 + Column2, ZEVector3::Zero);						// Down
+			FrustumPlanes[3] = ZEPlane(Column4 - Column2, ZEVector3::Zero);						// Up
+			FrustumPlanes[4] = ZEPlane(ZEVector3::UnitZ, ZEVector3(0.0f, 0.0f, GetNearZ()));	// Near
+			FrustumPlanes[5] = ZEPlane(-ZEVector3::UnitZ, ZEVector3(0.0f, 0.0f, GetFarZ()));	// Far
 
 			const ZEMatrix4x4 InverseViewTransform = GetInvViewTransform();
 			for (ZEUInt I = 0; I < 6; I++)
@@ -453,7 +453,7 @@ const ZEViewVolume& ZECamera::GetViewVolume()
 				ZEMatrix4x4::Transform(FrustumPlanes[I].p, InverseViewTransform, Point);
 			}
 
-			ZEFrustum::Create(ViewFrustum, FrustumPlanes[0], FrustumPlanes[3], FrustumPlanes[1], FrustumPlanes[2], FrustumPlanes[5], FrustumPlanes[4]);
+			ZEFrustum::Create(ViewFrustum, FrustumPlanes[0], FrustumPlanes[1], FrustumPlanes[2], FrustumPlanes[3], FrustumPlanes[4], FrustumPlanes[5]);
 		}
 
 		CameraDirtyFlags.UnraiseFlags(ZE_CDF_VIEW_FRUSTUM);

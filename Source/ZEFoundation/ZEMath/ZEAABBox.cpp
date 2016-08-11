@@ -62,7 +62,7 @@ ZEVector3 ZEAABBox::GetCenter() const
 
 ZEVector3 ZEAABBox::GetVertex(ZEUInt Index) const
 {
-	return  ZEVector3(Index & X_AXIS ? Max.x : Min.x, Index & Y_AXIS ? Max.y : Min.y, Index & Z_AXIS ? Max.z : Min.z);
+	return ZEVector3(Index & X_AXIS ? Max.x : Min.x, Index & Y_AXIS ? Max.y : Min.y, Index & Z_AXIS ? Max.z : Min.z);
 }
 
 float ZEAABBox::GetLength() const

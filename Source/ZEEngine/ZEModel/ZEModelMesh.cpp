@@ -72,34 +72,6 @@ struct ZEModelMeshConstants
 	ZEVector4	ClippingPlane3;
 };
 
-// void ZEModelMesh::LocalTransformChanged()
-// {
-// 	DirtyFlags.RaiseFlags(
-// 		ZEMD_MDF_LOCAL_TRANSFORM | ZEMD_MDF_INV_LOCAL_TRANSFORM |
-// 		ZEMD_MDF_MODEL_TRANSFORM | ZEMD_MDF_INV_MODEL_TRANSFORM |
-// 		ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_INV_WORLD_TRANSFORM |
-// 		ZEMD_MDF_MODEL_BOUNDING_BOX | ZEMD_MDF_WORLD_BOUNDING_BOX |
-// 		ZEMD_MDF_CONSTANT_BUFFER);
-// 
-// 	ze_for_each(ChildMesh, ChildMeshes)
-// 		ChildMesh->ParentTransformChanged();
-// 
-// 	if (Model != NULL)
-// 		Model->ChildBoundingBoxChanged();
-// }
-// 
-// void ZEModelMesh::ParentTransformChanged()
-// {
-// 	DirtyFlags.RaiseFlags(
-// 		ZEMD_MDF_MODEL_TRANSFORM | ZEMD_MDF_INV_MODEL_TRANSFORM |
-// 		ZEMD_MDF_WORLD_TRANSFORM | ZEMD_MDF_INV_WORLD_TRANSFORM |
-// 		ZEMD_MDF_MODEL_BOUNDING_BOX | ZEMD_MDF_WORLD_BOUNDING_BOX |
-// 		ZEMD_MDF_CONSTANT_BUFFER);
-// 
-// 	ze_for_each(ChildMesh, ChildMeshes)
-// 		ChildMesh->ParentTransformChanged();
-// }
-
 void ZEModelMesh::SetModel(ZEModel* Model)
 {
 	if (this->Model == Model)
@@ -246,6 +218,7 @@ bool ZEModelMesh::Load(const ZEMDResourceMesh* Resource)
 
 	AnimationType = ZE_MAT_PREDEFINED;
 	
+	SetName(Resource->GetName());
 	SetPosition(Resource->GetPosition());
 	SetRotation(Resource->GetRotation());
 	SetScale(Resource->GetScale());
@@ -797,17 +770,16 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (!Visible)
 		return false;
 
-	UpdateConstantBuffer();
-
 	ZEAABBox BoundingBox = GetWorldBoundingBox();
-
 	if (Parameters->View->ViewVolume != NULL && !Parameters->View->ViewVolume->IntersectionTest(BoundingBox))
 		return false;
+
+	UpdateConstantBuffer();
 
 	float ClosestBoundingBoxEdgeDistanceSquare = FLT_MAX;
 	float CurrentBoundingBoxEdgeDistanceSquare;
 
-	for (ZESize I = 0; I < 8; I++)
+	for (ZEUInt I = 0; I < 8; I++)
 	{
 		CurrentBoundingBoxEdgeDistanceSquare = ZEVector3::DistanceSquare(Parameters->View->Position, BoundingBox.GetVertex(I));
 
@@ -850,6 +822,9 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	{
 		Draw->RenderCommand.Priority = 0;
 		Draw->RenderCommand.Order = DrawOrder;
+
+		if (Draw->GetMaterial() == NULL || !Draw->GetMaterial()->IsLoaded())
+			continue;
 
 		if (!Draw->GetMaterial()->PreRender(Draw->RenderCommand))
 			continue;

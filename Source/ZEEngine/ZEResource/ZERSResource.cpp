@@ -221,7 +221,9 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 
 		ze_for_each(ExternalResource, ExternalResources)
 		{
-			if ((*ExternalResource)->State <= ZERS_RS_LOADING)
+			if ((*ExternalResource)->IsFailed())
+				return ZE_TR_FAILED;
+			else if (!(*ExternalResource)->IsLoaded())
 				return ZE_TR_COOPERATING;
 		}
 
@@ -337,7 +339,9 @@ void ZERSResource::RegisterExternalResource(const ZERSResource* Resource)
 	if (Resource == NULL)
 		return;
 
-	zeCheckError(ExternalResources.Exists(Resource), ZE_VOID, "Resource is already added as external resource.");
+	if (ExternalResources.Exists(Resource))
+		return;
+
 	ExternalResources.Add(Resource);
 }
 
@@ -573,7 +577,7 @@ void ZERSResource::Load(const ZEString& FileName)
 	if (TargetState == ZERS_RS_DESTROYED)
 		return;
 
-	if (State == ZERS_RS_LOADING || State == ZERS_RS_LOADED)
+	if (IsLoadedOrLoading())
 		return;
 
 	if (Destroying)

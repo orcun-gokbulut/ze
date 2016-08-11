@@ -52,6 +52,9 @@ class ZEMDResource : public ZERSResource
 	ZE_OBJECT
 	ZE_DISALLOW_COPY(ZEMDResource)
 	friend class ZERSTemplates;
+	friend class ZEMDResourceMesh;
+	friend class ZEMDResourceLOD;
+	friend class ZEMDResourceDraw;
 	private:
 		ZEList2<ZEMDResourceMesh>						Meshes;
 		ZEList2<ZEMDResourceBone>						Bones;

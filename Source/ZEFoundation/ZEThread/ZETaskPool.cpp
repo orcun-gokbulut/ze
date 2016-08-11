@@ -148,14 +148,14 @@ void ZETaskPool::Reschedule(ZETask* Task)
 	Task->Status = ZE_TS2_WAITING;
 
 	ZEInt TaskEffectivePriority = Task->GetPriority();
-	ze_for_each_reverse(CurrentTask, Tasks)
+	/*ze_for_each_reverse(CurrentTask, Tasks)
 	{
 		if (TaskEffectivePriority > CurrentTask->GetPriority())
 		{
 			Tasks.InsertBefore(&CurrentTask->Link, &Task->Link);
 			return;
 		}
-	}
+	}*/
 
 	Tasks.AddEnd(&Task->Link);
 }

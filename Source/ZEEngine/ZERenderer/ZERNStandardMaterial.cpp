@@ -615,7 +615,7 @@ bool ZERNStandardMaterial::GetSubSurfaceScatteringMapEnabled() const
 	return SubSurfaceScatteringMapEnabled;
 }
 
-void ZERNStandardMaterial::SetSubSurfaceScatteringMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSubSurfaceScatteringMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(Texture);
 	SubSurfaceScatteringMap = Texture;
@@ -669,7 +669,7 @@ bool ZERNStandardMaterial::GetBaseMapEnabled() const
 	return BaseMapEnabled;
 }
 
-void ZERNStandardMaterial::SetBaseMap(ZEGRTexture2D* Map)
+void ZERNStandardMaterial::SetBaseMap(const ZEGRTexture2D* Map)
 {
 	UnregisterExternalResource(BaseMap);
 	BaseMap = Map;
@@ -888,7 +888,7 @@ bool ZERNStandardMaterial::GetSpecularMapEnabled() const
 	return SpecularMapEnabled;		
 }
 
-void ZERNStandardMaterial::SetSpecularMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSpecularMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(SpecularMap);
 	SpecularMap = Texture;
@@ -943,7 +943,7 @@ bool ZERNStandardMaterial::GetSpecularGlossMapEnabled() const
 	return SpecularGlossMapEnabled;
 }
 
-void ZERNStandardMaterial::SetSpecularGlossMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetSpecularGlossMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(SpecularGlossMap);
 	SpecularGlossMap = Texture;
@@ -1043,7 +1043,7 @@ bool ZERNStandardMaterial::GetEmissiveMapEnabled() const
 	return EmissiveMapEnabled;
 }
 
-void ZERNStandardMaterial::SetEmissiveMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetEmissiveMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(EmissiveMap);
 	EmissiveMap = Texture;
@@ -1098,7 +1098,7 @@ bool ZERNStandardMaterial::GetNormalMapEnabled() const
 	return NormalMapEnabled;
 }
 
-void ZERNStandardMaterial::SetNormalMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetNormalMap(const ZEGRTexture2D* Texture)
 {
 	NormalMap = Texture;
 	NormalMapFile = "";
@@ -1196,7 +1196,7 @@ float ZERNStandardMaterial::GetHeightMapScale() const
 	return Constants.HeightMapScale;
 }
 
-void ZERNStandardMaterial::SetHeightMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetHeightMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(HeightMap);
 	HeightMap = Texture;
@@ -1265,7 +1265,7 @@ bool ZERNStandardMaterial::GetOpacityMapEnabled() const
 	return OpacityMapEnabled;
 }
 
-void ZERNStandardMaterial::SetOpacityMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetOpacityMap(const ZEGRTexture2D* Texture)
 {
 	OpacityMap = Texture;
 	OpacityMapFile = "";
@@ -1318,7 +1318,7 @@ bool ZERNStandardMaterial::GetEnvironmentMapEnabled() const
 	return EnvironmentMapEnabled;
 }
 
-void ZERNStandardMaterial::SetEnvironmentMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetEnvironmentMap(const ZEGRTexture2D* Texture)
 {
 	EnvironmentMap = Texture;
 	EnvironmentMapFile = "";
@@ -1551,7 +1551,7 @@ float ZERNStandardMaterial::GetDetailBaseMapAttenuationFactor() const
 	return Constants.DetailBaseMapAttenuationFactor;
 }
 
-void ZERNStandardMaterial::SetDetailBaseMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetDetailBaseMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(DetailBaseMap);
 	DetailBaseMap = Texture;
@@ -1665,7 +1665,7 @@ float ZERNStandardMaterial::GetDetailNormalMapAttenuationFactor() const
 	return Constants.DetailNormalMapAttenuationFactor;
 }
 
-void ZERNStandardMaterial::SetDetailNormalMap(ZEGRTexture2D* Texture)
+void ZERNStandardMaterial::SetDetailNormalMap(const ZEGRTexture2D* Texture)
 {
 	UnregisterExternalResource(DetailNormalMap);
 	DetailNormalMap = Texture;

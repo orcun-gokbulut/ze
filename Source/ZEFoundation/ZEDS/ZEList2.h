@@ -262,12 +262,16 @@ void ZEList2<ZEItemType>::AddBegin(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->InUse, "Link already cointained in a list.");
+	zeDebugCheck(Link->List != NULL, "Link already cointained in a list.");
 
 	if (First == NULL)
 	{
-		Link->InUse = true;
 		First = Link;
 		Last = Link;
+		Link->InUse = true;
+		#ifdef ZE_DEBUG_ENABLE
+		Link->List = this;
+		#endif
 		Count++;
 	}
 	else
@@ -281,12 +285,17 @@ void ZEList2<ZEItemType>::AddEnd(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
 	zeDebugCheck(Link->InUse, "Link already cointained in a list.");
+	zeDebugCheck(Link->List != NULL, "Link already cointained in a list.");
 
 	if (Last == NULL)
 	{
-		Link->InUse = true;
 		First = Link;
 		Last = Link;
+		Link->InUse = true;
+		#ifdef ZE_DEBUG_ENABLE
+		Link->List = this;
+		#endif
+
 		Count++;
 	}
 	else
@@ -299,13 +308,17 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::InsertBefore(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-	zeDebugCheck(!Exists(Link), "Link parameter is not in this list.");
+	zeDebugCheck(Link->List != this, "Link is not contained in this list.");
 	zeDebugCheck(NewLink == NULL, "NewLink parameter cannot be null.");
 	zeDebugCheck(NewLink->InUse, "NewLink already cointained in a list.");
-
+	zeDebugCheck(NewLink->List != NULL, "NewLink already cointained in a list.");
+	
 	NewLink->Prev = Link->Prev;
 	NewLink->Next = Link;
 	NewLink->InUse = true;
+	#ifdef ZE_DEBUG_ENABLE
+	NewLink->List = this;
+	#endif
 
 	if (Link->Prev == NULL)
 		First = NewLink;
@@ -321,13 +334,17 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::InsertAfter(ZELink<ZEItemType>* Link, ZELink<ZEItemType>* NewLink)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-	zeDebugCheck(!Exists(Link), "Link parameter is not in this list.");
+	zeDebugCheck(Link->List != this, "Link is not contained in this list.");
 	zeDebugCheck(NewLink == NULL, "NewLink parameter cannot be null.");
 	zeDebugCheck(NewLink->InUse, "NewLink already cointained in a list.");
+	zeDebugCheck(NewLink->List != NULL, "NewLink already cointained in a list.");
 
 	NewLink->Prev = Link;
 	NewLink->Next = Link->Next;
 	NewLink->InUse = true;
+	#ifdef ZE_DEBUG_ENABLE
+	NewLink->List = this;
+	#endif
 
 	if (Link->Next == NULL)
 		Last = NewLink;
@@ -343,7 +360,7 @@ template<typename ZEItemType>
 void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 {
 	zeDebugCheck(Link == NULL, "Link parameter cannot be null.");
-	zeDebugCheck(!Exists(Link), "Link is not in this list.");
+	zeDebugCheck(Link->List != this, "Link is not contained in this list.");
 
 	if (Link->Prev == NULL)
 		First = Link->Next;
@@ -355,9 +372,12 @@ void ZEList2<ZEItemType>::Remove(ZELink<ZEItemType>* Link)
 	else
 		Link->Next->Prev = Link->Prev;
 
-	Link->InUse = false;
 	Link->Prev = NULL;
 	Link->Next = NULL;
+	Link->InUse = false;
+	#ifdef ZE_DEBUG_ENABLE
+	Link->List = NULL;
+	#endif
 
 	Count--;
 }
@@ -402,6 +422,9 @@ inline void ZEList2<ZEItemType>::Clean()
 		Link->Prev = NULL;
 		Link->Next = NULL;
 		Link->InUse = false;
+		#ifdef ZE_DEBUG_ENABLE
+		Link->List = NULL;
+		#endif
 		Link = Temp;
 	}
 

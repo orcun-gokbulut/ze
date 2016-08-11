@@ -87,7 +87,7 @@ ZEStateScreen::ZEStateScreen()
 	LastLoadingPercentage = -1;
 	LastOutputBufferCount = 0;
 
-	SetEntityFlags(ZE_EF_TICKABLE_CUSTOM | ZE_EF_RENDERABLE);
+	SetEntityFlags(ZE_EF_RENDERABLE_CUSTOM);
 }
 
 ZEStateScreen::~ZEStateScreen()
@@ -111,11 +111,8 @@ ZEUIManager* ZEStateScreen::GetManager()
 	return Manager;
 }
 
-void ZEStateScreen::Tick(float ElapsedTime)
+bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)
 {
-	if (!IsLoaded())
-		return;
-
 	ZEUInt LoadingPercentage = GetScene()->GetLoadingPercentage();
 	if (LoadingPercentage == 100)
 	{
@@ -132,13 +129,7 @@ void ZEStateScreen::Tick(float ElapsedTime)
 			LastLoadingPercentage = LoadingPercentage;
 		}
 	}
-}
 
-bool ZEStateScreen::PreRender(const ZERNPreRenderParameters* Parameters)
-{
-	if (Parameters->Type != ZERN_PRT_COLOR)
-		return false;
-	
 	/*// Resize
 	for (ZESize I = 0; ConsoleLines.GetCount(); I++)
 		ConsoleLines[I]->SetWidth(Parameters->View->Viewport.GetWidth() - 100);

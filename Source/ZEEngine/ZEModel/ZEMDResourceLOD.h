@@ -84,9 +84,7 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		ZEHolder<const ZEGRIndexBuffer>			IndexBuffer;
 
 		ZEInt									MaterialID; // Backwards Compatibility
-		ZEHolder<const ZERNMaterial>			Material;
-
-
+		
 												ZEMDResourceLOD();
 		virtual									~ZEMDResourceLOD();
 
@@ -141,12 +139,6 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 
 		void									SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer);
 		ZEHolder<const ZEGRIndexBuffer>			GetIndexBuffer() const;
-
-		void									SetMaterial(ZEHolder<const ZERNMaterial> Material);
-		ZEHolder<const ZERNMaterial>			GetMaterial() const;
-
-		void									SetMaterialFileName(const ZEString& MaterialFilePath);
-		const ZEString&							GetMaterialFileName();
 
 		const ZEArray<ZEMDResourceDraw>&		GetDraws() const;
 		void									AddDraw(const ZEMDResourceDraw& Draw);

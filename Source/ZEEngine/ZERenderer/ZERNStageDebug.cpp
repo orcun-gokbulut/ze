@@ -183,7 +183,7 @@ bool ZERNStageDebug::SetupBoundingBoxVertexBuffer()
 	ze_for_each(Command, Commands)
 	{
 		ZEEntity* Entity = Command->Entity;
-		//if (Entity->GetClass() == ZEModel::Class())
+		if (Entity != NULL && Entity->GetClass() == ZEModel::Class())
 		{
 			ZEAABBox Box = Entity->GetWorldBoundingBox();
 			Vertices.Add(Box.Min);

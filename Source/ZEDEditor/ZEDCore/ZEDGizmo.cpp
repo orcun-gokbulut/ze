@@ -1051,7 +1051,7 @@ ZEEntityResult ZEDGizmo::UnloadInternal()
 	MaterialTriangles.Release();
 	DirtyGizmoFlags.RaiseAll();
 
-	ZE_ENTITY_DEINITIALIZE_CHAIN(ZEEntity);
+	ZE_ENTITY_UNLOAD_CHAIN(ZEEntity);
 	return ZE_ER_DONE;
 }
 
