@@ -1,145 +1,224 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
-  <Type Name="ZEArray&lt;*&gt;"> 
-	<Expand> 
-		<Item Name="Count">Count</Item>
-		<ArrayItems>
-			<Size>Count</Size>
-			<ValuePointer>Items</ValuePointer>
-		</ArrayItems>
-	</Expand> 
+  <Type Name="ZEArray&lt;*&gt;">
+    <Expand>
+      <Item Name="Count">Count</Item>
+      <ArrayItems>
+        <Size>Count</Size>
+        <ValuePointer>Items</ValuePointer>
+      </ArrayItems>
+    </Expand>
   </Type>
-  <Type Name="ZEList2&lt;*&gt;"> 
-	<Expand> 
-		<Item Name="Count">Count</Item>
-		<LinkedListItems>
-			<HeadPointer>First</HeadPointer>
-			<NextPointer>Next</NextPointer>
-			<ValueNode>Item</ValueNode>
-		</LinkedListItems>
-	</Expand> 
+  <Type Name="ZEList2&lt;*&gt;">
+    <Expand>
+      <Item Name="Count">Count</Item>
+      <LinkedListItems>
+        <Size>Count</Size>
+        <HeadPointer>First</HeadPointer>
+        <NextPointer>Next</NextPointer>
+        <ValueNode>Item</ValueNode>
+      </LinkedListItems>
+    </Expand>
   </Type>
   <Type Name="ZEString">
     <DisplayString>{(Buffer != 0 ? Buffer : ""), s}</DisplayString>
     <StringView>(Buffer != 0 ? Buffer : ""),s</StringView>
   </Type>
-	<Type Name="ZEVariant">
-		<DisplayString Condition="Type == ZE_VRT_UNDEFINED">UNDEFINED</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_NULL">NULL</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_FLOAT">Float={Value.Float}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_DOUBLE">Double={Value.Double}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_INTEGER_8">ZEInt8={(ZEInt8)Value.Int32}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_INTEGER_16">ZEInt16={(ZEInt16)Value.Int32}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_INTEGER_32">ZEInt32={(ZEInt32)Value.Int32}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_INTEGER_64">ZEInt64={(ZEInt64)Value.Int64}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_8">ZEUInt8={(ZEUInt8)Value.Int32}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_16">ZEUInt16={(ZEUInt16)Value.Int32}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_32">ZEUInt32={(ZEUInt32)Value.Int32}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_64">ZEUInt64={(ZEUInt64)Value.Int64}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_BOOLEAN">Bool={Value.Boolean}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_STRING">ZEString={Value.String}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_QUATERNION">ZEQuaternion={*(ZEQuaternion*)&amp;Value.Vectors}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_VECTOR2">ZEVector2={*(ZEVector2*)&amp;Value.Vectors}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_VECTOR3">ZEVector3={*(ZEVector3*)&amp;Value.Vectors}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_VECTOR4">ZEVector4={*(ZEVector4*)&amp;Value.Vectors}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_MATRIX3X3">ZEMatrix3x3={*Value.Matrix3x3}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_MATRIX4X4">ZEMatrix4x4={*Value.Matrix4x4}</DisplayString>
-		<DisplayString Condition="Type == ZE_VRT_CLASS">ZEObject={(ZEObject*)Value.Pointer}</DisplayString>
+  <Type Name="ZEVariant">
+    <DisplayString Condition="Type == ZE_VRT_UNDEFINED">UNDEFINED</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_NULL">NULL</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_FLOAT">Float={Value.Float}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_DOUBLE">Double={Value.Double}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_INTEGER_8">ZEInt8={(ZEInt8)Value.Int32}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_INTEGER_16">ZEInt16={(ZEInt16)Value.Int32}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_INTEGER_32">ZEInt32={(ZEInt32)Value.Int32}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_INTEGER_64">ZEInt64={(ZEInt64)Value.Int64}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_8">ZEUInt8={(ZEUInt8)Value.Int32}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_16">ZEUInt16={(ZEUInt16)Value.Int32}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_32">ZEUInt32={(ZEUInt32)Value.Int32}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_UNSIGNED_INTEGER_64">ZEUInt64={(ZEUInt64)Value.Int64}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_BOOLEAN">Bool={Value.Boolean}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_STRING">ZEString={Value.String}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_QUATERNION">ZEQuaternion={*(ZEQuaternion*)&amp;Value.Vectors}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_VECTOR2">ZEVector2={*(ZEVector2*)&amp;Value.Vectors}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_VECTOR3">ZEVector3={*(ZEVector3*)&amp;Value.Vectors}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_VECTOR4">ZEVector4={*(ZEVector4*)&amp;Value.Vectors}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_MATRIX3X3">ZEMatrix3x3={*Value.Matrix3x3}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_MATRIX4X4">ZEMatrix4x4={*Value.Matrix4x4}</DisplayString>
+    <DisplayString Condition="Type == ZE_VRT_CLASS">ZEObject={(ZEObject*)Value.Pointer}</DisplayString>
     <!--<StringView Condition="Type == ZE_VRT_STRING">(String.Buffer != 0 ? String.Buffer : ""),s</StringView>-->
-		<Expand>
-			<Item Name="Type">Type</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_FLOAT">(Value.Float)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_DOUBLE">(Value.Double)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_INTEGER_8">((ZEInt8)Value.Int32)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_INTEGER_16">((ZEInt16)Value.Int32)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_INTEGER_32">((ZEInt32)Value.Int32)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_INTEGER_64">((ZEInt64)Value.Int64)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_8">((ZEUInt8)Value.Int32)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_16">((ZEUInt16)Value.Int32)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_32">((ZEUInt32)Value.Int32)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_64">((ZEUInt64)Value.Int64)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_BOOLEAN">(Value.Boolean)</Item>
+    <Expand>
+      <Item Name="Type">Type</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_FLOAT">(Value.Float)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_DOUBLE">(Value.Double)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_INTEGER_8">((ZEInt8)Value.Int32)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_INTEGER_16">((ZEInt16)Value.Int32)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_INTEGER_32">((ZEInt32)Value.Int32)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_INTEGER_64">((ZEInt64)Value.Int64)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_8">((ZEUInt8)Value.Int32)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_16">((ZEUInt16)Value.Int32)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_32">((ZEUInt32)Value.Int32)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_UNSIGNED_INTEGER_64">((ZEUInt64)Value.Int64)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_BOOLEAN">(Value.Boolean)</Item>
       <Item Name="Value" Condition="Type == ZE_VRT_STRING">(Value.String)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_QUATERNION">(*(ZEQuaternion*)&amp;Value.Vectors)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_VECTOR2">(*(ZEVector2*)&amp;Value.Vectors)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_VECTOR3">(*(ZEVector3*)&amp;Value.Vectors)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_VECTOR4">(*(ZEVector4*)&amp;Value.Vectors)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_MATRIX3X3">(*Value.Matrix3x3)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_MATRIX4X4">(*Value.Matrix4x4)</Item>
-			<Item Name="Value" Condition="Type == ZE_VRT_CLASS">((ZEObject*)Value.Pointer)</Item>
-		</Expand>
-	</Type>
-	<Type Name="ZEVector2"> 
-		<DisplayString>&lt;x={x}, y={y}&gt;</DisplayString>
-		<Expand>
-			<Item Name="x">x</Item>
-			<Item Name="y">y</Item>
-		</Expand>
-	</Type>
-	<Type Name="ZEVector3">
-		<DisplayString>&lt;x={x}, y={y}, z={z}&gt;</DisplayString>
-		<Expand>
-			<Item Name="x">x</Item>
-			<Item Name="y">y</Item>
-			<Item Name="z">z</Item>
-		</Expand>
-	</Type>
-	<Type Name="ZEVector4">
-		<DisplayString>&lt;x={x}, y={y}, z={z}, w={w}&gt;</DisplayString>
-		<Expand>
-			<Item Name="x">x</Item>
-			<Item Name="y">y</Item>
-			<Item Name="z">z</Item>
-			<Item Name="w">w</Item>
-		</Expand>
-	</Type>
-	<Type Name="ZEQuaternion">
-		<DisplayString>&lt;x={x}, y={y}, z={z}, w={w}&gt;</DisplayString>
-		<Expand>
-			<Item Name="x">x</Item>
-			<Item Name="y">y</Item>
-			<Item Name="z">z</Item>
-			<Item Name="w">w</Item>
-		</Expand>
-	</Type>
-	<Type Name="ZEMatrix3x3">
-		<DisplayString>
-      ZEMatrix4x4
-    </DisplayString>
-		<Expand>
-			<Item Name="M11">M11</Item> 
-			<Item Name="M12">M12</Item> 
-			<Item Name="M13">M13</Item> 
-			<Item Name="M21">M21</Item> 
-			<Item Name="M22">M22</Item> 
-			<Item Name="M23">M23</Item> 
-			<Item Name="M31">M31</Item> 
-			<Item Name="M32">M32</Item> 
-			<Item Name="M33">M33</Item> 
-		</Expand>
-	</Type>
-	<Type Name="ZEMatrix4x4">
-		<DisplayString>
-        ZEMatrix4x4
-		</DisplayString>
-		<Expand>
-			<Item Name="M11">M11</Item> 
-			<Item Name="M12">M12</Item> 
-			<Item Name="M13">M13</Item> 
-			<Item Name="M14">M14</Item>
-			<Item Name="M21">M21</Item> 
-			<Item Name="M22">M22</Item> 
-			<Item Name="M23">M23</Item> 
-			<Item Name="M24">M24</Item> 
-			<Item Name="M31">M31</Item> 
-			<Item Name="M32">M32</Item> 
-			<Item Name="M33">M33</Item> 
-			<Item Name="M34">M34</Item> 
-			<Item Name="M41">M41</Item> 
-			<Item Name="M42">M42</Item> 
-			<Item Name="M43">M43</Item> 
-			<Item Name="M44">M44</Item>
-		</Expand>
-	</Type>
+      <Item Name="Value" Condition="Type == ZE_VRT_QUATERNION">(*(ZEQuaternion*)&amp;Value.Vectors)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_VECTOR2">(*(ZEVector2*)&amp;Value.Vectors)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_VECTOR3">(*(ZEVector3*)&amp;Value.Vectors)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_VECTOR4">(*(ZEVector4*)&amp;Value.Vectors)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_MATRIX3X3">(*Value.Matrix3x3)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_MATRIX4X4">(*Value.Matrix4x4)</Item>
+      <Item Name="Value" Condition="Type == ZE_VRT_CLASS">((ZEObject*)Value.Pointer)</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEVector2">
+    <DisplayString>&lt;x:{x}, y:{y}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEVector2d">
+    <DisplayString>&lt;x:{x}, y:{y}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEVector3">
+    <DisplayString>&lt;x:{x}, y:{y}, z:{z}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEVector3d">
+    <DisplayString>&lt;x:{x}, y:{y}, z:{z}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEVector4">
+    <DisplayString>&lt;x:{x}, y:{y}, z:{z}, w:{w}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+      <Item Name="w">w</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEVector4d">
+    <DisplayString>&lt;x:{x}, y:{y}, z:{z}, w:{w}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+      <Item Name="w">w</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEQuaternion">
+    <DisplayString>&lt;x:{x}, y:{y}, z:{z}, w:{w}&gt;</DisplayString>
+    <Expand>
+      <Item Name="x">x</Item>
+      <Item Name="y">y</Item>
+      <Item Name="z">z</Item>
+      <Item Name="w">w</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEMatrix3x3">
+    <DisplayString>ZEMatrix3x3</DisplayString>
+    <Expand>
+      <Item Name="M11">M11</Item>
+      <Item Name="M12">M12</Item>
+      <Item Name="M13">M13</Item>
+      <Item Name="M21">M21</Item>
+      <Item Name="M22">M22</Item>
+      <Item Name="M23">M23</Item>
+      <Item Name="M31">M31</Item>
+      <Item Name="M32">M32</Item>
+      <Item Name="M33">M33</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEMatrix3x3d">
+    <DisplayString>ZEMatrix3x3d</DisplayString>
+    <Expand>
+      <Item Name="M11">M11</Item>
+      <Item Name="M12">M12</Item>
+      <Item Name="M13">M13</Item>
+      <Item Name="M21">M21</Item>
+      <Item Name="M22">M22</Item>
+      <Item Name="M23">M23</Item>
+      <Item Name="M31">M31</Item>
+      <Item Name="M32">M32</Item>
+      <Item Name="M33">M33</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEMatrix4x4">
+    <DisplayString>ZEMatrix4x4</DisplayString>
+    <Expand>
+      <Item Name="M11">M11</Item>
+      <Item Name="M12">M12</Item>
+      <Item Name="M13">M13</Item>
+      <Item Name="M14">M14</Item>
+      <Item Name="M21">M21</Item>
+      <Item Name="M22">M22</Item>
+      <Item Name="M23">M23</Item>
+      <Item Name="M24">M24</Item>
+      <Item Name="M31">M31</Item>
+      <Item Name="M32">M32</Item>
+      <Item Name="M33">M33</Item>
+      <Item Name="M34">M34</Item>
+      <Item Name="M41">M41</Item>
+      <Item Name="M42">M42</Item>
+      <Item Name="M43">M43</Item>
+      <Item Name="M44">M44</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEMatrix4x4d">
+    <DisplayString>ZEMatrix4x4d</DisplayString>
+    <Expand>
+      <Item Name="M11">M11</Item>
+      <Item Name="M12">M12</Item>
+      <Item Name="M13">M13</Item>
+      <Item Name="M14">M14</Item>
+      <Item Name="M21">M21</Item>
+      <Item Name="M22">M22</Item>
+      <Item Name="M23">M23</Item>
+      <Item Name="M24">M24</Item>
+      <Item Name="M31">M31</Item>
+      <Item Name="M32">M32</Item>
+      <Item Name="M33">M33</Item>
+      <Item Name="M34">M34</Item>
+      <Item Name="M41">M41</Item>
+      <Item Name="M42">M42</Item>
+      <Item Name="M43">M43</Item>
+      <Item Name="M44">M44</Item>
+    </Expand>
+  </Type>
+  <Type Name="ZEAABBox">
+    <DisplayString>[Min:&lt;x:{Min.x}, y:{Min.y}, z:{Min.z}&gt;, Max:&lt;x:{Min.x}, y:{Min.y}, z:{Min.z}&gt;]</DisplayString>
+    <Expand>
+      <Item Name="Min">Min</Item>
+      <Item Name="Max">Max</Item>
+      <Synthetic  Name="Center">
+        <DisplayString>&lt;x:{Min.x + (Max.x - Min.x)}, y:{Min.y + (Max.y - Min.y)}, z:{Min.z + (Max.z - Min.z)}&gt;</DisplayString>
+        <Expand>
+          <Item Name="x">Min.x + (Max.x - Min.x)</Item>
+          <Item Name="y">Min.y + (Max.y - Min.y)</Item>
+          <Item Name="z">Min.z + (Max.z - Min.z)</Item>
+        </Expand>
+      </Synthetic >
+      <Synthetic  Name="Size">
+        <DisplayString>&lt;x:{Max.x - Min.x}, y:{Max.y - Min.y}, z:{Max.z - Min.z}&gt;</DisplayString>
+        <Expand>
+          <Item Name="x">Max.x - Min.x</Item>
+          <Item Name="y">Max.y - Min.y</Item>
+          <Item Name="z">Max.z - Min.z</Item>
+        </Expand>
+      </Synthetic >
+    </Expand>
+  </Type>
 </AutoVisualizer>
