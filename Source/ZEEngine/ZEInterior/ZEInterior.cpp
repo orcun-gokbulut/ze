@@ -272,10 +272,10 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 
 		ZEVector3 PointsTemp[32];
 		ZESize PointTempCount;
-		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetClippingPlane(ZE_FP_LEFT),		Points, PointsCount);
-		IntersectionTest(Points, PointsCount,			Frustum->GetClippingPlane(ZE_FP_RIGHT),		PointsTemp, PointTempCount);
-		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetClippingPlane(ZE_FP_DOWN),		Points, PointsCount);
-		IntersectionTest(Points, PointsCount,			Frustum->GetClippingPlane(ZE_FP_UP),		PointsTemp, PointTempCount);
+		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetPlane(ZE_FP_LEFT),		Points, PointsCount);
+		IntersectionTest(Points, PointsCount,			Frustum->GetPlane(ZE_FP_RIGHT),		PointsTemp, PointTempCount);
+		IntersectionTest(PointsTemp, PointTempCount,	Frustum->GetPlane(ZE_FP_DOWN),		Points, PointsCount);
+		IntersectionTest(Points, PointsCount,			Frustum->GetPlane(ZE_FP_UP),		PointsTemp, PointTempCount);
 
 		if (PointsCount == 0)
 			return false;
@@ -285,62 +285,52 @@ bool ZEInterior::GenerateViewVolume(ZEViewFrustum& NewViewVolume, ZEInteriorDoor
 
  		float LeftDotProduct = -1.0f; float RightDotProduct = -1.0f;
  		float TopDotProduct = -1.0f; float BottomDotProduct = -1.0f;
-		//ZEVector3 LeftPoint, RightPoint, TopPoint, BottomPoint;
 		ZEPlane LeftPlane, RightPlane, TopPlane, BottomPlane;
 
 		for (ZESize I = 0; I < PointsCount; I++)
 		{
-			ZEPlane::Create(VerticalPlane, Frustum->Position, Points[I], Points[I] - Frustum->Up);
+			ZEPlane::Create(VerticalPlane, Frustum->GetPosition(), Points[I], Points[I] - Frustum->GetUp());
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_LEFT).n, VerticalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetPlane(ZE_FP_LEFT).n, VerticalPlane.n);
 
 			if (TempDotProduct > LeftDotProduct)
 			{
 				LeftDotProduct = TempDotProduct;
 				LeftPlane.n = VerticalPlane.n;
-				LeftPlane.p = Frustum->Position;
-				//LeftPoint = Points[I];
+				LeftPlane.p = Frustum->GetPosition();
 			}
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_RIGHT).n, -VerticalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetPlane(ZE_FP_RIGHT).n, -VerticalPlane.n);
 
 			if (TempDotProduct > RightDotProduct)
 			{
 				RightDotProduct = TempDotProduct;
 				RightPlane.n = -VerticalPlane.n;
-				RightPlane.p = Frustum->Position;
-				//RightPoint = Points[I];
+				RightPlane.p = Frustum->GetPosition();
 			}
 
-			ZEPlane::Create(HorizontalPlane, Frustum->Position, Points[I], Points[I] - Frustum->Right);
+			ZEPlane::Create(HorizontalPlane, Frustum->GetPosition(), Points[I], Points[I] - Frustum->GetRight());
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_UP).n, HorizontalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetPlane(ZE_FP_UP).n, HorizontalPlane.n);
 
 			if (TempDotProduct > TopDotProduct)
 			{
 				TopDotProduct = TempDotProduct;
 				TopPlane.n = HorizontalPlane.n;
-				TopPlane.p = Frustum->Position;
-				//TopPoint = Points[I];
+				TopPlane.p = Frustum->GetPosition();
 			}
 
-			TempDotProduct = ZEVector3::DotProduct(Frustum->GetClippingPlane(ZE_FP_DOWN).n, -HorizontalPlane.n);
+			TempDotProduct = ZEVector3::DotProduct(Frustum->GetPlane(ZE_FP_DOWN).n, -HorizontalPlane.n);
 
 			if (TempDotProduct > BottomDotProduct)
 			{
 				BottomDotProduct = TempDotProduct;
 				BottomPlane.n = -HorizontalPlane.n;
-				BottomPlane.p = Frustum->Position;
-				//BottomPoint = Points[I];
+				BottomPlane.p = Frustum->GetPosition();
 			}
 		}
 
-		ZEViewFrustum::Create(NewViewVolume, LeftPlane, RightPlane, BottomPlane, TopPlane, Frustum->GetClippingPlane(ZE_FP_NEAR), Frustum->GetClippingPlane(ZE_FP_FAR));
-		NewViewVolume.Position = Frustum->Position;
-		NewViewVolume.Right = Frustum->Right;
-		NewViewVolume.Up = Frustum->Up;
-		NewViewVolume.Look = Frustum->Look;
-
+		ZEViewFrustum::Create(NewViewVolume, LeftPlane, RightPlane, BottomPlane, TopPlane, Frustum->GetPlane(ZE_FP_NEAR), Frustum->GetPlane(ZE_FP_FAR));
 		return true;
 	}
 
@@ -395,7 +385,7 @@ void ZEInterior::CullRooms(const ZERNPreRenderParameters* Parameters)
 		if (Parameters->View->ViewVolume->GetViewVolumeType() == ZE_VVT_FRUSTUM)
 		{
 			ZEViewFrustum* Frustum = (ZEViewFrustum*)Parameters->View->ViewVolume;
-			ZEVector3 FrustumPosition = Frustum->Position;
+			ZEVector3 FrustumPosition = Frustum->GetPosition();
 
 			for (ZESize I = 0; I < RoomCount; I++)
 			{
