@@ -159,16 +159,27 @@ void ZEEntity::ParentTransformChanged()
 	for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
 		ChildEntities[I]->ParentTransformChanged();
 
-	if (GetStatic() && GetScene() != NULL)
-		GetScene()->EntityBoundingBoxChanged(this);
+	if (GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && GetStatic() && GetScene() != NULL)
+		GetScene()->UpdateOctree(this);
 }
 
 void ZEEntity::BoundingBoxChanged()
 {
 	EntityDirtyFlags.RaiseFlags(ZE_EDF_WORLD_BOUNDING_BOX);
 
-	if (GetStatic() && GetScene() != NULL)
-		GetScene()->EntityBoundingBoxChanged(this);
+	if (!GetEntityFlags().GetFlags(ZE_EF_CULLABLE))
+		return;
+	
+	if (!GetStatic())
+		return;
+
+	if (GetScene() != NULL)
+		return;
+
+	if (!GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !IsLoaded())
+		return;
+
+	GetScene()->UpdateOctree(this);
 }
 
 bool ZEEntity::AddComponent(ZEEntity* Entity)
@@ -341,13 +352,15 @@ void ZEEntity::SetScene(ZEScene* NewScene)
 		ChildEntities[I]->SetScene(Scene);
 }
 
-void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
+void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox, bool NoEvent)
 {
 	if (this->BoundingBox.Min == BoundingBox.Min && this->BoundingBox.Max == BoundingBox.Max)
 		return;
 
 	this->BoundingBox = BoundingBox;
-	BoundingBoxChanged();
+
+	if (!NoEvent)
+		BoundingBoxChanged();
 }
 
 ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Parameters)

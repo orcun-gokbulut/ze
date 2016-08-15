@@ -357,12 +357,26 @@ void ZEMDResource::AddMesh(ZEMDResourceMesh* Mesh)
 
 	Mesh->Resource = this;
 	Meshes.AddEnd(&Mesh->Link);
+
+	for (ZESize I = 0; I < Mesh->LODs.GetCount(); I++)
+	{
+		ZEMDResourceLOD* CurrentLOD = Mesh->LODs[I];
+		for (ZESize N = 0; N < CurrentLOD->GetDraws().GetCount(); N++)
+			RegisterExternalResource(CurrentLOD->GetDraws()[N].GetMaterial());
+	}
 }
 
 void ZEMDResource::RemoveMesh(ZEMDResourceMesh* Mesh)
 {
 	zeCheckError(Mesh == NULL, ZE_VOID, "Cannot add mesh. Mesh is NULL.");
 	zeCheckError(Mesh->Resource != this, ZE_VOID, "Cannot remove mesh. Mesh does not belong to this resource.");
+
+	for (ZESize I = 0; I < Mesh->LODs.GetCount(); I++)
+	{
+		ZEMDResourceLOD* CurrentLOD = Mesh->LODs[I];
+		for (ZESize N = 0; N < CurrentLOD->GetDraws().GetCount(); N++)
+			UnregisterExternalResource(CurrentLOD->GetDraws()[N].GetMaterial());
+	}
 
 	Mesh->Resource = NULL;
 	Meshes.Remove(&Mesh->Link);

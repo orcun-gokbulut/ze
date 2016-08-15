@@ -65,6 +65,9 @@ class ZERNCommand;
 class ZEMLWriterNode;
 class ZEMLReaderNode;
 
+template<typename ZEItemType>
+class ZEOctree;
+
 typedef ZEFlags ZEEntityFlags;
 ZE_ENUM(ZEEntityFlag)
 {
@@ -158,6 +161,7 @@ class ZEEntity : public ZEObject
 
 		ZELink<ZEEntity>						TickListLink;
 		ZELink<ZEEntity>						RenderListLink;
+		ZEOctree<ZEEntity*>*					RenderListOctree;
 
 		#ifdef ZE_DEBUG_ENABLE
 		bool									LoadInternalChainCheck;
@@ -232,7 +236,7 @@ class ZEEntity : public ZEObject
 		void									RemoveChildEntity(ZEEntity* Entity);
 		void									ClearChildEntities();
 
-		void									SetBoundingBox(const ZEAABBox& BoundingBox);
+		void									SetBoundingBox(const ZEAABBox& BoundingBox, bool NoEvent = false);
 		virtual const ZEAABBox&					GetBoundingBox() const;
 		virtual const ZEAABBox&					GetWorldBoundingBox() const;
 

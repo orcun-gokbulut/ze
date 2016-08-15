@@ -198,15 +198,18 @@ void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 
 void ZEScene::AddToRenderList(ZEEntity* Entity)
 {
-	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "PreRendering an entity which is not loaded.");
-	zeDebugCheck(!Entity->GetVisible(), "PreRendering an entity which is not visible.");
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Adding an entity to render list which is not loaded.");
+	zeDebugCheck(!Entity->GetVisible(), "Adding an entity to render list which is not visible.");
 
 	if (Entity->RenderListLink.GetInUse())
 		return;
 
 	ZE_LOCK_SECTION(RenderListLock)
 	{
-		RenderList.AddEnd(&Entity->RenderListLink);
+		if (Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && Entity->GetStatic())
+			RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+		else
+			RenderList.AddEnd(&Entity->RenderListLink);
 	}
 }
 
@@ -217,27 +220,25 @@ void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 
 	ZE_LOCK_SECTION(RenderListLock)
 	{
-		if (Entity->GetStatic())
+		if (Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE) && Entity->GetStatic())
 			RenderListOctree.RemoveItem(Entity, Entity->GetWorldBoundingBox());
-
-		RenderList.Remove(&Entity->RenderListLink);
+		else
+			RenderList.Remove(&Entity->RenderListLink);
 	}
 }
 
-void ZEScene::EntityBoundingBoxChanged(ZEEntity* Entity)
+void ZEScene::UpdateOctree(ZEEntity* Entity)
 {
-	if (!Entity->GetStatic())
-		return;
-
-	if (!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded())
-		return;
-
-	return;
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_CULLABLE), "Non-culluble entity updating octree.");
+	zeDebugCheck(!Entity->GetStatic(), "Non-static entity updating octree.");
+	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded(), "Not loaded entity updating octree.");
 
 	ZE_LOCK_SECTION(RenderListLock)
 	{
-		RenderListOctree.RemoveItem(Entity);
-		RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+		if (Entity->RenderListOctree != NULL)
+			Entity->RenderListOctree->RemoveItem(Entity);
+
+		Entity->RenderListOctree = RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());	
 	}
 }
 
