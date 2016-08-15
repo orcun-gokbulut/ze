@@ -212,14 +212,24 @@ float ZEVector2::Max() const
 
 bool ZEVector2::Equals(const ZEVector2& Vector) const
 {
-	return ((ZEMath::Abs(this->x - Vector.x) < ZE_ZERO_THRESHOLD) && 
-		(ZEMath::Abs(this->y - Vector.y) < ZE_ZERO_THRESHOLD));
+	return (x == Vector.x && y == Vector.y);
 }
 
 bool ZEVector2::Equals(const ZEVector2& Vector, float Threshold) const
 {
 	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
-		(ZEMath::Abs(this->y - Vector.y) < Threshold));
+			(ZEMath::Abs(this->y - Vector.y) < Threshold));
+}
+
+bool ZEVector2::NotEquals(const ZEVector2& Vector) const
+{
+	return (x != Vector.x || y != Vector.y);
+}
+
+bool ZEVector2::NotEquals(const ZEVector2& Vector, float Threshold) const
+{
+	return ((ZEMath::Abs(x - Vector.x) >= Threshold) || 
+			(ZEMath::Abs(y - Vector.y) >= Threshold));
 }
 
 ZEVector2 ZEVector2::operator +(const ZEVector2 &RightOperand) const
@@ -314,7 +324,7 @@ bool ZEVector2::operator ==(const ZEVector2 &RightOperand) const
 
 bool ZEVector2::operator !=(const ZEVector2 &RightOperand) const
 {
-	return !Equals(RightOperand);
+	return NotEquals(RightOperand);
 }
 
 float ZEVector2::operator[](ZESize Index) const
@@ -620,16 +630,26 @@ float ZEVector3::Max() const
 
 bool ZEVector3::Equals(const ZEVector3& Vector) const
 {
-	return ((ZEMath::Abs(this->x - Vector.x) < ZE_ZERO_THRESHOLD) && 
-		(ZEMath::Abs(this->y - Vector.y) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->z - Vector.z) < ZE_ZERO_THRESHOLD));
+	return (this->x == Vector.x && this->y == Vector.y && this->z == Vector.z);
 }
 
 bool ZEVector3::Equals(const ZEVector3& Vector, float Threshold) const
 {
 	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
-		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
-		(ZEMath::Abs(this->z - Vector.z) < Threshold));
+			(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
+			(ZEMath::Abs(this->z - Vector.z) < Threshold));
+}
+
+bool ZEVector3::NotEquals(const ZEVector3& Vector) const
+{
+	return (x != Vector.x || y != Vector.y || z != Vector.z);
+}
+
+bool ZEVector3::NotEquals(const ZEVector3& Vector, float Threshold) const
+{
+	return ((ZEMath::Abs(x - Vector.x) >= Threshold) ||
+			(ZEMath::Abs(y - Vector.y) >= Threshold) ||
+			(ZEMath::Abs(z - Vector.z) >= Threshold));
 }
 
 ZEVector2 ZEVector3::ToVector2() const
@@ -728,7 +748,7 @@ bool ZEVector3::operator == (const ZEVector3 &RightOperand) const
 
 bool ZEVector3::operator != (const ZEVector3 &RightOperand) const
 {
-	return !Equals(RightOperand);
+	return NotEquals(RightOperand);
 }
 
 float ZEVector3::operator[](ZESize Index) const
@@ -918,20 +938,29 @@ float ZEVector4::Max() const
 
 bool ZEVector4::Equals(const ZEVector4& Vector) const
 {
-	return ((ZEMath::Abs(this->x - Vector.x) < ZE_ZERO_THRESHOLD) && 
-		(ZEMath::Abs(this->y - Vector.y) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->z - Vector.z) < ZE_ZERO_THRESHOLD) &&
-		(ZEMath::Abs(this->w - Vector.w) < ZE_ZERO_THRESHOLD));
+	return (x == Vector.x && y == Vector.y && z == Vector.z && w == Vector.w);
 }
 
 bool ZEVector4::Equals(const ZEVector4& Vector, float Threshold) const
 {
 	return ((ZEMath::Abs(this->x - Vector.x) < Threshold) && 
-		(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
-		(ZEMath::Abs(this->z - Vector.z) < Threshold) &&
-		(ZEMath::Abs(this->w - Vector.w) < Threshold));
+			(ZEMath::Abs(this->y - Vector.y) < Threshold) &&
+			(ZEMath::Abs(this->z - Vector.z) < Threshold) &&
+			(ZEMath::Abs(this->w - Vector.w) < Threshold));
 }
 
+bool ZEVector4::NotEquals(const ZEVector4& Vector) const
+{
+	return (x != Vector.x || y != Vector.y || z != Vector.z || w != Vector.w);
+}
+
+bool ZEVector4::NotEquals(const ZEVector4& Vector, float Threshold) const
+{
+	return ((ZEMath::Abs(this->x - Vector.x) >= Threshold) || 
+			(ZEMath::Abs(this->y - Vector.y) >= Threshold) ||
+			(ZEMath::Abs(this->z - Vector.z) >= Threshold) ||
+			(ZEMath::Abs(this->w - Vector.w) >= Threshold));
+}
 ZEVector2 ZEVector4::ToVector2() const
 {
 	return ZEVector2(x, y);
@@ -1033,7 +1062,7 @@ bool ZEVector4::operator == (const ZEVector4 &RightOperand) const
 
 bool ZEVector4::operator != (const ZEVector4 &RightOperand) const
 {
-	return !Equals(RightOperand);
+	return NotEquals(RightOperand);
 }
 
 float ZEVector4::operator[](ZESize Index) const

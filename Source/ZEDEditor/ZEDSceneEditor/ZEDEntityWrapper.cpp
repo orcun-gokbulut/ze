@@ -387,10 +387,27 @@ void ZEDEntityWrapper::Tick(float ElapsedTime)
 
 void ZEDEntityWrapper::Update()
 {
-	ZEEntity* Entity = GetEntity();
-	const ZEArray<ZEEntity*>& ChildEntities = Entity->GetChildEntities();
+	if (GetEntity() == NULL)
+	{
+		ClearChildWrappers();
+		return;
+	}
+	
+	LockWrapper();
+	SyncronizeChildWrappers((ZEObject*const*)GetEntity()->GetChildEntities().GetConstCArray(), GetEntity()->GetChildEntities().GetCount());
+	UnlockWrapper();
+}
 
-	SyncronizeChildWrappers((ZEObject*const*)ChildEntities.GetConstCArray(), ChildEntities.GetCount());
+void ZEDEntityWrapper::LockWrapper()
+{
+	if (GetEntity() != NULL)
+		GetEntity()->LockEntity();
+}
+
+void ZEDEntityWrapper::UnlockWrapper()
+{
+	if (GetEntity() != NULL)
+		GetEntity()->UnlockEntity();
 }
 
 ZEDEntityWrapper* ZEDEntityWrapper::CreateInstance()

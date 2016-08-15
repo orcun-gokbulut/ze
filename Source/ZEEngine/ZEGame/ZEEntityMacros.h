@@ -35,6 +35,8 @@
 
 #pragma once
 
+#include "ZEError.h"
+
 #define ZE_ENTITY_FUNCTION_CHAIN(BaseClass, Function) do {ZEEntityResult Result = __super::Function(); if (Result != ZE_ER_DONE) return Result;} while(false)
 #define ZE_ENTITY_LOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, LoadInternal)
 #define ZE_ENTITY_UNLOAD_CHAIN(BaseClass) ZE_ENTITY_FUNCTION_CHAIN(BaseClass, UnloadInternal)
@@ -56,7 +58,7 @@
 	} \
 	else
 
-#define ZE_ENTITY_RESOURCE_FENCE(Resource, TargetState, FailedReturn) \
+#define ZE_ENTITY_RESOURCE_FENCE(Resource, TargetState, FailedReturn, LoadPercentageStart, LoadPercentageEnd) \
 	if (Resource != NULL) \
 	{ \
 		if (Resource->IsFailed()) \
@@ -65,6 +67,26 @@
 		} \
 		else if (Resource->GetState() < TargetState) \
 		{ \
+			ZEUInt Percentage = LoadPercentageStart + (Resource->GetLoadPercentage() * (LoadPercentageEnd - LoadPercentageStart)) / 100; \
+			if (Percentage < GetLocalLoadingPercentage()) \
+				SetLocalLoadingPercentage(Percentage); \
+			return ZE_ER_WAIT; \
+		} \
+	} \
+	else
+
+#define ZE_ENTITY_RESOURCE_FENCE_PROGRESS(Resource, TargetState, FailedReturn, LoadPercentageStart, LoadPercentageEnd) \
+	if (Resource != NULL) \
+	{ \
+		if (Resource->IsFailed()) \
+		{ \
+			return FailedReturn; \
+		} \
+		else if (Resource->GetState() < TargetState) \
+		{ \
+			ZEUInt Percentage = LoadPercentageStart + (Resource->GetLoadProgress() * (LoadPercentageEnd - LoadPercentageStart)) / 100; \
+			if (Percentage < GetLocalLoadingPercentage()) \
+				SetLocalLoadingPercentage(Percentage); \
 			return ZE_ER_WAIT; \
 		} \
 	} \
@@ -74,3 +96,4 @@
 #define ZE_ENTITY_FENCE_INITIALIZED(Entity, FailedReturn) ZE_ENTITY_FENCE(Entity, ZE_ES_INITIALIZED, FailedReturn)
 #define ZE_ENTITY_RESOURCE_FENCE_STAGED(Resource, FailedReturn) ZE_ENTITY_RESOURCE_FENCE(Resource, ZERS_RS_STAGED, FailedReturn)
 #define ZE_ENTITY_RESOURCE_FENCE_LOADED(Resource, FailedReturn) ZE_ENTITY_RESOURCE_FENCE(Resource, ZERS_RS_LOADED, FailedReturn)
+#define ZE_ENTITY_RESOURCE_FENCE_LOADED_PROGRESS(Resource, FailedReturn, LoadPercentageStart, LoadPercentageEnd) ZE_ENTITY_RESOURCE_FENCE_PROGRESS(Resource, ZERS_RS_LOADED, FailedReturn, LoadPercentageStart, LoadPercentageEnd)

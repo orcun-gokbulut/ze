@@ -117,9 +117,27 @@ void ZEDSceneWrapper::RayCast(ZERayCastReport& Report, const ZERayCastParameters
 
 void ZEDSceneWrapper::Update()
 {
-	ZEScene* Scene = GetScene();
-	const ZESmartArray<ZEEntity*>& Entities = Scene->GetEntities();
-	SyncronizeChildWrappers((ZEObject*const*)Entities.GetConstCArray(), Entities.GetCount());
+	if (GetScene() == NULL)
+	{
+		ClearChildWrappers();
+		return;
+	}
+
+	LockWrapper();
+	SyncronizeChildWrappers((ZEObject*const*)GetScene()->GetEntities().GetConstCArray(), GetScene()->GetEntities().GetCount());
+	UnlockWrapper();
+}
+
+void ZEDSceneWrapper::LockWrapper()
+{
+	if (GetScene() != NULL)
+		GetScene()->LockScene();
+}
+
+void ZEDSceneWrapper::UnlockWrapper()
+{
+	if (GetScene() != NULL)
+		GetScene()->UnlockScene();
 }
 
 ZEDSceneWrapper* ZEDSceneWrapper::CreateInstance()
@@ -163,7 +181,7 @@ void ZEDSceneWrapper::PreRender(const ZERNPreRenderParameters* Parameters)
 	Parameters->Renderer->StartScene(NULL);
 
 	GetScene()->PreRender(Parameters);
-	ZEArray<ZEDObjectWrapper*> Wrappers = GetChildWrappers();
+	const ZEArray<ZEDObjectWrapper*>& Wrappers = GetChildWrappers();
 	for (ZESize I = 0; I < Wrappers.GetCount(); I++)
 		PreRenderEntity(static_cast<ZEDEntityWrapper*>(Wrappers[I]), Parameters);
 

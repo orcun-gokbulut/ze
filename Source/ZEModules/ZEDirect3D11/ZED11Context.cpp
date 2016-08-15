@@ -172,28 +172,28 @@ void ZED11Context::SetRenderState(const ZEGRRenderStateData* State)
 
 		switch ((ZEGRShaderType)I)
 		{
-		case ZEGR_ST_VERTEX:
-			Context->VSSetShader(SetShaderNull ? NULL : SrcShader->GetVertexShader(), NULL, 0);
-			break;
+			case ZEGR_ST_VERTEX:
+				Context->VSSetShader(SetShaderNull ? NULL : SrcShader->GetVertexShader(), NULL, 0);
+				break;
 
-		case ZEGR_ST_DOMAIN:
-			Context->DSSetShader(SetShaderNull ? NULL : SrcShader->GetDomainShader(), NULL, 0);
-			break;
+			case ZEGR_ST_DOMAIN:
+				Context->DSSetShader(SetShaderNull ? NULL : SrcShader->GetDomainShader(), NULL, 0);
+				break;
 
-		case ZEGR_ST_HULL:
-			Context->HSSetShader(SetShaderNull ? NULL : SrcShader->GetHullShader(), NULL, 0);
-			break;
+			case ZEGR_ST_HULL:
+				Context->HSSetShader(SetShaderNull ? NULL : SrcShader->GetHullShader(), NULL, 0);
+				break;
 
-		case ZEGR_ST_GEOMETRY:
-			Context->GSSetShader(SetShaderNull ? NULL : SrcShader->GetGeometryShader(), NULL, 0);
-			break;
+			case ZEGR_ST_GEOMETRY:
+				Context->GSSetShader(SetShaderNull ? NULL : SrcShader->GetGeometryShader(), NULL, 0);
+				break;
 
-		case ZEGR_ST_PIXEL:
-			Context->PSSetShader(SetShaderNull ? NULL : SrcShader->GetPixelShader(), NULL, 0);
-			break;
+			case ZEGR_ST_PIXEL:
+				Context->PSSetShader(SetShaderNull ? NULL : SrcShader->GetPixelShader(), NULL, 0);
+				break;
 
-		default:
-			break;
+			default:
+				break;
 		}
 		
 		UnlockContext();

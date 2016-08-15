@@ -66,12 +66,6 @@ class ZEViewVolume
 		virtual bool						IntersectionTest(const ZEAABBox& BoundingBox) const = 0;
 		virtual bool						IntersectionTest(const ZEOBBox& BoundingBox) const = 0;
 		virtual bool						IntersectionTest(const ZERectangle3D& PortalDoor) const = 0;
-
-		/*virtual bool						IntersectionTest1(const ZEBSphere& BoundingBox) const;
-		virtual bool						IntersectionTest1(const ZEAABBox& BoundingBox) const;
-		virtual bool						IntersectionTest1(const ZEOBBox& BoundingBox) const;
-		virtual bool						IntersectionTest1(const ZERectangle3D& PortalDoor) const;*/
-
 };
 
 #endif

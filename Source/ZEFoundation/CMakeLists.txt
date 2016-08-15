@@ -61,6 +61,7 @@ add_subdirectory(ZEPointer)
 add_subdirectory(ZEITIntegrity)
 
 ze_add_source(ZEAutoExp.txt						Sources Headers)
+ze_add_source(ZE.natvis							Sources Headers)
 ze_add_source(ZEData.h 							Sources Headers)
 ze_add_source(ZEData.cpp 						Sources)
 ze_add_source(ZEDLL.h 							Sources Headers)

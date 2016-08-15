@@ -60,43 +60,44 @@ class ZEThread
 {
 	ZE_COPY_NO_ACTION(ZEThread)
     private:
-        ZEString            Name;
+        ZEString					Name;
         #ifdef ZE_PLATFORM_WINDOWS
             static unsigned long __stdcall
-                            ThreadFunction(void* Thread);
-			ZEUInt			ThreadId;
-            void*			Handle;
+									ThreadFunction(void* Thread);
+			ZEUInt					ThreadId;
+            void*					Handle;
         #elif defined(ZE_PLATFORM_UNIX)
-            static void*    ThreadFunction(void* Thread);
-            pthread_t       Thread;
+            static void*			ThreadFunction(void* Thread);
+            pthread_t				Thread;
         #endif
 
-		ZEThreadStatus		Status;
-        ZEThreadFunction    Function;
-        void*				Parameter;
+		ZEThreadStatus				Status;
+        ZEThreadFunction			Function;
+        void*						Parameter;
 
 	public:
-		ZEInt				GetId();
-		ZEThreadStatus		GetStatus();
+		ZEInt						GetId();
+		ZEThreadStatus				GetStatus();
 		
-		void                SetName(const ZEString& Name);
-        const ZEString&     GetName();
+		void						SetName(const ZEString& Name);
+        const ZEString&				GetName();
 
-        void                SetFunction(ZEThreadFunction Function);
-        ZEThreadFunction&   GetFunction();
+        void						SetFunction(ZEThreadFunction Function);
+        ZEThreadFunction&			GetFunction();
 
-		void				SetParameter(void* Parameter);
-		void*				GetParameter();
+		void						SetParameter(void* Parameter);
+		void*						GetParameter();
 
-		bool                ControlPoint();
-		void				Run();
-		void				Suspend();
-		void				Terminate();
-        void                Exit();
-		void                Wait();
+		bool						ControlPoint();
+		void						Run();
+		void						Suspend();
+		void						Terminate();
+        void						Exit();
+		void						Wait();
 
-                            ZEThread();
-		virtual 			~ZEThread();
+									ZEThread();
+		virtual 					~ZEThread();
 
-        static ZEThread*    GetCurrentThread();
+		static ZEThread*			GetCurrentThread();
+		static ZEUInt64				GetCurrentThreadId();
 };

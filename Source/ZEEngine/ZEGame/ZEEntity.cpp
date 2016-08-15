@@ -343,6 +343,9 @@ void ZEEntity::SetScene(ZEScene* NewScene)
 
 void ZEEntity::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
+	if (this->BoundingBox.Min == BoundingBox.Min && this->BoundingBox.Max == BoundingBox.Max)
+		return;
+
 	this->BoundingBox = BoundingBox;
 	BoundingBoxChanged();
 }
@@ -358,6 +361,8 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	{
 		ReloadFlag = false;
 		ReinitializeFlag = false;
+		SetLocalLoadingPercentage(0);
+		UpdateRenderabilityState();
 
 		if (TargetState == ZE_ES_DESTROYED)
 		{
@@ -393,6 +398,9 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	else if (State == ZE_ES_LOADED)
 	{
 		ReinitializeFlag = false;
+		SetLocalLoadingPercentage(100);
+		UpdateRenderabilityState();
+		UpdateTickabilityState();
 
 		if (ReloadFlag || TargetState < ZE_ES_LOADED)
 		{
@@ -417,6 +425,8 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 	}
 	else if (State == ZE_ES_INITIALIZED)
 	{
+		UpdateTickabilityState();
+
 		if (ReloadFlag || ReinitializeFlag || TargetState < ZE_ES_INITIALIZED)
 		{
 			State = ZE_ES_DEINITIALIZING;
@@ -450,8 +460,6 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 			zeDebugCheck(!LoadInternalChainCheck, "LoadInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
 			State = ZE_ES_LOADED;
-			UpdateRenderabilityState();
-
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -481,9 +489,7 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 		{
 			zeDebugCheck(!UnloadInternalChainCheck, "UnloadInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
-			State = ZE_ES_NONE;
-			UpdateRenderabilityState();
-			
+			State = ZE_ES_NONE;		
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -508,8 +514,6 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 			zeDebugCheck(!InitializeInternalChainCheck, "InitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
 			State = ZE_ES_INITIALIZED;
-			UpdateTickabilityState();
-
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -540,8 +544,6 @@ ZETaskResult ZEEntity::UpdateStateTaskFunction(ZETaskThread* Thread, void* Param
 			zeDebugCheck(!DeinitializeInternalChainCheck, "DeinitializeInternal chain problem. Chain is not completed. Class Name: \"%s\".", GetClass()->GetName());
 
 			State = ZE_ES_NONE;
-			UpdateTickabilityState();
-
 			return ZE_TR_COOPERATING;
 		}
 		else if (Result == ZE_ER_WAIT)
@@ -610,6 +612,22 @@ bool ZEEntity::InitializeSelf()
 bool ZEEntity::DeinitializeSelf()
 {
 	return true;
+}
+
+void ZEEntity::SetLocalLoadingPercentage(ZEUInt Percentage)
+{
+	if (Percentage > 100)
+		Percentage = 100;
+	
+	ZE_LOCK_SECTION(EntityLock)
+	{
+		LocalLoadingPercentage = Percentage;
+	}
+}
+
+ZEUInt ZEEntity::GetLocalLoadingPercentage()
+{
+	return LocalLoadingPercentage;
 }
 
 ZEEntityResult ZEEntity::DestroyInternal()
@@ -684,6 +702,7 @@ ZEEntity::ZEEntity() : TickListLink(this), RenderListLink(this)
 	ReloadFlag = false;
 	ReinitializeFlag = false;
 	SerialOperation = false;
+	LocalLoadingPercentage = 0;
 	UpdateStateTask.SetFunction(ZEDelegateMethod(ZETaskFunction, ZEEntity, UpdateStateTaskFunction, this));
 
 	EntityId = 0;
@@ -980,7 +999,6 @@ ZEEntityState ZEEntity::GetState() const
 	return State;
 }
 
-
 ZEEntityState ZEEntity::GetTargetState() const
 {
 	return TargetState;
@@ -1018,22 +1036,37 @@ bool ZEEntity::IsDestroyed() const
 
 ZEUInt ZEEntity::GetLoadingPercentage()
 {
-	ZESize Total = IsLoaded() ? 100 : 0;
-	ZESize Count;
+	ZEEntityLoadingScore Score = GetLoadingScore();
+	return Score.Score / Score.Count;
+}
+
+ZEEntityLoadingScore ZEEntity::GetLoadingScore()
+{
+	ZEEntityLoadingScore TotalScore;
+	TotalScore.Count = 1;
+
 	ZE_LOCK_SECTION(EntityLock)
 	{
+		TotalScore.Score = GetLocalLoadingPercentage();
 		for (ZESize I = 0; I < Components.GetCount(); I++)
-			Total += Components[I]->GetLoadingPercentage();
-		Count = Components.GetCount();
+		{
+			ZEEntityLoadingScore ComponentScore = Components[I]->GetLoadingScore();
+			zeDebugCheck(ComponentScore.Score / ComponentScore.Count > 100, "DUR");
+			TotalScore.Count += ComponentScore.Count;
+			TotalScore.Score += ComponentScore.Score;
+		}
 
 		for (ZESize I = 0; I < ChildEntities.GetCount(); I++)
-			Total = ChildEntities[I]->GetLoadingPercentage();
-		Count += ChildEntities.GetCount();
-
+		{
+			ZEEntityLoadingScore ChildEntityScore = ChildEntities[I]->GetLoadingScore();
+			zeDebugCheck(ChildEntityScore.Score / ChildEntityScore.Count > 100, "DUR");
+			TotalScore.Count += ChildEntityScore.Count;
+			TotalScore.Score += ChildEntityScore.Score;
+		}
 	}
 
-	Total /= (Count + 1);
-	return (ZEUInt)Total;
+	
+	return TotalScore;
 }
 
 void ZEEntity::SetEnabled(bool Enabled)
@@ -1336,4 +1369,14 @@ bool ZEEntity::Unserialize(ZEMLReaderNode* Unserializer)
 	}
 
 	return true;
+}
+
+void ZEEntity::LockEntity()
+{
+	EntityLock.Lock();
+}
+
+void ZEEntity::UnlockEntity()
+{
+	EntityLock.Unlock();
 }

@@ -109,6 +109,9 @@ class ZEDEntityWrapper : public ZEDObjectWrapper
 
 		virtual void						Update();
 
+		virtual void						LockWrapper();
+		virtual void						UnlockWrapper();
+
 		static ZEDEntityWrapper*			CreateInstance();
 }
 ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEEntity);

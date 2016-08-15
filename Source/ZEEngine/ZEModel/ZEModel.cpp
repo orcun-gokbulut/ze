@@ -52,54 +52,58 @@ void ZEModel::CalculateBoundingBox() const
 {
 	if (Meshes.GetCount() == 0 && Bones.GetCount() == 0)
 	{
+		DirtyBoundingBox = false;
 		const_cast<ZEModel*>(this)->SetBoundingBox(ZEAABBox(ZEVector3::Zero, ZEVector3::Zero));
 		return;
 	}
-
-	ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
-
-	ze_for_each(Mesh, Meshes)
+	else
 	{
-		ze_for_each(LOD, Mesh->GetLODs())
+		ZEAABBox BoundingBox(ZEVector3(FLT_MAX, FLT_MAX, FLT_MAX), ZEVector3(-FLT_MAX, -FLT_MAX, -FLT_MAX));
+
+		ze_for_each(Mesh, Meshes)
 		{
-			if (!LOD->GetVertexType() != ZEMD_VT_SKINNED)
+			ze_for_each(LOD, Mesh->GetLODs())
 			{
-				const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
-
-				for (ZEInt N = 0; N < 8; N++)
+				if (!LOD->GetVertexType() != ZEMD_VT_SKINNED)
 				{
-					ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
-					if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-					if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-					if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+					const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
 
-					if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-					if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-					if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+					for (ZEInt N = 0; N < 8; N++)
+					{
+						ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
+						if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+						if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+						if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+
+						if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+						if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+						if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+					}
 				}
+
 			}
-
 		}
-	}
 
-	ze_for_each(Bone, Bones)
-	{
-		const ZEAABBox& CurrentBoundingBox = Bone->GetModelBoundingBox();
+		ze_for_each(Bone, Bones)
+		{
+			const ZEAABBox& CurrentBoundingBox = Bone->GetModelBoundingBox();
 
-		for (ZEInt N = 0; N < 8; N++)
-		{ 
-			ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
-			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+			for (ZEInt N = 0; N < 8; N++)
+			{ 
+				ZEVector3 Point = CurrentBoundingBox.GetVertex(N);
+				if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+				if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+				if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
 
-			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+				if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+				if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+				if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+			}
 		}
-	}
 
-	const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox);
+		DirtyBoundingBox = false;
+		const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox);
+	}
 }
 
 void ZEModel::UpdateConstantBufferBoneTransforms()
@@ -186,7 +190,7 @@ ZEEntityResult ZEModel::LoadInternal()
 {
 	ZE_ENTITY_LOAD_CHAIN(ZEEntity);
 
-	ZE_ENTITY_RESOURCE_FENCE_LOADED(Resource, ZE_ER_FAILED)
+	ZE_ENTITY_RESOURCE_FENCE_LOADED_PROGRESS(Resource, ZE_ER_FAILED, 5, 90)
 	{
 		if (ModelFileName.IsEmpty())
 			return ZE_ER_DONE;
@@ -247,8 +251,7 @@ ZEEntityResult ZEModel::LoadInternal()
 
 ZEEntityResult ZEModel::UnloadInternal()
 {
-// 	if (ModelResource != NULL)
-// 		const_cast<ZEMDResource*>(ModelResource)->Release();
+	Resource = NULL;
 
 	while (Meshes.GetFirst() != NULL)
 	{
@@ -504,22 +507,16 @@ void ZEModel::SetUserDefinedBoundingBoxEnabled(bool Value)
 
 const ZEAABBox& ZEModel::GetBoundingBox() const
 {
-	if (DirtyBoundingBox && !BoundingBoxIsUserDefined)
-	{
+	if (!BoundingBoxIsUserDefined && DirtyBoundingBox)
 		CalculateBoundingBox();
-		DirtyBoundingBox = false;
-	}
 
 	return ZEEntity::GetBoundingBox();
 }
 
 const ZEAABBox& ZEModel::GetWorldBoundingBox() const
 {
-	if (DirtyBoundingBox && !BoundingBoxIsUserDefined)
-	{
+	if (!BoundingBoxIsUserDefined && DirtyBoundingBox)
 		CalculateBoundingBox();
-		DirtyBoundingBox = false;
-	}
 
 	return ZEEntity::GetWorldBoundingBox();
 }

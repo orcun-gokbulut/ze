@@ -107,6 +107,8 @@ class ZEVector2
 
 		bool						Equals(const ZEVector2& Vector) const;
 		bool						Equals(const ZEVector2& Vector, float Threshold) const;
+		bool						NotEquals(const ZEVector2& Vector) const;
+		bool						NotEquals(const ZEVector2& Vector, float Threshold) const;
 
 		ZEVector2					operator +(const ZEVector2 &RightOperand) const;
 		ZEVector2					operator -(const ZEVector2 &RightOperand) const;
@@ -231,6 +233,8 @@ class ZEVector3
 
 		bool						Equals(const ZEVector3& Vector) const;
 		bool						Equals(const ZEVector3& Vector, float Threshold) const;
+		bool						NotEquals(const ZEVector3& Vector) const;
+		bool						NotEquals(const ZEVector3& Vector, float Threshold) const;
 
 		ZEVector2					ToVector2() const;
 
@@ -336,6 +340,8 @@ class ZEVector4
 
 		bool						Equals(const ZEVector4& Vector) const;
 		bool						Equals(const ZEVector4& Vector, float Threshold) const;
+		bool						NotEquals(const ZEVector4& Vector) const;
+		bool						NotEquals(const ZEVector4& Vector, float Threshold) const;
 
 		ZEVector2					ToVector2() const;
 		ZEVector3					ToVector3() const;

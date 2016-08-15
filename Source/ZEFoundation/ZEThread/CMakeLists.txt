@@ -74,7 +74,7 @@ endif()
 ze_add_library(TARGET ZEThread
 	SOURCES ${Sources} 
 	HEADERS ${Headers}
-	LIBS ZEDS ${VTune_LIBRARIES})
+	LIBS ZEDS "${VTune_LIBRARIES}")
 
 ze_add_test(TARGET ZEThreadTests
 	SOURCES ${Tests}
