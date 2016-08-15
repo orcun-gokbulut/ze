@@ -48,6 +48,8 @@ ze_add_source(ZE3dsMaxPlugin.cpp							Sources)
 ze_add_source(ZE3dsMaxPlugin.def							Sources)
 ze_add_source(ZE3dsMaxUtils.h								Sources)
 ze_add_source(ZE3dsMaxUtils.cpp								Sources)
+ze_add_source(ZE3dsMaxDefinitions.h							Sources)
+ze_add_source(ZE3dsMaxDefinitions.cpp						Sources)
 
 ze_add_source(ZE3dsMaxInteriorExporter.h					Sources)
 ze_add_source(ZE3dsMaxInteriorExporter.cpp					Sources)

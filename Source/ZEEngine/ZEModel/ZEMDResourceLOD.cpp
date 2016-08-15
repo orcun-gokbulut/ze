@@ -50,7 +50,6 @@ ZEMDResourceLOD::ZEMDResourceLOD() : Link(this)
 	Level = 0;
 	StartDistance = 0;
 	EndDistance = 1000000;
-	MaterialID = -1;
 	VertexType = ZEMD_VT_NORMAL;
 	IndexType = ZEMD_VIT_NONE;
 }
@@ -287,9 +286,6 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	SetEndDistance(LODNode.ReadFloat("EndDistance", (float)LODNode.ReadInt32("LODEndDistance", 100000)));
 	SetVertexType((ZEMDVertexType)LODNode.ReadInt32("VertexType", ZEMD_VT_NORMAL));
 	SetIndexType((ZEMDVertexIndexType)LODNode.ReadInt32("IndexType", ZEMD_VIT_NONE));
-	MaterialID = LODNode.ReadInt32("MaterialId", 0);
-
-	ZEString MaterialFileName = LODNode.ReadString("MaterialFilePath");
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 	{
@@ -335,20 +331,8 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 			if (!Draw.Unserialize(DrawNode))
 				return false;
 			
-			Draws.Add(Draw);
+			AddDraw(Draw);
 		}
-	}
-
-	if (Draws.GetCount() == 0)
-	{
-		ZEMDResourceDraw Draw;
-		if (GetVertexType() == ZEMD_VT_NORMAL)
-			Draw.SetCount(Vertices.GetCount());
-		else
-			Draw.SetCount(VerticesSkin.GetCount());
-
-		Draw.SetMaterialFileName(MaterialFileName);
-		Draws.Add(Draw);
 	}
 
 	GenerateBuffers();

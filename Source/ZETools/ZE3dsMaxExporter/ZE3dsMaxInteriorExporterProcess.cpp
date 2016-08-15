@@ -45,42 +45,6 @@
 #include "ZEProgressDialog.h"
 #include "ZEResourceConfiguratorWidget.h"
 
-enum ZEInteriorHelperOwnerType
-{
-	ZE_IHOT_INTERIOR		= 0,
-	ZE_IHOT_ROOM			= 1
-};
-
-ZEPackStruct(
-struct ZEInteriorFilePhysicalMeshPolygon
-{
-	ZEUInt32								Indices[3];
-});
-
-ZEPackStruct(
-struct ZEInteriorFilePhysicalMesh
-{
-	ZEArray<ZEVector3>						Vertices;
-	ZEArray<ZEInteriorFilePhysicalMeshPolygon>	Polygons;
-});
-
-ZEPackStruct(
-struct ZEInteriorFileVertex
-{
-	ZEVector3								Position;
-	ZEVector3								Normal;
-	ZEVector3								Tangent;
-	ZEVector3								Binormal;
-	ZEVector2								Texcoord;
-});
-
-ZEPackStruct(
-struct ZEInteriorFilePolygon
-{	
-	ZEUInt32								Material;
-	ZEInteriorFileVertex					Vertices[3];
-});
-
 ZEInt32 ZE3dsMaxInteriorExporter::ProcessFaceMaterial(IGameMaterial* Material)
 {
 	for (ZESize I = 0; I < (ZESize)Materials.Count(); I++)

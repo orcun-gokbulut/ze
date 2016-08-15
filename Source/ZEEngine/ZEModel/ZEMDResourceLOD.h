@@ -82,8 +82,6 @@ class ZEMDResourceLOD : public ZEObject, public ZEDestroyable
 		ZEHolder<const ZEGRVertexBuffer>		VertexBufferSkin;
 		ZEHolder<const ZEGRVertexBuffer>		VertexBufferExtra;
 		ZEHolder<const ZEGRIndexBuffer>			IndexBuffer;
-
-		ZEInt									MaterialID; // Backwards Compatibility
 		
 												ZEMDResourceLOD();
 		virtual									~ZEMDResourceLOD();

@@ -79,7 +79,7 @@ class ZE3dsMaxModelExporter : public SceneExport
 		bool								ProcessBones();
 		ZEInt32								ProcessMeshMaterial(IGameMaterial* Material);
 		bool								ProcessMaterials(const char* FileName);
-		bool								ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode);
+		bool								ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* MeshLODNode, bool IsMasterMesh = false);
 		void								ProcessPhysicalBodyConvexShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* ShapeNode);
 		bool								ProcessPhysicalShape(IGameNode* Node, IGameNode* OwnerNode, ZEMLNode* PhysicalShapeNode);
 		void								ProcessPhysicalBody(IGameNode* Node, ZEMLNode* ParentNode);

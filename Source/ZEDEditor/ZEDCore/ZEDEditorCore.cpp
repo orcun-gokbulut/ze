@@ -78,7 +78,7 @@ bool ZEDEditorCore::InitializeInternal()
 	EngineCore->GetOptions()->Load("options.ini");
 	EngineCore->GetOptions()->ResetChanges();
 	EngineCore->GetSystemMessageManager()->SetEnabled(false);
-	ApplicationInstance = *((HINSTANCE*)GetModuleHandle(NULL));
+	ApplicationInstance = (HINSTANCE)GetModuleHandle(NULL);
 
 	LoadClasses();
 

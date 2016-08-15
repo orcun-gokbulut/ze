@@ -163,8 +163,7 @@ ZEString ZEResourceConfigurator::GetResourceRelativePath(ZEString& RelativeTo, c
 
 	ZEPathInfo RelativePathInfo(RelativeTo);
 	
-	if (RelativePathInfo.IsFile())
-		RelativePathInfo.SetPath(RelativePathInfo.GetParentDirectory());
+	RelativePathInfo.SetPath(RelativePathInfo.GetParentDirectory());
 
 	if (Path.IsParent(RelativePathInfo.GetPath()))
 		return Path.GetRelativeTo(RelativePathInfo.GetPath());

@@ -33,25 +33,13 @@
 *****************************************************************************]]
 #ZE_SOURCE_PROCESSOR_END()
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required (VERSION 2.8)
 
-ze_set_project_folder("ZETools")
+ze_add_source(ZEModelConverter.cpp		Sources)
+ze_add_source(ZEModelConverter.h		Sources Headers)
+ze_add_source(ZEMain.cpp			Sources)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/ZEToolComponents)
-
-find_package(Qt5 COMPONENTS Widgets)
-
-ze_add_module(ZE3dsMaxExporter)
-ze_add_module(ZEFontBaker)
-ze_add_module(ZECrashReport)
-ze_add_module(ZESceneConverter)
-ze_add_module(ZEMaterialConverter)
-ze_add_module(ZEModelConverter)
-ze_add_module(ZEMLEditor)
-ze_add_module(ZETerrainExporter)
-ze_add_module(ZELCLicenseTool)
-ze_add_module(ZEITIntegrityTool)
-ze_add_module(ZEDSHShaderEditor)
-
-ze_add_cmake_project(ZETools)
+ze_add_executable(TARGET ZEModelConverter
+	CONSOLE
+	SOURCES ${Sources}
+	LIBS ZEFoundation ZEModel)
