@@ -416,6 +416,16 @@ void ZEDObjectWrapper::SendChangedEvent()
 	RaiseEvent(&Event);
 }
 
+void ZEDObjectWrapper::LockWrapper()
+{
+
+}
+
+void ZEDObjectWrapper::UnlockWrapper()
+{
+
+}
+
 void ZEDObjectWrapper::Update()
 {
 

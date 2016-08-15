@@ -63,6 +63,9 @@ class ZEDSceneWrapper : public ZEDObjectWrapper
 		virtual void							RayCast(ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		virtual void							Update();
 
+		virtual void							LockWrapper();
+		virtual void							UnlockWrapper();
+
 		static ZEDSceneWrapper*					CreateInstance();
 }
 ZE_META_ATTRIBUTE(ZEDObjectWrapper.TargetClass, ZEScene);

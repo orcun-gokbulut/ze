@@ -97,6 +97,7 @@ void ZELight::CalculateBoundingBox() const
 		AABB.Max = Extent;
 	}
 	
+	DirtyFlags.UnraiseFlags(ZE_LDF_BOUNDING_BOX);
 	const_cast<ZELight*>(this)->SetBoundingBox(AABB);
 }
 
@@ -298,10 +299,7 @@ const ZEVector3& ZELight::GetAttenuation() const
 const ZEAABBox& ZELight::GetBoundingBox() const
 {
 	if (DirtyFlags.GetFlags(ZE_LDF_BOUNDING_BOX))
-	{
 		CalculateBoundingBox();
-		DirtyFlags.UnraiseFlags(ZE_LDF_BOUNDING_BOX);
-	}
 
 	return ZEEntity::GetBoundingBox();
 }

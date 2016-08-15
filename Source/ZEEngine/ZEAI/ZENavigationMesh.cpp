@@ -78,7 +78,7 @@ static ZESize GetNormalIndex(ZENavigationMesh& Mesh, const ZEPolygon& Polygon)
 
 static ZESSize GetVertexIndexParents(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* CurrentNode)
 {
-	while(CurrentNode != NULL)
+	/*while(CurrentNode != NULL)
 	{
 		for (ZESize I = 0; I < CurrentNode->GetItemCount(); I++)
 		{
@@ -89,14 +89,14 @@ static ZESSize GetVertexIndexParents(ZENavigationMesh& Mesh, const ZEVector3& Po
 		}
 
 		CurrentNode = CurrentNode->GetParent();
-	}
+	}*/
 
 	return -1;
 }
 
 static ZESSize GetVertexIndexChilds(ZENavigationMesh& Mesh, const ZEVector3& Point, ZENavigationMeshOctree* Octree)
 {
-	for (ZESize I = 0; I < Octree->GetItemCount(); I++)
+	/*for (ZESize I = 0; I < Octree->GetItemCount(); I++)
 	{
 		ZEArray<ZESize>& VertexIndices = Octree->GetItem(I).VertexIndices;
 		for (ZESize N = 0; N < VertexIndices.GetCount(); N++)
@@ -110,7 +110,7 @@ static ZESSize GetVertexIndexChilds(ZENavigationMesh& Mesh, const ZEVector3& Poi
 			ZESSize Result = GetVertexIndexChilds(Mesh, Point, Octree->GetNode(I));
 			if (Result != -1)
 				return Result;
-		}
+		}*/
 
 	return -1;
 }

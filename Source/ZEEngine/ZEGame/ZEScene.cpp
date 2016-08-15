@@ -125,7 +125,6 @@ void ZEScene::RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZER
 	}
 }
 
-
 bool ZEScene::InitializeInternal()
 {
 	if (!ZEInitializable::InitializeInternal())
@@ -177,11 +176,10 @@ void ZEScene::AddToTickList(ZEEntity* Entity)
 	zeDebugCheck(!Entity->GetEntityFlags().GetFlags(ZE_EF_TICKABLE_CUSTOM) && !Entity->IsInitialized(), "Ticking an entity which is not initialized.");
 	zeDebugCheck(!Entity->GetEnabled(), "Ticking an entity which is not enabled.");
 
-
 	if (Entity->TickListLink.GetInUse())
 		return;
 
-	ZE_LOCK_SECTION(SceneLock)
+	ZE_LOCK_SECTION(TickListLock)
 	{
 		TickList.AddEnd(&Entity->TickListLink);
 	}
@@ -192,7 +190,7 @@ void ZEScene::RemoveFromTickList(ZEEntity* Entity)
 	if (!Entity->TickListLink.GetInUse())
 		return;
 
-	ZE_LOCK_SECTION(SceneLock)
+	ZE_LOCK_SECTION(TickListLock)
 	{
 		TickList.Remove(&Entity->TickListLink);
 	}
@@ -206,7 +204,7 @@ void ZEScene::AddToRenderList(ZEEntity* Entity)
 	if (Entity->RenderListLink.GetInUse())
 		return;
 
-	ZE_LOCK_SECTION(SceneLock)
+	ZE_LOCK_SECTION(RenderListLock)
 	{
 		RenderList.AddEnd(&Entity->RenderListLink);
 	}
@@ -217,15 +215,30 @@ void ZEScene::RemoveFromRenderList(ZEEntity* Entity)
 	if (!Entity->RenderListLink.GetInUse())
 		return;
 
-	ZE_LOCK_SECTION(SceneLock)
+	ZE_LOCK_SECTION(RenderListLock)
 	{
+		if (Entity->GetStatic())
+			RenderListOctree.RemoveItem(Entity, Entity->GetWorldBoundingBox());
+
 		RenderList.Remove(&Entity->RenderListLink);
 	}
 }
 
 void ZEScene::EntityBoundingBoxChanged(ZEEntity* Entity)
 {
+	if (!Entity->GetStatic())
+		return;
 
+	if (!Entity->GetEntityFlags().GetFlags(ZE_EF_RENDERABLE_CUSTOM) && !Entity->IsLoaded())
+		return;
+
+	return;
+
+	ZE_LOCK_SECTION(RenderListLock)
+	{
+		RenderListOctree.RemoveItem(Entity);
+		RenderListOctree.AddItem(Entity, Entity->GetWorldBoundingBox());
+	}
 }
 
 void ZEScene::UpdateConstantBuffer()
@@ -306,19 +319,26 @@ const ZEVector3& ZEScene::GetAmbientColor() const
 	return AmbientColor;
 }
 
-
 ZEUInt ZEScene::GetLoadingPercentage()
 {
-	ZESize Total = 100;
-	ZESize Count;
+	ZEEntityLoadingScore TotalScore;
+	TotalScore.Score = 0;
+	TotalScore.Count = 0;
+
 	ZE_LOCK_SECTION(SceneLock)
 	{
-		Count = Entities.GetCount();
-		for (ZESize I = 0; I < Count; I++)
-			Total += Entities[I]->GetLoadingPercentage();
+		for (ZESize I = 0; I < Entities.GetCount(); I++)
+		{
+			ZEEntityLoadingScore EntityScore = Entities[I]->GetLoadingScore();
+			TotalScore.Score += EntityScore.Score;
+			TotalScore.Count += EntityScore.Count;
+		}
 	}
 
-	return (ZEUInt)(Total / (Count + 1));
+	if (TotalScore.Count == 0)
+		return 100;
+	else
+		return (ZEUInt)(TotalScore.Score / TotalScore.Count);
 }
 
 const ZESmartArray<ZEEntity*>& ZEScene::GetEntities()
@@ -389,16 +409,31 @@ void ZEScene::Tick(float ElapsedTime)
 	if (!Enabled)
 		return;
 
-	ze_for_each(Entity, TickList)
-		TickEntity(Entity.GetPointer(), ElapsedTime);
+	ZE_LOCK_SECTION(TickListLock)
+	{
+		ze_for_each(Entity, TickList)
+			TickEntity(Entity.GetPointer(), ElapsedTime);
+	}
 }
 
 void ZEScene::PreRender(const ZERNPreRenderParameters* Parameters)
 {
 	Parameters->Renderer->StartScene(GetConstantBuffer());
 
-	ze_for_each(Entity, RenderList)
-		PreRenderEntity(Entity.GetPointer(), Parameters);
+	ZE_LOCK_SECTION(RenderListLock)
+	{
+		ze_for_each_iterator(Node, RenderListOctree.Traverse(Parameters->View->ViewVolume))
+		{
+			for (ZESize I = 0; I < Node->GetItemCount(); I++)
+			{
+				ZEEntity* Entity = Node->GetItem(I);
+				PreRenderEntity(Entity, Parameters);
+			}
+		}
+
+		ze_for_each(Entity, RenderList)
+			PreRenderEntity(Entity.GetPointer(), Parameters);
+	}
 
 	Parameters->Renderer->EndScene();
 }
@@ -541,6 +576,16 @@ bool ZEScene::Unserialize(const ZEString& FileName)
 
 	zeLog("Scene file \"%s\" has been loaded.", FileName.GetValue());
 	return true;
+}
+
+void ZEScene::LockScene()
+{
+	SceneLock.Lock();
+}
+
+void ZEScene::UnlockScene()
+{
+	SceneLock.Unlock();
 }
 
 ZEScene::ZEScene()

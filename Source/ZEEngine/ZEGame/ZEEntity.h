@@ -107,6 +107,13 @@ ZE_ENUM(ZEEntityState)
 
 };
 
+class ZEEntityLoadingScore
+{
+	public:
+		ZESize Score;
+		ZESize Count;
+};
+
 class ZEEntity : public ZEObject
 {
 	ZE_OBJECT
@@ -122,6 +129,7 @@ class ZEEntity : public ZEObject
 		bool									ReloadFlag;
 		bool									ReinitializeFlag;
 		bool									SerialOperation;
+		ZEUInt									LocalLoadingPercentage;
 		ZETask									UpdateStateTask;
 
 		ZEString								Name;
@@ -201,6 +209,9 @@ class ZEEntity : public ZEObject
 		virtual bool							InitializeSelf() final;
 		virtual bool							DeinitializeSelf() final;
 		
+		void									SetLocalLoadingPercentage(ZEUInt Percentage);
+		ZEUInt									GetLocalLoadingPercentage();
+
 												ZEEntity();
 		virtual									~ZEEntity();
 
@@ -258,6 +269,7 @@ class ZEEntity : public ZEObject
 		ZEEntityState							GetState() const;
 		ZEEntityState							GetTargetState() const;
 		ZEUInt									GetLoadingPercentage();
+		ZEEntityLoadingScore					GetLoadingScore();
 
 		bool									IsLoaded() const;
 		bool									IsLoadedOrLoading() const;
@@ -294,6 +306,9 @@ class ZEEntity : public ZEObject
 
 		virtual bool							Serialize(ZEMLWriterNode* Serializer);
 		virtual bool							Unserialize(ZEMLReaderNode* Unserializer);
+
+		void									LockEntity();
+		void									UnlockEntity();
 
 		ZEDObjectWrapper*						GetWrapper() const;
 }

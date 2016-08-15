@@ -43,10 +43,10 @@
 #include "ZETypes.h"
 #include "ZEDS/ZEArray.h"
 #include "ZEPointer/ZEHolder.h"
+#include "ZESpatial/ZEOctree.h"
 #include "ZEMeta/ZEObject.h"
 
 #include "ZERayCast.h"
-
 
 ZE_META_FORWARD_DECLARE(ZEEntity,			"ZEEntity.h")
 ZE_META_FORWARD_DECLARE(ZECamera,			"ZEGraphics/ZECamera.h")
@@ -78,9 +78,14 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		ZEVector3								AmbientColor;
 		ZELock									SceneLock;
 
+		ZELock									TickListLock;
 		ZEList2<ZEEntity>						TickList;
-		ZEList2<ZEEntity>						RenderList;
 
+		ZELock									RenderListLock;
+		ZEList2<ZEEntity>						RenderList;
+		ZEOctree<ZEEntity*>						RenderListOctree;
+
+		bool									PreRendering;
 		struct
 		{
 			ZEVector3							AmbientColor;
@@ -97,14 +102,14 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		void									EntityBoundingBoxChanged(ZEEntity* Entity);
 
-		void									UpdateConstantBuffer();
-
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
 		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
 		void									RayCastEntity(ZEEntity* Entity, ZERayCastReport& Report, const ZERayCastParameters& Parameters);
 		
 		bool									InitializeInternal();
 		bool									DeinitializeInternal();
+
+		void									UpdateConstantBuffer();
 
 
 												ZEScene();
@@ -143,6 +148,9 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 
 		bool									Serialize(const ZEString& FileName);
 		bool									Unserialize(const ZEString& FileName);
+
+		void									LockScene();
+		void									UnlockScene();
 
 		static ZEScene*							CreateInstance();
 };

@@ -410,6 +410,7 @@ const ZEItemType& ZEOctree<ZEItemType>::GetItem(ZESize Index) const
 template<typename ZEItemType>
 ZEItemType& ZEOctree<ZEItemType>::GetItem(ZESize Index)
 {
+	zeBreak(Items[Index] == (void*)0xDDDDDDDDDDDDDDDD);
 	return Items[Index];
 }
 
@@ -574,7 +575,7 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Vo
 	else
 	{
 		if (Nodes[ItemOctant] != NULL)
-			return Nodes[ItemOctant]->RemoveItem(Item, Point);		
+			return Nodes[ItemOctant]->RemoveItem(Item, Volume);		
 	}
 }
 
@@ -606,8 +607,10 @@ ZEOctree<ZEItemType>::ZEOctree()
 		Nodes[I] = NULL;
 
 	Depth = 0;
-	MaxDepth = 0;
+	MaxDepth = 1;
 	ParentOctant = ZE_OO_MULTIPLE;
+	BoundingBox.Min = -2.0f * ZEVector3::One;
+	BoundingBox.Max =  2.0f * ZEVector3::One;
 }
 
 template<typename ZEItemType>

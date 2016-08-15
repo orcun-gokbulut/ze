@@ -464,12 +464,12 @@ bool ZENavigationMeshGenerator::MergePolygons2to1(ZESize PolygonIndex1, ZESize P
 
 void ZENavigationMeshGenerator::TraverseOctree(ZENavigationMeshOctree* Octree)
 {
-	for (ZESize I = 0; I < Octree->GetItemCount(); I++)
+	/*for (ZESize I = 0; I < Octree->GetItemCount(); I++)
 		Mesh.Polygons.Add(Octree->GetItem(I));
 
 	for (ZEInt I = 0; I < 8; I++)
 		if (Octree->GetNode(I) != NULL)
-			TraverseOctree(Octree->GetNode(I));
+			TraverseOctree(Octree->GetNode(I));*/
 }
 
 ZENavigationMesh&  ZENavigationMeshGenerator::GetOutput()

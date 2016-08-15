@@ -82,7 +82,7 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 		ZERSResourceState						TargetState;
 		ZETask									UpdateStateTask;
 
-		ZEUInt									LoadProgress;
+		ZEUInt									LocalLoadProgress;
 
 		bool									LoadInternalDone;
 		bool									UnloadInternalDone;
@@ -100,8 +100,10 @@ class ZERSResource : public ZEObject, public ZEReferenceCounted
 	protected:
 		void									SetGUID(const ZEGUID& GUID);
 		void									SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size);
-		void									SetLoadProgress(ZEUInt Percentage);
-		void									SetLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage);
+
+		void									SetLocalLoadProgress(ZEUInt Percentage);
+		void									SetLocalLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage);
+		ZEUInt									GetLocalLoadProgress();
 
 		void									AddChildResource(ZERSResource* Resource);
 		void									RemoveChildResource(ZERSResource* Resource);

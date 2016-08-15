@@ -151,6 +151,9 @@ class ZEDObjectWrapper : public ZEObject, public ZEInitializable, public ZEDestr
 
 		virtual void								SendChangedEvent();
 
+		virtual void								LockWrapper();
+		virtual void								UnlockWrapper();
+
 		virtual void								Update();
 
 		virtual ZEDObjectWrapper*					Clone();

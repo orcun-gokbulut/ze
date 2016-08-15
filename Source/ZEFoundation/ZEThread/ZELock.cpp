@@ -38,12 +38,13 @@
 #include "ZEPlatform.h"
 
 #ifdef ZE_VTUNE_ENABLED
-#include "ittnotify.h"
+#include <ittnotify.h>
 #endif
 
 #ifdef ZE_PLATFORM_COMPILER_MSVC
 	#include <intrin.h>
 #endif
+#include "ZEThread.h"
 
 
 // ZELock
@@ -79,18 +80,30 @@ bool ZELock::Check(ZEUInt32 Number) const
 
 void ZELock::Wait(ZEUInt32 Number) const
 {
-	while(Check(Number));
+	while(Check(Number))
+	{
+		zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
+	}
 }
 
 void ZELock::Release(ZEUInt32 Number)
 {
-	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acuired yet by given number");
+	zeDebugCheck(OwnerThreadId != ZEThread::GetCurrentThreadId(), "Thread tries to release another thread's lock.");
+	zeDebugCheck(CurrentNumber != Number, "Lock cannot be released because it hasn't acquired yet by given number.");
+	
+	#ifdef ZE_DEBUG_ENABLE
+	OwnerThreadId = 0;
+	#endif
+
 	CurrentNumber++;
 }
 
 void ZELock::Wait() const
 {
-    while(IsLocked());
+	while(IsLocked())
+	{
+		zeDebugCheck(OwnerThreadId == ZEThread::GetCurrentThreadId(), "Recursive lock detected.");
+	}
 }
 
 void ZELock::Lock()
@@ -98,10 +111,13 @@ void ZELock::Lock()
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_prepare(this);
 	#endif
-    
-	ZEInt32 MyNumber = Queue();
 
+	ZEInt32 MyNumber = Queue();
 	Wait(MyNumber);
+
+	#ifdef ZE_DEBUG_ENABLE
+	OwnerThreadId = ZEThread::GetCurrentThreadId();
+	#endif
 
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_acquired(this);
@@ -113,7 +129,7 @@ void ZELock::Unlock()
 	#ifdef ZE_VTUNE_ENABLED
 	__itt_sync_releasing(this);
 	#endif
-
+	
 	Release(CurrentNumber);
 }
 
@@ -125,6 +141,10 @@ ZELock::ZELock()
 
 	CurrentNumber = 1;
 	NextNumber = 0;
+
+	#ifdef ZE_DEBUG_ENABLE
+	OwnerThreadId = 0;
+	#endif
 }
 
 ZELock::~ZELock()

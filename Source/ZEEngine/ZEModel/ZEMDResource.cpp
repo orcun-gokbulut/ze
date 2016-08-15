@@ -116,7 +116,7 @@ bool ZEMDResource::ReadMeshes(const ZEMLReaderNode& MeshesNode)
 		}
 
 		AddMesh(Mesh);
-		SetLoadProgress(I, SubNodeCount, 10, 50);
+		SetLocalLoadProgress(I, SubNodeCount, 10, 50);
 	}
 
 	return true;
@@ -190,7 +190,7 @@ bool ZEMDResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 		}
 
 		AddAnimation(Animation);
-		SetLoadProgress(I, SubNodeCount, 60, 95);
+		SetLocalLoadProgress(I, SubNodeCount, 60, 95);
 	}
 
 	return true;
@@ -234,7 +234,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 	ZEMLReader Reader;
 	if (!Reader.Open(GetFileName()))
 		return ZE_TR_FAILED;
-	SetLoadProgress(5);
+	SetLocalLoadProgress(5);
 
 	ZEMLReaderNode ModelNode = Reader.GetRootNode();
 
@@ -252,7 +252,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 	{
 		BoundingBoxIsUserDefined = false;
 	}
-	SetLoadProgress(10);
+	SetLocalLoadProgress(10);
 
 	ZEMLReaderNode MeshesNode = ModelNode.GetNode("Meshes");
 	if (MeshesNode.IsValid())
@@ -260,7 +260,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadMeshes(MeshesNode))
 			return ZE_TR_FAILED;
 	}
-	SetLoadProgress(50);
+	SetLocalLoadProgress(50);
 
 	ZEMLReaderNode BonesNode = ModelNode.GetNode("Bones");
 	if (BonesNode.IsValid())
@@ -268,7 +268,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadBones(BonesNode))
 			return ZE_TR_FAILED;
 	}
-	SetLoadProgress(55);
+	SetLocalLoadProgress(55);
 
 	ZEMLReaderNode HelpersNode = ModelNode.GetNode("Helpers");
 	if (HelpersNode.IsValid())
@@ -276,7 +276,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadHelpers(HelpersNode))
 			return ZE_TR_FAILED;
 	}
-	SetLoadProgress(60);
+	SetLocalLoadProgress(60);
 
 	ZEMLReaderNode AnimationsNode = ModelNode.GetNode("Animations");
 	if (AnimationsNode.IsValid())
@@ -284,7 +284,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadAnimations(AnimationsNode))
 			return ZE_TR_FAILED;
 	}
-	SetLoadProgress(95);
+	SetLocalLoadProgress(95);
 
 	ZEMLReaderNode MaterialsNode = ModelNode.GetNode("Materials");
 	if (MaterialsNode.IsValid())
@@ -292,7 +292,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadMaterials(MaterialsNode))
 			return ZE_TR_FAILED;
 	}
-	SetLoadProgress(100);
+	SetLocalLoadProgress(100);
 
 	return ZE_TR_DONE;
 }

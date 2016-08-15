@@ -191,7 +191,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 			{
 				zeLog("Resource loaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
 				LoadInternalDone = true;
-				SetLoadProgress(100);
+				SetLocalLoadProgress(100);
 			}
 			else if (Result == ZE_TR_FAILED)
 			{
@@ -238,7 +238,7 @@ ZETaskResult ZERSResource::UpdateStateFunction(ZETaskThread* TaskThread, void* P
 			if (Result == ZE_TR_DONE)
 			{
 				zeLog("Resource unloaded. Resource Class: \"%s\", File Name: \"%s\"", GetClass()->GetName(), this->FileName.ToCString());
-				SetLoadProgress(0);
+				SetLocalLoadProgress(0);
 				UnloadInternalDone = true;
 			}
 			else if (Result == ZE_TR_FAILED)
@@ -291,23 +291,28 @@ void ZERSResource::SetMemoryUsage(ZERSMemoryPool Pool, ZESize Size)
 	UpdateMemoryConsumption();
 }
 
-void ZERSResource::SetLoadProgress(ZEUInt Percentage)
+void ZERSResource::SetLocalLoadProgress(ZEUInt Percentage)
 {
 	if (Percentage > 100)
 		Percentage = 100;
 
-	LoadProgress = Percentage;
+	LocalLoadProgress = Percentage;
 }
 
-void ZERSResource::SetLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage)
+void ZERSResource::SetLocalLoadProgress(ZESize Index, ZESize Count, ZEUInt StartPercentage, ZEUInt EndPercentage)
 {
 	if (Count == 0)
 	{
-		SetLoadProgress(0);
+		SetLocalLoadProgress(0);
 		return;
 	}
 
-	SetLoadProgress(StartPercentage + (Index + 1) * (EndPercentage - StartPercentage) / Count);
+	SetLocalLoadProgress(StartPercentage + (Index + 1) * (EndPercentage - StartPercentage) / Count);
+}
+
+ZEUInt ZERSResource::GetLocalLoadProgress()
+{
+	return LocalLoadProgress;
 }
 
 void ZERSResource::AddChildResource(ZERSResource* ChildResource)
@@ -398,7 +403,7 @@ ZERSResource::ZERSResource() : ManagerLink(this), ManagerSharedLink(this)
 	memset(MemoryUsageSelf, 0, sizeof(MemoryUsage));
 	TargetState = ZERS_RS_NONE;
 	FileNameHash = 0;
-	LoadProgress = 0;
+	LocalLoadProgress = 0;
 	LoadInternalDone = false;
 	UnloadInternalDone = false;
 	Destroying = false;
@@ -489,7 +494,7 @@ ZEUInt ZERSResource::GetLoadProgress() const
 {
 	ResourceLock.Lock();
 
-	ZEUInt TotalProgress = LoadProgress;
+	ZEUInt TotalProgress = LocalLoadProgress;
 	ZEUInt TotalItems = 1;
 
 	ze_for_each(ExternalResource, ExternalResources)
@@ -506,9 +511,6 @@ ZEUInt ZERSResource::GetLoadProgress() const
 	}
 
 	ResourceLock.Unlock();
-
-	if (TotalItems == 0)
-		return 0;
 
 	return TotalProgress / TotalItems;
 }
