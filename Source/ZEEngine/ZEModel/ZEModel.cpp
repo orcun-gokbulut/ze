@@ -102,7 +102,7 @@ void ZEModel::CalculateBoundingBox() const
 		}
 
 		DirtyBoundingBox = false;
-		const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox);
+		const_cast<ZEModel*>(this)->SetBoundingBox(BoundingBox, true);
 	}
 }
 
@@ -130,7 +130,6 @@ void ZEModel::UpdateConstantBufferBoneTransforms()
 void ZEModel::ChildBoundingBoxChanged()
 {
 	BoundingBoxChanged();
-	DirtyBoundingBox = true;
 }
 
 void ZEModel::LocalTransformChanged()
@@ -143,7 +142,7 @@ void ZEModel::LocalTransformChanged()
 	ze_for_each(Mesh, Meshes)
 		Mesh->TransformChangedModel();
 	
-	DirtyBoundingBox = true;
+	BoundingBoxChanged();
 }
 
 void ZEModel::ParentTransformChanged()
@@ -156,7 +155,7 @@ void ZEModel::ParentTransformChanged()
 	ze_for_each(Mesh, Meshes)
 		Mesh->TransformChangedModel();
 
-	DirtyBoundingBox = true;
+	BoundingBoxChanged();
 }
 
 void ZEModel::AnimationStateChanged()
@@ -169,6 +168,7 @@ void ZEModel::AnimationStateChanged()
 	{
 		if (AnimationTrack != NULL && AnimationTrack->GetState() == ZE_MAS_PLAYING)
 		{
+			SetStatic(false);
 			SetEntityFlags(GetEntityFlags() | ZE_EF_TICKABLE);
 			return;
 		}
@@ -177,6 +177,7 @@ void ZEModel::AnimationStateChanged()
 		{
 			if (AnimationTracks[I]->GetState() == ZE_MAS_PLAYING)
 			{
+				SetStatic(false);
 				SetEntityFlags(GetEntityFlags() | ZE_EF_TICKABLE);
 				return;
 			}
@@ -184,6 +185,12 @@ void ZEModel::AnimationStateChanged()
 			SetEntityFlags(GetEntityFlags() & (~ZE_EF_TICKABLE));
 		}
 	}
+}
+
+void ZEModel::BoundingBoxChanged()
+{
+	DirtyBoundingBox = true;
+	ZEEntity::BoundingBoxChanged();
 }
 
 ZEEntityResult ZEModel::LoadInternal()

@@ -91,8 +91,8 @@ class ZEOctree
 		ZEItemType&								GetItem(ZESize Index);
 		const ZEItemType&						GetItem(ZESize Index) const;
 
-		void									AddItem(const ZEItemType& Item, const ZEVector3& Point);
-		void									AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
+		ZEOctree<ZEItemType>*					AddItem(const ZEItemType& Item, const ZEVector3& Point);
+		ZEOctree<ZEItemType>*					AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
 
 		void									RemoveItem(ZESize Index);
 		bool									RemoveItem(const ZEItemType& Item);
@@ -427,23 +427,24 @@ const ZEArray<const ZEItemType>& ZEOctree<ZEItemType>::GetItems() const
 }
 
 template<typename ZEItemType>
-void ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEVector3& Point)
+ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEVector3& Point)
 {
 	ZEInt ItemOctant = FindOctant(Point);
 	if (ItemOctant == ZE_OO_MULTIPLE)
 	{
 		Items.Add(Item);
+		return this;
 	}
 	else if (ItemOctant == ZE_OO_OUTSIDE)
 	{
 		if (Parent == NULL)
 		{
 			Expand();
-			AddItem(Item, Point);
+			return AddItem(Item, Point);
 		}
 		else
 		{
-			Parent->AddItem(Item, Point);
+			return Parent->AddItem(Item, Point);
 		}
 	}
 	else
@@ -451,33 +452,35 @@ void ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEVector3& Poin
 		if (MaxDepth == 0)
 		{
 			Items.Add(Item);
+			return this;
 		}
 		else
 		{
 			CreateChildNode(ItemOctant);
-			Nodes[ItemOctant]->AddItem(Item, Point);
+			return Nodes[ItemOctant]->AddItem(Item, Point);
 		}
 	}
 }
 
 template<typename ZEItemType>
-void ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEAABBox& Volume)
+ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEAABBox& Volume)
 {
 	ZEInt ItemOctant = FindOctant(Volume);
 	if (ItemOctant == ZE_OO_MULTIPLE)
 	{
 		Items.Add(Item);
+		return this;
 	}
 	else if (ItemOctant == ZE_OO_OUTSIDE)
 	{
 		if (Parent == NULL)
 		{
 			Expand();
-			AddItem(Item, Volume);
+			return AddItem(Item, Volume);
 		}
 		else
 		{
-			Parent->AddItem(Item, Volume);
+			return Parent->AddItem(Item, Volume);
 		}
 	}
 	else
@@ -485,11 +488,12 @@ void ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, const ZEAABBox& Volum
 		if (MaxDepth == 0)
 		{
 			Items.Add(Item);
+			return this;
 		}
 		else
 		{
 			CreateChildNode(ItemOctant);
-			Nodes[ItemOctant]->AddItem(Item, Volume);
+			return Nodes[ItemOctant]->AddItem(Item, Volume);
 		}
 	}
 }

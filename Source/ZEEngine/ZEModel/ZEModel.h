@@ -99,6 +99,7 @@ class ZEModel : public ZEEntity
 		virtual void							LocalTransformChanged();
 		virtual void							ParentTransformChanged();
 		void									AnimationStateChanged();
+		virtual void							BoundingBoxChanged();
 
 		virtual ZEEntityResult					LoadInternal();
 		virtual ZEEntityResult					UnloadInternal();

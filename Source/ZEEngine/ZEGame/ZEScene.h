@@ -100,7 +100,7 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		void									AddToRenderList(ZEEntity* Entity);
 		void									RemoveFromRenderList(ZEEntity* Entity);
 
-		void									EntityBoundingBoxChanged(ZEEntity* Entity);
+		void									UpdateOctree(ZEEntity* Entity);
 
 		void									TickEntity(ZEEntity* Entity, float ElapsedTime);
 		void									PreRenderEntity(ZEEntity* Entity, const ZERNPreRenderParameters* Parameters);
@@ -110,7 +110,6 @@ class ZEScene : public ZEObject, public ZEInitializable, public ZEDestroyable
 		bool									DeinitializeInternal();
 
 		void									UpdateConstantBuffer();
-
 
 												ZEScene();
 		virtual									~ZEScene();
