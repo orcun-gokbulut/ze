@@ -68,7 +68,6 @@ class ZEMDResource : public ZERSResource
 		bool											ReadBones(const ZEMLReaderNode& BonesNode);
 		bool											ReadAnimations(const ZEMLReaderNode& AnimationsNode);
 		bool											ReadHelpers(const ZEMLReaderNode& HelpersNode);
-		bool											ReadMaterials(const ZEMLReaderNode& MaterialsNode);
 		
 		virtual ZETaskResult							LoadInternal();
 		virtual ZETaskResult							UnloadInternal();

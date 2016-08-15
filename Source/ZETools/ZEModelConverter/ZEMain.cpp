@@ -1,6 +1,6 @@
 //ZE_SOURCE_PROCESSOR_START(License, 1.0)
 /*******************************************************************************
- Zinek Engine - ZEMDResourceDraw.cpp
+ Zinek Engine - ZEMain.cpp
  ------------------------------------------------------------------------------
  Copyright (C) 2008-2021 Yiğit Orçun GÖKBULUT. All rights reserved.
 
@@ -33,93 +33,69 @@
 *******************************************************************************/
 //ZE_SOURCE_PROCESSOR_END()
 
-#include "ZEMDResourceDraw.h"
+#include "ZEModelConverter.h"
 
-#include "ZEError.h"
-#include "ZEML/ZEMLReader.h"
-#include "ZEModelMeshLOD.h"
-#include "ZEMDResource.h"
-#include "ZEMDResourceLOD.h"
-#include "ZERenderer/ZERNMaterial.h"
-#include "ZERenderer/ZERNStandardMaterial.h"
+#include "ZEFile/ZEPathInfo.h"
 #include "ZEFile/ZEFileInfo.h"
+#include "ZEDS/ZEFormat.h"
+#include "ZEFile/ZEPathManager.h"
 
-void ZEMDResourceDraw::SetOffset(ZESize PoligonOffset)
+#include <stdio.h>
+#include <stdlib.h>
+
+static bool Operation(const char* Path, ZEPathOperationElement Element)
 {
-	this->Offset = PoligonOffset;
-}
+	ZEPathInfo PathInfo(Path);
 
-ZESize ZEMDResourceDraw::GetOffset() const 
-{
-	return Offset;
-}
+	if (PathInfo.GetExtension().Upper() == ".ZEMODEL")
+	{
+		ZEString TempDestination = ZEFormat::Format("{0}/{1}.new.ZEModel", 
+			PathInfo.GetParentDirectory(),
+			PathInfo.GetName());
 
-void ZEMDResourceDraw::SetCount(ZESize PoligonCount)
-{
-	this->Count = PoligonCount;
-}
+		printf("Converting ZEMaterial file:\n");
+		printf(" Source File: %s.\n", Path);
+		printf(" Destination File: %s.\n", Path);
 
-ZESize ZEMDResourceDraw::GetCount() const 
-{
-	return Count;
-}
+		if (!ZEModelConverter::Convert(Path, TempDestination))
+			return false;
 
-void ZEMDResourceDraw::SetMaterialFileName(const ZEString& FileName)
-{
-	if (MaterialFileName == FileName)
-		return;
+		ZEFileInfo FileInfo(TempDestination);
 
-	MaterialFileName = FileName;
-	
-	SetMaterial(ZERNStandardMaterial::LoadResourceShared(FileName).GetPointer());
-}
+		if (!FileInfo.IsExists())
+			return false;
 
-const ZEString& ZEMDResourceDraw::GetMaterialFileName()
-{
-	return MaterialFileName;
-}
-
-void ZEMDResourceDraw::SetMaterial(ZEHolder<const ZERNMaterial> Material)
-{
-	if (this->Material == Material)
-		return;
-
-	this->Material = Material;
-	
-	if (Material == NULL)
-		MaterialFileName = ZEString::Empty;
-	else
-		MaterialFileName = Material->GetFileName();
-
-	if (LOD != NULL && LOD->GetResource() != NULL)
-		LOD->GetResource()->RegisterExternalResource(Material);
-}
-
-ZEHolder<const ZERNMaterial> ZEMDResourceDraw::GetMaterial() const 
-{
-	return Material;
-}
-
-bool ZEMDResourceDraw::Unserialize(ZEMLReaderNode& DrawNode)
-{
-	zeCheckError(!DrawNode.IsValid(), false, "Invalid Draw node.");
-	zeCheckError(DrawNode.GetName() != "Draw", false, "Invalid Draw node name.");
-
-	SetOffset(DrawNode.ReadUInt32("Offset", 0));
-	SetCount(DrawNode.ReadUInt32("Count", 0));
-	SetMaterialFileName(ZEFileInfo(DrawNode.GetFile()->GetPath()).GetParentDirectory() + "/" + DrawNode.ReadString("MaterialFilePath"));
+		FileInfo.Rename(PathInfo.GetFileName().ToCString());
+	}
 
 	return true;
 }
 
-bool ZEMDResourceDraw::Serialize(ZEMLWriterNode& DrawNode) const
+int main(int argc, char** argv)
 {
-	return false;
-}
+	printf(" Zinek Engine Model Converter\n");
+	printf("----------------------------------------------------------------------------------- \n");
 
-ZEMDResourceDraw::ZEMDResourceDraw()
-{
-	LOD = NULL;
-	Offset = 0;
-	Count = 0;
+	if (argc == 2 && argc == 3)
+	{
+		printf(" This tool is provided for converting files in old format ZEModel v1.0 to new ZEModel v2.0\n");
+		printf(" format.\n");
+		printf("\n");
+		printf(" Usage:\n");
+		printf("   ZEModelConverter [Old Format Model File] [ZEModel v2.0 Model File]\n");
+		printf("   ZEModelConverter [Search Directory]\n");
+
+		return EXIT_FAILURE;
+	}
+
+	ZEPathManager::GetInstance()->SetAccessControl(false);
+
+	const char* Source = argv[1];
+	const char* Destination = argv[2];
+	if (argc == 3)
+		return ZEModelConverter::Convert(Source, Destination) ? EXIT_SUCCESS : EXIT_FAILURE;
+	else if (argc == 2)
+		ZEPathInfo(Source).Operate(Source, ZEPathOperationFunction::Create<Operation>(), ZE_POE_FILE, true);
+
+	return EXIT_SUCCESS;
 }

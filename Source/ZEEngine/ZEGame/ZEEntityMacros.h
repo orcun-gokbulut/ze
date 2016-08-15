@@ -47,7 +47,7 @@
 #define ZE_ENTITY_FENCE(Entity, TargetState, FailedReturn) \
 	if (Entity != NULL) \
 	{ \
-		if (Resource->IsFailed()) \
+		if (Entity->IsFailed()) \
 		{ \
 			return FailedReturn; \
 		} \

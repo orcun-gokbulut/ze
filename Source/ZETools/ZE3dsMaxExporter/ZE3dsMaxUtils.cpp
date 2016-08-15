@@ -388,29 +388,70 @@ bool ZE3dsMaxUtils::GetProperty(IExportEntity* Object, ZEPropType Type, const ZE
 		return false;
 }
 
-void ZE3dsMaxUtils::CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh)
+void ZE3dsMaxUtils::CalculateLocalBoundingBox(ZEAABBox& BoundingBox, const ZEArray<ZEModelFileVertex>& Vertices)
 {
-	if (Mesh->GetNumberOfFaces() == 0)
+	if (Vertices.GetCount() == 0)
 	{
 		BoundingBox.Min = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
 		return;
 	}
-	else
-		BoundingBox.Min = BoundingBox.Max = *(ZEVector3*)&Mesh->GetVertex(Mesh->GetFace(0)->vert[0], true);
 
-	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
+	BoundingBox.Min = BoundingBox.Max = Vertices[0].Position;
+
+	for (ZESize I = 0; I < Vertices.GetCount(); I++)
 	{
-		FaceEx* Face = Mesh->GetFace(I);
-		for (ZESize N = 0; N < 3; N++)
-		{
-			Point3 Point;
-			Mesh->GetVertex(Face->vert[N], Point, true);
-			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
-			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
-			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
-			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
-			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
-			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
-		}
+		ZEVector3 Point = Vertices[I].Position;
+		if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+		if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+		if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+		if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+		if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+		if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+	}
+
+// 	if (Mesh->GetNumberOfFaces() == 0)
+// 	{
+// 		BoundingBox.Min = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
+// 		return;
+// 	}
+// 	else
+// 		BoundingBox.Min = BoundingBox.Max = *(ZEVector3*)&Mesh->GetVertex(Mesh->GetFace(0)->vert[0], true);
+// 
+// 	for (ZEInt I = 0; I < Mesh->GetNumberOfFaces(); I++)
+// 	{
+// 		FaceEx* Face = Mesh->GetFace(I);
+// 		for (ZESize N = 0; N < 3; N++)
+// 		{
+// 			Point3 Point;
+// 			Mesh->GetVertex(Face->vert[N], Point, true);
+// 			if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+// 			if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+// 			if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+// 			if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+// 			if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+// 			if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
+// 		}
+// 	}
+}
+
+void ZE3dsMaxUtils::CalculateLocalBoundingBox(ZEAABBox& BoundingBox, const ZEArray<ZEModelFileSkinnedVertex>& Vertices)
+{
+	if (Vertices.GetCount() == 0)
+	{
+		BoundingBox.Min = BoundingBox.Max = ZEVector3(0.0f, 0.0f, 0.0f);
+		return;
+	}
+
+	BoundingBox.Min = BoundingBox.Max = Vertices[0].Position;
+
+	for (ZESize I = 0; I < Vertices.GetCount(); I++)
+	{
+		ZEVector3 Point = Vertices[I].Position;
+		if (Point.x < BoundingBox.Min.x) BoundingBox.Min.x = Point.x;
+		if (Point.y < BoundingBox.Min.y) BoundingBox.Min.y = Point.y;
+		if (Point.z < BoundingBox.Min.z) BoundingBox.Min.z = Point.z;
+		if (Point.x > BoundingBox.Max.x) BoundingBox.Max.x = Point.x;
+		if (Point.y > BoundingBox.Max.y) BoundingBox.Max.y = Point.y;
+		if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
 	}
 }

@@ -196,38 +196,6 @@ bool ZEMDResource::ReadAnimations(const ZEMLReaderNode& AnimationsNode)
 	return true;
 }
 
-bool ZEMDResource::ReadMaterials(const ZEMLReaderNode& MaterialsNode)
-{
-	zeCheckError(!MaterialsNode.IsValid(), false, "Invalid Materials node.");
-	zeCheckError(MaterialsNode.GetName() != "Materials", false, "Invalid Materials node name.");
-
-	ZEArray<ZEHolder<const ZERNStandardMaterial>> Materials;
-	ZESize SubNodeCount = MaterialsNode.GetNodeCount("Material");
-	for (ZESize I = 0; I < SubNodeCount; I++)
-	{
-		ZEMLReaderNode MaterialNode = MaterialsNode.GetNode("Material", I);
-		ZEString MaterialPath = ZEFileInfo(this->GetFileName()).GetParentDirectory() + "/" + MaterialNode.ReadString("FilePath");
-
-		if (!ZEFileInfo(MaterialPath).IsFile())
-			return false;
-
-		ZEHolder<const ZERNStandardMaterial> CurrentMaterial = ZERNStandardMaterial::LoadResourceShared(MaterialPath);
-		Materials.Add(CurrentMaterial);
-	}
-
-	ze_for_each(Mesh, Meshes)
-	{
-		ze_for_each(LOD, Mesh->GetLODs())
-		{
-			if (LOD->MaterialID >= 0 && LOD->MaterialID <= Materials.GetCount())
-			{
-				if (LOD->GetDraws().GetCount() == 1)
-					const_cast<ZEMDResourceDraw*>(&LOD->GetDraws()[0])->SetMaterial(Materials[LOD->MaterialID].Cast<const ZERNMaterial>());
-			}
-		}
-	}
-	return true;
-}
 
 ZETaskResult ZEMDResource::LoadInternal()
 {
@@ -284,14 +252,7 @@ ZETaskResult ZEMDResource::LoadInternal()
 		if (!ReadAnimations(AnimationsNode))
 			return ZE_TR_FAILED;
 	}
-	SetLocalLoadProgress(95);
 
-	ZEMLReaderNode MaterialsNode = ModelNode.GetNode("Materials");
-	if (MaterialsNode.IsValid())
-	{
-		if (!ReadMaterials(MaterialsNode))
-			return ZE_TR_FAILED;
-	}
 	SetLocalLoadProgress(100);
 
 	return ZE_TR_DONE;

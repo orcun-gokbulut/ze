@@ -197,14 +197,14 @@ void ZEMDResourceMesh::RemoveLOD(ZEMDResourceLOD* LOD)
 	zeCheckError(LOD == NULL, ZE_VOID, "Cannot add LOD. LOD is NULL.");
 	zeCheckError(LOD->ResourceMesh != this, ZE_VOID, "Cannot remove LOD. LOD does not belong to this mesh resource.");
 
-	LOD->ResourceMesh = NULL;
-	LODs.Remove(&LOD->Link);
-
 	if (GetResource() != NULL)
 	{
 		for (ZESize I = 0; I < LOD->GetDraws().GetCount(); I++)
 			GetResource()->UnregisterExternalResource(LOD->GetDraws()[I].GetMaterial());
 	}
+
+	LOD->ResourceMesh = NULL;
+	LODs.Remove(&LOD->Link);
 }
 
 void ZEMDResourceMesh::SetGeometry(const ZEArray<ZEVector3>& Vertices)

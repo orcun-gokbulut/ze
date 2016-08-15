@@ -173,7 +173,7 @@ ZEString ZEMDResourcePhysicalShape::GetUserDefinedProperties() const
 bool ZEMDResourcePhysicalShape::Unserialize(const ZEMLReaderNode& ShapeNode)
 {
 	zeCheckError(!ShapeNode.IsValid(), false, "Invalid Shape node.");
-	zeCheckError(ShapeNode.GetName() != "Shape", false, "Invalid Shape node name.");
+	zeCheckError(ShapeNode.GetName() != "PhysicalShape", false, "Invalid Shape node name.");
 
 	SetPosition(ShapeNode.ReadVector3("Position", ZEVector3::Zero));
 	SetRotation(ShapeNode.ReadQuaternion("Rotation", ZEQuaternion::Identity));

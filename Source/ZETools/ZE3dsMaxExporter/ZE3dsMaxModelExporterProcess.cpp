@@ -34,7 +34,7 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #include "ZE3dsMaxModelExporter.h"
-
+#include "ZE3dsMaxDefinitions.h"
 #include "ZEProgressDialog.h"
 #include "ZEResourceConfiguratorWidget.h"
 
@@ -47,61 +47,6 @@
 // #include <IGame/IGameFx.h>
 // #include <io.h>
 // #include "IGame/IGameModifier.h"
-
-enum ZEPhysicalBodyType
-{
-	ZE_PBT_NONE				= 0,
-	ZE_PBT_RIGID			= 1,
-	ZE_PBT_DEFORMABLE		= 2,
-	ZE_PBT_CLOTH			= 3
-};
-
-enum ZEPhysicalShapeType
-{
-	ZE_PBST_BOX				= 0,
-	ZE_PBST_SPHERE			= 1,
-	ZE_PBST_CAPSULE			= 2,
-	ZE_PBST_CYLINDER		= 3,
-	ZE_PBST_CONVEX			= 4
-};
-
-enum ZEModelHelperParentType
-{
-	ZE_MHPT_MODEL			= 0,
-	ZE_MHPT_MESH			= 1,
-	ZE_MHPT_BONE			= 2
-};
-
-ZEPackStruct(
-struct ZEModelFileSkinnedVertex
-{
-	ZEVector3									Position;
-	ZEVector3									Normal;
-	ZEVector3									Tangent;
-	ZEVector3									Binormal;
-	ZEVector2									Texcoord;
-	ZEUInt8										BoneIndices[4];
-	float										BoneWeights[4];
-});
-
-ZEPackStruct(
-struct ZEModelFileVertex
-{
-	ZEVector3									Position;
-	ZEVector3									Normal;
-	ZEVector3									Tangent;
-	ZEVector3									Binormal;
-	ZEVector2									Texcoord;
-});
-
-ZEPackStruct(
-struct ZEModelFileAnimationKey
-{
-	ZEUInt32									ItemId;
-	ZEVector3									Position;
-	ZEQuaternion								Rotation;
-	ZEVector3									Scale;
-});
 
 ZEInt32 ZE3dsMaxModelExporter::GetMeshId(IGameNode* Node)
 {
@@ -937,7 +882,7 @@ bool ZE3dsMaxModelExporter::ProcessBones()
 	return true;
 }
 
-bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNode)
+bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LODNode, bool IsMasterMesh)
 {
 	IGameMesh* Mesh = (IGameMesh*)Node->GetIGameObject();
 
@@ -1130,9 +1075,29 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODVertices(IGameNode* Node, ZEMLNode* LO
 	{
 		LODNode->AddData("Vertices")->SetData(SkinnedVertices.GetCArray(), SkinnedVertices.GetCount() * sizeof(ZEModelFileSkinnedVertex), false);
 		LODNode->AddData("AffectingBoneIds")->SetData(AffectingBoneIds.GetCArray(), AffectingBoneIds.GetCount() * sizeof(ZEUInt32), false);
+		
+		if (IsMasterMesh)
+		{
+			ZEAABBox BoundingBox;
+			ZE3dsMaxUtils::CalculateLocalBoundingBox(BoundingBox, SkinnedVertices);
+			ZEMLNode* BoundingBoxNode = LODNode->GetParent()->GetParent()->GetNode("BoundingBox");
+			BoundingBoxNode->AddProperty("Min")->SetVector3(BoundingBox.Min);
+			BoundingBoxNode->AddProperty("Max")->SetVector3(BoundingBox.Max);
+		}
 	}
 	else
+	{
 		LODNode->AddData("Vertices")->SetData(Vertices.GetCArray(), Vertices.GetCount() * sizeof(ZEModelFileVertex), false);
+
+		if (IsMasterMesh)
+		{
+			ZEAABBox BoundingBox;
+			ZE3dsMaxUtils::CalculateLocalBoundingBox(BoundingBox, Vertices);
+			ZEMLNode* BoundingBoxNode = LODNode->GetParent()->GetParent()->GetNode("BoundingBox");
+			BoundingBoxNode->AddProperty("Min")->SetVector3(BoundingBox.Min);
+			BoundingBoxNode->AddProperty("Max")->SetVector3(BoundingBox.Max);
+		}
+	}
 
 	return !GotError;
 }
@@ -1179,12 +1144,7 @@ bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesN
 	}
 
 	CurrentMeshNode->AddProperty("ParentMesh")->SetInt32(ParentMeshId);
-
-	ZEAABBox BoundingBox;
-	ZE3dsMaxUtils::CalculateLocalBoundingBox(BoundingBox, Mesh);
 	ZEMLNode* BBoxNode = CurrentMeshNode->AddNode("BoundingBox");
-	BBoxNode->AddProperty("Min")->SetVector3(BoundingBox.Min);
-	BBoxNode->AddProperty("Max")->SetVector3(BoundingBox.Max);
 
 	ZE3dsMaxUtils::GetProperty(Mesh,  ZE_BOOL_PROP, ZEString("Mesh_Visibility"), *CurrentMeshNode->AddProperty("IsVisible"));
 
@@ -1227,7 +1187,7 @@ bool ZE3dsMaxModelExporter::ProcessMasterMesh(IGameNode* Node, ZEMLNode* MeshesN
 	LODNode->AddProperty("LODStartDistance")->SetInt32(CurrentMeshLODLevelStartDistance);
 	LODNode->AddProperty("LODEndDistance")->SetInt32(CurrentMeshLODLevelEndDistance);
 
-	if (!ProcessMeshLODVertices(Node, LODNode))
+	if (!ProcessMeshLODVertices(Node, LODNode, true))
 		return false;
 
 	bool IsMeshPhysicalBodyExportEnabled = ((ZEMLProperty*)(ExportOptions->GetProperty("IsMeshPhysicalBodyExportEnabled")))->GetValue().GetBoolean();
@@ -1314,7 +1274,7 @@ bool ZE3dsMaxModelExporter::ProcessMeshLODs(IGameNode* Node, ZEMLNode* MeshesNod
 	LODNode->AddProperty("LODStartDistance")->SetInt32(CurrentMeshLODLevelStartDistance);
 	LODNode->AddProperty("LODEndDistance")->SetInt32(CurrentMeshLODLevelEndDistance);
 
-	if (!ProcessMeshLODVertices(Node, LODNode))
+	if (!ProcessMeshLODVertices(Node, LODNode, false))
 		return false;
 
 	ProcessedMeshes.Append(1, &Node);

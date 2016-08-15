@@ -34,8 +34,8 @@
 //ZE_SOURCE_PROCESSOR_END()
 
 #pragma once
-#ifndef __ZE3DS_MAX_UTILS_H__
-#define __ZE3DS_MAX_UTILS_H__
+
+#include "ZE3dsMaxDefinitions.h"
 
 #include "ZETypes.h"
 #include "ZEMath/ZEAABBox.h"
@@ -43,7 +43,6 @@
 #include "ZEML/ZEMLProperty.h"
 #include "ZEML/ZEMLData.h"
 #include "ZEML/ZEMLRoot.h"
-#include "ZEPacking.h"
 
 #include <Max.h>
 #include <istdplug.h>
@@ -100,7 +99,6 @@ class ZE3dsMaxUtils
 		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, float& Value);
 		static bool				GetProperty(IExportEntity* Object, ZEPropType Type, const ZEString& Property, ZEMLProperty& Value);
 
-		static void				CalculateLocalBoundingBox(ZEAABBox& BoundingBox, IGameMesh* Mesh);
+		static void				CalculateLocalBoundingBox(ZEAABBox& BoundingBox, const ZEArray<ZEModelFileVertex>& Vertices);
+		static void				CalculateLocalBoundingBox(ZEAABBox& BoundingBox, const ZEArray<ZEModelFileSkinnedVertex>& Vertices);
 };
-
-#endif
