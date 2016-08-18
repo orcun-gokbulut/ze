@@ -575,7 +575,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR2;
 
-			const char* Members[2] = {"x", "y"};
+			static const char* Members[2] = {"x", "y"};
 			float Output[2];
 			if (!ReadVectors(File, Output, Members, 2))
 				return false;
@@ -585,7 +585,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR2D;
 
-			const char* Members[2] = {"x", "y"};
+			static const char* Members[2] = {"x", "y"};
 			double Output[2];
 			if (!ReadDoubleVectors(File, Output, Members, 2))
 				return false;
@@ -595,7 +595,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR3;
 
-			const char* Members[3] = {"x", "y", "z"};
+			static const char* Members[3] = {"x", "y", "z"};
 			float Output[3];
 			if (!ReadVectors(File, Output, Members, 3))
 				return false;
@@ -605,7 +605,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR3D;
 
-			const char* Members[3] = {"x", "y", "z"};
+			static const char* Members[3] = {"x", "y", "z"};
 			double Output[3];
 			if (!ReadDoubleVectors(File, Output, Members, 3))
 				return false;
@@ -615,7 +615,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR4;
 
-			const char* Members[4] = {"x", "y", "z", "w"};
+			static const char* Members[4] = {"x", "y", "z", "w"};
 			float Output[4];
 			if (!ReadVectors(File, Output, Members, 4))
 				return false;
@@ -625,7 +625,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR4D;
 
-			const char* Members[4] = {"x", "y", "z", "w"};
+			static const char* Members[4] = {"x", "y", "z", "w"};
 			double Output[4];
 			if (!ReadDoubleVectors(File, Output, Members, 4))
 				return false;
@@ -635,7 +635,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_VECTOR4;
 
-			const char* Members[4] = {"w", "x", "y", "z"};
+			static const char* Members[4] = {"w", "x", "y", "z"};
 			float Output[4];
 			if (!ReadVectors(File, Output, Members, 4))
 				return false;
@@ -645,7 +645,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_MATRIX3X3;
 
-			const char* Members[9] = 
+			static const char* Members[9] = 
 			{
 				"M11", "M21", "M31",
 				"M12", "M22", "M32",
@@ -660,7 +660,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_MATRIX3X3D;
 
-			const char* Members[9] = 
+			static const char* Members[9] = 
 			{
 				"M11", "M21", "M31",
 				"M12", "M22", "M32",
@@ -675,7 +675,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_MATRIX4X4;
 
-			const char* Members[16] = 
+			static const char* Members[16] = 
 			{
 				"M11", "M21", "M31", "M41",
 				"M12", "M22", "M32", "M42",
@@ -691,7 +691,7 @@ bool ZEMLFormatXMLV1::ReadElement(ZEFile* File, ZEMLFormatElement& Element)
 		{
 			Element.ValueType = ZEML_VT_MATRIX4X4D;
 
-			const char* Members[16] = 
+			static const char* Members[16] = 
 			{
 				"M11", "M21", "M31", "M41",
 				"M12", "M22", "M32", "M42",
@@ -1023,9 +1023,9 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 					const ZEMatrix3x3& Matrix = Element.Value.GetMatrix3x3();
 					ZEString Output	= ZEFormat::Format(
 						"<Property Name=\"{0}\" Type=\"Matrix3x3\">"
-						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13>"
-						"<m21>{4}</m21><m22>{5}</m22><m23>{6}</m23>"
-						"<m31>{7}</m31><m32>{8}</m32><m33>{9}</m33>"
+						"<M11>{1}</M11><M12>{2}</M12><M13>{3}</M13>"
+						"<M21>{4}</M21><M22>{5}</M22><M23>{6}</M23>"
+						"<M31>{7}</M31><M32>{8}</M32><M33>{9}</M33>"
 						"</Property>\n", 
 						Element.Name,
 						Matrix.M11, Matrix.M12, Matrix.M13,
@@ -1042,9 +1042,9 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 					const ZEMatrix3x3d& Matrix = Element.Value.GetMatrix3x3d();
 					ZEString Output	= ZEFormat::Format(
 						"<Property Name=\"{0}\" Type=\"Matrix3x3d\">"
-						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13>"
-						"<m21>{4}</m21><m22>{5}</m22><m23>{6}</m23>"
-						"<m31>{7}</m31><m32>{8}</m32><m33>{9}</m33>"
+						"<M11>{1}</M11><M12>{2}</M12><M13>{3}</M13>"
+						"<M21>{4}</M21><M22>{5}</M22><M23>{6}</M23>"
+						"<M31>{7}</M31><M32>{8}</M32><M33>{9}</M33>"
 						"</Property>\n", 
 						Element.Name,
 						Matrix.M11, Matrix.M12, Matrix.M13,
@@ -1060,11 +1060,11 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				{
 					const ZEMatrix4x4& Matrix = Element.Value.GetMatrix4x4();
 					ZEString Output	= ZEFormat::Format(
-						"<Property Name=\"{0}\" Type=\"Matrix3x3\">"
-						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13><m14>{4}</m14>"
-						"<m21>{5}</m21><m22>{6}</m22><m23>{7}</m23><m24>{8}</m24>"
-						"<m31>{9}</m31><m32>{10}</m32><m33>{11}</m33><m34>{12}</m34>"
-						"<m31>{13}</m31><m32>{14}</m32><m33>{15}</m33><m34>{16}</m34>"
+						"<Property Name=\"{0}\" Type=\"Matrix4x4\">"
+						"<M11>{1}</M11><M12>{2}</M12><M13>{3}</M13><M14>{4}</M14>"
+						"<M21>{5}</M21><M22>{6}</M22><M23>{7}</M23><M24>{8}</M24>"
+						"<M31>{9}</M31><M32>{10}</M32><M33>{11}</M33><M34>{12}</M34>"
+						"<M41>{13}</M41><M42>{14}</M42><M43>{15}</M43><M44>{16}</M44>"
 						"</Property>\n", 
 						Element.Name,
 						Matrix.M11, Matrix.M12, Matrix.M13, Matrix.M14,
@@ -1081,11 +1081,11 @@ bool ZEMLFormatXMLV1::WriteElement(ZEFile* File, ZEMLFormatElement& Element)
 				{
 					const ZEMatrix4x4d& Matrix = Element.Value.GetMatrix4x4d();
 					ZEString Output	= ZEFormat::Format(
-						"<Property Name=\"{0}\" Type=\"Matrix3x3\">"
-						"<m11>{1}</m11><m12>{2}</m12><m13>{3}</m13><m14>{4}</m14>"
-						"<m21>{5}</m21><m22>{6}</m22><m23>{7}</m23><m24>{8}</m24>"
-						"<m31>{9}</m31><m32>{10}</m32><m33>{11}</m33><m34>{12}</m34>"
-						"<m31>{13}</m31><m32>{14}</m32><m33>{15}</m33><m34>{16}</m34>"
+						"<Property Name=\"{0}\" Type=\"Matrix4x4d\">"
+						"<M11>{1}</M11><M12>{2}</M12><M13>{3}</M13><M14>{4}</M14>"
+						"<M21>{5}</M21><M22>{6}</M22><M23>{7}</M23><M24>{8}</M24>"
+						"<M31>{9}</M31><M32>{10}</M32><M33>{11}</M33><M34>{12}</M34>"
+						"<M41>{13}</M41><M42>{14}</M42><M43>{15}</M43><M44>{16}</M44>"
 						"</Property>\n", 
 						Element.Name,
 						Matrix.M11, Matrix.M12, Matrix.M13, Matrix.M14,
