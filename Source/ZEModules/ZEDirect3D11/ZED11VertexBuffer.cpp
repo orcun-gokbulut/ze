@@ -70,7 +70,7 @@ bool ZED11VertexBuffer::Initialize(ZESize VertexCount, ZEUInt VertexStride, ZEGR
 	HRESULT Result = GetDevice()->CreateBuffer(&BufferDesc, SubresourceData, &Buffer);
 	if (FAILED(Result))
 	{
-		zeError("Can not create vertex buffer.");
+		zeError("Can not create vertex buffer. ErrorCode: %d.", Result);
 		return false;
 	}
 

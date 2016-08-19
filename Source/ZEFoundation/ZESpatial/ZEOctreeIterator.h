@@ -96,7 +96,7 @@ void ZEOctreeIterator<ZEItemType>::Next()
 	while (Octant <= 7)
 	{
 		ZEOctree<ZEItemType>* ChildOctree = Octree->GetNode(Octant);
-		if (ChildOctree == NULL || !Volume->IntersectionTest(ChildOctree->GetBoundingBox()))
+		if (ChildOctree == NULL || ChildOctree->GetTotalItemCount() == 0 || !Volume->IntersectionTest(ChildOctree->GetBoundingBox()))
 		{
 			Octant++;
 			continue;

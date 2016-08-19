@@ -71,9 +71,7 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		float										EndDistance;
 
 		ZEMDVertexType								VertexType;
-		ZEHolder<const ZEGRVertexBuffer>			VertexBufferBase;
-		ZEHolder<const ZEGRVertexBuffer>			VertexBufferNormals;
-		ZEHolder<const ZEGRVertexBuffer>			VertexBufferSkin;
+		ZEHolder<const ZEGRVertexBuffer>			VertexBuffer;
 
 		ZEMDVertexIndexType							IndexType;
 		ZEHolder<const ZEGRIndexBuffer>				IndexBuffer;
@@ -97,17 +95,8 @@ class ZEModelMeshLOD : public ZEObject, public ZEDestroyable
 		void										SetVertexType(ZEMDVertexType Type);
 		ZEMDVertexType								GetVertexType() const;
 
-		void										SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>			GetVertexBufferBase() const;
-
-		void										SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>			GetVertexBufferNormals() const;
-
-		void										SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>			GetVertexBufferSkin() const;
-
-		void										SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
-		ZEHolder<const ZEGRVertexBuffer>			GetVertexBufferExtra() const;
+		void										SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer);
+		ZEHolder<const ZEGRVertexBuffer>			GetVertexBuffer() const;
 
 		void										SetIndexType(ZEMDVertexIndexType Type);
 		ZEMDVertexIndexType							GetIndexType() const;

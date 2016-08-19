@@ -64,7 +64,7 @@ ZEGRVertexLayout GetPositionVertexLayout()
 	{
 		ZEGRVertexElement ElementArray[] = 
 		{
-			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT3, 0, 0, ZEGR_VU_PER_VERTEX, 0},
+			{ZEGR_VES_POSITION, 0, ZEGR_VET_FLOAT_3, 0, 0, ZEGR_VU_PER_VERTEX, 0},
 		};
 
 		VertexLayout.SetElements(ElementArray, 1);

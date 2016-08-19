@@ -55,6 +55,8 @@ ze_add_source(ZEGRRasterizerState.cpp 		Sources)
 ze_add_source(ZEGRRasterizerState.h 		Sources Headers ZEMC)
 ze_add_source(ZEGRVertexLayout.cpp			Sources)
 ze_add_source(ZEGRVertexLayout.h			Sources Headers ZEMC)
+ze_add_source(ZEGRVertexElementType.cpp		Sources)
+ze_add_source(ZEGRVertexElementType.h		Sources Headers ZEMC)
 
 ze_add_source(ZEGRResource.cpp				Sources)
 ze_add_source(ZEGRResource.h				Sources Headers ZEMC)

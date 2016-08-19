@@ -54,11 +54,11 @@ bool ZEModelMeshLOD::Load(const ZEMDResourceLOD* Resource)
 
 	SetStartDistance(Resource->GetStartDistance());
 	SetEndDistance(Resource->GetEndDistance());
-	SetVertexBufferBase(Resource->GetVertexBufferBase());
-	SetVertexBufferNormals(Resource->GetVertexBufferNormals());
-	SetVertexBufferSkin(Resource->GetVertexBufferSkin());
+	SetVertexType(Resource->GetVertexType());
+	SetVertexBuffer(Resource->GetVertexBuffer());
+	SetIndexType(Resource->GetIndexType());
 	SetIndexBuffer(Resource->GetIndexBuffer());
-
+	
 	ZESize DrawCount = Resource->GetDraws().GetCount();
 	Draws.SetCount(DrawCount);
 
@@ -79,9 +79,7 @@ bool ZEModelMeshLOD::Unload()
 {
 	SetStartDistance(0);
 	SetEndDistance(0);
-	SetVertexBufferBase(NULL);
-	SetVertexBufferNormals(NULL);
-	SetVertexBufferSkin(NULL);
+	SetVertexBuffer(NULL);
 	SetIndexBuffer(NULL);
 
 	return true;
@@ -145,44 +143,14 @@ ZEMDVertexType ZEModelMeshLOD::GetVertexType() const
 	return VertexType;
 }
 
-void ZEModelMeshLOD::SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
+void ZEModelMeshLOD::SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
-	VertexBufferBase = VertexBuffer;
+	this->VertexBuffer = VertexBuffer;
 }
 
-ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferBase() const
+ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBuffer() const
 {
-	return VertexBufferBase;
-}
-
-void ZEModelMeshLOD::SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-	VertexBufferNormals = VertexBufferNormals;
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferNormals() const
-{
-	return VertexBufferNormals;
-}
-
-void ZEModelMeshLOD::SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-	VertexBufferSkin = VertexBufferSkin;
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferSkin() const
-{
-	return VertexBufferSkin;
-}
-
-void ZEModelMeshLOD::SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEModelMeshLOD::GetVertexBufferExtra() const
-{
-	return NULL;
+	return VertexBuffer;
 }
 
 void ZEModelMeshLOD::SetIndexType(ZEMDVertexIndexType Type)

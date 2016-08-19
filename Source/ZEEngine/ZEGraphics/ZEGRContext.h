@@ -129,6 +129,7 @@ class ZEGRContext : public ZEObject
 		virtual void					ClearUnorderedAccesses(ZEUInt Index, ZEUInt Count);
 
 		virtual void					Draw(ZEUInt VertexCount, ZEUInt VertexOffset) = 0;
+		virtual void					DrawIndexed(ZEUInt IndexCount, ZEUInt IndexOffset, ZEUInt VertexOffset) = 0;
 		virtual void					DrawInstanced(ZEUInt VertexCount, ZEUInt VertexOffset, ZEUInt InstanceCount, ZEUInt InstanceOffset) = 0;
 		
 		virtual void					Dispatch(ZEUInt GroupCountX, ZEUInt GroupCountY, ZEUInt GroupCountZ) = 0;

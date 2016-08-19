@@ -358,8 +358,149 @@ static void ConvertMeshBoundingBox(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNod
 	DestinationBoundingBoxNode->WriteVector3("Max", BoundingBox.Max);
 }
 
+static bool GenerateIndices(const ZEArray<ZEMDVertex>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEMDVertex>& IndexedVertices)
+{
+	// GENERATING INDICES
+	ZEArray<ZEInt> VertexDuplicateIndices;
+	VertexDuplicateIndices.SetCount(Vertices.GetCount());
+	VertexDuplicateIndices.Fill(-1);
+
+	Indices.SetCount(Vertices.GetCount());
+
+	ZEUInt IndexedVertexCount = 0;
+	ZEArray<ZEInt> VertexMapping;
+	VertexMapping.SetCount(Vertices.GetCount());
+
+	for (ZEUInt I = 0; I < Vertices.GetCount(); I++)
+	{
+		if (VertexDuplicateIndices[I] != -1)
+		{
+			Indices[I] = VertexDuplicateIndices[I];
+			continue;
+		}
+		else
+		{
+			Indices[I] = IndexedVertexCount;
+			VertexMapping[IndexedVertexCount] = I;
+		}
+
+		for (ZEUInt N = I + 1; N < Vertices.GetCount(); N++)
+		{
+			const ZEMDVertex& VertexA = Vertices[I];
+			const ZEMDVertex& VertexB = Vertices[N];
+
+			if (VertexDuplicateIndices[N] != -1)
+				continue;
+
+			if (VertexA.Position != VertexB.Position || 
+				VertexA.Normal != VertexB.Normal ||
+				VertexA.Tangent != VertexB.Tangent ||
+				VertexA.Binormal != VertexB.Binormal ||
+				VertexA.Texcoords != VertexB.Texcoords)
+			{
+				continue;
+			}
+
+			VertexDuplicateIndices[N] = IndexedVertexCount;
+		}
+
+		IndexedVertexCount++;
+	}
+
+	// GENERATE SKINNED VERTEX BUFFER
+	IndexedVertices.SetCount(IndexedVertexCount);
+	for (ZESize I = 0; I < IndexedVertexCount; I++)
+	{
+		IndexedVertices[I] = Vertices[VertexMapping[I]];
+	}
+
+	return true;
+}
+
+static bool GenerateIndices(const ZEArray<ZEMDVertexSkin>& Vertices, ZEArray<ZEUInt32>& Indices, ZEArray<ZEMDVertexSkin>& IndexedVertices)
+{
+	// GENERATING INDICES
+	ZEArray<ZEInt> VertexDuplicateIndices;
+	VertexDuplicateIndices.SetCount(Vertices.GetCount());
+	VertexDuplicateIndices.Fill(-1);
+
+	Indices.SetCount(Vertices.GetCount());
+
+	ZEUInt IndexedVertexCount = 0;
+	ZEArray<ZEInt> VertexMapping;
+	VertexMapping.SetCount(Vertices.GetCount());
+
+	for (ZEUInt I = 0; I < Vertices.GetCount(); I++)
+	{
+		if (VertexDuplicateIndices[I] != -1)
+		{
+			Indices[I] = VertexDuplicateIndices[I];
+			continue;
+		}
+		else
+		{
+			Indices[I] = IndexedVertexCount;
+			VertexMapping[IndexedVertexCount] = I;
+		}
+
+		for (ZEUInt N = I + 1; N < Vertices.GetCount(); N++)
+		{
+			const ZEMDVertexSkin& VertexA = Vertices[I];
+			const ZEMDVertexSkin& VertexB = Vertices[N];
+
+			if (VertexDuplicateIndices[N] != -1)
+				continue;
+
+			if (VertexA.Position != VertexB.Position || 
+				VertexA.Normal != VertexB.Normal ||
+				VertexA.Tangent != VertexB.Tangent ||
+				VertexA.Binormal != VertexB.Binormal ||
+				VertexA.Texcoords != VertexB.Texcoords)
+			{
+				continue;
+			}
+
+
+			bool SkinFound[4] = {false};
+			for (int J = 0; J < 4; J++)
+			{
+				for (ZESize K = 0; K < 4; K++)
+				{
+					if (SkinFound[K])
+						continue;
+
+					if (VertexA.Indices[J] == VertexB.Indices[K] &&
+						VertexA.Weights[J] == VertexB.Weights[K])
+					{
+						SkinFound[K] = true;
+						break;
+					}		
+				}
+			}
+
+			if (!SkinFound[0] || !SkinFound[1] || !SkinFound[2] || !SkinFound[3])
+				continue;
+
+			VertexDuplicateIndices[N] = IndexedVertexCount;
+		}
+
+		IndexedVertexCount++;
+	}
+
+	// GENERATE SKINNED VERTEX BUFFER
+	IndexedVertices.SetCount(IndexedVertexCount);
+	for (ZESize I = 0; I < IndexedVertexCount; I++)
+	{
+		IndexedVertices[I] = Vertices[VertexMapping[I]];
+	}
+
+	return true;
+}
+
 static void ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* DestinationLODNode)
 {
+	zeLog("Processing LOD: %d.", SourceLODNode->ReadInt32("LODLevel", 0));
+
 	if (SourceLODNode == NULL || DestinationLODNode == NULL)
 		return;
 
@@ -367,39 +508,120 @@ static void ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* Destin
 		return;
 
 	DestinationLODNode->WriteInt32("Level", SourceLODNode->ReadInt32("LODLevel", 0));
-	DestinationLODNode->WriteFloat("StartDistance", SourceLODNode->ReadFloat("LODStartDistance", 0.0f));
-	DestinationLODNode->WriteFloat("EndDistance", SourceLODNode->ReadInt32("LODEndDistance", 100000.0f));
-
+	DestinationLODNode->WriteFloat("StartDistance", (float)SourceLODNode->ReadInt32("LODStartDistance", 0));
+	DestinationLODNode->WriteFloat("EndDistance", (float)SourceLODNode->ReadInt32("LODEndDistance", 100000));
 	bool IsSourceLODSkinned = SourceLODNode->IsPropertyExists("AffectingBoneIds");
-	DestinationLODNode->WriteInt32("VertexType", SourceLODNode->ReadInt32("VertexType", (IsSourceLODSkinned?ZEMD_VT_SKINNED:ZEMD_VT_NORMAL)));
 
-	//CHANGE INDEX TYPE
-	DestinationLODNode->WriteInt32("IndexType", SourceLODNode->ReadInt32("IndexType", ZEMD_VIT_NONE)); 
+	ZESize VertexCount;
+	ZESize VertexBufferSize;
+	ZEArray<ZEMDVertex>	Vertices;
+	ZEArray<ZEMDVertexSkin>	VerticesSkin;
 
-
-	ZESize VertexCount = 0;
-	if (IsSourceLODSkinned)
+	if (!IsSourceLODSkinned)
 	{
-		ZEArray<ZEMDVertexSkin>	VerticesSkin;
-		VerticesSkin.SetCount(SourceLODNode->ReadDataSize("Vertices") / sizeof(ZEMDVertexSkin));
-		if (!SourceLODNode->ReadDataItems("Vertices", VerticesSkin.GetCArray(), sizeof(ZEMDVertexSkin), VerticesSkin.GetCount()))
-			return;
-
-		DestinationLODNode->WriteData("Vertices", VerticesSkin.GetCArray(), VerticesSkin.GetCount() * sizeof(ZEMDVertexSkin));
-		VertexCount = VerticesSkin.GetCount();
-	}
-	else
-	{
-		ZEArray<ZEMDVertex>	Vertices;
 		Vertices.SetCount(SourceLODNode->ReadDataSize("Vertices") / sizeof(ZEMDVertex));
 		if (!SourceLODNode->ReadDataItems("Vertices", Vertices.GetCArray(), sizeof(ZEMDVertex), Vertices.GetCount()))
 			return;
 
-		DestinationLODNode->WriteData("Vertices", Vertices.GetCArray(), Vertices.GetCount() * sizeof(ZEMDVertex));
 		VertexCount = Vertices.GetCount();
+		VertexBufferSize = Vertices.GetCount() * sizeof(ZEMDVertex);
+	}
+	else
+	{
+		VerticesSkin.SetCount(SourceLODNode->ReadDataSize("Vertices") / sizeof(ZEMDVertexSkin));
+		if (!SourceLODNode->ReadDataItems("Vertices", VerticesSkin.GetCArray(), sizeof(ZEMDVertexSkin), VerticesSkin.GetCount()))
+			return;
+
+		VertexCount = VerticesSkin.GetCount();
+		VertexBufferSize = VerticesSkin.GetCount() * sizeof(ZEMDVertexSkin);
 	}
 
-	//INDICES ENTRIES HERE
+	bool IsIndexed = false;
+	ZEArray<ZEUInt32> Indices;
+	ZEArray<ZEMDVertex>	IndexedVertices;
+	ZEArray<ZEMDVertexSkin>	IndexedVerticesSkin;
+	ZESize IndexedVertexCount;
+	ZESize IndexedVertexBufferSize;
+	if (VertexCount > 600)
+	{
+		zeLog("Generating Indexes.");
+
+		if (!IsSourceLODSkinned)
+		{
+			GenerateIndices(Vertices, Indices, IndexedVertices);
+			IndexedVertexCount = IndexedVertices.GetCount();
+			IndexedVertexBufferSize = Vertices.GetCount() * (IndexedVertexCount > 65536 ? sizeof(ZEUInt32) : sizeof(ZEUInt16)) + IndexedVertexCount *  sizeof(ZEMDVertex);
+		}
+		else
+		{
+			GenerateIndices(VerticesSkin, Indices, IndexedVerticesSkin);
+			IndexedVertexCount = IndexedVerticesSkin.GetCount();
+			IndexedVertexBufferSize = VerticesSkin.GetCount() * (IndexedVertexCount > 65536 ? sizeof(ZEUInt32) : sizeof(ZEUInt16)) + IndexedVertexCount *  sizeof(ZEMDVertexSkin);
+		}
+
+		float GainRatio = (float)IndexedVertexBufferSize / (float)VertexBufferSize;
+		if (GainRatio <= 0.85f)
+		{
+			zeLog("Indexing Accepted. Gain ratio: %f (Limit: 0.85), Vertex Count: %d, Indexed Vertex Count: %d.", GainRatio, VertexCount, IndexedVertexCount);
+			IsIndexed = true;
+		}
+		else
+		{		
+			zeLog("Indexing Rejected. Gain ratio: %f (Limit: 0.85), Vertex Count: %d, Indexed Vertex Count: %d.", GainRatio, VertexCount, IndexedVertexCount);
+			IsIndexed = false;
+		}
+	}
+	else
+	{
+		zeLog("Indexing Rejected. Vertex count is low.");
+	}
+	
+	if (IsIndexed)
+	{
+		if (IndexedVertexCount > 65536)
+		{
+			// 32 Bit Indices
+			DestinationLODNode->WriteUInt8("IndexType", ZEMD_VIT_32BIT);
+			DestinationLODNode->WriteData("Indices", Indices.GetConstCArray(), Indices.GetCount() * sizeof(ZEUInt32));
+		}
+		else
+		{
+			// 16 Bit Indices
+			ZEArray<ZEUInt16> IndexList16;
+			IndexList16.SetCount(Indices.GetCount());
+			for (ZESize I = 0; I < Indices.GetCount(); I++)
+				IndexList16[I] = (ZEUInt16)Indices[I];
+
+			DestinationLODNode->WriteUInt8("IndexType", ZEMD_VIT_16BIT);
+			DestinationLODNode->WriteData("Indices", IndexList16.GetConstCArray(), IndexList16.GetCount() * sizeof(ZEUInt16));
+		}
+
+		if (!IsSourceLODSkinned)
+		{
+			DestinationLODNode->WriteUInt8("VertexType", ZEMD_VT_NORMAL);
+			DestinationLODNode->WriteData("Vertices", IndexedVertices.GetCArray(), IndexedVertices.GetCount() * sizeof(ZEMDVertex));
+		}
+		else
+		{
+			DestinationLODNode->WriteUInt8("VertexType", ZEMD_VT_SKINNED);
+			DestinationLODNode->WriteData("Vertices", IndexedVerticesSkin.GetCArray(), IndexedVerticesSkin.GetCount() * sizeof(ZEMDVertexSkin));
+		}
+	}
+	else
+	{
+		DestinationLODNode->WriteUInt8("IndexType", ZEMD_VIT_NONE);
+
+		if (!IsSourceLODSkinned)
+		{
+			DestinationLODNode->WriteUInt8("VertexType", ZEMD_VT_NORMAL);
+			DestinationLODNode->WriteData("Vertices", Vertices.GetCArray(), Vertices.GetCount() * sizeof(ZEMDVertex));
+		}
+		else
+		{
+			DestinationLODNode->WriteUInt8("VertexType", ZEMD_VT_SKINNED);
+			DestinationLODNode->WriteData("Vertices", VerticesSkin.GetCArray(), VerticesSkin.GetCount() * sizeof(ZEMDVertexSkin));
+		}
+	}
 
 	if (SourceLODNode->IsSubNodeExists("Draws"))
 		return;
@@ -409,7 +631,7 @@ static void ConvertMeshLOD(ZEMLReaderNode* SourceLODNode, ZEMLWriterNode* Destin
 	DrawsNode.OpenNode("Draw", DrawNode);
 
 	DrawNode.WriteUInt32("Offset", 0);
-	DrawNode.WriteUInt32("Count", VertexCount);
+	DrawNode.WriteUInt32("Count", (ZEUInt32)VertexCount);
 
 	ZEInt32 MaterialID = SourceLODNode->ReadInt32("MaterialId");
 
@@ -431,6 +653,8 @@ static void ConvertMesh(ZEMLReaderNode* SourceMeshNode, ZEMLWriterNode* Destinat
 	if (!SourceMeshNode->IsValid())
 		return;
 
+	zeLog("Processing Mesh: \"%s\".", SourceMeshNode->ReadString("Name").ToCString());
+	
 	DestinationMeshNode->WriteString("Name", SourceMeshNode->ReadString("Name"));
 	DestinationMeshNode->WriteInt32("ParentMesh", SourceMeshNode->ReadInt32("ParentMesh", -1));
 
@@ -488,6 +712,8 @@ static void ConvertHelper(ZEMLReaderNode* SourceHelperNode, ZEMLWriterNode* Dest
 	if (!SourceHelperNode->IsValid())
 		return;
 
+	zeLog("Processing Helper: \"%s\".", SourceHelperNode->ReadString("Name").ToCString());
+
 	DestinationHelperNode->WriteString("Name", SourceHelperNode->ReadString("Name"));
 	DestinationHelperNode->WriteInt32("OwnerType", SourceHelperNode->ReadInt32("OwnerType"));
 	DestinationHelperNode->WriteInt32("OwnerId", SourceHelperNode->ReadInt32("OwnerId", -1));
@@ -506,6 +732,8 @@ static void ConvertAnimation(ZEMLReaderNode* SourceAnimationNode, ZEMLWriterNode
 
 	if (!SourceAnimationNode->IsValid())
 		return;
+
+	zeLog("Processing Animation: \"%s\".", SourceAnimationNode->ReadString("Name").ToCString());
 
 	DestinationAnimationNode->WriteString("Name", SourceAnimationNode->ReadString("Name"));
 	DestinationAnimationNode->WriteFloat("FramesPerSecond", SourceAnimationNode->ReadFloat("FramesPerSecond", 30.0f));
@@ -604,6 +832,8 @@ static void ConvertModel(ZEMLReaderNode* Unserializer, ZEMLWriterNode* Serialize
 
 bool ZEModelConverter::Convert(const char* Source, const char* Destination)
 {
+	zeLog("Converting ZEModel file. Source File: \"%s\", Destination File: \"%s\".", Source, Destination);
+
 	ZEFile SourceFile;
 	if (!SourceFile.Open(Source, ZE_FOM_READ, ZE_FCM_NONE))
 	{
@@ -622,7 +852,7 @@ bool ZEModelConverter::Convert(const char* Source, const char* Destination)
 		return false;
 	}
 
-	printf(" Checking source version.\n");
+	zeLog("Checking source version.\n");
 
 	ZEUInt8 SourceFileMajorVersion = SourceModelNode.ReadUInt8("MajorVersion");
 	ZEUInt8 SourceFileMinorVersion = SourceModelNode.ReadUInt8("MinorVersion");
@@ -631,7 +861,7 @@ bool ZEModelConverter::Convert(const char* Source, const char* Destination)
 	{
 		if (SourceFileMajorVersion == 2 && SourceFileMinorVersion == 0)
 		{
-			printf("Material file is already converted.\n");
+			zeLog("Material file is already converted.\n");
 			return true;
 		}
 
@@ -653,11 +883,13 @@ bool ZEModelConverter::Convert(const char* Source, const char* Destination)
 	Serializer.OpenRootNode("ZEModel", DestinationModelNode);
 
 	ConvertModel(&SourceModelNode, &DestinationModelNode);
-	
+
 	DestinationModelNode.CloseNode();
 	Serializer.Close();
 
 	Unserializer.Close();
+
+	zeLog("Convert completed.");
 
 	return true;
 }

@@ -199,16 +199,16 @@
     </Expand>
   </Type>
   <Type Name="ZEAABBox">
-    <DisplayString>[Min:&lt;x:{Min.x}, y:{Min.y}, z:{Min.z}&gt;, Max:&lt;x:{Min.x}, y:{Min.y}, z:{Min.z}&gt;]</DisplayString>
+    <DisplayString>[Min:&lt;x:{Min.x}, y:{Min.y}, z:{Min.z}&gt;, Max:&lt;x:{Max.x}, y:{Max.y}, z:{Max.z}&gt;]</DisplayString>
     <Expand>
       <Item Name="Min">Min</Item>
       <Item Name="Max">Max</Item>
       <Synthetic  Name="Center">
-        <DisplayString>&lt;x:{Min.x + (Max.x - Min.x)}, y:{Min.y + (Max.y - Min.y)}, z:{Min.z + (Max.z - Min.z)}&gt;</DisplayString>
+        <DisplayString>&lt;x:{(Min.x + Max.x) / 2.0f}, y:{(Min.y + Max.y) / 2.0f}, z:{(Min.z + Max.z) / 2.0f}&gt;</DisplayString>
         <Expand>
-          <Item Name="x">Min.x + (Max.x - Min.x)</Item>
-          <Item Name="y">Min.y + (Max.y - Min.y)</Item>
-          <Item Name="z">Min.z + (Max.z - Min.z)</Item>
+          <Item Name="x">(Min.x + Max.x) / 2.0f</Item>
+          <Item Name="y">(Min.y + Max.y) / 2.0f</Item>
+          <Item Name="z">(Min.z + Max.z) / 2.0f</Item>
         </Expand>
       </Synthetic >
       <Synthetic  Name="Size">

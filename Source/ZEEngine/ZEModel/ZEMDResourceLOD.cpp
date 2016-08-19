@@ -180,54 +180,14 @@ const ZEArray<ZEUInt32>& ZEMDResourceLOD::GetIndices32() const
 	return Indices32;
 }
 
-void ZEMDResourceLOD::SetAffectingBoneIds(const ZEArray<ZEUInt16>& BoneIds)
+void ZEMDResourceLOD::SetVertexBuffer(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
 {
-	AffectingBoneIds = BoneIds;
+	this->VertexBuffer = VertexBuffer;
 }
 
-const ZEArray<ZEUInt16>& ZEMDResourceLOD::GetAffectingBoneIds() const
+ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBuffer() const
 {
-	return AffectingBoneIds;
-}
-
-void ZEMDResourceLOD::SetVertexBufferBase(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-	this->VertexBufferBase = VertexBuffer;
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferBase() const
-{
-	return VertexBufferBase;
-}
-
-void ZEMDResourceLOD::SetVertexBufferNormals(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-	this->VertexBufferNormals = VertexBuffer;
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferNormals() const
-{
-	return VertexBufferNormals;
-}
-
-void ZEMDResourceLOD::SetVertexBufferSkin(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-	this->VertexBufferSkin = VertexBuffer;
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferSkin() const
-{
-	return VertexBufferSkin;
-}
-
-void ZEMDResourceLOD::SetVertexBufferExtra(ZEHolder<const ZEGRVertexBuffer> VertexBuffer)
-{
-	this->VertexBufferExtra = VertexBuffer;
-}
-
-ZEHolder<const ZEGRVertexBuffer> ZEMDResourceLOD::GetVertexBufferExtra() const
-{
-	return VertexBufferExtra;
+	return VertexBuffer;
 }
 
 void ZEMDResourceLOD::SetIndexBuffer(ZEHolder<const ZEGRIndexBuffer> IndexBuffer)
@@ -259,10 +219,16 @@ void ZEMDResourceLOD::RemoveDraw(ZESize Index)
 
 void ZEMDResourceLOD::GenerateBuffers()
 {
+	if (GetIndexType() == ZEMD_VIT_16BIT)
+		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices.GetCount(), ZEGR_IBF_INDEX16, ZEGR_RU_GPU_READ_ONLY, Indices.GetConstCArray()).GetPointer();
+	else if (GetIndexType() == ZEMD_VIT_32BIT)
+		IndexBuffer = ZEGRIndexBuffer::CreateResource((ZEUInt)Indices32.GetCount(), ZEGR_IBF_INDEX32, ZEGR_RU_GPU_READ_ONLY, Indices.GetConstCArray()).GetPointer();
+
 	if (GetVertexType() == ZEMD_VT_NORMAL)
-		VertexBufferBase = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray()).GetPointer();
-	else
-		VertexBufferBase = ZEGRVertexBuffer::CreateResource(VerticesSkin.GetCount(), sizeof(ZEMDVertexSkin), ZEGR_RU_GPU_READ_ONLY, VerticesSkin.GetCArray()).GetPointer();
+		VertexBuffer = ZEGRVertexBuffer::CreateResource(Vertices.GetCount(), sizeof(ZEMDVertex), ZEGR_RU_GPU_READ_ONLY, Vertices.GetCArray()).GetPointer();
+	else if (GetVertexType() == ZEMD_VT_SKINNED)
+		VertexBuffer = ZEGRVertexBuffer::CreateResource(VerticesSkin.GetCount(), sizeof(ZEMDVertexSkin), ZEGR_RU_GPU_READ_ONLY, VerticesSkin.GetCArray()).GetPointer();
+
 }
 
 bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
@@ -273,19 +239,16 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 	Vertices.Clear();
 	VerticesSkin.Clear();
 	Indices.Clear();
-	AffectingBoneIds.Clear();
+	Indices32.Clear();
 
 	IndexBuffer = NULL;
-	VertexBufferBase = NULL;
-	VertexBufferNormals = NULL;
-	VertexBufferSkin = NULL;
-	VertexBufferExtra = NULL;
+	VertexBuffer = NULL;
 
 	SetLevel(LODNode.ReadInt32("Level", LODNode.ReadInt32("LODLevel", 0)));
 	SetStartDistance(LODNode.ReadFloat("StartDistance", (float)LODNode.ReadInt32("LODStartDistance", GetLevel() * 30)));
 	SetEndDistance(LODNode.ReadFloat("EndDistance", (float)LODNode.ReadInt32("LODEndDistance", 100000)));
-	SetVertexType((ZEMDVertexType)LODNode.ReadInt32("VertexType", ZEMD_VT_NORMAL));
-	SetIndexType((ZEMDVertexIndexType)LODNode.ReadInt32("IndexType", ZEMD_VIT_NONE));
+	SetVertexType((ZEMDVertexType)LODNode.ReadUInt8("VertexType", ZEMD_VT_NORMAL));
+	SetIndexType((ZEMDVertexIndexType)LODNode.ReadUInt8("IndexType", ZEMD_VIT_NONE));
 
 	if (GetVertexType() == ZEMD_VT_NORMAL)
 	{
@@ -299,11 +262,6 @@ bool ZEMDResourceLOD::Unserialize(const ZEMLReaderNode& LODNode)
 		VerticesSkin.SetCount(LODNode.ReadDataSize("Vertices") / sizeof(ZEMDVertexSkin));
 		if (!LODNode.ReadDataItems("Vertices", VerticesSkin.GetCArray(), sizeof(ZEMDVertexSkin), VerticesSkin.GetCount()))
 			return false;
-
-		AffectingBoneIds.SetCount(LODNode.ReadDataSize("AffectingBoneIds") / sizeof(ZEUInt32));
-		if (!LODNode.ReadDataItems("AffectingBoneIds", AffectingBoneIds.GetCArray(), sizeof(ZEUInt32), AffectingBoneIds.GetCount()))
-			return false;
-
 	}
 
 	if (GetIndexType() == ZEMD_VIT_16BIT)

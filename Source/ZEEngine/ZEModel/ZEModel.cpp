@@ -64,7 +64,7 @@ void ZEModel::CalculateBoundingBox() const
 		{
 			ze_for_each(LOD, Mesh->GetLODs())
 			{
-				if (!LOD->GetVertexType() != ZEMD_VT_SKINNED)
+				if (LOD->GetVertexType() != ZEMD_VT_SKINNED)
 				{
 					const ZEAABBox& CurrentBoundingBox = Mesh->GetModelBoundingBox();
 
@@ -80,7 +80,6 @@ void ZEModel::CalculateBoundingBox() const
 						if (Point.z > BoundingBox.Max.z) BoundingBox.Max.z = Point.z;
 					}
 				}
-
 			}
 		}
 

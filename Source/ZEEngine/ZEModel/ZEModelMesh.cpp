@@ -818,6 +818,9 @@ bool ZEModelMesh::PreRender(const ZERNPreRenderParameters* Parameters)
 	if (ClosestBoundingBoxEdgeDistanceSquare > (CurrentLOD->GetEndDistance() * CurrentLOD->GetEndDistance()))
 		return false;
 
+	if (CurrentLOD->GetVertexType() == ZEMD_VT_SKINNED)
+		GetModel()->UpdateConstantBufferBoneTransforms();
+
 	ze_for_each(Draw, CurrentLOD->GetDraws())
 	{
 		Draw->RenderCommand.Priority = 0;

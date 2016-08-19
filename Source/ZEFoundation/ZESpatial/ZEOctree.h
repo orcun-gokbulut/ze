@@ -56,6 +56,11 @@ class ZEOctree
 		ZEArray<ZEItemType>						Items;
 		ZEOctree*								Nodes[8];
 		ZEAABBox								BoundingBox;
+		ZESize									TotalNodeCount;
+		ZESize									TotalItemCount;
+
+		void									UpdateNodeCount(ZESSize Delta);
+		void									UpdateItemCount(ZESSize Delta);
 
 		void									Expand();
 		void									Shrink();
@@ -73,6 +78,9 @@ class ZEOctree
 		void									SetMaxDepth(ZEUInt Depth);
 		ZEUInt									GetMaxDepth() const;
 
+		ZESize									GetTotalNodeCount() const;
+		ZESize									GetTotalItemCount() const;
+
 		ZEOctree*								GetNode(ZESize Octant);
 		const ZEOctree*							GetNode(ZESize Octant) const;
 
@@ -85,11 +93,8 @@ class ZEOctree
 		ZEInt									FindOctant(const ZEVector3& Point) const;
 		ZEInt									FindOctant(const ZEAABBox& BoundingBox) const;
 
-		ZESize									GetItemCount() const;	
 		const ZEArray<ZEItemType>&				GetItems();
 		const ZEArray<const ZEItemType>&		GetItems() const;
-		ZEItemType&								GetItem(ZESize Index);
-		const ZEItemType&						GetItem(ZESize Index) const;
 
 		ZEOctree<ZEItemType>*					AddItem(const ZEItemType& Item, const ZEVector3& Point);
 		ZEOctree<ZEItemType>*					AddItem(const ZEItemType& Item, const ZEAABBox& Volume);
@@ -99,6 +104,8 @@ class ZEOctree
 		bool									RemoveItem(const ZEItemType& Item, const ZEVector3& Point);
 		bool									RemoveItem(const ZEItemType& Item, const ZEAABBox& Volume);
 
+		void									Check();
+
 		void									Clear();
 
 		ZEOctreeIterator<ZEItemType>			Traverse(const ZEViewVolume* Volume);
@@ -107,9 +114,30 @@ class ZEOctree
 												~ZEOctree();
 };
 
-
 // IMPLEMENTATION
 //////////////////////////////////////////////////////////////////////////////////////
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::UpdateNodeCount(ZESSize Delta)
+{
+	ZEOctree<ZEItemType>* Current = this;
+	while(Current != NULL)
+	{
+		Current->TotalNodeCount += Delta;
+		Current = Current->Parent;
+	}
+}
+
+template<typename ZEItemType>
+void ZEOctree<ZEItemType>::UpdateItemCount(ZESSize Delta)
+{
+	ZEOctree<ZEItemType>* Current = this;
+	while(Current != NULL)
+	{
+		Current->TotalItemCount += Delta;
+		Current = Current->Parent;
+	}
+}
 
 template<typename ZEItemType>
 ZEInt ZEOctree<ZEItemType>::FindOctant(const ZEVector3& Point) const
@@ -181,6 +209,7 @@ void ZEOctree<ZEItemType>::Expand()
 		Temp->Parent = Nodes[I];
 		Temp->ParentOctant = (~I) & 0x07;
 		Nodes[I]->Nodes[Temp->ParentOctant] = Temp;
+		Nodes[I]->TotalNodeCount = 1;
 	}
 
 	// Uplift
@@ -208,6 +237,7 @@ void ZEOctree<ZEItemType>::Shrink()
 		ParentPointer->Nodes[ParentOctant] = NULL;
 		delete this;
 
+		ParentPointer->UpdateNodeCount(-1);
 		ParentPointer->Shrink();
 	}
 }
@@ -258,6 +288,8 @@ void ZEOctree<ZEItemType>::CreateChildNode(ZEInt Octant)
 		Nodes[Octant]->BoundingBox.Min.z = BoundingBox.Min.z;
 		Nodes[Octant]->BoundingBox.Max.z = Center.z;
 	}
+
+	UpdateNodeCount(1);
 }
 
 template<typename ZEItemType>
@@ -287,7 +319,7 @@ template<typename ZEItemType>
 template<typename ZEItemType>
 void ZEOctree<ZEItemType>::SetBoundingBox(const ZEAABBox& BoundingBox)
 {
-	zeCheckError(Parent != NULL, ZE_VOID, "You can only change bounding box of a root octree.");
+	zeCheckError(Parent != NULL || TotalItemCount != 0 || TotalNodeCount != NULL, ZE_VOID, "You can only change bounding box of an empty root octree.");
 	this->BoundingBox = BoundingBox;
 }
 
@@ -295,6 +327,18 @@ template<typename ZEItemType>
 const ZEAABBox& ZEOctree<ZEItemType>::GetBoundingBox()  const
 {
 	return BoundingBox;
+}
+
+template<typename ZEItemType>
+ZESize ZEOctree<ZEItemType>::GetTotalNodeCount() const
+{
+	return TotalNodeCount;
+}
+
+template<typename ZEItemType>
+ZESize ZEOctree<ZEItemType>::GetTotalItemCount() const
+{
+	return TotalItemCount;
 }
 
 template<typename ZEItemType>
@@ -396,25 +440,6 @@ ZEUInt ZEOctree<ZEItemType>::GetMaxDepth()  const
 }
 
 template<typename ZEItemType>
-ZESize ZEOctree<ZEItemType>::GetItemCount()  const
-{
-	return Items.GetCount();
-}
-
-template<typename ZEItemType>
-const ZEItemType& ZEOctree<ZEItemType>::GetItem(ZESize Index) const
-{
-	return Items[Index];
-}
-
-template<typename ZEItemType>
-ZEItemType& ZEOctree<ZEItemType>::GetItem(ZESize Index)
-{
-	zeBreak(Items[Index] == (void*)0xDDDDDDDDDDDDDDDD);
-	return Items[Index];
-}
-
-template<typename ZEItemType>
 const ZEArray<ZEItemType>& ZEOctree<ZEItemType>::GetItems() 
 {
 	return Items;
@@ -433,6 +458,7 @@ ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, cons
 	if (ItemOctant == ZE_OO_MULTIPLE)
 	{
 		Items.Add(Item);
+		UpdateItemCount(1);
 		return this;
 	}
 	else if (ItemOctant == ZE_OO_OUTSIDE)
@@ -452,6 +478,7 @@ ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, cons
 		if (MaxDepth == 0)
 		{
 			Items.Add(Item);
+			UpdateItemCount(1);
 			return this;
 		}
 		else
@@ -469,6 +496,7 @@ ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, cons
 	if (ItemOctant == ZE_OO_MULTIPLE)
 	{
 		Items.Add(Item);
+		UpdateItemCount(1);
 		return this;
 	}
 	else if (ItemOctant == ZE_OO_OUTSIDE)
@@ -488,6 +516,7 @@ ZEOctree<ZEItemType>* ZEOctree<ZEItemType>::AddItem(const ZEItemType& Item, cons
 		if (MaxDepth == 0)
 		{
 			Items.Add(Item);
+			UpdateItemCount(1);
 			return this;
 		}
 		else
@@ -502,16 +531,18 @@ template<typename ZEItemType>
 void ZEOctree<ZEItemType>::RemoveItem(ZESize Index)
 {
 	Items.Remove(Index);
+	UpdateItemCount(-1);	
 	Shrink();
 }
 
 template<typename ZEItemType>
 bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item)
 {
-	ZEInt Index = Items.FindIndex(Item);
+	ZESSize Index = Items.FindIndex(Item);
 	if (Index != -1)
 	{
 		Items.Remove(Index);
+		UpdateItemCount(-1);
 		Shrink();
 		return true;
 	}
@@ -519,12 +550,11 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item)
 	{
 		for (ZESize I = 0; I < 8; I++)
 		{
-			if (Nodes[I] != NULL)
-			{
-				bool Result = Nodes[I]->RemoveItem(Item);
-				if (Result)
-					return true;
-			}
+			if (Nodes[I] == NULL)
+				continue;
+
+			if (Nodes[I]->RemoveItem(Item))
+				return true;
 		}
 
 		return false;
@@ -545,6 +575,7 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEVector3& P
 		if (Index != -1)
 		{
 			Items.Remove(Index);
+			UpdateItemCount(-1);
 			Shrink();
 			return true;
 		}
@@ -552,7 +583,9 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEVector3& P
 	else
 	{
 		if (Nodes[ItemOctant] != NULL)
-			return Nodes[ItemOctant]->RemoveItem(Item, Point);		
+			return Nodes[ItemOctant]->RemoveItem(Item, Point);
+		
+		return false;
 	}
 }
 
@@ -566,10 +599,11 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Vo
 	}
 	else if (ItemOctant == ZE_OO_MULTIPLE)
 	{
-		ZEInt Index = Items.FindIndex(Item);
+		ZESSize Index = Items.FindIndex(Item);
 		if (Index != -1)
 		{
 			Items.Remove(Index);
+			UpdateItemCount(-1);
 			Shrink();
 			return true;
 		}
@@ -579,18 +613,24 @@ bool ZEOctree<ZEItemType>::RemoveItem(const ZEItemType& Item, const ZEAABBox& Vo
 	else
 	{
 		if (Nodes[ItemOctant] != NULL)
-			return Nodes[ItemOctant]->RemoveItem(Item, Volume);		
+			return Nodes[ItemOctant]->RemoveItem(Item, Volume);
+
+		return false;
 	}
 }
 
 template<typename ZEItemType>
 void ZEOctree<ZEItemType>::Clear()
 {
+	UpdateNodeCount(-TotalNodeCount);
+	UpdateItemCount(-TotalItemCount);
+
 	Items.Clear();
 	for (ZEInt I = 0; I < 8; I++)
 	{
 		if (Nodes[I] != NULL)
 		{
+			Nodes[I]->Parent = NULL;
 			delete Nodes[I];
 			Nodes[I] = NULL;
 		}
@@ -610,19 +650,17 @@ ZEOctree<ZEItemType>::ZEOctree()
 	for (ZEInt I = 0; I < 8; I++)
 		Nodes[I] = NULL;
 
+	TotalItemCount = 0;
+	TotalNodeCount = 0;
 	Depth = 0;
 	MaxDepth = 1;
 	ParentOctant = ZE_OO_MULTIPLE;
 	BoundingBox.Min = -2.0f * ZEVector3::One;
-	BoundingBox.Max =  2.0f * ZEVector3::One;
+	BoundingBox.Min =  2.0f * ZEVector3::One;
 }
 
 template<typename ZEItemType>
 ZEOctree<ZEItemType>::~ZEOctree()
 {
-	for (ZEInt I = 0; I < 8; I++)
-	{
-		if (Nodes[I] != NULL)
-			delete Nodes[I];
-	}
+	Clear();
 }

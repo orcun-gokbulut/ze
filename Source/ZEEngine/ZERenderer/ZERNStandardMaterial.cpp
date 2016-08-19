@@ -288,13 +288,12 @@ ZETaskResult ZERNStandardMaterial::LoadInternal()
 {
 	if (!GetFileName().IsEmpty())
 	{
-		ZEFile File;
-		if(!File.Open(GetFileName(), ZE_FOM_READ, ZE_FCM_NONE))
-			zeError("Can not open given file. File : %s", GetFileName().ToCString());
-
 		ZEMLReader MaterialReader;
-		if (!MaterialReader.Open(&File))
+		if (!MaterialReader.Open(GetFileName()))
+		{
+			zeError("Cannot load ZERNStandardMaterial. Cannot open file. File Name: %s", GetFileName().ToCString());
 			return ZE_TR_FAILED;
+		}
 
 		ZEMLReaderNode MaterialNode = MaterialReader.GetRootNode();
 		if (!Unserialize(&MaterialNode))

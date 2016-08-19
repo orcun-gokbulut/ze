@@ -88,7 +88,7 @@ void ZEInteriorRoom::RayCastOctreePoligons(const ZEOctree<ZESize>& Octree, ZERay
 {
 	for (ZESize I = 0; I < Octree.GetItems().GetCount(); I++)
 	{
-		ZESize CurrentPoligonIndex = Octree.GetItem(I);
+		ZESize CurrentPoligonIndex = Octree.GetItems()[0];
 		const ZEInteriorPolygon* Polygon = &Resource->Polygons[CurrentPoligonIndex];
 
 		Helper.RayCastPolygon(Polygon->Vertices[0].Position, Polygon->Vertices[1].Position, Polygon->Vertices[2].Position);
